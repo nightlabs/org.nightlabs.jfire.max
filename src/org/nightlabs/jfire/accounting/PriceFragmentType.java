@@ -1,0 +1,167 @@
+/*
+ * Created on 30.10.2004
+ */
+package org.nightlabs.jfire.accounting;
+
+import java.io.Serializable;
+
+import javax.jdo.JDOObjectNotFoundException;
+import javax.jdo.PersistenceManager;
+
+import org.nightlabs.jfire.accounting.id.PriceFragmentTypeID;
+import org.nightlabs.jfire.organisation.Organisation;
+
+/**
+ * A PriceFragmentType defines a part out of which a <tt>Price</tt> may consist.
+ * Normally, these are taxes. Examples are: vat-de-16, vat-de-7 or vat-ch-6_5
+ * <br/><br/>
+ * Not all <tt>Price</tt> s contain <tt>PriceFragment</tt> s for all <tt>PriceFragmentType</tt> s.
+ * <tt>PriceFragmentType</tt> s are defined globally, but that does not mean that
+ * every organisation knows all of them.
+ *
+ * @author Marco Schulze - marco at nightlabs dot de
+ * @author Alexander Bieber <alex[AT]nightlabs[DOT]de>
+ *
+ * @jdo.persistence-capable
+ *		identity-type="application"
+ *		objectid-class="org.nightlabs.jfire.accounting.id.PriceFragmentTypeID"
+ *		detachable="true"
+ *		table="JFireTrade_PriceFragmentType"
+ *
+ * @jdo.create-objectid-class
+ *		field-order="organisationID, priceFragmentTypeID"
+ * 
+ * @jdo.inheritance strategy="new-table"
+ *
+ * @jdo.fetch-group name="PriceFragmentType.name" fields="name"
+ */
+public class PriceFragmentType
+	implements Serializable
+{
+
+	public static final String FETCH_GROUP_NAME = "PriceFragmentType.name";
+
+	/**
+	 * @jdo.field primary-key="true"
+	 * @jdo.column length="100"
+	 */
+	private String organisationID;
+
+	/**
+	 * @jdo.field primary-key="true"
+	 * @jdo.column length="100"
+	 */
+	private String priceFragmentTypeID;
+
+	protected PriceFragmentType() { }
+
+	public PriceFragmentType(String organisationID, String priceFragmentTypeID)
+	{
+		this.organisationID = organisationID;
+		this.priceFragmentTypeID = priceFragmentTypeID;
+		this.primaryKey = getPrimaryKey(organisationID, priceFragmentTypeID);
+		this.name = new PriceFragmentTypeName(this);
+	}
+	/**
+	 * @return Returns the organisationID.
+	 */
+	public String getOrganisationID()
+	{
+		return organisationID;
+	}
+	/**
+	 * @return Returns the priceFragmentTypeID.
+	 */
+	public String getPriceFragmentTypeID()
+	{
+		return priceFragmentTypeID;
+	}
+	/**
+	 * jdo.field persitence-modifier="persitent"
+	 */
+	protected String primaryKey;
+	
+	public String getPrimaryKey()
+	{
+		return primaryKey;
+	}
+	
+	public static String getPrimaryKey(String organisationID, String priceFragmentTypeID)
+	{
+		return organisationID + '/' + priceFragmentTypeID;
+	}
+
+	public static PriceFragmentTypeID primaryKeyToPriceFragmentTypeID(String primaryKey)
+	{
+		String[] parts = primaryKey.split("/");
+		if (parts.length != 2) 
+			throw new IllegalArgumentException("The given productTypePK "+primaryKey+" is illegal (more than one /)");
+		return PriceFragmentTypeID.create(parts[0], parts[1]);
+	}
+	
+	/**
+	 * This predefined priceFragmentType exists to allow a unified API for accesses
+	 * to the priceFragments and the <tt>Price.amount</tt>. This is necessary e.g. in
+	 * formulas.
+	 * 
+	 * @see Price#getAmount(String)
+	 * @see Price#setAmount(String, long)
+	 */
+	public static final String TOTAL_PRICEFRAGMENTTYPEID = "_Total_";
+	
+	/**
+	 * @jdo.field persistence-modifier="persistent" dependent="true" mapped-by="priceFragmentType"
+	 */
+	private PriceFragmentTypeName name;
+
+	/**
+	 * Returns the PriceFragmentTypeName of this type.
+	 * @return The PriceFragmentTypeName of this type.
+	 */
+	public PriceFragmentTypeName getName() {
+		return name;
+	}	
+	
+	/**
+	 * @jdo.field persistence-modifier="persistent"
+	 */
+	private PriceFragmentType containerPriceFragmentType;
+
+	/**
+	 * The PriceFragmentType this one is contained in. 
+	 * Currently the setter will only allow null or
+	 * the PriceFragmentType with id {@link #TOTAL_PRICEFRAGMENTTYPEID} or null.
+	 */
+	public PriceFragmentType getContainerPriceFragmentType() {
+		return containerPriceFragmentType;
+	}
+
+	/**
+	 * Set the PriceFragment this one is contained in.
+	 * Currently the setter will only allow null or
+	 * the PriceFragmentType with id {@link #TOTAL_PRICEFRAGMENTTYPEID} or null.
+	 */
+	public void setContainerPriceFragmentType(PriceFragmentType containerPriceFragmentType) {
+		this.containerPriceFragmentType = containerPriceFragmentType;
+	}
+
+	/**
+	 * @return Returns the special predefined <tt>PriceFragmentType</tt> that represents the total price.
+	 * The total price is no real price fragment, but can be managed by this <tt>PriceFragmentType</tt>
+	 * to make formulas easier.
+	 */
+	public static PriceFragmentType getTotalPriceFragmentType(PersistenceManager pm)
+	{
+		pm.getExtent(PriceFragmentType.class);
+		PriceFragmentType priceFragmentType;
+		try {
+			priceFragmentType = (PriceFragmentType) pm.getObjectById(PriceFragmentTypeID.create(
+					Organisation.DEVIL_ORGANISATION_ID, PriceFragmentType.TOTAL_PRICEFRAGMENTTYPEID));
+		} catch (JDOObjectNotFoundException x) {
+			priceFragmentType = new PriceFragmentType(Organisation.DEVIL_ORGANISATION_ID, PriceFragmentType.TOTAL_PRICEFRAGMENTTYPEID);
+			pm.makePersistent(priceFragmentType);
+		}
+		return priceFragmentType;
+	}
+
+}

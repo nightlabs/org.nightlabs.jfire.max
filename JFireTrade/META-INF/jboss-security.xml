@@ -1,4 +1,4 @@
-<security-domain>java:/jaas/ipanema</security-domain> 
+<security-domain>java:/jaas/jfire</security-domain> 
 <container-configurations>
 	<container-configuration>
 		<!-- Use the standardjboss.xml container-name so we only have

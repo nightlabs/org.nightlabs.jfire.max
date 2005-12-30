@@ -1,0 +1,1413 @@
+CountryID;CityID;RegionID;LanguageID;CityName
+AT;29033;7;de;Abfaltersbach
+AT;29034;7;de;Absam
+AT;29035;3;de;Absdorf
+AT;29036;5;de;Abtenau
+AT;29037;4;de;Ach
+AT;29038;3;de;Achau
+AT;29039;7;de;Achenkirch
+AT;29040;4;de;Adlwang
+AT;29041;6;de;Admont
+AT;29042;5;de;Adnet
+AT;29043;6;de;Aflenz Kurort
+AT;29044;2;de;Afritz
+AT;29045;3;de;Aggsbach Dorf
+AT;29046;3;de;Aggsbach Markt
+AT;29047;6;de;Aigen im Ennstal
+AT;29048;4;de;Aigen im Mühlkreis
+AT;29049;7;de;Ainet
+AT;29050;4;de;Aistersheim
+AT;29051;4;de;Alberndorf in der Riedmark
+AT;29052;8;de;Alberschwende
+AT;29053;7;de;Aldrans
+AT;29054;4;de;Alkoven
+AT;29055;3;de;Alland
+AT;29056;3;de;Allentsteig
+AT;29057;6;de;Allerheiligen bei Wildon
+AT;29058;6;de;Allerheiligen im Mürztal
+AT;29059;4;de;Allhaming
+AT;29060;7;de;Alpbach
+AT;29061;6;de;Alpl
+AT;29062;8;de;Altach
+AT;29063;6;de;Altaussee
+AT;29064;4;de;Altenberg bei Linz
+AT;29065;4;de;Altenfelden
+AT;29066;4;de;Altenhof am Hausruck
+AT;29067;5;de;Altenmarkt im Pongau
+AT;29068;3;de;Altenwörth
+AT;29069;3;de;Altlengbach
+AT;29070;3;de;Altlichtenwarth
+AT;29071;4;de;Altmünster
+AT;29072;4;de;Altschwendt
+AT;29073;3;de;Ameis
+AT;29074;1;de;Andau
+AT;29075;8;de;Andelsbuch
+AT;29076;4;de;Andrichsfurt
+AT;29077;5;de;Anif
+AT;29078;5;de;Annaberg
+AT;29079;4;de;Ansfelden
+AT;29080;5;de;Anthering
+AT;29081;4;de;Antiesenhofen
+AT;29082;1;de;Apetlon
+AT;29083;3;de;Arbesbach
+AT;29084;4;de;Arbing
+AT;29085;3;de;Ardagger
+AT;29086;6;de;Ardning
+AT;29087;6;de;Arnfels
+AT;29088;2;de;Arnoldstein
+AT;29089;4;de;Arnreit
+AT;29090;2;de;Arriach
+AT;29091;3;de;Artstetten
+AT;29092;7;de;Arzl im Pitztal
+AT;29093;4;de;Aschach an der Donau
+AT;29094;4;de;Aschach an der Steyr
+AT;29095;3;de;Aschbach Markt
+AT;29096;3;de;Aspang
+AT;29097;3;de;Asparn an der Zaya
+AT;29098;3;de;Asperhofen
+AT;29099;4;de;Attersee
+AT;29100;4;de;Attnang-Puchheim
+AT;29101;3;de;Atzenbrugg
+AT;29102;3;de;Auersthal
+AT;29103;4;de;Aurolzmünster
+AT;29104;7;de;Außervillgraten
+AT;29105;7;de;Axams
+AT;29106;4;de;Bachmanning
+AT;29107;6;de;Bad Aussee
+AT;29108;3;de;Bad Deutsch Altenburg
+AT;29109;2;de;Bad Eisenkappel
+AT;29110;3;de;Bad Fischau
+AT;29111;6;de;Bad Gams
+AT;29112;6;de;Bad Gleichenberg
+AT;29113;4;de;Bad Goisern
+AT;29114;4;de;Bad Hall
+AT;29115;5;de;Bad Hofgastein
+AT;29116;4;de;Bad Ischl
+AT;29117;2;de;Bad Kleinkirchheim
+AT;29118;3;de;Bad Pirawarth
+AT;29119;6;de;Bad Radkersburg
+AT;29120;4;de;Bad Schallerbach
+AT;29121;3;de;Bad Schönau
+AT;29122;1;de;Bad Tatzmannsdorf
+AT;29123;3;de;Bad Vöslau
+AT;29124;4;de;Bad Wimsbach-Neydharting
+AT;29125;2;de;Baldramsdorf
+AT;29126;6;de;Bärnbach
+AT;29127;4;de;Baumgartenberg
+AT;29128;7;de;Baumkirchen
+AT;29129;3;de;Behamberg
+AT;29130;5;de;Berndorf bei Salzburg
+AT;29131;3;de;Bernhardsthal
+AT;29132;7;de;Berwang
+AT;29133;8;de;Bezau
+AT;29134;7;de;Biberwier
+AT;29135;7;de;Bichlbach
+AT;29136;3;de;Biedermannsdorf
+AT;29137;6;de;Birkfeld
+AT;29138;2;de;Birnbaum
+AT;29139;3;de;Bisamberg
+AT;29140;6;de;Bischoffeld
+AT;29141;5;de;Bischofshofen
+AT;29142;3;de;Bischofstetten
+AT;29143;8;de;Bizau
+AT;29144;2;de;Bleiburg
+AT;29145;3;de;Blindenmarkt
+AT;29146;8;de;Bludenz
+AT;29147;8;de;Bludesch
+AT;29148;6;de;Blumau in Steiermark
+AT;29149;3;de;Bockfließ
+AT;29150;5;de;Böckstein
+AT;29151;3;de;Böheimkirchen
+AT;29152;5;de;Bramberg am Wildkogel
+AT;29153;7;de;Brandenberg
+AT;29154;4;de;Braunau am Inn
+AT;29155;8;de;Braz
+AT;29156;8;de;Bregenz
+AT;29157;4;de;Breitenaich
+AT;29158;7;de;Breitenbach am Inn
+AT;29159;6;de;Breitenfeld an der Rittschein
+AT;29160;3;de;Breitenfurt bei Wien
+AT;29161;4;de;Breitenschützing
+AT;29162;3;de;Breitenstein am Semmering
+AT;29163;3;de;Breitenwaida
+AT;29164;7;de;Brixen im Thale
+AT;29165;7;de;Brixlegg
+AT;29166;5;de;Bruck an der Großglocknerstraße
+AT;29167;6;de;Bruck an der Lafnitz
+AT;29168;3;de;Bruck an der Leitha
+AT;29169;6;de;Bruck an der Mur
+AT;29170;2;de;Brückl
+AT;29171;3;de;Brunn am Gebirge
+AT;29172;3;de;Brunn an der Wild
+AT;29173;6;de;Buch bei Hartberg
+AT;29174;4;de;Buchkirchen
+AT;29175;6;de;Burgau
+AT;29176;5;de;Bürmoos
+AT;29177;8;de;Bürs
+AT;29178;4;de;Christkindl
+AT;29179;8;de;Dalaas
+AT;29180;8;de;Damüls
+AT;29181;6;de;Dechantskirchen
+AT;29182;2;de;Dellach im Drautal
+AT;29183;4;de;Desselbrunn
+AT;29184;6;de;Deutsch Goritz
+AT;29185;1;de;Deutsch Jahrndorf
+AT;29186;1;de;Deutsch Kaltenbrunn
+AT;29187;6;de;Deutschfeistritz
+AT;29188;1;de;Deutschkreutz
+AT;29189;6;de;Deutschlandsberg
+AT;29190;5;de;Dienten am Hochkönig
+AT;29191;3;de;Dietmanns
+AT;29192;2;de;Diex
+AT;29193;4;de;Dimbach
+AT;29194;3;de;Dobermannsdorf
+AT;29195;3;de;Dobersberg
+AT;29196;6;de;Dobl
+AT;29197;2;de;Döbriach
+AT;29198;7;de;Dölsach
+AT;29199;6;de;Donnersbach
+AT;29200;1;de;Donnerskirchen
+AT;29201;8;de;Doren
+AT;29202;4;de;Dorf an der Pram
+AT;29203;5;de;Dorfgastein
+AT;29204;3;de;Dorfstetten
+AT;29205;8;de;Dornbirn
+AT;29206;3;de;Drasenhofen
+AT;29207;3;de;Drösing
+AT;29208;3;de;Dürnkrut
+AT;29209;7;de;Ebbs
+AT;29210;5;de;Eben im Pongau
+AT;29211;5;de;Ebenau
+AT;29212;2;de;Ebene Reichenau
+AT;29213;3;de;Ebenfurth
+AT;29214;4;de;Ebensee
+AT;29215;1;de;Eberau
+AT;29216;3;de;Ebergassing
+AT;29217;2;de;Eberndorf
+AT;29218;4;de;Eberschwang
+AT;29219;2;de;Eberstein
+AT;29220;3;de;Ebreichsdorf
+AT;29221;3;de;Echsenbach
+AT;29222;3;de;Eckartsau
+AT;29223;6;de;Edelsbach bei Feldbach
+AT;29224;6;de;Edelschrott
+AT;29225;4;de;Eferding
+AT;29226;4;de;Eggelsberg
+AT;29227;3;de;Eggenburg
+AT;29228;3;de;Eggendorf im Thale
+AT;29229;4;de;Eggendorf im Traunkreis
+AT;29230;4;de;Eggerding
+AT;29231;3;de;Eggern
+AT;29232;6;de;Eggersdorf bei Graz
+AT;29233;6;de;Ehrenhausen
+AT;29234;7;de;Ehrwald
+AT;29235;6;de;Eibiswald
+AT;29236;6;de;Eisenerz
+AT;29237;1;de;Eisenstadt
+AT;29238;2;de;Eisentratten
+AT;29239;3;de;Eisgarn
+AT;29240;2;de;Eitweg
+AT;29241;7;de;Elbigenalp
+AT;29242;5;de;Elixhausen
+AT;29243;7;de;Ellmau
+AT;29244;7;de;Elmen
+AT;29245;1;de;Eltendorf
+AT;29246;3;de;Emmersdorf an der Donau
+AT;29247;3;de;Engelhartstetten
+AT;29248;4;de;Engelhartszell
+AT;29249;4;de;Enns
+AT;29250;4;de;Enzenkirchen
+AT;29251;3;de;Enzersdorf im Thale
+AT;29252;7;de;Erl
+AT;29253;3;de;Erlauf
+AT;29254;3;de;Ernstbrunn
+AT;29255;7;de;Erpfendorf
+AT;29256;4;de;Esternberg
+AT;29257;3;de;Etsdorf am Kamp
+AT;29258;5;de;Eugendorf
+AT;29259;3;de;Euratsfeld
+AT;29260;2;de;Faak am See
+AT;29261;5;de;Faistenau
+AT;29262;6;de;Fehring
+AT;29263;3;de;Feistritz am Wechsel
+AT;29264;2;de;Feistritz an der Drau
+AT;29265;2;de;Feistritz an der Gail
+AT;29266;2;de;Feistritz im Rosental
+AT;29267;2;de;Feld am See
+AT;29268;6;de;Feldbach
+AT;29269;8;de;Feldkirch
+AT;29270;4;de;Feldkirchen an der Donau
+AT;29271;6;de;Feldkirchen bei Graz
+AT;29272;4;de;Feldkirchen bei Mattighofen
+AT;29273;2;de;Feldkirchen in Kärnten
+AT;29274;3;de;Felixdorf
+AT;29275;3;de;Fels am Wagram
+AT;29276;2;de;Ferlach
+AT;29277;3;de;Ferschnitz
+AT;29278;3;de;Feuersbrunn
+AT;29279;7;de;Fieberbrunn
+AT;29280;5;de;Filzmoos
+AT;29281;7;de;Finkenberg
+AT;29282;2;de;Finkenstein
+AT;29283;6;de;Fischbach
+AT;29284;7;de;Fiss
+AT;29285;5;de;Flachau
+AT;29286;2;de;Flattach
+AT;29287;7;de;Flaurling
+AT;29288;7;de;Flirsch
+AT;29289;6;de;Floing
+AT;29290;6;de;Fohnsdorf
+AT;29291;1;de;Forchtenstein
+AT;29292;4;de;Fornach
+AT;29293;3;de;Frankenfels
+AT;29294;4;de;Frankenmarkt
+AT;29295;4;de;Franking
+AT;29296;3;de;Franzen
+AT;29297;8;de;Frastanz
+AT;29298;3;de;Frättingsdorf
+AT;29299;1;de;Frauenkirchen
+AT;29300;3;de;Freiland
+AT;29301;6;de;Frein an der Mürz
+AT;29302;2;de;Fresach
+AT;29303;6;de;Fresing
+AT;29304;6;de;Friedberg
+AT;29305;4;de;Friedburg
+AT;29306;3;de;Friedersbach
+AT;29307;7;de;Fritzens
+AT;29308;6;de;Frohnleiten
+AT;29309;6;de;Frojach
+AT;29310;7;de;Fügen
+AT;29311;7;de;Fulpmes
+AT;29312;2;de;Fürnitz
+AT;29313;6;de;Fürstenfeld
+AT;29314;5;de;Fuschl am See
+AT;29315;8;de;Fußach
+AT;29316;3;de;Gablitz
+AT;29317;4;de;Gaflenz
+AT;29318;3;de;Gainfarn
+AT;29319;8;de;Gaißau
+AT;29320;2;de;Gallizien
+AT;29321;4;de;Gallneukirchen
+AT;29322;4;de;Gallspach
+AT;29323;7;de;Galtür
+AT;29324;3;de;Gaming
+AT;29325;6;de;Gamlitz
+AT;29326;4;de;Gampern
+AT;29327;6;de;Gams bei Hieflau
+AT;29328;3;de;Gansbach
+AT;29329;3;de;Gänserndorf
+AT;29330;8;de;Gargellen
+AT;29331;3;de;Gars am Kamp
+AT;29332;4;de;Garsten
+AT;29333;8;de;Gaschurn
+AT;29334;6;de;Gasen
+AT;29335;4;de;Gaspoltshofen
+AT;29336;3;de;Gastern
+AT;29337;1;de;Gattendorf
+AT;29338;3;de;Gaweinstal
+AT;29339;4;de;Geboltskirchen
+AT;29340;3;de;Gedersdorf
+AT;29341;4;de;Geiersberg
+AT;29342;4;de;Geinberg
+AT;29343;6;de;Geistthal
+AT;29344;3;de;Geras
+AT;29345;3;de;Gerasdorf bei Wien
+AT;29346;1;de;Gerersdorf bei Güssing
+AT;29347;4;de;Geretsberg
+AT;29348;7;de;Gerlos
+AT;29349;3;de;Gföhl
+AT;29350;4;de;Gilgenberg am Weilhart
+AT;29351;7;de;Ginzling
+AT;29352;2;de;Glanegg
+AT;29353;3;de;Glaubendorf
+AT;29354;6;de;Gleinstätten
+AT;29355;6;de;Gleisdorf
+AT;29356;2;de;Globasnitz
+AT;29357;2;de;Glödnitz
+AT;29358;3;de;Gloggnitz
+AT;29359;4;de;Gmunden
+AT;29360;3;de;Gnadendorf
+AT;29361;6;de;Gnas
+AT;29362;2;de;Gnesau
+AT;29363;2;de;Gödersdorf
+AT;29364;8;de;Göfis
+AT;29365;3;de;Göllersdorf
+AT;29366;5;de;Golling an der Salzach
+AT;29367;6;de;Gollrad
+AT;29368;3;de;Göpfritz an der Wild
+AT;29369;4;de;Gosau
+AT;29370;6;de;Gosdorf
+AT;29371;3;de;Göstling an der Ybbs
+AT;29372;3;de;Göttlesbrunn
+AT;29373;3;de;Götzendorf an der Leitha
+AT;29374;7;de;Götzens
+AT;29375;8;de;Götzis
+AT;29376;2;de;Grades
+AT;29377;6;de;Grafendorf bei Hartberg
+AT;29378;2;de;Grafenstein
+AT;29379;3;de;Grafenwörth
+AT;29380;3;de;Grainbrunn
+AT;29381;4;de;Gramastetten
+AT;29382;3;de;Gramatneusiedl
+AT;29383;7;de;Grän
+AT;29384;6;de;Gratkorn
+AT;29385;6;de;Gratwein
+AT;29386;6;de;Graz
+AT;29387;2;de;Greifenburg
+AT;29388;4;de;Grein
+AT;29389;3;de;Gresten
+AT;29390;7;de;Gries am Brenner
+AT;29391;7;de;Gries im Sellrain
+AT;29392;4;de;Grieskirchen
+AT;29393;2;de;Griffen
+AT;29394;3;de;Grimmenstein
+AT;29395;7;de;Grins
+AT;29396;6;de;Gröbming
+AT;29397;5;de;Grödig
+AT;29398;3;de;Groß-Enzersdorf
+AT;29399;3;de;Großharras
+AT;29400;6;de;Großklein
+AT;29401;3;de;Großkrut
+AT;29402;6;de;Großlobming
+AT;29403;3;de;Großmeiseldorf
+AT;29404;3;de;Großmugl
+AT;29405;3;de;Großriedenthal
+AT;29406;3;de;Großrußbach
+AT;29407;3;de;Großweikersdorf
+AT;29408;4;de;Grünau im Almtal
+AT;29409;3;de;Grünbach am Schneeberg
+AT;29410;6;de;Grundlsee
+AT;29411;6;de;Gstatterboden
+AT;29412;2;de;Gummern
+AT;29413;3;de;Gumpoldskirchen
+AT;29414;3;de;Günselsdorf
+AT;29415;4;de;Gunskirchen
+AT;29416;3;de;Guntersdorf
+AT;29417;3;de;Guntramsdorf
+AT;29418;2;de;Gurk
+AT;29419;4;de;Gurten
+AT;29420;1;de;Güssing
+AT;29421;4;de;Gutau
+AT;29422;2;de;Guttaring
+AT;29423;4;de;Haag am Hausruck
+AT;29424;3;de;Hadersdorf am Kamp
+AT;29425;3;de;Hadres
+AT;29426;4;de;Hagenberg im Mühlkreis
+AT;29427;4;de;Haibach bei Schärding
+AT;29428;4;de;Haibach ob der Donau
+AT;29429;3;de;Haidershofen
+AT;29430;2;de;Haimburg
+AT;29431;3;de;Hainburg an der Donau
+AT;29432;6;de;Hainersdorf
+AT;29433;3;de;Haitzendorf
+AT;29434;6;de;Halbenrain
+AT;29435;1;de;Halbturn
+AT;29436;7;de;Hall in Tirol
+AT;29437;5;de;Hallein
+AT;29438;4;de;Hallstatt
+AT;29439;4;de;Handenberg
+AT;29440;1;de;Hannersdorf
+AT;29441;3;de;Hardegg
+AT;29442;4;de;Hargelsberg
+AT;29443;3;de;Haringsee
+AT;29444;6;de;Hartberg
+AT;29445;7;de;Häselgehr
+AT;29446;4;de;Haslach an der Mühl
+AT;29447;6;de;Hatzendorf
+AT;29448;3;de;Haugsdorf
+AT;29449;3;de;Hausbrunn
+AT;29450;3;de;Hauskirchen
+AT;29451;3;de;Hausleiten
+AT;29452;6;de;Hausmannstätten
+AT;29453;3;de;Heidenreichstein
+AT;29454;6;de;Heilbrunn
+AT;29455;2;de;Heiligenblut
+AT;29456;6;de;Heiligenkreuz am Waasen
+AT;29457;1;de;Heiligenkreuz im Lafnitztal
+AT;29458;6;de;Heimschuh
+AT;29459;7;de;Heiterwang
+AT;29460;4;de;Helfenberg
+AT;29461;4;de;Hellmonsödt
+AT;29462;6;de;Hengsberg
+AT;29463;5;de;Henndorf am Wallersee
+AT;29464;2;de;Hermagor
+AT;29465;3;de;Herrnbaumgarten
+AT;29466;3;de;Herzogenburg
+AT;29467;4;de;Herzogsdorf
+AT;29468;6;de;Hieflau
+AT;29469;2;de;Himmelberg
+AT;29470;3;de;Hinterbrühl
+AT;29471;5;de;Hinterglemm
+AT;29472;3;de;Hintersdorf
+AT;29473;4;de;Hinterstoder
+AT;29474;7;de;Hintertux
+AT;29475;7;de;Hippach
+AT;29476;6;de;Hirnsdorf
+AT;29477;4;de;Hirschbach im Mühlkreis
+AT;29478;6;de;Hirschegg
+AT;29479;3;de;Hirtenberg
+AT;29480;8;de;Hittisau
+AT;29481;6;de;Hitzendorf
+AT;29482;7;de;Hochfilzen
+AT;29483;3;de;Hochneukirchen
+AT;29484;7;de;Hochsölden
+AT;29485;3;de;Hochwolkersdorf
+AT;29486;3;de;Hof am Leithagebirge
+AT;29487;5;de;Hof bei Salzburg
+AT;29488;4;de;Hofkirchen an der Trattnach
+AT;29489;4;de;Hofkirchen im Mühlkreis
+AT;29490;4;de;Hofkirchen im Traunkreis
+AT;29491;3;de;Höflein an der Donau
+AT;29492;3;de;Hohenau an der March
+AT;29493;8;de;Hohenems
+AT;29494;3;de;Hohenruppersdorf
+AT;29495;6;de;Hohentauern
+AT;29496;8;de;Hohenweiler
+AT;29497;4;de;Hohenzell
+AT;29498;4;de;Höhnhart
+AT;29499;3;de;Hollabrunn
+AT;29500;3;de;Hollenstein an der Ybbs
+AT;29501;3;de;Hollenthon
+AT;29502;5;de;Hollersbach im Pinzgau
+AT;29503;7;de;Holzgau
+AT;29504;7;de;Hopfgarten im Brixental
+AT;29505;7;de;Hopfgarten in Defereggen
+AT;29506;8;de;Hörbranz
+AT;29507;1;de;Horitschon
+AT;29508;4;de;Hörsching
+AT;29509;3;de;Hürm
+AT;29510;5;de;Hüttau
+AT;29511;2;de;Hüttenberg
+AT;29512;5;de;Hüttschlag
+AT;29513;3;de;Idolsberg
+AT;29514;1;de;Illmitz
+AT;29515;6;de;Ilz
+AT;29516;7;de;Imst
+AT;29517;3;de;Innermanzing
+AT;29518;7;de;Innervillgraten
+AT;29519;7;de;Innsbruck
+AT;29520;7;de;Inzing
+AT;29521;6;de;Irdning
+AT;29522;3;de;Irnfritz
+AT;29523;2;de;Irschen
+AT;29524;7;de;Ischgl
+AT;29525;3;de;Jagenbach
+AT;29526;6;de;Jagerberg
+AT;29527;3;de;Japons
+AT;29528;3;de;Jedenspeigen
+AT;29529;7;de;Jenbach
+AT;29530;2;de;Jenig
+AT;29531;1;de;Jennersdorf
+AT;29532;7;de;Jerzens
+AT;29533;3;de;Jetzelsdorf
+AT;29534;7;de;Jochberg
+AT;29535;1;de;Jois
+AT;29536;3;de;Judenau
+AT;29537;6;de;Judenburg
+AT;29538;6;de;Kainach bei Voitsberg
+AT;29539;1;de;Kaisersdorf
+AT;29540;6;de;Kalsdorf bei Graz
+AT;29541;3;de;Kaltenleutgeben
+AT;29542;6;de;Kalwang
+AT;29543;4;de;Kammer am Attersee
+AT;29544;6;de;Kammern im Liesingtal
+AT;29545;3;de;Kammersdorf
+AT;29546;6;de;Kapfenberg
+AT;29547;6;de;Kapfenstein
+AT;29548;2;de;Kappel am Krappfeld
+AT;29549;7;de;Kappl
+AT;29550;5;de;Kaprun
+AT;29551;3;de;Karlstetten
+AT;29552;3;de;Karlstift
+AT;29553;3;de;Karnabrunn
+AT;29554;7;de;Kartitsch
+AT;29555;3;de;Kasten bei Böheimkirchen
+AT;29556;6;de;Katsch an der Mur
+AT;29557;4;de;Katsdorf
+AT;29558;3;de;Kaumberg
+AT;29559;3;de;Kautzen
+AT;29560;4;de;Kefermarkt
+AT;29561;4;de;Kematen am Innbach
+AT;29562;4;de;Kematen an der Krems
+AT;29563;7;de;Kematen in Tirol
+AT;29564;3;de;Kemmelbach
+AT;29565;8;de;Kennelbach
+AT;29566;3;de;Kernhof
+AT;29567;3;de;Kettlasbrunn
+AT;29568;2;de;Keutschach
+AT;29569;3;de;Kierling
+AT;29570;3;de;Kilb
+AT;29571;6;de;Kindberg
+AT;29572;6;de;Kirchbach in Steiermark
+AT;29573;3;de;Kirchberg am Wagram
+AT;29574;3;de;Kirchberg am Walde
+AT;29575;3;de;Kirchberg am Wechsel
+AT;29576;3;de;Kirchberg an der Pielach
+AT;29577;6;de;Kirchberg an der Raab
+AT;29578;3;de;Kirchberg an der Wild
+AT;29579;4;de;Kirchberg bei Mattighofen
+AT;29580;7;de;Kirchberg in Tirol
+AT;29581;7;de;Kirchbichl
+AT;29582;4;de;Kirchdorf an der Krems
+AT;29583;7;de;Kirchdorf in Tirol
+AT;29584;4;de;Kirchheim im Innkreis
+AT;29585;3;de;Kirchschlag in der Buckligen Welt
+AT;29586;3;de;Kirnberg an der Mank
+AT;29587;1;de;Kittsee
+AT;29588;7;de;Kitzbühel
+AT;29589;6;de;Kitzeck im Sausal
+AT;29590;2;de;Klagenfurt
+AT;29591;4;de;Klaus an der Pyhrnbahn
+AT;29592;5;de;Kleinarl
+AT;29593;2;de;Kleinglödnitz
+AT;29594;3;de;Kleinneusiedl
+AT;29595;3;de;Kleinpöchlarn
+AT;29596;4;de;Kleinraming
+AT;29597;4;de;Kleinreifling
+AT;29598;4;de;Kleinzell im Mühlkreis
+AT;29599;1;de;Klingenbach
+AT;29600;6;de;Klöch
+AT;29601;8;de;Klösterle
+AT;29602;3;de;Klosterneuburg
+AT;29603;2;de;Knappenberg
+AT;29604;6;de;Knittelfeld
+AT;29605;1;de;Kobersdorf
+AT;29606;8;de;Koblach
+AT;29607;6;de;Köflach
+AT;29608;6;de;Koglhof
+AT;29609;1;de;Kohfidisch
+AT;29610;2;de;Kolbnitz
+AT;29611;4;de;Kollerschlag
+AT;29612;7;de;Kolsass
+AT;29613;3;de;Königstetten
+AT;29614;4;de;Königswiesen
+AT;29615;4;de;Kopfing im Innkreis
+AT;29616;5;de;Koppl
+AT;29617;3;de;Korneuburg
+AT;29618;7;de;Kössen
+AT;29619;2;de;Köstenberg
+AT;29620;3;de;Kottes
+AT;29621;3;de;Kottingbrunn
+AT;29622;2;de;Köttmannsdorf
+AT;29623;2;de;Kraig
+AT;29624;6;de;Krakaudorf
+AT;29625;7;de;Kramsach
+AT;29626;6;de;Kraubath an der Mur
+AT;29627;3;de;Krems an der Donau
+AT;29628;2;de;Kremsbrücke
+AT;29629;4;de;Kremsmünster
+AT;29630;4;de;Krenglbach
+AT;29631;1;de;Krensdorf
+AT;29632;6;de;Krieglach
+AT;29633;5;de;Krimml
+AT;29634;3;de;Kritzendorf
+AT;29635;4;de;Kronstorf
+AT;29636;3;de;Krumau am Kamp
+AT;29637;2;de;Krumpendorf
+AT;29638;3;de;Küb
+AT;29639;5;de;Kuchl
+AT;29640;7;de;Kufstein
+AT;29641;2;de;Kühnsdorf
+AT;29642;7;de;Kühtai
+AT;29643;1;de;Kukmirn
+AT;29644;6;de;Kumberg
+AT;29645;7;de;Kundl
+AT;29646;3;de;Laa an der Thaya
+AT;29647;3;de;Laab im Walde
+AT;29648;4;de;Laakirchen
+AT;29649;1;de;Lackenbach
+AT;29650;1;de;Lackendorf
+AT;29651;3;de;Lackenhof
+AT;29652;3;de;Ladendorf
+AT;29653;6;de;Lafnitz
+AT;29654;3;de;Laimbach am Ostrong
+AT;29655;6;de;Lainbach
+AT;29656;4;de;Lambach
+AT;29657;4;de;Lambrechten
+AT;29658;5;de;Lamprechtshausen
+AT;29659;8;de;Langenegg
+AT;29660;7;de;Längenfeld
+AT;29661;3;de;Langenlebarn
+AT;29662;3;de;Langenlois
+AT;29663;3;de;Langenrohr
+AT;29664;6;de;Langenwang
+AT;29665;3;de;Langenzersdorf
+AT;29666;3;de;Langschlag
+AT;29667;6;de;Lannach
+AT;29668;3;de;Lanzenkirchen
+AT;29669;4;de;Lasberg
+AT;29670;2;de;Launsdorf
+AT;29671;4;de;Laussa
+AT;29672;8;de;Lauterach
+AT;29673;2;de;Lavamünd
+AT;29674;3;de;Laxenburg
+AT;29675;6;de;Lebring
+AT;29676;8;de;Lech
+AT;29677;2;de;Ledenitzen
+AT;29678;3;de;Leiben
+AT;29679;6;de;Leibnitz
+AT;29680;3;de;Leitzersdorf
+AT;29681;4;de;Lembach im Mühlkreis
+AT;29682;5;de;Lend
+AT;29683;2;de;Lendorf
+AT;29684;6;de;Leoben
+AT;29685;3;de;Leobersdorf
+AT;29686;5;de;Leogang
+AT;29687;4;de;Leonding
+AT;29688;4;de;Leonstein
+AT;29689;4;de;Leopoldschlag
+AT;29690;3;de;Leopoldsdorf im Marchfelde
+AT;29691;7;de;Lermoos
+AT;29692;7;de;Leutasch
+AT;29693;6;de;Leutschach
+AT;29694;2;de;Liebenfels
+AT;29695;6;de;Lieboch
+AT;29696;2;de;Lieserbrücke
+AT;29697;6;de;Liezen
+AT;29698;6;de;Ligist
+AT;29699;3;de;Lilienfeld
+AT;29700;3;de;Litschau
+AT;29701;1;de;Litzelsdorf
+AT;29702;4;de;Lochen
+AT;29703;6;de;Lödersdorf
+AT;29704;5;de;Lofer
+AT;29705;4;de;Loibichl
+AT;29706;3;de;Loich
+AT;29707;6;de;Loipersdorf bei Fürstenfeld
+AT;29708;2;de;Lölling
+AT;29709;4;de;Losenstein
+AT;29710;8;de;Ludesch
+AT;29711;2;de;Ludmannsdorf
+AT;29712;3;de;Ludweis
+AT;29713;5;de;Lungötz
+AT;29714;3;de;Lunz am See
+AT;29715;8;de;Lustenau
+AT;29716;1;de;Lutzmannsburg
+AT;29717;8;de;Mäder
+AT;29718;3;de;Mailberg
+AT;29719;5;de;Maishofen
+AT;29720;3;de;Maissau
+AT;29721;2;de;Mallnitz
+AT;29722;3;de;Mank
+AT;29723;3;de;Mannersdorf am Leithagebirge
+AT;29724;1;de;Mannersdorf an der Rabnitz
+AT;29725;3;de;Marbach an der Donau
+AT;29726;4;de;Marchtrenk
+AT;29727;3;de;Margarethen am Moos
+AT;29728;5;de;Maria Alm am Steinernen Meer
+AT;29729;3;de;Maria Anzbach
+AT;29730;3;de;Maria Enzersdorf
+AT;29731;3;de;Maria Laach am Jauerling
+AT;29732;6;de;Maria Lankowitz
+AT;29733;3;de;Maria Lanzendorf
+AT;29734;2;de;Maria Luggau
+AT;29735;4;de;Maria Neustift
+AT;29736;2;de;Maria Rain
+AT;29737;2;de;Maria Rojach
+AT;29738;2;de;Maria Saal
+AT;29739;4;de;Maria Schmolln
+AT;29740;3;de;Maria Schutz
+AT;29741;3;de;Maria Taferl
+AT;29742;2;de;Maria Wörth
+AT;29743;6;de;Mariahof
+AT;29744;5;de;Mariapfarr
+AT;29745;1;de;Mariasdorf
+AT;29746;6;de;Mariazell
+AT;29747;3;de;Markgrafneusiedl
+AT;29748;1;de;Markt Allhau
+AT;29749;1;de;Markt Neuhodis
+AT;29750;3;de;Markt Piesting
+AT;29751;1;de;Marz
+AT;29752;7;de;Matrei am Brenner
+AT;29753;7;de;Matrei in Osttirol
+AT;29754;1;de;Mattersburg
+AT;29755;4;de;Mattighofen
+AT;29756;5;de;Mattsee
+AT;29757;3;de;Matzen
+AT;29758;3;de;Mauerbach
+AT;29759;4;de;Mauerkirchen
+AT;29760;7;de;Maurach
+AT;29761;6;de;Mautern in Steiermark
+AT;29762;4;de;Mauthausen
+AT;29763;7;de;Mayrhofen
+AT;29764;4;de;Meggenhofen
+AT;29765;4;de;Mehrnbach
+AT;29766;2;de;Meiselding
+AT;29767;3;de;Melk
+AT;29768;8;de;Mellau
+AT;29769;3;de;Messern
+AT;29770;6;de;Mettersdorf am Saßbach
+AT;29771;4;de;Mettmach
+AT;29772;5;de;Michaelbeuern
+AT;29773;4;de;Michaelnbach
+AT;29774;4;de;Micheldorf in Oberösterreich
+AT;29775;3;de;Michelhausen
+AT;29776;7;de;Mieders
+AT;29777;7;de;Mieming
+AT;29778;2;de;Miklauzhof
+AT;29779;7;de;Mils
+AT;29780;4;de;Mining
+AT;29781;1;de;Mischendorf
+AT;29782;3;de;Mistelbach an der Zaya
+AT;29783;4;de;Mistelbach bei Wels
+AT;29784;3;de;Mitterarnsdorf
+AT;29785;5;de;Mitterberghütten
+AT;29786;6;de;Mitterdorf im Mürztal
+AT;29787;4;de;Mitterkirchen
+AT;29788;3;de;Mitterndorf an der Fischa
+AT;29789;5;de;Mittersill
+AT;29790;2;de;Mittertrixen
+AT;29791;7;de;Mittewald an der Drau
+AT;29792;6;de;Mixnitz
+AT;29793;6;de;Möderbrugg
+AT;29794;3;de;Mödling
+AT;29795;1;de;Mogersdorf
+AT;29796;2;de;Möllbrücke
+AT;29797;3;de;Möllersdorf
+AT;29798;4;de;Molln
+AT;29799;4;de;Mönchdorf
+AT;29800;1;de;Mönchhof
+AT;29801;4;de;Mondsee
+AT;29802;3;de;Mönichkirchen
+AT;29803;6;de;Mönichwald
+AT;29804;2;de;Moosburg in Kärnten
+AT;29805;4;de;Moosdorf
+AT;29806;6;de;Mooskirchen
+AT;29807;1;de;Mörbisch am See
+AT;29808;2;de;Mörtschach
+AT;29809;7;de;Mötz
+AT;29810;5;de;Mühlbach am Hochkönig
+AT;29811;3;de;Mühlbach am Manhartsberg
+AT;29812;6;de;Mühlen
+AT;29813;5;de;Muhr
+AT;29814;1;de;Müllendorf
+AT;29815;3;de;Münchendorf
+AT;29816;4;de;Munderfing
+AT;29817;3;de;Münichreith am Ostrong
+AT;29818;4;de;Münzbach
+AT;29819;4;de;Münzkirchen
+AT;29820;6;de;Murau
+AT;29821;6;de;Mureck
+AT;29822;6;de;Mürzhofen
+AT;29823;6;de;Mürzsteg
+AT;29824;6;de;Mürzzuschlag
+AT;29825;3;de;Muthmannsdorf
+AT;29826;7;de;Mutters
+AT;29827;4;de;Naarn im Machland
+AT;29828;3;de;Nappersdorf
+AT;29829;7;de;Nassereith
+AT;29830;4;de;Natternbach
+AT;29831;7;de;Natters
+AT;29832;7;de;Nauders
+AT;29833;1;de;Neckenmarkt
+AT;29834;8;de;Nenzing
+AT;29835;7;de;Nesselwängle
+AT;29836;6;de;Nestelbach bei Graz
+AT;29837;6;de;Neuberg an der Mürz
+AT;29838;6;de;Neudau
+AT;29839;1;de;Neudorf
+AT;29840;3;de;Neudorf bei Staatz
+AT;29841;1;de;Neufeld an der Leitha
+AT;29842;4;de;Neufelden
+AT;29843;1;de;Neuhaus am Klausenbach
+AT;29844;4;de;Neuhofen an der Krems
+AT;29845;3;de;Neuhofen an der Ybbs
+AT;29846;5;de;Neukirchen am Großvenediger
+AT;29847;4;de;Neukirchen am Walde
+AT;29848;4;de;Neukirchen an der Enknach
+AT;29849;4;de;Neukirchen an der Vöckla
+AT;29850;4;de;Neukirchen bei Lambach
+AT;29851;3;de;Neulengbach
+AT;29852;5;de;Neumarkt am Wallersee
+AT;29853;3;de;Neumarkt an der Ybbs
+AT;29854;4;de;Neumarkt im Hausruckkreis
+AT;29855;4;de;Neumarkt im Mühlkreis
+AT;29856;6;de;Neumarkt in Steiermark
+AT;29857;3;de;Neupölla
+AT;29858;1;de;Neusiedl am See
+AT;29859;3;de;Neusiedl an der Zaya
+AT;29860;7;de;Neustift im Stubaital
+AT;29861;1;de;Neutal
+AT;29862;4;de;Neuzeug
+AT;29863;3;de;Niederabsdorf
+AT;29864;3;de;Niederfladnitz
+AT;29865;3;de;Niederhollabrunn
+AT;29866;4;de;Niederkappel
+AT;29867;3;de;Niederkreuzstetten
+AT;29868;3;de;Niederleis
+AT;29869;4;de;Niederneukirchen
+AT;29870;5;de;Niedernsill
+AT;29871;3;de;Niederrußbach
+AT;29872;4;de;Niederthalheim
+AT;29873;4;de;Niederwaldkirchen
+AT;29874;6;de;Niederwölz
+AT;29875;1;de;Nikitsch
+AT;29876;6;de;Niklasdorf
+AT;29877;7;de;Nikolsdorf
+AT;29878;3;de;Nöchling
+AT;29879;2;de;Nötsch im Gailtal
+AT;29880;5;de;Nußdorf am Haunsberg
+AT;29881;8;de;Nüziders
+AT;29882;6;de;Obdach
+AT;29883;5;de;Oberalm
+AT;29884;2;de;Oberdrauburg
+AT;29885;4;de;Obergrünburg
+AT;29886;7;de;Obergurgl
+AT;29887;6;de;Oberhaag
+AT;29888;4;de;Oberhofen am Irrsee
+AT;29889;4;de;Oberkappel
+AT;29890;1;de;Oberloisdorf
+AT;29891;3;de;Obermeisling
+AT;29892;4;de;Obermühl
+AT;29893;4;de;Obernberg am Inn
+AT;29894;3;de;Oberndorf an der Melk
+AT;29895;5;de;Oberndorf bei Salzburg
+AT;29896;7;de;Oberndorf in Tirol
+AT;29897;7;de;Oberperfuss
+AT;29898;1;de;Oberpullendorf
+AT;29899;3;de;Oberrohrbach
+AT;29900;1;de;Oberschützen
+AT;29901;3;de;Obersiebenbrunn
+AT;29902;3;de;Obersulz
+AT;29903;5;de;Obertauern
+AT;29904;7;de;Obertilliach
+AT;29905;4;de;Obertraun
+AT;29906;5;de;Obertrum am See
+AT;29907;2;de;Obervellach
+AT;29908;3;de;Oberwaltersdorf
+AT;29909;4;de;Oberwang
+AT;29910;1;de;Oberwart
+AT;29911;3;de;Oberweiden
+AT;29912;3;de;Oberwölbling
+AT;29913;6;de;Oberwölz
+AT;29914;6;de;Oberzeiring
+AT;29915;6;de;Öblarn
+AT;29916;3;de;Obritzberg
+AT;29917;7;de;Obsteig
+AT;29918;4;de;Oftering
+AT;29919;1;de;Oggau
+AT;29920;4;de;Ohlsdorf
+AT;29921;1;de;Olbendorf
+AT;29922;3;de;Ollersbach
+AT;29923;1;de;Ollersdorf im Burgenland
+AT;29924;3;de;Opponitz
+AT;29925;4;de;Ort im Innkreis
+AT;29926;3;de;Orth an der Donau
+AT;29927;1;de;Oslip
+AT;29928;2;de;Ossiach
+AT;29929;4;de;Ostermiething
+AT;29930;4;de;Ottensheim
+AT;29931;4;de;Pabneukirchen
+AT;29932;6;de;Paldau
+AT;29933;6;de;Palfau
+AT;29934;3;de;Palterndorf
+AT;29935;1;de;Pama
+AT;29936;1;de;Pamhagen
+AT;29937;1;de;Parndorf
+AT;29938;8;de;Partenen
+AT;29939;4;de;Pasching
+AT;29940;6;de;Passail
+AT;29941;2;de;Patergassen
+AT;29942;2;de;Paternion
+AT;29943;7;de;Patsch
+AT;29944;3;de;Payerbach
+AT;29945;6;de;Peggau
+AT;29946;4;de;Peilstein im Mühlviertel
+AT;29947;4;de;Pennewang
+AT;29948;3;de;Perchtoldsdorf
+AT;29949;4;de;Perg
+AT;29950;6;de;Pernegg an der Mur
+AT;29951;3;de;Perschling
+AT;29952;3;de;Persenbeug
+AT;29953;7;de;Pertisau
+AT;29954;3;de;Petronell
+AT;29955;3;de;Petzenkirchen
+AT;29956;4;de;Peuerbach
+AT;29957;3;de;Pfaffenschlag bei Waidhofen an der Thaya
+AT;29958;5;de;Pfarrwerfen
+AT;29959;7;de;Pfunds
+AT;29960;7;de;Pians
+AT;29961;4;de;Pichl bei Wels
+AT;29962;4;de;Pierbach
+AT;29963;5;de;Piesendorf
+AT;29964;1;de;Pilgersdorf
+AT;29965;3;de;Pillichsdorf
+AT;29966;6;de;Pinggau
+AT;29967;1;de;Pinkafeld
+AT;29968;4;de;Pinsdorf
+AT;29969;4;de;Pischelsdorf am Engelbach
+AT;29970;6;de;Pischelsdorf in Steiermark
+AT;29971;3;de;Pitten
+AT;29972;3;de;Plank am Kamp
+AT;29973;3;de;Pöchlarn
+AT;29974;1;de;Podersdorf am See
+AT;29975;3;de;Pöggstall
+AT;29976;4;de;Polling im Innkreis
+AT;29977;6;de;Pöls
+AT;29978;4;de;Pöndorf
+AT;29979;3;de;Pottenbrunn
+AT;29980;3;de;Pottendorf
+AT;29981;1;de;Pöttsching
+AT;29982;1;de;Potzneusiedl
+AT;29983;3;de;Poysbrunn
+AT;29984;3;de;Poysdorf
+AT;29985;7;de;Prägraten
+AT;29986;4;de;Prambachkirchen
+AT;29987;4;de;Pramet
+AT;29988;2;de;Prebl
+AT;29989;6;de;Preding
+AT;29990;6;de;Predlitz
+AT;29991;4;de;Pregarten
+AT;29992;2;de;Preitenegg
+AT;29993;3;de;Prellenkirchen
+AT;29994;3;de;Pressbaum
+AT;29995;3;de;Prinzendorf an der Zaya
+AT;29996;3;de;Prinzersdorf
+AT;29997;3;de;Prottes
+AT;29998;6;de;Pruggern
+AT;29999;7;de;Prutz
+AT;30000;5;de;Puch bei Hallein
+AT;30001;6;de;Puch bei Weiz
+AT;30002;3;de;Puchberg am Schneeberg
+AT;30003;4;de;Puchenau
+AT;30004;3;de;Puchenstuben
+AT;30005;4;de;Pucking
+AT;30006;3;de;Pulkau
+AT;30007;3;de;Pürbach
+AT;30008;3;de;Purkersdorf
+AT;30009;2;de;Pusarnitz
+AT;30010;6;de;Pusterwald
+AT;30011;2;de;Pustritz
+AT;30012;4;de;Putzleinsdorf
+AT;30013;6;de;Raaba
+AT;30014;3;de;Raabs an der Thaya
+AT;30015;3;de;Rabensburg
+AT;30016;2;de;Radenthein
+AT;30017;6;de;Radmer
+AT;30018;5;de;Radstadt
+AT;30019;8;de;Raggal
+AT;30020;3;de;Raggendorf
+AT;30021;4;de;Rainbach im Innkreis
+AT;30022;4;de;Rainbach im Mühlkreis
+AT;30023;5;de;Ramingstein
+AT;30024;6;de;Ramsau am Dachstein
+AT;30025;2;de;Rangersdorf
+AT;30026;8;de;Rankweil
+AT;30027;6;de;Ranten
+AT;30028;3;de;Rappottenstein
+AT;30029;6;de;Ratten
+AT;30030;5;de;Rauris
+AT;30031;3;de;Ravelsbach
+AT;30032;3;de;Raxendorf
+AT;30033;1;de;Rechnitz
+AT;30034;4;de;Regau
+AT;30035;3;de;Regelsbrunn
+AT;30036;3;de;Reichenau an der Rax
+AT;30037;4;de;Reichenau im Mühlkreis
+AT;30038;2;de;Reichenfels
+AT;30039;4;de;Reichersberg
+AT;30040;4;de;Reichraming
+AT;30041;2;de;Reifnitz
+AT;30042;6;de;Rein
+AT;30043;3;de;Reingers
+AT;30044;2;de;Reisach
+AT;30045;7;de;Reith bei Seefeld
+AT;30046;7;de;Reith im Alpbachtal
+AT;30047;3;de;Rekawinkel
+AT;30048;2;de;Rennweg
+AT;30049;6;de;Rettenegg
+AT;30050;7;de;Reutte
+AT;30051;3;de;Ried am Riederberg
+AT;30052;4;de;Ried im Innkreis
+AT;30053;7;de;Ried im Oberinntal
+AT;30054;4;de;Ried im Traunkreis
+AT;30055;4;de;Ried in der Riedmark
+AT;30056;4;de;Riedau
+AT;30057;1;de;Riedlingsdorf
+AT;30058;8;de;Riefensberg
+AT;30059;2;de;Riegersdorf
+AT;30060;3;de;Rohr im Gebirge
+AT;30061;4;de;Rohr im Kremstal
+AT;30062;3;de;Rohrau
+AT;30063;3;de;Rohrbach an der Gölsen
+AT;30064;6;de;Rohrbach an der Lafnitz
+AT;30065;1;de;Rohrbach bei Mattersburg
+AT;30066;4;de;Rohrbach in Oberösterreich
+AT;30067;3;de;Rohrendorf bei Krems
+AT;30068;4;de;Roitham
+AT;30069;7;de;Roppen
+AT;30070;3;de;Röschitz
+AT;30071;2;de;Rosegg
+AT;30072;2;de;Rosenbach
+AT;30073;3;de;Rosenburg
+AT;30074;6;de;Rosental an der Kainach
+AT;30075;3;de;Rossatz
+AT;30076;1;de;Rotenturm an der Pinka
+AT;30077;4;de;Rottenegg
+AT;30078;6;de;Rottenmann
+AT;30079;2;de;Ruden
+AT;30080;7;de;Rum
+AT;30081;4;de;Rutzenmoos
+AT;30082;5;de;Saalbach
+AT;30083;5;de;Saalfelden am Steinernen Meer
+AT;30084;6;de;Salla
+AT;30085;3;de;Sallingberg
+AT;30086;5;de;Salzburg
+AT;30087;4;de;Sandl
+AT;30088;4;de;Sarleinsbach
+AT;30089;4;de;Sarmingstein
+AT;30090;8;de;Satteins
+AT;30091;2;de;Sattendorf
+AT;30092;4;de;Sattledt
+AT;30093;3;de;Säusenstein
+AT;30094;7;de;Sautens
+AT;30095;4;de;Saxen
+AT;30096;1;de;Schachendorf
+AT;30097;6;de;Schäffern
+AT;30098;4;de;Schardenberg
+AT;30099;4;de;Schärding
+AT;30100;7;de;Scharnitz
+AT;30101;4;de;Scharnstein
+AT;30102;4;de;Scharten
+AT;30103;1;de;Schattendorf
+AT;30104;7;de;Schattwald
+AT;30105;7;de;Scheffau am Wilden Kaiser
+AT;30106;3;de;Scheibbs
+AT;30107;6;de;Scheifling
+AT;30108;4;de;Schenkenfelden
+AT;30109;4;de;Schiedlberg
+AT;30110;2;de;Schiefling am See
+AT;30111;6;de;Schladming
+AT;30112;3;de;Schleinbach
+AT;30113;8;de;Schlins
+AT;30114;7;de;Schlitters
+AT;30115;4;de;Schneegattern
+AT;30116;8;de;Schnepfau
+AT;30117;6;de;Schöder
+AT;30118;4;de;Schönau im Mühlkreis
+AT;30119;7;de;Schönberg im Stubaital
+AT;30120;3;de;Schönbühel an der Donau
+AT;30121;7;de;Schönwies
+AT;30122;8;de;Schoppernau
+AT;30123;3;de;Schottwien
+AT;30124;3;de;Schrattenthal
+AT;30125;8;de;Schröcken
+AT;30126;8;de;Schruns
+AT;30127;1;de;Schützen am Gebirge
+AT;30128;6;de;Schwanberg
+AT;30129;4;de;Schwand im Innkreis
+AT;30130;4;de;Schwanenstadt
+AT;30131;5;de;Schwarzach im Pongau
+AT;30132;3;de;Schwarzau am Steinfelde
+AT;30133;3;de;Schwarzau im Gebirge
+AT;30134;3;de;Schwarzenbach an der Pielach
+AT;30135;7;de;Schwaz
+AT;30136;3;de;Schwechat
+AT;30137;3;de;Schweiggers
+AT;30138;4;de;Schwertberg
+AT;30139;6;de;Sebersdorf
+AT;30140;6;de;Seckau
+AT;30141;3;de;Seebenstein
+AT;30142;2;de;Seeboden
+AT;30143;7;de;Seefeld in Tirol
+AT;30144;5;de;Seeham
+AT;30145;6;de;Seewiesen
+AT;30146;3;de;Seitenstetten
+AT;30147;7;de;Sellrain
+AT;30148;6;de;Selzthal
+AT;30149;3;de;Semmering
+AT;30150;6;de;Semriach
+AT;30151;7;de;Serfaus
+AT;30152;1;de;Siegendorf im Burgenland
+AT;30153;1;de;Sieggraben
+AT;30154;3;de;Sieghartskirchen
+AT;30155;4;de;Sierning
+AT;30156;5;de;Siezenheim
+AT;30157;4;de;Sigharting
+AT;30158;3;de;Sigmundsherberg
+AT;30159;7;de;Sillian
+AT;30160;6;de;Sinabelkirchen
+AT;30161;4;de;Sipbachzell
+AT;30162;2;de;Sirnitz
+AT;30163;7;de;Sistrans
+AT;30164;3;de;Sitzendorf an der Schmida
+AT;30165;6;de;Soboth
+AT;30166;6;de;Söchau
+AT;30167;7;de;Sölden
+AT;30168;7;de;Söll
+AT;30169;3;de;Sollenau
+AT;30170;3;de;Sommerein
+AT;30171;2;de;Sonnleiten
+AT;30172;8;de;Sonntag
+AT;30173;3;de;Spannberg
+AT;30174;6;de;Spielberg bei Knittelfeld
+AT;30175;6;de;Spielfeld
+AT;30176;3;de;Spillern
+AT;30177;4;de;Spital am Pyhrn
+AT;30178;6;de;Spital am Semmering
+AT;30179;2;de;Spittal an der Drau
+AT;30180;6;de;Stadl an der Mur
+AT;30181;4;de;Stadl-Paura
+AT;30182;1;de;Stadtschlaining
+AT;30183;6;de;Stainach
+AT;30184;6;de;Stainz
+AT;30185;6;de;Stallhofen
+AT;30186;7;de;Stams
+AT;30187;6;de;Stanz im Mürztal
+AT;30188;7;de;Stanzach
+AT;30189;3;de;Statzendorf
+AT;30190;1;de;Stegersbach
+AT;30191;6;de;Stein an der Enns
+AT;30192;3;de;Steinabrückl
+AT;30193;7;de;Steinach am Brenner
+AT;30194;3;de;Steinakirchen am Forst
+AT;30195;4;de;Steinbach am Attersee
+AT;30196;4;de;Steinbach am Ziehberg
+AT;30197;4;de;Steinerkirchen an der Traun
+AT;30198;6;de;Steinhaus am Semmering
+AT;30199;3;de;Stetteldorf am Wagram
+AT;30200;4;de;Steyr
+AT;30201;4;de;Steyregg
+AT;30202;4;de;Steyrermühl
+AT;30203;4;de;Steyrling
+AT;30204;3;de;Stillfried
+AT;30205;1;de;Stinatz
+AT;30206;3;de;Stixneusiedl
+AT;30207;2;de;Stockenboi
+AT;30208;3;de;Stockerau
+AT;30209;3;de;Stockern
+AT;30210;6;de;Stolzalpe
+AT;30211;1;de;Stoob
+AT;30212;3;de;Stössing
+AT;30213;6;de;Straden
+AT;30214;6;de;Strallegg
+AT;30215;3;de;Straning
+AT;30216;7;de;Strass im Zillertal
+AT;30217;6;de;Straß in Steiermark
+AT;30218;3;de;Strasshof an der Nordbahn
+AT;30219;2;de;Strau
+AT;30220;1;de;Strem
+AT;30221;3;de;Strengberg
+AT;30222;7;de;Strengen
+AT;30223;5;de;Strobl
+AT;30224;4;de;Stroheim
+AT;30225;3;de;Stronsdorf
+AT;30226;6;de;Studenzen
+AT;30227;5;de;Stuhlfelden
+AT;30228;4;de;Suben
+AT;30229;3;de;Sulz im Wienerwald
+AT;30230;1;de;Tadten
+AT;30231;2;de;Tainach
+AT;30232;4;de;Taiskirchen im Innkreis
+AT;30233;5;de;Tamsweg
+AT;30234;7;de;Tarrenz
+AT;30235;4;de;Taufkirchen an der Pram
+AT;30236;4;de;Taufkirchen an der Trattnach
+AT;30237;6;de;Tauplitz
+AT;30238;5;de;Taxenbach
+AT;30239;3;de;Teesdorf
+AT;30240;7;de;Telfes im Stubai
+AT;30241;7;de;Telfs
+AT;30242;5;de;Tenneck
+AT;30243;7;de;Terfens
+AT;30244;4;de;Ternberg
+AT;30245;3;de;Ternitz
+AT;30246;6;de;Teufenbach
+AT;30247;3;de;Texing
+AT;30248;5;de;Thalgau
+AT;30249;4;de;Thalheim bei Wels
+AT;30250;7;de;Thaur
+AT;30251;3;de;Thaya
+AT;30252;4;de;Thening
+AT;30253;3;de;Theras
+AT;30254;3;de;Theresienfeld
+AT;30255;7;de;Thiersee
+AT;30256;4;de;Thomasroith
+AT;30257;8;de;Thüringen
+AT;30258;8;de;Thüringerberg
+AT;30259;6;de;Tieschen
+AT;30260;4;de;Timelkam
+AT;30261;6;de;Timmersdorf
+AT;30262;6;de;Tobelbad
+AT;30263;7;de;Tösens
+AT;30264;4;de;Tragwein
+AT;30265;3;de;Traisen
+AT;30266;3;de;Traiskirchen
+AT;30267;3;de;Traismauer
+AT;30268;4;de;Traun
+AT;30269;4;de;Traunkirchen
+AT;30270;1;de;Trausdorf an der Wulka
+AT;30271;6;de;Trautenfels
+AT;30272;3;de;Trautmannsdorf an der Leitha
+AT;30273;6;de;Trautmannsdorf in Oststeiermark
+AT;30274;2;de;Trebesing
+AT;30275;6;de;Treglwang
+AT;30276;4;de;Treubach
+AT;30277;3;de;Tribuswinkel
+AT;30278;6;de;Trieben
+AT;30279;7;de;Trins
+AT;30280;6;de;Trofaiach
+AT;30281;8;de;Tschagguns
+AT;30282;3;de;Tulbing
+AT;30283;3;de;Tullnerbach-Lawies
+AT;30284;6;de;Turnau
+AT;30285;6;de;Turrach
+AT;30286;7;de;Tux
+AT;30287;5;de;Tweng
+AT;30288;2;de;Twimberg
+AT;30289;6;de;Übelbach
+AT;30290;7;de;Uderns
+AT;30291;3;de;Ulrichskirchen
+AT;30292;7;de;Umhausen
+AT;30293;4;de;Ungenach
+AT;30294;5;de;Unken
+AT;30295;2;de;Unterburg am Klopeiner See
+AT;30296;4;de;Untergaisbach
+AT;30297;1;de;Unterkohlstätten
+AT;30298;6;de;Unterlamm
+AT;30299;6;de;Unterpremstätten
+AT;30300;1;de;Unterpullendorf
+AT;30301;6;de;Unterpurkla
+AT;30302;1;de;Unterrabnitz
+AT;30303;3;de;Unterretzbach
+AT;30304;3;de;Untersiebenbrunn
+AT;30305;3;de;Unterstinkenbrunn
+AT;30306;5;de;Untertauern
+AT;30307;3;de;Untertullnerbach
+AT;30308;3;de;Unterwaltersdorf
+AT;30309;6;de;Unzmarkt
+AT;30310;4;de;Utzenaich
+AT;30311;8;de;Vandans
+AT;30312;4;de;Vichtenstein
+AT;30313;3;de;Viehdorf
+AT;30314;5;de;Vigaun
+AT;30315;2;de;Villach
+AT;30316;7;de;Vils
+AT;30317;4;de;Vöcklabruck
+AT;30318;4;de;Vöcklamarkt
+AT;30319;6;de;Voitsberg
+AT;30320;7;de;Volders
+AT;30321;2;de;Völkermarkt
+AT;30322;7;de;Völs
+AT;30323;7;de;Vomp
+AT;30324;6;de;Vorau
+AT;30325;4;de;Vorchdorf
+AT;30326;6;de;Vordernberg
+AT;30327;4;de;Vorderstoder
+AT;30328;3;de;Vösendorf
+AT;30329;6;de;Wagna
+AT;30330;5;de;Wagrain
+AT;30331;3;de;Waidhofen an der Thaya
+AT;30332;3;de;Waidhofen an der Ybbs
+AT;30333;7;de;Waidring
+AT;30334;4;de;Waizenkirchen
+AT;30335;7;de;Walchsee
+AT;30336;6;de;Wald am Schoberpaß
+AT;30337;5;de;Wald im Pinzgau
+AT;30338;6;de;Waldbach
+AT;30339;4;de;Waldhausen im Strudengau
+AT;30340;4;de;Walding
+AT;30341;3;de;Waldkirchen an der Thaya
+AT;30342;4;de;Waldneukirchen
+AT;30343;6;de;Waldstein
+AT;30344;4;de;Waldzell
+AT;30345;3;de;Walkenstein
+AT;30346;4;de;Wallern an der Trattnach
+AT;30347;1;de;Wallern im Burgenland
+AT;30348;3;de;Wallsee
+AT;30349;3;de;Wampersdorf
+AT;30350;4;de;Wartberg an der Krems
+AT;30351;6;de;Wartberg im Mürztal
+AT;30352;4;de;Wartberg ob der Aist
+AT;30353;7;de;Wattens
+AT;30354;4;de;Waxenberg
+AT;30355;7;de;Weerberg
+AT;30356;1;de;Weiden am See
+AT;30357;1;de;Weiden bei Rechnitz
+AT;30358;3;de;Weidling
+AT;30359;3;de;Weikendorf
+AT;30360;3;de;Weikertschlag an der Thaya
+AT;30361;6;de;Weinburg am Saßbach
+AT;30362;3;de;Weissenbach an der Triesting
+AT;30363;2;de;Weißensee
+AT;30364;6;de;Weißkirchen in Steiermark
+AT;30365;3;de;Weistrach
+AT;30366;2;de;Weitensfeld
+AT;30367;6;de;Weitersfeld an der Mur
+AT;30368;4;de;Weitersfelden
+AT;30369;3;de;Weitra
+AT;30370;6;de;Weiz
+AT;30371;4;de;Wels
+AT;30372;4;de;Weng im Innkreis
+AT;30373;6;de;Wenigzell
+AT;30374;7;de;Wenns
+AT;30375;1;de;Weppersdorf
+AT;30376;5;de;Werfen
+AT;30377;5;de;Werfenweng
+AT;30378;2;de;Wernberg
+AT;30379;6;de;Werndorf
+AT;30380;4;de;Wernstein am Inn
+AT;30381;4;de;Wesenufer
+AT;30382;6;de;Wettmannstätten
+AT;30383;4;de;Weyregg am Attersee
+AT;30384;9;de;Wien
+AT;30385;9;de;Wien-Austria Center
+AT;30386;3;de;Wiener Neudorf
+AT;30387;3;de;Wiener Neustadt
+AT;30388;3;de;Wienerbruck
+AT;30389;3;de;Wiesmath
+AT;30390;2;de;Wieting
+AT;30391;6;de;Wildalpen
+AT;30392;6;de;Wildbad Einöd
+AT;30393;3;de;Wildendürnbach
+AT;30394;6;de;Wildon
+AT;30395;3;de;Wilfleinsdorf
+AT;30396;4;de;Wilhering
+AT;30397;1;de;Winden am See
+AT;30398;4;de;Windhaag bei Freistadt
+AT;30399;4;de;Windhaag bei Perg
+AT;30400;3;de;Windigsteig
+AT;30401;4;de;Windischgarsten
+AT;30402;1;de;Wolfau
+AT;30403;4;de;Wolfern
+AT;30404;6;de;Wolfsberg im Schwarzautal
+AT;30405;4;de;Wolfsegg am Hausruck
+AT;30406;3;de;Wolfsgraben
+AT;30407;3;de;Wolfsthal
+AT;30408;8;de;Wolfurt
+AT;30409;3;de;Wöllersdorf
+AT;30410;7;de;Wörgl
+AT;30411;6;de;Wörschach
+AT;30412;6;de;Wörth an der Lafnitz
+AT;30413;1;de;Wulkaprodersdorf
+AT;30414;3;de;Wullersdorf
+AT;30415;3;de;Wulzeshofen
+AT;30416;6;de;Wundschuh
+AT;30417;3;de;Würmla
+AT;30418;3;de;Würnitz
+AT;30419;3;de;Ybbs an der Donau
+AT;30420;3;de;Ybbsitz
+AT;30421;7;de;Zams
+AT;30422;5;de;Zederhaus
+AT;30423;3;de;Zeillern
+AT;30424;3;de;Zeiselmauer
+AT;30425;4;de;Zell am Moos
+AT;30426;5;de;Zell am See
+AT;30427;7;de;Zell am Ziller
+AT;30428;4;de;Zell an der Pram
+AT;30429;3;de;Zellerndorf
+AT;30430;6;de;Zeltweg
+AT;30431;1;de;Zemendorf
+AT;30432;3;de;Ziersdorf
+AT;30433;1;de;Zillingtal
+AT;30434;4;de;Zipf
+AT;30435;7;de;Zirl
+AT;30436;3;de;Zistersdorf
+AT;30437;2;de;Zlan
+AT;30438;3;de;Zöbern
+AT;30439;1;de;Zurndorf
+AT;30440;8;de;Zürs
+AT;30441;2;de;Zweinitz
+AT;30442;4;de;Zwettl an der Rodl
+AT;30443;3;de;Zwingendorf
+AT;32381;4;de;Linz

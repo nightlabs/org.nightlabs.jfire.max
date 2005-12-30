@@ -1,0 +1,17 @@
+CountryID;RegionID;LanguageID;RegionName
+DE;BB;de;Brandenburg
+DE;BE;de;Berlin
+DE;BW;de;Baden-Württemberg
+DE;BY;de;Bayern
+DE;HB;de;Bremen
+DE;HE;de;Hessen
+DE;HH;de;Hamburg
+DE;MV;de;Mecklenburg-Vorpommern
+DE;NI;de;Niedersachsen
+DE;NW;de;Nordrhein-Westfalen
+DE;RP;de;Rheinland-Pfalz
+DE;SH;de;Schleswig-Holstein
+DE;SL;de;Saarland
+DE;SN;de;Sachsen
+DE;ST;de;Sachsen-Anhalt
+DE;TH;de;Thüringen

@@ -1,7 +1,7 @@
 /*
  * Created on Feb 21, 2005
  */
-package org.nightlabs.ipanema.simpletrade;
+package org.nightlabs.jfire.simpletrade;
 
 import java.rmi.RemoteException;
 import java.util.ArrayList;
@@ -21,44 +21,44 @@ import javax.jdo.Query;
 
 import org.apache.log4j.Logger;
 import org.nightlabs.ModuleException;
-import org.nightlabs.ipanema.accounting.Accounting;
-import org.nightlabs.ipanema.accounting.Currency;
-import org.nightlabs.ipanema.accounting.PriceFragmentType;
-import org.nightlabs.ipanema.accounting.Tariff;
-import org.nightlabs.ipanema.accounting.id.CurrencyID;
-import org.nightlabs.ipanema.accounting.id.PriceFragmentTypeID;
-import org.nightlabs.ipanema.accounting.id.TariffID;
-import org.nightlabs.ipanema.accounting.tariffpriceconfig.FormulaCell;
-import org.nightlabs.ipanema.accounting.tariffpriceconfig.FormulaPriceConfig;
-import org.nightlabs.ipanema.accounting.tariffpriceconfig.PriceCalculator;
-import org.nightlabs.ipanema.accounting.tariffpriceconfig.StablePriceConfig;
-import org.nightlabs.ipanema.base.BaseSessionBeanImpl;
-import org.nightlabs.ipanema.organisation.Organisation;
-import org.nightlabs.ipanema.security.User;
-import org.nightlabs.ipanema.simpletrade.store.SimpleProductType;
-import org.nightlabs.ipanema.store.NestedProductType;
-import org.nightlabs.ipanema.store.ProductType;
-import org.nightlabs.ipanema.store.Store;
-import org.nightlabs.ipanema.store.deliver.DeliveryConfiguration;
-import org.nightlabs.ipanema.store.deliver.ModeOfDelivery;
-import org.nightlabs.ipanema.store.deliver.id.ModeOfDeliveryID;
-import org.nightlabs.ipanema.store.id.ProductTypeID;
-import org.nightlabs.ipanema.trade.ArticleCreator;
-import org.nightlabs.ipanema.trade.CustomerGroup;
-import org.nightlabs.ipanema.trade.LegalEntity;
-import org.nightlabs.ipanema.trade.Offer;
-import org.nightlabs.ipanema.trade.Order;
-import org.nightlabs.ipanema.trade.Segment;
-import org.nightlabs.ipanema.trade.Trader;
-import org.nightlabs.ipanema.trade.id.SegmentID;
+import org.nightlabs.jfire.accounting.Accounting;
+import org.nightlabs.jfire.accounting.Currency;
+import org.nightlabs.jfire.accounting.PriceFragmentType;
+import org.nightlabs.jfire.accounting.Tariff;
+import org.nightlabs.jfire.accounting.id.CurrencyID;
+import org.nightlabs.jfire.accounting.id.PriceFragmentTypeID;
+import org.nightlabs.jfire.accounting.id.TariffID;
+import org.nightlabs.jfire.accounting.tariffpriceconfig.FormulaCell;
+import org.nightlabs.jfire.accounting.tariffpriceconfig.FormulaPriceConfig;
+import org.nightlabs.jfire.accounting.tariffpriceconfig.PriceCalculator;
+import org.nightlabs.jfire.accounting.tariffpriceconfig.StablePriceConfig;
+import org.nightlabs.jfire.base.BaseSessionBeanImpl;
+import org.nightlabs.jfire.organisation.Organisation;
+import org.nightlabs.jfire.security.User;
+import org.nightlabs.jfire.simpletrade.store.SimpleProductType;
+import org.nightlabs.jfire.store.NestedProductType;
+import org.nightlabs.jfire.store.ProductType;
+import org.nightlabs.jfire.store.Store;
+import org.nightlabs.jfire.store.deliver.DeliveryConfiguration;
+import org.nightlabs.jfire.store.deliver.ModeOfDelivery;
+import org.nightlabs.jfire.store.deliver.id.ModeOfDeliveryID;
+import org.nightlabs.jfire.store.id.ProductTypeID;
+import org.nightlabs.jfire.trade.ArticleCreator;
+import org.nightlabs.jfire.trade.CustomerGroup;
+import org.nightlabs.jfire.trade.LegalEntity;
+import org.nightlabs.jfire.trade.Offer;
+import org.nightlabs.jfire.trade.Order;
+import org.nightlabs.jfire.trade.Segment;
+import org.nightlabs.jfire.trade.Trader;
+import org.nightlabs.jfire.trade.id.SegmentID;
 import org.nightlabs.jdo.NLJDOHelper;
 import org.nightlabs.jdo.moduleregistry.ModuleMetaData;
 import org.nightlabs.util.Utils;
 
 
 /**
- * @ejb.bean name="ipanema/ejb/JFireSimpleTrade/SimpleTradeManager"	
- *					 jndi-name="ipanema/ejb/JFireSimpleTrade/SimpleTradeManager"
+ * @ejb.bean name="jfire/ejb/JFireSimpleTrade/SimpleTradeManager"	
+ *					 jndi-name="jfire/ejb/JFireSimpleTrade/SimpleTradeManager"
  *					 type="Stateless" 
  *					 transaction-type="Container"
  *
@@ -71,7 +71,7 @@ implements SessionBean
 	public static final Logger LOGGER = Logger.getLogger(SimpleTradeManagerBean.class);
 
 	/**
-	 * @see org.nightlabs.ipanema.base.BaseSessionBeanImpl#setSessionContext(javax.ejb.SessionContext)
+	 * @see org.nightlabs.jfire.base.BaseSessionBeanImpl#setSessionContext(javax.ejb.SessionContext)
 	 */
 	public void setSessionContext(SessionContext sessionContext)
 	throws EJBException, RemoteException
@@ -79,7 +79,7 @@ implements SessionBean
 		super.setSessionContext(sessionContext);
 	}
 	/**
-	 * @see org.nightlabs.ipanema.base.BaseSessionBeanImpl#unsetSessionContext()
+	 * @see org.nightlabs.jfire.base.BaseSessionBeanImpl#unsetSessionContext()
 	 */
 	public void unsetSessionContext() {
 		super.unsetSessionContext();
@@ -535,8 +535,8 @@ implements SessionBean
 	}
 
 	/**
-	 * @return <tt>Collection</tt> of {@link org.nightlabs.ipanema.trade.Article}
-	 * @throws org.nightlabs.ipanema.store.NotAvailableException in case there are not enough <tt>Product</tt>s available and the <tt>Product</tt>s cannot be created (because of a limit). 
+	 * @return <tt>Collection</tt> of {@link org.nightlabs.jfire.trade.Article}
+	 * @throws org.nightlabs.jfire.store.NotAvailableException in case there are not enough <tt>Product</tt>s available and the <tt>Product</tt>s cannot be created (because of a limit). 
 	 *
 	 * @ejb.interface-method
 	 * @ejb.permission role-name="_Guest_"

@@ -3,12 +3,12 @@
  * 					by alex
  *
  */
-package org.nightlabs.ipanema.simpletrade.store;
+package org.nightlabs.jfire.simpletrade.store;
 
 import java.util.Map;
 import java.util.Set;
 
-import org.nightlabs.ipanema.store.ProductTypeSearchFilter;
+import org.nightlabs.jfire.store.ProductTypeSearchFilter;
 
 /**
  * @author Alexander Bieber <alex[AT]nightlabs[DOT]de>
@@ -24,7 +24,7 @@ public class SimpleProductTypeSearchFilter extends ProductTypeSearchFilter {
 	}
 
 	/**
-	 * @see org.nightlabs.ipanema.store.ProductTypeSearchFilter#getProductTypeClass()
+	 * @see org.nightlabs.jfire.store.ProductTypeSearchFilter#getProductTypeClass()
 	 */
 	protected Class getProductTypeClass() {
 		return SimpleProductType.class;

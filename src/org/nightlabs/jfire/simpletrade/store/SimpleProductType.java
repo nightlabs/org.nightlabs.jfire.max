@@ -1,7 +1,7 @@
 /*
  * Created on Feb 21, 2005
  */
-package org.nightlabs.ipanema.simpletrade.store;
+package org.nightlabs.jfire.simpletrade.store;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -16,22 +16,22 @@ import org.nightlabs.inheritance.FieldInheriter;
 import org.nightlabs.inheritance.FieldMetaData;
 import org.nightlabs.inheritance.Inheritable;
 import org.nightlabs.inheritance.InheritableFieldInheriter;
-import org.nightlabs.ipanema.security.User;
-import org.nightlabs.ipanema.store.NestedProductType;
-import org.nightlabs.ipanema.store.ProductLocator;
-import org.nightlabs.ipanema.store.ProductType;
-import org.nightlabs.ipanema.store.Repository;
-import org.nightlabs.ipanema.store.Store;
-import org.nightlabs.ipanema.store.id.ProductTypeID;
-import org.nightlabs.ipanema.trade.LegalEntity;
-import org.nightlabs.ipanema.transfer.id.AnchorID;
+import org.nightlabs.jfire.security.User;
+import org.nightlabs.jfire.store.NestedProductType;
+import org.nightlabs.jfire.store.ProductLocator;
+import org.nightlabs.jfire.store.ProductType;
+import org.nightlabs.jfire.store.Repository;
+import org.nightlabs.jfire.store.Store;
+import org.nightlabs.jfire.store.id.ProductTypeID;
+import org.nightlabs.jfire.trade.LegalEntity;
+import org.nightlabs.jfire.transfer.id.AnchorID;
 
 /**
  * @author Marco Schulze - marco at nightlabs dot de
  * 
  * @jdo.persistence-capable 
  *		identity-type="application"
- *		persistence-capable-superclass="org.nightlabs.ipanema.store.ProductType"
+ *		persistence-capable-superclass="org.nightlabs.jfire.store.ProductType"
  *		detachable="true"
  *		table="JFireSimpleTrade_SimpleProductType"
  *
@@ -203,7 +203,7 @@ public class SimpleProductType extends ProductType
 	}
 
 //	/**
-//	 * @see org.nightlabs.ipanema.store.ProductType#isProductProvider()
+//	 * @see org.nightlabs.jfire.store.ProductType#isProductProvider()
 //	 */
 //	public boolean isProductProvider()
 //	{
@@ -211,7 +211,7 @@ public class SimpleProductType extends ProductType
 //	}
 
 //	/**
-//	 * @see org.nightlabs.ipanema.store.ProductType#provideAvailableProduct()
+//	 * @see org.nightlabs.jfire.store.ProductType#provideAvailableProduct()
 //	 */
 //	public Product provideAvailableProduct()
 //	{
@@ -235,7 +235,7 @@ public class SimpleProductType extends ProductType
 //	}
 
 	/**
-	 * @see org.nightlabs.ipanema.store.ProductType#_checkProductAvailability()
+	 * @see org.nightlabs.jfire.store.ProductType#_checkProductAvailability()
 	 */
 	protected boolean _checkProductAvailability()
 	{
@@ -249,7 +249,7 @@ public class SimpleProductType extends ProductType
 	/**
 	 * WORKAROUND Because of a JPOX bug, we have to re-set the member extendedProductType in the EJBean.
 	 * 
-	 * @see org.nightlabs.ipanema.store.ProductType#setExtendedProductType(org.nightlabs.ipanema.store.ProductType)
+	 * @see org.nightlabs.jfire.store.ProductType#setExtendedProductType(org.nightlabs.jfire.store.ProductType)
 	 */
 	public void setExtendedProductType(ProductType extendedProductType)
 	{
@@ -285,14 +285,14 @@ public class SimpleProductType extends ProductType
 	}
 
 	/**
-	 * This is the {@link org.nightlabs.ipanema.transfer.Anchor#getAnchorID()} of
+	 * This is the {@link org.nightlabs.jfire.transfer.Anchor#getAnchorID()} of
 	 * the {@link Repository} which becomes the factory-output-repository for all
 	 * newly created {@link SimpleProduct}s.
 	 */
 	public static final String ANCHOR_ID_REPOSITORY_HOME_LOCAL = SimpleProductType.class.getName() + ".local";
 
 	/**
-	 * This is the {@link org.nightlabs.ipanema.transfer.Anchor#getAnchorID()} of
+	 * This is the {@link org.nightlabs.jfire.transfer.Anchor#getAnchorID()} of
 	 * the {@link Repository} which is used for products that are bought from a foreign organisation.
 	 */
 	public static final String ANCHOR_ID_REPOSITORY_HOME_FOREIGN = SimpleProductType.class.getName() + ".foreign";

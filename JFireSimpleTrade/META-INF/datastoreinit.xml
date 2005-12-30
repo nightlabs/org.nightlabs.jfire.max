@@ -2,11 +2,11 @@
 		PUBLIC "-//NightLabs GmbH//DTD Datastore Initialization 1.0//EN"
 		"http://www.nightlabs.de/dtd/datastoreinit_1_0.dtd">
 <datastore-initialization>
-	<init bean="ipanema/ejb/JFireSimpleTrade/SimpleTradeManager" method="initialize">
+	<init bean="jfire/ejb/JFireSimpleTrade/SimpleTradeManager" method="initialize">
 		<depends
 					module="JFireTrade.ear"
 					archive="JFireTrade.jar"
-					bean="ipanema/ejb/JFireTrade/AccountingManager"
+					bean="jfire/ejb/JFireTrade/AccountingManager"
 					method="initialize" />
 	</init>
 </datastore-initialization>

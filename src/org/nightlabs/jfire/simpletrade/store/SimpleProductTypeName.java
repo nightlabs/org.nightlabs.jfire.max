@@ -1,7 +1,7 @@
 /*
  * Created on Feb 21, 2005
  */
-package org.nightlabs.ipanema.simpletrade.store;
+package org.nightlabs.jfire.simpletrade.store;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -13,14 +13,14 @@ import org.nightlabs.inheritance.Inheritable;
 import org.nightlabs.inheritance.MapFieldInheriter;
 import org.nightlabs.inheritance.NotWritableException;
 import org.nightlabs.inheritance.SimpleFieldInheriter;
-import org.nightlabs.ipanema.store.ProductType;
+import org.nightlabs.jfire.store.ProductType;
 
 /**
  * @author Marco Schulze - marco at nightlabs dot de
  * 
  * @jdo.persistence-capable
  *		identity-type="application"
- *		objectid-class="org.nightlabs.ipanema.simpletrade.store.id.SimpleProductTypeNameID"
+ *		objectid-class="org.nightlabs.jfire.simpletrade.store.id.SimpleProductTypeNameID"
  *		detachable="true"
  *		table="JFireSimpleTrade_SimpleProductTypeName"
  *

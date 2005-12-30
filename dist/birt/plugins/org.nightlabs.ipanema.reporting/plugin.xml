@@ -1,24 +1,24 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <?eclipse version="3.0"?>
 <plugin
-   id="org.nightlabs.ipanema.reporting"
+   id="org.nightlabs.jfire.reporting"
    name="ODA Driver for JDOQL (Server Side)"
    version="1.0"
    provider-name="NightLabs.org"
-   class="org.nightlabs.ipanema.reporting.ReportPlugin">
+   class="org.nightlabs.jfire.reporting.ReportPlugin">
    <extension
          point="org.eclipse.datatools.connectivity.oda.dataSource">
       <dataSource
             defaultDisplayName="JFire JDOQL Driver"
-            driverClass="org.nightlabs.ipanema.reporting.oda.jdoql.server.ServerJDOQLDriver"
-            id="org.nightlabs.ipanema.reporting.oda.jdoql.JDOQLDriver"
+            driverClass="org.nightlabs.jfire.reporting.oda.jdoql.server.ServerJDOQLDriver"
+            id="org.nightlabs.jfire.reporting.oda.jdoql.JDOQLDriver"
             odaVersion="3.0"
             setThreadContextClassLoader="false">
       </dataSource>
       <dataSet
             defaultDisplayName="JDOQL Data Set"
-            displayNameID="org.nightlabs.ipanema.reporting.oda.jdoql.JDOQLDataSet"
-            id="org.nightlabs.ipanema.reporting.oda.jdoql.JDOQLDataSet">
+            displayNameID="org.nightlabs.jfire.reporting.oda.jdoql.JDOQLDataSet"
+            id="org.nightlabs.jfire.reporting.oda.jdoql.JDOQLDataSet">
          <dataTypeMapping
                nativeDataType="String"
                nativeDataTypeCode="1"
@@ -49,14 +49,14 @@
          point="org.eclipse.datatools.connectivity.oda.dataSource">
       <dataSource
             defaultDisplayName="JFire JDO JavaScript Driver"
-            driverClass="org.nightlabs.ipanema.reporting.oda.jdojs.server.ServerJDOJSDriver"
-            id="org.nightlabs.ipanema.reporting.oda.jdojs.JDOJSDriver"
+            driverClass="org.nightlabs.jfire.reporting.oda.jdojs.server.ServerJDOJSDriver"
+            id="org.nightlabs.jfire.reporting.oda.jdojs.JDOJSDriver"
             odaVersion="3.0"
             setThreadContextClassLoader="false">
       </dataSource>
       <dataSet
             defaultDisplayName="JDO JavaScript Data Set"            
-            id="org.nightlabs.ipanema.reporting.oda.jdojs.JDOJSDataSet">
+            id="org.nightlabs.jfire.reporting.oda.jdojs.JDOJSDataSet">
          <dataTypeMapping
                nativeDataType="String"
                nativeDataTypeCode="1"

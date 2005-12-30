@@ -1,6 +1,6 @@
 importPackage(Packages.java.util);
 importClass(Packages.javax.jdo.Query);
-importClass(Packages.org.nightlabs.ipanema.accounting.Invoice);
+importClass(Packages.org.nightlabs.jfire.accounting.Invoice);
 
 resultSet.addRow();
 resultSet.addColumn("Test");
@@ -16,7 +16,7 @@ resultSet.addColumn("MrQuickFix");
 
 q = persistenceManager.newQuery(
   persistenceManager.getExtent(
-    Packages.org.nightlabs.ipanema.accounting.Invoice
+    Packages.org.nightlabs.jfire.accounting.Invoice
   )
 );
 

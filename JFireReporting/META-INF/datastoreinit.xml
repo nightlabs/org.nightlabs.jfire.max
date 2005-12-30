@@ -2,5 +2,5 @@
 		PUBLIC "-//NightLabs GmbH//DTD Datastore Initialization 1.0//EN"
 		"http://www.nightlabs.de/dtd/datastoreinit_1_0.dtd">
 <datastore-initialization>
-	<init bean="ipanema/ejb/JFireReporting/ReportManager" method="initialize"/>
+	<init bean="jfire/ejb/JFireReporting/ReportManager" method="initialize"/>
 </datastore-initialization>

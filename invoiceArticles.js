@@ -5,8 +5,8 @@ metaData.addColumn("amount", DataType.BIGDECIMAL);
 // *************************************
 // fetchScript
 // *************************************
-importPackage(Packages.org.nightlabs.ipanema.accounting);
-importPackage(Packages.org.nightlabs.ipanema.person);
+importPackage(Packages.org.nightlabs.jfire.accounting);
+importPackage(Packages.org.nightlabs.jfire.person);
 
 invoiceOrganisationID = p_1;
 invoiceInvoiceID = p_2;
@@ -14,7 +14,7 @@ languageID = p_3;
 
 q = persistenceManager.newQuery(
 	persistenceManager.getExtent(
-		Packages.org.nightlabs.ipanema.accounting.Invoice
+		Packages.org.nightlabs.jfire.accounting.Invoice
 	)
 );
 

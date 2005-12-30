@@ -1,4 +1,4 @@
-importPackage(Packages.org.nightlabs.ipanema.reporting.oda);
+importPackage(Packages.org.nightlabs.jfire.reporting.oda);
 
 metaData.addColumn("testColumn1", DataType.STRING);
 metaData.addColumn("testColumn2", DataType.STRING);

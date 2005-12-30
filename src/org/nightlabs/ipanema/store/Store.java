@@ -1,0 +1,1385 @@
+/*
+ * Created on 16.10.2004
+ */
+package org.nightlabs.ipanema.store;
+
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+
+import javax.jdo.JDOHelper;
+import javax.jdo.JDOObjectNotFoundException;
+import javax.jdo.PersistenceManager;
+import javax.jdo.listener.StoreCallback;
+
+import org.apache.log4j.Logger;
+
+import org.nightlabs.ipanema.accounting.MoneyTransfer;
+import org.nightlabs.ipanema.organisation.LocalOrganisation;
+import org.nightlabs.ipanema.security.User;
+import org.nightlabs.ipanema.store.book.BookProductTransfer;
+import org.nightlabs.ipanema.store.book.LocalStorekeeper;
+import org.nightlabs.ipanema.store.book.PartnerStorekeeper;
+import org.nightlabs.ipanema.store.deliver.DeliverProductTransfer;
+import org.nightlabs.ipanema.store.deliver.Delivery;
+import org.nightlabs.ipanema.store.deliver.DeliveryData;
+import org.nightlabs.ipanema.store.deliver.DeliveryException;
+import org.nightlabs.ipanema.store.deliver.DeliveryResult;
+import org.nightlabs.ipanema.store.deliver.ModeOfDeliveryFlavour;
+import org.nightlabs.ipanema.store.deliver.ServerDeliveryProcessor;
+import org.nightlabs.ipanema.store.deliver.ServerDeliveryProcessor.DeliverParams;
+import org.nightlabs.ipanema.store.deliver.id.ServerDeliveryProcessorID;
+import org.nightlabs.ipanema.store.id.DeliveryNoteID;
+import org.nightlabs.ipanema.store.id.ProductID;
+import org.nightlabs.ipanema.store.id.ProductTypeID;
+import org.nightlabs.ipanema.store.id.ProductTypeStatusTrackerID;
+import org.nightlabs.ipanema.trade.Article;
+import org.nightlabs.ipanema.trade.ArticleContainer;
+import org.nightlabs.ipanema.trade.LegalEntity;
+import org.nightlabs.ipanema.trade.Offer;
+import org.nightlabs.ipanema.trade.Order;
+import org.nightlabs.ipanema.trade.OrganisationLegalEntity;
+import org.nightlabs.ipanema.trade.id.ArticleID;
+import org.nightlabs.ipanema.transfer.Anchor;
+import org.nightlabs.ipanema.transfer.Transfer;
+import org.nightlabs.ipanema.transfer.TransferRegistry;
+
+/**
+ * The Store is responsible for managing all ProductTypes and Products
+ * within the store. There exists exactly one instance.
+ * 
+ * @author marco at nightlabs dot de
+ *
+ * @jdo.persistence-capable
+ *		identity-type="datastore"
+ *		detachable="true"
+ *		table="JFireTrade_Store"
+ *
+ * @jdo.inheritance strategy="new-table"
+ */
+public class Store
+	implements TransferRegistry, StoreCallback
+{
+	public static Logger LOGGER = Logger.getLogger(Store.class);
+	
+	/**
+	 * This method returns the singleton instance of Store. If there is
+	 * no instance of Store in the datastore, yet, it will be created.
+	 *
+	 * @param pm
+	 * @return
+	 */
+	public static Store getStore(PersistenceManager pm)
+	{
+		Iterator it = pm.getExtent(Store.class).iterator();
+		if (it.hasNext())
+			return (Store)it.next();
+
+		Store store = new Store();
+
+		// initialize the organisationID
+		LocalOrganisation localOrganisation = LocalOrganisation.getLocalOrganisation(pm);
+		String organisationID = localOrganisation.getOrganisation().getOrganisationID();
+		store.organisationID = organisationID;
+		store.mandator = OrganisationLegalEntity.getOrganisationLegalEntity(pm, organisationID, OrganisationLegalEntity.ANCHOR_TYPE_ID_ORGANISATION, true);
+		store.localStorekeeper = new LocalStorekeeper(store.mandator, LocalStorekeeper.class.getName());
+		store.mandator.setStorekeeper(store.localStorekeeper);
+		store.partnerStorekeeper = new PartnerStorekeeper(organisationID, PartnerStorekeeper.class.getName());
+
+		pm.makePersistent(store);
+		return store;
+	}
+
+	/**
+	 * @jdo.field persistence-modifier="persistent"
+	 */
+	private LocalStorekeeper localStorekeeper;
+
+	/**
+	 * @jdo.field persistence-modifier="persistent"
+	 */
+	private PartnerStorekeeper partnerStorekeeper;
+
+	/**
+	 * @jdo.field persistence-modifier="persistent"
+	 * @jdo.column length="100"
+	 */
+	private String organisationID;
+	
+	/**
+	 * @jdo.field persistence-modifier="persistent"
+	 */
+	private long nextProductTypeID = 0;
+	private static long _nextProductTypeID = -1;
+	private static Object _nextProductTypeIDMutex = new Object();
+
+	/**
+	 * @jdo.field persistence-modifier="persistent"
+	 */
+	private long nextProductID = 0;
+	private static long _nextProductID = -1;
+	private static Object _nextProductIDMutex = new Object();
+
+	/**
+	 * @jdo.field persistence-modifier="persistent"
+	 */ 
+	private OrganisationLegalEntity mandator;
+
+	protected Store() { }
+
+//	/**
+//	 * key: String productPrimaryKey {organisationID + / + productID}<br/>
+//	 * value: ProductType productType
+//	 *
+//	 * @jdo.field
+//	 *		persistence-modifier="persistent"
+//	 *		collection-type="map"
+//	 *		key-type="java.lang.String"
+//	 *		value-type="ProductType"
+//	 *		dependent="true"
+//	 *
+//	 * @jdo.join
+//	 *
+//	 * @jdo.map-vendor-extension vendor-name="jpox" key="key-length" value="max 201"
+//	 */
+//	protected Map productTypes = new HashMap();
+	
+//	/**
+//	 * key: String productPrimaryKey {organisationID + / + productID}<br/>
+//	 * value: ProductStatusTracker productStatusTracker
+//	 * 
+//	 * @jdo.field
+//	 *		persistence-modifier="persistent"
+//	 *		collection-type="map"
+//	 *		key-type="java.lang.String"
+//	 *		value-type="ProductStatusTracker"
+//	 *		dependent="true"
+//	 *
+//	 * @jdo.join
+//	 * 
+//	 * @jdo.map-vendor-extension vendor-name="jpox" key="key-length" value="max 201"
+//	 */
+//	protected Map productTypeStatusTrackers = new HashMap();
+
+//	/**
+//	 * key: String productPrimaryKey {organisationID + / + productID}<br/>
+//	 * value: ProductType product
+//	 * 
+//	 * @jdo.field
+//	 *		persistence-modifier="persistent"
+//	 *		collection-type="map"
+//	 *		key-type="java.lang.String"
+//	 *		value-type="ProductType"
+//	 *		dependent="true"
+//	 *
+//	 * @jdo.join
+//	 * 
+//	 * @jdo.map-vendor-extension vendor-name="jpox" key="key-length" value="max 201"
+//	 */
+//	protected Map products = new HashMap();
+	
+//	/**
+//	 * key: String productPrimaryKey {organisationID + / + productID}<br/>
+//	 * value: ProductStatusTracker productStatusTracker
+//	 *
+//	 * @jdo.field
+//	 *		persistence-modifier="persistent"
+//	 *		collection-type="map"
+//	 *		key-type="java.lang.String"
+//	 *		value-type="ProductStatusTracker"
+//	 *		dependent="true"
+//	 *
+//	 * @jdo.join
+//	 *
+//	 * @jdo.map-vendor-extension vendor-name="jpox" key="key-length" value="max 201"
+//	 */
+//	protected Map productStatusTrackers = new HashMap();
+
+//	/**
+//	 * key: String productPrimaryKey {organisationID + / + productID}<br/>
+//	 * value: ProductTransferTracker productTransferTracker
+//	 *
+//	 * @jdo.field
+//	 *		persistence-modifier="persistent"
+//	 *		collection-type="map"
+//	 *		key-type="java.lang.String"
+//	 *		value-type="ProductTransferTracker"
+//	 *		dependent="true"
+//	 *
+//	 * @jdo.join
+//	 *
+//	 * @jdo.map-vendor-extension vendor-name="jpox" key="key-length" value="max 201"
+//	 */
+//	protected Map productTransferTrackers = new HashMap();
+
+	public void setProductTypeStatus_published(User user, ProductType productType)
+	{
+		if (productType.isPublished())
+			return;
+
+		productType.setPublished(true);
+		getProductTypeStatusTracker(productType, true).newCurrentStatus(user);
+	}
+
+	public void setProductTypeStatus_confirmed(User user, ProductType productType)
+	{
+		if (productType.isConfirmed())
+			return;
+
+		productType.setConfirmed(true);
+		getProductTypeStatusTracker(productType, true).newCurrentStatus(user);
+	}
+
+	public void setProductTypeStatus_saleable(User user, ProductType productType, boolean saleable)
+	{
+		if (productType.isSaleable() == saleable)
+			return;
+
+		productType.setSaleable(saleable);
+		getProductTypeStatusTracker(productType, true).newCurrentStatus(user);
+	}
+
+	public void setProductTypeStatus_closed(User user, ProductType productType)
+	{
+		if (productType.isClosed())
+			return;
+
+		productType.setSaleable(true);
+		getProductTypeStatusTracker(productType, true).newCurrentStatus(user);
+	}
+
+	/**
+	 * @return Returns the organisationID.
+	 */
+	public String getOrganisationID()
+	{
+		return organisationID;
+	}
+	/**
+	 * @param organisationID The organisationID to set.
+	 */
+	protected void setOrganisationID(String organisationID)
+	{
+		this.organisationID = organisationID;
+	}
+
+	public String createProductTypeID()
+	{
+		synchronized (_nextProductTypeIDMutex) {
+			if (_nextProductTypeID < 0)
+				_nextProductTypeID = nextProductTypeID;
+
+			long res = _nextProductTypeID++;
+			nextProductTypeID = _nextProductTypeID;
+			return Long.toHexString(res);
+		}
+	}
+
+	public long createProductID()
+	{
+		synchronized (_nextProductIDMutex) {
+			if (_nextProductID < 0)
+				_nextProductID = nextProductID;
+
+			long res = _nextProductID++;
+			nextProductID = _nextProductID;
+			return res;
+		}
+	}
+
+	protected PersistenceManager getPersistenceManager()
+	{
+		PersistenceManager pm = JDOHelper.getPersistenceManager(this);
+		if (pm == null)
+			throw new IllegalStateException("This instance of Store is currently not persistent! Cannot obtain a PersistenceManager!");
+		return pm;
+	}
+
+	public boolean containsProductType(ProductType productType)
+	{
+		PersistenceManager pm = getPersistenceManager();
+		try {
+			pm.getObjectById(ProductTypeID.create(
+				productType.getOrganisationID(), productType.getProductTypeID()));
+
+			return true;
+		} catch (JDOObjectNotFoundException x) {
+			return false;
+		}
+	}
+
+	/**
+	 * @param user Which user is adding this productType.
+	 * @param productType
+	 */
+	public ProductType addProductType(User user, ProductType productType, Anchor home)
+	{
+		PersistenceManager pm = getPersistenceManager();
+		try {
+			pm.getObjectById(ProductTypeID.create(
+				productType.getOrganisationID(), productType.getProductTypeID()));
+
+			throw new IllegalStateException("ProductType \""+productType.getPrimaryKey()+"\" exists already!");
+		} catch (JDOObjectNotFoundException x) {
+			// we expect this.
+		}
+
+		if (JDOHelper.isDetached(productType))
+			productType = (ProductType) pm.attachCopy(productType, false);
+		else
+			pm.makePersistent(productType);
+
+		// TODO remove this and put all the logic from ProductTypeStatusTracker into ProductTypeLocal!
+		ProductTypeStatusTracker productTypeStatusTracker = new ProductTypeStatusTracker(productType, user);
+		pm.makePersistent(productTypeStatusTracker);
+
+		productType.createProductTypeLocal(user, home);
+		return productType;
+	}
+
+	/**
+	 * @param user Which user is adding this product.
+	 * @param product The <tt>Product</tt> that shall be added.
+	 * @param initialRepository The <tt>Repository</tt> into which the <tt>product</tt> is "born"
+	 */
+	public Product addProduct(User user, Product product, Repository initialRepository)
+	{
+		PersistenceManager pm = getPersistenceManager();
+
+// TODO uncomment the following once the JPOX bug is solved.
+//		try {
+//			pm.getObjectById(ProductID.create(
+//				product.getOrganisationID(), product.getProductID()));
+//
+//			throw new IllegalStateException("Product \""+product.getPrimaryKey()+"\" exists already!");
+//		} catch (JDOObjectNotFoundException x) {
+//			// we expect this.
+//		}
+
+		if (JDOHelper.isDetached(product))
+			product = (Product) pm.attachCopy(product, false);
+		else
+			pm.makePersistent(product);
+
+		product.createProductLocal(user, initialRepository);
+		return product;
+	}
+
+	public ProductType getProductType(String organisationID, String productTypeID, boolean throwExceptionIfNotFound)
+	{
+		PersistenceManager pm = getPersistenceManager();
+		pm.getExtent(ProductType.class);
+
+		try {
+			return (ProductType) pm.getObjectById(ProductTypeID.create(organisationID, productTypeID));
+		} catch (JDOObjectNotFoundException x) {
+			if (throwExceptionIfNotFound)
+				throw x;
+		}
+
+		return null;
+	}
+	public ProductTypeStatusTracker getProductTypeStatusTracker(String organisationID, String productTypeID, boolean throwExceptionIfNotFound)
+	{
+		PersistenceManager pm = getPersistenceManager();
+		pm.getExtent(ProductTypeStatusTracker.class);
+		ProductTypeStatusTracker res = null;
+		try {
+			res = (ProductTypeStatusTracker) pm.getObjectById(
+					ProductTypeStatusTrackerID.create(organisationID, productTypeID));
+		} catch (JDOObjectNotFoundException x) {
+			if (throwExceptionIfNotFound)
+				throw x;
+		}
+		return res;
+	}
+	public ProductTypeStatusTracker getProductTypeStatusTracker(ProductTypeID productTypeID, boolean throwExceptionIfNotFound)
+	{
+		return getProductTypeStatusTracker(productTypeID.organisationID, productTypeID.productTypeID, throwExceptionIfNotFound);
+	}
+	public ProductTypeStatusTracker getProductTypeStatusTracker(ProductType productType, boolean throwExceptionIfNotFound)
+	{
+		return getProductTypeStatusTracker((ProductTypeID)JDOHelper.getObjectId(productType), throwExceptionIfNotFound);
+	}
+
+	public Product getProduct(String organisationID, long productID, boolean throwExceptionIfNotFound)
+	{
+		PersistenceManager pm = getPersistenceManager();
+		pm.getExtent(Product.class);
+		try {
+			return (Product) pm.getObjectById(ProductID.create(organisationID, productID));
+		} catch (JDOObjectNotFoundException x) {
+			if (throwExceptionIfNotFound)
+				throw x;
+		}
+
+		return null;
+	}
+//	public ProductStatusTracker getProductStatusTracker(Product product, boolean throwExceptionIfNotFound)
+//	{
+//		if (product == null)
+//			throw new NullPointerException("product must not be null!");
+//
+//		PersistenceManager pm = getPersistenceManager();
+//		pm.getExtent(ProductStatusTracker.class);
+//		try {
+//			return (ProductStatusTracker) pm.getObjectById(
+//					ProductStatusTrackerID.create(product.getOrganisationID(), product.getProductID()));
+//		} catch (JDOObjectNotFoundException x) {
+//			if (throwExceptionIfNotFound)
+//				throw x;
+//		}
+//		return null;
+//	}
+//	public ProductTransferTracker getProductTransferTracker(
+//			String organisationID, String productID, boolean throwExceptionIfNotFound)
+//	{
+//		// TODO
+//		throw new UnsupportedOperationException("NYI");
+//	}
+//	public ProductTransferTracker getProductTransferTracker(ProductType product, boolean throwExceptionIfNotFound)
+//	{
+//		// TODO
+//		throw new UnsupportedOperationException("NYI");
+//	}
+
+//	protected ProductTransfer transferProducts(ProductTransfer container, User initiator, Anchor from, Anchor to, Collection products)
+//	{
+//		PersistenceManager pm = JDOHelper.getPersistenceManager(this);
+//		if (pm == null)
+//			throw new IllegalStateException("This store is not persistent! I don't have a PersistenceManager!");
+//
+//		ProductTransfer productTransfer = new ProductTransfer(this, container, initiator, from, to, products);
+//		for (Iterator it = products.iterator(); it.hasNext(); ) {
+//			Product product = (Product)it.next();
+////			getProductTransferTracker(product, true).addProductTransfer(productTransfer);
+//		}
+//		// TODO We should make sure that all products can be transferred (e.g. to check packaged products).
+//		// And probably we need to do much more...
+//		return productTransfer;
+//	}
+//
+//	public ProductTransfer transferProducts(User initiator, Anchor from, Anchor to, ProductTransfer container)
+//	{
+//		return transferProducts(container, initiator, from, to, container.products.values());
+//	}
+//
+//	public ProductTransfer transferProducts(User initiator, Anchor from, Anchor to, Collection products)
+//	{
+//		return transferProducts(null, initiator, from, to, products);
+//	}
+
+	/**
+	 * @param productType Can be <code>null</code>, if <code>nestedProductType</code> is defined.
+	 * @param nestedProductType Can be <code>null</code>, if <code>productType</code> is defined (usually, when it is the top-level-producttype).
+	 * @return Returns <tt>Collection</tt> of suitable <tt>Product</tt>s or <tt>null</tt> if nothing is available.
+	 */
+	public Collection findProducts(User user, ProductType productType, NestedProductType nestedProductType, ProductLocator productLocator)
+	{
+		if (nestedProductType == null && productType == null)
+			throw new IllegalArgumentException("productType and nestedProductType are both null! One of them must be defined!");
+
+		if (nestedProductType != null)
+			productType = nestedProductType.getInnerProductType();
+
+		return productType.findProducts(
+				user, nestedProductType, productLocator);
+	}
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	/**
+	 * @jdo.field persistence-modifier="persistent"
+	 */	
+	private long nextDeliveryNoteID = 0;
+	private static long _nextDeliveryNoteID = -1;
+	private static Object _nextDeliveryNoteIDMutex = new Object();
+
+	protected long createDeliveryNoteID() {
+		synchronized (_nextDeliveryNoteIDMutex) {
+			if (_nextDeliveryNoteID < 0)
+				_nextDeliveryNoteID = nextDeliveryNoteID;
+
+			long res = _nextDeliveryNoteID++;
+			nextDeliveryNoteID = _nextDeliveryNoteID;
+			return res;
+		}
+	}
+
+
+	/**
+	 * @return Returns the mandator.
+	 */
+	public OrganisationLegalEntity getMandator()
+	{
+		return mandator;
+	}
+
+	public void addArticlesToDeliveryNote(User user, DeliveryNote deliveryNote, Collection articles)
+	throws DeliveryNoteEditException
+	{
+		for (Iterator it = articles.iterator(); it.hasNext(); ) {
+			Article article = (Article) it.next();
+			deliveryNote.addArticle(article);
+		}
+	}
+
+	public void removeArticlesFromDeliveryNote(User user, DeliveryNote deliveryNote, Collection articles)
+	throws DeliveryNoteEditException
+	{
+		for (Iterator it = articles.iterator(); it.hasNext(); ) {
+			Article article = (Article) it.next();
+			deliveryNote.removeArticle(article);
+		}
+	}
+
+	/**
+	 * Creates a new DeliveryNote with the given articles.
+	 * Checks whether vendor and customer are the same for all involved offers
+	 * whether not articles are associated to another <tt>DeliverNote</tt>. If
+	 * one check
+	 * fails a DeliveryNoteEditException will be thrown.
+	 *
+	 * @param user The user which is responsible for creation of this invoice.
+	 * @param articles The {@link Article}s that shall be added to the invoice. Must not be empty (because the customer is looked up from the articles). 
+	 */
+	public DeliveryNote createDeliveryNote(
+			User user, Collection articles)
+	throws DeliveryNoteEditException
+	{
+		if (articles.size() <= 0)
+			throw new DeliveryNoteEditException(
+				DeliveryNoteEditException.REASON_NO_ARTICLES,
+				"Cannot create a DeliveryNote without Articles!"
+			);
+
+		// Make sure all Articles are not yet in a DeliveryNote.
+		// all offers have the same vendor and customer
+		// and all offers have the same currency
+		String vendorPK = null;
+		OrganisationLegalEntity vendorLE = null;
+		String customerPK = null;
+		LegalEntity customerLE = null;
+		for (Iterator iter = articles.iterator(); iter.hasNext();) {
+			Article article = (Article) iter.next();
+			
+			if (vendorPK == null) {
+				vendorLE = article.getOffer().getOrder().getVendor();
+				vendorPK = vendorLE.getPrimaryKey();
+			}
+			if (customerPK == null) {
+				customerLE = article.getOffer().getOrder().getCustomer();
+				customerPK = customerLE.getPrimaryKey();
+			}
+
+			Offer articleOffer = article.getOffer();
+			Order articleOrder = articleOffer.getOrder();
+			
+			if (!articleOffer.getOfferLocal().isConfirmed()) {
+				throw new DeliveryNoteEditException(
+					DeliveryNoteEditException.REASON_OFFER_NOT_CONFIRMED, 
+					"At least one involved offer is not confirmed!",
+					(ArticleID) JDOHelper.getObjectId(article)
+				);
+			}
+
+			if (!vendorPK.equals(articleOrder.getVendor().getPrimaryKey()) 
+						|| 
+					!customerPK.equals(articleOrder.getCustomer().getPrimaryKey()) 
+					)
+			{
+				throw new DeliveryNoteEditException(
+					DeliveryNoteEditException.REASON_ANCHORS_DONT_MATCH,				
+					"Vendor and customer are not equal for all involved orders, can not create DeliveryNote!!"
+				);
+			}
+
+			if (article.getDeliveryNote() != null) {
+//				DeliveryNoteID invoiceID = DeliveryNoteID.create(article.getDeliveryNote().getOrganisationID(), article.getDeliveryNote().getDeliveryNoteID());
+				DeliveryNote deliveryNote = article.getDeliveryNote();
+				throw new DeliveryNoteEditException(
+					DeliveryNoteEditException.REASON_ARTICLE_ALREADY_IN_DELIVERY_NOTE,
+					"Article already in a delivery note. Article "+article.getPrimaryKey()+", DeliveryNote "+deliveryNote.getPrimaryKey(), 
+					(ArticleID) JDOHelper.getObjectId(article), 
+					(DeliveryNoteID) JDOHelper.getObjectId(deliveryNote)
+				);
+			}
+
+		}
+
+		if (!vendorPK.equals(getMandator().getPrimaryKey()))
+			throw new DeliveryNoteEditException(
+				DeliveryNoteEditException.REASON_FOREIGN_ORGANISATION,
+				"Attempt to create a DeliveryNote not with the local organisation as vendor. Vendor is "+vendorPK
+			);
+
+		DeliveryNote deliveryNote = new DeliveryNote(
+				user, vendorLE, customerLE, createDeliveryNoteID());
+		new DeliveryNoteLocal(deliveryNote); // self-registering
+		getPersistenceManager().makePersistent(deliveryNote);
+		for (Iterator iter = articles.iterator(); iter.hasNext();) {
+			Article article = (Article) iter.next();
+			deliveryNote.addArticle(article);
+		}
+
+		return deliveryNote;
+	}
+
+	/**
+	 * Creates and persists a {@link DeliveryNote} for all {@link Article}s of the
+	 * given <tt>Offer</tt>.
+	 * It silently ignores <tt>Article</tt>s that are already in an other
+	 * <tt>DeliveryNote</tt>.
+	 *
+	 * @param user
+	 * @param offer
+	 * @return a new DeliveryNote
+	 * @throws DeliveryNoteEditException
+	 */
+	public DeliveryNote createDeliveryNote(User user, ArticleContainer articleContainer) 
+	throws DeliveryNoteEditException 
+	{
+		ArrayList articles = new ArrayList();
+		for (Iterator it = articleContainer.getArticles().iterator(); it.hasNext(); ) {
+			Article article = (Article) it.next();
+			if (article.getDeliveryNote() == null)
+				articles.add(article);
+		}
+		return createDeliveryNote(user, articles);
+	}
+
+	public void validateDeliveryNote(DeliveryNote deliveryNote)
+	{
+		deliveryNote.validate();
+	}
+
+	/**
+	 * @return Never returns <tt>null</tt>. If {@link Delivery#getServerDeliveryProcessorID()}
+	 *		returns <tt>null</tt>, a suitable processor is searched according to the given
+	 *		<tt>ModeOfDeliveryFlavour</tt>. If no processor can be found at all, an
+	 *		<tt>IllegalStateException</tt> is thrown.
+	 */
+	protected ServerDeliveryProcessor getServerDeliveryProcessor(
+			Delivery delivery)
+	{
+		ModeOfDeliveryFlavour modeOfDeliveryFlavour = delivery.getModeOfDeliveryFlavour();
+		ServerDeliveryProcessorID serverDeliveryProcessorID = delivery.getServerDeliveryProcessorID();
+		// get ServerDeliveryProcessor, if serverDeliveryProcessorID is defined.
+		ServerDeliveryProcessor serverDeliveryProcessor = null;
+		if (serverDeliveryProcessorID != null) {
+			PersistenceManager pm = getPersistenceManager();
+			pm.getExtent(ServerDeliveryProcessor.class);
+			serverDeliveryProcessor = (ServerDeliveryProcessor) pm.getObjectById(serverDeliveryProcessorID);
+		}
+
+		if (serverDeliveryProcessor == null) {
+			Collection c = ServerDeliveryProcessor.getServerDeliveryProcessorsForOneModeOfDeliveryFlavour(
+					getPersistenceManager(),
+					modeOfDeliveryFlavour);
+			if (c.isEmpty())
+				throw new IllegalStateException("No ServerDeliveryProcessor registered for ModeOfDeliveryFlavour \""+modeOfDeliveryFlavour.getPrimaryKey()+"\"!");
+
+			serverDeliveryProcessor = (ServerDeliveryProcessor) c.iterator().next();
+		} // if (serverDeliveryProcessor == null) {
+
+		return serverDeliveryProcessor;
+	}
+
+	/**
+	 * @param deliveryNotes Can be null. Should be a <tt>Collection</tt> of {@link DeliveryNote}
+	 * @param currency Can be null.
+	 * @return Either <tt>null</tt>, in case no DeliveryNote was passed or the partner
+	 *		(if at least one DeliveryNote has been passed in <tt>deliveryNotes</tt>).
+	 */
+	protected LegalEntity deliverBegin_checkDeliveryNotesAndGetPartner(Collection deliveryNotes)
+	{
+		if (deliveryNotes == null)
+			return null;
+
+//	 check currency and find out partner
+		// ...maybe it will later be possible to deliver an deliveryNote in a different
+		// currency, but currently this is not possible.
+//		LegalEntity mandator = getMandator();
+		String mandatorPK = getMandator().getPrimaryKey();
+		LegalEntity partner = null;
+		for (Iterator it = deliveryNotes.iterator(); it.hasNext(); ) {
+			DeliveryNote deliveryNote = (DeliveryNote) it.next();
+
+			if (mandatorPK.equals(deliveryNote.getVendor().getPrimaryKey())) {
+				if (partner == null)
+					partner = deliveryNote.getCustomer();
+				else {
+					String foundPartnerPK = deliveryNote.getCustomer().getPrimaryKey();
+					if (!partner.getPrimaryKey().equals(foundPartnerPK))
+						throw new IllegalArgumentException("Customer of deliveryNote \"" + deliveryNote.getPrimaryKey() + "\" does not match other deliveryNotes' partners! Expected partner \"" + partner.getPrimaryKey() + "\", but found \"" + foundPartnerPK + "\"!");
+				}
+			} // vendor is mandator
+			else {
+				if (!mandatorPK.equals(deliveryNote.getCustomer().getPrimaryKey()))
+					throw new IllegalArgumentException("The deliveryNote \""+deliveryNote.getPrimaryKey()+"\" has nothing to do with the mandator (\"" + mandator.getPrimaryKey() + "\")!");
+
+				if (partner == null)
+					partner = deliveryNote.getVendor();
+				else {
+					String foundPartnerPK = deliveryNote.getVendor().getPrimaryKey();
+					if (!partner.getPrimaryKey().equals(foundPartnerPK))
+						throw new IllegalArgumentException("Vendor of deliveryNote \"" + deliveryNote.getPrimaryKey() + "\" does not match other deliveryNotes' partners! Expected partner \"" + partner.getPrimaryKey() + "\", but found \"" + foundPartnerPK + "\"!");
+				}
+			}
+		}
+
+		return partner;
+	}
+
+//	/**
+//	 * @param user The {@link User} who is responsible for the delivery.
+//	 * @param deliveryDataList Instances of {@link DeliveryData}.
+//	 * @return Returns instances of {@link DeliveryResult} corresponding to the
+//	 *		{@link DeliveryData} objects passed in <tt>deliveryDataList</tt>.
+//	 */
+//	public List deliverBegin(User user, List deliveryDataList)
+//	{
+//		List resList = new ArrayList();
+//		for (Iterator it = deliveryDataList.iterator(); it.hasNext(); ) {
+//			DeliveryData deliveryData = (DeliveryData) it.next();
+//			try {
+//				DeliveryResult res = deliverBegin(user, deliveryData);
+//				resList.add(res);
+//			} catch (DeliveryException x) {
+//				resList.add(x.getDeliveryResult());
+//			} catch (Throwable t) {
+//				
+//			}
+//		}
+//		return resList;
+//	}
+
+	public LocalStorekeeper getLocalStorekeeper()
+	{
+		return localStorekeeper;
+	}
+
+	public PartnerStorekeeper getPartnerStorekeeper()
+	{
+		return partnerStorekeeper;
+	}
+
+	/**
+	 * Finalizes a deliveryNote and sends it to the involved 
+	 * organisation if neccessary.
+	 * 
+	 * @param finalizer
+	 * @param deliveryNote
+	 */
+	public void finalizeDeliveryNote(User finalizer, DeliveryNote deliveryNote) {
+		if (deliveryNote.isFinalized())
+			return;
+
+		if (!deliveryNote.getVendor().getPrimaryKey().equals(getMandator().getPrimaryKey()))
+			throw new IllegalArgumentException("Can not finalize a deliveryNote where mandator is not vendor of this deliveryNote!");
+
+		// deliveryNote.setFinalized(...) does nothing, if it is already finalized.
+		deliveryNote.setFinalized(finalizer);
+		if (deliveryNote.getCustomer() instanceof OrganisationLegalEntity) {
+			// TODO: Put the Invoice in the queue on this organisations server ...
+		}
+	}
+
+	public void bookDeliveryNote(User initiator, DeliveryNote deliveryNote, boolean finalizeIfNecessary, boolean silentlyIgnoreBookedInvoice)
+	{
+		DeliveryNoteLocal deliveryNoteLocal = deliveryNote.getDeliveryNoteLocal();
+		if (deliveryNoteLocal.isBooked()) {
+			if (!silentlyIgnoreBookedInvoice)
+				throw new IllegalStateException("Invoice \""+deliveryNote.getPrimaryKey()+"\" has already been booked!");
+
+			return;
+		}
+
+		if (!deliveryNote.isFinalized()) {
+			if (!finalizeIfNecessary)
+				throw new IllegalStateException("Invoice \""+deliveryNote.getPrimaryKey()+"\" is not finalized!");
+
+			finalizeDeliveryNote(initiator, deliveryNote);
+		}
+
+//		LegalEntity from = null;
+//		LegalEntity to = null;
+//
+//		if (deliveryNote.getPrice().getAmount() >= 0) {
+//			from = deliveryNote.getCustomer();
+//			to = deliveryNote.getVendor();
+//		}
+//		else {
+//			from = deliveryNote.getVendor();
+//			to = deliveryNote.getCustomer();
+//		}
+//
+//		// The LocalAccountant is assigned to the mandator in any case, because it is
+//		// assigned during creation of Accounting. Hence, we don't need to check whether
+//		// from or to is the other side.
+//		if (from.getAccountant() == null)
+//			from.setAccountant(getPartnerAccountant());
+//
+//		if (to.getAccountant() == null)
+//			to.setAccountant(getPartnerAccountant());
+//
+//		// create the BookMoneyTransfer with positive amount but in the right direction
+//		if (deliveryNote.getPrice().getAmount() < 0) {
+//			LegalEntity tmp = from;
+//			from = to;
+//			to = tmp;
+//		}
+//
+//		BookProductTransfer interLegalEntityMoneyTransfer = new BookProductTransfer(
+//			this,
+//			initiator,
+//			from,
+//			to,			
+//			deliveryNote
+//		);
+//		HashMap involvedAnchors = new HashMap();
+//		interLegalEntityMoneyTransfer.bookTransfer(initiator, involvedAnchors);
+
+		if (deliveryNote.getCustomer().getStorekeeper() == null)
+			deliveryNote.getCustomer().setStorekeeper(getPartnerStorekeeper());
+
+		if (deliveryNote.getVendor().getStorekeeper() == null)
+			deliveryNote.getVendor().setStorekeeper(getPartnerStorekeeper());
+
+		// The booking works only with ProductHoles - the ProductLocal is not touched (Product is never touched anyway by deliveries or bookings) 
+		HashMap involvedAnchors = new HashMap();
+		List bookProductTransfers = BookProductTransfer.createBookProductTransfers(this, initiator, deliveryNote);
+		boolean failed = true;
+		try {
+			for (Iterator it = bookProductTransfers.iterator(); it.hasNext(); ) {
+				BookProductTransfer bookProductTransfer = (BookProductTransfer) it.next();
+				bookProductTransfer.bookTransfer(initiator, involvedAnchors);
+			}
+	
+			checkIntegrity(bookProductTransfers, involvedAnchors);
+
+			failed = false;
+		} finally {
+			if (failed)
+				Anchor.resetIntegrity(bookProductTransfers, involvedAnchors);
+		}
+
+		deliveryNoteLocal.setBooked(initiator);
+	}
+
+	/**
+	 * 1. The LegalEntity checks, whether the ProductHoles of the current transaction have quantity = 0.<br/>
+	 * 2. The Repositories do NOT check anything themselves (except maybe whether they're too full (=> no space)),
+	 *    but is checked by this method whether all ProductHoles have a quantity between -1 and +1 and only
+	 *    exactly ONE Repository has -1 and ONE repository has +1.<br/>
+	 * 3. productLocal.quantity is updated.
+	 *
+	 * @param containers Instances of {@link Transfer}
+	 * @param involvedAnchors
+	 */
+	protected void checkIntegrity(Collection containers, Map involvedAnchors)
+	{
+		PersistenceManager pm = getPersistenceManager();
+
+		// We collect the products from all container-transfers.
+		Set products = new HashSet();
+		for (Iterator it = containers.iterator(); it.hasNext(); ) {
+			ProductTransfer container = (ProductTransfer) it.next();
+			products.addAll(container.getProducts());
+		}
+
+		// These two Maps should store for each Product where it's coming from and
+		// where it's going to because of the given containers.
+		Map fromProductReferenceByProductMap = new HashMap();
+		Map toProductReferenceByProductMap = new HashMap();
+
+		for (Iterator itA = involvedAnchors.values().iterator(); itA.hasNext(); ) {
+			Anchor anchor = (Anchor) itA.next();
+
+			// Give every involved Anchor the possibility to check itself.
+			anchor.checkIntegrity(containers);
+
+			// LegalEntity checked itself already! Therefore all its ProductHoles have quantity = 0
+			// and we don't need to iterate the products (and search for ProductHoles).
+			if (anchor instanceof LegalEntity)
+				continue;
+
+			// If the current Anchor is the final destination or the very source of the transfer of
+			// any product, put it into one of the product2xxxMaps 
+			for (Iterator itP = products.iterator(); itP.hasNext(); ) {
+				Product product = (Product) itP.next();
+				ProductReference productReference = ProductReference.getProductReference(pm, anchor, product, true);
+				int qty = productReference.getQuantity();
+				switch (qty) {
+					case -1: {
+						ProductReference pr = (ProductReference) fromProductReferenceByProductMap.get(product);
+						if (pr != null)
+							throw new IllegalStateException("The Product \"" + product.getPrimaryKey() + "\" has more than one ProductReference with quantity = -1: ProductReference \"" + pr.getPrimaryKey() + "\" and \"" + productReference.getPrimaryKey() + "\" (and maybe even more)!");
+
+						fromProductReferenceByProductMap.put(product, productReference);
+						break;
+					}
+					case 0:
+						// nothing
+						break;
+					case 1: {
+						ProductReference pr = (ProductReference) toProductReferenceByProductMap.get(product);
+						if (pr != null)
+							throw new IllegalStateException("The Product \"" + product.getPrimaryKey() + "\" has more than one ProductReference with quantity = +1: ProductReference \"" + pr.getPrimaryKey() + "\" and \"" + productReference.getPrimaryKey() + "\" (and maybe even more)!");
+
+						toProductReferenceByProductMap.put(product, productReference);
+						break;
+					}
+					default:
+					throw new IllegalStateException("ProductReference for Anchor \""+anchor.getPrimaryKey()+"\" and Product \""+product.getPrimaryKey()+"\" has illegal quantity = " + qty + "! Quantity must be >= -1 and <= 1!");
+				}
+			}
+		}
+
+		// If we came here, all is fine. Note, that products.size() and the size of the two maps might
+		// differ. This can happen, because we checked only those ProductHoles that are part of this transaction
+		// and there might be a "neighbour" chain that caused the beginning/end of this chain to be 0.
+
+// Marco: productLocal.quantity is updated in Repository now already!
+//		// We update productLocal.quantity now. This works always, because a 
+//		for (Iterator itP = products.iterator(); itP.hasNext(); ) {
+//			Product product = (Product) itP.next();
+//			ProductLocal productLocal = product.getProductLocal();
+//			ProductReference productReferenceSource = (ProductReference) product2SourceProductHoleMap.get(product);
+//			ProductReference productReferenceDest = (ProductReference) product2DestinationProductHoleMap.get(product);
+//
+//			Repository repositorySource = productReferenceSource == null ? null : (Repository) productReferenceSource.getAnchor();
+//			Repository repositoryDest = productReferenceDest == null ? null : (Repository) productReferenceDest.getAnchor();
+//
+//			if (repositorySource != null && repositorySource.isOutside())
+//				productLocal.incQuantity();
+//
+//			if (repositoryDest != null && repositoryDest.isOutside())
+//				productLocal.decQuantity();
+//		}
+	}
+
+	/**
+	 * If the {@link ProductLocal#get} 
+	 *
+	 * @param products
+	 */
+	public void consolidateProductReferences(Collection products)
+	{
+		PersistenceManager pm = getPersistenceManager();
+
+		for (Iterator itP = products.iterator(); itP.hasNext(); ) {
+			Product product = (Product) itP.next();
+
+			Collection productReferencesSource = ProductReference.getProductReferences(pm, product, -1);
+			Collection productReferencesDest = ProductReference.getProductReferences(pm, product, 1);
+
+			int size = productReferencesSource.size();
+			if (size != productReferencesDest.size())
+				throw new IllegalStateException("Product \"" + product.getPrimaryKey() + "\" has " + productReferencesSource.size() + " ProductHoles with quantity = -1, but " + productReferencesDest.size() + " ProductHoles with quantity = +1! The number of both should be the same!");
+
+			// If we have multiple "chains" of product-transfers, we cannot consolidate.
+			if (size != 1)
+				continue;
+
+			ProductReference productReferenceSource = (ProductReference) productReferencesSource.iterator().next();
+			ProductReference productReferenceDest = (ProductReference) productReferencesDest.iterator().next();
+			Repository repositorySource = (Repository) productReferenceSource.getAnchor();
+			Repository repositoryDest = (Repository) productReferenceDest.getAnchor();
+			ProductLocal productLocal = product.getProductLocal();
+
+			if (productLocal.getQuantity() >= 0) {
+				pm.deletePersistentAll(ProductReference.getProductReferences(pm, product));
+
+				// put the product to the final destination
+				Repository currentRepository = (Repository) productLocal.getAnchor();
+				if (!currentRepository.isOutside() && !repositorySource.getPrimaryKey().equals(currentRepository.getPrimaryKey()))
+					throw new IllegalStateException("Product \"" + product.getPrimaryKey() + "\" is currently in a different inside repository (\"" + currentRepository.getPrimaryKey() + "\") than the transfer chain starts (\"" + repositorySource.getPrimaryKey() + "\")!");
+
+				setProductLocalAnchorRecursively(product, repositoryDest);
+			}
+		}
+	}
+
+	/**
+	 * This method sets the Anchor for all (including the nested) Products.
+	 *
+	 * @param productLocal
+	 * @param anchor
+	 */
+	protected void setProductLocalAnchorRecursively(Product product, Anchor anchor)
+	{
+		ProductLocal productLocal = product.getProductLocal();
+		productLocal.setAnchor(anchor);
+		// TODO I should somehow ensure, that the nested products really can be delivered - or does it work this way, because
+		// we call it only when ProductLocal.quantity >= 0???!
+
+// The nested products are handled during assembling/disassembling
+//		for (Iterator it = productLocal.getNestedProducts().iterator(); it.hasNext(); )
+//			setProductLocalAnchorRecursively((Product)it.next(), anchor);
+	}
+
+	protected void deliverBegin_checkArticles(Collection articles)
+	{
+		for (Iterator iter = articles.iterator(); iter.hasNext();) {
+			Article article = (Article) iter.next();
+			if (article.isReversed())
+				throw new IllegalArgumentException("Article " + article.getPrimaryKey() + " is reversed and therefore cannot be delivered!");
+
+			if (article.isReversing() && !article.getReversedArticle().getArticleLocal().isDelivered())
+				throw new IllegalArgumentException("Article " + article.getPrimaryKey() + " is reversing the Article " + article.getReversedArticle().getPrimaryKey() + " which was not delivered! Cannot return something that has never left!");
+		}
+	}
+
+	public DeliveryResult deliverBegin(User user, DeliveryData deliveryData)
+	throws DeliveryException
+	{
+		if (user == null)
+			throw new NullPointerException("user");
+
+		if (deliveryData == null)
+			throw new NullPointerException("deliveryData");
+
+		if (deliveryData.getDelivery() == null)
+			throw new NullPointerException("deliveryData.getDelivery() returns null!");
+
+		ServerDeliveryProcessor serverDeliveryProcessor = getServerDeliveryProcessor(
+				deliveryData.getDelivery());
+
+		LegalEntity partner = null;
+		if (deliveryData.getDelivery().getDeliveryNotes() != null) {
+			partner = deliverBegin_checkDeliveryNotesAndGetPartner(
+					deliveryData.getDelivery().getDeliveryNotes());
+		}
+		else
+			throw new IllegalArgumentException("Delivery is not possible anymore without delivery notes! This exception should never happen.");
+
+		if (partner == null) {
+			partner = deliveryData.getDelivery().getPartner();
+		}
+		else {
+			if (!partner.getPrimaryKey().equals(deliveryData.getDelivery().getPartner().getPrimaryKey()))
+				throw new IllegalArgumentException("deliveryData.getDelivery().getPartner() does not match the partner of deliveryData.getDelivery().getInvoices()!");
+		}
+
+		deliverBegin_checkArticles(deliveryData.getDelivery().getArticles());
+
+		if (partner.getStorekeeper() == null)
+			partner.setStorekeeper(getPartnerStorekeeper());
+
+//	 call server-sided delivery processor's first phase
+		DeliverProductTransfer deliverProductTransfer = serverDeliveryProcessor.deliverBegin(
+				new DeliverParams(this, user, deliveryData));
+
+		DeliveryResult serverDeliveryResult;
+		serverDeliveryResult = deliveryData.getDelivery().getDeliverBeginServerResult();
+		if (serverDeliveryResult == null)
+			throw new DeliveryException(
+					new DeliveryResult(
+							getOrganisationID(),
+							DeliveryResult.CODE_FAILED,
+							"deliveryData.getDelivery().getDeliverBeginServerResult() returned null! You probably forgot to set it in your ServerDeliveryProcessor (\""+serverDeliveryProcessor.getPrimaryKey()+"\")!",
+							(Throwable)null));
+
+		if (serverDeliveryResult.isFailed())
+			throw new DeliveryException(serverDeliveryResult);
+
+//		// I don't know why, but without the following line, it is not set in the datastore.
+//		deliveryData.getDelivery().setDeliverBeginServerResult(serverDeliveryResult);
+
+		if (deliveryData.getDelivery().isPostponed()) {
+			// if we have a DeliverProductTransfer, we need to delete it from datastore
+			if (deliverProductTransfer != null) {
+				if (deliverProductTransfer.isBookedFrom() || deliverProductTransfer.isBookedTo())
+					throw new IllegalStateException("DeliverProductTransfer is already booked! You should never book the DeliverProductTransfer in your ServerDeliveryProcessor! Check the class \""+serverDeliveryProcessor.getClass()+"\"!");
+
+				getPersistenceManager().deletePersistent(deliverProductTransfer);
+				deliverProductTransfer = null;
+			}
+		}
+		else { // not postponed
+			if (!serverDeliveryResult.isApproved())
+				throw new DeliveryException(serverDeliveryResult);
+
+			if (deliverProductTransfer == null)
+				throw new NullPointerException("serverDeliveryProcessor.deliverBegin(...) returned null but Delivery is NOT postponed! You are only allowed (and you should) return null, if you postpone a Delivery! serverDeliveryProcessorPK=\""+serverDeliveryProcessor.getPrimaryKey()+"\"");
+
+			HashMap involvedAnchors = new HashMap();
+			ArrayList containers = new ArrayList(1);
+			containers.add(deliverProductTransfer);
+			boolean failed = true;
+			try {
+				deliverProductTransfer.bookTransfer(user, involvedAnchors);
+	
+				// check consistence
+				checkIntegrity(containers, involvedAnchors);
+
+				failed = false;
+			} finally {
+				if (failed)
+					Anchor.resetIntegrity(containers, involvedAnchors);
+			}
+		}
+
+		return serverDeliveryResult;
+	}
+
+//	protected void transferProductsWithPartner(LegalEntity partner, ProductTransfer productTransfer)
+//	{
+//		// we group the products that come from the same repository - so we have less ProductTransfers
+//		Map repository2ProductList = new HashMap();
+//
+//		for (Iterator it = productTransfer.getProducts().iterator(); it.hasNext(); ) {
+//			Product product = (Product) it.next();
+//			Repository repository = (Repository)product.getProductLocal().getAnchor();
+//			List productList = (List)repository2ProductList.get(repository);
+//			if (productList == null) {
+//				productList = new ArrayList();
+//				repository2ProductList.put(repository, productList);
+//			}
+//			productList.add(product);
+//		}
+//
+//		for (Iterator it = repository2ProductList.entrySet().iterator(); it.hasNext(); ) {
+//			Map.Entry me = (Map.Entry)it.next();
+//			Repository repository = (Repository) me.getKey();
+//			List productList = (List) me.getValue();
+//
+//			Anchor from;
+//			Anchor to;
+//			switch (productTransfer.getAnchorType(partner)) {
+//				case Transfer.ANCHORTYPE_FROM:
+//					from = partner;
+//					to = repository; // FIXME This is wrong! The target must be found out differently (e.g. registry or another config - or the one it came originally from?!)
+//					break;
+//				case Transfer.ANCHORTYPE_TO:
+//					from = repository;
+//					to = partner;
+//					break;
+//				default:
+//					throw new IllegalStateException("Partner LegalEntity is neither from nor to of transfer!");
+//			}
+////			new ProductTransfer(this, );
+//		}
+//	}
+
+	public DeliveryResult deliverDoWork(
+			User user, DeliveryData deliveryData)
+	throws DeliveryException
+	{
+		if (user == null)
+			throw new NullPointerException("user");
+
+		if (deliveryData == null)
+			throw new NullPointerException("deliveryData");
+
+		ServerDeliveryProcessor serverDeliveryProcessor = getServerDeliveryProcessor(
+				deliveryData.getDelivery());
+
+//	 call server-sided delivery processor's second phase
+		serverDeliveryProcessor.deliverDoWork(
+				new DeliverParams(this, user, deliveryData));
+
+		DeliveryResult serverDeliveryResult;
+		serverDeliveryResult = deliveryData.getDelivery().getDeliverDoWorkServerResult();
+		if (serverDeliveryResult == null)
+			throw new DeliveryException(
+					new DeliveryResult(
+							getOrganisationID(),
+							DeliveryResult.CODE_FAILED,
+							"deliveryData.getDelivery().getDeliverDoWorkServerResult() returned null! You probably forgot to set it in your ServerDeliveryProcessor (\""+serverDeliveryProcessor.getPrimaryKey()+"\")!",
+							(Throwable)null));
+
+		if (serverDeliveryResult.isFailed())
+			throw new DeliveryException(serverDeliveryResult);
+
+		if (!serverDeliveryResult.isDelivered())
+			throw new DeliveryException(serverDeliveryResult);
+
+		return serverDeliveryResult;
+	}
+
+
+	public DeliveryResult deliverEnd(
+			User user, DeliveryData deliveryData)
+	throws DeliveryException
+	{
+		if (user == null)
+			throw new NullPointerException("user");
+
+		if (deliveryData == null)
+			throw new NullPointerException("deliveryData");
+
+		ServerDeliveryProcessor serverDeliveryProcessor = getServerDeliveryProcessor(
+				deliveryData.getDelivery());
+
+//	 call server-sided delivery processor's third phase
+		serverDeliveryProcessor.deliverEnd(
+				new DeliverParams(this, user, deliveryData));
+
+		DeliveryResult serverDeliveryResult;
+		serverDeliveryResult = deliveryData.getDelivery().getDeliverEndServerResult();
+		if (serverDeliveryResult == null)
+			throw new DeliveryException(
+					new DeliveryResult(
+							getOrganisationID(),
+							DeliveryResult.CODE_FAILED,
+							"deliveryData.getDelivery().getDeliverEndServerResult() returned null! You probably forgot to set it in your ServerDeliveryProcessor (\""+serverDeliveryProcessor.getPrimaryKey()+"\")!",
+							(Throwable)null));
+
+		if (serverDeliveryResult.isFailed())
+			throw new DeliveryException(serverDeliveryResult);
+
+		if (deliveryData.getDelivery().isForceRollback() || deliveryData.getDelivery().isPostponed()) {
+			DeliverProductTransfer deliverProductTransfer = DeliverProductTransfer.getDeliverProductTransferForDelivery(
+					getPersistenceManager(), deliveryData.getDelivery());
+
+			if (deliverProductTransfer != null) {
+				LOGGER.warn("Your Delivery \""+deliveryData.getDelivery()+"\" has first " +
+						"created a deliverProductTransfer and decided afterwards (in deliverEnd) to" +
+						"postpone. This is not nice! Now I have to rollback your " +
+						"DeliverProductTransfer! You should postpone a Delivery always in deliverBegin!");
+
+				deliverRollback(user, deliveryData);
+			}
+			else
+				deliveryData.getDelivery().clearPending();
+		}
+		else {
+			if (!serverDeliveryResult.isDelivered())
+				throw new DeliveryException(serverDeliveryResult);
+		}
+
+		if (deliveryData.getDelivery().isPending() && !deliveryData.getDelivery().isFailed())
+			throw new IllegalStateException("Delivery should not be pending anymore, because failed is false! How's that possible?");
+
+		return serverDeliveryResult;
+	}
+
+
+	/**
+	 * This method is called to rollback a delivery. It removes all transfers
+	 * and the accounts adjust their balance.
+	 * <p>
+	 * It is not integrated within deliverxxxEnd
+	 * (e.g. {@link #deliverInvoicesEnd(User, DeliveryData, DeliverProductTransfer)}),
+	 * because it needs to be called within a separate transaction. 
+	 */
+	public void deliverRollback(
+			User user, DeliveryData deliveryData)
+	{
+		Delivery delivery = deliveryData.getDelivery();
+
+		DeliverProductTransfer deliverProductTransfer = DeliverProductTransfer.getDeliverProductTransferForDelivery(
+				getPersistenceManager(), delivery);
+
+		if (!deliveryData.getDelivery().isPending())
+			throw new IllegalStateException("Delivery \"" + deliveryData.getDelivery().getPrimaryKey() + "\" is not pending! Cannot rollback!");
+
+		if (deliverProductTransfer == null) {
+			delivery.setRollbackStatus(Delivery.ROLLBACK_STATUS_DONE_WITHOUT_ACTION);
+			return;
+		}
+
+		PersistenceManager pm = getPersistenceManager();
+
+		Map involvedAnchors = new HashMap();
+		ArrayList containers = new ArrayList(1);
+		containers.add(deliverProductTransfer);
+		boolean failed = true;
+		try {
+	
+			for (Iterator it = deliverProductTransfer.getChildren().iterator(); it.hasNext(); ) {
+				MoneyTransfer moneyTransfer = (MoneyTransfer) it.next();
+	
+				if (moneyTransfer.isBooked())
+					moneyTransfer.rollbackTransfer(user, involvedAnchors);
+	
+				pm.deletePersistent(moneyTransfer);
+			}
+	
+			if (deliverProductTransfer.isBooked())
+				deliverProductTransfer.rollbackTransfer(user, involvedAnchors);
+	
+			checkIntegrity(containers, involvedAnchors);
+
+			failed = false;
+		} finally {
+			if (failed)
+				Anchor.resetIntegrity(containers, involvedAnchors);
+		}
+
+		pm.deletePersistent(deliverProductTransfer);
+
+		delivery.setRollbackStatus(Delivery.ROLLBACK_STATUS_DONE_NORMAL);
+	}
+
+
+
+/////////// begin implementation of TransferRegistry /////////////
+	private long nextTransferID = 0;
+	private static long _nextTransferID = -1;
+	private static Object _nextTransferIDMutex = new Object();
+
+	/**
+	 * This method adds an instance of Transfer. This is not necessary, if the Transfer has been created
+	 * by this organisation, because every Transfer does a self-registration.
+	 *
+	 * @param transfer
+	 */
+	public void addTransfer(Transfer transfer)
+	{
+		if (transfer == null)
+			throw new NullPointerException("transfer is null!");
+		
+		if (transfer.getOrganisationID() == null)
+			throw new NullPointerException("transfer.organisationID is null!");
+
+		if (transfer.getTransferID() < 0)
+			throw new NullPointerException("transfer.transferID < 0!");
+
+		getPersistenceManager().makePersistent(transfer);
+	}
+
+	public long createTransferID(String transferTypeID)
+	{
+		if (!ProductTransfer.TRANSFERTYPEID.equals(transferTypeID))
+			throw new IllegalArgumentException("This implementation of TransferRegistry manages only Transfers with transferTypeID=\""+ProductTransfer.TRANSFERTYPEID+"\"!");
+
+		synchronized (_nextTransferIDMutex) {
+			if (_nextTransferID < 0)
+				_nextTransferID = nextTransferID;
+
+			long res = _nextTransferID++;
+			nextTransferID = _nextTransferID;
+			return res;
+		}
+	}
+/////////// end implementation of TransferRegistry /////////////
+
+	public void jdoPreStore()
+	{
+		if (_nextTransferID >= 0 && nextTransferID != _nextTransferID)
+			nextTransferID = _nextTransferID;
+
+		if (_nextDeliveryNoteID >= 0 && nextDeliveryNoteID != _nextDeliveryNoteID)
+			nextDeliveryNoteID = _nextDeliveryNoteID;
+
+		if (_nextProductTypeID >= 0 && nextProductTypeID != _nextProductTypeID)
+			nextProductTypeID = _nextProductTypeID;
+
+		if (_nextProductID >= 0 && nextProductID != _nextProductID)
+			nextProductID = _nextProductID;
+	}
+}

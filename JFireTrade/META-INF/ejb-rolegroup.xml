@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE ejb-rolegroup
+PUBLIC "-//NightLabs GmbH//DTD JFire role groups 1.0//EN"
+"http://www.nightlabs.de/dtd/ejb-rolegroup_1_0.dtd">
+
+<ejb-rolegroup>
+	<rolegroups defaultgroup="TradeTemp">
+
+		<rolegroup id="TradeTemp">
+			<!-- This rolegroup is defined as "defaultgroup". This means, all roles that are not mentioned
+					in this file, but declared in ejb-jar.xml, will be registered within this rolegroup.
+			-->
+			
+			<description>This is a temporary rolegroup - we will configure proper roles when all is complete.</description>
+		</rolegroup>
+
+	</rolegroups>
+</ejb-rolegroup>

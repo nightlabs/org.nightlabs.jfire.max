@@ -1,0 +1,1230 @@
+/*
+ * Created on 27.10.2004
+ */
+package org.nightlabs.ipanema.trade;
+
+import java.io.Serializable;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Locale;
+import java.util.Set;
+
+import javax.jdo.JDOHelper;
+import javax.jdo.JDOObjectNotFoundException;
+import javax.jdo.PersistenceManager;
+import javax.naming.InitialContext;
+import javax.naming.NamingException;
+
+import org.nightlabs.ModuleException;
+import org.nightlabs.ipanema.accounting.Accounting;
+import org.nightlabs.ipanema.accounting.Currency;
+import org.nightlabs.ipanema.accounting.priceconfig.IPackagePriceConfig;
+import org.nightlabs.ipanema.asyncinvoke.AsyncInvoke;
+import org.nightlabs.ipanema.asyncinvoke.AsyncInvokeEnvelope;
+import org.nightlabs.ipanema.asyncinvoke.ErrorCallback;
+import org.nightlabs.ipanema.asyncinvoke.Invocation;
+import org.nightlabs.ipanema.asyncinvoke.UndeliverableCallback;
+import org.nightlabs.ipanema.person.Person;
+import org.nightlabs.ipanema.security.User;
+import org.nightlabs.ipanema.security.id.UserID;
+import org.nightlabs.ipanema.servermanager.j2ee.SecurityReflector;
+import org.nightlabs.ipanema.store.NotAvailableException;
+import org.nightlabs.ipanema.store.Product;
+import org.nightlabs.ipanema.store.ProductLocal;
+import org.nightlabs.ipanema.store.ProductType;
+import org.nightlabs.ipanema.store.Store;
+import org.nightlabs.ipanema.trade.id.ArticleID;
+import org.nightlabs.ipanema.transfer.id.AnchorID;
+import org.nightlabs.jdo.NLJDOHelper;
+
+/**
+ * Trader is responsible for purchase and sale. It manages orders, offers and
+ * delegates to the Store and to the Accounting.
+ * 
+ * @author Marco Schulze - marco at nightlabs dot de
+ * @author Alexander Bieber <alex[AT]nightlabs[DOT]de>
+ * 
+ * @jdo.persistence-capable identity-type="datastore" detachable="true"
+ *                          table="JFireTrade_Trader"
+ * 
+ * @jdo.inheritance strategy="new-table"
+ */
+public class Trader
+{
+	/**
+	 * This method returns the singleton instance of Trader. If there is no
+	 * instance of Trader in the datastore, yet, it will be created.
+	 * 
+	 * @param pm
+	 * @return
+	 */
+	public static Trader getTrader(PersistenceManager pm)
+	{
+		Iterator it = pm.getExtent(Trader.class).iterator();
+		if (it.hasNext())
+			return (Trader) it.next();
+
+		Trader trader = new Trader();
+
+		trader.store = Store.getStore(pm);
+		trader.accounting = Accounting.getAccounting(pm);
+		trader.organisationID = trader.accounting.getOrganisationID();
+		trader.mandator = trader.accounting.getMandator();
+
+		trader.defaultCustomerGroupForKnownCustomer = new CustomerGroup(
+				trader.organisationID, CustomerGroup.CUSTOMER_GROUP_ID_DEFAULT);
+		trader.defaultCustomerGroupForKnownCustomer.getName().setText(
+				Locale.GERMAN.getLanguage(), "Standard");
+		trader.defaultCustomerGroupForKnownCustomer.getName().setText(
+				Locale.FRENCH.getLanguage(), "Standard");
+		trader.defaultCustomerGroupForKnownCustomer.getName().setText(
+				Locale.ENGLISH.getLanguage(), "Default");
+
+		pm.makePersistent(trader);
+		return trader;
+	}
+
+	/**
+	 * @jdo.field persistence-modifier="persistent"
+	 * @jdo.column length="100"
+	 */
+	private String organisationID;
+
+	/**
+	 * @jdo.field persistence-modifier="persistent"
+	 */
+	private Accounting accounting;
+
+	/**
+	 * @jdo.field persistence-modifier="persistent"
+	 */
+	private Store store;
+
+	/**
+	 * The mandator is the LegalEntity that is represented by this Trader.
+	 */
+	private OrganisationLegalEntity mandator;
+
+	public Accounting getAccounting()
+	{
+		return accounting;
+	}
+
+	public Store getStore()
+	{
+		return store;
+	}
+
+	// /**
+	// * key: String orderPK<br/>
+	// * value: OrderRequirement orderRequirement
+	// *
+	// * @jdo.field
+	// * persistence-modifier="persistent"
+	// * collection-type="map"
+	// * key-type="java.lang.String"
+	// * value-type="OrderRequirement"
+	// *
+	// * @jdo.join
+	// *
+	// * @jdo.map-vendor-extension vendor-name="jpox" key="key-length" value="max
+	// 201"
+	// */
+	// protected Map orderRequirements = new HashMap();
+	//
+	// /**
+	// * key: String offerPK<br/>
+	// * value: OfferRequirement offerRequirement
+	// *
+	// * @jdo.field
+	// * persistence-modifier="persistent"
+	// * collection-type="map"
+	// * key-type="java.lang.String"
+	// * value-type="OfferRequirement"
+	// *
+	// * @jdo.join
+	// *
+	// * @jdo.map-vendor-extension vendor-name="jpox" key="key-length" value="max
+	// 201"
+	// */
+	// protected Map offerRequirements = new HashMap();
+
+	/**
+	 * @return Returns the organisationID.
+	 */
+	public String getOrganisationID()
+	{
+		return organisationID;
+	}
+
+	/**
+	 * TODO We don't know yet how we handle the CustomerGroups in the product
+	 * chain. This member might be removed soon.
+	 * 
+	 * Update: Probably we will add a mapping of customer groups. Hence, this
+	 * member will stay here and always contain a local CustomerGroup (of this
+	 * organisation). There will be a mapping within the priceconfig and a global
+	 * one. The priceconfig- customergroup-mapping will inherit the global one.
+	 * 
+	 * @jdo.field persistence-modifier="persistent"
+	 */
+	private CustomerGroup defaultCustomerGroupForKnownCustomer;
+
+	/**
+	 * @return Returns the <tt>CustomerGroup</tt> that is automatically assigned
+	 *         to all newly created customers as
+	 *         {@link LegalEntity#defaultCustomerGroup}. Note, that the anonymous
+	 *         customer has a different <tt>CustomerGroup</tt> assigned!
+	 */
+	public CustomerGroup getDefaultCustomerGroupForKnownCustomer()
+	{
+		return defaultCustomerGroupForKnownCustomer;
+	}
+
+	/**
+	 * @param defaultCustomerGroupForKnownCustomer
+	 *          The defaultCustomerGroupForKnownCustomer to set.
+	 * 
+	 * @see #getDefaultCustomerGroupForKnownCustomer()
+	 */
+	public void setDefaultCustomerGroupForKnownCustomer(
+			CustomerGroup customerGroupForEndCustomer)
+	{
+		if (!organisationID.equals(customerGroupForEndCustomer.getOrganisationID()))
+			throw new IllegalArgumentException(
+					"defaultCustomerGroupForKnownCustomer.organisationID is foreign!");
+
+		this.defaultCustomerGroupForKnownCustomer = customerGroupForEndCustomer;
+	}
+
+	/**
+	 * The mandator is the OrganisationLegalEntity which is represented by this
+	 * Trader, means this Trader manages the datastore on behalf of this entity.
+	 * 
+	 * @return Returns the mandator.
+	 */
+	public OrganisationLegalEntity getMandator()
+	{
+		return mandator;
+	}
+
+	public LegalEntity getVendor(String organisationID, String anchorID)
+	{
+		// TODO: implement
+		return null;
+		// String vendorPK = LegalEntity.getPrimaryKey(organisationID, anchorID);
+		// return (LegalEntity) vendors.get(vendorPK);
+	}
+
+	public LegalEntity getCustomer(String organisationID, String anchorID)
+	{
+		// TODO: implement
+		return null;
+		// String customerPK = LegalEntity.getPrimaryKey(organisationID, anchorID);
+		// return (LegalEntity) vendors.get(customerPK);
+	}
+
+	/**
+	 * Creates a new OrganisationLegalEntity, if it does not yet exist. If it is
+	 * already existing, this method doesn't do anything but only returns the
+	 * previously created instance.
+	 * 
+	 * @param organisationID
+	 * @return Returns an OrganisationLegalEntity for the given organisationID
+	 */
+	public OrganisationLegalEntity getOrganisationLegalEntity(
+			String organisationID)
+	{
+		PersistenceManager pm = getPersistenceManager();
+		return OrganisationLegalEntity.getOrganisationLegalEntity(pm,
+				organisationID, OrganisationLegalEntity.ANCHOR_TYPE_ID_ORGANISATION,
+				true);
+
+		// if (organisationLegalEntity != null)
+		// return organisationLegalEntity;
+		//		
+		// Organisation org = Organisation.getOrganisation(pm, organisationID,
+		// false);
+		// if (org == null)
+		// throw new IllegalArgumentException("There is no Organistaion known with
+		// organisationID "+organisationID);
+		//
+		// organisationLegalEntity = new OrganisationLegalEntity(org);
+		// organisationLegalEntity.setPerson(org.getPerson());
+		// pm.makePersistent(organisationLegalEntity);
+		//		
+		// return organisationLegalEntity;
+	}
+
+	/**
+	 * Checks if the LegalEntity with the appropriate anchorID is existent and
+	 * creates one if not. The given person will be set to the found or created
+	 * LegalEntity. If makePersistent is true the newly created LegalEntity will
+	 * be made persistent.
+	 * 
+	 * @param person
+	 *          The person to set to the LegalEntity
+	 * @param makePesistent
+	 *          Weather a newly created LegalEntity should be made persistent
+	 * @return The legal entity for this person
+	 */
+	public LegalEntity setPersonToLegalEntity(Person person, boolean makePesistent)
+	{
+		String anchorID = person.getPrimaryKey();
+		AnchorID oAnchorID = AnchorID.create(getMandator().getOrganisationID(),
+				LegalEntity.ANCHOR_TYPE_ID_PARTNER, anchorID);
+		LegalEntity legalEntity = null;
+		PersistenceManager pm = getPersistenceManager();
+		boolean found = true;
+		try {
+			legalEntity = (LegalEntity) pm.getObjectById(oAnchorID);
+		} catch (JDOObjectNotFoundException e) {
+			legalEntity = new LegalEntity(oAnchorID.organisationID,
+					LegalEntity.ANCHOR_TYPE_ID_PARTNER, oAnchorID.anchorID);
+			legalEntity
+					.setDefaultCustomerGroup(getDefaultCustomerGroupForKnownCustomer());
+			found = false;
+		}
+		legalEntity.setPerson(person);
+		if (makePesistent && !found)
+			if (!JDOHelper.isPersistent(legalEntity))
+				pm.makePersistent(legalEntity);
+		return legalEntity;
+	}
+
+	/**
+	 * @jdo.field persistence-modifier="persistent"
+	 */
+	protected long nextOrderID = 0;
+
+	protected synchronized long createOrderID()
+	{
+		long res = nextOrderID;
+		nextOrderID = res + 1;
+		return res;
+	}
+
+	/**
+	 * Creates a new <tt>Segment</tt> within the given <tt>Order</tt> for the
+	 * given <tt>SegmentType</tt>. Note, that you can create many
+	 * <tt>Segment</tt>s with the same <tt>SegmentType</tt>.
+	 * 
+	 * @param order
+	 *          The <tt>Order</tt> in which to create a <tt>Segment</tt>.
+	 * @param segmentType
+	 *          Can be <tt>null</tt>. If undefined, the default segmentType
+	 *          will be used.
+	 * @return the newly created <tt>Segment</tt>
+	 */
+	public Segment createSegment(Order order, SegmentType segmentType)
+	{
+		if (!organisationID.equals(order.getOrganisationID())) // TODO implement
+																														// later.
+			throw new UnsupportedOperationException(
+					"Cannot yet create a Segment in a foreign order.");
+
+		PersistenceManager pm = getPersistenceManager();
+
+		if (segmentType == null) {
+			segmentType = SegmentType.getDefaultSegmentType(pm);
+		} // if (segmentType == null) {
+
+		Segment segment = new Segment(organisationID, createSegmentID(),
+				segmentType, order);
+		order.addSegment(segment);
+
+		return segment;
+	}
+
+	// public Order getOrder(OrderID orderID) throws OrderNotFoundException {
+	// Order order = null;
+	// try {
+	// order = (Order) getPersistenceManager().getObjectById(orderID);
+	// } catch (JDOObjectNotFoundException e) {
+	// throw new OrderNotFoundException("Could not find order with OrderID:
+	// "+orderID);
+	// }
+	// return order;
+	// }
+
+	public Order createOrder(OrganisationLegalEntity vendor,
+			LegalEntity customer, Currency currency) throws ModuleException
+	{
+		if (customer == null)
+			throw new NullPointerException("customer");
+
+		if (currency == null)
+			throw new NullPointerException("currency");
+
+		PersistenceManager pm = JDOHelper.getPersistenceManager(this);
+		if (pm == null)
+			throw new IllegalStateException(
+					"This OrganisationLegalEntity is currently not persistent! Can invoke this method only on a persistent object!");
+
+		// LocalOrganisation localOrganisation =
+		// LocalOrganisation.getLocalOrganisation(pm);
+
+		if (mandator.getPrimaryKey().equals(vendor.getPrimaryKey())) {
+			// local: the vendor is owning the datastore
+			try {
+				User user = SecurityReflector.lookupSecurityReflector(
+						new InitialContext()).whoAmI().getUser(pm);
+
+				Order order = new Order(getMandator(), customer, createOrderID(),
+						currency, user);
+
+				getPersistenceManager().makePersistent(order);
+				return order;
+			} catch (NamingException e) {
+				throw new ModuleException(e);
+			}
+		}
+		// TODO: Implement foreign stuff
+		// // not local, means it's a remote organisation...
+		// // Thus, we delegate to the TradeManager of the other organisation.
+		// Hashtable props = Lookup.getInitialContextProps(pm, getOrganisationID());
+		// try {
+		// TradeManager tm = TradeManagerUtil.getHome(props).create();
+		// Order order = tm.createOrder(currency.getCurrencyID());
+		// tm.remove();
+		//			
+		// String pk = order.getPrimaryKey();
+		// orders.put(pk, order);
+		// return order;
+		// } catch (ModuleException e) {
+		// throw e;
+		// } catch (Exception e) {
+		// throw new ModuleException(e);
+		// }
+		// return null;
+		throw new UnsupportedOperationException("NYI");
+	}
+
+	public OrderRequirement createOrderRequirement(Order order)
+	{
+		if (!order.getOrganisationID().equals(this.getOrganisationID()))
+			throw new IllegalArgumentException(
+					"Cannot create an instance of OrderRequirement for a foreign Organisation!");
+
+		// TODO implement this
+		throw new UnsupportedOperationException("NYI");
+		// OrderRequirement orderRequirement =
+		// (OrderRequirement)orderRequirements.get(order.getPrimaryKey());
+		// if (orderRequirement == null) {
+		// orderRequirement = new OrderRequirement(this, order);
+		// orderRequirements.put(order.getPrimaryKey(), orderRequirement);
+		// }
+		// return orderRequirement;
+	}
+
+	public OfferRequirement createOfferRequirement(Offer offer)
+	{
+		if (!offer.getOrganisationID().equals(this.getOrganisationID()))
+			throw new IllegalArgumentException(
+					"Cannot create an instance of OfferRequirement for a foreign Organisation!");
+
+		// TODO implement this
+		throw new UnsupportedOperationException("NYI");
+		// OfferRequirement offerRequirement =
+		// (OfferRequirement)offerRequirements.get(offer.getPrimaryKey());
+		// if (offerRequirement == null) {
+		// offerRequirement = new OfferRequirement(this, offer);
+		// offerRequirements.put(offer.getPrimaryKey(), offerRequirement);
+		// }
+		// return offerRequirement;
+	}
+
+	/**
+	 * This method creates a new Offer for the given vendor or returns a
+	 * previously created one.
+	 * 
+	 * @param vendor
+	 * @return Returns the offer for the given vendor. Never returns <tt>null</tt>.
+	 * @throws ModuleException
+	 */
+	public Offer createOfferRequirementOffer(OfferRequirement offerRequirement,
+			OrganisationLegalEntity vendor) throws ModuleException
+	{
+		Offer offer = offerRequirement.getOfferByVendor(vendor);
+		if (offer == null) {
+			// We don't have an Offer registered, thus we need to create one.
+			// Therefore, we first need the OrderRequirement instance assigned
+			// for the order equivalent.
+			OrderRequirement orderRequirement = createOrderRequirement(offerRequirement
+					.getOffer().getOrder());
+
+			// From the OrderRequirement, we obtain the order for the given vendor.
+			// Order order = orderRequirement.createOrder(vendor);
+			Order order = createOrderRequirementOrder(orderRequirement, vendor);
+
+			// offer = createOffer();
+			offerRequirement.addOffer(offer);
+		}
+		return offer;
+	}
+
+	/**
+	 * This method creates a new Order for the given vendor or returns a
+	 * previously created one.
+	 * 
+	 * @param vendor
+	 * @return Returns the order for the given vendor. Never returns <tt>null</tt>.
+	 * @throws ModuleException
+	 */
+	public Order createOrderRequirementOrder(OrderRequirement orderRequirement,
+			OrganisationLegalEntity vendor) throws ModuleException
+	{
+		Order order = orderRequirement.getOrder(vendor);
+		if (order == null) {
+			order = createOrder(vendor, getMandator(), order.getCurrency());
+			orderRequirement.addOrder(order);
+		}
+		return order;
+	}
+
+	/**
+	 * @jdo.field persistence-modifier="persistent"
+	 */
+	protected long nextOfferID = 0;
+
+	protected synchronized long createOfferID()
+	{
+		long res = nextOfferID;
+		nextOfferID = res + 1;
+		return res;
+	}
+
+	/**
+	 * @jdo.field persistence-modifier="persistent"
+	 */
+	protected long nextSegmentID = 0;
+
+	protected synchronized long createSegmentID()
+	{
+		long res = nextSegmentID;
+		nextSegmentID = res + 1;
+		return res;
+	}
+
+	/**
+	 * @jdo.field persistence-modifier="persistent"
+	 */
+	protected long nextArticleID = 0;
+
+	public synchronized long createArticleID()
+	{
+		long res = nextArticleID;
+		nextArticleID = res + 1;
+		return res;
+	}
+
+	public Offer createOffer(User user, Order order) throws ModuleException
+	{
+		if (mandator.getPrimaryKey().equals(order.getVendor().getPrimaryKey())) {
+			Offer offer = new Offer(user, order, createOfferID());
+			new OfferLocal(offer); // OfferLocal registers itself in Offer
+			getPersistenceManager().makePersistent(offer);
+			return offer;
+		}
+		// TODO: Implement Offer creating on foreign servers
+		// // order is not local, thus we must delegate to the remote bean...
+		// Hashtable props = Lookup.getInitialContextProps(pm,
+		// vendor.getOrganisationID());
+		// try {
+		// TradeManager tm = TradeManagerUtil.getHome(props).create();
+		// Offer offer = tm.createOffer(OrderID.create(getOrganisationID(),
+		// getOrderID()));
+		// tm.remove();
+		// String pk = offer.getPrimaryKey();
+		// offers.put(pk, offer);
+		// return offer;
+		// } catch (ModuleException e) {
+		// throw e;
+		// } catch (Exception e) {
+		// throw new ModuleException(e);
+		// }
+		throw new UnsupportedOperationException("NYI");
+	}
+
+	public Collection reverseArticles(User user, Offer reversingOffer, Collection reversedArticles)
+	throws ModuleException
+	{
+		List res = new ArrayList(reversedArticles.size());
+		for (Iterator it = reversedArticles.iterator(); it.hasNext();) {
+			Article reversedArticle = (Article) it.next();
+
+			if (!reversedArticle.getOffer().getOfferLocal().isConfirmed())
+				throw new IllegalStateException("Offer " + reversedArticle.getOffer().getPrimaryKey() + " of Article " + reversedArticle.getPrimaryKey() + " is NOT confirmed! Cannot create reversing Article!");
+
+			Article reversingArticle = reversedArticle.reverseArticle(user, reversingOffer, createArticleID());
+			reversingArticle.createArticleLocal(user);
+			res.add(reversingArticle);
+		}
+		return res;
+	}
+
+
+//	public Article reverseArticle(User user, Offer offer, Article reversedArticle)
+//			throws ModuleException
+//	{
+//		if (!reversedArticle.getOffer().getOfferLocal().isConfirmed())
+//			throw new IllegalStateException("Offer " + reversedArticle.getOffer().getPrimaryKey() + " of Article " + reversedArticle.getPrimaryKey() + " is NOT confirmed! Cannot create reversing Article!");
+//
+//		Article reversingArticle = reversedArticle.reverseArticle(user, offer, createArticleID());
+//		reversingArticle.createArticleLocal(user);
+//		return reversingArticle;
+//	}
+
+	protected void createArticleLocals(User user, Collection articles)
+	{
+		for (Iterator it = articles.iterator(); it.hasNext();) {
+			Article article = (Article) it.next();
+			article.createArticleLocal(user);
+		}
+	}
+
+	/**
+	 * This method creates an <tt>Article</tt> for a noncommittal offer (just to
+	 * give the customer an idea about the price). Therefore, no <tt>Product</tt>
+	 * will be allocated and only the <tt>ProductType</tt> referenced as given
+	 * here.
+	 * 
+	 * @param productTypes
+	 *          Instances of {@link ProductType}.
+	 */
+	public Collection createArticles(User user, Offer offer, Segment segment,
+			Collection productTypes, ArticleCreator articleCreator)
+			throws ModuleException
+	{
+		throw new UnsupportedOperationException("NYI");
+	}
+
+	/**
+	 * This method creates an <tt>Article</tt> with a specific <tt>Product</tt>.
+	 * If <tt>allocate</tt> is true, the method
+	 * {@link #allocateArticleBegin(User, Article)} is called immediately and the
+	 * method {@link #allocateArticleEnd(User, Article)} is either called
+	 * asynchronously or immediately, depending on
+	 * <code>synchronousAllocation</code>.
+	 * 
+	 * @param user
+	 *          The User who is responsible for the action.
+	 * @param offer
+	 *          The non-finalized Offer into which the new Article shall be
+	 *          created.
+	 * @param segment
+	 *          The Segment into which the new Article shall be created.
+	 * @param products
+	 *          The {@link Product}s that shall be wrapped by {@link Article}s.
+	 * @param articleCreator
+	 *          The ArticleCreator that provides the new naked Article (without
+	 *          price and not allocated).
+	 * @param allocate
+	 *          Whether or not to allocate. This causes the methods
+	 *          {@link #allocateArticleBegin(User, Article)} and
+	 *          {@link #allocateArticleEnd(User, Article)} to be executed.
+	 * @param allocateSynchronously
+	 *          The method {@link #allocateArticleEnd(User, Article)} is quite
+	 *          expensive (it may require to create and handle offers with other
+	 *          organisations). That's why you can set this <code>false</code>
+	 *          in order to call this method asynchronously. This param is
+	 *          ignored, if <code>allocate == false</code>.
+	 * 
+	 * @return Instances of {@link Article}.
+	 */
+	public Collection createArticles(User user, Offer offer, Segment segment,
+			Collection products, ArticleCreator articleCreator, boolean allocate,
+			boolean allocateSynchronously) throws ModuleException
+	{
+		List articles = articleCreator.createProductArticles(this, offer, segment,
+				products);
+
+		createArticleLocals(user, articles);
+
+		offer.addArticles(articles);
+
+		if (allocate) {
+			// allocateArticle (re)creates the price already => no need to create the
+			// price.
+			allocateArticles(user, articles, allocateSynchronously);
+		}
+		else {
+			// create the Articles' prices
+			for (Iterator iter = articles.iterator(); iter.hasNext();) {
+				Article article = (Article) iter.next();
+				IPackagePriceConfig packagePriceConfig = article.getProductType()
+						.getPackagePriceConfig();
+				article.setPrice(packagePriceConfig.createArticlePrice(article));
+			}
+		}
+
+		offer.validate();
+
+		return articles;
+	}
+
+	/**
+	 * @param user
+	 *          Who is responsible for the allocation.
+	 * @param articles
+	 *          Instances of {@link Article}
+	 * @param synchronously
+	 *          Whether the second phase of allocation shall be done
+	 *          synchronously. Otherwise it will be done via {@link AsyncInvoke}.
+	 */
+	public void allocateArticles(User user, Collection articles,
+			boolean synchronously) throws ModuleException
+	{
+		try {
+			allocateArticlesBegin(user, articles); // allocateArticleBegin
+																							// (re)creates the price
+
+			if (synchronously)
+				allocateArticlesEnd(user, articles);
+			else
+				new AsyncInvoke().exec(
+						new AllocateArticlesEndInvocation(user, articles),
+						null,
+						new AllocateArticlesEndErrorCallback(),
+						new AllocateArticlesEndUndeliverableCallback());
+
+		} catch (RuntimeException x) {
+			throw x;
+		} catch (ModuleException x) {
+			throw x;
+		} catch (Exception x) {
+			throw new ModuleException(x);
+		}
+	}
+
+	public static class AllocateArticlesEndUndeliverableCallback extends
+			UndeliverableCallback
+	{
+		public void handle(AsyncInvokeEnvelope envelope) throws Exception
+		{
+			PersistenceManager pm = getPersistenceManager();
+			try {
+				pm.getExtent(Article.class);
+				Collection articleIDs = ((AllocateArticlesEndInvocation) envelope
+						.getInvocation()).getArticleIDs();
+				for (Iterator iter = articleIDs.iterator(); iter.hasNext();) {
+					ArticleID articleID = (ArticleID) iter.next();
+					Article article = (Article) pm.getObjectById(articleID);
+					article.setAllocationAbandoned(true);
+				}
+			} finally {
+				pm.close();
+			}
+		}
+	}
+
+	public static class AllocateArticlesEndErrorCallback extends ErrorCallback
+	{
+		public void handle(AsyncInvokeEnvelope envelope, Throwable error)
+				throws Exception
+		{
+			PersistenceManager pm = getPersistenceManager();
+			try {
+				pm.getExtent(Article.class);
+				Collection articleIDs = ((AllocateArticlesEndInvocation) envelope
+						.getInvocation()).getArticleIDs();
+				for (Iterator iter = articleIDs.iterator(); iter.hasNext();) {
+					ArticleID articleID = (ArticleID) iter.next();
+					Article article = (Article) pm.getObjectById(articleID);
+					article.setAllocationException(error);
+				}
+			} finally {
+				pm.close();
+			}
+		}
+	}
+
+	public static class AllocateArticlesEndInvocation extends Invocation
+	{
+		private UserID userID;
+
+		private Set articleIDs;
+
+		public Set getArticleIDs()
+		{
+			return articleIDs;
+		}
+
+		public AllocateArticlesEndInvocation(User user, Collection articles)
+		{
+			this.userID = (UserID) JDOHelper.getObjectId(user);
+			this.articleIDs = NLJDOHelper.getObjectIDSet(articles);
+		}
+
+		public Serializable invoke() throws Exception
+		{
+			// WORKAROUND it doesn't work immediately - the transactions collide
+			try {
+				Thread.sleep(3000);
+			} catch (InterruptedException x) {
+			}
+
+			PersistenceManager pm = getPersistenceManager();
+			try {
+				pm.getExtent(User.class);
+				User user = (User) pm.getObjectById(userID);
+				Collection articles = NLJDOHelper.getObjectSet(pm, articleIDs,
+						Article.class);
+				Trader.getTrader(pm).allocateArticlesEnd(user, articles);
+			} finally {
+				pm.close();
+			}
+			return null;
+		}
+	}
+
+	/**
+	 * @param user
+	 * @param articles
+	 *          Instances of {@link Article}.
+	 * @param synchronously
+	 */
+	public void releaseArticles(User user, Collection articles,
+			boolean synchronously) throws ModuleException
+	{
+		try {
+			releaseArticlesBegin(user, articles);
+
+			if (synchronously)
+				releaseArticlesEnd(user, articles);
+			else
+				new AsyncInvoke().exec(
+						new ReleaseArticlesEndInvocation(user, articles),
+						null,
+						new ReleaseArticlesEndErrorCallback(),
+						new ReleaseArticlesEndUndeliverableCallback());
+
+		} catch (RuntimeException x) {
+			throw x;
+		} catch (ModuleException x) {
+			throw x;
+		} catch (Exception x) {
+			throw new ModuleException(x);
+		}
+	}
+
+	public static class ReleaseArticlesEndUndeliverableCallback extends
+			UndeliverableCallback
+	{
+		public void handle(AsyncInvokeEnvelope envelope) throws Exception
+		{
+			PersistenceManager pm = getPersistenceManager();
+			try {
+				pm.getExtent(Article.class);
+				Collection articleIDs = ((ReleaseArticlesEndInvocation) envelope
+						.getInvocation()).getArticleIDs();
+				for (Iterator iter = articleIDs.iterator(); iter.hasNext();) {
+					ArticleID articleID = (ArticleID) iter.next();
+					Article article = (Article) pm.getObjectById(articleID);
+					article.setReleaseAbandoned(true);
+				}
+			} finally {
+				pm.close();
+			}
+		}
+	}
+
+	public static class ReleaseArticlesEndErrorCallback extends ErrorCallback
+	{
+		public void handle(AsyncInvokeEnvelope envelope, Throwable error)
+				throws Exception
+		{
+			PersistenceManager pm = getPersistenceManager();
+			try {
+				pm.getExtent(Article.class);
+				Collection articleIDs = ((ReleaseArticlesEndInvocation) envelope
+						.getInvocation()).getArticleIDs();
+				for (Iterator iter = articleIDs.iterator(); iter.hasNext();) {
+					ArticleID articleID = (ArticleID) iter.next();
+					Article article = (Article) pm.getObjectById(articleID);
+					article.setReleaseException(error);
+				}
+			} finally {
+				pm.close();
+			}
+		}
+	}
+
+	public static class ReleaseArticlesEndInvocation extends Invocation
+	{
+		private UserID userID;
+
+		private Collection articleIDs;
+
+		public Collection getArticleIDs()
+		{
+			return articleIDs;
+		}
+
+		public ReleaseArticlesEndInvocation(User user, Collection articles)
+		{
+			this.userID = (UserID) JDOHelper.getObjectId(user);
+			this.articleIDs = NLJDOHelper.getObjectIDSet(articles);
+		}
+
+		public Serializable invoke() throws Exception
+		{
+			// WORKAROUND it doesn't work immediately - the transactions collide
+			try {
+				Thread.sleep(3000);
+			} catch (InterruptedException x) {
+			}
+
+			PersistenceManager pm = getPersistenceManager();
+			try {
+				pm.getExtent(User.class);
+				User user = (User) pm.getObjectById(userID);
+				Collection articles = NLJDOHelper.getObjectSet(pm, articleIDs,
+						Article.class);
+				Trader.getTrader(pm).releaseArticlesEnd(user, articles);
+			} finally {
+				pm.close();
+			}
+			return null;
+		}
+	}
+
+	protected void releaseArticlesBegin(User user, Collection articles)
+			throws ModuleException
+	{
+		TotalArticleStatus tas = getTotalArticleStatus(articles);
+
+		if (!tas.allocated || tas.releasePending)
+			return;
+
+		if (tas.allocationPending)
+			throw new IllegalStateException(
+					"Articles \""
+							+ getToStringList(articles)
+							+ "\" cannot be released, because they are currently in state allocationPending!");
+
+		for (Iterator iter = articles.iterator(); iter.hasNext();) {
+			Article article = (Article) iter.next();
+			if (article.isReversing()) {
+				// reversing article
+
+				// If the reversing article is in a non-accepted Offer, it must not be released!
+				if (!article.getOffer().getOfferLocal().isConfirmed())
+					throw new IllegalStateException("The Offer " + article.getOffer().getPrimaryKey() + " of reversing Article " + article.getPrimaryKey() + " is NOT confirmed!");
+
+
+				// If the reversed article is in a DeliveryNote, both - reversed and reversing - articles must be in a DeliveryNote.
+				// The DeliveryNotes must be booked!
+
+				Article reversedArticle = article.getReversedArticle();
+				if (reversedArticle.getDeliveryNote() != null) {
+					if (article.getDeliveryNote() ==  null)
+						throw new IllegalStateException("The reversing Article " + article.getPrimaryKey() + " is NOT in a DeliveryNote, but its corresponding reversed Article is! In this case, the reversing Article MUST be in a DeliveryNote, too!");
+
+					if (!reversedArticle.getDeliveryNote().getDeliveryNoteLocal().isBooked())
+						throw new IllegalStateException("The reversed Article " + reversedArticle.getPrimaryKey() + " is in a DeliveryNote, but it is NOT booked! The DeliveryNote must be booked!");
+
+					if (!article.getDeliveryNote().getDeliveryNoteLocal().isBooked())
+						throw new IllegalStateException("The reversing Article " + article.getPrimaryKey() + " is in a DeliveryNote, but it is NOT booked! The DeliveryNote must be booked!");
+				}
+
+			}
+			else {
+				// normal article (non-reversing)
+				if (article.getOffer().isFinalized())
+					throw new IllegalStateException("Article \"" + article.getPrimaryKey()
+							+ "\" cannot be released, because its Offer is finalized!");
+			}
+
+			Product product = article.getProduct();
+			article.setReleasePending(true);
+			product.getProductLocal().setReleasePending(true);
+		}
+	}
+
+	protected void releaseArticlesEnd(User user, Collection articles)
+			throws ModuleException
+	{
+		TotalArticleStatus tas = getTotalArticleStatus(articles);
+
+		if (!tas.allocated)
+			return;
+
+		if (!tas.releasePending)
+			throw new IllegalArgumentException("Articles "
+					+ getToStringList(articles) + " are NOT in state releasePending!");
+
+		for (Iterator iter = articles.iterator(); iter.hasNext();) {
+			Article article = (Article) iter.next();
+			Product product = article.getProduct();
+
+			// delegate disassembling to the product
+			product.disassemble(user, true);
+
+			// clear product's article and update all stati
+			ProductLocal productLocal = product.getProductLocal();
+			productLocal.setAllocated(false);
+			productLocal.setArticle(null);
+			article.setAllocated(false);
+			article.setReleasePending(false);
+			// article.product is NOT cleared, because it should be possible to easily
+			// re-allocate
+		}
+	}
+
+	protected static String getToStringList(Collection objects)
+	{
+		StringBuffer sb = new StringBuffer();
+		for (Iterator iter = objects.iterator(); iter.hasNext();) {
+			Object o = iter.next();
+			sb.append(String.valueOf(o));
+			if (iter.hasNext())
+				sb.append(", ");
+		}
+		return sb.toString();
+	}
+
+	protected static class TotalArticleStatus
+	{
+		public boolean allocated = false;
+
+		public boolean allocationPending = false;
+
+		public boolean releasePending = false;
+	}
+
+	protected static TotalArticleStatus getTotalArticleStatus(Collection articles)
+	{
+		if (articles.isEmpty())
+			throw new IllegalArgumentException("articles is empty!");
+
+		boolean first = true;
+		TotalArticleStatus res = new TotalArticleStatus();
+		for (Iterator iter = articles.iterator(); iter.hasNext();) {
+			Article article = (Article) iter.next();
+			if (first) {
+				res.allocated = article.isAllocated();
+				res.allocationPending = article.isAllocationPending();
+				res.releasePending = article.isReleasePending();
+				first = false;
+			}
+			else {
+				if (res.allocated != article.isAllocated())
+					throw new IllegalArgumentException("Article "
+							+ article.getPrimaryKey()
+							+ " has a different 'allocated' status than the others!");
+
+				if (res.allocationPending != article.isAllocationPending())
+					throw new IllegalArgumentException("Article "
+							+ article.getPrimaryKey()
+							+ " has a different 'allocationPending' status than the others!");
+
+				if (res.releasePending != article.isReleasePending())
+					throw new IllegalArgumentException("Article "
+							+ article.getPrimaryKey()
+							+ " has a different 'releasePending' status than the others!");
+			}
+		}
+		return res;
+	}
+
+	/**
+	 * If the given <tt>article</tt> is already allocated or allocationPending,
+	 * this method returns silently without doing anything. If the given
+	 * <tt>article</tt> cannot be allocated, a
+	 * {@link org.nightlabs.ipanema.store.NotAvailableException} will be thrown. A
+	 * non-allocated <tt>Product</tt> might be "empty" (=not assembled), i.e.
+	 * not have any nested products. Hence, it is necessary to assemble it during
+	 * the allocation. That's why this method sets only the status
+	 * <code>allocationPending</code> (via
+	 * {@link Product#setAllocationPending(boolean)} and
+	 * {@link Article#setAllocationPending(boolean)}) and the rest is done
+	 * (asynchronously) by {@link #allocateArticleEnd(User, Article)}.
+	 * <p>
+	 * This method creates a top-level-{@link ArticlePrice} (it will be filled
+	 * with nested details in {@link #allocateArticleEnd(User, Article)}).
+	 * </p>
+	 * 
+	 * @param user
+	 *          The user who is responsible for this allocation.
+	 * @param article
+	 *          The <code>Article</code> that shall be allocated. It must have
+	 *          its <code>Product</code> assigned ({@link Article#getProduct()}
+	 *          must not return <code>null</code>).
+	 * @throws org.nightlabs.ipanema.store.NotAvailableException
+	 *           If the product (or a packaged product) cannot be allocated.
+	 * @throws ModuleException
+	 *           If another error occurs.
+	 */
+	protected void allocateArticlesBegin(User user, Collection articles)
+			throws ModuleException
+	{
+		// If all articles are currently allocated or the allocation is pending, we
+		// silently return.
+		// If the status is different between them, we throw an
+		// IllegalArgumentException
+		TotalArticleStatus tas = getTotalArticleStatus(articles);
+
+		if (tas.allocated || tas.allocationPending)
+			return;
+
+		if (tas.releasePending)
+			throw new IllegalStateException(
+					"Articles \""
+							+ getToStringList(articles)
+							+ "\" cannot be allocated, because it is currently in state releasePending!");
+
+		for (Iterator iter = articles.iterator(); iter.hasNext();) {
+			Article article = (Article) iter.next();
+
+			Product product = article.getProduct();
+			if (product == null)
+				throw new IllegalStateException("Articles '" + article.getPrimaryKey()
+						+ "' does not have a product!");
+
+			ProductLocal productLocal = product.getProductLocal();
+
+			if (productLocal.getArticle() != null)
+				throw new NotAvailableException(
+						"The article '"
+								+ article.getPrimaryKey()
+								+ "' with product '"
+								+ product.getPrimaryKey()
+								+ "' cannot be allocated, because the product is already allocated in article '"
+								+ productLocal.getArticle().getPrimaryKey() + "'!");
+
+			if (!article.getOrganisationID().equals(product.getOrganisationID()))
+				throw new IllegalStateException("The article '"
+						+ article.getPrimaryKey()
+						+ "' has a different organisationID than the product '"
+						+ product.getPrimaryKey() + "'!");
+
+			productLocal.setArticle(article);
+			productLocal.setAllocationPending(true);
+			article.setAllocationPending(true);
+
+			IPackagePriceConfig packagePriceConfig = product.getProductType()
+					.getPackagePriceConfig();
+			article.setPrice(packagePriceConfig.createArticlePrice(article));
+		}
+	}
+
+	/**
+	 * This method performs the second step of allocation: After
+	 * {@link #allocateArticleBegin(User, Article)} has set the
+	 * <code>Article</code> and the corresponding <code>ProductLocal</code> to
+	 * status <code>allocationPending</code>, this method assembles the
+	 * ProductLocal recursively.
+	 * 
+	 * @param user
+	 *          The user who is responsible for this allocation.
+	 * @param article
+	 *          The <code>Article</code> that shall be allocated. It must have
+	 *          its <code>Product</code> assigned ({@link Article#getProduct()}
+	 *          must not return <code>null</code>).
+	 * @throws ModuleException
+	 */
+	protected void allocateArticlesEnd(User user, Collection articles)
+			throws ModuleException
+	{
+		TotalArticleStatus tas = getTotalArticleStatus(articles);
+		if (tas.allocated)
+			return;
+
+		if (!tas.allocationPending)
+			throw new IllegalArgumentException("Articles "
+					+ getToStringList(articles) + " are NOT in state allocationPending!");
+
+		for (Iterator iter = articles.iterator(); iter.hasNext();) {
+			Article article = (Article) iter.next();
+			Product product = article.getProduct();
+
+			// delegate assembling to the product (give it a chance to intercept)
+			product.assemble(user);
+
+			IPackagePriceConfig packagePriceConfig = product.getProductType()
+					.getPackagePriceConfig();
+			packagePriceConfig.fillArticlePrice(article);
+
+			product.getProductLocal().setAllocated(true);
+			article.setAllocated(true);
+			article.setAllocationPending(false);
+		}
+	}
+
+	public void validateOffer(Offer offer)
+	{
+		offer.validate();
+	}
+
+	public void finalizeOffer(User user, Offer offer)
+	{
+		offer.setFinalized(user);
+	}
+
+	public void acceptOffer(User user, OfferLocal offerLocal)
+	{
+		offerLocal.accept(user);
+	}
+	/**
+	 * This is a convenience method which calls {@link #acceptOffer(User, OfferLocal)}.
+	 */
+	public void acceptOffer(User user, Offer offer)
+	{
+		acceptOffer(user, offer.getOfferLocal());
+	}
+
+	public void rejectOffer(User user, OfferLocal offerLocal)
+	{
+		offerLocal.reject(user);
+	}
+	/**
+	 * This is a convenience method which calls {@link #rejectOffer(User, OfferLocal)}.
+	 */
+	public void rejectOffer(User user, Offer offer)
+	{
+		rejectOffer(user, offer.getOfferLocal());
+	}
+
+	public void confirmOffer(User user, OfferLocal offerLocal)
+	{
+		offerLocal.confirm(user);
+	}
+	/**
+	 * This is a convenience method which calls {@link #confirmOffer(User, OfferLocal)}.
+	 */
+	public void confirmOffer(User user, Offer offer)
+	{
+		confirmOffer(user, offer.getOfferLocal());
+	}
+
+	/**
+	 * The {@link Article}s must already be released!
+	 * 
+	 * @param user
+	 *          The user who is responsible.
+	 * @param articles
+	 *          Instances of {@link Article}.
+	 */
+	public void deleteArticles(User user, Collection articles)
+			throws ModuleException
+	{
+		for (Iterator it = articles.iterator(); it.hasNext();) {
+			Article article = (Article) it.next();
+			Offer offer = article.getOffer();
+			offer.removeArticle(article);
+		}
+	}
+
+	protected PersistenceManager getPersistenceManager()
+	{
+		PersistenceManager pm = JDOHelper.getPersistenceManager(this);
+		if (pm == null)
+			throw new IllegalStateException(
+					"This instance of Trader is currently not attached to a datastore! Cannot get a PersistenceManager!");
+
+		return pm;
+	}
+}

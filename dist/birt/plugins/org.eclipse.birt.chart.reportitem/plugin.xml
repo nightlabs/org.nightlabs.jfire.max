@@ -1,0 +1,95 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?eclipse version="3.0"?>
+<plugin
+   id="org.eclipse.birt.chart.reportitem"
+   name="BIRT Chart-Report Integration"
+   version="1.0.1"
+   provider-name="Eclipse.org"
+   class="org.eclipse.birt.chart.reportitem.plugin.ChartReportItemPlugin">
+
+   <runtime>
+      <library name="reportitem.jar">
+         <export name="*"/>
+      </library>
+   </runtime>
+
+   <requires>
+      <import plugin="org.eclipse.emf.ecore"/>
+      <import plugin="org.eclipse.birt.report.designer.ui"/>
+      <import plugin="org.eclipse.birt.report.model"/>
+      <import plugin="org.eclipse.draw2d"/>
+      <import plugin="org.eclipse.birt.report.designer.core"/>
+      <import plugin="org.eclipse.birt.chart.ui"/>
+      <import plugin="org.eclipse.birt.chart.engine"/>
+      <import plugin="org.eclipse.birt.report.engine"/>
+      <import plugin="org.eclipse.jface"/>
+      <import plugin="org.eclipse.birt.data"/>
+      <import plugin="org.eclipse.birt.core"/>
+      <import plugin="org.eclipse.birt.framework.taskwizard.prototype"/>
+      <import plugin="org.eclipse.birt.chart.ui.prototype"/>
+   </requires>
+   <extension
+         id="chart"
+         name="The chart extension"
+         point="org.eclipse.birt.report.designer.ui.reportitemUI">
+      <model
+      		 extensionName="Chart"/>
+      <reportItemFigureUI
+      	 	class="org.eclipse.birt.chart.reportitem.ChartReportItemUIImpl"/>
+      <builder
+         	class="org.eclipse.birt.chart.reportitem.ChartReportItemBuilderImpl"/> <outline icon="icons/obj16/cell.gif"/>
+      <palette
+               icon="icons/pal/palette_icon.gif"
+               category="Content"/>
+      <editor
+               showInMasterPage="false"
+               canResize="false"
+               showInDesigner="true"/>
+      <outline
+      		   icon="icons/pal/palette_icon.gif"/>
+   </extension>
+   <extension
+         id="chart"
+         name="The chart extension"
+         point="org.eclipse.birt.report.model.reportItemModel">
+      <reportItem
+            class="org.eclipse.birt.chart.reportitem.ChartReportItemFactoryImpl"
+            isNameRequired="true"
+            displayNameID="Element.Chart"
+            extensionName="Chart">
+         <property
+               type="xml"
+               displayNameID="Element.Chart.xmlRepresentation"
+               name="xmlRepresentation"/>
+         <propertyVisibility
+               visibility="hide"
+               name="xmlRepresentation"/>
+      </reportItem>
+   </extension>
+   <extension
+         id="chart"
+         name="The chart extension"
+         point="org.eclipse.birt.chart.ui.uisheets">
+      <propertySheet
+            classDefinition="org.eclipse.birt.chart.reportitem.ui.ChartDataSetBindingSheetImpl"
+            nodePath="Data"
+            nodeIndex="50"/>
+   </extension>
+   <extension
+         id="chart"
+         name="The chart extension"
+         point="org.eclipse.birt.report.engine.reportitemQuery">
+      <reportItem
+            class="org.eclipse.birt.chart.reportitem.ChartReportItemQueryImpl"
+            name="Chart"/>
+   </extension>
+   <extension
+         id="chart"
+         name="The chart extension"
+         point="org.eclipse.birt.report.engine.reportitemPresentation">
+      <reportItem
+            class="org.eclipse.birt.chart.reportitem.ChartReportItemPresentationImpl"
+            name="Chart"
+            supportedFormats="jpeg; png; gif; bmp"/>
+   </extension>
+</plugin>

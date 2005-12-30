@@ -1,0 +1,67 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE application PUBLIC "-//Sun Microsystems, Inc.//DTD J2EE Application 1.3//EN" "http://java.sun.com/dtd/application_1_3.dtd">
+<application>
+	<display-name>NightLabs JFire Reporting</display-name>
+	<module>
+		<ejb>JFireReporting.jar</ejb>
+	</module>
+	
+	<module>
+		<java>birt/lib/core.jar</java>
+	</module>
+	<module>
+		<java>birt/lib/engine.jar</java>
+	</module>
+	<module>
+		<java>birt/lib/oda.jar</java>
+	</module>
+	<module>
+		<java>birt/lib/birt-oda.jar</java>
+	</module>
+	<module>
+		<java>birt/lib/chart-engine.jar</java>
+	</module>
+	<module>
+		<java>birt/lib/common.jar</java>
+	</module>
+	<module>
+		<java>birt/lib/common.resources.jar</java>
+	</module>
+	<module>
+		<java>birt/lib/commons-cli-1.0.jar</java>
+	</module>
+	<module>
+		<java>birt/lib/commons-codec-1.3.jar</java>
+	</module>
+	<module>
+		<java>birt/lib/dte.jar</java>
+	</module>
+	<module>
+		<java>birt/lib/ecore.jar</java>
+	</module>
+	<module>
+		<java>birt/lib/ecore.resources.jar</java>
+	</module>
+	<module>
+		<java>birt/lib/ecore.xmi.jar</java>
+	</module>
+	
+	<!--
+	<module>
+		<java>birt/lib/js.jar</java>
+	</module>
+	-->
+	
+	<module>
+		<java>birt/lib/model.jar</java>
+	</module>
+	<module>
+		<java>birt/lib/odaconsumer-helper.jar</java>
+	</module>
+	<module>
+		<java>birt/lib/Tidy.jar</java>
+	</module>
+	<module>
+		<java>birt/lib/viewservlets.jar</java>
+	</module>
+</application>

@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE classloader-repository
+PUBLIC "-//NightLabs GmbH//DTD ClassLoader Repository 1.0//EN"
+"http://www.nightlabs.de/dtd/clrepository_1_0.dtd">
+
+<classloader-repository>
+<!--
+    The following elements prevent publication of any resources from
+    the specified jars.
+-->
+<!--	<publish target="core.jar" inherit="false"/>
+	<publish target="engine.jar" inherit="false"/>
+-->
+    <publish inherit="false"/>
+</classloader-repository>

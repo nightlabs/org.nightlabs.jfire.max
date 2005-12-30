@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?eclipse version="3.0"?>
+<plugin
+   id="org.eclipse.birt.data.oda.adapter.dtp"
+   name="DTP-BIRT ODA Adapter Plug-in"
+   version="2.0.0"
+   provider-name="Eclipse.org"
+   class="org.eclipse.birt.data.oda.adapter.dtp.plugin.DriverPlugin">
+
+   <runtime>
+      <library name="oda-adapter.jar">
+         <export name="*"/>
+      </library>
+   </runtime>
+
+   <requires>
+      <import plugin="org.eclipse.birt.core"/>
+      <import plugin="org.eclipse.birt.data.oda"/>
+      <import plugin="org.eclipse.datatools.connectivity.oda"/>
+   </requires>
+   <extension
+         point="org.eclipse.datatools.connectivity.oda.dataSource">
+      <dataSource
+            odaVersion="3.0"
+            driverClass="org.eclipse.birt.data.oda.adapter.dtp.Driver"
+            defaultDisplayName="DTP-BIRT ODA DataSource Adapter"
+            setThreadContextClassLoader="false"
+            id="org.eclipse.birt.data.oda.adapter.dtp"/>
+      <dataSet
+            defaultDisplayName="DTP-BIRT ODA DataSet Adapter"
+            id="org.eclipse.birt.data.oda.adapter.dtp.dataSet">
+         <dataTypeMapping
+               nativeDataType="String"
+               nativeDataTypeCode="0"
+               odaScalarDataType="String"/>
+      </dataSet>
+   </extension>
+
+</plugin>

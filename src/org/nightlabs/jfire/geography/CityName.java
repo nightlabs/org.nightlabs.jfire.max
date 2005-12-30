@@ -1,7 +1,7 @@
 /*
  * Created on Feb 2, 2005
  */
-package org.nightlabs.ipanema.geography;
+package org.nightlabs.jfire.geography;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -13,17 +13,18 @@ import org.nightlabs.i18n.I18nText;
  *
  * @jdo.persistence-capable 
  *		identity-type = "application"
- *		objectid-class = "org.nightlabs.ipanema.geography.id.LocationNameID"
+ *		objectid-class = "org.nightlabs.jfire.geography.id.CityNameID"
  *		detachable = "true"
- *		table = "JFireGeography_LocationName"
+ *		table = "JFireGeography_CityName"
  *
  * @jdo.inheritance strategy = "new-table"
  *
- * @jdo.fetch-group name="Location.name" fields="location, names"
+ * @jdo.create-objectid-class field-order="countryID, organisationID, cityID"
+ *
+ * @jdo.fetch-group name="City.name" fields="city, names"
  */
-public class LocationName extends I18nText
+public class CityName extends I18nText
 {
-	/////// begin primary key ///////
 	/**
 	 * 2-char-iso-code
 	 *
@@ -42,13 +43,12 @@ public class LocationName extends I18nText
 	 * @jdo.field primary-key="true"
 	 * @jdo.column length="100"
 	 */
-	private String locationID;
-	/////// end primary key ///////
+	private String cityID;
 
 	/**
 	 * @jdo.field persistence-modifier="persistent"
 	 */
-	private Location location;
+	private City city;
 
 	/**
 	 * key: String languageID<br/>
@@ -60,7 +60,7 @@ public class LocationName extends I18nText
 	 *		key-type="java.lang.String"
 	 *		value-type="java.lang.String"
 	 *		dependent="true"
-	 *		table="JFireGeography_LocationName_names"
+	 *		table="JFireGeography_CityName_names"
 	 *
 	 * @jdo.join
 	 */
@@ -76,16 +76,16 @@ public class LocationName extends I18nText
 	 */
 	protected String name;
 
-	protected LocationName()
+	protected CityName()
 	{
 	}
 
-	public LocationName(Location location)
+	public CityName(City city)
 	{
-		this.location = location;
-		this.countryID = location.getCountryID();
-		this.organisationID = location.getOrganisationID();
-		this.locationID = location.getLocationID();
+		this.city = city;
+		this.countryID = city.getCountryID();
+		this.organisationID = city.getOrganisationID();
+		this.cityID = city.getCityID();
 	}
 
 	/**
@@ -96,17 +96,17 @@ public class LocationName extends I18nText
 		return names;
 	}
 
-	public Location getLocation()
-	{
-		return location;
-	}
-
 	/**
 	 * @see org.nightlabs.i18n.I18nText#setText(java.lang.String)
 	 */
 	protected void setText(String localizedValue)
 	{
 		this.name = localizedValue;
+	}
+
+	public City getCity()
+	{
+		return city;
 	}
 
 	/**
@@ -122,6 +122,6 @@ public class LocationName extends I18nText
 	 */
 	protected String getFallBackValue(String languageID)
 	{
-		return Location.getPrimaryKey(countryID, organisationID, locationID);
+		return City.getPrimaryKey(countryID, organisationID, cityID);
 	}
 }

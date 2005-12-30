@@ -1,7 +1,7 @@
 /*
  * Created on Feb 2, 2005
  */
-package org.nightlabs.ipanema.geography;
+package org.nightlabs.jfire.geography;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -13,16 +13,17 @@ import org.nightlabs.i18n.I18nText;
  *
  * @jdo.persistence-capable 
  *		identity-type = "application"
- *		objectid-class = "org.nightlabs.ipanema.geography.id.CountryNameID"
+ *		objectid-class = "org.nightlabs.jfire.geography.id.RegionNameID"
  *		detachable = "true"
- *		table = "JFireGeography_CountryName"
+ *		table = "JFireGeography_RegionName"
  *
  * @jdo.inheritance strategy = "new-table"
  *
- * @jdo.fetch-group name="Country.name" fields="country, names"
+ * @jdo.fetch-group name="Region.name" fields="region, names"
  */
-public class CountryName extends I18nText
+public class RegionName extends I18nText
 {
+	/////// begin primary key ///////
 	/**
 	 * @jdo.field primary-key="true"
 	 * @jdo.column length="100"
@@ -30,9 +31,22 @@ public class CountryName extends I18nText
 	private String countryID;
 
 	/**
+	 * @jdo.field primary-key="true"
+	 * @jdo.column length="100"
+	 */
+	private String organisationID;
+
+	/**
+	 * @jdo.field primary-key="true"
+	 * @jdo.column length="100"
+	 */
+	private String regionID;
+	/////// end primary key ///////
+
+	/**
 	 * @jdo.field persistence-modifier="persistent"
 	 */
-	private Country country;
+	private Region region;
 
 	/**
 	 * key: String languageID<br/>
@@ -44,7 +58,7 @@ public class CountryName extends I18nText
 	 *		key-type="java.lang.String"
 	 *		value-type="java.lang.String"
 	 *		dependent="true"
-	 *		table="JFireGeography_CountryName_names"
+	 *		table="JFireGeography_RegionName_names"
 	 *
 	 * @jdo.join
 	 */
@@ -60,14 +74,48 @@ public class CountryName extends I18nText
 	 */
 	protected String name;
 
-	protected CountryName()
+	protected RegionName()
 	{
 	}
 
-	public CountryName(Country country)
+	public RegionName(Region region)
 	{
-		this.country = country;
-		countryID = country.getCountryID();
+		this.countryID = region.getCountryID();
+		this.organisationID = region.getOrganisationID();
+		this.regionID = region.getRegionID();
+		this.region = region;
+	}
+
+	/**
+	 * @return Returns the countryID.
+	 */
+	public String getCountryID()
+	{
+		return countryID;
+	}
+
+	/**
+	 * @return Returns the organisationID.
+	 */
+	public String getOrganisationID()
+	{
+		return organisationID;
+	}
+
+	/**
+	 * @return Returns the region.
+	 */
+	public Region getRegion()
+	{
+		return region;
+	}
+
+	/**
+	 * @return Returns the regionID.
+	 */
+	public String getRegionID()
+	{
+		return regionID;
 	}
 
 	/**
@@ -99,7 +147,7 @@ public class CountryName extends I18nText
 	 */
 	protected String getFallBackValue(String languageID)
 	{
-		return country == null ? languageID : countryID;
+		return region == null ? languageID : region.getPrimaryKey();
 	}
 
 }

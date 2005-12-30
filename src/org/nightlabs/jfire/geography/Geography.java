@@ -1,7 +1,7 @@
 /*
  * Created on 13.11.2004
  */
-package org.nightlabs.ipanema.geography;
+package org.nightlabs.jfire.geography;
 
 import java.io.Serializable;
 import java.util.Collection;
@@ -12,7 +12,7 @@ import javax.jdo.PersistenceManager;
 
 import org.apache.log4j.Logger;
 
-import org.nightlabs.ipanema.organisation.LocalOrganisation;
+import org.nightlabs.jfire.organisation.LocalOrganisation;
 
 /**
  * This is a JDO-singleton - means there exists exactly one instance in each datastore.

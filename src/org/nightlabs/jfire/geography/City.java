@@ -1,7 +1,7 @@
 /*
  * Created on 13.11.2004
  */
-package org.nightlabs.ipanema.geography;
+package org.nightlabs.jfire.geography;
 
 import java.io.Serializable;
 import java.util.Collection;
@@ -12,14 +12,14 @@ import java.util.Map;
 
 import javax.jdo.JDOHelper;
 
-import org.nightlabs.ipanema.geography.id.CityID;
+import org.nightlabs.jfire.geography.id.CityID;
 
 /**
  * @author Marco Schulze - marco at nightlabs dot de
  *
  * @jdo.persistence-capable
  *		identity-type = "application"
- *		objectid-class = "org.nightlabs.ipanema.geography.id.CityID"
+ *		objectid-class = "org.nightlabs.jfire.geography.id.CityID"
  *		detachable = "true"
  *		table = "JFireGeography_City"
  *

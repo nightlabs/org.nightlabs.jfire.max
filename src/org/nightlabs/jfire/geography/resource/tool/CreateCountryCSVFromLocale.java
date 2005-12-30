@@ -1,7 +1,7 @@
 /*
  * Created on Aug 13, 2005
  */
-package org.nightlabs.ipanema.geography.resource.tool;
+package org.nightlabs.jfire.geography.resource.tool;
 
 import java.io.File;
 import java.io.FileOutputStream;
@@ -18,8 +18,8 @@ import java.util.Map;
 
 import org.apache.log4j.Logger;
 
-import org.nightlabs.ipanema.geography.Country;
-import org.nightlabs.ipanema.geography.GeographySystem;
+import org.nightlabs.jfire.geography.Country;
+import org.nightlabs.jfire.geography.GeographySystem;
 
 public class CreateCountryCSVFromLocale
 {

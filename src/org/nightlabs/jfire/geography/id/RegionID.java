@@ -1,7 +1,7 @@
 /*
  * Created on Dec 14, 2004
  */
-package org.nightlabs.ipanema.geography.id;
+package org.nightlabs.jfire.geography.id;
 
 import org.nightlabs.jdo.BaseObjectID;
 import org.nightlabs.jdo.ObjectIDException;

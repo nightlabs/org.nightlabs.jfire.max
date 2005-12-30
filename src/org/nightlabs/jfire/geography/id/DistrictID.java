@@ -1,7 +1,7 @@
 /*
  * Created on Dec 14, 2004
  */
-package org.nightlabs.ipanema.geography.id;
+package org.nightlabs.jfire.geography.id;
 
 import org.nightlabs.jdo.BaseObjectID;
 import org.nightlabs.jdo.ObjectIDException;
@@ -9,13 +9,13 @@ import org.nightlabs.jdo.ObjectIDException;
 /**
  * @author Marco Schulze - marco at nightlabs dot de
  */
-public class LocationNameID extends BaseObjectID
+public class DistrictID extends BaseObjectID
 {
 	public String countryID;
 	public String organisationID;
-	public String locationID;
+	public String districtID;
 
-	public LocationNameID()
+	public DistrictID()
 	{
 	}
 
@@ -23,17 +23,17 @@ public class LocationNameID extends BaseObjectID
 	 * @param keyStr
 	 * @throws org.nightlabs.jdo.ObjectIDException
 	 */
-	public LocationNameID(String keyStr) throws ObjectIDException
+	public DistrictID(String keyStr) throws ObjectIDException
 	{
 		super(keyStr);
 	}
 
-	public static LocationNameID create(String countryID, String organisationID, String locationID)
+	public static DistrictID create(String countryID, String organisationID, String districtID)
 	{
-		LocationNameID n = new LocationNameID();
+		DistrictID n = new DistrictID();
 		n.countryID = countryID;
 		n.organisationID = organisationID;
-		n.locationID = locationID;
+		n.districtID = districtID;
 		return n;
 	}
 }

@@ -1,7 +1,7 @@
 /*
  * Created on Dec 14, 2004
  */
-package org.nightlabs.ipanema.geography.id;
+package org.nightlabs.jfire.geography.id;
 
 import org.nightlabs.jdo.BaseObjectID;
 import org.nightlabs.jdo.ObjectIDException;
@@ -9,22 +9,22 @@ import org.nightlabs.jdo.ObjectIDException;
 /**
  * @author Marco Schulze - marco at nightlabs dot de
  */
-public class CountryID extends BaseObjectID
+public class CountryNameID extends BaseObjectID
 {
 	public String countryID;
 	
-	public CountryID()
+	public CountryNameID()
 	{
 	}
 
-	public CountryID(String keyStr) throws ObjectIDException
+	public CountryNameID(String keyStr) throws ObjectIDException
 	{
 		super(keyStr);
 	}
 
-	public static CountryID create(String countryID)
+	public static CountryNameID create(String countryID)
 	{
-		CountryID n = new CountryID();
+		CountryNameID n = new CountryNameID();
 		n.countryID = countryID;
 		return n;
 	}

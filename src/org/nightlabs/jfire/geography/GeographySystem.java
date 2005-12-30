@@ -1,7 +1,7 @@
 /*
  * Created on Feb 4, 2005
  */
-package org.nightlabs.ipanema.geography;
+package org.nightlabs.jfire.geography;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -29,10 +29,10 @@ import javax.naming.NamingException;
 
 import org.apache.log4j.Logger;
 
-import org.nightlabs.ipanema.geography.id.CityID;
-import org.nightlabs.ipanema.geography.id.CountryID;
-import org.nightlabs.ipanema.geography.id.RegionID;
-import org.nightlabs.ipanema.organisation.Organisation;
+import org.nightlabs.jfire.geography.id.CityID;
+import org.nightlabs.jfire.geography.id.CountryID;
+import org.nightlabs.jfire.geography.id.RegionID;
+import org.nightlabs.jfire.organisation.Organisation;
 import org.nightlabs.jdo.BaseObjectID;
 import org.nightlabs.util.FulltextMap;
 import org.nightlabs.util.Utils;

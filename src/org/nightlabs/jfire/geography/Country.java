@@ -1,7 +1,7 @@
 /*
  * Created on 13.11.2004
  */
-package org.nightlabs.ipanema.geography;
+package org.nightlabs.jfire.geography;
 
 import java.io.Serializable;
 import java.util.Collection;
@@ -18,7 +18,7 @@ import javax.jdo.PersistenceManager;
  * 
  * @jdo.persistence-capable
  *		identity-type = "application"
- *		objectid-class = "org.nightlabs.ipanema.geography.id.CountryID"
+ *		objectid-class = "org.nightlabs.jfire.geography.id.CountryID"
  *		detachable = "true"
  *		table = "JFireGeography_Country"
  *

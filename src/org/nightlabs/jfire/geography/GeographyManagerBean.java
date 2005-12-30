@@ -1,7 +1,7 @@
 /*
  * Created on Feb 3, 2005
  */
-package org.nightlabs.ipanema.geography;
+package org.nightlabs.jfire.geography;
 
 import java.rmi.RemoteException;
 import java.util.ArrayList;
@@ -17,16 +17,16 @@ import javax.jdo.PersistenceManager;
 import org.apache.log4j.Logger;
 
 import org.nightlabs.ModuleException;
-import org.nightlabs.ipanema.base.BaseSessionBeanImpl;
-import org.nightlabs.ipanema.geography.id.CityID;
-import org.nightlabs.ipanema.geography.id.CountryID;
-import org.nightlabs.ipanema.geography.id.LocationID;
-import org.nightlabs.ipanema.geography.id.RegionID;
+import org.nightlabs.jfire.base.BaseSessionBeanImpl;
+import org.nightlabs.jfire.geography.id.CityID;
+import org.nightlabs.jfire.geography.id.CountryID;
+import org.nightlabs.jfire.geography.id.LocationID;
+import org.nightlabs.jfire.geography.id.RegionID;
 import org.nightlabs.jdo.NLJDOHelper;
 
 /**
- * @ejb.bean name="ipanema/ejb/JFireGeography/GeographyManager"	
- *           jndi-name="ipanema/ejb/JFireGeography/GeographyManager"
+ * @ejb.bean name="jfire/ejb/JFireGeography/GeographyManager"	
+ *           jndi-name="jfire/ejb/JFireGeography/GeographyManager"
  *           type="Stateless" 
  *           transaction-type="Container"
  *
@@ -39,7 +39,7 @@ public abstract class GeographyManagerBean
 	public static final Logger LOGGER = Logger.getLogger(GeographyManagerBean.class);
 
 	/**
-	 * @see org.nightlabs.ipanema.base.BaseSessionBeanImpl#setSessionContext(javax.ejb.SessionContext)
+	 * @see org.nightlabs.jfire.base.BaseSessionBeanImpl#setSessionContext(javax.ejb.SessionContext)
 	 */
 	public void setSessionContext(SessionContext sessionContext)
 			throws EJBException, RemoteException
@@ -48,7 +48,7 @@ public abstract class GeographyManagerBean
 		super.setSessionContext(sessionContext);
 	}
 	/**
-	 * @see org.nightlabs.ipanema.base.BaseSessionBeanImpl#unsetSessionContext()
+	 * @see org.nightlabs.jfire.base.BaseSessionBeanImpl#unsetSessionContext()
 	 */
 	public void unsetSessionContext() {
 		super.unsetSessionContext();

@@ -1,21 +1,21 @@
 /*
  * Created on Feb 2, 2005
  */
-package org.nightlabs.ipanema.geography;
+package org.nightlabs.jfire.geography;
 
 import java.io.Serializable;
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.Set;
 
-import org.nightlabs.ipanema.geography.id.DistrictID;
+import org.nightlabs.jfire.geography.id.DistrictID;
 
 /**
  * @author Marco Schulze - marco at nightlabs dot de
  *
  * @jdo.persistence-capable
  *		identity-type = "application"
- *		objectid-class = "org.nightlabs.ipanema.geography.id.DistrictID"
+ *		objectid-class = "org.nightlabs.jfire.geography.id.DistrictID"
  *		detachable = "true"
  *		table = "JFireGeography_District"
  *

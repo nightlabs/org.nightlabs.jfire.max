@@ -168,7 +168,7 @@ implements SessionBean
 		pm = getPersistenceManager();
 		try {
 			ModuleMetaData moduleMetaData = ModuleMetaData.getModuleMetaData(pm, JFireBaseEAR.MODULE_NAME);
-			if (moduleMetaData != null) {
+			if (moduleMetaData == null) {
 			
 				LOGGER.info("Initialization oJFireBase started...");
 				
@@ -176,79 +176,79 @@ implements SessionBean
 				moduleMetaData = new ModuleMetaData(
 						JFireReportingEAR.MODULE_NAME, "1.0.0-0-beta", "1.0.0-0-beta");
 				pm.makePersistent(moduleMetaData);
-			}
 
-			// Register internal report categories if not existent			
-			ReportCategory offerCat = ReportCategory.getReportCategory(
-					pm,
-					getOrganisationID(),
-					ReportCategory.INTERNAL_CATEGORY_TYPE_OFFER
-				);
-			if (offerCat == null) {
-				offerCat = new ReportCategory(
+				// Register internal report categories if not existent			
+				ReportCategory offerCat = ReportCategory.getReportCategory(
 						pm,
-						null,
 						getOrganisationID(),
-						ReportCategory.INTERNAL_CATEGORY_TYPE_OFFER,
-						true
-					);
-				offerCat.getName().setText(Locale.ENGLISH.getLanguage(), "Offer Layouts");
-				offerCat.getName().setText(Locale.GERMAN.getLanguage(), "Angebots-Vorlagen");
-				pm.makePersistent(offerCat);
-			}
-						
-			ReportCategory orderCat = ReportCategory.getReportCategory(
-					pm,
-					getOrganisationID(),
-					ReportCategory.INTERNAL_CATEGORY_TYPE_ORDER
+						ReportCategory.INTERNAL_CATEGORY_TYPE_OFFER
 				);
-			if (orderCat == null) {
-				orderCat = new ReportCategory(
-						pm,
-						null,
-						getOrganisationID(),
-						ReportCategory.INTERNAL_CATEGORY_TYPE_ORDER,
-						true
+				if (offerCat == null) {
+					offerCat = new ReportCategory(
+							pm,
+							null,
+							getOrganisationID(),
+							ReportCategory.INTERNAL_CATEGORY_TYPE_OFFER,
+							true
 					);
-				orderCat.getName().setText(Locale.ENGLISH.getLanguage(), "Order Layouts");
-				orderCat.getName().setText(Locale.GERMAN.getLanguage(), "Auftrags-Vorlagen");
-				pm.makePersistent(orderCat);
-			}
-			
-			ReportCategory invoiceCat = ReportCategory.getReportCategory(
-					pm,
-					getOrganisationID(),
-					ReportCategory.INTERNAL_CATEGORY_TYPE_INVOICE
+					offerCat.getName().setText(Locale.ENGLISH.getLanguage(), "Offer Layouts");
+					offerCat.getName().setText(Locale.GERMAN.getLanguage(), "Angebots-Vorlagen");
+					pm.makePersistent(offerCat);
+				}
+				
+				ReportCategory orderCat = ReportCategory.getReportCategory(
+						pm,
+						getOrganisationID(),
+						ReportCategory.INTERNAL_CATEGORY_TYPE_ORDER
 				);
-			if (invoiceCat == null) {
-				invoiceCat = new ReportCategory(
-						pm,
-						null,
-						getOrganisationID(),
-						ReportCategory.INTERNAL_CATEGORY_TYPE_INVOICE,
-						true
+				if (orderCat == null) {
+					orderCat = new ReportCategory(
+							pm,
+							null,
+							getOrganisationID(),
+							ReportCategory.INTERNAL_CATEGORY_TYPE_ORDER,
+							true
 					);
-				invoiceCat.getName().setText(Locale.ENGLISH.getLanguage(), "Invoice Layouts");
-				invoiceCat.getName().setText(Locale.GERMAN.getLanguage(), "Rechnungs-Vorlagen");
-				pm.makePersistent(invoiceCat);
-			}
-			
-			ReportCategory deliveryNoteCat = ReportCategory.getReportCategory(
-					pm,
-					getOrganisationID(),
-					ReportCategory.INTERNAL_CATEGORY_TYPE_DELIVERY_NOTE
+					orderCat.getName().setText(Locale.ENGLISH.getLanguage(), "Order Layouts");
+					orderCat.getName().setText(Locale.GERMAN.getLanguage(), "Auftrags-Vorlagen");
+					pm.makePersistent(orderCat);
+				}
+				
+				ReportCategory invoiceCat = ReportCategory.getReportCategory(
+						pm,
+						getOrganisationID(),
+						ReportCategory.INTERNAL_CATEGORY_TYPE_INVOICE
 				);
-			if (deliveryNoteCat == null) {
-				deliveryNoteCat = new ReportCategory(
-						pm,
-						null,
-						getOrganisationID(),
-						ReportCategory.INTERNAL_CATEGORY_TYPE_DELIVERY_NOTE,
-						true
+				if (invoiceCat == null) {
+					invoiceCat = new ReportCategory(
+							pm,
+							null,
+							getOrganisationID(),
+							ReportCategory.INTERNAL_CATEGORY_TYPE_INVOICE,
+							true
 					);
-				deliveryNoteCat.getName().setText(Locale.ENGLISH.getLanguage(), "Deliverynote Layouts");
-				deliveryNoteCat.getName().setText(Locale.GERMAN.getLanguage(), "Lieferschein-Vorlagen");
-				pm.makePersistent(deliveryNoteCat);
+					invoiceCat.getName().setText(Locale.ENGLISH.getLanguage(), "Invoice Layouts");
+					invoiceCat.getName().setText(Locale.GERMAN.getLanguage(), "Rechnungs-Vorlagen");
+					pm.makePersistent(invoiceCat);
+				}
+				
+				ReportCategory deliveryNoteCat = ReportCategory.getReportCategory(
+						pm,
+						getOrganisationID(),
+						ReportCategory.INTERNAL_CATEGORY_TYPE_DELIVERY_NOTE
+				);
+				if (deliveryNoteCat == null) {
+					deliveryNoteCat = new ReportCategory(
+							pm,
+							null,
+							getOrganisationID(),
+							ReportCategory.INTERNAL_CATEGORY_TYPE_DELIVERY_NOTE,
+							true
+					);
+					deliveryNoteCat.getName().setText(Locale.ENGLISH.getLanguage(), "Deliverynote Layouts");
+					deliveryNoteCat.getName().setText(Locale.GERMAN.getLanguage(), "Lieferschein-Vorlagen");
+					pm.makePersistent(deliveryNoteCat);
+				}
 			}
 			
 		} finally {

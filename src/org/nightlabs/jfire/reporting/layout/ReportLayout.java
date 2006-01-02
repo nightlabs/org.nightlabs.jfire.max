@@ -47,7 +47,7 @@ import org.nightlabs.jfire.reporting.layout.id.ReportRegistryItemID;
  *
  * @jdo.inheritance strategy="superclass-table"
  * 
- * @jdo.fetch-group name="ReportLayout.childItems" fetch-groups="default" fields="reportDesign"
+ * @jdo.fetch-group name="ReportLayout.reportDesign" fetch-groups="default" fields="reportDesign"
  * @jdo.fetch-group name="ReportLayout.this" fetch-groups="default, ReportRegistryItem.this" fields="reportDesign"
  */
 public class ReportLayout extends ReportRegistryItem {

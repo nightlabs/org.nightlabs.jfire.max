@@ -89,4 +89,42 @@ public class ReportLayoutConfigModule extends ConfigModule {
 		this.availEntries = availEntries;
 	}
 	
+	public ReportLayoutAvailEntry getAvailEntry(String reportRegistryItemType) {
+		ReportLayoutAvailEntry result = availEntries.get(reportRegistryItemType);
+		if (result == null) {
+			result = new ReportLayoutAvailEntry(reportRegistryItemType, this);
+			availEntries.put(reportRegistryItemType, result);
+		}
+		return result;
+	}
+	
+	@Override
+	public Object clone() {
+		ReportLayoutConfigModule clone = new ReportLayoutConfigModule();
+		for (ReportLayoutAvailEntry entry : availEntries.values()) {
+			clone.availEntries.put(
+					entry.getReportRegistryItemType(),
+					new ReportLayoutAvailEntry(
+							entry.getReportRegistryItemType(),
+							clone
+						)
+				);
+		}
+		return clone;
+	}
+	
+	public void assignTo(ReportLayoutConfigModule configModule) {
+		configModule.getAvailEntries().clear();
+		for (ReportLayoutAvailEntry entry : getAvailEntries().values()) {
+			configModule.getAvailEntries().put(entry.getReportRegistryItemType(), entry.clone(configModule));
+		}
+	}
+	
+	public void copyFrom(ReportLayoutConfigModule configModule) {
+		setAvailEntries(new HashMap<String, ReportLayoutAvailEntry>());
+		for (ReportLayoutAvailEntry entry : configModule.getAvailEntries().values()) {
+			getAvailEntries().put(entry.getReportRegistryItemType(), entry.clone(this));
+		}
+	}
+	
 }

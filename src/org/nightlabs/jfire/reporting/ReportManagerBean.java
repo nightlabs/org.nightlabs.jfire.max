@@ -55,8 +55,13 @@ import org.eclipse.birt.report.engine.api.ReportEngine;
 import org.eclipse.datatools.connectivity.oda.IParameterMetaData;
 import org.eclipse.datatools.connectivity.oda.IResultSet;
 import org.nightlabs.ModuleException;
+import org.nightlabs.jdo.NLJDOHelper;
+import org.nightlabs.jdo.moduleregistry.ModuleMetaData;
 import org.nightlabs.jfire.base.BaseSessionBeanImpl;
 import org.nightlabs.jfire.base.JFireBaseEAR;
+import org.nightlabs.jfire.config.ConfigSetup;
+import org.nightlabs.jfire.config.UserConfigSetup;
+import org.nightlabs.jfire.reporting.config.ReportLayoutConfigModule;
 import org.nightlabs.jfire.reporting.layout.RenderedReportLayout;
 import org.nightlabs.jfire.reporting.layout.ReportCategory;
 import org.nightlabs.jfire.reporting.layout.ReportRegistryItem;
@@ -72,8 +77,6 @@ import org.nightlabs.jfire.reporting.platform.RAPlatformContext;
 import org.nightlabs.jfire.reporting.platform.ReportingManager;
 import org.nightlabs.jfire.reporting.platform.ReportingManagerFactory;
 import org.nightlabs.jfire.servermanager.JFireServerManager;
-import org.nightlabs.jdo.NLJDOHelper;
-import org.nightlabs.jdo.moduleregistry.ModuleMetaData;
 import org.nightlabs.util.Utils;
 
 /**
@@ -167,6 +170,7 @@ implements SessionBean
 		PersistenceManager pm;
 		pm = getPersistenceManager();
 		try {
+			
 			ModuleMetaData moduleMetaData = ModuleMetaData.getModuleMetaData(pm, JFireBaseEAR.MODULE_NAME);
 			if (moduleMetaData == null) {
 			
@@ -249,6 +253,15 @@ implements SessionBean
 					deliveryNoteCat.getName().setText(Locale.GERMAN.getLanguage(), "Lieferschein-Vorlagen");
 					pm.makePersistent(deliveryNoteCat);
 				}
+				
+				
+				ConfigSetup configSetup = ConfigSetup.getConfigSetup(
+						pm, 
+						getOrganisationID(), 
+						UserConfigSetup.CONFIG_SETUP_TYPE_USER
+					);
+				configSetup.getConfigModuleClasses().add(ReportLayoutConfigModule.class.getName());
+				
 			}
 			
 		} finally {

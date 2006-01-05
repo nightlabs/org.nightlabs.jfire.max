@@ -44,17 +44,17 @@ import org.nightlabs.jfire.reporting.layout.id.ReportRegistryItemID;
  *		detachable = "true"
  *		table="JFireReporting_ReportLayoutAvailEntry"
  *
- * @jdo.create-objectid-class field-order="organisationID, reportRegistryItemID"
+ * @jdo.create-objectid-class
  */
 public class ReportLayoutAvailEntry implements Serializable {
-
+	
 	/**
 	 * @jdo.field persistence-modifier="persistent"
 	 */
 	private ReportLayoutConfigModule reportLayoutConfigModule;
 	
 	/**
-	 * @jdo.field persistence-modifier="persistent"
+	 * @jdo.field primary-key="true"
 	 * @jdo.column length="100"
 	 */
 	private String reportRegistryItemType;
@@ -65,11 +65,23 @@ public class ReportLayoutAvailEntry implements Serializable {
 	 */
 	private String organisationID;
 	
+	/**
+	 * @jdo.field primary-key="true"
+	 * @jdo.column length="100"
+	 */
+	private String configKey;
 	
 	/**
 	 * @jdo.field primary-key="true"
+	 * @jdo.column length="100"
 	 */
-	private long reportRegistryItemID;
+	protected String configType;
+	
+	/**
+	 * @jdo.field primary-key="true"
+	 * @jdo.column length="150"
+	 */
+	private String cfModKey;
 	
 	/**
 	 * The default ReportLayoutID for this categoryType
@@ -98,20 +110,23 @@ public class ReportLayoutAvailEntry implements Serializable {
 	/**
 	 * 
 	 */
-	public ReportLayoutAvailEntry(String reportRegistryItemType, long reportRegistryItemID, ReportLayoutConfigModule configModule) {
+	public ReportLayoutAvailEntry(String reportRegistryItemType, ReportLayoutConfigModule configModule) {
 		this();
 		this.reportLayoutConfigModule = configModule;
 		this.reportRegistryItemType = reportRegistryItemType;
-		this.reportRegistryItemID =  reportRegistryItemID;
+		this.organisationID = configModule.getOrganisationID();
+		this.configKey = configModule.getConfigKey();
+		this.configType = configModule.getConfigType();
+		this.cfModKey = configModule.getCfModKey();
 	}
-
+	
 	/**
 	 * @return Returns the organisationID.
 	 */
 	public String getOrganisationID() {
 		return organisationID;
 	}
-
+	
 	/**
 	 * @param organisationID The organisationID to set.
 	 */
@@ -119,41 +134,28 @@ public class ReportLayoutAvailEntry implements Serializable {
 		this.organisationID = organisationID;
 	}
 
-	/**
-	 * @return Returns the reportRegistryItemID.
-	 */
-	public long getReportRegistryItemID() {
-		return reportRegistryItemID;
-	}
-
-	/**
-	 * @param reportRegistryItemID The reportRegistryItemID to set.
-	 */
-	public void setReportRegistryItemID(long reportRegistryItemID) {
-		this.reportRegistryItemID = reportRegistryItemID;
-	}
-
+	
 	/**
 	 * @return Returns the reportRegistryItemType.
 	 */
 	public String getReportRegistryItemType() {
 		return reportRegistryItemType;
 	}
-
+	
 	/**
 	 * @param reportRegistryItemType The reportRegistryItemType to set.
 	 */
 	public void setReportRegistryItemType(String reportRegistryItemType) {
 		this.reportRegistryItemType = reportRegistryItemType;
 	}
-
+	
 	/**
 	 * @return Returns the reportLayoutConfigModule.
 	 */
 	public ReportLayoutConfigModule getReportLayoutConfigModule() {
 		return reportLayoutConfigModule;
 	}
-
+	
 	/**
 	 * @param reportLayoutConfigModule The reportLayoutConfigModule to set.
 	 */
@@ -161,35 +163,35 @@ public class ReportLayoutAvailEntry implements Serializable {
 			ReportLayoutConfigModule reportLayoutConfigModule) {
 		this.reportLayoutConfigModule = reportLayoutConfigModule;
 	}
-
+	
 	/**
 	 * @return Returns the availableReportLayouts.
 	 */
 	public Collection<String> getAvailableReportLayoutKeys() {
 		return availableReportLayoutKeys;
 	}
-
+	
 	/**
 	 * @param availableReportLayouts The availableReportLayouts to set.
 	 */
 	public void setAvailableReportLayoutKeys(Collection<String> availableReportLayoutKeys) {
 		this.availableReportLayoutKeys = availableReportLayoutKeys;
 	}
-
+	
 	/**
 	 * @return Returns the defaultReportLayoutKey.
 	 */
 	public String getDefaultReportLayoutKey() {
 		return defaultReportLayoutKey;
 	}
-
+	
 	/**
 	 * @param defaultReportLayoutID The defaultReportLayoutID to set.
 	 */
 	public void setDefaultReportLayoutKey(String defaultReportLayoutKey) {
 		this.defaultReportLayoutKey = defaultReportLayoutKey;
 	}
-
+	
 	/**
 	 * Returns either the ReportRegistryItemID configured as default for 
 	 * this entry or null if none is set.
@@ -203,7 +205,7 @@ public class ReportLayoutAvailEntry implements Serializable {
 			throw new IllegalStateException("Could not create ReportRegistryItemID instance out of string-key: "+defaultReportLayoutKey, e);
 		}
 	}
-
+	
 	/**
 	 * Converts the stored Collection of strings into a Collection
 	 * of ReportRegistryItemIDs representing the available 
@@ -219,6 +221,57 @@ public class ReportLayoutAvailEntry implements Serializable {
 			}
 		}
 		return result;
+	}
+
+	/**
+	 * @return Returns the cfModKey.
+	 */
+	public String getCfModKey() {
+		return cfModKey;
+	}
+
+	/**
+	 * @param cfModKey The cfModKey to set.
+	 */
+	public void setCfModKey(String cfModKey) {
+		this.cfModKey = cfModKey;
+	}
+
+	/**
+	 * @return Returns the configKey.
+	 */
+	public String getConfigKey() {
+		return configKey;
+	}
+
+	/**
+	 * @param configKey The configKey to set.
+	 */
+	public void setConfigKey(String configKey) {
+		this.configKey = configKey;
+	}
+
+	/**
+	 * @return Returns the configType.
+	 */
+	public String getConfigType() {
+		return configType;
+	}
+
+	/**
+	 * @param configType The configType to set.
+	 */
+	public void setConfigType(String configType) {
+		this.configType = configType;
+	}
+
+	public ReportLayoutAvailEntry clone(ReportLayoutConfigModule configModule) {
+		ReportLayoutAvailEntry clone = new ReportLayoutAvailEntry(getReportRegistryItemType(), configModule);
+		clone.setDefaultReportLayoutKey(getDefaultReportLayoutKey());
+		for (String availKey : getAvailableReportLayoutKeys()) {
+			clone.getAvailableReportLayoutKeys().add(availKey);
+		}
+		return clone;
 	}
 	
 }

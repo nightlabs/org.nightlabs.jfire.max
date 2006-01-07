@@ -42,10 +42,44 @@ if (customer == null)
 	throw "Person is not assigned!";
 
 resultSet.addRow();
-resultSet.addColumn(person.getPersonDataField(PersonStruct.PERSONALDATA_COMPANY).getText());
-resultSet.addColumn(person.getPersonDataField(PersonStruct.PERSONALDATA_NAME).getText());
-resultSet.addColumn(person.getPersonDataField(PersonStruct.PERSONALDATA_FIRSTNAME).getText());
-resultSet.addColumn(person.getPersonDataField(PersonStruct.POSTADDRESS_ADDRESS).getText());
-resultSet.addColumn(person.getPersonDataField(PersonStruct.POSTADDRESS_CITY).getText());
-resultSet.addColumn(person.getPersonDataField(PersonStruct.POSTADDRESS_POSTCODE).getText());
+try {
+	company = person.getPersonDataField(PersonStruct.PERSONALDATA_COMPANY).getText();
+	resultSet.addColumn(company);
+} catch (e) {
+	resultSet.addColumn("");
+}
 
+try {
+	name = person.getPersonDataField(PersonStruct.PERSONALDATA_NAME).getText();
+	resultSet.addColumn(name);
+} catch (e) {
+	resultSet.addColumn("");
+}
+
+try {
+	firstName = person.getPersonDataField(PersonStruct.PERSONALDATA_FIRSTNAME).getText();
+	resultSet.addColumn(firstName);
+} catch (e) {
+	resultSet.addColumn("");
+}
+
+try {
+	address = person.getPersonDataField(PersonStruct.POSTADDRESS_ADDRESS).getText();
+	resultSet.addColumn(address);
+} catch (e) {
+	resultSet.addColumn("");
+}
+
+try {
+	city = person.getPersonDataField(PersonStruct.POSTADDRESS_CITY).getText();
+	resultSet.addColumn(city);
+} catch (e) {
+	resultSet.addColumn("");
+}
+
+try {
+	postCode = person.getPersonDataField(PersonStruct.POSTADDRESS_POSTCODE).getText();
+	resultSet.addColumn(postCode);
+} catch (e) {
+	resultSet.addColumn("");
+}

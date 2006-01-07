@@ -26,11 +26,16 @@
 
 package org.nightlabs.jfire.reporting.config;
 
+import java.lang.reflect.InvocationTargetException;
+import java.text.ParseException;
+import java.util.Collection;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.Map;
 
 import org.nightlabs.jfire.config.Config;
 import org.nightlabs.jfire.config.ConfigModule;
+import org.nightlabs.jfire.reporting.layout.id.ReportRegistryItemID;
 
 /**
  * @author Alexander Bieber <alex[AT]nightlabs[ÐOT]de>
@@ -116,15 +121,38 @@ public class ReportLayoutConfigModule extends ConfigModule {
 	public void assignTo(ReportLayoutConfigModule configModule) {
 		configModule.getAvailEntries().clear();
 		for (ReportLayoutAvailEntry entry : getAvailEntries().values()) {
-			configModule.getAvailEntries().put(entry.getReportRegistryItemType(), entry.clone(configModule));
+			configModule.getAvailEntries().put(
+					entry.getReportRegistryItemType(), 
+					entry.clone(configModule)
+				);
 		}
 	}
 	
 	public void copyFrom(ReportLayoutConfigModule configModule) {
-		setAvailEntries(new HashMap<String, ReportLayoutAvailEntry>());
-		for (ReportLayoutAvailEntry entry : configModule.getAvailEntries().values()) {
-			getAvailEntries().put(entry.getReportRegistryItemType(), entry.clone(this));
+		for (ReportLayoutAvailEntry availEntry : configModule.getAvailEntries().values()) {
+			ReportLayoutAvailEntry thisEntry = getAvailEntry(availEntry.getReportRegistryItemType());
+			if (thisEntry == null)
+				throw new IllegalStateException("Could not get ReportLayoutAvailEntry even with auto-create");
+			thisEntry.getAvailableReportLayoutKeys().clear();
+			for (String availLayout : availEntry.getAvailableReportLayoutKeys()) {
+				thisEntry.getAvailableReportLayoutKeys().add(availLayout);
+			}
+			thisEntry.setDefaultReportLayoutKey(availEntry.getDefaultReportLayoutKey());
 		}
+	}
+	
+	public ReportRegistryItemID getDefaultAvailEntry(String reportRegistryItemType) {
+		ReportLayoutAvailEntry availEntry = getAvailEntry(reportRegistryItemType);
+		if (availEntry == null)
+			throw new IllegalStateException("Could not get ReportLayoutAvailEntry even with auto-create");
+		return availEntry.getDefaultReportLayoutID();
+	}
+	
+	public Collection<ReportRegistryItemID> getAvailEntries(String reportRegistryItemType) {
+		ReportLayoutAvailEntry availEntry = getAvailEntry(reportRegistryItemType);
+		if (availEntry == null)
+			throw new IllegalStateException("Could not get ReportLayoutAvailEntry even with auto-create");
+		return availEntry.getAvailableReportLayoutIDs();		
 	}
 	
 }

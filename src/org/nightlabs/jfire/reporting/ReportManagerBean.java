@@ -27,6 +27,7 @@
 package org.nightlabs.jfire.reporting;
 
 import java.io.File;
+import java.io.IOException;
 import java.rmi.RemoteException;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -41,6 +42,7 @@ import javax.ejb.EJBException;
 import javax.ejb.SessionBean;
 import javax.ejb.SessionContext;
 import javax.jdo.FetchPlan;
+import javax.jdo.JDOHelper;
 import javax.jdo.PersistenceManager;
 import javax.naming.NamingException;
 
@@ -59,11 +61,14 @@ import org.nightlabs.jdo.NLJDOHelper;
 import org.nightlabs.jdo.moduleregistry.ModuleMetaData;
 import org.nightlabs.jfire.base.BaseSessionBeanImpl;
 import org.nightlabs.jfire.base.JFireBaseEAR;
+import org.nightlabs.jfire.config.Config;
+import org.nightlabs.jfire.config.ConfigModule;
 import org.nightlabs.jfire.config.ConfigSetup;
 import org.nightlabs.jfire.config.UserConfigSetup;
 import org.nightlabs.jfire.reporting.config.ReportLayoutConfigModule;
 import org.nightlabs.jfire.reporting.layout.RenderedReportLayout;
 import org.nightlabs.jfire.reporting.layout.ReportCategory;
+import org.nightlabs.jfire.reporting.layout.ReportLayout;
 import org.nightlabs.jfire.reporting.layout.ReportRegistryItem;
 import org.nightlabs.jfire.reporting.layout.ReportRegistryItemCarrier;
 import org.nightlabs.jfire.reporting.layout.id.ReportRegistryItemID;
@@ -124,6 +129,171 @@ implements SessionBean
 	 */
 	public void ejbRemove() throws EJBException, RemoteException { }
 	
+	
+	private void initRegisterConfigModules(PersistenceManager pm) 
+	throws ModuleException 
+	{
+		// Register all Reporing config-Modules
+		ConfigSetup configSetup = ConfigSetup.getConfigSetup(
+				pm, 
+				getOrganisationID(), 
+				UserConfigSetup.CONFIG_SETUP_TYPE_USER
+			);
+		configSetup.getConfigModuleClasses().add(ReportLayoutConfigModule.class.getName());
+		ConfigSetup.ensureAllPrerequisites(pm);
+	}
+	
+	private void initDefaultCatReportLayout(PersistenceManager pm, ReportCategory cat, File earDir, String catType, String germanName, String englishName)
+	throws ModuleException
+	{
+		File layoutDesign = new File(earDir, "Default-"+catType+".rptdesign");
+		LOGGER.info("Checking default report layout fo catType "+catType+" file: "+layoutDesign);
+		if (layoutDesign.exists()) {
+			LOGGER.info("File: "+layoutDesign+" existing");
+			ReportLayout layout = new ReportLayout(pm, cat, null);
+			try {
+				layout.loadFile(layoutDesign);
+			} catch (IOException e) {
+				LOGGER.error("Could not read ReportLayout file for default offer layout: ", e);
+			}
+			layout.getName().setText(Locale.ENGLISH.getLanguage(), englishName);
+			layout.getName().setText(Locale.GERMAN.getLanguage(), germanName);
+			LOGGER.info("Persisting default layout for "+catType);
+			pm.makePersistent(layout);
+			LOGGER.info("Persisting default layout for "+catType+" ...  DONE");
+			
+			Collection configs = Config.getConfigsByType(pm, getOrganisationID(), UserConfigSetup.CONFIG_TYPE_USER_CONFIG);
+			for (Iterator iter = configs.iterator(); iter.hasNext();) {
+				Config config = (Config) iter.next();
+				ReportLayoutConfigModule configModule = (ReportLayoutConfigModule)ConfigModule.getAutoCreateConfigModule(pm, config, ReportLayoutConfigModule.class, null);
+				configModule.getAvailEntry(catType).setDefaultReportLayoutKey(JDOHelper.getObjectId(layout).toString());
+				LOGGER.info("Set default for ReportLayoutConfigModule for category "+catType+" and Config "+config.getConfigKey());
+			}
+			LOGGER.info("Created new default report layout for catType "+catType);
+		}
+	}
+	
+	private void initRegisterCategoriesAndLayouts(PersistenceManager pm, JFireServerManager jfireServerManager) 
+	throws ModuleException 
+	{
+		File earDir = new File(
+				jfireServerManager.getJFireServerConfigModule()
+				.getJ2ee().getJ2eeDeployBaseDirectory()+
+				"JFireReporting.ear"
+			);
+		
+//		 Register internal report categories if not existent			
+		ReportCategory offerCat = ReportCategory.getReportCategory(
+				pm,
+				getOrganisationID(),
+				ReportCategory.INTERNAL_CATEGORY_TYPE_OFFER
+		);
+		if (offerCat == null) {
+			offerCat = new ReportCategory(
+					pm,
+					null,
+					getOrganisationID(),
+					ReportCategory.INTERNAL_CATEGORY_TYPE_OFFER,
+					true
+			);
+			offerCat.getName().setText(Locale.ENGLISH.getLanguage(), "Offer Layouts");
+			offerCat.getName().setText(Locale.GERMAN.getLanguage(), "Angebots-Vorlagen");
+			pm.makePersistent(offerCat);
+		}
+		initDefaultCatReportLayout(
+				pm,
+				offerCat,
+				earDir,
+				ReportCategory.INTERNAL_CATEGORY_TYPE_OFFER,
+				"Standard Angebots-Vorlage",
+				"Default offer layout"
+			);
+		
+		
+		ReportCategory orderCat = ReportCategory.getReportCategory(
+				pm,
+				getOrganisationID(),
+				ReportCategory.INTERNAL_CATEGORY_TYPE_ORDER
+		);
+		if (orderCat == null) {
+			orderCat = new ReportCategory(
+					pm,
+					null,
+					getOrganisationID(),
+					ReportCategory.INTERNAL_CATEGORY_TYPE_ORDER,
+					true
+			);
+			orderCat.getName().setText(Locale.ENGLISH.getLanguage(), "Order Layouts");
+			orderCat.getName().setText(Locale.GERMAN.getLanguage(), "Auftrags-Vorlagen");
+			pm.makePersistent(orderCat);
+		}
+		
+		initDefaultCatReportLayout(
+				pm,
+				orderCat,
+				earDir,
+				ReportCategory.INTERNAL_CATEGORY_TYPE_ORDER,
+				"Standard Auftrags-Vorlage",
+				"Default order layout"
+			);
+		
+		
+		ReportCategory invoiceCat = ReportCategory.getReportCategory(
+				pm,
+				getOrganisationID(),
+				ReportCategory.INTERNAL_CATEGORY_TYPE_INVOICE
+		);
+		if (invoiceCat == null) {
+			invoiceCat = new ReportCategory(
+					pm,
+					null,
+					getOrganisationID(),
+					ReportCategory.INTERNAL_CATEGORY_TYPE_INVOICE,
+					true
+			);
+			invoiceCat.getName().setText(Locale.ENGLISH.getLanguage(), "Invoice Layouts");
+			invoiceCat.getName().setText(Locale.GERMAN.getLanguage(), "Rechnungs-Vorlagen");
+			pm.makePersistent(invoiceCat);
+		}
+		
+		initDefaultCatReportLayout(
+				pm,
+				invoiceCat,
+				earDir,
+				ReportCategory.INTERNAL_CATEGORY_TYPE_INVOICE,
+				"Standard Rechnungs-Vorlage",
+				"Default invoice layout"
+			);
+		
+		
+		ReportCategory deliveryNoteCat = ReportCategory.getReportCategory(
+				pm,
+				getOrganisationID(),
+				ReportCategory.INTERNAL_CATEGORY_TYPE_DELIVERY_NOTE
+		);
+		if (deliveryNoteCat == null) {
+			deliveryNoteCat = new ReportCategory(
+					pm,
+					null,
+					getOrganisationID(),
+					ReportCategory.INTERNAL_CATEGORY_TYPE_DELIVERY_NOTE,
+					true
+			);
+			deliveryNoteCat.getName().setText(Locale.ENGLISH.getLanguage(), "Deliverynote Layouts");
+			deliveryNoteCat.getName().setText(Locale.GERMAN.getLanguage(), "Lieferschein-Vorlagen");
+			pm.makePersistent(deliveryNoteCat);
+		}
+		
+		initDefaultCatReportLayout(
+				pm,
+				deliveryNoteCat,
+				earDir,
+				ReportCategory.INTERNAL_CATEGORY_TYPE_DELIVERY_NOTE,
+				"Standard Lieferschein-Vorlage",
+				"Default deliverynote layout"
+			);
+	}
+	
 	/**
 	 * This method is called by the datastore initialization mechanism.
 	 * 
@@ -169,103 +339,32 @@ implements SessionBean
 
 		PersistenceManager pm;
 		pm = getPersistenceManager();
+		JFireServerManager jfireServerManager = getJFireServerManager();
 		try {
 			
-			ModuleMetaData moduleMetaData = ModuleMetaData.getModuleMetaData(pm, JFireBaseEAR.MODULE_NAME);
+			ModuleMetaData moduleMetaData = ModuleMetaData.getModuleMetaData(pm, JFireReportingEAR.MODULE_NAME);
 			if (moduleMetaData == null) {
 			
-				LOGGER.info("Initialization oJFireBase started...");
+				LOGGER.info("Initialization of JFireReporting started ...");
+	
 				
 				// version is {major}.{minor}.{release}-{patchlevel}-{suffix}
 				moduleMetaData = new ModuleMetaData(
 						JFireReportingEAR.MODULE_NAME, "1.0.0-0-beta", "1.0.0-0-beta");
 				pm.makePersistent(moduleMetaData);
+				LOGGER.info("Persisted ModuleMetaData for JFireReporting with version 1.0.0-0-beta");
 
-				// Register internal report categories if not existent			
-				ReportCategory offerCat = ReportCategory.getReportCategory(
-						pm,
-						getOrganisationID(),
-						ReportCategory.INTERNAL_CATEGORY_TYPE_OFFER
-				);
-				if (offerCat == null) {
-					offerCat = new ReportCategory(
-							pm,
-							null,
-							getOrganisationID(),
-							ReportCategory.INTERNAL_CATEGORY_TYPE_OFFER,
-							true
-					);
-					offerCat.getName().setText(Locale.ENGLISH.getLanguage(), "Offer Layouts");
-					offerCat.getName().setText(Locale.GERMAN.getLanguage(), "Angebots-Vorlagen");
-					pm.makePersistent(offerCat);
-				}
+				initRegisterConfigModules(pm);
+				LOGGER.info("Initialized Reporting ConfigModules");
 				
-				ReportCategory orderCat = ReportCategory.getReportCategory(
-						pm,
-						getOrganisationID(),
-						ReportCategory.INTERNAL_CATEGORY_TYPE_ORDER
-				);
-				if (orderCat == null) {
-					orderCat = new ReportCategory(
-							pm,
-							null,
-							getOrganisationID(),
-							ReportCategory.INTERNAL_CATEGORY_TYPE_ORDER,
-							true
-					);
-					orderCat.getName().setText(Locale.ENGLISH.getLanguage(), "Order Layouts");
-					orderCat.getName().setText(Locale.GERMAN.getLanguage(), "Auftrags-Vorlagen");
-					pm.makePersistent(orderCat);
-				}
-				
-				ReportCategory invoiceCat = ReportCategory.getReportCategory(
-						pm,
-						getOrganisationID(),
-						ReportCategory.INTERNAL_CATEGORY_TYPE_INVOICE
-				);
-				if (invoiceCat == null) {
-					invoiceCat = new ReportCategory(
-							pm,
-							null,
-							getOrganisationID(),
-							ReportCategory.INTERNAL_CATEGORY_TYPE_INVOICE,
-							true
-					);
-					invoiceCat.getName().setText(Locale.ENGLISH.getLanguage(), "Invoice Layouts");
-					invoiceCat.getName().setText(Locale.GERMAN.getLanguage(), "Rechnungs-Vorlagen");
-					pm.makePersistent(invoiceCat);
-				}
-				
-				ReportCategory deliveryNoteCat = ReportCategory.getReportCategory(
-						pm,
-						getOrganisationID(),
-						ReportCategory.INTERNAL_CATEGORY_TYPE_DELIVERY_NOTE
-				);
-				if (deliveryNoteCat == null) {
-					deliveryNoteCat = new ReportCategory(
-							pm,
-							null,
-							getOrganisationID(),
-							ReportCategory.INTERNAL_CATEGORY_TYPE_DELIVERY_NOTE,
-							true
-					);
-					deliveryNoteCat.getName().setText(Locale.ENGLISH.getLanguage(), "Deliverynote Layouts");
-					deliveryNoteCat.getName().setText(Locale.GERMAN.getLanguage(), "Lieferschein-Vorlagen");
-					pm.makePersistent(deliveryNoteCat);
-				}
-				
-				
-				ConfigSetup configSetup = ConfigSetup.getConfigSetup(
-						pm, 
-						getOrganisationID(), 
-						UserConfigSetup.CONFIG_SETUP_TYPE_USER
-					);
-				configSetup.getConfigModuleClasses().add(ReportLayoutConfigModule.class.getName());
+				initRegisterCategoriesAndLayouts(pm, jfireServerManager);
+				LOGGER.info("Initialized Reporting Categories and Layouts");
 				
 			}
 			
 		} finally {
 			pm.close();
+			jfireServerManager.close();
 		}
 		
 		

@@ -483,8 +483,8 @@ implements
 	protected ProductType() {} 
 
 	/**
-	 * @param organisationID This may be null. It will then be found out while being persisted the first time.
-	 * @param productTypeID
+	 * @param organisationID This must not be null. This reflects the owner organisation which is issuing this <code>ProductType</code>.
+	 * @param productTypeID The local ID within the namespace of <code>organisationID</code>.
 	 * @param extendedProductType The "parent" <tt>ProductType</tt> in the
 	 *		data-inheritance-tree. If this is <tt>null</tt> it will be considered being
 	 *		a root node.
@@ -601,7 +601,10 @@ implements
 	}
 
 	/**
-	 * @return Returns the extendedProductType.
+	 * @return Returns the extendedProductType, which means the parent of this
+	 *		<code>ProductType</code> in the data inheritance tree. This may be
+	 *		<code>null</code> if this <code>ProductType</code> is a root element in the
+	 *		inheritance tree.
 	 */
 	public ProductType getExtendedProductType()
 	{
@@ -609,7 +612,10 @@ implements
 	}
 
 	/**
-	 * @param extendedProductType The extendedProductType to set.
+	 * @param extendedProductType The extendedProductType to set. This method should not be called
+	 *		from outside. Currently it is not yet possible to change the structure of the inheritance
+	 *		tree (it's fixed after creation).
+	 * @see #getExtendedProductType()
 	 */
 	protected void setExtendedProductType(ProductType extendedProductType)
 	{
@@ -624,7 +630,16 @@ implements
 		this.extendedProductType = extendedProductType;
 	}
 
-	// *** begin: nestedProductTypes ***
+	/**
+	 * A <code>ProductType</code> can contain others (e.g. a car would contain 4 wheels,
+	 * the engine and much more). This method allows to package another <code>ProductType</code>
+	 * within this one.
+	 *
+	 * @param productType The <code>ProductType</code> which will be packaged within this one. 
+	 * @return Returns the {@link NestedProductType} which functions as glue-with-metadata between
+	 *		the package and its content. You can change the quantity (and later other properties)
+	 *		manipulating the <code>NestedProductType</code>.
+	 */
 	public NestedProductType createNestedProductType(ProductType productType)
 	{
 		// it MUST be possible to continue nesting indefinitely
@@ -640,13 +655,27 @@ implements
 	}
 
 	/**
-	 * @return Returns a <tt>Collection</tt> of {@link NestedProductType}.
+	 * @return Returns a <tt>Collection</tt> of {@link NestedProductType}. These are all
+	 *		other <code>ProductType</code>s that have been added to this package. It does <b>not</b>
+	 *		contain itself, even if this <code>ProductType</code> does virtual-self-packaging.
+	 *
+	 * @see #getNestedProductTypes(boolean)
 	 */
 	public Collection<NestedProductType> getNestedProductTypes()
 	{
 		return Collections.unmodifiableCollection(nestedProductTypes.values());
 	}
 
+	/**
+	 * This method can be used instead of {@link #getNestedProductTypes()} and provides
+	 * the possibility to take the virtual-self-packaging into account.
+	 *
+	 * @param includeSelfForVirtualSelfPackaging Whether or not to add <code>this</code>
+	 *		to the result, if this ProductType virtually packages itself (i.e. has an {@link #getInnerPriceConfig() inner}
+	 *		<b>and</b> a {@link #getPackagePriceConfig() package price config} assigned).
+	 *
+	 * @return Returns either the same as {@link #getNestedProductTypes()} or adds <code>this</code> to the result.
+	 */
 	public Collection getNestedProductTypes(boolean includeSelfForVirtualSelfPackaging)
 	{
 		if (!includeSelfForVirtualSelfPackaging || isPackageInner() || getInnerPriceConfig() == null)
@@ -662,6 +691,13 @@ implements
 	 * @jdo.field persistence-modifier="none"
 	 */
 	protected transient NestedProductType selfForVirtualSelfPackaging = null;
+
+	/**
+	 * This method is used internally (e.g. by {@link #getNestedProductTypes(boolean)}).
+	 *
+	 * @return Returns a transient, temporary instance of {@link NestedProductType} linking <code>this</code>
+	 *		to itself.
+	 */
 	protected NestedProductType getSelfForVirtualSelfPackaging()
 	{
 		if (selfForVirtualSelfPackaging == null)
@@ -670,7 +706,7 @@ implements
 	}
 
 	/**
-	 * @param productTypePK The composite primary key returned by <tt>ProductType.getPrimaryKey()</tt>
+	 * @param productTypePK The composite primary key returned by {@link #getPrimaryKey()}.
 	 * @return Returns a packaged productType or <tt>null</tt> if none with the given ID exists.
 	 */
 	public NestedProductType getNestedProductType(String productTypePK, boolean throwExceptionIfNotExistent)
@@ -684,8 +720,8 @@ implements
 		return res;
 	}
 	/**
-	 * @param organisationID
-	 * @param productTypeID
+	 * @param organisationID The organisation part of the primary key as returned by {@link #getOrganisationID()}.
+	 * @param productTypeID The local id part of the primary key as returned by {@link #getProductTypeID()}.
 	 * @return Returns a packaged product or <tt>null</tt> if none with the given ID exists.
 	 */
 	public NestedProductType getNestedProductType(String organisationID, String productTypeID, boolean throwExceptionIfNotExistent)
@@ -700,14 +736,15 @@ implements
 	}
 	/**
 	 * Removes a packaged product from this package.
-	 * @param organisationID
-	 * @param productTypeID
+	 *
+	 * @param organisationID The organisation part of the primary key as returned by {@link #getOrganisationID()}.
+	 * @param productTypeID The local id part of the primary key as returned by {@link #getProductTypeID()}.
 	 */
 	public void removeNestedProductType(String organisationID, String productTypeID)
 	{
 		nestedProductTypes.remove(getPrimaryKey(organisationID, productTypeID));
 	}
-	// *** end: nestedProductTypes ***
+
 
 	/**
 	 * @return Returns the innerPriceConfig.

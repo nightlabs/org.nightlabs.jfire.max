@@ -51,6 +51,7 @@ import org.nightlabs.jfire.accounting.priceconfig.IInnerPriceConfig;
 import org.nightlabs.jfire.accounting.priceconfig.IPackagePriceConfig;
 import org.nightlabs.jfire.accounting.priceconfig.IPriceConfig;
 import org.nightlabs.jfire.accounting.priceconfig.PriceConfig;
+import org.nightlabs.jfire.organisation.Organisation;
 import org.nightlabs.jfire.security.User;
 import org.nightlabs.jfire.store.book.LocalStorekeeperDelegate;
 import org.nightlabs.jfire.store.deliver.DeliveryConfiguration;
@@ -60,6 +61,36 @@ import org.nightlabs.jfire.trade.LegalEntity;
 import org.nightlabs.jfire.transfer.Anchor;
 
 /**
+ * <p>
+ * This is the base class for all product-types in the ERP. You subclass it in order to implement
+ * your own specialized saleable goods.
+ * </p>
+ * <p>
+ * A <code>ProductType</code> has the possibility to create {@link Product}s (on the fly if necessary).
+ * </p>
+ * <p>
+ * <code>ProductType</code>s are organized in a data-inheritance-tree, where each child can inherit
+ * properties from the parent (or override some of them). Usually, there is one root-<code>ProductType</code>
+ * ({@link #getExtendedProductType()}<code> == null</code>) for each implementation of <code>ProductType</code>
+ * and each {@link Organisation} (the local one and every business partner). 
+ * </p>
+ * <p>
+ * It's important to
+ * understand the difference between a {@link Product} and a <code>ProductType</code>:
+ * While the <code>Product</code> is one concrete thing that can only be at one
+ * location and owned by one person at a time, a <code>ProductType</code> specifies
+ * the common properties of all its <code>Product</code>s.
+ * </p>
+ * <p>
+ * Imagine the following example: You want to sell balls. Each type of ball - say
+ * specified by diameter and color - would be represented by a <code>BallType</code>.
+ * If your store has enough space for 100 green balls with a diameter of 30 cm and
+ * 200 red balls with a diameter of 90 cm, then you would probably have two instances of
+ * <code>BallType</code> and 300 instances of <code>Ball</code> in your datastore.
+ * <code>BallType</code> would extend <code>ProductType</code> and <code>Ball</code> would
+ * be an implementation of {@link Product}. 
+ * </p>
+ *
  * @author Niklas Schiffler <nick@nightlabs.de>
  * @author marco schulze - marco at nightlabs dot de
  * @author Alexander Bieber <alex[AT]nightlabs[DOT]de>

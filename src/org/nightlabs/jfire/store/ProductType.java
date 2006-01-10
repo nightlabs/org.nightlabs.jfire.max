@@ -51,6 +51,7 @@ import org.nightlabs.jfire.accounting.priceconfig.IInnerPriceConfig;
 import org.nightlabs.jfire.accounting.priceconfig.IPackagePriceConfig;
 import org.nightlabs.jfire.accounting.priceconfig.IPriceConfig;
 import org.nightlabs.jfire.accounting.priceconfig.PriceConfig;
+import org.nightlabs.jfire.organisation.LocalOrganisation;
 import org.nightlabs.jfire.organisation.Organisation;
 import org.nightlabs.jfire.security.User;
 import org.nightlabs.jfire.store.book.LocalStorekeeperDelegate;
@@ -586,7 +587,13 @@ implements
 	}
 
 	/**
-	 * @return Returns the owner.
+	 * An organisation might sell products for someone else who does not have a JFire
+	 * organisation connected to the network. Hence, this organisation would create
+	 * and manage the <code>ProductType</code>, but still is not the owner.
+	 * The real owner can therefore be assigned as property of this
+	 * <code>ProductType</code>. 
+	 *
+	 * @return Returns the owner. If not managed for someone else, this is the {@link LocalOrganisation#getOrganisation() local organisation}
 	 */
 	public LegalEntity getOwner()
 	{
@@ -594,6 +601,7 @@ implements
 	}
 	/**
 	 * @param owner The owner to set.
+	 * @see #getOwner()
 	 */
 	public void setOwner(LegalEntity owner)
 	{

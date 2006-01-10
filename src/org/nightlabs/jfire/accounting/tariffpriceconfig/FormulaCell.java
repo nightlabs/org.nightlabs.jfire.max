@@ -44,6 +44,8 @@ import org.nightlabs.jfire.accounting.priceconfig.PriceConfig;
  *
  * @jdo.inheritance strategy="new-table"
  *
+ * @jdo.create-objectid-class field-order="organisationID, priceConfigID, formulaID"
+ *
  * @jdo.fetch-group name="FormulaCell.priceConfig" fields="priceConfig"
  * @jdo.fetch-group name="FormulaCell.priceCoordinate" fields="priceCoordinate"
  * @jdo.fetch-group name="FormulaCell.priceFragmentFormulas" fields="priceFragmentFormulas"

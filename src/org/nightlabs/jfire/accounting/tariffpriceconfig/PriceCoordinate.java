@@ -49,6 +49,8 @@ import org.nightlabs.jfire.trade.CustomerGroup;
  *
  * @jdo.inheritance strategy="new-table"
  *
+ * @jdo.create-objectid-class field-order="organisationID, priceCoordinateID"
+ *
  * @jdo.fetch-group name="PriceCoordinate.priceConfig" fields="priceConfig"
  * @jdo.fetch-group name="PriceCoordinate.this" fetch-groups="default" fields="priceConfig"
  */

@@ -44,6 +44,8 @@ import org.nightlabs.i18n.I18nText;
  *
  * @jdo.inheritance strategy="new-table"
  *
+ * @jdo.create-objectid-class field-order="organisationID, serverPaymentProcessorID"
+ *
  * @jdo.fetch-group name="ServerPaymentProcessorName.names" fields="names"
  * @jdo.fetch-group name="ServerPaymentProcessorName.serverPaymentProcessor" fields="serverPaymentProcessor"
  * @jdo.fetch-group name="ServerPaymentProcessorName.this" fetch-groups="default" fields="serverPaymentProcessor, names"

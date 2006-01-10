@@ -57,6 +57,8 @@ import org.nightlabs.jfire.transfer.Anchor;
  *
  * @jdo.inheritance strategy="new-table"
  *
+ * @jdo.create-objectid-class field-order="organisationID, serverDeliveryProcessorID"
+ *
  * @jdo.fetch-group name="ServerDeliveryProcessor.name" fields="name"
  * @jdo.fetch-group name="ServerDeliveryProcessor.modeOfDeliveries" fields="modeOfDeliveries"
  * @jdo.fetch-group name="ServerDeliveryProcessor.modeOfDeliveryFlavours" fields="modeOfDeliveryFlavours"

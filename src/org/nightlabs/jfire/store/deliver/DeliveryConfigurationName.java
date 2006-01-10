@@ -40,6 +40,8 @@ import org.nightlabs.i18n.I18nText;
  *		detachable="true"
  *		table="JFireTrade_DeliveryConfigurationName"
  *
+ * @jdo.create-objectid-class field-order="organisationID, deliveryConfigurationID"
+ *
  * @jdo.inheritance strategy="new-table"
  *
  * @jdo.fetch-group name="DeliveryConfigurationName.names" fields="names"

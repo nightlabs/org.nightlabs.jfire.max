@@ -47,6 +47,11 @@ import java.io.Serializable;
  *		table="JFireTrade_DeliveryData"
  *
  * @jdo.inheritance strategy="new-table"
+ *
+ * @jdo.create-objectid-class
+ *		field-order="organisationID, deliveryID"
+ *		include-body="id/DeliveryDataID.body.inc"
+ *
  */
 public class DeliveryData
 implements Serializable

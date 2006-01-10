@@ -62,6 +62,8 @@ import org.nightlabs.jfire.trade.id.CustomerGroupID;
  *
  * @jdo.inheritance strategy="new-table"
  *
+ * @jdo.create-objectid-class field-order="organisationID, modeOfDeliveryFlavourID"
+ *
  * @jdo.fetch-group name="ModeOfDeliveryFlavour.name" fields="name"
  * @jdo.fetch-group name="ModeOfDeliveryFlavour.modeOfDelivery" fields="modeOfDelivery"
  * @jdo.fetch-group name="ModeOfDeliveryFlavour.this" fetch-groups="default" fields="modeOfDelivery, name"

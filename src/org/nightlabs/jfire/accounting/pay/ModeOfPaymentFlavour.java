@@ -53,6 +53,8 @@ import org.nightlabs.jfire.trade.id.CustomerGroupID;
  *		table="JFireTrade_ModeOfPaymentFlavour"
  *
  * @jdo.inheritance strategy="new-table"
+ *
+ * @jdo.create-objectid-class field-order="organisationID, modeOfPaymentFlavourID"
  * 
  * @!jdo.query // this fails with: Cannot perform operation "in" on UnboundVariable and MapValueLiteral "(?,?)"
  *		name="getAvailableModeOfPaymentFlavoursForOneCustomerGroup"

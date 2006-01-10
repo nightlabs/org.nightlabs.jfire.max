@@ -52,7 +52,6 @@ import org.nightlabs.jfire.security.User;
 import org.nightlabs.jfire.trade.LegalEntity;
 import org.nightlabs.jfire.transfer.Transfer;
 import org.nightlabs.jfire.transfer.id.AnchorID;
-import org.nightlabs.jdo.ObjectIDException;
 import org.nightlabs.math.Base62Coder;
 
 /**
@@ -65,6 +64,10 @@ import org.nightlabs.math.Base62Coder;
  *		table="JFireTrade_Payment"
  *
  * @jdo.inheritance strategy="new-table"
+ *
+ * @jdo.create-objectid-class
+ *		field-order="organisationID, paymentID"
+ *		include-body="id/PaymentID.body.inc"
  */
 public class Payment
 implements Serializable, StoreCallback
@@ -141,7 +144,7 @@ implements Serializable, StoreCallback
 			if (serverPaymentProcessorIDStrKey != null) {
 				try {
 					serverPaymentProcessorID = new ServerPaymentProcessorID(serverPaymentProcessorIDStrKey);
-				} catch (ObjectIDException e) {
+				} catch (Exception e) {
 					throw new RuntimeException(e);
 				}
 			}

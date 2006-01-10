@@ -40,6 +40,8 @@ import org.nightlabs.math.Base62Coder;
  *		table="JFireTrade_PaymentResult"
  *
  * @jdo.inheritance strategy="new-table"
+ *
+ * @jdo.create-objectid-class field-order="organisationID, paymentResultID"
  */
 public class PaymentResult
 implements Serializable

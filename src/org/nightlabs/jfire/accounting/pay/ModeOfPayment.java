@@ -42,6 +42,8 @@ import java.util.Map;
  *
  * @jdo.inheritance strategy="new-table"
  *
+ * @jdo.create-objectid-class field-order="organisationID, modeOfPaymentID"
+ *
  * @jdo.fetch-group name="ModeOfPayment.name" fields="name"
  * @jdo.fetch-group name="ModeOfPayment.flavours" fields="flavours"
  * @jdo.fetch-group name="ModeOfPayment.this" fetch-groups="default" fields="flavours, name"

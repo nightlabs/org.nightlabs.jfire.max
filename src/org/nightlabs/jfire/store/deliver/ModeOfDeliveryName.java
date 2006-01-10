@@ -42,6 +42,8 @@ import org.nightlabs.i18n.I18nText;
  *
  * @jdo.inheritance strategy="new-table"
  *
+ * @jdo.create-objectid-class field-order="organisationID, modeOfDeliveryID"
+ *
  * @jdo.fetch-group name="ModeOfDeliveryName.names" fields="names"
  * @jdo.fetch-group name="ModeOfDeliveryName.this" fetch-groups="default" fields="names"
  */

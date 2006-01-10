@@ -59,6 +59,8 @@ import org.nightlabs.jfire.transfer.id.AnchorID;
  *		table="JFireTrade_ServerPaymentProcessor"
  *
  * @jdo.inheritance strategy="new-table"
+ *
+ * @jdo.create-objectid-class field-order="organisationID, serverPaymentProcessorID"
  * 
  * @jdo.fetch-group name="ServerPaymentProcessor.name" fields="name"
  * @jdo.fetch-group name="ServerPaymentProcessor.modeOfPayments" fields="modeOfPayments"

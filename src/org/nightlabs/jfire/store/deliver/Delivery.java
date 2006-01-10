@@ -52,7 +52,6 @@ import org.nightlabs.jfire.trade.LegalEntity;
 import org.nightlabs.jfire.trade.id.ArticleID;
 import org.nightlabs.jfire.transfer.Transfer;
 import org.nightlabs.jfire.transfer.id.AnchorID;
-import org.nightlabs.jdo.ObjectIDException;
 import org.nightlabs.math.Base62Coder;
 
 /**
@@ -65,6 +64,10 @@ import org.nightlabs.math.Base62Coder;
  *		table="JFireTrade_Delivery"
  *
  * @jdo.inheritance strategy="new-table"
+ *
+ * @jdo.create-objectid-class
+ *		field-order="organisationID, deliveryID"
+ *		include-body="id/DeliveryID.body.inc"
  */
 public class Delivery
 implements Serializable, StoreCallback
@@ -141,7 +144,7 @@ implements Serializable, StoreCallback
 			if (serverDeliveryProcessorIDStrKey != null) {
 				try {
 					serverDeliveryProcessorID = new ServerDeliveryProcessorID(serverDeliveryProcessorIDStrKey);
-				} catch (ObjectIDException e) {
+				} catch (Exception e) {
 					throw new RuntimeException(e);
 				}
 			}

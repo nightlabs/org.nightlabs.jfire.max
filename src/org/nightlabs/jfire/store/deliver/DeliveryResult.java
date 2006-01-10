@@ -40,6 +40,8 @@ import org.nightlabs.math.Base62Coder;
  *		table="JFireTrade_DeliveryResult"
  *
  * @jdo.inheritance strategy="new-table"
+ *
+ * @jdo.create-objectid-class field-order="organisationID, deliveryResultID"
  */
 public class DeliveryResult
 implements Serializable

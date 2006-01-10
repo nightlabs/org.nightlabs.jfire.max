@@ -49,6 +49,10 @@ import java.io.Serializable;
  *		table="JFireTrade_PaymentData"
  *
  * @jdo.inheritance strategy="new-table"
+ *
+ * @jdo.create-objectid-class
+ *		field-order="organisationID, paymentID"
+ *		include-body="id/PaymentDataID.body.inc"
  */
 public class PaymentData
 implements Serializable

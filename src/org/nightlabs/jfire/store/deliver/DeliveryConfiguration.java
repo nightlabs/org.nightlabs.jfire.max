@@ -49,6 +49,8 @@ import java.util.Set;
  *		detachable="true"
  *		table="JFireTrade_DeliveryConfiguration"
  *
+ * @jdo.create-objectid-class field-order="organisationID, deliveryConfigurationID"
+ *
  * @jdo.inheritance strategy="new-table"
  */
 public class DeliveryConfiguration

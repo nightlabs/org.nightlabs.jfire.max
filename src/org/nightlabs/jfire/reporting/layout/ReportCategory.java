@@ -93,6 +93,8 @@ public class ReportCategory extends ReportRegistryItem implements NestableReport
 	 */
 	private Set<ReportRegistryItem> childItems;	
 
+// TODO This constructor should not exist, because it is very likely, that the child item
+//		is created by another organisation! It's error prone - better get rid of this constructor.
 	/**
 	 * Creates a new ReportCategory with the given one as parent.
 	 * 

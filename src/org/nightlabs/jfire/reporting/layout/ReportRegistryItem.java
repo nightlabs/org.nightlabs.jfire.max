@@ -106,6 +106,7 @@ public abstract class ReportRegistryItem implements Serializable, StoreCallback 
 	
 	/**
 	 * @jdo.field primary-key="true"
+	 * @jdo.column length="100"
 	 */
 	private long reportRegistryItemID;
 	

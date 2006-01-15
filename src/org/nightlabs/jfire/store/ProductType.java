@@ -843,6 +843,41 @@ implements
 	 */
 	protected Map<String, ProductTypeFieldMetaData> fieldMetaDataMap;
 
+	/**
+	 * <p>
+	 * Note, that the following fields cause a <code>null</code> result (i.e. no inheritance).
+	 * If you want to inherit them anyway, you can extend this method and handle them before
+	 * calling the super method.
+	 * </p>
+	 * <p>
+	 * Fields:
+	 * <ul>
+	 *   <li>jdo* (you must never inherit an internal jdo field!!!)</li>
+	 *   <li>organisationID  (you must never inherit a primary key field!!!)</li>
+	 *   <li>productTypeID (primary key field)</li>
+	 *   <li>primaryKey (concatenated primary key - must never be inherited as well)</li>
+	 *   <li>closed</li>
+	 *   <li>confirmed</li>
+	 *   <li>fieldMetaDataMap</li>
+	 *   <li>extendedProductType</li>
+	 *   <li>inheritanceNature</li>
+	 *   <li>managedProductTypeGroup</li>
+	 *   <li>packageNature</li>
+	 *   <li>productAvailable</li>
+	 *   <li>productTypeGroups</li>
+	 *   <li>productTypeLocal</li>
+	 *   <li>published</li>
+	 *   <li>saleable</li>
+	 *   <li>selfForVirtualSelfPackaging</li>
+	 *   <li>innerPriceConfig</li>
+	 *   <li>packagePriceConfig</li>
+	 * </ul>
+	 * </p>
+	 * <p>
+	 * Note, that the above list might not be up-to-date. Check the source code if you have problems!
+	 * And please update the javadoc, if you encounter differences!
+	 * </p>
+	 */
 	public org.nightlabs.inheritance.FieldMetaData getFieldMetaData(String fieldName)
 	{
 		if (fieldName.startsWith("jdo"))
@@ -869,6 +904,8 @@ implements
 				nonInheritableFields.add("published");
 				nonInheritableFields.add("saleable");
 				nonInheritableFields.add("selfForVirtualSelfPackaging");
+				nonInheritableFields.add("innerPriceConfig");
+				nonInheritableFields.add("packagePriceConfig");
 			}
 
 			if (nonInheritableFields.contains(fieldName))

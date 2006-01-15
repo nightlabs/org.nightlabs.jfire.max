@@ -26,6 +26,7 @@
 
 package org.nightlabs.jfire.store.book;
 
+import java.io.Serializable;
 import java.util.Map;
 
 import javax.jdo.JDOHelper;
@@ -56,6 +57,7 @@ import org.nightlabs.jfire.trade.LegalEntity;
  *		field-order="organisationID, storekeeperID"
  */
 public abstract class Storekeeper
+implements Serializable
 {
 	/**
 	 * @jdo.field primary-key="true"

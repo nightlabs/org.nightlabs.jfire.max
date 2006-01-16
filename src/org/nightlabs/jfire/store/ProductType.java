@@ -852,8 +852,8 @@ implements
 	 * <p>
 	 * Fields:
 	 * <ul>
-	 *   <li>jdo* (you must never inherit an internal jdo field!!!)</li>
-	 *   <li>organisationID  (you must never inherit a primary key field!!!)</li>
+	 *   <li>jdo* (you must never inherit an internal jdo field!)</li>
+	 *   <li>organisationID  (you must never inherit a primary key field!)</li>
 	 *   <li>productTypeID (primary key field)</li>
 	 *   <li>primaryKey (concatenated primary key - must never be inherited as well)</li>
 	 *   <li>closed</li>
@@ -865,10 +865,10 @@ implements
 	 *   <li>packageNature</li>
 	 *   <li>productAvailable</li>
 	 *   <li>productTypeGroups</li>
-	 *   <li>productTypeLocal</li>
+	 *   <li>productTypeLocal (must never be inherited!)</li>
 	 *   <li>published</li>
 	 *   <li>saleable</li>
-	 *   <li>selfForVirtualSelfPackaging</li>
+	 *   <li>selfForVirtualSelfPackaging (transient and a must-not-inherit, too)</li>
 	 *   <li>innerPriceConfig</li>
 	 *   <li>packagePriceConfig</li>
 	 * </ul>

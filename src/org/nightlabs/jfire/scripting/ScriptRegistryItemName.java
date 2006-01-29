@@ -61,16 +61,7 @@ extends I18nText
 	 * @jdo.column length="100"
 	 */
 	private String scriptRegistryItemType;
-	/**
-	 * This is either "category" or "script". Use the constants!
-	 *
-	 * @see ScriptRegistryItem#SCRIPT_REGISTRY_ITEM_NATURE_CATEGORY
-	 * @see ScriptRegistryItem#SCRIPT_REGISTRY_ITEM_NATURE_SCRIPT
-	 *
-	 * @jdo.field primary-key="true"
-	 * @jdo.column length="10"
-	 */
-	private String scriptRegistryItemNature;
+	
 	/**
 	 * @jdo.field primary-key="true"
 	 * @jdo.column length="100"
@@ -110,7 +101,6 @@ extends I18nText
 		this.scriptRegistryItem = scriptRegistryItem;
 		this.organisationID = scriptRegistryItem.getOrganisationID();
 		this.scriptRegistryItemType = scriptRegistryItem.getScriptRegistryItemType();
-		this.scriptRegistryItemNature = scriptRegistryItem.getScriptRegistryItemNature();
 		this.scriptRegistryItemID = scriptRegistryItem.getScriptRegistryItemID();
 	}
 
@@ -153,7 +143,7 @@ extends I18nText
 	 */
 	protected String getFallBackValue(String languageID)
 	{
-		return ScriptRegistryItem.getPrimaryKey(organisationID, scriptRegistryItemType, scriptRegistryItemNature, scriptRegistryItemID);
+		return ScriptRegistryItem.getPrimaryKey(organisationID, scriptRegistryItemType, scriptRegistryItemID);
 	}
 
 	/**
@@ -166,10 +156,6 @@ extends I18nText
 	public String getScriptRegistryItemType()
 	{
 		return scriptRegistryItemType;
-	}
-	public String getScriptRegistryItemNature()
-	{
-		return scriptRegistryItemNature;
 	}
 	public String getScriptRegistryItemID()
 	{

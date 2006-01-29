@@ -41,15 +41,12 @@ import org.nightlabs.util.Utils;
  *
  * @jdo.inheritance strategy="new-table"
  *
- * @jdo.create-objectid-class field-order="organisationID, scriptRegistryItemType, scriptRegistryItemNature, scriptRegistryItemID"
+ * @jdo.create-objectid-class field-order="organisationID, scriptRegistryItemType, scriptRegistryItemID"
  */
 public class ScriptRegistryItem
 		implements Serializable
 {
 	private static final long serialVersionUID = 9221181132208442543L;
-
-	protected static final String SCRIPT_REGISTRY_ITEM_NATURE_CATEGORY = "category";
-	protected static final String SCRIPT_REGISTRY_ITEM_NATURE_SCRIPT = "script";
 
 	/**
 	 * @jdo.field primary-key="true"
@@ -61,17 +58,10 @@ public class ScriptRegistryItem
 	 * @jdo.column length="100"
 	 */
 	private String scriptRegistryItemType;
-	/**
-	 * This is either "{@value ScriptRegistryItem#SCRIPT_REGISTRY_ITEM_NATURE_CATEGORY}" or "{@value ScriptRegistryItem#SCRIPT_REGISTRY_ITEM_NATURE_SCRIPT}".
-	 * Use the constants!
-	 *
-	 * @see ScriptRegistryItem#SCRIPT_REGISTRY_ITEM_NATURE_CATEGORY
-	 * @see ScriptRegistryItem#SCRIPT_REGISTRY_ITEM_NATURE_SCRIPT
-	 *
-	 * @jdo.field primary-key="true"
-	 * @jdo.column length="10"
-	 */
-	private String scriptRegistryItemNature;
+	
+	// TODO: @Marco: Removed item nature as its only two values would be category and script. 
+	// This is aleady coverd by the two subclasses. Revision with nature was 3025
+	
 	/**
 	 * @jdo.field primary-key="true"
 	 * @jdo.column length="100"
@@ -106,17 +96,16 @@ public class ScriptRegistryItem
 	 */
 	protected ScriptRegistryItem() { }
 
-	public ScriptRegistryItem(String organisationID, String scriptRegistryItemType, String scriptRegistryItemNature, String scriptRegistryItemID)
+	public ScriptRegistryItem(String organisationID, String scriptRegistryItemType, String scriptRegistryItemID)
 	{
 		this.organisationID = organisationID;
 		this.scriptRegistryItemType = scriptRegistryItemType;
-		this.scriptRegistryItemNature = scriptRegistryItemNature;
 		this.scriptRegistryItemID = scriptRegistryItemID;
 	}
 
-	public static String getPrimaryKey(String organisationID, String scriptRegistryItemType, String scriptRegistryItemNature, String scriptRegistryItemID)
+	public static String getPrimaryKey(String organisationID, String scriptRegistryItemType, String scriptRegistryItemID)
 	{
-		return organisationID + '/' + scriptRegistryItemType + '/' + scriptRegistryItemNature  + '/' + scriptRegistryItemID;
+		return organisationID + '/' + scriptRegistryItemType + '/' + scriptRegistryItemID;
 	}
 
 	public String getOrganisationID()
@@ -127,17 +116,8 @@ public class ScriptRegistryItem
 	{
 		return scriptRegistryItemType;
 	}
-	/**
-	 * The nature serves as distinction between scripts and categories in order to separate
-	 * their namespaces. This makes it easier to name the scripts whose ids can then be
-	 * directly used as variables.
-	 *
-	 * @return Returns one of {@link #SCRIPT_REGISTRY_ITEM_NATURE_CATEGORY} or {@link #SCRIPT_REGISTRY_ITEM_NATURE_SCRIPT} 
-	 */
-	public String getScriptRegistryItemNature()
-	{
-		return scriptRegistryItemNature;
-	}
+
+		
 	public String getScriptRegistryItemID()
 	{
 		return scriptRegistryItemID;
@@ -176,7 +156,6 @@ public class ScriptRegistryItem
 		return
 				Utils.equals(this.organisationID,           other.organisationID) &&
 				Utils.equals(this.scriptRegistryItemType,   other.scriptRegistryItemType) &&
-				Utils.equals(this.scriptRegistryItemNature, other.scriptRegistryItemNature) &&
 				Utils.equals(this.scriptRegistryItemID,     other.scriptRegistryItemID);
 	}
 
@@ -186,7 +165,6 @@ public class ScriptRegistryItem
 		return
 				Utils.hashCode(organisationID) ^
 				Utils.hashCode(scriptRegistryItemType) ^
-				Utils.hashCode(scriptRegistryItemNature) ^
 				Utils.hashCode(scriptRegistryItemID);
 	}
 }

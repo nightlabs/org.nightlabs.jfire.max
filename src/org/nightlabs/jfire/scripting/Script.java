@@ -25,9 +25,8 @@ import javax.jdo.Query;
  *		query="SELECT
  *			WHERE
  *				this.scriptRegistryItemType == pScriptRegistryItemType &&
- *				this.scriptRegistryItemNature == pScriptRegistryItemNature &&
  *				this.scriptRegistryItemID == pScriptRegistryItemID
- *			PARAMETERS pScriptRegistryItemType, pScriptRegistryItemNature, pScriptRegistryItemID
+ *			PARAMETERS pScriptRegistryItemType, pScriptRegistryItemID
  *			IMPORTS java.lang.String"
  */
 public class Script
@@ -41,7 +40,7 @@ public class Script
 	{
 		Query q = pm.newNamedQuery(Script.class, "getScriptsByTypeAndID");
 		return (Collection<Script>) q.execute(
-				scriptRegistryItemType, SCRIPT_REGISTRY_ITEM_NATURE_SCRIPT, scriptRegistryItemID);
+				scriptRegistryItemType, scriptRegistryItemID);
 	}
 
 	/**
@@ -83,7 +82,7 @@ public class Script
 
 	public Script(ScriptCategory parent, String organisationID, String scriptRegistryItemID)
 	{
-		super(organisationID, parent.getScriptRegistryItemType(), SCRIPT_REGISTRY_ITEM_NATURE_SCRIPT, scriptRegistryItemID);
+		super(organisationID, parent.getScriptRegistryItemType(), scriptRegistryItemID);
 		this.setParent(parent);
 		this.setParameterSet(parent.getParameterSet());
 	}

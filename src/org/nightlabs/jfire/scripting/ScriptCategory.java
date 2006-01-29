@@ -12,7 +12,7 @@ import java.util.Set;
  *
  * @jdo.persistence-capable 
  *		identity-type="application"
- *		persistence-capable-superclass=""
+ *		persistence-capable-superclass="org.nightlabs.jfire.scripting.ScriptRegistryItem"
  *		detachable="true"
  *		table="JFireScripting_ScriptCategory"
  *
@@ -49,7 +49,7 @@ public class ScriptCategory
 			String scriptRegistryItemType,
 			String scriptRegistryItemID)
 	{
-		super(organisationID, scriptRegistryItemType, SCRIPT_REGISTRY_ITEM_NATURE_CATEGORY, scriptRegistryItemID);
+		super(organisationID, scriptRegistryItemType, scriptRegistryItemID);
 		init();
 	}
 
@@ -63,7 +63,7 @@ public class ScriptCategory
 			String organisationID,
 			String scriptRegistryItemID)
 	{
-		super(organisationID, parent.getScriptRegistryItemType(), SCRIPT_REGISTRY_ITEM_NATURE_CATEGORY, scriptRegistryItemID);
+		super(organisationID, parent.getScriptRegistryItemType(), scriptRegistryItemID);
 		this.setParent(parent);
 		init();
 	}

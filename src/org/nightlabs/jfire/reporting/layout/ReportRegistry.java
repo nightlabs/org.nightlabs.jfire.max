@@ -30,31 +30,49 @@ import java.util.Iterator;
 
 import javax.jdo.PersistenceManager;
 
+import org.nightlabs.jfire.reporting.layout.id.ReportRegistryID;
+
 /**
  * Singleton to hold the id of next new {@link org.nightlabs.jfire.reporting.layout.ReportRegistryItem}.
  * 
  * @author Alexander Bieber <alex[AT]nightlabs[DOT]de>
  *
  * @jdo.persistence-capable
- *		identity-type="datastore"
+ *		identity-type="application"
+ *		objectid-class = "org.nightlabs.jfire.reporting.layout.id.ReportRegistryID"
  *		detachable="true"
  *		table="JFireReporting_ReportRegistry"
  *
+ * @jdo.create-objectid-class
+ * 
  * @jdo.inheritance strategy="new-table"
  */
 public class ReportRegistry {
 
-	private long newReportCategoryID = 0;
 	
 	/**
-	 * 
+	 * @jdo.field primary-key="true"
 	 */
-	public ReportRegistry() {
+	private int reportRegistryID = 0;
+	
+	/**
+	 * @jdo.field persistence-modifier="persistent"
+	 */
+	private long newReportItemID = 0;
+	
+	/**
+	 * @deprecated Only for JDO
+	 */
+	protected ReportRegistry() {
 		super();
 	}
 	
-	public long getNewReportCategoryID() {
-		return newReportCategoryID;
+	public ReportRegistry(int reportRegistryID) {
+		this.reportRegistryID = reportRegistryID;
+	}
+	
+	public long getNewReportItemID() {
+		return newReportItemID;
 	}
 
 	/**
@@ -62,19 +80,22 @@ public class ReportRegistry {
 	 * before incrementing it by one. Equivalent to 
 	 * <code>newReportCategoryID++</code>
 	 */
-	public long createNewReportCategoryID() {
-		long result = getNewReportCategoryID();
-		newReportCategoryID = result + 1;
+	public long createNewReportItemID() {
+		long result = getNewReportItemID();
+		newReportItemID = result + 1;
 		return result;
 	}
+
+	public static final int SINGLETON_REGISTRY_ID = 0;
+	public static final ReportRegistryID SINGLETON_ID = ReportRegistryID.create(SINGLETON_REGISTRY_ID); 
 	
-	public static ReportRegistry getReportCategoryRegistry(PersistenceManager pm) {
+	public static ReportRegistry getReportRegistry(PersistenceManager pm) {
 		Iterator it = pm.getExtent(ReportRegistry.class).iterator();
 		if (it.hasNext()) {
 			return (ReportRegistry)it.next();
 		}
 		else {
-			ReportRegistry reportCategoryRegistry = new ReportRegistry();
+			ReportRegistry reportCategoryRegistry = new ReportRegistry(SINGLETON_REGISTRY_ID);
 			pm.makePersistent(reportCategoryRegistry);
 			return reportCategoryRegistry;
 		}

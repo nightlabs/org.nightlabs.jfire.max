@@ -34,6 +34,8 @@ import javax.jdo.PersistenceManager;
 import javax.jdo.Query;
 import javax.jdo.listener.StoreCallback;
 
+import org.apache.log4j.Logger;
+
 /**
  * @author Alexander Bieber <alex[AT]nightlabs[DOT]de>
  * 
@@ -106,7 +108,6 @@ public abstract class ReportRegistryItem implements Serializable, StoreCallback 
 	
 	/**
 	 * @jdo.field primary-key="true"
-	 * @jdo.column length="100"
 	 */
 	private long reportRegistryItemID;
 	
@@ -144,7 +145,7 @@ public abstract class ReportRegistryItem implements Serializable, StoreCallback 
 		this.organisationID = organisationID;
 		this.reportRegistryItemType = reportRegistryItemType;
 		if (pm != null) 
-			this.reportRegistryItemID = ReportRegistry.getReportCategoryRegistry(pm).createNewReportCategoryID();
+			this.reportRegistryItemID = ReportRegistry.getReportRegistry(pm).createNewReportItemID();
 		else
 			this.reportRegistryItemID = -1;
 		this.name = new ReportRegistryItemName(this);
@@ -200,8 +201,17 @@ public abstract class ReportRegistryItem implements Serializable, StoreCallback 
 			PersistenceManager pm = JDOHelper.getPersistenceManager(this);
 			if (pm == null)
 				throw new IllegalStateException("Could not get PersistenceManager jdoPreStore()");
-			ReportRegistry registry = ReportRegistry.getReportCategoryRegistry(pm);
-			this.reportRegistryItemID = registry.createNewReportCategoryID();
+			ReportRegistry registry = ReportRegistry.getReportRegistry(pm);
+			this.reportRegistryItemID = registry.createNewReportItemID();
+			// Assuming that reportRegistryItemIDs < 0 exist only for new items we
+			// issue an event now
+			System.out.println("Adding change event for item "+this.getReportRegistryItemType()+" "+this.getReportRegistryItemID()+" parent is "+getParentItem());
+			ReportRegistryItemChangeEvent.addChangeEventToController(
+					pm,
+					ReportRegistryItemChangeEvent.EVENT_TYPE_ITEM_ADDED,
+					this,
+					getParentItem()
+				);
 		}
 		
 		if (this.name.getReportRegistryItemID() < 0) {

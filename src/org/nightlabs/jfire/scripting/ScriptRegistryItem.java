@@ -19,7 +19,7 @@
  *     Boston, MA  02110-1301  USA                                             *
  *                                                                             *
  * Or get it online :                                                          *
- *     http://opensource.org/licenses/lgpl-license.php                         *
+ *     http://www.gnu.org/copyleft/lesser.html                                 *
  *                                                                             *
  *                                                                             *
  ******************************************************************************/
@@ -27,6 +27,14 @@
 package org.nightlabs.jfire.scripting;
 
 import java.io.Serializable;
+import java.util.Collection;
+
+import javax.jdo.JDODetachedFieldAccessException;
+import javax.jdo.JDOHelper;
+import javax.jdo.JDOObjectNotFoundException;
+import javax.jdo.PersistenceManager;
+import javax.jdo.Query;
+import javax.jdo.listener.StoreCallback;
 
 import org.nightlabs.util.Utils;
 
@@ -42,12 +50,32 @@ import org.nightlabs.util.Utils;
  * @jdo.inheritance strategy="new-table"
  *
  * @jdo.create-objectid-class field-order="organisationID, scriptRegistryItemType, scriptRegistryItemID"
+ * 
+ * @jdo.fetch-group name="ScriptRegistryItem.parent" fetch-groups="default" fields="parent"
+ * @jdo.fetch-group name="ScriptRegistryItem.name" fetch-groups="default" fields="name"
+ * @jdo.fetch-group name="ScriptRegistryItem.this" fetch-groups="default" fields="parent, name"
+ * 
+ * @jdo.query
+ *		name="getTopLevelScriptRegistryItems"
+ *		query="SELECT
+ *			WHERE this.organisationID == paramOrganisationID &&
+ *            this.parent == null    
+ *			PARAMETERS String paramOrganisationID
+ *			IMPORTS import java.lang.String"
+ * 
  */
 public class ScriptRegistryItem
-		implements Serializable
+		implements Serializable, StoreCallback
 {
 	private static final long serialVersionUID = 9221181132208442543L;
+	
+	public static final String QUERY_GET_TOPLEVEL_SCRIPT_REGISTRY_ITEMS = "getTopLevelScriptRegistryItems";
 
+	public static final String FETCH_GROUP_PARENT = "ScriptRegistryItem.parentItem";
+	public static final String FETCH_GROUP_NAME = "ScriptRegistryItem.name";
+	public static final String FETCH_GROUP_THIS_SCRIPT_REGISTRY_ITEM = "ScriptRegistryItem.this";
+	
+	
 	/**
 	 * @jdo.field primary-key="true"
 	 * @jdo.column length="100"
@@ -77,6 +105,8 @@ public class ScriptRegistryItem
 	 * @jdo.field persistence-modifier="persistent"
 	 */
 	private ScriptParameterSet parameterSet;
+	
+	private ScriptRegistryItemName name;
 
 //	/**
 //	 * @jdo.field
@@ -101,6 +131,7 @@ public class ScriptRegistryItem
 		this.organisationID = organisationID;
 		this.scriptRegistryItemType = scriptRegistryItemType;
 		this.scriptRegistryItemID = scriptRegistryItemID;
+		this.name = new ScriptRegistryItemName(this);
 	}
 
 	public static String getPrimaryKey(String organisationID, String scriptRegistryItemType, String scriptRegistryItemID)
@@ -136,6 +167,10 @@ public class ScriptRegistryItem
 	{
 		return parameterSet;
 	}
+	
+	public ScriptRegistryItemName getName() {
+		return name;
+	}
 
 	public void setParameterSet(ScriptParameterSet parameterSet)
 	{
@@ -167,4 +202,55 @@ public class ScriptRegistryItem
 				Utils.hashCode(scriptRegistryItemType) ^
 				Utils.hashCode(scriptRegistryItemID);
 	}
+
+	/**
+	 * Returns all top level (parent == null) ScriptRegistryItems for the given organisationID
+	 * 
+	 * @param pm The PersistenceManager to use.
+	 * @param organisatinID The organisationID to use
+	 */
+	public static Collection getTopScriptRegistryItems(PersistenceManager pm, String organisatinID) {
+		Query q = pm.newNamedQuery(ScriptRegistryItem.class, QUERY_GET_TOPLEVEL_SCRIPT_REGISTRY_ITEMS);
+		return (Collection)q.execute(organisatinID);
+	}
+
+	public void jdoPreStore() {
+		// Assuming that preStore only called when first made persistent
+		PersistenceManager pm = JDOHelper.getPersistenceManager(this);
+		if (pm == null)
+			throw new IllegalStateException("Could not get PersistenceManager jdoPreStore()");
+		
+		ScriptRegistryItem parent = getParent();
+		if (getParameterSet() != null && parent != null) {
+			if (JDOHelper.isDetached(parent)) {
+				ScriptRegistryItem pParent = null;
+				boolean setFromPersistent = false;
+				try {
+					pParent = (ScriptRegistryItem) pm.getObjectById(JDOHelper.getObjectId(parent));
+					setFromPersistent = true;
+				} catch(JDOObjectNotFoundException e) {}
+				if (setFromPersistent) {
+					setParameterSet(pParent.getParameterSet());
+				}
+				else {
+					try {
+						
+					} catch (JDODetachedFieldAccessException e) {
+						// TODO: Log with logger?? when made transient -> Nullpointerexception
+						System.out.println("WARNING: Could not set the parameterSet initially from null to the parents one");
+					}
+				}
+			}
+			else
+				this.setParameterSet(parent.getParameterSet());
+		}
+		
+		ScriptRegistryItemChangeEvent.addChangeEventToController(
+				pm,
+				ScriptRegistryItemChangeEvent.EVENT_TYPE_ITEM_ADDED,
+				this,
+				getParent()
+			);		
+	}
+	
 }

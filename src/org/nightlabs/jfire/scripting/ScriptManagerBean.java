@@ -19,7 +19,7 @@
  *     Boston, MA  02110-1301  USA                                             *
  *                                                                             *
  * Or get it online :                                                          *
- *     http://opensource.org/licenses/lgpl-license.php                         *
+ *     http://www.gnu.org/copyleft/lesser.html                                 *
  *                                                                             *
  *                                                                             *
  ******************************************************************************/
@@ -27,6 +27,11 @@
 package org.nightlabs.jfire.scripting;
 
 import java.rmi.RemoteException;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.HashSet;
+import java.util.Iterator;
+import java.util.List;
 
 import javax.ejb.CreateException;
 import javax.ejb.EJBException;
@@ -36,8 +41,10 @@ import javax.jdo.PersistenceManager;
 
 import org.apache.log4j.Logger;
 import org.nightlabs.ModuleException;
+import org.nightlabs.jdo.NLJDOHelper;
 import org.nightlabs.jdo.moduleregistry.ModuleMetaData;
 import org.nightlabs.jfire.base.BaseSessionBeanImpl;
+import org.nightlabs.jfire.scripting.id.ScriptRegistryItemID;
 
 /**
  * @author Alexander Bieber <alex[AT]nightlabs[DOT]de>
@@ -132,4 +139,137 @@ implements SessionBean
 	{
 	}
 	
+	/**
+	 * @throws ModuleException
+	 *
+	 * @ejb.interface-method
+	 * @ejb.permission role-name="_Guest_"
+	 * @ejb.transaction type = "Required"
+	 */
+	public ScriptRegistryItem getScriptRegistryItem (
+			ScriptRegistryItemID scriptRegistryItemID,
+			String[] fetchGroups
+		)
+	throws ModuleException
+	{
+		PersistenceManager pm;
+		pm = getPersistenceManager();
+		try {
+			ScriptRegistryItem reportRegistryItem = (ScriptRegistryItem)pm.getObjectById(scriptRegistryItemID);
+			if (fetchGroups != null)
+				pm.getFetchPlan().setGroups(fetchGroups);
+			ScriptRegistryItem result = (ScriptRegistryItem) pm.detachCopy(reportRegistryItem);
+			return result;
+		} finally {
+			pm.close();
+		}
+	}
+	
+	/**
+	 * @throws ModuleException
+	 *
+	 * @ejb.interface-method
+	 * @ejb.permission role-name="_Guest_"
+	 * @ejb.transaction type = "Required"
+	 */
+	public List<ScriptRegistryItem> getScriptRegistryItems (
+			List<ScriptRegistryItemID> scriptRegistryItemIDs,
+			String[] fetchGroups
+		)
+	throws ModuleException
+	{
+		PersistenceManager pm;
+		pm = getPersistenceManager();
+		try {
+			if (fetchGroups != null)
+				pm.getFetchPlan().setGroups(fetchGroups);
+			
+			List<ScriptRegistryItem> result = new ArrayList<ScriptRegistryItem>();
+			for (ScriptRegistryItemID itemID : scriptRegistryItemIDs) {
+				ScriptRegistryItem item = (ScriptRegistryItem)pm.getObjectById(itemID);
+				result.add((ScriptRegistryItem)pm.detachCopy(item));
+			}
+
+			return result;
+		} finally {
+			pm.close();
+		}
+	}
+	
+	/**
+	 * @throws ModuleException
+	 *
+	 * @ejb.interface-method
+	 * @ejb.permission role-name="_Guest_"
+	 * @ejb.transaction type = "Required"
+	 */
+	public Collection getTopLevelScriptRegistryItems (
+			String organisationID,
+			String[] fetchGroups
+		)
+	throws ModuleException
+	{
+		PersistenceManager pm;
+		pm = getPersistenceManager();
+		try {
+			Collection topLevelItems = ScriptRegistryItem.getTopScriptRegistryItems(pm, organisationID);
+			if (fetchGroups != null)
+				pm.getFetchPlan().setGroups(fetchGroups);
+			Collection result = (Collection) pm.detachCopyAll(topLevelItems);
+			return result;
+		} finally {
+			pm.close();
+		}
+	}
+	
+	/**
+	 * @throws ModuleException
+	 *
+	 * @ejb.interface-method
+	 * @ejb.permission role-name="_Guest_"
+	 * @ejb.transaction type = "Required"
+	 */
+	public Collection<ScriptRegistryItemCarrier> getTopLevelScriptRegistryItemCarriers (String organisationID)
+	throws ModuleException
+	{
+		PersistenceManager pm;
+		pm = getPersistenceManager();
+		try {
+			Collection topLevelItems = ScriptRegistryItem.getTopScriptRegistryItems(pm, organisationID);
+			Collection<ScriptRegistryItemCarrier> result = new HashSet<ScriptRegistryItemCarrier>();
+			for (Iterator iter = topLevelItems.iterator(); iter.hasNext();) {
+				ScriptRegistryItem item = (ScriptRegistryItem) iter.next();
+				result.add(new ScriptRegistryItemCarrier(null, item, true));
+			}
+			return result;
+		} finally {
+			pm.close();
+		}
+	}
+	
+	
+	/**
+	 * @throws ModuleException
+	 *
+	 * @ejb.interface-method
+	 * @ejb.permission role-name="_Guest_"
+	 * @ejb.transaction type="Required"
+	 */
+	public ScriptRegistryItem storeRegistryItem (
+			ScriptRegistryItem reportRegistryItem,
+			boolean get,
+			String[] fetchGroups
+		)
+	throws ModuleException
+	{
+		PersistenceManager pm;
+		pm = getPersistenceManager();
+		try {
+			return (ScriptRegistryItem)NLJDOHelper.storeJDO(pm, reportRegistryItem, get, fetchGroups);
+		} finally {
+			pm.close();
+		}
+	}
+	
+		
 }

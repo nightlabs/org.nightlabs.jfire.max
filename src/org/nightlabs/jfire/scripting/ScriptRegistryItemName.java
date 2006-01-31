@@ -19,7 +19,7 @@
  *     Boston, MA  02110-1301  USA                                             *
  *                                                                             *
  * Or get it online :                                                          *
- *     http://opensource.org/licenses/lgpl-license.php                         *
+ *     http://www.gnu.org/copyleft/lesser.html                                 *
  *                                                                             *
  *                                                                             *
  ******************************************************************************/
@@ -33,6 +33,7 @@ import org.nightlabs.i18n.I18nText;
 
 /**
  * @author Marco Schulze - marco at nightlabs dot de
+ * @author Alexander Bieber <alex[AT]nightlabs[DOT]de>
  * 
  * @jdo.persistence-capable
  *		identity-type="application"
@@ -42,7 +43,7 @@ import org.nightlabs.i18n.I18nText;
  *
  * @jdo.inheritance strategy="new-table"
  *
- * @jdo.create-objectid-class field-order="organisationID, scriptRegistryItemType, scriptRegistryItemNature, scriptRegistryItemID"
+ * @jdo.create-objectid-class field-order="organisationID, scriptRegistryItemType, scriptRegistryItemID"
  *
  * @jdo.fetch-group name="ScriptRegistryItem.name" fields="scriptRegistryItem, names"
  */

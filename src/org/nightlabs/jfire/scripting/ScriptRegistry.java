@@ -1,3 +1,29 @@
+/* *****************************************************************************
+ * JFire - it's hot - Free ERP System - http://jfire.org                       *
+ * Copyright (C) 2004-2005 NightLabs - http://NightLabs.org                    *
+ *                                                                             *
+ * This library is free software; you can redistribute it and/or               *
+ * modify it under the terms of the GNU Lesser General Public                  *
+ * License as published by the Free Software Foundation; either                *
+ * version 2.1 of the License, or (at your option) any later version.          *
+ *                                                                             *
+ * This library is distributed in the hope that it will be useful,             *
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of              *
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU           *
+ * Lesser General Public License for more details.                             *
+ *                                                                             *
+ * You should have received a copy of the GNU Lesser General Public            *
+ * License along with this library; if not, write to the                       *
+ *     Free Software Foundation, Inc.,                                         *
+ *     51 Franklin St, Fifth Floor,                                            *
+ *     Boston, MA  02110-1301  USA                                             *
+ *                                                                             *
+ * Or get it online :                                                          *
+ *     http://www.gnu.org/copyleft/lesser.html                                 *
+ *                                                                             *
+ *                                                                             *
+ ******************************************************************************/
+
 package org.nightlabs.jfire.scripting;
 
 import java.util.Collection;
@@ -12,6 +38,7 @@ import javax.naming.NamingException;
 
 import org.nightlabs.jfire.organisation.LocalOrganisation;
 import org.nightlabs.jfire.organisation.Organisation;
+import org.nightlabs.jfire.scripting.id.ScriptRegistryID;
 
 /**
  * <p>
@@ -22,23 +49,36 @@ import org.nightlabs.jfire.organisation.Organisation;
  * </p>
  *
  * @author Marco Schulze - marco at nightlabs dot de
+ * @author Alexander Bieber <alex[AT]nightlabs[DOT]de>
  *
  * @jdo.persistence-capable
- *		identity-type="datastore"
+ *		identity-type="application"
+ *		objectid-class = "org.nightlabs.jfire.scripting.id.ScriptRegistryID"
  *		detachable="true"
- *		table="JFireScripting_ScriptExecutorRegistry"
+ *		table="JFireScripting_ScriptRegistry"
  *
+ * @jdo.create-objectid-class
+ * 
  * @jdo.inheritance strategy="new-table"
  */
 public class ScriptRegistry
 {
+	
+	/**
+	 * @jdo.field primary-key="true"
+	 */
+	private int scriptRegistryID;
+	
+	public static final ScriptRegistryID SINGLETON_ID = ScriptRegistryID.create(0); 
+	
+	
 	public static ScriptRegistry getScriptRegistry(PersistenceManager pm)
 	{
 		Iterator it = pm.getExtent(ScriptRegistry.class).iterator();
 		if (it.hasNext())
 			return (ScriptRegistry) it.next();
 
-		ScriptRegistry reg = new ScriptRegistry();
+		ScriptRegistry reg = new ScriptRegistry(SINGLETON_ID.scriptRegistryID);
 		pm.makePersistent(reg);
 
 		reg.bindLanguageToScriptExecutorClass(
@@ -82,9 +122,20 @@ public class ScriptRegistry
 	private long nextScriptParameterSetID = 0;
 
 	/**
-	 * Don't call this constructor directly. Use {@link #getScriptExecutorRegistry(PersistenceManager) } instead!
+	 * @deprecated for JDO only 
 	 */
 	protected ScriptRegistry() { }
+
+	/**
+	 * Don't call this constructor directly. Use {@link #getScriptExecutorRegistry(PersistenceManager) } instead!
+	 */
+	protected ScriptRegistry(int scriptRegistyID) {
+		this.scriptRegistryID = scriptRegistyID;
+	}
+	
+	public int getScriptRegistryID() {
+		return scriptRegistryID;
+	}
 
 	/**
 	 * Binds a class to a language. A previous binding (if existing) to the same language

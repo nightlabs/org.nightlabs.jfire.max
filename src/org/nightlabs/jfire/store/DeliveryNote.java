@@ -464,7 +464,7 @@ implements Serializable, ArticleContainer, DetachCallback
 	}
 	/**
 	 * This member is set to true as soon as all desired 
-	 * {@link Article}s were added to this offer. A finalized 
+	 * {@link Article}s were added to this delivery note. A finalized 
 	 * DeliveryNote can not be altered any more.
 	 */
 	public boolean isFinalized() {

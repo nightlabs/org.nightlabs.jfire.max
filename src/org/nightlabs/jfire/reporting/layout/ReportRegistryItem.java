@@ -197,6 +197,9 @@ public abstract class ReportRegistryItem implements Serializable, StoreCallback 
 	 * @see javax.jdo.listener.StoreCallback#jdoPreStore()
 	 */
 	public void jdoPreStore() {
+		if (!JDOHelper.isNew(this)) 
+			return;
+		
 		if (this.reportRegistryItemID < 0) {
 			PersistenceManager pm = JDOHelper.getPersistenceManager(this);
 			if (pm == null)

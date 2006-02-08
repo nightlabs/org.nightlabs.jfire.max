@@ -29,6 +29,7 @@ package org.nightlabs.jfire.scripting;
 import java.io.Serializable;
 import java.util.Collection;
 
+import javax.jdo.JDODetachedFieldAccessException;
 import javax.jdo.PersistenceManager;
 import javax.jdo.Query;
 
@@ -107,7 +108,12 @@ public class Script
 	{
 		super(organisationID, parent.getScriptRegistryItemType(), scriptRegistryItemID);
 		this.setParent(parent);
-		this.setParameterSet(parent.getParameterSet());
+		try {
+			this.setParameterSet(parent.getParameterSet());
+		} catch(JDODetachedFieldAccessException e) {
+			// When detached without parameterSet don't bother -> see ScriptRegistryItem.preStore
+			System.out.println("DEEBUG: Script instantiated with detached parent, parameterSet could not be set as it was not detached.");
+		}
 	}
 
 	@Override

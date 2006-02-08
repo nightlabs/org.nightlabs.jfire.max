@@ -26,6 +26,7 @@
 
 package org.nightlabs.jfire.scripting;
 
+import java.awt.Toolkit;
 import java.io.Serializable;
 import java.util.Collection;
 
@@ -216,12 +217,16 @@ public class ScriptRegistryItem
 
 	public void jdoPreStore() {
 		// Assuming that preStore only called when first made persistent
+		if (!JDOHelper.isNew(this)) 
+			return;
+		
 		PersistenceManager pm = JDOHelper.getPersistenceManager(this);
 		if (pm == null)
 			throw new IllegalStateException("Could not get PersistenceManager jdoPreStore()");
 		
-		ScriptRegistryItem parent = getParent();
-		if (getParameterSet() != null && parent != null) {
+		
+		ScriptRegistryItem _parent = getParent();
+		if (getParameterSet() == null && parent != null) {
 			if (JDOHelper.isDetached(parent)) {
 				ScriptRegistryItem pParent = null;
 				boolean setFromPersistent = false;
@@ -234,15 +239,13 @@ public class ScriptRegistryItem
 				}
 				else {
 					try {
-						
+						this.setParameterSet(_parent.getParameterSet());
 					} catch (JDODetachedFieldAccessException e) {
 						// TODO: Log with logger?? when made transient -> Nullpointerexception
 						System.out.println("WARNING: Could not set the parameterSet initially from null to the parents one");
 					}
 				}
 			}
-			else
-				this.setParameterSet(parent.getParameterSet());
 		}
 		
 		ScriptRegistryItemChangeEvent.addChangeEventToController(

@@ -38,7 +38,7 @@ import javax.jdo.Query;
  *
  * @jdo.persistence-capable 
  *		identity-type="application"
- *		persistence-capable-superclass=""
+ *		persistence-capable-superclass="org.nightlabs.jfire.scripting.ScriptRegistryItem"
  *		detachable="true"
  *		table="JFireScripting_Script"
  *

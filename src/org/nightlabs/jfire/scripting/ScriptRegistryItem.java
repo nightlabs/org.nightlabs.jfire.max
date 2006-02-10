@@ -26,7 +26,6 @@
 
 package org.nightlabs.jfire.scripting;
 
-import java.awt.Toolkit;
 import java.io.Serializable;
 import java.util.Collection;
 

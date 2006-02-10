@@ -96,6 +96,7 @@ public class ScriptParameter
 	{
 		return scriptParameterSetID;
 	}
+	
 	void setScriptParameterSetID(long scriptParameterSetID) {
 		this.scriptParameterSetID = scriptParameterSetID;
 	}
@@ -104,6 +105,11 @@ public class ScriptParameter
 	{
 		return scriptParameterID;
 	}
+	
+	public void setScriptParameterID(String scriptParameterID) {
+		this.scriptParameterID = scriptParameterID;
+	}
+	
 	public ScriptParameterSet getScriptParameterSet()
 	{
 		return scriptParameterSet;

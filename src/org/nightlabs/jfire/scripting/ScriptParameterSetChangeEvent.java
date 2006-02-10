@@ -26,12 +26,10 @@
 
 package org.nightlabs.jfire.scripting;
 
-import javax.jdo.JDOHelper;
 import javax.jdo.PersistenceManager;
 
 import org.nightlabs.jfire.jdo.controller.JDOObjectChangeEvent;
 import org.nightlabs.jfire.jdo.controller.JDOObjectController;
-import org.nightlabs.jfire.scripting.id.ScriptRegistryItemID;
 
 /**
  * @author Alexander Bieber <alex[AT]nightlabs[ÐOT]de>
@@ -40,137 +38,47 @@ import org.nightlabs.jfire.scripting.id.ScriptRegistryItemID;
  *		identity-type="application"
  * 		persistence-capable-superclass="org.nightlabs.jfire.jdo.controller.JDOObjectChangeEvent"
  *		detachable="true"
- *		table="JFireScripting_ScriptRegistryItemChangeEvent"
+ *		table="JFireScripting_ScriptParameterSetChangeEvent"
  *
  * @jdo.inheritance strategy="new-table"
  *
  */
-public class ScriptRegistryItemChangeEvent extends JDOObjectChangeEvent {
+public class ScriptParameterSetChangeEvent extends JDOObjectChangeEvent {
 
-	public static final String EVENT_TYPE_ITEM_ADDED = "itemAdded";
-	public static final String EVENT_TYPE_ITEM_MOVED = "itemMoved";
-	public static final String EVENT_TYPE_ITEM_DELETED = "itemDeleted";
+	public static final String EVENT_TYPE_SET_ADDED = "setAdded";
+	public static final String EVENT_TYPE_PARAMETER_ADDED = "parameterAdded";
+	public static final String EVENT_TYPE_PARAMETER_CHANGED = "parameterChanged";
 	
 	
 	/**
 	 * @jdo.field persistence-modifier="persistent"
-	 * @jdo.column length="255"
 	 */
-	private String itemID;
-	
-	/**
-	 * @jdo.field persistence-modifier="persistent"
-	 * @jdo.column length="255"
-	 */
-	private String relatedItemID;
-	
-	/**
-	 * @jdo.field persistence-modifier="none"
-	 */
-	private transient ScriptRegistryItemCarrier itemCarrier;
-	/**
-	 * @jdo.field persistence-modifier="none"
-	 */
-	private transient ScriptRegistryItemCarrier relatedItemCarrier;
+	private long scriptParameterSetID;
 	
 	/**
 	 * @param controller
 	 */
-	public ScriptRegistryItemChangeEvent(JDOObjectController controller) {
+	public ScriptParameterSetChangeEvent(JDOObjectController controller) {
 		super(controller);
 	}
 
 	/**
 	 * @deprecated
 	 */
-	public ScriptRegistryItemChangeEvent() {
+	public ScriptParameterSetChangeEvent() {
 		super();
 	}
 
-	/**
-	 * @return Returns the itemCarrier.
-	 */
-	public ScriptRegistryItemCarrier getItemCarrier() {
-		if (itemCarrier == null) {
-			if (itemID != null) {
-				try {
-					itemCarrier = new ScriptRegistryItemCarrier(
-							null, 
-							new ScriptRegistryItemID(itemID)
-						);
-				} catch (Exception e) {
-					throw new RuntimeException(e);
-				}
-			}
-		}
-			
-		return itemCarrier;
+	public void setScriptParameterSetID(long scriptParameterSetID) {
+		this.scriptParameterSetID = scriptParameterSetID;
 	}
-
-	/**
-	 * @param itemCarrier The itemCarrier to set.
-	 */
-	public void setItemCarrier(ScriptRegistryItemCarrier itemCarrier) {
-		this.itemCarrier = itemCarrier;
-	}
-
-	/**
-	 * @return Returns the relatedItemCarrier.
-	 */
-	public ScriptRegistryItemCarrier getRelatedItemCarrier() {
-		if (relatedItemCarrier == null) {
-			if (relatedItemID != null) {
-				try {
-					relatedItemCarrier = new ScriptRegistryItemCarrier(
-							null, 
-							new ScriptRegistryItemID(relatedItemID)
-						);
-				} catch (Exception e) {
-					throw new RuntimeException(e);
-				}
-			}
-		}
-			
-		return relatedItemCarrier;
-	}
-
-	/**
-	 * @param relatedItemCarrier The relatedItemCarrier to set.
-	 */
-	public void setRelatedItemCarrier(ScriptRegistryItemCarrier relatedItemCarrier) {
-		this.relatedItemCarrier = relatedItemCarrier;
+	
+	public long getScriptParameterSetID() {
+		return scriptParameterSetID;
 	}
 	
 	/**
-	 * @return Returns the itemID.
-	 */
-	public String getItemID() {
-		return itemID;
-	}
-
-	/**
-	 * @param itemID The itemID to set.
-	 */
-	public void setItemID(String itemID) {
-		this.itemID = itemID;
-	}
-
-	/**
-	 * @return Returns the relatedItemID.
-	 */
-	public String getRelatedItemID() {
-		return relatedItemID;
-	}
-
-	/**
-	 * @param relatedItemID The relatedItemID to set.
-	 */
-	public void setRelatedItemID(String relatedItemID) {
-		this.relatedItemID = relatedItemID;
-	}
-
-	/**
-	 * Add a new ScriptRegistryItemChangedEvent to the controller
+	 * Add a new ScriptParameterSetChangedEvent to the controller
 	 * for the ReportRegistry.
 	 * 
 	 * @param pm The PersistenceManager to use.
@@ -181,22 +89,16 @@ public class ScriptRegistryItemChangeEvent extends JDOObjectChangeEvent {
 	public static void addChangeEventToController(
 			PersistenceManager pm,
 			String eventType,
-			ScriptRegistryItem changed, 
-			ScriptRegistryItem relative
+			ScriptParameterSet changed 
 		) 
 	{
 		JDOObjectController controller = JDOObjectController.getObjectController(
 				pm,
 				ScriptRegistry.SINGLETON_ID.toString()
 			);
-		ScriptRegistryItemChangeEvent event = new ScriptRegistryItemChangeEvent(controller);
+		ScriptParameterSetChangeEvent event = new ScriptParameterSetChangeEvent(controller);
 		event.setEventType(eventType);
-		event.setItemID(JDOHelper.getObjectId(changed).toString());
-		
-		if (relative != null) {
-			event.setRelatedItemID(JDOHelper.getObjectId(relative).toString());
-		}
-		
+		event.setScriptParameterSetID(changed.getScriptParameterSetID());
 		controller.addChangeEvent(event);
 	}
 	

@@ -41,6 +41,7 @@ import org.nightlabs.util.Utils;
 
 /**
  * @author Marco Schulze - marco at nightlabs dot de
+ * @author Alexander Bieber <alex[AT]nightlabs[DOT]de>
  *
  * @jdo.persistence-capable 
  *		identity-type="application"
@@ -107,6 +108,9 @@ public class ScriptRegistryItem
 	 */
 	private ScriptParameterSet parameterSet;
 	
+	/**
+	 * @jdo.field persistence-modifier="persistent"
+	 */
 	private ScriptRegistryItemName name;
 
 //	/**

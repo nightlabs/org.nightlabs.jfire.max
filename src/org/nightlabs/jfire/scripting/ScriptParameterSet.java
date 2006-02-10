@@ -32,17 +32,49 @@ import java.util.Collections;
 import java.util.Map;
 import java.util.Set;
 
+import javax.jdo.JDOHelper;
+import javax.jdo.PersistenceManager;
+import javax.jdo.Query;
+import javax.jdo.listener.StoreCallback;
+
 /**
  * A ScriptParameterSet can only be manipulated by the owner organisation. Hence, it contains
  * always (in all datastores) the same parameters and is everywhere (except in its "home" datastore)
  * read only.
  *
  * @author Marco Schulze - marco at nightlabs dot de
+ * @author Alexander Bieber <alex[AT]nightlabs[DOT]de>
+ * 
+ * @jdo.persistence-capable 
+ *		identity-type="application"
+ *		objectid-class="org.nightlabs.jfire.scripting.id.ScriptParameterSetID"
+ *		detachable="true"
+ *		table="JFireScripting_ScriptParameterSet"
+ *
+ * @jdo.create-objectid-class field-order="organisationID, scriptParameterSetID"
+ * 
+ * @jdo.fetch-group name="ScriptParameterSet.parameters" fetch-groups="default" fields="parameters"
+ * @jdo.fetch-group name="ScriptParameterSet.name" fetch-groups="default" fields="name"
+ * @jdo.fetch-group name="ScriptParameterSet.this" fetch-groups="default" fields="parameters, name"
+ * 
+ * @jdo.query
+ *		name="getParameterSetsByOrganisation"
+ *		query="SELECT
+ *			WHERE this.organisationID == paramOrganisationID
+ *			PARAMETERS String paramOrganisationID
+ *			IMPORTS import java.lang.String"
+ * 
  */
-public class ScriptParameterSet
-		implements Serializable
+ public class ScriptParameterSet
+		implements Serializable, StoreCallback
 {
 	private static final long serialVersionUID = 1L;
+	
+	public static final String FETCH_GROUP_PARAMETERS = "ScriptParameterSet.parameters";
+	public static final String FETCH_GROUP_NAME = "ScriptParameterSet.name";
+	public static final String FETCH_THIS_SCRIPT_PARAMETER_SET = "ScriptParameterSet.this";	
+	
+	public static final String QUERY_GET_PARAMETER_SETS_BY_ORGANISATION = "getParameterSetsByOrganisation";
 
 	/**
 	 * @jdo.field primary-key="true"
@@ -68,6 +100,11 @@ public class ScriptParameterSet
 	 * @jdo.key mapped-by="scriptParameterID"
 	 */
 	private Map<String, ScriptParameter> parameters;
+	
+	/**
+	 * @jdo.field persistence-modifier="persistent"
+	 */
+	private ScriptParameterSetName name;
 
 	/**
 	 * @deprecated Only for JDO!
@@ -78,6 +115,7 @@ public class ScriptParameterSet
 	{
 		this.organisationID = organisationID;
 		this.scriptParameterSetID = scriptParameterSetID;
+		this.name = new ScriptParameterSetName(this);
 	}
 
 	public String getOrganisationID()
@@ -138,5 +176,48 @@ public class ScriptParameterSet
 	public void removeParameter(String scriptParameterID)
 	{
 		parameters.remove(scriptParameterID);
+	}
+	
+	public static String getPrimaryKey(String organisationID, long scriptParameterSetID)
+	{
+		return organisationID + '/' + scriptParameterSetID;
+	}
+
+	public ScriptParameterSetName getName() {
+		return name;
+	}
+
+	public void jdoPreStore() {
+		if (!JDOHelper.isNew(this)) 
+			return;
+		
+		PersistenceManager pm = JDOHelper.getPersistenceManager(this);
+		if (pm == null)
+			throw new IllegalStateException("Could not get PersistenceManager jdoPreStore()");
+		
+		
+		if (scriptParameterSetID < 0) {
+			// TODO: add check for organisationID
+			ScriptRegistry scriptRegistry = ScriptRegistry.getScriptRegistry(pm);
+			scriptParameterSetID = scriptRegistry.createScriptParameterSetID();
+			for (ScriptParameter parameter : getParameters()) {
+				if (parameter.getScriptParameterSetID() != scriptParameterSetID)
+					parameter.setScriptParameterSetID(scriptParameterSetID);
+			}
+		}
+		
+		// TODO: trigger change event ??
+	}
+
+	/**
+	 * Get all ParameterSets of an organisation.
+	 * 
+	 * @param pm The PersistenceManager to use.
+	 * @param organisationID The organisation
+	 * @return
+	 */
+	public static Collection getParameterSetsByOrganisation(PersistenceManager pm, String organisationID) {
+		Query q = pm.newNamedQuery(ScriptParameterSet.class, QUERY_GET_PARAMETER_SETS_BY_ORGANISATION);
+		return (Collection)q.execute(organisationID);
 	}
 }

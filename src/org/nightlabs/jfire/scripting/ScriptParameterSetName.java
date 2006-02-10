@@ -26,28 +26,31 @@
 
 package org.nightlabs.jfire.scripting;
 
-import java.io.Serializable;
+import java.util.HashMap;
+import java.util.Map;
+
+import org.nightlabs.i18n.I18nText;
 
 /**
- * 
+ * @author Marco Schulze - marco at nightlabs dot de
  * @author Alexander Bieber <alex[AT]nightlabs[DOT]de>
  * 
- * @jdo.persistence-capable 
+ * @jdo.persistence-capable
  *		identity-type="application"
- *		objectid-class="org.nightlabs.jfire.scripting.id.ScriptParameterID"
+ *		objectid-class="org.nightlabs.jfire.scripting.id.ScriptParameterSetNameID"
  *		detachable="true"
- *		table="JFireScripting_ScriptParameter"
+ *		table="JFireScripting_ScriptParameterSetName"
  *
- * @jdo.create-objectid-class field-order="organisationID, scriptParameterSetID, scriptParameterID"
- * 
- * @jdo.fetch-group name="ScriptParameter.scriptParameterSet" fetch-groups="default" fields="scriptParameterSet"
- * @jdo.fetch-group name="ScriptParameter.this" fetch-groups="default" fields="scriptParameterSet"
- * 
+ * @jdo.inheritance strategy="new-table"
+ *
+ * @jdo.create-objectid-class field-order="organisationID, scriptParameterSetID"
+ *
+ * @jdo.fetch-group name="ScriptRegistryItem.name" fields="scriptRegistryItem, names"
  */
-public class ScriptParameter
-		implements Serializable
+public class ScriptParameterSetName
+extends I18nText
 {
-	private static final long serialVersionUID = 1L;
+	private static final long serialVersionUID = 2756108947806097093L;
 
 	/**
 	 * @jdo.field primary-key="true"
@@ -58,78 +61,99 @@ public class ScriptParameter
 	 * @jdo.field primary-key="true"
 	 */
 	private long scriptParameterSetID;
+	
 	/**
-	 * @jdo.field primary-key="true"
-	 * @jdo.column length="100"
-	 */
-	private String scriptParameterID;
-
-	/**
-	 * @jdo.field persistence-modifier="persistent" null-value="exception"
+	 * @jdo.field persistence-modifier="persistent"
 	 */
 	private ScriptParameterSet scriptParameterSet;
 
 	/**
-	 * @jdo.field persistence-modifier="persistent" null-value="exception"
+	 * key: String languageID<br/>
+	 * value: String name
+	 *
+	 * @jdo.field
+	 *		persistence-modifier="persistent"
+	 *		collection-type="map"
+	 *		key-type="java.lang.String"
+	 *		value-type="java.lang.String"
+	 *		dependent="true"
+	 *		table="JFireScripting_ScriptParameterSetName_names"
+	 *
+	 * @jdo.join
 	 */
-	private String scriptParameterClassName;
+	protected Map names = new HashMap();
 
 	/**
 	 * @deprecated Only for JDO!
 	 */
-	protected ScriptParameter() {}
+	protected ScriptParameterSetName()
+	{
+	}
 
-	public ScriptParameter(ScriptParameterSet scriptParameterSet, String scriptParameterID)
+	public ScriptParameterSetName(ScriptParameterSet scriptParameterSet)
 	{
 		this.scriptParameterSet = scriptParameterSet;
 		this.organisationID = scriptParameterSet.getOrganisationID();
 		this.scriptParameterSetID = scriptParameterSet.getScriptParameterSetID();
-		this.scriptParameterID = scriptParameterID;
-		this.scriptParameterClassName = Object.class.getName();
 	}
 
+	/**
+	 * @see org.nightlabs.i18n.I18nText#getI18nMap()
+	 */
+	protected Map getI18nMap()
+	{
+		return names;
+	}
+
+	/**
+	 * This variable contains the name in a certain language after localization.
+	 *
+	 * @see #localize(String)
+	 * @see #detachCopyLocalized(String, javax.jdo.PersistenceManager)
+	 *
+	 * @jdo.field persistence-modifier="transactional" default-fetch-group="false"
+	 */
+	protected String name;
+
+	/**
+	 * @see org.nightlabs.i18n.I18nText#setText(java.lang.String)
+	 */
+	protected void setText(String localizedValue)
+	{
+		name = localizedValue;
+	}
+
+	/**
+	 * @see org.nightlabs.i18n.I18nText#getText()
+	 */
+	public String getText()
+	{
+		return name;
+	}
+
+	/**
+	 * @see org.nightlabs.i18n.I18nText#getFallBackValue(java.lang.String)
+	 */
+	protected String getFallBackValue(String languageID)
+	{
+		return ScriptParameterSet.getPrimaryKey(organisationID, scriptParameterSetID);
+	}
+
+	/**
+	 * @return Returns the organisationID.
+	 */
 	public String getOrganisationID()
 	{
 		return organisationID;
 	}
-	public long getScriptParameterSetID()
-	{
-		return scriptParameterSetID;
-	}
-	void setScriptParameterSetID(long scriptParameterSetID) {
-		this.scriptParameterSetID = scriptParameterSetID;
-	}
-	
-	public String getScriptParameterID()
-	{
-		return scriptParameterID;
-	}
-	public ScriptParameterSet getScriptParameterSet()
-	{
+
+	public ScriptParameterSet getScriptParameterSet() {
 		return scriptParameterSet;
 	}
-
-	public String getScriptParameterClassName()
-	{
-		return scriptParameterClassName;
+	
+	public long getScriptParameterSetID() {
+		return scriptParameterSetID;
 	}
-	public void setScriptParameterClassName(String scriptParameterClassName)
-	{
-		if (scriptParameterClassName == null)
-			throw new IllegalArgumentException("scriptParameterClassName must not be null!");
-
-		this.scriptParameterClassName = scriptParameterClassName;
-	}
-	public Class getScriptParameterClass()
-		throws ClassNotFoundException
-	{
-		return Class.forName(scriptParameterClassName);
-	}
-	public void setScriptParameterClass(Class scriptParameterClass)
-	{
-		if (scriptParameterClass == null)
-			throw new IllegalArgumentException("scriptParameterClass must not be null!");
-
-		this.scriptParameterClassName = scriptParameterClass.getName();
-	}
+	
+	
 }

@@ -44,6 +44,7 @@ import org.nightlabs.ModuleException;
 import org.nightlabs.jdo.NLJDOHelper;
 import org.nightlabs.jdo.moduleregistry.ModuleMetaData;
 import org.nightlabs.jfire.base.BaseSessionBeanImpl;
+import org.nightlabs.jfire.scripting.id.ScriptParameterSetID;
 import org.nightlabs.jfire.scripting.id.ScriptRegistryItemID;
 
 /**
@@ -270,6 +271,87 @@ implements SessionBean
 			pm.close();
 		}
 	}
+
 	
+	
+	
+	/**
+	 * @throws ModuleException
+	 *
+	 * @ejb.interface-method
+	 * @ejb.permission role-name="_Guest_"
+	 * @ejb.transaction type = "Required"
+	 */
+	public Collection<ScriptParameterSet> getScriptParameterSets(
+			String organisationID, 
+			String[] fetchGroups
+		)
+	throws ModuleException
+	{
+		PersistenceManager pm;
+		pm = getPersistenceManager();
+		try {
+			if (fetchGroups != null)
+				pm.getFetchPlan().setGroups(fetchGroups);
+			Collection paramSets = ScriptParameterSet.getParameterSetsByOrganisation(pm, organisationID);
+			Collection pSets = pm.detachCopyAll(paramSets);
+			Collection<ScriptParameterSet> result = new HashSet<ScriptParameterSet>();
+			for (Iterator iter = pSets.iterator(); iter.hasNext();) {
+				ScriptParameterSet paramSet = (ScriptParameterSet) iter.next();
+				result.add(paramSet);
+			}
+			return result;
+		} finally {
+			pm.close();
+		}
+	}
+	
+	/**
+	 * @throws ModuleException
+	 *
+	 * @ejb.interface-method
+	 * @ejb.permission role-name="_Guest_"
+	 * @ejb.transaction type = "Required"
+	 */
+	public ScriptParameterSet getScriptParameterSet(
+			ScriptParameterSetID scriptParameterSetID, 
+			String[] fetchGroups
+		)
+	throws ModuleException
+	{
+		PersistenceManager pm;
+		pm = getPersistenceManager();
+		try {
+			if (fetchGroups != null)
+				pm.getFetchPlan().setGroups(fetchGroups);
+			ScriptParameterSet parameterSet = (ScriptParameterSet)pm.getObjectById(scriptParameterSetID);
+			return (ScriptParameterSet)pm.detachCopy(parameterSet);
+		} finally {
+			pm.close();
+		}
+	}
+	
+	/**
+	 * @throws ModuleException
+	 *
+	 * @ejb.interface-method
+	 * @ejb.permission role-name="_Guest_"
+	 * @ejb.transaction type="Required"
+	 */
+	public ScriptParameterSet storeParameterSet (
+			ScriptParameterSet scriptParameterSet,
+			boolean get,
+			String[] fetchGroups
+		)
+	throws ModuleException
+	{
+		PersistenceManager pm;
+		pm = getPersistenceManager();
+		try {
+			return (ScriptParameterSet)NLJDOHelper.storeJDO(pm, scriptParameterSet, get, fetchGroups);
+		} finally {
+			pm.close();
+		}
+	}
 		
 }

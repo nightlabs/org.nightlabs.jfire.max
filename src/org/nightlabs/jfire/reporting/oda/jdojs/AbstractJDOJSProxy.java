@@ -38,6 +38,8 @@ import org.eclipse.datatools.connectivity.oda.OdaException;
 import org.eclipse.datatools.connectivity.oda.SortSpec;
 
 /**
+ * Base type for a JDO JavaScript Query (DataSet) in JFireReporting.
+ * 
  * @author Alexander Bieber <alex[AT]nightlabs[DOT]de>
  *
  */

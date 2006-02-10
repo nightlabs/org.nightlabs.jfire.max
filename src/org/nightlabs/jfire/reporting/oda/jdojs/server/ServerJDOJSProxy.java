@@ -53,6 +53,9 @@ import org.nightlabs.jfire.servermanager.j2ee.SecurityReflector;
 import org.nightlabs.jfire.servermanager.j2ee.SecurityReflector.UserDescriptor;
 
 /**
+ * Server-side JDO JavaScript DataSets. Its method are also called
+ * from the client-side(preview) DataSet through the ReportManager-Bean. 
+ *  
  * @author Alexander Bieber <alex[AT]nightlabs[DOT]de>
  *
  */

@@ -64,6 +64,8 @@ import org.nightlabs.jfire.servermanager.j2ee.SecurityReflector.UserDescriptor;
 import com.sun.org.apache.xpath.internal.FoundIndex;
 
 /**
+ * Helper to render reports on the server.
+ * 
  * @author Alexander Bieber <alex[AT]nightlabs[DOT]de>
  *
  */
@@ -100,6 +102,15 @@ public class ReportingManager {
 		
 	}
 	
+	/**
+	 * Lets BIRT render the given report with the given params in the given format.
+	 * 
+	 * @param pm The PersistenceManager to retrieve the ReportLayout from.
+	 * @param reportRegistryItemID The ReportLayoutID to render.
+	 * @param params The parameters to render this report with. 
+	 * @param format The format to render to.
+	 * @throws EngineException
+	 */
 	public RenderedReportLayout renderReport(
 			PersistenceManager pm,
 			ReportRegistryItemID reportRegistryItemID, 

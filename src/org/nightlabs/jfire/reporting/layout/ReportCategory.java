@@ -37,6 +37,10 @@ import org.nightlabs.jfire.reporting.layout.id.ReportRegistryItemID;
 
 
 /**
+ * ReportCategories are used to organise reports on the server. 
+ * The JFire sytem itself uses internal categories to organise
+ * report-layouts for invoices, orders etc.
+ * 
  * @author Alexander Bieber <alex[AT]nightlabs[DOT]de>
  * 
  * @jdo.persistence-capable

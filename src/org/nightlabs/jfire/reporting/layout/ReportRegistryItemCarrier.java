@@ -34,6 +34,9 @@ import java.util.Set;
 import org.nightlabs.jfire.reporting.layout.id.ReportRegistryItemID;
 
 /**
+ * Carrier organisable in a tree like structure. Used to transfer the 
+ * registry structure to the client.
+ * 
  * @author Alexander Bieber <alex[AT]nightlabs[DOT]de>
  *
  */

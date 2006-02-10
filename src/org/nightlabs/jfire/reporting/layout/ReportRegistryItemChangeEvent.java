@@ -40,6 +40,7 @@ import org.nightlabs.jfire.reporting.layout.id.ReportRegistryItemID;
  *		identity-type="application"
  * 		persistence-capable-superclass="org.nightlabs.jfire.jdo.controller.JDOObjectChangeEvent"
  *		detachable="true"
+ *		table="JFireReporting_ReportRegistryItemChangeEvent"
  *
  * @jdo.inheritance strategy="new-table"
  *

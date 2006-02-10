@@ -38,6 +38,8 @@ import org.nightlabs.io.DataBuffer;
 import org.nightlabs.jfire.reporting.layout.id.ReportRegistryItemID;
 
 /**
+ * A ReportLayout holds the BIRT report definition.
+ * 
  * @author Alexander Bieber <alex[AT]nightlabs[DOT]de>
  *
  * @jdo.persistence-capable

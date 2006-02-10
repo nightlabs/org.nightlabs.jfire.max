@@ -34,6 +34,8 @@ import org.eclipse.datatools.connectivity.oda.IResultSetMetaData;
 import org.eclipse.datatools.connectivity.oda.OdaException;
 
 /**
+ * Common type for all oda resultset metadata in JFireReporting.
+ *  
  * @author Alexander Bieber <alex[AT]nightlabs[DOT]de>
  *
  */

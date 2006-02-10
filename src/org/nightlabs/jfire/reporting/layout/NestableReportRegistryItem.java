@@ -29,7 +29,8 @@ package org.nightlabs.jfire.reporting.layout;
 import java.util.Set;
 
 /**
- * 
+ * Interface for nestable registry items (ReportCategory).
+ *  
  * @author Alexander Bieber <alex[AT]nightlabs[DOT]de>
  *
  */

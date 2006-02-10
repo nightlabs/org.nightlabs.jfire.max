@@ -48,6 +48,8 @@ import org.nightlabs.jfire.reporting.oda.jdojs.JDOJSResultSetMetaData;
 
 
 /**
+ * Common type for all oda resultsets in JFireBase.
+ * 
  * @author Alexander Bieber <alex[AT]nightlabs[DOT]de>
  *
  */

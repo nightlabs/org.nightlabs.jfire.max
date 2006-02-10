@@ -34,12 +34,12 @@ import org.nightlabs.jfire.reporting.oda.jdojs.IJDOJSProxyFactory;
  *
  */
 public class ServerJDOJSDriver extends AbstractJDOJSDriver {
-
+	
 	/* (non-Javadoc)
 	 * @see org.nightlabs.jfire.reporting.oda.jdojs.AbstractJDOJSDriver#createProxyFactory()
 	 */
 	protected IJDOJSProxyFactory createProxyFactory() {
-	return new ServerJDOJSProxyFactory();
+		return new ServerJDOJSProxyFactory();
 	}
-
+	
 }

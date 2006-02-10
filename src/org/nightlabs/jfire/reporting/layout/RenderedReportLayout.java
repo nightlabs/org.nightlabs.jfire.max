@@ -32,6 +32,8 @@ import java.util.Date;
 import org.nightlabs.jfire.reporting.Birt;
 
 /**
+ * Holds the format and the content of a report rendered by BIRT.
+ * 
  * @author Alexander Bieber <alex[AT]nightlabs[DOT]de>
  *
  */

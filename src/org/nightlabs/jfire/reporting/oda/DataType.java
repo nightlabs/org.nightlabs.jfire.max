@@ -31,6 +31,12 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 
+/**
+ * Public declarations concerning BIRT datatypes.
+ * 
+ * @author Alexander Bieber <alex[AT]nightlabs[ÐOT]de>
+ *
+ */
 public class DataType {
 	protected DataType() {}
 	

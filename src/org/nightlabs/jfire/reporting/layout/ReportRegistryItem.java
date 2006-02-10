@@ -37,6 +37,8 @@ import javax.jdo.listener.StoreCallback;
 import org.apache.log4j.Logger;
 
 /**
+ * Common type for report registry item (ReportCategory, ReportLayout).
+ * 
  * @author Alexander Bieber <alex[AT]nightlabs[DOT]de>
  * 
  * @jdo.persistence-capable

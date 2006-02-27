@@ -86,7 +86,7 @@ public class Country implements Serializable
 	 *		collection-type="map"
 	 *		key-type="java.lang.String"
 	 *		value-type="Region"
-	 *		dependent="true"
+	 *		dependent-value="true"
 	 *		mapped-by="country"
 	 *
 	 * @jdo.key mapped-by="primaryKey"

@@ -82,7 +82,6 @@ public class CityName extends I18nText
 	 *		collection-type="map"
 	 *		key-type="java.lang.String"
 	 *		value-type="java.lang.String"
-	 *		dependent="true"
 	 *		table="JFireGeography_CityName_names"
 	 *
 	 * @jdo.join

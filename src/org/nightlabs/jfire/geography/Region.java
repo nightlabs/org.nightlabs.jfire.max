@@ -109,7 +109,7 @@ public class Region implements Serializable
 	 *		collection-type="map"
 	 *		key-type="java.lang.String"
 	 *		value-type="City"
-	 *		dependent="true"
+	 *		dependent-value="true"
 	 *		mapped-by="region"
 	 *
 	 * @jdo.key mapped-by="primaryKey"

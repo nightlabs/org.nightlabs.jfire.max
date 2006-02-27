@@ -114,7 +114,7 @@ public class City implements Serializable
 	 *		collection-type="map"
 	 *		key-type="java.lang.String"
 	 *		value-type="Location"
-	 *		dependent="true"
+	 *		dependent-value="true"
 	 *		mapped-by="city"
 	 *
 	 * @jdo.key mapped-by="primaryKey"
@@ -132,7 +132,7 @@ public class City implements Serializable
 	 *		collection-type="map"
 	 *		key-type="java.lang.String"
 	 *		value-type="District"
-	 *		dependent="true"
+	 *		dependent-value="true"
 	 *		mapped-by="city"
 	 *
 	 * @jdo.key mapped-by="primaryKey"

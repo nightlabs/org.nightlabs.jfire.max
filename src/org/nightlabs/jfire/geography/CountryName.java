@@ -66,7 +66,6 @@ public class CountryName extends I18nText
 	 *		collection-type="map"
 	 *		key-type="java.lang.String"
 	 *		value-type="java.lang.String"
-	 *		dependent="true"
 	 *		table="JFireGeography_CountryName_names"
 	 *
 	 * @jdo.join

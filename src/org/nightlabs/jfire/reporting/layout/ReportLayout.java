@@ -116,7 +116,7 @@ public class ReportLayout extends ReportRegistryItem {
 	
 	
 	/**
-	 * @jdo.field persistence-modifier="persistent"
+	 * @jdo.field persistence-modifier="persistent" collection-type="array" serialized-element="true"
 	 */
 	private byte[] reportDesign;
 	

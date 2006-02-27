@@ -59,7 +59,7 @@ import org.nightlabs.jfire.reporting.layout.id.ReportRegistryItemID;
  *			WHERE this.organisationID == paramOrganisationID &&
  *            this.reportRegistryItemType == paramCategoryType            
  *			PARAMETERS String paramOrganisationID, String paramCategoryType
- *			IMPORTS import java.lang.String"
+ *			import java.lang.String"
  * 
  */
 public class ReportCategory extends ReportRegistryItem implements NestableReportRegistryItem {

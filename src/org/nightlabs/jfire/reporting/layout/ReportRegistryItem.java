@@ -64,7 +64,7 @@ import org.apache.log4j.Logger;
  *			WHERE this.organisationID == paramOrganisationID &&
  *            this.reportRegistryItemType == paramReportRegistryItemType            
  *			PARAMETERS String paramOrganisationID, String reportRegistryItemType
- *			IMPORTS import java.lang.String"
+ *			import java.lang.String"
  * 
  * @jdo.query
  *		name="getTopLevelReportRegistryItemByType"
@@ -73,7 +73,7 @@ import org.apache.log4j.Logger;
  *            this.reportRegistryItemType == paramReportRegistryItemType &&
  *            this.parentItem == null    
  *			PARAMETERS String paramOrganisationID, String reportRegistryItemType
- *			IMPORTS import java.lang.String"
+ *			import java.lang.String"
  *
  * @jdo.query
  *		name="getTopLevelReportRegistryItems"
@@ -81,7 +81,7 @@ import org.apache.log4j.Logger;
  *			WHERE this.organisationID == paramOrganisationID &&
  *            this.parentItem == null    
  *			PARAMETERS String paramOrganisationID
- *			IMPORTS import java.lang.String"
+ *			import java.lang.String"
  */
 public abstract class ReportRegistryItem implements Serializable, StoreCallback  {
 	

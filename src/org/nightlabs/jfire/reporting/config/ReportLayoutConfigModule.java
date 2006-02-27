@@ -74,7 +74,7 @@ public class ReportLayoutConfigModule extends ConfigModule {
 	 *		collection-type="map"
 	 *		key-type="java.lang.String"
 	 *		value-type="org.nightlabs.jfire.reporting.config.ReportLayoutAvailEntry"
-	 *		dependent="true"
+	 *		dependent-value="true"
 	 *		mapped-by="reportLayoutConfigModule"
 	 *
 	 * @jdo.key mapped-by="reportRegistryItemType"

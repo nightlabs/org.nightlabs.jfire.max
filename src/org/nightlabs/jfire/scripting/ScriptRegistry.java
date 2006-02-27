@@ -103,7 +103,6 @@ public class ScriptRegistry
 	 *		collection-type="map"
 	 *		key-type="java.lang.String"
 	 *		value-type="java.lang.String"
-	 *		dependent="true"
 	 *		table="JFireScripting_ScriptExecutorRegistry_scriptExecutorClassNameByLanguage"
 	 *
 	 * @jdo.join

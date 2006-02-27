@@ -62,7 +62,7 @@ import org.nightlabs.util.Utils;
  *			WHERE this.organisationID == paramOrganisationID &&
  *            this.parent == null    
  *			PARAMETERS String paramOrganisationID
- *			IMPORTS import java.lang.String"
+ *			import java.lang.String"
  * 
  */
 public class ScriptRegistryItem
@@ -118,7 +118,7 @@ public class ScriptRegistryItem
 //	 *		collection-type="map"
 //	 *		key-type="java.lang.String"
 //	 *		value-type="ScriptParameter"
-//	 *		dependent="true"
+//	 *		dependent-value="true"
 //	 *		table="JFireScripting_ScriptRegistryItem_parameters"
 //	 *
 //	 * @jdo.join

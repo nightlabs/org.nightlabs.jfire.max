@@ -51,7 +51,7 @@ import javax.jdo.Query;
  *				this.scriptRegistryItemType == pScriptRegistryItemType &&
  *				this.scriptRegistryItemID == pScriptRegistryItemID
  *			PARAMETERS pScriptRegistryItemType, pScriptRegistryItemID
- *			IMPORTS java.lang.String"
+ *			import java.lang.String"
  */
 public class Script
 		extends ScriptRegistryItem

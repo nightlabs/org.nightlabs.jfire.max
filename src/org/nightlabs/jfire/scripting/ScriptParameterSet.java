@@ -62,7 +62,7 @@ import javax.jdo.listener.StoreCallback;
  *		query="SELECT
  *			WHERE this.organisationID == paramOrganisationID
  *			PARAMETERS String paramOrganisationID
- *			IMPORTS import java.lang.String"
+ *			import java.lang.String"
  * 
  */
  public class ScriptParameterSet

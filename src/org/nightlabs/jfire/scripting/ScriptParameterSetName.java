@@ -76,7 +76,6 @@ extends I18nText
 	 *		collection-type="map"
 	 *		key-type="java.lang.String"
 	 *		value-type="java.lang.String"
-	 *		dependent="true"
 	 *		table="JFireScripting_ScriptParameterSetName_names"
 	 *
 	 * @jdo.join

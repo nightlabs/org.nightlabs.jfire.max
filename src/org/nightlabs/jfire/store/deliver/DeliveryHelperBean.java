@@ -469,7 +469,7 @@ implements SessionBean
 			Delivery delivery = (Delivery) pm.getObjectById(deliveryID);
 
 			if (JDOHelper.isDetached(deliverBeginServerResult))
-				deliverBeginServerResult = (DeliveryResult) pm.attachCopy(deliverBeginServerResult, false);
+				deliverBeginServerResult = (DeliveryResult) pm.makePersistent(deliverBeginServerResult);
 			else
 				pm.makePersistent(deliverBeginServerResult);
 
@@ -503,7 +503,7 @@ implements SessionBean
 			Delivery delivery = (Delivery) pm.getObjectById(deliveryID);
 
 			if (JDOHelper.isDetached(deliverDoWorkServerResult))
-				deliverDoWorkServerResult = (DeliveryResult) pm.attachCopy(deliverDoWorkServerResult, false);
+				deliverDoWorkServerResult = (DeliveryResult) pm.makePersistent(deliverDoWorkServerResult);
 			else
 				pm.makePersistent(deliverDoWorkServerResult);
 
@@ -537,7 +537,7 @@ implements SessionBean
 			Delivery delivery = (Delivery) pm.getObjectById(deliveryID);
 
 			if (JDOHelper.isDetached(deliverEndServerResult))
-				deliverEndServerResult = (DeliveryResult) pm.attachCopy(deliverEndServerResult, false);
+				deliverEndServerResult = (DeliveryResult) pm.makePersistent(deliverEndServerResult);
 			else
 				pm.makePersistent(deliverEndServerResult);
 

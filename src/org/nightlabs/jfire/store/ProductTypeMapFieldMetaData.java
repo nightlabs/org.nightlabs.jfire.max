@@ -54,7 +54,7 @@ public class ProductTypeMapFieldMetaData
 	 *		collection-type="map"
 	 *		key-type="java.lang.String"
 	 *		value-type="ProductTypeMapEntryMetaData"
-	 *		dependent="true"
+	 *		dependent-value="true"
 	 *		mapped-by="mapFieldMetaData"
 	 *
 	 * @jdo.key mapped-by="key"

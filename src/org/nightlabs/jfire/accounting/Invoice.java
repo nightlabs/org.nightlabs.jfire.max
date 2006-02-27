@@ -76,7 +76,7 @@ import org.nightlabs.jfire.transfer.id.AnchorID;
  *            customer.anchorID == paramCustomerID_anchorID
  *			PARAMETERS String paramVendorID_organisationID, String paramVendorID_anchorID,
  *                 String paramCustomerID_organisationID, String paramCustomerID_anchorID
- *			IMPORTS import java.lang.String
+ *			import java.lang.String
  *			ORDER BY invoiceID DESC"
  *
  * @jdo.query
@@ -89,7 +89,7 @@ import org.nightlabs.jfire.transfer.id.AnchorID;
  *            finalizeDT == null
  *			PARAMETERS String paramVendorID_organisationID, String paramVendorID_anchorID,
  *                 String paramCustomerID_organisationID, String paramCustomerID_anchorID
- *			IMPORTS import java.lang.String
+ *			import java.lang.String
  *			ORDER BY invoiceID DESC"
  *
  * @jdo.fetch-group name="Invoice.invoiceLocal" fields="invoiceLocal"

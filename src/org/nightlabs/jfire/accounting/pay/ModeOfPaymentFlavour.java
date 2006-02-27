@@ -67,7 +67,7 @@ import org.nightlabs.jfire.trade.id.CustomerGroupID;
  *				)
  *			PARAMETERS CustomerGroup paramCustomerGroup
  *			VARIABLES ModeOfPayment modeOfPayment
- *			IMPORTS import org.nightlabs.jfire.trade.CustomerGroup; import org.nightlabs.jfire.accounting.pay.ModeOfPayment"
+ *			import org.nightlabs.jfire.trade.CustomerGroup; import org.nightlabs.jfire.accounting.pay.ModeOfPayment"
  *
  * @!jdo.query
  *		name="getAvailableModeOfPaymentFlavoursForOneCustomerGroup"
@@ -87,10 +87,9 @@ import org.nightlabs.jfire.trade.id.CustomerGroupID;
  *				)
  *			PARAMETERS String paramOrganisationID, String paramCustomerGroupID
  *			VARIABLES CustomerGroup customerGroup; ModeOfPayment modeOfPayment
- *			IMPORTS
- *				import java.lang.String;
- *				import org.nightlabs.jfire.trade.CustomerGroup;
- *				import org.nightlabs.jfire.accounting.pay.ModeOfPayment"
+ *			import java.lang.String;
+ *			import org.nightlabs.jfire.trade.CustomerGroup;
+ *			import org.nightlabs.jfire.accounting.pay.ModeOfPayment"
  *
  * @jdo.query
  *		name="getAvailableModeOfPaymentFlavoursForOneCustomerGroup_WORKAROUND1"

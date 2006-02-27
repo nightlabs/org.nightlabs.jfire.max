@@ -86,7 +86,7 @@ implements Serializable
 	 *		collection-type="map"
 	 *		key-type="String"
 	 *		value-type="ModeOfPaymentFlavour"
-	 *		dependent="true"
+	 *		dependent-value="true"
 	 *		mapped-by="modeOfPayment"
 	 *
 	 * @jdo.key mapped-by="primaryKey"

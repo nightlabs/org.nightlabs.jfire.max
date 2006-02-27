@@ -76,22 +76,22 @@ import org.nightlabs.jfire.transfer.id.AnchorID;
  * @jdo.query name="getProductReferencesForAnchor" query="SELECT
  *		WHERE anchor == pAnchor
  *		PARAMETERS Anchor pAnchor
- *		IMPORTS import org.nightlabs.jfire.transfer.Anchor"
+ *		import org.nightlabs.jfire.transfer.Anchor"
  *
  * @jdo.query name="getProductReferencesForProduct" query="SELECT
  *		WHERE product == pProduct
  *		PARAMETERS Product pProduct
- *		IMPORTS import org.nightlabs.jfire.store.Product"
+ *		import org.nightlabs.jfire.store.Product"
  *
  * @jdo.query name="getProductReferencesForProductAndQuantity" query="SELECT
  *		WHERE product == pProduct && quantity == pQuantity
  *		PARAMETERS Product pProduct, int pQuantity
- *		IMPORTS import org.nightlabs.jfire.store.Product"
+ *		import org.nightlabs.jfire.store.Product"
  *
  * @jdo.query name="getProductReferenceCountForProductReferenceGroup" query="SELECT count(productProductID)
  *		WHERE productReferenceGroup == pProductReferenceGroup
  *		PARAMETERS ProductReferenceGroup pProductReferenceGroup
- *		IMPORTS import org.nightlabs.jfire.store.ProductReferenceGroup"
+ *		import org.nightlabs.jfire.store.ProductReferenceGroup"
  */
 public class ProductReference
 implements Serializable, DeleteCallback

@@ -414,7 +414,7 @@ implements SessionBean
 			Payment payment = (Payment) pm.getObjectById(paymentID);
 
 			if (JDOHelper.isDetached(payBeginServerResult))
-				payBeginServerResult = (PaymentResult) pm.attachCopy(payBeginServerResult, false);
+				payBeginServerResult = (PaymentResult) pm.makePersistent(payBeginServerResult);
 			else
 				pm.makePersistent(payBeginServerResult);
 
@@ -452,7 +452,7 @@ implements SessionBean
 			Payment payment = (Payment) pm.getObjectById(paymentID);
 
 			if (JDOHelper.isDetached(payDoWorkServerResult))
-				payDoWorkServerResult = (PaymentResult) pm.attachCopy(payDoWorkServerResult, false);
+				payDoWorkServerResult = (PaymentResult) pm.makePersistent(payDoWorkServerResult);
 			else
 				pm.makePersistent(payDoWorkServerResult);
 
@@ -486,7 +486,7 @@ implements SessionBean
 			Payment payment = (Payment) pm.getObjectById(paymentID);
 
 			if (JDOHelper.isDetached(payEndServerResult))
-				payEndServerResult = (PaymentResult) pm.attachCopy(payEndServerResult, false);
+				payEndServerResult = (PaymentResult) pm.makePersistent(payEndServerResult);
 			else
 				pm.makePersistent(payEndServerResult);
 

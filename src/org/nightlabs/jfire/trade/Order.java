@@ -67,7 +67,7 @@ import org.nightlabs.jfire.transfer.id.AnchorID;
  *			WHERE JDOHelper.getObjectId(vendor) == paramVendorID &&
  *			      JDOHelper.getObjectId(customer) == paramCustomerID
  *			PARAMETERS AnchorID paramVendorID, AnchorID paramCustomerID
- *			IMPORTS import org.nightlabs.jfire.transfer.id.AnchorID"
+ *			import org.nightlabs.jfire.transfer.id.AnchorID"
  *
  * @jdo.query
  *		name="getOrdersByVendorAndCustomer"
@@ -78,7 +78,7 @@ import org.nightlabs.jfire.transfer.id.AnchorID;
  *            customer.anchorID == paramCustomerID_anchorID
  *			PARAMETERS String paramVendorID_organisationID, String paramVendorID_anchorID,
  *                 String paramCustomerID_organisationID, String paramCustomerID_anchorID
- *			IMPORTS import java.lang.String
+ *			import java.lang.String
  *			ORDER BY orderID DESC"
  *
  * @jdo.fetch-group name="Order.vendor" fields="vendor"
@@ -189,7 +189,7 @@ implements Serializable, ArticleContainer, SegmentContainer, DetachCallback
 	 *		key-type="java.lang.String"
 	 *		value-type="Article"
 	 *		mapped-by="order"
-	 *		dependent="true"
+	 *		dependent-value="true"
 	 *
 	 * @jdo.key mapped-by="primaryKey"
 	 *

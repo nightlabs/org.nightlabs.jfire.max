@@ -51,7 +51,7 @@ import org.nightlabs.jfire.store.ProductType;
  *		query="SELECT UNIQUE this
  *			WHERE moneyFlowDimensionID == paramMoneyFlowDimensionID
  *			PARAMETERS String paramMoneyFlowDimensionID
- *			IMPORTS import java.lang.String"
+ *			import java.lang.String"
  */
 public abstract class MoneyFlowDimension {
 

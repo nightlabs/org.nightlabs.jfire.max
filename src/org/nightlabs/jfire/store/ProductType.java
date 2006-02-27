@@ -132,7 +132,7 @@ import org.nightlabs.jfire.transfer.Anchor;
  *			productTypeGroup.productTypeGroupID == paramProductTypeGroupID
  *		VARIABLES ProductTypeGroup productTypeGroup
  *		PARAMETERS String paramOrganisationID, String paramProductTypeGroupID
- *		IMPORTS import java.lang.String; import org.nightlabs.jfire.store.ProductTypeGroup"
+ *		import java.lang.String; import org.nightlabs.jfire.store.ProductTypeGroup"
  *
  * @jdo.query
  *		name="getChildProductTypes_topLevel"
@@ -148,7 +148,7 @@ import org.nightlabs.jfire.transfer.Anchor;
  *		    this.extendedProductType.organisationID == parentProductTypeOrganisationID &&
  *		    this.extendedProductType.productTypeID == parentProductTypeProductTypeID
  *		  PARAMETERS String parentProductTypeOrganisationID, String parentProductTypeProductTypeID
- *		  IMPORTS import java.lang.String"
+ *		  import java.lang.String"
  **/
 public abstract class ProductType
 implements
@@ -836,7 +836,7 @@ implements
 	 *		collection-type="map"
 	 *		key-type="java.lang.String"
 	 *		value-type="ProductTypeFieldMetaData"
-	 *		dependent="true"
+	 *		dependent-value="true"
 	 *		mapped-by="productType"
 	 *
 	 * @jdo.key mapped-by="fieldName"

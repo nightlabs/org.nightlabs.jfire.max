@@ -64,7 +64,7 @@ import org.nightlabs.jfire.trade.CustomerGroup;
  *			this.priceCoordinate.customerGroupPK == paramCustomerGroupPK &&
  *			this.priceCoordinate.currencyID == paramCurrencyID
  *		PARAMETERS StablePriceConfig paramPriceConfig, String paramCustomerGroupPK, String paramCurrencyID
- *		IMPORTS import java.lang.String; import org.nightlabs.jfire.accounting.tariffpriceconfig.StablePriceConfig"
+ *		import java.lang.String; import org.nightlabs.jfire.accounting.tariffpriceconfig.StablePriceConfig"
  *
  * @jdo.fetch-group name="StablePriceConfig.priceCells" fields="priceCells"
  *
@@ -104,7 +104,8 @@ implements IPackagePriceConfig, IResultPriceConfig
 	 *		key-type="PriceCoordinate"
 	 *		value-type="PriceCell"
 	 *		mapped-by="priceConfig"
-	 *		dependent="true"
+	 *		dependent-key="true"
+	 *		dependent-value="true"
 	 *
 	 * @jdo.key mapped-by="priceCoordinate"
 	 *

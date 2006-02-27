@@ -82,7 +82,7 @@ implements IFormulaPriceConfig
 	 *		collection-type="map"
 	 *		key-type="String"
 	 *		value-type="TariffPriceConfig"
-	 *		dependent="true"
+	 *		dependent-value="true"
 	 *		table="JFireTrade_FormulaPriceConfig_packagingResultPriceConfigs"
 	 *
 	 * @jdo.join
@@ -110,7 +110,8 @@ implements IFormulaPriceConfig
 	 *		collection-type="map"
 	 *		key-type="PriceCoordinate"
 	 *		value-type="FormulaCell"
-	 *		dependent="true"
+	 *		dependent-key="true"
+	 *		dependent-value="true"
 	 *		mapped-by="mapOwner"
 	 *		@!mapped-by="priceConfig"
 	 *

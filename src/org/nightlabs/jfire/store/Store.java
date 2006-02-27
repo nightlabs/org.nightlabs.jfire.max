@@ -353,7 +353,7 @@ public class Store
 		}
 
 		if (JDOHelper.isDetached(productType))
-			productType = (ProductType) pm.attachCopy(productType, false);
+			productType = (ProductType) pm.makePersistent(productType);
 		else
 			pm.makePersistent(productType);
 
@@ -385,7 +385,7 @@ public class Store
 //		}
 
 		if (JDOHelper.isDetached(product))
-			product = (Product) pm.attachCopy(product, false);
+			product = (Product) pm.makePersistent(product);
 		else
 			pm.makePersistent(product);
 

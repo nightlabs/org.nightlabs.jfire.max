@@ -73,7 +73,6 @@ public class ModeOfPaymentFlavourName extends I18nText
 	 *		collection-type="map"
 	 *		key-type="java.lang.String"
 	 *		value-type="java.lang.String"
-	 *		dependent="true"
 	 *		default-fetch-group="true"
 	 *		table="JFireTrade_ModeOfPaymentFlavourName_names"
 	 *

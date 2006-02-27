@@ -115,7 +115,7 @@ public class Price
 	 *		collection-type="map"
 	 *		key-type="java.lang.String"
 	 *		value-type="PriceFragment"
-	 *		dependent="true"
+	 *		dependent-value="true"
 	 *		mapped-by="price"
 	 *
 	 * @jdo.key mapped-by="priceFragmentTypeID"

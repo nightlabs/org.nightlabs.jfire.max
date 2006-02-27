@@ -637,7 +637,7 @@ implements SessionBean
 			if (fetchGroups != null)
 				pm.getFetchPlan().setGroups(fetchGroups);
 			Trader trader = Trader.getTrader(pm);
-			Person aPerson = (Person)pm.attachCopy(person, false);
+			Person aPerson = (Person)pm.makePersistent(person);
 			LegalEntity legalEntity = trader.setPersonToLegalEntity(aPerson, true);
 			if (get)
 				return (LegalEntity)pm.detachCopy(legalEntity);

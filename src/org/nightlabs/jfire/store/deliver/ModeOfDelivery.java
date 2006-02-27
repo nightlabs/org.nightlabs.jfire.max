@@ -137,7 +137,7 @@ implements Serializable
 	 *		collection-type="map"
 	 *		key-type="String"
 	 *		value-type="ModeOfDeliveryFlavour"
-	 *		dependent="true"
+	 *		dependent-value="true"
 	 *		mapped-by="modeOfDelivery"
 	 *
 	 * @jdo.key mapped-by="primaryKey"

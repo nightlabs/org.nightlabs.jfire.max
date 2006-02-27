@@ -70,7 +70,7 @@ import org.nightlabs.jfire.transfer.id.TransferID;
  *					this.delivery.organisationID == paramOrganisationID &&
  *					this.delivery.deliveryID == paramDeliveryID
  *				PARAMETERS String paramOrganisationID, String paramDeliveryID
- *				IMPORTS import java.lang.String"
+ *				import java.lang.String"
  */
 public class DeliverProductTransfer extends ProductTransfer
 {

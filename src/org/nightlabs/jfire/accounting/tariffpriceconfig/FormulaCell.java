@@ -67,7 +67,6 @@ public class FormulaCell implements Serializable
 	 *		collection-type="map"
 	 *		key-type="String"
 	 *		value-type="String"
-	 *		dependent="true"
 	 *		table="JFireTrade_FormulaCell_priceFragmentFormulas"
 	 *
 	 * @jdo.key-column length="100"

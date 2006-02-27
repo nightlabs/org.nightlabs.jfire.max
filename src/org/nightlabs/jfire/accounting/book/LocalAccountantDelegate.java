@@ -78,7 +78,7 @@ import org.nightlabs.util.Utils;
  *			WHERE organisationID == paramOrganisationID &&
  *            localAccountantDelegateID == paramLocalAccountantDelegateID
  *			PARAMETERS String paramOrganisationID, String paramLocalAccountantDelegateID
- *			IMPORTS import java.lang.String"
+ *			import java.lang.String"
  *
  * @jdo.query
  *		name="getChildDelegates"
@@ -88,7 +88,7 @@ import org.nightlabs.util.Utils;
  *						this.extendedAccountantDelegate.organisationID == paramOrganisationID &&
  *						this.extendedAccountantDelegate.localAccountantDelegateID == paramLocalAccountantDelegateID
  *			PARAMETERS String paramOrganisationID, String paramLocalAccountantDelegateID
- *			IMPORTS import java.lang.String"
+ *			import java.lang.String"
  *
  * @jdo.fetch-group name="LocalAccountantDelegate.moneyFlowMappings" fields="moneyFlowMappings"
  * @jdo.fetch-group name="LocalAccountantDelegate.name" fields="name"

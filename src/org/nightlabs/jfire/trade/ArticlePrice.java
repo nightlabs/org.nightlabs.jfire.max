@@ -83,7 +83,7 @@ public class ArticlePrice extends org.nightlabs.jfire.accounting.Price
 	 *		collection-type="map"
 	 *		key-type="String"
 	 *		value-type="ArticlePrice"
-	 *		dependent="true"
+	 *		dependent-value="true"
 	 *		mapped-by="packageArticlePrice"
 	 *
 	 * @jdo.key mapped-by="nestKey"

@@ -60,7 +60,7 @@ import org.nightlabs.jfire.accounting.priceconfig.IPriceConfig;
  *			this.priceCoordinate.customerGroupPK == paramCustomerGroupPK &&
  *			this.priceCoordinate.currencyID == paramCurrencyID
  *		PARAMETERS StablePriceConfig paramPriceConfig, String paramCustomerGroupPK, String paramCurrencyID
- *		IMPORTS import java.lang.String; import org.nightlabs.jfire.accounting.tariffpriceconfig.StablePriceConfig"
+ *		import java.lang.String; import org.nightlabs.jfire.accounting.tariffpriceconfig.StablePriceConfig"
  */
 public class PriceCell implements Serializable
 {

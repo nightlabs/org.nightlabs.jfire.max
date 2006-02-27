@@ -76,7 +76,6 @@ public class PriceConfigName extends I18nText
 	 *		collection-type="map"
 	 *		key-type="java.lang.String"
 	 *		value-type="java.lang.String"
-	 *		dependent="true"
 	 *		table="JFireTrade_PriceConfigName_names"
 	 *
 	 * @jdo.join

@@ -68,7 +68,7 @@ import org.nightlabs.jfire.transfer.id.AnchorID;
  * @jdo.query name="getNonFinalizedOffersForOrder" query="SELECT
  *			WHERE this.order == paramOrder && this.finalizeDT == null
  *			PARAMETERS Order paramOrder
- *			IMPORTS import org.nightlabs.jfire.trade.Order
+ *			import org.nightlabs.jfire.trade.Order
  *			ORDER BY offerID DESCENDING"
  *
  * @jdo.fetch-group name="Offer.offerLocal" fields="offerLocal"
@@ -208,7 +208,7 @@ implements
 	 *		collection-type="map"
 	 *		key-type="String"
 	 *		value-type="Article"
-	 *		dependent="true"
+	 *		dependent-value="true"
 	 *		mapped-by="offer"
 	 *
 	 * @jdo.key mapped-by="primaryKey"

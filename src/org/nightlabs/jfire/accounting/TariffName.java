@@ -97,7 +97,6 @@ implements StoreCallback
 	 *		collection-type="map"
 	 *		key-type="java.lang.String"
 	 *		value-type="java.lang.String"
-	 *		dependent="true"
 	 *		table="JFireTrade_TariffName_names"
 	 *
 	 * @jdo.join

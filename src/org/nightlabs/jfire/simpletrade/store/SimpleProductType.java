@@ -75,7 +75,7 @@ import org.nightlabs.jfire.transfer.id.AnchorID;
  *		    this.extendedProductType.organisationID == parentProductTypeOrganisationID &&
  *		    this.extendedProductType.productTypeID == parentProductTypeProductTypeID
  *		  PARAMETERS String parentProductTypeOrganisationID, String parentProductTypeProductTypeID
- *		  IMPORTS import java.lang.String"
+ *		  import java.lang.String"
  * 
  * @jdo.fetch-group name="SimpleProductType.this" fetch-groups="default, ProductType.this" fields="name"
  *

@@ -88,7 +88,6 @@ implements Inheritable
 	 *		collection-type="map"
 	 *		key-type="java.lang.String"
 	 *		value-type="java.lang.String"
-	 *		dependent="true"
 	 *		table="JFireSimpleTrade_SimpleProductTypeName_names"
 	 *
 	 * @jdo.join

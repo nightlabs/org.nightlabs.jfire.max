@@ -151,12 +151,13 @@ public abstract class GeographyManagerBean
 	 * @ejb.interface-method
 	 * @ejb.permission role-name="_Guest_"
 	 */
-	public Collection getCountries(String[] fetchGroups)
+	public Collection getCountries(String[] fetchGroups, int maxFetchDepth)
 	throws ModuleException
 	{
 		try {
 			PersistenceManager pm = getPersistenceManager();
 			try {
+				pm.getFetchPlan().setMaxFetchDepth(maxFetchDepth);
 				if (fetchGroups != null)
 					pm.getFetchPlan().setGroups(fetchGroups);
 
@@ -184,12 +185,13 @@ public abstract class GeographyManagerBean
 	 * @ejb.interface-method
 	 * @ejb.permission role-name="_Guest_"
 	 */
-	public Country getCountry(CountryID countryID, String[] fetchGroups)
+	public Country getCountry(CountryID countryID, String[] fetchGroups, int maxFetchDepth)
 	throws ModuleException
 	{
 		try {
 			PersistenceManager pm = getPersistenceManager();
 			try {
+				pm.getFetchPlan().setMaxFetchDepth(maxFetchDepth);
 				if (fetchGroups != null)
 					pm.getFetchPlan().setGroups(fetchGroups);
 
@@ -212,12 +214,13 @@ public abstract class GeographyManagerBean
 	 * @ejb.interface-method
 	 * @ejb.permission role-name="_Guest_"
 	 */
-	public Region getRegion(RegionID regionID, String[] fetchGroups)
+	public Region getRegion(RegionID regionID, String[] fetchGroups, int maxFetchDepth)
 	throws ModuleException
 	{
 		try {
 			PersistenceManager pm = getPersistenceManager();
 			try {
+				pm.getFetchPlan().setMaxFetchDepth(maxFetchDepth);
 				if (fetchGroups != null)
 					pm.getFetchPlan().setGroups(fetchGroups);
 
@@ -240,12 +243,13 @@ public abstract class GeographyManagerBean
 	 * @ejb.interface-method
 	 * @ejb.permission role-name="_Guest_"
 	 */
-	public City getCity(CityID cityID, String[] fetchGroups)
+	public City getCity(CityID cityID, String[] fetchGroups, int maxFetchDepth)
 	throws ModuleException
 	{
 		try {
 			PersistenceManager pm = getPersistenceManager();
 			try {
+				pm.getFetchPlan().setMaxFetchDepth(maxFetchDepth);
 				if (fetchGroups != null)
 					pm.getFetchPlan().setGroups(fetchGroups);
 
@@ -268,12 +272,13 @@ public abstract class GeographyManagerBean
 	 * @ejb.interface-method
 	 * @ejb.permission role-name="_Guest_"
 	 */
-	public Location getLocation(LocationID locationID, String[] fetchGroups)
+	public Location getLocation(LocationID locationID, String[] fetchGroups, int maxFetchDepth)
 	throws ModuleException
 	{
 		try {
 			PersistenceManager pm = getPersistenceManager();
 			try {
+				pm.getFetchPlan().setMaxFetchDepth(maxFetchDepth);
 				if (fetchGroups != null)
 					pm.getFetchPlan().setGroups(fetchGroups);
 
@@ -297,13 +302,13 @@ public abstract class GeographyManagerBean
 	 * @ejb.interface-method
 	 * @ejb.permission role-name="_Guest_"
 	 */
-	public Country storeCountry(Country country, boolean get, String[] fetchGroups)
+	public Country storeCountry(Country country, boolean get, String[] fetchGroups, int maxFetchDepth)
 	throws ModuleException
 	{
 		try {
 			PersistenceManager pm = getPersistenceManager();
 			try {
-				return (Country) NLJDOHelper.storeJDO(pm, country, get, fetchGroups);
+				return (Country) NLJDOHelper.storeJDO(pm, country, get, fetchGroups, maxFetchDepth);
 			} finally {
 				pm.close();
 			}
@@ -320,13 +325,13 @@ public abstract class GeographyManagerBean
 	 * @ejb.interface-method
 	 * @ejb.permission role-name="_Guest_"
 	 */
-	public Region storeRegion(Region region, boolean get, String[] fetchGroups)
+	public Region storeRegion(Region region, boolean get, String[] fetchGroups, int maxFetchDepth)
 	throws ModuleException
 	{
 		try {
 			PersistenceManager pm = getPersistenceManager();
 			try {
-				return (Region) NLJDOHelper.storeJDO(pm, region, get, fetchGroups);
+				return (Region) NLJDOHelper.storeJDO(pm, region, get, fetchGroups, maxFetchDepth);
 			} finally {
 				pm.close();
 			}
@@ -343,13 +348,13 @@ public abstract class GeographyManagerBean
 	 * @ejb.interface-method
 	 * @ejb.permission role-name="_Guest_"
 	 */
-	public City storeCity(City city, boolean get, String[] fetchGroups)
+	public City storeCity(City city, boolean get, String[] fetchGroups, int maxFetchDepth)
 	throws ModuleException
 	{
 		try {
 			PersistenceManager pm = getPersistenceManager();
 			try {
-				return (City) NLJDOHelper.storeJDO(pm, city, get, fetchGroups);
+				return (City) NLJDOHelper.storeJDO(pm, city, get, fetchGroups, maxFetchDepth);
 			} finally {
 				pm.close();
 			}

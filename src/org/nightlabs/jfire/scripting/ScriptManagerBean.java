@@ -41,6 +41,7 @@ import javax.jdo.PersistenceManager;
 
 import org.apache.log4j.Logger;
 import org.nightlabs.ModuleException;
+import org.nightlabs.i18n.I18nText;
 import org.nightlabs.jdo.NLJDOHelper;
 import org.nightlabs.jdo.moduleregistry.ModuleMetaData;
 import org.nightlabs.jfire.base.BaseSessionBeanImpl;
@@ -127,19 +128,7 @@ implements SessionBean
 			pm.close();
 		}
 	}
-	
-	/**
-	 * @throws ModuleException
-	 *
-	 * @ejb.interface-method
-	 * @ejb.permission role-name="_Guest_"
-	 * @ejb.transaction type = "Required"
-	 */
-	public void test()
-	throws ModuleException
-	{
-	}
-	
+
 	/**
 	 * @throws ModuleException
 	 *
@@ -149,16 +138,18 @@ implements SessionBean
 	 */
 	public ScriptRegistryItem getScriptRegistryItem (
 			ScriptRegistryItemID scriptRegistryItemID,
-			String[] fetchGroups
+			String[] fetchGroups, int maxFetchDepth
 		)
 	throws ModuleException
 	{
 		PersistenceManager pm;
 		pm = getPersistenceManager();
 		try {
-			ScriptRegistryItem reportRegistryItem = (ScriptRegistryItem)pm.getObjectById(scriptRegistryItemID);
+			pm.getFetchPlan().setMaxFetchDepth(maxFetchDepth);
 			if (fetchGroups != null)
 				pm.getFetchPlan().setGroups(fetchGroups);
+
+			ScriptRegistryItem reportRegistryItem = (ScriptRegistryItem)pm.getObjectById(scriptRegistryItemID);			
 			ScriptRegistryItem result = (ScriptRegistryItem) pm.detachCopy(reportRegistryItem);
 			return result;
 		} finally {
@@ -175,13 +166,14 @@ implements SessionBean
 	 */
 	public List<ScriptRegistryItem> getScriptRegistryItems (
 			List<ScriptRegistryItemID> scriptRegistryItemIDs,
-			String[] fetchGroups
+			String[] fetchGroups, int maxFetchDepth
 		)
 	throws ModuleException
 	{
 		PersistenceManager pm;
 		pm = getPersistenceManager();
 		try {
+			pm.getFetchPlan().setMaxFetchDepth(maxFetchDepth);
 			if (fetchGroups != null)
 				pm.getFetchPlan().setGroups(fetchGroups);
 			
@@ -206,16 +198,18 @@ implements SessionBean
 	 */
 	public Collection getTopLevelScriptRegistryItems (
 			String organisationID,
-			String[] fetchGroups
+			String[] fetchGroups, int maxFetchDepth
 		)
 	throws ModuleException
 	{
 		PersistenceManager pm;
 		pm = getPersistenceManager();
 		try {
-			Collection topLevelItems = ScriptRegistryItem.getTopScriptRegistryItems(pm, organisationID);
+			pm.getFetchPlan().setMaxFetchDepth(maxFetchDepth);
 			if (fetchGroups != null)
 				pm.getFetchPlan().setGroups(fetchGroups);
+
+			Collection topLevelItems = ScriptRegistryItem.getTopScriptRegistryItems(pm, organisationID);
 			Collection result = (Collection) pm.detachCopyAll(topLevelItems);
 			return result;
 		} finally {
@@ -259,14 +253,14 @@ implements SessionBean
 	public ScriptRegistryItem storeRegistryItem (
 			ScriptRegistryItem reportRegistryItem,
 			boolean get,
-			String[] fetchGroups
+			String[] fetchGroups, int maxFetchDepth
 		)
 	throws ModuleException
 	{
 		PersistenceManager pm;
 		pm = getPersistenceManager();
 		try {
-			return (ScriptRegistryItem)NLJDOHelper.storeJDO(pm, reportRegistryItem, get, fetchGroups);
+			return (ScriptRegistryItem)NLJDOHelper.storeJDO(pm, reportRegistryItem, get, fetchGroups, maxFetchDepth);
 		} finally {
 			pm.close();
 		}
@@ -284,13 +278,14 @@ implements SessionBean
 	 */
 	public Collection<ScriptParameterSet> getScriptParameterSets(
 			String organisationID, 
-			String[] fetchGroups
+			String[] fetchGroups, int maxFetchDepth
 		)
 	throws ModuleException
 	{
 		PersistenceManager pm;
 		pm = getPersistenceManager();
 		try {
+			pm.getFetchPlan().setMaxFetchDepth(maxFetchDepth);
 			if (fetchGroups != null)
 				pm.getFetchPlan().setGroups(fetchGroups);
 			Collection paramSets = ScriptParameterSet.getParameterSetsByOrganisation(pm, organisationID);
@@ -315,17 +310,46 @@ implements SessionBean
 	 */
 	public ScriptParameterSet getScriptParameterSet(
 			ScriptParameterSetID scriptParameterSetID, 
-			String[] fetchGroups
+			String[] fetchGroups, int maxFetchDepth
 		)
 	throws ModuleException
 	{
 		PersistenceManager pm;
 		pm = getPersistenceManager();
 		try {
+			pm.getFetchPlan().setMaxFetchDepth(maxFetchDepth);
 			if (fetchGroups != null)
 				pm.getFetchPlan().setGroups(fetchGroups);
 			ScriptParameterSet parameterSet = (ScriptParameterSet)pm.getObjectById(scriptParameterSetID);
 			return (ScriptParameterSet)pm.detachCopy(parameterSet);
+		} finally {
+			pm.close();
+		}
+	}
+	
+	
+	/**
+	 * @throws ModuleException
+	 *
+	 * @ejb.interface-method
+	 * @ejb.permission role-name="_Guest_"
+	 * @ejb.transaction type="Required"
+	 */
+	public ScriptParameterSet createParameterSet (I18nText name, String[] fetchGroups, int maxFetchDepth)
+	throws ModuleException
+	{
+		PersistenceManager pm;
+		pm = getPersistenceManager();
+		try {
+			ScriptRegistry registry = ScriptRegistry.getScriptRegistry(pm);
+			long setID = registry.createScriptParameterSetID();
+			ScriptParameterSet set = new ScriptParameterSet(getOrganisationID(), setID);
+			set.getName().copyFrom(name);
+			pm.getFetchPlan().setMaxFetchDepth(maxFetchDepth);
+			if (fetchGroups != null)
+				pm.getFetchPlan().setGroups(fetchGroups);
+			pm.makePersistent(set);
+			return (ScriptParameterSet)pm.detachCopy(set);
 		} finally {
 			pm.close();
 		}
@@ -341,14 +365,14 @@ implements SessionBean
 	public ScriptParameterSet storeParameterSet (
 			ScriptParameterSet scriptParameterSet,
 			boolean get,
-			String[] fetchGroups
+			String[] fetchGroups, int maxFetchDepth
 		)
 	throws ModuleException
 	{
 		PersistenceManager pm;
 		pm = getPersistenceManager();
 		try {
-			return (ScriptParameterSet)NLJDOHelper.storeJDO(pm, scriptParameterSet, get, fetchGroups);
+			return (ScriptParameterSet)NLJDOHelper.storeJDO(pm, scriptParameterSet, get, fetchGroups, maxFetchDepth);
 		} finally {
 			pm.close();
 		}

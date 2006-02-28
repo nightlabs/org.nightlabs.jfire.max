@@ -205,8 +205,12 @@ import javax.jdo.listener.StoreCallback;
 					parameter.setScriptParameterSetID(scriptParameterSetID);
 			}
 		}
-		
-		// TODO: trigger change event ??
+
+		ScriptParameterSetChangeEvent.addChangeEventToController(
+				pm,
+				ScriptParameterSetChangeEvent.EVENT_TYPE_SET_ADDED,
+				this
+			);		
 	}
 
 	/**

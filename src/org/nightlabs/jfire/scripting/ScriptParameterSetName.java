@@ -45,7 +45,7 @@ import org.nightlabs.i18n.I18nText;
  *
  * @jdo.create-objectid-class field-order="organisationID, scriptParameterSetID"
  *
- * @jdo.fetch-group name="ScriptRegistryItem.name" fields="scriptRegistryItem, names"
+ * @jdo.fetch-group name="ScriptParameterSet.name" fields="scriptParameterSet, names"
  */
 public class ScriptParameterSetName
 extends I18nText

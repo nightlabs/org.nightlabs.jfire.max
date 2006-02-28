@@ -60,7 +60,7 @@ public class LegalEntitySearchFilter extends PersonSearchFilter {
 		filter.append(PERSON_VARNAME+" == this.person");
 	}
 	
-	protected Class getExtendClass() {
+	protected Class getExtentClass() {
 		return LegalEntity.class;
 	}
 }

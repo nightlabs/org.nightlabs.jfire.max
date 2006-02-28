@@ -52,7 +52,7 @@ public class AccountSearchFilter extends SearchFilter {
 		super(SearchFilter.CONJUNCTION_DEFAULT);
 	}
 
-	protected Class getExtendClass() {
+	protected Class getExtentClass() {
 		return Account.class;
 	}
 
@@ -64,7 +64,7 @@ public class AccountSearchFilter extends SearchFilter {
 		params.append("java.lang.String accountCurrencyID, ");
 		params.append("java.lang.String paramNameFilter");
 	
-		vars.append("java.lang.String nameFilterVar");
+//		vars.append("java.lang.String nameFilterVar");
 		
 		if (owner != null) {
 			paramMap.put("ownerOrganisationID", owner.organisationID);
@@ -98,6 +98,7 @@ public class AccountSearchFilter extends SearchFilter {
 		
 		paramMap.put("paramNameFilter", nameFilter);
 		if (nameFilter != null) {
+			vars.append("java.lang.String nameFilterVar");
 			if (filter.length() > 0)
 				filter.append(" && ");
 			filter.append("(this.name.names.containsValue(nameFilterVar) && nameFilterVar.toLowerCase().indexOf(paramNameFilter.toLowerCase())>=0)");

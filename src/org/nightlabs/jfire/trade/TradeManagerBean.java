@@ -124,7 +124,7 @@ implements SessionBean
 	 **/
 	public Order createOrder(
 			AnchorID customerID, String currencyID,
-			SegmentTypeID[] segmentTypeIDs, String[] fetchGroups)
+			SegmentTypeID[] segmentTypeIDs, String[] fetchGroups, int maxFetchDepth)
 	throws ModuleException
 	{
 		PersistenceManager pm = getPersistenceManager();
@@ -151,6 +151,7 @@ implements SessionBean
 				}
 			} // if (segmentTypeIDs != null) {
 
+			pm.getFetchPlan().setMaxFetchDepth(maxFetchDepth);
 			if (fetchGroups != null)
 				pm.getFetchPlan().setGroups(fetchGroups);
 
@@ -171,7 +172,7 @@ implements SessionBean
 	 * @ejb.permission role-name="TradeManager-write"
 	 * @ejb.transaction type = "Required"
 	 **/
-	public Order createOrder(String currencyID, String[] fetchGroups)
+	public Order createOrder(String currencyID, String[] fetchGroups, int maxFetchDepth)
 		throws ModuleException
 	{
 		PersistenceManager pm = getPersistenceManager();
@@ -187,6 +188,7 @@ implements SessionBean
 			// TODO: create foreign order ...really? Isn't that todo garbage?
 			Order order = trader.createOrder(trader.getMandator(), customer, currency);
 
+			pm.getFetchPlan().setMaxFetchDepth(maxFetchDepth);
 			if (fetchGroups != null)
 				pm.getFetchPlan().setGroups(fetchGroups);
 
@@ -206,7 +208,7 @@ implements SessionBean
 	 * @ejb.permission role-name="TradeManager-write"
 	 * @ejb.transaction type = "Required"
 	 **/
-	public Offer createOffer(OrderID orderID, String[] fetchGroups)
+	public Offer createOffer(OrderID orderID, String[] fetchGroups, int maxFetchDepth)
 	throws ModuleException
 	{
 		PersistenceManager pm = getPersistenceManager();
@@ -215,6 +217,7 @@ implements SessionBean
 			pm.getExtent(Order.class);
 			Offer offer = trader.createOffer(User.getUser(pm, getPrincipal()), (Order) pm.getObjectById(orderID, true));
 
+			pm.getFetchPlan().setMaxFetchDepth(maxFetchDepth);
 			if (fetchGroups != null)
 				pm.getFetchPlan().setGroups(fetchGroups);
 
@@ -231,15 +234,18 @@ implements SessionBean
 	 * @ejb.permission role-name="TradeManager-write"
 	 * @ejb.transaction type = "Required"
 	 **/
-	public Offer finalizeOffer(OfferID offerID, boolean get, String[] fetchGroups)
+	public Offer finalizeOffer(OfferID offerID, boolean get, String[] fetchGroups, int maxFetchDepth)
 	throws ModuleException
 	{
 		PersistenceManager pm = getPersistenceManager();
 		try {
 			pm.getExtent(Offer.class);
 
-			if (get && fetchGroups != null)
-				pm.getFetchPlan().setGroups(fetchGroups);
+			if (get) {
+				pm.getFetchPlan().setMaxFetchDepth(maxFetchDepth);
+				if (fetchGroups != null)
+					pm.getFetchPlan().setGroups(fetchGroups);
+			}
 
 			Offer offer = (Offer) pm.getObjectById(offerID);
 			Trader.getTrader(pm).finalizeOffer(User.getUser(pm, getPrincipal()), offer);
@@ -260,15 +266,18 @@ implements SessionBean
 	 * @ejb.permission role-name="TradeManager-write"
 	 * @ejb.transaction type = "Required"
 	 **/
-	public Offer acceptOffer(OfferID offerID, boolean get, String[] fetchGroups)
+	public Offer acceptOffer(OfferID offerID, boolean get, String[] fetchGroups, int maxFetchDepth)
 	throws ModuleException
 	{
 		PersistenceManager pm = getPersistenceManager();
 		try {
 			pm.getExtent(Offer.class);
 
-			if (get && fetchGroups != null)
-				pm.getFetchPlan().setGroups(fetchGroups);
+			if (get) {
+				pm.getFetchPlan().setMaxFetchDepth(maxFetchDepth);
+				if (fetchGroups != null)
+					pm.getFetchPlan().setGroups(fetchGroups);
+			}
 
 			Offer offer = (Offer) pm.getObjectById(offerID);
 			Trader.getTrader(pm).acceptOffer(User.getUser(pm, getPrincipal()), offer);
@@ -289,15 +298,18 @@ implements SessionBean
 	 * @ejb.permission role-name="TradeManager-write"
 	 * @ejb.transaction type = "Required"
 	 **/
-	public Offer rejectOffer(OfferID offerID, boolean get, String[] fetchGroups)
+	public Offer rejectOffer(OfferID offerID, boolean get, String[] fetchGroups, int maxFetchDepth)
 	throws ModuleException
 	{
 		PersistenceManager pm = getPersistenceManager();
 		try {
 			pm.getExtent(Offer.class);
 
-			if (get && fetchGroups != null)
-				pm.getFetchPlan().setGroups(fetchGroups);
+			if (get) {
+				pm.getFetchPlan().setMaxFetchDepth(maxFetchDepth);
+				if (fetchGroups != null)
+					pm.getFetchPlan().setGroups(fetchGroups);
+			}
 
 			Offer offer = (Offer) pm.getObjectById(offerID);
 			Trader.getTrader(pm).rejectOffer(User.getUser(pm, getPrincipal()), offer);
@@ -318,15 +330,18 @@ implements SessionBean
 	 * @ejb.permission role-name="TradeManager-write"
 	 * @ejb.transaction type = "Required"
 	 **/
-	public Offer confirmOffer(OfferID offerID, boolean get, String[] fetchGroups)
+	public Offer confirmOffer(OfferID offerID, boolean get, String[] fetchGroups, int maxFetchDepth)
 	throws ModuleException
 	{
 		PersistenceManager pm = getPersistenceManager();
 		try {
 			pm.getExtent(Offer.class);
 
-			if (get && fetchGroups != null)
-				pm.getFetchPlan().setGroups(fetchGroups);
+			if (get) {
+				pm.getFetchPlan().setMaxFetchDepth(maxFetchDepth);
+				if (fetchGroups != null)
+					pm.getFetchPlan().setGroups(fetchGroups);
+			}
 
 			Offer offer = (Offer) pm.getObjectById(offerID);
 			Trader.getTrader(pm).confirmOffer(User.getUser(pm, getPrincipal()), offer);
@@ -347,7 +362,7 @@ implements SessionBean
 	 * @ejb.permission role-name="TradeManager-read"
 	 * @ejb.transaction type = "Required"
 	 **/
-	public List getNonFinalizedOffers(OrderID orderID, String[] fetchGroups)
+	public List getNonFinalizedOffers(OrderID orderID, String[] fetchGroups, int maxFetchDepth)
 	throws ModuleException
 	{
 		PersistenceManager pm = getPersistenceManager();
@@ -355,6 +370,7 @@ implements SessionBean
 			pm.getExtent(Order.class);
 			Order order = (Order) pm.getObjectById(orderID);
 
+			pm.getFetchPlan().setMaxFetchDepth(maxFetchDepth);
 			if (fetchGroups != null)
 				pm.getFetchPlan().setGroups(fetchGroups);
 
@@ -382,7 +398,7 @@ implements SessionBean
 	 * @ejb.permission role-name="TradeManager-write"
 	 * @ejb.transaction type = "Required"
 	 **/
-	public Collection reverseArticles(OfferID offerID, Collection reversedArticleIDs, boolean get, String[] fetchGroups)
+	public Collection reverseArticles(OfferID offerID, Collection reversedArticleIDs, boolean get, String[] fetchGroups, int maxFetchDepth)
 	throws ModuleException
 	{
 		PersistenceManager pm = getPersistenceManager();
@@ -420,6 +436,7 @@ implements SessionBean
 			if (!get)
 				return null;
 
+			pm.getFetchPlan().setMaxFetchDepth(maxFetchDepth);
 			if (fetchGroups != null)
 				pm.getFetchPlan().setGroups(fetchGroups);
 
@@ -452,7 +469,7 @@ implements SessionBean
 	 * @ejb.permission role-name="TradeManager-write"
 	 * @ejb.transaction type = "Required"
 	 **/
-	public Offer createReverseOffer(Collection reversedArticleIDs, boolean get, String[] fetchGroups)
+	public Offer createReverseOffer(Collection reversedArticleIDs, boolean get, String[] fetchGroups, int maxFetchDepth)
 	throws ModuleException
 	{
 		PersistenceManager pm = getPersistenceManager();
@@ -489,6 +506,7 @@ implements SessionBean
 			if (!get)
 				return null;
 
+			pm.getFetchPlan().setMaxFetchDepth(maxFetchDepth);
 			if (fetchGroups != null)
 				pm.getFetchPlan().setGroups(fetchGroups);
 
@@ -514,7 +532,7 @@ implements SessionBean
 //	 * @ejb.transaction type = "Required"
 //	 **/
 //	public Article reverseArticle(
-//			OfferID offerID, ArticleID reversedArticleID, boolean get, String[] fetchGroups)
+//			OfferID offerID, ArticleID reversedArticleID, boolean get, String[] fetchGroups, int maxFetchDepth)
 //	throws ModuleException
 //	{
 //		PersistenceManager pm = getPersistenceManager();
@@ -548,11 +566,12 @@ implements SessionBean
 	 * @ejb.permission role-name="_Guest_"
 	 * @ejb.transaction type = "Required"
 	 */
-	public LegalEntity getAnonymousCustomer(String[] fetchGroups)
+	public LegalEntity getAnonymousCustomer(String[] fetchGroups, int maxFetchDepth)
 	throws ModuleException
 	{
 		PersistenceManager pm = getPersistenceManager();
 		try {
+			pm.getFetchPlan().setMaxFetchDepth(maxFetchDepth);
 			if (fetchGroups != null)
 				pm.getFetchPlan().setGroups(fetchGroups);
 
@@ -572,11 +591,12 @@ implements SessionBean
 	 * @ejb.transaction type = "Required"
 	 */
 	public OrganisationLegalEntity getOrganisationLegalEntity(
-			String organisationID, boolean throwExceptionIfNotExistent, String[] fetchGroups)
+			String organisationID, boolean throwExceptionIfNotExistent, String[] fetchGroups, int maxFetchDepth)
 	throws ModuleException
 	{
 		PersistenceManager pm = getPersistenceManager();
 		try {
+			pm.getFetchPlan().setMaxFetchDepth(maxFetchDepth);
 			if (fetchGroups != null)
 				pm.getFetchPlan().setGroups(fetchGroups);
 
@@ -603,11 +623,12 @@ implements SessionBean
 	 * @ejb.permission role-name="_Guest_"
 	 * @ejb.transaction type = "Required"
 	 */
-	public List getOrders(AnchorID vendorID, AnchorID customerID, long rangeBeginIdx, long rangeEndIdx, String[] fetchGroups)
+	public List getOrders(AnchorID vendorID, AnchorID customerID, long rangeBeginIdx, long rangeEndIdx, String[] fetchGroups, int maxFetchDepth)
 	throws ModuleException
 	{
 		PersistenceManager pm = getPersistenceManager();
 		try {
+			pm.getFetchPlan().setMaxFetchDepth(maxFetchDepth);
 			if (fetchGroups != null)
 				pm.getFetchPlan().setGroups(fetchGroups);
 			return (List) pm.detachCopyAll(Order.getOrders(pm, vendorID, customerID, rangeBeginIdx, rangeEndIdx));
@@ -628,12 +649,13 @@ implements SessionBean
 	 * @ejb.permission role-name="_Guest_"
 	 * @ejb.transaction type = "Required"
 	 */ 
-	public LegalEntity storePersonAsLegalEntity(Person person, boolean get, String[] fetchGroups)
+	public LegalEntity storePersonAsLegalEntity(Person person, boolean get, String[] fetchGroups, int maxFetchDepth)
 	throws ModuleException
 	{
 		
 		PersistenceManager pm = getPersistenceManager();
 		try {
+			pm.getFetchPlan().setMaxFetchDepth(maxFetchDepth);
 			if (fetchGroups != null)
 				pm.getFetchPlan().setGroups(fetchGroups);
 			Trader trader = Trader.getTrader(pm);
@@ -657,12 +679,12 @@ implements SessionBean
 	 * @return The stored LegalEntity or null
 	 * @throws ModuleException
 	 */
-	public LegalEntity storeLegalEntity(LegalEntity legalEntity, boolean get, String[] fetchGroups)
+	public LegalEntity storeLegalEntity(LegalEntity legalEntity, boolean get, String[] fetchGroups, int maxFetchDepth)
 	throws ModuleException
 	{
 		PersistenceManager pm = getPersistenceManager();
 		try {
-			return (LegalEntity)NLJDOHelper.storeJDO(pm, legalEntity, get, fetchGroups);
+			return (LegalEntity)NLJDOHelper.storeJDO(pm, legalEntity, get, fetchGroups, maxFetchDepth);
 		} finally {
 			pm.close();
 		}
@@ -673,11 +695,12 @@ implements SessionBean
 	 * @ejb.permission role-name="_Guest_"
 	 * @ejb.transaction type = "Required"
 	 */ 
-	public Order getOrder(OrderID orderID, String[] fetchGroups)
+	public Order getOrder(OrderID orderID, String[] fetchGroups, int maxFetchDepth)
 	throws ModuleException
 	{
 		PersistenceManager pm = getPersistenceManager();
 		try {
+			pm.getFetchPlan().setMaxFetchDepth(maxFetchDepth);
 			if (fetchGroups != null)
 				pm.getFetchPlan().setGroups(fetchGroups);
 
@@ -692,11 +715,12 @@ implements SessionBean
 	 * @ejb.permission role-name="_Guest_"
 	 * @ejb.transaction type = "Required"
 	 */ 
-	public LegalEntity getLegalEntity(AnchorID anchorID, String[] fetchGroups)
+	public LegalEntity getLegalEntity(AnchorID anchorID, String[] fetchGroups, int maxFetchDepth)
 	throws ModuleException
 	{
 		PersistenceManager pm = getPersistenceManager();
 		try {
+			pm.getFetchPlan().setMaxFetchDepth(maxFetchDepth);
 			if (fetchGroups != null)
 				pm.getFetchPlan().setGroups(fetchGroups);
 
@@ -711,12 +735,13 @@ implements SessionBean
 	 * @ejb.permission role-name="_Guest_"
 	 * @ejb.transaction type = "Required"
 	 */ 
-	public Collection getLegalEntities(Object[] leAnchorIDs, String[] fetchGroups)
+	public Collection getLegalEntities(Object[] leAnchorIDs, String[] fetchGroups, int maxFetchDepth)
 	throws ModuleException
 	{
 		PersistenceManager pm = getPersistenceManager();
 		try {
 			Collection les = new LinkedList();
+			pm.getFetchPlan().setMaxFetchDepth(maxFetchDepth);
 			if (fetchGroups != null)
 				pm.getFetchPlan().setGroups(fetchGroups);
 			
@@ -742,11 +767,12 @@ implements SessionBean
 	 * @ejb.permission role-name="_Guest_"
 	 * @ejb.transaction type = "Required"
 	 */ 
-	public Offer getOffer(OfferID offerID, String[] fetchGroups)
+	public Offer getOffer(OfferID offerID, String[] fetchGroups, int maxFetchDepth)
 	throws ModuleException
 	{
 		PersistenceManager pm = getPersistenceManager();
 		try {
+			pm.getFetchPlan().setMaxFetchDepth(maxFetchDepth);
 			if (fetchGroups != null)
 				pm.getFetchPlan().setGroups(fetchGroups);
 
@@ -762,11 +788,12 @@ implements SessionBean
 	 * @ejb.permission role-name="_Guest_"
 	 * @ejb.transaction type = "Required"
 	 */ 
-	public Article getArticle(ArticleID articleID, String[] fetchGroups)
+	public Article getArticle(ArticleID articleID, String[] fetchGroups, int maxFetchDepth)
 	throws ModuleException
 	{
 		PersistenceManager pm = getPersistenceManager();
 		try {
+			pm.getFetchPlan().setMaxFetchDepth(maxFetchDepth);
 			if (fetchGroups != null)
 				pm.getFetchPlan().setGroups(fetchGroups);
 
@@ -785,11 +812,12 @@ implements SessionBean
 	 * @ejb.permission role-name="_Guest_"
 	 * @ejb.transaction type = "Required"
 	 */ 
-	public Collection getArticles(Collection articleIDs, String[] fetchGroups)
+	public Collection getArticles(Collection articleIDs, String[] fetchGroups, int maxFetchDepth)
 	throws ModuleException
 	{
 		PersistenceManager pm = getPersistenceManager();
 		try {
+			pm.getFetchPlan().setMaxFetchDepth(maxFetchDepth);
 			if (fetchGroups != null)
 				pm.getFetchPlan().setGroups(fetchGroups);
 
@@ -828,7 +856,7 @@ implements SessionBean
 	 * @ejb.transaction type = "Required"
 	 **/
 	public Segment createSegment(
-			OrderID orderID, SegmentTypeID segmentTypeID, String[] fetchGroups)
+			OrderID orderID, SegmentTypeID segmentTypeID, String[] fetchGroups, int maxFetchDepth)
 	throws ModuleException
 	{
 		PersistenceManager pm = getPersistenceManager();
@@ -845,6 +873,7 @@ implements SessionBean
 			Trader trader = Trader.getTrader(pm);
 			Segment segment = trader.createSegment(order, segmentType);
 
+			pm.getFetchPlan().setMaxFetchDepth(maxFetchDepth);
 			if (fetchGroups != null)
 				pm.getFetchPlan().setGroups(fetchGroups);
 
@@ -900,7 +929,7 @@ implements SessionBean
 	 * @ejb.transaction type = "Required"
 	 * @ejb.permission role-name="_Guest_"
 	 */
-	public Collection releaseArticles(Collection articleIDs, boolean synchronously, boolean get, String[] fetchGroups)
+	public Collection releaseArticles(Collection articleIDs, boolean synchronously, boolean get, String[] fetchGroups, int maxFetchDepth)
 		throws ModuleException
 	{
 		PersistenceManager pm = getPersistenceManager();
@@ -913,6 +942,7 @@ implements SessionBean
 			if (!get)
 				return null;
 
+			pm.getFetchPlan().setMaxFetchDepth(maxFetchDepth);
 			if (fetchGroups != null)
 				pm.getFetchPlan().setGroups(fetchGroups);
 

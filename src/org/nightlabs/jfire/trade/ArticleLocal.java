@@ -160,10 +160,10 @@ implements Serializable, DetachCallback
 	public void jdoPreDetach()
 	{
 	}
-	public void jdoPostDetach(Object _detached)
+	public void jdoPostDetach(Object _attached)
 	{
-		ArticleLocal attached = this;
-		ArticleLocal detached = (ArticleLocal)_detached;
+		ArticleLocal attached = (ArticleLocal)_attached;
+		ArticleLocal detached = this;
 
 		Collection fetchGroups = attached.getPersistenceManager().getFetchPlan().getGroups();
 

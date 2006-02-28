@@ -122,12 +122,12 @@ implements SessionBean
 	 * @ejb.transaction type = "Required"
 	 * @ejb.permission role-name="_Guest_"
 	 */
-	public TariffPriceConfig storePriceConfig(TariffPriceConfig priceConfig, boolean get, String[] fetchGroups)
+	public TariffPriceConfig storePriceConfig(TariffPriceConfig priceConfig, boolean get, String[] fetchGroups, int maxFetchDepth)
 	throws ModuleException
 	{
 		PersistenceManager pm = getPersistenceManager();
 		try {
-			return (TariffPriceConfig) NLJDOHelper.storeJDO(pm, priceConfig, get, fetchGroups);
+			return (TariffPriceConfig) NLJDOHelper.storeJDO(pm, priceConfig, get, fetchGroups, maxFetchDepth);
 		} finally {
 			pm.close();
 		}

@@ -144,7 +144,7 @@ implements SessionBean
 	 */
 	public PaymentResult payBegin_internal(
 			PaymentDataID paymentDataID,
-			String[] fetchGroups)
+			String[] fetchGroups, int maxFetchDepth)
 	throws ModuleException
 	{
 		PersistenceManager pm = getPersistenceManager();
@@ -181,10 +181,12 @@ implements SessionBean
 					user, paymentData);
 
 			if (!JDOHelper.isPersistent(payBeginServerResult))
-				pm.makePersistent(payBeginServerResult);
+				payBeginServerResult = (PaymentResult) pm.makePersistent(payBeginServerResult);
 			paymentData.getPayment().setPayBeginServerResult(payBeginServerResult);
-			
-			pm.getFetchPlan().setGroups(fetchGroups);
+
+			pm.getFetchPlan().setMaxFetchDepth(maxFetchDepth);
+			if (fetchGroups != null)
+				pm.getFetchPlan().setGroups(fetchGroups);
 
 			PaymentResult payBeginServerResult_detached = (PaymentResult) pm.detachCopy(payBeginServerResult);
 //			payBeginServerResult_detached.setError(payBeginServerResult.getError());
@@ -221,7 +223,7 @@ implements SessionBean
 	 * @ejb.transaction type = "RequiresNew"
 	 * @ejb.permission role-name="_Guest_"
 	 */
-	public PaymentResult payDoWork_internal(PaymentID paymentID, String[] fetchGroups)
+	public PaymentResult payDoWork_internal(PaymentID paymentID, String[] fetchGroups, int maxFetchDepth)
 	throws ModuleException
 	{
 		PersistenceManager pm = getPersistenceManager();
@@ -241,7 +243,10 @@ implements SessionBean
 				pm.makePersistent(payDoWorkServerResult);
 			paymentData.getPayment().setPayDoWorkServerResult(payDoWorkServerResult);
 
-			pm.getFetchPlan().setGroups(fetchGroups);
+			pm.getFetchPlan().setMaxFetchDepth(maxFetchDepth);
+			if (fetchGroups != null)
+				pm.getFetchPlan().setGroups(fetchGroups);
+
 			PaymentResult payDoWorkServerResult_detached = (PaymentResult) pm.detachCopy(payDoWorkServerResult);
 //			payDoWorkServerResult_detached.setError(payDoWorkServerResult.getError());
 			return payDoWorkServerResult_detached;
@@ -256,7 +261,7 @@ implements SessionBean
 	 * @ejb.transaction type = "RequiresNew"
 	 * @ejb.permission role-name="_Guest_"
 	 */
-	public PaymentResult payEnd_internal(PaymentID paymentID, String[] fetchGroups)
+	public PaymentResult payEnd_internal(PaymentID paymentID, String[] fetchGroups, int maxFetchDepth)
 	throws ModuleException
 	{
 		PersistenceManager pm = getPersistenceManager();
@@ -282,7 +287,10 @@ implements SessionBean
 			// get InvoiceIDs
 			Collection invoiceIDs = paymentData.getPayment().getInvoiceIDs();
 
-			pm.getFetchPlan().setGroups(fetchGroups);
+			pm.getFetchPlan().setMaxFetchDepth(maxFetchDepth);
+			if (fetchGroups != null)
+				pm.getFetchPlan().setGroups(fetchGroups);
+
 			PaymentResult payEndServerResult_detached = (PaymentResult) pm.detachCopy(payEndServerResult);
 //			payBeginServerResult_detached.setError(payBeginServerResult.getError());
 
@@ -405,7 +413,7 @@ implements SessionBean
 	 */
 	public PaymentResult payBegin_storePayBeginServerResult(
 			PaymentID paymentID, PaymentResult payBeginServerResult,
-			boolean get, String[] fetchGroups)
+			boolean get, String[] fetchGroups, int maxFetchDepth)
 	throws ModuleException
 	{
 		PersistenceManager pm = getPersistenceManager();
@@ -427,6 +435,7 @@ implements SessionBean
 			if (!get)
 				return null;
 
+			pm.getFetchPlan().setMaxFetchDepth(maxFetchDepth);
 			if (fetchGroups != null)
 				pm.getFetchPlan().setGroups(fetchGroups);
 
@@ -443,7 +452,7 @@ implements SessionBean
 	 */
 	public PaymentResult payDoWork_storePayDoWorkServerResult(
 			PaymentID paymentID, PaymentResult payDoWorkServerResult,
-			boolean get, String[] fetchGroups)
+			boolean get, String[] fetchGroups, int maxFetchDepth)
 	throws ModuleException
 	{
 		PersistenceManager pm = getPersistenceManager();
@@ -461,6 +470,7 @@ implements SessionBean
 			if (!get)
 				return null;
 
+			pm.getFetchPlan().setMaxFetchDepth(maxFetchDepth);
 			if (fetchGroups != null)
 				pm.getFetchPlan().setGroups(fetchGroups);
 
@@ -477,7 +487,7 @@ implements SessionBean
 	 */
 	public PaymentResult payEnd_storePayEndServerResult(
 			PaymentID paymentID, PaymentResult payEndServerResult,
-			boolean get, String[] fetchGroups)
+			boolean get, String[] fetchGroups, int maxFetchDepth)
 	throws ModuleException
 	{
 		PersistenceManager pm = getPersistenceManager();
@@ -495,6 +505,7 @@ implements SessionBean
 			if (!get)
 				return null;
 
+			pm.getFetchPlan().setMaxFetchDepth(maxFetchDepth);
 			if (fetchGroups != null)
 				pm.getFetchPlan().setGroups(fetchGroups);
 

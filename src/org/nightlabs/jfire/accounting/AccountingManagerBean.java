@@ -392,14 +392,15 @@ public abstract class AccountingManagerBean
 	 * @ejb.transaction type = "Required"
 	 * @ejb.permission role-name="_Guest_"
 	 */
-	public Collection getTariffs(String[] fetchGroups)
+	public Collection getTariffs(String[] fetchGroups, int maxFetchDepth)
 		throws ModuleException
 	{
 		PersistenceManager pm = getPersistenceManager();
 		try {
 			FetchPlan fetchPlan = pm.getFetchPlan();
-			for (int i = 0; i < fetchGroups.length; ++i)
-				fetchPlan.addGroup(fetchGroups[i]);
+			fetchPlan.setMaxFetchDepth(maxFetchDepth);
+			if (fetchGroups != null)
+				fetchPlan.setGroups(fetchGroups);
 
 			Collection res = new ArrayList();
 			for (Iterator it = pm.getExtent(Tariff.class, true).iterator(); it.hasNext(); ) {
@@ -420,12 +421,12 @@ public abstract class AccountingManagerBean
 	 * @ejb.transaction type = "Required"
 	 * @ejb.permission role-name="_Guest_"
 	 */
-	public Tariff storeTariff(Tariff tariff, boolean get, String[] fetchGroups)
+	public Tariff storeTariff(Tariff tariff, boolean get, String[] fetchGroups, int maxFetchDepth)
 	throws ModuleException
 	{
 		PersistenceManager pm = getPersistenceManager();
 		try {
-			return (Tariff) NLJDOHelper.storeJDO(pm, tariff, get, fetchGroups);
+			return (Tariff) NLJDOHelper.storeJDO(pm, tariff, get, fetchGroups, maxFetchDepth);
 		} finally {
 			pm.close();
 		}
@@ -438,13 +439,14 @@ public abstract class AccountingManagerBean
 	 * @ejb.transaction type = "Required"
 	 * @ejb.permission role-name="_Guest_"
 	 */
-	public Collection getCustomerGroups(String[] fetchGroups)
+	public Collection getCustomerGroups(String[] fetchGroups, int maxFetchDepth)
 	throws ModuleException
 	{
 		PersistenceManager pm = getPersistenceManager();
 		try {
+			pm.getFetchPlan().setMaxFetchDepth(maxFetchDepth);
 			if (fetchGroups != null)
-				pm.getFetchPlan().setGroups(Utils.array2ArrayList(fetchGroups));
+				pm.getFetchPlan().setGroups(fetchGroups);
 			Query q = pm.newQuery(CustomerGroup.class);
 			return pm.detachCopyAll((Collection)q.execute());
 		} finally {
@@ -459,12 +461,12 @@ public abstract class AccountingManagerBean
 	 * @ejb.transaction type = "Required"
 	 * @ejb.permission role-name="_Guest_"
 	 */
-	public CustomerGroup storeCustomerGroup(CustomerGroup customerGroup, boolean get, String[] fetchGroups)
+	public CustomerGroup storeCustomerGroup(CustomerGroup customerGroup, boolean get, String[] fetchGroups, int maxFetchDepth)
 	throws ModuleException
 	{
 		PersistenceManager pm = getPersistenceManager();
 		try {
-			return (CustomerGroup) NLJDOHelper.storeJDO(pm, customerGroup, get, fetchGroups);
+			return (CustomerGroup) NLJDOHelper.storeJDO(pm, customerGroup, get, fetchGroups, maxFetchDepth);
 		} finally {
 			pm.close();
 		}
@@ -477,13 +479,15 @@ public abstract class AccountingManagerBean
 	 * @ejb.transaction type = "Required"
 	 * @ejb.permission role-name="_Guest_"
 	 */
-	public Collection getCurrencies(String[] fetchGroups)
+	public Collection getCurrencies(String[] fetchGroups, int maxFetchDepth)
 	throws ModuleException
 	{
 		PersistenceManager pm = getPersistenceManager();
 		try {
+			pm.getFetchPlan().setMaxFetchDepth(maxFetchDepth);
 			if (fetchGroups != null)
-				pm.getFetchPlan().setGroups(Utils.array2ArrayList(fetchGroups));
+				pm.getFetchPlan().setGroups(fetchGroups);
+
 			Query q = pm.newQuery(Currency.class);
 			return pm.detachCopyAll((Collection)q.execute());
 		} finally {
@@ -498,10 +502,10 @@ public abstract class AccountingManagerBean
 	 * @ejb.transaction type = "Required"
 	 * @ejb.permission role-name="_Guest_"
 	 */
-	public Account getAccount(AnchorID accountID, String[] fetchGroups) 
+	public Account getAccount(AnchorID accountID, String[] fetchGroups, int maxFetchDepth) 
 	throws ModuleException
 	{
-		return getAccount(Account.getPrimaryKey(accountID.organisationID, accountID.anchorTypeID, accountID.anchorID), fetchGroups);
+		return getAccount(Account.getPrimaryKey(accountID.organisationID, accountID.anchorTypeID, accountID.anchorID), fetchGroups, maxFetchDepth);
 	}
 
 		/**
@@ -511,14 +515,16 @@ public abstract class AccountingManagerBean
 	 * @ejb.transaction type = "Required"
 	 * @ejb.permission role-name="_Guest_"
 	 */
-	public Account getAccount(String accountPK, String[] fetchGroups) 
+	public Account getAccount(String accountPK, String[] fetchGroups, int maxFetchDepth) 
 	throws ModuleException
 	{
 		Account result = null;
 		PersistenceManager pm = getPersistenceManager();
 		try {
+			pm.getFetchPlan().setMaxFetchDepth(maxFetchDepth);
 			if (fetchGroups != null)
-				pm.getFetchPlan().setGroups(Utils.array2ArrayList(fetchGroups));
+				pm.getFetchPlan().setGroups(fetchGroups);
+
 			Query q = pm.newQuery(Account.class);
 			q.declareParameters("java.lang.String accountPK");
 			q.setFilter("this.primaryKey == accountPK");
@@ -539,11 +545,12 @@ public abstract class AccountingManagerBean
 	 * @ejb.transaction type = "Required"
 	 * @ejb.permission role-name="_Guest_"
 	 */
-	public Collection getAccounts(AccountSearchFilter searchFilter,  String[] fetchGroups)
+	public Collection getAccounts(AccountSearchFilter searchFilter,  String[] fetchGroups, int maxFetchDepth)
 	throws ModuleException
 	{
 		PersistenceManager pm = getPersistenceManager();
 		try {
+			pm.getFetchPlan().setMaxFetchDepth(maxFetchDepth);
 			if (fetchGroups != null)
 				pm.getFetchPlan().setGroups(fetchGroups);
 			
@@ -566,7 +573,7 @@ public abstract class AccountingManagerBean
 	 * @ejb.transaction type = "Required"
 	 * @ejb.permission role-name="_Guest_"
 	 */
-	public Account createMandatorAccount(String anchorID, String currencyID, boolean createShadowAccount, boolean get, String[] fetchGroups)
+	public Account createMandatorAccount(String anchorID, String currencyID, boolean createShadowAccount, boolean get, String[] fetchGroups, int maxFetchDepth)
 	throws ModuleException
 	{
 		PersistenceManager pm = getPersistenceManager();
@@ -580,8 +587,10 @@ public abstract class AccountingManagerBean
 			
 			Account newAccount = Accounting.getAccounting(pm).createMandatorAccount(anchorID, currency, createShadowAccount);
 			if (get) {
+				pm.getFetchPlan().setMaxFetchDepth(maxFetchDepth);
 				if (fetchGroups != null)
-					pm.getFetchPlan().setGroups(Utils.array2ArrayList(fetchGroups));
+					pm.getFetchPlan().setGroups(fetchGroups);
+
 				return (Account)pm.detachCopy(newAccount);
 			}
 			return null;			
@@ -597,7 +606,7 @@ public abstract class AccountingManagerBean
 	 * @ejb.transaction type = "Required"
 	 * @ejb.permission role-name="_Guest_"
 	 */
-	public Account storeAccount(Account account, boolean get, String[] fetchGroups)
+	public Account storeAccount(Account account, boolean get, String[] fetchGroups, int maxFetchDepth)
 	throws ModuleException
 	{
 		PersistenceManager pm = getPersistenceManager();
@@ -607,7 +616,7 @@ public abstract class AccountingManagerBean
 			if (!account.getOrganisationID().equals(getOrganisationID()))
 				throw new IllegalArgumentException("Given Account was created for a different organisation, can not store to this datastore!");
 			
-			Account result = (Account)NLJDOHelper.storeJDO(pm, account, get, fetchGroups);
+			Account result = (Account)NLJDOHelper.storeJDO(pm, account, get, fetchGroups, maxFetchDepth);
 			return result;
 		} finally {
 			pm.close();
@@ -767,11 +776,12 @@ public abstract class AccountingManagerBean
 	 * @ejb.transaction type = "Required"
 	 * @ejb.permission role-name="_Guest_"
 	 */
-	public Collection getLocalAccountantDelegates(Collection delegateIDs, String[] fetchGroups)
+	public Collection getLocalAccountantDelegates(Collection delegateIDs, String[] fetchGroups, int maxFetchDepth)
 	throws ModuleException
 	{
 		PersistenceManager pm = getPersistenceManager();
 		try {
+			pm.getFetchPlan().setMaxFetchDepth(maxFetchDepth);
 			if (fetchGroups != null)
 				pm.getFetchPlan().setGroups(fetchGroups);
 			
@@ -804,11 +814,12 @@ public abstract class AccountingManagerBean
 	 * @ejb.transaction type = "Required"
 	 * @ejb.permission role-name="_Guest_"
 	 */
-	public LocalAccountantDelegate getLocalAccountantDelegate(LocalAccountantDelegateID delegateID, String[] fetchGroups)
+	public LocalAccountantDelegate getLocalAccountantDelegate(LocalAccountantDelegateID delegateID, String[] fetchGroups, int maxFetchDepth)
 	throws ModuleException
 	{
 		PersistenceManager pm = getPersistenceManager();
 		try {
+			pm.getFetchPlan().setMaxFetchDepth(maxFetchDepth);
 			if (fetchGroups != null)
 				pm.getFetchPlan().setGroups(fetchGroups);
 			
@@ -835,13 +846,13 @@ public abstract class AccountingManagerBean
 	public LocalAccountantDelegate storeLocalAccountantDelegate(
 			LocalAccountantDelegate delegate, 
 			boolean get, 
-			String[] fetchGroups
+			String[] fetchGroups, int maxFetchDepth
 		)
 	throws ModuleException
 	{
 		PersistenceManager pm = getPersistenceManager();
 		try {
-			return (LocalAccountantDelegate)NLJDOHelper.storeJDO(pm, delegate, get, fetchGroups);
+			return (LocalAccountantDelegate)NLJDOHelper.storeJDO(pm, delegate, get, fetchGroups, maxFetchDepth);
 		} finally {
 			pm.close();
 		}
@@ -852,14 +863,14 @@ public abstract class AccountingManagerBean
 	 * @ejb.permission role-name="_Guest_"
 	 * @ejb.transaction type = "Required"
 	 */ 
-	public MoneyFlowMapping storeMoneyFlowMapping(MoneyFlowMapping mapping, boolean get, String[] fetchGroups)
+	public MoneyFlowMapping storeMoneyFlowMapping(MoneyFlowMapping mapping, boolean get, String[] fetchGroups, int maxFetchDepth)
 	throws ModuleException
 	{
 		PersistenceManager pm = getPersistenceManager();
 		try {
 			if (fetchGroups != null)
 				pm.getFetchPlan().setGroups(fetchGroups);
-			return (MoneyFlowMapping) NLJDOHelper.storeJDO(pm, mapping, get, fetchGroups);
+			return (MoneyFlowMapping) NLJDOHelper.storeJDO(pm, mapping, get, fetchGroups, maxFetchDepth);
 		} finally {
 			pm.close();
 		}
@@ -906,42 +917,51 @@ public abstract class AccountingManagerBean
 		}
 	}
 
-	/**
-	 * @throws ModuleException
-	 * @deprecated use {@link #getPriceFragmentTypeIDs(String[])} 
-	 * 
-	 * @ejb.interface-method
-	 * @ejb.transaction type = "Required"
-	 * @ejb.permission role-name="_Guest_"
-	 */
-	public Collection getPriceFragmentTypes(String[] fetchGroups)
-	throws ModuleException
-	{
-		PersistenceManager pm = getPersistenceManager();
-		try {
-			if (fetchGroups != null)
-				pm.getFetchPlan().setGroups(fetchGroups);
-			Query q = pm.newQuery(PriceFragmentType.class);
-			return pm.detachCopyAll((Collection)q.execute());
-		} finally {
-			pm.close();
-		}
-	}
+//	/**
+//	 * @throws ModuleException
+//	 * @deprecated use {@link #getPriceFragmentTypes(Collection, String[], int)} 
+//	 * 
+//	 * @ejb.interface-method
+//	 * @ejb.transaction type = "Required"
+//	 * @ejb.permission role-name="_Guest_"
+//	 */
+//	public Collection getPriceFragmentTypes(String[] fetchGroups, int maxFetchDepth)
+//	throws ModuleException
+//	{
+//		PersistenceManager pm = getPersistenceManager();
+//		try {
+//			pm.getFetchPlan().setMaxFetchDepth(maxFetchDepth);
+//			if (fetchGroups != null)
+//				pm.getFetchPlan().setGroups(fetchGroups);
+//			Query q = pm.newQuery(PriceFragmentType.class);
+//			return pm.detachCopyAll((Collection)q.execute());
+//		} finally {
+//			pm.close();
+//		}
+//	}
 
 	/**
+	 * @param priceFragmentTypeIDs Can be <code>null</code> in order to return ALL {@link PriceFragmentType}s or a collection of {@link PriceFragmentTypeID}s to return only a subset.
 	 * @throws ModuleException
 	 * 
 	 * @ejb.interface-method
 	 * @ejb.transaction type = "Required"
 	 * @ejb.permission role-name="_Guest_"
 	 */
-	public Collection getPriceFragmentTypes(Collection priceFragmentTypeIDs, String[] fetchGroups)
+	public Collection getPriceFragmentTypes(Collection priceFragmentTypeIDs, String[] fetchGroups, int maxFetchDepth)
 	throws ModuleException
 	{
 		PersistenceManager pm = getPersistenceManager();
 		try {
+			pm.getFetchPlan().setMaxFetchDepth(maxFetchDepth);
 			if (fetchGroups != null)
 				pm.getFetchPlan().setGroups(fetchGroups);
+
+			if (priceFragmentTypeIDs == null) {
+				Query q = pm.newQuery(PriceFragmentType.class);
+				return pm.detachCopyAll((Collection)q.execute());
+			}
+
 			Collection result = new LinkedList();
 			for (Iterator iter = priceFragmentTypeIDs.iterator(); iter.hasNext();) {
 				PriceFragmentTypeID priceFragmentTypeID = (PriceFragmentTypeID) iter.next();
@@ -988,13 +1008,15 @@ public abstract class AccountingManagerBean
 	 * @ejb.transaction type = "Required"
 	 * @ejb.permission role-name="_Guest_"
 	 */
-	public PriceFragmentType getPriceFragmentType(PriceFragmentTypeID priceFragmentTypeID, String[] fetchGroups)
+	public PriceFragmentType getPriceFragmentType(PriceFragmentTypeID priceFragmentTypeID, String[] fetchGroups, int maxFetchDepth)
 	throws ModuleException
 	{
 		PersistenceManager pm = getPersistenceManager();
 		try {
+			pm.getFetchPlan().setMaxFetchDepth(maxFetchDepth);
 			if (fetchGroups != null)
 				pm.getFetchPlan().setGroups(fetchGroups);
+
 			PriceFragmentType priceFragmentType = (PriceFragmentType)pm.getObjectById(priceFragmentTypeID);
 			return (PriceFragmentType)pm.detachCopy(priceFragmentType);
 		} finally {
@@ -1037,7 +1059,7 @@ public abstract class AccountingManagerBean
 	 */
 	public Invoice createInvoice(
 			Collection articleIDs,
-			boolean get, String[] fetchGroups)
+			boolean get, String[] fetchGroups, int maxFetchDepth)
 		throws ModuleException
 	{
 		PersistenceManager pm = getPersistenceManager();
@@ -1064,8 +1086,10 @@ public abstract class AccountingManagerBean
 			accounting.validateInvoice(invoice);
 
 			if (get) {
+				pm.getFetchPlan().setMaxFetchDepth(maxFetchDepth);
 				if (fetchGroups != null)
-					pm.getFetchPlan().setGroups(Utils.array2ArrayList(fetchGroups));
+					pm.getFetchPlan().setGroups(fetchGroups);
+
 				return (Invoice)pm.detachCopy(invoice);
 			}
 			return null;
@@ -1092,7 +1116,7 @@ public abstract class AccountingManagerBean
 	 */
 	public Invoice createInvoice(
 			ArticleContainerID articleContainerID,
-			boolean get, String[] fetchGroups)
+			boolean get, String[] fetchGroups, int maxFetchDepth)
 		throws ModuleException
 	{
 		PersistenceManager pm = getPersistenceManager();
@@ -1139,8 +1163,10 @@ public abstract class AccountingManagerBean
 			accounting.validateInvoice(invoice);
 
 			if (get) {
+				pm.getFetchPlan().setMaxFetchDepth(maxFetchDepth);
 				if (fetchGroups != null)
-					pm.getFetchPlan().setGroups(Utils.array2ArrayList(fetchGroups));
+					pm.getFetchPlan().setGroups(fetchGroups);
+
 				return (Invoice)pm.detachCopy(invoice);
 			}
 			return null;
@@ -1158,7 +1184,7 @@ public abstract class AccountingManagerBean
 	 */
 	public Invoice addArticlesToInvoice(
 			InvoiceID invoiceID, Collection articleIDs,
-			boolean validate, boolean get, String[] fetchGroups)
+			boolean validate, boolean get, String[] fetchGroups, int maxFetchDepth)
 		throws ModuleException
 	{
 		PersistenceManager pm = getPersistenceManager();
@@ -1181,6 +1207,7 @@ public abstract class AccountingManagerBean
 			if (!get)
 				return null;
 
+			pm.getFetchPlan().setMaxFetchDepth(maxFetchDepth);
 			if (fetchGroups != null)
 				pm.getFetchPlan().setGroups(fetchGroups);
 
@@ -1199,7 +1226,7 @@ public abstract class AccountingManagerBean
 	 */
 	public Invoice removeArticlesFromInvoice(
 			InvoiceID invoiceID, Collection articleIDs,
-			boolean validate, boolean get, String[] fetchGroups)
+			boolean validate, boolean get, String[] fetchGroups, int maxFetchDepth)
 		throws ModuleException
 	{
 		PersistenceManager pm = getPersistenceManager();
@@ -1222,6 +1249,7 @@ public abstract class AccountingManagerBean
 			if (validate)
 				accounting.validateInvoice(invoice);
 
+			pm.getFetchPlan().setMaxFetchDepth(maxFetchDepth);
 			if (fetchGroups != null)
 				pm.getFetchPlan().setGroups(fetchGroups);
 
@@ -1462,14 +1490,14 @@ public abstract class AccountingManagerBean
 
 		try {
 
-			return paymentHelperLocal.payBegin_internal(paymentDataID, fetchGroups);
+			return paymentHelperLocal.payBegin_internal(paymentDataID, fetchGroups, 0);
 
 		} catch (Throwable t) {
 			PaymentResult payBeginServerResult = new PaymentResult(getOrganisationID(), t);
 
 			try {
 				return paymentHelperLocal.payBegin_storePayBeginServerResult(
-						PaymentID.create(paymentDataID), payBeginServerResult, true, fetchGroups);
+						PaymentID.create(paymentDataID), payBeginServerResult, true, fetchGroups, 0);
 			} catch (ModuleException x) {
 				throw x;
 			} catch (RuntimeException x) {
@@ -1592,14 +1620,14 @@ public abstract class AccountingManagerBean
 
 		try {
 
-			return paymentHelperLocal.payDoWork_internal(paymentID, fetchGroups);
+			return paymentHelperLocal.payDoWork_internal(paymentID, fetchGroups, 0);
 
 		} catch (Throwable t) {
 			PaymentResult payDoWorkServerResult = new PaymentResult(getOrganisationID(), t);
 
 			try {
 				PaymentResult payDoWorkServerResult_detached = paymentHelperLocal.payDoWork_storePayDoWorkServerResult(
-						paymentID, payDoWorkServerResult, true, fetchGroups);
+						paymentID, payDoWorkServerResult, true, fetchGroups, 0);
 
 				return payDoWorkServerResult_detached;
 			} catch (ModuleException x) {
@@ -1723,14 +1751,14 @@ public abstract class AccountingManagerBean
 
 		try {
 
-			return paymentHelperLocal.payEnd_internal(paymentID, fetchGroups);
+			return paymentHelperLocal.payEnd_internal(paymentID, fetchGroups, 0);
 
 		} catch (Throwable t) {
 			PaymentResult payEndServerResult = new PaymentResult(getOrganisationID(), t);
 
 			try {
 				PaymentResult payEndServerResult_detached = paymentHelperLocal.payEnd_storePayEndServerResult(
-						paymentID, payEndServerResult, true, fetchGroups);
+						paymentID, payEndServerResult, true, fetchGroups, 0);
 
 				paymentHelperLocal.payRollback(paymentID);
 
@@ -1945,11 +1973,12 @@ public abstract class AccountingManagerBean
 	 * @ejb.permission role-name="_Guest_"
 	 * @ejb.transaction type = "Required"
 	 */ 
-	public Invoice getInvoice(InvoiceID invoiceID, String[] fetchGroups)
+	public Invoice getInvoice(InvoiceID invoiceID, String[] fetchGroups, int maxFetchDepth)
 	throws ModuleException
 	{
 		PersistenceManager pm = getPersistenceManager();
 		try {
+			pm.getFetchPlan().setMaxFetchDepth(maxFetchDepth);
 			if (fetchGroups != null)
 				pm.getFetchPlan().setGroups(fetchGroups);
 
@@ -1973,11 +2002,12 @@ public abstract class AccountingManagerBean
 	 * @ejb.permission role-name="_Guest_"
 	 * @ejb.transaction type = "Required"
 	 */
-	public List getInvoices(AnchorID vendorID, AnchorID customerID, long rangeBeginIdx, long rangeEndIdx, String[] fetchGroups)
+	public List getInvoices(AnchorID vendorID, AnchorID customerID, long rangeBeginIdx, long rangeEndIdx, String[] fetchGroups, int maxFetchDepth)
 	throws ModuleException
 	{
 		PersistenceManager pm = getPersistenceManager();
 		try {
+			pm.getFetchPlan().setMaxFetchDepth(maxFetchDepth);
 			if (fetchGroups != null)
 				pm.getFetchPlan().setGroups(fetchGroups);
 			return (List) pm.detachCopyAll(Invoice.getInvoices(pm, vendorID, customerID, rangeBeginIdx, rangeEndIdx));
@@ -1994,11 +2024,12 @@ public abstract class AccountingManagerBean
 	 * @ejb.permission role-name="_Guest_"
 	 * @ejb.transaction type = "Required"
 	 */
-	public List getNonFinalizedInvoices(AnchorID vendorID, AnchorID customerID, String[] fetchGroups)
+	public List getNonFinalizedInvoices(AnchorID vendorID, AnchorID customerID, String[] fetchGroups, int maxFetchDepth)
 	throws ModuleException
 	{
 		PersistenceManager pm = getPersistenceManager();
 		try {
+			pm.getFetchPlan().setMaxFetchDepth(maxFetchDepth);
 			if (fetchGroups != null)
 				pm.getFetchPlan().setGroups(fetchGroups);
 			return (List) pm.detachCopyAll(Invoice.getNonFinalizedInvoices(pm, vendorID, customerID));
@@ -2016,7 +2047,7 @@ public abstract class AccountingManagerBean
 //	 * @ejb.permission role-name="_Guest_"
 //	 * @ejb.transaction type = "Supports"
 //	 */
-//	public Collection getAvailableModeOfPaymentFlavoursForOneCustomer(AnchorID legalEntityID, String[] fetchGroups)
+//	public Collection getAvailableModeOfPaymentFlavoursForOneCustomer(AnchorID legalEntityID, String[] fetchGroups, int maxFetchDepth)
 //	throws ModuleException
 //	{
 //		PersistenceManager pm = getPersistenceManager();
@@ -2054,11 +2085,12 @@ public abstract class AccountingManagerBean
 	 * @ejb.transaction type = "Supports"
 	 */
 	public Collection getAvailableModeOfPaymentFlavoursForAllCustomerGroups(
-			Collection customerGroupIDs, byte mergeMode, String[] fetchGroups)
+			Collection customerGroupIDs, byte mergeMode, String[] fetchGroups, int maxFetchDepth)
 	throws ModuleException
 	{
 		PersistenceManager pm = getPersistenceManager();
 		try {
+			pm.getFetchPlan().setMaxFetchDepth(maxFetchDepth);
 			if (fetchGroups != null)
 				pm.getFetchPlan().setGroups(fetchGroups);
 
@@ -2079,11 +2111,12 @@ public abstract class AccountingManagerBean
 	 * @ejb.transaction type = "Supports"
 	 */
 	public Collection getServerPaymentProcessorsForOneModeOfPaymentFlavour(
-			ModeOfPaymentFlavourID modeOfPaymentFlavourID, String[] fetchGroups)
+			ModeOfPaymentFlavourID modeOfPaymentFlavourID, String[] fetchGroups, int maxFetchDepth)
 	throws ModuleException
 	{
 		PersistenceManager pm = getPersistenceManager();
 		try {
+			pm.getFetchPlan().setMaxFetchDepth(maxFetchDepth);
 			if (fetchGroups != null)
 				pm.getFetchPlan().setGroups(fetchGroups);
 
@@ -2101,11 +2134,12 @@ public abstract class AccountingManagerBean
 	 * @ejb.permission role-name="_Guest_"
 	 * @ejb.transaction type = "Supports"
 	 */
-	public Collection getAvailableModeOfPaymentFlavoursForOneCustomerGroup(CustomerGroupID customerGroupID, String[] fetchGroups)
+	public Collection getAvailableModeOfPaymentFlavoursForOneCustomerGroup(CustomerGroupID customerGroupID, String[] fetchGroups, int maxFetchDepth)
 	throws ModuleException
 	{
 		PersistenceManager pm = getPersistenceManager();
 		try {
+			pm.getFetchPlan().setMaxFetchDepth(maxFetchDepth);
 			if (fetchGroups != null)
 				pm.getFetchPlan().setGroups(fetchGroups);
 
@@ -2118,74 +2152,74 @@ public abstract class AccountingManagerBean
 		}
 	}
 
-	/**
-	 * @param productTypeID The object ID of the desired ProductType.
-	 * @param fetchGroups These fetch-groups are applied to the main
-	 *		ProductType which is specified by <tt>productTypeID</tt> and
-	 *		the {@link NestedProductType}s. They should NOT
-	 *		include anything within the price config! Unlike as usual, they do not
-	 *		replace the fetchGroups
-	 *		used per default by this method, but they are appended.
-	 *
-	 * @ejb.interface-method
-	 * @ejb.transaction type = "Required"
-	 * @ejb.permission role-name="_Guest_"
-	 */
-	public ProductType getProductTypeForPriceConfigEditing(
-			ProductTypeID productTypeID,
-			String[] fetchGroups)
-	throws ModuleException
-	{
-		PersistenceManager pm = getPersistenceManager();
-		try {
-			pm.getExtent(ProductType.class);
-
-			pm.getFetchPlan().setGroups(new String[] {
-					FetchPlan.DEFAULT,
-					ProductType.FETCH_GROUP_NESTED_PRODUCT_TYPES,
-					NestedProductType.FETCH_GROUP_INNER_PRODUCT_TYPE
-			});
-			if (fetchGroups != null) {
-				for (int i = 0; i < fetchGroups.length; ++i)
-					pm.getFetchPlan().addGroup(fetchGroups[i]);
-			}
-			ProductType productType = (ProductType) pm.getObjectById(productTypeID);
-			ProductType _productType = (ProductType) pm.detachCopy(productType);
-
-			pm.getFetchPlan().setGroups(new String[] {
-					FetchPlan.DEFAULT,
-					FetchGroupsPriceConfig.FETCH_GROUP_EDIT
-			});
-			detachCopyPriceConfigs(pm, productType, _productType);
-			for (Iterator it = _productType.getNestedProductTypes(false).iterator(); it.hasNext(); ) {
-				NestedProductType _npt = (NestedProductType) it.next();
-				NestedProductType npt = productType.getNestedProductType(
-						_npt.getInnerProductTypePrimaryKey(), true);
-				detachCopyPriceConfigs(
-						pm, npt.getInnerProductType(), _npt.getInnerProductType());
-			}
-
-			return _productType;
-		} finally {
-			pm.close();
-		}
-	}
-
-	private static void detachCopyPriceConfigs(
-			PersistenceManager pm, ProductType livingPT, ProductType detachedPT)
-	{
-		if (livingPT.getInnerPriceConfig() == null)
-			detachedPT.setInnerPriceConfig(null);
-		else
-			detachedPT.setInnerPriceConfig(
-					(IInnerPriceConfig) pm.detachCopy(livingPT.getInnerPriceConfig()));
-
-		if (livingPT.getPackagePriceConfig() == null)
-			detachedPT.setPackagePriceConfig(null);
-		else
-			detachedPT.setPackagePriceConfig(
-					(IPackagePriceConfig) pm.detachCopy(livingPT.getPackagePriceConfig()));
-	}
+//	/**
+//	 * @param productTypeID The object ID of the desired ProductType.
+//	 * @param fetchGroups These fetch-groups are applied to the main
+//	 *		ProductType which is specified by <tt>productTypeID</tt> and
+//	 *		the {@link NestedProductType}s. They should NOT
+//	 *		include anything within the price config! Unlike as usual, they do not
+//	 *		replace the fetchGroups
+//	 *		used per default by this method, but they are appended.
+//	 *
+//	 * @ejb.interface-method
+//	 * @ejb.transaction type = "Required"
+//	 * @ejb.permission role-name="_Guest_"
+//	 */
+//	public ProductType getProductTypeForPriceConfigEditing(
+//			ProductTypeID productTypeID,
+//			String[] fetchGroups, int maxFetchDepth)
+//	throws ModuleException
+//	{
+//		PersistenceManager pm = getPersistenceManager();
+//		try {
+//			pm.getExtent(ProductType.class);
+//
+//			pm.getFetchPlan().setGroups(new String[] {
+//					FetchPlan.DEFAULT,
+//					ProductType.FETCH_GROUP_NESTED_PRODUCT_TYPES,
+//					NestedProductType.FETCH_GROUP_INNER_PRODUCT_TYPE
+//			});
+//			if (fetchGroups != null) {
+//				for (int i = 0; i < fetchGroups.length; ++i)
+//					pm.getFetchPlan().addGroup(fetchGroups[i]);
+//			}
+//			ProductType productType = (ProductType) pm.getObjectById(productTypeID);
+//			ProductType _productType = (ProductType) pm.detachCopy(productType);
+//
+//			pm.getFetchPlan().setGroups(new String[] {
+//					FetchPlan.DEFAULT,
+//					FetchGroupsPriceConfig.FETCH_GROUP_EDIT
+//			});
+//			detachCopyPriceConfigs(pm, productType, _productType);
+//			for (Iterator it = _productType.getNestedProductTypes(false).iterator(); it.hasNext(); ) {
+//				NestedProductType _npt = (NestedProductType) it.next();
+//				NestedProductType npt = productType.getNestedProductType(
+//						_npt.getInnerProductTypePrimaryKey(), true);
+//				detachCopyPriceConfigs(
+//						pm, npt.getInnerProductType(), _npt.getInnerProductType());
+//			}
+//
+//			return _productType;
+//		} finally {
+//			pm.close();
+//		}
+//	}
+//
+//	private static void detachCopyPriceConfigs(
+//			PersistenceManager pm, ProductType livingPT, ProductType detachedPT)
+//	{
+//		if (livingPT.getInnerPriceConfig() == null)
+//			detachedPT.setInnerPriceConfig(null);
+//		else
+//			detachedPT.setInnerPriceConfig(
+//					(IInnerPriceConfig) pm.detachCopy(livingPT.getInnerPriceConfig()));
+//
+//		if (livingPT.getPackagePriceConfig() == null)
+//			detachedPT.setPackagePriceConfig(null);
+//		else
+//			detachedPT.setPackagePriceConfig(
+//					(IPackagePriceConfig) pm.detachCopy(livingPT.getPackagePriceConfig()));
+//	}
 
 	/**
 	 * @ejb.interface-method

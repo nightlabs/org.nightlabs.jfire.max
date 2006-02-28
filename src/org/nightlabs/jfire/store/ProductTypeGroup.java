@@ -216,12 +216,14 @@ implements Serializable, DetachCallback
 	/**
 	 * @see javax.jdo.listener.DetachCallback#jdoPostDetach(java.lang.Object)
 	 */
-	public void jdoPostDetach(Object detached)
+	public void jdoPostDetach(Object _attached)
 	{
+		ProductTypeGroup attached = (ProductTypeGroup)_attached;
+		ProductTypeGroup detached = this;
 		PersistenceManager pm = getPersistenceManager();
 		Collection fetchGroups = pm.getFetchPlan().getGroups();
 		if (fetchGroups.contains(FETCH_GROUP_PRODUCT_TYPES) || fetchGroups.contains(FetchPlan.ALL))
-			((ProductTypeGroup)detached).productTypes = pm.detachCopyAll(
-					getProductTypes(pm, (ProductTypeGroupID) JDOHelper.getObjectId(this)));
+			detached.productTypes = pm.detachCopyAll(
+					getProductTypes(pm, (ProductTypeGroupID) JDOHelper.getObjectId(attached)));
 	}
 }

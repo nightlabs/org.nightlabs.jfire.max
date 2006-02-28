@@ -493,10 +493,10 @@ implements Serializable, ArticleContainer, SegmentContainer, DetachCallback
 	public void jdoPreDetach()
 	{
 	}
-	public void jdoPostDetach(Object _detached)
+	public void jdoPostDetach(Object _attached)
 	{
-		Order attached = this;
-		Order detached = (Order)_detached;
+		Order attached = (Order)_attached;
+		Order detached = this;
 		Collection fetchGroups = attached.getPersistenceManager().getFetchPlan().getGroups();
 
 		if (fetchGroups.contains(FETCH_GROUP_VENDOR_ID)) {

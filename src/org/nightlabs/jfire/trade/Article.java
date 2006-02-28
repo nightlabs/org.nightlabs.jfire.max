@@ -973,10 +973,10 @@ public class Article
 	{
 	}
 
-	public void jdoPostDetach(Object _detached)
+	public void jdoPostDetach(Object _attached)
 	{
-		Article attached = this;
-		Article detached = (Article)_detached;
+		Article attached = (Article)_attached;
+		Article detached = this;
 		Collection fetchGroups = attached.getPersistenceManager().getFetchPlan().getGroups();
 
 		boolean fetchGroupsArticleInEditor =

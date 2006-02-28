@@ -626,10 +626,10 @@ implements
 	{
 	}
 
-	public void jdoPostDetach(Object _detached)
+	public void jdoPostDetach(Object _attached)
 	{
-		Offer attached = this;
-		Offer detached = (Offer)_detached;
+		Offer attached = (Offer)_attached;
+		Offer detached = this;
 		Collection fetchGroups = attached.getPersistenceManager().getFetchPlan().getGroups();
 
 		if (fetchGroups.contains(FETCH_GROUP_VENDOR_ID)) {

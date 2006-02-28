@@ -593,10 +593,10 @@ implements Serializable, ArticleContainer, DetachCallback
 	public void jdoPreDetach()
 	{
 	}
-	public void jdoPostDetach(Object _detached)
+	public void jdoPostDetach(Object _attached)
 	{
-		Invoice attached = this;
-		Invoice detached = (Invoice)_detached;
+		Invoice attached = (Invoice)_attached;
+		Invoice detached = this;
 		Collection fetchGroups = attached.getPersistenceManager().getFetchPlan().getGroups();
 
 		if (fetchGroups.contains(FETCH_GROUP_VENDOR_ID)) {

@@ -488,10 +488,10 @@ implements Serializable, ArticleContainer, DetachCallback
 	public void jdoPreDetach()
 	{
 	}
-	public void jdoPostDetach(Object _detached)
+	public void jdoPostDetach(Object _attached)
 	{
-		DeliveryNote attached = this;
-		DeliveryNote detached = (DeliveryNote)_detached;
+		DeliveryNote attached = (DeliveryNote)_attached;
+		DeliveryNote detached = this;
 		Collection fetchGroups = attached.getPersistenceManager().getFetchPlan().getGroups();
 
 		if (fetchGroups.contains(FETCH_GROUP_VENDOR_ID)) {

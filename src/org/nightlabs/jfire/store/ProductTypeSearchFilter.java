@@ -42,9 +42,9 @@ public abstract class ProductTypeSearchFilter extends SearchFilter {
 	}
 
 	/**
-	 * @see org.nightlabs.jdo.search.SearchFilter#getExtendClass()
+	 * @see org.nightlabs.jdo.search.SearchFilter#getExtentClass()
 	 */
-	protected Class getExtendClass() {
+	protected Class getExtentClass() {
 		Class productTypeClass = getProductTypeClass();
 		if (!ProductType.class.isAssignableFrom(productTypeClass))
 			throw new IllegalArgumentException("getProductTypeClass must return a subclass of ProductType");

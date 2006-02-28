@@ -148,7 +148,7 @@ implements SessionBean
 	 */
 	public DeliveryResult deliverBegin_internal(
 			DeliveryDataID deliveryDataID,
-			String[] fetchGroups)
+			String[] fetchGroups, int maxFetchDepth)
 	throws ModuleException
 	{
 		PersistenceManager pm = getPersistenceManager();
@@ -166,7 +166,9 @@ implements SessionBean
 				pm.makePersistent(deliverBeginServerResult);
 			deliveryData.getDelivery().setDeliverBeginServerResult(deliverBeginServerResult);
 
-			pm.getFetchPlan().setGroups(fetchGroups);
+			pm.getFetchPlan().setMaxFetchDepth(maxFetchDepth);
+			if (fetchGroups != null)
+				pm.getFetchPlan().setGroups(fetchGroups);
 
 			DeliveryResult deliverBeginServerResult_detached = (DeliveryResult) pm.detachCopy(deliverBeginServerResult);
 //			deliverBeginServerResult_detached.setError(deliverBeginServerResult.getError());
@@ -202,7 +204,7 @@ implements SessionBean
 	 * @ejb.transaction type = "RequiresNew"
 	 * @ejb.permission role-name="_Guest_"
 	 */
-	public DeliveryResult deliverDoWork_internal(DeliveryID deliveryID, String[] fetchGroups)
+	public DeliveryResult deliverDoWork_internal(DeliveryID deliveryID, String[] fetchGroups, int maxFetchDepth)
 	throws ModuleException
 	{
 		PersistenceManager pm = getPersistenceManager();
@@ -222,7 +224,10 @@ implements SessionBean
 				pm.makePersistent(deliverDoWorkServerResult);
 			deliveryData.getDelivery().setDeliverDoWorkServerResult(deliverDoWorkServerResult);
 
-			pm.getFetchPlan().setGroups(fetchGroups);
+			pm.getFetchPlan().setMaxFetchDepth(maxFetchDepth);
+			if (fetchGroups != null)
+				pm.getFetchPlan().setGroups(fetchGroups);
+
 			DeliveryResult deliverDoWorkServerResult_detached = (DeliveryResult) pm.detachCopy(deliverDoWorkServerResult);
 //			deliverDoWorkServerResult_detached.setError(deliverDoWorkServerResult.getError());
 			return deliverDoWorkServerResult_detached;
@@ -236,7 +241,7 @@ implements SessionBean
 	 * @ejb.transaction type = "RequiresNew"
 	 * @ejb.permission role-name="_Guest_"
 	 */
-	public DeliveryResult deliverEnd_internal(DeliveryID deliveryID, String[] fetchGroups)
+	public DeliveryResult deliverEnd_internal(DeliveryID deliveryID, String[] fetchGroups, int maxFetchDepth)
 	throws ModuleException
 	{
 		PersistenceManager pm = getPersistenceManager();
@@ -260,7 +265,9 @@ implements SessionBean
 				pm.makePersistent(deliverEndServerResult);
 			deliveryData.getDelivery().setDeliverEndServerResult(deliverEndServerResult);
 
-			pm.getFetchPlan().setGroups(fetchGroups);
+			pm.getFetchPlan().setMaxFetchDepth(maxFetchDepth);
+			if (fetchGroups != null)
+				pm.getFetchPlan().setGroups(fetchGroups);
 
 			// get DeliveryNoteIDs for booking
 			Collection deliveryNoteIDs = deliveryData.getDelivery().getDeliveryNoteIDs();
@@ -399,7 +406,7 @@ implements SessionBean
 //	 * @ejb.transaction type = "RequiresNew"
 //	 * @ejb.permission role-name="_Guest_"
 //	 */
-//	public DeliveryResult deliverEnd_internal(DeliveryID deliveryID, String[] fetchGroups)
+//	public DeliveryResult deliverEnd_internal(DeliveryID deliveryID, String[] fetchGroups, int maxFetchDepth)
 //	throws ModuleException
 //	{
 //		PersistenceManager pm = getPersistenceManager();
@@ -460,7 +467,7 @@ implements SessionBean
 	 */
 	public DeliveryResult deliverBegin_storeDeliverBeginServerResult(
 			DeliveryID deliveryID, DeliveryResult deliverBeginServerResult,
-			boolean get, String[] fetchGroups)
+			boolean get, String[] fetchGroups, int maxFetchDepth)
 	throws ModuleException
 	{
 		PersistenceManager pm = getPersistenceManager();
@@ -478,6 +485,7 @@ implements SessionBean
 			if (!get)
 				return null;
 
+			pm.getFetchPlan().setMaxFetchDepth(maxFetchDepth);
 			if (fetchGroups != null)
 				pm.getFetchPlan().setGroups(fetchGroups);
 
@@ -494,7 +502,7 @@ implements SessionBean
 	 */
 	public DeliveryResult deliverDoWork_storeDeliverDoWorkServerResult(
 			DeliveryID deliveryID, DeliveryResult deliverDoWorkServerResult,
-			boolean get, String[] fetchGroups)
+			boolean get, String[] fetchGroups, int maxFetchDepth)
 	throws ModuleException
 	{
 		PersistenceManager pm = getPersistenceManager();
@@ -512,6 +520,7 @@ implements SessionBean
 			if (!get)
 				return null;
 
+			pm.getFetchPlan().setMaxFetchDepth(maxFetchDepth);
 			if (fetchGroups != null)
 				pm.getFetchPlan().setGroups(fetchGroups);
 
@@ -528,7 +537,7 @@ implements SessionBean
 	 */
 	public DeliveryResult deliverEnd_storeDeliverEndServerResult(
 			DeliveryID deliveryID, DeliveryResult deliverEndServerResult,
-			boolean get, String[] fetchGroups)
+			boolean get, String[] fetchGroups, int maxFetchDepth)
 	throws ModuleException
 	{
 		PersistenceManager pm = getPersistenceManager();
@@ -546,6 +555,7 @@ implements SessionBean
 			if (!get)
 				return null;
 
+			pm.getFetchPlan().setMaxFetchDepth(maxFetchDepth);
 			if (fetchGroups != null)
 				pm.getFetchPlan().setGroups(fetchGroups);
 

@@ -44,6 +44,8 @@ import javax.jdo.Query;
 
 import org.apache.log4j.Logger;
 import org.nightlabs.ModuleException;
+import org.nightlabs.jdo.NLJDOHelper;
+import org.nightlabs.jdo.moduleregistry.ModuleMetaData;
 import org.nightlabs.jfire.accounting.Accounting;
 import org.nightlabs.jfire.accounting.Currency;
 import org.nightlabs.jfire.accounting.PriceFragmentType;
@@ -74,9 +76,6 @@ import org.nightlabs.jfire.trade.Order;
 import org.nightlabs.jfire.trade.Segment;
 import org.nightlabs.jfire.trade.Trader;
 import org.nightlabs.jfire.trade.id.SegmentID;
-import org.nightlabs.jdo.NLJDOHelper;
-import org.nightlabs.jdo.moduleregistry.ModuleMetaData;
-import org.nightlabs.util.Utils;
 
 
 /**
@@ -412,18 +411,17 @@ implements SessionBean
 	 * @ejb.permission role-name="SimpleTradeManager-user"
 	 * @ejb.transaction type = "Required"
 	 */
-	public Collection getChildProductTypes(ProductTypeID parentProductTypeID, String[] fetchGroups)
+	public Collection getChildProductTypes(ProductTypeID parentProductTypeID, String[] fetchGroups, int maxFetchDepth)
 		throws ModuleException
 	{
 		PersistenceManager pm = getPersistenceManager();
 		try {
 			Collection res = SimpleProductType.getChildProductTypes(pm, parentProductTypeID);
 
-			if (fetchGroups != null) {
-				FetchPlan fetchPlan = pm.getFetchPlan();
-				for (int i = 0; i < fetchGroups.length; ++i)
-					fetchPlan.addGroup(fetchGroups[i]);
-			}
+			FetchPlan fetchPlan = pm.getFetchPlan();
+			fetchPlan.setMaxFetchDepth(maxFetchDepth);
+			if (fetchGroups != null)
+				fetchPlan.setGroups(fetchGroups);
 
 			return pm.detachCopyAll(res);
 		} finally {
@@ -438,7 +436,7 @@ implements SessionBean
 	 * @ejb.permission role-name="SimpleTradeManager.Admin"
 	 * @ejb.transaction type = "Required"
 	 */
-	public SimpleProductType storeProductType(SimpleProductType productType, boolean get, String[] fetchGroups)
+	public SimpleProductType storeProductType(SimpleProductType productType, boolean get, String[] fetchGroups, int maxFetchDepth)
 	throws ModuleException
 	{
 		if (productType == null)
@@ -448,7 +446,7 @@ implements SessionBean
 		try {
 			SimpleProductType result = null;
 			if (NLJDOHelper.exists(pm, productType)) {
-				result = (SimpleProductType) NLJDOHelper.storeJDO(pm, productType, get, fetchGroups);
+				result = (SimpleProductType) NLJDOHelper.storeJDO(pm, productType, get, fetchGroups, maxFetchDepth);
 				productType = (SimpleProductType) pm.getObjectById(JDOHelper.getObjectId(productType));
 			}
 			else {
@@ -481,7 +479,7 @@ implements SessionBean
 //	 * @ejb.permission role-name="SimpleTradeManager.Admin"
 //	 * @ejb.transaction type = "Required"
 //	 */
-//	public SimpleProductType updateProductType(SimpleProductType productType, boolean get, String[] fetchGroups)
+//	public SimpleProductType updateProductType(SimpleProductType productType, boolean get, String[] fetchGroups, int maxFetchDepth)
 //		throws ModuleException
 //	{
 //		if (productType == null)
@@ -544,12 +542,15 @@ implements SessionBean
 	 * @ejb.permission role-name="SimpleTradeManager.Admin"
 	 * @ejb.transaction type = "Required"
 	 */
-	public Collection getFormulaPriceConfigs(String[] fetchGroups)
+	public Collection getFormulaPriceConfigs(String[] fetchGroups, int maxFetchDepth)
 		throws ModuleException
 	{
 		PersistenceManager pm = getPersistenceManager();
 		try {
-			pm.getFetchPlan().setGroups(Utils.array2ArrayList(fetchGroups));
+			pm.getFetchPlan().setMaxFetchDepth(maxFetchDepth);
+			if (fetchGroups != null)
+				pm.getFetchPlan().setGroups(fetchGroups);
+
 			Query q = pm.newQuery(FormulaPriceConfig.class);
 			return pm.detachCopyAll((Collection)q.execute());
 		} finally {
@@ -569,7 +570,7 @@ implements SessionBean
 			SegmentID segmentID,
 			ProductTypeID productTypeID,
 			int quantity,
-			TariffID tariffID, String[] fetchGroups)
+			TariffID tariffID, String[] fetchGroups, int maxFetchDepth)
 	throws ModuleException
 	{
 		PersistenceManager pm = getPersistenceManager();
@@ -624,6 +625,7 @@ implements SessionBean
 //				articles.add(article);
 //			}
 
+			pm.getFetchPlan().setMaxFetchDepth(maxFetchDepth);
 			if (fetchGroups != null)
 				pm.getFetchPlan().setGroups(fetchGroups);
 

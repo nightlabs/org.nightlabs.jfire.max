@@ -494,7 +494,7 @@ implements SessionBean
 	 */
 	public ReportRegistryItem getReportRegistryItem (
 			ReportRegistryItemID reportRegistryItemID,
-			String[] fetchGroups
+			String[] fetchGroups, int maxFetchDepth
 		)
 	throws ModuleException
 	{
@@ -502,6 +502,7 @@ implements SessionBean
 		pm = getPersistenceManager();
 		try {
 			ReportRegistryItem reportRegistryItem = (ReportRegistryItem)pm.getObjectById(reportRegistryItemID);
+			pm.getFetchPlan().setMaxFetchDepth(maxFetchDepth);
 			if (fetchGroups != null)
 				pm.getFetchPlan().setGroups(fetchGroups);
 			ReportRegistryItem result = (ReportRegistryItem) pm.detachCopy(reportRegistryItem);
@@ -520,13 +521,14 @@ implements SessionBean
 	 */
 	public List<ReportRegistryItem> getReportRegistryItems (
 			List<ReportRegistryItemID> reportRegistryItemIDs,
-			String[] fetchGroups
+			String[] fetchGroups, int maxFetchDepth
 		)
 	throws ModuleException
 	{
 		PersistenceManager pm;
 		pm = getPersistenceManager();
 		try {
+			pm.getFetchPlan().setMaxFetchDepth(maxFetchDepth);
 			if (fetchGroups != null)
 				pm.getFetchPlan().setGroups(fetchGroups);
 			
@@ -551,7 +553,7 @@ implements SessionBean
 	 */
 	public Collection getTopLevelReportRegistryItems (
 			String organisationID,
-			String[] fetchGroups
+			String[] fetchGroups, int maxFetchDepth
 		)
 	throws ModuleException
 	{
@@ -559,6 +561,7 @@ implements SessionBean
 		pm = getPersistenceManager();
 		try {
 			Collection topLevelItems = ReportRegistryItem.getTopReportRegistryItems(pm, organisationID);
+			pm.getFetchPlan().setMaxFetchDepth(maxFetchDepth);
 			if (fetchGroups != null)
 				pm.getFetchPlan().setGroups(fetchGroups);
 			Collection result = (Collection) pm.detachCopyAll(topLevelItems);
@@ -614,14 +617,14 @@ implements SessionBean
 	public ReportRegistryItem storeRegistryItem (
 			ReportRegistryItem reportRegistryItem,
 			boolean get,
-			String[] fetchGroups
+			String[] fetchGroups, int maxFetchDepth
 		)
 	throws ModuleException
 	{
 		PersistenceManager pm;
 		pm = getPersistenceManager();
 		try {
-			return (ReportRegistryItem)NLJDOHelper.storeJDO(pm, reportRegistryItem, get, fetchGroups);
+			return (ReportRegistryItem)NLJDOHelper.storeJDO(pm, reportRegistryItem, get, fetchGroups, maxFetchDepth);
 		} finally {
 			pm.close();
 		}

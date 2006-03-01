@@ -220,7 +220,7 @@ implements Serializable, DetachCallback
 	{
 		ProductTypeGroup attached = (ProductTypeGroup)_attached;
 		ProductTypeGroup detached = this;
-		PersistenceManager pm = getPersistenceManager();
+		PersistenceManager pm = attached.getPersistenceManager();
 		Collection fetchGroups = pm.getFetchPlan().getGroups();
 		if (fetchGroups.contains(FETCH_GROUP_PRODUCT_TYPES) || fetchGroups.contains(FetchPlan.ALL))
 			detached.productTypes = pm.detachCopyAll(

@@ -107,6 +107,8 @@ import org.nightlabs.jfire.transfer.Anchor;
  * @jdo.create-objectid-class field-order="organisationID, productTypeID"
  *
  * @jdo.fetch-group name="ProductType.extendedProductType" fields="extendedProductType"
+ * @jdo.fetch-group name="ProductType.extendedProductType[2]" fields="extendedProductType[2]"
+ * @jdo.fetch-group name="ProductType.extendedProductType[-1]" fields="extendedProductType[-1]"
  * @jdo.fetch-group name="ProductType.fieldMetaDataMap" fields="fieldMetaDataMap"
  * @jdo.fetch-group name="ProductType.innerPriceConfig" fields="innerPriceConfig"
  * @jdo.fetch-group name="ProductType.nestedProductTypes" fields="nestedProductTypes"
@@ -163,6 +165,8 @@ implements
 	public static final String FETCH_GROUP_NAME = "ProductType.name";
 
 	public static final String FETCH_GROUP_EXTENDED_PRODUCT_TYPE = "ProductType.extendedProductType";
+	public static final String FETCH_GROUP_EXTENDED_PRODUCT_TYPE_2 = "ProductType.extendedProductType[2]";
+	public static final String FETCH_GROUP_EXTENDED_PRODUCT_TYPE_NO_LIMIT = "ProductType.extendedProductType[-1]";
 	/**
 	 * Needed for inheritance.
 	 */

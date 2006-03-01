@@ -22,9 +22,6 @@
 	<classpathentry sourcepath="JPOX_SRC" kind="var" path="JDO2"/>
 	<classpathentry sourcepath="JPOX_SRC" kind="var" path="JPOX"/>
 	<classpathentry sourcepath="/JPOXENHANCER_SRC" kind="var" path="JPOXENHANCER"/>
-	<classpathentry kind="var" path="ECLIPSE_HOME/plugins/org.eclipse.core.runtime_3.1.0.v20051027.jar"/>
-	<classpathentry kind="var" path="ECLIPSE_HOME/plugins/org.eclipse.core.runtime.compatibility_3.1.0.jar"/>
-	<classpathentry kind="var" path="ECLIPSE_HOME/plugins/org.eclipse.osgi_3.2.0.v20051030.jar"/>
 	<classpathentry kind="var" path="WORKSPACE/JFireServerManager/dist/JFireServerManager.jar"/>
 	<classpathentry sourcepath="WORKSPACE/JFireBase/src" kind="var" path="WORKSPACE/JFireBase/dist/JFireBase.jar"/>
 	<classpathentry kind="lib" path="dist/birt/lib/engine.jar"/>

@@ -66,31 +66,41 @@ import org.nightlabs.jfire.transfer.id.AnchorID;
  * @jdo.fetch-group name="ServerPaymentProcessor.modeOfPayments" fields="modeOfPayments"
  * @jdo.fetch-group name="ServerPaymentProcessor.modeOfPaymentFlavours" fields="modeOfPaymentFlavours"
  * @jdo.fetch-group name="ServerPaymentProcessor.this" fetch-groups="default" fields="name, modeOfPayments, modeOfPaymentFlavours"
- * 
+ *
  * @jdo.query name="getServerPaymentProcessorsForOneModeOfPaymentFlavour_WORKAROUND1"
  *            query="SELECT
  *            	WHERE
  *            		modeOfPaymentFlavour.organisationID == paramOrganisationID &&
  *            		modeOfPaymentFlavour.modeOfPaymentFlavourID == paramModeOfPaymentFlavourID &&
  *            		this.modeOfPaymentFlavours.containsValue(modeOfPaymentFlavour)
- *            	PARAMETERS
- *            		String paramOrganisationID, String paramModeOfPaymentFlavourID
  *            	VARIABLES ModeOfPaymentFlavour modeOfPaymentFlavour
- *            	IMPORTS
- *            		import java.lang.String;
- *            		import org.nightlabs.jfire.accounting.pay.ModeOfPaymentFlavour"
- * 
+ *            	PARAMETERS String paramOrganisationID, String paramModeOfPaymentFlavourID
+ *            	import java.lang.String;
+ *            	import org.nightlabs.jfire.accounting.pay.ModeOfPaymentFlavour"
+ *
  * @jdo.query name="getServerPaymentProcessorsForOneModeOfPaymentFlavour_WORKAROUND2"
  *            query="SELECT
  *            	WHERE
  *            		modeOfPaymentFlavour.organisationID == paramOrganisationID &&
  *            		modeOfPaymentFlavour.modeOfPaymentFlavourID == paramModeOfPaymentFlavourID &&
  *            		this.modeOfPayments.containsValue(modeOfPaymentFlavour.modeOfPayment)
- *            	PARAMETERS String paramOrganisationID, String paramModeOfPaymentFlavourID
  *            	VARIABLES ModeOfPaymentFlavour modeOfPaymentFlavour
- *            	IMPORTS
- *            		import java.lang.String;
- *            		import org.nightlabs.jfire.accounting.pay.ModeOfPaymentFlavour"
+ *            	PARAMETERS String paramOrganisationID, String paramModeOfPaymentFlavourID
+ *            	import java.lang.String;
+ *            	import org.nightlabs.jfire.accounting.pay.ModeOfPaymentFlavour"
+ *
+ * @!jdo.query name="getServerPaymentProcessorsForOneModeOfPaymentFlavour_WORKAROUND2"
+ *            query="SELECT
+ *            	WHERE
+ *            		modeOfPaymentFlavour.organisationID == paramOrganisationID &&
+ *            		modeOfPaymentFlavour.modeOfPaymentFlavourID == paramModeOfPaymentFlavourID &&
+ *            		modeOfPayment == modeOfPaymentFlavour.modeOfPayment &&
+ *            		this.modeOfPayments.containsValue(modeOfPayment)
+ *            	VARIABLES ModeOfPaymentFlavour modeOfPaymentFlavour; ModeOfPayment modeOfPayment
+ *            	PARAMETERS String paramOrganisationID, String paramModeOfPaymentFlavourID
+ *            	import java.lang.String;
+ *            	import org.nightlabs.jfire.accounting.pay.ModeOfPaymentFlavour;
+ *            	import org.nightlabs.jfire.accounting.pay.ModeOfPayment"
  */
 public abstract class ServerPaymentProcessor implements Serializable
 {
@@ -136,8 +146,10 @@ public abstract class ServerPaymentProcessor implements Serializable
 	{
 		Map m = new HashMap();
 
-		Query query = pm.newNamedQuery(ServerPaymentProcessor.class,
-				"getServerPaymentProcessorsForOneModeOfPaymentFlavour_WORKAROUND1");
+		Query query;
+
+		query = pm.newNamedQuery(ServerPaymentProcessor.class,
+				"getServerPaymentProcessorsForOneModeOfPaymentFlavour_WORKAROUND2");
 		for (Iterator it = ((Collection) query.execute(organisationID,
 				modeOfPaymentFlavourID)).iterator(); it.hasNext();) {
 			ServerPaymentProcessor p = (ServerPaymentProcessor) it.next();
@@ -145,7 +157,7 @@ public abstract class ServerPaymentProcessor implements Serializable
 		}
 
 		query = pm.newNamedQuery(ServerPaymentProcessor.class,
-				"getServerPaymentProcessorsForOneModeOfPaymentFlavour_WORKAROUND2");
+				"getServerPaymentProcessorsForOneModeOfPaymentFlavour_WORKAROUND1");
 		for (Iterator it = ((Collection) query.execute(organisationID,
 				modeOfPaymentFlavourID)).iterator(); it.hasNext();) {
 			ServerPaymentProcessor p = (ServerPaymentProcessor) it.next();

@@ -70,12 +70,10 @@ import org.nightlabs.jfire.transfer.Anchor;
  *            		modeOfDeliveryFlavour.organisationID == paramOrganisationID &&
  *            		modeOfDeliveryFlavour.modeOfDeliveryFlavourID == paramModeOfDeliveryFlavourID &&
  *            		this.modeOfDeliveryFlavours.containsValue(modeOfDeliveryFlavour)
- *            	PARAMETERS
- *            		String paramOrganisationID, String paramModeOfDeliveryFlavourID
  *            	VARIABLES ModeOfDeliveryFlavour modeOfDeliveryFlavour
- *            	IMPORTS
- *            		import java.lang.String;
- *            		import org.nightlabs.jfire.store.deliver.ModeOfDeliveryFlavour"
+ *            	PARAMETERS String paramOrganisationID, String paramModeOfDeliveryFlavourID
+ *            	import java.lang.String;
+ *            	import org.nightlabs.jfire.store.deliver.ModeOfDeliveryFlavour"
  * 
  * @jdo.query name="getServerDeliveryProcessorsForOneModeOfDeliveryFlavour_WORKAROUND2"
  *            query="SELECT
@@ -83,11 +81,10 @@ import org.nightlabs.jfire.transfer.Anchor;
  *            		modeOfDeliveryFlavour.organisationID == paramOrganisationID &&
  *            		modeOfDeliveryFlavour.modeOfDeliveryFlavourID == paramModeOfDeliveryFlavourID &&
  *            		this.modeOfDeliveries.containsValue(modeOfDeliveryFlavour.modeOfDelivery)
- *            	PARAMETERS String paramOrganisationID, String paramModeOfDeliveryFlavourID
  *            	VARIABLES ModeOfDeliveryFlavour modeOfDeliveryFlavour
- *            	IMPORTS
- *            		import java.lang.String;
- *            		import org.nightlabs.jfire.store.deliver.ModeOfDeliveryFlavour"
+ *            	PARAMETERS String paramOrganisationID, String paramModeOfDeliveryFlavourID
+ *            	import java.lang.String;
+ *            	import org.nightlabs.jfire.store.deliver.ModeOfDeliveryFlavour"
  */
 public abstract class ServerDeliveryProcessor
 implements Serializable

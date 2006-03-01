@@ -65,8 +65,8 @@ import org.nightlabs.jfire.trade.id.CustomerGroupID;
  *					paramCustomerGroup.modeOfPayments.containsValue(modeOfPayment) &&
  *			 		modeOfPayment.flavours.containsValue(this)
  *				)
- *			PARAMETERS CustomerGroup paramCustomerGroup
  *			VARIABLES ModeOfPayment modeOfPayment
+ *			PARAMETERS CustomerGroup paramCustomerGroup
  *			import org.nightlabs.jfire.trade.CustomerGroup; import org.nightlabs.jfire.accounting.pay.ModeOfPayment"
  *
  * @!jdo.query
@@ -85,8 +85,8 @@ import org.nightlabs.jfire.trade.id.CustomerGroupID;
  *				 		modeOfPayment.flavours.containsValue(this)
  *					)
  *				)
- *			PARAMETERS String paramOrganisationID, String paramCustomerGroupID
  *			VARIABLES CustomerGroup customerGroup; ModeOfPayment modeOfPayment
+ *			PARAMETERS String paramOrganisationID, String paramCustomerGroupID
  *			import java.lang.String;
  *			import org.nightlabs.jfire.trade.CustomerGroup;
  *			import org.nightlabs.jfire.accounting.pay.ModeOfPayment"
@@ -99,11 +99,10 @@ import org.nightlabs.jfire.trade.id.CustomerGroupID;
  *				customerGroup.customerGroupID == paramCustomerGroupID
  *				&&
  *				customerGroup.modeOfPaymentFlavours.containsValue(this)
- *			PARAMETERS String paramOrganisationID, String paramCustomerGroupID
  *			VARIABLES CustomerGroup customerGroup
- *			IMPORTS
- *				import java.lang.String;
- *				import org.nightlabs.jfire.trade.CustomerGroup"
+ *			PARAMETERS String paramOrganisationID, String paramCustomerGroupID
+ *			import java.lang.String;
+ *			import org.nightlabs.jfire.trade.CustomerGroup"
  *
  * @jdo.query
  *		name="getAvailableModeOfPaymentFlavoursForOneCustomerGroup_WORKAROUND2"
@@ -114,12 +113,11 @@ import org.nightlabs.jfire.trade.id.CustomerGroupID;
  *				&&
  *				customerGroup.modeOfPayments.containsValue(modeOfPayment) &&
  *				modeOfPayment.flavours.containsValue(this)
- *			PARAMETERS String paramOrganisationID, String paramCustomerGroupID
  *			VARIABLES CustomerGroup customerGroup; ModeOfPayment modeOfPayment
- *			IMPORTS
- *				import java.lang.String;
- *				import org.nightlabs.jfire.trade.CustomerGroup;
- *				import org.nightlabs.jfire.accounting.pay.ModeOfPayment"
+ *			PARAMETERS String paramOrganisationID, String paramCustomerGroupID
+ *			import java.lang.String;
+ *			import org.nightlabs.jfire.trade.CustomerGroup;
+ *			import org.nightlabs.jfire.accounting.pay.ModeOfPayment"
  *
  * @jdo.fetch-group name="ModeOfPaymentFlavour.name" fields="name"
  * @jdo.fetch-group name="ModeOfPaymentFlavour.modeOfPayment" fields="modeOfPayment"

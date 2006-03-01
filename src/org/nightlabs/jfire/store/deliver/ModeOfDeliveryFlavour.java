@@ -77,11 +77,10 @@ import org.nightlabs.jfire.trade.id.CustomerGroupID;
  *				varProductType.productTypeID == paramProductTypeID
  *				&&
  *				varProductType.deliveryConfiguration.modeOfDeliveryFlavours.containsValue(this)
- *			PARAMETERS String paramOrganisationID, String paramProductTypeID
  *			VARIABLES ProductType varProductType
- *			IMPORTS
- *				import java.lang.String;
- *				import org.nightlabs.jfire.store.ProductType"
+ *			PARAMETERS String paramOrganisationID, String paramProductTypeID
+ *			import java.lang.String;
+ *			import org.nightlabs.jfire.store.ProductType"
  *
  * @!jdo,query
  *		name="getAvailableModeOfDeliveryFlavoursForOneProductType_WORKAROUND2"
@@ -94,12 +93,11 @@ import org.nightlabs.jfire.trade.id.CustomerGroupID;
  *				varProductType.deliveryConfiguration.modeOfDeliveries.containsValue(varModeOfDelivery)
  *				&&
  *				varModeOfDelivery.containsValue(this)
- *			PARAMETERS String paramOrganisationID, String paramProductTypeID
  *			VARIABLES ProductType varProductType, ModeOfDelivery varModeOfDelivery
- *			IMPORTS
- *				import java.lang.String;
- *				import org.nightlabs.jfire.store.ProductType;
- *				import org.nightlabs.jfire.store.deliver.ModeOfDelivery"
+ *			PARAMETERS String paramOrganisationID, String paramProductTypeID
+ *			import java.lang.String;
+ *			import org.nightlabs.jfire.store.ProductType;
+ *			import org.nightlabs.jfire.store.deliver.ModeOfDelivery"
  *
  * @jdo.query
  *		name="getAvailableModeOfDeliveryFlavoursForOneCustomerGroup_WORKAROUND1"
@@ -109,11 +107,10 @@ import org.nightlabs.jfire.trade.id.CustomerGroupID;
  *				customerGroup.customerGroupID == paramCustomerGroupID
  *				&&
  *				customerGroup.modeOfDeliveryFlavours.containsValue(this)
- *			PARAMETERS String paramOrganisationID, String paramCustomerGroupID
  *			VARIABLES CustomerGroup customerGroup
- *			IMPORTS
- *				import java.lang.String;
- *				import org.nightlabs.jfire.trade.CustomerGroup"
+ *			PARAMETERS String paramOrganisationID, String paramCustomerGroupID
+ *			import java.lang.String;
+ *			import org.nightlabs.jfire.trade.CustomerGroup"
  *
  * @jdo.query
  *		name="getAvailableModeOfDeliveryFlavoursForOneCustomerGroup_WORKAROUND2"
@@ -124,12 +121,11 @@ import org.nightlabs.jfire.trade.id.CustomerGroupID;
  *				&&
  *				customerGroup.modeOfDeliveries.containsValue(modeOfDelivery) &&
  *				modeOfDelivery.flavours.containsValue(this)
- *			PARAMETERS String paramOrganisationID, String paramCustomerGroupID
  *			VARIABLES CustomerGroup customerGroup; ModeOfDelivery modeOfDelivery
- *			IMPORTS
- *				import java.lang.String;
- *				import org.nightlabs.jfire.trade.CustomerGroup;
- *				import org.nightlabs.jfire.store.deliver.ModeOfDelivery"
+ *			PARAMETERS String paramOrganisationID, String paramCustomerGroupID
+ *			import java.lang.String;
+ *			import org.nightlabs.jfire.trade.CustomerGroup;
+ *			import org.nightlabs.jfire.store.deliver.ModeOfDelivery"
  */
 public class ModeOfDeliveryFlavour
 implements Serializable

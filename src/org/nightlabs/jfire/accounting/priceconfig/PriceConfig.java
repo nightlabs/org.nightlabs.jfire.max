@@ -65,7 +65,7 @@ import org.nightlabs.jfire.trade.ArticlePrice;
  * @jdo.fetch-group name="PriceConfig.name" fields="name"
  * @jdo.fetch-group name="PriceConfig.priceFragmentTypes" fields="priceFragmentTypes"
  *
- * @jdo.fetch-group name="FetchGroupsPriceConfig.edit" fetch-groups="default" fields="currencies, name, priceFragmentTypes"
+ * @jdo.fetch-group name="FetchGroupsPriceConfig.edit" fields="currencies, name, priceFragmentTypes"
  */
 public abstract class PriceConfig implements Serializable, StoreCallback, IPriceConfig
 {

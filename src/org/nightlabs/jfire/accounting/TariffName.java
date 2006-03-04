@@ -55,6 +55,8 @@ import org.nightlabs.i18n.I18nText;
  * @jdo.fetch-group name="FetchGroupsTrade.articleInInvoiceEditor" fields="tariff, names"
  * @jdo.fetch-group name="FetchGroupsTrade.articleInDeliveryNoteEditor" fields="tariff, names"
  *
+ * @jdo.fetch-group name="FetchGroupsPriceConfig.edit" fields="tariff, names"
+ *
  * @!
  * TODO What is that fetch-group "PriceCell.this" doing here? Marco ;-) Well, not mine, maybe just delete it. Alex
  */

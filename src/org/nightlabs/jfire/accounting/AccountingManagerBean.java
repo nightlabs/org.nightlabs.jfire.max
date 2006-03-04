@@ -27,6 +27,7 @@
 package org.nightlabs.jfire.accounting;
 
 import java.io.Serializable;
+import java.lang.reflect.Method;
 import java.rmi.RemoteException;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -49,8 +50,8 @@ import javax.jdo.Query;
 
 import org.apache.commons.lang.exception.ExceptionUtils;
 import org.apache.log4j.Logger;
-
 import org.nightlabs.ModuleException;
+import org.nightlabs.jdo.NLJDOHelper;
 import org.nightlabs.jfire.accounting.book.LocalAccountantDelegate;
 import org.nightlabs.jfire.accounting.book.MoneyFlowDimension;
 import org.nightlabs.jfire.accounting.book.MoneyFlowMapping;
@@ -79,8 +80,6 @@ import org.nightlabs.jfire.accounting.pay.id.ModeOfPaymentFlavourID;
 import org.nightlabs.jfire.accounting.pay.id.PaymentDataID;
 import org.nightlabs.jfire.accounting.pay.id.PaymentID;
 import org.nightlabs.jfire.accounting.priceconfig.FetchGroupsPriceConfig;
-import org.nightlabs.jfire.accounting.priceconfig.IInnerPriceConfig;
-import org.nightlabs.jfire.accounting.priceconfig.IPackagePriceConfig;
 import org.nightlabs.jfire.asyncinvoke.AsyncInvoke;
 import org.nightlabs.jfire.asyncinvoke.AsyncInvokeEnvelope;
 import org.nightlabs.jfire.asyncinvoke.ErrorCallback;
@@ -111,8 +110,6 @@ import org.nightlabs.jfire.trade.id.CustomerGroupID;
 import org.nightlabs.jfire.trade.id.OfferID;
 import org.nightlabs.jfire.trade.id.OrderID;
 import org.nightlabs.jfire.transfer.id.AnchorID;
-import org.nightlabs.jdo.NLJDOHelper;
-import org.nightlabs.util.Utils;
 
 /**
  * @author Alexander Bieber <alex[AT]nightlabs[DOT]de
@@ -2151,6 +2148,118 @@ public abstract class AccountingManagerBean
 			pm.close();
 		}
 	}
+
+	/**
+	 * @param productTypeID The object ID of the desired ProductType.
+	 *
+	 * @ejb.interface-method
+	 * @ejb.transaction type = "Required"
+	 * @ejb.permission role-name="_Guest_"
+	 */
+	public ProductType getProductTypeForPriceConfigEditing(
+			ProductTypeID productTypeID)
+	throws ModuleException
+	{
+		PersistenceManager pm = getPersistenceManager();
+		try {
+			FetchPlan fetchPlan = pm.getFetchPlan();
+
+			System.out.println("***********************************************************************");
+			System.out.println("***********************************************************************");
+			System.out.println("***********************************************************************");
+			System.out.println("***********************************************************************");
+
+			int detachmentOptions = fetchPlan.getDetachmentOptions();
+			System.out.println("detachmentOptions: " + detachmentOptions);
+			System.out.println("detachmentOptions & DETACH_LOAD_FIELDS: " + ((detachmentOptions & FetchPlan.DETACH_LOAD_FIELDS) != 0 ? true : false));
+			System.out.println("detachmentOptions & DETACH_UNLOAD_FIELDS: " + ((detachmentOptions & FetchPlan.DETACH_UNLOAD_FIELDS) != 0 ? true : false));
+
+			fetchPlan.setDetachmentOptions(FetchPlan.DETACH_LOAD_FIELDS);
+			fetchPlan.setMaxFetchDepth(-1);
+			fetchPlan.setGroups(new String[] {FetchPlan.DEFAULT, FetchGroupsPriceConfig.FETCH_GROUP_EDIT});
+
+			detachmentOptions = fetchPlan.getDetachmentOptions();
+			System.out.println("***********************************************************************");
+			System.out.println("detachmentOptions: " + detachmentOptions);
+			System.out.println("detachmentOptions & DETACH_LOAD_FIELDS: " + ((detachmentOptions & FetchPlan.DETACH_LOAD_FIELDS) != 0 ? true : false));
+			System.out.println("detachmentOptions & DETACH_UNLOAD_FIELDS: " + ((detachmentOptions & FetchPlan.DETACH_UNLOAD_FIELDS) != 0 ? true : false));
+
+			pm.getExtent(ProductType.class);
+			ProductType res = (ProductType) pm.getObjectById(productTypeID);
+			res.getName().getTexts();
+
+			// load main price configs
+			res.getPackagePriceConfig();
+			res.getInnerPriceConfig();
+
+			// load all extended ProductType-s
+			ProductType pt = res;
+			while (pt != null) {
+				pt = pt.getExtendedProductType();
+				System.out.println(pt == null ? null : pt.getPrimaryKey());
+			}
+
+			// load all nested ProductType-s
+			for (NestedProductType npt : res.getNestedProductTypes()) {
+				npt.getPackageProductType();
+				ProductType ipt = npt.getInnerProductType();
+				ipt.getName().getTexts();
+				ipt.getPackagePriceConfig();
+				ipt.getInnerPriceConfig();
+				pt = ipt;
+				while (pt != null) {
+					pt = pt.getExtendedProductType();
+					System.out.println(pt == null ? null : pt.getPrimaryKey());
+				}
+			}
+
+//			System.out.println("***********************************************************************");
+//			System.out.println("***********************************************************************");
+//			System.out.println("***********************************************************************");
+//			System.out.println("***********************************************************************");
+
+			ProductType detachedRes = (ProductType) pm.detachCopy(res);
+
+			// FIXME WORKAROUND for JPOX - begin
+			resolveExtendedProductTypes(pm, res, detachedRes);
+
+			for (NestedProductType attached_npt : res.getNestedProductTypes()) {
+				NestedProductType detached_npt = detachedRes.getNestedProductType(attached_npt.getInnerProductTypePrimaryKey(), true);
+
+				resolveExtendedProductTypes(pm,
+						attached_npt.getInnerProductType(), 
+						detached_npt.getInnerProductType());
+			}
+
+			// FIXME WORKAROUND for JPOX - end
+
+			return detachedRes;
+		} finally {
+			pm.close();
+		}
+	}
+	
+// FIXME WORKAROUND for JPOX - begin
+	private static void resolveExtendedProductTypes(PersistenceManager pm, ProductType attachedPT, ProductType detachedPT)
+	{
+		while (attachedPT != null) {
+			attachedPT = attachedPT.getExtendedProductType();
+			System.out.println(attachedPT == null ? null : attachedPT.getPrimaryKey());
+			ProductType extPT = null;
+			if (attachedPT != null)
+				extPT = (ProductType) pm.detachCopy(attachedPT);
+			try {
+				Method method = ProductType.class.getDeclaredMethod("setExtendedProductType", new Class[] {ProductType.class});
+				method.setAccessible(true);
+				method.invoke(detachedPT, extPT);
+			} catch (Exception e) {
+				e.printStackTrace();
+			}
+			detachedPT = extPT;
+		}
+	}
+// FIXME WORKAROUND for JPOX - end
+	
 
 //	/**
 //	 * @param productTypeID The object ID of the desired ProductType.

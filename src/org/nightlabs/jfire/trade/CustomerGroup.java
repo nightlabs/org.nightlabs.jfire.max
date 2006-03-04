@@ -49,6 +49,8 @@ import org.nightlabs.jfire.store.deliver.ModeOfDeliveryFlavour;
  * @jdo.inheritance strategy="new-table"
  *
  * @jdo.create-objectid-class field-order="organisationID, customerGroupID"
+ *
+ * @jdo.fetch-group name="FetchGroupsPriceConfig.edit" fields="name"
  */
 public class CustomerGroup implements Serializable
 {

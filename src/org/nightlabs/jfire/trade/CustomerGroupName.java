@@ -43,6 +43,8 @@ import org.nightlabs.i18n.I18nText;
  * @jdo.inheritance strategy="new-table"
  *
  * @jdo.create-objectid-class field-order="organisationID, customerGroupID"
+ *
+ * @jdo.fetch-group name="FetchGroupsPriceConfig.edit" fields="customerGroup, names"
  */
 public class CustomerGroupName extends I18nText
 {

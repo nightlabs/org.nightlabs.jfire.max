@@ -63,6 +63,8 @@ import org.nightlabs.jdo.LocalizedDetachable;
  * @jdo.fetch-group name="FetchGroupsTrade.articleInOfferEditor" fields="name"
  * @jdo.fetch-group name="FetchGroupsTrade.articleInInvoiceEditor" fields="name"
  * @jdo.fetch-group name="FetchGroupsTrade.articleInDeliveryNoteEditor" fields="name"
+ *
+ * @jdo.fetch-group name="FetchGroupsPriceConfig.edit" fields="name"
  */
 public class Tariff
 	implements Serializable, StoreCallback, Localizable, LocalizedDetachable

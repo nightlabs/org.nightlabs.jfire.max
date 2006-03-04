@@ -44,6 +44,8 @@ import org.nightlabs.i18n.I18nText;
  * 
  * @jdo.create-objectid-class
  *		field-order="organisationID, priceFragmentTypeID"
+ *
+ * @jdo.fetch-group name="FetchGroupsPriceConfig.edit" fields="priceFragmentType, names"
  */
 public class PriceFragmentTypeName extends I18nText {
 

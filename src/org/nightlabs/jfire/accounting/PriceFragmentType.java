@@ -57,6 +57,8 @@ import org.nightlabs.jfire.organisation.Organisation;
  * @jdo.inheritance strategy="new-table"
  *
  * @jdo.fetch-group name="PriceFragmentType.name" fields="name"
+ *
+ * @jdo.fetch-group name="FetchGroupsPriceConfig.edit" fields="name"
  */
 public class PriceFragmentType
 	implements Serializable

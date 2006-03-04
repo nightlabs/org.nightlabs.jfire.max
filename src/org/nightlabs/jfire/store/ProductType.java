@@ -626,8 +626,12 @@ implements
 	/**
 	 * @param extendedProductType The extendedProductType to set. This method should not be called
 	 *		from outside. Currently it is not yet possible to change the structure of the inheritance
-	 *		tree (it's fixed after creation).
+	 *		tree (it's fixed after creation)!!!
 	 * @see #getExtendedProductType()
+	 * 
+	 * @deprecated Currently it is not yet possible to change the structure of the inheritance
+	 *		tree!!! You must not call this method! Even after we implemented
+	 *		the possibility to restructure the product type tree, you will use another API!!!
 	 */
 	protected void setExtendedProductType(ProductType extendedProductType)
 	{

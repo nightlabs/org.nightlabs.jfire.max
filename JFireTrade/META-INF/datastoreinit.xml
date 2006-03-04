@@ -10,5 +10,5 @@
 			archive="JFireBaseBean.jar"
 			bean="jfire/ejb/JFireBaseBean/ConfigManager"
 			method="initialize" />
-		</init>
+	</init>
 </datastore-initialization>

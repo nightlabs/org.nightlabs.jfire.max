@@ -53,6 +53,8 @@ import org.nightlabs.jfire.trade.CustomerGroup;
  *
  * @jdo.fetch-group name="PriceCoordinate.priceConfig" fields="priceConfig"
  * @jdo.fetch-group name="PriceCoordinate.this" fetch-groups="default" fields="priceConfig"
+ *
+ * @jdo.fetch-group name="FetchGroupsPriceConfig.edit" fields="priceConfig"
  */
 public class PriceCoordinate implements Serializable, StoreCallback, IPriceCoordinate
 {

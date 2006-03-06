@@ -57,6 +57,21 @@ public abstract class ScriptExecutor
 	private Map<String, Object> parameterValues;
 
 	/**
+	 * You must implement this method and return the language that your Executor implementation
+	 * supports.
+	 * @return Returns a unique string identifying the script language (e.g. "JavaScript", "com.foo.MyScriptLanguage").
+	 */
+	public abstract String getLanguage();
+
+	/**
+	 * You must implement this method and return the file extensions (without the leading dot)
+	 * of your files (if files are used instead of the datastore). Note, that the first
+	 * entry is considered the default file extension.
+	 * @return Returns sth. like "js" or "asp".
+	 */
+	public abstract String[] getFileExtensions();
+
+	/**
 	 * @param script The script that shall be executed.
 	 * @param parameterValues The parameter values or <code>null</code>, if no
 	 *		parameters are required.

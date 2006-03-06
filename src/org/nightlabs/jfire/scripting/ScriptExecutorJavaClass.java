@@ -36,6 +36,7 @@ public class ScriptExecutorJavaClass
 		extends ScriptExecutor
 {
 	public static final String LANGUAGE_JAVA_CLASS = "JavaClass";
+	public static final String FILE_EXTENSION_JAVA_CLASS = "class";
 
 	private ScriptExecutorJavaClassDelegate delegate = null;
 
@@ -79,6 +80,16 @@ public class ScriptExecutorJavaClass
 			throws ScriptException
 	{
 		return getDelegate().doExecute();
+	}
+
+	@Override
+	public String getLanguage() {
+		return LANGUAGE_JAVA_CLASS;
+	}
+
+	@Override
+	public String[] getFileExtensions() {
+		return new String[] { FILE_EXTENSION_JAVA_CLASS };
 	}
 
 }

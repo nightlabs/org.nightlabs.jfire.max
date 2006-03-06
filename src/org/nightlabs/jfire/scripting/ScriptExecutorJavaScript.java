@@ -45,6 +45,7 @@ public class ScriptExecutorJavaScript
 		extends ScriptExecutor
 {
 	public static final String LANGUAGE_JAVA_SCRIPT = "JavaScript";
+	public static final String FILE_EXTENSION_JAVA_SCRIPT = "js";
 
 	@Override
 	protected Object doExecute()
@@ -78,4 +79,15 @@ public class ScriptExecutorJavaScript
 		}
 	}
 
+	@Override
+	public String[] getFileExtensions()
+	{
+		return new String[] { FILE_EXTENSION_JAVA_SCRIPT };
+	}
+
+	@Override
+	public String getLanguage() {
+		return LANGUAGE_JAVA_SCRIPT;
+	}
+	
 }

@@ -30,6 +30,7 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
+import java.util.Map.Entry;
 
 import javax.jdo.JDOHelper;
 import javax.jdo.PersistenceManager;
@@ -81,13 +82,15 @@ public class ScriptRegistry
 		ScriptRegistry reg = new ScriptRegistry(SINGLETON_ID.scriptRegistryID);
 		pm.makePersistent(reg);
 
-		reg.bindLanguageToScriptExecutorClass(
-				ScriptExecutorJavaScript.LANGUAGE_JAVA_SCRIPT,
-				ScriptExecutorJavaScript.class);
+		try {
+			reg.registerScriptExecutorClass(
+					ScriptExecutorJavaScript.class);
 
-		reg.bindLanguageToScriptExecutorClass(
-				ScriptExecutorJavaClass.LANGUAGE_JAVA_CLASS,
-				ScriptExecutorJavaClass.class);
+			reg.registerScriptExecutorClass(
+					ScriptExecutorJavaClass.class);
+		} catch (Exception e) {
+			throw new RuntimeException(e);
+		}
 
 		reg.organisationID = LocalOrganisation.getLocalOrganisation(pm).getOrganisationID();
 
@@ -107,7 +110,22 @@ public class ScriptRegistry
 	 *
 	 * @jdo.join
 	 */
-	private Map<String, String> scriptExecutorClassNameByLanguage;
+	private Map<String, String> language2ScriptExecutorClassName;
+
+	/**
+	 * key: String fileExtension<br/>
+	 * value: String language
+	 *
+	 * @jdo.field
+	 *		persistence-modifier="persistent"
+	 *		collection-type="map"
+	 *		key-type="java.lang.String"
+	 *		value-type="java.lang.String"
+	 *		table="JFireScripting_ScriptExecutorRegistry_scriptExecutorClassNameByLanguage"
+	 *
+	 * @jdo.join
+	 */
+	private Map<String, String> fileExtension2Language;
 
 	/**
 	 * @jdo.field persistence-modifier="persistent"
@@ -140,22 +158,28 @@ public class ScriptRegistry
 	 * Binds a class to a language. A previous binding (if existing) to the same language
 	 * is overriden by a call to this method. There can only be one
 	 * class bound to a language.
-	 *
-	 * @param language A language in which scripts can be written. Internally,
-	 * {@link ScriptExecutorJavaScript#LANGUAGE_JAVA_SCRIPT} and
-	 * {@link ScriptExecutorJavaClass#LANGUAGE_JAVA_CLASS} are already supported
-	 * (where the second language basically means that all the logic is implemented
-	 * in a java class which inherits {@link ScriptExecutorJavaClass}).
 	 * @param clazz A class which has a default constructor and extends {@link ScriptExecutor}.
+	 *
+	 * @throws IllegalAccessException 
+	 * @throws InstantiationException 
 	 *
 	 * @see #unbindLanguage(String)
 	 */
-	public void bindLanguageToScriptExecutorClass(String language, Class clazz)
+	public void registerScriptExecutorClass(Class clazz)
+	throws InstantiationException, IllegalAccessException
 	{
 		if (!ScriptExecutor.class.isAssignableFrom(clazz))
 			throw new ClassCastException("Class " + clazz.getName() + " does not extend " + ScriptExecutor.class.getName());
 
-		scriptExecutorClassNameByLanguage.put(language, clazz.getName());
+		ScriptExecutor se = (ScriptExecutor) clazz.newInstance();
+		String lang = se.getLanguage();
+
+		language2ScriptExecutorClassName.put(lang, clazz.getName());
+		String[] fes = se.getFileExtensions();
+		for (int i = 0; i < fes.length; i++) {
+			String fileExtension = fes[i];
+			fileExtension2Language.put(fileExtension, lang);
+		}
 	}
 
 	/**
@@ -164,11 +188,16 @@ public class ScriptRegistry
 	 *
 	 * @param language The language that shall be unbound.
 	 *
-	 * @see #bindLanguageToScriptExecutorClass(String, Class)
+	 * @see #registerScriptExecutorClass(Class)
 	 */
 	public void unbindLanguage(String language)
 	{
-		scriptExecutorClassNameByLanguage.remove(language);
+		language2ScriptExecutorClassName.remove(language);
+		for (Iterator<Map.Entry<String, String>> it = fileExtension2Language.entrySet().iterator(); it.hasNext(); ) {
+			Map.Entry<String, String> entry = it.next();
+			if (entry.getValue().equals(language))
+				it.remove();
+		}
 	}
 
 	/**
@@ -183,7 +212,7 @@ public class ScriptRegistry
 	public Class getScriptExecutorClass(String language, boolean throwExceptionIfNotFound)
 		throws ClassNotFoundException, IllegalArgumentException
 	{
-		String className = scriptExecutorClassNameByLanguage.get(language);
+		String className = language2ScriptExecutorClassName.get(language);
 		if (className == null) {
 			if (throwExceptionIfNotFound)
 				throw new IllegalArgumentException("The language \"" + language + "\" is unknown: No ScriptExecutor class bound!");
@@ -288,4 +317,13 @@ public class ScriptRegistry
 
 		throw new IllegalStateException("Have multiple scripts for scriptRegistryItemType=\"" + scriptRegistryItemType + "\" and scriptRegistryItemID=\"" + scriptRegistryItemID + "\" and they do neither come from the root nor from the devil organisation!");
 	}
+	
+	public Collection getRegisteredLanguages() {
+		return language2ScriptExecutorClassName.keySet();
+	}
+	
+	public Collection getRegisteredFileExtensions() {
+		return fileExtension2Language.keySet();
+	}
+	
 }

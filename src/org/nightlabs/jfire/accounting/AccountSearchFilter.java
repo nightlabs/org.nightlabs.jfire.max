@@ -56,7 +56,11 @@ public class AccountSearchFilter extends SearchFilter {
 		return Account.class;
 	}
 
-	protected void prepareQuery(Set imports, StringBuffer vars, StringBuffer filter, StringBuffer params, Map paramMap, StringBuffer result) {
+	@Override
+	protected void prepareQuery(
+			Set<Class> imports, StringBuffer vars, StringBuffer filter, StringBuffer params,
+			Map<String, Object> paramMap, StringBuffer result)
+	{
 		params.append("java.lang.String ownerOrganisationID, ");
 		params.append("java.lang.String ownerAnchorTypeID, ");
 		params.append("java.lang.String ownerAnchorID, ");

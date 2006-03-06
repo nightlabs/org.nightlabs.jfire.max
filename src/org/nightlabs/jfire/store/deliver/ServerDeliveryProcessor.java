@@ -74,8 +74,9 @@ import org.nightlabs.jfire.transfer.Anchor;
  *            	PARAMETERS String paramOrganisationID, String paramModeOfDeliveryFlavourID
  *            	import java.lang.String;
  *            	import org.nightlabs.jfire.store.deliver.ModeOfDeliveryFlavour"
- * 
- * @jdo.query name="getServerDeliveryProcessorsForOneModeOfDeliveryFlavour_WORKAROUND2"
+ *
+ * FIXME The following script doesn't work because of a current JPOX bug. Fortunately, the workaround below is functional.
+ * @!jdo.query name="getServerDeliveryProcessorsForOneModeOfDeliveryFlavour_WORKAROUND2"
  *            query="SELECT
  *            	WHERE
  *            		modeOfDeliveryFlavour.organisationID == paramOrganisationID &&
@@ -85,6 +86,19 @@ import org.nightlabs.jfire.transfer.Anchor;
  *            	PARAMETERS String paramOrganisationID, String paramModeOfDeliveryFlavourID
  *            	import java.lang.String;
  *            	import org.nightlabs.jfire.store.deliver.ModeOfDeliveryFlavour"
+ *
+ * @jdo.query name="getServerDeliveryProcessorsForOneModeOfDeliveryFlavour_WORKAROUND2"
+ *            query="SELECT
+ *            	WHERE
+ *            		modeOfDeliveryFlavour.organisationID == paramOrganisationID &&
+ *            		modeOfDeliveryFlavour.modeOfDeliveryFlavourID == paramModeOfDeliveryFlavourID &&
+ *            		modeOfDelivery == modeOfDeliveryFlavour.modeOfDelivery &&
+ *            		this.modeOfDeliveries.containsValue(modeOfDelivery)
+ *            	VARIABLES ModeOfDeliveryFlavour modeOfDeliveryFlavour; ModeOfDelivery modeOfDelivery
+ *            	PARAMETERS String paramOrganisationID, String paramModeOfDeliveryFlavourID
+ *            	import java.lang.String;
+ *            	import org.nightlabs.jfire.store.deliver.ModeOfDeliveryFlavour;
+ *            	import org.nightlabs.jfire.store.deliver.ModeOfDelivery"
  */
 public abstract class ServerDeliveryProcessor
 implements Serializable

@@ -78,7 +78,8 @@ import org.nightlabs.jfire.transfer.id.AnchorID;
  *            	import java.lang.String;
  *            	import org.nightlabs.jfire.accounting.pay.ModeOfPaymentFlavour"
  *
- * @jdo.query name="getServerPaymentProcessorsForOneModeOfPaymentFlavour_WORKAROUND2"
+ * FIXME The following script doesn't work because of a current JPOX bug. Fortunately, the workaround below is functional.
+ * @!jdo.query name="getServerPaymentProcessorsForOneModeOfPaymentFlavour_WORKAROUND2"
  *            query="SELECT
  *            	WHERE
  *            		modeOfPaymentFlavour.organisationID == paramOrganisationID &&
@@ -89,7 +90,7 @@ import org.nightlabs.jfire.transfer.id.AnchorID;
  *            	import java.lang.String;
  *            	import org.nightlabs.jfire.accounting.pay.ModeOfPaymentFlavour"
  *
- * @!jdo.query name="getServerPaymentProcessorsForOneModeOfPaymentFlavour_WORKAROUND2"
+ * @jdo.query name="getServerPaymentProcessorsForOneModeOfPaymentFlavour_WORKAROUND2"
  *            query="SELECT
  *            	WHERE
  *            		modeOfPaymentFlavour.organisationID == paramOrganisationID &&

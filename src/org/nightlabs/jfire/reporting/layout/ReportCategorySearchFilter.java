@@ -49,11 +49,9 @@ public class ReportCategorySearchFilter extends SearchFilter {
 		return null;
 	}
 
-	/* (non-Javadoc)
-	 * @see com.nightlabs.jdo.search.SearchFilter#prepareQuery(java.util.Set, java.lang.StringBuffer, java.lang.StringBuffer, java.lang.StringBuffer, java.util.Map, java.lang.StringBuffer)
-	 */
-	protected void prepareQuery(Set imports, StringBuffer vars,
-			StringBuffer filter, StringBuffer params, Map paramMap,
+	@Override
+	protected void prepareQuery(Set<Class> imports, StringBuffer vars,
+			StringBuffer filter, StringBuffer params, Map<String, Object> paramMap,
 			StringBuffer result
 		) 
 	{

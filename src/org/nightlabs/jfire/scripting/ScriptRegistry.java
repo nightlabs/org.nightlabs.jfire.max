@@ -26,6 +26,7 @@
 
 package org.nightlabs.jfire.scripting;
 
+import java.io.File;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Iterator;
@@ -40,6 +41,7 @@ import javax.naming.NamingException;
 import org.nightlabs.jfire.organisation.LocalOrganisation;
 import org.nightlabs.jfire.organisation.Organisation;
 import org.nightlabs.jfire.scripting.id.ScriptRegistryID;
+import org.nightlabs.util.Utils;
 
 /**
  * <p>
@@ -64,7 +66,7 @@ import org.nightlabs.jfire.scripting.id.ScriptRegistryID;
  */
 public class ScriptRegistry
 {
-	
+
 	/**
 	 * @jdo.field primary-key="true"
 	 */
@@ -106,11 +108,11 @@ public class ScriptRegistry
 	 *		collection-type="map"
 	 *		key-type="java.lang.String"
 	 *		value-type="java.lang.String"
-	 *		table="JFireScripting_ScriptExecutorRegistry_scriptExecutorClassNameByLanguage"
+	 *		table="JFireScripting_ScriptRegistry_language2ScriptExecutorClassName"
 	 *
 	 * @jdo.join
 	 */
-	private Map<String, String> language2ScriptExecutorClassName;
+	private Map language2ScriptExecutorClassName;
 
 	/**
 	 * key: String fileExtension<br/>
@@ -121,11 +123,11 @@ public class ScriptRegistry
 	 *		collection-type="map"
 	 *		key-type="java.lang.String"
 	 *		value-type="java.lang.String"
-	 *		table="JFireScripting_ScriptExecutorRegistry_scriptExecutorClassNameByLanguage"
+	 *		table="JFireScripting_ScriptRegistry_fileExtension2Language"
 	 *
 	 * @jdo.join
 	 */
-	private Map<String, String> fileExtension2Language;
+	private Map fileExtension2Language;
 
 	/**
 	 * @jdo.field persistence-modifier="persistent"
@@ -193,8 +195,8 @@ public class ScriptRegistry
 	public void unbindLanguage(String language)
 	{
 		language2ScriptExecutorClassName.remove(language);
-		for (Iterator<Map.Entry<String, String>> it = fileExtension2Language.entrySet().iterator(); it.hasNext(); ) {
-			Map.Entry<String, String> entry = it.next();
+		for (Iterator it = fileExtension2Language.entrySet().iterator(); it.hasNext(); ) {
+			Map.Entry entry = (Map.Entry)it.next();
 			if (entry.getValue().equals(language))
 				it.remove();
 		}
@@ -212,7 +214,7 @@ public class ScriptRegistry
 	public Class getScriptExecutorClass(String language, boolean throwExceptionIfNotFound)
 		throws ClassNotFoundException, IllegalArgumentException
 	{
-		String className = language2ScriptExecutorClassName.get(language);
+		String className = (String) language2ScriptExecutorClassName.get(language);
 		if (className == null) {
 			if (throwExceptionIfNotFound)
 				throw new IllegalArgumentException("The language \"" + language + "\" is unknown: No ScriptExecutor class bound!");
@@ -271,19 +273,21 @@ public class ScriptRegistry
 	{
 		PersistenceManager pm = getPersistenceManager();
 
-		Collection<Script> scripts = Script.getScripts(pm, scriptRegistryItemType, scriptRegistryItemID);
+		Collection scripts = Script.getScripts(pm, scriptRegistryItemType, scriptRegistryItemID);
 
 		if (scripts.isEmpty())
 			return null;
 
 		if (scripts.size() == 1)
-			return scripts.iterator().next();
+			return (Script) scripts.iterator().next();
 
-		Map<String, Script> scriptsByOrganisationID = new HashMap<String, Script>();
-		for (Script script : scripts)
+		Map scriptsByOrganisationID = new HashMap();
+		for (Iterator it = scripts.iterator(); it.hasNext(); ) {
+			Script script = (Script) it.next();
 			scriptsByOrganisationID.put(script.getOrganisationID(), script);
+		}
 
-		Script script = scriptsByOrganisationID.get(organisationID);
+		Script script = (Script) scriptsByOrganisationID.get(organisationID);
 		if (script != null)
 			return script;
 
@@ -306,12 +310,12 @@ public class ScriptRegistry
 			}
 		}
 
-		script = scriptsByOrganisationID.get(rootOrganisationID);
+		script = (Script) scriptsByOrganisationID.get(rootOrganisationID);
 		if (script != null)
 			return script;
 
 
-		script = scriptsByOrganisationID.get(Organisation.DEVIL_ORGANISATION_ID);
+		script = (Script) scriptsByOrganisationID.get(Organisation.DEVIL_ORGANISATION_ID);
 		if (script != null)
 			return script;
 
@@ -325,5 +329,23 @@ public class ScriptRegistry
 	public Collection getRegisteredFileExtensions() {
 		return fileExtension2Language.keySet();
 	}
-	
+
+	public String getLanguageByFileName(String fileName, boolean throwExceptionIfNotFound)
+	{
+		String res = getLanguageByFileExtension(Utils.getFileExtension(fileName), false);
+		if (throwExceptionIfNotFound && res == null)
+			throw new IllegalArgumentException("There is no language registered for the fileExtension of the file: " + fileName);
+
+		return res;
+	}
+
+	public String getLanguageByFileExtension(String fileExtension, boolean throwExceptionIfNotFound)
+	{
+		String res = (String) fileExtension2Language.get(fileExtension);
+		if (throwExceptionIfNotFound && res == null)
+			throw new IllegalArgumentException("There is no language registered for the given fileExtension: " + fileExtension);
+
+		return res;
+	}
+
 }

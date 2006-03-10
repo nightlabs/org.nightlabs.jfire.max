@@ -220,9 +220,10 @@ public class ScriptRegistryItem
 
 	public void jdoPreStore() {
 		// Assuming that preStore only called when first made persistent
+		if (true) return; // TODO @Bieber: Change Event Tracking should only be done if there is an interested client! Marco.
+
 		if (!JDOHelper.isNew(this)) 
 			return;
-		
 		PersistenceManager pm = JDOHelper.getPersistenceManager(this);
 		if (pm == null)
 			throw new IllegalStateException("Could not get PersistenceManager jdoPreStore()");

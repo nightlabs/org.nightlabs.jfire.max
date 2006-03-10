@@ -59,11 +59,10 @@ public class Script
 {
 	private static final long serialVersionUID = 1L;
 
-	@SuppressWarnings("unchecked")
-	public static Collection<Script> getScripts(PersistenceManager pm, String scriptRegistryItemType, String scriptRegistryItemID)
+	public static Collection getScripts(PersistenceManager pm, String scriptRegistryItemType, String scriptRegistryItemID)
 	{
 		Query q = pm.newNamedQuery(Script.class, "getScriptsByTypeAndID");
-		return (Collection<Script>) q.execute(
+		return (Collection) q.execute(
 				scriptRegistryItemType, scriptRegistryItemID);
 	}
 
@@ -104,9 +103,9 @@ public class Script
 	 */
 	protected Script() { }
 
-	public Script(ScriptCategory parent, String organisationID, String scriptRegistryItemID)
+	public Script(ScriptCategory parent, String organisationID, String scriptRegistryItemType, String scriptRegistryItemID)
 	{
-		super(organisationID, parent.getScriptRegistryItemType(), scriptRegistryItemID);
+		super(organisationID, scriptRegistryItemType, scriptRegistryItemID);
 		this.setParent(parent);
 		try {
 			this.setParameterSet(parent.getParameterSet());

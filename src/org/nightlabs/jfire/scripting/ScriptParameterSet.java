@@ -29,6 +29,8 @@ package org.nightlabs.jfire.scripting;
 import java.io.Serializable;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.HashMap;
+import java.util.Iterator;
 import java.util.Map;
 import java.util.Set;
 
@@ -99,7 +101,7 @@ import javax.jdo.listener.StoreCallback;
 	 *
 	 * @jdo.key mapped-by="scriptParameterID"
 	 */
-	private Map<String, ScriptParameter> parameters;
+	private Map parameters;
 	
 	/**
 	 * @jdo.field persistence-modifier="persistent"
@@ -116,6 +118,7 @@ import javax.jdo.listener.StoreCallback;
 		this.organisationID = organisationID;
 		this.scriptParameterSetID = scriptParameterSetID;
 		this.name = new ScriptParameterSetName(this);
+		parameters = new HashMap();
 	}
 
 	public String getOrganisationID()
@@ -127,12 +130,12 @@ import javax.jdo.listener.StoreCallback;
 		return scriptParameterSetID;
 	}
 
-	public Set<String> getParameterIDs()
+	public Set getParameterIDs()
 	{
 		return Collections.unmodifiableSet(parameters.keySet());
 	}
 
-	public Collection<ScriptParameter> getParameters()
+	public Collection getParameters()
 	{
 		return Collections.unmodifiableCollection(parameters.values());
 	}
@@ -148,7 +151,7 @@ import javax.jdo.listener.StoreCallback;
 	 */
 	public ScriptParameter createParameter(String scriptParameterID)
 	{
-		ScriptParameter res = parameters.get(scriptParameterID);
+		ScriptParameter res = (ScriptParameter) parameters.get(scriptParameterID);
 		if (res != null)
 			return res;
 
@@ -166,7 +169,7 @@ import javax.jdo.listener.StoreCallback;
 	 */
 	public ScriptParameter getParameter(String scriptParameterID, boolean throwExceptionIfNotFound)
 	{
-		ScriptParameter res = parameters.get(scriptParameterID);
+		ScriptParameter res = (ScriptParameter) parameters.get(scriptParameterID);
 		if (res == null && throwExceptionIfNotFound)
 			throw new IllegalArgumentException("No parameter registered with scriptParameterID=\"" + scriptParameterID + "\"!");
 
@@ -200,7 +203,8 @@ import javax.jdo.listener.StoreCallback;
 			// TODO: add check for organisationID
 			ScriptRegistry scriptRegistry = ScriptRegistry.getScriptRegistry(pm);
 			scriptParameterSetID = scriptRegistry.createScriptParameterSetID();
-			for (ScriptParameter parameter : getParameters()) {
+			for (Iterator it = getParameters().iterator(); it.hasNext(); ) {
+				ScriptParameter parameter = (ScriptParameter) it.next();
 				if (parameter.getScriptParameterSetID() != scriptParameterSetID)
 					parameter.setScriptParameterSetID(scriptParameterSetID);
 			}

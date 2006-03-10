@@ -36,7 +36,7 @@ public class ScriptExecutorJavaClass
 		extends ScriptExecutor
 {
 	public static final String LANGUAGE_JAVA_CLASS = "JavaClass";
-	public static final String FILE_EXTENSION_JAVA_CLASS = "class";
+	public static final String FILE_EXTENSION_JAVA_CLASS = "javaclass";
 
 	private ScriptExecutorJavaClassDelegate delegate = null;
 

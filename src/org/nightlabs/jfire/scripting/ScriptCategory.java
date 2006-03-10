@@ -63,7 +63,7 @@ public class ScriptCategory
 	 *		element-type="org.nightlabs.jfire.scripting.ScriptRegistryItem"
 	 *		mapped-by="parent"
 	 */
-	private Set<ScriptRegistryItem> children;	
+	private Set children;	
 
 	/**
 	 * @deprecated Only for JDO!
@@ -84,9 +84,10 @@ public class ScriptCategory
 	}
 
 	/**
-	 * @param organisationID The owner-organisation.
-	 * @param scriptRegistryItemType The type of the ScriptCategory
-	 * @param scriptRegistryItemID The local id in the scope of organisationID and scriptRegistryItemType
+	 * @param parent Can be <code>null</code>, if this is the root category.
+	 * @param organisationID The owner-organisation. Must not be <code>null</code>.
+	 * @param scriptRegistryItemType The type of the ScriptCategory. Must not be <code>null</code>.
+	 * @param scriptRegistryItemID The local id in the scope of <code>organisationID</code> and <code>scriptRegistryItemType</code>. Must not be null. 
 	 */
 	public ScriptCategory(
 			ScriptCategory parent,
@@ -97,6 +98,14 @@ public class ScriptCategory
 		super(organisationID, scriptRegistryItemType, scriptRegistryItemID);
 		this.setParent(parent);
 		init();
+	}
+
+	private static String _getScriptRegistryItemType(ScriptCategory parent)
+	{
+		if (parent == null)
+			throw new IllegalArgumentException("parent must not be null! Use the other constructor, if you want to create a root-category!");
+
+		return parent.getScriptRegistryItemType();
 	}
 	
 	/**
@@ -109,7 +118,7 @@ public class ScriptCategory
 			String organisationID,
 			String scriptRegistryItemID)
 	{
-		super(organisationID, parent.getScriptRegistryItemType(), scriptRegistryItemID);
+		super(organisationID, _getScriptRegistryItemType(parent), scriptRegistryItemID);
 		this.setParent(parent);
 		init();
 	}
@@ -120,7 +129,7 @@ public class ScriptCategory
 	 */
 	private void init()
 	{
-		children = new HashSet<ScriptRegistryItem>();
+		children = new HashSet();
 	}
 
 	@Override
@@ -129,7 +138,7 @@ public class ScriptCategory
 		return super.getParent();
 	}
 
-	public Set<ScriptRegistryItem> getChildren()
+	public Set getChildren()
 	{
 		return Collections.unmodifiableSet(children);
 	}

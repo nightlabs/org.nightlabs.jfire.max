@@ -183,7 +183,7 @@ public class ScriptingInitializer
 
 		File[] subDirs = dir.listFiles(dirFileFilter);		
 		for (int i=0; i<subDirs.length; i++) {
-			createScriptCategories(subDirs[0], category);
+			createScriptCategories(subDirs[i], category);
 		}
 	}
 

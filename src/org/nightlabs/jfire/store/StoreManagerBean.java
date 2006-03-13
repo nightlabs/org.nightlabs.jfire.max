@@ -45,6 +45,7 @@ import org.apache.commons.lang.exception.ExceptionUtils;
 import org.apache.log4j.Logger;
 
 import org.nightlabs.ModuleException;
+import org.nightlabs.jdo.NLJDOHelper;
 import org.nightlabs.jfire.accounting.Accounting;
 import org.nightlabs.jfire.accounting.Invoice;
 import org.nightlabs.jfire.accounting.id.InvoiceID;
@@ -947,14 +948,14 @@ implements SessionBean
 
 		try {
 
-			return deliveryHelperLocal.deliverBegin_internal(deliveryDataID, fetchGroups, 0);
+			return deliveryHelperLocal.deliverBegin_internal(deliveryDataID, fetchGroups, NLJDOHelper.MAX_FETCH_DEPTH_NO_LIMIT);
 
 		} catch (Throwable t) {
 			DeliveryResult deliverBeginServerResult = new DeliveryResult(getOrganisationID(), t);
 
 			try {
 				return deliveryHelperLocal.deliverBegin_storeDeliverBeginServerResult(
-						DeliveryID.create(deliveryDataID), deliverBeginServerResult, true, fetchGroups, 0);
+						DeliveryID.create(deliveryDataID), deliverBeginServerResult, true, fetchGroups, NLJDOHelper.MAX_FETCH_DEPTH_NO_LIMIT);
 			} catch (ModuleException x) {
 				throw x;
 			} catch (RuntimeException x) {
@@ -1134,14 +1135,14 @@ implements SessionBean
 
 		try {
 
-			return deliveryHelperLocal.deliverDoWork_internal(deliveryID, fetchGroups, 0);
+			return deliveryHelperLocal.deliverDoWork_internal(deliveryID, fetchGroups, NLJDOHelper.MAX_FETCH_DEPTH_NO_LIMIT);
 
 		} catch (Throwable t) {
 			DeliveryResult deliverDoWorkServerResult = new DeliveryResult(getOrganisationID(), t);
 
 			try {
 				DeliveryResult deliverDoWorkServerResult_detached = deliveryHelperLocal.deliverDoWork_storeDeliverDoWorkServerResult(
-						deliveryID, deliverDoWorkServerResult, true, fetchGroups, 0);
+						deliveryID, deliverDoWorkServerResult, true, fetchGroups, NLJDOHelper.MAX_FETCH_DEPTH_NO_LIMIT);
 
 				return deliverDoWorkServerResult_detached;
 			} catch (ModuleException x) {
@@ -1209,14 +1210,14 @@ implements SessionBean
 
 		try {
 
-			return deliveryHelperLocal.deliverEnd_internal(deliveryID, fetchGroups, 0);
+			return deliveryHelperLocal.deliverEnd_internal(deliveryID, fetchGroups, NLJDOHelper.MAX_FETCH_DEPTH_NO_LIMIT);
 
 		} catch (Throwable t) {
 			DeliveryResult deliverEndServerResult = new DeliveryResult(getOrganisationID(), t);
 
 			try {
 				DeliveryResult deliverEndServerResult_detached = deliveryHelperLocal.deliverEnd_storeDeliverEndServerResult(
-						deliveryID, deliverEndServerResult, true, fetchGroups, 0);
+						deliveryID, deliverEndServerResult, true, fetchGroups, NLJDOHelper.MAX_FETCH_DEPTH_NO_LIMIT);
 
 				deliveryHelperLocal.deliverRollback(deliveryID);
 

@@ -1487,14 +1487,14 @@ public abstract class AccountingManagerBean
 
 		try {
 
-			return paymentHelperLocal.payBegin_internal(paymentDataID, fetchGroups, 0);
+			return paymentHelperLocal.payBegin_internal(paymentDataID, fetchGroups, NLJDOHelper.MAX_FETCH_DEPTH_NO_LIMIT);
 
 		} catch (Throwable t) {
 			PaymentResult payBeginServerResult = new PaymentResult(getOrganisationID(), t);
 
 			try {
 				return paymentHelperLocal.payBegin_storePayBeginServerResult(
-						PaymentID.create(paymentDataID), payBeginServerResult, true, fetchGroups, 0);
+						PaymentID.create(paymentDataID), payBeginServerResult, true, fetchGroups, NLJDOHelper.MAX_FETCH_DEPTH_NO_LIMIT);
 			} catch (ModuleException x) {
 				throw x;
 			} catch (RuntimeException x) {
@@ -1617,14 +1617,14 @@ public abstract class AccountingManagerBean
 
 		try {
 
-			return paymentHelperLocal.payDoWork_internal(paymentID, fetchGroups, 0);
+			return paymentHelperLocal.payDoWork_internal(paymentID, fetchGroups, NLJDOHelper.MAX_FETCH_DEPTH_NO_LIMIT);
 
 		} catch (Throwable t) {
 			PaymentResult payDoWorkServerResult = new PaymentResult(getOrganisationID(), t);
 
 			try {
 				PaymentResult payDoWorkServerResult_detached = paymentHelperLocal.payDoWork_storePayDoWorkServerResult(
-						paymentID, payDoWorkServerResult, true, fetchGroups, 0);
+						paymentID, payDoWorkServerResult, true, fetchGroups, NLJDOHelper.MAX_FETCH_DEPTH_NO_LIMIT);
 
 				return payDoWorkServerResult_detached;
 			} catch (ModuleException x) {
@@ -1748,14 +1748,14 @@ public abstract class AccountingManagerBean
 
 		try {
 
-			return paymentHelperLocal.payEnd_internal(paymentID, fetchGroups, 0);
+			return paymentHelperLocal.payEnd_internal(paymentID, fetchGroups, NLJDOHelper.MAX_FETCH_DEPTH_NO_LIMIT);
 
 		} catch (Throwable t) {
 			PaymentResult payEndServerResult = new PaymentResult(getOrganisationID(), t);
 
 			try {
 				PaymentResult payEndServerResult_detached = paymentHelperLocal.payEnd_storePayEndServerResult(
-						paymentID, payEndServerResult, true, fetchGroups, 0);
+						paymentID, payEndServerResult, true, fetchGroups, NLJDOHelper.MAX_FETCH_DEPTH_NO_LIMIT);
 
 				paymentHelperLocal.payRollback(paymentID);
 

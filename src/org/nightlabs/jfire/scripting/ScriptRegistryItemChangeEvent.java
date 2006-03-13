@@ -34,7 +34,7 @@ import org.nightlabs.jfire.jdo.controller.JDOObjectController;
 import org.nightlabs.jfire.scripting.id.ScriptRegistryItemID;
 
 /**
- * @author Alexander Bieber <alex[AT]nightlabs[ÐOT]de>
+ * @author Alexander Bieber <alex[AT]nightlabs[DOT]de>
  * 
  * @jdo.persistence-capable
  *		identity-type="application"

@@ -27,7 +27,7 @@
 package org.nightlabs.jfire.scripting;
 
 /**
- * @author Alexander Bieber <alex[AT]nightlabs[ÐOT]de>
+ * @author Alexander Bieber <alex[AT]nightlabs[DOT]de>
  *
  */
 public class JFireScriptingEAR {

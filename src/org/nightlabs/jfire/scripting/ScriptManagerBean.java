@@ -209,7 +209,7 @@ implements SessionBean
 			if (fetchGroups != null)
 				pm.getFetchPlan().setGroups(fetchGroups);
 
-			Collection topLevelItems = ScriptRegistryItem.getTopScriptRegistryItems(pm, organisationID);
+			Collection topLevelItems = ScriptRegistryItem.getTopScriptRegistryItemsByOrganisationID(pm, organisationID);
 			Collection result = (Collection) pm.detachCopyAll(topLevelItems);
 			return result;
 		} finally {
@@ -218,6 +218,8 @@ implements SessionBean
 	}
 	
 	/**
+	 * 
+	 * @param organisationID The organisationID the carriers should be searched for. If null top level carriers for all organisations are returned.
 	 * @throws ModuleException
 	 *
 	 * @ejb.interface-method
@@ -230,7 +232,7 @@ implements SessionBean
 		PersistenceManager pm;
 		pm = getPersistenceManager();
 		try {
-			Collection topLevelItems = ScriptRegistryItem.getTopScriptRegistryItems(pm, organisationID);
+			Collection topLevelItems = ScriptRegistryItem.getTopScriptRegistryItemsByOrganisationID(pm, organisationID);
 			Collection<ScriptRegistryItemCarrier> result = new HashSet<ScriptRegistryItemCarrier>();
 			for (Iterator iter = topLevelItems.iterator(); iter.hasNext();) {
 				ScriptRegistryItem item = (ScriptRegistryItem) iter.next();

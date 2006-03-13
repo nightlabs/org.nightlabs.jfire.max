@@ -57,19 +57,26 @@ import org.nightlabs.util.Utils;
  * @jdo.fetch-group name="ScriptRegistryItem.this" fetch-groups="default" fields="parent, name"
  * 
  * @jdo.query
- *		name="getTopLevelScriptRegistryItems"
+ *		name="getTopLevelScriptRegistryItemsByOrganisationID"
  *		query="SELECT
  *			WHERE this.organisationID == paramOrganisationID &&
  *            this.parent == null    
  *			PARAMETERS String paramOrganisationID
  *			import java.lang.String"
  * 
+ * @jdo.query
+ *		name="getTopLevelScriptRegistryItems"
+ *		query="SELECT
+ *			WHERE this.parent == null    
+ *			import java.lang.String"
+ *
  */
 public class ScriptRegistryItem
 		implements Serializable, StoreCallback
 {
 	private static final long serialVersionUID = 9221181132208442543L;
 	
+	public static final String QUERY_GET_TOPLEVEL_SCRIPT_REGISTRY_ITEMS_BY_ORGANISATION_ID = "getTopLevelScriptRegistryItemsByOrganisationID";
 	public static final String QUERY_GET_TOPLEVEL_SCRIPT_REGISTRY_ITEMS = "getTopLevelScriptRegistryItems";
 
 	public static final String FETCH_GROUP_PARENT = "ScriptRegistryItem.parentItem";
@@ -209,15 +216,30 @@ public class ScriptRegistryItem
 
 	/**
 	 * Returns all top level (parent == null) ScriptRegistryItems for the given organisationID
+	 * If organisation is null the top level registry items
+	 * for all organisation are returned.
+	 * 
+	 * @param pm The PersistenceManager to use.
+	 * @param organisatinID The organisationID to use. 
+	 */
+	public static Collection getTopScriptRegistryItemsByOrganisationID(PersistenceManager pm, String organisatinID) {
+		if (organisatinID == null || "".equals(organisatinID))
+			return getTopScriptRegistryItems(pm);
+		Query q = pm.newNamedQuery(ScriptRegistryItem.class, QUERY_GET_TOPLEVEL_SCRIPT_REGISTRY_ITEMS_BY_ORGANISATION_ID);
+		return (Collection)q.execute(organisatinID);
+	}
+
+	/**
+	 * Returns all top level (parent == null) ScriptRegistryItems for the given organisationID
 	 * 
 	 * @param pm The PersistenceManager to use.
 	 * @param organisatinID The organisationID to use
 	 */
-	public static Collection getTopScriptRegistryItems(PersistenceManager pm, String organisatinID) {
+	public static Collection getTopScriptRegistryItems(PersistenceManager pm) {
 		Query q = pm.newNamedQuery(ScriptRegistryItem.class, QUERY_GET_TOPLEVEL_SCRIPT_REGISTRY_ITEMS);
-		return (Collection)q.execute(organisatinID);
+		return (Collection)q.execute();
 	}
-
+	
 	public void jdoPreStore() {
 		// Assuming that preStore only called when first made persistent
 		if (true) return; // TODO @Bieber: Change Event Tracking should only be done if there is an interested client! Marco.

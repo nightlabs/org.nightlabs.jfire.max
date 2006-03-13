@@ -29,7 +29,7 @@ package org.nightlabs.jfire.scripting;
 import java.util.Set;
 
 /**
- * @author Alexander Bieber <alex[AT]nightlabs[ÐOT]de>
+ * @author Alexander Bieber <alex[AT]nightlabs[DOT]de>
  *
  */
 public interface NestableScriptRegistryItem {

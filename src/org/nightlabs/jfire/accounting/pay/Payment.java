@@ -27,7 +27,6 @@
 package org.nightlabs.jfire.accounting.pay;
 
 import java.io.Serializable;
-import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Date;
 import java.util.HashSet;
@@ -749,10 +748,10 @@ implements Serializable, StoreCallback
 	 *		collection-type="collection"
 	 *		element-type="org.nightlabs.jfire.accounting.Invoice"
 	 *		table="JFireTrade_Payment_invoices"
-	 * 
+	 *
 	 * @jdo.join
 	 */
-	private Collection invoices = null;
+	private Set invoices = null;
 
 	/**
 	 * @jdo.field persistence-modifier="persistent"
@@ -871,7 +870,7 @@ implements Serializable, StoreCallback
 	/**
 	 * @param invoices The invoices to set.
 	 */
-	public void setInvoices(Collection invoices)
+	public void setInvoices(Set invoices)
 	{
 		if (invoices == null)
 			throw new NullPointerException("invoices must not be null!");
@@ -1178,7 +1177,7 @@ implements Serializable, StoreCallback
 		if (invoiceIDs != null) {
 			if (invoices == null || invoices.size() != invoiceIDs.size()) {
 				if (invoices == null)
-					invoices = new ArrayList();
+					invoices = new HashSet();
 
 				invoices.clear();
 
@@ -1192,7 +1191,7 @@ implements Serializable, StoreCallback
 
 		if (JDOHelper.isNew(this)) {
 			if (invoices == null)
-				invoices = new ArrayList();
+				invoices = new HashSet();
 		}
 
 		if (precursorID != null && precursor != null) {

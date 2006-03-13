@@ -27,7 +27,6 @@
 package org.nightlabs.jfire.store.deliver;
 
 import java.io.Serializable;
-import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Date;
 import java.util.HashSet;
@@ -773,7 +772,7 @@ implements Serializable, StoreCallback
 	 * 
 	 * @jdo.join
 	 */
-	private Collection deliveryNotes = null;
+	private Set deliveryNotes = null;
 
 	/**
 	 * @jdo.field persistence-modifier="persistent"
@@ -1397,7 +1396,7 @@ implements Serializable, StoreCallback
 		if (JDOHelper.isNew(this)) {
 			HashSet dnIDs = new HashSet();
 			if (deliveryNotes == null)
-				deliveryNotes = new ArrayList();
+				deliveryNotes = new HashSet();
 	
 			deliveryNotes.clear();
 			for (Iterator it = articleLocals.iterator(); it.hasNext(); ) {

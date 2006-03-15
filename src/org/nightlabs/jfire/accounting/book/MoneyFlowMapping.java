@@ -34,6 +34,8 @@ import javax.jdo.PersistenceManager;
 
 import org.nightlabs.jfire.accounting.Account;
 import org.nightlabs.jfire.accounting.Currency;
+import org.nightlabs.jfire.accounting.book.LocalAccountantDelegate.ResolvedMapEntry;
+import org.nightlabs.jfire.accounting.book.LocalAccountantDelegate.ResolvedMapKey;
 import org.nightlabs.jfire.accounting.id.CurrencyID;
 import org.nightlabs.jfire.store.ProductType;
 import org.nightlabs.jfire.trade.ArticlePrice;
@@ -283,7 +285,7 @@ public abstract class MoneyFlowMapping implements Serializable {
 		
 	}
 	
-	public abstract void addMappingsToMap(ProductType productType, Map resolvedMappings);
+	public abstract void addMappingsToMap(ProductType productType, Map<String, MoneyFlowMapping> resolvedMappings);
 	
 	
 	public static String getMappingKey(
@@ -295,6 +297,7 @@ public abstract class MoneyFlowMapping implements Serializable {
 		return productTypePK+"/"+packageType+"/"+currencyID;
 	}
 	
+	// TODO: Must check for taking from multiple amounts
 	public abstract long getArticlePriceDimensionAmount(Map dimensionValues, ArticlePrice articlePrice);
 	
 	public void validate() {

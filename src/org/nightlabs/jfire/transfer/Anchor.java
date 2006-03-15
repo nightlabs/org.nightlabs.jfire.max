@@ -166,7 +166,7 @@ public abstract class Anchor
 	 * Do NOT call this method directly! Use {@link Transfer#bookTransfer(User, Map)}
 	 * instead!
 	 */
-	public void rollbackTransfer(User user, Transfer transfer, Map involvedAnchors)
+	public void rollbackTransfer(User user, Transfer transfer, Map<String, Anchor> involvedAnchors)
 	{
 		if (transfer == null)
 			throw new NullPointerException("transfer must not be null!");
@@ -200,7 +200,7 @@ public abstract class Anchor
 			transfer.setBookedTo(false);
 	}
 
-	protected abstract void internalRollbackTransfer(Transfer transfer, User user, Map involvedAnchors);
+	protected abstract void internalRollbackTransfer(Transfer transfer, User user, Map<String, Anchor> involvedAnchors);
 
 	/**
 	 * Do NOT call this method directly! Use {@link Transfer#bookTransfer(User, Map)}
@@ -215,7 +215,7 @@ public abstract class Anchor
 	 *
 	 * @throws DuplicateTransferException If the given transfer has already been booked.
 	 */
-	public void bookTransfer(User user, Transfer transfer, Map involvedAnchors)
+	public void bookTransfer(User user, Transfer transfer, Map<String, Anchor> involvedAnchors)
 	{
 		if (transfer == null)
 			throw new NullPointerException("transfer must not be null!");
@@ -251,7 +251,7 @@ public abstract class Anchor
 //		transfers.put(pk,transfer);
 	}
 
-	protected abstract void internalBookTransfer(Transfer transfer, User user, Map involvedAnchors);
+	protected abstract void internalBookTransfer(Transfer transfer, User user, Map<String, Anchor> involvedAnchors);
 
 //	protected void addTransfer(Transfer transfer)
 //	{
@@ -261,7 +261,7 @@ public abstract class Anchor
 //		transfers.put(transfer.getPrimaryKey(), transfer);
 //	}
 
-	public static void checkIntegrity(Collection containers, Map involvedAnchors)
+	public static void checkIntegrity(Collection<Transfer> containers, Map<String, Anchor> involvedAnchors)
 	{
 		for (Iterator it = involvedAnchors.values().iterator(); it.hasNext(); ) {
 			Anchor anchor = (Anchor) it.next();
@@ -269,7 +269,7 @@ public abstract class Anchor
 		}
 	}
 
-	public static void resetIntegrity(Collection containers, Map involvedAnchors)
+	public static void resetIntegrity(Collection<Transfer> containers, Map<String, Anchor> involvedAnchors)
 	{
 		for (Iterator it = involvedAnchors.values().iterator(); it.hasNext(); ) {
 			Anchor anchor = (Anchor) it.next();
@@ -291,7 +291,7 @@ public abstract class Anchor
 	 *		They contain all the other transfers (them pointing to this
 	 *		one with {@link Transfer#getContainer()}.
 	 */
-	public abstract void checkIntegrity(Collection containers);
+	public abstract void checkIntegrity(Collection<Transfer> containers);
 
 	/**
 	 * This method is called on all involved anchors after {@link #checkIntegrity(Collection)} failed on one
@@ -301,7 +301,7 @@ public abstract class Anchor
 	 *
 	 * @param containers
 	 */
-	public abstract void resetIntegrity(Collection containers);
+	public abstract void resetIntegrity(Collection<Transfer> containers);
 
 	protected PersistenceManager getPersistenceManager()
 	{

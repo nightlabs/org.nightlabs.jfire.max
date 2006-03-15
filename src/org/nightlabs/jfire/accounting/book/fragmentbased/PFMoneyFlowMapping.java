@@ -187,7 +187,7 @@ public class PFMoneyFlowMapping extends MoneyFlowMapping {
 		setPriceFragmentType((PriceFragmentType)getPersistenceManager().getObjectById(PriceFragmentType.primaryKeyToPriceFragmentTypeID(getPriceFragmentTypePK())));
 	}	
 	
-	public void addMappingsToMap(ProductType productType, Map resolvedMappings) {
+	public void addMappingsToMap(ProductType productType, Map<String, MoneyFlowMapping> resolvedMappings) {
 		// TODO: Add here instance multiple times for wildcards
 		getProductType();
 		getAccount();

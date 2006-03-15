@@ -37,6 +37,7 @@ import org.nightlabs.jfire.store.DeliveryNote;
 import org.nightlabs.jfire.store.Store;
 import org.nightlabs.jfire.trade.Article;
 import org.nightlabs.jfire.trade.OrganisationLegalEntity;
+import org.nightlabs.jfire.transfer.Anchor;
 
 /**
  * @author Marco Schulze - marco at nightlabs dot de
@@ -112,7 +113,7 @@ implements Serializable
 	 * @param bookTransfer TODO
 	 * @param involvedAnchors TODO
 	 */
-	public void preBookArticles(OrganisationLegalEntity mandator, User user, DeliveryNote deliveryNote, BookProductTransfer bookTransfer, Map involvedAnchors) {}
+	public void preBookArticles(OrganisationLegalEntity mandator, User user, DeliveryNote deliveryNote, BookProductTransfer bookTransfer, Map<String, Anchor> involvedAnchors) {}
 
 	/**
 	 * Called by LocalStorekeeper before all articles of a deliveryNote are booked.
@@ -120,7 +121,7 @@ implements Serializable
 	 * @param bookTransfer TODO
 	 * @param involvedAnchors TODO
 	 */
-	public void postBookArticles(OrganisationLegalEntity mandator, User user, DeliveryNote deliveryNote, BookProductTransfer bookTransfer, Map involvedAnchors) {}
+	public void postBookArticles(OrganisationLegalEntity mandator, User user, DeliveryNote deliveryNote, BookProductTransfer bookTransfer, Map<String, Anchor> involvedAnchors) {}
 
 	protected PersistenceManager getPersistenceManager()
 	{

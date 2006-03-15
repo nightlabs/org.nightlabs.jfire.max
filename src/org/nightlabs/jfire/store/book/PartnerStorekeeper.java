@@ -37,6 +37,7 @@ import org.nightlabs.jfire.store.Repository;
 import org.nightlabs.jfire.store.Store;
 import org.nightlabs.jfire.store.deliver.DeliverProductTransfer;
 import org.nightlabs.jfire.trade.LegalEntity;
+import org.nightlabs.jfire.transfer.Anchor;
 import org.nightlabs.jfire.transfer.Transfer;
 import org.nightlabs.jfire.transfer.id.AnchorID;
 
@@ -109,7 +110,7 @@ public class PartnerStorekeeper extends Storekeeper
 	}
 
 	protected void handleBookOrDeliveryProductTransfer(User user, LegalEntity mandator,
-			ProductTransfer transfer, Map involvedAnchors)
+			ProductTransfer transfer, Map<String, Anchor> involvedAnchors)
 	{
 		PersistenceManager pm = getPersistenceManager();
 		Repository partnerInsideRepository = createPartnerInsideRepository(

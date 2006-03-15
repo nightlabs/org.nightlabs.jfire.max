@@ -40,11 +40,11 @@ import javax.jdo.PersistenceManager;
 import javax.jdo.Query;
 
 import org.apache.log4j.Logger;
-
 import org.nightlabs.jfire.accounting.Accounting;
 import org.nightlabs.jfire.accounting.Currency;
 import org.nightlabs.jfire.accounting.Invoice;
 import org.nightlabs.jfire.accounting.InvoiceMoneyTransfer;
+import org.nightlabs.jfire.accounting.tariffpriceconfig.CellReflector.ResolvedPriceCell;
 import org.nightlabs.jfire.security.User;
 import org.nightlabs.jfire.store.NestedProductType;
 import org.nightlabs.jfire.store.ProductType;
@@ -176,7 +176,7 @@ public abstract class LocalAccountantDelegate implements Serializable {
 		/**
 	 * Returns the list of Dimensions this LocalAccountantDelegate knows.
 	 */
-	public abstract List getMoneyFlowDimensionIDs();
+	public abstract List<String> getMoneyFlowDimensionIDs();
 	
 	
 	/* ************ Getter / Setter ***************** */
@@ -223,6 +223,12 @@ public abstract class LocalAccountantDelegate implements Serializable {
 	 * Helper class used as key in the resolvedMappings Map.
 	 */
 	public static class ResolvedMapKey implements Serializable {
+		/**
+		 * 
+		 */
+		private static final long serialVersionUID = 1L;
+		
+		
 		private ProductTypeID productTypeID;
 		private String packageType;
 		public ResolvedMapKey(ProductTypeID productTypeID, String packageType) {
@@ -254,14 +260,20 @@ public abstract class LocalAccountantDelegate implements Serializable {
 	/**
 	 * Helper class to hold resolved mappings for one ProductType 
 	 */
-	public static class ResolvedMapEnty implements Serializable {
+	public static class ResolvedMapEntry implements Serializable {
+		/**
+		 * 
+		 */
+		private static final long serialVersionUID = 1L;
+		
+		
 		private ProductType productType;
 		private int delegationLevel;
 		/**
 		 * key: String MoneyFlowMapping.getMappingKey(dimensionValues)
 		 * value: MoneyFlowMapping mapping
 		 */
-		Map resolvedMappings = new HashMap();
+		Map<String, MoneyFlowMapping> resolvedMappings = new HashMap<String, MoneyFlowMapping>();
 		/**
 		 * @return Returns the productType.
 		 */
@@ -277,13 +289,13 @@ public abstract class LocalAccountantDelegate implements Serializable {
 		/**
 		 * @return Returns the resolvedMappings.
 		 */
-		public Map getResolvedMappings() {
+		public Map<String, MoneyFlowMapping> getResolvedMappings() {
 			return resolvedMappings;
 		}
 		/**
 		 * @param resolvedMappings The resolvedMappings to set.
 		 */
-		public void setResolvedMappings(Map resolvedMappings) {
+		public void setResolvedMappings(Map<String, MoneyFlowMapping> resolvedMappings) {
 			this.resolvedMappings = resolvedMappings;
 		}
 		/**
@@ -306,7 +318,7 @@ public abstract class LocalAccountantDelegate implements Serializable {
 	public static interface ResolveProductTypeProvider {
 		ProductType getProductType();
 		String getPackageType();
-		Collection getNestedProviders();
+		Collection<ResolveProductTypeProvider> getNestedProviders();
 	}
 	
 	/**
@@ -329,10 +341,11 @@ public abstract class LocalAccountantDelegate implements Serializable {
 			return packageType;
 		}
 		
-		private List nested;
-		public Collection getNestedProviders() {
+		private List<ResolveProductTypeProvider> nested;
+		
+		public Collection<ResolveProductTypeProvider> getNestedProviders() {
 			if (nested == null) {
-				nested = new LinkedList();
+				nested = new LinkedList<ResolveProductTypeProvider>();
 				for (Iterator iter = productType.getNestedProductTypes().iterator(); iter.hasNext();) {
 					NestedProductType nestedType = (NestedProductType) iter.next();
 					nested.add(
@@ -368,10 +381,11 @@ public abstract class LocalAccountantDelegate implements Serializable {
 			return packageType;
 		}
 		
-		private List nested;
-		public Collection getNestedProviders() {
+		private List<ResolveProductTypeProvider> nested;
+		
+		public Collection<ResolveProductTypeProvider> getNestedProviders() {
 			if (nested == null) {
-				nested = new LinkedList();
+				nested = new LinkedList<ResolveProductTypeProvider>();
 				for (Iterator iter = articlePrice.getNestedArticlePrices().iterator(); iter.hasNext();) {
 					ArticlePrice nestedPrice = (ArticlePrice) iter.next();
 					nested.add(
@@ -392,10 +406,10 @@ public abstract class LocalAccountantDelegate implements Serializable {
 	 * {@link #resolveProductTypeMappings(ProductType)} 
 	 * 
 	 * @param invoice The Invoice mappings should be resolved for.
-	 * @return A map with key {@link ResolvedMapKey} and value {@link ResolvedMapEnty}
+	 * @return A map with key {@link ResolvedMapKey} and value {@link ResolvedMapEntry}
 	 */
-	public Map resolveProductTypeMappings(Invoice invoice) {
-		Map result = new HashMap();
+	public Map<ResolvedMapKey, ResolvedMapEntry> resolveProductTypeMappings(Invoice invoice) {
+		Map<ResolvedMapKey, ResolvedMapEntry> result = new HashMap<ResolvedMapKey, ResolvedMapEntry>();
 		for (Iterator iter = invoice.getArticles().iterator(); iter.hasNext();) {
 			Article article = (Article) iter.next();
 			ArticlePriceTypeProvider provider = new ArticlePriceTypeProvider(getPackageType(article.getPrice()), article.getPrice());
@@ -408,7 +422,7 @@ public abstract class LocalAccountantDelegate implements Serializable {
 	 * Resolves all MoneyFlowMappings for the given productType and all 
 	 * its nested ProductTypes.
 	 * 
-	 * A Map with key {@link ResolvedMapKey} and value {@link ResolvedMapEnty} is 
+	 * A Map with key {@link ResolvedMapKey} and value {@link ResolvedMapEntry} is 
 	 * returned here. Within the ResolvedMapEntries mappings are stored in an
 	 * Map with key (String) mappingKey and value {@link MoneyFlowMapping}.
 	 * Upon resolving mappings the delegation hierarchy and the productType 
@@ -436,10 +450,10 @@ public abstract class LocalAccountantDelegate implements Serializable {
 	 * mapping just to be overwritten finally by the mapping for PType2.   
 	 * 
 	 * @param productType The ProductType to resolve mappings for.
-	 * @return A map with key {@link ResolvedMapKey} and value {@link ResolvedMapEnty}
+	 * @return A map with key {@link ResolvedMapKey} and value {@link ResolvedMapEntry}
 	 */
 	public Map resolveProductTypeMappings(ProductType productType) {
-		Map result = new HashMap();
+		Map<ResolvedMapKey, ResolvedMapEntry> result = new HashMap<ResolvedMapKey, ResolvedMapEntry>();
 		resolveProductTypeMappings(productType, result, 0);
 		return result;
 	}
@@ -455,7 +469,7 @@ public abstract class LocalAccountantDelegate implements Serializable {
 	 * @param delegationLevel The current delegationLevel (>0 indicates that the current this was delegated to this LocalAccountantDelegate)
 	 * @see #resolveProductTypeMappings(ProductType, String, Map, int) 
 	 */
-	public void resolveProductTypeMappings(ProductType productType, Map resolvedMappings, int delegationLevel) {
+	public void resolveProductTypeMappings(ProductType productType, Map<ResolvedMapKey, ResolvedMapEntry> resolvedMappings, int delegationLevel) {
 		ProductTypeProvider provider = new ProductTypeProvider(getPackageType(productType), productType);
 		resolveProductTypeMappings(provider, provider.getPackageType(), resolvedMappings, delegationLevel);
 	}
@@ -476,8 +490,8 @@ public abstract class LocalAccountantDelegate implements Serializable {
 	 * @param resolvedMappings The Map to store the resolved ResolvedMapEntries 
 	 * @param delegationLevel The current delegationLevel (>0 indicates that the current this was delegated to this LocalAccountantDelegate)
 	 */
-	public void resolveProductTypeMappings(ResolveProductTypeProvider productTypeProvider, String packageType, Map resolvedMappings, int delegationLevel) {
-		ResolvedMapEnty entry = addProductTypeMappings(
+	public void resolveProductTypeMappings(ResolveProductTypeProvider productTypeProvider, String packageType, Map<ResolvedMapKey, ResolvedMapEntry> resolvedMappings, int delegationLevel) {
+		ResolvedMapEntry entry = addProductTypeMappings(
 				productTypeProvider.getProductType(), 
 				productTypeProvider.getPackageType(), 
 				delegationLevel
@@ -511,20 +525,20 @@ public abstract class LocalAccountantDelegate implements Serializable {
 	 * See {@link #resolveProductTypeMappings(ProductType)} on how mappings
 	 * can overwrite each other concerning delegate- and productType-hierarcy.
 	 */
-	protected ResolvedMapEnty addProductTypeMappings(ProductType productType, String packageType, int delegationLevel) {
-		LinkedList delegateHierarchy = new LinkedList();
+	protected ResolvedMapEntry addProductTypeMappings(ProductType productType, String packageType, int delegationLevel) {
+		LinkedList<LocalAccountantDelegate> delegateHierarchy = new LinkedList<LocalAccountantDelegate>();
 		LocalAccountantDelegate delegateRun = this;
 		while (delegateRun != null) {
 			delegateHierarchy.add(delegateRun);
 			delegateRun = delegateRun.getExtendedAccountantDelegate();
 		}
 		
-		ResolvedMapEnty entry = null;
+		ResolvedMapEntry entry = null;
 		// go through the delegate hierarchy
 		while (!delegateHierarchy.isEmpty()) {
 			LocalAccountantDelegate delegate = (LocalAccountantDelegate) delegateHierarchy.removeLast();
 			
-			LinkedList productTypeHierarchy = new LinkedList();
+			LinkedList<ProductType> productTypeHierarchy = new LinkedList<ProductType>();
 			ProductType pTypeRun = productType;
 			while (pTypeRun != null) {
 				productTypeHierarchy.add(pTypeRun);
@@ -538,7 +552,7 @@ public abstract class LocalAccountantDelegate implements Serializable {
 					MoneyFlowMapping mapping = (MoneyFlowMapping)iterator.next();
 					if (mapping.matches(pType, packageType)) {
 						if (entry == null) {
-							entry = new ResolvedMapEnty();
+							entry = new ResolvedMapEntry();
 							entry.setProductType(productType);
 							entry.setDelegationLevel(delegationLevel);
 						}
@@ -563,8 +577,10 @@ public abstract class LocalAccountantDelegate implements Serializable {
 	 * A LocalAccountantDelegate should decide based on its
 	 * configuration to which accounts the money is to be booked.
 	 * 
-	 * Subclasses may delegate the work here to {@link #bookProductTypeParts(OrganisationLegalEntity, User, Map, LinkedList, int, BookMoneyTransfer, Map)}
-	 * and only Provide new dimensions.
+	 * Subclasses may delegate the work here to 
+	 * {@link #bookProductTypeParts(OrganisationLegalEntity, User, Map, LinkedList, int, BookMoneyTransfer, Map)}
+	 * and only provide new dimensions.
+	 * 
 	 * @param mandator The organisation the LocalAccountant books for.
 	 * @param user The user that initiated the booking.
 	 * @param invoice The invoice that is currently booked.
@@ -578,7 +594,7 @@ public abstract class LocalAccountantDelegate implements Serializable {
 			Invoice invoice,
 			Article article, 
 			BookMoneyTransfer container, 
-			Map involvedAnchors
+			Map<String, Anchor> involvedAnchors
 		);
 
 
@@ -588,7 +604,7 @@ public abstract class LocalAccountantDelegate implements Serializable {
 	 * @param bookTransfer TODO
 	 * @param involvedAnchors TODO
 	 */
-	public void preBookArticles(OrganisationLegalEntity mandator, User user, Invoice invoice, BookMoneyTransfer bookTransfer, Map involvedAnchors) {}
+	public void preBookArticles(OrganisationLegalEntity mandator, User user, Invoice invoice, BookMoneyTransfer bookTransfer, Map<String, Anchor> involvedAnchors) {}
 
 	/**
 	 * Called by LocalAccountant before all articles of an invoice are booked.
@@ -596,7 +612,7 @@ public abstract class LocalAccountantDelegate implements Serializable {
 	 * @param bookTransfer TODO
 	 * @param involvedAnchors TODO
 	 */
-	public void postBookArticles(OrganisationLegalEntity mandator, User user, Invoice invoice, BookMoneyTransfer bookTransfer, Map involvedAnchors) {}
+	public void postBookArticles(OrganisationLegalEntity mandator, User user, Invoice invoice, BookMoneyTransfer bookTransfer, Map<String, Anchor> involvedAnchors) {}
 
 	/**
 	 * Tries to book all money concerning the given ProductType. It is intented to
@@ -607,13 +623,14 @@ public abstract class LocalAccountantDelegate implements Serializable {
 	 * delegationLevel in the entries whether to book the money itself or delegate
 	 * to the LocalAccountantDelegate assigned to the ProductType currently in
 	 * the stack an call this method for this delegate.
+	 * 
 	 * If no delegation is done this implementation of bookProductTypeParts
 	 * will call abstract {@link #internalBookProductTypeParts(OrganisationLegalEntity, User, Map, LinkedList, ArticlePrice, ProductType, String, int, BookMoneyTransfer, Map)}
 	 * which should do the job.  
 	 *
 	 * @param mandator The mandator to book for.
 	 * @param user The user that initiated the booking.
-	 * @param resolvedMappings The map of resolved mappings.
+	 * @param resolvedMappings The map of resolved MoneyFlowMappings.
 	 * @param articlePriceStack A Stack of ArticlePrices representing the ProductType packaging
 	 * @param delegationLevel The level of delegation calls to this method
 	 * @param container The Container transfer, that is the transfer from the customer to the vendor of the invoice 
@@ -622,16 +639,16 @@ public abstract class LocalAccountantDelegate implements Serializable {
 	public void bookProductTypeParts(
 			OrganisationLegalEntity mandator,			
 			User user,
-			Map resolvedMappings,
-			LinkedList articlePriceStack,
-			Map bookInvoiceTransfers,
+			Map<ResolvedMapKey, ResolvedMapEntry> resolvedMappings,
+			LinkedList<ArticlePrice> articlePriceStack,
+			Map<Anchor, Map<Anchor, Collection<BookInvoiceTransfer>>> bookInvoiceTransfers,
 			int delegationLevel,
-			BookMoneyTransfer container, Map involvedAnchors
+			BookMoneyTransfer container, Map<String, Anchor> involvedAnchors
 		)
 	{
 		ArticlePrice articlePrice = (ArticlePrice) articlePriceStack.peek();
 		ProductType productType = articlePrice.getProductType();
- 		boolean topLevel = articlePrice.getPackageArticlePrice() == null;
+// 		boolean topLevel = articlePrice.getPackageArticlePrice() == null;
 		String packageType = getPackageType(articlePrice);
 
 		int nextDelegationLevel = getDelegationLevel(resolvedMappings, productType, packageType);
@@ -672,22 +689,25 @@ public abstract class LocalAccountantDelegate implements Serializable {
 	 * Called by {@link #bookProductTypeParts(OrganisationLegalEntity, User, Map, LinkedList, int, BookMoneyTransfer, Map)}
 	 * to actually book the money for the given productType and packageType
 	 * after the delegation was resolved.
-	 * Subclasses may delegate the work here to {@link #internalBookProductTypePartsByDimension(OrganisationLegalEntity, User, Map, LinkedList, ArticlePrice, ProductType, String, int, BookMoneyTransfer, Map)}
+	 * 
+	 * Subclasses may delegate the work here to 
+	 * {@link #internalBookProductTypePartsByDimension(OrganisationLegalEntity, User, Map, LinkedList, ArticlePrice, ProductType, String, int, BookMoneyTransfer, Map)}
 	 * which for all possible dimension values books the money based on the 
 	 * (Dimension)-Mappings to the appropiate Accounts.
 	 */
 	protected abstract void internalBookProductTypeParts(
 			OrganisationLegalEntity mandator,			
 			User user,
-			Map resolvedMappings,
-			LinkedList articlePriceStack,
+			Map<ResolvedMapKey, ResolvedMapEntry> resolvedMappings,
+			LinkedList<ArticlePrice> articlePriceStack,
 			ArticlePrice articlePrice,
-			Map bookInvoiceTransfers,
+			Map<Anchor, Map<Anchor, Collection<BookInvoiceTransfer>>> bookInvoiceTransfers,
 			ProductType productType, 
 			String packageType,
 			int delegationLevel,
-			BookMoneyTransfer container, Map involvedAnchors
+			BookMoneyTransfer container, Map<String, Anchor> involvedAnchors
 		);
+	
 
 	/**
 	 * Can be used as default implementation of {@link #internalBookProductTypeParts(OrganisationLegalEntity, User, Map, LinkedList, ArticlePrice, ProductType, String, int, BookMoneyTransfer, Map)}.
@@ -697,14 +717,14 @@ public abstract class LocalAccountantDelegate implements Serializable {
 	protected void internalBookProductTypePartsByDimension(
 			OrganisationLegalEntity mandator,			
 			User user,
-			Map resolvedMappings,
-			LinkedList articlePriceStack,
+			Map<ResolvedMapKey, ResolvedMapEntry> resolvedMappings,
+			LinkedList<ArticlePrice> articlePriceStack,
 			ArticlePrice articlePrice,
-			Map bookInvoiceTransfers,
+			Map<Anchor, Map<Anchor, Collection<BookInvoiceTransfer>>> bookInvoiceTransfers,
 			ProductType productType, 
 			String packageType,
 			int delegationLevel,
-			BookMoneyTransfer container, Map involvedAnchors
+			BookMoneyTransfer container, Map<String, Anchor> involvedAnchors
 		) 
 	{
 		
@@ -723,15 +743,13 @@ public abstract class LocalAccountantDelegate implements Serializable {
 		}
 		Currency currency = articlePrice.getCurrency();
 		
-		List dimensionIDs = getMoneyFlowDimensionIDs();
+//		List dimensionIDs = getMoneyFlowDimensionIDs();
 				
 		List dimensions = getDimensionLeafNodes(productType);
 		
-		for (Iterator iter = dimensions.iterator(); iter.hasNext();) {
+		for (Iterator iter = dimensions.iterator(); iter.hasNext();) {			
 			DimensionNode dimensionNode = (DimensionNode) iter.next();
-			
-			Anchor from = null;
-			Anchor to = null;
+			LOGGER.info("Checking for DimensionNode: "+dimensionNode);
 			
 			MoneyFlowMapping mapping = getMoneyFlowMapping(
 					resolvedMappings, productType, packageType, 
@@ -741,8 +759,6 @@ public abstract class LocalAccountantDelegate implements Serializable {
 			if (mapping != null) {
 				
 				// have configuration for this productType, packageType and dimensionValues
-				to = mapping.getAccount();
-				
 				// resolve the anchor to get the money from 
 				Collection bookTransfers = getBookInvoiceTransfersForDimensionValues(
 						mandator,
@@ -753,28 +769,28 @@ public abstract class LocalAccountantDelegate implements Serializable {
 					);
 				for (Iterator iterator = bookTransfers.iterator(); iterator.hasNext();) {
 					BookInvoiceTransfer biTransfer = (BookInvoiceTransfer) iterator.next();
-					if (biTransfer.getFrom() == null || biTransfer.getFrom().getPrimaryKey().equals(to.getPrimaryKey()))
+					if (biTransfer.getFrom() == null || biTransfer.getFrom().getPrimaryKey().equals(biTransfer.getTo().getPrimaryKey()))
 						biTransfer.setFrom(mandator);
 					
 					// reverse if amount negative
 					if (biTransfer.getAmount() < 0) {
-						Anchor tmpAnchor = biTransfer.getTo();
-						biTransfer.setFrom(to);
+						Anchor tmpAnchor = biTransfer.getFrom();
+						biTransfer.setFrom(biTransfer.getTo());
 						biTransfer.setTo(tmpAnchor);
 					}
 					
 					if (biTransfer.getFrom().getPrimaryKey().equals(biTransfer.getTo().getPrimaryKey()))
 						continue;
 					
-					Map toTransfers = (Map)bookInvoiceTransfers.get(biTransfer.getFrom());
+					Map<Anchor, Collection<BookInvoiceTransfer>> toTransfers = bookInvoiceTransfers.get(biTransfer.getFrom());
 					if (toTransfers == null) {
-						toTransfers = new HashMap();
+						toTransfers = new HashMap<Anchor, Collection<BookInvoiceTransfer>>();
 						bookInvoiceTransfers.put(biTransfer.getFrom(), toTransfers);
 					}
 					
-					Collection transfers = (Collection)toTransfers.get(biTransfer.getTo());
+					Collection<BookInvoiceTransfer> transfers = toTransfers.get(biTransfer.getTo());
 					if (transfers == null) {
-						transfers = new LinkedList();
+						transfers = new LinkedList<BookInvoiceTransfer>();
 						toTransfers.put(biTransfer.getTo(), transfers);
 					}
 					transfers.add(biTransfer);
@@ -868,12 +884,12 @@ public abstract class LocalAccountantDelegate implements Serializable {
 	 * @param resolvedMapping The MoneyFlowMapping causing the call to this method (contains the target Anchor (Account))
 	 * @param resolvedMappings A Map with the resolved Mappings for all involved ProductTypes
 	 */
-	public abstract Collection getBookInvoiceTransfersForDimensionValues(
+	public abstract Collection<BookInvoiceTransfer> getBookInvoiceTransfersForDimensionValues(
 			OrganisationLegalEntity mandator,
-			LinkedList articlePriceStack, 
-			Map dimensionValues,
+			LinkedList<ArticlePrice> articlePriceStack, 
+			Map<String, String> dimensionValues,
 			MoneyFlowMapping resolvedMapping,
-			Map resolvedMappings
+			Map<ResolvedMapKey, ResolvedMapEntry> resolvedMappings
 		);
 	
 	/**
@@ -888,7 +904,7 @@ public abstract class LocalAccountantDelegate implements Serializable {
 	public abstract String getMoneyFlowMappingKey(
 			ProductTypeID productTypeID, 
 			String packageType,
-			Map dimensionValues,
+			Map<String, String> dimensionValues,
 			String currencyID
 		);
 
@@ -903,10 +919,10 @@ public abstract class LocalAccountantDelegate implements Serializable {
 	 * @return
 	 */
 	protected MoneyFlowMapping getMoneyFlowMapping(
-			Map resolvedMappings, 
+			Map<ResolvedMapKey, ResolvedMapEntry> resolvedMappings, 
 			ProductType productType, 
 			String packageType,
-			Map dimensionValues,
+			Map<String, String> dimensionValues,
 			Currency currency
 	) {
 		return getMoneyFlowMapping(
@@ -929,14 +945,14 @@ public abstract class LocalAccountantDelegate implements Serializable {
 	 * @return
 	 */
 	protected MoneyFlowMapping getMoneyFlowMapping(
-			Map resolvedMappings, 
+			Map<ResolvedMapKey, ResolvedMapEntry> resolvedMappings, 
 			ProductTypeID productTypeID, 
 			String packageType,
-			Map dimensionValues,
+			Map<String, String> dimensionValues,
 			String currencyID
 	) {
 		ResolvedMapKey key = new ResolvedMapKey(productTypeID, packageType);
-		ResolvedMapEnty entry = (ResolvedMapEnty)resolvedMappings.get(key);
+		ResolvedMapEntry entry = (ResolvedMapEntry)resolvedMappings.get(key);
 		if (entry == null)
 			return null;
 		MoneyFlowMapping mapping = (MoneyFlowMapping)entry.getResolvedMappings().get(
@@ -958,7 +974,7 @@ public abstract class LocalAccountantDelegate implements Serializable {
 	 */
 	protected boolean haveToDelegateBooking(Map resolvedMappings, ProductType productType, String packageType, int delegationLevel) {
 		ResolvedMapKey key = new ResolvedMapKey((ProductTypeID)JDOHelper.getObjectId(productType), packageType); 
-		ResolvedMapEnty entry = (ResolvedMapEnty)resolvedMappings.get(key);
+		ResolvedMapEntry entry = (ResolvedMapEntry)resolvedMappings.get(key);
 		if (entry == null)
 			return false;
 		else
@@ -971,7 +987,7 @@ public abstract class LocalAccountantDelegate implements Serializable {
 	 */
 	protected int getDelegationLevel(Map resolvedMappings, ProductType productType, String packageType) {
 		ResolvedMapKey key = new ResolvedMapKey((ProductTypeID)JDOHelper.getObjectId(productType), packageType); 
-		ResolvedMapEnty entry = (ResolvedMapEnty)resolvedMappings.get(key);
+		ResolvedMapEntry entry = (ResolvedMapEntry)resolvedMappings.get(key);
 		if (entry == null)
 			return 0;
 		else
@@ -1027,21 +1043,21 @@ public abstract class LocalAccountantDelegate implements Serializable {
 	 */
 	protected static class DimensionNode {
 		String dimensionPath;
-		Map dimensionValues = new HashMap();
+		Map<String, String> dimensionValues = new HashMap<String, String>();
 		DimensionNode parentDimension;
-		List children = new LinkedList();
+		List<DimensionNode> children = new LinkedList<DimensionNode>();
 		
 		/**
 		 * @return Returns the children.
 		 */
-		public List getChildren() {
+		public List<DimensionNode> getChildren() {
 			return children;
 		}
 
 		/**
 		 * @param children The children to set.
 		 */
-		public void setChildren(List children) {
+		public void setChildren(List<DimensionNode> children) {
 			this.children = children;
 		}
 
@@ -1062,14 +1078,14 @@ public abstract class LocalAccountantDelegate implements Serializable {
 		/**
 		 * @return Returns the dimensionValues.
 		 */
-		public Map getDimensionValues() {
+		public Map<String, String> getDimensionValues() {
 			return dimensionValues;
 		}
 
 		/**
 		 * @param dimensionValues The dimensionValues to set.
 		 */
-		public void setDimensionValues(Map dimensionValues) {
+		public void setDimensionValues(Map<String, String> dimensionValues) {
 			this.dimensionValues = dimensionValues;
 		}
 
@@ -1086,6 +1102,11 @@ public abstract class LocalAccountantDelegate implements Serializable {
 		public void setParentDimension(DimensionNode parentDimension) {
 			this.parentDimension = parentDimension;
 		}
+		
+		@Override
+		public String toString() {
+			return dimensionPath;
+		}
 	}
 	
 	/**
@@ -1093,7 +1114,7 @@ public abstract class LocalAccountantDelegate implements Serializable {
 	 */
 	public DimensionNode getRootNode(ProductType productType) {
 		DimensionNode node = new DimensionNode();
-		List dimensionIDs = getMoneyFlowDimensionIDs();
+		List<String> dimensionIDs = getMoneyFlowDimensionIDs();
 		makeDimensionNodes(node, dimensionIDs, 0, productType);
 		return node;
 	}
@@ -1102,13 +1123,13 @@ public abstract class LocalAccountantDelegate implements Serializable {
 	 * Build DimensionNodes for all dimensions in the level given by idx as 
 	 * children of the given parent and then recurses into the next level.
 	 */
-	private void makeDimensionNodes(DimensionNode parent, List dimensionIDs, int idx, ProductType productType) {
+	private void makeDimensionNodes(DimensionNode parent, List<String> dimensionIDs, int idx, ProductType productType) {
 		String moneyFlowDimensionID = (String)dimensionIDs.get(idx);
 		String[] dimValues = (String[])Utils.collection2TypedArray(getDimensionValues(moneyFlowDimensionID, productType), String.class);
 		for (int i = 0; i < dimValues.length; i++) {
 			DimensionNode node = new DimensionNode();
 			parent.children.add(node);
-			node.dimensionValues = new HashMap(parent.dimensionValues);
+			node.dimensionValues = new HashMap<String, String>(parent.dimensionValues);
 			node.dimensionValues.put(moneyFlowDimensionID, dimValues[i]);
 			if (parent.dimensionPath != null)
 				node.dimensionPath = parent.dimensionPath + "/" + dimValues[i];
@@ -1123,8 +1144,8 @@ public abstract class LocalAccountantDelegate implements Serializable {
 	 * Return a list with all leaf DimensionNodes in the resolved tree,
 	 * so the list will contain every possible dimension-value-permutation.
 	 */
-	public List getDimensionLeafNodes(ProductType productType) {
-		List leaves = new LinkedList();
+	public List<DimensionNode> getDimensionLeafNodes(ProductType productType) {
+		List<DimensionNode> leaves = new LinkedList<DimensionNode>();
 		addDimensionLeaves(leaves, getRootNode(productType));
 		return leaves;
 	}
@@ -1133,7 +1154,7 @@ public abstract class LocalAccountantDelegate implements Serializable {
 	 * Adds the DimensionNodes to the given list if it is a leaf.
 	 * Recurses into the nodes children.
 	 */
-	private void addDimensionLeaves(List leaves, DimensionNode node)  {
+	private void addDimensionLeaves(List<DimensionNode> leaves, DimensionNode node)  {
 		if (node.children.size() <= 0)
 			leaves.add(node);
 		else {
@@ -1170,12 +1191,12 @@ public abstract class LocalAccountantDelegate implements Serializable {
 	}
 	
 	
-	protected void bookInvoiceTransfers(User user, Map bookInvoiceTransfers, BookMoneyTransfer container, Map involvedAnchors) {
+	protected void bookInvoiceTransfers(User user, Map<Anchor, Map<Anchor, Collection<BookInvoiceTransfer>>> bookInvoiceTransfers, BookMoneyTransfer container, Map<String, Anchor> involvedAnchors) {
 		for (Iterator iter = bookInvoiceTransfers.entrySet().iterator(); iter.hasNext();) {
 			Map.Entry entry = (Map.Entry) iter.next();
 			Anchor from = (Anchor)entry.getKey();
 			Map toTransfers = (Map)entry.getValue();
-			LOGGER.info("bookInvoiceTransfers for Anchor from "+from.getPrimaryKey());
+			LOGGER.info("Starting book BookInvoiceTransfers from "+from.getPrimaryKey());
 			for (Iterator iterator = toTransfers.entrySet().iterator(); iterator.hasNext();) {
 				Map.Entry toEntry = (Map.Entry) iterator.next();
 				Anchor to = (Anchor)toEntry.getKey();
@@ -1183,7 +1204,7 @@ public abstract class LocalAccountantDelegate implements Serializable {
 				long balance = 0;
 				for (Iterator it = transfers.iterator(); it.hasNext();) {
 					BookInvoiceTransfer transfer = (BookInvoiceTransfer) it.next();
-					LOGGER.info("  bookInvoiceTransfers for Anchor to "+transfer.getTo().getPrimaryKey()+" with amount: "+transfer.getAmount());
+					LOGGER.info("  bookInvoiceTransfers to "+transfer.getTo().getPrimaryKey()+" with amount: "+transfer.getAmount());
 					balance += transfer.getAmount();
 				}
 				Anchor aFrom = (balance > 0) ? from : to;

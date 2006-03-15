@@ -299,7 +299,7 @@ implements SessionBean
 			// For performance reasons (we don't want the booking to block the payment), we do this here
 			// and not in payBegin_xxx and delay the booking another 10 sec.
 			try {
-				new AsyncInvoke().exec(new BookInvoiceInvocation(invoiceIDs, 60000)); // TODO should be 10000
+				new AsyncInvoke().exec(new BookInvoiceInvocation(invoiceIDs, 10000)); // TODO should be 10000
 			} catch (Exception e) {
 				throw new ModuleException(e);
 			}

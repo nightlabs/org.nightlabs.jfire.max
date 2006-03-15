@@ -881,7 +881,7 @@ public class Store
 			deliveryNote.getVendor().setStorekeeper(getPartnerStorekeeper());
 
 		// The booking works only with ProductHoles - the ProductLocal is not touched (Product is never touched anyway by deliveries or bookings) 
-		HashMap involvedAnchors = new HashMap();
+		Map<String, Anchor> involvedAnchors = new HashMap<String, Anchor>();
 		List bookProductTransfers = BookProductTransfer.createBookProductTransfers(this, initiator, deliveryNote);
 		boolean failed = true;
 		try {
@@ -1138,7 +1138,7 @@ public class Store
 			if (deliverProductTransfer == null)
 				throw new NullPointerException("serverDeliveryProcessor.deliverBegin(...) returned null but Delivery is NOT postponed! You are only allowed (and you should) return null, if you postpone a Delivery! serverDeliveryProcessorPK=\""+serverDeliveryProcessor.getPrimaryKey()+"\"");
 
-			HashMap involvedAnchors = new HashMap();
+			Map<String, Anchor> involvedAnchors = new HashMap<String, Anchor>();
 			ArrayList containers = new ArrayList(1);
 			containers.add(deliverProductTransfer);
 			boolean failed = true;

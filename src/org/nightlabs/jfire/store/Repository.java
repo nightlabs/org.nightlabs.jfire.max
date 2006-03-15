@@ -126,7 +126,7 @@ public class Repository extends Anchor
 	}
 
 	protected void internalBookTransfer(Transfer transfer, User user,
-			Map involvedAnchors)
+			Map<String, Anchor> involvedAnchors)
 	{
 		ProductTransfer productTransfer = (ProductTransfer) transfer;
 
@@ -200,10 +200,10 @@ public class Repository extends Anchor
 //			incProductLocalQuantity((Product) it.next(), val);
 //	}
 
-	public void checkIntegrity(Collection containers)
+	public void checkIntegrity(Collection<Transfer> containers)
 	{
 	}
-	public void resetIntegrity(Collection containers)
+	public void resetIntegrity(Collection<Transfer> containers)
 	{
 	}
 

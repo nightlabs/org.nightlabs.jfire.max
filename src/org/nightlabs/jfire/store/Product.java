@@ -283,7 +283,7 @@ implements Serializable
 		}
 
 		// create the ProductTransfers for the grouped nested products
-		Map involvedAnchors = new HashMap();
+		Map<String, Anchor> involvedAnchors = new HashMap<String, Anchor>();
 		LinkedList productTransfers = new LinkedList();
 		boolean failed = true;
 		try {
@@ -365,7 +365,7 @@ implements Serializable
 		}
 
 		// create the ProductTransfers for the grouped nested products
-		Map involvedAnchors = new HashMap();
+		Map<String, Anchor> involvedAnchors = new HashMap<String, Anchor>();
 		LinkedList productTransfers = new LinkedList();
 		boolean failed = true;
 		try {

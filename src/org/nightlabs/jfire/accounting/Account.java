@@ -216,7 +216,7 @@ public class Account extends Anchor
 	 * 
 	 * @see org.nightlabs.jfire.transfer.Anchor#internalBookTransfer(Transfer, User, Map)
 	 */
-	protected void internalBookTransfer(Transfer transfer, User user, Map involvedAnchors)
+	protected void internalBookTransfer(Transfer transfer, User user, Map<String, Anchor> involvedAnchors)
 	{
 		MoneyTransfer moneyTransfer = (MoneyTransfer) transfer;
 
@@ -242,7 +242,7 @@ public class Account extends Anchor
 		}
 	}
 		
-	protected void bookShadowTransfers(User user, MoneyTransfer moneyTransfer, Map involvedAnchors) {
+	protected void bookShadowTransfers(User user, MoneyTransfer moneyTransfer, Map<String, Anchor> involvedAnchors) {
 		Accounting accounting = Accounting.getAccounting(JDOHelper.getPersistenceManager(this));
 		boolean isDebit = Transfer.ANCHORTYPE_FROM == moneyTransfer.getAnchorType(this);
 		for (Iterator iter = getShadowAccounts().iterator(); iter.hasNext();) {
@@ -313,12 +313,12 @@ public class Account extends Anchor
 		this.owner = owner;
 	}
 
-	public void checkIntegrity(Collection containers)
+	public void checkIntegrity(Collection<Transfer> containers)
 	{
 		// here we might check later, whether allowed credit limits have been exceeded
 	}
 
-	public void resetIntegrity(Collection containers)
+	public void resetIntegrity(Collection<Transfer> containers)
 	{
 	}
 }

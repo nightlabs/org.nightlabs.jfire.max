@@ -282,13 +282,13 @@ public abstract class Transfer
 	 * <tt>to.bookTransfer(...)</tt>. Some special implementations
 	 * might do other stuff, too.
 	 */
-	public void bookTransfer(User user, Map involvedAnchors)
+	public void bookTransfer(User user, Map<String, Anchor> involvedAnchors)
 	{
 		from.bookTransfer(user, this, involvedAnchors);
 		to.bookTransfer(user, this, involvedAnchors);
 	}
 
-	public void rollbackTransfer(User user, Map involvedAnchors)
+	public void rollbackTransfer(User user, Map<String, Anchor> involvedAnchors)
 	{
 		from.rollbackTransfer(user, this, involvedAnchors);
 		to.rollbackTransfer(user, this, involvedAnchors);

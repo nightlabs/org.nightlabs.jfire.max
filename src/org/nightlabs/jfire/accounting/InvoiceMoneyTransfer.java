@@ -140,7 +140,8 @@ extends MoneyTransfer
 	/**
 	 * @see org.nightlabs.jfire.transfer.Transfer#bookTransfer(org.nightlabs.jfire.security.User, java.util.Map)
 	 */
-	public void bookTransfer(User user, Map involvedAnchors)
+	@Override
+	public void bookTransfer(User user, Map<String, Anchor> involvedAnchors)
 	{
 		bookTransferAtInvoice(user, involvedAnchors);
 		super.bookTransfer(user, involvedAnchors);
@@ -156,7 +157,8 @@ extends MoneyTransfer
 	/**
 	 * @see org.nightlabs.jfire.transfer.Transfer#rollbackTransfer(org.nightlabs.jfire.security.User, java.util.Map)
 	 */
-	public void rollbackTransfer(User user, Map involvedAnchors)
+	@Override
+	public void rollbackTransfer(User user, Map<String, Anchor> involvedAnchors)
 	{
 		rollbackTransferAtInvoice(user, involvedAnchors);
 		super.rollbackTransfer(user, involvedAnchors);

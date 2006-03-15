@@ -896,13 +896,14 @@ public abstract class AccountingManagerBean
 			for (Iterator iter = resolvedMappings.entrySet().iterator(); iter.hasNext();) {
 				Map.Entry entry = (Map.Entry) iter.next();
 				
-				LocalAccountantDelegate.ResolvedMapEnty persitentMapEntry = (LocalAccountantDelegate.ResolvedMapEnty)entry.getValue();				
-				LocalAccountantDelegate.ResolvedMapEnty mapEntry = new LocalAccountantDelegate.ResolvedMapEnty();
+				LocalAccountantDelegate.ResolvedMapEntry persitentMapEntry = (LocalAccountantDelegate.ResolvedMapEntry)entry.getValue();				
+				LocalAccountantDelegate.ResolvedMapEntry mapEntry = new LocalAccountantDelegate.ResolvedMapEntry();
 				
 				for (Iterator iterator = persitentMapEntry.getResolvedMappings().entrySet().iterator(); iterator.hasNext();) {
 					Map.Entry resolvedEntry = (Map.Entry) iterator.next();
 					MoneyFlowMapping persistentMapping = (MoneyFlowMapping)resolvedEntry.getValue();
-					mapEntry.getResolvedMappings().put(resolvedEntry.getKey(), pm.detachCopy(persistentMapping));
+					MoneyFlowMapping detachedMapping = (MoneyFlowMapping)pm.detachCopy(persistentMapping);
+					mapEntry.getResolvedMappings().put((String)resolvedEntry.getKey(), detachedMapping);
 				}
 				
 				result.put(entry.getKey(), mapEntry);				

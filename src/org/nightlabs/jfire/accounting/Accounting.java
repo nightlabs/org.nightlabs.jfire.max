@@ -635,7 +635,7 @@ public class Accounting
 				invoice
 			);
 
-		HashMap involvedAnchors = new HashMap();
+		Map<String, Anchor> involvedAnchors = new HashMap<String, Anchor>();
 		ArrayList containers = new ArrayList(1);
 		containers.add(bookMoneyTransfer);
 		boolean failed = true;
@@ -926,7 +926,7 @@ public class Accounting
 			if (payMoneyTransfer == null)
 				throw new NullPointerException("serverPaymentProcessor.payBegin(...) returned null but Payment is NOT postponed! You are only allowed (and you should) return null, if you postpone a Payment! serverPaymentProcessorPK=\""+serverPaymentProcessor.getPrimaryKey()+"\"");
 
-			HashMap involvedAnchors = new HashMap();
+			Map<String, Anchor> involvedAnchors = new HashMap<String, Anchor>();
 			ArrayList containers = new ArrayList(1);
 			containers.add(payMoneyTransfer);
 			boolean failed = true;

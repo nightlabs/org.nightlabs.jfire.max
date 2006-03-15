@@ -96,7 +96,7 @@ public class PartnerAccountant extends Accountant
 	 * @param mandator
 	 * @param transfer
 	 */
-	protected void handleBookMoneyTransfer(LegalEntity mandator, BookMoneyTransfer transfer, User user, Map involvedAnchors)
+	protected void handleBookMoneyTransfer(LegalEntity mandator, BookMoneyTransfer transfer, User user, Map<String, Anchor> involvedAnchors)
 	{
 		boolean mandatorIsVendor = transfer.getInvoice().getVendor().getPrimaryKey().equals(mandator.getPrimaryKey());
 		boolean mandatorIsCustomer = !mandatorIsVendor;
@@ -182,7 +182,7 @@ public class PartnerAccountant extends Accountant
 	 */
 	private long handleSingleInvoicePayment(
 			User user, LegalEntity partner, PayMoneyTransfer transfer,
-			Invoice invoice, long amountToPay, Map involvedAnchors)
+			Invoice invoice, long amountToPay, Map<String, Anchor> involvedAnchors)
 	{
 		if (amountToPay < 0)
 			throw new IllegalArgumentException("amountToPay=="+amountToPay+"! amountToPay must be positive or zero!");

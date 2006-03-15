@@ -219,7 +219,7 @@ public class LegalEntity extends Anchor
 		}
 	};
 
-	public void checkIntegrity(Collection containers)
+	public void checkIntegrity(Collection<Transfer> containers)
 	{
 		Transfer firstContainer = (Transfer) containers.iterator().next();
 
@@ -243,7 +243,7 @@ public class LegalEntity extends Anchor
 			throw new IllegalArgumentException("I know only MoneyTransfer and ProductTransfer! Your container of type " + containers.getClass() + " cannot be processed!");
 	}
 
-	public void resetIntegrity(Collection containers)
+	public void resetIntegrity(Collection<Transfer> containers)
 	{
 		Transfer firstContainer = (Transfer) containers.iterator().next();
 
@@ -354,7 +354,7 @@ public class LegalEntity extends Anchor
 		}
 	}
 
-	protected void internalBookTransfer(Transfer transfer, User user, Map involvedAnchors)
+	protected void internalBookTransfer(Transfer transfer, User user, Map<String, Anchor> involvedAnchors)
 	{
 		PersistenceManager pm = JDOHelper.getPersistenceManager(this);
 		if (pm == null)

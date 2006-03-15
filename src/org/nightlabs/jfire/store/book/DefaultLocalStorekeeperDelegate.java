@@ -249,7 +249,8 @@ public class DefaultLocalStorekeeperDelegate extends LocalStorekeeperDelegate
 	 *
 	 * @see org.nightlabs.jfire.store.book.LocalStorekeeperDelegate#postBookArticles(org.nightlabs.jfire.trade.OrganisationLegalEntity, org.nightlabs.jfire.security.User, org.nightlabs.jfire.store.DeliveryNote, org.nightlabs.jfire.store.book.BookProductTransfer, java.util.Map)
 	 */
-	public void postBookArticles(OrganisationLegalEntity mandator, User user, DeliveryNote deliveryNote, BookProductTransfer bookTransfer, Map involvedAnchors)
+	@Override
+	public void postBookArticles(OrganisationLegalEntity mandator, User user, DeliveryNote deliveryNote, BookProductTransfer bookTransfer, Map<String, Anchor> involvedAnchors)
 	{
 		Store store = getStore();
 

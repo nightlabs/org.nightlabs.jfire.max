@@ -65,8 +65,8 @@ import org.nightlabs.jfire.trade.Trader;
 
 
 /**
- * @ejb.bean name="jfire/ejb/JFireSimpleTrade/SimpleTradeManager"	
- *					 jndi-name="jfire/ejb/JFireSimpleTrade/SimpleTradeManager"
+ * @ejb.bean name="jfire/ejb/JFireChezFrancois/ChezFrancoisDatastoreInitializer"	
+ *					 jndi-name="jfire/ejb/JFireChezFrancois/ChezFrancoisDatastoreInitializer"
  *					 type="Stateless" 
  *					 transaction-type="Container"
  *

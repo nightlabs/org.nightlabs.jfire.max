@@ -3,6 +3,6 @@
 <application>
 	<display-name>Demo System Chez Francois</display-name>
 	<module>
-		<java>JFireChezFrancois.jar</java>
+		<ejb>JFireChezFrancois.jar</ejb>
 	</module>
 </application>

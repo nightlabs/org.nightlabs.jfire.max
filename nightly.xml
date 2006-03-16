@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE nightlybuild PUBLIC "-//NightLabs//DTD NightlyBuild V 0.6//EN" "http://www.nightlabs.de/dtd/nightlybuild_0_6.dtd">
+<nightlybuild>
+
+  <project name="JFireChezFrancois">
+    <!-- source repository is defined in JFireBuildAll/nightly-jfire-server.xml -->
+    <ant path="JFireChezFrancois" file="build-nightlabs.xml" target="deploy"/>
+    <requires/> <!-- default requires: uses .classpath file -->
+    <provides path="/JFireChezFrancois" location="JFireChezFrancois/dist/JFireChezFrancois.jar"/>
+    <provides path="/JFireChezFrancois/dist/JFireChezFrancois.jar" location="JFireChezFrancois/dist/JFireChezFrancois.jar"/>
+    <provides path="WORKSPACE/JFireChezFrancois/dist/JFireChezFrancois.jar" location="JFireChezFrancois/dist/JFireChezFrancois.jar"/>
+    <publishes location="JFireChezFrancois/dist/JFireChezFrancois.jar"/>
+    <javadoc path="JFireChezFrancois/src"/>
+  </project>
+
+</nightlybuild>

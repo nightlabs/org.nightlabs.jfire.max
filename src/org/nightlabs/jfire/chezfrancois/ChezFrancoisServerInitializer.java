@@ -1,12 +1,13 @@
 package org.nightlabs.jfire.chezfrancois;
 
+import org.apache.log4j.Logger;
 import org.nightlabs.jfire.serverinit.ServerInitializer;
 import org.nightlabs.jfire.servermanager.JFireServerManager;
 import org.nightlabs.jfire.servermanager.OrganisationNotFoundException;
 
 public class ChezFrancoisServerInitializer extends ServerInitializer
 {
-	private static final String ORGANISATION_ID = "jfire.chezfrancois.co.th";
+	public static final String ORGANISATION_ID_WINE_STORE = "jfire.chezfrancois.co.th";
 
 	@Override
 	public void initialize()
@@ -19,12 +20,17 @@ public class ChezFrancoisServerInitializer extends ServerInitializer
 //    try {
     	JFireServerManager jfsm = getJFireServerManagerFactory().getJFireServerManager();
     	try {
+    		if (jfsm.isNewServerNeedingSetup()) {
+    			Logger logger = Logger.getLogger(ChezFrancoisServerInitializer.class);
+    			logger.error("Server initialization is not possible, because the basic server configuration is not complete yet! Configure and reboot the server!");
+    			return;
+    		}
+
     		try {
-    			jfsm.getOrganisationConfig(ORGANISATION_ID);
+    			jfsm.getOrganisationConfig(ORGANISATION_ID_WINE_STORE);
     		} catch (OrganisationNotFoundException x) {
     			// do initialization!
-    			jfsm.createOrganisation(ORGANISATION_ID, "Chez François Wine Store", "francois", "test", true);
-
+    			jfsm.createOrganisation(ORGANISATION_ID_WINE_STORE, "Chez François Wine Store", "francois", "test", true);
     		}
     	} finally {
     		jfsm.close();

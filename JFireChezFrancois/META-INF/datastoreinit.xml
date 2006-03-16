@@ -1,0 +1,16 @@
+<!DOCTYPE datastore-initialization
+		PUBLIC "-//NightLabs GmbH//DTD Datastore Initialization 1.0//EN"
+		"http://www.nightlabs.de/dtd/datastoreinit_1_0.dtd">
+<datastore-initialization>
+
+	<init bean="jfire/ejb/JFireChezFrancois/ChezFrancoisDatastoreInitializer" method="initialize">
+
+		<depends
+					module="JFireSimpleTrade.ear"
+					archive="JFireSimpleTrade.jar"
+					bean="jfire/ejb/JFireSimpleTrade/SimpleTradeManager"
+					method="initialize" />
+
+	</init>
+
+</datastore-initialization>

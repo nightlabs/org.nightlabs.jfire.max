@@ -22,5 +22,7 @@
 	<classpathentry sourcepath="/WORKSPACE/org.nightlabs.base/src" kind="var" path="WORKSPACE/NightLabsBase/dist/NightLabsBase.jar"/>
 	<classpathentry kind="var" path="LOG4J"/>
 	<classpathentry sourcepath="WORKSPACE/NightLabsJDO/src" kind="var" path="WORKSPACE/NightLabsJDO/dist/NightLabsJDO.jar"/>
+	<classpathentry sourcepath="/WORKSPACE/JFireTrade" kind="var" path="WORKSPACE/JFireTrade/dist/JFireTrade.jar"/>
+	<classpathentry sourcepath="/WORKSPACE/JFireSimpleTrade/src" kind="var" path="WORKSPACE/JFireSimpleTrade/dist/JFireSimpleTrade.jar"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>

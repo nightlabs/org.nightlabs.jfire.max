@@ -190,200 +190,200 @@ implements SessionBean
 			store.setProductTypeStatus_published(user, rootSimpleProductType);
 
 
-			// TEST add test products
-			// TODO remove this test stuff
-			{
-				String langID = Locale.ENGLISH.getLanguage();
-
-//				pm.getExtent(CustomerGroup.class);
-//				CustomerGroup customerGroup = (CustomerGroup) pm.getObjectById(CustomerGroupID.create(organisationID, "default"));
-
-				pm.getExtent(Currency.class);
-				Currency euro = (Currency) pm.getObjectById(CurrencyID.create("EUR"));
-
-				pm.getExtent(Tariff.class);
-				Tariff tariff;
-				try {
-					tariff = (Tariff) pm.getObjectById(TariffID.create(organisationID, 0));
-				} catch (JDOObjectNotFoundException x) {
-					tariff = new Tariff(organisationID);
-					tariff.getName().setText(langID, "Normal Price");
-					pm.makePersistent(tariff);
-				}
-
-				// create the category "car"
-				SimpleProductType car = new SimpleProductType(
-						organisationID, "car", rootSimpleProductType, null, 
-						ProductType.INHERITANCE_NATURE_BRANCH, ProductType.PACKAGE_NATURE_OUTER);
-				car.getName().setText(langID, "Car");
-//				car.setDeliveryConfiguration(deliveryConfiguration);
-				store.addProductType(user, car, SimpleProductType.getDefaultHome(pm, car));
-				store.setProductTypeStatus_published(user, car);
-
-				// create the price config "Car - Middle Class"
-				PriceFragmentType totalPriceFragmentType = PriceFragmentType.getTotalPriceFragmentType(pm);
-				PriceFragmentType vatNet = (PriceFragmentType) pm.getObjectById(PriceFragmentTypeID.create(getRootOrganisationID(), "vat-de-16-net"));
-				PriceFragmentType vatVal = (PriceFragmentType) pm.getObjectById(PriceFragmentTypeID.create(getRootOrganisationID(), "vat-de-16-val"));
-
-				Accounting accounting = Accounting.getAccounting(pm);
-				Trader trader = Trader.getTrader(pm);
-				StablePriceConfig stablePriceConfig = new StablePriceConfig(organisationID, accounting.createPriceConfigID());
-				FormulaPriceConfig formulaPriceConfig = new FormulaPriceConfig(organisationID, accounting.createPriceConfigID());
-				formulaPriceConfig.getName().setText(langID, "Car - Middle Class");
-				
-				CustomerGroup customerGroupDefault = trader.getDefaultCustomerGroupForKnownCustomer();
-				CustomerGroup customerGroupAnonymous = LegalEntity.getAnonymousCustomer(pm).getDefaultCustomerGroup();
-				formulaPriceConfig.addCustomerGroup(customerGroupDefault);
-				formulaPriceConfig.addCustomerGroup(customerGroupAnonymous);
-				formulaPriceConfig.addCurrency(euro);
-				formulaPriceConfig.addTariff(tariff);
-//				formulaPriceConfig.addProductType(rootSimpleProductType);
-				formulaPriceConfig.addPriceFragmentType(totalPriceFragmentType);
-				formulaPriceConfig.addPriceFragmentType(vatNet);
-				formulaPriceConfig.addPriceFragmentType(vatVal);
-				stablePriceConfig.adoptParameters(formulaPriceConfig);
-
-				FormulaCell fallbackFormulaCell = formulaPriceConfig.createFallbackFormulaCell();
-				fallbackFormulaCell.setFormula(totalPriceFragmentType,
-						"cell.resolvePriceCellsAmount(\n" +
-						"	new AbsolutePriceCoordinate(\n" +
-						"		\""+organisationID+"/"+CustomerGroup.CUSTOMER_GROUP_ID_DEFAULT+"\",\n" +
-						"		null,\n" +
-						"		null,\n" +
-						"		null,\n" +
-						"		null\n" +
-						"	)\n" +
-						");");
-				fallbackFormulaCell.setFormula(vatNet, "cell.resolvePriceCellsAmount(\n" +
-						"	new AbsolutePriceCoordinate(\n" +
-						"		null,\n" +
-						"		null,\n" +
-						"		null,\n" +
-						"		null,\n" +
-						"		\""+Organisation.DEVIL_ORGANISATION_ID+"/_Total_\"\n" +
-						"	)\n" +
-						") / 1.16;");
-				fallbackFormulaCell.setFormula(vatVal, "cell.resolvePriceCellsAmount(\n" +
-						"	new AbsolutePriceCoordinate(\n" +
-						"		null,\n" +
-						"		null,\n" +
-						"		null,\n" +
-						"		null,\n" +
-						"		\""+Organisation.DEVIL_ORGANISATION_ID+"/_Total_\"\n" +
-						"	)\n" +
-						")\n" +
-
-//						"/ 1.16 * 0.16");
-
-						"\n" +
-						"-\n" +
-						"\n" +
-						"cell.resolvePriceCellsAmount(\n" +
-						"	new AbsolutePriceCoordinate(\n" +
-						"		null,\n" +
-						"		null,\n" +
-						"		null,\n" +
-						"		null,\n" +
-						"		\""+getRootOrganisationID()+"/vat-de-16-net\"\n" +
-						"	)\n" +
-						");");
-
-				FormulaCell cell = formulaPriceConfig.createFormulaCell(customerGroupDefault, tariff, euro);
-				cell.setFormula(totalPriceFragmentType, "5000");
-
-				// create the car "BMW 320i" and assign the "Car - Middle Class" price config
-				SimpleProductType bmw320i = new SimpleProductType(
-						organisationID, "bmw320i", car, null, ProductType.INHERITANCE_NATURE_LEAF, ProductType.PACKAGE_NATURE_OUTER);
-				bmw320i.getName().setText(Locale.ENGLISH.getLanguage(), "BMW 320i");
-				bmw320i.setPackagePriceConfig(stablePriceConfig);
-				bmw320i.setInnerPriceConfig(formulaPriceConfig);
-				bmw320i.setDeliveryConfiguration(deliveryConfiguration);
-				store.addProductType(user, bmw320i, SimpleProductType.getDefaultHome(pm, bmw320i));
-
-				store.setProductTypeStatus_published(user, bmw320i);
-				store.setProductTypeStatus_confirmed(user, bmw320i);
-				store.setProductTypeStatus_saleable(user, bmw320i, true);
-
-				// create the category "Car Part"
-				SimpleProductType carPart = new SimpleProductType(
-						organisationID, "carPart", rootSimpleProductType, null, ProductType.INHERITANCE_NATURE_BRANCH, ProductType.PACKAGE_NATURE_INNER);
-				carPart.getName().setText(Locale.ENGLISH.getLanguage(), "Car Part");
-				carPart.setDeliveryConfiguration(deliveryConfiguration);
-				store.addProductType(user, carPart, SimpleProductType.getDefaultHome(pm, carPart));
-
-				// create the part "Wheel"
-				SimpleProductType wheel = new SimpleProductType(
-						organisationID, "wheel", carPart, null, ProductType.INHERITANCE_NATURE_LEAF, ProductType.PACKAGE_NATURE_INNER);
-				wheel.getName().setText(Locale.ENGLISH.getLanguage(), "Wheel");
-				wheel.setDeliveryConfiguration(deliveryConfiguration);
-				store.addProductType(user, wheel, SimpleProductType.getDefaultHome(pm, wheel));
-
-				// create the priceConfig "Car Part - Wheel" and assign it to "Wheel"
-				formulaPriceConfig = new FormulaPriceConfig(organisationID, accounting.createPriceConfigID());
-				formulaPriceConfig.addProductType(car);
-				formulaPriceConfig.addPriceFragmentType(vatVal);
-				formulaPriceConfig.addPriceFragmentType(vatNet);
-				formulaPriceConfig.getName().setText(langID, "Car Part - Wheel");
-				fallbackFormulaCell = formulaPriceConfig.createFallbackFormulaCell();
-				fallbackFormulaCell.setFormula(
-						Organisation.DEVIL_ORGANISATION_ID,
-						PriceFragmentType.TOTAL_PRICEFRAGMENTTYPEID,
-						"cell.resolvePriceCellsAmount(\n" +
-						"	new AbsolutePriceCoordinate(\n" +
-						"		null,\n" +
-						"		null,\n" +
-						"		null,\n" +
-						"		\""+car.getPrimaryKey()+"\",\n" +
-						"		null\n" +
-						"	)\n" +
-						") * 0.1;");
-
-				fallbackFormulaCell.setFormula(vatNet, "cell.resolvePriceCellsAmount(\n" +
-						"	new AbsolutePriceCoordinate(\n" +
-						"		null,\n" +
-						"		null,\n" +
-						"		null,\n" +
-						"		null,\n" +
-						"		\""+Organisation.DEVIL_ORGANISATION_ID+"/_Total_\"\n" +
-						"	)\n"+
-						") / 1.16;");
-				fallbackFormulaCell.setFormula(vatVal, "cell.resolvePriceCellsAmount(\n" +
-						"	new AbsolutePriceCoordinate(\n" +
-						"		null,\n" +
-						"		null,\n" +
-						"		null,\n" +
-						"		null,\n" +
-						"		\""+Organisation.DEVIL_ORGANISATION_ID+"/_Total_\"\n" +
-						"	)\n"+
-						")\n" +
-						
-//						"/ 1.16 * 0.16;");
-						
-						"\n" +
-						"-\n" +
-						"\n" +
-						"cell.resolvePriceCellsAmount(\n" +
-						"	new AbsolutePriceCoordinate(\n" +
-						"		null,\n" +
-						"		null,\n" +
-						"		null,\n" +
-						"		null,\n" +
-						"		\""+getRootOrganisationID()+"/vat-de-16-net\"\n" +
-						"	)\n"+
-						");");
-
-				wheel.setInnerPriceConfig(formulaPriceConfig);
-
-				// package 4 wheels inside the bmw320i
-				NestedProductType wheelInsideBMW = bmw320i.createNestedProductType(wheel);
-				wheelInsideBMW.setQuantity(4);
-
-				// calculate prices
-				PriceCalculator priceCalculator = new PriceCalculator(bmw320i);
-				priceCalculator.preparePriceCalculation(accounting);
-				priceCalculator.calculatePrices();
-			}
-			// TEST END
+//			// TEST add test products
+//			// TODO remove this test stuff
+//			{
+//				String langID = Locale.ENGLISH.getLanguage();
+//
+////				pm.getExtent(CustomerGroup.class);
+////				CustomerGroup customerGroup = (CustomerGroup) pm.getObjectById(CustomerGroupID.create(organisationID, "default"));
+//
+//				pm.getExtent(Currency.class);
+//				Currency euro = (Currency) pm.getObjectById(CurrencyID.create("EUR"));
+//
+//				pm.getExtent(Tariff.class);
+//				Tariff tariff;
+//				try {
+//					tariff = (Tariff) pm.getObjectById(TariffID.create(organisationID, 0));
+//				} catch (JDOObjectNotFoundException x) {
+//					tariff = new Tariff(organisationID);
+//					tariff.getName().setText(langID, "Normal Price");
+//					pm.makePersistent(tariff);
+//				}
+//
+//				// create the category "car"
+//				SimpleProductType car = new SimpleProductType(
+//						organisationID, "car", rootSimpleProductType, null, 
+//						ProductType.INHERITANCE_NATURE_BRANCH, ProductType.PACKAGE_NATURE_OUTER);
+//				car.getName().setText(langID, "Car");
+////				car.setDeliveryConfiguration(deliveryConfiguration);
+//				store.addProductType(user, car, SimpleProductType.getDefaultHome(pm, car));
+//				store.setProductTypeStatus_published(user, car);
+//
+//				// create the price config "Car - Middle Class"
+//				PriceFragmentType totalPriceFragmentType = PriceFragmentType.getTotalPriceFragmentType(pm);
+//				PriceFragmentType vatNet = (PriceFragmentType) pm.getObjectById(PriceFragmentTypeID.create(getRootOrganisationID(), "vat-de-16-net"));
+//				PriceFragmentType vatVal = (PriceFragmentType) pm.getObjectById(PriceFragmentTypeID.create(getRootOrganisationID(), "vat-de-16-val"));
+//
+//				Accounting accounting = Accounting.getAccounting(pm);
+//				Trader trader = Trader.getTrader(pm);
+//				StablePriceConfig stablePriceConfig = new StablePriceConfig(organisationID, accounting.createPriceConfigID());
+//				FormulaPriceConfig formulaPriceConfig = new FormulaPriceConfig(organisationID, accounting.createPriceConfigID());
+//				formulaPriceConfig.getName().setText(langID, "Car - Middle Class");
+//				
+//				CustomerGroup customerGroupDefault = trader.getDefaultCustomerGroupForKnownCustomer();
+//				CustomerGroup customerGroupAnonymous = LegalEntity.getAnonymousCustomer(pm).getDefaultCustomerGroup();
+//				formulaPriceConfig.addCustomerGroup(customerGroupDefault);
+//				formulaPriceConfig.addCustomerGroup(customerGroupAnonymous);
+//				formulaPriceConfig.addCurrency(euro);
+//				formulaPriceConfig.addTariff(tariff);
+////				formulaPriceConfig.addProductType(rootSimpleProductType);
+//				formulaPriceConfig.addPriceFragmentType(totalPriceFragmentType);
+//				formulaPriceConfig.addPriceFragmentType(vatNet);
+//				formulaPriceConfig.addPriceFragmentType(vatVal);
+//				stablePriceConfig.adoptParameters(formulaPriceConfig);
+//
+//				FormulaCell fallbackFormulaCell = formulaPriceConfig.createFallbackFormulaCell();
+//				fallbackFormulaCell.setFormula(totalPriceFragmentType,
+//						"cell.resolvePriceCellsAmount(\n" +
+//						"	new AbsolutePriceCoordinate(\n" +
+//						"		\""+organisationID+"/"+CustomerGroup.CUSTOMER_GROUP_ID_DEFAULT+"\",\n" +
+//						"		null,\n" +
+//						"		null,\n" +
+//						"		null,\n" +
+//						"		null\n" +
+//						"	)\n" +
+//						");");
+//				fallbackFormulaCell.setFormula(vatNet, "cell.resolvePriceCellsAmount(\n" +
+//						"	new AbsolutePriceCoordinate(\n" +
+//						"		null,\n" +
+//						"		null,\n" +
+//						"		null,\n" +
+//						"		null,\n" +
+//						"		\""+Organisation.DEVIL_ORGANISATION_ID+"/_Total_\"\n" +
+//						"	)\n" +
+//						") / 1.16;");
+//				fallbackFormulaCell.setFormula(vatVal, "cell.resolvePriceCellsAmount(\n" +
+//						"	new AbsolutePriceCoordinate(\n" +
+//						"		null,\n" +
+//						"		null,\n" +
+//						"		null,\n" +
+//						"		null,\n" +
+//						"		\""+Organisation.DEVIL_ORGANISATION_ID+"/_Total_\"\n" +
+//						"	)\n" +
+//						")\n" +
+//
+////						"/ 1.16 * 0.16");
+//
+//						"\n" +
+//						"-\n" +
+//						"\n" +
+//						"cell.resolvePriceCellsAmount(\n" +
+//						"	new AbsolutePriceCoordinate(\n" +
+//						"		null,\n" +
+//						"		null,\n" +
+//						"		null,\n" +
+//						"		null,\n" +
+//						"		\""+getRootOrganisationID()+"/vat-de-16-net\"\n" +
+//						"	)\n" +
+//						");");
+//
+//				FormulaCell cell = formulaPriceConfig.createFormulaCell(customerGroupDefault, tariff, euro);
+//				cell.setFormula(totalPriceFragmentType, "5000");
+//
+//				// create the car "BMW 320i" and assign the "Car - Middle Class" price config
+//				SimpleProductType bmw320i = new SimpleProductType(
+//						organisationID, "bmw320i", car, null, ProductType.INHERITANCE_NATURE_LEAF, ProductType.PACKAGE_NATURE_OUTER);
+//				bmw320i.getName().setText(Locale.ENGLISH.getLanguage(), "BMW 320i");
+//				bmw320i.setPackagePriceConfig(stablePriceConfig);
+//				bmw320i.setInnerPriceConfig(formulaPriceConfig);
+//				bmw320i.setDeliveryConfiguration(deliveryConfiguration);
+//				store.addProductType(user, bmw320i, SimpleProductType.getDefaultHome(pm, bmw320i));
+//
+//				store.setProductTypeStatus_published(user, bmw320i);
+//				store.setProductTypeStatus_confirmed(user, bmw320i);
+//				store.setProductTypeStatus_saleable(user, bmw320i, true);
+//
+//				// create the category "Car Part"
+//				SimpleProductType carPart = new SimpleProductType(
+//						organisationID, "carPart", rootSimpleProductType, null, ProductType.INHERITANCE_NATURE_BRANCH, ProductType.PACKAGE_NATURE_INNER);
+//				carPart.getName().setText(Locale.ENGLISH.getLanguage(), "Car Part");
+//				carPart.setDeliveryConfiguration(deliveryConfiguration);
+//				store.addProductType(user, carPart, SimpleProductType.getDefaultHome(pm, carPart));
+//
+//				// create the part "Wheel"
+//				SimpleProductType wheel = new SimpleProductType(
+//						organisationID, "wheel", carPart, null, ProductType.INHERITANCE_NATURE_LEAF, ProductType.PACKAGE_NATURE_INNER);
+//				wheel.getName().setText(Locale.ENGLISH.getLanguage(), "Wheel");
+//				wheel.setDeliveryConfiguration(deliveryConfiguration);
+//				store.addProductType(user, wheel, SimpleProductType.getDefaultHome(pm, wheel));
+//
+//				// create the priceConfig "Car Part - Wheel" and assign it to "Wheel"
+//				formulaPriceConfig = new FormulaPriceConfig(organisationID, accounting.createPriceConfigID());
+//				formulaPriceConfig.addProductType(car);
+//				formulaPriceConfig.addPriceFragmentType(vatVal);
+//				formulaPriceConfig.addPriceFragmentType(vatNet);
+//				formulaPriceConfig.getName().setText(langID, "Car Part - Wheel");
+//				fallbackFormulaCell = formulaPriceConfig.createFallbackFormulaCell();
+//				fallbackFormulaCell.setFormula(
+//						Organisation.DEVIL_ORGANISATION_ID,
+//						PriceFragmentType.TOTAL_PRICEFRAGMENTTYPEID,
+//						"cell.resolvePriceCellsAmount(\n" +
+//						"	new AbsolutePriceCoordinate(\n" +
+//						"		null,\n" +
+//						"		null,\n" +
+//						"		null,\n" +
+//						"		\""+car.getPrimaryKey()+"\",\n" +
+//						"		null\n" +
+//						"	)\n" +
+//						") * 0.1;");
+//
+//				fallbackFormulaCell.setFormula(vatNet, "cell.resolvePriceCellsAmount(\n" +
+//						"	new AbsolutePriceCoordinate(\n" +
+//						"		null,\n" +
+//						"		null,\n" +
+//						"		null,\n" +
+//						"		null,\n" +
+//						"		\""+Organisation.DEVIL_ORGANISATION_ID+"/_Total_\"\n" +
+//						"	)\n"+
+//						") / 1.16;");
+//				fallbackFormulaCell.setFormula(vatVal, "cell.resolvePriceCellsAmount(\n" +
+//						"	new AbsolutePriceCoordinate(\n" +
+//						"		null,\n" +
+//						"		null,\n" +
+//						"		null,\n" +
+//						"		null,\n" +
+//						"		\""+Organisation.DEVIL_ORGANISATION_ID+"/_Total_\"\n" +
+//						"	)\n"+
+//						")\n" +
+//						
+////						"/ 1.16 * 0.16;");
+//						
+//						"\n" +
+//						"-\n" +
+//						"\n" +
+//						"cell.resolvePriceCellsAmount(\n" +
+//						"	new AbsolutePriceCoordinate(\n" +
+//						"		null,\n" +
+//						"		null,\n" +
+//						"		null,\n" +
+//						"		null,\n" +
+//						"		\""+getRootOrganisationID()+"/vat-de-16-net\"\n" +
+//						"	)\n"+
+//						");");
+//
+//				wheel.setInnerPriceConfig(formulaPriceConfig);
+//
+//				// package 4 wheels inside the bmw320i
+//				NestedProductType wheelInsideBMW = bmw320i.createNestedProductType(wheel);
+//				wheelInsideBMW.setQuantity(4);
+//
+//				// calculate prices
+//				PriceCalculator priceCalculator = new PriceCalculator(bmw320i);
+//				priceCalculator.preparePriceCalculation(accounting);
+//				priceCalculator.calculatePrices();
+//			}
+//			// TEST END
 
 			LOGGER.info("Initialization of JFireSimpleTrade complete!");
 		} finally {

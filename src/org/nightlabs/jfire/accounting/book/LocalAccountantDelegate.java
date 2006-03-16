@@ -728,6 +728,7 @@ public abstract class LocalAccountantDelegate implements Serializable {
 		) 
 	{
 		
+		LOGGER.info("bookProductTypePartsByDimension for article with PType "+articlePrice.getProductType().getName().getText("en"));
 		if (haveToDelegateBooking(resolvedMappings, productType, packageType, delegationLevel)) {
 			productType.getLocalAccountantDelegate().bookProductTypeParts(
 					mandator,
@@ -749,8 +750,6 @@ public abstract class LocalAccountantDelegate implements Serializable {
 		
 		for (Iterator iter = dimensions.iterator(); iter.hasNext();) {			
 			DimensionNode dimensionNode = (DimensionNode) iter.next();
-			LOGGER.info("Checking for DimensionNode: "+dimensionNode);
-			
 			MoneyFlowMapping mapping = getMoneyFlowMapping(
 					resolvedMappings, productType, packageType, 
 					dimensionNode.getDimensionValues(), currency
@@ -798,7 +797,6 @@ public abstract class LocalAccountantDelegate implements Serializable {
 			} // if (mapping != null)
 			
 		} // for (Iterator iter = articlePrice.getFragments().iterator(); iter.hasNext();) {
-
 //	 recurse
 		for (Iterator iterator = articlePrice.getNestedArticlePrices().iterator(); iterator.hasNext();) {
 			ArticlePrice nestedArticlePrice = (ArticlePrice) iterator.next();
@@ -870,6 +868,11 @@ public abstract class LocalAccountantDelegate implements Serializable {
 		 */
 		public void setTo(Anchor to) {
 			this.to = to;
+		}
+		
+		@Override
+		public String toString() {
+			return "BookInvoiceTransfer from "+from.getAnchorID()+" to "+to.getAnchorID()+" amount "+getAmount();
 		}
 	}
 	

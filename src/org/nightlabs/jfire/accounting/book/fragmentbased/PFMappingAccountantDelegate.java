@@ -234,6 +234,7 @@ public class PFMappingAccountantDelegate extends
 		PriceFragmentType priceFragmentType = (PriceFragmentType) getPersistenceManager().getObjectById(typeID);
 	
 		// now if it is total then book all fragments contained in total
+		// TODO: Check here if is container not only total
 		if (priceFragmentType.getPriceFragmentTypeID().equals(PriceFragmentType.TOTAL_PRICEFRAGMENTTYPEID)) 
 			return getBookInvoiceTransferForContainerFragmentType(
 					mandator,
@@ -245,7 +246,8 @@ public class PFMappingAccountantDelegate extends
 			return getBookInvoiceTransfersForSingleFragmentType(
 					mandator,
 					priceFragmentType, articlePriceStack, dimensionValues,
-					resolvedMapping, resolvedMappings
+					resolvedMapping, resolvedMappings,
+					false
 				);
 		
 	}
@@ -289,7 +291,8 @@ public class PFMappingAccountantDelegate extends
 					articlePriceStack,
 					fakeDimValues,
 					resolvedMapping,
-					resolvedMappings
+					resolvedMappings,
+					true
 				);
 			result.addAll(singleTransfers);
 		}
@@ -302,13 +305,15 @@ public class PFMappingAccountantDelegate extends
 			LinkedList articlePriceStack, 
 			Map<String, String> dimensionValues, 
 			MoneyFlowMapping resolvedMapping, 
-			Map<ResolvedMapKey, ResolvedMapEntry> resolvedMappings
+			Map<ResolvedMapKey, ResolvedMapEntry> resolvedMappings,
+			boolean forContainer
 		) 
 	{
 		Collection<BookInvoiceTransfer> result = new ArrayList<BookInvoiceTransfer>();
 		BookInvoiceTransfer transfer = getBookInvoiceTransferForSingleFragmentType(
 				priceFragmentType, articlePriceStack, dimensionValues,
-				resolvedMapping, resolvedMappings				
+				resolvedMapping, resolvedMappings,
+				forContainer
 			);
 		if (transfer == null) {
 			transfer = new BookInvoiceTransfer(
@@ -321,6 +326,8 @@ public class PFMappingAccountantDelegate extends
 				); 
 		}
 		result.add(transfer);
+		logBookInvoiceTransfers("getBookInvoiceTransferForSingleFragmentType ", result);
+		
 		return result;
 	}
 	
@@ -329,7 +336,8 @@ public class PFMappingAccountantDelegate extends
 			LinkedList<ArticlePrice> articlePriceStack, 
 			Map<String, String> dimensionValues, 
 			MoneyFlowMapping resolvedMapping, 
-			Map<ResolvedMapKey, ResolvedMapEntry> resolvedMappings
+			Map<ResolvedMapKey, ResolvedMapEntry> resolvedMappings,
+			boolean forContainer
 		) 
 	{
 		List<PriceFragmentType> priceFragmentTypes = new LinkedList<PriceFragmentType>();		
@@ -338,22 +346,34 @@ public class PFMappingAccountantDelegate extends
 		PriceFragmentType totalPType = PriceFragmentType.getTotalPriceFragmentType(getPersistenceManager());
 		
 		// if we look for the priceFragmentType of interest for total in all upper packages
-		if (!PriceFragmentType.TOTAL_PRICEFRAGMENTTYPEID.equals(priceFragmentType.getPriceFragmentTypeID()))
-			priceFragmentTypes.add(totalPType);
+//		if (!PriceFragmentType.TOTAL_PRICEFRAGMENTTYPEID.equals(priceFragmentType.getPriceFragmentTypeID()))
+		priceFragmentTypes.add(totalPType);
 
 		List<PriceFragmentType> totalPTypes = new ArrayList<PriceFragmentType>(1);
 		totalPTypes.add(totalPType);
 		
 		Iterator iterator = articlePriceStack.iterator();
+		LOGGER.info("Search BookAnchors for single pricefragment: "+priceFragmentType.getName().getText("en"));
 		int count = 0;
 		while (iterator.hasNext()) {				
 			ArticlePrice upperArticlePrice = (ArticlePrice)iterator.next();
 			List<PriceFragmentType> pTypeParam = null;
-			if (count == 0)
-				pTypeParam = totalPTypes; // for our own product-type we only check if total was booked for this type already
+			if (count == 0) {
+				if (forContainer) {
+					count++;
+					continue;
+				}
+				else
+					pTypeParam = totalPTypes; 
+				// for our own product-type we only check if total was booked for this type already, 
+				// but only of we are not a part of a container booking
+			}
 			else
-				pTypeParam = priceFragmentTypes;
+				pTypeParam = priceFragmentTypes;			
 			
+			count++;
+			
+			LOGGER.info("Search for ArticlePricePType: "+upperArticlePrice.getProductType().getName().getText("en"));
 			BookInvoiceTransfer result = getBookInvoiceTransferForSingleFragmentType(
 					upperArticlePrice,
 					articlePriceStack,
@@ -361,7 +381,8 @@ public class PFMappingAccountantDelegate extends
 					pTypeParam,
 					resolvedMapping,
 					resolvedMappings
-			);
+				);
+			LOGGER.info("Found: "+result);
 			if (result != null)
 				return result;
 			
@@ -439,5 +460,11 @@ public class PFMappingAccountantDelegate extends
 		}		
 		return null;
 		
+	}
+	
+	private void logBookInvoiceTransfers(String prefix, Collection<BookInvoiceTransfer> transfers) {
+		for (BookInvoiceTransfer transfer : transfers) {
+			LOGGER.info(prefix + transfers.toString());
+		}
 	}
 }

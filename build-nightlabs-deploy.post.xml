@@ -1,0 +1,7 @@
+<project>
+	<target name="deploy.post">
+		<copy
+			file="${project.dir}/dist/serverinit.properties"
+			todir="${j2ee.deploy.dir}/${j2ee.deploy.subdir}/${j2ee.ear}"/>
+	</target>
+</project>

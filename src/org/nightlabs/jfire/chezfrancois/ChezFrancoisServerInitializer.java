@@ -1,12 +1,10 @@
 package org.nightlabs.jfire.chezfrancois;
 
-import javax.transaction.TransactionManager;
-
-import org.nightlabs.jfire.demo.DemoSystem;
+import org.nightlabs.jfire.serverinit.ServerInitializer;
 import org.nightlabs.jfire.servermanager.JFireServerManager;
 import org.nightlabs.jfire.servermanager.OrganisationNotFoundException;
 
-public class ChezFrancois extends DemoSystem
+public class ChezFrancoisServerInitializer extends ServerInitializer
 {
 	private static final String ORGANISATION_ID = "jfire.chezfrancois.co.th";
 
@@ -14,11 +12,11 @@ public class ChezFrancois extends DemoSystem
 	public void initialize()
 	throws Exception
 	{
-		TransactionManager transactionManager = getJ2EEVendorAdapter().getTransactionManager(getInitialContext());
+//		TransactionManager transactionManager = getJ2EEVendorAdapter().getTransactionManager(getInitialContext());
 
-		boolean doCommit = false;
-		transactionManager.begin();
-    try {
+//		boolean doCommit = false;
+//		transactionManager.begin();
+//    try {
     	JFireServerManager jfsm = getJFireServerManagerFactory().getJFireServerManager();
     	try {
     		try {
@@ -32,13 +30,13 @@ public class ChezFrancois extends DemoSystem
     		jfsm.close();
     	}
 
-			doCommit = true;
-    } finally {
-    	if (doCommit)
-    		transactionManager.commit();
-    	else
-    		transactionManager.rollback();
-    }
+//			doCommit = true;
+//    } finally {
+//    	if (doCommit)
+//    		transactionManager.commit();
+//    	else
+//    		transactionManager.rollback();
+//    }
 	}
 
 }

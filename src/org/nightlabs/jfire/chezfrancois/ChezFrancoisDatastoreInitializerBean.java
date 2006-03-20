@@ -46,6 +46,7 @@ import org.nightlabs.jfire.accounting.Tariff;
 import org.nightlabs.jfire.accounting.id.CurrencyID;
 import org.nightlabs.jfire.accounting.id.PriceFragmentTypeID;
 import org.nightlabs.jfire.accounting.id.TariffID;
+import org.nightlabs.jfire.accounting.priceconfig.IInnerPriceConfig;
 import org.nightlabs.jfire.accounting.tariffpriceconfig.FormulaCell;
 import org.nightlabs.jfire.accounting.tariffpriceconfig.FormulaPriceConfig;
 import org.nightlabs.jfire.accounting.tariffpriceconfig.PriceCalculator;
@@ -59,6 +60,7 @@ import org.nightlabs.jfire.store.ProductType;
 import org.nightlabs.jfire.store.Store;
 import org.nightlabs.jfire.store.deliver.DeliveryConfiguration;
 import org.nightlabs.jfire.store.id.ProductTypeID;
+import org.nightlabs.jfire.trade.Article;
 import org.nightlabs.jfire.trade.CustomerGroup;
 import org.nightlabs.jfire.trade.LegalEntity;
 import org.nightlabs.jfire.trade.Trader;
@@ -100,7 +102,7 @@ implements SessionBean
 	 * @ejb.permission unchecked="true"
 	 */
 	public void ejbRemove() throws EJBException, RemoteException { }
-
+	
 	/**
 	 * This method is called by the datastore initialization mechanism.
 	 * It populates the datastore with the demo data.
@@ -112,6 +114,107 @@ implements SessionBean
 	 * @ejb.transaction type = "Required"
 	 */
 	public void initialize() 
+	throws ModuleException 
+	{
+		PersistenceManager pm = this.getPersistenceManager();
+		try {
+			String organisationID = getOrganisationID();
+			
+			if (!ChezFrancoisServerInitializer.ORGANISATION_ID_WINE_STORE.equals(organisationID))
+				return;
+
+			ModuleMetaData moduleMetaData = ModuleMetaData.getModuleMetaData(pm, "JFireChezFrancois");
+			if (moduleMetaData != null)
+				return;
+
+			LOGGER.info("Initialization of JFireChezFrancois started...");
+			
+			pm.getExtent(Article.class);
+
+			String languageID = "en";
+
+			pm.getExtent(Tariff.class);
+			Tariff tariffNormalPrice;
+			try {
+				tariffNormalPrice = (Tariff) pm.getObjectById(TariffID.create(organisationID, 0));
+			} catch (JDOObjectNotFoundException x) {
+				tariffNormalPrice = new Tariff(organisationID);
+				tariffNormalPrice.getName().setText(languageID, "Normal Price");
+				pm.makePersistent(tariffNormalPrice);
+			}
+
+			Tariff tariffGoldCard;
+			try {
+				tariffGoldCard = (Tariff) pm.getObjectById(TariffID.create(organisationID, 1));
+			} catch (JDOObjectNotFoundException x) {
+				tariffGoldCard = new Tariff(organisationID);
+				tariffGoldCard.getName().setText(languageID, "Gold Card");
+				pm.makePersistent(tariffGoldCard);
+			}
+
+			// version is {major}.{minor}.{release}-{patchlevel}-{suffix}
+			moduleMetaData = new ModuleMetaData(
+					"JFireChezFrancois", "1.0.0-0-beta", "1.0.0-0-beta");
+			pm.makePersistent(moduleMetaData);
+			
+			DataCreator dataCreator = new DataCreator(User.getUser(pm, getPrincipal()));
+
+			SimpleProductType wine = dataCreator.createCategory(null, "wine", "Wine");
+			SimpleProductType bottle = dataCreator.createCategory(wine, "bottle", "Bottle");
+			SimpleProductType box = dataCreator.createCategory(wine, "box", "Box");
+			SimpleProductType bottleRed = dataCreator.createCategory(bottle, "bottle-red", "Red");
+			SimpleProductType bottleWhite = dataCreator.createCategory(bottle, "bottle-red", "Red");
+			SimpleProductType bottleMerlot = dataCreator.createCategory(bottleRed, "bottle-merlot", "Merlot");
+			SimpleProductType bottleCabernetSauvignon = dataCreator.createCategory(bottleRed, "bottle-cabernet-sauvignon", "Cabernet Sauvignon");
+			SimpleProductType bottlePinotNoir = dataCreator.createCategory(bottleRed, "bottle-pinot-noir", "Pinot Noir");
+
+			SimpleProductType bottleMerlotAustralia = dataCreator.createCategory(bottleMerlot, "bottle-merlot-australia", "Australia");
+			SimpleProductType bottleMerlotFrance = dataCreator.createCategory(bottleMerlot, "bottle-merlot-france", "France");
+			SimpleProductType bottleMerlotCalifornia = dataCreator.createCategory(bottleMerlot, "bottle-merlot-california", "California");
+
+			SimpleProductType bottleCabernetSauvignonFrance = dataCreator.createCategory(bottleCabernetSauvignon, "bottle-cabernet-sauvignon-france", "France");
+			SimpleProductType bottleCabernetSauvignonSouthAfrika = dataCreator.createCategory(bottleCabernetSauvignon, "bottle-cabernet-sauvignon-south-africa", "South Africa");
+
+			IInnerPriceConfig priceConfigCheapWines = dataCreator.createFixPriceConfig("Cheap Wines", new Tariff[] {tariffNormalPrice, tariffGoldCard}, new long[] {399, 350});
+			IInnerPriceConfig priceConfigMiddleWines = dataCreator.createFixPriceConfig("Middle Wines", new Tariff[] {tariffNormalPrice, tariffGoldCard}, new long[] {500, 420});
+			IInnerPriceConfig priceConfigExpensiveWines = dataCreator.createFixPriceConfig("Expensive Wines", new Tariff[] {tariffNormalPrice, tariffGoldCard}, new long[] {999, 830});
+
+			SimpleProductType bottleMerlotAustralia2001 = dataCreator.createLeaf(bottleMerlotAustralia, "bottle-merlot-australia-2001", "Merlot 2001 (Australia)", priceConfigExpensiveWines);
+			SimpleProductType bottleMerlotAustralia2004 = dataCreator.createLeaf(bottleMerlotAustralia, "bottle-merlot-australia-2004", "Merlot 2004 (Australia)", priceConfigCheapWines);
+			SimpleProductType bottleMerlotFrance2001 = dataCreator.createLeaf(bottleMerlotFrance, "bottle-merlot-france-2001", "Merlot 2001 (France)", priceConfigExpensiveWines);
+			SimpleProductType bottleMerlotCalifornia2003 = dataCreator.createLeaf(bottleMerlotCalifornia, "bottle-merlot-california-2003", "Merlot 2003 (California)", priceConfigMiddleWines);
+
+			SimpleProductType bottleCabernetSauvignonFrance2002 = dataCreator.createLeaf(bottleCabernetSauvignonFrance, "bottle-cabernet-sauvignon-france-2002", "Cabernet Sauvignon 2002 (France)", priceConfigMiddleWines);
+			SimpleProductType bottleCabernetSauvignonSouthAfrika2003 = dataCreator.createLeaf(bottleCabernetSauvignonSouthAfrika, "bottle-cabernet-sauvignon-south-africa-2003", "Cabernet Sauvignon 2003 (South Africa)", priceConfigCheapWines);
+			
+			dataCreator.calculatePrices();
+
+//			// package 4 wheels inside the bmw320i
+//			NestedProductType wheelInsideBMW = bmw320i.createNestedProductType(wheel);
+//			wheelInsideBMW.setQuantity(4);
+//
+//			// calculate prices
+//			PriceCalculator priceCalculator = new PriceCalculator(bmw320i);
+//			priceCalculator.preparePriceCalculation(accounting);
+//			priceCalculator.calculatePrices();
+
+			LOGGER.info("Initialization of JFireChezFrancois complete!");
+		} finally {
+			pm.close();
+		}
+	}
+
+	/**
+	 * This method is called by the datastore initialization mechanism.
+	 * It populates the datastore with the demo data.
+	 * 
+	 * @throws ModuleException
+	 *
+	 * @ejb.interface-method
+	 * @ejb.permission role-name="_Guest_"
+	 * @ejb.transaction type = "Required"
+	 */
+	public void initializeOLD() 
 	throws ModuleException 
 	{
 		PersistenceManager pm = this.getPersistenceManager();

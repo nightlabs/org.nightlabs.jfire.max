@@ -51,7 +51,14 @@ import org.nightlabs.jfire.accounting.tariffpriceconfig.FormulaPriceConfig;
 import org.nightlabs.jfire.accounting.tariffpriceconfig.PriceCalculator;
 import org.nightlabs.jfire.accounting.tariffpriceconfig.StablePriceConfig;
 import org.nightlabs.jfire.organisation.Organisation;
+import org.nightlabs.jfire.person.Person;
+import org.nightlabs.jfire.person.PersonDataNotFoundException;
+import org.nightlabs.jfire.person.PersonRegistry;
+import org.nightlabs.jfire.person.PersonStruct;
+import org.nightlabs.jfire.person.TextPersonDataField;
+import org.nightlabs.jfire.security.SecurityException;
 import org.nightlabs.jfire.security.User;
+import org.nightlabs.jfire.security.UserLocal;
 import org.nightlabs.jfire.simpletrade.store.SimpleProductType;
 import org.nightlabs.jfire.store.ProductType;
 import org.nightlabs.jfire.store.Store;
@@ -391,4 +398,26 @@ public class DataCreator
 		return mapping;
 	}
 
+	public User createUser(
+			String userID, String password,
+			String personCompany, String personName, String personFirstName)
+	throws
+		SecurityException,
+		PersonDataNotFoundException
+	{
+		User user = new User(organisationID, userID);
+		UserLocal userLocal = new UserLocal(user);
+		userLocal.setPasswordPlain(password);
+
+		Person person = new Person(organisationID, PersonRegistry.getRegistry(pm).createPersonID());
+		PersonStruct personStruct = PersonStruct.getPersonStruct(pm);
+		personStruct.explodePerson(person);
+		((TextPersonDataField)person.getPersonDataField(PersonStruct.PERSONALDATA_COMPANY)).setText(personCompany);
+		((TextPersonDataField)person.getPersonDataField(PersonStruct.PERSONALDATA_NAME)).setText(personName);
+		((TextPersonDataField)person.getPersonDataField(PersonStruct.PERSONALDATA_FIRSTNAME)).setText(personFirstName);
+		user.setPerson(person);
+		personStruct.implodePerson(person);
+		pm.makePersistent(user);
+		return user;
+	}
 }

@@ -33,7 +33,7 @@ import org.nightlabs.jfire.servermanager.OrganisationNotFoundException;
 
 public class ChezFrancoisServerInitializer extends ServerInitializer
 {
-	public static final String ORGANISATION_ID_WINE_STORE = "jfire.chezfrancois.co.th";
+	public static final String ORGANISATION_ID_WINE_STORE = "chezfrancois.jfire.org";
 
 	@Override
 	public void initialize()

@@ -27,9 +27,10 @@
 package org.nightlabs.jfire.store;
 
 import java.io.Serializable;
-import java.util.ArrayList;
 import java.util.Collection;
+import java.util.HashSet;
 import java.util.Map;
+import java.util.Set;
 
 import org.nightlabs.jfire.security.User;
 import org.nightlabs.jfire.transfer.Anchor;
@@ -67,7 +68,7 @@ public class ProductTransfer extends Transfer implements Serializable
 	 *
 	 * @!jdo.map-vendor-extension vendor-name="jpox" key="key-length" value="max 130"
 	 */
-	private Collection products = null;
+	private Set products = null;
 
 	/**
 	 * @deprecated Only for JDO!
@@ -86,7 +87,7 @@ public class ProductTransfer extends Transfer implements Serializable
 			Anchor from, Anchor to, Collection products)
 	{
 		super(transferRegistry, TRANSFERTYPEID, container, initiator, from, to);
-		this.products = new ArrayList(products);
+		this.products = new HashSet(products);
 //		this.products = new HashMap();
 //
 //		// WORKAROUND begin

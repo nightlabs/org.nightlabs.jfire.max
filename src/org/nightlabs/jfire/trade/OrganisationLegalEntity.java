@@ -84,6 +84,7 @@ public class OrganisationLegalEntity extends LegalEntity
 	{
 		super(organisation.getOrganisationID(), anchorTypeID, OrganisationLegalEntity.class.getName());
 		this.organisation = organisation;
+		this.setPerson(organisation.getPerson());
 //		PersistenceManager pm = JDOHelper.getPersistenceManager(organisation);
 //		if (pm == null)
 //			throw new NullPointerException("organisation has no PersistenceManager attached! Can use this constructor only with a persistent non-detached organisation.");

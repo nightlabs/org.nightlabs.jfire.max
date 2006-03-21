@@ -1,0 +1,18 @@
+### TODO
+# Please add TODOs in the correct format (like the first)
+
+***
+Date: 2006-03-21
+Author: Marco Schulze
+Subject: local references should be stored in ProductTypeLocal
+Status: OPEN
+Text:
+Currently, there are some local* fields in ProductType. These objects are different in every datastore. Thus,
+these fields should be moved to ProductTypeLocal.
+***
+Date: 
+Author: 
+Subject: 
+Status: 
+Text:
+***

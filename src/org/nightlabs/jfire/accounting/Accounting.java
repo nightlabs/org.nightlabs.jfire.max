@@ -41,7 +41,9 @@ import org.apache.log4j.Logger;
 
 import org.nightlabs.jfire.accounting.book.BookMoneyTransfer;
 import org.nightlabs.jfire.accounting.book.LocalAccountant;
+import org.nightlabs.jfire.accounting.book.MoneyFlowMapping;
 import org.nightlabs.jfire.accounting.book.PartnerAccountant;
+import org.nightlabs.jfire.accounting.book.MoneyFlowMapping.Registry;
 import org.nightlabs.jfire.accounting.id.InvoiceID;
 import org.nightlabs.jfire.accounting.pay.ModeOfPaymentFlavour;
 import org.nightlabs.jfire.accounting.pay.PayMoneyTransfer;
@@ -79,7 +81,7 @@ import org.nightlabs.jfire.transfer.id.AnchorID;
  * @jdo.inheritance strategy="new-table"
  */
 public class Accounting
-	implements TransferRegistry, IPriceConfigIDProvider, StoreCallback
+	implements TransferRegistry, IPriceConfigIDProvider, StoreCallback, MoneyFlowMapping.Registry
 {
 	public static final Logger LOGGER = Logger.getLogger(Accounting.class);
 

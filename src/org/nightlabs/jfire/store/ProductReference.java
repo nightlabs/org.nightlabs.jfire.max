@@ -107,7 +107,8 @@ implements Serializable, DeleteCallback
 	public static long getProductReferenceCount(PersistenceManager pm, ProductReferenceGroup productReferenceGroup)
 	{
 		Query q = pm.newNamedQuery(ProductReference.class, "getProductReferenceCountForProductReferenceGroup");
-		return ((Long)((Collection)q.execute(productReferenceGroup)).iterator().next()).longValue();
+//		return ((Long)((Collection)q.execute(productReferenceGroup)).iterator().next()).longValue();
+		return ((Long)q.execute(productReferenceGroup)).longValue();
 	}
 
 	public static ProductReference getProductReference(

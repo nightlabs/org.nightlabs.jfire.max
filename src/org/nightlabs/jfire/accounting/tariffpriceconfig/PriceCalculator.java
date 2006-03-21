@@ -38,7 +38,6 @@ import org.mozilla.javascript.ImporterTopLevel;
 import org.mozilla.javascript.Scriptable;
 import org.mozilla.javascript.ScriptableObject;
 import org.mozilla.javascript.Undefined;
-
 import org.nightlabs.ModuleException;
 import org.nightlabs.jfire.accounting.PriceFragmentType;
 import org.nightlabs.jfire.accounting.priceconfig.IPriceConfig;
@@ -364,10 +363,10 @@ public class PriceCalculator
 
 				for (Iterator itPackagedPTs = virtualPackagedProductTypes.values().iterator(); itPackagedPTs.hasNext(); ) {
 					NestedProductType nestedProductType = (NestedProductType)itPackagedPTs.next();
-					ProductType innerProductType = nestedProductType.getInnerProductType();
+//					ProductType innerProductType = nestedProductType.getInnerProductType();
 
-					if (innerProductType.isPackageInner() || innerProductType == packageProductType) {
-						IPriceConfig innerPriceConfig = innerProductType.getInnerPriceConfig();
+//					if (innerProductType.isPackageInner() || innerProductType == packageProductType) {
+//						IPriceConfig innerPriceConfig = innerProductType.getInnerPriceConfig();
 						PriceCell innerPriceCell = calculatePriceCell(
 								nestedProductType, priceFragmentType, priceCoordinate);
 	
@@ -376,7 +375,7 @@ public class PriceCalculator
 							amount *= nestedProductType.getQuantity();
 							outerPriceCellAmount += amount;
 						}
-					}
+//					}
 				} // for (Iterator itPackagedPIs = getPackagedProductInfos().iterator(); itPackagedPIs.hasNext(); ) {
 
 				outerPriceCell.getPrice().setAmount(priceFragmentType, outerPriceCellAmount);

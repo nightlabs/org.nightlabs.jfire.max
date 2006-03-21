@@ -74,7 +74,7 @@ public abstract class MoneyFlowMapping implements Serializable {
 			 
 	public static interface Registry {
 		public String getOrganisationID();
-		public int createMoneyFlowMappingID(String organisationID);
+		public int createMoneyFlowMappingID(); // String organisationID);
 	}
 	
 	/**

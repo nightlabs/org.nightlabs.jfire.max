@@ -33,16 +33,20 @@ import javax.ejb.CreateException;
 import javax.ejb.EJBException;
 import javax.ejb.SessionBean;
 import javax.ejb.SessionContext;
+import javax.jdo.FetchPlan;
 import javax.jdo.JDOObjectNotFoundException;
 import javax.jdo.PersistenceManager;
 
 import org.apache.log4j.Logger;
 import org.nightlabs.ModuleException;
 import org.nightlabs.jdo.moduleregistry.ModuleMetaData;
+import org.nightlabs.jfire.accounting.Account;
 import org.nightlabs.jfire.accounting.Accounting;
 import org.nightlabs.jfire.accounting.Currency;
 import org.nightlabs.jfire.accounting.PriceFragmentType;
 import org.nightlabs.jfire.accounting.Tariff;
+import org.nightlabs.jfire.accounting.book.LocalAccountantDelegate;
+import org.nightlabs.jfire.accounting.book.fragmentbased.PFMappingAccountantDelegate;
 import org.nightlabs.jfire.accounting.id.CurrencyID;
 import org.nightlabs.jfire.accounting.id.PriceFragmentTypeID;
 import org.nightlabs.jfire.accounting.id.TariffID;
@@ -118,8 +122,11 @@ implements SessionBean
 	{
 		PersistenceManager pm = this.getPersistenceManager();
 		try {
+			pm.getFetchPlan().setGroup(FetchPlan.DEFAULT);
+			pm.getFetchPlan().setMaxFetchDepth(1);
+
 			String organisationID = getOrganisationID();
-			
+
 			if (!ChezFrancoisServerInitializer.ORGANISATION_ID_WINE_STORE.equals(organisationID))
 				return;
 
@@ -128,11 +135,28 @@ implements SessionBean
 				return;
 
 			LOGGER.info("Initialization of JFireChezFrancois started...");
-			
-			pm.getExtent(Article.class);
+
+			// version is {major}.{minor}.{release}-{patchlevel}-{suffix}
+			moduleMetaData = new ModuleMetaData(
+					"JFireChezFrancois", "1.0.0-0-beta", "1.0.0-0-beta");
+			pm.makePersistent(moduleMetaData);
+
+			Organisation organisation = Organisation.getOrganisation(pm, organisationID);
+			if (organisation.getPerson() == null)
+				throw new IllegalStateException("organisation.getPerson() == null");
+
+//			if (organisation.getPerson() == null) {
+//				PersonRegistry personRegistry = PersonRegistry.getRegistry(pm);
+//				Person person = new Person(organisationID, personRegistry.createPersonID());
+//				PersonStruct personStruct = PersonStruct.getPersonStruct(pm);
+//				personStruct.explodePerson(person);
+//				personStruct.implodePerson(person);
+//				organisation.setPerson(person);
+//			}
 
 			String languageID = "en";
 
+			// create Tariffs: normal price, gold card
 			pm.getExtent(Tariff.class);
 			Tariff tariffNormalPrice;
 			try {
@@ -152,18 +176,15 @@ implements SessionBean
 				pm.makePersistent(tariffGoldCard);
 			}
 
-			// version is {major}.{minor}.{release}-{patchlevel}-{suffix}
-			moduleMetaData = new ModuleMetaData(
-					"JFireChezFrancois", "1.0.0-0-beta", "1.0.0-0-beta");
-			pm.makePersistent(moduleMetaData);
-			
 			DataCreator dataCreator = new DataCreator(User.getUser(pm, getPrincipal()));
 
+			dataCreator.getRootSimpleProductType().getName().setText(languageID, "Chez Francois Wine Store");
+
+			// create ProductTypes: wine (bottle)
 			SimpleProductType wine = dataCreator.createCategory(null, "wine", "Wine");
 			SimpleProductType bottle = dataCreator.createCategory(wine, "bottle", "Bottle");
-			SimpleProductType box = dataCreator.createCategory(wine, "box", "Box");
 			SimpleProductType bottleRed = dataCreator.createCategory(bottle, "bottle-red", "Red");
-			SimpleProductType bottleWhite = dataCreator.createCategory(bottle, "bottle-red", "Red");
+			SimpleProductType bottleWhite = dataCreator.createCategory(bottle, "bottle-white", "White");
 			SimpleProductType bottleMerlot = dataCreator.createCategory(bottleRed, "bottle-merlot", "Merlot");
 			SimpleProductType bottleCabernetSauvignon = dataCreator.createCategory(bottleRed, "bottle-cabernet-sauvignon", "Cabernet Sauvignon");
 			SimpleProductType bottlePinotNoir = dataCreator.createCategory(bottleRed, "bottle-pinot-noir", "Pinot Noir");
@@ -186,19 +207,124 @@ implements SessionBean
 
 			SimpleProductType bottleCabernetSauvignonFrance2002 = dataCreator.createLeaf(bottleCabernetSauvignonFrance, "bottle-cabernet-sauvignon-france-2002", "Cabernet Sauvignon 2002 (France)", priceConfigMiddleWines);
 			SimpleProductType bottleCabernetSauvignonSouthAfrika2003 = dataCreator.createLeaf(bottleCabernetSauvignonSouthAfrika, "bottle-cabernet-sauvignon-south-africa-2003", "Cabernet Sauvignon 2003 (South Africa)", priceConfigCheapWines);
-			
+
+			// create ProductTypes: wine (box)
+			SimpleProductType box = dataCreator.createCategory(wine, "box", "Box");
+			SimpleProductType boxRed = dataCreator.createCategory(box, "box-red", "Red");
+			SimpleProductType boxMerlot = dataCreator.createCategory(boxRed, "box-merlot", "Merlot");
+
+			SimpleProductType boxWhite = dataCreator.createCategory(box, "box-white", "White");
+
+			IInnerPriceConfig priceConfigBox6Bottles90Percent = dataCreator.createFormulaPriceConfig(
+					"Box (6 bottles, 90%)", new Tariff[] {tariffNormalPrice, tariffGoldCard}, new String[] {
+							"cell.resolvePriceCellsAmount(\n" +
+							"	new AbsolutePriceCoordinate(\n" +
+							"		null,\n" +
+							"		null,\n" +
+							"		null,\n" +
+							"		\""+bottle.getPrimaryKey()+"\",\n" +
+							"		null\n" +
+							"	)\n" +
+							") * -0.1;",
+							"cell.resolvePriceCellsAmount(\n" +
+							"	new AbsolutePriceCoordinate(\n" +
+							"		null,\n" +
+							"		null,\n" +
+							"		null,\n" +
+							"		\""+bottle.getPrimaryKey()+"\",\n" +
+							"		null\n" +
+							"	)\n" +
+							") * -0.1;"});
+			((FormulaPriceConfig)priceConfigBox6Bottles90Percent).addProductType(bottle);
+
+			SimpleProductType boxMerlotAustralia = dataCreator.createCategory(boxMerlot, "box-merlot-australia", "Australia");
+			SimpleProductType boxMerlotFrance = dataCreator.createCategory(boxMerlot, "box-merlot-france", "France");
+			SimpleProductType boxMerlotCalifornia = dataCreator.createCategory(boxMerlot, "box-merlot-california", "California");
+
+			SimpleProductType boxMerlotAustralia2001 = dataCreator.createLeaf(boxMerlotAustralia, "box-merlot-australia-2001", "Box (6): Merlot 2001 (Australia)", priceConfigBox6Bottles90Percent);
+			SimpleProductType boxMerlotAustralia2004 = dataCreator.createLeaf(boxMerlotAustralia, "box-merlot-australia-2004", "Box (6): Merlot 2004 (Australia)", priceConfigBox6Bottles90Percent);
+			SimpleProductType boxMerlotFrance2001 = dataCreator.createLeaf(boxMerlotFrance, "box-merlot-france-2001", "Box (6): Merlot 2001 (France)", priceConfigBox6Bottles90Percent);
+			SimpleProductType boxMerlotCalifornia2003 = dataCreator.createLeaf(boxMerlotCalifornia, "box-merlot-california-2003", "Box (6): Merlot 2003 (California)", priceConfigBox6Bottles90Percent);
+			boxMerlotAustralia2001.createNestedProductType(bottleMerlotAustralia2001).setQuantity(6);
+			boxMerlotAustralia2004.createNestedProductType(bottleMerlotAustralia2004).setQuantity(6);
+			boxMerlotFrance2001.createNestedProductType(bottleMerlotFrance2001).setQuantity(6);
+			boxMerlotCalifornia2003.createNestedProductType(bottleMerlotCalifornia2003).setQuantity(6);
+
+			// create ProductTypes: accessories
+			IInnerPriceConfig priceConfigChocolate = dataCreator.createFixPriceConfig(
+					"Chocolate", new Tariff[] {tariffNormalPrice, tariffGoldCard}, new long[] {200, 150});
+			IInnerPriceConfig priceConfigCorkScrew = dataCreator.createFixPriceConfig(
+					"Corkscrew", new Tariff[] {tariffNormalPrice, tariffGoldCard}, new long[] {600, 450});
+
+			SimpleProductType accessories = dataCreator.createCategory(null, "accessories", "Accessories");
+			SimpleProductType chocolate = dataCreator.createCategory(accessories, "chocolate", "Chocolate");
+			SimpleProductType sarotti = dataCreator.createLeaf(chocolate, "sarotti", "Sarotti", priceConfigChocolate);
+			SimpleProductType corkscrew = dataCreator.createCategory(accessories, "corkscrew", "Corkscrew");
+			SimpleProductType corkscrewXYZ = dataCreator.createLeaf(corkscrew, "corkscrew-xyz", "Corkscrew XYZ", priceConfigCorkScrew);
+
 			dataCreator.calculatePrices();
 
-//			// package 4 wheels inside the bmw320i
-//			NestedProductType wheelInsideBMW = bmw320i.createNestedProductType(wheel);
-//			wheelInsideBMW.setQuantity(4);
-//
-//			// calculate prices
-//			PriceCalculator priceCalculator = new PriceCalculator(bmw320i);
-//			priceCalculator.preparePriceCalculation(accounting);
-//			priceCalculator.calculatePrices();
+			// create Accounts: Red Wine (bottle), White Wine (bottle), Red Wine (box), White Wine (box)
+			Account accountBottleRedVatNet = dataCreator.createLocalAccount("bottle-red-vat-net.eur");
+			Account accountBottleRedVatVal = dataCreator.createLocalAccount("bottle-red-vat-val.eur");
+			Account accountBottleWhiteVatNet = dataCreator.createLocalAccount("bottle-white-vat-net.eur");
+			Account accountBottleWhiteVatVal = dataCreator.createLocalAccount("bottle-white-vat-val.eur");
+
+			Account accountBoxRedVatNet = dataCreator.createLocalAccount("box-red-vat-net.eur");
+			Account accountBoxRedVatVal = dataCreator.createLocalAccount("box-red-vat-val.eur");
+			Account accountBoxWhiteVatNet = dataCreator.createLocalAccount("box-white-vat-net.eur");
+			Account accountBoxWhiteVatVal = dataCreator.createLocalAccount("box-white-vat-val.eur");
+
+			// create Accounts: Accessories
+			Account accessoriesVatNet = dataCreator.createLocalAccount("accessories-vat-net.eur");
+			Account accessoriesVatVal = dataCreator.createLocalAccount("accessories-vat-val.eur");
+
+			// configure moneyflow
+			LocalAccountantDelegate wineAccountantDelegate = new PFMappingAccountantDelegate(organisationID, "wineAccountantDelegate");
+			wine.setLocalAccountantDelegate(wineAccountantDelegate);
+
+			wineAccountantDelegate.addMoneyFlowMapping(
+					dataCreator.createPFMoneyFlowMapping(bottleRed, dataCreator.getPriceFragmentTypeTotal(), accountBottleRedVatNet));
+			wineAccountantDelegate.addMoneyFlowMapping(
+					dataCreator.createPFMoneyFlowMapping(bottleRed, dataCreator.getPriceFragmentTypeVatVal(), accountBottleRedVatVal));
+
+			wineAccountantDelegate.addMoneyFlowMapping(
+					dataCreator.createPFMoneyFlowMapping(bottleWhite, dataCreator.getPriceFragmentTypeVatNet(), accountBottleWhiteVatNet));
+			wineAccountantDelegate.addMoneyFlowMapping(
+					dataCreator.createPFMoneyFlowMapping(bottleWhite, dataCreator.getPriceFragmentTypeVatVal(), accountBottleWhiteVatVal));
+
+			wineAccountantDelegate.addMoneyFlowMapping(
+					dataCreator.createPFMoneyFlowMapping(boxRed, dataCreator.getPriceFragmentTypeTotal(), accountBoxRedVatNet));
+			wineAccountantDelegate.addMoneyFlowMapping(
+					dataCreator.createPFMoneyFlowMapping(boxRed, dataCreator.getPriceFragmentTypeVatVal(), accountBoxRedVatVal));
+
+			wineAccountantDelegate.addMoneyFlowMapping(
+					dataCreator.createPFMoneyFlowMapping(boxWhite, dataCreator.getPriceFragmentTypeVatNet(), accountBoxWhiteVatNet));
+			wineAccountantDelegate.addMoneyFlowMapping(
+					dataCreator.createPFMoneyFlowMapping(boxWhite, dataCreator.getPriceFragmentTypeVatVal(), accountBoxWhiteVatVal));
+
+			LocalAccountantDelegate accessoriesAccountantDelegate = new PFMappingAccountantDelegate(organisationID, "accessoriesAccountantDelegate");
+			accessories.setLocalAccountantDelegate(accessoriesAccountantDelegate);
+
+			accessoriesAccountantDelegate.addMoneyFlowMapping(
+					dataCreator.createPFMoneyFlowMapping(accessories, dataCreator.getPriceFragmentTypeVatNet(), accessoriesVatNet));
+			accessoriesAccountantDelegate.addMoneyFlowMapping(
+					dataCreator.createPFMoneyFlowMapping(accessories, dataCreator.getPriceFragmentTypeVatVal(), accessoriesVatVal));
+
+
+			// apply inheritance (e.g. because of LocalAccountantDelegates)
+			wine.getFieldMetaData("localAccountantDelegate").setValueInherited(false);
+			wine.applyInheritance();
+			accessories.getFieldMetaData("localAccountantDelegate").setValueInherited(false);
+			accessories.applyInheritance();
 
 			LOGGER.info("Initialization of JFireChezFrancois complete!");
+
+
+			LOGGER.info("Initializing JDO for Article.class...");
+			pm.getExtent(Article.class);
+			LOGGER.info("Initializing JDO for Article.class complete!");
+
 		} finally {
 			pm.close();
 		}

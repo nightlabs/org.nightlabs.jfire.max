@@ -1,3 +1,29 @@
+/* *****************************************************************************
+ * JFire - it's hot - Free ERP System - http://jfire.org                       *
+ * Copyright (C) 2004-2005 NightLabs - http://NightLabs.org                    *
+ *                                                                             *
+ * This library is free software; you can redistribute it and/or               *
+ * modify it under the terms of the GNU Lesser General Public                  *
+ * License as published by the Free Software Foundation; either                *
+ * version 2.1 of the License, or (at your option) any later version.          *
+ *                                                                             *
+ * This library is distributed in the hope that it will be useful,             *
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of              *
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU           *
+ * Lesser General Public License for more details.                             *
+ *                                                                             *
+ * You should have received a copy of the GNU Lesser General Public            *
+ * License along with this library; if not, write to the                       *
+ *     Free Software Foundation, Inc.,                                         *
+ *     51 Franklin St, Fifth Floor,                                            *
+ *     Boston, MA  02110-1301  USA                                             *
+ *                                                                             *
+ * Or get it online :                                                          *
+ *     http://opensource.org/licenses/lgpl-license.php                         *
+ *                                                                             *
+ *                                                                             *
+ ******************************************************************************/
+
 package org.nightlabs.jfire.chezfrancois;
 
 import java.util.ArrayList;
@@ -11,10 +37,12 @@ import javax.naming.InitialContext;
 import javax.naming.NamingException;
 
 import org.nightlabs.ModuleException;
+import org.nightlabs.jfire.accounting.Account;
 import org.nightlabs.jfire.accounting.Accounting;
 import org.nightlabs.jfire.accounting.Currency;
 import org.nightlabs.jfire.accounting.PriceFragmentType;
 import org.nightlabs.jfire.accounting.Tariff;
+import org.nightlabs.jfire.accounting.book.fragmentbased.PFMoneyFlowMapping;
 import org.nightlabs.jfire.accounting.id.CurrencyID;
 import org.nightlabs.jfire.accounting.id.PriceFragmentTypeID;
 import org.nightlabs.jfire.accounting.priceconfig.IInnerPriceConfig;
@@ -30,6 +58,7 @@ import org.nightlabs.jfire.store.Store;
 import org.nightlabs.jfire.store.id.ProductTypeID;
 import org.nightlabs.jfire.trade.CustomerGroup;
 import org.nightlabs.jfire.trade.LegalEntity;
+import org.nightlabs.jfire.trade.OrganisationLegalEntity;
 import org.nightlabs.jfire.trade.Trader;
 
 public class DataCreator
@@ -41,6 +70,11 @@ public class DataCreator
 	private Store store;
 	private Accounting accounting;
 	private String rootOrganisationID;
+
+	public SimpleProductType getRootSimpleProductType()
+	{
+		return rootSimpleProductType;
+	}
 
 	public DataCreator(User user)
 	{
@@ -186,13 +220,58 @@ public class DataCreator
 
 	public IInnerPriceConfig createFixPriceConfig(String name, Tariff[] tariffs, long[] prices)
 	{
-		pm.getExtent(Currency.class);
-		Currency euro = (Currency) pm.getObjectById(CurrencyID.create("EUR"));
+		String[] formulas = new String[prices.length];
+		for (int i = 0; i < prices.length; i++) {
+			long price = prices[i];
+			formulas[i] = String.valueOf(price);
+		}
+		return createFormulaPriceConfig(name, tariffs, formulas);
+	}
+
+	private Currency euro = null;	
+	protected Currency getCurrencyEUR()
+	{
+		if (euro == null) {
+			pm.getExtent(Currency.class);
+			euro = (Currency) pm.getObjectById(CurrencyID.create("EUR"));
+		}
+
+		return euro;
+	}
+
+	private PriceFragmentType priceFragmentTypeTotal = null;
+	public PriceFragmentType getPriceFragmentTypeTotal()
+	{
+		if (priceFragmentTypeTotal == null)
+			priceFragmentTypeTotal = PriceFragmentType.getTotalPriceFragmentType(pm);
+
+		return priceFragmentTypeTotal;
+	}
+
+	private PriceFragmentType priceFragmentTypeVatNet = null;
+	public PriceFragmentType getPriceFragmentTypeVatNet() {
+		if (priceFragmentTypeVatNet == null)
+			priceFragmentTypeVatNet = (PriceFragmentType) pm.getObjectById(PriceFragmentTypeID.create(rootOrganisationID, "vat-de-16-net"));
+
+		return priceFragmentTypeVatNet;			
+	}
+
+	private PriceFragmentType priceFragmentTypeVatVal = null;
+	public PriceFragmentType getPriceFragmentTypeVatVal() {
+		if (priceFragmentTypeVatVal == null)
+			priceFragmentTypeVatVal = (PriceFragmentType) pm.getObjectById(PriceFragmentTypeID.create(rootOrganisationID, "vat-de-16-val"));
+
+		return priceFragmentTypeVatVal;
+	}
+
+	public IInnerPriceConfig createFormulaPriceConfig(String name, Tariff[] tariffs, String[] formulas)
+	{
+		Currency euro = getCurrencyEUR();
 
 //	 create the price config "Car - Middle Class"
-		PriceFragmentType totalPriceFragmentType = PriceFragmentType.getTotalPriceFragmentType(pm);
-		PriceFragmentType vatNet = (PriceFragmentType) pm.getObjectById(PriceFragmentTypeID.create(rootOrganisationID, "vat-de-16-net"));
-		PriceFragmentType vatVal = (PriceFragmentType) pm.getObjectById(PriceFragmentTypeID.create(rootOrganisationID, "vat-de-16-val"));
+		PriceFragmentType totalPriceFragmentType = getPriceFragmentTypeTotal();
+		PriceFragmentType vatNet = getPriceFragmentTypeVatNet();
+		PriceFragmentType vatVal = getPriceFragmentTypeVatVal();
 
 		Accounting accounting = Accounting.getAccounting(pm);
 		Trader trader = Trader.getTrader(pm);
@@ -260,14 +339,56 @@ public class DataCreator
 				"	)\n" +
 				");");
 
-		for (int i = 0; i < prices.length; i++) {
-			long price = prices[i];
+		for (int i = 0; i < formulas.length; i++) {
+			String formula = formulas[i];
 			Tariff tariff = tariffs[i];
 		
 			FormulaCell cell = formulaPriceConfig.createFormulaCell(customerGroupDefault, tariff, euro);
-			cell.setFormula(totalPriceFragmentType, String.valueOf(price));
+			cell.setFormula(totalPriceFragmentType, formula);
 		}
 
 		return formulaPriceConfig;
 	}
+
+	private OrganisationLegalEntity organisationLegalEntity = null;
+	protected OrganisationLegalEntity getOrganisationLegalEntity()
+	{
+		if (organisationLegalEntity == null)
+			organisationLegalEntity = OrganisationLegalEntity.getOrganisationLegalEntity(
+				pm, organisationID, OrganisationLegalEntity.ANCHOR_TYPE_ID_ORGANISATION, true);
+
+		return organisationLegalEntity;
+	}
+
+	public Account createLocalAccount(String anchorID)
+	{
+		Currency euro = getCurrencyEUR();
+
+		Account account = new Account(
+				organisationID, Account.ANCHOR_TYPE_ID_LOCAL_NORMAL, anchorID, organisationLegalEntity, euro);
+
+		pm.makePersistent(account);
+
+		return account;
+	}
+
+	public PFMoneyFlowMapping createPFMoneyFlowMapping(
+			ProductType productType, PriceFragmentType priceFragmentType, Account account)
+	{
+		PFMoneyFlowMapping mapping = new PFMoneyFlowMapping(
+				organisationID,
+				accounting.createMoneyFlowMappingID(),
+				productType.getPrimaryKey(),
+				PFMoneyFlowMapping.PACKAGE_TYPE_PACKAGE,
+				priceFragmentType.getPrimaryKey(),
+				euro.getCurrencyID()
+		);
+		mapping.setOwnerPK(getOrganisationLegalEntity().getPrimaryKey());
+		mapping.setSourceOrganisationID(organisationID);
+		mapping.setAccountPK(account.getPrimaryKey());
+//
+//		pm.makePersistent(mapping);
+		return mapping;
+	}
+
 }

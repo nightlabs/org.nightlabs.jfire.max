@@ -444,6 +444,8 @@ implements SessionBean
 
 		PersistenceManager pm = getPersistenceManager();
 		try {
+			pm.getFetchPlan().setGroup(FetchPlan.DEFAULT);
+
 			SimpleProductType result = null;
 			if (NLJDOHelper.exists(pm, productType)) {
 				result = (SimpleProductType) NLJDOHelper.storeJDO(pm, productType, get, fetchGroups, maxFetchDepth);

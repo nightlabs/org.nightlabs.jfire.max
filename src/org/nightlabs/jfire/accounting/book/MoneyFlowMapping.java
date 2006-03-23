@@ -226,6 +226,8 @@ public abstract class MoneyFlowMapping implements Serializable {
 	 */
 	public void setAccount(Account account) {
 		this.account = account;
+		accountPK = (account == null) ? null : account.getPrimaryKey();
+			
 	}
 
 	/**

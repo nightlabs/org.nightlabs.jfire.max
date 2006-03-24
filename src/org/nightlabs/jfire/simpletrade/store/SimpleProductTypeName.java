@@ -36,6 +36,7 @@ import org.nightlabs.inheritance.Inheritable;
 import org.nightlabs.inheritance.MapFieldInheriter;
 import org.nightlabs.inheritance.NotWritableException;
 import org.nightlabs.inheritance.SimpleFieldInheriter;
+import org.nightlabs.inheritance.StaticFieldMetaData;
 import org.nightlabs.jfire.store.ProductType;
 
 /**
@@ -170,44 +171,44 @@ implements Inheritable
 		return simpleProductType;
 	}
 
-	protected static class StaticFieldMetaData
-	implements FieldMetaData
-	{
-		private String fieldName;
-
-		public StaticFieldMetaData(String fieldName)
-		{
-			this.fieldName = fieldName;
-		}
-
-		public String getFieldName()
-		{
-			return fieldName;
-		}
-
-		public byte getWritableByChildren()
-		{
-			return WRITABLEBYCHILDREN_YES;
-		}
-
-		public void setWritableByChildren(byte writableByChildren) { }
-
-		public boolean isWritable()
-		{
-			return true;
-		}
-
-		public void assertWritable() throws NotWritableException { }
-
-		public void setWritable(boolean writable) { }
-
-		public boolean isValueInherited()
-		{
-			return true;
-		}
-
-		public void setValueInherited(boolean valueInherited) { }
-	}
+//	protected static class StaticFieldMetaData
+//	implements FieldMetaData
+//	{
+//		private String fieldName;
+//
+//		public StaticFieldMetaData(String fieldName)
+//		{
+//			this.fieldName = fieldName;
+//		}
+//
+//		public String getFieldName()
+//		{
+//			return fieldName;
+//		}
+//
+//		public byte getWritableByChildren()
+//		{
+//			return WRITABLEBYCHILDREN_YES;
+//		}
+//
+//		public void setWritableByChildren(byte writableByChildren) { }
+//
+//		public boolean isWritable()
+//		{
+//			return true;
+//		}
+//
+//		public void assertWritable() throws NotWritableException { }
+//
+//		public void setWritable(boolean writable) { }
+//
+//		public boolean isValueInherited()
+//		{
+//			return true;
+//		}
+//
+//		public void setValueInherited(boolean valueInherited) { }
+//	}
 
 	public FieldMetaData getFieldMetaData(String fieldName)
 	{

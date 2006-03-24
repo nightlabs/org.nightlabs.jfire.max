@@ -360,6 +360,7 @@ public class SimpleProductType extends ProductType
 
 	// ******************************
 	// /// *** begin inheritance *** ///
+	@Override
 	public FieldMetaData getFieldMetaData(String fieldName)
 	{
 		if ("createdProductCount".equals(fieldName))
@@ -368,6 +369,7 @@ public class SimpleProductType extends ProductType
 		return super.getFieldMetaData(fieldName);
 	}
 
+	@Override
 	public FieldInheriter getFieldInheriter(String fieldName)
 	{
 		if ("name".equals(fieldName))
@@ -376,6 +378,7 @@ public class SimpleProductType extends ProductType
 		return super.getFieldInheriter(fieldName);
 	}
 
+	@Override
 	public void preInherit(Inheritable mother, Inheritable child)
 	{
 		super.preInherit(mother, child);

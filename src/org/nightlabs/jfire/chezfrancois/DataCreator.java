@@ -70,6 +70,8 @@ import org.nightlabs.jfire.trade.Trader;
 
 public class DataCreator
 {
+	private String languageID = "en";
+
 	private PersistenceManager pm;
 	private String organisationID;
 	private User user;
@@ -107,8 +109,6 @@ public class DataCreator
 			throw new RuntimeException(e);
 		}
 	}
-
-	private String languageID = "en";
 
 	protected SimpleProductType createCategory(SimpleProductType parent, String productTypeID, String name)
 	{
@@ -367,12 +367,13 @@ public class DataCreator
 		return organisationLegalEntity;
 	}
 
-	public Account createLocalAccount(String anchorID)
+	public Account createLocalAccount(String anchorID, String name)
 	{
 		Currency euro = getCurrencyEUR();
 
 		Account account = new Account(
 				organisationID, Account.ANCHOR_TYPE_ID_LOCAL_NORMAL, anchorID, organisationLegalEntity, euro);
+		account.getName().setText(languageID, name);
 
 		pm.makePersistent(account);
 
@@ -382,6 +383,7 @@ public class DataCreator
 	public PFMoneyFlowMapping createPFMoneyFlowMapping(
 			ProductType productType, PriceFragmentType priceFragmentType, Account account)
 	{
+		Currency euro = getCurrencyEUR();
 		PFMoneyFlowMapping mapping = new PFMoneyFlowMapping(
 				organisationID,
 				accounting.createMoneyFlowMappingID(),

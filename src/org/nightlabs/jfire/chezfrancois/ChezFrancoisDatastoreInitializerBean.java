@@ -239,24 +239,24 @@ implements SessionBean
 				SimpleProductType sarotti = dataCreator.createLeaf(chocolate, "sarotti", "Sarotti", priceConfigChocolate);
 				SimpleProductType corkscrew = dataCreator.createCategory(accessories, "corkscrew", "Corkscrew");
 				SimpleProductType corkscrewXYZ = dataCreator.createLeaf(corkscrew, "corkscrew-xyz", "Corkscrew XYZ", priceConfigCorkScrew);
-	
+
 				dataCreator.calculatePrices();
-	
+
 				// create Accounts: Red Wine (bottle), White Wine (bottle), Red Wine (box), White Wine (box)
-				Account accountBottleRedVatNet = dataCreator.createLocalAccount("bottle-red-vat-net.eur");
-				Account accountBottleRedVatVal = dataCreator.createLocalAccount("bottle-red-vat-val.eur");
-				Account accountBottleWhiteVatNet = dataCreator.createLocalAccount("bottle-white-vat-net.eur");
-				Account accountBottleWhiteVatVal = dataCreator.createLocalAccount("bottle-white-vat-val.eur");
-	
-				Account accountBoxRedVatNet = dataCreator.createLocalAccount("box-red-vat-net.eur");
-				Account accountBoxRedVatVal = dataCreator.createLocalAccount("box-red-vat-val.eur");
-				Account accountBoxWhiteVatNet = dataCreator.createLocalAccount("box-white-vat-net.eur");
-				Account accountBoxWhiteVatVal = dataCreator.createLocalAccount("box-white-vat-val.eur");
-	
+				Account accountBottleRedVatNet = dataCreator.createLocalAccount("bottle-red-vat-net.eur", "Bottle Red Net (EUR)");
+				Account accountBottleRedVatVal = dataCreator.createLocalAccount("bottle-red-vat-val.eur", "Bottle Red VAT (EUR)");
+				Account accountBottleWhiteVatNet = dataCreator.createLocalAccount("bottle-white-vat-net.eur", "Bottle White Net (EUR)");
+				Account accountBottleWhiteVatVal = dataCreator.createLocalAccount("bottle-white-vat-val.eur", "Bottle White VAT (EUR)");
+
+				Account accountBoxRedVatNet = dataCreator.createLocalAccount("box-red-vat-net.eur", "Box Red Net (EUR)");
+				Account accountBoxRedVatVal = dataCreator.createLocalAccount("box-red-vat-val.eur", "Box Red VAT (EUR)");
+				Account accountBoxWhiteVatNet = dataCreator.createLocalAccount("box-white-vat-net.eur", "Box White Net (EUR)");
+				Account accountBoxWhiteVatVal = dataCreator.createLocalAccount("box-white-vat-val.eur", "Box White VAT (EUR)");
+
 				// create Accounts: Accessories
-				Account accessoriesVatNet = dataCreator.createLocalAccount("accessories-vat-net.eur");
-				Account accessoriesVatVal = dataCreator.createLocalAccount("accessories-vat-val.eur");
-	
+				Account accessoriesVatNet = dataCreator.createLocalAccount("accessories-vat-net.eur", "Accessories Net (EUR)");
+				Account accessoriesVatVal = dataCreator.createLocalAccount("accessories-vat-val.eur", "Accessories VAT (EUR)");
+
 				// configure moneyflow
 				LocalAccountantDelegate wineAccountantDelegate = new PFMappingAccountantDelegate(organisationID, "wineAccountantDelegate");
 				wine.setLocalAccountantDelegate(wineAccountantDelegate);

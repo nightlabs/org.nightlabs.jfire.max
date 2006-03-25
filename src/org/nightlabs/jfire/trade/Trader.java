@@ -40,7 +40,9 @@ import javax.jdo.PersistenceManager;
 import javax.naming.InitialContext;
 import javax.naming.NamingException;
 
+import org.apache.log4j.Logger;
 import org.nightlabs.ModuleException;
+import org.nightlabs.jdo.NLJDOHelper;
 import org.nightlabs.jfire.accounting.Accounting;
 import org.nightlabs.jfire.accounting.Currency;
 import org.nightlabs.jfire.accounting.priceconfig.IPackagePriceConfig;
@@ -60,7 +62,6 @@ import org.nightlabs.jfire.store.ProductType;
 import org.nightlabs.jfire.store.Store;
 import org.nightlabs.jfire.trade.id.ArticleID;
 import org.nightlabs.jfire.transfer.id.AnchorID;
-import org.nightlabs.jdo.NLJDOHelper;
 
 /**
  * Trader is responsible for purchase and sale. It manages orders, offers and
@@ -76,6 +77,8 @@ import org.nightlabs.jdo.NLJDOHelper;
  */
 public class Trader
 {
+	private static Logger LOGGER = Logger.getLogger(Trader.class);
+
 	/**
 	 * This method returns the singleton instance of Trader. If there is no
 	 * instance of Trader in the datastore, yet, it will be created.
@@ -734,7 +737,14 @@ public class Trader
 						.getInvocation()).getArticleIDs();
 				for (Iterator iter = articleIDs.iterator(); iter.hasNext();) {
 					ArticleID articleID = (ArticleID) iter.next();
-					Article article = (Article) pm.getObjectById(articleID);
+					Article article = null;
+					try {
+						article = (Article) pm.getObjectById(articleID);
+					} catch (JDOObjectNotFoundException x) {
+						LOGGER.error("AllocateArticlesEndUndeliverableCallback: Article does not exist in datastore: " + articleID);
+					}
+
+					if (article != null)
 					article.setAllocationAbandoned(true);
 				}
 			} finally {
@@ -755,8 +765,15 @@ public class Trader
 						.getInvocation()).getArticleIDs();
 				for (Iterator iter = articleIDs.iterator(); iter.hasNext();) {
 					ArticleID articleID = (ArticleID) iter.next();
-					Article article = (Article) pm.getObjectById(articleID);
-					article.setAllocationException(error);
+					Article article = null;
+					try {
+						article = (Article) pm.getObjectById(articleID);
+					} catch (JDOObjectNotFoundException x) {
+						LOGGER.error("AllocateArticlesEndErrorCallback: Article does not exist in datastore: " + articleID);
+					}
+
+					if (article != null)
+						article.setAllocationException(error);
 				}
 			} finally {
 				pm.close();

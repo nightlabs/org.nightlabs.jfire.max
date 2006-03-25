@@ -204,7 +204,7 @@ public abstract class TariffPriceConfig extends PriceConfig
 	public void adoptParameters(IPriceConfig _other, boolean onlyAdd)
 	{
 		if (_other == null)
-			throw new NullPointerException("Param 'IPriceConfig other' must not be null!");
+			throw new IllegalArgumentException("Param 'IPriceConfig other' must not be null!");
 
 		if (!(_other instanceof TariffPriceConfig))
 			throw new IllegalArgumentException("other is an instance of \""+_other.getClass().getName()+"\" but must be TariffPriceConfig!");

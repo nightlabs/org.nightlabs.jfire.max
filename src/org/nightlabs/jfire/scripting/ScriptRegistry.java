@@ -26,12 +26,12 @@
 
 package org.nightlabs.jfire.scripting;
 
-import java.io.File;
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Iterator;
+import java.util.List;
 import java.util.Map;
-import java.util.Map.Entry;
 
 import javax.jdo.JDOHelper;
 import javax.jdo.PersistenceManager;
@@ -41,6 +41,7 @@ import javax.naming.NamingException;
 import org.nightlabs.jfire.organisation.LocalOrganisation;
 import org.nightlabs.jfire.organisation.Organisation;
 import org.nightlabs.jfire.scripting.id.ScriptRegistryID;
+import org.nightlabs.jfire.scripting.id.ScriptRegistryItemID;
 import org.nightlabs.util.Utils;
 
 /**
@@ -348,4 +349,42 @@ public class ScriptRegistry
 		return res;
 	}
 
+	public Map<ScriptRegistryItemID, Object> execute(List<Script> scripts, Map<String, Object> parameterValues)
+	throws
+		IllegalArgumentException,
+		ClassNotFoundException,
+		InstantiationException,
+		IllegalAccessException,
+		ScriptException
+	{
+		List<Map<String, Object>> parameterValuesList = new ArrayList<Map<String,Object>>(scripts.size());
+		for (int i = 0; i < scripts.size(); ++i) {
+			parameterValuesList.add(parameterValues);
+		}
+		return execute(scripts, parameterValuesList);
+	}
+
+	public Map<ScriptRegistryItemID, Object> execute(List<Script> scripts, List<Map<String, Object>> parameterValues)
+	throws
+		IllegalArgumentException,
+		ClassNotFoundException,
+		InstantiationException,
+		IllegalAccessException,
+		ScriptException
+	{
+		if (scripts.size() != parameterValues.size())
+			throw new IllegalArgumentException("scripts.size() != parameterValues.size()");
+
+		Map<ScriptRegistryItemID, Object> res = new HashMap<ScriptRegistryItemID, Object>();
+		Iterator<Map<String,Object>> parameterValuesIterator = parameterValues.iterator();
+		for (Script script : scripts) {
+			ScriptExecutor scriptExecutor = createScriptExecutor(script.getLanguage());
+			scriptExecutor.prepare(script,
+					parameterValuesIterator.next());
+			res.put(
+					(ScriptRegistryItemID) JDOHelper.getObjectId(script),
+					scriptExecutor.execute());
+		}
+		return res;
+	}
 }

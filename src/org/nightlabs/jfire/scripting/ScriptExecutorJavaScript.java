@@ -32,8 +32,10 @@ import javax.jdo.JDOHelper;
 
 import org.mozilla.javascript.Context;
 import org.mozilla.javascript.ImporterTopLevel;
+import org.mozilla.javascript.NativeJavaObject;
 import org.mozilla.javascript.Scriptable;
 import org.mozilla.javascript.ScriptableObject;
+import org.mozilla.javascript.Undefined;
 
 /**
  * This implementation of {@link ScriptExecutor} supports JavaScript
@@ -72,6 +74,13 @@ public class ScriptExecutorJavaScript
 			Script script = getScript();
 			Object result = context.evaluateString(
 					scope, script.getText(), JDOHelper.getObjectId(script).toString(), 1, null);
+
+			if (result instanceof Undefined)
+				result = null;
+			else if (result instanceof NativeJavaObject)
+				result = ((NativeJavaObject)result).unwrap();
+			else
+				throw new IllegalStateException("context.evaluateString(...) returned an object of an unknown type!");
 
 			return result;
 		} finally {

@@ -82,19 +82,24 @@ public abstract class ScriptExecutor
 	public final void prepare(Script script, Map<String, Object> parameterValues)
 		throws ScriptException
 	{
-		if (script == null)
-			throw new IllegalArgumentException("script must not be null!");
-
-		this.script = script;
-
-		if (parameterValues == null)
-			parameterValues = new HashMap<String, Object>(0);
-
-		this.parameterValues = parameterValues;
-
-		validateParameters();
-		doPrepare();
-		prepared = true;
+		preparing = true;
+		try {
+			if (script == null)
+				throw new IllegalArgumentException("script must not be null!");
+	
+			this.script = script;
+	
+			if (parameterValues == null)
+				parameterValues = new HashMap<String, Object>(0);
+	
+			this.parameterValues = parameterValues;
+	
+			validateParameters();
+			doPrepare();
+			prepared = true;
+		} finally {
+			preparing = false;
+		}
 	}
 
 	protected void doPrepare()
@@ -104,6 +109,13 @@ public abstract class ScriptExecutor
 	public boolean isPrepared()
 	{
 		return prepared;
+	}
+
+	private boolean preparing = false;
+
+	protected boolean isPreparing()
+	{
+		return preparing;
 	}
 
 	/**
@@ -150,7 +162,7 @@ public abstract class ScriptExecutor
 
 		// get the defined parameter values and put them into "undeclared" set,
 		// because we will remove all that are declared.
-		Set<String> undeclaredParameterIDs = getParameterValues().keySet();
+		Set<String> undeclaredParameterIDs = new HashSet<String>(getParameterValues().keySet());
 
 		undefinedParameterIDs.removeAll(undeclaredParameterIDs);
 		undeclaredParameterIDs.removeAll(parameterSet.getParameterIDs());
@@ -168,7 +180,7 @@ public abstract class ScriptExecutor
 
 	public Script getScript()
 	{
-		if (!isPrepared())
+		if (!isPrepared() && !preparing)
 			throw new IllegalStateException("Cannot obtain script prior to prepare(...)! Call prepare(...) first!");
 
 		return script;
@@ -189,7 +201,7 @@ public abstract class ScriptExecutor
 	 */
 	public Map<String, Object> getParameterValues()
 	{
-		if (!isPrepared())
+		if (!isPrepared() && !preparing)
 			throw new IllegalStateException("Cannot obtain parameter values prior to prepare(...)! Call prepare(...) first!");
 
 		return parameterValues;

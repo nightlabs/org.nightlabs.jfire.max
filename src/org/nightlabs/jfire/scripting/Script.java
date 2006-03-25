@@ -27,6 +27,7 @@
 package org.nightlabs.jfire.scripting;
 
 import java.io.Serializable;
+import java.sql.Types;
 import java.util.Collection;
 
 import javax.jdo.JDODetachedFieldAccessException;
@@ -95,6 +96,7 @@ public class Script
 	 * This field stores the actual code of the script which will be executed.
 	 *
 	 * @jdo.field persistence-modifier="persistent"
+	 * @jdo.column jdbc-type="LONGVARCHAR"
 	 */
 	private String text;
 

@@ -36,6 +36,7 @@ import javax.jdo.PersistenceManager;
 import javax.jdo.Query;
 import javax.jdo.listener.StoreCallback;
 
+import org.apache.log4j.Logger;
 import org.nightlabs.util.Utils;
 
 /**
@@ -240,17 +241,15 @@ public class ScriptRegistryItem
 		return (Collection)q.execute();
 	}
 	
-	public void jdoPreStore() {
-		// Assuming that preStore only called when first made persistent
-		if (true) return; // TODO @Bieber: Change Event Tracking should only be done if there is an interested client! Marco.
-
+	public void jdoPreStore()
+	{
 		if (!JDOHelper.isNew(this)) 
 			return;
+
 		PersistenceManager pm = JDOHelper.getPersistenceManager(this);
 		if (pm == null)
 			throw new IllegalStateException("Could not get PersistenceManager jdoPreStore()");
-		
-		
+
 		ScriptRegistryItem _parent = getParent();
 		if (getParameterSet() == null && parent != null) {
 			if (JDOHelper.isDetached(parent)) {
@@ -268,12 +267,14 @@ public class ScriptRegistryItem
 						this.setParameterSet(_parent.getParameterSet());
 					} catch (JDODetachedFieldAccessException e) {
 						// TODO: Log with logger?? when made transient -> Nullpointerexception
-						System.out.println("WARNING: Could not set the parameterSet initially from null to the parents one");
+						Logger.getLogger(ScriptRegistryItem.class).error("Could not set the parameterSet initially from null to the parents one");
 					}
 				}
 			}
 		}
-		
+
+		if (true) return; // TODO @Bieber: Change Event Tracking should only be done if there is an interested client! Marco.
+
 		ScriptRegistryItemChangeEvent.addChangeEventToController(
 				pm,
 				ScriptRegistryItemChangeEvent.EVENT_TYPE_ITEM_ADDED,

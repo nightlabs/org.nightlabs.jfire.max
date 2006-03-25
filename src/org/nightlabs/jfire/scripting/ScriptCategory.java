@@ -30,6 +30,10 @@ import java.util.Collections;
 import java.util.HashSet;
 import java.util.Set;
 
+import javax.jdo.JDODetachedFieldAccessException;
+
+import org.apache.log4j.Logger;
+
 /**
  * @author Marco Schulze - marco at nightlabs dot de
  *
@@ -130,6 +134,14 @@ public class ScriptCategory
 	private void init()
 	{
 		children = new HashSet();
+
+		try {
+			ScriptCategory parent = getParent();
+			if (parent != null)
+				setParameterSet(parent.getParameterSet());
+		} catch (JDODetachedFieldAccessException x) {
+			Logger.getLogger(ScriptCategory.class).warn("Could not inherit ParameterSet! Will try it in jdoPreStore()...", x);
+		}
 	}
 
 	@Override

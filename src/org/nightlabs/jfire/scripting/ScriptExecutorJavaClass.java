@@ -57,6 +57,7 @@ public class ScriptExecutorJavaClass
 						+	" does not implement interface " + ScriptExecutorJavaClassDelegate.class.getName());
 
 			delegate = (ScriptExecutorJavaClassDelegate)delegateInstance;
+			delegate.setScriptExecutorJavaClass(this);
 			return delegate;
 		} catch (ClassNotFoundException e) {
 			throw new ScriptException(e);

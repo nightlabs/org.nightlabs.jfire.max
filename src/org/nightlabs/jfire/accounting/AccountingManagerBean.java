@@ -330,6 +330,7 @@ public abstract class AccountingManagerBean
 				modeOfPaymentFlavour.getName().setText(Locale.ENGLISH.getLanguage(), "Bank Transfer");
 				modeOfPaymentFlavour.getName().setText(Locale.GERMAN.getLanguage(), "Überweisung");
 				modeOfPaymentFlavour.getName().setText(Locale.FRENCH.getLanguage(), "Virement");
+				modeOfPaymentFlavour.loadIconFromResource();
 				pm.makePersistent(modeOfPayment);
 				trader.getDefaultCustomerGroupForKnownCustomer().addModeOfPayment(modeOfPayment);
 	

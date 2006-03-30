@@ -26,6 +26,10 @@
 
 package org.nightlabs.jfire.store.deliver;
 
+import java.io.FileNotFoundException;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -41,10 +45,12 @@ import javax.jdo.JDOHelper;
 import javax.jdo.PersistenceManager;
 import javax.jdo.Query;
 
+import org.nightlabs.io.DataBuffer;
 import org.nightlabs.jfire.store.ProductType;
 import org.nightlabs.jfire.store.deliver.id.ModeOfDeliveryFlavourID;
 import org.nightlabs.jfire.store.id.ProductTypeID;
 import org.nightlabs.jfire.trade.id.CustomerGroupID;
+import org.nightlabs.util.Utils;
 
 /**
  * A <tt>ModeOfDeliveryFlavour</tt> is a subkind of <tt>ModeOfDelivery</tt>. An example
@@ -66,6 +72,7 @@ import org.nightlabs.jfire.trade.id.CustomerGroupID;
  *
  * @jdo.fetch-group name="ModeOfDeliveryFlavour.name" fields="name"
  * @jdo.fetch-group name="ModeOfDeliveryFlavour.modeOfDelivery" fields="modeOfDelivery"
+ * @jdo.fetch-group name="ModeOfDeliveryFlavour.icon16x16Data" fields="icon16x16Data"
  * @jdo.fetch-group name="ModeOfDeliveryFlavour.this" fetch-groups="default" fields="modeOfDelivery, name"
  *
  * @!jdo,query
@@ -126,12 +133,14 @@ import org.nightlabs.jfire.trade.id.CustomerGroupID;
  *			import java.lang.String;
  *			import org.nightlabs.jfire.trade.CustomerGroup;
  *			import org.nightlabs.jfire.store.deliver.ModeOfDelivery"
+ *
  */
 public class ModeOfDeliveryFlavour
 implements Serializable
 {
 	public static final String FETCH_GROUP_NAME = "ModeOfDeliveryFlavour.name";
 	public static final String FETCH_GROUP_MODE_OF_DELIVERY = "ModeOfDeliveryFlavour.modeOfDelivery";
+	public static final String FETCH_GROUP_ICON_16X16_DATA = "ModeOfDeliveryFlavour.icon16x16Data";
 	public static final String FETCH_GROUP_THIS_MODE_OF_DELIVERY_FLAVOUR = "ModeOfDeliveryFlavour.this";
 
 	public static class ModeOfDeliveryFlavourProductTypeGroupCarrier
@@ -506,6 +515,16 @@ implements Serializable
 	 */
 	private ModeOfDeliveryFlavourName name;
 
+//	/**
+//	* @jdo.field persistence-modifier="persistent"
+//	*/
+//	private Date icon16x16Timestamp;
+//	
+	/**
+	 * @jdo.field persistence-modifier="persistent" collection-type="array" serialized-element="true"
+	 */
+	private byte[] icon16x16Data;
+
 	/**
 	 * @deprecated Only for JDO!
 	 */
@@ -558,5 +577,62 @@ implements Serializable
 	public ModeOfDeliveryFlavourName getName()
 	{
 		return name;
+	}
+//	public Date getIcon16x16Timestamp()
+//	{
+//	return icon16x16Timestamp;
+//	}
+//	public void setIcon16x16Timestamp(Date icon16x16Timestamp)
+//	{
+//	this.icon16x16Timestamp = icon16x16Timestamp;
+//	}
+	public byte[] getIcon16x16Data()
+	{
+		return icon16x16Data;
+	}
+	public void setIcon16x16Data(byte[] icon16x16Data)
+	{
+		this.icon16x16Data = icon16x16Data;
+	}
+
+	/**
+	 * Calls {@link #loadIconFromResource(Class, String) } with <code>resourceLoaderClass == </code>
+	 * {@link ModeOfDeliveryFlavour} and <code>fileName == "ModeOfDeliveryFlavour-" + modeOfDeliveryFlavourID + ".16x16.png"</code>.
+	 * This method is used for the default {@link ModeOfDeliveryFlavour}s populated by JFireTrade.
+	 *
+	 * @throws IOException
+	 */
+	public void loadIconFromResource() throws IOException
+	{
+		String resourcePath = "resource/" + ModeOfDeliveryFlavour.class.getSimpleName() + '-' + modeOfDeliveryFlavourID + ".16x16.png";
+		loadIconFromResource(
+				ModeOfDeliveryFlavour.class, resourcePath);
+	}
+
+	/**
+	 * This method loads an icon from a resource file by calling the method
+	 * {@link Class#getResourceAsStream(String)} of
+	 * <code>resourceLoaderClass</code>.
+	 *
+	 * @param resourceLoaderClass The class that is used for loading the file.
+	 * @param fileName A filename relative to <code>resourceLoaderClass</code>. Note, that subdirectories are possible, but ".." not.
+	 * @throws IOException If loading the resource failed. This might be a {@link FileNotFoundException}.
+	 */
+	public void loadIconFromResource(Class resourceLoaderClass, String fileName) throws IOException
+	{
+		InputStream in = resourceLoaderClass.getResourceAsStream(fileName);
+		if (in == null)
+			throw new FileNotFoundException("Could not find resource: " + fileName);
+		try {
+			DataBuffer db = new DataBuffer(512);
+//			db.maxSizeForRAM = Integer.MAX_VALUE;
+			OutputStream out = db.createOutputStream();
+			Utils.transferStreamData(in, out);
+			out.close();
+
+			this.icon16x16Data = db.createByteArray();
+		} finally {
+			in.close();
+		}
 	}
 }

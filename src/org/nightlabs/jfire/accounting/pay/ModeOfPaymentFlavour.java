@@ -26,6 +26,10 @@
 
 package org.nightlabs.jfire.accounting.pay;
 
+import java.io.FileNotFoundException;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
 import java.io.Serializable;
 import java.util.Collection;
 import java.util.HashMap;
@@ -35,8 +39,10 @@ import java.util.Map;
 import javax.jdo.PersistenceManager;
 import javax.jdo.Query;
 
+import org.nightlabs.io.DataBuffer;
 import org.nightlabs.jfire.trade.CustomerGroup;
 import org.nightlabs.jfire.trade.id.CustomerGroupID;
+import org.nightlabs.util.Utils;
 
 /**
  * A <tt>ModeOfPaymentFlavour</tt> is a subkind of <tt>ModeOfPayment</tt>. An example
@@ -55,7 +61,12 @@ import org.nightlabs.jfire.trade.id.CustomerGroupID;
  * @jdo.inheritance strategy="new-table"
  *
  * @jdo.create-objectid-class field-order="organisationID, modeOfPaymentFlavourID"
- * 
+ *
+ * @jdo.fetch-group name="ModeOfPaymentFlavour.name" fields="name"
+ * @jdo.fetch-group name="ModeOfPaymentFlavour.modeOfPayment" fields="modeOfPayment"
+ * @jdo.fetch-group name="ModeOfPaymentFlavour.icon16x16Data" fields="icon16x16Data"
+ * @jdo.fetch-group name="ModeOfPaymentFlavour.this" fetch-groups="default" fields="modeOfPayment, name, icon16x16Data"
+ *
  * @!jdo.query // this fails with: Cannot perform operation "in" on UnboundVariable and MapValueLiteral "(?,?)"
  *		name="getAvailableModeOfPaymentFlavoursForOneCustomerGroup"
  *		query="SELECT
@@ -119,15 +130,13 @@ import org.nightlabs.jfire.trade.id.CustomerGroupID;
  *			import org.nightlabs.jfire.trade.CustomerGroup;
  *			import org.nightlabs.jfire.accounting.pay.ModeOfPayment"
  *
- * @jdo.fetch-group name="ModeOfPaymentFlavour.name" fields="name"
- * @jdo.fetch-group name="ModeOfPaymentFlavour.modeOfPayment" fields="modeOfPayment"
- * @jdo.fetch-group name="ModeOfPaymentFlavour.this" fetch-groups="default" fields="modeOfPayment, name"
  */
 public class ModeOfPaymentFlavour
 implements Serializable
 {
 	public static final String FETCH_GROUP_NAME = "ModeOfPaymentFlavour.name";
 	public static final String FETCH_GROUP_MODE_OF_PAYMENT = "ModeOfPaymentFlavour.modeOfPayment";
+	public static final String FETCH_GROUP_ICON_16X16_DATA = "ModeOfPaymentFlavour.icon16x16Data";
 	public static final String FETCH_GROUP_THIS_MODE_OF_PAYMENT_FLAVOUR = "ModeOfPaymentFlavour.this";
 
 	public static final byte MERGE_MODE_ADDITIVE = 1;
@@ -280,7 +289,17 @@ implements Serializable
 	 * @jdo.field persistence-modifier="persistent"
 	 */
 	private ModeOfPayment modeOfPayment;
-	
+
+//	/**
+//	 * @jdo.field persistence-modifier="persistent"
+//	 */
+//	private Date icon16x16Timestamp;
+//
+	/**
+	 * @jdo.field persistence-modifier="persistent" collection-type="array" serialized-element="true"
+	 */
+	private byte[] icon16x16Data;
+
 	/**
 	 * @jdo.field persistence-modifier="persistent" dependent="true" mapped-by="modeOfPaymentFlavour"
 	 */
@@ -338,5 +357,62 @@ implements Serializable
 	public ModeOfPaymentFlavourName getName()
 	{
 		return name;
+	}
+//	public Date getIcon16x16Timestamp()
+//	{
+//		return icon16x16Timestamp;
+//	}
+//	public void setIcon16x16Timestamp(Date icon16x16Timestamp)
+//	{
+//		this.icon16x16Timestamp = icon16x16Timestamp;
+//	}
+	public byte[] getIcon16x16Data()
+	{
+		return icon16x16Data;
+	}
+	public void setIcon16x16Data(byte[] icon16x16Data)
+	{
+		this.icon16x16Data = icon16x16Data;
+	}
+
+	/**
+	 * Calls {@link #loadIconFromResource(Class, String) } with <code>resourceLoaderClass == </code>
+	 * {@link ModeOfPaymentFlavour} and <code>fileName == "ModeOfPaymentFlavour-" + modeOfPaymentFlavourID + ".16x16.png"</code>.
+	 * This method is used for the default {@link ModeOfPaymentFlavour}s populated by JFireTrade.
+	 *
+	 * @throws IOException
+	 */
+	public void loadIconFromResource() throws IOException
+	{
+		String resourcePath = "resource/" + ModeOfPaymentFlavour.class.getSimpleName() + '-' + modeOfPaymentFlavourID + ".16x16.png";
+		loadIconFromResource(
+				ModeOfPaymentFlavour.class, resourcePath);
+	}
+
+	/**
+	 * This method loads an icon from a resource file by calling the method
+	 * {@link Class#getResourceAsStream(String)} of
+	 * <code>resourceLoaderClass</code>.
+	 *
+	 * @param resourceLoaderClass The class that is used for loading the file.
+	 * @param fileName A filename relative to <code>resourceLoaderClass</code>. Note, that subdirectories are possible, but ".." not.
+	 * @throws IOException If loading the resource failed. This might be a {@link FileNotFoundException}.
+	 */
+	public void loadIconFromResource(Class resourceLoaderClass, String fileName) throws IOException
+	{
+		InputStream in = resourceLoaderClass.getResourceAsStream(fileName);
+		if (in == null)
+			throw new FileNotFoundException("Could not find resource: " + fileName);
+		try {
+			DataBuffer db = new DataBuffer(512);
+//			db.maxSizeForRAM = Integer.MAX_VALUE;
+			OutputStream out = db.createOutputStream();
+			Utils.transferStreamData(in, out);
+			out.close();
+
+			this.icon16x16Data = db.createByteArray();
+		} finally {
+			in.close();
+		}
 	}
 }

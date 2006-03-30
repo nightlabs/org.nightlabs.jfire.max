@@ -120,6 +120,11 @@ public abstract class ServerPaymentProcessor implements Serializable
 	public static Collection getServerPaymentProcessorsForOneModeOfPaymentFlavour(
 			PersistenceManager pm, ModeOfPaymentFlavour modeOfPaymentFlavour)
 	{
+		if (pm == null)
+			throw new IllegalArgumentException("pm must not be null!");
+		if (modeOfPaymentFlavour == null)
+			throw new IllegalArgumentException("modeOfPaymentFlavour must not be null!");
+
 		return getServerPaymentProcessorsForOneModeOfPaymentFlavour(pm,
 				modeOfPaymentFlavour.getOrganisationID(), modeOfPaymentFlavour
 						.getModeOfPaymentFlavourID());
@@ -132,6 +137,11 @@ public abstract class ServerPaymentProcessor implements Serializable
 	public static Collection getServerPaymentProcessorsForOneModeOfPaymentFlavour(
 			PersistenceManager pm, ModeOfPaymentFlavourID modeOfPaymentFlavourID)
 	{
+		if (pm == null)
+			throw new IllegalArgumentException("pm must not be null!");
+		if (modeOfPaymentFlavourID == null)
+			throw new IllegalArgumentException("modeOfPaymentFlavourID must not be null!");
+
 		return getServerPaymentProcessorsForOneModeOfPaymentFlavour(pm,
 				modeOfPaymentFlavourID.organisationID,
 				modeOfPaymentFlavourID.modeOfPaymentFlavourID);

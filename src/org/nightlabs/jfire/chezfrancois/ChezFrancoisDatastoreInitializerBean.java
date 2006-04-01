@@ -48,6 +48,13 @@ import org.nightlabs.jfire.accounting.id.TariffID;
 import org.nightlabs.jfire.accounting.priceconfig.IInnerPriceConfig;
 import org.nightlabs.jfire.accounting.tariffpriceconfig.FormulaPriceConfig;
 import org.nightlabs.jfire.base.BaseSessionBeanImpl;
+import org.nightlabs.jfire.person.Person;
+import org.nightlabs.jfire.person.PersonDataBlockGroupNotFoundException;
+import org.nightlabs.jfire.person.PersonDataBlockNotFoundException;
+import org.nightlabs.jfire.person.PersonDataFieldNotFoundException;
+import org.nightlabs.jfire.person.PersonRegistry;
+import org.nightlabs.jfire.person.PersonStruct;
+import org.nightlabs.jfire.person.TextPersonDataField;
 import org.nightlabs.jfire.security.Authority;
 import org.nightlabs.jfire.security.RoleGroup;
 import org.nightlabs.jfire.security.RoleGroupRef;
@@ -58,6 +65,8 @@ import org.nightlabs.jfire.security.UserLocal;
 import org.nightlabs.jfire.security.id.AuthorityID;
 import org.nightlabs.jfire.simpletrade.store.SimpleProductType;
 import org.nightlabs.jfire.trade.Article;
+import org.nightlabs.jfire.trade.LegalEntity;
+import org.nightlabs.jfire.trade.Trader;
 
 
 /**
@@ -96,7 +105,7 @@ implements SessionBean
 	 * @ejb.permission unchecked="true"
 	 */
 	public void ejbRemove() throws EJBException, RemoteException { }
-	
+
 	/**
 	 * This method is called by the datastore initialization mechanism.
 	 * It populates the datastore with the demo data.
@@ -297,17 +306,49 @@ implements SessionBean
 				accessories.applyInheritance();
 
 
-				// create some more users
-				User user00 = dataCreator.createUser("user00", "test", "Chez Francois", "Miller", "Adam");
-				User user01 = dataCreator.createUser("user01", "test", "Chez Francois", "Miller", "Eva");
+				UserGroup userGroup = new UserGroup(organisationID, UserGroup.USERID_PREFIX_TYPE_USERGROUP + "SalesAgents");
+				userGroup.setName("Sales Agents");
+				userGroup.setDescription("This group is blablabla.");
+				new UserLocal(userGroup);
+				userGroup = (UserGroup) pm.makePersistent(userGroup);
 
-				UserGroup userGroup = new UserGroup(organisationID, UserGroup.USERID_PREFIX_TYPE_USERGROUP + "Administrators");
+				userGroup = new UserGroup(organisationID, UserGroup.USERID_PREFIX_TYPE_USERGROUP + "SalesManagers");
+				userGroup.setName("Sales Managers");
+				userGroup.setDescription("This group is blablabla.");
+				new UserLocal(userGroup);
+				userGroup = (UserGroup) pm.makePersistent(userGroup);
+
+				userGroup = new UserGroup(organisationID, UserGroup.USERID_PREFIX_TYPE_USERGROUP + "Statistics");
+				userGroup.setName("Statistics");
+				userGroup.setDescription("This group consists out of the statistics guys.");
+				new UserLocal(userGroup);
+				userGroup = (UserGroup) pm.makePersistent(userGroup);
+
+				userGroup = new UserGroup(organisationID, UserGroup.USERID_PREFIX_TYPE_USERGROUP + "TheOthers");
+				userGroup.setName("The Others");
+				userGroup.setDescription("This group is trallali trallala.");
+				new UserLocal(userGroup);
+				userGroup = (UserGroup) pm.makePersistent(userGroup);
+
+				// create some more users
+				User user00 = dataCreator.createUser("user00", "test", "Chez Francois", "Miller", "Adam", "adam.miller@chezfrancois.co.th");
+				LegalEntity legalEntity00 = dataCreator.createLegalEntity(user00.getPerson());
+				User user01 = dataCreator.createUser("user01", "test", "Chez Francois", "Miller", "Eva", "eva.miller@chezfrancois.co.th");
+				LegalEntity legalEntity01 = dataCreator.createLegalEntity(user01.getPerson());
+				User user02 = dataCreator.createUser("marco", "test", "NightLabs GmbH", "Schulze", "Marco", "m a r c o.at.nightlabs dot de");
+				LegalEntity legalEntity02 = dataCreator.createLegalEntity(user02.getPerson());
+				User user03 = dataCreator.createUser("alex", "test", "NightLabs GmbH", "Bieber", "Alex", "a l e x.at.nightlabs dot de");
+				LegalEntity legalEntity03 = dataCreator.createLegalEntity(user03.getPerson());
+
+				userGroup = new UserGroup(organisationID, UserGroup.USERID_PREFIX_TYPE_USERGROUP + "Administrators");
 				userGroup.setName("Administrators");
 				userGroup.setDescription("This group has all access rights within its organisation.");
 				new UserLocal(userGroup);
 				userGroup = (UserGroup) pm.makePersistent(userGroup);
 				userGroup.addUser(user00);
 				userGroup.addUser(user01);
+				userGroup.addUser(user02);
+				userGroup.addUser(user03);
 
 				Authority authority = (Authority) pm.getObjectById(AuthorityID.create(organisationID, Authority.AUTHORITY_ID_ORGANISATION));
 
@@ -324,6 +365,12 @@ implements SessionBean
 
 					userGroupRef.addRoleGroupRef(roleGroupRef);
 				}
+
+				dataCreator.createOrderForEndcustomer(LegalEntity.getAnonymousCustomer(pm));
+				dataCreator.createOrderForEndcustomer(LegalEntity.getAnonymousCustomer(pm));
+				dataCreator.createOrderForEndcustomer(legalEntity00);
+				dataCreator.createOrderForEndcustomer(LegalEntity.getAnonymousCustomer(pm));
+				dataCreator.createOrderForEndcustomer(legalEntity00);
 
 				LOGGER.info("Initialization of JFireChezFrancois complete!");
 

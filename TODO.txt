@@ -1,0 +1,11 @@
+Important note: JFireGeography will soon undergo heavy refactoring, because it currently doesn't support
+overwriting/adding of information via the root organisation. Correctly, the data read from the current CSVs
+must be marked coming from the devil organisation (NOT from the root orga as it is now).
+Additionally, there should be a second set of CSV files that come from the root organisation.
+But in order to work with CSV files, we first need a resource adapter
+managing the filesystem like a database (with transactions and snapshots of the files).
+--
+Alternatively, we could store this second set of CSV files in the database (as BLOB fields of a JDO object).
+This has two advantages:
+- We do not need to write the FileSystemResourceAdapter.
+- We have ALL data in the database (=> easier for backups).

@@ -30,7 +30,6 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
-import java.io.Serializable;
 import java.text.Collator;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -51,19 +50,19 @@ import javax.naming.InitialContext;
 import javax.naming.NamingException;
 
 import org.apache.log4j.Logger;
-
+import org.nightlabs.jdo.ObjectIDUtil;
 import org.nightlabs.jfire.geography.id.CityID;
 import org.nightlabs.jfire.geography.id.CountryID;
+import org.nightlabs.jfire.geography.id.LocationID;
 import org.nightlabs.jfire.geography.id.RegionID;
 import org.nightlabs.jfire.organisation.Organisation;
-import org.nightlabs.jdo.BaseObjectID;
 import org.nightlabs.util.FulltextMap;
 import org.nightlabs.util.Utils;
 
 /**
  * @author Marco Schulze - marco at nightlabs dot de
  */
-public class GeographySystem implements Serializable
+public class GeographySystem // implements Serializable
 {
 	public static final Logger LOGGER = Logger.getLogger(GeographySystem.class);
 
@@ -115,37 +114,37 @@ public class GeographySystem implements Serializable
 	 * key: String countryID <br/>
 	 * value: Country country
 	 */
-	protected Map countries = new HashMap();
+	protected Map<String, Country> countries = new HashMap<String, Country>();
 
 	/**
 	 * key: String regionPK <br/>
 	 * value: Region region
 	 */
-	protected Map regions = new HashMap();
+	protected Map<String, Region> regions = new HashMap<String, Region>();
 
 	/**
 	 * key: String cityPK <br/>
 	 * value: City city
 	 */
-	protected Map cities = new HashMap();
+	protected Map<String, City> cities = new HashMap<String, City>();
 
 	/**
 	 * key: String districtPK <br/>
 	 * value: District district
 	 */
-	protected Map districts = new HashMap();
+	protected Map<String, District> districts = new HashMap<String, District>();
 
 	/**
 	 * key: String locationPK<br/>
 	 * value: Location location
 	 */
-	protected Map locations = new HashMap();
+	protected Map<String, Location> locations = new HashMap<String, Location>();
 
 
 	protected static String[] csvLine2Fields(String line)
 	{
 		StringTokenizer tok = new StringTokenizer(line, ";", true);
-		ArrayList res = new ArrayList();
+		LinkedList<String> res = new LinkedList<String>();
 		boolean lastWasSep = false;
 		while (tok.hasMoreTokens()) {
 			String f = tok.nextToken();
@@ -165,7 +164,7 @@ public class GeographySystem implements Serializable
 		return (String[]) Utils.collection2TypedArray(res, String.class);
 	}
 
-	public Collection getCountries()
+	public Collection<Country> getCountries()
 	{
 		needCountries();
 
@@ -176,18 +175,18 @@ public class GeographySystem implements Serializable
 	 * key: String languageID (this is important for sorting)<br/>
 	 * value: List countries
 	 */
-	private transient Map countriesSortedByLanguageID = null;
+	private transient Map<String, List<Country>> countriesSortedByLanguageID = null;
 
-	public List getCountriesSorted(final Locale locale)
+	public List<Country> getCountriesSorted(final Locale locale)
 	{
 		if (countriesSortedByLanguageID == null)
-			countriesSortedByLanguageID = new HashMap();
+			countriesSortedByLanguageID = new HashMap<String, List<Country>>();
 
 		final String languageID = locale.getLanguage();
-		List countriesSorted = (List) countriesSortedByLanguageID.get(languageID);
+		List<Country> countriesSorted = countriesSortedByLanguageID.get(languageID);
 
 		if (countriesSorted == null) {
-			countriesSorted = new ArrayList(getCountries());
+			countriesSorted = new ArrayList<Country>(getCountries());
 			Collections.sort(countriesSorted, getCountryComparator(locale));
 
 			countriesSortedByLanguageID.put(languageID, countriesSorted);
@@ -203,7 +202,7 @@ public class GeographySystem implements Serializable
 	 *		value: List locations<br/>
 	 * }
 	 */
-	private transient Map locationsSortedByLanguageIDByCountryID = null;
+	private transient Map<String, Map<String, List<Location>>> locationsSortedByLanguageIDByCountryID = null;
 
 	/**
 	 * key: String countryID<br/>
@@ -212,7 +211,7 @@ public class GeographySystem implements Serializable
 	 *		value: List regions<br/>
 	 * }
 	 */
-	private transient Map regionsSortedByLanguageIDByCountryID = null;
+	private transient Map<String, Map<String, List<Region>>> regionsSortedByLanguageIDByCountryID = null;
 
 	/**
 	 * key: RegionID regionID<br/>
@@ -221,7 +220,7 @@ public class GeographySystem implements Serializable
 	 *		value: List cities<br/>
 	 * }
 	 */
-	private transient Map citiesSortedByLanguageIDByRegionID = null;
+	private transient Map<RegionID, Map<String, List<City>>> citiesSortedByLanguageIDByRegionID = null;
 
 	public Country getCountry(CountryID countryID, boolean throwExceptionIfNotFound)
 	{
@@ -267,7 +266,7 @@ public class GeographySystem implements Serializable
 	 * @return Returns an empty collection if <tt>throwExceptionIfNotFound == false</tt> and
 	 *		no <tt>Country</tt> exists for the given <tt>countryID</tt>.
 	 */
-	public Collection getRegions(CountryID countryID, boolean throwExceptionIfNotFound)
+	public Collection<Region> getRegions(CountryID countryID, boolean throwExceptionIfNotFound)
 	{
 		Country country = getCountry(countryID, throwExceptionIfNotFound);
 		if (country == null)
@@ -276,23 +275,23 @@ public class GeographySystem implements Serializable
 		return Collections.unmodifiableCollection(country.getRegions());
 	}
 
-	public List getRegionsSorted(final CountryID countryID, final Locale locale)
+	public List<Region> getRegionsSorted(final CountryID countryID, final Locale locale)
 	{
 		if (regionsSortedByLanguageIDByCountryID == null)
-			regionsSortedByLanguageIDByCountryID = new HashMap();
+			regionsSortedByLanguageIDByCountryID = new HashMap<String, Map<String,List<Region>>>();
 
-		Map regionsSortedByLanguageID = (Map) regionsSortedByLanguageIDByCountryID.get(countryID.countryID);
+		Map<String,List<Region>> regionsSortedByLanguageID = regionsSortedByLanguageIDByCountryID.get(countryID.countryID);
 		if (regionsSortedByLanguageID == null) {
-			regionsSortedByLanguageID = new HashMap();
+			regionsSortedByLanguageID = new HashMap<String, List<Region>>();
 			regionsSortedByLanguageIDByCountryID.put(countryID.countryID, regionsSortedByLanguageID);
 		}
 
 		final String languageID = locale.getLanguage();
 
-		List regionsSorted = (List) regionsSortedByLanguageID.get(languageID);
+		List<Region> regionsSorted = regionsSortedByLanguageID.get(languageID);
 
 		if (regionsSorted == null) {
-			regionsSorted = new ArrayList(getRegions(countryID, false));
+			regionsSorted = new ArrayList<Region>(getRegions(countryID, false));
 			Collections.sort(regionsSorted, getRegionComparator(locale));
 
 			regionsSortedByLanguageID.put(languageID, regionsSorted);
@@ -301,13 +300,25 @@ public class GeographySystem implements Serializable
 		return regionsSorted;
 	}
 
+	public Location getLocation(LocationID locationID, boolean throwExceptionIfNotFound)
+	{
+		needLocations(locationID.countryID);
+
+		Location res = (Location) locations.get(Location.getPrimaryKey(locationID));
+
+		if (res == null && throwExceptionIfNotFound)
+			throw new IllegalArgumentException("No Location registered with locationID=\""+locationID+"\"!!!");
+
+		return res;
+	}
+
 	/**
 	 * @param countryID
 	 * @param throwExceptionIfNotFound
 	 * @return Returns an empty collection if <tt>throwExceptionIfNotFound == false</tt> and
 	 *		no <tt>Country</tt> exists for the given <tt>countryID</tt>.
 	 */
-	public Collection getLocations(CityID cityID, boolean throwExceptionIfNotFound)
+	public Collection<Location> getLocations(CityID cityID, boolean throwExceptionIfNotFound)
 	{
 		City city = getCity(cityID, throwExceptionIfNotFound);
 		if (city == null)
@@ -316,23 +327,23 @@ public class GeographySystem implements Serializable
 		return Collections.unmodifiableCollection(city.getLocations());
 	}
 
-	public List getLocationsSorted(final CityID cityID, final Locale locale)
+	public List<Location> getLocationsSorted(final CityID cityID, final Locale locale)
 	{
 		if (locationsSortedByLanguageIDByCountryID == null)
-			locationsSortedByLanguageIDByCountryID = new HashMap();
+			locationsSortedByLanguageIDByCountryID = new HashMap<String, Map<String,List<Location>>>();
 
-		Map locationsSortedByLanguageID = (Map) locationsSortedByLanguageIDByCountryID.get(cityID.countryID);
+		Map<String,List<Location>> locationsSortedByLanguageID = locationsSortedByLanguageIDByCountryID.get(cityID.countryID);
 		if (locationsSortedByLanguageID == null) {
-			locationsSortedByLanguageID = new HashMap();
+			locationsSortedByLanguageID = new HashMap<String, List<Location>>();
 			locationsSortedByLanguageIDByCountryID.put(cityID.countryID, locationsSortedByLanguageID);
 		}
 
 		final String languageID = locale.getLanguage();
 
-		List locationsSorted = (List) locationsSortedByLanguageID.get(languageID);
+		List<Location> locationsSorted = locationsSortedByLanguageID.get(languageID);
 
 		if (locationsSorted == null) {
-			locationsSorted = new ArrayList(getLocations(cityID, false));
+			locationsSorted = new ArrayList<Location>(getLocations(cityID, false));
 			Collections.sort(locationsSorted, getLocationComparator(locale));
 
 			locationsSortedByLanguageID.put(languageID, locationsSorted);
@@ -347,7 +358,7 @@ public class GeographySystem implements Serializable
 	 * @return Returns an empty collection if <tt>throwExceptionIfNotFound == false</tt> and
 	 *		no <tt>Country</tt> exists for the given <tt>countryID</tt>.
 	 */
-	public Collection getCities(RegionID regionID, boolean throwExceptionIfNotFound)
+	public Collection<City> getCities(RegionID regionID, boolean throwExceptionIfNotFound)
 	{
 		needCities(regionID.countryID);
 
@@ -358,17 +369,14 @@ public class GeographySystem implements Serializable
 		return Collections.unmodifiableCollection(region.getCities());
 	}
 
-	protected Comparator getCountryComparator(final Locale locale)
+	protected Comparator<Country> getCountryComparator(final Locale locale)
 	{
-		return new Comparator() {
+		return new Comparator<Country>() {
 			private Collator collator = Collator.getInstance(locale);
 			private String languageID = locale.getLanguage();
 
-			public int compare(Object obj0, Object obj1)
+			public int compare(Country c0, Country c1)
 			{
-				Country c0 = (Country)obj0;
-				Country c1 = (Country)obj1;
-
 				String n0 = c0.getName().getText(languageID);
 				String n1 = c1.getName().getText(languageID);
 
@@ -437,20 +445,20 @@ public class GeographySystem implements Serializable
 	public List getCitiesSorted(final RegionID regionID, Locale locale)
 	{
 		if (citiesSortedByLanguageIDByRegionID == null)
-			citiesSortedByLanguageIDByRegionID = new HashMap();
+			citiesSortedByLanguageIDByRegionID = new HashMap<RegionID, Map<String, List<City>>>();
 
-		Map citiesSortedByLanguageID = (Map) citiesSortedByLanguageIDByRegionID.get(regionID);
+		Map<String, List<City>> citiesSortedByLanguageID = citiesSortedByLanguageIDByRegionID.get(regionID);
 		if (citiesSortedByLanguageID == null) {
-			citiesSortedByLanguageID = new HashMap();
+			citiesSortedByLanguageID = new HashMap<String, List<City>>();
 			citiesSortedByLanguageIDByRegionID.put(regionID, citiesSortedByLanguageID);
 		}
 
 		String languageID = locale.getLanguage();
 
-		List citiesSorted = (List) citiesSortedByLanguageID.get(languageID);
+		List<City> citiesSorted = citiesSortedByLanguageID.get(languageID);
 
 		if (citiesSorted == null) {
-			citiesSorted = new ArrayList(getCities(regionID, false));
+			citiesSorted = new ArrayList<City>(getCities(regionID, false));
 			Collections.sort(citiesSorted, getCityComparator(locale));
 
 			citiesSortedByLanguageID.put(languageID, citiesSorted);
@@ -466,24 +474,24 @@ public class GeographySystem implements Serializable
 	 *		value: List countries (instances of {@link Country}
 	 * }
 	 */
-	protected Map countriesByCountryNameByLanguageID = null;
+	protected Map<String, FulltextMap> countriesByCountryNameByLanguageID = null;
 	protected FulltextMap getCountriesByCountryNameMap(String languageID)
 	{
 		LOGGER.debug("getCountriesByCountryNameMap(languageID=\""+languageID+"\") entered.");
 
 		if (countriesByCountryNameByLanguageID == null)
-			countriesByCountryNameByLanguageID = new HashMap();
+			countriesByCountryNameByLanguageID = new HashMap<String, FulltextMap>();
 
-		FulltextMap countriesByCountryName = (FulltextMap) countriesByCountryNameByLanguageID.get(languageID);
+		FulltextMap countriesByCountryName = countriesByCountryNameByLanguageID.get(languageID);
 		if (countriesByCountryName == null) {
 			countriesByCountryName = new FulltextMap(FULLTEXT_MAP_FEATURES);
 			countriesByCountryNameByLanguageID.put(languageID, countriesByCountryName);
 			for (Iterator it = getCountries().iterator(); it.hasNext(); ) {
 				Country country = (Country) it.next();
 				String countryName = country.getName().getText(languageID);
-				List countryList = (List) countriesByCountryName.get(countryName);
+				List<Country> countryList = (List) countriesByCountryName.get(countryName);
 				if (countryList == null) {
-					countryList = new LinkedList();
+					countryList = new LinkedList<Country>();
 					countriesByCountryName.put(countryName, countryList);
 				}
 				countryList.add(country);
@@ -977,7 +985,7 @@ public class GeographySystem implements Serializable
 							countryID = null;
 
 						if (countryID != null) {
-							if (!BaseObjectID.isValidIDString(countryID)) {
+							if (!ObjectIDUtil.isValidIDString(countryID)) {
 								LOGGER.warn("CSV \""+file+"\", line "+row+": countryID \"" + countryID + "\" is not a valid ID String! Row ignored!");
 								continue;
 							}
@@ -1079,7 +1087,7 @@ public class GeographySystem implements Serializable
 						if ("".equals(regionID))
 							regionID = countryID;
 
-						if (!BaseObjectID.isValidIDString(regionID)) {
+						if (!ObjectIDUtil.isValidIDString(regionID)) {
 							LOGGER.warn("CSV \""+file+"\", line "+row+": regionID \"" + regionID + "\" is not a valid ID String! Row ignored!");
 							continue;
 						}
@@ -1186,7 +1194,7 @@ public class GeographySystem implements Serializable
 							continue;
 						}
 	
-						if (!BaseObjectID.isValidIDString(locationID)) {
+						if (!ObjectIDUtil.isValidIDString(locationID)) {
 							LOGGER.warn("CSV \""+file+"\", line "+row+": locationID \"" + locationID + "\" is not a valid ID String! Row ignored!");
 							continue;
 						}
@@ -1200,7 +1208,7 @@ public class GeographySystem implements Serializable
 						}
 
 						String cityPK = City.getPrimaryKey(countryID, rootOrganisationID, cityID);
-						City city = (City) cities.get(cityPK);
+						City city = cities.get(cityPK);
 						if (city == null) {
 							LOGGER.warn("CSV \""+file+"\", line "+row+": City with PK \""+cityPK+"\" does not exist! Row ignored.");
 							continue;
@@ -1209,7 +1217,7 @@ public class GeographySystem implements Serializable
 						District district = null;
 						if (!"".equals(districtID)) {
 							String districtPK = District.getPrimaryKey(countryID, rootOrganisationID, districtID);
-							district = (District) cities.get(districtPK);
+							district = districts.get(districtPK);
 							if (district == null)
 								LOGGER.warn("CSV \""+file+"\", line "+row+": District with PK \""+districtPK+"\" does not exist! Will NOT assign a district to location \""+locationPK+"\"!");
 						}
@@ -1306,7 +1314,7 @@ public class GeographySystem implements Serializable
 							continue;
 						}
 	
-						if (!BaseObjectID.isValidIDString(cityID)) {
+						if (!ObjectIDUtil.isValidIDString(cityID)) {
 							LOGGER.warn("CSV \""+file+"\", line "+row+": cityID \"" + cityID + "\" is not a valid ID String! Row ignored!");
 							continue;
 						}
@@ -1430,7 +1438,7 @@ public class GeographySystem implements Serializable
 						if ("".equals(districtID))
 							districtID = cityID;
 	
-						if (!BaseObjectID.isValidIDString(districtID)) {
+						if (!ObjectIDUtil.isValidIDString(districtID)) {
 							LOGGER.warn("CSV \""+file+"\", line "+row+": districtID \"" + districtID + "\" is not a valid ID String! Row ignored!");
 							continue;
 						}
@@ -1567,7 +1575,7 @@ public class GeographySystem implements Serializable
 							continue;
 						}
 	
-						if (!BaseObjectID.isValidIDString(cityID)) {
+						if (!ObjectIDUtil.isValidIDString(cityID)) {
 							LOGGER.warn("CSV \""+file+"\", line "+row+": cityID \"" + cityID + "\" is not a valid ID String! Row ignored!");
 							continue;
 						}

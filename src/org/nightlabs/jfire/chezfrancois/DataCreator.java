@@ -464,6 +464,7 @@ public class DataCreator
 	{
 		LegalEntity legalEntity = new LegalEntity(
 				personRegistry.getOrganisationID(), LegalEntity.ANCHOR_TYPE_ID_PARTNER, Long.toHexString(person.getPersonID()));
+		legalEntity.setPerson(person);
 		pm.makePersistent(legalEntity);
 		return legalEntity;
 	}

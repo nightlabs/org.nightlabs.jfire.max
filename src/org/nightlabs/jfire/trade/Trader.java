@@ -631,9 +631,9 @@ public class Trader
 	 * This method creates an <tt>Article</tt> with a specific <tt>Product</tt>.
 	 * If <tt>allocate</tt> is true, the method
 	 * {@link #allocateArticleBegin(User, Article)} is called immediately and the
-	 * method {@link #allocateArticleEnd(User, Article)} is either called
+	 * method {@link #allocateArticlesEnd(User, Collection)} is either called
 	 * asynchronously or immediately, depending on
-	 * <code>synchronousAllocation</code>.
+	 * <code>allocateSynchronously</code>.
 	 * 
 	 * @param user
 	 *          The User who is responsible for the action.
@@ -710,7 +710,7 @@ public class Trader
 			if (synchronously)
 				allocateArticlesEnd(user, articles);
 			else
-				new AsyncInvoke().exec(
+				AsyncInvoke.exec(
 						new AllocateArticlesEndInvocation(user, articles),
 						null,
 						new AllocateArticlesEndErrorCallback(),
@@ -835,7 +835,7 @@ public class Trader
 			if (synchronously)
 				releaseArticlesEnd(user, articles);
 			else
-				new AsyncInvoke().exec(
+				AsyncInvoke.exec(
 						new ReleaseArticlesEndInvocation(user, articles),
 						null,
 						new ReleaseArticlesEndErrorCallback(),

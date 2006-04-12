@@ -2360,7 +2360,7 @@ public abstract class AccountingManagerBean
 //			StoreManager storeManager = StoreManagerUtil.getHome(getInitialContextProps("orga00.nightlabs.de")).create();
 //			storeManager.createProductTypeID();
 
-			new AsyncInvoke().exec(
+			AsyncInvoke.exec(
 					new Invocation() {
 						public Serializable invoke() throws Exception
 						{

@@ -266,12 +266,11 @@ public class ArticlePrice extends org.nightlabs.jfire.accounting.Price
 	}
 
 	/**
-	 * Util method to be used by PriceConfig implmentations when
-	 * generating OfferItemPrices.
-	 * 
-	 * Copies all data (amount, fragments) from the given origPrice.
+	 * This method is used internally by the constructor. It copies all data (amount, fragments) from the given origPrice
+	 * and if <code>refund == true</code>, it inverses them.
 	 *
-	 * @param origPrice
+	 * @param origPrice The original price to be copied.
+	 * @param refund Whether the values must be inversed (i.e. multiplied with -1).
 	 */
 	protected void assign(org.nightlabs.jfire.accounting.Price origPrice, boolean refund)
 	{
@@ -319,7 +318,8 @@ public class ArticlePrice extends org.nightlabs.jfire.accounting.Price
 
 	/**
 	 * Negates the amounts of all <tt>PriceFragment</tt>s. It does not dive into
-	 * packaged <tt>ArticlePrice</tt>s! 
+	 * packaged <tt>ArticlePrice</tt>s! Method is used internally by
+	 * {@link #assign(org.nightlabs.jfire.accounting.Price, boolean) }.
 	 */
 	protected void negate()
 	{

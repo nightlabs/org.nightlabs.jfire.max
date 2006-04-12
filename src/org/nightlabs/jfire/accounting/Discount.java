@@ -49,8 +49,10 @@ public abstract class Discount {
 	 */
 	protected Discount() {
 	}
-	
+
 	/**
+	 * // TODO Why does a Discount have a discountID and doesn't use the invoiceID?! 
+	 *
 	 * @param invoice
 	 * @param discountID
 	 */
@@ -60,7 +62,7 @@ public abstract class Discount {
 		this.discountID = discountID;
 		invoice.setDiscount(this);
 	}
-	
+
 	/**
 	 * @jdo.field primary-key="true"
 	 * @jdo.column length="100"

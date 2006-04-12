@@ -63,15 +63,15 @@ public class ArticleCreator
 	 * default ones (e.g. if you have more
 	 * situation-dependent properties than just the <code>Tariff</code>).
 	 * <p>
-	 * Usually, this method is a one-liner with sth. like: <code>return new MySpecialArticle(...);</code>
+	 * Usually, this method has only a few lines with a loop creating one {@link Article} for each given {@link Product}.
 	 * </p>
 	 *
 	 * @param trader The <code>Trader</code> which is calling this method in one of its <code>createArticles(...)</code> methods.
-	 * @param offer The <code>Offer</code> into which the new <code>Article</code> shall be created.
-	 * @param segment The <code>Segment</code> into which the new <code>Article</code> shall be created.
-	 * @param product The <code>Product</code> for which to create the <code>Article</code>. Note, that this
-	 *		<code>Product</code> does not yet have any nested <code>Product</code>s as they are created while allocation.
-	 * @return Returns a new (and quite raw) instances of {@link Article} (or descendants). They must NOT yet have an
+	 * @param offer The <code>Offer</code> into which the new <code>Article</code>s shall be created.
+	 * @param segment The <code>Segment</code> into which the new <code>Article</code>s shall be created.
+	 * @param products The {@link Product}s for which to create the <code>Article</code>s. Note, that this
+	 *		<code>Product</code>s do not yet have any nested <code>Product</code>s as they are created while allocation.
+	 * @return Returns new (and quite raw) instances of {@link Article} (or descendants). They must NOT yet have an
 	 *		{@link ArticlePrice} assigned and they must NOT yet be allocated. This is done by the {@link Trader}
 	 *		afterwards (if at all).
 	 */
@@ -89,13 +89,13 @@ public class ArticleCreator
 	 * This method must create a new <code>Article</code> for a noncommital offer (therefore
 	 * only the <code>ProductType</code> is known and no concrete <code>Product</code> yet).
 	 * <p>
-	 * Usually, this method is a one-liner with sth. like: <code>return new MySpecialArticle(...);</code>
+	 * Usually, this method has only a few lines with a loop creating one {@link Article} for each given {@link ProductType}.
 	 * </p>
 	 *
 	 * @param trader The <code>Trader</code> which is calling this method in one of its <code>createArticles(...)</code> method.
-	 * @param offer The <code>Offer</code> into which the new <code>Article</code> shall be created.
-	 * @param segment The <code>Segment</code> into which the new <code>Article</code> shall be created.
-	 * @param productType The <code>ProductType</code> for which to create this <code>Article</code>.
+	 * @param offer The <code>Offer</code> into which the new <code>Article</code>s shall be created.
+	 * @param segment The <code>Segment</code> into which the new <code>Article</code>s shall be created.
+	 * @param productTypes The {@link ProductType}s for which to create <code>Article</code>s.
 	 * @return Returns new instances of {@link Article} (or descendants) which might later be linked to concrete <code>Product</code>s.
 	 */
 	public List createProductTypeArticles(Trader trader, Offer offer, Segment segment, Collection productTypes)

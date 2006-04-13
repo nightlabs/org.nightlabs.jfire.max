@@ -440,9 +440,9 @@ implements Serializable
 	/**
 	 * This method is called by the default implementation of
 	 * {@link #deliverBegin(DeliverParams)} to get the "outside"
-	 * <tt>Anchor</tt> for a delivery. This might be a different account for each
+	 * <tt>Anchor</tt> for a delivery. This might be a different repository for each
 	 * processor to provide easy checking possibility with an external agency
-	 * (e.g. credit card company or bank).
+	 * (e.g. DHL).
 	 * <p>
 	 * Even if you overwrite the deliver(...) method, you should use this method to
 	 * obtain your "outside world anchor" to keep the API consistent.

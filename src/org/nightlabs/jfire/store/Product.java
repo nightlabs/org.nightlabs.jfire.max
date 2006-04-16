@@ -69,7 +69,6 @@ implements Serializable
 
 	/**
 	 * @jdo.field primary-key="true"
-	 * @jdo.column length="100"
 	 */
 	private long productID;
 

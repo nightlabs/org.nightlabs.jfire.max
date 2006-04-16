@@ -69,12 +69,11 @@ implements Serializable
 
 	/**
 	 * @jdo.field primary-key="true"
-	 * @jdo.column length="100"
 	 */
 	private long productProductID;
 
 	/**
-	 * This must be in the range -1 &lt; quantity &lt; 1 at the end of a transaction. During the
+	 * This must be in the range -1 &lt;= quantity &lt;= 1 at the end of a transaction. During the
 	 * transaction, it might be more or less.
 	 *
 	 * @jdo.field persistence-modifier="persistent"

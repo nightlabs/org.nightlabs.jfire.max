@@ -85,7 +85,6 @@ public abstract class MoneyFlowMapping implements Serializable {
 	
 	/**
 	 * @jdo.field persistence-modifier="persistent" primary-key="true"
-	 * @jdo.column length="100"
 	 */
 	private int moneyFlowMappingID;
 	

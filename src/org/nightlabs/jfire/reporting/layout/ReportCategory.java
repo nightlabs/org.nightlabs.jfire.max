@@ -47,8 +47,11 @@ import org.nightlabs.jfire.reporting.layout.id.ReportRegistryItemID;
  *		identity-type="application"
  * 		persistence-capable-superclass="org.nightlabs.jfire.reporting.layout.ReportRegistryItem"
  *		detachable="true"
+ *		table="JFireReporting_ReportCategory"
  *
- * @jdo.inheritance strategy="superclass-table"
+ * @!jdo.inheritance strategy="superclass-table"
+ * JPOX-BUG: superclass-table fails with HSQLDB! (MySQL works)
+ * @jdo.inheritance strategy="new-table"
  *
  * @jdo.fetch-group name="ReportCategory.childItems" fetch-groups="default" fields="childItems"
  * @jdo.fetch-group name="ReportCategory.this" fetch-groups="default, ReportRegistryItem.this" fields="childItems"

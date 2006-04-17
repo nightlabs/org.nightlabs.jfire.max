@@ -46,11 +46,12 @@ import org.nightlabs.jfire.reporting.layout.id.ReportRegistryItemID;
  *		identity-type="application"
  * 		persistence-capable-superclass="org.nightlabs.jfire.reporting.layout.ReportRegistryItem"
  *		detachable="true"
- *		@!table="JFireReporting_ReportLayout"
+ *		table="JFireReporting_ReportLayout"
  *
- * WORKAROUND: Workaround for MySQL table lock timeout when initializing datastore on ADD COLUMN when using superclass-table 
+ * WORKAROUND: Workaround for MySQL table lock timeout when initializing datastore on ADD COLUMN when using superclass-table
+ * ...and: superclass-table fails with HSQLDB! (MySQL works) 
  * @jdo.inheritance strategy="new-table"
- * 
+ *
  * @jdo.fetch-group name="ReportLayout.reportDesign" fetch-groups="default" fields="reportDesign"
  * @jdo.fetch-group name="ReportLayout.this" fetch-groups="default, ReportRegistryItem.this" fields="reportDesign"
  */

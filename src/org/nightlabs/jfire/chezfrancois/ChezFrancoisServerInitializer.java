@@ -56,7 +56,8 @@ public class ChezFrancoisServerInitializer extends ServerInitializer
     			jfsm.getOrganisationConfig(ORGANISATION_ID_WINE_STORE);
     		} catch (OrganisationNotFoundException x) {
     			// do initialization!
-    			jfsm.createOrganisation(ORGANISATION_ID_WINE_STORE, "Chez François Wine Store", "francois", "test", true);
+//    			jfsm.createOrganisation(ORGANISATION_ID_WINE_STORE, "Chez François Wine Store", "francois", "test", true);
+    			jfsm.createOrganisation(ORGANISATION_ID_WINE_STORE, "Chez Francois Wine Store", "francois", "test", true);
     		}
     	} finally {
     		jfsm.close();

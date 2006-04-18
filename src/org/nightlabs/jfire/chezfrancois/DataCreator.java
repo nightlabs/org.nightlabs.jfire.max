@@ -70,6 +70,7 @@ import org.nightlabs.jfire.trade.CustomerGroup;
 import org.nightlabs.jfire.trade.LegalEntity;
 import org.nightlabs.jfire.trade.Order;
 import org.nightlabs.jfire.trade.OrganisationLegalEntity;
+import org.nightlabs.jfire.trade.SegmentType;
 import org.nightlabs.jfire.trade.Trader;
 
 public class DataCreator
@@ -473,7 +474,9 @@ public class DataCreator
 	throws ModuleException
 	{
 		Trader trader = Trader.getTrader(pm);
-		return trader.createOrder(trader.getMandator(), customer, getCurrencyEUR());
+		Order order = trader.createOrder(trader.getMandator(), customer, getCurrencyEUR());
+		trader.createSegment(order, SegmentType.getDefaultSegmentType(pm));
+		return order;
 	}
 
 }

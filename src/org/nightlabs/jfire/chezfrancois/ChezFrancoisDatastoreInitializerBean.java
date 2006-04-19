@@ -236,7 +236,12 @@ implements SessionBean
 				boxMerlotAustralia2004.createNestedProductType(bottleMerlotAustralia2004).setQuantity(6);
 				boxMerlotFrance2001.createNestedProductType(bottleMerlotFrance2001).setQuantity(6);
 				boxMerlotCalifornia2003.createNestedProductType(bottleMerlotCalifornia2003).setQuantity(6);
-	
+
+				boxMerlotAustralia2001.getFieldMetaData("nestedProductTypes").setValueInherited(false);
+				boxMerlotAustralia2004.getFieldMetaData("nestedProductTypes").setValueInherited(false);
+				boxMerlotFrance2001.getFieldMetaData("nestedProductTypes").setValueInherited(false);
+				boxMerlotCalifornia2003.getFieldMetaData("nestedProductTypes").setValueInherited(false);
+
 				// create ProductTypes: accessories
 				IInnerPriceConfig priceConfigChocolate = dataCreator.createFixPriceConfig(
 						"Chocolate", new Tariff[] {tariffNormalPrice, tariffGoldCard}, new long[] {200, 150});

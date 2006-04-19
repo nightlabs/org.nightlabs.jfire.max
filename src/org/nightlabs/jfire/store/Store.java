@@ -902,9 +902,9 @@ public class Store
 	}
 
 	/**
-	 * 1. The LegalEntity checks, whether the ProductHoles of the current transaction have quantity = 0.<br/>
+	 * 1. The LegalEntity checks, whether the {@link ProductReference}s of the current transaction have quantity = 0.<br/>
 	 * 2. The Repositories do NOT check anything themselves (except maybe whether they're too full (=> no space)),
-	 *    but is checked by this method whether all ProductHoles have a quantity between -1 and +1 and only
+	 *    but is checked by this method whether all {@link ProductReference}s have a quantity between -1 and +1 and only
 	 *    exactly ONE Repository has -1 and ONE repository has +1.<br/>
 	 * 3. productLocal.quantity is updated.
 	 *

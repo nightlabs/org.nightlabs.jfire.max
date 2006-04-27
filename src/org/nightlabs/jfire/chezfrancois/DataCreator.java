@@ -474,7 +474,7 @@ public class DataCreator
 	throws ModuleException
 	{
 		Trader trader = Trader.getTrader(pm);
-		Order order = trader.createOrder(trader.getMandator(), customer, getCurrencyEUR());
+		Order order = trader.createOrder(trader.getMandator(), customer, null, getCurrencyEUR());
 		trader.createSegment(order, SegmentType.getDefaultSegmentType(pm));
 		return order;
 	}

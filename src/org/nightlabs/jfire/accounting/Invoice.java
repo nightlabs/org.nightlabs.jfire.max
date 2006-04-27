@@ -40,6 +40,7 @@ import javax.jdo.PersistenceManager;
 import javax.jdo.Query;
 import javax.jdo.listener.DetachCallback;
 
+import org.nightlabs.jdo.ObjectIDUtil;
 import org.nightlabs.jfire.accounting.id.InvoiceID;
 import org.nightlabs.jfire.security.User;
 import org.nightlabs.jfire.trade.Article;
@@ -164,7 +165,11 @@ implements Serializable, ArticleContainer, DetachCallback
 	 * @jdo.column length="100"
 	 */
 	private String organisationID;
-
+	/**
+	 * @jdo.field primary-key="true"
+	 * @jdo.column length="50"
+	 */
+	private String invoiceIDPrefix;
 	/**
 	 * @jdo.field primary-key="true"
 	 */
@@ -176,20 +181,22 @@ implements Serializable, ArticleContainer, DetachCallback
 	protected Invoice() {}
 
 	public Invoice(
-			User creator, OrganisationLegalEntity vendor,
-			LegalEntity customer, long _invoiceID, Currency currency// , ModeOfPaymentFlavour desiredModeOfPaymentFlavour
-			) {
+			User creator, OrganisationLegalEntity vendor, LegalEntity customer,
+			String invoiceIDPrefix, long _invoiceID, Currency currency)
+	{
 		if (creator == null)
-			throw new NullPointerException("creator");
+			throw new IllegalArgumentException("creator must not be null!");
 
 		if (vendor == null)
-			throw new NullPointerException("vendor");
+			throw new IllegalArgumentException("vendor must not be null!");
 
 		if (customer == null)
-			throw new NullPointerException("customer");
+			throw new IllegalArgumentException("customer must not be null!");
+
+		ObjectIDUtil.assertValidIDString(invoiceIDPrefix, "invoiceIDPrefix");
 
 		if (_invoiceID < 0)
-			throw new IllegalArgumentException("_invoiceID < 0");
+			throw new IllegalArgumentException("invoiceID < 0");
 
 		if (currency == null)
 			throw new NullPointerException("currency");
@@ -202,13 +209,14 @@ implements Serializable, ArticleContainer, DetachCallback
 		AccountingPriceConfig accountingPriceConfig = accounting.getAccountingPriceConfig();
 
 		this.organisationID = vendor.getOrganisationID();
+		this.invoiceIDPrefix = invoiceIDPrefix;
 		this.invoiceID = _invoiceID;
 		this.createDT = new Date(System.currentTimeMillis());
 		this.createUser = creator;
 		this.vendor = vendor;
 		this.customer = customer;
 		this.currency = currency;
-		this.primaryKey = getPrimaryKey(organisationID, invoiceID);
+		this.primaryKey = getPrimaryKey(this.organisationID, this.invoiceIDPrefix, this.invoiceID);
 //		this.desiredModeOfPaymentFlavour = desiredModeOfPaymentFlavour;
 		this.price = new Price(
 				accountingPriceConfig.getOrganisationID(), accountingPriceConfig.getPriceConfigID(),
@@ -451,9 +459,9 @@ implements Serializable, ArticleContainer, DetachCallback
 	 */
 	private Currency currency;
 
-	public static String getPrimaryKey(String organisationID, long invoiceID)
+	public static String getPrimaryKey(String organisationID, String invoiceIDPrefix, long invoiceID)
 	{
-		return organisationID + '/' + Long.toHexString(invoiceID);
+		return organisationID + '/' + invoiceIDPrefix + '/' + Long.toHexString(invoiceID);
 	}
 
 	public String getPrimaryKey()

@@ -39,6 +39,7 @@ import javax.jdo.PersistenceManager;
 import javax.jdo.Query;
 import javax.jdo.listener.DetachCallback;
 
+import org.nightlabs.jdo.ObjectIDUtil;
 import org.nightlabs.jfire.security.User;
 import org.nightlabs.jfire.store.id.DeliveryNoteID;
 import org.nightlabs.jfire.trade.Article;
@@ -157,7 +158,8 @@ implements Serializable, ArticleContainer, DetachCallback
 	protected DeliveryNote() { }
 
 	public DeliveryNote(User creator, OrganisationLegalEntity vendor,
-			LegalEntity customer, long _deliveryNoteID) {
+			LegalEntity customer, String deliveryNoteIDPrefix, long _deliveryNoteID)
+	{
 		if (creator == null)
 			throw new NullPointerException("creator");
 
@@ -166,6 +168,8 @@ implements Serializable, ArticleContainer, DetachCallback
 
 		if (customer == null)
 			throw new NullPointerException("customer");
+		
+		ObjectIDUtil.assertValidIDString(deliveryNoteIDPrefix, "deliveryNoteIDPrefix");
 
 		if (_deliveryNoteID < 0)
 			throw new IllegalArgumentException("_deliveryNoteID < 0");
@@ -181,13 +185,14 @@ implements Serializable, ArticleContainer, DetachCallback
 //		AccountingPriceConfig accountingPriceConfig = accounting.getAccountingPriceConfig();
 
 		this.organisationID = vendor.getOrganisationID();
+		this.deliveryNoteIDPrefix = deliveryNoteIDPrefix;
 		this.deliveryNoteID = _deliveryNoteID;
 		this.createDT = new Date(System.currentTimeMillis());
 		this.createUser = creator;
 		this.vendor = vendor;
 		this.customer = customer;
 //		this.currency = currency;
-		this.primaryKey = getPrimaryKey(organisationID, deliveryNoteID);
+		this.primaryKey = getPrimaryKey(this.organisationID, this.deliveryNoteIDPrefix, this.deliveryNoteID);
 	}
 
 	/**
@@ -195,7 +200,11 @@ implements Serializable, ArticleContainer, DetachCallback
 	 * @jdo.column length="100"
 	 */
 	private String organisationID;
-
+	/**
+	 * @jdo.field primary-key="true"
+	 * @jdo.column length="50"
+	 */
+	private String deliveryNoteIDPrefix;
 	/**
 	 * @jdo.field primary-key="true"
 	 */
@@ -273,13 +282,17 @@ implements Serializable, ArticleContainer, DetachCallback
 	public String getOrganisationID() {
 		return organisationID;
 	}
+	public String getDeliveryNoteIDPrefix()
+	{
+		return deliveryNoteIDPrefix;
+	}
 	public long getDeliveryNoteID() {
 		return deliveryNoteID;
 	}
 
-	public static String getPrimaryKey(String organisationID, long deliveryID)
+	public static String getPrimaryKey(String organisationID, String deliveryNoteIDPrefix, long deliveryID)
 	{
-		return organisationID + '/' + Long.toHexString(deliveryID);
+		return organisationID + '/' + deliveryNoteIDPrefix + '/' + Long.toHexString(deliveryID);
 	}
 	public String getPrimaryKey()
 	{

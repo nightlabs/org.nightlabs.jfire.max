@@ -43,11 +43,14 @@ import javax.jdo.PersistenceManager;
 
 import org.apache.log4j.Logger;
 import org.nightlabs.ModuleException;
+import org.nightlabs.jdo.NLJDOHelper;
+import org.nightlabs.jdo.moduleregistry.ModuleMetaData;
 import org.nightlabs.jfire.accounting.Currency;
 import org.nightlabs.jfire.accounting.id.CurrencyID;
 import org.nightlabs.jfire.base.BaseSessionBeanImpl;
 import org.nightlabs.jfire.config.ConfigSetup;
 import org.nightlabs.jfire.config.UserConfigSetup;
+import org.nightlabs.jfire.idgenerator.IDGenerator;
 import org.nightlabs.jfire.person.Person;
 import org.nightlabs.jfire.security.User;
 import org.nightlabs.jfire.trade.config.LegalEntityViewConfigModule;
@@ -56,8 +59,6 @@ import org.nightlabs.jfire.trade.id.OfferID;
 import org.nightlabs.jfire.trade.id.OrderID;
 import org.nightlabs.jfire.trade.id.SegmentTypeID;
 import org.nightlabs.jfire.transfer.id.AnchorID;
-import org.nightlabs.jdo.NLJDOHelper;
-import org.nightlabs.jdo.moduleregistry.ModuleMetaData;
 
 
 /**
@@ -123,7 +124,7 @@ implements SessionBean
 	 * @ejb.transaction type = "Required"
 	 **/
 	public Order createOrder(
-			AnchorID customerID, String currencyID,
+			AnchorID customerID, String orderIDPrefix, String currencyID,
 			SegmentTypeID[] segmentTypeIDs, String[] fetchGroups, int maxFetchDepth)
 	throws ModuleException
 	{
@@ -137,7 +138,7 @@ implements SessionBean
 			pm.getExtent(LegalEntity.class);
 			LegalEntity customer = (LegalEntity) pm.getObjectById(customerID);
 
-			Order order = trader.createOrder(trader.getMandator(), customer, currency);
+			Order order = trader.createOrder(trader.getMandator(), customer, orderIDPrefix, currency);
 
 			if (segmentTypeIDs != null) {
 				pm.getExtent(SegmentType.class);
@@ -172,7 +173,7 @@ implements SessionBean
 	 * @ejb.permission role-name="TradeManager-write"
 	 * @ejb.transaction type = "Required"
 	 **/
-	public Order createOrder(String currencyID, String[] fetchGroups, int maxFetchDepth)
+	public Order createOrder(String orderIDPrefix, String currencyID, String[] fetchGroups, int maxFetchDepth)
 		throws ModuleException
 	{
 		PersistenceManager pm = getPersistenceManager();
@@ -186,7 +187,7 @@ implements SessionBean
 
 			OrganisationLegalEntity customer = trader.getOrganisationLegalEntity(getPrincipal().getUserID());
 			// TODO: create foreign order ...really? Isn't that todo garbage?
-			Order order = trader.createOrder(trader.getMandator(), customer, currency);
+			Order order = trader.createOrder(trader.getMandator(), customer, orderIDPrefix, currency);
 
 			pm.getFetchPlan().setMaxFetchDepth(maxFetchDepth);
 			if (fetchGroups != null)
@@ -208,14 +209,15 @@ implements SessionBean
 	 * @ejb.permission role-name="TradeManager-write"
 	 * @ejb.transaction type = "Required"
 	 **/
-	public Offer createOffer(OrderID orderID, String[] fetchGroups, int maxFetchDepth)
+	public Offer createOffer(OrderID orderID, String offerIDPrefix, String[] fetchGroups, int maxFetchDepth)
 	throws ModuleException
 	{
 		PersistenceManager pm = getPersistenceManager();
 		try {
 			Trader trader = Trader.getTrader(pm);
 			pm.getExtent(Order.class);
-			Offer offer = trader.createOffer(User.getUser(pm, getPrincipal()), (Order) pm.getObjectById(orderID, true));
+			Offer offer = trader.createOffer(
+					User.getUser(pm, getPrincipal()), (Order) pm.getObjectById(orderID, true), offerIDPrefix);
 
 			pm.getFetchPlan().setMaxFetchDepth(maxFetchDepth);
 			if (fetchGroups != null)
@@ -469,7 +471,9 @@ implements SessionBean
 	 * @ejb.permission role-name="TradeManager-write"
 	 * @ejb.transaction type = "Required"
 	 **/
-	public Offer createReverseOffer(Collection reversedArticleIDs, boolean get, String[] fetchGroups, int maxFetchDepth)
+	public Offer createReverseOffer(
+			Collection reversedArticleIDs, String offerIDPrefix,
+			boolean get, String[] fetchGroups, int maxFetchDepth)
 	throws ModuleException
 	{
 		PersistenceManager pm = getPersistenceManager();
@@ -493,15 +497,13 @@ implements SessionBean
 			User user = User.getUser(pm, getPrincipal());
 
 			Trader trader = Trader.getTrader(pm);
-			Offer offer = new Offer(user, order, trader.createOfferID());
+			Offer offer = new Offer(
+					user, order,
+					offerIDPrefix, IDGenerator.nextID(Offer.class.getName() + '/' + offerIDPrefix));
 			new OfferLocal(offer); // self-registering
 			pm.makePersistent(offer);
 
 			trader.reverseArticles(user, offer, reversedArticles);
-//			for (Iterator it = reversedArticles.iterator(); it.hasNext(); ) {
-//				Article reversedArticle = (Article) it.next();
-//				trader.reverseArticle(user, offer, reversedArticle);
-//			}
 
 			if (!get)
 				return null;

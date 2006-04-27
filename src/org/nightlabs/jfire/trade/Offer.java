@@ -40,6 +40,7 @@ import javax.jdo.Query;
 import javax.jdo.listener.AttachCallback;
 import javax.jdo.listener.DetachCallback;
 
+import org.nightlabs.jdo.ObjectIDUtil;
 import org.nightlabs.jfire.accounting.Accounting;
 import org.nightlabs.jfire.accounting.AccountingPriceConfig;
 import org.nightlabs.jfire.accounting.Currency;
@@ -114,6 +115,12 @@ implements
 	 * @jdo.column length="100"
 	 */
 	private String organisationID;
+
+	/**
+	 * @jdo.field primary-key="true"
+	 * @jdo.column length="50"
+	 */
+	private String offerIDPrefix;
 
 	/**
 	 * @jdo.field primary-key="true"
@@ -250,10 +257,15 @@ implements
 	 */
 	protected Offer() { }
 
-	public Offer(User user, Order order, long offerID)
+	public Offer(User user, Order order, String offerIDPrefix, long offerID)
 	{
 		if (order == null)
-			throw new NullPointerException("order must not be null!");
+			throw new IllegalArgumentException("order must not be null!");
+
+		ObjectIDUtil.assertValidIDString(offerIDPrefix, "offerIDPrefix");
+
+		if (offerID < 0)
+			throw new IllegalArgumentException("offerID < 0");
 
 		PersistenceManager pm = JDOHelper.getPersistenceManager(order);
 		if (pm == null)
@@ -263,9 +275,10 @@ implements
 
 		this.order = order;
 		this.organisationID = order.getOrganisationID();
+		this.offerIDPrefix = offerIDPrefix;
 		this.offerID = offerID;
 		this.currency = order.getCurrency();
-		this.primaryKey = getPrimaryKey(organisationID, offerID);
+		this.primaryKey = getPrimaryKey(this.organisationID, this.offerIDPrefix, this.offerID);
 		this.createDT = new Date();
 		this.createUser = user;
 
@@ -282,7 +295,10 @@ implements
 	{
 		return organisationID;
 	}
-
+	public String getOfferIDPrefix()
+	{
+		return offerIDPrefix;
+	}
 	/**
 	 * @return Returns the offerID.
 	 */
@@ -290,9 +306,9 @@ implements
 	{
 		return offerID;
 	}
-	public static String getPrimaryKey(String organisationID, long offerID)
+	public static String getPrimaryKey(String organisationID, String offerIDPrefix, long offerID)
 	{
-		return organisationID + '/' + Long.toHexString(offerID);
+		return organisationID + '/' + offerIDPrefix + '/' + Long.toHexString(offerID);
 	}
 
 	public String getPrimaryKey()

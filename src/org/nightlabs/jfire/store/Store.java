@@ -41,8 +41,10 @@ import javax.jdo.PersistenceManager;
 import javax.jdo.listener.StoreCallback;
 
 import org.apache.log4j.Logger;
-
+import org.nightlabs.ModuleException;
 import org.nightlabs.jfire.accounting.MoneyTransfer;
+import org.nightlabs.jfire.config.Config;
+import org.nightlabs.jfire.idgenerator.IDGenerator;
 import org.nightlabs.jfire.organisation.LocalOrganisation;
 import org.nightlabs.jfire.security.User;
 import org.nightlabs.jfire.store.book.BookProductTransfer;
@@ -67,6 +69,7 @@ import org.nightlabs.jfire.trade.LegalEntity;
 import org.nightlabs.jfire.trade.Offer;
 import org.nightlabs.jfire.trade.Order;
 import org.nightlabs.jfire.trade.OrganisationLegalEntity;
+import org.nightlabs.jfire.trade.TradeConfigModule;
 import org.nightlabs.jfire.trade.id.ArticleID;
 import org.nightlabs.jfire.transfer.Anchor;
 import org.nightlabs.jfire.transfer.Transfer;
@@ -515,31 +518,6 @@ public class Store
 	}
 	
 	
-	
-	
-	
-	
-	
-	
-	
-	/**
-	 * @jdo.field persistence-modifier="persistent"
-	 */	
-	private long nextDeliveryNoteID = 0;
-	private static long _nextDeliveryNoteID = -1;
-	private static Object _nextDeliveryNoteIDMutex = new Object();
-
-	protected long createDeliveryNoteID() {
-		synchronized (_nextDeliveryNoteIDMutex) {
-			if (_nextDeliveryNoteID < 0)
-				_nextDeliveryNoteID = nextDeliveryNoteID;
-
-			long res = _nextDeliveryNoteID++;
-			nextDeliveryNoteID = _nextDeliveryNoteID;
-			return res;
-		}
-	}
-
 
 	/**
 	 * @return Returns the mandator.
@@ -575,10 +553,12 @@ public class Store
 	 * fails a DeliveryNoteEditException will be thrown.
 	 *
 	 * @param user The user which is responsible for creation of this invoice.
-	 * @param articles The {@link Article}s that shall be added to the invoice. Must not be empty (because the customer is looked up from the articles). 
+	 * @param articles The {@link Article}s that shall be added to the invoice. Must not be empty (because the customer is looked up from the articles).
+	 * @param deliveryNoteIDPrefix Which prefix shall be used (i.e. what namespace for the newly generated deliveryNoteID). If this is <code>null</code>, the
+	 *		user's default value will be used. 
 	 */
 	public DeliveryNote createDeliveryNote(
-			User user, Collection articles)
+			User user, Collection articles, String deliveryNoteIDPrefix)
 	throws DeliveryNoteEditException
 	{
 		if (articles.size() <= 0)
@@ -647,8 +627,21 @@ public class Store
 				"Attempt to create a DeliveryNote not with the local organisation as vendor. Vendor is "+vendorPK
 			);
 
+		if (deliveryNoteIDPrefix == null) {
+			TradeConfigModule tradeConfigModule;
+			try {
+				tradeConfigModule = (TradeConfigModule) Config.getConfig(
+						getPersistenceManager(), organisationID, user).createConfigModule(TradeConfigModule.class);
+			} catch (ModuleException x) {
+				throw new RuntimeException(x); // should not happen.
+			}
+
+			deliveryNoteIDPrefix = tradeConfigModule.getActiveIDPrefixCf(DeliveryNote.class.getName()).getDefaultIDPrefix();
+		}
+
 		DeliveryNote deliveryNote = new DeliveryNote(
-				user, vendorLE, customerLE, createDeliveryNoteID());
+				user, vendorLE, customerLE,
+				deliveryNoteIDPrefix, IDGenerator.nextID(DeliveryNote.class.getName() + '/' + deliveryNoteIDPrefix));
 		new DeliveryNoteLocal(deliveryNote); // self-registering
 		getPersistenceManager().makePersistent(deliveryNote);
 		for (Iterator iter = articles.iterator(); iter.hasNext();) {
@@ -670,7 +663,7 @@ public class Store
 	 * @return a new DeliveryNote
 	 * @throws DeliveryNoteEditException
 	 */
-	public DeliveryNote createDeliveryNote(User user, ArticleContainer articleContainer) 
+	public DeliveryNote createDeliveryNote(User user, ArticleContainer articleContainer, String deliveryNoteIDPrefix) 
 	throws DeliveryNoteEditException 
 	{
 		ArrayList articles = new ArrayList();
@@ -679,7 +672,7 @@ public class Store
 			if (article.getDeliveryNote() == null)
 				articles.add(article);
 		}
-		return createDeliveryNote(user, articles);
+		return createDeliveryNote(user, articles, deliveryNoteIDPrefix);
 	}
 
 	public void validateDeliveryNote(DeliveryNote deliveryNote)
@@ -1395,9 +1388,6 @@ public class Store
 	{
 		if (_nextTransferID >= 0 && nextTransferID != _nextTransferID)
 			nextTransferID = _nextTransferID;
-
-		if (_nextDeliveryNoteID >= 0 && nextDeliveryNoteID != _nextDeliveryNoteID)
-			nextDeliveryNoteID = _nextDeliveryNoteID;
 
 		if (_nextProductTypeID >= 0 && nextProductTypeID != _nextProductTypeID)
 			nextProductTypeID = _nextProductTypeID;

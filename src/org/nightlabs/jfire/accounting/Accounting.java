@@ -38,12 +38,11 @@ import javax.jdo.PersistenceManager;
 import javax.jdo.listener.StoreCallback;
 
 import org.apache.log4j.Logger;
-
+import org.nightlabs.ModuleException;
 import org.nightlabs.jfire.accounting.book.BookMoneyTransfer;
 import org.nightlabs.jfire.accounting.book.LocalAccountant;
 import org.nightlabs.jfire.accounting.book.MoneyFlowMapping;
 import org.nightlabs.jfire.accounting.book.PartnerAccountant;
-import org.nightlabs.jfire.accounting.book.MoneyFlowMapping.Registry;
 import org.nightlabs.jfire.accounting.id.InvoiceID;
 import org.nightlabs.jfire.accounting.pay.ModeOfPaymentFlavour;
 import org.nightlabs.jfire.accounting.pay.PayMoneyTransfer;
@@ -55,6 +54,8 @@ import org.nightlabs.jfire.accounting.pay.ServerPaymentProcessor;
 import org.nightlabs.jfire.accounting.pay.ServerPaymentProcessor.PayParams;
 import org.nightlabs.jfire.accounting.pay.id.ServerPaymentProcessorID;
 import org.nightlabs.jfire.accounting.priceconfig.IPriceConfigIDProvider;
+import org.nightlabs.jfire.config.Config;
+import org.nightlabs.jfire.idgenerator.IDGenerator;
 import org.nightlabs.jfire.organisation.LocalOrganisation;
 import org.nightlabs.jfire.security.User;
 import org.nightlabs.jfire.trade.Article;
@@ -63,6 +64,7 @@ import org.nightlabs.jfire.trade.LegalEntity;
 import org.nightlabs.jfire.trade.Offer;
 import org.nightlabs.jfire.trade.Order;
 import org.nightlabs.jfire.trade.OrganisationLegalEntity;
+import org.nightlabs.jfire.trade.TradeConfigModule;
 import org.nightlabs.jfire.trade.id.ArticleID;
 import org.nightlabs.jfire.transfer.Anchor;
 import org.nightlabs.jfire.transfer.Transfer;
@@ -100,12 +102,6 @@ public class Accounting
 
 		Accounting accounting = new Accounting();
 
-		// initialize the organisationID and all other members
-//		it = pm.getExtent(LocalOrganisation.class).iterator();
-//		if (!it.hasNext())
-//			throw new IllegalStateException("LocalOrganisation undefined in datastore!");
-//		LocalOrganisation localOrganisation = (LocalOrganisation) it.next();
-//		String organisationID = localOrganisation.getOrganisation().getOrganisationID();
 		String organisationID = LocalOrganisation.getLocalOrganisation(pm).getOrganisationID();
 		accounting.organisationID = organisationID;
 		accounting.mandator = OrganisationLegalEntity.getOrganisationLegalEntity(pm, organisationID, OrganisationLegalEntity.ANCHOR_TYPE_ID_ORGANISATION, true); // new OrganisationLegalEntity(localOrganisation.getOrganisation());
@@ -182,87 +178,7 @@ public class Accounting
 	public OrganisationLegalEntity getMandator() {
 		return mandator;
 	}
-	
-//	/**
-//	 * key: String productPK<br/>
-//	 * value: ProductInfo productInfo
-//	 * 
-//	 * @jdo.field
-//	 *		persistence-modifier="persistent"
-//	 *		collection-type="map"
-//	 *		key-type="java.lang.String"
-//	 *		value-type="ProductInfo"
-//	 *		dependent="true"
-//	 *
-//	 * @jdo.join
-//	 *
-//	 * @jdo.map-vendor-extension vendor-name="jpox" key="key-length" value="max 201"
-//	 */
-//	protected Map productInfos = new HashMap();
-	
-//	public ProductInfo getProductInfo(String organisationID, String productID, boolean throwExceptionIfNotExistent)
-//	{
-//		String pk = ProductInfo.getPrimaryKey(organisationID, productID);
-//		ProductInfo res = (ProductInfo) productInfos.get(pk);
-//		if (res == null && throwExceptionIfNotExistent)
-//			throw new IllegalArgumentException("No ProductInfo existing with organisationID=\""+organisationID+"\" and productID=\""+productID+"\"!");
-//		return res;
-//	}
-//
-//	public ProductInfo getProductInfo(ProductType product, boolean throwExceptionIfNotExistent)
-//	{
-//		String pk = product.getPrimaryKey();
-//		ProductInfo res = (ProductInfo) productInfos.get(pk);
-//		if (res == null && throwExceptionIfNotExistent)
-//			throw new IllegalArgumentException("No ProductInfo existing for product \""+pk+"\"!");
-//		return res;
-//	}
-//
-//	public void addProductInfo(ProductInfo productInfo)
-//	{
-//		productInfos.put(productInfo.getPrimaryKey(), productInfo);
-//	}
 
-//	/**
-//	 * This method creates a ProductInfo by looking up and delegating to
-//	 * the ProductInfoFactory which is associated to the extended ProductInfo.
-//	 * If there is either no extended ProductInfo or it does not have a
-//	 * ProductInfoFactory associated, this method creates an instance of
-//	 * <tt>ProductInfo</tt> (the root object).
-//	 * <p>
-//	 * If there exists already a ProductInfo for the given ProductType, it will
-//	 * simply be returned without any changes.
-//	 *
-//	 * @param product The product for which to create a ProductInfo
-//	 */
-//	public ProductInfo createProductInfo(ProductType product)
-//		throws ModuleException
-//	{
-//		String pk = product.getPrimaryKey();
-//		ProductInfo productInfo = (ProductInfo) productInfos.get(pk);
-//
-//		if (productInfo == null) {
-//			ProductInfo extendedProductInfo = null;
-//			ProductInfoFactory productInfoFactory = null;
-//			ProductType extendedProduct = product.getExtendedProductType();
-//
-//			if (extendedProduct != null)
-//				extendedProductInfo = getProductInfo(extendedProduct, true);
-//
-//			if (extendedProductInfo != null)
-//				productInfoFactory = extendedProductInfo.getProductInfoFactory();
-//
-//			if (productInfoFactory != null)
-//				productInfo = productInfoFactory.createProductInfo(product, extendedProductInfo);
-//			else
-//				productInfo = new ProductInfo(product, extendedProductInfo);
-//
-//			addProductInfo(productInfo);
-//			updatePackagedProductInfos(productInfo);
-//		}
-//
-//		return productInfo;
-//	}
 
 	/**
 	 * @return Returns the accountingPriceConfig.
@@ -272,48 +188,6 @@ public class Accounting
 		return accountingPriceConfig;
 	}
 
-//	/**
-//	 * This method sets the <tt>packagedProductInfos</tt> to match the
-//	 * <tt>packagedProducts</tt> of the <tt>ProductType</tt> that is analog
-//	 * to the given <tt>ProductInfo</tt>
-//	 *
-//	 * @param productInfo The ProductInfo whose packagedProductInfos shall be updated.
-//	 */
-//	public void updatePackagedProductInfos(ProductInfo productInfo)
-//	{
-//		// Add all missing packaged ProductInfo s.
-//
-//		// In packagedProductPKs we store the String productPK s that should exist.
-//		HashSet packagedProductPKs = new HashSet();
-//		for (Iterator it = productInfo.getProduct().getPackagedProductTypes().iterator(); it.hasNext(); ) {
-//			ProductType packagedProduct = (ProductType)it.next();
-//			packagedProductPKs.add(packagedProduct.getPrimaryKey());
-//			ProductInfo packagedProductInfo = productInfo.getPackagedProductInfo(
-//					packagedProduct.getOrganisationID(), packagedProduct.getProductTypeID(), false);
-//			if (packagedProductInfo == null) {
-//				packagedProductInfo = getProductInfo(packagedProduct, true);
-//				productInfo.addPackagedProductInfo(packagedProductInfo);
-//			}
-//		}
-//
-//
-//		// Remove all packaged ProductInfo s which are not registered in packagedProductPKs
-//
-//		// Because we cannot remove while iterating, we need to store everything that should
-//		// be deleted in packagedProductInfosToDelete
-//		HashSet packagedProductInfosToDelete = new HashSet();
-//		for (Iterator it = productInfo.getPackagedProductInfos().iterator(); it.hasNext(); ) {
-//			ProductInfo packagedProductInfo = (ProductInfo)it.next();
-//			if (!packagedProductPKs.contains(packagedProductInfo.getPrimaryKey()))
-//				packagedProductInfosToDelete.add(packagedProductInfo);
-//		}
-//
-//		for (Iterator it = packagedProductInfosToDelete.iterator(); it.hasNext(); ) {
-//			ProductInfo packagedProductInfo = (ProductInfo)it.next();
-//			productInfo.removePackagedProductInfo(
-//					packagedProductInfo.getOrganisationID(), packagedProductInfo.getProductID());
-//		}
-//	}
 
 /////////// begin implementation of TransferRegistry /////////////
 	/**
@@ -397,25 +271,6 @@ public class Accounting
 	}
 
 	/**
-	 * @jdo.field persistence-modifier="persistent"
-	 */	
-	private long nextInvoiceID = 0;
-	private static long _nextInvoiceID = -1;
-	private static Object _nextInvoiceIDMutex = new Object();
-
-	protected long createInvoiceID() {
-		synchronized (_nextInvoiceIDMutex) {
-			if (_nextInvoiceID < 0)
-				_nextInvoiceID = nextInvoiceID;
-
-			long res = _nextInvoiceID;
-			_nextInvoiceID = res + 1;
-			nextInvoiceID = _nextInvoiceID;
-			return res;
-		}
-	}
-
-	/**
 	 * Creates a new Invoice with the given articles.
 	 * Checks whether vendor and customer are the same for all involved offers
 	 * whether not articles are associated to another invoice
@@ -425,7 +280,7 @@ public class Accounting
 	 * @param user The user which is responsible for creation of this invoice.
 	 * @param articles The {@link Article}s that shall be added to the invoice. Must not be empty (because the customer is looked up from the articles). 
 	 */
-	public Invoice createInvoice(User user, Collection articles)
+	public Invoice createInvoice(User user, Collection articles, String invoiceIDPrefix)
 	throws InvoiceEditException
 	{
 		if (articles.size() <= 0)
@@ -501,8 +356,22 @@ public class Accounting
 				"Attempt to create a Invoice not with the local organisation as vendor. Vendor is "+vendorPK
 			);
 
+		if (invoiceIDPrefix == null) {
+			TradeConfigModule tradeConfigModule;
+			try {
+				tradeConfigModule = (TradeConfigModule) Config.getConfig(
+						getPersistenceManager(), organisationID, user).createConfigModule(TradeConfigModule.class);
+			} catch (ModuleException x) {
+				throw new RuntimeException(x); // should not happen.
+			}
+
+			invoiceIDPrefix = tradeConfigModule.getActiveIDPrefixCf(Invoice.class.getName()).getDefaultIDPrefix();
+		}
+
 		Invoice invoice = new Invoice(
-				user, vendorLE, customerLE, createInvoiceID(), invoiceCurrency); // , desiredModeOfPaymentFlavour);
+				user, vendorLE, customerLE,
+				invoiceIDPrefix, IDGenerator.nextID(Invoice.class.getName() + '/' + invoiceIDPrefix),
+				invoiceCurrency);
 		new InvoiceLocal(invoice); // registers itself in the invoice
 		getPersistenceManager().makePersistent(invoice);
 		for (Iterator iter = articles.iterator(); iter.hasNext();) {
@@ -540,7 +409,7 @@ public class Accounting
 	 * @return a new Invoice
 	 * @throws InvoiceEditException
 	 */
-	public Invoice createInvoice(User user, ArticleContainer articleContainer) 
+	public Invoice createInvoice(User user, ArticleContainer articleContainer, String invoiceIDPrefix) 
 	throws InvoiceEditException 
 	{
 		ArrayList articles = new ArrayList();
@@ -549,7 +418,7 @@ public class Accounting
 			if (article.getInvoice() == null)
 				articles.add(article);
 		}
-		return createInvoice(user, articles);
+		return createInvoice(user, articles, invoiceIDPrefix);
 	}
 
 	/**
@@ -1135,9 +1004,6 @@ public class Accounting
 
 	public void jdoPreStore()
 	{
-		if (_nextInvoiceID >= 0 && nextInvoiceID != _nextInvoiceID)
-			nextInvoiceID = _nextInvoiceID;
-
 		if (_nextMoneyFlowMappingID >= 0 && nextMoneyFlowMappingID != _nextMoneyFlowMappingID)
 			nextMoneyFlowMappingID = _nextMoneyFlowMappingID;
 

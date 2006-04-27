@@ -627,7 +627,7 @@ implements SessionBean
 	 * @ejb.permission role-name="_Guest_"
 	 */
 	public DeliveryNote createDeliveryNote(
-			Collection articleIDs,
+			Collection articleIDs, String deliveryNoteIDPrefix,
 			boolean get, String[] fetchGroups, int maxFetchDepth)
 		throws ModuleException
 	{
@@ -651,7 +651,7 @@ implements SessionBean
 				articles.add(article);
 			}
 
-			DeliveryNote deliveryNote = store.createDeliveryNote(user, articles);
+			DeliveryNote deliveryNote = store.createDeliveryNote(user, articles, deliveryNoteIDPrefix);
 			store.validateDeliveryNote(deliveryNote);
 
 			if (get) {
@@ -684,7 +684,7 @@ implements SessionBean
 	 * @ejb.permission role-name="_Guest_"
 	 */
 	public DeliveryNote createDeliveryNote(
-			ArticleContainerID articleContainerID,
+			ArticleContainerID articleContainerID, String deliveryNoteIDPrefix,
 			boolean get, String[] fetchGroups, int maxFetchDepth)
 		throws ModuleException
 	{
@@ -728,7 +728,7 @@ implements SessionBean
 				}
 			}
 
-			DeliveryNote deliveryNote = store.createDeliveryNote(user, articleContainer);
+			DeliveryNote deliveryNote = store.createDeliveryNote(user, articleContainer, deliveryNoteIDPrefix);
 			store.validateDeliveryNote(deliveryNote);
 
 			if (get) {

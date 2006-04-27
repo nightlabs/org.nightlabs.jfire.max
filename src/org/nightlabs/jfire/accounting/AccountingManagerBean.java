@@ -1072,7 +1072,7 @@ public abstract class AccountingManagerBean
 	 * @ejb.permission role-name="_Guest_"
 	 */
 	public Invoice createInvoice(
-			Collection articleIDs,
+			Collection articleIDs, String invoiceIDPrefix, 
 			boolean get, String[] fetchGroups, int maxFetchDepth)
 		throws ModuleException
 	{
@@ -1096,7 +1096,7 @@ public abstract class AccountingManagerBean
 				articles.add(article);
 			}
 
-			Invoice invoice = accounting.createInvoice(user, articles);
+			Invoice invoice = accounting.createInvoice(user, articles, invoiceIDPrefix);
 			accounting.validateInvoice(invoice);
 
 			if (get) {
@@ -1129,7 +1129,7 @@ public abstract class AccountingManagerBean
 	 * @ejb.permission role-name="_Guest_"
 	 */
 	public Invoice createInvoice(
-			ArticleContainerID articleContainerID,
+			ArticleContainerID articleContainerID, String invoiceIDPrefix,
 			boolean get, String[] fetchGroups, int maxFetchDepth)
 		throws ModuleException
 	{
@@ -1173,7 +1173,7 @@ public abstract class AccountingManagerBean
 				}
 			}
 
-			Invoice invoice = accounting.createInvoice(user, articleContainer);
+			Invoice invoice = accounting.createInvoice(user, articleContainer, invoiceIDPrefix);
 			accounting.validateInvoice(invoice);
 
 			if (get) {

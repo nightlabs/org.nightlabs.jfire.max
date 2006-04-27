@@ -39,6 +39,7 @@ import javax.jdo.PersistenceManager;
 import javax.jdo.Query;
 import javax.jdo.listener.DetachCallback;
 
+import org.nightlabs.jdo.ObjectIDUtil;
 import org.nightlabs.jfire.accounting.Currency;
 import org.nightlabs.jfire.security.User;
 import org.nightlabs.jfire.transfer.id.AnchorID;
@@ -143,7 +144,11 @@ implements Serializable, ArticleContainer, SegmentContainer, DetachCallback
 	 * @jdo.column length="100"
 	 */
 	private String organisationID;
-
+	/**
+	 * @jdo.field primary-key="true"
+	 * @jdo.column length="50"
+	 */
+	private String orderIDPrefix;
 	/**
 	 * @jdo.field primary-key="true"
 	 */
@@ -276,21 +281,28 @@ implements Serializable, ArticleContainer, SegmentContainer, DetachCallback
 
 	public Order(
 			OrganisationLegalEntity vendor, LegalEntity customer,
-			long orderID, Currency currency, User user)
+			String orderIDPrefix, long orderID,
+			Currency currency, User user)
 	{
 		if (vendor == null)
-			throw new NullPointerException("vendor");
-		
+			throw new IllegalArgumentException("vendor must not be null!");
+
 		if (customer == null)
-			throw new NullPointerException("customer");
+			throw new IllegalArgumentException("customer must not be null!");
+
+		ObjectIDUtil.assertValidIDString(orderIDPrefix, "orderIDPrefix");
+
+		if (orderID < 0)
+			throw new IllegalArgumentException("orderID < 0");
 
 		if (currency == null)
-			throw new NullPointerException("currency");
+			throw new IllegalArgumentException("currency must not be null!");
 
 		this.vendor = vendor;
 		this.customer = customer;
 		this.customerGroup = customer.getDefaultCustomerGroup();
 		this.organisationID = vendor.getOrganisationID();
+		this.orderIDPrefix = orderIDPrefix;
 		this.orderID = orderID;
 		this.currency = currency;
 
@@ -307,6 +319,10 @@ implements Serializable, ArticleContainer, SegmentContainer, DetachCallback
 	{
 		return organisationID;
 	}
+	public String getOrderIDPrefix()
+	{
+		return orderIDPrefix;
+	}
 	/**
 	 * @return Returns the orderID.
 	 */
@@ -315,13 +331,13 @@ implements Serializable, ArticleContainer, SegmentContainer, DetachCallback
 		return orderID;
 	}
 
-	public static String getPrimaryKey(String organisationID, long orderID)
+	public static String getPrimaryKey(String organisationID, String orderIDPrefix, long orderID)
 	{
-		return organisationID + '/' + Long.toHexString(orderID);
+		return organisationID +'/' + orderIDPrefix + '/' + Long.toHexString(orderID);
 	}
 	public String getPrimaryKey()
 	{
-		return organisationID + '/' + Long.toHexString(orderID);
+		return organisationID + '/' + orderIDPrefix + '/' + Long.toHexString(orderID);
 	}
 
 	/**

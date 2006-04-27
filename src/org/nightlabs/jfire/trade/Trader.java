@@ -51,10 +51,13 @@ import org.nightlabs.jfire.asyncinvoke.AsyncInvokeEnvelope;
 import org.nightlabs.jfire.asyncinvoke.ErrorCallback;
 import org.nightlabs.jfire.asyncinvoke.Invocation;
 import org.nightlabs.jfire.asyncinvoke.UndeliverableCallback;
+import org.nightlabs.jfire.config.Config;
+import org.nightlabs.jfire.idgenerator.IDGenerator;
 import org.nightlabs.jfire.person.Person;
 import org.nightlabs.jfire.security.User;
 import org.nightlabs.jfire.security.id.UserID;
 import org.nightlabs.jfire.servermanager.j2ee.SecurityReflector;
+import org.nightlabs.jfire.store.DeliveryNote;
 import org.nightlabs.jfire.store.NotAvailableException;
 import org.nightlabs.jfire.store.Product;
 import org.nightlabs.jfire.store.ProductLocal;
@@ -321,18 +324,6 @@ public class Trader
 	}
 
 	/**
-	 * @jdo.field persistence-modifier="persistent"
-	 */
-	protected long nextOrderID = 0;
-
-	protected synchronized long createOrderID()
-	{
-		long res = nextOrderID;
-		nextOrderID = res + 1;
-		return res;
-	}
-
-	/**
 	 * Creates a new <tt>Segment</tt> within the given <tt>Order</tt> for the
 	 * given <tt>SegmentType</tt>. Note, that you can create many
 	 * <tt>Segment</tt>s with the same <tt>SegmentType</tt>.
@@ -376,7 +367,7 @@ public class Trader
 	// }
 
 	public Order createOrder(OrganisationLegalEntity vendor,
-			LegalEntity customer, Currency currency) throws ModuleException
+			LegalEntity customer, String orderIDPrefix, Currency currency) throws ModuleException
 	{
 		if (customer == null)
 			throw new NullPointerException("customer");
@@ -398,7 +389,21 @@ public class Trader
 				User user = SecurityReflector.lookupSecurityReflector(
 						new InitialContext()).whoAmI().getUser(pm);
 
-				Order order = new Order(getMandator(), customer, createOrderID(),
+				if (orderIDPrefix == null) {
+					TradeConfigModule tradeConfigModule;
+					try {
+						tradeConfigModule = (TradeConfigModule) Config.getConfig(
+								getPersistenceManager(), organisationID, user).createConfigModule(TradeConfigModule.class);
+					} catch (ModuleException x) {
+						throw new RuntimeException(x); // should not happen.
+					}
+
+					orderIDPrefix = tradeConfigModule.getActiveIDPrefixCf(DeliveryNote.class.getName()).getDefaultIDPrefix();
+				}
+
+				Order order = new Order(
+						getMandator(), customer,
+						orderIDPrefix, IDGenerator.nextID(Order.class.getName() + '/' + orderIDPrefix),
 						currency, user);
 
 				getPersistenceManager().makePersistent(order);
@@ -471,7 +476,7 @@ public class Trader
 	 * @throws ModuleException
 	 */
 	public Offer createOfferRequirementOffer(OfferRequirement offerRequirement,
-			OrganisationLegalEntity vendor) throws ModuleException
+			OrganisationLegalEntity vendor, String orderIDPrefix) throws ModuleException // TODO shouldn't orderIDPrefix be looked up or generated automatically?
 	{
 		Offer offer = offerRequirement.getOfferByVendor(vendor);
 		if (offer == null) {
@@ -483,7 +488,7 @@ public class Trader
 
 			// From the OrderRequirement, we obtain the order for the given vendor.
 			// Order order = orderRequirement.createOrder(vendor);
-			Order order = createOrderRequirementOrder(orderRequirement, vendor);
+			Order order = createOrderRequirementOrder(orderRequirement, vendor, orderIDPrefix);
 
 			// offer = createOffer();
 			offerRequirement.addOffer(offer);
@@ -500,26 +505,14 @@ public class Trader
 	 * @throws ModuleException
 	 */
 	public Order createOrderRequirementOrder(OrderRequirement orderRequirement,
-			OrganisationLegalEntity vendor) throws ModuleException
+			OrganisationLegalEntity vendor, String orderIDPrefix) throws ModuleException // TODO shouldn't orderIDPrefix be looked up or generated automatically?
 	{
 		Order order = orderRequirement.getOrder(vendor);
 		if (order == null) {
-			order = createOrder(vendor, getMandator(), order.getCurrency());
+			order = createOrder(vendor, getMandator(), orderIDPrefix, order.getCurrency());
 			orderRequirement.addOrder(order);
 		}
 		return order;
-	}
-
-	/**
-	 * @jdo.field persistence-modifier="persistent"
-	 */
-	protected long nextOfferID = 0;
-
-	protected synchronized long createOfferID()
-	{
-		long res = nextOfferID;
-		nextOfferID = res + 1;
-		return res;
 	}
 
 	/**
@@ -546,10 +539,24 @@ public class Trader
 		return res;
 	}
 
-	public Offer createOffer(User user, Order order) throws ModuleException
+	public Offer createOffer(User user, Order order, String offerIDPrefix) throws ModuleException
 	{
 		if (mandator.getPrimaryKey().equals(order.getVendor().getPrimaryKey())) {
-			Offer offer = new Offer(user, order, createOfferID());
+			if (offerIDPrefix == null) {
+				TradeConfigModule tradeConfigModule;
+				try {
+					tradeConfigModule = (TradeConfigModule) Config.getConfig(
+							getPersistenceManager(), organisationID, user).createConfigModule(TradeConfigModule.class);
+				} catch (ModuleException x) {
+					throw new RuntimeException(x); // should not happen.
+				}
+
+				offerIDPrefix = tradeConfigModule.getActiveIDPrefixCf(DeliveryNote.class.getName()).getDefaultIDPrefix();
+			}
+
+			Offer offer = new Offer(
+					user, order,
+					offerIDPrefix, IDGenerator.nextID(Offer.class.getName() + '/' + offerIDPrefix));
 			new OfferLocal(offer); // OfferLocal registers itself in Offer
 			getPersistenceManager().makePersistent(offer);
 			return offer;

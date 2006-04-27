@@ -46,17 +46,9 @@ import org.apache.log4j.Logger;
 import org.nightlabs.ModuleException;
 import org.nightlabs.jdo.NLJDOHelper;
 import org.nightlabs.jdo.moduleregistry.ModuleMetaData;
-import org.nightlabs.jfire.accounting.Accounting;
-import org.nightlabs.jfire.accounting.Currency;
-import org.nightlabs.jfire.accounting.PriceFragmentType;
 import org.nightlabs.jfire.accounting.Tariff;
-import org.nightlabs.jfire.accounting.id.CurrencyID;
-import org.nightlabs.jfire.accounting.id.PriceFragmentTypeID;
 import org.nightlabs.jfire.accounting.id.TariffID;
-import org.nightlabs.jfire.accounting.tariffpriceconfig.FormulaCell;
 import org.nightlabs.jfire.accounting.tariffpriceconfig.FormulaPriceConfig;
-import org.nightlabs.jfire.accounting.tariffpriceconfig.PriceCalculator;
-import org.nightlabs.jfire.accounting.tariffpriceconfig.StablePriceConfig;
 import org.nightlabs.jfire.base.BaseSessionBeanImpl;
 import org.nightlabs.jfire.organisation.Organisation;
 import org.nightlabs.jfire.security.User;
@@ -69,8 +61,6 @@ import org.nightlabs.jfire.store.deliver.ModeOfDelivery;
 import org.nightlabs.jfire.store.deliver.id.ModeOfDeliveryID;
 import org.nightlabs.jfire.store.id.ProductTypeID;
 import org.nightlabs.jfire.trade.ArticleCreator;
-import org.nightlabs.jfire.trade.CustomerGroup;
-import org.nightlabs.jfire.trade.LegalEntity;
 import org.nightlabs.jfire.trade.Offer;
 import org.nightlabs.jfire.trade.Order;
 import org.nightlabs.jfire.trade.Segment;
@@ -600,7 +590,7 @@ implements SessionBean
 				offer = (Offer) offers.iterator().next();
 			}
 			else {
-				offer = trader.createOffer(user, order);
+				offer = trader.createOffer(user, order, null); // TODO offerIDPrefix ???
 			}
 
 			// find / create Products

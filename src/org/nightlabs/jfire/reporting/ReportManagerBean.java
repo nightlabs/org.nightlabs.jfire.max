@@ -60,9 +60,7 @@ import org.nightlabs.ModuleException;
 import org.nightlabs.jdo.NLJDOHelper;
 import org.nightlabs.jdo.moduleregistry.ModuleMetaData;
 import org.nightlabs.jfire.base.BaseSessionBeanImpl;
-import org.nightlabs.jfire.base.JFireBaseEAR;
 import org.nightlabs.jfire.config.Config;
-import org.nightlabs.jfire.config.ConfigModule;
 import org.nightlabs.jfire.config.ConfigSetup;
 import org.nightlabs.jfire.config.UserConfigSetup;
 import org.nightlabs.jfire.reporting.config.ReportLayoutConfigModule;
@@ -165,7 +163,7 @@ implements SessionBean
 			Collection configs = Config.getConfigsByType(pm, getOrganisationID(), UserConfigSetup.CONFIG_TYPE_USER_CONFIG);
 			for (Iterator iter = configs.iterator(); iter.hasNext();) {
 				Config config = (Config) iter.next();
-				ReportLayoutConfigModule configModule = (ReportLayoutConfigModule)ConfigModule.getAutoCreateConfigModule(pm, config, ReportLayoutConfigModule.class, null);
+				ReportLayoutConfigModule configModule = (ReportLayoutConfigModule)config.createConfigModule(ReportLayoutConfigModule.class, null);
 				configModule.getAvailEntry(catType).setDefaultReportLayoutKey(JDOHelper.getObjectId(layout).toString());
 				LOGGER.info("Set default for ReportLayoutConfigModule for category "+catType+" and Config "+config.getConfigKey());
 			}

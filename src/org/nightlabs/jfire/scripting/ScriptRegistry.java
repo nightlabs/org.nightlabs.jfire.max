@@ -29,9 +29,11 @@ package org.nightlabs.jfire.scripting;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import javax.jdo.JDOHelper;
 import javax.jdo.PersistenceManager;
@@ -177,6 +179,8 @@ public class ScriptRegistry
 		ScriptExecutor se = (ScriptExecutor) clazz.newInstance();
 		String lang = se.getLanguage();
 
+		unbindLanguage(lang);
+
 		language2ScriptExecutorClassName.put(lang, clazz.getName());
 		String[] fes = se.getFileExtensions();
 		for (int i = 0; i < fes.length; i++) {
@@ -195,11 +199,18 @@ public class ScriptRegistry
 	 */
 	public void unbindLanguage(String language)
 	{
-		language2ScriptExecutorClassName.remove(language);
+		if (language2ScriptExecutorClassName.remove(language) == null)
+			return;
+
+		Set fileExtensions = new HashSet();
 		for (Iterator it = fileExtension2Language.entrySet().iterator(); it.hasNext(); ) {
 			Map.Entry entry = (Map.Entry)it.next();
 			if (entry.getValue().equals(language))
-				it.remove();
+				fileExtensions.add(entry.getKey());
+		}
+		for (Iterator it = fileExtensions.iterator(); it.hasNext();) {
+			Object fileExtension = it.next();
+			fileExtension2Language.remove(fileExtension);
 		}
 	}
 

@@ -63,6 +63,7 @@ import org.nightlabs.jfire.security.SecurityException;
 import org.nightlabs.jfire.security.User;
 import org.nightlabs.jfire.security.UserLocal;
 import org.nightlabs.jfire.simpletrade.store.SimpleProductType;
+import org.nightlabs.jfire.simpletrade.store.SimpleProductTypeActionHandler;
 import org.nightlabs.jfire.store.ProductType;
 import org.nightlabs.jfire.store.Store;
 import org.nightlabs.jfire.store.id.ProductTypeID;
@@ -131,7 +132,7 @@ public class DataCreator
 				ProductType.INHERITANCE_NATURE_BRANCH, ProductType.PACKAGE_NATURE_OUTER);
 		pt.getName().setText(languageID, name);
 
-		store.addProductType(user, pt, SimpleProductType.getDefaultHome(pm, pt));
+		store.addProductType(user, pt, SimpleProductTypeActionHandler.getDefaultHome(pm, pt));
 		store.setProductTypeStatus_published(user, pt);
 
 		return pt;
@@ -146,7 +147,7 @@ public class DataCreator
 		pt.getName().setText(Locale.ENGLISH.getLanguage(), name);
 		pt.setPackagePriceConfig(new StablePriceConfig(organisationID, accounting.createPriceConfigID()));
 		pt.setInnerPriceConfig(innerPriceConfig);
-		store.addProductType(user, pt, SimpleProductType.getDefaultHome(pm, pt));
+		store.addProductType(user, pt, SimpleProductTypeActionHandler.getDefaultHome(pm, pt));
 
 		store.setProductTypeStatus_published(user, pt);
 		store.setProductTypeStatus_confirmed(user, pt);

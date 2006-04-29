@@ -53,6 +53,7 @@ import org.nightlabs.jfire.base.BaseSessionBeanImpl;
 import org.nightlabs.jfire.organisation.Organisation;
 import org.nightlabs.jfire.security.User;
 import org.nightlabs.jfire.simpletrade.store.SimpleProductType;
+import org.nightlabs.jfire.simpletrade.store.SimpleProductTypeActionHandler;
 import org.nightlabs.jfire.store.NestedProductType;
 import org.nightlabs.jfire.store.ProductType;
 import org.nightlabs.jfire.store.Store;
@@ -140,6 +141,10 @@ implements SessionBean
 					"JFireSimpleTrade", "1.0.0-0-beta", "1.0.0-0-beta");
 			pm.makePersistent(moduleMetaData);
 
+			SimpleProductTypeActionHandler simpleProductTypeActionHandler = new SimpleProductTypeActionHandler(
+					Organisation.DEVIL_ORGANISATION_ID, SimpleProductTypeActionHandler.class.getName(), SimpleProductType.class);
+			pm.makePersistent(simpleProductTypeActionHandler);
+
 			Store store = Store.getStore(pm);
 //			Accounting accounting = Accounting.getAccounting(pm);
 
@@ -176,7 +181,7 @@ implements SessionBean
 					null, store.getMandator(),
 					ProductType.INHERITANCE_NATURE_BRANCH, ProductType.PACKAGE_NATURE_OUTER);
 			rootSimpleProductType.setDeliveryConfiguration(deliveryConfiguration);
-			store.addProductType(user, rootSimpleProductType, SimpleProductType.getDefaultHome(pm, rootSimpleProductType));
+			store.addProductType(user, rootSimpleProductType, SimpleProductTypeActionHandler.getDefaultHome(pm, rootSimpleProductType));
 			store.setProductTypeStatus_published(user, rootSimpleProductType);
 
 
@@ -445,7 +450,7 @@ implements SessionBean
 				Store.getStore(pm).addProductType(
 						User.getUser(pm, getPrincipal()),
 						productType,
-						SimpleProductType.getDefaultHome(pm, productType));
+						SimpleProductTypeActionHandler.getDefaultHome(pm, productType));
 			}
 			// now, productType is attached to the datastore in any case
 

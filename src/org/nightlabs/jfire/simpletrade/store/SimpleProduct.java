@@ -49,13 +49,10 @@ public class SimpleProduct extends Product
 	/**
 	 * @deprecated Only for JDO!
 	 */
-	protected SimpleProduct()
-	{
-	}
+	protected SimpleProduct() { }
 
 	/**
-	 * @param productType
-	 * @param productID
+	 * @see Product#Product(ProductType, long)
 	 */
 	public SimpleProduct(ProductType productType, long productID)
 	{
@@ -63,6 +60,9 @@ public class SimpleProduct extends Product
 	}
 
 	/**
+	 * This implementation returns <code>null</code>, because <code>SimpleProduct</code>s don't support
+	 * {@link ProductLocator}s.
+	 *
 	 * @see org.nightlabs.jfire.store.Product#getProductLocator(User, NestedProductType)
 	 */
 	public ProductLocator getProductLocator(User user, NestedProductType nestedProductType)

@@ -43,7 +43,6 @@ import javax.jdo.PersistenceManager;
 
 import org.apache.commons.lang.exception.ExceptionUtils;
 import org.apache.log4j.Logger;
-
 import org.nightlabs.ModuleException;
 import org.nightlabs.jdo.NLJDOHelper;
 import org.nightlabs.jfire.accounting.Accounting;
@@ -83,7 +82,6 @@ import org.nightlabs.jfire.trade.id.ArticleID;
 import org.nightlabs.jfire.trade.id.OfferID;
 import org.nightlabs.jfire.trade.id.OrderID;
 import org.nightlabs.jfire.transfer.id.AnchorID;
-import org.nightlabs.util.Utils;
 
 /**
  *
@@ -269,24 +267,6 @@ implements SessionBean
 		try {
 			LOGGER.info("createProductTypeID() called by " + getPrincipalString());
 			return Store.getStore(pm).createProductTypeID();
-		} finally {
-			pm.close();
-		}
-	}
-
-	/**
-	 * @throws ModuleException
-	 * 
-	 * @ejb.interface-method
-	 * @ejb.permission role-name="StoreManager.createProductID"
-	 * @ejb.transaction type = "Required"
-	 **/
-	public long createProductID() 
-	throws ModuleException
-	{
-		PersistenceManager pm = getPersistenceManager();
-		try {
-			return Store.getStore(pm).createProductID();
 		} finally {
 			pm.close();
 		}

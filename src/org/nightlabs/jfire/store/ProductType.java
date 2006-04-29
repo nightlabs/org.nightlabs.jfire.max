@@ -631,7 +631,8 @@ implements
 	 * 
 	 * @deprecated Currently it is not yet possible to change the structure of the inheritance
 	 *		tree!!! You must not call this method! Even after we implemented
-	 *		the possibility to restructure the product type tree, you will use another API!!!
+	 *		the possibility to restructure the product type tree, you will use another API
+	 *		(via the {@link Store})!!!
 	 */
 	protected void setExtendedProductType(ProductType extendedProductType)
 	{
@@ -1143,7 +1144,7 @@ implements
 	{
 		PersistenceManager pm = JDOHelper.getPersistenceManager(this);
 		if (pm == null)
-			throw new IllegalStateException("This instance of ProductType is not yet persistent or currently not attached to a datastore! Cannot obtain PersistenceManager!");
+			throw new IllegalStateException("This instance of " + this.getClass().getName() + " is not yet persistent or currently not attached to a datastore! Cannot obtain PersistenceManager!");
 
 		return pm;
 	}
@@ -1338,26 +1339,6 @@ implements
 		else
 			return this.getInnerPriceConfig();
 	}
-
-	/**
-	 * Implement this method to find a suitable <tt>Product</tt> for the given
-	 * <tt>ProductLocator</tt>.
-	 * <p>
-	 * Do NOT call this method directly!
-	 * Use {@link Store#findProducts(User, NestedProductType, ProductLocator)} instead! This is
-	 * necessary for interception.
-	 * <p>
-	 * You should return the same number of <tt>Product</tt>s as defined in <tt>nestedProductType.quantity</tt>! Otherwise,
-	 * it is handled as if you return <tt>null</tt>.
-	 *
-	 * @param user The <tt>User</tt> who is responsible for this creation.
-	 * @param nestedProductType This will be <tt>null</tt> if the top-level product shall be found/created.
-	 * @param productLocator A specialized Object defining for YOUR implementation of <tt>ProductType</tt> which <tt>Product</tt> to find.
-	 * @return Return either <tt>null</tt> if no suitable <tt>Product</tt>s can be allocated or a <tt>Collection</tt> of <tt>Product</tt>.
-	 *
-	 * @see #isProductProvider()
-	 */
-	protected abstract Collection findProducts(User user, NestedProductType nestedProductType, ProductLocator productLocator);
 
 	public abstract I18nText getName();
 

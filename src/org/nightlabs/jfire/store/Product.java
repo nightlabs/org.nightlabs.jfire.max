@@ -39,6 +39,7 @@ import javax.jdo.JDOHelper;
 import javax.jdo.PersistenceManager;
 
 import org.nightlabs.ModuleException;
+import org.nightlabs.jfire.idgenerator.IDGenerator;
 import org.nightlabs.jfire.security.User;
 import org.nightlabs.jfire.trade.Article;
 import org.nightlabs.jfire.trade.Trader;
@@ -71,6 +72,11 @@ implements Serializable
 	 * @jdo.field primary-key="true"
 	 */
 	private long productID;
+
+	public static long createProductID()
+	{
+		return IDGenerator.nextID(Product.class.getName());
+	}
 
 	/**
 	 * @jdo.field persistence-modifier="persistent"
@@ -179,7 +185,7 @@ implements Serializable
 	 * This method is called by
 	 * {@link org.nightlabs.jfire.trade.Trader#allocateArticle(User, Article)}.
 	 * It must return a <code>ProductLocator</code> that is suitable for
-	 * {@link ProductType#findProducts(User, NestedProductType, ProductLocator)}
+	 * {@link ProductType#findProducts(User, ProductType, NestedProductType, ProductLocator)}
 	 * of the <code>nestedProductType</code>s. This method assumes that a wrapping
 	 * <code>ProductType</code> knows the <code>ProductType</code>s it is packaging
 	 * (which is usually the case - not the other way around).

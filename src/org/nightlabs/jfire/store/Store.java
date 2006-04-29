@@ -146,13 +146,6 @@ public class Store
 
 	/**
 	 * @jdo.field persistence-modifier="persistent"
-	 */
-	private long nextProductID = 0;
-	private static long _nextProductID = -1;
-	private static Object _nextProductIDMutex = new Object();
-
-	/**
-	 * @jdo.field persistence-modifier="persistent"
 	 */ 
 	private OrganisationLegalEntity mandator;
 
@@ -303,18 +296,6 @@ public class Store
 			long res = _nextProductTypeID++;
 			nextProductTypeID = _nextProductTypeID;
 			return Long.toHexString(res);
-		}
-	}
-
-	public long createProductID()
-	{
-		synchronized (_nextProductIDMutex) {
-			if (_nextProductID < 0)
-				_nextProductID = nextProductID;
-
-			long res = _nextProductID++;
-			nextProductID = _nextProductID;
-			return res;
 		}
 	}
 
@@ -513,11 +494,12 @@ public class Store
 		if (nestedProductType != null)
 			productType = nestedProductType.getInnerProductType();
 
-		return productType.findProducts(
-				user, nestedProductType, productLocator);
+		ProductTypeActionHandler ptah = ProductTypeActionHandler.getProductTypeActionHandler(
+				getPersistenceManager(), productType.getClass());
+
+		return ptah.findProducts(
+				user, productType, nestedProductType, productLocator);
 	}
-	
-	
 
 	/**
 	 * @return Returns the mandator.
@@ -1391,8 +1373,5 @@ public class Store
 
 		if (_nextProductTypeID >= 0 && nextProductTypeID != _nextProductTypeID)
 			nextProductTypeID = _nextProductTypeID;
-
-		if (_nextProductID >= 0 && nextProductID != _nextProductID)
-			nextProductID = _nextProductID;
 	}
 }

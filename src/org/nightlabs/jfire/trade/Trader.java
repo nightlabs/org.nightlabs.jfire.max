@@ -348,7 +348,7 @@ public class Trader
 			segmentType = SegmentType.getDefaultSegmentType(pm);
 		} // if (segmentType == null) {
 
-		Segment segment = new Segment(organisationID, createSegmentID(),
+		Segment segment = new Segment(organisationID, Segment.createSegmentID(),
 				segmentType, order);
 		order.addSegment(segment);
 
@@ -515,30 +515,6 @@ public class Trader
 		return order;
 	}
 
-	/**
-	 * @jdo.field persistence-modifier="persistent"
-	 */
-	protected long nextSegmentID = 0;
-
-	protected synchronized long createSegmentID()
-	{
-		long res = nextSegmentID;
-		nextSegmentID = res + 1;
-		return res;
-	}
-
-	/**
-	 * @jdo.field persistence-modifier="persistent"
-	 */
-	protected long nextArticleID = 0;
-
-	public synchronized long createArticleID()
-	{
-		long res = nextArticleID;
-		nextArticleID = res + 1;
-		return res;
-	}
-
 	public Offer createOffer(User user, Order order, String offerIDPrefix) throws ModuleException
 	{
 		if (mandator.getPrimaryKey().equals(order.getVendor().getPrimaryKey())) {
@@ -591,7 +567,7 @@ public class Trader
 			if (!reversedArticle.getOffer().getOfferLocal().isConfirmed())
 				throw new IllegalStateException("Offer " + reversedArticle.getOffer().getPrimaryKey() + " of Article " + reversedArticle.getPrimaryKey() + " is NOT confirmed! Cannot create reversing Article!");
 
-			Article reversingArticle = reversedArticle.reverseArticle(user, reversingOffer, createArticleID());
+			Article reversingArticle = reversedArticle.reverseArticle(user, reversingOffer, Article.createArticleID());
 			reversingArticle.createArticleLocal(user);
 			res.add(reversingArticle);
 		}

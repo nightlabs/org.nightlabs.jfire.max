@@ -28,6 +28,10 @@ package org.nightlabs.jfire.trade;
 
 import java.io.Serializable;
 
+import org.nightlabs.jfire.accounting.Invoice;
+import org.nightlabs.jfire.idgenerator.IDGenerator;
+import org.nightlabs.jfire.store.DeliveryNote;
+
 /**
  * One {@link Order}, {@link Offer}, {@link Invoice} or {@link DeliveryNote} may contain
  * many <tt>Segment</tt>s. Each <tt>Segment</tt> knows its {@link SegmentType}. This layer
@@ -68,6 +72,11 @@ public class Segment implements Serializable
 	 * @jdo.field primary-key="true"
 	 */
 	private long segmentID;
+
+	public static long createSegmentID()
+	{
+		return IDGenerator.nextID(Segment.class.getName());
+	}
 
 	/**
 	 * @jdo.field persistence-modifier="persistent"

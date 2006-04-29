@@ -80,7 +80,7 @@ public class ArticleCreator
 		List res = new ArrayList(products.size());
 		for (Iterator iter = products.iterator(); iter.hasNext();) {
 			Product product = (Product) iter.next();
-			res.add(new Article(offer, segment, trader.createArticleID(), product, tariff));
+			res.add(new Article(offer, segment, Article.createArticleID(), product, tariff));
 		}
 		return res;
 	}
@@ -103,7 +103,7 @@ public class ArticleCreator
 		List res = new ArrayList(productTypes.size());
 		for (Iterator iter = productTypes.iterator(); iter.hasNext();) {
 			ProductType productType = (ProductType) iter.next();
-			res.add(new Article(offer, segment, trader.createArticleID(), productType, tariff));
+			res.add(new Article(offer, segment, Article.createArticleID(), productType, tariff));
 		}
 		return res;
 	}

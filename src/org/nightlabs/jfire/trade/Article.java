@@ -37,12 +37,12 @@ import javax.jdo.listener.StoreCallback;
 
 import org.apache.commons.lang.exception.ExceptionUtils;
 import org.apache.log4j.Logger;
-
 import org.nightlabs.jfire.accounting.Currency;
 import org.nightlabs.jfire.accounting.Invoice;
 import org.nightlabs.jfire.accounting.Tariff;
 import org.nightlabs.jfire.accounting.id.InvoiceID;
 import org.nightlabs.jfire.accounting.priceconfig.IPackagePriceConfig;
+import org.nightlabs.jfire.idgenerator.IDGenerator;
 import org.nightlabs.jfire.security.User;
 import org.nightlabs.jfire.store.DeliveryNote;
 import org.nightlabs.jfire.store.Product;
@@ -137,6 +137,11 @@ public class Article
 	 * @jdo.field primary-key="true"
 	 */
 	private long articleID;
+
+	public static long createArticleID()
+	{
+		return IDGenerator.nextID(Article.class.getName());
+	}
 
 	/**
 	 * @jdo.field persistence-modifier="persistent"

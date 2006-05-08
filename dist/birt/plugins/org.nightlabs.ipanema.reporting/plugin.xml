@@ -2,7 +2,7 @@
 <?eclipse version="3.0"?>
 <plugin
    id="org.nightlabs.jfire.reporting"
-   name="ODA Driver for JDOQL (Server Side)"
+   name="ODA Driver for Server Side JFire DataSources"
    version="1.0"
    provider-name="NightLabs.org"
    class="org.nightlabs.jfire.reporting.ReportPlugin">
@@ -91,5 +91,44 @@
          </properties>
       </dataSet>
     </extension>
+    
+    <extension
+         point="org.eclipse.datatools.connectivity.oda.dataSource">
+      <dataSource
+            defaultDisplayName="JFire Server Side Script Driver"
+            driverClass="org.nightlabs.jfire.reporting.oda.jfs.server.ServerJFSDriver"
+            id="org.nightlabs.jfire.reporting.oda.jfs.JFSDriver"
+            odaVersion="3.0"
+            setThreadContextClassLoader="false">
+      </dataSource>
+      <dataSet
+            defaultDisplayName="Server Side JFire Script Data Set"            
+            id="org.nightlabs.jfire.reporting.oda.jfs.JFSDataSet">
+         <dataTypeMapping
+               nativeDataType="String"
+               nativeDataTypeCode="1"
+               odaScalarDataType="String"/>
+         <dataTypeMapping
+               nativeDataType="Integer"
+               nativeDataTypeCode="2"
+               odaScalarDataType="Integer"/>
+         <dataTypeMapping
+               nativeDataType="Double"
+               nativeDataTypeCode="3"
+               odaScalarDataType="Double"/>
+         <dataTypeMapping
+               nativeDataType="Boolean"
+               nativeDataTypeCode="4"
+               odaScalarDataType="Integer"/>
+         <dataTypeMapping
+               nativeDataType="Date"
+               nativeDataTypeCode="5"
+               odaScalarDataType="Date"/>
+         <dataTypeMapping
+               nativeDataType="BigDecimal(Long)"
+               nativeDataTypeCode="6"
+               odaScalarDataType="Decimal"/>
+      </dataSet>
+    </extension>    
 
 </plugin>

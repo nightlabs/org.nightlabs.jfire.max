@@ -7,61 +7,38 @@
 	</module>
 	
 	<module>
-		<java>birt/lib/core.jar</java>
-	</module>
+		<java>birt/lib/chartengineapi.jar</java></module>
+		
 	<module>
-		<java>birt/lib/engine.jar</java>
-	</module>
+		<java>birt/lib/com.ibm.icu_3.4.3.jar</java></module>
 	<module>
-		<java>birt/lib/oda.jar</java>
-	</module>
+		<java>birt/lib/commons-cli-1.0.jar</java></module>
 	<module>
-		<java>birt/lib/birt-oda.jar</java>
-	</module>
+		<java>birt/lib/commons-codec-1.3.jar</java></module>
 	<module>
-		<java>birt/lib/chart-engine.jar</java>
-	</module>
+		<java>birt/lib/coreapi.jar</java></module>
 	<module>
-		<java>birt/lib/common.jar</java>
-	</module>
+		<java>birt/lib/dataadaptorapi.jar</java></module>
 	<module>
-		<java>birt/lib/common.resources.jar</java>
-	</module>
+		<java>birt/lib/dteapi.jar</java></module>
 	<module>
-		<java>birt/lib/commons-cli-1.0.jar</java>
-	</module>
+		<java>birt/lib/engineapi.jar</java></module>
 	<module>
-		<java>birt/lib/commons-codec-1.3.jar</java>
-	</module>
+		<java>birt/lib/flute.jar</java></module>
 	<module>
-		<java>birt/lib/dte.jar</java>
-	</module>
+		<java>birt/lib/js.jar</java></module>
 	<module>
-		<java>birt/lib/ecore.jar</java>
-	</module>
+		<java>birt/lib/modelapi.jar</java></module>
 	<module>
-		<java>birt/lib/ecore.resources.jar</java>
-	</module>
+		<java>birt/lib/org.eclipse.emf.common_2.2.0.v200604200629.jar</java></module>
 	<module>
-		<java>birt/lib/ecore.xmi.jar</java>
-	</module>
+		<java>birt/lib/org.eclipse.emf.ecore_2.2.0.v200604200629.jar</java></module>
+	<module>
+		<java>birt/lib/org.eclipse.emf.ecore.xmi_2.2.0.v200604200629.jar</java></module>
+	<module>
+		<java>birt/lib/sac.jar</java></module>
+		
+    <module>
+		<java>birt/lib/org.eclipse.datatools.connectivity.oda_3.0.1.200604281.jar</java></module>
 	
-	<!--
-	<module>
-		<java>birt/lib/js.jar</java>
-	</module>
-	-->
-	
-	<module>
-		<java>birt/lib/model.jar</java>
-	</module>
-	<module>
-		<java>birt/lib/odaconsumer-helper.jar</java>
-	</module>
-	<module>
-		<java>birt/lib/Tidy.jar</java>
-	</module>
-	<module>
-		<java>birt/lib/viewservlets.jar</java>
-	</module>
 </application>

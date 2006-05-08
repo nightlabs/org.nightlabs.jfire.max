@@ -1,0 +1,40 @@
+#
+#************************************************************************
+# Copyright (c) 2004, 2006 Actuate Corporation.
+# All rights reserved. This program and the accompanying materials
+# are made available under the terms of the Eclipse Public License v1.0
+# which accompanies this distribution, and is available at
+# http://www.eclipse.org/legal/epl-v10.html
+#
+# Contributors:
+#  Actuate Corporation - initial API and implementation
+#  
+#************************************************************************
+#
+# Exception messages for the Oda Flat File Driver
+
+connection_CONNECTION_PROPERTIES_MISSING=Faltan las propiedades de conexión.
+connection_CANNOT_OPEN_FLAT_FILE_DB_DIR=No se puede abrir la base de datos del archivo sin formato en el directorio: 
+
+query_COMMAND_IS_EMPTY=El comando de consulta está vacío.
+query_DO_NOT_SUPPORT_CROSS_TABLE_QUERY=No se admite la consulta de tabla de referencias cruzadas.
+query_COMMAND_NOT_VALID=El comando de consulta no es válido.
+query_ARGUMENT_ERROR=El argumento debe ser 'NAME' o 'TYPE'.
+query_IO_EXCEPTION=Se ha producido una excepción de E/S al leer el archivo.
+query_SOURCE_DATA_ERROR=Error de fuente de datos
+query_COLUMN_NAME_ERROR=Error de nombre de columna
+
+resultSet_COLUMN_NOT_FOUND=No se ha encontrado la columna:
+resultSet_CURSOR_HAS_NOT_BEEN_INITIALIZED=Todavía no se ha inicializado el cursor.
+
+resultSetMetaData_INVALID_COLUMN_INDEX=Índice de columna no válido:
+
+dataTypes_TYPE_NAME_INVALID=Nombre de tipo no válido:
+
+dataSetMetaData_PRODUCT_NAME=Proveedor de fuente de datos del archivo sin formato DTP ODA
+
+common_ARGUMENT_CANNOT_BE_NULL=Los argumentos no pueden ser nulos.
+common_CONNECTION_HAS_NOT_OPEN=La conexión no está abierta.
+common_CANNOT_FIND_COLUMN=No se puede encontrar ninguna columna.
+query_streamClosed=Secuencia cerrada
+query_invalidTableName=Nombre de tabla no válido:

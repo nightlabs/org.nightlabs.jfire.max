@@ -29,13 +29,13 @@ package org.nightlabs.jfire.reporting.oda.jdoql;
 import org.eclipse.datatools.connectivity.oda.IQuery;
 import org.eclipse.datatools.connectivity.oda.OdaException;
 
-import org.nightlabs.jfire.reporting.oda.JDOConnection;
+import org.nightlabs.jfire.reporting.oda.Connection;
 
 /**
  * @author Alexander Bieber <alex[AT]nightlabs[DOT]de>
  *
  */
-public class JDOQLConnection extends JDOConnection {
+public class JDOQLConnection extends Connection {
 	
 	private IJDOQueryProxyFactory proxyFactory;
 	
@@ -46,9 +46,9 @@ public class JDOQLConnection extends JDOConnection {
 	 * @see org.eclipse.datatools.connectivity.oda.IConnection#newQuery(java.lang.String)
 	 */
 	public IQuery newQuery(String dataSetType) throws OdaException {
-		if (getCurrentProperties() == null)
+		if (getConnectionProperties() == null)
 			throw new IllegalStateException("Connection properties are not assigned. Maybe open() was never called!");
-		return proxyFactory.createJDOQueryProxy(getCurrentProperties());
+		return proxyFactory.createJDOQueryProxy(getConnectionProperties());
 	}
 
 }

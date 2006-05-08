@@ -88,7 +88,7 @@ public class ReportingManagerFactory implements Serializable {
 
 //			 Associate the configuration with the HTML output format.
 			config.setEmitterConfiguration( HTMLRenderOption.OUTPUT_FORMAT_HTML, hc );			
-			reportEngine = new ReportEngine(config);			
+			reportEngine = new ReportEngine(config);				
 		}
 		return reportEngine;
 	}

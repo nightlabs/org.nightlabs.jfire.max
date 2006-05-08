@@ -49,6 +49,7 @@ import javax.naming.NamingException;
 import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
 import org.eclipse.birt.core.framework.Platform;
+import org.eclipse.birt.core.framework.PlatformConfig;
 import org.eclipse.birt.report.engine.api.EngineException;
 import org.eclipse.birt.report.engine.api.HTMLRenderOption;
 import org.eclipse.birt.report.engine.api.IReportRunnable;
@@ -56,11 +57,13 @@ import org.eclipse.birt.report.engine.api.IRunAndRenderTask;
 import org.eclipse.birt.report.engine.api.ReportEngine;
 import org.eclipse.datatools.connectivity.oda.IParameterMetaData;
 import org.eclipse.datatools.connectivity.oda.IResultSet;
+import org.eclipse.datatools.connectivity.oda.IResultSetMetaData;
 import org.nightlabs.ModuleException;
 import org.nightlabs.jdo.NLJDOHelper;
 import org.nightlabs.jdo.moduleregistry.ModuleMetaData;
 import org.nightlabs.jfire.base.BaseSessionBeanImpl;
 import org.nightlabs.jfire.config.Config;
+import org.nightlabs.jfire.config.ConfigModule;
 import org.nightlabs.jfire.config.ConfigSetup;
 import org.nightlabs.jfire.config.UserConfigSetup;
 import org.nightlabs.jfire.reporting.config.ReportLayoutConfigModule;
@@ -76,13 +79,16 @@ import org.nightlabs.jfire.reporting.oda.jdojs.server.ServerJDOJSProxy;
 import org.nightlabs.jfire.reporting.oda.jdoql.JDOQLMetaDataParser;
 import org.nightlabs.jfire.reporting.oda.jdoql.JDOQLResultSetMetaData;
 import org.nightlabs.jfire.reporting.oda.jdoql.server.ServerJDOQLProxy;
+import org.nightlabs.jfire.reporting.oda.jfs.server.ServerJFSQueryProxy;
 import org.nightlabs.jfire.reporting.platform.RAPlatformContext;
 import org.nightlabs.jfire.reporting.platform.ReportingManager;
 import org.nightlabs.jfire.reporting.platform.ReportingManagerFactory;
+import org.nightlabs.jfire.scripting.id.ScriptRegistryItemID;
 import org.nightlabs.jfire.servermanager.JFireServerManager;
 import org.nightlabs.util.Utils;
 
 /**
+ * TODO: Unify method names for ResultSet and ResultSetMetaData getter (also in Dirvers, and Queries)
  * @author Alexander Bieber <alex[AT]nightlabs[DOT]de>
  * 
  * @ejb.bean name="jfire/ejb/JFireReporting/ReportManager"	
@@ -163,7 +169,7 @@ implements SessionBean
 			Collection configs = Config.getConfigsByType(pm, getOrganisationID(), UserConfigSetup.CONFIG_TYPE_USER_CONFIG);
 			for (Iterator iter = configs.iterator(); iter.hasNext();) {
 				Config config = (Config) iter.next();
-				ReportLayoutConfigModule configModule = (ReportLayoutConfigModule)config.createConfigModule(ReportLayoutConfigModule.class, null);
+				ReportLayoutConfigModule configModule = (ReportLayoutConfigModule)ConfigModule.getAutoCreateConfigModule(pm, config, ReportLayoutConfigModule.class, null);
 				configModule.getAvailEntry(catType).setDefaultReportLayoutKey(JDOHelper.getObjectId(layout).toString());
 				LOGGER.info("Set default for ReportLayoutConfigModule for category "+catType+" and Config "+config.getConfigKey());
 			}
@@ -306,18 +312,22 @@ implements SessionBean
 	{
 		// TODO: Better check if platform initialized. Propose on birt forum.
 		if (true) {
-			RAPlatformContext platformContext = new RAPlatformContext();
 			JFireServerManager jfireServerManager = getJFireServerManager();
 			try {
 				try {
-					System.setProperty(
-							Platform.PROPERTY_BIRT_HOME,
-							Utils.addFinalSlash(
-									jfireServerManager.getJFireServerConfigModule()
-									.getJ2ee().getJ2eeDeployBaseDirectory())+
-									"JFireReporting.ear"+File.separator+"birt"+File.separator
-					);
-					Platform.initialize(platformContext);
+					String birtHome = Utils.addFinalSlash(
+							jfireServerManager.getJFireServerConfigModule()
+							.getJ2ee().getJ2eeDeployBaseDirectory())+
+							"JFireReporting.ear"+File.separator+"birt"+File.separator;
+ 
+					System.setProperty(Platform.PROPERTY_BIRT_HOME, birtHome);
+					PlatformConfig config = new PlatformConfig();
+					config.setProperty(Platform.PROPERTY_BIRT_HOME, birtHome);
+					
+					RAPlatformContext platformContext = new RAPlatformContext(birtHome);
+					config.setPlatformContext(platformContext);
+					Platform.startup(config);
+//					Platform.initialize(platformContext);
 				} catch (Throwable t) {			
 					LOGGER.log(Level.ERROR, "Initializing BIRT Platform failed!", t);
 				}
@@ -446,6 +456,8 @@ implements SessionBean
 	}
 	
 	/**
+	 * TODO: This can be done in the client = speedup
+	 * 
 	 * @throws ModuleException
 	 *
 	 * @ejb.interface-method
@@ -481,6 +493,50 @@ implements SessionBean
 				parameters
 			);
 	}
+	
+	/**
+	 * @throws ModuleException
+	 *
+	 * @ejb.interface-method
+	 * @ejb.permission role-name="_Guest_"
+	 * @ejb.transaction type = "Required"
+	 */
+	public IResultSetMetaData getJFSResultSetMetaData(ScriptRegistryItemID scriptRegistryItemID)
+	throws ModuleException
+	{
+		PersistenceManager pm = getPersistenceManager();
+		try {
+			return ServerJFSQueryProxy.getJFSResultSetMetaData(pm, scriptRegistryItemID);
+		} finally {
+			pm.close();
+		}
+	}
+	
+	/**
+	 * @throws ModuleException
+	 *
+	 * @ejb.interface-method
+	 * @ejb.permission role-name="_Guest_"
+	 * @ejb.transaction type = "Required"
+	 */
+	public IResultSet getJFSResultSet(
+			ScriptRegistryItemID scriptRegistryItemID,
+			Map parameters
+		)
+	throws ModuleException
+	{
+		PersistenceManager pm = getPersistenceManager();
+		try {
+			return ServerJFSQueryProxy.getJFSResultSet(
+					pm,
+					scriptRegistryItemID,
+					parameters
+			);
+		} finally {
+			pm.close();
+		}
+	}
+	
 	
 	
 	/**

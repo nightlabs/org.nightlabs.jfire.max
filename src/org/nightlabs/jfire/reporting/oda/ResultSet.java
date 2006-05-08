@@ -43,23 +43,22 @@ import org.eclipse.datatools.connectivity.oda.IClob;
 import org.eclipse.datatools.connectivity.oda.IResultSet;
 import org.eclipse.datatools.connectivity.oda.IResultSetMetaData;
 import org.eclipse.datatools.connectivity.oda.OdaException;
-
 import org.nightlabs.jfire.reporting.oda.jdojs.JDOJSResultSetMetaData;
 
 
 /**
- * Common type for all oda resultsets in JFireBase.
+ * Common type for all oda resultsets in JFireReporting.
  * 
  * @author Alexander Bieber <alex[AT]nightlabs[DOT]de>
  *
  */
 public abstract class ResultSet implements IResultSet, Serializable {
 
-	private Collection collection;
+	private Collection<Object> collection;
 	private transient Iterator iterator;
 	private int currPos = 0;
 	private Object currRow = null;
-	private List currRowCols = null;
+	private List<Object> currRowCols = null;
 	private ResultSetMetaData metaData = null;
 	
 	
@@ -71,7 +70,7 @@ public abstract class ResultSet implements IResultSet, Serializable {
 		return collection;
 	}
 	
-	protected void setCollection(Collection collection) {
+	protected void setCollection(Collection<Object> collection) {
 		this.collection = collection;
 	}
 	
@@ -115,6 +114,7 @@ public abstract class ResultSet implements IResultSet, Serializable {
 	/* (non-Javadoc)
 	 * @see org.eclipse.datatools.connectivity.oda.IResultSet#next()
 	 */
+	@SuppressWarnings("unchecked")
 	public boolean next() throws OdaException {
 		if (iterator == null)
 			return false;
@@ -152,6 +152,7 @@ public abstract class ResultSet implements IResultSet, Serializable {
 		return currRowCols.get(index - 1);
 	}
 	
+	@SuppressWarnings("unchecked")
 	private Object checkColObject(int index, Class objectClass) throws OdaException {
 		Object o = getColObject(index);
 		if (o != null) {
@@ -321,20 +322,20 @@ public abstract class ResultSet implements IResultSet, Serializable {
 		currentAddRow = null;
 	}
 	
-	private Collection getCreateCollection() {
+	private Collection<Object> getCreateCollection() {
 		if (collection == null)
-			collection = new LinkedList();
+			collection = new LinkedList<Object>();
 		return collection;
 	}
 	
-	private transient List currentAddRow = null;
+	private transient List<Object> currentAddRow = null;
 	
 	/**
 	 * Adds a new row to the dataSet. A row must be populated
 	 * with columns by {@link #addColumn(Object)}.
 	 */
 	public void addRow() {
-		Collection col = getCreateCollection();
+		Collection<Object> col = getCreateCollection();
 		IResultSetMetaData metaData = null;
 		int metaDataColCount = 0;
 		try {
@@ -352,12 +353,12 @@ public abstract class ResultSet implements IResultSet, Serializable {
 				throw new IllegalStateException("Could not add row. MetaData is not set");
 		}
 		
-		List row = null;
+		List<Object> row = null;
 		try {
 			if (getMetaData() != null)
-				row = new ArrayList(getMetaData().getColumnCount());
+				row = new ArrayList<Object>(getMetaData().getColumnCount());
 			else
-				row = new ArrayList();
+				row = new ArrayList<Object>();
 		} catch (OdaException e) {
 			throw new RuntimeException(e);
 		}
@@ -395,7 +396,7 @@ public abstract class ResultSet implements IResultSet, Serializable {
 	 * columns
 	 */
 	public void addRow(Object[] columns) {
-		Collection col = getCreateCollection();
+		Collection<Object> col = getCreateCollection();
 		int mColCount = 0;
 		try {
 			mColCount = getMetaData().getColumnCount();
@@ -405,7 +406,7 @@ public abstract class ResultSet implements IResultSet, Serializable {
 		if (columns.length != mColCount)
 			throw new IllegalArgumentException("ColumnCount of metaData("+mColCount+") does not match count of objects for curren row ("+columns.length+")");
 		
-		List row = new ArrayList(columns.length);
+		List<Object> row = new ArrayList<Object>(columns.length);
 		for (int i = 0; i < columns.length; i++) {
 			checkCol(i+1, columns[i]);
 			row.add(columns[i]);

@@ -40,13 +40,14 @@ import org.eclipse.datatools.connectivity.oda.OdaException;
  * @author Alexander Bieber <alex[AT]nightlabs[DOT]de>
  *
  */
-public abstract class JDOConnection implements IConnection {
+public abstract class Connection implements IConnection {
 	
 	public static final String PROPERTY_ORGANISATION_ID = "organisationID";
 	
 	private Map currentProperties;
+	private Object appContext;
 	
-	protected Map getCurrentProperties() {
+	public Map getConnectionProperties() {
 		return currentProperties;
 	}
 	/* (non-Javadoc)
@@ -61,31 +62,36 @@ public abstract class JDOConnection implements IConnection {
 	 * @see org.eclipse.datatools.connectivity.oda.IConnection#setAppContext(java.lang.Object)
 	 */
 	public void setAppContext(Object context) throws OdaException {
-		// TODO Auto-generated method stub
+		this.appContext = context;
+	}
+	
+	/**
+	 * Returns the appContext set by {@link #setAppContext(Object)}
+	 */
+	public Object getAppContext() {
+		return appContext;
 	}
 
 	/* (non-Javadoc)
 	 * @see org.eclipse.datatools.connectivity.oda.IConnection#close()
 	 */
 	public void close() throws OdaException {
-		// TODO Auto-generated method stub
-
 	}
 
 	/* (non-Javadoc)
 	 * @see org.eclipse.datatools.connectivity.oda.IConnection#isOpen()
 	 */
 	public boolean isOpen() throws OdaException {
-		// TODO Auto-generated method stub
 		return currentProperties != null;
 	}
 
-	/* (non-Javadoc)
+	/**
+	 * Does nothing.
 	 * @see org.eclipse.datatools.connectivity.oda.IConnection#getMetaData(java.lang.String)
 	 */
 	public IDataSetMetaData getMetaData(String dataSetType) throws OdaException {
 		// TODO Auto-generated method stub
-		return null;
+		return new ConnectionMetaData(this);
 	}
 
 	/* (non-Javadoc)

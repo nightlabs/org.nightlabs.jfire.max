@@ -75,8 +75,8 @@ public abstract class ResultSetMetaData implements IResultSetMetaData, Serializa
 	}
 	
 	
-	private Map columns = new HashMap();
-	private Map colIdxByNames = new HashMap();
+	private Map<Integer, Column> columns = new HashMap<Integer, Column>();
+	private Map<String, Integer> colIdxByNames = new HashMap<String, Integer>();
 	
 	/**
 	 * Returns the Column for the given 1-based 

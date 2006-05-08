@@ -43,6 +43,12 @@ import org.eclipse.birt.core.framework.IPlatformContext;
  */
 public class RAPlatformContext implements IPlatformContext {
 
+	private String root;
+	
+	public RAPlatformContext(String root) {
+		this.root = root;
+	}
+	
 	/* (non-Javadoc)
 	 * @see org.eclipse.birt.core.framework.IPlatformContext#getFileList(java.lang.String, java.lang.String, boolean, boolean)
 	 */
@@ -96,6 +102,10 @@ public class RAPlatformContext implements IPlatformContext {
 		} catch (MalformedURLException e) {
 			throw new IllegalArgumentException("URL malformed for "+folder+File.pathSeparator+fileName);
 		}
+	}
+
+	public String getPlatform() {
+		return root;
 	}
 
 }

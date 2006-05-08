@@ -27,17 +27,15 @@
 package org.nightlabs.jfire.reporting.oda.jdoql;
 
 import org.eclipse.datatools.connectivity.oda.IConnection;
-import org.eclipse.datatools.connectivity.oda.IDriver;
-import org.eclipse.datatools.connectivity.oda.LogConfiguration;
 import org.eclipse.datatools.connectivity.oda.OdaException;
+import org.nightlabs.jfire.reporting.oda.Driver;
 
 /**
  * @author Alexander Bieber <alex[AT]nightlabs[DOT]de>
  *
  */
-public abstract class AbstractJDOQLDriver implements IDriver {
+public abstract class AbstractJDOQLDriver extends Driver {
 
-	private Object appContext;
 	private IJDOQueryProxyFactory proxyFactory;
 	
 	public AbstractJDOQLDriver() {
@@ -62,30 +60,4 @@ public abstract class AbstractJDOQLDriver implements IDriver {
 		return new JDOQLConnection(getProxyFactory());
 	}
 
-	/*
-	 *  (non-Javadoc)
-	 * @see org.eclipse.datatools.connectivity.oda.IDriver#setLogConfiguration(org.eclipse.datatools.connectivity.oda.LogConfiguration)
-	 */
-	public void setLogConfiguration(LogConfiguration logConfig) throws OdaException {
-	}
-
-	/*
-	 *  (non-Javadoc)
-	 * @see org.eclipse.datatools.connectivity.oda.IDriver#getMaxConnections()
-	 */
-	public int getMaxConnections() throws OdaException {
-		return 0;
-	}
-
-	/*
-	 *  (non-Javadoc)
-	 * @see org.eclipse.datatools.connectivity.oda.IDriver#setAppContext(java.lang.Object)
-	 */
-	public void setAppContext(Object context) throws OdaException {
-		this.appContext = context;
-		if (appContext instanceof IJDOQueryProxyFactory)
-			this.proxyFactory = (IJDOQueryProxyFactory)appContext;
-		else
-			this.proxyFactory = null;
-	}
 }

@@ -8,6 +8,11 @@
 			archive="JFireBaseBean.jar"
 			bean="jfire/ejb/JFireBaseBean/ConfigManager"
 			method="initialize" />
+		<depends
+			module="JFireScripting.ear"
+			archive="JFireScripting.jar"
+			bean="jfire/ejb/JFireScripting/ScriptManager"
+			method="initialize" />
 	</init>
 	
 </datastore-initialization>

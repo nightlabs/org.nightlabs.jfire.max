@@ -63,7 +63,6 @@ import org.nightlabs.jdo.NLJDOHelper;
 import org.nightlabs.jdo.moduleregistry.ModuleMetaData;
 import org.nightlabs.jfire.base.BaseSessionBeanImpl;
 import org.nightlabs.jfire.config.Config;
-import org.nightlabs.jfire.config.ConfigModule;
 import org.nightlabs.jfire.config.ConfigSetup;
 import org.nightlabs.jfire.config.UserConfigSetup;
 import org.nightlabs.jfire.reporting.config.ReportLayoutConfigModule;
@@ -83,6 +82,7 @@ import org.nightlabs.jfire.reporting.oda.jfs.server.ServerJFSQueryProxy;
 import org.nightlabs.jfire.reporting.platform.RAPlatformContext;
 import org.nightlabs.jfire.reporting.platform.ReportingManager;
 import org.nightlabs.jfire.reporting.platform.ReportingManagerFactory;
+import org.nightlabs.jfire.reporting.scripting.ScriptingInitializer;
 import org.nightlabs.jfire.scripting.id.ScriptRegistryItemID;
 import org.nightlabs.jfire.servermanager.JFireServerManager;
 import org.nightlabs.util.Utils;
@@ -299,6 +299,12 @@ implements SessionBean
 			);
 	}
 	
+	private void initRegisterScripts(PersistenceManager pm, JFireServerManager jfireServerManager) 
+	throws ModuleException 
+	{
+		ScriptingInitializer.initialize(pm, jfireServerManager, getOrganisationID());		
+	}
+	
 	/**
 	 * This method is called by the datastore initialization mechanism.
 	 * 
@@ -350,6 +356,10 @@ implements SessionBean
 		pm = getPersistenceManager();
 		JFireServerManager jfireServerManager = getJFireServerManager();
 		try {
+			
+			// Init scripts before module metat data check
+			initRegisterScripts(pm, jfireServerManager);
+			
 			
 			ModuleMetaData moduleMetaData = ModuleMetaData.getModuleMetaData(pm, JFireReportingEAR.MODULE_NAME);
 			if (moduleMetaData == null) {

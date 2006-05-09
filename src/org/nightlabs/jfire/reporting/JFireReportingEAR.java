@@ -26,11 +26,14 @@
 
 package org.nightlabs.jfire.reporting;
 
+import java.io.File;
+
 import javax.naming.InitialContext;
 import javax.naming.NamingException;
 
 import org.nightlabs.ModuleException;
 import org.nightlabs.jfire.base.Lookup;
+import org.nightlabs.jfire.servermanager.JFireServerManager;
 import org.nightlabs.jfire.servermanager.j2ee.SecurityReflector;
 import org.nightlabs.jfire.servermanager.j2ee.SecurityReflector.UserDescriptor;
 
@@ -56,5 +59,16 @@ public class JFireReportingEAR {
 		Lookup lookup = null;
 		lookup = new Lookup(userDescriptor.getOrganisationID());
 		return lookup;
+	}
+	
+	public static File getEARDir(JFireServerManager jfireServerManager) 
+	throws ModuleException 
+	{
+		File earDir = new File(
+				jfireServerManager.getJFireServerConfigModule()
+				.getJ2ee().getJ2eeDeployBaseDirectory()+
+				"JFireReporting.ear"
+			);
+		return earDir;
 	}
 }

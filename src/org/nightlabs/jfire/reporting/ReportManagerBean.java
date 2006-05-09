@@ -169,7 +169,8 @@ implements SessionBean
 			Collection configs = Config.getConfigsByType(pm, getOrganisationID(), UserConfigSetup.CONFIG_TYPE_USER_CONFIG);
 			for (Iterator iter = configs.iterator(); iter.hasNext();) {
 				Config config = (Config) iter.next();
-				ReportLayoutConfigModule configModule = (ReportLayoutConfigModule)ConfigModule.getAutoCreateConfigModule(pm, config, ReportLayoutConfigModule.class, null);
+				ReportLayoutConfigModule configModule = (ReportLayoutConfigModule)config.createConfigModule(ReportLayoutConfigModule.class, null);
+//				ReportLayoutConfigModule configModule = (ReportLayoutConfigModule)ConfigModule.getAutoCreateConfigModule(pm, config, ReportLayoutConfigModule.class, null);
 				configModule.getAvailEntry(catType).setDefaultReportLayoutKey(JDOHelper.getObjectId(layout).toString());
 				LOGGER.info("Set default for ReportLayoutConfigModule for category "+catType+" and Config "+config.getConfigKey());
 			}

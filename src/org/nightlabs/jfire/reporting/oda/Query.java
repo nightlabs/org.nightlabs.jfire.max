@@ -16,7 +16,6 @@ import org.eclipse.datatools.connectivity.oda.IParameterMetaData;
 import org.eclipse.datatools.connectivity.oda.IQuery;
 import org.eclipse.datatools.connectivity.oda.OdaException;
 import org.eclipse.datatools.connectivity.oda.SortSpec;
-import org.jpox.poid.MaxPoidGenerator;
 
 /**
  * @author Alexander Bieber <alex [AT] nightlabs [DOT] de>

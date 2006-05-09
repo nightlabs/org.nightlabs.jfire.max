@@ -1,5 +1,6 @@
 package org.nightlabs.jfire.trade;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.GregorianCalendar;
 import java.util.List;
@@ -22,6 +23,7 @@ import org.nightlabs.jdo.ObjectIDUtil;
  * @jdo.create-objectid-class field-order="organisationID, idPrefixCfID"
  */
 public class IDPrefixCf
+implements Serializable
 {
 	/**
 	 * Use the current year automatically without asking the user.

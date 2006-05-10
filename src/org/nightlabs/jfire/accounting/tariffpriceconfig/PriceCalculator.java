@@ -41,7 +41,8 @@ import org.mozilla.javascript.Undefined;
 import org.nightlabs.ModuleException;
 import org.nightlabs.jfire.accounting.PriceFragmentType;
 import org.nightlabs.jfire.accounting.priceconfig.IPriceConfig;
-import org.nightlabs.jfire.accounting.priceconfig.IPriceConfigIDProvider;
+import org.nightlabs.jfire.accounting.priceconfig.PriceConfig;
+import org.nightlabs.jfire.idgenerator.IDGenerator;
 import org.nightlabs.jfire.store.NestedProductType;
 import org.nightlabs.jfire.store.ProductType;
 
@@ -100,11 +101,11 @@ public class PriceCalculator
 	 */
 	protected Map resolvableProductTypes = null;
 
-	public void preparePriceCalculation(IPriceConfigIDProvider priceConfigIDProvider)
+	public void preparePriceCalculation()
 	throws ModuleException
 	{
 		preparePriceCalculation_createResolvableProductTypesMap(); // must be first to create virtualPackagedProductTypes
-		preparePriceCalculation_createPackagedResultPriceConfigs(priceConfigIDProvider);
+		preparePriceCalculation_createPackagedResultPriceConfigs();
 //		preparePriceCalculation_adoptPackagePriceConfigParams();
 	}
 
@@ -122,24 +123,24 @@ public class PriceCalculator
 //		}
 //	}
 	
-	protected IResultPriceConfig createResultPriceConfig(IPriceConfigIDProvider priceConfigIDProvider)
+	protected IResultPriceConfig createResultPriceConfig()
 	throws ModuleException
 	{
 		return new StablePriceConfig(
-				priceConfigIDProvider.getOrganisationID(),
-				priceConfigIDProvider.createPriceConfigID());
+				IDGenerator.getOrganisationID(),
+				PriceConfig.createPriceConfigID());
 	}
 
 	/**
 	 * This method creates an instance of IResultPriceConfig
-	 * by calling {@link #createResultPriceConfig(IPriceConfigIDProvider)} for
+	 * by calling {@link #createResultPriceConfig()} for
 	 * each internal FormulaPriceConfig to persistently store
 	 * the results of the formulas in the current context, if it does
 	 * not yet exist. Additionally, it adopts the parameters.
 	 *
 	 * @throws ModuleException
 	 */
-	public void preparePriceCalculation_createPackagedResultPriceConfigs(IPriceConfigIDProvider priceConfigIDProvider)
+	public void preparePriceCalculation_createPackagedResultPriceConfigs()
 	throws ModuleException
 	{
 //	 Create an instance of StablePriceConfig for each FormulaPriceConfig
@@ -166,7 +167,7 @@ public class PriceCalculator
 					resultPriceConfig.resetPriceFragmentCalculationStati();
 				}
 				else {
-					resultPriceConfig = createResultPriceConfig(priceConfigIDProvider);
+					resultPriceConfig = createResultPriceConfig();
 //							this.getOrganisationID(),
 //							this.getProductID()
 //							+ '-'

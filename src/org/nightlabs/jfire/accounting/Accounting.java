@@ -53,7 +53,7 @@ import org.nightlabs.jfire.accounting.pay.PaymentResult;
 import org.nightlabs.jfire.accounting.pay.ServerPaymentProcessor;
 import org.nightlabs.jfire.accounting.pay.ServerPaymentProcessor.PayParams;
 import org.nightlabs.jfire.accounting.pay.id.ServerPaymentProcessorID;
-import org.nightlabs.jfire.accounting.priceconfig.IPriceConfigIDProvider;
+import org.nightlabs.jfire.accounting.priceconfig.PriceConfig;
 import org.nightlabs.jfire.config.Config;
 import org.nightlabs.jfire.idgenerator.IDGenerator;
 import org.nightlabs.jfire.organisation.LocalOrganisation;
@@ -83,7 +83,7 @@ import org.nightlabs.jfire.transfer.id.AnchorID;
  * @jdo.inheritance strategy="new-table"
  */
 public class Accounting
-	implements TransferRegistry, IPriceConfigIDProvider, StoreCallback, MoneyFlowMapping.Registry
+	implements TransferRegistry, StoreCallback, MoneyFlowMapping.Registry
 {
 	public static final Logger LOGGER = Logger.getLogger(Accounting.class);
 
@@ -105,7 +105,7 @@ public class Accounting
 		String organisationID = LocalOrganisation.getLocalOrganisation(pm).getOrganisationID();
 		accounting.organisationID = organisationID;
 		accounting.mandator = OrganisationLegalEntity.getOrganisationLegalEntity(pm, organisationID, OrganisationLegalEntity.ANCHOR_TYPE_ID_ORGANISATION, true); // new OrganisationLegalEntity(localOrganisation.getOrganisation());
-		accounting.accountingPriceConfig = new AccountingPriceConfig(organisationID, accounting.createPriceConfigID());
+		accounting.accountingPriceConfig = new AccountingPriceConfig(organisationID, PriceConfig.createPriceConfigID());
 		accounting.localAccountant = new LocalAccountant(accounting.mandator, LocalAccountant.class.getName());
 		accounting.mandator.setAccountant(accounting.localAccountant);
 		accounting.partnerAccountant = new PartnerAccountant(organisationID, PartnerAccountant.class.getName());
@@ -232,24 +232,6 @@ public class Accounting
 		}
 	}
 /////////// end implementation of TransferRegistry /////////////
-
-	/**
-	 * @jdo.field persistence-modifier="persistent"
-	 */	
-	private long nextPriceConfigID = 0;
-	private static long _nextPriceConfigID = -1;
-	private static Object _nextPriceConfigIDMutex = new Object();
-
-	public long createPriceConfigID() {
-		synchronized (_nextPriceConfigIDMutex) {
-			if (_nextPriceConfigID < 0)
-				_nextPriceConfigID = nextPriceConfigID;
-
-			long res = _nextPriceConfigID++;
-			nextPriceConfigID = _nextPriceConfigID;
-			return res;
-		}
-	}
 
 	/**
 	 * @jdo.field persistence-modifier="persistent"
@@ -1009,9 +991,6 @@ public class Accounting
 
 		if (_nextTransferID >= 0 && nextTransferID != _nextTransferID)
 			nextTransferID = _nextTransferID;
-
-		if (_nextPriceConfigID >= 0 && nextPriceConfigID != _nextPriceConfigID)
-			nextPriceConfigID = _nextPriceConfigID;
 
 		if (_nextPriceCoordinateID >= 0 && nextPriceCoordinateID != _nextPriceCoordinateID)
 			nextPriceCoordinateID = _nextPriceCoordinateID;

@@ -37,6 +37,7 @@ import javax.jdo.listener.StoreCallback;
 
 import org.nightlabs.jfire.accounting.Currency;
 import org.nightlabs.jfire.accounting.PriceFragmentType;
+import org.nightlabs.jfire.idgenerator.IDGenerator;
 import org.nightlabs.jfire.trade.Article;
 import org.nightlabs.jfire.trade.ArticlePrice;
 
@@ -72,6 +73,10 @@ public abstract class PriceConfig implements Serializable, StoreCallback, IPrice
 	public static final String FETCH_GROUP_CURRENCIES = "PriceConfig.currencies";
 	public static final String FETCH_GROUP_NAME = "PriceConfig.name";
 	public static final String FETCH_GROUP_PRICE_FRAGMENT_TYPES = "PriceConfig.priceFragmentTypes";
+
+	public static long createPriceConfigID() {
+		return IDGenerator.nextID(PriceConfig.class.getName());
+	}
 	
 	/**
 	 * @jdo.field primary-key="true"

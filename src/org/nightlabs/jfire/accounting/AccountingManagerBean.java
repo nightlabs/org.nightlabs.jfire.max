@@ -1037,24 +1037,7 @@ public abstract class AccountingManagerBean
 			pm.close();
 		}
 	}
-	
-	/**
-	 * @throws ModuleException
-	 *
-	 * @ejb.interface-method
-	 * @ejb.transaction type = "Required"
-	 * @ejb.permission role-name="_Guest_"
-	 */
-	public long createPriceConfigID()
-		throws ModuleException
-	{
-		PersistenceManager pm = getPersistenceManager();
-		try {
-			return Accounting.getAccounting(pm).createPriceConfigID();
-		} finally {
-			pm.close();
-		}
-	}
+
 
 	/**
 	 * Creates an Invoice for all specified <code>Article</code>s. If

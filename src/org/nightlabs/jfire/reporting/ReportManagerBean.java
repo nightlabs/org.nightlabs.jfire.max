@@ -78,11 +78,13 @@ import org.nightlabs.jfire.reporting.oda.jdojs.server.ServerJDOJSProxy;
 import org.nightlabs.jfire.reporting.oda.jdoql.JDOQLMetaDataParser;
 import org.nightlabs.jfire.reporting.oda.jdoql.JDOQLResultSetMetaData;
 import org.nightlabs.jfire.reporting.oda.jdoql.server.ServerJDOQLProxy;
+import org.nightlabs.jfire.reporting.oda.jfs.ScriptExecutorJavaClassReporting;
 import org.nightlabs.jfire.reporting.oda.jfs.server.ServerJFSQueryProxy;
 import org.nightlabs.jfire.reporting.platform.RAPlatformContext;
 import org.nightlabs.jfire.reporting.platform.ReportingManager;
 import org.nightlabs.jfire.reporting.platform.ReportingManagerFactory;
 import org.nightlabs.jfire.reporting.scripting.ScriptingInitializer;
+import org.nightlabs.jfire.scripting.ScriptRegistry;
 import org.nightlabs.jfire.scripting.id.ScriptRegistryItemID;
 import org.nightlabs.jfire.servermanager.JFireServerManager;
 import org.nightlabs.util.Utils;
@@ -302,6 +304,11 @@ implements SessionBean
 	private void initRegisterScripts(PersistenceManager pm, JFireServerManager jfireServerManager) 
 	throws ModuleException 
 	{
+		try {
+			ScriptRegistry.getScriptRegistry(pm).registerScriptExecutorClass(ScriptExecutorJavaClassReporting.class);
+		} catch (Exception e) {
+			throw new ModuleException(e);
+		}
 		ScriptingInitializer.initialize(pm, jfireServerManager, getOrganisationID());		
 	}
 	

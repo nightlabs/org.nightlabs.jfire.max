@@ -66,6 +66,10 @@ public class ServerJFSQueryProxy extends AbstractJFSQueryProxy {
 		}
 	}
 	
+	private static Script getScript(PersistenceManager pm, ScriptRegistryItemID itemID) {
+		return validateScriptRegistryItem((ScriptRegistryItem) pm.getObjectById(itemID));
+	}
+	
 	private static Script validateScriptRegistryItem(ScriptRegistryItem item) {
 		if (item == null)
 			throw new NullPointerException("The ScriptRegistryItem is null ");
@@ -73,12 +77,11 @@ public class ServerJFSQueryProxy extends AbstractJFSQueryProxy {
 			throw new IllegalArgumentException("The ScriptRegistryItem is not an instance or subclass of Script, but "+item.getClass().getName());
 		
 		return (Script)item;
-	}
+	}	
 	
-	private static ReportingScriptExecutor getReportingScriptExecutor(PersistenceManager pm, ScriptRegistryItemID scriptRegistryItemID)
+	private static ReportingScriptExecutor getReportingScriptExecutor(PersistenceManager pm, Script script)
 	throws ModuleException
 	{
-		Script script = validateScriptRegistryItem((ScriptRegistryItem) pm.getObjectById(scriptRegistryItemID));
 		ScriptExecutor executor = null;
 		try {
 			executor = ScriptRegistry.getScriptRegistry(pm).createScriptExecutor(script.getLanguage());
@@ -103,7 +106,7 @@ public class ServerJFSQueryProxy extends AbstractJFSQueryProxy {
 		}
 	}
 	
-	public static IResultSet getJFSResultSet(ScriptRegistryItemID scriptRegistryItemID, Map parameters)
+	public static IResultSet getJFSResultSet(ScriptRegistryItemID scriptRegistryItemID, Map<String, Object> parameters)
 	throws ModuleException
 	{
 		Lookup lookup = JFireReportingEAR.getLookup();
@@ -119,12 +122,14 @@ public class ServerJFSQueryProxy extends AbstractJFSQueryProxy {
 	public static IResultSetMetaData getJFSResultSetMetaData(PersistenceManager pm, ScriptRegistryItemID scriptRegistryItemID)
 	throws ModuleException
 	{
-		return getReportingScriptExecutor(pm, scriptRegistryItemID).getResultSetMetaData();
+		Script script = getScript(pm, scriptRegistryItemID);
+		return getReportingScriptExecutor(pm, script).getResultSetMetaData(script);
 	}
 
-	public static IResultSet getJFSResultSet(PersistenceManager pm, ScriptRegistryItemID scriptRegistryItemID, Map parameters)
+	public static IResultSet getJFSResultSet(PersistenceManager pm, ScriptRegistryItemID scriptRegistryItemID, Map<String, Object> parameters)
 	throws ModuleException
 	{
-		return getReportingScriptExecutor(pm, scriptRegistryItemID).getResultSet(parameters);
+		Script script = getScript(pm, scriptRegistryItemID);
+		return getReportingScriptExecutor(pm, script).getResultSet(script, parameters);
 	}
 }

@@ -46,6 +46,7 @@ import org.nightlabs.jfire.accounting.book.fragmentbased.PFMoneyFlowMapping;
 import org.nightlabs.jfire.accounting.id.CurrencyID;
 import org.nightlabs.jfire.accounting.id.PriceFragmentTypeID;
 import org.nightlabs.jfire.accounting.priceconfig.IInnerPriceConfig;
+import org.nightlabs.jfire.accounting.priceconfig.PriceConfig;
 import org.nightlabs.jfire.accounting.tariffpriceconfig.FormulaCell;
 import org.nightlabs.jfire.accounting.tariffpriceconfig.FormulaPriceConfig;
 import org.nightlabs.jfire.accounting.tariffpriceconfig.PriceCalculator;
@@ -145,7 +146,7 @@ public class DataCreator
 		SimpleProductType pt = new SimpleProductType(
 				organisationID, productTypeID, category, null, ProductType.INHERITANCE_NATURE_LEAF, ProductType.PACKAGE_NATURE_OUTER);
 		pt.getName().setText(Locale.ENGLISH.getLanguage(), name);
-		pt.setPackagePriceConfig(new StablePriceConfig(organisationID, accounting.createPriceConfigID()));
+		pt.setPackagePriceConfig(new StablePriceConfig(organisationID, PriceConfig.createPriceConfigID()));
 		pt.setInnerPriceConfig(innerPriceConfig);
 		store.addProductType(user, pt, SimpleProductTypeActionHandler.getDefaultHome(pm, pt));
 
@@ -166,14 +167,14 @@ public class DataCreator
 				((StablePriceConfig)pt.getPackagePriceConfig()).adoptParameters(pt.getInnerPriceConfig());
 
 			PriceCalculator priceCalculator = new PriceCalculator(pt);
-			priceCalculator.preparePriceCalculation(accounting);
+			priceCalculator.preparePriceCalculation();
 			priceCalculator.calculatePrices();
 		}
 	}
 
 	public IInnerPriceConfig createInnerPercentagePriceConfig(String name, int percentage, ProductType packageProductType)
 	{
-		FormulaPriceConfig formulaPriceConfig = new FormulaPriceConfig(organisationID, accounting.createPriceConfigID());
+		FormulaPriceConfig formulaPriceConfig = new FormulaPriceConfig(organisationID, PriceConfig.createPriceConfigID());
 		PriceFragmentType vatNet = (PriceFragmentType) pm.getObjectById(PriceFragmentTypeID.create(rootOrganisationID, "vat-de-16-net"));
 		PriceFragmentType vatVal = (PriceFragmentType) pm.getObjectById(PriceFragmentTypeID.create(rootOrganisationID, "vat-de-16-val"));
 		formulaPriceConfig.addProductType(packageProductType);
@@ -288,8 +289,8 @@ public class DataCreator
 
 		Accounting accounting = Accounting.getAccounting(pm);
 		Trader trader = Trader.getTrader(pm);
-		StablePriceConfig stablePriceConfig = new StablePriceConfig(organisationID, accounting.createPriceConfigID());
-		FormulaPriceConfig formulaPriceConfig = new FormulaPriceConfig(organisationID, accounting.createPriceConfigID());
+		StablePriceConfig stablePriceConfig = new StablePriceConfig(organisationID, PriceConfig.createPriceConfigID());
+		FormulaPriceConfig formulaPriceConfig = new FormulaPriceConfig(organisationID, PriceConfig.createPriceConfigID());
 		formulaPriceConfig.getName().setText(languageID, name);
 		
 		CustomerGroup customerGroupDefault = trader.getDefaultCustomerGroupForKnownCustomer();

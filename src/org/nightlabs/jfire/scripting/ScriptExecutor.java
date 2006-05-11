@@ -82,25 +82,6 @@ public abstract class ScriptExecutor
 	public final void prepare(Script script, Map<String, Object> parameterValues)
 		throws ScriptException
 	{
-		prepare(script, parameterValues, true);
-	}
-	
-	/**
-	 * This is a shortcut for preparing the executor without knowing
-	 * parameterValues yet (use with validateParams = false).
-	 * Subclasses may use this in combination with {@link #setParameterValues(Map)}.
-	 * 
-	 * @param script The script that shall be executed.
-	 * @param parameterValues The parameter values or <code>null</code>, if no
-	 *		parameters are required.
-	 * @param validateParams Whether to validate parameters or not
-	 * @throws ScriptException If sth. goes wrong while preparing. Especially
-	 *		{@link UndefinedParameterValueException}s and {@link UndeclaredParameterException}s
-	 *		might happen.
-	 */
-	protected void prepare(Script script, Map<String, Object> parameterValues, boolean validateParams) 
-		throws ScriptException
-	{
 		preparing = true;
 		try {
 			if (script == null)
@@ -113,8 +94,7 @@ public abstract class ScriptExecutor
 	
 			this.parameterValues = parameterValues;
 	
-			if (validateParams)
-				validateParameters();
+			validateParameters();
 			doPrepare();
 			prepared = true;
 		} finally {
@@ -122,24 +102,6 @@ public abstract class ScriptExecutor
 		}
 	}
 	
-	/**
-	 * Sets and validates the parameterValues for the execution of a script.
-	 * Use this only if you don't know parameters when calling {@link #prepare(Script, Map)}
-	 * and you have to use {@link #prepare(Script, Map, boolean)}.
-	 *  
-	 * @param parameterValues The parameterValues to set or <code>null</code> if none needed
-	 * @throws ScriptException Thrown when validation fails
-	 */
-	protected void setParameterValues(Map<String, Object> parameterValues) 
-		throws ScriptException 
-	{
-		if (parameterValues == null)
-			parameterValues = new HashMap<String, Object>(0);
-
-		this.parameterValues = parameterValues;
-		validateParameters();
-	}
-
 	/**
 	 * Called on {@link #prepare(Script, Map)} after the 
 	 * validation of parameters.
@@ -212,8 +174,12 @@ public abstract class ScriptExecutor
 
 		// get the defined parameter values and put them into "undeclared" set,
 		// because we will remove all that are declared.
-		Set<String> undeclaredParameterIDs = new HashSet<String>(getParameterValues().keySet());
-
+		Set<String> undeclaredParameterIDs = null;
+		if (getParameterValues() != null)
+			undeclaredParameterIDs = new HashSet<String>(getParameterValues().keySet());
+		else
+			undeclaredParameterIDs = new HashSet<String>();
+		
 		undefinedParameterIDs.removeAll(undeclaredParameterIDs);
 		if (parameterSet != null)
 			undeclaredParameterIDs.removeAll(parameterSet.getParameterIDs());

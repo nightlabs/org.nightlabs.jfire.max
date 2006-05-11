@@ -1,6 +1,8 @@
 package org.nightlabs.jfire.reporting.oda.jfs;
 
+import java.util.HashMap;
 import java.util.Map;
+import java.util.Set;
 
 import org.eclipse.datatools.connectivity.oda.IResultSet;
 import org.eclipse.datatools.connectivity.oda.IResultSetMetaData;
@@ -8,6 +10,7 @@ import org.nightlabs.jfire.scripting.Script;
 import org.nightlabs.jfire.scripting.ScriptException;
 import org.nightlabs.jfire.scripting.ScriptExecutorJavaClass;
 import org.nightlabs.jfire.scripting.ScriptExecutorJavaClassDelegate;
+import org.nightlabs.jfire.scripting.ScriptParameterSet;
 
 /**
  * 
@@ -44,7 +47,16 @@ public class ScriptExecutorJavaClassReporting extends ScriptExecutorJavaClass im
 	public IResultSetMetaData getResultSetMetaData(Script script)
 	throws ScriptException
 	{
-		prepare(script, null, false);
+		ScriptParameterSet parameterSet = script.getParameterSet();
+		Map<String, Object> fakeParams = null;
+		if (parameterSet != null) {
+			Set<String> ids = parameterSet.getParameterIDs();
+			fakeParams = new HashMap<String, Object>();
+			for (String id : ids) {
+				fakeParams.put(id, this);
+			}
+		}
+		prepare(script, fakeParams);
 		return getReportingDelegate().getResultSetMetaData();
 	}
 

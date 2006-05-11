@@ -43,7 +43,6 @@ import org.eclipse.datatools.connectivity.oda.IClob;
 import org.eclipse.datatools.connectivity.oda.IResultSet;
 import org.eclipse.datatools.connectivity.oda.IResultSetMetaData;
 import org.eclipse.datatools.connectivity.oda.OdaException;
-import org.nightlabs.jfire.reporting.oda.jdojs.JDOJSResultSetMetaData;
 
 
 /**
@@ -417,10 +416,10 @@ public abstract class ResultSet implements IResultSet, Serializable {
 	private void checkCol(int index, Object col) {
 		if (col == null)
 			return;
-		JDOJSResultSetMetaData metaData = null;
+		IResultSetMetaData metaData = null;
 		int dataType = 0;
 		try {
-			metaData = (JDOJSResultSetMetaData) getMetaData();
+			metaData = (IResultSetMetaData) getMetaData();
 			dataType = metaData.getColumnType(index);
 		} catch (OdaException e) {
 			throw new IllegalStateException("Exception in checkCol while getting metaData: "+e.getClass().getName()+", message: "+e.getMessage());

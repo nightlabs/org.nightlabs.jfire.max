@@ -66,9 +66,11 @@ public abstract class Query implements IQuery {
 	public void clearParameters() {
 		parameters.clear();
 	}
-	
-	/* (non-Javadoc)
-	 * @see org.nightlabs.report.oda.jdo.IJDOQueryProxy#setParameter(java.lang.String, java.lang.Object)
+
+	/**
+	 * 
+	 * @param paramName
+	 * @param value
 	 */
 	public void setParameter(String paramName, Object value) {
 		parameters.put(getParameterID(paramName), value);

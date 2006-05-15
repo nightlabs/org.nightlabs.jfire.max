@@ -22,6 +22,7 @@ import org.eclipse.datatools.connectivity.oda.SortSpec;
 public abstract class Query implements IQuery {
 
 	private int paramMaxID = 0;
+	private ParameterMetaData parameterMetaData = null;
 	private Map<Integer, Object> parameters = new HashMap<Integer, Object>();
 	private Map<String, Integer> paramNames = new HashMap<String, Integer>();
 //	private Map<Integer, Object> 
@@ -247,14 +248,21 @@ public abstract class Query implements IQuery {
 		return null;
 	}
 	
-
 	/* (non-Javadoc)
 	 * @see org.eclipse.datatools.connectivity.oda.IQuery#getParameterMetaData()
 	 */
 	public IParameterMetaData getParameterMetaData() throws OdaException {
-		// TODO Auto-generated method stub
-		return null;
+		return parameterMetaData;
 	}
+	
+	/**
+	 * Sets the parameterMetaData.
+	 * @param parameterMetaData The parameterMetaData to set.
+	 */
+	public void setParameterMetaData(ParameterMetaData parameterMetaData) {
+		this.parameterMetaData = parameterMetaData;
+	}
+		
 	
 	/* (non-Javadoc)
 	 * @see org.eclipse.datatools.connectivity.oda.IQuery#setSortSpec(org.eclipse.datatools.connectivity.oda.SortSpec)

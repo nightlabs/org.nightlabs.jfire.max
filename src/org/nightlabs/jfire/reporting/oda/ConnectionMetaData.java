@@ -89,7 +89,7 @@ public class ConnectionMetaData implements IDataSetMetaData {
 	 */
 	public boolean supportsInParameters() throws OdaException {
 		// TODO Auto-generated method stub
-		return false;
+		return true;
 	}
 
 	/* (non-Javadoc)

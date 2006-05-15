@@ -39,8 +39,8 @@ import javax.ejb.SessionContext;
 import javax.jdo.PersistenceManager;
 
 import org.apache.log4j.Logger;
-
 import org.nightlabs.ModuleException;
+import org.nightlabs.jdo.NLJDOHelper;
 import org.nightlabs.jfire.accounting.AccountingManagerBean;
 import org.nightlabs.jfire.accounting.Price;
 import org.nightlabs.jfire.accounting.Tariff;
@@ -50,7 +50,6 @@ import org.nightlabs.jfire.accounting.priceconfig.id.PriceConfigID;
 import org.nightlabs.jfire.base.BaseSessionBeanImpl;
 import org.nightlabs.jfire.trade.CustomerGroup;
 import org.nightlabs.jfire.trade.id.CustomerGroupID;
-import org.nightlabs.jdo.NLJDOHelper;
 
 /**
  * @ejb.bean name="jfire/ejb/JFireTrade/TariffPriceConfigManager"	

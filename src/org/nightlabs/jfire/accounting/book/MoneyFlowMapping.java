@@ -34,8 +34,6 @@ import javax.jdo.PersistenceManager;
 
 import org.nightlabs.jfire.accounting.Account;
 import org.nightlabs.jfire.accounting.Currency;
-import org.nightlabs.jfire.accounting.book.LocalAccountantDelegate.ResolvedMapEntry;
-import org.nightlabs.jfire.accounting.book.LocalAccountantDelegate.ResolvedMapKey;
 import org.nightlabs.jfire.accounting.id.CurrencyID;
 import org.nightlabs.jfire.store.ProductType;
 import org.nightlabs.jfire.trade.ArticlePrice;

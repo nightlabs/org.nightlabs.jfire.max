@@ -44,7 +44,6 @@ import org.nightlabs.jfire.accounting.PriceFragmentType;
 import org.nightlabs.jfire.accounting.book.BookMoneyTransfer;
 import org.nightlabs.jfire.accounting.book.LocalAccountantDelegate;
 import org.nightlabs.jfire.accounting.book.MoneyFlowMapping;
-import org.nightlabs.jfire.accounting.book.LocalAccountantDelegate.BookInvoiceTransfer;
 import org.nightlabs.jfire.accounting.id.PriceFragmentTypeID;
 import org.nightlabs.jfire.security.User;
 import org.nightlabs.jfire.store.ProductType;

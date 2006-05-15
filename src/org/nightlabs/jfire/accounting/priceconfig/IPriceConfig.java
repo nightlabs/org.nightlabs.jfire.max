@@ -30,6 +30,7 @@ import java.util.Collection;
 import java.util.LinkedList;
 
 import org.nightlabs.jfire.accounting.Currency;
+import org.nightlabs.jfire.accounting.Price;
 import org.nightlabs.jfire.accounting.PriceFragmentType;
 import org.nightlabs.jfire.store.NestedProductType;
 import org.nightlabs.jfire.store.Product;

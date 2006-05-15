@@ -34,7 +34,6 @@ import javax.jdo.JDOHelper;
 import javax.jdo.PersistenceManager;
 import javax.jdo.Query;
 
-import org.nightlabs.jfire.accounting.MoneyTransfer;
 import org.nightlabs.jfire.security.User;
 import org.nightlabs.jfire.store.Product;
 import org.nightlabs.jfire.store.ProductTransfer;

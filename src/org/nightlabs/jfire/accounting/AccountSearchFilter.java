@@ -29,9 +29,9 @@ package org.nightlabs.jfire.accounting;
 import java.util.Map;
 import java.util.Set;
 
+import org.nightlabs.jdo.search.SearchFilter;
 import org.nightlabs.jfire.person.util.PersonSearchFilter;
 import org.nightlabs.jfire.transfer.id.AnchorID;
-import org.nightlabs.jdo.search.SearchFilter;
 
 /**
  * @author Alexander Bieber <alex[AT]nightlabs[DOT]de>

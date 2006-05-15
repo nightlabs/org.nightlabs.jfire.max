@@ -31,8 +31,8 @@ import java.util.HashMap;
 import java.util.Map;
 
 import org.nightlabs.jfire.accounting.Price;
-import org.nightlabs.jfire.accounting.priceconfig.PriceConfig;
 import org.nightlabs.jfire.accounting.priceconfig.IPriceConfig;
+import org.nightlabs.jfire.accounting.priceconfig.PriceConfig;
 
 /**
  * @author Marco Schulze - marco at nightlabs dot de

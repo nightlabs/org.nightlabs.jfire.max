@@ -27,12 +27,10 @@
 package org.nightlabs.jfire.trade;
 
 import java.io.Serializable;
-import java.util.Locale;
 
 import javax.jdo.JDOObjectNotFoundException;
 import javax.jdo.PersistenceManager;
 
-import org.nightlabs.jfire.language.Language;
 import org.nightlabs.jfire.language.id.LanguageID;
 import org.nightlabs.jfire.organisation.Organisation;
 import org.nightlabs.jfire.trade.id.SegmentTypeID;

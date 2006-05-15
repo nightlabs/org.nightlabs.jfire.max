@@ -44,7 +44,6 @@ import org.nightlabs.jfire.accounting.Accounting;
 import org.nightlabs.jfire.accounting.Currency;
 import org.nightlabs.jfire.accounting.Invoice;
 import org.nightlabs.jfire.accounting.InvoiceMoneyTransfer;
-import org.nightlabs.jfire.accounting.tariffpriceconfig.CellReflector.ResolvedPriceCell;
 import org.nightlabs.jfire.security.User;
 import org.nightlabs.jfire.store.NestedProductType;
 import org.nightlabs.jfire.store.ProductType;

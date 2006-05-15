@@ -28,8 +28,8 @@ package org.nightlabs.jfire.accounting;
 
 import java.util.LinkedList;
 
-import org.nightlabs.jfire.accounting.priceconfig.PriceConfig;
 import org.nightlabs.jfire.accounting.priceconfig.IPackagePriceConfig;
+import org.nightlabs.jfire.accounting.priceconfig.PriceConfig;
 import org.nightlabs.jfire.store.NestedProductType;
 import org.nightlabs.jfire.store.Product;
 import org.nightlabs.jfire.trade.Article;

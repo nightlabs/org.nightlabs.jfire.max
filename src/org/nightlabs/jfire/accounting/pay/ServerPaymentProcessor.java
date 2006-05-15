@@ -67,6 +67,38 @@ import org.nightlabs.jfire.transfer.id.AnchorID;
  * @jdo.fetch-group name="ServerPaymentProcessor.modeOfPaymentFlavours" fields="modeOfPaymentFlavours"
  * @jdo.fetch-group name="ServerPaymentProcessor.this" fetch-groups="default" fields="name, modeOfPayments, modeOfPaymentFlavours"
  *
+ * @!jdo.query name="getServerPaymentProcessorsForOneModeOfPaymentFlavour"
+ *            query="SELECT
+ *            	WHERE
+ *            		modeOfPaymentFlavour.organisationID == paramOrganisationID &&
+ *            		modeOfPaymentFlavour.modeOfPaymentFlavourID == paramModeOfPaymentFlavourID &&
+ *            		(
+ *            			this.modeOfPaymentFlavours.containsValue(modeOfPaymentFlavour) ||
+ *            			this.modeOfPayments.containsValue(modeOfPaymentFlavour.modeOfPayment)
+ *            		)
+ *            	VARIABLES ModeOfPaymentFlavour modeOfPaymentFlavour
+ *            	PARAMETERS String paramOrganisationID, String paramModeOfPaymentFlavourID
+ *            	import java.lang.String;
+ *            	import org.nightlabs.jfire.accounting.pay.ModeOfPaymentFlavour"
+ *
+ * @!jdo.query name="getServerPaymentProcessorsForOneModeOfPaymentFlavour"
+ *            query="SELECT
+ *            	WHERE
+ *            		(
+ *            			modeOfPaymentFlavour1.organisationID == paramOrganisationID &&
+ *            			modeOfPaymentFlavour1.modeOfPaymentFlavourID == paramModeOfPaymentFlavourID &&
+ *            			this.modeOfPaymentFlavours.containsValue(modeOfPaymentFlavour1)
+ *            		) ||
+ *            		(
+ *            			modeOfPaymentFlavour2.organisationID == paramOrganisationID &&
+ *            			modeOfPaymentFlavour2.modeOfPaymentFlavourID == paramModeOfPaymentFlavourID &&
+ *            			this.modeOfPayments.containsValue(modeOfPaymentFlavour2.modeOfPayment)
+ *            		)
+ *            	VARIABLES ModeOfPaymentFlavour modeOfPaymentFlavour1; ModeOfPaymentFlavour modeOfPaymentFlavour2
+ *            	PARAMETERS String paramOrganisationID, String paramModeOfPaymentFlavourID
+ *            	import java.lang.String;
+ *            	import org.nightlabs.jfire.accounting.pay.ModeOfPaymentFlavour"
+ *
  * @jdo.query name="getServerPaymentProcessorsForOneModeOfPaymentFlavour_WORKAROUND1"
  *            query="SELECT
  *            	WHERE
@@ -78,8 +110,8 @@ import org.nightlabs.jfire.transfer.id.AnchorID;
  *            	import java.lang.String;
  *            	import org.nightlabs.jfire.accounting.pay.ModeOfPaymentFlavour"
  *
- * FIXME The following script doesn't work because of a current JPOX bug. Fortunately, the workaround below is functional.
- * @!jdo.query name="getServerPaymentProcessorsForOneModeOfPaymentFlavour_WORKAROUND2"
+ * FIXME Maybe we can put WORKAROUND 1+2 into one query now... NO! The JPOX bug with the combination of && and || seems to still exist! Marco. 2006-05-16
+ * @jdo.query name="getServerPaymentProcessorsForOneModeOfPaymentFlavour_WORKAROUND2"
  *            query="SELECT
  *            	WHERE
  *            		modeOfPaymentFlavour.organisationID == paramOrganisationID &&
@@ -89,19 +121,6 @@ import org.nightlabs.jfire.transfer.id.AnchorID;
  *            	PARAMETERS String paramOrganisationID, String paramModeOfPaymentFlavourID
  *            	import java.lang.String;
  *            	import org.nightlabs.jfire.accounting.pay.ModeOfPaymentFlavour"
- *
- * @jdo.query name="getServerPaymentProcessorsForOneModeOfPaymentFlavour_WORKAROUND2"
- *            query="SELECT
- *            	WHERE
- *            		modeOfPaymentFlavour.organisationID == paramOrganisationID &&
- *            		modeOfPaymentFlavour.modeOfPaymentFlavourID == paramModeOfPaymentFlavourID &&
- *            		modeOfPayment == modeOfPaymentFlavour.modeOfPayment &&
- *            		this.modeOfPayments.containsValue(modeOfPayment)
- *            	VARIABLES ModeOfPaymentFlavour modeOfPaymentFlavour; ModeOfPayment modeOfPayment
- *            	PARAMETERS String paramOrganisationID, String paramModeOfPaymentFlavourID
- *            	import java.lang.String;
- *            	import org.nightlabs.jfire.accounting.pay.ModeOfPaymentFlavour;
- *            	import org.nightlabs.jfire.accounting.pay.ModeOfPayment"
  */
 public abstract class ServerPaymentProcessor implements Serializable
 {
@@ -158,6 +177,10 @@ public abstract class ServerPaymentProcessor implements Serializable
 		Map m = new HashMap();
 
 		Query query;
+		
+//		query = pm.newNamedQuery(ServerPaymentProcessor.class,
+//				"getServerPaymentProcessorsForOneModeOfPaymentFlavour");
+//		return (Collection) query.execute(organisationID, modeOfPaymentFlavourID);
 
 		query = pm.newNamedQuery(ServerPaymentProcessor.class,
 				"getServerPaymentProcessorsForOneModeOfPaymentFlavour_WORKAROUND2");

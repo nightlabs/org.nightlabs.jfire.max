@@ -28,6 +28,7 @@ package org.nightlabs.jfire.accounting.pay;
 
 import java.io.Serializable;
 
+import org.nightlabs.jfire.accounting.pay.ServerPaymentProcessor.PayParams;
 import org.nightlabs.math.Base62Coder;
 
 /**

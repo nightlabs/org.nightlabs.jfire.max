@@ -15,5 +15,6 @@
 	<classpathentry sourcepath="/RHINO_SRC" kind="var" path="RHINO"/>
 	<classpathentry kind="var" path="JBOSS/server/default/lib/bcel.jar"/>
 	<classpathentry kind="var" path="JBOSS/client/jboss-j2ee.jar"/>
+	<classpathentry kind="var" path="XERCES"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>

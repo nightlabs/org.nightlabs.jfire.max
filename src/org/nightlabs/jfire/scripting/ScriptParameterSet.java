@@ -180,6 +180,13 @@ import javax.jdo.listener.StoreCallback;
 	{
 		parameters.remove(scriptParameterID);
 	}
+
+	/**
+	 * Removes all parameters from this set.
+	 */
+	public void removeAllParameters() {
+		parameters.clear();
+	}
 	
 	public static String getPrimaryKey(String organisationID, long scriptParameterSetID)
 	{

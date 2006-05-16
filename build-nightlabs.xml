@@ -1,5 +1,5 @@
 <!--
-  Generic j2ee (jboss/jpox) ant build file (version 2005-12-28)
+  Generic j2ee (jboss/jpox) ant build file (version 2006-05-16)
   Author: marc [at] nightlabs [dot] de
   Author: marco [at] nightlabs [dot] de
 
@@ -191,6 +191,18 @@
         <isset property="j2ee.deploymetainf.excludes"/>
       </not>
     </condition>
+
+    <condition property="dist.bin.includes" value="**/*">
+      <not>
+        <isset property="dist.bin.includes"/>
+      </not>
+    </condition>
+    <condition property="dist.bin.excludes" value="**/log4j.*">
+      <not>
+        <isset property="dist.bin.excludes"/>
+      </not>
+    </condition>
+
     <!-- print properties for debugging -->
     <!--
     <echo>project name: ${project.name}</echo>
@@ -208,7 +220,12 @@
     <echo>j2ee.ear: ${j2ee.ear}</echo>
     <echo>j2ee.deploy.includes: ${j2ee.deploy.includes}</echo>
     <echo>j2ee.client.enable: ${j2ee.client.enable}</echo>
+    <echo>dist.bin.includes: ${dist.bin.includes}</echo>
+    <echo>dist.bin.excludes: ${dist.bin.excludes}</echo>
 		-->
+    <echo>dist.bin.includes: ${dist.bin.includes}</echo>
+    <echo>dist.bin.excludes: ${dist.bin.excludes}</echo>
+
   </target>
 
 		<!-- This macro executes a target in the local buildfile
@@ -493,7 +510,7 @@
     <mkdir dir="${project.dir}/${dist.dir}/" />
     <delete file="${project.dir}/${dist.dir}/${j2ee.client.jar}" failonerror="false" />
     <jar jarfile="${project.dir}/${dist.dir}/${j2ee.client.jar}">
-      <fileset dir="${project.dir}/${bin.dir}" excludes="${j2ee.client.excludes}" includes="${j2ee.clientdist.includes}" />
+      <fileset dir="${project.dir}/${bin.dir}" excludes="${j2ee.clientdist.excludes}" includes="${j2ee.clientdist.includes}" />
     </jar>
   	<dolocaliftrue boolean="true" target="dist.bin.client.post"/>
   </target>
@@ -504,14 +521,17 @@
     <mkdir dir="${project.dir}/${dist.dir}/" />
     <delete file="${project.dir}/${dist.dir}/${project.jar}" failonerror="false" />
     <jar jarfile="${project.dir}/${dist.dir}/${project.jar}">
+      <fileset dir="${project.dir}/${bin.dir}" excludes="${dist.bin.excludes}" includes="${dist.bin.includes}"/>
+<!--
       <fileset dir="${project.dir}/${bin.dir}">
         <include name="**/*.*"/>
       </fileset>
+-->
       <fileset dir="${project.dir}/${project.name}">
         <include name="META-INF/ejb-jar.xml"/>
       	<include name="META-INF/ejb-rolegroup.xml"/>
        	<include name="META-INF/jboss.xml"/>
-				<include name="META-INF/datastoreinit.xml"/>
+		<include name="META-INF/datastoreinit.xml"/>
         <include name="META-INF/*-ds.xml"/>
         <include name="META-INF/ra.xml"/>
       </fileset>

@@ -47,6 +47,7 @@ import javax.xml.transform.TransformerException;
 
 import org.apache.log4j.Logger;
 import org.apache.xerces.util.DOMUtil;
+import org.jpox.store.rdbms.fieldmanager.ParameterSetter;
 import org.nightlabs.ModuleException;
 import org.nightlabs.i18n.I18nText;
 import org.nightlabs.jfire.organisation.Organisation;
@@ -161,9 +162,6 @@ public class ScriptingInitializer
 	throws SAXException, IOException 
 	{
 		Document doc = categoryDescriptors.get(categoryDir);
-		if (true)
-			return null;
-		// TODO: Remove this to enable content.xml parsing
 		if (doc == null) {
 			final File contentFile = new File(categoryDir, "content.xml");
 			if (contentFile.exists()) { 
@@ -193,8 +191,8 @@ public class ScriptingInitializer
 				parser.parse(inputSource);
 				if (parseException != null)
 					throw parseException;
-//				parser.getDocument().get
-				categoryDescriptors.put(categoryDir, parser.getDocument());
+				doc = parser.getDocument();
+				categoryDescriptors.put(categoryDir, doc);
 			}
 		}
 		return doc;
@@ -220,12 +218,17 @@ public class ScriptingInitializer
 		) 
 	throws TransformerException 
 	{
+		Node setNode = NLDOMUtil.findSingleNode(parentNode, "parameter-set");
+		if (setNode == null)
+			return parameterSet;
 		if (parameterSet == null) {
 			ScriptRegistry registry = ScriptRegistry.getScriptRegistry(pm);
 			parameterSet = new ScriptParameterSet(organisationID, registry.createScriptParameterSetID());
+			pm.makePersistent(parameterSet);
 		}
-		parameterSet.removeAllParameters();
+		createElementName(setNode, parameterSet.getName(), "ParameterSet"+parameterSet.getScriptParameterSetID());
 		Collection<Node> nodes = NLDOMUtil.findNodeList(parentNode, "parameter-set/parameter");
+		parameterSet.removeAllParameters();
 		for (Node node : nodes) {
 			Node pIDNode = node.getAttributes().getNamedItem("name");
 			if (pIDNode != null && !"".equals(pIDNode.getTextContent())) {
@@ -296,13 +299,16 @@ public class ScriptingInitializer
 			}
 
 			// category name and parameters
+			Node catNode = null;
 			if (catDocument != null) {
-				Node catNode = NLDOMUtil.findSingleNode(catDocument, "script-category");
+				catNode = NLDOMUtil.findSingleNode(catDocument, "script-category");
 				if (catNode != null) {
-					createElementName(catNode, category.getName(), categoryID);
-					createParameterSet(pm, organisationID, category.getParameterSet(), catNode);
+					ScriptParameterSet parameterSet = createParameterSet(pm, organisationID, category.getParameterSet(), catNode);
+					if (parameterSet != null)
+						category.setParameterSet(parameterSet);
 				}
 			}
+			createElementName(catNode, category.getName(), categoryID);
 			LOGGER.info("create Script Category = "+category.getName());
 			
 
@@ -346,9 +352,11 @@ public class ScriptingInitializer
 					
 					// script name and parameters
 					if (scriptNode != null) {
-						createElementName(scriptNode, script.getName(), scriptID);
-						createParameterSet(pm, organisationID, script.getParameterSet(), scriptNode);
+						ScriptParameterSet parameterSet = createParameterSet(pm, organisationID, script.getParameterSet(), scriptNode);						
+						if (parameterSet != null)
+							script.setParameterSet(parameterSet);
 					}
+					createElementName(scriptNode, script.getName(), scriptID);
 					
 				} catch (Exception e) {
 					LOGGER.warn("could NOT create script "+scriptID+"!", e);

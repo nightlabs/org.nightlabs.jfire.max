@@ -44,6 +44,7 @@ import javax.ejb.SessionContext;
 import javax.jdo.FetchPlan;
 import javax.jdo.JDOHelper;
 import javax.jdo.PersistenceManager;
+import javax.jdo.Query;
 import javax.naming.NamingException;
 
 import org.apache.log4j.Level;
@@ -738,6 +739,33 @@ implements SessionBean
 	}
 	
 	
+	/**
+	 * @throws ModuleException
+	 *
+	 * @ejb.interface-method
+	 * @ejb.permission role-name="_Guest_"
+	 * @ejb.transaction type="Required"
+	 */
+	public Collection execJDOQL (
+			String jdoql,
+			Map params
+		)
+	throws ModuleException
+	{
+		PersistenceManager pm;
+		pm = getPersistenceManager();
+		try {
+			Query q = pm.newQuery(jdoql);
+			LOGGER.info("Excecuting JDOQL : ");
+			LOGGER.info("");
+			LOGGER.info(jdoql);
+			LOGGER.info("");
+			Object result = q.executeWithMap(params);
+			return NLJDOHelper.getDetachedQueryResult(pm, result);
+		} finally {
+			pm.close();
+		}
+	}
 	
 	
 }

@@ -130,6 +130,7 @@ public class ServerJFSQueryProxy extends AbstractJFSQueryProxy {
 	throws ModuleException
 	{
 		Script script = getScript(pm, scriptRegistryItemID);
+		parameters.put("persistenceManager", pm);
 		return getReportingScriptExecutor(pm, script).getResultSet(script, parameters);
 	}
 }

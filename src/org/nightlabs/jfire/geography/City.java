@@ -259,19 +259,21 @@ public class City implements Serializable
 		return n;
 	}
 
-	public void addDistrict(District district)
+	public District addDistrict(District district)
 	{
 		if (!this.getPrimaryKey().equals(district.getCity().getPrimaryKey())) 
 			throw new IllegalArgumentException("district has wrong city (!= this)!!!");
 
 		districts.put(district.getPrimaryKey(), district);
+		return district;
 	}
 
-	public void addLocation(Location location)
+	public Location addLocation(Location location)
 	{
 		if (!this.getPrimaryKey().equals(location.getCity().getPrimaryKey())) 
 			throw new IllegalArgumentException("location has wrong city (!= this)!!!");
 
 		locations.put(location.getPrimaryKey(), location);
+		return location;
 	}
 }

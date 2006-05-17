@@ -220,16 +220,25 @@ public class Region implements Serializable
 	{
 		return name;
 	}
-	public void addCity(City city)
+	public City addCity(City city)
 	{
+//		// DEBUG begin
+//		new Exception("addCity(...) called").printStackTrace();
+//		// DEBUG end
+
+		City res;
 		if (city.getPrimaryKey() == null) {
 			PersistenceManager pm = JDOHelper.getPersistenceManager(this);
 			if (pm == null)			
 				throw new IllegalStateException("city does not have a primary key and this instance of Region is not persistent! Cannot assign a primary key!");
 			
-			pm.makePersistent(city);
+			res = (City) pm.makePersistent(city);
 		}
+		else
+			res = city;
+
 		cities.put(city.getPrimaryKey(), city);
+		return res;
 	}
 	public Collection getCities()
 	{

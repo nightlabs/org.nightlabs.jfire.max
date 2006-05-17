@@ -140,11 +140,12 @@ public class Geography implements Serializable
 		return pm;
 	}
 
-	public synchronized void addCountry(Country country)
+	public synchronized Country addCountry(Country country)
 	{
 		if (!JDOHelper.isPersistent(country))
-			getPersistenceManager().makePersistent(country);
-//		countries.put(country.getCountryID(), country);
+			return (Country) getPersistenceManager().makePersistent(country);
+
+		return country;
 	}
 
 	public Collection getCountries()

@@ -142,17 +142,21 @@ public class Country implements Serializable
 		return name;
 	}
 
-	public void addRegion(Region region)
+	public Region addRegion(Region region)
 	{
+		Region res;
 		if (region.getPrimaryKey() == null) {
 			PersistenceManager pm = JDOHelper.getPersistenceManager(this);
 			if (pm == null)			
 				throw new IllegalStateException("region does not have a primary key and this instance of Country is not persistent! Cannot assign a primary key!");
 
-			pm.makePersistent(region);
+			res = (Region) pm.makePersistent(region);
 		}
+		else
+			res = region;
 
 		regions.put(region.getPrimaryKey(), region);
+		return res;
 	}
 	public Collection getRegions()
 	{

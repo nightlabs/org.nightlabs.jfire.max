@@ -67,7 +67,7 @@ import org.nightlabs.jfire.transfer.Anchor;
  * your own specialized saleable goods.
  * </p>
  * <p>
- * A <code>ProductType</code> has the possibility to create {@link Product}s (on the fly if necessary).
+ * {@link Product}s for a <code>ProductType</code> are created via the assigned {@link ProductTypeActionHandler}.
  * </p>
  * <p>
  * <code>ProductType</code>s are organized in a data-inheritance-tree, where each child can inherit
@@ -183,9 +183,9 @@ implements
 	public static final String FETCH_GROUP_THIS_PRODUCT_TYPE = "ProductType.this";
 
 	/**
-	 * @param pm The <tt>PersistenceManager</tt> that should be used to access the datastore.
-	 * @param parentProductTypeID The <tt>ProductType</tt> of which to find all children or <tt>null</tt> to find all top-level-<tt>ProductType</tt>s.
-	 * @return Returns instances of <tt>ProductType</tt>.
+	 * @param pm The <code>PersistenceManager</code> that should be used to access the datastore.
+	 * @param parentProductTypeID The <code>ProductType</code> of which to find all children or <code>null</code> to find all top-level-<code>ProductType</code>s.
+	 * @return Returns instances of <code>ProductType</code>.
 	 */
 	public static Collection getChildProductTypes(PersistenceManager pm, ProductTypeID parentProductTypeID)
 	{
@@ -349,31 +349,31 @@ implements
 //	private boolean _package;
 
 //	/**
-//	 * If the <tt>ProductType</tt> has this <tt>flavour</tt>, it cannot create
-//	 * <tt>Product</tt> instances and can therefore not be sold. Instead it is
-//	 * used as node (<b>not</b> leaf) within the <tt>ProductType</tt>
-//	 * data-inheritance-tree to categorize <tt>ProductType</tt>s.
+//	 * If the <code>ProductType</code> has this <code>flavour</code>, it cannot create
+//	 * <code>Product</code> instances and can therefore not be sold. Instead it is
+//	 * used as node (<b>not</b> leaf) within the <code>ProductType</code>
+//	 * data-inheritance-tree to categorize <code>ProductType</code>s.
 //	 */
 //	public static String FLAVOUR_CATEGORY = "category";
 //
 //	/**
-//	 * If the <tt>ProductType</tt> has this <tt>flavour</tt>, it cannot be
+//	 * If the <code>ProductType</code> has this <code>flavour</code>, it cannot be
 //	 * extended anymore - means it is a leaf in the tree. Being a package,
-//	 * it can contain other <tt>ProductType<tt>s (see {@link #getNestedProductTypes()})
+//	 * it can contain other <code>ProductType</code>s (see {@link #getNestedProductTypes()})
 //	 * and it can virtually package itself. Even though being a package, it
-//	 * can still be packaged within another <tt>ProductType</tt>, but
+//	 * can still be packaged within another <code>ProductType</code>, but
 //	 * it is not able to make its price dependent on its siblings within
 //	 * this other package. A package always has a definite price, which is the sum
-//	 * of all its nested <tt>ProductType</tt>s.
+//	 * of all its nested <code>ProductType</code>s.
 //	 */
 //	public static String FLAVOUR_PACKAGE = "package";
 //
 //	/**
-//	 * If the <tt>ProductType</tt> has this <tt>flavour</tt>, it cannot be
+//	 * If the <code>ProductType</code> has this <code>flavour</code>, it cannot be
 //	 * extended anymore - means it is a leaf in the tree. Being inner - means
-//	 * not a package itself, it is not able to package other <tt>ProductType</tt>s.
+//	 * not a package itself, it is not able to package other <code>ProductType</code>s.
 //	 * The price is dependent on its siblings within the package. Hence, the price
-//	 * of an inner <tt>ProductType</tt> varies from package to package.
+//	 * of an inner <code>ProductType</code> varies from package to package.
 //	 */
 //	public static String FLAVOUR_INNER = "inner";
 //
@@ -387,17 +387,17 @@ implements
 //	private String flavour;
 
 	/**
-	 * If the <tt>ProductType</tt> has this <tt>inheritanceNature</tt>, it cannot
-	 * create <tt>Product</tt> instances and can therefore not be sold. Instead
-	 * it is used as node within the <tt>ProductType</tt>
-	 * data-inheritance-tree to categorize <tt>ProductType</tt>s.
+	 * If the <code>ProductType</code> has this <code>inheritanceNature</code>, it cannot
+	 * create <code>Product</code> instances and can therefore not be sold. Instead
+	 * it is used as node within the <code>ProductType</code>
+	 * data-inheritance-tree to categorize <code>ProductType</code>s.
 	 */
 	public static final byte INHERITANCE_NATURE_BRANCH = 11;
 
 	/**
-	 * If the <tt>ProductType</tt> has this <tt>inheritanceNature</tt>, it cannot be
-	 * extended anymore - means it is a leaf in the tree. Only in this
-	 * <tt>inheritanceNature</tt>, it can instantiate {@link Product} instances.
+	 * If the <code>ProductType</code> has this <code>inheritanceNature</code>, it cannot be
+	 * extended anymore - means it is a leaf in the tree. Only with this
+	 * <code>inheritanceNature</code>, it can instantiate {@link Product} instances.
 	 */
 	public static final byte INHERITANCE_NATURE_LEAF = 12;
 
@@ -412,12 +412,12 @@ implements
 	private byte inheritanceNature;
 
 	/**
-	 * If the <tt>ProductType</tt> has this <tt>packageNature</tt>, it is an inner part
+	 * If the <code>ProductType</code> has this <code>packageNature</code>, it is an inner part
 	 * of a package. This means, it is NOT able to package itself virtually - but it
-	 * is able to nest other <tt>ProductType</tt>s (see {@link #getNestedProductTypes()})!
+	 * is able to nest other <code>ProductType</code>s (see {@link #getNestedProductTypes()})!
 	 * <p>
 	 * The price is dependent on its siblings within the package. Hence, the price
-	 * of an inner <tt>ProductType</tt> varies from package to package.
+	 * of an inner <code>ProductType</code> varies from package to package.
 	 * </p>
 	 * <p>
 	 * If a ProductType of this nature does package other product types, their price
@@ -430,13 +430,13 @@ implements
 	public static final byte PACKAGE_NATURE_INNER = 21;
 
 	/**
-	 * If the <tt>ProductType</tt> has this <tt>packageNature</tt>, it can not only
-	 * contain other <tt>ProductType<tt>s (see {@link #getNestedProductTypes()}),
+	 * If the <code>ProductType</code> has this <code>packageNature</code>, it can not only
+	 * contain other <code>ProductType</code>s (see {@link #getNestedProductTypes()}),
 	 * but even virtually package itself. Additionally, it
-	 * can still be packaged within another <tt>ProductType</tt>, but
+	 * can still be packaged within another <code>ProductType</code>, but
 	 * it is not able to make its price dependent on its siblings within
 	 * this other package. A package always has a definite price, which is the sum
-	 * of all its nested <tt>ProductType</tt>s.
+	 * of all its nested <code>ProductType</code>s.
 	 */
 	public static final byte PACKAGE_NATURE_OUTER = 22;
 
@@ -490,15 +490,15 @@ implements
 	/**
 	 * @param organisationID This must not be null. This reflects the owner organisation which is issuing this <code>ProductType</code>.
 	 * @param productTypeID The local ID within the namespace of <code>organisationID</code>.
-	 * @param extendedProductType The "parent" <tt>ProductType</tt> in the
-	 *		data-inheritance-tree. If this is <tt>null</tt> it will be considered being
+	 * @param extendedProductType The "parent" <code>ProductType</code> in the
+	 *		data-inheritance-tree. If this is <code>null</code> it will be considered being
 	 *		a root node.
 	 * @param owner The owner of this ProductType because an Organisation might
-	 *		sell <tt>ProductType</tt>s for another <tt>LegalEntity</tt> which has
-	 *		no own Organisation in the system. This can be <tt>null</tt>, if
-	 *		<tt>extendedProductType</tt> is defined. In this case, it will be set to
-	 *		<tt>extendedProductType.</tt>{@link #getOwner()}.
-	 * @param flavour What is this <tt>ProductType</tt> used for? Must be one of {@link #FLAVOUR_CATEGORY}, {@link #FLAVOUR_PACKAGE}, {@link #FLAVOUR_INNER}
+	 *		sell <code>ProductType</code>s for another <code>LegalEntity</code> which has
+	 *		no own Organisation in the system. This can be <code>null</code>, if
+	 *		<code>extendedProductType</code> is defined. In this case, it will be set to
+	 *		<code>extendedProductType.</code>{@link #getOwner()}.
+	 * @param flavour What is this <code>ProductType</code> used for? Must be one of {@link #FLAVOUR_CATEGORY}, {@link #FLAVOUR_PACKAGE}, {@link #FLAVOUR_INNER}
 	 */
 	public ProductType(
 			String organisationID, String productTypeID,
@@ -672,7 +672,7 @@ implements
 	}
 
 	/**
-	 * @return Returns a <tt>Collection</tt> of {@link NestedProductType}. These are all
+	 * @return Returns a <code>Collection</code> of {@link NestedProductType}. These are all
 	 *		other <code>ProductType</code>s that have been added to this package. It does <b>not</b>
 	 *		contain itself, even if this <code>ProductType</code> does virtual-self-packaging.
 	 *
@@ -724,7 +724,7 @@ implements
 
 	/**
 	 * @param productTypePK The composite primary key returned by {@link #getPrimaryKey()}.
-	 * @return Returns a packaged productType or <tt>null</tt> if none with the given ID exists.
+	 * @return Returns a packaged productType or <code>null</code> if none with the given ID exists.
 	 */
 	public NestedProductType getNestedProductType(String productTypePK, boolean throwExceptionIfNotExistent)
 	{
@@ -739,7 +739,7 @@ implements
 	/**
 	 * @param organisationID The organisation part of the primary key as returned by {@link #getOrganisationID()}.
 	 * @param productTypeID The local id part of the primary key as returned by {@link #getProductTypeID()}.
-	 * @return Returns a packaged product or <tt>null</tt> if none with the given ID exists.
+	 * @return Returns a packaged product or <code>null</code> if none with the given ID exists.
 	 */
 	public NestedProductType getNestedProductType(String organisationID, String productTypeID, boolean throwExceptionIfNotExistent)
 	{
@@ -992,7 +992,7 @@ implements
 	// *********************************
 
 //	/**
-//	 * Whether or not this implementation is able to create <tt>Product</tt>s automatically,
+//	 * Whether or not this implementation is able to create <code>Product</code>s automatically,
 //	 * when needed. This is e.g. the case if a packaged fee should be included in a product.
 //	 *
 //	 * @see #createProduct()
@@ -1000,30 +1000,30 @@ implements
 //	public abstract boolean isProductFactory();
 //
 //	/**
-//	 * If you decided to make this <tt>ProductType</tt> a product factory
-//	 * by returning <tt>true</tt> in <tt>isProductFactory()</tt>, then you must
-//	 * implement this method - otherwise just throw an <tt>UnsupportedOperationException</tt>.
+//	 * If you decided to make this <code>ProductType</code> a product factory
+//	 * by returning <code>true</code> in <code>isProductFactory()</code>, then you must
+//	 * implement this method - otherwise just throw an <code>UnsupportedOperationException</code>.
 //	 *
 //	 * In your implementation of this method, you must create an instance
-//	 * of <tt>Product</tt>, assign a primary key to it and return this instance.
+//	 * of <code>Product</code>, assign a primary key to it and return this instance.
 //	 *
-//	 * @return Returns a newly created instance of <tt>Product</tt>.
+//	 * @return Returns a newly created instance of <code>Product</code>.
 //	 *
 //	 * @see #isProductFactory()
 //	 */
 //	public abstract Product createProduct();
 
 //	/**
-//	 * This member is automatically set to the result of <tt>isProductProvider()</tt>.
+//	 * This member is automatically set to the result of <code>isProductProvider()</code>.
 //	 *
 //	 * @jdo.field persistence-modifier="persistent"
 //	 */
 //	private boolean productProvider;
 
 //	/**
-//	 * Whether or not this <tt>ProductType</tt> is able to find/create available <tt>Product</tt>s.
-//	 * A <tt>ProductType</tt> can only be packaged within another one having <tt>productProvider==true</tt>, if this
-//	 * is <tt>true</tt>, too. If the <tt>Product</tt>s of the package are created manually, the
+//	 * Whether or not this <code>ProductType</code> is able to find/create available <code>Product</code>s.
+//	 * A <code>ProductType</code> can only be packaged within another one having <code>productProvider==true</code>, if this
+//	 * is <code>true</code>, too. If the <code>Product</code>s of the package are created manually, the
 //	 * result of this method does not matter.
 //	 *
 //	 * @see #findProducts(User, NestedProductType, ProductLocator)
@@ -1032,21 +1032,21 @@ implements
 //	public abstract boolean isProductProvider();
 
 //	/**
-//	 * If <tt>isProductProvider()</tt> is true, this method might be called and must
-//	 * either return <tt>null</tt> if there is no <tt>Product</tt> available or an instance
+//	 * If <code>isProductProvider()</code> is true, this method might be called and must
+//	 * either return <code>null</code> if there is no <code>Product</code> available or an instance
 //	 * that can be sold.
 //	 * <p>
-//	 * The implementation of <tt>ProductType</tt> might choose to create a new instance
-//	 * of <tt>Product</tt> when this method is called.
+//	 * The implementation of <code>ProductType</code> might choose to create a new instance
+//	 * of <code>Product</code> when this method is called.
 //	 * <p>
-//	 * This method is only called while this <tt>ProductType</tt> is persistent.
+//	 * This method is only called while this <code>ProductType</code> is persistent.
 //	 * <p>
 //	 * ???? !!!! ????
 //	 * Marco: IMHO this method should allocate the product immediately, to avoid someone
-//	 * else from "stealing" it. Therefore, we probably need the parameter <tt>allocationKey</tt>.
+//	 * else from "stealing" it. Therefore, we probably need the parameter <code>allocationKey</code>.
 //	 * ???? !!!! ????
 //	 *
-//	 * @return Returns <tt>null</tt> or a <tt>Product</tt> that can be sold.
+//	 * @return Returns <code>null</code> or a <code>Product</code> that can be sold.
 //	 */
 //	public abstract Product provideAvailableProduct();
 
@@ -1061,13 +1061,13 @@ implements
 
 	/**
 	 * Your implementation of this method should check whether it can
-	 * return a <tt>Product</tt> in <tt>provideAvailableProduct()</tt>
+	 * return a <code>Product</code> in <code>provideAvailableProduct()</code>
 	 * or whether there's none available anymore.
 	 * <p>
-	 * If there is no <tt>Product</tt> available anymore, the <tt>ProductType</tt>
+	 * If there is no <code>Product</code> available anymore, the <code>ProductType</code>
 	 * will be listed as not available (or even filtered out) in sale lists.
 	 * <p>
-	 * This method is only called while this <tt>ProductType</tt> is persistent. 
+	 * This method is only called while this <code>ProductType</code> is persistent. 
 	 */
 	protected abstract boolean _checkProductAvailability();
 
@@ -1110,14 +1110,14 @@ implements
 	}
 
 	/**
-	 * @return Returns <tt>true</tt>, if <tt>packageNature == </tt>{@link #PACKAGE_NATURE_OUTER}.
+	 * @return Returns <code>true</code>, if <code>packageNature == </code>{@link #PACKAGE_NATURE_OUTER}.
 	 */
 	public boolean isPackageOuter()
 	{
 		return PACKAGE_NATURE_OUTER == packageNature;
 	}
 	/**
-	 * @return Returns <tt>true</tt>, if <tt>packageNature == </tt>{@link #PACKAGE_NATURE_INNER}.
+	 * @return Returns <code>true</code>, if <code>packageNature == </code>{@link #PACKAGE_NATURE_INNER}.
 	 */
 	public boolean isPackageInner()
 	{
@@ -1125,7 +1125,7 @@ implements
 	}
 
 	/**
-	 * @return Returns <tt>true</tt> if <tt>inheritanceNature == </tt>{@link #INHERITANCE_NATURE_BRANCH}.
+	 * @return Returns <code>true</code> if <code>inheritanceNature == </code>{@link #INHERITANCE_NATURE_BRANCH}.
 	 */
 	public boolean isInheritanceBranch()
 	{
@@ -1133,7 +1133,7 @@ implements
 	}
 
 	/**
-	 * @return Returns <tt>true</tt> if <tt>inheritanceNature == </tt>{@link #INHERITANCE_NATURE_LEAF}.
+	 * @return Returns <code>true</code> if <code>inheritanceNature == </code>{@link #INHERITANCE_NATURE_LEAF}.
 	 */
 	public boolean isInheritanceLeaf()
 	{
@@ -1317,18 +1317,18 @@ implements
 	}
 
 	/**
-	 * This method returns the inner price config, if <tt>packageProductTypePK</tt>
-	 * equals this pk (means we use <tt>this</tt> as virtual inner product type) or
+	 * This method returns the inner price config, if <code>packageProductTypePK</code>
+	 * equals this pk (means we use <code>this</code> as virtual inner product type) or
 	 * if this is not a package.
-	 * If it is a package (and <tt>packageProductTypePK</tt> does not point back
-	 * to <tt>this</tt>), the package price config will be returned.
+	 * If it is a package (and <code>packageProductTypePK</code> does not point back
+	 * to <code>this</code>), the package price config will be returned.
 	 * <p>
 	 * The sense in this behaviour is to automatically return the correct price config
 	 * depending on the situation.
 	 *
-	 * @param packageProductTypePK The primary key of the <tt>ProductType</tt>
+	 * @param packageProductTypePK The primary key of the <code>ProductType</code>
 	 * (obtained via {@link ProductType#getPrimaryKey()) in which this
-	 * <tt>ProductType</tt> is packaged. This parameter can be <tt>null</tt>.
+	 * <code>ProductType</code> is packaged. This parameter can be <code>null</code>.
 	 * @return Returns either the result of {@link #getInnerPriceConfig()} or
 	 * of {@link #getPackagePriceConfig()}.
 	 */
@@ -1343,7 +1343,7 @@ implements
 	public abstract I18nText getName();
 
 	/**
-	 * @return Returns either <tt>null</tt> or the ProductTypeGroup
+	 * @return Returns either <code>null</code> or the ProductTypeGroup
 	 *		which is managed by this ProductType.
 	 */
 	public ProductTypeGroup getManagedProductTypeGroup()

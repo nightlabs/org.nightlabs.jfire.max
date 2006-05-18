@@ -17,6 +17,11 @@ public class ServerJFSDriver extends AbstractJFSDriver {
 	 */
 	public ServerJFSDriver() {
 		super();
+		System.out.println("********************************************************");
+		System.out.println("********************************************************");
+		System.out.println("           JFSDriver intantiated");
+		System.out.println("********************************************************");
+		System.out.println("********************************************************");
 	}
 
 	/* (non-Javadoc)
@@ -24,8 +29,7 @@ public class ServerJFSDriver extends AbstractJFSDriver {
 	 */
 	@Override
 	protected IJFSQueryProxyFactory createProxyFactory() {
-		// TODO Auto-generated method stub
-		return null;
+		return new ServerJFSQueryProxyFactory();
 	}
 
 }

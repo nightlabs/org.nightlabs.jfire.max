@@ -748,7 +748,8 @@ implements SessionBean
 	 */
 	public Collection execJDOQL (
 			String jdoql,
-			Map params
+			Map params,
+			String[] fetchGroups
 		)
 	throws ModuleException
 	{
@@ -760,6 +761,8 @@ implements SessionBean
 			LOGGER.info("");
 			LOGGER.info(jdoql);
 			LOGGER.info("");
+			if (fetchGroups != null)
+				pm.getFetchPlan().setGroups(fetchGroups);
 			Object result = q.executeWithMap(params);
 			return NLJDOHelper.getDetachedQueryResult(pm, result);
 		} finally {

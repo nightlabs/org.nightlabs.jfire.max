@@ -44,11 +44,14 @@ import javax.naming.InitialContext;
 import javax.naming.NamingException;
 
 import org.apache.log4j.Logger;
+import org.eclipse.birt.report.engine.api.EngineConstants;
 import org.eclipse.birt.report.engine.api.EngineException;
+import org.eclipse.birt.report.engine.api.HTMLRenderContext;
 import org.eclipse.birt.report.engine.api.HTMLRenderOption;
 import org.eclipse.birt.report.engine.api.IGetParameterDefinitionTask;
 import org.eclipse.birt.report.engine.api.IParameterDefnBase;
 import org.eclipse.birt.report.engine.api.IParameterGroupDefn;
+import org.eclipse.birt.report.engine.api.IRenderTask;
 import org.eclipse.birt.report.engine.api.IReportRunnable;
 import org.eclipse.birt.report.engine.api.IRunAndRenderTask;
 import org.eclipse.birt.report.engine.api.IScalarParameterDefn;
@@ -134,6 +137,15 @@ public class ReportingManager {
 		IRunAndRenderTask task = reportEngine.createRunAndRenderTask(report);
 		HTMLRenderOption options = new HTMLRenderOption( );
 		options.setOutputFormat(format.toString());
+		
+		HTMLRenderContext renderContext = new HTMLRenderContext( );
+		renderContext.setImageDirectory( "image" ); //$NON-NLS-1$
+		renderContext.setBaseImageURL("images"); //$NON-NLS-1$
+
+		HashMap appContext = new HashMap( );
+		appContext.put( EngineConstants.APPCONTEXT_HTML_RENDER_CONTEXT,
+				renderContext );
+		task.setAppContext( appContext );
 		
 		DataBuffer dataBuffer = null;
 		OutputStream outputStream = null;

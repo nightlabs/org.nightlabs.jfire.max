@@ -5,6 +5,7 @@ package org.nightlabs.jfire.reporting.scripting;
 
 import java.util.Collection;
 import java.util.Iterator;
+import java.util.Locale;
 import java.util.Map;
 
 import javax.jdo.PersistenceManager;
@@ -19,6 +20,7 @@ import org.nightlabs.jfire.reporting.oda.jfs.JFSResultSetMetaData;
 import org.nightlabs.jfire.reporting.oda.jfs.ScriptExecutorJavaClassReportingDelegate;
 import org.nightlabs.jfire.scripting.ScriptException;
 import org.nightlabs.jfire.scripting.ScriptExecutorJavaClass;
+import org.nightlabs.jfire.simpletrade.store.SimpleProductType;
 import org.nightlabs.jfire.trade.Article;
 
 /**
@@ -54,24 +56,42 @@ public class ScriptExecutorGeneralSalesStatistic implements
 	 * @see org.nightlabs.jfire.scripting.ScriptExecutorJavaClassDelegate#doExecute()
 	 */
 	public Object doExecute() throws ScriptException {
+		System.out.println("**********************************************");
+		System.out.println("**********************************************");
+		System.out.println("   doExecute");
+		System.out.println("**********************************************");
+		System.out.println("**********************************************");
 		JFSResultSet resultSet = new JFSResultSet((JFSResultSetMetaData)getResultSetMetaData());
 		Map<String, Object> param = getScriptExecutorJavaClass().getParameterValues();
 		PersistenceManager pm = (PersistenceManager)param.get("persistenceManager");
 		Query q = pm.newQuery(
 				"SELECT "+
-				"  this.getProduct().getProductType().getName().getText(\"en\"), " +
-				"  COUNT(this), " +
-				"  SUM(this.getPrice().getAmount()) " +
-				"FROM " +
-				"  "+Article.class.getName()+" "+				
-				"GROUP BY " +
-				"  this.getProduct()"
+				 "  this.product.productType, "+
+				 "  COUNT(this.articleID), "+
+				 "  SUM(this.price.amount) "+
+				"FROM "+
+				"  "+Article.class.getName()+" " +
+				"GROUP BY "+
+				"  this.product.productType"
 			);
 		Collection products = (Collection)q.execute();
+		int count = 0;
 		for (Iterator iter = products.iterator(); iter.hasNext();) {
 			Object[] row = (Object[]) iter.next();
-			resultSet.addRow(row);
+			Object[] nRow = new Object[3];
+			nRow[0] = ((SimpleProductType)row[0]).getName().getText(Locale.getDefault().getLanguage());
+			nRow[1] = row[1];
+			nRow[2] = row[2];
+			resultSet.addRow(nRow);
+			count++;
 		}
+		System.out.println("**********************************************");
+		System.out.println("**********************************************");
+		System.out.println("   doExecute returning resultSet "+resultSet);
+		System.out.println("                      with #rows "+count);
+		System.out.println("**********************************************");
+		System.out.println("**********************************************");
+		resultSet.init();
 		return resultSet;
 	}
 

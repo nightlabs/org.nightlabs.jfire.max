@@ -29,6 +29,16 @@
                 <property name="pattern">Unformatted</property>
             </structure>
         </scalar-parameter>
+        <scalar-parameter name="invoiceIDPrefix" id="118">
+            <property name="valueType">static</property>
+            <property name="dataType">string</property>
+            <property name="allowBlank">true</property>
+            <property name="controlType">text-box</property>
+            <property name="defaultValue">2006</property>
+            <structure name="format">
+                <property name="category">Unformatted</property>
+            </structure>
+        </scalar-parameter>
         <scalar-parameter name="invoiceInvoiceID" id="9">
             <text-property name="displayName">invoice invoiceID</text-property>
             <property name="valueType">static</property>
@@ -209,16 +219,24 @@ try {
                     <property name="isOutput">false</property>
                 </structure>
                 <structure>
+                    <property name="name">invoiceIDPrefix</property>
+                    <property name="dataType">string</property>
+                    <property name="position">2</property>
+                    <expression name="defaultValue">"2006"</expression>
+                    <property name="isInput">true</property>
+                    <property name="isOutput">false</property>
+                </structure>
+                <structure>
                     <property name="name">invoiceInvoiceID</property>
                     <property name="dataType">decimal</property>
-                    <property name="position">2</property>
+                    <property name="position">3</property>
                     <expression name="defaultValue">1</expression>
                     <property name="isInput">true</property>
                 </structure>
                 <structure>
                     <property name="name">languageID</property>
                     <property name="dataType">string</property>
-                    <property name="position">3</property>
+                    <property name="position">4</property>
                     <expression name="defaultValue">"de"</expression>
                     <property name="isInput">true</property>
                 </structure>
@@ -251,8 +269,9 @@ metaData.addColumn("amount", DataType.BIGDECIMAL);
 importPackage(Packages.org.nightlabs.jfire.person);
 
 invoiceOrganisationID = p_1;
-invoiceInvoiceID = p_2;
-languageID = p_3;
+invoiceIDPrefix = p_2;
+invoiceInvoiceID = p_3;
+languageID = p_4;
 
 q = persistenceManager.newQuery(
 	persistenceManager.getExtent(
@@ -262,6 +281,7 @@ q = persistenceManager.newQuery(
 
 q.setUnique(true);
 q.setFilter("this.organisationID == \""+invoiceOrganisationID+"\" &amp;&amp;");
+q.setFilter("this.invoiceIDPrefix == \""+invoiceIDPrefix+"\" &amp;&amp; ");
 q.setFilter("this.invoiceID == "+invoiceInvoiceID);
 
 invoice = q.execute();
@@ -464,6 +484,10 @@ result</property>
                 <structure>
                     <property name="paramName">languageID</property>
                     <expression name="expression">params["languageID"]</expression>
+                </structure>
+                <structure>
+                    <property name="paramName">invoiceIDPrefix</property>
+                    <expression name="expression">params["invoiceIDPrefix"]</expression>
                 </structure>
             </list-property>
             <list-property name="boundDataColumns">

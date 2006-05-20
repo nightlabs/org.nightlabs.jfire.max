@@ -1,33 +1,56 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<!-- Written by Eclipse BIRT 1.0 -->
-<report xmlns="http://www.eclipse.org/birt/2005/design" version="3" id="1">
+<!-- Written by Eclipse BIRT 2.0 -->
+<report xmlns="http://www.eclipse.org/birt/2005/design" version="3.2.1" id="1">
     <property name="createdBy">Eclipse BIRT Designer Version 1.0.1 Build &lt;20051201-1157></property>
     <property name="units">in</property>
+    <list-property name="configVars">
+        <structure>
+            <property name="name">invoiceOrganisationID</property>
+            <property name="value">"bieber.NightLabs.de"</property>
+        </structure>
+        <structure>
+            <property name="name">invoiceInvoiceID</property>
+            <property name="value">1</property>
+        </structure>
+        <structure>
+            <property name="name">languageID</property>
+            <property name="value">"de"</property>
+        </structure>
+    </list-property>
     <parameters>
         <scalar-parameter name="invoiceOrganisationID" id="8">
             <text-property name="displayName">invoice organisationID</text-property>
             <property name="valueType">static</property>
             <property name="dataType">string</property>
-            <property name="format">Unformatted</property>
             <property name="controlType">text-box</property>
-            <expression name="defaultValue">"bieber.NightLabs.de"</expression>
+            <property name="defaultValue">"bieber.NightLabs.de"</property>
+            <structure name="format">
+                <property name="category">Unformatted</property>
+                <property name="pattern">Unformatted</property>
+            </structure>
         </scalar-parameter>
         <scalar-parameter name="invoiceInvoiceID" id="9">
             <text-property name="displayName">invoice invoiceID</text-property>
             <property name="valueType">static</property>
             <property name="dataType">decimal</property>
             <property name="allowBlank">false</property>
-            <property name="format">Unformatted</property>
             <property name="controlType">text-box</property>
-            <expression name="defaultValue">1</expression>
+            <property name="defaultValue">1</property>
+            <structure name="format">
+                <property name="category">Unformatted</property>
+                <property name="pattern">Unformatted</property>
+            </structure>
         </scalar-parameter>
         <scalar-parameter name="languageID" id="10">
             <text-property name="displayName">languageID</text-property>
             <property name="valueType">static</property>
             <property name="dataType">string</property>
-            <property name="format">Unformatted</property>
             <property name="controlType">text-box</property>
-            <expression name="defaultValue">"de"</expression>
+            <property name="defaultValue">"de"</property>
+            <structure name="format">
+                <property name="category">Unformatted</property>
+                <property name="pattern">Unformatted</property>
+            </structure>
         </scalar-parameter>
     </parameters>
     <data-sources>
@@ -35,7 +58,6 @@
     </data-sources>
     <data-sets>
         <oda-data-set extensionID="org.nightlabs.jfire.reporting.oda.jdojs.JDOJSDataSet" name="Customer" id="6">
-            <property name="dataSource">Data Source</property>
             <list-property name="parameters">
                 <structure>
                     <property name="name">invoiceOrganisationID</property>
@@ -62,6 +84,41 @@
                     <property name="isOutput">false</property>
                 </structure>
             </list-property>
+            <structure name="cachedMetaData">
+                <list-property name="resultSet">
+                    <structure>
+                        <property name="position">1</property>
+                        <property name="name">Company</property>
+                        <property name="dataType">string</property>
+                    </structure>
+                    <structure>
+                        <property name="position">2</property>
+                        <property name="name">Name</property>
+                        <property name="dataType">string</property>
+                    </structure>
+                    <structure>
+                        <property name="position">3</property>
+                        <property name="name">FirstName</property>
+                        <property name="dataType">string</property>
+                    </structure>
+                    <structure>
+                        <property name="position">4</property>
+                        <property name="name">Address</property>
+                        <property name="dataType">string</property>
+                    </structure>
+                    <structure>
+                        <property name="position">5</property>
+                        <property name="name">City</property>
+                        <property name="dataType">string</property>
+                    </structure>
+                    <structure>
+                        <property name="position">6</property>
+                        <property name="name">PostCode</property>
+                        <property name="dataType">string</property>
+                    </structure>
+                </list-property>
+            </structure>
+            <property name="dataSource">Data Source</property>
             <property name="queryText">metaData.addColumn("Company", DataType.STRING);
 metaData.addColumn("Name", DataType.STRING);
 metaData.addColumn("FirstName", DataType.STRING);
@@ -142,7 +199,6 @@ try {
 </property>
         </oda-data-set>
         <oda-data-set extensionID="org.nightlabs.jfire.reporting.oda.jdojs.JDOJSDataSet" name="Articles" id="7">
-            <property name="dataSource">Data Source</property>
             <list-property name="parameters">
                 <structure>
                     <property name="name">invoiceOrganisationID</property>
@@ -167,6 +223,26 @@ try {
                     <property name="isInput">true</property>
                 </structure>
             </list-property>
+            <structure name="cachedMetaData">
+                <list-property name="resultSet">
+                    <structure>
+                        <property name="position">1</property>
+                        <property name="name">pos</property>
+                        <property name="dataType">integer</property>
+                    </structure>
+                    <structure>
+                        <property name="position">2</property>
+                        <property name="name">name</property>
+                        <property name="dataType">string</property>
+                    </structure>
+                    <structure>
+                        <property name="position">3</property>
+                        <property name="name">amount</property>
+                        <property name="dataType">decimal</property>
+                    </structure>
+                </list-property>
+            </structure>
+            <property name="dataSource">Data Source</property>
             <property name="queryText">metaData.addColumn("pos", DataType.INTEGER);
 metaData.addColumn("name", DataType.STRING);
 metaData.addColumn("amount", DataType.BIGDECIMAL);
@@ -218,7 +294,7 @@ for (it = articles.iterator(); it.hasNext(); ) {
                     <property name="contentType">html</property>
                     <text-property name="content"><![CDATA[<center>
 <H1>
-Bill ...
+Invoice - Chez Francois 
 </H1>
 </center>]]></text-property>
                 </text>
@@ -226,10 +302,6 @@ Bill ...
         </simple-master-page>
     </page-setup>
     <body>
-        <text id="120">
-            <property name="contentType">html</property>
-            <text-property name="content"><![CDATA[<center><FONT size="20">INVOICE</FONT></center>]]></text-property>
-        </text>
         <table id="11">
             <property name="width">100%</property>
             <property name="dataSet">Customer</property>
@@ -245,6 +317,48 @@ Bill ...
                 <structure>
                     <property name="paramName">languageID</property>
                     <expression name="expression">params["languageID"]</expression>
+                </structure>
+            </list-property>
+            <list-property name="boundDataColumns">
+                <structure>
+                    <property name="name">Company</property>
+                    <expression name="expression">dataSetRow["Company"] ;</expression>
+                </structure>
+                <structure>
+                    <property name="name">Name</property>
+                    <expression name="expression">dataSetRow["Name"]</expression>
+                </structure>
+                <structure>
+                    <property name="name">FirstName</property>
+                    <expression name="expression">dataSetRow["FirstName"]</expression>
+                </structure>
+                <structure>
+                    <property name="name">result = "";
+if (!"".equals(row["Name"]))
+	result = row["Name"]+", ";
+result = result+row["FirstName"];
+result</property>
+                    <expression name="expression">result = "";
+if (!"".equals(row["Name"]))
+	result = row["Name"]+", ";
+result = result+row["FirstName"];
+result</expression>
+                </structure>
+                <structure>
+                    <property name="name">Address</property>
+                    <expression name="expression">dataSetRow["Address"]</expression>
+                </structure>
+                <structure>
+                    <property name="name">PostCode</property>
+                    <expression name="expression">dataSetRow["PostCode"]</expression>
+                </structure>
+                <structure>
+                    <property name="name">City</property>
+                    <expression name="expression">dataSetRow["City"]</expression>
+                </structure>
+                <structure>
+                    <property name="name">row["PostCode"]+" "+row["City"]</property>
+                    <expression name="expression">row["PostCode"]+" "+row["City"]</expression>
                 </structure>
             </list-property>
             <column id="18"/>
@@ -268,32 +382,32 @@ Bill ...
                                         <row id="102">
                                             <cell id="103">
                                                 <data id="104">
-                                                    <expression name="valueExpr">row["Company"]</expression>
+                                                    <property name="resultSetColumn">Company</property>
                                                 </data>
                                             </cell>
                                         </row>
                                         <row id="107">
                                             <cell id="108">
                                                 <data id="109">
-                                                    <expression name="valueExpr">result = "";
+                                                    <property name="resultSetColumn">result = "";
 if (!"".equals(row["Name"]))
 	result = row["Name"]+", ";
 result = result+row["FirstName"];
-result</expression>
+result</property>
                                                 </data>
                                             </cell>
                                         </row>
                                         <row id="110">
                                             <cell id="111">
                                                 <data id="112">
-                                                    <expression name="valueExpr">row["Address"]</expression>
+                                                    <property name="resultSetColumn">Address</property>
                                                 </data>
                                             </cell>
                                         </row>
                                         <row id="113">
                                             <cell id="114">
                                                 <data id="115">
-                                                    <expression name="valueExpr">row["PostCode"]+" "+row["City"]</expression>
+                                                    <property name="resultSetColumn">row["PostCode"]+" "+row["City"]</property>
                                                 </data>
                                             </cell>
                                         </row>
@@ -301,11 +415,11 @@ result</expression>
                                             <cell id="117"/>
                                         </row>
                                     </grid>
-</cell>
+                                </cell>
                                 <cell id="98"/>
                             </row>
                         </grid>
-</cell>
+                    </cell>
                 </row>
             </detail>
             <footer>
@@ -352,6 +466,28 @@ result</expression>
                     <expression name="expression">params["languageID"]</expression>
                 </structure>
             </list-property>
+            <list-property name="boundDataColumns">
+                <structure>
+                    <property name="name">pos</property>
+                    <expression name="expression">dataSetRow["pos"]</expression>
+                </structure>
+                <structure>
+                    <property name="name">name</property>
+                    <expression name="expression">dataSetRow["name"]</expression>
+                </structure>
+                <structure>
+                    <property name="name">amount</property>
+                    <expression name="expression">dataSetRow["amount"]</expression>
+                </structure>
+                <structure>
+                    <property name="name">row["amount"]/100</property>
+                    <expression name="expression">row["amount"]/100</expression>
+                </structure>
+                <structure>
+                    <property name="name">Total.sum(row["amount"])/100</property>
+                    <expression name="expression">Total.sum(row["amount"])/100</expression>
+                </structure>
+            </list-property>
             <column id="81"/>
             <column id="82"/>
             <column id="83"/>
@@ -381,17 +517,17 @@ result</expression>
                     <cell id="71">
                         <property name="paddingLeft">5pt</property>
                         <data id="72">
-                            <expression name="valueExpr">row["pos"]</expression>
+                            <property name="resultSetColumn">pos</property>
                         </data>
                     </cell>
                     <cell id="73">
                         <data id="74">
-                            <expression name="valueExpr">row["name"]</expression>
+                            <property name="resultSetColumn">name</property>
                         </data>
                     </cell>
                     <cell id="75">
                         <data id="76">
-                            <expression name="valueExpr">row["amount"]/100</expression>
+                            <property name="resultSetColumn">row["amount"]/100</property>
                         </data>
                     </cell>
                 </row>
@@ -413,7 +549,7 @@ result</expression>
                         <property name="borderTopStyle">solid</property>
                         <property name="borderTopWidth">thin</property>
                         <data id="84">
-                            <expression name="valueExpr">Total.sum(row["amount"])/100</expression>
+                            <property name="resultSetColumn">Total.sum(row["amount"])/100</property>
                         </data>
                     </cell>
                 </row>

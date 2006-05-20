@@ -30,6 +30,8 @@ import java.io.Serializable;
 import java.util.Date;
 
 import org.nightlabs.jfire.reporting.Birt;
+import org.nightlabs.jfire.reporting.Birt.OutputFormat;
+import org.nightlabs.jfire.reporting.layout.id.ReportRegistryItemID;
 
 /**
  * Holds the format and the content of a report rendered by BIRT.
@@ -38,61 +40,108 @@ import org.nightlabs.jfire.reporting.Birt;
  *
  */
 public class RenderedReportLayout implements Serializable {
+	private static final long serialVersionUID = 1L;
 
+	/**
+	 * The header hold the descriptive information
+	 * for a {@link RenderedReportLayout} 
+	 */
+	public class Header implements Serializable {
+		private static final long serialVersionUID = 1L;
+
+		private ReportRegistryItemID reportRegistryItemID;		
+		private Birt.OutputFormat outputFormat;		
+		private Date timestamp;		
+		
+		public Header(ReportRegistryItemID reportRegistryItemID, OutputFormat outputFormat, Date timestamp) {
+			this.reportRegistryItemID = reportRegistryItemID;
+			this.timestamp = timestamp;
+			this.outputFormat = outputFormat;
+		}
+
+		/**
+		 * @return the outputFormat
+		 */
+		public Birt.OutputFormat getOutputFormat() {
+			return outputFormat;
+		}
+
+		/**
+		 * @param outputFormat the outputFormat to set
+		 */
+		public void setOutputFormat(Birt.OutputFormat outputFormat) {
+			this.outputFormat = outputFormat;
+		}
+
+		/**
+		 * @return the reportRegistryItemID
+		 */
+		public ReportRegistryItemID getReportRegistryItemID() {
+			return reportRegistryItemID;
+		}
+
+		/**
+		 * @param reportRegistryItemID the reportRegistryItemID to set
+		 */
+		public void setReportRegistryItemID(ReportRegistryItemID reportRegistryItemID) {
+			this.reportRegistryItemID = reportRegistryItemID;
+		}
+
+		/**
+		 * @return the timestamp
+		 */
+		public Date getTimestamp() {
+			return timestamp;
+		}
+
+		/**
+		 * @param timestamp the timestamp to set
+		 */
+		public void setTimestamp(Date timestamp) {
+			this.timestamp = timestamp;
+		}
+	}
+	
+	private Header header;
+	
+	private Serializable data;
+
+	
 	/**
 	 * 
 	 */
-	public RenderedReportLayout() {
+	public RenderedReportLayout(ReportRegistryItemID itemID, OutputFormat format, Date timestamp) {
 		super();
+		header = new Header(itemID, format, timestamp);
 	}
 	
-	private Date timestamp;
 	
-	private Birt.OutputFormat outputFormat;
-	
-	private byte[] data;
-	
-
 	/**
-	 * @return Returns the outputFormat.
+	 * @return the header
 	 */
-	public Birt.OutputFormat getOutputFormat() {
-		return outputFormat;
+	public Header getHeader() {
+		return header;
 	}
 
 	/**
-	 * @param outputFormat The outputFormat to set.
+	 * @param header the header to set
 	 */
-	public void setOutputFormat(Birt.OutputFormat outputFormat) {
-		this.outputFormat = outputFormat;
-	}
-
-	/**
-	 * @return Returns the timestamp.
-	 */
-	public Date getTimestamp() {
-		return timestamp;
-	}
-
-	/**
-	 * @param timestamp The timestamp to set.
-	 */
-	public void setTimestamp(Date timestamp) {
-		this.timestamp = timestamp;
+	public void setHeader(Header header) {
+		this.header = header;
 	}
 
 	/**
 	 * 
 	 * @return Returns the data of this RenderedReportLayout
 	 */
-	public byte[] getData() {
+	public Serializable getData() {
 		return data;
 	}
 	
 	/**
 	 * Set the data
 	 */
-	public void setData(byte[] data) {
+	public void setData(Serializable data) {
 		this.data = data;
 	}
 }

@@ -6,11 +6,13 @@ package org.nightlabs.jfire.reporting.oda.jfs.server;
 import java.util.Map;
 
 import javax.jdo.PersistenceManager;
+import javax.naming.NamingException;
 
 import org.eclipse.datatools.connectivity.oda.IResultSet;
 import org.eclipse.datatools.connectivity.oda.IResultSetMetaData;
 import org.eclipse.datatools.connectivity.oda.OdaException;
 import org.nightlabs.ModuleException;
+import org.nightlabs.jfire.base.InitException;
 import org.nightlabs.jfire.base.Lookup;
 import org.nightlabs.jfire.reporting.JFireReportingEAR;
 import org.nightlabs.jfire.reporting.oda.jfs.AbstractJFSQueryProxy;
@@ -20,6 +22,7 @@ import org.nightlabs.jfire.scripting.ScriptExecutor;
 import org.nightlabs.jfire.scripting.ScriptRegistry;
 import org.nightlabs.jfire.scripting.ScriptRegistryItem;
 import org.nightlabs.jfire.scripting.id.ScriptRegistryItemID;
+import org.nightlabs.jfire.servermanager.j2ee.SecurityReflector;
 
 /**
  * @author Alexander Bieber <alex [AT] nightlabs [DOT] de>
@@ -96,7 +99,12 @@ public class ServerJFSQueryProxy extends AbstractJFSQueryProxy {
 	public static IResultSetMetaData getJFSResultSetMetaData(ScriptRegistryItemID scriptRegistryItemID)
 	throws ModuleException
 	{
-		Lookup lookup = JFireReportingEAR.getLookup();
+		Lookup lookup;
+		try {
+			lookup = SecurityReflector.getLookup();
+		} catch (Exception e) {
+			throw new ModuleException("Could not get Lookup from SecurityReflector!", e);
+		}
 		PersistenceManager pm = null;
 		try {
 			pm = lookup.getPersistenceManager();
@@ -109,7 +117,12 @@ public class ServerJFSQueryProxy extends AbstractJFSQueryProxy {
 	public static IResultSet getJFSResultSet(ScriptRegistryItemID scriptRegistryItemID, Map<String, Object> parameters)
 	throws ModuleException
 	{
-		Lookup lookup = JFireReportingEAR.getLookup();
+		Lookup lookup;
+		try {
+			lookup = SecurityReflector.getLookup();
+		} catch (Exception e) {
+			throw new ModuleException("Could not get Lookup from SecurityReflector!", e);
+		}
 		PersistenceManager pm = null;
 		try {
 			pm = lookup.getPersistenceManager();

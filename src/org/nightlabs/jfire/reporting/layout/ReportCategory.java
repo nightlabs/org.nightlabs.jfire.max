@@ -72,6 +72,8 @@ public class ReportCategory extends ReportRegistryItem implements NestableReport
 	public static final String INTERNAL_CATEGORY_TYPE_INVOICE = "InvoiceLayout";
 	public static final String INTERNAL_CATEGORY_TYPE_DELIVERY_NOTE = "DeliveryNoteLayout";
 	
+	public static final String CATEGORY_TYPE_GENERAL = "GeneralLayouts";
+	
 	public static final String QUERY_GET_REPORT_CATEGORY = "getReportCategory";
 	
 	// TODO: Would be great to have recursion depth here and for ReportRegistryItem.parentItem when thinking of caching in client 

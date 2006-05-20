@@ -60,6 +60,8 @@ import org.nightlabs.io.DataBuffer;
 import org.nightlabs.jfire.reporting.Birt;
 import org.nightlabs.jfire.reporting.layout.RenderedReportLayout;
 import org.nightlabs.jfire.reporting.layout.ReportLayout;
+import org.nightlabs.jfire.reporting.layout.ReportRegistry;
+import org.nightlabs.jfire.reporting.layout.ReportLayoutRenderer;
 import org.nightlabs.jfire.reporting.layout.id.ReportRegistryItemID;
 import org.nightlabs.jfire.servermanager.j2ee.SecurityReflector;
 import org.nightlabs.jfire.servermanager.j2ee.SecurityReflector.UserDescriptor;
@@ -74,26 +76,15 @@ import com.sun.org.apache.xpath.internal.FoundIndex;
  */
 public class ReportingManager {
 
-	private Logger LOGGER = Logger.getLogger(ReportingManager.class);
+//	private Logger LOGGER = Logger.getLogger(ReportingManager.class);
 	
 	private ReportingManagerFactory factory;
-	private UserDescriptor userDescriptor;
-	
 	
 	/**
 	 * 
 	 */
 	public ReportingManager(ReportingManagerFactory factory) {
 		this.factory = factory;
-		InitialContext initCtx;
-		try {
-			initCtx = new InitialContext();
-			userDescriptor = SecurityReflector.lookupSecurityReflector(initCtx).whoAmI();
-			initCtx.close();
-		} catch (NamingException e) {
-			LOGGER.error(e);
-			throw new RuntimeException(e);
-		}
 	}
 	
 	
@@ -131,59 +122,20 @@ public class ReportingManager {
 		ReportEngine reportEngine = factory.getReportEngine();
 		
 		InputStream inputStream = new ByteArrayInputStream(reportLayout.getReportDesign());
-		
 		IReportRunnable report = reportEngine.openReportDesign(inputStream);
-		
 		IRunAndRenderTask task = reportEngine.createRunAndRenderTask(report);
-		HTMLRenderOption options = new HTMLRenderOption( );
-		options.setOutputFormat(format.toString());
 		
-		HTMLRenderContext renderContext = new HTMLRenderContext( );
-		renderContext.setImageDirectory( "image" ); //$NON-NLS-1$
-		renderContext.setBaseImageURL("images"); //$NON-NLS-1$
-
-		HashMap appContext = new HashMap( );
-		appContext.put( EngineConstants.APPCONTEXT_HTML_RENDER_CONTEXT,
-				renderContext );
-		task.setAppContext( appContext );
-		
-		DataBuffer dataBuffer = null;
-		OutputStream outputStream = null;
-		RenderedReportLayout result = new RenderedReportLayout();
+		ReportRegistry registry = ReportRegistry.getReportRegistry(pm);
+		ReportLayoutRenderer renderer = null; 
 		try {
-			try {
-				dataBuffer = new DataBuffer(512, Integer.MAX_VALUE, (File)null);
-				outputStream = dataBuffer.createOutputStream();
-			} catch (IOException e) {
-				e.printStackTrace();		
-			}
-			
-			
-			options.setOutputStream(outputStream);
-			task.setRenderOption( options );
-			
-			HashMap<String,Object> parsedParams = parseReportParams(reportEngine, report, params);
-			
-			// TODO: Birt does only support HashMaps here, maybe this should change
-			task.setParameterValues(parsedParams);
-			
-			task.run();
-		} finally {			
-			try {
-				outputStream.close();
-			} catch (IOException e) {
-				throw new RuntimeException(e);
-			}
-		}
-		result.setOutputFormat(format);
-		result.setTimestamp(new Date());
-		try {
-			result.setData(dataBuffer.createByteArray());
-		} catch (IOException e) {
-			throw new RuntimeException(e);
+			renderer = registry.createReportRenderer(format);
+		} catch (Exception e) {
+			throw new EngineException("Could not create ReportLayoutRenderer for OutputFormat "+format, e);
 		}
 		
-		return result;
+		HashMap<String,Object> parsedParams = parseReportParams(reportEngine, report, params);
+		
+		return renderer.renderReport(pm, reportRegistryItemID, task, parsedParams, format);
 	}
 
 

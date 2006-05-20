@@ -78,14 +78,13 @@ public class ReportingManagerFactory implements Serializable {
 		if (reportEngine == null) {
 			EngineConfig config = new EngineConfig( );
 
+			// TODO: Add configuration for other formats/emitters as well -> the appropriate ReportLayoutRenderer configure it
+			
 //			 Create the emitter configuration.
 			HTMLEmitterConfig hc = new HTMLEmitterConfig( );
-			
-
 //			 Use the "HTML complete" image handler to write the files to disk.
 			HTMLCompleteImageHandler imageHandler = new HTMLCompleteImageHandler( );
 			hc.setImageHandler( imageHandler );
-
 //			 Associate the configuration with the HTML output format.
 			config.setEmitterConfiguration( HTMLRenderOption.OUTPUT_FORMAT_HTML, hc );			
 			reportEngine = new ReportEngine(config);				

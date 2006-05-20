@@ -33,6 +33,8 @@ package org.nightlabs.jfire.reporting;
  */
 public class Birt {
 
+	// TODO: Maybe we should change this back to simple Strings, so we are able to plug new Emmitters more easily ???
+	
 
 	public static enum OutputFormat {
 		html, pdf

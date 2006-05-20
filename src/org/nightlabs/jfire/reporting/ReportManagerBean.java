@@ -300,6 +300,34 @@ implements SessionBean
 				"Standard Lieferschein-Vorlage",
 				"Default deliverynote layout"
 			);
+		
+		
+		ReportCategory generalCat = ReportCategory.getReportCategory(
+				pm,
+				getOrganisationID(),
+				ReportCategory.CATEGORY_TYPE_GENERAL
+			);
+		if (generalCat == null) {
+			generalCat = new ReportCategory(
+					pm,
+					null,
+					getOrganisationID(),
+					ReportCategory.CATEGORY_TYPE_GENERAL,
+					true
+			);
+			generalCat.getName().setText(Locale.ENGLISH.getLanguage(), "General");
+			generalCat.getName().setText(Locale.GERMAN.getLanguage(), "Allgemein");
+			pm.makePersistent(generalCat);
+		}
+		
+		initDefaultCatReportLayout(
+				pm,
+				generalCat,
+				earDir,
+				ReportCategory.CATEGORY_TYPE_GENERAL,
+				"Sales Statistic",
+				"Umsatz Statistik"
+			);
 	}
 	
 	private void initRegisterScripts(PersistenceManager pm, JFireServerManager jfireServerManager) 
@@ -367,7 +395,6 @@ implements SessionBean
 			
 			// Init scripts before module metat data check
 			initRegisterScripts(pm, jfireServerManager);
-			
 			
 			ModuleMetaData moduleMetaData = ModuleMetaData.getModuleMetaData(pm, JFireReportingEAR.MODULE_NAME);
 			if (moduleMetaData == null) {

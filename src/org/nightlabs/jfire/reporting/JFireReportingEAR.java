@@ -32,8 +32,10 @@ import javax.naming.InitialContext;
 import javax.naming.NamingException;
 
 import org.nightlabs.ModuleException;
+import org.nightlabs.jfire.base.InitException;
 import org.nightlabs.jfire.base.Lookup;
 import org.nightlabs.jfire.servermanager.JFireServerManager;
+import org.nightlabs.jfire.servermanager.JFireServerManagerUtil;
 import org.nightlabs.jfire.servermanager.j2ee.SecurityReflector;
 import org.nightlabs.jfire.servermanager.j2ee.SecurityReflector.UserDescriptor;
 
@@ -47,28 +49,24 @@ public class JFireReportingEAR {
 	
 	public static final String MODULE_NAME = "JFireReporting"; 
 	
-	// TODO: Move this method to SecurityReflector or somewhere else in the ServerManager
-	public static Lookup getLookup() throws ModuleException {
-		SecurityReflector securityReflector = null;
-		try {
-			securityReflector = SecurityReflector.lookupSecurityReflector(new InitialContext());
-		} catch (NamingException e) {
-			throw new ModuleException(e);			
-		}
-		UserDescriptor userDescriptor = securityReflector.whoAmI();
-		Lookup lookup = null;
-		lookup = new Lookup(userDescriptor.getOrganisationID());
-		return lookup;
-	}
-	
-	public static File getEARDir(JFireServerManager jfireServerManager) 
+	public static File getEARDir() 
 	throws ModuleException 
 	{
-		File earDir = new File(
-				jfireServerManager.getJFireServerConfigModule()
-				.getJ2ee().getJ2eeDeployBaseDirectory()+
-				"JFireReporting.ear"
-			);
-		return earDir;
+		JFireServerManager jFireServerManager;
+		try {
+			jFireServerManager = JFireServerManagerUtil.getJFireServerManager();
+		} catch (Exception e) {
+			throw new ModuleException("Could not get JFireServerManager!", e);
+		}
+		try {
+			File earDir = new File(
+					jFireServerManager.getJFireServerConfigModule()
+					.getJ2ee().getJ2eeDeployBaseDirectory()+
+					"JFireReporting.ear"
+				);
+			return earDir;
+		} finally {
+			jFireServerManager.close();
+		}
 	}
 }

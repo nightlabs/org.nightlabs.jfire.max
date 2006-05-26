@@ -260,56 +260,41 @@ public class PriceCoordinate implements Serializable, StoreCallback, IPriceCoord
 			thisHashCode = toString().hashCode();
 		return thisHashCode;
 	}
-	/**
-	 * @return Returns the currencyID.
-	 */
+
 	public String getCurrencyID()
 	{
 		return currencyID;
 	}
-	/**
-	 * @return Returns the customerGroupPK.
-	 */
+
 	public String getCustomerGroupPK()
 	{
 		return customerGroupPK;
 	}
-	/**
-	 * @return Returns the priceConfig.
-	 */
+
 	public PriceConfig getPriceConfig()
 	{
 		return priceConfig;
 	}
-	/**
-	 * @return Returns the tariffPK.
-	 */
+
 	public String getTariffPK()
 	{
 		return tariffPK;
 	}
 
-	/**
-	 * @param currencyID The currencyID to set.
-	 */
 	public void setCurrencyID(String currencyID)
 	{
 		this.currencyID = currencyID;
 		thisString = null;
 		thisHashCode = 0;
 	}
-	/**
-	 * @param customerGroupPK The customerGroupPK to set.
-	 */
+
 	public void setCustomerGroupPK(String customerGroupPK)
 	{
 		this.customerGroupPK = customerGroupPK;
 		thisString = null;
 		thisHashCode = 0;
 	}
-	/**
-	 * @param tariffPK The tariffPK to set.
-	 */
+
 	public void setTariffPK(String tariffPK)
 	{
 		this.tariffPK = tariffPK;

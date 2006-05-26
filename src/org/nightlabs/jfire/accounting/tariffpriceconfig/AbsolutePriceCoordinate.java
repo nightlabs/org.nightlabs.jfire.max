@@ -144,24 +144,17 @@ public class AbsolutePriceCoordinate extends PriceCoordinate implements IAbsolut
 		this.priceFragmentTypePK = priceFragmentType.getPrimaryKey();
 	}
 
-	/**
-	 * @return Returns the priceFragmentTypePK.
-	 */
 	public String getPriceFragmentTypePK()
 	{
 		return priceFragmentTypePK;
 	}
-	/**
-	 * @return Returns the productTypePK.
-	 */
+
 	public String getProductTypePK()
 	{
 		return productTypePK;
 	}
 
-	/**
-	 * @see java.lang.Object#toString()
-	 */
+	@Override
 	public String toString()
 	{
 		if (thisString == null) {
@@ -183,9 +176,7 @@ public class AbsolutePriceCoordinate extends PriceCoordinate implements IAbsolut
 		return thisString;
 	}
 
-	/**
-	 * @see org.nightlabs.jfire.ticketing.accounting.PriceCoordinate#equals(java.lang.Object)
-	 */
+	@Override
 	public boolean equals(Object obj)
 	{
 		if (this == obj)
@@ -197,9 +188,9 @@ public class AbsolutePriceCoordinate extends PriceCoordinate implements IAbsolut
 		if (!super.equals(obj))
 			return false;
 
-		AbsolutePriceCoordinate other = (AbsolutePriceCoordinate)obj;
+		IAbsolutePriceCoordinate other = (IAbsolutePriceCoordinate)obj;
 		return
-				this.productTypePK.equals(other.productTypePK) &&
-				this.priceFragmentTypePK.equals(other.priceFragmentTypePK);
+				this.productTypePK.equals(other.getProductTypePK()) &&
+				this.priceFragmentTypePK.equals(other.getPriceFragmentTypePK());
 	}
 }

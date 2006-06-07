@@ -29,9 +29,12 @@ package org.nightlabs.jfire.trade;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.HashMap;
 import java.util.Iterator;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Locale;
+import java.util.Map;
 import java.util.Set;
 
 import javax.jdo.JDOHelper;
@@ -62,6 +65,7 @@ import org.nightlabs.jfire.store.NotAvailableException;
 import org.nightlabs.jfire.store.Product;
 import org.nightlabs.jfire.store.ProductLocal;
 import org.nightlabs.jfire.store.ProductType;
+import org.nightlabs.jfire.store.ProductTypeActionHandler;
 import org.nightlabs.jfire.store.Store;
 import org.nightlabs.jfire.trade.id.ArticleID;
 import org.nightlabs.jfire.transfer.id.AnchorID;
@@ -928,6 +932,7 @@ public class Trader
 							+ getToStringList(articles)
 							+ "\" cannot be released, because they are currently in state allocationPending!");
 
+		Map productTypeActionHandler2Articles = new HashMap();
 		for (Iterator iter = articles.iterator(); iter.hasNext();) {
 			Article article = (Article) iter.next();
 			if (article.isReversing()) {
@@ -964,6 +969,19 @@ public class Trader
 			Product product = article.getProduct();
 			article.setReleasePending(true);
 			product.getProductLocal().setReleasePending(true);
+
+			ProductTypeActionHandler productTypeActionHandler = ProductTypeActionHandler.getProductTypeActionHandler(
+					getPersistenceManager(), article.getProductType().getClass());
+			List al = (List) productTypeActionHandler2Articles.get(productTypeActionHandler);
+			if (al == null) {
+				al = new LinkedList();
+				productTypeActionHandler2Articles.put(productTypeActionHandler, al);
+			}
+			al.add(article);
+		}
+		for (Iterator it = productTypeActionHandler2Articles.entrySet().iterator(); it.hasNext();) {
+			Map.Entry me = (Map.Entry) it.next();
+			((ProductTypeActionHandler) me.getKey()).onReleaseArticlesBegin(user, this, (List) me.getValue());
 		}
 	}
 
@@ -979,6 +997,7 @@ public class Trader
 			throw new IllegalArgumentException("Articles "
 					+ getToStringList(articles) + " are NOT in state releasePending!");
 
+		Map productTypeActionHandler2Articles = new HashMap();
 		for (Iterator iter = articles.iterator(); iter.hasNext();) {
 			Article article = (Article) iter.next();
 			Product product = article.getProduct();
@@ -992,8 +1011,22 @@ public class Trader
 			productLocal.setArticle(null);
 			article.setAllocated(false);
 			article.setReleasePending(false);
+
+			ProductTypeActionHandler productTypeActionHandler = ProductTypeActionHandler.getProductTypeActionHandler(
+					getPersistenceManager(), article.getProductType().getClass());
+			List al = (List) productTypeActionHandler2Articles.get(productTypeActionHandler);
+			if (al == null) {
+				al = new LinkedList();
+				productTypeActionHandler2Articles.put(productTypeActionHandler, al);
+			}
+			al.add(article);
 			// article.product is NOT cleared, because it should be possible to easily
 			// re-allocate
+		}
+
+		for (Iterator it = productTypeActionHandler2Articles.entrySet().iterator(); it.hasNext();) {
+			Map.Entry me = (Map.Entry) it.next();
+			((ProductTypeActionHandler) me.getKey()).onReleaseArticlesEnd(user, this, (List) me.getValue());
 		}
 	}
 
@@ -1099,6 +1132,7 @@ public class Trader
 							+ getToStringList(articles)
 							+ "\" cannot be allocated, because it is currently in state releasePending!");
 
+		Map productTypeActionHandler2Articles = new HashMap();
 		for (Iterator iter = articles.iterator(); iter.hasNext();) {
 			Article article = (Article) iter.next();
 
@@ -1127,10 +1161,22 @@ public class Trader
 			productLocal.setArticle(article);
 			productLocal.setAllocationPending(true);
 			article.setAllocationPending(true);
-
 			IPackagePriceConfig packagePriceConfig = product.getProductType()
 					.getPackagePriceConfig();
 			article.setPrice(packagePriceConfig.createArticlePrice(article));
+
+			ProductTypeActionHandler productTypeActionHandler = ProductTypeActionHandler.getProductTypeActionHandler(
+					getPersistenceManager(), article.getProductType().getClass());
+			List al = (List) productTypeActionHandler2Articles.get(productTypeActionHandler);
+			if (al == null) {
+				al = new LinkedList();
+				productTypeActionHandler2Articles.put(productTypeActionHandler, al);
+			}
+			al.add(article);
+		}
+		for (Iterator it = productTypeActionHandler2Articles.entrySet().iterator(); it.hasNext();) {
+			Map.Entry me = (Map.Entry) it.next();
+			((ProductTypeActionHandler) me.getKey()).onAllocateArticlesBegin(user, this, (List) me.getValue());
 		}
 	}
 
@@ -1160,6 +1206,7 @@ public class Trader
 			throw new IllegalArgumentException("Articles "
 					+ getToStringList(articles) + " are NOT in state allocationPending!");
 
+		Map productTypeActionHandler2Articles = new HashMap();
 		for (Iterator iter = articles.iterator(); iter.hasNext();) {
 			Article article = (Article) iter.next();
 			Product product = article.getProduct();
@@ -1174,6 +1221,20 @@ public class Trader
 			product.getProductLocal().setAllocated(true);
 			article.setAllocated(true);
 			article.setAllocationPending(false);
+
+			ProductTypeActionHandler productTypeActionHandler = ProductTypeActionHandler.getProductTypeActionHandler(
+					getPersistenceManager(), article.getProductType().getClass());
+			List al = (List) productTypeActionHandler2Articles.get(productTypeActionHandler);
+			if (al == null) {
+				al = new LinkedList();
+				productTypeActionHandler2Articles.put(productTypeActionHandler, al);
+			}
+			al.add(article);
+		}
+
+		for (Iterator it = productTypeActionHandler2Articles.entrySet().iterator(); it.hasNext();) {
+			Map.Entry me = (Map.Entry) it.next();
+			((ProductTypeActionHandler) me.getKey()).onAllocateArticlesEnd(user, this, (List) me.getValue());
 		}
 	}
 

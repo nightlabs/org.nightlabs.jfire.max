@@ -35,7 +35,9 @@ import org.nightlabs.jdo.ObjectIDUtil;
 import org.nightlabs.jfire.accounting.Accounting;
 import org.nightlabs.jfire.organisation.Organisation;
 import org.nightlabs.jfire.security.User;
+import org.nightlabs.jfire.trade.Article;
 import org.nightlabs.jfire.trade.Trader;
+import org.nightlabs.util.Utils;
 
 /**
  * <p>
@@ -225,5 +227,88 @@ public abstract class ProductTypeActionHandler
 	 */
 	public abstract Collection findProducts(
 			User user, ProductType productType, NestedProductType nestedProductType, ProductLocator productLocator);
+
+	/**
+	 * This method is called by {@link Trader#allocateArticlesBegin(User, Collection)}
+	 * when an Article is allocated. You can extend this method
+	 * in order to do sth. when allocation starts. The basic implementation in
+	 * <code>ProductTypeActionHandler</code> is a noop.
+	 * <p>
+	 * Note, that you better implement your work in {@link #onAllocateArticlesEnd(User, Trader, Collection)}, because
+	 * that method is normally called asynchronously (and thus, expensive work is not such a problem).
+	 * </p>
+	 * @param user The user who initiated this action.
+	 * @param trader The trader.
+	 * @param articles The {@link Article}s that are being allocated.
+	 */
+	public void onAllocateArticlesBegin(User user, Trader trader, Collection articles)
+	{
+	}
+
+	/**
+	 * This method is called by {@link Trader#allocateArticlesEnd(User, Collection)}
+	 * when an Article is allocated. You can extend this method
+	 * in order to do sth. when allocation ends. The basic implementation in
+	 * <code>ProductTypeActionHandler</code> is a noop.
+	 * <p>
+	 * As {@link Trader#allocateArticlesEnd(User, Collection)} is normally called asynchronously,
+	 * you should do expensive things here (and not in {@link #onAllocateArticlesBegin(User, Trader, Collection)}).
+	 * But still, you should try to get your work done as fast as possible ;-)
+	 * </p>
+	 * @param user The user who initiated this action.
+	 * @param trader The trader.
+	 * @param articles The {@link Article}s that are being allocated.
+	 */
+	public void onAllocateArticlesEnd(User user, Trader trader, Collection articles)
+	{
+	}
+
+	/**
+	 * This method is called by {@link Trader#releaseArticlesBegin(User, Collection)}.
+	 * The basic implementation in
+	 * <code>ProductTypeActionHandler</code> is a noop.
+	 *
+	 * @param user The user who initiated this action.
+	 * @param trader The trader.
+	 * @param articles The {@link Article}s that are being released.
+	 */
+	public void onReleaseArticlesBegin(User user, Trader trader, Collection articles)
+	{
+	}
+
+	/**
+	 * This method is called by {@link Trader#releaseArticlesEnd(User, Collection)}.
+	 * The basic implementation in
+	 * <code>ProductTypeActionHandler</code> is a noop.
+	 *
+	 * @param user The user who initiated this action.
+	 * @param trader The trader.
+	 * @param articles The {@link Article}s that are being released.
+	 */
+	public void onReleaseArticlesEnd(User user, Trader trader, Collection articles)
+	{
+	}
+
+	@Override
+	public int hashCode()
+	{
+		return Utils.hashCode(organisationID) ^ Utils.hashCode(productTypeActionHandlerID);
+	}
+
+	@Override
+	public boolean equals(Object obj)
+	{
+		if (this == obj)
+			return true;
+
+		if (!(obj instanceof ProductTypeActionHandler))
+			return false;
+
+		ProductTypeActionHandler other = (ProductTypeActionHandler) obj;
+
+		return
+				Utils.equals(this.organisationID, other.organisationID) &&
+				Utils.equals(this.productTypeActionHandlerID, other.productTypeActionHandlerID);
+	}
 
 }

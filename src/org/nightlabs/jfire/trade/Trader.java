@@ -1246,6 +1246,10 @@ public class Trader
 	public void finalizeOffer(User user, Offer offer)
 	{
 		offer.setFinalized(user);
+		for (Iterator it = offer.getOfferActionHandlers().iterator(); it.hasNext(); ) {
+			OfferActionHandler offerActionHandler = (OfferActionHandler) it.next();
+			offerActionHandler.onFinalizeOffer(user, offer);
+		}
 	}
 
 	public void acceptOffer(User user, OfferLocal offerLocal)

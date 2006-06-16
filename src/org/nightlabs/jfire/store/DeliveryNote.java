@@ -31,8 +31,10 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import javax.jdo.JDOHelper;
 import javax.jdo.PersistenceManager;
@@ -63,7 +65,7 @@ import org.nightlabs.jfire.transfer.id.AnchorID;
  * @jdo.inheritance strategy="new-table"
  *
  * @jdo.create-objectid-class
- *		field-order="organisationID, deliveryNoteID"
+ *		field-order="organisationID, deliveryNoteIDPrefix, deliveryNoteID"
  *		add-interfaces="org.nightlabs.jfire.trade.id.ArticleContainerID"
  *
  * @jdo.query
@@ -248,24 +250,33 @@ implements Serializable, ArticleContainer, DetachCallback
 	 */
 	private boolean customerID_detached = false;
 
+//	/**
+//	 * key: String articlePK (organisationID/articleID)<br/>
+//	 * value: Article article
+//	 *
+//	 * @jdo.field
+//	 *		persistence-modifier="persistent"
+//	 *		collection-type="map"
+//	 *		key-type="java.lang.String"
+//	 *		value-type="org.nightlabs.jfire.trade.Article"
+//	 *		mapped-by="deliveryNote"
+//	 *
+//	 * @jdo.key mapped-by="primaryKey"
+//	 *
+//	 * @!jdo.join
+//	 *
+//	 * @!jdo.map-vendor-extension vendor-name="jpox" key="key-field" value="primaryKey"
+//	 */
+//	private Map articles = new HashMap();
+
 	/**
-	 * key: String articlePK (organisationID/articleID)<br/>
-	 * value: Article article
-	 *
 	 * @jdo.field
 	 *		persistence-modifier="persistent"
-	 *		collection-type="map"
-	 *		key-type="java.lang.String"
-	 *		value-type="org.nightlabs.jfire.trade.Article"
+	 *		collection-type="collection"
+	 *		element-type="org.nightlabs.jfire.trade.Article"
 	 *		mapped-by="deliveryNote"
-	 *
-	 * @jdo.key mapped-by="primaryKey"
-	 *
-	 * @!jdo.join
-	 *
-	 * @!jdo.map-vendor-extension vendor-name="jpox" key="key-field" value="primaryKey"
 	 */
-	private Map articles = new HashMap();
+	private Set articles = new HashSet();
 
 	/**
 	 * @jdo.field persistence-modifier="persistent"	 
@@ -338,10 +349,20 @@ implements Serializable, ArticleContainer, DetachCallback
 		return customerID;
 	}
 
-	public Collection getArticles() {
-		return Collections.unmodifiableCollection(articles.values());
+	/**
+	 * @jdo.field persistence-modifier="none"
+	 */
+	private transient Set _articles = null;
+
+	@SuppressWarnings("unchecked")
+	public Collection getArticles()
+	{
+		if (_articles == null)
+			_articles = Collections.unmodifiableSet(articles);
+
+		return _articles;
 	}
-	
+
 	/**
 	 * A DeliveryNote is only valid after {@link #validate()} has been called.
 	 *
@@ -434,7 +455,7 @@ implements Serializable, ArticleContainer, DetachCallback
 //				"Cannot add an Article with a different currency ("+article.getPrice().getCurrency().getCurrencyID()+") than this DeliveryNote's one ("+getCurrency().getCurrencyID()+")!"
 //			);
 
-		articles.put(article.getPrimaryKey(), article);
+		articles.add(article);
 
 		this.valid = false;	
 		article.setDeliveryNote(this);		
@@ -446,9 +467,8 @@ implements Serializable, ArticleContainer, DetachCallback
 		if (isFinalized())
 			throw new DeliveryNoteEditException(DeliveryNoteEditException.REASON_DELIVERY_NOTE_FINALIZED, "DeliveryNote is finalized, can not change any more!");
 
-		String articlePK = article.getPrimaryKey();
-		if (articles.containsKey(articlePK)) {
-			articles.remove(articlePK);
+		if (articles.contains(article)) {
+			articles.remove(article);
 			this.valid = false;
 			article.setDeliveryNote(null);
 		}

@@ -31,8 +31,10 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import javax.jdo.JDOHelper;
 import javax.jdo.PersistenceManager;
@@ -59,7 +61,7 @@ import org.nightlabs.jfire.transfer.id.AnchorID;
  * @jdo.inheritance strategy="new-table"
  *
  * @jdo.create-objectid-class
- *		field-order="organisationID, orderID"
+ *		field-order="organisationID, orderIDPrefix, orderID"
  *		add-interfaces="org.nightlabs.jfire.trade.id.ArticleContainerID"
  *
  * @!jdo.query
@@ -183,61 +185,89 @@ implements Serializable, ArticleContainer, SegmentContainer, DetachCallback
 	 */
 	protected boolean customerChangeable = true;
 
-	/**
-	 * key: String articlePK<br/>
-	 * value: Article article
-	 * <br/><br/>
-	 *
-	 * @jdo.field
-	 *		persistence-modifier="persistent"
-	 *		collection-type="map"
-	 *		key-type="java.lang.String"
-	 *		value-type="Article"
-	 *		mapped-by="order"
-	 *		dependent-value="true"
-	 *
-	 * @jdo.key mapped-by="primaryKey"
-	 *
-	 * @!jdo.join
-	 * @!jdo.map-vendor-extension vendor-name="jpox" key="key-field" value="primaryKey"
-	 */
-	private Map articles = new HashMap();
+//	/**
+//	 * key: String articlePK<br/>
+//	 * value: Article article
+//	 * <br/><br/>
+//	 *
+//	 * @jdo.field
+//	 *		persistence-modifier="persistent"
+//	 *		collection-type="map"
+//	 *		key-type="java.lang.String"
+//	 *		value-type="Article"
+//	 *		mapped-by="order"
+//	 *		dependent-value="true"
+//	 *
+//	 * @jdo.key mapped-by="primaryKey"
+//	 *
+//	 * @!jdo.join
+//	 * @!jdo.map-vendor-extension vendor-name="jpox" key="key-field" value="primaryKey"
+//	 */
+//	private Map articles = new HashMap();
 
 	/**
-	 * key: String offerPK<br/>
-	 * value: Offer offer
-	 * <br/><br/>
-	 *
 	 * @jdo.field
 	 *		persistence-modifier="persistent"
-	 *		collection-type="map"
-	 *		key-type="java.lang.String"
-	 *		value-type="Offer"
+	 *		collection-type="collection"
+	 *		element-type="Article"
 	 *		mapped-by="order"
-	 *
-	 * @jdo.key mapped-by="primaryKey"
-	 *
-	 * @!jdo.map-vendor-extension vendor-name="jpox" key="key-field" value="primaryKey"
+	 *		dependent-value="true"
 	 */
-	private Map offers = new HashMap();
-	
+	private Set articles;
+
+//	/**
+//	 * key: String offerPK<br/>
+//	 * value: Offer offer
+//	 * <br/><br/>
+//	 *
+//	 * @jdo.field
+//	 *		persistence-modifier="persistent"
+//	 *		collection-type="map"
+//	 *		key-type="java.lang.String"
+//	 *		value-type="Offer"
+//	 *		mapped-by="order"
+//	 *
+//	 * @jdo.key mapped-by="primaryKey"
+//	 *
+//	 * @!jdo.map-vendor-extension vendor-name="jpox" key="key-field" value="primaryKey"
+//	 */
+//	private Map offers = new HashMap();
+
 	/**
-	 * key: String segmentPK<br/>
-	 * value: Segment segment
-	 * <br/><br/>
-	 *
 	 * @jdo.field
 	 *		persistence-modifier="persistent"
-	 *		collection-type="map"
-	 *		key-type="java.lang.String"
-	 *		value-type="Segment"
+	 *		collection-type="collection"
+	 *		element-type="Offer"
 	 *		mapped-by="order"
-	 *
-	 * @jdo.key mapped-by="primaryKey"
-	 *
-	 * @!jdo.map-vendor-extension vendor-name="jpox" key="key-field" value="primaryKey"
 	 */
-	private Map segments = new HashMap();
+	private Set offers;
+
+//	/**
+//	 * key: String segmentPK<br/>
+//	 * value: Segment segment
+//	 * <br/><br/>
+//	 *
+//	 * @jdo.field
+//	 *		persistence-modifier="persistent"
+//	 *		collection-type="map"
+//	 *		key-type="java.lang.String"
+//	 *		value-type="Segment"
+//	 *		mapped-by="order"
+//	 *
+//	 * @jdo.key mapped-by="primaryKey"
+//	 *
+//	 * @!jdo.map-vendor-extension vendor-name="jpox" key="key-field" value="primaryKey"
+//	 */
+//	private Map segments = new HashMap();
+
+	/**
+	 * @jdo.field
+	 *		persistence-modifier="persistent"
+	 *		collection-type="collection"
+	 *		element-type="Segment"
+	 *		mapped-by="order"
+	 */
+	private Set segments;
 
 	/**
 	 * @jdo.field persistence-modifier="persistent"
@@ -310,6 +340,10 @@ implements Serializable, ArticleContainer, SegmentContainer, DetachCallback
 		this.createUser = user;
 		this.changeDT = new Date();
 		this.changeUser = user;
+
+		articles = new HashSet();
+		offers = new HashSet();
+		segments = new HashSet();
 	}
 
 	/**
@@ -430,52 +464,75 @@ implements Serializable, ArticleContainer, SegmentContainer, DetachCallback
 	{
 		return changeUser;
 	}
-	/**
-	 * @return Returns the createDT.
-	 */
+
 	public Date getCreateDT()
 	{
 		return createDT;
 	}
-	/**
-	 * @return Returns the createUser.
-	 */
+
 	public User getCreateUser()
 	{
 		return createUser;
 	}
+
 	/**
-	 * @see org.nightlabs.jfire.trade.ArticleContainer#getArticles()
+	 * @jdo.field persistence-modifier="none"
 	 */
+	private transient Set _articles = null;
+
+	@SuppressWarnings("unchecked")
 	public Collection getArticles()
 	{
-		return Collections.unmodifiableCollection(articles.values());
+		if (_articles == null)
+			_articles = Collections.unmodifiableSet(articles);
+
+		return _articles;
 	}
+
+	/**
+	 * @jdo.field persistence-modifier="none"
+	 */
+	private transient Set _offers = null;
 
 	/**
 	 * @return Returns the offers.
 	 */
+	@SuppressWarnings("unchecked")
 	public Collection getOffers()
 	{
-		return offers.values();
+		if (_offers == null)
+			_offers = Collections.unmodifiableSet(offers);
+
+		return _offers;
 	}
+
+	/**
+	 * @jdo.field persistence-modifier="none"
+	 */
+	private transient Set _segments = null;
+
 	/**
 	 * @return Returns the segments.
 	 */
+	@SuppressWarnings("unchecked")
 	public Collection getSegments()
 	{
-		return segments.values();
+		if (_segments == null)
+			_segments = Collections.unmodifiableSet(segments);
+
+		return _segments;
 	}
 
 	/**
 	 * This method is called by {@link Trader} to add a newly created <tt>Segment</tt>.
 	 */
+	@SuppressWarnings("unchecked")
 	protected void addSegment(Segment segment)
 	{
 		if (!getPrimaryKey().equals(segment.getOrder().getPrimaryKey()))
 			throw new IllegalArgumentException("segment.order != this !!!");
 
-		segments.put(segment.getPrimaryKey(), segment);
+		segments.add(segment);
 	}
 
 	/**
@@ -488,9 +545,10 @@ implements Serializable, ArticleContainer, SegmentContainer, DetachCallback
 	 *
 	 * @see ArticleContainer#addArticle(Article)
 	 */
+	@SuppressWarnings("unchecked")
 	public void addArticle(Article article)
 	{
-		articles.put(article.getPrimaryKey(), article);
+		articles.add(article);
 	}
 
 	public void removeArticle(Article article)

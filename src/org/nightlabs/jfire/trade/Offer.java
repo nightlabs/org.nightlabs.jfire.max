@@ -30,9 +30,9 @@ import java.io.Serializable;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Date;
-import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Iterator;
-import java.util.Map;
+import java.util.Set;
 
 import javax.jdo.JDOHelper;
 import javax.jdo.PersistenceManager;
@@ -48,6 +48,7 @@ import org.nightlabs.jfire.accounting.Price;
 import org.nightlabs.jfire.security.User;
 import org.nightlabs.jfire.store.ProductType;
 import org.nightlabs.jfire.transfer.id.AnchorID;
+import org.nightlabs.util.Utils;
 
 /**
  * @author Niklas Schiffler <nick@nightlabs.de>
@@ -63,7 +64,7 @@ import org.nightlabs.jfire.transfer.id.AnchorID;
  * @jdo.inheritance strategy="new-table"
  *
  * @jdo.create-objectid-class
- *		field-order="organisationID, offerID"
+ *		field-order="organisationID, offerIDPrefix, offerID"
  *		add-interfaces="org.nightlabs.jfire.trade.id.ArticleContainerID"
  *
  * @jdo.query name="getNonFinalizedOffersForOrder" query="SELECT
@@ -206,21 +207,33 @@ implements
 	 */
 	private User finalizeUser = null;
 
+//	/**
+//	 * key: String articlePK<br/>
+//	 * value: Article article
+//	 *
+//	 * @jdo.field
+//	 *		persistence-modifier="persistent"
+//	 *		collection-type="map"
+//	 *		key-type="String"
+//	 *		value-type="Article"
+//	 *		dependent-value="true"
+//	 *		mapped-by="offer"
+//	 *
+//	 * @jdo.key mapped-by="primaryKey"
+//	 */
+//	private Map articles;
+
 	/**
-	 * key: String articlePK<br/>
-	 * value: Article article
+	 * Instances of {@link Article}.
 	 *
 	 * @jdo.field
 	 *		persistence-modifier="persistent"
-	 *		collection-type="map"
-	 *		key-type="String"
-	 *		value-type="Article"
+	 *		collection-type="collection"
+	 *		element-type="Article"
 	 *		dependent-value="true"
 	 *		mapped-by="offer"
-	 *
-	 * @jdo.key mapped-by="primaryKey"
 	 */
-	private Map articles = new HashMap();
+	private Set articles;
 
 	/**
 	 * This member represents the sum of all prices of all offer items.
@@ -251,6 +264,17 @@ implements
 	 * @jdo.field persistence-modifier="none"
 	 */
 	private boolean customerID_detached = false;
+
+	/**
+	 * @jdo.field
+	 *		persistence-modifier="persistent"
+	 *		collection-type="collection"
+	 *		element-type="org.nightlabs.jfire.trade.OfferActionHandler"
+	 *		table="JFireTrade_Offer_offerActionHandlers"
+	 *
+	 * @jdo.join
+	 */
+	private Set offerActionHandlers;
 
 	/**
 	 * @deprecated This constructor exists only for JDO!
@@ -286,6 +310,9 @@ implements
 		this.price = new Price(
 				accountingPriceConfig.getOrganisationID(), accountingPriceConfig.getPriceConfigID(),
 				accountingPriceConfig.createPriceID(), getCurrency());
+
+		articles = new HashSet();
+		offerActionHandlers = new HashSet();
 	}
 
 	/**
@@ -325,7 +352,7 @@ implements
 		this.offerLocal = offerLocal;
 	}
 
-	public synchronized void addArticles(Collection articles)
+	public void addArticles(Collection articles)
 	{
 		if (isFinalized())
 			throw new IllegalStateException("This offer is already finalized! Cannot add a new Article!");
@@ -339,12 +366,12 @@ implements
 			if (!this.primaryKey.equals(article.getOffer().getPrimaryKey()))
 				throw new IllegalArgumentException("offerItem.offer != this!");
 
-			this.articles.put(article.getPrimaryKey(), article);
+			this.articles.add(article);
 			this.order.addArticle(article);
 		}
 	}
 
-	public synchronized void addArticle(Article article)
+	public void addArticle(Article article)
 	{
 		if (isFinalized())
 			throw new IllegalStateException("This offer is already finalized! Cannot add a new Article!");
@@ -355,7 +382,7 @@ implements
 		if (!JDOHelper.getObjectId(this).equals(article.getOfferID()))
 			throw new IllegalArgumentException("article.offer != this!");
 
-		this.articles.put(article.getPrimaryKey(), article);
+		this.articles.add(article);
 
 		if (JDOHelper.isDetached(this))
 			attachable = false;
@@ -363,7 +390,7 @@ implements
 			this.order.addArticle(article);
 	}
 
-	public synchronized void removeArticle(Article article)
+	public void removeArticle(Article article)
 	{
 		if (isFinalized())
 			throw new IllegalStateException("Offer \""+getPrimaryKey()+"\" is already finalized! Cannot delete the Article \""+article.getPrimaryKey()+"\"!");
@@ -371,7 +398,7 @@ implements
 		if (!article.isReversing() && (article.isAllocated() || article.isAllocationPending()))
 			throw new IllegalStateException("Article \""+article.getPrimaryKey()+"\" is allocated (or allocationPending) and not reversing! Cannot be removed!");
 
-		this.articles.remove(article.getPrimaryKey());
+		this.articles.remove(article);
 		this.valid = false;
 
 		if (JDOHelper.isDetached(this))
@@ -438,7 +465,7 @@ implements
 		if (pm == null)
 			throw new IllegalStateException("This instance of offer is currently not persistent!");
 
-		for (Iterator it = articles.values().iterator(); it.hasNext(); ) {
+		for (Iterator it = articles.iterator(); it.hasNext(); ) {
 			Article article = (Article)it.next();
 			if (all || article.isPriceDependentOnOffer()) {
 				if (article.isPriceDependentOnOffer())
@@ -540,12 +567,18 @@ implements
 	{
 		return currency;
 	}
+
 	/**
-	 * @see org.nightlabs.jfire.trade.ArticleContainer#getArticles()
+	 * @jdo.field persistence-modifier="none"
 	 */
+	private transient Set _articles = null;
+
 	public Collection getArticles()
 	{
-		return Collections.unmodifiableCollection(articles.values());
+		if (_articles == null)
+			_articles = Collections.unmodifiableSet(articles);
+
+		return _articles;
 	}
 
 	/**
@@ -670,4 +703,54 @@ implements
 	{
 	}
 
+	/**
+	 * @jdo.field persistence-modifier="none"
+	 */
+	private transient Set _offerActionHandlers = null;
+
+	/**
+	 * @return Instances of {@link OfferActionHandler}.
+	 */
+	@SuppressWarnings("unchecked")
+	public Set getOfferActionHandlers()
+	{
+		if (_offerActionHandlers == null)
+			_offerActionHandlers = Collections.unmodifiableSet(offerActionHandlers);
+
+		return _offerActionHandlers;
+	}
+
+	@SuppressWarnings("unchecked")
+	public void addOfferActionHandler(OfferActionHandler offerActionHandler)
+	{
+		if (!offerActionHandlers.contains(offerActionHandler))
+			offerActionHandlers.add(offerActionHandler);
+	}
+
+	public boolean removeOfferActionHandler(OfferActionHandler offerActionHandler)
+	{
+		return offerActionHandlers.remove(offerActionHandler);
+	}
+
+	@Override
+	public boolean equals(Object obj)
+	{
+		if (this == obj)
+			return true;
+
+		if (!(obj instanceof Offer))
+			return false;
+
+		Offer o = (Offer)obj;
+		return
+				Utils.equals(this.organisationID, o.organisationID) &&
+				Utils.equals(this.offerIDPrefix, o.offerIDPrefix) &&
+				this.offerID == o.offerID;
+	}
+
+	@Override
+	public int hashCode()
+	{
+		return Utils.hashCode(organisationID) ^ Utils.hashCode(offerIDPrefix) ^ Utils.hashCode(offerID);
+	}
 }

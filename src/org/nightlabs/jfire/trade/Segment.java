@@ -31,6 +31,7 @@ import java.io.Serializable;
 import org.nightlabs.jfire.accounting.Invoice;
 import org.nightlabs.jfire.idgenerator.IDGenerator;
 import org.nightlabs.jfire.store.DeliveryNote;
+import org.nightlabs.util.Utils;
 
 /**
  * One {@link Order}, {@link Offer}, {@link Invoice} or {@link DeliveryNote} may contain
@@ -145,5 +146,25 @@ public class Segment implements Serializable
 	public SegmentType getSegmentType()
 	{
 		return segmentType;
+	}
+
+	@Override
+	public boolean equals(Object obj)
+	{
+		if (this == obj)
+			return true;
+
+		if (!(obj instanceof Segment))
+			return false;
+
+		Segment o = (Segment) obj;
+
+		return Utils.equals(this.organisationID, o.organisationID) && this.segmentID == o.segmentID;
+	}
+
+	@Override
+	public int hashCode()
+	{
+		return Utils.hashCode(organisationID) ^ Utils.hashCode(segmentID);
 	}
 }

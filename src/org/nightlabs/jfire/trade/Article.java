@@ -52,6 +52,7 @@ import org.nightlabs.jfire.trade.id.ArticleID;
 import org.nightlabs.jfire.trade.id.OfferID;
 import org.nightlabs.jfire.trade.id.OrderID;
 import org.nightlabs.jfire.transfer.id.AnchorID;
+import org.nightlabs.util.Utils;
 
 /**
  * An instance of <tt>Article</tt> occurs in the context of a {@link Segment}. It represents a
@@ -1145,5 +1146,27 @@ public class Article
 	protected ArticleLocal createArticleLocal(User user)
 	{
 		return new ArticleLocal(this);
+	}
+
+	@Override
+	public boolean equals(Object obj)
+	{
+		if (this == obj)
+			return true;
+
+		if (!(obj instanceof Article))
+			return false;
+
+		Article o = (Article)obj;
+
+		return
+				Utils.equals(this.organisationID, o.organisationID) &&
+				this.articleID == o.articleID;
+	}
+
+	@Override
+	public int hashCode()
+	{
+		return Utils.hashCode(organisationID) ^ Utils.hashCode(articleID);
 	}
 }

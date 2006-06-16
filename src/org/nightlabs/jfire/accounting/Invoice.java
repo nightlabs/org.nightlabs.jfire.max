@@ -31,9 +31,11 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import javax.jdo.JDOHelper;
 import javax.jdo.PersistenceManager;
@@ -65,7 +67,7 @@ import org.nightlabs.jfire.transfer.id.AnchorID;
  * @jdo.inheritance strategy="new-table"
  *
  * @jdo.create-objectid-class
- *		field-order="organisationID, invoiceID"
+ *		field-order="organisationID, invoiceIDPrefix, invoiceID"
  *		add-interfaces="org.nightlabs.jfire.trade.id.ArticleContainerID"
  *
  * @jdo.query
@@ -221,6 +223,8 @@ implements Serializable, ArticleContainer, DetachCallback
 		this.price = new Price(
 				accountingPriceConfig.getOrganisationID(), accountingPriceConfig.getPriceConfigID(),
 				accountingPriceConfig.createPriceID(), currency);
+
+		articles = new HashSet();
 	}
 
 	/**
@@ -261,22 +265,31 @@ implements Serializable, ArticleContainer, DetachCallback
 	 */
 	private boolean customerID_detached = false;
 
+//	/**
+//	 * key: String articlePK (organisationID/articleID)<br/>
+//	 * value: Article article
+//	 *
+//	 * @jdo.field
+//	 *		persistence-modifier="persistent"
+//	 *		collection-type="map"
+//	 *		key-type="java.lang.String"
+//	 *		value-type="org.nightlabs.jfire.trade.Article"
+//	 *		mapped-by="invoice"
+//	 *
+//	 * @jdo.key mapped-by="primaryKey"
+//	 *
+//	 * @!jdo.map-vendor-extension vendor-name="jpox" key="key-field" value="primaryKey"
+//	 */
+//	private Map articles = new HashMap();
+
 	/**
-	 * key: String articlePK (organisationID/articleID)<br/>
-	 * value: Article article
-	 *
 	 * @jdo.field
 	 *		persistence-modifier="persistent"
-	 *		collection-type="map"
-	 *		key-type="java.lang.String"
-	 *		value-type="org.nightlabs.jfire.trade.Article"
+	 *		collection-type="collection"
+	 *		element-type="org.nightlabs.jfire.trade.Article"
 	 *		mapped-by="invoice"
-	 *
-	 * @jdo.key mapped-by="primaryKey"
-	 *
-	 * @!jdo.map-vendor-extension vendor-name="jpox" key="key-field" value="primaryKey"
 	 */
-	private Map articles = new HashMap();
+	private Set articles;
 
 	public InvoiceLocal getInvoiceLocal()
 	{
@@ -358,7 +371,7 @@ implements Serializable, ArticleContainer, DetachCallback
 					"The reversed Article is not in an Invoice! Cannot add the reversing Article to one in this case!",
 					articleID);
 
-		articles.put(article.getPrimaryKey(), article);
+		articles.add(article);
 
 		this.valid = false;	
 		article.setInvoice(this);		
@@ -370,9 +383,8 @@ implements Serializable, ArticleContainer, DetachCallback
 		if (isFinalized())
 			throw new InvoiceEditException(InvoiceEditException.REASON_INVOICE_FINALIZED, "Invoice is finalized, can not change any more!");
 
-		String itemPK = article.getPrimaryKey();
-		if (articles.containsKey(itemPK)) {
-			articles.remove(itemPK);
+		if (articles.contains(article)) {
+			articles.remove(article);
 			this.valid = false;
 			article.setInvoice(null);
 		}
@@ -433,7 +445,7 @@ implements Serializable, ArticleContainer, DetachCallback
 		price.clearFragments();
 		price.setAmount(0);
 
-		for (Iterator it = articles.values().iterator(); it.hasNext(); ) {
+		for (Iterator it = articles.iterator(); it.hasNext(); ) {
 			Article article = (Article)it.next();
 			price.sumPrice(article.getPrice());
 		}
@@ -535,9 +547,21 @@ implements Serializable, ArticleContainer, DetachCallback
 	public long getInvoiceID() {
 		return invoiceID;
 	}
-	public Collection getArticles() {
-		return Collections.unmodifiableCollection(articles.values());
+
+	/**
+	 * @jdo.field persistence-modifier="none"
+	 */
+	private transient Set _articles = null;
+
+	@SuppressWarnings("unchecked")
+	public Collection getArticles()
+	{
+		if (_articles == null)
+			_articles = Collections.unmodifiableSet(articles);
+
+		return _articles;
 	}
+
 	public String getOrganisationID() {
 		return organisationID;
 	}

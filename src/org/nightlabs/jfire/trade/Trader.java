@@ -715,6 +715,8 @@ public class Trader
 	public static class AllocateArticlesEndUndeliverableCallback extends
 			UndeliverableCallback
 	{
+		private static final long serialVersionUID = 1L;
+
 		public void handle(AsyncInvokeEnvelope envelope) throws Exception
 		{
 			PersistenceManager pm = getPersistenceManager();
@@ -742,6 +744,8 @@ public class Trader
 
 	public static class AllocateArticlesEndErrorCallback extends ErrorCallback
 	{
+		private static final long serialVersionUID = 1L;
+
 		public void handle(AsyncInvokeEnvelope envelope, Throwable error)
 				throws Exception
 		{
@@ -770,6 +774,8 @@ public class Trader
 
 	public static class AllocateArticlesEndInvocation extends Invocation
 	{
+		private static final long serialVersionUID = 1L;
+
 		private UserID userID;
 
 		private Set articleIDs;
@@ -813,7 +819,7 @@ public class Trader
 	 *          Instances of {@link Article}.
 	 * @param synchronously
 	 */
-	public void releaseArticles(User user, Collection articles,
+	public void releaseArticles(User user, Collection<Article> articles,
 			boolean synchronously) throws ModuleException
 	{
 		try {
@@ -881,6 +887,8 @@ public class Trader
 
 	public static class ReleaseArticlesEndInvocation extends Invocation
 	{
+		private static final long serialVersionUID = 1L;
+
 		private UserID userID;
 
 		private Collection articleIDs;
@@ -890,7 +898,7 @@ public class Trader
 			return articleIDs;
 		}
 
-		public ReleaseArticlesEndInvocation(User user, Collection articles)
+		public ReleaseArticlesEndInvocation(User user, Collection<Article> articles)
 		{
 			this.userID = (UserID) JDOHelper.getObjectId(user);
 			this.articleIDs = NLJDOHelper.getObjectIDSet(articles);
@@ -908,7 +916,7 @@ public class Trader
 			try {
 				pm.getExtent(User.class);
 				User user = (User) pm.getObjectById(userID);
-				Collection articles = NLJDOHelper.getObjectSet(pm, articleIDs,
+				Collection<Article> articles = NLJDOHelper.getObjectSet(pm, articleIDs,
 						Article.class);
 				Trader.getTrader(pm).releaseArticlesEnd(user, articles);
 			} finally {
@@ -918,7 +926,7 @@ public class Trader
 		}
 	}
 
-	protected void releaseArticlesBegin(User user, Collection articles)
+	protected void releaseArticlesBegin(User user, Collection<Article> articles)
 			throws ModuleException
 	{
 		TotalArticleStatus tas = getTotalArticleStatus(articles);
@@ -985,7 +993,7 @@ public class Trader
 		}
 	}
 
-	protected void releaseArticlesEnd(User user, Collection articles)
+	protected void releaseArticlesEnd(User user, Collection<Article> articles)
 			throws ModuleException
 	{
 		TotalArticleStatus tas = getTotalArticleStatus(articles);
@@ -997,7 +1005,7 @@ public class Trader
 			throw new IllegalArgumentException("Articles "
 					+ getToStringList(articles) + " are NOT in state releasePending!");
 
-		Map productTypeActionHandler2Articles = new HashMap();
+		Map<ProductTypeActionHandler, List<Article>> productTypeActionHandler2Articles = new HashMap<ProductTypeActionHandler, List<Article>>();
 		for (Iterator iter = articles.iterator(); iter.hasNext();) {
 			Article article = (Article) iter.next();
 			Product product = article.getProduct();
@@ -1014,9 +1022,9 @@ public class Trader
 
 			ProductTypeActionHandler productTypeActionHandler = ProductTypeActionHandler.getProductTypeActionHandler(
 					getPersistenceManager(), article.getProductType().getClass());
-			List al = (List) productTypeActionHandler2Articles.get(productTypeActionHandler);
+			List<Article> al = productTypeActionHandler2Articles.get(productTypeActionHandler);
 			if (al == null) {
-				al = new LinkedList();
+				al = new LinkedList<Article>();
 				productTypeActionHandler2Articles.put(productTypeActionHandler, al);
 			}
 			al.add(article);
@@ -1024,9 +1032,8 @@ public class Trader
 			// re-allocate
 		}
 
-		for (Iterator it = productTypeActionHandler2Articles.entrySet().iterator(); it.hasNext();) {
-			Map.Entry me = (Map.Entry) it.next();
-			((ProductTypeActionHandler) me.getKey()).onReleaseArticlesEnd(user, this, (List) me.getValue());
+		for (Map.Entry<ProductTypeActionHandler, List<Article>> me : productTypeActionHandler2Articles.entrySet()) {
+			me.getKey().onReleaseArticlesEnd(user, this, me.getValue());
 		}
 	}
 

@@ -225,7 +225,7 @@ public abstract class ProductTypeActionHandler
 	 * @param productLocator A specialized Object defining for YOUR implementation of <code>ProductType</code> which <code>Product</code> to find.
 	 * @return Return either <code>null</code> if no suitable <code>Product</code>s can be allocated or a <code>Collection</code> of <code>Product</code>.
 	 */
-	public abstract Collection findProducts(
+	public abstract Collection<Product> findProducts(
 			User user, ProductType productType, NestedProductType nestedProductType, ProductLocator productLocator);
 
 	/**
@@ -241,7 +241,7 @@ public abstract class ProductTypeActionHandler
 	 * @param trader The trader.
 	 * @param articles The {@link Article}s that are being allocated.
 	 */
-	public void onAllocateArticlesBegin(User user, Trader trader, Collection articles)
+	public void onAllocateArticlesBegin(User user, Trader trader, Collection<Article> articles)
 	{
 	}
 
@@ -259,7 +259,7 @@ public abstract class ProductTypeActionHandler
 	 * @param trader The trader.
 	 * @param articles The {@link Article}s that are being allocated.
 	 */
-	public void onAllocateArticlesEnd(User user, Trader trader, Collection articles)
+	public void onAllocateArticlesEnd(User user, Trader trader, Collection<Article> articles)
 	{
 	}
 
@@ -272,7 +272,7 @@ public abstract class ProductTypeActionHandler
 	 * @param trader The trader.
 	 * @param articles The {@link Article}s that are being released.
 	 */
-	public void onReleaseArticlesBegin(User user, Trader trader, Collection articles)
+	public void onReleaseArticlesBegin(User user, Trader trader, Collection<Article> articles)
 	{
 	}
 
@@ -285,7 +285,7 @@ public abstract class ProductTypeActionHandler
 	 * @param trader The trader.
 	 * @param articles The {@link Article}s that are being released.
 	 */
-	public void onReleaseArticlesEnd(User user, Trader trader, Collection articles)
+	public void onReleaseArticlesEnd(User user, Trader trader, Collection<Article> articles)
 	{
 	}
 

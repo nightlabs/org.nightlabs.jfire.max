@@ -206,7 +206,7 @@ implements Serializable
 	 *
 	 * @!jdo.join
 	 */
-	private Set nestedProductLocals = new HashSet();
+	private Set<ProductLocal> nestedProductLocals = new HashSet<ProductLocal>();
 
 	/**
 	 * @deprecated Only for JDO!
@@ -336,17 +336,17 @@ implements Serializable
 		return res;
 	}
 
-	public Collection getNestedProductLocals()
+	public Collection<ProductLocal> getNestedProductLocals()
 	{
 		return Collections.unmodifiableCollection(nestedProductLocals);
 	}
 
-	public Collection getNestedProductLocals(boolean includeSelfForVirtualSelfPackaging)
+	public Collection<ProductLocal> getNestedProductLocals(boolean includeSelfForVirtualSelfPackaging)
 	{
 		if (!includeSelfForVirtualSelfPackaging || getProduct().getProductType().getInnerPriceConfig() == null)
 			return getNestedProductLocals();
 		else {
-			HashSet res = new HashSet(nestedProductLocals);
+			HashSet<ProductLocal> res = new HashSet<ProductLocal>(nestedProductLocals);
 			res.add(this);
 			return Collections.unmodifiableCollection(res);
 		}

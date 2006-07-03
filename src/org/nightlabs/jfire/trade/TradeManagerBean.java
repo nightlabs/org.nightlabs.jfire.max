@@ -39,6 +39,7 @@ import javax.ejb.CreateException;
 import javax.ejb.EJBException;
 import javax.ejb.SessionBean;
 import javax.ejb.SessionContext;
+import javax.jdo.JDOHelper;
 import javax.jdo.PersistenceManager;
 
 import org.apache.log4j.Logger;
@@ -984,6 +985,53 @@ implements SessionBean
 				);
 			configSetup.getConfigModuleClasses().add(LegalEntityViewConfigModule.class.getName());
 			
+		} finally {
+			pm.close();
+		}
+	}
+
+	/**
+	 * This method assigns a customer to an {@link Order}. This fails with
+	 * an {@link IllegalStateException}, if the <code>Order</code> contains
+	 * at least one finalized {@link Offer}.
+	 *
+	 * @param orderID The ID of the {@link Order} that shall be linked to another customer.
+	 * @param customerID The ID of the {@link LegalEntity} which shall be the new customer.
+	 * @throws ModuleException 
+	 *
+	 * @ejb.interface-method
+	 * @ejb.transaction type = "Required"
+	 * @ejb.permission role-name="_Guest_"
+	 */
+	public Order assignCustomer(OrderID orderID, AnchorID customerID, boolean get, String[] fetchGroups, int maxFetchDepth)
+	throws ModuleException
+	{
+		PersistenceManager pm = getPersistenceManager();
+		try {
+			pm.getFetchPlan().setMaxFetchDepth(maxFetchDepth);
+			if (fetchGroups != null)
+				pm.getFetchPlan().setGroups(fetchGroups);
+
+			pm.getExtent(Order.class);
+			pm.getExtent(LegalEntity.class);
+
+			Order order = (Order) pm.getObjectById(orderID);
+			LegalEntity newCustomer = (LegalEntity) pm.getObjectById(customerID);
+
+			// check offers for finalization
+			for (Offer offer : order.getOffers()) {
+				 if (offer.isFinalized())
+					 throw new IllegalStateException("Order contains finalized Offer: " + JDOHelper.getObjectId(offer));
+
+				 JDOHelper.makeDirty(offer, "finalizeDT"); // force the offer to become dirty as the virtually assigned customerID isn't correct anymore => cache notification
+			}
+
+			order.setCustomer(newCustomer);
+
+			if (!get)
+				return null;
+
+			return (Order) pm.detachCopy(order);
 		} finally {
 			pm.close();
 		}

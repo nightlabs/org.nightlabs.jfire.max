@@ -213,7 +213,7 @@ implements Serializable, ArticleContainer, SegmentContainer, DetachCallback
 	 *		mapped-by="order"
 	 *		dependent-value="true"
 	 */
-	private Set articles;
+	private Set<Article> articles;
 
 //	/**
 //	 * key: String offerPK<br/>
@@ -240,7 +240,7 @@ implements Serializable, ArticleContainer, SegmentContainer, DetachCallback
 	 *		element-type="Offer"
 	 *		mapped-by="order"
 	 */
-	private Set offers;
+	private Set<Offer> offers;
 
 //	/**
 //	 * key: String segmentPK<br/>
@@ -478,10 +478,9 @@ implements Serializable, ArticleContainer, SegmentContainer, DetachCallback
 	/**
 	 * @jdo.field persistence-modifier="none"
 	 */
-	private transient Set _articles = null;
+	private transient Set<Article> _articles = null;
 
-	@SuppressWarnings("unchecked")
-	public Collection getArticles()
+	public Collection<Article> getArticles()
 	{
 		if (_articles == null)
 			_articles = Collections.unmodifiableSet(articles);
@@ -492,13 +491,12 @@ implements Serializable, ArticleContainer, SegmentContainer, DetachCallback
 	/**
 	 * @jdo.field persistence-modifier="none"
 	 */
-	private transient Set _offers = null;
+	private transient Set<Offer> _offers = null;
 
 	/**
 	 * @return Returns the offers.
 	 */
-	@SuppressWarnings("unchecked")
-	public Collection getOffers()
+	public Collection<Offer> getOffers()
 	{
 		if (_offers == null)
 			_offers = Collections.unmodifiableSet(offers);

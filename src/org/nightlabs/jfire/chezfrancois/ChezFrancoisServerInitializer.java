@@ -27,11 +27,11 @@
 package org.nightlabs.jfire.chezfrancois;
 
 import org.apache.log4j.Logger;
-import org.nightlabs.jfire.serverinit.ServerInitializer;
+import org.nightlabs.jfire.serverinit.ServerInitializerDelegate;
 import org.nightlabs.jfire.servermanager.JFireServerManager;
 import org.nightlabs.jfire.servermanager.OrganisationNotFoundException;
 
-public class ChezFrancoisServerInitializer extends ServerInitializer
+public class ChezFrancoisServerInitializer extends ServerInitializerDelegate
 {
 	public static final String ORGANISATION_ID_WINE_STORE = "chezfrancois.jfire.org";
 

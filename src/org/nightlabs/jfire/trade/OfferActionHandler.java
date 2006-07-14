@@ -1,5 +1,8 @@
 package org.nightlabs.jfire.trade;
 
+import javax.jdo.JDOHelper;
+import javax.jdo.PersistenceManager;
+
 import org.nightlabs.jfire.security.User;
 import org.nightlabs.util.Utils;
 
@@ -73,5 +76,14 @@ public class OfferActionHandler
 
 	public void onFinalizeOffer(User user, Offer offer)
 	{
+	}
+
+	protected PersistenceManager getPersistenceManager()
+	{
+		PersistenceManager pm = JDOHelper.getPersistenceManager(this);
+		if (pm == null)
+			throw new IllegalStateException("This instance of OfferActionHandler has currently no PersistenceManager assigned!");
+
+		return pm;
 	}
 }

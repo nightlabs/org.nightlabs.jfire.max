@@ -233,7 +233,7 @@ implements
 	 *		dependent-value="true"
 	 *		mapped-by="offer"
 	 */
-	private Set articles;
+	private Set<Article> articles;
 
 	/**
 	 * This member represents the sum of all prices of all offer items.
@@ -571,9 +571,9 @@ implements
 	/**
 	 * @jdo.field persistence-modifier="none"
 	 */
-	private transient Set _articles = null;
+	private transient Set<Article> _articles = null;
 
-	public Collection getArticles()
+	public Collection<Article> getArticles()
 	{
 		if (_articles == null)
 			_articles = Collections.unmodifiableSet(articles);

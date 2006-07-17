@@ -60,6 +60,7 @@ import org.nightlabs.jfire.store.id.ProductTypeGroupID;
 import org.nightlabs.jfire.store.id.ProductTypeID;
 import org.nightlabs.jfire.trade.LegalEntity;
 import org.nightlabs.jfire.transfer.Anchor;
+import org.nightlabs.util.Utils;
 
 /**
  * <p>
@@ -1424,5 +1425,26 @@ implements
 	protected ProductTypeLocal createProductTypeLocal(User user, Anchor home)
 	{
 		return new ProductTypeLocal(this, home); // self-registering
+	}
+
+	@Override
+	public int hashCode()
+	{
+		return Utils.hashCode(organisationID) ^ Utils.hashCode(productTypeID);
+	}
+	@Override
+	public boolean equals(Object obj)
+	{
+		if (this == obj)
+			return true;
+
+		if (!(obj instanceof ProductType))
+			return false;
+
+		ProductType o = (ProductType) obj;
+
+		return
+				Utils.equals(this.organisationID, o.organisationID) &&
+				Utils.equals(this.productTypeID, o.productTypeID);
 	}
 }

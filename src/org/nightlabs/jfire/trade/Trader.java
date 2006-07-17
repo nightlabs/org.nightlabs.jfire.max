@@ -1247,11 +1247,17 @@ public class Trader
 
 	public void validateOffer(Offer offer)
 	{
+		if (offer.isValid())
+			return;
+
 		offer.validate();
 	}
 
 	public void finalizeOffer(User user, Offer offer)
 	{
+		if (offer.isFinalized())
+			return;
+
 		offer.setFinalized(user);
 		for (Iterator it = offer.getOfferActionHandlers().iterator(); it.hasNext(); ) {
 			OfferActionHandler offerActionHandler = (OfferActionHandler) it.next();

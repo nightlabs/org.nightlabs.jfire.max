@@ -32,6 +32,7 @@ import java.util.Collection;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Set;
 
 import javax.ejb.CreateException;
 import javax.ejb.EJBException;
@@ -244,6 +245,33 @@ implements SessionBean
 		}
 	}
 	
+	/**
+	 * 
+	 * @param topLevelIDs a Set of {@link ScriptRegistryItemID}s which {@link ScriptRegistryItemCarrier} you want to get for 
+	 * @throws ModuleException
+	 *
+	 * @ejb.interface-method
+	 * @ejb.permission role-name="_Guest_"
+	 * @ejb.transaction type = "Required"
+	 */
+	public Collection<ScriptRegistryItemCarrier> getTopLevelScriptRegistryItemCarriers (Set<ScriptRegistryItemID> topLevelIDs)
+	throws ModuleException
+	{
+		PersistenceManager pm;
+		pm = getPersistenceManager();
+		try {			
+//			Collection topLevelItems = ScriptRegistryItem.getTopScriptRegistryItemsByOrganisationID(pm, organisationID);
+			Collection topLevelItems = pm.getObjectsById(topLevelIDs);			
+			Collection<ScriptRegistryItemCarrier> result = new HashSet<ScriptRegistryItemCarrier>();
+			for (Iterator iter = topLevelItems.iterator(); iter.hasNext();) {
+				ScriptRegistryItem item = (ScriptRegistryItem) iter.next();
+				result.add(new ScriptRegistryItemCarrier(null, item, true));
+			}
+			return result;
+		} finally {
+			pm.close();
+		}
+	}
 	
 	/**
 	 * @throws ModuleException

@@ -63,8 +63,9 @@ public class ReportRegistry {
 	 */
 	private int reportRegistryID = 0;
 	
+	// TODO: Change to use IDGenerator.
 	/**
-	 * @jdo.field persistence-modifier="persistent"
+	 * @jdo.field persistence-modifier="persistent"  
 	 */
 	private long newReportItemID = 0;
 	

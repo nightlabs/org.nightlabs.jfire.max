@@ -105,11 +105,9 @@ public class PriceCoordinate implements Serializable, StoreCallback, IPriceCoord
 	}
 
 	/**
-	 * @deprecated This constructor should not be used in java code! An instance
-	 * created by it, cannot be persisted into the database! It is
-	 * only intended for usage as address in javascript formulas! Though it's
-	 * marked as deprecated, it will NOT vanish. Deprecation is only set to make you
-	 * aware of the special function of this constructor. 
+	 * <strong>WARNING:</strong> An instance created by this constructor, cannot be persisted
+	 * into the database! It is only intended for usage as address in javascript formulas or
+	 * similar purposes! 
 	 *
 	 * @param customerGroupPK Either <tt>null</tt> (which means the same <tt>CustomerGroup</tt>
 	 *		as the current cell's location) or the PK of another cell's location

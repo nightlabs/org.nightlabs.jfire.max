@@ -136,6 +136,7 @@ public class DataCreator
 			if(langIdx >= languages.length)
 				break;
 			name.setText(languages[langIdx], string);
+			langIdx++;
 		}
 	}
 	

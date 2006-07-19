@@ -279,10 +279,10 @@ implements SessionBean
 				// create ProductTypes: accessories
 				IInnerPriceConfig priceConfigChocolate = dataCreator.createFixPriceConfig(
 						new Tariff[] {tariffNormalPrice, tariffGoldCard}, new long[] {200, 150}, 
-						"Chocolate");
+						"Chocolate", "Schokolade", "Chocolat");
 				IInnerPriceConfig priceConfigCorkScrew = dataCreator.createFixPriceConfig(
 						new Tariff[] {tariffNormalPrice, tariffGoldCard}, new long[] {600, 450}, 
-						"Corkscrew");
+						"Corkscrew", "Korkenzieher", "Tire-bouchon");
 	
 				SimpleProductType accessories = dataCreator.createCategory(null, "accessories", 
 						"Accessories", "Zubehör", "Accessoires");
@@ -292,7 +292,7 @@ implements SessionBean
 						"Sarotti");
 				SimpleProductType corkscrew = dataCreator.createCategory(accessories, "corkscrew", 
 						"Corkscrew", "Korkenzieher", "Tire-bouchon");
-				SimpleProductType corkscrewStainlessSteel = dataCreator.createLeaf(corkscrew, "corkscrew-xyz", priceConfigCorkScrew, 
+				SimpleProductType corkscrewStainlessSteel = dataCreator.createLeaf(corkscrew, "corkscrew-stainless-steel", priceConfigCorkScrew, 
 						"Corkscrew (stainless steel)", "Korkenzieher (Edelstahl)", "Tire-bouchon (inox)");
 
 				dataCreator.calculatePrices();

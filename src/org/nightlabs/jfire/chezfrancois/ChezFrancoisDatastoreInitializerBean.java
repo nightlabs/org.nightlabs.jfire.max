@@ -28,6 +28,7 @@ package org.nightlabs.jfire.chezfrancois;
 
 import java.rmi.RemoteException;
 import java.util.Iterator;
+import java.util.Locale;
 
 import javax.ejb.CreateException;
 import javax.ejb.EJBException;
@@ -168,42 +169,66 @@ implements SessionBean
 				dataCreator.getRootSimpleProductType().getName().setText(languageID, "Chez Francois Wine Store");
 	
 				// create ProductTypes: wine (bottle)
-				SimpleProductType wine = dataCreator.createCategory(null, "wine", "Wine");
-				SimpleProductType bottle = dataCreator.createCategory(wine, "bottle", "Bottle");
-				SimpleProductType bottleRed = dataCreator.createCategory(bottle, "bottle-red", "Red");
-				SimpleProductType bottleWhite = dataCreator.createCategory(bottle, "bottle-white", "White");
-				SimpleProductType bottleMerlot = dataCreator.createCategory(bottleRed, "bottle-merlot", "Merlot");
-				SimpleProductType bottleCabernetSauvignon = dataCreator.createCategory(bottleRed, "bottle-cabernet-sauvignon", "Cabernet Sauvignon");
-				SimpleProductType bottlePinotNoir = dataCreator.createCategory(bottleRed, "bottle-pinot-noir", "Pinot Noir");
+				SimpleProductType wine = dataCreator.createCategory(null, "wine", 
+						"Wine", "Wein", "Vin");
+				SimpleProductType bottle = dataCreator.createCategory(wine, "bottle", 
+						"Bottle", "Flasche", "Bouteille");
+				SimpleProductType bottleRed = dataCreator.createCategory(bottle, "bottle-red", 
+						"Red", "Rot", "Rouge");
+				SimpleProductType bottleWhite = dataCreator.createCategory(bottle, "bottle-white", 
+						"White", "Weiß", "Blanc");
+				SimpleProductType bottleMerlot = dataCreator.createCategory(bottleRed, "bottle-merlot", 
+						"Merlot");
+				SimpleProductType bottleCabernetSauvignon = dataCreator.createCategory(bottleRed, "bottle-cabernet-sauvignon", 
+						"Cabernet Sauvignon");
+				SimpleProductType bottlePinotNoir = dataCreator.createCategory(bottleRed, "bottle-pinot-noir", 
+						"Pinot Noir");
 	
-				SimpleProductType bottleMerlotAustralia = dataCreator.createCategory(bottleMerlot, "bottle-merlot-australia", "Australia");
-				SimpleProductType bottleMerlotFrance = dataCreator.createCategory(bottleMerlot, "bottle-merlot-france", "France");
-				SimpleProductType bottleMerlotCalifornia = dataCreator.createCategory(bottleMerlot, "bottle-merlot-california", "California");
+				SimpleProductType bottleMerlotAustralia = dataCreator.createCategory(bottleMerlot, "bottle-merlot-australia", 
+						"Australia", "Australien", "Australie");
+				SimpleProductType bottleMerlotFrance = dataCreator.createCategory(bottleMerlot, "bottle-merlot-france", 
+						"France", "Frankreich", "France");
+				SimpleProductType bottleMerlotCalifornia = dataCreator.createCategory(bottleMerlot, "bottle-merlot-california", 
+						"California", "Kalifornien", "Californie");
 	
-				SimpleProductType bottleCabernetSauvignonFrance = dataCreator.createCategory(bottleCabernetSauvignon, "bottle-cabernet-sauvignon-france", "France");
-				SimpleProductType bottleCabernetSauvignonSouthAfrika = dataCreator.createCategory(bottleCabernetSauvignon, "bottle-cabernet-sauvignon-south-africa", "South Africa");
+				SimpleProductType bottleCabernetSauvignonFrance = dataCreator.createCategory(bottleCabernetSauvignon, "bottle-cabernet-sauvignon-france", 
+						"France", "Frankreich", "France");
+				SimpleProductType bottleCabernetSauvignonSouthAfrika = dataCreator.createCategory(bottleCabernetSauvignon, "bottle-cabernet-sauvignon-south-africa", 
+						"South Africa", "Südafrika", "Afrique du Sud");
 	
-				IInnerPriceConfig priceConfigCheapWines = dataCreator.createFixPriceConfig("Cheap Wines", new Tariff[] {tariffNormalPrice, tariffGoldCard}, new long[] {399, 350});
-				IInnerPriceConfig priceConfigMiddleWines = dataCreator.createFixPriceConfig("Middle Wines", new Tariff[] {tariffNormalPrice, tariffGoldCard}, new long[] {500, 420});
-				IInnerPriceConfig priceConfigExpensiveWines = dataCreator.createFixPriceConfig("Expensive Wines", new Tariff[] {tariffNormalPrice, tariffGoldCard}, new long[] {999, 830});
+				IInnerPriceConfig priceConfigCheapWines = dataCreator.createFixPriceConfig(new Tariff[] {tariffNormalPrice, tariffGoldCard}, new long[] {399, 350}, 
+						"Cheap Wines", "Billiger Wein", "Vin pas cher");
+				IInnerPriceConfig priceConfigMiddleWines = dataCreator.createFixPriceConfig(new Tariff[] {tariffNormalPrice, tariffGoldCard}, new long[] {500, 420}, 
+						"Middle Wines", "Mittlerer Wein", "Vin moyen");
+				IInnerPriceConfig priceConfigExpensiveWines = dataCreator.createFixPriceConfig(new Tariff[] {tariffNormalPrice, tariffGoldCard}, new long[] {999, 830}, 
+						"Expensive Wines", "Teurer Wein", "Vin cher");
 	
-				SimpleProductType bottleMerlotAustralia2001 = dataCreator.createLeaf(bottleMerlotAustralia, "bottle-merlot-australia-2001", "Merlot 2001 (Australia)", priceConfigExpensiveWines);
-				SimpleProductType bottleMerlotAustralia2004 = dataCreator.createLeaf(bottleMerlotAustralia, "bottle-merlot-australia-2004", "Merlot 2004 (Australia)", priceConfigCheapWines);
-				SimpleProductType bottleMerlotFrance2001 = dataCreator.createLeaf(bottleMerlotFrance, "bottle-merlot-france-2001", "Merlot 2001 (France)", priceConfigExpensiveWines);
-				SimpleProductType bottleMerlotCalifornia2003 = dataCreator.createLeaf(bottleMerlotCalifornia, "bottle-merlot-california-2003", "Merlot 2003 (California)", priceConfigMiddleWines);
+				SimpleProductType bottleMerlotAustralia2001 = dataCreator.createLeaf(bottleMerlotAustralia, "bottle-merlot-australia-2001", priceConfigExpensiveWines, 
+						"Merlot 2001 (Australia)", "Merlot 2001 (Australien)", "Merlot 2001 (Australie)");
+				SimpleProductType bottleMerlotAustralia2004 = dataCreator.createLeaf(bottleMerlotAustralia, "bottle-merlot-australia-2004", priceConfigCheapWines, 
+						"Merlot 2004 (Australia)", "Merlot 2004 (Australien)", "Merlot 2004 (Australie)");
+				SimpleProductType bottleMerlotFrance2001 = dataCreator.createLeaf(bottleMerlotFrance, "bottle-merlot-france-2001", priceConfigExpensiveWines, 
+						"Merlot 2001 (France)", "Merlot 2001 (Frankreich)", "Merlot 2001 (France)");
+				SimpleProductType bottleMerlotCalifornia2003 = dataCreator.createLeaf(bottleMerlotCalifornia, "bottle-merlot-california-2003", priceConfigMiddleWines, 
+						"Merlot 2003 (California)", "Merlot 2003 (Kalifornien)", "Merlot 2003 (Californie)");
 	
-				SimpleProductType bottleCabernetSauvignonFrance2002 = dataCreator.createLeaf(bottleCabernetSauvignonFrance, "bottle-cabernet-sauvignon-france-2002", "Cabernet Sauvignon 2002 (France)", priceConfigMiddleWines);
-				SimpleProductType bottleCabernetSauvignonSouthAfrika2003 = dataCreator.createLeaf(bottleCabernetSauvignonSouthAfrika, "bottle-cabernet-sauvignon-south-africa-2003", "Cabernet Sauvignon 2003 (South Africa)", priceConfigCheapWines);
+				SimpleProductType bottleCabernetSauvignonFrance2002 = dataCreator.createLeaf(bottleCabernetSauvignonFrance, "bottle-cabernet-sauvignon-france-2002", priceConfigMiddleWines, 
+						"Cabernet Sauvignon 2002 (France)", "Cabernet Sauvignon 2002 (Frankreich)", "Cabernet Sauvignon 2002 (France)");
+				SimpleProductType bottleCabernetSauvignonSouthAfrika2003 = dataCreator.createLeaf(bottleCabernetSauvignonSouthAfrika, "bottle-cabernet-sauvignon-south-africa-2003", priceConfigCheapWines, 
+						"Cabernet Sauvignon 2003 (South Africa)", "Cabernet Sauvignon 2003 (Südafrika)", "Cabernet Sauvignon 2003 (Afrique du Sud)");
 	
 				// create ProductTypes: wine (box)
-				SimpleProductType box = dataCreator.createCategory(wine, "box", "Box");
-				SimpleProductType boxRed = dataCreator.createCategory(box, "box-red", "Red");
-				SimpleProductType boxMerlot = dataCreator.createCategory(boxRed, "box-merlot", "Merlot");
+				SimpleProductType box = dataCreator.createCategory(wine, "box", 
+						"Box", "Karton", "Caisse");
+				SimpleProductType boxRed = dataCreator.createCategory(box, "box-red", 
+						"Red", "Rot", "Rouge");
+				SimpleProductType boxMerlot = dataCreator.createCategory(boxRed, "box-merlot", 
+						"Merlot");
 	
 				SimpleProductType boxWhite = dataCreator.createCategory(box, "box-white", "White");
 	
 				IInnerPriceConfig priceConfigBox6Bottles90Percent = dataCreator.createFormulaPriceConfig(
-						"Box (6 bottles, 90%)", new Tariff[] {tariffNormalPrice, tariffGoldCard}, new String[] {
+						new Tariff[] {tariffNormalPrice, tariffGoldCard}, new String[] {
 								"cell.resolvePriceCellsAmount(\n" +
 								"	new AbsolutePriceCoordinate(\n" +
 								"		null,\n" +
@@ -221,17 +246,26 @@ implements SessionBean
 								"		\""+bottle.getPrimaryKey()+"\",\n" +
 								"		null\n" +
 								"	)\n" +
-								") * -0.1;"});
+								") * -0.1;"},
+								"Box (6 bottles, 90%)", "Karton (6 Flaschen, 90%)", "Caisse (6 bouteilles, 90%)"
+								);
 				((FormulaPriceConfig)priceConfigBox6Bottles90Percent).addProductType(bottle);
 	
-				SimpleProductType boxMerlotAustralia = dataCreator.createCategory(boxMerlot, "box-merlot-australia", "Australia");
-				SimpleProductType boxMerlotFrance = dataCreator.createCategory(boxMerlot, "box-merlot-france", "France");
-				SimpleProductType boxMerlotCalifornia = dataCreator.createCategory(boxMerlot, "box-merlot-california", "California");
+				SimpleProductType boxMerlotAustralia = dataCreator.createCategory(boxMerlot, "box-merlot-australia", 
+						"Australia", "Australien", "Australie");
+				SimpleProductType boxMerlotFrance = dataCreator.createCategory(boxMerlot, "box-merlot-france", 
+						"France", "Frankreich", "France");
+				SimpleProductType boxMerlotCalifornia = dataCreator.createCategory(boxMerlot, "box-merlot-california", 
+						"California", "Kalifornien", "Californie");
 	
-				SimpleProductType boxMerlotAustralia2001 = dataCreator.createLeaf(boxMerlotAustralia, "box-merlot-australia-2001", "Box (6): Merlot 2001 (Australia)", priceConfigBox6Bottles90Percent);
-				SimpleProductType boxMerlotAustralia2004 = dataCreator.createLeaf(boxMerlotAustralia, "box-merlot-australia-2004", "Box (6): Merlot 2004 (Australia)", priceConfigBox6Bottles90Percent);
-				SimpleProductType boxMerlotFrance2001 = dataCreator.createLeaf(boxMerlotFrance, "box-merlot-france-2001", "Box (6): Merlot 2001 (France)", priceConfigBox6Bottles90Percent);
-				SimpleProductType boxMerlotCalifornia2003 = dataCreator.createLeaf(boxMerlotCalifornia, "box-merlot-california-2003", "Box (6): Merlot 2003 (California)", priceConfigBox6Bottles90Percent);
+				SimpleProductType boxMerlotAustralia2001 = dataCreator.createLeaf(boxMerlotAustralia, "box-merlot-australia-2001", priceConfigBox6Bottles90Percent, 
+						"Box (6): Merlot 2001 (Australia)", "Karton (6): Merlot 2001 (Australien)", "Caisse (6): Merlot 2001 (Australie)");
+				SimpleProductType boxMerlotAustralia2004 = dataCreator.createLeaf(boxMerlotAustralia, "box-merlot-australia-2004", priceConfigBox6Bottles90Percent, 
+						"Box (6): Merlot 2004 (Australia)", "Karton (6): Merlot 2004 (Australien)", "Caisse (6): Merlot 2004 (Australie)");
+				SimpleProductType boxMerlotFrance2001 = dataCreator.createLeaf(boxMerlotFrance, "box-merlot-france-2001", priceConfigBox6Bottles90Percent, 
+						"Box (6): Merlot 2001 (France)", "Karton (6): Merlot 2001 (Frankreich)", "Caisse (6): Merlot 2001 (France)");
+				SimpleProductType boxMerlotCalifornia2003 = dataCreator.createLeaf(boxMerlotCalifornia, "box-merlot-california-2003", priceConfigBox6Bottles90Percent, 
+						"Box (6): Merlot 2003 (California)", "Karton (6): Merlot 2003 (Kalifornien)", "Caisse (6): Merlot 2003 (Californie)");
 				boxMerlotAustralia2001.createNestedProductType(bottleMerlotAustralia2001).setQuantity(6);
 				boxMerlotAustralia2004.createNestedProductType(bottleMerlotAustralia2004).setQuantity(6);
 				boxMerlotFrance2001.createNestedProductType(bottleMerlotFrance2001).setQuantity(6);
@@ -244,15 +278,22 @@ implements SessionBean
 
 				// create ProductTypes: accessories
 				IInnerPriceConfig priceConfigChocolate = dataCreator.createFixPriceConfig(
-						"Chocolate", new Tariff[] {tariffNormalPrice, tariffGoldCard}, new long[] {200, 150});
+						new Tariff[] {tariffNormalPrice, tariffGoldCard}, new long[] {200, 150}, 
+						"Chocolate");
 				IInnerPriceConfig priceConfigCorkScrew = dataCreator.createFixPriceConfig(
-						"Corkscrew", new Tariff[] {tariffNormalPrice, tariffGoldCard}, new long[] {600, 450});
+						new Tariff[] {tariffNormalPrice, tariffGoldCard}, new long[] {600, 450}, 
+						"Corkscrew");
 	
-				SimpleProductType accessories = dataCreator.createCategory(null, "accessories", "Accessories");
-				SimpleProductType chocolate = dataCreator.createCategory(accessories, "chocolate", "Chocolate");
-				SimpleProductType sarotti = dataCreator.createLeaf(chocolate, "sarotti", "Sarotti", priceConfigChocolate);
-				SimpleProductType corkscrew = dataCreator.createCategory(accessories, "corkscrew", "Corkscrew");
-				SimpleProductType corkscrewXYZ = dataCreator.createLeaf(corkscrew, "corkscrew-xyz", "Corkscrew XYZ", priceConfigCorkScrew);
+				SimpleProductType accessories = dataCreator.createCategory(null, "accessories", 
+						"Accessories", "Zubehör", "Accessoires");
+				SimpleProductType chocolate = dataCreator.createCategory(accessories, "chocolate", 
+						"Chocolate", "Schokolade", "Chocolat");
+				SimpleProductType sarotti = dataCreator.createLeaf(chocolate, "sarotti", priceConfigChocolate, 
+						"Sarotti");
+				SimpleProductType corkscrew = dataCreator.createCategory(accessories, "corkscrew", 
+						"Corkscrew", "Korkenzieher", "Tire-bouchon");
+				SimpleProductType corkscrewStainlessSteel = dataCreator.createLeaf(corkscrew, "corkscrew-xyz", priceConfigCorkScrew, 
+						"Corkscrew (stainless steel)", "Korkenzieher (Edelstahl)", "Tire-bouchon (inox)");
 
 				dataCreator.calculatePrices();
 

@@ -37,6 +37,7 @@ import javax.naming.InitialContext;
 import javax.naming.NamingException;
 
 import org.nightlabs.ModuleException;
+import org.nightlabs.i18n.I18nText;
 import org.nightlabs.jfire.accounting.Account;
 import org.nightlabs.jfire.accounting.Accounting;
 import org.nightlabs.jfire.accounting.Currency;
@@ -78,6 +79,11 @@ import org.nightlabs.jfire.trade.Trader;
 public class DataCreator
 {
 	private String languageID = "en";
+	private String[] languages = new String[] {
+			"en",
+			Locale.GERMAN.getLanguage(),
+			Locale.FRENCH.getLanguage()
+	};
 
 	private PersistenceManager pm;
 	private String organisationID;
@@ -117,7 +123,23 @@ public class DataCreator
 		}
 	}
 
-	protected SimpleProductType createCategory(SimpleProductType parent, String productTypeID, String name)
+	/**
+	 * Set names for different languages. The order for language
+	 * entries is defined by {@link #languages}.
+	 * @param names Names in different languages.
+	 * @param name The i18n text object to set.
+	 */
+	protected void setNames(I18nText name, String[] names)
+	{
+		int langIdx = 0;
+		for (String string : names) {
+			if(langIdx >= languages.length)
+				break;
+			name.setText(languages[langIdx], string);
+		}
+	}
+	
+	protected SimpleProductType createCategory(SimpleProductType parent, String productTypeID, String ... names)
 	{
 		if (parent == null)
 			parent = rootSimpleProductType;
@@ -131,7 +153,7 @@ public class DataCreator
 		SimpleProductType pt = new SimpleProductType(
 				organisationID, productTypeID, parent, null, 
 				ProductType.INHERITANCE_NATURE_BRANCH, ProductType.PACKAGE_NATURE_OUTER);
-		pt.getName().setText(languageID, name);
+		setNames(pt.getName(), names);
 
 		store.addProductType(user, pt, SimpleProductTypeActionHandler.getDefaultHome(pm, pt));
 		store.setProductTypeStatus_published(user, pt);
@@ -141,11 +163,11 @@ public class DataCreator
 
 	private List<SimpleProductType> createdLeafs = new ArrayList<SimpleProductType>(); 
 
-	public SimpleProductType createLeaf(SimpleProductType category, String productTypeID, String name, IInnerPriceConfig innerPriceConfig)
+	public SimpleProductType createLeaf(SimpleProductType category, String productTypeID, IInnerPriceConfig innerPriceConfig, String ... names)
 	{
 		SimpleProductType pt = new SimpleProductType(
 				organisationID, productTypeID, category, null, ProductType.INHERITANCE_NATURE_LEAF, ProductType.PACKAGE_NATURE_OUTER);
-		pt.getName().setText(Locale.ENGLISH.getLanguage(), name);
+		setNames(pt.getName(), names);
 		pt.setPackagePriceConfig(new StablePriceConfig(organisationID, PriceConfig.createPriceConfigID()));
 		pt.setInnerPriceConfig(innerPriceConfig);
 		store.addProductType(user, pt, SimpleProductTypeActionHandler.getDefaultHome(pm, pt));
@@ -232,14 +254,14 @@ public class DataCreator
 		return formulaPriceConfig;
 	}
 
-	public IInnerPriceConfig createFixPriceConfig(String name, Tariff[] tariffs, long[] prices)
+	public IInnerPriceConfig createFixPriceConfig(Tariff[] tariffs, long[] prices, String ... names)
 	{
 		String[] formulas = new String[prices.length];
 		for (int i = 0; i < prices.length; i++) {
 			long price = prices[i];
 			formulas[i] = String.valueOf(price);
 		}
-		return createFormulaPriceConfig(name, tariffs, formulas);
+		return createFormulaPriceConfig(tariffs, formulas, names);
 	}
 
 	private Currency euro = null;	
@@ -278,7 +300,7 @@ public class DataCreator
 		return priceFragmentTypeVatVal;
 	}
 
-	public IInnerPriceConfig createFormulaPriceConfig(String name, Tariff[] tariffs, String[] formulas)
+	public IInnerPriceConfig createFormulaPriceConfig(Tariff[] tariffs, String[] formulas, String ... names)
 	{
 		Currency euro = getCurrencyEUR();
 
@@ -291,7 +313,7 @@ public class DataCreator
 		Trader trader = Trader.getTrader(pm);
 		StablePriceConfig stablePriceConfig = new StablePriceConfig(organisationID, PriceConfig.createPriceConfigID());
 		FormulaPriceConfig formulaPriceConfig = new FormulaPriceConfig(organisationID, PriceConfig.createPriceConfigID());
-		formulaPriceConfig.getName().setText(languageID, name);
+		setNames(formulaPriceConfig.getName(), names);
 		
 		CustomerGroup customerGroupDefault = trader.getDefaultCustomerGroupForKnownCustomer();
 		CustomerGroup customerGroupAnonymous = LegalEntity.getAnonymousCustomer(pm).getDefaultCustomerGroup();

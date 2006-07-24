@@ -16,6 +16,7 @@ import org.nightlabs.util.Utils;
  *		table="JFireTrade_OfferActionHandler"
  *
  * @jdo.inheritance strategy="new-table"
+ * @jdo.inheritance-discriminator strategy="class-name"
  *
  * @jdo.create-objectid-class field-order="organisationID, offerActionHandlerID"
  */

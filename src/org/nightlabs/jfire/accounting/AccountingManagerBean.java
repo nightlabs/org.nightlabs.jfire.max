@@ -1197,7 +1197,7 @@ public abstract class AccountingManagerBean
 			}
 
 			Accounting accounting = Accounting.getAccounting(pm);
-			accounting.addArticlesToInvoice(invoice, articles);
+			accounting.addArticlesToInvoice(User.getUser(pm, getPrincipal()), invoice, articles);
 
 			if (validate)
 				accounting.validateInvoice(invoice);
@@ -1239,7 +1239,7 @@ public abstract class AccountingManagerBean
 			}
 
 			Accounting accounting = Accounting.getAccounting(pm);
-			accounting.removeArticlesFromInvoice(invoice, articles);
+			accounting.removeArticlesFromInvoice(User.getUser(pm, getPrincipal()), invoice, articles);
 
 			if (!get)
 				return null;

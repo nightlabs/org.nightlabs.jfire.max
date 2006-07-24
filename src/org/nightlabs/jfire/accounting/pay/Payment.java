@@ -751,7 +751,7 @@ implements Serializable, StoreCallback
 	 *
 	 * @jdo.join
 	 */
-	private Set invoices = null;
+	private Set<Invoice> invoices = null;
 
 	/**
 	 * @jdo.field persistence-modifier="persistent"
@@ -809,7 +809,7 @@ implements Serializable, StoreCallback
 	/**
 	 * @return Returns the invoices.
 	 */
-	public Collection getInvoices()
+	public Set<Invoice> getInvoices()
 	{
 		return invoices;
 	}

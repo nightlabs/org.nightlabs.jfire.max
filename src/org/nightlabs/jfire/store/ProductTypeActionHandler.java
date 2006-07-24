@@ -33,6 +33,7 @@ import javax.jdo.Query;
 
 import org.nightlabs.jdo.ObjectIDUtil;
 import org.nightlabs.jfire.accounting.Accounting;
+import org.nightlabs.jfire.accounting.Invoice;
 import org.nightlabs.jfire.organisation.Organisation;
 import org.nightlabs.jfire.security.User;
 import org.nightlabs.jfire.trade.Article;
@@ -64,6 +65,7 @@ import org.nightlabs.util.Utils;
  *		table="JFireTrade_ProductTypeActionHandler"
  *
  * @jdo.inheritance strategy="new-table"
+ * @jdo.inheritance-discriminator strategy="class-name"
  *
  * @jdo.create-objectid-class field-order="organisationID, productTypeActionHandlerID"
  *
@@ -286,6 +288,30 @@ public abstract class ProductTypeActionHandler
 	 * @param articles The {@link Article}s that are being released.
 	 */
 	public void onReleaseArticlesEnd(User user, Trader trader, Collection<Article> articles)
+	{
+	}
+
+	/**
+	 * This method is called by {@link Accounting#addArticlesToInvoice(User, org.nightlabs.jfire.accounting.Invoice, Collection)}. 
+	 *
+	 * @param user The user who initiated this action.
+	 * @param accounting The Accounting instance.
+	 * @param invoice The invoice to which articles are added. This is the same as {@link Article#getInvoice()}.
+	 * @param articles The {@link Article}s that are being added to the invoice.
+	 */
+	public void onAddArticlesToInvoice(User user, Accounting accounting, Invoice invoice, Collection<Article> articles)
+	{		
+	}
+
+	/**
+	 * This method is called by {@link Store#addArticlesToDeliveryNote(User, DeliveryNote, Collection)}.
+	 *
+	 * @param user The user who initiated this action.
+	 * @param store The Store instance.
+	 * @param deliveryNote The delivery note to which articles are added. This is the same as {@link Article#getDeliveryNote()}.
+	 * @param articles The {@link Article}s that are added.
+	 */
+	public void onAddArticlesToDeliveryNote(User user, Store store, DeliveryNote deliveryNote, Collection<Article> articles)
 	{
 	}
 

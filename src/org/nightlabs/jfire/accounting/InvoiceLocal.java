@@ -27,7 +27,10 @@
 package org.nightlabs.jfire.accounting;
 
 import java.io.Serializable;
+import java.util.Collections;
 import java.util.Date;
+import java.util.HashSet;
+import java.util.Set;
 
 import org.nightlabs.jfire.security.User;
 
@@ -113,6 +116,7 @@ implements Serializable
 		this.organisationID = invoice.getOrganisationID();
 		this.invoiceID = invoice.getInvoiceID();
 		this.invoice = invoice;
+		this.invoiceActionHandlers = new HashSet<InvoiceActionHandler>();
 
 		invoice.setInvoiceLocal(this);
 	}
@@ -170,5 +174,43 @@ implements Serializable
 	 */
 	public boolean isBooked() {
 		return bookDT != null;
+	}
+
+	/**
+	 * @jdo.field
+	 *		persistence-modifier="persistent"
+	 *		collection-type="collection"
+	 *		element-type="InvoiceActionHandler"
+	 *		table="JFireTrade_Invoice_invoiceActionHandlers"
+	 *
+	 * @jdo.join
+	 */
+	private Set<InvoiceActionHandler> invoiceActionHandlers;
+
+	/**
+	 * @jdo.field persistence-modifier="none"
+	 */
+	private transient Set<InvoiceActionHandler> _invoiceActionHandlers = null;
+
+	/**
+	 * @return Instances of {@link InvoiceActionHandler}.
+	 */
+	public Set<InvoiceActionHandler> getInvoiceActionHandlers()
+	{
+		if (_invoiceActionHandlers == null)
+			_invoiceActionHandlers = Collections.unmodifiableSet(invoiceActionHandlers);
+
+		return _invoiceActionHandlers;
+	}
+
+	public void addInvoiceActionHandler(InvoiceActionHandler invoiceActionHandler)
+	{
+		if (!invoiceActionHandlers.contains(invoiceActionHandler))
+			invoiceActionHandlers.add(invoiceActionHandler);
+	}
+
+	public boolean removeInvoiceActionHandler(InvoiceActionHandler invoiceActionHandler)
+	{
+		return invoiceActionHandlers.remove(invoiceActionHandler);
 	}
 }

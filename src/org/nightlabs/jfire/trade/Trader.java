@@ -1259,8 +1259,7 @@ public class Trader
 			return;
 
 		offer.setFinalized(user);
-		for (Iterator it = offer.getOfferActionHandlers().iterator(); it.hasNext(); ) {
-			OfferActionHandler offerActionHandler = (OfferActionHandler) it.next();
+		for (OfferActionHandler offerActionHandler : offer.getOfferLocal().getOfferActionHandlers()) {
 			offerActionHandler.onFinalizeOffer(user, offer);
 		}
 	}

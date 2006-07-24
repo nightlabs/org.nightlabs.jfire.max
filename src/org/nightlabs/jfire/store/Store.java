@@ -31,6 +31,7 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -512,9 +513,23 @@ public class Store
 	public void addArticlesToDeliveryNote(User user, DeliveryNote deliveryNote, Collection articles)
 	throws DeliveryNoteEditException
 	{
+		Map productTypeActionHandler2Articles = new HashMap();
 		for (Iterator it = articles.iterator(); it.hasNext(); ) {
 			Article article = (Article) it.next();
 			deliveryNote.addArticle(article);
+
+			ProductTypeActionHandler productTypeActionHandler = ProductTypeActionHandler.getProductTypeActionHandler(
+					getPersistenceManager(), article.getProductType().getClass());
+			List al = (List) productTypeActionHandler2Articles.get(productTypeActionHandler);
+			if (al == null) {
+				al = new LinkedList();
+				productTypeActionHandler2Articles.put(productTypeActionHandler, al);
+			}
+			al.add(article);
+		}
+		for (Iterator it = productTypeActionHandler2Articles.entrySet().iterator(); it.hasNext();) {
+			Map.Entry me = (Map.Entry) it.next();
+			((ProductTypeActionHandler) me.getKey()).onAddArticlesToDeliveryNote(user, this, deliveryNote, (List) me.getValue());
 		}
 	}
 

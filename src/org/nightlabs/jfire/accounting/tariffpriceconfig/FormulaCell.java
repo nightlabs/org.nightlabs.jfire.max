@@ -113,6 +113,11 @@ public class FormulaCell implements Serializable
 		this.mapOwner = mapOwner;
 	}
 
+	public PriceConfig getMapOwner()
+	{
+		return mapOwner;
+	}
+
 	/**
 	 * @jdo.field persistence-modifier="persistent"
 	 */

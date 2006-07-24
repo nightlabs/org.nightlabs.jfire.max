@@ -266,17 +266,6 @@ implements
 	private boolean customerID_detached = false;
 
 	/**
-	 * @jdo.field
-	 *		persistence-modifier="persistent"
-	 *		collection-type="collection"
-	 *		element-type="org.nightlabs.jfire.trade.OfferActionHandler"
-	 *		table="JFireTrade_Offer_offerActionHandlers"
-	 *
-	 * @jdo.join
-	 */
-	private Set offerActionHandlers;
-
-	/**
 	 * @deprecated This constructor exists only for JDO!
 	 */
 	protected Offer() { }
@@ -311,8 +300,7 @@ implements
 				accountingPriceConfig.getOrganisationID(), accountingPriceConfig.getPriceConfigID(),
 				accountingPriceConfig.createPriceID(), getCurrency());
 
-		articles = new HashSet();
-		offerActionHandlers = new HashSet();
+		articles = new HashSet<Article>();
 	}
 
 	/**
@@ -701,35 +689,6 @@ implements
 
 	public void jdoPostAttach(Object arg0)
 	{
-	}
-
-	/**
-	 * @jdo.field persistence-modifier="none"
-	 */
-	private transient Set _offerActionHandlers = null;
-
-	/**
-	 * @return Instances of {@link OfferActionHandler}.
-	 */
-	@SuppressWarnings("unchecked")
-	public Set getOfferActionHandlers()
-	{
-		if (_offerActionHandlers == null)
-			_offerActionHandlers = Collections.unmodifiableSet(offerActionHandlers);
-
-		return _offerActionHandlers;
-	}
-
-	@SuppressWarnings("unchecked")
-	public void addOfferActionHandler(OfferActionHandler offerActionHandler)
-	{
-		if (!offerActionHandlers.contains(offerActionHandler))
-			offerActionHandlers.add(offerActionHandler);
-	}
-
-	public boolean removeOfferActionHandler(OfferActionHandler offerActionHandler)
-	{
-		return offerActionHandlers.remove(offerActionHandler);
 	}
 
 	@Override

@@ -30,6 +30,8 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Iterator;
+import java.util.LinkedList;
+import java.util.List;
 import java.util.Map;
 
 import javax.jdo.JDOHelper;
@@ -58,6 +60,7 @@ import org.nightlabs.jfire.config.Config;
 import org.nightlabs.jfire.idgenerator.IDGenerator;
 import org.nightlabs.jfire.organisation.LocalOrganisation;
 import org.nightlabs.jfire.security.User;
+import org.nightlabs.jfire.store.ProductTypeActionHandler;
 import org.nightlabs.jfire.trade.Article;
 import org.nightlabs.jfire.trade.ArticleContainer;
 import org.nightlabs.jfire.trade.LegalEntity;
@@ -364,16 +367,30 @@ public class Accounting
 		return invoice;
 	}
 
-	public void addArticlesToInvoice(Invoice invoice, Collection articles)
+	public void addArticlesToInvoice(User user, Invoice invoice, Collection articles)
 	throws InvoiceEditException
 	{
+		Map productTypeActionHandler2Articles = new HashMap();
 		for (Iterator it = articles.iterator(); it.hasNext(); ) {
 			Article article = (Article) it.next();
 			invoice.addArticle(article);
+
+			ProductTypeActionHandler productTypeActionHandler = ProductTypeActionHandler.getProductTypeActionHandler(
+					getPersistenceManager(), article.getProductType().getClass());
+			List al = (List) productTypeActionHandler2Articles.get(productTypeActionHandler);
+			if (al == null) {
+				al = new LinkedList();
+				productTypeActionHandler2Articles.put(productTypeActionHandler, al);
+			}
+			al.add(article);
+		}
+		for (Iterator it = productTypeActionHandler2Articles.entrySet().iterator(); it.hasNext();) {
+			Map.Entry me = (Map.Entry) it.next();
+			((ProductTypeActionHandler) me.getKey()).onAddArticlesToInvoice(user, this, invoice, (List) me.getValue());
 		}
 	}
 
-	public void removeArticlesFromInvoice(Invoice invoice, Collection articles)
+	public void removeArticlesFromInvoice(User user, Invoice invoice, Collection articles)
 	throws InvoiceEditException
 	{
 		for (Iterator it = articles.iterator(); it.hasNext(); ) {
@@ -427,7 +444,7 @@ public class Accounting
 	/**
 	 * Books the given Invoice.
 	 * 
-	 * @param initiator The {@link User} who is responsible for booking.
+	 * @param user The {@link User} who is responsible for booking.
 	 * @param invoice The {@link Invoice} that should be booked.
 	 * @param finalizeIfNecessary An invoice can only be booked, if finalized. Shall this method finalize,
 	 *		if not yet done (otherwhise an exception is thrown).
@@ -435,7 +452,7 @@ public class Accounting
 	 *		exception if this param is <tt>false</tt> or returns silently without doing anything if this
 	 *		param is <tt>true</tt>.
 	 */
-	public void bookInvoice(User initiator, Invoice invoice, boolean finalizeIfNecessary, boolean silentlyIgnoreBookedInvoice)
+	public void bookInvoice(User user, Invoice invoice, boolean finalizeIfNecessary, boolean silentlyIgnoreBookedInvoice)
 	{
 		InvoiceLocal invoiceLocal = invoice.getInvoiceLocal();
 		if (invoiceLocal.isBooked()) {
@@ -449,7 +466,7 @@ public class Accounting
 			if (!finalizeIfNecessary)
 				throw new IllegalStateException("Invoice \""+invoice.getPrimaryKey()+"\" is not finalized!");
 
-			finalizeInvoice(initiator, invoice);
+			finalizeInvoice(user, invoice);
 		}
 
 		LegalEntity from = null;
@@ -482,7 +499,7 @@ public class Accounting
 
 		BookMoneyTransfer bookMoneyTransfer = new BookMoneyTransfer(
 				this,
-				initiator,
+				user,
 				from,
 				to,			
 				invoice
@@ -493,7 +510,7 @@ public class Accounting
 		containers.add(bookMoneyTransfer);
 		boolean failed = true;
 		try {
-			bookMoneyTransfer.bookTransfer(initiator, involvedAnchors);
+			bookMoneyTransfer.bookTransfer(user, involvedAnchors);
 	
 			// check consistence
 			Anchor.checkIntegrity(containers, involvedAnchors);
@@ -504,7 +521,11 @@ public class Accounting
 				Anchor.resetIntegrity(containers, involvedAnchors);
 		}
 
-		invoiceLocal.setBooked(initiator);
+		invoiceLocal.setBooked(user);
+
+		for (InvoiceActionHandler invoiceActionHandler : invoiceLocal.getInvoiceActionHandlers()) {
+			invoiceActionHandler.onBook(user, invoice);
+		}
 	}
 
 	public PaymentResult payDoWork(
@@ -539,6 +560,12 @@ public class Accounting
 
 		if (!serverPaymentResult.isPaid())
 			throw new PaymentException(serverPaymentResult);
+
+		for (Invoice invoice : paymentData.getPayment().getInvoices()) {
+			for (InvoiceActionHandler invoiceActionHandler : invoice.getInvoiceLocal().getInvoiceActionHandlers()) {
+				invoiceActionHandler.onPayDoWork(user, paymentData, invoice);
+			}
+		}
 
 		return serverPaymentResult;
 	}
@@ -600,6 +627,12 @@ public class Accounting
 
 		if (paymentData.getPayment().isPending() && !paymentData.getPayment().isFailed())
 			throw new IllegalStateException("Payment should not be pending anymore, because failed is false! How's that possible?");
+
+		for (Invoice invoice : paymentData.getPayment().getInvoices()) {
+			for (InvoiceActionHandler invoiceActionHandler : invoice.getInvoiceLocal().getInvoiceActionHandlers()) {
+				invoiceActionHandler.onPayEnd(user, paymentData, invoice);
+			}
+		}
 
 		return serverPaymentResult;
 	}

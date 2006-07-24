@@ -49,6 +49,7 @@ import org.nightlabs.jfire.trade.Article;
 import org.nightlabs.jfire.trade.ArticleContainer;
 import org.nightlabs.jfire.trade.LegalEntity;
 import org.nightlabs.jfire.trade.Offer;
+import org.nightlabs.jfire.trade.OfferActionHandler;
 import org.nightlabs.jfire.trade.Order;
 import org.nightlabs.jfire.trade.OrganisationLegalEntity;
 import org.nightlabs.jfire.trade.id.ArticleID;
@@ -224,7 +225,7 @@ implements Serializable, ArticleContainer, DetachCallback
 				accountingPriceConfig.getOrganisationID(), accountingPriceConfig.getPriceConfigID(),
 				accountingPriceConfig.createPriceID(), currency);
 
-		articles = new HashSet();
+		articles = new HashSet<Article>();
 	}
 
 	/**
@@ -289,7 +290,7 @@ implements Serializable, ArticleContainer, DetachCallback
 	 *		element-type="org.nightlabs.jfire.trade.Article"
 	 *		mapped-by="invoice"
 	 */
-	private Set articles;
+	private Set<Article> articles;
 
 	public InvoiceLocal getInvoiceLocal()
 	{
@@ -305,7 +306,7 @@ implements Serializable, ArticleContainer, DetachCallback
 	 * the article's offer has the same vendor and customer as this Invoice, 
 	 * and the article is not yet part of another invoice.
 	 * <p>
-	 * NEVER use this method directly (within the server)! Call {@link Accounting#addArticlesToInvoice(Invoice, Collection)}
+	 * NEVER use this method directly (within the server)! Call {@link Accounting#addArticlesToInvoice(User, Invoice, Collection)}
 	 * instead!
 	 * </p>
 	 *
@@ -551,10 +552,9 @@ implements Serializable, ArticleContainer, DetachCallback
 	/**
 	 * @jdo.field persistence-modifier="none"
 	 */
-	private transient Set _articles = null;
+	private transient Set<Article> _articles = null;
 
-	@SuppressWarnings("unchecked")
-	public Collection getArticles()
+	public Set<Article> getArticles()
 	{
 		if (_articles == null)
 			_articles = Collections.unmodifiableSet(articles);

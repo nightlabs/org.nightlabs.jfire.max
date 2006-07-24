@@ -27,7 +27,10 @@
 package org.nightlabs.jfire.trade;
 
 import java.io.Serializable;
+import java.util.Collections;
 import java.util.Date;
+import java.util.HashSet;
+import java.util.Set;
 
 import org.nightlabs.jfire.security.User;
 
@@ -124,6 +127,7 @@ implements Serializable
 		this.organisationID = offer.getOrganisationID();
 		this.offerID = offer.getOfferID();
 		this.offer = offer;
+		this.offerActionHandlers = new HashSet<OfferActionHandler>();
 
 		offer.setOfferLocal(this);
 	}
@@ -256,5 +260,43 @@ implements Serializable
 	public User getConfirmUser()
 	{
 		return confirmUser;
+	}
+
+	/**
+	 * @jdo.field
+	 *		persistence-modifier="persistent"
+	 *		collection-type="collection"
+	 *		element-type="org.nightlabs.jfire.trade.OfferActionHandler"
+	 *		table="JFireTrade_Offer_offerActionHandlers"
+	 *
+	 * @jdo.join
+	 */
+	private Set<OfferActionHandler> offerActionHandlers;
+
+	/**
+	 * @jdo.field persistence-modifier="none"
+	 */
+	private transient Set<OfferActionHandler> _offerActionHandlers = null;
+
+	/**
+	 * @return Instances of {@link OfferActionHandler}.
+	 */
+	public Set<OfferActionHandler> getOfferActionHandlers()
+	{
+		if (_offerActionHandlers == null)
+			_offerActionHandlers = Collections.unmodifiableSet(offerActionHandlers);
+
+		return _offerActionHandlers;
+	}
+
+	public void addOfferActionHandler(OfferActionHandler offerActionHandler)
+	{
+		if (!offerActionHandlers.contains(offerActionHandler))
+			offerActionHandlers.add(offerActionHandler);
+	}
+
+	public boolean removeOfferActionHandler(OfferActionHandler offerActionHandler)
+	{
+		return offerActionHandlers.remove(offerActionHandler);
 	}
 }

@@ -1,0 +1,8 @@
+<report-category 
+	id="Order-Root"
+	type="JFireTrade-Order"
+>
+	<name language="de">Auftrags-Layouts</name>
+	<name language="en">Order-Layouts</name>
+
+</report-category>

@@ -1,0 +1,8 @@
+<report-category 
+	id="General-Root"
+	type="JFireTrade-General"
+>
+	<name language="de">Allgemeine Berichte</name>
+	<name language="en">General Reports</name>
+
+</report-category>

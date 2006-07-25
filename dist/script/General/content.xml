@@ -1,0 +1,29 @@
+<!DOCTYPE script-category PUBLIC "-//NightLabs//DTD ScriptingInitializer V 1.0//EN" "http://www.nightlabs.de/dtd/scripting-initializer-content_1_0.dtd">
+<script-category 
+	id="General"
+	type="JFireReportingTrade-General"
+>
+    <!-- id is optional and defaults to the directory-name -->
+    <!-- id is optional and overwrites the type set to the initializer. 
+		Note that all sub-categories and scripts will get this type
+		when they do not specify a different one
+		 -->
+	<name language="de">Allgemein</name>
+	<name language="en">General</name>
+
+	<parameter-set>
+		<name language="de">ParameterSet: Allgemein</name>
+		<name language="en">ParameterSet: General</name>
+		<parameter name="persistenceManager" type="javax.jdo.PersistenceManager"/>
+	</parameter-set>
+		
+	<script 
+		file="GeneralSalesStatistic.javaclass" 
+		id="GeneralSalesStatistic"
+		resultClass="org.nightlabs.jfire.reporting.oda.jfs.ResultSet"
+	>
+	<!-- id is optional and defaults to the value of file -->
+		<name language="de">Allgemeine Verkaufs-statistik</name>
+		<name language="en">General Sales statistic</name>
+	</script>
+</script-category>

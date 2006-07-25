@@ -1,0 +1,20 @@
+<report-category 
+	id="Invoice-Root"
+	type="JFireTrade-Invoice"
+>
+    <!-- id is optional and defaults to the directory-name -->
+    <!-- type is optional and defaults to the value programatically set -->
+	<name language="de">Rechnungs-Layouts</name>
+	<name language="en">Invoice-Layouts</name>
+
+	<report
+		file="Default-InvoiceLayout.rptdesign" 
+		id="Default-InvoiceLayout"
+		overwriteOnInit="false"
+	>
+	<!-- id is optional and defaults to the value of file without extension -->
+	<!-- overwriteOnInit is optional and defaults to true -->
+		<name language="de">Standart-Rechnung</name>
+		<name language="en">Default-Invoice</name>
+	</report>
+</report-category>

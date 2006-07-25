@@ -1,0 +1,8 @@
+<report-category 
+	id="DeliveryNote-Root"
+	type="JFireTrade-DeliveryNote"
+>
+	<name language="de">Lieferschein-Layouts</name>
+	<name language="en">Deliverynote-Layouts</name>
+
+</report-category>

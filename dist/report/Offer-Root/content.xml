@@ -1,0 +1,8 @@
+<report-category 
+	id="Offer-Root"
+	type="JFireTrade-Offer"
+>
+	<name language="de">Angebots-Layouts</name>
+	<name language="en">Offer-Layouts</name>
+
+</report-category>

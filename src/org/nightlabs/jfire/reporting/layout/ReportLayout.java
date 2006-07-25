@@ -31,7 +31,6 @@ import java.io.IOException;
 import java.util.Date;
 
 import javax.jdo.JDOHelper;
-import javax.jdo.PersistenceManager;
 
 import org.apache.log4j.Logger;
 import org.nightlabs.io.DataBuffer;
@@ -57,7 +56,10 @@ import org.nightlabs.jfire.reporting.layout.id.ReportRegistryItemID;
  */
 public class ReportLayout extends ReportRegistryItem {
 
-	protected static Logger LOGGER = Logger.getLogger(ReportLayout.class);
+	/**
+	 * LOG4J logger used by this class
+	 */
+	private static final Logger logger = Logger.getLogger(ReportLayout.class);
 	
 	public static final String FETCH_GROUP_REPORT_DESIGN = "ReportLayout.reportDesign";
 	public static final String FETCH_GROUP_THIS_REPORT_LAYOUT = "ReportLayout.this";
@@ -130,7 +132,7 @@ public class ReportLayout extends ReportRegistryItem {
 	public void loadFile(File f)
 	throws IOException
 	{
-		LOGGER.info("loadFile(\""+f.getAbsolutePath()+"\"): loading " + f.length() + " bytes into RAM.");
+		logger.info("loadFile(\""+f.getAbsolutePath()+"\"): loading " + f.length() + " bytes into RAM.");
 
 		boolean error = true;
 		try {
@@ -170,7 +172,7 @@ public class ReportLayout extends ReportRegistryItem {
 			throw new IllegalStateException("ReportLayout has to be child of a ReportCategory but is not.");
 		ReportRegistryItem parent = (ReportRegistryItem) getPersistenceManager().getObjectById(parentID);
 		ReportCategory.ensureRelationWithParent(parent, this);
-		LOGGER.info("Called ensureRelationWithParent for ReportLayout");
+		logger.info("Called ensureRelationWithParent for ReportLayout");
 	}
 	
 }

@@ -56,7 +56,10 @@ import org.xml.sax.SAXParseException;
  */
 public class ReportInitializer {
 
-	protected static Logger LOGGER = Logger.getLogger(ReportInitializer.class);
+	/**
+	 * LOG4J logger used by this class
+	 */
+	private static final Logger logger = Logger.getLogger(ReportInitializer.class);
 
 	private String scriptSubDir;
 	private ReportCategory baseCategory;
@@ -138,7 +141,7 @@ public class ReportInitializer {
 		if (!scriptDir.exists())
 			throw new IllegalStateException("Script directory does not exist: " + scriptDir.getAbsolutePath());
 
-		LOGGER.info("BEGIN initialization of Scripts");	
+		logger.info("BEGIN initialization of Scripts");	
 //		initDefaultParameterSets();
 		createReportCategories(scriptDir, baseCategory);
 	}
@@ -153,17 +156,17 @@ public class ReportInitializer {
 				DOMParser parser = new DOMParser();
 				parser.setErrorHandler(new ErrorHandler(){
 					public void error(SAXParseException exception) throws SAXException {
-						LOGGER.error("Parse ("+contentFile+"): ", exception);
+						logger.error("Parse ("+contentFile+"): ", exception);
 						parseException = exception;
 					}
 
 					public void fatalError(SAXParseException exception) throws SAXException {
-						LOGGER.fatal("Parse ("+contentFile+"): ", exception);
+						logger.fatal("Parse ("+contentFile+"): ", exception);
 						parseException = exception;
 					}
 
 					public void warning(SAXParseException exception) throws SAXException {
-						LOGGER.warn("Parse ("+contentFile+"): ", exception);
+						logger.warn("Parse ("+contentFile+"): ", exception);
 					}
 				});
 				parseException = null;
@@ -208,7 +211,7 @@ public class ReportInitializer {
 					nameSet = true;
 				}
 				else
-					LOGGER.warn("name element of node "+elementNode.getNodeName()+" has an invalid/missing language attribute");
+					logger.warn("name element of node "+elementNode.getNodeName()+" has an invalid/missing language attribute");
 			}
 		}
 		if (!nameSet)
@@ -246,7 +249,7 @@ public class ReportInitializer {
 
 			// create the category name
 			createElementName(catNode, category.getName(), categoryID);
-			LOGGER.info("create Script Category = "+category.getName());
+			logger.info("create Script Category = "+category.getName());
 			
 
 			// Create reports
@@ -272,7 +275,7 @@ public class ReportInitializer {
 				}
 				
 				try {			
-					LOGGER.info("create ReportLayout = " + reportID);				
+					logger.info("create ReportLayout = " + reportID);				
 					ReportLayout layout;
 					boolean hadToBeCreated = false;
 					try {
@@ -294,7 +297,7 @@ public class ReportInitializer {
 					createElementName(reportNode, layout.getName(), reportID);
 					
 				} catch (Exception e) {
-					LOGGER.warn("could NOT create ReportLayout "+reportID+"!", e);
+					logger.warn("could NOT create ReportLayout "+reportID+"!", e);
 				}
 			}
 

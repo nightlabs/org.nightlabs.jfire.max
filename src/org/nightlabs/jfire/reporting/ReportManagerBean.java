@@ -27,14 +27,12 @@
 package org.nightlabs.jfire.reporting;
 
 import java.io.File;
-import java.io.IOException;
 import java.rmi.RemoteException;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
-import java.util.Locale;
 import java.util.Map;
 
 import javax.ejb.CreateException;
@@ -42,7 +40,6 @@ import javax.ejb.EJBException;
 import javax.ejb.SessionBean;
 import javax.ejb.SessionContext;
 import javax.jdo.FetchPlan;
-import javax.jdo.JDOHelper;
 import javax.jdo.PersistenceManager;
 import javax.jdo.Query;
 import javax.naming.NamingException;
@@ -63,13 +60,10 @@ import org.nightlabs.ModuleException;
 import org.nightlabs.jdo.NLJDOHelper;
 import org.nightlabs.jdo.moduleregistry.ModuleMetaData;
 import org.nightlabs.jfire.base.BaseSessionBeanImpl;
-import org.nightlabs.jfire.config.Config;
 import org.nightlabs.jfire.config.ConfigSetup;
 import org.nightlabs.jfire.config.UserConfigSetup;
 import org.nightlabs.jfire.reporting.config.ReportLayoutConfigModule;
 import org.nightlabs.jfire.reporting.layout.RenderedReportLayout;
-import org.nightlabs.jfire.reporting.layout.ReportCategory;
-import org.nightlabs.jfire.reporting.layout.ReportLayout;
 import org.nightlabs.jfire.reporting.layout.ReportRegistryItem;
 import org.nightlabs.jfire.reporting.layout.ReportRegistryItemCarrier;
 import org.nightlabs.jfire.reporting.layout.id.ReportRegistryItemID;
@@ -104,7 +98,10 @@ public abstract class ReportManagerBean
 extends BaseSessionBeanImpl
 implements SessionBean
 {
-	public static final Logger LOGGER = Logger.getLogger(ReportManagerBean.class);
+	/**
+	 * LOG4J logger used by this class
+	 */
+	private static final Logger logger = Logger.getLogger(ReportManagerBean.class);
 
 	/**
 	 * @see com.nightlabs.jfire.base.BaseSessionBeanImpl#setSessionContext(javax.ejb.SessionContext)
@@ -370,7 +367,7 @@ implements SessionBean
 					Platform.startup(config);
 //					Platform.initialize(platformContext);
 				} catch (Throwable t) {			
-					LOGGER.log(Level.ERROR, "Initializing BIRT Platform failed!", t);
+					logger.log(Level.ERROR, "Initializing BIRT Platform failed!", t);
 				}
 			} finally {
 				jfireServerManager.close();
@@ -380,7 +377,7 @@ implements SessionBean
 		try {
 			new ReportingManagerFactory(getInitialContext(getOrganisationID()), getOrganisationID()); // registers itself in JNDI
 		} catch (Exception e) {
-			LOGGER.error("Creating ReportingManagerFactory for organisation \""+getOrganisationID()+"\" failed!", e);
+			logger.error("Creating ReportingManagerFactory for organisation \""+getOrganisationID()+"\" failed!", e);
 			throw new ModuleException(e);
 		}
 
@@ -397,20 +394,20 @@ implements SessionBean
 			ModuleMetaData moduleMetaData = ModuleMetaData.getModuleMetaData(pm, JFireReportingEAR.MODULE_NAME);
 			if (moduleMetaData == null) {
 			
-				LOGGER.info("Initialization of JFireReporting started ...");
+				logger.info("Initialization of JFireReporting started ...");
 	
 				
 				// version is {major}.{minor}.{release}-{patchlevel}-{suffix}
 				moduleMetaData = new ModuleMetaData(
 						JFireReportingEAR.MODULE_NAME, "1.0.0-0-beta", "1.0.0-0-beta");
 				pm.makePersistent(moduleMetaData);
-				LOGGER.info("Persisted ModuleMetaData for JFireReporting with version 1.0.0-0-beta");
+				logger.info("Persisted ModuleMetaData for JFireReporting with version 1.0.0-0-beta");
 
 				initRegisterConfigModules(pm);
-				LOGGER.info("Initialized Reporting ConfigModules");
+				logger.info("Initialized Reporting ConfigModules");
 				
 //				initRegisterCategoriesAndLayouts(pm, jfireServerManager);
-				LOGGER.info("Initialized Reporting Categories and Layouts");
+				logger.info("Initialized Reporting Categories and Layouts");
 				
 			}
 			
@@ -782,10 +779,10 @@ implements SessionBean
 		pm = getPersistenceManager();
 		try {
 			Query q = pm.newQuery(jdoql);
-			LOGGER.info("Excecuting JDOQL : ");
-			LOGGER.info("");
-			LOGGER.info(jdoql);
-			LOGGER.info("");
+			logger.info("Excecuting JDOQL : ");
+			logger.info("");
+			logger.info(jdoql);
+			logger.info("");
 			if (fetchGroups != null)
 				pm.getFetchPlan().setGroups(fetchGroups);
 			Object result = q.executeWithMap(params);

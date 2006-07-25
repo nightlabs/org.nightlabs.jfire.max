@@ -35,8 +35,6 @@ import org.apache.log4j.Logger;
 import org.nightlabs.jfire.reporting.Birt;
 import org.nightlabs.jfire.reporting.Birt.OutputFormat;
 import org.nightlabs.jfire.reporting.layout.id.ReportRegistryID;
-import org.nightlabs.jfire.scripting.Script;
-import org.nightlabs.jfire.scripting.ScriptExecutor;
 
 /**
  * Singleton to hold the id of next new {@link org.nightlabs.jfire.reporting.layout.ReportRegistryItem}
@@ -56,7 +54,10 @@ import org.nightlabs.jfire.scripting.ScriptExecutor;
  */
 public class ReportRegistry {
 
-	private static Logger LOGGER = Logger.getLogger(ReportRegistry.class);
+	/**
+	 * LOG4J logger used by this class
+	 */
+	private static final Logger logger = Logger.getLogger(ReportRegistry.class);
 	
 	/**
 	 * @jdo.field primary-key="true"
@@ -200,7 +201,7 @@ public class ReportRegistry {
 			try {
 				reportRegistry.registerReportRenderer(ReportLayoutRendererHTML.class);
 			} catch (Exception e) {
-				LOGGER.warn("Could not initially register HTML ReportLayoutRenderer when initializing ReportRegistry.", e);
+				logger.warn("Could not initially register HTML ReportLayoutRenderer when initializing ReportRegistry.", e);
 			}
 			return reportRegistry;
 		}

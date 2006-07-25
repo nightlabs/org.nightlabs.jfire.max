@@ -27,46 +27,28 @@
 package org.nightlabs.jfire.reporting.platform;
 
 import java.io.ByteArrayInputStream;
-import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.IOException;
 import java.io.InputStream;
-import java.io.OutputStream;
 import java.util.Collection;
-import java.util.Date;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
 
 import javax.jdo.PersistenceManager;
-import javax.management.RuntimeErrorException;
-import javax.naming.InitialContext;
-import javax.naming.NamingException;
 
-import org.apache.log4j.Logger;
-import org.eclipse.birt.report.engine.api.EngineConstants;
 import org.eclipse.birt.report.engine.api.EngineException;
-import org.eclipse.birt.report.engine.api.HTMLRenderContext;
-import org.eclipse.birt.report.engine.api.HTMLRenderOption;
 import org.eclipse.birt.report.engine.api.IGetParameterDefinitionTask;
 import org.eclipse.birt.report.engine.api.IParameterDefnBase;
 import org.eclipse.birt.report.engine.api.IParameterGroupDefn;
-import org.eclipse.birt.report.engine.api.IRenderTask;
 import org.eclipse.birt.report.engine.api.IReportRunnable;
 import org.eclipse.birt.report.engine.api.IRunAndRenderTask;
 import org.eclipse.birt.report.engine.api.IScalarParameterDefn;
 import org.eclipse.birt.report.engine.api.ReportEngine;
-import org.nightlabs.io.DataBuffer;
 import org.nightlabs.jfire.reporting.Birt;
 import org.nightlabs.jfire.reporting.layout.RenderedReportLayout;
 import org.nightlabs.jfire.reporting.layout.ReportLayout;
-import org.nightlabs.jfire.reporting.layout.ReportRegistry;
 import org.nightlabs.jfire.reporting.layout.ReportLayoutRenderer;
+import org.nightlabs.jfire.reporting.layout.ReportRegistry;
 import org.nightlabs.jfire.reporting.layout.id.ReportRegistryItemID;
-import org.nightlabs.jfire.servermanager.j2ee.SecurityReflector;
-import org.nightlabs.jfire.servermanager.j2ee.SecurityReflector.UserDescriptor;
-
-import com.sun.org.apache.xpath.internal.FoundIndex;
 
 /**
  * Helper to render reports on the server.
@@ -76,8 +58,6 @@ import com.sun.org.apache.xpath.internal.FoundIndex;
  */
 public class ReportingManager {
 
-//	private Logger LOGGER = Logger.getLogger(ReportingManager.class);
-	
 	private ReportingManagerFactory factory;
 	
 	/**

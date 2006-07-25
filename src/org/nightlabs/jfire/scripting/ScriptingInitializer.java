@@ -58,6 +58,35 @@ import org.xml.sax.InputSource;
 import org.xml.sax.SAXException;
 import org.xml.sax.SAXParseException;
 
+/**
+ * Helper class to initialize default scripts. The ScriptInitializer will
+ * recusursively scan a given directory and create a tree of {@link ScriptCategory}s
+ * and {@link Script}s according to the directory structure it finds.<br/>
+ * 
+ * For each folder the initializer finds a category will be created as child of
+ * the upper directory's one. A descriptor file 'content.xml' can be placed in
+ * the directory to define in detail what id and names and parameter-sets
+ * the created categories and scripts should have.
+ * 
+ * Each file found will cause a {@link Script} to be created. Depending on the 
+ * file extension some assumptions will be made:
+ * <ul>
+ *   <li><b>.js</b>: The script is assumed to be a JavaScript and the file-contents to state the script text.</li>
+ *   <li><b>.javaclass</b>: The script is assumed to be a JavaClass and the file-contents to reference the
+ *   class by its fully qualified class-name</li>
+ * </ul>
+ * For more detailed information consult the the dtd of the scriping initializer content.xml at
+ * <a href="http://www.nightlabs.de/dtd/scripting-initializer-content_1_0.dtd">http://www.nightlabs.de/dtd/scripting-initializer-content_1_0.dtd</a>
+ * 
+ * The recommended usage is 
+ * <ul>
+ * <li><b>Create the initializer</b>: Use {@link #ScriptingInitializer(String, ScriptCategory, String, JFireServerManager, PersistenceManager, String)} 
+ * to create the initializer and set the base category, root directory and fallback values for ids</li>
+ * <li><b>Initialize from (sub)directories</b>: Use {@link #initialize()} to start the initialization</li>
+ * 
+ * @author Alexander Bieber <alex [AT] nightlabs [DOT] de>
+ *
+ */
 public class ScriptingInitializer 
 {
 	protected Logger LOGGER = Logger.getLogger(ScriptingInitializer.class);
@@ -73,11 +102,13 @@ public class ScriptingInitializer
 	private Map<File, Document> categoryDescriptors = new HashMap<File, Document>();
 
 	/**
+	 * Returns the ScriptCategory for the given primary key either out of the datastore
+	 * or after creating it.
 	 * 
 	 * @param parent optional may be null
 	 * @param organisationID the organisation ID
-	 * @param scriptRegistryItemType 
-	 * @param scriptRegistryItemID
+	 * @param scriptRegistryItemType The category's item type.
+	 * @param scriptRegistryItemID The categroy's ID.
 	 */
 	public static final ScriptCategory createCategory(PersistenceManager pm, ScriptCategory parent, String organisationID, 
 			String scriptRegistryItemType, String scriptRegistryItemID)  
@@ -265,15 +296,22 @@ public class ScriptingInitializer
 			String itemType = parent.getScriptRegistryItemType();
 			Document catDocument = getCategoryDescriptor(dir);
 			if (catDocument != null) {
+				LOGGER.debug("Have category-descriptor");
 				Node catNode = NLDOMUtil.findSingleNode(catDocument, "script-category");
 				if (catNode != null) {
-					Node idAttr = catNode.getAttributes().getNamedItem("id");
-					if (idAttr != null && !"".equals(idAttr.getTextContent()))
-						categoryID = idAttr.getTextContent();
-
+					LOGGER.debug("Have script-category element");
+					
 					Node typeAttr = catNode.getAttributes().getNamedItem("type");
-					if (typeAttr != null && !"".equals(typeAttr.getTextContent()))
+					if (typeAttr != null && !"".equals(typeAttr.getTextContent())) {
+						LOGGER.debug("Have type-attribute in script-category element: "+typeAttr.getTextContent());
 						itemType = typeAttr.getTextContent();
+					}
+					
+					Node idAttr = catNode.getAttributes().getNamedItem("id");
+					if (idAttr != null && !"".equals(idAttr.getTextContent())) {
+						LOGGER.debug("Have id-attribute in script-category element: "+idAttr.getTextContent());
+						categoryID = idAttr.getTextContent();
+					}
 				}
 			}
 
@@ -302,7 +340,7 @@ public class ScriptingInitializer
 				}
 			}
 			createElementName(catNode, category.getName(), categoryID);
-			LOGGER.info("create Script Category = "+category.getName());
+			LOGGER.info("create Script Category = "+itemType + "/" + categoryID);
 			
 
 			// Create scripts
@@ -313,19 +351,29 @@ public class ScriptingInitializer
 				Node scriptNode = getScriptDescriptor(scriptFile, catDocument);				
 				
 				String scriptID = Utils.getFileNameWithoutExtension(scriptFile.getName());
+				
 				String scriptItemType = scriptRegistryItemType;
+				if (category != null) {
+					if (category.getScriptRegistryItemType() != null)
+						scriptItemType = category.getScriptRegistryItemType();
+				}
 				
 				if (scriptNode != null) {
+					LOGGER.debug("Have script element");
 					Node idNode = scriptNode.getAttributes().getNamedItem("id");
-					if (idNode != null && !"".equals(idNode.getTextContent()))
+					if (idNode != null && !"".equals(idNode.getTextContent())) {
+						LOGGER.debug("Have id-attribute in script element: "+idNode.getTextContent());
 						scriptID = idNode.getTextContent();
+					}
 					Node typeNode = scriptNode.getAttributes().getNamedItem("type");
-					if (typeNode != null && !"".equals(typeNode.getTextContent()))
+					if (typeNode != null && !"".equals(typeNode.getTextContent())) {
+						LOGGER.debug("Have type-attribute in script element: "+idNode.getTextContent());
 						scriptItemType = typeNode.getTextContent();
+					}
 				}
 				
 				try {			
-					LOGGER.info("create Script = " + scriptID);				
+					LOGGER.info("create Script = "+scriptRegistryItemType + "/" + scriptID);				
 					String scriptContent = Utils.readTextFile(scriptFile);
 					LOGGER.debug("scriptContent = " + scriptContent);
 					Script script;
@@ -337,7 +385,7 @@ public class ScriptingInitializer
 								scriptID)
 						);
 					} catch (JDOObjectNotFoundException e) {
-						script = new Script(category, organisationID, scriptRegistryItemType, scriptID);
+						script = new Script(category, organisationID, scriptItemType, scriptID);
 						category.addChild(script);
 					}
 					script.setText(scriptContent);

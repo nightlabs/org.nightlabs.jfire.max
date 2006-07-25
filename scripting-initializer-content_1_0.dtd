@@ -1,0 +1,98 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- DTD for the content.xml of ScriptingInitializer - version 1.0 - July 2006--> 
+	
+<!--
+	The JFireScripting ScriptingInitializer recursively scans directies
+	and creates ScriptCategories and Scripts according to the directory
+	structure it finds.
+	
+	Each directory will cause a ScriptCategory to be created and each
+	file will cause a script to be created. The file extension of
+	files determines the language of the script that the initializer
+	creates. Currently there are two possibilities:
+		* js: Causes a JavaScript-Script to be created and the file contents
+			will be the script's text
+		* javaclass: Causes a JavaClass-Script to be created and the
+			file contents are assumed to reference the class by its fully
+			qualified name.
+	
+	In every directory a file named content.xml can be places that defines
+	in detail what id and names and parameter-sets the created categories 
+	and scripts should have. This is the dtd of the content.xml file.
+	-->
+
+
+<!--
+	Each directory represents a ScriptCategory, thats why the root element
+	of each content.xml is <script-category>.
+	By default the directory (or file) name defines the scriptRegistryItemID of 
+	the created ScriptCategory or Script. With an attribute "id" for the
+	<script-category> the id of the currently processed ScriptRegistryItem can
+	be overwritten. 
+	
+	A ScriptingInitializer has to be created by defining a scriptRegistryItemType.
+	This type is used as type for created ScriptCategries and Scripts unless
+	this is not overwritten by the "type"-attribute of the <script-category> element.
+	
+	The type defined in the content.xml will set the type for the creation of 
+	the refereced ScriptCategory. If none is defined the scriptRegistryItemType of
+	the parent category will be used. Only if there is no parent category
+	the type used to create the initializer will be utilized.
+	Note that this means, that if you define a type for a <script-category> different
+	to the default one, all sub-categories will have the same type unless
+	they overwrite.
+	-->
+<!ELEMENT script-category (name+,parameter-set?,script*)>
+<!ATTLIST script-category
+	id NMTOKEN #IMPLIED 
+	type NMTOKEN #IMPLIED
+>
+
+<!--
+	The script element is not required for a Script to be created. 
+	As stated above the initializer will create a script with the filename as id 
+	and the type of its parent category as scriptRegistryItemType as well as the 
+	parameter-set of its parent.
+	
+	However by defining a <script> element all of this can be overwritten.
+	A <script> element must define a "file" attribute referencing the script file by
+	its file name (including file-extension). The "resultClass" attribute is obligatory
+	as well and defines the result of the Script by its fully qualifed
+	class-name.
+	
+	As for <script-category>s id and type can be overwritten. The only difference
+	is that the overwritten types will not propagate further down the tree
+	like for categories.
+	-->
+<!ELEMENT script (name+,parameter-set?)>
+<!ATTLIST script
+	file NMTOKEN #REQUIRED
+	resultClass NMTOKEN #REQUIRED
+	id NMTOKEN #IMPLIED
+	type NMTOKEN #IMPLIED
+>
+
+
+<!--
+	For <script-category>s and <script>s <parameter-set>s can be defined.
+	A parameter-set consists of one or more <parameter>s and needs to
+	have a name assigned.
+	
+	<parameter>s consists of two attributes: Their name and type, where the
+	name is a String to reference the parameter and type is the fully qualified
+	java class-name of the parameter.
+	-->
+<!ELEMENT parameter-set (name+,parameter+)>
+
+<!ELEMENT parameter EMPTY>
+<!ATTLIST parameter
+	name NMTOKEN #REQUIRED
+	type NMTOKEN #REQUIRED
+>
+
+<!--
+	Names can be given to categories and scripts. The patter is simple, here is an example:	
+	<name language="en">The english name</name>
+	-->
+<!ELEMENT name (#PCDATA)>
+<!ATTLIST name language NMTOKEN #REQUIRED>

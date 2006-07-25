@@ -30,9 +30,7 @@
 	<classpathentry sourcepath="/org.eclipse.birt.report.engine/src" kind="lib" path="dist/birt/lib/engineapi.jar"/>
 	<classpathentry kind="lib" path="dist/birt/lib/modelapi.jar"/>
 	<classpathentry kind="lib" path="dist/birt/lib/dataadaptorapi.jar"/>
-	<classpathentry sourcepath="/WORKSPACE/JFireTrade" kind="var" path="WORKSPACE/JFireTrade/dist/JFireTrade.jar"/>
 	<classpathentry sourcepath="WORKSPACE/NightLabsJDO/src" kind="var" path="WORKSPACE/NightLabsJDO/dist/NightLabsJDO.jar"/>
-	<classpathentry sourcepath="/WORKSPACE/JFireSimpleTrade/src" kind="var" path="WORKSPACE/JFireSimpleTrade/dist/JFireSimpleTrade.jar"/>
 	<classpathentry kind="var" path="XERCES"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>

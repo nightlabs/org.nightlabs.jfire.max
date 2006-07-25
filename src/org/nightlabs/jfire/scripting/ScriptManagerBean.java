@@ -32,7 +32,6 @@ import java.util.Collection;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
-import java.util.Set;
 
 import javax.ejb.CreateException;
 import javax.ejb.EJBException;
@@ -63,7 +62,10 @@ public abstract class ScriptManagerBean
 extends BaseSessionBeanImpl
 implements SessionBean
 {
-	public static final Logger LOGGER = Logger.getLogger(ScriptManagerBean.class);
+	/**
+	 * LOG4J logger used by this class
+	 */
+	private static final Logger logger = Logger.getLogger(ScriptManagerBean.class);
 
 	/**
 	 * @see com.nightlabs.jfire.base.BaseSessionBeanImpl#setSessionContext(javax.ejb.SessionContext)
@@ -114,14 +116,14 @@ implements SessionBean
 			ModuleMetaData moduleMetaData = ModuleMetaData.getModuleMetaData(pm, JFireScriptingEAR.MODULE_NAME);
 			if (moduleMetaData == null) {
 			
-				LOGGER.info("Initialization of JFireReporting started ...");
+				logger.info("Initialization of JFireReporting started ...");
 	
 				
 				// version is {major}.{minor}.{release}-{patchlevel}-{suffix}
 				moduleMetaData = new ModuleMetaData(
 						JFireScriptingEAR.MODULE_NAME, "1.0.0-0-beta", "1.0.0-0-beta");
 				pm.makePersistent(moduleMetaData);
-				LOGGER.info("Persisted ModuleMetaData for JFireReporting with version 1.0.0-0-beta");
+				logger.info("Persisted ModuleMetaData for JFireReporting with version 1.0.0-0-beta");
 
 			}
 			

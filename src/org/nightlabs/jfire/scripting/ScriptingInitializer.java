@@ -90,7 +90,10 @@ import org.xml.sax.SAXParseException;
  */
 public class ScriptingInitializer 
 {
-	protected Logger LOGGER = Logger.getLogger(ScriptingInitializer.class);
+	/**
+	 * LOG4J logger used by this class
+	 */
+	private static final Logger logger = Logger.getLogger(ScriptingInitializer.class);
 
 	private String scriptSubDir;
 	private ScriptCategory baseCategory;
@@ -178,7 +181,7 @@ public class ScriptingInitializer
 		if (!scriptDir.exists())
 			throw new IllegalStateException("Script directory does not exist: " + scriptDir.getAbsolutePath());
 
-		LOGGER.info("BEGIN initialization of Scripts");	
+		logger.info("BEGIN initialization of Scripts");	
 //		initDefaultParameterSets();
 		createScriptCategories(scriptDir, baseCategory);
 	}
@@ -193,17 +196,17 @@ public class ScriptingInitializer
 				DOMParser parser = new DOMParser();
 				parser.setErrorHandler(new ErrorHandler(){
 					public void error(SAXParseException exception) throws SAXException {
-						LOGGER.error("Parse ("+contentFile+"): ", exception);
+						logger.error("Parse ("+contentFile+"): ", exception);
 						parseException = exception;
 					}
 
 					public void fatalError(SAXParseException exception) throws SAXException {
-						LOGGER.fatal("Parse ("+contentFile+"): ", exception);
+						logger.fatal("Parse ("+contentFile+"): ", exception);
 						parseException = exception;
 					}
 
 					public void warning(SAXParseException exception) throws SAXException {
-						LOGGER.warn("Parse ("+contentFile+"): ", exception);
+						logger.warn("Parse ("+contentFile+"): ", exception);
 					}
 				});
 				parseException = null;
@@ -262,9 +265,9 @@ public class ScriptingInitializer
 					parameterSet.createParameter(pIDNode.getTextContent()).setScriptParameterClassName(pTypeNode.getTextContent());
 				}
 				else
-					LOGGER.warn("parameter element of parameter-set has an invalid/missing type attribute");
+					logger.warn("parameter element of parameter-set has an invalid/missing type attribute");
 			} else
-				LOGGER.warn("parameter element of parameter-set has an invalid/missing name attribute");
+				logger.warn("parameter element of parameter-set has an invalid/missing name attribute");
 		}
 		return parameterSet;
 	}
@@ -282,7 +285,7 @@ public class ScriptingInitializer
 					nameSet = true;
 				}
 				else
-					LOGGER.warn("name element of node "+elementNode.getNodeName()+" has an invalid/missing language attribute");
+					logger.warn("name element of node "+elementNode.getNodeName()+" has an invalid/missing language attribute");
 			}
 		}
 		if (!nameSet)
@@ -297,26 +300,26 @@ public class ScriptingInitializer
 			String itemType = parent.getScriptRegistryItemType();
 			Document catDocument = getCategoryDescriptor(dir);
 			if (catDocument != null) {
-				LOGGER.debug("Have category-descriptor");
+				logger.debug("Have category-descriptor");
 				Node catNode = NLDOMUtil.findSingleNode(catDocument, "script-category");
 				if (catNode != null) {
-					LOGGER.debug("Have script-category element: "+catNode.getLocalName());
+					logger.debug("Have script-category element: "+catNode.getLocalName());
 					NamedNodeMap attributes = catNode.getAttributes();
 					if (attributes != null) {
 						Node typeAttr = attributes.getNamedItem("type");
 						if (typeAttr != null && !"".equals(typeAttr.getTextContent())) {
-							LOGGER.debug("Have type-attribute in script-category element: "+typeAttr.getTextContent());
+							logger.debug("Have type-attribute in script-category element: "+typeAttr.getTextContent());
 							itemType = typeAttr.getTextContent();
 						}
 
 						Node idAttr = attributes.getNamedItem("id");
 						if (idAttr != null && !"".equals(idAttr.getTextContent())) {
-							LOGGER.debug("Have id-attribute in script-category element: "+idAttr.getTextContent());
+							logger.debug("Have id-attribute in script-category element: "+idAttr.getTextContent());
 							categoryID = idAttr.getTextContent();
 						}
 					}
 					else {
-						LOGGER.warn("Attributes NamedNodeMap of script-category element is null!!!");
+						logger.warn("Attributes NamedNodeMap of script-category element is null!!!");
 					}
 				}
 			}
@@ -346,7 +349,7 @@ public class ScriptingInitializer
 				}
 			}
 			createElementName(catNode, category.getName(), categoryID);
-			LOGGER.info("create Script Category = "+itemType + "/" + categoryID);
+			logger.info("create Script Category = "+itemType + "/" + categoryID);
 			
 
 			// Create scripts
@@ -365,23 +368,23 @@ public class ScriptingInitializer
 				}
 				
 				if (scriptNode != null) {
-					LOGGER.debug("Have script element");
+					logger.debug("Have script element");
 					Node idNode = scriptNode.getAttributes().getNamedItem("id");
 					if (idNode != null && !"".equals(idNode.getTextContent())) {
-						LOGGER.debug("Have id-attribute in script element: "+idNode.getTextContent());
+						logger.debug("Have id-attribute in script element: "+idNode.getTextContent());
 						scriptID = idNode.getTextContent();
 					}
 					Node typeNode = scriptNode.getAttributes().getNamedItem("type");
 					if (typeNode != null && !"".equals(typeNode.getTextContent())) {
-						LOGGER.debug("Have type-attribute in script element: "+idNode.getTextContent());
+						logger.debug("Have type-attribute in script element: "+idNode.getTextContent());
 						scriptItemType = typeNode.getTextContent();
 					}
 				}
 				
 				try {			
-					LOGGER.info("create Script = "+scriptRegistryItemType + "/" + scriptID);				
+					logger.info("create Script = "+scriptRegistryItemType + "/" + scriptID);				
 					String scriptContent = Utils.readTextFile(scriptFile);
-					LOGGER.debug("scriptContent = " + scriptContent);
+					logger.debug("scriptContent = " + scriptContent);
 					Script script;
 					try {
 						pm.getExtent(Script.class);
@@ -406,7 +409,7 @@ public class ScriptingInitializer
 					createElementName(scriptNode, script.getName(), scriptID);
 					
 				} catch (Exception e) {
-					LOGGER.warn("could NOT create script "+scriptID+"!", e);
+					logger.warn("could NOT create script "+scriptID+"!", e);
 				}
 			}
 

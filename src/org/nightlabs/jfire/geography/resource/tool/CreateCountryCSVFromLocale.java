@@ -46,7 +46,10 @@ import org.nightlabs.jfire.geography.GeographySystem;
 
 public class CreateCountryCSVFromLocale
 {
-	public static final Logger LOGGER = Logger.getLogger(CreateCountryCSVFromLocale.class);
+	/**
+	 * LOG4J logger used by this class
+	 */
+	private static final Logger logger = Logger.getLogger(CreateCountryCSVFromLocale.class);
 
 	public CreateCountryCSVFromLocale()
 	{
@@ -66,7 +69,7 @@ public class CreateCountryCSVFromLocale
 				countries.put(country.getCountryID(), country);
 			}
 
-			LOGGER.info("Loading countries from "+Locale.class.getName()+"...");
+			logger.info("Loading countries from "+Locale.class.getName()+"...");
 			String[] countryIDs = Locale.getISOCountries();
 			String[] languageIDs = Locale.getISOLanguages();
 			String defaultLanguageID = Locale.getDefault().getLanguage();
@@ -121,7 +124,7 @@ public class CreateCountryCSVFromLocale
 					}
 				}
 
-				LOGGER.info("Sorting " + countries.size() + " countries by countryID...");
+				logger.info("Sorting " + countries.size() + " countries by countryID...");
 				List countryList = new LinkedList(countries.values());
 				Collections.sort(countryList, new Comparator() {
 					public int compare(Object obj0, Object obj1)
@@ -144,7 +147,7 @@ public class CreateCountryCSVFromLocale
 					};
 				};
 
-				LOGGER.info("Writing CSV data...");
+				logger.info("Writing CSV data...");
 				for (Iterator itCountry = countryList.iterator(); itCountry.hasNext(); ) {
 					Country country = (Country) itCountry.next();
 					List names = new LinkedList(country.getName().getTexts());
@@ -163,9 +166,9 @@ public class CreateCountryCSVFromLocale
 				writer.close();
 				fout.close();
 			}
-			LOGGER.info("Added "+countryCount+" new  countries & "+countryLangCount+" names from "+Locale.class.getName()+".");
+			logger.info("Added "+countryCount+" new  countries & "+countryLangCount+" names from "+Locale.class.getName()+".");
 		} catch (Throwable t) {
-			LOGGER.error("CSV creation failed!", t);
+			logger.error("CSV creation failed!", t);
 		}
 	}
 

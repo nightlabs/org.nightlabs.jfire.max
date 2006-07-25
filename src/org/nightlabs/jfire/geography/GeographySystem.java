@@ -64,7 +64,10 @@ import org.nightlabs.util.Utils;
  */
 public class GeographySystem // implements Serializable
 {
-	public static final Logger LOGGER = Logger.getLogger(GeographySystem.class);
+	/**
+	 * LOG4J logger used by this class
+	 */
+	private static final Logger logger = Logger.getLogger(GeographySystem.class);
 
 	/**
 	 * @param initialContextProperties The properties needed to create a JNDI initial context
@@ -477,7 +480,7 @@ public class GeographySystem // implements Serializable
 	protected Map<String, FulltextMap> countriesByCountryNameByLanguageID = null;
 	protected FulltextMap getCountriesByCountryNameMap(String languageID)
 	{
-		LOGGER.debug("getCountriesByCountryNameMap(languageID=\""+languageID+"\") entered.");
+		logger.debug("getCountriesByCountryNameMap(languageID=\""+languageID+"\") entered.");
 
 		if (countriesByCountryNameByLanguageID == null)
 			countriesByCountryNameByLanguageID = new HashMap<String, FulltextMap>();
@@ -498,7 +501,7 @@ public class GeographySystem // implements Serializable
 			}
 		}
 
-		LOGGER.debug("getCountriesByCountryNameMap(languageID=\""+languageID+"\") about to exit.");
+		logger.debug("getCountriesByCountryNameMap(languageID=\""+languageID+"\") about to exit.");
 		return countriesByCountryName;
 	}
 
@@ -516,7 +519,7 @@ public class GeographySystem // implements Serializable
 
 	protected FulltextMap getLocationsByLocationNameMap(CityID cityID, String languageID)
 	{
-		LOGGER.debug("getLocationsByLocationNameMap(cityID=\""+cityID+"\", languageID=\""+languageID+"\") entered.");
+		logger.debug("getLocationsByLocationNameMap(cityID=\""+cityID+"\", languageID=\""+languageID+"\") entered.");
 
 		needLocations(cityID.countryID);
 
@@ -549,7 +552,7 @@ public class GeographySystem // implements Serializable
 			}
 		}
 
-		LOGGER.debug("getLocationsByLocationNameMap(cityID=\""+cityID+"\", languageID=\""+languageID+"\") about to exit.");
+		logger.debug("getLocationsByLocationNameMap(cityID=\""+cityID+"\", languageID=\""+languageID+"\") about to exit.");
 		return locationsByLocationName;
 	}
 
@@ -567,7 +570,7 @@ public class GeographySystem // implements Serializable
 
 	protected FulltextMap getRegionsByRegionNameMap(CountryID countryID, String languageID)
 	{
-		LOGGER.debug("getRegionsByRegionNameMap(countryID=\""+countryID+"\", languageID=\""+languageID+"\") entered.");
+		logger.debug("getRegionsByRegionNameMap(countryID=\""+countryID+"\", languageID=\""+languageID+"\") entered.");
 
 		needRegions(countryID.countryID);
 
@@ -600,7 +603,7 @@ public class GeographySystem // implements Serializable
 			}
 		}
 
-		LOGGER.debug("getRegionsByRegionNameMap(countryID=\""+countryID+"\", languageID=\""+languageID+"\") about to exit.");
+		logger.debug("getRegionsByRegionNameMap(countryID=\""+countryID+"\", languageID=\""+languageID+"\") about to exit.");
 		return regionsByRegionName;
 	}
 
@@ -615,7 +618,7 @@ public class GeographySystem // implements Serializable
 
 	protected FulltextMap getDistrictsByZipMap(RegionID regionID)
 	{
-		LOGGER.debug("getDistrictsByZipMap(regionID=\""+regionID+"\") entered.");
+		logger.debug("getDistrictsByZipMap(regionID=\""+regionID+"\") entered.");
 
 		needZips(regionID.countryID);
 
@@ -648,7 +651,7 @@ public class GeographySystem // implements Serializable
 			}
 		}
 
-		LOGGER.debug("getDistrictsByZipMap(regionID=\""+regionID+"\") about to exit.");
+		logger.debug("getDistrictsByZipMap(regionID=\""+regionID+"\") about to exit.");
 		return districtsByZip;
 	}
 
@@ -666,7 +669,7 @@ public class GeographySystem // implements Serializable
 
 	protected FulltextMap getCitiesByCityNameMap(RegionID regionID, String languageID)
 	{
-		LOGGER.debug("getCitiesByCityNameMap(regionID=\""+regionID+"\", languageID=\""+languageID+"\") entered.");
+		logger.debug("getCitiesByCityNameMap(regionID=\""+regionID+"\", languageID=\""+languageID+"\") entered.");
 
 		needCities(regionID.countryID);
 
@@ -699,7 +702,7 @@ public class GeographySystem // implements Serializable
 			}
 		}
 
-		LOGGER.debug("getCitiesByCityNameMap(regionID=\""+regionID+"\", languageID=\""+languageID+"\") about to exit.");
+		logger.debug("getCitiesByCityNameMap(regionID=\""+regionID+"\", languageID=\""+languageID+"\") about to exit.");
 		return citiesByCityName;
 	}
 
@@ -955,10 +958,10 @@ public class GeographySystem // implements Serializable
 //			countryLangCount = 0;
 
 			String file = "resource/Data-Country.csv";
-			LOGGER.info("Loading countries from \""+file+"\"...");
+			logger.info("Loading countries from \""+file+"\"...");
 			InputStream in = Geography.class.getResourceAsStream(file);
 			if (in == null) {
-				LOGGER.warn("File \"" + file + "\" does not exist!");
+				logger.warn("File \"" + file + "\" does not exist!");
 				return;
 			}
 			try {
@@ -986,7 +989,7 @@ public class GeographySystem // implements Serializable
 
 						if (countryID != null) {
 							if (!ObjectIDUtil.isValidIDString(countryID)) {
-								LOGGER.warn("CSV \""+file+"\", line "+row+": countryID \"" + countryID + "\" is not a valid ID String! Row ignored!");
+								logger.warn("CSV \""+file+"\", line "+row+": countryID \"" + countryID + "\" is not a valid ID String! Row ignored!");
 								continue;
 							}
 
@@ -1008,7 +1011,7 @@ public class GeographySystem // implements Serializable
 			} finally {
 				in.close();
 			}
-			LOGGER.info("Read " +row+ " rows from \""+file+"\" and added " + countryCount + " new countries & " + countryLangCount + " names.");
+			logger.info("Read " +row+ " rows from \""+file+"\" and added " + countryCount + " new countries & " + countryLangCount + " names.");
 
 		} catch (Exception x) {
 			throw new RuntimeException(x);
@@ -1037,7 +1040,7 @@ public class GeographySystem // implements Serializable
 
 		Country country = (Country) countries.get(countryID);
 		if (country == null) {
-			LOGGER.warn("Country with ID \""+countryID+"\" does not exist! Cannot load regions of this country.");
+			logger.warn("Country with ID \""+countryID+"\" does not exist! Cannot load regions of this country.");
 			return;
 		}
 
@@ -1046,11 +1049,11 @@ public class GeographySystem // implements Serializable
 		int regionLangCount = 0;
 
 		try {
-			LOGGER.info("Loading regions of country \""+countryID+"\"...");
+			logger.info("Loading regions of country \""+countryID+"\"...");
 			String file = "resource/Data-Region-" + countryID + ".csv";
 			InputStream in = Geography.class.getResourceAsStream(file);
 			if (in == null) {
-				LOGGER.warn("File \"" + file + "\" does not exist!");
+				logger.warn("File \"" + file + "\" does not exist!");
 				return;
 			}
 			try {
@@ -1067,7 +1070,7 @@ public class GeographySystem // implements Serializable
 	        	String[] fields = csvLine2Fields(line); // line.replaceAll("\"", "").split(";");
 
 	        	if (fields.length != 4) {
-	        		LOGGER.warn(file + ": Invalid number of fields in row "+row+"! Row ignored.");
+	        		logger.warn(file + ": Invalid number of fields in row "+row+"! Row ignored.");
 	        		continue;
 	        	}
 	
@@ -1080,7 +1083,7 @@ public class GeographySystem // implements Serializable
 						String regionName = fields[3];
 
 						if (!countryID.equals(fcountryID)) {
-							LOGGER.warn(file + ": Row "+row+" does declare the wrong country! Should be \""+countryID+"\" but is \""+fcountryID+"\"! Row ignored.");
+							logger.warn(file + ": Row "+row+" does declare the wrong country! Should be \""+countryID+"\" but is \""+fcountryID+"\"! Row ignored.");
 							continue;
 						}
 
@@ -1088,7 +1091,7 @@ public class GeographySystem // implements Serializable
 							regionID = countryID;
 
 						if (!ObjectIDUtil.isValidIDString(regionID)) {
-							LOGGER.warn("CSV \""+file+"\", line "+row+": regionID \"" + regionID + "\" is not a valid ID String! Row ignored!");
+							logger.warn("CSV \""+file+"\", line "+row+": regionID \"" + regionID + "\" is not a valid ID String! Row ignored!");
 							continue;
 						}
 
@@ -1112,10 +1115,10 @@ public class GeographySystem // implements Serializable
 			} finally {
 				in.close();
 			}
-			LOGGER.info("Read " +row+ " rows and added " + regionCount + " new regions & " + regionLangCount + " names for country \"" + countryID + "\".");
+			logger.info("Read " +row+ " rows and added " + regionCount + " new regions & " + regionLangCount + " names for country \"" + countryID + "\".");
 
 			if (regionCount == 0) {
-				LOGGER.info("The country \"" + countryID + "\" does not have regions. Creating dummy region with regionID=\""+countryID+"\"!");
+				logger.info("The country \"" + countryID + "\" does not have regions. Creating dummy region with regionID=\""+countryID+"\"!");
 				String regionID = countryID;
 				Region region = new Region(this, rootOrganisationID, regionID, country);
 				region.getName().load(country.getName());
@@ -1153,12 +1156,12 @@ public class GeographySystem // implements Serializable
 		int locationLangCount = 0;
 
 		try {
-			LOGGER.info("Loading locations of country \""+countryID+"\"...");
+			logger.info("Loading locations of country \""+countryID+"\"...");
 
 			String file = "resource/Data-Location-" + countryID + ".csv";
 			InputStream in = Geography.class.getResourceAsStream(file);
 			if (in == null) {
-				LOGGER.warn("File \"" + file + "\" does not exist!");
+				logger.warn("File \"" + file + "\" does not exist!");
 				return;
 			}
 			try {
@@ -1175,7 +1178,7 @@ public class GeographySystem // implements Serializable
 	        	String[] fields = csvLine2Fields(line); // line.replaceAll("\"", "").split(";");
 
 	        	if (fields.length != 6) {
-	        		LOGGER.warn(file + ": Invalid number of fields in row "+row+"! Row ignored.");
+	        		logger.warn(file + ": Invalid number of fields in row "+row+"! Row ignored.");
 	        		continue;
 	        	}
 
@@ -1190,12 +1193,12 @@ public class GeographySystem // implements Serializable
 						String locationName = fields[5];
 
 						if (!countryID.equals(fcountryID)) {
-							LOGGER.warn(file + ": Row "+row+" declares the wrong country! Should be \""+countryID+"\" but is \""+fcountryID+"\"! Row ignored.");
+							logger.warn(file + ": Row "+row+" declares the wrong country! Should be \""+countryID+"\" but is \""+fcountryID+"\"! Row ignored.");
 							continue;
 						}
 	
 						if (!ObjectIDUtil.isValidIDString(locationID)) {
-							LOGGER.warn("CSV \""+file+"\", line "+row+": locationID \"" + locationID + "\" is not a valid ID String! Row ignored!");
+							logger.warn("CSV \""+file+"\", line "+row+": locationID \"" + locationID + "\" is not a valid ID String! Row ignored!");
 							continue;
 						}
 
@@ -1203,14 +1206,14 @@ public class GeographySystem // implements Serializable
 
 						Country country = (Country) countries.get(countryID);
 						if (country == null) {
-							LOGGER.warn("CSV \""+file+"\", line "+row+": country with ID \""+countryID+"\" does not exist! Row ignored.");
+							logger.warn("CSV \""+file+"\", line "+row+": country with ID \""+countryID+"\" does not exist! Row ignored.");
 							continue;
 						}
 
 						String cityPK = City.getPrimaryKey(countryID, rootOrganisationID, cityID);
 						City city = cities.get(cityPK);
 						if (city == null) {
-							LOGGER.warn("CSV \""+file+"\", line "+row+": City with PK \""+cityPK+"\" does not exist! Row ignored.");
+							logger.warn("CSV \""+file+"\", line "+row+": City with PK \""+cityPK+"\" does not exist! Row ignored.");
 							continue;
 						}
 
@@ -1219,7 +1222,7 @@ public class GeographySystem // implements Serializable
 							String districtPK = District.getPrimaryKey(countryID, rootOrganisationID, districtID);
 							district = districts.get(districtPK);
 							if (district == null)
-								LOGGER.warn("CSV \""+file+"\", line "+row+": District with PK \""+districtPK+"\" does not exist! Will NOT assign a district to location \""+locationPK+"\"!");
+								logger.warn("CSV \""+file+"\", line "+row+": District with PK \""+districtPK+"\" does not exist! Will NOT assign a district to location \""+locationPK+"\"!");
 						}
 
 						Location location = (Location) locations.get(
@@ -1241,7 +1244,7 @@ public class GeographySystem // implements Serializable
 	 			in.close();
 	 		}
 
-	 		LOGGER.info("Read " +row+ " rows and added " + locationCount + " new locations & " + locationLangCount + " names for country \"" + countryID + "\".");
+	 		logger.info("Read " +row+ " rows and added " + locationCount + " new locations & " + locationLangCount + " names for country \"" + countryID + "\".");
 
 		} catch (Exception x) {
 			throw new RuntimeException(x);
@@ -1274,12 +1277,12 @@ public class GeographySystem // implements Serializable
 		int cityLangCount = 0;
 
 		try {
-			LOGGER.info("Loading cities of country \""+countryID+"\"...");
+			logger.info("Loading cities of country \""+countryID+"\"...");
 
 			String file = "resource/Data-City-" + countryID + ".csv";
 			InputStream in = Geography.class.getResourceAsStream(file);
 			if (in == null) {
-				LOGGER.warn("File \"" + file + "\" does not exist!");
+				logger.warn("File \"" + file + "\" does not exist!");
 				return;
 			}
 			try {
@@ -1296,7 +1299,7 @@ public class GeographySystem // implements Serializable
 	        	String[] fields = csvLine2Fields(line); // line.replaceAll("\"", "").split(";");
 
 	        	if (fields.length != 5) {
-	        		LOGGER.warn(file + ": Invalid number of fields in row "+row+"! Row ignored.");
+	        		logger.warn(file + ": Invalid number of fields in row "+row+"! Row ignored.");
 	        		continue;
 	        	}
 	
@@ -1310,18 +1313,18 @@ public class GeographySystem // implements Serializable
 						String cityName = fields[4];
 	
 						if (!countryID.equals(fcountryID)) {
-							LOGGER.warn(file + ": Row "+row+" does declare the wrong country! Should be \""+countryID+"\" but is \""+fcountryID+"\"! Row ignored.");
+							logger.warn(file + ": Row "+row+" does declare the wrong country! Should be \""+countryID+"\" but is \""+fcountryID+"\"! Row ignored.");
 							continue;
 						}
 	
 						if (!ObjectIDUtil.isValidIDString(cityID)) {
-							LOGGER.warn("CSV \""+file+"\", line "+row+": cityID \"" + cityID + "\" is not a valid ID String! Row ignored!");
+							logger.warn("CSV \""+file+"\", line "+row+": cityID \"" + cityID + "\" is not a valid ID String! Row ignored!");
 							continue;
 						}
 	
 						Country country = (Country) countries.get(countryID);
 						if (country == null) {
-							LOGGER.warn("CSV \""+file+"\", line "+row+": country with ID \""+countryID+"\" does not exist! Row ignored.");
+							logger.warn("CSV \""+file+"\", line "+row+": country with ID \""+countryID+"\" does not exist! Row ignored.");
 							continue;
 						}
 
@@ -1331,7 +1334,7 @@ public class GeographySystem // implements Serializable
 						String regionPK = Region.getPrimaryKey(countryID, rootOrganisationID, regionID);
 						Region region = (Region) regions.get(regionPK);
 						if (region == null) {
-							LOGGER.warn("CSV \""+file+"\", line "+row+": Region with PK \""+regionPK+"\" does not exist! Row ignored.");
+							logger.warn("CSV \""+file+"\", line "+row+": Region with PK \""+regionPK+"\" does not exist! Row ignored.");
 							continue;
 						}
 	
@@ -1354,7 +1357,7 @@ public class GeographySystem // implements Serializable
 	 			in.close();
 	 		}
 
-	 		LOGGER.info("Read " +row+ " rows and added " + cityCount + " new cities & " + cityLangCount + " names for country \"" + countryID + "\".");
+	 		logger.info("Read " +row+ " rows and added " + cityCount + " new cities & " + cityLangCount + " names for country \"" + countryID + "\".");
 
 		} catch (Exception x) {
 			throw new RuntimeException(x);
@@ -1387,12 +1390,12 @@ public class GeographySystem // implements Serializable
 		int districtLangCount = 0;
 
 		try {
-			LOGGER.info("Loading districts of country \""+countryID+"\"...");
+			logger.info("Loading districts of country \""+countryID+"\"...");
 
 			String file = "resource/Data-District-" + countryID + ".csv";
 			InputStream in = Geography.class.getResourceAsStream(file);
 			if (in == null) {
-				LOGGER.warn("File \"" + file + "\" does not exist!");
+				logger.warn("File \"" + file + "\" does not exist!");
 				return;
 			}
 			try {
@@ -1409,7 +1412,7 @@ public class GeographySystem // implements Serializable
 	        	String[] fields = csvLine2Fields(line); // line.replaceAll("\"", "").split(";");
 
 	        	if (fields.length != 7) {
-	        		LOGGER.warn(file + ": Invalid number of fields ("+fields.length+") in row "+row+"! Row ignored.");
+	        		logger.warn(file + ": Invalid number of fields ("+fields.length+") in row "+row+"! Row ignored.");
 	        		continue;
 	        	}
 	
@@ -1425,13 +1428,13 @@ public class GeographySystem // implements Serializable
 						String longitudeStr = fields[6];
 	
 						if (!countryID.equals(fcountryID)) {
-							LOGGER.warn(file + ": Row "+row+" does declare the wrong country! Should be \""+countryID+"\" but is \""+fcountryID+"\"! Row ignored.");
+							logger.warn(file + ": Row "+row+" does declare the wrong country! Should be \""+countryID+"\" but is \""+fcountryID+"\"! Row ignored.");
 							continue;
 						}
 	
 						Country country = (Country) countries.get(countryID);
 						if (country == null) {
-							LOGGER.warn("CSV \""+file+"\", line "+row+": country with ID \""+countryID+"\" does not exist! Row ignored.");
+							logger.warn("CSV \""+file+"\", line "+row+": country with ID \""+countryID+"\" does not exist! Row ignored.");
 							continue;
 						}
 	
@@ -1439,14 +1442,14 @@ public class GeographySystem // implements Serializable
 							districtID = cityID;
 	
 						if (!ObjectIDUtil.isValidIDString(districtID)) {
-							LOGGER.warn("CSV \""+file+"\", line "+row+": districtID \"" + districtID + "\" is not a valid ID String! Row ignored!");
+							logger.warn("CSV \""+file+"\", line "+row+": districtID \"" + districtID + "\" is not a valid ID String! Row ignored!");
 							continue;
 						}
 	
 						String cityPK = City.getPrimaryKey(countryID, rootOrganisationID, cityID);
 						City city = (City) cities.get(cityPK);
 						if (city == null) {
-							LOGGER.warn("CSV \""+file+"\", line "+row+": City with PK \""+cityPK+"\" does not exist! Row ignored.");
+							logger.warn("CSV \""+file+"\", line "+row+": City with PK \""+cityPK+"\" does not exist! Row ignored.");
 							continue;
 						}
 	
@@ -1457,14 +1460,14 @@ public class GeographySystem // implements Serializable
 						try {
 							latitude = Double.parseDouble(latitudeStr);
 						} catch (NumberFormatException x) {
-							LOGGER.warn("CSV \""+file+"\", line "+row+": latitude \"" + latitudeStr + "\" is not a double! Setting latitude = 0.");
+							logger.warn("CSV \""+file+"\", line "+row+": latitude \"" + latitudeStr + "\" is not a double! Setting latitude = 0.");
 						}
 	
 						double longitude = 0;
 						try {
 							longitude = Double.parseDouble(longitudeStr);
 						} catch (NumberFormatException x) {
-							LOGGER.warn("CSV \""+file+"\", line "+row+": longitude \"" + longitudeStr + "\" is not a double! Setting longitude = 0.");
+							logger.warn("CSV \""+file+"\", line "+row+": longitude \"" + longitudeStr + "\" is not a double! Setting longitude = 0.");
 						}
 
 
@@ -1490,7 +1493,7 @@ public class GeographySystem // implements Serializable
 	 			in.close();
 	 		}
 
-	 		LOGGER.info("Read " +row+ " rows and added " + districtCount + " new districts & " + districtLangCount + " names for country \"" + countryID + "\".");
+	 		logger.info("Read " +row+ " rows and added " + districtCount + " new districts & " + districtLangCount + " names for country \"" + countryID + "\".");
 
 		} catch (Exception x) {
 			throw new RuntimeException(x);
@@ -1522,12 +1525,12 @@ public class GeographySystem // implements Serializable
 		int zipCount = 0;
 
 		try {
-			LOGGER.info("Loading zips of country \""+countryID+"\"...");
+			logger.info("Loading zips of country \""+countryID+"\"...");
 
 			String file = "resource/Data-Zip-" + countryID + ".csv";
 			InputStream in = Geography.class.getResourceAsStream(file);
 			if (in == null) {
-				LOGGER.warn("File \"" + file + "\" does not exist!");
+				logger.warn("File \"" + file + "\" does not exist!");
 				return;
 			}
 			try {
@@ -1544,7 +1547,7 @@ public class GeographySystem // implements Serializable
 	        	String[] fields = csvLine2Fields(line); // line.replaceAll("\"", "").split(";");
 
 	        	if (fields.length != 4) {
-	        		LOGGER.warn(file + ": Invalid number of fields in row "+row+"! Row ignored.");
+	        		logger.warn(file + ": Invalid number of fields in row "+row+"! Row ignored.");
 	        		continue;
 	        	}
 
@@ -1557,7 +1560,7 @@ public class GeographySystem // implements Serializable
 						String zip = fields[3];
 	
 						if (!countryID.equals(fcountryID)) {
-							LOGGER.warn(file + ": Row "+row+" does declare the wrong country! Should be \""+countryID+"\" but is \""+fcountryID+"\"! Row ignored.");
+							logger.warn(file + ": Row "+row+" does declare the wrong country! Should be \""+countryID+"\" but is \""+fcountryID+"\"! Row ignored.");
 							continue;
 						}
 	
@@ -1565,25 +1568,25 @@ public class GeographySystem // implements Serializable
 							districtID = cityID;
 	
 						if ("".equals(zip)) {
-							LOGGER.warn("CSV \""+file+"\", line "+row+": zip field is empty! Row ignored!");
+							logger.warn("CSV \""+file+"\", line "+row+": zip field is empty! Row ignored!");
 							continue;
 						}
 	
 						Country country = (Country) countries.get(countryID);
 						if (country == null) {
-							LOGGER.warn("CSV \""+file+"\", line "+row+": country with ID \""+countryID+"\" does not exist! Row ignored.");
+							logger.warn("CSV \""+file+"\", line "+row+": country with ID \""+countryID+"\" does not exist! Row ignored.");
 							continue;
 						}
 	
 						if (!ObjectIDUtil.isValidIDString(cityID)) {
-							LOGGER.warn("CSV \""+file+"\", line "+row+": cityID \"" + cityID + "\" is not a valid ID String! Row ignored!");
+							logger.warn("CSV \""+file+"\", line "+row+": cityID \"" + cityID + "\" is not a valid ID String! Row ignored!");
 							continue;
 						}
 
 						String districtPK = District.getPrimaryKey(countryID, rootOrganisationID, districtID);
 						District district = (District) districts.get(districtPK);
 						if (district == null) {
-							LOGGER.warn("CSV \""+file+"\", line "+row+": District with PK \""+districtPK+"\" does not exist! Row ignored.");
+							logger.warn("CSV \""+file+"\", line "+row+": District with PK \""+districtPK+"\" does not exist! Row ignored.");
 							continue;
 						}
 
@@ -1592,7 +1595,7 @@ public class GeographySystem // implements Serializable
 							City csvCity = (City) cities.get(City.getPrimaryKey(countryID, rootOrganisationID, cityID));
 							String csvCityName = csvCity == null ? "{unknown city}" : csvCity.getName().getText(languageID);
 
-							LOGGER.warn("CSV \""+file+"\", line "+row+": District with PK \""+districtPK+"\" (named \""+district.getName()+"\") has cityID \""+district.getCity().getCityID()+"\" (named \""+district.getCity().getName().getText(languageID)+"\") but csv row declares cityID \""+cityID+"\" (named \"" + csvCityName + "\")! Will add zip \""+zip+"\" to district \""+districtPK+"\" anyway.");
+							logger.warn("CSV \""+file+"\", line "+row+": District with PK \""+districtPK+"\" (named \""+district.getName()+"\") has cityID \""+district.getCity().getCityID()+"\" (named \""+district.getCity().getName().getText(languageID)+"\") but csv row declares cityID \""+cityID+"\" (named \"" + csvCityName + "\")! Will add zip \""+zip+"\" to district \""+districtPK+"\" anyway.");
 						}
 	
 						district.addZip(zip);
@@ -1606,7 +1609,7 @@ public class GeographySystem // implements Serializable
 	 			in.close();
 	 		}
 
-	 		LOGGER.info("Read " +row+ " rows and added " + zipCount + " new zips for country \"" + countryID + "\".");
+	 		logger.info("Read " +row+ " rows and added " + zipCount + " new zips for country \"" + countryID + "\".");
 		} catch (Exception x) {
 			throw new RuntimeException(x);
 		}

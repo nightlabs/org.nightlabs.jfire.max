@@ -59,7 +59,10 @@ public abstract class GeographyManagerBean
 	extends BaseSessionBeanImpl
 	implements SessionBean
 {
-	public static final Logger LOGGER = Logger.getLogger(GeographyManagerBean.class);
+	/**
+	 * LOG4J logger used by this class
+	 */
+	private static final Logger logger = Logger.getLogger(GeographyManagerBean.class);
 
 	/**
 	 * @see org.nightlabs.jfire.base.BaseSessionBeanImpl#setSessionContext(javax.ejb.SessionContext)
@@ -67,7 +70,7 @@ public abstract class GeographyManagerBean
 	public void setSessionContext(SessionContext sessionContext)
 			throws EJBException, RemoteException
 	{
-		LOGGER.debug(this.getClass().getName() + ".setSessionContext("+sessionContext+")");
+		logger.debug(this.getClass().getName() + ".setSessionContext("+sessionContext+")");
 		super.setSessionContext(sessionContext);
 	}
 	/**
@@ -83,7 +86,7 @@ public abstract class GeographyManagerBean
 	public void ejbCreate()
 	throws CreateException
 	{
-		LOGGER.debug(this.getClass().getName() + ".ejbCreate()");
+		logger.debug(this.getClass().getName() + ".ejbCreate()");
 	}
 	/**
 	 * @see javax.ejb.SessionBean#ejbRemove()
@@ -92,7 +95,7 @@ public abstract class GeographyManagerBean
 	 */
 	public void ejbRemove() throws EJBException, RemoteException
 	{
-		LOGGER.debug(this.getClass().getName() + ".ejbRemove()");
+		logger.debug(this.getClass().getName() + ".ejbRemove()");
 	}
 	
 	/**
@@ -100,14 +103,14 @@ public abstract class GeographyManagerBean
 	 */
 	public void ejbActivate() throws EJBException, RemoteException
 	{
-		LOGGER.debug(this.getClass().getName() + ".ejbActivate()");
+		logger.debug(this.getClass().getName() + ".ejbActivate()");
 	}
 	/**
 	 * @see javax.ejb.SessionBean#ejbPassivate()
 	 */
 	public void ejbPassivate() throws EJBException, RemoteException
 	{
-		LOGGER.debug(this.getClass().getName() + ".ejbPassivate()");
+		logger.debug(this.getClass().getName() + ".ejbPassivate()");
 	}
 
 //	protected static StreamTokenizer getCSVTokenizer(InputStreamReader reader)

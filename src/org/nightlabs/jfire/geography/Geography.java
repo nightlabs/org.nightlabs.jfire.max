@@ -53,7 +53,10 @@ import org.nightlabs.jfire.organisation.LocalOrganisation;
  */
 public class Geography implements Serializable
 {
-	public static final Logger LOGGER = Logger.getLogger(Geography.class);
+	/**
+	 * LOG4J logger used by this class
+	 */
+	private static final Logger logger = Logger.getLogger(Geography.class);
 
 //	/**
 //	 * key: String countryPK<br/>
@@ -95,11 +98,11 @@ public class Geography implements Serializable
 //
 //		geography.countries = geographyCache.countries;
 
-		LOGGER.info("making geography persistent...");
+		logger.info("making geography persistent...");
 		long startDT = System.currentTimeMillis();
 		pm.makePersistent(geography);
 		long stopDT = System.currentTimeMillis();
-		LOGGER.info("makePersistent(geography) took " + (stopDT - startDT) + "msec.");
+		logger.info("makePersistent(geography) took " + (stopDT - startDT) + "msec.");
 		return geography;
 	}
 

@@ -81,7 +81,10 @@ public abstract class SimpleTradeManagerBean
 extends BaseSessionBeanImpl
 implements SessionBean
 {
-	public static final Logger LOGGER = Logger.getLogger(SimpleTradeManagerBean.class);
+	/**
+	 * LOG4J logger used by this class
+	 */
+	private static final Logger logger = Logger.getLogger(SimpleTradeManagerBean.class);
 
 	/**
 	 * @see org.nightlabs.jfire.base.BaseSessionBeanImpl#setSessionContext(javax.ejb.SessionContext)
@@ -134,7 +137,7 @@ implements SessionBean
 			if (moduleMetaData != null)
 				return;
 
-			LOGGER.info("Initialization of JFireSimpleTrade started...");
+			logger.info("Initialization of JFireSimpleTrade started...");
 
 			// version is {major}.{minor}.{release}-{patchlevel}-{suffix}
 			moduleMetaData = new ModuleMetaData(
@@ -172,7 +175,7 @@ implements SessionBean
 
 				pm.makePersistent(deliveryConfiguration);
 			} catch (JDOObjectNotFoundException x) {
-				LOGGER.warn("Could not populate default DeliveryConfiguration for JFireSimpleTrade with ModeOfDelivery s!", x);
+				logger.warn("Could not populate default DeliveryConfiguration for JFireSimpleTrade with ModeOfDelivery s!", x);
 			}
 
 			User user = User.getUser(pm, getPrincipal());
@@ -380,7 +383,7 @@ implements SessionBean
 //			}
 //			// TEST END
 
-			LOGGER.info("Initialization of JFireSimpleTrade complete!");
+			logger.info("Initialization of JFireSimpleTrade complete!");
 		} finally {
 			pm.close();
 		}

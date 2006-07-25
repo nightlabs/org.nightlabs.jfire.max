@@ -52,6 +52,7 @@ import org.nightlabs.util.Utils;
 import org.nightlabs.xml.DOMParser;
 import org.nightlabs.xml.NLDOMUtil;
 import org.w3c.dom.Document;
+import org.w3c.dom.NamedNodeMap;
 import org.w3c.dom.Node;
 import org.xml.sax.ErrorHandler;
 import org.xml.sax.InputSource;
@@ -299,18 +300,23 @@ public class ScriptingInitializer
 				LOGGER.debug("Have category-descriptor");
 				Node catNode = NLDOMUtil.findSingleNode(catDocument, "script-category");
 				if (catNode != null) {
-					LOGGER.debug("Have script-category element");
-					
-					Node typeAttr = catNode.getAttributes().getNamedItem("type");
-					if (typeAttr != null && !"".equals(typeAttr.getTextContent())) {
-						LOGGER.debug("Have type-attribute in script-category element: "+typeAttr.getTextContent());
-						itemType = typeAttr.getTextContent();
+					LOGGER.debug("Have script-category element: "+catNode.getLocalName());
+					NamedNodeMap attributes = catNode.getAttributes();
+					if (attributes != null) {
+						Node typeAttr = attributes.getNamedItem("type");
+						if (typeAttr != null && !"".equals(typeAttr.getTextContent())) {
+							LOGGER.debug("Have type-attribute in script-category element: "+typeAttr.getTextContent());
+							itemType = typeAttr.getTextContent();
+						}
+
+						Node idAttr = attributes.getNamedItem("id");
+						if (idAttr != null && !"".equals(idAttr.getTextContent())) {
+							LOGGER.debug("Have id-attribute in script-category element: "+idAttr.getTextContent());
+							categoryID = idAttr.getTextContent();
+						}
 					}
-					
-					Node idAttr = catNode.getAttributes().getNamedItem("id");
-					if (idAttr != null && !"".equals(idAttr.getTextContent())) {
-						LOGGER.debug("Have id-attribute in script-category element: "+idAttr.getTextContent());
-						categoryID = idAttr.getTextContent();
+					else {
+						LOGGER.warn("Attributes NamedNodeMap of script-category element is null!!!");
 					}
 				}
 			}
@@ -319,11 +325,11 @@ public class ScriptingInitializer
 			ScriptCategory category;
 			try {
 				pm.getExtent(ScriptCategory.class);
-				category = (ScriptCategory) pm.getObjectById(
-						ScriptRegistryItemID.create(
-								organisationID,
-								itemType,
-								categoryID));			
+				ScriptRegistryItemID registryItemID = ScriptRegistryItemID.create(organisationID, itemType, categoryID); 
+				Object cat = pm.getObjectById(registryItemID);
+				if (!(cat instanceof ScriptCategory))
+					throw new IllegalStateException("Found ScriptRegistryItem for id "+registryItemID+" but it is not an instance of ScriptCategory, it is "+cat.getClass().getName());
+				category = (ScriptCategory)cat;
 			} catch(JDOObjectNotFoundException e) {
 				category = new ScriptCategory(parent, organisationID, itemType, categoryID);
 				parent.addChild(category);

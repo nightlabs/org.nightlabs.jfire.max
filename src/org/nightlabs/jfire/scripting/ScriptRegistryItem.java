@@ -72,7 +72,7 @@ import org.nightlabs.util.Utils;
  *			import java.lang.String"
  *
  */
-public class ScriptRegistryItem
+public abstract class ScriptRegistryItem
 		implements Serializable, StoreCallback
 {
 	private static final long serialVersionUID = 9221181132208442543L;

@@ -66,7 +66,7 @@ public class ReportRegistryItemCarrier implements Serializable {
 		) 
 	{
 		this.parentCarrier = parentCarrier;
-		this.registryItemID = ReportRegistryItemID.create(item.getOrganisationID(), item.getReportRegistryItemID());
+		this.registryItemID = ReportRegistryItemID.create(item.getOrganisationID(), item.getReportRegistryItemType(), item.getReportRegistryItemID());
 		this.childCarriers = new HashSet<ReportRegistryItemCarrier>();
 		this.registryItemType = item.getReportRegistryItemType();
 		if (recurse && (item instanceof NestableReportRegistryItem)) {

@@ -112,24 +112,24 @@ public class ReportCategory extends ReportRegistryItem implements NestableReport
 	 * @throws NullPointerException if parentItem is null
 	 */
 	public ReportCategory(
-			PersistenceManager pm,
-			ReportCategory parentItem 
+			ReportCategory parentItem,
+			String reportRegistryItemID 
 		) 
 	{
-		super(pm, parentItem, parentItem.getOrganisationID(), parentItem.getReportRegistryItemType());
+		super(parentItem, parentItem.getOrganisationID(), parentItem.getReportRegistryItemType(), reportRegistryItemID);
 		this.internal = parentItem.isInternal();
 		this.childItems = new HashSet<ReportRegistryItem>();
 	}
 	
 	public ReportCategory(
-			PersistenceManager pm,
 			ReportCategory parentItem,
 			String organisationID,
 			String reportRegistryItemType,
+			String reportRegistryItemID,
 			boolean internal
 		)
 	{
-		super(pm, parentItem, organisationID, reportRegistryItemType);
+		super(parentItem, organisationID, reportRegistryItemType, reportRegistryItemID);
 		if (parentItem != null)
 			this.internal = parentItem.isInternal();
 		else

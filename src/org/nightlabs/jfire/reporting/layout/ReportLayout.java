@@ -75,44 +75,40 @@ public class ReportLayout extends ReportRegistryItem {
 	}
 
 	/**
-	 * Creates a new ReportLayout as parent of the given
+	 * Creates a new ReportLayout as child of the given
 	 * ReportCategory with the given reportDesign.
-	 * @param pm The PersistenceManager to retrieve the ReportRegistry with
-	 * @param parentItem The parent category of the new layout.
+	 * 
+	 * @param parentItem The parent category of the new layout. The reportItemRegistryItem type of the new layout will also match its parent.
+	 * @param reportRegistryItemID The reportRegistryItemID of the new layout.
 	 * @param reportDesign The report design data of the new layout.
 	 */
 	public ReportLayout(
-			PersistenceManager pm,
-			ReportCategory parentItem, 
+			ReportCategory parentItem,
+			String reportRegistryItemID,
 			byte[] reportDesign
 		) 
 	{
-		super(pm, parentItem, parentItem.getOrganisationID(), parentItem.getReportRegistryItemType());
+		super(parentItem, parentItem.getOrganisationID(), parentItem.getReportRegistryItemType(), reportRegistryItemID);
 		this.reportDesign = reportDesign;
 	}
-	
+
 	/**
-	 * Creates a new ReportLayout as parent of the given
-	 * ReportCategory with the given reportDesign.
+	 * Creates a new ReportLayout as child of the given ReportCategory and the given primary-key fields.
+	 * No reportDesign data will be set.
+	 * 
 	 * @param parentItem The parent category of the new layout.
-	 * @param reportDesign The report design data of the new layout.
+	 * @param organisationID The organisationID of the new layout.
+	 * @param reportRegistryItemType The reportRegistryItemType of the new layout.
+	 * @param reportRegistryItemID The reportRegistryItemID of the new layout.
 	 */
-	public ReportLayout(
-			ReportCategory parentItem, 
-			byte[] reportDesign
-		) 
-	{
-		super(null, parentItem, parentItem.getOrganisationID(), parentItem.getReportRegistryItemType());
-		this.reportDesign = reportDesign;
-	}
-	
 	public ReportLayout(
 			ReportCategory parentItem,
 			String organisationID,
-			String reportRegistryItemType			
+			String reportRegistryItemType,
+			String reportRegistryItemID
 		) 
 	{
-		super(null, parentItem, organisationID, reportRegistryItemType);
+		super(parentItem, organisationID, reportRegistryItemType, reportRegistryItemID);
 	}
 	
 	

@@ -42,7 +42,7 @@ import org.nightlabs.i18n.I18nText;
  *
  * @jdo.inheritance strategy="new-table"
  *
- * @jdo.create-objectid-class field-order="organisationID, reportRegistryItemID"
+ * @jdo.create-objectid-class field-order="organisationID, reportRegistryItemType, reportRegistryItemID"
  *
  * @jdo.fetch-group name="ReportRegistryItem.name" fields="reportRegistryItem, names"
  */
@@ -59,10 +59,18 @@ public class ReportRegistryItemName extends I18nText {
 	 * @jdo.column length="100"
 	 */
 	private String organisationID;
+	
 	/**
 	 * @jdo.field primary-key="true"
+	 * @jdo.column length="100"
 	 */
-	private long reportRegistryItemID;
+	private String reportRegistryItemType;
+	
+	/**
+	 * @jdo.field primary-key="true"
+	 * @jdo.column length="100"
+	 */
+	private String reportRegistryItemID;
 	
 	/**
 	 * @jdo.field persistence-modifier="persistent"
@@ -141,16 +149,16 @@ public class ReportRegistryItemName extends I18nText {
 		return organisationID;
 	}
 
-	public long getReportRegistryItemID() {
+	public String getReportRegistryItemID() {
 		return reportRegistryItemID;
 	}
 
+	public String getReportRegistryItemType() {
+		return reportRegistryItemType;
+	}
+	
 	public ReportRegistryItem getReportRegistryItem() {
 		return reportRegistryItem;
 	}
 	
-	protected void setReportRegistryItemID(long reportRegistryItemID) {
-		this.reportRegistryItemID = reportRegistryItemID;
-	}
-
 }

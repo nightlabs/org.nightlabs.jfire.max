@@ -30,11 +30,14 @@ import java.io.Serializable;
 import java.util.Collection;
 
 import javax.jdo.JDOHelper;
+import javax.jdo.JDOObjectNotFoundException;
 import javax.jdo.PersistenceManager;
 import javax.jdo.Query;
 import javax.jdo.listener.StoreCallback;
 
 import org.apache.log4j.Logger;
+import org.nightlabs.jdo.NLJDOHelper;
+import org.nightlabs.jfire.reporting.layout.id.ReportRegistryItemID;
 
 /**
  * Common type for report registry item (ReportCategory, ReportLayout).
@@ -103,15 +106,16 @@ public abstract class ReportRegistryItem implements Serializable, StoreCallback 
 	private String organisationID;
 	
 	/**
-	 * @jdo.field persistence-modifier="persistent"
+	 * @jdo.field primary-key="true"
 	 * @jdo.column length="100"
 	 */
 	private String reportRegistryItemType;
 	
 	/**
 	 * @jdo.field primary-key="true"
+	 * @jdo.column length="100"
 	 */
-	private long reportRegistryItemID;
+	private String reportRegistryItemID;
 	
 	/**
 	 * @jdo.field persistence-modifier="persistent"
@@ -137,19 +141,16 @@ public abstract class ReportRegistryItem implements Serializable, StoreCallback 
 	 * @param reportRegistryItemType The type of the new item.
 	 */
 	public ReportRegistryItem(
-			PersistenceManager pm,
 			ReportRegistryItem parentItem, 
 			String organisationID, 
-			String reportRegistryItemType
+			String reportRegistryItemType,
+			String reportRegistryItemID
 		) 
 	{
 		this.parentItem = parentItem;
 		this.organisationID = organisationID;
 		this.reportRegistryItemType = reportRegistryItemType;
-		if (pm != null) 
-			this.reportRegistryItemID = ReportRegistry.getReportRegistry(pm).createNewReportItemID();
-		else
-			this.reportRegistryItemID = -1;
+		this.reportRegistryItemID = reportRegistryItemID;
 		this.name = new ReportRegistryItemName(this);
 	}
 	
@@ -161,7 +162,7 @@ public abstract class ReportRegistryItem implements Serializable, StoreCallback 
 		return reportRegistryItemType;
 	}
 	
-	public long getReportRegistryItemID() {
+	public String getReportRegistryItemID() {
 		return reportRegistryItemID;
 	}
 	
@@ -202,26 +203,21 @@ public abstract class ReportRegistryItem implements Serializable, StoreCallback 
 		if (!JDOHelper.isNew(this)) 
 			return;
 		
-		if (this.reportRegistryItemID < 0) {
 			PersistenceManager pm = JDOHelper.getPersistenceManager(this);
 			if (pm == null)
 				throw new IllegalStateException("Could not get PersistenceManager jdoPreStore()");
-			ReportRegistry registry = ReportRegistry.getReportRegistry(pm);
-			this.reportRegistryItemID = registry.createNewReportItemID();
-			// Assuming that reportRegistryItemIDs < 0 exist only for new items we
-			// issue an event now
-			System.out.println("Adding change event for item "+this.getReportRegistryItemType()+" "+this.getReportRegistryItemID()+" parent is "+getParentItem());
-			ReportRegistryItemChangeEvent.addChangeEventToController(
-					pm,
-					ReportRegistryItemChangeEvent.EVENT_TYPE_ITEM_ADDED,
-					this,
-					getParentItem()
-				);
-		}
-		
-		if (this.name.getReportRegistryItemID() < 0) {
-			this.name.setReportRegistryItemID(this.reportRegistryItemID);
-		}
+			ReportRegistryItemID id = ReportRegistryItemID.create(getOrganisationID(), getReportRegistryItemType(), getReportRegistryItemID());
+			try {
+				pm.getObjectById(id);
+			} catch (JDOObjectNotFoundException e) {
+				System.out.println("Adding change event for item "+this.getReportRegistryItemType()+" "+this.getReportRegistryItemID()+" parent is "+getParentItem());
+				ReportRegistryItemChangeEvent.addChangeEventToController(
+						pm,
+						ReportRegistryItemChangeEvent.EVENT_TYPE_ITEM_ADDED,
+						this,
+						getParentItem()
+					);
+			}
 	}
 
 	protected PersistenceManager getPersistenceManager()

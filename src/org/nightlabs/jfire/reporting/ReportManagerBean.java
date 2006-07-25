@@ -84,7 +84,6 @@ import org.nightlabs.jfire.reporting.oda.jfs.server.ServerJFSQueryProxy;
 import org.nightlabs.jfire.reporting.platform.RAPlatformContext;
 import org.nightlabs.jfire.reporting.platform.ReportingManager;
 import org.nightlabs.jfire.reporting.platform.ReportingManagerFactory;
-import org.nightlabs.jfire.reporting.scripting.ScriptingInitializer;
 import org.nightlabs.jfire.scripting.ScriptRegistry;
 import org.nightlabs.jfire.scripting.id.ScriptRegistryItemID;
 import org.nightlabs.jfire.servermanager.JFireServerManager;
@@ -150,185 +149,185 @@ implements SessionBean
 		ConfigSetup.ensureAllPrerequisites(pm);
 	}
 	
-	private void initDefaultCatReportLayout(PersistenceManager pm, ReportCategory cat, File earDir, String catType, String germanName, String englishName)
-	throws ModuleException
-	{
-		File layoutDesign = new File(earDir, "Default-"+catType+".rptdesign");
-		LOGGER.info("Checking default report layout fo catType "+catType+" file: "+layoutDesign);
-		if (layoutDesign.exists()) {
-			LOGGER.info("File: "+layoutDesign+" existing");
-			ReportLayout layout = new ReportLayout(pm, cat, null);
-			try {
-				layout.loadFile(layoutDesign);
-			} catch (IOException e) {
-				LOGGER.error("Could not read ReportLayout file for default offer layout: ", e);
-			}
-			layout.getName().setText(Locale.ENGLISH.getLanguage(), englishName);
-			layout.getName().setText(Locale.GERMAN.getLanguage(), germanName);
-			LOGGER.info("Persisting default layout for "+catType);
-			pm.makePersistent(layout);
-			LOGGER.info("Persisting default layout for "+catType+" ...  DONE");
-			
-			Collection configs = Config.getConfigsByType(pm, getOrganisationID(), UserConfigSetup.CONFIG_TYPE_USER_CONFIG);
-			for (Iterator iter = configs.iterator(); iter.hasNext();) {
-				Config config = (Config) iter.next();
-				ReportLayoutConfigModule configModule = (ReportLayoutConfigModule)config.createConfigModule(ReportLayoutConfigModule.class, null);
-//				ReportLayoutConfigModule configModule = (ReportLayoutConfigModule)ConfigModule.getAutoCreateConfigModule(pm, config, ReportLayoutConfigModule.class, null);
-				configModule.getAvailEntry(catType).setDefaultReportLayoutKey(JDOHelper.getObjectId(layout).toString());
-				LOGGER.info("Set default for ReportLayoutConfigModule for category "+catType+" and Config "+config.getConfigKey());
-			}
-			LOGGER.info("Created new default report layout for catType "+catType);
-		}
-	}
+//	private void initDefaultCatReportLayout(PersistenceManager pm, ReportCategory cat, File earDir, String catType, String germanName, String englishName)
+//	throws ModuleException
+//	{
+//		File layoutDesign = new File(earDir, "Default-"+catType+".rptdesign");
+//		LOGGER.info("Checking default report layout fo catType "+catType+" file: "+layoutDesign);
+//		if (layoutDesign.exists()) {
+//			LOGGER.info("File: "+layoutDesign+" existing");
+//			ReportLayout layout = new ReportLayout(pm, cat, null);
+//			try {
+//				layout.loadFile(layoutDesign);
+//			} catch (IOException e) {
+//				LOGGER.error("Could not read ReportLayout file for default offer layout: ", e);
+//			}
+//			layout.getName().setText(Locale.ENGLISH.getLanguage(), englishName);
+//			layout.getName().setText(Locale.GERMAN.getLanguage(), germanName);
+//			LOGGER.info("Persisting default layout for "+catType);
+//			pm.makePersistent(layout);
+//			LOGGER.info("Persisting default layout for "+catType+" ...  DONE");
+//			
+//			Collection configs = Config.getConfigsByType(pm, getOrganisationID(), UserConfigSetup.CONFIG_TYPE_USER_CONFIG);
+//			for (Iterator iter = configs.iterator(); iter.hasNext();) {
+//				Config config = (Config) iter.next();
+//				ReportLayoutConfigModule configModule = (ReportLayoutConfigModule)config.createConfigModule(ReportLayoutConfigModule.class, null);
+////				ReportLayoutConfigModule configModule = (ReportLayoutConfigModule)ConfigModule.getAutoCreateConfigModule(pm, config, ReportLayoutConfigModule.class, null);
+//				configModule.getAvailEntry(catType).setDefaultReportLayoutKey(JDOHelper.getObjectId(layout).toString());
+//				LOGGER.info("Set default for ReportLayoutConfigModule for category "+catType+" and Config "+config.getConfigKey());
+//			}
+//			LOGGER.info("Created new default report layout for catType "+catType);
+//		}
+//	}
 	
-	private void initRegisterCategoriesAndLayouts(PersistenceManager pm, JFireServerManager jfireServerManager) 
-	throws ModuleException 
-	{
-		File earDir = new File(
-				jfireServerManager.getJFireServerConfigModule()
-				.getJ2ee().getJ2eeDeployBaseDirectory()+
-				"JFireReporting.ear"
-			);
-		
-//		 Register internal report categories if not existent			
-		ReportCategory offerCat = ReportCategory.getReportCategory(
-				pm,
-				getOrganisationID(),
-				ReportCategory.INTERNAL_CATEGORY_TYPE_OFFER
-		);
-		if (offerCat == null) {
-			offerCat = new ReportCategory(
-					pm,
-					null,
-					getOrganisationID(),
-					ReportCategory.INTERNAL_CATEGORY_TYPE_OFFER,
-					true
-			);
-			offerCat.getName().setText(Locale.ENGLISH.getLanguage(), "Offer Layouts");
-			offerCat.getName().setText(Locale.GERMAN.getLanguage(), "Angebots-Vorlagen");
-			pm.makePersistent(offerCat);
-		}
-		initDefaultCatReportLayout(
-				pm,
-				offerCat,
-				earDir,
-				ReportCategory.INTERNAL_CATEGORY_TYPE_OFFER,
-				"Standard Angebots-Vorlage",
-				"Default offer layout"
-			);
-		
-		
-		ReportCategory orderCat = ReportCategory.getReportCategory(
-				pm,
-				getOrganisationID(),
-				ReportCategory.INTERNAL_CATEGORY_TYPE_ORDER
-		);
-		if (orderCat == null) {
-			orderCat = new ReportCategory(
-					pm,
-					null,
-					getOrganisationID(),
-					ReportCategory.INTERNAL_CATEGORY_TYPE_ORDER,
-					true
-			);
-			orderCat.getName().setText(Locale.ENGLISH.getLanguage(), "Order Layouts");
-			orderCat.getName().setText(Locale.GERMAN.getLanguage(), "Auftrags-Vorlagen");
-			pm.makePersistent(orderCat);
-		}
-		
-		initDefaultCatReportLayout(
-				pm,
-				orderCat,
-				earDir,
-				ReportCategory.INTERNAL_CATEGORY_TYPE_ORDER,
-				"Standard Auftrags-Vorlage",
-				"Default order layout"
-			);
-		
-		
-		ReportCategory invoiceCat = ReportCategory.getReportCategory(
-				pm,
-				getOrganisationID(),
-				ReportCategory.INTERNAL_CATEGORY_TYPE_INVOICE
-		);
-		if (invoiceCat == null) {
-			invoiceCat = new ReportCategory(
-					pm,
-					null,
-					getOrganisationID(),
-					ReportCategory.INTERNAL_CATEGORY_TYPE_INVOICE,
-					true
-			);
-			invoiceCat.getName().setText(Locale.ENGLISH.getLanguage(), "Invoice Layouts");
-			invoiceCat.getName().setText(Locale.GERMAN.getLanguage(), "Rechnungs-Vorlagen");
-			pm.makePersistent(invoiceCat);
-		}
-		
-		initDefaultCatReportLayout(
-				pm,
-				invoiceCat,
-				earDir,
-				ReportCategory.INTERNAL_CATEGORY_TYPE_INVOICE,
-				"Standard Rechnungs-Vorlage",
-				"Default invoice layout"
-			);
-		
-		
-		ReportCategory deliveryNoteCat = ReportCategory.getReportCategory(
-				pm,
-				getOrganisationID(),
-				ReportCategory.INTERNAL_CATEGORY_TYPE_DELIVERY_NOTE
-		);
-		if (deliveryNoteCat == null) {
-			deliveryNoteCat = new ReportCategory(
-					pm,
-					null,
-					getOrganisationID(),
-					ReportCategory.INTERNAL_CATEGORY_TYPE_DELIVERY_NOTE,
-					true
-			);
-			deliveryNoteCat.getName().setText(Locale.ENGLISH.getLanguage(), "Deliverynote Layouts");
-			deliveryNoteCat.getName().setText(Locale.GERMAN.getLanguage(), "Lieferschein-Vorlagen");
-			pm.makePersistent(deliveryNoteCat);
-		}
-		
-		initDefaultCatReportLayout(
-				pm,
-				deliveryNoteCat,
-				earDir,
-				ReportCategory.INTERNAL_CATEGORY_TYPE_DELIVERY_NOTE,
-				"Standard Lieferschein-Vorlage",
-				"Default deliverynote layout"
-			);
-		
-		
-		ReportCategory generalCat = ReportCategory.getReportCategory(
-				pm,
-				getOrganisationID(),
-				ReportCategory.CATEGORY_TYPE_GENERAL
-			);
-		if (generalCat == null) {
-			generalCat = new ReportCategory(
-					pm,
-					null,
-					getOrganisationID(),
-					ReportCategory.CATEGORY_TYPE_GENERAL,
-					true
-			);
-			generalCat.getName().setText(Locale.ENGLISH.getLanguage(), "General");
-			generalCat.getName().setText(Locale.GERMAN.getLanguage(), "Allgemein");
-			pm.makePersistent(generalCat);
-		}
-		
-		initDefaultCatReportLayout(
-				pm,
-				generalCat,
-				earDir,
-				ReportCategory.CATEGORY_TYPE_GENERAL,
-				"Sales Statistic",
-				"Umsatz Statistik"
-			);
-	}
+//	private void initRegisterCategoriesAndLayouts(PersistenceManager pm, JFireServerManager jfireServerManager) 
+//	throws ModuleException 
+//	{
+//		// TODO: Init report categories and layouts like spcripting
+//		File earDir = new File(
+//				jfireServerManager.getJFireServerConfigModule()
+//				.getJ2ee().getJ2eeDeployBaseDirectory()+
+//				"JFireReporting.ear"
+//			);
+//		
+////		 Register internal report categories if not existent			
+//		ReportCategory offerCat = ReportCategory.getReportCategory(
+//				pm,
+//				getOrganisationID(),
+//				ReportCategory.INTERNAL_CATEGORY_TYPE_OFFER
+//		);
+//		if (offerCat == null) {
+//			offerCat = new ReportCategory(
+//					null,
+//					getOrganisationID(),
+//					ReportCategory.INTERNAL_CATEGORY_TYPE_OFFER,
+//					true
+//			);
+//			offerCat.getName().setText(Locale.ENGLISH.getLanguage(), "Offer Layouts");
+//			offerCat.getName().setText(Locale.GERMAN.getLanguage(), "Angebots-Vorlagen");
+//			pm.makePersistent(offerCat);
+//		}
+//		initDefaultCatReportLayout(
+//				pm,
+//				offerCat,
+//				earDir,
+//				ReportCategory.INTERNAL_CATEGORY_TYPE_OFFER,
+//				"Standard Angebots-Vorlage",
+//				"Default offer layout"
+//			);
+//		
+//		
+//		ReportCategory orderCat = ReportCategory.getReportCategory(
+//				pm,
+//				getOrganisationID(),
+//				ReportCategory.INTERNAL_CATEGORY_TYPE_ORDER
+//		);
+//		if (orderCat == null) {
+//			orderCat = new ReportCategory(
+//					pm,
+//					null,
+//					getOrganisationID(),
+//					ReportCategory.INTERNAL_CATEGORY_TYPE_ORDER,
+//					true
+//			);
+//			orderCat.getName().setText(Locale.ENGLISH.getLanguage(), "Order Layouts");
+//			orderCat.getName().setText(Locale.GERMAN.getLanguage(), "Auftrags-Vorlagen");
+//			pm.makePersistent(orderCat);
+//		}
+//		
+//		initDefaultCatReportLayout(
+//				pm,
+//				orderCat,
+//				earDir,
+//				ReportCategory.INTERNAL_CATEGORY_TYPE_ORDER,
+//				"Standard Auftrags-Vorlage",
+//				"Default order layout"
+//			);
+//		
+//		
+//		ReportCategory invoiceCat = ReportCategory.getReportCategory(
+//				pm,
+//				getOrganisationID(),
+//				ReportCategory.INTERNAL_CATEGORY_TYPE_INVOICE
+//		);
+//		if (invoiceCat == null) {
+//			invoiceCat = new ReportCategory(
+//					pm,
+//					null,
+//					getOrganisationID(),
+//					ReportCategory.INTERNAL_CATEGORY_TYPE_INVOICE,
+//					true
+//			);
+//			invoiceCat.getName().setText(Locale.ENGLISH.getLanguage(), "Invoice Layouts");
+//			invoiceCat.getName().setText(Locale.GERMAN.getLanguage(), "Rechnungs-Vorlagen");
+//			pm.makePersistent(invoiceCat);
+//		}
+//		
+//		initDefaultCatReportLayout(
+//				pm,
+//				invoiceCat,
+//				earDir,
+//				ReportCategory.INTERNAL_CATEGORY_TYPE_INVOICE,
+//				"Standard Rechnungs-Vorlage",
+//				"Default invoice layout"
+//			);
+//		
+//		
+//		ReportCategory deliveryNoteCat = ReportCategory.getReportCategory(
+//				pm,
+//				getOrganisationID(),
+//				ReportCategory.INTERNAL_CATEGORY_TYPE_DELIVERY_NOTE
+//		);
+//		if (deliveryNoteCat == null) {
+//			deliveryNoteCat = new ReportCategory(
+//					pm,
+//					null,
+//					getOrganisationID(),
+//					ReportCategory.INTERNAL_CATEGORY_TYPE_DELIVERY_NOTE,
+//					true
+//			);
+//			deliveryNoteCat.getName().setText(Locale.ENGLISH.getLanguage(), "Deliverynote Layouts");
+//			deliveryNoteCat.getName().setText(Locale.GERMAN.getLanguage(), "Lieferschein-Vorlagen");
+//			pm.makePersistent(deliveryNoteCat);
+//		}
+//		
+//		initDefaultCatReportLayout(
+//				pm,
+//				deliveryNoteCat,
+//				earDir,
+//				ReportCategory.INTERNAL_CATEGORY_TYPE_DELIVERY_NOTE,
+//				"Standard Lieferschein-Vorlage",
+//				"Default deliverynote layout"
+//			);
+//		
+//		
+//		ReportCategory generalCat = ReportCategory.getReportCategory(
+//				pm,
+//				getOrganisationID(),
+//				ReportCategory.CATEGORY_TYPE_GENERAL
+//			);
+//		if (generalCat == null) {
+//			generalCat = new ReportCategory(
+//					pm,
+//					null,
+//					getOrganisationID(),
+//					ReportCategory.CATEGORY_TYPE_GENERAL,
+//					true
+//			);
+//			generalCat.getName().setText(Locale.ENGLISH.getLanguage(), "General");
+//			generalCat.getName().setText(Locale.GERMAN.getLanguage(), "Allgemein");
+//			pm.makePersistent(generalCat);
+//		}
+//		
+//		initDefaultCatReportLayout(
+//				pm,
+//				generalCat,
+//				earDir,
+//				ReportCategory.CATEGORY_TYPE_GENERAL,
+//				"Sales Statistic",
+//				"Umsatz Statistik"
+//			);
+//	}
 	
 	private void initRegisterScripts(PersistenceManager pm, JFireServerManager jfireServerManager) 
 	throws ModuleException 
@@ -338,7 +337,6 @@ implements SessionBean
 		} catch (Exception e) {
 			throw new ModuleException(e);
 		}
-		ScriptingInitializer.initialize(pm, jfireServerManager, getOrganisationID());		
 	}
 	
 	/**
@@ -411,7 +409,7 @@ implements SessionBean
 				initRegisterConfigModules(pm);
 				LOGGER.info("Initialized Reporting ConfigModules");
 				
-				initRegisterCategoriesAndLayouts(pm, jfireServerManager);
+//				initRegisterCategoriesAndLayouts(pm, jfireServerManager);
 				LOGGER.info("Initialized Reporting Categories and Layouts");
 				
 			}

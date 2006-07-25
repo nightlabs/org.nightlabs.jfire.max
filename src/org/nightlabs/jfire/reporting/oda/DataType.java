@@ -97,13 +97,13 @@ public class DataType {
 		classes2Types.put(Serializable.class, K_BLOB);
 		classes2Types.put(Serializable.class, K_CLOB);
 		
-		types2Classes.put(K_STRING, N_STRING);
-		types2Classes.put(K_INTEGER, N_INTEGER);
-		types2Classes.put(K_DOUBLE, N_DOUBLE);
-		types2Classes.put(K_DATE, N_DATE);
-		types2Classes.put(K_BIGDECIMAL, N_BIGDECIMAL);
-		types2Classes.put(K_BLOB, N_BLOB);
-		types2Classes.put(K_CLOB, N_CLOB);
+		types2Names.put(K_STRING, N_STRING);
+		types2Names.put(K_INTEGER, N_INTEGER);
+		types2Names.put(K_DOUBLE, N_DOUBLE);
+		types2Names.put(K_DATE, N_DATE);
+		types2Names.put(K_BIGDECIMAL, N_BIGDECIMAL);
+		types2Names.put(K_BLOB, N_BLOB);
+		types2Names.put(K_CLOB, N_CLOB);
 	}
 	
 	public static Class[] dataTypeToClasses(int dataType) {		

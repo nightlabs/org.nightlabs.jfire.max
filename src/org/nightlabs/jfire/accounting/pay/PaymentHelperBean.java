@@ -65,7 +65,10 @@ public abstract class PaymentHelperBean
 extends BaseSessionBeanImpl
 implements SessionBean
 {
-	public static final Logger LOGGER = Logger.getLogger(PaymentHelperBean.class);
+	/**
+	 * LOG4J logger used by this class
+	 */
+	private static final Logger logger = Logger.getLogger(PaymentHelperBean.class);
 
 	/**
 	 * @see org.nightlabs.jfire.base.BaseSessionBeanImpl#setSessionContext(javax.ejb.SessionContext)
@@ -73,7 +76,7 @@ implements SessionBean
 	public void setSessionContext(SessionContext sessionContext)
 			throws EJBException, RemoteException
 	{
-		LOGGER.debug(this.getClass().getName() + ".setSessionContext("+sessionContext+")");
+		logger.debug(this.getClass().getName() + ".setSessionContext("+sessionContext+")");
 		super.setSessionContext(sessionContext);
 	}
 	/**
@@ -83,7 +86,7 @@ implements SessionBean
 	public void ejbCreate()
 	throws CreateException
 	{
-		LOGGER.debug(this.getClass().getName() + ".ejbCreate()");
+		logger.debug(this.getClass().getName() + ".ejbCreate()");
 	}
 	/**
 	 * @see javax.ejb.SessionBean#ejbRemove()
@@ -92,7 +95,7 @@ implements SessionBean
 	 */
 	public void ejbRemove() throws EJBException, RemoteException
 	{
-		LOGGER.debug(this.getClass().getName() + ".ejbRemove()");
+		logger.debug(this.getClass().getName() + ".ejbRemove()");
 	}
 
 	/**
@@ -319,7 +322,10 @@ implements SessionBean
 	 */
 	public static class BookInvoiceInvocation extends Invocation
 	{
-		protected static final Logger LOGGER = Logger.getLogger(BookInvoiceInvocation.class);
+		/**
+		 * LOG4J logger used by this class
+		 */
+		private static final Logger logger = Logger.getLogger(BookInvoiceInvocation.class);
 
 		private long createDT = System.currentTimeMillis();
 		private Collection invoiceIDs;
@@ -347,14 +353,14 @@ implements SessionBean
 			this.invoiceIDs = invoiceIDs;
 			this.delayMSec = delayMSec;
 
-			LOGGER.info("Created BookInvoiceInvocation for " + invoiceIDs.size() + " invoices with "+delayMSec+" msec delay.");
+			logger.info("Created BookInvoiceInvocation for " + invoiceIDs.size() + " invoices with "+delayMSec+" msec delay.");
 		}
 
 		public Serializable invoke() throws Exception
 		{
 			long wait = createDT + delayMSec - System.currentTimeMillis();
 			if (wait > 0) {
-				LOGGER.info("invoke() called: Waiting " + wait + " msec before starting to book.");
+				logger.info("invoke() called: Waiting " + wait + " msec before starting to book.");
 				try { Thread.sleep(wait); } catch (InterruptedException x) { }
 			}
 
@@ -366,7 +372,7 @@ implements SessionBean
 					InvoiceID invoiceID = (InvoiceID) it.next();
 					Invoice invoice = (Invoice) pm.getObjectById(invoiceID);
 					if (!invoice.getInvoiceLocal().isBooked()) {
-						LOGGER.info("Booking invoice: " + invoice.getPrimaryKey());
+						logger.info("Booking invoice: " + invoice.getPrimaryKey());
 
 						if (user == null)
 							user = User.getUser(pm, getPrincipal());
@@ -374,7 +380,7 @@ implements SessionBean
 						Accounting.getAccounting(pm).bookInvoice(user, invoice, true, false);
 					}
 					else
-						LOGGER.info("Invoice " + invoice.getPrimaryKey() + " is already booked! Ignoring.");
+						logger.info("Invoice " + invoice.getPrimaryKey() + " is already booked! Ignoring.");
 				}
 
 			} finally {

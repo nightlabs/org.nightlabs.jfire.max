@@ -84,7 +84,10 @@ import org.nightlabs.jfire.transfer.id.AnchorID;
  */
 public class Trader
 {
-	private static Logger LOGGER = Logger.getLogger(Trader.class);
+	/**
+	 * LOG4J logger used by this class
+	 */
+	private static final Logger logger = Logger.getLogger(Trader.class);
 
 	/**
 	 * This method returns the singleton instance of Trader. If there is no
@@ -730,7 +733,7 @@ public class Trader
 					try {
 						article = (Article) pm.getObjectById(articleID);
 					} catch (JDOObjectNotFoundException x) {
-						LOGGER.error("AllocateArticlesEndUndeliverableCallback: Article does not exist in datastore: " + articleID);
+						logger.error("AllocateArticlesEndUndeliverableCallback: Article does not exist in datastore: " + articleID);
 					}
 
 					if (article != null)
@@ -760,7 +763,7 @@ public class Trader
 					try {
 						article = (Article) pm.getObjectById(articleID);
 					} catch (JDOObjectNotFoundException x) {
-						LOGGER.error("AllocateArticlesEndErrorCallback: Article does not exist in datastore: " + articleID);
+						logger.error("AllocateArticlesEndErrorCallback: Article does not exist in datastore: " + articleID);
 					}
 
 					if (article != null)

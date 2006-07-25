@@ -74,7 +74,10 @@ public abstract class TradeManagerBean
 extends BaseSessionBeanImpl
 implements SessionBean 
 {
-	public static final Logger LOGGER = Logger.getLogger(TradeManagerBean.class);
+	/**
+	 * LOG4J logger used by this class
+	 */
+	private static final Logger logger = Logger.getLogger(TradeManagerBean.class);
 
 	////////////////////// EJB "constuctor" ////////////////////////////
 
@@ -85,7 +88,7 @@ implements SessionBean
 	public void ejbCreate() 
 	throws CreateException
 	{
-		LOGGER.debug(this.getClass().getName() + ".ejbCreate()");
+		logger.debug(this.getClass().getName() + ".ejbCreate()");
 	}
 
 	/**
@@ -95,7 +98,7 @@ implements SessionBean
 	 */
 	public void ejbRemove() throws EJBException, RemoteException
 	{
-		LOGGER.debug(this.getClass().getName() + ".ejbRemove()");
+		logger.debug(this.getClass().getName() + ".ejbRemove()");
 	}
 
 	// //// begin EJB stuff ////
@@ -757,7 +760,7 @@ implements SessionBean
 			long time = System.currentTimeMillis();
 			Collection result = pm.detachCopyAll(les);
 			time = System.currentTimeMillis() - time;
-			LOGGER.debug("Detach of "+result.size()+" LegalEntities took "+((double)time / (double)1000));
+			logger.debug("Detach of "+result.size()+" LegalEntities took "+((double)time / (double)1000));
 			return result;
 		}
 		finally {
@@ -971,7 +974,7 @@ implements SessionBean
 			if (moduleMetaData != null)
 				return;
 
-			LOGGER.info("Initialization of JFireTrade-ConfigModules started...");
+			logger.info("Initialization of JFireTrade-ConfigModules started...");
 
 			// version is {major}.{minor}.{release}-{patchlevel}-{suffix}
 			moduleMetaData = new ModuleMetaData(

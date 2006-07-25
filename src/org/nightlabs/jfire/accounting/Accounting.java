@@ -88,7 +88,10 @@ import org.nightlabs.jfire.transfer.id.AnchorID;
 public class Accounting
 	implements TransferRegistry, StoreCallback, MoneyFlowMapping.Registry
 {
-	public static final Logger LOGGER = Logger.getLogger(Accounting.class);
+	/**
+	 * LOG4J logger used by this class
+	 */
+	private static final Logger logger = Logger.getLogger(Accounting.class);
 
 	/**
 	 * This method returns the singleton instance of Accounting. If there is
@@ -610,7 +613,7 @@ public class Accounting
 					getPersistenceManager(), paymentData.getPayment());
 
 			if (payMoneyTransfer != null) {
-				LOGGER.warn("Your Payment \""+paymentData.getPayment()+"\" has first " +
+				logger.warn("Your Payment \""+paymentData.getPayment()+"\" has first " +
 						"created a payMoneyTransfer and decided afterwards (in payEnd) to" +
 						"postpone. This is not nice! Now I have to rollback your " +
 						"PayMoneyTransfer! You should postpone a Payment always in payBegin!");

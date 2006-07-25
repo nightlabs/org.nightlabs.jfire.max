@@ -92,7 +92,10 @@ import org.nightlabs.jfire.transfer.TransferRegistry;
 public class Store
 	implements TransferRegistry, StoreCallback
 {
-	public static Logger LOGGER = Logger.getLogger(Store.class);
+	/**
+	 * LOG4J logger used by this class
+	 */
+	private static final Logger logger = Logger.getLogger(Store.class);
 	
 	/**
 	 * This method returns the singleton instance of Store. If there is
@@ -1259,7 +1262,7 @@ public class Store
 					getPersistenceManager(), deliveryData.getDelivery());
 
 			if (deliverProductTransfer != null) {
-				LOGGER.warn("Your Delivery \""+deliveryData.getDelivery()+"\" has first " +
+				logger.warn("Your Delivery \""+deliveryData.getDelivery()+"\" has first " +
 						"created a deliverProductTransfer and decided afterwards (in deliverEnd) to" +
 						"postpone. This is not nice! Now I have to rollback your " +
 						"DeliverProductTransfer! You should postpone a Delivery always in deliverBegin!");

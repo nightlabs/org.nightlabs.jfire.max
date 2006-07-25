@@ -51,7 +51,10 @@ import org.nightlabs.jfire.store.ProductType;
  */
 public class PriceCalculator
 {
-	public static Logger LOGGER = Logger.getLogger(PriceCalculator.class);
+	/**
+	 * LOG4J logger used by this class
+	 */
+	private static final Logger logger = Logger.getLogger(PriceCalculator.class);
 
 	private ProductType packageProductType;
 	private IResultPriceConfig packagePriceConfig;
@@ -578,15 +581,15 @@ public class PriceCalculator
 
 			throw new IllegalStateException("PriceCell has invalid status!");
 		} catch (PriceCalculationException x) {
-			LOGGER.error("PriceCalculationException at original " + x.getAbsolutePriceCoordinate());
-			LOGGER.error("PriceCalculationException at now " + absolutePriceCoordinate);
-			LOGGER.error("Formula:\n------\n" + formula + "\n------");
-			LOGGER.error("Exception", x);
+			logger.error("PriceCalculationException at original " + x.getAbsolutePriceCoordinate());
+			logger.error("PriceCalculationException at now " + absolutePriceCoordinate);
+			logger.error("Formula:\n------\n" + formula + "\n------");
+			logger.error("Exception", x);
 			throw x;
 		} catch (Exception x) {
-			LOGGER.error("PriceCalculationException at " + absolutePriceCoordinate);
-			LOGGER.error("Formula:\n------\n" + formula + "\n------");
-			LOGGER.error("Exception", x);
+			logger.error("PriceCalculationException at " + absolutePriceCoordinate);
+			logger.error("Formula:\n------\n" + formula + "\n------");
+			logger.error("Exception", x);
 			throw new PriceCalculationException(absolutePriceCoordinate, x);
 		}
 	}

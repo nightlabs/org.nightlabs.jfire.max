@@ -74,7 +74,11 @@ public class PFMappingAccountantDelegate extends
 	 */
 	private static final long serialVersionUID = 1L;
 
-
+	/**
+	 * LOG4J logger used by this class
+	 */
+	private static final org.apache.log4j.Logger logger = org.apache.log4j.Logger
+			.getLogger(PFMappingAccountantDelegate.class);
 
 	/**
 	 * @deprecated Only for JDO
@@ -352,7 +356,7 @@ public class PFMappingAccountantDelegate extends
 		totalPTypes.add(totalPType);
 		
 		Iterator iterator = articlePriceStack.iterator();
-		LOGGER.info("Search BookAnchors for single pricefragment: "+priceFragmentType.getName().getText("en"));
+		logger.info("Search BookAnchors for single pricefragment: "+priceFragmentType.getName().getText("en"));
 		int count = 0;
 		while (iterator.hasNext()) {				
 			ArticlePrice upperArticlePrice = (ArticlePrice)iterator.next();
@@ -372,7 +376,7 @@ public class PFMappingAccountantDelegate extends
 			
 			count++;
 			
-			LOGGER.info("Search for ArticlePricePType: "+upperArticlePrice.getProductType().getName().getText("en"));
+			logger.info("Search for ArticlePricePType: "+upperArticlePrice.getProductType().getName().getText("en"));
 			BookInvoiceTransfer result = getBookInvoiceTransferForSingleFragmentType(
 					upperArticlePrice,
 					articlePriceStack,
@@ -381,7 +385,7 @@ public class PFMappingAccountantDelegate extends
 					resolvedMapping,
 					resolvedMappings
 				);
-			LOGGER.info("Found: "+result);
+			logger.info("Found: "+result);
 			if (result != null)
 				return result;
 			
@@ -463,7 +467,7 @@ public class PFMappingAccountantDelegate extends
 	
 	private void logBookInvoiceTransfers(String prefix, Collection<BookInvoiceTransfer> transfers) {
 		for (BookInvoiceTransfer transfer : transfers) {
-			LOGGER.info(prefix + transfers.toString());
+			logger.info(prefix + transfers.toString());
 		}
 	}
 }

@@ -96,7 +96,10 @@ public abstract class StoreManagerBean
 extends BaseSessionBeanImpl
 implements SessionBean 
 {
-	public static final Logger LOGGER = Logger.getLogger(StoreManagerBean.class);
+	/**
+	 * LOG4J logger used by this class
+	 */
+	private static final Logger logger = Logger.getLogger(StoreManagerBean.class);
 	
 	////////////////////// EJB "constuctor" ////////////////////////////
 	
@@ -124,7 +127,7 @@ implements SessionBean
 	 */
 	public void ejbRemove() throws EJBException, RemoteException
 	{
-		LOGGER.debug(this.getClass().getName() + ".ejbRemove()");
+		logger.debug(this.getClass().getName() + ".ejbRemove()");
 	}
 
 	public void setSessionContext(SessionContext sessionContext)
@@ -265,7 +268,7 @@ implements SessionBean
 	{
 		PersistenceManager pm = getPersistenceManager();
 		try {
-			LOGGER.info("createProductTypeID() called by " + getPrincipalString());
+			logger.info("createProductTypeID() called by " + getPrincipalString());
 			return Store.getStore(pm).createProductTypeID();
 		} finally {
 			pm.close();

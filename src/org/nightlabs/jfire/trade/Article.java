@@ -102,7 +102,10 @@ import org.nightlabs.util.Utils;
 public class Article
 	implements Serializable, DeleteCallback, DetachCallback, StoreCallback
 {
-	private static final Logger LOGGER = Logger.getLogger(Article.class);
+	/**
+	 * LOG4J logger used by this class
+	 */
+	private static final Logger logger = Logger.getLogger(Article.class);
 
 	public static final String FETCH_GROUP_ARTICLE_LOCAL = "Article.articleLocal";
 	public static final String FETCH_GROUP_SEGMENT = "Article.segment";
@@ -1043,7 +1046,7 @@ public class Article
 	{
 		if (primaryKey == null) {
 			primaryKey = getPrimaryKey(organisationID, articleID);
-			LOGGER.info("Seems, the JPOX bug still exists: primaryKey == null! Resetting it to " + primaryKey);
+			logger.info("Seems, the JPOX bug still exists: primaryKey == null! Resetting it to " + primaryKey);
 		}
 	}
 

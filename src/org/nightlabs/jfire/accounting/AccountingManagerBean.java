@@ -125,7 +125,10 @@ public abstract class AccountingManagerBean
 	extends BaseSessionBeanImpl
 	implements SessionBean
 {
-	public static final Logger LOGGER = Logger.getLogger(AccountingManagerBean.class);
+	/**
+	 * LOG4J logger used by this class
+	 */
+	private static final Logger logger = Logger.getLogger(AccountingManagerBean.class);
 
 	/**
 	 * @see org.nightlabs.jfire.base.BaseSessionBeanImpl#setSessionContext(javax.ejb.SessionContext)
@@ -133,7 +136,7 @@ public abstract class AccountingManagerBean
 	public void setSessionContext(SessionContext sessionContext)
 			throws EJBException, RemoteException
 	{
-		LOGGER.debug(this.getClass().getName() + ".setSessionContext("+sessionContext+")");
+		logger.debug(this.getClass().getName() + ".setSessionContext("+sessionContext+")");
 		super.setSessionContext(sessionContext);
 	}
 	/**
@@ -143,7 +146,7 @@ public abstract class AccountingManagerBean
 	public void ejbCreate()
 	throws CreateException
 	{
-		LOGGER.debug(this.getClass().getName() + ".ejbCreate()");
+		logger.debug(this.getClass().getName() + ".ejbCreate()");
 	}
 	/**
 	 * @see javax.ejb.SessionBean#ejbRemove()
@@ -152,7 +155,7 @@ public abstract class AccountingManagerBean
 	 */
 	public void ejbRemove() throws EJBException, RemoteException
 	{
-		LOGGER.debug(this.getClass().getName() + ".ejbRemove()");
+		logger.debug(this.getClass().getName() + ".ejbRemove()");
 	}
 	
 	/**
@@ -160,14 +163,14 @@ public abstract class AccountingManagerBean
 	 */
 	public void ejbActivate() throws EJBException, RemoteException
 	{
-		LOGGER.debug(this.getClass().getName() + ".ejbActivate()");
+		logger.debug(this.getClass().getName() + ".ejbActivate()");
 	}
 	/**
 	 * @see javax.ejb.SessionBean#ejbPassivate()
 	 */
 	public void ejbPassivate() throws EJBException, RemoteException
 	{
-		LOGGER.debug(this.getClass().getName() + ".ejbPassivate()");
+		logger.debug(this.getClass().getName() + ".ejbPassivate()");
 	}
 	
 	/**

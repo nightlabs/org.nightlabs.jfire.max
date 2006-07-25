@@ -97,7 +97,10 @@ import org.nightlabs.util.Utils;
  */
 public abstract class LocalAccountantDelegate implements Serializable {
 	
-	protected static final Logger LOGGER = Logger.getLogger(LocalAccountantDelegate.class);
+	/**
+	 * LOG4J logger used by this class
+	 */
+	private static final Logger logger = Logger.getLogger(LocalAccountantDelegate.class);
 	
 	public static final String FETCH_GROUP_MONEY_FLOW_MAPPINGS = "LocalAccountantDelegate.moneyFlowMappings";
 	public static final String FETCH_GROUP_NAME = "LocalAccountantDelegate.name";
@@ -727,7 +730,7 @@ public abstract class LocalAccountantDelegate implements Serializable {
 		) 
 	{
 		
-		LOGGER.info("bookProductTypePartsByDimension for article with PType "+articlePrice.getProductType().getName().getText("en"));
+		logger.info("bookProductTypePartsByDimension for article with PType "+articlePrice.getProductType().getName().getText("en"));
 		if (haveToDelegateBooking(resolvedMappings, productType, packageType, delegationLevel)) {
 			productType.getLocalAccountantDelegate().bookProductTypeParts(
 					mandator,
@@ -1198,7 +1201,7 @@ public abstract class LocalAccountantDelegate implements Serializable {
 			Map.Entry entry = (Map.Entry) iter.next();
 			Anchor from = (Anchor)entry.getKey();
 			Map toTransfers = (Map)entry.getValue();
-			LOGGER.info("Starting book BookInvoiceTransfers from "+from.getPrimaryKey());
+			logger.info("Starting book BookInvoiceTransfers from "+from.getPrimaryKey());
 			for (Iterator iterator = toTransfers.entrySet().iterator(); iterator.hasNext();) {
 				Map.Entry toEntry = (Map.Entry) iterator.next();
 				Anchor to = (Anchor)toEntry.getKey();
@@ -1206,7 +1209,7 @@ public abstract class LocalAccountantDelegate implements Serializable {
 				long balance = 0;
 				for (Iterator it = transfers.iterator(); it.hasNext();) {
 					BookInvoiceTransfer transfer = (BookInvoiceTransfer) it.next();
-					LOGGER.info("  bookInvoiceTransfers to "+transfer.getTo().getPrimaryKey()+" with amount: "+transfer.getAmount());
+					logger.info("  bookInvoiceTransfers to "+transfer.getTo().getPrimaryKey()+" with amount: "+transfer.getAmount());
 					balance += transfer.getAmount();
 				}
 				Anchor aFrom = (balance > 0) ? from : to;

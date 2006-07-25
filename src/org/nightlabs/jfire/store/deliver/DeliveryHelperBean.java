@@ -69,7 +69,10 @@ public abstract class DeliveryHelperBean
 extends BaseSessionBeanImpl
 implements SessionBean
 {
-	public static final Logger LOGGER = Logger.getLogger(DeliveryHelperBean.class);
+	/**
+	 * LOG4J logger used by this class
+	 */
+	private static final Logger logger = Logger.getLogger(DeliveryHelperBean.class);
 
 	/**
 	 * @see org.nightlabs.jfire.base.BaseSessionBeanImpl#setSessionContext(javax.ejb.SessionContext)
@@ -77,7 +80,7 @@ implements SessionBean
 	public void setSessionContext(SessionContext sessionContext)
 			throws EJBException, RemoteException
 	{
-		LOGGER.debug(this.getClass().getName() + ".setSessionContext("+sessionContext+")");
+		logger.debug(this.getClass().getName() + ".setSessionContext("+sessionContext+")");
 		super.setSessionContext(sessionContext);
 	}
 	/**
@@ -87,7 +90,7 @@ implements SessionBean
 	public void ejbCreate()
 	throws CreateException
 	{
-		LOGGER.debug(this.getClass().getName() + ".ejbCreate()");
+		logger.debug(this.getClass().getName() + ".ejbCreate()");
 	}
 	/**
 	 * @see javax.ejb.SessionBean#ejbRemove()
@@ -96,7 +99,7 @@ implements SessionBean
 	 */
 	public void ejbRemove() throws EJBException, RemoteException
 	{
-		LOGGER.debug(this.getClass().getName() + ".ejbRemove()");
+		logger.debug(this.getClass().getName() + ".ejbRemove()");
 	}
 
 	/**
@@ -300,7 +303,10 @@ implements SessionBean
 	 */
 	public static class BookDeliveryNoteInvocation extends Invocation
 	{
-		protected static final Logger LOGGER = Logger.getLogger(BookDeliveryNoteInvocation.class);
+		/**
+		 * LOG4J logger used by this class
+		 */
+		private static final Logger logger = Logger.getLogger(BookDeliveryNoteInvocation.class);
 
 		private long createDT = System.currentTimeMillis();
 		private Collection deliveryNoteIDs;
@@ -329,14 +335,14 @@ implements SessionBean
 			this.deliveryNoteIDs = deliveryNoteIDs;
 			this.delayMSec = delayMSec;
 
-			LOGGER.info("Created BookDeliveryNoteInvocation for " + deliveryNoteIDs.size() + " deliveryNotes with "+delayMSec+" msec delay.");
+			logger.info("Created BookDeliveryNoteInvocation for " + deliveryNoteIDs.size() + " deliveryNotes with "+delayMSec+" msec delay.");
 		}
 
 		public Serializable invoke() throws Exception
 		{
 			long wait = createDT + delayMSec - System.currentTimeMillis();
 			if (wait > 0) {
-				LOGGER.info("invoke() called: Waiting " + wait + " msec before starting to book.");
+				logger.info("invoke() called: Waiting " + wait + " msec before starting to book.");
 				try { Thread.sleep(wait); } catch (InterruptedException x) { }
 			}
 
@@ -368,7 +374,7 @@ implements SessionBean
 				for (Iterator itD = deliveryNotes.iterator(); itD.hasNext(); ) {
 					DeliveryNote deliveryNote = (DeliveryNote) itD.next();
 					if (!deliveryNote.getDeliveryNoteLocal().isBooked()) {
-						LOGGER.info("Booking deliveryNote: " + deliveryNote.getPrimaryKey());
+						logger.info("Booking deliveryNote: " + deliveryNote.getPrimaryKey());
 
 						if (user == null)
 							user = User.getUser(pm, getPrincipal());
@@ -379,7 +385,7 @@ implements SessionBean
 						store.bookDeliveryNote(user, deliveryNote, true, false);
 					}
 					else
-						LOGGER.info("DeliveryNote " + deliveryNote.getPrimaryKey() + " is already booked! Ignoring.");
+						logger.info("DeliveryNote " + deliveryNote.getPrimaryKey() + " is already booked! Ignoring.");
 
 					for (Iterator itA = deliveryNote.getArticles().iterator(); itA.hasNext(); ) {
 						Article article = (Article) itA.next();
@@ -390,7 +396,7 @@ implements SessionBean
 				if (store == null)
 					store = Store.getStore(pm);
 
-				LOGGER.info("Calling store.consolidateProductReferences(...) with " + products.size() + " products.");
+				logger.info("Calling store.consolidateProductReferences(...) with " + products.size() + " products.");
 				store.consolidateProductReferences(products);
 
 			} finally {

@@ -28,7 +28,6 @@ package org.nightlabs.jfire.chezfrancois;
 
 import java.rmi.RemoteException;
 import java.util.Iterator;
-import java.util.Locale;
 
 import javax.ejb.CreateException;
 import javax.ejb.EJBException;
@@ -49,13 +48,6 @@ import org.nightlabs.jfire.accounting.id.TariffID;
 import org.nightlabs.jfire.accounting.priceconfig.IInnerPriceConfig;
 import org.nightlabs.jfire.accounting.tariffpriceconfig.FormulaPriceConfig;
 import org.nightlabs.jfire.base.BaseSessionBeanImpl;
-import org.nightlabs.jfire.person.Person;
-import org.nightlabs.jfire.person.PersonDataBlockGroupNotFoundException;
-import org.nightlabs.jfire.person.PersonDataBlockNotFoundException;
-import org.nightlabs.jfire.person.PersonDataFieldNotFoundException;
-import org.nightlabs.jfire.person.PersonRegistry;
-import org.nightlabs.jfire.person.PersonStruct;
-import org.nightlabs.jfire.person.TextPersonDataField;
 import org.nightlabs.jfire.security.Authority;
 import org.nightlabs.jfire.security.RoleGroup;
 import org.nightlabs.jfire.security.RoleGroupRef;
@@ -67,7 +59,6 @@ import org.nightlabs.jfire.security.id.AuthorityID;
 import org.nightlabs.jfire.simpletrade.store.SimpleProductType;
 import org.nightlabs.jfire.trade.Article;
 import org.nightlabs.jfire.trade.LegalEntity;
-import org.nightlabs.jfire.trade.Trader;
 
 
 /**
@@ -82,7 +73,10 @@ public abstract class ChezFrancoisDatastoreInitializerBean
 extends BaseSessionBeanImpl
 implements SessionBean
 {
-	public static final Logger LOGGER = Logger.getLogger(ChezFrancoisDatastoreInitializerBean.class);
+	/**
+	 * LOG4J logger used by this class
+	 */
+	private static final Logger logger = Logger.getLogger(ChezFrancoisDatastoreInitializerBean.class);
 
 	public void setSessionContext(SessionContext sessionContext)
 	throws EJBException, RemoteException
@@ -135,7 +129,7 @@ implements SessionBean
 				if (moduleMetaData != null)
 					return;
 	
-				LOGGER.info("Initialization of JFireChezFrancois started...");
+				logger.info("Initialization of JFireChezFrancois started...");
 	
 				// version is {major}.{minor}.{release}-{patchlevel}-{suffix}
 				moduleMetaData = new ModuleMetaData(
@@ -418,12 +412,12 @@ implements SessionBean
 				dataCreator.createOrderForEndcustomer(LegalEntity.getAnonymousCustomer(pm));
 				dataCreator.createOrderForEndcustomer(legalEntity00);
 
-				LOGGER.info("Initialization of JFireChezFrancois complete!");
+				logger.info("Initialization of JFireChezFrancois complete!");
 
 
-				LOGGER.info("Initializing JDO for Article.class...");
+				logger.info("Initializing JDO for Article.class...");
 				pm.getExtent(Article.class);
-				LOGGER.info("Initializing JDO for Article.class complete!");
+				logger.info("Initializing JDO for Article.class complete!");
 	
 			} finally {
 				pm.close();

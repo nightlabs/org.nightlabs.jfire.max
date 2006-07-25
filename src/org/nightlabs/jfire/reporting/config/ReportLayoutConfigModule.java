@@ -26,11 +26,8 @@
 
 package org.nightlabs.jfire.reporting.config;
 
-import java.lang.reflect.InvocationTargetException;
-import java.text.ParseException;
 import java.util.Collection;
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.Map;
 
 import org.nightlabs.jfire.config.Config;
@@ -38,7 +35,7 @@ import org.nightlabs.jfire.config.ConfigModule;
 import org.nightlabs.jfire.reporting.layout.id.ReportRegistryItemID;
 
 /**
- * @author Alexander Bieber <alex[AT]nightlabs[ÐOT]de>
+ * @author Alexander Bieber <alex[AT]nightlabs[DOT]de>
  *
  * @jdo.persistence-capable
  *		identity-type="application"

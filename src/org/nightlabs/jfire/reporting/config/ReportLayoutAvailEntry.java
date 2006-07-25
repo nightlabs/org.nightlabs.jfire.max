@@ -36,7 +36,7 @@ import org.nightlabs.jfire.reporting.layout.id.ReportRegistryItemID;
  * ConfigModule to store all available and one default 
  * ReportLayouts for one reportCategoryType.
  * 
- * @author Alexander Bieber <alex[AT]nightlabs[ÐOT]de>
+ * @author Alexander Bieber <alex[AT]nightlabs[DOT]de>
  *
  * @jdo.persistence-capable
  *		identity-type = "application"

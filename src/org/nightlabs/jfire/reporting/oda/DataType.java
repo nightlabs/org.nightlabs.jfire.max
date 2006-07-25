@@ -34,7 +34,7 @@ import java.util.Map;
 /**
  * Public declarations concerning BIRT datatypes.
  * 
- * @author Alexander Bieber <alex[AT]nightlabs[ÐOT]de>
+ * @author Alexander Bieber <alex[AT]nightlabs[DOT]de>
  *
  */
 public class DataType {

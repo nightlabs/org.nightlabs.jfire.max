@@ -112,7 +112,7 @@ import org.nightlabs.jfire.trade.id.OrderID;
 import org.nightlabs.jfire.transfer.id.AnchorID;
 
 /**
- * @author Alexander Bieber <alex[AT]nightlabs[DOT]de
+ * @author Alexander Bieber - alex[AT]nightlabs[DOT]de
  * 
  * @ejb.bean name="jfire/ejb/JFireTrade/AccountingManager"	
  *           jndi-name="jfire/ejb/JFireTrade/AccountingManager"

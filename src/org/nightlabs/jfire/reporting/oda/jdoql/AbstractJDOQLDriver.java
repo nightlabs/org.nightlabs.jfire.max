@@ -36,12 +36,20 @@ import org.nightlabs.jfire.reporting.oda.Driver;
  */
 public abstract class AbstractJDOQLDriver extends Driver {
 
+	/**
+	 * LOG4J logger used by this class
+	 */
+	private static final org.apache.log4j.Logger logger = org.apache.log4j.Logger
+			.getLogger(AbstractJDOQLDriver.class);
+	
 	private IJDOQueryProxyFactory proxyFactory;
 	
 	public AbstractJDOQLDriver() {
-		System.out.println("*****************************************");
-		System.out.println("************ JDOQLDriver instantiated **");
-		System.out.println("*****************************************");
+		if(logger.isDebugEnabled()) {
+			logger.debug("*****************************************");
+			logger.debug("************ JDOQLDriver instantiated **");
+			logger.debug("*****************************************");
+		}
 	}
 	
 	protected abstract IJDOQueryProxyFactory createProxyFactory();

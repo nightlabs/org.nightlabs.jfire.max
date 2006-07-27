@@ -57,6 +57,12 @@ import org.nightlabs.jfire.servermanager.j2ee.SecurityReflector.UserDescriptor;
  */
 public class ServerJDOQLProxy extends AbstractJDOQLProxy {
 
+	/**
+	 * LOG4J logger used by this class
+	 */
+	private static final org.apache.log4j.Logger logger = org.apache.log4j.Logger
+			.getLogger(ServerJDOQLProxy.class);
+	
 //	private String organisationID;
 	
 //	public ServerJDOQLProxy(String organisationID) {
@@ -113,9 +119,8 @@ public class ServerJDOQLProxy extends AbstractJDOQLProxy {
 			Object o = null;
 			try {
 				o = q.executeWithMap(parameters);
-			} catch (Exception e) {			
-				System.out.println("Exception executing Query: ");
-				e.printStackTrace();			
+			} catch (Exception e) {
+				logger.error("Exception executing Query", e);
 			}
 			JDOQLResultSet resultSet = null;
 			Collection collection = null;

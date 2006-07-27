@@ -88,6 +88,12 @@ import org.nightlabs.jfire.reporting.layout.id.ReportRegistryItemID;
  */
 public abstract class ReportRegistryItem implements Serializable, StoreCallback  {
 	
+	/**
+	 * LOG4J logger used by this class
+	 */
+	private static final org.apache.log4j.Logger logger = org.apache.log4j.Logger
+			.getLogger(ReportRegistryItem.class);
+	
 	public static final String QUERY_GET_REPORT_REGISTRY_ITEM_BY_TYPE = "getReportRegistryItemByType";
 	public static final String QUERY_TOP_LEVEL_GET_REPORT_REGISTRY_ITEM_BY_TYPE = "getTopLevelReportRegistryItemByType";
 	public static final String QUERY_TOP_LEVEL_GET_REPORT_REGISTRY_ITEMS = "getTopLevelReportRegistryItems";
@@ -210,7 +216,8 @@ public abstract class ReportRegistryItem implements Serializable, StoreCallback 
 			try {
 				pm.getObjectById(id);
 			} catch (JDOObjectNotFoundException e) {
-				System.out.println("Adding change event for item "+this.getReportRegistryItemType()+" "+this.getReportRegistryItemID()+" parent is "+getParentItem());
+				if(logger.isDebugEnabled())
+					logger.debug("Adding change event for item "+this.getReportRegistryItemType()+" "+this.getReportRegistryItemID()+" parent is "+getParentItem());
 				ReportRegistryItemChangeEvent.addChangeEventToController(
 						pm,
 						ReportRegistryItemChangeEvent.EVENT_TYPE_ITEM_ADDED,

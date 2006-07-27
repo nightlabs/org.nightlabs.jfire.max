@@ -13,15 +13,23 @@ import org.nightlabs.jfire.reporting.oda.jfs.IJFSQueryProxyFactory;
 public class ServerJFSDriver extends AbstractJFSDriver {
 
 	/**
+	 * LOG4J logger used by this class
+	 */
+	private static final org.apache.log4j.Logger logger = org.apache.log4j.Logger
+			.getLogger(ServerJFSDriver.class);
+	
+	/**
 	 * 
 	 */
 	public ServerJFSDriver() {
 		super();
-		System.out.println("********************************************************");
-		System.out.println("********************************************************");
-		System.out.println("           JFSDriver intantiated");
-		System.out.println("********************************************************");
-		System.out.println("********************************************************");
+		if(logger.isDebugEnabled()) {
+			logger.debug("********************************************************");
+			logger.debug("********************************************************");
+			logger.debug("           JFSDriver intantiated");
+			logger.debug("********************************************************");
+			logger.debug("********************************************************");
+		}
 	}
 
 	/* (non-Javadoc)

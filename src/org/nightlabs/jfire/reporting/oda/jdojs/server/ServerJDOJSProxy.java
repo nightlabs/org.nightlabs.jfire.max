@@ -61,6 +61,12 @@ import org.nightlabs.jfire.servermanager.j2ee.SecurityReflector.UserDescriptor;
  */
 public class ServerJDOJSProxy extends AbstractJDOJSProxy {
 	
+	/**
+	 * LOG4J logger used by this class
+	 */
+	private static final org.apache.log4j.Logger logger = org.apache.log4j.Logger
+			.getLogger(ServerJDOJSProxy.class);
+	
 //	private String organisationID;
 //	
 //	public ServerJDOJSProxy(String organisationID) {
@@ -132,7 +138,8 @@ public class ServerJDOJSProxy extends AbstractJDOJSProxy {
 			
 			Object js_metaData = Context.javaToJS(metaData, scope);
 			ScriptableObject.putProperty(scope, "metaData", js_metaData);
-			System.out.println("Trying to execute prepare JavaScript:\n"+prepareScript);
+			if(logger.isDebugEnabled())
+				logger.debug("Trying to execute prepare JavaScript:\n"+prepareScript);
 			context.evaluateString(scope, prepareScript, "JDOJS prepare script", 1, null);
 			try {
 				if (metaData.getColumnCount() <= 0)
@@ -189,14 +196,17 @@ public class ServerJDOJSProxy extends AbstractJDOJSProxy {
 					Object js_persistenceManager = Context.javaToJS(pm, scope);
 					ScriptableObject.putProperty(scope, "persistenceManager", js_persistenceManager);
 					
-					System.out.println("*****************************************");
-					System.out.println("*****************************************");
-					System.out.println("*****************************************");
-					System.out.println("*********   JDOJSDriver Params: ");
+					if(logger.isDebugEnabled()) {
+						logger.debug("*****************************************");
+						logger.debug("*****************************************");
+						logger.debug("*****************************************");
+						logger.debug("*********   JDOJSDriver Params: ");
+					}
 					
 					for (Iterator iter = parameters.entrySet().iterator(); iter.hasNext();) {
 						Map.Entry entry = (Map.Entry) iter.next();
-						System.out.println("*********   "+entry.getKey()+": "+entry.getValue());
+						if(logger.isDebugEnabled())
+							logger.debug("*********   "+entry.getKey()+": "+entry.getValue());
 						int paramId = ((Integer)entry.getKey()).intValue();
 						
 						String paramName = (parameterMetaData == null) ? null : parameterMetaData.getParameterTypeName(paramId);
@@ -208,11 +218,14 @@ public class ServerJDOJSProxy extends AbstractJDOJSProxy {
 						ScriptableObject.putProperty(scope, paramName, js_param);
 						
 					}
-					System.out.println("*****************************************");
-					System.out.println("*****************************************");
-					System.out.println("*****************************************");
+					if(logger.isDebugEnabled()) {
+						logger.debug("*****************************************");
+						logger.debug("*****************************************");
+						logger.debug("*****************************************");
+					}
 					
-					System.out.println("Trying to execute prepare JavaScript:\n"+fetchScript);
+					if(logger.isDebugEnabled())
+						logger.debug("Trying to execute prepare JavaScript:\n"+fetchScript);
 					context.evaluateString(scope, fetchScript, "JDOJS fetch script", 1, null);
 					resultSet.init();
 					return resultSet;

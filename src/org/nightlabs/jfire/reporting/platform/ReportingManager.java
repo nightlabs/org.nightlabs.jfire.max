@@ -58,6 +58,12 @@ import org.nightlabs.jfire.reporting.layout.id.ReportRegistryItemID;
  */
 public class ReportingManager {
 
+	/**
+	 * LOG4J logger used by this class
+	 */
+	private static final org.apache.log4j.Logger logger = org.apache.log4j.Logger
+			.getLogger(ReportingManager.class);
+	
 	private ReportingManagerFactory factory;
 	
 	/**
@@ -147,7 +153,7 @@ public class ReportingManager {
 			}
 			if ( found == null )
 			{
-				System.err.println( "Parameter " + name + " not found in the report." );
+				logger.error( "Parameter " + name + " not found in the report." );
 				continue;
 			}
 			Object value = values.get( name );

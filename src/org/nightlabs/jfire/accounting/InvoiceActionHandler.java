@@ -2,7 +2,6 @@ package org.nightlabs.jfire.accounting;
 
 import org.nightlabs.jfire.accounting.pay.Payment;
 import org.nightlabs.jfire.accounting.pay.PaymentData;
-import org.nightlabs.jfire.accounting.pay.PaymentException;
 import org.nightlabs.jfire.accounting.pay.ServerPaymentProcessor;
 import org.nightlabs.jfire.security.User;
 import org.nightlabs.util.Utils;
@@ -73,10 +72,10 @@ public class InvoiceActionHandler
 	 * @param paymentData The payment-data which allows to access the {@link Payment}.
 	 * @param invoice The invoice that is paid. Note that multiple <code>InvoiceActionHandler</code>s might be called for multiple <code>Invoice</code>s
 	 * 		for <strong>the same</strong> {@link PaymentData}, because one payment can comprise many invoices.
-	 * @throws PaymentException Throw this exception if sth. goes wrong with the payment.
+	 * @throws Exception If sth. goes wrong.
 	 */
 	public void onPayDoWork(User user, PaymentData paymentData, Invoice invoice)
-	throws PaymentException
+	throws Exception
 	{
 	}
 

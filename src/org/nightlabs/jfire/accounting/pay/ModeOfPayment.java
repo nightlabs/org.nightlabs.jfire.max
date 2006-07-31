@@ -31,6 +31,9 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
 
+import org.nightlabs.jfire.accounting.pay.id.ModeOfPaymentFlavourID;
+import org.nightlabs.jfire.accounting.pay.id.ModeOfPaymentID;
+
 /**
  * @author Marco Schulze - marco at nightlabs dot de
  * 
@@ -100,6 +103,11 @@ implements Serializable
 	 */
 	protected ModeOfPayment() { }
 
+	public ModeOfPayment(ModeOfPaymentID modeOfPaymentID)
+	{
+		this(modeOfPaymentID.organisationID, modeOfPaymentID.modeOfPaymentID);
+	}
+
 	public ModeOfPayment(String organisationID, String modeOfPaymentID)
 	{
 		this.organisationID = organisationID;
@@ -155,6 +163,11 @@ implements Serializable
 		if (throwExceptionIfNotExistent && res == null)
 			throw new IllegalArgumentException("No ModeOfPaymentFlavour with modeOfPaymentFlavourPK=\"" + modeOfPaymentFlavourPK + "\" in the ModeOfPayment \"" + getPrimaryKey() + "\" existing!");
 		return res;
+	}
+
+	public ModeOfPaymentFlavour createFlavour(ModeOfPaymentFlavourID modeOfPaymentFlavourID)
+	{
+		return createFlavour(modeOfPaymentFlavourID.organisationID, modeOfPaymentFlavourID.modeOfPaymentFlavourID);
 	}
 
 	/**

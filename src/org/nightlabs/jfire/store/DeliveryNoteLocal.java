@@ -43,7 +43,7 @@ import org.nightlabs.jfire.security.User;
  * @jdo.inheritance strategy="new-table"
  *
  * @jdo.create-objectid-class
- *		field-order="organisationID, deliveryNoteID"
+ *		field-order="organisationID, deliveryNoteIDPrefix, deliveryNoteID"
  *
  * @jdo.fetch-group name="DeliveryNote.deliveryNoteLocal" fields="deliveryNote"
  * @jdo.fetch-group name="DeliveryNoteLocal.deliveryNote" fields="deliveryNote"
@@ -62,7 +62,11 @@ implements Serializable
 	 * @jdo.column length="100"
 	 */
 	private String organisationID;
-
+	/**
+	 * @jdo.field primary-key="true"
+	 * @jdo.column length="50"
+	 */
+	private String deliveryNoteIDPrefix;
 	/**
 	 * @jdo.field primary-key="true"
 	 */
@@ -100,6 +104,7 @@ implements Serializable
 	public DeliveryNoteLocal(DeliveryNote deliveryNote)
 	{
 		this.organisationID = deliveryNote.getOrganisationID();
+		this.deliveryNoteIDPrefix = deliveryNote.getDeliveryNoteIDPrefix();
 		this.deliveryNoteID = deliveryNote.getDeliveryNoteID();
 		this.deliveryNote = deliveryNote;
 
@@ -109,6 +114,10 @@ implements Serializable
 	public String getOrganisationID()
 	{
 		return organisationID;
+	}
+	public String getDeliveryNoteIDPrefix()
+	{
+		return deliveryNoteIDPrefix;
 	}
 	public long getDeliveryNoteID()
 	{

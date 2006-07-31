@@ -545,6 +545,10 @@ implements Serializable, ArticleContainer, DetachCallback
 		return customerID;
 	}
 
+	public String getInvoiceIDPrefix()
+	{
+		return invoiceIDPrefix;
+	}
 	public long getInvoiceID() {
 		return invoiceID;
 	}

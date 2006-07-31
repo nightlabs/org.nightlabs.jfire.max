@@ -564,10 +564,19 @@ public class Accounting
 		if (!serverPaymentResult.isPaid())
 			throw new PaymentException(serverPaymentResult);
 
-		for (Invoice invoice : paymentData.getPayment().getInvoices()) {
-			for (InvoiceActionHandler invoiceActionHandler : invoice.getInvoiceLocal().getInvoiceActionHandlers()) {
-				invoiceActionHandler.onPayDoWork(user, paymentData, invoice);
+		try {
+			for (Invoice invoice : paymentData.getPayment().getInvoices()) {
+				for (InvoiceActionHandler invoiceActionHandler : invoice.getInvoiceLocal().getInvoiceActionHandlers()) {
+					invoiceActionHandler.onPayDoWork(user, paymentData, invoice);
+				}
 			}
+		} catch (Exception x) {
+			throw new PaymentException(
+					new PaymentResult(
+							getOrganisationID(),
+							PaymentResult.CODE_FAILED,
+							"Calling InvoiceActionHandler.onPayDoWork failed!",
+							x));
 		}
 
 		return serverPaymentResult;
@@ -631,10 +640,19 @@ public class Accounting
 		if (paymentData.getPayment().isPending() && !paymentData.getPayment().isFailed())
 			throw new IllegalStateException("Payment should not be pending anymore, because failed is false! How's that possible?");
 
-		for (Invoice invoice : paymentData.getPayment().getInvoices()) {
-			for (InvoiceActionHandler invoiceActionHandler : invoice.getInvoiceLocal().getInvoiceActionHandlers()) {
-				invoiceActionHandler.onPayEnd(user, paymentData, invoice);
+		try {
+			for (Invoice invoice : paymentData.getPayment().getInvoices()) {
+				for (InvoiceActionHandler invoiceActionHandler : invoice.getInvoiceLocal().getInvoiceActionHandlers()) {
+					invoiceActionHandler.onPayEnd(user, paymentData, invoice);
+				}
 			}
+		} catch (Exception x) {
+			throw new PaymentException(
+					new PaymentResult(
+							getOrganisationID(),
+							PaymentResult.CODE_FAILED,
+							"Calling InvoiceActionHandler.onPayEnd failed!",
+							x));
 		}
 
 		return serverPaymentResult;

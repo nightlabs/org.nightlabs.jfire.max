@@ -717,6 +717,7 @@ implements SessionBean
 
 			if (get) {
 				pm.getFetchPlan().setMaxFetchDepth(maxFetchDepth);
+				pm.getFetchPlan().setDetachmentOptions(FetchPlan.DETACH_LOAD_FIELDS + FetchPlan.DETACH_UNLOAD_FIELDS);
 				if (fetchGroups != null)
 					pm.getFetchPlan().setGroups(fetchGroups);
 

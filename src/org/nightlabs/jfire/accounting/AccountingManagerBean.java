@@ -63,6 +63,7 @@ import org.nightlabs.jfire.accounting.id.CurrencyID;
 import org.nightlabs.jfire.accounting.id.InvoiceID;
 import org.nightlabs.jfire.accounting.id.PriceFragmentTypeID;
 import org.nightlabs.jfire.accounting.pay.ModeOfPayment;
+import org.nightlabs.jfire.accounting.pay.ModeOfPaymentConst;
 import org.nightlabs.jfire.accounting.pay.ModeOfPaymentFlavour;
 import org.nightlabs.jfire.accounting.pay.PaymentData;
 import org.nightlabs.jfire.accounting.pay.PaymentException;
@@ -268,11 +269,11 @@ public abstract class AccountingManagerBean
 	
 	//		 create some ModeOfPayments
 				// Cash
-				ModeOfPayment modeOfPayment = new ModeOfPayment(Organisation.DEVIL_ORGANISATION_ID, "cash");
+				ModeOfPayment modeOfPayment = new ModeOfPayment(ModeOfPaymentConst.MODE_OF_PAYMENT_ID_CASH);
 				modeOfPayment.getName().setText(Locale.ENGLISH.getLanguage(), "Cash");
 				modeOfPayment.getName().setText(Locale.GERMAN.getLanguage(), "Bargeld");
 				modeOfPayment.getName().setText(Locale.FRENCH.getLanguage(), "Argent Liquide");
-				ModeOfPaymentFlavour modeOfPaymentFlavour = modeOfPayment.createFlavour(Organisation.DEVIL_ORGANISATION_ID, "cash");
+				ModeOfPaymentFlavour modeOfPaymentFlavour = modeOfPayment.createFlavour(ModeOfPaymentConst.MODE_OF_PAYMENT_FLAVOUR_ID_CASH);
 				modeOfPaymentFlavour.getName().setText(Locale.ENGLISH.getLanguage(), "Cash");
 				modeOfPaymentFlavour.getName().setText(Locale.GERMAN.getLanguage(), "Bargeld");
 				modeOfPaymentFlavour.getName().setText(Locale.FRENCH.getLanguage(), "Argent Liquide");
@@ -286,10 +287,10 @@ public abstract class AccountingManagerBean
 	
 				// No payment - this is a dummy MOP which means, the payment is postponed without
 				//   specifying a certain real MOP
-				modeOfPayment = new ModeOfPayment(Organisation.DEVIL_ORGANISATION_ID, "nonPayment");
+				modeOfPayment = new ModeOfPayment(ModeOfPaymentConst.MODE_OF_PAYMENT_ID_NON_PAYMENT);
 				modeOfPayment.getName().setText(Locale.ENGLISH.getLanguage(), "Non-Payment");
 				modeOfPayment.getName().setText(Locale.GERMAN.getLanguage(), "Nichtzahlung");
-				modeOfPaymentFlavour = modeOfPayment.createFlavour(Organisation.DEVIL_ORGANISATION_ID, "nonPayment");
+				modeOfPaymentFlavour = modeOfPayment.createFlavour(ModeOfPaymentConst.MODE_OF_PAYMENT_FLAVOUR_ID_NON_PAYMENT);
 				modeOfPaymentFlavour.getName().setText(Locale.ENGLISH.getLanguage(), "Non-Payment");
 				modeOfPaymentFlavour.getName().setText(Locale.GERMAN.getLanguage(), "Nichtzahlung");
 				modeOfPaymentFlavour.loadIconFromResource();
@@ -301,20 +302,20 @@ public abstract class AccountingManagerBean
 				
 	
 				// Credit Card - VISA, Master, AmEx, Diners
-				modeOfPayment = new ModeOfPayment(Organisation.DEVIL_ORGANISATION_ID, "creditCard");
+				modeOfPayment = new ModeOfPayment(ModeOfPaymentConst.MODE_OF_PAYMENT_ID_CREDIT_CARD);
 				modeOfPayment.getName().setText(Locale.ENGLISH.getLanguage(), "Credit Card");
 				modeOfPayment.getName().setText(Locale.GERMAN.getLanguage(), "Kreditkarte");
 				modeOfPayment.getName().setText(Locale.FRENCH.getLanguage(), "Carte de Crédit");
-				modeOfPaymentFlavour = modeOfPayment.createFlavour(Organisation.DEVIL_ORGANISATION_ID, "visa");
+				modeOfPaymentFlavour = modeOfPayment.createFlavour(ModeOfPaymentConst.MODE_OF_PAYMENT_FLAVOUR_ID_VISA);
 				modeOfPaymentFlavour.getName().setText(Locale.ENGLISH.getLanguage(), "VISA");
 				modeOfPaymentFlavour.loadIconFromResource();
-				modeOfPaymentFlavour = modeOfPayment.createFlavour(Organisation.DEVIL_ORGANISATION_ID, "masterCard");
+				modeOfPaymentFlavour = modeOfPayment.createFlavour(ModeOfPaymentConst.MODE_OF_PAYMENT_FLAVOUR_ID_MASTER_CARD);
 				modeOfPaymentFlavour.getName().setText(Locale.ENGLISH.getLanguage(), "MasterCard");
 				modeOfPaymentFlavour.loadIconFromResource();
-				modeOfPaymentFlavour = modeOfPayment.createFlavour(Organisation.DEVIL_ORGANISATION_ID, "americanExpress");
+				modeOfPaymentFlavour = modeOfPayment.createFlavour(ModeOfPaymentConst.MODE_OF_PAYMENT_FLAVOUR_ID_AMERICAN_EXPRESS);
 				modeOfPaymentFlavour.getName().setText(Locale.ENGLISH.getLanguage(), "American Express");
 				modeOfPaymentFlavour.loadIconFromResource();
-				modeOfPaymentFlavour = modeOfPayment.createFlavour(Organisation.DEVIL_ORGANISATION_ID, "dinersClub");
+				modeOfPaymentFlavour = modeOfPayment.createFlavour(ModeOfPaymentConst.MODE_OF_PAYMENT_FLAVOUR_ID_DINERS_CLUB);
 				modeOfPaymentFlavour.getName().setText(Locale.ENGLISH.getLanguage(), "Diners Club");
 				modeOfPaymentFlavour.loadIconFromResource();
 				pm.makePersistent(modeOfPayment);
@@ -325,11 +326,11 @@ public abstract class AccountingManagerBean
 				ModeOfPayment modeOfPaymentCreditCard = modeOfPayment;
 	
 				// Bank Transfer
-				modeOfPayment = new ModeOfPayment(Organisation.DEVIL_ORGANISATION_ID, "bankTransfer");
+				modeOfPayment = new ModeOfPayment(ModeOfPaymentConst.MODE_OF_PAYMENT_ID_BANK_TRANSFER);
 				modeOfPayment.getName().setText(Locale.ENGLISH.getLanguage(), "Bank Transfer");
 				modeOfPayment.getName().setText(Locale.GERMAN.getLanguage(), "Überweisung");
 				modeOfPayment.getName().setText(Locale.FRENCH.getLanguage(), "Virement");
-				modeOfPaymentFlavour = modeOfPayment.createFlavour(Organisation.DEVIL_ORGANISATION_ID, "bankTransfer");
+				modeOfPaymentFlavour = modeOfPayment.createFlavour(ModeOfPaymentConst.MODE_OF_PAYMENT_FLAVOUR_ID_BANK_TRANSFER);
 				modeOfPaymentFlavour.getName().setText(Locale.ENGLISH.getLanguage(), "Bank Transfer");
 				modeOfPaymentFlavour.getName().setText(Locale.GERMAN.getLanguage(), "Überweisung");
 				modeOfPaymentFlavour.getName().setText(Locale.FRENCH.getLanguage(), "Virement");
@@ -341,11 +342,11 @@ public abstract class AccountingManagerBean
 				ModeOfPayment modeOfPaymentBankTransfer = modeOfPayment;
 	
 				// Debit Note
-				modeOfPayment = new ModeOfPayment(Organisation.DEVIL_ORGANISATION_ID, "debitNote");
+				modeOfPayment = new ModeOfPayment(ModeOfPaymentConst.MODE_OF_PAYMENT_ID_DEBIT_NOTE);
 				modeOfPayment.getName().setText(Locale.ENGLISH.getLanguage(), "Debit Note");
 				modeOfPayment.getName().setText(Locale.GERMAN.getLanguage(), "Lastschrift");
 				modeOfPayment.getName().setText(Locale.FRENCH.getLanguage(), "Note de Débit");
-				modeOfPaymentFlavour = modeOfPayment.createFlavour(Organisation.DEVIL_ORGANISATION_ID, "debitNote");
+				modeOfPaymentFlavour = modeOfPayment.createFlavour(ModeOfPaymentConst.MODE_OF_PAYMENT_FLAVOUR_ID_DEBIT_NOTE);
 				modeOfPaymentFlavour.getName().setText(Locale.ENGLISH.getLanguage(), "Debit Note");
 				modeOfPaymentFlavour.getName().setText(Locale.GERMAN.getLanguage(), "Lastschrift");
 				modeOfPaymentFlavour.getName().setText(Locale.FRENCH.getLanguage(), "Note de Débit");
@@ -1165,6 +1166,7 @@ public abstract class AccountingManagerBean
 
 			if (get) {
 				pm.getFetchPlan().setMaxFetchDepth(maxFetchDepth);
+				pm.getFetchPlan().setDetachmentOptions(FetchPlan.DETACH_LOAD_FIELDS + FetchPlan.DETACH_UNLOAD_FIELDS);
 				if (fetchGroups != null)
 					pm.getFetchPlan().setGroups(fetchGroups);
 

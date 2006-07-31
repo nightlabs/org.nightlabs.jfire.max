@@ -46,7 +46,7 @@ import org.nightlabs.jfire.security.User;
  * @jdo.inheritance strategy="new-table"
  *
  * @jdo.create-objectid-class
- *		field-order="organisationID, invoiceID"
+ *		field-order="organisationID, invoiceIDPrefix, invoiceID"
  *
  * @jdo.fetch-group name="Invoice.invoiceLocal" fields="invoice"
  * @jdo.fetch-group name="InvoiceLocal.invoice" fields="invoice"
@@ -65,7 +65,11 @@ implements Serializable
 	 * @jdo.column length="100"
 	 */
 	private String organisationID;
-
+	/**
+	 * @jdo.field primary-key="true"
+	 * @jdo.column length="50"
+	 */
+	private String invoiceIDPrefix;
 	/**
 	 * @jdo.field primary-key="true"
 	 */
@@ -114,6 +118,7 @@ implements Serializable
 	public InvoiceLocal(Invoice invoice)
 	{
 		this.organisationID = invoice.getOrganisationID();
+		this.invoiceIDPrefix = invoice.getInvoiceIDPrefix();
 		this.invoiceID = invoice.getInvoiceID();
 		this.invoice = invoice;
 		this.invoiceActionHandlers = new HashSet<InvoiceActionHandler>();
@@ -124,6 +129,10 @@ implements Serializable
 	public String getOrganisationID()
 	{
 		return organisationID;
+	}
+	public String getInvoiceIDPrefix()
+	{
+		return invoiceIDPrefix;
 	}
 	public long getInvoiceID()
 	{
@@ -181,7 +190,7 @@ implements Serializable
 	 *		persistence-modifier="persistent"
 	 *		collection-type="collection"
 	 *		element-type="InvoiceActionHandler"
-	 *		table="JFireTrade_Invoice_invoiceActionHandlers"
+	 *		table="JFireTrade_InvoiceLocal_invoiceActionHandlers"
 	 *
 	 * @jdo.join
 	 */

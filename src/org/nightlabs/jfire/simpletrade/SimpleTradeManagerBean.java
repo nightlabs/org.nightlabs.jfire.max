@@ -612,7 +612,7 @@ implements SessionBean
 					user, offer, segment,
 					products,
 					new ArticleCreator(tariff),
-					true, false);
+					true, false, true);
 //			Collection articles = new ArrayList();
 //			for (Iterator it = products.iterator(); it.hasNext(); ) {
 //				SimpleProduct product = (SimpleProduct) it.next();

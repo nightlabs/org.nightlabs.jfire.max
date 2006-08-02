@@ -74,6 +74,8 @@ implements SessionBean
 	 */
 	private static final Logger logger = Logger.getLogger(DeliveryHelperBean.class);
 
+	private static final boolean ASYNC_INVOKE_ENABLE_XA = false; // not sure, but I think XA's not necessary.
+
 	/**
 	 * @see org.nightlabs.jfire.base.BaseSessionBeanImpl#setSessionContext(javax.ejb.SessionContext)
 	 */
@@ -278,9 +280,9 @@ implements SessionBean
 
 			// In case, they're not yet booked, we'll book the invoices asynchronously.
 			// For performance reasons (we don't want the booking to block the payment), we do this here
-			// and not in payBegin_xxx and delay the booking another 10 sec.
+			// and not in payBegin_xxx and delay the booking another 5 sec.
 			try {
-				AsyncInvoke.exec(new BookDeliveryNoteInvocation(deliveryNoteIDs, 10000)); // TODO should be 10000
+				AsyncInvoke.exec(new BookDeliveryNoteInvocation(deliveryNoteIDs, 5000), ASYNC_INVOKE_ENABLE_XA);
 			} catch (Exception e) {
 				throw new ModuleException(e);
 			}

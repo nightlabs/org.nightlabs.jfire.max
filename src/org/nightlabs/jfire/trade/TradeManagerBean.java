@@ -943,7 +943,7 @@ implements SessionBean
 			Collection articles = NLJDOHelper.getObjectList(pm, articleIDs, Article.class);
 
 			Trader trader = Trader.getTrader(pm);
-			trader.releaseArticles(User.getUser(pm, getPrincipal()), articles, synchronously);
+			trader.releaseArticles(User.getUser(pm, getPrincipal()), articles, synchronously, true);
 
 			if (!get)
 				return null;

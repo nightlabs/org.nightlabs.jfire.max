@@ -361,11 +361,12 @@ public class Accounting
 				invoiceIDPrefix, IDGenerator.nextID(Invoice.class.getName() + '/' + invoiceIDPrefix),
 				invoiceCurrency);
 		new InvoiceLocal(invoice); // registers itself in the invoice
-		getPersistenceManager().makePersistent(invoice);
-		for (Iterator iter = articles.iterator(); iter.hasNext();) {
-			Article article = (Article) iter.next();
-			invoice.addArticle(article);
-		}
+		invoice = (Invoice) getPersistenceManager().makePersistent(invoice);
+		addArticlesToInvoice(user, invoice, articles);
+//		for (Iterator iter = articles.iterator(); iter.hasNext();) {
+//			Article article = (Article) iter.next();
+//			invoice.addArticle(article);
+//		}
 
 		return invoice;
 	}

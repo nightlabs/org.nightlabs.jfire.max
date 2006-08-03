@@ -1496,6 +1496,7 @@ public abstract class AccountingManagerBean
 			return paymentHelperLocal.payBegin_internal(paymentDataID, fetchGroups, NLJDOHelper.MAX_FETCH_DEPTH_NO_LIMIT);
 
 		} catch (Throwable t) {
+			logger.error("payBegin_internal(...) failed: " + paymentDataID, t);
 			PaymentResult payBeginServerResult = new PaymentResult(getOrganisationID(), t);
 
 			try {
@@ -1626,6 +1627,7 @@ public abstract class AccountingManagerBean
 			return paymentHelperLocal.payDoWork_internal(paymentID, fetchGroups, NLJDOHelper.MAX_FETCH_DEPTH_NO_LIMIT);
 
 		} catch (Throwable t) {
+			logger.error("payDoWork_internal(...) failed: " + paymentID, t);
 			PaymentResult payDoWorkServerResult = new PaymentResult(getOrganisationID(), t);
 
 			try {
@@ -1757,6 +1759,7 @@ public abstract class AccountingManagerBean
 			return paymentHelperLocal.payEnd_internal(paymentID, fetchGroups, NLJDOHelper.MAX_FETCH_DEPTH_NO_LIMIT);
 
 		} catch (Throwable t) {
+			logger.error("payEnd_internal(...) failed: " + paymentID, t);
 			PaymentResult payEndServerResult = new PaymentResult(getOrganisationID(), t);
 
 			try {

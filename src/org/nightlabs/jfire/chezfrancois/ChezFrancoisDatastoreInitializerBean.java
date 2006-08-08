@@ -176,7 +176,7 @@ implements SessionBean
 				}
 				// end registration of demo timer task
 
-	
+
 				String languageID = "en";
 	
 				// create Tariffs: normal price, gold card

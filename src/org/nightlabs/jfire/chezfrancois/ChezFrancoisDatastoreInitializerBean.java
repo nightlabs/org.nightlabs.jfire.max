@@ -28,6 +28,7 @@ package org.nightlabs.jfire.chezfrancois;
 
 import java.rmi.RemoteException;
 import java.util.Iterator;
+import java.util.Locale;
 
 import javax.ejb.CreateException;
 import javax.ejb.EJBException;
@@ -48,6 +49,7 @@ import org.nightlabs.jfire.accounting.id.TariffID;
 import org.nightlabs.jfire.accounting.priceconfig.IInnerPriceConfig;
 import org.nightlabs.jfire.accounting.tariffpriceconfig.FormulaPriceConfig;
 import org.nightlabs.jfire.base.BaseSessionBeanImpl;
+import org.nightlabs.jfire.organisation.Organisation;
 import org.nightlabs.jfire.security.Authority;
 import org.nightlabs.jfire.security.RoleGroup;
 import org.nightlabs.jfire.security.RoleGroupRef;
@@ -57,6 +59,8 @@ import org.nightlabs.jfire.security.UserGroupRef;
 import org.nightlabs.jfire.security.UserLocal;
 import org.nightlabs.jfire.security.id.AuthorityID;
 import org.nightlabs.jfire.simpletrade.store.SimpleProductType;
+import org.nightlabs.jfire.timer.Task;
+import org.nightlabs.jfire.timer.id.TaskID;
 import org.nightlabs.jfire.trade.Article;
 import org.nightlabs.jfire.trade.LegalEntity;
 
@@ -135,6 +139,43 @@ implements SessionBean
 				moduleMetaData = new ModuleMetaData(
 						"JFireChezFrancois", "1.0.0-0-beta", "1.0.0-0-beta");
 				pm.makePersistent(moduleMetaData);
+
+
+				// registering demo timer task
+				TaskID taskID = TaskID.create(Organisation.DEVIL_ORGANISATION_ID, Task.TASK_TYPE_ID_SYSTEM, "ChezFrancois-DemoTimerTask");
+				try {
+					pm.getObjectById(taskID);
+				} catch (JDOObjectNotFoundException x) {
+					Task task = new Task(
+							taskID.organisationID, taskID.taskTypeID, taskID.taskID,
+							User.getUser(pm, getOrganisationID(), User.USERID_SYSTEM),
+							ChezFrancoisDatastoreInitializerHome.JNDI_NAME,
+							"demoTimerTask");
+
+					task.getName().setText(Locale.ENGLISH.getLanguage(), "Chez Francois Demo Timer Task");
+					task.getDescription().setText(Locale.ENGLISH.getLanguage(), "This task demonstrates how to use the JFire Timer.");
+
+					task.getTimePatternSet().createTimePattern(
+							"*", // year
+							"*", // month
+							"*", // day
+							"mon-fri", // dayOfWeek
+							"*", //  hour
+							"*/2"); // minute
+
+					task.getTimePatternSet().createTimePattern(
+							"*", // year
+							"*", // month
+							"*", // day
+							"sat,sun", // dayOfWeek
+							"*", //  hour
+							"1-59/2"); // minute
+
+					task.setEnabled(true);
+					pm.makePersistent(task);
+				}
+				// end registration of demo timer task
+
 	
 				String languageID = "en";
 	
@@ -429,6 +470,23 @@ implements SessionBean
 		} catch (Exception x) {
 			throw new ModuleException(x);
 		}
+	}
+
+	/**
+	 * This is a demo task doing nothing.
+	 *
+	 * @ejb.interface-method
+	 * @ejb.permission role-name="_Guest_"
+	 * @ejb.transaction type = "Required"
+	 */
+	public void demoTimerTask(TaskID taskID) 
+	{
+		logger.info("demoTimerTask: entered for taskID " + taskID);
+		logger.info("demoTimerTask: sleeping 10 sec");
+		try {
+			Thread.sleep(10000);
+		} catch (InterruptedException ignore) { }
+		logger.info("demoTimerTask: about to exit for taskID " + taskID);
 	}
 
 //	/**

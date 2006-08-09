@@ -14,7 +14,14 @@ public interface ReportManagerTrade
     * This method is called by the datastore initialization mechanism.
     * @throws ModuleException
     */
-   public void initialize(  )
+   public void initializeScripting(  )
+      throws org.nightlabs.ModuleException, java.rmi.RemoteException;
+
+   /**
+    * This method is called by the datastore initialization mechanism.
+    * @throws ModuleException
+    */
+   public void initializeReporting(  )
       throws org.nightlabs.ModuleException, java.rmi.RemoteException;
 
 }

@@ -14,6 +14,12 @@ public interface ReportManagerTradeLocal
     * This method is called by the datastore initialization mechanism.
     * @throws ModuleException
     */
-   public void initialize(  ) throws org.nightlabs.ModuleException;
+   public void initializeScripting(  ) throws org.nightlabs.ModuleException;
+
+   /**
+    * This method is called by the datastore initialization mechanism.
+    * @throws ModuleException
+    */
+   public void initializeReporting(  ) throws org.nightlabs.ModuleException;
 
 }

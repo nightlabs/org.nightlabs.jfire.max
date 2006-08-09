@@ -37,6 +37,7 @@ import javax.jdo.PersistenceManager;
 import org.apache.log4j.Logger;
 import org.nightlabs.ModuleException;
 import org.nightlabs.jfire.base.BaseSessionBeanImpl;
+import org.nightlabs.jfire.organisation.Organisation;
 import org.nightlabs.jfire.servermanager.JFireServerManager;
 
 /**
@@ -96,7 +97,7 @@ implements SessionBean
 	 * @ejb.permission role-name="JFireReporting-admin"
 	 * @ejb.transaction type = "Required"
 	 */
-	public void initialize() 
+	public void initializeScripting() 
 	throws ModuleException 
 	{
 		PersistenceManager pm;
@@ -104,9 +105,7 @@ implements SessionBean
 		JFireServerManager jfireServerManager = getJFireServerManager();
 		try {
 			
-			ScriptingInitializer.initialize(pm, jfireServerManager, getOrganisationID());
-			
-//			ReportInitializer. 
+			ScriptingInitializer.initialize(pm, jfireServerManager, Organisation.DEVIL_ORGANISATION_ID);
 			
 		} finally {
 			pm.close();
@@ -116,4 +115,30 @@ implements SessionBean
 		
 	}
 	
+	/**
+	 * This method is called by the datastore initialization mechanism.
+	 * 
+	 * @throws ModuleException
+	 *
+	 * @ejb.interface-method
+	 * @ejb.permission role-name="JFireReporting-admin"
+	 * @ejb.transaction type = "Required"
+	 */
+	public void initializeReporting() 
+	throws ModuleException 
+	{
+		PersistenceManager pm;
+		pm = getPersistenceManager();
+		JFireServerManager jfireServerManager = getJFireServerManager();
+		try {
+			
+			ReportingInitializer.initialize(pm, jfireServerManager, Organisation.DEVIL_ORGANISATION_ID);
+			
+		} finally {
+			pm.close();
+			jfireServerManager.close();
+		}
+		
+		
+	}
 }

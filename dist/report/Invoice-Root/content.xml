@@ -1,6 +1,6 @@
 <report-category 
 	id="Invoice-Root"
-	type="JFireTrade-Invoice"
+	type="JFireReportingTrade-Reporting-Invoice"
 >
     <!-- id is optional and defaults to the directory-name -->
     <!-- type is optional and defaults to the value programatically set -->

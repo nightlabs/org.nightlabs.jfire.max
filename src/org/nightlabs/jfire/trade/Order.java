@@ -45,6 +45,7 @@ import org.nightlabs.jdo.ObjectIDUtil;
 import org.nightlabs.jfire.accounting.Currency;
 import org.nightlabs.jfire.security.User;
 import org.nightlabs.jfire.transfer.id.AnchorID;
+import org.nightlabs.util.Utils;
 
 
 /**
@@ -580,5 +581,31 @@ implements Serializable, ArticleContainer, SegmentContainer, DetachCallback
 			detached.customerID = attached.getCustomerID();
 			detached.customerID_detached = true;
 		}
+	}
+
+	@Override
+	public boolean equals(Object obj)
+	{
+		if (obj == this)
+			return true;
+
+		if (!(obj instanceof Order))
+			return false;
+
+		Order o = (Order) obj;
+
+		return
+				Utils.equals(this.organisationID, o.organisationID) && 
+				Utils.equals(this.orderIDPrefix, o.orderIDPrefix) &&
+				this.orderID == o.orderID;
+	}
+
+	@Override
+	public int hashCode()
+	{
+		return
+				Utils.hashCode(this.organisationID) ^ 
+				Utils.hashCode(this.orderIDPrefix) ^
+				Utils.hashCode(this.orderID);
 	}
 }

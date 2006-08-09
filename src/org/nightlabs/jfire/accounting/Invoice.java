@@ -49,12 +49,12 @@ import org.nightlabs.jfire.trade.Article;
 import org.nightlabs.jfire.trade.ArticleContainer;
 import org.nightlabs.jfire.trade.LegalEntity;
 import org.nightlabs.jfire.trade.Offer;
-import org.nightlabs.jfire.trade.OfferActionHandler;
 import org.nightlabs.jfire.trade.Order;
 import org.nightlabs.jfire.trade.OrganisationLegalEntity;
 import org.nightlabs.jfire.trade.id.ArticleID;
 import org.nightlabs.jfire.transfer.Transfer;
 import org.nightlabs.jfire.transfer.id.AnchorID;
+import org.nightlabs.util.Utils;
 
 /**
  * @author Alexander Bieber <alex[AT]nightlabs[DOT]de>
@@ -644,5 +644,31 @@ implements Serializable, ArticleContainer, DetachCallback
 			detached.customerID = attached.getCustomerID();
 			detached.customerID_detached = true;
 		}
+	}
+
+	@Override
+	public boolean equals(Object obj)
+	{
+		if (obj == this)
+			return true;
+
+		if (!(obj instanceof Invoice))
+			return false;
+
+		Invoice o = (Invoice) obj;
+
+		return
+				Utils.equals(this.organisationID, o.organisationID) && 
+				Utils.equals(this.invoiceIDPrefix, o.invoiceIDPrefix) &&
+				this.invoiceID == o.invoiceID;
+	}
+
+	@Override
+	public int hashCode()
+	{
+		return
+				Utils.hashCode(this.organisationID) ^ 
+				Utils.hashCode(this.invoiceIDPrefix) ^
+				Utils.hashCode(this.invoiceID);
 	}
 }

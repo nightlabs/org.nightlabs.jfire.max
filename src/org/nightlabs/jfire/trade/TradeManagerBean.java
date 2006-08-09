@@ -45,6 +45,7 @@ import javax.jdo.PersistenceManager;
 import org.apache.log4j.Logger;
 import org.nightlabs.ModuleException;
 import org.nightlabs.jdo.NLJDOHelper;
+import org.nightlabs.jdo.ObjectIDUtil;
 import org.nightlabs.jdo.moduleregistry.ModuleMetaData;
 import org.nightlabs.jfire.accounting.Currency;
 import org.nightlabs.jfire.accounting.id.CurrencyID;
@@ -482,32 +483,26 @@ implements SessionBean
 	{
 		PersistenceManager pm = getPersistenceManager();
 		try {
-			pm.getExtent(Article.class);
 			Order order = null;
-			List reversedArticles = new ArrayList(reversedArticleIDs.size());
-			for (Iterator it = reversedArticleIDs.iterator(); it.hasNext(); ) {
-				ArticleID articleID = (ArticleID) it.next();
-				Article article = (Article) pm.getObjectById(articleID);
-				if (order == null)
-					order = article.getOrder();
-				else if (!order.getPrimaryKey().equals(article.getOrder().getPrimaryKey()))
-					throw new IllegalArgumentException("Not all Articles are in the same Order!");
-
-				reversedArticles.add(article);
-			}
-			if (order == null)
-				throw new IllegalArgumentException("Collection reversedArticleIDs must not be empty!");
+			Set<Article> reversedArticles = NLJDOHelper.getObjectSet(pm, reversedArticleIDs, Article.class);
+//			List reversedArticles = new ArrayList(reversedArticleIDs.size());
+//			for (Iterator it = reversedArticleIDs.iterator(); it.hasNext(); ) {
+//				ArticleID articleID = (ArticleID) it.next();
+//				Article article = (Article) pm.getObjectById(articleID);
+//				if (order == null)
+//					order = article.getOrder();
+//				else if (!order.getPrimaryKey().equals(article.getOrder().getPrimaryKey()))
+//					throw new IllegalArgumentException("Not all Articles are in the same Order!");
+//
+//				reversedArticles.add(article);
+//			}
+//			if (order == null)
+//				throw new IllegalArgumentException("Collection reversedArticleIDs must not be empty!");
 
 			User user = User.getUser(pm, getPrincipal());
 
 			Trader trader = Trader.getTrader(pm);
-			Offer offer = new Offer(
-					user, order,
-					offerIDPrefix, IDGenerator.nextID(Offer.class.getName() + '/' + offerIDPrefix));
-			new OfferLocal(offer); // self-registering
-			pm.makePersistent(offer);
-
-			trader.reverseArticles(user, offer, reversedArticles);
+			Offer offer = trader.createReverseOffer(user, reversedArticles, offerIDPrefix);
 
 			if (!get)
 				return null;

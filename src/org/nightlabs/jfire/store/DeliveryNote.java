@@ -52,6 +52,7 @@ import org.nightlabs.jfire.trade.Order;
 import org.nightlabs.jfire.trade.OrganisationLegalEntity;
 import org.nightlabs.jfire.trade.id.ArticleID;
 import org.nightlabs.jfire.transfer.id.AnchorID;
+import org.nightlabs.util.Utils;
 
 /**
  * @author Alexander Bieber <alex[AT]nightlabs[DOT]de>
@@ -536,5 +537,31 @@ implements Serializable, ArticleContainer, DetachCallback
 			detached.customerID = attached.getCustomerID();
 			detached.customerID_detached = true;
 		}
+	}
+
+	@Override
+	public boolean equals(Object obj)
+	{
+		if (obj == this)
+			return true;
+
+		if (!(obj instanceof DeliveryNote))
+			return false;
+
+		DeliveryNote o = (DeliveryNote) obj;
+
+		return
+				Utils.equals(this.organisationID, o.organisationID) && 
+				Utils.equals(this.deliveryNoteIDPrefix, o.deliveryNoteIDPrefix) &&
+				this.deliveryNoteID == o.deliveryNoteID;
+	}
+
+	@Override
+	public int hashCode()
+	{
+		return
+				Utils.hashCode(this.organisationID) ^ 
+				Utils.hashCode(this.deliveryNoteIDPrefix) ^
+				Utils.hashCode(this.deliveryNoteID);
 	}
 }

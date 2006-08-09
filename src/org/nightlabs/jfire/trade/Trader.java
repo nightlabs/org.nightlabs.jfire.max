@@ -30,6 +30,7 @@ import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
@@ -373,6 +374,41 @@ public class Trader
 	// return order;
 	// }
 
+	public Offer createReverseOffer(User user, Set<Article> reversedArticles, String offerIDPrefix)
+	throws ModuleException
+	{
+		if (reversedArticles.isEmpty())
+			throw new IllegalArgumentException("Set reversedArticles must not be empty!");
+
+		if (offerIDPrefix == null) {
+			TradeConfigModule tradeConfigModule;
+			try {
+				tradeConfigModule = (TradeConfigModule) Config.getConfig(
+						getPersistenceManager(), organisationID, user).createConfigModule(TradeConfigModule.class);
+			} catch (ModuleException x) {
+				throw new RuntimeException(x); // should not happen.
+			}
+
+			offerIDPrefix = tradeConfigModule.getActiveIDPrefixCf(Offer.class.getName()).getDefaultIDPrefix();
+		}
+
+		Order order = null;
+		for (Article article : reversedArticles) {
+			if (order == null)
+				order = article.getOrder();
+			else if (!order.equals(article.getOrder()))
+				throw new IllegalArgumentException("Not all reversedArticles in the same Order!");
+		}
+
+		Offer offer = new Offer(
+				user, order,
+				offerIDPrefix, IDGenerator.nextID(Offer.class.getName() + '/' + offerIDPrefix));
+		new OfferLocal(offer); // self-registering
+		offer = (Offer) getPersistenceManager().makePersistent(offer);
+		reverseArticles(user, offer, reversedArticles);
+		return offer;
+	}
+
 	public Order createOrder(OrganisationLegalEntity vendor,
 			LegalEntity customer, String orderIDPrefix, Currency currency) throws ModuleException
 	{
@@ -405,7 +441,7 @@ public class Trader
 						throw new RuntimeException(x); // should not happen.
 					}
 
-					orderIDPrefix = tradeConfigModule.getActiveIDPrefixCf(DeliveryNote.class.getName()).getDefaultIDPrefix();
+					orderIDPrefix = tradeConfigModule.getActiveIDPrefixCf(Order.class.getName()).getDefaultIDPrefix();
 				}
 
 				Order order = new Order(
@@ -564,10 +600,10 @@ public class Trader
 		throw new UnsupportedOperationException("NYI");
 	}
 
-	public Collection reverseArticles(User user, Offer reversingOffer, Collection reversedArticles)
+	public Set<Article> reverseArticles(User user, Offer reversingOffer, Collection<Article> reversedArticles)
 	throws ModuleException
 	{
-		List res = new ArrayList(reversedArticles.size());
+		Set<Article> res = new HashSet<Article>(reversedArticles.size());
 		for (Iterator it = reversedArticles.iterator(); it.hasNext();) {
 			Article reversedArticle = (Article) it.next();
 

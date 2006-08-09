@@ -53,6 +53,8 @@ public class ReportRegistryItemChangeEvent extends JDOObjectChangeEvent {
 	
 	
 	/**
+	 * Full ObjectID-string to reference the changed object.
+	 * 
 	 * @jdo.field persistence-modifier="persistent"
 	 * @jdo.column length="255"
 	 */
@@ -65,6 +67,8 @@ public class ReportRegistryItemChangeEvent extends JDOObjectChangeEvent {
 	private String itemType;
 	
 	/**
+	 * Full ObjectID-string to reference the relative of the changed object (i.e. its parent).
+	 * 
 	 * @jdo.field persistence-modifier="persistent"
 	 * @jdo.column length="255"
 	 */
@@ -233,9 +237,7 @@ public class ReportRegistryItemChangeEvent extends JDOObjectChangeEvent {
 			);
 		ReportRegistryItemChangeEvent event = new ReportRegistryItemChangeEvent(controller);
 		event.setEventType(eventType);
-		// event.setItemID(JDOHelper.getObjectId(changed).toString());
-		// TODO: Check if someone relied on above crap.
-		event.setItemID(changed.getReportRegistryItemID());
+		event.setItemID(JDOHelper.getObjectId(changed).toString());
 		event.setItemType(changed.getReportRegistryItemType());
 		
 		if (relative != null) {

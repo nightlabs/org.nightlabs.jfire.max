@@ -233,7 +233,9 @@ public class ReportRegistryItemChangeEvent extends JDOObjectChangeEvent {
 			);
 		ReportRegistryItemChangeEvent event = new ReportRegistryItemChangeEvent(controller);
 		event.setEventType(eventType);
-		event.setItemID(JDOHelper.getObjectId(changed).toString());
+		// event.setItemID(JDOHelper.getObjectId(changed).toString());
+		// TODO: Check if someone relied on above crap.
+		event.setItemID(changed.getReportRegistryItemID());
 		event.setItemType(changed.getReportRegistryItemType());
 		
 		if (relative != null) {

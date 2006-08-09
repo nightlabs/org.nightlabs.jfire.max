@@ -35,8 +35,6 @@ import javax.jdo.PersistenceManager;
 import javax.jdo.Query;
 import javax.jdo.listener.StoreCallback;
 
-import org.apache.log4j.Logger;
-import org.nightlabs.jdo.NLJDOHelper;
 import org.nightlabs.jfire.reporting.layout.id.ReportRegistryItemID;
 
 /**
@@ -50,7 +48,7 @@ import org.nightlabs.jfire.reporting.layout.id.ReportRegistryItemID;
  *		detachable = "true"
  *		table="JFireReporting_ReportRegistryItem"
  *
- * @jdo.create-objectid-class field-order="organisationID, reportRegistryItemID"
+ * @jdo.create-objectid-class field-order="organisationID, reportRegistryItemType, reportRegistryItemID"
  *
  *
  * @jdo.inheritance strategy = "new-table" 
@@ -79,11 +77,17 @@ import org.nightlabs.jfire.reporting.layout.id.ReportRegistryItemID;
  *			import java.lang.String"
  *
  * @jdo.query
- *		name="getTopLevelReportRegistryItems"
+ *		name="getTopLevelReportRegistryItemsByOrganisation"
  *		query="SELECT
  *			WHERE this.organisationID == paramOrganisationID &&
  *            this.parentItem == null    
  *			PARAMETERS String paramOrganisationID
+ *			import java.lang.String"
+ *
+ * @jdo.query
+ *		name="getTopLevelReportRegistryItems"
+ *		query="SELECT
+ *			WHERE this.parentItem == null
  *			import java.lang.String"
  */
 public abstract class ReportRegistryItem implements Serializable, StoreCallback  {
@@ -96,6 +100,7 @@ public abstract class ReportRegistryItem implements Serializable, StoreCallback 
 	
 	public static final String QUERY_GET_REPORT_REGISTRY_ITEM_BY_TYPE = "getReportRegistryItemByType";
 	public static final String QUERY_TOP_LEVEL_GET_REPORT_REGISTRY_ITEM_BY_TYPE = "getTopLevelReportRegistryItemByType";
+	public static final String QUERY_TOP_LEVEL_GET_REPORT_REGISTRY_ITEMS_BY_ORGANISATION = "getTopLevelReportRegistryItemsByOrganisation";
 	public static final String QUERY_TOP_LEVEL_GET_REPORT_REGISTRY_ITEMS = "getTopLevelReportRegistryItems";
 
 	public static final String FETCH_GROUP_PARENT_ITEM = "ReportRegistryItem.parentItem";
@@ -195,9 +200,15 @@ public abstract class ReportRegistryItem implements Serializable, StoreCallback 
 	}
 	
 	public static Collection getTopReportRegistryItems(PersistenceManager pm, String organisatinID) {
-		Query q = pm.newNamedQuery(ReportRegistryItem.class, QUERY_TOP_LEVEL_GET_REPORT_REGISTRY_ITEMS);
-//		return (Collection)q.execute(organisatinID);
+		if (organisatinID == null || "".equals(organisatinID))
+			return getTopReportRegistryItems(pm);
+		Query q = pm.newNamedQuery(ReportRegistryItem.class, QUERY_TOP_LEVEL_GET_REPORT_REGISTRY_ITEMS_BY_ORGANISATION);
 		return (Collection)q.execute(organisatinID);
+	}
+	
+	public static Collection getTopReportRegistryItems(PersistenceManager pm) {
+		Query q = pm.newNamedQuery(ReportRegistryItem.class, QUERY_TOP_LEVEL_GET_REPORT_REGISTRY_ITEMS);
+		return (Collection)q.execute();
 	}
 	
 	/**

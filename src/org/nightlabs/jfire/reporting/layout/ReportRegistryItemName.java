@@ -87,6 +87,7 @@ public class ReportRegistryItemName extends I18nText {
 	public ReportRegistryItemName(ReportRegistryItem reportRegistryItem) {
 		this.organisationID = reportRegistryItem.getOrganisationID();
 		this.reportRegistryItemID = reportRegistryItem.getReportRegistryItemID();
+		this.reportRegistryItemType = reportRegistryItem.getReportRegistryItemType();
 		this.reportRegistryItem = reportRegistryItem;
 		this.names = new HashMap();
 	}

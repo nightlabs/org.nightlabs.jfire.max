@@ -67,10 +67,10 @@ import org.nightlabs.jfire.reporting.layout.id.ReportRegistryItemID;
  */
 public class ReportCategory extends ReportRegistryItem implements NestableReportRegistryItem {
 
-	public static final String INTERNAL_CATEGORY_TYPE_ORDER = "OrderLayout";
-	public static final String INTERNAL_CATEGORY_TYPE_OFFER = "OfferLayout";
-	public static final String INTERNAL_CATEGORY_TYPE_INVOICE = "InvoiceLayout";
-	public static final String INTERNAL_CATEGORY_TYPE_DELIVERY_NOTE = "DeliveryNoteLayout";
+//	public static final String INTERNAL_CATEGORY_TYPE_ORDER = "OrderLayout";
+//	public static final String INTERNAL_CATEGORY_TYPE_OFFER = "OfferLayout";
+//	public static final String INTERNAL_CATEGORY_TYPE_INVOICE = "InvoiceLayout";
+//	public static final String INTERNAL_CATEGORY_TYPE_DELIVERY_NOTE = "DeliveryNoteLayout";
 	
 	public static final String CATEGORY_TYPE_GENERAL = "GeneralLayouts";
 	

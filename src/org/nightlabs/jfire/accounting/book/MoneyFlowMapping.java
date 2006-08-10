@@ -37,6 +37,7 @@ import org.nightlabs.jfire.accounting.Currency;
 import org.nightlabs.jfire.accounting.id.CurrencyID;
 import org.nightlabs.jfire.store.ProductType;
 import org.nightlabs.jfire.trade.ArticlePrice;
+import org.nightlabs.util.Utils;
 
 /**
  * Abstract mapping to an Account. Subclasses can add conditions on which money
@@ -116,11 +117,16 @@ public abstract class MoneyFlowMapping implements Serializable {
 	private Currency currency;
 	
 	/**
+	 * TODO this should be persistence-modifier="none"
+	 *
 	 * @jdo.field persistence-modifier="persistent"
 	 */
 	private String accountPK;
 	
 	/**
+	 * TODO this should have null-value="exception"
+	 * TODO check all other fields and add such constraints!!!
+	 *
 	 * @jdo.field persistence-modifier="persistent"
 	 */
 	private Account account;
@@ -314,4 +320,23 @@ public abstract class MoneyFlowMapping implements Serializable {
 	
 	public abstract boolean matches(ProductType productType, String packageType);
 
+	@Override
+	public int hashCode()
+	{
+		return Utils.hashCode(organisationID) ^ moneyFlowMappingID;
+	}
+
+	@Override
+	public boolean equals(Object obj)
+	{
+		if (obj == this)
+			return true;
+
+		if (!(obj instanceof MoneyFlowMapping))
+			return false;
+
+		MoneyFlowMapping o = (MoneyFlowMapping) obj;
+
+		return Utils.equals(this.organisationID, o.organisationID) && this.moneyFlowMappingID == o.moneyFlowMappingID;
+	}
 }

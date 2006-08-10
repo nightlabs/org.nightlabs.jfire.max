@@ -91,11 +91,10 @@ public class PFMappingAccountantDelegate extends
 	 * @param accountant
 	 * @param productType
 	 */
-	public PFMappingAccountantDelegate(String organisationID,
-			String localAccountantID) {
-		super(organisationID, localAccountantID);
+	public PFMappingAccountantDelegate(String organisationID, String localAccountantDelegateID) {
+		super(organisationID, localAccountantDelegateID);
 	}
-	
+
 
 	/**
 	 * @param parent

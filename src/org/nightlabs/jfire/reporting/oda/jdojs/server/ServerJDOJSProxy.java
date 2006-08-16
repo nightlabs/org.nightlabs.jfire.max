@@ -237,8 +237,6 @@ public class ServerJDOJSProxy extends AbstractJDOJSProxy {
 			}
 		} catch (RuntimeException e) {
 			throw e;
-		} catch (ModuleException e) {
-			throw e;
 		} catch (Exception e) {
 			throw new ModuleException(e);
 		}

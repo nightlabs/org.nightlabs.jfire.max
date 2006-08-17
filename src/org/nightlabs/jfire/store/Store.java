@@ -1289,7 +1289,7 @@ public class Store
 	 * and the accounts adjust their balance.
 	 * <p>
 	 * It is not integrated within deliverxxxEnd
-	 * (e.g. {@link #deliverInvoicesEnd(User, DeliveryData, DeliverProductTransfer)}),
+	 * (e.g. {@link #deliverEnd(User, DeliveryData)}),
 	 * because it needs to be called within a separate transaction. 
 	 */
 	public void deliverRollback(
@@ -1317,12 +1317,12 @@ public class Store
 		try {
 	
 			for (Iterator it = deliverProductTransfer.getChildren().iterator(); it.hasNext(); ) {
-				MoneyTransfer moneyTransfer = (MoneyTransfer) it.next();
+				ProductTransfer productTransfer = (ProductTransfer) it.next();
 	
-				if (moneyTransfer.isBooked())
-					moneyTransfer.rollbackTransfer(user, involvedAnchors);
+				if (productTransfer.isBooked())
+					productTransfer.rollbackTransfer(user, involvedAnchors);
 	
-				pm.deletePersistent(moneyTransfer);
+				pm.deletePersistent(productTransfer);
 			}
 	
 			if (deliverProductTransfer.isBooked())

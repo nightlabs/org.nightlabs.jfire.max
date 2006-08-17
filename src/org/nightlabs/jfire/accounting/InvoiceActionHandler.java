@@ -1,7 +1,11 @@
 package org.nightlabs.jfire.accounting;
 
+import javax.jdo.JDOHelper;
+import javax.jdo.PersistenceManager;
+
 import org.nightlabs.jfire.accounting.pay.Payment;
 import org.nightlabs.jfire.accounting.pay.PaymentData;
+import org.nightlabs.jfire.accounting.pay.PaymentException;
 import org.nightlabs.jfire.accounting.pay.ServerPaymentProcessor;
 import org.nightlabs.jfire.security.User;
 import org.nightlabs.util.Utils;
@@ -65,6 +69,22 @@ public class InvoiceActionHandler
 	}
 
 	/**
+	 * This method is called by {@link Accounting#payBegin(User, PaymentData)} after the {@link ServerPaymentProcessor} has
+	 * been triggered.
+	 *
+	 * @param user The responsible user.
+	 * @param paymentData The payment-data which allows to access the {@link Payment}.
+	 * @param invoice The invoice that is paid. Note that multiple <code>InvoiceActionHandler</code>s might be called for multiple <code>Invoice</code>s
+	 * 		for <strong>the same</strong> {@link PaymentData}, because one payment can comprise many invoices.
+	 * @throws Exception If sth. goes wrong. It will be wrapped inside a PaymentException
+	 * @throws PaymentException If you throw a PaymentException directly, it won't be wrapped.
+	 */
+	public void onPayBegin(User user, PaymentData paymentData, Invoice invoice)
+	throws Exception, PaymentException
+	{
+	}
+
+	/**
 	 * This method is called by {@link Accounting#payDoWork(User, PaymentData)} after the {@link ServerPaymentProcessor} has
 	 * been triggered.
 	 *
@@ -72,10 +92,11 @@ public class InvoiceActionHandler
 	 * @param paymentData The payment-data which allows to access the {@link Payment}.
 	 * @param invoice The invoice that is paid. Note that multiple <code>InvoiceActionHandler</code>s might be called for multiple <code>Invoice</code>s
 	 * 		for <strong>the same</strong> {@link PaymentData}, because one payment can comprise many invoices.
-	 * @throws Exception If sth. goes wrong.
+	 * @throws Exception If sth. goes wrong. It will be wrapped inside a PaymentException
+	 * @throws PaymentException If you throw a PaymentException directly, it won't be wrapped.
 	 */
 	public void onPayDoWork(User user, PaymentData paymentData, Invoice invoice)
-	throws Exception
+	throws Exception, PaymentException
 	{
 	}
 
@@ -87,8 +108,11 @@ public class InvoiceActionHandler
 	 * </p>
 	 * <p>
 	 * You should try to avoid throwing an Exception here, because it is too late for a roll-back in an external payment system!
-	 * If you do risky things that might fail, you should better override {@link #onPayDoWork(User, PaymentData, Invoice)}! An exception
-	 * at this stage will require manual clean-up by an operator!
+	 * If you do risky things that might fail, you should better override {@link #onPayDoWork(User, PaymentData, Invoice)} and do them
+	 * there! The best solution, is to ensure already in {@link #onPayBegin(User, PaymentData, Invoice)} that a payment will succeed.
+	 * </p>
+	 * <p>
+	 * An exception at this stage (i.e. thrown by this method) will require manual clean-up by an operator!
 	 * </p>
 	 *
 	 * @param user The responsible user.
@@ -98,6 +122,15 @@ public class InvoiceActionHandler
 	 */
 	public void onPayEnd(User user, PaymentData paymentData, Invoice invoice)
 	{
+	}
+
+	protected PersistenceManager getPersistenceManager()
+	{
+		PersistenceManager pm = JDOHelper.getPersistenceManager(this);
+		if (pm == null)
+			throw new IllegalStateException("no PersistenceManager assigned!");
+
+		return pm;
 	}
 
 	@Override

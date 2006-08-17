@@ -571,6 +571,8 @@ public class Accounting
 					invoiceActionHandler.onPayDoWork(user, paymentData, invoice);
 				}
 			}
+		} catch (PaymentException x) {
+			throw x;
 		} catch (Exception x) {
 			throw new PaymentException(
 					new PaymentResult(
@@ -816,6 +818,23 @@ public class Accounting
 
 //		// I don't know why, but without the following line, it is not set in the datastore.
 //		paymentData.getPayment().setPayBeginServerResult(serverPaymentResult);
+
+		try {
+			for (Invoice invoice : paymentData.getPayment().getInvoices()) {
+				for (InvoiceActionHandler invoiceActionHandler : invoice.getInvoiceLocal().getInvoiceActionHandlers()) {
+					invoiceActionHandler.onPayBegin(user, paymentData, invoice);
+				}
+			}
+		} catch (PaymentException x) {
+			throw x;
+		} catch (Exception x) {
+			throw new PaymentException(
+					new PaymentResult(
+							getOrganisationID(),
+							PaymentResult.CODE_FAILED,
+							"Calling InvoiceActionHandler.onPayBegin failed!",
+							x));
+		}
 
 		if (paymentData.getPayment().isPostponed()) {
 			// if we have a PayMoneyTransfer, we need to delete it from datastore

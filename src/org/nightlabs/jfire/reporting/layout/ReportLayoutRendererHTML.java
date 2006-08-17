@@ -75,11 +75,7 @@ public class ReportLayoutRendererHTML implements ReportLayoutRenderer {
 			throw new IllegalStateException("Could not obtain archive directory!",e);
 		}
 		File layoutRoot;
-		try {
-			layoutRoot = new File(earDir, "birt"+File.separator+"rendered"+File.separator+SecurityReflector.getUserDescriptor().getSessionID());
-		} catch (NamingException e) {
-			throw new IllegalStateException("Could not get UserDescriptor from SecurityReflector", e);
-		}
+		layoutRoot = new File(earDir, "birt"+File.separator+"rendered"+File.separator+SecurityReflector.getUserDescriptor().getSessionID());
 		
 		if (layoutRoot.exists()) {
 			if (!Utils.deleteDirectoryRecursively(layoutRoot))

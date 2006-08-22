@@ -38,6 +38,9 @@ import java.util.List;
 import org.eclipse.birt.core.framework.IPlatformContext;
 
 /**
+ * {@link IPlatformContext} for Birt within the JFire Server.
+ * TODO: This needs some more thoughts!
+ * 
  * @author Alexander Bieber <alex[AT]nightlabs[DOT]de>
  *
  */

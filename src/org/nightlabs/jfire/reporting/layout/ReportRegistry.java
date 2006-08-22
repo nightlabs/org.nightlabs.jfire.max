@@ -35,6 +35,9 @@ import org.apache.log4j.Logger;
 import org.nightlabs.jfire.reporting.Birt;
 import org.nightlabs.jfire.reporting.Birt.OutputFormat;
 import org.nightlabs.jfire.reporting.layout.id.ReportRegistryID;
+import org.nightlabs.jfire.reporting.layout.render.ReportLayoutRenderer;
+import org.nightlabs.jfire.reporting.layout.render.ReportLayoutRendererHTML;
+import org.nightlabs.jfire.reporting.layout.render.ReportLayoutRendererPDF;
 
 /**
  * Singleton to hold the id of next new {@link org.nightlabs.jfire.reporting.layout.ReportRegistryItem}
@@ -191,21 +194,15 @@ public class ReportRegistry {
 	
 	public static ReportRegistry getReportRegistry(PersistenceManager pm) {
 		Iterator it = pm.getExtent(ReportRegistry.class).iterator();
+		ReportRegistry registry;
 		if (it.hasNext()) {
-			ReportRegistry reportRegistry = (ReportRegistry)it.next(); 
-			return reportRegistry;
+			registry = (ReportRegistry)it.next(); 
 		}
 		else {
-			ReportRegistry reportRegistry = new ReportRegistry(SINGLETON_REGISTRY_ID);
-			reportRegistry = (ReportRegistry)pm.makePersistent(reportRegistry);
-			try {
-				reportRegistry.registerReportRenderer(ReportLayoutRendererHTML.class);
-			} catch (Exception e) {
-				logger.warn("Could not initially register HTML ReportLayoutRenderer when initializing ReportRegistry.", e);
-			}
-			return reportRegistry;
+			registry = new ReportRegistry(SINGLETON_REGISTRY_ID);
+			registry = (ReportRegistry)pm.makePersistent(registry);
 		}
-		
+		return registry;
 	}
 
 }

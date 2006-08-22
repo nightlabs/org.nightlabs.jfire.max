@@ -1,7 +1,7 @@
 /**
  * 
  */
-package org.nightlabs.jfire.reporting.layout;
+package org.nightlabs.jfire.reporting.layout.render;
 
 import java.io.BufferedInputStream;
 import java.io.File;
@@ -64,28 +64,12 @@ public class ReportLayoutRendererHTML implements ReportLayoutRenderer {
 	{
 		if (format != Birt.OutputFormat.html)
 			throw new IllegalArgumentException(this.getClass().getName()+" was asked to render a report to format "+format+" altough it is registered to "+getOutputFormat());
+		File layoutRoot = ReportLayoutRendererUtil.prepareRenderedLayoutOutputFolder();
+		
 		HTMLRenderOption options = new HTMLRenderOption( );
 		options.setOutputFormat(format.toString());
 		
 		HTMLRenderContext renderContext = new HTMLRenderContext( );
-		File earDir;
-		try {
-			earDir = JFireReportingEAR.getEARDir();
-		} catch (Exception e) {
-			throw new IllegalStateException("Could not obtain archive directory!",e);
-		}
-		File layoutRoot;
-		layoutRoot = new File(earDir, "birt"+File.separator+"rendered"+File.separator+SecurityReflector.getUserDescriptor().getSessionID());
-		
-		if (layoutRoot.exists()) {
-			if (!Utils.deleteDirectoryRecursively(layoutRoot))
-				throw new IllegalStateException("Could not delete rendered report tmp folder "+layoutRoot);
-		}
-		if (!layoutRoot.exists()) {
-			if (!layoutRoot.mkdirs())
-				throw new IllegalStateException("Could not create rendered report tmp folder "+layoutRoot);
-		}
-		
 		renderContext.setImageDirectory(layoutRoot.getAbsolutePath().toString()+File.separator+"images");
 		renderContext.setBaseImageURL("images"); //$NON-NLS-1$
 
@@ -102,70 +86,7 @@ public class ReportLayoutRendererHTML implements ReportLayoutRenderer {
 		task.run();
 		
 		RenderedReportLayout result = new RenderedReportLayout(reportRegistryItemID, format, new Date());
-
-		// zip the complete folder
-		File zip = new File(layoutRoot, "renderedLayout.zip");
-		try {
-			Utils.zipFolder(zip, layoutRoot);
-		} catch (IOException e) {
-			throw new IllegalStateException("Could not zip the rendered layout.", e);
-		}
-		BufferedInputStream buf;
-		try {
-			buf = new BufferedInputStream(new FileInputStream(zip));
-		} catch (FileNotFoundException e) {
-			throw new IllegalStateException("Could not find zip file "+zip, e);
-		}
-		try {
-			DataBuffer dataBuffer = null;
-			try {
-				dataBuffer = new DataBuffer(buf);
-			} catch (IOException e) {
-				throw new IllegalStateException("Could not create DataBuffer!", e);
-			}
-			result.setData(dataBuffer.createByteArray());
-		} catch (IOException e) {
-			throw new IllegalStateException("Could not create the rendered report data", e);
-		} finally {
-			try {
-				buf.close();
-			} catch (IOException e) {
-				throw new IllegalStateException("Could not close FileInputStream", e);
-			}
-		}
-		
-		
-//		DataBuffer dataBuffer = null;
-//		OutputStream outputStream = null;
-//		RenderedReportLayout result = new RenderedReportLayout(reportRegistryItemID, format, new Date());
-//		try {
-//			try {
-//				dataBuffer = new DataBuffer(512, Integer.MAX_VALUE, (File)null);
-//				outputStream = dataBuffer.createOutputStream();
-//			} catch (IOException e) {
-//				e.printStackTrace();		
-//			}
-//			
-//			
-//			options.setOutputFileName(layoutRoot.getAbsolutePath().toString()+File.separator+"renderedLayout.html");
-////			options.setOutputStream(outputStream);
-//			task.setRenderOption( options );
-//			
-//			task.setParameterValues(parsedParams);
-//			
-//			task.run();
-//		} finally {			
-//			try {
-//				outputStream.close();
-//			} catch (IOException e) {
-//				throw new RuntimeException(e);
-//			}
-//		}
-//		try {
-//			result.setData(dataBuffer.createByteArray());
-//		} catch (IOException e) {
-//			throw new RuntimeException(e);
-//		}
+		ReportLayoutRendererUtil.prepareRenderedLayoutForTransfer(layoutRoot, result, true);
 		
 		return result;
 	}

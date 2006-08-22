@@ -24,7 +24,7 @@
  *                                                                             *
  ******************************************************************************/
 
-package org.nightlabs.jfire.reporting.platform;
+package org.nightlabs.jfire.reporting.layout.render;
 
 import java.io.ByteArrayInputStream;
 import java.io.InputStream;
@@ -35,6 +35,8 @@ import java.util.Map;
 
 import javax.jdo.PersistenceManager;
 
+import org.eclipse.birt.core.framework.IConfigurationElement;
+import org.eclipse.birt.core.framework.Platform;
 import org.eclipse.birt.report.engine.api.EngineException;
 import org.eclipse.birt.report.engine.api.IGetParameterDefinitionTask;
 import org.eclipse.birt.report.engine.api.IParameterDefnBase;
@@ -44,32 +46,34 @@ import org.eclipse.birt.report.engine.api.IRunAndRenderTask;
 import org.eclipse.birt.report.engine.api.IScalarParameterDefn;
 import org.eclipse.birt.report.engine.api.ReportEngine;
 import org.nightlabs.jfire.reporting.Birt;
-import org.nightlabs.jfire.reporting.layout.RenderedReportLayout;
+import org.nightlabs.jfire.reporting.ReportingManagerFactory;
 import org.nightlabs.jfire.reporting.layout.ReportLayout;
-import org.nightlabs.jfire.reporting.layout.ReportLayoutRenderer;
 import org.nightlabs.jfire.reporting.layout.ReportRegistry;
 import org.nightlabs.jfire.reporting.layout.id.ReportRegistryItemID;
 
 /**
- * Helper to render reports on the server.
+ * Helper to render reports on the server. Instances of {@link RenderManager}
+ * can be obtained by a {@link ReportingManagerFactory} of wich one instance
+ * is bound to JNDI for each Organisation.
+ * 
  * 
  * @author Alexander Bieber <alex[AT]nightlabs[DOT]de>
  *
  */
-public class ReportingManager {
+public class RenderManager {
 
 	/**
 	 * LOG4J logger used by this class
 	 */
 	private static final org.apache.log4j.Logger logger = org.apache.log4j.Logger
-			.getLogger(ReportingManager.class);
+			.getLogger(RenderManager.class);
 	
 	private ReportingManagerFactory factory;
 	
 	/**
 	 * 
 	 */
-	public ReportingManager(ReportingManagerFactory factory) {
+	public RenderManager(ReportingManagerFactory factory) {
 		this.factory = factory;
 	}
 	
@@ -108,6 +112,7 @@ public class ReportingManager {
 		ReportEngine reportEngine = factory.getReportEngine();
 		
 		InputStream inputStream = new ByteArrayInputStream(reportLayout.getReportDesign());
+//		Platform.
 		IReportRunnable report = reportEngine.openReportDesign(inputStream);
 		IRunAndRenderTask task = reportEngine.createRunAndRenderTask(report);
 		
@@ -116,7 +121,7 @@ public class ReportingManager {
 		try {
 			renderer = registry.createReportRenderer(format);
 		} catch (Exception e) {
-			throw new EngineException("Could not create ReportLayoutRenderer for OutputFormat "+format, e);
+			throw new EngineException("Could not create ReportLayoutRenderer for OutputFormat "+format, e.getMessage());
 		}
 		
 		HashMap<String,Object> parsedParams = parseReportParams(reportEngine, report, params);

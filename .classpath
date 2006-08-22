@@ -24,13 +24,13 @@
 	<classpathentry kind="var" path="WORKSPACE/JFireServerManager/dist/JFireServerManager.jar"/>
 	<classpathentry sourcepath="WORKSPACE/JFireBase/src" kind="var" path="WORKSPACE/JFireBase/dist/JFireBase.jar"/>
 	<classpathentry kind="lib" path="dist/birt/lib/js.jar"/>
-	<classpathentry sourcepath="/org.eclipse.datatools.connectivity.oda" kind="lib" path="dist/birt/lib/org.eclipse.datatools.connectivity.oda_3.0.1.200604281.jar"/>
+	<classpathentry sourcepath="/home/alex/tmp/birt-runtime-src.zip" kind="lib" path="dist/birt/lib/engineapi.jar"/>
+	<classpathentry sourcepath="/home/alex/tmp/birt-core-src.zip" kind="lib" path="dist/birt/lib/coreapi.jar"/>
+	<classpathentry kind="lib" path="dist/birt/lib/oda.jar"/>
 	<classpathentry sourcepath="/WORKSPACE/JFireScripting" kind="var" path="WORKSPACE/JFireScripting/dist/JFireScripting.jar"/>
-	<classpathentry sourcepath="/org.eclipse.birt.core/src" kind="lib" path="dist/birt/lib/coreapi.jar"/>
-	<classpathentry sourcepath="/org.eclipse.birt.report.engine/src" kind="lib" path="dist/birt/lib/engineapi.jar"/>
 	<classpathentry kind="lib" path="dist/birt/lib/modelapi.jar"/>
-	<classpathentry kind="lib" path="dist/birt/lib/dataadaptorapi.jar"/>
 	<classpathentry sourcepath="WORKSPACE/NightLabsJDO/src" kind="var" path="WORKSPACE/NightLabsJDO/dist/NightLabsJDO.jar"/>
 	<classpathentry kind="var" path="XERCES"/>
+	<classpathentry kind="lib" path="dist/birt/lib/dataadapterapi.jar"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>

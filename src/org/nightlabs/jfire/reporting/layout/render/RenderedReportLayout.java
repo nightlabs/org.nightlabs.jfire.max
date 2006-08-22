@@ -24,7 +24,7 @@
  *                                                                             *
  ******************************************************************************/
 
-package org.nightlabs.jfire.reporting.layout;
+package org.nightlabs.jfire.reporting.layout.render;
 
 import java.io.Serializable;
 import java.util.Date;
@@ -51,12 +51,16 @@ public class RenderedReportLayout implements Serializable {
 
 		private ReportRegistryItemID reportRegistryItemID;		
 		private Birt.OutputFormat outputFormat;		
-		private Date timestamp;		
+		private Date timestamp;
+		private boolean zipped;
+		private String entryFileName;
 		
 		public Header(ReportRegistryItemID reportRegistryItemID, OutputFormat outputFormat, Date timestamp) {
 			this.reportRegistryItemID = reportRegistryItemID;
 			this.timestamp = timestamp;
 			this.outputFormat = outputFormat;
+			this.zipped = false;
+			this.entryFileName = "renderedLayout."+outputFormat.toString();
 		}
 
 		/**
@@ -100,6 +104,41 @@ public class RenderedReportLayout implements Serializable {
 		public void setTimestamp(Date timestamp) {
 			this.timestamp = timestamp;
 		}
+
+		/**
+		 * Returns the file name of the entry of the renderedLayout.
+		 * Defaults to 'renderedLayout.'[OUTPUTFORMAT].
+		 * @return the entryFileName
+		 */
+		public String getEntryFileName() {
+			return entryFileName;
+		}
+
+		/**
+		 * @param entryFileName the entryFileName to set
+		 */
+		public void setEntryFileName(String entryFileName) {
+			this.entryFileName = entryFileName;
+		}
+
+		/**
+		 * Returns whether the data of the {@link RenderedReportLayout}
+		 * is zipped (compressed).
+		 * 
+		 * @return the zipped
+		 */
+		public boolean isZipped() {
+			return zipped;
+		}
+
+		/**
+		 * @param zipped the zipped to set
+		 */
+		public void setZipped(boolean zipped) {
+			this.zipped = zipped;
+		}
+		
+		
 	}
 	
 	private Header header;

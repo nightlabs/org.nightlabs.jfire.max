@@ -46,8 +46,10 @@ import javax.naming.NamingException;
 
 import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
+import org.eclipse.birt.core.framework.IConfigurationElement;
 import org.eclipse.birt.core.framework.Platform;
 import org.eclipse.birt.core.framework.PlatformConfig;
+import org.eclipse.birt.report.engine.api.EngineConfig;
 import org.eclipse.birt.report.engine.api.EngineException;
 import org.eclipse.birt.report.engine.api.HTMLRenderOption;
 import org.eclipse.birt.report.engine.api.IReportRunnable;
@@ -63,10 +65,14 @@ import org.nightlabs.jfire.base.BaseSessionBeanImpl;
 import org.nightlabs.jfire.config.ConfigSetup;
 import org.nightlabs.jfire.config.UserConfigSetup;
 import org.nightlabs.jfire.reporting.config.ReportLayoutConfigModule;
-import org.nightlabs.jfire.reporting.layout.RenderedReportLayout;
+import org.nightlabs.jfire.reporting.layout.ReportRegistry;
 import org.nightlabs.jfire.reporting.layout.ReportRegistryItem;
 import org.nightlabs.jfire.reporting.layout.ReportRegistryItemCarrier;
 import org.nightlabs.jfire.reporting.layout.id.ReportRegistryItemID;
+import org.nightlabs.jfire.reporting.layout.render.RenderedReportLayout;
+import org.nightlabs.jfire.reporting.layout.render.RenderManager;
+import org.nightlabs.jfire.reporting.layout.render.ReportLayoutRendererHTML;
+import org.nightlabs.jfire.reporting.layout.render.ReportLayoutRendererPDF;
 import org.nightlabs.jfire.reporting.oda.jdojs.JDOJSResultSet;
 import org.nightlabs.jfire.reporting.oda.jdojs.JDOJSResultSetMetaData;
 import org.nightlabs.jfire.reporting.oda.jdojs.server.ServerJDOJSProxy;
@@ -76,8 +82,6 @@ import org.nightlabs.jfire.reporting.oda.jdoql.server.ServerJDOQLProxy;
 import org.nightlabs.jfire.reporting.oda.jfs.ScriptExecutorJavaClassReporting;
 import org.nightlabs.jfire.reporting.oda.jfs.server.ServerJFSQueryProxy;
 import org.nightlabs.jfire.reporting.platform.RAPlatformContext;
-import org.nightlabs.jfire.reporting.platform.ReportingManager;
-import org.nightlabs.jfire.reporting.platform.ReportingManagerFactory;
 import org.nightlabs.jfire.scripting.ScriptRegistry;
 import org.nightlabs.jfire.scripting.id.ScriptRegistryItemID;
 import org.nightlabs.jfire.servermanager.JFireServerManager;
@@ -359,10 +363,14 @@ implements SessionBean
 							"JFireReporting.ear"+File.separator+"birt"+File.separator;
  
 					System.setProperty(Platform.PROPERTY_BIRT_HOME, birtHome);
-					PlatformConfig config = new PlatformConfig();
-					config.setProperty(Platform.PROPERTY_BIRT_HOME, birtHome);
+					EngineConfig config = new EngineConfig();
+					config.setEngineHome(birtHome);
+					config.setLogConfig(birtHome, java.util.logging.Level.ALL);					
+//					PlatformConfig config = new PlatformConfig();
+//					config.setProperty(Platform.PROPERTY_BIRT_HOME, birtHome);
+//					config.set
 					
-					RAPlatformContext platformContext = new RAPlatformContext(birtHome);
+					RAPlatformContext platformContext = new RAPlatformContext(birtHome);					
 					config.setPlatformContext(platformContext);
 					Platform.startup(config);
 //					Platform.initialize(platformContext);
@@ -381,12 +389,20 @@ implements SessionBean
 			throw new ModuleException(e);
 		}
 
-		
 
 		PersistenceManager pm;
 		pm = getPersistenceManager();
 		JFireServerManager jfireServerManager = getJFireServerManager();
 		try {
+
+			// init layout renderer
+			ReportRegistry registry = ReportRegistry.getReportRegistry(pm);
+			try {
+				registry.registerReportRenderer(ReportLayoutRendererHTML.class);
+				registry.registerReportRenderer(ReportLayoutRendererPDF.class);
+			} catch (Exception e) {
+				logger.warn("Could not initially register HTML ReportLayoutRenderer when initializing ReportRegistry.", e);
+			}
 			
 			// Init scripts before module metat data check
 			initRegisterScripts(pm, jfireServerManager);
@@ -417,38 +433,6 @@ implements SessionBean
 		}
 		
 		
-	}
-	
-	/**
-	 * @throws ModuleException
-	 *
-	 * @ejb.interface-method
-	 * @ejb.permission role-name="_Guest_"
-	 * @ejb.transaction type = "Required"
-	 */
-	public void test()
-	throws ModuleException
-	{
-		JFireServerManager serverManager = getJFireServerManager();
-		try {
-			ReportingManagerFactory engineFactory = ReportingManagerFactory.getReportingManagerFactory(getInitialContext(getOrganisationID()), getOrganisationID());
-			ReportEngine reportEngine =  engineFactory.getReportEngine();
-			String filePre = Utils.addFinalSlash(serverManager.getJFireServerConfigModule().getJ2ee().getJ2eeDeployBaseDirectory())+
-			"JFireReporting.ear/birt/";
-			IReportRunnable report = reportEngine.openReportDesign(filePre + "testJDO.rptdesign");
-//			IReportRunnable report = reportEngine.openReportDesign(filePre + "testreport.rptdesign");
-			IRunAndRenderTask task = reportEngine.createRunAndRenderTask(report);
-			HTMLRenderOption options = new HTMLRenderOption( );
-			options.setOutputFormat( HTMLRenderOption.OUTPUT_FORMAT_HTML );
-			options.setOutputFileName( filePre + "testreport.html" );
-			task.setRenderOption( options );
-			task.run();
-//			get
-		} catch (Throwable t) {
-			throw new ModuleException(t);
-		} finally {
-			serverManager.close();			
-		}
 	}
 	
 	/**
@@ -745,7 +729,7 @@ implements SessionBean
 		PersistenceManager pm;
 		pm = getPersistenceManager();
 		try {
-			ReportingManager rm = getReportingManagerFactory().getReportingManager();
+			RenderManager rm = getReportingManagerFactory().createRenderManager();
 			try {
 				try {
 					return rm.renderReport(pm, reportLayoutID, params, Birt.parseOutputFormat(format));

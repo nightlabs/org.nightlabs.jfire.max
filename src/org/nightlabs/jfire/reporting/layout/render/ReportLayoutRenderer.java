@@ -1,7 +1,7 @@
 /**
  * 
  */
-package org.nightlabs.jfire.reporting.layout;
+package org.nightlabs.jfire.reporting.layout.render;
 
 import java.util.Map;
 
@@ -11,6 +11,7 @@ import org.eclipse.birt.report.engine.api.EngineException;
 import org.eclipse.birt.report.engine.api.IRunAndRenderTask;
 import org.nightlabs.jfire.reporting.Birt;
 import org.nightlabs.jfire.reporting.Birt.OutputFormat;
+import org.nightlabs.jfire.reporting.layout.ReportRegistry;
 import org.nightlabs.jfire.reporting.layout.id.ReportRegistryItemID;
 
 /**

@@ -24,7 +24,7 @@
  *                                                                             *
  ******************************************************************************/
 
-package org.nightlabs.jfire.reporting.platform;
+package org.nightlabs.jfire.reporting;
 
 import java.io.Serializable;
 
@@ -37,8 +37,19 @@ import org.eclipse.birt.report.engine.api.HTMLCompleteImageHandler;
 import org.eclipse.birt.report.engine.api.HTMLEmitterConfig;
 import org.eclipse.birt.report.engine.api.HTMLRenderOption;
 import org.eclipse.birt.report.engine.api.ReportEngine;
+import org.nightlabs.jfire.reporting.layout.ReportLayout;
+import org.nightlabs.jfire.reporting.layout.render.RenderManager;
 
 /**
+ * {@link ReportingManagerFactory} is the entry point for operations with 
+ * stored {@link ReportLayout}s. One instance of the factory is bound to JNDI
+ * for each organisation (see {@link #ReportingManagerFactory(InitialContext, String)}).
+ * 
+ * Currently the factory allows access to a configured BIRT {@link ReportEngine} that
+ * should be used to create new engine tasks. Additionally the factory can serve  
+ * {@link RenderManager} that help rendering reports according to user-given paramters. 
+ * 
+ * 
  * @author Alexander Bieber <alex[AT]nightlabs[DOT]de>
  *
  */
@@ -53,6 +64,14 @@ public class ReportingManagerFactory implements Serializable {
 	
 	private ReportEngine reportEngine;
 	
+	/**
+	 * Creates a new ReportingManagerFactory and binds it into JNDI with
+	 * {@link #JNDI_PREFIX} followed by the given organisatinID as name.
+	 * 
+	 * @param ctx The initial context to use.
+	 * @param organisationID The organisationID this factory should be used for
+	 * @throws NamingException 
+	 */
 	public ReportingManagerFactory(InitialContext ctx, String organisationID)
 	throws NamingException
 	{
@@ -73,6 +92,8 @@ public class ReportingManagerFactory implements Serializable {
 
 	/**
 	 * Get (and create if neccessary) the ReportEngine for this factory (organisation).
+	 * {@link ReportEngine}'s methods hopefully are threadsafe and can be called without
+	 * any additional care.
 	 */
 	public ReportEngine getReportEngine() {
 		if (reportEngine == null) {
@@ -92,8 +113,13 @@ public class ReportingManagerFactory implements Serializable {
 		return reportEngine;
 	}
 	
-	public ReportingManager getReportingManager() {
-		return new ReportingManager(this);
+	/**
+	 * Obtain a new instance of {@link RenderManager} as a helper to render reports.
+	 * 
+	 * @return A new instance of {@link RenderManager}.
+	 */
+	public RenderManager createRenderManager() {
+		return new RenderManager(this);
 	}
 	
 	

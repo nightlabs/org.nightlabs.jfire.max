@@ -121,7 +121,7 @@ public class SimpleProductType extends ProductType
 	}
 
 	/**
-	 * @jdo.field persistence-modifier="persistent"
+	 * @jdo.field persistence-modifier="persistent" mapped-by="simpleProductType"
 	 */
 	private SimpleProductTypeName name;
 

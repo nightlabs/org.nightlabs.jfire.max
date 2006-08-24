@@ -8,8 +8,8 @@
     <requires/> <!-- default requires: uses .classpath file -->
     <provides/> <!-- default provides: provides dist/<projectname>.jar in all variations -->
     <provides
-    	path="WORKSPACE/JFireReporting/dist/birt/lib/org.eclipse.datatools.connectivity.oda_3.0.1.200604281.jar"
-    	location="JFireReporting/dist/birt/lib/org.eclipse.datatools.connectivity.oda_3.0.1.200604281.jar" />
+    	path="WORKSPACE/JFireReporting/dist/birt/lib/oda.jar"
+    	location="JFireReporting/dist/birt/lib/oda.jar" />
     <publishes location="JFireReporting/dist/JFireReporting.jar"/>
     <javadoc path="JFireReporting/src"/>
     <javadoc path="JFireReporting/ejbsrc"/>

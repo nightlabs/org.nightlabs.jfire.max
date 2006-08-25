@@ -8,8 +8,8 @@
     <requires/> <!-- default requires: uses .classpath file -->
     <provides/> <!-- default provides: provides dist/<projectname>.jar in all variations -->
     <publishes location="JFireReportingTrade/dist/JFireReportingTrade.jar"/>
-    <javadoc path="JFireReporting/src"/>
-    <javadoc path="JFireReporting/ejbsrc"/>
+    <javadoc path="JFireReportingTrade/src"/>
+    <javadoc path="JFireReportingTrade/ejbsrc"/>
   </project>
 
 </nightlybuild>

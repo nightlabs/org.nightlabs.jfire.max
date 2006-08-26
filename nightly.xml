@@ -10,6 +10,9 @@
     <provides
     	path="WORKSPACE/JFireReporting/dist/birt/lib/oda.jar"
     	location="JFireReporting/dist/birt/lib/oda.jar" />
+    <provides
+    	path="/JFireReporting/dist/birt/lib/oda.jar"
+    	location="JFireReporting/dist/birt/lib/oda.jar" />
     <publishes location="JFireReporting/dist/JFireReporting.jar"/>
     <javadoc path="JFireReporting/src"/>
     <javadoc path="JFireReporting/ejbsrc"/>

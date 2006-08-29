@@ -26,17 +26,19 @@
 
 package org.nightlabs.jfire.accounting;
 
-import java.io.Serializable;
+import java.io.IOException;
 import java.lang.reflect.Method;
 import java.rmi.RemoteException;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
+import java.util.Set;
 
 import javax.ejb.CreateException;
 import javax.ejb.EJBException;
@@ -81,20 +83,12 @@ import org.nightlabs.jfire.accounting.pay.id.ModeOfPaymentFlavourID;
 import org.nightlabs.jfire.accounting.pay.id.PaymentDataID;
 import org.nightlabs.jfire.accounting.pay.id.PaymentID;
 import org.nightlabs.jfire.accounting.priceconfig.FetchGroupsPriceConfig;
-import org.nightlabs.jfire.asyncinvoke.AsyncInvoke;
-import org.nightlabs.jfire.asyncinvoke.AsyncInvokeEnvelope;
-import org.nightlabs.jfire.asyncinvoke.ErrorCallback;
-import org.nightlabs.jfire.asyncinvoke.Invocation;
-import org.nightlabs.jfire.asyncinvoke.SuccessCallback;
-import org.nightlabs.jfire.asyncinvoke.UndeliverableCallback;
+import org.nightlabs.jfire.accounting.query.InvoiceQuery;
 import org.nightlabs.jfire.base.BaseSessionBeanImpl;
-import org.nightlabs.jfire.organisation.Organisation;
 import org.nightlabs.jfire.security.User;
 import org.nightlabs.jfire.store.DeliveryNote;
 import org.nightlabs.jfire.store.NestedProductType;
 import org.nightlabs.jfire.store.ProductType;
-import org.nightlabs.jfire.store.StoreManager;
-import org.nightlabs.jfire.store.StoreManagerUtil;
 import org.nightlabs.jfire.store.id.DeliveryNoteID;
 import org.nightlabs.jfire.store.id.ProductTypeID;
 import org.nightlabs.jfire.trade.Article;
@@ -175,230 +169,222 @@ public abstract class AccountingManagerBean
 	}
 	
 	/**
-	 * @throws ModuleException
+	 * @throws IOException @throws IOException While loading an icon from a local resource, this might happen and we don't care in the initialize method.
 	 *
 	 * @ejb.interface-method
 	 * @ejb.transaction type = "Required"
 	 * @ejb.permission role-name="_Guest_"
 	 */
 	public void initialize()
-		throws ModuleException
+	throws IOException
 	{
+		PersistenceManager pm = getPersistenceManager();
 		try {
-			PersistenceManager pm = getPersistenceManager();
-			try {
-				MoneyFlowDimension priceFragmentDimension = MoneyFlowDimension.getMoneyFlowDimension(pm, PriceFragmentDimension.MONEY_FLOW_DIMENSION_ID);
-				if (priceFragmentDimension == null) {
-					priceFragmentDimension = new PriceFragmentDimension();
-					pm.makePersistent(priceFragmentDimension);
-				}
-				
-				MoneyFlowDimension ownerDimension = MoneyFlowDimension.getMoneyFlowDimension(pm, OwnerDimension.MONEY_FLOW_DIMENSION_ID);
-				if (ownerDimension == null) {
-					ownerDimension = new OwnerDimension();
-					pm.makePersistent(ownerDimension);
-				}
-				
-				MoneyFlowDimension sourceOrgDimension = MoneyFlowDimension.getMoneyFlowDimension(pm, SourceOrganisationDimension.MONEY_FLOW_DIMENSION_ID);
-				if (sourceOrgDimension == null) {
-					sourceOrgDimension = new SourceOrganisationDimension();
-					pm.makePersistent(sourceOrgDimension);
-				}
-				
-				// check, whether the datastore is already initialized
-				pm.getExtent(Currency.class);
-				try {
-					pm.getObjectById(CurrencyID.create("EUR"), true);
-					return; // already initialized
-				} catch (JDOObjectNotFoundException x) {
-					// datastore not yet initialized
-				}
-	
-				// Create the currencies EUR and CHF
-				Currency currency;
-	
-				// TODO currencySymbol (second "EUR") should be €,
-				// but this doesn't work yet because of a charset problem with the db
-				currency = new Currency("EUR", "EUR", 2);
-				pm.makePersistent(currency);
-	
-				currency = new Currency("CHF", "CHF", 2);
-				pm.makePersistent(currency);
-	
-				// create PriceFragmentTypes for Swiss and German VAT
-				PriceFragmentType priceFragmentType = new PriceFragmentType(getRootOrganisationID(), "vat-de-16-net");
-				priceFragmentType.getName().setText(Locale.ENGLISH.getLanguage(), "VAT Germany 16% Net");
-				priceFragmentType.getName().setText(Locale.GERMAN.getLanguage(), "MwSt. Deutschland 16% Netto");
-				priceFragmentType.setContainerPriceFragmentType(PriceFragmentType.getTotalPriceFragmentType(pm));
-				pm.makePersistent(priceFragmentType);
-	
-				priceFragmentType = new PriceFragmentType(getRootOrganisationID(), "vat-de-16-val");
-				priceFragmentType.getName().setText(Locale.ENGLISH.getLanguage(), "VAT Germany 16% Value");
-				priceFragmentType.getName().setText(Locale.GERMAN.getLanguage(), "MwSt. Deutschland 16% Wert");
-				priceFragmentType.setContainerPriceFragmentType(PriceFragmentType.getTotalPriceFragmentType(pm));
-				pm.makePersistent(priceFragmentType);
-	
-				priceFragmentType = new PriceFragmentType(getRootOrganisationID(), "vat-de-7-net");
-				priceFragmentType.getName().setText(Locale.ENGLISH.getLanguage(), "VAT Germany 7% Net");
-				priceFragmentType.setContainerPriceFragmentType(PriceFragmentType.getTotalPriceFragmentType(pm));
-				pm.makePersistent(priceFragmentType);
-	
-				priceFragmentType = new PriceFragmentType(getRootOrganisationID(), "vat-de-7-val");
-				priceFragmentType.getName().setText(Locale.ENGLISH.getLanguage(), "VAT Germany 7% Value");
-				priceFragmentType.setContainerPriceFragmentType(PriceFragmentType.getTotalPriceFragmentType(pm));
-				pm.makePersistent(priceFragmentType);
-	
-				priceFragmentType = new PriceFragmentType(getRootOrganisationID(), "vat-ch-7_6-net");
-				priceFragmentType.getName().setText(Locale.ENGLISH.getLanguage(), "VAT Switzerland 7.6% Net");
-				priceFragmentType.setContainerPriceFragmentType(PriceFragmentType.getTotalPriceFragmentType(pm));
-				pm.makePersistent(priceFragmentType);
-	
-				priceFragmentType = new PriceFragmentType(getRootOrganisationID(), "vat-ch-7_6-val");
-				priceFragmentType.getName().setText(Locale.ENGLISH.getLanguage(), "VAT Switzerland 7.6% Value");
-				priceFragmentType.setContainerPriceFragmentType(PriceFragmentType.getTotalPriceFragmentType(pm));
-				pm.makePersistent(priceFragmentType);
-	
-				Accounting accounting = Accounting.getAccounting(pm);
-				Trader trader = Trader.getTrader(pm);
-	
-	
-	
-	
-				LegalEntity anonymousCustomer = LegalEntity.getAnonymousCustomer(pm);
-				CustomerGroup anonymousCustomerGroup = anonymousCustomer.getDefaultCustomerGroup();
-	
-	//		 create some ModeOfPayments
-				// Cash
-				ModeOfPayment modeOfPayment = new ModeOfPayment(ModeOfPaymentConst.MODE_OF_PAYMENT_ID_CASH);
-				modeOfPayment.getName().setText(Locale.ENGLISH.getLanguage(), "Cash");
-				modeOfPayment.getName().setText(Locale.GERMAN.getLanguage(), "Bargeld");
-				modeOfPayment.getName().setText(Locale.FRENCH.getLanguage(), "Argent Liquide");
-				ModeOfPaymentFlavour modeOfPaymentFlavour = modeOfPayment.createFlavour(ModeOfPaymentConst.MODE_OF_PAYMENT_FLAVOUR_ID_CASH);
-				modeOfPaymentFlavour.getName().setText(Locale.ENGLISH.getLanguage(), "Cash");
-				modeOfPaymentFlavour.getName().setText(Locale.GERMAN.getLanguage(), "Bargeld");
-				modeOfPaymentFlavour.getName().setText(Locale.FRENCH.getLanguage(), "Argent Liquide");
-				modeOfPaymentFlavour.loadIconFromResource();
-				pm.makePersistent(modeOfPayment);
-				trader.getDefaultCustomerGroupForKnownCustomer().addModeOfPayment(modeOfPayment);
-				anonymousCustomerGroup.addModeOfPayment(modeOfPayment);
-				
-				// we need this later for payment processor registration
-				ModeOfPayment modeOfPaymentCash = modeOfPayment;
-	
-				// No payment - this is a dummy MOP which means, the payment is postponed without
-				//   specifying a certain real MOP
-				modeOfPayment = new ModeOfPayment(ModeOfPaymentConst.MODE_OF_PAYMENT_ID_NON_PAYMENT);
-				modeOfPayment.getName().setText(Locale.ENGLISH.getLanguage(), "Non-Payment");
-				modeOfPayment.getName().setText(Locale.GERMAN.getLanguage(), "Nichtzahlung");
-				modeOfPaymentFlavour = modeOfPayment.createFlavour(ModeOfPaymentConst.MODE_OF_PAYMENT_FLAVOUR_ID_NON_PAYMENT);
-				modeOfPaymentFlavour.getName().setText(Locale.ENGLISH.getLanguage(), "Non-Payment");
-				modeOfPaymentFlavour.getName().setText(Locale.GERMAN.getLanguage(), "Nichtzahlung");
-				modeOfPaymentFlavour.loadIconFromResource();
-				pm.makePersistent(modeOfPayment);
-				trader.getDefaultCustomerGroupForKnownCustomer().addModeOfPayment(modeOfPayment);
-	
-				// we need this later for payment processor registration
-				ModeOfPayment modeOfPaymentNonPayment = modeOfPayment;
-				
-	
-				// Credit Card - VISA, Master, AmEx, Diners
-				modeOfPayment = new ModeOfPayment(ModeOfPaymentConst.MODE_OF_PAYMENT_ID_CREDIT_CARD);
-				modeOfPayment.getName().setText(Locale.ENGLISH.getLanguage(), "Credit Card");
-				modeOfPayment.getName().setText(Locale.GERMAN.getLanguage(), "Kreditkarte");
-				modeOfPayment.getName().setText(Locale.FRENCH.getLanguage(), "Carte de Crédit");
-				modeOfPaymentFlavour = modeOfPayment.createFlavour(ModeOfPaymentConst.MODE_OF_PAYMENT_FLAVOUR_ID_VISA);
-				modeOfPaymentFlavour.getName().setText(Locale.ENGLISH.getLanguage(), "VISA");
-				modeOfPaymentFlavour.loadIconFromResource();
-				modeOfPaymentFlavour = modeOfPayment.createFlavour(ModeOfPaymentConst.MODE_OF_PAYMENT_FLAVOUR_ID_MASTER_CARD);
-				modeOfPaymentFlavour.getName().setText(Locale.ENGLISH.getLanguage(), "MasterCard");
-				modeOfPaymentFlavour.loadIconFromResource();
-				modeOfPaymentFlavour = modeOfPayment.createFlavour(ModeOfPaymentConst.MODE_OF_PAYMENT_FLAVOUR_ID_AMERICAN_EXPRESS);
-				modeOfPaymentFlavour.getName().setText(Locale.ENGLISH.getLanguage(), "American Express");
-				modeOfPaymentFlavour.loadIconFromResource();
-				modeOfPaymentFlavour = modeOfPayment.createFlavour(ModeOfPaymentConst.MODE_OF_PAYMENT_FLAVOUR_ID_DINERS_CLUB);
-				modeOfPaymentFlavour.getName().setText(Locale.ENGLISH.getLanguage(), "Diners Club");
-				modeOfPaymentFlavour.loadIconFromResource();
-				pm.makePersistent(modeOfPayment);
-				trader.getDefaultCustomerGroupForKnownCustomer().addModeOfPayment(modeOfPayment);
-				anonymousCustomerGroup.addModeOfPayment(modeOfPayment);
-	
-				// we need this later for payment processor registration
-				ModeOfPayment modeOfPaymentCreditCard = modeOfPayment;
-	
-				// Bank Transfer
-				modeOfPayment = new ModeOfPayment(ModeOfPaymentConst.MODE_OF_PAYMENT_ID_BANK_TRANSFER);
-				modeOfPayment.getName().setText(Locale.ENGLISH.getLanguage(), "Bank Transfer");
-				modeOfPayment.getName().setText(Locale.GERMAN.getLanguage(), "Überweisung");
-				modeOfPayment.getName().setText(Locale.FRENCH.getLanguage(), "Virement");
-				modeOfPaymentFlavour = modeOfPayment.createFlavour(ModeOfPaymentConst.MODE_OF_PAYMENT_FLAVOUR_ID_BANK_TRANSFER);
-				modeOfPaymentFlavour.getName().setText(Locale.ENGLISH.getLanguage(), "Bank Transfer");
-				modeOfPaymentFlavour.getName().setText(Locale.GERMAN.getLanguage(), "Überweisung");
-				modeOfPaymentFlavour.getName().setText(Locale.FRENCH.getLanguage(), "Virement");
-				modeOfPaymentFlavour.loadIconFromResource();
-				pm.makePersistent(modeOfPayment);
-				trader.getDefaultCustomerGroupForKnownCustomer().addModeOfPayment(modeOfPayment);
-	
-				// we need this later for payment processor registration
-				ModeOfPayment modeOfPaymentBankTransfer = modeOfPayment;
-	
-				// Debit Note
-				modeOfPayment = new ModeOfPayment(ModeOfPaymentConst.MODE_OF_PAYMENT_ID_DEBIT_NOTE);
-				modeOfPayment.getName().setText(Locale.ENGLISH.getLanguage(), "Debit Note");
-				modeOfPayment.getName().setText(Locale.GERMAN.getLanguage(), "Lastschrift");
-				modeOfPayment.getName().setText(Locale.FRENCH.getLanguage(), "Note de Débit");
-				modeOfPaymentFlavour = modeOfPayment.createFlavour(ModeOfPaymentConst.MODE_OF_PAYMENT_FLAVOUR_ID_DEBIT_NOTE);
-				modeOfPaymentFlavour.getName().setText(Locale.ENGLISH.getLanguage(), "Debit Note");
-				modeOfPaymentFlavour.getName().setText(Locale.GERMAN.getLanguage(), "Lastschrift");
-				modeOfPaymentFlavour.getName().setText(Locale.FRENCH.getLanguage(), "Note de Débit");
-				modeOfPaymentFlavour.loadIconFromResource();
-				pm.makePersistent(modeOfPayment);
-				trader.getDefaultCustomerGroupForKnownCustomer().addModeOfPayment(modeOfPayment);
-	
-				// we need this later for payment processor registration
-				ModeOfPayment modeOfPaymentDebitNote = modeOfPayment;
-	
-	
-				// create some ServerPaymentProcessors
-				ServerPaymentProcessorCash serverPaymentProcessorCash = ServerPaymentProcessorCash.getServerPaymentProcessorCash(pm);
-				serverPaymentProcessorCash.getName().setText(Locale.ENGLISH.getLanguage(), "Cash Payment");
-				serverPaymentProcessorCash.getName().setText(Locale.GERMAN.getLanguage(), "Barzahlung");
-				serverPaymentProcessorCash.getName().setText(Locale.FRENCH.getLanguage(), "Paiement Argent Liquide");
-				serverPaymentProcessorCash.addModeOfPayment(modeOfPaymentCash);
-	
-				ServerPaymentProcessorNonPayment serverPaymentProcessorNonPayment =
-					ServerPaymentProcessorNonPayment.getServerPaymentProcessorNonPayment(pm);
-				serverPaymentProcessorNonPayment.getName().setText(Locale.ENGLISH.getLanguage(), "Non-Payment (payment will be postponed)");
-				serverPaymentProcessorNonPayment.getName().setText(Locale.GERMAN.getLanguage(), "Nichtzahlung (Zahlung wird verschoben)");
-				serverPaymentProcessorNonPayment.addModeOfPayment(modeOfPaymentNonPayment);
-	
-				ServerPaymentProcessorCreditCardDummyForClientPayment serverPaymentProcessorCreditCardDummyForClientPayment =
-						ServerPaymentProcessorCreditCardDummyForClientPayment.getServerPaymentProcessorCreditCardDummyForClientPayment(pm);
-				serverPaymentProcessorCreditCardDummyForClientPayment.getName().setText(Locale.ENGLISH.getLanguage(), "Dummy for client-sided Credit Card Payment");
-				serverPaymentProcessorCreditCardDummyForClientPayment.getName().setText(Locale.GERMAN.getLanguage(), "Pseudo-Modul für client-seitige Kreditkarten-Zahlungen");
-				serverPaymentProcessorCreditCardDummyForClientPayment.addModeOfPayment(modeOfPaymentCreditCard);
-	
-				ServerPaymentProcessorSaferPay serverPaymentProcessorSaferPay = ServerPaymentProcessorSaferPay.getServerPaymentProcessorSaferPay(pm);
-				serverPaymentProcessorSaferPay.getName().setText(Locale.ENGLISH.getLanguage(), "SaferPay");
-				serverPaymentProcessorSaferPay.addModeOfPayment(modeOfPaymentCreditCard);
-	
-				ServerPaymentProcessorBankTransferGermany serverPaymentProcessorBankTransferGermany = ServerPaymentProcessorBankTransferGermany.getServerPaymentProcessorBankTransferGermany(pm);
-				serverPaymentProcessorBankTransferGermany.getName().setText(Locale.ENGLISH.getLanguage(), "Bank transfer within Germany");
-				serverPaymentProcessorBankTransferGermany.getName().setText(Locale.GERMAN.getLanguage(), "Überweisung innerhalb Deutschlands");
-				serverPaymentProcessorBankTransferGermany.addModeOfPayment(modeOfPaymentBankTransfer);
-	
-				ServerPaymentProcessorDebitNoteGermany serverPaymentProcessorDebitNoteGermany = ServerPaymentProcessorDebitNoteGermany.getServerPaymentProcessorDebitNoteGermany(pm);
-				serverPaymentProcessorDebitNoteGermany.getName().setText(Locale.ENGLISH.getLanguage(), "Debit Note within Germany");
-				serverPaymentProcessorDebitNoteGermany.getName().setText(Locale.GERMAN.getLanguage(), "Lastschrift innerhalb Deutschlands");
-				serverPaymentProcessorDebitNoteGermany.addModeOfPayment(modeOfPaymentDebitNote);
-			} finally {
-				pm.close();
+			MoneyFlowDimension priceFragmentDimension = MoneyFlowDimension.getMoneyFlowDimension(pm, PriceFragmentDimension.MONEY_FLOW_DIMENSION_ID);
+			if (priceFragmentDimension == null) {
+				priceFragmentDimension = new PriceFragmentDimension();
+				pm.makePersistent(priceFragmentDimension);
 			}
-		} catch (RuntimeException x) {
-			throw x;
-		} catch (ModuleException x) {
-			throw x;
-		} catch (Exception x) {
-			throw new ModuleException(x);
+
+			MoneyFlowDimension ownerDimension = MoneyFlowDimension.getMoneyFlowDimension(pm, OwnerDimension.MONEY_FLOW_DIMENSION_ID);
+			if (ownerDimension == null) {
+				ownerDimension = new OwnerDimension();
+				pm.makePersistent(ownerDimension);
+			}
+
+			MoneyFlowDimension sourceOrgDimension = MoneyFlowDimension.getMoneyFlowDimension(pm, SourceOrganisationDimension.MONEY_FLOW_DIMENSION_ID);
+			if (sourceOrgDimension == null) {
+				sourceOrgDimension = new SourceOrganisationDimension();
+				pm.makePersistent(sourceOrgDimension);
+			}
+
+			// check, whether the datastore is already initialized
+			pm.getExtent(Currency.class);
+			try {
+				pm.getObjectById(CurrencyID.create("EUR"), true);
+				return; // already initialized
+			} catch (JDOObjectNotFoundException x) {
+				// datastore not yet initialized
+			}
+
+			// Create the currencies EUR and CHF
+			Currency currency;
+
+			// TODO currencySymbol (second "EUR") should be €,
+			// but this doesn't work yet because of a charset problem with the db
+			currency = new Currency("EUR", "EUR", 2);
+			pm.makePersistent(currency);
+
+			currency = new Currency("CHF", "CHF", 2);
+			pm.makePersistent(currency);
+
+			// create PriceFragmentTypes for Swiss and German VAT
+			PriceFragmentType priceFragmentType = new PriceFragmentType(getRootOrganisationID(), "vat-de-16-net");
+			priceFragmentType.getName().setText(Locale.ENGLISH.getLanguage(), "VAT Germany 16% Net");
+			priceFragmentType.getName().setText(Locale.GERMAN.getLanguage(), "MwSt. Deutschland 16% Netto");
+			priceFragmentType.setContainerPriceFragmentType(PriceFragmentType.getTotalPriceFragmentType(pm));
+			pm.makePersistent(priceFragmentType);
+
+			priceFragmentType = new PriceFragmentType(getRootOrganisationID(), "vat-de-16-val");
+			priceFragmentType.getName().setText(Locale.ENGLISH.getLanguage(), "VAT Germany 16% Value");
+			priceFragmentType.getName().setText(Locale.GERMAN.getLanguage(), "MwSt. Deutschland 16% Wert");
+			priceFragmentType.setContainerPriceFragmentType(PriceFragmentType.getTotalPriceFragmentType(pm));
+			pm.makePersistent(priceFragmentType);
+
+			priceFragmentType = new PriceFragmentType(getRootOrganisationID(), "vat-de-7-net");
+			priceFragmentType.getName().setText(Locale.ENGLISH.getLanguage(), "VAT Germany 7% Net");
+			priceFragmentType.setContainerPriceFragmentType(PriceFragmentType.getTotalPriceFragmentType(pm));
+			pm.makePersistent(priceFragmentType);
+
+			priceFragmentType = new PriceFragmentType(getRootOrganisationID(), "vat-de-7-val");
+			priceFragmentType.getName().setText(Locale.ENGLISH.getLanguage(), "VAT Germany 7% Value");
+			priceFragmentType.setContainerPriceFragmentType(PriceFragmentType.getTotalPriceFragmentType(pm));
+			pm.makePersistent(priceFragmentType);
+
+			priceFragmentType = new PriceFragmentType(getRootOrganisationID(), "vat-ch-7_6-net");
+			priceFragmentType.getName().setText(Locale.ENGLISH.getLanguage(), "VAT Switzerland 7.6% Net");
+			priceFragmentType.setContainerPriceFragmentType(PriceFragmentType.getTotalPriceFragmentType(pm));
+			pm.makePersistent(priceFragmentType);
+
+			priceFragmentType = new PriceFragmentType(getRootOrganisationID(), "vat-ch-7_6-val");
+			priceFragmentType.getName().setText(Locale.ENGLISH.getLanguage(), "VAT Switzerland 7.6% Value");
+			priceFragmentType.setContainerPriceFragmentType(PriceFragmentType.getTotalPriceFragmentType(pm));
+			pm.makePersistent(priceFragmentType);
+
+			Accounting accounting = Accounting.getAccounting(pm);
+			Trader trader = Trader.getTrader(pm);
+
+
+
+
+			LegalEntity anonymousCustomer = LegalEntity.getAnonymousCustomer(pm);
+			CustomerGroup anonymousCustomerGroup = anonymousCustomer.getDefaultCustomerGroup();
+
+			//		 create some ModeOfPayments
+			// Cash
+			ModeOfPayment modeOfPayment = new ModeOfPayment(ModeOfPaymentConst.MODE_OF_PAYMENT_ID_CASH);
+			modeOfPayment.getName().setText(Locale.ENGLISH.getLanguage(), "Cash");
+			modeOfPayment.getName().setText(Locale.GERMAN.getLanguage(), "Bargeld");
+			modeOfPayment.getName().setText(Locale.FRENCH.getLanguage(), "Argent Liquide");
+			ModeOfPaymentFlavour modeOfPaymentFlavour = modeOfPayment.createFlavour(ModeOfPaymentConst.MODE_OF_PAYMENT_FLAVOUR_ID_CASH);
+			modeOfPaymentFlavour.getName().setText(Locale.ENGLISH.getLanguage(), "Cash");
+			modeOfPaymentFlavour.getName().setText(Locale.GERMAN.getLanguage(), "Bargeld");
+			modeOfPaymentFlavour.getName().setText(Locale.FRENCH.getLanguage(), "Argent Liquide");
+			modeOfPaymentFlavour.loadIconFromResource();
+			pm.makePersistent(modeOfPayment);
+			trader.getDefaultCustomerGroupForKnownCustomer().addModeOfPayment(modeOfPayment);
+			anonymousCustomerGroup.addModeOfPayment(modeOfPayment);
+
+			// we need this later for payment processor registration
+			ModeOfPayment modeOfPaymentCash = modeOfPayment;
+
+			// No payment - this is a dummy MOP which means, the payment is postponed without
+			//   specifying a certain real MOP
+			modeOfPayment = new ModeOfPayment(ModeOfPaymentConst.MODE_OF_PAYMENT_ID_NON_PAYMENT);
+			modeOfPayment.getName().setText(Locale.ENGLISH.getLanguage(), "Non-Payment");
+			modeOfPayment.getName().setText(Locale.GERMAN.getLanguage(), "Nichtzahlung");
+			modeOfPaymentFlavour = modeOfPayment.createFlavour(ModeOfPaymentConst.MODE_OF_PAYMENT_FLAVOUR_ID_NON_PAYMENT);
+			modeOfPaymentFlavour.getName().setText(Locale.ENGLISH.getLanguage(), "Non-Payment");
+			modeOfPaymentFlavour.getName().setText(Locale.GERMAN.getLanguage(), "Nichtzahlung");
+			modeOfPaymentFlavour.loadIconFromResource();
+			pm.makePersistent(modeOfPayment);
+			trader.getDefaultCustomerGroupForKnownCustomer().addModeOfPayment(modeOfPayment);
+
+			// we need this later for payment processor registration
+			ModeOfPayment modeOfPaymentNonPayment = modeOfPayment;
+
+
+			// Credit Card - VISA, Master, AmEx, Diners
+			modeOfPayment = new ModeOfPayment(ModeOfPaymentConst.MODE_OF_PAYMENT_ID_CREDIT_CARD);
+			modeOfPayment.getName().setText(Locale.ENGLISH.getLanguage(), "Credit Card");
+			modeOfPayment.getName().setText(Locale.GERMAN.getLanguage(), "Kreditkarte");
+			modeOfPayment.getName().setText(Locale.FRENCH.getLanguage(), "Carte de Crédit");
+			modeOfPaymentFlavour = modeOfPayment.createFlavour(ModeOfPaymentConst.MODE_OF_PAYMENT_FLAVOUR_ID_VISA);
+			modeOfPaymentFlavour.getName().setText(Locale.ENGLISH.getLanguage(), "VISA");
+			modeOfPaymentFlavour.loadIconFromResource();
+			modeOfPaymentFlavour = modeOfPayment.createFlavour(ModeOfPaymentConst.MODE_OF_PAYMENT_FLAVOUR_ID_MASTER_CARD);
+			modeOfPaymentFlavour.getName().setText(Locale.ENGLISH.getLanguage(), "MasterCard");
+			modeOfPaymentFlavour.loadIconFromResource();
+			modeOfPaymentFlavour = modeOfPayment.createFlavour(ModeOfPaymentConst.MODE_OF_PAYMENT_FLAVOUR_ID_AMERICAN_EXPRESS);
+			modeOfPaymentFlavour.getName().setText(Locale.ENGLISH.getLanguage(), "American Express");
+			modeOfPaymentFlavour.loadIconFromResource();
+			modeOfPaymentFlavour = modeOfPayment.createFlavour(ModeOfPaymentConst.MODE_OF_PAYMENT_FLAVOUR_ID_DINERS_CLUB);
+			modeOfPaymentFlavour.getName().setText(Locale.ENGLISH.getLanguage(), "Diners Club");
+			modeOfPaymentFlavour.loadIconFromResource();
+			pm.makePersistent(modeOfPayment);
+			trader.getDefaultCustomerGroupForKnownCustomer().addModeOfPayment(modeOfPayment);
+			anonymousCustomerGroup.addModeOfPayment(modeOfPayment);
+
+			// we need this later for payment processor registration
+			ModeOfPayment modeOfPaymentCreditCard = modeOfPayment;
+
+			// Bank Transfer
+			modeOfPayment = new ModeOfPayment(ModeOfPaymentConst.MODE_OF_PAYMENT_ID_BANK_TRANSFER);
+			modeOfPayment.getName().setText(Locale.ENGLISH.getLanguage(), "Bank Transfer");
+			modeOfPayment.getName().setText(Locale.GERMAN.getLanguage(), "Überweisung");
+			modeOfPayment.getName().setText(Locale.FRENCH.getLanguage(), "Virement");
+			modeOfPaymentFlavour = modeOfPayment.createFlavour(ModeOfPaymentConst.MODE_OF_PAYMENT_FLAVOUR_ID_BANK_TRANSFER);
+			modeOfPaymentFlavour.getName().setText(Locale.ENGLISH.getLanguage(), "Bank Transfer");
+			modeOfPaymentFlavour.getName().setText(Locale.GERMAN.getLanguage(), "Überweisung");
+			modeOfPaymentFlavour.getName().setText(Locale.FRENCH.getLanguage(), "Virement");
+			modeOfPaymentFlavour.loadIconFromResource();
+			pm.makePersistent(modeOfPayment);
+			trader.getDefaultCustomerGroupForKnownCustomer().addModeOfPayment(modeOfPayment);
+
+			// we need this later for payment processor registration
+			ModeOfPayment modeOfPaymentBankTransfer = modeOfPayment;
+
+			// Debit Note
+			modeOfPayment = new ModeOfPayment(ModeOfPaymentConst.MODE_OF_PAYMENT_ID_DEBIT_NOTE);
+			modeOfPayment.getName().setText(Locale.ENGLISH.getLanguage(), "Debit Note");
+			modeOfPayment.getName().setText(Locale.GERMAN.getLanguage(), "Lastschrift");
+			modeOfPayment.getName().setText(Locale.FRENCH.getLanguage(), "Note de Débit");
+			modeOfPaymentFlavour = modeOfPayment.createFlavour(ModeOfPaymentConst.MODE_OF_PAYMENT_FLAVOUR_ID_DEBIT_NOTE);
+			modeOfPaymentFlavour.getName().setText(Locale.ENGLISH.getLanguage(), "Debit Note");
+			modeOfPaymentFlavour.getName().setText(Locale.GERMAN.getLanguage(), "Lastschrift");
+			modeOfPaymentFlavour.getName().setText(Locale.FRENCH.getLanguage(), "Note de Débit");
+			modeOfPaymentFlavour.loadIconFromResource();
+			pm.makePersistent(modeOfPayment);
+			trader.getDefaultCustomerGroupForKnownCustomer().addModeOfPayment(modeOfPayment);
+
+			// we need this later for payment processor registration
+			ModeOfPayment modeOfPaymentDebitNote = modeOfPayment;
+
+
+			// create some ServerPaymentProcessors
+			ServerPaymentProcessorCash serverPaymentProcessorCash = ServerPaymentProcessorCash.getServerPaymentProcessorCash(pm);
+			serverPaymentProcessorCash.getName().setText(Locale.ENGLISH.getLanguage(), "Cash Payment");
+			serverPaymentProcessorCash.getName().setText(Locale.GERMAN.getLanguage(), "Barzahlung");
+			serverPaymentProcessorCash.getName().setText(Locale.FRENCH.getLanguage(), "Paiement Argent Liquide");
+			serverPaymentProcessorCash.addModeOfPayment(modeOfPaymentCash);
+
+			ServerPaymentProcessorNonPayment serverPaymentProcessorNonPayment =
+				ServerPaymentProcessorNonPayment.getServerPaymentProcessorNonPayment(pm);
+			serverPaymentProcessorNonPayment.getName().setText(Locale.ENGLISH.getLanguage(), "Non-Payment (payment will be postponed)");
+			serverPaymentProcessorNonPayment.getName().setText(Locale.GERMAN.getLanguage(), "Nichtzahlung (Zahlung wird verschoben)");
+			serverPaymentProcessorNonPayment.addModeOfPayment(modeOfPaymentNonPayment);
+
+			ServerPaymentProcessorCreditCardDummyForClientPayment serverPaymentProcessorCreditCardDummyForClientPayment =
+				ServerPaymentProcessorCreditCardDummyForClientPayment.getServerPaymentProcessorCreditCardDummyForClientPayment(pm);
+			serverPaymentProcessorCreditCardDummyForClientPayment.getName().setText(Locale.ENGLISH.getLanguage(), "Dummy for client-sided Credit Card Payment");
+			serverPaymentProcessorCreditCardDummyForClientPayment.getName().setText(Locale.GERMAN.getLanguage(), "Pseudo-Modul für client-seitige Kreditkarten-Zahlungen");
+			serverPaymentProcessorCreditCardDummyForClientPayment.addModeOfPayment(modeOfPaymentCreditCard);
+
+			ServerPaymentProcessorSaferPay serverPaymentProcessorSaferPay = ServerPaymentProcessorSaferPay.getServerPaymentProcessorSaferPay(pm);
+			serverPaymentProcessorSaferPay.getName().setText(Locale.ENGLISH.getLanguage(), "SaferPay");
+			serverPaymentProcessorSaferPay.addModeOfPayment(modeOfPaymentCreditCard);
+
+			ServerPaymentProcessorBankTransferGermany serverPaymentProcessorBankTransferGermany = ServerPaymentProcessorBankTransferGermany.getServerPaymentProcessorBankTransferGermany(pm);
+			serverPaymentProcessorBankTransferGermany.getName().setText(Locale.ENGLISH.getLanguage(), "Bank transfer within Germany");
+			serverPaymentProcessorBankTransferGermany.getName().setText(Locale.GERMAN.getLanguage(), "Überweisung innerhalb Deutschlands");
+			serverPaymentProcessorBankTransferGermany.addModeOfPayment(modeOfPaymentBankTransfer);
+
+			ServerPaymentProcessorDebitNoteGermany serverPaymentProcessorDebitNoteGermany = ServerPaymentProcessorDebitNoteGermany.getServerPaymentProcessorDebitNoteGermany(pm);
+			serverPaymentProcessorDebitNoteGermany.getName().setText(Locale.ENGLISH.getLanguage(), "Debit Note within Germany");
+			serverPaymentProcessorDebitNoteGermany.getName().setText(Locale.GERMAN.getLanguage(), "Lastschrift innerhalb Deutschlands");
+			serverPaymentProcessorDebitNoteGermany.addModeOfPayment(modeOfPaymentDebitNote);
+		} finally {
+			pm.close();
 		}
 	}
 
@@ -1977,7 +1963,7 @@ public abstract class AccountingManagerBean
 	/**
 	 * @ejb.interface-method
 	 * @ejb.permission role-name="_Guest_"
-	 * @ejb.transaction type = "Required"
+	 * @ejb.transaction type="Supports"
 	 */ 
 	public Invoice getInvoice(InvoiceID invoiceID, String[] fetchGroups, int maxFetchDepth)
 	throws ModuleException
@@ -1989,6 +1975,40 @@ public abstract class AccountingManagerBean
 				pm.getFetchPlan().setGroups(fetchGroups);
 
 			return (Invoice) pm.detachCopy(pm.getObjectById(invoiceID));
+		} finally {
+			pm.close();
+		}
+	}
+
+	/**
+	 * @ejb.interface-method
+	 * @ejb.permission role-name="_Guest_"
+	 * @ejb.transaction type="Supports"
+	 */
+	public Set<InvoiceID> getInvoiceIDs(InvoiceQuery invoiceQuery)
+	{
+		PersistenceManager pm = getPersistenceManager();
+		try {
+			invoiceQuery.setPersistenceManager(pm);
+			return new HashSet<InvoiceID>(invoiceQuery.getResult());
+		} finally {
+			pm.close();
+		}
+	}
+
+	/**
+	 * @ejb.interface-method
+	 * @ejb.permission role-name="_Guest_"
+	 * @ejb.transaction type="Supports"
+	 */
+	public List<Invoice> getInvoices(Set<InvoiceID> invoiceIDs, String[] fetchGroups, int maxFetchDepth)
+	{
+		PersistenceManager pm = getPersistenceManager();
+		try {
+			pm.getFetchPlan().setMaxFetchDepth(maxFetchDepth);
+			if (fetchGroups != null)
+				pm.getFetchPlan().setGroups(fetchGroups);
+			return NLJDOHelper.getDetachedObjectList(pm, invoiceIDs, Invoice.class, fetchGroups, maxFetchDepth);
 		} finally {
 			pm.close();
 		}
@@ -2009,7 +2029,6 @@ public abstract class AccountingManagerBean
 	 * @ejb.transaction type = "Required"
 	 */
 	public List getInvoices(AnchorID vendorID, AnchorID customerID, long rangeBeginIdx, long rangeEndIdx, String[] fetchGroups, int maxFetchDepth)
-	throws ModuleException
 	{
 		PersistenceManager pm = getPersistenceManager();
 		try {
@@ -2031,7 +2050,6 @@ public abstract class AccountingManagerBean
 	 * @ejb.transaction type = "Required"
 	 */
 	public List getNonFinalizedInvoices(AnchorID vendorID, AnchorID customerID, String[] fetchGroups, int maxFetchDepth)
-	throws ModuleException
 	{
 		PersistenceManager pm = getPersistenceManager();
 		try {
@@ -2092,7 +2110,6 @@ public abstract class AccountingManagerBean
 	 */
 	public Collection getAvailableModeOfPaymentFlavoursForAllCustomerGroups(
 			Collection customerGroupIDs, byte mergeMode, String[] fetchGroups, int maxFetchDepth)
-	throws ModuleException
 	{
 		PersistenceManager pm = getPersistenceManager();
 		try {
@@ -2118,7 +2135,6 @@ public abstract class AccountingManagerBean
 	 */
 	public Collection getServerPaymentProcessorsForOneModeOfPaymentFlavour(
 			ModeOfPaymentFlavourID modeOfPaymentFlavourID, String[] fetchGroups, int maxFetchDepth)
-	throws ModuleException
 	{
 		PersistenceManager pm = getPersistenceManager();
 		try {
@@ -2141,7 +2157,6 @@ public abstract class AccountingManagerBean
 	 * @ejb.transaction type = "Supports"
 	 */
 	public Collection getAvailableModeOfPaymentFlavoursForOneCustomerGroup(CustomerGroupID customerGroupID, String[] fetchGroups, int maxFetchDepth)
-	throws ModuleException
 	{
 		PersistenceManager pm = getPersistenceManager();
 		try {

@@ -26,6 +26,7 @@
 
 package org.nightlabs.jfire.store;
 
+import java.io.IOException;
 import java.rmi.RemoteException;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -141,118 +142,109 @@ implements SessionBean
 	}
 
 	/**
-	 * @throws ModuleException
+	 * @throws IOException While loading an icon from a local resource, this might happen and we don't care in the initialize method.
 	 *
 	 * @ejb.interface-method
 	 * @ejb.transaction type = "Required"
 	 * @ejb.permission role-name="_Guest_"
 	 */
-	public void initialize()
-		throws ModuleException
+	public void initialize() throws IOException
 	{
+		PersistenceManager pm = getPersistenceManager();
 		try {
-			PersistenceManager pm = getPersistenceManager();
+			pm.getExtent(ModeOfDelivery.class);
 			try {
-				pm.getExtent(ModeOfDelivery.class);
-				try {
-					pm.getObjectById(ModeOfDeliveryID.create(
-							Organisation.DEVIL_ORGANISATION_ID,
-							ModeOfDelivery.MODE_OF_DELIVERY_ID_MANUAL));
-	
-					// it already exists, hence initialization is already done
-					return;
-				} catch (JDOObjectNotFoundException x) {
-					// not yet initialized
-				}
-	
-	
-				Store store = Store.getStore(pm);
-				Trader trader = Trader.getTrader(pm);
-	
-				LegalEntity anonymousCustomer = LegalEntity.getAnonymousCustomer(pm);
-				CustomerGroup anonymousCustomerGroup = anonymousCustomer.getDefaultCustomerGroup();
-	
-	
-	//		 create fundamental set of ModeOfDelivery/ModeOfDeliveryFlavour
-				// manual
-				ModeOfDelivery modeOfDelivery = new ModeOfDelivery(Organisation.DEVIL_ORGANISATION_ID, ModeOfDelivery.MODE_OF_DELIVERY_ID_MANUAL);
-				modeOfDelivery.getName().setText(Locale.ENGLISH.getLanguage(), "Personal Delivery (manually from hand to hand)");
-				modeOfDelivery.getName().setText(Locale.GERMAN.getLanguage(), "Persönliche Lieferung (manuell von Hand zu Hand)");
-				ModeOfDeliveryFlavour modeOfDeliveryFlavour = modeOfDelivery.createFlavour(Organisation.DEVIL_ORGANISATION_ID, "manual");
-				modeOfDeliveryFlavour.loadIconFromResource();
-				modeOfDeliveryFlavour.getName().setText(Locale.ENGLISH.getLanguage(), "Personal Delivery (manually from hand to hand)");
-				modeOfDeliveryFlavour.getName().setText(Locale.GERMAN.getLanguage(), "Persönliche Lieferung (manuell von Hand zu Hand)");
-				pm.makePersistent(modeOfDelivery);
-				trader.getDefaultCustomerGroupForKnownCustomer().addModeOfDelivery(modeOfDelivery);
-				anonymousCustomerGroup.addModeOfDelivery(modeOfDelivery);
-	
-				ModeOfDelivery modeOfDeliveryManual = modeOfDelivery;
-	
-	
-				// nonDelivery
-				modeOfDelivery = new ModeOfDelivery(Organisation.DEVIL_ORGANISATION_ID, ModeOfDelivery.MODE_OF_DELIVERY_ID_NON_DELIVERY);
-				modeOfDelivery.getName().setText(Locale.ENGLISH.getLanguage(), "Non-Delivery");
-				modeOfDelivery.getName().setText(Locale.GERMAN.getLanguage(), "Nichtversand");
-				modeOfDeliveryFlavour = modeOfDelivery.createFlavour(Organisation.DEVIL_ORGANISATION_ID, "nonDelivery");
-				modeOfDeliveryFlavour.getName().setText(Locale.ENGLISH.getLanguage(), "Non-Delivery");
-				modeOfDeliveryFlavour.getName().setText(Locale.GERMAN.getLanguage(), "Nichtversand");
-				pm.makePersistent(modeOfDelivery);
-				trader.getDefaultCustomerGroupForKnownCustomer().addModeOfDelivery(modeOfDelivery);
-	
-				ModeOfDelivery modeOfDeliveryNonDelivery = modeOfDelivery;
-	
-	
-				// mailing.physical
-				modeOfDelivery = new ModeOfDelivery(Organisation.DEVIL_ORGANISATION_ID, ModeOfDelivery.MODE_OF_DELIVERY_ID_MAILING_PHYSICAL);
-				modeOfDelivery.getName().setText(Locale.ENGLISH.getLanguage(), "Mailing Delivery (physical)");
-				modeOfDelivery.getName().setText(Locale.GERMAN.getLanguage(), "Postversand (physisch)");
-				modeOfDeliveryFlavour = modeOfDelivery.createFlavour(Organisation.DEVIL_ORGANISATION_ID, "mailing.physical.default");
-				modeOfDeliveryFlavour.getName().setText(Locale.ENGLISH.getLanguage(), "Mailing Delivery by default service");
-				modeOfDeliveryFlavour.getName().setText(Locale.GERMAN.getLanguage(), "Postversand via Standard-Dienstleister");
-				modeOfDeliveryFlavour = modeOfDelivery.createFlavour(Organisation.DEVIL_ORGANISATION_ID, "mailing.physical.DHL");
-				modeOfDeliveryFlavour.getName().setText(Locale.ENGLISH.getLanguage(), "Mailing Delivery via DHL");
-				modeOfDeliveryFlavour.getName().setText(Locale.GERMAN.getLanguage(), "Postversand via DHL");
-				modeOfDeliveryFlavour = modeOfDelivery.createFlavour(Organisation.DEVIL_ORGANISATION_ID, "mailing.physical.UPS");
-				modeOfDeliveryFlavour.getName().setText(Locale.ENGLISH.getLanguage(), "Mailing Delivery via UPS");
-				modeOfDeliveryFlavour.getName().setText(Locale.GERMAN.getLanguage(), "Postversand via UPS");
-				pm.makePersistent(modeOfDelivery);
-				trader.getDefaultCustomerGroupForKnownCustomer().addModeOfDelivery(modeOfDelivery);
-				anonymousCustomerGroup.addModeOfDelivery(modeOfDelivery);
-	
-				// mailing.virtual
-				modeOfDelivery = new ModeOfDelivery(Organisation.DEVIL_ORGANISATION_ID, ModeOfDelivery.MODE_OF_DELIVERY_ID_MAILING_VIRTUAL);
-				modeOfDelivery.getName().setText(Locale.ENGLISH.getLanguage(), "Virtual Delivery (online)");
-				modeOfDelivery.getName().setText(Locale.GERMAN.getLanguage(), "Virtuelle Lieferung (online)");
-				modeOfDeliveryFlavour = modeOfDelivery.createFlavour(Organisation.DEVIL_ORGANISATION_ID, "mailing.virtual.jfire");
-				modeOfDeliveryFlavour.getName().setText(Locale.ENGLISH.getLanguage(), "JFire Internal Delivery");
-				modeOfDeliveryFlavour.getName().setText(Locale.GERMAN.getLanguage(), "JFire-interne Lieferung");
-				modeOfDeliveryFlavour = modeOfDelivery.createFlavour(Organisation.DEVIL_ORGANISATION_ID, "mailing.virtual.email");
-				modeOfDeliveryFlavour.getName().setText(Locale.ENGLISH.getLanguage(), "Delivery by eMail");
-				modeOfDeliveryFlavour.getName().setText(Locale.GERMAN.getLanguage(), "Zustellung via eMail");
-				pm.makePersistent(modeOfDelivery);
-				trader.getDefaultCustomerGroupForKnownCustomer().addModeOfDelivery(modeOfDelivery);
-				anonymousCustomerGroup.addModeOfDelivery(modeOfDelivery);
-	
-				// create some ServerDeliveryProcessor s
-				ServerDeliveryProcessorManual serverDeliveryProcessorManual = ServerDeliveryProcessorManual.getServerDeliveryProcessorManual(pm);
-				serverDeliveryProcessorManual.addModeOfDelivery(modeOfDeliveryManual);
-				serverDeliveryProcessorManual.getName().setText(Locale.ENGLISH.getLanguage(), "Manual Delivery (no digital action)");
-				serverDeliveryProcessorManual.getName().setText(Locale.GERMAN.getLanguage(), "Manuelle Lieferung (nicht-digitale Aktion)");
-	
-				ServerDeliveryProcessorNonDelivery serverDeliveryProcessorNonDelivery =
-						ServerDeliveryProcessorNonDelivery.getServerDeliveryProcessorNonDelivery(pm);
-				serverDeliveryProcessorNonDelivery.addModeOfDelivery(modeOfDeliveryNonDelivery);
-				serverDeliveryProcessorNonDelivery.getName().setText(Locale.ENGLISH.getLanguage(), "Non-Delivery (delivery will be postponed)");
-				serverDeliveryProcessorNonDelivery.getName().setText(Locale.GERMAN.getLanguage(), "Nichtlieferung (Lieferung wird verschoben)");
-			} finally {
-				pm.close();
+				pm.getObjectById(ModeOfDeliveryID.create(
+						Organisation.DEVIL_ORGANISATION_ID,
+						ModeOfDelivery.MODE_OF_DELIVERY_ID_MANUAL));
+
+				// it already exists, hence initialization is already done
+				return;
+			} catch (JDOObjectNotFoundException x) {
+				// not yet initialized
 			}
-		} catch (RuntimeException x) {
-			throw x;
-		} catch (ModuleException x) {
-			throw x;
-		} catch (Exception x) {
-			throw new ModuleException(x);
+
+
+			Store store = Store.getStore(pm);
+			Trader trader = Trader.getTrader(pm);
+
+			LegalEntity anonymousCustomer = LegalEntity.getAnonymousCustomer(pm);
+			CustomerGroup anonymousCustomerGroup = anonymousCustomer.getDefaultCustomerGroup();
+
+
+			//		 create fundamental set of ModeOfDelivery/ModeOfDeliveryFlavour
+			// manual
+			ModeOfDelivery modeOfDelivery = new ModeOfDelivery(Organisation.DEVIL_ORGANISATION_ID, ModeOfDelivery.MODE_OF_DELIVERY_ID_MANUAL);
+			modeOfDelivery.getName().setText(Locale.ENGLISH.getLanguage(), "Personal Delivery (manually from hand to hand)");
+			modeOfDelivery.getName().setText(Locale.GERMAN.getLanguage(), "Persönliche Lieferung (manuell von Hand zu Hand)");
+			ModeOfDeliveryFlavour modeOfDeliveryFlavour = modeOfDelivery.createFlavour(Organisation.DEVIL_ORGANISATION_ID, "manual");
+			modeOfDeliveryFlavour.loadIconFromResource();
+			modeOfDeliveryFlavour.getName().setText(Locale.ENGLISH.getLanguage(), "Personal Delivery (manually from hand to hand)");
+			modeOfDeliveryFlavour.getName().setText(Locale.GERMAN.getLanguage(), "Persönliche Lieferung (manuell von Hand zu Hand)");
+			pm.makePersistent(modeOfDelivery);
+			trader.getDefaultCustomerGroupForKnownCustomer().addModeOfDelivery(modeOfDelivery);
+			anonymousCustomerGroup.addModeOfDelivery(modeOfDelivery);
+
+			ModeOfDelivery modeOfDeliveryManual = modeOfDelivery;
+
+
+			// nonDelivery
+			modeOfDelivery = new ModeOfDelivery(Organisation.DEVIL_ORGANISATION_ID, ModeOfDelivery.MODE_OF_DELIVERY_ID_NON_DELIVERY);
+			modeOfDelivery.getName().setText(Locale.ENGLISH.getLanguage(), "Non-Delivery");
+			modeOfDelivery.getName().setText(Locale.GERMAN.getLanguage(), "Nichtversand");
+			modeOfDeliveryFlavour = modeOfDelivery.createFlavour(Organisation.DEVIL_ORGANISATION_ID, "nonDelivery");
+			modeOfDeliveryFlavour.getName().setText(Locale.ENGLISH.getLanguage(), "Non-Delivery");
+			modeOfDeliveryFlavour.getName().setText(Locale.GERMAN.getLanguage(), "Nichtversand");
+			pm.makePersistent(modeOfDelivery);
+			trader.getDefaultCustomerGroupForKnownCustomer().addModeOfDelivery(modeOfDelivery);
+
+			ModeOfDelivery modeOfDeliveryNonDelivery = modeOfDelivery;
+
+
+			// mailing.physical
+			modeOfDelivery = new ModeOfDelivery(Organisation.DEVIL_ORGANISATION_ID, ModeOfDelivery.MODE_OF_DELIVERY_ID_MAILING_PHYSICAL);
+			modeOfDelivery.getName().setText(Locale.ENGLISH.getLanguage(), "Mailing Delivery (physical)");
+			modeOfDelivery.getName().setText(Locale.GERMAN.getLanguage(), "Postversand (physisch)");
+			modeOfDeliveryFlavour = modeOfDelivery.createFlavour(Organisation.DEVIL_ORGANISATION_ID, "mailing.physical.default");
+			modeOfDeliveryFlavour.getName().setText(Locale.ENGLISH.getLanguage(), "Mailing Delivery by default service");
+			modeOfDeliveryFlavour.getName().setText(Locale.GERMAN.getLanguage(), "Postversand via Standard-Dienstleister");
+			modeOfDeliveryFlavour = modeOfDelivery.createFlavour(Organisation.DEVIL_ORGANISATION_ID, "mailing.physical.DHL");
+			modeOfDeliveryFlavour.getName().setText(Locale.ENGLISH.getLanguage(), "Mailing Delivery via DHL");
+			modeOfDeliveryFlavour.getName().setText(Locale.GERMAN.getLanguage(), "Postversand via DHL");
+			modeOfDeliveryFlavour = modeOfDelivery.createFlavour(Organisation.DEVIL_ORGANISATION_ID, "mailing.physical.UPS");
+			modeOfDeliveryFlavour.getName().setText(Locale.ENGLISH.getLanguage(), "Mailing Delivery via UPS");
+			modeOfDeliveryFlavour.getName().setText(Locale.GERMAN.getLanguage(), "Postversand via UPS");
+			pm.makePersistent(modeOfDelivery);
+			trader.getDefaultCustomerGroupForKnownCustomer().addModeOfDelivery(modeOfDelivery);
+			anonymousCustomerGroup.addModeOfDelivery(modeOfDelivery);
+
+			// mailing.virtual
+			modeOfDelivery = new ModeOfDelivery(Organisation.DEVIL_ORGANISATION_ID, ModeOfDelivery.MODE_OF_DELIVERY_ID_MAILING_VIRTUAL);
+			modeOfDelivery.getName().setText(Locale.ENGLISH.getLanguage(), "Virtual Delivery (online)");
+			modeOfDelivery.getName().setText(Locale.GERMAN.getLanguage(), "Virtuelle Lieferung (online)");
+			modeOfDeliveryFlavour = modeOfDelivery.createFlavour(Organisation.DEVIL_ORGANISATION_ID, "mailing.virtual.jfire");
+			modeOfDeliveryFlavour.getName().setText(Locale.ENGLISH.getLanguage(), "JFire Internal Delivery");
+			modeOfDeliveryFlavour.getName().setText(Locale.GERMAN.getLanguage(), "JFire-interne Lieferung");
+			modeOfDeliveryFlavour = modeOfDelivery.createFlavour(Organisation.DEVIL_ORGANISATION_ID, "mailing.virtual.email");
+			modeOfDeliveryFlavour.getName().setText(Locale.ENGLISH.getLanguage(), "Delivery by eMail");
+			modeOfDeliveryFlavour.getName().setText(Locale.GERMAN.getLanguage(), "Zustellung via eMail");
+			pm.makePersistent(modeOfDelivery);
+			trader.getDefaultCustomerGroupForKnownCustomer().addModeOfDelivery(modeOfDelivery);
+			anonymousCustomerGroup.addModeOfDelivery(modeOfDelivery);
+
+			// create some ServerDeliveryProcessor s
+			ServerDeliveryProcessorManual serverDeliveryProcessorManual = ServerDeliveryProcessorManual.getServerDeliveryProcessorManual(pm);
+			serverDeliveryProcessorManual.addModeOfDelivery(modeOfDeliveryManual);
+			serverDeliveryProcessorManual.getName().setText(Locale.ENGLISH.getLanguage(), "Manual Delivery (no digital action)");
+			serverDeliveryProcessorManual.getName().setText(Locale.GERMAN.getLanguage(), "Manuelle Lieferung (nicht-digitale Aktion)");
+
+			ServerDeliveryProcessorNonDelivery serverDeliveryProcessorNonDelivery =
+				ServerDeliveryProcessorNonDelivery.getServerDeliveryProcessorNonDelivery(pm);
+			serverDeliveryProcessorNonDelivery.addModeOfDelivery(modeOfDeliveryNonDelivery);
+			serverDeliveryProcessorNonDelivery.getName().setText(Locale.ENGLISH.getLanguage(), "Non-Delivery (delivery will be postponed)");
+			serverDeliveryProcessorNonDelivery.getName().setText(Locale.GERMAN.getLanguage(), "Nichtlieferung (Lieferung wird verschoben)");
+		} finally {
+			pm.close();
 		}
 	}
 

@@ -38,14 +38,12 @@ import javax.ejb.SessionContext;
 import javax.jdo.PersistenceManager;
 
 import org.apache.log4j.Logger;
-
-import org.nightlabs.ModuleException;
+import org.nightlabs.jdo.NLJDOHelper;
 import org.nightlabs.jfire.base.BaseSessionBeanImpl;
 import org.nightlabs.jfire.geography.id.CityID;
 import org.nightlabs.jfire.geography.id.CountryID;
 import org.nightlabs.jfire.geography.id.LocationID;
 import org.nightlabs.jfire.geography.id.RegionID;
-import org.nightlabs.jdo.NLJDOHelper;
 
 /**
  * @ejb.bean name="jfire/ejb/JFireGeography/GeographyManager"	
@@ -132,21 +130,12 @@ public abstract class GeographyManagerBean
 	 * @ejb.permission role-name="_Guest_"
 	 */
 	public void initialize()
-	throws ModuleException
 	{
+		PersistenceManager pm = getPersistenceManager();
 		try {
-			PersistenceManager pm = getPersistenceManager();
-			try {
-				Geography.getGeography(pm);
-			} finally {
-				pm.close();
-			}
-		} catch (RuntimeException x) {
-			throw x;
-		} catch (ModuleException x) {
-			throw x;
-		} catch (Exception x) {
-			throw new ModuleException(x);
+			Geography.getGeography(pm);
+		} finally {
+			pm.close();
 		}
 	}
 
@@ -155,32 +144,23 @@ public abstract class GeographyManagerBean
 	 * @ejb.permission role-name="_Guest_"
 	 */
 	public Collection getCountries(String[] fetchGroups, int maxFetchDepth)
-	throws ModuleException
 	{
+		PersistenceManager pm = getPersistenceManager();
 		try {
-			PersistenceManager pm = getPersistenceManager();
-			try {
-				pm.getFetchPlan().setMaxFetchDepth(maxFetchDepth);
-				if (fetchGroups != null)
-					pm.getFetchPlan().setGroups(fetchGroups);
+			pm.getFetchPlan().setMaxFetchDepth(maxFetchDepth);
+			if (fetchGroups != null)
+				pm.getFetchPlan().setGroups(fetchGroups);
 
-				ArrayList res = new ArrayList();
-				for (Iterator it = pm.getExtent(Country.class).iterator(); it.hasNext(); ) {
-					Country country = (Country) it.next();
+			ArrayList res = new ArrayList();
+			for (Iterator it = pm.getExtent(Country.class).iterator(); it.hasNext(); ) {
+				Country country = (Country) it.next();
 
-					res.add(pm.detachCopy(country));
-				}
-
-				return res;
-			} finally {
-				pm.close();
+				res.add(pm.detachCopy(country));
 			}
-		} catch (RuntimeException x) {
-			throw x;
-		} catch (ModuleException x) {
-			throw x;
-		} catch (Exception x) {
-			throw new ModuleException(x);
+
+			return res;
+		} finally {
+			pm.close();
 		}
 	}
 
@@ -189,27 +169,18 @@ public abstract class GeographyManagerBean
 	 * @ejb.permission role-name="_Guest_"
 	 */
 	public Country getCountry(CountryID countryID, String[] fetchGroups, int maxFetchDepth)
-	throws ModuleException
 	{
+		PersistenceManager pm = getPersistenceManager();
 		try {
-			PersistenceManager pm = getPersistenceManager();
-			try {
-				pm.getFetchPlan().setMaxFetchDepth(maxFetchDepth);
-				if (fetchGroups != null)
-					pm.getFetchPlan().setGroups(fetchGroups);
+			pm.getFetchPlan().setMaxFetchDepth(maxFetchDepth);
+			if (fetchGroups != null)
+				pm.getFetchPlan().setGroups(fetchGroups);
 
-				pm.getExtent(Country.class);
-				Country country = (Country) pm.getObjectById(countryID);
-				return (Country) pm.detachCopy(country);
-			} finally {
-				pm.close();
-			}
-		} catch (RuntimeException x) {
-			throw x;
-		} catch (ModuleException x) {
-			throw x;
-		} catch (Exception x) {
-			throw new ModuleException(x);
+			pm.getExtent(Country.class);
+			Country country = (Country) pm.getObjectById(countryID);
+			return (Country) pm.detachCopy(country);
+		} finally {
+			pm.close();
 		}
 	}
 
@@ -218,27 +189,18 @@ public abstract class GeographyManagerBean
 	 * @ejb.permission role-name="_Guest_"
 	 */
 	public Region getRegion(RegionID regionID, String[] fetchGroups, int maxFetchDepth)
-	throws ModuleException
 	{
+		PersistenceManager pm = getPersistenceManager();
 		try {
-			PersistenceManager pm = getPersistenceManager();
-			try {
-				pm.getFetchPlan().setMaxFetchDepth(maxFetchDepth);
-				if (fetchGroups != null)
-					pm.getFetchPlan().setGroups(fetchGroups);
+			pm.getFetchPlan().setMaxFetchDepth(maxFetchDepth);
+			if (fetchGroups != null)
+				pm.getFetchPlan().setGroups(fetchGroups);
 
-				pm.getExtent(Region.class);
-				Region region = (Region) pm.getObjectById(regionID);
-				return (Region) pm.detachCopy(region);
-			} finally {
-				pm.close();
-			}
-		} catch (RuntimeException x) {
-			throw x;
-		} catch (ModuleException x) {
-			throw x;
-		} catch (Exception x) {
-			throw new ModuleException(x);
+			pm.getExtent(Region.class);
+			Region region = (Region) pm.getObjectById(regionID);
+			return (Region) pm.detachCopy(region);
+		} finally {
+			pm.close();
 		}
 	}
 
@@ -247,27 +209,18 @@ public abstract class GeographyManagerBean
 	 * @ejb.permission role-name="_Guest_"
 	 */
 	public City getCity(CityID cityID, String[] fetchGroups, int maxFetchDepth)
-	throws ModuleException
 	{
+		PersistenceManager pm = getPersistenceManager();
 		try {
-			PersistenceManager pm = getPersistenceManager();
-			try {
-				pm.getFetchPlan().setMaxFetchDepth(maxFetchDepth);
-				if (fetchGroups != null)
-					pm.getFetchPlan().setGroups(fetchGroups);
+			pm.getFetchPlan().setMaxFetchDepth(maxFetchDepth);
+			if (fetchGroups != null)
+				pm.getFetchPlan().setGroups(fetchGroups);
 
-				pm.getExtent(City.class);
-				City city = (City) pm.getObjectById(cityID);
-				return (City) pm.detachCopy(city);
-			} finally {
-				pm.close();
-			}
-		} catch (RuntimeException x) {
-			throw x;
-		} catch (ModuleException x) {
-			throw x;
-		} catch (Exception x) {
-			throw new ModuleException(x);
+			pm.getExtent(City.class);
+			City city = (City) pm.getObjectById(cityID);
+			return (City) pm.detachCopy(city);
+		} finally {
+			pm.close();
 		}
 	}
 
@@ -276,27 +229,18 @@ public abstract class GeographyManagerBean
 	 * @ejb.permission role-name="_Guest_"
 	 */
 	public Location getLocation(LocationID locationID, String[] fetchGroups, int maxFetchDepth)
-	throws ModuleException
 	{
+		PersistenceManager pm = getPersistenceManager();
 		try {
-			PersistenceManager pm = getPersistenceManager();
-			try {
-				pm.getFetchPlan().setMaxFetchDepth(maxFetchDepth);
-				if (fetchGroups != null)
-					pm.getFetchPlan().setGroups(fetchGroups);
+			pm.getFetchPlan().setMaxFetchDepth(maxFetchDepth);
+			if (fetchGroups != null)
+				pm.getFetchPlan().setGroups(fetchGroups);
 
-				pm.getExtent(Location.class);
-				Location location = (Location) pm.getObjectById(locationID);
-				return (Location) pm.detachCopy(location);
-			} finally {
-				pm.close();
-			}
-		} catch (RuntimeException x) {
-			throw x;
-		} catch (ModuleException x) {
-			throw x;
-		} catch (Exception x) {
-			throw new ModuleException(x);
+			pm.getExtent(Location.class);
+			Location location = (Location) pm.getObjectById(locationID);
+			return (Location) pm.detachCopy(location);
+		} finally {
+			pm.close();
 		}
 	}
 
@@ -306,21 +250,12 @@ public abstract class GeographyManagerBean
 	 * @ejb.permission role-name="_Guest_"
 	 */
 	public Country storeCountry(Country country, boolean get, String[] fetchGroups, int maxFetchDepth)
-	throws ModuleException
 	{
+		PersistenceManager pm = getPersistenceManager();
 		try {
-			PersistenceManager pm = getPersistenceManager();
-			try {
-				return (Country) NLJDOHelper.storeJDO(pm, country, get, fetchGroups, maxFetchDepth);
-			} finally {
-				pm.close();
-			}
-		} catch (RuntimeException x) {
-			throw x;
-		} catch (ModuleException x) {
-			throw x;
-		} catch (Exception x) {
-			throw new ModuleException(x);
+			return (Country) NLJDOHelper.storeJDO(pm, country, get, fetchGroups, maxFetchDepth);
+		} finally {
+			pm.close();
 		}
 	}
 
@@ -329,21 +264,12 @@ public abstract class GeographyManagerBean
 	 * @ejb.permission role-name="_Guest_"
 	 */
 	public Region storeRegion(Region region, boolean get, String[] fetchGroups, int maxFetchDepth)
-	throws ModuleException
 	{
+		PersistenceManager pm = getPersistenceManager();
 		try {
-			PersistenceManager pm = getPersistenceManager();
-			try {
-				return (Region) NLJDOHelper.storeJDO(pm, region, get, fetchGroups, maxFetchDepth);
-			} finally {
-				pm.close();
-			}
-		} catch (RuntimeException x) {
-			throw x;
-		} catch (ModuleException x) {
-			throw x;
-		} catch (Exception x) {
-			throw new ModuleException(x);
+			return (Region) NLJDOHelper.storeJDO(pm, region, get, fetchGroups, maxFetchDepth);
+		} finally {
+			pm.close();
 		}
 	}
 
@@ -352,21 +278,12 @@ public abstract class GeographyManagerBean
 	 * @ejb.permission role-name="_Guest_"
 	 */
 	public City storeCity(City city, boolean get, String[] fetchGroups, int maxFetchDepth)
-	throws ModuleException
 	{
+		PersistenceManager pm = getPersistenceManager();
 		try {
-			PersistenceManager pm = getPersistenceManager();
-			try {
-				return (City) NLJDOHelper.storeJDO(pm, city, get, fetchGroups, maxFetchDepth);
-			} finally {
-				pm.close();
-			}
-		} catch (RuntimeException x) {
-			throw x;
-		} catch (ModuleException x) {
-			throw x;
-		} catch (Exception x) {
-			throw new ModuleException(x);
+			return (City) NLJDOHelper.storeJDO(pm, city, get, fetchGroups, maxFetchDepth);
+		} finally {
+			pm.close();
 		}
 	}
 

@@ -1,11 +1,13 @@
 package org.nightlabs.jfire.accounting.query;
 
+import java.util.Date;
 import java.util.Set;
 
 import javax.jdo.Query;
 
 import org.nightlabs.jdo.query.JDOQuery;
 import org.nightlabs.jfire.accounting.Invoice;
+import org.nightlabs.jfire.accounting.id.CurrencyID;
 import org.nightlabs.jfire.accounting.id.InvoiceID;
 import org.nightlabs.jfire.transfer.id.AnchorID;
 
@@ -22,11 +24,15 @@ extends JDOQuery<Set<InvoiceID>>
 
 	private AnchorID vendorID = null;
 	private AnchorID customerID = null;
+	private CurrencyID currencyID = null;
 	private Long amountToPayMin = null;
 	private Long amountToPayMax = null;
 	private Long amountPaidMin = null;
 	private Long amountPaidMax = null;
 	private Boolean booked = null;
+
+	private Date bookDTMin = null;
+	private Date bookDTMax = null;
 
 	@Override
 	protected Query prepareQuery()
@@ -37,6 +43,9 @@ extends JDOQuery<Set<InvoiceID>>
 		StringBuffer filter = new StringBuffer();
 
 		filter.append("1 == 1");
+
+		if (currencyID != null)
+			filter.append("\n && JDOHelper.getObjectId(this.price.currency) == currencyID");
 
 		if (amountToPayMin != null)
 			filter.append("\n && this.price.amount - this.invoiceLocal.amountPaid > amountToPayMin");
@@ -50,11 +59,19 @@ extends JDOQuery<Set<InvoiceID>>
 		if (amountPaidMax != null)
 			filter.append("\n && this.invoiceLocal.amountPaid < amountPaidMax");
 
-		if (booked != null && booked.booleanValue())
-			filter.append("\n && this.invoiceLocal.bookDT != null");
+		if (bookDTMin == null && bookDTMax == null) {
+			if (booked != null && booked.booleanValue())
+				filter.append("\n && this.invoiceLocal.bookDT != null");
 
-		if (booked != null && !booked.booleanValue())
-			filter.append("\n && this.invoiceLocal.bookDT == null");
+			if (booked != null && !booked.booleanValue())
+				filter.append("\n && this.invoiceLocal.bookDT == null");
+		}
+
+		if (bookDTMin != null)
+			filter.append("\n && this.bookDT >= bookDTMin");
+
+		if (bookDTMax != null)
+			filter.append("\n && this.bookDT >= bookDTMax");
 
 		if (vendorID != null)
 			filter.append("\n && JDOHelper.getObjectId(this.vendor) == vendorID");
@@ -64,6 +81,15 @@ extends JDOQuery<Set<InvoiceID>>
 
 		q.setFilter(filter.toString());
 		return q;
+	}
+
+	public CurrencyID getCurrencyID()
+	{
+		return currencyID;
+	}
+	public void setCurrencyID(CurrencyID currencyID)
+	{
+		this.currencyID = currencyID;
 	}
 
 	public Long getAmountPaidMax()
@@ -114,6 +140,24 @@ extends JDOQuery<Set<InvoiceID>>
 	public void setBooked(Boolean booked)
 	{
 		this.booked = booked;
+	}
+
+	public Date getBookDTMax()
+	{
+		return bookDTMax;
+	}
+	public void setBookDTMax(Date bookDTMax)
+	{
+		this.bookDTMax = bookDTMax;
+	}
+
+	public Date getBookDTMin()
+	{
+		return bookDTMin;
+	}
+	public void setBookDTMin(Date bookDTMin)
+	{
+		this.bookDTMin = bookDTMin;
 	}
 
 	public AnchorID getCustomerID()

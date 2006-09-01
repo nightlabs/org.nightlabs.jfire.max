@@ -54,6 +54,7 @@ import org.apache.commons.lang.exception.ExceptionUtils;
 import org.apache.log4j.Logger;
 import org.nightlabs.ModuleException;
 import org.nightlabs.jdo.NLJDOHelper;
+import org.nightlabs.jdo.query.JDOQuery;
 import org.nightlabs.jfire.accounting.book.LocalAccountantDelegate;
 import org.nightlabs.jfire.accounting.book.MoneyFlowDimension;
 import org.nightlabs.jfire.accounting.book.MoneyFlowMapping;
@@ -1981,16 +1982,29 @@ public abstract class AccountingManagerBean
 	}
 
 	/**
+	 * @param invoiceQueries Instances of {@link InvoiceQuery} that shall be chained
+	 *		in order to retrieve the result. The result of one query is passed to the
+	 *		next one using the {@link JDOQuery#setCandidates(Collection)}.
+	 *
 	 * @ejb.interface-method
 	 * @ejb.permission role-name="_Guest_"
 	 * @ejb.transaction type="Supports"
 	 */
-	public Set<InvoiceID> getInvoiceIDs(InvoiceQuery invoiceQuery)
+	public Set<InvoiceID> getInvoiceIDs(Collection<InvoiceQuery> invoiceQueries)
 	{
 		PersistenceManager pm = getPersistenceManager();
 		try {
-			invoiceQuery.setPersistenceManager(pm);
-			return new HashSet<InvoiceID>(invoiceQuery.getResult());
+			pm.getFetchPlan().setMaxFetchDepth(1);
+			pm.getFetchPlan().setGroup(FetchPlan.DEFAULT);
+
+			Set<Invoice> invoices = null;
+			for (InvoiceQuery query : invoiceQueries) {
+				query.setPersistenceManager(pm);
+				query.setCandidates(invoices);
+				invoices = new HashSet<Invoice>(query.getResult());
+			}
+
+			return NLJDOHelper.getObjectIDSet(invoices);
 		} finally {
 			pm.close();
 		}

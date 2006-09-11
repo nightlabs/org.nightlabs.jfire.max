@@ -43,7 +43,7 @@ public class RenderedReportLayout implements Serializable {
 	private static final long serialVersionUID = 1L;
 
 	/**
-	 * The header hold the descriptive information
+	 * The header holds the descriptive information
 	 * for a {@link RenderedReportLayout} 
 	 */
 	public class Header implements Serializable {
@@ -145,7 +145,6 @@ public class RenderedReportLayout implements Serializable {
 	
 	private Serializable data;
 
-	
 	/**
 	 * 
 	 */

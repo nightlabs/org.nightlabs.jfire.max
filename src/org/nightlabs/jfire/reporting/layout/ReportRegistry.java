@@ -36,8 +36,6 @@ import org.nightlabs.jfire.reporting.Birt;
 import org.nightlabs.jfire.reporting.Birt.OutputFormat;
 import org.nightlabs.jfire.reporting.layout.id.ReportRegistryID;
 import org.nightlabs.jfire.reporting.layout.render.ReportLayoutRenderer;
-import org.nightlabs.jfire.reporting.layout.render.ReportLayoutRendererHTML;
-import org.nightlabs.jfire.reporting.layout.render.ReportLayoutRendererPDF;
 
 /**
  * Singleton to hold the id of next new {@link org.nightlabs.jfire.reporting.layout.ReportRegistryItem}

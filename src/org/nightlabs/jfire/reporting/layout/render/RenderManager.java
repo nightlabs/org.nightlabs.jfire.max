@@ -27,6 +27,7 @@
 package org.nightlabs.jfire.reporting.layout.render;
 
 import java.io.ByteArrayInputStream;
+import java.io.File;
 import java.io.InputStream;
 import java.util.Collection;
 import java.util.HashMap;
@@ -35,8 +36,6 @@ import java.util.Map;
 
 import javax.jdo.PersistenceManager;
 
-import org.eclipse.birt.core.framework.IConfigurationElement;
-import org.eclipse.birt.core.framework.Platform;
 import org.eclipse.birt.report.engine.api.EngineException;
 import org.eclipse.birt.report.engine.api.IGetParameterDefinitionTask;
 import org.eclipse.birt.report.engine.api.IParameterDefnBase;
@@ -85,6 +84,27 @@ public class RenderManager {
 	public void close() {
 		
 	}
+
+	/**
+	 * Lets BIRT render the given report with the given params in the given format.
+	 * The report will be rendered into the default temporary folder for 
+	 * rendered report layouts. See {@link ReportLayoutRendererUtil#prepareRenderedLayoutOutputFolder()}.
+	 * Also it will set the entry file-name of the report to "renderedReport".
+	 *
+	 * @see #renderReport(PersistenceManager, ReportRegistryItemID, Map, org.nightlabs.jfire.reporting.Birt.OutputFormat, String, File, boolean)
+	 * @throws EngineException
+	 */
+	public RenderedReportLayout renderReport(
+			PersistenceManager pm,
+			ReportRegistryItemID reportRegistryItemID, 
+			Map<String,Object> params,
+			Birt.OutputFormat format
+		)
+	throws EngineException
+	{
+		File layoutRoot = ReportLayoutRendererUtil.prepareRenderedLayoutOutputFolder();
+		return renderReport(pm, reportRegistryItemID, params, format, "renderedLayout", layoutRoot, true);
+	}
 	
 	/**
 	 * Lets BIRT render the given report with the given params in the given format.
@@ -93,13 +113,19 @@ public class RenderManager {
 	 * @param reportRegistryItemID The ReportLayoutID to render.
 	 * @param params The parameters to render this report with. 
 	 * @param format The format to render to.
+	 * @param fileName The name that should be used for the report entry file (without file-extension)
+	 * @param layoutRoot The root folder to render the report into
+	 * @param prepareForTransfer Whether the results data should be set.
 	 * @throws EngineException
 	 */
 	public RenderedReportLayout renderReport(
 			PersistenceManager pm,
 			ReportRegistryItemID reportRegistryItemID, 
 			Map<String,Object> params,
-			Birt.OutputFormat format
+			Birt.OutputFormat format,
+			String fileName,
+			File layoutRoot,
+			boolean prepareForTransfer
 		) 
 	throws EngineException
 	{
@@ -115,7 +141,7 @@ public class RenderManager {
 //		Platform.
 		IReportRunnable report = reportEngine.openReportDesign(inputStream);
 		IRunAndRenderTask task = reportEngine.createRunAndRenderTask(report);
-		
+	
 		ReportRegistry registry = ReportRegistry.getReportRegistry(pm);
 		ReportLayoutRenderer renderer = null; 
 		try {
@@ -126,19 +152,19 @@ public class RenderManager {
 		
 		HashMap<String,Object> parsedParams = parseReportParams(reportEngine, report, params);
 		
-		return renderer.renderReport(pm, reportRegistryItemID, task, parsedParams, format);
+		return renderer.renderReport(pm, reportRegistryItemID, task, parsedParams, format, fileName, layoutRoot, prepareForTransfer);
 	}
 
 
 	public static HashMap<String,Object> parseReportParams( ReportEngine engine, IReportRunnable report, Map values )
 	{
 		HashMap<String,Object> result = new HashMap<String,Object>();
-		if ( values.isEmpty( ) )
+		if (values.isEmpty())
 			return result;
 
-		IGetParameterDefinitionTask task = engine.createGetParameterDefinitionTask( report );
+		IGetParameterDefinitionTask task = engine.createGetParameterDefinitionTask(report);
 		// TODO: find alternative to deprecated getParameterDefns 
-		Collection params = task.getParameterDefns( false );
+		Collection params = task.getParameterDefns(false);
 	
 		for (Iterator iterator = values.keySet().iterator(); iterator.hasNext();) {
 			String name = (String) iterator.next();
@@ -148,9 +174,9 @@ public class RenderManager {
 			for (Iterator iter = params.iterator(); iter.hasNext();) {
 				IParameterDefnBase param = (IParameterDefnBase) iter.next();
 				
-				if ( param instanceof IParameterGroupDefn )
+				if (param instanceof IParameterGroupDefn)
 					continue;
-				if ( param.getName( ).equals( name ) )
+				if (param.getName().equals(name))
 				{
 					found = (IScalarParameterDefn) param;
 					break;
@@ -161,8 +187,8 @@ public class RenderManager {
 				logger.error( "Parameter " + name + " not found in the report." );
 				continue;
 			}
-			Object value = values.get( name );
-			result.put( name, value );
+			Object value = values.get(name);
+			result.put(name, value);
 		}
 		return result;
 	}	

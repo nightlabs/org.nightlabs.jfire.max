@@ -30,8 +30,11 @@ import java.io.Serializable;
 import java.util.Collections;
 import java.util.Date;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 
+import org.nightlabs.jfire.accounting.state.InvoiceState;
+import org.nightlabs.jfire.accounting.state.InvoiceStateDefinition;
 import org.nightlabs.jfire.security.User;
 
 /**
@@ -109,6 +112,26 @@ implements Serializable
 	 * @jdo.field persistence-modifier="persistent"
 	 */
 	private Date bookDT  = null;
+
+	/**
+	 * @jdo.field persistence-modifier="persistent"
+	 */
+	private InvoiceState invoiceState;
+
+	/**
+	 * This is the history of <b>all</b> {@link InvoiceState}s with the newest last and the oldest first.
+	 * Of course, only the states known to the current organisation are linked here.
+	 *
+	 * @jdo.field
+	 *		persistence-modifier="persistent"
+	 *		collection-type="collection"
+	 *		element-type="InvoiceState"
+	 *		dependent-element="true"
+	 *		table="JFireTrade_InvoiceLocal_invoiceStates"
+	 *
+	 * @jdo.join
+	 */
+	private List<InvoiceState> invoiceStates;
 
 	/**
 	 * @deprecated Only for JDO!
@@ -221,5 +244,39 @@ implements Serializable
 	public boolean removeInvoiceActionHandler(InvoiceActionHandler invoiceActionHandler)
 	{
 		return invoiceActionHandlers.remove(invoiceActionHandler);
+	}
+
+	/**
+	 * This method is <b>not</b> intended to be called directly.
+	 * Call {@link InvoiceStateDefinition#createInvoiceState(User, Invoice)} instead!
+	 */
+	public void setInvoiceState(InvoiceState currentInvoiceState)
+	{
+		if (currentInvoiceState == null)
+			throw new IllegalArgumentException("invoiceState must not be null!");
+
+		if (!currentInvoiceState.getInvoiceStateDefinition().isPublicState())
+			throw new IllegalArgumentException("invoiceState.invoiceStateDefinition.publicState is false!");
+
+		this.invoiceState = currentInvoiceState;
+		this.invoiceStates.add(currentInvoiceState);
+	}
+
+	public InvoiceState getInvoiceState()
+	{
+		return invoiceState;
+	}
+
+	/**
+	 * @jdo.field persistence-modifier="none"
+	 */
+	private transient List<InvoiceState> _invoiceStates = null;
+
+	public List<InvoiceState> getInvoiceStates()
+	{
+		if (_invoiceStates == null)
+			_invoiceStates = Collections.unmodifiableList(invoiceStates);
+
+		return _invoiceStates;
 	}
 }

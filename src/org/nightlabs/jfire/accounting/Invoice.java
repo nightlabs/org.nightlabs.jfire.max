@@ -44,6 +44,8 @@ import javax.jdo.listener.DetachCallback;
 
 import org.nightlabs.jdo.ObjectIDUtil;
 import org.nightlabs.jfire.accounting.id.InvoiceID;
+import org.nightlabs.jfire.accounting.state.InvoiceState;
+import org.nightlabs.jfire.accounting.state.InvoiceStateDefinition;
 import org.nightlabs.jfire.security.User;
 import org.nightlabs.jfire.trade.Article;
 import org.nightlabs.jfire.trade.ArticleContainer;
@@ -265,6 +267,25 @@ implements Serializable, ArticleContainer, DetachCallback
 	 * @jdo.field persistence-modifier="none"
 	 */
 	private boolean customerID_detached = false;
+	
+	/**
+	 * @jdo.field persistence-modifier="persistent"
+	 */
+	private InvoiceState invoiceState;
+
+	/**
+	 * This is the history of <b>public</b> {@link InvoiceState}s with the newest last and the oldest first.
+	 *
+	 * @jdo.field
+	 *		persistence-modifier="persistent"
+	 *		collection-type="collection"
+	 *		element-type="InvoiceState"
+	 *		dependent-element="true"
+	 *		table="JFireTrade_Invoice_invoiceStates"
+	 *
+	 * @jdo.join
+	 */
+	private List<InvoiceState> invoiceStates;
 
 //	/**
 //	 * key: String articlePK (organisationID/articleID)<br/>
@@ -671,4 +692,39 @@ implements Serializable, ArticleContainer, DetachCallback
 				Utils.hashCode(this.invoiceIDPrefix) ^
 				Utils.hashCode(this.invoiceID);
 	}
+
+	/**
+	 * This method is <b>not</b> intended to be called directly.
+	 * Call {@link InvoiceStateDefinition#createInvoiceState(User, Invoice)} instead!
+	 */
+	public void setInvoiceState(InvoiceState currentInvoiceState)
+	{
+		if (currentInvoiceState == null)
+			throw new IllegalArgumentException("invoiceState must not be null!");
+
+		if (!currentInvoiceState.getInvoiceStateDefinition().isPublicState())
+			throw new IllegalArgumentException("invoiceState.invoiceStateDefinition.publicState is false!");
+
+		this.invoiceState = currentInvoiceState;
+		this.invoiceStates.add(currentInvoiceState);
+	}
+
+	public InvoiceState getInvoiceState()
+	{
+		return invoiceState;
+	}
+
+	/**
+	 * @jdo.field persistence-modifier="none"
+	 */
+	private transient List<InvoiceState> _invoiceStates = null;
+
+	public List<InvoiceState> getInvoiceStates()
+	{
+		if (_invoiceStates == null)
+			_invoiceStates = Collections.unmodifiableList(invoiceStates);
+
+		return _invoiceStates;
+	}
+
 }

@@ -27,12 +27,16 @@
 package org.nightlabs.jfire.trade;
 
 import java.io.Serializable;
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Date;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 
 import org.nightlabs.jfire.security.User;
+import org.nightlabs.jfire.trade.state.OfferState;
+import org.nightlabs.jfire.trade.state.OfferStateDefinition;
 
 /**
  * @author Marco Schulze - marco at nightlabs dot de
@@ -122,6 +126,26 @@ implements Serializable
 	private User confirmUser = null;
 
 	/**
+	 * @jdo.field persistence-modifier="persistent"
+	 */
+	private OfferState offerState;
+
+	/**
+	 * This is the history of <b>all</b> {@link OfferState}s with the newest last and the oldest first.
+	 * Of course, only the states known to the current organisation are linked here.
+	 *
+	 * @jdo.field
+	 *		persistence-modifier="persistent"
+	 *		collection-type="collection"
+	 *		element-type="OfferState"
+	 *		dependent-element="true"
+	 *		table="JFireTrade_OfferLocal_offerStates"
+	 *
+	 * @jdo.join
+	 */
+	private List<OfferState> offerStates;
+
+	/**
 	 * @deprecated Only for JDO!
 	 */
 	protected OfferLocal() { }
@@ -133,6 +157,7 @@ implements Serializable
 		this.offerID = offer.getOfferID();
 		this.offer = offer;
 		this.offerActionHandlers = new HashSet<OfferActionHandler>();
+		this.offerStates = new ArrayList<OfferState>();
 
 		offer.setOfferLocal(this);
 	}
@@ -307,5 +332,36 @@ implements Serializable
 	public boolean removeOfferActionHandler(OfferActionHandler offerActionHandler)
 	{
 		return offerActionHandlers.remove(offerActionHandler);
+	}
+
+	/**
+	 * This method is <b>not</b> intended to be called directly.
+	 * Call {@link OfferStateDefinition#createOfferState(User, Offer)} instead!
+	 */
+	public void setOfferState(OfferState currentOfferState)
+	{
+		if (currentOfferState == null)
+			throw new IllegalArgumentException("offerState must not be null!");
+
+		this.offerState = currentOfferState;
+		this.offerStates.add(currentOfferState);
+	}
+
+	public OfferState getOfferState()
+	{
+		return offerState;
+	}
+
+	/**
+	 * @jdo.field persistence-modifier="none"
+	 */
+	private transient List<OfferState> _offerStates = null;
+
+	public List<OfferState> getOfferStates()
+	{
+		if (_offerStates == null)
+			_offerStates = Collections.unmodifiableList(offerStates);
+
+		return _offerStates;
 	}
 }

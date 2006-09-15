@@ -32,6 +32,7 @@ import java.util.Collections;
 import java.util.Date;
 import java.util.HashSet;
 import java.util.Iterator;
+import java.util.List;
 import java.util.Set;
 
 import javax.jdo.JDOHelper;
@@ -47,6 +48,7 @@ import org.nightlabs.jfire.accounting.Currency;
 import org.nightlabs.jfire.accounting.Price;
 import org.nightlabs.jfire.security.User;
 import org.nightlabs.jfire.store.ProductType;
+import org.nightlabs.jfire.trade.state.OfferState;
 import org.nightlabs.jfire.transfer.id.AnchorID;
 import org.nightlabs.util.Utils;
 
@@ -264,6 +266,25 @@ implements
 	 * @jdo.field persistence-modifier="none"
 	 */
 	private boolean customerID_detached = false;
+
+	/**
+	 * @jdo.field persistence-modifier="persistent"
+	 */
+	private OfferState offerState;
+
+	/**
+	 * This is the history of <b>public</b> {@link OfferState}s with the newest last and the oldest first.
+	 *
+	 * @jdo.field
+	 *		persistence-modifier="persistent"
+	 *		collection-type="collection"
+	 *		element-type="OfferState"
+	 *		dependent-element="true"
+	 *		table="JFireTrade_Offer_offerStates"
+	 *
+	 * @jdo.join
+	 */
+	private List<OfferState> offerStates;
 
 	/**
 	 * @deprecated This constructor exists only for JDO!
@@ -711,5 +732,39 @@ implements
 	public int hashCode()
 	{
 		return Utils.hashCode(organisationID) ^ Utils.hashCode(offerIDPrefix) ^ Utils.hashCode(offerID);
+	}
+
+	/**
+	 * This method is <b>not</b> intended to be called directly.
+	 * Call {@link OfferStateDefinition#createOfferState(User, Offer)} instead!
+	 */
+	public void setOfferState(OfferState currentOfferState)
+	{
+		if (currentOfferState == null)
+			throw new IllegalArgumentException("offerState must not be null!");
+
+		if (!currentOfferState.getOfferStateDefinition().isPublicState())
+			throw new IllegalArgumentException("offerState.offerStateDefinition.publicState is false!");
+
+		this.offerState = currentOfferState;
+		this.offerStates.add(currentOfferState);
+	}
+
+	public OfferState getOfferState()
+	{
+		return offerState;
+	}
+
+	/**
+	 * @jdo.field persistence-modifier="none"
+	 */
+	private transient List<OfferState> _offerStates = null;
+
+	public List<OfferState> getOfferStates()
+	{
+		if (_offerStates == null)
+			_offerStates = Collections.unmodifiableList(offerStates);
+
+		return _offerStates;
 	}
 }

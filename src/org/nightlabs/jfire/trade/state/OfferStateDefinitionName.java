@@ -24,7 +24,7 @@
  *                                                                             *
  ******************************************************************************/
 
-package org.nightlabs.jfire.trade;
+package org.nightlabs.jfire.trade.state;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -36,19 +36,20 @@ import org.nightlabs.i18n.I18nText;
  *
  * @jdo.persistence-capable
  *		identity-type="application"
- *		objectid-class="org.nightlabs.jfire.trade.id.SegmentTypeNameID"
+ *		objectid-class="org.nightlabs.jfire.trade.state.id.OfferStateDefinitionNameID"
  *		detachable="true"
- *		table="JFireTrade_SegmentTypeName"
+ *		table="JFireTrade_OfferStateDefinitionName"
  *
  * @jdo.inheritance strategy="new-table"
  *
- * @jdo.create-objectid-class field-order="organisationID, segmentTypeID"
+ * @jdo.create-objectid-class field-order="organisationID, offerStateDefinitionID"
  *
- * @jdo.fetch-group name="SegmentType.name" fields="segmentType, names"
- * @jdo.fetch-group name="SegmentType.this" fields="segmentType, names"
+ * @jdo.fetch-group name="OfferStateDefinition.name" fields="offerStateDefinition, names"
  */
-public class SegmentTypeName extends I18nText
+public class OfferStateDefinitionName extends I18nText
 {
+	private static final long serialVersionUID = 1L;
+
 	/**
 	 * @jdo.field primary-key="true"
 	 * @jdo.column length="100"
@@ -59,7 +60,7 @@ public class SegmentTypeName extends I18nText
 	 * @jdo.field primary-key="true"
 	 * @jdo.column length="100"
 	 */
-	private String segmentTypeID;
+	private String offerStateDefinitionID;
 
 	/**
 	 * key: String languageID<br/>
@@ -71,7 +72,7 @@ public class SegmentTypeName extends I18nText
 	 *		key-type="java.lang.String"
 	 *		value-type="java.lang.String"
 	 *		default-fetch-group="true"
-	 *		table="JFireTrade_SegmentTypeName_names"
+	 *		table="JFireTrade_OfferStateDefinitionName_names"
 	 *
 	 * @jdo.join
 	 */
@@ -90,20 +91,20 @@ public class SegmentTypeName extends I18nText
 	/**
 	 * @jdo.field persistence-modifier="persistent"
 	 */
-	private SegmentType segmentType;
+	private OfferStateDefinition offerStateDefinition;
 
 	/**
 	 * @deprecated Only for JDO!
 	 */
-	protected SegmentTypeName()
+	protected OfferStateDefinitionName()
 	{
 	}
 
-	public SegmentTypeName(SegmentType segmentType)
+	public OfferStateDefinitionName(OfferStateDefinition offerStateDefinition)
 	{
-		this.organisationID = segmentType.getOrganisationID();
-		this.segmentTypeID = segmentType.getSegmentTypeID();
-		this.segmentType = segmentType;
+		this.organisationID = offerStateDefinition.getOrganisationID();
+		this.offerStateDefinitionID = offerStateDefinition.getOfferStateDefinitionID();
+		this.offerStateDefinition = offerStateDefinition;
 	}
 
 	/**
@@ -135,21 +136,22 @@ public class SegmentTypeName extends I18nText
 	 */
 	protected String getFallBackValue(String languageID)
 	{
-		return SegmentType.getPrimaryKey(organisationID, segmentTypeID);
+		return OfferStateDefinition.getPrimaryKey(organisationID, offerStateDefinitionID);
 	}
 
 	public String getOrganisationID()
 	{
 		return organisationID;
 	}
-	public String getSegmentTypeID()
+
+	public String getOfferStateDefinitionID()
 	{
-		return segmentTypeID;
+		return offerStateDefinitionID;
 	}
 
-	public SegmentType getSegmentType()
+	public OfferStateDefinition getOfferStateDefinition()
 	{
-		return segmentType;
+		return offerStateDefinition;
 	}
 
 }

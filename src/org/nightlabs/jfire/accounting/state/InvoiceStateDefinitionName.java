@@ -24,7 +24,7 @@
  *                                                                             *
  ******************************************************************************/
 
-package org.nightlabs.jfire.trade;
+package org.nightlabs.jfire.accounting.state;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -36,19 +36,20 @@ import org.nightlabs.i18n.I18nText;
  *
  * @jdo.persistence-capable
  *		identity-type="application"
- *		objectid-class="org.nightlabs.jfire.trade.id.SegmentTypeNameID"
+ *		objectid-class="org.nightlabs.jfire.trade.state.id.InvoiceStateDefinitionNameID"
  *		detachable="true"
- *		table="JFireTrade_SegmentTypeName"
+ *		table="JFireTrade_InvoiceStateDefinitionName"
  *
  * @jdo.inheritance strategy="new-table"
  *
- * @jdo.create-objectid-class field-order="organisationID, segmentTypeID"
+ * @jdo.create-objectid-class field-order="organisationID, invoiceStateDefinitionID"
  *
- * @jdo.fetch-group name="SegmentType.name" fields="segmentType, names"
- * @jdo.fetch-group name="SegmentType.this" fields="segmentType, names"
+ * @jdo.fetch-group name="InvoiceStateDefinition.name" fields="invoiceStateDefinition, names"
  */
-public class SegmentTypeName extends I18nText
+public class InvoiceStateDefinitionName extends I18nText
 {
+	private static final long serialVersionUID = 1L;
+
 	/**
 	 * @jdo.field primary-key="true"
 	 * @jdo.column length="100"
@@ -59,7 +60,7 @@ public class SegmentTypeName extends I18nText
 	 * @jdo.field primary-key="true"
 	 * @jdo.column length="100"
 	 */
-	private String segmentTypeID;
+	private String invoiceStateDefinitionID;
 
 	/**
 	 * key: String languageID<br/>
@@ -71,7 +72,7 @@ public class SegmentTypeName extends I18nText
 	 *		key-type="java.lang.String"
 	 *		value-type="java.lang.String"
 	 *		default-fetch-group="true"
-	 *		table="JFireTrade_SegmentTypeName_names"
+	 *		table="JFireTrade_InvoiceStateDefinitionName_names"
 	 *
 	 * @jdo.join
 	 */
@@ -90,20 +91,20 @@ public class SegmentTypeName extends I18nText
 	/**
 	 * @jdo.field persistence-modifier="persistent"
 	 */
-	private SegmentType segmentType;
+	private InvoiceStateDefinition invoiceStateDefinition;
 
 	/**
 	 * @deprecated Only for JDO!
 	 */
-	protected SegmentTypeName()
+	protected InvoiceStateDefinitionName()
 	{
 	}
 
-	public SegmentTypeName(SegmentType segmentType)
+	public InvoiceStateDefinitionName(InvoiceStateDefinition invoiceStateDefinition)
 	{
-		this.organisationID = segmentType.getOrganisationID();
-		this.segmentTypeID = segmentType.getSegmentTypeID();
-		this.segmentType = segmentType;
+		this.organisationID = invoiceStateDefinition.getOrganisationID();
+		this.invoiceStateDefinitionID = invoiceStateDefinition.getInvoiceStateDefinitionID();
+		this.invoiceStateDefinition = invoiceStateDefinition;
 	}
 
 	/**
@@ -135,21 +136,22 @@ public class SegmentTypeName extends I18nText
 	 */
 	protected String getFallBackValue(String languageID)
 	{
-		return SegmentType.getPrimaryKey(organisationID, segmentTypeID);
+		return InvoiceStateDefinition.getPrimaryKey(organisationID, invoiceStateDefinitionID);
 	}
 
 	public String getOrganisationID()
 	{
 		return organisationID;
 	}
-	public String getSegmentTypeID()
+
+	public String getInvoiceStateDefinitionID()
 	{
-		return segmentTypeID;
+		return invoiceStateDefinitionID;
 	}
 
-	public SegmentType getSegmentType()
+	public InvoiceStateDefinition getInvoiceStateDefinition()
 	{
-		return segmentType;
+		return invoiceStateDefinition;
 	}
 
 }

@@ -3,9 +3,11 @@ package org.nightlabs.jfire.trade.state;
 import java.io.Serializable;
 
 import org.nightlabs.jfire.idgenerator.IDGenerator;
+import org.nightlabs.jfire.organisation.Organisation;
 import org.nightlabs.jfire.security.User;
 import org.nightlabs.jfire.trade.Offer;
 import org.nightlabs.jfire.trade.OfferLocal;
+import org.nightlabs.jfire.trade.state.id.OfferStateDefinitionID;
 
 /**
  * @author Marco Schulze - marco at nightlabs dot de
@@ -22,6 +24,7 @@ import org.nightlabs.jfire.trade.OfferLocal;
  *		field-order="organisationID, offerStateDefinitionID"
  *
  * @jdo.fetch-group name="OfferStateDefinition.name" fields="name"
+ * @jdo.fetch-group name="OfferStateDefinition.description" fields="description"
  */
 public class OfferStateDefinition
 implements Serializable
@@ -29,6 +32,13 @@ implements Serializable
 	private static final long serialVersionUID = 1L;
 
 	public static final String FETCH_GROUP_NAME = "OfferStateDefinition.name";
+	public static final String FETCH_GROUP_DESCRIPTION = "OfferStateDefinition.description";
+
+	public static final OfferStateDefinitionID OFFER_STATE_DEFINITION_ID_CREATED = OfferStateDefinitionID.create(Organisation.DEVIL_ORGANISATION_ID, "created");
+	public static final OfferStateDefinitionID OFFER_STATE_DEFINITION_ID_FINALIZED = OfferStateDefinitionID.create(Organisation.DEVIL_ORGANISATION_ID, "finalized");
+	public static final OfferStateDefinitionID OFFER_STATE_DEFINITION_ID_CANCELLED = OfferStateDefinitionID.create(Organisation.DEVIL_ORGANISATION_ID, "cancelled");
+	public static final OfferStateDefinitionID OFFER_STATE_DEFINITION_ID_ACCEPTED = OfferStateDefinitionID.create(Organisation.DEVIL_ORGANISATION_ID, "accepted");
+	public static final OfferStateDefinitionID OFFER_STATE_DEFINITION_ID_REJECTED = OfferStateDefinitionID.create(Organisation.DEVIL_ORGANISATION_ID, "rejected");
 
 	/**
 	 * @jdo.field primary-key="true"
@@ -48,6 +58,11 @@ implements Serializable
 	private OfferStateDefinitionName name;
 
 	/**
+	 * @jdo.field persistence-modifier="persistent" mapped-by="offerStateDefinition"
+	 */
+	private OfferStateDefinitionDescription description;
+
+	/**
 	 * @jdo.field persistence-modifier="persistent"
 	 */
 	private boolean publicState = false;
@@ -57,11 +72,17 @@ implements Serializable
 	 */
 	protected OfferStateDefinition() { }
 
+	public OfferStateDefinition(OfferStateDefinitionID offerStateDefinitionID)
+	{
+		this(offerStateDefinitionID.organisationID, offerStateDefinitionID.offerStateDefinitionID);
+	}
+
 	public OfferStateDefinition(String organisationID, String offerStateDefinitionID)
 	{
 		this.organisationID = organisationID;
 		this.offerStateDefinitionID = offerStateDefinitionID;
 		this.name = new OfferStateDefinitionName(this);
+		this.description = new OfferStateDefinitionDescription(this);
 	}
 
 	public String getOrganisationID()
@@ -81,6 +102,11 @@ implements Serializable
 	public OfferStateDefinitionName getName()
 	{
 		return name;
+	}
+
+	public OfferStateDefinitionDescription getDescription()
+	{
+		return description;
 	}
 
 	/**

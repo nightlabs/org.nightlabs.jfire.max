@@ -85,6 +85,7 @@ import org.nightlabs.jfire.accounting.pay.id.PaymentDataID;
 import org.nightlabs.jfire.accounting.pay.id.PaymentID;
 import org.nightlabs.jfire.accounting.priceconfig.FetchGroupsPriceConfig;
 import org.nightlabs.jfire.accounting.query.InvoiceQuery;
+import org.nightlabs.jfire.accounting.state.InvoiceStateDefinition;
 import org.nightlabs.jfire.base.BaseSessionBeanImpl;
 import org.nightlabs.jfire.security.User;
 import org.nightlabs.jfire.store.DeliveryNote;
@@ -218,6 +219,46 @@ public abstract class AccountingManagerBean
 
 			currency = new Currency("CHF", "CHF", 2);
 			pm.makePersistent(currency);
+
+
+			// create the essential InvoiceStateDefinitions
+			InvoiceStateDefinition invoiceStateDefinition;
+
+			invoiceStateDefinition = new InvoiceStateDefinition(InvoiceStateDefinition.INVOICE_STATE_DEFINITION_ID_CREATED);
+			invoiceStateDefinition.getName().setText(Locale.ENGLISH.getLanguage(), "created");
+			invoiceStateDefinition.getDescription().setText(Locale.ENGLISH.getLanguage(), "The Invoice has been newly created. This is the first state in the Invoice related workflow.");
+			pm.makePersistent(invoiceStateDefinition);
+
+			invoiceStateDefinition = new InvoiceStateDefinition(InvoiceStateDefinition.INVOICE_STATE_DEFINITION_ID_FINALIZED);
+			invoiceStateDefinition.getName().setText(Locale.ENGLISH.getLanguage(), "finalized");
+			invoiceStateDefinition.getDescription().setText(Locale.ENGLISH.getLanguage(), "The Invoice has been finalized. After that, it cannot be modified anymore. A modification would require cancellation and recreation.");
+			pm.makePersistent(invoiceStateDefinition);
+
+			invoiceStateDefinition = new InvoiceStateDefinition(InvoiceStateDefinition.INVOICE_STATE_DEFINITION_ID_BOOKED);
+			invoiceStateDefinition.getName().setText(Locale.ENGLISH.getLanguage(), "booked");
+			invoiceStateDefinition.getDescription().setText(Locale.ENGLISH.getLanguage(), "The Invoice has been booked. That means, all the money for all Articles has been transferred internally onto the configured Accounts.");
+			pm.makePersistent(invoiceStateDefinition);
+
+			invoiceStateDefinition = new InvoiceStateDefinition(InvoiceStateDefinition.INVOICE_STATE_DEFINITION_ID_CANCELLED);
+			invoiceStateDefinition.getName().setText(Locale.ENGLISH.getLanguage(), "cancelled");
+			invoiceStateDefinition.getDescription().setText(Locale.ENGLISH.getLanguage(), "The Invoice was cancelled after finalization (and maybe after booking). In case it was already booked, a reversing booking has been done. The Article.invoice fields are nulled and the Articles within the Invoice have been replaced by referencingArticles.");
+			pm.makePersistent(invoiceStateDefinition);
+
+			invoiceStateDefinition = new InvoiceStateDefinition(InvoiceStateDefinition.INVOICE_STATE_DEFINITION_ID_DOUBTFUL);
+			invoiceStateDefinition.getName().setText(Locale.ENGLISH.getLanguage(), "doubtful");
+			invoiceStateDefinition.getDescription().setText(Locale.ENGLISH.getLanguage(), "The debt became doubtful. That means the person owing money (usually the customer, if it's not refunding) became financially unstable.");
+			pm.makePersistent(invoiceStateDefinition);
+
+			invoiceStateDefinition = new InvoiceStateDefinition(InvoiceStateDefinition.INVOICE_STATE_DEFINITION_ID_PAID);
+			invoiceStateDefinition.getName().setText(Locale.ENGLISH.getLanguage(), "paid");
+			invoiceStateDefinition.getDescription().setText(Locale.ENGLISH.getLanguage(), "The Invoice was paid completely. There's no money outstanding anymore.");
+			pm.makePersistent(invoiceStateDefinition);
+
+			invoiceStateDefinition = new InvoiceStateDefinition(InvoiceStateDefinition.INVOICE_STATE_DEFINITION_ID_UNCOLLECTABLE);
+			invoiceStateDefinition.getName().setText(Locale.ENGLISH.getLanguage(), "uncollectable");
+			invoiceStateDefinition.getDescription().setText(Locale.ENGLISH.getLanguage(), "The Invoice will never be paid. Usually this happens when the customer becomes bankrupt.");
+			pm.makePersistent(invoiceStateDefinition);
+
 
 			// create PriceFragmentTypes for Swiss and German VAT
 			PriceFragmentType priceFragmentType = new PriceFragmentType(getRootOrganisationID(), "vat-de-16-net");

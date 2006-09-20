@@ -4,7 +4,9 @@ import java.io.Serializable;
 
 import org.nightlabs.jfire.accounting.Invoice;
 import org.nightlabs.jfire.accounting.InvoiceLocal;
+import org.nightlabs.jfire.accounting.state.id.InvoiceStateDefinitionID;
 import org.nightlabs.jfire.idgenerator.IDGenerator;
+import org.nightlabs.jfire.organisation.Organisation;
 import org.nightlabs.jfire.security.User;
 
 /**
@@ -12,7 +14,7 @@ import org.nightlabs.jfire.security.User;
  *
  * @jdo.persistence-capable
  *		identity-type="application"
- *		objectid-class="org.nightlabs.jfire.trade.state.id.InvoiceStateDefinitionID"
+ *		objectid-class="org.nightlabs.jfire.accounting.state.id.InvoiceStateDefinitionID"
  *		detachable="true"
  *		table="JFireTrade_InvoiceStateDefinition"
  *
@@ -22,13 +24,23 @@ import org.nightlabs.jfire.security.User;
  *		field-order="organisationID, invoiceStateDefinitionID"
  *
  * @jdo.fetch-group name="InvoiceStateDefinition.name" fields="name"
+ * @jdo.fetch-group name="InvoiceStateDefinition.description" fields="description"
  */
 public class InvoiceStateDefinition
 implements Serializable
 {
 	private static final long serialVersionUID = 1L;
 
+	public static final InvoiceStateDefinitionID INVOICE_STATE_DEFINITION_ID_CREATED = InvoiceStateDefinitionID.create(Organisation.DEVIL_ORGANISATION_ID, "created");
+	public static final InvoiceStateDefinitionID INVOICE_STATE_DEFINITION_ID_FINALIZED = InvoiceStateDefinitionID.create(Organisation.DEVIL_ORGANISATION_ID, "finalized");
+	public static final InvoiceStateDefinitionID INVOICE_STATE_DEFINITION_ID_BOOKED = InvoiceStateDefinitionID.create(Organisation.DEVIL_ORGANISATION_ID, "booked");
+	public static final InvoiceStateDefinitionID INVOICE_STATE_DEFINITION_ID_CANCELLED = InvoiceStateDefinitionID.create(Organisation.DEVIL_ORGANISATION_ID, "cancelled");
+	public static final InvoiceStateDefinitionID INVOICE_STATE_DEFINITION_ID_PAID = InvoiceStateDefinitionID.create(Organisation.DEVIL_ORGANISATION_ID, "paid");
+	public static final InvoiceStateDefinitionID INVOICE_STATE_DEFINITION_ID_DOUBTFUL = InvoiceStateDefinitionID.create(Organisation.DEVIL_ORGANISATION_ID, "doubtful");
+	public static final InvoiceStateDefinitionID INVOICE_STATE_DEFINITION_ID_UNCOLLECTABLE = InvoiceStateDefinitionID.create(Organisation.DEVIL_ORGANISATION_ID, "uncollectable");
+
 	public static final String FETCH_GROUP_NAME = "InvoiceStateDefinition.name";
+	public static final String FETCH_GROUP_DESCRIPTION = "InvoiceStateDefinition.description";
 
 	/**
 	 * @jdo.field primary-key="true"
@@ -48,6 +60,11 @@ implements Serializable
 	private InvoiceStateDefinitionName name;
 
 	/**
+	 * @jdo.field persistence-modifier="persistent" mapped-by="invoiceStateDefinition"
+	 */
+	private InvoiceStateDefinitionDescription description;
+
+	/**
 	 * @jdo.field persistence-modifier="persistent"
 	 */
 	private boolean publicState = false;
@@ -57,11 +74,17 @@ implements Serializable
 	 */
 	protected InvoiceStateDefinition() { }
 
+	public InvoiceStateDefinition(InvoiceStateDefinitionID invoiceStateDefinitionID)
+	{
+		this(invoiceStateDefinitionID.organisationID, invoiceStateDefinitionID.invoiceStateDefinitionID);
+	}
+
 	public InvoiceStateDefinition(String organisationID, String invoiceStateDefinitionID)
 	{
 		this.organisationID = organisationID;
 		this.invoiceStateDefinitionID = invoiceStateDefinitionID;
 		this.name = new InvoiceStateDefinitionName(this);
+		this.description = new InvoiceStateDefinitionDescription(this);
 	}
 
 	public String getOrganisationID()
@@ -81,6 +104,11 @@ implements Serializable
 	public InvoiceStateDefinitionName getName()
 	{
 		return name;
+	}
+
+	public InvoiceStateDefinitionDescription getDescription()
+	{
+		return description;
 	}
 
 	/**

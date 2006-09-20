@@ -70,6 +70,7 @@ import org.nightlabs.jfire.store.deliver.id.ModeOfDeliveryFlavourID;
 import org.nightlabs.jfire.store.deliver.id.ModeOfDeliveryID;
 import org.nightlabs.jfire.store.id.DeliveryNoteID;
 import org.nightlabs.jfire.store.id.ProductTypeID;
+import org.nightlabs.jfire.store.state.DeliveryNoteStateDefinition;
 import org.nightlabs.jfire.trade.Article;
 import org.nightlabs.jfire.trade.ArticleContainer;
 import org.nightlabs.jfire.trade.CustomerGroup;
@@ -163,6 +164,35 @@ implements SessionBean
 			} catch (JDOObjectNotFoundException x) {
 				// not yet initialized
 			}
+
+
+			// create the essential DeliveryNoteStateDefinitions
+			DeliveryNoteStateDefinition deliveryNoteStateDefinition;
+
+			deliveryNoteStateDefinition = new DeliveryNoteStateDefinition(DeliveryNoteStateDefinition.DELIVERY_NOTE_STATE_DEFINITION_ID_CREATED);
+			deliveryNoteStateDefinition.getName().setText(Locale.ENGLISH.getLanguage(), "created");
+			deliveryNoteStateDefinition.getDescription().setText(Locale.ENGLISH.getLanguage(), "The DeliveryNote has been newly created. This is the first state in the DeliveryNote related workflow.");
+			pm.makePersistent(deliveryNoteStateDefinition);
+
+			deliveryNoteStateDefinition = new DeliveryNoteStateDefinition(DeliveryNoteStateDefinition.DELIVERY_NOTE_STATE_DEFINITION_ID_FINALIZED);
+			deliveryNoteStateDefinition.getName().setText(Locale.ENGLISH.getLanguage(), "finalized");
+			deliveryNoteStateDefinition.getDescription().setText(Locale.ENGLISH.getLanguage(), "The DeliveryNote was finalized. After that, it cannot be modified anymore. A modification would require cancellation and recreation.");
+			pm.makePersistent(deliveryNoteStateDefinition);
+
+			deliveryNoteStateDefinition = new DeliveryNoteStateDefinition(DeliveryNoteStateDefinition.DELIVERY_NOTE_STATE_DEFINITION_ID_BOOKED);
+			deliveryNoteStateDefinition.getName().setText(Locale.ENGLISH.getLanguage(), "booked");
+			deliveryNoteStateDefinition.getDescription().setText(Locale.ENGLISH.getLanguage(), "The DeliveryNote has been booked. That means, all the product transfers for all Articles has been performed internally onto the configured Repositories.");
+			pm.makePersistent(deliveryNoteStateDefinition);
+
+			deliveryNoteStateDefinition = new DeliveryNoteStateDefinition(DeliveryNoteStateDefinition.DELIVERY_NOTE_STATE_DEFINITION_ID_CANCELLED);
+			deliveryNoteStateDefinition.getName().setText(Locale.ENGLISH.getLanguage(), "cancelled");
+			deliveryNoteStateDefinition.getDescription().setText(Locale.ENGLISH.getLanguage(), "The DeliveryNote was cancelled after finalization (and maybe after booking). In case it was already booked, a reversing booking has been done. The Article.deliveryNote fields are nulled and the Articles within the DeliveryNote have been replaced by referencingArticles.");
+			pm.makePersistent(deliveryNoteStateDefinition);
+
+			deliveryNoteStateDefinition = new DeliveryNoteStateDefinition(DeliveryNoteStateDefinition.DELIVERY_NOTE_STATE_DEFINITION_ID_DELIVERED);
+			deliveryNoteStateDefinition.getName().setText(Locale.ENGLISH.getLanguage(), "delivered");
+			deliveryNoteStateDefinition.getDescription().setText(Locale.ENGLISH.getLanguage(), "All Articles of the DeliveryNote were delivered. There's no Article left that still needs to be delivered.");
+			pm.makePersistent(deliveryNoteStateDefinition);
 
 
 			Store store = Store.getStore(pm);

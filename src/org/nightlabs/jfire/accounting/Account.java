@@ -59,6 +59,8 @@ import org.nightlabs.jfire.transfer.Transfer;
  */
 public class Account extends Anchor
 {
+	private static final long serialVersionUID = 1L;
+
 	public static final String FETCH_GROUP_OWNER = "Account.owner";
 	public static final String FETCH_GROUP_CURRENCY = "Account.currency";
 	public static final String FETCH_GROUP_NAME = "Account.name";
@@ -67,8 +69,42 @@ public class Account extends Anchor
 	
 	/**
 	 * anchorTypeID for normal accounts of the Local organisation
+	 *
+	 * @deprecated This type will be deleted very soon. It must be one of
+	 *		{@link #ANCHOR_TYPE_ID_LOCAL_REVENUE_IN}, {@link #ANCHOR_TYPE_ID_LOCAL_REVENUE_OUT} or
+	 *		{@link #ANCHOR_TYPE_ID_LOCAL_COST} instead!
 	 */
 	public static final String ANCHOR_TYPE_ID_LOCAL_NORMAL = "Account.Local.Normal";
+
+	/**
+	 * anchorTypeID for revenue accounts of the local organisation. This is the default revenue account. In case
+	 * money is forwarded to a cost account (see {@link #ANCHOR_TYPE_ID_LOCAL_COST}), a revenue-out account
+	 * (see {@link #ANCHOR_TYPE_ID_LOCAL_REVENUE_OUT}) is automatically created. This mechanism
+	 * allows to keep the system consistent (the sum of all accounts' balances is always 0) while at the same time
+	 * having a double entry bookkeeping.
+	 * <p>
+	 * Note, that even though this is named revenue-<b>in</b> account, a refund will cause money to leave from (i.e. go <b>out</b> of)
+	 * this account.
+	 * </p>
+	 * @see #ANCHOR_TYPE_ID_LOCAL_COST
+	 * @see #ANCHOR_TYPE_ID_LOCAL_REVENUE_OUT
+	 * @see #setRevenueInAccount(Account)
+	 * @see #setRevenueOutAccount(Account)
+	 */
+	public static final String ANCHOR_TYPE_ID_LOCAL_REVENUE_IN = "Account.Local.Revenue.In";
+
+	/**
+	 * anchorTypeID for revenue accounts of the local organisation, but solely as a split account for money that's
+	 * forwarded to a cost-account. Revenues will - despite of the name - not be deposited on an account with this type,
+	 * but rather on the corresponding revenue-in account.
+	 */
+	public static final String ANCHOR_TYPE_ID_LOCAL_REVENUE_OUT = "Account.Local.Revenue.Out";
+
+	/**
+	 * anchorTypeID for normal accounts of the Local organisation
+	 */
+	public static final String ANCHOR_TYPE_ID_LOCAL_COST = "Account.Local.Cost";
+
 	/**
 	 * anchorTypeID for accounts of trading partners when they acting as vendor
 	 */
@@ -320,5 +356,127 @@ public class Account extends Anchor
 
 	public void resetIntegrity(Collection<Transfer> containers)
 	{
+	}
+
+	/**
+	 * If this Account is the split out account from which money is taken and transferred to a cost center account,
+	 * this field will reference the original revenue account (where the money is coming in).
+	 *
+	 * @see #ANCHOR_TYPE_ID_LOCAL_REVENUE_IN
+	 * @see #ANCHOR_TYPE_ID_LOCAL_REVENUE_OUT
+	 * @see #ANCHOR_TYPE_ID_LOCAL_COST
+	 *
+	 * @jdo.field persistence-modifier="persistent" mapped-by="revenueOutAccount"
+	 */
+	private Account revenueInAccount = null;
+
+	/**
+	 * This is <code>null</code> in most cases. It only references another account (which is automatically
+	 * created), if this Account is a revenue account (i.e. getting money for products sold by the local
+	 * organisation) and if money continues further to an cost account.
+	 *
+	 * @see #ANCHOR_TYPE_ID_LOCAL_REVENUE_IN
+	 * @see #ANCHOR_TYPE_ID_LOCAL_REVENUE_OUT
+	 * @see #ANCHOR_TYPE_ID_LOCAL_COST
+	 *
+	 * @jdo.field persistence-modifier="persistent" mapped-by="revenueInAccount"
+	 */
+	private Account revenueOutAccount = null;
+
+	/**
+	 * This method can only be called, if this is a revenue-out account (i.e. having {@link #ANCHOR_TYPE_ID_LOCAL_REVENUE_OUT}).
+	 *
+	 * @param revenueInAccount The corresponding revenue-in account. It must have {@link #ANCHOR_TYPE_ID_LOCAL_REVENUE_IN}.
+	 */
+	protected void setRevenueInAccount(Account revenueInAccount)
+	{
+		if (revenueInAccount == null)
+			throw new IllegalArgumentException("revenueInAccount must not be null!");
+
+		if (!ANCHOR_TYPE_ID_LOCAL_REVENUE_IN.equals(revenueInAccount.getAnchorTypeID()))
+			throw new IllegalArgumentException("revenueAccountIn \""+revenueInAccount.getPrimaryKey()+"\" has anchorTypeID \"" + revenueInAccount.getAnchorTypeID() + "\" which is illegal! It must be \"" + ANCHOR_TYPE_ID_LOCAL_REVENUE_IN + "\"!");
+
+		if (!ANCHOR_TYPE_ID_LOCAL_REVENUE_OUT.equals(this.getAnchorTypeID()))
+			throw new IllegalArgumentException("this \""+this.getPrimaryKey()+"\" has anchorTypeID \"" + this.getAnchorTypeID() + "\" which is illegal! It must be \"" + ANCHOR_TYPE_ID_LOCAL_REVENUE_OUT + "\"!");
+
+		if (this.revenueInAccount != null && !this.revenueInAccount.equals(revenueInAccount))
+			throw new IllegalArgumentException("this \""+this.getPrimaryKey()+"\" has already a revenueInAccount assigned!");
+
+		this.revenueInAccount = revenueInAccount;
+	}
+
+	/**
+	 * @return Returns <code>null</code>, if this is <b>not</b> a revenue-out account.
+	 * @see #setRevenueInAccount(Account)
+	 */
+	public Account getRevenueInAccount()
+	{
+		return revenueInAccount;
+	}
+
+	/**
+	 * This method can only be called, if this is a revenue-in account (i.e. having {@link #ANCHOR_TYPE_ID_LOCAL_REVENUE_IN}).
+	 *
+	 * @param revenueOutAccount The corresponding revenue-out account. It must have {@link #ANCHOR_TYPE_ID_LOCAL_REVENUE_OUT}.
+	 */
+	protected void setRevenueOutAccount(Account revenueOutAccount)
+	{
+		if (revenueOutAccount == null)
+			throw new IllegalArgumentException("revenueOutAccount must not be null!");
+
+		if (!ANCHOR_TYPE_ID_LOCAL_REVENUE_OUT.equals(revenueOutAccount.getAnchorTypeID()))
+			throw new IllegalArgumentException("revenueAccountOut \""+revenueOutAccount.getPrimaryKey()+"\" has anchorTypeID \"" + revenueOutAccount.getAnchorTypeID() + "\" which is illegal! It must be \"" + ANCHOR_TYPE_ID_LOCAL_REVENUE_OUT + "\"!");
+
+		if (!ANCHOR_TYPE_ID_LOCAL_REVENUE_IN.equals(this.getAnchorTypeID()))
+			throw new IllegalArgumentException("this \""+this.getPrimaryKey()+"\" has anchorTypeID \"" + this.getAnchorTypeID() + "\" which is illegal! It must be \"" + ANCHOR_TYPE_ID_LOCAL_REVENUE_IN + "\"!");
+
+		if (this.revenueOutAccount != null && !this.revenueOutAccount.equals(revenueOutAccount))
+			throw new IllegalArgumentException("this \""+this.getPrimaryKey()+"\" has already a revenueOutAccount assigned!");
+
+		this.revenueOutAccount = revenueOutAccount;
+	}
+
+	/**
+	 * @return Returns <code>null</code>, if this is either <b>not</b> a revenue-in account or if it
+	 *		is a revenue-in account but has no revenue-out account assigned, yet.
+	 * @see #setRevenueOutAccount(Account)
+	 * @see #createRevenueOutAccount()
+	 */
+	public Account getRevenueOutAccount()
+	{
+		return revenueOutAccount;
+	}
+
+	protected Account _createRevenueOutAccount()
+	{
+		return new Account(
+				this.getOrganisationID(),
+				ANCHOR_TYPE_ID_LOCAL_REVENUE_OUT,
+				this.getAnchorID(),
+				this.getOwner(),
+				this.getCurrency());
+	}
+
+	/**
+	 * This method will create a corresponding revenueOutAccount, if it does not yet exist.
+	 * Otherwise, it will return the previously created corresponding revenue-out account.
+	 * <p>
+	 * This method can only be called, if this is a revenue-in account (i.e. having {@link #ANCHOR_TYPE_ID_LOCAL_REVENUE_IN}).
+	 * </p>
+	 *
+	 * @return the corresponding revenue-out account.
+	 */
+	public Account createRevenueOutAccount()
+	{
+		if (revenueOutAccount == null) {
+			if (!ANCHOR_TYPE_ID_LOCAL_REVENUE_IN.equals(this.getAnchorTypeID()))
+				throw new IllegalStateException("this \""+this.getPrimaryKey()+"\" has anchorTypeID \"" + this.getAnchorTypeID() + "\" which is illegal! It must be \"" + ANCHOR_TYPE_ID_LOCAL_REVENUE_IN + "\"!");
+
+			Account account = _createRevenueOutAccount();
+			account.setRevenueInAccount(this);
+			this.setRevenueOutAccount(account);
+		}
+
+		return revenueOutAccount;
 	}
 }

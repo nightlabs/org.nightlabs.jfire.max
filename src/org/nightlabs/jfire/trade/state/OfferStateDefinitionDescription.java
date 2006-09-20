@@ -24,7 +24,7 @@
  *                                                                             *
  ******************************************************************************/
 
-package org.nightlabs.jfire.accounting.state;
+package org.nightlabs.jfire.trade.state;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -36,17 +36,17 @@ import org.nightlabs.i18n.I18nText;
  *
  * @jdo.persistence-capable
  *		identity-type="application"
- *		objectid-class="org.nightlabs.jfire.accounting.state.id.InvoiceStateDefinitionNameID"
+ *		objectid-class="org.nightlabs.jfire.trade.state.id.OfferStateDefinitionDescriptionID"
  *		detachable="true"
- *		table="JFireTrade_InvoiceStateDefinitionName"
+ *		table="JFireTrade_OfferStateDefinitionDescription"
  *
  * @jdo.inheritance strategy="new-table"
  *
- * @jdo.create-objectid-class field-order="organisationID, invoiceStateDefinitionID"
+ * @jdo.create-objectid-class field-order="organisationID, offerStateDefinitionID"
  *
- * @jdo.fetch-group name="InvoiceStateDefinition.name" fields="invoiceStateDefinition, names"
+ * @jdo.fetch-group name="OfferStateDefinition.description" fields="offerStateDefinition, descriptions"
  */
-public class InvoiceStateDefinitionName extends I18nText
+public class OfferStateDefinitionDescription extends I18nText
 {
 	private static final long serialVersionUID = 1L;
 
@@ -60,11 +60,11 @@ public class InvoiceStateDefinitionName extends I18nText
 	 * @jdo.field primary-key="true"
 	 * @jdo.column length="100"
 	 */
-	private String invoiceStateDefinitionID;
+	private String offerStateDefinitionID;
 
 	/**
 	 * key: String languageID<br/>
-	 * value: String name
+	 * value: String description
 	 * 
 	 * @jdo.field
 	 *		persistence-modifier="persistent"
@@ -72,11 +72,14 @@ public class InvoiceStateDefinitionName extends I18nText
 	 *		key-type="java.lang.String"
 	 *		value-type="java.lang.String"
 	 *		default-fetch-group="true"
-	 *		table="JFireTrade_InvoiceStateDefinitionName_names"
+	 *		table="JFireTrade_OfferStateDefinitionDescription_descriptions"
+	 *
+	 * @jdo.key-column length="5"
+	 * @jdo.value-column jdbc-type="LONGVARCHAR"
 	 *
 	 * @jdo.join
 	 */
-	protected Map names = new HashMap();
+	protected Map descriptions = new HashMap();
 
 	/**
 	 * This variable contains the name in a certain language after localization.
@@ -86,25 +89,25 @@ public class InvoiceStateDefinitionName extends I18nText
 	 *
 	 * @jdo.field persistence-modifier="transactional" default-fetch-group="false"
 	 */
-	protected String name;
+	protected String description;
 
 	/**
 	 * @jdo.field persistence-modifier="persistent"
 	 */
-	private InvoiceStateDefinition invoiceStateDefinition;
+	private OfferStateDefinition offerStateDefinition;
 
 	/**
 	 * @deprecated Only for JDO!
 	 */
-	protected InvoiceStateDefinitionName()
+	protected OfferStateDefinitionDescription()
 	{
 	}
 
-	public InvoiceStateDefinitionName(InvoiceStateDefinition invoiceStateDefinition)
+	public OfferStateDefinitionDescription(OfferStateDefinition offerStateDefinition)
 	{
-		this.organisationID = invoiceStateDefinition.getOrganisationID();
-		this.invoiceStateDefinitionID = invoiceStateDefinition.getInvoiceStateDefinitionID();
-		this.invoiceStateDefinition = invoiceStateDefinition;
+		this.organisationID = offerStateDefinition.getOrganisationID();
+		this.offerStateDefinitionID = offerStateDefinition.getOfferStateDefinitionID();
+		this.offerStateDefinition = offerStateDefinition;
 	}
 
 	/**
@@ -112,7 +115,7 @@ public class InvoiceStateDefinitionName extends I18nText
 	 */
 	protected Map getI18nMap()
 	{
-		return names;
+		return descriptions;
 	}
 
 	/**
@@ -120,7 +123,7 @@ public class InvoiceStateDefinitionName extends I18nText
 	 */
 	protected void setText(String localizedValue)
 	{
-		this.name = localizedValue;
+		this.description = localizedValue;
 	}
 
 	/**
@@ -128,7 +131,7 @@ public class InvoiceStateDefinitionName extends I18nText
 	 */
 	public String getText()
 	{
-		return name;
+		return description;
 	}
 
 	/**
@@ -136,7 +139,7 @@ public class InvoiceStateDefinitionName extends I18nText
 	 */
 	protected String getFallBackValue(String languageID)
 	{
-		return InvoiceStateDefinition.getPrimaryKey(organisationID, invoiceStateDefinitionID);
+		return OfferStateDefinition.getPrimaryKey(organisationID, offerStateDefinitionID);
 	}
 
 	public String getOrganisationID()
@@ -144,14 +147,14 @@ public class InvoiceStateDefinitionName extends I18nText
 		return organisationID;
 	}
 
-	public String getInvoiceStateDefinitionID()
+	public String getOfferStateDefinitionID()
 	{
-		return invoiceStateDefinitionID;
+		return offerStateDefinitionID;
 	}
 
-	public InvoiceStateDefinition getInvoiceStateDefinition()
+	public OfferStateDefinition getOfferStateDefinition()
 	{
-		return invoiceStateDefinition;
+		return offerStateDefinition;
 	}
 
 }

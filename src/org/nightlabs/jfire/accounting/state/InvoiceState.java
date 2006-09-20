@@ -11,7 +11,7 @@ import org.nightlabs.jfire.security.User;
  *
  * @jdo.persistence-capable
  *		identity-type="application"
- *		objectid-class="org.nightlabs.jfire.trade.state.id.InvoiceStateID"
+ *		objectid-class="org.nightlabs.jfire.accounting.state.id.InvoiceStateID"
  *		detachable="true"
  *		table="JFireTrade_InvoiceState"
  *
@@ -28,6 +28,9 @@ public class InvoiceState
 implements Serializable
 {
 	private static final long serialVersionUID = 1L;
+
+	// zweifelhafte forderung	
+	// uneinbringliche forderungsa
 
 	/**
 	 * @jdo.field primary-key="true"

@@ -33,6 +33,7 @@ import java.util.HashSet;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Locale;
 import java.util.Set;
 
 import javax.ejb.CreateException;
@@ -41,6 +42,7 @@ import javax.ejb.SessionBean;
 import javax.ejb.SessionContext;
 import javax.jdo.JDOHelper;
 import javax.jdo.PersistenceManager;
+import javax.naming.InitialContext;
 
 import org.apache.log4j.Logger;
 import org.nightlabs.ModuleException;
@@ -60,6 +62,7 @@ import org.nightlabs.jfire.trade.id.ArticleID;
 import org.nightlabs.jfire.trade.id.OfferID;
 import org.nightlabs.jfire.trade.id.OrderID;
 import org.nightlabs.jfire.trade.id.SegmentTypeID;
+import org.nightlabs.jfire.trade.state.OfferStateDefinition;
 import org.nightlabs.jfire.transfer.id.AnchorID;
 
 
@@ -982,7 +985,36 @@ implements SessionBean
 					UserConfigSetup.CONFIG_SETUP_TYPE_USER
 				);
 			configSetup.getConfigModuleClasses().add(LegalEntityViewConfigModule.class.getName());
-			
+
+
+			// create the essential OfferStateDefinitions
+			OfferStateDefinition offerStateDefinition;
+
+			offerStateDefinition = new OfferStateDefinition(OfferStateDefinition.OFFER_STATE_DEFINITION_ID_CREATED);
+			offerStateDefinition.getName().setText(Locale.ENGLISH.getLanguage(), "created");
+			offerStateDefinition.getDescription().setText(Locale.ENGLISH.getLanguage(), "The Offer has been newly created. This is the first state in the Offer related workflow.");
+			pm.makePersistent(offerStateDefinition);
+
+			offerStateDefinition = new OfferStateDefinition(OfferStateDefinition.OFFER_STATE_DEFINITION_ID_FINALIZED);
+			offerStateDefinition.getName().setText(Locale.ENGLISH.getLanguage(), "created");
+			offerStateDefinition.getDescription().setText(Locale.ENGLISH.getLanguage(), "The Offer has been finalized. After that, it cannot be modified anymore. A modification would require cancellation and recreation.");
+			pm.makePersistent(offerStateDefinition);
+
+			offerStateDefinition = new OfferStateDefinition(OfferStateDefinition.OFFER_STATE_DEFINITION_ID_ACCEPTED);
+			offerStateDefinition.getName().setText(Locale.ENGLISH.getLanguage(), "accepted");
+			offerStateDefinition.getDescription().setText(Locale.ENGLISH.getLanguage(), "The Offer has been accepted by the customer. That turns the offer into a binding contract.");
+			pm.makePersistent(offerStateDefinition);
+
+			offerStateDefinition = new OfferStateDefinition(OfferStateDefinition.OFFER_STATE_DEFINITION_ID_CANCELLED);
+			offerStateDefinition.getName().setText(Locale.ENGLISH.getLanguage(), "cancelled");
+			offerStateDefinition.getDescription().setText(Locale.ENGLISH.getLanguage(), "The Offer has been cancelled by the vendor. The result is the same as if the customer had rejected the offer. A cancellation is possible even after the customer has accepted the Offer.");
+			pm.makePersistent(offerStateDefinition);
+
+			offerStateDefinition = new OfferStateDefinition(OfferStateDefinition.OFFER_STATE_DEFINITION_ID_REJECTED);
+			offerStateDefinition.getName().setText(Locale.ENGLISH.getLanguage(), "rejected");
+			offerStateDefinition.getDescription().setText(Locale.ENGLISH.getLanguage(), "The Offer has been rejected by the customer. A new Offer needs to be created in order to continue the interaction.");
+			pm.makePersistent(offerStateDefinition);
+
 		} finally {
 			pm.close();
 		}

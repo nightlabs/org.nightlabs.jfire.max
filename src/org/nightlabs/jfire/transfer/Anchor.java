@@ -36,6 +36,7 @@ import javax.jdo.PersistenceManager;
 
 import org.nightlabs.jfire.security.User;
 import org.nightlabs.jfire.transfer.id.AnchorID;
+import org.nightlabs.util.Utils;
 
 /**
  * An Anchor is an end-point for a Transfer. Every Transfer has exactly two Anchors -
@@ -310,5 +311,37 @@ public abstract class Anchor
 			throw new IllegalStateException("This instance of Anchor ("+getPrimaryKey()+") is currently not persistent or not attached. Cannot obtain PersistenceManager!");
 
 		return pm;
+	}
+
+	public static void main(String[] args)
+	{
+		int val = Integer.MAX_VALUE - 10;
+		for (int i = 0; i < 10; ++i) {
+			val = val + 3;
+			System.out.println(val);
+		}
+	}
+
+	@Override
+	public boolean equals(Object obj)
+	{
+		if (this == obj)
+			return true;
+
+		if (!(this instanceof Anchor))
+			return false;
+
+		Anchor o = (Anchor) obj;
+
+		return
+				Utils.equals(this.organisationID, o.organisationID) &&
+				Utils.equals(this.anchorTypeID, o.anchorTypeID) &&
+				Utils.equals(this.anchorID, o.anchorID);
+	}
+
+	@Override
+	public int hashCode()
+	{
+		return Utils.hashCode(organisationID) ^ Utils.hashCode(anchorTypeID) ^ Utils.hashCode(anchorID);
 	}
 }

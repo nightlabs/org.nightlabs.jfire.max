@@ -44,6 +44,8 @@ import javax.jdo.listener.DetachCallback;
 import org.nightlabs.jdo.ObjectIDUtil;
 import org.nightlabs.jfire.security.User;
 import org.nightlabs.jfire.store.id.DeliveryNoteID;
+import org.nightlabs.jfire.store.state.DeliveryNoteState;
+import org.nightlabs.jfire.store.state.DeliveryNoteStateDefinition;
 import org.nightlabs.jfire.trade.Article;
 import org.nightlabs.jfire.trade.ArticleContainer;
 import org.nightlabs.jfire.trade.LegalEntity;
@@ -250,6 +252,25 @@ implements Serializable, ArticleContainer, DetachCallback
 	 * @jdo.field persistence-modifier="none"
 	 */
 	private boolean customerID_detached = false;
+
+	/**
+	 * @jdo.field persistence-modifier="persistent"
+	 */
+	private DeliveryNoteState deliveryNoteState;
+
+	/**
+	 * This is the history of <b>public</b> {@link DeliveryNoteState}s with the newest last and the oldest first.
+	 *
+	 * @jdo.field
+	 *		persistence-modifier="persistent"
+	 *		collection-type="collection"
+	 *		element-type="DeliveryNoteState"
+	 *		dependent-element="true"
+	 *		table="JFireTrade_DeliveryNote_deliveryNoteStates"
+	 *
+	 * @jdo.join
+	 */
+	private List<DeliveryNoteState> deliveryNoteStates;
 
 //	/**
 //	 * key: String articlePK (organisationID/articleID)<br/>
@@ -564,4 +585,40 @@ implements Serializable, ArticleContainer, DetachCallback
 				Utils.hashCode(this.deliveryNoteIDPrefix) ^
 				Utils.hashCode(this.deliveryNoteID);
 	}
+
+
+	/**
+	 * This method is <b>not</b> intended to be called directly.
+	 * Call {@link DeliveryNoteStateDefinition#createDeliveryNoteState(User, DeliveryNote)} instead!
+	 */
+	public void setDeliveryNoteState(DeliveryNoteState currentDeliveryNoteState)
+	{
+		if (currentDeliveryNoteState == null)
+			throw new IllegalArgumentException("deliveryNoteState must not be null!");
+
+		if (!currentDeliveryNoteState.getDeliveryNoteStateDefinition().isPublicState())
+			throw new IllegalArgumentException("deliveryNoteState.deliveryNoteStateDefinition.publicState is false!");
+
+		this.deliveryNoteState = currentDeliveryNoteState;
+		this.deliveryNoteStates.add(currentDeliveryNoteState);
+	}
+
+	public DeliveryNoteState getDeliveryNoteState()
+	{
+		return deliveryNoteState;
+	}
+
+	/**
+	 * @jdo.field persistence-modifier="none"
+	 */
+	private transient List<DeliveryNoteState> _deliveryNoteStates = null;
+
+	public List<DeliveryNoteState> getDeliveryNoteStates()
+	{
+		if (_deliveryNoteStates == null)
+			_deliveryNoteStates = Collections.unmodifiableList(deliveryNoteStates);
+
+		return _deliveryNoteStates;
+	}
+
 }

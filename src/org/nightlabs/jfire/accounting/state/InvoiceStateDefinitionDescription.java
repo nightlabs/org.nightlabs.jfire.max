@@ -36,17 +36,17 @@ import org.nightlabs.i18n.I18nText;
  *
  * @jdo.persistence-capable
  *		identity-type="application"
- *		objectid-class="org.nightlabs.jfire.accounting.state.id.InvoiceStateDefinitionNameID"
+ *		objectid-class="org.nightlabs.jfire.accounting.state.id.InvoiceStateDefinitionDescriptionID"
  *		detachable="true"
- *		table="JFireTrade_InvoiceStateDefinitionName"
+ *		table="JFireTrade_InvoiceStateDefinitionDescription"
  *
  * @jdo.inheritance strategy="new-table"
  *
  * @jdo.create-objectid-class field-order="organisationID, invoiceStateDefinitionID"
  *
- * @jdo.fetch-group name="InvoiceStateDefinition.name" fields="invoiceStateDefinition, names"
+ * @jdo.fetch-group name="InvoiceStateDefinition.description" fields="invoiceStateDefinition, descriptions"
  */
-public class InvoiceStateDefinitionName extends I18nText
+public class InvoiceStateDefinitionDescription extends I18nText
 {
 	private static final long serialVersionUID = 1L;
 
@@ -64,7 +64,7 @@ public class InvoiceStateDefinitionName extends I18nText
 
 	/**
 	 * key: String languageID<br/>
-	 * value: String name
+	 * value: String description
 	 * 
 	 * @jdo.field
 	 *		persistence-modifier="persistent"
@@ -72,11 +72,14 @@ public class InvoiceStateDefinitionName extends I18nText
 	 *		key-type="java.lang.String"
 	 *		value-type="java.lang.String"
 	 *		default-fetch-group="true"
-	 *		table="JFireTrade_InvoiceStateDefinitionName_names"
+	 *		table="JFireTrade_InvoiceStateDefinitionDescription_descriptions"
+	 *
+	 * @jdo.key-column length="5"
+	 * @jdo.value-column jdbc-type="LONGVARCHAR"
 	 *
 	 * @jdo.join
 	 */
-	protected Map names = new HashMap();
+	protected Map descriptions = new HashMap();
 
 	/**
 	 * This variable contains the name in a certain language after localization.
@@ -86,7 +89,7 @@ public class InvoiceStateDefinitionName extends I18nText
 	 *
 	 * @jdo.field persistence-modifier="transactional" default-fetch-group="false"
 	 */
-	protected String name;
+	protected String description;
 
 	/**
 	 * @jdo.field persistence-modifier="persistent"
@@ -96,11 +99,11 @@ public class InvoiceStateDefinitionName extends I18nText
 	/**
 	 * @deprecated Only for JDO!
 	 */
-	protected InvoiceStateDefinitionName()
+	protected InvoiceStateDefinitionDescription()
 	{
 	}
 
-	public InvoiceStateDefinitionName(InvoiceStateDefinition invoiceStateDefinition)
+	public InvoiceStateDefinitionDescription(InvoiceStateDefinition invoiceStateDefinition)
 	{
 		this.organisationID = invoiceStateDefinition.getOrganisationID();
 		this.invoiceStateDefinitionID = invoiceStateDefinition.getInvoiceStateDefinitionID();
@@ -112,7 +115,7 @@ public class InvoiceStateDefinitionName extends I18nText
 	 */
 	protected Map getI18nMap()
 	{
-		return names;
+		return descriptions;
 	}
 
 	/**
@@ -120,7 +123,7 @@ public class InvoiceStateDefinitionName extends I18nText
 	 */
 	protected void setText(String localizedValue)
 	{
-		this.name = localizedValue;
+		this.description = localizedValue;
 	}
 
 	/**
@@ -128,7 +131,7 @@ public class InvoiceStateDefinitionName extends I18nText
 	 */
 	public String getText()
 	{
-		return name;
+		return description;
 	}
 
 	/**

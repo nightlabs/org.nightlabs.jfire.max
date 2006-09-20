@@ -37,6 +37,7 @@ import javax.ejb.SessionContext;
 import javax.jdo.FetchPlan;
 import javax.jdo.JDOObjectNotFoundException;
 import javax.jdo.PersistenceManager;
+import javax.naming.InitialContext;
 
 import org.apache.log4j.Logger;
 import org.nightlabs.ModuleException;
@@ -144,7 +145,8 @@ implements SessionBean
 				// registering demo timer task
 				TaskID taskID = TaskID.create(Organisation.DEVIL_ORGANISATION_ID, Task.TASK_TYPE_ID_SYSTEM, "ChezFrancois-DemoTimerTask");
 				try {
-					pm.getObjectById(taskID);
+					Task task = (Task) pm.getObjectById(taskID);
+					task.getActiveExecID();
 				} catch (JDOObjectNotFoundException x) {
 					Task task = new Task(
 							taskID.organisationID, taskID.taskTypeID, taskID.taskID,
@@ -481,6 +483,49 @@ implements SessionBean
 	 */
 	public void demoTimerTask(TaskID taskID) 
 	{
+		logger.info("***************************************************************************************************************");
+		logger.info("***************************************************************************************************************");
+		logger.info("***************************************************************************************************************");
+		logger.info("***************************************************************************************************************");
+		logger.info("***************************************************************************************************************");
+		logger.info("***************************************************************************************************************");
+
+		String jndiName = "java:/jbpm/JbpmConfiguration";
+		try {
+			InitialContext initialContext = new InitialContext();
+			Object o = initialContext.lookup(jndiName);
+			logger.info("fetched object from jndi with jndiName \""+jndiName+"\"");
+			logger.info("  class=" + (o == null ? null : o.getClass().getName()));
+			logger.info("  instance=" + o);
+		} catch (Throwable t) {
+			logger.error("Lookup of jbpm with jndiName \""+jndiName+"\" failed!", t);
+		}
+
+		logger.info("***************************************************************************************************************");
+		logger.info("***************************************************************************************************************");
+		logger.info("***************************************************************************************************************");
+		logger.info("***************************************************************************************************************");
+		logger.info("***************************************************************************************************************");
+		logger.info("***************************************************************************************************************");
+
+		jndiName = "java:/jbpm/JbpmConfigurationMarco";
+		try {
+			InitialContext initialContext = new InitialContext();
+			Object o = initialContext.lookup(jndiName);
+			logger.info("fetched object from jndi with jndiName \""+jndiName+"\"");
+			logger.info("  class=" + (o == null ? null : o.getClass().getName()));
+			logger.info("  instance=" + o);
+		} catch (Throwable t) {
+			logger.error("Lookup of jbpm with jndiName \""+jndiName+"\" failed!", t);
+		}
+
+		logger.info("***************************************************************************************************************");
+		logger.info("***************************************************************************************************************");
+		logger.info("***************************************************************************************************************");
+		logger.info("***************************************************************************************************************");
+		logger.info("***************************************************************************************************************");
+		logger.info("***************************************************************************************************************");
+
 		logger.info("demoTimerTask: entered for taskID " + taskID);
 		logger.info("demoTimerTask: sleeping 10 sec");
 		try {

@@ -127,9 +127,6 @@ public abstract class AccountingManagerBean
 	 */
 	private static final Logger logger = Logger.getLogger(AccountingManagerBean.class);
 
-	/**
-	 * @see org.nightlabs.jfire.base.BaseSessionBeanImpl#setSessionContext(javax.ejb.SessionContext)
-	 */
 	public void setSessionContext(SessionContext sessionContext)
 			throws EJBException, RemoteException
 	{
@@ -169,7 +166,7 @@ public abstract class AccountingManagerBean
 	{
 		logger.debug(this.getClass().getName() + ".ejbPassivate()");
 	}
-	
+
 	/**
 	 * @throws IOException @throws IOException While loading an icon from a local resource, this might happen and we don't care in the initialize method.
 	 *

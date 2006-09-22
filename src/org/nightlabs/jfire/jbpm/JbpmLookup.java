@@ -12,6 +12,11 @@ public class JbpmLookup
 {
 	protected JbpmLookup() {}
 
+	protected static String getEhCacheConfigFileName(String organisationID)
+	{
+		return "ehcache-"+organisationID+"-cfg.xml";
+	}
+
 	protected static String getJbpmConfigFileName(String organisationID)
 	{
 		return "jbpm-"+organisationID+"-cfg.xml";

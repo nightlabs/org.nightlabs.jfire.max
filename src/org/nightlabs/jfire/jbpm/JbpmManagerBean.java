@@ -111,18 +111,25 @@ implements SessionBean
 
 					// the ehcache.xml seems to be global in all cases :-( as I didn't find how to specify its name somewhere
 					List<DeploymentJarItem> deploymentJarItems = new LinkedList<DeploymentJarItem>();
-					deploymentJarItems.add(
-							new DeploymentJarItem(
-									new File("ehcache.xml"),
-									new File(jfireJbpmEarDirectory, "ehcache.template.xml"),
-									null));
-
-					jfireServerManager.createDeploymentJar(
-							new File("JFire_ehcache_global.last/ehcache-cfg.jar"),
-							deploymentJarItems,
-							DeployOverwriteBehaviour.KEEP);
+//					deploymentJarItems.add(
+//							new DeploymentJarItem(
+//									new File("ehcache.xml"),
+//									new File(jfireJbpmEarDirectory, "ehcache.template.xml"),
+//									null));
+//
+//					jfireServerManager.createDeploymentJar(
+//							new File("JFire_ehcache_global.last/ehcache-cfg.jar"),
+//							deploymentJarItems,
+//							DeployOverwriteBehaviour.KEEP);
 
 					deploymentJarItems.clear();
+
+					deploymentJarItems.add(
+						new DeploymentJarItem(
+								new File(JbpmLookup.getEhCacheConfigFileName(getOrganisationID())),
+								new File(jfireJbpmEarDirectory, "ehcache.template.xml"),
+								null));
+
 					deploymentJarItems.add(
 							new DeploymentJarItem(
 									new File(JbpmLookup.getJbpmConfigFileName(getOrganisationID())),
@@ -150,7 +157,7 @@ implements SessionBean
 				boolean deploymentComplete;
 				do {
 					deploymentComplete = true;
-					if (cl.getResource("ehcache.xml") == null)
+					if (cl.getResource(JbpmLookup.getEhCacheConfigFileName(getOrganisationID())) == null)
 						deploymentComplete = false;
 
 					if (cl.getResource(JbpmLookup.getJbpmConfigFileName(getOrganisationID())) == null)

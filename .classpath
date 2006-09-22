@@ -21,7 +21,6 @@
 	<classpathentry kind="var" path="LOG4J"/>
 	<classpathentry sourcepath="WORKSPACE/JFireBaseBean/src" kind="var" path="WORKSPACE/JFireBaseBean/dist/JFireBaseBean.jar"/>
 	<classpathentry sourcepath="/WORKSPACE/JFireServerManager/src" kind="var" path="WORKSPACE/JFireServerManager/dist/JFireServerManager.jar"/>
-	<classpathentry kind="var" path="JBOSS/server/default/deploy/jbpm/jbpm-3.1.2.jar"/>
-	<classpathentry kind="var" path="JBOSS/server/default/deploy/jbpm/jbpm-identity-3.1.2.jar"/>
+	<classpathentry kind="lib" path="lib/jbpm/jbpm-3.1.2.jar"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>

@@ -30,6 +30,8 @@
     <property name="hibernate.connection.password">${databasePassword}</property>
     <property name="hibernate.hbm2ddl.auto">update</property>
 
+	<property name="hibernate.cache.provider_class">org.hibernate.cache.EhCacheProvider</property>
+	<property name="hibernate.cache.provider_configuration_file_resource_path">ehcache-${organisationID}-cfg.xml</property>
 
     <!-- other hibernate properties 
     <property name="hibernate.show_sql">true</property>

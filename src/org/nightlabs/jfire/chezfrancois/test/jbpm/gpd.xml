@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<process-diagram name="myfirst" width="636" height="651">
+  <node name="start" x="190" y="39" width="140" height="40">
+    <transition name="to_auction">
+      <label x="5" y="-10"/>
+    </transition>
+  </node>
+  <node name="auction" x="189" y="129" width="140" height="40">
+    <transition name="to_task1">
+      <label x="5" y="-10"/>
+    </transition>
+  </node>
+  <node name="end1" x="189" y="373" width="140" height="40"/>
+  <node name="task1" x="190" y="245" width="140" height="40">
+    <transition name="to_end">
+      <label x="5" y="-10"/>
+    </transition>
+    <transition name="to_decision1">
+      <label x="5" y="-10"/>
+    </transition>
+  </node>
+  <node name="decision1" x="400" y="303" width="140" height="40">
+    <transition name="to_state2">
+      <label x="5" y="-10"/>
+    </transition>
+    <transition name="to_state1">
+      <label x="5" y="-10"/>
+    </transition>
+  </node>
+  <node name="state1" x="319" y="435" width="140" height="40">
+    <transition name="">
+      <label x="5" y="-10"/>
+    </transition>
+  </node>
+  <node name="state2" x="489" y="435" width="140" height="40">
+    <transition name="">
+      <label x="5" y="-10"/>
+    </transition>
+  </node>
+  <node name="end2" x="404" y="525" width="140" height="40"/>
+</process-diagram>

@@ -26,5 +26,7 @@
 	<classpathentry sourcepath="/WORKSPACE/JFireTrade" kind="var" path="WORKSPACE/JFireTrade/dist/JFireTrade.jar"/>
 	<classpathentry sourcepath="/WORKSPACE/JFireSimpleTrade/src" kind="var" path="WORKSPACE/JFireSimpleTrade/dist/JFireSimpleTrade.jar"/>
 	<classpathentry sourcepath="JPOX_SRC" kind="var" path="JDO2"/>
+	<classpathentry kind="var" path="WORKSPACE/JFireJbpm/dist/JFireJbpm.jar"/>
+	<classpathentry kind="var" path="JBOSS/server/default/deploy/jbpm/jbpm-3.1.2.jar"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>

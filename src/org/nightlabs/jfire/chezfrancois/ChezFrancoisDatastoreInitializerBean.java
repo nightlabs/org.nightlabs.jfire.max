@@ -26,6 +26,8 @@
 
 package org.nightlabs.jfire.chezfrancois;
 
+import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.rmi.RemoteException;
 import java.util.Iterator;
 import java.util.Locale;
@@ -37,9 +39,11 @@ import javax.ejb.SessionContext;
 import javax.jdo.FetchPlan;
 import javax.jdo.JDOObjectNotFoundException;
 import javax.jdo.PersistenceManager;
-import javax.naming.InitialContext;
 
 import org.apache.log4j.Logger;
+import org.jbpm.JbpmContext;
+import org.jbpm.graph.def.ProcessDefinition;
+import org.jbpm.jpdl.xml.JpdlXmlReader;
 import org.nightlabs.ModuleException;
 import org.nightlabs.jdo.moduleregistry.ModuleMetaData;
 import org.nightlabs.jfire.accounting.Account;
@@ -50,6 +54,7 @@ import org.nightlabs.jfire.accounting.id.TariffID;
 import org.nightlabs.jfire.accounting.priceconfig.IInnerPriceConfig;
 import org.nightlabs.jfire.accounting.tariffpriceconfig.FormulaPriceConfig;
 import org.nightlabs.jfire.base.BaseSessionBeanImpl;
+import org.nightlabs.jfire.jbpm.JbpmLookup;
 import org.nightlabs.jfire.organisation.Organisation;
 import org.nightlabs.jfire.security.Authority;
 import org.nightlabs.jfire.security.RoleGroup;
@@ -64,6 +69,7 @@ import org.nightlabs.jfire.timer.Task;
 import org.nightlabs.jfire.timer.id.TaskID;
 import org.nightlabs.jfire.trade.Article;
 import org.nightlabs.jfire.trade.LegalEntity;
+import org.nightlabs.util.Utils;
 
 
 /**
@@ -126,9 +132,10 @@ implements SessionBean
 				pm.getFetchPlan().setMaxFetchDepth(1);
 	
 				String organisationID = getOrganisationID();
-	
-				if (!ChezFrancoisServerInitializer.ORGANISATION_ID_WINE_STORE.equals(organisationID))
-					return;
+
+// currently I need it for all organisations. Marco ;-)
+//				if (!ChezFrancoisServerInitializer.ORGANISATION_ID_WINE_STORE.equals(organisationID))
+//					return;
 	
 				ModuleMetaData moduleMetaData = ModuleMetaData.getModuleMetaData(pm, "JFireChezFrancois");
 				if (moduleMetaData != null)
@@ -490,34 +497,51 @@ implements SessionBean
 		logger.info("***************************************************************************************************************");
 		logger.info("***************************************************************************************************************");
 
-		String jndiName = "java:/jbpm/JbpmConfiguration";
 		try {
-			InitialContext initialContext = new InitialContext();
-			Object o = initialContext.lookup(jndiName);
-			logger.info("fetched object from jndi with jndiName \""+jndiName+"\"");
-			logger.info("  class=" + (o == null ? null : o.getClass().getName()));
-			logger.info("  instance=" + o);
+			JbpmContext jbpmContext = JbpmLookup.getJbpmConfiguration().createJbpmContext();
+			try {
+				logger.info("Have JbpmContext! Deploying process definition!");
+				InputStream in = ChezFrancoisDatastoreInitializerBean.class.getResourceAsStream("test/jbpm/processdefinition.xml");
+				JpdlXmlReader jpdlXmlReader = new JpdlXmlReader(new InputStreamReader(in, Utils.CHARSET_NAME_UTF_8));
+				ProcessDefinition processDefinition = jpdlXmlReader.readProcessDefinition();
+				jpdlXmlReader.close();
+
+				jbpmContext.deployProcessDefinition(processDefinition);
+			} finally {
+				jbpmContext.close();
+			}
 		} catch (Throwable t) {
-			logger.error("Lookup of jbpm with jndiName \""+jndiName+"\" failed!", t);
+			logger.error("Jbpm Test failed!", t);
 		}
 
-		logger.info("***************************************************************************************************************");
-		logger.info("***************************************************************************************************************");
-		logger.info("***************************************************************************************************************");
-		logger.info("***************************************************************************************************************");
-		logger.info("***************************************************************************************************************");
-		logger.info("***************************************************************************************************************");
-
-		jndiName = "java:/jbpm/JbpmConfigurationMarco";
-		try {
-			InitialContext initialContext = new InitialContext();
-			Object o = initialContext.lookup(jndiName);
-			logger.info("fetched object from jndi with jndiName \""+jndiName+"\"");
-			logger.info("  class=" + (o == null ? null : o.getClass().getName()));
-			logger.info("  instance=" + o);
-		} catch (Throwable t) {
-			logger.error("Lookup of jbpm with jndiName \""+jndiName+"\" failed!", t);
-		}
+//		String jndiName = "java:/jbpm/JbpmConfiguration";
+//		try {
+//			InitialContext initialContext = new InitialContext();
+//			Object o = initialContext.lookup(jndiName);
+//			logger.info("fetched object from jndi with jndiName \""+jndiName+"\"");
+//			logger.info("  class=" + (o == null ? null : o.getClass().getName()));
+//			logger.info("  instance=" + o);
+//		} catch (Throwable t) {
+//			logger.error("Lookup of jbpm with jndiName \""+jndiName+"\" failed!", t);
+//		}
+//
+//		logger.info("***************************************************************************************************************");
+//		logger.info("***************************************************************************************************************");
+//		logger.info("***************************************************************************************************************");
+//		logger.info("***************************************************************************************************************");
+//		logger.info("***************************************************************************************************************");
+//		logger.info("***************************************************************************************************************");
+//
+//		jndiName = "java:/jbpm/JbpmConfigurationMarco";
+//		try {
+//			InitialContext initialContext = new InitialContext();
+//			Object o = initialContext.lookup(jndiName);
+//			logger.info("fetched object from jndi with jndiName \""+jndiName+"\"");
+//			logger.info("  class=" + (o == null ? null : o.getClass().getName()));
+//			logger.info("  instance=" + o);
+//		} catch (Throwable t) {
+//			logger.error("Lookup of jbpm with jndiName \""+jndiName+"\" failed!", t);
+//		}
 
 		logger.info("***************************************************************************************************************");
 		logger.info("***************************************************************************************************************");

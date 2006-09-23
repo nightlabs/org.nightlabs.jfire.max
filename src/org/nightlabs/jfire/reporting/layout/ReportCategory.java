@@ -29,11 +29,8 @@ package org.nightlabs.jfire.reporting.layout;
 import java.util.HashSet;
 import java.util.Set;
 
-import javax.jdo.JDOHelper;
 import javax.jdo.PersistenceManager;
 import javax.jdo.Query;
-
-import org.nightlabs.jfire.reporting.layout.id.ReportRegistryItemID;
 
 
 /**
@@ -163,25 +160,24 @@ public class ReportCategory extends ReportRegistryItem implements NestableReport
 		this.childItems.add(childItem);
 	}
 
-	public static void ensureRelationWithParent(ReportRegistryItem parent, ReportRegistryItem childItem) {
-		if (parent == null)
-			return;
+//	public static void ensureRelationWithParent(ReportRegistryItem parent, ReportRegistryItem childItem) {
+//		if (parent == null)
+//			return;
+//
+//		if (parent instanceof ReportCategory) {
+//			ReportCategory category = (ReportCategory)parent;
+////			if (category.getChildItems().contains(childItem))
+//				category.addChildItem(childItem);
+//		}
+//	}
 
-		if (parent instanceof ReportCategory) {
-			ReportCategory category = (ReportCategory)parent;
-//			if (category.getChildItems().contains(childItem))
-				category.addChildItem(childItem);
-		}
-	}
-
-	@Override
-	public void jdoPreStore() {
-		super.jdoPreStore();
-		ReportRegistryItemID parentID = (ReportRegistryItemID) JDOHelper.getObjectId(this.getParentItem());
-		if (parentID == null)
-			return;
-		ReportRegistryItem parent = (ReportRegistryItem) getPersistenceManager().getObjectById(parentID);
-		ReportCategory.ensureRelationWithParent(parent, this);
-	}
-	
+//	@Override
+//	public void jdoPreStore() {
+//		super.jdoPreStore();
+//		ReportRegistryItemID parentID = (ReportRegistryItemID) JDOHelper.getObjectId(this.getParentItem());
+//		if (parentID == null)
+//			return;
+//		ReportRegistryItem parent = (ReportRegistryItem) getPersistenceManager().getObjectById(parentID);
+//		ReportCategory.ensureRelationWithParent(parent, this);
+//	}
 }

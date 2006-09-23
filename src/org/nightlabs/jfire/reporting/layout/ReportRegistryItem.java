@@ -90,7 +90,8 @@ import org.nightlabs.jfire.reporting.layout.id.ReportRegistryItemID;
  *			WHERE this.parentItem == null
  *			import java.lang.String"
  */
-public abstract class ReportRegistryItem implements Serializable, StoreCallback  {
+public abstract class ReportRegistryItem implements Serializable, StoreCallback
+{
 	
 	/**
 	 * LOG4J logger used by this class
@@ -210,32 +211,34 @@ public abstract class ReportRegistryItem implements Serializable, StoreCallback 
 		Query q = pm.newNamedQuery(ReportRegistryItem.class, QUERY_TOP_LEVEL_GET_REPORT_REGISTRY_ITEMS);
 		return (Collection)q.execute();
 	}
-	
+
 	/**
-	 * Assigns a reportRegistryItemID for this ReportRegistryItem it this is not set yet.
+	 * TODO isn't this wrong: Assigns a reportRegistryItemID for this ReportRegistryItem it this is not set yet.
+	 *
+	 * IMHO, it creates a ChangeEvent, but this isn't necessary anymore - is it?
 	 *   
 	 * @see javax.jdo.listener.StoreCallback#jdoPreStore()
 	 */
 	public void jdoPreStore() {
 		if (!JDOHelper.isNew(this)) 
 			return;
-		
-			PersistenceManager pm = JDOHelper.getPersistenceManager(this);
-			if (pm == null)
-				throw new IllegalStateException("Could not get PersistenceManager jdoPreStore()");
-			ReportRegistryItemID id = ReportRegistryItemID.create(getOrganisationID(), getReportRegistryItemType(), getReportRegistryItemID());
-			try {
-				pm.getObjectById(id);
-			} catch (JDOObjectNotFoundException e) {
-				if(logger.isDebugEnabled())
-					logger.debug("Adding change event for item "+this.getReportRegistryItemType()+" "+this.getReportRegistryItemID()+" parent is "+getParentItem());
-				ReportRegistryItemChangeEvent.addChangeEventToController(
-						pm,
-						ReportRegistryItemChangeEvent.EVENT_TYPE_ITEM_ADDED,
-						this,
-						getParentItem()
-					);
-			}
+
+		PersistenceManager pm = JDOHelper.getPersistenceManager(this);
+		if (pm == null)
+			throw new IllegalStateException("Could not get PersistenceManager jdoPreStore()");
+		ReportRegistryItemID id = ReportRegistryItemID.create(getOrganisationID(), getReportRegistryItemType(), getReportRegistryItemID());
+		try {
+			pm.getObjectById(id);
+		} catch (JDOObjectNotFoundException e) {
+			if(logger.isDebugEnabled())
+				logger.debug("Adding change event for item "+this.getReportRegistryItemType()+" "+this.getReportRegistryItemID()+" parent is "+getParentItem());
+			ReportRegistryItemChangeEvent.addChangeEventToController(
+					pm,
+					ReportRegistryItemChangeEvent.EVENT_TYPE_ITEM_ADDED,
+					this,
+					getParentItem()
+			);
+		}
 	}
 
 	protected PersistenceManager getPersistenceManager()

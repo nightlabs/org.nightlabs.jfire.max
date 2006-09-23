@@ -164,15 +164,15 @@ public class ReportLayout extends ReportRegistryItem {
 		return fileTimestamp;
 	}
 
-	@Override
-	public void jdoPreStore() {
-		super.jdoPreStore();
-		ReportRegistryItemID parentID = (ReportRegistryItemID) JDOHelper.getObjectId(this.getParentItem());
-		if (parentID == null)
-			throw new IllegalStateException("ReportLayout has to be child of a ReportCategory but is not.");
-		ReportRegistryItem parent = (ReportRegistryItem) getPersistenceManager().getObjectById(parentID);
-		ReportCategory.ensureRelationWithParent(parent, this);
-		logger.info("Called ensureRelationWithParent for ReportLayout");
-	}
-	
+//	@Override
+//	public void jdoPreStore() {
+//		super.jdoPreStore();
+//		ReportRegistryItemID parentID = (ReportRegistryItemID) JDOHelper.getObjectId(this.getParentItem());
+//		if (parentID == null)
+//			throw new IllegalStateException("ReportLayout has to be child of a ReportCategory but is not.");
+//		ReportRegistryItem parent = (ReportRegistryItem) getPersistenceManager().getObjectById(parentID);
+//		ReportCategory.ensureRelationWithParent(parent, this);
+//		logger.info("Called ensureRelationWithParent for ReportLayout");
+//	}
+
 }

@@ -102,24 +102,24 @@ public class ReportCategory extends ReportRegistryItem implements NestableReport
 	 */
 	private Set<ReportRegistryItem> childItems;	
 
-// TODO This constructor should not exist, because it is very likely, that the child item
-//		is created by another organisation! It's error prone - better get rid of this constructor.
-	/**
-	 * Creates a new ReportCategory with the given one as parent.
-	 * 
-	 * @param pm PersistenceManager to retrieve the ReportRegistry with.
-	 * @param parentItem A non null ReportCategory that will be the parent of the new one.
-	 * @throws NullPointerException if parentItem is null
-	 */
-	public ReportCategory(
-			ReportCategory parentItem,
-			String reportRegistryItemID 
-		) 
-	{
-		super(parentItem, parentItem.getOrganisationID(), parentItem.getReportRegistryItemType(), reportRegistryItemID);
-		this.internal = parentItem.isInternal();
-		this.childItems = new HashSet<ReportRegistryItem>();
-	}
+//// TODO This constructor should not exist, because it is very likely, that the child item
+////		is created by another organisation! It's error prone - better get rid of this constructor.
+//	/**
+//	 * Creates a new ReportCategory with the given one as parent.
+//	 * 
+//	 * @param pm PersistenceManager to retrieve the ReportRegistry with.
+//	 * @param parentItem A non null ReportCategory that will be the parent of the new one.
+//	 * @throws NullPointerException if parentItem is null
+//	 */
+//	public ReportCategory(
+//			ReportCategory parentItem,
+//			String reportRegistryItemID 
+//		) 
+//	{
+//		super(parentItem, parentItem.getOrganisationID(), parentItem.getReportRegistryItemType(), reportRegistryItemID);
+//		this.internal = parentItem.isInternal();
+//		this.childItems = new HashSet<ReportRegistryItem>();
+//	}
 	
 	public ReportCategory(
 			ReportCategory parentItem,

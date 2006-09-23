@@ -154,20 +154,20 @@ implements SessionBean
 //	throws ModuleException
 //	{
 //		File layoutDesign = new File(earDir, "Default-"+catType+".rptdesign");
-//		LOGGER.info("Checking default report layout fo catType "+catType+" file: "+layoutDesign);
+//		logger.info("Checking default report layout fo catType "+catType+" file: "+layoutDesign);
 //		if (layoutDesign.exists()) {
-//			LOGGER.info("File: "+layoutDesign+" existing");
+//			logger.info("File: "+layoutDesign+" existing");
 //			ReportLayout layout = new ReportLayout(pm, cat, null);
 //			try {
 //				layout.loadFile(layoutDesign);
 //			} catch (IOException e) {
-//				LOGGER.error("Could not read ReportLayout file for default offer layout: ", e);
+//				logger.error("Could not read ReportLayout file for default offer layout: ", e);
 //			}
 //			layout.getName().setText(Locale.ENGLISH.getLanguage(), englishName);
 //			layout.getName().setText(Locale.GERMAN.getLanguage(), germanName);
-//			LOGGER.info("Persisting default layout for "+catType);
+//			logger.info("Persisting default layout for "+catType);
 //			pm.makePersistent(layout);
-//			LOGGER.info("Persisting default layout for "+catType+" ...  DONE");
+//			logger.info("Persisting default layout for "+catType+" ...  DONE");
 //			
 //			Collection configs = Config.getConfigsByType(pm, getOrganisationID(), UserConfigSetup.CONFIG_TYPE_USER_CONFIG);
 //			for (Iterator iter = configs.iterator(); iter.hasNext();) {
@@ -175,9 +175,9 @@ implements SessionBean
 //				ReportLayoutConfigModule configModule = (ReportLayoutConfigModule)config.createConfigModule(ReportLayoutConfigModule.class, null);
 ////				ReportLayoutConfigModule configModule = (ReportLayoutConfigModule)ConfigModule.getAutoCreateConfigModule(pm, config, ReportLayoutConfigModule.class, null);
 //				configModule.getAvailEntry(catType).setDefaultReportLayoutKey(JDOHelper.getObjectId(layout).toString());
-//				LOGGER.info("Set default for ReportLayoutConfigModule for category "+catType+" and Config "+config.getConfigKey());
+//				logger.info("Set default for ReportLayoutConfigModule for category "+catType+" and Config "+config.getConfigKey());
 //			}
-//			LOGGER.info("Created new default report layout for catType "+catType);
+//			logger.info("Created new default report layout for catType "+catType);
 //		}
 //	}
 	

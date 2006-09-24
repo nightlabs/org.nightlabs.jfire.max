@@ -1,6 +1,7 @@
 package org.nightlabs.jfire.jbpm;
 
 import java.io.File;
+import java.net.URL;
 import java.rmi.RemoteException;
 import java.util.LinkedList;
 import java.util.List;
@@ -153,6 +154,7 @@ implements SessionBean
 				ClassLoader cl = this.getClass().getClassLoader();
 
 				// wait until the stuff is deployed
+				URL hibernateConfigFileResource = null;
 				long startDT = System.currentTimeMillis();
 				boolean deploymentComplete;
 				do {
@@ -163,7 +165,8 @@ implements SessionBean
 					if (cl.getResource(JbpmLookup.getJbpmConfigFileName(getOrganisationID())) == null)
 						deploymentComplete = false;
 
-					if (cl.getResource(JbpmLookup.getJbpmConfigFileName(getOrganisationID())) == null)
+					hibernateConfigFileResource = cl.getResource(JbpmLookup.getHibernateConfigFileName(getOrganisationID()));
+					if (hibernateConfigFileResource == null)
 						deploymentComplete = false;
 
 					if (!deploymentComplete) {
@@ -177,6 +180,17 @@ implements SessionBean
 
 				logger.info("Deployment complete!");
 
+//				Configuration configuration = new Configuration();
+//				String xml;
+//				InputStream in = hibernateConfigFileResource.openStream();
+//				try {
+//					xml = Utils.readTextFile(in);
+//				} finally {
+//					in.close();
+//				}
+//				configuration.addXML(xml);
+//				SchemaExport schemaExport = new SchemaExport(configuration);
+//				schemaExport.create(false, true);
 			} // if (moduleMetaData == null) {
 
 			JbpmConfiguration jbpmConfiguration = JbpmConfiguration.getInstance(JbpmLookup.getJbpmConfigFileName(getOrganisationID()));

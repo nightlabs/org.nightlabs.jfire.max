@@ -23,7 +23,8 @@
 	<property name="hibernate.transaction.manager_lookup_class">org.hibernate.transaction.JBossTransactionManagerLookup</property>
 	<property name="hibernate.hbm2ddl.auto">update</property>
 -->
-    <property name="hibernate.dialect">org.hibernate.dialect.MySQLDialect</property>
+	<property name="hibernate.dialect">org.hibernate.dialect.MySQLInnoDBDialect</property>
+<!--   <property name="hibernate.dialect">org.hibernate.dialect.MySQLDialect</property> -->
     <property name="hibernate.connection.driver_class">${databaseDriverName}</property>
     <property name="hibernate.connection.url">${databaseURL}</property>
     <property name="hibernate.connection.username">${databaseUserName}</property>
@@ -32,6 +33,11 @@
 
 	<property name="hibernate.cache.provider_class">org.hibernate.cache.EhCacheProvider</property>
 	<property name="hibernate.cache.provider_configuration_file_resource_path">ehcache-${organisationID}-cfg.xml</property>
+
+<!-- 	delimiter=type=InnoDB
+	<property name="delimiter">type=InnoDB</property>
+	<property name="hibernate.hbm2ddl.delimiter">type=InnoDB</property>
+-->
 
     <!-- other hibernate properties 
     <property name="hibernate.show_sql">true</property>

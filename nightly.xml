@@ -9,6 +9,9 @@
     <publishes location="JFireJbpm/dist/JFireJbpm.jar"/>
     <javadoc path="JFireJbpm/src"/>
     <javadoc path="JFireJbpm/ejbsrc"/>
+    <provides
+    	path="WORKSPACE/JFireJbpm/lib/jbpm/jbpm-3.1.2.jar"
+    	location="JFireJbpm/lib/jbpm/jbpm-3.1.2.jar"/>
   </project>
 
 </nightlybuild>

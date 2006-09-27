@@ -269,7 +269,7 @@ implements
 	private ProductTypeGroup managedProductTypeGroup = null;
 
 	/**
-	 * @jdo.field persistence-modifier="persistent"
+	 * @jdo.field persistence-modifier="persistent" mapped-by="productType"
 	 */
 	private ProductTypeLocal productTypeLocal;
 

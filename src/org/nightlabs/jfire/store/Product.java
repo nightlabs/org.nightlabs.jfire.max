@@ -90,7 +90,7 @@ implements Serializable
 	private ProductType productType;
 
 	/**
-	 * @jdo.field persistence-modifier="persistent"
+	 * @jdo.field persistence-modifier="persistent" mapped-by="product"
 	 * @! mapped-by="product" // TODO this mapped-by should be here, but there seems to be a bug in JPOX
 	 */
 	private ProductLocal productLocal = null;

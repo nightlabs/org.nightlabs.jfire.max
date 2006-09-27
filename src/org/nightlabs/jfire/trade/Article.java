@@ -153,7 +153,7 @@ public class Article
 	private String primaryKey;
 
 	/**
-	 * @jdo.field persistence-modifier="persistent"
+	 * @jdo.field persistence-modifier="persistent" mapped-by="article"
 	 */
 	private ArticleLocal articleLocal;
 

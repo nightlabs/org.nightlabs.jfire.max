@@ -28,16 +28,9 @@ package org.nightlabs.jfire.reporting.trade;
 
 import java.io.File;
 
-import javax.naming.InitialContext;
-import javax.naming.NamingException;
-
 import org.nightlabs.ModuleException;
-import org.nightlabs.jfire.base.InitException;
-import org.nightlabs.jfire.base.Lookup;
 import org.nightlabs.jfire.servermanager.JFireServerManager;
 import org.nightlabs.jfire.servermanager.JFireServerManagerUtil;
-import org.nightlabs.jfire.servermanager.j2ee.SecurityReflector;
-import org.nightlabs.jfire.servermanager.j2ee.SecurityReflector.UserDescriptor;
 
 /**
  * @author Alexander Bieber <alex[AT]nightlabs[DOT]de>

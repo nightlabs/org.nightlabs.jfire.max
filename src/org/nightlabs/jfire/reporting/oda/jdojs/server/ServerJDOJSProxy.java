@@ -40,7 +40,6 @@ import org.mozilla.javascript.Context;
 import org.mozilla.javascript.ImporterTopLevel;
 import org.mozilla.javascript.Scriptable;
 import org.mozilla.javascript.ScriptableObject;
-
 import org.nightlabs.ModuleException;
 import org.nightlabs.jfire.base.Lookup;
 import org.nightlabs.jfire.reporting.oda.DataType;
@@ -49,8 +48,8 @@ import org.nightlabs.jfire.reporting.oda.ResultSetMetaData;
 import org.nightlabs.jfire.reporting.oda.jdojs.AbstractJDOJSProxy;
 import org.nightlabs.jfire.reporting.oda.jdojs.JDOJSResultSet;
 import org.nightlabs.jfire.reporting.oda.jdojs.JDOJSResultSetMetaData;
-import org.nightlabs.jfire.servermanager.j2ee.SecurityReflector;
-import org.nightlabs.jfire.servermanager.j2ee.SecurityReflector.UserDescriptor;
+import org.nightlabs.jfire.security.SecurityReflector;
+import org.nightlabs.jfire.security.SecurityReflector.UserDescriptor;
 
 /**
  * Server-side JDO JavaScript DataSets. Its method are also called

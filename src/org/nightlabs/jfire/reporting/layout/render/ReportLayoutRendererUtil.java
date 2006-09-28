@@ -11,7 +11,7 @@ import java.io.IOException;
 
 import org.nightlabs.io.DataBuffer;
 import org.nightlabs.jfire.reporting.JFireReportingEAR;
-import org.nightlabs.jfire.servermanager.j2ee.SecurityReflector;
+import org.nightlabs.jfire.security.SecurityReflector;
 import org.nightlabs.util.Utils;
 
 /**

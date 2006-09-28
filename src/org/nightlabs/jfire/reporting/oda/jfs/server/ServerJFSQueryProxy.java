@@ -6,15 +6,12 @@ package org.nightlabs.jfire.reporting.oda.jfs.server;
 import java.util.Map;
 
 import javax.jdo.PersistenceManager;
-import javax.naming.NamingException;
 
 import org.eclipse.datatools.connectivity.oda.IResultSet;
 import org.eclipse.datatools.connectivity.oda.IResultSetMetaData;
 import org.eclipse.datatools.connectivity.oda.OdaException;
 import org.nightlabs.ModuleException;
-import org.nightlabs.jfire.base.InitException;
 import org.nightlabs.jfire.base.Lookup;
-import org.nightlabs.jfire.reporting.JFireReportingEAR;
 import org.nightlabs.jfire.reporting.oda.jfs.AbstractJFSQueryProxy;
 import org.nightlabs.jfire.reporting.oda.jfs.ReportingScriptExecutor;
 import org.nightlabs.jfire.scripting.Script;
@@ -22,7 +19,7 @@ import org.nightlabs.jfire.scripting.ScriptExecutor;
 import org.nightlabs.jfire.scripting.ScriptRegistry;
 import org.nightlabs.jfire.scripting.ScriptRegistryItem;
 import org.nightlabs.jfire.scripting.id.ScriptRegistryItemID;
-import org.nightlabs.jfire.servermanager.j2ee.SecurityReflector;
+import org.nightlabs.jfire.security.SecurityReflector;
 
 /**
  * @author Alexander Bieber <alex [AT] nightlabs [DOT] de>
@@ -101,7 +98,7 @@ public class ServerJFSQueryProxy extends AbstractJFSQueryProxy {
 	{
 		Lookup lookup;
 		try {
-			lookup = SecurityReflector.getLookup();
+			lookup = new Lookup(SecurityReflector.getUserDescriptor().getOrganisationID());
 		} catch (Exception e) {
 			throw new ModuleException("Could not get Lookup from SecurityReflector!", e);
 		}
@@ -119,7 +116,7 @@ public class ServerJFSQueryProxy extends AbstractJFSQueryProxy {
 	{
 		Lookup lookup;
 		try {
-			lookup = SecurityReflector.getLookup();
+			lookup = new Lookup(SecurityReflector.getUserDescriptor().getOrganisationID());
 		} catch (Exception e) {
 			throw new ModuleException("Could not get Lookup from SecurityReflector!", e);
 		}

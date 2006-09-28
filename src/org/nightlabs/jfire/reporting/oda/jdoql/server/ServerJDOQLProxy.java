@@ -41,15 +41,14 @@ import javax.naming.NamingException;
 import org.eclipse.datatools.connectivity.oda.IResultSet;
 import org.eclipse.datatools.connectivity.oda.IResultSetMetaData;
 import org.eclipse.datatools.connectivity.oda.OdaException;
-
 import org.nightlabs.ModuleException;
 import org.nightlabs.jfire.base.Lookup;
 import org.nightlabs.jfire.reporting.oda.jdoql.AbstractJDOQLProxy;
 import org.nightlabs.jfire.reporting.oda.jdoql.JDOQLMetaDataParser;
 import org.nightlabs.jfire.reporting.oda.jdoql.JDOQLResultSet;
 import org.nightlabs.jfire.reporting.oda.jdoql.JDOQLResultSetMetaData;
-import org.nightlabs.jfire.servermanager.j2ee.SecurityReflector;
-import org.nightlabs.jfire.servermanager.j2ee.SecurityReflector.UserDescriptor;
+import org.nightlabs.jfire.security.SecurityReflector;
+import org.nightlabs.jfire.security.SecurityReflector.UserDescriptor;
 
 /**
  * @author Alexander Bieber <alex[AT]nightlabs[DOT]de>

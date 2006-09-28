@@ -6,7 +6,7 @@ import javax.naming.NamingException;
 
 import org.jbpm.JbpmConfiguration;
 import org.nightlabs.jfire.jbpm.internal.JbpmConfigurationCarrier;
-import org.nightlabs.jfire.servermanager.j2ee.SecurityReflector;
+import org.nightlabs.jfire.security.SecurityReflector;
 
 public class JbpmLookup
 {

@@ -27,7 +27,6 @@
 package org.nightlabs.jfire.trade;
 
 import java.io.Serializable;
-import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -41,8 +40,6 @@ import java.util.Set;
 import javax.jdo.JDOHelper;
 import javax.jdo.JDOObjectNotFoundException;
 import javax.jdo.PersistenceManager;
-import javax.naming.InitialContext;
-import javax.naming.NamingException;
 
 import org.apache.log4j.Logger;
 import org.nightlabs.ModuleException;
@@ -58,9 +55,9 @@ import org.nightlabs.jfire.asyncinvoke.UndeliverableCallback;
 import org.nightlabs.jfire.config.Config;
 import org.nightlabs.jfire.idgenerator.IDGenerator;
 import org.nightlabs.jfire.person.Person;
+import org.nightlabs.jfire.security.SecurityReflector;
 import org.nightlabs.jfire.security.User;
 import org.nightlabs.jfire.security.id.UserID;
-import org.nightlabs.jfire.servermanager.j2ee.SecurityReflector;
 import org.nightlabs.jfire.store.DeliveryNote;
 import org.nightlabs.jfire.store.NotAvailableException;
 import org.nightlabs.jfire.store.Product;
@@ -428,32 +425,27 @@ public class Trader
 
 		if (mandator.getPrimaryKey().equals(vendor.getPrimaryKey())) {
 			// local: the vendor is owning the datastore
-			try {
-				User user = SecurityReflector.lookupSecurityReflector(
-						new InitialContext()).whoAmI().getUser(pm);
+			User user = SecurityReflector.getUserDescriptor().getUser(pm);
 
-				if (orderIDPrefix == null) {
-					TradeConfigModule tradeConfigModule;
-					try {
-						tradeConfigModule = (TradeConfigModule) Config.getConfig(
-								getPersistenceManager(), organisationID, user).createConfigModule(TradeConfigModule.class);
-					} catch (ModuleException x) {
-						throw new RuntimeException(x); // should not happen.
-					}
-
-					orderIDPrefix = tradeConfigModule.getActiveIDPrefixCf(Order.class.getName()).getDefaultIDPrefix();
+			if (orderIDPrefix == null) {
+				TradeConfigModule tradeConfigModule;
+				try {
+					tradeConfigModule = (TradeConfigModule) Config.getConfig(
+							getPersistenceManager(), organisationID, user).createConfigModule(TradeConfigModule.class);
+				} catch (ModuleException x) {
+					throw new RuntimeException(x); // should not happen.
 				}
 
-				Order order = new Order(
-						getMandator(), customer,
-						orderIDPrefix, IDGenerator.nextID(Order.class.getName() + '/' + orderIDPrefix),
-						currency, user);
-
-				getPersistenceManager().makePersistent(order);
-				return order;
-			} catch (NamingException e) {
-				throw new ModuleException(e);
+				orderIDPrefix = tradeConfigModule.getActiveIDPrefixCf(Order.class.getName()).getDefaultIDPrefix();
 			}
+
+			Order order = new Order(
+					getMandator(), customer,
+					orderIDPrefix, IDGenerator.nextID(Order.class.getName() + '/' + orderIDPrefix),
+					currency, user);
+
+			getPersistenceManager().makePersistent(order);
+			return order;
 		}
 		// TODO: Implement foreign stuff
 		// // not local, means it's a remote organisation...

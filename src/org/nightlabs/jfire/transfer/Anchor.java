@@ -328,7 +328,7 @@ public abstract class Anchor
 		if (this == obj)
 			return true;
 
-		if (!(this instanceof Anchor))
+		if (!(obj instanceof Anchor))
 			return false;
 
 		Anchor o = (Anchor) obj;

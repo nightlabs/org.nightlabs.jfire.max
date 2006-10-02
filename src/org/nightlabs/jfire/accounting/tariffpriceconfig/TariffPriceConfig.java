@@ -82,7 +82,7 @@ public abstract class TariffPriceConfig extends PriceConfig
 	 *
 	 * @jdo.join
 	 */
-	private Map customerGroups = new HashMap();
+	private Map<String, CustomerGroup> customerGroups = new HashMap<String, CustomerGroup>();
 
 	/**
 	 * key: String tariffPK<br/>
@@ -97,7 +97,7 @@ public abstract class TariffPriceConfig extends PriceConfig
 	 *
 	 * @jdo.join
 	 */
-	private Map tariffs = new HashMap();
+	private Map<String, Tariff> tariffs = new HashMap<String, Tariff>();
 
 	protected TariffPriceConfig()
 	{
@@ -122,7 +122,7 @@ public abstract class TariffPriceConfig extends PriceConfig
 	/**
 	 * @return Returns the customerGroups.
 	 */
-	public Collection getCustomerGroups()
+	public Collection<CustomerGroup> getCustomerGroups()
 	{
 		return customerGroups.values();
 	}
@@ -150,7 +150,7 @@ public abstract class TariffPriceConfig extends PriceConfig
 	/**
 	 * @return Returns the tariffs.
 	 */
-	public Collection getTariffs()
+	public Collection<Tariff> getTariffs()
 	{
 		return tariffs.values();
 	}

@@ -31,6 +31,7 @@ import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 
+import org.apache.log4j.Logger;
 import org.nightlabs.ModuleException;
 import org.nightlabs.jfire.accounting.PriceFragmentType;
 import org.nightlabs.jfire.store.NestedProductType;
@@ -44,6 +45,8 @@ import org.nightlabs.jfire.store.ProductType;
  */
 public class CellReflector
 {
+	private static final Logger logger = Logger.getLogger(CellReflector.class);
+
 	public static class ResolvedPriceCell {
 		public ResolvedPriceCell(NestedProductType nestedProductType, PriceCell priceCell) {
 			this.nestedProductType = nestedProductType;
@@ -168,6 +171,9 @@ public class CellReflector
 //			String _priceFragmentTypePK)
 		throws ModuleException
 	{
+		if (logger.isDebugEnabled())
+			logger.debug("resolvePriceCellsAmount (" + address + "): enter");
+
 		Collection resolvedPriceCells = resolvePriceCells(address);
 //				_customerGroupPK,
 //				_tariffPK,
@@ -193,6 +199,9 @@ public class CellReflector
 			}
 			sumAmount += amount;
 		}
+
+		if (logger.isDebugEnabled())
+			logger.debug("resolvePriceCellsAmount (" + address + "): sumAmount=" + sumAmount);
 
 		return sumAmount;
 	}
@@ -298,11 +307,14 @@ protected IPriceCoordinate createLocalPriceCoordinate(IPriceCoordinate address)
  * @return Returns a <tt>Collection</tt> of {@link ResolvedPriceCell}. Never <tt>null</tt>, but the <tt>Collection</tt> may be empty.
  * @throws ModuleException 
  */
-	public Collection resolvePriceCells(
+	public Collection<ResolvedPriceCell> resolvePriceCells(
 			IAbsolutePriceCoordinate address)
 	throws ModuleException
 	{
-		Collection priceCells = new LinkedList();
+		if (logger.isDebugEnabled())
+			logger.debug("resolvePriceCells (" + address + "): enter");
+
+		Collection<ResolvedPriceCell> priceCells = new LinkedList<ResolvedPriceCell>();
 
 		IAbsolutePriceCoordinate absoluteCoordinate = createAbsolutePriceCoordinate(address);
 		IPriceCoordinate localPriceCoordinate = createLocalPriceCoordinate(address);
@@ -318,13 +330,16 @@ protected IPriceCoordinate createLocalPriceCoordinate(IPriceCoordinate address)
 		if (foundProductTypePKs == null)
 			return priceCells;
 
+		if (logger.isDebugEnabled())
+			logger.debug("resolvePriceCells (" + address + "): foundProductTypePKs.size=" + foundProductTypePKs.size());
+
 		PriceFragmentType priceFragmentType = packageProductType
 				.getInnerPriceConfig().getPriceFragmentType(priceFragmentTypePK, true);
 
 		for (Iterator it = foundProductTypePKs.iterator(); it.hasNext(); ) {
 			String foundProductTypePK = (String) it.next();
 			NestedProductType packagedProductType = (NestedProductType) priceCalculator.virtualPackagedProductTypes.get(foundProductTypePK);
-			
+
 			PriceCell priceCell = null;
 			// filter the cell itself out if everything is identical
 			if (!foundProductTypePK.equals(this.getCoordinate().getProductTypePK()) ||
@@ -336,6 +351,13 @@ protected IPriceCoordinate createLocalPriceCoordinate(IPriceCoordinate address)
 
 			if (priceCell != null)
 				priceCells.add(new ResolvedPriceCell(packagedProductType, priceCell));
+		}
+
+		if (logger.isDebugEnabled()) {
+			logger.debug("resolvePriceCells (" + address + "): priceCells.size=" + priceCells.size());
+			for (ResolvedPriceCell cell : priceCells) {
+				logger.debug("resolvePriceCells (" + address + "):    cell: nestedInnerPTPK=" + cell.nestedProductType.getInnerProductTypePrimaryKey() + " coordinate=" + cell.priceCell.getPriceCoordinate() + " priceFragmentTypePK="+priceFragmentTypePK+" amount=" + cell.priceCell.getPrice().getAmount(priceFragmentTypePK));
+			}
 		}
 
 		return priceCells;

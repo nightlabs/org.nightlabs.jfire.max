@@ -473,17 +473,20 @@ public class Accounting
 			finalizeInvoice(user, invoice);
 		}
 
-		LegalEntity from = null;
-		LegalEntity to = null;
+		LegalEntity from = invoice.getCustomer();
+		LegalEntity to = invoice.getVendor();
 
-		if (invoice.getPrice().getAmount() >= 0) {
-			from = invoice.getCustomer();
-			to = invoice.getVendor();
-		}
-		else {
-			from = invoice.getVendor();
-			to = invoice.getCustomer();
-		}
+//		if (invoice.getPrice().getAmount() >= 0) {
+//			from = invoice.getCustomer();
+//			to = invoice.getVendor();
+//		}
+//		else {
+//			from = invoice.getVendor();
+//			to = invoice.getCustomer();
+//		}
+
+		if (logger.isDebugEnabled())
+			logger.debug("Invoice " + invoice.getPrimaryKey() + ": price=" + invoice.getPrice().getAmount() + invoice.getPrice().getCurrency().getCurrencyID() + " vendor=" + invoice.getVendor().getPrimaryKey() + " customer=" + invoice.getCustomer().getPrimaryKey());
 
 		// The LocalAccountant is assigned to the mandator in any case, because it is
 		// assigned during creation of Accounting. Hence, we don't need to check whether

@@ -32,6 +32,9 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
 
+import javax.jdo.JDOHelper;
+import javax.jdo.PersistenceManager;
+
 import org.nightlabs.jfire.organisation.Organisation;
 
 /**
@@ -206,6 +209,23 @@ public class Price
 	 */
 	public void setAmount(long amount)
 	{
+		PriceFragment priceFragmentTotal = getPriceFragment(
+				PriceFragmentType.PRICE_FRAGMENT_TYPE_ID_TOTAL.organisationID, PriceFragmentType.PRICE_FRAGMENT_TYPE_ID_TOTAL.priceFragmentTypeID, false);
+
+		if (priceFragmentTotal == null) {
+			PersistenceManager pm = JDOHelper.getPersistenceManager(this);
+			if (pm == null)
+				throw new IllegalStateException("This instance of Price ("+getPrimaryKey()+") does neither have a PriceFragment for the PriceFragmentType \"_Total_\" nor is it attached to a datastore (=> cannot lookup the PriceFragmentType). You must either use setAmount(PriceFragmentType, long) or call this method when the PriceFragment already exists or when this Price is currently persistent (connected to the datastore).");
+
+			PriceFragmentType pftTotal = (PriceFragmentType) pm.getObjectById(PriceFragmentType.PRICE_FRAGMENT_TYPE_ID_TOTAL);
+			priceFragmentTotal = createPriceFragment(pftTotal);
+		}
+
+		priceFragmentTotal.setAmount(amount);
+	}
+
+	protected void _setAmount(long amount)
+	{
 		this.amount = amount;
 	}
 	
@@ -241,7 +261,7 @@ public class Price
 		if (priceFragmentType == null)
 			throw new NullPointerException("priceFragmentType");
 
-		PriceFragment fragment = (PriceFragment) fragments.get(priceFragmentType.getPriceFragmentTypeID());
+		PriceFragment fragment = (PriceFragment) fragments.get(priceFragmentType.getPrimaryKey());
 		if (fragment == null) {
 			fragment = new PriceFragment(this, priceFragmentType);
 			fragments.put(priceFragmentType.getPrimaryKey(), fragment);
@@ -298,10 +318,7 @@ public class Price
 	 */
 	public void setAmount(PriceFragmentType priceFragmentType, long amount)
 	{
-		if (priceFragmentType == null ||
-				(Organisation.DEVIL_ORGANISATION_ID.equals(priceFragmentType.getOrganisationID()) &&
-				 PriceFragmentType.TOTAL_PRICEFRAGMENTTYPEID.equals(priceFragmentType.getPriceFragmentTypeID())))
-			this.amount = amount;
+		// the PriceFragment for the _Total_ PriceFragmentType will call _setAmount(...) here
 		PriceFragment priceFragment = createPriceFragment(priceFragmentType);
 		priceFragment.setAmount(amount);
 	}

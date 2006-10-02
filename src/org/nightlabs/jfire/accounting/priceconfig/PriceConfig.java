@@ -165,7 +165,7 @@ public abstract class PriceConfig implements Serializable, StoreCallback, IPrice
 	 */
 	private Map currencies = new HashMap();
 
-	public Collection getCurrencies()
+	public Collection<Currency> getCurrencies()
 	{
 		return currencies.values();
 	}
@@ -220,7 +220,7 @@ public abstract class PriceConfig implements Serializable, StoreCallback, IPrice
 	 */
 	private Map priceFragmentTypes = new HashMap();
 	
-	public Collection getPriceFragmentTypes()
+	public Collection<PriceFragmentType> getPriceFragmentTypes()
 	{
 		return priceFragmentTypes.values();
 	}

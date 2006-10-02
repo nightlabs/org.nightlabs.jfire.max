@@ -31,6 +31,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 import org.nightlabs.jfire.accounting.Price;
+import org.nightlabs.jfire.accounting.id.PriceFragmentTypeID;
 import org.nightlabs.jfire.accounting.priceconfig.IPriceConfig;
 import org.nightlabs.jfire.accounting.priceconfig.PriceConfig;
 
@@ -211,22 +212,22 @@ public class PriceCell implements Serializable
 		priceFragmentsCalculationStatus = null;
 	}
 
-	public String getPriceFragmentCalculationStatus(String priceFragmentTypeID)
+	public String getPriceFragmentCalculationStatus(String priceFragmentTypePK)
 	{
 		if (priceFragmentsCalculationStatus == null)
 			return CALCULATIONSTATUS_DIRTY;
 
-		String status = (String) priceFragmentsCalculationStatus.get(priceFragmentTypeID);
+		String status = (String) priceFragmentsCalculationStatus.get(priceFragmentTypePK);
 		if (status == null)
 			return CALCULATIONSTATUS_DIRTY;
 
 		return status;
 	}
 
-	public void setPriceFragmentCalculationStatus(String priceFragmentTypeID, String status)
+	public void setPriceFragmentCalculationStatus(String priceFragmentTypePK, String status)
 	{
 		if (priceFragmentsCalculationStatus == null)
 			priceFragmentsCalculationStatus = new HashMap();
-		priceFragmentsCalculationStatus.put(priceFragmentTypeID, status);
+		priceFragmentsCalculationStatus.put(priceFragmentTypePK, status);
 	}
 }

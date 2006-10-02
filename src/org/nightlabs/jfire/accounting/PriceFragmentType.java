@@ -123,7 +123,9 @@ public class PriceFragmentType
 			throw new IllegalArgumentException("The given productTypePK "+primaryKey+" is illegal (more than one /)");
 		return PriceFragmentTypeID.create(parts[0], parts[1]);
 	}
-	
+
+	public static final PriceFragmentTypeID PRICE_FRAGMENT_TYPE_ID_TOTAL = PriceFragmentTypeID.create(Organisation.DEVIL_ORGANISATION_ID, "_Total_");
+
 	/**
 	 * This predefined priceFragmentType exists to allow a unified API for accesses
 	 * to the priceFragments and the <tt>Price.amount</tt>. This is necessary e.g. in
@@ -131,9 +133,10 @@ public class PriceFragmentType
 	 * 
 	 * @see Price#getAmount(String)
 	 * @see Price#setAmount(String, long)
+	 * @deprecated Use {@link #PRICE_FRAGMENT_TYPE_ID_TOTAL}
 	 */
-	public static final String TOTAL_PRICEFRAGMENTTYPEID = "_Total_";
-	
+	public static final String TOTAL_PRICEFRAGMENTTYPEID = PRICE_FRAGMENT_TYPE_ID_TOTAL.priceFragmentTypeID;
+
 	/**
 	 * @jdo.field persistence-modifier="persistent" dependent="true" mapped-by="priceFragmentType"
 	 */

@@ -30,19 +30,23 @@ import java.rmi.RemoteException;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Iterator;
+import java.util.Locale;
 import java.util.regex.Pattern;
 
 import javax.ejb.CreateException;
 import javax.ejb.EJBException;
 import javax.ejb.SessionBean;
 import javax.ejb.SessionContext;
+import javax.jdo.JDODetachedFieldAccessException;
 import javax.jdo.PersistenceManager;
 
 import org.apache.log4j.Logger;
 import org.nightlabs.ModuleException;
 import org.nightlabs.jdo.NLJDOHelper;
 import org.nightlabs.jfire.accounting.AccountingManagerBean;
+import org.nightlabs.jfire.accounting.Currency;
 import org.nightlabs.jfire.accounting.Price;
+import org.nightlabs.jfire.accounting.PriceFragmentType;
 import org.nightlabs.jfire.accounting.Tariff;
 import org.nightlabs.jfire.accounting.id.CurrencyID;
 import org.nightlabs.jfire.accounting.id.TariffID;
@@ -116,7 +120,57 @@ implements SessionBean
 	{
 		logger.debug(this.getClass().getName() + ".ejbPassivate()");
 	}
-	
+
+	public static void logTariffPriceConfig(TariffPriceConfig priceConfig)
+	{
+		if (!logger.isDebugEnabled())
+			return;
+
+		try {
+			logger.debug("priceConfig="+priceConfig.getPrimaryKey() + " priceConfig.class=" + priceConfig.getClass().getName());
+			for (Currency currency : priceConfig.getCurrencies()) {
+				logger.debug("  currency=" + currency.getCurrencyID() + " ("+currency.getCurrencySymbol()+")");
+				for (CustomerGroup customerGroup : priceConfig.getCustomerGroups()) {
+					logger.debug("    customerGroup=" + customerGroup.getPrimaryKey() + " ("+customerGroup.getName().getText(Locale.ENGLISH.getLanguage())+")");
+					for (Tariff tariff : priceConfig.getTariffs()) {
+						logger.debug("      tariff=" + tariff.getPrimaryKey() + " ("+tariff.getName().getText(Locale.ENGLISH.getLanguage())+")");
+						PriceCoordinate priceCoordinate = new PriceCoordinate(customerGroup.getPrimaryKey(), tariff.getPrimaryKey(), currency.getCurrencyID());
+						if (priceConfig instanceof IFormulaPriceConfig) {
+							FormulaCell formulaCell = ((IFormulaPriceConfig)priceConfig).getFormulaCell(priceCoordinate, false);
+							for (PriceFragmentType priceFragmentType : priceConfig.getPriceFragmentTypes()) {
+								String formula = formulaCell == null ? null : formulaCell.getFormula(priceFragmentType);
+								logger.debug("        priceFragmentType=" + priceFragmentType.getPrimaryKey() + " ("+priceFragmentType.getName().getText(Locale.ENGLISH.getLanguage())+") formula=" + formula);
+							}
+						}
+						else if (priceConfig instanceof IResultPriceConfig) {
+							PriceCell priceCell = ((IResultPriceConfig)priceConfig).getPriceCell(priceCoordinate, false);
+							Price price = priceCell == null ? null : priceCell.getPrice();
+							for (PriceFragmentType priceFragmentType : priceConfig.getPriceFragmentTypes()) {
+								String amount = price == null ? null : String.valueOf(price.getAmount(priceFragmentType));
+								logger.debug("        priceFragmentType=" + priceFragmentType.getPrimaryKey() + " ("+priceFragmentType.getName().getText(Locale.ENGLISH.getLanguage())+") amount=" + amount);
+							}
+						}
+					}
+				}
+			}
+			
+			if (priceConfig instanceof IFormulaPriceConfig) {
+				FormulaCell formulaCell = ((IFormulaPriceConfig)priceConfig).getFallbackFormulaCell(false);
+				if (formulaCell == null)
+					logger.debug("  fallbackFormulaCell is null");
+				else {
+					logger.debug("  fallbackFormulaCell:");
+					for (PriceFragmentType priceFragmentType : priceConfig.getPriceFragmentTypes()) {
+						String formula = formulaCell == null ? null : formulaCell.getFormula(priceFragmentType);
+						logger.debug("    priceFragmentType=" + priceFragmentType.getPrimaryKey() + " ("+priceFragmentType.getName().getText(Locale.ENGLISH.getLanguage())+") formula=" + formula);
+					}
+				}
+			}
+		} catch (JDODetachedFieldAccessException x) {
+			logger.warn("Could not traverse PriceConfig", x);
+		}
+	}
+
 	/**
 	 * @throws ModuleException
 	 *
@@ -129,6 +183,11 @@ implements SessionBean
 	{
 		PersistenceManager pm = getPersistenceManager();
 		try {
+			if (logger.isDebugEnabled()) {
+				logger.debug("storePriceConfig: PriceConfig BEFORE attach:");
+				logTariffPriceConfig(priceConfig);
+			}
+
 			return (TariffPriceConfig) NLJDOHelper.storeJDO(pm, priceConfig, get, fetchGroups, maxFetchDepth);
 		} finally {
 			pm.close();

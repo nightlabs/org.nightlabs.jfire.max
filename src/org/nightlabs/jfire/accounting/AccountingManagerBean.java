@@ -86,6 +86,8 @@ import org.nightlabs.jfire.accounting.pay.id.PaymentID;
 import org.nightlabs.jfire.accounting.priceconfig.FetchGroupsPriceConfig;
 import org.nightlabs.jfire.accounting.query.InvoiceQuery;
 import org.nightlabs.jfire.accounting.state.InvoiceStateDefinition;
+import org.nightlabs.jfire.accounting.tariffpriceconfig.TariffPriceConfig;
+import org.nightlabs.jfire.accounting.tariffpriceconfig.TariffPriceConfigManagerBean;
 import org.nightlabs.jfire.base.BaseSessionBeanImpl;
 import org.nightlabs.jfire.security.User;
 import org.nightlabs.jfire.store.DeliveryNote;
@@ -2308,6 +2310,26 @@ public abstract class AccountingManagerBean
 			}
 
 			// FIXME WORKAROUND for JPOX - end
+
+			if (logger.isDebugEnabled()) {
+				LinkedList<ProductType> productTypes = new LinkedList<ProductType>();
+				productTypes.add(detachedRes);
+
+				for (NestedProductType npt : detachedRes.getNestedProductTypes())
+					productTypes.add(npt.getInnerProductType());
+
+				for (ProductType productType : productTypes) {
+					logger.debug("getProductTypeForPriceConfigEditing: productType="+productType.getPrimaryKey());
+					if (productType.getInnerPriceConfig() instanceof TariffPriceConfig) {
+						logger.debug("innerPriceConfig:");
+						TariffPriceConfigManagerBean.logTariffPriceConfig((TariffPriceConfig)productType.getInnerPriceConfig());
+					}
+					if (productType.getPackagePriceConfig() instanceof TariffPriceConfig) {
+						logger.debug("packagePriceConfig:");
+						TariffPriceConfigManagerBean.logTariffPriceConfig((TariffPriceConfig)productType.getPackagePriceConfig());
+					}
+				}
+			}
 
 			return detachedRes;
 		} finally {

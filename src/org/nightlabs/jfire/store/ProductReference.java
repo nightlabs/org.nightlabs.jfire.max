@@ -117,7 +117,9 @@ implements Serializable, DeleteCallback
 	{
 		pm.getExtent(ProductReference.class);
 		try {
-			return (ProductReference) pm.getObjectById(ProductReferenceID.create(anchor, product));
+			ProductReference res = (ProductReference) pm.getObjectById(ProductReferenceID.create(anchor, product));
+			res.getPrimaryKey(); // workaround for JPOX bug
+			return res;
 		} catch (JDOObjectNotFoundException x) {
 			if (throwExceptionIfNotFound)
 				throw x;
@@ -131,7 +133,9 @@ implements Serializable, DeleteCallback
 	{
 		pm.getExtent(ProductReference.class);
 		try {
-			return (ProductReference) pm.getObjectById(ProductReferenceID.create(anchorID, productID));
+			ProductReference res = (ProductReference) pm.getObjectById(ProductReferenceID.create(anchorID, productID));
+			res.getPrimaryKey(); // workaround for JPOX bug
+			return res;
 		} catch (JDOObjectNotFoundException x) {
 			if (throwExceptionIfNotFound)
 				throw x;

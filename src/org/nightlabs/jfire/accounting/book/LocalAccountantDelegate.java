@@ -766,7 +766,7 @@ public abstract class LocalAccountantDelegate implements Serializable {
 						articlePriceStack, 
 						dimensionNode.getDimensionValues(),
 						mapping,
-						resolvedMappings
+						resolvedMappings, container
 					);
 				for (Iterator iterator = bookTransfers.iterator(); iterator.hasNext();) {
 					BookInvoiceTransfer biTransfer = (BookInvoiceTransfer) iterator.next();
@@ -883,18 +883,18 @@ public abstract class LocalAccountantDelegate implements Serializable {
 	 * that collect all neccessary money from the right accounts and
 	 * transfer it to the account specified for given dimensionValues and
 	 * ProductType (first in articlePriceStack).  
-	 * 
 	 * @param articlePriceStack The current articlePriceStack.
 	 * @param dimensionValues A Map with the current dimension values (key: String value: String)
 	 * @param resolvedMapping The MoneyFlowMapping causing the call to this method (contains the target Anchor (Account))
 	 * @param resolvedMappings A Map with the resolved Mappings for all involved ProductTypes
+	 * @param bookMoneyTransfer TODO
 	 */
 	public abstract Collection<BookInvoiceTransfer> getBookInvoiceTransfersForDimensionValues(
 			OrganisationLegalEntity mandator,
 			LinkedList<ArticlePrice> articlePriceStack, 
 			Map<String, String> dimensionValues,
 			MoneyFlowMapping resolvedMapping,
-			Map<ResolvedMapKey, ResolvedMapEntry> resolvedMappings
+			Map<ResolvedMapKey, ResolvedMapEntry> resolvedMappings, BookMoneyTransfer bookMoneyTransfer
 		);
 	
 	/**

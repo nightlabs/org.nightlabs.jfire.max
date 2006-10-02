@@ -28,6 +28,8 @@ package org.nightlabs.jfire.accounting;
 
 import java.io.Serializable;
 
+import org.nightlabs.jfire.organisation.Organisation;
+
 
 /**
  * PriceFragments are optional, that means the sum of all priceFragments is usually
@@ -52,7 +54,9 @@ import java.io.Serializable;
  * @jdo.fetch-group name="PriceFragment.currency" fields="currency"
  * @jdo.fetch-group name="PriceFragment.priceFragmentType" fields="priceFragmentType"
  *
- * @jdo.fetch-group name="FetchGroupsPriceConfig.edit" fetch-groups="default" fields="currency, priceFragmentType"
+ * @jdo.fetch-group name="Price.fragments" fields="price"
+ *
+ * @jdo.fetch-group name="FetchGroupsPriceConfig.edit" fetch-groups="default" fields="price, currency, priceFragmentType"
  */
 public class PriceFragment
 	implements Serializable
@@ -198,6 +202,10 @@ public class PriceFragment
 	 */
 	public void setAmount(long amount)
 	{
+		if (PriceFragmentType.PRICE_FRAGMENT_TYPE_ID_TOTAL.organisationID.equals(priceFragmentType.getOrganisationID()) &&
+		    PriceFragmentType.PRICE_FRAGMENT_TYPE_ID_TOTAL.priceFragmentTypeID.equals(priceFragmentType.getPriceFragmentTypeID()))
+			this.price._setAmount(amount);
+
 		this.amount = amount;
 	}
 

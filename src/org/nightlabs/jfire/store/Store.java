@@ -332,18 +332,16 @@ public class Store
 	{
 		PersistenceManager pm = getPersistenceManager();
 		try {
-			pm.getObjectById(ProductTypeID.create(
+			ProductType pt = (ProductType) pm.getObjectById(ProductTypeID.create(
 				productType.getOrganisationID(), productType.getProductTypeID()));
+			pt.getProductTypeID();
 
 			throw new IllegalStateException("ProductType \""+productType.getPrimaryKey()+"\" exists already!");
 		} catch (JDOObjectNotFoundException x) {
 			// we expect this.
 		}
 
-		if (JDOHelper.isDetached(productType))
-			productType = (ProductType) pm.makePersistent(productType);
-		else
-			pm.makePersistent(productType);
+		productType = (ProductType) pm.makePersistent(productType);
 
 		// TODO remove this and put all the logic from ProductTypeStatusTracker into ProductTypeLocal!
 		ProductTypeStatusTracker productTypeStatusTracker = new ProductTypeStatusTracker(productType, user);

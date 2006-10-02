@@ -507,23 +507,31 @@ public class PriceCalculator
 		String formula = null;
 
 		ProductType productType = nestedProductType.getInnerProductType();
-		
+
 		IAbsolutePriceCoordinate absolutePriceCoordinate = createAbsolutePriceCoordinate(
 				priceCell.getPriceCoordinate(),
 				productType, priceFragmentType);
 		try {
-			String status = priceCell.getPriceFragmentCalculationStatus(priceFragmentType.getPriceFragmentTypeID());
-			if (PriceCell.CALCULATIONSTATUS_CLEAN.equals(status))
+			String status = priceCell.getPriceFragmentCalculationStatus(priceFragmentType.getPrimaryKey());
+
+			if (logger.isDebugEnabled())
+				logger.debug("calculatePriceCell (" + absolutePriceCoordinate + "): priceFragmentType=" + priceFragmentType.getPrimaryKey() + " status=" + status);
+
+			if (PriceCell.CALCULATIONSTATUS_CLEAN.equals(status)) {
+				if (logger.isDebugEnabled())
+					logger.debug("calculatePriceCell (" + absolutePriceCoordinate + "): priceFragmentType=" + priceFragmentType.getPrimaryKey() + " result="+priceCell.getPrice().getAmount(priceFragmentType)+" readingFromPriceCell: " + priceCell);
+
 				return; // nothing to do
+			}
 
 			if (PriceCell.CALCULATIONSTATUS_INPROCESS.equals(status))
 				throw new CircularReferenceException(
 						absolutePriceCoordinate,
-						"PriceCell \""+priceCell.getPriceCoordinate()+"\" has a circular reference in priceFragmentTypeID \""+priceFragmentType.getPriceFragmentTypeID()+"\" in product \""+productType.getPrimaryKey()+"\"!");
+						"PriceCell \""+priceCell.getPriceCoordinate()+"\" has a circular reference in priceFragmentType \""+priceFragmentType.getPrimaryKey()+"\" in productType \""+productType.getPrimaryKey()+"\"!");
 
 			if (PriceCell.CALCULATIONSTATUS_DIRTY.equals(status)) {
 				priceCell.setPriceFragmentCalculationStatus(
-						priceFragmentType.getPriceFragmentTypeID(), PriceCell.CALCULATIONSTATUS_INPROCESS);
+						priceFragmentType.getPrimaryKey(), PriceCell.CALCULATIONSTATUS_INPROCESS);
 
 				if (formulaCell != null)
 					formula = formulaCell.getFormula(priceFragmentType);
@@ -544,6 +552,14 @@ public class PriceCalculator
 						String importClasses = getImportClasses();
 						if (importClasses != null)
 							formula = "importClass(" + importClasses + ");\n" + formula;
+
+						if (logger.isDebugEnabled()) {
+							Object oldCell = ScriptableObject.getProperty(scope, "cell");
+							if (oldCell == null)
+								logger.debug("calculatePriceCell (" + absolutePriceCoordinate + "): oldCell is null");
+							else
+								logger.debug("calculatePriceCell (" + absolutePriceCoordinate + "): oldCell: " + oldCell);
+						} // if (logger.isDebugEnabled()) {
 
 						CellReflector cell = createCellReflector(
 //								this, packageProductType,
@@ -567,6 +583,9 @@ public class PriceCalculator
 // TODO To multiply here doesn't work, because the quantity is then multiple times multiplicated multiple times.
 //						res = packagedProductType.getQuantity() * res;
 
+						if (logger.isDebugEnabled())
+							logger.debug("calculatePriceCell (" + absolutePriceCoordinate + "): result=" + res + " writingToPriceCell: " + priceCell);
+
 						priceCell.getPrice().setAmount(priceFragmentType, res);
 					} finally {
 						Context.exit();
@@ -574,7 +593,7 @@ public class PriceCalculator
 				}
 
 				priceCell.setPriceFragmentCalculationStatus(
-						priceFragmentType.getPriceFragmentTypeID(), PriceCell.CALCULATIONSTATUS_CLEAN);
+						priceFragmentType.getPrimaryKey(), PriceCell.CALCULATIONSTATUS_CLEAN);
 
 				return;
 			} // status is invalid => perform calculation

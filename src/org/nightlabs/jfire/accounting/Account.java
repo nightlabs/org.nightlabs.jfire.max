@@ -379,7 +379,7 @@ public class Account extends Anchor
 	 * @see #ANCHOR_TYPE_ID_LOCAL_REVENUE_OUT
 	 * @see #ANCHOR_TYPE_ID_LOCAL_COST
 	 *
-	 * @jdo.field persistence-modifier="persistent" mapped-by="revenueInAccount"
+	 * @jdo.field persistence-modifier="persistent"
 	 */
 	private Account revenueOutAccount = null;
 

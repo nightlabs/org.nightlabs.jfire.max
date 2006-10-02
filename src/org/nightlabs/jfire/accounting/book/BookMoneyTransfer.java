@@ -26,6 +26,7 @@
 
 package org.nightlabs.jfire.accounting.book;
 
+import org.apache.log4j.Logger;
 import org.nightlabs.jfire.accounting.Invoice;
 import org.nightlabs.jfire.accounting.InvoiceMoneyTransfer;
 import org.nightlabs.jfire.security.User;
@@ -50,6 +51,7 @@ import org.nightlabs.jfire.transfer.TransferRegistry;
  */
 public class BookMoneyTransfer extends InvoiceMoneyTransfer
 {
+	private static final Logger logger = Logger.getLogger(BookMoneyTransfer.class);
 
 	/**
 	 * @deprecated Only of JDO!
@@ -83,6 +85,9 @@ public class BookMoneyTransfer extends InvoiceMoneyTransfer
 
 		if (!(to instanceof LegalEntity))
 			throw new IllegalArgumentException("to must be an instance of LegalEntity, but is of type " + from.getClass().getName());
+
+		if (logger.isDebugEnabled())
+			logger.debug("constructor: from=" + from.getPrimaryKey() + " to=" + to.getPrimaryKey());
 	}
 
 }

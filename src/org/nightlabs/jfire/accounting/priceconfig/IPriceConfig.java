@@ -54,7 +54,7 @@ public interface IPriceConfig
 
 	String getPrimaryKey();
 
-	Collection getCurrencies();
+	Collection<Currency> getCurrencies();
 
 	/**
 	 * @param currency The Currency to add.
@@ -77,7 +77,7 @@ public interface IPriceConfig
 
 	Currency removeCurrency(String currencyID);
 
-	Collection getPriceFragmentTypes();
+	Collection<PriceFragmentType> getPriceFragmentTypes();
 
 	void addPriceFragmentType(PriceFragmentType priceFragmentType);
 

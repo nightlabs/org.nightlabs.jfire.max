@@ -277,8 +277,6 @@ public class ArticlePrice extends org.nightlabs.jfire.accounting.Price
 		if (!getCurrency().getCurrencyID().equals(origPrice.getCurrency().getCurrencyID()))
 			throw new IllegalArgumentException("Currencies do not match!");
 
-		this.setAmount(origPrice.getAmount());
-
 		for (Iterator it = origPrice.getFragments().iterator(); it.hasNext(); ) {
 			PriceFragment origpf = (PriceFragment)it.next();
 			PriceFragment pf = new PriceFragment(this, origpf);
@@ -288,7 +286,9 @@ public class ArticlePrice extends org.nightlabs.jfire.accounting.Price
 			// prices.
 			addPriceFragment(pf);
 		}
-		
+
+		this.setAmount(origPrice.getAmount());
+
 		if (refund)
 			negate();
 
@@ -323,7 +323,7 @@ public class ArticlePrice extends org.nightlabs.jfire.accounting.Price
 	 */
 	protected void negate()
 	{
-		this.setAmount(-this.getAmount());
+		this._setAmount(-this.getAmount());
 		for (Iterator it = this.getFragments().iterator(); it.hasNext(); ) {
 			PriceFragment pf = (PriceFragment)it.next();
 			pf.setAmount(-pf.getAmount());

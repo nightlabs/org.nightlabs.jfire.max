@@ -180,7 +180,7 @@ public class PFMoneyFlowMapping extends MoneyFlowMapping {
 		return articlePrice.getPriceFragment(
 				(String)dimensionValues.get(PriceFragmentDimension.MONEY_FLOW_DIMENSION_ID), 
 				true
-			).getAmountAbsoluteValue();
+			).getAmount(); // .getAmountAbsoluteValue();
 	}
 
 	public void validateMapping() {

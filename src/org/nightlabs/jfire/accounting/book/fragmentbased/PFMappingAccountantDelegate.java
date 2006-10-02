@@ -319,24 +319,30 @@ public class PFMappingAccountantDelegate extends
 				resolvedMappings, forContainer, bookMoneyTransfer
 			);
 		if (transfer == null) {
+			ArticlePrice articlePrice = (ArticlePrice)articlePriceStack.getFirst();
+			Article article = articlePrice.getArticle();
+
+			long amount = resolvedMapping.getArticlePriceDimensionAmount(
+					dimensionValues, 
+					articlePrice
+				);
+
 			Anchor from;
 			Anchor to;
-			if (mandator.equals(bookMoneyTransfer.getTo())) {
+			if (amount >= 0) {
 				from = mandator;
 				to = resolvedMapping.getAccount();
 			}
 			else {
 				to = mandator;
 				from = resolvedMapping.getAccount();
+				amount *= -1;
 			}
 
 			transfer = new BookInvoiceTransfer(
 					from,
 					to,
-					resolvedMapping.getArticlePriceDimensionAmount(
-							dimensionValues, 
-							(ArticlePrice)articlePriceStack.getFirst()
-						)
+					amount
 				); 
 		}
 		result.add(transfer);
@@ -462,23 +468,27 @@ public class PFMappingAccountantDelegate extends
 			if (packagingUpperMapping != null) {
 				Anchor from;
 				Anchor to;
-				if (mandator.equals(bookMoneyTransfer.getTo())) {
+				
+				long amount = resolvedMapping.getArticlePriceDimensionAmount(
+						dimensionValues, 
+						(ArticlePrice)articlePriceStack.getFirst()
+					);
+
+				if (amount >= 0) {
 					from = packagingUpperMapping.getAccount();
 					to = resolvedMapping.getAccount();
 				}
 				else {
 					to = packagingUpperMapping.getAccount();
 					from = resolvedMapping.getAccount();
+					amount *= -1;
 				}
 				
 				return
 						new LocalAccountantDelegate.BookInvoiceTransfer(
 								from,
 								to,
-								resolvedMapping.getArticlePriceDimensionAmount(
-										dimensionValues, 
-										(ArticlePrice)articlePriceStack.getFirst()
-									)
+								amount
 							); 
 					
 			}

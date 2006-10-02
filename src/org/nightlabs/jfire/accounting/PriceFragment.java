@@ -28,8 +28,6 @@ package org.nightlabs.jfire.accounting;
 
 import java.io.Serializable;
 
-import org.nightlabs.jfire.organisation.Organisation;
-
 
 /**
  * PriceFragments are optional, that means the sum of all priceFragments is usually
@@ -48,7 +46,7 @@ import org.nightlabs.jfire.organisation.Organisation;
  * @jdo.inheritance strategy = "new-table"
  * 
  * @jdo.create-objectid-class
- *		field-order="organisationID, priceConfigID, priceID, priceFragmentTypeOrganisationID, priceFragmentTypeID"
+ *		field-order="organisationID, priceConfigID, priceID, priceFragmentTypePK"
  *
  * @jdo.fetch-group name="PriceFragment.price" fields="price"
  * @jdo.fetch-group name="PriceFragment.currency" fields="currency"
@@ -61,6 +59,8 @@ import org.nightlabs.jfire.organisation.Organisation;
 public class PriceFragment
 	implements Serializable
 {
+	private static final long serialVersionUID = 1L;
+
 	public static final String FETCH_GROUP_PRICE = "Price.price";
 	public static final String FETCH_GROUP_CURRENCY = "Price.currency";
 	public static final String FETCH_GROUP_PRICE_FRAGMENT_TYPE = "Price.priceFragmentType";
@@ -70,7 +70,7 @@ public class PriceFragment
 	 * @jdo.column length="100"
 	 */
 	private String organisationID;
-	
+
 	/**
 	 * @jdo.field primary-key="true"
 	 */
@@ -81,17 +81,23 @@ public class PriceFragment
 	 */
 	private long priceID;
 
+//	/**
+//	 * @jdo.field primary-key="true"
+//	 * @jdo.column length="100"
+//	 */
+//	private String priceFragmentTypeOrganisationID;
+//	
+//	/**
+//	 * @jdo.field primary-key="true"
+//	 * @jdo.column length="100"
+//	 */
+//	private String priceFragmentTypeID;
+
 	/**
 	 * @jdo.field primary-key="true"
-	 * @jdo.column length="100"
+	 * @jdo.column length="201"
 	 */
-	private String priceFragmentTypeOrganisationID;
-	
-	/**
-	 * @jdo.field primary-key="true"
-	 * @jdo.column length="100"
-	 */
-	private String priceFragmentTypeID;
+	private String priceFragmentTypePK;
 
 	/**
 	 * @jdo.field persistence-modifier="persistent"
@@ -122,9 +128,10 @@ public class PriceFragment
 		this.priceConfigID = price.getPriceConfigID();
 		this.priceID = price.getPriceID();
 		this.currency = price.getCurrency();
-		this.priceFragmentTypeOrganisationID = priceFragmentType.getOrganisationID();
-		this.priceFragmentTypeID = priceFragmentType.getPriceFragmentTypeID();
+//		this.priceFragmentTypeOrganisationID = priceFragmentType.getOrganisationID();
+//		this.priceFragmentTypeID = priceFragmentType.getPriceFragmentTypeID();
 		this.priceFragmentType = priceFragmentType;
+		this.priceFragmentTypePK = this.priceFragmentType.getPrimaryKey();
 	}
 
 	public PriceFragment(Price price, PriceFragment origPriceFragment)
@@ -134,9 +141,10 @@ public class PriceFragment
 		this.priceConfigID = price.getPriceConfigID();
 		this.priceID = price.getPriceID();
 		this.currency = price.getCurrency();
-		this.priceFragmentTypeOrganisationID = origPriceFragment.priceFragmentTypeOrganisationID;
-		this.priceFragmentTypeID = origPriceFragment.getPriceFragmentTypeID();
+//		this.priceFragmentTypeOrganisationID = origPriceFragment.priceFragmentTypeOrganisationID;
+//		this.priceFragmentTypeID = origPriceFragment.getPriceFragmentTypeID();
 		this.priceFragmentType = origPriceFragment.getPriceFragmentType();
+		this.priceFragmentTypePK = this.priceFragmentType.getPrimaryKey();
 		this.amount = origPriceFragment.getAmount();
 	}
 
@@ -161,26 +169,30 @@ public class PriceFragment
 	{
 		return priceID;
 	}
-	/**
-	 * @return Returns the priceFragmentTypeOrganisationID.
-	 */
-	public String getPriceFragmentTypeOrganisationID()
-	{
-		return priceFragmentTypeOrganisationID;
-	}
-	/**
-	 * @return Returns the priceFragmentTypeID.
-	 */
-	public String getPriceFragmentTypeID()
-	{
-		return priceFragmentTypeID;
-	}
+//	/**
+//	 * @return Returns the priceFragmentTypeOrganisationID.
+//	 */
+//	public String getPriceFragmentTypeOrganisationID()
+//	{
+//		return priceFragmentTypeOrganisationID;
+//	}
+//	/**
+//	 * @return Returns the priceFragmentTypeID.
+//	 */
+//	public String getPriceFragmentTypeID()
+//	{
+//		return priceFragmentTypeID;
+//	}
 	/**
 	 * @return Returns the priceFragmentType.
 	 */
 	public PriceFragmentType getPriceFragmentType()
 	{
 		return priceFragmentType;
+	}
+	public String getPriceFragmentTypePK()
+	{
+		return priceFragmentTypePK;
 	}
 	/**
 	 * @return Returns the amount.
@@ -189,14 +201,14 @@ public class PriceFragment
 	{
 		return amount;
 	}
-	/**
-	 * @return Returns the amount.
-	 */
-	public long getAmountAbsoluteValue()
-	{
-		return Math.abs(amount);
-	}
-	
+//	/**
+//	 * @return Returns the amount.
+//	 */
+//	public long getAmountAbsoluteValue()
+//	{
+//		return Math.abs(amount);
+//	}
+
 	/**
 	 * @param amount The amount to set.
 	 */
@@ -217,6 +229,4 @@ public class PriceFragment
 	public Price getPrice() {
 		return price;
 	}
-	
-	
 }

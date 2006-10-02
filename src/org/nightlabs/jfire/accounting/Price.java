@@ -35,8 +35,6 @@ import java.util.Map;
 import javax.jdo.JDOHelper;
 import javax.jdo.PersistenceManager;
 
-import org.nightlabs.jfire.organisation.Organisation;
-
 /**
  * @author Marco Schulze - marco at nightlabs dot de
  *
@@ -65,6 +63,8 @@ import org.nightlabs.jfire.organisation.Organisation;
 public class Price
 	implements Serializable
 {
+	private static final long serialVersionUID = 1L;
+
 	public static final String FETCH_GROUP_CURRENCY = "Price.currency";
 	public static final String FETCH_GROUP_FRAGMENTS = "Price.fragments";
 	public static final String FETCH_GROUP_THIS_PRICE = "Price.this";
@@ -121,16 +121,15 @@ public class Price
 	 *		dependent-value="true"
 	 *		mapped-by="price"
 	 *
-	 * @jdo.key mapped-by="priceFragmentTypeID"
-	 *
-	 * @!jdo.map-vendor-extension vendor-name="jpox" key="key-field" value="priceFragmentTypeID"
-	 *
-	 * // This is not necessary if there's no join: @!jdo.map-vendor-extension vendor-name="jpox" key="key-length" value="max 100"
+	 * @jdo.key mapped-by="priceFragmentTypePK"
 	 */
-	protected Map fragments = new HashMap();
+	protected Map<String, PriceFragment> fragments;
 
 	/////// end normal fields ////////
 
+	/**
+	 * @deprecated Only for JDO!
+	 */
 	protected Price() { }
 
 	/**
@@ -148,6 +147,7 @@ public class Price
 		if (currency == null)
 			throw new NullPointerException("currency");
 		this.currency = currency;
+		this.fragments = new HashMap<String, PriceFragment>();
 	}
 	
 	public static String getPrimaryKey(String organisationID, long priceConfigID, long priceID)
@@ -244,7 +244,7 @@ public class Price
 			throw new IllegalArgumentException("No PriceFragment registered with priceFragmentTypePK=\""+priceFragmentTypePK+"\"!");
 		return fragment;
 	}
-	
+
 	public PriceFragment getPriceFragment(
 			String priceFragmentTypeOrganisationID,
 			String priceFragmentTypeID, boolean throwExceptionIfNotExistent)
@@ -276,7 +276,7 @@ public class Price
 	public long getAmount(String priceFragmentTypePK)
 	{
 		if (priceFragmentTypePK == null ||
-				PriceFragmentType.getPrimaryKey(Organisation.DEVIL_ORGANISATION_ID, PriceFragmentType.TOTAL_PRICEFRAGMENTTYPEID).equals(priceFragmentTypePK))
+				PriceFragmentType.getPrimaryKey(PriceFragmentType.PRICE_FRAGMENT_TYPE_ID_TOTAL.organisationID, PriceFragmentType.PRICE_FRAGMENT_TYPE_ID_TOTAL.priceFragmentTypeID).equals(priceFragmentTypePK))
 			return amount;
 
 		PriceFragment priceFragment = getPriceFragment(priceFragmentTypePK, false);
@@ -285,12 +285,12 @@ public class Price
 
 		return 0;
 	}
-	
+
 	protected void addPriceFragment(PriceFragment priceFragment)
 	{
-		fragments.put(priceFragment.getPriceFragmentTypeID(), priceFragment);
+		fragments.put(priceFragment.getPriceFragmentTypePK(), priceFragment);
 	}
-	
+
 	/**
 	 * @return Returns the amount.
 	 */
@@ -302,9 +302,9 @@ public class Price
 		if (priceFragmentTypeOrganisationID == null && priceFragmentTypeID != null)
 			throw new IllegalArgumentException("priceFragmentTypeOrganisationID is null, but priceFragmentTypeID is not null! Either none or both must be null!");
 
-		if (priceFragmentTypeID == null ||
-				(Organisation.DEVIL_ORGANISATION_ID.equals(priceFragmentTypeOrganisationID) &&
-				 PriceFragmentType.TOTAL_PRICEFRAGMENTTYPEID.equals(priceFragmentTypeID)))
+		if (priceFragmentTypeID == null || (
+						PriceFragmentType.PRICE_FRAGMENT_TYPE_ID_TOTAL.organisationID.equals(priceFragmentTypeOrganisationID) &&
+						PriceFragmentType.PRICE_FRAGMENT_TYPE_ID_TOTAL.priceFragmentTypeID.equals(priceFragmentTypeID)))
 			return amount;
 
 		PriceFragment priceFragment = getPriceFragment(priceFragmentTypeOrganisationID, priceFragmentTypeID, false);

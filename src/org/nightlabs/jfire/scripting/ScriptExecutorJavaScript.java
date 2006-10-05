@@ -29,6 +29,7 @@ package org.nightlabs.jfire.scripting;
 import java.util.Map;
 
 import javax.jdo.JDOHelper;
+import javax.jdo.PersistenceManager;
 
 import org.mozilla.javascript.Context;
 import org.mozilla.javascript.ImporterTopLevel;
@@ -49,6 +50,12 @@ public class ScriptExecutorJavaScript
 	public static final String LANGUAGE_JAVA_SCRIPT = "JavaScript";
 	public static final String FILE_EXTENSION_JAVA_SCRIPT = "js";
 
+	/**
+	 * Every JavaScript that is executed by this ScriptExecutor has access to a
+	 * {@link PersistenceManager} via this variable name ({@value #VARIABLE_PERSISTENCE_MANAGER}).
+	 */
+	public static final String VARIABLE_PERSISTENCE_MANAGER = "persistenceManager";
+
 	@Override
 	protected Object doExecute()
 			throws ScriptException
@@ -57,6 +64,9 @@ public class ScriptExecutorJavaScript
 		try {
 //		 Scriptable scope = context.initStandardObjects();
 			Scriptable scope = new ImporterTopLevel(context);
+
+			Object js_pm = Context.javaToJS(getPersistenceManager(), scope);
+			ScriptableObject.putProperty(scope, VARIABLE_PERSISTENCE_MANAGER, js_pm);
 
 //			String importPackages = getImportPackages();
 //			if (importPackages != null)

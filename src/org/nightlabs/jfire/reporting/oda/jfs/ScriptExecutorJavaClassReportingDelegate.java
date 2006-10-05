@@ -1,11 +1,15 @@
 package org.nightlabs.jfire.reporting.oda.jfs;
 
+import org.eclipse.datatools.connectivity.oda.IResultSet;
 import org.eclipse.datatools.connectivity.oda.IResultSetMetaData;
 import org.nightlabs.jfire.reporting.oda.ResultSetMetaData;
 import org.nightlabs.jfire.scripting.ScriptExecutorJavaClassDelegate;
 
 /**
  * Inherited ScriptExecutor delegate for JavaClasses that adds reporting functionality. 
+ * Besides the {@link #getResultSetMetaData()} method script executor delegates for
+ * reporting are obliged to return an implementation of {@link IResultSet}
+ * in their {@link ScriptExecutorJavaClassDelegate#doExecute()} method.
  *  
  * @author Alexander Bieber <alex [AT] nightlabs [DOT] de>
  *

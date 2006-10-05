@@ -6,18 +6,28 @@ import java.util.Set;
 
 import org.eclipse.datatools.connectivity.oda.IResultSet;
 import org.eclipse.datatools.connectivity.oda.IResultSetMetaData;
+import org.nightlabs.jfire.reporting.oda.jfs.server.ServerJFSQueryProxy;
 import org.nightlabs.jfire.scripting.Script;
 import org.nightlabs.jfire.scripting.ScriptException;
 import org.nightlabs.jfire.scripting.ScriptExecutorJavaClass;
 import org.nightlabs.jfire.scripting.ScriptExecutorJavaClassDelegate;
 import org.nightlabs.jfire.scripting.ScriptParameterSet;
+import org.nightlabs.jfire.scripting.ScriptRegistry;
 
 /**
+ * When JFireReporting is deployed this class is registered to the {@link ScriptRegistry}
+ * to be the executor for scripts with the language {@link ScriptExecutorJavaClass#LANGUAGE_JAVA_CLASS}.
+ * <p>
+ * It implements the {@link ReportingScriptExecutor} interface and serves as helper
+ * for the JFS ODA Driver. {@link ServerJFSQueryProxy} for an the usage of this executor.
  * 
  * @author Alexander Bieber <alex [AT] nightlabs [DOT] de>
  *
  */
-public class ScriptExecutorJavaClassReporting extends ScriptExecutorJavaClass implements ReportingScriptExecutor {
+public class ScriptExecutorJavaClassReporting 
+extends ScriptExecutorJavaClass 
+implements ReportingScriptExecutor 
+{
 
 	/**
 	 * 
@@ -28,6 +38,8 @@ public class ScriptExecutorJavaClassReporting extends ScriptExecutorJavaClass im
 
 	/**
 	 * Returns the ready casted delegate.
+	 * 
+	 * @throws ScriptException when the delegate can't be casted to {@link ScriptExecutorJavaClassReportingDelegate}
 	 */
 	protected ScriptExecutorJavaClassReportingDelegate getReportingDelegate()
 	throws ScriptException
@@ -40,8 +52,17 @@ public class ScriptExecutorJavaClassReporting extends ScriptExecutorJavaClass im
 		}
 	}
 
-	/*
-	 * (non-Javadoc)
+	/**
+	 * {@inheritDoc}
+	 * <p>
+	 * This implementation will first fake the params for the delegate, meaning it will put 
+	 * itself(this) as value for all required parameters, in order to be able to prepare
+	 * the script. The script meeds to be prepared as {@link #getDelegate()} will 
+	 * throw an IllegalStateException if not.
+	 * <p>
+	 * After preparation the {@link ScriptExecutorJavaClassReportingDelegate#getResultSetMetaData()}
+	 * method will be called for the delegate to obtain the meta data.
+	 * 
 	 * @see org.nightlabs.jfire.reporting.oda.jfs.ReportingScriptExecutor#getResultSetMetaData(org.nightlabs.jfire.scripting.Script)
 	 */
 	public IResultSetMetaData getResultSetMetaData(Script script)
@@ -60,8 +81,15 @@ public class ScriptExecutorJavaClassReporting extends ScriptExecutorJavaClass im
 		return getReportingDelegate().getResultSetMetaData();
 	}
 
-	/*
-	 * (non-Javadoc)
+	/**
+	 * {@inheritDoc}
+	 * <p>
+	 * Prepares and executes the Query. It assumes the result to be an instance
+	 * of {@link IResultSet} and throws an {@link ScriptException} otherwise.
+	 * 
+	 * @throws ScriptException Not only when execution fails, but also if the returned result is
+	 * 	not of type {@link IResultSet}.
+	 * 
 	 * @see org.nightlabs.jfire.reporting.oda.jfs.ReportingScriptExecutor#getResultSet(org.nightlabs.jfire.scripting.Script, java.util.Map)
 	 */
 	public IResultSet getResultSet(Script script, Map<String, Object> parameters)

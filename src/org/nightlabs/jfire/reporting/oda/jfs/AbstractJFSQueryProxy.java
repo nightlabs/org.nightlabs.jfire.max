@@ -6,9 +6,17 @@ package org.nightlabs.jfire.reporting.oda.jfs;
 import org.eclipse.datatools.connectivity.oda.OdaException;
 import org.nightlabs.jdo.ObjectIDUtil;
 import org.nightlabs.jfire.reporting.oda.Query;
+import org.nightlabs.jfire.scripting.Script;
 import org.nightlabs.jfire.scripting.id.ScriptRegistryItemID;
 
 /**
+ * Common implementation of the JFS ODA Driver, that is used in server and client
+ * and can resolve the {@link Script} the driver's data set is linked to.
+ * <p>
+ * The query parameter of the ODA dataset linked to this driver will be assumed
+ * to be a string reference of a {@link ScriptRegistryItemID}, referencing
+ * as {@link Script} not a category.
+ *  
  * @author Alexander Bieber <alex [AT] nightlabs [DOT] de>
  *
  */

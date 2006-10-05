@@ -74,10 +74,9 @@ public class ScriptRegistry
 	 * @jdo.field primary-key="true"
 	 */
 	private int scriptRegistryID;
-	
+
 	public static final ScriptRegistryID SINGLETON_ID = ScriptRegistryID.create(0); 
-	
-	
+
 	public static ScriptRegistry getScriptRegistry(PersistenceManager pm)
 	{
 		Iterator it = pm.getExtent(ScriptRegistry.class).iterator();
@@ -249,7 +248,9 @@ public class ScriptRegistry
 	public ScriptExecutor createScriptExecutor(String language)
 		throws IllegalArgumentException, ClassNotFoundException, InstantiationException, IllegalAccessException
 	{
-		return (ScriptExecutor) getScriptExecutorClass(language, true).newInstance();
+		ScriptExecutor scriptExecutor = (ScriptExecutor) getScriptExecutorClass(language, true).newInstance();
+		scriptExecutor.setPersistenceManager(getPersistenceManager());
+		return scriptExecutor;
 	}
 
 	public synchronized long createScriptParameterSetID()

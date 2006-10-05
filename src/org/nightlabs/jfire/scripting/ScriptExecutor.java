@@ -32,6 +32,7 @@ import java.util.Map;
 import java.util.Set;
 
 import javax.jdo.JDOHelper;
+import javax.jdo.PersistenceManager;
 
 import org.nightlabs.jfire.scripting.id.ScriptRegistryItemID;
 
@@ -70,6 +71,31 @@ public abstract class ScriptExecutor
 	 * @return Returns sth. like "js" or "asp".
 	 */
 	public abstract String[] getFileExtensions();
+
+	private PersistenceManager persistenceManager;
+
+	/**
+	 * This method is called by {@link ScriptRegistry#createScriptExecutor(String)}.
+	 * Therefore, you cannot use the {@link ScriptExecutor} outside the same transaction
+	 * without setting a new {@link PersistenceManager} (from the new transaction).
+	 *
+	 * @param persistenceManager The Persistence
+	 */
+	public void setPersistenceManager(PersistenceManager persistenceManager)
+	{
+		this.persistenceManager = persistenceManager;
+	}
+	public PersistenceManager getPersistenceManager()
+	{
+		return getPersistenceManager(true);
+	}
+	public PersistenceManager getPersistenceManager(boolean throwExceptionIfNotAssigned)
+	{
+		if (throwExceptionIfNotAssigned && persistenceManager == null)
+			throw new IllegalStateException("There is no PersistenceManager assigned to this ScriptExecutor: " + this);
+
+		return persistenceManager;
+	}
 
 	/**
 	 * @param script The script that shall be executed.

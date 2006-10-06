@@ -31,6 +31,9 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
 
+import org.nightlabs.jfire.store.deliver.id.ModeOfDeliveryFlavourID;
+import org.nightlabs.jfire.store.deliver.id.ModeOfDeliveryID;
+
 /**
  * @author Marco Schulze - marco at nightlabs dot de
  * 
@@ -151,6 +154,10 @@ implements Serializable
 	 */
 	protected ModeOfDelivery() { }
 
+	public ModeOfDelivery(ModeOfDeliveryID modeOfDeliveryID)
+	{
+		this(modeOfDeliveryID.organisationID, modeOfDeliveryID.modeOfDeliveryID);
+	}
 	public ModeOfDelivery(String organisationID, String modeOfDeliveryID)
 	{
 		this.organisationID = organisationID;
@@ -206,6 +213,11 @@ implements Serializable
 		if (throwExceptionIfNotExistent && res == null)
 			throw new IllegalArgumentException("No ModeOfDeliveryFlavour with modeOfDeliveryFlavourPK=\"" + modeOfDeliveryFlavourPK + "\" in the ModeOfDelivery \"" + getPrimaryKey() + "\" existing!");
 		return res;
+	}
+
+	public ModeOfDeliveryFlavour createFlavour(ModeOfDeliveryFlavourID modeOfDeliveryFlavourID)
+	{
+		return createFlavour(modeOfDeliveryFlavourID.organisationID, modeOfDeliveryFlavourID.modeOfDeliveryFlavourID);
 	}
 
 	/**

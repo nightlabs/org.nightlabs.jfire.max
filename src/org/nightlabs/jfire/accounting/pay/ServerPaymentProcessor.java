@@ -60,8 +60,10 @@ import org.nightlabs.jfire.transfer.id.AnchorID;
  *
  * @jdo.inheritance strategy="new-table"
  *
+ * @jdo.inheritance-discriminator strategy="class-name"
+ *
  * @jdo.create-objectid-class field-order="organisationID, serverPaymentProcessorID"
- * 
+ *
  * @jdo.fetch-group name="ServerPaymentProcessor.name" fields="name"
  * @jdo.fetch-group name="ServerPaymentProcessor.modeOfPayments" fields="modeOfPayments"
  * @jdo.fetch-group name="ServerPaymentProcessor.modeOfPaymentFlavours" fields="modeOfPaymentFlavours"

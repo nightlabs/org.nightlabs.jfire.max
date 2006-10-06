@@ -42,7 +42,7 @@ import org.nightlabs.jfire.transfer.Anchor;
  *		detachable="true"
  *		table="JFireTrade_ServerPaymentProcessorBankTransferGermany"
  *
- * @jdo.inheritance strategy="new-table"
+ * @jdo.inheritance strategy="superclass-table"
  */
 public class ServerPaymentProcessorBankTransferGermany extends ServerPaymentProcessor
 {

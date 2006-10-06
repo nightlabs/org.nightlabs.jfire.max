@@ -47,7 +47,7 @@ import org.nightlabs.jfire.transfer.Anchor;
  *		detachable="true"
  *		table="JFireTrade_ServerDeliveryProcessorManual"
  *
- * @jdo.inheritance strategy="new-table"
+ * @jdo.inheritance strategy="superclass-table"
  */
 public class ServerDeliveryProcessorManual extends ServerDeliveryProcessor
 {

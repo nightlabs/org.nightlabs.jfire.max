@@ -43,7 +43,7 @@ import org.nightlabs.jfire.transfer.Anchor;
  *		detachable="true"
  *		table="JFireTrade_ServerPaymentProcessorSaferPay"
  *
- * @jdo.inheritance strategy="new-table"
+ * @jdo.inheritance strategy="superclass-table"
  */
 public class ServerPaymentProcessorSaferPay extends ServerPaymentProcessor
 {

@@ -45,7 +45,7 @@ import org.nightlabs.jfire.transfer.Anchor;
  *		detachable="true"
  *		table="JFireTrade_ServerPaymentProcessorCreditCardDummyForClientPayment"
  *
- * @jdo.inheritance strategy="new-table"
+ * @jdo.inheritance strategy="superclass-table"
  */
 public class ServerPaymentProcessorCreditCardDummyForClientPayment extends ServerPaymentProcessor
 {

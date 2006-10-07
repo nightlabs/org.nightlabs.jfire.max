@@ -7,8 +7,12 @@ import java.math.BigDecimal;
 import java.sql.Date;
 import java.sql.Time;
 import java.sql.Timestamp;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
+import java.util.SortedMap;
+import java.util.TreeMap;
 
 import org.eclipse.datatools.connectivity.oda.IParameterMetaData;
 import org.eclipse.datatools.connectivity.oda.IQuery;
@@ -16,16 +20,23 @@ import org.eclipse.datatools.connectivity.oda.OdaException;
 import org.eclipse.datatools.connectivity.oda.SortSpec;
 
 /**
+ * Common implementation of {@link IQuery} that can be (and is) used 
+ * by all ODA drivers in JFireReporting project.
+ * <p>
+ * It handles parameters and properties for the query, so the actual
+ * driver only has to implement the data acquisition based on these values.
+ * 
  * @author Alexander Bieber <alex [AT] nightlabs [DOT] de>
  *
  */
 public abstract class Query implements IQuery {
 
+	public static final String PARAM_NAME_PREFIX = "param";
+	
 	private int paramMaxID = 0;
-	private ParameterMetaData parameterMetaData = null;
-	private Map<Integer, Object> parameters = new HashMap<Integer, Object>();
+//	private ParameterMetaData parameterMetaData = null;
+	private SortedMap<Integer, Object> parameters = new TreeMap<Integer, Object>();
 	private Map<String, Integer> paramNames = new HashMap<String, Integer>();
-//	private Map<Integer, Object> 
 	private Map<String, String> properties = new HashMap<String, String>();
 	
 	private Object appContext;
@@ -41,8 +52,41 @@ public abstract class Query implements IQuery {
 		// TODO Auto-generated constructor stub
 	}
 
-	public Map getParameters() {
-		return parameters;
+	/**
+	 * Returns all parameter values in a {@link List}.
+	 * 
+	 * @return All parameter values in a {@link List}.
+	 */
+	public List<Object> getParameters() {
+		List<Object> result = new ArrayList<Object>(parameters.size());
+		// iterating the sorted map will give the values
+		// sorted by the keys in ascending order, so
+		// they will be sorted by their position.
+		for (Object param : parameters.values()) {
+			result.add(param);
+		}
+		return result;
+	}
+
+	/**
+	 * Returns all parameter values associated to a parameter name.
+	 * If no name could be assigned to a parameter by quering the
+	 * {@link IParameterMetaData} (beeing {@link NamedParameterMetaData})
+	 * than the parameter will be named in the schema {@link #PARAM_NAME_PREFIX}+parameterPosition.
+	 * The parameterPosition is 1-based so this will result in param1, param2 ...
+	 * 
+	 * @return All parameter values associated to a name.
+	 * @throws OdaException
+	 */
+	public Map<String, Object> getNamedParameters()
+	throws OdaException
+	{
+		mapParameterNames();
+		Map<String, Object> namedParams = new HashMap<String, Object>(parameters.size());
+		for (Map.Entry<String, Integer> nameEntry : paramNames.entrySet()) {
+			namedParams.put(nameEntry.getKey(), parameters.get(nameEntry.getValue()));
+		}
+		return namedParams;
 	}
 	
 	public Object getParameter(String name) {
@@ -73,7 +117,9 @@ public abstract class Query implements IQuery {
 	 * @param paramName
 	 * @param value
 	 */
-	public void setParameter(String paramName, Object value) {
+	public void setParameter(String paramName, Object value)
+	throws OdaException
+	{
 		parameters.put(getParameterID(paramName), value);
 	}
 
@@ -226,8 +272,35 @@ public abstract class Query implements IQuery {
 	public int findInParameter(String parameterName) throws OdaException {
 		return getParameterID(parameterName);
 	}
+
+	/**
+	 * Maps the parameter set to their names. The names are either determined
+	 * by the ParameterMetaData of this Query (in case it implements {@link NamedParameterMetaData}).
+	 * All additional parameters are named "param{PARAM_NO}"
+	 * 
+	 * @throws OdaException
+	 */
+	private void mapParameterNames() 
+	throws OdaException 
+	{
+		IParameterMetaData pMetaData = getParameterMetaData();
+		int mParamIDFromMetaData = 0;
+		paramNames.clear();
+		if (pMetaData instanceof NamedParameterMetaData) {
+			NamedParameterMetaData nMetaData = (NamedParameterMetaData)pMetaData;
+			for (mParamIDFromMetaData = 1; mParamIDFromMetaData<=nMetaData.getParameterCount(); mParamIDFromMetaData++) {
+				paramNames.put(nMetaData.getParameterName(mParamIDFromMetaData), mParamIDFromMetaData);
+			}
+		}
+		for (int i = mParamIDFromMetaData +1; i<=parameters.size(); i++) {
+			paramNames.put("param"+i, i);
+		}
+	}
 	
-	public int getParameterID(String paramName) {
+	public int getParameterID(String paramName)
+	throws OdaException
+	{
+		mapParameterNames();
 		Integer paramID = paramNames.get(paramName);
 		if (paramID == null) {
 			paramID = new Integer(paramMaxID++);
@@ -236,8 +309,10 @@ public abstract class Query implements IQuery {
 		return paramID.intValue();
 	}
 	
-	public String getParameterName(int paramId) {
-		// TODO: Improve param name resolving
+	public String getParameterName(int paramId)
+	throws OdaException
+	{
+		mapParameterNames();
 		Integer intID = new Integer(paramId);
 		if (paramNames.containsValue(intID)) {
 			for (Map.Entry entry : paramNames.entrySet()) {
@@ -248,21 +323,16 @@ public abstract class Query implements IQuery {
 		return null;
 	}
 	
-	/* (non-Javadoc)
+	/**
+	 * {@inheritDoc}
+	 * <p>
+	 * This implementation returns null.
+	 * 
 	 * @see org.eclipse.datatools.connectivity.oda.IQuery#getParameterMetaData()
 	 */
 	public IParameterMetaData getParameterMetaData() throws OdaException {
-		return parameterMetaData;
+		return null;
 	}
-	
-	/**
-	 * Sets the parameterMetaData.
-	 * @param parameterMetaData The parameterMetaData to set.
-	 */
-	public void setParameterMetaData(ParameterMetaData parameterMetaData) {
-		this.parameterMetaData = parameterMetaData;
-	}
-		
 	
 	/* (non-Javadoc)
 	 * @see org.eclipse.datatools.connectivity.oda.IQuery#setSortSpec(org.eclipse.datatools.connectivity.oda.SortSpec)

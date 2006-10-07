@@ -26,13 +26,10 @@
 
 package org.nightlabs.jfire.reporting.oda.jdojs.server;
 
-import java.util.Iterator;
 import java.util.Map;
 
 import javax.jdo.PersistenceManager;
-import javax.naming.InitialContext;
 
-import org.eclipse.datatools.connectivity.oda.IParameterMetaData;
 import org.eclipse.datatools.connectivity.oda.IResultSet;
 import org.eclipse.datatools.connectivity.oda.IResultSetMetaData;
 import org.eclipse.datatools.connectivity.oda.OdaException;
@@ -96,8 +93,8 @@ public class ServerJDOJSProxy extends AbstractJDOJSProxy {
 			return fetchJDOJSResultSet(
 					(JDOJSResultSetMetaData)getMetaData(), 
 					getFetchScript(),
-					getParameterMetaData(),
-					getParameters()
+//					getParameterMetaData(),
+					getNamedParameters()
 					
 				);
 		} catch (Exception e) {
@@ -152,18 +149,40 @@ public class ServerJDOJSProxy extends AbstractJDOJSProxy {
 		}
 	}
 	
+	/**
+	 * Fetches the ResultSet by executing the given fechtScript.
+	 * Before execution the fetchScript is prefixed by the imports for
+	 * fech-scripts ({@link #IMPORT_CLASSES_FETCH}, {@link #IMPORT_PACKAGES_FETCH}).
+	 * <p>
+	 * Additionally three special variables will be deployed into the script:
+	 * <ul>
+	 *   <li><b>metaData</b>: The result set metadata that was returned by the prepare script.</li>
+	 *   <li><b>resultSet</b>: A freshly create result set object that can be filled by the script and should be returned. 
+	 *   	The object is of type {@link JDOJSResultSet}</li>
+	 *   <li><b>persistenceManager</b>: A PersistenceManager the script can use to query its result set</li>
+	 * </ul>
+	 * <p>
+	 * Besides the special variables all parameters defined for this query will be
+	 * deployed into the script. Note that ODA does not operate on named parameters,
+	 * the names of the parameters that are deployed (in case not defined otherwise by the ParameterMetaData)
+	 * will be named like param0, param1, ...
+	 * 
+	 * @param metaData The meta data of the result set.
+	 * @param fetchScript The script to execute.
+	 * @param parameters The query's parmeters
+	 * @return A resultSet that was filled by the fetchScript.
+	 * @throws ModuleException
+	 */
 	public static JDOJSResultSet fetchJDOJSResultSet(
 			JDOJSResultSetMetaData metaData, 
 			String fetchScript,
-			IParameterMetaData parameterMetaData,
-			Map parameters
-			
+//			IParameterMetaData parameterMetaData,
+			Map<String, Object> parameters			
 		)
 	throws ModuleException
 	{
 		try {
-			SecurityReflector securityReflector = SecurityReflector.lookupSecurityReflector(new InitialContext());
-			UserDescriptor userDescriptor = securityReflector.whoAmI();
+			UserDescriptor userDescriptor = SecurityReflector.getUserDescriptor();
 
 			Context context = Context.enter();
 			Lookup lookup = null;
@@ -202,21 +221,27 @@ public class ServerJDOJSProxy extends AbstractJDOJSProxy {
 						logger.debug("*********   JDOJSDriver Params: ");
 					}
 					
-					for (Iterator iter = parameters.entrySet().iterator(); iter.hasNext();) {
-						Map.Entry entry = (Map.Entry) iter.next();
-						if(logger.isDebugEnabled())
-							logger.debug("*********   "+entry.getKey()+": "+entry.getValue());
-						int paramId = ((Integer)entry.getKey()).intValue();
-						
-						String paramName = (parameterMetaData == null) ? null : parameterMetaData.getParameterTypeName(paramId);
-						if (paramName == null)
-							paramName = "p_"+paramId;
-						else
-							paramName = "p_"+paramName;
-						Object js_param = Context.javaToJS(entry.getValue(), scope);
-						ScriptableObject.putProperty(scope, paramName, js_param);
-						
+//					for (Iterator iter = parameters.entrySet().iterator(); iter.hasNext();) {
+//						Map.Entry entry = (Map.Entry) iter.next();
+//						if(logger.isDebugEnabled())
+//							logger.debug("*********   "+entry.getKey()+": "+entry.getValue());
+//						int paramId = ((Integer)entry.getKey()).intValue();
+//						
+//						String paramName = (parameterMetaData == null) ? null : parameterMetaData.getParameterTypeName(paramId);
+//						if (paramName == null)
+//							paramName = "p_"+paramId;
+//						else
+//							paramName = "p_"+paramName;
+//						Object js_param = Context.javaToJS(entry.getValue(), scope);
+//						ScriptableObject.putProperty(scope, paramName, js_param);						
+//					}
+					
+					// deactivate part above as parameternames are now mapped by Query itself					
+					for (Map.Entry<String, Object> paramEntry : parameters.entrySet()) {
+						Object js_param = Context.javaToJS(paramEntry.getValue(), scope);
+						ScriptableObject.putProperty(scope, paramEntry.getKey(), js_param);						
 					}
+					
 					if(logger.isDebugEnabled()) {
 						logger.debug("*****************************************");
 						logger.debug("*****************************************");

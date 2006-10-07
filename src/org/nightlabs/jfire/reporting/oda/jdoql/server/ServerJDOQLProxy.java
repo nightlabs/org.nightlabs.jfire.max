@@ -85,7 +85,10 @@ public class ServerJDOQLProxy extends AbstractJDOQLProxy {
 	 */
 	public IResultSet executeQuery() throws OdaException {
 		try {
-			return executeQuery(getQuery(), getParameters(), (JDOQLResultSetMetaData)getMetaData(), false, null);
+			return executeQuery(
+					getQuery(), getNamedParameters(), 
+					(JDOQLResultSetMetaData)getMetaData(), false, null
+				);
 		} catch (Exception e) {
 			throw new OdaException("Could not execute JDOQLQuery "+e.getClass().getName()+": "+e.getMessage());
 		}

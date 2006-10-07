@@ -3,6 +3,7 @@
  */
 package org.nightlabs.jfire.reporting.oda.jfs;
 
+import org.eclipse.datatools.connectivity.oda.IParameterMetaData;
 import org.eclipse.datatools.connectivity.oda.OdaException;
 import org.nightlabs.jdo.ObjectIDUtil;
 import org.nightlabs.jfire.reporting.oda.Query;
@@ -31,6 +32,15 @@ public abstract class AbstractJFSQueryProxy extends Query implements IJFSQueryPr
 		super();
 	}
 
+	@Override
+	public IParameterMetaData getParameterMetaData() throws OdaException {
+		// TODO: Implement getParameterMetaData for JFS Scripts (Possible with ParameterSet)
+		System.out.println("**************************************************");
+		System.out.println("*********** getParameterMetaData() called ********");
+		System.out.println("**************************************************");
+		return super.getParameterMetaData();
+	}
+	
 	/**
 	 * Checks if the query is set to an JDO-ObjectID String and
 	 * creates a ScriptRegistryID if possible.

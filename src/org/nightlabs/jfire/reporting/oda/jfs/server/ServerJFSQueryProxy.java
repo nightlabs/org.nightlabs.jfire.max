@@ -3,19 +3,23 @@
  */
 package org.nightlabs.jfire.reporting.oda.jfs.server;
 
+import java.math.BigDecimal;
 import java.util.Map;
 
 import javax.jdo.PersistenceManager;
 
+import org.eclipse.datatools.connectivity.oda.IParameterMetaData;
 import org.eclipse.datatools.connectivity.oda.IResultSet;
 import org.eclipse.datatools.connectivity.oda.IResultSetMetaData;
 import org.eclipse.datatools.connectivity.oda.OdaException;
 import org.nightlabs.ModuleException;
 import org.nightlabs.jfire.base.Lookup;
+import org.nightlabs.jfire.reporting.oda.ParameterMetaData;
 import org.nightlabs.jfire.reporting.oda.jfs.AbstractJFSQueryProxy;
 import org.nightlabs.jfire.reporting.oda.jfs.ReportingScriptExecutor;
 import org.nightlabs.jfire.scripting.Script;
 import org.nightlabs.jfire.scripting.ScriptExecutor;
+import org.nightlabs.jfire.scripting.ScriptParameterSet;
 import org.nightlabs.jfire.scripting.ScriptRegistry;
 import org.nightlabs.jfire.scripting.ScriptRegistryItem;
 import org.nightlabs.jfire.scripting.id.ScriptRegistryItemID;
@@ -46,6 +50,23 @@ public class ServerJFSQueryProxy extends AbstractJFSQueryProxy {
 	public void close() throws OdaException {
 	}
 
+	private IParameterMetaData parameterMetaData;
+	
+	/*
+	 * (non-Javadoc)
+	 * @see org.nightlabs.jfire.reporting.oda.jfs.AbstractJFSQueryProxy#getParameterMetaData()
+	 */
+	@Override
+	public IParameterMetaData getParameterMetaData() 
+	throws OdaException 
+	{
+		if (parameterMetaData == null) {
+			ScriptRegistryItemID itemID = getScriptRegistryItemID();
+			parameterMetaData = getScriptParameterMetaData(itemID);
+		}
+		return parameterMetaData;
+	}
+	
 	/**
 	 * {@inheritDoc}
 	 * <p>
@@ -56,9 +77,9 @@ public class ServerJFSQueryProxy extends AbstractJFSQueryProxy {
 	 */
 	public IResultSet executeQuery() throws OdaException {
 		try {
-			return getJFSResultSet(getScriptRegistryItemID(), getParameters());
+			return getJFSResultSet(getScriptRegistryItemID(), getNamedParameters());
 		} catch (ModuleException e) {
-			OdaException ex = new OdaException("Could not get MetaData "+e.getMessage());
+			OdaException ex = new OdaException("Could not get ResultSet "+e.getMessage());
 			ex.initCause(e);
 			throw ex;
 		}
@@ -135,20 +156,23 @@ s	 */
 	}
 	
 	/**
+	 * Obtains a (new ?!?) PersistenceManager with the help of {@link Lookup}.
+	 */
+	protected static PersistenceManager getPersistenceManager() 
+	{
+		Lookup lookup;
+		lookup = new Lookup(SecurityReflector.getUserDescriptor().getOrganisationID());
+		return lookup.getPersistenceManager();
+	}
+	
+	/**
 	 * Shorcut to {@link #getJFSResultSetMetaData(PersistenceManager, ScriptRegistryItemID)}
 	 */
 	public static IResultSetMetaData getJFSResultSetMetaData(ScriptRegistryItemID scriptRegistryItemID)
 	throws ModuleException
 	{
-		Lookup lookup;
+		PersistenceManager pm = getPersistenceManager();
 		try {
-			lookup = new Lookup(SecurityReflector.getUserDescriptor().getOrganisationID());
-		} catch (Exception e) {
-			throw new ModuleException("Could not get Lookup from SecurityReflector!", e);
-		}
-		PersistenceManager pm = null;
-		try {
-			pm = lookup.getPersistenceManager();
 			return getJFSResultSetMetaData(pm, scriptRegistryItemID);
 		} finally {
 			pm.close();
@@ -161,15 +185,8 @@ s	 */
 	public static IResultSet getJFSResultSet(ScriptRegistryItemID scriptRegistryItemID, Map<String, Object> parameters)
 	throws ModuleException
 	{
-		Lookup lookup;
-		try {
-			lookup = new Lookup(SecurityReflector.getUserDescriptor().getOrganisationID());
-		} catch (Exception e) {
-			throw new ModuleException("Could not get Lookup from SecurityReflector!", e);
-		}
-		PersistenceManager pm = null;
-		try {
-			pm = lookup.getPersistenceManager();
+		PersistenceManager pm = getPersistenceManager();
+		try {			
 			return getJFSResultSet(pm, scriptRegistryItemID, parameters);
 		} finally {
 			pm.close();
@@ -205,7 +222,29 @@ s	 */
 	throws ModuleException
 	{
 		Script script = getScript(pm, scriptRegistryItemID);
-		parameters.put("persistenceManager", pm);
+		// if this script relies on a persistenceManager parameter, provide one ;-)
+		// this is legacy code (JavaClass)scripts can now obtain the pm from their executor
+		if (script.getParameterSet().getParameter("persistenceManager", false) != null)
+			parameters.put("persistenceManager", pm);
 		return createReportingScriptExecutor(pm, script).getResultSet(script, parameters);
+	}
+	
+	public static IParameterMetaData getScriptParameterMetaData(ScriptRegistryItemID itemID)
+	throws OdaException
+	{
+		PersistenceManager pm = getPersistenceManager();
+		try {
+			return getScriptParameterMetaData(pm, itemID);
+		} finally {
+			pm.close();
+		}
+	}
+	
+	public static IParameterMetaData getScriptParameterMetaData(PersistenceManager pm, ScriptRegistryItemID itemID)
+	throws OdaException
+	{
+		Script script = getScript(pm, itemID);
+		ScriptParameterSet paramSet = script.getParameterSet();
+		return ParameterMetaData.createMetaDataFromParameterSet(paramSet);
 	}
 }

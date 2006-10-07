@@ -46,18 +46,13 @@ import javax.naming.NamingException;
 
 import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
-import org.eclipse.birt.core.framework.IConfigurationElement;
 import org.eclipse.birt.core.framework.Platform;
-import org.eclipse.birt.core.framework.PlatformConfig;
 import org.eclipse.birt.report.engine.api.EngineConfig;
 import org.eclipse.birt.report.engine.api.EngineException;
-import org.eclipse.birt.report.engine.api.HTMLRenderOption;
-import org.eclipse.birt.report.engine.api.IReportRunnable;
-import org.eclipse.birt.report.engine.api.IRunAndRenderTask;
-import org.eclipse.birt.report.engine.api.ReportEngine;
 import org.eclipse.datatools.connectivity.oda.IParameterMetaData;
 import org.eclipse.datatools.connectivity.oda.IResultSet;
 import org.eclipse.datatools.connectivity.oda.IResultSetMetaData;
+import org.eclipse.datatools.connectivity.oda.OdaException;
 import org.nightlabs.ModuleException;
 import org.nightlabs.jdo.NLJDOHelper;
 import org.nightlabs.jdo.moduleregistry.ModuleMetaData;
@@ -69,8 +64,8 @@ import org.nightlabs.jfire.reporting.layout.ReportRegistry;
 import org.nightlabs.jfire.reporting.layout.ReportRegistryItem;
 import org.nightlabs.jfire.reporting.layout.ReportRegistryItemCarrier;
 import org.nightlabs.jfire.reporting.layout.id.ReportRegistryItemID;
-import org.nightlabs.jfire.reporting.layout.render.RenderedReportLayout;
 import org.nightlabs.jfire.reporting.layout.render.RenderManager;
+import org.nightlabs.jfire.reporting.layout.render.RenderedReportLayout;
 import org.nightlabs.jfire.reporting.layout.render.ReportLayoutRendererHTML;
 import org.nightlabs.jfire.reporting.layout.render.ReportLayoutRendererPDF;
 import org.nightlabs.jfire.reporting.oda.jdojs.JDOJSResultSet;
@@ -506,15 +501,15 @@ implements SessionBean
 	public JDOJSResultSet fetchJDOJSResultSet(
 			JDOJSResultSetMetaData metaData, 
 			String prepareScript,
-			IParameterMetaData parameterMetaData,
-			Map parameters
+//			IParameterMetaData parameterMetaData,
+			Map<String, Object> parameters
 		)
 	throws ModuleException
 	{
 		return ServerJDOJSProxy.fetchJDOJSResultSet(
 				metaData, 
 				prepareScript,
-				parameterMetaData,
+//				parameterMetaData,
 				parameters
 			);
 	}
@@ -546,7 +541,7 @@ implements SessionBean
 	 */
 	public IResultSet getJFSResultSet(
 			ScriptRegistryItemID scriptRegistryItemID,
-			Map parameters
+			Map<String, Object> parameters
 		)
 	throws ModuleException
 	{
@@ -562,6 +557,32 @@ implements SessionBean
 		}
 	}
 	
+	/**
+	 * @throws ModuleException
+	 *
+	 * @ejb.interface-method
+	 * @ejb.permission role-name="_Guest_"
+	 * @ejb.transaction type = "Required"
+	 */
+	public IParameterMetaData getJFSParameterMetaData(
+			ScriptRegistryItemID scriptRegistryItemID
+		)
+	throws ModuleException
+	{
+		PersistenceManager pm = getPersistenceManager();
+		try {
+			try {
+				return ServerJFSQueryProxy.getScriptParameterMetaData(
+						pm,
+						scriptRegistryItemID
+				);
+			} catch (OdaException e) {
+				throw new ModuleException("Failed to create parameterMetaData for JFS Query!", e);
+			}
+		} finally {
+			pm.close();
+		}
+	}
 	
 	
 	/**

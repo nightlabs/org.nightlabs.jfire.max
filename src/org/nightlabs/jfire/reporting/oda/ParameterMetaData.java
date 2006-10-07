@@ -5,18 +5,26 @@ package org.nightlabs.jfire.reporting.oda;
 
 import java.io.Serializable;
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
+import java.util.SortedSet;
+import java.util.TreeSet;
 
 import org.eclipse.datatools.connectivity.oda.IParameterMetaData;
 import org.eclipse.datatools.connectivity.oda.OdaException;
+import org.nightlabs.jfire.scripting.ScriptParameter;
+import org.nightlabs.jfire.scripting.ScriptParameterSet;
 
 /**
  * A generic class for metadata for oda DataSets.
+ * <p>
+ * Note that as defined by ODA the position-parameters used
+ * for most of the methods are 1-based.
  * 
  * @author Alexander Bieber <alex [AT] nightlabs [DOT] de>
  *
  */
-public class ParameterMetaData implements IParameterMetaData, Serializable {
+public class ParameterMetaData implements NamedParameterMetaData, Serializable {
 
 	private static final long serialVersionUID = 1L;	
 
@@ -27,9 +35,10 @@ public class ParameterMetaData implements IParameterMetaData, Serializable {
 
 		private static final long serialVersionUID = 1L;
 		
+		private String parameterName;
 		private int mode;
 		private int dataType;
-		private String dataTypeName;
+		private String dataTypeName;		
 		private int precision;
 		private int scale;
 		private int nullable;
@@ -106,7 +115,19 @@ public class ParameterMetaData implements IParameterMetaData, Serializable {
 		public void setNullable(int nullable) {
 			this.nullable = nullable;
 		}
-		
+		/**
+		 * @return the parameterName
+		 */
+		public String getParameterName() {
+			return parameterName;
+		}
+		/**
+		 * @param parameterName the parameterName to set
+		 */
+		public void setParameterName(String parameterName) {
+			this.parameterName = parameterName;
+		}
+				
 	}
 	
 	private List<ParameterDescriptor> parameters = new ArrayList<ParameterDescriptor>();
@@ -122,8 +143,20 @@ public class ParameterMetaData implements IParameterMetaData, Serializable {
 	private ParameterDescriptor getDescriptor(int pPosition) {
 		int pIdx = pPosition -1;
 		if (pIdx >= parameters.size() || pIdx < 0)
-			throw new IllegalArgumentException("No parameter with at index "+pPosition+" can be found in this ParameterMetaData set.");
+			throw new IllegalArgumentException("No parameter at index "+pPosition+" can be found in this ParameterMetaData set.");
 		return parameters.get(pIdx);
+	}
+	
+	/**
+	 * Additional method that returns a name for a given parameter.
+	 * Note that this is not part of the ODA API and therefor not neccessary
+	 * to exist. 
+	 * 
+	 * @param pPosition The parameter postion the name should be returned.
+	 * @return The name of the referenced parameter if one is set, <code>null</code> otherwise.
+	 */
+	public String getParameterName(int pPosition) {
+		return getDescriptor(pPosition).getParameterName();
 	}
 	
 	/* (non-Javadoc)
@@ -148,7 +181,7 @@ public class ParameterMetaData implements IParameterMetaData, Serializable {
 	}
 
 	/* (non-Javadoc)
-	 * @see org.eclipse.datatools.connectivity.oda.IParameterMetaData#getPrecision(int)
+	 * @see org.eclipse.datatools.connectivity.oda.IParametParameterDescriptorerMetaData#getPrecision(int)
 	 */
 	public int getPrecision(int pPosition) throws OdaException {
 		return getDescriptor(pPosition).getPrecision();
@@ -175,6 +208,45 @@ public class ParameterMetaData implements IParameterMetaData, Serializable {
 	
 	public void addParameterDescriptor(ParameterDescriptor descriptor) {
 		parameters.add(descriptor);
+	}
+
+	/**
+	 * Tries to create a ODA {@link ParameterMetaData} from the given 
+	 * {@link ScriptParameterSet}. The parameters will be sorted by
+	 * their parameterID (their name) so this method will always return
+	 * the same result for the same parameter set.
+	 * 
+	 * @param parameterSet The parameter set to create meta data for.
+	 * @return A ParameterMetaData representing the parameter of the given script parameter set.
+	 * @throws OdaException
+	 */
+	public static ParameterMetaData createMetaDataFromParameterSet(ScriptParameterSet parameterSet)
+	throws OdaException
+	{
+		ParameterMetaData result = new ParameterMetaData();
+		SortedSet<String> sortedParamIDs = new TreeSet<String>();
+		for (Iterator iter = parameterSet.getParameters().iterator(); iter.hasNext();) {
+			ScriptParameter parameter = (ScriptParameter) iter.next();
+			sortedParamIDs.add(parameter.getScriptParameterID());
+		}
+		for (String paramID : sortedParamIDs) {
+			ScriptParameter parameter = parameterSet.getParameter(paramID, false);
+			if (parameter == null)
+				throw new IllegalStateException("Previously still registered parameter now not found ?!?");
+			ParameterDescriptor descriptor = new ParameterDescriptor();
+			descriptor.setMode(IParameterMetaData.parameterModeIn);
+			int dataType;
+			try {
+				dataType = DataType.classToDataType(parameter.getScriptParameterClass());
+			} catch (ClassNotFoundException e) {
+				throw new OdaException("Could not create ParameterMetaData from ScriptParameterSet as one parameter's class could not be found or mapped to a scalar datatype. "+e.getMessage());
+			}			
+			descriptor.setDataType(dataType);
+			descriptor.setDataTypeName(DataType.getTypeName(dataType));
+			descriptor.setParameterName(paramID);
+			result.addParameterDescriptor(descriptor);
+		}
+		return result;
 	}
 
 }

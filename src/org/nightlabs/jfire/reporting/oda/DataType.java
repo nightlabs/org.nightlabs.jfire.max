@@ -27,6 +27,7 @@
 package org.nightlabs.jfire.reporting.oda;
 
 import java.io.Serializable;
+import java.math.BigDecimal;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
@@ -76,16 +77,16 @@ public class DataType {
 	public static final Integer K_BLOB = new Integer(BLOB);
 	public static final Integer K_CLOB = new Integer(CLOB);
 	
-	private static final Map types2Classes = new HashMap();
-	private static final Map classes2Types = new HashMap();
-	private static final Map types2Names = new HashMap();
+	private static final Map<Integer, Class[]> types2Classes = new HashMap<Integer, Class[]>();
+	private static final Map<Class, Integer> classes2Types = new HashMap<Class, Integer>();
+	private static final Map<Integer, String> types2Names = new HashMap<Integer, String>();
 	
 	static {
 		types2Classes.put(K_STRING, new Class[] {String.class});
 		types2Classes.put(K_INTEGER, new Class[] {Integer.class});
-		types2Classes.put(K_DOUBLE, new Class[] {Double.class});
+		types2Classes.put(K_DOUBLE, new Class[] {Double.class, Float.class});
 		types2Classes.put(K_DATE, new Class[] {Date.class});
-		types2Classes.put(K_BIGDECIMAL, new Class[] {Long.class});
+		types2Classes.put(K_BIGDECIMAL, new Class[] {Long.class, BigDecimal.class});
 		types2Classes.put(K_BLOB, new Class[] {Serializable.class});
 		types2Classes.put(K_CLOB, new Class[] {Serializable.class});
 		

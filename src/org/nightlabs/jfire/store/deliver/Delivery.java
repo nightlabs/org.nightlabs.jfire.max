@@ -761,7 +761,7 @@ implements Serializable, StoreCallback
 	 *		element-type="org.nightlabs.jfire.trade.ArticleLocal"
 	 *		mapped-by="delivery"
 	 */	
-	private Collection articleLocals = null;
+	private Collection<ArticleLocal> articleLocals = null;
 
 	/**
 	 * @jdo.field
@@ -772,7 +772,7 @@ implements Serializable, StoreCallback
 	 * 
 	 * @jdo.join
 	 */
-	private Set deliveryNotes = null;
+	private Set<DeliveryNote> deliveryNotes = null;
 
 	/**
 	 * @jdo.field persistence-modifier="persistent"
@@ -810,12 +810,12 @@ implements Serializable, StoreCallback
 	/**
 	 * @jdo.field persistence-modifier="transactional"
 	 */
-	private Collection articleIDs = null;
+	private Collection<ArticleID> articleIDs = null;
 
 	/**
 	 * @jdo.field persistence-modifier="transactional"
 	 */
-	private transient Collection _articles = null;
+	private transient Collection<Article> _articles = null;
 
 //	/**
 //	 * @jdo.field persistence-modifier="transactional"
@@ -845,7 +845,7 @@ implements Serializable, StoreCallback
 	/**
 	 * @return Returns the deliveryNotes.
 	 */
-	public Collection getDeliveryNotes()
+	public Collection<DeliveryNote> getDeliveryNotes()
 	{
 		return deliveryNotes;
 	}
@@ -853,15 +853,15 @@ implements Serializable, StoreCallback
 	/**
 	 * @jdo.field persistence-modifier="transactional"
 	 */
-	private Set deliveryNoteIDs = null;
+	private Set<DeliveryNoteID> deliveryNoteIDs = null;
 
-	public Set getDeliveryNoteIDs()
+	public Set<DeliveryNoteID> getDeliveryNoteIDs()
 	{
 		if (deliveryNoteIDs == null) {
 			Set dnids = new HashSet();
 			for (Iterator it = deliveryNotes.iterator(); it.hasNext(); ) {
 				DeliveryNote deliveryNote = (DeliveryNote) it.next();
-				dnids.add(JDOHelper.getObjectId(deliveryNote));
+				dnids.add((DeliveryNoteID) JDOHelper.getObjectId(deliveryNote));
 			}
 			deliveryNoteIDs = dnids;
 		}
@@ -905,12 +905,12 @@ implements Serializable, StoreCallback
 	/**
 	 * @return Returns instances of {@link org.nightlabs.jfire.trade.id.ArticleID}.
 	 */
-	public Collection getArticleIDs()
+	public Collection<ArticleID> getArticleIDs()
 	{
 		if (articleIDs == null) {
 			HashSet s = new HashSet();
-			for (Iterator it = getArticles().iterator(); it.hasNext(); ) {
-				s.add(JDOHelper.getObjectId(it.next()));
+			for (Article article : getArticles()) {
+				s.add((ArticleID) JDOHelper.getObjectId(article));
 			}
 			articleIDs = s;
 		}
@@ -929,7 +929,7 @@ implements Serializable, StoreCallback
 	/**
 	 * @return Returns instances of {@link org.nightlabs.jfire.trade.Article}.
 	 */
-	public Collection getArticles()
+	public Collection<Article> getArticles()
 	{
 		if (_articles == null) {
 			Set res = new HashSet();

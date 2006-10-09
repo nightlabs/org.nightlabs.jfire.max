@@ -1,5 +1,5 @@
 <!--
-  Generic j2ee (jboss/jpox) ant build file (version 2006-07-25)
+  Generic j2ee (jboss/jpox) ant build file (version 2006-10-09.02)
   Author: marc [at] nightlabs [dot] de
   Author: marco [at] nightlabs [dot] de
 
@@ -197,6 +197,8 @@
     <setdefault property="ejbsrc.dir" value="ejbsrc" />
     <!-- set bin.dir to "bin" if not already defined -->
     <setdefault property="bin.dir" value="bin" />
+  	<!-- set lib.dir to "lib" if not already defined -->
+  	<setdefault property="lib.dir" value="lib" />
     <!-- set project.dir to "." if not already defined -->
     <setdefault property="project.dir" value="." />
     <!-- set lib.dir to "lib" if not already defined -->
@@ -260,6 +262,10 @@
     <!-- set dist.dir to "dist" if not already defined -->
     <setdefault property="j2ee.deployear.includes" value="${project.jar},${project.war},${project.rar}" />
     <setdefault property="j2ee.deployear.excludes" value="" />
+
+  	<setdefault property="j2ee.deployear.lib.includes" value="" />
+  	<setdefault property="j2ee.deployear.lib.excludes" value="" />
+
 	<!--  Don't set default for deplaysubdir.includes/excludes so per default nothing is copied
     <setdefault property="j2ee.deploysubdir.includes" value="*.xml" />
     <setdefault property="j2ee.deploysubdir.excludes" value="application.xml" />
@@ -493,6 +499,9 @@
     <mkdir dir="${j2ee.deploy.dir}/${j2ee.deploy.subdir}/${j2ee.ear}"/>
     <copy todir="${j2ee.deploy.dir}/${j2ee.deploy.subdir}/${j2ee.ear}">
       <fileset dir="${project.dir}/${dist.dir}" includes="${j2ee.deployear.includes}" excludes="${j2ee.deployear.excludes}"/>
+    </copy>
+	<copy todir="${j2ee.deploy.dir}/${j2ee.deploy.subdir}/${j2ee.ear}" failonerror="false">
+      <fileset dir="${project.dir}/${lib.dir}" includes="${j2ee.deployear.lib.includes}" excludes="${j2ee.deployear.lib.excludes}"/>
     </copy>
     <mkdir dir="${j2ee.deploy.dir}/${j2ee.deploy.subdir}/${j2ee.ear}/META-INF"/>
     <copy todir="${j2ee.deploy.dir}/${j2ee.deploy.subdir}/${j2ee.ear}/META-INF">

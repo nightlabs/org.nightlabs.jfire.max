@@ -3,6 +3,7 @@ package org.nightlabs.jfire.reporting.oda.jfs;
 import org.eclipse.datatools.connectivity.oda.IResultSet;
 import org.eclipse.datatools.connectivity.oda.IResultSetMetaData;
 import org.nightlabs.jfire.reporting.oda.ResultSetMetaData;
+import org.nightlabs.jfire.scripting.ScriptException;
 import org.nightlabs.jfire.scripting.ScriptExecutorJavaClassDelegate;
 
 /**
@@ -22,6 +23,7 @@ public interface ScriptExecutorJavaClassReportingDelegate extends ScriptExecutor
 	 * of this method.
 	 * 
 	 * @return A ResultSetMetaData describing the colums this delegate returns on execution.
+	 * @throws ScriptException When the script fails to return the metadata
 	 */
-	public IResultSetMetaData getResultSetMetaData();
+	public IResultSetMetaData getResultSetMetaData() throws ScriptException;
 }

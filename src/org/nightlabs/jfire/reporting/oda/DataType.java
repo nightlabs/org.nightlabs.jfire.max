@@ -59,52 +59,88 @@ public class DataType {
 	public static final String N_BOOLEAN = "Boolean";
 	public static final String N_DATE = "Date";
 	public static final String N_BIGDECIMAL = "BigDecimal(Long)";
-//	public static final int TIME = 92;
-//	public static final int TIMESTAMP = 93;
+	public static final int TIME = 92;
+	public static final int TIMESTAMP = 93;
 	public static final String N_BLOB = "Blob";
 	public static final String N_CLOB = "Clob";
 	public static final String N_UNKNOWN = "Unknown";
 	
 	
-	public static final Integer K_STRING = new Integer(STRING);; 
-	public static final Integer K_INTEGER = new Integer(INTEGER);
-	public static final Integer K_DOUBLE = new Integer(DOUBLE);
-	public static final Integer K_BOOLEAN = new Integer(BOOLEAN);
-	public static final Integer K_DATE = new Integer(DATE);
-	public static final Integer K_BIGDECIMAL = new Integer(BIGDECIMAL);
-//	public static final Integer K_TIME = new Integer(TIME);
-//	public static final Integer K_TIMESTAMP = new Integer(TIMESTAMP);
-	public static final Integer K_BLOB = new Integer(BLOB);
-	public static final Integer K_CLOB = new Integer(CLOB);
+//	public static final Integer K_STRING = new Integer(STRING);; 
+//	public static final Integer K_INTEGER = new Integer(INTEGER);
+//	public static final Integer K_DOUBLE = new Integer(DOUBLE);
+//	public static final Integer K_BOOLEAN = new Integer(BOOLEAN);
+//	public static final Integer K_DATE = new Integer(DATE);
+//	public static final Integer K_BIGDECIMAL = new Integer(BIGDECIMAL);
+////	public static final Integer K_TIME = new Integer(TIME);
+////	public static final Integer K_TIMESTAMP = new Integer(TIMESTAMP);
+//	public static final Integer K_BLOB = new Integer(BLOB);
+//	public static final Integer K_CLOB = new Integer(CLOB);
 	
 	private static final Map<Integer, Class[]> types2Classes = new HashMap<Integer, Class[]>();
 	private static final Map<Class, Integer> classes2Types = new HashMap<Class, Integer>();
 	private static final Map<Integer, String> types2Names = new HashMap<Integer, String>();
+	private static final Map<Integer, Integer> sqlTypes2dataTypes = new HashMap<Integer, Integer>();
 	
 	static {
-		types2Classes.put(K_STRING, new Class[] {String.class});
-		types2Classes.put(K_INTEGER, new Class[] {Integer.class});
-		types2Classes.put(K_DOUBLE, new Class[] {Double.class, Float.class});
-		types2Classes.put(K_DATE, new Class[] {Date.class});
-		types2Classes.put(K_BIGDECIMAL, new Class[] {Long.class, BigDecimal.class});
-		types2Classes.put(K_BLOB, new Class[] {Serializable.class});
-		types2Classes.put(K_CLOB, new Class[] {Serializable.class});
+		types2Classes.put(STRING, new Class[] {String.class});
+		types2Classes.put(INTEGER, new Class[] {Integer.class});
+		types2Classes.put(DOUBLE, new Class[] {Double.class, Float.class});
+		types2Classes.put(DATE, new Class[] {Date.class});
+		types2Classes.put(BIGDECIMAL, new Class[] {Long.class, BigDecimal.class});
+		types2Classes.put(BLOB, new Class[] {Serializable.class});
+		types2Classes.put(CLOB, new Class[] {Serializable.class});
+		types2Classes.put(BOOLEAN, new Class[] {Boolean.class});
 		
-		classes2Types.put(String.class, K_STRING);
-		classes2Types.put(Integer.class, K_INTEGER);
-		classes2Types.put(Double.class, K_DOUBLE);
-		classes2Types.put(Date.class, K_DATE);
-		classes2Types.put(Long.class, K_BIGDECIMAL);
-		classes2Types.put(Serializable.class, K_BLOB);
-		classes2Types.put(Serializable.class, K_CLOB);
+		classes2Types.put(String.class, STRING);
+		classes2Types.put(Integer.class, INTEGER);
+		classes2Types.put(Double.class, DOUBLE);
+		classes2Types.put(Date.class, DATE);
+		classes2Types.put(Long.class, BIGDECIMAL);
+		classes2Types.put(Serializable.class, BLOB);
+		classes2Types.put(Serializable.class, CLOB);
+		classes2Types.put(Boolean.class, BOOLEAN);
+//		classes2Types.put(java.sql..class, CLOB);
 		
-		types2Names.put(K_STRING, N_STRING);
-		types2Names.put(K_INTEGER, N_INTEGER);
-		types2Names.put(K_DOUBLE, N_DOUBLE);
-		types2Names.put(K_DATE, N_DATE);
-		types2Names.put(K_BIGDECIMAL, N_BIGDECIMAL);
-		types2Names.put(K_BLOB, N_BLOB);
-		types2Names.put(K_CLOB, N_CLOB);
+		types2Names.put(STRING, N_STRING);
+		types2Names.put(INTEGER, N_INTEGER);
+		types2Names.put(DOUBLE, N_DOUBLE);
+		types2Names.put(DATE, N_DATE);
+		types2Names.put(BIGDECIMAL, N_BIGDECIMAL);
+		types2Names.put(BOOLEAN, N_BOOLEAN);
+		types2Names.put(BLOB, N_BLOB);
+		types2Names.put(CLOB, N_CLOB);
+		
+		sqlTypes2dataTypes.put(java.sql.Types.BIT, BOOLEAN);
+		sqlTypes2dataTypes.put(java.sql.Types.TINYINT, INTEGER);
+		sqlTypes2dataTypes.put(java.sql.Types.SMALLINT, INTEGER);
+		sqlTypes2dataTypes.put(java.sql.Types.INTEGER, INTEGER);
+		sqlTypes2dataTypes.put(java.sql.Types.BIGINT, BIGDECIMAL);
+		sqlTypes2dataTypes.put(java.sql.Types.FLOAT, DOUBLE);
+		sqlTypes2dataTypes.put(java.sql.Types.REAL, DOUBLE);
+		sqlTypes2dataTypes.put(java.sql.Types.DOUBLE, DOUBLE);
+		sqlTypes2dataTypes.put(java.sql.Types.NUMERIC, BIGDECIMAL);
+		sqlTypes2dataTypes.put(java.sql.Types.DECIMAL, DOUBLE);
+		sqlTypes2dataTypes.put(java.sql.Types.CHAR, STRING);
+		sqlTypes2dataTypes.put(java.sql.Types.VARCHAR, STRING);
+		sqlTypes2dataTypes.put(java.sql.Types.LONGVARCHAR, STRING);
+		sqlTypes2dataTypes.put(java.sql.Types.DATE, DATE);
+		sqlTypes2dataTypes.put(java.sql.Types.LONGVARCHAR, STRING);
+		sqlTypes2dataTypes.put(java.sql.Types.TIME, TIME);
+		sqlTypes2dataTypes.put(java.sql.Types.TIMESTAMP, TIMESTAMP);
+		sqlTypes2dataTypes.put(java.sql.Types.BINARY, BLOB);
+		sqlTypes2dataTypes.put(java.sql.Types.VARBINARY, BLOB);
+		sqlTypes2dataTypes.put(java.sql.Types.LONGVARBINARY, BLOB);
+		sqlTypes2dataTypes.put(java.sql.Types.LONGVARCHAR, UNKNOWN);
+		sqlTypes2dataTypes.put(java.sql.Types.OTHER, UNKNOWN);
+		sqlTypes2dataTypes.put(java.sql.Types.JAVA_OBJECT, UNKNOWN);
+		sqlTypes2dataTypes.put(java.sql.Types.LONGVARCHAR, UNKNOWN);
+		sqlTypes2dataTypes.put(java.sql.Types.ARRAY, UNKNOWN);
+		sqlTypes2dataTypes.put(java.sql.Types.BLOB, BLOB);
+		sqlTypes2dataTypes.put(java.sql.Types.CLOB, CLOB);
+		sqlTypes2dataTypes.put(java.sql.Types.REF, UNKNOWN);
+		sqlTypes2dataTypes.put(java.sql.Types.DATALINK, UNKNOWN);
+		sqlTypes2dataTypes.put(java.sql.Types.BOOLEAN, BOOLEAN);
 	}
 	
 	public static Class[] dataTypeToClasses(int dataType) {		
@@ -126,6 +162,13 @@ public class DataType {
 		if (name != null)
 			return name;
 		return N_UNKNOWN;
+	}
+	
+	public static int sqlTypeToDataType(int sqlType) {
+		Integer result = sqlTypes2dataTypes.get(sqlType);
+		if (result == null)
+			return UNKNOWN;
+		return result;
 	}
 	
 	

@@ -158,7 +158,7 @@ s	 */
 	/**
 	 * Obtains a (new ?!?) PersistenceManager with the help of {@link Lookup}.
 	 */
-	protected static PersistenceManager getPersistenceManager() 
+	public static PersistenceManager getPersistenceManager() 
 	{
 		Lookup lookup;
 		lookup = new Lookup(SecurityReflector.getUserDescriptor().getOrganisationID());

@@ -39,10 +39,10 @@ import org.eclipse.datatools.connectivity.oda.OdaException;
  * @author Alexander Bieber <alex[AT]nightlabs[DOT]de>
  *
  */
-public abstract class ResultSetMetaData implements IResultSetMetaData, Serializable {
+public class ResultSetMetaData implements IResultSetMetaData, Serializable {
 	
-	
-	
+	private static final long serialVersionUID = 1L;
+
 	public static class Column implements Serializable {
 		private static final long serialVersionUID = 1L;
 		
@@ -118,7 +118,8 @@ public abstract class ResultSetMetaData implements IResultSetMetaData, Serializa
 	}
 	
 	/**
-	 * Sets the column meta data for the given index 
+	 * Sets the column meta data for the given index.
+	 *  
 	 */
 	public void setColumn(int index, String colName, int dataType) {
 		setColumn(index, new Column(colName, dataType));		

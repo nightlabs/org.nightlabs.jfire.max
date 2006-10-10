@@ -96,9 +96,6 @@ public abstract class ScriptRegistryItem
 	 */
 	private String scriptRegistryItemType;
 	
-	// TODO: @Marco: Removed item nature as its only two values would be category and script. 
-	// This is aleady coverd by the two subclasses. Revision with nature was 3025
-	
 	/**
 	 * @jdo.field primary-key="true"
 	 * @jdo.column length="100"

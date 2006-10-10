@@ -36,7 +36,8 @@ import org.apache.log4j.Logger;
 
 /**
  * @author Marco Schulze - marco at nightlabs dot de
- *
+ * @author Alexander Bieber <!-- alex [AT] nightlabs [DOT] de -->
+ * 
  * @jdo.persistence-capable 
  *		identity-type="application"
  *		persistence-capable-superclass="org.nightlabs.jfire.scripting.ScriptRegistryItem"
@@ -66,6 +67,7 @@ public class ScriptCategory
 	 *		collection-type="collection"
 	 *		element-type="org.nightlabs.jfire.scripting.ScriptRegistryItem"
 	 *		mapped-by="parent"
+	 *		dependent-element="true"
 	 */
 	private Set children;	
 
@@ -150,11 +152,29 @@ public class ScriptCategory
 		return super.getParent();
 	}
 
+	/**
+	 * Returns and unmodifiableSet with 
+	 * all sub-categories and scripts of this category.
+	 */
 	public Set getChildren()
 	{
 		return Collections.unmodifiableSet(children);
 	}
 
+	/**
+	 * Clears the set of children of this category.
+	 * Note that the set is marked with dependent-element="true"
+	 * and therefore all sub elements will be deleted recursively.
+	 */
+	public void clearChildren() {
+		children.clear();
+	}
+
+	/**
+	 * Add the given child to the set of sub-elements.
+	 * 
+	 * @param child The new child to add.
+	 */
 	public void addChild(ScriptRegistryItem child)
 	{
 		if (!this.equals(child.getParent()))

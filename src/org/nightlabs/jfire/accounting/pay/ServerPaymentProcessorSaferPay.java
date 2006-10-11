@@ -44,6 +44,8 @@ import org.nightlabs.jfire.transfer.Anchor;
  *		table="JFireTrade_ServerPaymentProcessorSaferPay"
  *
  * @jdo.inheritance strategy="superclass-table"
+ *
+ * @deprecated The new ServerPaymentProcessorSaferpay should come from the project JFireTradeSaferpay
  */
 public class ServerPaymentProcessorSaferPay extends ServerPaymentProcessor
 {

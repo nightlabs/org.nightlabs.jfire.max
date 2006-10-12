@@ -31,8 +31,11 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Iterator;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.SortedSet;
+import java.util.TreeSet;
 
 import javax.jdo.JDOHelper;
 import javax.jdo.PersistenceManager;
@@ -98,15 +101,31 @@ import javax.jdo.listener.StoreCallback;
 	 *		key-type="String"
 	 *		value-type="ScriptParameter"
 	 *		mapped-by="scriptParameterSet"
+	 *		dependent-value="true"
 	 *
 	 * @jdo.key mapped-by="scriptParameterID"
 	 */
 	private Map parameters;
+
+	/**
+	 * @jdo.field
+	 *		persistence-modifier="persistent"
+	 *		collection-type="collection"
+	 *		element-type="ScriptParameter"
+	 *		mapped-by="scriptParameterSet"
+	 *		dependent-element="true"
+	 */
+	private List orderedParameters;
 	
 	/**
 	 * @jdo.field persistence-modifier="persistent"
 	 */
 	private ScriptParameterSetName name;
+	
+	/**
+	 * @jdo.field persistence-modifier="persistent"
+	 */
+	private int nextParameterOrderNumber;	
 
 	/**
 	 * @deprecated Only for JDO!
@@ -119,6 +138,7 @@ import javax.jdo.listener.StoreCallback;
 		this.scriptParameterSetID = scriptParameterSetID;
 		this.name = new ScriptParameterSetName(this);
 		parameters = new HashMap();
+		nextParameterOrderNumber = 0;
 	}
 
 	public String getOrganisationID()
@@ -139,6 +159,11 @@ import javax.jdo.listener.StoreCallback;
 	{
 		return Collections.unmodifiableCollection(parameters.values());
 	}
+	
+	public SortedSet getSortedParameters() {
+		SortedSet sortedParams = new TreeSet(parameters.values());
+		return Collections.unmodifiableSortedSet(sortedParams);
+	}
 
 	/**
 	 * Creates a new parameter within this set. If there exists already one with
@@ -156,6 +181,7 @@ import javax.jdo.listener.StoreCallback;
 			return res;
 
 		res = new ScriptParameter(this, scriptParameterID);
+		res.setOrderNumber(nextParameterOrderNumber++);
 		parameters.put(scriptParameterID, res);
 		return res;
 	}
@@ -186,6 +212,7 @@ import javax.jdo.listener.StoreCallback;
 	 */
 	public void removeAllParameters() {
 		parameters.clear();
+		nextParameterOrderNumber = 0;
 	}
 	
 	public static String getPrimaryKey(String organisationID, long scriptParameterSetID)

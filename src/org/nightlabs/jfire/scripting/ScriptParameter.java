@@ -28,6 +28,8 @@ package org.nightlabs.jfire.scripting;
 
 import java.io.Serializable;
 
+import org.nightlabs.util.Utils;
+
 /**
  * 
  * @author Alexander Bieber <alex[AT]nightlabs[DOT]de>
@@ -45,7 +47,7 @@ import java.io.Serializable;
  * 
  */
 public class ScriptParameter
-		implements Serializable
+		implements Serializable, Comparable
 {
 	private static final long serialVersionUID = 1L;
 
@@ -75,6 +77,11 @@ public class ScriptParameter
 	private String scriptParameterClassName;
 
 	/**
+	 * @jdo.field persistence-modifier="persistent"
+	 */
+	private int orderNumber;
+	
+	/**
 	 * @deprecated Only for JDO!
 	 */
 	protected ScriptParameter() {}
@@ -87,7 +94,7 @@ public class ScriptParameter
 		this.scriptParameterID = scriptParameterID;
 		this.scriptParameterClassName = Object.class.getName();
 	}
-
+	
 	public String getOrganisationID()
 	{
 		return organisationID;
@@ -138,4 +145,47 @@ public class ScriptParameter
 
 		this.scriptParameterClassName = scriptParameterClass.getName();
 	}
+	
+	protected void setOrderNumber(int orderNumber) {
+		this.orderNumber = orderNumber;
+	}
+	
+	public int getOrderNumber() {
+		return orderNumber;
+	}
+
+
+	@Override
+	public int hashCode() {
+		return 
+			Utils.hashCode(organisationID) ^ 
+			Utils.hashCode(scriptParameterSetID) ^ 
+			Utils.hashCode(scriptParameterID);
+	}
+	
+	@Override
+	public boolean equals(Object obj) {
+		if (this == obj)
+			return true;
+		
+		if (obj instanceof ScriptParameter)
+			return false;
+		
+		ScriptParameter other = (ScriptParameter) obj;
+		
+		return 
+			Utils.equals(this.organisationID, other.organisationID) &&
+			this.scriptParameterSetID == other.scriptParameterSetID &&
+			Utils.equals(this.scriptParameterID, other.scriptParameterID);
+	}
+
+	/**
+	 * Comparing Script Parameters by their order number
+	 */
+	public int compareTo(Object o) {
+		if (!(o instanceof ScriptParameter))
+			return 0;
+		return Integer.valueOf(orderNumber).compareTo(Integer.valueOf(((ScriptParameter)o).orderNumber));
+	}
+	
 }

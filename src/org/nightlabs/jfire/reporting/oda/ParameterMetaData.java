@@ -7,8 +7,6 @@ import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
-import java.util.SortedSet;
-import java.util.TreeSet;
 
 import org.eclipse.datatools.connectivity.oda.IParameterMetaData;
 import org.eclipse.datatools.connectivity.oda.OdaException;
@@ -224,13 +222,8 @@ public class ParameterMetaData implements NamedParameterMetaData, Serializable {
 	throws OdaException
 	{
 		ParameterMetaData result = new ParameterMetaData();
-		SortedSet<String> sortedParamIDs = new TreeSet<String>();
-		for (Iterator iter = parameterSet.getParameters().iterator(); iter.hasNext();) {
+		for (Iterator iter = parameterSet.getSortedParameters().iterator(); iter.hasNext();) {
 			ScriptParameter parameter = (ScriptParameter) iter.next();
-			sortedParamIDs.add(parameter.getScriptParameterID());
-		}
-		for (String paramID : sortedParamIDs) {
-			ScriptParameter parameter = parameterSet.getParameter(paramID, false);
 			if (parameter == null)
 				throw new IllegalStateException("Previously still registered parameter now not found ?!?");
 			ParameterDescriptor descriptor = new ParameterDescriptor();
@@ -243,7 +236,7 @@ public class ParameterMetaData implements NamedParameterMetaData, Serializable {
 			}			
 			descriptor.setDataType(dataType);
 			descriptor.setDataTypeName(DataType.getTypeName(dataType));
-			descriptor.setParameterName(paramID);
+			descriptor.setParameterName(parameter.getScriptParameterID());
 			result.addParameterDescriptor(descriptor);
 		}
 		return result;

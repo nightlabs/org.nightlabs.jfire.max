@@ -65,6 +65,7 @@ import org.nightlabs.jfire.reporting.layout.ReportRegistryItem;
 import org.nightlabs.jfire.reporting.layout.ReportRegistryItemCarrier;
 import org.nightlabs.jfire.reporting.layout.id.ReportRegistryItemID;
 import org.nightlabs.jfire.reporting.layout.render.RenderManager;
+import org.nightlabs.jfire.reporting.layout.render.RenderReportRequest;
 import org.nightlabs.jfire.reporting.layout.render.RenderedReportLayout;
 import org.nightlabs.jfire.reporting.layout.render.ReportLayoutRendererHTML;
 import org.nightlabs.jfire.reporting.layout.render.ReportLayoutRendererPDF;
@@ -730,21 +731,18 @@ implements SessionBean
 		}
 	}
 	
-	
+
 	/**
 	 * @throws ModuleException
 	 *
 	 * @ejb.interface-method
 	 * @ejb.permission role-name="_Guest_"
 	 * @ejb.transaction type="Required"
+	 * 
+	 * @param renderReportRequest
+	 * @return
 	 */
-	public RenderedReportLayout renderReportLayout (
-			ReportRegistryItemID reportLayoutID,
-//			Birt.OutputFormat format,
-			Map params,
-			String format
-//			Map<String,Object> params
-		)
+	public RenderedReportLayout renderReportLayout(RenderReportRequest renderReportRequest)
 	throws ModuleException
 	{
 		PersistenceManager pm;
@@ -753,7 +751,7 @@ implements SessionBean
 			RenderManager rm = getReportingManagerFactory().createRenderManager();
 			try {
 				try {
-					return rm.renderReport(pm, reportLayoutID, params, Birt.parseOutputFormat(format));
+					return rm.renderReport(pm, renderReportRequest);
 				} catch (EngineException e) {
 					throw new ModuleException(e);
 				}
@@ -764,6 +762,29 @@ implements SessionBean
 			pm.close();
 		}
 	}
+	
+//	/**
+//	 * @throws ModuleException
+//	 *
+//	 * @ejb.interface-method
+//	 * @ejb.permission role-name="_Guest_"
+//	 * @ejb.transaction type="Required"
+//	 * 
+//	 * @deprecated Use {@link #renderReportLayout(RenderReportRequest)} instead.
+//	 */
+//	public RenderedReportLayout renderReportLayout (
+//			ReportRegistryItemID reportLayoutID,
+//			Map params,
+//			String format
+//		)
+//	throws ModuleException
+//	{
+//		RenderReportRequest request = new RenderReportRequest();
+//		request.setReportRegistryItemID(reportLayoutID);
+//		request.setParameters(params);
+//		request.setOutputFormat(Birt.parseOutputFormat(format));
+//		return renderReportLayout(request);
+//	}
 	
 	
 	/**

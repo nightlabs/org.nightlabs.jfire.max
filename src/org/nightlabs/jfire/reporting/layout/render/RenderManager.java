@@ -91,28 +91,24 @@ public class RenderManager {
 	 * rendered report layouts. See {@link ReportLayoutRendererUtil#prepareRenderedLayoutOutputFolder()}.
 	 * Also it will set the entry file-name of the report to "renderedReport".
 	 *
-	 * @see #renderReport(PersistenceManager, ReportRegistryItemID, Map, org.nightlabs.jfire.reporting.Birt.OutputFormat, String, File, boolean)
+	 * @see #renderReport(PersistenceManager, RenderReportRequest, String, File, boolean)
 	 * @throws EngineException
 	 */
 	public RenderedReportLayout renderReport(
 			PersistenceManager pm,
-			ReportRegistryItemID reportRegistryItemID, 
-			Map<String,Object> params,
-			Birt.OutputFormat format
+			RenderReportRequest renderRequest
 		)
 	throws EngineException
 	{
 		File layoutRoot = ReportLayoutRendererUtil.prepareRenderedLayoutOutputFolder();
-		return renderReport(pm, reportRegistryItemID, params, format, "renderedLayout", layoutRoot, true);
+		return renderReport(pm, renderRequest, "renderedLayout", layoutRoot, true);
 	}
 	
 	/**
 	 * Lets BIRT render the given report with the given params in the given format.
 	 * 
 	 * @param pm The PersistenceManager to retrieve the ReportLayout from.
-	 * @param reportRegistryItemID The ReportLayoutID to render.
-	 * @param params The parameters to render this report with. 
-	 * @param format The format to render to.
+	 * @param renderRequest The request for rendering, holding the layout id to be rendered, the format it should be rendered to and the report parameters
 	 * @param fileName The name that should be used for the report entry file (without file-extension)
 	 * @param layoutRoot The root folder to render the report into
 	 * @param prepareForTransfer Whether the results data should be set.
@@ -120,9 +116,7 @@ public class RenderManager {
 	 */
 	public RenderedReportLayout renderReport(
 			PersistenceManager pm,
-			ReportRegistryItemID reportRegistryItemID, 
-			Map<String,Object> params,
-			Birt.OutputFormat format,
+			RenderReportRequest renderRequest,
 			String fileName,
 			File layoutRoot,
 			boolean prepareForTransfer
@@ -131,9 +125,9 @@ public class RenderManager {
 	{
 		ReportLayout reportLayout = null;
 		try {
-			reportLayout = (ReportLayout)pm.getObjectById(reportRegistryItemID);
+			reportLayout = (ReportLayout)pm.getObjectById(renderRequest.getReportRegistryItemID());
 		} catch (ClassCastException e) {
-			throw new IllegalArgumentException("The ReportRegistryItemID with id "+reportRegistryItemID+" is not of type ReportLayout.");
+			throw new IllegalArgumentException("The ReportRegistryItemID with id "+renderRequest.getReportRegistryItemID()+" is not of type ReportLayout.");
 		}
 		ReportEngine reportEngine = factory.getReportEngine();
 		
@@ -145,14 +139,15 @@ public class RenderManager {
 		ReportRegistry registry = ReportRegistry.getReportRegistry(pm);
 		ReportLayoutRenderer renderer = null; 
 		try {
-			renderer = registry.createReportRenderer(format);
+			renderer = registry.createReportRenderer(renderRequest.getOutputFormat());
 		} catch (Exception e) {
-			throw new EngineException("Could not create ReportLayoutRenderer for OutputFormat "+format, e.getMessage());
+			throw new EngineException("Could not create ReportLayoutRenderer for OutputFormat "+renderRequest.getOutputFormat(), e.getMessage());
 		}
 		
-		HashMap<String,Object> parsedParams = parseReportParams(reportEngine, report, params);
+		HashMap<String,Object> parsedParams = parseReportParams(reportEngine, report, renderRequest.getParameters());
+		renderRequest.setParameters(parsedParams);
 		
-		return renderer.renderReport(pm, reportRegistryItemID, task, parsedParams, format, fileName, layoutRoot, prepareForTransfer);
+		return renderer.renderReport(pm, renderRequest, task, fileName, layoutRoot, prepareForTransfer);
 	}
 
 

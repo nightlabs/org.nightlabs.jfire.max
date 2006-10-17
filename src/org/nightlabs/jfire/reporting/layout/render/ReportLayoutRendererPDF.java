@@ -6,7 +6,6 @@ package org.nightlabs.jfire.reporting.layout.render;
 import java.io.File;
 import java.util.Date;
 import java.util.HashMap;
-import java.util.Map;
 
 import javax.jdo.PersistenceManager;
 
@@ -17,7 +16,6 @@ import org.eclipse.birt.report.engine.api.IRunAndRenderTask;
 import org.eclipse.birt.report.engine.api.PDFRenderContext;
 import org.nightlabs.jfire.reporting.Birt;
 import org.nightlabs.jfire.reporting.Birt.OutputFormat;
-import org.nightlabs.jfire.reporting.layout.id.ReportRegistryItemID;
 
 /**
  * @author Alexander Bieber <!-- alex [AT] nightlabs [DOT] de -->
@@ -43,18 +41,18 @@ public class ReportLayoutRendererPDF implements ReportLayoutRenderer {
 	 * @see org.nightlabs.jfire.reporting.layout.render.ReportLayoutRenderer#renderReport(javax.jdo.PersistenceManager, org.nightlabs.jfire.reporting.layout.id.ReportRegistryItemID, org.eclipse.birt.report.engine.api.IRunAndRenderTask, java.util.Map, org.nightlabs.jfire.reporting.Birt.OutputFormat, java.lang.String, java.io.File, boolean)
 	 */
 	public RenderedReportLayout renderReport(PersistenceManager pm,
-			ReportRegistryItemID reportRegistryItemID, IRunAndRenderTask task,
-			Map<String, Object> parsedParams, OutputFormat format,
+			RenderReportRequest renderRequest,
+			IRunAndRenderTask task,
 			String fileName, File layoutRoot,
 			boolean prepareForTransfer
 		)
 	throws EngineException 
 	{
-		if (format != Birt.OutputFormat.pdf)
-			throw new IllegalArgumentException(this.getClass().getName()+" was asked to render a report to format "+format+" altough it is registered to "+getOutputFormat());
+		if (renderRequest.getOutputFormat() != Birt.OutputFormat.pdf)
+			throw new IllegalArgumentException(this.getClass().getName()+" was asked to render a report to format "+renderRequest.getOutputFormat()+" altough it is registered to "+getOutputFormat());
 		
 		HTMLRenderOption options = new HTMLRenderOption( );		
-		options.setOutputFormat(format.toString());
+		options.setOutputFormat(renderRequest.getOutputFormat().toString());
 		
 		PDFRenderContext renderContext = new PDFRenderContext();
 		
@@ -65,11 +63,11 @@ public class ReportLayoutRendererPDF implements ReportLayoutRenderer {
 		options.setOutputFileName(layoutRoot.getAbsolutePath().toString()+File.separator+fileName+".pdf");
 		task.setRenderOption( options );
 		
-		task.setParameterValues(parsedParams);
+		task.setParameterValues(renderRequest.getParameters());
 		
 		task.run();
 		
-		RenderedReportLayout result = new RenderedReportLayout(reportRegistryItemID, format, new Date());
+		RenderedReportLayout result = new RenderedReportLayout(renderRequest.getReportRegistryItemID(), renderRequest.getOutputFormat(), new Date());
 		if (prepareForTransfer)
 			ReportLayoutRendererUtil.prepareRenderedLayoutForTransfer(layoutRoot, result, fileName, true);
 		return result;

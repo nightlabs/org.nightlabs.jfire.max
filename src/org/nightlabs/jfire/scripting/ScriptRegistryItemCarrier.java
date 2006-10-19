@@ -32,6 +32,7 @@ import java.util.Iterator;
 import java.util.Set;
 
 import org.nightlabs.jfire.scripting.id.ScriptRegistryItemID;
+import org.nightlabs.util.Utils;
 
 /**
  * @author Alexander Bieber <alex[AT]nightlabs[DOT]de>
@@ -120,6 +121,21 @@ public class ScriptRegistryItemCarrier implements Serializable {
 				break;
 			}				
 		}
+	}
+	
+	@Override
+	public int hashCode() {
+		return registryItemID != null ? Utils.hashCode(registryItemID.toString()) : 0;
+	}
+	
+	@Override
+	public boolean equals(Object obj) {
+		if (this == obj)
+			return true;
+		if (!(obj instanceof ScriptRegistryItemCarrier))
+			return false;
+		ScriptRegistryItemCarrier other = (ScriptRegistryItemCarrier) obj;
+		return Utils.equals(this.registryItemID, other.registryItemID);
 	}
 
 }

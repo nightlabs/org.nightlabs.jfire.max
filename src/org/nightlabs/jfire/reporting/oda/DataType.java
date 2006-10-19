@@ -47,8 +47,8 @@ public class DataType {
 	public static final int BOOLEAN = 4;
 	public static final int DATE = 5;
 	public static final int BIGDECIMAL = 6;
-//	public static final int TIME = 92;
-//	public static final int TIMESTAMP = 93;
+	public static final int TIME = 92;
+	public static final int TIMESTAMP = 93;
 	public static final int BLOB = 0;
 	public static final int CLOB = 10;
 	public static final int UNKNOWN = 0;
@@ -59,8 +59,8 @@ public class DataType {
 	public static final String N_BOOLEAN = "Boolean";
 	public static final String N_DATE = "Date";
 	public static final String N_BIGDECIMAL = "BigDecimal(Long)";
-	public static final int TIME = 92;
-	public static final int TIMESTAMP = 93;
+	public static final String N_TIME = "Time";
+	public static final String N_TIMESTAMP = "Timestamp";
 	public static final String N_BLOB = "Blob";
 	public static final String N_CLOB = "Clob";
 	public static final String N_UNKNOWN = "Unknown";
@@ -106,6 +106,8 @@ public class DataType {
 		types2Names.put(INTEGER, N_INTEGER);
 		types2Names.put(DOUBLE, N_DOUBLE);
 		types2Names.put(DATE, N_DATE);
+		types2Names.put(TIME, N_TIME);
+		types2Names.put(TIMESTAMP, N_TIMESTAMP);
 		types2Names.put(BIGDECIMAL, N_BIGDECIMAL);
 		types2Names.put(BOOLEAN, N_BOOLEAN);
 		types2Names.put(BLOB, N_BLOB);

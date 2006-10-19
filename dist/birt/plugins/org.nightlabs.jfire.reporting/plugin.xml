@@ -40,6 +40,14 @@
                nativeDataTypeCode="5"
                odaScalarDataType="Date"/>
          <dataTypeMapping
+               nativeDataType="Time"
+               nativeDataTypeCode="92"
+               odaScalarDataType="Time"/>
+         <dataTypeMapping
+               nativeDataType="Timestamp"
+               nativeDataTypeCode="93"
+               odaScalarDataType="Timestamp"/>
+         <dataTypeMapping
                nativeDataType="BigDecimal(Long)"
                nativeDataTypeCode="6"
                odaScalarDataType="Integer"/>
@@ -77,6 +85,14 @@
                nativeDataType="Date"
                nativeDataTypeCode="5"
                odaScalarDataType="Date"/>
+         <dataTypeMapping
+               nativeDataType="Time"
+               nativeDataTypeCode="92"
+               odaScalarDataType="Time"/>
+         <dataTypeMapping
+               nativeDataType="Timestamp"
+               nativeDataTypeCode="93"
+               odaScalarDataType="Timestamp"/>
          <dataTypeMapping
                nativeDataType="BigDecimal(Long)"
                nativeDataTypeCode="6"
@@ -124,6 +140,14 @@
                nativeDataType="Date"
                nativeDataTypeCode="5"
                odaScalarDataType="Date"/>
+         <dataTypeMapping
+               nativeDataType="Time"
+               nativeDataTypeCode="92"
+               odaScalarDataType="Time"/>
+         <dataTypeMapping
+               nativeDataType="Timestamp"
+               nativeDataTypeCode="93"
+               odaScalarDataType="Timestamp"/>
          <dataTypeMapping
                nativeDataType="BigDecimal(Long)"
                nativeDataTypeCode="6"

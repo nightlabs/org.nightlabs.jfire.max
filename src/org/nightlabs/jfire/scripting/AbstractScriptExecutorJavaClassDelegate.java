@@ -26,6 +26,10 @@
 
 package org.nightlabs.jfire.scripting;
 
+import java.util.Map;
+
+import javax.jdo.PersistenceManager;
+
 public abstract class AbstractScriptExecutorJavaClassDelegate
 		implements ScriptExecutorJavaClassDelegate
 {
@@ -42,4 +46,20 @@ public abstract class AbstractScriptExecutorJavaClassDelegate
 		this.scriptExecutorJavaClass = scriptExecutorJavaClass;
 	}
 
+	public Map<String, Object> getParameterValues() {
+		if (getScriptExecutorJavaClass() != null)
+			return getScriptExecutorJavaClass().getParameterValues();
+		return null;
+	}
+	
+	public Object getParameterValue(String key) {
+		if (getParameterValues() != null)
+			return getParameterValues().get(key);
+		return null;
+	}
+	
+	public PersistenceManager getPersistenceManager()  {
+		return getScriptExecutorJavaClass().getPersistenceManager();
+	}
+	
 }

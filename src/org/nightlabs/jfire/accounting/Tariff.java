@@ -32,9 +32,6 @@ import javax.jdo.JDOHelper;
 import javax.jdo.PersistenceManager;
 import javax.jdo.listener.StoreCallback;
 
-import org.nightlabs.i18n.Localizable;
-import org.nightlabs.jdo.LocalizedDetachable;
-
 /**
  * TODO Shall I really put this class into JFireTrade? Or is it Ticketing specific?
  *			Does it help me here or does it make things complicated?
@@ -67,7 +64,7 @@ import org.nightlabs.jdo.LocalizedDetachable;
  * @jdo.fetch-group name="FetchGroupsPriceConfig.edit" fields="name"
  */
 public class Tariff
-	implements Serializable, StoreCallback, Localizable, LocalizedDetachable
+	implements Serializable, StoreCallback
 {
 	public static final String FETCH_GROUP_NAME = "Tariff.name";
 
@@ -164,21 +161,21 @@ public class Tariff
 		return name;
 	}
 
-	/**
-	 * @see org.nightlabs.i18n.Localizable#localize(java.lang.String)
-	 */
-	public void localize(String languageID)
-	{
-		name.localize(languageID);
-	}
-
-	/**
-	 * @see org.nightlabs.jdo.LocalizedDetachable#detachCopyLocalized(java.lang.String, javax.jdo.PersistenceManager)
-	 */
-	public LocalizedDetachable detachCopyLocalized(String languageID, PersistenceManager pm)
-	{
-		Tariff tariff = (Tariff) pm.detachCopy(this);
-		tariff.name.localize(languageID, this.name);
-		return tariff;
-	}
+//	/**
+//	 * @see org.nightlabs.i18n.Localizable#localize(java.lang.String)
+//	 */
+//	public void localize(String languageID)
+//	{
+//		name.localize(languageID);
+//	}
+//
+//	/**
+//	 * @see org.nightlabs.jdo.LocalizedDetachable#detachCopyLocalized(java.lang.String, javax.jdo.PersistenceManager)
+//	 */
+//	public LocalizedDetachable detachCopyLocalized(String languageID, PersistenceManager pm)
+//	{
+//		Tariff tariff = (Tariff) pm.detachCopy(this);
+//		tariff.name.localize(languageID, this.name);
+//		return tariff;
+//	}
 }

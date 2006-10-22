@@ -106,16 +106,6 @@ implements StoreCallback
 	protected Map names = new HashMap();
 
 	/**
-	 * This variable contains the name in a certain language after localization.
-	 *
-	 * @see I18nText#localize(java.lang.String)
-	 * @see org.nightlabs.jdo.LocalizedDetachable#detachCopyLocalized(java.lang.String, javax.jdo.PersistenceManager)
-	 *
-	 * @jdo.field persistence-modifier="transactional" default-fetch-group="false"
-	 */
-	protected String name;
-
-	/**
 	 * @return Returns the organisationID.
 	 */
 	public String getOrganisationID()
@@ -156,22 +146,6 @@ implements StoreCallback
 	protected Map getI18nMap()
 	{
 		return names;
-	}
-
-	/**
-	 * @see org.nightlabs.i18n.I18nText#setText(java.lang.String)
-	 */
-	public void setText(String localizedValue)
-	{
-		this.name = localizedValue;
-	}
-
-	/**
-	 * @see org.nightlabs.i18n.I18nText#getText()
-	 */
-	public String getText()
-	{
-		return name;
 	}
 
 	/**

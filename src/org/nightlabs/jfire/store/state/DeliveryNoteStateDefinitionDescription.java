@@ -82,16 +82,6 @@ public class DeliveryNoteStateDefinitionDescription extends I18nText
 	protected Map descriptions = new HashMap();
 
 	/**
-	 * This variable contains the name in a certain language after localization.
-	 *
-	 * @see #localize(String)
-	 * @see #detachCopyLocalized(String, javax.jdo.PersistenceManager)
-	 *
-	 * @jdo.field persistence-modifier="transactional" default-fetch-group="false"
-	 */
-	protected String description;
-
-	/**
 	 * @jdo.field persistence-modifier="persistent"
 	 */
 	private DeliveryNoteStateDefinition deliveryNoteStateDefinition;
@@ -116,22 +106,6 @@ public class DeliveryNoteStateDefinitionDescription extends I18nText
 	protected Map getI18nMap()
 	{
 		return descriptions;
-	}
-
-	/**
-	 * @see org.nightlabs.i18n.I18nText#setText(java.lang.String)
-	 */
-	protected void setText(String localizedValue)
-	{
-		this.description = localizedValue;
-	}
-
-	/**
-	 * @see org.nightlabs.i18n.I18nText#getText()
-	 */
-	public String getText()
-	{
-		return description;
 	}
 
 	/**

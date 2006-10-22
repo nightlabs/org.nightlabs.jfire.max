@@ -113,32 +113,6 @@ extends I18nText
 	}
 
 	/**
-	 * This variable contains the name in a certain language after localization.
-	 *
-	 * @see #localize(String)
-	 * @see #detachCopyLocalized(String, javax.jdo.PersistenceManager)
-	 *
-	 * @jdo.field persistence-modifier="transactional" default-fetch-group="false"
-	 */
-	protected String name;
-
-	/**
-	 * @see org.nightlabs.i18n.I18nText#setText(java.lang.String)
-	 */
-	protected void setText(String localizedValue)
-	{
-		name = localizedValue;
-	}
-
-	/**
-	 * @see org.nightlabs.i18n.I18nText#getText()
-	 */
-	public String getText()
-	{
-		return name;
-	}
-
-	/**
 	 * @see org.nightlabs.i18n.I18nText#getFallBackValue(java.lang.String)
 	 */
 	protected String getFallBackValue(String languageID)

@@ -1121,7 +1121,7 @@ public class GeographySystem // implements Serializable
 				logger.info("The country \"" + countryID + "\" does not have regions. Creating dummy region with regionID=\""+countryID+"\"!");
 				String regionID = countryID;
 				Region region = new Region(this, rootOrganisationID, regionID, country);
-				region.getName().load(country.getName());
+				region.getName().copyFrom(country.getName());
 				country.addRegion(region);
 				regions.put(region.getPrimaryKey(), region);
 			}

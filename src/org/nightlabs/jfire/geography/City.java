@@ -253,7 +253,7 @@ public class City implements Serializable
 			throw new IllegalArgumentException("persistentRegion is neither persistent nor detached! Could not obtain an object-id!");
 
 		City n = new City(organisationID, cityID, persistentRegion);
-		n.name.load(this.name);
+		n.name.copyFrom(this.name);
 		// do NOT copy locations
 		// do NOT copy districts
 		return n;

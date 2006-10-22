@@ -175,7 +175,7 @@ public class Country implements Serializable
 	public Country copyForJDOStorage()
 	{
 		Country n = new Country(this.countryID);
-		n.name.load(this.name);
+		n.name.copyFrom(this.name);
 		return n;
 	}
 }

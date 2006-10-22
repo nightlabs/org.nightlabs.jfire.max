@@ -269,7 +269,7 @@ public class Region implements Serializable
 			throw new IllegalArgumentException("persistentCountry is neither persistent nor detached! Could not obtain an object-id!");
 
 		Region n = new Region(organisationID, regionID, persistentCountry);
-		n.name.load(this.name);
+		n.name.copyFrom(this.name);
 		return n;
 	}
 

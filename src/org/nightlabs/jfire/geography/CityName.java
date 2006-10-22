@@ -87,16 +87,6 @@ public class CityName extends I18nText
 	 * @jdo.join
 	 */
 	protected Map names = new HashMap();
-	
-	/**
-	 * This variable contains the name in a certain language after localization.
-	 *
-	 * @see #localize(String)
-	 * @see #detachCopyLocalized(String, javax.jdo.PersistenceManager)
-	 *
-	 * @jdo.field persistence-modifier="transactional" default-fetch-group="false"
-	 */
-	protected String name;
 
 	protected CityName()
 	{
@@ -118,25 +108,9 @@ public class CityName extends I18nText
 		return names;
 	}
 
-	/**
-	 * @see org.nightlabs.i18n.I18nText#setText(java.lang.String)
-	 */
-	protected void setText(String localizedValue)
-	{
-		this.name = localizedValue;
-	}
-
 	public City getCity()
 	{
 		return city;
-	}
-
-	/**
-	 * @see org.nightlabs.i18n.I18nText#getText()
-	 */
-	public String getText()
-	{
-		return name;
 	}
 
 	/**

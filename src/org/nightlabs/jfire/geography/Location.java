@@ -218,7 +218,7 @@ public class Location implements Serializable
 			throw new IllegalArgumentException("persistentCity is neither persistent nor detached! Could not obtain an object-id!");
 
 		Location n = new Location(organisationID, locationID, persistentCity);
-		n.name.load(this.name);
+		n.name.copyFrom(this.name);
 		return n;
 	}
 }

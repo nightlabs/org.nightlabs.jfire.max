@@ -45,6 +45,7 @@ import org.eclipse.birt.report.engine.api.IRunAndRenderTask;
 import org.eclipse.birt.report.engine.api.IScalarParameterDefn;
 import org.eclipse.birt.report.engine.api.ReportEngine;
 import org.nightlabs.jfire.reporting.Birt;
+import org.nightlabs.jfire.reporting.JFireReportingHelper;
 import org.nightlabs.jfire.reporting.ReportingManagerFactory;
 import org.nightlabs.jfire.reporting.layout.ReportLayout;
 import org.nightlabs.jfire.reporting.layout.ReportRegistry;
@@ -150,7 +151,14 @@ public class RenderManager {
 		renderRequest.setParameters(parsedParams);
 		
 		logger.debug("Have report renderer, delegating render work");
-		return renderer.renderReport(pm, renderRequest, task, fileName, layoutRoot, prepareForTransfer);
+		JFireReportingHelper.open(pm, false);
+		RenderedReportLayout result = null;
+		try {
+			result = renderer.renderReport(pm, renderRequest, task, fileName, layoutRoot, prepareForTransfer);
+		} finally {
+			JFireReportingHelper.close();
+		}
+		return result;
 	}
 
 

@@ -55,7 +55,7 @@ public class ServerJFSQueryProxy extends AbstractJFSQueryProxy {
 	 */
 	public void close() throws OdaException {
 		logger.debug("close() IQuery."); 
-		closePersistenceManager();
+//		closePersistenceManager();
 	}
 
 	private IParameterMetaData parameterMetaData;
@@ -125,13 +125,19 @@ public class ServerJFSQueryProxy extends AbstractJFSQueryProxy {
 	 * Returns the script associated to the dataset. Scripts are associated
 	 * by referencing them with the String representation of their {@link ScriptRegistryItemID} 
 	 * int the query property of the dataset.
-	 * 
+	 * <p>
+	 * Note that this method replaces the organisationID of the itemID passed with the
+	 * organisationID of the executing user.
+	 * <p>
+	 * TODO: Refactor script reference in query text to have an option whether to replace the organisation-id or not 
+	 *  
 	 * @param pm The PersistenceManager to lookup the script with.
 	 * @param itemID The script's id.
 	 * @return An instance of {@link Script}. Note that and {@link IllegalArgumentException} will be
 	 * 	thrown when the script registry item referenced is not a Script (maybe a category).
 	 */
 	private static Script getScript(PersistenceManager pm, ScriptRegistryItemID itemID) {
+		itemID.organisationID = SecurityReflector.getUserDescriptor().getOrganisationID();
 		return validateScriptRegistryItem((ScriptRegistryItem) pm.getObjectById(itemID));
 	}
 	
@@ -173,35 +179,35 @@ s	 */
 		return (ReportingScriptExecutor)executor;
 	}
 	
-	private PersistenceManager pm; 
-	
-	/**
-	 * Obtains the PersistenceManager for this proxy. If none created yet, 
-	 * it will be obtained with the help of {@link Lookup#getPersistenceManager()}.
-	 */
-	protected PersistenceManager getPersistenceManager() 
-	{
-		logger.debug("getPersistenceManager() called on "+this);
-		if (pm == null) {
-			Lookup lookup;
-			lookup = new Lookup(SecurityReflector.getUserDescriptor().getOrganisationID());
-			pm = lookup.getPersistenceManager();
-			logger.debug("getPersistenceManager() created new PersistenceManager "+pm);
-		}
-		logger.debug("getPersistenceManager() returns "+pm);
-		return pm;
-	}
-	
-	/**
-	 * Closes the PersistenceManager if it was created.
-	 */
-	protected void closePersistenceManager() {
-		logger.debug("Close persistenceManager, doing nothing");
-//		if (pm != null && !pm.isClosed()) {
-//			logger.debug("Closing PersistenceManager");
-//			pm.close();
+//	private PersistenceManager pm; 
+//	
+//	/**
+//	 * Obtains the PersistenceManager for this proxy. If none created yet, 
+//	 * it will be obtained with the help of {@link Lookup#getPersistenceManager()}.
+//	 */
+//	protected PersistenceManager getPersistenceManager() 
+//	{
+//		logger.debug("getPersistenceManager() called on "+this);
+//		if (pm == null) {
+//			Lookup lookup;
+//			lookup = new Lookup(SecurityReflector.getUserDescriptor().getOrganisationID());
+//			pm = lookup.getPersistenceManager();
+//			logger.debug("getPersistenceManager() created new PersistenceManager "+pm);
 //		}
-	}
+//		logger.debug("getPersistenceManager() returns "+pm);
+//		return pm;
+//	}
+	
+//	/**
+//	 * Closes the PersistenceManager if it was created.
+//	 */
+//	protected void closePersistenceManager() {
+//		logger.debug("Close persistenceManager, doing nothing");
+////		if (pm != null && !pm.isClosed()) {
+////			logger.debug("Closing PersistenceManager");
+////			pm.close();
+////		}
+//	}
 	
 //	/**
 //	 * Shorcut to {@link #getJFSResultSetMetaData(PersistenceManager, ScriptRegistryItemID)}

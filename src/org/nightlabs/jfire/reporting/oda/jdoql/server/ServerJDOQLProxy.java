@@ -86,6 +86,7 @@ public class ServerJDOQLProxy extends AbstractJDOQLProxy {
 	public IResultSet executeQuery() throws OdaException {
 		try {
 			return executeQuery(
+					getPersistenceManager(),
 					getQuery(), getNamedParameters(), 
 					(JDOQLResultSetMetaData)getMetaData(), false, null
 				);
@@ -95,6 +96,7 @@ public class ServerJDOQLProxy extends AbstractJDOQLProxy {
 	}
 	
 	public static IResultSet executeQuery(
+			PersistenceManager pm,
 			String query, 
 			Map parameters,
 			JDOQLResultSetMetaData metaData,
@@ -103,19 +105,19 @@ public class ServerJDOQLProxy extends AbstractJDOQLProxy {
 		) 
 	throws ModuleException 
 	{
-		SecurityReflector securityReflector = null;
+//		SecurityReflector securityReflector = null;
+//		try {
+//			securityReflector = SecurityReflector.lookupSecurityReflector(new InitialContext());
+//		} catch (NamingException e) {
+//			throw new ModuleException(e);
+//		}
+//		UserDescriptor userDescriptor = securityReflector.whoAmI();
+//
+//		Lookup lookup = null;
+//		lookup = new Lookup(userDescriptor.getOrganisationID());
+//		PersistenceManager pm = ;
 		try {
-			securityReflector = SecurityReflector.lookupSecurityReflector(new InitialContext());
-		} catch (NamingException e) {
-			throw new ModuleException(e);
-		}
-		UserDescriptor userDescriptor = securityReflector.whoAmI();
-
-		Lookup lookup = null;
-		lookup = new Lookup(userDescriptor.getOrganisationID());
-		PersistenceManager pm = null;
-		try {
-			pm = lookup.getPersistenceManager();
+//			pm = lookup.getPersistenceManager();
 //			Query q = pm.newQuery(IJDOQueryProxy.LANGUAGE_JDOQL, getQuery());
 			Query q = pm.newQuery(query);
 			Object o = null;
@@ -155,7 +157,7 @@ public class ServerJDOQLProxy extends AbstractJDOQLProxy {
 			resultSet = new JDOQLResultSet(metaData, collection);
 			return resultSet;
 		} finally {
-			pm.close();
+//			pm.close();
 		}
 	}
 

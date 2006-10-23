@@ -91,6 +91,7 @@ public class ServerJDOJSProxy extends AbstractJDOJSProxy {
 	public IResultSet executeQuery() throws OdaException {
 		try {
 			return fetchJDOJSResultSet(
+					getPersistenceManager(),
 					(JDOJSResultSetMetaData)getMetaData(), 
 					getFetchScript(),
 //					getParameterMetaData(),
@@ -174,6 +175,7 @@ public class ServerJDOJSProxy extends AbstractJDOJSProxy {
 	 * @throws ModuleException
 	 */
 	public static JDOJSResultSet fetchJDOJSResultSet(
+			PersistenceManager pm, 
 			JDOJSResultSetMetaData metaData, 
 			String fetchScript,
 //			IParameterMetaData parameterMetaData,
@@ -182,14 +184,14 @@ public class ServerJDOJSProxy extends AbstractJDOJSProxy {
 	throws ModuleException
 	{
 		try {
-			UserDescriptor userDescriptor = SecurityReflector.getUserDescriptor();
-
+//			UserDescriptor userDescriptor = SecurityReflector.getUserDescriptor();
+//
 			Context context = Context.enter();
-			Lookup lookup = null;
-			lookup = new Lookup(userDescriptor.getOrganisationID());
-			PersistenceManager pm = null;
+//			Lookup lookup = null;
+//			lookup = new Lookup(userDescriptor.getOrganisationID());
+//			PersistenceManager pm = null;
 			try {
-				pm = lookup.getPersistenceManager();
+//				pm = lookup.getPersistenceManager();
 				try {
 					// Scriptable scope = context.initStandardObjects();
 					Scriptable scope = new ImporterTopLevel(context);
@@ -257,7 +259,7 @@ public class ServerJDOJSProxy extends AbstractJDOJSProxy {
 					Context.exit();
 				}
 			} finally {
-				pm.close();
+//				pm.close();
 			}
 		} catch (RuntimeException e) {
 			throw e;

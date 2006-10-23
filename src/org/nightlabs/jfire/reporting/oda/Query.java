@@ -14,10 +14,13 @@ import java.util.Map;
 import java.util.SortedMap;
 import java.util.TreeMap;
 
+import javax.jdo.PersistenceManager;
+
 import org.eclipse.datatools.connectivity.oda.IParameterMetaData;
 import org.eclipse.datatools.connectivity.oda.IQuery;
 import org.eclipse.datatools.connectivity.oda.OdaException;
 import org.eclipse.datatools.connectivity.oda.SortSpec;
+import org.nightlabs.jfire.reporting.JFireReportingHelper;
 
 /**
  * Common implementation of {@link IQuery} that can be (and is) used 
@@ -346,5 +349,21 @@ public abstract class Query implements IQuery {
 	 */
 	public SortSpec getSortSpec() throws OdaException {
 		return sortSpec;
+	}
+	
+	/**
+	 * Uses the {@link JFireReportingHelper} to obtain a 
+	 * {@link PersistenceManager} for the currently rendered BIRT report.
+	 * <p>
+	 * Please not that this method can 
+	 * <b>only be used within a JFire J2EE Server environment</b>
+	 * <p>
+	 * Most likely it will be used by subclasses of Query to provide access
+	 * to the datastore.
+	 * 
+	 * @return The {@link PersistenceManager} for this query obtained by the {@link JFireReportingHelper}.
+	 */
+	public PersistenceManager getPersistenceManager() {
+		return JFireReportingHelper.getPersistenceManager();
 	}
 }

@@ -44,7 +44,7 @@ import org.nightlabs.jfire.reporting.layout.render.RenderManager;
  * {@link ReportingManagerFactory} is the entry point for operations with 
  * stored {@link ReportLayout}s. One instance of the factory is bound to JNDI
  * for each organisation (see {@link #ReportingManagerFactory(InitialContext, String)}).
- * 
+ * <p>
  * Currently the factory allows access to a configured BIRT {@link ReportEngine} that
  * should be used to create new engine tasks. Additionally the factory can serve  
  * {@link RenderManager} that help rendering reports according to user-given paramters. 

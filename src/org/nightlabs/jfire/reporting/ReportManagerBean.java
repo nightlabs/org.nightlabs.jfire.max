@@ -436,7 +436,7 @@ implements SessionBean
 	 *
 	 * @ejb.interface-method
 	 * @ejb.permission role-name="_Guest_"
-	 * @ejb.transaction type = "Required"
+	 * @ejb.transaction type = "Never"
 	 */
 	public IResultSet fetchJDOQLResultSet(
 			String queryText, 
@@ -445,9 +445,10 @@ implements SessionBean
 		) 
 	throws ModuleException
 	{
+		PersistenceManager pm = getPersistenceManager();
 		try {
 			return ServerJDOQLProxy.executeQuery(
-//					getOrganisationID(), 
+					pm,
 					queryText, 
 					parameters, 
 					metaData,
@@ -456,6 +457,8 @@ implements SessionBean
 				);
 		} catch (Throwable t) {
 			throw new ModuleException(t);
+		} finally {
+			pm.close();
 		}
 	}
 	
@@ -497,22 +500,26 @@ implements SessionBean
 	 *
 	 * @ejb.interface-method
 	 * @ejb.permission role-name="_Guest_"
-	 * @ejb.transaction type = "Required"
+	 * @ejb.transaction type = "Never"
 	 */
 	public JDOJSResultSet fetchJDOJSResultSet(
 			JDOJSResultSetMetaData metaData, 
 			String prepareScript,
-//			IParameterMetaData parameterMetaData,
 			Map<String, Object> parameters
 		)
 	throws ModuleException
 	{
-		return ServerJDOJSProxy.fetchJDOJSResultSet(
-				metaData, 
-				prepareScript,
-//				parameterMetaData,
-				parameters
-			);
+		PersistenceManager pm = getPersistenceManager();
+		try {
+			return ServerJDOJSProxy.fetchJDOJSResultSet(
+					pm,
+					metaData, 
+					prepareScript,
+					parameters
+				);
+		} finally {
+			pm.close();
+		}
 	}
 	
 	/**
@@ -520,7 +527,7 @@ implements SessionBean
 	 *
 	 * @ejb.interface-method
 	 * @ejb.permission role-name="_Guest_"
-	 * @ejb.transaction type = "Required"
+	 * @ejb.transaction type = "Never"
 	 */
 	public IResultSetMetaData getJFSResultSetMetaData(ScriptRegistryItemID scriptRegistryItemID)
 	throws ModuleException
@@ -538,7 +545,7 @@ implements SessionBean
 	 *
 	 * @ejb.interface-method
 	 * @ejb.permission role-name="_Guest_"
-	 * @ejb.transaction type = "Required"
+	 * @ejb.transaction type = "Never"
 	 */
 	public IResultSet getJFSResultSet(
 			ScriptRegistryItemID scriptRegistryItemID,
@@ -563,7 +570,7 @@ implements SessionBean
 	 *
 	 * @ejb.interface-method
 	 * @ejb.permission role-name="_Guest_"
-	 * @ejb.transaction type = "Required"
+	 * @ejb.transaction type = "Never"
 	 */
 	public IParameterMetaData getJFSParameterMetaData(
 			ScriptRegistryItemID scriptRegistryItemID

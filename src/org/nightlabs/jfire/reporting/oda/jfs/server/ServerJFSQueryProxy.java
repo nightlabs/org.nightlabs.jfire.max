@@ -3,11 +3,11 @@
  */
 package org.nightlabs.jfire.reporting.oda.jfs.server;
 
-import java.math.BigDecimal;
 import java.util.Map;
 
 import javax.jdo.PersistenceManager;
 
+import org.apache.log4j.Logger;
 import org.eclipse.datatools.connectivity.oda.IParameterMetaData;
 import org.eclipse.datatools.connectivity.oda.IResultSet;
 import org.eclipse.datatools.connectivity.oda.IResultSetMetaData;
@@ -38,16 +38,24 @@ import org.nightlabs.jfire.security.SecurityReflector;
 public class ServerJFSQueryProxy extends AbstractJFSQueryProxy {
 
 	/**
+	 * Logger used by this class.
+	 */
+	private static final Logger logger = Logger.getLogger(ServerJFSQueryProxy.class);
+	
+	/**
 	 * 
 	 */
 	public ServerJFSQueryProxy(Map properties) {
 		super();
+		logger.debug("ServerJFSQueryProxy instantiated");
 	}
 
 	/* (non-Javadoc)
 	 * @see org.eclipse.datatools.connectivity.oda.IQuery#close()
 	 */
 	public void close() throws OdaException {
+		logger.debug("close() IQuery."); 
+		closePersistenceManager();
 	}
 
 	private IParameterMetaData parameterMetaData;
@@ -76,12 +84,17 @@ public class ServerJFSQueryProxy extends AbstractJFSQueryProxy {
 	 * @see org.eclipse.datatools.connectivity.oda.IQuery#executeQuery()
 	 */
 	public IResultSet executeQuery() throws OdaException {
+		PersistenceManager pm = getPersistenceManager();
 		try {
-			return getJFSResultSet(getScriptRegistryItemID(), getNamedParameters());
-		} catch (ModuleException e) {
-			OdaException ex = new OdaException("Could not get ResultSet "+e.getMessage());
-			ex.initCause(e);
-			throw ex;
+			try {
+				return getJFSResultSet(pm, getScriptRegistryItemID(), getNamedParameters());
+			} catch (ModuleException e) {
+				OdaException ex = new OdaException("Could not get ResultSet "+e.getMessage());
+				ex.initCause(e);
+				throw ex;
+			}
+		} finally {
+//			pm.close();
 		}
 	}
 
@@ -94,12 +107,17 @@ public class ServerJFSQueryProxy extends AbstractJFSQueryProxy {
 	 * @see org.eclipse.datatools.connectivity.oda.IQuery#getMetaData()
 	 */
 	public IResultSetMetaData getMetaData() throws OdaException {
+		PersistenceManager pm = getPersistenceManager();
 		try {
-			return getJFSResultSetMetaData(getScriptRegistryItemID());
-		} catch (ModuleException e) {
-			OdaException ex = new OdaException("Could not get MetaData "+e.getMessage());
-			ex.initCause(e);
-			throw ex;
+			try {
+				return getJFSResultSetMetaData(pm, getScriptRegistryItemID());
+			} catch (ModuleException e) {
+				OdaException ex = new OdaException("Could not get MetaData "+e.getMessage());
+				ex.initCause(e);
+				throw ex;
+			}
+		} finally {
+//			pm.close();
 		}
 	}
 	
@@ -155,43 +173,63 @@ s	 */
 		return (ReportingScriptExecutor)executor;
 	}
 	
+	private PersistenceManager pm; 
+	
 	/**
-	 * Obtains a (new ?!?) PersistenceManager with the help of {@link Lookup}.
+	 * Obtains the PersistenceManager for this proxy. If none created yet, 
+	 * it will be obtained with the help of {@link Lookup#getPersistenceManager()}.
 	 */
-	public static PersistenceManager getPersistenceManager() 
+	protected PersistenceManager getPersistenceManager() 
 	{
-		Lookup lookup;
-		lookup = new Lookup(SecurityReflector.getUserDescriptor().getOrganisationID());
-		return lookup.getPersistenceManager();
+		logger.debug("getPersistenceManager() called on "+this);
+		if (pm == null) {
+			Lookup lookup;
+			lookup = new Lookup(SecurityReflector.getUserDescriptor().getOrganisationID());
+			pm = lookup.getPersistenceManager();
+			logger.debug("getPersistenceManager() created new PersistenceManager "+pm);
+		}
+		logger.debug("getPersistenceManager() returns "+pm);
+		return pm;
 	}
 	
 	/**
-	 * Shorcut to {@link #getJFSResultSetMetaData(PersistenceManager, ScriptRegistryItemID)}
+	 * Closes the PersistenceManager if it was created.
 	 */
-	public static IResultSetMetaData getJFSResultSetMetaData(ScriptRegistryItemID scriptRegistryItemID)
-	throws ModuleException
-	{
-		PersistenceManager pm = getPersistenceManager();
-		try {
-			return getJFSResultSetMetaData(pm, scriptRegistryItemID);
-		} finally {
-			pm.close();
-		}
+	protected void closePersistenceManager() {
+		logger.debug("Close persistenceManager, doing nothing");
+//		if (pm != null && !pm.isClosed()) {
+//			logger.debug("Closing PersistenceManager");
+//			pm.close();
+//		}
 	}
-
-	/**
-	 * Shortcut to #getJFSResultSet(PersistenceManager, ScriptRegistryItemID, Map<String, Object>)}
-	 */
-	public static IResultSet getJFSResultSet(ScriptRegistryItemID scriptRegistryItemID, Map<String, Object> parameters)
-	throws ModuleException
-	{
-		PersistenceManager pm = getPersistenceManager();
-		try {			
-			return getJFSResultSet(pm, scriptRegistryItemID, parameters);
-		} finally {
-			pm.close();
-		}
-	}
+	
+//	/**
+//	 * Shorcut to {@link #getJFSResultSetMetaData(PersistenceManager, ScriptRegistryItemID)}
+//	 */
+//	public static IResultSetMetaData getJFSResultSetMetaData(PersistenceManager pm, ScriptRegistryItemID scriptRegistryItemID)
+//	throws ModuleException
+//	{
+//		PersistenceManager pm = getPersistenceManager();
+//		try {
+//			return getJFSResultSetMetaData(pm, scriptRegistryItemID);
+//		} finally {
+//			pm.close();
+//		}
+//	}
+//
+//	/**
+//	 * Shortcut to #getJFSResultSet(PersistenceManager, ScriptRegistryItemID, Map<String, Object>)}
+//	 */
+//	public static IResultSet getJFSResultSet(ScriptRegistryItemID scriptRegistryItemID, Map<String, Object> parameters)
+//	throws ModuleException
+//	{
+//		PersistenceManager pm = getPersistenceManager();
+//		try {			
+//			return getJFSResultSet(pm, scriptRegistryItemID, parameters);
+//		} finally {
+//			pm.close();
+//		}
+//	}
 	
 	/**
 	 * Lookup the {@link ReportingScriptExecutor} and let him execute {@link ReportingScriptExecutor#getResultSetMetaData(Script)}.
@@ -229,17 +267,32 @@ s	 */
 		return createReportingScriptExecutor(pm, script).getResultSet(script, parameters);
 	}
 	
-	public static IParameterMetaData getScriptParameterMetaData(ScriptRegistryItemID itemID)
+	/**
+	 * Returns the parameter metadata of the given JFire Script in the form 
+	 * of an ODA runtime interface {@link IParameterMetaData}.
+	 *  
+	 * @param itemID The id of the JFire script.
+	 * @throws OdaException
+	 */
+	public IParameterMetaData getScriptParameterMetaData(ScriptRegistryItemID itemID)
 	throws OdaException
 	{
 		PersistenceManager pm = getPersistenceManager();
 		try {
 			return getScriptParameterMetaData(pm, itemID);
 		} finally {
-			pm.close();
+//			pm.close();
 		}
 	}
-	
+
+	/**
+	 * Returns the parameter metadata of the given JFire Script in the form 
+	 * of an ODA runtime interface {@link IParameterMetaData}.
+	 *
+	 * @param pm The PersistenceManager to use.
+	 * @param itemID The id of the JFire script.
+	 * @throws OdaException
+	 */
 	public static IParameterMetaData getScriptParameterMetaData(PersistenceManager pm, ScriptRegistryItemID itemID)
 	throws OdaException
 	{

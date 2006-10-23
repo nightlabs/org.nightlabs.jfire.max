@@ -129,6 +129,8 @@ public class RenderManager {
 		} catch (ClassCastException e) {
 			throw new IllegalArgumentException("The ReportRegistryItemID with id "+renderRequest.getReportRegistryItemID()+" is not of type ReportLayout.");
 		}
+		logger.debug("Rendering report "+reportLayout.getReportRegistryItemID()+" to outputformat: "+renderRequest.getOutputFormat());
+		
 		ReportEngine reportEngine = factory.getReportEngine();
 		
 		InputStream inputStream = new ByteArrayInputStream(reportLayout.getReportDesign());
@@ -147,6 +149,7 @@ public class RenderManager {
 		HashMap<String,Object> parsedParams = parseReportParams(reportEngine, report, renderRequest.getParameters());
 		renderRequest.setParameters(parsedParams);
 		
+		logger.debug("Have report renderer, delegating render work");
 		return renderer.renderReport(pm, renderRequest, task, fileName, layoutRoot, prepareForTransfer);
 	}
 

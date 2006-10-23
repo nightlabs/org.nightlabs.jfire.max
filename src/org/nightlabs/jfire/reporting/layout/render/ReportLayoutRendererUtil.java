@@ -9,6 +9,7 @@ import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 
+import org.apache.log4j.Logger;
 import org.nightlabs.io.DataBuffer;
 import org.nightlabs.jfire.reporting.JFireReportingEAR;
 import org.nightlabs.jfire.security.SecurityReflector;
@@ -23,6 +24,11 @@ import org.nightlabs.util.Utils;
 public class ReportLayoutRendererUtil {
 
 	/**
+	 * Logger used by this class.
+	 */
+	private static final Logger logger = Logger.getLogger(ReportLayoutRendererUtil.class);
+	
+	/**
 	 * Retruns after asuring that a folder exists, that can be uniquely addressed
 	 * using the sessionID of the actual user.
 	 *  
@@ -36,8 +42,7 @@ public class ReportLayoutRendererUtil {
 			throw new IllegalStateException("Could not obtain archive directory!",e);
 		}
 		File layoutRoot;
-		layoutRoot = new File(earDir, "birt"+File.separator+"rendered"+File.separator+SecurityReflector.getUserDescriptor().getSessionID());
-		
+		layoutRoot = new File(earDir, "birt"+File.separator+"rendered"+File.separator+SecurityReflector.getUserDescriptor().getSessionID()+"-"+Long.toHexString(Thread.currentThread().getId()));
 		if (layoutRoot.exists()) {
 			if (!Utils.deleteDirectoryRecursively(layoutRoot))
 				throw new IllegalStateException("Could not delete rendered report tmp folder "+layoutRoot);
@@ -46,6 +51,7 @@ public class ReportLayoutRendererUtil {
 			if (!layoutRoot.mkdirs())
 				throw new IllegalStateException("Could not create rendered report tmp folder "+layoutRoot);
 		}
+		logger.debug("Returning rendered layout outputfolder: "+layoutRoot);
 		return layoutRoot;
 	}
 	

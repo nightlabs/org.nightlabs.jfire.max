@@ -737,7 +737,7 @@ implements SessionBean
 	 *
 	 * @ejb.interface-method
 	 * @ejb.permission role-name="_Guest_"
-	 * @ejb.transaction type="Required"
+	 * @ejb.transaction type="Never"
 	 * 
 	 * @param renderReportRequest
 	 * @return

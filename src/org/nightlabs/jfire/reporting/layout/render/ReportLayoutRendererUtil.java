@@ -82,6 +82,8 @@ public class ReportLayoutRendererUtil {
 			transferFile = new File(layoutRoot, entryFileName+"."+reportLayout.getHeader().getOutputFormat().toString());
 		}
 		
+
+		reportLayout.getHeader().setEntryFileName(entryFileName+"."+reportLayout.getHeader().getOutputFormat().toString());
 		
 		BufferedInputStream buf;
 		try {

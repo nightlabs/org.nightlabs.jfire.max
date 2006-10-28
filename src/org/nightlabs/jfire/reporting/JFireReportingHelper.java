@@ -146,7 +146,7 @@ public class JFireReportingHelper {
 	 * @return The value of a named variable associated to the current thread
 	 * (execution of the current report).
 	 */
-	public Object getVar(String varName) {
+	public static Object getVar(String varName) {
 		return helpers.get().getVars().get(varName);
 	}
 	
@@ -157,7 +157,7 @@ public class JFireReportingHelper {
 	 * @return The map of all named varialbes associated to the current thread
 	 * (execution of the current report).
 	 */
-	public Map<String, Object> getVars() {
+	public static Map<String, Object> getVars() {
 		return helpers.get().getVars();
 	}
 	

@@ -8,6 +8,7 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 
+import org.apache.log4j.Logger;
 import org.eclipse.datatools.connectivity.oda.IParameterMetaData;
 import org.eclipse.datatools.connectivity.oda.OdaException;
 import org.nightlabs.jfire.scripting.ScriptParameter;
@@ -26,6 +27,8 @@ public class ParameterMetaData implements NamedParameterMetaData, Serializable {
 
 	private static final long serialVersionUID = 1L;	
 
+	private static final Logger logger = Logger.getLogger(ParameterMetaData.class);
+	
 	/**
 	 * Holds information about parameters according to datatools oda. 
 	 */
@@ -238,6 +241,11 @@ public class ParameterMetaData implements NamedParameterMetaData, Serializable {
 			descriptor.setDataTypeName(DataType.getTypeName(dataType));
 			descriptor.setParameterName(parameter.getScriptParameterID());
 			result.addParameterDescriptor(descriptor);
+		}
+		if (logger.isDebugEnabled()) {
+			for (int i = 0; i < result.getParameterCount(); i++) {
+				logger.debug("Parameter "+(i+1)+": "+result.getParameterName(i+1)+", "+result.getParameterTypeName(i+1));
+			}
 		}
 		return result;
 	}

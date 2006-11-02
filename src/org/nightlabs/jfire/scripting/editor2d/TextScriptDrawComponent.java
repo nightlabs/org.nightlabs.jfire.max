@@ -25,7 +25,6 @@
  ******************************************************************************/
 package org.nightlabs.jfire.scripting.editor2d;
 
-import org.nightlabs.editor2d.IText;
 import org.nightlabs.editor2d.TextDrawComponent;
 
 /**

@@ -25,10 +25,9 @@
  ******************************************************************************/
 package org.nightlabs.jfire.scripting.editor2d.impl;
 
+import java.util.Collection;
 import java.util.HashSet;
 import java.util.Iterator;
-import java.util.LinkedList;
-import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
@@ -50,12 +49,8 @@ implements ScriptMultiLayerDrawComponent
 	
 	public void assignScriptResults(Map<ScriptRegistryItemID, Object> scriptValues) 
 	{
-		// get all scriptIDs with the corresponding ScriptDrawComponents
-		List scriptDrawComponents = new LinkedList();
-		// TODO: get all ScriptDrawComponents with a generic way
-//		scriptDrawComponents.addAll(getDrawComponents(ScriptDrawComponent.class));		
-		scriptDrawComponents.addAll(findDrawComponents(ScriptDrawComponent.class, true));
-				
+		// TODO: all scriptDrawComponents should already be cached when added
+		Collection scriptDrawComponents = findDrawComponents(ScriptDrawComponent.class, true);				
 		for (Iterator it = scriptDrawComponents.iterator(); it.hasNext(); ) 
 		{
 			ScriptDrawComponent sd = (ScriptDrawComponent) it.next();
@@ -83,10 +78,8 @@ implements ScriptMultiLayerDrawComponent
 	
 	public Set<ScriptRegistryItemID> getScriptRegistryItemIDs() 
 	{
-		List scriptDrawComponents = new LinkedList();
-		// TODO: get all ScriptDrawComponents with a generic way
-//		scriptDrawComponents.addAll(getDrawComponents(ScriptDrawComponent.class));		
-		scriptDrawComponents.addAll(findDrawComponents(ScriptDrawComponent.class, true));
+		// TODO: all scriptDrawComponents should already be cached when added
+		Collection scriptDrawComponents = findDrawComponents(ScriptDrawComponent.class, true);
 		
 		Set<ScriptRegistryItemID> scriptIDs = new HashSet<ScriptRegistryItemID>();
 		for (Iterator it = scriptDrawComponents.iterator(); it.hasNext(); ) {

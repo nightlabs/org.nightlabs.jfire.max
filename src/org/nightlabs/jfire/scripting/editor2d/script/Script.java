@@ -52,12 +52,12 @@ public class Script
 		this.text = text;
 	}
 	
-	private Map<ScriptRegistryItemID, Object> scriptID2Value = new HashMap<ScriptRegistryItemID, Object>();
-	public Map<ScriptRegistryItemID, Object> getScriptID2Value() {
-		return scriptID2Value;		
+	private Map<ScriptRegistryItemID, String> scriptID2VariableName = new HashMap<ScriptRegistryItemID, String>();
+	public Map<ScriptRegistryItemID, String> getScriptID2VariableName() {
+		return scriptID2VariableName;		
 	}
 	
-	public void addScriptID(ScriptRegistryItemID scriptID, Object value) {
-		scriptID2Value.put(scriptID, value);
+	public void addVariableName(ScriptRegistryItemID scriptID, String value) {
+		scriptID2VariableName.put(scriptID, value);
 	}
 }

@@ -110,7 +110,7 @@ public class LegalEntity extends Anchor
 		}
 
 		// It's better to have a Person for EVERY LegalEntity
-		Person person = new Person(organisationID, IDGenerator.nextID(Person.class));
+		Person person = new Person(IDGenerator.getOrganisationID(), IDGenerator.nextID(Person.class));
 		PersonStruct personStruct = PersonStruct.getPersonStruct(pm);
 		personStruct.explodePerson(person);
 		try {

@@ -52,13 +52,13 @@ import org.nightlabs.jfire.accounting.tariffpriceconfig.FormulaCell;
 import org.nightlabs.jfire.accounting.tariffpriceconfig.FormulaPriceConfig;
 import org.nightlabs.jfire.accounting.tariffpriceconfig.PriceCalculator;
 import org.nightlabs.jfire.accounting.tariffpriceconfig.StablePriceConfig;
+import org.nightlabs.jfire.idgenerator.IDGenerator;
 import org.nightlabs.jfire.organisation.Organisation;
 import org.nightlabs.jfire.person.Person;
 import org.nightlabs.jfire.person.PersonDataBlockGroupNotFoundException;
 import org.nightlabs.jfire.person.PersonDataBlockNotFoundException;
 import org.nightlabs.jfire.person.PersonDataFieldNotFoundException;
 import org.nightlabs.jfire.person.PersonDataNotFoundException;
-import org.nightlabs.jfire.person.PersonRegistry;
 import org.nightlabs.jfire.person.PersonStruct;
 import org.nightlabs.jfire.person.TextPersonDataField;
 import org.nightlabs.jfire.security.SecurityException;
@@ -448,15 +448,6 @@ public class DataCreator
 		return user;
 	}
 
-	private PersonRegistry personRegistry = null;
-	protected PersonRegistry getPersonRegistry()
-	{
-		if (personRegistry == null)
-			personRegistry = PersonRegistry.getRegistry(pm);
-
-		return personRegistry;
-	}
-
 	private PersonStruct personStruct = null;
 	protected PersonStruct getPersonStruct()
 	{
@@ -467,13 +458,11 @@ public class DataCreator
 	}
 
 	public Person createPerson(
-//			PersonRegistry personRegistry, PersonStruct personStruct,
 			String company, String name, String firstName, String eMail)
 	throws PersonDataBlockNotFoundException, PersonDataBlockGroupNotFoundException, PersonDataFieldNotFoundException
 	{
-		PersonRegistry personRegistry = getPersonRegistry();
 		PersonStruct personStruct = getPersonStruct();
-		Person person = new Person(personRegistry.getOrganisationID(), personRegistry.createPersonID());
+		Person person = new Person(IDGenerator.getOrganisationID(), IDGenerator.nextID(Person.class));
 		personStruct.explodePerson(person);
 		((TextPersonDataField)person.getPersonDataField(PersonStruct.PERSONALDATA_COMPANY)).setText(company);
 		((TextPersonDataField)person.getPersonDataField(PersonStruct.PERSONALDATA_NAME)).setText(name);
@@ -489,7 +478,7 @@ public class DataCreator
 	public LegalEntity createLegalEntity(Person person)
 	{
 		LegalEntity legalEntity = new LegalEntity(
-				personRegistry.getOrganisationID(), LegalEntity.ANCHOR_TYPE_ID_PARTNER, Long.toHexString(person.getPersonID()));
+				person.getOrganisationID(), LegalEntity.ANCHOR_TYPE_ID_PARTNER, Long.toHexString(person.getPersonID()));
 		legalEntity.setPerson(person);
 		pm.makePersistent(legalEntity);
 		return legalEntity;

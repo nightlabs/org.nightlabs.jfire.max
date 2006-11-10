@@ -38,12 +38,9 @@ import javax.jdo.PersistenceManager;
 
 import org.nightlabs.jfire.accounting.MoneyTransfer;
 import org.nightlabs.jfire.accounting.book.Accountant;
+import org.nightlabs.jfire.idgenerator.IDGenerator;
 import org.nightlabs.jfire.organisation.LocalOrganisation;
 import org.nightlabs.jfire.person.Person;
-import org.nightlabs.jfire.person.PersonDataBlockGroupNotFoundException;
-import org.nightlabs.jfire.person.PersonDataBlockNotFoundException;
-import org.nightlabs.jfire.person.PersonDataFieldNotFoundException;
-import org.nightlabs.jfire.person.PersonRegistry;
 import org.nightlabs.jfire.person.PersonStruct;
 import org.nightlabs.jfire.person.TextPersonDataField;
 import org.nightlabs.jfire.security.User;
@@ -113,7 +110,7 @@ public class LegalEntity extends Anchor
 		}
 
 		// It's better to have a Person for EVERY LegalEntity
-		Person person = new Person(organisationID, PersonRegistry.getRegistry(pm).createPersonID());
+		Person person = new Person(organisationID, IDGenerator.nextID(Person.class));
 		PersonStruct personStruct = PersonStruct.getPersonStruct(pm);
 		personStruct.explodePerson(person);
 		try {

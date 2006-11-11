@@ -94,7 +94,7 @@ implements SessionBean
 	 * @throws ModuleException
 	 *
 	 * @ejb.interface-method
-	 * @ejb.permission role-name="JFireReporting-admin"
+	 * @ejb.permission role-name="_System_"
 	 * @ejb.transaction type = "Required"
 	 */
 	public void initializeScripting() 

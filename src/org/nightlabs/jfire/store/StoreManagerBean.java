@@ -147,7 +147,7 @@ implements SessionBean
 	 *
 	 * @ejb.interface-method
 	 * @ejb.transaction type = "Required"
-	 * @ejb.permission role-name="_Guest_"
+	 * @ejb.permission role-name="_System_"
 	 */
 	public void initialize() throws IOException
 	{

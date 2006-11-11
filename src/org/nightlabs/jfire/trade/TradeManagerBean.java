@@ -42,19 +42,16 @@ import javax.ejb.SessionBean;
 import javax.ejb.SessionContext;
 import javax.jdo.JDOHelper;
 import javax.jdo.PersistenceManager;
-import javax.naming.InitialContext;
 
 import org.apache.log4j.Logger;
 import org.nightlabs.ModuleException;
 import org.nightlabs.jdo.NLJDOHelper;
-import org.nightlabs.jdo.ObjectIDUtil;
 import org.nightlabs.jdo.moduleregistry.ModuleMetaData;
 import org.nightlabs.jfire.accounting.Currency;
 import org.nightlabs.jfire.accounting.id.CurrencyID;
 import org.nightlabs.jfire.base.BaseSessionBeanImpl;
 import org.nightlabs.jfire.config.ConfigSetup;
 import org.nightlabs.jfire.config.UserConfigSetup;
-import org.nightlabs.jfire.idgenerator.IDGenerator;
 import org.nightlabs.jfire.person.Person;
 import org.nightlabs.jfire.security.User;
 import org.nightlabs.jfire.trade.config.LegalEntityViewConfigModule;
@@ -961,10 +958,10 @@ implements SessionBean
 	 *
 	 * @ejb.interface-method
 	 * @ejb.transaction type = "Required"
-	 * @ejb.permission role-name="_Guest_"
+	 * @ejb.permission role-name="_System_"
 	 */
 	public void initialize()
-		throws ModuleException
+	throws ModuleException
 	{
 		PersistenceManager pm = getPersistenceManager();
 		try {

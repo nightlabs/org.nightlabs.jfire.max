@@ -123,7 +123,7 @@ implements SessionBean
 	 * @throws ModuleException
 	 *
 	 * @ejb.interface-method
-	 * @ejb.permission role-name="SimpleTradeManager-admin"
+	 * @ejb.permission role-name="_System_"
 	 * @ejb.transaction type = "Required"
 	 */
 	public void initialize() 

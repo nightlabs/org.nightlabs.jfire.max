@@ -25,34 +25,50 @@
  ******************************************************************************/
 package org.nightlabs.jfire.scripting.condition;
 
-import java.util.HashMap;
-import java.util.Map;
+import java.util.List;
+import java.util.Set;
 
+import org.nightlabs.jfire.scripting.id.ScriptRegistryItemID;
 
 /**
  * @author Daniel.Mazurek [at] NightLabs [dot] de
  *
  */
-public class ConditionScriptRegistry 
+public interface IConditionContextProvider 
 {
-	private Map<String, IConditionContextProvider> context2ContextProvider;
-	protected Map<String, IConditionContextProvider> getContext2ContextProvider() {
-		if (context2ContextProvider == null) {
-			context2ContextProvider = new HashMap<String, IConditionContextProvider>();
-		}
-		return context2ContextProvider;
-	}
+	/**
+	 * 
+	 * @return a {@link Set} of ScriptRegistryItemIDs which are legal in this context
+	 */
+	public Set<ScriptRegistryItemID> getAllowedScriptRegistryItemIDs();
 	
-	public void registerConditionContextProvider(IConditionContextProvider contextProvider) 
-	{
-		if (contextProvider == null)
-			throw new IllegalArgumentException("Param contextProvider must NOT be null!");
-		
-		getContext2ContextProvider().put(contextProvider.getConditionContext(), contextProvider);
-	}
+	/**
+	 * 
+	 * @param scriptID the ScriptRegistryItemID to get the corresponding {@link ScriptConditioner} for 
+	 * @return the corresponding {@link ScriptConditioner} for the given scriptID 
+	 */
+	public ScriptConditioner getScriptConditioner(ScriptRegistryItemID scriptID);
+			
+	/**
+	 * 
+	 * @return a String which is the context for the provider
+	 *  
+	 */	
+	public String getConditionContext();
 	
-	public IConditionContextProvider getConditionContextProvider(String context) {
-		return getContext2ContextProvider().get(context);
-	}
+	/**
+	 * 
+	 * @param scriptID the ScriptRegistryItemID to get a variableName for
+	 * @return the variableName of the given ScriptRegistryItemID
+	 */
+	public String getVariableName(ScriptRegistryItemID scriptID); 
 	
+	/**
+	 * 
+	 * @param scriptID the id of the script to get possible values for
+	 * @return a List of Objects which are possible values for the result of script
+	 * with the given ScriptRegistryItemID
+	 * 
+	 */
+	public List<Object> getPossibleValues(ScriptRegistryItemID scriptID);
 }

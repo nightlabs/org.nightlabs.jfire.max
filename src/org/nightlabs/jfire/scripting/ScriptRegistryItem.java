@@ -27,7 +27,9 @@
 package org.nightlabs.jfire.scripting;
 
 import java.io.Serializable;
+import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Set;
 
 import javax.jdo.JDODetachedFieldAccessException;
 import javax.jdo.JDOHelper;
@@ -37,6 +39,8 @@ import javax.jdo.Query;
 import javax.jdo.listener.StoreCallback;
 
 import org.apache.log4j.Logger;
+import org.nightlabs.ModuleException;
+import org.nightlabs.jfire.scripting.id.ScriptRegistryItemID;
 import org.nightlabs.util.Utils;
 
 /**
@@ -71,12 +75,31 @@ import org.nightlabs.util.Utils;
  *			WHERE this.parent == null    
  *			import java.lang.String"
  *
+ * @jdo.query
+ *		name="getTopLevelScriptRegistryItemsByType"
+ *		query="SELECT
+ *			WHERE this.parent == null &&
+ *						this.scriptRegistryItemType == pScriptRegistryItemType
+ *			PARAMETERS pScriptRegistryItemType  
+ *			import java.lang.String"
+ *
+ * @jdo.query
+ *		name="getTopLevelScriptRegistryItemsByOrganisationIDAndType"
+ *		query="SELECT
+ *			WHERE this.parent == null &&
+ *						this.organisationID == pOrganisationID &&
+ *						this.scriptRegistryItemType == pScriptRegistryItemType
+ *			PARAMETERS pOrganisationID, pScriptRegistryItemType  
+ *			import java.lang.String"
+ *
  */
 public abstract class ScriptRegistryItem
 		implements Serializable, StoreCallback
 {
 	private static final long serialVersionUID = 9221181132208442543L;
 	
+	public static final String QUERY_GET_TOPLEVEL_SCRIPT_REGISTRY_ITEMS_BY_ORGANISATION_ID_AND_TYPE = "getTopLevelScriptRegistryItemsByOrganisationIDAndType";
+	public static final String QUERY_GET_TOPLEVEL_SCRIPT_REGISTRY_ITEMS_BY_TYPE = "getTopLevelScriptRegistryItemsByType";	
 	public static final String QUERY_GET_TOPLEVEL_SCRIPT_REGISTRY_ITEMS_BY_ORGANISATION_ID = "getTopLevelScriptRegistryItemsByOrganisationID";
 	public static final String QUERY_GET_TOPLEVEL_SCRIPT_REGISTRY_ITEMS = "getTopLevelScriptRegistryItems";
 
@@ -116,19 +139,6 @@ public abstract class ScriptRegistryItem
 	 * @jdo.field persistence-modifier="persistent"
 	 */
 	private ScriptRegistryItemName name;
-
-//	/**
-//	 * @jdo.field
-//	 *		persistence-modifier="persistent"
-//	 *		collection-type="map"
-//	 *		key-type="java.lang.String"
-//	 *		value-type="ScriptParameter"
-//	 *		dependent-value="true"
-//	 *		table="JFireScripting_ScriptRegistryItem_parameters"
-//	 *
-//	 * @jdo.join
-//	 */
-//	private Map<String, ScriptParameter> parameters;
 
 	/**
 	 * @deprecated Only for JDO! 
@@ -218,25 +228,61 @@ public abstract class ScriptRegistryItem
 	 * for all organisation are returned.
 	 * 
 	 * @param pm The PersistenceManager to use.
-	 * @param organisatinID The organisationID to use. 
+	 * @param organisationID The organisationID to use. 
 	 */
-	public static Collection getTopScriptRegistryItemsByOrganisationID(PersistenceManager pm, String organisatinID) {
-		if (organisatinID == null || "".equals(organisatinID))
+	public static Collection getTopScriptRegistryItemsByOrganisationID(PersistenceManager pm, 
+			String organisationID) 
+	{
+		if (organisationID == null || "".equals(organisationID))
 			return getTopScriptRegistryItems(pm);
 		Query q = pm.newNamedQuery(ScriptRegistryItem.class, QUERY_GET_TOPLEVEL_SCRIPT_REGISTRY_ITEMS_BY_ORGANISATION_ID);
-		return (Collection)q.execute(organisatinID);
+		return (Collection)q.execute(organisationID);
 	}
 
 	/**
-	 * Returns all top level (parent == null) ScriptRegistryItems for the given organisationID
+	 * Returns all top level (parent == null) ScriptRegistryItems for all
+	 * organisations
 	 * 
 	 * @param pm The PersistenceManager to use.
-	 * @param organisatinID The organisationID to use
 	 */
-	public static Collection getTopScriptRegistryItems(PersistenceManager pm) {
+	public static Collection getTopScriptRegistryItems(PersistenceManager pm) 
+	{
 		Query q = pm.newNamedQuery(ScriptRegistryItem.class, QUERY_GET_TOPLEVEL_SCRIPT_REGISTRY_ITEMS);
 		return (Collection)q.execute();
 	}
+	
+	/**
+	 * Returns all top level (parent == null) ScriptRegistryItems with the given
+	 * scriptRegistryItemType
+	 * 
+	 * @param pm The PersistenceManager to use.
+	 * @param scriptRegistryItemType the ScriptRegistryItemType to filter
+	 */
+	public static Collection getTopScriptRegistryItemsByType(PersistenceManager pm, 
+			String scriptRegistryItemType) 
+	{
+		Query q = pm.newNamedQuery(ScriptRegistryItem.class, QUERY_GET_TOPLEVEL_SCRIPT_REGISTRY_ITEMS_BY_TYPE);
+		return (Collection)q.execute(scriptRegistryItemType);
+	}	
+	
+	/**
+	 * Returns all top level (parent == null) ScriptRegistryItems for the given organisationID 
+	 * and scriptRegistryItemType
+	 * If organisation is null the top level registry items
+	 * for all organisation are returned.
+	 * 
+	 * @param pm The PersistenceManager to use.
+	 * @param organisationID The organisationID to use. 
+	 * @param scriptRegistryItemType the scriptRegistryItemType to use
+	 */
+	public static Collection getTopScriptRegistryItemsByOrganisationIDAndType(
+			PersistenceManager pm, String organisationID, String scriptRegistryItemType) 
+	{
+		if (organisationID == null || "".equals(organisationID))
+			return getTopScriptRegistryItemsByType(pm, scriptRegistryItemType);
+		Query q = pm.newNamedQuery(ScriptRegistryItem.class, QUERY_GET_TOPLEVEL_SCRIPT_REGISTRY_ITEMS_BY_ORGANISATION_ID_AND_TYPE);
+		return (Collection)q.execute(organisationID, scriptRegistryItemType);
+	}	
 	
 	public void jdoPreStore()
 	{

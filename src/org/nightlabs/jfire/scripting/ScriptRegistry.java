@@ -399,4 +399,17 @@ public class ScriptRegistry
 		}
 		return res;
 	}
+	
+	public Map<ScriptRegistryItemID, Script> getScripts(Collection<ScriptRegistryItemID> scriptItemsIDs) 
+	{
+		if (scriptItemsIDs == null)
+			return null;
+		
+		Map<ScriptRegistryItemID, Script> scriptID2Script = new HashMap<ScriptRegistryItemID, Script>(scriptItemsIDs.size());
+		for (ScriptRegistryItemID itemID : scriptItemsIDs) {
+			Script script = getScript(itemID.scriptRegistryItemType, itemID.scriptRegistryItemID);
+			scriptID2Script.put(itemID, script);
+		}
+		return scriptID2Script;
+	}
 }

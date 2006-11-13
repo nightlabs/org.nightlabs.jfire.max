@@ -27,7 +27,6 @@
 package org.nightlabs.jfire.scripting;
 
 import java.io.Serializable;
-import java.sql.Types;
 import java.util.Collection;
 
 import javax.jdo.JDODetachedFieldAccessException;
@@ -53,6 +52,15 @@ import javax.jdo.Query;
  *				this.scriptRegistryItemID == pScriptRegistryItemID
  *			PARAMETERS pScriptRegistryItemType, pScriptRegistryItemID
  *			import java.lang.String"
+ *
+ * @jdo.query
+ *		name="getScriptsByTypeAndResultClass"
+ *		query="SELECT
+ *			WHERE
+ *				this.scriptRegistryItemType == pScriptRegistryItemType &&
+ *				this.resultClassName == pResultClassName
+ *			PARAMETERS pScriptRegistryItemType, pResultClassName
+ *			import java.lang.String"
  */
 public class Script
 		extends ScriptRegistryItem
@@ -60,13 +68,22 @@ public class Script
 {
 	private static final long serialVersionUID = 1L;
 
+	public static final String QUERY_GET_SCRIPTS_BY_TYPE_AND_ID = "getScriptsByTypeAndID";
 	public static Collection getScripts(PersistenceManager pm, String scriptRegistryItemType, String scriptRegistryItemID)
 	{
-		Query q = pm.newNamedQuery(Script.class, "getScriptsByTypeAndID");
+		Query q = pm.newNamedQuery(Script.class, QUERY_GET_SCRIPTS_BY_TYPE_AND_ID);
 		return (Collection) q.execute(
 				scriptRegistryItemType, scriptRegistryItemID);
 	}
 
+	public static final String QUERY_GET_SCRIPTS_BY_TYPE_AND_RESULT_CLASS = "getScriptsByTypeAndResultClass";
+	public static Collection getScriptsByTypeAndResult(PersistenceManager pm, 
+			String scriptRegistryItemType, String resultClassName)
+	{
+		Query q = pm.newNamedQuery(Script.class, QUERY_GET_SCRIPTS_BY_TYPE_AND_RESULT_CLASS);
+		return (Collection) q.execute(scriptRegistryItemType, resultClassName);
+	}
+	
 	/**
 	 * This field stores the language of the script. Currently,
 	 * the {@link ScriptExecutorJavaScript} supports {@link ScriptExecutorJavaScript#LANGUAGE_JAVA_SCRIPT}}

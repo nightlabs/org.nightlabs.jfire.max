@@ -32,6 +32,8 @@ import java.util.Collection;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
 import javax.ejb.CreateException;
 import javax.ejb.EJBException;
@@ -298,9 +300,6 @@ implements SessionBean
 		}
 	}
 
-	
-	
-	
 	/**
 	 * @throws ModuleException
 	 *
@@ -409,5 +408,75 @@ implements SessionBean
 			pm.close();
 		}
 	}
-		
+			
+	/**
+	 * 
+	 * @param organisationID The organisationID the carriers should be searched for. 
+	 * If null top level carriers for all organisations are returned.
+	 * @param scriptRegistryItemType the scriptRegistryItemType to search for
+	 * @throws ModuleException
+	 *
+	 * @ejb.interface-method
+	 * @ejb.permission role-name="_Guest_"
+	 * @ejb.transaction type = "Required"
+	 */
+	public Collection<ScriptRegistryItemCarrier> getTopLevelScriptRegistryItemCarriers (
+			String organisationID, String scriptRegistryItemType)
+	throws ModuleException
+	{
+		PersistenceManager pm;
+		pm = getPersistenceManager();
+		try {
+			Collection topLevelItems = ScriptRegistryItem.getTopScriptRegistryItemsByOrganisationIDAndType(
+					pm, organisationID, scriptRegistryItemType);
+			Collection<ScriptRegistryItemCarrier> result = new HashSet<ScriptRegistryItemCarrier>();
+			for (Iterator iter = topLevelItems.iterator(); iter.hasNext();) {
+				ScriptRegistryItem item = (ScriptRegistryItem) iter.next();
+				result.add(new ScriptRegistryItemCarrier(null, item, true));
+			}
+			return result;
+		} finally {
+			pm.close();
+		}
+	}		
+	
+//	/**
+//	 * @throws ModuleException
+//	 *
+//	 * @ejb.interface-method
+//	 * @ejb.permission role-name="_Guest_"
+//	 * @ejb.transaction type="Required"
+//	 */
+//	public Map<ScriptRegistryItemID, Script> getScripts(Collection<ScriptRegistryItemID> scriptItemsIDs)
+//	throws ModuleException
+//	{
+//		PersistenceManager pm;
+//		pm = getPersistenceManager();
+//		try {
+//			return ScriptRegistry.getScriptRegistry(pm).getScripts(scriptItemsIDs);
+//		} finally {
+//			pm.close();
+//		}
+//	} 
+//	
+//	/**
+//	 * @throws ModuleException
+//	 *
+//	 * @ejb.interface-method
+//	 * @ejb.permission role-name="_Guest_"
+//	 * @ejb.transaction type="Required"
+//	 */	
+////	public Set<ScriptRegistryItemID> getScriptIDs(String organisationID, String scriptRegistryItemType, int depth)
+//	public Set<ScriptRegistryItemID> getScriptIDs(String organisationID, String scriptRegistryItemType)	
+//	throws ModuleException
+//	{
+//		Collection<ScriptRegistryItemCarrier> topLevelCarrier = getTopLevelScriptRegistryItemCarriers(organisationID, scriptRegistryItemType);
+//		Set<ScriptRegistryItemID> scriptIDs = new HashSet<ScriptRegistryItemID>();		
+//		for (ScriptRegistryItemCarrier carrier : topLevelCarrier) {
+//			scriptIDs.add(carrier.getRegistryItemID());
+//			scriptIDs.addAll(carrier.getChildScriptRegistryItemIDs());
+//		}
+//		return scriptIDs;
+//	}
+
 }

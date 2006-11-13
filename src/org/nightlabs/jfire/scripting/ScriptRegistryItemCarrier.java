@@ -27,10 +27,13 @@
 package org.nightlabs.jfire.scripting;
 
 import java.io.Serializable;
+import java.util.ArrayList;
+import java.util.Collection;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Set;
 
+import org.nightlabs.ModuleException;
 import org.nightlabs.jfire.scripting.id.ScriptRegistryItemID;
 import org.nightlabs.util.Utils;
 
@@ -138,4 +141,13 @@ public class ScriptRegistryItemCarrier implements Serializable {
 		return Utils.equals(this.registryItemID, other.registryItemID);
 	}
 
+	public Collection<ScriptRegistryItemID> getChildScriptRegistryItemIDs()
+	throws ModuleException
+	{
+		Collection<ScriptRegistryItemID> childIDs = new ArrayList<ScriptRegistryItemID>(getChildCarriers().size());
+		for (ScriptRegistryItemCarrier childCarrier : getChildCarriers()) {
+			childIDs.add(childCarrier.getRegistryItemID());
+		}
+		return childIDs;
+	}	
 }

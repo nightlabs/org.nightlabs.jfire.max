@@ -25,34 +25,31 @@
  ******************************************************************************/
 package org.nightlabs.jfire.scripting.condition;
 
-import java.util.HashMap;
-import java.util.Map;
+import java.util.Set;
 
+import org.nightlabs.jfire.scripting.id.ScriptRegistryItemID;
 
 /**
  * @author Daniel.Mazurek [at] NightLabs [dot] de
  *
  */
-public class ConditionScriptRegistry 
+public abstract class AbstractScriptTypeContextProvider 
+extends AbstractConditionContextProvider
+implements IScriptTypeContextProvider
 {
-	private Map<String, IConditionContextProvider> context2ContextProvider;
-	protected Map<String, IConditionContextProvider> getContext2ContextProvider() {
-		if (context2ContextProvider == null) {
-			context2ContextProvider = new HashMap<String, IConditionContextProvider>();
-		}
-		return context2ContextProvider;
+
+	public AbstractScriptTypeContextProvider(String scriptRegistryItemID) {
+		super(scriptRegistryItemID);
+	}
+
+	public String getScriptRegistryItemType() {
+		return getConditionContext();
 	}
 	
-	public void registerConditionContextProvider(IConditionContextProvider contextProvider) 
-	{
-		if (contextProvider == null)
-			throw new IllegalArgumentException("Param contextProvider must NOT be null!");
-		
-		getContext2ContextProvider().put(contextProvider.getConditionContext(), contextProvider);
+	public Set<ScriptRegistryItemID> getAllowedScriptRegistryItemIDs() {
+		// TODO: call ScriptManager.getScriptIDs(null, getScriptRegistryItemType()) 
+		// to get all ScriptRegistryItemIDs of the same type
+		return null;
 	}
-	
-	public IConditionContextProvider getConditionContextProvider(String context) {
-		return getContext2ContextProvider().get(context);
-	}
-	
+
 }

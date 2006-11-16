@@ -29,6 +29,8 @@ import java.util.LinkedList;
 import java.util.List;
 
 /**
+ * The Implementation of the {@link IConditionContainer} Interface
+ * 
  * @author Daniel.Mazurek [at] NightLabs [dot] de
  *
  */

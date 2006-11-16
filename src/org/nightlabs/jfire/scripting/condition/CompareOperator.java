@@ -1,6 +1,9 @@
 package org.nightlabs.jfire.scripting.condition;
 
 /**
+ * This enum defines a certain set of compare operators which can be used
+ * for {@link ISimpleCondition}s
+ * 
  * @author Daniel.Mazurek [at] NightLabs [dot] de
  *
  */

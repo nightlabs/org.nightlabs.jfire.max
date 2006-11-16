@@ -31,6 +31,9 @@ import java.util.List;
 import org.nightlabs.util.CollectionUtil;
 
 /**
+ * The default Implementation of the {@link ICompareOperatorProvider} interface
+ * which can be used in nearly all cases
+ *  
  * @author Daniel.Mazurek [at] NightLabs [dot] de
  *
  */

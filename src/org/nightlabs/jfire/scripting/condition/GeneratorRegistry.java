@@ -29,6 +29,11 @@ import java.util.HashMap;
 import java.util.Map;
 
 /**
+ * A Registry which allows the registration of {@link ISyntaxGenerator} for 
+ * a certain language
+ * 
+ * This class is a singleton
+ * 
  * @author Daniel.Mazurek [at] NightLabs [dot] de
  *
  */

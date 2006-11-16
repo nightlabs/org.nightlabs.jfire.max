@@ -42,9 +42,27 @@ package org.nightlabs.jfire.scripting.condition;
 public interface IConditionContainer
 extends ICondition
 {
+	/**
+	 * adds a {@link ICondition} to the container 
+	 * @param condition the condition to add
+	 */
 	void addCondition(ICondition condition);
+	
+	/**
+	 * removes a {@link ICondition} from the container
+	 * @param condition the condition to remove
+	 */
 	void removeCondition(ICondition condition);
 	
+	/**
+	 * sets the {@link CombineOperator} for the container
+	 * @param combineOperator the combineOperator to set
+	 */
 	void setCombineOperator(CombineOperator combineOperator);
+	
+	/**
+	 * returns the {@link CombineOperator} of the container
+	 * @return the CombineOperator of the container
+	 */
 	CombineOperator getCombineOperator();
 }

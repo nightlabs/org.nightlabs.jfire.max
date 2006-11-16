@@ -1,6 +1,9 @@
 package org.nightlabs.jfire.scripting.condition;
 
 /**
+ * This enum defines a certian set of Combine Operators which can be used
+ * in a {@link IConditionContainer} to combine conditions
+ * 
  * @author Daniel.Mazurek [at] NightLabs [dot] de
  *
  */

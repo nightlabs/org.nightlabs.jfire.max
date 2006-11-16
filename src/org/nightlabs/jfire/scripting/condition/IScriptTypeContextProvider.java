@@ -26,11 +26,18 @@
 package org.nightlabs.jfire.scripting.condition;
 
 /**
+ * extends the {@link IConditionContextProvider} so far that the conditionContext
+ * is a scriptRegistryItemType
+ * 
  * @author Daniel.Mazurek [at] NightLabs [dot] de
  *
  */
 public interface IScriptTypeContextProvider 
 extends IConditionContextProvider 
 {
+	/**
+	 * 
+	 * @return the scriptRegistryItemType which is the conditionContext
+	 */
 	public String getScriptRegistryItemType();
 }

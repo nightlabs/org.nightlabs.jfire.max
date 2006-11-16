@@ -107,6 +107,7 @@ implements ISimpleCondition
 			"of the assigned ScriptConditioner");
 		}
 	}
+	
 	public String getValueAsString() 
 	{
 //		if (value != null)

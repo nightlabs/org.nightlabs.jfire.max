@@ -32,7 +32,6 @@ import java.util.Map;
 import javax.jdo.PersistenceManager;
 
 import org.nightlabs.jfire.organisation.LocalOrganisation;
-import org.nightlabs.jfire.scripting.id.ConditionScriptRegistryID;
 import org.nightlabs.jfire.scripting.id.ScriptRegistryItemID;
 
 
@@ -48,11 +47,11 @@ import org.nightlabs.jfire.scripting.id.ScriptRegistryItemID;
  *
  * @jdo.persistence-capable
  *		identity-type="application"
- *		objectid-class = "org.nightlabs.jfire.scripting.id.ConditionScriptRegistryID"
+ *		objectid-class = "org.nightlabs.jfire.scripting.condition.id.ConditionScriptRegistryID"
  *		detachable="true"
  *		table="JFireScripting_ConditionScriptRegistry"
  *
- * @jdo.create-objectid-class
+ * @jdo.create-objectid-class field-order="organisationID, conditionScriptRegistryID"
  * 
  * @jdo.inheritance strategy="new-table"
  */
@@ -62,30 +61,26 @@ public class ConditionScriptRegistry
 	 * @jdo.field primary-key="true"
 	 */
 	private int conditionScriptRegistryID;
-	
-	public static final ConditionScriptRegistryID SINGLETON_ID = ConditionScriptRegistryID.create(0); 
-	
+
 	public static ConditionScriptRegistry getConditionScriptRegistry(PersistenceManager pm)
 	{
 		Iterator it = pm.getExtent(ConditionScriptRegistry.class).iterator();
 		if (it.hasNext())
 			return (ConditionScriptRegistry) it.next();
 
-		ConditionScriptRegistry reg = new ConditionScriptRegistry(SINGLETON_ID.conditionScriptRegistryID);
-		pm.makePersistent(reg);
+		ConditionScriptRegistry reg = new ConditionScriptRegistry(LocalOrganisation.getLocalOrganisation(pm).getOrganisationID(), 0);
+		reg = (ConditionScriptRegistry) pm.makePersistent(reg);
 
 		try {
 			// TODO: register defaultContextProvider
 		} catch (Exception e) {
 			throw new RuntimeException(e);
 		}
-
-		reg.organisationID = LocalOrganisation.getLocalOrganisation(pm).getOrganisationID();
 		return reg;
 	}	
-	
+
 	/**
-	 * @jdo.field persistence-modifier="persistent"
+	 * @jdo.field primary-key="true"
 	 * @jdo.column length="100"
 	 */
 	private String organisationID;
@@ -98,10 +93,11 @@ public class ConditionScriptRegistry
 	/**
 	 * Don't call this constructor directly. Use {@link #getConditionScriptRegistry(PersistenceManager) } instead!
 	 */
-	protected ConditionScriptRegistry(int conditionScriptRegistryID) {
+	protected ConditionScriptRegistry(String organisationID, int conditionScriptRegistryID) {
+		this.organisationID = organisationID;
 		this.conditionScriptRegistryID = conditionScriptRegistryID;
 	}
-	
+
 	public int getConditionScriptRegistryID() {
 		return conditionScriptRegistryID;
 	}

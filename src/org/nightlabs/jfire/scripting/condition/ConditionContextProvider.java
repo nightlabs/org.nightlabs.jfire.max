@@ -46,6 +46,42 @@ import org.nightlabs.jfire.scripting.id.ScriptRegistryItemID;
 public class ConditionContextProvider 
 //implements IConditionContextProvider 
 {
+	/**
+	 * TODO: Because this class is incomplete without primary key fields and breaks the nightly build, I added this field. Marco.
+	 * 
+	 * @jdo.field primary-key="true"
+	 * @jdo.column length="100"
+	 */
+	private String organisationID;
+
+	/**
+	 * TODO: Because this class is incomplete without primary key fields and breaks the nightly build, I added this field. Marco.
+	 * 
+	 * @jdo.field primary-key="true"
+	 * @jdo.column length="100"
+	 */
+	private String conditionContextProviderID;
+
+	/**
+	 * TODO: Because your class was incomplete, I added this constructor. Marco.
+	 *
+	 * @deprecated Only for JDO!
+	 */
+	protected ConditionContextProvider()
+	{
+	}
+
+	/**
+	 * TODO: Because your class was incomplete, I added this constructor. Marco.
+	 * In case, you want to use another primary key (e.g. include {@link #conditionContext}
+	 * or replace {@link #conditionContextProviderID} by a long), please change this constructor
+	 * (and the fields, of course).
+	 */
+	public ConditionContextProvider(String organisationID, String conditionContextProviderID)
+	{
+		this.organisationID = organisationID;
+		this.conditionContextProviderID = conditionContextProviderID;
+	}
 
 	/**
 	 * @jdo.field

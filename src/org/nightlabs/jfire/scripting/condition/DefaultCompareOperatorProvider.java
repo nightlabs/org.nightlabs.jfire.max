@@ -73,10 +73,8 @@ implements ICompareOperatorProvider
 	protected List<CompareOperator> getAllOperators() 
 	{
 		if (allOperators == null) {
-			allOperators = CollectionUtil.enum2List(Enum.valueOf(CompareOperator.class, "EQUAL"));
-// TODO Hallo Daniel, warum schreibst Du das denn so kompliziert? Und außerdem mit einem gehardcodeted String!!!
-// Geht folgendes nicht?! Marco ;-)
-//			allOperators = CollectionUtil.enum2List(CompareOperator.EQUAL);
+//			allOperators = CollectionUtil.enum2List(Enum.valueOf(CompareOperator.class, "EQUAL"));
+			allOperators = CollectionUtil.enum2List(CompareOperator.EQUAL);			
 		}
 		return allOperators;
 	}

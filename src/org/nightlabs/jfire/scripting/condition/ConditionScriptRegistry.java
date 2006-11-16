@@ -26,33 +26,151 @@
 package org.nightlabs.jfire.scripting.condition;
 
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.Map;
+
+import javax.jdo.PersistenceManager;
+
+import org.nightlabs.jfire.organisation.LocalOrganisation;
+import org.nightlabs.jfire.scripting.id.ConditionScriptRegistryID;
+import org.nightlabs.jfire.scripting.id.ScriptRegistryItemID;
 
 
 /**
+ * <p>
+ * This class is the entry point for the management of {@link IConditionContextProvider}
+ * </p>
+ * <p>
+ * This is a JDO singleton - i.e. one instance per datastore managed by JDO.
+ * </p>
+ *
  * @author Daniel.Mazurek [at] NightLabs [dot] de
  *
+ * @jdo.persistence-capable
+ *		identity-type="application"
+ *		objectid-class = "org.nightlabs.jfire.scripting.id.ConditionScriptRegistryID"
+ *		detachable="true"
+ *		table="JFireScripting_ConditionScriptRegistry"
+ *
+ * @jdo.create-objectid-class
+ * 
+ * @jdo.inheritance strategy="new-table"
  */
 public class ConditionScriptRegistry 
 {
-	private Map<String, IConditionContextProvider> context2ContextProvider;
-	protected Map<String, IConditionContextProvider> getContext2ContextProvider() {
-		if (context2ContextProvider == null) {
-			context2ContextProvider = new HashMap<String, IConditionContextProvider>();
+	/**
+	 * @jdo.field primary-key="true"
+	 */
+	private int conditionScriptRegistryID;
+	
+	public static final ConditionScriptRegistryID SINGLETON_ID = ConditionScriptRegistryID.create(0); 
+	
+	public static ConditionScriptRegistry getConditionScriptRegistry(PersistenceManager pm)
+	{
+		Iterator it = pm.getExtent(ConditionScriptRegistry.class).iterator();
+		if (it.hasNext())
+			return (ConditionScriptRegistry) it.next();
+
+		ConditionScriptRegistry reg = new ConditionScriptRegistry(SINGLETON_ID.conditionScriptRegistryID);
+		pm.makePersistent(reg);
+
+		try {
+			// TODO: register defaultContextProvider
+		} catch (Exception e) {
+			throw new RuntimeException(e);
 		}
-		return context2ContextProvider;
+
+		reg.organisationID = LocalOrganisation.getLocalOrganisation(pm).getOrganisationID();
+		return reg;
+	}	
+	
+	/**
+	 * @jdo.field persistence-modifier="persistent"
+	 * @jdo.column length="100"
+	 */
+	private String organisationID;
+	
+	/**
+	 * @deprecated for JDO only 
+	 */
+	protected ConditionScriptRegistry() { }
+	
+	/**
+	 * Don't call this constructor directly. Use {@link #getConditionScriptRegistry(PersistenceManager) } instead!
+	 */
+	protected ConditionScriptRegistry(int conditionScriptRegistryID) {
+		this.conditionScriptRegistryID = conditionScriptRegistryID;
 	}
 	
-	public void registerConditionContextProvider(IConditionContextProvider contextProvider) 
+	public int getConditionScriptRegistryID() {
+		return conditionScriptRegistryID;
+	}
+	
+	/**
+	 * key: condition context<br/>
+	 * value: {@link ConditionContextProvider}
+	 *
+	 * @jdo.field
+	 *		persistence-modifier="persistent"
+	 *		collection-type="map"
+	 *		key-type="java.lang.String"
+	 *		value-type="org.nightlabs.jfire.scripting.condition.ConditionContextProvider"
+	 *		table="JFireScripting_ConditionScriptRegistry_context2ContextProvider"
+	 *		mapped-by="conditionContext"
+	 *
+	 * @jdo.key mapped-by="conditionContext"
+	 */	
+//	private Map context2ContextProvider = new HashMap();
+	private Map<String, ConditionContextProvider> context2ContextProvider = new HashMap<String, ConditionContextProvider>();
+	
+	/**
+	 * @param contextProvider the {@link ConditionContextProvider} to add
+	 */
+	public void registerConditionContextProvider(ConditionContextProvider contextProvider) 
 	{
 		if (contextProvider == null)
 			throw new IllegalArgumentException("Param contextProvider must NOT be null!");
 		
-		getContext2ContextProvider().put(contextProvider.getConditionContext(), contextProvider);
+		context2ContextProvider.put(contextProvider.getConditionContext(), contextProvider);		
 	}
 	
-	public IConditionContextProvider getConditionContextProvider(String context) {
-		return getContext2ContextProvider().get(context);
+	/**
+	 * @param contextProvider the {@link ConditionContextProvider} to remove
+	 */
+	public void unregisterConditionContextProvider(ConditionContextProvider contextProvider) 
+	{
+		if (contextProvider == null)
+			throw new IllegalArgumentException("Param contextProvider must NOT be null!");
+		
+		context2ContextProvider.remove(contextProvider.getConditionContext());		
+	}	
+	
+	/**
+	 * 
+	 * @param context the context to get the conditionContextProvider for 
+	 * @return the {@link ConditionContextProvider} for the given context or null
+	 * if no conditionContextProvider was registered for this context
+	 */
+	public ConditionContextProvider getConditionContextProvider(String context) {
+//		return (ConditionContextProvider) context2ContextProvider.get(context);
+		return context2ContextProvider.get(context);
 	}
 	
+	/**
+	 * key: {@link ScriptRegistryItemID} <br/>
+	 * value: {@link IPossibleValueProvider}
+	 *
+	 * @jdo.field
+	 *		persistence-modifier="persistent"
+	 *		collection-type="map"
+	 *		key-type="org.nightlabs.jfire.scripting.id.ScriptRegistryItemID"
+	 *		value-type="org.nightlabs.jfire.scripting.condition.IPossibleValueProvider"
+	 *		table="JFireScripting_ConditionScriptRegistry_scriptRegistryItemID2PossibleValueProvider"
+	 *
+	 * 
+	 */	
+//	private Map scriptRegistryItemID2PossibleValueProvider = new HashMap();
+	private Map<ScriptRegistryItemID, IPossibleValueProvider> scriptRegistryItemID2PossibleValueProvider = 
+		new HashMap<ScriptRegistryItemID, IPossibleValueProvider>();
+	 
 }

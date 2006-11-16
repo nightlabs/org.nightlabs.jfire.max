@@ -68,7 +68,7 @@ public class Script
 {
 	private static final long serialVersionUID = 1L;
 
-	public static final String QUERY_GET_SCRIPTS_BY_TYPE_AND_ID = "getScriptsByTypeAndID";
+	private static final String QUERY_GET_SCRIPTS_BY_TYPE_AND_ID = "getScriptsByTypeAndID";
 	public static Collection getScripts(PersistenceManager pm, String scriptRegistryItemType, String scriptRegistryItemID)
 	{
 		Query q = pm.newNamedQuery(Script.class, QUERY_GET_SCRIPTS_BY_TYPE_AND_ID);
@@ -76,7 +76,7 @@ public class Script
 				scriptRegistryItemType, scriptRegistryItemID);
 	}
 
-	public static final String QUERY_GET_SCRIPTS_BY_TYPE_AND_RESULT_CLASS = "getScriptsByTypeAndResultClass";
+	private static final String QUERY_GET_SCRIPTS_BY_TYPE_AND_RESULT_CLASS = "getScriptsByTypeAndResultClass";
 	public static Collection getScriptsByTypeAndResult(PersistenceManager pm, 
 			String scriptRegistryItemType, String resultClassName)
 	{

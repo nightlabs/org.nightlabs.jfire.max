@@ -25,49 +25,45 @@
  ******************************************************************************/
 package org.nightlabs.jfire.scripting.condition;
 
-import java.util.Set;
-
 import org.nightlabs.jfire.scripting.id.ScriptRegistryItemID;
 
 /**
  * @author Daniel.Mazurek [at] NightLabs [dot] de
+ * 
+ * @jdo.persistence-capable
+ *		identity-type="application"
+ *		objectid-class="org.nightlabs.jfire.scripting.id.AbstractPossibleValueProvider"
+ *		detachable="true"
+ *		table="JFireScripting_AbstractPossibleValueProvider"
+ *
+ * @jdo.inheritance strategy="subclass-table"
+ * 
+ * @jdo.create-objectid-class
  *
  */
-public interface IConditionContextProvider 
+public abstract class AbstractPossibleValueProvider 
+implements IPossibleValueProvider 
 {
-	/**
-	 * 
-	 * @return a {@link Set} of ScriptRegistryItemIDs which are legal in this context
-	 */
-	public Set<ScriptRegistryItemID> getAllowedScriptRegistryItemIDs();
+//	public AbstractPossibleValueProvider(ScriptRegistryItemID scriptID) {
+//		this.scriptRegistryItemID = scriptID;
+//	}
 	
-//	/**
-//	 * 
-//	 * @param scriptID the ScriptRegistryItemID to get the corresponding {@link ScriptConditioner} for 
-//	 * @return the corresponding {@link ScriptConditioner} for the given scriptID 
-//	 */
-//	public ScriptConditioner getScriptConditioner(ScriptRegistryItemID scriptID);
-			
 	/**
-	 * 
-	 * @return a String which is the context for the provider
-	 *  
+	 * @deprecated for JDO only 
+	 */
+	protected AbstractPossibleValueProvider() {
+		
+	}
+	
+	/**
+	 * @jdo.field persistence-modifier="persistent"
+	 * 						primary-key="true"
+	 * @jdo.column length="100"  
 	 */	
-	public String getConditionContext();
+	private ScriptRegistryItemID scriptRegistryItemID;
 	
-	/**
-	 * 
-	 * @param scriptID the ScriptRegistryItemID to get a variableName for
-	 * @return the variableName of the given ScriptRegistryItemID
-	 */
-	public String getVariableName(ScriptRegistryItemID scriptID); 
-	
-//	/**
-//	 * 
-//	 * @param scriptID the id of the script to get possible values for
-//	 * @return a List of Objects which are possible values for the result of script
-//	 * with the given ScriptRegistryItemID
-//	 * 
-//	 */
-//	public List<Object> getPossibleValues(ScriptRegistryItemID scriptID);
+	public ScriptRegistryItemID getScriptRegistryItemID() {
+		return scriptRegistryItemID;
+	}	
+
 }

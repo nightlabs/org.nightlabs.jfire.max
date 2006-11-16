@@ -25,91 +25,76 @@
  ******************************************************************************/
 package org.nightlabs.jfire.scripting.condition;
 
+import java.util.Set;
+
 import org.nightlabs.jfire.scripting.id.ScriptRegistryItemID;
 
 /**
- * The Base Interface for expressing simple condition which result is always a boolean
- * 
- * The structure of a simple condition always looks like this
- * [variable] [compareOperator] [value]
- * where the variable is expressed as a ScriptRegistryItemID
- * the compareOperator is a enum which describes the comapre operation
- * and the value must also be compatible to the type of the variable
- * 
  * @author Daniel.Mazurek [at] NightLabs [dot] de
+ * 
+ * @jdo.persistence-capable
+ *		identity-type="application"
+ *		objectid-class="org.nightlabs.jfire.accounting.pay.id.ConditionContextProviderID"
+ *		detachable="true"
+ *		table="JFireScripting_ConditionContextProvider"
+ *
+ * @jdo.inheritance strategy="new-table"
+ * 
+ * @jdo.create-objectid-class
  *
  */
-public interface ISimpleCondition
-extends ICondition
+public class ConditionContextProvider 
+//implements IConditionContextProvider 
 {
-//	/**
-//	 * 
-//	 * @param scriptID the ScriptRegistryItemID which reponds to the variable 
-//	 * of the simple condition
-//	 * 
-//	 */
-//	void setScriptRegistryItemID(ScriptRegistryItemID scriptID);
-//	
-//	/**
-//	 * 
-//	 * @return the ScriptRegistryItemID which reponds to the variable 
-//	 * of the simple condition
-//	 */
-//	ScriptRegistryItemID getScriptRegistryItemID();
 
 	/**
-	 * returns the name of the variable 
-	 * @return the name of the variable
-	 */
-	String getVariableName();
-	
-	/**
-	 * sets the variableName 
-	 * @param variableName the variableName to set
-	 */
-	void setVariableName(String variableName);
-	
-	/**
-	 * returns the value as string
-	 * @return the value as string
-	 */
-	String getValueAsString();
-	
-//	/**
-//	 * 
-//	 * @param value the value object
-//	 */
-//	void setValue(Object value);
+	 * @jdo.field
+	 *		persistence-modifier="persistent"
+	 *		collection-type="collection"
+	 *		element-type="org.nightlabs.jfire.scripting.id.ScriptRegistryItemID"
+	 */	
+	private Set scriptRegistryItemIDs;
 
 	/**
-	 * sets the value as String
-	 * @param s the value to set
+	 * 
+	 * @return a {@link Set} of {@link ScriptRegistryItemID}s for the context 
 	 */
-	void setValueAsString(String s);
+	public Set<ScriptRegistryItemID> getAllowedScriptRegistryItemIDs() {
+		return scriptRegistryItemIDs;
+	}
+
+	/**
+	 * adds a {@link ScriptRegistryItemID} to the context
+	 * @param scriptID the {@link ScriptRegistryItemID} to add
+	 */
+	public void addScriptRegistryItemID(ScriptRegistryItemID scriptID) {
+		scriptRegistryItemIDs.add(scriptID);
+	}
+
+	/**
+	 * removes a {@link ScriptRegistryItemID} from the context
+	 * @param scriptID the {@link ScriptRegistryItemID} to remove
+	 */
+	public void removeScriptRegistryItemID(ScriptRegistryItemID scriptID) {
+		scriptRegistryItemIDs.remove(scriptID);
+	}
+
+	/**
+	 * @jdo.field persistence-modifier="persistent"
+	 * @jdo.column length="100"
+	 */	
+	private String conditionContext;
 	
 	/**
-	 * returns the {@link CompareOperator} of the simple condition
-	 * @return the {@link CompareOperator} of the simple condition
+	 * returns the condition context
+	 * @return the condition context
 	 */
-	CompareOperator getCompareOperator();
+	public String getConditionContext() {
+		return conditionContext;
+	}
 	
-	/**
-	 * sets the compareOperator for the condition
-	 * @param compareOperator the {@link CompareOperator} of the condition to set
-	 */
-	void setCompareOperator(CompareOperator compareOperator);
-		
-//	/**
-//	 * 
-//	 * @param scriptID the {@link ScriptRegistryItemID} to get a
-//	 * {@link ScriptConditioner} for 
-//	 * @return the scriptConditioner for the given ScriptRegistryItemID
-//	 */
-//	ScriptConditioner getScriptConditioner(ScriptRegistryItemID scriptID);
-	
-//	/**
-//	 * @return the {@link ScriptConditioner} for the {@link ScriptRegistryItemID} of the
-//	 * condition
-//	 */
-//	ScriptConditioner getScriptConditioner();	
+//	public String getVariableName(ScriptRegistryItemID scriptID) {
+//		return null;
+//	}
+
 }

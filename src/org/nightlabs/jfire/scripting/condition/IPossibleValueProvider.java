@@ -25,31 +25,29 @@
  ******************************************************************************/
 package org.nightlabs.jfire.scripting.condition;
 
-import java.util.Set;
+import java.util.List;
 
 import org.nightlabs.jfire.scripting.id.ScriptRegistryItemID;
 
 /**
+ * This Interface is responsible for providing possible values for
+ * a certain ScriptRegistryItemID
+ *  
  * @author Daniel.Mazurek [at] NightLabs [dot] de
  *
  */
-public abstract class AbstractScriptTypeContextProvider 
-extends AbstractConditionContextProvider
-implements IScriptTypeContextProvider
-{
-
-	public AbstractScriptTypeContextProvider(String scriptRegistryItemID) {
-		super(scriptRegistryItemID);
-	}
-
-	public String getScriptRegistryItemType() {
-		return getConditionContext();
-	}
+public interface IPossibleValueProvider 
+{	
+	/**
+	 * @return a {@link List} of possible values for the result of the
+	 * script with the {@link ScriptRegistryItemID} which is returned by
+	 * {@link IPossibleValueProvider#getScriptRegistryItemID()}
+	 */
+	public List<Object> getPossibleValues();
 	
-	public Set<ScriptRegistryItemID> getAllowedScriptRegistryItemIDs() {
-		// TODO: call ScriptManager.getScriptIDs(null, getScriptRegistryItemType()) 
-		// to get all ScriptRegistryItemIDs of the same type
-		return null;
-	}
-
+	/**
+	 * 
+	 * @return the {@link ScriptRegistryItemID} 
+	 */
+	public ScriptRegistryItemID getScriptRegistryItemID();
 }

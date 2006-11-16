@@ -64,8 +64,18 @@ public interface ISyntaxGenerator
 	 */
 	String getVariableString(String variableName);
 	
+	/**
+	 * 
+	 * @return the String which represents the opening of a condition container, 
+	 * repectivly in many languages this represents a certain type of bracket
+	 */
 	String getOpenContainerString();
-	
+
+	/**
+	 * 
+	 * @return the String which represents the closing of a condition container, 
+	 * repectivly in many languages this represents a certain type of bracket
+	 */
 	String getCloseContainerString();
 	
 //	String getConditionString(IConditionContainer conatiner);

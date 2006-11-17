@@ -40,6 +40,16 @@ import org.nightlabs.util.CollectionUtil;
 public class DefaultCompareOperatorProvider
 implements ICompareOperatorProvider
 {
+	private static DefaultCompareOperatorProvider sharedInstance = null;
+	public static DefaultCompareOperatorProvider sharedInstance() {
+		if (sharedInstance == null) {
+			sharedInstance = new DefaultCompareOperatorProvider();			
+		}
+		return sharedInstance;
+	}
+	
+	protected DefaultCompareOperatorProvider() {}
+	
 	public List<CompareOperator> getCompareOperator(Class scriptResultClass) 
 	{
 		if (scriptResultClass.equals(String.class)) {
@@ -70,7 +80,7 @@ implements ICompareOperatorProvider
 	}
 	
 	private List<CompareOperator> allOperators;
-	protected List<CompareOperator> getAllOperators() 
+	public List<CompareOperator> getAllOperators() 
 	{
 		if (allOperators == null) {
 //			allOperators = CollectionUtil.enum2List(Enum.valueOf(CompareOperator.class, "EQUAL"));
@@ -80,7 +90,7 @@ implements ICompareOperatorProvider
 	}
 	
 	private List<CompareOperator> equalOperators;
-	protected List<CompareOperator> getEqualOperators() 
+	public List<CompareOperator> getEqualOperators() 
 	{
 		if (equalOperators == null) {
 			equalOperators = new ArrayList<CompareOperator>(2);

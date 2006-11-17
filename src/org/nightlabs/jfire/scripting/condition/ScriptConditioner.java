@@ -25,6 +25,7 @@
  ******************************************************************************/
 package org.nightlabs.jfire.scripting.condition;
 
+import java.util.Collection;
 import java.util.List;
 
 import org.nightlabs.jfire.scripting.id.ScriptRegistryItemID;
@@ -37,7 +38,7 @@ public class ScriptConditioner
 {
 	public ScriptConditioner(ScriptRegistryItemID scriptID, String variableName, 
 			List<CompareOperator> compareOperators, 
-			List<Object> possibleValues, ILabelProvider valueLabelProvider) 
+			Collection<Object> possibleValues, ILabelProvider valueLabelProvider) 
 	{
 		if (scriptID == null)
 			throw new IllegalArgumentException("Param scriptID must NOT be null!");
@@ -76,11 +77,11 @@ public class ScriptConditioner
 		this.variableName = variableName;
 	}
 	
-	private List<Object> possibleValues;
-	public List<Object> getPossibleValues() {
+	private Collection<Object> possibleValues;
+	public Collection<Object> getPossibleValues() {
 		return possibleValues;
 	}
-	public void setPossibleValues(List<Object> possibleValues) {
+	public void setPossibleValues(Collection<Object> possibleValues) {
 		this.possibleValues = possibleValues;
 	}
 	

@@ -35,6 +35,9 @@ implements ILabelProvider
 
 	public String getText(Object object) 
 	{
+		// TODO: check first with reflection if the object contains a field which is
+		// assignable from I18nText and return the value of the Locale.getDefault().getLanguage()
+
 		if (object != null)
 			return object.toString();
 		

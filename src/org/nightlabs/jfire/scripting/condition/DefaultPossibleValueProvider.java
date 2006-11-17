@@ -38,40 +38,33 @@ import javax.jdo.spi.PersistenceCapable;
 import org.apache.log4j.Logger;
 import org.nightlabs.jfire.scripting.Script;
 import org.nightlabs.jfire.scripting.ScriptRegistry;
+import org.nightlabs.jfire.scripting.id.ScriptRegistryItemID;
 
 /**
- * The default implementation of the IPossibleValueProvider,
- * takes the result of the script with the given ScriptRegistryItemID
- * and returns the extent of all instances of the same class as possible
+ * The default PossibleValueProvider,
+ * takes the resultClass of the script with the given ScriptRegistryItemID
+ * and returns all instances of the same class as possible
  * values, from the datastore.
  *  
  * @author Daniel.Mazurek [at] NightLabs [dot] de
  *
  */
 public class DefaultPossibleValueProvider 
-extends AbstractPossibleValueProvider 
+extends PossibleValueProvider 
 {
 	private static final Logger logger = Logger.getLogger(DefaultPossibleValueProvider.class);
-	
-//	public DefaultPossibleValueProvider(ScriptRegistryItemID scriptID,
-//			PersistenceManager pm) 
-//	{
-//		super(scriptID);
-//		this.pm = pm;
-//	}
-//	private PersistenceManager pm;
-	
-//	public DefaultPossibleValueProvider(ScriptRegistryItemID scriptID) {
-//		super(scriptID);
-//	}
+		
+	public DefaultPossibleValueProvider(ScriptRegistryItemID scriptID) {
+		super(scriptID);
+	}
 	
 	private static final List<Object> EMPTY_LIST = new ArrayList<Object>(0);
 	public List<Object> getPossibleValues() 
 	{
 		PersistenceManager pm = JDOHelper.getPersistenceManager(this);
 		ScriptRegistry scriptRegistry = ScriptRegistry.getScriptRegistry(pm);
-		Script script = scriptRegistry.getScript(getScriptRegistryItemID().scriptRegistryItemType, 
-				getScriptRegistryItemID().scriptRegistryItemID);
+		Script script = scriptRegistry.getScript(getScriptRegistryItemType(), 
+				getScriptRegistryItemID());
 		try {
 			Class resultClass = script.getResultClass();
 			if (PersistenceCapable.class.isAssignableFrom(resultClass)) {
@@ -122,5 +115,5 @@ extends AbstractPossibleValueProvider
 //		}
 //		return EMPTY_LIST;
 //	}
-
+	 
 }

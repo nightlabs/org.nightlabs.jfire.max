@@ -34,34 +34,52 @@ import org.nightlabs.jfire.scripting.id.ScriptRegistryItemID;
  * 
  * @jdo.persistence-capable
  *		identity-type="application"
- *		objectid-class="org.nightlabs.jfire.accounting.pay.id.ConditionContextProviderID"
+ *		objectid-class="org.nightlabs.jfire.scripting.condition.id.ConditionContextProviderID"
  *		detachable="true"
  *		table="JFireScripting_ConditionContextProvider"
  *
  * @jdo.inheritance strategy="new-table"
  * 
- * @jdo.create-objectid-class
+ * @jdo.create-objectid-class field-order="organisationID, conditionContextProviderID"
  *
  */
 public class ConditionContextProvider 
 //implements IConditionContextProvider 
 {
-	/**
-	 * TODO: Because this class is incomplete without primary key fields and breaks the nightly build, I added this field. Marco.
-	 * 
+	/** 
 	 * @jdo.field primary-key="true"
 	 * @jdo.column length="100"
 	 */
 	private String organisationID;
 
-	/**
-	 * TODO: Because this class is incomplete without primary key fields and breaks the nightly build, I added this field. Marco.
-	 * 
+//	/**
+//	 * @jdo.field primary-key="true"
+//	 * @jdo.column length="100"
+//	 */	
+//	private String conditionContext;
+//	
+//	/**
+//	 * returns the condition context
+//	 * @return the condition context
+//	 */
+//	public String getConditionContext() {
+//		return conditionContext;
+//	}
+	
+	/** 
 	 * @jdo.field primary-key="true"
 	 * @jdo.column length="100"
 	 */
 	private String conditionContextProviderID;
 
+	/**
+	 * 
+	 * @return the conditonContextProviderID
+	 */
+	public String getConditionContextProviderID() {
+		return conditionContextProviderID;
+	}
+	
 	/**
 	 * TODO: Because your class was incomplete, I added this constructor. Marco.
 	 *
@@ -72,15 +90,14 @@ public class ConditionContextProvider
 	}
 
 	/**
-	 * TODO: Because your class was incomplete, I added this constructor. Marco.
-	 * In case, you want to use another primary key (e.g. include {@link #conditionContext}
-	 * or replace {@link #conditionContextProviderID} by a long), please change this constructor
-	 * (and the fields, of course).
+	 * @param organisationID the organisationID
+	 * @param conditionContextProviderID the id for the context
 	 */
 	public ConditionContextProvider(String organisationID, String conditionContextProviderID)
 	{
 		this.organisationID = organisationID;
 		this.conditionContextProviderID = conditionContextProviderID;
+//		this.conditionContext = conditionContext;
 	}
 
 	/**
@@ -92,13 +109,21 @@ public class ConditionContextProvider
 	private Set scriptRegistryItemIDs;
 
 	/**
-	 * 
+	 * returns a {@link Set} of {@link ScriptRegistryItemID}s for the context 
 	 * @return a {@link Set} of {@link ScriptRegistryItemID}s for the context 
 	 */
-	public Set<ScriptRegistryItemID> getAllowedScriptRegistryItemIDs() {
+	public Set<ScriptRegistryItemID> getScriptRegistryItemIDs() {
 		return scriptRegistryItemIDs;
 	}
 
+	/**
+	 * sets the set of scriptRegistryItemIDs for the context
+	 * @param scriptRegistryItemIDs the scriptRegistryItemIDs to set
+	 */
+	public void setScriptRegistryItemIDs(Set<ScriptRegistryItemID> scriptRegistryItemIDs) {
+		this.scriptRegistryItemIDs = scriptRegistryItemIDs;
+	}
+	
 	/**
 	 * adds a {@link ScriptRegistryItemID} to the context
 	 * @param scriptID the {@link ScriptRegistryItemID} to add
@@ -113,20 +138,6 @@ public class ConditionContextProvider
 	 */
 	public void removeScriptRegistryItemID(ScriptRegistryItemID scriptID) {
 		scriptRegistryItemIDs.remove(scriptID);
-	}
-
-	/**
-	 * @jdo.field persistence-modifier="persistent"
-	 * @jdo.column length="100"
-	 */	
-	private String conditionContext;
-	
-	/**
-	 * returns the condition context
-	 * @return the condition context
-	 */
-	public String getConditionContext() {
-		return conditionContext;
 	}
 	
 //	public String getVariableName(ScriptRegistryItemID scriptID) {

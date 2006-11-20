@@ -138,9 +138,9 @@ metaData.addColumn("PostCode", DataType.STRING);</property>
             <property name="fetchScript">importPackage(Packages.org.nightlabs.jfire.accounting);
 importPackage(Packages.org.nightlabs.jfire.person);
 
-invoiceOrganisationID = p_1;
-invoiceInvoiceID = p_2;
-languageID = p_3;
+invoiceOrganisationID = param1;
+invoiceInvoiceID = param2;
+languageID = param3;
 
 q = persistenceManager.newQuery(
 	persistenceManager.getExtent(
@@ -268,10 +268,10 @@ metaData.addColumn("amount", DataType.BIGDECIMAL);
             <property name="fetchScript">importPackage(Packages.org.nightlabs.jfire.accounting);
 importPackage(Packages.org.nightlabs.jfire.person);
 
-invoiceOrganisationID = p_1;
-invoiceIDPrefix = p_2;
-invoiceInvoiceID = p_3;
-languageID = p_4;
+invoiceOrganisationID = param1;
+invoiceIDPrefix = param2;
+invoiceInvoiceID = param3;
+languageID = param4;
 
 q = persistenceManager.newQuery(
 	persistenceManager.getExtent(

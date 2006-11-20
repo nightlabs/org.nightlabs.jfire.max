@@ -49,6 +49,8 @@ import org.nightlabs.jdo.moduleregistry.ModuleMetaData;
 import org.nightlabs.jfire.accounting.Tariff;
 import org.nightlabs.jfire.accounting.id.TariffID;
 import org.nightlabs.jfire.accounting.tariffpriceconfig.FormulaPriceConfig;
+import org.nightlabs.jfire.accounting.tariffpriceconfig.IResultPriceConfig;
+import org.nightlabs.jfire.accounting.tariffpriceconfig.PriceCalculator;
 import org.nightlabs.jfire.base.BaseSessionBeanImpl;
 import org.nightlabs.jfire.organisation.Organisation;
 import org.nightlabs.jfire.security.User;
@@ -454,6 +456,13 @@ implements SessionBean
 						User.getUser(pm, getPrincipal()),
 						productType,
 						SimpleProductTypeActionHandler.getDefaultHome(pm, productType));
+
+				// make sure the prices are correct
+				((IResultPriceConfig)productType.getPackagePriceConfig()).adoptParameters(
+						productType.getInnerPriceConfig());
+				PriceCalculator priceCalculator = new PriceCalculator(productType);
+				priceCalculator.preparePriceCalculation();
+				priceCalculator.calculatePrices();
 			}
 			// now, productType is attached to the datastore in any case
 

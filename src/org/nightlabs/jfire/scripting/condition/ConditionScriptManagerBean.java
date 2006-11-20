@@ -44,7 +44,7 @@ import org.nightlabs.jfire.scripting.Script;
 import org.nightlabs.jfire.scripting.ScriptRegistry;
 import org.nightlabs.jfire.scripting.id.ScriptRegistryItemID;
 
-import quicktime.std.qtcomponents.SCInfo;
+
 
 /**
  * @author Daniel.Mazurek [at] NightLabs [dot] de

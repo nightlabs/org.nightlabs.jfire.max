@@ -25,7 +25,12 @@
  ******************************************************************************/
 package org.nightlabs.jfire.scripting.condition;
 
+import java.util.Collection;
+import java.util.HashSet;
 import java.util.Set;
+
+import javax.jdo.PersistenceManager;
+import javax.jdo.Query;
 
 import org.nightlabs.jfire.scripting.id.ScriptRegistryItemID;
 
@@ -42,29 +47,31 @@ import org.nightlabs.jfire.scripting.id.ScriptRegistryItemID;
  * 
  * @jdo.create-objectid-class field-order="organisationID, conditionContextProviderID"
  *
+ * @jdo.query
+ *		name="getConditionProviderByOrganisationIDAndProviderID"
+ *		query="SELECT
+ *			WHERE
+ *				this.conditionContextProviderID == pConditionContextProviderID &&
+ *				this.organisationID == pOrganisationID
+ *			PARAMETERS pConditionContextProviderID, pOrganisationID
+ *			import java.lang.String"
  */
 public class ConditionContextProvider 
 //implements IConditionContextProvider 
 {
+	public static ConditionContextProvider getConditionContextProvider(PersistenceManager pm, 
+			String organisationID, String conditionContextProviderID) 
+	{
+		Query q = pm.newNamedQuery(ConditionContextProvider.class, "getConditionProviderByOrganisationIDAndProviderID");
+		Collection providers = (Collection) q.execute(organisationID, conditionContextProviderID); 
+		return (ConditionContextProvider) providers.iterator().next();
+	}
+	
 	/** 
 	 * @jdo.field primary-key="true"
 	 * @jdo.column length="100"
 	 */
 	private String organisationID;
-
-//	/**
-//	 * @jdo.field primary-key="true"
-//	 * @jdo.column length="100"
-//	 */	
-//	private String conditionContext;
-//	
-//	/**
-//	 * returns the condition context
-//	 * @return the condition context
-//	 */
-//	public String getConditionContext() {
-//		return conditionContext;
-//	}
 	
 	/** 
 	 * @jdo.field primary-key="true"
@@ -78,6 +85,14 @@ public class ConditionContextProvider
 	 */
 	public String getConditionContextProviderID() {
 		return conditionContextProviderID;
+	}
+	
+	/**
+	 * 
+	 * @return the organisationID
+	 */
+	public String getOrganisationID() {
+		return organisationID;
 	}
 	
 	/**
@@ -106,7 +121,7 @@ public class ConditionContextProvider
 	 *		collection-type="collection"
 	 *		element-type="org.nightlabs.jfire.scripting.id.ScriptRegistryItemID"
 	 */	
-	private Set scriptRegistryItemIDs;
+	private Set<ScriptRegistryItemID> scriptRegistryItemIDs = new HashSet<ScriptRegistryItemID>();
 
 	/**
 	 * returns a {@link Set} of {@link ScriptRegistryItemID}s for the context 

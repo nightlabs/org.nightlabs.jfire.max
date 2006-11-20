@@ -30,6 +30,7 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import javax.ejb.CreateException;
 import javax.ejb.EJBException;
@@ -146,6 +147,29 @@ implements SessionBean
 			scriptID2ScriptConditioner.put(itemID, sc);
 		}
 		return scriptID2ScriptConditioner;
+	}
+	
+	/**
+	 * @throws ModuleException
+	 *
+	 * @ejb.interface-method
+	 * @ejb.permission role-name="_Guest_"
+	 * @ejb.transaction type = "Required"
+	 */	
+	public Map<ScriptRegistryItemID, ScriptConditioner> getScriptConditioner(String organisationID, 
+			String conditionContextProviderID)
+	throws ModuleException
+	{
+		PersistenceManager pm;
+		pm = getPersistenceManager();
+		try {
+			ConditionContextProvider provider = ConditionContextProvider.getConditionContextProvider(
+					pm, organisationID, conditionContextProviderID);
+			Set<ScriptRegistryItemID> scriptIDs = provider.getScriptRegistryItemIDs();
+			return getScriptConditioner(scriptIDs);
+		} finally {
+			pm.close();
+		}		
 	}
 	
 }

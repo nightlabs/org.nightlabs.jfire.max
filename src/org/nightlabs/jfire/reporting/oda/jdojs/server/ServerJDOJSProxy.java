@@ -26,6 +26,7 @@
 
 package org.nightlabs.jfire.reporting.oda.jdojs.server;
 
+import java.util.Iterator;
 import java.util.Map;
 
 import javax.jdo.PersistenceManager;
@@ -38,15 +39,12 @@ import org.mozilla.javascript.ImporterTopLevel;
 import org.mozilla.javascript.Scriptable;
 import org.mozilla.javascript.ScriptableObject;
 import org.nightlabs.ModuleException;
-import org.nightlabs.jfire.base.Lookup;
 import org.nightlabs.jfire.reporting.oda.DataType;
 import org.nightlabs.jfire.reporting.oda.ResultSet;
 import org.nightlabs.jfire.reporting.oda.ResultSetMetaData;
 import org.nightlabs.jfire.reporting.oda.jdojs.AbstractJDOJSProxy;
 import org.nightlabs.jfire.reporting.oda.jdojs.JDOJSResultSet;
 import org.nightlabs.jfire.reporting.oda.jdojs.JDOJSResultSetMetaData;
-import org.nightlabs.jfire.security.SecurityReflector;
-import org.nightlabs.jfire.security.SecurityReflector.UserDescriptor;
 
 /**
  * Server-side JDO JavaScript DataSets. Its method are also called
@@ -221,33 +219,21 @@ public class ServerJDOJSProxy extends AbstractJDOJSProxy {
 						logger.debug("*****************************************");
 						logger.debug("*****************************************");
 						logger.debug("*********   JDOJSDriver Params: ");
-					}
 					
-//					for (Iterator iter = parameters.entrySet().iterator(); iter.hasNext();) {
-//						Map.Entry entry = (Map.Entry) iter.next();
-//						if(logger.isDebugEnabled())
-//							logger.debug("*********   "+entry.getKey()+": "+entry.getValue());
-//						int paramId = ((Integer)entry.getKey()).intValue();
-//						
-//						String paramName = (parameterMetaData == null) ? null : parameterMetaData.getParameterTypeName(paramId);
-//						if (paramName == null)
-//							paramName = "p_"+paramId;
-//						else
-//							paramName = "p_"+paramName;
-//						Object js_param = Context.javaToJS(entry.getValue(), scope);
-//						ScriptableObject.putProperty(scope, paramName, js_param);						
-//					}
+						for (Iterator iter = parameters.entrySet().iterator(); iter.hasNext();) {
+							Map.Entry entry = (Map.Entry) iter.next();
+							logger.debug("*********   "+entry.getKey()+": "+entry.getValue());
+						}
+						
+						logger.debug("*****************************************");
+						logger.debug("*****************************************");
+						logger.debug("*****************************************");
+					}
 					
 					// deactivate part above as parameternames are now mapped by Query itself					
 					for (Map.Entry<String, Object> paramEntry : parameters.entrySet()) {
 						Object js_param = Context.javaToJS(paramEntry.getValue(), scope);
 						ScriptableObject.putProperty(scope, paramEntry.getKey(), js_param);						
-					}
-					
-					if(logger.isDebugEnabled()) {
-						logger.debug("*****************************************");
-						logger.debug("*****************************************");
-						logger.debug("*****************************************");
 					}
 					
 					if(logger.isDebugEnabled())
@@ -268,3 +254,4 @@ public class ServerJDOJSProxy extends AbstractJDOJSProxy {
 		}
 	}
 }
+

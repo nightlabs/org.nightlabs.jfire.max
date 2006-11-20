@@ -27,7 +27,9 @@ package org.nightlabs.jfire.scripting.condition;
 
 import java.rmi.RemoteException;
 import java.util.Collection;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import javax.ejb.CreateException;
 import javax.ejb.EJBException;
@@ -41,6 +43,8 @@ import org.nightlabs.jfire.base.BaseSessionBeanImpl;
 import org.nightlabs.jfire.scripting.Script;
 import org.nightlabs.jfire.scripting.ScriptRegistry;
 import org.nightlabs.jfire.scripting.id.ScriptRegistryItemID;
+
+import quicktime.std.qtcomponents.SCInfo;
 
 /**
  * @author Daniel.Mazurek [at] NightLabs [dot] de
@@ -124,4 +128,24 @@ implements SessionBean
 			pm.close();
 		}
 	}
+	
+	/**
+	 * @throws ModuleException
+	 *
+	 * @ejb.interface-method
+	 * @ejb.permission role-name="_Guest_"
+	 * @ejb.transaction type = "Required"
+	 */
+	public Map<ScriptRegistryItemID, ScriptConditioner> getScriptConditioner(Collection<ScriptRegistryItemID> scriptIDs)
+	throws ModuleException
+	{
+		Map<ScriptRegistryItemID, ScriptConditioner> scriptID2ScriptConditioner = 
+			new HashMap<ScriptRegistryItemID, ScriptConditioner>(scriptIDs.size());		
+		for (ScriptRegistryItemID itemID : scriptIDs) {
+			ScriptConditioner sc = getScriptConditioner(itemID);
+			scriptID2ScriptConditioner.put(itemID, sc);
+		}
+		return scriptID2ScriptConditioner;
+	}
+	
 }

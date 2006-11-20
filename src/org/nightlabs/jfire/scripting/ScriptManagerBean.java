@@ -105,8 +105,8 @@ implements SessionBean
 	 * @throws ModuleException
 	 *
 	 * @ejb.interface-method
-	 * @ejb.permission role-name="JFireReport-admin"
-	 * @ejb.transaction type = "Required"
+	 * @ejb.permission role-name="_System_"
+	 * @ejb.transaction type="Required"
 	 */
 	public void initialize() 
 	throws ModuleException 

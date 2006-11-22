@@ -27,9 +27,7 @@
 package org.nightlabs.jfire.scripting;
 
 import java.io.Serializable;
-import java.util.ArrayList;
 import java.util.Collection;
-import java.util.Set;
 
 import javax.jdo.JDODetachedFieldAccessException;
 import javax.jdo.JDOHelper;
@@ -39,8 +37,6 @@ import javax.jdo.Query;
 import javax.jdo.listener.StoreCallback;
 
 import org.apache.log4j.Logger;
-import org.nightlabs.ModuleException;
-import org.nightlabs.jfire.scripting.id.ScriptRegistryItemID;
 import org.nightlabs.util.Utils;
 
 /**

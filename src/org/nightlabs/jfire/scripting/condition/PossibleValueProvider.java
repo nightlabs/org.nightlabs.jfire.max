@@ -26,7 +26,6 @@
 package org.nightlabs.jfire.scripting.condition;
 
 import java.util.Collection;
-import java.util.Collections;
 
 import javax.jdo.PersistenceManager;
 import javax.jdo.Query;

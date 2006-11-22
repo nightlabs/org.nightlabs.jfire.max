@@ -25,7 +25,6 @@
  ******************************************************************************/
 package org.nightlabs.jfire.scripting.condition;
 
-import org.nightlabs.jfire.scripting.id.ScriptRegistryItemID;
 
 /**
  * The Base Interface for expressing simple condition which result is always a boolean

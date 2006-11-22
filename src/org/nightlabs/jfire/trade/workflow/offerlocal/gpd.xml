@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<process-diagram name="Offer" width="808" height="526">
+  <node name="Created" x="234" y="115" width="140" height="40">
+    <transition name="tr0">
+      <label x="5" y="-10"/>
+    </transition>
+  </node>
+  <node name="Rejected" x="233" y="346" width="140" height="40"/>
+  <node name="Accepted" x="53" y="349" width="140" height="40"/>
+  <node name="Final" x="233" y="211" width="140" height="40">
+    <transition name="tr1">
+      <label x="5" y="-10"/>
+    </transition>
+    <transition name="tr2">
+      <label x="5" y="-10"/>
+    </transition>
+    <transition name="tr3">
+      <label x="5" y="-10"/>
+    </transition>
+  </node>
+  <node name="Expired" x="406" y="346" width="140" height="40"/>
+</process-diagram>

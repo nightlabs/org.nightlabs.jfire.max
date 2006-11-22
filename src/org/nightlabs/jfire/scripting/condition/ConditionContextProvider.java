@@ -25,6 +25,7 @@
  ******************************************************************************/
 package org.nightlabs.jfire.scripting.condition;
 
+import java.io.Serializable;
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.Set;
@@ -47,25 +48,34 @@ import org.nightlabs.jfire.scripting.id.ScriptRegistryItemID;
  * 
  * @jdo.create-objectid-class field-order="organisationID, conditionContextProviderID"
  *
+ * @jdo.fetch-group name="ConditionContextProvider.scriptRegistryItemIDs" fetch-groups="default" fields="scriptRegistryItemIDs"
+ * @jdo.fetch-group name="ConditionContextProvider.this" fetch-groups="default, ConditionContextProvider.this" fields="scriptRegistryItemIDs"
+ *
  * @jdo.query
  *		name="getConditionProviderByOrganisationIDAndProviderID"
  *		query="SELECT
  *			WHERE
  *				this.conditionContextProviderID == pConditionContextProviderID &&
  *				this.organisationID == pOrganisationID
- *			PARAMETERS pConditionContextProviderID, pOrganisationID
+ *			PARAMETERS String pConditionContextProviderID, String pOrganisationID
  *			import java.lang.String"
  */
 public class ConditionContextProvider 
-//implements IConditionContextProvider 
+//implements IConditionContextProvider
+implements Serializable
 {
+	private static final long serialVersionUID = 1L;
+	
 	public static ConditionContextProvider getConditionContextProvider(PersistenceManager pm, 
 			String organisationID, String conditionContextProviderID) 
 	{
-		Query q = pm.newNamedQuery(ConditionContextProvider.class, "getConditionProviderByOrganisationIDAndProviderID");
-		Collection providers = (Collection) q.execute(organisationID, conditionContextProviderID); 
+		Query q = pm.newNamedQuery(ConditionContextProvider.class, "getConditionProviderByOrganisationIDAndProviderID"); 
+		Collection providers = (Collection) q.execute(conditionContextProviderID, organisationID);		
 		return (ConditionContextProvider) providers.iterator().next();
 	}
+	
+	public static final String FETCH_GROUP_SCRIPT_REGISTRY_ITEM_IDS = "ConditionContextProvider.scriptRegistryItemIDs";
+	public static final String FETCH_GROUP_THIS_CONDITION_CONTEXT_PROVIDER = "ConditionContextProvider.this";
 	
 	/** 
 	 * @jdo.field primary-key="true"

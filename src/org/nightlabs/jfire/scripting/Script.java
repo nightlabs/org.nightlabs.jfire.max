@@ -50,7 +50,7 @@ import javax.jdo.Query;
  *			WHERE
  *				this.scriptRegistryItemType == pScriptRegistryItemType &&
  *				this.scriptRegistryItemID == pScriptRegistryItemID
- *			PARAMETERS pScriptRegistryItemType, pScriptRegistryItemID
+ *			PARAMETERS String pScriptRegistryItemType, String pScriptRegistryItemID
  *			import java.lang.String"
  *
  * @jdo.query
@@ -59,7 +59,7 @@ import javax.jdo.Query;
  *			WHERE
  *				this.scriptRegistryItemType == pScriptRegistryItemType &&
  *				this.resultClassName == pResultClassName
- *			PARAMETERS pScriptRegistryItemType, pResultClassName
+ *			PARAMETERS String pScriptRegistryItemType, String pResultClassName
  *			import java.lang.String"
  */
 public class Script

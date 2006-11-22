@@ -27,7 +27,9 @@ package org.nightlabs.jfire.scripting.condition;
 
 import java.rmi.RemoteException;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -36,13 +38,18 @@ import javax.ejb.CreateException;
 import javax.ejb.EJBException;
 import javax.ejb.SessionBean;
 import javax.ejb.SessionContext;
+import javax.jdo.JDOHelper;
+import javax.jdo.JDOObjectNotFoundException;
 import javax.jdo.PersistenceManager;
 
 import org.apache.log4j.Logger;
 import org.nightlabs.ModuleException;
+import org.nightlabs.jdo.NLJDOHelper;
 import org.nightlabs.jfire.base.BaseSessionBeanImpl;
 import org.nightlabs.jfire.scripting.Script;
 import org.nightlabs.jfire.scripting.ScriptRegistry;
+import org.nightlabs.jfire.scripting.condition.id.ConditionContextProviderID;
+import org.nightlabs.jfire.scripting.condition.id.PossibleValueProviderID;
 import org.nightlabs.jfire.scripting.id.ScriptRegistryItemID;
 
 
@@ -118,12 +125,35 @@ implements SessionBean
 			} catch (ClassNotFoundException e) {
 				logger.error("script resultClass "+script.getResultClassName()+" of script with scriptRegistryItemID "+scriptRegistryItemID+" could not be found", e);
 			}
-			PossibleValueProvider valueProvider = PossibleValueProvider.getPossibleValueProvider(pm, scriptRegistryItemID);
-			Collection possibleValues = valueProvider.getPossibleValues();
-			ILabelProvider valueLabelProvider = valueProvider.getLabelProvider();
+			
+			Collection possibleValues = Collections.EMPTY_LIST;
+			ILabelProvider valueLabelProvider = new LabelProvider();			
+//			PossibleValueProvider valueProvider = PossibleValueProvider.getPossibleValueProvider(pm, scriptRegistryItemID);
+			PossibleValueProviderID valueProviderID = PossibleValueProviderID.create(
+					scriptRegistryItemID.organisationID, 
+					scriptRegistryItemID.scriptRegistryItemType, 
+					scriptRegistryItemID.scriptRegistryItemID);
+			try {
+				PossibleValueProvider valueProvider = (PossibleValueProvider) pm.getObjectById(valueProviderID);
+				pm.getFetchPlan().setGroup(PossibleValueProvider.FETCH_GROUP_THIS_POSSIBLE_VALUE_PROVIDER);
+				valueProvider = (PossibleValueProvider) pm.detachCopy(valueProvider);				
+				possibleValues = valueProvider.getPossibleValues();
+				valueLabelProvider = valueProvider.getLabelProvider();								
+			} catch (JDOObjectNotFoundException e) {
+				// do nothing but use default values
+			}
 			
 			ScriptConditioner sc = new ScriptConditioner(scriptRegistryItemID, variableName, 
 					compareOperators, possibleValues, valueLabelProvider);
+			
+//			if (logger.isDebugEnabled()) {
+				logger.info("scriptRegistryItemID = "+scriptRegistryItemID);
+				logger.info("variableName = "+variableName);
+				logger.info("scriptResultClass = "+script.getResultClassName());
+				logger.info("compareOperators.size() = "+compareOperators.size());
+				logger.info("possibleValues.size() = "+possibleValues.size());	
+				logger.info("valueLabelProvider = "+valueLabelProvider);				
+//			}
 			return sc;
 		} finally {
 			pm.close();
@@ -163,9 +193,25 @@ implements SessionBean
 		PersistenceManager pm;
 		pm = getPersistenceManager();
 		try {
-			ConditionContextProvider provider = ConditionContextProvider.getConditionContextProvider(
-					pm, organisationID, conditionContextProviderID);
+//			ConditionContextProvider provider = ConditionContextProvider.getConditionContextProvider(
+//					pm, organisationID, conditionContextProviderID);			
+//			Set<ScriptRegistryItemID> scriptIDs = provider.getScriptRegistryItemIDs();
+			
+			ConditionContextProviderID providerID = ConditionContextProviderID.create(organisationID, conditionContextProviderID);
+			List providers = NLJDOHelper.getDetachedObjectList(
+					pm, new Object[] {providerID}, null, 
+					new String[] {ConditionContextProvider.FETCH_GROUP_SCRIPT_REGISTRY_ITEM_IDS}, 
+					NLJDOHelper.MAX_FETCH_DEPTH_NO_LIMIT);
+			
+			ConditionContextProvider provider = (ConditionContextProvider) providers.iterator().next();
 			Set<ScriptRegistryItemID> scriptIDs = provider.getScriptRegistryItemIDs();
+			
+			logger.info("scriptIDs.size() = "+scriptIDs.size());
+			int counter = 0;
+			for (ScriptRegistryItemID itemID : scriptIDs) {
+				logger.info("ScriptRegistryItemID " + (counter++) + " = "+itemID);
+			}
+			
 			return getScriptConditioner(scriptIDs);
 		} finally {
 			pm.close();

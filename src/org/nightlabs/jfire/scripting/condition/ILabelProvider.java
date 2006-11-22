@@ -1,6 +1,9 @@
 package org.nightlabs.jfire.scripting.condition;
 
-public interface ILabelProvider 
+import java.io.Serializable;
+
+public interface ILabelProvider
+extends Serializable
 {
 	/**
 	 * 

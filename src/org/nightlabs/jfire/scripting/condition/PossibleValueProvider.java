@@ -25,6 +25,7 @@
  ******************************************************************************/
 package org.nightlabs.jfire.scripting.condition;
 
+import java.io.Serializable;
 import java.util.Collection;
 
 import javax.jdo.PersistenceManager;
@@ -47,25 +48,30 @@ import org.nightlabs.jfire.scripting.id.ScriptRegistryItemID;
  * 
  * @jdo.create-objectid-class field-order="organisationID, scriptRegistryItemType, scriptRegistryItemID"
  *
+ * @jdo.fetch-group name="PossibleValueProvider.this" fetch-groups="default" fields="organisationID, scriptRegistryItemID, scriptRegistryItemType, labelProviderClassName"
+ * 
  * @jdo.query
- *		name="getPossibleValueProviderByScriptRegistryItemID"
+ *		name="getPossibleValuesByScriptRegistryItemID"
  *		query="SELECT
  *			WHERE
  *				this.organisationID == pOrganisationID &&
  *				this.scriptRegistryItemType == pScriptRegistryItemType &&
  *				this.scriptRegistryItemID == pScriptRegistryItemID
  *
- *			PARAMETERS pOrganisationID, pScriptRegistryItemType, pScriptRegistryItemID 
+ *			PARAMETERS String pOrganisationID, String pScriptRegistryItemType, String pScriptRegistryItemID 
  *			import java.lang.String"
  */
 public abstract class PossibleValueProvider
+implements Serializable
 {
 	private static final Logger logger = Logger.getLogger(PossibleValueProvider.class);
 
+	public static final String FETCH_GROUP_THIS_POSSIBLE_VALUE_PROVIDER = "PossibleValueProvider.this";
+	
 	public static PossibleValueProvider getPossibleValueProvider(PersistenceManager pm, String organisationID,
 			String scriptRegistryItemType, String scriptRegistryItemID) 
 	{
-		Query q = pm.newNamedQuery(Script.class, "getPossibleValuesByScriptRegistryItemID");
+		Query q = pm.newNamedQuery(PossibleValueProvider.class, "getPossibleValuesByScriptRegistryItemID");
 		Collection providers = (Collection) q.execute(organisationID, scriptRegistryItemType, scriptRegistryItemID);
 		if (providers != null && !providers.isEmpty()) {
 			PossibleValueProvider provider = (PossibleValueProvider) providers.iterator().next();

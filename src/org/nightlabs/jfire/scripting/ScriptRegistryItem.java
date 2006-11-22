@@ -76,7 +76,7 @@ import org.nightlabs.util.Utils;
  *		query="SELECT
  *			WHERE this.parent == null &&
  *						this.scriptRegistryItemType == pScriptRegistryItemType
- *			PARAMETERS pScriptRegistryItemType  
+ *			PARAMETERS String pScriptRegistryItemType  
  *			import java.lang.String"
  *
  * @jdo.query
@@ -85,7 +85,7 @@ import org.nightlabs.util.Utils;
  *			WHERE this.parent == null &&
  *						this.organisationID == pOrganisationID &&
  *						this.scriptRegistryItemType == pScriptRegistryItemType
- *			PARAMETERS pOrganisationID, pScriptRegistryItemType  
+ *			PARAMETERS String pOrganisationID, String pScriptRegistryItemType  
  *			import java.lang.String"
  *
  */

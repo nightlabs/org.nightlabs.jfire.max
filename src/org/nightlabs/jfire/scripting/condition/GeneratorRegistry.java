@@ -28,6 +28,8 @@ package org.nightlabs.jfire.scripting.condition;
 import java.util.HashMap;
 import java.util.Map;
 
+import org.nightlabs.jfire.scripting.ScriptExecutorJavaScript;
+
 /**
  * A Registry which allows the registration of {@link ISyntaxGenerator} for 
  * a certain language
@@ -42,8 +44,13 @@ public class GeneratorRegistry
 	private static GeneratorRegistry sharedInstance;
 	public static GeneratorRegistry sharedInstance()  
 	{
-		if (sharedInstance == null)
+		if (sharedInstance == null) 
+		{
 			sharedInstance = new GeneratorRegistry();
+			// register JavaScriptSyntaxGenerator
+			sharedInstance.registerGenerator(ScriptExecutorJavaScript.LANGUAGE_JAVA_SCRIPT, 
+					new JavaScriptSyntaxGenerator());
+		}
 		return sharedInstance;
 	}
 	

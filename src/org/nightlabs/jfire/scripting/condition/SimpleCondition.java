@@ -42,6 +42,9 @@ implements ISimpleCondition
 		
 		if (compareOperator == null)
 			throw new IllegalArgumentException("Param compareOperator must not be null");
+
+		if (value == null)
+			throw new IllegalArgumentException("Param value must not be null");
 		
 		this.variableName = variableName;
 		this.compareOperator = compareOperator;

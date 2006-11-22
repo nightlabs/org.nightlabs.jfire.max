@@ -25,6 +25,7 @@
  ******************************************************************************/
 package org.nightlabs.jfire.scripting.condition;
 
+import java.io.Serializable;
 import java.util.Collection;
 import java.util.List;
 
@@ -35,6 +36,7 @@ import org.nightlabs.jfire.scripting.id.ScriptRegistryItemID;
  *
  */
 public class ScriptConditioner 
+implements Serializable
 {
 	public ScriptConditioner(ScriptRegistryItemID scriptID, String variableName, 
 			List<CompareOperator> compareOperators, 

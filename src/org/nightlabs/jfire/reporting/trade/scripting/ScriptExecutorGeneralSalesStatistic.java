@@ -12,9 +12,7 @@ import javax.jdo.PersistenceManager;
 import javax.jdo.Query;
 
 import org.eclipse.datatools.connectivity.oda.IResultSetMetaData;
-import org.nightlabs.jfire.reporting.Birt;
 import org.nightlabs.jfire.reporting.oda.DataType;
-import org.nightlabs.jfire.reporting.oda.ResultSet;
 import org.nightlabs.jfire.reporting.oda.jfs.JFSResultSet;
 import org.nightlabs.jfire.reporting.oda.jfs.JFSResultSetMetaData;
 import org.nightlabs.jfire.reporting.oda.jfs.ScriptExecutorJavaClassReportingDelegate;

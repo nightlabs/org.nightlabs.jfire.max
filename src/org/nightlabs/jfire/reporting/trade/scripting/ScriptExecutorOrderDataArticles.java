@@ -4,7 +4,6 @@
 package org.nightlabs.jfire.reporting.trade.scripting;
 
 import org.eclipse.datatools.connectivity.oda.IResultSetMetaData;
-import org.nightlabs.jfire.reporting.Birt;
 import org.nightlabs.jfire.reporting.oda.DataType;
 import org.nightlabs.jfire.reporting.oda.jfs.JFSResultSet;
 import org.nightlabs.jfire.reporting.oda.jfs.JFSResultSetMetaData;

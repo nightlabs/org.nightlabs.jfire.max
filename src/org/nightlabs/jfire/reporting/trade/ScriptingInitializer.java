@@ -6,7 +6,6 @@ import java.util.Locale;
 import javax.jdo.PersistenceManager;
 
 import org.nightlabs.ModuleException;
-import org.nightlabs.jfire.organisation.Organisation;
 import org.nightlabs.jfire.scripting.ScriptCategory;
 import org.nightlabs.jfire.servermanager.JFireServerManager;
 

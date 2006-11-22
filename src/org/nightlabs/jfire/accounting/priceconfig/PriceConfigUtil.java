@@ -26,14 +26,21 @@
 
 package org.nightlabs.jfire.accounting.priceconfig;
 
+import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Iterator;
 import java.util.LinkedList;
+
+import javax.jdo.JDOHelper;
+import javax.jdo.PersistenceManager;
+import javax.jdo.Query;
 
 import org.nightlabs.jfire.accounting.Price;
 import org.nightlabs.jfire.store.NestedProductType;
 import org.nightlabs.jfire.store.Product;
 import org.nightlabs.jfire.store.ProductLocal;
 import org.nightlabs.jfire.store.ProductType;
+import org.nightlabs.jfire.store.id.ProductTypeID;
 import org.nightlabs.jfire.trade.Article;
 import org.nightlabs.jfire.trade.ArticlePrice;
 
@@ -337,5 +344,34 @@ public class PriceConfigUtil
 		} // if (productType.isPackage()) {
 
 		return articlePrice;
+	}
+
+	private static ArrayList<AffectedProductType> getProductTypesNestingThis(Query q, ProductType productType, int nestingLevel)
+	{
+		ArrayList<AffectedProductType> res = new ArrayList<AffectedProductType>();
+		for (ProductType pt : (Collection<ProductType>)q.execute(productType)) {
+			res.add(new AffectedProductType((ProductTypeID) JDOHelper.getObjectId(pt), nestingLevel));
+			res.addAll(getProductTypesNestingThis(q, pt, nestingLevel + 1));
+		}
+		return res;
+	}
+
+	public static ArrayList<AffectedProductType> getAffectedProductTypes(PersistenceManager pm, IPriceConfig priceConfig)
+	{
+		ArrayList<AffectedProductType> res = new ArrayList<AffectedProductType>();
+
+		Query q1 = pm.newQuery(ProductType.class);
+		q1.setFilter("this.innerPriceConfig == :priceConfig || this.packagePriceConfig == :priceConfig");
+
+		Query q2 = pm.newQuery(ProductType.class);
+		q2.declareVariables(NestedProductType.class.getName() + " nestedProductType");
+		q2.setFilter("this.nestedProductTypes.containsValue(nestedProductType) && nestedProductType.innerProductType == :productType");
+
+		for (ProductType pt : (Collection<ProductType>)q1.execute(priceConfig)) {
+			res.add(new AffectedProductType((ProductTypeID) JDOHelper.getObjectId(pt), 0));
+			res.addAll(getProductTypesNestingThis(q2, pt, 1));
+		}
+
+		return res;
 	}
 }

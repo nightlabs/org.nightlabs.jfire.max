@@ -29,8 +29,13 @@ package org.nightlabs.jfire.accounting.tariffpriceconfig;
 import java.rmi.RemoteException;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Iterator;
+import java.util.List;
 import java.util.Locale;
+import java.util.Map;
+import java.util.Set;
 import java.util.regex.Pattern;
 
 import javax.ejb.CreateException;
@@ -42,7 +47,6 @@ import javax.jdo.PersistenceManager;
 
 import org.apache.log4j.Logger;
 import org.nightlabs.ModuleException;
-import org.nightlabs.jdo.NLJDOHelper;
 import org.nightlabs.jfire.accounting.AccountingManagerBean;
 import org.nightlabs.jfire.accounting.Currency;
 import org.nightlabs.jfire.accounting.Price;
@@ -50,8 +54,12 @@ import org.nightlabs.jfire.accounting.PriceFragmentType;
 import org.nightlabs.jfire.accounting.Tariff;
 import org.nightlabs.jfire.accounting.id.CurrencyID;
 import org.nightlabs.jfire.accounting.id.TariffID;
+import org.nightlabs.jfire.accounting.priceconfig.AffectedProductType;
+import org.nightlabs.jfire.accounting.priceconfig.IPriceConfig;
+import org.nightlabs.jfire.accounting.priceconfig.PriceConfigUtil;
 import org.nightlabs.jfire.accounting.priceconfig.id.PriceConfigID;
 import org.nightlabs.jfire.base.BaseSessionBeanImpl;
+import org.nightlabs.jfire.store.ProductType;
 import org.nightlabs.jfire.trade.CustomerGroup;
 import org.nightlabs.jfire.trade.id.CustomerGroupID;
 
@@ -175,20 +183,72 @@ implements SessionBean
 	 * @throws ModuleException
 	 *
 	 * @ejb.interface-method
-	 * @ejb.transaction type = "Required"
+	 * @ejb.transaction type="Required"
 	 * @ejb.permission role-name="_Guest_"
 	 */
-	public TariffPriceConfig storePriceConfig(TariffPriceConfig priceConfig, boolean get, String[] fetchGroups, int maxFetchDepth)
+	public Collection<TariffPriceConfig> storePriceConfigs(Collection<TariffPriceConfig> _priceConfigs, boolean get, String[] fetchGroups, int maxFetchDepth)
 	throws ModuleException
 	{
 		PersistenceManager pm = getPersistenceManager();
 		try {
 			if (logger.isDebugEnabled()) {
-				logger.debug("storePriceConfig: PriceConfig BEFORE attach:");
-				logTariffPriceConfig(priceConfig);
+				for (TariffPriceConfig priceConfig : _priceConfigs) {
+					logger.debug("storePriceConfig: PriceConfig BEFORE attach:");
+					logTariffPriceConfig(priceConfig);
+				}
 			}
 
-			return (TariffPriceConfig) NLJDOHelper.storeJDO(pm, priceConfig, get, fetchGroups, maxFetchDepth);
+			// store all price configs and put the living objects into priceConfigs
+			Set<TariffPriceConfig> priceConfigs = new HashSet<TariffPriceConfig>();
+			List<AffectedProductType> affectedProductTypes = null;
+			for (TariffPriceConfig priceConfig : _priceConfigs) {
+				priceConfig = (TariffPriceConfig) pm.makePersistent(priceConfig);
+				priceConfigs.add(priceConfig);
+				
+				if (affectedProductTypes == null)
+					affectedProductTypes = PriceConfigUtil.getAffectedProductTypes(pm, priceConfig);
+				else
+					affectedProductTypes.addAll(PriceConfigUtil.getAffectedProductTypes(pm, priceConfig));
+			}
+
+			// and recalculate the prices for all affected ProductTypes
+			long startDT = System.currentTimeMillis();
+			int recalculatedCounter = 0;
+			int skippedBecauseAlreadyProcessed = 0;
+			Set<ProductType> processedProductTypes = new HashSet<ProductType>();
+			for (AffectedProductType affectedProductType : affectedProductTypes) {
+				ProductType productType = (ProductType) pm.getObjectById(affectedProductType.getProductTypeID());
+				if (processedProductTypes.contains(productType)) {
+					++skippedBecauseAlreadyProcessed;
+					continue;
+				}
+				processedProductTypes.add(productType);
+
+				if (productType.getPackageNature() == ProductType.PACKAGE_NATURE_OUTER) {
+					++recalculatedCounter;
+					PriceCalculator priceCalculator = new PriceCalculator(productType);
+					priceCalculator.preparePriceCalculation();
+					priceCalculator.calculatePrices();
+
+					if (logger.isDebugEnabled())
+						logger.debug("storePriceConfig: Recalculating prices for ProductType " + productType.getPrimaryKey() + " (" + productType.getName().getText() + ")");
+				}
+				else {
+					if (logger.isDebugEnabled())
+						logger.debug("storePriceConfig: Will NOT recalculate prices for ProductType " + productType.getPrimaryKey() + " (" + productType.getName().getText() + ") because it is not PACKAGE_NATURE_OUTER!");
+				}
+			}
+
+			logger.info("storePriceConfig: Recalculated prices for " + recalculatedCounter + " ProductTypes in " + (System.currentTimeMillis() - startDT) + " msec. // affectedProductTypes.size()=" + affectedProductTypes.size() + " // skippedBecauseAlreadyProcessed=" + skippedBecauseAlreadyProcessed);
+
+			if (!get)
+				return null;
+
+			pm.getFetchPlan().setMaxFetchDepth(maxFetchDepth);
+			if (fetchGroups != null)
+				pm.getFetchPlan().setGroups(fetchGroups);
+
+			return pm.detachCopyAll(priceConfigs);
 		} finally {
 			pm.close();
 		}
@@ -198,17 +258,14 @@ implements SessionBean
 
 	/**
 	 * @return a <tt>Collection</tt> of {@link TariffPricePair}
-	 * 
-	 * @throws ModuleException
 	 *
 	 * @ejb.interface-method
-	 * @ejb.transaction type = "Required"
+	 * @ejb.transaction type="Supports"
 	 * @ejb.permission role-name="_Guest_"
 	 */
-	public Collection getTariffPricePairs(
+	public Collection<TariffPricePair> getTariffPricePairs(
 			PriceConfigID priceConfigID, CustomerGroupID customerGroupID, CurrencyID currencyID,
 			String[] tariffFetchGroups, String[] priceFetchGroups)
-	throws ModuleException
 	{
 		PersistenceManager pm = getPersistenceManager();
 		try {
@@ -221,7 +278,7 @@ implements SessionBean
 					CustomerGroup.getPrimaryKey(customerGroupID.organisationID, customerGroupID.customerGroupID),
 					currencyID.currencyID);
 
-			Collection res = new ArrayList();
+			Collection<TariffPricePair> res = new ArrayList<TariffPricePair>();
 
 			for (Iterator it = priceCells.iterator(); it.hasNext(); ) {
 				PriceCell priceCell = (PriceCell) it.next();
@@ -251,5 +308,30 @@ implements SessionBean
 		} finally {
 			pm.close();
 		}
+	}
+
+	/**
+	 * @return The returned Map&lt;PriceConfigID, List&lt;AffectedProductType&gt;&gt; indicates which modified
+	 *		price config would result in which products to have their prices recalculated.
+	 *
+	 * @ejb.interface-method
+	 * @ejb.transaction type="Supports"
+	 * @ejb.permission role-name="_Guest_"
+	 */
+	public Map<PriceConfigID, List<AffectedProductType>> getAffectedProductTypes(Set<PriceConfigID> priceConfigIDs)
+	{
+		Map<PriceConfigID, List<AffectedProductType>> res = new HashMap<PriceConfigID, List<AffectedProductType>>(priceConfigIDs.size());
+		PersistenceManager pm = getPersistenceManager();
+		try {
+			for (PriceConfigID priceConfigID : priceConfigIDs) {
+				IPriceConfig priceConfig = (IPriceConfig) pm.getObjectById(priceConfigID);
+				ArrayList<AffectedProductType> affectedProductTypes = PriceConfigUtil.getAffectedProductTypes(pm, priceConfig);
+				affectedProductTypes.trimToSize();
+				res.put(priceConfigID, affectedProductTypes);
+			}
+		} finally {
+			pm.close();
+		}
+		return res;
 	}
 }

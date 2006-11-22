@@ -40,6 +40,7 @@ import org.nightlabs.jfire.accounting.PriceFragmentType;
 import org.nightlabs.jfire.idgenerator.IDGenerator;
 import org.nightlabs.jfire.trade.Article;
 import org.nightlabs.jfire.trade.ArticlePrice;
+import org.nightlabs.util.Utils;
 
 /**
  * A <tt>PriceConfig</tt> is a complete set of prices which can be assigned to a product by setting
@@ -388,6 +389,23 @@ public abstract class PriceConfig implements Serializable, StoreCallback, IPrice
 	public PriceConfigName getName()
 	{
 		return name;
+	}
+
+	@Override
+	public int hashCode()
+	{
+		return Utils.hashCode(this.organisationID) + Utils.hashCode(this.priceConfigID);
+	}
+
+	@Override
+	public boolean equals(Object obj)
+	{
+		if (obj == this) return true;
+		if (!(obj instanceof IPriceConfig)) return false;
+
+		IPriceConfig other = (IPriceConfig) obj;
+
+		return Utils.equals(this.organisationID, other.getOrganisationID()) && Utils.equals(this.priceConfigID, other.getPriceConfigID());
 	}
 
 //	/**

@@ -23,61 +23,13 @@
  *                                                                             *
  *                                                                             *
  ******************************************************************************/
-package org.nightlabs.jfire.scripting.editor2d.script;
-
-import java.util.HashMap;
-import java.util.Map;
-
-import org.nightlabs.jfire.scripting.id.ScriptRegistryItemID;
-
+package org.nightlabs.jfire.scripting.editor2d;
 
 /**
  * @author Daniel.Mazurek [at] NightLabs [dot] de
  *
  */
-public class Script 
+public class ScriptingConstants 
 {
-	public Script(String language, String text) 
-	{
-		if (language == null)
-			throw new IllegalArgumentException("Param language must not be null");
-		
-		if (text == null)
-			throw new IllegalArgumentException("Param text must not be null");
-		
-		this.language = language;
-		this.text = text;
-	}
-	
-	private String language;
-	public String getLanguage() {
-		return language;
-	}
-	public void setLanguage(String language) {
-		this.language = language;
-	}
-
-	private String text;
-	public String getText() {
-		return text;
-	}
-	public void setText(String text) {
-		this.text = text;
-	}
-
-	private Map<String, ScriptRegistryItemID> variableName2ScriptID = new HashMap<String, ScriptRegistryItemID>();
-	public Map<String, ScriptRegistryItemID> getVariableName2ScriptID() {
-		return variableName2ScriptID;		
-	}	
-	public void setVariableName2ScriptID(Map<String, ScriptRegistryItemID> variableName2ScriptID) {
-		this.variableName2ScriptID = variableName2ScriptID;
-	}
-	
-//	private Map<ScriptRegistryItemID, String> scriptID2VariableName = new HashMap<ScriptRegistryItemID, String>();
-//	public Map<ScriptRegistryItemID, String> getScriptID2VariableName() {
-//		return scriptID2VariableName;		
-//	}	
-//	public void addVariableName(ScriptRegistryItemID scriptID, String value) {
-//		scriptID2VariableName.put(scriptID, value);
-//	}
+	public static final String PROP_VISIBLE_SCRIPT = "VisibleScript";
 }

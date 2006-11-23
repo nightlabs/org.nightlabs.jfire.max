@@ -28,7 +28,9 @@ package org.nightlabs.jfire.scripting.editor2d;
 import java.util.Map;
 import java.util.Set;
 
+import org.nightlabs.editor2d.DrawComponent;
 import org.nightlabs.editor2d.MultiLayerDrawComponent;
+import org.nightlabs.jfire.scripting.editor2d.script.Script;
 import org.nightlabs.jfire.scripting.id.ScriptRegistryItemID;
 
 /**
@@ -61,4 +63,27 @@ extends MultiLayerDrawComponent
 	 * value: value of the script
 	 */
 	public void assignScriptResults(Map<ScriptRegistryItemID, Object> scriptValues);
+		
+	/**
+	 * returns a Map with all visibleScripts and the corresponding drawComponent ID
+	 *
+	 * key: DrawComponent ID {@link DrawComponent#getId()}
+	 * value: VisibleScript {@link DrawComponent#getProperties().get(ScriptingConstants.PROP_VISIBLE_SCRIPT)}
+	 * 
+	 * @return a {@link Map} with the drawComponent ID as key, and
+	 * the VisibleScript as value 
+	 */
+	public Map<Long, Script> getVisibleScripts();
+	
+	/**
+	 * assigns the visible property according to value of the visibleScript,
+	 * obtained from the Method {@link ScriptMultiLayerDrawComponent#getVisibleScripts()}
+	 * 
+	 * key: DrawComponentID {@link DrawComponent#getId()}
+	 * value: result of visibleScript {@link DrawComponent#getProperties().get(ScriptingConstants.PROP_VISIBLE_SCRIPT)}
+	 * 
+	 * @param scriptValues a map with the drawComponent ID as key, and the value 
+	 * of the visibleScript as value
+	 */
+	public void assignVisibleScriptResults(Map<Long, Boolean> scriptValues);
 }

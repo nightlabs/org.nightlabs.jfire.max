@@ -26,15 +26,20 @@
 package org.nightlabs.jfire.scripting.editor2d.impl;
 
 import java.util.Collection;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Map;
 import java.util.Set;
 
 import org.apache.log4j.Logger;
+import org.nightlabs.editor2d.DrawComponent;
+import org.nightlabs.editor2d.DrawComponentContainer;
 import org.nightlabs.editor2d.impl.MultiLayerDrawComponentImpl;
 import org.nightlabs.jfire.scripting.editor2d.ScriptDrawComponent;
 import org.nightlabs.jfire.scripting.editor2d.ScriptMultiLayerDrawComponent;
+import org.nightlabs.jfire.scripting.editor2d.ScriptingConstants;
+import org.nightlabs.jfire.scripting.editor2d.script.Script;
 import org.nightlabs.jfire.scripting.id.ScriptRegistryItemID;
 
 /**
@@ -88,4 +93,42 @@ implements ScriptMultiLayerDrawComponent
 		}
 		return scriptIDs;
 	}
+
+	public void assignVisibleScriptResults(Map<Long, Boolean> scriptValues) 
+	{
+		if (scriptValues == null)
+			throw new IllegalArgumentException("Param scriptValues must NOT be null!");
+	
+		for (Map.Entry<Long, Boolean> entry : scriptValues.entrySet()) {
+			DrawComponent dc = getDrawComponent(entry.getKey());
+			if (dc != null) {
+				dc.setVisible(entry.getValue());
+			}
+		}
+	}
+
+	public Map<Long, Script> getVisibleScripts() {
+		return getVisibleScripts(this);
+	}
+	
+	protected Map<Long, Script> getVisibleScripts(DrawComponentContainer dcc) 
+	{
+		// TODO all DrawComponents with a visibleScript should already be cached
+		// when visibleScript is assigned
+		Map<Long, Script> dcID2VisibleScript = new HashMap<Long, Script>();
+		for (DrawComponent dc : dcc.getDrawComponents()) 
+		{
+			if (dc instanceof DrawComponentContainer) {
+				DrawComponentContainer container = (DrawComponentContainer) dc;
+				dcID2VisibleScript.putAll(getVisibleScripts(container));
+			}
+			else {
+				Script script = (Script) dc.getProperties().get(ScriptingConstants.PROP_VISIBLE_SCRIPT);
+				if (script != null) {
+					 dcID2VisibleScript.put(dc.getId(), script);
+				}				
+			}
+		}
+		return null;
+	}		
 }

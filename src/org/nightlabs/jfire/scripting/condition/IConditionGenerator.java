@@ -32,7 +32,7 @@ package org.nightlabs.jfire.scripting.condition;
  * @author Daniel.Mazurek [at] NightLabs [dot] de
  *
  */
-public interface ISyntaxGenerator 
+public interface IConditionGenerator 
 {
 	/**
 	 * returns the scriptLanguage depended String for all available
@@ -78,5 +78,12 @@ public interface ISyntaxGenerator
 	 */
 	String getCloseContainerString();
 	
-//	String getConditionString(IConditionContainer conatiner);
+//	String getConditionString(IConditionContainer conatiner);		
+	
+	/**
+	 * 
+	 * @param scriptText the scripText to parse
+	 * @return the corresponding {@link ICondition} for the scriptText
+	 */
+	public ICondition getCondition(String scriptText);
 }

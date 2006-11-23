@@ -29,8 +29,8 @@ package org.nightlabs.jfire.scripting.condition;
  * @author Daniel.Mazurek [at] NightLabs [dot] de
  *
  */
-public class JavaScriptSyntaxGenerator 
-implements ISyntaxGenerator 
+public class JavaScriptConditionGenerator 
+implements IConditionGenerator 
 {
 
 	public String getCombineOperator(CombineOperator combineOperator) 
@@ -78,5 +78,15 @@ implements ISyntaxGenerator
 	public String getOpenContainerString() {
 		return "(";
 	}
-	 
+
+	/**
+	 * 
+	 * @param scriptText the scripText to parse
+	 * @return the corresponding {@link ICondition} for the scriptText
+	 */
+	public ICondition getCondition(String scriptText) {
+		// TODO parse scriptText and create appropriate ICondition
+		return null;
+	}
+	 	
 }

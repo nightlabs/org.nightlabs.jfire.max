@@ -66,7 +66,7 @@ implements IConditionContainer
 			} 
 			else if (condition instanceof IConditionContainer) 
 			{
-				ISyntaxGenerator generator = GeneratorRegistry.sharedInstance().getGenerator(getLanguage());
+				IConditionGenerator generator = GeneratorRegistry.sharedInstance().getGenerator(getLanguage());
 				IConditionContainer container = (IConditionContainer) condition;
 				sb.append(generator.getOpenContainerString());
 				sb.append(container.getScriptText());

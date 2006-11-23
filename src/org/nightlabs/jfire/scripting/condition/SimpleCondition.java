@@ -77,7 +77,7 @@ implements ISimpleCondition
 
 	public String getScriptText() 
 	{
-		ISyntaxGenerator generator = GeneratorRegistry.sharedInstance().getGenerator(getLanguage());
+		IConditionGenerator generator = GeneratorRegistry.sharedInstance().getGenerator(getLanguage());
 		String variable = generator.getVariableString(getVariableName());
 		String operator = generator.getCompareOperator(getCompareOperator());
 		return variable + operator + getValueAsString();

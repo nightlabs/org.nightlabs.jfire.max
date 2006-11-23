@@ -31,7 +31,7 @@ import java.util.Map;
 import org.nightlabs.jfire.scripting.ScriptExecutorJavaScript;
 
 /**
- * A Registry which allows the registration of {@link ISyntaxGenerator} for 
+ * A Registry which allows the registration of {@link IConditionGenerator} for 
  * a certain language
  * 
  * This class is a singleton
@@ -47,9 +47,9 @@ public class GeneratorRegistry
 		if (sharedInstance == null) 
 		{
 			sharedInstance = new GeneratorRegistry();
-			// register JavaScriptSyntaxGenerator
+			// register JavaScriptConditionGenerator
 			sharedInstance.registerGenerator(ScriptExecutorJavaScript.LANGUAGE_JAVA_SCRIPT, 
-					new JavaScriptSyntaxGenerator());
+					new JavaScriptConditionGenerator());
 		}
 		return sharedInstance;
 	}
@@ -58,13 +58,13 @@ public class GeneratorRegistry
 		super();
 	}
 	
-	private Map<String, ISyntaxGenerator> language2Generator = new HashMap<String, ISyntaxGenerator>();
+	private Map<String, IConditionGenerator> language2Generator = new HashMap<String, IConditionGenerator>();
 	
-	public void registerGenerator(String language, ISyntaxGenerator generator) {
+	public void registerGenerator(String language, IConditionGenerator generator) {
 		language2Generator.put(language, generator);
 	}
 	
-	public ISyntaxGenerator getGenerator(String language) {
+	public IConditionGenerator getGenerator(String language) {
 		return language2Generator.get(language);
 	}
 }

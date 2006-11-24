@@ -26,6 +26,7 @@
 
 package org.nightlabs.jfire.trade;
 
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
@@ -36,6 +37,7 @@ import java.util.Set;
 
 import javax.jdo.JDOHelper;
 
+import org.nightlabs.jfire.trade.id.ArticleContainerID;
 import org.nightlabs.jfire.trade.id.ArticleID;
 
 /**
@@ -43,17 +45,19 @@ import org.nightlabs.jfire.trade.id.ArticleID;
  */
 public class ArticleSegmentGroups
 {
+	private ArticleContainerID articleContainerID;
+
 	/**
 	 * key: String segmentPK<br/>
 	 * value: {@link ArticleSegmentGroup} articleSegmentGroup
 	 */
-	private Map articleSegmentGroups = new HashMap();
+	private Map<String, ArticleSegmentGroup> articleSegmentGroups = new HashMap<String, ArticleSegmentGroup>();
 
 	/**
 	 * key: {@link org.nightlabs.jfire.trade.id.ArticleID} articleID<br/>
 	 * value: {@link ArticleCarrier} articleCarrier
 	 */
-	private Map articleCarriers = new HashMap();
+	private Map<ArticleID, ArticleCarrier> articleCarriers = new HashMap<ArticleID, ArticleCarrier>();
 
 	public boolean containsArticle(ArticleID articleID) {
 		return articleCarriers.containsKey(articleID);
@@ -75,6 +79,11 @@ public class ArticleSegmentGroups
 
 //	private Set articles = null;
 
+	public ArticleContainerID getArticleContainerID()
+	{
+		return articleContainerID;
+	}
+
 	/**
 	 * @param articleContainer This might additionally implement the interface
 	 * {@link SegmentContainer} to provide {@link Segment}s even if no {@link Article}
@@ -82,6 +91,10 @@ public class ArticleSegmentGroups
 	 */
 	public ArticleSegmentGroups(ArticleContainer articleContainer)
 	{
+		this.articleContainerID = (ArticleContainerID) JDOHelper.getObjectId(articleContainer);
+		if (articleContainerID == null)
+			throw new IllegalStateException("articleContainer does not have an object-id assignd: " + articleContainer);
+
 		initWithArticleContainer(articleContainer);
 
 		if (articleContainer instanceof SegmentContainer)
@@ -102,6 +115,45 @@ public class ArticleSegmentGroups
 		}
 	}
 
+	protected Collection<ArticleCarrier> addArticles(Collection<Article> articles)
+	{
+		ArrayList<ArticleCarrier> res = new ArrayList<ArticleCarrier>(articles.size());
+		for (Article article : articles) {
+			res.add(addArticle(article));
+		}
+		return res;
+	}
+
+	protected ArticleCarrier addArticle(Article article)
+	{
+		String segmentPK = article.getSegment().getPrimaryKey();
+		ArticleSegmentGroup asg = (ArticleSegmentGroup) articleSegmentGroups.get(segmentPK);
+		if (asg == null) {
+			asg = _createArticleSegmentGroup(article.getSegment());
+			articleSegmentGroups.put(segmentPK, asg);
+		}
+
+		// we want to have the same instance of Segment if they're equal - deduplicate if necessary
+		if (article.getSegment() != asg.getSegment())
+			article.setSegment(asg.getSegment());
+
+		return asg.addArticle(article);
+	}
+
+	protected void removeArticles(Collection<Article> articles)
+	{
+		for (Article article : articles)
+			removeArticle(article);
+	}
+
+	protected void removeArticle(Article article)
+	{
+		String segmentPK = article.getSegment().getPrimaryKey();
+		ArticleSegmentGroup asg = (ArticleSegmentGroup) articleSegmentGroups.get(segmentPK);
+		if (asg != null)
+			asg.removeArticle(article);
+	}
+
 	/**
 	 * Called internally and must return a new instance of <code>ArticleSegmentGroup</code>. You
 	 * can override this method, if you want to subclass <code>ArticleSegmentGroup</code>.
@@ -115,20 +167,7 @@ public class ArticleSegmentGroups
 	{
 		for (Iterator it = articleContainer.getArticles().iterator(); it.hasNext(); ) {
 			Article article = (Article) it.next();
-
-			String segmentPK = article.getSegment().getPrimaryKey();
-			ArticleSegmentGroup asg = (ArticleSegmentGroup) articleSegmentGroups.get(segmentPK);
-			if (asg == null) {
-				asg = _createArticleSegmentGroup(article.getSegment());
-				articleSegmentGroups.put(segmentPK, asg);
-			}
-
-			// we want to have the same instance of Segment if they're equal - deduplicate
-			// ...just in case the detach bug still exists
-			if (article.getSegment() != asg.getSegment())
-				article.setSegment(asg.getSegment());
-
-			asg.addArticle(article);
+			addArticle(article);
 		}
 	}
 
@@ -138,6 +177,15 @@ public class ArticleSegmentGroups
 	public Collection getArticleSegmentGroups()
 	{
 		return articleSegmentGroups.values();
+	}
+
+	public ArticleSegmentGroup getArticleSegmentGroupForSegmentPK(String segmentPK, boolean throwExceptionIfNotFound)
+	{
+		ArticleSegmentGroup res = articleSegmentGroups.get(segmentPK);
+		if (throwExceptionIfNotFound && res == null)
+			throw new IllegalArgumentException("No ArticleSegmentGroup registered for segmentPK: " + segmentPK);
+
+		return res;
 	}
 
 	public Set getArticles()
@@ -161,7 +209,7 @@ public class ArticleSegmentGroups
 	 */
 	protected void _addArticleCarrier(ArticleCarrier articleCarrier)
 	{
-		articleCarriers.put(JDOHelper.getObjectId(articleCarrier.getArticle()), articleCarrier);
+		articleCarriers.put((ArticleID) JDOHelper.getObjectId(articleCarrier.getArticle()), articleCarrier);
 //		articles = null;
 	}
 

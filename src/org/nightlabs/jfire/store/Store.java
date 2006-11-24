@@ -43,7 +43,6 @@ import javax.jdo.listener.StoreCallback;
 
 import org.apache.log4j.Logger;
 import org.nightlabs.ModuleException;
-import org.nightlabs.jfire.accounting.MoneyTransfer;
 import org.nightlabs.jfire.config.Config;
 import org.nightlabs.jfire.idgenerator.IDGenerator;
 import org.nightlabs.jfire.organisation.LocalOrganisation;
@@ -83,9 +82,12 @@ import org.nightlabs.jfire.transfer.TransferRegistry;
  * @author marco at nightlabs dot de
  *
  * @jdo.persistence-capable
- *		identity-type="datastore"
+ *		identity-type="application"
+ *		objectid-class="org.nightlabs.jfire.store.id.StoreID"
  *		detachable="true"
  *		table="JFireTrade_Store"
+ *
+ * @jdo.create-objectid-class
  *
  * @jdo.inheritance strategy="new-table"
  */
@@ -136,7 +138,7 @@ public class Store
 	private PartnerStorekeeper partnerStorekeeper;
 
 	/**
-	 * @jdo.field persistence-modifier="persistent"
+	 * @jdo.field primary-key="true"
 	 * @jdo.column length="100"
 	 */
 	private String organisationID;

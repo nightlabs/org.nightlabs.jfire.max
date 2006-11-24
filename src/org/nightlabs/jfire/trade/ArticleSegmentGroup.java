@@ -58,10 +58,10 @@ public class ArticleSegmentGroup
 		return articleSegmentGroups;
 	}
 
-	public void addArticle(Article article)
+	public ArticleCarrier addArticle(Article article)
 	{
 		ArticleProductTypeClassGroup aptg = createArticleProductTypeClassGroup(article.getProductType().getClass());
-		aptg.addArticle(article);
+		return aptg.addArticle(article);
 	}
 
 	public void removeArticle(Article article)
@@ -108,8 +108,11 @@ public class ArticleSegmentGroup
 	 */
 	public ArticleProductTypeClassGroup getArticleProductTypeClassGroup(ProductType productType, boolean throwExceptionIfNotFound)
 	{
-		String productTypeClassName = productType.getClass().getName();
+		return getArticleProductTypeClassGroup(productType.getClass().getName(), throwExceptionIfNotFound);
+	}
 
+	public ArticleProductTypeClassGroup getArticleProductTypeClassGroup(String productTypeClassName, boolean throwExceptionIfNotFound)
+	{
 		ArticleProductTypeClassGroup aptg = (ArticleProductTypeClassGroup)articleProductTypeClassGroups.get(productTypeClassName);
 		if (throwExceptionIfNotFound && aptg == null)
 			throw new IllegalArgumentException("There is no ArticleProductTypeClassGroup registered for the productTypeClass " + productTypeClassName);

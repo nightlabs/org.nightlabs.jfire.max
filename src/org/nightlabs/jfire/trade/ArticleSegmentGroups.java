@@ -115,7 +115,7 @@ public class ArticleSegmentGroups
 		}
 	}
 
-	protected Collection<ArticleCarrier> addArticles(Collection<Article> articles)
+	public Collection<ArticleCarrier> addArticles(Collection<Article> articles)
 	{
 		ArrayList<ArticleCarrier> res = new ArrayList<ArticleCarrier>(articles.size());
 		for (Article article : articles) {
@@ -140,7 +140,7 @@ public class ArticleSegmentGroups
 		return asg.addArticle(article);
 	}
 
-	protected void removeArticles(Collection<Article> articles)
+	public void removeArticles(Collection<Article> articles)
 	{
 		for (Article article : articles)
 			removeArticle(article);

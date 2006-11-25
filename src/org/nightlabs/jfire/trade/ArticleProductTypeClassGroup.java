@@ -35,6 +35,7 @@ import java.util.Map;
 import java.util.Set;
 
 import org.nightlabs.jfire.store.ProductType;
+import org.nightlabs.jfire.trade.id.ArticleID;
 
 /**
  * @author Marco Schulze - marco at nightlabs dot de
@@ -49,7 +50,7 @@ public class ArticleProductTypeClassGroup
 	 * key: String articlePK<br/>
 	 * value: {@link ArticleCarrier} articleCarrier
 	 */
-	private Map articleCarriers = new HashMap();
+	private Map<String, ArticleCarrier> articleCarriers = new HashMap<String, ArticleCarrier>();
 
 //	/**
 //	 * Cache for articles, which is normally <code>null</code>!!!
@@ -120,9 +121,9 @@ public class ArticleProductTypeClassGroup
 	 * @return Returns a <code>Collection</code> of {@link ArticleCarrier} - the ones that
 	 *		have been created by this method in order to wrap the given {@link Article}s.
 	 */
-	public Collection addArticles(Collection articles)
+	public Collection<ArticleCarrier> addArticles(Collection articles)
 	{
-		Set articleCarriers = new HashSet(articles.size());
+		Set<ArticleCarrier> articleCarriers = new HashSet<ArticleCarrier>(articles.size());
 		for (Iterator it = articles.iterator(); it.hasNext(); ) {
 			Article article = (Article) it.next();
 			if (article != null)
@@ -133,10 +134,10 @@ public class ArticleProductTypeClassGroup
 	/**
 	 * @return Returns a <tt>Collection</tt> of {@link Article}.
 	 */
-	public Collection getArticles()
+	public Collection<Article> getArticles()
 	{
 //		if (articles == null) {
-			Set s = new HashSet(articleCarriers.size());
+			Set<Article> s = new HashSet<Article>(articleCarriers.size());
 			for (Iterator it = articleCarriers.values().iterator(); it.hasNext();) {
 				ArticleCarrier articleCarrier = (ArticleCarrier) it.next();
 				s.add(articleCarrier.getArticle());
@@ -148,7 +149,18 @@ public class ArticleProductTypeClassGroup
 //		return articles;
 	}
 
-	public Collection getArticleCarriers()
+	public Collection<ArticleCarrier> getArticleCarriers(Collection<Article> articles)
+	{
+		Set<ArticleCarrier> res = new HashSet<ArticleCarrier>(articles.size());
+		for (Article article : articles) {
+			ArticleCarrier articleCarrier = articleCarriers.get(article.getPrimaryKey());
+			if (articleCarrier != null)
+				res.add(articleCarrier);
+		}
+		return res;
+	}
+
+	public Collection<ArticleCarrier> getArticleCarriers()
 	{
 		return Collections.unmodifiableCollection(articleCarriers.values());
 	}

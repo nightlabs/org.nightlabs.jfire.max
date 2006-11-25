@@ -26,11 +26,17 @@
 
 package org.nightlabs.jfire.trade;
 
+import java.util.Map;
+
+import javax.jdo.JDODataStoreException;
 import javax.jdo.JDOObjectNotFoundException;
 import javax.jdo.PersistenceManager;
+import javax.jdo.listener.StoreCallback;
 
 import org.nightlabs.jfire.organisation.Organisation;
+import org.nightlabs.jfire.security.User;
 import org.nightlabs.jfire.transfer.Anchor;
+import org.nightlabs.jfire.transfer.Transfer;
 import org.nightlabs.jfire.transfer.id.AnchorID;
 
 /**
@@ -48,6 +54,7 @@ import org.nightlabs.jfire.transfer.id.AnchorID;
  * @jdo.fetch-group name="OrganisationLegalEntity.this" fetch-groups="default" fields="organisation"
  */
 public class OrganisationLegalEntity extends LegalEntity
+//implements StoreCallback
 {
 	public static final String FETCH_GROUP_ORGANISATION = "OrganisationLegalEntity.organisation";
 	public static final String FETCH_GROUP_THIS_ORGANISATION_LEGAL_ENTITY = "OrganisationLegalEntity.this";
@@ -78,13 +85,33 @@ public class OrganisationLegalEntity extends LegalEntity
 //	private String localOrganisationID;
 //	private boolean localOrganisation;
 
-	public OrganisationLegalEntity() { }
+	protected OrganisationLegalEntity() { }
 
-	public OrganisationLegalEntity(org.nightlabs.jfire.organisation.Organisation organisation, String anchorTypeID)
+	protected OrganisationLegalEntity(org.nightlabs.jfire.organisation.Organisation organisation, String anchorTypeID)
 	{
 		super(organisation.getOrganisationID(), anchorTypeID, OrganisationLegalEntity.class.getName());
-		this.organisation = organisation;
-		this.setPerson(organisation.getPerson());
+		System.out.println("******************************************");
+		System.out.println("******************************************");
+		System.out.println("******************************************");
+		System.out.println("******************************************");
+		System.out.println("******************************************");
+		System.out.println("******************************************");
+		System.out.println("******************************************");
+		System.out.println("******************************************");
+		System.out.println("******************************************");
+		System.out.println("*************OrganisationLegalEntity****************");
+		System.out.println("******************************************");
+		System.out.println("******************************************");
+		System.out.println("******************************************");
+		System.out.println("******************************************");
+		System.out.println("******************************************");
+		System.out.println("******************************************");
+		System.out.println("******************************************");
+		System.out.println("******************************************");
+		// TODO: The person and organisation should be set here, but is not because of JPOX but, see
+//		this.organisation = organisation;
+//		this.setPerson(organisation.getPerson());
+		
 //		PersistenceManager pm = JDOHelper.getPersistenceManager(organisation);
 //		if (pm == null)
 //			throw new NullPointerException("organisation has no PersistenceManager attached! Can use this constructor only with a persistent non-detached organisation.");
@@ -147,10 +174,41 @@ public class OrganisationLegalEntity extends LegalEntity
 					pm, organisationID, throwExceptionIfNotExistent);
 
 			if (organisationID != null) {
+				
 				organisationLegalEntity = new OrganisationLegalEntity(organisation, anchorTypeID);
-				pm.makePersistent(organisationLegalEntity);
+				try {
+					organisationLegalEntity = (OrganisationLegalEntity) pm.makePersistent(organisationLegalEntity);
+				} catch (JDODataStoreException workaround) {
+					System.out.println();
+					System.out.println("******************************************");
+					System.out.println("******************************************");
+					System.out.println("******************************************");
+					System.out.println("******************************************");
+					System.out.println("******************************************");
+					System.out.println("******************************************");
+					System.out.println("******************************************");
+					System.out.println("******************************************");
+					System.out.println("******************************************");
+					System.out.println("*****OrganisationLegalEntity workaround**********");
+					System.out.println("******************************************");
+					System.out.println("******************************************");
+					System.out.println("******************************************");
+					System.out.println("******************************************");
+					System.out.println("******************************************");
+					System.out.println("******************************************");
+					System.out.println("******************************************");
+					System.out.println("******************************************");
+				}
+				// TODO: This should be done in the constructor of OrganisationLegalEntity
+				organisationLegalEntity.organisation = organisation;
+				organisationLegalEntity.setPerson(organisation.getPerson());
 			}
 		}
 		return organisationLegalEntity;
 	}
+
+//	public void jdoPreStore() {
+//		if (getPerson() == null)
+//			setPerson(organisation.getPerson());
+//	}
 }

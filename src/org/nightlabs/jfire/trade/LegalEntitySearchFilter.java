@@ -26,13 +26,14 @@
 
 package org.nightlabs.jfire.trade;
 
-import org.nightlabs.jfire.person.util.PersonSearchFilter;
+import org.nightlabs.jfire.prop.search.PropSearchFilter;
+
 
 /**
  * @author Alexander Bieber <alex[AT]nightlabs[DOT]de>
  *
  */
-public class LegalEntitySearchFilter extends PersonSearchFilter {
+public class LegalEntitySearchFilter extends PropSearchFilter {
 
 	/**
 	 * 
@@ -56,10 +57,12 @@ public class LegalEntitySearchFilter extends PersonSearchFilter {
 		super(_conjunction, personType);
 	}
 
-	public void setPersonVariableCondition(StringBuffer filter) {
-		filter.append(PERSON_VARNAME+" == this.person");
+	@Override
+	public void setPropVariableCondition(StringBuffer filter) {
+		filter.append(PROPERTY_VARNAME+" == this.person");
 	}
 	
+	@Override
 	protected Class getExtentClass() {
 		return LegalEntity.class;
 	}

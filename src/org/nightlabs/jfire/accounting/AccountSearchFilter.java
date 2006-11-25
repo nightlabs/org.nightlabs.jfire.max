@@ -30,7 +30,7 @@ import java.util.Map;
 import java.util.Set;
 
 import org.nightlabs.jdo.search.SearchFilter;
-import org.nightlabs.jfire.person.util.PersonSearchFilter;
+import org.nightlabs.jfire.prop.search.PropSearchFilter;
 import org.nightlabs.jfire.transfer.id.AnchorID;
 
 /**
@@ -43,7 +43,7 @@ public class AccountSearchFilter extends SearchFilter {
 	private String anchorTypeID;
 	private String currencyID;
 	private String nameFilter;
-	private PersonSearchFilter personFilter;
+	private PropSearchFilter personFilter;
 
 	/**
 	 * @param _conjunction
@@ -110,9 +110,9 @@ public class AccountSearchFilter extends SearchFilter {
 		
 		if (personFilter != null) {
 			filter.append(" && (");
-			personFilter.setPersonVariableCondition(filter);
+			personFilter.setPropVariableCondition(filter);
 			filter.append(" && ");
-			personFilter.addPersonFilterItems(imports, vars, filter, params, paramMap);
+			personFilter.addPropFilterItems(imports, vars, filter, params, paramMap);
 			filter.append(" && )");
 		}
 	}
@@ -176,14 +176,14 @@ public class AccountSearchFilter extends SearchFilter {
 	/**
 	 * @return Returns the personFilter.
 	 */
-	public PersonSearchFilter getPersonFilter() {
+	public PropSearchFilter getPersonFilter() {
 		return personFilter;
 	}
 
 	/**
 	 * @param personFilter The personFilter to set.
 	 */
-	public void setPersonFilter(PersonSearchFilter personFilter) {
+	public void setPersonFilter(PropSearchFilter personFilter) {
 		this.personFilter = personFilter;
 	}
 	

@@ -54,6 +54,7 @@ import org.nightlabs.jfire.accounting.id.TariffID;
 import org.nightlabs.jfire.accounting.priceconfig.IInnerPriceConfig;
 import org.nightlabs.jfire.accounting.tariffpriceconfig.FormulaPriceConfig;
 import org.nightlabs.jfire.base.BaseSessionBeanImpl;
+import org.nightlabs.jfire.idgenerator.IDGenerator;
 import org.nightlabs.jfire.jbpm.JbpmLookup;
 import org.nightlabs.jfire.organisation.Organisation;
 import org.nightlabs.jfire.security.Authority;
@@ -194,18 +195,16 @@ implements SessionBean
 				try {
 					tariffNormalPrice = (Tariff) pm.getObjectById(TariffID.create(organisationID, 0));
 				} catch (JDOObjectNotFoundException x) {
-					tariffNormalPrice = new Tariff(organisationID);
+					tariffNormalPrice = (Tariff) pm.makePersistent(new Tariff(organisationID, IDGenerator.nextID(Tariff.class)));
 					tariffNormalPrice.getName().setText(languageID, "Normal Price");
-					pm.makePersistent(tariffNormalPrice);
 				}
 	
 				Tariff tariffGoldCard;
 				try {
 					tariffGoldCard = (Tariff) pm.getObjectById(TariffID.create(organisationID, 1));
 				} catch (JDOObjectNotFoundException x) {
-					tariffGoldCard = new Tariff(organisationID);
+					tariffGoldCard = (Tariff) pm.makePersistent(new Tariff(organisationID, IDGenerator.nextID(Tariff.class)));
 					tariffGoldCard.getName().setText(languageID, "Gold Card");
-					pm.makePersistent(tariffGoldCard);
 				}
 	
 				DataCreator dataCreator = new DataCreator(User.getUser(pm, getPrincipal()));

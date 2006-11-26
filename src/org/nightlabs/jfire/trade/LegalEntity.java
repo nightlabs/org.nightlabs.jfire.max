@@ -43,6 +43,7 @@ import org.nightlabs.jfire.organisation.LocalOrganisation;
 import org.nightlabs.jfire.person.Person;
 import org.nightlabs.jfire.person.PersonStruct;
 import org.nightlabs.jfire.prop.IStruct;
+import org.nightlabs.jfire.prop.Property;
 import org.nightlabs.jfire.prop.Struct;
 import org.nightlabs.jfire.prop.TextDataField;
 import org.nightlabs.jfire.security.User;
@@ -74,6 +75,8 @@ import org.nightlabs.jfire.transfer.id.AnchorID;
  */
 public class LegalEntity extends Anchor
 {
+	private static final long serialVersionUID = 1L;
+
 	public static final String ANCHOR_ID_ANONYMOUS = "LegalEntity-anonymous";
 
 	public static final String FETCH_GROUP_ACCOUNTANT = "LegalEntity.accountant";
@@ -112,7 +115,7 @@ public class LegalEntity extends Anchor
 		}
 
 		// It's better to have a Person for EVERY LegalEntity
-		Person person = new Person(IDGenerator.getOrganisationID(), IDGenerator.nextID(Person.class));
+		Person person = new Person(IDGenerator.getOrganisationID(), IDGenerator.nextID(Property.class));
 		IStruct struct = Struct.getStruct(organisationID, Person.class, pm);
 		struct.explodeProperty(person);
 		try {
@@ -128,7 +131,7 @@ public class LegalEntity extends Anchor
 		anonymousCustomer.setPerson(person);
 		anonymousCustomer.setAnonymous(true);
 		anonymousCustomer.setDefaultCustomerGroup(anonymousCustomerGroup);
-		pm.makePersistent(anonymousCustomer);
+		anonymousCustomer = (LegalEntity) pm.makePersistent(anonymousCustomer);
 		return anonymousCustomer;
 	}
 

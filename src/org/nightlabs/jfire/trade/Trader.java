@@ -75,8 +75,13 @@ import org.nightlabs.jfire.transfer.id.AnchorID;
  * @author Marco Schulze - marco at nightlabs dot de
  * @author Alexander Bieber <alex[AT]nightlabs[DOT]de>
  * 
- * @jdo.persistence-capable identity-type="datastore" detachable="true"
- *                          table="JFireTrade_Trader"
+ * @jdo.persistence-capable
+ *		identity-type="application"
+ *		objectid-class="org.nightlabs.jfire.trade.id.TraderID"
+ *		detachable="true"
+ *		table="JFireTrade_Trader"
+ *
+ * @jdo.create-objectid-class
  * 
  * @jdo.inheritance strategy="new-table"
  */
@@ -121,7 +126,7 @@ public class Trader
 	}
 
 	/**
-	 * @jdo.field persistence-modifier="persistent"
+	 * @jdo.field primary-key="true"
 	 * @jdo.column length="100"
 	 */
 	private String organisationID;

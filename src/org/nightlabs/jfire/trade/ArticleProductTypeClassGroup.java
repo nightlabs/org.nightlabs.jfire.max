@@ -35,7 +35,6 @@ import java.util.Map;
 import java.util.Set;
 
 import org.nightlabs.jfire.store.ProductType;
-import org.nightlabs.jfire.trade.id.ArticleID;
 
 /**
  * @author Marco Schulze - marco at nightlabs dot de

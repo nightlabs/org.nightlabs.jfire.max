@@ -28,10 +28,6 @@ package org.nightlabs.jfire.accounting;
 
 import java.io.Serializable;
 
-import javax.jdo.JDOHelper;
-import javax.jdo.PersistenceManager;
-import javax.jdo.listener.StoreCallback;
-
 /**
  * TODO Shall I really put this class into JFireTrade? Or is it Ticketing specific?
  *			Does it help me here or does it make things complicated?
@@ -64,7 +60,7 @@ import javax.jdo.listener.StoreCallback;
  * @jdo.fetch-group name="FetchGroupsPriceConfig.edit" fields="name"
  */
 public class Tariff
-	implements Serializable, StoreCallback
+	implements Serializable
 {
 	public static final String FETCH_GROUP_NAME = "Tariff.name";
 
@@ -91,10 +87,10 @@ public class Tariff
 
 	public Tariff() { }
 
-	public Tariff(String organisationID)
+	public Tariff(String organisationID, long tariffID)
 	{
 		this.organisationID = organisationID;
-//		this.tariffID = tariffID;
+		this.tariffID = tariffID;
 		this.primaryKey = getPrimaryKey(organisationID, tariffID);
 		this.name = new TariffName(this);
 	}
@@ -120,15 +116,15 @@ public class Tariff
 //			return -1;
 		return tariffID;
 	}
-	/**
-	 * @param tariffID The tariffID to set.
-	 */
-	public void setTariffID(long tariffID)
-	{
-		this.tariffID = tariffID;
-		this.primaryKey = getPrimaryKey(getOrganisationID(), tariffID);
-		this.name.setTariffID(tariffID);
-	}
+//	/**
+//	 * @param tariffID The tariffID to set.
+//	 */
+//	public void setTariffID(long tariffID)
+//	{
+//		this.tariffID = tariffID;
+//		this.primaryKey = getPrimaryKey(getOrganisationID(), tariffID);
+//		this.name.setTariffID(tariffID);
+//	}
 //	public static String getPrimaryKey(String organisationID, String tariffID)
 //	{
 //		return organisationID + '/' + tariffID;
@@ -141,17 +137,17 @@ public class Tariff
 		return primaryKey;
 	}
 	
-	/**
-	 * @see javax.jdo.listener.StoreCallback#jdoPreStore()
-	 */
-	public void jdoPreStore()
-	{
-		if (tariffID < 0) {
-			PersistenceManager pm = JDOHelper.getPersistenceManager(this);
-			this.setTariffID(
-					TariffRegistry.getTariffRegistry(pm).createTariffID());
-		}
-	}
+//	/**
+//	 * @see javax.jdo.listener.StoreCallback#jdoPreStore()
+//	 */
+//	public void jdoPreStore()
+//	{
+//		if (tariffID < 0) {
+//			PersistenceManager pm = JDOHelper.getPersistenceManager(this);
+//			this.setTariffID(
+//					TariffRegistry.getTariffRegistry(pm).createTariffID());
+//		}
+//	}
 
 	/**
 	 * @return Returns the name.

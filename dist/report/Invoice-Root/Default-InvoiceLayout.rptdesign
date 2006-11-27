@@ -6,7 +6,7 @@
     <list-property name="configVars">
         <structure>
             <property name="name">invoiceOrganisationID</property>
-            <property name="value">"bieber.NightLabs.de"</property>
+            <property name="value">"chezfrancois.jfire.org"</property>
         </structure>
         <structure>
             <property name="name">invoiceInvoiceID</property>
@@ -14,7 +14,7 @@
         </structure>
         <structure>
             <property name="name">languageID</property>
-            <property name="value">"de"</property>
+            <property name="value">"en"</property>
         </structure>
     </list-property>
     <parameters>
@@ -23,7 +23,7 @@
             <property name="valueType">static</property>
             <property name="dataType">string</property>
             <property name="controlType">text-box</property>
-            <property name="defaultValue">"bieber.NightLabs.de"</property>
+            <property name="defaultValue">"chezfrancois.jfire.org"</property>
             <structure name="format">
                 <property name="category">Unformatted</property>
                 <property name="pattern">Unformatted</property>
@@ -214,7 +214,7 @@ try {
                     <property name="name">invoiceOrganisationID</property>
                     <property name="dataType">string</property>
                     <property name="position">1</property>
-                    <expression name="defaultValue">"bieber.NightLabs.de"</expression>
+                    <expression name="defaultValue">"chezfrancois.jfire.org"</expression>
                     <property name="isInput">true</property>
                     <property name="isOutput">false</property>
                 </structure>

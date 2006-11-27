@@ -34,7 +34,6 @@ import javax.jdo.JDOHelper;
 import javax.jdo.PersistenceManager;
 
 import org.apache.log4j.Logger;
-
 import org.nightlabs.jfire.organisation.LocalOrganisation;
 
 /**
@@ -44,15 +43,20 @@ import org.nightlabs.jfire.organisation.LocalOrganisation;
  *
  * @author Marco Schulze - marco at nightlabs dot de
  * 
- * @jdo.persistence-capable 
- *		identity-type = "datastore"
- *		detachable = "true"
- *		table = "JFireGeography_Geography"
+ * @jdo.persistence-capable
+ *		identity-type="application"
+ *		objectid-class="org.nightlabs.jfire.geography.id.GeographyID" 
+ *		detachable="true"
+ *		table="JFireGeography_Geography"
+ *
+ * @jdo.create-objectid-class
  *
  * @jdo.inheritance strategy = "new-table"
  */
 public class Geography implements Serializable
 {
+	private static final long serialVersionUID = 1L;
+
 	/**
 	 * LOG4J logger used by this class
 	 */
@@ -106,6 +110,9 @@ public class Geography implements Serializable
 		return geography;
 	}
 
+	/**
+	 * @jdo.field primary-key="true"
+	 */
 	private String organisationID;
 
 	public Geography() { }

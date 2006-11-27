@@ -35,23 +35,40 @@ import org.nightlabs.inheritance.NotWritableException;
  * @author Marco Schulze - marco at nightlabs dot de
  * 
  * @jdo.persistence-capable
- *		identity-type="datastore"
+ *		identity-type="application"
+ *		objectid-class="org.nightlabs.jfire.store.id.ProductTypeMapEntryMetaDataID"
  *		detachable="true"
  *		table="JFireTrade_MapEntryMetaData"
+ *
+ * @jdo.create-objectid-class field-order="organisationID, productTypeID, fieldName, key"
  *
  * @jdo.inheritance strategy="new-table"
  */
 public class ProductTypeMapEntryMetaData
 	implements org.nightlabs.inheritance.MapEntryMetaData, Serializable
 {
+	private static final long serialVersionUID = 1L;
+
 	/**
-	 * @jdo.field persistence-modifier="persistent"
+	 * @jdo.field primary-key="true"
+	 * @jdo.column length="100"
+	 */
+	private String organisationID;
+
+	/**
+	 * @jdo.field primary-key="true"
+	 * @jdo.column length="100"
+	 */
+	private String productTypeID;
+
+	/**
+	 * @jdo.field primary-key="true"
 	 * @jdo.column length="100"
 	 */
 	private String fieldName;
 
 	/**
-	 * @jdo.field persistence-modifier="persistent"
+	 * @jdo.field primary-key="true"
 	 * @jdo.column length="100"
 	 */
 	private String key;
@@ -88,8 +105,20 @@ public class ProductTypeMapEntryMetaData
 	public ProductTypeMapEntryMetaData(ProductTypeMapFieldMetaData mapFieldMetaData, String key)
 	{
 		this.mapFieldMetaData = mapFieldMetaData;
+		this.organisationID = mapFieldMetaData.getOrganisationID();
+		this.productTypeID = mapFieldMetaData.getProductTypeID();
 		this.fieldName = mapFieldMetaData.getFieldName();
 		this.key = key;
+	}
+
+	public String getOrganisationID()
+	{
+		return organisationID;
+	}
+
+	public String getProductTypeID()
+	{
+		return productTypeID;
 	}
 
 	/**
@@ -106,6 +135,11 @@ public class ProductTypeMapEntryMetaData
 	public Object getKey()
 	{
 		return key;
+	}
+
+	public ProductTypeMapFieldMetaData getMapFieldMetaData()
+	{
+		return mapFieldMetaData;
 	}
 
 	/**

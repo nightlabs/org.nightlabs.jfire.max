@@ -64,12 +64,12 @@ public class ProductTypeMapFieldMetaData
 	protected ProductTypeMapFieldMetaData() { }
 
 	/**
-	 * @param product
+	 * @param productType
 	 * @param fieldName
 	 */
-	public ProductTypeMapFieldMetaData(ProductType product, String fieldName)
+	public ProductTypeMapFieldMetaData(ProductType productType, String fieldName)
 	{
-		super(product, fieldName);
+		super(productType, fieldName);
 	}
 
 	/**

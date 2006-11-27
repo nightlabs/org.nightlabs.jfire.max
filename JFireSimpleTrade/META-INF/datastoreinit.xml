@@ -4,7 +4,9 @@
 <datastore-initialization>
 
 	<init bean="jfire/ejb/JFireSimpleTrade/SimpleTradeManager" method="initialize">
+			<depends module="JFireTrade.ear" />
 
+<!--
 		<depends
 					module="JFireTrade.ear"
 					archive="JFireTrade.jar"
@@ -22,7 +24,7 @@
 					archive="JFireTrade.jar"
 					bean="jfire/ejb/JFireTrade/TradeManager"
 					method="initialize" />
-
+-->
 	</init>
 
 </datastore-initialization>

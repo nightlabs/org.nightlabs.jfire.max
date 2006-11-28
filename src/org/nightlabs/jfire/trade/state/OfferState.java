@@ -12,10 +12,6 @@ import org.nightlabs.jfire.trade.Offer;
  *		table="JFireTrade_OfferState"
  *
  * @jdo.inheritance strategy="new-table"
- *
- * @jdo.fetch-group name="OfferState.user" fields="user"
- * @jdo.fetch-group name="OfferState.offer" fields="offer"
- * @jdo.fetch-group name="OfferState.offerStateDefinition" fields="offerStateDefinition"
  */
 public class OfferState
 extends State

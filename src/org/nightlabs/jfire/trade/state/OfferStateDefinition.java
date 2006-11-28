@@ -10,14 +10,14 @@ import org.nightlabs.jfire.trade.state.id.StateDefinitionID;
  * @author Marco Schulze - marco at nightlabs dot de
  *
  * @jdo.persistence-capable
- *		persistence-capable-superclass="org.nightlabs.jfire.trade.state.ArticleContainerStateDefinition"
+ *		persistence-capable-superclass="org.nightlabs.jfire.trade.state.StateDefinition"
  *		detachable="true"
  *		table="JFireTrade_OfferStateDefinition"
  *
  * @jdo.inheritance strategy="new-table"
  */
 public class OfferStateDefinition
-extends ArticleContainerStateDefinition
+extends StateDefinition
 {
 	private static final long serialVersionUID = 1L;
 
@@ -50,6 +50,6 @@ extends ArticleContainerStateDefinition
 
 	protected State _createState(User user, Statable statable)
 	{
-		return new OfferState(user.getOrganisationID(), IDGenerator.nextID(State.class), user, (Offer)statable, this);
+		return new OfferState(IDGenerator.getOrganisationID(), IDGenerator.nextID(State.class), user, (Offer)statable, this);
 	}
 }

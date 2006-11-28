@@ -54,8 +54,12 @@ import org.nightlabs.jfire.trade.Offer;
 import org.nightlabs.jfire.trade.Order;
 import org.nightlabs.jfire.trade.OrganisationLegalEntity;
 import org.nightlabs.jfire.trade.id.ArticleID;
+import org.nightlabs.jfire.trade.state.Statable;
+import org.nightlabs.jfire.trade.state.StatableLocal;
+import org.nightlabs.jfire.trade.state.State;
 import org.nightlabs.jfire.transfer.Transfer;
 import org.nightlabs.jfire.transfer.id.AnchorID;
+import org.nightlabs.util.CollectionUtil;
 import org.nightlabs.util.Utils;
 
 /**
@@ -113,7 +117,7 @@ import org.nightlabs.util.Utils;
  * @jdo.fetch-group name="Invoice.this" fetch-groups="default" fields="invoiceLocal, articles, createUser, currency, customer, discount, finalizeUser, price, vendor"
  **/
 public class Invoice
-implements Serializable, ArticleContainer, DetachCallback
+implements Serializable, ArticleContainer, Statable, DetachCallback
 {
 	public static final String FETCH_GROUP_INVOICE_LOCAL = "Invoice.invoiceLocal";
 	public static final String FETCH_GROUP_ARTICLES = "Invoice.articles";
@@ -316,7 +320,14 @@ implements Serializable, ArticleContainer, DetachCallback
 	 */
 	private Set<Article> articles;
 
+	/**
+	 * @return the same as {@link #getStatableLocal()}
+	 */
 	public InvoiceLocal getInvoiceLocal()
+	{
+		return invoiceLocal;
+	}
+	public StatableLocal getStatableLocal()
 	{
 		return invoiceLocal;
 	}
@@ -700,19 +711,19 @@ implements Serializable, ArticleContainer, DetachCallback
 	 * This method is <b>not</b> intended to be called directly.
 	 * Call {@link InvoiceStateDefinition#createInvoiceState(User, Invoice)} instead!
 	 */
-	public void setInvoiceState(InvoiceState currentInvoiceState)
+	public void setState(State currentState)
 	{
-		if (currentInvoiceState == null)
+		if (currentState == null)
 			throw new IllegalArgumentException("invoiceState must not be null!");
 
-		if (!currentInvoiceState.getInvoiceStateDefinition().isPublicState())
+		if (!currentState.getStateDefinition().isPublicState())
 			throw new IllegalArgumentException("invoiceState.invoiceStateDefinition.publicState is false!");
 
-		this.invoiceState = currentInvoiceState;
-		this.invoiceStates.add(currentInvoiceState);
+		this.invoiceState = (InvoiceState) currentState;
+		this.invoiceStates.add((InvoiceState) currentState);
 	}
 
-	public InvoiceState getInvoiceState()
+	public InvoiceState getState()
 	{
 		return invoiceState;
 	}
@@ -720,14 +731,13 @@ implements Serializable, ArticleContainer, DetachCallback
 	/**
 	 * @jdo.field persistence-modifier="none"
 	 */
-	private transient List<InvoiceState> _invoiceStates = null;
+	private transient List<State> _invoiceStates = null;
 
-	public List<InvoiceState> getInvoiceStates()
+	public List<State> getStates()
 	{
 		if (_invoiceStates == null)
-			_invoiceStates = Collections.unmodifiableList(invoiceStates);
+			_invoiceStates = CollectionUtil.castList(Collections.unmodifiableList(invoiceStates));
 
 		return _invoiceStates;
 	}
-
 }

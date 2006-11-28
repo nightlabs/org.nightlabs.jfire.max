@@ -1,104 +1,48 @@
 package org.nightlabs.jfire.store.state;
 
-import java.io.Serializable;
-import java.util.Date;
-
 import org.nightlabs.jfire.security.User;
 import org.nightlabs.jfire.store.DeliveryNote;
+import org.nightlabs.jfire.trade.state.State;
 
 /**
  * @author Marco Schulze - marco at nightlabs dot de
  *
  * @jdo.persistence-capable
- *		identity-type="application"
- *		objectid-class="org.nightlabs.jfire.store.state.id.DeliveryNoteStateID"
+ *		persistence-capable-superclass="org.nightlabs.jfire.trade.state.State"
  *		detachable="true"
  *		table="JFireTrade_DeliveryNoteState"
  *
  * @jdo.inheritance strategy="new-table"
- *
- * @jdo.create-objectid-class
- *		field-order="organisationID, deliveryNoteStateID"
- *
- * @jdo.fetch-group name="DeliveryNoteState.user" fields="user"
- * @jdo.fetch-group name="DeliveryNoteState.deliveryNote" fields="deliveryNote"
- * @jdo.fetch-group name="DeliveryNoteState.deliveryNoteStateDefinition" fields="deliveryNoteStateDefinition"
  */
 public class DeliveryNoteState
-implements Serializable
+extends State
 {
 	private static final long serialVersionUID = 1L;
-
-	/**
-	 * @jdo.field primary-key="true"
-	 * @jdo.column length="100"
-	 */
-	private String organisationID;
-
-	/**
-	 * @jdo.field primary-key="true"
-	 */
-	private long deliveryNoteStateID;
-
-
-	/**
-	 * @jdo.field persistence-modifier="persistent" null-value="exception"
-	 */
-	private User user;
-
-	/**
-	 * @jdo.field persistence-modifier="persistent" null-value="exception"
-	 */
-	private DeliveryNote deliveryNote;
-
-	/**
-	 * @jdo.field persistence-modifier="persistent" null-value="exception"
-	 */
-	private DeliveryNoteStateDefinition deliveryNoteStateDefinition;
-
-	/**
-	 * @jdo.field persistence-modifier="persistent" null-value="exception"
-	 */
-	private Date createDT;
 
 	/**
 	 * @deprecated Only for JDO!
 	 */
 	protected DeliveryNoteState() { }
 
-	public DeliveryNoteState(String organisationID, long deliveryNoteStateID, User user, DeliveryNote deliveryNote, DeliveryNoteStateDefinition deliveryNoteStateDefinition)
+	public DeliveryNoteState(String organisationID, long stateID, User user, DeliveryNote deliveryNote, DeliveryNoteStateDefinition deliveryNoteStateDefinition)
 	{
-		this.organisationID = organisationID;
-		this.deliveryNoteStateID = deliveryNoteStateID;
-		this.user = user;
-		this.deliveryNote = deliveryNote;
-		this.deliveryNoteStateDefinition = deliveryNoteStateDefinition;
-		this.createDT = new Date();
+		super(organisationID, stateID, user, deliveryNote, deliveryNoteStateDefinition);
 	}
 
-	public String getOrganisationID()
-	{
-		return organisationID;
-	}
-	public long getDeliveryNoteStateID()
-	{
-		return deliveryNoteStateID;
-	}
-	public User getUser()
-	{
-		return user;
-	}
+	/**
+	 * This is a convenience method calling the super method {@link State#getStatable()}.
+	 * @return the result of {@link State#getStatable()}
+	 */
 	public DeliveryNote getDeliveryNote()
 	{
-		return deliveryNote;
+		return (DeliveryNote) getStatable();
 	}
+	/**
+	 * This is a convenience method calling the super method {@link State#getStateDefinition()}.
+	 * @return the result of {@link State#getStateDefinition()}
+	 */
 	public DeliveryNoteStateDefinition getDeliveryNoteStateDefinition()
 	{
-		return deliveryNoteStateDefinition;
+		return (DeliveryNoteStateDefinition) getStateDefinition();
 	}
-	public Date getCreateDT()
-	{
-		return createDT;
-	}
-
 }

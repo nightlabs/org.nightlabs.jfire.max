@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
 <process-definition
-  xmlns=""  name="Offer.Vendor">
+  xmlns=""  name="devil.NightLabs.org/Offer.Vendor">
    <start-state name="devil.NightLabs.org/created">
       <transition name="finalize" to="devil.NightLabs.org/finalized"></transition>
       <transition name="abort" to="devil.NightLabs.org/aborted"></transition>

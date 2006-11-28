@@ -36,17 +36,17 @@ import org.nightlabs.i18n.I18nText;
  *
  * @jdo.persistence-capable
  *		identity-type="application"
- *		objectid-class="org.nightlabs.jfire.trade.state.id.ArticleContainerStateDefinitionDescriptionID"
+ *		objectid-class="org.nightlabs.jfire.trade.state.id.StateDefinitionDescriptionID"
  *		detachable="true"
- *		table="JFireTrade_ArticleContainerStateDefinitionDescription"
+ *		table="JFireTrade_StateDefinitionDescription"
  *
  * @jdo.inheritance strategy="new-table"
  *
- * @jdo.create-objectid-class field-order="organisationID, articleContainerStateDefinitionID"
+ * @jdo.create-objectid-class field-order="organisationID, stateDefinitionClass, stateDefinitionID"
  *
- * @jdo.fetch-group name="ArticleContainerStateDefinition.description" fields="articleContainerStateDefinition, descriptions"
+ * @jdo.fetch-group name="StateDefinition.description" fields="stateDefinition, descriptions"
  */
-public class ArticleContainerStateDefinitionDescription extends I18nText
+public class StateDefinitionDescription extends I18nText
 {
 	private static final long serialVersionUID = 1L;
 
@@ -60,13 +60,13 @@ public class ArticleContainerStateDefinitionDescription extends I18nText
 	 * @jdo.field primary-key="true"
 	 * @jdo.column length="100"
 	 */
-	private String articleContainerStateDefinitionClass;
+	private String stateDefinitionClass;
 
 	/**
 	 * @jdo.field primary-key="true"
 	 * @jdo.column length="100"
 	 */
-	private String articleContainerStateDefinitionID;
+	private String stateDefinitionID;
 
 	/**
 	 * key: String languageID<br/>
@@ -78,7 +78,7 @@ public class ArticleContainerStateDefinitionDescription extends I18nText
 	 *		key-type="java.lang.String"
 	 *		value-type="java.lang.String"
 	 *		default-fetch-group="true"
-	 *		table="JFireTrade_ArticleContainerStateDefinitionDescription_descriptions"
+	 *		table="JFireTrade_StateDefinitionDescription_descriptions"
 	 *
 	 * @jdo.key-column length="5"
 	 * @jdo.value-column jdbc-type="LONGVARCHAR"
@@ -90,21 +90,21 @@ public class ArticleContainerStateDefinitionDescription extends I18nText
 	/**
 	 * @jdo.field persistence-modifier="persistent"
 	 */
-	private ArticleContainerStateDefinition articleContainerStateDefinition;
+	private StateDefinition stateDefinition;
 
 	/**
 	 * @deprecated Only for JDO!
 	 */
-	protected ArticleContainerStateDefinitionDescription()
+	protected StateDefinitionDescription()
 	{
 	}
 
-	public ArticleContainerStateDefinitionDescription(ArticleContainerStateDefinition articleContainerStateDefinition)
+	public StateDefinitionDescription(StateDefinition stateDefinition)
 	{
-		this.organisationID = articleContainerStateDefinition.getOrganisationID();
-		this.articleContainerStateDefinitionClass = articleContainerStateDefinition.getStateDefinitionClass();
-		this.articleContainerStateDefinitionID = articleContainerStateDefinition.getStateDefinitionID();
-		this.articleContainerStateDefinition = articleContainerStateDefinition;
+		this.organisationID = stateDefinition.getOrganisationID();
+		this.stateDefinitionClass = stateDefinition.getStateDefinitionClass();
+		this.stateDefinitionID = stateDefinition.getStateDefinitionID();
+		this.stateDefinition = stateDefinition;
 	}
 
 	/**
@@ -120,7 +120,7 @@ public class ArticleContainerStateDefinitionDescription extends I18nText
 	 */
 	protected String getFallBackValue(String languageID)
 	{
-		return ArticleContainerStateDefinition.getPrimaryKey(organisationID, articleContainerStateDefinitionClass, articleContainerStateDefinitionID);
+		return StateDefinition.getPrimaryKey(organisationID, stateDefinitionClass, stateDefinitionID);
 	}
 
 	public String getOrganisationID()
@@ -128,14 +128,19 @@ public class ArticleContainerStateDefinitionDescription extends I18nText
 		return organisationID;
 	}
 
-	public String getArticleContainerStateDefinitionID()
+	public String getStateDefinitionClass()
 	{
-		return articleContainerStateDefinitionID;
+		return stateDefinitionClass;
 	}
 
-	public ArticleContainerStateDefinition getArticleContainerStateDefinition()
+	public String getStateDefinitionID()
 	{
-		return articleContainerStateDefinition;
+		return stateDefinitionID;
+	}
+
+	public StateDefinition getArticleContainerStateDefinition()
+	{
+		return stateDefinition;
 	}
 
 }

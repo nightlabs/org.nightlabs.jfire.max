@@ -36,6 +36,10 @@ import java.util.Set;
 import org.nightlabs.jfire.accounting.state.InvoiceState;
 import org.nightlabs.jfire.accounting.state.InvoiceStateDefinition;
 import org.nightlabs.jfire.security.User;
+import org.nightlabs.jfire.trade.state.Statable;
+import org.nightlabs.jfire.trade.state.StatableLocal;
+import org.nightlabs.jfire.trade.state.State;
+import org.nightlabs.util.CollectionUtil;
 
 /**
  * @author Marco Schulze - marco at nightlabs dot de
@@ -57,7 +61,7 @@ import org.nightlabs.jfire.security.User;
  * @jdo.fetch-group name="InvoiceLocal.this" fields="invoice, bookUser"
  */
 public class InvoiceLocal
-implements Serializable
+implements Serializable, StatableLocal
 {
 	public static final String FETCH_GROUP_INVOICE = "InvoiceLocal.invoice";
 	public static final String FETCH_GROUP_BOOK_USER = "InvoiceLocal.bookUser";
@@ -161,7 +165,15 @@ implements Serializable
 	{
 		return invoiceID;
 	}
+
+	/**
+	 * @return the same as {@link #getStatable()}
+	 */
 	public Invoice getInvoice()
+	{
+		return invoice;
+	}
+	public Statable getStatable()
 	{
 		return invoice;
 	}
@@ -250,19 +262,16 @@ implements Serializable
 	 * This method is <b>not</b> intended to be called directly.
 	 * Call {@link InvoiceStateDefinition#createInvoiceState(User, Invoice)} instead!
 	 */
-	public void setInvoiceState(InvoiceState currentInvoiceState)
+	public void setState(State currentState)
 	{
-		if (currentInvoiceState == null)
+		if (currentState == null)
 			throw new IllegalArgumentException("invoiceState must not be null!");
 
-		if (!currentInvoiceState.getInvoiceStateDefinition().isPublicState())
-			throw new IllegalArgumentException("invoiceState.invoiceStateDefinition.publicState is false!");
-
-		this.invoiceState = currentInvoiceState;
-		this.invoiceStates.add(currentInvoiceState);
+		this.invoiceState = (InvoiceState)currentState;
+		this.invoiceStates.add((InvoiceState)currentState);
 	}
 
-	public InvoiceState getInvoiceState()
+	public InvoiceState getState()
 	{
 		return invoiceState;
 	}
@@ -270,12 +279,12 @@ implements Serializable
 	/**
 	 * @jdo.field persistence-modifier="none"
 	 */
-	private transient List<InvoiceState> _invoiceStates = null;
+	private transient List<State> _invoiceStates = null;
 
-	public List<InvoiceState> getInvoiceStates()
+	public List<State> getStates()
 	{
 		if (_invoiceStates == null)
-			_invoiceStates = Collections.unmodifiableList(invoiceStates);
+			_invoiceStates = CollectionUtil.castList(Collections.unmodifiableList(invoiceStates));
 
 		return _invoiceStates;
 	}

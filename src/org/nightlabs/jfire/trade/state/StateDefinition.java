@@ -24,7 +24,7 @@ import org.nightlabs.jfire.trade.OfferLocal;
  * @jdo.fetch-group name="StateDefinition.name" fields="name"
  * @jdo.fetch-group name="StateDefinition.description" fields="description"
  */
-public abstract class ArticleContainerStateDefinition
+public abstract class StateDefinition
 implements Serializable
 {
 	public static final String FETCH_GROUP_NAME = "StateDefinition.name";
@@ -49,14 +49,14 @@ implements Serializable
 	private String stateDefinitionID;
 
 	/**
-	 * @jdo.field persistence-modifier="persistent" mapped-by="articleContainerStateDefinition"
+	 * @jdo.field persistence-modifier="persistent" mapped-by="stateDefinition"
 	 */
-	private ArticleContainerStateDefinitionName name;
+	private StateDefinitionName name;
 
 	/**
-	 * @jdo.field persistence-modifier="persistent" mapped-by="articleContainerStateDefinition"
+	 * @jdo.field persistence-modifier="persistent" mapped-by="stateDefinition"
 	 */
-	private ArticleContainerStateDefinitionDescription description;
+	private StateDefinitionDescription description;
 
 	/**
 	 * @jdo.field persistence-modifier="persistent"
@@ -66,22 +66,22 @@ implements Serializable
 	/**
 	 * @deprecated Only for JDO!
 	 */
-	protected ArticleContainerStateDefinition()
+	protected StateDefinition()
 	{
 	}
 
-	public ArticleContainerStateDefinition(String organisationID, Class articleContainerStateDefinitionClass, String articleContainerStateDefinitionID)
+	public StateDefinition(String organisationID, Class articleContainerStateDefinitionClass, String articleContainerStateDefinitionID)
 	{
 		this(organisationID, articleContainerStateDefinitionClass.getName(), articleContainerStateDefinitionID);
 	}
 
-	public ArticleContainerStateDefinition(String organisationID, String articleContainerStateDefinitionClass, String articleContainerStateDefinitionID)
+	public StateDefinition(String organisationID, String articleContainerStateDefinitionClass, String articleContainerStateDefinitionID)
 	{
 		this.organisationID = organisationID;
 		this.stateDefinitionClass = articleContainerStateDefinitionClass;
 		this.stateDefinitionID = articleContainerStateDefinitionID;
-		this.name = new ArticleContainerStateDefinitionName(this);
-		this.description = new ArticleContainerStateDefinitionDescription(this);
+		this.name = new StateDefinitionName(this);
+		this.description = new StateDefinitionDescription(this);
 	}
 
 	public static String getPrimaryKey(String organisationID, String articleContainerStateDefinitionClass, String articleContainerStateDefinitionID)
@@ -150,11 +150,11 @@ implements Serializable
 	 */
 	protected abstract State _createState(User user, Statable statable);
 
-	public ArticleContainerStateDefinitionName getName()
+	public StateDefinitionName getName()
 	{
 		return name;
 	}
-	public ArticleContainerStateDefinitionDescription getDescription()
+	public StateDefinitionDescription getDescription()
 	{
 		return description;
 	}

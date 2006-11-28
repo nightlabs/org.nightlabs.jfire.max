@@ -53,7 +53,11 @@ import org.nightlabs.jfire.trade.Offer;
 import org.nightlabs.jfire.trade.Order;
 import org.nightlabs.jfire.trade.OrganisationLegalEntity;
 import org.nightlabs.jfire.trade.id.ArticleID;
+import org.nightlabs.jfire.trade.state.Statable;
+import org.nightlabs.jfire.trade.state.StatableLocal;
+import org.nightlabs.jfire.trade.state.State;
 import org.nightlabs.jfire.transfer.id.AnchorID;
+import org.nightlabs.util.CollectionUtil;
 import org.nightlabs.util.Utils;
 
 /**
@@ -108,7 +112,7 @@ import org.nightlabs.util.Utils;
  * @jdo.fetch-group name="DeliveryNote.this" fetch-groups="default" fields="deliveryNoteLocal, articles, createUser, customer, finalizeUser, vendor"
  **/
 public class DeliveryNote
-implements Serializable, ArticleContainer, DetachCallback
+implements Serializable, ArticleContainer, Statable, DetachCallback
 {
 	public static final String FETCH_GROUP_DELIVERY_NOTE_LOCAL = "DeliveryNote.deliveryNoteLocal";
 	public static final String FETCH_GROUP_ARTICLES = "DeliveryNote.articles";
@@ -335,10 +339,18 @@ implements Serializable, ArticleContainer, DetachCallback
 		return primaryKey;
 	}
 
+	/**
+	 * @return the same as {@link #getStatableLocal()}
+	 */
 	public DeliveryNoteLocal getDeliveryNoteLocal()
 	{
 		return deliveryNoteLocal;
 	}
+	public StatableLocal getStatableLocal()
+	{
+		return deliveryNoteLocal;
+	}
+
 	protected void setDeliveryNoteLocal(DeliveryNoteLocal deliveryNoteLocal)
 	{
 		this.deliveryNoteLocal = deliveryNoteLocal;
@@ -594,19 +606,19 @@ implements Serializable, ArticleContainer, DetachCallback
 	 * This method is <b>not</b> intended to be called directly.
 	 * Call {@link DeliveryNoteStateDefinition#createDeliveryNoteState(User, DeliveryNote)} instead!
 	 */
-	public void setDeliveryNoteState(DeliveryNoteState currentDeliveryNoteState)
+	public void setState(State currentState)
 	{
-		if (currentDeliveryNoteState == null)
+		if (currentState == null)
 			throw new IllegalArgumentException("deliveryNoteState must not be null!");
 
-		if (!currentDeliveryNoteState.getDeliveryNoteStateDefinition().isPublicState())
+		if (!currentState.getStateDefinition().isPublicState())
 			throw new IllegalArgumentException("deliveryNoteState.deliveryNoteStateDefinition.publicState is false!");
 
-		this.deliveryNoteState = currentDeliveryNoteState;
-		this.deliveryNoteStates.add(currentDeliveryNoteState);
+		this.deliveryNoteState = (DeliveryNoteState)currentState;
+		this.deliveryNoteStates.add((DeliveryNoteState)currentState);
 	}
 
-	public DeliveryNoteState getDeliveryNoteState()
+	public DeliveryNoteState getState()
 	{
 		return deliveryNoteState;
 	}
@@ -614,12 +626,12 @@ implements Serializable, ArticleContainer, DetachCallback
 	/**
 	 * @jdo.field persistence-modifier="none"
 	 */
-	private transient List<DeliveryNoteState> _deliveryNoteStates = null;
+	private transient List<State> _deliveryNoteStates = null;
 
-	public List<DeliveryNoteState> getDeliveryNoteStates()
+	public List<State> getStates()
 	{
 		if (_deliveryNoteStates == null)
-			_deliveryNoteStates = Collections.unmodifiableList(deliveryNoteStates);
+			_deliveryNoteStates = CollectionUtil.castList(Collections.unmodifiableList(deliveryNoteStates));
 
 		return _deliveryNoteStates;
 	}

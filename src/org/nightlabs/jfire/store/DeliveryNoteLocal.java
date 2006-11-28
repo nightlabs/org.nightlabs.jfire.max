@@ -34,6 +34,10 @@ import java.util.List;
 import org.nightlabs.jfire.security.User;
 import org.nightlabs.jfire.store.state.DeliveryNoteState;
 import org.nightlabs.jfire.store.state.DeliveryNoteStateDefinition;
+import org.nightlabs.jfire.trade.state.Statable;
+import org.nightlabs.jfire.trade.state.StatableLocal;
+import org.nightlabs.jfire.trade.state.State;
+import org.nightlabs.util.CollectionUtil;
 
 /**
  * @author Marco Schulze - marco at nightlabs dot de
@@ -55,7 +59,7 @@ import org.nightlabs.jfire.store.state.DeliveryNoteStateDefinition;
  * @jdo.fetch-group name="DeliveryNoteLocal.this" fields="deliveryNote, bookUser"
  */
 public class DeliveryNoteLocal
-implements Serializable
+implements Serializable, StatableLocal
 {
 	public static final String FETCH_GROUP_DELIVERY_NOTE = "DeliveryNoteLocal.deliveryNote";
 	public static final String FETCH_GROUP_BOOK_USER = "DeliveryNoteLocal.bookUser";
@@ -146,7 +150,15 @@ implements Serializable
 	{
 		return deliveryNoteID;
 	}
+
+	/**
+	 * @return the same as {@link #getStatable()}
+	 */
 	public DeliveryNote getDeliveryNote()
+	{
+		return deliveryNote;
+	}
+	public Statable getStatable()
 	{
 		return deliveryNote;
 	}
@@ -177,19 +189,16 @@ implements Serializable
 	 * This method is <b>not</b> intended to be called directly.
 	 * Call {@link DeliveryNoteStateDefinition#createDeliveryNoteState(User, DeliveryNote)} instead!
 	 */
-	public void setDeliveryNoteState(DeliveryNoteState currentDeliveryNoteState)
+	public void setState(State currentState)
 	{
-		if (currentDeliveryNoteState == null)
+		if (currentState == null)
 			throw new IllegalArgumentException("deliveryNoteState must not be null!");
 
-		if (!currentDeliveryNoteState.getDeliveryNoteStateDefinition().isPublicState())
-			throw new IllegalArgumentException("deliveryNoteState.deliveryNoteStateDefinition.publicState is false!");
-
-		this.deliveryNoteState = currentDeliveryNoteState;
-		this.deliveryNoteStates.add(currentDeliveryNoteState);
+		this.deliveryNoteState = (DeliveryNoteState)currentState;
+		this.deliveryNoteStates.add((DeliveryNoteState)currentState);
 	}
 
-	public DeliveryNoteState getDeliveryNoteState()
+	public DeliveryNoteState getState()
 	{
 		return deliveryNoteState;
 	}
@@ -197,12 +206,12 @@ implements Serializable
 	/**
 	 * @jdo.field persistence-modifier="none"
 	 */
-	private transient List<DeliveryNoteState> _deliveryNoteStates = null;
+	private transient List<State> _deliveryNoteStates = null;
 
-	public List<DeliveryNoteState> getDeliveryNoteStates()
+	public List<State> getStates()
 	{
 		if (_deliveryNoteStates == null)
-			_deliveryNoteStates = Collections.unmodifiableList(deliveryNoteStates);
+			_deliveryNoteStates = CollectionUtil.castList(Collections.unmodifiableList(deliveryNoteStates));
 
 		return _deliveryNoteStates;
 	}

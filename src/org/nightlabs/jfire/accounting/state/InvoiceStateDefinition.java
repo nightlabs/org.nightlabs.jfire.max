@@ -1,159 +1,58 @@
 package org.nightlabs.jfire.accounting.state;
 
-import java.io.Serializable;
-
 import org.nightlabs.jfire.accounting.Invoice;
-import org.nightlabs.jfire.accounting.InvoiceLocal;
-import org.nightlabs.jfire.accounting.state.id.InvoiceStateDefinitionID;
 import org.nightlabs.jfire.idgenerator.IDGenerator;
 import org.nightlabs.jfire.organisation.Organisation;
 import org.nightlabs.jfire.security.User;
+import org.nightlabs.jfire.trade.state.Statable;
+import org.nightlabs.jfire.trade.state.State;
+import org.nightlabs.jfire.trade.state.StateDefinition;
+import org.nightlabs.jfire.trade.state.id.StateDefinitionID;
 
 /**
  * @author Marco Schulze - marco at nightlabs dot de
  *
  * @jdo.persistence-capable
- *		identity-type="application"
- *		objectid-class="org.nightlabs.jfire.accounting.state.id.InvoiceStateDefinitionID"
+ *		persistence-capable-superclass="org.nightlabs.jfire.trade.state.StateDefinition"
  *		detachable="true"
  *		table="JFireTrade_InvoiceStateDefinition"
  *
  * @jdo.inheritance strategy="new-table"
- *
- * @jdo.create-objectid-class
- *		field-order="organisationID, invoiceStateDefinitionID"
- *
- * @jdo.fetch-group name="InvoiceStateDefinition.name" fields="name"
- * @jdo.fetch-group name="InvoiceStateDefinition.description" fields="description"
  */
 public class InvoiceStateDefinition
-implements Serializable
+extends StateDefinition
 {
 	private static final long serialVersionUID = 1L;
 
-	public static final InvoiceStateDefinitionID INVOICE_STATE_DEFINITION_ID_CREATED = InvoiceStateDefinitionID.create(Organisation.DEVIL_ORGANISATION_ID, "created");
-	public static final InvoiceStateDefinitionID INVOICE_STATE_DEFINITION_ID_FINALIZED = InvoiceStateDefinitionID.create(Organisation.DEVIL_ORGANISATION_ID, "finalized");
-	public static final InvoiceStateDefinitionID INVOICE_STATE_DEFINITION_ID_BOOKED = InvoiceStateDefinitionID.create(Organisation.DEVIL_ORGANISATION_ID, "booked");
-	public static final InvoiceStateDefinitionID INVOICE_STATE_DEFINITION_ID_CANCELLED = InvoiceStateDefinitionID.create(Organisation.DEVIL_ORGANISATION_ID, "cancelled");
-	public static final InvoiceStateDefinitionID INVOICE_STATE_DEFINITION_ID_PAID = InvoiceStateDefinitionID.create(Organisation.DEVIL_ORGANISATION_ID, "paid");
-	public static final InvoiceStateDefinitionID INVOICE_STATE_DEFINITION_ID_DOUBTFUL = InvoiceStateDefinitionID.create(Organisation.DEVIL_ORGANISATION_ID, "doubtful");
-	public static final InvoiceStateDefinitionID INVOICE_STATE_DEFINITION_ID_UNCOLLECTABLE = InvoiceStateDefinitionID.create(Organisation.DEVIL_ORGANISATION_ID, "uncollectable");
-
-	public static final String FETCH_GROUP_NAME = "InvoiceStateDefinition.name";
-	public static final String FETCH_GROUP_DESCRIPTION = "InvoiceStateDefinition.description";
-
-	/**
-	 * @jdo.field primary-key="true"
-	 * @jdo.column length="100"
-	 */
-	private String organisationID;
-
-	/**
-	 * @jdo.field primary-key="true"
-	 * @jdo.column length="100"
-	 */
-	private String invoiceStateDefinitionID;
-
-	/**
-	 * @jdo.field persistence-modifier="persistent" mapped-by="invoiceStateDefinition"
-	 */
-	private InvoiceStateDefinitionName name;
-
-	/**
-	 * @jdo.field persistence-modifier="persistent" mapped-by="invoiceStateDefinition"
-	 */
-	private InvoiceStateDefinitionDescription description;
-
-	/**
-	 * @jdo.field persistence-modifier="persistent"
-	 */
-	private boolean publicState = false;
+	public static final StateDefinitionID STATE_DEFINITION_ID_CREATED = StateDefinitionID.create(Organisation.DEVIL_ORGANISATION_ID, InvoiceStateDefinition.class.getName(), "created");
+	public static final StateDefinitionID STATE_DEFINITION_ID_FINALIZED = StateDefinitionID.create(Organisation.DEVIL_ORGANISATION_ID, InvoiceStateDefinition.class.getName(), "finalized");
+	public static final StateDefinitionID STATE_DEFINITION_ID_BOOKED = StateDefinitionID.create(Organisation.DEVIL_ORGANISATION_ID, InvoiceStateDefinition.class.getName(), "booked");
+	public static final StateDefinitionID STATE_DEFINITION_ID_CANCELLED = StateDefinitionID.create(Organisation.DEVIL_ORGANISATION_ID, InvoiceStateDefinition.class.getName(), "cancelled");
+	public static final StateDefinitionID STATE_DEFINITION_ID_PAID = StateDefinitionID.create(Organisation.DEVIL_ORGANISATION_ID, InvoiceStateDefinition.class.getName(), "paid");
+	public static final StateDefinitionID STATE_DEFINITION_ID_DOUBTFUL = StateDefinitionID.create(Organisation.DEVIL_ORGANISATION_ID, InvoiceStateDefinition.class.getName(), "doubtful");
+	public static final StateDefinitionID STATE_DEFINITION_ID_UNCOLLECTABLE = StateDefinitionID.create(Organisation.DEVIL_ORGANISATION_ID, InvoiceStateDefinition.class.getName(), "uncollectable");
 
 	/**
 	 * @deprecated Only for JDO!
 	 */
 	protected InvoiceStateDefinition() { }
 
-	public InvoiceStateDefinition(InvoiceStateDefinitionID invoiceStateDefinitionID)
+	public InvoiceStateDefinition(StateDefinitionID stateDefinitionID)
 	{
-		this(invoiceStateDefinitionID.organisationID, invoiceStateDefinitionID.invoiceStateDefinitionID);
+		this(stateDefinitionID.organisationID, stateDefinitionID.stateDefinitionID);
+
+		if (!InvoiceStateDefinition.class.getName().equals(stateDefinitionID.stateDefinitionClass))
+			throw new IllegalArgumentException("stateDefinitionID.stateDefinitionClass must be " + InvoiceStateDefinition.class.getName() + " but is " + stateDefinitionID.stateDefinitionClass);
 	}
 
-	public InvoiceStateDefinition(String organisationID, String invoiceStateDefinitionID)
+	public InvoiceStateDefinition(String organisationID, String stateDefinitionID)
 	{
-		this.organisationID = organisationID;
-		this.invoiceStateDefinitionID = invoiceStateDefinitionID;
-		this.name = new InvoiceStateDefinitionName(this);
-		this.description = new InvoiceStateDefinitionDescription(this);
+		super(organisationID, InvoiceStateDefinition.class, stateDefinitionID);
 	}
 
-	public String getOrganisationID()
+	@Override
+	protected State _createState(User user, Statable statable)
 	{
-		return organisationID;
-	}
-	public String getInvoiceStateDefinitionID()
-	{
-		return invoiceStateDefinitionID;
-	}
-
-	public static String getPrimaryKey(String organisationID, String invoiceStateDefinitionID)
-	{
-		return organisationID + '/' + invoiceStateDefinitionID;
-	}
-
-	public InvoiceStateDefinitionName getName()
-	{
-		return name;
-	}
-
-	public InvoiceStateDefinitionDescription getDescription()
-	{
-		return description;
-	}
-
-	/**
-	 * If a state definition is marked as <code>publicState</code>, it will be exposed to other organisations
-	 * by storing it in both the {@link InvoiceLocal} and the {@link Invoice} instance. If it is not public,
-	 * it is only stored in the {@link InvoiceLocal}.
-	 *
-	 * @return true, if it shall be registered in the non-local instance and therefore published to business partners.
-	 */
-	public boolean isPublicState()
-	{
-		return publicState;
-	}
-
-	/**
-	 * This method creates a new {@link InvoiceState} and registers it in the {@link Invoice} and {@link InvoiceLocal}.
-	 * Note, that it won't be added to the {@link Invoice} (but only to the {@link InvoiceLocal}), if {@link #isPublicState()}
-	 * returns false.
-	 * <p>
-	 * This method calls {@link #_createInvoiceState(User, Invoice)} in order to obtain the new instance. Override that method
-	 * if you feel the need for subclassing {@link InvoiceState}.
-	 * </p>
-	 * 
-	 * @param user The user who is responsible for the action.
-	 * @param invoice The invoice that is transitioned to the new state.
-	 * @return Returns the new newly created InvoiceState instance.
-	 */
-	public InvoiceState createInvoiceState(User user, Invoice invoice)
-	{
-		InvoiceState invoiceState = _createInvoiceState(user, invoice);
-
-		invoice.getInvoiceLocal().setInvoiceState(invoiceState);
-
-		if (isPublicState())
-			invoice.setInvoiceState(invoiceState);
-
-		return invoiceState;
-	}
-
-	/**
-	 * This method creates an instance of {@link InvoiceState}. It is called by {@link #createInvoiceState(User, Invoice)}.
-	 * This method does NOT register anything. You should override this method if you want to subclass {@link InvoiceState}.
-	 */
-	protected InvoiceState _createInvoiceState(User user, Invoice invoice)
-	{
-		return new InvoiceState(user.getOrganisationID(), IDGenerator.nextID(InvoiceState.class), user, invoice, this);
+		return new InvoiceState(user.getOrganisationID(), IDGenerator.nextID(InvoiceState.class), user, (Invoice)statable, this);
 	}
 }

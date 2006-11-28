@@ -10,7 +10,7 @@ import org.nightlabs.jfire.security.User;
  *
  * @jdo.persistence-capable
  *		identity-type="application"
- *		objectid-class="org.nightlabs.jfire.trade.state.id.ArticleContainerStateID"
+ *		objectid-class="org.nightlabs.jfire.trade.state.id.StateID"
  *		detachable="true"
  *		table="JFireTrade_State"
  *
@@ -18,7 +18,7 @@ import org.nightlabs.jfire.security.User;
  * @jdo.inheritance-discriminator strategy="class-name"
  *
  * @jdo.create-objectid-class
- *		field-order="organisationID, articleContainerStateID"
+ *		field-order="organisationID, stateID"
  *
  * @jdo.fetch-group name="State.user" fields="user"
  * @jdo.fetch-group name="State.statable" fields="statable"
@@ -29,6 +29,10 @@ implements Serializable
 {
 	private static final long serialVersionUID = 1L;
 
+	public static final String FETCH_GROUP_USER = "State.user";
+	public static final String FETCH_GROUP_STATABLE = "State.statable";
+	public static final String FETCH_GROUP_STATE_DEFINITION = "State.stateDefinition";
+
 	/**
 	 * @jdo.field primary-key="true"
 	 * @jdo.column length="100"
@@ -38,7 +42,7 @@ implements Serializable
 	/**
 	 * @jdo.field primary-key="true"
 	 */
-	private long articleContainerStateID;
+	private long stateID;
 
 
 	/**
@@ -54,7 +58,7 @@ implements Serializable
 	/**
 	 * @jdo.field persistence-modifier="persistent" null-value="exception"
 	 */
-	private ArticleContainerStateDefinition stateDefinition;
+	private StateDefinition stateDefinition;
 
 	/**
 	 * @jdo.field persistence-modifier="persistent" null-value="exception"
@@ -67,15 +71,15 @@ implements Serializable
 	protected State() { }
 
 	public State(
-			String organisationID, long articleContainerStateID,
+			String organisationID, long stateID,
 			User user, Statable statable,
-			ArticleContainerStateDefinition articleContainerStateDefinition)
+			StateDefinition stateDefinition)
 	{
 		this.organisationID = organisationID;
-		this.articleContainerStateID = articleContainerStateID;
+		this.stateID = stateID;
 		this.user = user;
 		this.statable = statable;
-		this.stateDefinition = articleContainerStateDefinition;
+		this.stateDefinition = stateDefinition;
 		this.createDT = new Date();
 	}
 
@@ -83,9 +87,9 @@ implements Serializable
 	{
 		return organisationID;
 	}
-	public long getArticleContainerStateID()
+	public long getStateID()
 	{
-		return articleContainerStateID;
+		return stateID;
 	}
 	public User getUser()
 	{
@@ -95,7 +99,7 @@ implements Serializable
 	{
 		return statable;
 	}
-	public ArticleContainerStateDefinition getStateDefinition()
+	public StateDefinition getStateDefinition()
 	{
 		return stateDefinition;
 	}

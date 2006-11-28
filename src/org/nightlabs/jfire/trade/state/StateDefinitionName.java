@@ -24,7 +24,7 @@
  *                                                                             *
  ******************************************************************************/
 
-package org.nightlabs.jfire.accounting.state;
+package org.nightlabs.jfire.trade.state;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -36,17 +36,17 @@ import org.nightlabs.i18n.I18nText;
  *
  * @jdo.persistence-capable
  *		identity-type="application"
- *		objectid-class="org.nightlabs.jfire.accounting.state.id.InvoiceStateDefinitionNameID"
+ *		objectid-class="org.nightlabs.jfire.trade.state.id.StateDefinitionNameID"
  *		detachable="true"
- *		table="JFireTrade_InvoiceStateDefinitionName"
+ *		table="JFireTrade_StateDefinitionName"
  *
  * @jdo.inheritance strategy="new-table"
  *
- * @jdo.create-objectid-class field-order="organisationID, invoiceStateDefinitionID"
+ * @jdo.create-objectid-class field-order="organisationID, stateDefinitionClass, stateDefinitionID"
  *
- * @jdo.fetch-group name="InvoiceStateDefinition.name" fields="invoiceStateDefinition, names"
+ * @jdo.fetch-group name="StateDefinition.name" fields="stateDefinition, names"
  */
-public class InvoiceStateDefinitionName extends I18nText
+public class StateDefinitionName extends I18nText
 {
 	private static final long serialVersionUID = 1L;
 
@@ -60,7 +60,13 @@ public class InvoiceStateDefinitionName extends I18nText
 	 * @jdo.field primary-key="true"
 	 * @jdo.column length="100"
 	 */
-	private String invoiceStateDefinitionID;
+	private String stateDefinitionClass;
+
+	/**
+	 * @jdo.field primary-key="true"
+	 * @jdo.column length="100"
+	 */
+	private String stateDefinitionID;
 
 	/**
 	 * key: String languageID<br/>
@@ -72,29 +78,30 @@ public class InvoiceStateDefinitionName extends I18nText
 	 *		key-type="java.lang.String"
 	 *		value-type="java.lang.String"
 	 *		default-fetch-group="true"
-	 *		table="JFireTrade_InvoiceStateDefinitionName_names"
+	 *		table="JFireTrade_StateDefinitionName_names"
 	 *
 	 * @jdo.join
 	 */
-	protected Map names = new HashMap();
+	private Map names = new HashMap();
 
 	/**
 	 * @jdo.field persistence-modifier="persistent"
 	 */
-	private InvoiceStateDefinition invoiceStateDefinition;
+	private StateDefinition stateDefinition;
 
 	/**
 	 * @deprecated Only for JDO!
 	 */
-	protected InvoiceStateDefinitionName()
+	protected StateDefinitionName()
 	{
 	}
 
-	public InvoiceStateDefinitionName(InvoiceStateDefinition invoiceStateDefinition)
+	public StateDefinitionName(StateDefinition stateDefinition)
 	{
-		this.organisationID = invoiceStateDefinition.getOrganisationID();
-		this.invoiceStateDefinitionID = invoiceStateDefinition.getInvoiceStateDefinitionID();
-		this.invoiceStateDefinition = invoiceStateDefinition;
+		this.organisationID = stateDefinition.getOrganisationID();
+		this.stateDefinitionID = stateDefinition.getStateDefinitionID();
+		this.stateDefinitionClass = stateDefinition.getStateDefinitionClass();
+		this.stateDefinition = stateDefinition;
 	}
 
 	/**
@@ -110,7 +117,7 @@ public class InvoiceStateDefinitionName extends I18nText
 	 */
 	protected String getFallBackValue(String languageID)
 	{
-		return InvoiceStateDefinition.getPrimaryKey(organisationID, invoiceStateDefinitionID);
+		return StateDefinition.getPrimaryKey(organisationID, stateDefinitionClass, stateDefinitionID);
 	}
 
 	public String getOrganisationID()
@@ -118,14 +125,19 @@ public class InvoiceStateDefinitionName extends I18nText
 		return organisationID;
 	}
 
-	public String getInvoiceStateDefinitionID()
+	public String getStateDefinitionClass()
 	{
-		return invoiceStateDefinitionID;
+		return stateDefinitionClass;
 	}
 
-	public InvoiceStateDefinition getInvoiceStateDefinition()
+	public String getStateDefinitionID()
 	{
-		return invoiceStateDefinition;
+		return stateDefinitionID;
+	}
+
+	public StateDefinition getArticleContainerStateDefinition()
+	{
+		return stateDefinition;
 	}
 
 }

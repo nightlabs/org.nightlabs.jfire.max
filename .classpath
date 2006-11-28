@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <classpath>
 	<classpathentry kind="src" path="src"/>
+	<classpathentry kind="src" path="ejbsrc"/>
 	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER"/>
 	<classpathentry kind="var" path="JDK_TOOLS"/>
 	<classpathentry kind="var" path="JBOSS/bin/run.jar"/>
@@ -22,5 +23,7 @@
 	<classpathentry sourcepath="WORKSPACE/JFireBaseBean/src" kind="var" path="WORKSPACE/JFireBaseBean/dist/JFireBaseBean.jar"/>
 	<classpathentry sourcepath="/WORKSPACE/JFireServerManager/src" kind="var" path="WORKSPACE/JFireServerManager/dist/JFireServerManager.jar"/>
 	<classpathentry kind="lib" path="lib/jbpm/jbpm-3.1.2.jar"/>
+	<classpathentry sourcepath="JPOX_SRC" kind="var" path="JPOX"/>
+	<classpathentry sourcepath="/JPOXENHANCER_SRC" kind="var" path="JPOXENHANCER"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>

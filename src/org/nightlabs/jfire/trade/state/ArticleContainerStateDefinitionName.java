@@ -36,17 +36,17 @@ import org.nightlabs.i18n.I18nText;
  *
  * @jdo.persistence-capable
  *		identity-type="application"
- *		objectid-class="org.nightlabs.jfire.trade.state.id.OfferStateDefinitionDescriptionID"
+ *		objectid-class="org.nightlabs.jfire.trade.state.id.ArticleContainerStateDefinitionNameID"
  *		detachable="true"
- *		table="JFireTrade_OfferStateDefinitionDescription"
+ *		table="JFireTrade_ArticleContainerStateDefinitionName"
  *
  * @jdo.inheritance strategy="new-table"
  *
- * @jdo.create-objectid-class field-order="organisationID, offerStateDefinitionID"
+ * @jdo.create-objectid-class field-order="organisationID, articleContainerStateDefinitionClass, articleContainerStateDefinitionID"
  *
- * @jdo.fetch-group name="OfferStateDefinition.description" fields="offerStateDefinition, descriptions"
+ * @jdo.fetch-group name="ArticleContainerStateDefinition.name" fields="articleContainerStateDefinition, names"
  */
-public class OfferStateDefinitionDescription extends I18nText
+public class ArticleContainerStateDefinitionName extends I18nText
 {
 	private static final long serialVersionUID = 1L;
 
@@ -60,11 +60,17 @@ public class OfferStateDefinitionDescription extends I18nText
 	 * @jdo.field primary-key="true"
 	 * @jdo.column length="100"
 	 */
-	private String offerStateDefinitionID;
+	private String articleContainerStateDefinitionClass;
+
+	/**
+	 * @jdo.field primary-key="true"
+	 * @jdo.column length="100"
+	 */
+	private String articleContainerStateDefinitionID;
 
 	/**
 	 * key: String languageID<br/>
-	 * value: String description
+	 * value: String name
 	 * 
 	 * @jdo.field
 	 *		persistence-modifier="persistent"
@@ -72,32 +78,30 @@ public class OfferStateDefinitionDescription extends I18nText
 	 *		key-type="java.lang.String"
 	 *		value-type="java.lang.String"
 	 *		default-fetch-group="true"
-	 *		table="JFireTrade_OfferStateDefinitionDescription_descriptions"
-	 *
-	 * @jdo.key-column length="5"
-	 * @jdo.value-column jdbc-type="LONGVARCHAR"
+	 *		table="JFireTrade_ArticleContainerStateDefinitionName_names"
 	 *
 	 * @jdo.join
 	 */
-	protected Map descriptions = new HashMap();
+	private Map names = new HashMap();
 
 	/**
 	 * @jdo.field persistence-modifier="persistent"
 	 */
-	private OfferStateDefinition offerStateDefinition;
+	private ArticleContainerStateDefinition articleContainerStateDefinition;
 
 	/**
 	 * @deprecated Only for JDO!
 	 */
-	protected OfferStateDefinitionDescription()
+	protected ArticleContainerStateDefinitionName()
 	{
 	}
 
-	public OfferStateDefinitionDescription(OfferStateDefinition offerStateDefinition)
+	public ArticleContainerStateDefinitionName(ArticleContainerStateDefinition articleContainerStateDefinition)
 	{
-		this.organisationID = offerStateDefinition.getOrganisationID();
-		this.offerStateDefinitionID = offerStateDefinition.getOfferStateDefinitionID();
-		this.offerStateDefinition = offerStateDefinition;
+		this.organisationID = articleContainerStateDefinition.getOrganisationID();
+		this.articleContainerStateDefinitionID = articleContainerStateDefinition.getStateDefinitionID();
+		this.articleContainerStateDefinitionClass = articleContainerStateDefinition.getStateDefinitionClass();
+		this.articleContainerStateDefinition = articleContainerStateDefinition;
 	}
 
 	/**
@@ -105,7 +109,7 @@ public class OfferStateDefinitionDescription extends I18nText
 	 */
 	protected Map getI18nMap()
 	{
-		return descriptions;
+		return names;
 	}
 
 	/**
@@ -113,7 +117,7 @@ public class OfferStateDefinitionDescription extends I18nText
 	 */
 	protected String getFallBackValue(String languageID)
 	{
-		return OfferStateDefinition.getPrimaryKey(organisationID, offerStateDefinitionID);
+		return ArticleContainerStateDefinition.getPrimaryKey(organisationID, articleContainerStateDefinitionClass, articleContainerStateDefinitionID);
 	}
 
 	public String getOrganisationID()
@@ -121,14 +125,14 @@ public class OfferStateDefinitionDescription extends I18nText
 		return organisationID;
 	}
 
-	public String getOfferStateDefinitionID()
+	public String getArticleContainerStateDefinitionID()
 	{
-		return offerStateDefinitionID;
+		return articleContainerStateDefinitionID;
 	}
 
-	public OfferStateDefinition getOfferStateDefinition()
+	public ArticleContainerStateDefinition getArticleContainerStateDefinition()
 	{
-		return offerStateDefinition;
+		return articleContainerStateDefinition;
 	}
 
 }

@@ -59,6 +59,8 @@ import org.nightlabs.util.Utils;
  *		detachable="true"
  *		table="JFireTrade_Order"
  *
+ * @jdo.implements name="org.nightlabs.jfire.trade.ArticleContainer"
+ *
  * @jdo.inheritance strategy="new-table"
  *
  * @jdo.create-objectid-class

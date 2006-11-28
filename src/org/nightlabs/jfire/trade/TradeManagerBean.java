@@ -60,6 +60,7 @@ import org.nightlabs.jfire.trade.id.OfferID;
 import org.nightlabs.jfire.trade.id.OrderID;
 import org.nightlabs.jfire.trade.id.SegmentTypeID;
 import org.nightlabs.jfire.trade.state.OfferStateDefinition;
+import org.nightlabs.jfire.trade.state.id.StateDefinitionID;
 import org.nightlabs.jfire.transfer.id.AnchorID;
 
 
@@ -987,29 +988,44 @@ implements SessionBean
 			// create the essential OfferStateDefinitions
 			OfferStateDefinition offerStateDefinition;
 
-			offerStateDefinition = new OfferStateDefinition(OfferStateDefinition.OFFER_STATE_DEFINITION_ID_CREATED);
+			offerStateDefinition = new OfferStateDefinition(OfferStateDefinition.STATE_DEFINITION_ID_CREATED);
 			offerStateDefinition.getName().setText(Locale.ENGLISH.getLanguage(), "created");
 			offerStateDefinition.getDescription().setText(Locale.ENGLISH.getLanguage(), "The Offer has been newly created. This is the first state in the Offer related workflow.");
 			pm.makePersistent(offerStateDefinition);
 
-			offerStateDefinition = new OfferStateDefinition(OfferStateDefinition.OFFER_STATE_DEFINITION_ID_FINALIZED);
+			offerStateDefinition = new OfferStateDefinition(OfferStateDefinition.STATE_DEFINITION_ID_FINALIZED);
 			offerStateDefinition.getName().setText(Locale.ENGLISH.getLanguage(), "created");
 			offerStateDefinition.getDescription().setText(Locale.ENGLISH.getLanguage(), "The Offer has been finalized. After that, it cannot be modified anymore. A modification would require cancellation and recreation.");
 			pm.makePersistent(offerStateDefinition);
 
-			offerStateDefinition = new OfferStateDefinition(OfferStateDefinition.OFFER_STATE_DEFINITION_ID_ACCEPTED);
+			offerStateDefinition = new OfferStateDefinition(OfferStateDefinition.STATE_DEFINITION_ID_ACCEPTED);
 			offerStateDefinition.getName().setText(Locale.ENGLISH.getLanguage(), "accepted");
 			offerStateDefinition.getDescription().setText(Locale.ENGLISH.getLanguage(), "The Offer has been accepted by the customer. That turns the offer into a binding contract.");
 			pm.makePersistent(offerStateDefinition);
 
-			offerStateDefinition = new OfferStateDefinition(OfferStateDefinition.OFFER_STATE_DEFINITION_ID_CANCELLED);
+			offerStateDefinition = new OfferStateDefinition(OfferStateDefinition.STATE_DEFINITION_ID_CANCELLED);
 			offerStateDefinition.getName().setText(Locale.ENGLISH.getLanguage(), "cancelled");
 			offerStateDefinition.getDescription().setText(Locale.ENGLISH.getLanguage(), "The Offer has been cancelled by the vendor. The result is the same as if the customer had rejected the offer. A cancellation is possible even after the customer has accepted the Offer.");
 			pm.makePersistent(offerStateDefinition);
 
-			offerStateDefinition = new OfferStateDefinition(OfferStateDefinition.OFFER_STATE_DEFINITION_ID_REJECTED);
+			offerStateDefinition = new OfferStateDefinition(OfferStateDefinition.STATE_DEFINITION_ID_REJECTED);
 			offerStateDefinition.getName().setText(Locale.ENGLISH.getLanguage(), "rejected");
 			offerStateDefinition.getDescription().setText(Locale.ENGLISH.getLanguage(), "The Offer has been rejected by the customer. A new Offer needs to be created in order to continue the interaction.");
+			pm.makePersistent(offerStateDefinition);
+
+			offerStateDefinition = new OfferStateDefinition(OfferStateDefinition.STATE_DEFINITION_ID_EXPIRED);
+			offerStateDefinition.getName().setText(Locale.ENGLISH.getLanguage(), "expired");
+			offerStateDefinition.getDescription().setText(Locale.ENGLISH.getLanguage(), "The Offer has expired - the customer waited too long. A new Offer needs to be created in order to continue the interaction.");
+			pm.makePersistent(offerStateDefinition);
+
+			offerStateDefinition = new OfferStateDefinition(OfferStateDefinition.STATE_DEFINITION_ID_ABORTED);
+			offerStateDefinition.getName().setText(Locale.ENGLISH.getLanguage(), "aborted");
+			offerStateDefinition.getDescription().setText(Locale.ENGLISH.getLanguage(), "The Offer has been aborted by the vendor. A new Offer needs to be created in order to continue the interaction.");
+			pm.makePersistent(offerStateDefinition);
+
+			offerStateDefinition = new OfferStateDefinition(OfferStateDefinition.STATE_DEFINITION_ID_REVOKED);
+			offerStateDefinition.getName().setText(Locale.ENGLISH.getLanguage(), "revoked");
+			offerStateDefinition.getDescription().setText(Locale.ENGLISH.getLanguage(), "The Offer has been revoked by the vendor. A new Offer needs to be created in order to continue the interaction.");
 			pm.makePersistent(offerStateDefinition);
 
 		} finally {

@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<process-diagram name="Offer.Customer" width="748" height="679">
+  <node name="devil.NightLabs.org/finalized" x="233" y="138" width="206" height="40">
+    <transition name="accept">
+      <label x="5" y="-10"/>
+    </transition>
+    <transition name="reject">
+      <label x="5" y="-10"/>
+    </transition>
+  </node>
+  <node name="devil.NightLabs.org/customerRejected" x="350" y="348" width="236" height="40"/>
+  <node name="devil.NightLabs.org/customerAccepted" x="53" y="349" width="242" height="40"/>
+</process-diagram>

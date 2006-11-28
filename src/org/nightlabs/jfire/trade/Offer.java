@@ -49,7 +49,12 @@ import org.nightlabs.jfire.accounting.Price;
 import org.nightlabs.jfire.security.User;
 import org.nightlabs.jfire.store.ProductType;
 import org.nightlabs.jfire.trade.state.OfferState;
+import org.nightlabs.jfire.trade.state.OfferStateDefinition;
+import org.nightlabs.jfire.trade.state.Statable;
+import org.nightlabs.jfire.trade.state.StatableLocal;
+import org.nightlabs.jfire.trade.state.State;
 import org.nightlabs.jfire.transfer.id.AnchorID;
+import org.nightlabs.util.CollectionUtil;
 import org.nightlabs.util.Utils;
 
 /**
@@ -62,6 +67,9 @@ import org.nightlabs.util.Utils;
  *		objectid-class="org.nightlabs.jfire.trade.id.OfferID"
  *		detachable="true"
  *		table="JFireTrade_Offer"
+ *
+ * @jdo.implements name="org.nightlabs.jfire.trade.ArticleContainer"
+ * @jdo.implements name="org.nightlabs.jfire.trade.state.Statable"
  *
  * @jdo.inheritance strategy="new-table"
  *
@@ -88,7 +96,8 @@ import org.nightlabs.util.Utils;
 public class Offer
 implements
 		Serializable,
-		ArticleContainer, // TODO shall we implement SegmentContainer here? Do we need it?
+		ArticleContainer, // TODO shall we implement SegmentContainer here? Do we need it? Yes, i think so... but I'll do it later. Marco.
+		Statable,
 		DetachCallback,
 		AttachCallback
 {
@@ -352,7 +361,14 @@ implements
 		return primaryKey;
 	}
 
+	/**
+	 * @return the same as {@link #getStatableLocal()}
+	 */
 	public OfferLocal getOfferLocal()
+	{
+		return offerLocal;
+	}
+	public StatableLocal getStatableLocal()
 	{
 		return offerLocal;
 	}
@@ -738,19 +754,19 @@ implements
 	 * This method is <b>not</b> intended to be called directly.
 	 * Call {@link OfferStateDefinition#createOfferState(User, Offer)} instead!
 	 */
-	public void setOfferState(OfferState currentOfferState)
+	public void setState(State currentState)
 	{
-		if (currentOfferState == null)
+		if (currentState == null)
 			throw new IllegalArgumentException("offerState must not be null!");
 
-		if (!currentOfferState.getOfferStateDefinition().isPublicState())
+		if (!currentState.getStateDefinition().isPublicState())
 			throw new IllegalArgumentException("offerState.offerStateDefinition.publicState is false!");
 
-		this.offerState = currentOfferState;
-		this.offerStates.add(currentOfferState);
+		this.offerState = (OfferState)currentState;
+		this.offerStates.add((OfferState)currentState);
 	}
 
-	public OfferState getOfferState()
+	public OfferState getState()
 	{
 		return offerState;
 	}
@@ -758,12 +774,12 @@ implements
 	/**
 	 * @jdo.field persistence-modifier="none"
 	 */
-	private transient List<OfferState> _offerStates = null;
+	private transient List<State> _offerStates = null;
 
-	public List<OfferState> getOfferStates()
+	public List<State> getStates()
 	{
 		if (_offerStates == null)
-			_offerStates = Collections.unmodifiableList(offerStates);
+			_offerStates = CollectionUtil.castList(Collections.unmodifiableList(offerStates));
 
 		return _offerStates;
 	}

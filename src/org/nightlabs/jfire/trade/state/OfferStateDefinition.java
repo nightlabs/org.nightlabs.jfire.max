@@ -1,157 +1,55 @@
 package org.nightlabs.jfire.trade.state;
 
-import java.io.Serializable;
-
 import org.nightlabs.jfire.idgenerator.IDGenerator;
 import org.nightlabs.jfire.organisation.Organisation;
 import org.nightlabs.jfire.security.User;
 import org.nightlabs.jfire.trade.Offer;
-import org.nightlabs.jfire.trade.OfferLocal;
-import org.nightlabs.jfire.trade.state.id.OfferStateDefinitionID;
+import org.nightlabs.jfire.trade.state.id.StateDefinitionID;
 
 /**
  * @author Marco Schulze - marco at nightlabs dot de
  *
  * @jdo.persistence-capable
- *		identity-type="application"
- *		objectid-class="org.nightlabs.jfire.trade.state.id.OfferStateDefinitionID"
+ *		persistence-capable-superclass="org.nightlabs.jfire.trade.state.ArticleContainerStateDefinition"
  *		detachable="true"
  *		table="JFireTrade_OfferStateDefinition"
  *
  * @jdo.inheritance strategy="new-table"
- *
- * @jdo.create-objectid-class
- *		field-order="organisationID, offerStateDefinitionID"
- *
- * @jdo.fetch-group name="OfferStateDefinition.name" fields="name"
- * @jdo.fetch-group name="OfferStateDefinition.description" fields="description"
  */
 public class OfferStateDefinition
-implements Serializable
+extends ArticleContainerStateDefinition
 {
 	private static final long serialVersionUID = 1L;
 
-	public static final String FETCH_GROUP_NAME = "OfferStateDefinition.name";
-	public static final String FETCH_GROUP_DESCRIPTION = "OfferStateDefinition.description";
-
-	public static final OfferStateDefinitionID OFFER_STATE_DEFINITION_ID_CREATED = OfferStateDefinitionID.create(Organisation.DEVIL_ORGANISATION_ID, "created");
-	public static final OfferStateDefinitionID OFFER_STATE_DEFINITION_ID_FINALIZED = OfferStateDefinitionID.create(Organisation.DEVIL_ORGANISATION_ID, "finalized");
-	public static final OfferStateDefinitionID OFFER_STATE_DEFINITION_ID_CANCELLED = OfferStateDefinitionID.create(Organisation.DEVIL_ORGANISATION_ID, "cancelled");
-	public static final OfferStateDefinitionID OFFER_STATE_DEFINITION_ID_ACCEPTED = OfferStateDefinitionID.create(Organisation.DEVIL_ORGANISATION_ID, "accepted");
-	public static final OfferStateDefinitionID OFFER_STATE_DEFINITION_ID_REJECTED = OfferStateDefinitionID.create(Organisation.DEVIL_ORGANISATION_ID, "rejected");
-
-	/**
-	 * @jdo.field primary-key="true"
-	 * @jdo.column length="100"
-	 */
-	private String organisationID;
-
-	/**
-	 * @jdo.field primary-key="true"
-	 * @jdo.column length="100"
-	 */
-	private String offerStateDefinitionID;
-
-	/**
-	 * @jdo.field persistence-modifier="persistent" mapped-by="offerStateDefinition"
-	 */
-	private OfferStateDefinitionName name;
-
-	/**
-	 * @jdo.field persistence-modifier="persistent" mapped-by="offerStateDefinition"
-	 */
-	private OfferStateDefinitionDescription description;
-
-	/**
-	 * @jdo.field persistence-modifier="persistent"
-	 */
-	private boolean publicState = false;
+	public static final StateDefinitionID STATE_DEFINITION_ID_CREATED = StateDefinitionID.create(Organisation.DEVIL_ORGANISATION_ID, OfferStateDefinition.class.getName(), "created");
+	public static final StateDefinitionID STATE_DEFINITION_ID_FINALIZED = StateDefinitionID.create(Organisation.DEVIL_ORGANISATION_ID, OfferStateDefinition.class.getName(), "finalized");
+	public static final StateDefinitionID STATE_DEFINITION_ID_CANCELLED = StateDefinitionID.create(Organisation.DEVIL_ORGANISATION_ID, OfferStateDefinition.class.getName(), "cancelled");
+	public static final StateDefinitionID STATE_DEFINITION_ID_ACCEPTED = StateDefinitionID.create(Organisation.DEVIL_ORGANISATION_ID, OfferStateDefinition.class.getName(), "accepted");
+	public static final StateDefinitionID STATE_DEFINITION_ID_REJECTED = StateDefinitionID.create(Organisation.DEVIL_ORGANISATION_ID, OfferStateDefinition.class.getName(), "rejected");
+	public static final StateDefinitionID STATE_DEFINITION_ID_EXPIRED = StateDefinitionID.create(Organisation.DEVIL_ORGANISATION_ID, OfferStateDefinition.class.getName(), "expired");
+	public static final StateDefinitionID STATE_DEFINITION_ID_ABORTED = StateDefinitionID.create(Organisation.DEVIL_ORGANISATION_ID, OfferStateDefinition.class.getName(), "aborted");
+	public static final StateDefinitionID STATE_DEFINITION_ID_REVOKED = StateDefinitionID.create(Organisation.DEVIL_ORGANISATION_ID, OfferStateDefinition.class.getName(), "revoked");
 
 	/**
 	 * @deprecated Only for JDO!
 	 */
 	protected OfferStateDefinition() { }
 
-	public OfferStateDefinition(OfferStateDefinitionID offerStateDefinitionID)
+	public OfferStateDefinition(StateDefinitionID stateDefinitionID)
 	{
-		this(offerStateDefinitionID.organisationID, offerStateDefinitionID.offerStateDefinitionID);
+		this(stateDefinitionID.organisationID, stateDefinitionID.stateDefinitionID);
+
+		if (!OfferStateDefinition.class.getName().equals(stateDefinitionID.stateDefinitionClass))
+			throw new IllegalArgumentException("stateDefinitionID.stateDefinitionClass must be " + OfferStateDefinition.class.getName() + " but is " + stateDefinitionID.stateDefinitionClass);
 	}
 
-	public OfferStateDefinition(String organisationID, String offerStateDefinitionID)
+	public OfferStateDefinition(String organisationID, String articleContainerStateDefinitionID)
 	{
-		this.organisationID = organisationID;
-		this.offerStateDefinitionID = offerStateDefinitionID;
-		this.name = new OfferStateDefinitionName(this);
-		this.description = new OfferStateDefinitionDescription(this);
+		super(organisationID, OfferStateDefinition.class, articleContainerStateDefinitionID);
 	}
 
-	public String getOrganisationID()
+	protected State _createState(User user, Statable statable)
 	{
-		return organisationID;
-	}
-	public String getOfferStateDefinitionID()
-	{
-		return offerStateDefinitionID;
-	}
-
-	public static String getPrimaryKey(String organisationID, String offerStateDefinitionID)
-	{
-		return organisationID + '/' + offerStateDefinitionID;
-	}
-
-	public OfferStateDefinitionName getName()
-	{
-		return name;
-	}
-
-	public OfferStateDefinitionDescription getDescription()
-	{
-		return description;
-	}
-
-	/**
-	 * If a state definition is marked as <code>publicState</code>, it will be exposed to other organisations
-	 * by storing it in both the {@link OfferLocal} and the {@link Offer} instance. If it is not public,
-	 * it is only stored in the {@link OfferLocal}.
-	 *
-	 * @return true, if it shall be registered in the non-local instance and therefore published to business partners.
-	 */
-	public boolean isPublicState()
-	{
-		return publicState;
-	}
-
-	/**
-	 * This method creates a new {@link OfferState} and registers it in the {@link Offer} and {@link OfferLocal}.
-	 * Note, that it won't be added to the {@link Offer} (but only to the {@link OfferLocal}), if {@link #isPublicState()}
-	 * returns false.
-	 * <p>
-	 * This method calls {@link #_createOfferState(User, Offer)} in order to obtain the new instance. Override that method
-	 * if you feel the need for subclassing {@link OfferState}.
-	 * </p>
-	 * 
-	 * @param user The user who is responsible for the action.
-	 * @param offer The offer that is transitioned to the new state.
-	 * @return Returns the new newly created OfferState instance.
-	 */
-	public OfferState createOfferState(User user, Offer offer)
-	{
-		OfferState offerState = _createOfferState(user, offer);
-
-		offer.getOfferLocal().setOfferState(offerState);
-
-		if (isPublicState())
-			offer.setOfferState(offerState);
-
-		return offerState;
-	}
-
-	/**
-	 * This method creates an instance of {@link OfferState}. It is called by {@link #createOfferState(User, Offer)}.
-	 * This method does NOT register anything. You should override this method if you want to subclass {@link OfferState}.
-	 */
-	protected OfferState _createOfferState(User user, Offer offer)
-	{
-		return new OfferState(user.getOrganisationID(), IDGenerator.nextID(OfferState.class), user, offer, this);
+		return new OfferState(user.getOrganisationID(), IDGenerator.nextID(State.class), user, (Offer)statable, this);
 	}
 }

@@ -37,6 +37,10 @@ import java.util.Set;
 import org.nightlabs.jfire.security.User;
 import org.nightlabs.jfire.trade.state.OfferState;
 import org.nightlabs.jfire.trade.state.OfferStateDefinition;
+import org.nightlabs.jfire.trade.state.Statable;
+import org.nightlabs.jfire.trade.state.StatableLocal;
+import org.nightlabs.jfire.trade.state.State;
+import org.nightlabs.util.CollectionUtil;
 
 /**
  * @author Marco Schulze - marco at nightlabs dot de
@@ -46,6 +50,8 @@ import org.nightlabs.jfire.trade.state.OfferStateDefinition;
  *		objectid-class="org.nightlabs.jfire.trade.id.OfferLocalID"
  *		detachable="true"
  *		table="JFireTrade_OfferLocal"
+ *
+ * @jdo.implements name="org.nightlabs.jfire.trade.state.StatableLocal"
  *
  * @jdo.inheritance strategy="new-table"
  *
@@ -60,8 +66,10 @@ import org.nightlabs.jfire.trade.state.OfferStateDefinition;
  * @jdo.fetch-group name="OfferLocal.this" fields="offer, acceptUser, rejectUser, confirmUser"
  */
 public class OfferLocal
-implements Serializable
+implements Serializable, StatableLocal
 {
+	private static final long serialVersionUID = 1L;
+
 	public static final String FETCH_GROUP_OFFER = "OfferLocal.offer";
 	public static final String FETCH_GROUP_ACCEPT_USER = "OfferLocal.acceptUser";
 	public static final String FETCH_GROUP_REJECT_USER = "OfferLocal.rejectUser";
@@ -174,7 +182,14 @@ implements Serializable
 	{
 		return offerID;
 	}
+	/**
+	 * @return the same as {@link #getStatable()}
+	 */
 	public Offer getOffer()
+	{
+		return offer;
+	}
+	public Statable getStatable()
 	{
 		return offer;
 	}
@@ -338,16 +353,16 @@ implements Serializable
 	 * This method is <b>not</b> intended to be called directly.
 	 * Call {@link OfferStateDefinition#createOfferState(User, Offer)} instead!
 	 */
-	public void setOfferState(OfferState currentOfferState)
+	public void setState(State currentState)
 	{
-		if (currentOfferState == null)
+		if (currentState == null)
 			throw new IllegalArgumentException("offerState must not be null!");
 
-		this.offerState = currentOfferState;
-		this.offerStates.add(currentOfferState);
+		this.offerState = (OfferState)currentState;
+		this.offerStates.add((OfferState)currentState);
 	}
 
-	public OfferState getOfferState()
+	public OfferState getState()
 	{
 		return offerState;
 	}
@@ -355,12 +370,12 @@ implements Serializable
 	/**
 	 * @jdo.field persistence-modifier="none"
 	 */
-	private transient List<OfferState> _offerStates = null;
+	private transient List<State> _offerStates = null;
 
-	public List<OfferState> getOfferStates()
+	public List<State> getStates()
 	{
 		if (_offerStates == null)
-			_offerStates = Collections.unmodifiableList(offerStates);
+			_offerStates = CollectionUtil.castList(Collections.unmodifiableList(offerStates));
 
 		return _offerStates;
 	}

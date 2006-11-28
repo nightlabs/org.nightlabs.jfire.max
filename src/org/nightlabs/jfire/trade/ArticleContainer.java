@@ -30,6 +30,7 @@ import java.util.Collection;
 import java.util.Date;
 
 import org.nightlabs.jfire.security.User;
+import org.nightlabs.jfire.trade.state.StatableLocal;
 
 /**
  * @author Marco Schulze - marco at nightlabs dot de

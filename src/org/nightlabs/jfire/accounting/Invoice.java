@@ -67,6 +67,9 @@ import org.nightlabs.util.Utils;
  *		detachable="true"
  *		table="JFireTrade_Invoice"
  *
+ * @jdo.implements name="org.nightlabs.jfire.trade.ArticleContainer"
+ * @jdo.implements name="org.nightlabs.jfire.trade.state.Statable"
+ *
  * @jdo.inheritance strategy="new-table"
  *
  * @jdo.create-objectid-class

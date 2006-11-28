@@ -1,11 +1,11 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
 <process-definition
-  xmlns=""  name="devil.NightLabs.org/Offer.Customer">
-   <start-state name="devil.NightLabs.org/finalized">
-      <transition name="accept" to="devil.NightLabs.org/customerAccepted"></transition>
-      <transition name="reject" to="devil.NightLabs.org/customerRejected"></transition>
+  xmlns=""  name="devil.NightLabs.org:Offer.Customer">
+   <start-state name="devil.NightLabs.org:finalized">
+      <transition name="accept" to="devil.NightLabs.org:customerAccepted"></transition>
+      <transition name="reject" to="devil.NightLabs.org:customerRejected"></transition>
    </start-state>
-   <end-state name="devil.NightLabs.org/customerRejected"></end-state>
-   <end-state name="devil.NightLabs.org/customerAccepted"></end-state>
+   <end-state name="devil.NightLabs.org:customerRejected"></end-state>
+   <end-state name="devil.NightLabs.org:customerAccepted"></end-state>
 </process-definition>

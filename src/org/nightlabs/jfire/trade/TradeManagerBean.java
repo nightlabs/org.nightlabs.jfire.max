@@ -26,6 +26,7 @@
 
 package org.nightlabs.jfire.trade;
 
+import java.io.IOException;
 import java.rmi.RemoteException;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -46,6 +47,7 @@ import javax.jdo.PersistenceManager;
 import org.apache.log4j.Logger;
 import org.nightlabs.ModuleException;
 import org.nightlabs.jdo.NLJDOHelper;
+import org.nightlabs.jdo.moduleregistry.MalformedVersionException;
 import org.nightlabs.jdo.moduleregistry.ModuleMetaData;
 import org.nightlabs.jfire.accounting.Currency;
 import org.nightlabs.jfire.accounting.id.CurrencyID;
@@ -60,7 +62,7 @@ import org.nightlabs.jfire.trade.id.OfferID;
 import org.nightlabs.jfire.trade.id.OrderID;
 import org.nightlabs.jfire.trade.id.SegmentTypeID;
 import org.nightlabs.jfire.trade.state.OfferStateDefinition;
-import org.nightlabs.jfire.trade.state.id.StateDefinitionID;
+import org.nightlabs.jfire.trade.state.ProcessDefinitionUtil;
 import org.nightlabs.jfire.transfer.id.AnchorID;
 
 
@@ -962,7 +964,7 @@ implements SessionBean
 	 * @ejb.permission role-name="_System_"
 	 */
 	public void initialize()
-	throws ModuleException
+	throws IOException, MalformedVersionException
 	{
 		PersistenceManager pm = getPersistenceManager();
 		try {
@@ -1027,6 +1029,11 @@ implements SessionBean
 			offerStateDefinition.getName().setText(Locale.ENGLISH.getLanguage(), "revoked");
 			offerStateDefinition.getDescription().setText(Locale.ENGLISH.getLanguage(), "The Offer has been revoked by the vendor. A new Offer needs to be created in order to continue the interaction.");
 			pm.makePersistent(offerStateDefinition);
+
+
+			// persist process definitions
+			ProcessDefinitionUtil.storeProcessDefinition(pm, TradeManagerBean.class.getResource("jbpm/offer/customer/processdefinition.xml"));
+			ProcessDefinitionUtil.storeProcessDefinition(pm, TradeManagerBean.class.getResource("jbpm/offer/vendor/processdefinition.xml"));
 
 		} finally {
 			pm.close();

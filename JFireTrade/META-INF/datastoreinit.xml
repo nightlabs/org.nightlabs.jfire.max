@@ -2,9 +2,14 @@
 		PUBLIC "-//NightLabs GmbH//DTD Datastore Initialization 1.0//EN"
 		"http://www.nightlabs.de/dtd/datastoreinit_1_0.dtd">
 <datastore-initialization>
-	<init bean="jfire/ejb/JFireTrade/AccountingManager" method="initialize"/>
-	<init bean="jfire/ejb/JFireTrade/StoreManager" method="initialize"/>
+	<init bean="jfire/ejb/JFireTrade/AccountingManager" method="initialize">
+		<depends module="JFireJbpm.ear"/>
+	</init>
+	<init bean="jfire/ejb/JFireTrade/StoreManager" method="initialize">
+		<depends module="JFireJbpm.ear"/>
+	</init>
 	<init bean="jfire/ejb/JFireTrade/TradeManager" method="initialize">
+		<depends module="JFireJbpm.ear"/>
 		<depends
 			module="JFireBase.ear"
 			archive="JFireBaseBean.jar"

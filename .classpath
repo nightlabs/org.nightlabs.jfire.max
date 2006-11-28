@@ -26,5 +26,7 @@
 	<classpathentry sourcepath="/RHINO_SRC" kind="var" path="RHINO"/>
 	<classpathentry kind="var" path="JPOXENHANCER"/>
 	<classpathentry kind="var" path="APACHE_COMMONS/commons-lang.jar"/>
+	<classpathentry kind="var" path="WORKSPACE/JFireJbpm/dist/JFireJbpm.jar"/>
+	<classpathentry kind="var" path="WORKSPACE/JFireJbpm/lib/jbpm/jbpm-3.1.2.jar"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>

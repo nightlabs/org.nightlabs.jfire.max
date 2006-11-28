@@ -14,6 +14,7 @@ import java.util.List;
 import javax.jdo.JDOObjectNotFoundException;
 import javax.jdo.PersistenceManager;
 
+import org.apache.log4j.Logger;
 import org.jbpm.JbpmContext;
 import org.jbpm.jpdl.xml.JpdlXmlReader;
 import org.nightlabs.jfire.jbpm.JbpmLookup;
@@ -37,12 +38,13 @@ import org.nightlabs.jfire.jbpm.graph.def.id.ProcessDefinitionID;
 public class ProcessDefinition
 implements Serializable
 {
+	private static final Logger logger = Logger.getLogger(ProcessDefinition.class);
 	private static final long serialVersionUID = 1L;
 
 	public static ProcessDefinitionID getProcessDefinitionID(org.jbpm.graph.def.ProcessDefinition jbpmProcessDefinition)
 	{
 		String pdName = jbpmProcessDefinition.getName();
-		String[] parts = pdName.split("/");
+		String[] parts = pdName.split(":");
 		if (parts.length != 2)
 			throw new IllegalArgumentException("jbpmProcessDefinition.name must contain exactly one '/' - i.e. it must be composed out of organisationID and processDefinitionIDString: " + pdName);
 
@@ -57,22 +59,34 @@ implements Serializable
 	public static org.jbpm.graph.def.ProcessDefinition readProcessDefinition(URL jbpmProcessDefinitionURL)
 	throws IOException
 	{
-		org.jbpm.graph.def.ProcessDefinition jbpmProcessDefinition;
+		if (jbpmProcessDefinitionURL == null)
+			throw new IllegalArgumentException("jbpmProcessDefinitionURL == null");
 
-		InputStream in = jbpmProcessDefinitionURL.openStream();
-		if (in == null)
-			throw new FileNotFoundException("Could not open input stream for " + jbpmProcessDefinitionURL);
 		try {
-			Reader reader = new InputStreamReader(in);
-			JpdlXmlReader jpdlXmlReader = new JpdlXmlReader(reader);
-			jbpmProcessDefinition = jpdlXmlReader.readProcessDefinition();
-			jpdlXmlReader.close();
+			org.jbpm.graph.def.ProcessDefinition jbpmProcessDefinition;
+	
+			InputStream in = jbpmProcessDefinitionURL.openStream();
+			if (in == null)
+				throw new FileNotFoundException("Could not open input stream for " + jbpmProcessDefinitionURL);
+			try {
+				Reader reader = new InputStreamReader(in);
+				JpdlXmlReader jpdlXmlReader = new JpdlXmlReader(reader);
+				jbpmProcessDefinition = jpdlXmlReader.readProcessDefinition();
+				jpdlXmlReader.close();
+	
+			} finally {
+				in.close();
+			}
 
-		} finally {
-			in.close();
+			return jbpmProcessDefinition;
+		} catch (Throwable t) {
+			logger.error("reading process definition failed: " + jbpmProcessDefinitionURL, t);
+			if (t instanceof IOException)
+				throw (IOException)t;
+			if (t instanceof RuntimeException)
+				throw (RuntimeException)t;
+			throw new RuntimeException(t);
 		}
-
-		return jbpmProcessDefinition;
 	}
 
 	/**

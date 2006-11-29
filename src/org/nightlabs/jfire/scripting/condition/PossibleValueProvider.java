@@ -27,6 +27,7 @@ package org.nightlabs.jfire.scripting.condition;
 
 import java.io.Serializable;
 import java.util.Collection;
+import java.util.Map;
 
 import javax.jdo.PersistenceManager;
 import javax.jdo.Query;
@@ -44,13 +45,14 @@ import org.nightlabs.jfire.scripting.id.ScriptRegistryItemID;
  *		detachable="true"
  *		table="JFireScripting_PossibleValueProvider"
  *
- * @jdo.inheritance strategy="subclass-table"
+ * @jdo.inheritance strategy="new-table"
+ * @jdo.inheritance-discriminator strategy="class-name"
  * 
  * @jdo.create-objectid-class field-order="organisationID, scriptRegistryItemType, scriptRegistryItemID"
  *
  * @jdo.fetch-group name="PossibleValueProvider.this" fetch-groups="default" fields="organisationID, scriptRegistryItemID, scriptRegistryItemType, labelProviderClassName"
  * 
- * @jdo.query
+ * @!jdo.query
  *		name="getPossibleValuesByScriptRegistryItemID"
  *		query="SELECT
  *			WHERE
@@ -68,29 +70,31 @@ implements Serializable
 
 	public static final String FETCH_GROUP_THIS_POSSIBLE_VALUE_PROVIDER = "PossibleValueProvider.this";
 	
-	public static PossibleValueProvider getPossibleValueProvider(PersistenceManager pm, String organisationID,
-			String scriptRegistryItemType, String scriptRegistryItemID) 
-	{
-		Query q = pm.newNamedQuery(PossibleValueProvider.class, "getPossibleValuesByScriptRegistryItemID");
-		Collection providers = (Collection) q.execute(organisationID, scriptRegistryItemType, scriptRegistryItemID);
-		if (providers != null && !providers.isEmpty()) {
-			PossibleValueProvider provider = (PossibleValueProvider) providers.iterator().next();
-			if (providers.size() > 1)
-				logger.warn("There exist more than one PossibleValueProvider for " +
-						"organisationID "+organisationID+", "+
-						"scriptRegistryItemType "+scriptRegistryItemType+" and "+
-						"scriptRegistryItemID "+scriptRegistryItemID);
-			return provider;
-		}
-		return null;
-	}
-
-	public static PossibleValueProvider getPossibleValueProvider(PersistenceManager pm, 
-			ScriptRegistryItemID scriptRegistryItemID)
-	{
-		return getPossibleValueProvider(pm, scriptRegistryItemID.organisationID, 
-				scriptRegistryItemID.scriptRegistryItemType, scriptRegistryItemID.scriptRegistryItemID);
-	}
+	public static final int LIMIT_UNLIMITED = -1;
+	
+//	public static PossibleValueProvider getPossibleValueProvider(PersistenceManager pm, String organisationID,
+//			String scriptRegistryItemType, String scriptRegistryItemID) 
+//	{
+//		Query q = pm.newNamedQuery(PossibleValueProvider.class, "getPossibleValuesByScriptRegistryItemID");
+//		Collection providers = (Collection) q.execute(organisationID, scriptRegistryItemType, scriptRegistryItemID);
+//		if (providers != null && !providers.isEmpty()) {
+//			PossibleValueProvider provider = (PossibleValueProvider) providers.iterator().next();
+//			if (providers.size() > 1)
+//				logger.warn("There exist more than one PossibleValueProvider for " +
+//						"organisationID "+organisationID+", "+
+//						"scriptRegistryItemType "+scriptRegistryItemType+" and "+
+//						"scriptRegistryItemID "+scriptRegistryItemID);
+//			return provider;
+//		}
+//		return null;
+//	}
+//
+//	public static PossibleValueProvider getPossibleValueProvider(PersistenceManager pm, 
+//			ScriptRegistryItemID scriptRegistryItemID)
+//	{
+//		return getPossibleValueProvider(pm, scriptRegistryItemID.organisationID, 
+//				scriptRegistryItemID.scriptRegistryItemType, scriptRegistryItemID.scriptRegistryItemID);
+//	}
 	
 	/**
 	 * @deprecated for JDO only 
@@ -111,6 +115,10 @@ implements Serializable
 	 * @jdo.column length="100"
 	 */
 	private String organisationID;
+	
+	protected String getOrganisationID() {
+		return organisationID;
+	}
 	
 	/**
 	 * @jdo.field primary-key="true"
@@ -136,8 +144,10 @@ implements Serializable
 	 * 
 	 * @return a {@link Collection} of possible values for the result of the {@link Script}
 	 * with the {@link ScriptRegistryItemID} returned from {@link PossibleValueProvider#getScriptRegistryItemID()}
+	 * based on given the parameterValues
 	 */
-	public abstract Collection<Object> getPossibleValues();
+//	public abstract Collection<Object> getPossibleValues();
+	public abstract Collection<Object> getPossibleValues(Map<String, Object> parameterValues, int limit);
 	
 	/**
 	 * @jdo.field persistence-modifier="persistent"

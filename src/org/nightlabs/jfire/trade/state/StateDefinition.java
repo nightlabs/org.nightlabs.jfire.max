@@ -132,7 +132,7 @@ implements Serializable
 	 * @param statable The {@link Statable} that is transitioned to the new state.
 	 * @return Returns the new newly created State instance.
 	 */
-	public State createArticleContainerState(User user, Statable statable)
+	public State createState(User user, Statable statable)
 	{
 		State state = _createState(user, statable);
 
@@ -145,7 +145,7 @@ implements Serializable
 	}
 
 	/**
-	 * This method creates an instance of {@link State}. It is called by {@link #createArticleContainerState(User, Offer)}.
+	 * This method creates an instance of {@link State}. It is called by {@link #createState(User, Offer)}.
 	 * This method does NOT register anything. You should override this method if you want to subclass {@link State}.
 	 */
 	protected abstract State _createState(User user, Statable statable);

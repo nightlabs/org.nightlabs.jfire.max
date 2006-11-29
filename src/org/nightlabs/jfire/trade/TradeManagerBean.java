@@ -1032,8 +1032,8 @@ implements SessionBean
 
 
 			// persist process definitions
-			ProcessDefinitionUtil.storeProcessDefinition(pm, TradeManagerBean.class.getResource("jbpm/offer/customer/processdefinition.xml"));
-			ProcessDefinitionUtil.storeProcessDefinition(pm, TradeManagerBean.class.getResource("jbpm/offer/vendor/processdefinition.xml"));
+			ProcessDefinitionUtil.storeProcessDefinition(pm, TradeManagerBean.class.getResource("jbpm/offer/customer/")); // processdefinition.xml"));
+			ProcessDefinitionUtil.storeProcessDefinition(pm, TradeManagerBean.class.getResource("jbpm/offer/vendor/")); // processdefinition.xml"));
 
 		} finally {
 			pm.close();

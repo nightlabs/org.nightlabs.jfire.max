@@ -62,6 +62,8 @@ implements Serializable
 		if (jbpmProcessDefinitionURL == null)
 			throw new IllegalArgumentException("jbpmProcessDefinitionURL == null");
 
+		jbpmProcessDefinitionURL = new URL(jbpmProcessDefinitionURL, "processdefinition.xml");
+
 		try {
 			org.jbpm.graph.def.ProcessDefinition jbpmProcessDefinition;
 	

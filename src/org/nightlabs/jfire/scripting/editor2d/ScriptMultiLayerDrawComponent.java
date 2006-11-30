@@ -30,7 +30,7 @@ import java.util.Set;
 
 import org.nightlabs.editor2d.DrawComponent;
 import org.nightlabs.editor2d.MultiLayerDrawComponent;
-import org.nightlabs.jfire.scripting.editor2d.script.Script;
+import org.nightlabs.jfire.scripting.condition.Script;
 import org.nightlabs.jfire.scripting.id.ScriptRegistryItemID;
 
 /**

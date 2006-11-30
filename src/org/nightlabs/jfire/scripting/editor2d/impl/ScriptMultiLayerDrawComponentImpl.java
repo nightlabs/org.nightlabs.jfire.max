@@ -36,10 +36,10 @@ import org.apache.log4j.Logger;
 import org.nightlabs.editor2d.DrawComponent;
 import org.nightlabs.editor2d.DrawComponentContainer;
 import org.nightlabs.editor2d.impl.MultiLayerDrawComponentImpl;
+import org.nightlabs.jfire.scripting.condition.Script;
 import org.nightlabs.jfire.scripting.editor2d.ScriptDrawComponent;
 import org.nightlabs.jfire.scripting.editor2d.ScriptMultiLayerDrawComponent;
 import org.nightlabs.jfire.scripting.editor2d.ScriptingConstants;
-import org.nightlabs.jfire.scripting.editor2d.script.Script;
 import org.nightlabs.jfire.scripting.id.ScriptRegistryItemID;
 
 /**

@@ -9,6 +9,7 @@ import java.io.Serializable;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.Iterator;
 import java.util.List;
 
 import javax.jdo.JDOObjectNotFoundException;
@@ -16,6 +17,9 @@ import javax.jdo.PersistenceManager;
 
 import org.apache.log4j.Logger;
 import org.jbpm.JbpmContext;
+import org.jbpm.graph.def.Node;
+import org.jbpm.graph.node.EndState;
+import org.jbpm.graph.node.StartState;
 import org.jbpm.jpdl.xml.JpdlXmlReader;
 import org.nightlabs.jfire.jbpm.JbpmLookup;
 import org.nightlabs.jfire.jbpm.graph.def.id.ProcessDefinitionID;
@@ -46,7 +50,7 @@ implements Serializable
 		String pdName = jbpmProcessDefinition.getName();
 		String[] parts = pdName.split(":");
 		if (parts.length != 2)
-			throw new IllegalArgumentException("jbpmProcessDefinition.name must contain exactly one '/' - i.e. it must be composed out of organisationID and processDefinitionIDString: " + pdName);
+			throw new IllegalArgumentException("jbpmProcessDefinition.name must contain exactly one ':' - i.e. it must be composed out of organisationID and processDefinitionIDString: " + pdName);
 
 		return ProcessDefinitionID.create(parts[0], parts[1]);
 	}
@@ -117,6 +121,33 @@ implements Serializable
 			} catch (JDOObjectNotFoundException x) {
 				processDefinition = (ProcessDefinition) pm.makePersistent(new ProcessDefinition(processDefinitionID, jbpmProcessDefinition));
 			}
+
+			// create StateDefinitions
+			for (Iterator itNode = jbpmProcessDefinition.getNodes().iterator(); itNode.hasNext(); ) {
+				Node node = (Node) itNode.next();
+				if (node instanceof StartState ||
+						node instanceof EndState ||
+						node instanceof org.jbpm.graph.node.State)
+				{
+//					StateDefinitionID stateDefinitionID = StateDefinition.getStateDefinitionID(node);
+					StateDefinition stateDefinition = (StateDefinition) pm.makePersistent(
+							new StateDefinition(processDefinition, node.getName()));
+
+//									stateDefinitionID.stateDefinitionOrganisationID,
+//									stateDefinitionID.stateDefinitionID));
+
+					// create Transitions
+					// TODO should we create JDO Transition objects for all jbpm Transitions? right now we can't because we create only StateDefinitions for States (not for other Nodes)
+					if (node.getLeavingTransitions() != null) {
+						for (Iterator itTransition = node.getLeavingTransitions().iterator(); itTransition.hasNext(); ) {
+							org.jbpm.graph.def.Transition jbpmTransition = (org.jbpm.graph.def.Transition) itTransition.next();
+//							TransitionID transitionID = Transition.getTransitionID(jbpmTransition);
+							pm.makePersistent(new Transition(stateDefinition, jbpmTransition.getName()));
+						}
+					} // if (node.getLeavingTransitions() != null) {
+				}
+			}
+
 			return processDefinition;
 		} finally {
 			if (closeJbpmContext)
@@ -132,7 +163,7 @@ implements Serializable
 
 	/**
 	 * @jdo.field primary-key="true"
-	 * @jdo.column length="100"
+	 * @jdo.column length="50"
 	 */
 	private String processDefinitionID;
 
@@ -147,6 +178,7 @@ implements Serializable
 	 *		collection-type="collection"
 	 *		element-type="ProcessDefinitionVersion"
 	 *		dependent-element="true"
+	 *		mapped-by="processDefinition"
 	 */
 	private List<ProcessDefinitionVersion> processDefinitionVersions;
 
@@ -207,5 +239,10 @@ implements Serializable
 	public List<ProcessDefinitionVersion> getProcessDefinitionVersions()
 	{
 		return Collections.unmodifiableList(processDefinitionVersions);
+	}
+
+	public String getJbpmProcessDefinitionName()
+	{
+		return organisationID + ':' + processDefinitionID;
 	}
 }

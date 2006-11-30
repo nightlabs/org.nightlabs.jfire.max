@@ -2,6 +2,8 @@ package org.nightlabs.jfire.jbpm.graph.def;
 
 import java.io.Serializable;
 
+import org.jbpm.JbpmContext;
+
 /**
  * @author Marco Schulze - marco at nightlabs dot de
  *
@@ -30,7 +32,7 @@ public class ProcessDefinitionVersion
 
 	/**
 	 * @jdo.field primary-key="true"
-	 * @jdo.column length="100"
+	 * @jdo.column length="50"
 	 */
 	private String processDefinitionID;
 
@@ -38,6 +40,11 @@ public class ProcessDefinitionVersion
 	 * @jdo.field primary-key="true" indexed="true"
 	 */
 	private long jbpmProcessDefinitionId;
+
+	/**
+	 * @jdo.field persistence-modifier="persistent"
+	 */
+	private ProcessDefinition processDefinition;
 
 	/**
 	 * @deprecated Only for JDO!
@@ -48,6 +55,7 @@ public class ProcessDefinitionVersion
 
 	protected ProcessDefinitionVersion(ProcessDefinition processDefinition, org.jbpm.graph.def.ProcessDefinition jbpmProcessDefinition)
 	{
+		this.processDefinition = processDefinition;
 		this.organisationID = processDefinition.getOrganisationID();
 		this.processDefinitionID = processDefinition.getProcessDefinitionID();
 		this.jbpmProcessDefinitionId = jbpmProcessDefinition.getId();
@@ -61,8 +69,17 @@ public class ProcessDefinitionVersion
 	{
 		return processDefinitionID;
 	}
+	public ProcessDefinition getProcessDefinition()
+	{
+		return processDefinition;
+	}
 	public long getJbpmProcessDefinitionId()
 	{
 		return jbpmProcessDefinitionId;
+	}
+
+	public org.jbpm.graph.def.ProcessDefinition getJbpmProcessDefinition(JbpmContext jbpmContext)
+	{
+		return jbpmContext.getGraphSession().getProcessDefinition(jbpmProcessDefinitionId);
 	}
 }

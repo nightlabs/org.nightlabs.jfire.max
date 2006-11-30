@@ -3,6 +3,7 @@ package org.nightlabs.jfire.trade.notification;
 import java.util.ArrayList;
 import java.util.Collection;
 
+import javax.jdo.JDOObjectNotFoundException;
 import javax.jdo.PersistenceManager;
 
 import org.nightlabs.annotation.Implement;
@@ -56,9 +57,21 @@ extends JDOLifecycleListenerFilter
 
 		Collection<DirtyObjectID> res = null;
 		PersistenceManager pm = event.getPersistenceManager();
-		for (DirtyObjectID dirtyObjectID : event.getDirtyObjectIDs()) {
-			Article article = (Article) pm.getObjectById(dirtyObjectID.getObjectID());
+		iterateDirtyObjectIDs: for (DirtyObjectID dirtyObjectID : event.getDirtyObjectIDs()) {
 			boolean add = false;
+
+			Article article = null;
+			try {
+				article = (Article) pm.getObjectById(dirtyObjectID.getObjectID());
+			} catch (JDOObjectNotFoundException x) {
+				// the object has already been deleted => we ignore it if this filter isn't for deleted objects (which it should never be as deletion should tracked using implicit listeners as best practice)
+				for (JDOLifecycleState state : jdoLifecycleStates) {
+					if (JDOLifecycleState.DELETED.equals(state))
+						add = true;
+					else
+						continue iterateDirtyObjectIDs;
+				}
+			}
 
 			if (articleContainerID instanceof OrderID) {
 				if (articleContainerID.equals(article.getOrderID()))

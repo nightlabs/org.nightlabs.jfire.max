@@ -21,9 +21,9 @@
    <end-state name="devil.NightLabs.org:aborted"></end-state>
    <end-state name="devil.NightLabs.org:revoked"></end-state>
    <node name="devil.NightLabs.org:customerAccepted">
-      <transition name="" to="devil.NightLabs.org:accepted"></transition>
+      <transition name="accept" to="devil.NightLabs.org:accepted"></transition>
    </node>
    <node name="devil.NightLabs.org:customerRejected">
-      <transition name="" to="devil.NightLabs.org:rejected"></transition>
+      <transition name="reject" to="devil.NightLabs.org:rejected"></transition>
    </node>
 </process-definition>

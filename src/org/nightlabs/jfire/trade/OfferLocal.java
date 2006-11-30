@@ -34,13 +34,11 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
+import org.nightlabs.jfire.jbpm.graph.def.ActionHandlerNodeEnter;
+import org.nightlabs.jfire.jbpm.graph.def.Statable;
+import org.nightlabs.jfire.jbpm.graph.def.StatableLocal;
+import org.nightlabs.jfire.jbpm.graph.def.State;
 import org.nightlabs.jfire.security.User;
-import org.nightlabs.jfire.trade.state.OfferState;
-import org.nightlabs.jfire.trade.state.OfferStateDefinition;
-import org.nightlabs.jfire.trade.state.Statable;
-import org.nightlabs.jfire.trade.state.StatableLocal;
-import org.nightlabs.jfire.trade.state.State;
-import org.nightlabs.util.CollectionUtil;
 
 /**
  * @author Marco Schulze - marco at nightlabs dot de
@@ -51,7 +49,7 @@ import org.nightlabs.util.CollectionUtil;
  *		detachable="true"
  *		table="JFireTrade_OfferLocal"
  *
- * @jdo.implements name="org.nightlabs.jfire.trade.state.StatableLocal"
+ * @jdo.implements name="org.nightlabs.jfire.jbpm.graph.def.StatableLocal"
  *
  * @jdo.inheritance strategy="new-table"
  *
@@ -136,22 +134,22 @@ implements Serializable, StatableLocal
 	/**
 	 * @jdo.field persistence-modifier="persistent"
 	 */
-	private OfferState offerState;
+	private State state;
 
 	/**
-	 * This is the history of <b>all</b> {@link OfferState}s with the newest last and the oldest first.
+	 * This is the history of <b>all</b> {@link State}s with the newest last and the oldest first.
 	 * Of course, only the states known to the current organisation are linked here.
 	 *
 	 * @jdo.field
 	 *		persistence-modifier="persistent"
 	 *		collection-type="collection"
-	 *		element-type="OfferState"
+	 *		element-type="State"
 	 *		dependent-element="true"
-	 *		table="JFireTrade_OfferLocal_offerStates"
+	 *		table="JFireTrade_OfferLocal_states"
 	 *
 	 * @jdo.join
 	 */
-	private List<OfferState> offerStates;
+	private List<State> states;
 
 	/**
 	 * @deprecated Only for JDO!
@@ -165,7 +163,7 @@ implements Serializable, StatableLocal
 		this.offerID = offer.getOfferID();
 		this.offer = offer;
 		this.offerActionHandlers = new HashSet<OfferActionHandler>();
-		this.offerStates = new ArrayList<OfferState>();
+		this.states = new ArrayList<State>();
 
 		offer.setOfferLocal(this);
 	}
@@ -350,33 +348,49 @@ implements Serializable, StatableLocal
 	}
 
 	/**
-	 * This method is <b>not</b> intended to be called directly.
-	 * Call {@link OfferStateDefinition#createOfferState(User, Offer)} instead!
+	 * This method is <b>not</b> intended to be called directly. It is called by
+	 * {@link State#State(String, long, User, Statable, org.nightlabs.jfire.jbpm.graph.def.StateDefinition)}
+	 * which is called automatically by {@link ActionHandlerNodeEnter}, if this <code>ActionHandler</code> is registered.
 	 */
 	public void setState(State currentState)
 	{
 		if (currentState == null)
-			throw new IllegalArgumentException("offerState must not be null!");
+			throw new IllegalArgumentException("state must not be null!");
 
-		this.offerState = (OfferState)currentState;
-		this.offerStates.add((OfferState)currentState);
+		this.state = (State)currentState;
+		this.states.add((State)currentState);
 	}
 
-	public OfferState getState()
+	public State getState()
 	{
-		return offerState;
+		return state;
 	}
 
 	/**
 	 * @jdo.field persistence-modifier="none"
 	 */
-	private transient List<State> _offerStates = null;
+	private transient List<State> _states = null;
 
 	public List<State> getStates()
 	{
-		if (_offerStates == null)
-			_offerStates = CollectionUtil.castList(Collections.unmodifiableList(offerStates));
+		if (_states == null)
+			_states = Collections.unmodifiableList(states);
 
-		return _offerStates;
+		return _states;
+	}
+
+	/**
+	 * @jdo.field persistence-modifier="persistent"
+	 */
+	private long jbpmProcessInstanceId = -1;
+
+	public long getJbpmProcessInstanceId()
+	{
+		return jbpmProcessInstanceId;
+	}
+
+	public void setJbpmProcessInstanceId(long jbpmProcessInstanceId)
+	{
+		this.jbpmProcessInstanceId = jbpmProcessInstanceId;
 	}
 }

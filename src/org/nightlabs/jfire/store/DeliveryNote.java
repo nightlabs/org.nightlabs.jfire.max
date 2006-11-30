@@ -42,10 +42,12 @@ import javax.jdo.Query;
 import javax.jdo.listener.DetachCallback;
 
 import org.nightlabs.jdo.ObjectIDUtil;
+import org.nightlabs.jfire.jbpm.graph.def.ActionHandlerNodeEnter;
+import org.nightlabs.jfire.jbpm.graph.def.Statable;
+import org.nightlabs.jfire.jbpm.graph.def.StatableLocal;
+import org.nightlabs.jfire.jbpm.graph.def.State;
 import org.nightlabs.jfire.security.User;
 import org.nightlabs.jfire.store.id.DeliveryNoteID;
-import org.nightlabs.jfire.store.state.DeliveryNoteState;
-import org.nightlabs.jfire.store.state.DeliveryNoteStateDefinition;
 import org.nightlabs.jfire.trade.Article;
 import org.nightlabs.jfire.trade.ArticleContainer;
 import org.nightlabs.jfire.trade.LegalEntity;
@@ -53,9 +55,6 @@ import org.nightlabs.jfire.trade.Offer;
 import org.nightlabs.jfire.trade.Order;
 import org.nightlabs.jfire.trade.OrganisationLegalEntity;
 import org.nightlabs.jfire.trade.id.ArticleID;
-import org.nightlabs.jfire.trade.state.Statable;
-import org.nightlabs.jfire.trade.state.StatableLocal;
-import org.nightlabs.jfire.trade.state.State;
 import org.nightlabs.jfire.transfer.id.AnchorID;
 import org.nightlabs.util.CollectionUtil;
 import org.nightlabs.util.Utils;
@@ -70,7 +69,7 @@ import org.nightlabs.util.Utils;
  *		table="JFireTrade_DeliveryNote"
  *
  * @jdo.implements name="org.nightlabs.jfire.trade.ArticleContainer"
- * @jdo.implements name="org.nightlabs.jfire.trade.state.Statable"
+ * @jdo.implements name="org.nightlabs.jfire.jbpm.graph.def.Statable"
  *
  * @jdo.inheritance strategy="new-table"
  *
@@ -263,21 +262,21 @@ implements Serializable, ArticleContainer, Statable, DetachCallback
 	/**
 	 * @jdo.field persistence-modifier="persistent"
 	 */
-	private DeliveryNoteState deliveryNoteState;
+	private State state;
 
 	/**
-	 * This is the history of <b>public</b> {@link DeliveryNoteState}s with the newest last and the oldest first.
+	 * This is the history of <b>public</b> {@link State}s with the newest last and the oldest first.
 	 *
 	 * @jdo.field
 	 *		persistence-modifier="persistent"
 	 *		collection-type="collection"
-	 *		element-type="DeliveryNoteState"
+	 *		element-type="State"
 	 *		dependent-element="true"
-	 *		table="JFireTrade_DeliveryNote_deliveryNoteStates"
+	 *		table="JFireTrade_DeliveryNote_states"
 	 *
 	 * @jdo.join
 	 */
-	private List<DeliveryNoteState> deliveryNoteStates;
+	private List<State> states;
 
 //	/**
 //	 * key: String articlePK (organisationID/articleID)<br/>
@@ -603,37 +602,38 @@ implements Serializable, ArticleContainer, Statable, DetachCallback
 
 
 	/**
-	 * This method is <b>not</b> intended to be called directly.
-	 * Call {@link DeliveryNoteStateDefinition#createDeliveryNoteState(User, DeliveryNote)} instead!
+	 * This method is <b>not</b> intended to be called directly. It is called by
+	 * {@link State#State(String, long, User, Statable, org.nightlabs.jfire.jbpm.graph.def.StateDefinition)}
+	 * which is called automatically by {@link ActionHandlerNodeEnter}, if this <code>ActionHandler</code> is registered.
 	 */
 	public void setState(State currentState)
 	{
 		if (currentState == null)
-			throw new IllegalArgumentException("deliveryNoteState must not be null!");
+			throw new IllegalArgumentException("state must not be null!");
 
 		if (!currentState.getStateDefinition().isPublicState())
-			throw new IllegalArgumentException("deliveryNoteState.deliveryNoteStateDefinition.publicState is false!");
+			throw new IllegalArgumentException("state.stateDefinition.publicState is false!");
 
-		this.deliveryNoteState = (DeliveryNoteState)currentState;
-		this.deliveryNoteStates.add((DeliveryNoteState)currentState);
+		this.state = (State)currentState;
+		this.states.add((State)currentState);
 	}
 
-	public DeliveryNoteState getState()
+	public State getState()
 	{
-		return deliveryNoteState;
+		return state;
 	}
 
 	/**
 	 * @jdo.field persistence-modifier="none"
 	 */
-	private transient List<State> _deliveryNoteStates = null;
+	private transient List<State> _states = null;
 
 	public List<State> getStates()
 	{
-		if (_deliveryNoteStates == null)
-			_deliveryNoteStates = CollectionUtil.castList(Collections.unmodifiableList(deliveryNoteStates));
+		if (_states == null)
+			_states = CollectionUtil.castList(Collections.unmodifiableList(states));
 
-		return _deliveryNoteStates;
+		return _states;
 	}
 
 }

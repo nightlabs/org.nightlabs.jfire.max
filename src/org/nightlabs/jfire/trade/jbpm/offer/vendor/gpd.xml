@@ -43,12 +43,12 @@
   <node name="devil.NightLabs.org:aborted" x="456" y="132" width="217" height="40"/>
   <node name="devil.NightLabs.org:revoked" x="456" y="480" width="217" height="40"/>
   <node name="devil.NightLabs.org:customerAccepted" x="-41" y="379" width="225" height="40">
-    <transition name="">
+    <transition name="accept">
       <label x="5" y="-10"/>
     </transition>
   </node>
   <node name="devil.NightLabs.org:customerRejected" x="456" y="252" width="217" height="40">
-    <transition name="">
+    <transition name="reject">
       <label x="5" y="-10"/>
     </transition>
   </node>

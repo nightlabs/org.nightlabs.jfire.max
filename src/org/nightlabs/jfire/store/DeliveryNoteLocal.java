@@ -31,12 +31,11 @@ import java.util.Collections;
 import java.util.Date;
 import java.util.List;
 
+import org.nightlabs.jfire.jbpm.graph.def.ActionHandlerNodeEnter;
+import org.nightlabs.jfire.jbpm.graph.def.Statable;
+import org.nightlabs.jfire.jbpm.graph.def.StatableLocal;
+import org.nightlabs.jfire.jbpm.graph.def.State;
 import org.nightlabs.jfire.security.User;
-import org.nightlabs.jfire.store.state.DeliveryNoteState;
-import org.nightlabs.jfire.store.state.DeliveryNoteStateDefinition;
-import org.nightlabs.jfire.trade.state.Statable;
-import org.nightlabs.jfire.trade.state.StatableLocal;
-import org.nightlabs.jfire.trade.state.State;
 import org.nightlabs.util.CollectionUtil;
 
 /**
@@ -107,21 +106,21 @@ implements Serializable, StatableLocal
 	/**
 	 * @jdo.field persistence-modifier="persistent"
 	 */
-	private DeliveryNoteState deliveryNoteState;
+	private State state;
 
 	/**
-	 * This is the history of <b>public</b> {@link DeliveryNoteState}s with the newest last and the oldest first.
+	 * This is the history of <b>public</b> {@link State}s with the newest last and the oldest first.
 	 *
 	 * @jdo.field
 	 *		persistence-modifier="persistent"
 	 *		collection-type="collection"
-	 *		element-type="DeliveryNoteState"
+	 *		element-type="State"
 	 *		dependent-element="true"
-	 *		table="JFireTrade_DeliveryNoteLocal_deliveryNoteStates"
+	 *		table="JFireTrade_DeliveryNoteLocal_states"
 	 *
 	 * @jdo.join
 	 */
-	private List<DeliveryNoteState> deliveryNoteStates;
+	private List<State> states;
 
 	/**
 	 * @deprecated Only for JDO!
@@ -186,33 +185,50 @@ implements Serializable, StatableLocal
 
 
 	/**
-	 * This method is <b>not</b> intended to be called directly.
-	 * Call {@link DeliveryNoteStateDefinition#createDeliveryNoteState(User, DeliveryNote)} instead!
+	 * This method is <b>not</b> intended to be called directly. It is called by
+	 * {@link State#State(String, long, User, Statable, org.nightlabs.jfire.jbpm.graph.def.StateDefinition)}
+	 * which is called automatically by {@link ActionHandlerNodeEnter}, if this <code>ActionHandler</code> is registered.
 	 */
 	public void setState(State currentState)
 	{
 		if (currentState == null)
-			throw new IllegalArgumentException("deliveryNoteState must not be null!");
+			throw new IllegalArgumentException("state must not be null!");
 
-		this.deliveryNoteState = (DeliveryNoteState)currentState;
-		this.deliveryNoteStates.add((DeliveryNoteState)currentState);
+		this.state = (State)currentState;
+		this.states.add((State)currentState);
 	}
 
-	public DeliveryNoteState getState()
+	public State getState()
 	{
-		return deliveryNoteState;
+		return state;
 	}
 
 	/**
 	 * @jdo.field persistence-modifier="none"
 	 */
-	private transient List<State> _deliveryNoteStates = null;
+	private transient List<State> _states = null;
 
 	public List<State> getStates()
 	{
-		if (_deliveryNoteStates == null)
-			_deliveryNoteStates = CollectionUtil.castList(Collections.unmodifiableList(deliveryNoteStates));
+		if (_states == null)
+			_states = CollectionUtil.castList(Collections.unmodifiableList(states));
 
-		return _deliveryNoteStates;
+		return _states;
 	}
+
+	/**
+	 * @jdo.field persistence-modifier="persistent"
+	 */
+	private long jbpmProcessInstanceId = -1;
+
+	public long getJbpmProcessInstanceId()
+	{
+		return jbpmProcessInstanceId;
+	}
+
+	public void setJbpmProcessInstanceId(long jbpmProcessInstanceId)
+	{
+		this.jbpmProcessInstanceId = jbpmProcessInstanceId;
+	}
+
 }

@@ -66,6 +66,8 @@ import org.nightlabs.jfire.store.ProductType;
 import org.nightlabs.jfire.store.ProductTypeActionHandler;
 import org.nightlabs.jfire.store.Store;
 import org.nightlabs.jfire.trade.id.ArticleID;
+import org.nightlabs.jfire.trade.state.ProcessDefinitionAssignment;
+import org.nightlabs.jfire.trade.state.id.ProcessDefinitionAssignmentID;
 import org.nightlabs.jfire.transfer.id.AnchorID;
 
 /**
@@ -573,8 +575,15 @@ public class Trader
 			Offer offer = new Offer(
 					user, order,
 					offerIDPrefix, IDGenerator.nextID(Offer.class.getName() + '/' + offerIDPrefix));
-			new OfferLocal(offer); // OfferLocal registers itself in Offer
-			getPersistenceManager().makePersistent(offer);
+
+			OfferLocal offerLocal = new OfferLocal(offer); // OfferLocal registers itself in Offer
+
+			offer = (Offer) getPersistenceManager().makePersistent(offer);
+
+			ProcessDefinitionAssignment processDefinitionAssignment = (ProcessDefinitionAssignment) getPersistenceManager().getObjectById(
+					ProcessDefinitionAssignmentID.create(Offer.class, TradeSide.vendor));
+			processDefinitionAssignment.createProcessInstance(null, user, offer);
+
 			return offer;
 		}
 		// TODO: Implement Offer creating on foreign servers

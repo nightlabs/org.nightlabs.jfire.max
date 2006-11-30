@@ -46,15 +46,13 @@ import org.nightlabs.jfire.accounting.Accounting;
 import org.nightlabs.jfire.accounting.AccountingPriceConfig;
 import org.nightlabs.jfire.accounting.Currency;
 import org.nightlabs.jfire.accounting.Price;
+import org.nightlabs.jfire.jbpm.graph.def.ActionHandlerNodeEnter;
+import org.nightlabs.jfire.jbpm.graph.def.Statable;
+import org.nightlabs.jfire.jbpm.graph.def.StatableLocal;
+import org.nightlabs.jfire.jbpm.graph.def.State;
 import org.nightlabs.jfire.security.User;
 import org.nightlabs.jfire.store.ProductType;
-import org.nightlabs.jfire.trade.state.OfferState;
-import org.nightlabs.jfire.trade.state.OfferStateDefinition;
-import org.nightlabs.jfire.trade.state.Statable;
-import org.nightlabs.jfire.trade.state.StatableLocal;
-import org.nightlabs.jfire.trade.state.State;
 import org.nightlabs.jfire.transfer.id.AnchorID;
-import org.nightlabs.util.CollectionUtil;
 import org.nightlabs.util.Utils;
 
 /**
@@ -69,7 +67,7 @@ import org.nightlabs.util.Utils;
  *		table="JFireTrade_Offer"
  *
  * @jdo.implements name="org.nightlabs.jfire.trade.ArticleContainer"
- * @jdo.implements name="org.nightlabs.jfire.trade.state.Statable"
+ * @jdo.implements name="org.nightlabs.jfire.jbpm.graph.def.Statable"
  *
  * @jdo.inheritance strategy="new-table"
  *
@@ -279,21 +277,21 @@ implements
 	/**
 	 * @jdo.field persistence-modifier="persistent"
 	 */
-	private OfferState offerState;
+	private State state;
 
 	/**
-	 * This is the history of <b>public</b> {@link OfferState}s with the newest last and the oldest first.
+	 * This is the history of <b>public</b> {@link State}s with the newest last and the oldest first.
 	 *
 	 * @jdo.field
 	 *		persistence-modifier="persistent"
 	 *		collection-type="collection"
-	 *		element-type="OfferState"
+	 *		element-type="State"
 	 *		dependent-element="true"
-	 *		table="JFireTrade_Offer_offerStates"
+	 *		table="JFireTrade_Offer_states"
 	 *
 	 * @jdo.join
 	 */
-	private List<OfferState> offerStates;
+	private List<State> states;
 
 	/**
 	 * @deprecated This constructor exists only for JDO!
@@ -751,36 +749,38 @@ implements
 	}
 
 	/**
-	 * This method is <b>not</b> intended to be called directly.
-	 * Call {@link OfferStateDefinition#createOfferState(User, Offer)} instead!
+	 * This method is <b>not</b> intended to be called directly. It is called by
+	 * {@link State#State(String, long, User, Statable, org.nightlabs.jfire.jbpm.graph.def.StateDefinition)}
+	 * which is called automatically by {@link ActionHandlerNodeEnter}, if this <code>ActionHandler</code> is registered.
 	 */
 	public void setState(State currentState)
 	{
 		if (currentState == null)
-			throw new IllegalArgumentException("offerState must not be null!");
+			throw new IllegalArgumentException("state must not be null!");
 
 		if (!currentState.getStateDefinition().isPublicState())
-			throw new IllegalArgumentException("offerState.offerStateDefinition.publicState is false!");
+			throw new IllegalArgumentException("state.stateDefinition.publicState is false!");
 
-		this.offerState = (OfferState)currentState;
-		this.offerStates.add((OfferState)currentState);
+		this.state = (State)currentState;
+		this.states.add((State)currentState);
 	}
 
-	public OfferState getState()
+	public State getState()
 	{
-		return offerState;
+		return state;
 	}
 
 	/**
 	 * @jdo.field persistence-modifier="none"
 	 */
-	private transient List<State> _offerStates = null;
+	private transient List<State> _states = null;
 
 	public List<State> getStates()
 	{
-		if (_offerStates == null)
-			_offerStates = CollectionUtil.castList(Collections.unmodifiableList(offerStates));
+		if (_states == null)
+			_states = Collections.unmodifiableList(states);
 
-		return _offerStates;
+		return _states;
 	}
+
 }

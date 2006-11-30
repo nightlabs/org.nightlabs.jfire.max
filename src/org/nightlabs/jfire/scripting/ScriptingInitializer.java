@@ -383,7 +383,7 @@ public class ScriptingInitializer
 					Node resultClassNode = scriptNode.getAttributes().getNamedItem("resultClass");
 					if (resultClassNode != null && !"".equals(resultClassNode.getTextContent())) {
 						logger.debug("Have resultClass-attribute in script element: "+idNode.getTextContent());
-						scriptResultClass = typeNode.getTextContent();
+						scriptResultClass = resultClassNode.getTextContent();
 					}					
 				}
 				

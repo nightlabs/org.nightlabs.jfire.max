@@ -26,8 +26,6 @@
 
 package org.nightlabs.jfire.chezfrancois;
 
-import java.io.InputStream;
-import java.io.InputStreamReader;
 import java.rmi.RemoteException;
 import java.util.Iterator;
 import java.util.Locale;
@@ -41,9 +39,6 @@ import javax.jdo.JDOObjectNotFoundException;
 import javax.jdo.PersistenceManager;
 
 import org.apache.log4j.Logger;
-import org.jbpm.JbpmContext;
-import org.jbpm.graph.def.ProcessDefinition;
-import org.jbpm.jpdl.xml.JpdlXmlReader;
 import org.nightlabs.ModuleException;
 import org.nightlabs.jdo.moduleregistry.ModuleMetaData;
 import org.nightlabs.jfire.accounting.Account;
@@ -55,7 +50,6 @@ import org.nightlabs.jfire.accounting.priceconfig.IInnerPriceConfig;
 import org.nightlabs.jfire.accounting.tariffpriceconfig.FormulaPriceConfig;
 import org.nightlabs.jfire.base.BaseSessionBeanImpl;
 import org.nightlabs.jfire.idgenerator.IDGenerator;
-import org.nightlabs.jfire.jbpm.JbpmLookup;
 import org.nightlabs.jfire.organisation.Organisation;
 import org.nightlabs.jfire.security.Authority;
 import org.nightlabs.jfire.security.RoleGroup;
@@ -70,7 +64,6 @@ import org.nightlabs.jfire.timer.Task;
 import org.nightlabs.jfire.timer.id.TaskID;
 import org.nightlabs.jfire.trade.Article;
 import org.nightlabs.jfire.trade.LegalEntity;
-import org.nightlabs.util.Utils;
 
 
 /**
@@ -496,22 +489,22 @@ implements SessionBean
 		logger.info("***************************************************************************************************************");
 		logger.info("***************************************************************************************************************");
 
-		try {
-			JbpmContext jbpmContext = JbpmLookup.getJbpmConfiguration().createJbpmContext();
-			try {
-				logger.info("Have JbpmContext! Deploying process definition!");
-				InputStream in = ChezFrancoisDatastoreInitializerBean.class.getResourceAsStream("test/jbpm/processdefinition.xml");
-				JpdlXmlReader jpdlXmlReader = new JpdlXmlReader(new InputStreamReader(in, Utils.CHARSET_NAME_UTF_8));
-				ProcessDefinition processDefinition = jpdlXmlReader.readProcessDefinition();
-				jpdlXmlReader.close();
-
-				jbpmContext.deployProcessDefinition(processDefinition);
-			} finally {
-				jbpmContext.close();
-			}
-		} catch (Throwable t) {
-			logger.error("Jbpm Test failed!", t);
-		}
+//		try {
+//			JbpmContext jbpmContext = JbpmLookup.getJbpmConfiguration().createJbpmContext();
+//			try {
+//				logger.info("Have JbpmContext! Deploying process definition!");
+//				InputStream in = ChezFrancoisDatastoreInitializerBean.class.getResourceAsStream("test/jbpm/processdefinition.xml");
+//				JpdlXmlReader jpdlXmlReader = new JpdlXmlReader(new InputStreamReader(in, Utils.CHARSET_NAME_UTF_8));
+//				ProcessDefinition processDefinition = jpdlXmlReader.readProcessDefinition();
+//				jpdlXmlReader.close();
+//
+//				jbpmContext.deployProcessDefinition(processDefinition);
+//			} finally {
+//				jbpmContext.close();
+//			}
+//		} catch (Throwable t) {
+//			logger.error("Jbpm Test failed!", t);
+//		}
 
 //		String jndiName = "java:/jbpm/JbpmConfiguration";
 //		try {

@@ -61,38 +61,12 @@ public class DefaultPossibleValueProvider
 extends PossibleValueProvider 
 {
 	private static final Logger logger = Logger.getLogger(DefaultPossibleValueProvider.class);
-		
-	public DefaultPossibleValueProvider(ScriptRegistryItemID scriptID) {
-		super(scriptID);
+
+	public DefaultPossibleValueProvider(Script script) // ScriptRegistryItemID scriptID)
+	{
+		super(script);
 	}
-	
-//	private static final List<Object> EMPTY_LIST = new ArrayList<Object>(0);
-//	public List<Object> getPossibleValues() 
-//	{
-//		PersistenceManager pm = JDOHelper.getPersistenceManager(this);
-//		ScriptRegistry scriptRegistry = ScriptRegistry.getScriptRegistry(pm);
-//		Script script = scriptRegistry.getScript(getScriptRegistryItemType(), 
-//				getScriptRegistryItemID());
-//		try {
-//			Class resultClass = script.getResultClass();
-//			if (PersistenceCapable.class.isAssignableFrom(resultClass)) {
-//				Extent extent = pm.getExtent(resultClass);
-//				List<Object> possibleValues = new LinkedList<Object>();
-//				for (Iterator it = extent.iterator(); it.hasNext(); ) {
-//					possibleValues.add(it.next());
-//				}
-//				if (logger.isDebugEnabled())
-//					logger.debug(possibleValues.size()+" possible values for class "+resultClass);
-//				return possibleValues;					
-//			} else {
-//				logger.warn("resultClass "+script.getResultClassName()+" of script scriptRegistryItemID "+getScriptRegistryItemID()+" is no instance of PersistenceCapable!");
-//			}			
-//		} catch (ClassNotFoundException e) {
-//			logger.error("resultClass "+script.getResultClassName()+" of script with ScriptRegistryItemID "+getScriptRegistryItemID()+" was not found!", e);
-//		}
-//		return EMPTY_LIST;
-//	}
-	
+		
 	public List<Object> getPossibleValues(Map<String, Object> parameterValues, int limit) 
 	{
 		PersistenceManager pm = JDOHelper.getPersistenceManager(this);

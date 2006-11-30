@@ -98,6 +98,56 @@ implements SessionBean
 		super.unsetSessionContext();
 	}
 		
+	protected ScriptConditioner getScriptConditioner(PersistenceManager pm, 
+			ScriptRegistryItemID scriptRegistryItemID, 
+			Map<String, Object> parameterValues, int valueLimit)
+	{
+		String variableName = scriptRegistryItemID.scriptRegistryItemID;
+		Script script = ScriptRegistry.getScriptRegistry(pm).getScript(
+				scriptRegistryItemID.scriptRegistryItemType, 
+				scriptRegistryItemID.scriptRegistryItemID);
+		Class scriptResultClass;
+		List<CompareOperator> compareOperators = DefaultCompareOperatorProvider.sharedInstance().getEqualOperators();
+		try {
+			scriptResultClass = script.getResultClass();
+			compareOperators = DefaultCompareOperatorProvider.sharedInstance().getCompareOperator(scriptResultClass);			
+		} catch (ClassNotFoundException e) {
+			logger.error("script resultClass "+script.getResultClassName()+" of script with scriptRegistryItemID "+scriptRegistryItemID+" could not be found", e);
+		}
+		
+		Collection possibleValues = Collections.EMPTY_LIST;
+		String valueLabelProviderClassName = LabelProvider.class.getName();			
+		PossibleValueProviderID valueProviderID = PossibleValueProviderID.create(
+				scriptRegistryItemID.organisationID, 
+				scriptRegistryItemID.scriptRegistryItemType, 
+				scriptRegistryItemID.scriptRegistryItemID);
+		try {
+			PossibleValueProvider valueProvider = (PossibleValueProvider) pm.getObjectById(valueProviderID);
+			pm.getFetchPlan().setGroup(PossibleValueProvider.FETCH_GROUP_THIS_POSSIBLE_VALUE_PROVIDER);				
+			possibleValues = valueProvider.getPossibleValues(parameterValues, valueLimit);
+			valueLabelProviderClassName = valueProvider.getLabelProviderClassName();
+		} 
+		catch (JDOObjectNotFoundException e) {
+			// If no valueprovider is registered use the default
+			PossibleValueProvider provider = PossibleValueProvider.getDefaultPossibleValueProvider(getPersistenceManager(), script); 
+			possibleValues = provider.getPossibleValues(parameterValues, valueLimit);
+			logger.info("No possible values found for ScriptRegistryItemID "+scriptRegistryItemID+", use DefaultPossibleValueProvider!");				
+		}
+		
+		ScriptConditioner sc = new ScriptConditioner(scriptRegistryItemID, variableName, 
+				compareOperators, possibleValues, valueLabelProviderClassName);
+		
+//		if (logger.isDebugEnabled()) {
+			logger.info("scriptRegistryItemID = "+scriptRegistryItemID);
+			logger.info("variableName = "+variableName);
+			logger.info("scriptResultClass = "+script.getResultClassName());
+			logger.info("compareOperators.size() = "+compareOperators.size());
+			logger.info("possibleValues.size() = "+possibleValues.size());	
+			logger.info("valueLabelProviderClassName = "+valueLabelProviderClassName);				
+//		}
+		return sc;
+	}
+	
 	/**
 	 * @throws ModuleException
 	 *
@@ -112,52 +162,7 @@ implements SessionBean
 		PersistenceManager pm;
 		pm = getPersistenceManager();
 		try {
-			String variableName = scriptRegistryItemID.scriptRegistryItemID;
-			Script script = ScriptRegistry.getScriptRegistry(pm).getScript(
-					scriptRegistryItemID.scriptRegistryItemType, 
-					scriptRegistryItemID.scriptRegistryItemID);
-			Class scriptResultClass;
-			List<CompareOperator> compareOperators = DefaultCompareOperatorProvider.sharedInstance().getEqualOperators();
-			try {
-				scriptResultClass = script.getResultClass();
-				compareOperators = DefaultCompareOperatorProvider.sharedInstance().getCompareOperator(scriptResultClass);			
-			} catch (ClassNotFoundException e) {
-				logger.error("script resultClass "+script.getResultClassName()+" of script with scriptRegistryItemID "+scriptRegistryItemID+" could not be found", e);
-			}
-			
-			Collection possibleValues = Collections.EMPTY_LIST;
-			ILabelProvider valueLabelProvider = new LabelProvider();			
-//			PossibleValueProvider valueProvider = PossibleValueProvider.getPossibleValueProvider(pm, scriptRegistryItemID);
-			PossibleValueProviderID valueProviderID = PossibleValueProviderID.create(
-					scriptRegistryItemID.organisationID, 
-					scriptRegistryItemID.scriptRegistryItemType, 
-					scriptRegistryItemID.scriptRegistryItemID);
-			try {
-				PossibleValueProvider valueProvider = (PossibleValueProvider) pm.getObjectById(valueProviderID);
-				pm.getFetchPlan().setGroup(PossibleValueProvider.FETCH_GROUP_THIS_POSSIBLE_VALUE_PROVIDER);
-				valueProvider = (PossibleValueProvider) pm.detachCopy(valueProvider);				
-				possibleValues = valueProvider.getPossibleValues(parameterValues, valueLimit);
-				valueLabelProvider = valueProvider.getLabelProvider();								
-			} catch (JDOObjectNotFoundException e) {
-				DefaultPossibleValueProvider provider = new DefaultPossibleValueProvider(scriptRegistryItemID);
-				possibleValues = provider.getPossibleValues(parameterValues, valueLimit);
-//				if (logger.isDebugEnabled())
-//					logger.debug("No possible values found for ScriptRegistryItemID "+scriptRegistryItemID+", use DefaultPossibleValueProvider!");
-					logger.warn("No possible values found for ScriptRegistryItemID "+scriptRegistryItemID+", use DefaultPossibleValueProvider!");				
-			}
-			
-			ScriptConditioner sc = new ScriptConditioner(scriptRegistryItemID, variableName, 
-					compareOperators, possibleValues, valueLabelProvider);
-			
-//			if (logger.isDebugEnabled()) {
-				logger.info("scriptRegistryItemID = "+scriptRegistryItemID);
-				logger.info("variableName = "+variableName);
-				logger.info("scriptResultClass = "+script.getResultClassName());
-				logger.info("compareOperators.size() = "+compareOperators.size());
-				logger.info("possibleValues.size() = "+possibleValues.size());	
-				logger.info("valueLabelProvider = "+valueLabelProvider);				
-//			}
-			return sc;
+			return getScriptConditioner(pm, scriptRegistryItemID, parameterValues, valueLimit);
 		} finally {
 			pm.close();
 		}
@@ -174,13 +179,18 @@ implements SessionBean
 			Map<ScriptRegistryItemID, Map<String, Object>> scriptID2Paramters, int valueLimit)
 	throws ModuleException
 	{
+		PersistenceManager pm = getPersistenceManager();
 		Map<ScriptRegistryItemID, ScriptConditioner> scriptID2ScriptConditioner = 
-			new HashMap<ScriptRegistryItemID, ScriptConditioner>(scriptID2Paramters.size());
-		for (Map.Entry<ScriptRegistryItemID, Map<String, Object>> entry : scriptID2Paramters.entrySet()) {
-			ScriptConditioner sc = getScriptConditioner(entry.getKey(), entry.getValue(), valueLimit);
-			scriptID2ScriptConditioner.put(entry.getKey(), sc);			
+			new HashMap<ScriptRegistryItemID, ScriptConditioner>(scriptID2Paramters.size());		
+		try {
+			for (Map.Entry<ScriptRegistryItemID, Map<String, Object>> entry : scriptID2Paramters.entrySet()) {
+				ScriptConditioner sc = getScriptConditioner(pm, entry.getKey(), entry.getValue(), valueLimit);
+				scriptID2ScriptConditioner.put(entry.getKey(), sc);			
+			}
+			return scriptID2ScriptConditioner;
+		} finally {
+			pm.close();
 		}
-		return scriptID2ScriptConditioner;
 	}
 	
 	/**
@@ -210,119 +220,5 @@ implements SessionBean
 			pm.close();
 		}		
 	}
-	
-//	/**
-//	 * @throws ModuleException
-//	 *
-//	 * @ejb.interface-method
-//	 * @ejb.permission role-name="_Guest_"
-//	 * @ejb.transaction type = "Required"
-//	 */
-//	public ScriptConditioner getScriptConditioner(ScriptRegistryItemID scriptRegistryItemID)
-//	throws ModuleException
-//	{
-//		PersistenceManager pm;
-//		pm = getPersistenceManager();
-//		try {
-//			String variableName = scriptRegistryItemID.scriptRegistryItemID;
-//			Script script = ScriptRegistry.getScriptRegistry(pm).getScript(
-//					scriptRegistryItemID.scriptRegistryItemType, 
-//					scriptRegistryItemID.scriptRegistryItemID);
-//			Class scriptResultClass;
-//			List<CompareOperator> compareOperators = DefaultCompareOperatorProvider.sharedInstance().getEqualOperators();
-//			try {
-//				scriptResultClass = script.getResultClass();
-//				compareOperators = DefaultCompareOperatorProvider.sharedInstance().getCompareOperator(scriptResultClass);			
-//			} catch (ClassNotFoundException e) {
-//				logger.error("script resultClass "+script.getResultClassName()+" of script with scriptRegistryItemID "+scriptRegistryItemID+" could not be found", e);
-//			}
-//			
-//			Collection possibleValues = Collections.EMPTY_LIST;
-//			ILabelProvider valueLabelProvider = new LabelProvider();			
-////			PossibleValueProvider valueProvider = PossibleValueProvider.getPossibleValueProvider(pm, scriptRegistryItemID);
-//			PossibleValueProviderID valueProviderID = PossibleValueProviderID.create(
-//					scriptRegistryItemID.organisationID, 
-//					scriptRegistryItemID.scriptRegistryItemType, 
-//					scriptRegistryItemID.scriptRegistryItemID);
-//			try {
-//				PossibleValueProvider valueProvider = (PossibleValueProvider) pm.getObjectById(valueProviderID);
-//				pm.getFetchPlan().setGroup(PossibleValueProvider.FETCH_GROUP_THIS_POSSIBLE_VALUE_PROVIDER);
-//				valueProvider = (PossibleValueProvider) pm.detachCopy(valueProvider);				
-//				possibleValues = valueProvider.getPossibleValues();
-//				valueLabelProvider = valueProvider.getLabelProvider();								
-//			} catch (JDOObjectNotFoundException e) {
-//				// do nothing but use default values
-//			}
-//			
-//			ScriptConditioner sc = new ScriptConditioner(scriptRegistryItemID, variableName, 
-//					compareOperators, possibleValues, valueLabelProvider);
-//			
-////			if (logger.isDebugEnabled()) {
-//				logger.info("scriptRegistryItemID = "+scriptRegistryItemID);
-//				logger.info("variableName = "+variableName);
-//				logger.info("scriptResultClass = "+script.getResultClassName());
-//				logger.info("compareOperators.size() = "+compareOperators.size());
-//				logger.info("possibleValues.size() = "+possibleValues.size());	
-//				logger.info("valueLabelProvider = "+valueLabelProvider);				
-////			}
-//			return sc;
-//		} finally {
-//			pm.close();
-//		}
-//	}
-	
-//	/**
-//	 * @throws ModuleException
-//	 *
-//	 * @ejb.interface-method
-//	 * @ejb.permission role-name="_Guest_"
-//	 * @ejb.transaction type = "Required"
-//	 */
-//	public Map<ScriptRegistryItemID, ScriptConditioner> getScriptConditioner(Collection<ScriptRegistryItemID> scriptIDs)
-//	throws ModuleException
-//	{
-//		Map<ScriptRegistryItemID, ScriptConditioner> scriptID2ScriptConditioner = 
-//			new HashMap<ScriptRegistryItemID, ScriptConditioner>(scriptIDs.size());		
-//		for (ScriptRegistryItemID itemID : scriptIDs) {
-//			ScriptConditioner sc = getScriptConditioner(itemID);
-//			scriptID2ScriptConditioner.put(itemID, sc);
-//		}
-//		return scriptID2ScriptConditioner;
-//	}
-	
-//	/**
-//	 * @throws ModuleException
-//	 *
-//	 * @ejb.interface-method
-//	 * @ejb.permission role-name="_Guest_"
-//	 * @ejb.transaction type = "Required"
-//	 */	
-//	public Map<ScriptRegistryItemID, ScriptConditioner> getScriptConditioner(String organisationID, 
-//			String conditionContextProviderID)
-//	throws ModuleException
-//	{
-//		PersistenceManager pm;
-//		pm = getPersistenceManager();
-//		try {
-//			ConditionContextProviderID providerID = ConditionContextProviderID.create(organisationID, conditionContextProviderID);
-//			List providers = NLJDOHelper.getDetachedObjectList(
-//					pm, new Object[] {providerID}, null, 
-//					new String[] {ConditionContextProvider.FETCH_GROUP_SCRIPT_REGISTRY_ITEM_IDS}, 
-//					NLJDOHelper.MAX_FETCH_DEPTH_NO_LIMIT);
-//			
-//			ConditionContextProvider provider = (ConditionContextProvider) providers.iterator().next();
-//			Set<ScriptRegistryItemID> scriptIDs = provider.getScriptRegistryItemIDs();
-//			
-//			logger.info("scriptIDs.size() = "+scriptIDs.size());
-//			int counter = 0;
-//			for (ScriptRegistryItemID itemID : scriptIDs) {
-//				logger.info("ScriptRegistryItemID " + (counter++) + " = "+itemID);
-//			}
-//			
-//			return getScriptConditioner(scriptIDs);
-//		} finally {
-//			pm.close();
-//		}		
-//	}
 	
 }

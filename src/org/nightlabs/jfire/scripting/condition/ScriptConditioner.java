@@ -29,6 +29,7 @@ import java.io.Serializable;
 import java.util.Collection;
 import java.util.List;
 
+import org.apache.log4j.Logger;
 import org.nightlabs.jfire.scripting.id.ScriptRegistryItemID;
 
 /**
@@ -38,9 +39,13 @@ import org.nightlabs.jfire.scripting.id.ScriptRegistryItemID;
 public class ScriptConditioner 
 implements Serializable
 {
+	private static final Logger logger = Logger.getLogger(ScriptConditioner.class);
+	
 	public ScriptConditioner(ScriptRegistryItemID scriptID, String variableName, 
 			List<CompareOperator> compareOperators, 
-			Collection<Object> possibleValues, ILabelProvider valueLabelProvider) 
+			Collection<Object> possibleValues, 
+//			ILabelProvider valueLabelProvider) 
+			String valueLabelProviderClassName)			
 	{
 		if (scriptID == null)
 			throw new IllegalArgumentException("Param scriptID must NOT be null!");
@@ -58,9 +63,10 @@ implements Serializable
 		this.variableName = variableName;
 		this.possibleValues = possibleValues;
 		this.compareOperators = compareOperators;
-		this.valueLabelProvider = valueLabelProvider;
-		if (valueLabelProvider == null)
-			valueLabelProvider = new LabelProvider();
+		this.labelProviderClassName = valueLabelProviderClassName;
+//		this.valueLabelProvider = valueLabelProvider;
+//		if (valueLabelProvider == null)
+//			valueLabelProvider = new LabelProvider();
 	}
 	
 	private ScriptRegistryItemID scriptRegistryItemID;
@@ -86,20 +92,46 @@ implements Serializable
 	public void setPossibleValues(Collection<Object> possibleValues) {
 		this.possibleValues = possibleValues;
 	}
-	
-	private ILabelProvider valueLabelProvider;
-	public ILabelProvider getValueLabelProvider() {
-		return valueLabelProvider;
-	}
-	public void setValueLabelProvider(ILabelProvider valueLabelProvider) {
-		this.valueLabelProvider = valueLabelProvider;
-	}
-	
+		
 	private List<CompareOperator> compareOperators;
 	public List<CompareOperator> getCompareOperators() {
 		return compareOperators;
 	}
 	public void setCompareOperators(List<CompareOperator> compareOperators) {
 		this.compareOperators = compareOperators;
-	}	
+	}
+	
+//	private ILabelProvider valueLabelProvider;
+//	public ILabelProvider getValueLabelProvider() {
+//		return valueLabelProvider;
+//	}
+//	public void setValueLabelProvider(ILabelProvider valueLabelProvider) {
+//		this.valueLabelProvider = valueLabelProvider;
+//	}
+	
+	
+	private ILabelProvider valueLabelProvider;
+	public ILabelProvider getValueLabelProvider() 
+	{
+		if (valueLabelProvider == null && labelProviderClassName != null) {
+			try {
+				Class labelProviderClass = Class.forName(labelProviderClassName);
+				Object lp = labelProviderClass.newInstance();
+				if (lp instanceof ILabelProvider) {
+					valueLabelProvider = (ILabelProvider) lp;
+				}				
+			} catch (Exception e) {
+				logger.warn("There occured an error while trying to create an instance for the class "+
+						labelProviderClassName, e);
+				valueLabelProvider = new LabelProvider();
+			}			
+		}
+		return valueLabelProvider;
+	}
+	
+	private String labelProviderClassName;
+	public void setValueLabelProviderClassName(String labelProviderClassName) {
+		this.labelProviderClassName = labelProviderClassName;
+	}
+	
 }

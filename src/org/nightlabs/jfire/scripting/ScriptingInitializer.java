@@ -359,9 +359,10 @@ public class ScriptingInitializer
 
 				Node scriptNode = getScriptDescriptor(scriptFile, catDocument);				
 				
-				String scriptID = Utils.getFileNameWithoutExtension(scriptFile.getName());
-				
+				String scriptID = Utils.getFileNameWithoutExtension(scriptFile.getName());				
 				String scriptItemType = scriptRegistryItemType;
+				String scriptResultClass = "java.lang.Object";
+				
 				if (category != null) {
 					if (category.getScriptRegistryItemType() != null)
 						scriptItemType = category.getScriptRegistryItemType();
@@ -379,6 +380,11 @@ public class ScriptingInitializer
 						logger.debug("Have type-attribute in script element: "+idNode.getTextContent());
 						scriptItemType = typeNode.getTextContent();
 					}
+					Node resultClassNode = scriptNode.getAttributes().getNamedItem("resultClass");
+					if (resultClassNode != null && !"".equals(resultClassNode.getTextContent())) {
+						logger.debug("Have resultClass-attribute in script element: "+idNode.getTextContent());
+						scriptResultClass = typeNode.getTextContent();
+					}					
 				}
 				
 				try {			
@@ -399,6 +405,7 @@ public class ScriptingInitializer
 					}
 					script.setText(scriptContent);
 					script.setLanguage(getScriptRegistry().getLanguageByFileName(scriptFile.getName(), true));
+					script.setResultClassName(scriptResultClass);
 					
 					// script name and parameters
 					if (scriptNode != null) {

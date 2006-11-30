@@ -6,6 +6,7 @@ package org.nightlabs.jfire.accounting.state;
  */
 public class InvoiceStateDefinitionUtil
 {
+	// TODO this class should have constants for all StateDefinitionIDs and TransitionIDs applicable to this context and known to JFireTrade
 //	public static final StateDefinitionID STATE_DEFINITION_ID_CREATED = StateDefinitionID.create(Organisation.DEVIL_ORGANISATION_ID, InvoiceStateDefinitionUtil.class.getName(), "created");
 //	public static final StateDefinitionID STATE_DEFINITION_ID_FINALIZED = StateDefinitionID.create(Organisation.DEVIL_ORGANISATION_ID, InvoiceStateDefinitionUtil.class.getName(), "finalized");
 //	public static final StateDefinitionID STATE_DEFINITION_ID_BOOKED = StateDefinitionID.create(Organisation.DEVIL_ORGANISATION_ID, InvoiceStateDefinitionUtil.class.getName(), "booked");

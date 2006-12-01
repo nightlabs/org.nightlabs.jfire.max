@@ -35,9 +35,12 @@ import java.io.IOException;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Iterator;
+import java.util.LinkedList;
+import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 
+import javax.jdo.FetchPlan;
 import javax.jdo.JDOObjectNotFoundException;
 import javax.jdo.PersistenceManager;
 import javax.xml.transform.TransformerException;
@@ -362,6 +365,9 @@ public class ScriptingInitializer
 				String scriptID = Utils.getFileNameWithoutExtension(scriptFile.getName());				
 				String scriptItemType = scriptRegistryItemType;
 				String scriptResultClass = "java.lang.Object";
+//				String[] fetchGroups = new String[] {FetchPlan.DEFAULT};
+				String[] fetchGroups = null;
+				int maxFetchDepth = 1;
 				
 				if (category != null) {
 					if (category.getScriptRegistryItemType() != null)
@@ -384,7 +390,22 @@ public class ScriptingInitializer
 					if (resultClassNode != null && !"".equals(resultClassNode.getTextContent())) {
 						logger.debug("Have resultClass-attribute in script element: "+idNode.getTextContent());
 						scriptResultClass = resultClassNode.getTextContent();
-					}					
+					}
+					Node maxFetchDepthNode = scriptNode.getAttributes().getNamedItem("maxFetchDepth");
+					if (maxFetchDepthNode != null && !"".equals(maxFetchDepthNode.getTextContent())) {
+						logger.debug("Have maxFetchDepthNode-attribute in script element: "+idNode.getTextContent());
+						try {
+							maxFetchDepth = Integer.parseInt(maxFetchDepthNode.getTextContent());
+						} catch (NumberFormatException e) {
+							maxFetchDepth = 1;
+						}
+					}
+					Node fetchGroupsNode = scriptNode.getAttributes().getNamedItem("fetchGroups");
+					if (fetchGroupsNode != null && !"".equals(fetchGroupsNode.getTextContent())) {
+						logger.debug("Have fetchGroupsNode-attribute in script element: "+idNode.getTextContent());
+						String fetchGroupsContent = fetchGroupsNode.getTextContent();
+						fetchGroups = parseFetchGroups(fetchGroupsContent);
+					}										  
 				}
 				
 				try {			
@@ -406,6 +427,8 @@ public class ScriptingInitializer
 					script.setText(scriptContent);
 					script.setLanguage(getScriptRegistry().getLanguageByFileName(scriptFile.getName(), true));
 					script.setResultClassName(scriptResultClass);
+					script.setMaxFetchDepth(maxFetchDepth);
+					script.setFetchGroups(fetchGroups);
 					
 					// script name and parameters
 					if (scriptNode != null) {
@@ -435,21 +458,26 @@ public class ScriptingInitializer
 		}
 	}
 
-//	protected String getScriptContent(File f) 
-//	throws FileNotFoundException, IOException 
-//	{
-//		FileInputStream fin = new FileInputStream(f);
-////		InputStreamReader reader = new InputStreamReader(fin, "utf-8");
-//		DataInputStream din = new DataInputStream(fin);
-//		StringBuffer sb = new StringBuffer();
-//		while(din.available() != 0) {
-//			sb.append(din.readUTF());
-//		}
-//		din.close();
-//		fin.close();
-//		return null;
-//	}
-
+	private String[] parseFetchGroups(String s) 
+	{
+		StringBuffer sb = new StringBuffer(s);
+		List<String> fetchGroups = new LinkedList<String>();
+		int firstIndex = 0;
+		int index = sb.indexOf(",");		
+		while(index != -1) {			
+			String fetchGroup = sb.substring(firstIndex, index);
+			fetchGroups.add(fetchGroup);
+			firstIndex = index + 1;
+			index = sb.indexOf(",");
+		}
+		if (logger.isDebugEnabled()) {
+			for (String fetchGroup : fetchGroups) {
+				logger.debug("fetchGroup = "+fetchGroup);
+			}
+		}			
+		return fetchGroups.toArray(new String[fetchGroups.size()]);
+	}
+	
 	protected FileFilter dirFileFilter = new FileFilter() {	
 		public boolean accept(File pathname) {
 			return pathname.isDirectory();
@@ -470,13 +498,5 @@ public class ScriptingInitializer
 		}	
 	};
 	
-//	// init Default ParameterSets
-//	private void initDefaultParameterSets() 
-//	{
-//		ScriptRegistry scriptRegistry = ScriptRegistry.getScriptRegistry(pm);
-//		ScriptParameterSet paramSet = new ScriptParameterSet(organisationID, scriptRegistry.createScriptParameterSetID());
-//		paramSet.createParameter(ScriptingConstants.PARAMETER_ID_PERSISTENCE_MANAGER).setScriptParameterClass(PersistenceManager.class);
-//		paramSet.createParameter(ScriptingConstants.PARAMETER_ID_TICKET_ID).setScriptParameterClass(ProductID.class);
-//	}
 }
 

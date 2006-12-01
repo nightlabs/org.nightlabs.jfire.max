@@ -29,9 +29,12 @@ package org.nightlabs.jfire.scripting;
 import java.io.Serializable;
 import java.util.Collection;
 
+import javax.jdo.FetchPlan;
 import javax.jdo.JDODetachedFieldAccessException;
 import javax.jdo.PersistenceManager;
 import javax.jdo.Query;
+
+import org.nightlabs.jdo.NLJDOHelper;
 
 /**
  * @author Marco Schulze - marco at nightlabs dot de
@@ -96,11 +99,6 @@ public class Script
 	 */
 	private String language;
 
-//	/**
-//	 * @jdo.field persistence-modifier="persistent"
-//	 */
-//	private String scriptExecutorClassName;
-
 	/**
 	 * This is the fully qualified class name specifying the type of the script's result.
 	 * The default value is: <code>java.lang.Object</code>
@@ -132,6 +130,10 @@ public class Script
 			// When detached without parameterSet don't bother -> see ScriptRegistryItem.preStore
 			System.out.println("DEEBUG: Script instantiated with detached parent, parameterSet could not be set as it was not detached.");
 		}
+		// TODO remove this if jdo doesn't accept null arrays
+//		fetchGroups = new String[] {
+//			FetchPlan.DEFAULT	
+//		};
 	}
 
 	@Override
@@ -212,6 +214,40 @@ public class Script
 		return Class.forName(resultClassName);
 	}
 
+	/**
+	 * @jdo.field
+	 *		persistence-modifier="persistent" 
+	 *		collection-type="array"
+	 *		element-type="String"
+	 *		table="JFireScripting_Script_fetchGroups"
+	 *
+	 * @jdo.join
+	 */
+	private String[] fetchGroups;
+
+	public String[] getFetchGroups() {
+		return fetchGroups;
+	}
+	public void setFetchGroups(String[] fetchGroups) {
+		this.fetchGroups = fetchGroups;
+	}
+
+	/**
+	 * @jdo.field persistence-modifier="persistent"
+	 */
+	private int maxFetchDepth = 1;
+	
+	public int getMaxFetchDepth() {
+		return maxFetchDepth;
+	}
+	public void setMaxFetchDepth(int maxFetchDepth) {
+		this.maxFetchDepth = maxFetchDepth;
+	}
+//	/**
+//	* @jdo.field persistence-modifier="persistent"
+//	*/
+//	private String scriptExecutorClassName;
+//	
 //	public String getScriptExecutorClassName()
 //	{
 //		return scriptExecutorClassName;

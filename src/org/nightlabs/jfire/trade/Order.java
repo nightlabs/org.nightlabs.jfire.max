@@ -44,6 +44,7 @@ import javax.jdo.listener.DetachCallback;
 import org.nightlabs.jdo.ObjectIDUtil;
 import org.nightlabs.jfire.accounting.Currency;
 import org.nightlabs.jfire.security.User;
+import org.nightlabs.jfire.trade.id.OrderID;
 import org.nightlabs.jfire.transfer.id.AnchorID;
 import org.nightlabs.util.Utils;
 
@@ -76,8 +77,8 @@ import org.nightlabs.util.Utils;
  *			import org.nightlabs.jfire.transfer.id.AnchorID"
  *
  * @jdo.query
- *		name="getOrdersByVendorAndCustomer"
- *		query="SELECT
+ *		name="getOrderIDsByVendorAndCustomer"
+ *		query="SELECT JDOHelper.getObjectId(this)
  *			WHERE vendor.organisationID == paramVendorID_organisationID &&
  *            vendor.anchorID == paramVendorID_anchorID &&
  *			      customer.organisationID == paramCustomerID_organisationID &&
@@ -127,9 +128,10 @@ implements Serializable, ArticleContainer, SegmentContainer, DetachCallback
 	 * @param rangeEndIdx Either -1, if no range shall be specified, or a positive number (incl. 0) defining the index where the range shall end (exclusive).
 	 * @return Returns instances of {@link Order}.
 	 */
-	public static List getOrders(PersistenceManager pm, AnchorID vendorID, AnchorID customerID, long rangeBeginIdx, long rangeEndIdx)
+	@SuppressWarnings("unchecked")
+	public static List<OrderID> getOrderIDs(PersistenceManager pm, AnchorID vendorID, AnchorID customerID, long rangeBeginIdx, long rangeEndIdx)
 	{
-		Query query = pm.newNamedQuery(Order.class, "getOrdersByVendorAndCustomer");
+		Query query = pm.newNamedQuery(Order.class, "getOrderIDsByVendorAndCustomer");
 //		return (Collection) query.execute(vendorID, customerID);
 // WORKAROUND JDOQL with ObjectID doesn't work yet.
 		Map params = new HashMap();
@@ -141,7 +143,7 @@ implements Serializable, ArticleContainer, SegmentContainer, DetachCallback
 		if (rangeBeginIdx >= 0 && rangeEndIdx >= 0)
 			query.setRange(rangeBeginIdx, rangeEndIdx);
 
-		return (List) query.executeWithMap(params);
+		return (List<OrderID>) query.executeWithMap(params);
 	}
 
 	/**

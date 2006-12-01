@@ -30,12 +30,16 @@ import java.util.Collection;
 import java.util.Date;
 
 import org.nightlabs.jfire.security.User;
+import org.nightlabs.jfire.transfer.id.AnchorID;
 
 /**
  * @author Marco Schulze - marco at nightlabs dot de
  */
 public interface ArticleContainer
 {
+	AnchorID getCustomerID();
+	AnchorID getVendorID();
+
 	/**
 	 * @return Returns the organisation that issued the ArticleContainer - usually the vendor organisation.
 	 */

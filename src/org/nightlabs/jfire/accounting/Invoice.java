@@ -80,8 +80,8 @@ import org.nightlabs.util.Utils;
  *		add-interfaces="org.nightlabs.jfire.trade.id.ArticleContainerID"
  *
  * @jdo.query
- *		name="getInvoicesByVendorAndCustomer"
- *		query="SELECT
+ *		name="getInvoiceIDsByVendorAndCustomer"
+ *		query="SELECT JDOHelper.getObjectId(this)
  *			WHERE vendor.organisationID == paramVendorID_organisationID &&
  *            vendor.anchorID == paramVendorID_anchorID &&
  *			      customer.organisationID == paramCustomerID_organisationID &&
@@ -144,9 +144,10 @@ implements Serializable, ArticleContainer, Statable, DetachCallback
 	 * @param rangeEndIdx Either -1, if no range shall be specified, or a positive number (incl. 0) defining the index where the range shall end (exclusive).
 	 * @return Returns instances of {@link Invoice}.
 	 */
-	public static List getInvoices(PersistenceManager pm, AnchorID vendorID, AnchorID customerID, long rangeBeginIdx, long rangeEndIdx)
+	@SuppressWarnings("unchecked")
+	public static List<InvoiceID> getInvoiceIDs(PersistenceManager pm, AnchorID vendorID, AnchorID customerID, long rangeBeginIdx, long rangeEndIdx)
 	{
-		Query query = pm.newNamedQuery(Invoice.class, "getInvoicesByVendorAndCustomer");
+		Query query = pm.newNamedQuery(Invoice.class, "getInvoiceIDsByVendorAndCustomer");
 		Map params = new HashMap();
 		params.put("paramVendorID_organisationID", vendorID.organisationID);
 		params.put("paramVendorID_anchorID", vendorID.anchorID);
@@ -156,7 +157,7 @@ implements Serializable, ArticleContainer, Statable, DetachCallback
 		if (rangeBeginIdx >= 0 && rangeEndIdx >= 0)
 			query.setRange(rangeBeginIdx, rangeEndIdx);
 
-		return (List) query.executeWithMap(params);
+		return (List<InvoiceID>) query.executeWithMap(params);
 	}
 
 	public static List getNonFinalizedInvoices(PersistenceManager pm, AnchorID vendorID, AnchorID customerID)

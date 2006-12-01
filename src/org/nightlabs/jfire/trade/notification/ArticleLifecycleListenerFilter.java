@@ -37,10 +37,12 @@ extends JDOLifecycleListenerFilter
 		return articleContainerID;
 	}
 
+	private static final Class[] candidateClasses = { Article.class };
+
 	@Implement
 	public Class[] getCandidateClasses()
 	{
-		return new Class[] { Article.class };
+		return candidateClasses;
 	}
 
 	@Implement

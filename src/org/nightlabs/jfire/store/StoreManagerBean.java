@@ -288,7 +288,6 @@ implements SessionBean
 	 * @ejb.transaction type = "Required"
 	 **/
 	public String createProductTypeID() 
-	throws ModuleException
 	{
 		PersistenceManager pm = getPersistenceManager();
 		try {
@@ -298,14 +297,29 @@ implements SessionBean
 			pm.close();
 		}
 	}
+
+	/**
+	 * @ejb.interface-method
+	 * @ejb.permission role-name="_Guest_"
+	 * @ejb.transaction type="Supports"
+	 */ 
+	@SuppressWarnings("unchecked")
+	public List<DeliveryNote> getDeliveryNotes(Set<DeliveryNoteID> deliveryNoteIDs, String[] fetchGroups, int maxFetchDepth)
+	{
+		PersistenceManager pm = getPersistenceManager();
+		try {
+			return NLJDOHelper.getDetachedObjectList(pm, deliveryNoteIDs, DeliveryNote.class, fetchGroups, maxFetchDepth);
+		} finally {
+			pm.close();
+		}
+	}
 	
 	/**
 	 * @ejb.interface-method
 	 * @ejb.permission role-name="_Guest_"
-	 * @ejb.transaction type = "Required"
+	 * @ejb.transaction type="Supports"
 	 */ 
 	public DeliveryNote getDeliveryNote(DeliveryNoteID deliveryID, String[] fetchGroups, int maxFetchDepth)
-	throws ModuleException
 	{
 		PersistenceManager pm = getPersistenceManager();
 		try {
@@ -324,10 +338,9 @@ implements SessionBean
 	 *  
 	 * @ejb.interface-method
 	 * @ejb.permission role-name="_Guest_"
-	 * @ejb.transaction type = "Required"
+	 * @ejb.transaction type="Supports"
 	 */ 
 	public Collection searchProductTypes(ProductTypeSearchFilter searchFilter, String[] fetchGroups, int maxFetchDepth)
-	throws ModuleException
 	{
 		PersistenceManager pm = getPersistenceManager();
 		try {
@@ -353,7 +366,6 @@ implements SessionBean
 	 * @ejb.transaction type = "Required"
 	 */ 
 	public Collection searchProductTypeGroups(ProductTypeGroupSearchFilter searchFilter, String[] fetchGroups, int maxFetchDepth)
-	throws ModuleException
 	{
 		PersistenceManager pm = getPersistenceManager();
 		try {
@@ -381,7 +393,6 @@ implements SessionBean
 	 * @ejb.transaction type = "Required"
 	 */ 
 	public ProductTypeGroupSearchResult searchProductTypeGroups(ProductTypeGroupSearchFilter searchFilter, boolean saleable)
-	throws ModuleException
 	{
 		PersistenceManager pm = getPersistenceManager();		
 		try {
@@ -412,7 +423,6 @@ implements SessionBean
 	 * @ejb.transaction type="Supports"
 	 */ 
 	public ProductType getProductType(ProductTypeID productTypeID, String[] fetchGroups, int maxFetchDepth)
-	throws ModuleException
 	{
 		PersistenceManager pm = getPersistenceManager();
 		try {
@@ -432,7 +442,6 @@ implements SessionBean
 	 * @ejb.transaction type="Supports"
 	 */ 
 	public List<ProductType> getProductTypes(Set<ProductTypeID> productTypeIDs, String[] fetchGroups, int maxFetchDepth)
-	throws ModuleException
 	{
 		PersistenceManager pm = getPersistenceManager();
 		try {
@@ -448,7 +457,6 @@ implements SessionBean
 	 * @ejb.transaction type = "Required"
 	 */ 
 	public ProductTypeStatus setProductTypeStatus_published(ProductTypeID productTypeID, boolean get, String[] fetchGroups, int maxFetchDepth)
-	throws ModuleException
 	{
 		PersistenceManager pm = getPersistenceManager();
 		try {
@@ -478,7 +486,6 @@ implements SessionBean
 	 * @ejb.transaction type = "Required"
 	 */ 
 	public ProductTypeStatus setProductTypeStatus_confirmed(ProductTypeID productTypeID, boolean get, String[] fetchGroups, int maxFetchDepth)
-	throws ModuleException
 	{
 		PersistenceManager pm = getPersistenceManager();
 		try {
@@ -508,7 +515,6 @@ implements SessionBean
 	 * @ejb.transaction type = "Required"
 	 */ 
 	public ProductTypeStatus setProductTypeStatus_saleable(ProductTypeID productTypeID, boolean saleable, boolean get, String[] fetchGroups, int maxFetchDepth)
-	throws ModuleException
 	{
 		PersistenceManager pm = getPersistenceManager();
 		try {
@@ -538,7 +544,6 @@ implements SessionBean
 	 * @ejb.transaction type = "Required"
 	 */ 
 	public ProductTypeStatus setProductTypeStatus_closed(ProductTypeID productTypeID, boolean get, String[] fetchGroups, int maxFetchDepth)
-	throws ModuleException
 	{
 		PersistenceManager pm = getPersistenceManager();
 		try {
@@ -577,7 +582,6 @@ implements SessionBean
 					Collection customerGroupIDs,
 					byte mergeMode,
 					String[] fetchGroups, int maxFetchDepth)
-	throws ModuleException
 	{
 		PersistenceManager pm = getPersistenceManager();
 		try {
@@ -617,7 +621,6 @@ implements SessionBean
 	 */
 	public Collection getServerDeliveryProcessorsForOneModeOfDeliveryFlavour(
 			ModeOfDeliveryFlavourID modeOfDeliveryFlavourID, String[] fetchGroups, int maxFetchDepth)
-	throws ModuleException
 	{
 		PersistenceManager pm = getPersistenceManager();
 		try {
@@ -642,6 +645,7 @@ implements SessionBean
 	 * @param get Whether a detached version of the created DeliveryNote should be returned, otherwise null will be returned.
 	 * @param fetchGroups Array ouf fetch-groups the deliveryNote should be detached with.
 	 * @return Detached DeliveryNote or null.
+	 * @throws DeliveryNoteEditException 
 	 *
 	 * @throws ModuleException
 	 *
@@ -652,7 +656,7 @@ implements SessionBean
 	public DeliveryNote createDeliveryNote(
 			Collection articleIDs, String deliveryNoteIDPrefix,
 			boolean get, String[] fetchGroups, int maxFetchDepth)
-		throws ModuleException
+	throws DeliveryNoteEditException
 	{
 		PersistenceManager pm = getPersistenceManager();
 		try {
@@ -700,6 +704,7 @@ implements SessionBean
 	 * @param get Whether a detached version of the created DeliveryNote should be returned, otherwise null will be returned.
 	 * @param fetchGroups Array ouf fetch-groups the deliveryNote should be detached with.
 	 * @return Detached DeliveryNote or null.
+	 * @throws DeliveryNoteEditException 
 	 *
 	 * @throws ModuleException
 	 *
@@ -710,7 +715,7 @@ implements SessionBean
 	public DeliveryNote createDeliveryNote(
 			ArticleContainerID articleContainerID, String deliveryNoteIDPrefix,
 			boolean get, String[] fetchGroups, int maxFetchDepth)
-		throws ModuleException
+	throws DeliveryNoteEditException
 	{
 		PersistenceManager pm = getPersistenceManager();
 		try {
@@ -770,7 +775,7 @@ implements SessionBean
 	}
 
 	/**
-	 * @throws ModuleException
+	 * @throws DeliveryNoteEditException 
 	 *
 	 * @ejb.interface-method
 	 * @ejb.transaction type = "Required"
@@ -779,7 +784,7 @@ implements SessionBean
 	public DeliveryNote addArticlesToDeliveryNote(
 			DeliveryNoteID deliveryNoteID, Collection articleIDs,
 			boolean validate, boolean get, String[] fetchGroups, int maxFetchDepth)
-		throws ModuleException
+	throws DeliveryNoteEditException
 	{
 		PersistenceManager pm = getPersistenceManager();
 		try {
@@ -812,8 +817,8 @@ implements SessionBean
 	}
 
 	/**
-	 * @throws ModuleException
-	 *
+	 * @throws DeliveryNoteEditException
+	 * 
 	 * @ejb.interface-method
 	 * @ejb.transaction type = "Required"
 	 * @ejb.permission role-name="_Guest_"
@@ -821,7 +826,7 @@ implements SessionBean
 	public DeliveryNote removeArticlesFromDeliveryNote(
 			DeliveryNoteID deliveryNoteID, Collection articleIDs,
 			boolean validate, boolean get, String[] fetchGroups, int maxFetchDepth)
-		throws ModuleException
+	throws DeliveryNoteEditException
 	{
 		PersistenceManager pm = getPersistenceManager();
 		try {
@@ -1280,15 +1285,16 @@ implements SessionBean
 	 * @ejb.permission role-name="_Guest_"
 	 * @ejb.transaction type = "Required"
 	 */
-	public List getDeliveryNotes(AnchorID vendorID, AnchorID customerID, long rangeBeginIdx, long rangeEndIdx, String[] fetchGroups, int maxFetchDepth)
+	public List<DeliveryNoteID> getDeliveryNoteIDs(AnchorID vendorID, AnchorID customerID, long rangeBeginIdx, long rangeEndIdx)
 	throws ModuleException
 	{
 		PersistenceManager pm = getPersistenceManager();
 		try {
-			pm.getFetchPlan().setMaxFetchDepth(maxFetchDepth);
-			if (fetchGroups != null)
-				pm.getFetchPlan().setGroups(fetchGroups);
-			return (List) pm.detachCopyAll(DeliveryNote.getDeliveryNotes(pm, vendorID, customerID, rangeBeginIdx, rangeEndIdx));
+			return new ArrayList<DeliveryNoteID>(DeliveryNote.getDeliveryNoteIDs(pm, vendorID, customerID, rangeBeginIdx, rangeEndIdx));
+//			pm.getFetchPlan().setMaxFetchDepth(maxFetchDepth);
+//			if (fetchGroups != null)
+//				pm.getFetchPlan().setGroups(fetchGroups);
+//			return (List) pm.detachCopyAll(DeliveryNote.getDeliveryNoteIDs(pm, vendorID, customerID, rangeBeginIdx, rangeEndIdx));
 		} finally {
 			pm.close();
 		}

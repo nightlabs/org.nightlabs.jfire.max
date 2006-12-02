@@ -11,4 +11,7 @@ public interface StatableLocal
 
 	long getJbpmProcessInstanceId();
 	void setJbpmProcessInstanceId(long jbpmProcessInstanceId);
+
+	static final String FETCH_GROUP_STATE = "StatableLocal.state";
+	static final String FETCH_GROUP_STATES = "StatableLocal.states";
 }

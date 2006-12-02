@@ -3,24 +3,35 @@ package org.nightlabs.jfire.jbpm;
 import java.io.File;
 import java.net.URL;
 import java.rmi.RemoteException;
+import java.util.Collection;
+import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Set;
 
 import javax.ejb.CreateException;
 import javax.ejb.EJBException;
 import javax.ejb.SessionBean;
 import javax.ejb.SessionContext;
 import javax.jdo.PersistenceManager;
+import javax.jdo.Query;
 
 import org.apache.log4j.Logger;
 import org.jbpm.JbpmConfiguration;
+import org.jbpm.JbpmContext;
+import org.nightlabs.jdo.NLJDOHelper;
 import org.nightlabs.jdo.moduleregistry.ModuleMetaData;
 import org.nightlabs.jfire.base.BaseSessionBeanImpl;
-import org.nightlabs.jfire.security.User;
+import org.nightlabs.jfire.jbpm.graph.def.State;
+import org.nightlabs.jfire.jbpm.graph.def.StateDefinition;
+import org.nightlabs.jfire.jbpm.graph.def.Transition;
+import org.nightlabs.jfire.jbpm.graph.def.id.TransitionID;
 import org.nightlabs.jfire.servermanager.JFireServerManager;
 import org.nightlabs.jfire.servermanager.config.JFireServerConfigModule;
 import org.nightlabs.jfire.servermanager.deploy.DeployOverwriteBehaviour;
 import org.nightlabs.jfire.servermanager.deploy.DeploymentJarItem;
+import org.nightlabs.jfire.trade.state.id.StateDefinitionID;
+import org.nightlabs.jfire.trade.state.id.StateID;
 
 /**
  * @ejb.bean name="jfire/ejb/JFireJbpm/JbpmManager"
@@ -78,15 +89,12 @@ implements SessionBean
 
 	/**
 	 * @ejb.interface-method
-	 * @ejb.transaction type = "Required"
-	 * @ejb.permission role-name="_Guest_"
+	 * @ejb.transaction type="Required"
+	 * @ejb.permission role-name="_System_"
 	 */
 	public void initialize()
 	throws Exception
 	{
-		if (!User.USERID_SYSTEM.equals(getPrincipal().getUserID()))
-			throw new IllegalStateException("This method can only be called internally!");
-
 		PersistenceManager pm = getPersistenceManager();
 		try {
 			// Unfortunately, the JbpmService didn't accept the attribute "JbpmCfgResource".
@@ -199,4 +207,80 @@ implements SessionBean
 			pm.close();
 		}
 	}
+
+	/**
+	 * @ejb.interface-method
+	 * @ejb.transaction type="Supports"
+	 * @ejb.permission role-name="_Guest_"
+	 */
+	public Set<TransitionID> getTransitionIDs(StateID stateID)
+	{
+		PersistenceManager pm = getPersistenceManager();
+		try {
+			Query q = pm.newQuery(Transition.class);
+			q.setResult("JDOHelper.getObjectId(this)");
+			q.setFilter("this.fromStateDefinition == :stateDefinition");
+
+			pm.getExtent(State.class);
+			State state = (State) pm.getObjectById(stateID);
+			return new HashSet<TransitionID>((Collection<? extends TransitionID>) q.execute(state.getStateDefinition()));
+		} finally {
+			pm.close();
+		}
+	}
+
+	/**
+	 * @ejb.interface-method
+	 * @ejb.transaction type="Supports"
+	 * @ejb.permission role-name="_Guest_"
+	 */
+	public Set<TransitionID> getTransitionIDs(StateDefinitionID stateDefinitionID)
+	{
+		PersistenceManager pm = getPersistenceManager();
+		try {
+			Query q = pm.newQuery(Transition.class);
+			q.setResult("JDOHelper.getObjectId(this)");
+			q.setFilter("this.fromStateDefinition == :stateDefinition");
+
+			pm.getExtent(StateDefinition.class);
+			StateDefinition stateDefinition = (StateDefinition) pm.getObjectById(stateDefinitionID);
+			return new HashSet<TransitionID>((Collection<? extends TransitionID>) q.execute(stateDefinition));
+		} finally {
+			pm.close();
+		}
+	}
+
+	/**
+	 * @ejb.interface-method
+	 * @ejb.transaction type="Supports"
+	 * @ejb.permission role-name="_Guest_"
+	 */
+	@SuppressWarnings("unchecked")
+	public List<Transition> getTransitions(Set<TransitionID> transitionIDs, String[] fetchGroups, int maxFetchDepth)
+	{
+		PersistenceManager pm = getPersistenceManager();
+		try {
+			return NLJDOHelper.getDetachedObjectList(pm, transitionIDs, Transition.class, fetchGroups, maxFetchDepth);
+		} finally {
+			pm.close();
+		}
+	}
+
+//	public void signal(StateID stateID, String jbpmTransitionName)
+//	{
+//		PersistenceManager pm = getPersistenceManager();
+//		try {
+//			pm.getExtent(State.class);
+//			State state = (State) pm.getObjectById(stateID);
+//			JbpmContext jbpmContext = JbpmLookup.getJbpmConfiguration().createJbpmContext();
+//			try {
+//				state.getStateDefinition().getProcessDefinition().getJbpmProcessDefinitionName();
+//				
+//			} finally {
+//				jbpmContext.close();
+//			}
+//		} finally {
+//			pm.close();
+//		}
+//	}
 }

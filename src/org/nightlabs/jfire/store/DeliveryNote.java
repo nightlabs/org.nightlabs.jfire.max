@@ -109,6 +109,10 @@ import org.nightlabs.util.Utils;
  * @jdo.fetch-group name="DeliveryNote.finalizeUser" fields="finalizeUser"
  * @jdo.fetch-group name="DeliveryNote.vendor" fields="vendor"
  * @jdo.fetch-group name="DeliveryNote.this" fetch-groups="default" fields="deliveryNoteLocal, articles, createUser, customer, finalizeUser, vendor"
+ *
+ * @jdo.fetch-group name="Statable.state" fields="state"
+ * @jdo.fetch-group name="Statable.states" fields="states"
+ *
  **/
 public class DeliveryNote
 implements Serializable, ArticleContainer, Statable, DetachCallback

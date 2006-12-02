@@ -62,6 +62,10 @@ import org.nightlabs.jfire.security.User;
  * @jdo.fetch-group name="OfferLocal.rejectUser" fields="rejectUser"
  * @jdo.fetch-group name="OfferLocal.confirmUser" fields="confirmUser"
  * @jdo.fetch-group name="OfferLocal.this" fields="offer, acceptUser, rejectUser, confirmUser"
+ *
+ * @jdo.fetch-group name="StatableLocal.state" fields="state"
+ * @jdo.fetch-group name="StatableLocal.states" fields="states"
+ *
  */
 public class OfferLocal
 implements Serializable, StatableLocal

@@ -67,21 +67,21 @@ import org.nightlabs.jfire.trade.LegalEntity;
 
 
 /**
- * @ejb.bean name="jfire/ejb/JFireChezFrancois/ChezFrancoisDatastoreInitializer"	
- *					 jndi-name="jfire/ejb/JFireChezFrancois/ChezFrancoisDatastoreInitializer"
+ * @ejb.bean name="jfire/ejb/JFireChezFrancois/ChezFrancoisDatastoreInitialiser"	
+ *					 jndi-name="jfire/ejb/JFireChezFrancois/ChezFrancoisDatastoreInitialiser"
  *					 type="Stateless" 
  *					 transaction-type="Container"
  *
  * @ejb.util generate = "physical"
  */
-public abstract class ChezFrancoisDatastoreInitializerBean
+public abstract class ChezFrancoisDatastoreInitialiserBean
 extends BaseSessionBeanImpl
 implements SessionBean
 {
 	/**
 	 * LOG4J logger used by this class
 	 */
-	private static final Logger logger = Logger.getLogger(ChezFrancoisDatastoreInitializerBean.class);
+	private static final Logger logger = Logger.getLogger(ChezFrancoisDatastoreInitialiserBean.class);
 
 	public void setSessionContext(SessionContext sessionContext)
 	throws EJBException, RemoteException
@@ -128,7 +128,7 @@ implements SessionBean
 				String organisationID = getOrganisationID();
 
 // currently I need it for all organisations. Marco ;-)
-//				if (!ChezFrancoisServerInitializer.ORGANISATION_ID_WINE_STORE.equals(organisationID))
+//				if (!ChezFrancoisServerInitialiser.ORGANISATION_ID_WINE_STORE.equals(organisationID))
 //					return;
 	
 				ModuleMetaData moduleMetaData = ModuleMetaData.getModuleMetaData(pm, "JFireChezFrancois");
@@ -152,7 +152,7 @@ implements SessionBean
 					Task task = new Task(
 							taskID.organisationID, taskID.taskTypeID, taskID.taskID,
 							User.getUser(pm, getOrganisationID(), User.USERID_SYSTEM),
-							ChezFrancoisDatastoreInitializerHome.JNDI_NAME,
+							ChezFrancoisDatastoreInitialiserHome.JNDI_NAME,
 							"demoTimerTask");
 
 					task.getName().setText(Locale.ENGLISH.getLanguage(), "Chez Francois Demo Timer Task");
@@ -493,7 +493,7 @@ implements SessionBean
 //			JbpmContext jbpmContext = JbpmLookup.getJbpmConfiguration().createJbpmContext();
 //			try {
 //				logger.info("Have JbpmContext! Deploying process definition!");
-//				InputStream in = ChezFrancoisDatastoreInitializerBean.class.getResourceAsStream("test/jbpm/processdefinition.xml");
+//				InputStream in = ChezFrancoisDatastoreInitialiserBean.class.getResourceAsStream("test/jbpm/processdefinition.xml");
 //				JpdlXmlReader jpdlXmlReader = new JpdlXmlReader(new InputStreamReader(in, Utils.CHARSET_NAME_UTF_8));
 //				ProcessDefinition processDefinition = jpdlXmlReader.readProcessDefinition();
 //				jpdlXmlReader.close();
@@ -567,7 +567,7 @@ implements SessionBean
 //		try {
 //			String organisationID = getOrganisationID();
 //			
-//			if (!ChezFrancoisServerInitializer.ORGANISATION_ID_WINE_STORE.equals(organisationID))
+//			if (!ChezFrancoisServerInitialiser.ORGANISATION_ID_WINE_STORE.equals(organisationID))
 //				return;
 //
 //			ModuleMetaData moduleMetaData = ModuleMetaData.getModuleMetaData(pm, "JFireChezFrancois");

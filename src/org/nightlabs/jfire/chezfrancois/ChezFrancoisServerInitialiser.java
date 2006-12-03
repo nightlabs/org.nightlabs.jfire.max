@@ -36,7 +36,7 @@ public class ChezFrancoisServerInitialiser extends ServerInitialiserDelegate
 	public static final String ORGANISATION_ID_WINE_STORE = "chezfrancois.jfire.org";
 
 	@Override
-	public void initialize()
+	public void initialise()
 	throws Exception
 	{
 //		TransactionManager transactionManager = getJ2EEVendorAdapter().getTransactionManager(getInitialContext());

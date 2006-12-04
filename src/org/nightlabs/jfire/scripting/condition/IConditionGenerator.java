@@ -25,6 +25,8 @@
  ******************************************************************************/
 package org.nightlabs.jfire.scripting.condition;
 
+import java.util.List;
+
 /**
  * This Interface generates the language dependend syntax for the
  * operations described in {@link CombineOperator} and {@link CompareOperator}
@@ -57,12 +59,11 @@ public interface IConditionGenerator
 	String getCompareOperator(CompareOperator compareOperator);
 	
 	/**
-	 * returns the scriptLanguage depended String of of the variable
+	 * returns the scriptLanguage depended String Identifier of a variable
 	 *  
-	 * @param variableName the name of the variable
-	 * @return the scriptLanguage depended String of of the variable 
+	 * @return the scriptLanguage depended String Identifier of a variable 
 	 */
-	String getVariableString(String variableName);
+	String getVariableString();
 	
 	/**
 	 * 
@@ -77,13 +78,38 @@ public interface IConditionGenerator
 	 * repectivly in many languages this represents a certain type of bracket
 	 */
 	String getCloseContainerString();
-	
-//	String getConditionString(IConditionContainer conatiner);		
+
+	/**
+	 * 
+	 * @return all {@link CompareOperator}s as List of Language dependend Strings
+	 */
+	List<String> getCompareOperators();
+
+	/**
+	 * 
+	 * @return all {@link CombineOperator}s as List of Language dependend Strings
+	 */
+	List<String> getCombineOperators();
 	
 	/**
 	 * 
-	 * @param scriptText the scripText to parse
-	 * @return the corresponding {@link ICondition} for the scriptText
+	 * @param compareOperator the compareOperator as language dependend string
+	 * @return the {@link CompareOperator} for the given language dependend string
 	 */
-	public ICondition getCondition(String scriptText);
+	CompareOperator getCompareOperator(String compareOperator);
+	
+	/**
+	 * 
+	 * @param combineOperator the combineOperator as language dependend string
+	 * @return the {@link CombineOperator} for the given language dependend string
+	 */
+	CombineOperator getCombineOperator(String combineOperator);
+	
+///**
+// * 
+// * @param scriptText the scripText to parse
+// * @return the corresponding {@link ICondition} for the scriptText
+// */
+//public ICondition getCondition(String scriptText);
+
 }

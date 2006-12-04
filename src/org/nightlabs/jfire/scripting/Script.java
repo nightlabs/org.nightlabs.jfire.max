@@ -243,6 +243,19 @@ public class Script
 	public void setMaxFetchDepth(int maxFetchDepth) {
 		this.maxFetchDepth = maxFetchDepth;
 	}
+
+	/**
+	 * @jdo.field persistence-modifier="persistent"
+	 */	
+	private boolean needsDetach = true;
+	
+	public void setNeedsDetach(boolean needsDetach) {
+		this.needsDetach = needsDetach;
+	}
+	public boolean isNeedsDetach() {
+		return needsDetach;
+	}
+	
 //	/**
 //	* @jdo.field persistence-modifier="persistent"
 //	*/

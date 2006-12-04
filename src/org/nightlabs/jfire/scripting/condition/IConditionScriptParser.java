@@ -25,70 +25,15 @@
  ******************************************************************************/
 package org.nightlabs.jfire.scripting.condition;
 
+import java.util.Set;
 
 /**
- * The Base Interface for expressing simple condition which result is always a boolean
- * 
- * The structure of a simple condition always looks like this
- * [variable] [compareOperator] [value]
- * where the variable is expressed as a ScriptRegistryItemID
- * the compareOperator is a enum which describes the comapre operation
- * and the value must also be compatible to the type of the variable
- * 
  * @author Daniel.Mazurek [at] NightLabs [dot] de
  *
  */
-public interface ISimpleCondition
-extends ICondition
+public interface IConditionScriptParser 
 {
-//	/**
-//	 * 
-//	 * @param scriptID the ScriptRegistryItemID which reponds to the variable 
-//	 * of the simple condition
-//	 * 
-//	 */
-//	void setScriptRegistryItemID(ScriptRegistryItemID scriptID);
-//	
-//	/**
-//	 * 
-//	 * @return the ScriptRegistryItemID which reponds to the variable 
-//	 * of the simple condition
-//	 */
-//	ScriptRegistryItemID getScriptRegistryItemID();
-
-	/**
-	 * returns the name of the variable 
-	 * @return the name of the variable
-	 */
-	String getVariableName();
-	
-	/**
-	 * sets the variableName 
-	 * @param variableName the variableName to set
-	 */
-	void setVariableName(String variableName);
-	
-	/**
-	 * returns the value as string
-	 * @return the value as string
-	 */
-	String getValueAsString();
-	
-	/**
-	 * sets the value as String
-	 * @param s the value to set
-	 */
-	void setValueAsString(String s);
-	
-	/**
-	 * returns the {@link CompareOperator} of the simple condition
-	 * @return the {@link CompareOperator} of the simple condition
-	 */
-	CompareOperator getCompareOperator();
-	
-	/**
-	 * sets the compareOperator for the condition
-	 * @param compareOperator the {@link CompareOperator} of the condition to set
-	 */
-	void setCompareOperator(CompareOperator compareOperator);
+	Set<String> getSpecialCharacters();
+	ICondition getCondition(IConditionGenerator generator, String scriptText);
+//	IConditionGenerator getConditionGenerator();
 }

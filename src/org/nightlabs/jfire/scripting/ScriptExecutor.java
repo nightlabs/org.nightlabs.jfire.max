@@ -273,6 +273,14 @@ public abstract class ScriptExecutor
 
 		Object result = doExecute();
 
+		// detach script result if necessary
+		if (script.isNeedsDetach()) {
+			PersistenceManager pm = getPersistenceManager();
+			pm.getFetchPlan().setGroups(script.getFetchGroups());
+			pm.getFetchPlan().setMaxFetchDepth(script.getMaxFetchDepth());
+			result = pm.detachCopy(result);
+		}
+		
 		// check result type against declared type in script
 		if (result == null)
 			return null;

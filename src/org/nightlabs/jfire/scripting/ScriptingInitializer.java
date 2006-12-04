@@ -368,6 +368,7 @@ public class ScriptingInitializer
 //				String[] fetchGroups = new String[] {FetchPlan.DEFAULT};
 				String[] fetchGroups = null;
 				int maxFetchDepth = 1;
+				boolean needsDetach = false;
 				
 				if (category != null) {
 					if (category.getScriptRegistryItemType() != null)
@@ -405,7 +406,12 @@ public class ScriptingInitializer
 						logger.debug("Have fetchGroupsNode-attribute in script element: "+idNode.getTextContent());
 						String fetchGroupsContent = fetchGroupsNode.getTextContent();
 						fetchGroups = parseFetchGroups(fetchGroupsContent);
-					}										  
+					}
+					Node needsDetachNode = scriptNode.getAttributes().getNamedItem("needsDetach");
+					if (needsDetachNode != null && !"".equals(needsDetachNode.getTextContent())) {
+						logger.debug("Have needsDetachNode-attribute in script element: "+idNode.getTextContent());
+						needsDetach = Boolean.parseBoolean(needsDetachNode.getTextContent());
+					}					
 				}
 				
 				try {			
@@ -429,6 +435,7 @@ public class ScriptingInitializer
 					script.setResultClassName(scriptResultClass);
 					script.setMaxFetchDepth(maxFetchDepth);
 					script.setFetchGroups(fetchGroups);
+					script.setNeedsDetach(needsDetach);
 					
 					// script name and parameters
 					if (scriptNode != null) {

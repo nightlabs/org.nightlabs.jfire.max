@@ -25,6 +25,11 @@
  ******************************************************************************/
 package org.nightlabs.jfire.scripting.condition;
 
+import java.util.ArrayList;
+import java.util.List;
+
+import sun.security.action.GetLongAction;
+
 /**
  * @author Daniel.Mazurek [at] NightLabs [dot] de
  *
@@ -67,8 +72,8 @@ implements IConditionGenerator
 		return null;
 	}
 
-	public String getVariableString(String variableName) {
-		return "$"+variableName;
+	public String getVariableString() {
+		return "$";
 	}
 
 	public String getCloseContainerString() {
@@ -79,14 +84,68 @@ implements IConditionGenerator
 		return "(";
 	}
 
-	/**
-	 * 
-	 * @param scriptText the scripText to parse
-	 * @return the corresponding {@link ICondition} for the scriptText
-	 */
-	public ICondition getCondition(String scriptText) {
-		// TODO parse scriptText and create appropriate ICondition
-		return null;
+	private List<String> compareOperatorStrings = null;
+	public List<String> getCompareOperators() {
+		if (compareOperatorStrings == null) {
+			CompareOperator[] compareOperators = CompareOperator.values();
+			List<String> compareOperatorStrings = new ArrayList<String>(compareOperators.length);
+			for (int i=0; i<compareOperators.length; i++) {
+				compareOperatorStrings.add(getCompareOperator(compareOperators[i]));
+			}			
+		}
+		return compareOperatorStrings;
 	}
-	 	
+	
+	private List<String> combineOperatorStrings = null;
+	public List<String> getCombineOperators() 
+	{
+		if (combineOperatorStrings == null) {
+			CombineOperator[] combineOperators = CombineOperator.values();
+			List<String> combineOperatorStrings = new ArrayList<String>(combineOperators.length);
+			for (int i=0; i<combineOperators.length; i++) {
+				combineOperatorStrings.add(getCombineOperator(combineOperators[i]));
+			}			
+		}
+		return combineOperatorStrings;		
+	}
+
+	public CompareOperator getCompareOperator(String compareOperator) 
+	{		
+		if (compareOperator.equals("==")) {
+			return CompareOperator.EQUAL;
+		}
+		else if (compareOperator.equals("!=")) {
+			return CompareOperator.NOT_EQUAL;
+		}
+		else if (compareOperator.equals(">")) {
+			return CompareOperator.GREATER_THEN;
+		}
+		else if (compareOperator.equals("<")) {
+			return CompareOperator.SMALLER_THEN;
+		}
+		else if (compareOperator.equals(">=")) {
+			return CompareOperator.GREATER_OR_EQUAL_THEN;
+		}
+		else if (compareOperator.equals("<=")) {
+			return CompareOperator.SMALLER_OR_EQUAL_THEN;
+		}
+		else
+			throw new IllegalArgumentException("Param compareOperator ("+compareOperator+") is not a valid compareOperator String");
+	}
+
+	public CombineOperator getCombineOperator(String combineOperator) 
+	{
+		if (combineOperator.equals("&&")) {
+			return CombineOperator.LOGICAL_AND;
+		}
+		else if (combineOperator.equals("||")) {
+			return CombineOperator.LOGICAL_OR;
+		}
+//		else if (combineOperator.equals("!")) {
+//			return CombineOperator.LOGICAL_NOT;
+//		}
+		else
+			throw new IllegalArgumentException("Param combineOperator ("+combineOperator+") is not a valid combineOperator String");
+	}	
+		
 }

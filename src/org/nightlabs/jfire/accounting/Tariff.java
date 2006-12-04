@@ -51,6 +51,7 @@ import java.io.Serializable;
  *		field-order="organisationID, tariffID"
  *
  * @jdo.fetch-group name="Tariff.name" fields="name"
+ * @jdo.fetch-group name="Tariff.this" fetch-groups="default" fields="name"
  *
  * @jdo.fetch-group name="FetchGroupsTrade.articleInOrderEditor" fields="name"
  * @jdo.fetch-group name="FetchGroupsTrade.articleInOfferEditor" fields="name"
@@ -63,6 +64,7 @@ public class Tariff
 	implements Serializable
 {
 	public static final String FETCH_GROUP_NAME = "Tariff.name";
+	public static final String FETCH_GROUP_THIS_TARIFF = "Tariff.this";
 
 	/**
 	 * @jdo.field primary-key="true"

@@ -3,7 +3,7 @@
 		"http://www.nightlabs.de/dtd/datastoreinit_1_0.dtd">
 <datastore-initialization>
 
-	<init bean="jfire/ejb/JFireChezFrancois/ChezFrancoisDatastoreInitializer" method="initialize">
+	<init bean="jfire/ejb/JFireChezFrancois/ChezFrancoisDatastoreInitialiser" method="initialize">
 
 		<depends
 					module="JFireSimpleTrade.ear"

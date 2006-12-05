@@ -88,6 +88,7 @@ import org.nightlabs.jfire.accounting.query.InvoiceQuery;
 import org.nightlabs.jfire.accounting.tariffpriceconfig.TariffPriceConfig;
 import org.nightlabs.jfire.accounting.tariffpriceconfig.TariffPriceConfigManagerBean;
 import org.nightlabs.jfire.base.BaseSessionBeanImpl;
+import org.nightlabs.jfire.idgenerator.IDNamespaceDefault;
 import org.nightlabs.jfire.security.User;
 import org.nightlabs.jfire.store.DeliveryNote;
 import org.nightlabs.jfire.store.NestedProductType;
@@ -425,6 +426,10 @@ public abstract class AccountingManagerBean
 			serverPaymentProcessorDebitNoteGermany.getName().setText(Locale.ENGLISH.getLanguage(), "Debit Note within Germany");
 			serverPaymentProcessorDebitNoteGermany.getName().setText(Locale.GERMAN.getLanguage(), "Lastschrift innerhalb Deutschlands");
 			serverPaymentProcessorDebitNoteGermany.addModeOfPayment(modeOfPaymentDebitNote);
+
+			IDNamespaceDefault idNamespaceDefault = IDNamespaceDefault.createIDNamespaceDefault(pm, getOrganisationID(), Invoice.class);
+			idNamespaceDefault.setCacheSizeServer(0);
+			idNamespaceDefault.setCacheSizeClient(0);
 		} finally {
 			pm.close();
 		}

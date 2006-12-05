@@ -75,7 +75,7 @@ implements Serializable
 
 	public static long createProductID()
 	{
-		return IDGenerator.nextID(Product.class.getName());
+		return IDGenerator.nextID(Product.class);
 	}
 
 	/**

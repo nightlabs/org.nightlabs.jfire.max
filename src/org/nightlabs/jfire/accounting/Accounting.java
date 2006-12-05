@@ -361,7 +361,7 @@ public class Accounting
 
 		Invoice invoice = new Invoice(
 				user, vendorLE, customerLE,
-				invoiceIDPrefix, IDGenerator.nextID(Invoice.class.getName() + '/' + invoiceIDPrefix),
+				invoiceIDPrefix, IDGenerator.nextID(Invoice.class, invoiceIDPrefix),
 				invoiceCurrency);
 		new InvoiceLocal(invoice); // registers itself in the invoice
 		invoice = (Invoice) getPersistenceManager().makePersistent(invoice);

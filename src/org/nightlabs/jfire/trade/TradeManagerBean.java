@@ -53,6 +53,7 @@ import org.nightlabs.jfire.accounting.id.CurrencyID;
 import org.nightlabs.jfire.base.BaseSessionBeanImpl;
 import org.nightlabs.jfire.config.ConfigSetup;
 import org.nightlabs.jfire.config.UserConfigSetup;
+import org.nightlabs.jfire.idgenerator.IDNamespaceDefault;
 import org.nightlabs.jfire.jbpm.graph.def.ProcessDefinition;
 import org.nightlabs.jfire.person.Person;
 import org.nightlabs.jfire.security.User;
@@ -1064,6 +1065,15 @@ implements SessionBean
 
 			pd = ProcessDefinitionUtil.storeProcessDefinition(pm, TradeManagerBean.class.getResource("jbpm/offer/vendor/")); // processdefinition.xml"));
 			pm.makePersistent(new ProcessDefinitionAssignment(Offer.class, TradeSide.vendor, pd));
+
+
+			IDNamespaceDefault idNamespaceDefault = IDNamespaceDefault.createIDNamespaceDefault(pm, getOrganisationID(), Order.class);
+			idNamespaceDefault.setCacheSizeServer(0);
+			idNamespaceDefault.setCacheSizeClient(0);
+
+			idNamespaceDefault = IDNamespaceDefault.createIDNamespaceDefault(pm, getOrganisationID(), Offer.class);
+			idNamespaceDefault.setCacheSizeServer(0);
+			idNamespaceDefault.setCacheSizeClient(0);
 
 		} finally {
 			pm.close();

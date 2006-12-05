@@ -144,7 +144,7 @@ public class Article
 
 	public static long createArticleID()
 	{
-		return IDGenerator.nextID(Article.class.getName());
+		return IDGenerator.nextID(Article.class);
 	}
 
 	/**

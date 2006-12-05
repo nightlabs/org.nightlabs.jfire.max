@@ -406,7 +406,7 @@ public class Trader
 
 		Offer offer = new Offer(
 				user, order,
-				offerIDPrefix, IDGenerator.nextID(Offer.class.getName() + '/' + offerIDPrefix));
+				offerIDPrefix, IDGenerator.nextID(Offer.class, offerIDPrefix));
 		new OfferLocal(offer); // self-registering
 		offer = (Offer) getPersistenceManager().makePersistent(offer);
 		reverseArticles(user, offer, reversedArticles);
@@ -448,7 +448,7 @@ public class Trader
 
 			Order order = new Order(
 					getMandator(), customer,
-					orderIDPrefix, IDGenerator.nextID(Order.class.getName() + '/' + orderIDPrefix),
+					orderIDPrefix, IDGenerator.nextID(Order.class, orderIDPrefix),
 					currency, user);
 
 			getPersistenceManager().makePersistent(order);
@@ -574,7 +574,7 @@ public class Trader
 
 			Offer offer = new Offer(
 					user, order,
-					offerIDPrefix, IDGenerator.nextID(Offer.class.getName() + '/' + offerIDPrefix));
+					offerIDPrefix, IDGenerator.nextID(Offer.class, offerIDPrefix));
 
 			OfferLocal offerLocal = new OfferLocal(offer); // OfferLocal registers itself in Offer
 

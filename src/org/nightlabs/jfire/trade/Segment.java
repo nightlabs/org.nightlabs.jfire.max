@@ -76,7 +76,7 @@ public class Segment implements Serializable
 
 	public static long createSegmentID()
 	{
-		return IDGenerator.nextID(Segment.class.getName());
+		return IDGenerator.nextID(Segment.class);
 	}
 
 	/**

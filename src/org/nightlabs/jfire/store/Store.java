@@ -641,7 +641,7 @@ public class Store
 
 		DeliveryNote deliveryNote = new DeliveryNote(
 				user, vendorLE, customerLE,
-				deliveryNoteIDPrefix, IDGenerator.nextID(DeliveryNote.class.getName() + '/' + deliveryNoteIDPrefix));
+				deliveryNoteIDPrefix, IDGenerator.nextID(DeliveryNote.class, deliveryNoteIDPrefix));
 		new DeliveryNoteLocal(deliveryNote); // self-registering
 		getPersistenceManager().makePersistent(deliveryNote);
 		for (Iterator iter = articles.iterator(); iter.hasNext();) {

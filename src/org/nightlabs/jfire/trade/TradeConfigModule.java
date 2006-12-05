@@ -87,7 +87,7 @@ public class TradeConfigModule
 		if (res == null) {
 			res = new IDPrefixCf(
 					IDGenerator.getOrganisationID(),
-					IDGenerator.nextID(IDPrefixCf.class.getName()),
+					IDGenerator.nextID(IDPrefixCf.class),
 					this, articleContainerClassName);
 			idPrefixCfs.put(res.getArticleContainerClassName(), res);
 		}

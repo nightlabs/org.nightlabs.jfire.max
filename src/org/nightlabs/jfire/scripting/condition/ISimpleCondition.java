@@ -31,31 +31,13 @@ package org.nightlabs.jfire.scripting.condition;
  * 
  * The structure of a simple condition always looks like this
  * [variable] [compareOperator] [value]
- * where the variable is expressed as a ScriptRegistryItemID
- * the compareOperator is a enum which describes the comapre operation
- * and the value must also be compatible to the type of the variable
- * 
+ *  
  * @author Daniel.Mazurek [at] NightLabs [dot] de
  *
  */
 public interface ISimpleCondition
 extends ICondition
 {
-//	/**
-//	 * 
-//	 * @param scriptID the ScriptRegistryItemID which reponds to the variable 
-//	 * of the simple condition
-//	 * 
-//	 */
-//	void setScriptRegistryItemID(ScriptRegistryItemID scriptID);
-//	
-//	/**
-//	 * 
-//	 * @return the ScriptRegistryItemID which reponds to the variable 
-//	 * of the simple condition
-//	 */
-//	ScriptRegistryItemID getScriptRegistryItemID();
-
 	/**
 	 * returns the name of the variable 
 	 * @return the name of the variable

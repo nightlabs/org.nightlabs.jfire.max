@@ -73,11 +73,4 @@ public class Script
 		this.variableName2ScriptID = variableName2ScriptID;
 	}
 	
-//	private Map<ScriptRegistryItemID, String> scriptID2VariableName = new HashMap<ScriptRegistryItemID, String>();
-//	public Map<ScriptRegistryItemID, String> getScriptID2VariableName() {
-//		return scriptID2VariableName;		
-//	}	
-//	public void addVariableName(ScriptRegistryItemID scriptID, String value) {
-//		scriptID2VariableName.put(scriptID, value);
-//	}
 }

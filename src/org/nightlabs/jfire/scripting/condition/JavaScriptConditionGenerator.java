@@ -28,14 +28,15 @@ package org.nightlabs.jfire.scripting.condition;
 import java.util.ArrayList;
 import java.util.List;
 
-import sun.security.action.GetLongAction;
+import org.nightlabs.jfire.scripting.ScriptExecutorJavaScript;
 
 /**
  * @author Daniel.Mazurek [at] NightLabs [dot] de
  *
  */
 public class JavaScriptConditionGenerator 
-implements IConditionGenerator 
+//implements IConditionGenerator 
+extends ConstrainedConditionGenerator
 {
 
 	public String getCombineOperator(CombineOperator combineOperator) 
@@ -46,8 +47,8 @@ implements IConditionGenerator
 				return "&&";
 			case LOGICAL_OR:
 				return "||";
-			case LOGICAL_NOT:
-				return "!";				
+//			case LOGICAL_NOT:
+//				return "!";				
 		}
 		return null;
 	}
@@ -88,7 +89,7 @@ implements IConditionGenerator
 	public List<String> getCompareOperators() {
 		if (compareOperatorStrings == null) {
 			CompareOperator[] compareOperators = CompareOperator.values();
-			List<String> compareOperatorStrings = new ArrayList<String>(compareOperators.length);
+			compareOperatorStrings = new ArrayList<String>(compareOperators.length);
 			for (int i=0; i<compareOperators.length; i++) {
 				compareOperatorStrings.add(getCompareOperator(compareOperators[i]));
 			}			
@@ -101,7 +102,7 @@ implements IConditionGenerator
 	{
 		if (combineOperatorStrings == null) {
 			CombineOperator[] combineOperators = CombineOperator.values();
-			List<String> combineOperatorStrings = new ArrayList<String>(combineOperators.length);
+			combineOperatorStrings = new ArrayList<String>(combineOperators.length);
 			for (int i=0; i<combineOperators.length; i++) {
 				combineOperatorStrings.add(getCombineOperator(combineOperators[i]));
 			}			
@@ -146,6 +147,10 @@ implements IConditionGenerator
 //		}
 		else
 			throw new IllegalArgumentException("Param combineOperator ("+combineOperator+") is not a valid combineOperator String");
+	}
+
+	public String getLanguage() {
+		return ScriptExecutorJavaScript.LANGUAGE_JAVA_SCRIPT;
 	}	
 		
 }

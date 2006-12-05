@@ -28,8 +28,6 @@ package org.nightlabs.jfire.scripting.condition;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.nightlabs.jfire.scripting.ScriptExecutorJavaScript;
-
 /**
  * A Registry which allows the registration of {@link IConditionGenerator} for 
  * a certain language
@@ -48,8 +46,9 @@ public class GeneratorRegistry
 		{
 			sharedInstance = new GeneratorRegistry();
 			// register JavaScriptConditionGenerator
-			sharedInstance.registerGenerator(ScriptExecutorJavaScript.LANGUAGE_JAVA_SCRIPT, 
-					new JavaScriptConditionGenerator());
+//			sharedInstance.registerGenerator(ScriptExecutorJavaScript.LANGUAGE_JAVA_SCRIPT, 
+//					new JavaScriptConditionGenerator());
+			sharedInstance.registerGenerator(new JavaScriptConditionGenerator());
 		}
 		return sharedInstance;
 	}
@@ -60,8 +59,11 @@ public class GeneratorRegistry
 	
 	private Map<String, IConditionGenerator> language2Generator = new HashMap<String, IConditionGenerator>();
 	
-	public void registerGenerator(String language, IConditionGenerator generator) {
-		language2Generator.put(language, generator);
+//	public void registerGenerator(String language, IConditionGenerator generator) {
+//		language2Generator.put(language, generator);
+//	}
+	public void registerGenerator(IConditionGenerator generator) {
+		language2Generator.put(generator.getLanguage(), generator);
 	}
 	
 	public IConditionGenerator getGenerator(String language) {

@@ -26,10 +26,9 @@
 package org.nightlabs.jfire.scripting.condition;
 
 /**
- * The Base Interface for simple scripts which describe a condition
- *  
- * each condition has a language dependend scriptText 
- * which expresses the condition
+ * The Base Tagging Interface for scripts which describe a condition
+ * the 2 implementations are {@link SimpleCondition} and
+ * {@link ConditionContainer} 
  *  
  * @author Daniel.Mazurek [at] NightLabs [dot] de
  *
@@ -43,17 +42,17 @@ public interface ICondition
 //	 */
 //	boolean getResult();
 	
-	/**
-	 * returns the text of the script of the condition
-	 * 
-	 * @return the text of the script of the condition
-	 */
-	String getScriptText();
+//	/**
+//	 * returns the text of the script of the condition
+//	 * 
+//	 * @return the text of the script of the condition
+//	 */
+//	String getScriptText();
 	
-	/**
-	 * returns the name of the script language
-	 * 
-	 * @return the name of the script language
-	 */
-	String getLanguage();
+//	/**
+//	 * returns the name of the script language
+//	 * 
+//	 * @return the name of the script language
+//	 */
+//	String getLanguage();
 }

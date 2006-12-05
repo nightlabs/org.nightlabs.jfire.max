@@ -25,6 +25,8 @@
  ******************************************************************************/
 package org.nightlabs.jfire.scripting.condition;
 
+import java.util.List;
+
 /**
  * This Interface describes a container for holding {@link Condition}s
  * 
@@ -65,4 +67,10 @@ extends ICondition
 	 * @return the CombineOperator of the container
 	 */
 	CombineOperator getCombineOperator();
+	
+	/**
+	 * returns a {@link List} of the contained conditions
+	 * @return a {@link List} of the contained conditions
+	 */
+	List<ICondition> getConditions();
 }

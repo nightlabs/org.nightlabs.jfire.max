@@ -75,91 +75,14 @@ implements ISimpleCondition
 		this.variableName = variableName;
 	}
 
-	public String getScriptText() 
-	{
-		IConditionGenerator generator = GeneratorRegistry.sharedInstance().getGenerator(getLanguage());
-		String variable = generator.getVariableString() + getVariableName();
-		String operator = generator.getCompareOperator(getCompareOperator());
-		return variable + operator + getValueAsString();
-	}
+//	public String getScriptText() 
+//	{
+//		IConditionGenerator generator = GeneratorRegistry.sharedInstance().getGenerator(getLanguage());
+//		String openContainer = generator.getOpenContainerString();
+//		String variable = generator.getVariableString() + getVariableName();
+//		String operator = generator.getCompareOperator(getCompareOperator());
+//		String closeContainer = generator.getCloseContainerString();
+//		return openContainer + variable + operator + getValueAsString() + closeContainer;
+//	}
 
-//	public SimpleCondition(Map<ScriptRegistryItemID, ScriptConditioner> scriptID2ScriptConditioner,
-//			ScriptRegistryItemID scriptRegistryItemID) 
-//	{
-//		if (scriptID2ScriptConditioner == null)
-//			throw new IllegalArgumentException("Param scriptID2ScriptConditioner must NOT be null!");
-//		
-//		if (scriptID2ScriptConditioner.isEmpty())
-//			throw new IllegalArgumentException("Param scriptID2ScriptConditioner must NOT be empty!");
-//
-//		if (scriptRegistryItemID == null)
-//			throw new IllegalArgumentException("Param scriptRegistryItemID must NOT be null!");
-//		
-//		this.scriptID2ScriptConditioner = scriptID2ScriptConditioner;
-//		this.scriptRegistryItemID = scriptRegistryItemID;	
-//		init();
-//	}
-//	
-//	protected void init() 
-//	{
-//		compareOperator = getScriptConditioner().getCompareOperators().get(0);
-//		if (getScriptConditioner().getPossibleValues() != null)
-//			value = getScriptConditioner().getPossibleValues().get(0);
-//	}
-//	
-//	private ScriptRegistryItemID scriptRegistryItemID;
-//	public void setScriptRegistryItemID(ScriptRegistryItemID scriptID) {
-//		this.scriptRegistryItemID = scriptID;
-//	}	
-//	public ScriptRegistryItemID getScriptRegistryItemID() {
-//		return scriptRegistryItemID;
-//	}
-//	
-//	private Map<ScriptRegistryItemID, ScriptConditioner> scriptID2ScriptConditioner;
-//	public ScriptConditioner getScriptConditioner(ScriptRegistryItemID scriptID) {
-//		return scriptID2ScriptConditioner.get(scriptID);
-//	}
-//	
-//	private CompareOperator compareOperator;
-//	public CompareOperator getCompareOperator() {
-//		return compareOperator;
-//	}
-//	public void setCompareOperator(CompareOperator compareOperator) 
-//	{
-//		if (getScriptConditioner().getCompareOperators().contains(compareOperator))
-//			this.compareOperator = compareOperator;
-//		else
-//			throw new IllegalArgumentException("Param compareOperator is not contained in the allowed" +
-//					"compareOperators of the assigned ScriptConditioner");
-//	}
-//	
-//	protected ScriptConditioner getScriptConditioner() {
-//		return getScriptConditioner(getScriptRegistryItemID());
-//	}
-//
-//	private Object value;
-//	public Object getValue() {
-//		return value;
-//	}
-//	public void setValue(Object value) 
-//	{
-//		if (getScriptConditioner().getPossibleValues() != null &&
-//				getScriptConditioner().getPossibleValues().contains(value)) 
-//		{
-//			this.value = value;
-//		}
-//		else {
-//			throw new IllegalArgumentException("Param value is not contained in the possible values" +
-//			"of the assigned ScriptConditioner");
-//		}
-//	}
-//	public String getValueAsString() 
-//	{
-////		if (value != null)
-//		return getScriptConditioner().getValueLabelProvider().getText(value);
-//	}
-//
-//	public String getVariableName() {
-//		return getScriptConditioner().getVariableName();
-//	}
 }

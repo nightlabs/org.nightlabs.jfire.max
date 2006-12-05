@@ -25,7 +25,6 @@
  ******************************************************************************/
 package org.nightlabs.jfire.scripting.condition;
 
-import org.nightlabs.jfire.scripting.ScriptExecutorJavaScript;
 
 /**
  * @author Daniel.Mazurek [at] NightLabs [dot] de
@@ -34,9 +33,9 @@ import org.nightlabs.jfire.scripting.ScriptExecutorJavaScript;
 public abstract class AbstractCondition 
 implements ICondition 
 {
-	// the default language is JavaScript
-	private String language = ScriptExecutorJavaScript.LANGUAGE_JAVA_SCRIPT;
-	public String getLanguage() {
-		return language;
-	}
+//	// the default language is JavaScript
+//	private String language = ScriptExecutorJavaScript.LANGUAGE_JAVA_SCRIPT;
+//	public String getLanguage() {
+//		return language;
+//	}
 }

@@ -25,7 +25,6 @@
  ******************************************************************************/
 package org.nightlabs.jfire.scripting.condition;
 
-import java.util.List;
 
 /**
  * This Interface generates the language dependend syntax for the
@@ -37,79 +36,23 @@ import java.util.List;
 public interface IConditionGenerator 
 {
 	/**
-	 * returns the scriptLanguage depended String for all available
-	 * {@link CombineOperator}s like AND, OR ....
 	 * 
-	 * e.g. for JavaScript CombineOperator.AND would return "&"
-	 * 
-	 * @param combineOperator the {@link CombineOperator} to express
-	 * @return a String which expresses the CombineOperator as scriptLanguage depended String
+	 * @param text the scriptText to transform into a ICondition, either a {@link SimpleCondition}
+	 * or a {@link ConditionContainer}
+	 * @return the ICondition which has been parsed from the given scriptText
 	 */
-	String getCombineOperator(CombineOperator combineOperator);
-	
-	/**
-	 * returns the scriptLanguage depended String for all available
-	 * {@link CompareOperator}s like EQUALS, NOT_EQUALS ....
-	 * 
-	 * e.g. for JavaScript CompareOperator.EQUALS would return "=="
-	 * 
-	 * @param compareOperator the {@link CompareOperator} to express
-	 * @return a String which expresses the CompareOperator as scriptLanguage depended String
-	 */
-	String getCompareOperator(CompareOperator compareOperator);
-	
-	/**
-	 * returns the scriptLanguage depended String Identifier of a variable
-	 *  
-	 * @return the scriptLanguage depended String Identifier of a variable 
-	 */
-	String getVariableString();
+	ICondition getCondition(String text);
 	
 	/**
 	 * 
-	 * @return the String which represents the opening of a condition container, 
-	 * repectivly in many languages this represents a certain type of bracket
+	 * @param condition the {@link ICondition} to transform into language dependend string
+	 * @return the language dependend string of the fiven condition
 	 */
-	String getOpenContainerString();
-
-	/**
-	 * 
-	 * @return the String which represents the closing of a condition container, 
-	 * repectivly in many languages this represents a certain type of bracket
-	 */
-	String getCloseContainerString();
-
-	/**
-	 * 
-	 * @return all {@link CompareOperator}s as List of Language dependend Strings
-	 */
-	List<String> getCompareOperators();
-
-	/**
-	 * 
-	 * @return all {@link CombineOperator}s as List of Language dependend Strings
-	 */
-	List<String> getCombineOperators();
+	String getScriptText(ICondition condition);
 	
 	/**
 	 * 
-	 * @param compareOperator the compareOperator as language dependend string
-	 * @return the {@link CompareOperator} for the given language dependend string
+	 * @return the script language as String
 	 */
-	CompareOperator getCompareOperator(String compareOperator);
-	
-	/**
-	 * 
-	 * @param combineOperator the combineOperator as language dependend string
-	 * @return the {@link CombineOperator} for the given language dependend string
-	 */
-	CombineOperator getCombineOperator(String combineOperator);
-	
-///**
-// * 
-// * @param scriptText the scripText to parse
-// * @return the corresponding {@link ICondition} for the scriptText
-// */
-//public ICondition getCondition(String scriptText);
-
+	String getLanguage();
 }

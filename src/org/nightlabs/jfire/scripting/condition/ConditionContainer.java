@@ -40,9 +40,14 @@ implements IConditionContainer
 {
 
 	private List<ICondition> conditions = new LinkedList<ICondition>();
+	public List<ICondition> getConditions() {
+		return conditions;
+	}
+	
 	public void addCondition(ICondition condition) {
 		conditions.add(condition);
 	}
+	
 	public void removeCondition(ICondition condition) {
 		conditions.remove(condition);		
 	}
@@ -55,25 +60,19 @@ implements IConditionContainer
 		this.combineOperator = combineOperator;
 	}
 
-	public String getScriptText() 
-	{
-		StringBuffer sb = new StringBuffer();
-		for (ICondition condition : conditions) 
-		{
-			if (condition instanceof ISimpleCondition) {
-				ISimpleCondition con = (ISimpleCondition) condition;
-				sb.append(con.getScriptText());
-			} 
-			else if (condition instanceof IConditionContainer) 
-			{
-				IConditionGenerator generator = GeneratorRegistry.sharedInstance().getGenerator(getLanguage());
-				IConditionContainer container = (IConditionContainer) condition;
-				sb.append(generator.getOpenContainerString());
-				sb.append(container.getScriptText());
-				sb.append(generator.getCloseContainerString());				
-			}
-		}
-		return sb.toString();
-	}
+//	public String getScriptText() 
+//	{
+//		StringBuffer sb = new StringBuffer();
+//		IConditionGenerator generator = GeneratorRegistry.sharedInstance().getGenerator(getLanguage());
+//		sb.append(generator.getOpenContainerString());								
+//		for (int i=0; i<conditions.size(); i++) {
+//			ICondition con = conditions.get(i);
+//			sb.append(con.getScriptText());
+//			if (i != conditions.size()-1)
+//				sb.append(generator.getCombineOperator(combineOperator));
+//		}
+//		sb.append(generator.getCloseContainerString());
+//		return sb.toString();
+//	}
 
 }

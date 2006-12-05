@@ -44,6 +44,8 @@ import javax.jdo.JDOHelper;
 import javax.jdo.PersistenceManager;
 
 import org.apache.log4j.Logger;
+import org.jbpm.JbpmContext;
+import org.jbpm.graph.exe.ProcessInstance;
 import org.nightlabs.ModuleException;
 import org.nightlabs.jdo.NLJDOHelper;
 import org.nightlabs.jdo.moduleregistry.MalformedVersionException;
@@ -54,12 +56,14 @@ import org.nightlabs.jfire.base.BaseSessionBeanImpl;
 import org.nightlabs.jfire.config.ConfigSetup;
 import org.nightlabs.jfire.config.UserConfigSetup;
 import org.nightlabs.jfire.idgenerator.IDNamespaceDefault;
+import org.nightlabs.jfire.jbpm.JbpmLookup;
 import org.nightlabs.jfire.jbpm.graph.def.ProcessDefinition;
 import org.nightlabs.jfire.person.Person;
 import org.nightlabs.jfire.security.User;
 import org.nightlabs.jfire.trade.config.LegalEntityViewConfigModule;
 import org.nightlabs.jfire.trade.id.ArticleID;
 import org.nightlabs.jfire.trade.id.OfferID;
+import org.nightlabs.jfire.trade.id.OfferLocalID;
 import org.nightlabs.jfire.trade.id.OrderID;
 import org.nightlabs.jfire.trade.id.SegmentTypeID;
 import org.nightlabs.jfire.trade.state.ProcessDefinitionAssignment;
@@ -961,7 +965,7 @@ implements SessionBean
 	 * @ejb.permission role-name="_Guest_"
 	 */
 	public Collection releaseArticles(Collection articleIDs, boolean synchronously, boolean get, String[] fetchGroups, int maxFetchDepth)
-		throws ModuleException
+	throws ModuleException
 	{
 		PersistenceManager pm = getPersistenceManager();
 		try {
@@ -978,6 +982,28 @@ implements SessionBean
 				pm.getFetchPlan().setGroups(fetchGroups);
 
 			return pm.detachCopyAll(articles);
+		} finally {
+			pm.close();
+		}
+	}
+
+	/**
+	 * @ejb.interface-method
+	 * @ejb.transaction type = "Required"
+	 * @ejb.permission role-name="_Guest_"
+	 */
+	public void signalOffer(OfferID offerID, String jbpmTransitionName)
+	{
+		PersistenceManager pm = getPersistenceManager();
+		try {
+			OfferLocal offerLocal = (OfferLocal) pm.getObjectById(OfferLocalID.create(offerID));
+			JbpmContext jbpmContext = JbpmLookup.getJbpmConfiguration().createJbpmContext();
+			try {
+				ProcessInstance processInstance = jbpmContext.getProcessInstanceForUpdate(offerLocal.getJbpmProcessInstanceId());
+				processInstance.signal(jbpmTransitionName);
+			} finally {
+				jbpmContext.close();
+			}
 		} finally {
 			pm.close();
 		}

@@ -55,6 +55,7 @@ import org.nightlabs.jfire.security.User;
  *
  * @jdo.create-objectid-class
  *		field-order="organisationID, offerIDPrefix, offerID"
+ *		include-body="id/OfferLocalID.body.inc"
  *
  * @jdo.fetch-group name="Offer.offerLocal" fields="offer"
  * @jdo.fetch-group name="OfferLocal.offer" fields="offer"
@@ -361,8 +362,8 @@ implements Serializable, StatableLocal
 		if (currentState == null)
 			throw new IllegalArgumentException("state must not be null!");
 
-		this.state = (State)currentState;
 		this.states.add((State)currentState);
+		this.state = (State)currentState;
 	}
 
 	public State getState()

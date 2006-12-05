@@ -74,6 +74,7 @@ import org.nightlabs.util.Utils;
  * @jdo.create-objectid-class
  *		field-order="organisationID, offerIDPrefix, offerID"
  *		add-interfaces="org.nightlabs.jfire.trade.id.ArticleContainerID"
+ *		include-body="id/OfferID.body.inc"
  *
  * @jdo.query name="getNonFinalizedOffersForOrder" query="SELECT
  *			WHERE this.order == paramOrder && this.finalizeDT == null

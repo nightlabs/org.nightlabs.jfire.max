@@ -149,7 +149,6 @@ implements Serializable, StatableLocal
 	 *		persistence-modifier="persistent"
 	 *		collection-type="collection"
 	 *		element-type="State"
-	 *		dependent-element="true"
 	 *		table="JFireTrade_OfferLocal_states"
 	 *
 	 * @jdo.join
@@ -362,8 +361,13 @@ implements Serializable, StatableLocal
 		if (currentState == null)
 			throw new IllegalArgumentException("state must not be null!");
 
-		this.states.add((State)currentState);
 		this.state = (State)currentState;
+		try { // TODO remove this workaround as soon as JPOX is fixed
+			this.states.add((State)currentState);
+		} catch (Exception x) { // JPOX WORKAROUND (we get a Duplicate key exception)
+			if (!x.getMessage().contains("Duplicate entry"))
+				throw new RuntimeException(x);
+		}
 	}
 
 	public State getState()

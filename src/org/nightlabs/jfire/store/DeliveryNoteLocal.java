@@ -119,7 +119,6 @@ implements Serializable, StatableLocal
 	 *		persistence-modifier="persistent"
 	 *		collection-type="collection"
 	 *		element-type="State"
-	 *		dependent-element="true"
 	 *		table="JFireTrade_DeliveryNoteLocal_states"
 	 *
 	 * @jdo.join

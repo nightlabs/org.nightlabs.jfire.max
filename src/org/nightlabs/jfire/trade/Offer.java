@@ -290,7 +290,6 @@ implements
 	 *		persistence-modifier="persistent"
 	 *		collection-type="collection"
 	 *		element-type="State"
-	 *		dependent-element="true"
 	 *		table="JFireTrade_Offer_states"
 	 *
 	 * @jdo.join

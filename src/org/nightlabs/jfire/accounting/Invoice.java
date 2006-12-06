@@ -291,7 +291,6 @@ implements Serializable, ArticleContainer, Statable, DetachCallback
 	 *		persistence-modifier="persistent"
 	 *		collection-type="collection"
 	 *		element-type="State"
-	 *		dependent-element="true"
 	 *		table="JFireTrade_Invoice_states"
 	 *
 	 * @jdo.join

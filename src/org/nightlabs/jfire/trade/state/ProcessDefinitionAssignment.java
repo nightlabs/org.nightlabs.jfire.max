@@ -143,8 +143,7 @@ implements Serializable
 			processInstance.getContextInstance().setVariable(ActionHandlerNodeEnter.VARIABLE_NAME_STATABLE_ID, JDOHelper.getObjectId(statable).toString());
 
 			ActionHandlerNodeEnter.createStartState(
-					getPersistenceManager(), user, statable,
-					OfferStateDefinitionUtil.class, processInstance.getProcessDefinition());
+					getPersistenceManager(), user, statable, processInstance.getProcessDefinition());
 
 			return processInstance;
 		} finally {

@@ -74,7 +74,32 @@ implements ISimpleCondition
 	public void setVariableName(String variableName) {
 		this.variableName = variableName;
 	}
-
+	
+//	@Override
+//	public boolean equals(Object obj) 
+//	{
+//		if (obj == null)
+//			return false;		
+//		if (obj instanceof SimpleCondition) {
+//			SimpleCondition sc = (SimpleCondition) obj;			
+//			if (!sc.getVariableName().equals(variableName))
+//				return false;
+//			if (sc.getCompareOperator() != compareOperator)
+//				return false;
+//			if (!sc.getValueAsString().equals(value))
+//				return false;
+//			
+//			return true;
+//		}		
+//		return false;
+//	}
+//	
+//	@Override
+//	public int hashCode() 
+//	{
+//		return variableName.hashCode() + value.hashCode() + compareOperator.hashCode();
+//	}
+	
 //	public String getScriptText() 
 //	{
 //		IConditionGenerator generator = GeneratorRegistry.sharedInstance().getGenerator(getLanguage());

@@ -2,8 +2,12 @@ package org.nightlabs.jfire.jbpm.graph.def;
 
 import java.io.Serializable;
 
+import javax.jdo.JDOHelper;
+import javax.jdo.PersistenceManager;
+
 import org.nightlabs.jfire.idgenerator.IDGenerator;
 import org.nightlabs.jfire.jbpm.graph.def.id.ProcessDefinitionID;
+import org.nightlabs.jfire.security.User;
 import org.nightlabs.jfire.trade.state.id.StateDefinitionID;
 
 /**
@@ -224,5 +228,28 @@ implements Serializable
 	public StateDefinitionDescription getDescription()
 	{
 		return description;
+	}
+
+	/**
+	 * This method creates a new instance of {@link State} and registers it in the {@link StatableLocal} (and
+	 * if <code>{@link #isPublicState()} == true</code>, additionally in {@link Statable}).
+	 *
+	 * @param user The user who is responsible for the creation of the new <code>State</code>.
+	 * @param statable The <code>Statable</code> instance for which the <code>State</code> is created.
+	 * @return the new <code>State</code> instance.
+	 */
+	public State createState(User user, Statable statable)
+	{
+		State state = new State(IDGenerator.getOrganisationID(), IDGenerator.nextID(State.class), user, statable, this);
+
+		PersistenceManager pm = JDOHelper.getPersistenceManager(this);
+		if (pm != null)
+			state = (State) pm.makePersistent(state);
+
+		statable.getStatableLocal().setState(state);
+		if (this.isPublicState())
+				statable.setState(state);
+
+		return state;
 	}
 }

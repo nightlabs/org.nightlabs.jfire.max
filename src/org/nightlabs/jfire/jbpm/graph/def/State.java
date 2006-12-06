@@ -3,6 +3,9 @@ package org.nightlabs.jfire.jbpm.graph.def;
 import java.io.Serializable;
 import java.util.Date;
 
+import javax.jdo.PersistenceManager;
+
+import org.nightlabs.jfire.idgenerator.IDGenerator;
 import org.nightlabs.jfire.security.User;
 
 /**
@@ -70,7 +73,10 @@ implements Serializable
 	 */
 	protected State() { }
 
-	public State(
+	/**
+	 * Use {@link StateDefinition#createState(User, Statable)} instead!
+	 */
+	protected State(
 			String organisationID, long stateID,
 			User user, Statable statable,
 			StateDefinition stateDefinition)
@@ -82,11 +88,13 @@ implements Serializable
 		this.stateDefinition = stateDefinition;
 		this.createDT = new Date();
 
-		// autoregister this State in Statable and StatableLocal
-		statable.getStatableLocal().setState(this);
-
-		if (stateDefinition.isPublicState())
-			statable.setState(this);
+		// auto-registration causes a duplicate key exception (JPOX bug?!) => we register in the StateDefinition#createState method
+		// which is called by ActionHandlerNodeEnter#doExecute(...)
+//		// autoregister this State in Statable and StatableLocal
+//		statable.getStatableLocal().setState(this);
+//
+//		if (stateDefinition.isPublicState())
+//			statable.setState(this);
 	}
 
 	public String getOrganisationID()

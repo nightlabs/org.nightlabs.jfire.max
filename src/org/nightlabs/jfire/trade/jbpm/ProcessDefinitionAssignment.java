@@ -1,4 +1,4 @@
-package org.nightlabs.jfire.trade.state;
+package org.nightlabs.jfire.trade.jbpm;
 
 import java.io.Serializable;
 
@@ -23,7 +23,7 @@ import org.nightlabs.jfire.trade.TradeSide;
  *
  * @jdo.persistence-capable
  *		identity-type="application"
- *		objectid-class="org.nightlabs.jfire.trade.state.id.ProcessDefinitionAssignmentID"
+ *		objectid-class="org.nightlabs.jfire.trade.jbpm.id.ProcessDefinitionAssignmentID"
  *		detachable="true"
  *		table="JFireTrade_ProcessDefinitionAssignment"
  *

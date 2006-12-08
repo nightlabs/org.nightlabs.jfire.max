@@ -1,12 +1,13 @@
-package org.nightlabs.jfire.trade.state;
+package org.nightlabs.jfire.trade.jbpm;
 
 
 /**
  * @author Marco Schulze - marco at nightlabs dot de
  */
-public class OfferStateDefinitionUtil
+public class StateDefinitionConstantsOffer
 {
 	// TODO this class should have constants for all StateDefinitionIDs and TransitionIDs applicable to this context and known to JFireTrade
+	
 //	public static final StateDefinitionID STATE_DEFINITION_ID_CREATED = StateDefinitionID.create(Organisation.DEVIL_ORGANISATION_ID, "Offer.Vendor", Organisation.DEVIL_ORGANISATION_ID, "created");
 //	public static final StateDefinitionID STATE_DEFINITION_ID_FINALIZED = StateDefinitionID.create(Organisation.DEVIL_ORGANISATION_ID, "Offer.Vendor", Organisation.DEVIL_ORGANISATION_ID, "finalized");
 //	public static final StateDefinitionID STATE_DEFINITION_ID_CANCELLED = StateDefinitionID.create(Organisation.DEVIL_ORGANISATION_ID, "Offer.Vendor", Organisation.DEVIL_ORGANISATION_ID, "cancelled");
@@ -16,5 +17,5 @@ public class OfferStateDefinitionUtil
 //	public static final StateDefinitionID STATE_DEFINITION_ID_ABORTED = StateDefinitionID.create(Organisation.DEVIL_ORGANISATION_ID, "Offer.Vendor", Organisation.DEVIL_ORGANISATION_ID, "aborted");
 //	public static final StateDefinitionID STATE_DEFINITION_ID_REVOKED = StateDefinitionID.create(Organisation.DEVIL_ORGANISATION_ID, "Offer.Vendor", Organisation.DEVIL_ORGANISATION_ID, "revoked");
 
-	private OfferStateDefinitionUtil() { }
+	private StateDefinitionConstantsOffer() { }
 }

@@ -221,39 +221,39 @@ public abstract class AccountingManagerBean
 
 
 //			// create the essential InvoiceStateDefinitions
-//			InvoiceStateDefinitionUtil invoiceStateDefinitionUtil;
+//			StateDefinitionConstantsInvoice invoiceStateDefinitionUtil;
 //
-//			invoiceStateDefinitionUtil = new InvoiceStateDefinitionUtil(InvoiceStateDefinitionUtil.STATE_DEFINITION_ID_CREATED);
+//			invoiceStateDefinitionUtil = new StateDefinitionConstantsInvoice(StateDefinitionConstantsInvoice.STATE_DEFINITION_ID_CREATED);
 //			invoiceStateDefinitionUtil.getName().setText(Locale.ENGLISH.getLanguage(), "created");
 //			invoiceStateDefinitionUtil.getDescription().setText(Locale.ENGLISH.getLanguage(), "The Invoice has been newly created. This is the first state in the Invoice related workflow.");
 //			pm.makePersistent(invoiceStateDefinitionUtil);
 //
-//			invoiceStateDefinitionUtil = new InvoiceStateDefinitionUtil(InvoiceStateDefinitionUtil.STATE_DEFINITION_ID_FINALIZED);
+//			invoiceStateDefinitionUtil = new StateDefinitionConstantsInvoice(StateDefinitionConstantsInvoice.STATE_DEFINITION_ID_FINALIZED);
 //			invoiceStateDefinitionUtil.getName().setText(Locale.ENGLISH.getLanguage(), "finalized");
 //			invoiceStateDefinitionUtil.getDescription().setText(Locale.ENGLISH.getLanguage(), "The Invoice has been finalized. After that, it cannot be modified anymore. A modification would require cancellation and recreation.");
 //			pm.makePersistent(invoiceStateDefinitionUtil);
 //
-//			invoiceStateDefinitionUtil = new InvoiceStateDefinitionUtil(InvoiceStateDefinitionUtil.STATE_DEFINITION_ID_BOOKED);
+//			invoiceStateDefinitionUtil = new StateDefinitionConstantsInvoice(StateDefinitionConstantsInvoice.STATE_DEFINITION_ID_BOOKED);
 //			invoiceStateDefinitionUtil.getName().setText(Locale.ENGLISH.getLanguage(), "booked");
 //			invoiceStateDefinitionUtil.getDescription().setText(Locale.ENGLISH.getLanguage(), "The Invoice has been booked. That means, all the money for all Articles has been transferred internally onto the configured Accounts.");
 //			pm.makePersistent(invoiceStateDefinitionUtil);
 //
-//			invoiceStateDefinitionUtil = new InvoiceStateDefinitionUtil(InvoiceStateDefinitionUtil.STATE_DEFINITION_ID_CANCELLED);
+//			invoiceStateDefinitionUtil = new StateDefinitionConstantsInvoice(StateDefinitionConstantsInvoice.STATE_DEFINITION_ID_CANCELLED);
 //			invoiceStateDefinitionUtil.getName().setText(Locale.ENGLISH.getLanguage(), "cancelled");
 //			invoiceStateDefinitionUtil.getDescription().setText(Locale.ENGLISH.getLanguage(), "The Invoice was cancelled after finalization (and maybe after booking). In case it was already booked, a reversing booking has been done. The Article.invoice fields are nulled and the Articles within the Invoice have been replaced by referencingArticles.");
 //			pm.makePersistent(invoiceStateDefinitionUtil);
 //
-//			invoiceStateDefinitionUtil = new InvoiceStateDefinitionUtil(InvoiceStateDefinitionUtil.STATE_DEFINITION_ID_DOUBTFUL);
+//			invoiceStateDefinitionUtil = new StateDefinitionConstantsInvoice(StateDefinitionConstantsInvoice.STATE_DEFINITION_ID_DOUBTFUL);
 //			invoiceStateDefinitionUtil.getName().setText(Locale.ENGLISH.getLanguage(), "doubtful");
 //			invoiceStateDefinitionUtil.getDescription().setText(Locale.ENGLISH.getLanguage(), "The debt became doubtful. That means the person owing money (usually the customer, if it's not refunding) became financially unstable.");
 //			pm.makePersistent(invoiceStateDefinitionUtil);
 //
-//			invoiceStateDefinitionUtil = new InvoiceStateDefinitionUtil(InvoiceStateDefinitionUtil.STATE_DEFINITION_ID_PAID);
+//			invoiceStateDefinitionUtil = new StateDefinitionConstantsInvoice(StateDefinitionConstantsInvoice.STATE_DEFINITION_ID_PAID);
 //			invoiceStateDefinitionUtil.getName().setText(Locale.ENGLISH.getLanguage(), "paid");
 //			invoiceStateDefinitionUtil.getDescription().setText(Locale.ENGLISH.getLanguage(), "The Invoice was paid completely. There's no money outstanding anymore.");
 //			pm.makePersistent(invoiceStateDefinitionUtil);
 //
-//			invoiceStateDefinitionUtil = new InvoiceStateDefinitionUtil(InvoiceStateDefinitionUtil.STATE_DEFINITION_ID_UNCOLLECTABLE);
+//			invoiceStateDefinitionUtil = new StateDefinitionConstantsInvoice(StateDefinitionConstantsInvoice.STATE_DEFINITION_ID_UNCOLLECTABLE);
 //			invoiceStateDefinitionUtil.getName().setText(Locale.ENGLISH.getLanguage(), "uncollectable");
 //			invoiceStateDefinitionUtil.getDescription().setText(Locale.ENGLISH.getLanguage(), "The Invoice will never be paid. Usually this happens when the customer becomes bankrupt.");
 //			pm.makePersistent(invoiceStateDefinitionUtil);

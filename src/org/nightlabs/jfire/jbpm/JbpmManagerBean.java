@@ -20,7 +20,6 @@ import javax.jdo.Query;
 
 import org.apache.log4j.Logger;
 import org.jbpm.JbpmConfiguration;
-import org.jbpm.JbpmContext;
 import org.nightlabs.jdo.NLJDOHelper;
 import org.nightlabs.jdo.moduleregistry.ModuleMetaData;
 import org.nightlabs.jfire.base.BaseSessionBeanImpl;
@@ -205,6 +204,21 @@ implements SessionBean
 
 			JbpmConfiguration jbpmConfiguration = JbpmConfiguration.getInstance(JbpmLookup.getJbpmConfigFileName(getOrganisationID()));
 			JbpmLookup.bindJbpmConfiguration(getOrganisationID(), jbpmConfiguration);
+		} finally {
+			pm.close();
+		}
+	}
+
+	/**
+	 * @ejb.interface-method
+	 * @ejb.transaction type="Supports"
+	 * @ejb.permission role-name="_Guest_"
+	 */
+	public List<State> getStates(Set<StateID> stateIDs, String[] fetchGroups, int maxFetchDepth)
+	{
+		PersistenceManager pm = getPersistenceManager();
+		try {
+			return NLJDOHelper.getDetachedObjectList(pm, stateIDs, State.class, fetchGroups, maxFetchDepth);
 		} finally {
 			pm.close();
 		}

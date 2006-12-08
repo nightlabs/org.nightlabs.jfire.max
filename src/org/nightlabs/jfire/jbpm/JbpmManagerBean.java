@@ -4,9 +4,11 @@ import java.io.File;
 import java.net.URL;
 import java.rmi.RemoteException;
 import java.util.Collection;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 import javax.ejb.CreateException;
@@ -209,17 +211,23 @@ implements SessionBean
 	}
 
 	/**
+	 * @param userExecutable If <code>null</code>, it is ignored. If not <code>null</code>, the query filters only transitions where userExecutable has this value.
+	 *
 	 * @ejb.interface-method
 	 * @ejb.transaction type="Supports"
 	 * @ejb.permission role-name="_Guest_"
 	 */
-	public Set<TransitionID> getTransitionIDs(StateID stateID)
+	public Set<TransitionID> getTransitionIDs(StateID stateID, Boolean userExecutable)
 	{
 		PersistenceManager pm = getPersistenceManager();
 		try {
 			Query q = pm.newQuery(Transition.class);
 			q.setResult("JDOHelper.getObjectId(this)");
-			q.setFilter("this.fromStateDefinition == :stateDefinition");
+			StringBuffer filter = new StringBuffer("this.fromStateDefinition == :stateDefinition");
+			if (userExecutable != null)
+				filter.append(" && this.userExecutable == :userExecutable");
+
+			q.setFilter(filter.toString());
 
 			pm.getExtent(State.class);
 			State state = (State) pm.getObjectById(stateID);
@@ -230,21 +238,32 @@ implements SessionBean
 	}
 
 	/**
+	 * @param stateDefinitionID The StateDefinition from which the transitions leave.
+	 * @param userExecutable If <code>null</code>, it is ignored. If not <code>null</code>, the query filters only transitions where userExecutable has this value.
+	 *
 	 * @ejb.interface-method
 	 * @ejb.transaction type="Supports"
 	 * @ejb.permission role-name="_Guest_"
 	 */
-	public Set<TransitionID> getTransitionIDs(StateDefinitionID stateDefinitionID)
+	public Set<TransitionID> getTransitionIDs(StateDefinitionID stateDefinitionID, Boolean userExecutable)
 	{
 		PersistenceManager pm = getPersistenceManager();
 		try {
 			Query q = pm.newQuery(Transition.class);
 			q.setResult("JDOHelper.getObjectId(this)");
-			q.setFilter("this.fromStateDefinition == :stateDefinition");
+			StringBuffer filter = new StringBuffer("this.fromStateDefinition == :stateDefinition");
+			if (userExecutable != null)
+				filter.append(" && this.userExecutable == :userExecutable");
+
+			q.setFilter(filter.toString());
 
 			pm.getExtent(StateDefinition.class);
 			StateDefinition stateDefinition = (StateDefinition) pm.getObjectById(stateDefinitionID);
-			return new HashSet<TransitionID>((Collection<? extends TransitionID>) q.execute(stateDefinition));
+
+			Map<String, Object> params = new HashMap<String, Object>();
+			params.put("stateDefinition", stateDefinition);
+			params.put("userExecutable", userExecutable);
+			return new HashSet<TransitionID>((Collection<? extends TransitionID>) q.executeWithMap(params));
 		} finally {
 			pm.close();
 		}

@@ -4,6 +4,7 @@ import java.io.Serializable;
 
 import javax.jdo.JDOHelper;
 import javax.jdo.PersistenceManager;
+import javax.jdo.Query;
 
 import org.nightlabs.jfire.idgenerator.IDGenerator;
 import org.nightlabs.jfire.jbpm.graph.def.id.ProcessDefinitionID;
@@ -27,6 +28,11 @@ import org.nightlabs.jfire.trade.state.id.StateDefinitionID;
  *
  * @jdo.fetch-group name="StateDefinition.name" fields="name"
  * @jdo.fetch-group name="StateDefinition.description" fields="description"
+ *
+ * @jdo.query name="getStateDefinitionByProcessDefinitionAndJbpmNodeName" query="SELECT UNIQUE
+ *		WHERE
+ *			this.processDefinition == :processDefinition &&
+ *			this.jbpmNodeName == :jbpmNodeName"
  */
 public class StateDefinition
 implements Serializable
@@ -35,6 +41,17 @@ implements Serializable
 
 	public static final String FETCH_GROUP_NAME = "StateDefinition.name";
 	public static final String FETCH_GROUP_DESCRIPTION = "StateDefinition.description";
+
+	public static StateDefinition getStateDefinition(
+			ProcessDefinition processDefinition, String jbpmNodeName)
+	{
+		PersistenceManager pm = JDOHelper.getPersistenceManager(processDefinition);
+		if (pm == null)
+			throw new IllegalArgumentException("processDefinition is currently not persistent! Cannot obtain PersistenceManager!");
+
+		Query q = pm.newNamedQuery(StateDefinition.class, "getStateDefinitionByProcessDefinitionAndJbpmNodeName");
+		return (StateDefinition) q.execute(processDefinition, jbpmNodeName);
+	}
 
 	public static StateDefinitionID getStateDefinitionID(org.jbpm.graph.def.Node jbpmNode)
 	{

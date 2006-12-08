@@ -98,6 +98,11 @@ public class Transition
 	private String jbpmTransitionName;
 
 	/**
+	 * @jdo.field persistence-modifier="persistent"
+	 */
+	private boolean userExecutable = true;
+
+	/**
 	 * @jdo.field
 	 *		persistence-modifier="persistent"
 	 *		dependent="true"
@@ -105,6 +110,8 @@ public class Transition
 	 *		null-value="exception"
 	 */
 	private TransitionName name;
+
+	// TODO a Transition should have a description as well!
 
 	/**
 	 * @jdo.field persistence-modifier="persistent"
@@ -184,5 +191,14 @@ public class Transition
 	public String getJbpmTransitionName()
 	{
 		return jbpmTransitionName;
+	}
+
+	public boolean isUserExecutable()
+	{
+		return userExecutable;
+	}
+	public void setUserExecutable(boolean userExecutable)
+	{
+		this.userExecutable = userExecutable;
 	}
 }

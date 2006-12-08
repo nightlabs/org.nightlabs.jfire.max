@@ -37,16 +37,20 @@ import org.nightlabs.jfire.scripting.id.ScriptRegistryItemID;
  */
 public class Script 
 {
-	public Script(String language, String text) 
+	public Script(String language, String text, Map<String, ScriptRegistryItemID> variableName2ScriptID) 
 	{
 		if (language == null)
 			throw new IllegalArgumentException("Param language must not be null");
 		
 		if (text == null)
 			throw new IllegalArgumentException("Param text must not be null");
+
+		if (variableName2ScriptID == null)
+			throw new IllegalArgumentException("Param variableName2ScriptID must not be null");
 		
 		this.language = language;
 		this.text = text;
+		this.variableName2ScriptID = variableName2ScriptID;
 	}
 	
 	private String language;

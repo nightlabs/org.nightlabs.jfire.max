@@ -4,7 +4,7 @@ package org.nightlabs.jfire.store.jbpm;
 /**
  * @author Marco Schulze - marco at nightlabs dot de
  */
-public class DeliveryNoteStateDefinitionUtil
+public class StateDefinitionConstantsDeliveryNote
 {
 	// TODO this class should have constants for all StateDefinitionIDs and TransitionIDs applicable to this context and known to JFireTrade
 //	public static final StateDefinitionID STATE_DEFINITION_ID_CREATED = StateDefinitionID.create(Organisation.DEVIL_ORGANISATION_ID, StateDefinitionConstantsDeliveryNote.class.getName(), "created");
@@ -14,5 +14,5 @@ public class DeliveryNoteStateDefinitionUtil
 //
 //	public static final StateDefinitionID STATE_DEFINITION_ID_DELIVERED = StateDefinitionID.create(Organisation.DEVIL_ORGANISATION_ID, StateDefinitionConstantsDeliveryNote.class.getName(), "delivered");
 
-	private DeliveryNoteStateDefinitionUtil() { }
+	private StateDefinitionConstantsDeliveryNote() { }
 }

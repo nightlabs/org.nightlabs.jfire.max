@@ -67,7 +67,7 @@ import org.nightlabs.jfire.store.ProductTypeActionHandler;
 import org.nightlabs.jfire.store.Store;
 import org.nightlabs.jfire.trade.id.ArticleID;
 import org.nightlabs.jfire.trade.jbpm.ProcessDefinitionAssignment;
-import org.nightlabs.jfire.trade.state.id.ProcessDefinitionAssignmentID;
+import org.nightlabs.jfire.trade.jbpm.id.ProcessDefinitionAssignmentID;
 import org.nightlabs.jfire.transfer.id.AnchorID;
 
 /**

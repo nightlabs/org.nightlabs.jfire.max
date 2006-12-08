@@ -34,6 +34,7 @@ import java.util.HashSet;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Locale;
 import java.util.Set;
 
 import javax.ejb.CreateException;
@@ -59,6 +60,8 @@ import org.nightlabs.jfire.idgenerator.IDNamespaceDefault;
 import org.nightlabs.jfire.jbpm.JbpmLookup;
 import org.nightlabs.jfire.jbpm.graph.def.ProcessDefinition;
 import org.nightlabs.jfire.jbpm.graph.def.StateDefinition;
+import org.nightlabs.jfire.jbpm.graph.def.Transition;
+import org.nightlabs.jfire.jbpm.graph.def.id.ProcessDefinitionID;
 import org.nightlabs.jfire.person.Person;
 import org.nightlabs.jfire.security.User;
 import org.nightlabs.jfire.trade.config.LegalEntityViewConfigModule;
@@ -67,8 +70,8 @@ import org.nightlabs.jfire.trade.id.OfferID;
 import org.nightlabs.jfire.trade.id.OfferLocalID;
 import org.nightlabs.jfire.trade.id.OrderID;
 import org.nightlabs.jfire.trade.id.SegmentTypeID;
-import org.nightlabs.jfire.trade.jbpm.JbpmUtil;
 import org.nightlabs.jfire.trade.jbpm.JbpmConstantsOffer;
+import org.nightlabs.jfire.trade.jbpm.JbpmUtil;
 import org.nightlabs.jfire.trade.jbpm.ProcessDefinitionAssignment;
 import org.nightlabs.jfire.transfer.id.AnchorID;
 
@@ -1042,60 +1045,92 @@ implements SessionBean
 			configSetup.getConfigModuleClasses().add(LegalEntityViewConfigModule.class.getName());
 
 
-			// create the essential OfferStateDefinitions
+			// persist process definitions
+			ProcessDefinition processDefinitionOfferCustomer;
+//			ProcessDefinitionID processDefinitionIDOfferCustomer;
+			processDefinitionOfferCustomer = JbpmUtil.storeProcessDefinition(pm, TradeManagerBean.class.getResource("jbpm/offer/customer/"));
+			pm.makePersistent(new ProcessDefinitionAssignment(Offer.class, TradeSide.customer, processDefinitionOfferCustomer));
+//			processDefinitionIDOfferCustomer = (ProcessDefinitionID) JDOHelper.getObjectId(processDefinitionOfferCustomer);
+
+			ProcessDefinition processDefinitionOfferVendor;
+			ProcessDefinitionID processDefinitionIDOfferVendor;
+			processDefinitionOfferVendor = JbpmUtil.storeProcessDefinition(pm, TradeManagerBean.class.getResource("jbpm/offer/vendor/"));
+			pm.makePersistent(new ProcessDefinitionAssignment(Offer.class, TradeSide.vendor, processDefinitionOfferVendor));
+			processDefinitionIDOfferVendor = (ProcessDefinitionID) JDOHelper.getObjectId(processDefinitionOfferVendor);
+
+			// give known StateDefinitions a name and a description
 			StateDefinition stateDefinition;
 
-//			stateDefinition = new StateDefinition(JbpmConstantsOffer.);
-//			offerStateDefinitionUtil = new JbpmConstantsOffer(JbpmConstantsOffer.STATE_DEFINITION_ID_CREATED);
-//			offerStateDefinitionUtil.getName().setText(Locale.ENGLISH.getLanguage(), "created");
-//			offerStateDefinitionUtil.getDescription().setText(Locale.ENGLISH.getLanguage(), "The Offer has been newly created. This is the first state in the Offer related workflow.");
-//			pm.makePersistent(offerStateDefinitionUtil);
-//
-//			offerStateDefinitionUtil = new JbpmConstantsOffer(JbpmConstantsOffer.STATE_DEFINITION_ID_FINALIZED);
-//			offerStateDefinitionUtil.getName().setText(Locale.ENGLISH.getLanguage(), "created");
-//			offerStateDefinitionUtil.getDescription().setText(Locale.ENGLISH.getLanguage(), "The Offer has been finalized. After that, it cannot be modified anymore. A modification would require cancellation and recreation.");
-//			pm.makePersistent(offerStateDefinitionUtil);
-//
-//			offerStateDefinitionUtil = new JbpmConstantsOffer(JbpmConstantsOffer.STATE_DEFINITION_ID_ACCEPTED);
-//			offerStateDefinitionUtil.getName().setText(Locale.ENGLISH.getLanguage(), "accepted");
-//			offerStateDefinitionUtil.getDescription().setText(Locale.ENGLISH.getLanguage(), "The Offer has been accepted by the customer. That turns the offer into a binding contract.");
-//			pm.makePersistent(offerStateDefinitionUtil);
-//
-//			offerStateDefinitionUtil = new JbpmConstantsOffer(JbpmConstantsOffer.STATE_DEFINITION_ID_CANCELLED);
-//			offerStateDefinitionUtil.getName().setText(Locale.ENGLISH.getLanguage(), "cancelled");
-//			offerStateDefinitionUtil.getDescription().setText(Locale.ENGLISH.getLanguage(), "The Offer has been cancelled by the vendor. The result is the same as if the customer had rejected the offer. A cancellation is possible even after the customer has accepted the Offer.");
-//			pm.makePersistent(offerStateDefinitionUtil);
-//
-//			offerStateDefinitionUtil = new JbpmConstantsOffer(JbpmConstantsOffer.STATE_DEFINITION_ID_REJECTED);
-//			offerStateDefinitionUtil.getName().setText(Locale.ENGLISH.getLanguage(), "rejected");
-//			offerStateDefinitionUtil.getDescription().setText(Locale.ENGLISH.getLanguage(), "The Offer has been rejected by the customer. A new Offer needs to be created in order to continue the interaction.");
-//			pm.makePersistent(offerStateDefinitionUtil);
-//
-//			offerStateDefinitionUtil = new JbpmConstantsOffer(JbpmConstantsOffer.STATE_DEFINITION_ID_EXPIRED);
-//			offerStateDefinitionUtil.getName().setText(Locale.ENGLISH.getLanguage(), "expired");
-//			offerStateDefinitionUtil.getDescription().setText(Locale.ENGLISH.getLanguage(), "The Offer has expired - the customer waited too long. A new Offer needs to be created in order to continue the interaction.");
-//			pm.makePersistent(offerStateDefinitionUtil);
-//
-//			offerStateDefinitionUtil = new JbpmConstantsOffer(JbpmConstantsOffer.STATE_DEFINITION_ID_ABORTED);
-//			offerStateDefinitionUtil.getName().setText(Locale.ENGLISH.getLanguage(), "aborted");
-//			offerStateDefinitionUtil.getDescription().setText(Locale.ENGLISH.getLanguage(), "The Offer has been aborted by the vendor. A new Offer needs to be created in order to continue the interaction.");
-//			pm.makePersistent(offerStateDefinitionUtil);
-//
-//			offerStateDefinitionUtil = new JbpmConstantsOffer(JbpmConstantsOffer.STATE_DEFINITION_ID_REVOKED);
-//			offerStateDefinitionUtil.getName().setText(Locale.ENGLISH.getLanguage(), "revoked");
-//			offerStateDefinitionUtil.getDescription().setText(Locale.ENGLISH.getLanguage(), "The Offer has been revoked by the vendor. A new Offer needs to be created in order to continue the interaction.");
-//			pm.makePersistent(offerStateDefinitionUtil);
+			// vendor
+			stateDefinition = StateDefinition.getStateDefinition(processDefinitionOfferVendor, JbpmConstantsOffer.Vendor.STATE_DEFINITION_JBPM_NODE_NAME_CREATED);
+			stateDefinition.getName().setText(Locale.ENGLISH.getLanguage(), "created");
+			stateDefinition.getDescription().setText(Locale.ENGLISH.getLanguage(), "The Offer has been newly created. This is the first state in the Offer related workflow.");
+			stateDefinition.setPublicState(true);
+
+			stateDefinition = StateDefinition.getStateDefinition(processDefinitionOfferVendor, JbpmConstantsOffer.Vendor.STATE_DEFINITION_JBPM_NODE_NAME_ABORTED);
+			stateDefinition.getName().setText(Locale.ENGLISH.getLanguage(), "aborted");
+			stateDefinition.getDescription().setText(Locale.ENGLISH.getLanguage(), "The Offer has been aborted by the vendor (before finalization). A new Offer needs to be created in order to continue the interaction.");
+			stateDefinition.setPublicState(true);
+
+			stateDefinition = StateDefinition.getStateDefinition(processDefinitionOfferVendor, JbpmConstantsOffer.Vendor.STATE_DEFINITION_JBPM_NODE_NAME_FINALIZED);
+			stateDefinition.getName().setText(Locale.ENGLISH.getLanguage(), "finalized");
+			stateDefinition.getDescription().setText(Locale.ENGLISH.getLanguage(), "The Offer has been finalized. After that, it cannot be modified anymore. A modification would require revocation and recreation.");
+			stateDefinition.setPublicState(true);
+
+			stateDefinition = StateDefinition.getStateDefinition(processDefinitionOfferVendor, JbpmConstantsOffer.Vendor.STATE_DEFINITION_JBPM_NODE_NAME_ACCEPTED);
+			stateDefinition.getName().setText(Locale.ENGLISH.getLanguage(), "accepted");
+			stateDefinition.getDescription().setText(Locale.ENGLISH.getLanguage(), "The Offer has been accepted by the customer. That turns the offer into a binding contract.");
+			stateDefinition.setPublicState(true);
+
+			stateDefinition = StateDefinition.getStateDefinition(processDefinitionOfferVendor, JbpmConstantsOffer.Vendor.STATE_DEFINITION_JBPM_NODE_NAME_REVOKED);
+			stateDefinition.getName().setText(Locale.ENGLISH.getLanguage(), "revoked");
+			stateDefinition.getDescription().setText(Locale.ENGLISH.getLanguage(), "The Offer has been revoked by the vendor. The result is the same as if the customer had rejected the offer. A new Offer needs to be created in order to continue the interaction.");
+			stateDefinition.setPublicState(true);
+
+			stateDefinition = StateDefinition.getStateDefinition(processDefinitionOfferVendor, JbpmConstantsOffer.Vendor.STATE_DEFINITION_JBPM_NODE_NAME_REJECTED);
+			stateDefinition.getName().setText(Locale.ENGLISH.getLanguage(), "rejected");
+			stateDefinition.getDescription().setText(Locale.ENGLISH.getLanguage(), "The Offer has been rejected by the customer. A new Offer needs to be created in order to continue the interaction.");
+			stateDefinition.setPublicState(true);
+
+			stateDefinition = StateDefinition.getStateDefinition(processDefinitionOfferVendor, JbpmConstantsOffer.Vendor.STATE_DEFINITION_JBPM_NODE_NAME_EXPIRED);
+			stateDefinition.getName().setText(Locale.ENGLISH.getLanguage(), "expired");
+			stateDefinition.getDescription().setText(Locale.ENGLISH.getLanguage(), "The Offer has expired - the customer waited too long. A new Offer needs to be created in order to continue the interaction.");
+			stateDefinition.setPublicState(true);
+
+			// customer
+			stateDefinition = StateDefinition.getStateDefinition(processDefinitionOfferCustomer, JbpmConstantsOffer.Customer.STATE_DEFINITION_JBPM_NODE_NAME_FINALIZED);
+			stateDefinition.getName().setText(Locale.ENGLISH.getLanguage(), "finalized");
+			stateDefinition.getDescription().setText(Locale.ENGLISH.getLanguage(), "The Offer has been finalized. After that, it cannot be modified anymore. A modification would require revocation and recreation. The customer needs to decide know whether he accepts or rejects. If the customer does not decide within a certain time, the Offer expires.");
+			stateDefinition.setPublicState(true);
+
+			stateDefinition = StateDefinition.getStateDefinition(processDefinitionOfferCustomer, JbpmConstantsOffer.Customer.STATE_DEFINITION_JBPM_NODE_NAME_CUSTOMER_ACCEPTED);
+			stateDefinition.getName().setText(Locale.ENGLISH.getLanguage(), "customer accepted");
+			stateDefinition.getDescription().setText(Locale.ENGLISH.getLanguage(), "The customer has accepted the Offer.");
+			stateDefinition.setPublicState(true);
+
+			stateDefinition = StateDefinition.getStateDefinition(processDefinitionOfferCustomer, JbpmConstantsOffer.Customer.STATE_DEFINITION_JBPM_NODE_NAME_CUSTOMER_REJECTED);
+			stateDefinition.getName().setText(Locale.ENGLISH.getLanguage(), "customer rejected");
+			stateDefinition.getDescription().setText(Locale.ENGLISH.getLanguage(), "The customer has rejected the Offer.");
+			stateDefinition.setPublicState(true);
 
 
-			// persist process definitions
-			ProcessDefinition pd;
-			pd = JbpmUtil.storeProcessDefinition(pm, TradeManagerBean.class.getResource("jbpm/offer/customer/")); // processdefinition.xml"));
-			pm.makePersistent(new ProcessDefinitionAssignment(Offer.class, TradeSide.customer, pd));
+			// give known Transitions a name
+			Transition transition;
 
-			pd = JbpmUtil.storeProcessDefinition(pm, TradeManagerBean.class.getResource("jbpm/offer/vendor/")); // processdefinition.xml"));
-			pm.makePersistent(new ProcessDefinitionAssignment(Offer.class, TradeSide.vendor, pd));
+			// vendor
+			transition = (Transition) pm.getObjectById(JbpmConstantsOffer.Vendor.getTransitionID_created_2_accept(processDefinitionIDOfferVendor));
+			transition.getName().setText(Locale.ENGLISH.getLanguage(), "accept");
+
+			transition = (Transition) pm.getObjectById(JbpmConstantsOffer.Vendor.getTransitionID_finalized_2_customerAccepted(processDefinitionIDOfferVendor));
+			transition.getName().setText(Locale.ENGLISH.getLanguage(), "customer accepted");
+			transition.setUserExecutable(false);
+
+			transition = (Transition) pm.getObjectById(JbpmConstantsOffer.Vendor.getTransitionID_finalized_2_customerRejected(processDefinitionIDOfferVendor));
+			transition.getName().setText(Locale.ENGLISH.getLanguage(), "customer rejected");
+			transition.setUserExecutable(false);
 
 
+			// switch off the IDGenerator's caches for Order and Offer
 			IDNamespaceDefault idNamespaceDefault = IDNamespaceDefault.createIDNamespaceDefault(pm, getOrganisationID(), Order.class);
 			idNamespaceDefault.setCacheSizeServer(0);
 			idNamespaceDefault.setCacheSizeClient(0);

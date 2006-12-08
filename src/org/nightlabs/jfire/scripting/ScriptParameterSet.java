@@ -42,6 +42,8 @@ import javax.jdo.PersistenceManager;
 import javax.jdo.Query;
 import javax.jdo.listener.StoreCallback;
 
+import org.nightlabs.util.CollectionUtil;
+
 /**
  * A ScriptParameterSet can only be manipulated by the owner organisation. Hence, it contains
  * always (in all datastores) the same parameters and is everywhere (except in its "home" datastore)
@@ -71,7 +73,7 @@ import javax.jdo.listener.StoreCallback;
  * 
  */
  public class ScriptParameterSet
-		implements Serializable, StoreCallback
+		implements Serializable, IScriptParameterSet //, StoreCallback
 {
 	private static final long serialVersionUID = 1L;
 	
@@ -105,7 +107,7 @@ import javax.jdo.listener.StoreCallback;
 	 *
 	 * @jdo.key mapped-by="scriptParameterID"
 	 */
-	private Map parameters;
+	private Map<String, ScriptParameter> parameters;
 
 	/**
 	 * @jdo.field
@@ -115,7 +117,7 @@ import javax.jdo.listener.StoreCallback;
 	 *		mapped-by="scriptParameterSet"
 	 *		dependent-element="true"
 	 */
-	private List orderedParameters;
+	private List<ScriptParameter> orderedParameters;
 	
 	/**
 	 * @jdo.field persistence-modifier="persistent"
@@ -150,17 +152,19 @@ import javax.jdo.listener.StoreCallback;
 		return scriptParameterSetID;
 	}
 
-	public Set getParameterIDs()
+	public Set<String> getParameterIDs()
 	{
 		return Collections.unmodifiableSet(parameters.keySet());
 	}
 
-	public Collection getParameters()
+	public Collection<ScriptParameter> getParameters()
 	{
 		return Collections.unmodifiableCollection(parameters.values());
+//		Collection<IScriptParameter> params = CollectionUtil.castCollection(parameters.values()); 
+//		return Collections.unmodifiableCollection(params);
 	}
 	
-	public SortedSet getSortedParameters() {
+	public SortedSet<ScriptParameter> getSortedParameters() {
 		SortedSet sortedParams = new TreeSet(parameters.values());
 		return Collections.unmodifiableSortedSet(sortedParams);
 	}
@@ -224,32 +228,36 @@ import javax.jdo.listener.StoreCallback;
 		return name;
 	}
 
-	public void jdoPreStore() {
-		if (!JDOHelper.isNew(this)) 
-			return;
-		
-		PersistenceManager pm = JDOHelper.getPersistenceManager(this);
-		if (pm == null)
-			throw new IllegalStateException("Could not get PersistenceManager jdoPreStore()");
-		
-		
-		if (scriptParameterSetID < 0) {
-			// TODO: add check for organisationID
-			ScriptRegistry scriptRegistry = ScriptRegistry.getScriptRegistry(pm);
-			scriptParameterSetID = scriptRegistry.createScriptParameterSetID();
-			for (Iterator it = getParameters().iterator(); it.hasNext(); ) {
-				ScriptParameter parameter = (ScriptParameter) it.next();
-				if (parameter.getScriptParameterSetID() != scriptParameterSetID)
-					parameter.setScriptParameterSetID(scriptParameterSetID);
-			}
-		}
-
-		ScriptParameterSetChangeEvent.addChangeEventToController(
-				pm,
-				ScriptParameterSetChangeEvent.EVENT_TYPE_SET_ADDED,
-				this
-			);		
-	}
+//	/**
+//	 * TODO: Remove this StoreCallback, ScriptParameterSets should be created 
+//	 * with ID from IDGenerator
+//	 */
+//	public void jdoPreStore() {
+//		if (!JDOHelper.isNew(this)) 
+//			return;
+//		
+//		PersistenceManager pm = JDOHelper.getPersistenceManager(this);
+//		if (pm == null)
+//			throw new IllegalStateException("Could not get PersistenceManager jdoPreStore()");
+//		
+//		
+//		if (scriptParameterSetID < 0) {
+//			// TODO: add check for organisationID
+//			ScriptRegistry scriptRegistry = ScriptRegistry.getScriptRegistry(pm);
+//			scriptParameterSetID = scriptRegistry.createScriptParameterSetID();
+//			for (Iterator it = getParameters().iterator(); it.hasNext(); ) {
+//				ScriptParameter parameter = (ScriptParameter) it.next();
+//				if (parameter.getScriptParameterSetID() != scriptParameterSetID)
+//					parameter.setScriptParameterSetID(scriptParameterSetID);
+//			}
+//		}
+//
+//		ScriptParameterSetChangeEvent.addChangeEventToController(
+//				pm,
+//				ScriptParameterSetChangeEvent.EVENT_TYPE_SET_ADDED,
+//				this
+//			);		
+//	}
 
 	/**
 	 * Get all ParameterSets of an organisation.

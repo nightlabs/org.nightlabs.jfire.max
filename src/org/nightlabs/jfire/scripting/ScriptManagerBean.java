@@ -45,6 +45,7 @@ import org.nightlabs.i18n.I18nText;
 import org.nightlabs.jdo.NLJDOHelper;
 import org.nightlabs.jdo.moduleregistry.ModuleMetaData;
 import org.nightlabs.jfire.base.BaseSessionBeanImpl;
+import org.nightlabs.jfire.idgenerator.IDGenerator;
 import org.nightlabs.jfire.scripting.id.ScriptParameterSetID;
 import org.nightlabs.jfire.scripting.id.ScriptRegistryItemID;
 
@@ -371,7 +372,7 @@ implements SessionBean
 		pm = getPersistenceManager();
 		try {
 			ScriptRegistry registry = ScriptRegistry.getScriptRegistry(pm);
-			long setID = registry.createScriptParameterSetID();
+			long setID = IDGenerator.nextID(ScriptParameterSet.class);
 			ScriptParameterSet set = new ScriptParameterSet(getOrganisationID(), setID);
 			set.getName().copyFrom(name);
 			pm.getFetchPlan().setMaxFetchDepth(maxFetchDepth);

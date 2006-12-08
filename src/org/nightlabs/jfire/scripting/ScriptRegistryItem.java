@@ -189,7 +189,7 @@ public abstract class ScriptRegistryItem
 
 	public void setParameterSet(ScriptParameterSet parameterSet)
 	{
-		this.parameterSet = parameterSet;
+		this.parameterSet = (ScriptParameterSet) parameterSet;
 	}
 
 	@Override

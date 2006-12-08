@@ -48,6 +48,7 @@ import javax.xml.transform.TransformerException;
 import org.apache.log4j.Logger;
 import org.nightlabs.ModuleException;
 import org.nightlabs.i18n.I18nText;
+import org.nightlabs.jfire.idgenerator.IDGenerator;
 import org.nightlabs.jfire.organisation.Organisation;
 import org.nightlabs.jfire.scripting.id.ScriptRegistryItemID;
 import org.nightlabs.jfire.servermanager.JFireServerManager;
@@ -254,7 +255,7 @@ public class ScriptingInitializer
 			return parameterSet;
 		if (parameterSet == null) {
 			ScriptRegistry registry = ScriptRegistry.getScriptRegistry(pm);
-			parameterSet = new ScriptParameterSet(organisationID, registry.createScriptParameterSetID());
+			parameterSet = new ScriptParameterSet(organisationID, IDGenerator.nextID(ScriptParameterSet.class));
 			pm.makePersistent(parameterSet);
 		}
 		createElementName(setNode, parameterSet.getName(), "ParameterSet"+parameterSet.getScriptParameterSetID());
@@ -346,7 +347,7 @@ public class ScriptingInitializer
 			if (catDocument != null) {
 				catNode = NLDOMUtil.findSingleNode(catDocument, "script-category");
 				if (catNode != null) {
-					ScriptParameterSet parameterSet = createParameterSet(pm, organisationID, category.getParameterSet(), catNode);
+					ScriptParameterSet parameterSet = createParameterSet(pm, organisationID, (ScriptParameterSet)category.getParameterSet(), catNode);
 					if (parameterSet != null)
 						category.setParameterSet(parameterSet);
 				}
@@ -439,7 +440,7 @@ public class ScriptingInitializer
 					
 					// script name and parameters
 					if (scriptNode != null) {
-						ScriptParameterSet parameterSet = createParameterSet(pm, organisationID, script.getParameterSet(), scriptNode);						
+						ScriptParameterSet parameterSet = createParameterSet(pm, organisationID, (ScriptParameterSet)script.getParameterSet(), scriptNode);						
 						if (parameterSet != null)
 							script.setParameterSet(parameterSet);
 					}

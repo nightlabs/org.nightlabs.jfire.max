@@ -253,13 +253,6 @@ public class ScriptRegistry
 		return scriptExecutor;
 	}
 
-	public synchronized long createScriptParameterSetID()
-	{
-		long res = nextScriptParameterSetID;
-		nextScriptParameterSetID = res + 1;
-		return res;
-	}
-
 	protected PersistenceManager getPersistenceManager()
 	{
 		PersistenceManager pm = JDOHelper.getPersistenceManager(this);
@@ -398,6 +391,27 @@ public class ScriptRegistry
 					scriptExecutor.execute());
 		}
 		return res;
+	}
+	
+	public List<Object> executeScripts(List<IScript> scripts, List<Map<String, Object>> parameterValues)
+	throws
+		IllegalArgumentException,
+		ClassNotFoundException,
+		InstantiationException,
+		IllegalAccessException,
+		ScriptException
+	{
+		if (scripts.size() != parameterValues.size())
+			throw new IllegalArgumentException("scripts.size() != parameterValues.size()");
+
+		List<Object> res = new ArrayList<Object>(scripts.size());
+		Iterator<Map<String,Object>> parameterValuesIterator = parameterValues.iterator();
+		for (IScript script : scripts) {
+			ScriptExecutor scriptExecutor = createScriptExecutor(script.getLanguage());
+			scriptExecutor.prepare(script, parameterValuesIterator.next());
+			res.add(scriptExecutor.execute());
+		}
+		return res;		
 	}
 	
 	public Map<ScriptRegistryItemID, Script> getScripts(Collection<ScriptRegistryItemID> scriptItemsIDs) 

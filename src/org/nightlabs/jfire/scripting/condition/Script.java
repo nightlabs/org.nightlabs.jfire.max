@@ -28,6 +28,8 @@ package org.nightlabs.jfire.scripting.condition;
 import java.util.HashMap;
 import java.util.Map;
 
+import org.nightlabs.jfire.scripting.IScript;
+import org.nightlabs.jfire.scripting.IScriptParameterSet;
 import org.nightlabs.jfire.scripting.id.ScriptRegistryItemID;
 
 
@@ -36,6 +38,7 @@ import org.nightlabs.jfire.scripting.id.ScriptRegistryItemID;
  *
  */
 public class Script 
+implements IScript
 {
 	public Script(String language, String text, Map<String, ScriptRegistryItemID> variableName2ScriptID) 
 	{
@@ -53,6 +56,9 @@ public class Script
 		this.variableName2ScriptID = variableName2ScriptID;
 	}
 	
+	/**
+	 * the name of the script language
+	 */
 	private String language;
 	public String getLanguage() {
 		return language;
@@ -61,6 +67,9 @@ public class Script
 		this.language = language;
 	}
 
+	/**
+	 * the script language dependend script
+	 */
 	private String text;
 	public String getText() {
 		return text;
@@ -69,6 +78,11 @@ public class Script
 		this.text = text;
 	}
 
+	/**
+	 * a map which maps variablenames of the scriptText to {@link ScriptRegistryItemID}
+	 * key: variablename of the scriptText
+	 * value: the corresponding {@link ScriptRegistryItemID}
+	 */
 	private Map<String, ScriptRegistryItemID> variableName2ScriptID = new HashMap<String, ScriptRegistryItemID>();
 	public Map<String, ScriptRegistryItemID> getVariableName2ScriptID() {
 		return variableName2ScriptID;		
@@ -76,5 +90,49 @@ public class Script
 	public void setVariableName2ScriptID(Map<String, ScriptRegistryItemID> variableName2ScriptID) {
 		this.variableName2ScriptID = variableName2ScriptID;
 	}
+	 
+	/**
+	 * a map which maps the variablenames of the scriptText to the values
+	 * key: variablename of the scriptText
+	 * value: the value of the script with the corresponding ScriptRegistryItemID, which can be determined from
+	 * {@link Script#getVariableName2ScriptID()}
+	 */
+	private transient Map<String, Object> variableName2Value = new HashMap<String, Object>();
+	public Map<String, Object> getVariableName2Value() {
+		return variableName2Value;
+	}
+	public void setVariableName2Value(Map<String, Object> variableName2Value) {
+		this.variableName2Value = variableName2Value;
+	}
 	
+	//***************************** Compatibilty Reasons for IScript **************************
+	private IScriptParameterSet parameterSet = new ConditionScriptParameterSet(); 
+	public IScriptParameterSet getParameterSet() {
+		return parameterSet; 
+	}	
+	
+	private String[] fetchGroups = null; 
+	public String[] getFetchGroups() {
+		return fetchGroups;
+	}
+	
+	private int maxFetchDepth = 0;
+	public int getMaxFetchDepth() {
+		return maxFetchDepth;
+	}
+			
+	public Class getResultClass()
+	throws ClassNotFoundException
+	{
+		return Boolean.class;
+	}
+	
+	public boolean isNeedsDetach() {
+		return false;
+	}
+	
+	public String getResultClassName() {
+		return Boolean.class.getName();
+	}
+
 }

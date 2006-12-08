@@ -54,7 +54,8 @@ import org.nightlabs.jfire.scripting.id.ScriptRegistryItemID;
 public abstract class ScriptExecutor
 {
 	private boolean prepared = false;
-	private Script script;
+//	private Script script;
+	private IScript script;
 	private Map<String, Object> parameterValues;
 
 	/**
@@ -97,6 +98,37 @@ public abstract class ScriptExecutor
 		return persistenceManager;
 	}
 
+//	/**
+//	 * @param script The script that shall be executed.
+//	 * @param parameterValues The parameter values or <code>null</code>, if no
+//	 *		parameters are required.
+//	 * @throws ScriptException If sth. goes wrong while preparing. Especially
+//	 *		{@link UndefinedParameterValueException}s and {@link UndeclaredParameterException}s
+//	 *		might happen.
+//	 */
+//	public final void prepare(Script script, Map<String, Object> parameterValues)
+//		throws ScriptException
+//	{
+//		preparing = true;
+//		try {
+//			if (script == null)
+//				throw new IllegalArgumentException("script must not be null!");
+//	
+//			this.script = script;
+//	
+//			if (parameterValues == null)
+//				parameterValues = new HashMap<String, Object>(0);
+//	
+//			this.parameterValues = parameterValues;
+//	
+//			validateParameters();
+//			doPrepare();
+//			prepared = true;
+//		} finally {
+//			preparing = false;
+//		}
+//	}
+
 	/**
 	 * @param script The script that shall be executed.
 	 * @param parameterValues The parameter values or <code>null</code>, if no
@@ -105,7 +137,7 @@ public abstract class ScriptExecutor
 	 *		{@link UndefinedParameterValueException}s and {@link UndeclaredParameterException}s
 	 *		might happen.
 	 */
-	public final void prepare(Script script, Map<String, Object> parameterValues)
+	public final void prepare(IScript script, Map<String, Object> parameterValues)
 		throws ScriptException
 	{
 		preparing = true;
@@ -162,7 +194,7 @@ public abstract class ScriptExecutor
 	 */
 	protected static Set<String> getUndefinedParameterIDs(Script script, Map<String, Object> parameterValues)
 	{
-		ScriptParameterSet parameterSet = script.getParameterSet();
+		IScriptParameterSet parameterSet = script.getParameterSet();
 		Set<String> res = new HashSet<String>(parameterSet.getParameterIDs());
 		res.removeAll(parameterValues.keySet());
 		return res;
@@ -175,7 +207,7 @@ public abstract class ScriptExecutor
 	 */
 	protected static Set<String> getUndeclaredParameterIDs(Script script, Map<String, Object> parameterValues)
 	{
-		ScriptParameterSet parameterSet = script.getParameterSet();
+		IScriptParameterSet parameterSet = script.getParameterSet();
 		Set<String> res = new HashSet<String>(parameterValues.keySet());
 		res.removeAll(parameterSet.getParameterIDs());
 		return res;
@@ -188,7 +220,7 @@ public abstract class ScriptExecutor
 	protected void validateParameters()
 			throws ScriptException
 	{
-		ScriptParameterSet parameterSet = getScript().getParameterSet();
+		IScriptParameterSet parameterSet = getScript().getParameterSet();
 
 		// get the declared parameters and put them into "undefined" set, because
 		// we will remove all that are defined.
@@ -221,6 +253,21 @@ public abstract class ScriptExecutor
 					undeclaredParameterIDs);
 	}
 
+//	/**
+//	 * Returns the script set with {@link #prepare(Script, Map)}. 
+//	 * If prepare was not called prior to this method
+//	 * an {@link IllegalStateException} will be thrown.
+//	 * 
+//	 * @return The script to execute.
+//	 */
+//	public Script getScript()
+//	{
+//		if (!isPrepared() && !preparing)
+//			throw new IllegalStateException("Cannot obtain script prior to prepare(...)! Call prepare(...) first!");
+//
+//		return script;
+//	}
+
 	/**
 	 * Returns the script set with {@link #prepare(Script, Map)}. 
 	 * If prepare was not called prior to this method
@@ -228,7 +275,7 @@ public abstract class ScriptExecutor
 	 * 
 	 * @return The script to execute.
 	 */
-	public Script getScript()
+	public IScript getScript()
 	{
 		if (!isPrepared() && !preparing)
 			throw new IllegalStateException("Cannot obtain script prior to prepare(...)! Call prepare(...) first!");

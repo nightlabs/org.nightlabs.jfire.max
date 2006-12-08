@@ -29,12 +29,9 @@ package org.nightlabs.jfire.scripting;
 import java.io.Serializable;
 import java.util.Collection;
 
-import javax.jdo.FetchPlan;
 import javax.jdo.JDODetachedFieldAccessException;
 import javax.jdo.PersistenceManager;
 import javax.jdo.Query;
-
-import org.nightlabs.jdo.NLJDOHelper;
 
 /**
  * @author Marco Schulze - marco at nightlabs dot de
@@ -67,7 +64,7 @@ import org.nightlabs.jdo.NLJDOHelper;
  */
 public class Script
 		extends ScriptRegistryItem
-		implements Serializable
+		implements Serializable, IScript
 {
 	private static final long serialVersionUID = 1L;
 

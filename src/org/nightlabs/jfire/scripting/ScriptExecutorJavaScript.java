@@ -81,7 +81,7 @@ public class ScriptExecutorJavaScript
 				ScriptableObject.putProperty(scope, me.getKey(), js_value);
 			}
 
-			Script script = getScript();
+			IScript script = getScript();
 			Object result = context.evaluateString(
 					scope, script.getText(), JDOHelper.getObjectId(script).toString(), 1, null);
 

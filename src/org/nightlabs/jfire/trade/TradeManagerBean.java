@@ -68,7 +68,7 @@ import org.nightlabs.jfire.trade.id.OfferLocalID;
 import org.nightlabs.jfire.trade.id.OrderID;
 import org.nightlabs.jfire.trade.id.SegmentTypeID;
 import org.nightlabs.jfire.trade.jbpm.JbpmUtil;
-import org.nightlabs.jfire.trade.jbpm.StateDefinitionConstantsOffer;
+import org.nightlabs.jfire.trade.jbpm.JbpmConstantsOffer;
 import org.nightlabs.jfire.trade.jbpm.ProcessDefinitionAssignment;
 import org.nightlabs.jfire.transfer.id.AnchorID;
 
@@ -1045,43 +1045,43 @@ implements SessionBean
 			// create the essential OfferStateDefinitions
 			StateDefinition stateDefinition;
 
-//			stateDefinition = new StateDefinition(StateDefinitionConstantsOffer.);
-//			offerStateDefinitionUtil = new StateDefinitionConstantsOffer(StateDefinitionConstantsOffer.STATE_DEFINITION_ID_CREATED);
+//			stateDefinition = new StateDefinition(JbpmConstantsOffer.);
+//			offerStateDefinitionUtil = new JbpmConstantsOffer(JbpmConstantsOffer.STATE_DEFINITION_ID_CREATED);
 //			offerStateDefinitionUtil.getName().setText(Locale.ENGLISH.getLanguage(), "created");
 //			offerStateDefinitionUtil.getDescription().setText(Locale.ENGLISH.getLanguage(), "The Offer has been newly created. This is the first state in the Offer related workflow.");
 //			pm.makePersistent(offerStateDefinitionUtil);
 //
-//			offerStateDefinitionUtil = new StateDefinitionConstantsOffer(StateDefinitionConstantsOffer.STATE_DEFINITION_ID_FINALIZED);
+//			offerStateDefinitionUtil = new JbpmConstantsOffer(JbpmConstantsOffer.STATE_DEFINITION_ID_FINALIZED);
 //			offerStateDefinitionUtil.getName().setText(Locale.ENGLISH.getLanguage(), "created");
 //			offerStateDefinitionUtil.getDescription().setText(Locale.ENGLISH.getLanguage(), "The Offer has been finalized. After that, it cannot be modified anymore. A modification would require cancellation and recreation.");
 //			pm.makePersistent(offerStateDefinitionUtil);
 //
-//			offerStateDefinitionUtil = new StateDefinitionConstantsOffer(StateDefinitionConstantsOffer.STATE_DEFINITION_ID_ACCEPTED);
+//			offerStateDefinitionUtil = new JbpmConstantsOffer(JbpmConstantsOffer.STATE_DEFINITION_ID_ACCEPTED);
 //			offerStateDefinitionUtil.getName().setText(Locale.ENGLISH.getLanguage(), "accepted");
 //			offerStateDefinitionUtil.getDescription().setText(Locale.ENGLISH.getLanguage(), "The Offer has been accepted by the customer. That turns the offer into a binding contract.");
 //			pm.makePersistent(offerStateDefinitionUtil);
 //
-//			offerStateDefinitionUtil = new StateDefinitionConstantsOffer(StateDefinitionConstantsOffer.STATE_DEFINITION_ID_CANCELLED);
+//			offerStateDefinitionUtil = new JbpmConstantsOffer(JbpmConstantsOffer.STATE_DEFINITION_ID_CANCELLED);
 //			offerStateDefinitionUtil.getName().setText(Locale.ENGLISH.getLanguage(), "cancelled");
 //			offerStateDefinitionUtil.getDescription().setText(Locale.ENGLISH.getLanguage(), "The Offer has been cancelled by the vendor. The result is the same as if the customer had rejected the offer. A cancellation is possible even after the customer has accepted the Offer.");
 //			pm.makePersistent(offerStateDefinitionUtil);
 //
-//			offerStateDefinitionUtil = new StateDefinitionConstantsOffer(StateDefinitionConstantsOffer.STATE_DEFINITION_ID_REJECTED);
+//			offerStateDefinitionUtil = new JbpmConstantsOffer(JbpmConstantsOffer.STATE_DEFINITION_ID_REJECTED);
 //			offerStateDefinitionUtil.getName().setText(Locale.ENGLISH.getLanguage(), "rejected");
 //			offerStateDefinitionUtil.getDescription().setText(Locale.ENGLISH.getLanguage(), "The Offer has been rejected by the customer. A new Offer needs to be created in order to continue the interaction.");
 //			pm.makePersistent(offerStateDefinitionUtil);
 //
-//			offerStateDefinitionUtil = new StateDefinitionConstantsOffer(StateDefinitionConstantsOffer.STATE_DEFINITION_ID_EXPIRED);
+//			offerStateDefinitionUtil = new JbpmConstantsOffer(JbpmConstantsOffer.STATE_DEFINITION_ID_EXPIRED);
 //			offerStateDefinitionUtil.getName().setText(Locale.ENGLISH.getLanguage(), "expired");
 //			offerStateDefinitionUtil.getDescription().setText(Locale.ENGLISH.getLanguage(), "The Offer has expired - the customer waited too long. A new Offer needs to be created in order to continue the interaction.");
 //			pm.makePersistent(offerStateDefinitionUtil);
 //
-//			offerStateDefinitionUtil = new StateDefinitionConstantsOffer(StateDefinitionConstantsOffer.STATE_DEFINITION_ID_ABORTED);
+//			offerStateDefinitionUtil = new JbpmConstantsOffer(JbpmConstantsOffer.STATE_DEFINITION_ID_ABORTED);
 //			offerStateDefinitionUtil.getName().setText(Locale.ENGLISH.getLanguage(), "aborted");
 //			offerStateDefinitionUtil.getDescription().setText(Locale.ENGLISH.getLanguage(), "The Offer has been aborted by the vendor. A new Offer needs to be created in order to continue the interaction.");
 //			pm.makePersistent(offerStateDefinitionUtil);
 //
-//			offerStateDefinitionUtil = new StateDefinitionConstantsOffer(StateDefinitionConstantsOffer.STATE_DEFINITION_ID_REVOKED);
+//			offerStateDefinitionUtil = new JbpmConstantsOffer(JbpmConstantsOffer.STATE_DEFINITION_ID_REVOKED);
 //			offerStateDefinitionUtil.getName().setText(Locale.ENGLISH.getLanguage(), "revoked");
 //			offerStateDefinitionUtil.getDescription().setText(Locale.ENGLISH.getLanguage(), "The Offer has been revoked by the vendor. A new Offer needs to be created in order to continue the interaction.");
 //			pm.makePersistent(offerStateDefinitionUtil);

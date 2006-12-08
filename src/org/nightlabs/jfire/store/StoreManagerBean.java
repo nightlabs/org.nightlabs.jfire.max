@@ -168,29 +168,29 @@ implements SessionBean
 
 
 //			// create the essential DeliveryNoteStateDefinitions
-//			StateDefinitionConstantsDeliveryNote deliveryNoteStateDefinitionUtil;
+//			JbpmConstantsDeliveryNote deliveryNoteStateDefinitionUtil;
 //
-//			deliveryNoteStateDefinitionUtil = new StateDefinitionConstantsDeliveryNote(StateDefinitionConstantsDeliveryNote.STATE_DEFINITION_ID_CREATED);
+//			deliveryNoteStateDefinitionUtil = new JbpmConstantsDeliveryNote(JbpmConstantsDeliveryNote.STATE_DEFINITION_ID_CREATED);
 //			deliveryNoteStateDefinitionUtil.getName().setText(Locale.ENGLISH.getLanguage(), "created");
 //			deliveryNoteStateDefinitionUtil.getDescription().setText(Locale.ENGLISH.getLanguage(), "The DeliveryNote has been newly created. This is the first state in the DeliveryNote related workflow.");
 //			pm.makePersistent(deliveryNoteStateDefinitionUtil);
 //
-//			deliveryNoteStateDefinitionUtil = new StateDefinitionConstantsDeliveryNote(StateDefinitionConstantsDeliveryNote.STATE_DEFINITION_ID_FINALIZED);
+//			deliveryNoteStateDefinitionUtil = new JbpmConstantsDeliveryNote(JbpmConstantsDeliveryNote.STATE_DEFINITION_ID_FINALIZED);
 //			deliveryNoteStateDefinitionUtil.getName().setText(Locale.ENGLISH.getLanguage(), "finalized");
 //			deliveryNoteStateDefinitionUtil.getDescription().setText(Locale.ENGLISH.getLanguage(), "The DeliveryNote was finalized. After that, it cannot be modified anymore. A modification would require cancellation and recreation.");
 //			pm.makePersistent(deliveryNoteStateDefinitionUtil);
 //
-//			deliveryNoteStateDefinitionUtil = new StateDefinitionConstantsDeliveryNote(StateDefinitionConstantsDeliveryNote.STATE_DEFINITION_ID_BOOKED);
+//			deliveryNoteStateDefinitionUtil = new JbpmConstantsDeliveryNote(JbpmConstantsDeliveryNote.STATE_DEFINITION_ID_BOOKED);
 //			deliveryNoteStateDefinitionUtil.getName().setText(Locale.ENGLISH.getLanguage(), "booked");
 //			deliveryNoteStateDefinitionUtil.getDescription().setText(Locale.ENGLISH.getLanguage(), "The DeliveryNote has been booked. That means, all the product transfers for all Articles has been performed internally onto the configured Repositories.");
 //			pm.makePersistent(deliveryNoteStateDefinitionUtil);
 //
-//			deliveryNoteStateDefinitionUtil = new StateDefinitionConstantsDeliveryNote(StateDefinitionConstantsDeliveryNote.STATE_DEFINITION_ID_CANCELLED);
+//			deliveryNoteStateDefinitionUtil = new JbpmConstantsDeliveryNote(JbpmConstantsDeliveryNote.STATE_DEFINITION_ID_CANCELLED);
 //			deliveryNoteStateDefinitionUtil.getName().setText(Locale.ENGLISH.getLanguage(), "cancelled");
 //			deliveryNoteStateDefinitionUtil.getDescription().setText(Locale.ENGLISH.getLanguage(), "The DeliveryNote was cancelled after finalization (and maybe after booking). In case it was already booked, a reversing booking has been done. The Article.deliveryNote fields are nulled and the Articles within the DeliveryNote have been replaced by referencingArticles.");
 //			pm.makePersistent(deliveryNoteStateDefinitionUtil);
 //
-//			deliveryNoteStateDefinitionUtil = new StateDefinitionConstantsDeliveryNote(StateDefinitionConstantsDeliveryNote.STATE_DEFINITION_ID_DELIVERED);
+//			deliveryNoteStateDefinitionUtil = new JbpmConstantsDeliveryNote(JbpmConstantsDeliveryNote.STATE_DEFINITION_ID_DELIVERED);
 //			deliveryNoteStateDefinitionUtil.getName().setText(Locale.ENGLISH.getLanguage(), "delivered");
 //			deliveryNoteStateDefinitionUtil.getDescription().setText(Locale.ENGLISH.getLanguage(), "All Articles of the DeliveryNote were delivered. There's no Article left that still needs to be delivered.");
 //			pm.makePersistent(deliveryNoteStateDefinitionUtil);

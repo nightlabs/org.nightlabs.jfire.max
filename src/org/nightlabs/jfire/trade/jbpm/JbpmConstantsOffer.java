@@ -7,7 +7,7 @@ import org.nightlabs.jfire.trade.state.id.StateDefinitionID;
 /**
  * @author Marco Schulze - marco at nightlabs dot de
  */
-public class StateDefinitionConstantsOffer
+public class JbpmConstantsOffer
 {
 	public static class Vendor {
 		private static final String PROCESS_DEFINITION_ID = "Offer.Vendor";
@@ -44,5 +44,5 @@ public class StateDefinitionConstantsOffer
 //	public static final StateDefinitionID STATE_DEFINITION_ID_ABORTED = StateDefinitionID.create(Organisation.DEVIL_ORGANISATION_ID, "Offer.Vendor", Organisation.DEVIL_ORGANISATION_ID, "aborted");
 //	public static final StateDefinitionID STATE_DEFINITION_ID_REVOKED = StateDefinitionID.create(Organisation.DEVIL_ORGANISATION_ID, "Offer.Vendor", Organisation.DEVIL_ORGANISATION_ID, "revoked");
 
-	private StateDefinitionConstantsOffer() { }
+	private JbpmConstantsOffer() { }
 }

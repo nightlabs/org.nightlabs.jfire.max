@@ -231,7 +231,11 @@ implements SessionBean
 
 			pm.getExtent(State.class);
 			State state = (State) pm.getObjectById(stateID);
-			return new HashSet<TransitionID>((Collection<? extends TransitionID>) q.execute(state.getStateDefinition()));
+
+			Map<String, Object> params = new HashMap<String, Object>();
+			params.put("stateDefinition", state.getStateDefinition());
+			params.put("userExecutable", userExecutable);
+			return new HashSet<TransitionID>((Collection<? extends TransitionID>) q.executeWithMap(params));
 		} finally {
 			pm.close();
 		}

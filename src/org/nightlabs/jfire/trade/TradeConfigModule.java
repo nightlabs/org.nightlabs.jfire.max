@@ -3,6 +3,7 @@ package org.nightlabs.jfire.trade;
 import java.util.HashMap;
 import java.util.Map;
 
+import org.nightlabs.annotation.Implement;
 import org.nightlabs.jfire.accounting.Currency;
 import org.nightlabs.jfire.accounting.Invoice;
 import org.nightlabs.jfire.config.Config;
@@ -51,19 +52,12 @@ public class TradeConfigModule
 	 */
 	private Map idPrefixCfs = null;
 
-	public TradeConfigModule(String organisationID, Config config, String cfModID)
-	{
-		super(organisationID, config, cfModID);
-		idPrefixCfs = new HashMap(); 
+	public TradeConfigModule() { }
+
+	@Implement
+	public void init() {
+		idPrefixCfs = new HashMap();
 	}
-
-	/**
-	 * @deprecated Only for JDO!
-	 */
-	protected TradeConfigModule() { }
-
-	@Override
-	public void init() { }
 
 	public Currency getCurrency()
 	{

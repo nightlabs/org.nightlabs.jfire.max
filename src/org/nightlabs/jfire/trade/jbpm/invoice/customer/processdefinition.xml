@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<process-definition
+  xmlns=""  name="devil.NightLabs.org:Invoice.Customer">
+   <start-state name="devil.NightLabs.org:finalized">
+   </start-state>
+</process-definition>

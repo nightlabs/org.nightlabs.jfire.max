@@ -29,7 +29,6 @@ package org.nightlabs.jfire.trade.config;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.nightlabs.jfire.config.Config;
 import org.nightlabs.jfire.config.ConfigModule;
 import org.nightlabs.jfire.person.PersonStruct;
 
@@ -58,9 +57,9 @@ public class LegalEntityViewConfigModule extends ConfigModule {
 		super();
 	}
 
-	public LegalEntityViewConfigModule(String organisationID, Config config, String cfModID) {
-		super(organisationID, config, cfModID);
-	}
+//	public LegalEntityViewConfigModule(String organisationID, Config config, String cfModID) {
+//		super(organisationID, config, cfModID);
+//	}
 	
 	/**
 	 * @jdo.field

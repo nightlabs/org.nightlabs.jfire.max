@@ -1,12 +1,19 @@
 package org.nightlabs.jfire.jbpm.graph.def;
 
 import java.io.Serializable;
+import java.util.Collection;
 import java.util.Date;
+import java.util.HashSet;
+import java.util.Set;
 
+import javax.jdo.JDOHelper;
 import javax.jdo.PersistenceManager;
+import javax.jdo.Query;
 
+import org.nightlabs.jdo.ObjectID;
 import org.nightlabs.jfire.idgenerator.IDGenerator;
 import org.nightlabs.jfire.security.User;
+import org.nightlabs.jfire.trade.state.id.StateID;
 
 /**
  * @author Marco Schulze - marco at nightlabs dot de
@@ -26,6 +33,9 @@ import org.nightlabs.jfire.security.User;
  * @jdo.fetch-group name="State.user" fields="user"
  * @jdo.fetch-group name="State.statable" fields="statable"
  * @jdo.fetch-group name="State.stateDefinition" fields="stateDefinition"
+ *
+ * @jdo.query name="getStateIDsForStatable" query="SELECT JDOHelper.getObjectId(this)
+ *		WHERE this.statable == :statable"
  */
 public class State
 implements Serializable
@@ -35,6 +45,13 @@ implements Serializable
 	public static final String FETCH_GROUP_USER = "State.user";
 	public static final String FETCH_GROUP_STATABLE = "State.statable";
 	public static final String FETCH_GROUP_STATE_DEFINITION = "State.stateDefinition";
+
+	public static Set<StateID> getStateIDsForStatableID(PersistenceManager pm, ObjectID statableID)
+	{
+		Statable statable = (Statable) pm.getObjectById(statableID);
+		Query q = pm.newNamedQuery(State.class, "getStateIDsForStatable");
+		return new HashSet<StateID>((Collection<? extends StateID>) q.execute(statable));
+	}
 
 	/**
 	 * @jdo.field primary-key="true"

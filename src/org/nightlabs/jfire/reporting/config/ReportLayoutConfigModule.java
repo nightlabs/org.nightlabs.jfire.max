@@ -58,9 +58,9 @@ public class ReportLayoutConfigModule extends ConfigModule {
 		super();
 	}
 	
-	public ReportLayoutConfigModule(String organisationID, Config config, String cfModID) {
-		super(organisationID, config, cfModID);
-	}
+//	public ReportLayoutConfigModule(String organisationID, Config config, String cfModID) {
+//		super(organisationID, config, cfModID);
+//	}
 
 	/**
 	 * key: String reportRegistryItemType

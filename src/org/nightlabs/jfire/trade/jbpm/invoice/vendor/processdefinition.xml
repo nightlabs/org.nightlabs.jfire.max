@@ -3,5 +3,22 @@
 <process-definition
   xmlns=""  name="devil.NightLabs.org:Invoice.Vendor">
    <start-state name="devil.NightLabs.org:created">
+      <transition name="" to="aborted"></transition>
+      <transition name="finalize" to="devil.NightLabs.org:finalized"></transition>
    </start-state>
+   <state name="devil.NightLabs.org:finalized">
+      <transition name="" to="booked"></transition>
+      <transition name="tr2" to="devil.NightLabs.org:paid"></transition>
+      <transition name="tr3" to="devil.NightLabs.org:doubtful"></transition>
+   </state>
+   <state name="booked">
+      <transition name="" to="devil.NightLabs.org:finalized"></transition>
+   </state>
+   <end-state name="aborted"></end-state>
+   <state name="devil.NightLabs.org:doubtful">
+      <transition name="" to="devil.NightLabs.org:uncollectable"></transition>
+      <transition name="tr2" to="devil.NightLabs.org:paid"></transition>
+   </state>
+   <end-state name="devil.NightLabs.org:uncollectable"></end-state>
+   <end-state name="devil.NightLabs.org:paid"></end-state>
 </process-definition>

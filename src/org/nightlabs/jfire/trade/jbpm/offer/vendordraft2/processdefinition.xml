@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<process-definition
+  xmlns=""  name="devil.NightLabs.org:Offer.Vendor">
+   <start-state name="devil.NightLabs.org:created">
+      <transition name="abort" to="devil.NightLabs.org:aborted"></transition>
+      <transition name="devil.NightLabs.org:accept" to="devil.NightLabs.org:accepted"></transition>
+      <transition name="finalize" to="devil.NightLabs.org:finalized"></transition>
+   </start-state>
+   <end-state name="devil.NightLabs.org:rejected"></end-state>
+   <end-state name="devil.NightLabs.org:accepted"></end-state>
+   <state name="devil.NightLabs.org:finalized">
+      <transition name="expire" to="devil.NightLabs.org:expired"></transition>
+      <transition name="revoke" to="devil.NightLabs.org:revoked"></transition>
+      <transition name="reject" to="devil.NightLabs.org:rejected"></transition>
+      <transition name="accept" to="devil.NightLabs.org:accepted"></transition>
+      <transition name="send" to="devil.NightLabs.org:sent"></transition>
+   </state>
+   <end-state name="devil.NightLabs.org:expired"></end-state>
+   <end-state name="devil.NightLabs.org:aborted"></end-state>
+   <end-state name="devil.NightLabs.org:revoked"></end-state>
+   <node name="devil.NightLabs.org:customerAccepted">
+      <transition name="accept" to="devil.NightLabs.org:accepted"></transition>
+   </node>
+   <node name="devil.NightLabs.org:customerRejected">
+      <transition name="reject" to="devil.NightLabs.org:rejected"></transition>
+   </node>
+   <state name="devil.NightLabs.org:sent">
+   <transition name="devil.NightLabs.org:customerAccepted" to="devil.NightLabs.org:customerAccepted"></transition>
+      <transition name="devil.NightLabs.org:customerRejected" to="devil.NightLabs.org:customerRejected"></transition>
+      <transition name="expire" to="devil.NightLabs.org:expired"></transition>
+      <transition name="revoke" to="devil.NightLabs.org:revoked"></transition>
+      <transition name="reject" to="devil.NightLabs.org:rejected"></transition>
+      
+   </state>
+</process-definition>

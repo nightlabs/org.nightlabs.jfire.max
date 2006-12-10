@@ -4,4 +4,8 @@
   xmlns=""  name="devil.NightLabs.org:DeliveryNote.Vendor">
    <start-state name="devil.NightLabs.org:created">
    </start-state>
+   <state name="devil.NightLabs.org:finalized"></state>
+   <state name="devil.NightLabs.org:booked"></state>
+   <end-state name="devil.NightLabs.org:aborted"></end-state>
+   <end-state name="devil.NightLabs.org:delivered"></end-state>
 </process-definition>

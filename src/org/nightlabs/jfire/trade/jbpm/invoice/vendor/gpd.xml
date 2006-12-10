@@ -1,5 +1,41 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<process-diagram name="devil.NightLabs.org:Invoice.Vendor" width="767" height="633">
-  <node name="devil.NightLabs.org:created" x="233" y="138" width="206" height="40"/>
+<process-diagram name="devil.NightLabs.org:Invoice.Vendor" width="767" height="634">
+  <node name="devil.NightLabs.org:created" x="233" y="30" width="206" height="40">
+    <transition name="">
+      <label x="5" y="-10"/>
+    </transition>
+    <transition name="finalize">
+      <label x="5" y="-10"/>
+    </transition>
+  </node>
+  <node name="devil.NightLabs.org:finalized" x="232" y="127" width="207" height="40">
+    <transition name="">
+      <label x="5" y="-10"/>
+      <bendpoint w1="-113" h1="-1" w2="84" h2="-48"/>
+    </transition>
+    <transition name="tr2">
+      <label x="5" y="-10"/>
+    </transition>
+    <transition name="tr3">
+      <label x="5" y="-10"/>
+    </transition>
+  </node>
+  <node name="booked" x="69" y="171" width="140" height="40">
+    <transition name="">
+      <label x="5" y="-10"/>
+      <bendpoint w1="122" h1="0" w2="-75" h2="47"/>
+    </transition>
+  </node>
+  <node name="aborted" x="553" y="68" width="140" height="40"/>
+  <node name="devil.NightLabs.org:doubtful" x="105" y="335" width="208" height="40">
+    <transition name="">
+      <label x="5" y="-10"/>
+    </transition>
+    <transition name="tr2">
+      <label x="5" y="-10"/>
+    </transition>
+  </node>
+  <node name="devil.NightLabs.org:uncollectable" x="106" y="406" width="207" height="40"/>
+  <node name="devil.NightLabs.org:paid" x="379" y="405" width="195" height="40"/>
 </process-diagram>

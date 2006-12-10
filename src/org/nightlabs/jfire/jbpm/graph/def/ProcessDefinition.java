@@ -56,7 +56,7 @@ implements Serializable
 	}
 
 	/**
-	 * @param jbpmProcessDefinitionURL The URL pointing to the processdefinition.xml file
+	 * @param jbpmProcessDefinitionURL The URL pointing to the processdefinition.xml file's directory
 	 * @return the newly created {@link ProcessDefinition} (or the old one with a new version, if it previously existed.
 	 * @throws IOException 
 	 */
@@ -97,11 +97,14 @@ implements Serializable
 
 	/**
 	 * @param jbpmContext The jbpm context to work in. Can be <code>null</code> which will cause a context to be implicitely created and closed.
-	 * @param jbpmProcessDefinitionURL The URL pointing to the processdefinition.xml file
+	 * @param jbpmProcessDefinitionURL The URL pointing to the processdefinition.xml file's directory
 	 * @return the newly created {@link ProcessDefinition} (or the old one with a new version, if it previously existed.
 	 * @throws IOException 
 	 */
-	public static ProcessDefinition storeProcessDefinition(PersistenceManager pm, JbpmContext jbpmContext, org.jbpm.graph.def.ProcessDefinition jbpmProcessDefinition)
+	public static ProcessDefinition storeProcessDefinition(
+			PersistenceManager pm, JbpmContext jbpmContext, org.jbpm.graph.def.ProcessDefinition jbpmProcessDefinition,
+			URL jbpmProcessDefinitionURL)
+	throws IOException
 	{
 		pm.getExtent(ProcessDefinition.class);
 
@@ -117,9 +120,10 @@ implements Serializable
 			ProcessDefinition processDefinition;
 			try {
 				processDefinition = (ProcessDefinition) pm.getObjectById(processDefinitionID);
-				processDefinition.createProcessDefinitionVersion(jbpmProcessDefinition);
+				processDefinition.createProcessDefinitionVersion(jbpmProcessDefinition, jbpmProcessDefinitionURL);
 			} catch (JDOObjectNotFoundException x) {
-				processDefinition = (ProcessDefinition) pm.makePersistent(new ProcessDefinition(processDefinitionID, jbpmProcessDefinition));
+				processDefinition = (ProcessDefinition) pm.makePersistent(
+						new ProcessDefinition(processDefinitionID, jbpmProcessDefinition, jbpmProcessDefinitionURL));
 			}
 
 			// create StateDefinitions
@@ -188,16 +192,20 @@ implements Serializable
 	protected ProcessDefinition()
 	{
 	}
-	protected ProcessDefinition(ProcessDefinitionID processDefinitionID, org.jbpm.graph.def.ProcessDefinition jbpmProcessDefinition)
+	protected ProcessDefinition(ProcessDefinitionID processDefinitionID, org.jbpm.graph.def.ProcessDefinition jbpmProcessDefinition, URL jbpmProcessDefinitionURL)
+	throws IOException
 	{
-		this(processDefinitionID.organisationID, processDefinitionID.processDefinitionID, jbpmProcessDefinition);
+		this(processDefinitionID.organisationID, processDefinitionID.processDefinitionID, jbpmProcessDefinition,
+				jbpmProcessDefinitionURL);
 	}
-	protected ProcessDefinition(String organisationID, String processDefinitionID, org.jbpm.graph.def.ProcessDefinition jbpmProcessDefinition)
+	protected ProcessDefinition(String organisationID, String processDefinitionID, org.jbpm.graph.def.ProcessDefinition jbpmProcessDefinition,
+			URL jbpmProcessDefinitionURL)
+	throws IOException
 	{
 		this.organisationID = organisationID;
 		this.processDefinitionID = processDefinitionID;
 		processDefinitionVersions = new ArrayList<ProcessDefinitionVersion>();
-		createProcessDefinitionVersion(jbpmProcessDefinition);
+		createProcessDefinitionVersion(jbpmProcessDefinition, jbpmProcessDefinitionURL);
 	}
 
 	/**
@@ -205,10 +213,12 @@ implements Serializable
 	 * and makes it the current version (retrievable via {@link #getProcessDefinitionVersion()}).
 	 * @param jbpmProcessDefinition
 	 * @return
+	 * @throws IOException 
 	 */
-	public ProcessDefinitionVersion createProcessDefinitionVersion(org.jbpm.graph.def.ProcessDefinition jbpmProcessDefinition)
+	public ProcessDefinitionVersion createProcessDefinitionVersion(org.jbpm.graph.def.ProcessDefinition jbpmProcessDefinition, URL jbpmProcessDefinitionURL)
+	throws IOException
 	{
-		processDefinitionVersion = new ProcessDefinitionVersion(this, jbpmProcessDefinition);
+		processDefinitionVersion = new ProcessDefinitionVersion(this, jbpmProcessDefinition, jbpmProcessDefinitionURL);
 		processDefinitionVersions.add(processDefinitionVersion);
 		return processDefinitionVersion;
 	}

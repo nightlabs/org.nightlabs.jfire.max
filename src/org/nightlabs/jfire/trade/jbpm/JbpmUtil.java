@@ -21,6 +21,6 @@ public class JbpmUtil
 		ActionHandlerNodeEnter.register(jbpmProcessDefinition);
 
 		// store it
-		return ProcessDefinition.storeProcessDefinition(pm, null, jbpmProcessDefinition);
+		return ProcessDefinition.storeProcessDefinition(pm, null, jbpmProcessDefinition, jbpmProcessDefinitionURL);
 	}
 }

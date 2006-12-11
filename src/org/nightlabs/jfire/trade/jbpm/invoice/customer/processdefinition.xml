@@ -2,6 +2,19 @@
 
 <process-definition
   xmlns=""  name="devil.NightLabs.org:Invoice.Customer">
-   <start-state name="devil.NightLabs.org:finalized">
+   <start-state name="devil.NightLabs.org:sent">
+      <transition name="book" to="devil.NightLabs.org:booked"></transition>
+      <transition name="dispute" to="disputeStarted here????"></transition>
    </start-state>
+   <end-state name="devil.NightLabs.org:paid"></end-state>
+   <state name="devil.NightLabs.org:booked">
+      <transition name="devil.NightLabs.org:pay" to="devil.NightLabs.org:paid"></transition>
+      <transition name="dispute" to="disputeStarted better here?"></transition>
+   </state>
+   <state name="disputeStarted here????">
+      <transition name="book" to="devil.NightLabs.org:booked"></transition>
+   </state>
+   <state name="disputeStarted better here?">
+      <transition name="devil.NightLabs.org:pay" to="devil.NightLabs.org:paid"></transition>
+   </state>
 </process-definition>

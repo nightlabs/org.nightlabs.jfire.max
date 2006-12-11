@@ -1,5 +1,31 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<process-diagram name="devil.NightLabs.org:Invoice.Customer" width="767" height="633">
-  <node name="devil.NightLabs.org:finalized" x="233" y="138" width="206" height="40"/>
+<process-diagram name="devil.NightLabs.org:Invoice.Customer" width="742" height="635">
+  <node name="devil.NightLabs.org:sent" x="3" y="3" width="216" height="40">
+    <transition name="book">
+      <label x="0" y="-10"/>
+    </transition>
+    <transition name="dispute">
+      <label x="5" y="-10"/>
+    </transition>
+  </node>
+  <node name="devil.NightLabs.org:paid" x="1" y="211" width="220" height="40"/>
+  <node name="devil.NightLabs.org:booked" x="2" y="103" width="219" height="40">
+    <transition name="devil.NightLabs.org:pay">
+      <label x="-1" y="-10"/>
+    </transition>
+    <transition name="dispute">
+      <label x="5" y="-10"/>
+    </transition>
+  </node>
+  <node name="disputeStarted here????" x="400" y="2" width="179" height="40">
+    <transition name="book">
+      <label x="44" y="-12"/>
+    </transition>
+  </node>
+  <node name="disputeStarted better here?" x="401" y="104" width="179" height="40">
+    <transition name="devil.NightLabs.org:pay">
+      <label x="34" y="-12"/>
+    </transition>
+  </node>
 </process-diagram>

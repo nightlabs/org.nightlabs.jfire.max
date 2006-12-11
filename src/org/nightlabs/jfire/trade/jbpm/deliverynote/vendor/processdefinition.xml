@@ -3,9 +3,19 @@
 <process-definition
   xmlns=""  name="devil.NightLabs.org:DeliveryNote.Vendor">
    <start-state name="devil.NightLabs.org:created">
+      <transition name="finalize" to="devil.NightLabs.org:finalized"></transition>
+      <transition name="abort" to="devil.NightLabs.org:aborted"></transition>
    </start-state>
-   <state name="devil.NightLabs.org:finalized"></state>
-   <state name="devil.NightLabs.org:booked"></state>
+   <state name="devil.NightLabs.org:finalized">
+      <transition name="devil.NightLabs.org:book" to="devil.NightLabs.org:booked"></transition>
+   </state>
+   <state name="devil.NightLabs.org:booked">
+      <transition name="devil.NightLabs.org:send" to="devil.NightLabs.org:sent"></transition>
+      <transition name="devil.NightLabs.org:deliver" to="devil.NightLabs.org:delivered"></transition>
+   </state>
    <end-state name="devil.NightLabs.org:aborted"></end-state>
    <end-state name="devil.NightLabs.org:delivered"></end-state>
+   <node name="devil.NightLabs.org:sent">
+      <transition name="afterSent" to="devil.NightLabs.org:booked"></transition>
+   </node>
 </process-definition>

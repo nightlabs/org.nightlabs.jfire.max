@@ -2,6 +2,11 @@
 
 <process-definition
   xmlns=""  name="devil.NightLabs.org:DeliveryNote.Customer">
-   <start-state name="devil.NightLabs.org:finalized">
+   <start-state name="devil.NightLabs.org:sent">
+      <transition name="check" to="checked"></transition>
    </start-state>
+   <state name="checked">
+      <transition name="book" to="devil.NightLabs.org:booked"></transition>
+   </state>
+   <state name="devil.NightLabs.org:booked"></state>
 </process-definition>

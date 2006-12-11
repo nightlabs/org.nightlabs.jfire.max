@@ -1,0 +1,82 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<process-diagram name="devil.NightLabs.org:Invoice.Vendor" width="742" height="634">
+  <node name="devil.NightLabs.org:created" x="97" y="21" width="206" height="40">
+    <transition name="abort">
+      <label x="-47" y="-14"/>
+    </transition>
+    <transition name="finalize">
+      <label x="5" y="-10"/>
+    </transition>
+  </node>
+  <node name="devil.NightLabs.org:finalized" x="97" y="109" width="207" height="40">
+    <transition name="devil.NightLabs.org:book">
+      <label x="-131" y="-10"/>
+    </transition>
+  </node>
+  <node name="devil.NightLabs.org:aborted" x="420" y="21" width="221" height="40"/>
+  <node name="devil.NightLabs.org:doubtful" x="427" y="402" width="214" height="40">
+    <transition name="devil.NightLabs.org:pay">
+      <label x="-130" y="-13"/>
+      <bendpoint w1="-87" h1="41" w2="246" h2="0"/>
+    </transition>
+    <transition name="bookUnreceivable">
+      <label x="5" y="-10"/>
+    </transition>
+    <transition name="trust">
+      <label x="5" y="-10"/>
+      <bendpoint w1="-45" h1="-38" w2="287" h2="168"/>
+      <bendpoint w1="-197" h1="-38" w2="135" h2="168"/>
+    </transition>
+  </node>
+  <node name="devil.NightLabs.org:uncollectable" x="429" y="581" width="207" height="40"/>
+  <node name="devil.NightLabs.org:paid" x="104" y="443" width="195" height="40"/>
+  <node name="devil.NightLabs.org:booked" x="98" y="196" width="208" height="40">
+    <transition name="devil.NightLabs.org:send">
+      <label x="16" y="-8"/>
+    </transition>
+    <transition name="doubt">
+      <label x="-113" y="-125"/>
+      <bendpoint w1="140" h1="206" w2="-192" h2="0"/>
+    </transition>
+    <transition name="devil.NightLabs.org:pay">
+      <label x="-124" y="-55"/>
+    </transition>
+    <transition name="sendReminder">
+      <label x="-49" y="-13"/>
+    </transition>
+  </node>
+  <node name="devil.NightLabs.org:sent" x="425" y="85" width="170" height="40">
+    <transition name="">
+      <label x="5" y="-10"/>
+      <bendpoint w1="-110" h1="-2" w2="198" h2="-113"/>
+    </transition>
+  </node>
+  <node name="devil.NightLabs.org:bookedUnreceivable" x="414" y="499" width="240" height="40">
+    <transition name="endAsUncollectable">
+      <label x="5" y="-10"/>
+    </transition>
+  </node>
+  <node name="devil.NightLabs.org:reminderSent" x="423" y="196" width="221" height="40">
+    <transition name="sendPreCollectionLetter">
+      <label x="5" y="-10"/>
+    </transition>
+    <transition name="devil.NightLabs.org:pay">
+      <label x="33" y="-16"/>
+      <bendpoint w1="-180" h1="61" w2="152" h2="-186"/>
+    </transition>
+    <transition name="doubt">
+      <label x="-58" y="-117"/>
+      <bendpoint w1="175" h1="0" w2="188" h2="-208"/>
+      <bendpoint w1="175" h1="206" w2="188" h2="-2"/>
+    </transition>
+  </node>
+  <node name="devil.NightLabs.org:preCollectionLetterSent" x="397" y="297" width="273" height="40">
+    <transition name="doubt">
+      <label x="5" y="-10"/>
+    </transition>
+    <transition name="devil.NightLabs.org:pay">
+      <label x="-30" y="-50"/>
+    </transition>
+  </node>
+</process-diagram>

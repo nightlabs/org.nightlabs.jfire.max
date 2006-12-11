@@ -74,7 +74,8 @@ extends ConstrainedConditionGenerator
 	}
 
 	public String getVariableString() {
-		return "$";
+//		return "$";
+		return "";
 	}
 
 	public String getCloseContainerString() {

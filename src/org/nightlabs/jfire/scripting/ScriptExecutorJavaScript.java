@@ -30,6 +30,7 @@ import java.util.Map;
 
 import javax.jdo.JDOHelper;
 import javax.jdo.PersistenceManager;
+import javax.jdo.spi.PersistenceCapable;
 
 import org.mozilla.javascript.Context;
 import org.mozilla.javascript.ImporterTopLevel;
@@ -62,19 +63,12 @@ public class ScriptExecutorJavaScript
 	{
 		Context context = Context.enter();
 		try {
-//		 Scriptable scope = context.initStandardObjects();
 			Scriptable scope = new ImporterTopLevel(context);
 
-			Object js_pm = Context.javaToJS(getPersistenceManager(), scope);
-			ScriptableObject.putProperty(scope, VARIABLE_PERSISTENCE_MANAGER, js_pm);
-
-//			String importPackages = getImportPackages();
-//			if (importPackages != null)
-//				formula = "importPackage(" + importPackages + ");\n" + formula;
-//
-//			String importClasses = getImportClasses();
-//			if (importClasses != null)
-//				formula = "importClass(" + importClasses + ");\n" + formula;
+			if (getPersistenceManager() != null) {
+				Object js_pm = Context.javaToJS(getPersistenceManager(), scope);
+				ScriptableObject.putProperty(scope, VARIABLE_PERSISTENCE_MANAGER, js_pm);				
+			}
 
 			for (Map.Entry<String, Object> me : getParameterValues().entrySet()) {
 				Object js_value = Context.javaToJS(me.getValue(), scope);
@@ -82,15 +76,25 @@ public class ScriptExecutorJavaScript
 			}
 
 			IScript script = getScript();
+			String sourceName = "Script";
+			if (script instanceof PersistenceCapable) {
+				sourceName = JDOHelper.getObjectId(script).toString();
+			}
 			Object result = context.evaluateString(
-					scope, script.getText(), JDOHelper.getObjectId(script).toString(), 1, null);
+					scope, script.getText(), sourceName, 1, null);
 
 			if (result instanceof Undefined)
 				result = null;
 			else if (result instanceof NativeJavaObject)
 				result = ((NativeJavaObject)result).unwrap();
+			else if (result instanceof Boolean)
+				; // fine - no conversion necessary
+			else if (result instanceof Number)
+				; // fine - no conversion necessary
+			else if (result instanceof String)
+				; // fine - no conversion necessary
 			else
-				throw new IllegalStateException("context.evaluateString(...) returned an object of an unknown type!");
+				throw new IllegalStateException("context.evaluateString(...) returned an object of an unknown type: " + (result == null ? null : result.getClass().getName()));
 
 			return result;
 		} finally {

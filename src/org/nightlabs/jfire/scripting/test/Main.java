@@ -23,23 +23,63 @@
  *                                                                             *
  *                                                                             *
  ******************************************************************************/
-package org.nightlabs.jfire.scripting;
+package org.nightlabs.jfire.scripting.test;
 
-import java.io.Serializable;
-import java.util.Collection;
-import java.util.Set;
+import org.mozilla.javascript.Context;
+import org.mozilla.javascript.ImporterTopLevel;
+import org.mozilla.javascript.NativeJavaObject;
+import org.mozilla.javascript.Scriptable;
+import org.mozilla.javascript.Undefined;
 
 /**
  * @author Daniel.Mazurek [at] NightLabs [dot] de
  *
  */
-public interface IScriptParameterSet
-extends Serializable
-{
-	public Collection<ScriptParameter> getParameters();
-	public Set<String> getParameterIDs();
-	
-//	public IScriptParameter createParameter(String scriptParameterID);
-//	public long getScriptParameterSetID();
-//	public void removeAllParameters();
+public class Main {
+
+	public Main() {
+		// TODO Auto-generated constructor stub
+	}
+
+	public static void main(String[] args) {
+		Context context = Context.enter();
+		try {
+			Scriptable scope = new ImporterTopLevel(context);
+
+
+			String sourceName = "Script";
+			Object result = context.evaluateString(
+					scope,
+//					"new Packages.org.nightlabs.jfire.scripting.test.Main();",
+//					"new java.lang.Long(\"5983724587634867435\")",
+//					"\"Blubb\"",
+					"new java.util.Date()",
+					sourceName, 1, null);
+
+			System.out.println("result=" + result);
+			System.out.println("result.class=" + (result == null ? null : result.getClass().getName()));
+
+			if (result instanceof Undefined)
+				result = null;
+			else if (result instanceof NativeJavaObject)
+				result = ((NativeJavaObject)result).unwrap();
+			else if (result instanceof Boolean)
+				; // fine - no conversion necessary
+			else if (result instanceof Number)
+				; // fine - no conversion necessary
+			else if (result instanceof String)
+				; // fine - no conversion necessary
+//			else
+//				throw new IllegalStateException("context.evaluateString(...) returned an object of an unknown type!");
+
+			System.out.println("AFTER CONVERSION");
+			System.out.println("result=" + result);
+			System.out.println("result.class=" + (result == null ? null : result.getClass().getName()));
+		} finally {
+			Context.exit();
+		}
+
+
+	}
+
 }

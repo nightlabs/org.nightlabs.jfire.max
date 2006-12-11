@@ -37,6 +37,7 @@ import javax.ejb.CreateException;
 import javax.ejb.EJBException;
 import javax.ejb.SessionBean;
 import javax.ejb.SessionContext;
+import javax.jdo.JDOHelper;
 import javax.jdo.PersistenceManager;
 
 import org.apache.log4j.Logger;
@@ -47,6 +48,7 @@ import org.nightlabs.jdo.moduleregistry.ModuleMetaData;
 import org.nightlabs.jfire.base.BaseSessionBeanImpl;
 import org.nightlabs.jfire.idgenerator.IDGenerator;
 import org.nightlabs.jfire.scripting.id.ScriptParameterSetID;
+import org.nightlabs.jfire.scripting.id.ScriptRegistryID;
 import org.nightlabs.jfire.scripting.id.ScriptRegistryItemID;
 
 /**
@@ -438,6 +440,52 @@ implements SessionBean
 			pm.close();
 		}
 	}		
+	
+	/**
+	 * returns the detached {@link ScriptRegistry}
+	 * 
+	 * @ejb.interface-method
+	 * @ejb.permission role-name="_Guest_"
+	 * @ejb.transaction type = "Required"
+	 */	
+	public ScriptRegistry getScriptRegistry(String[] fetchGroups, int maxFetchDepth)
+	throws ModuleException
+	{
+		PersistenceManager pm;
+		pm = getPersistenceManager();
+		try {
+			pm.getFetchPlan().setGroups(fetchGroups);
+			pm.getFetchPlan().setMaxFetchDepth(maxFetchDepth);
+			ScriptRegistry scriptRegistry = (ScriptRegistry) pm.getObjectById(ScriptRegistry.SINGLETON_ID);
+			scriptRegistry = (ScriptRegistry) pm.detachCopy(scriptRegistry);
+			return scriptRegistry;
+		} finally {
+			pm.close();
+		}
+	}
+	
+	/**
+	 * returns the detached {@link ScriptRegistry}
+	 * 
+	 * @ejb.interface-method
+	 * @ejb.permission role-name="_Guest_"
+	 * @ejb.transaction type = "Required"
+	 */	
+	public ScriptRegistry getScriptRegistry()
+	throws ModuleException
+	{
+		PersistenceManager pm;
+		pm = getPersistenceManager();
+		try {
+			pm.getFetchPlan().setGroup(ScriptRegistry.FETCH_GROUP_THIS_SCRIPT_REGISTRY);
+			pm.getFetchPlan().setMaxFetchDepth(NLJDOHelper.MAX_FETCH_DEPTH_NO_LIMIT);
+			ScriptRegistry scriptRegistry = (ScriptRegistry) pm.getObjectById(ScriptRegistry.SINGLETON_ID);
+			scriptRegistry = (ScriptRegistry) pm.detachCopy(scriptRegistry);
+			return scriptRegistry;
+		} finally {
+			pm.close();
+		}
+	}	
 	
 //	/**
 //	 * @throws ModuleException

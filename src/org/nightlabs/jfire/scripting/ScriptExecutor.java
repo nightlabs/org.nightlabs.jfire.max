@@ -88,8 +88,9 @@ public abstract class ScriptExecutor
 	}
 	public PersistenceManager getPersistenceManager()
 	{
-		return getPersistenceManager(true);
+		return getPersistenceManager(false);
 	}
+	
 	public PersistenceManager getPersistenceManager(boolean throwExceptionIfNotAssigned)
 	{
 		if (throwExceptionIfNotAssigned && persistenceManager == null)
@@ -152,7 +153,7 @@ public abstract class ScriptExecutor
 	
 			this.parameterValues = parameterValues;
 	
-			validateParameters();
+//			validateParameters();
 			doPrepare();
 			prepared = true;
 		} finally {

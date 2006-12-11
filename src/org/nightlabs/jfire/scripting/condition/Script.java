@@ -97,8 +97,12 @@ implements IScript
 	 * value: the value of the script with the corresponding ScriptRegistryItemID, which can be determined from
 	 * {@link Script#getVariableName2ScriptID()}
 	 */
-	private transient Map<String, Object> variableName2Value = new HashMap<String, Object>();
-	public Map<String, Object> getVariableName2Value() {
+	private transient Map<String, Object> variableName2Value = null;
+	public Map<String, Object> getVariableName2Value() 
+	{
+		if (variableName2Value == null) {
+			variableName2Value = new HashMap<String, Object>();
+		}
 		return variableName2Value;
 	}
 	public void setVariableName2Value(Map<String, Object> variableName2Value) {

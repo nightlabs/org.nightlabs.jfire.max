@@ -157,7 +157,7 @@ public class ConstrainedConditionScriptParser
 	
 	private ICondition parseConditionContainer(String text, ConstrainedConditionGenerator generator) 
 	{
-		System.out.println("containerText = "+text);
+//		System.out.println("containerText = "+text);
 		List<String> subContainer = getContainerSubStrings(text, 
 				generator.getOpenContainerString(), 
 				generator.getCloseContainerString());
@@ -178,13 +178,13 @@ public class ConstrainedConditionScriptParser
 				text = text.replace(container, "");
 				ICondition condition = parseConditionContainer(container, generator);
 				conditionContainer.addCondition(condition);
-				System.out.println("subContainer = "+container);
+//				System.out.println("subContainer = "+container);
 			}			
 			text = text.replace(generator.getOpenContainerString(), "");
 			text = text.replace(generator.getCloseContainerString(), "");
-			System.out.println("combineText = "+text);
+//			System.out.println("combineText = "+text);
 			String combineOperatorRegEx = getCombineOperatorRegEx(generator);
-			System.out.println("combineOperatorRegEx = "+combineOperatorRegEx);
+//			System.out.println("combineOperatorRegEx = "+combineOperatorRegEx);
 			Pattern combinePattern = Pattern.compile(combineOperatorRegEx);
 			Matcher combinePatternMatcher = combinePattern.matcher(text);
 			if (combinePatternMatcher.find()) {
@@ -199,9 +199,9 @@ public class ConstrainedConditionScriptParser
 
 				String combineOperator = text.substring(start, end);
 
-				System.out.println("start = "+start);
-				System.out.println("end = "+end);
-				System.out.println("combineOperator = "+combineOperator);
+//				System.out.println("start = "+start);
+//				System.out.println("end = "+end);
+//				System.out.println("combineOperator = "+combineOperator);
 				
 				conditionContainer.setCombineOperator(generator.getCombineOperator(combineOperator));
 				return conditionContainer;										
@@ -247,20 +247,20 @@ public class ConstrainedConditionScriptParser
 	
 	private ISimpleCondition parseSimpleCondition(ConstrainedConditionGenerator generator, String scriptText) 
 	{
-		System.out.println("simpleConditionText = "+scriptText);
+//		System.out.println("simpleConditionText = "+scriptText);
 		String variableRegEx = getVariableRegEx(generator);
 		Pattern variablePattern = Pattern.compile(variableRegEx);
 		Matcher variableMatcher = variablePattern.matcher(scriptText);
 		if (variableMatcher.find()) {
 			String variable = variableMatcher.group();
 			variable = variable.replace(generator.getVariableString(), "");
-			System.out.println("variable = "+variable);
+//			System.out.println("variable = "+variable);
 			String compareOperatorRegEx = getCompareOperatorRegEx(generator);
 			Pattern compareOperatorPattern = Pattern.compile(compareOperatorRegEx);
 			Matcher compareOperatorMatcher = compareOperatorPattern.matcher(scriptText);
 			if (compareOperatorMatcher.find()) {
 				String compareOperator = compareOperatorMatcher.group();
-				System.out.println("compareOperator = "+compareOperator);
+//				System.out.println("compareOperator = "+compareOperator);
 				CompareOperator co = generator.getCompareOperator(compareOperator);
 				int index = scriptText.indexOf(compareOperator);
 				String value = "";
@@ -270,8 +270,8 @@ public class ConstrainedConditionScriptParser
 						value = scriptText.substring(index + compareOperator.length(), endIndex);
 					else
 						value = scriptText.substring(index + compareOperator.length());
-					System.out.println("value = "+value);
-					System.out.println();
+//					System.out.println("value = "+value);
+//					System.out.println();
 				} else {
 					throw new IllegalArgumentException("Param scriptText "+scriptText+" does " +
 							"not contain a value");
@@ -311,9 +311,9 @@ public class ConstrainedConditionScriptParser
 		sb.append(getCompareOperatorRegEx(generator));
 		sb.append("]*)");
 		String regEx = sb.toString();
-		if (logger.isDebugEnabled()) {
-			logger.debug("variableRegEx = "+regEx);
-		}
+//		if (logger.isDebugEnabled()) {
+//			logger.debug("variableRegEx = "+regEx);
+//		}
 		return regEx;
 	}
 		
@@ -358,10 +358,10 @@ public class ConstrainedConditionScriptParser
 					s = s.replace(specialCharacter, "\\"+specialCharacter);
 				}
 			}
-			if (logger.isDebugEnabled()) {
-				logger.debug("originalString = "+originalString);
-				logger.debug("replacedString = "+s);
-			}
+//			if (logger.isDebugEnabled()) {
+//				logger.debug("originalString = "+originalString);
+//				logger.debug("replacedString = "+s);
+//			}
 			return s;
 	}
 	

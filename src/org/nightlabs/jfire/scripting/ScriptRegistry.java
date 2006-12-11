@@ -26,6 +26,7 @@
 
 package org.nightlabs.jfire.scripting;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
@@ -66,10 +67,14 @@ import org.nightlabs.util.Utils;
  * @jdo.create-objectid-class
  * 
  * @jdo.inheritance strategy="new-table"
+ * 
+ * @jdo.fetch-group name="ScriptRegistry.this" fetch-groups="default" fields="fileExtension2Language, language2ScriptExecutorClassName"
  */
 public class ScriptRegistry
+implements Serializable
 {
-
+	public static final String FETCH_GROUP_THIS_SCRIPT_REGISTRY = "ScriptRegistry.this";
+	
 	/**
 	 * @jdo.field primary-key="true"
 	 */
@@ -114,7 +119,7 @@ public class ScriptRegistry
 	 *
 	 * @jdo.join
 	 */
-	private Map language2ScriptExecutorClassName;
+	private Map<String, String> language2ScriptExecutorClassName;
 
 	/**
 	 * key: String fileExtension<br/>
@@ -129,7 +134,7 @@ public class ScriptRegistry
 	 *
 	 * @jdo.join
 	 */
-	private Map fileExtension2Language;
+	private Map<String, String> fileExtension2Language;
 
 	/**
 	 * @jdo.field persistence-modifier="persistent"
@@ -249,17 +254,8 @@ public class ScriptRegistry
 		throws IllegalArgumentException, ClassNotFoundException, InstantiationException, IllegalAccessException
 	{
 		ScriptExecutor scriptExecutor = (ScriptExecutor) getScriptExecutorClass(language, true).newInstance();
-		scriptExecutor.setPersistenceManager(getPersistenceManager());
+		scriptExecutor.setPersistenceManager(JDOHelper.getPersistenceManager(this));
 		return scriptExecutor;
-	}
-
-	protected PersistenceManager getPersistenceManager()
-	{
-		PersistenceManager pm = JDOHelper.getPersistenceManager(this);
-		if (pm == null)
-			throw new IllegalStateException("This instance of ScriptRegistry is currently not attached to a datastore. Cannot obtain PersistenceManager!");
-
-		return pm;
 	}
 
 	private static String rootOrganisationID = null;
@@ -277,7 +273,7 @@ public class ScriptRegistry
 	 */
 	public Script getScript(String scriptRegistryItemType, String scriptRegistryItemID)
 	{
-		PersistenceManager pm = getPersistenceManager();
+		PersistenceManager pm = JDOHelper.getPersistenceManager(this);
 
 		Collection scripts = Script.getScripts(pm, scriptRegistryItemType, scriptRegistryItemID);
 

@@ -25,11 +25,14 @@
  ******************************************************************************/
 package org.nightlabs.jfire.scripting;
 
+import java.io.Serializable;
+
 /**
  * @author Daniel.Mazurek [at] NightLabs [dot] de
  *
  */
-public interface IScript 
+public interface IScript
+extends Serializable
 {	
 	/**
 	 * Accessor to the language of the script. Currently,

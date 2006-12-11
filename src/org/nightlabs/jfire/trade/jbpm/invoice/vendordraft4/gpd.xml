@@ -1,0 +1,81 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<process-diagram name="devil.NightLabs.org:Invoice.Vendor" width="800" height="634">
+  <node name="devil.NightLabs.org:created" x="233" y="30" width="206" height="40">
+    <transition name="abort">
+      <label x="-47" y="-14"/>
+    </transition>
+    <transition name="finalize">
+      <label x="5" y="-10"/>
+    </transition>
+  </node>
+  <node name="devil.NightLabs.org:finalized" x="232" y="127" width="207" height="40">
+    <transition name="">
+      <label x="5" y="-10"/>
+    </transition>
+  </node>
+  <node name="aborted" x="554" y="31" width="140" height="40"/>
+  <node name="devil.NightLabs.org:doubtful" x="570" y="349" width="208" height="40">
+    <transition name="pay">
+      <label x="5" y="-10"/>
+    </transition>
+    <transition name="giveup">
+      <label x="5" y="-10"/>
+    </transition>
+    <transition name="trust">
+      <label x="5" y="-10"/>
+    </transition>
+  </node>
+  <node name="devil.NightLabs.org:uncollectable" x="572" y="569" width="207" height="40"/>
+  <node name="devil.NightLabs.org:paid" x="232" y="494" width="195" height="40"/>
+  <node name="waitForBooking" x="154" y="274" width="140" height="40">
+    <transition name="book">
+      <label x="5" y="-10"/>
+    </transition>
+  </node>
+  <node name="fork1" x="235" y="209" width="200" height="25">
+    <transition name="waitForBooking">
+      <label x="-86" y="-9"/>
+    </transition>
+    <transition name="waitForPayment">
+      <label x="5" y="-10"/>
+    </transition>
+  </node>
+  <node name="waitForPayment" x="364" y="274" width="140" height="40">
+    <transition name="pay">
+      <label x="5" y="-10"/>
+    </transition>
+    <transition name="doubt">
+      <label x="5" y="-10"/>
+      <bendpoint w1="239" h1="-1" w2="-1" h2="-76"/>
+    </transition>
+  </node>
+  <node name="booked" x="155" y="350" width="140" height="40">
+    <transition name="">
+      <label x="5" y="-10"/>
+    </transition>
+  </node>
+  <node name="paid" x="364" y="351" width="140" height="40">
+    <transition name="">
+      <label x="5" y="-10"/>
+    </transition>
+  </node>
+  <node name="join1" x="229" y="427" width="200" height="25">
+    <transition name="">
+      <label x="5" y="-10"/>
+    </transition>
+  </node>
+  <node name="isBooked" x="606" y="423" width="140" height="40">
+    <transition name="alreadyBooked">
+      <label x="-81" y="-12"/>
+    </transition>
+    <transition name="notYetBooked">
+      <label x="5" y="-10"/>
+    </transition>
+  </node>
+  <node name="reversebook" x="463" y="496" width="140" height="40">
+    <transition name="">
+      <label x="5" y="-10"/>
+    </transition>
+  </node>
+</process-diagram>

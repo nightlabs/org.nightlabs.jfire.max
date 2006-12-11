@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<process-diagram name="devil.NightLabs.org:Offer.Vendor" width="790" height="662">
+<process-diagram name="devil.NightLabs.org:Offer.Vendor" width="842" height="617">
   <node name="devil.NightLabs.org:created" x="208" y="49" width="190" height="40">
     <transition name="finalize">
       <label x="5" y="-10"/>

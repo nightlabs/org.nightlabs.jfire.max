@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<process-diagram name="devil.NightLabs.org:Invoice.Vendor" width="767" height="634">
+<process-diagram name="devil.NightLabs.org:Invoice.Vendor" width="800" height="634">
   <node name="devil.NightLabs.org:created" x="233" y="30" width="206" height="40">
     <transition name="">
       <label x="5" y="-10"/>
@@ -10,21 +10,15 @@
     </transition>
   </node>
   <node name="devil.NightLabs.org:finalized" x="232" y="127" width="207" height="40">
-    <transition name="">
-      <label x="5" y="-10"/>
-      <bendpoint w1="-113" h1="-1" w2="84" h2="-48"/>
-    </transition>
-    <transition name="tr2">
-      <label x="5" y="-10"/>
-    </transition>
     <transition name="tr3">
       <label x="5" y="-10"/>
     </transition>
-  </node>
-  <node name="booked" x="69" y="171" width="140" height="40">
-    <transition name="">
+    <transition name="pay">
       <label x="5" y="-10"/>
-      <bendpoint w1="122" h1="0" w2="-75" h2="47"/>
+    </transition>
+    <transition name="book">
+      <label x="5" y="-10"/>
+      <bendpoint w1="-174" h1="-1" w2="12" h2="-49"/>
     </transition>
   </node>
   <node name="aborted" x="553" y="68" width="140" height="40"/>
@@ -32,10 +26,34 @@
     <transition name="">
       <label x="5" y="-10"/>
     </transition>
-    <transition name="tr2">
+    <transition name="pay">
       <label x="5" y="-10"/>
     </transition>
   </node>
   <node name="devil.NightLabs.org:uncollectable" x="106" y="406" width="207" height="40"/>
   <node name="devil.NightLabs.org:paid" x="379" y="405" width="195" height="40"/>
+  <node name="isBooked" x="407" y="250" width="140" height="40">
+    <transition name="notYetBooked">
+      <label x="5" y="-10"/>
+    </transition>
+    <transition name="alreadyBooked">
+      <label x="5" y="-10"/>
+    </transition>
+  </node>
+  <node name="waitForBooking" x="619" y="327" width="140" height="40">
+    <transition name="">
+      <label x="5" y="-10"/>
+    </transition>
+  </node>
+  <node name="booked.1" x="79" y="175" width="140" height="40">
+    <transition name="">
+      <label x="5" y="-10"/>
+      <bendpoint w1="123" h1="-1" w2="-63" h2="47"/>
+    </transition>
+  </node>
+  <node name="booked.2" x="618" y="405" width="140" height="40">
+    <transition name="">
+      <label x="5" y="-10"/>
+    </transition>
+  </node>
 </process-diagram>

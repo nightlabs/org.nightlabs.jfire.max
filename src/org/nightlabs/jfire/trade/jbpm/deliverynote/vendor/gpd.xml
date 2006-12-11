@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<process-diagram name="devil.NightLabs.org:DeliveryNote.Vendor" width="767" height="634">
-  <node name="devil.NightLabs.org:created" x="233" y="138" width="206" height="40"/>
+<process-diagram name="devil.NightLabs.org:DeliveryNote.Vendor" width="800" height="634">
+  <node name="devil.NightLabs.org:created" x="228" y="24" width="206" height="40"/>
   <node name="devil.NightLabs.org:finalized" x="230" y="220" width="206" height="40"/>
   <node name="devil.NightLabs.org:booked" x="44" y="282" width="181" height="40"/>
   <node name="devil.NightLabs.org:aborted" x="546" y="137" width="181" height="40"/>

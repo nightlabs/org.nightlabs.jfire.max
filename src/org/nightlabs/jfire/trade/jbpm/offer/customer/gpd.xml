@@ -1,14 +1,22 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<process-diagram name="devil.NightLabs.org:Offer.Customer" width="748" height="679">
-  <node name="devil.NightLabs.org:finalized" x="233" y="138" width="206" height="40">
+<process-diagram name="devil.NightLabs.org:Offer.Customer" width="800" height="634">
+  <node name="devil.NightLabs.org:finalized" x="187" y="140" width="206" height="40">
     <transition name="accept">
       <label x="5" y="-10"/>
     </transition>
     <transition name="reject">
       <label x="5" y="-10"/>
     </transition>
+    <transition name="devil.NightLabs.org:expired">
+      <label x="5" y="-10"/>
+    </transition>
+    <transition name="devil.NightLabs.org:revoked">
+      <label x="-79" y="-16"/>
+    </transition>
   </node>
-  <node name="devil.NightLabs.org:customerRejected" x="350" y="348" width="236" height="40"/>
-  <node name="devil.NightLabs.org:customerAccepted" x="53" y="349" width="242" height="40"/>
+  <node name="devil.NightLabs.org:customerRejected" x="304" y="350" width="236" height="40"/>
+  <node name="devil.NightLabs.org:customerAccepted" x="7" y="351" width="242" height="40"/>
+  <node name="devil.NightLabs.org:expired" x="492" y="276" width="224" height="40"/>
+  <node name="devil.NightLabs.org:revoked" x="584" y="140" width="181" height="40"/>
 </process-diagram>

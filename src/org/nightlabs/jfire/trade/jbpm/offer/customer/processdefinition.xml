@@ -5,7 +5,11 @@
    <start-state name="devil.NightLabs.org:finalized">
       <transition name="accept" to="devil.NightLabs.org:customerAccepted"></transition>
       <transition name="reject" to="devil.NightLabs.org:customerRejected"></transition>
+      <transition name="devil.NightLabs.org:expired" to="devil.NightLabs.org:expired"></transition>
+      <transition name="devil.NightLabs.org:revoked" to="devil.NightLabs.org:revoked"></transition>
    </start-state>
    <end-state name="devil.NightLabs.org:customerRejected"></end-state>
    <end-state name="devil.NightLabs.org:customerAccepted"></end-state>
+   <end-state name="devil.NightLabs.org:expired"></end-state>
+   <end-state name="devil.NightLabs.org:revoked"></end-state>
 </process-definition>

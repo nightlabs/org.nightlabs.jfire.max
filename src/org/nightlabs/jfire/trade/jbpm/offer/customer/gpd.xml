@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<process-diagram name="devil.NightLabs.org:Offer.Customer" width="800" height="634">
-  <node name="devil.NightLabs.org:finalized" x="187" y="140" width="206" height="40">
+<process-diagram name="devil.NightLabs.org:Offer.Customer" width="766" height="617">
+  <node name="devil.NightLabs.org:sent" x="187" y="140" width="206" height="40">
     <transition name="accept">
       <label x="5" y="-10"/>
     </transition>

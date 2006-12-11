@@ -1,15 +1,16 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<process-diagram name="devil.NightLabs.org:Offer.Vendor" width="842" height="617">
-  <node name="devil.NightLabs.org:created" x="208" y="49" width="190" height="40">
+<process-diagram name="devil.NightLabs.org:Offer.Vendor" width="784" height="617">
+  <node name="devil.NightLabs.org:created" x="-24" y="17" width="190" height="40">
     <transition name="finalize">
-      <label x="5" y="-10"/>
+      <label x="-122" y="-52"/>
+      <bendpoint w1="231" h1="75" w2="-1" h2="-114"/>
     </transition>
     <transition name="abort">
-      <label x="5" y="-10"/>
+      <label x="-26" y="-15"/>
     </transition>
     <transition name="devil.NightLabs.org:accept">
-      <label x="-138" y="-11"/>
+      <label x="1" y="-20"/>
     </transition>
   </node>
   <node name="devil.NightLabs.org:rejected" x="456" y="336" width="217" height="40"/>
@@ -38,9 +39,12 @@
       <label x="5" y="-10"/>
       <bendpoint w1="-148" h1="2" w2="84" h2="-47"/>
     </transition>
+    <transition name="devil.NightLabs.org:send">
+      <label x="0" y="-2"/>
+    </transition>
   </node>
   <node name="devil.NightLabs.org:expired" x="456" y="408" width="217" height="40"/>
-  <node name="devil.NightLabs.org:aborted" x="456" y="132" width="217" height="40"/>
+  <node name="devil.NightLabs.org:aborted" x="453" y="16" width="217" height="40"/>
   <node name="devil.NightLabs.org:revoked" x="456" y="480" width="217" height="40"/>
   <node name="devil.NightLabs.org:customerAccepted" x="-41" y="379" width="225" height="40">
     <transition name="accept">
@@ -50,6 +54,12 @@
   <node name="devil.NightLabs.org:customerRejected" x="456" y="252" width="217" height="40">
     <transition name="reject">
       <label x="5" y="-10"/>
+    </transition>
+  </node>
+  <node name="devil.NightLabs.org:sent" x="452" y="80" width="216" height="40">
+    <transition name="">
+      <label x="5" y="-10"/>
+      <bendpoint w1="-140" h1="-1" w2="103" h2="-100"/>
     </transition>
   </node>
 </process-diagram>

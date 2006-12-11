@@ -2,7 +2,7 @@
 
 <process-definition
   xmlns=""  name="devil.NightLabs.org:Offer.Customer">
-   <start-state name="devil.NightLabs.org:finalized">
+   <start-state name="devil.NightLabs.org:sent">
       <transition name="accept" to="devil.NightLabs.org:customerAccepted"></transition>
       <transition name="reject" to="devil.NightLabs.org:customerRejected"></transition>
       <transition name="devil.NightLabs.org:expired" to="devil.NightLabs.org:expired"></transition>

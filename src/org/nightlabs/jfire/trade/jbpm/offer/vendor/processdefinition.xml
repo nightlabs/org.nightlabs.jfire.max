@@ -16,6 +16,7 @@
       <transition name="devil.NightLabs.org:customerAccepted" to="devil.NightLabs.org:customerAccepted"></transition>
       <transition name="devil.NightLabs.org:customerRejected" to="devil.NightLabs.org:customerRejected"></transition>
       <transition name="accept" to="devil.NightLabs.org:accepted"></transition>
+      <transition name="devil.NightLabs.org:send" to="devil.NightLabs.org:sent"></transition>
    </state>
    <end-state name="devil.NightLabs.org:expired"></end-state>
    <end-state name="devil.NightLabs.org:aborted"></end-state>
@@ -25,5 +26,8 @@
    </node>
    <node name="devil.NightLabs.org:customerRejected">
       <transition name="reject" to="devil.NightLabs.org:rejected"></transition>
+   </node>
+   <node name="devil.NightLabs.org:sent">
+      <transition name="" to="devil.NightLabs.org:finalized"></transition>
    </node>
 </process-definition>

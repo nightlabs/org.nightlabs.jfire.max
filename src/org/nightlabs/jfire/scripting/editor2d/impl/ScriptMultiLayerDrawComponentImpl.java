@@ -111,6 +111,7 @@ implements ScriptMultiLayerDrawComponent
 		return getVisibleScripts(this);
 	}
 	
+//	private static final Map<Long, Script> EMPTY_MAP = new HashMap<Long, Script>(0);
 	protected Map<Long, Script> getVisibleScripts(DrawComponentContainer dcc) 
 	{
 		// TODO all DrawComponents with a visibleScript should already be cached
@@ -129,6 +130,6 @@ implements ScriptMultiLayerDrawComponent
 				}				
 			}
 		}
-		return null;
+		return dcID2VisibleScript;
 	}		
 }

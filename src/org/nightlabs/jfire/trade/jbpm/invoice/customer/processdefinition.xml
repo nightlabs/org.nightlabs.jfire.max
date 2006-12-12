@@ -4,17 +4,17 @@
   xmlns=""  name="devil.NightLabs.org:Invoice.Customer">
    <start-state name="devil.NightLabs.org:sent">
       <transition name="book" to="devil.NightLabs.org:booked"></transition>
-      <transition name="dispute" to="disputeStarted here????"></transition>
+      <transition name="dispute" to="disputeStarted.beforeBook"></transition>
    </start-state>
    <end-state name="devil.NightLabs.org:paid"></end-state>
    <state name="devil.NightLabs.org:booked">
       <transition name="devil.NightLabs.org:pay" to="devil.NightLabs.org:paid"></transition>
-      <transition name="dispute" to="disputeStarted better here?"></transition>
+      <transition name="dispute" to="disputeStarted.afterBook"></transition>
    </state>
-   <state name="disputeStarted here????">
+   <state name="disputeStarted.beforeBook">
       <transition name="book" to="devil.NightLabs.org:booked"></transition>
    </state>
-   <state name="disputeStarted better here?">
+   <state name="disputeStarted.afterBook">
       <transition name="devil.NightLabs.org:pay" to="devil.NightLabs.org:paid"></transition>
    </state>
 </process-definition>

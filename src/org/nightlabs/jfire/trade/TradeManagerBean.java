@@ -1047,14 +1047,14 @@ implements SessionBean
 
 			// persist process definitions
 			ProcessDefinition processDefinitionOfferCustomer;
-//			ProcessDefinitionID processDefinitionIDOfferCustomer;
-			processDefinitionOfferCustomer = JbpmUtil.storeProcessDefinition(pm, TradeManagerBean.class.getResource("jbpm/offer/customer/"));
+			ProcessDefinitionID processDefinitionIDOfferCustomer;
+			processDefinitionOfferCustomer = JbpmUtil.storeProcessDefinition(pm, ProcessDefinitionAssignment.class.getResource("offer/customer/"));
 			pm.makePersistent(new ProcessDefinitionAssignment(Offer.class, TradeSide.customer, processDefinitionOfferCustomer));
-//			processDefinitionIDOfferCustomer = (ProcessDefinitionID) JDOHelper.getObjectId(processDefinitionOfferCustomer);
+			processDefinitionIDOfferCustomer = (ProcessDefinitionID) JDOHelper.getObjectId(processDefinitionOfferCustomer);
 
 			ProcessDefinition processDefinitionOfferVendor;
 			ProcessDefinitionID processDefinitionIDOfferVendor;
-			processDefinitionOfferVendor = JbpmUtil.storeProcessDefinition(pm, TradeManagerBean.class.getResource("jbpm/offer/vendor/"));
+			processDefinitionOfferVendor = JbpmUtil.storeProcessDefinition(pm, ProcessDefinitionAssignment.class.getResource("offer/vendor/"));
 			pm.makePersistent(new ProcessDefinitionAssignment(Offer.class, TradeSide.vendor, processDefinitionOfferVendor));
 			processDefinitionIDOfferVendor = (ProcessDefinitionID) JDOHelper.getObjectId(processDefinitionOfferVendor);
 
@@ -1075,6 +1075,11 @@ implements SessionBean
 			stateDefinition = StateDefinition.getStateDefinition(processDefinitionOfferVendor, JbpmConstantsOffer.Vendor.STATE_DEFINITION_JBPM_NODE_NAME_FINALIZED);
 			stateDefinition.getName().setText(Locale.ENGLISH.getLanguage(), "finalized");
 			stateDefinition.getDescription().setText(Locale.ENGLISH.getLanguage(), "The Offer has been finalized. After that, it cannot be modified anymore. A modification would require revocation and recreation.");
+			stateDefinition.setPublicState(true);
+
+			stateDefinition = StateDefinition.getStateDefinition(processDefinitionOfferVendor, JbpmConstantsOffer.Vendor.STATE_DEFINITION_JBPM_NODE_NAME_SENT);
+			stateDefinition.getName().setText(Locale.ENGLISH.getLanguage(), "sent");
+			stateDefinition.getDescription().setText(Locale.ENGLISH.getLanguage(), "The Offer has been sent from the vendor to the customer.");
 			stateDefinition.setPublicState(true);
 
 			stateDefinition = StateDefinition.getStateDefinition(processDefinitionOfferVendor, JbpmConstantsOffer.Vendor.STATE_DEFINITION_JBPM_NODE_NAME_ACCEPTED);
@@ -1098,9 +1103,19 @@ implements SessionBean
 			stateDefinition.setPublicState(true);
 
 			// customer
-			stateDefinition = StateDefinition.getStateDefinition(processDefinitionOfferCustomer, JbpmConstantsOffer.Customer.STATE_DEFINITION_JBPM_NODE_NAME_FINALIZED);
-			stateDefinition.getName().setText(Locale.ENGLISH.getLanguage(), "finalized");
-			stateDefinition.getDescription().setText(Locale.ENGLISH.getLanguage(), "The Offer has been finalized. After that, it cannot be modified anymore. A modification would require revocation and recreation. The customer needs to decide know whether he accepts or rejects. If the customer does not decide within a certain time, the Offer expires.");
+			stateDefinition = StateDefinition.getStateDefinition(processDefinitionOfferCustomer, JbpmConstantsOffer.Customer.STATE_DEFINITION_JBPM_NODE_NAME_SENT);
+			stateDefinition.getName().setText(Locale.ENGLISH.getLanguage(), "sent");
+			stateDefinition.getDescription().setText(Locale.ENGLISH.getLanguage(), "The Offer has been sent from the vendor to the customer.");
+			stateDefinition.setPublicState(true);
+
+			stateDefinition = StateDefinition.getStateDefinition(processDefinitionOfferCustomer, JbpmConstantsOffer.Customer.STATE_DEFINITION_JBPM_NODE_NAME_REVOKED);
+			stateDefinition.getName().setText(Locale.ENGLISH.getLanguage(), "revoked");
+			stateDefinition.getDescription().setText(Locale.ENGLISH.getLanguage(), "The vendor revoked the offer.");
+			stateDefinition.setPublicState(true);
+
+			stateDefinition = StateDefinition.getStateDefinition(processDefinitionOfferCustomer, JbpmConstantsOffer.Customer.STATE_DEFINITION_JBPM_NODE_NAME_EXPIRED);
+			stateDefinition.getName().setText(Locale.ENGLISH.getLanguage(), "expired");
+			stateDefinition.getDescription().setText(Locale.ENGLISH.getLanguage(), "The Offer expired.");
 			stateDefinition.setPublicState(true);
 
 			stateDefinition = StateDefinition.getStateDefinition(processDefinitionOfferCustomer, JbpmConstantsOffer.Customer.STATE_DEFINITION_JBPM_NODE_NAME_CUSTOMER_ACCEPTED);
@@ -1120,6 +1135,7 @@ implements SessionBean
 			// vendor
 			transition = (Transition) pm.getObjectById(JbpmConstantsOffer.Vendor.getTransitionID_created_2_accept(processDefinitionIDOfferVendor));
 			transition.getName().setText(Locale.ENGLISH.getLanguage(), "accept");
+			transition.setUserExecutable(false);
 
 			transition = (Transition) pm.getObjectById(JbpmConstantsOffer.Vendor.getTransitionID_finalized_2_customerAccepted(processDefinitionIDOfferVendor));
 			transition.getName().setText(Locale.ENGLISH.getLanguage(), "customer accepted");
@@ -1127,6 +1143,15 @@ implements SessionBean
 
 			transition = (Transition) pm.getObjectById(JbpmConstantsOffer.Vendor.getTransitionID_finalized_2_customerRejected(processDefinitionIDOfferVendor));
 			transition.getName().setText(Locale.ENGLISH.getLanguage(), "customer rejected");
+			transition.setUserExecutable(false);
+
+			// customer
+			transition = (Transition) pm.getObjectById(JbpmConstantsOffer.Customer.getTransitionID_sent_2_expired(processDefinitionIDOfferCustomer));
+			transition.getName().setText(Locale.ENGLISH.getLanguage(), "expired");
+			transition.setUserExecutable(false);
+
+			transition = (Transition) pm.getObjectById(JbpmConstantsOffer.Customer.getTransitionID_sent_2_revoked(processDefinitionIDOfferCustomer));
+			transition.getName().setText(Locale.ENGLISH.getLanguage(), "revoked");
 			transition.setUserExecutable(false);
 
 

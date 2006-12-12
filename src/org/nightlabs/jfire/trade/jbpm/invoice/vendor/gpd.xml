@@ -57,7 +57,7 @@
       <label x="5" y="-10"/>
     </transition>
   </node>
-  <node name="devil.NightLabs.org:reminderSent" x="423" y="196" width="221" height="40">
+  <node name="devil.NightLabs.org:sentReminder" x="423" y="196" width="221" height="40">
     <transition name="sendPreCollectionLetter">
       <label x="5" y="-10"/>
     </transition>
@@ -71,7 +71,7 @@
       <bendpoint w1="175" h1="206" w2="188" h2="-2"/>
     </transition>
   </node>
-  <node name="devil.NightLabs.org:preCollectionLetterSent" x="397" y="297" width="273" height="40">
+  <node name="devil.NightLabs.org:sentPreCollectionLetter" x="397" y="297" width="273" height="40">
     <transition name="doubt">
       <label x="5" y="-10"/>
     </transition>

@@ -21,7 +21,7 @@
       <transition name="devil.NightLabs.org:send" to="devil.NightLabs.org:sent"></transition>
       <transition name="doubt" to="devil.NightLabs.org:doubtful"></transition>
       <transition name="devil.NightLabs.org:pay" to="devil.NightLabs.org:paid"></transition>
-      <transition name="sendReminder" to="devil.NightLabs.org:reminderSent"></transition>
+      <transition name="sendReminder" to="devil.NightLabs.org:sentReminder"></transition>
    </state>
    <node name="devil.NightLabs.org:sent">
       <transition name="" to="devil.NightLabs.org:booked"></transition>
@@ -29,12 +29,12 @@
    <node name="devil.NightLabs.org:bookedUnreceivable">
       <transition name="endAsUncollectable" to="devil.NightLabs.org:uncollectable"></transition>
    </node>
-   <state name="devil.NightLabs.org:reminderSent">
-      <transition name="sendPreCollectionLetter" to="devil.NightLabs.org:preCollectionLetterSent"></transition>
+   <state name="devil.NightLabs.org:sentReminder">
+      <transition name="sendPreCollectionLetter" to="devil.NightLabs.org:sentPreCollectionLetter"></transition>
       <transition name="devil.NightLabs.org:pay" to="devil.NightLabs.org:paid"></transition>
       <transition name="doubt" to="devil.NightLabs.org:doubtful"></transition>
    </state>
-   <state name="devil.NightLabs.org:preCollectionLetterSent">
+   <state name="devil.NightLabs.org:sentPreCollectionLetter">
       <transition name="doubt" to="devil.NightLabs.org:doubtful"></transition>
       <transition name="devil.NightLabs.org:pay" to="devil.NightLabs.org:paid"></transition>
    </state>

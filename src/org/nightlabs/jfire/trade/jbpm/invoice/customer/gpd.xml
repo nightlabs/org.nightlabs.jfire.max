@@ -18,12 +18,12 @@
       <label x="5" y="-10"/>
     </transition>
   </node>
-  <node name="disputeStarted here????" x="400" y="2" width="179" height="40">
+  <node name="disputeStarted.beforeBook" x="400" y="2" width="179" height="40">
     <transition name="book">
       <label x="44" y="-12"/>
     </transition>
   </node>
-  <node name="disputeStarted better here?" x="401" y="104" width="179" height="40">
+  <node name="disputeStarted.afterBook" x="401" y="104" width="179" height="40">
     <transition name="devil.NightLabs.org:pay">
       <label x="34" y="-12"/>
     </transition>

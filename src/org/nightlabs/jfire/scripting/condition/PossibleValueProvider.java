@@ -33,6 +33,7 @@ import javax.jdo.JDOObjectNotFoundException;
 import javax.jdo.PersistenceManager;
 
 import org.apache.log4j.Logger;
+import org.nightlabs.jdo.ObjectID;
 import org.nightlabs.jfire.scripting.Script;
 import org.nightlabs.jfire.scripting.condition.id.PossibleValueProviderID;
 import org.nightlabs.jfire.scripting.id.ScriptRegistryItemID;
@@ -145,6 +146,7 @@ implements Serializable
 	 * @return a {@link Collection} of possible values for the result of the {@link Script}
 	 * returned from {@link PossibleValueProvider#getScript()}
 	 * based on given the parameterValues, the limit flag can be determined to limit the results
+	 * 
 	 */
 	public abstract Collection<Object> getPossibleValues(Map<String, Object> parameterValues, int limit);
 	

@@ -88,6 +88,7 @@ extends PossibleValueProvider
 					List<Object> possibleValues = new LinkedList<Object>();
 					for (Iterator it = extent.iterator(); it.hasNext(); ) {
 						possibleValues.add(it.next());
+//						possibleValues.add(pm.getObjectId(it.next()));
 					}
 					if (logger.isDebugEnabled())
 						logger.debug(possibleValues.size()+" possible values for class "+result.getClass());

@@ -43,8 +43,7 @@ implements Serializable
 	
 	public ScriptConditioner(ScriptRegistryItemID scriptID, String variableName, 
 			List<CompareOperator> compareOperators, 
-			Collection<Object> possibleValues, 
-//			ILabelProvider valueLabelProvider) 
+			Collection<Object> possibleValues,  
 			String valueLabelProviderClassName)			
 	{
 		if (scriptID == null)
@@ -64,9 +63,6 @@ implements Serializable
 		this.possibleValues = possibleValues;
 		this.compareOperators = compareOperators;
 		this.labelProviderClassName = valueLabelProviderClassName;
-//		this.valueLabelProvider = valueLabelProvider;
-//		if (valueLabelProvider == null)
-//			valueLabelProvider = new LabelProvider();
 	}
 	
 	private ScriptRegistryItemID scriptRegistryItemID;
@@ -101,16 +97,7 @@ implements Serializable
 		this.compareOperators = compareOperators;
 	}
 	
-//	private ILabelProvider valueLabelProvider;
-//	public ILabelProvider getValueLabelProvider() {
-//		return valueLabelProvider;
-//	}
-//	public void setValueLabelProvider(ILabelProvider valueLabelProvider) {
-//		this.valueLabelProvider = valueLabelProvider;
-//	}
-	
-	
-	private ILabelProvider valueLabelProvider;
+	private transient ILabelProvider valueLabelProvider;
 	public ILabelProvider getValueLabelProvider() 
 	{
 		if (valueLabelProvider == null && labelProviderClassName != null) {
@@ -133,5 +120,13 @@ implements Serializable
 	public void setValueLabelProviderClassName(String labelProviderClassName) {
 		this.labelProviderClassName = labelProviderClassName;
 	}
+	
+//	private boolean possibleValuesAreObjectIDs = false;
+//	public boolean isPossibleValuesAreObjectIDs() {
+//		return possibleValuesAreObjectIDs;
+//	}
+//	public void setPossibleValuesAreObjectIDs(boolean possibleValuesAreObjectIDs) {
+//		this.possibleValuesAreObjectIDs = possibleValuesAreObjectIDs;
+//	}
 	
 }

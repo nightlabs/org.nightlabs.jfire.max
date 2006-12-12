@@ -80,7 +80,16 @@ public class ConstrainedConditionScriptParser
 	{
 		if (scriptText == null)
 			throw new IllegalArgumentException("param scriptText must NOT be null!");
-		
+
+// convert sth. like the following line:
+//		JDOHelper.getObjectId(myVariable) == ObjectIDUtil.createObjectID("jdo/org.b.MyClassID?fieldA=0")
+//
+// to sth. like this:
+//		myVariable == jdo/org.b.MyClassID?fieldA=0
+
+		scriptText = scriptText.replaceAll("JDOHelper.getObjectId\\((.*?)\\)", "$1");
+		scriptText = scriptText.replaceAll("ObjectIDUtil.createObjectID\\(\\\"(.*?)\\\"\\)", "$1");
+
 		return parseConditionContainer(scriptText, generator);
 	}
 	

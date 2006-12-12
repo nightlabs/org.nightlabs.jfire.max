@@ -101,8 +101,7 @@ implements SessionBean
 	protected ScriptConditioner getScriptConditioner(PersistenceManager pm, 
 			ScriptRegistryItemID scriptRegistryItemID, 
 			Map<String, Object> parameterValues, int valueLimit)
-	{
-		String variableName = scriptRegistryItemID.scriptRegistryItemID;
+	{		
 		Script script = ScriptRegistry.getScriptRegistry(pm).getScript(
 				scriptRegistryItemID.scriptRegistryItemType, 
 				scriptRegistryItemID.scriptRegistryItemID);
@@ -115,6 +114,8 @@ implements SessionBean
 			logger.error("script resultClass "+script.getResultClassName()+" of script with scriptRegistryItemID "+scriptRegistryItemID+" could not be found", e);
 		}
 		
+		String variableName = scriptRegistryItemID.scriptRegistryItemID;
+//		String variableName = script.getName().getText();
 		Collection possibleValues = Collections.EMPTY_LIST;
 		String valueLabelProviderClassName = LabelProvider.class.getName();			
 		PossibleValueProviderID valueProviderID = PossibleValueProviderID.create(
@@ -135,7 +136,8 @@ implements SessionBean
 		}
 		
 		ScriptConditioner sc = new ScriptConditioner(scriptRegistryItemID, variableName, 
-				compareOperators, possibleValues, valueLabelProviderClassName);
+				compareOperators, possibleValues, valueLabelProviderClassName);		
+//		sc.setPossibleValuesAreObjectIDs(script.isNeedsDetach());
 		
 //		if (logger.isDebugEnabled()) {
 			logger.info("scriptRegistryItemID = "+scriptRegistryItemID);

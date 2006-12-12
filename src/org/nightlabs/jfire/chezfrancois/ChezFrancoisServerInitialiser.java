@@ -27,6 +27,8 @@
 package org.nightlabs.jfire.chezfrancois;
 
 import org.apache.log4j.Logger;
+import org.nightlabs.ModuleException;
+import org.nightlabs.jfire.init.InitException;
 import org.nightlabs.jfire.serverinit.ServerInitialiserDelegate;
 import org.nightlabs.jfire.servermanager.JFireServerManager;
 import org.nightlabs.jfire.servermanager.OrganisationNotFoundException;
@@ -36,8 +38,7 @@ public class ChezFrancoisServerInitialiser extends ServerInitialiserDelegate
 	public static final String ORGANISATION_ID_WINE_STORE = "chezfrancois.jfire.org";
 
 	@Override
-	public void initialise()
-	throws Exception
+	public void initialise() throws InitException
 	{
 //		TransactionManager transactionManager = getJ2EEVendorAdapter().getTransactionManager(getInitialContext());
 
@@ -57,7 +58,11 @@ public class ChezFrancoisServerInitialiser extends ServerInitialiserDelegate
     		} catch (OrganisationNotFoundException x) {
     			// do initialization!
 //    			jfsm.createOrganisation(ORGANISATION_ID_WINE_STORE, "Chez François Wine Store", "francois", "test", true);
-    			jfsm.createOrganisation(ORGANISATION_ID_WINE_STORE, "Chez Francois Wine Store", "francois", "test", true);
+    			try {
+						jfsm.createOrganisation(ORGANISATION_ID_WINE_STORE, "Chez Francois Wine Store", "francois", "test", true);
+					} catch (ModuleException e) {
+						throw new InitException(e.getMessage(), e);
+					}
     		}
     	} finally {
     		jfsm.close();

@@ -1,0 +1,40 @@
+<!DOCTYPE server-initialisation
+		PUBLIC "-//NightLabs GmbH//DTD Server Initialisation 1.0//EN"
+		"http://www.nightlabs.de/dtd/serverinit_1_0.dtd">
+<server-initialisation>
+	<early-init class="org.nightlabs.jfire.chezfrancois.inittest.ServerInitialiser1" priority="4">
+		<depends module="JFireChezFrancois.ear" archive="JFireChezFrancois.jar"
+			class="org.nightlabs.jfire.chezfrancois.inittest.ServerInitialiser5" />
+	</early-init>
+
+	<early-init class="org.nightlabs.jfire.chezfrancois.inittest.ServerInitialiser2" priority="2">
+		<depends module="JFireChezFrancois.ear" archive="JFireChezFrancois.jar"
+			class="org.nightlabs.jfire.chezfrancois.inittest.ServerInitialiser5" />
+		<depends module="JFireChezFrancois.ear" archive="JFireChezFrancois.jar"
+			class="org.nightlabs.jfire.chezfrancois.inittest.ServerInitialiser1" />
+		<depends module="JFireChezFrancois.ear" archive="JFireChezFrancois.jar"
+			class="org.nightlabs.jfire.chezfrancois.inittest.ServerInitialiser4" />			
+	</early-init>
+
+	<early-init class="org.nightlabs.jfire.chezfrancois.inittest.ServerInitialiser3" priority="1">
+		<depends module="JFireChezFrancois.ear" archive="JFireChezFrancois.jar"
+			class="org.nightlabs.jfire.chezfrancois.inittest.ServerInitialiser1" />
+		<depends module="JFireChezFrancois.ear" archive="JFireChezFrancois.jar"
+			class="org.nightlabs.jfire.chezfrancois.inittest.ServerInitialiser2" />
+	</early-init>
+
+	<early-init class="org.nightlabs.jfire.chezfrancois.inittest.ServerInitialiser4" priority="3">
+	</early-init>
+
+	<early-init class="org.nightlabs.jfire.chezfrancois.inittest.ServerInitialiser5" priority="1">
+	</early-init>	
+	
+	<early-init class="org.nightlabs.jfire.chezfrancois.inittest.ServerInitialiser6" priority="2">
+		<depends module="JFireChezFrancois.ear" archive="JFireChezFrancois.jar"
+			class="org.nightlabs.jfire.chezfrancois.inittest.ServerInitialiser2" />
+		<depends module="JFireChezFrancois.ear" archive="JFireChezFrancois.jar"
+			class="org.nightlabs.jfire.chezfrancois.inittest.ServerInitialiser3" />
+		<depends module="JFireChezFrancois.ear" archive="JFireChezFrancois.jar"
+			class="org.nightlabs.jfire.chezfrancois.inittest.ServerInitialiser4" />
+	</early-init>	
+</server-initialisation>

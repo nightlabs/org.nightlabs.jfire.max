@@ -76,7 +76,8 @@ extends AbstractActionHandler
 		if (logger.isDebugEnabled())
 			logger.debug("doExecute: graphElement.class=" + (graphElement == null ? null : graphElement.getClass().getName()) + " graphElement=" + graphElement);
 
-		if (!(graphElement instanceof org.jbpm.graph.node.State || graphElement instanceof org.jbpm.graph.node.EndState)) {
+//		if (!(graphElement instanceof org.jbpm.graph.node.State || graphElement instanceof org.jbpm.graph.node.EndState)) {
+		if (!(graphElement instanceof org.jbpm.graph.def.Node)) {
 			if (logger.isDebugEnabled())
 				logger.debug("doExecute: graphElement is not an instance of an interesting type => return without action!");
 

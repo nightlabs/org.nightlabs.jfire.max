@@ -603,8 +603,7 @@
         <include name="META-INF/ejb-jar.xml"/>
       	<include name="META-INF/ejb-rolegroup.xml"/>
        	<include name="META-INF/jboss.xml"/>
-        <include name="META-INF/datastoreinit.xml"/>
-        <include name="META-INF/serverinit.xml"/>
+		<include name="META-INF/datastoreinit.xml"/>
         <include name="META-INF/*-ds.xml"/>
         <include name="META-INF/ra.xml"/>
       </fileset>

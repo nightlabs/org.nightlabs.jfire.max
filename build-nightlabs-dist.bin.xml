@@ -1,0 +1,24 @@
+<project>
+	<!-- Create the server jar file -->
+	<target name="dist.bin">
+    <mkdir dir="${project.dir}/${dist.dir}/" />
+    <delete file="${project.dir}/${dist.dir}/${project.jar}" failonerror="false" />
+    <jar jarfile="${project.dir}/${dist.dir}/${project.jar}">
+      <fileset dir="${project.dir}/${bin.dir}" excludes="${dist.bin.excludes}" includes="${dist.bin.includes}"/>
+<!--
+      <fileset dir="${project.dir}/${bin.dir}">
+        <include name="**/*.*"/>
+      </fileset>
+-->
+      <fileset dir="${project.dir}/${project.name}">
+        <include name="META-INF/ejb-jar.xml"/>
+      	<include name="META-INF/ejb-rolegroup.xml"/>
+       	<include name="META-INF/jboss.xml"/>
+        <include name="META-INF/datastoreinit.xml"/>
+        <include name="META-INF/serverinit.xml"/>
+        <include name="META-INF/*-ds.xml"/>
+        <include name="META-INF/ra.xml"/>
+      </fileset>
+    </jar>
+	</target>	
+</project>

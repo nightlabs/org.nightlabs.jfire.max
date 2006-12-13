@@ -25,6 +25,8 @@
  ******************************************************************************/
 package org.nightlabs.jfire.scripting.condition;
 
+import org.nightlabs.jfire.scripting.id.ScriptRegistryItemID;
+
 
 /**
  * The Base Interface for expressing simple condition which result is always a boolean
@@ -38,29 +40,54 @@ package org.nightlabs.jfire.scripting.condition;
 public interface ISimpleCondition
 extends ICondition
 {
+//	/**
+//	 * returns the name of the variable 
+//	 * @return the name of the variable
+//	 */
+//	String getVariableName();
+//	
+//	/**
+//	 * sets the variableName 
+//	 * @param variableName the variableName to set
+//	 */
+//	void setVariableName(String variableName);
+	
+//	/**
+//	 * returns the value as string
+//	 * @return the value as string
+//	 */
+//	String getValueAsString();
+//	
+//	/**
+//	 * sets the value as String
+//	 * @param s the value to set
+//	 */
+//	void setValueAsString(String s);
+
 	/**
-	 * returns the name of the variable 
-	 * @return the name of the variable
+	 * returns the {@link ScriptRegistryItemID} which represents the variable 
+	 * @return the ScriptRegistryItemID which represents the variable
 	 */
-	String getVariableName();
+	ScriptRegistryItemID getScriptRegistryItemID();
 	
 	/**
-	 * sets the variableName 
-	 * @param variableName the variableName to set
+	 * sets the {@link ScriptRegistryItemID} which represents the variable 
+	 * @param scriptID the {@link ScriptRegistryItemID} to set
 	 */
-	void setVariableName(String variableName);
+	void setScriptRegistryItemID(ScriptRegistryItemID scriptID);
+
+	/**
+	 * returns the value
+	 * @return the value
+	 */
+	Object getValue();
 	
 	/**
-	 * returns the value as string
-	 * @return the value as string
+	 * sets the value
+	 * @param o the value to set
 	 */
-	String getValueAsString();
-	
-	/**
-	 * sets the value as String
-	 * @param s the value to set
-	 */
-	void setValueAsString(String s);
+	void setValue(Object o);
+
 	
 	/**
 	 * returns the {@link CompareOperator} of the simple condition

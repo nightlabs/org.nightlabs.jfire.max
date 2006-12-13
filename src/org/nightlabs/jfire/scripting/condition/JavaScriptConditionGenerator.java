@@ -26,6 +26,7 @@
 package org.nightlabs.jfire.scripting.condition;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 
 import org.nightlabs.jfire.scripting.ScriptExecutorJavaScript;
@@ -38,6 +39,13 @@ public class JavaScriptConditionGenerator
 //implements IConditionGenerator 
 extends ConstrainedConditionGenerator
 {
+//	public JavaScriptConditionGenerator(Collection<ScriptConditioner> scriptConditioners) {
+//		super(scriptConditioners);
+//	}
+
+	public JavaScriptConditionGenerator() {
+		super();
+	}
 
 	public String getCombineOperator(CombineOperator combineOperator) 
 	{

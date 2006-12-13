@@ -41,7 +41,10 @@ implements Serializable
 {
 	private static final Logger logger = Logger.getLogger(ScriptConditioner.class);
 	
-	public ScriptConditioner(ScriptRegistryItemID scriptID, String variableName, 
+	public ScriptConditioner(
+			ScriptRegistryItemID scriptID,
+			org.nightlabs.jfire.scripting.Script script,
+			String variableName, 
 			List<CompareOperator> compareOperators, 
 			Collection<Object> possibleValues,  
 			String valueLabelProviderClassName)			
@@ -58,11 +61,15 @@ implements Serializable
 		if (compareOperators.isEmpty())
 			throw new IllegalArgumentException("Param compareOperators must NOT be empty!");
 
+		if (script == null)
+			throw new IllegalArgumentException("Param script must NOT be null!");
+		
 		this.scriptRegistryItemID = scriptID;
 		this.variableName = variableName;
 		this.possibleValues = possibleValues;
 		this.compareOperators = compareOperators;
 		this.labelProviderClassName = valueLabelProviderClassName;
+		this.script = script;
 	}
 	
 	private ScriptRegistryItemID scriptRegistryItemID;
@@ -73,6 +80,15 @@ implements Serializable
 		this.scriptRegistryItemID = scriptRegistryItemID;
 	}
 	
+	private org.nightlabs.jfire.scripting.Script script;
+	public org.nightlabs.jfire.scripting.Script getScript() {
+		return script;
+	}
+	public void setScript(org.nightlabs.jfire.scripting.Script script) {
+		this.script = script;
+	}
+	
+	// TODO: Must come from client
 	private String variableName;
 	public String getVariableName() {
 		return variableName;

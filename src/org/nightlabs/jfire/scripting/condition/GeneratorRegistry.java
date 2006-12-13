@@ -25,6 +25,7 @@
  ******************************************************************************/
 package org.nightlabs.jfire.scripting.condition;
 
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -46,8 +47,6 @@ public class GeneratorRegistry
 		{
 			sharedInstance = new GeneratorRegistry();
 			// register JavaScriptConditionGenerator
-//			sharedInstance.registerGenerator(ScriptExecutorJavaScript.LANGUAGE_JAVA_SCRIPT, 
-//					new JavaScriptConditionGenerator());
 			sharedInstance.registerGenerator(new JavaScriptConditionGenerator());
 		}
 		return sharedInstance;
@@ -59,14 +58,18 @@ public class GeneratorRegistry
 	
 	private Map<String, IConditionGenerator> language2Generator = new HashMap<String, IConditionGenerator>();
 	
-//	public void registerGenerator(String language, IConditionGenerator generator) {
-//		language2Generator.put(language, generator);
-//	}
 	public void registerGenerator(IConditionGenerator generator) {
 		language2Generator.put(generator.getLanguage(), generator);
 	}
 	
-	public IConditionGenerator getGenerator(String language) {
-		return language2Generator.get(language);
+//	public IConditionGenerator getGenerator(String language) {
+//		return language2Generator.get(language);
+//	}
+	public IConditionGenerator getGenerator(String language, Collection<ScriptConditioner> scriptConditioner) 
+	{
+		IConditionGenerator generator = language2Generator.get(language);
+		generator.setScriptConditioner(scriptConditioner);
+		return generator;
 	}
+	
 }

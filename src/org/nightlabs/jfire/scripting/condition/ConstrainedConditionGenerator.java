@@ -25,7 +25,16 @@
  ******************************************************************************/
 package org.nightlabs.jfire.scripting.condition;
 
+import java.util.Collection;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
+
+import javax.jdo.JDOHelper;
+import javax.jdo.spi.PersistenceCapable;
+
+import org.nightlabs.jdo.ObjectID;
+import org.nightlabs.jfire.scripting.id.ScriptRegistryItemID;
 
 /**
  * @author Daniel.Mazurek [at] NightLabs [dot] de
@@ -34,6 +43,91 @@ import java.util.List;
 public abstract class ConstrainedConditionGenerator 
 implements IConditionGenerator 
 {
+//	public ConstrainedConditionGenerator(Collection<ScriptConditioner> scriptConditioners) 
+//	{
+//		setScriptConditioner(scriptConditioners);
+//	}
+
+	public ConstrainedConditionGenerator() 
+	{
+
+	}
+
+	private Collection<ScriptConditioner> scriptConditioners;
+	private Map<ScriptRegistryItemID, String> scriptID2Name;	
+	private ConstrainedConditionScriptParser parser;
+	
+	public Collection<ScriptConditioner> getScriptConditioner() {
+		return scriptConditioners;
+	}
+	public void setScriptConditioner(Collection<ScriptConditioner> scriptConditioner) {
+		this.scriptConditioners = scriptConditioner;
+		int size = scriptConditioners.size();
+		scriptID2Name = new HashMap<ScriptRegistryItemID, String>(size);
+		for (ScriptConditioner conditioner : scriptConditioners) {
+			scriptID2Name.put(conditioner.getScriptRegistryItemID(), conditioner.getVariableName());
+		}
+	}
+	
+	public ICondition getCondition(String text) 
+	{
+		if (parser == null) {
+			parser = new ConstrainedConditionScriptParser(scriptConditioners);  
+		}		
+		return parser.getCondition(this, text);
+	}
+	
+	public String getScriptText(ICondition condition) 
+	{
+		if (condition instanceof ISimpleCondition) 
+		{			
+			ISimpleCondition simpleCondition = (ISimpleCondition) condition;
+			String openContainer = getOpenContainerString();
+			String closeContainer = getCloseContainerString();
+			String operator = getCompareOperator(simpleCondition.getCompareOperator());
+			String varName = getVariableString() + scriptID2Name.get(simpleCondition.getScriptRegistryItemID());
+			Object value = simpleCondition.getValue();
+			String valueName = "";
+			String variableName = "";
+			if (simpleCondition.getValue() instanceof PersistenceCapable) 
+			{
+				String lineBreak = "\n";
+				StringBuffer sb = new StringBuffer();
+				sb.append("importPackage(Packages.javax.jdo);");
+				sb.append(lineBreak);
+				sb.append("importPackage(Packages.org.nightlabs.jdo);");
+				sb.append(lineBreak);
+				sb.append("JDOHelper.getObjectId("+varName+")");
+				varName = sb.toString();
+				ObjectID objectID = (ObjectID) JDOHelper.getObjectId(value);
+				String objectIDString = objectID.toString();				
+				valueName = "ObjectIDUtil.createObjectID("+objectIDString+")";
+			}
+			else {
+				variableName = varName;
+				// TODO: allow only primitive types
+				valueName = String.valueOf(value);
+			}
+			return openContainer + variableName + operator + valueName + closeContainer;
+		}
+		if (condition instanceof IConditionContainer) {
+			IConditionContainer container = (IConditionContainer) condition;
+			StringBuffer sb = new StringBuffer();
+			sb.append(getOpenContainerString());
+			List<ICondition> conditions = container.getConditions();
+			for (int i=0; i<conditions.size(); i++) {
+				ICondition con = conditions.get(i);
+				sb.append(getScriptText(con));
+				if (i != conditions.size()-1)
+					sb.append(getCombineOperator(container.getCombineOperator()));
+			}
+			sb.append(getCloseContainerString());
+			return sb.toString();
+		}
+		else
+			throw new RuntimeException("unknown implementation of ICondition "+condition);
+	}
+	
 	/**
 	* returns the scriptLanguage depended String for all available
 	* {@link CombineOperator}s like AND, OR ....
@@ -103,36 +197,4 @@ implements IConditionGenerator
 	*/
 	public abstract CombineOperator getCombineOperator(String combineOperator);
 	
-	public ICondition getCondition(String text) {
-		return ConstrainedConditionScriptParser.sharedInstance().getCondition(this, text);
-	}
-	
-	public String getScriptText(ICondition condition) 
-	{
-//		return condition.getScriptText();
-		if (condition instanceof ISimpleCondition) {
-			ISimpleCondition simpleCondition = (ISimpleCondition) condition;
-			String openContainer = getOpenContainerString();
-			String variable = getVariableString() + simpleCondition.getVariableName();
-			String operator = getCompareOperator(simpleCondition.getCompareOperator());
-			String closeContainer = getCloseContainerString();
-			return openContainer + variable + operator + simpleCondition.getValueAsString() + closeContainer;			
-		}
-		if (condition instanceof IConditionContainer) {
-			IConditionContainer container = (IConditionContainer) condition;
-			StringBuffer sb = new StringBuffer();
-			sb.append(getOpenContainerString());
-			List<ICondition> conditions = container.getConditions();
-			for (int i=0; i<conditions.size(); i++) {
-				ICondition con = conditions.get(i);
-				sb.append(getScriptText(con));
-				if (i != conditions.size()-1)
-					sb.append(getCombineOperator(container.getCombineOperator()));
-			}
-			sb.append(getCloseContainerString());
-			return sb.toString();
-		}
-		else
-			return null;
-	}
 }

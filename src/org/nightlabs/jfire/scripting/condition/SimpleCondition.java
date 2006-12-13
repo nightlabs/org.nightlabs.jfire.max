@@ -25,6 +25,8 @@
  ******************************************************************************/
 package org.nightlabs.jfire.scripting.condition;
 
+import org.nightlabs.jfire.scripting.id.ScriptRegistryItemID;
+
 
 /**
  * @author Daniel.Mazurek [at] NightLabs [dot] de
@@ -34,11 +36,11 @@ public class SimpleCondition
 extends AbstractCondition 
 implements ISimpleCondition
 {
-	public SimpleCondition(String variableName, CompareOperator compareOperator,
-			String value) 
+	public SimpleCondition(ScriptRegistryItemID scriptID, CompareOperator compareOperator,
+			Object value) 
 	{
-		if (variableName == null)
-			throw new IllegalArgumentException("Param variableName must not be null");
+		if (scriptID == null)
+			throw new IllegalArgumentException("Param scriptID must not be null");
 		
 		if (compareOperator == null)
 			throw new IllegalArgumentException("Param compareOperator must not be null");
@@ -46,7 +48,7 @@ implements ISimpleCondition
 		if (value == null)
 			throw new IllegalArgumentException("Param value must not be null");
 		
-		this.variableName = variableName;
+		this.scriptRegistryItemID = scriptID;
 		this.compareOperator = compareOperator;
 		this.value = value;
 	}
@@ -59,21 +61,38 @@ implements ISimpleCondition
 		this.compareOperator = compareOperator;
 	}
 	
-	private String value = "";
-	public String getValueAsString() {
+	private ScriptRegistryItemID scriptRegistryItemID;
+	public ScriptRegistryItemID getScriptRegistryItemID() {
+		return scriptRegistryItemID;
+	}
+	public void setScriptRegistryItemID(ScriptRegistryItemID scriptRegistryItemID) {
+		this.scriptRegistryItemID = scriptRegistryItemID;
+	}
+	
+	private Object value;
+	public Object getValue() {
 		return value;
 	}
-	public void setValueAsString(String value) {
+	public void setValue(Object value) {
 		this.value = value;
 	}
 	
-	private String variableName;
-	public String getVariableName() {
-		return variableName;
-	}
-	public void setVariableName(String variableName) {
-		this.variableName = variableName;
-	}
+//	private String value = "";
+//	public String getValueAsString() {
+//		return value;
+//	}
+//	public void setValueAsString(String value) {
+//		this.value = value;
+//	}
+//	
+//	private String variableName;
+//	public String getVariableName() {
+//		return variableName;
+//	}
+//	public void setVariableName(String variableName) {
+//		this.variableName = variableName;
+//	}
+
 	
 //	@Override
 //	public boolean equals(Object obj) 

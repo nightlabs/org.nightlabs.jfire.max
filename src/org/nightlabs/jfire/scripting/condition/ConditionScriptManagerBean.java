@@ -37,6 +37,7 @@ import javax.ejb.CreateException;
 import javax.ejb.EJBException;
 import javax.ejb.SessionBean;
 import javax.ejb.SessionContext;
+import javax.jdo.FetchPlan;
 import javax.jdo.JDOObjectNotFoundException;
 import javax.jdo.PersistenceManager;
 
@@ -114,8 +115,10 @@ implements SessionBean
 			logger.error("script resultClass "+script.getResultClassName()+" of script with scriptRegistryItemID "+scriptRegistryItemID+" could not be found", e);
 		}
 		
+		// TODO: must come from client
 		String variableName = scriptRegistryItemID.scriptRegistryItemID;
 //		String variableName = script.getName().getText();
+		
 		Collection possibleValues = Collections.EMPTY_LIST;
 		String valueLabelProviderClassName = LabelProvider.class.getName();			
 		PossibleValueProviderID valueProviderID = PossibleValueProviderID.create(
@@ -135,8 +138,10 @@ implements SessionBean
 			logger.info("No possible values found for ScriptRegistryItemID "+scriptRegistryItemID+", use DefaultPossibleValueProvider!");				
 		}
 		
-		ScriptConditioner sc = new ScriptConditioner(scriptRegistryItemID, variableName, 
-				compareOperators, possibleValues, valueLabelProviderClassName);		
+		pm.getFetchPlan().setGroups(new String[] {FetchPlan.DEFAULT, Script.FETCH_GROUP_NAME});
+		script = (Script) pm.detachCopy(script);
+		ScriptConditioner sc = new ScriptConditioner(scriptRegistryItemID, script, 
+				variableName, compareOperators, possibleValues, valueLabelProviderClassName);		
 //		sc.setPossibleValuesAreObjectIDs(script.isNeedsDetach());
 		
 //		if (logger.isDebugEnabled()) {

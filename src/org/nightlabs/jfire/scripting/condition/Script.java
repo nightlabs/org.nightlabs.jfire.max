@@ -91,18 +91,17 @@ implements IScript
 		this.variableName2ScriptID = variableName2ScriptID;
 	}
 
-//	private transient Map<ScriptRegistryItemID, String> scriptID2variableName = null;
-//	public Map<ScriptRegistryItemID, String> getScriptID2variableName() {
-//		if (scriptID2variableName == null) {
-//			HashMap<ScriptRegistryItemID, String> m = new HashMap<ScriptRegistryItemID, String>();
-//			for (Map.Entry<String, ScriptRegistryItemID> me : variableName2ScriptID.entrySet())
-//				m.put(me.getValue(), me.getKey());
-//
-//			scriptID2variableName = m;
-//		}
-//		
-//		return scriptID2variableName;
-//	}
+	private transient Map<ScriptRegistryItemID, String> scriptID2variableName = null;
+	public Map<ScriptRegistryItemID, String> getScriptID2VariableName() {
+		if (scriptID2variableName == null) {
+			HashMap<ScriptRegistryItemID, String> m = new HashMap<ScriptRegistryItemID, String>();
+			for (Map.Entry<String, ScriptRegistryItemID> me : variableName2ScriptID.entrySet())
+				m.put(me.getValue(), me.getKey());
+
+			scriptID2variableName = m;
+		}		
+		return scriptID2variableName;
+	}
 
 	/**
 	 * a map which maps the variablenames of the scriptText to the values

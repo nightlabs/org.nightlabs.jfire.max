@@ -26,13 +26,21 @@
 package org.nightlabs.jfire.scripting.condition;
 
 import java.util.ArrayList;
+import java.util.Collection;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import javax.jdo.JDOHelper;
+import javax.jdo.spi.PersistenceCapable;
+
 import org.apache.log4j.Logger;
+import org.nightlabs.jdo.ObjectID;
+import org.nightlabs.jfire.scripting.id.ScriptRegistryItemID;
 
 /**
  * @author Daniel.Mazurek [at] NightLabs [dot] de
@@ -42,17 +50,41 @@ public class ConstrainedConditionScriptParser
 {
 	private static final Logger logger = Logger.getLogger(ConstrainedConditionScriptParser.class);
 	
-	private static ConstrainedConditionScriptParser sharedInstance = null;
-	public static ConstrainedConditionScriptParser sharedInstance() {
-		if (sharedInstance == null) {
-			sharedInstance = new ConstrainedConditionScriptParser();
+//	private static ConstrainedConditionScriptParser sharedInstance = null;
+//	public static ConstrainedConditionScriptParser sharedInstance() {
+//		if (sharedInstance == null) {
+//			sharedInstance = new ConstrainedConditionScriptParser();
+//		}
+//		return sharedInstance;
+//	}
+//	
+//	protected ConstrainedConditionScriptParser() {
+//		
+//	}
+	
+	private Collection<ScriptConditioner> scriptConditioners;
+	public ConstrainedConditionScriptParser(Collection<ScriptConditioner> scriptConditioners) 
+	{
+		this.scriptConditioners = scriptConditioners;
+		variableName2ScriptID = new HashMap<String, ScriptRegistryItemID>();
+		objectIDString2Value = new HashMap<String, Object>();
+		for (ScriptConditioner conditioner : scriptConditioners) {
+			variableName2ScriptID.put(conditioner.getVariableName(), 
+					conditioner.getScriptRegistryItemID());
+			for (Object value : conditioner.getPossibleValues()) {
+				if (value instanceof PersistenceCapable) {
+					ObjectID objectID = (ObjectID) JDOHelper.getObjectId(value);
+					objectIDString2Value.put(objectID.toString(), value);
+				}
+				else {
+					objectIDString2Value.put(String.valueOf(value), value);
+				}
+			}
 		}
-		return sharedInstance;
 	}
 	
-	protected ConstrainedConditionScriptParser() {
-		
-	}
+	private Map<String, ScriptRegistryItemID> variableName2ScriptID;
+	private Map<String, Object> objectIDString2Value;
 	
 	// special characters for regular expressions
 	private static Set<String> specialCharacters = new HashSet<String>();
@@ -293,7 +325,9 @@ public class ConstrainedConditionScriptParser
 					logger.debug("value = "+value);
 				}
 				
-				SimpleCondition simpleCondition = new SimpleCondition(variable, co, value);
+				ScriptRegistryItemID scriptID = variableName2ScriptID.get(variable);
+				Object valueObject = objectIDString2Value.get(value);
+				SimpleCondition simpleCondition = new SimpleCondition(scriptID, co, valueObject);
 				return simpleCondition;				
 			}
 			else {

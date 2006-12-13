@@ -55,4 +55,7 @@ public interface ICondition
 //	 * @return the name of the script language
 //	 */
 //	String getLanguage();
+	
+//	Script getScript();	
+//	void setScript(Script script);
 }

@@ -25,6 +25,8 @@
  ******************************************************************************/
 package org.nightlabs.jfire.scripting.condition;
 
+import java.util.Collection;
+
 
 /**
  * This Interface generates the language dependend syntax for the
@@ -55,4 +57,19 @@ public interface IConditionGenerator
 	 * @return the script language as String
 	 */
 	String getLanguage();
+	
+	/**
+	 * 
+	 * @return a Collection of {@link ScriptConditioner} which provide the necessary data
+	 * for parsing and creating the scriptTexts 
+	 */
+	Collection<ScriptConditioner> getScriptConditioner();
+	
+	/**
+	 * set the Collection of {@link ScriptConditioner} which provide the necessary data
+	 * for parsing and creating the scriptTexts
+	 * 
+	 * @param scriptConditioner the scriptConditioner to set
+	 */
+	void setScriptConditioner(Collection<ScriptConditioner> scriptConditioner);
 }

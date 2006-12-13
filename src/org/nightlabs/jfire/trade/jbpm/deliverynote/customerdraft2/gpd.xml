@@ -2,13 +2,18 @@
 
 <process-diagram name="devil.NightLabs.org:DeliveryNote.Customer" width="742" height="637">
   <node name="devil.NightLabs.org:sent" x="4" y="4" width="206" height="40">
-    <transition name="createReceptionNote">
-      <label x="5" y="-10"/>
-    </transition>
-    <transition name="book">
+    <transition name="check">
       <label x="5" y="-10"/>
     </transition>
   </node>
+  <node name="checked or checking?" x="3" y="117" width="208" height="40">
+    <transition name="book">
+      <label x="5" y="-10"/>
+    </transition>
+    <transition name="">
+      <label x="5" y="-10"/>
+    </transition>
+  </node>
+  <node name="devil.NightLabs.org:booked" x="3" y="229" width="209" height="40"/>
   <node name="devil.NightLabs.org:createdReceptionNote" x="347" y="116" width="268" height="40"/>
-  <node name="devil.NightLabs.org:booked" x="5" y="120" width="205" height="40"/>
 </process-diagram>

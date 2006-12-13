@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<process-definition
+  xmlns=""  name="devil.NightLabs.org:DeliveryNote.Customer">
+   <start-state name="devil.NightLabs.org:sent">
+      <transition name="check" to="checked or checking?"></transition>
+   </start-state>
+   <state name="checked or checking?">
+      <transition name="book" to="devil.NightLabs.org:booked"></transition>
+      <transition name="" to="devil.NightLabs.org:createdReceptionNote"></transition>
+   </state>
+   <state name="devil.NightLabs.org:booked"></state>
+   <end-state name="devil.NightLabs.org:createdReceptionNote"></end-state>
+</process-definition>

@@ -76,24 +76,7 @@ implements ISimpleCondition
 	public void setValue(Object value) {
 		this.value = value;
 	}
-	
-//	private String value = "";
-//	public String getValueAsString() {
-//		return value;
-//	}
-//	public void setValueAsString(String value) {
-//		this.value = value;
-//	}
-//	
-//	private String variableName;
-//	public String getVariableName() {
-//		return variableName;
-//	}
-//	public void setVariableName(String variableName) {
-//		this.variableName = variableName;
-//	}
-
-	
+		
 //	@Override
 //	public boolean equals(Object obj) 
 //	{
@@ -101,11 +84,11 @@ implements ISimpleCondition
 //			return false;		
 //		if (obj instanceof SimpleCondition) {
 //			SimpleCondition sc = (SimpleCondition) obj;			
-//			if (!sc.getVariableName().equals(variableName))
+//			if (!sc.getScriptRegistryItemID().equals(scriptRegistryItemID))
 //				return false;
 //			if (sc.getCompareOperator() != compareOperator)
 //				return false;
-//			if (!sc.getValueAsString().equals(value))
+//			if (!sc.getValue().equals(value))
 //				return false;
 //			
 //			return true;
@@ -116,17 +99,7 @@ implements ISimpleCondition
 //	@Override
 //	public int hashCode() 
 //	{
-//		return variableName.hashCode() + value.hashCode() + compareOperator.hashCode();
-//	}
-	
-//	public String getScriptText() 
-//	{
-//		IConditionGenerator generator = GeneratorRegistry.sharedInstance().getGenerator(getLanguage());
-//		String openContainer = generator.getOpenContainerString();
-//		String variable = generator.getVariableString() + getVariableName();
-//		String operator = generator.getCompareOperator(getCompareOperator());
-//		String closeContainer = generator.getCloseContainerString();
-//		return openContainer + variable + operator + getValueAsString() + closeContainer;
+//		return scriptRegistryItemID.hashCode() + value.hashCode() + compareOperator.hashCode();
 //	}
 
 }

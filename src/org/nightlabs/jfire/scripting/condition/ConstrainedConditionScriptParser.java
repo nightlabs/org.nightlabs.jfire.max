@@ -49,19 +49,7 @@ import org.nightlabs.jfire.scripting.id.ScriptRegistryItemID;
 public class ConstrainedConditionScriptParser 
 {
 	private static final Logger logger = Logger.getLogger(ConstrainedConditionScriptParser.class);
-	
-//	private static ConstrainedConditionScriptParser sharedInstance = null;
-//	public static ConstrainedConditionScriptParser sharedInstance() {
-//		if (sharedInstance == null) {
-//			sharedInstance = new ConstrainedConditionScriptParser();
-//		}
-//		return sharedInstance;
-//	}
-//	
-//	protected ConstrainedConditionScriptParser() {
-//		
-//	}
-	
+		
 	private Collection<ScriptConditioner> scriptConditioners;
 	public ConstrainedConditionScriptParser(Collection<ScriptConditioner> scriptConditioners) 
 	{
@@ -74,7 +62,10 @@ public class ConstrainedConditionScriptParser
 			for (Object value : conditioner.getPossibleValues()) {
 				if (value instanceof PersistenceCapable) {
 					ObjectID objectID = (ObjectID) JDOHelper.getObjectId(value);
-					objectIDString2Value.put(objectID.toString(), value);
+					if (objectID != null)
+						objectIDString2Value.put(objectID.toString(), value);
+					else
+						logger.error("There exists no ObjectID for the persistenceCapable "+String.valueOf(value));
 				}
 				else {
 					objectIDString2Value.put(String.valueOf(value), value);
@@ -108,94 +99,95 @@ public class ConstrainedConditionScriptParser
 		return specialCharacters;
 	}
 	
+//	public ICondition getCondition(ConstrainedConditionGenerator generator, String scriptText) 
+//	{
+//		if (scriptText == null)
+//			throw new IllegalArgumentException("param scriptText must NOT be null!");
+//
+//		System.out.println("originalScriptText = "+scriptText);
+//		
+//// convert sth. like the following line:
+////		importPackage(Packages.javax.jdo);
+////		importPackage(Packages.org.nightlabs.jdo);
+////		JDOHelper.getObjectId(myVariable) == ObjectIDUtil.createObjectID("jdo/org.b.MyClassID?fieldA=0")
+////
+//// to sth. like this:
+////		myVariable == jdo/org.b.MyClassID?fieldA=0
+//		
+//		StringBuffer sb = new StringBuffer();
+//		sb.append("importPackage\\(Packages.javax.jdo\\)\\;");
+//		sb.append("importPackage\\(Packages.org.nightlabs.jdo\\)\\;");
+//		sb.append("JDOHelper.getObjectId\\((.*?)\\)");
+//		String varRegEx = sb.toString();
+//		
+////		System.out.println("varRegEx = "+varRegEx);
+//
+//		scriptText = scriptText.replaceAll(varRegEx, "$1");
+//		scriptText = scriptText.replaceAll("ObjectIDUtil.createObjectID\\(\\\"(.*?)\\\"\\)", "$1");
+////		scriptText = scriptText.replaceAll("ObjectIDUtil.createObjectID\\(\"(.*?)\"\\)", "$1");
+////		scriptText = scriptText.replaceAll("ObjectIDUtil.createObjectID\\((.*?)\\)", "$1");
+//
+//		System.out.println("replacedScriptText = "+scriptText);
+//		
+//		return parseConditionContainer(scriptText, generator);
+//	}
+	
 	public ICondition getCondition(ConstrainedConditionGenerator generator, String scriptText) 
 	{
 		if (scriptText == null)
 			throw new IllegalArgumentException("param scriptText must NOT be null!");
 
+//		if (logger.isDebugEnabled())
+//			logger.debug("originalScriptText = "+scriptText);
+			System.out.println("originalScriptText = "+scriptText);
+		
 // convert sth. like the following line:
-//		JDOHelper.getObjectId(myVariable) == ObjectIDUtil.createObjectID("jdo/org.b.MyClassID?fieldA=0")
+//		importPackage(Packages.javax.jdo);
+//		JDOHelper.getObjectId(myVariable).toString()==jdo/org.b.MyClassID?fieldA=0
 //
 // to sth. like this:
 //		myVariable == jdo/org.b.MyClassID?fieldA=0
+		
+		StringBuffer sb = new StringBuffer();
+		sb.append("importPackage\\(Packages.javax.jdo\\)\\;");
+//		sb.append("importPackage\\(Packages.org.nightlabs.jdo\\)\\;");
+		sb.append("JDOHelper.getObjectId\\((.*?)\\)");		
+		sb.append("\\.toString\\(\\)");
+		
+		String varRegEx = sb.toString();		
+//		System.out.println("varRegEx = "+varRegEx);
 
-		scriptText = scriptText.replaceAll("JDOHelper.getObjectId\\((.*?)\\)", "$1");
-		scriptText = scriptText.replaceAll("ObjectIDUtil.createObjectID\\(\\\"(.*?)\\\"\\)", "$1");
+		scriptText = scriptText.replaceAll(varRegEx, "$1");
+//		scriptText = scriptText.replaceAll("ObjectIDUtil.createObjectID\\(\\\"(.*?)\\\"\\)", "$1");
+//		scriptText = scriptText.replaceAll("ObjectIDUtil.createObjectID\\((.*?)\\)", "$1");
 
+//		if (logger.isDebugEnabled())
+//			logger.debug("replacedScriptText = "+scriptText);
+		System.out.println("replacedScriptText = "+scriptText);
+		
 		return parseConditionContainer(scriptText, generator);
-	}
+	}	
 	
-	private boolean isContainer(String text, ConstrainedConditionGenerator generator) 
-	{
-		// check if simpleCondition or container and call corresponding method
-		int openContainerIndex = -1; 
-		for (int i=0; i<text.length(); i++) {
-			char c = text.charAt(i);
-			if (openContainerIndex != -1) {
-				if (String.valueOf(c).equals(generator.getOpenContainerString()) &&
-						i == openContainerIndex + 1) 
-				{
-					return true;
-				}							
-			}	
-			if (String.valueOf(c).equals(generator.getOpenContainerString())) {
-				openContainerIndex = i;
-			}
-		}
-		return false;
-	}
-	
-//	private ICondition parseConditionContainer(String text, ConstrainedConditionGenerator generator) 
+//	private boolean isContainer(String text, ConstrainedConditionGenerator generator) 
 //	{
-//		while (isContainer(text, generator)) 
-//		{
-//			System.out.println("containerText = "+text);
-//			List<String> subContainer = getContainerSubStrings(text, 
-//					generator.getOpenContainerString(), 
-//					generator.getCloseContainerString());
-//			if (subContainer.size() == 0) {
-//				return parseSimpleCondition(generator, text);
-//			}
-//			ConditionContainer conditionContainer = new ConditionContainer();
-//			for (String container : subContainer) {
-//				text = text.replace(container, "");
-//				ICondition condition = parseConditionContainer(container, generator);
-//				conditionContainer.addCondition(condition);
-//				System.out.println("subContainer = "+container);
-//			}			
-//			text = text.replace(generator.getOpenContainerString(), "");
-//			text = text.replace(generator.getCloseContainerString(), "");
-//			System.out.println("combineText = "+text);
-//			Pattern combinePattern = Pattern.compile(getCombineOperatorRegEx(generator));
-//			Matcher combinePatternMatcher = combinePattern.matcher(text);
-//			if (combinePatternMatcher.find()) {
-////				while (combinePatternMatcher.find()) {
-////					int groupCount = combinePatternMatcher.groupCount();						
-////					System.out.println("groupCount = "+groupCount);
-//				int start = combinePatternMatcher.regionStart();
-//				int end = combinePatternMatcher.regionEnd();
-//				String combineOperator = text.substring(start, end);
-//
-//				System.out.println("start = "+start);
-//				System.out.println("end = "+end);
-//				System.out.println("combineOperator = "+combineOperator);
-//				
-//				conditionContainer.setCombineOperator(generator.getCombineOperator(combineOperator));
-//				return conditionContainer;										
-//			}
-//			else {
-//				StringBuffer sb = new StringBuffer();
-//				for (String string : generator.getCombineOperators()) {
-//					sb.append(string+" , ");
-//				}
-//				throw new IllegalArgumentException("Param text "+text+" does not contain any of " + 
-//						" the following combineOperators!");
+//		// check if simpleCondition or container and call corresponding method
+//		int openContainerIndex = -1; 
+//		for (int i=0; i<text.length(); i++) {
+//			char c = text.charAt(i);
+//			if (openContainerIndex != -1) {
+//				if (String.valueOf(c).equals(generator.getOpenContainerString()) &&
+//						i == openContainerIndex + 1) 
+//				{
+//					return true;
+//				}							
 //			}	
+//			if (String.valueOf(c).equals(generator.getOpenContainerString())) {
+//				openContainerIndex = i;
+//			}
 //		}
-//		throw new IllegalArgumentException("Param text "+text+" is not valid");
-////		return parseSimpleCondition(generator, text);
+//		return false;
 //	}
-	
+		
 	private ICondition parseConditionContainer(String text, ConstrainedConditionGenerator generator) 
 	{
 //		System.out.println("containerText = "+text);
@@ -238,12 +230,7 @@ public class ConstrainedConditionScriptParser
 				int start = combinePatternMatcher.start();
 				int end = combinePatternMatcher.end();
 
-				String combineOperator = text.substring(start, end);
-
-//				System.out.println("start = "+start);
-//				System.out.println("end = "+end);
-//				System.out.println("combineOperator = "+combineOperator);
-				
+				String combineOperator = text.substring(start, end);				
 				conditionContainer.setCombineOperator(generator.getCombineOperator(combineOperator));
 				return conditionContainer;										
 			}
@@ -326,7 +313,7 @@ public class ConstrainedConditionScriptParser
 				}
 				
 				ScriptRegistryItemID scriptID = variableName2ScriptID.get(variable);
-				Object valueObject = objectIDString2Value.get(value);
+				Object valueObject = objectIDString2Value.get(value);				
 				SimpleCondition simpleCondition = new SimpleCondition(scriptID, co, valueObject);
 				return simpleCondition;				
 			}
@@ -407,20 +394,5 @@ public class ConstrainedConditionScriptParser
 //			}
 			return s;
 	}
-	
-//	private String specialCharacterRegEx;
-//	private String getSpecialCharacterRegEx() {
-//		if (specialCharacterRegEx == null) {
-//			StringBuffer sb = new StringBuffer();
-//			for (String specialCharacter : getSpecialCharacters()) {
-//				sb.append("[\\"+specialCharacter+"]");				
-//			} 
-//			specialCharacterRegEx = sb.toString();
-//			if (logger.isDebugEnabled()) {
-//				logger.debug("specialCharacterRegEx = "+specialCharacterRegEx); 
-//			}
-//		}
-//		return specialCharacterRegEx;
-//	}	
 	
 }

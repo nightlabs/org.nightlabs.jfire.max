@@ -25,11 +25,19 @@
  ******************************************************************************/
 package org.nightlabs.jfire.scripting.test;
 
+import java.util.HashMap;
+import java.util.Map;
+
 import org.mozilla.javascript.Context;
 import org.mozilla.javascript.ImporterTopLevel;
 import org.mozilla.javascript.NativeJavaObject;
 import org.mozilla.javascript.Scriptable;
+import org.mozilla.javascript.ScriptableObject;
 import org.mozilla.javascript.Undefined;
+import org.nightlabs.jdo.ObjectIDUtil;
+import org.nightlabs.jfire.scripting.Script;
+import org.nightlabs.jfire.scripting.ScriptCategory;
+import org.nightlabs.jfire.scripting.id.ScriptRegistryItemID;
 
 /**
  * @author Daniel.Mazurek [at] NightLabs [dot] de
@@ -41,66 +49,18 @@ public class Main {
 		// TODO Auto-generated constructor stub
 	}
 
-	public static void main(String[] args) {
-		Context context = Context.enter();
-		try {
-			Scriptable scope = new ImporterTopLevel(context);
-
-			String sourceName = "Script";
-			Object result = context.evaluateString(
-					scope,
-//					"new Packages.org.nightlabs.jfire.scripting.test.Main();",
-//					"new java.lang.Long(\"5983724587634867435\")",
-//					"\"Blubb\"",
-					"new java.util.Date()",
-					sourceName, 1, null);
-
-			System.out.println("result=" + result);
-			System.out.println("result.class=" + (result == null ? null : result.getClass().getName()));
-
-			if (result instanceof Undefined)
-				result = null;
-			else if (result instanceof NativeJavaObject)
-				result = ((NativeJavaObject)result).unwrap();
-			else if (result instanceof Boolean)
-				; // fine - no conversion necessary
-			else if (result instanceof Number)
-				; // fine - no conversion necessary
-			else if (result instanceof String)
-				; // fine - no conversion necessary
-//			else
-//				throw new IllegalStateException("context.evaluateString(...) returned an object of an unknown type!");
-
-			System.out.println("AFTER CONVERSION");
-			System.out.println("result=" + result);
-			System.out.println("result.class=" + (result == null ? null : result.getClass().getName()));
-		} finally {
-			Context.exit();
-		}
-	}
-	
 //	public static void main(String[] args) {
 //		Context context = Context.enter();
 //		try {
 //			Scriptable scope = new ImporterTopLevel(context);
 //
-//			StringBuffer imports = new StringBuffer();
-//			for (Map.Entry<String, Object> me : getParameterValues().entrySet()) 
-//			{ 
-////				Object value = me.getValue();
-////				String packageName = value.getClass().getPackage().getName();
-////				String importString = "importPackage(Packages."+packageName+");"+"\n";
-////				imports.append(importString);
-//				Object js_value = Context.javaToJS(me.getValue(), scope);
-//				ScriptableObject.putProperty(scope, me.getKey(), js_value);
-//			}
-//
 //			String sourceName = "Script";
-//			String scriptText = imports.toString() + getScriptText();
-//			System.out.println("scriptText = "+scriptText);
 //			Object result = context.evaluateString(
 //					scope,
-//					scriptText,
+////					"new Packages.org.nightlabs.jfire.scripting.test.Main();",
+////					"new java.lang.Long(\"5983724587634867435\")",
+////					"\"Blubb\"",
+//					"new java.util.Date()",
 //					sourceName, 1, null);
 //
 //			System.out.println("result=" + result);
@@ -126,19 +86,108 @@ public class Main {
 //			Context.exit();
 //		}
 //	}
-//
-//	private static Map<String, Object> getParameterValues() 
-//	{
-//		Map<String, Object> parameter = new HashMap<String, Object>();
-//		CategorySet categorySet = new CategorySet("organisationID", "categorySet1");
-//		parameter.put("Category", new Category(categorySet, 0, 0));
-//		return parameter;
-//	}
-//	
-//	private static String getScriptText() 
-//	{
-////		return "Category.getName().getText()==1";
-////		return "Category.getCategoryIndex()==1";
-//		return "Category==organisationID=organisationID&categorySetID=categorySet1&categoryID=0";
-//	}
+	
+	public static void main(String[] args) 
+	{
+		runJavaScript();
+//		checkObjectIDEquals();
+	}
+
+	private static void checkObjectIDEquals() 
+	{
+		ScriptRegistryItemID scriptID = getScriptRegistryItemID(TEST);
+		String scriptIDString = scriptID.toString();
+		String objectIDString = "jdo/org.nightlabs.jfire.scripting.id.ScriptRegistryItemID?organisationID=devil.nightlabs.org&scriptRegistryItemType=IpanemaTicketing-Type-Ticket&scriptRegistryItemID=Test";
+		Object objectID = ObjectIDUtil.createObjectID(objectIDString);
+		boolean idEquals = objectID.equals(scriptID);
+		boolean stringEquals = scriptIDString.equals(objectIDString);
+		System.out.println("objectID.equals(scriptID) = "+idEquals);
+		System.out.println("scriptIDString.equals(objectIDString) = "+stringEquals);		
+	}
+	
+	private static void runJavaScript() 
+	{
+		Context context = Context.enter();
+		try {
+			Scriptable scope = new ImporterTopLevel(context);
+
+			StringBuffer imports = new StringBuffer();
+			for (Map.Entry<String, Object> me : getParameterValues().entrySet()) 
+			{ 
+				Object js_value = Context.javaToJS(me.getValue(), scope);
+				ScriptableObject.putProperty(scope, me.getKey(), js_value);
+			}
+
+			String sourceName = "Script";
+			String scriptText = imports.toString() + getScriptText();
+			System.out.println("scriptText = "+scriptText);
+			Object result = context.evaluateString(
+					scope,
+					scriptText,
+					sourceName, 1, null);
+
+			System.out.println("result=" + result);
+			System.out.println("result.class=" + (result == null ? null : result.getClass().getName()));
+
+			if (result instanceof Undefined)
+				result = null;
+			else if (result instanceof NativeJavaObject)
+				result = ((NativeJavaObject)result).unwrap();
+			else if (result instanceof Boolean)
+				; // fine - no conversion necessary
+			else if (result instanceof Number)
+				; // fine - no conversion necessary
+			else if (result instanceof String)
+				; // fine - no conversion necessary
+//			else
+//				throw new IllegalStateException("context.evaluateString(...) returned an object of an unknown type!");
+
+			System.out.println("AFTER CONVERSION");
+			System.out.println("result=" + result);
+			System.out.println("result.class=" + (result == null ? null : result.getClass().getName()));
+		} finally {
+			Context.exit();
+		}		
+	}
+	
+	private static final String TEST = "Test";
+	
+	private static Map<String, Object> getParameterValues() 
+	{
+		Map<String, Object> parameter = new HashMap<String, Object>();
+		String scriptIDName = TEST;
+		ScriptRegistryItemID scriptID = getScriptRegistryItemID(scriptIDName);
+		parameter.put(scriptIDName, scriptID);
+//		String scriptIDString = scriptID.toString();
+//		parameter.put(scriptIDName, scriptIDString);
+		System.out.println("scriptID = "+scriptID);
+		return parameter;
+	}
+
+	private static ScriptRegistryItemID getScriptRegistryItemID(String scriptIDName) 
+	{
+		String organisationID = "devil.nightlabs.org";
+		String scriptType = "IpanemaTicketing-Type-Ticket";
+		return ScriptRegistryItemID.create(organisationID, scriptType, scriptIDName);
+	}
+	
+	private static String getScriptText() 
+	{		
+		StringBuffer sb = new StringBuffer();
+		String objectIDString = getScriptRegistryItemID(TEST).toString();
+		sb.append("importPackage(Packages.javax.jdo);");
+		sb.append("importPackage(Packages.org.nightlabs.jdo);");
+//		sb.append("("+TEST+".toString()).equals(\""+objectIDString+"\")");
+		sb.append(TEST+".toString()==\""+objectIDString+"\"");
+		
+//		sb.append(TEST+".equals(ObjectIDUtil.createObjectID(\""+objectIDString+"\"))");		
+//		sb.append(TEST+"==(ObjectIDUtil.createObjectID(\""+objectIDString+"\"))");
+//		sb.append(TEST+"==\""+objectIDString+"\"");
+//		sb.append("5 == \"5.0\"");
+//		sb.append("ObjectIDUtil.createObjectID(\""+objectIDString+"\")");
+		
+		String script = sb.toString();	
+		System.out.println("script = "+script);
+		return script;				
+	}
 }

@@ -103,8 +103,7 @@ public class ScriptExecutorJavaScript
 	}
 
 	@Override
-	public String[] getFileExtensions()
-	{
+	public String[] getFileExtensions() {
 		return new String[] { FILE_EXTENSION_JAVA_SCRIPT };
 	}
 

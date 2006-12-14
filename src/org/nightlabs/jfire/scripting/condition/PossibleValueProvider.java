@@ -148,7 +148,7 @@ implements Serializable
 	 * based on given the parameterValues, the limit flag can be determined to limit the results
 	 * 
 	 */
-	public abstract Collection<Object> getPossibleValues(Map<String, Object> parameterValues, int limit);
+	public abstract Collection getPossibleValues(Map<String, Object> parameterValues, int limit);
 	
 	/**
 	 * @jdo.field persistence-modifier="persistent"

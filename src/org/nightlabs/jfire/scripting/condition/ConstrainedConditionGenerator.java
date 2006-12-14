@@ -91,17 +91,15 @@ implements IConditionGenerator
 			String variableName = "";
 			if (simpleCondition.getValue() instanceof PersistenceCapable) 
 			{
-				String lineBreak = "\n";
 				StringBuffer sb = new StringBuffer();
 				sb.append("importPackage(Packages.javax.jdo);");
-				sb.append(lineBreak);
-				sb.append("importPackage(Packages.org.nightlabs.jdo);");
-				sb.append(lineBreak);
-				sb.append("JDOHelper.getObjectId("+varName+")");
-				varName = sb.toString();
+//				sb.append("importPackage(Packages.org.nightlabs.jdo);");
+				sb.append("JDOHelper.getObjectId("+varName+").toString()");
+				variableName = sb.toString();
 				ObjectID objectID = (ObjectID) JDOHelper.getObjectId(value);
 				String objectIDString = objectID.toString();				
-				valueName = "ObjectIDUtil.createObjectID("+objectIDString+")";
+//				valueName = "ObjectIDUtil.createObjectID(\""+objectIDString+"\")";
+				valueName = "\""+objectIDString+"\"";
 			}
 			else {
 				variableName = varName;

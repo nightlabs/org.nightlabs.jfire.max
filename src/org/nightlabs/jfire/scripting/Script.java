@@ -64,7 +64,7 @@ import javax.jdo.Query;
  */
 public class Script
 		extends ScriptRegistryItem
-		implements Serializable, IScript
+		implements IScript
 {
 	private static final long serialVersionUID = 1L;
 

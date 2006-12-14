@@ -45,6 +45,8 @@ import javax.jdo.PersistenceManager;
 
 import org.apache.commons.lang.exception.ExceptionUtils;
 import org.apache.log4j.Logger;
+import org.jbpm.JbpmContext;
+import org.jbpm.graph.exe.ProcessInstance;
 import org.nightlabs.ModuleException;
 import org.nightlabs.jdo.NLJDOHelper;
 import org.nightlabs.jfire.accounting.Accounting;
@@ -52,6 +54,7 @@ import org.nightlabs.jfire.accounting.Invoice;
 import org.nightlabs.jfire.accounting.id.InvoiceID;
 import org.nightlabs.jfire.base.BaseSessionBeanImpl;
 import org.nightlabs.jfire.idgenerator.IDNamespaceDefault;
+import org.nightlabs.jfire.jbpm.JbpmLookup;
 import org.nightlabs.jfire.organisation.Organisation;
 import org.nightlabs.jfire.security.User;
 import org.nightlabs.jfire.store.deliver.DeliveryData;
@@ -71,6 +74,7 @@ import org.nightlabs.jfire.store.deliver.id.DeliveryID;
 import org.nightlabs.jfire.store.deliver.id.ModeOfDeliveryFlavourID;
 import org.nightlabs.jfire.store.deliver.id.ModeOfDeliveryID;
 import org.nightlabs.jfire.store.id.DeliveryNoteID;
+import org.nightlabs.jfire.store.id.DeliveryNoteLocalID;
 import org.nightlabs.jfire.store.id.ProductTypeID;
 import org.nightlabs.jfire.trade.Article;
 import org.nightlabs.jfire.trade.ArticleContainer;
@@ -1322,6 +1326,28 @@ implements SessionBean
 			if (fetchGroups != null)
 				pm.getFetchPlan().setGroups(fetchGroups);
 			return (List) pm.detachCopyAll(DeliveryNote.getNonFinalizedDeliveryNotes(pm, vendorID, customerID));
+		} finally {
+			pm.close();
+		}
+	}
+
+	/**
+	 * @ejb.interface-method
+	 * @ejb.transaction type = "Required"
+	 * @ejb.permission role-name="_Guest_"
+	 */
+	public void signalDeliveryNote(DeliveryNoteID deliveryNoteID, String jbpmTransitionName)
+	{
+		PersistenceManager pm = getPersistenceManager();
+		try {
+			DeliveryNoteLocal deliveryNoteLocal = (DeliveryNoteLocal) pm.getObjectById(DeliveryNoteLocalID.create(deliveryNoteID));
+			JbpmContext jbpmContext = JbpmLookup.getJbpmConfiguration().createJbpmContext();
+			try {
+				ProcessInstance processInstance = jbpmContext.getProcessInstanceForUpdate(deliveryNoteLocal.getJbpmProcessInstanceId());
+				processInstance.signal(jbpmTransitionName);
+			} finally {
+				jbpmContext.close();
+			}
 		} finally {
 			pm.close();
 		}

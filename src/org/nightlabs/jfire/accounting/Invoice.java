@@ -62,7 +62,8 @@ import org.nightlabs.util.CollectionUtil;
 import org.nightlabs.util.Utils;
 
 /**
- * @author Alexander Bieber <alex[AT]nightlabs[DOT]de>
+ * @author Alexander Bieber <!-- alex at nightlabs dot de -->
+ * @author Marco Schulze - Marco at NightLabs dot de
  * 
  * @jdo.persistence-capable
  *		identity-type="application"
@@ -113,7 +114,7 @@ import org.nightlabs.util.Utils;
  * @jdo.fetch-group name="Invoice.finalizeUser" fields="finalizeUser"
  * @jdo.fetch-group name="Invoice.price" fields="price"
  * @jdo.fetch-group name="Invoice.vendor" fields="vendor"
- * @jdo.fetch-group name="Invoice.this" fetch-groups="default" fields="invoiceLocal, articles, createUser, currency, customer, discount, finalizeUser, price, vendor"
+ * @jdo.fetch-group name="Invoice.this" fetch-groups="default" fields="invoiceLocal, articles, createUser, currency, customer, discount, finalizeUser, price, vendor, state, states"
  *
  * @jdo.fetch-group name="Statable.state" fields="state"
  * @jdo.fetch-group name="Statable.states" fields="states"
@@ -247,7 +248,7 @@ implements Serializable, ArticleContainer, Statable, DetachCallback
 	private String primaryKey;
 
 	/**
-	 * @jdo.field persistence-modifier="persistent"	 
+	 * @jdo.field persistence-modifier="persistent" mapped-by="invoice"	 
 	 */
 	private InvoiceLocal invoiceLocal;
 

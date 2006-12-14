@@ -27,6 +27,7 @@
 package org.nightlabs.jfire.store;
 
 import java.io.Serializable;
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Date;
@@ -60,7 +61,8 @@ import org.nightlabs.util.CollectionUtil;
 import org.nightlabs.util.Utils;
 
 /**
- * @author Alexander Bieber <alex[AT]nightlabs[DOT]de>
+ * @author Alexander Bieber <!-- alex at nightlabs dot de -->
+ * @author Marco Schulze - Marco at NightLabs dot de
  *
  * @jdo.persistence-capable
  *		identity-type="application"
@@ -108,7 +110,7 @@ import org.nightlabs.util.Utils;
  * @jdo.fetch-group name="DeliveryNote.customer" fields="customer"
  * @jdo.fetch-group name="DeliveryNote.finalizeUser" fields="finalizeUser"
  * @jdo.fetch-group name="DeliveryNote.vendor" fields="vendor"
- * @jdo.fetch-group name="DeliveryNote.this" fetch-groups="default" fields="deliveryNoteLocal, articles, createUser, customer, finalizeUser, vendor"
+ * @jdo.fetch-group name="DeliveryNote.this" fetch-groups="default" fields="deliveryNoteLocal, articles, createUser, customer, finalizeUser, vendor, state, states"
  *
  * @jdo.fetch-group name="Statable.state" fields="state"
  * @jdo.fetch-group name="Statable.states" fields="states"
@@ -209,6 +211,10 @@ implements Serializable, ArticleContainer, Statable, DetachCallback
 		this.customer = customer;
 //		this.currency = currency;
 		this.primaryKey = getPrimaryKey(this.organisationID, this.deliveryNoteIDPrefix, this.deliveryNoteID);
+
+		articles = new HashSet<Article>();
+		states = new ArrayList<State>();
+		receptionNotes = new HashSet<ReceptionNote>();
 	}
 
 	/**
@@ -232,7 +238,7 @@ implements Serializable, ArticleContainer, Statable, DetachCallback
 	private String primaryKey;
 
 	/**
-	 * @jdo.field persistence-modifier="persistent"	 
+	 * @jdo.field persistence-modifier="persistent" mapped-by="deliveryNote"	 
 	 */
 	private DeliveryNoteLocal deliveryNoteLocal;
 
@@ -308,7 +314,16 @@ implements Serializable, ArticleContainer, Statable, DetachCallback
 	 *		element-type="org.nightlabs.jfire.trade.Article"
 	 *		mapped-by="deliveryNote"
 	 */
-	private Set articles = new HashSet();
+	private Set<Article> articles;
+
+	/**
+	 * @jdo.field
+	 *		persistence-modifier="persistent"
+	 *		collection-type="collection"
+	 *		element-type="ReceptionNote"
+	 *		mapped-by="deliveryNote"
+	 */
+	private Set<ReceptionNote> receptionNotes;
 
 	/**
 	 * @jdo.field persistence-modifier="persistent"	 
@@ -392,10 +407,10 @@ implements Serializable, ArticleContainer, Statable, DetachCallback
 	/**
 	 * @jdo.field persistence-modifier="none"
 	 */
-	private transient Set _articles = null;
+	private transient Set<Article> _articles = null;
 
 	@SuppressWarnings("unchecked")
-	public Collection getArticles()
+	public Collection<Article> getArticles()
 	{
 		if (_articles == null)
 			_articles = Collections.unmodifiableSet(articles);
@@ -640,4 +655,26 @@ implements Serializable, ArticleContainer, Statable, DetachCallback
 		return _states;
 	}
 
+	/**
+	 * @jdo.field persistence-modifier="persistent"
+	 */
+	private int nextReceptionNoteID = 0;
+
+	public int createReceptionNoteID()
+	{
+		return nextReceptionNoteID++;
+	}
+
+	/**
+	 * @jdo.field persistence-modifier="none"
+	 */
+	private transient Set<ReceptionNote> _receptionNotes = null;
+
+	public Set<ReceptionNote> getReceptionNotes()
+	{
+		if (_receptionNotes == null)
+			_receptionNotes = Collections.unmodifiableSet(receptionNotes);
+
+		return _receptionNotes;
+	}
 }

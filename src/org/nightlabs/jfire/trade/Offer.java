@@ -147,7 +147,7 @@ implements
 	private String primaryKey;
 
 	/**
-	 * @jdo.field persistence-modifier="persistent"
+	 * @jdo.field persistence-modifier="persistent" mapped-by="offer"
 	 */
 	private OfferLocal offerLocal;
 
@@ -693,7 +693,7 @@ implements
 	{
 		PersistenceManager pm = JDOHelper.getPersistenceManager(this);
 		if (pm == null)
-			throw new IllegalStateException("This instance of Order is currently not attached to the datastore. Cannot obtain PersistenceManager!");
+			throw new IllegalStateException("This instance of Offer is currently not attached to the datastore. Cannot obtain PersistenceManager!");
 		return pm;
 	}
 

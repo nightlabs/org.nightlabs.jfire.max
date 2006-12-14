@@ -36,12 +36,14 @@ public class JbpmConstantsInvoice
 		public static final String STATE_DEFINITION_JBPM_NODE_NAME_BOOKED        = Organisation.DEVIL_ORGANISATION_ID + ":booked";
 		public static final String STATE_DEFINITION_JBPM_NODE_NAME_PAID          = Organisation.DEVIL_ORGANISATION_ID + ":paid";
 
-		public static TransitionID getTransitionID_pay(StateDefinitionID stateDefinitionID) {
-			return TransitionID.create(
-					stateDefinitionID.processDefinitionOrganisationID, stateDefinitionID.processDefinitionID,
-					stateDefinitionID.stateDefinitionOrganisationID, stateDefinitionID.stateDefinitionID,
-					Organisation.DEVIL_ORGANISATION_ID, "pay");
-		}
+		public static final String TRANSITION_NAME_PAY = Organisation.DEVIL_ORGANISATION_ID + ":pay";
+
+//		public static TransitionID getTransitionID_pay(StateDefinitionID stateDefinitionID) {
+//			return TransitionID.create(
+//					stateDefinitionID.processDefinitionOrganisationID, stateDefinitionID.processDefinitionID,
+//					stateDefinitionID.stateDefinitionOrganisationID, stateDefinitionID.stateDefinitionID,
+//					Organisation.DEVIL_ORGANISATION_ID, "pay");
+//		}
 	}
 
 	// TODO this class should have constants for all StateDefinitionIDs and TransitionIDs applicable to this context and known to JFireTrade

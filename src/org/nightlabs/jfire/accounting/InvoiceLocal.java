@@ -49,10 +49,13 @@ import org.nightlabs.util.CollectionUtil;
  *		detachable="true"
  *		table="JFireTrade_InvoiceLocal"
  *
+ * @jdo.implements name="org.nightlabs.jfire.jbpm.graph.def.StatableLocal"
+ *
  * @jdo.inheritance strategy="new-table"
  *
  * @jdo.create-objectid-class
  *		field-order="organisationID, invoiceIDPrefix, invoiceID"
+ *		include-body="id/InvoiceLocalID.body.inc"
  *
  * @jdo.fetch-group name="Invoice.invoiceLocal" fields="invoice"
  * @jdo.fetch-group name="InvoiceLocal.invoice" fields="invoice"

@@ -70,7 +70,10 @@ import org.nightlabs.jfire.trade.Offer;
 import org.nightlabs.jfire.trade.Order;
 import org.nightlabs.jfire.trade.OrganisationLegalEntity;
 import org.nightlabs.jfire.trade.TradeConfigModule;
+import org.nightlabs.jfire.trade.TradeSide;
 import org.nightlabs.jfire.trade.id.ArticleID;
+import org.nightlabs.jfire.trade.jbpm.ProcessDefinitionAssignment;
+import org.nightlabs.jfire.trade.jbpm.id.ProcessDefinitionAssignmentID;
 import org.nightlabs.jfire.transfer.Anchor;
 import org.nightlabs.jfire.transfer.Transfer;
 import org.nightlabs.jfire.transfer.TransferRegistry;
@@ -644,6 +647,11 @@ public class Store
 				deliveryNoteIDPrefix, IDGenerator.nextID(DeliveryNote.class, deliveryNoteIDPrefix));
 		new DeliveryNoteLocal(deliveryNote); // self-registering
 		getPersistenceManager().makePersistent(deliveryNote);
+
+		ProcessDefinitionAssignment processDefinitionAssignment = (ProcessDefinitionAssignment) getPersistenceManager().getObjectById(
+				ProcessDefinitionAssignmentID.create(Store.class, TradeSide.vendor));
+		processDefinitionAssignment.createProcessInstance(null, user, deliveryNote);
+
 		for (Iterator iter = articles.iterator(); iter.hasNext();) {
 			Article article = (Article) iter.next();
 			deliveryNote.addArticle(article);

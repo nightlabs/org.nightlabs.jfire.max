@@ -52,6 +52,8 @@ import javax.jdo.Query;
 
 import org.apache.commons.lang.exception.ExceptionUtils;
 import org.apache.log4j.Logger;
+import org.jbpm.JbpmContext;
+import org.jbpm.graph.exe.ProcessInstance;
 import org.nightlabs.ModuleException;
 import org.nightlabs.jdo.NLJDOHelper;
 import org.nightlabs.jdo.query.JDOQuery;
@@ -64,6 +66,7 @@ import org.nightlabs.jfire.accounting.book.fragmentbased.SourceOrganisationDimen
 import org.nightlabs.jfire.accounting.book.id.LocalAccountantDelegateID;
 import org.nightlabs.jfire.accounting.id.CurrencyID;
 import org.nightlabs.jfire.accounting.id.InvoiceID;
+import org.nightlabs.jfire.accounting.id.InvoiceLocalID;
 import org.nightlabs.jfire.accounting.id.PriceFragmentTypeID;
 import org.nightlabs.jfire.accounting.jbpm.JbpmConstantsInvoice;
 import org.nightlabs.jfire.accounting.pay.ModeOfPayment;
@@ -90,8 +93,10 @@ import org.nightlabs.jfire.accounting.tariffpriceconfig.TariffPriceConfig;
 import org.nightlabs.jfire.accounting.tariffpriceconfig.TariffPriceConfigManagerBean;
 import org.nightlabs.jfire.base.BaseSessionBeanImpl;
 import org.nightlabs.jfire.idgenerator.IDNamespaceDefault;
+import org.nightlabs.jfire.jbpm.JbpmLookup;
 import org.nightlabs.jfire.jbpm.graph.def.ProcessDefinition;
 import org.nightlabs.jfire.jbpm.graph.def.StateDefinition;
+import org.nightlabs.jfire.jbpm.graph.def.Transition;
 import org.nightlabs.jfire.jbpm.graph.def.id.ProcessDefinitionID;
 import org.nightlabs.jfire.security.User;
 import org.nightlabs.jfire.store.DeliveryNote;
@@ -112,6 +117,7 @@ import org.nightlabs.jfire.trade.id.ArticleContainerID;
 import org.nightlabs.jfire.trade.id.ArticleID;
 import org.nightlabs.jfire.trade.id.CustomerGroupID;
 import org.nightlabs.jfire.trade.id.OfferID;
+import org.nightlabs.jfire.trade.id.OfferLocalID;
 import org.nightlabs.jfire.trade.id.OrderID;
 import org.nightlabs.jfire.trade.jbpm.JbpmUtil;
 import org.nightlabs.jfire.trade.jbpm.ProcessDefinitionAssignment;
@@ -225,47 +231,6 @@ public abstract class AccountingManagerBean
 
 			currency = new Currency("CHF", "CHF", 2);
 			pm.makePersistent(currency);
-
-
-//			// create the essential InvoiceStateDefinitions
-//			JbpmConstantsInvoice invoiceStateDefinitionUtil;
-//
-//			invoiceStateDefinitionUtil = new JbpmConstantsInvoice(JbpmConstantsInvoice.STATE_DEFINITION_ID_CREATED);
-//			invoiceStateDefinitionUtil.getName().setText(Locale.ENGLISH.getLanguage(), "created");
-//			invoiceStateDefinitionUtil.getDescription().setText(Locale.ENGLISH.getLanguage(), "The Invoice has been newly created. This is the first state in the Invoice related workflow.");
-//			pm.makePersistent(invoiceStateDefinitionUtil);
-//
-//			invoiceStateDefinitionUtil = new JbpmConstantsInvoice(JbpmConstantsInvoice.STATE_DEFINITION_ID_FINALIZED);
-//			invoiceStateDefinitionUtil.getName().setText(Locale.ENGLISH.getLanguage(), "finalized");
-//			invoiceStateDefinitionUtil.getDescription().setText(Locale.ENGLISH.getLanguage(), "The Invoice has been finalized. After that, it cannot be modified anymore. A modification would require cancellation and recreation.");
-//			pm.makePersistent(invoiceStateDefinitionUtil);
-//
-//			invoiceStateDefinitionUtil = new JbpmConstantsInvoice(JbpmConstantsInvoice.STATE_DEFINITION_ID_BOOKED);
-//			invoiceStateDefinitionUtil.getName().setText(Locale.ENGLISH.getLanguage(), "booked");
-//			invoiceStateDefinitionUtil.getDescription().setText(Locale.ENGLISH.getLanguage(), "The Invoice has been booked. That means, all the money for all Articles has been transferred internally onto the configured Accounts.");
-//			pm.makePersistent(invoiceStateDefinitionUtil);
-//
-//			invoiceStateDefinitionUtil = new JbpmConstantsInvoice(JbpmConstantsInvoice.STATE_DEFINITION_ID_CANCELLED);
-//			invoiceStateDefinitionUtil.getName().setText(Locale.ENGLISH.getLanguage(), "cancelled");
-//			invoiceStateDefinitionUtil.getDescription().setText(Locale.ENGLISH.getLanguage(), "The Invoice was cancelled after finalization (and maybe after booking). In case it was already booked, a reversing booking has been done. The Article.invoice fields are nulled and the Articles within the Invoice have been replaced by referencingArticles.");
-//			pm.makePersistent(invoiceStateDefinitionUtil);
-//
-//			invoiceStateDefinitionUtil = new JbpmConstantsInvoice(JbpmConstantsInvoice.STATE_DEFINITION_ID_DOUBTFUL);
-//			invoiceStateDefinitionUtil.getName().setText(Locale.ENGLISH.getLanguage(), "doubtful");
-//			invoiceStateDefinitionUtil.getDescription().setText(Locale.ENGLISH.getLanguage(), "The debt became doubtful. That means the person owing money (usually the customer, if it's not refunding) became financially unstable.");
-//			pm.makePersistent(invoiceStateDefinitionUtil);
-//
-//			invoiceStateDefinitionUtil = new JbpmConstantsInvoice(JbpmConstantsInvoice.STATE_DEFINITION_ID_PAID);
-//			invoiceStateDefinitionUtil.getName().setText(Locale.ENGLISH.getLanguage(), "paid");
-//			invoiceStateDefinitionUtil.getDescription().setText(Locale.ENGLISH.getLanguage(), "The Invoice was paid completely. There's no money outstanding anymore.");
-//			pm.makePersistent(invoiceStateDefinitionUtil);
-//
-//			invoiceStateDefinitionUtil = new JbpmConstantsInvoice(JbpmConstantsInvoice.STATE_DEFINITION_ID_UNCOLLECTABLE);
-//			invoiceStateDefinitionUtil.getName().setText(Locale.ENGLISH.getLanguage(), "uncollectable");
-//			invoiceStateDefinitionUtil.getDescription().setText(Locale.ENGLISH.getLanguage(), "The Invoice will never be paid. Usually this happens when the customer becomes bankrupt.");
-//			pm.makePersistent(invoiceStateDefinitionUtil);
-
-			// TODO deploy ProcessDefinitions!
 
 
 			// create PriceFragmentTypes for Swiss and German VAT
@@ -523,6 +488,9 @@ public abstract class AccountingManagerBean
 			stateDefinition.getName().setText(Locale.ENGLISH.getLanguage(), "paid");
 			stateDefinition.getDescription().setText(Locale.ENGLISH.getLanguage(), "paid");
 			stateDefinition.setPublicState(true);
+
+			Query q = pm.newQuery(Transition.class);
+			q.setFilter("");
 
 
 			// deactive IDGenerator's cache for invoice
@@ -2461,6 +2429,27 @@ public abstract class AccountingManagerBean
 	}
 // FIXME WORKAROUND for JPOX - end
 
+	/**
+	 * @ejb.interface-method
+	 * @ejb.transaction type = "Required"
+	 * @ejb.permission role-name="_Guest_"
+	 */
+	public void signalInvoice(InvoiceID invoiceID, String jbpmTransitionName)
+	{
+		PersistenceManager pm = getPersistenceManager();
+		try {
+			InvoiceLocal invoiceLocal = (InvoiceLocal) pm.getObjectById(InvoiceLocalID.create(invoiceID));
+			JbpmContext jbpmContext = JbpmLookup.getJbpmConfiguration().createJbpmContext();
+			try {
+				ProcessInstance processInstance = jbpmContext.getProcessInstanceForUpdate(invoiceLocal.getJbpmProcessInstanceId());
+				processInstance.signal(jbpmTransitionName);
+			} finally {
+				jbpmContext.close();
+			}
+		} finally {
+			pm.close();
+		}
+	}
 
 //	/**
 //	 * @param productTypeID The object ID of the desired ProductType.

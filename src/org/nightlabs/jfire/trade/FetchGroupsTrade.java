@@ -35,4 +35,5 @@ public class FetchGroupsTrade
 	public static final String FETCH_GROUP_ARTICLE_IN_OFFER_EDITOR = "FetchGroupsTrade.articleInOfferEditor";
 	public static final String FETCH_GROUP_ARTICLE_IN_INVOICE_EDITOR = "FetchGroupsTrade.articleInInvoiceEditor";
 	public static final String FETCH_GROUP_ARTICLE_IN_DELIVERY_NOTE_EDITOR = "FetchGroupsTrade.articleInDeliveryNoteEditor";
+	public static final String FETCH_GROUP_ARTICLE_IN_RECEPTION_NOTE_EDITOR = "FetchGroupsTrade.articleInReceptionNoteEditor";
 }

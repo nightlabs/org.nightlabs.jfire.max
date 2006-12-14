@@ -47,10 +47,13 @@ import org.nightlabs.util.CollectionUtil;
  *		detachable="true"
  *		table="JFireTrade_DeliveryNoteLocal"
  *
+ * @jdo.implements name="org.nightlabs.jfire.jbpm.graph.def.StatableLocal"
+ *
  * @jdo.inheritance strategy="new-table"
  *
  * @jdo.create-objectid-class
  *		field-order="organisationID, deliveryNoteIDPrefix, deliveryNoteID"
+ *		include-body="id/DeliveryNoteLocalID.body.inc"
  *
  * @jdo.fetch-group name="DeliveryNote.deliveryNoteLocal" fields="deliveryNote"
  * @jdo.fetch-group name="DeliveryNoteLocal.deliveryNote" fields="deliveryNote"

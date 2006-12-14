@@ -47,7 +47,9 @@ import org.nightlabs.jfire.security.User;
 import org.nightlabs.jfire.store.DeliveryNote;
 import org.nightlabs.jfire.store.Product;
 import org.nightlabs.jfire.store.ProductType;
+import org.nightlabs.jfire.store.ReceptionNote;
 import org.nightlabs.jfire.store.id.DeliveryNoteID;
+import org.nightlabs.jfire.store.id.ReceptionNoteID;
 import org.nightlabs.jfire.trade.id.ArticleID;
 import org.nightlabs.jfire.trade.id.OfferID;
 import org.nightlabs.jfire.trade.id.OrderID;
@@ -126,6 +128,7 @@ public class Article
 	public static final String FETCH_GROUP_OFFER_ID = "Article.offerID";
 	public static final String FETCH_GROUP_INVOICE_ID = "Article.invoiceID";
 	public static final String FETCH_GROUP_DELIVERY_NOTE_ID = "Article.deliveryNoteID";
+	public static final String FETCH_GROUP_RECEPTION_NOTE_ID = "Article.receptionNoteID";
 	public static final String FETCH_GROUP_REVERSED_ARTICLE_ID = "Article.reversedArticleID";
 	public static final String FETCH_GROUP_REVERSING_ARTICLE_ID = "Article.reversingArticleID";
 	public static final String FETCH_GROUP_VENDOR_ID = "Article.vendorID";
@@ -180,25 +183,19 @@ public class Article
 	private Invoice invoice = null;
 
 	/**
-	 * <b>Important change! New:</b>
 	 * An <tt>Article</tt> can only be in one <tt>DeliveryNote</tt> (or in none).
 	 * If the <tt>Article</tt> shall be returned, a new reverse-<tt>Article</tt>
 	 * needs to be created. Hence, <tt>Invoice</tt> and <tt>DeliveryNote</tt> handling
 	 * is quite the same.
-	 * <p>
-	 * <b>Old:</b>
-	 * An <tt>Article</tt> can be part of many <tt>DeliveryNote</tt>s. This field reflects the
-	 * last DeliveryNote in which this Article has been delivered. If the customer returns
-	 * the product (e.g. because it is defective), this field is set to <tt>null</tt>
-	 * again.
-	 * <p>
-	 * This means this field is always <tt>null</tt> when it waits to be included in a
-	 * new deliveryNote. Whether it has been sent is then distinguished by the flag
-	 * <tt>DeliveryNote.delivered</tt>.
 	 *
 	 * @jdo.field persistence-modifier="persistent"
 	 */
 	private DeliveryNote deliveryNote = null;
+
+	/**
+	 * @jdo.field persistence-modifier="persistent"
+	 */
+	private ReceptionNote receptionNote = null;
 
 	/**
 	 * @jdo.field persistence-modifier="persistent"
@@ -243,6 +240,15 @@ public class Article
 	 */
 	private boolean deliveryNoteID_detached = false;
 
+	/**
+	 * @jdo.field persistence-modifier="none"
+	 */
+	private ReceptionNoteID receptionNoteID = null;
+	/**
+	 * @jdo.field persistence-modifier="none"
+	 */
+	private boolean receptionNoteID_detached = false;
+
 	public OrderID getOrderID()
 	{
 		if (orderID == null && !orderID_detached)
@@ -270,6 +276,14 @@ public class Article
 			deliveryNoteID = (DeliveryNoteID) JDOHelper.getObjectId(deliveryNote);
 
 		return deliveryNoteID;
+	}
+
+	public ReceptionNoteID getReceptionNoteID()
+	{
+		if (receptionNoteID == null && !receptionNoteID_detached)
+			receptionNoteID = (ReceptionNoteID) JDOHelper.getObjectId(receptionNote);
+
+		return receptionNoteID;
 	}
 
 	public ArticleID getReversedArticleID()
@@ -784,6 +798,16 @@ public class Article
 	{
 		this.deliveryNote = deliveryNote;
 	}
+
+	public ReceptionNote getReceptionNote()
+	{
+		return receptionNote;
+	}
+	public void setReceptionNote(ReceptionNote receptionNote)
+	{
+		this.receptionNote = receptionNote;
+	}
+
 	/**
 	 * @return Returns the segment.
 	 */
@@ -1037,7 +1061,8 @@ public class Article
 			fetchGroups.contains(FetchGroupsTrade.FETCH_GROUP_ARTICLE_IN_ORDER_EDITOR) ||
 			fetchGroups.contains(FetchGroupsTrade.FETCH_GROUP_ARTICLE_IN_OFFER_EDITOR) ||
 			fetchGroups.contains(FetchGroupsTrade.FETCH_GROUP_ARTICLE_IN_INVOICE_EDITOR) ||
-			fetchGroups.contains(FetchGroupsTrade.FETCH_GROUP_ARTICLE_IN_DELIVERY_NOTE_EDITOR);
+			fetchGroups.contains(FetchGroupsTrade.FETCH_GROUP_ARTICLE_IN_DELIVERY_NOTE_EDITOR) ||
+			fetchGroups.contains(FetchGroupsTrade.FETCH_GROUP_ARTICLE_IN_RECEPTION_NOTE_EDITOR);
 
 // The following lines (nulling all the IDs) is not really necessary, but in case the JDO impl
 // has a bug that causes them to be copied, we're sure they're always null - despite of any bug
@@ -1064,6 +1089,11 @@ public class Article
 		if (fetchGroupsArticleInEditor || fetchGroups.contains(FETCH_GROUP_DELIVERY_NOTE_ID)) {
 			detached.deliveryNoteID = attached.getDeliveryNoteID();
 			detached.deliveryNoteID_detached = true;
+		}
+
+		if (fetchGroupsArticleInEditor || fetchGroups.contains(FETCH_GROUP_RECEPTION_NOTE_ID)) {
+			detached.receptionNoteID = attached.getReceptionNoteID();
+			detached.receptionNoteID_detached = true;
 		}
 
 		if (fetchGroupsArticleInEditor || fetchGroups.contains(FETCH_GROUP_REVERSED_ARTICLE_ID)) {

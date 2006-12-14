@@ -68,7 +68,10 @@ import org.nightlabs.jfire.trade.Offer;
 import org.nightlabs.jfire.trade.Order;
 import org.nightlabs.jfire.trade.OrganisationLegalEntity;
 import org.nightlabs.jfire.trade.TradeConfigModule;
+import org.nightlabs.jfire.trade.TradeSide;
 import org.nightlabs.jfire.trade.id.ArticleID;
+import org.nightlabs.jfire.trade.jbpm.ProcessDefinitionAssignment;
+import org.nightlabs.jfire.trade.jbpm.id.ProcessDefinitionAssignmentID;
 import org.nightlabs.jfire.transfer.Anchor;
 import org.nightlabs.jfire.transfer.Transfer;
 import org.nightlabs.jfire.transfer.TransferRegistry;
@@ -365,6 +368,11 @@ public class Accounting
 				invoiceCurrency);
 		new InvoiceLocal(invoice); // registers itself in the invoice
 		invoice = (Invoice) getPersistenceManager().makePersistent(invoice);
+
+		ProcessDefinitionAssignment processDefinitionAssignment = (ProcessDefinitionAssignment) getPersistenceManager().getObjectById(
+				ProcessDefinitionAssignmentID.create(Invoice.class, TradeSide.vendor));
+		processDefinitionAssignment.createProcessInstance(null, user, invoice);
+
 		addArticlesToInvoice(user, invoice, articles);
 //		for (Iterator iter = articles.iterator(); iter.hasNext();) {
 //			Article article = (Article) iter.next();

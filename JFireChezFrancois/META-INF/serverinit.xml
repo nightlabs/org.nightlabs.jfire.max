@@ -2,5 +2,5 @@
 		PUBLIC "-//NightLabs GmbH//DTD Server Initialisation 1.0//EN"
 		"http://www.nightlabs.de/dtd/serverinit_1_0.dtd">
 <server-initialisation>
-	<early-init class="org.nightlabs.jfire.chezfrancois.ChezFrancoisServerInitialiser" />
+	<late-init class="org.nightlabs.jfire.chezfrancois.ChezFrancoisServerInitialiser" />
 </server-initialisation>

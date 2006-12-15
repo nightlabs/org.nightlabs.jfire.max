@@ -34,6 +34,7 @@ import java.util.Set;
 import javax.jdo.JDOHelper;
 import javax.jdo.PersistenceManager;
 
+import org.apache.log4j.Logger;
 import org.nightlabs.jfire.scripting.id.ScriptRegistryItemID;
 
 /**
@@ -335,12 +336,19 @@ public abstract class ScriptExecutor
 			return null;
 
 		Class resultClass = result.getClass();
+		ClassLoader oldContextCL = Thread.currentThread().getContextClassLoader();
+		Thread.currentThread().setContextClassLoader(resultClass.getClassLoader());
 		try {
-			if (!script.getResultClass().isAssignableFrom(resultClass))
-				throw new ResultClassMismatchException(
-						(ScriptRegistryItemID) JDOHelper.getObjectId(script), script.getResultClass(), resultClass);
-		} catch (ClassNotFoundException cnf) {
-			throw new ScriptException(cnf);
+			try {
+				if (!script.getResultClass().isAssignableFrom(resultClass))
+					throw new ResultClassMismatchException(
+							(ScriptRegistryItemID) JDOHelper.getObjectId(script), script.getResultClass(), resultClass);
+			} catch (ClassNotFoundException cnf) {
+				Logger.getLogger(ScriptExecutor.class).error("Class not found: " + script.getResultClassName(), cnf);
+				throw new ScriptException(cnf);
+			}
+		} finally {
+			Thread.currentThread().setContextClassLoader(oldContextCL);
 		}
 
 		return result;

@@ -26,7 +26,6 @@
 
 package org.nightlabs.jfire.scripting;
 
-import java.io.Serializable;
 import java.util.Collection;
 
 import javax.jdo.JDODetachedFieldAccessException;
@@ -208,6 +207,11 @@ public class Script
 	public Class getResultClass()
 		throws ClassNotFoundException
 	{
+		try {
+			return Class.forName(resultClassName, true, Thread.currentThread().getContextClassLoader());
+		} catch (ClassNotFoundException x) {
+			// ignore
+		}
 		return Class.forName(resultClassName);
 	}
 

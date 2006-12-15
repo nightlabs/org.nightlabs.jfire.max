@@ -11,15 +11,18 @@ import org.nightlabs.jfire.trade.state.id.StateDefinitionID;
  */
 public class JbpmConstantsInvoice
 {
+	public static class Both {
+		public static final String STATE_DEFINITION_JBPM_NODE_NAME_SENT          = Organisation.DEVIL_ORGANISATION_ID + ":sent";
+		public static final String STATE_DEFINITION_JBPM_NODE_NAME_BOOKED        = Organisation.DEVIL_ORGANISATION_ID + ":booked";
+	}
+
 	public static class Vendor {
 		public static final ProcessDefinitionID PROCESS_DEFINITION_ID = ProcessDefinitionID.create(
 				Organisation.DEVIL_ORGANISATION_ID, "Invoice.Vendor");
 
 		public static final String STATE_DEFINITION_JBPM_NODE_NAME_CREATED       = Organisation.DEVIL_ORGANISATION_ID + ":created";
 		public static final String STATE_DEFINITION_JBPM_NODE_NAME_FINALIZED     = Organisation.DEVIL_ORGANISATION_ID + ":finalized";
-		public static final String STATE_DEFINITION_JBPM_NODE_NAME_SENT          = Organisation.DEVIL_ORGANISATION_ID + ":sent";
 		public static final String STATE_DEFINITION_JBPM_NODE_NAME_ABORTED       = Organisation.DEVIL_ORGANISATION_ID + ":aborted";
-		public static final String STATE_DEFINITION_JBPM_NODE_NAME_BOOKED        = Organisation.DEVIL_ORGANISATION_ID + ":booked";
 		public static final String STATE_DEFINITION_JBPM_NODE_NAME_PAID          = Organisation.DEVIL_ORGANISATION_ID + ":paid";
 		public static final String STATE_DEFINITION_JBPM_NODE_NAME_SENT_REMINDER = Organisation.DEVIL_ORGANISATION_ID + ":sentReminder";
 		public static final String STATE_DEFINITION_JBPM_NODE_NAME_SENT_PRE_COLLECTION_LETTER = Organisation.DEVIL_ORGANISATION_ID + ":sentPreCollectionLetter";
@@ -32,8 +35,6 @@ public class JbpmConstantsInvoice
 		public static final ProcessDefinitionID PROCESS_DEFINITION_ID = ProcessDefinitionID.create(
 				Organisation.DEVIL_ORGANISATION_ID, "Invoice.Customer");
 
-		public static final String STATE_DEFINITION_JBPM_NODE_NAME_SENT          = Organisation.DEVIL_ORGANISATION_ID + ":sent";
-		public static final String STATE_DEFINITION_JBPM_NODE_NAME_BOOKED        = Organisation.DEVIL_ORGANISATION_ID + ":booked";
 		public static final String STATE_DEFINITION_JBPM_NODE_NAME_PAID          = Organisation.DEVIL_ORGANISATION_ID + ":paid";
 
 		public static final String TRANSITION_NAME_PAY = Organisation.DEVIL_ORGANISATION_ID + ":pay";

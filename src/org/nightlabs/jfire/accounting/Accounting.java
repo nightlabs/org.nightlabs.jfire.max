@@ -26,17 +26,21 @@
 
 package org.nightlabs.jfire.accounting;
 
+import java.io.IOException;
+import java.net.URL;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 
 import javax.jdo.JDOHelper;
 import javax.jdo.JDOObjectNotFoundException;
 import javax.jdo.PersistenceManager;
+import javax.jdo.Query;
 import javax.jdo.listener.StoreCallback;
 
 import org.apache.log4j.Logger;
@@ -46,6 +50,9 @@ import org.nightlabs.jfire.accounting.book.LocalAccountant;
 import org.nightlabs.jfire.accounting.book.MoneyFlowMapping;
 import org.nightlabs.jfire.accounting.book.PartnerAccountant;
 import org.nightlabs.jfire.accounting.id.InvoiceID;
+import org.nightlabs.jfire.accounting.jbpm.ActionHandlerBookInvoice;
+import org.nightlabs.jfire.accounting.jbpm.ActionHandlerFinalizeInvoice;
+import org.nightlabs.jfire.accounting.jbpm.JbpmConstantsInvoice;
 import org.nightlabs.jfire.accounting.pay.ModeOfPaymentFlavour;
 import org.nightlabs.jfire.accounting.pay.PayMoneyTransfer;
 import org.nightlabs.jfire.accounting.pay.Payment;
@@ -58,6 +65,11 @@ import org.nightlabs.jfire.accounting.pay.id.ServerPaymentProcessorID;
 import org.nightlabs.jfire.accounting.priceconfig.PriceConfig;
 import org.nightlabs.jfire.config.Config;
 import org.nightlabs.jfire.idgenerator.IDGenerator;
+import org.nightlabs.jfire.jbpm.graph.def.ActionHandlerNodeEnter;
+import org.nightlabs.jfire.jbpm.graph.def.ProcessDefinition;
+import org.nightlabs.jfire.jbpm.graph.def.StateDefinition;
+import org.nightlabs.jfire.jbpm.graph.def.Transition;
+import org.nightlabs.jfire.jbpm.graph.def.id.ProcessDefinitionID;
 import org.nightlabs.jfire.organisation.LocalOrganisation;
 import org.nightlabs.jfire.security.User;
 import org.nightlabs.jfire.store.ProductTypeActionHandler;
@@ -1082,5 +1094,128 @@ public class Accounting
 
 		if (_nextPriceCoordinateID >= 0 && nextPriceCoordinateID != _nextPriceCoordinateID)
 			nextPriceCoordinateID = _nextPriceCoordinateID;
+	}
+
+	private static void setStateDefinitionProperties(
+			ProcessDefinition processDefinition, String jbpmNodeName,
+			String name, String description, boolean publicState)
+	{
+		StateDefinition stateDefinition;
+		try {
+			stateDefinition = StateDefinition.getStateDefinition(processDefinition, jbpmNodeName);
+		} catch (JDOObjectNotFoundException x) {
+			logger.warn("The ProcessDefinition \"" + processDefinition.getJbpmProcessDefinitionName() + "\" does not contain a jBPM Node named \"" + jbpmNodeName + "\"!");
+			return;
+		}
+		stateDefinition.getName().setText(Locale.ENGLISH.getLanguage(), name);
+		stateDefinition.getDescription().setText(Locale.ENGLISH.getLanguage(), description);
+		stateDefinition.setPublicState(publicState);
+	}
+
+	public ProcessDefinition storeProcessDefinitionInvoice(TradeSide tradeSide, URL jbpmProcessDefinitionURL)
+	throws IOException
+	{
+		PersistenceManager pm = getPersistenceManager();
+
+		org.jbpm.graph.def.ProcessDefinition jbpmProcessDefinition = ProcessDefinition.readProcessDefinition(jbpmProcessDefinitionURL);
+
+		// we add the events+actionhandlers
+		ActionHandlerNodeEnter.register(jbpmProcessDefinition);
+
+		if (TradeSide.vendor == tradeSide)
+			ActionHandlerFinalizeInvoice.register(jbpmProcessDefinition);
+
+		ActionHandlerBookInvoice.register(jbpmProcessDefinition);
+
+		// store the process definition
+		ProcessDefinition processDefinition = ProcessDefinition.storeProcessDefinition(pm, null, jbpmProcessDefinition, jbpmProcessDefinitionURL);
+		ProcessDefinitionID processDefinitionID = (ProcessDefinitionID) JDOHelper.getObjectId(processDefinition);
+
+		switch (tradeSide) {
+			case vendor:
+			{
+				// give known StateDefinitions a name and a description
+				setStateDefinitionProperties(processDefinition, JbpmConstantsInvoice.Vendor.STATE_DEFINITION_JBPM_NODE_NAME_CREATED,
+						"created",
+						"The Invoice has been newly created. This is the first state in the Invoice related workflow.",
+						true);
+
+				setStateDefinitionProperties(processDefinition, JbpmConstantsInvoice.Vendor.STATE_DEFINITION_JBPM_NODE_NAME_ABORTED,
+						"aborted",
+						"Aborted.",
+						true);
+
+				setStateDefinitionProperties(processDefinition, JbpmConstantsInvoice.Both.STATE_DEFINITION_JBPM_NODE_NAME_BOOKED,
+						"booked",
+						"Booked.",
+						true);
+
+				setStateDefinitionProperties(processDefinition, JbpmConstantsInvoice.Vendor.STATE_DEFINITION_JBPM_NODE_NAME_BOOKED_UNRECEIVABLE,
+						"booked unreceivable",
+						"booked unreceivable",
+						true);
+
+				setStateDefinitionProperties(processDefinition, JbpmConstantsInvoice.Vendor.STATE_DEFINITION_JBPM_NODE_NAME_DOUBTFUL,
+						"doubtful",
+						"doubtful",
+						true);
+
+				setStateDefinitionProperties(processDefinition, JbpmConstantsInvoice.Vendor.STATE_DEFINITION_JBPM_NODE_NAME_FINALIZED,
+						"finalized",
+						"finalized",
+						true);
+
+				setStateDefinitionProperties(processDefinition, JbpmConstantsInvoice.Vendor.STATE_DEFINITION_JBPM_NODE_NAME_PAID,
+						"paid",
+						"paid",
+						true);
+
+				setStateDefinitionProperties(processDefinition, JbpmConstantsInvoice.Both.STATE_DEFINITION_JBPM_NODE_NAME_SENT,
+						"sent",
+						"sent",
+						true);
+
+				setStateDefinitionProperties(processDefinition, JbpmConstantsInvoice.Vendor.STATE_DEFINITION_JBPM_NODE_NAME_SENT_PRE_COLLECTION_LETTER,
+						"sent pre-collection letter",
+						"sent pre-collection letter",
+						true);
+
+				setStateDefinitionProperties(processDefinition, JbpmConstantsInvoice.Vendor.STATE_DEFINITION_JBPM_NODE_NAME_SENT_REMINDER,
+						"sent reminder",
+						"sent reminder",
+						true);
+
+				setStateDefinitionProperties(processDefinition, JbpmConstantsInvoice.Vendor.STATE_DEFINITION_JBPM_NODE_NAME_UNCOLLECTABLE,
+						"uncollectable",
+						"uncollectable",
+						true);
+			}
+			break;
+			case customer:
+			{
+				setStateDefinitionProperties(processDefinition, JbpmConstantsInvoice.Both.STATE_DEFINITION_JBPM_NODE_NAME_SENT,
+						"sent",
+						"sent",
+						true);
+
+				setStateDefinitionProperties(processDefinition, JbpmConstantsInvoice.Both.STATE_DEFINITION_JBPM_NODE_NAME_BOOKED,
+						"booked",
+						"booked",
+						true);
+
+				setStateDefinitionProperties(processDefinition, JbpmConstantsInvoice.Customer.STATE_DEFINITION_JBPM_NODE_NAME_PAID,
+						"paid",
+						"paid",
+						true);
+
+				Query q = pm.newQuery(Transition.class);
+				q.setFilter("");
+			}
+			break;
+			default:
+				throw new IllegalStateException("Unknown TradeSide: " + tradeSide);
+		}
+
+		return processDefinition;
 	}
 }

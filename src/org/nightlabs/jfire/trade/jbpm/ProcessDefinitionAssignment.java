@@ -9,6 +9,7 @@ import org.jbpm.JbpmContext;
 import org.jbpm.graph.exe.ProcessInstance;
 import org.nightlabs.jfire.accounting.Invoice;
 import org.nightlabs.jfire.jbpm.JbpmLookup;
+import org.nightlabs.jfire.jbpm.graph.def.AbstractActionHandler;
 import org.nightlabs.jfire.jbpm.graph.def.ActionHandlerNodeEnter;
 import org.nightlabs.jfire.jbpm.graph.def.ProcessDefinition;
 import org.nightlabs.jfire.jbpm.graph.def.Statable;
@@ -140,7 +141,7 @@ implements Serializable
 
 			statable.getStatableLocal().setJbpmProcessInstanceId(processInstance.getId());
 
-			processInstance.getContextInstance().setVariable(ActionHandlerNodeEnter.VARIABLE_NAME_STATABLE_ID, JDOHelper.getObjectId(statable).toString());
+			processInstance.getContextInstance().setVariable(AbstractActionHandler.VARIABLE_NAME_STATABLE_ID, JDOHelper.getObjectId(statable).toString());
 
 			ActionHandlerNodeEnter.createStartState(
 					getPersistenceManager(), user, statable, processInstance.getProcessDefinition());

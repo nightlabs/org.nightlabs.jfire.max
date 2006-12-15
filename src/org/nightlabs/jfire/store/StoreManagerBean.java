@@ -55,6 +55,7 @@ import org.nightlabs.jfire.accounting.id.InvoiceID;
 import org.nightlabs.jfire.base.BaseSessionBeanImpl;
 import org.nightlabs.jfire.idgenerator.IDNamespaceDefault;
 import org.nightlabs.jfire.jbpm.JbpmLookup;
+import org.nightlabs.jfire.jbpm.graph.def.ProcessDefinition;
 import org.nightlabs.jfire.organisation.Organisation;
 import org.nightlabs.jfire.security.User;
 import org.nightlabs.jfire.store.deliver.DeliveryData;
@@ -83,11 +84,13 @@ import org.nightlabs.jfire.trade.LegalEntity;
 import org.nightlabs.jfire.trade.Offer;
 import org.nightlabs.jfire.trade.OfferLocal;
 import org.nightlabs.jfire.trade.Order;
+import org.nightlabs.jfire.trade.TradeSide;
 import org.nightlabs.jfire.trade.Trader;
 import org.nightlabs.jfire.trade.id.ArticleContainerID;
 import org.nightlabs.jfire.trade.id.ArticleID;
 import org.nightlabs.jfire.trade.id.OfferID;
 import org.nightlabs.jfire.trade.id.OrderID;
+import org.nightlabs.jfire.trade.jbpm.ProcessDefinitionAssignment;
 import org.nightlabs.jfire.transfer.id.AnchorID;
 
 /**
@@ -280,6 +283,15 @@ implements SessionBean
 			serverDeliveryProcessorNonDelivery.addModeOfDelivery(modeOfDeliveryNonDelivery);
 			serverDeliveryProcessorNonDelivery.getName().setText(Locale.ENGLISH.getLanguage(), "Non-Delivery (delivery will be postponed)");
 			serverDeliveryProcessorNonDelivery.getName().setText(Locale.GERMAN.getLanguage(), "Nichtlieferung (Lieferung wird verschoben)");
+
+			// persist process definitions
+			ProcessDefinition processDefinitionDeliveryNoteCustomer;
+			processDefinitionDeliveryNoteCustomer = store.storeProcessDefinitionDeliveryNote(TradeSide.customer, ProcessDefinitionAssignment.class.getResource("deliverynote/customer/"));
+			pm.makePersistent(new ProcessDefinitionAssignment(DeliveryNote.class, TradeSide.customer, processDefinitionDeliveryNoteCustomer));
+
+			ProcessDefinition processDefinitionDeliveryNoteVendor;
+			processDefinitionDeliveryNoteVendor = store.storeProcessDefinitionDeliveryNote(TradeSide.vendor, ProcessDefinitionAssignment.class.getResource("deliverynote/vendor/"));
+			pm.makePersistent(new ProcessDefinitionAssignment(DeliveryNote.class, TradeSide.vendor, processDefinitionDeliveryNoteVendor));
 
 			IDNamespaceDefault idNamespaceDefault = IDNamespaceDefault.createIDNamespaceDefault(pm, getOrganisationID(), DeliveryNote.class);
 			idNamespaceDefault.setCacheSizeServer(0);

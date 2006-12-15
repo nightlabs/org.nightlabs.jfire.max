@@ -402,95 +402,12 @@ public abstract class AccountingManagerBean
 
 			// persist process definitions
 			ProcessDefinition processDefinitionInvoiceCustomer;
-			ProcessDefinitionID processDefinitionIDInvoiceCustomer;
-			processDefinitionInvoiceCustomer = JbpmUtil.storeProcessDefinition(pm, ProcessDefinitionAssignment.class.getResource("invoice/customer/"));
+			processDefinitionInvoiceCustomer = accounting.storeProcessDefinitionInvoice(TradeSide.customer, ProcessDefinitionAssignment.class.getResource("invoice/customer/"));
 			pm.makePersistent(new ProcessDefinitionAssignment(Invoice.class, TradeSide.customer, processDefinitionInvoiceCustomer));
-			processDefinitionIDInvoiceCustomer = (ProcessDefinitionID) JDOHelper.getObjectId(processDefinitionInvoiceCustomer);
 
 			ProcessDefinition processDefinitionInvoiceVendor;
-			ProcessDefinitionID processDefinitionIDInvoiceVendor;
-			processDefinitionInvoiceVendor = JbpmUtil.storeProcessDefinition(pm, ProcessDefinitionAssignment.class.getResource("invoice/vendor/"));
+			processDefinitionInvoiceVendor = accounting.storeProcessDefinitionInvoice(TradeSide.vendor, ProcessDefinitionAssignment.class.getResource("invoice/vendor/"));
 			pm.makePersistent(new ProcessDefinitionAssignment(Invoice.class, TradeSide.vendor, processDefinitionInvoiceVendor));
-			processDefinitionIDInvoiceVendor = (ProcessDefinitionID) JDOHelper.getObjectId(processDefinitionInvoiceVendor);
-
-			// give known StateDefinitions a name and a description
-			StateDefinition stateDefinition;
-
-			// vendor
-			stateDefinition = StateDefinition.getStateDefinition(processDefinitionInvoiceVendor, JbpmConstantsInvoice.Vendor.STATE_DEFINITION_JBPM_NODE_NAME_CREATED);
-			stateDefinition.getName().setText(Locale.ENGLISH.getLanguage(), "created");
-			stateDefinition.getDescription().setText(Locale.ENGLISH.getLanguage(), "The Invoice has been newly created. This is the first state in the Invoice related workflow.");
-			stateDefinition.setPublicState(true);
-
-			stateDefinition = StateDefinition.getStateDefinition(processDefinitionInvoiceVendor, JbpmConstantsInvoice.Vendor.STATE_DEFINITION_JBPM_NODE_NAME_ABORTED);
-			stateDefinition.getName().setText(Locale.ENGLISH.getLanguage(), "aborted");
-			stateDefinition.getDescription().setText(Locale.ENGLISH.getLanguage(), "Aborted.");
-			stateDefinition.setPublicState(true);
-
-			stateDefinition = StateDefinition.getStateDefinition(processDefinitionInvoiceVendor, JbpmConstantsInvoice.Vendor.STATE_DEFINITION_JBPM_NODE_NAME_BOOKED);
-			stateDefinition.getName().setText(Locale.ENGLISH.getLanguage(), "booked");
-			stateDefinition.getDescription().setText(Locale.ENGLISH.getLanguage(), "Booked.");
-			stateDefinition.setPublicState(true);
-
-			stateDefinition = StateDefinition.getStateDefinition(processDefinitionInvoiceVendor, JbpmConstantsInvoice.Vendor.STATE_DEFINITION_JBPM_NODE_NAME_BOOKED_UNRECEIVABLE);
-			stateDefinition.getName().setText(Locale.ENGLISH.getLanguage(), "booked unreceivable");
-			stateDefinition.getDescription().setText(Locale.ENGLISH.getLanguage(), "booked unreceivable");
-			stateDefinition.setPublicState(true);
-
-			stateDefinition = StateDefinition.getStateDefinition(processDefinitionInvoiceVendor, JbpmConstantsInvoice.Vendor.STATE_DEFINITION_JBPM_NODE_NAME_DOUBTFUL);
-			stateDefinition.getName().setText(Locale.ENGLISH.getLanguage(), "doubtful");
-			stateDefinition.getDescription().setText(Locale.ENGLISH.getLanguage(), "doubtful");
-			stateDefinition.setPublicState(true);
-
-			stateDefinition = StateDefinition.getStateDefinition(processDefinitionInvoiceVendor, JbpmConstantsInvoice.Vendor.STATE_DEFINITION_JBPM_NODE_NAME_FINALIZED);
-			stateDefinition.getName().setText(Locale.ENGLISH.getLanguage(), "finalized");
-			stateDefinition.getDescription().setText(Locale.ENGLISH.getLanguage(), "finalized");
-			stateDefinition.setPublicState(true);
-
-			stateDefinition = StateDefinition.getStateDefinition(processDefinitionInvoiceVendor, JbpmConstantsInvoice.Vendor.STATE_DEFINITION_JBPM_NODE_NAME_PAID);
-			stateDefinition.getName().setText(Locale.ENGLISH.getLanguage(), "paid");
-			stateDefinition.getDescription().setText(Locale.ENGLISH.getLanguage(), "paid");
-			stateDefinition.setPublicState(true);
-
-			stateDefinition = StateDefinition.getStateDefinition(processDefinitionInvoiceVendor, JbpmConstantsInvoice.Vendor.STATE_DEFINITION_JBPM_NODE_NAME_SENT);
-			stateDefinition.getName().setText(Locale.ENGLISH.getLanguage(), "sent");
-			stateDefinition.getDescription().setText(Locale.ENGLISH.getLanguage(), "sent");
-			stateDefinition.setPublicState(true);
-
-			stateDefinition = StateDefinition.getStateDefinition(processDefinitionInvoiceVendor, JbpmConstantsInvoice.Vendor.STATE_DEFINITION_JBPM_NODE_NAME_SENT_PRE_COLLECTION_LETTER);
-			stateDefinition.getName().setText(Locale.ENGLISH.getLanguage(), "sent pre-collection letter");
-			stateDefinition.getDescription().setText(Locale.ENGLISH.getLanguage(), "sent pre-collection letter");
-			stateDefinition.setPublicState(true);
-
-			stateDefinition = StateDefinition.getStateDefinition(processDefinitionInvoiceVendor, JbpmConstantsInvoice.Vendor.STATE_DEFINITION_JBPM_NODE_NAME_SENT_REMINDER);
-			stateDefinition.getName().setText(Locale.ENGLISH.getLanguage(), "sent reminder");
-			stateDefinition.getDescription().setText(Locale.ENGLISH.getLanguage(), "sent reminder");
-			stateDefinition.setPublicState(true);
-
-			stateDefinition = StateDefinition.getStateDefinition(processDefinitionInvoiceVendor, JbpmConstantsInvoice.Vendor.STATE_DEFINITION_JBPM_NODE_NAME_UNCOLLECTABLE);
-			stateDefinition.getName().setText(Locale.ENGLISH.getLanguage(), "uncollectable");
-			stateDefinition.getDescription().setText(Locale.ENGLISH.getLanguage(), "uncollectable");
-			stateDefinition.setPublicState(true);
-
-
-			// customer
-			stateDefinition = StateDefinition.getStateDefinition(processDefinitionInvoiceCustomer, JbpmConstantsInvoice.Customer.STATE_DEFINITION_JBPM_NODE_NAME_SENT);
-			stateDefinition.getName().setText(Locale.ENGLISH.getLanguage(), "sent");
-			stateDefinition.getDescription().setText(Locale.ENGLISH.getLanguage(), "sent");
-			stateDefinition.setPublicState(true);
-
-			stateDefinition = StateDefinition.getStateDefinition(processDefinitionInvoiceCustomer, JbpmConstantsInvoice.Customer.STATE_DEFINITION_JBPM_NODE_NAME_BOOKED);
-			stateDefinition.getName().setText(Locale.ENGLISH.getLanguage(), "booked");
-			stateDefinition.getDescription().setText(Locale.ENGLISH.getLanguage(), "booked");
-			stateDefinition.setPublicState(true);
-
-			stateDefinition = StateDefinition.getStateDefinition(processDefinitionInvoiceCustomer, JbpmConstantsInvoice.Customer.STATE_DEFINITION_JBPM_NODE_NAME_PAID);
-			stateDefinition.getName().setText(Locale.ENGLISH.getLanguage(), "paid");
-			stateDefinition.getDescription().setText(Locale.ENGLISH.getLanguage(), "paid");
-			stateDefinition.setPublicState(true);
-
-			Query q = pm.newQuery(Transition.class);
-			q.setFilter("");
 
 
 			// deactive IDGenerator's cache for invoice

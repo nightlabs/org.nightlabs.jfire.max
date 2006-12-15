@@ -26,6 +26,8 @@
 
 package org.nightlabs.jfire.store;
 
+import java.io.IOException;
+import java.net.URL;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
@@ -45,6 +47,9 @@ import org.apache.log4j.Logger;
 import org.nightlabs.ModuleException;
 import org.nightlabs.jfire.config.Config;
 import org.nightlabs.jfire.idgenerator.IDGenerator;
+import org.nightlabs.jfire.jbpm.graph.def.ActionHandlerNodeEnter;
+import org.nightlabs.jfire.jbpm.graph.def.ProcessDefinition;
+import org.nightlabs.jfire.jbpm.graph.def.id.ProcessDefinitionID;
 import org.nightlabs.jfire.organisation.LocalOrganisation;
 import org.nightlabs.jfire.security.User;
 import org.nightlabs.jfire.store.book.BookProductTransfer;
@@ -1399,5 +1404,37 @@ public class Store
 
 		if (_nextProductTypeID >= 0 && nextProductTypeID != _nextProductTypeID)
 			nextProductTypeID = _nextProductTypeID;
+	}
+
+	public ProcessDefinition storeProcessDefinitionDeliveryNote(TradeSide tradeSide, URL jbpmProcessDefinitionURL)
+	throws IOException
+	{
+		PersistenceManager pm = getPersistenceManager();
+
+		org.jbpm.graph.def.ProcessDefinition jbpmProcessDefinition = ProcessDefinition.readProcessDefinition(jbpmProcessDefinitionURL);
+
+		// we add the events+actionhandlers
+		ActionHandlerNodeEnter.register(jbpmProcessDefinition);
+
+
+		// store it
+		ProcessDefinition processDefinition = ProcessDefinition.storeProcessDefinition(pm, null, jbpmProcessDefinition, jbpmProcessDefinitionURL);
+		ProcessDefinitionID processDefinitionID = (ProcessDefinitionID) JDOHelper.getObjectId(processDefinition);
+
+		switch (tradeSide) {
+			case vendor:
+			{
+				
+			}
+			break;
+			case customer:
+			{
+			}
+			break;
+			default:
+				throw new IllegalStateException("Unknown TradeSide: " + tradeSide);
+		}
+
+		return processDefinition;
 	}
 }

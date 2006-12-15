@@ -8,10 +8,8 @@ import org.jbpm.graph.def.Action;
 import org.jbpm.graph.def.Event;
 import org.jbpm.graph.def.GraphElement;
 import org.jbpm.graph.exe.ExecutionContext;
-import org.jbpm.graph.exe.ProcessInstance;
 import org.jbpm.instantiation.Delegation;
 import org.nightlabs.annotation.Implement;
-import org.nightlabs.jdo.ObjectID;
 import org.nightlabs.jdo.ObjectIDUtil;
 import org.nightlabs.jfire.security.SecurityReflector;
 import org.nightlabs.jfire.security.User;
@@ -33,12 +31,6 @@ extends AbstractActionHandler
 		jbpmProcessDefinition.addEvent(event);
 	}
 
-	/**
-	 * This variable name references the toString()-representation of the {@link ObjectID} which
-	 * references the instance of {@link Statable} for which the {@link ProcessInstance} has been
-	 * created.
-	 */
-	public static final String VARIABLE_NAME_STATABLE_ID = "statableID";
 //	/**
 //	 * This variable name references the fully qualified name of the class extending {@link StateDefinition}.
 //	 * It is used in the {@link ContextInstance}. Usually, this will be the name of one of the following classes:

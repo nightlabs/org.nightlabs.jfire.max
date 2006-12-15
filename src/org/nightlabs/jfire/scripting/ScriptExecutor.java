@@ -321,6 +321,7 @@ public abstract class ScriptExecutor
 
 		Object result = doExecute();
 
+		// TODO: must be done in the bean (ScriptRegistry) to avoid detaching in the server
 		// detach script result if necessary
 		if (script.isNeedsDetach()) {
 			PersistenceManager pm = getPersistenceManager();

@@ -35,8 +35,6 @@ import org.mozilla.javascript.Scriptable;
 import org.mozilla.javascript.ScriptableObject;
 import org.mozilla.javascript.Undefined;
 import org.nightlabs.jdo.ObjectIDUtil;
-import org.nightlabs.jfire.scripting.Script;
-import org.nightlabs.jfire.scripting.ScriptCategory;
 import org.nightlabs.jfire.scripting.id.ScriptRegistryItemID;
 
 /**
@@ -111,7 +109,6 @@ public class Main {
 		try {
 			Scriptable scope = new ImporterTopLevel(context);
 
-			StringBuffer imports = new StringBuffer();
 			for (Map.Entry<String, Object> me : getParameterValues().entrySet()) 
 			{ 
 				Object js_value = Context.javaToJS(me.getValue(), scope);
@@ -119,7 +116,7 @@ public class Main {
 			}
 
 			String sourceName = "Script";
-			String scriptText = imports.toString() + getScriptText();
+			String scriptText = getScriptText();
 			System.out.println("scriptText = "+scriptText);
 			Object result = context.evaluateString(
 					scope,
@@ -155,9 +152,8 @@ public class Main {
 	private static Map<String, Object> getParameterValues() 
 	{
 		Map<String, Object> parameter = new HashMap<String, Object>();
-		String scriptIDName = TEST;
-		ScriptRegistryItemID scriptID = getScriptRegistryItemID(scriptIDName);
-		parameter.put(scriptIDName, scriptID);
+		ScriptRegistryItemID scriptID = getScriptRegistryItemID(TEST);
+		parameter.put(TEST, scriptID);
 //		String scriptIDString = scriptID.toString();
 //		parameter.put(scriptIDName, scriptIDString);
 		System.out.println("scriptID = "+scriptID);
@@ -170,16 +166,24 @@ public class Main {
 		String scriptType = "IpanemaTicketing-Type-Ticket";
 		return ScriptRegistryItemID.create(organisationID, scriptType, scriptIDName);
 	}
-	
+		
 	private static String getScriptText() 
 	{		
 		StringBuffer sb = new StringBuffer();
 		String objectIDString = getScriptRegistryItemID(TEST).toString();
 		sb.append("importPackage(Packages.javax.jdo);");
-		sb.append("importPackage(Packages.org.nightlabs.jdo);");
-//		sb.append("("+TEST+".toString()).equals(\""+objectIDString+"\")");
-		sb.append(TEST+".toString()==\""+objectIDString+"\"");
+
+//		sb.append("(");
+////		sb.append("("+TEST+".toString()==\""+objectIDString+"\""+")");
+//		sb.append("("+TEST+".toString()=="+objectIDString+")");
+//		sb.append("&&");
+////		sb.append("("+TEST+".toString()!=\""+objectIDString+"\""+")");		
+//		sb.append("("+TEST+".toString()!="+objectIDString+")");
+//		sb.append(")");
 		
+//		sb.append("("+TEST+".toString()).equals(\""+objectIDString+"\")");
+//		sb.append("("+TEST+".toString()=="+objectIDString+")");
+		sb.append("("+TEST+".toString()==\""+objectIDString+"\""+")");
 //		sb.append(TEST+".equals(ObjectIDUtil.createObjectID(\""+objectIDString+"\"))");		
 //		sb.append(TEST+"==(ObjectIDUtil.createObjectID(\""+objectIDString+"\"))");
 //		sb.append(TEST+"==\""+objectIDString+"\"");
@@ -189,5 +193,5 @@ public class Main {
 		String script = sb.toString();	
 		System.out.println("script = "+script);
 		return script;				
-	}
+	}	
 }

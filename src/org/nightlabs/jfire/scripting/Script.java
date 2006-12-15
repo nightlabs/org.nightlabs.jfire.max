@@ -244,7 +244,7 @@ public class Script
 	/**
 	 * @jdo.field persistence-modifier="persistent"
 	 */	
-	private boolean needsDetach = true;
+	private boolean needsDetach = false;
 	
 	public void setNeedsDetach(boolean needsDetach) {
 		this.needsDetach = needsDetach;

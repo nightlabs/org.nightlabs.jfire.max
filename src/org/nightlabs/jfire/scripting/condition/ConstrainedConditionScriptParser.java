@@ -137,32 +137,25 @@ public class ConstrainedConditionScriptParser
 		if (scriptText == null)
 			throw new IllegalArgumentException("param scriptText must NOT be null!");
 
-//		if (logger.isDebugEnabled())
-//			logger.debug("originalScriptText = "+scriptText);
-			System.out.println("originalScriptText = "+scriptText);
+		System.out.println("originalScriptText = "+scriptText);
 		
 // convert sth. like the following line:
 //		importPackage(Packages.javax.jdo);
-//		JDOHelper.getObjectId(myVariable).toString()==jdo/org.b.MyClassID?fieldA=0
+//		(JDOHelper.getObjectId(myVariable).toString()==jdo/org.b.MyClassID?fieldA=0)
 //
 // to sth. like this:
 //		myVariable == jdo/org.b.MyClassID?fieldA=0
 		
 		StringBuffer sb = new StringBuffer();
 		sb.append("importPackage\\(Packages.javax.jdo\\)\\;");
-//		sb.append("importPackage\\(Packages.org.nightlabs.jdo\\)\\;");
-		sb.append("JDOHelper.getObjectId\\((.*?)\\)");		
-		sb.append("\\.toString\\(\\)");
+		String importRegEx = sb.toString();
+		scriptText = scriptText.replaceAll(importRegEx, "");
 		
+		sb = new StringBuffer();
+		sb.append("JDOHelper.getObjectId\\((.*?)\\)");		
+		sb.append("\\.toString\\(\\)");		
 		String varRegEx = sb.toString();		
-//		System.out.println("varRegEx = "+varRegEx);
-
 		scriptText = scriptText.replaceAll(varRegEx, "$1");
-//		scriptText = scriptText.replaceAll("ObjectIDUtil.createObjectID\\(\\\"(.*?)\\\"\\)", "$1");
-//		scriptText = scriptText.replaceAll("ObjectIDUtil.createObjectID\\((.*?)\\)", "$1");
-
-//		if (logger.isDebugEnabled())
-//			logger.debug("replacedScriptText = "+scriptText);
 		System.out.println("replacedScriptText = "+scriptText);
 		
 		return parseConditionContainer(scriptText, generator);
@@ -298,8 +291,19 @@ public class ConstrainedConditionScriptParser
 						value = scriptText.substring(index + compareOperator.length(), endIndex);
 					else
 						value = scriptText.substring(index + compareOperator.length());
+					
+					logger.debug("value before replace = "+value);
+					Pattern p = Pattern.compile("\\\"(.*?)\\\"");
+					Matcher matcher = p.matcher(value); 
+					if (matcher.find()) {
+						value = value.substring(1, value.length()-1);
+					}
+//					value = value.replace("\\\"(.*?)\\\"", "$1");					
+					logger.debug("value after replace = "+value);
+					
 //					System.out.println("value = "+value);
 //					System.out.println();
+					
 				} else {
 					throw new IllegalArgumentException("Param scriptText "+scriptText+" does " +
 							"not contain a value");

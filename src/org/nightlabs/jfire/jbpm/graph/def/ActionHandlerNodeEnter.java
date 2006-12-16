@@ -31,6 +31,37 @@ extends AbstractActionHandler
 		jbpmProcessDefinition.addEvent(event);
 	}
 
+	private static class LastNodeEnterTransitionCarrier
+	{
+		public String transitionName;
+	}
+
+	private static ThreadLocal<LastNodeEnterTransitionCarrier> lastNodeEnterTransitionCarrier = new ThreadLocal<LastNodeEnterTransitionCarrier>() {
+		@Override
+		protected LastNodeEnterTransitionCarrier initialValue()
+		{
+			return new LastNodeEnterTransitionCarrier();
+		}
+	};
+
+	/**
+	 * This method allows to find out which transition was used for the last node-enter event. It is managed
+	 * on a per-Thread base. A typical use case is to leave a Node via a certain transition depending on the
+	 * name of the transition that was used to enter it (e.g. simply the same name).
+	 *
+	 * @return Returns either <code>null</code>, if <code>ActionHandlerNodeEnter</code> was never triggered on
+	 *		the current thread or the name of the last transition that was used to enter a node on the current thread.
+	 */
+	public static String getLastNodeEnterTransitionName()
+	{
+		return lastNodeEnterTransitionCarrier.get().transitionName;
+	}
+
+	protected static void setLastNodeEnterTransitionName(String transitionName)
+	{
+		lastNodeEnterTransitionCarrier.get().transitionName = transitionName;
+	}
+
 //	/**
 //	 * This variable name references the fully qualified name of the class extending {@link StateDefinition}.
 //	 * It is used in the {@link ContextInstance}. Usually, this will be the name of one of the following classes:
@@ -63,6 +94,7 @@ extends AbstractActionHandler
 	protected void doExecute(ExecutionContext executionContext)
 			throws Exception
 	{
+		setLastNodeEnterTransitionName(executionContext.getTransition().getName());
 		GraphElement graphElement = executionContext.getEventSource();
 
 		if (logger.isDebugEnabled())

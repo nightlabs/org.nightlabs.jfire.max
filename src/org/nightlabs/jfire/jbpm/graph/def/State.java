@@ -6,11 +6,14 @@ import java.util.Date;
 import java.util.HashSet;
 import java.util.Set;
 
+import javax.jdo.JDOHelper;
 import javax.jdo.PersistenceManager;
 import javax.jdo.Query;
 
+import org.nightlabs.jdo.NLJDOHelper;
 import org.nightlabs.jdo.ObjectID;
 import org.nightlabs.jfire.security.User;
+import org.nightlabs.jfire.trade.state.id.StateDefinitionID;
 import org.nightlabs.jfire.trade.state.id.StateID;
 
 /**
@@ -46,9 +49,35 @@ implements Serializable
 
 	public static Set<StateID> getStateIDsForStatableID(PersistenceManager pm, ObjectID statableID)
 	{
+// TODO WORKAROUND for JPOX: The following would be cleaner, but it does not work :-(
+//		Statable statable = (Statable) pm.getObjectById(statableID);
+//		Query q = pm.newNamedQuery(State.class, "getStateIDsForStatable");
+//		return new HashSet<StateID>((Collection<? extends StateID>) q.execute(statable));
+
+// WORKAROUND begin
+		Set<StateID> res = new HashSet<StateID>();
 		Statable statable = (Statable) pm.getObjectById(statableID);
-		Query q = pm.newNamedQuery(State.class, "getStateIDsForStatable");
-		return new HashSet<StateID>((Collection<? extends StateID>) q.execute(statable));
+		res.addAll(NLJDOHelper.getObjectIDSet(statable.getStates()));
+
+		StatableLocal statableLocal = statable.getStatableLocal();
+		res.addAll(NLJDOHelper.getObjectIDSet(statableLocal.getStates()));
+		return res;
+// WORKAROUND end
+	}
+
+	public static boolean hasState(PersistenceManager pm, ObjectID statableID, String jbpmNodeName)
+	{
+		// TODO use a query once JPOX issues with interfaces are fixed
+		Statable statable = (Statable) pm.getObjectById(statableID);
+		for (State state : statable.getStates()) {
+			if (jbpmNodeName.equals(state.getStateDefinition().getJbpmNodeName()))
+				return true;
+		}
+		for (State state : statable.getStatableLocal().getStates()) {
+			if (jbpmNodeName.equals(state.getStateDefinition().getJbpmNodeName()))
+				return true;
+		}
+		return false;
 	}
 
 	/**

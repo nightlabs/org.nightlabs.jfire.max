@@ -1,8 +1,14 @@
 package org.nightlabs.jfire.jbpm.graph.def;
 
 import java.io.Serializable;
+import java.util.HashMap;
+import java.util.List;
+
+import javax.jdo.PersistenceManager;
+import javax.jdo.Query;
 
 import org.nightlabs.jfire.idgenerator.IDGenerator;
+import org.nightlabs.jfire.jbpm.graph.def.id.ProcessDefinitionID;
 import org.nightlabs.jfire.jbpm.graph.def.id.TransitionID;
 import org.nightlabs.jfire.trade.state.id.StateDefinitionID;
 
@@ -24,6 +30,20 @@ import org.nightlabs.jfire.trade.state.id.StateDefinitionID;
  *				transitionOrganisationID, transitionID"
  *
  * @jdo.fetch-group name="Transition.name" fields="name"
+ *
+ * @jdo.query name="getTransitionByStateDefinitionAndTransitionName" query="SELECT UNIQUE
+ *		WHERE
+ *			this.processDefinitionOrganisationID == :processDefinitionOrganisationID &&
+ *			this.processDefinitionID == :processDefinitionID &&
+ *			this.stateDefinitionOrganisationID == :stateDefinitionOrganisationID &&
+ *			this.stateDefinitionID == :stateDefinitionID &&
+ *			this.jbpmTransitionName == :jbpmTransitionName"
+ *
+ * @jdo.query name="getTransitionsByTransitionName" query="SELECT
+ *		WHERE
+ *			this.processDefinitionOrganisationID == :processDefinitionOrganisationID &&
+ *			this.processDefinitionID == :processDefinitionID &&
+ *			this.jbpmTransitionName == :jbpmTransitionName"
  */
 public class Transition
 		implements Serializable
@@ -31,6 +51,30 @@ public class Transition
 	private static final long serialVersionUID = 1L;
 
 	public static final String FETCH_GROUP_NAME = "Transition.name";
+
+	@SuppressWarnings("unchecked")
+	public static Transition getTransition(PersistenceManager pm, StateDefinitionID stateDefinitionID, String jbpmTransitionName)
+	{
+		HashMap params = new HashMap(5);
+		params.put("processDefinitionOrganisationID", stateDefinitionID.processDefinitionOrganisationID);
+		params.put("processDefinitionID", stateDefinitionID.processDefinitionID);
+		params.put("stateDefinitionOrganisationID", stateDefinitionID.stateDefinitionOrganisationID);
+		params.put("stateDefinitionID", stateDefinitionID.stateDefinitionID);
+		params.put("jbpmTransitionName", jbpmTransitionName);
+		Query q = pm.newNamedQuery(Transition.class, "getTransitionByStateDefinitionAndTransitionName");
+		return (Transition) q.executeWithMap(params);
+	}
+
+	@SuppressWarnings("unchecked")
+	public static List<Transition> getTransitions(PersistenceManager pm, ProcessDefinitionID processDefinitionID, String jbpmTransitionName)
+	{
+		HashMap params = new HashMap(3);
+		params.put("processDefinitionOrganisationID", processDefinitionID.organisationID);
+		params.put("processDefinitionID", processDefinitionID.processDefinitionID);
+		params.put("jbpmTransitionName", jbpmTransitionName);
+		Query q = pm.newNamedQuery(Transition.class, "getTransitionsByTransitionName");
+		return (List<Transition>) q.executeWithMap(params);
+	}
 
 	public static TransitionID getTransitionID(org.jbpm.graph.def.Transition jbpmTransition)
 	{

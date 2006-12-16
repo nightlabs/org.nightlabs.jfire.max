@@ -247,6 +247,11 @@ implements Serializable
 		return description;
 	}
 
+	public String getJbpmNodeName()
+	{
+		return jbpmNodeName;
+	}
+
 	/**
 	 * This method creates a new instance of {@link State} and registers it in the {@link StatableLocal} (and
 	 * if <code>{@link #isPublicState()} == true</code>, additionally in {@link Statable}).

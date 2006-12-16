@@ -52,6 +52,7 @@ import org.nightlabs.jfire.jbpm.graph.def.StatableLocal;
 import org.nightlabs.jfire.jbpm.graph.def.State;
 import org.nightlabs.jfire.security.User;
 import org.nightlabs.jfire.store.ProductType;
+import org.nightlabs.jfire.trade.jbpm.ActionHandlerFinalizeOffer;
 import org.nightlabs.jfire.transfer.id.AnchorID;
 import org.nightlabs.util.Utils;
 
@@ -563,8 +564,11 @@ implements
 	}
 
 	/**
+	 * This method must not be called directly! It's called via {@link ActionHandlerFinalizeOffer}.
+	 * <p>
 	 * This method sets the finalized flag of an <tt>Offer</tt> to true. After that,
 	 * a change of an <tt>Offer</tt> is not possible anymore.
+	 * </p>
 	 * <p>
 	 * After creation of an <tt>Offer</tt>, the next step in the service-customer relation
 	 * is the finalization of the <tt>Offer</tt>. The customer receives a finalized offer
@@ -573,8 +577,9 @@ implements
 	 * to ensure, that the customer finally confirms the correct Offer (and not one that
 	 * has already been changed). Hence, the customer receives the Offer (on paper or
 	 * by email) not before it has been finalized.
+	 * </p>
 	 */
-	protected void setFinalized(User user)
+	public void setFinalized(User user)
 	{
 		if (isFinalized())
 			return;

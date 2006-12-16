@@ -44,6 +44,7 @@ import javax.jdo.listener.DetachCallback;
 
 import org.nightlabs.jdo.ObjectIDUtil;
 import org.nightlabs.jfire.accounting.id.InvoiceID;
+import org.nightlabs.jfire.accounting.jbpm.ActionHandlerFinalizeInvoice;
 import org.nightlabs.jfire.jbpm.graph.def.ActionHandlerNodeEnter;
 import org.nightlabs.jfire.jbpm.graph.def.Statable;
 import org.nightlabs.jfire.jbpm.graph.def.StatableLocal;
@@ -385,9 +386,9 @@ implements Serializable, ArticleContainer, Statable, DetachCallback
 			);
 		}
 
-		if (!article.getOffer().getOfferLocal().isConfirmed()) {
+		if (!article.getOffer().getOfferLocal().isAccepted()) {
 			throw new InvoiceEditException(
-				InvoiceEditException.REASON_OFFER_NOT_CONFIRMED, 
+				InvoiceEditException.REASON_OFFER_NOT_ACCEPTED,
 				"At least one involved offer is not confirmed!",
 				articleID
 			);
@@ -627,7 +628,11 @@ implements Serializable, ArticleContainer, Statable, DetachCallback
 	{
 		return valid;
 	}
-	protected void setFinalized(User finalizer) {
+
+	/**
+	 * This method must not be called directly! it is triggered via {@link ActionHandlerFinalizeInvoice}.
+	 */
+	public void setFinalized(User finalizer) {
 		if (isFinalized())
 			return;
 

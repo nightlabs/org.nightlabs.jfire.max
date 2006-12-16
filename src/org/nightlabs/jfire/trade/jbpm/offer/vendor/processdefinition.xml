@@ -5,12 +5,12 @@
    <start-state name="devil.NightLabs.org:created">
       <transition name="finalize" to="devil.NightLabs.org:finalized"></transition>
       <transition name="abort" to="devil.NightLabs.org:aborted"></transition>
-      <transition name="devil.NightLabs.org:accept" to="devil.NightLabs.org:accepted"></transition>
+      <transition name="devil.NightLabs.org:acceptImplicitely" to="devil.NightLabs.org:acceptedImplicitely"></transition>
    </start-state>
    <end-state name="devil.NightLabs.org:rejected"></end-state>
    <end-state name="devil.NightLabs.org:accepted"></end-state>
    <state name="devil.NightLabs.org:finalized">
-      <transition name="expire" to="devil.NightLabs.org:expired"></transition>
+      <transition name="devil.NightLabs.org:expire" to="devil.NightLabs.org:expired"></transition>
       <transition name="revoke" to="devil.NightLabs.org:revoked"></transition>
       <transition name="reject" to="devil.NightLabs.org:rejected"></transition>
       <transition name="devil.NightLabs.org:customerAccepted" to="devil.NightLabs.org:customerAccepted"></transition>
@@ -28,6 +28,10 @@
       <transition name="reject" to="devil.NightLabs.org:rejected"></transition>
    </node>
    <node name="devil.NightLabs.org:sent">
-      <transition name="" to="devil.NightLabs.org:finalized"></transition>
+      <transition name="devil.NightLabs.org:send" to="devil.NightLabs.org:finalized"></transition>
+      <transition name="sendImplicitely" to="devil.NightLabs.org:accepted"></transition>
+   </node>
+   <node name="devil.NightLabs.org:acceptedImplicitely">
+      <transition name="sendImplicitely" to="devil.NightLabs.org:sent"></transition>
    </node>
 </process-definition>

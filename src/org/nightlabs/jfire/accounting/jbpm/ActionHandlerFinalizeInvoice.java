@@ -1,5 +1,6 @@
 package org.nightlabs.jfire.accounting.jbpm;
 
+import javax.jdo.JDOHelper;
 import javax.jdo.PersistenceManager;
 
 import org.jbpm.graph.def.Action;
@@ -10,9 +11,12 @@ import org.jbpm.instantiation.Delegation;
 import org.nightlabs.annotation.Implement;
 import org.nightlabs.jfire.accounting.Accounting;
 import org.nightlabs.jfire.accounting.Invoice;
+import org.nightlabs.jfire.accounting.id.InvoiceID;
+import org.nightlabs.jfire.asyncinvoke.AsyncInvoke;
 import org.nightlabs.jfire.jbpm.graph.def.AbstractActionHandler;
 import org.nightlabs.jfire.security.SecurityReflector;
 import org.nightlabs.jfire.security.User;
+import org.nightlabs.jfire.trade.OrganisationLegalEntity;
 
 public class ActionHandlerFinalizeInvoice
 extends AbstractActionHandler
@@ -27,9 +31,9 @@ extends AbstractActionHandler
 		Event event = new Event("node-enter");
 		event.addAction(action);
 
-		Node finalized = jbpmProcessDefinition.getNode(JbpmConstantsInvoice.Vendor.STATE_DEFINITION_JBPM_NODE_NAME_FINALIZED);
+		Node finalized = jbpmProcessDefinition.getNode(JbpmConstantsInvoice.Vendor.NODE_NAME_FINALIZED);
 		if (finalized == null)
-			throw new IllegalArgumentException("The node \""+ JbpmConstantsInvoice.Vendor.STATE_DEFINITION_JBPM_NODE_NAME_FINALIZED +"\" does not exist in the ProcessDefinition \"" + jbpmProcessDefinition.getName() + "\"!");
+			throw new IllegalArgumentException("The node \""+ JbpmConstantsInvoice.Vendor.NODE_NAME_FINALIZED +"\" does not exist in the ProcessDefinition \"" + jbpmProcessDefinition.getName() + "\"!");
 
 		finalized.addEvent(event);
 	}
@@ -39,9 +43,26 @@ extends AbstractActionHandler
 	throws Exception
 	{
 		PersistenceManager pm = getPersistenceManager();
+		Invoice invoice = (Invoice) getStatable();
+		doExecute(pm, invoice);
+	}
+
+	protected static void doExecute(PersistenceManager pm, Invoice invoice)
+	throws Exception
+	{
+		if (invoice.isFinalized())
+			return;
+
 		Accounting accounting = Accounting.getAccounting(pm);
 		User user = SecurityReflector.getUserDescriptor().getUser(pm);
-		Invoice invoice = (Invoice) getStatable();
-		accounting.finalizeInvoice(user, invoice);
+
+		if (!invoice.getVendor().getPrimaryKey().equals(accounting.getMandator().getPrimaryKey()))
+			throw new IllegalArgumentException("Can not finalize an invoice where mandator is not vendor of this invoice!");
+
+		// invoice.setFinalized(...) does nothing, if it is already finalized.
+		invoice.setFinalized(user);
+
+		// book asynchronously
+		AsyncInvoke.exec(new BookInvoiceInvocation((InvoiceID) JDOHelper.getObjectId(invoice)), true);
 	}
 }

@@ -61,8 +61,7 @@ import org.nightlabs.jfire.security.User;
  * @jdo.fetch-group name="OfferLocal.offer" fields="offer"
  * @jdo.fetch-group name="OfferLocal.acceptUser" fields="acceptUser"
  * @jdo.fetch-group name="OfferLocal.rejectUser" fields="rejectUser"
- * @jdo.fetch-group name="OfferLocal.confirmUser" fields="confirmUser"
- * @jdo.fetch-group name="OfferLocal.this" fields="offer, acceptUser, rejectUser, confirmUser"
+ * @jdo.fetch-group name="OfferLocal.this" fields="offer, acceptUser, rejectUser"
  *
  * @jdo.fetch-group name="StatableLocal.state" fields="state"
  * @jdo.fetch-group name="StatableLocal.states" fields="states"
@@ -123,18 +122,18 @@ implements Serializable, StatableLocal
 	 */
 	private User rejectUser = null;
 
-	/**
-	 * When an <tt>Offer</tt> has been accepted by the customer, it still needs to be
-	 * confirmed by the saler.
-	 *
-	 * @jdo.field persistence-modifier="persistent"
-	 */
-	private Date confirmDT = null;
-
-	/**
-	 * @jdo.field persistence-modifier="persistent"
-	 */
-	private User confirmUser = null;
+//	/**
+//	 * When an <tt>Offer</tt> has been accepted by the customer, it still needs to be
+//	 * confirmed by the saler.
+//	 *
+//	 * @jdo.field persistence-modifier="persistent"
+//	 */
+//	private Date confirmDT = null;
+//
+//	/**
+//	 * @jdo.field persistence-modifier="persistent"
+//	 */
+//	private User confirmUser = null;
 
 	/**
 	 * @jdo.field persistence-modifier="persistent"
@@ -214,16 +213,16 @@ implements Serializable, StatableLocal
 	{
 		return rejectDT != null;
 	}
-	/**
-	 * When an <tt>Offer</tt> has been accepted by the customer, it still needs to be
-	 * confirmed by the saler.
-	 *
-	 * @return Returns whether it's confirmed.
-	 */
-	public boolean isConfirmed()
-	{
-		return confirmDT != null;
-	}
+//	/**
+//	 * When an <tt>Offer</tt> has been accepted by the customer, it still needs to be
+//	 * confirmed by the saler.
+//	 *
+//	 * @return Returns whether it's confirmed.
+//	 */
+//	public boolean isConfirmed()
+//	{
+//		return confirmDT != null;
+//	}
 
 	/**
 	 * Accepts the <tt>Offer</tt>. This happens after finalization. It means, the customer
@@ -267,24 +266,24 @@ implements Serializable, StatableLocal
 		rejectDT = new Date();
 		rejectUser = user;
 	}
-	/**
-	 * Confirms this offer. Confirmation happens after the customer has accepted. This
-	 * basically means a notification is sent to the customer that work/delivery will begin.
-	 * <p>
-	 * This method is called by {@link Trader#confirmOffer(User, OfferLocal)}.
-	 * </p>
-	 */
-	protected void confirm(User user)
-	{
-		if (isConfirmed())
-			return;
-
-		if (!isAccepted())
-			throw new IllegalStateException("This Offer ("+offer.getPrimaryKey()+") is not accepted! Call accept() first!");
-
-		confirmDT = new Date();
-		acceptUser = user;
-	}
+//	/**
+//	 * Confirms this offer. Confirmation happens after the customer has accepted. This
+//	 * basically means a notification is sent to the customer that work/delivery will begin.
+//	 * <p>
+//	 * This method is called by {@link Trader#confirmOffer(User, OfferLocal)}.
+//	 * </p>
+//	 */
+//	protected void confirm(User user)
+//	{
+//		if (isConfirmed())
+//			return;
+//
+//		if (!isAccepted())
+//			throw new IllegalStateException("This Offer ("+offer.getPrimaryKey()+") is not accepted! Call accept() first!");
+//
+//		confirmDT = new Date();
+//		acceptUser = user;
+//	}
 
 	public Date getAcceptDT()
 	{
@@ -304,14 +303,14 @@ implements Serializable, StatableLocal
 		return rejectUser;
 	}
 
-	public Date getConfirmDT()
-	{
-		return confirmDT;
-	}
-	public User getConfirmUser()
-	{
-		return confirmUser;
-	}
+//	public Date getConfirmDT()
+//	{
+//		return confirmDT;
+//	}
+//	public User getConfirmUser()
+//	{
+//		return confirmUser;
+//	}
 
 	/**
 	 * @jdo.field

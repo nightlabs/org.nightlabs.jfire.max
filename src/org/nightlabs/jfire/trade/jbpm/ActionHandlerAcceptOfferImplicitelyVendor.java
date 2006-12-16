@@ -1,6 +1,5 @@
 package org.nightlabs.jfire.trade.jbpm;
 
-import javax.jdo.JDOHelper;
 import javax.jdo.PersistenceManager;
 
 import org.jbpm.graph.def.Action;
@@ -9,30 +8,29 @@ import org.jbpm.graph.def.Node;
 import org.jbpm.graph.exe.ExecutionContext;
 import org.jbpm.instantiation.Delegation;
 import org.nightlabs.annotation.Implement;
-import org.nightlabs.jfire.asyncinvoke.AsyncInvoke;
 import org.nightlabs.jfire.jbpm.graph.def.AbstractActionHandler;
 import org.nightlabs.jfire.security.SecurityReflector;
 import org.nightlabs.jfire.security.User;
 import org.nightlabs.jfire.trade.Offer;
 import org.nightlabs.jfire.trade.OfferActionHandler;
-import org.nightlabs.jfire.trade.id.OfferID;
+import org.nightlabs.jfire.trade.OrganisationLegalEntity;
 
-public class ActionHandlerFinalizeOffer
+public class ActionHandlerAcceptOfferImplicitelyVendor
 extends AbstractActionHandler
 {
 	private static final long serialVersionUID = 1L;
 
 	public static void register(org.jbpm.graph.def.ProcessDefinition jbpmProcessDefinition)
 	{
-		Action action = new Action(new Delegation(ActionHandlerFinalizeOffer.class.getName()));
-		action.setName(ActionHandlerFinalizeOffer.class.getName());
+		Action action = new Action(new Delegation(ActionHandlerAcceptOfferImplicitelyVendor.class.getName()));
+		action.setName(ActionHandlerAcceptOfferImplicitelyVendor.class.getName());
 
 		Event event = new Event("node-enter");
 		event.addAction(action);
 
-		Node finalized = jbpmProcessDefinition.getNode(JbpmConstantsOffer.Vendor.NODE_NAME_FINALIZED);
+		Node finalized = jbpmProcessDefinition.getNode(JbpmConstantsOffer.Both.NODE_NAME_ACCEPTED_IMPLICITELY);
 		if (finalized == null)
-			throw new IllegalArgumentException("The node \""+ JbpmConstantsOffer.Vendor.NODE_NAME_FINALIZED +"\" does not exist in the ProcessDefinition \"" + jbpmProcessDefinition.getName() + "\"!");
+			throw new IllegalArgumentException("The node \""+ JbpmConstantsOffer.Both.NODE_NAME_ACCEPTED_IMPLICITELY +"\" does not exist in the ProcessDefinition \"" + jbpmProcessDefinition.getName() + "\"!");
 
 		finalized.addEvent(event);
 	}
@@ -44,17 +42,8 @@ extends AbstractActionHandler
 		PersistenceManager pm = getPersistenceManager();
 		Offer offer = (Offer) getStatable();
 
-		doExecute(pm, offer);
-	}
-
-	/**
-	 * This method is called by {@link #doExecute(ExecutionContext)} and by {@link ActionHandlerAcceptOfferImplicitelyVendor#doExecute(ExecutionContext)}.
-	 */
-	protected static void doExecute(PersistenceManager pm, Offer offer)
-	throws Exception
-	{
-		if (offer.isFinalized())
-			return;
+		if (!offer.isFinalized())
+			ActionHandlerFinalizeOffer.doExecute(pm, offer);
 
 		User user = SecurityReflector.getUserDescriptor().getUser(pm);
 
@@ -63,6 +52,9 @@ extends AbstractActionHandler
 			offerActionHandler.onFinalizeOffer(user, offer);
 		}
 
-		AsyncInvoke.exec(new SendOfferInvocation((OfferID) JDOHelper.getObjectId(offer)), true);
+		// send the offer to the customer, if the customer is an organisation
+		if (offer.getOrder().getCustomer() instanceof OrganisationLegalEntity) {
+			throw new UnsupportedOperationException("NYI"); // TODO implement!
+		}
 	}
 }

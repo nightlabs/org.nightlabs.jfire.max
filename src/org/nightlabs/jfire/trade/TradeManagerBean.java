@@ -241,69 +241,70 @@ implements SessionBean
 		}
 	}
 
-	/**
-	 * Finalizes the specified {@link Offer}.
-	 *
-	 * @ejb.interface-method
-	 * @ejb.permission role-name="TradeManager-write"
-	 * @ejb.transaction type = "Required"
-	 **/
-	public Offer finalizeOffer(OfferID offerID, boolean get, String[] fetchGroups, int maxFetchDepth)
-	throws ModuleException
-	{
-		PersistenceManager pm = getPersistenceManager();
-		try {
-			pm.getExtent(Offer.class);
+// works now via jBPM
+//	/**
+//	 * Finalizes the specified {@link Offer}.
+//	 *
+//	 * @ejb.interface-method
+//	 * @ejb.permission role-name="TradeManager-write"
+//	 * @ejb.transaction type = "Required"
+//	 **/
+//	public Offer finalizeOffer(OfferID offerID, boolean get, String[] fetchGroups, int maxFetchDepth)
+//	throws ModuleException
+//	{
+//		PersistenceManager pm = getPersistenceManager();
+//		try {
+//			pm.getExtent(Offer.class);
+//
+//			if (get) {
+//				pm.getFetchPlan().setMaxFetchDepth(maxFetchDepth);
+//				if (fetchGroups != null)
+//					pm.getFetchPlan().setGroups(fetchGroups);
+//			}
+//
+//			Offer offer = (Offer) pm.getObjectById(offerID);
+//			Trader.getTrader(pm).finalizeOffer(User.getUser(pm, getPrincipal()), offer);
+//
+//			if (get)
+//				return (Offer) pm.detachCopy(offer);
+//			else
+//				return null;
+//		} finally {
+//			pm.close();
+//		}
+//	}
 
-			if (get) {
-				pm.getFetchPlan().setMaxFetchDepth(maxFetchDepth);
-				if (fetchGroups != null)
-					pm.getFetchPlan().setGroups(fetchGroups);
-			}
-
-			Offer offer = (Offer) pm.getObjectById(offerID);
-			Trader.getTrader(pm).finalizeOffer(User.getUser(pm, getPrincipal()), offer);
-
-			if (get)
-				return (Offer) pm.detachCopy(offer);
-			else
-				return null;
-		} finally {
-			pm.close();
-		}
-	}
-
-	/**
-	 * Accepts the specified {@link Offer}.
-	 *
-	 * @ejb.interface-method
-	 * @ejb.permission role-name="TradeManager-write"
-	 * @ejb.transaction type = "Required"
-	 **/
-	public Offer acceptOffer(OfferID offerID, boolean get, String[] fetchGroups, int maxFetchDepth)
-	throws ModuleException
-	{
-		PersistenceManager pm = getPersistenceManager();
-		try {
-			pm.getExtent(Offer.class);
-
-			if (get) {
-				pm.getFetchPlan().setMaxFetchDepth(maxFetchDepth);
-				if (fetchGroups != null)
-					pm.getFetchPlan().setGroups(fetchGroups);
-			}
-
-			Offer offer = (Offer) pm.getObjectById(offerID);
-			Trader.getTrader(pm).acceptOffer(User.getUser(pm, getPrincipal()), offer);
-
-			if (get)
-				return (Offer) pm.detachCopy(offer);
-			else
-				return null;
-		} finally {
-			pm.close();
-		}
-	}
+//	/**
+//	 * Accepts the specified {@link Offer}.
+//	 *
+//	 * @ejb.interface-method
+//	 * @ejb.permission role-name="TradeManager-write"
+//	 * @ejb.transaction type = "Required"
+//	 **/
+//	public Offer acceptOffer(OfferID offerID, boolean get, String[] fetchGroups, int maxFetchDepth)
+//	throws ModuleException
+//	{
+//		PersistenceManager pm = getPersistenceManager();
+//		try {
+//			pm.getExtent(Offer.class);
+//
+//			if (get) {
+//				pm.getFetchPlan().setMaxFetchDepth(maxFetchDepth);
+//				if (fetchGroups != null)
+//					pm.getFetchPlan().setGroups(fetchGroups);
+//			}
+//
+//			Offer offer = (Offer) pm.getObjectById(offerID);
+//			Trader.getTrader(pm).acceptOffer(User.getUser(pm, getPrincipal()), offer);
+//
+//			if (get)
+//				return (Offer) pm.detachCopy(offer);
+//			else
+//				return null;
+//		} finally {
+//			pm.close();
+//		}
+//	}
 
 	/**
 	 * Rejects the specified {@link Offer}.
@@ -337,37 +338,37 @@ implements SessionBean
 		}
 	}
 
-	/**
-	 * Confirms the specified {@link Offer}.
-	 *
-	 * @ejb.interface-method
-	 * @ejb.permission role-name="TradeManager-write"
-	 * @ejb.transaction type = "Required"
-	 **/
-	public Offer confirmOffer(OfferID offerID, boolean get, String[] fetchGroups, int maxFetchDepth)
-	throws ModuleException
-	{
-		PersistenceManager pm = getPersistenceManager();
-		try {
-			pm.getExtent(Offer.class);
-
-			if (get) {
-				pm.getFetchPlan().setMaxFetchDepth(maxFetchDepth);
-				if (fetchGroups != null)
-					pm.getFetchPlan().setGroups(fetchGroups);
-			}
-
-			Offer offer = (Offer) pm.getObjectById(offerID);
-			Trader.getTrader(pm).confirmOffer(User.getUser(pm, getPrincipal()), offer);
-
-			if (get)
-				return (Offer) pm.detachCopy(offer);
-			else
-				return null;
-		} finally {
-			pm.close();
-		}
-	}
+//	/**
+//	 * Confirms the specified {@link Offer}.
+//	 *
+//	 * @ejb.interface-method
+//	 * @ejb.permission role-name="TradeManager-write"
+//	 * @ejb.transaction type = "Required"
+//	 **/
+//	public Offer confirmOffer(OfferID offerID, boolean get, String[] fetchGroups, int maxFetchDepth)
+//	throws ModuleException
+//	{
+//		PersistenceManager pm = getPersistenceManager();
+//		try {
+//			pm.getExtent(Offer.class);
+//
+//			if (get) {
+//				pm.getFetchPlan().setMaxFetchDepth(maxFetchDepth);
+//				if (fetchGroups != null)
+//					pm.getFetchPlan().setGroups(fetchGroups);
+//			}
+//
+//			Offer offer = (Offer) pm.getObjectById(offerID);
+//			Trader.getTrader(pm).confirmOffer(User.getUser(pm, getPrincipal()), offer);
+//
+//			if (get)
+//				return (Offer) pm.detachCopy(offer);
+//			else
+//				return null;
+//		} finally {
+//			pm.close();
+//		}
+//	}
 
 	/**
 	 * @param orderID The orderID defining the Order for which to find all non-finalized offers.

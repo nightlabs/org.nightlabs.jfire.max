@@ -26,10 +26,8 @@
 
 package org.nightlabs.jfire.accounting.pay;
 
-import java.io.Serializable;
 import java.rmi.RemoteException;
 import java.util.Collection;
-import java.util.Iterator;
 
 import javax.ejb.CreateException;
 import javax.ejb.EJBException;
@@ -42,11 +40,8 @@ import org.apache.log4j.Logger;
 import org.nightlabs.ModuleException;
 import org.nightlabs.jfire.accounting.Accounting;
 import org.nightlabs.jfire.accounting.Invoice;
-import org.nightlabs.jfire.accounting.id.InvoiceID;
 import org.nightlabs.jfire.accounting.pay.id.PaymentDataID;
 import org.nightlabs.jfire.accounting.pay.id.PaymentID;
-import org.nightlabs.jfire.asyncinvoke.AsyncInvoke;
-import org.nightlabs.jfire.asyncinvoke.Invocation;
 import org.nightlabs.jfire.base.BaseSessionBeanImpl;
 import org.nightlabs.jfire.security.User;
 import org.nightlabs.jfire.trade.LegalEntity;
@@ -298,15 +293,15 @@ implements SessionBean
 			PaymentResult payEndServerResult_detached = (PaymentResult) pm.detachCopy(payEndServerResult);
 //			payBeginServerResult_detached.setError(payBeginServerResult.getError());
 
-
-			// In case, they're not yet booked, we'll book the invoices asynchronously.
-			// For performance reasons (we don't want the booking to block the payment), we do this here
-			// and not in payBegin_xxx and delay the booking another 5 sec.
-			try {
-				AsyncInvoke.exec(new BookInvoiceInvocation(invoiceIDs, 5000), ASYNC_INVOKE_ENABLE_XA);
-			} catch (Exception e) {
-				throw new ModuleException(e);
-			}
+// booking should be done already by jBPM and ActionHandlerBookInvoice[Implicitely]
+//			// In case, they're not yet booked, we'll book the invoices asynchronously.
+//			// For performance reasons (we don't want the booking to block the payment), we do this here
+//			// and not in payBegin_xxx and delay the booking another 5 sec.
+//			try {
+//				AsyncInvoke.exec(new BookInvoiceInvocation(invoiceIDs, 5000), ASYNC_INVOKE_ENABLE_XA);
+//			} catch (Exception e) {
+//				throw new ModuleException(e);
+//			}
 
 			return payEndServerResult_detached;
 		} finally {
@@ -315,82 +310,82 @@ implements SessionBean
 	}
 
 
-	/**
-	 * This invocation books all {@link Invoice}s specified by the given {@link InvoiceID}s
-	 * in case they have not yet been booked. If an <code>Invoice</code> is already booked,
-	 * it's silently ignored.
-	 *
-	 * @author Marco Schulze - marco at nightlabs dot de
-	 */
-	public static class BookInvoiceInvocation extends Invocation
-	{
-		/**
-		 * LOG4J logger used by this class
-		 */
-		private static final Logger logger = Logger.getLogger(BookInvoiceInvocation.class);
-
-		private long createDT = System.currentTimeMillis();
-		private Collection invoiceIDs;
-		private long delayMSec;
-
-		/**
-		 * @param invoiceIDs Instances of {@link InvoiceID}. Must not be <code>null</code>. The
-		 *		specified {@link Invoice}s can already be booked. Those which are already booked,
-		 *		will be silently ignored.
-		 * @param delayMSec Milliseconds (0 &lt; delayMSec &lt; 60000) which to wait before doing sth.
-		 *		In case your main thread does sth. that manipulates invoices or accounts, you should delay
-		 *		the booking to avoid performance problems (and dead-locks).
-		 */
-		public BookInvoiceInvocation(Collection invoiceIDs, long delayMSec)
-		{
-			if (invoiceIDs == null)
-				throw new IllegalArgumentException("invoiceIDs must not be null!");
-
-			if (delayMSec < 0)
-				throw new IllegalArgumentException("delayMSec < 0!");
-
-			if (delayMSec > 60000)
-				throw new IllegalArgumentException("delayMSec > 60000!");
-
-			this.invoiceIDs = invoiceIDs;
-			this.delayMSec = delayMSec;
-
-			logger.info("Created BookInvoiceInvocation for " + invoiceIDs.size() + " invoices with "+delayMSec+" msec delay.");
-		}
-
-		public Serializable invoke() throws Exception
-		{
-			long wait = createDT + delayMSec - System.currentTimeMillis();
-			if (wait > 0) {
-				logger.info("invoke() called: Waiting " + wait + " msec before starting to book.");
-				try { Thread.sleep(wait); } catch (InterruptedException x) { }
-			}
-
-			PersistenceManager pm = getPersistenceManager();
-			try {
-				pm.getExtent(Invoice.class);
-				User user = null;
-				for (Iterator it = invoiceIDs.iterator(); it.hasNext(); ) {
-					InvoiceID invoiceID = (InvoiceID) it.next();
-					Invoice invoice = (Invoice) pm.getObjectById(invoiceID);
-					if (!invoice.getInvoiceLocal().isBooked()) {
-						logger.info("Booking invoice: " + invoice.getPrimaryKey());
-
-						if (user == null)
-							user = User.getUser(pm, getPrincipal());
-
-						Accounting.getAccounting(pm).bookInvoice(user, invoice, true, false);
-					}
-					else
-						logger.info("Invoice " + invoice.getPrimaryKey() + " is already booked! Ignoring.");
-				}
-
-			} finally {
-				pm.close();
-			}
-			return null;
-		}
-	}
+//	/**
+//	 * This invocation books all {@link Invoice}s specified by the given {@link InvoiceID}s
+//	 * in case they have not yet been booked. If an <code>Invoice</code> is already booked,
+//	 * it's silently ignored.
+//	 *
+//	 * @author Marco Schulze - marco at nightlabs dot de
+//	 */
+//	public static class BookInvoiceInvocation extends Invocation
+//	{
+//		/**
+//		 * LOG4J logger used by this class
+//		 */
+//		private static final Logger logger = Logger.getLogger(BookInvoiceInvocation.class);
+//
+//		private long createDT = System.currentTimeMillis();
+//		private Collection invoiceIDs;
+//		private long delayMSec;
+//
+//		/**
+//		 * @param invoiceIDs Instances of {@link InvoiceID}. Must not be <code>null</code>. The
+//		 *		specified {@link Invoice}s can already be booked. Those which are already booked,
+//		 *		will be silently ignored.
+//		 * @param delayMSec Milliseconds (0 &lt; delayMSec &lt; 60000) which to wait before doing sth.
+//		 *		In case your main thread does sth. that manipulates invoices or accounts, you should delay
+//		 *		the booking to avoid performance problems (and dead-locks).
+//		 */
+//		public BookInvoiceInvocation(Collection invoiceIDs, long delayMSec)
+//		{
+//			if (invoiceIDs == null)
+//				throw new IllegalArgumentException("invoiceIDs must not be null!");
+//
+//			if (delayMSec < 0)
+//				throw new IllegalArgumentException("delayMSec < 0!");
+//
+//			if (delayMSec > 60000)
+//				throw new IllegalArgumentException("delayMSec > 60000!");
+//
+//			this.invoiceIDs = invoiceIDs;
+//			this.delayMSec = delayMSec;
+//
+//			logger.info("Created BookInvoiceInvocation for " + invoiceIDs.size() + " invoices with "+delayMSec+" msec delay.");
+//		}
+//
+//		public Serializable invoke() throws Exception
+//		{
+//			long wait = createDT + delayMSec - System.currentTimeMillis();
+//			if (wait > 0) {
+//				logger.info("invoke() called: Waiting " + wait + " msec before starting to book.");
+//				try { Thread.sleep(wait); } catch (InterruptedException x) { }
+//			}
+//
+//			PersistenceManager pm = getPersistenceManager();
+//			try {
+//				pm.getExtent(Invoice.class);
+//				User user = null;
+//				for (Iterator it = invoiceIDs.iterator(); it.hasNext(); ) {
+//					InvoiceID invoiceID = (InvoiceID) it.next();
+//					Invoice invoice = (Invoice) pm.getObjectById(invoiceID);
+//					if (!invoice.getInvoiceLocal().isBooked()) {
+//						logger.info("Booking invoice: " + invoice.getPrimaryKey());
+//
+//						if (user == null)
+//							user = User.getUser(pm, getPrincipal());
+//
+//						Accounting.getAccounting(pm).bookInvoice(user, invoice, true, false);
+//					}
+//					else
+//						logger.info("Invoice " + invoice.getPrimaryKey() + " is already booked! Ignoring.");
+//				}
+//
+//			} finally {
+//				pm.close();
+//			}
+//			return null;
+//		}
+//	}
 
 
 	/**

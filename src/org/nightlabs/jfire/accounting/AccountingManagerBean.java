@@ -68,7 +68,6 @@ import org.nightlabs.jfire.accounting.id.CurrencyID;
 import org.nightlabs.jfire.accounting.id.InvoiceID;
 import org.nightlabs.jfire.accounting.id.InvoiceLocalID;
 import org.nightlabs.jfire.accounting.id.PriceFragmentTypeID;
-import org.nightlabs.jfire.accounting.jbpm.JbpmConstantsInvoice;
 import org.nightlabs.jfire.accounting.pay.ModeOfPayment;
 import org.nightlabs.jfire.accounting.pay.ModeOfPaymentConst;
 import org.nightlabs.jfire.accounting.pay.ModeOfPaymentFlavour;
@@ -95,9 +94,6 @@ import org.nightlabs.jfire.base.BaseSessionBeanImpl;
 import org.nightlabs.jfire.idgenerator.IDNamespaceDefault;
 import org.nightlabs.jfire.jbpm.JbpmLookup;
 import org.nightlabs.jfire.jbpm.graph.def.ProcessDefinition;
-import org.nightlabs.jfire.jbpm.graph.def.StateDefinition;
-import org.nightlabs.jfire.jbpm.graph.def.Transition;
-import org.nightlabs.jfire.jbpm.graph.def.id.ProcessDefinitionID;
 import org.nightlabs.jfire.security.User;
 import org.nightlabs.jfire.store.DeliveryNote;
 import org.nightlabs.jfire.store.NestedProductType;
@@ -117,9 +113,7 @@ import org.nightlabs.jfire.trade.id.ArticleContainerID;
 import org.nightlabs.jfire.trade.id.ArticleID;
 import org.nightlabs.jfire.trade.id.CustomerGroupID;
 import org.nightlabs.jfire.trade.id.OfferID;
-import org.nightlabs.jfire.trade.id.OfferLocalID;
 import org.nightlabs.jfire.trade.id.OrderID;
-import org.nightlabs.jfire.trade.jbpm.JbpmUtil;
 import org.nightlabs.jfire.trade.jbpm.ProcessDefinitionAssignment;
 import org.nightlabs.jfire.transfer.id.AnchorID;
 
@@ -1094,9 +1088,10 @@ public abstract class AccountingManagerBean
 				Offer offer = article.getOffer();
 				OfferLocal offerLocal = offer.getOfferLocal();
 				trader.validateOffer(offer);
-				trader.finalizeOffer(user, offer);
-				trader.acceptOffer(user, offerLocal);
-				trader.confirmOffer(user, offerLocal);
+				trader.acceptOfferImplicitely(offer);
+//				trader.finalizeOffer(user, offer);
+//				trader.acceptOffer(user, offerLocal);
+//				trader.confirmOffer(user, offerLocal);
 				articles.add(article);
 			}
 
@@ -1162,19 +1157,25 @@ public abstract class AccountingManagerBean
 				Offer offer = (Offer) articleContainer;
 				OfferLocal offerLocal = offer.getOfferLocal();
 				trader.validateOffer(offer);
-				trader.finalizeOffer(user, offer);
-				trader.acceptOffer(user, offerLocal);
-				trader.confirmOffer(user, offerLocal);
+				trader.acceptOfferImplicitely(offer);
+//				trader.finalizeOffer(user, offer);
+//				trader.acceptOffer(user, offerLocal);
+//				trader.confirmOffer(user, offerLocal);
 			}
 			else {
+				Set offers = new HashSet();
 				for (Iterator it = articleContainer.getArticles().iterator(); it.hasNext(); ) {
 					Article article = (Article) it.next();
 					Offer offer = article.getOffer();
-					OfferLocal offerLocal = offer.getOfferLocal();
+					offers.add(offer);
+				}
+				for (Iterator it = offers.iterator(); it.hasNext(); ) {
+					Offer offer = (Offer) it.next();
 					trader.validateOffer(offer);
-					trader.finalizeOffer(user, offer);
-					trader.acceptOffer(user, offerLocal);
-					trader.confirmOffer(user, offerLocal);
+					trader.acceptOfferImplicitely(offer);
+//					trader.finalizeOffer(user, offer);
+//					trader.acceptOffer(user, offerLocal);
+//					trader.confirmOffer(user, offerLocal);
 				}
 			}
 
@@ -1279,113 +1280,113 @@ public abstract class AccountingManagerBean
 		}
 	}
 
-	/**
-	 * @throws ModuleException
-	 *
-	 * @ejb.interface-method
-	 * @ejb.transaction type = "Required"
-	 * @ejb.permission role-name="_Guest_"
-	 */
-	public void finalizeInvoice(InvoiceID invoiceID)
-		throws ModuleException
-	{
-		PersistenceManager pm = getPersistenceManager();
-		try {
-			User user = User.getUser(pm, getPrincipal());
-			finalizeInvoice(pm, user, invoiceID);
-		} finally {
-			pm.close();
-		}
-	}
-	
-	/**
-	 * @throws ModuleException
-	 *
-	 * @ejb.interface-method
-	 * @ejb.transaction type = "Required"
-	 * @ejb.permission role-name="_Guest_"
-	 */
-	public void finalizeInvoices(Collection invoiceIDs)
-		throws ModuleException
-	{
-		PersistenceManager pm = getPersistenceManager();
-		try {
-			User user = User.getUser(pm, getPrincipal());
-			for (Iterator iter = invoiceIDs.iterator(); iter.hasNext();) {
-				InvoiceID invoiceID = (InvoiceID) iter.next();
-				finalizeInvoice(pm, user, invoiceID);
-			}
-		} finally {
-			pm.close();
-		}
-	}
+//	/**
+//	 * @throws ModuleException
+//	 *
+//	 * @ejb.interface-method
+//	 * @ejb.transaction type = "Required"
+//	 * @ejb.permission role-name="_Guest_"
+//	 */
+//	public void finalizeInvoice(InvoiceID invoiceID)
+//		throws ModuleException
+//	{
+//		PersistenceManager pm = getPersistenceManager();
+//		try {
+//			User user = User.getUser(pm, getPrincipal());
+//			finalizeInvoice(pm, user, invoiceID);
+//		} finally {
+//			pm.close();
+//		}
+//	}
+//	
+//	/**
+//	 * @throws ModuleException
+//	 *
+//	 * @ejb.interface-method
+//	 * @ejb.transaction type = "Required"
+//	 * @ejb.permission role-name="_Guest_"
+//	 */
+//	public void finalizeInvoices(Collection invoiceIDs)
+//		throws ModuleException
+//	{
+//		PersistenceManager pm = getPersistenceManager();
+//		try {
+//			User user = User.getUser(pm, getPrincipal());
+//			for (Iterator iter = invoiceIDs.iterator(); iter.hasNext();) {
+//				InvoiceID invoiceID = (InvoiceID) iter.next();
+//				finalizeInvoice(pm, user, invoiceID);
+//			}
+//		} finally {
+//			pm.close();
+//		}
+//	}
+//
+//	/**
+//	 * @throws ModuleException
+//	 *
+//	 * @ejb.interface-method
+//	 * @ejb.transaction type = "Required"
+//	 * @ejb.permission role-name="_Guest_"
+//	 */
+//	public void bookInvoice(InvoiceID invoiceID, boolean finalizeIfNecessary, boolean silentlyIgnoreBookedInvoice)
+//		throws ModuleException
+//	{
+//		PersistenceManager pm = getPersistenceManager();
+//		try {
+//			User user = User.getUser(pm, getPrincipal());
+//			bookInvoice(pm, user, invoiceID, finalizeIfNecessary, silentlyIgnoreBookedInvoice);
+//		} finally {
+//			pm.close();
+//		}
+//	}
+//
+//	/**
+//	 * @throws ModuleException
+//	 *
+//	 * @ejb.interface-method
+//	 * @ejb.transaction type = "Required"
+//	 * @ejb.permission role-name="_Guest_"
+//	 */
+//	public void bookInvoices(Collection invoiceIDs, boolean finalizeIfNecessary, boolean silentlyIgnoreBookedInvoice)
+//		throws ModuleException
+//	{
+//		PersistenceManager pm = getPersistenceManager();
+//		try {
+//			User user = User.getUser(pm, getPrincipal());
+//			for (Iterator iter = invoiceIDs.iterator(); iter.hasNext();) {
+//				InvoiceID invoiceID = (InvoiceID) iter.next();
+//				bookInvoice(pm, user, invoiceID, finalizeIfNecessary, silentlyIgnoreBookedInvoice);
+//			}
+//		} finally {
+//			pm.close();
+//		}
+//	}
 
-	/**
-	 * @throws ModuleException
-	 *
-	 * @ejb.interface-method
-	 * @ejb.transaction type = "Required"
-	 * @ejb.permission role-name="_Guest_"
-	 */
-	public void bookInvoice(InvoiceID invoiceID, boolean finalizeIfNecessary, boolean silentlyIgnoreBookedInvoice)
-		throws ModuleException
-	{
-		PersistenceManager pm = getPersistenceManager();
-		try {
-			User user = User.getUser(pm, getPrincipal());
-			bookInvoice(pm, user, invoiceID, finalizeIfNecessary, silentlyIgnoreBookedInvoice);
-		} finally {
-			pm.close();
-		}
-	}
-
-	/**
-	 * @throws ModuleException
-	 *
-	 * @ejb.interface-method
-	 * @ejb.transaction type = "Required"
-	 * @ejb.permission role-name="_Guest_"
-	 */
-	public void bookInvoices(Collection invoiceIDs, boolean finalizeIfNecessary, boolean silentlyIgnoreBookedInvoice)
-		throws ModuleException
-	{
-		PersistenceManager pm = getPersistenceManager();
-		try {
-			User user = User.getUser(pm, getPrincipal());
-			for (Iterator iter = invoiceIDs.iterator(); iter.hasNext();) {
-				InvoiceID invoiceID = (InvoiceID) iter.next();
-				bookInvoice(pm, user, invoiceID, finalizeIfNecessary, silentlyIgnoreBookedInvoice);
-			}
-		} finally {
-			pm.close();
-		}
-	}
-
-	protected void bookInvoice(
-			PersistenceManager pm, User user, InvoiceID invoiceID,
-			boolean finalizeIfNecessary, boolean silentlyIgnoreBookedInvoice)
-	throws ModuleException
-	{
-		Invoice invoice = null;
-		try {
-			invoice = (Invoice)pm.getObjectById(invoiceID);
-		} catch (JDOObjectNotFoundException e) {
-			throw new ModuleException("Could not find an Invoice in datastore for invcoiceID: "+invoiceID, e);
-		}
-		Accounting.getAccounting(pm).bookInvoice(user, invoice, finalizeIfNecessary, silentlyIgnoreBookedInvoice);
-	}
-
-	protected void finalizeInvoice(PersistenceManager pm, User user, InvoiceID invoiceID)
-	throws ModuleException
-	{
-		Invoice invoice = null;
-		try {
-			invoice = (Invoice)pm.getObjectById(invoiceID);
-		} catch (JDOObjectNotFoundException e) {
-			throw new ModuleException("Could not find an Invoice in datastore for invcoiceID: "+invoiceID, e);
-		}
-		Accounting.getAccounting(pm).finalizeInvoice(user, invoice);
-	}
+//	protected void bookInvoice(
+//			PersistenceManager pm, User user, InvoiceID invoiceID,
+//			boolean finalizeIfNecessary, boolean silentlyIgnoreBookedInvoice)
+//	throws ModuleException
+//	{
+//		Invoice invoice = null;
+//		try {
+//			invoice = (Invoice)pm.getObjectById(invoiceID);
+//		} catch (JDOObjectNotFoundException e) {
+//			throw new ModuleException("Could not find an Invoice in datastore for invcoiceID: "+invoiceID, e);
+//		}
+//		Accounting.getAccounting(pm).bookInvoice(user, invoice, finalizeIfNecessary, silentlyIgnoreBookedInvoice);
+//	}
+//
+//	protected void finalizeInvoice(PersistenceManager pm, User user, InvoiceID invoiceID)
+//	throws ModuleException
+//	{
+//		Invoice invoice = null;
+//		try {
+//			invoice = (Invoice)pm.getObjectById(invoiceID);
+//		} catch (JDOObjectNotFoundException e) {
+//			throw new ModuleException("Could not find an Invoice in datastore for invcoiceID: "+invoiceID, e);
+//		}
+//		Accounting.getAccounting(pm).finalizeInvoice(user, invoice);
+//	}
 
 
 	/**

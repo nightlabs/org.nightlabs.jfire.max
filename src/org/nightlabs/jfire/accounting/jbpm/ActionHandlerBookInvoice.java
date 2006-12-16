@@ -1,5 +1,6 @@
 package org.nightlabs.jfire.accounting.jbpm;
 
+import javax.jdo.JDOHelper;
 import javax.jdo.PersistenceManager;
 
 import org.jbpm.graph.def.Action;
@@ -10,6 +11,8 @@ import org.jbpm.instantiation.Delegation;
 import org.nightlabs.annotation.Implement;
 import org.nightlabs.jfire.accounting.Accounting;
 import org.nightlabs.jfire.accounting.Invoice;
+import org.nightlabs.jfire.accounting.id.InvoiceID;
+import org.nightlabs.jfire.asyncinvoke.AsyncInvoke;
 import org.nightlabs.jfire.jbpm.graph.def.AbstractActionHandler;
 import org.nightlabs.jfire.security.SecurityReflector;
 import org.nightlabs.jfire.security.User;
@@ -27,9 +30,9 @@ extends AbstractActionHandler
 		Event event = new Event("node-enter");
 		event.addAction(action);
 
-		Node booked = jbpmProcessDefinition.getNode(JbpmConstantsInvoice.Both.STATE_DEFINITION_JBPM_NODE_NAME_BOOKED);
+		Node booked = jbpmProcessDefinition.getNode(JbpmConstantsInvoice.Both.NODE_NAME_BOOKED);
 		if (booked == null)
-			throw new IllegalArgumentException("The node \""+ JbpmConstantsInvoice.Both.STATE_DEFINITION_JBPM_NODE_NAME_BOOKED +"\" does not exist in the ProcessDefinition \"" + jbpmProcessDefinition.getName() + "\"!");
+			throw new IllegalArgumentException("The node \""+ JbpmConstantsInvoice.Both.NODE_NAME_BOOKED +"\" does not exist in the ProcessDefinition \"" + jbpmProcessDefinition.getName() + "\"!");
 
 		booked.addEvent(event);
 	}
@@ -42,7 +45,10 @@ extends AbstractActionHandler
 		Accounting accounting = Accounting.getAccounting(pm);
 		User user = SecurityReflector.getUserDescriptor().getUser(pm);
 		Invoice invoice = (Invoice) getStatable();
-		accounting.bookInvoice(user, invoice, false, false);
+		accounting.onBookInvoice(user, invoice);
+
+		// send asynchronously
+		AsyncInvoke.exec(new SendInvoiceInvocation((InvoiceID) JDOHelper.getObjectId(invoice)), true);
 	}
 
 }

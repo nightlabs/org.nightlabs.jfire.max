@@ -44,11 +44,16 @@ import javax.jdo.PersistenceManager;
 import javax.jdo.listener.StoreCallback;
 
 import org.apache.log4j.Logger;
+import org.jbpm.JbpmContext;
+import org.jbpm.graph.exe.ProcessInstance;
 import org.nightlabs.ModuleException;
 import org.nightlabs.jfire.config.Config;
 import org.nightlabs.jfire.idgenerator.IDGenerator;
+import org.nightlabs.jfire.jbpm.JbpmLookup;
 import org.nightlabs.jfire.jbpm.graph.def.ActionHandlerNodeEnter;
 import org.nightlabs.jfire.jbpm.graph.def.ProcessDefinition;
+import org.nightlabs.jfire.jbpm.graph.def.State;
+import org.nightlabs.jfire.jbpm.graph.def.Transition;
 import org.nightlabs.jfire.jbpm.graph.def.id.ProcessDefinitionID;
 import org.nightlabs.jfire.organisation.LocalOrganisation;
 import org.nightlabs.jfire.security.User;
@@ -68,6 +73,10 @@ import org.nightlabs.jfire.store.id.DeliveryNoteID;
 import org.nightlabs.jfire.store.id.ProductID;
 import org.nightlabs.jfire.store.id.ProductTypeID;
 import org.nightlabs.jfire.store.id.ProductTypeStatusTrackerID;
+import org.nightlabs.jfire.store.jbpm.ActionHandlerBookDeliveryNote;
+import org.nightlabs.jfire.store.jbpm.ActionHandlerBookDeliveryNoteImplicitely;
+import org.nightlabs.jfire.store.jbpm.ActionHandlerFinalizeDeliveryNote;
+import org.nightlabs.jfire.store.jbpm.JbpmConstantsDeliveryNote;
 import org.nightlabs.jfire.trade.Article;
 import org.nightlabs.jfire.trade.ArticleContainer;
 import org.nightlabs.jfire.trade.LegalEntity;
@@ -597,10 +606,10 @@ public class Store
 			Offer articleOffer = article.getOffer();
 			Order articleOrder = articleOffer.getOrder();
 			
-			if (!articleOffer.getOfferLocal().isConfirmed()) {
+			if (!articleOffer.getOfferLocal().isAccepted()) {
 				throw new DeliveryNoteEditException(
-					DeliveryNoteEditException.REASON_OFFER_NOT_CONFIRMED, 
-					"At least one involved offer is not confirmed!",
+					DeliveryNoteEditException.REASON_OFFER_NOT_ACCEPTED, 
+					"At least one involved offer is not accepted!",
 					(ArticleID) JDOHelper.getObjectId(article)
 				);
 			}
@@ -654,7 +663,7 @@ public class Store
 		getPersistenceManager().makePersistent(deliveryNote);
 
 		ProcessDefinitionAssignment processDefinitionAssignment = (ProcessDefinitionAssignment) getPersistenceManager().getObjectById(
-				ProcessDefinitionAssignmentID.create(Store.class, TradeSide.vendor));
+				ProcessDefinitionAssignmentID.create(DeliveryNote.class, TradeSide.vendor));
 		processDefinitionAssignment.createProcessInstance(null, user, deliveryNote);
 
 		for (Iterator iter = articles.iterator(); iter.hasNext();) {
@@ -726,12 +735,32 @@ public class Store
 	}
 
 	/**
+	 * This method is a noop, if the offer is already accepted. If the Offer cannot be accepted implicitely
+	 * (either because the business partner doesn't allow implicit acceptance or because the jBPM token is at
+	 * a position where this is not possible, an exception is thrown).
+	 */
+	protected void bookDeliveryNoteImplicitely(DeliveryNote deliveryNote)
+	{
+		DeliveryNoteID deliveryNoteID = (DeliveryNoteID) JDOHelper.getObjectId(deliveryNote);
+		if (State.hasState(getPersistenceManager(), deliveryNoteID, JbpmConstantsDeliveryNote.Both.NODE_NAME_BOOKED))
+			return;
+
+		JbpmContext jbpmContext = JbpmLookup.getJbpmConfiguration().createJbpmContext();
+		try {
+			ProcessInstance processInstance = jbpmContext.getProcessInstance(deliveryNote.getDeliveryNoteLocal().getJbpmProcessInstanceId());
+			processInstance.signal(JbpmConstantsDeliveryNote.Vendor.TRANSITION_NAME_BOOK_IMPLICITELY);
+		} finally {
+			jbpmContext.close();
+		}
+	}
+
+	/**
 	 * @param deliveryNotes Can be null. Should be a <tt>Collection</tt> of {@link DeliveryNote}
 	 * @param currency Can be null.
 	 * @return Either <tt>null</tt>, in case no DeliveryNote was passed or the partner
 	 *		(if at least one DeliveryNote has been passed in <tt>deliveryNotes</tt>).
 	 */
-	protected LegalEntity deliverBegin_checkDeliveryNotesAndGetPartner(Collection deliveryNotes)
+	protected LegalEntity bookDeliveryNotesImplicitelyAndGetPartner(Collection deliveryNotes)
 	{
 		if (deliveryNotes == null)
 			return null;
@@ -744,6 +773,8 @@ public class Store
 		LegalEntity partner = null;
 		for (Iterator it = deliveryNotes.iterator(); it.hasNext(); ) {
 			DeliveryNote deliveryNote = (DeliveryNote) it.next();
+
+			bookDeliveryNoteImplicitely(deliveryNote);
 
 			if (mandatorPK.equals(deliveryNote.getVendor().getPrimaryKey())) {
 				if (partner == null)
@@ -825,22 +856,28 @@ public class Store
 		}
 	}
 
-	public void bookDeliveryNote(User initiator, DeliveryNote deliveryNote, boolean finalizeIfNecessary, boolean silentlyIgnoreBookedInvoice)
+	/**
+	 * This method is called by {@link ActionHandlerBookDeliveryNote}.
+	 */
+	public void onBookDeliveryNote(User initiator, DeliveryNote deliveryNote)
 	{
 		DeliveryNoteLocal deliveryNoteLocal = deliveryNote.getDeliveryNoteLocal();
-		if (deliveryNoteLocal.isBooked()) {
-			if (!silentlyIgnoreBookedInvoice)
-				throw new IllegalStateException("Invoice \""+deliveryNote.getPrimaryKey()+"\" has already been booked!");
+//		if (deliveryNoteLocal.isBooked()) {
+//			if (!silentlyIgnoreBookedInvoice)
+//				throw new IllegalStateException("Invoice \""+deliveryNote.getPrimaryKey()+"\" has already been booked!");
+//
+//			return;
+//		}
+//
+//		if (!deliveryNote.isFinalized()) {
+//			if (!finalizeIfNecessary)
+//				throw new IllegalStateException("Invoice \""+deliveryNote.getPrimaryKey()+"\" is not finalized!");
+//
+//			finalizeDeliveryNote(initiator, deliveryNote);
+//		}
 
+		if (deliveryNoteLocal.isBooked())
 			return;
-		}
-
-		if (!deliveryNote.isFinalized()) {
-			if (!finalizeIfNecessary)
-				throw new IllegalStateException("Invoice \""+deliveryNote.getPrimaryKey()+"\" is not finalized!");
-
-			finalizeDeliveryNote(initiator, deliveryNote);
-		}
 
 //		LegalEntity from = null;
 //		LegalEntity to = null;
@@ -1088,7 +1125,7 @@ public class Store
 
 		LegalEntity partner = null;
 		if (deliveryData.getDelivery().getDeliveryNotes() != null) {
-			partner = deliverBegin_checkDeliveryNotesAndGetPartner(
+			partner = bookDeliveryNotesImplicitelyAndGetPartner(
 					deliveryData.getDelivery().getDeliveryNotes());
 		}
 		else
@@ -1406,7 +1443,7 @@ public class Store
 			nextProductTypeID = _nextProductTypeID;
 	}
 
-	public ProcessDefinition storeProcessDefinitionDeliveryNote(TradeSide tradeSide, URL jbpmProcessDefinitionURL)
+	public ProcessDefinition storeProcessDefinitionReceptionNote(TradeSide tradeSide, URL jbpmProcessDefinitionURL)
 	throws IOException
 	{
 		PersistenceManager pm = getPersistenceManager();
@@ -1424,7 +1461,47 @@ public class Store
 		switch (tradeSide) {
 			case vendor:
 			{
-				
+			}
+			break;
+			case customer:
+			{
+			}
+			break;
+			default:
+				throw new IllegalStateException("Unknown TradeSide: " + tradeSide);
+		}
+
+		return processDefinition;
+	}
+
+	public ProcessDefinition storeProcessDefinitionDeliveryNote(TradeSide tradeSide, URL jbpmProcessDefinitionURL)
+	throws IOException
+	{
+		PersistenceManager pm = getPersistenceManager();
+
+		org.jbpm.graph.def.ProcessDefinition jbpmProcessDefinition = ProcessDefinition.readProcessDefinition(jbpmProcessDefinitionURL);
+
+		// we add the events+actionhandlers
+		ActionHandlerNodeEnter.register(jbpmProcessDefinition);
+
+		if (TradeSide.vendor == tradeSide) {
+			ActionHandlerFinalizeDeliveryNote.register(jbpmProcessDefinition);
+			ActionHandlerBookDeliveryNoteImplicitely.register(jbpmProcessDefinition);
+		}
+
+		ActionHandlerBookDeliveryNote.register(jbpmProcessDefinition);
+
+		// store it
+		ProcessDefinition processDefinition = ProcessDefinition.storeProcessDefinition(pm, null, jbpmProcessDefinition, jbpmProcessDefinitionURL);
+		ProcessDefinitionID processDefinitionID = (ProcessDefinitionID) JDOHelper.getObjectId(processDefinition);
+
+		switch (tradeSide) {
+			case vendor:
+			{
+
+				for (Transition transition : Transition.getTransitions(pm, processDefinitionID, JbpmConstantsDeliveryNote.Vendor.TRANSITION_NAME_BOOK_IMPLICITELY)) {
+					transition.setUserExecutable(false);
+				}
 			}
 			break;
 			case customer:

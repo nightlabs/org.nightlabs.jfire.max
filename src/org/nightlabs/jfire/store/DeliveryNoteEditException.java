@@ -37,7 +37,7 @@ public class DeliveryNoteEditException extends ArticleContainerException
 {
 	public static int REASON_NESTED_EXCEPTION = 0;
 	public static int REASON_ARTICLE_ALREADY_IN_DELIVERY_NOTE = 1;
-	public static int REASON_OFFER_NOT_CONFIRMED = 2;
+	public static int REASON_OFFER_NOT_ACCEPTED = 2;
 	public static int REASON_ANCHORS_DONT_MATCH = 3;
 	public static int REASON_FOREIGN_ORGANISATION = 4;
 	public static int REASON_NO_ARTICLES = 5;

@@ -293,6 +293,12 @@ implements SessionBean
 			processDefinitionDeliveryNoteVendor = store.storeProcessDefinitionDeliveryNote(TradeSide.vendor, ProcessDefinitionAssignment.class.getResource("deliverynote/vendor/"));
 			pm.makePersistent(new ProcessDefinitionAssignment(DeliveryNote.class, TradeSide.vendor, processDefinitionDeliveryNoteVendor));
 
+			ProcessDefinition processDefinitionReceptionNoteCustomer;
+			processDefinitionReceptionNoteCustomer = store.storeProcessDefinitionReceptionNote(TradeSide.customer, ProcessDefinitionAssignment.class.getResource("receptionnote/customer/"));
+			pm.makePersistent(new ProcessDefinitionAssignment(ReceptionNote.class, TradeSide.customer, processDefinitionReceptionNoteCustomer));
+
+			// TODO create and persist ProcessDefinition for ReceptionNote.Vendor
+
 			IDNamespaceDefault idNamespaceDefault = IDNamespaceDefault.createIDNamespaceDefault(pm, getOrganisationID(), DeliveryNote.class);
 			idNamespaceDefault.setCacheSizeServer(0);
 			idNamespaceDefault.setCacheSizeClient(0);
@@ -693,9 +699,10 @@ implements SessionBean
 				Offer offer = article.getOffer();
 				OfferLocal offerLocal = offer.getOfferLocal();
 				trader.validateOffer(offer);
-				trader.finalizeOffer(user, offer);
-				trader.acceptOffer(user, offerLocal);
-				trader.confirmOffer(user, offerLocal);
+				trader.acceptOfferImplicitely(offer);
+//				trader.finalizeOffer(user, offer);
+//				trader.acceptOffer(user, offerLocal);
+//				trader.confirmOffer(user, offerLocal);
 				articles.add(article);
 			}
 
@@ -762,9 +769,10 @@ implements SessionBean
 				Offer offer = (Offer) articleContainer;
 				OfferLocal offerLocal = offer.getOfferLocal();
 				trader.validateOffer(offer);
-				trader.finalizeOffer(user, offer);
-				trader.acceptOffer(user, offerLocal);
-				trader.confirmOffer(user, offerLocal);
+				trader.acceptOfferImplicitely(offer);
+//				trader.finalizeOffer(user, offer);
+//				trader.acceptOffer(user, offerLocal);
+//				trader.confirmOffer(user, offerLocal);
 			}
 			else {
 				for (Iterator it = articleContainer.getArticles().iterator(); it.hasNext(); ) {
@@ -772,9 +780,10 @@ implements SessionBean
 					Offer offer = article.getOffer();
 					OfferLocal offerLocal = offer.getOfferLocal();
 					trader.validateOffer(offer);
-					trader.finalizeOffer(user, offer);
-					trader.acceptOffer(user, offerLocal);
-					trader.confirmOffer(user, offerLocal);
+					trader.acceptOfferImplicitely(offer);
+//					trader.finalizeOffer(user, offer);
+//					trader.acceptOffer(user, offerLocal);
+//					trader.confirmOffer(user, offerLocal);
 				}
 			}
 

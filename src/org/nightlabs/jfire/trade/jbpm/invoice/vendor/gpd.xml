@@ -1,12 +1,16 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<process-diagram name="devil.NightLabs.org:Invoice.Vendor" width="742" height="634">
+<process-diagram name="devil.NightLabs.org:Invoice.Vendor" width="897" height="622">
   <node name="devil.NightLabs.org:created" x="97" y="21" width="206" height="40">
     <transition name="abort">
       <label x="-47" y="-14"/>
     </transition>
     <transition name="finalize">
       <label x="5" y="-10"/>
+    </transition>
+    <transition name="devil.NightLabs.org:bookImplicitely">
+      <label x="0" y="36"/>
+      <bendpoint w1="-257" h1="0" w2="-1" h2="-174"/>
     </transition>
   </node>
   <node name="devil.NightLabs.org:finalized" x="97" y="109" width="207" height="40">
@@ -77,6 +81,11 @@
     </transition>
     <transition name="devil.NightLabs.org:pay">
       <label x="-30" y="-50"/>
+    </transition>
+  </node>
+  <node name="devil.NightLabs.org:bookedImplicitely" x="-171" y="195" width="230" height="40">
+    <transition name="">
+      <label x="5" y="-10"/>
     </transition>
   </node>
 </process-diagram>

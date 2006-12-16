@@ -49,6 +49,7 @@ import org.nightlabs.jfire.jbpm.graph.def.StatableLocal;
 import org.nightlabs.jfire.jbpm.graph.def.State;
 import org.nightlabs.jfire.security.User;
 import org.nightlabs.jfire.store.id.DeliveryNoteID;
+import org.nightlabs.jfire.store.jbpm.ActionHandlerFinalizeDeliveryNote;
 import org.nightlabs.jfire.trade.Article;
 import org.nightlabs.jfire.trade.ArticleContainer;
 import org.nightlabs.jfire.trade.LegalEntity;
@@ -484,9 +485,9 @@ implements Serializable, ArticleContainer, Statable, DetachCallback
 			);
 		}
 
-		if (!article.getOffer().getOfferLocal().isConfirmed()) {
+		if (!article.getOffer().getOfferLocal().isAccepted()) {
 			throw new DeliveryNoteEditException(
-				DeliveryNoteEditException.REASON_OFFER_NOT_CONFIRMED, 
+				DeliveryNoteEditException.REASON_OFFER_NOT_ACCEPTED, 
 				"At least one involved offer is not confirmed!",
 				articleID
 			);
@@ -541,7 +542,11 @@ implements Serializable, ArticleContainer, Statable, DetachCallback
 	{
 		return valid;
 	}
-	protected void setFinalized(User finalizer) {
+
+	/**
+	 * This method MUST NOT be called directly. It is called by {@link ActionHandlerFinalizeDeliveryNote}.
+	 */
+	public void setFinalized(User finalizer) {
 		if (isFinalized())
 			return;
 

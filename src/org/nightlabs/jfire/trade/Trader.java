@@ -44,6 +44,8 @@ import javax.jdo.JDOObjectNotFoundException;
 import javax.jdo.PersistenceManager;
 
 import org.apache.log4j.Logger;
+import org.jbpm.JbpmContext;
+import org.jbpm.graph.exe.ProcessInstance;
 import org.nightlabs.ModuleException;
 import org.nightlabs.jdo.NLJDOHelper;
 import org.nightlabs.jfire.accounting.Accounting;
@@ -56,8 +58,10 @@ import org.nightlabs.jfire.asyncinvoke.Invocation;
 import org.nightlabs.jfire.asyncinvoke.UndeliverableCallback;
 import org.nightlabs.jfire.config.Config;
 import org.nightlabs.jfire.idgenerator.IDGenerator;
+import org.nightlabs.jfire.jbpm.JbpmLookup;
 import org.nightlabs.jfire.jbpm.graph.def.ActionHandlerNodeEnter;
 import org.nightlabs.jfire.jbpm.graph.def.ProcessDefinition;
+import org.nightlabs.jfire.jbpm.graph.def.State;
 import org.nightlabs.jfire.jbpm.graph.def.StateDefinition;
 import org.nightlabs.jfire.jbpm.graph.def.Transition;
 import org.nightlabs.jfire.jbpm.graph.def.id.ProcessDefinitionID;
@@ -73,7 +77,11 @@ import org.nightlabs.jfire.store.ProductType;
 import org.nightlabs.jfire.store.ProductTypeActionHandler;
 import org.nightlabs.jfire.store.Store;
 import org.nightlabs.jfire.trade.id.ArticleID;
+import org.nightlabs.jfire.trade.id.OfferID;
+import org.nightlabs.jfire.trade.jbpm.ActionHandlerAcceptOffer;
+import org.nightlabs.jfire.trade.jbpm.ActionHandlerAcceptOfferImplicitelyVendor;
 import org.nightlabs.jfire.trade.jbpm.ActionHandlerFinalizeOffer;
+import org.nightlabs.jfire.trade.jbpm.ActionHandlerSendOffer;
 import org.nightlabs.jfire.trade.jbpm.JbpmConstantsOffer;
 import org.nightlabs.jfire.trade.jbpm.ProcessDefinitionAssignment;
 import org.nightlabs.jfire.trade.jbpm.id.ProcessDefinitionAssignmentID;
@@ -585,7 +593,7 @@ public class Trader
 					user, order,
 					offerIDPrefix, IDGenerator.nextID(Offer.class, offerIDPrefix));
 
-			OfferLocal offerLocal = new OfferLocal(offer); // OfferLocal registers itself in Offer
+			new OfferLocal(offer); // OfferLocal registers itself in Offer
 
 			offer = (Offer) getPersistenceManager().makePersistent(offer);
 
@@ -622,8 +630,8 @@ public class Trader
 		for (Iterator it = reversedArticles.iterator(); it.hasNext();) {
 			Article reversedArticle = (Article) it.next();
 
-			if (!reversedArticle.getOffer().getOfferLocal().isConfirmed())
-				throw new IllegalStateException("Offer " + reversedArticle.getOffer().getPrimaryKey() + " of Article " + reversedArticle.getPrimaryKey() + " is NOT confirmed! Cannot create reversing Article!");
+			if (!reversedArticle.getOffer().getOfferLocal().isAccepted())
+				throw new IllegalStateException("Offer " + reversedArticle.getOffer().getPrimaryKey() + " of Article " + reversedArticle.getPrimaryKey() + " has NOT been accepted! Cannot create reversing Article!");
 
 			Article reversingArticle = reversedArticle.reverseArticle(user, reversingOffer, Article.createArticleID());
 			reversingArticle.createArticleLocal(user);
@@ -907,6 +915,8 @@ public class Trader
 	public static class ReleaseArticlesEndUndeliverableCallback extends
 			UndeliverableCallback
 	{
+		private static final long serialVersionUID = 1L;
+
 		public void handle(AsyncInvokeEnvelope envelope) throws Exception
 		{
 			PersistenceManager pm = getPersistenceManager();
@@ -927,6 +937,8 @@ public class Trader
 
 	public static class ReleaseArticlesEndErrorCallback extends ErrorCallback
 	{
+		private static final long serialVersionUID = 1L;
+
 		public void handle(AsyncInvokeEnvelope envelope, Throwable error)
 				throws Exception
 		{
@@ -1008,8 +1020,8 @@ public class Trader
 				// reversing article
 
 				// If the reversing article is in a non-accepted Offer, it must not be released!
-				if (!article.getOffer().getOfferLocal().isConfirmed())
-					throw new IllegalStateException("The Offer " + article.getOffer().getPrimaryKey() + " of reversing Article " + article.getPrimaryKey() + " is NOT confirmed!");
+				if (!article.getOffer().getOfferLocal().isAccepted())
+					throw new IllegalStateException("The Offer " + article.getOffer().getPrimaryKey() + " of reversing Article " + article.getPrimaryKey() + " has NOT been accepted!");
 
 
 				// If the reversed article is in a DeliveryNote, both - reversed and reversing - articles must be in a DeliveryNote.
@@ -1314,27 +1326,47 @@ public class Trader
 		offer.validate();
 	}
 
-	public void finalizeOffer(User user, Offer offer)
+// has been moved into the ActionHandler
+//	/**
+//	 * This method must not be called directly. It's triggered by jBPM via the {@link ActionHandlerFinalizeOffer}
+//	 */
+//	public void onFinalizeOffer(User user, Offer offer)
+//	{
+//		if (offer.isFinalized())
+//			return;
+//
+//		offer.setFinalized(user);
+//		for (OfferActionHandler offerActionHandler : offer.getOfferLocal().getOfferActionHandlers()) {
+//			offerActionHandler.onFinalizeOffer(user, offer);
+//		}
+//	}
+
+	/**
+	 * This method is a noop, if the offer is already accepted. If the Offer cannot be accepted implicitely
+	 * (either because the business partner doesn't allow implicit acceptance or because the jBPM token is at
+	 * a position where this is not possible, an exception is thrown).
+	 */
+	public void acceptOfferImplicitely(Offer offer)
 	{
-		if (offer.isFinalized())
+		OfferID offerID = (OfferID) JDOHelper.getObjectId(offer);
+		if (State.hasState(getPersistenceManager(), offerID, JbpmConstantsOffer.Vendor.NODE_NAME_ACCEPTED))
 			return;
 
-		offer.setFinalized(user);
-		for (OfferActionHandler offerActionHandler : offer.getOfferLocal().getOfferActionHandlers()) {
-			offerActionHandler.onFinalizeOffer(user, offer);
+		JbpmContext jbpmContext = JbpmLookup.getJbpmConfiguration().createJbpmContext();
+		try {
+			ProcessInstance processInstance = jbpmContext.getProcessInstance(offer.getOfferLocal().getJbpmProcessInstanceId());
+			processInstance.signal(JbpmConstantsOffer.Vendor.TRANSITION_NAME_ACCEPT_IMPLICITELY);
+		} finally {
+			jbpmContext.close();
 		}
 	}
 
-	public void acceptOffer(User user, OfferLocal offerLocal)
-	{
-		offerLocal.accept(user);
-	}
 	/**
-	 * This is a convenience method which calls {@link #acceptOffer(User, OfferLocal)}.
+	 * You must NOT call this method directly. It is called by {@link ActionHandlerAcceptOffer}.
 	 */
-	public void acceptOffer(User user, Offer offer)
+	public void onAcceptOffer(User user, Offer offer)
 	{
-		acceptOffer(user, offer.getOfferLocal());
+		offer.getOfferLocal().accept(user);
 	}
 
 	public void rejectOffer(User user, OfferLocal offerLocal)
@@ -1349,17 +1381,17 @@ public class Trader
 		rejectOffer(user, offer.getOfferLocal());
 	}
 
-	public void confirmOffer(User user, OfferLocal offerLocal)
-	{
-		offerLocal.confirm(user);
-	}
-	/**
-	 * This is a convenience method which calls {@link #confirmOffer(User, OfferLocal)}.
-	 */
-	public void confirmOffer(User user, Offer offer)
-	{
-		confirmOffer(user, offer.getOfferLocal());
-	}
+//	public void confirmOffer(User user, OfferLocal offerLocal)
+//	{
+//		offerLocal.confirm(user);
+//	}
+//	/**
+//	 * This is a convenience method which calls {@link #confirmOffer(User, OfferLocal)}.
+//	 */
+//	public void confirmOffer(User user, Offer offer)
+//	{
+//		confirmOffer(user, offer.getOfferLocal());
+//	}
 
 	/**
 	 * The {@link Article}s must already be released!
@@ -1415,115 +1447,132 @@ public class Trader
 		// we add the events+actionhandlers
 		ActionHandlerNodeEnter.register(jbpmProcessDefinition);
 
-		if (TradeSide.vendor == tradeSide)
+		if (TradeSide.vendor == tradeSide) {
 			ActionHandlerFinalizeOffer.register(jbpmProcessDefinition);
+			ActionHandlerSendOffer.register(jbpmProcessDefinition);
+			ActionHandlerAcceptOffer.register(jbpmProcessDefinition);
+			ActionHandlerAcceptOfferImplicitelyVendor.register(jbpmProcessDefinition);
+		}
 
 		// store it
 		ProcessDefinition processDefinition = ProcessDefinition.storeProcessDefinition(pm, null, jbpmProcessDefinition, jbpmProcessDefinitionURL);
 		ProcessDefinitionID processDefinitionID = (ProcessDefinitionID) JDOHelper.getObjectId(processDefinition);
 
+		setStateDefinitionProperties(processDefinition, JbpmConstantsOffer.Both.NODE_NAME_SENT,
+				"sent",
+				"The Offer has been sent from the vendor to the customer.",
+				true);
+
+		setStateDefinitionProperties(processDefinition, JbpmConstantsOffer.Both.NODE_NAME_REVOKED,
+				"revoked",
+				"The Offer has been revoked by the vendor. The result is the same as if the customer had rejected the offer. A new Offer needs to be created in order to continue the interaction.",
+				true);
+
+		setStateDefinitionProperties(processDefinition, JbpmConstantsOffer.Both.NODE_NAME_EXPIRED,
+				"expired",
+				"The Offer has expired - the customer waited too long. A new Offer needs to be created in order to continue the interaction.",
+				true);
+
 		switch (tradeSide) {
 			case vendor:
 			{
 				// give known StateDefinitions a name and a description
-				setStateDefinitionProperties(processDefinition, JbpmConstantsOffer.Vendor.STATE_DEFINITION_JBPM_NODE_NAME_CREATED,
+				setStateDefinitionProperties(processDefinition, JbpmConstantsOffer.Vendor.NODE_NAME_CREATED,
 						"created",
 						"The Offer has been newly created. This is the first state in the Offer related workflow.",
 						true);
 
-				setStateDefinitionProperties(processDefinition, JbpmConstantsOffer.Vendor.STATE_DEFINITION_JBPM_NODE_NAME_ABORTED,
+				setStateDefinitionProperties(processDefinition, JbpmConstantsOffer.Vendor.NODE_NAME_ABORTED,
 						"aborted",
 						"The Offer has been aborted by the vendor (before finalization). A new Offer needs to be created in order to continue the interaction.",
 						true);
 
-				setStateDefinitionProperties(processDefinition, JbpmConstantsOffer.Vendor.STATE_DEFINITION_JBPM_NODE_NAME_FINALIZED,
+				setStateDefinitionProperties(processDefinition, JbpmConstantsOffer.Vendor.NODE_NAME_FINALIZED,
 						"finalized",
 						"The Offer has been finalized. After that, it cannot be modified anymore. A modification would require revocation and recreation.",
 						true);
 
-				setStateDefinitionProperties(processDefinition, JbpmConstantsOffer.Vendor.STATE_DEFINITION_JBPM_NODE_NAME_SENT,
-						"sent",
-						"The Offer has been sent from the vendor to the customer.",
-						true);
-
-				setStateDefinitionProperties(processDefinition, JbpmConstantsOffer.Vendor.STATE_DEFINITION_JBPM_NODE_NAME_ACCEPTED,
+				setStateDefinitionProperties(processDefinition, JbpmConstantsOffer.Vendor.NODE_NAME_ACCEPTED,
 						"accepted",
 						"The Offer has been accepted by the customer. That turns the offer into a binding contract.",
 						true);
 
-				setStateDefinitionProperties(processDefinition, JbpmConstantsOffer.Vendor.STATE_DEFINITION_JBPM_NODE_NAME_REVOKED,
-						"revoked",
-						"The Offer has been revoked by the vendor. The result is the same as if the customer had rejected the offer. A new Offer needs to be created in order to continue the interaction.",
-						true);
-
-				setStateDefinitionProperties(processDefinition, JbpmConstantsOffer.Vendor.STATE_DEFINITION_JBPM_NODE_NAME_REJECTED,
+				setStateDefinitionProperties(processDefinition, JbpmConstantsOffer.Vendor.NODE_NAME_REJECTED,
 						"rejected",
 						"The Offer has been rejected by the customer. A new Offer needs to be created in order to continue the interaction.",
 						true);
 
-				setStateDefinitionProperties(processDefinition, JbpmConstantsOffer.Vendor.STATE_DEFINITION_JBPM_NODE_NAME_EXPIRED,
-						"expired",
-						"The Offer has expired - the customer waited too long. A new Offer needs to be created in order to continue the interaction.",
-						true);
-
 				// give known Transitions a name
-				Transition transition;
-
-				try {
-					transition = (Transition) pm.getObjectById(JbpmConstantsOffer.Vendor.getTransitionID_created_2_accept(processDefinitionID));
-					transition.getName().setText(Locale.ENGLISH.getLanguage(), "accept");
+				for (Transition transition : Transition.getTransitions(pm, processDefinitionID, JbpmConstantsOffer.Vendor.TRANSITION_NAME_ACCEPT_IMPLICITELY)) {
+//					transition.getName().setText(Locale.ENGLISH.getLanguage(), "accept implicitely"); - no name necessary as it's not displayed to the user
 					transition.setUserExecutable(false);
-				} catch (JDOObjectNotFoundException x) {
-					logger.warn("The ProcessDefinition \"" + processDefinition.getJbpmProcessDefinitionName() + "\" does not contain a jBPM Transition named \"accept\" from Node \"created\"!");
 				}
 
-				transition = (Transition) pm.getObjectById(JbpmConstantsOffer.Vendor.getTransitionID_finalized_2_customerAccepted(processDefinitionID));
-				transition.getName().setText(Locale.ENGLISH.getLanguage(), "customer accepted");
-				transition.setUserExecutable(false);
+				for (Transition transition : Transition.getTransitions(pm, processDefinitionID, JbpmConstantsOffer.Vendor.TRANSITION_NAME_CUSTOMER_ACCEPTED)) {
+//					transition.getName().setText(Locale.ENGLISH.getLanguage(), "customer accepted");
+					transition.setUserExecutable(false);
+				}
 
-				transition = (Transition) pm.getObjectById(JbpmConstantsOffer.Vendor.getTransitionID_finalized_2_customerRejected(processDefinitionID));
-				transition.getName().setText(Locale.ENGLISH.getLanguage(), "customer rejected");
-				transition.setUserExecutable(false);
+				for (Transition transition : Transition.getTransitions(pm, processDefinitionID, JbpmConstantsOffer.Vendor.TRANSITION_NAME_CUSTOMER_REJECTED)) {
+//					transition.getName().setText(Locale.ENGLISH.getLanguage(), "customer rejected");
+					transition.setUserExecutable(false);
+				}
+
+//				Transition transition;
+//
+//				try {
+//					transition = (Transition) pm.getObjectById(JbpmConstantsOffer.Vendor.getTransitionID_created_2_accept(processDefinitionID));
+//					transition.getName().setText(Locale.ENGLISH.getLanguage(), "accept");
+//					transition.setUserExecutable(false);
+//				} catch (JDOObjectNotFoundException x) {
+//					logger.warn("The ProcessDefinition \"" + processDefinition.getJbpmProcessDefinitionName() + "\" does not contain a jBPM Transition named \"accept\" from Node \"created\"!");
+//				}
+//
+//				transition = (Transition) pm.getObjectById(JbpmConstantsOffer.Vendor.getTransitionID_finalized_2_customerAccepted(processDefinitionID));
+//				transition.getName().setText(Locale.ENGLISH.getLanguage(), "customer accepted");
+//				transition.setUserExecutable(false);
+//
+//				transition = (Transition) pm.getObjectById(JbpmConstantsOffer.Vendor.getTransitionID_finalized_2_customerRejected(processDefinitionID));
+//				transition.getName().setText(Locale.ENGLISH.getLanguage(), "customer rejected");
+//				transition.setUserExecutable(false);
 			}
 			break;
 			case customer:
 			{
 				// give known StateDefinitions a name and a description
-				setStateDefinitionProperties(processDefinition, JbpmConstantsOffer.Customer.STATE_DEFINITION_JBPM_NODE_NAME_SENT,
-						"sent",
-						"The Offer has been sent from the vendor to the customer.",
-						true);
-
-				setStateDefinitionProperties(processDefinition, JbpmConstantsOffer.Customer.STATE_DEFINITION_JBPM_NODE_NAME_REVOKED,
-						"revoked",
-						"The vendor revoked the offer.",
-						true);
-
-				setStateDefinitionProperties(processDefinition, JbpmConstantsOffer.Customer.STATE_DEFINITION_JBPM_NODE_NAME_EXPIRED,
-						"expired",
-						"The Offer expired.",
-						true);
-
-				setStateDefinitionProperties(processDefinition, JbpmConstantsOffer.Customer.STATE_DEFINITION_JBPM_NODE_NAME_CUSTOMER_ACCEPTED,
+				setStateDefinitionProperties(processDefinition, JbpmConstantsOffer.Customer.NODE_NAME_CUSTOMER_ACCEPTED,
 						"customer accepted",
 						"The customer has accepted the Offer.",
 						true);
 
-				setStateDefinitionProperties(processDefinition, JbpmConstantsOffer.Customer.STATE_DEFINITION_JBPM_NODE_NAME_CUSTOMER_REJECTED,
+				setStateDefinitionProperties(processDefinition, JbpmConstantsOffer.Customer.NODE_NAME_CUSTOMER_REJECTED,
 						"customer rejected",
 						"The customer has rejected the Offer.",
 						true);
 
-				// give known Transitions a name
-				Transition transition;
+				for (Transition transition : Transition.getTransitions(pm, processDefinitionID, JbpmConstantsOffer.Customer.TRANSITION_NAME_EXPIRED)) {
+//					transition.getName().setText(Locale.ENGLISH.getLanguage(), "expired"); - no name necessary as it's not displayed to the user
+					transition.setUserExecutable(false);
+				}
 
-				transition = (Transition) pm.getObjectById(JbpmConstantsOffer.Customer.getTransitionID_sent_2_expired(processDefinitionID));
-				transition.getName().setText(Locale.ENGLISH.getLanguage(), "expired");
-				transition.setUserExecutable(false);
+				for (Transition transition : Transition.getTransitions(pm, processDefinitionID, JbpmConstantsOffer.Customer.TRANSITION_NAME_REVOKED)) {
+					transition.setUserExecutable(false);
+				}
 
-				transition = (Transition) pm.getObjectById(JbpmConstantsOffer.Customer.getTransitionID_sent_2_revoked(processDefinitionID));
-				transition.getName().setText(Locale.ENGLISH.getLanguage(), "revoked");
-				transition.setUserExecutable(false);
+				for (Transition transition : Transition.getTransitions(pm, processDefinitionID, JbpmConstantsOffer.Customer.TRANSITION_NAME_ACCEPTED_IMPLICITELY)) {
+					transition.setUserExecutable(false);
+				}
+
+//				// give known Transitions a name
+//				Transition transition;
+//
+//				transition = (Transition) pm.getObjectById(JbpmConstantsOffer.Customer.getTransitionID_sent_2_expired(processDefinitionID));
+//				transition.getName().setText(Locale.ENGLISH.getLanguage(), "expired");
+//				transition.setUserExecutable(false);
+//
+//				transition = (Transition) pm.getObjectById(JbpmConstantsOffer.Customer.getTransitionID_sent_2_revoked(processDefinitionID));
+//				transition.getName().setText(Locale.ENGLISH.getLanguage(), "revoked");
+//				transition.setUserExecutable(false);
 			}
 			break;
 			default:

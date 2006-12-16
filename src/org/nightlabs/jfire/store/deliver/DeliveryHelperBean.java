@@ -53,7 +53,6 @@ import org.nightlabs.jfire.store.deliver.id.DeliveryID;
 import org.nightlabs.jfire.store.id.DeliveryNoteID;
 import org.nightlabs.jfire.trade.Article;
 import org.nightlabs.jfire.trade.LegalEntity;
-import org.nightlabs.jfire.trade.id.ArticleID;
 
 /**
  * @author Marco Schulze - marco at nightlabs dot de
@@ -74,7 +73,7 @@ implements SessionBean
 	 */
 	private static final Logger logger = Logger.getLogger(DeliveryHelperBean.class);
 
-	private static final boolean ASYNC_INVOKE_ENABLE_XA = false; // not sure, but I think XA's not necessary.
+//	private static final boolean ASYNC_INVOKE_ENABLE_XA = false; // not sure, but I think XA's not necessary.
 
 	/**
 	 * @see org.nightlabs.jfire.base.BaseSessionBeanImpl#setSessionContext(javax.ejb.SessionContext)
@@ -278,14 +277,20 @@ implements SessionBean
 			DeliveryResult deliverEndServerResult_detached = (DeliveryResult) pm.detachCopy(deliverEndServerResult);
 //			deliverBeginServerResult_detached.setError(deliverBeginServerResult.getError());
 
-			// In case, they're not yet booked, we'll book the invoices asynchronously.
-			// For performance reasons (we don't want the booking to block the payment), we do this here
-			// and not in payBegin_xxx and delay the booking another 5 sec.
 			try {
-				AsyncInvoke.exec(new BookDeliveryNoteInvocation(deliveryNoteIDs, 5000), ASYNC_INVOKE_ENABLE_XA);
+				AsyncInvoke.exec(new ConsolidateProductReferencesInvocation(deliveryNoteIDs, 5000), true); // ASYNC_INVOKE_ENABLE_XA);
 			} catch (Exception e) {
 				throw new ModuleException(e);
 			}
+
+//			// In case, they're not yet booked, we'll book the invoices asynchronously.
+//			// For performance reasons (we don't want the booking to block the payment), we do this here
+//			// and not in payBegin_xxx and delay the booking another 5 sec.
+//			try {
+//				AsyncInvoke.exec(new BookDeliveryNoteInvocation(deliveryNoteIDs, 5000), ASYNC_INVOKE_ENABLE_XA);
+//			} catch (Exception e) {
+//				throw new ModuleException(e);
+//			}
 
 			return deliverEndServerResult_detached;
 		} finally {
@@ -293,37 +298,131 @@ implements SessionBean
 		}
 	}
 
-	/**
-	 * This invocation books all {@link DeliveryNote}s specified indirectly by the given {@link ArticleID}s
-	 * in case they have not yet been booked. If a <code>DeliveryNote</code> is already booked,
-	 * it's silently ignored.
-	 * <p>
-	 * At the end, this method calls {@link Store#consolidateProductReferences(Collection)}.
-	 * </p>
-	 *
-	 * @author Marco Schulze - marco at nightlabs dot de
-	 */
-	public static class BookDeliveryNoteInvocation extends Invocation
+//	/**
+//	 * This invocation books all {@link DeliveryNote}s specified indirectly by the given {@link ArticleID}s
+//	 * in case they have not yet been booked. If a <code>DeliveryNote</code> is already booked,
+//	 * it's silently ignored.
+//	 * <p>
+//	 * At the end, this method calls {@link Store#consolidateProductReferences(Collection)}.
+//	 * </p>
+//	 *
+//	 * @author Marco Schulze - marco at nightlabs dot de
+//	 */
+//	public static class BookDeliveryNoteInvocation extends Invocation
+//	{
+//		/**
+//		 * LOG4J logger used by this class
+//		 */
+//		private static final Logger logger = Logger.getLogger(BookDeliveryNoteInvocation.class);
+//
+//		private long createDT = System.currentTimeMillis();
+//		private Collection deliveryNoteIDs;
+//		private long delayMSec;
+//
+//		/**
+//		 * @param articleIDs Instances of {@link org.nightlabs.jfire.trade.id.ArticleID}. Must not be <code>null</code>.
+//		 *		They're used to resolve the {@link DeliveryNote}s. The
+//		 *		specified {@link DeliveryNote}s can already be booked. Those which are already booked,
+//		 *		will be silently ignored.
+//		 * @param delayMSec Milliseconds (0 &lt; delayMSec &lt; 60000) which to wait before doing sth.
+//		 *		In case your main thread does sth. that manipulates deliveryNotes or accounts, you should delay
+//		 *		the booking to avoid performance problems (and dead-locks).
+//		 */
+//		public BookDeliveryNoteInvocation(Collection deliveryNoteIDs, long delayMSec)
+//		{
+//			if (deliveryNoteIDs == null)
+//				throw new IllegalArgumentException("deliveryNoteIDs must not be null!");
+//
+//			if (delayMSec < 0)
+//				throw new IllegalArgumentException("delayMSec < 0!");
+//
+//			if (delayMSec > 60000)
+//				throw new IllegalArgumentException("delayMSec > 60000!");
+//
+//			this.deliveryNoteIDs = deliveryNoteIDs;
+//			this.delayMSec = delayMSec;
+//
+//			logger.info("Created BookDeliveryNoteInvocation for " + deliveryNoteIDs.size() + " deliveryNotes with "+delayMSec+" msec delay.");
+//		}
+//
+//		public Serializable invoke() throws Exception
+//		{
+//			long wait = createDT + delayMSec - System.currentTimeMillis();
+//			if (wait > 0) {
+//				logger.info("invoke() called: Waiting " + wait + " msec before starting to book.");
+//				try { Thread.sleep(wait); } catch (InterruptedException x) { }
+//			}
+//
+//			PersistenceManager pm = getPersistenceManager();
+//			try {
+//				Store store = null;
+//
+////				pm.getExtent(Article.class);
+//				pm.getExtent(DeliveryNote.class);
+//				Set deliveryNotes = new HashSet();
+//				for (Iterator it = deliveryNoteIDs.iterator(); it.hasNext(); ) {
+//					DeliveryNoteID deliveryNoteID = (DeliveryNoteID) it.next();
+//					DeliveryNote deliveryNote = (DeliveryNote) pm.getObjectById(deliveryNoteID);
+//					deliveryNotes.add(deliveryNote);
+//				}
+////				Collection products = new HashSet();
+////				for (Iterator it = articleIDs.iterator(); it.hasNext(); ) {
+////					ArticleID articleID = (ArticleID) it.next();
+////					Article article = (Article) pm.getObjectById(articleID);
+////					products.add(article.getProduct());
+////					DeliveryNote deliveryNote = article.getDeliveryNote();
+////					if (deliveryNote == null)
+////						throw new IllegalStateException("Article \""+article.getPrimaryKey()+"\" has no DeliveryNote assigned!");
+////					deliveryNotes.add(deliveryNote);
+////				}
+//
+//				Collection products = new HashSet();
+//				User user = null;
+//				for (Iterator itD = deliveryNotes.iterator(); itD.hasNext(); ) {
+//					DeliveryNote deliveryNote = (DeliveryNote) itD.next();
+//					if (!deliveryNote.getDeliveryNoteLocal().isBooked()) {
+//						logger.info("Booking deliveryNote: " + deliveryNote.getPrimaryKey());
+//
+//						if (user == null)
+//							user = User.getUser(pm, getPrincipal());
+//
+//						if (store == null)
+//							store = Store.getStore(pm);
+//
+//						store.bookDeliveryNote(user, deliveryNote, true, false);
+//					}
+//					else
+//						logger.info("DeliveryNote " + deliveryNote.getPrimaryKey() + " is already booked! Ignoring.");
+//
+//					for (Iterator itA = deliveryNote.getArticles().iterator(); itA.hasNext(); ) {
+//						Article article = (Article) itA.next();
+//						products.add(article.getProduct());
+//					}
+//				}
+//
+//				if (store == null)
+//					store = Store.getStore(pm);
+//
+//				logger.info("Calling store.consolidateProductReferences(...) with " + products.size() + " products.");
+//				store.consolidateProductReferences(products);
+//
+//			} finally {
+//				pm.close();
+//			}
+//			return null;
+//		}
+//	}
+
+	public static class ConsolidateProductReferencesInvocation extends Invocation
 	{
-		/**
-		 * LOG4J logger used by this class
-		 */
-		private static final Logger logger = Logger.getLogger(BookDeliveryNoteInvocation.class);
+		private static final long serialVersionUID = 1L;
+		private static final Logger logger = Logger.getLogger(ConsolidateProductReferencesInvocation.class);
 
 		private long createDT = System.currentTimeMillis();
 		private Collection deliveryNoteIDs;
 		private long delayMSec;
 
-		/**
-		 * @param articleIDs Instances of {@link org.nightlabs.jfire.trade.id.ArticleID}. Must not be <code>null</code>.
-		 *		They're used to resolve the {@link DeliveryNote}s. The
-		 *		specified {@link DeliveryNote}s can already be booked. Those which are already booked,
-		 *		will be silently ignored.
-		 * @param delayMSec Milliseconds (0 &lt; delayMSec &lt; 60000) which to wait before doing sth.
-		 *		In case your main thread does sth. that manipulates deliveryNotes or accounts, you should delay
-		 *		the booking to avoid performance problems (and dead-locks).
-		 */
-		public BookDeliveryNoteInvocation(Collection deliveryNoteIDs, long delayMSec)
+		public ConsolidateProductReferencesInvocation(Collection deliveryNoteIDs, long delayMSec)
 		{
 			if (deliveryNoteIDs == null)
 				throw new IllegalArgumentException("deliveryNoteIDs must not be null!");
@@ -352,7 +451,6 @@ implements SessionBean
 			try {
 				Store store = null;
 
-//				pm.getExtent(Article.class);
 				pm.getExtent(DeliveryNote.class);
 				Set deliveryNotes = new HashSet();
 				for (Iterator it = deliveryNoteIDs.iterator(); it.hasNext(); ) {
@@ -360,34 +458,11 @@ implements SessionBean
 					DeliveryNote deliveryNote = (DeliveryNote) pm.getObjectById(deliveryNoteID);
 					deliveryNotes.add(deliveryNote);
 				}
-//				Collection products = new HashSet();
-//				for (Iterator it = articleIDs.iterator(); it.hasNext(); ) {
-//					ArticleID articleID = (ArticleID) it.next();
-//					Article article = (Article) pm.getObjectById(articleID);
-//					products.add(article.getProduct());
-//					DeliveryNote deliveryNote = article.getDeliveryNote();
-//					if (deliveryNote == null)
-//						throw new IllegalStateException("Article \""+article.getPrimaryKey()+"\" has no DeliveryNote assigned!");
-//					deliveryNotes.add(deliveryNote);
-//				}
 
 				Collection products = new HashSet();
 				User user = null;
 				for (Iterator itD = deliveryNotes.iterator(); itD.hasNext(); ) {
 					DeliveryNote deliveryNote = (DeliveryNote) itD.next();
-					if (!deliveryNote.getDeliveryNoteLocal().isBooked()) {
-						logger.info("Booking deliveryNote: " + deliveryNote.getPrimaryKey());
-
-						if (user == null)
-							user = User.getUser(pm, getPrincipal());
-
-						if (store == null)
-							store = Store.getStore(pm);
-
-						store.bookDeliveryNote(user, deliveryNote, true, false);
-					}
-					else
-						logger.info("DeliveryNote " + deliveryNote.getPrimaryKey() + " is already booked! Ignoring.");
 
 					for (Iterator itA = deliveryNote.getArticles().iterator(); itA.hasNext(); ) {
 						Article article = (Article) itA.next();

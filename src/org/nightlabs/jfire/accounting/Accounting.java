@@ -40,10 +40,11 @@ import java.util.Map;
 import javax.jdo.JDOHelper;
 import javax.jdo.JDOObjectNotFoundException;
 import javax.jdo.PersistenceManager;
-import javax.jdo.Query;
 import javax.jdo.listener.StoreCallback;
 
 import org.apache.log4j.Logger;
+import org.jbpm.JbpmContext;
+import org.jbpm.graph.exe.ProcessInstance;
 import org.nightlabs.ModuleException;
 import org.nightlabs.jfire.accounting.book.BookMoneyTransfer;
 import org.nightlabs.jfire.accounting.book.LocalAccountant;
@@ -51,6 +52,7 @@ import org.nightlabs.jfire.accounting.book.MoneyFlowMapping;
 import org.nightlabs.jfire.accounting.book.PartnerAccountant;
 import org.nightlabs.jfire.accounting.id.InvoiceID;
 import org.nightlabs.jfire.accounting.jbpm.ActionHandlerBookInvoice;
+import org.nightlabs.jfire.accounting.jbpm.ActionHandlerBookInvoiceImplicitely;
 import org.nightlabs.jfire.accounting.jbpm.ActionHandlerFinalizeInvoice;
 import org.nightlabs.jfire.accounting.jbpm.JbpmConstantsInvoice;
 import org.nightlabs.jfire.accounting.pay.ModeOfPaymentFlavour;
@@ -65,8 +67,10 @@ import org.nightlabs.jfire.accounting.pay.id.ServerPaymentProcessorID;
 import org.nightlabs.jfire.accounting.priceconfig.PriceConfig;
 import org.nightlabs.jfire.config.Config;
 import org.nightlabs.jfire.idgenerator.IDGenerator;
+import org.nightlabs.jfire.jbpm.JbpmLookup;
 import org.nightlabs.jfire.jbpm.graph.def.ActionHandlerNodeEnter;
 import org.nightlabs.jfire.jbpm.graph.def.ProcessDefinition;
+import org.nightlabs.jfire.jbpm.graph.def.State;
 import org.nightlabs.jfire.jbpm.graph.def.StateDefinition;
 import org.nightlabs.jfire.jbpm.graph.def.Transition;
 import org.nightlabs.jfire.jbpm.graph.def.id.ProcessDefinitionID;
@@ -320,10 +324,10 @@ public class Accounting
 			Offer articleOffer = article.getOffer();
 			Order articleOrder = articleOffer.getOrder();
 			
-			if (!articleOffer.getOfferLocal().isConfirmed()) {
+			if (!articleOffer.getOfferLocal().isAccepted()) {
 				throw new InvoiceEditException(
-					InvoiceEditException.REASON_OFFER_NOT_CONFIRMED, 
-					"At least one involved offer is not confirmed!",
+					InvoiceEditException.REASON_OFFER_NOT_ACCEPTED, 
+					"At least one involved offer is not accepted!",
 					(ArticleID) JDOHelper.getObjectId(article)
 				);
 			}
@@ -469,7 +473,8 @@ public class Accounting
 	}
 
 	/**
-	 * Books the given Invoice.
+	 * Books the given Invoice. You must NOT call this method directly. It is called
+	 * by {@link ActionHandlerBookInvoice}.
 	 * 
 	 * @param user The {@link User} who is responsible for booking.
 	 * @param invoice The {@link Invoice} that should be booked.
@@ -479,22 +484,26 @@ public class Accounting
 	 *		exception if this param is <tt>false</tt> or returns silently without doing anything if this
 	 *		param is <tt>true</tt>.
 	 */
-	public void bookInvoice(User user, Invoice invoice, boolean finalizeIfNecessary, boolean silentlyIgnoreBookedInvoice)
+	public void onBookInvoice(User user, Invoice invoice)
 	{
 		InvoiceLocal invoiceLocal = invoice.getInvoiceLocal();
-		if (invoiceLocal.isBooked()) {
-			if (!silentlyIgnoreBookedInvoice)
-				throw new IllegalStateException("Invoice \""+invoice.getPrimaryKey()+"\" has already been booked!");
 
+//		if (invoiceLocal.isBooked()) {
+//			if (!silentlyIgnoreBookedInvoice)
+//				throw new IllegalStateException("Invoice \""+invoice.getPrimaryKey()+"\" has already been booked!");
+//
+//			return;
+//		}
+//
+//		if (!invoice.isFinalized()) {
+//			if (!finalizeIfNecessary)
+//				throw new IllegalStateException("Invoice \""+invoice.getPrimaryKey()+"\" is not finalized!");
+//
+//			finalizeInvoice(user, invoice);
+//		}
+
+		if (invoiceLocal.isBooked())
 			return;
-		}
-
-		if (!invoice.isFinalized()) {
-			if (!finalizeIfNecessary)
-				throw new IllegalStateException("Invoice \""+invoice.getPrimaryKey()+"\" is not finalized!");
-
-			finalizeInvoice(user, invoice);
-		}
 
 		LegalEntity from = invoice.getCustomer();
 		LegalEntity to = invoice.getVendor();
@@ -810,7 +819,7 @@ public class Accounting
 
 		LegalEntity partner = null;
 		if (paymentData.getPayment().getInvoices() != null) {
-			partner = finalizeInvoicesAndGetPartner(user,
+			partner = bookInvoicesImplicitelyAndGetPartner(user,
 					paymentData.getPayment().getInvoices(),
 					paymentData.getPayment().getCurrency());
 		}
@@ -934,12 +943,32 @@ public class Accounting
 	}
 
 	/**
+	 * This method is a noop, if the offer is already accepted. If the Offer cannot be accepted implicitely
+	 * (either because the business partner doesn't allow implicit acceptance or because the jBPM token is at
+	 * a position where this is not possible, an exception is thrown).
+	 */
+	protected void bookInvoiceImplicitely(Invoice invoice)
+	{
+		InvoiceID invoiceID = (InvoiceID) JDOHelper.getObjectId(invoice);
+		if (State.hasState(getPersistenceManager(), invoiceID, JbpmConstantsInvoice.Both.NODE_NAME_BOOKED))
+			return;
+
+		JbpmContext jbpmContext = JbpmLookup.getJbpmConfiguration().createJbpmContext();
+		try {
+			ProcessInstance processInstance = jbpmContext.getProcessInstance(invoice.getInvoiceLocal().getJbpmProcessInstanceId());
+			processInstance.signal(JbpmConstantsInvoice.Vendor.TRANSITION_NAME_BOOK_IMPLICITELY);
+		} finally {
+			jbpmContext.close();
+		}
+	}
+
+	/**
 	 * @param invoices Can be null. Should be a <tt>Collection</tt> of {@link Invoice}
 	 * @param currency Can be null.
 	 * @return Either <tt>null</tt>, in case no Invoice was passed or the partner
 	 *		(if at least one Invoice has been passed in <tt>invoices</tt>).
 	 */
-	protected LegalEntity finalizeInvoicesAndGetPartner(User user, Collection invoices, Currency currency)
+	protected LegalEntity bookInvoicesImplicitelyAndGetPartner(User user, Collection invoices, Currency currency)
 	{
 		if (invoices == null)
 			return null;
@@ -953,8 +982,8 @@ public class Accounting
 		for (Iterator it = invoices.iterator(); it.hasNext(); ) {
 			Invoice invoice = (Invoice) it.next();
 
-			validateInvoice(invoice);
-			finalizeInvoice(user, invoice);
+//			finalizeInvoice(user, invoice);
+			bookInvoiceImplicitely(invoice);
 
 			if (currency == null)
 				currency = invoice.getCurrency();
@@ -989,26 +1018,27 @@ public class Accounting
 		return partner;
 	}
 
-	/**
-	 * Finalizes an invoice and sends it to the involved 
-	 * organisation if neccessary.
-	 * 
-	 * @param finalizer
-	 * @param invoice
-	 */
-	public void finalizeInvoice(User finalizer, Invoice invoice) {
-		if (invoice.isFinalized())
-			return;
-
-		if (!invoice.getVendor().getPrimaryKey().equals(getMandator().getPrimaryKey()))
-			throw new IllegalArgumentException("Can not finalize an invoice where mandator is not vendor of this invoice!");
-
-		// invoice.setFinalized(...) does nothing, if it is already finalized.
-		invoice.setFinalized(finalizer);
-		if (invoice.getCustomer() instanceof OrganisationLegalEntity) {
-			// TODO: Put the Invoice in the queue on this organisations server ...
-		}
-	}
+//	/**
+//	 * Finalizes an invoice and sends it to the involved 
+//	 * organisation if neccessary.
+//	 * 
+//	 * @param finalizer
+//	 * @param invoice
+//	 */
+//	public void finalizeInvoice(User finalizer, Invoice invoice) {
+//		if (invoice.isFinalized())
+//			return;
+//
+//		if (!invoice.getVendor().getPrimaryKey().equals(getMandator().getPrimaryKey()))
+//			throw new IllegalArgumentException("Can not finalize an invoice where mandator is not vendor of this invoice!");
+//
+//		// invoice.setFinalized(...) does nothing, if it is already finalized.
+//		invoice.setFinalized(finalizer);
+//		if (invoice.getCustomer() instanceof OrganisationLegalEntity) {
+//			// TODO: Put the Invoice in the queue on this organisations server ...
+//			throw new UnsupportedOperationException("NYI");
+//		}
+//	}
 
 	/**
 	 * Creates and persists a new Account for the mandator.
@@ -1122,8 +1152,10 @@ public class Accounting
 		// we add the events+actionhandlers
 		ActionHandlerNodeEnter.register(jbpmProcessDefinition);
 
-		if (TradeSide.vendor == tradeSide)
+		if (TradeSide.vendor == tradeSide) {
 			ActionHandlerFinalizeInvoice.register(jbpmProcessDefinition);
+			ActionHandlerBookInvoiceImplicitely.register(jbpmProcessDefinition);
+		}
 
 		ActionHandlerBookInvoice.register(jbpmProcessDefinition);
 
@@ -1131,61 +1163,61 @@ public class Accounting
 		ProcessDefinition processDefinition = ProcessDefinition.storeProcessDefinition(pm, null, jbpmProcessDefinition, jbpmProcessDefinitionURL);
 		ProcessDefinitionID processDefinitionID = (ProcessDefinitionID) JDOHelper.getObjectId(processDefinition);
 
+		setStateDefinitionProperties(processDefinition, JbpmConstantsInvoice.Both.NODE_NAME_BOOKED,
+				"booked",
+				"Booked.",
+				true);
+
+		setStateDefinitionProperties(processDefinition, JbpmConstantsInvoice.Both.NODE_NAME_SENT,
+				"sent",
+				"sent",
+				true);
+
 		switch (tradeSide) {
 			case vendor:
 			{
 				// give known StateDefinitions a name and a description
-				setStateDefinitionProperties(processDefinition, JbpmConstantsInvoice.Vendor.STATE_DEFINITION_JBPM_NODE_NAME_CREATED,
+				setStateDefinitionProperties(processDefinition, JbpmConstantsInvoice.Vendor.NODE_NAME_CREATED,
 						"created",
 						"The Invoice has been newly created. This is the first state in the Invoice related workflow.",
 						true);
 
-				setStateDefinitionProperties(processDefinition, JbpmConstantsInvoice.Vendor.STATE_DEFINITION_JBPM_NODE_NAME_ABORTED,
+				setStateDefinitionProperties(processDefinition, JbpmConstantsInvoice.Vendor.NODE_NAME_ABORTED,
 						"aborted",
 						"Aborted.",
 						true);
 
-				setStateDefinitionProperties(processDefinition, JbpmConstantsInvoice.Both.STATE_DEFINITION_JBPM_NODE_NAME_BOOKED,
-						"booked",
-						"Booked.",
-						true);
-
-				setStateDefinitionProperties(processDefinition, JbpmConstantsInvoice.Vendor.STATE_DEFINITION_JBPM_NODE_NAME_BOOKED_UNRECEIVABLE,
+				setStateDefinitionProperties(processDefinition, JbpmConstantsInvoice.Vendor.NODE_NAME_BOOKED_UNRECEIVABLE,
 						"booked unreceivable",
 						"booked unreceivable",
 						true);
 
-				setStateDefinitionProperties(processDefinition, JbpmConstantsInvoice.Vendor.STATE_DEFINITION_JBPM_NODE_NAME_DOUBTFUL,
+				setStateDefinitionProperties(processDefinition, JbpmConstantsInvoice.Vendor.NODE_NAME_DOUBTFUL,
 						"doubtful",
 						"doubtful",
 						true);
 
-				setStateDefinitionProperties(processDefinition, JbpmConstantsInvoice.Vendor.STATE_DEFINITION_JBPM_NODE_NAME_FINALIZED,
+				setStateDefinitionProperties(processDefinition, JbpmConstantsInvoice.Vendor.NODE_NAME_FINALIZED,
 						"finalized",
 						"finalized",
 						true);
 
-				setStateDefinitionProperties(processDefinition, JbpmConstantsInvoice.Vendor.STATE_DEFINITION_JBPM_NODE_NAME_PAID,
+				setStateDefinitionProperties(processDefinition, JbpmConstantsInvoice.Vendor.NODE_NAME_PAID,
 						"paid",
 						"paid",
 						true);
 
-				setStateDefinitionProperties(processDefinition, JbpmConstantsInvoice.Both.STATE_DEFINITION_JBPM_NODE_NAME_SENT,
-						"sent",
-						"sent",
-						true);
-
-				setStateDefinitionProperties(processDefinition, JbpmConstantsInvoice.Vendor.STATE_DEFINITION_JBPM_NODE_NAME_SENT_PRE_COLLECTION_LETTER,
+				setStateDefinitionProperties(processDefinition, JbpmConstantsInvoice.Vendor.NODE_NAME_SENT_PRE_COLLECTION_LETTER,
 						"sent pre-collection letter",
 						"sent pre-collection letter",
 						true);
 
-				setStateDefinitionProperties(processDefinition, JbpmConstantsInvoice.Vendor.STATE_DEFINITION_JBPM_NODE_NAME_SENT_REMINDER,
+				setStateDefinitionProperties(processDefinition, JbpmConstantsInvoice.Vendor.NODE_NAME_SENT_REMINDER,
 						"sent reminder",
 						"sent reminder",
 						true);
 
-				setStateDefinitionProperties(processDefinition, JbpmConstantsInvoice.Vendor.STATE_DEFINITION_JBPM_NODE_NAME_UNCOLLECTABLE,
+				setStateDefinitionProperties(processDefinition, JbpmConstantsInvoice.Vendor.NODE_NAME_UNCOLLECTABLE,
 						"uncollectable",
 						"uncollectable",
 						true);
@@ -1193,28 +1225,20 @@ public class Accounting
 			break;
 			case customer:
 			{
-				setStateDefinitionProperties(processDefinition, JbpmConstantsInvoice.Both.STATE_DEFINITION_JBPM_NODE_NAME_SENT,
-						"sent",
-						"sent",
-						true);
-
-				setStateDefinitionProperties(processDefinition, JbpmConstantsInvoice.Both.STATE_DEFINITION_JBPM_NODE_NAME_BOOKED,
-						"booked",
-						"booked",
-						true);
-
-				setStateDefinitionProperties(processDefinition, JbpmConstantsInvoice.Customer.STATE_DEFINITION_JBPM_NODE_NAME_PAID,
+				setStateDefinitionProperties(processDefinition, JbpmConstantsInvoice.Customer.NODE_NAME_PAID,
 						"paid",
 						"paid",
 						true);
 
-				Query q = pm.newQuery(Transition.class);
-				q.setFilter("");
+				for (Transition transition : Transition.getTransitions(pm, processDefinitionID, JbpmConstantsInvoice.Vendor.TRANSITION_NAME_BOOK_IMPLICITELY)) {
+					transition.setUserExecutable(false);
+				}
 			}
 			break;
 			default:
 				throw new IllegalStateException("Unknown TradeSide: " + tradeSide);
 		}
+
 
 		return processDefinition;
 	}

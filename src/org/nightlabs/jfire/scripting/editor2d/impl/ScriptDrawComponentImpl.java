@@ -38,17 +38,6 @@ public abstract class ScriptDrawComponentImpl
 extends DrawComponentImpl 
 implements ScriptDrawComponent
 {
-//	private ScriptRegistryItemID scriptRegistryItemID;
-//	public ScriptRegistryItemID getScriptRegistryItemID() {
-//		return scriptRegistryItemID;
-//	}
-//	public void setScriptRegistryItemID(ScriptRegistryItemID scriptRegistryItemID) 
-//	{
-//		ScriptRegistryItemID oldID = this.scriptRegistryItemID; 
-//		this.scriptRegistryItemID = scriptRegistryItemID;
-//		firePropertyChange(PROP_SCRIPT_REGISTRY_ITEM_ID, oldID, scriptRegistryItemID);
-//	}
-
 	private transient ScriptRegistryItemID scriptRegistryItemID = null;
 	private String scriptRegistryItemIDKeyStr = null;
 

@@ -65,7 +65,7 @@ implements SessionBean
 	 */
 	private static final Logger logger = Logger.getLogger(PaymentHelperBean.class);
 
-	private static final boolean ASYNC_INVOKE_ENABLE_XA = false; // not sure, but I think it's not necessary
+	private static final boolean ASYNC_INVOKE_ENABLE_XA = true; // not sure, but I think it's not necessary - should be better to enable. marco
 
 	/**
 	 * @see org.nightlabs.jfire.base.BaseSessionBeanImpl#setSessionContext(javax.ejb.SessionContext)

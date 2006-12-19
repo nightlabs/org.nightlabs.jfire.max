@@ -6,13 +6,14 @@
       <transition name="finalize" to="devil.NightLabs.org:finalized"></transition>
    </start-state>
    <state name="devil.NightLabs.org:finalized">
-      <transition name="devil.NightLabs.org:deliver" to="devil.NightLabs.org:delivered"></transition>
+      <transition name="devil.NightLabs.org:book" to="devil.NightLabs.org:booked"></transition>
    </state>
    <state name="devil.NightLabs.org:booked">
       <transition name="devil.NightLabs.org:send" to="devil.NightLabs.org:sent"></transition>
+      <transition name="devil.NightLabs.org:deliver" to="devil.NightLabs.org:delivered"></transition>
    </state>
-   <end-state name="devil.NightLabs.org:sent"></end-state>
-   <state name="devil.NightLabs.org:delivered">
-      <transition name="devil.NightLabs.org:book" to="devil.NightLabs.org:booked"></transition>
-   </state>
+   <node name="devil.NightLabs.org:sent">
+      <transition name="" to="devil.NightLabs.org:booked"></transition>
+   </node>
+   <end-state name="devil.NightLabs.org:delivered"></end-state>
 </process-definition>

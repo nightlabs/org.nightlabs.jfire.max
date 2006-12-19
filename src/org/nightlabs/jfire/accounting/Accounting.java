@@ -693,6 +693,30 @@ public class Accounting
 							x));
 		}
 
+		try {
+			for (Invoice invoice : paymentData.getPayment().getInvoices()) {
+				InvoiceLocal invoiceLocal = invoice.getInvoiceLocal();
+				if (invoiceLocal.getAmountToPay() == 0) {
+					JbpmContext jbpmContext = JbpmLookup.getJbpmConfiguration().createJbpmContext();
+					try {
+						ProcessInstance processInstance = jbpmContext.getProcessInstanceForUpdate(invoiceLocal.getJbpmProcessInstanceId());
+						if (!JbpmConstantsInvoice.Both.NODE_NAME_PAID.equals(processInstance.getRootToken().getNode().getName())) {
+							processInstance.signal(JbpmConstantsInvoice.Both.TRANSITION_NAME_PAY);
+						}
+					} finally {
+						jbpmContext.close();
+					}
+				}
+			}
+		} catch (Exception x) {
+			throw new PaymentException(
+					new PaymentResult(
+							getOrganisationID(),
+							PaymentResult.CODE_FAILED,
+							"Signalling transition \"" + JbpmConstantsInvoice.Both.TRANSITION_NAME_PAY + "\" failed!",
+							x));
+		}
+
 		return serverPaymentResult;
 	}
 
@@ -1173,6 +1197,11 @@ public class Accounting
 				"sent",
 				true);
 
+		setStateDefinitionProperties(processDefinition, JbpmConstantsInvoice.Both.NODE_NAME_PAID,
+				"paid",
+				"paid",
+				true);
+
 		switch (tradeSide) {
 			case vendor:
 			{
@@ -1202,11 +1231,6 @@ public class Accounting
 						"finalized",
 						true);
 
-				setStateDefinitionProperties(processDefinition, JbpmConstantsInvoice.Vendor.NODE_NAME_PAID,
-						"paid",
-						"paid",
-						true);
-
 				setStateDefinitionProperties(processDefinition, JbpmConstantsInvoice.Vendor.NODE_NAME_SENT_PRE_COLLECTION_LETTER,
 						"sent pre-collection letter",
 						"sent pre-collection letter",
@@ -1221,18 +1245,15 @@ public class Accounting
 						"uncollectable",
 						"uncollectable",
 						true);
-			}
-			break;
-			case customer:
-			{
-				setStateDefinitionProperties(processDefinition, JbpmConstantsInvoice.Customer.NODE_NAME_PAID,
-						"paid",
-						"paid",
-						true);
 
 				for (Transition transition : Transition.getTransitions(pm, processDefinitionID, JbpmConstantsInvoice.Vendor.TRANSITION_NAME_BOOK_IMPLICITELY)) {
 					transition.setUserExecutable(false);
 				}
+			}
+			break;
+			case customer:
+			{
+
 			}
 			break;
 			default:

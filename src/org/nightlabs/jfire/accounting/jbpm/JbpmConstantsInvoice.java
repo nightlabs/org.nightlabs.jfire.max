@@ -2,7 +2,6 @@ package org.nightlabs.jfire.accounting.jbpm;
 
 import org.nightlabs.jfire.organisation.Organisation;
 
-
 /**
  * @author Marco Schulze - marco at nightlabs dot de
  */
@@ -11,6 +10,22 @@ public class JbpmConstantsInvoice
 	public static class Both {
 		public static final String NODE_NAME_SENT   = Organisation.DEVIL_ORGANISATION_ID + ":sent";
 		public static final String NODE_NAME_BOOKED = Organisation.DEVIL_ORGANISATION_ID + ":booked";
+
+		public static final String NODE_NAME_PAID          = Organisation.DEVIL_ORGANISATION_ID + ":paid";
+
+		/**
+		 * <p>
+		 * This transition is automatically triggered synchronously as soon as the invoice
+		 * has been completely paid. It is not triggered by a partial payment, if there's still
+		 * an amount outstanding after this payment. In other words, it is only triggered by a partial
+		 * payment, if it was the last partial payment and there is no outstanding money left.
+		 * </p>
+		 * <p>
+		 * It is triggered by
+		 * {@link org.nightlabs.jfire.accounting.Accounting#payEnd(org.nightlabs.jfire.security.User, org.nightlabs.jfire.accounting.pay.PaymentData)}.
+		 * </p>
+		 */
+		public static final String TRANSITION_NAME_PAY = Organisation.DEVIL_ORGANISATION_ID + ":pay";
 	}
 
 	public static class Vendor {
@@ -30,7 +45,6 @@ public class JbpmConstantsInvoice
 		public static final String NODE_NAME_CREATED       = Organisation.DEVIL_ORGANISATION_ID + ":created";
 		public static final String NODE_NAME_FINALIZED     = Organisation.DEVIL_ORGANISATION_ID + ":finalized";
 		public static final String NODE_NAME_ABORTED       = Organisation.DEVIL_ORGANISATION_ID + ":aborted";
-		public static final String NODE_NAME_PAID          = Organisation.DEVIL_ORGANISATION_ID + ":paid";
 		public static final String NODE_NAME_SENT_REMINDER = Organisation.DEVIL_ORGANISATION_ID + ":sentReminder";
 		public static final String NODE_NAME_SENT_PRE_COLLECTION_LETTER = Organisation.DEVIL_ORGANISATION_ID + ":sentPreCollectionLetter";
 		public static final String NODE_NAME_DOUBTFUL      = Organisation.DEVIL_ORGANISATION_ID + ":doubtful";
@@ -50,14 +64,6 @@ public class JbpmConstantsInvoice
 		public static final String TRANSITION_NAME_SEND = Organisation.DEVIL_ORGANISATION_ID + ":send";
 
 		public static final String TRANSITION_NAME_BOOK_IMPLICITELY = Organisation.DEVIL_ORGANISATION_ID + ":bookImplicitely";
-
-		/**
-		 * This transition is automatically triggered synchronously as soon as the invoice
-		 * has been completely paid. It is not triggered by a partial payment, if there's still
-		 * a due amount outstanding after this payment. In other words, it is only triggered by a partial
-		 * payment, if it was the last partial payment and there is no outstanding money left.
-		 */
-		public static final String TRANSITION_NAME_PAY = Organisation.DEVIL_ORGANISATION_ID + ":pay";
 	}
 
 	public static class Customer {
@@ -73,10 +79,6 @@ public class JbpmConstantsInvoice
 //		 */
 //		public static final ProcessDefinitionID PROCESS_DEFINITION_ID = ProcessDefinitionID.create(
 //				Organisation.DEVIL_ORGANISATION_ID, "Invoice.Customer");
-
-		public static final String NODE_NAME_PAID = Organisation.DEVIL_ORGANISATION_ID + ":paid";
-
-		public static final String TRANSITION_NAME_PAY = Organisation.DEVIL_ORGANISATION_ID + ":pay";
 	}
 
 	private JbpmConstantsInvoice() { }

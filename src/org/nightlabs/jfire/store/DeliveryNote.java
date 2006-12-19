@@ -48,6 +48,8 @@ import org.nightlabs.jfire.jbpm.graph.def.Statable;
 import org.nightlabs.jfire.jbpm.graph.def.StatableLocal;
 import org.nightlabs.jfire.jbpm.graph.def.State;
 import org.nightlabs.jfire.security.User;
+import org.nightlabs.jfire.store.deliver.DeliverProductTransfer;
+import org.nightlabs.jfire.store.deliver.Delivery;
 import org.nightlabs.jfire.store.id.DeliveryNoteID;
 import org.nightlabs.jfire.store.jbpm.ActionHandlerFinalizeDeliveryNote;
 import org.nightlabs.jfire.trade.Article;
@@ -57,6 +59,7 @@ import org.nightlabs.jfire.trade.Offer;
 import org.nightlabs.jfire.trade.Order;
 import org.nightlabs.jfire.trade.OrganisationLegalEntity;
 import org.nightlabs.jfire.trade.id.ArticleID;
+import org.nightlabs.jfire.transfer.Transfer;
 import org.nightlabs.jfire.transfer.id.AnchorID;
 import org.nightlabs.util.CollectionUtil;
 import org.nightlabs.util.Utils;
@@ -309,6 +312,11 @@ implements Serializable, ArticleContainer, Statable, DetachCallback
 //	private Map articles = new HashMap();
 
 	/**
+	 * @jdo.field persistence-modifier="persistent"
+	 */
+	private int articleCount = 0;
+
+	/**
 	 * @jdo.field
 	 *		persistence-modifier="persistent"
 	 *		collection-type="collection"
@@ -419,6 +427,11 @@ implements Serializable, ArticleContainer, Statable, DetachCallback
 		return _articles;
 	}
 
+	public int getArticleCount()
+	{
+		return articleCount;
+	}
+
 	/**
 	 * A DeliveryNote is only valid after {@link #validate()} has been called.
 	 *
@@ -512,6 +525,7 @@ implements Serializable, ArticleContainer, Statable, DetachCallback
 //			);
 
 		articles.add(article);
+		articleCount = articles.size();
 
 		this.valid = false;	
 		article.setDeliveryNote(this);		
@@ -527,6 +541,7 @@ implements Serializable, ArticleContainer, Statable, DetachCallback
 			articles.remove(article);
 			this.valid = false;
 			article.setDeliveryNote(null);
+			articleCount = articles.size();
 		}
 	}
 
@@ -681,5 +696,34 @@ implements Serializable, ArticleContainer, Statable, DetachCallback
 			_receptionNotes = Collections.unmodifiableSet(receptionNotes);
 
 		return _receptionNotes;
+	}
+
+	public void bookDeliveryNoteProductTransfer(DeliveryNoteProductTransfer transfer, boolean rollback)
+	{
+		if (!DeliveryNoteProductTransfer.BOOK_TYPE_DELIVER.equals(transfer.getBookType()))
+			return;
+
+		boolean vendorIsFrom = transfer.getAnchorType(vendor) == Transfer.ANCHORTYPE_FROM;
+		boolean vendorIsTo = transfer.getAnchorType(vendor) == Transfer.ANCHORTYPE_TO;
+		boolean customerIsFrom = transfer.getAnchorType(customer) == Transfer.ANCHORTYPE_FROM;
+		boolean customerIsTo = transfer.getAnchorType(customer) == Transfer.ANCHORTYPE_TO;
+
+		if (!vendorIsFrom && !vendorIsTo && !customerIsFrom && !customerIsTo)
+			throw new IllegalArgumentException("Transfer \""+transfer.getPrimaryKey()+"\" && DeliveryNote \""+this.getPrimaryKey()+"\": Transfer and delivery note are not related!");
+
+		int articleCount = 0;
+
+		Delivery delivery = ((DeliverProductTransfer)transfer.getContainer()).getDelivery();
+		for (Article article : delivery.getArticles()) {
+			if (this.equals(article.getDeliveryNote())) {
+				++articleCount;
+				article.getArticleLocal().setDelivery(rollback ? null : delivery);
+			}
+		}
+
+		if (rollback)
+			deliveryNoteLocal.decDeliveredArticleCount(articleCount);
+		else
+			deliveryNoteLocal.incDeliveredArticleCount(articleCount);
 	}
 }

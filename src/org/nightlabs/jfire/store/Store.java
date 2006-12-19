@@ -1330,6 +1330,52 @@ public class Store
 		if (deliveryData.getDelivery().isPending() && !deliveryData.getDelivery().isFailed())
 			throw new IllegalStateException("Delivery should not be pending anymore, because failed is false! How's that possible?");
 
+
+// TODO do we need DeliveryActionHandlers?
+//		try {
+//			for (DeliveryNote deliveryNote : deliveryData.getDelivery().getDeliveryNotes()) {
+//				for (DeliveryNoteActionHandler deliveryNoteActionHandler : deliveryNote.getDeliveryNoteLocal().getDeliveryNoteActionHandlers()) {
+//					deliveryNoteActionHandler.onDeliverEnd(user, deliveryData, deliveryNote);
+//				}
+//			}
+//		} catch (Exception x) {
+//			throw new DeliveryException(
+//					new DeliveryResult(
+//							getOrganisationID(),
+//							DeliveryResult.CODE_FAILED,
+//							"Calling DeliveryNoteActionHandler.onDeliverEnd failed!",
+//							x));
+//		}
+
+//		try {
+//			for (DeliveryNote deliveryNote : deliveryData.getDelivery().getDeliveryNotes()) {
+//				DeliveryNoteLocal deliveryNoteLocal = deliveryNote.getDeliveryNoteLocal();
+//				for (Article article : deliveryNote.getArticles()) {
+//					article.getArticleLocal().isDelivered()
+//				}
+//				
+//				
+//				if (!deliveryNoteLocal.isOutstanding()) {
+//					JbpmContext jbpmContext = JbpmLookup.getJbpmConfiguration().createJbpmContext();
+//					try {
+//						ProcessInstance processInstance = jbpmContext.getProcessInstanceForUpdate(deliveryNoteLocal.getJbpmProcessInstanceId());
+//						if (!JbpmConstantsDeliveryNote.Both.NODE_NAME_DELIVERED.equals(processInstance.getRootToken().getNode().getName())) {
+//							processInstance.signal(JbpmConstantsDeliveryNote.Both.TRANSITION_NAME_DELIVER);
+//						}
+//					} finally {
+//						jbpmContext.close();
+//					}
+//				}
+//			}
+//		} catch (Exception x) {
+//			throw new DeliveryException(
+//					new DeliveryResult(
+//							getOrganisationID(),
+//							DeliveryResult.CODE_FAILED,
+//							"Signalling transition \"" + JbpmConstantsDeliveryNote.Both.TRANSITION_NAME_DELIVER + "\" failed!",
+//							x));
+//		}
+
 		return serverDeliveryResult;
 	}
 

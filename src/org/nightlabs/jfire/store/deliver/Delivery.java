@@ -754,14 +754,25 @@ implements Serializable, StoreCallback
 //	 */
 //	private Collection products = null;
 
+//	/**
+//	 * @jdo.field
+//	 *		persistence-modifier="persistent"
+//	 *		collection-type="collection"
+//	 *		element-type="org.nightlabs.jfire.trade.ArticleLocal"
+//	 *		mapped-by="delivery"
+//	 */	
+//	private Collection<ArticleLocal> articleLocals = null;
+
 	/**
 	 * @jdo.field
 	 *		persistence-modifier="persistent"
 	 *		collection-type="collection"
-	 *		element-type="org.nightlabs.jfire.trade.ArticleLocal"
-	 *		mapped-by="delivery"
+	 *		element-type="org.nightlabs.jfire.trade.Article"
+	 *		table="JFireTrade_Delivery_articles"
+	 *
+	 * @jdo.join
 	 */	
-	private Collection<ArticleLocal> articleLocals = null;
+	private Set<Article> articles = null;
 
 	/**
 	 * @jdo.field
@@ -812,10 +823,10 @@ implements Serializable, StoreCallback
 	 */
 	private Collection<ArticleID> articleIDs = null;
 
-	/**
-	 * @jdo.field persistence-modifier="transactional"
-	 */
-	private transient Collection<Article> _articles = null;
+//	/**
+//	 * @jdo.field persistence-modifier="transactional"
+//	 */
+//	private transient Collection<Article> _articles = null;
 
 //	/**
 //	 * @jdo.field persistence-modifier="transactional"
@@ -918,29 +929,34 @@ implements Serializable, StoreCallback
 		return articleIDs;
 	}
 
-	/**
-	 * @return Returns instances of {@link ArticleLocal}.
-	 */
-	public Collection getArticleLocals()
+//	/**
+//	 * @return Returns instances of {@link ArticleLocal}.
+//	 */
+//	public Collection getArticleLocals()
+//	{
+//		return articleLocals;
+//	}
+
+	public Set<Article> getArticles()
 	{
-		return articleLocals;
+		return articles;
 	}
 
-	/**
-	 * @return Returns instances of {@link org.nightlabs.jfire.trade.Article}.
-	 */
-	public Collection<Article> getArticles()
-	{
-		if (_articles == null) {
-			Set res = new HashSet();
-			for (Iterator it = articleLocals.iterator(); it.hasNext();) {
-				ArticleLocal articleLocal = (ArticleLocal) it.next();
-				res.add(articleLocal.getArticle());
-			}
-			_articles = res;
-		}
-		return _articles;
-	}
+//	/**
+//	 * @return Returns instances of {@link org.nightlabs.jfire.trade.Article}.
+//	 */
+//	public Collection<Article> getArticles()
+//	{
+//		if (_articles == null) {
+//			Set res = new HashSet();
+//			for (Iterator it = articleLocals.iterator(); it.hasNext();) {
+//				ArticleLocal articleLocal = (ArticleLocal) it.next();
+//				res.add(articleLocal.getArticle());
+//			}
+//			_articles = res;
+//		}
+//		return _articles;
+//	}
 	/**
 	 * @param articleIDs Instances of {@link org.nightlabs.jfire.trade.id.ArticleID}
 	 */
@@ -949,7 +965,8 @@ implements Serializable, StoreCallback
 		if (articleIDs == null)
 			throw new IllegalArgumentException("articleIDs must not be null!");
 
-		if (articleLocals != null)
+//		if (articleLocals != null)
+		if (articles != null)
 			throw new IllegalStateException("Articles cannot be changed afterwards! They have already been set!");
 //			articles = null;
 
@@ -1358,11 +1375,15 @@ implements Serializable, StoreCallback
 //			currency = (Currency) pm.getObjectById(currencyID);
 
 		if (articleIDs != null) {
-			if (articleLocals == null || articleLocals.size() != articleIDs.size()) {
-				if (articleLocals == null)
-					articleLocals = new HashSet();
+//			if (articleLocals == null || articleLocals.size() != articleIDs.size()) {
+			if (articles == null || articles.size() != articleIDs.size()) {
+//				if (articleLocals == null)
+//					articleLocals = new HashSet();
+				if (articles == null)
+					articles = new HashSet();
 
-				articleLocals.clear();
+//				articleLocals.clear();
+				articles.clear();
 
 				for (Iterator it = articleIDs.iterator(); it.hasNext(); ) {
 					ArticleID articleID = (ArticleID) it.next();
@@ -1372,8 +1393,10 @@ implements Serializable, StoreCallback
 					if (articleLocal.isDelivered() && !getPrimaryKey().equals(articleLocal.getDelivery().getPrimaryKey()))
 						throw new IllegalStateException("The Article \""+article.getPrimaryKey()+"\" has already been delivered by another delivery!");
 
-					articleLocal.setDelivery(this);
-					articleLocals.add(articleLocal);
+//					articleLocal.setDelivery(this); // this must be done when booking the transfer - not now
+
+					articles.add(article);
+//					articleLocals.add(articleLocal);
 				}
 			}
 		}
@@ -1399,9 +1422,18 @@ implements Serializable, StoreCallback
 				deliveryNotes = new HashSet();
 	
 			deliveryNotes.clear();
-			for (Iterator it = articleLocals.iterator(); it.hasNext(); ) {
-				ArticleLocal articleLocal = (ArticleLocal) it.next();
-				DeliveryNote deliveryNote = articleLocal.getArticle().getDeliveryNote();
+//			for (Iterator it = articleLocals.iterator(); it.hasNext(); ) {
+//				ArticleLocal articleLocal = (ArticleLocal) it.next();
+//				DeliveryNote deliveryNote = articleLocal.getArticle().getDeliveryNote();
+//				DeliveryNoteID deliveryNoteID = (DeliveryNoteID) JDOHelper.getObjectId(deliveryNote);
+//				if (!dnIDs.contains(deliveryNoteID)) {
+//					deliveryNotes.add(deliveryNote);
+//					dnIDs.add(deliveryNoteID);
+//				}
+//			}
+			for (Iterator it = articles.iterator(); it.hasNext(); ) {
+				Article article = (Article) it.next();
+				DeliveryNote deliveryNote = article.getDeliveryNote();
 				DeliveryNoteID deliveryNoteID = (DeliveryNoteID) JDOHelper.getObjectId(deliveryNote);
 				if (!dnIDs.contains(deliveryNoteID)) {
 					deliveryNotes.add(deliveryNote);

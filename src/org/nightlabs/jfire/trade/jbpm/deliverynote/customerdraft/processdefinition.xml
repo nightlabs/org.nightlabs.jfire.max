@@ -4,11 +4,11 @@
   xmlns=""  name="devil.NightLabs.org:DeliveryNote.Customer">
    <start-state name="devil.NightLabs.org:sent">
       <transition name="createReceptionNote" to="devil.NightLabs.org:createdReceptionNote"></transition>
-      <transition name="devil.NightLabs.org:deliver" to="devil.NightLabs.org:delivered"></transition>
+      <transition name="book" to="devil.NightLabs.org:booked"></transition>
    </start-state>
    <end-state name="devil.NightLabs.org:createdReceptionNote"></end-state>
-   <end-state name="devil.NightLabs.org:booked"></end-state>
-   <state name="devil.NightLabs.org:delivered">
-      <transition name="devil.NightLabs.org:book" to="devil.NightLabs.org:booked"></transition>
+   <end-state name="devil.NightLabs.org:delivered"></end-state>
+   <state name="devil.NightLabs.org:booked">
+      <transition name="devil.NightLabs.org:deliver" to="devil.NightLabs.org:delivered"></transition>
    </state>
 </process-definition>

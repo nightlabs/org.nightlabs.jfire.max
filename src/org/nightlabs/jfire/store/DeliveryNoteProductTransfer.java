@@ -27,6 +27,7 @@
 package org.nightlabs.jfire.store;
 
 import java.util.Collection;
+import java.util.Map;
 
 import org.nightlabs.jfire.security.User;
 import org.nightlabs.jfire.transfer.Anchor;
@@ -114,5 +115,37 @@ public class DeliveryNoteProductTransfer extends ProductTransfer
 	public String getBookType()
 	{
 		return bookType;
+	}
+
+
+	/*
+	 * @see org.nightlabs.jfire.transfer.Transfer#bookTransfer(org.nightlabs.jfire.security.User, java.util.Map)
+	 */
+	@Override
+	public void bookTransfer(User user, Map<String, Anchor> involvedAnchors)
+	{
+		bookTransferAtDeliveryNote(user, involvedAnchors);
+		super.bookTransfer(user, involvedAnchors);
+	}
+
+	protected void bookTransferAtDeliveryNote(User user, Map involvedAnchors)
+	{
+		deliveryNote.bookDeliveryNoteProductTransfer(this, false);
+	}
+
+
+	/*
+	 * @see org.nightlabs.jfire.transfer.Transfer#rollbackTransfer(org.nightlabs.jfire.security.User, java.util.Map)
+	 */
+	@Override
+	public void rollbackTransfer(User user, Map<String, Anchor> involvedAnchors)
+	{
+		rollbackTransferAtDeliveryNote(user, involvedAnchors);
+		super.rollbackTransfer(user, involvedAnchors);
+	}
+
+	protected void rollbackTransferAtDeliveryNote(User user, Map involvedAnchors)
+	{
+		deliveryNote.bookDeliveryNoteProductTransfer(this, true);
 	}
 }

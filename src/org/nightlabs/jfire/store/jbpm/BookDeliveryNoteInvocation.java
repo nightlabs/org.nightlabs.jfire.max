@@ -46,7 +46,7 @@ extends Invocation
 				pm.getExtent(DeliveryNoteLocal.class);
 				DeliveryNoteLocal deliveryNoteLocal = (DeliveryNoteLocal) pm.getObjectById(DeliveryNoteLocalID.create(deliveryNoteID));
 				ProcessInstance processInstance = jbpmContext.getProcessInstance(deliveryNoteLocal.getJbpmProcessInstanceId());
-				processInstance.signal(JbpmConstantsDeliveryNote.Vendor.TRANSITION_NAME_BOOK);
+				processInstance.signal(JbpmConstantsDeliveryNote.Both.TRANSITION_NAME_BOOK);
 			} finally {
 				jbpmContext.close();
 			}

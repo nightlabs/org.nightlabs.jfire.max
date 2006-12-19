@@ -91,10 +91,15 @@ implements Serializable, StatableLocal
 	 */
 	private DeliveryNote deliveryNote;
 
+//	/**
+//	 * @jdo.field persistence-modifier="persistent"	 
+//	 */
+//	private boolean delivered = false;
+
 	/**
 	 * @jdo.field persistence-modifier="persistent"	 
 	 */
-	private boolean delivered = false;
+	private int deliveredArticleCount = 0;
 
 	/**
 	 * This member stores the user who booked this DeliveryNote.
@@ -182,12 +187,12 @@ implements Serializable, StatableLocal
 		return bookDT != null;
 	}
 
-	public boolean isDelivered() {
-		return delivered;
-	}
-	public void setDelivered(boolean delivered) {
-		this.delivered = delivered;
-	}
+//	public boolean isDelivered() {
+//		return delivered;
+//	}
+//	public void setDelivered(boolean delivered) {
+//		this.delivered = delivered;
+//	}
 
 
 	/**
@@ -237,4 +242,41 @@ implements Serializable, StatableLocal
 		this.jbpmProcessInstanceId = jbpmProcessInstanceId;
 	}
 
+	public int getDeliveredArticleCount()
+	{
+		return deliveredArticleCount;
+	}
+
+	/**
+	 * This method is called by {@link DeliveryNote#bookDeliveryNoteProductTransfer(DeliveryNoteProductTransfer, boolean)}.
+	 *
+	 * @return the new value after incrementing it
+	 */
+	protected int incDeliveredArticleCount(int count)
+	{
+		if (count < 0)
+			return decDeliveredArticleCount(-count);
+
+		int newDeliveredArticleCount = deliveredArticleCount + count;
+
+		if (newDeliveredArticleCount > deliveryNote.getArticleCount())
+			throw new IllegalArgumentException("deliveredArticleCount + count > deliveryNote.getArticleCount() !!!");
+
+		deliveredArticleCount = newDeliveredArticleCount;
+		return deliveredArticleCount;
+	}
+
+	/**
+	 * This method is called by {@link DeliveryNote#bookDeliveryNoteProductTransfer(DeliveryNoteProductTransfer, boolean)}.
+	 *
+	 * @return the new value after decrementing it
+	 */
+	protected int decDeliveredArticleCount(int count)
+	{
+		if (count > deliveredArticleCount)
+			throw new IllegalArgumentException("count > deliveredArticleCount !!!");
+
+		deliveredArticleCount -= count;
+		return deliveredArticleCount;
+	}
 }

@@ -33,6 +33,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
+import org.jbpm.JbpmContext;
 import org.nightlabs.jfire.jbpm.graph.def.ActionHandlerNodeEnter;
 import org.nightlabs.jfire.jbpm.graph.def.Statable;
 import org.nightlabs.jfire.jbpm.graph.def.StatableLocal;
@@ -200,8 +201,9 @@ implements Serializable, StatableLocal
 	}
 	public void setOutstanding(boolean outstanding)
 	{
-		if (this.outstanding != outstanding)
+		if (this.outstanding != outstanding) {
 			this.outstanding = outstanding;
+		}
 	}
 
 	protected void setBooked(User bookUser) {

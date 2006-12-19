@@ -7,19 +7,24 @@
     </transition>
   </node>
   <node name="devil.NightLabs.org:finalized" x="3" y="105" width="210" height="40">
-    <transition name="devil.NightLabs.org:deliver">
-      <label x="5" y="-10"/>
-    </transition>
-  </node>
-  <node name="devil.NightLabs.org:booked" x="4" y="312" width="210" height="40">
-    <transition name="devil.NightLabs.org:send">
-      <label x="5" y="-10"/>
-    </transition>
-  </node>
-  <node name="devil.NightLabs.org:sent" x="14" y="447" width="191" height="40"/>
-  <node name="devil.NightLabs.org:delivered" x="2" y="212" width="213" height="40">
     <transition name="devil.NightLabs.org:book">
       <label x="5" y="-10"/>
     </transition>
   </node>
+  <node name="devil.NightLabs.org:booked" x="4" y="206" width="210" height="40">
+    <transition name="devil.NightLabs.org:send">
+      <label x="5" y="-10"/>
+      <bendpoint w1="162" h1="-28" w2="-148" h2="-29"/>
+    </transition>
+    <transition name="devil.NightLabs.org:deliver">
+      <label x="3" y="-11"/>
+    </transition>
+  </node>
+  <node name="devil.NightLabs.org:sent" x="326" y="207" width="187" height="40">
+    <transition name="">
+      <label x="5" y="-10"/>
+      <bendpoint w1="-144" h1="24" w2="166" h2="25"/>
+    </transition>
+  </node>
+  <node name="devil.NightLabs.org:delivered" x="3" y="321" width="214" height="40"/>
 </process-diagram>

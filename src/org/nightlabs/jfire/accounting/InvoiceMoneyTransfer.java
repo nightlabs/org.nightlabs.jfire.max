@@ -137,7 +137,7 @@ extends MoneyTransfer
 		return bookType;
 	}
 
-	/**
+	/*
 	 * @see org.nightlabs.jfire.transfer.Transfer#bookTransfer(org.nightlabs.jfire.security.User, java.util.Map)
 	 */
 	@Override
@@ -149,12 +149,11 @@ extends MoneyTransfer
 
 	protected void bookTransferAtInvoice(User user, Map involvedAnchors)
 	{
-		if (BOOK_TYPE_PAY.equals(bookType))
-			invoice.bookPayInvoiceMoneyTransfer(this, false);
+		invoice.bookInvoiceMoneyTransfer(this, false);
 	}
 
 
-	/**
+	/*
 	 * @see org.nightlabs.jfire.transfer.Transfer#rollbackTransfer(org.nightlabs.jfire.security.User, java.util.Map)
 	 */
 	@Override
@@ -166,7 +165,6 @@ extends MoneyTransfer
 
 	protected void rollbackTransferAtInvoice(User user, Map involvedAnchors)
 	{
-		if (BOOK_TYPE_PAY.equals(bookType))
-			invoice.bookPayInvoiceMoneyTransfer(this, true);
+		invoice.bookInvoiceMoneyTransfer(this, true);
 	}
 }

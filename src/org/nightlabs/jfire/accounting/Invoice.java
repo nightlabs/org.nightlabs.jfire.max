@@ -529,8 +529,11 @@ implements Serializable, ArticleContainer, Statable, DetachCallback
 	 * @param rollback If the payment has failed, this method is called again to
 	 *		readjust the amountPaid (rollback the InvoiceMoneyTransfer)
 	 */
-	public void bookPayInvoiceMoneyTransfer(InvoiceMoneyTransfer transfer, boolean rollback)
+	public void bookInvoiceMoneyTransfer(InvoiceMoneyTransfer transfer, boolean rollback)
 	{
+		if (!InvoiceMoneyTransfer.BOOK_TYPE_PAY.equals(transfer.getBookType()))
+			return;
+
 		boolean vendorIsFrom = transfer.getAnchorType(vendor) == Transfer.ANCHORTYPE_FROM;
 		boolean vendorIsTo = transfer.getAnchorType(vendor) == Transfer.ANCHORTYPE_TO;
 		boolean customerIsFrom = transfer.getAnchorType(customer) == Transfer.ANCHORTYPE_FROM;

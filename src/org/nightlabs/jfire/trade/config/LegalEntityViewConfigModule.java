@@ -53,14 +53,10 @@ public class LegalEntityViewConfigModule extends ConfigModule {
 	/**
 	 * 
 	 */
-	protected LegalEntityViewConfigModule() {
+	public LegalEntityViewConfigModule() {
 		super();
 	}
 
-//	public LegalEntityViewConfigModule(String organisationID, Config config, String cfModID) {
-//		super(organisationID, config, cfModID);
-//	}
-	
 	/**
 	 * @jdo.field
 	 *		persistence-modifier="persistent"

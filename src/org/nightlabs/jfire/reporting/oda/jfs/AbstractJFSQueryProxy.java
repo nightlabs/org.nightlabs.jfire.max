@@ -5,6 +5,7 @@ package org.nightlabs.jfire.reporting.oda.jfs;
 
 import org.eclipse.datatools.connectivity.oda.IParameterMetaData;
 import org.eclipse.datatools.connectivity.oda.OdaException;
+import org.nightlabs.jdo.ObjectID;
 import org.nightlabs.jdo.ObjectIDUtil;
 import org.nightlabs.jfire.reporting.oda.Query;
 import org.nightlabs.jfire.scripting.Script;
@@ -35,9 +36,6 @@ public abstract class AbstractJFSQueryProxy extends Query implements IJFSQueryPr
 	@Override
 	public IParameterMetaData getParameterMetaData() throws OdaException {
 		// TODO: Implement getParameterMetaData for JFS Scripts (Possible with ParameterSet)
-		System.out.println("**************************************************");
-		System.out.println("*********** getParameterMetaData() called ********");
-		System.out.println("**************************************************");
 		return super.getParameterMetaData();
 	}
 	
@@ -50,7 +48,7 @@ public abstract class AbstractJFSQueryProxy extends Query implements IJFSQueryPr
 	public void prepare(String query) throws OdaException {
 		if (!query.startsWith("jdo/"))
 			throw new IllegalArgumentException("Queries for JFS DataSets have to refer to a JFire ScriptRegistryItemID, but instead "+query+" was passed.");
-		Object idObject = ObjectIDUtil.createObjectID(query);
+		ObjectID idObject = ObjectIDUtil.createObjectID(query);
 		if (!(idObject instanceof ScriptRegistryItemID))
 			throw new IllegalArgumentException("The query string of this JFS DataSet does refer to a JDO object but not to an ScriptRegistryItem. The query was "+query);
 		scriptRegistryItemID = (ScriptRegistryItemID)idObject;

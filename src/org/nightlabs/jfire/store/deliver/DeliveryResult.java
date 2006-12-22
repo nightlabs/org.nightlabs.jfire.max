@@ -29,6 +29,7 @@ package org.nightlabs.jfire.store.deliver;
 import java.io.Serializable;
 
 import org.nightlabs.math.Base62Coder;
+import org.nightlabs.util.Utils;
 
 /**
  * @author Marco Schulze - marco at nightlabs dot de
@@ -215,16 +216,6 @@ implements Serializable
 	 */
 	private String text = null;
 
-// NOT NECESSARY: This is usually instantiated by the delivery processors. Hence,
-// the implementation might add persistent or non-persistent data by subclassing.
-//	/**
-//	 * This allows the Client/Server-DeliveryProcessors to pass specific additional
-//	 * information which will not be stored in the database.
-//	 *
-//	 * @jdo.field persistence-modifier="none"
-//	 */
-//	private Object nonPersistentObject = null;
-
 	/**
 	 * This may be non-<tt>null</tt> if an exception occured. The exception will NOT be stored
 	 * in the database.
@@ -232,6 +223,12 @@ implements Serializable
 	 * @jdo.field persistence-modifier="none"
 	 */
 	private Throwable error = null;
+
+	/**
+	 * @jdo.field persistence-modifier="persistent"
+	 * @jdo.column jdbc-type="LONGVARCHAR"
+	 */
+	private String errorStackTrace = null;
 
 	/**
 	 * This is a non-persistent field which can be used by a pair of delivery-processors
@@ -327,18 +324,26 @@ implements Serializable
 	}
 
 	/**
-	 * @return Returns the error.
+	 * @return Returns the error. Note, that this field is not stored to the database!
+	 * @see #getErrorStackTrace()
 	 */
 	public Throwable getError()
 	{
 		return error;
 	}
+
+	public String getErrorStackTrace()
+	{
+		return errorStackTrace;
+	}
+
 	/**
 	 * @param error The error to set.
 	 */
 	public void setError(Throwable error)
 	{
 		this.error = error;
+		this.errorStackTrace = error == null ? null : Utils.getStackTraceAsString(error);
 	}
 	/**
 	 * @return Returns the text.

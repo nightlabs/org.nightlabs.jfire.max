@@ -100,12 +100,12 @@ public class DataCreator
 		return rootSimpleProductType;
 	}
 
-	public DataCreator(User user)
+	public DataCreator(PersistenceManager pm, User user)
 	{
+		this.pm = pm;
 		this.user = user;
 		this.organisationID = user.getOrganisationID();
-		this.pm = JDOHelper.getPersistenceManager(user);
-		
+
 		pm.getExtent(SimpleProductType.class);
 		rootSimpleProductType = (SimpleProductType) pm.getObjectById(
 				ProductTypeID.create(organisationID, SimpleProductType.class.getName()));

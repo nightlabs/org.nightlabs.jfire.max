@@ -199,11 +199,11 @@ implements SessionBean
 					tariffGoldCard = (Tariff) pm.makePersistent(new Tariff(organisationID, IDGenerator.nextID(Tariff.class)));
 					tariffGoldCard.getName().setText(languageID, "Gold Card");
 				}
-	
-				DataCreator dataCreator = new DataCreator(User.getUser(pm, getPrincipal()));
-	
+
+				DataCreator dataCreator = new DataCreator(pm, User.getUser(pm, getPrincipal()));
+
 				dataCreator.getRootSimpleProductType().getName().setText(languageID, "Chez Francois Wine Store");
-	
+
 				// create ProductTypes: wine (bottle)
 				SimpleProductType wine = dataCreator.createCategory(null, "wine", 
 						"Wine", "Wein", "Vin");

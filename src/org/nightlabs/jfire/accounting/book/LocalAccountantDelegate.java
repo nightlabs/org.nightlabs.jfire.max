@@ -411,7 +411,8 @@ public abstract class LocalAccountantDelegate implements Serializable {
 	 * @return A map with key {@link ResolvedMapKey} and value {@link ResolvedMapEntry}
 	 */
 	public Map<ResolvedMapKey, ResolvedMapEntry> resolveProductTypeMappings(Invoice invoice) {
-		Map<ResolvedMapKey, ResolvedMapEntry> result = new HashMap<ResolvedMapKey, ResolvedMapEntry>();
+//		Map<ResolvedMapKey, ResolvedMapEntry> result = new HashMap<ResolvedMapKey, ResolvedMapEntry>();
+		Map result = new HashMap();
 		for (Iterator iter = invoice.getArticles().iterator(); iter.hasNext();) {
 			Article article = (Article) iter.next();
 			ArticlePriceTypeProvider provider = new ArticlePriceTypeProvider(getPackageType(article.getPrice()), article.getPrice());
@@ -455,7 +456,8 @@ public abstract class LocalAccountantDelegate implements Serializable {
 	 * @return A map with key {@link ResolvedMapKey} and value {@link ResolvedMapEntry}
 	 */
 	public Map resolveProductTypeMappings(ProductType productType) {
-		Map<ResolvedMapKey, ResolvedMapEntry> result = new HashMap<ResolvedMapKey, ResolvedMapEntry>();
+//		Map<ResolvedMapKey, ResolvedMapEntry> result = new HashMap<ResolvedMapKey, ResolvedMapEntry>();
+		Map result = new HashMap();
 		resolveProductTypeMappings(productType, result, 0);
 		return result;
 	}
@@ -528,7 +530,8 @@ public abstract class LocalAccountantDelegate implements Serializable {
 	 * can overwrite each other concerning delegate- and productType-hierarcy.
 	 */
 	protected ResolvedMapEntry addProductTypeMappings(ProductType productType, String packageType, int delegationLevel) {
-		LinkedList<LocalAccountantDelegate> delegateHierarchy = new LinkedList<LocalAccountantDelegate>();
+//		LinkedList<LocalAccountantDelegate> delegateHierarchy = new LinkedList<LocalAccountantDelegate>();
+		LinkedList delegateHierarchy = new LinkedList();
 		LocalAccountantDelegate delegateRun = this;
 		while (delegateRun != null) {
 			delegateHierarchy.add(delegateRun);

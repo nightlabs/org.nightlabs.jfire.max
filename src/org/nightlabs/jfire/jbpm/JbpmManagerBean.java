@@ -15,7 +15,6 @@ import javax.ejb.CreateException;
 import javax.ejb.EJBException;
 import javax.ejb.SessionBean;
 import javax.ejb.SessionContext;
-import javax.jdo.FetchPlan;
 import javax.jdo.PersistenceManager;
 import javax.jdo.Query;
 
@@ -95,7 +94,7 @@ implements SessionBean
 	 * @ejb.transaction type="Required"
 	 * @ejb.permission role-name="_System_"
 	 */
-	public void initialize()
+	public void initialise()
 	throws Exception
 	{
 		PersistenceManager pm = getPersistenceManager();

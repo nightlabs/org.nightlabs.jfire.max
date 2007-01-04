@@ -118,7 +118,7 @@ implements SessionBean
 	public void ejbRemove() throws EJBException, RemoteException { }
 	
 	/**
-	 * This method is called by the datastore initialization mechanism.
+	 * This method is called by the datastore initialisation mechanism.
 	 * It creates the root simple product for the organisation itself.
 	 * Simple products of other organisations must be imported.
 	 * 
@@ -128,7 +128,7 @@ implements SessionBean
 	 * @ejb.permission role-name="_System_"
 	 * @ejb.transaction type = "Required"
 	 */
-	public void initialize() 
+	public void initialise() 
 	throws ModuleException 
 	{
 		PersistenceManager pm = this.getPersistenceManager();

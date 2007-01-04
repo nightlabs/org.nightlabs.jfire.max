@@ -101,7 +101,7 @@ implements SessionBean
 	
 	
 	/**
-	 * This method is called by the datastore initialization mechanism.
+	 * This method is called by the datastore initialisation mechanism.
 	 * 
 	 * @throws ModuleException
 	 *
@@ -109,7 +109,7 @@ implements SessionBean
 	 * @ejb.permission role-name="_System_"
 	 * @ejb.transaction type="Required"
 	 */
-	public void initialize() 
+	public void initialise() 
 	throws ModuleException 
 	{
 		PersistenceManager pm;

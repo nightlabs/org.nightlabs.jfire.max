@@ -1016,7 +1016,7 @@ implements SessionBean
 	 * @ejb.transaction type = "Required"
 	 * @ejb.permission role-name="_System_"
 	 */
-	public void initialize()
+	public void initialise()
 	throws IOException, MalformedVersionException
 	{
 		PersistenceManager pm = getPersistenceManager();

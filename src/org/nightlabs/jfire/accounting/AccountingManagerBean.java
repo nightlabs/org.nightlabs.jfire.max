@@ -177,13 +177,13 @@ public abstract class AccountingManagerBean
 	}
 
 	/**
-	 * @throws IOException While loading an icon from a local resource, this might happen and we don't care in the initialize method.
+	 * @throws IOException While loading an icon from a local resource, this might happen and we don't care in the initialise method.
 	 *
 	 * @ejb.interface-method
 	 * @ejb.transaction type="Required"
 	 * @ejb.permission role-name="_System_"
 	 */
-	public void initialize()
+	public void initialise()
 	throws IOException
 	{
 		PersistenceManager pm = getPersistenceManager();

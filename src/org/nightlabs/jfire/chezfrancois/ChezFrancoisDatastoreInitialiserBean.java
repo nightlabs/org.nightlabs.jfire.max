@@ -116,7 +116,7 @@ implements SessionBean
 	 * @ejb.permission role-name="_Guest_"
 	 * @ejb.transaction type = "Required"
 	 */
-	public void initialize() 
+	public void initialise() 
 	throws ModuleException 
 	{
 		try {

@@ -1,16 +1,16 @@
-<!DOCTYPE datastore-initialization
-		PUBLIC "-//NightLabs GmbH//DTD Datastore Initialization 1.0//EN"
-		"http://www.nightlabs.de/dtd/datastoreinit_1_0.dtd">
-<datastore-initialization>
+<!DOCTYPE datastore-initialisation
+		PUBLIC "-//NightLabs GmbH//DTD Datastore Initialisation 1.2//EN"
+		"http://www.nightlabs.de/dtd/datastoreinit_1_2.dtd">
+<datastore-initialisation>
 
-	<init bean="jfire/ejb/JFireChezFrancois/ChezFrancoisDatastoreInitialiser" method="initialize">
+	<init bean="jfire/ejb/JFireChezFrancois/ChezFrancoisDatastoreInitialiser" method="initialise">
 
 		<depends
 					module="JFireSimpleTrade.ear"
 					archive="JFireSimpleTrade.jar"
 					bean="jfire/ejb/JFireSimpleTrade/SimpleTradeManager"
-					method="initialize" />
+					method="initialise" />
 
 	</init>
 
-</datastore-initialization>
+</datastore-initialisation>

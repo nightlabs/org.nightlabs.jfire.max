@@ -280,7 +280,23 @@ public class SQLResultSet implements IResultSet, Serializable {
 			throw new OdaException(e);
 		}
 	}
+	
+	public Object getObject(String columnName) throws OdaException {
+		try {
+			return resultSet.getObject(columnName);
+		} catch (Exception e) {
+			throw new OdaException(e);
+		}
+	}
 
+	public Object getObject(int columnIndex) throws OdaException {
+		try {
+			return resultSet.getObject(columnIndex);
+		} catch (Exception e) {
+			throw new OdaException(e);
+		}
+	}
+	
 	/* (non-Javadoc)
 	 * @see org.eclipse.datatools.connectivity.oda.IResultSet#next()
 	 */

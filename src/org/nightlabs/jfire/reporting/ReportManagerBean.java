@@ -345,7 +345,7 @@ implements SessionBean
 	 * @ejb.permission role-name="JFireReport-admin"
 	 * @ejb.transaction type = "Required"
 	 */
-	public void initialize() 
+	public void initialise() 
 	throws ModuleException 
 	{
 		// TODO: Better check if platform initialized. Propose on birt forum.

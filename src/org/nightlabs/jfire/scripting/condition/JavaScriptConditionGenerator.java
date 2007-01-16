@@ -94,30 +94,30 @@ extends ConstrainedConditionGenerator
 		return "(";
 	}
 
-	private List<String> compareOperatorStrings = null;
-	public List<String> getCompareOperators() {
-		if (compareOperatorStrings == null) {
-			CompareOperator[] compareOperators = CompareOperator.values();
-			compareOperatorStrings = new ArrayList<String>(compareOperators.length);
-			for (int i=0; i<compareOperators.length; i++) {
-				compareOperatorStrings.add(getCompareOperator(compareOperators[i]));
-			}			
-		}
-		return compareOperatorStrings;
-	}
+//	private List<String> compareOperatorStrings = null;
+//	public List<String> getCompareOperators() {
+//		if (compareOperatorStrings == null) {
+//			CompareOperator[] compareOperators = CompareOperator.values();
+//			compareOperatorStrings = new ArrayList<String>(compareOperators.length);
+//			for (int i=0; i<compareOperators.length; i++) {
+//				compareOperatorStrings.add(getCompareOperator(compareOperators[i]));
+//			}			
+//		}
+//		return compareOperatorStrings;
+//	}
 	
-	private List<String> combineOperatorStrings = null;
-	public List<String> getCombineOperators() 
-	{
-		if (combineOperatorStrings == null) {
-			CombineOperator[] combineOperators = CombineOperator.values();
-			combineOperatorStrings = new ArrayList<String>(combineOperators.length);
-			for (int i=0; i<combineOperators.length; i++) {
-				combineOperatorStrings.add(getCombineOperator(combineOperators[i]));
-			}			
-		}
-		return combineOperatorStrings;		
-	}
+//	private List<String> combineOperatorStrings = null;
+//	public List<String> getCombineOperators() 
+//	{
+//		if (combineOperatorStrings == null) {
+//			CombineOperator[] combineOperators = CombineOperator.values();
+//			combineOperatorStrings = new ArrayList<String>(combineOperators.length);
+//			for (int i=0; i<combineOperators.length; i++) {
+//				combineOperatorStrings.add(getCombineOperator(combineOperators[i]));
+//			}			
+//		}
+//		return combineOperatorStrings;		
+//	}
 
 	public CompareOperator getCompareOperator(String compareOperator) 
 	{		

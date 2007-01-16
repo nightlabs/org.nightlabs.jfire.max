@@ -98,40 +98,7 @@ public class ConstrainedConditionScriptParser
 	public Set<String> getSpecialCharacters() {
 		return specialCharacters;
 	}
-	
-//	public ICondition getCondition(ConstrainedConditionGenerator generator, String scriptText) 
-//	{
-//		if (scriptText == null)
-//			throw new IllegalArgumentException("param scriptText must NOT be null!");
-//
-//		System.out.println("originalScriptText = "+scriptText);
-//		
-//// convert sth. like the following line:
-////		importPackage(Packages.javax.jdo);
-////		importPackage(Packages.org.nightlabs.jdo);
-////		JDOHelper.getObjectId(myVariable) == ObjectIDUtil.createObjectID("jdo/org.b.MyClassID?fieldA=0")
-////
-//// to sth. like this:
-////		myVariable == jdo/org.b.MyClassID?fieldA=0
-//		
-//		StringBuffer sb = new StringBuffer();
-//		sb.append("importPackage\\(Packages.javax.jdo\\)\\;");
-//		sb.append("importPackage\\(Packages.org.nightlabs.jdo\\)\\;");
-//		sb.append("JDOHelper.getObjectId\\((.*?)\\)");
-//		String varRegEx = sb.toString();
-//		
-////		System.out.println("varRegEx = "+varRegEx);
-//
-//		scriptText = scriptText.replaceAll(varRegEx, "$1");
-//		scriptText = scriptText.replaceAll("ObjectIDUtil.createObjectID\\(\\\"(.*?)\\\"\\)", "$1");
-////		scriptText = scriptText.replaceAll("ObjectIDUtil.createObjectID\\(\"(.*?)\"\\)", "$1");
-////		scriptText = scriptText.replaceAll("ObjectIDUtil.createObjectID\\((.*?)\\)", "$1");
-//
-//		System.out.println("replacedScriptText = "+scriptText);
-//		
-//		return parseConditionContainer(scriptText, generator);
-//	}
-	
+		
 	public ICondition getCondition(ConstrainedConditionGenerator generator, String scriptText) 
 	{
 		if (scriptText == null)
@@ -188,6 +155,7 @@ public class ConstrainedConditionScriptParser
 				generator.getOpenContainerString(), 
 				generator.getCloseContainerString());
 		if (subContainer.size() == 0) {
+			// TODO: check if simpleCOndition is really simple or if not needed to divide again
 			return parseSimpleCondition(generator, text);
 		}
 		if (subContainer.size() == 1) 
@@ -214,15 +182,8 @@ public class ConstrainedConditionScriptParser
 			Pattern combinePattern = Pattern.compile(combineOperatorRegEx);
 			Matcher combinePatternMatcher = combinePattern.matcher(text);
 			if (combinePatternMatcher.find()) {
-//					while (combinePatternMatcher.find()) {
-//						int groupCount = combinePatternMatcher.groupCount();						
-//						System.out.println("groupCount = "+groupCount);
-				
-//				int start = combinePatternMatcher.regionStart();
-//				int end = combinePatternMatcher.regionEnd();
 				int start = combinePatternMatcher.start();
 				int end = combinePatternMatcher.end();
-
 				String combineOperator = text.substring(start, end);				
 				conditionContainer.setCombineOperator(generator.getCombineOperator(combineOperator));
 				return conditionContainer;										
@@ -351,20 +312,47 @@ public class ConstrainedConditionScriptParser
 		return regEx;
 	}
 		
+//	private String getCompareOperatorRegEx(ConstrainedConditionGenerator generator) 
+//	{
+//		StringBuffer sb = new StringBuffer();
+//		for (int i = 0; i < generator.getCompareOperators().size(); i++) 
+//		{
+//			String compareOperator = generator.getCompareOperators().get(i);
+//			String checkedCompareOperator = checkString(compareOperator);
+//			sb.append(checkedCompareOperator);
+//			if (i != generator.getCompareOperators().size()-1)
+//				sb.append("|");
+//		}
+//		return sb.toString();
+//	}
+
 	private String getCompareOperatorRegEx(ConstrainedConditionGenerator generator) 
 	{
 		StringBuffer sb = new StringBuffer();
-		for (int i = 0; i < generator.getCompareOperators().size(); i++) 
-		{
+		// get all compare operator Strings and concat them with |
+		for (int i = 0; i < generator.getCompareOperators().size(); i++) {
 			String compareOperator = generator.getCompareOperators().get(i);
-			String checkedCompareOperator = checkString(compareOperator);
-			sb.append(checkedCompareOperator);
-			if (i != generator.getCompareOperators().size()-1)
-				sb.append("|");
+			if (compareOperator != null) {
+				String checkedCompareOperator = checkString(compareOperator);
+				sb.append(checkedCompareOperator);
+				if (i != generator.getCompareOperators().size()-1)
+					sb.append("|");				
+			}
 		}
+		// replace duplicate | if some compareOperator Strings are null
+		while (sb.indexOf("||") != -1) {
+			String s = sb.toString();
+			s = s.replace("||", "|");
+			sb = new StringBuffer(s);
+		}
+		// cut off | at the end if some compareOperator Strings are null
+		while(sb.lastIndexOf("|") == sb.length()-1) {
+			sb = new StringBuffer(sb.subSequence(0, sb.length()-1));
+		}		
 		return sb.toString();
 	}
-
+	
+	
 	private String getCombineOperatorRegEx(ConstrainedConditionGenerator generator) 
 	{
 		StringBuffer sb = new StringBuffer();

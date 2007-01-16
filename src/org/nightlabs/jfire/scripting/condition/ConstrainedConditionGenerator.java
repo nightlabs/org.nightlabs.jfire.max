@@ -25,6 +25,7 @@
  ******************************************************************************/
 package org.nightlabs.jfire.scripting.condition;
 
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
@@ -233,17 +234,40 @@ implements IConditionGenerator
 	*/
 	public abstract String getCloseContainerString();
 	
-	/**
-	* 
-	* @return all {@link CompareOperator}s as List of Language dependend Strings
-	*/
-	public abstract List<String> getCompareOperators();
+//	/**
+//	* 
+//	* @return all {@link CompareOperator}s as List of Language dependend Strings
+//	*/
+//	public abstract List<String> getCompareOperators();
+	private List<String> compareOperatorStrings = null;
+	public List<String> getCompareOperators() {
+		if (compareOperatorStrings == null) {
+			CompareOperator[] compareOperators = CompareOperator.values();
+			compareOperatorStrings = new ArrayList<String>(compareOperators.length);
+			for (int i=0; i<compareOperators.length; i++) {
+				compareOperatorStrings.add(getCompareOperator(compareOperators[i]));
+			}			
+		}
+		return compareOperatorStrings;
+	}	
 	
-	/**
-	* 
-	* @return all {@link CombineOperator}s as List of Language dependend Strings
-	*/
-	public abstract List<String> getCombineOperators();
+//	/**
+//	* 
+//	* @return all {@link CombineOperator}s as List of Language dependend Strings
+//	*/
+//	public abstract List<String> getCombineOperators();
+	private List<String> combineOperatorStrings = null;
+	public List<String> getCombineOperators() 
+	{
+		if (combineOperatorStrings == null) {
+			CombineOperator[] combineOperators = CombineOperator.values();
+			combineOperatorStrings = new ArrayList<String>(combineOperators.length);
+			for (int i=0; i<combineOperators.length; i++) {
+				combineOperatorStrings.add(getCombineOperator(combineOperators[i]));
+			}			
+		}
+		return combineOperatorStrings;		
+	}
 	
 	/**
 	* 

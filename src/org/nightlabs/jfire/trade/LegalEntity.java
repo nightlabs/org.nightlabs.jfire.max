@@ -45,7 +45,7 @@ import org.nightlabs.jfire.person.PersonStruct;
 import org.nightlabs.jfire.prop.IStruct;
 import org.nightlabs.jfire.prop.Property;
 import org.nightlabs.jfire.prop.Struct;
-import org.nightlabs.jfire.prop.TextDataField;
+import org.nightlabs.jfire.prop.datafield.TextDataField;
 import org.nightlabs.jfire.security.User;
 import org.nightlabs.jfire.store.Product;
 import org.nightlabs.jfire.store.ProductReference;

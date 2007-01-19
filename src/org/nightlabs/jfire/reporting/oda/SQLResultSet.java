@@ -21,11 +21,11 @@ import org.eclipse.datatools.connectivity.oda.IResultSetMetaData;
 import org.eclipse.datatools.connectivity.oda.OdaException;
 
 /**
- * An implementation of {@link IResultMetaData} that uses a 
- * sql {@link ResultSet} to provide Data.
+ * An implementation of {@link IResultMetaData} that uses 
+ * a list of sql {@link ResultSet} to provide Data.
  * <p>
- * It imposes only one constraint on the ResultSet used:
- * It has to be {@link Serializable}.
+ * It imposes only one constraint on the ResultSets used:
+ * They need to be {@link Serializable}.
  *   
  * @author Alexander Bieber <!-- alex [AT] nightlabs [DOT] de -->
  */
@@ -36,7 +36,6 @@ public class SQLResultSet implements IResultSet, Serializable {
 	private ResultSet resultSet;
 //	private int currentResultSetIdx = 0;
 	private List<ResultSet> resultSets = new ArrayList<ResultSet>(1);
-	
 	
 	/**
 	 * 
@@ -351,7 +350,39 @@ public class SQLResultSet implements IResultSet, Serializable {
 			throw new OdaException(e);
 		}
 	}
+	
+	/**
+	 * Returns the currently active resultSet
+	 * in the list of resultSets managed by this one.
+	 * 
+	 * @return The currently active resultSet.
+	 */
+	public ResultSet getActiveResultSet() {
+		return resultSet;
+	}
 
+	/**
+	 * Initializes the this resultSet so it can
+	 * be iterated from the beginning.
+	 * <p>
+	 * This method will make the first resultSet
+	 * in the list the active one and will set
+	 * all contained sets to beforeFirst();
+	 *  
+	 * @throws SQLException
+	 */
+	public void init() throws SQLException {
+		if (resultSets.size() <= 0)
+			resultSet = null;
+		else {
+			resultSet = resultSets.get(0);
+			resultSet.beforeFirst();
+			for (int i = 1; i < resultSets.size(); i++) {
+				resultSets.get(i).beforeFirst();
+			}
+		}
+	}
+	
 	/**
 	 * Creates an Implementation of {@link IResultSetMetaData} based
 	 * on the meta data of the given SQL resultSet.

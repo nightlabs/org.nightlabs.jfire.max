@@ -40,7 +40,6 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 
-import javax.jdo.FetchPlan;
 import javax.jdo.JDOObjectNotFoundException;
 import javax.jdo.PersistenceManager;
 import javax.xml.transform.TransformerException;
@@ -245,14 +244,19 @@ public class ScriptingInitializer
 	private ScriptParameterSet createParameterSet(
 			PersistenceManager pm,
 			String organisationID,
-			ScriptParameterSet parameterSet, 
+			ScriptRegistryItem registryItem,
 			Node parentNode
 		) 
 	throws TransformerException 
 	{
 		Node setNode = NLDOMUtil.findSingleNode(parentNode, "parameter-set");
+		ScriptParameterSet parameterSet = registryItem.getParameterSet();
 		if (setNode == null)
 			return parameterSet;
+		ScriptCategory parent = registryItem.getParent();
+		if (parent != null && parent.getParameterSet() != null && parent.getParameterSet().equals(parameterSet))
+			parameterSet = null;
+		
 		if (parameterSet == null) {
 			ScriptRegistry registry = ScriptRegistry.getScriptRegistry(pm);
 			parameterSet = new ScriptParameterSet(organisationID, IDGenerator.nextID(ScriptParameterSet.class));
@@ -347,7 +351,7 @@ public class ScriptingInitializer
 			if (catDocument != null) {
 				catNode = NLDOMUtil.findSingleNode(catDocument, "script-category");
 				if (catNode != null) {
-					ScriptParameterSet parameterSet = createParameterSet(pm, organisationID, (ScriptParameterSet)category.getParameterSet(), catNode);
+					ScriptParameterSet parameterSet = createParameterSet(pm, organisationID, category, catNode);
 					if (parameterSet != null)
 						category.setParameterSet(parameterSet);
 				}
@@ -440,7 +444,7 @@ public class ScriptingInitializer
 					
 					// script name and parameters
 					if (scriptNode != null) {
-						ScriptParameterSet parameterSet = createParameterSet(pm, organisationID, (ScriptParameterSet)script.getParameterSet(), scriptNode);						
+						ScriptParameterSet parameterSet = createParameterSet(pm, organisationID, script, scriptNode);						
 						if (parameterSet != null)
 							script.setParameterSet(parameterSet);
 					}

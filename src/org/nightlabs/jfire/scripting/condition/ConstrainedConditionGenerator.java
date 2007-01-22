@@ -31,10 +31,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import javax.jdo.JDOHelper;
-import javax.jdo.spi.PersistenceCapable;
-
-import org.nightlabs.jdo.ObjectID;
 import org.nightlabs.jfire.scripting.id.ScriptRegistryItemID;
 
 /**
@@ -56,33 +52,60 @@ implements IConditionGenerator
 
 	private Collection<ScriptConditioner> scriptConditioners;
 	private Map<ScriptRegistryItemID, String> scriptID2Name;	
+	protected Map<ScriptRegistryItemID, String> getScriptID2Name() {
+		return scriptID2Name;
+	}
 	private ConstrainedConditionScriptParser parser;
 	
 	public Collection<ScriptConditioner> getScriptConditioner() {
 		return scriptConditioners;
 	}
-	public void setScriptConditioner(Collection<ScriptConditioner> scriptConditioner) {
+	public void setScriptConditioner(Collection<ScriptConditioner> scriptConditioner) 
+	{
 		this.scriptConditioners = scriptConditioner;
 		int size = scriptConditioners.size();
 		scriptID2Name = new HashMap<ScriptRegistryItemID, String>(size);
 		for (ScriptConditioner conditioner : scriptConditioners) {
 			scriptID2Name.put(conditioner.getScriptRegistryItemID(), conditioner.getVariableName());
 		}
+		parser = null;
+	}
+	
+	private Map<ScriptRegistryItemID, ValueStringConverter> scriptID2ValueStringConverter = null;
+	public void setValueStringConverter(Map<ScriptRegistryItemID, ValueStringConverter> scriptID2ValueStringConverter) {
+		this.scriptID2ValueStringConverter = scriptID2ValueStringConverter;
+		parser = null;
 	}
 	
 	public ICondition getCondition(String text) 
 	{
 		if (parser == null) {
-			parser = new ConstrainedConditionScriptParser(scriptConditioners);  
+//			parser = new ConstrainedConditionScriptParser(scriptConditioners);  
+			parser = new ConstrainedConditionScriptParser(scriptConditioners, scriptID2ValueStringConverter);			
 		}		
 		return parser.getCondition(this, text);
 	}
 	
+	// TODO: should be abstract as this is only the JavaScript Implementation
+	public abstract String getScriptText(ICondition condition);
 //	public String getScriptText(ICondition condition) 
 //	{
+//		StringBuffer sb = new StringBuffer();
+//		getScriptText(condition, sb, false);
+//		return sb.toString();
+//	}
+//	
+//	protected void getScriptText(ICondition condition, StringBuffer sb, boolean importInserted) 
+//	{
 //		if (condition instanceof ISimpleCondition) 
-//		{			
+//		{	
 //			ISimpleCondition simpleCondition = (ISimpleCondition) condition;
+//			if (simpleCondition.getValue() instanceof PersistenceCapable) {
+//				if (!importInserted) {
+//					sb.insert(0, "importPackage(Packages.javax.jdo);");
+//					importInserted = true;
+//				}
+//			}
 //			String openContainer = getOpenContainerString();
 //			String closeContainer = getCloseContainerString();
 //			String operator = getCompareOperator(simpleCondition.getCompareOperator());
@@ -90,16 +113,11 @@ implements IConditionGenerator
 //			Object value = simpleCondition.getValue();
 //			String valueName = "";
 //			String variableName = "";
-//			if (simpleCondition.getValue() instanceof PersistenceCapable) 
+//			if (value instanceof PersistenceCapable) 
 //			{
-//				StringBuffer sb = new StringBuffer();
-//				sb.append("importPackage(Packages.javax.jdo);");
-////				sb.append("importPackage(Packages.org.nightlabs.jdo);");
-//				sb.append("JDOHelper.getObjectId("+varName+").toString()");
-//				variableName = sb.toString();
+//				variableName = "JDOHelper.getObjectId("+varName+").toString()";
 //				ObjectID objectID = (ObjectID) JDOHelper.getObjectId(value);
-//				String objectIDString = objectID.toString();				
-////				valueName = "ObjectIDUtil.createObjectID(\""+objectIDString+"\")";
+//				String objectIDString = String.valueOf(objectID);
 //				valueName = "\""+objectIDString+"\"";
 //			}
 //			else {
@@ -107,89 +125,32 @@ implements IConditionGenerator
 //				// TODO: allow only primitive types
 //				valueName = String.valueOf(value);
 //			}
-//			return openContainer + variableName + operator + valueName + closeContainer;
+//			sb.append(openContainer + variableName + operator + valueName + closeContainer);
 //		}
-//		if (condition instanceof IConditionContainer) {
+//		else if (condition instanceof IConditionContainer) 
+//		{
 //			IConditionContainer container = (IConditionContainer) condition;
-//			StringBuffer sb = new StringBuffer();
 //			sb.append(getOpenContainerString());
 //			List<ICondition> conditions = container.getConditions();
 //			for (int i=0; i<conditions.size(); i++) {
 //				ICondition con = conditions.get(i);
-//				sb.append(getScriptText(con));
+//				if (!importInserted) {
+//					if (con instanceof ISimpleCondition) {
+//						if (((ISimpleCondition)con).getValue() instanceof PersistenceCapable) {
+//							sb.insert(0, "importPackage(Packages.javax.jdo);");
+//							importInserted = true;
+//						}									
+//					}					
+//				}
+//				getScriptText(con, sb, importInserted);
 //				if (i != conditions.size()-1)
 //					sb.append(getCombineOperator(container.getCombineOperator()));
 //			}
 //			sb.append(getCloseContainerString());
-//			return sb.toString();
 //		}
 //		else
 //			throw new RuntimeException("unknown implementation of ICondition "+condition);
 //	}
-
-	public String getScriptText(ICondition condition) 
-	{
-		StringBuffer sb = new StringBuffer();
-		getScriptText(condition, sb, false);
-		return sb.toString();
-	}
-	
-	protected void getScriptText(ICondition condition, StringBuffer sb, boolean importInserted) 
-	{
-		if (condition instanceof ISimpleCondition) 
-		{	
-			ISimpleCondition simpleCondition = (ISimpleCondition) condition;
-			if (simpleCondition.getValue() instanceof PersistenceCapable) {
-				if (!importInserted) {
-					sb.insert(0, "importPackage(Packages.javax.jdo);");
-					importInserted = true;
-				}
-			}
-			String openContainer = getOpenContainerString();
-			String closeContainer = getCloseContainerString();
-			String operator = getCompareOperator(simpleCondition.getCompareOperator());
-			String varName = getVariableString() + scriptID2Name.get(simpleCondition.getScriptRegistryItemID());
-			Object value = simpleCondition.getValue();
-			String valueName = "";
-			String variableName = "";
-			if (value instanceof PersistenceCapable) 
-			{
-				variableName = "JDOHelper.getObjectId("+varName+").toString()";
-				ObjectID objectID = (ObjectID) JDOHelper.getObjectId(value);
-				String objectIDString = String.valueOf(objectID);
-				valueName = "\""+objectIDString+"\"";
-			}
-			else {
-				variableName = varName;
-				// TODO: allow only primitive types
-				valueName = String.valueOf(value);
-			}
-			sb.append(openContainer + variableName + operator + valueName + closeContainer);
-		}
-		else if (condition instanceof IConditionContainer) 
-		{
-			IConditionContainer container = (IConditionContainer) condition;
-			sb.append(getOpenContainerString());
-			List<ICondition> conditions = container.getConditions();
-			for (int i=0; i<conditions.size(); i++) {
-				ICondition con = conditions.get(i);
-				if (!importInserted) {
-					if (con instanceof ISimpleCondition) {
-						if (((ISimpleCondition)con).getValue() instanceof PersistenceCapable) {
-							sb.insert(0, "importPackage(Packages.javax.jdo);");
-							importInserted = true;
-						}									
-					}					
-				}
-				getScriptText(con, sb, importInserted);
-				if (i != conditions.size()-1)
-					sb.append(getCombineOperator(container.getCombineOperator()));
-			}
-			sb.append(getCloseContainerString());
-		}
-		else
-			throw new RuntimeException("unknown implementation of ICondition "+condition);
-	}
 		
 	/**
 	* returns the scriptLanguage depended String for all available
@@ -283,4 +244,8 @@ implements IConditionGenerator
 	*/
 	public abstract CombineOperator getCombineOperator(String combineOperator);
 	
+	/**
+	 * @return the string of the language
+	 */
+	public abstract String getLanguage();
 }

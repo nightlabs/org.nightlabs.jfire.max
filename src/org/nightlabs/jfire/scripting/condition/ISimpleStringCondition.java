@@ -25,52 +25,19 @@
  ******************************************************************************/
 package org.nightlabs.jfire.scripting.condition;
 
-import java.util.Collection;
-
-
-/**
- * This Interface generates the language dependend syntax for the
- * operations described in {@link CombineOperator} and {@link CompareOperator}
- * 
+/** 
  * @author Daniel.Mazurek [at] NightLabs [dot] de
  *
  */
-public interface IConditionGenerator 
+public interface ISimpleStringCondition 
+extends ICondition 
 {
-	/** 
-	 * @param text the scriptText to transform into a ICondition
-	 * @param simpleStringConditions determines if the ICondition contains {@link ISimpleCondition}s or
-	 * {@link ISimpleStringCondition}s
-	 * 
-	 * @return the ICondition which has been parsed from the given scriptText
-	 */
-	ICondition getCondition(String text, boolean simpleStringConditions);
+	public String getCompareOperator();
+	public void setCompareOperator(String compareOperator);
 	
-	/**
-	 * 
-	 * @param condition the {@link ICondition} to transform into language dependend string
-	 * @return the language dependend string of the fiven condition
-	 */
-	String getScriptText(ICondition condition);
+	public String getValue();
+	public void setValue(String value);
 	
-	/**
-	 * 
-	 * @return the script language as String
-	 */
-	String getLanguage();
-	
-	/**
-	 * 
-	 * @return a Collection of {@link ScriptConditioner} which provide the necessary data
-	 * for parsing and creating the scriptTexts 
-	 */
-	Collection<ScriptConditioner> getScriptConditioner();
-	
-	/**
-	 * set the Collection of {@link ScriptConditioner} which provide the necessary data
-	 * for parsing and creating the scriptTexts
-	 * 
-	 * @param scriptConditioner the scriptConditioner to set
-	 */
-	void setScriptConditioner(Collection<ScriptConditioner> scriptConditioner);
+	public String getVariable();
+	public void setVariable(String variable);
 }

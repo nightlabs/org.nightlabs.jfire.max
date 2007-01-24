@@ -25,52 +25,59 @@
  ******************************************************************************/
 package org.nightlabs.jfire.scripting.condition;
 
-import java.util.Collection;
-
+import java.util.List;
 
 /**
- * This Interface generates the language dependend syntax for the
- * operations described in {@link CombineOperator} and {@link CompareOperator}
- * 
  * @author Daniel.Mazurek [at] NightLabs [dot] de
  *
  */
-public interface IConditionGenerator 
+public class ConditionUtil 
 {
-	/** 
-	 * @param text the scriptText to transform into a ICondition
-	 * @param simpleStringConditions determines if the ICondition contains {@link ISimpleCondition}s or
-	 * {@link ISimpleStringCondition}s
-	 * 
-	 * @return the ICondition which has been parsed from the given scriptText
-	 */
-	ICondition getCondition(String text, boolean simpleStringConditions);
-	
 	/**
-	 * 
-	 * @param condition the {@link ICondition} to transform into language dependend string
-	 * @return the language dependend string of the fiven condition
+	 * adds all contained {@link ISimpleCondition}s of a condition to the given list 
+	 * @param condition the condition to get all contained {@link ISimpleCondition}s for 
+	 * @param simpleConditions a {@link List} to add all contained {@link ISimpleCondition}s to 
 	 */
-	String getScriptText(ICondition condition);
-	
+	public static void getSimpleConditions(ICondition condition, List<ISimpleCondition> simpleConditions) 
+	{
+		if (condition == null)
+			throw new IllegalArgumentException("Param condition must NOT be null!");
+		
+		if (simpleConditions == null)
+			throw new IllegalArgumentException("Param simpleCOnditions must NOT be null!");
+		
+		if (condition instanceof IConditionContainer) {
+			IConditionContainer container = (IConditionContainer) condition;
+			for (ICondition condition2 : container.getConditions()) {
+				getSimpleConditions(condition2, simpleConditions);
+			}			
+		} 
+		else if (condition instanceof ISimpleCondition) {
+			simpleConditions.add((ISimpleCondition)condition);
+		}
+	}
+
 	/**
-	 * 
-	 * @return the script language as String
-	 */
-	String getLanguage();
-	
-	/**
-	 * 
-	 * @return a Collection of {@link ScriptConditioner} which provide the necessary data
-	 * for parsing and creating the scriptTexts 
-	 */
-	Collection<ScriptConditioner> getScriptConditioner();
-	
-	/**
-	 * set the Collection of {@link ScriptConditioner} which provide the necessary data
-	 * for parsing and creating the scriptTexts
-	 * 
-	 * @param scriptConditioner the scriptConditioner to set
-	 */
-	void setScriptConditioner(Collection<ScriptConditioner> scriptConditioner);
+	 * adds all contained {@link ISimpleStringCondition}s of a condition to the given list 
+	 * @param condition the condition to get all contained {@link ISimpleStringCondition}s for 
+	 * @param simpleConditions a {@link List} to add all contained {@link ISimpleStringCondition}s to 
+	 */	
+	public static void getSimpleStringConditions(ICondition condition, List<ISimpleStringCondition> simpleConditions) 
+	{
+		if (condition == null)
+			throw new IllegalArgumentException("Param condition must NOT be null!");
+		
+		if (simpleConditions == null)
+			throw new IllegalArgumentException("Param simpleCOnditions must NOT be null!");
+		
+		if (condition instanceof IConditionContainer) {
+			IConditionContainer container = (IConditionContainer) condition;
+			for (ICondition condition2 : container.getConditions()) {
+				getSimpleStringConditions(condition2, simpleConditions);
+			}			
+		} 
+		else if (condition instanceof ISimpleStringCondition) {
+			simpleConditions.add((ISimpleStringCondition)condition);
+		}
+	}
 }

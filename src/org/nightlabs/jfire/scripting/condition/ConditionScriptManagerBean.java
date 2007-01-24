@@ -187,6 +187,21 @@ implements SessionBean
 	throws ModuleException
 	{
 		PersistenceManager pm = getPersistenceManager();
+		return getScriptConditioner(pm, scriptID2Paramters, valueLimit);
+	}
+	
+	/**
+	 * @throws ModuleException
+	 *
+	 * @ejb.interface-method
+	 * @ejb.permission role-name="_Guest_"
+	 * @ejb.transaction type = "Required"
+	 */	
+	public Map<ScriptRegistryItemID, ScriptConditioner> getScriptConditioner(
+			PersistenceManager pm, Map<ScriptRegistryItemID, 
+			Map<String, Object>> scriptID2Paramters, int valueLimit)
+	throws ModuleException
+	{
 		Map<ScriptRegistryItemID, ScriptConditioner> scriptID2ScriptConditioner = 
 			new HashMap<ScriptRegistryItemID, ScriptConditioner>(scriptID2Paramters.size());		
 		try {
@@ -197,7 +212,7 @@ implements SessionBean
 			return scriptID2ScriptConditioner;
 		} finally {
 			pm.close();
-		}
+		}		
 	}
 	
 	/**

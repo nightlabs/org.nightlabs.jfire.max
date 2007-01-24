@@ -77,16 +77,18 @@ implements IConditionGenerator
 		parser = null;
 	}
 	
-	public ICondition getCondition(String text) 
+	public ICondition getCondition(String text, boolean simpleScriptCondition) 
 	{
-		if (parser == null) {
-//			parser = new ConstrainedConditionScriptParser(scriptConditioners);  
-			parser = new ConstrainedConditionScriptParser(scriptConditioners, scriptID2ValueStringConverter);			
+		if (parser == null) 
+		{
+			if (!simpleScriptCondition)
+				parser = new ConstrainedConditionScriptParser(scriptConditioners, scriptID2ValueStringConverter);
+			else
+				parser = new ConstrainedConditionScriptParser();				
 		}		
-		return parser.getCondition(this, text);
+		return parser.getCondition(this, text, simpleScriptCondition);
 	}
 	
-	// TODO: should be abstract as this is only the JavaScript Implementation
 	public abstract String getScriptText(ICondition condition);
 //	public String getScriptText(ICondition condition) 
 //	{

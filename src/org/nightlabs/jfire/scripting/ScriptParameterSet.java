@@ -110,6 +110,7 @@ import org.nightlabs.util.CollectionUtil;
 	private Map<String, ScriptParameter> parameters;
 
 	/**
+	 * TODO: Is this needed
 	 * @jdo.field
 	 *		persistence-modifier="persistent"
 	 *		collection-type="collection"

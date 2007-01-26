@@ -204,15 +204,11 @@ implements SessionBean
 	{
 		Map<ScriptRegistryItemID, ScriptConditioner> scriptID2ScriptConditioner = 
 			new HashMap<ScriptRegistryItemID, ScriptConditioner>(scriptID2Paramters.size());		
-		try {
-			for (Map.Entry<ScriptRegistryItemID, Map<String, Object>> entry : scriptID2Paramters.entrySet()) {
-				ScriptConditioner sc = getScriptConditioner(pm, entry.getKey(), entry.getValue(), valueLimit);
-				scriptID2ScriptConditioner.put(entry.getKey(), sc);			
-			}
-			return scriptID2ScriptConditioner;
-		} finally {
-			pm.close();
-		}		
+		for (Map.Entry<ScriptRegistryItemID, Map<String, Object>> entry : scriptID2Paramters.entrySet()) {
+			ScriptConditioner sc = getScriptConditioner(pm, entry.getKey(), entry.getValue(), valueLimit);
+			scriptID2ScriptConditioner.put(entry.getKey(), sc);			
+		}
+		return scriptID2ScriptConditioner;
 	}
 	
 	/**

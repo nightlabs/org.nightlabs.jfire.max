@@ -350,7 +350,7 @@ public class ConstrainedConditionScriptParser
 				else {
 					ScriptRegistryItemID scriptID = variableName2ScriptID.get(variable);				
 					Object valueObject = null;
-					if (scriptID2ValueStringConverter.get(scriptID) != null) {
+					if (scriptID2ValueStringConverter != null && scriptID2ValueStringConverter.get(scriptID) != null) {
 						ValueStringConverter valueStringConverter = scriptID2ValueStringConverter.get(scriptID);
 						valueObject = valueStringConverter.getValue(value);
 					}
@@ -467,13 +467,15 @@ public class ConstrainedConditionScriptParser
 		// get all strings between compareOperators
 		while (combinePatternMatcher.find()) 
 		{
-			found = true;
 			String group = combinePatternMatcher.group(); 
-			combineOperator = generator.getCombineOperator(group);
-			end = combinePatternMatcher.start();
-			String simpleCondition = sb.substring(start, end);
-			simpleConditions.add(simpleCondition);
-			start = combinePatternMatcher.end();
+			if (!group.equals("")) {
+				found = true;				
+				combineOperator = generator.getCombineOperator(group);
+				end = combinePatternMatcher.start();
+				String simpleCondition = sb.substring(start, end);
+				simpleConditions.add(simpleCondition);
+				start = combinePatternMatcher.end();				
+			}
 		}
 		
 		// get final condition

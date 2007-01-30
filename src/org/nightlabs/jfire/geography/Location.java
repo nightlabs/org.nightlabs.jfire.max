@@ -45,11 +45,13 @@ import org.nightlabs.jfire.geography.id.LocationID;
  *
  * @jdo.fetch-group name="Location.name" fields="name"
  * @jdo.fetch-group name="Location.city" fields="city"
+ * @jdo.fetch-group name="Location.this" fields="city, district, geographySystem, name"
  */
 public class Location implements Serializable
 {
 	public static final String FETCH_GROUP_NAME = "Location.name";
 	public static final String FETCH_GROUP_CITY = "Location.city";
+	public static final String FETCH_GROUP_LOCATION_THIS = "Location.this";
 
 	/**
 	 * 2-char-iso-code

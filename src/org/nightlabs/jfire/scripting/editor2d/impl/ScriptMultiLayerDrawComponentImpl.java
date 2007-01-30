@@ -60,7 +60,11 @@ implements ScriptMultiLayerDrawComponent
 		{
 			ScriptDrawComponent sd = (ScriptDrawComponent) it.next();
 			Object value = scriptValues.get(sd.getScriptRegistryItemID());
-			if (value == null) {
+			if (sd.getScriptRegistryItemID() == null) {
+				logger.error("ScriptDrawComponent "+sd+" has null as scriptRegistryItemID!");
+				throw new IllegalStateException("ScriptDrawComponent "+sd+" has null as scriptRegistryItemID!");
+			}
+			else if (value == null) {
 				if (scriptValues.containsKey(sd.getScriptRegistryItemID()))
 					logger.error("scriptValues does contain an entry but has a null value for : " + sd.getScriptRegistryItemID());
 				else
@@ -72,10 +76,8 @@ implements ScriptMultiLayerDrawComponent
 
 				throw new IllegalStateException("scriptValues does not contain an entry (or entry has a null value) for " + sd.getScriptRegistryItemID());
 			}
-
-			if (!(value instanceof String))
-				throw new IllegalStateException("scriptValues does not contain an entry which is NOT a String instance but " + value + " for " + sd.getScriptRegistryItemID());
-
+//			if (!(value instanceof String))
+//				throw new IllegalStateException("scriptValues does not contain an entry which is NOT a String instance but " + value + " for " + sd.getScriptRegistryItemID());
 			sd.setScriptValue(value);
 		}		
 		firePropertyChange(PROP_SCRIPT_VALUES, null, null);

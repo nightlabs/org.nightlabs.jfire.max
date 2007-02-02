@@ -417,9 +417,9 @@ implements SessionBean
 				LegalEntity legalEntity00 = dataCreator.createLegalEntity(user00.getPerson());
 				User user01 = dataCreator.createUser("user01", "test", "Chez Francois", "Miller", "Eva", "eva.miller@chezfrancois.co.th");
 				LegalEntity legalEntity01 = dataCreator.createLegalEntity(user01.getPerson());
-				User user02 = dataCreator.createUser("marco", "test", "NightLabs GmbH", "Schulze", "Marco", "m a r c o.at.nightlabs dot de");
+				User user02 = dataCreator.createUser("marco", "test", "NightLabs GmbH", "Schulze", "Marco", "marco@nightlabs.de");
 				LegalEntity legalEntity02 = dataCreator.createLegalEntity(user02.getPerson());
-				User user03 = dataCreator.createUser("alex", "test", "NightLabs GmbH", "Bieber", "Alex", "a l e x.at.nightlabs dot de");
+				User user03 = dataCreator.createUser("alex", "test", "NightLabs GmbH", "Bieber", "Alex", "alex@nightlabs.de");
 				LegalEntity legalEntity03 = dataCreator.createLegalEntity(user03.getPerson());
 
 				userGroup = new UserGroup(organisationID, UserGroup.USERID_PREFIX_TYPE_USERGROUP + "Administrators");

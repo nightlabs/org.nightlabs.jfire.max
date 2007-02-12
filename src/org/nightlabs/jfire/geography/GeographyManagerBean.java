@@ -131,12 +131,12 @@ public abstract class GeographyManagerBean
 	 */
 	public void initialize()
 	{
-		PersistenceManager pm = getPersistenceManager();
-		try {
-			Geography.getGeography(pm);
-		} finally {
-			pm.close();
-		}
+//		PersistenceManager pm = getPersistenceManager();
+//		try {
+//			Geography.getGeography(pm);
+//		} finally {
+//			pm.close();
+//		}
 	}
 
 	/**

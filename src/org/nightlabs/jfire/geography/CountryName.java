@@ -35,12 +35,14 @@ import org.nightlabs.i18n.I18nText;
  * @author Marco Schulze - marco at nightlabs dot de
  *
  * @jdo.persistence-capable 
- *		identity-type = "application"
- *		objectid-class = "org.nightlabs.jfire.geography.id.CountryNameID"
- *		detachable = "true"
- *		table = "JFireGeography_CountryName"
+ *		identity-type="application"
+ *		objectid-class="org.nightlabs.jfire.geography.id.CountryNameID"
+ *		detachable="true"
+ *		table="JFireGeography_CountryName"
  *
- * @jdo.inheritance strategy = "new-table"
+ * @jdo.inheritance strategy="new-table"
+ *
+ * @jdo.create-objectid-class
  *
  * @jdo.fetch-group name="Country.name" fields="country, names"
  */

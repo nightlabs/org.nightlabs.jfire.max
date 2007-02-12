@@ -23,5 +23,6 @@
 	<classpathentry sourcepath="JPOX_SRC" kind="var" path="JPOX"/>
 	<classpathentry sourcepath="/WORKSPACE/JFireBaseBean/ejbsrc" kind="var" path="WORKSPACE/JFireBaseBean/dist/JFireBaseBean.jar"/>
 	<classpathentry kind="var" path="JPOXENHANCER"/>
+	<classpathentry sourcepath="/WORKSPACE/JFireServerManager/src" kind="var" path="WORKSPACE/JFireServerManager/dist/JFireServerManager.jar"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>

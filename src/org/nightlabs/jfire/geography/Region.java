@@ -41,12 +41,14 @@ import org.nightlabs.jfire.geography.id.RegionID;
  * @author Marco Schulze - marco at nightlabs dot de
  *
  * @jdo.persistence-capable
- *		identity-type = "application"
- *		objectid-class = "org.nightlabs.jfire.geography.id.RegionID"
- *		detachable = "true"
- *		table = "JFireGeography_Region"
+ *		identity-type="application"
+ *		objectid-class="org.nightlabs.jfire.geography.id.RegionID"
+ *		detachable="true"
+ *		table="JFireGeography_Region"
  *
- * @jdo.inheritance strategy = "new-table"
+ * @jdo.inheritance strategy="new-table"
+ *
+ * @jdo.create-objectid-class field-order="countryID, organisationID, regionID"
  *
  * @jdo.fetch-group name="Region.country" fields="country"
  * @jdo.fetch-group name="Region.name" fields="name"
@@ -88,7 +90,7 @@ public class Region implements Serializable
 	/**
 	 * @jdo.field persistence-modifier="none"
 	 */
-	protected transient GeographySystem geographySystem;
+	protected transient Geography geography;
 
 	/**
 	 * @jdo.field persistence-modifier="persistent"
@@ -131,7 +133,7 @@ public class Region implements Serializable
 	{
 		this(null, organisationID, regionID, country);
 	}
-	public Region(GeographySystem geographySystem, String organisationID, String regionID, Country country)
+	public Region(Geography geography, String organisationID, String regionID, Country country)
 	{
 		if (organisationID == null)
 			throw new NullPointerException("organisationID");
@@ -139,7 +141,7 @@ public class Region implements Serializable
 		if (regionID == null)
 			throw new NullPointerException("regionID");
 
-		this.geographySystem = geographySystem;
+		this.geography = geography;
 		this.countryID = country.getCountryID();
 		this.organisationID = organisationID;
 		this.regionID = regionID;
@@ -242,8 +244,8 @@ public class Region implements Serializable
 	}
 	public Collection getCities()
 	{
-		if (geographySystem != null)
-			geographySystem.needCities(countryID);
+		if (geography != null)
+			geography.needCities(countryID);
 
 		return Collections.unmodifiableCollection(cities.values());
 	}

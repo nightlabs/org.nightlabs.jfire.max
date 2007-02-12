@@ -1,0 +1,7 @@
+<!DOCTYPE datastore-initialisation
+		PUBLIC "-//NightLabs GmbH//DTD Datastore Initialisation 1.2//EN"
+		"http://www.nightlabs.de/dtd/datastoreinit_1_2.dtd">
+<datastore-initialisation>
+	<init bean="jfire/ejb/JFireGeography/GeographyManager" method="initialise">
+	</init>
+</datastore-initialisation>

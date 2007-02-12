@@ -40,9 +40,9 @@ import java.util.Locale;
 import java.util.Map;
 
 import org.apache.log4j.Logger;
-
 import org.nightlabs.jfire.geography.Country;
-import org.nightlabs.jfire.geography.GeographySystem;
+import org.nightlabs.jfire.geography.Geography;
+import org.nightlabs.jfire.geography.GeographyImplResourceCSV;
 
 public class CreateCountryCSVFromLocale
 {
@@ -61,10 +61,12 @@ public class CreateCountryCSVFromLocale
 	public static void main(String[] args)
 	{
 		try {
+			GeographyImplResourceCSV.register();
+
 			Map countries = new HashMap();
 
 			// make sure, we have additional countries unknown to Locale
-			for (Iterator it = GeographySystem.sharedInstance().getCountries().iterator(); it.hasNext(); ) {
+			for (Iterator it = Geography.sharedInstance().getCountries().iterator(); it.hasNext(); ) {
 				Country country = (Country) it.next();
 				countries.put(country.getCountryID(), country);
 			}

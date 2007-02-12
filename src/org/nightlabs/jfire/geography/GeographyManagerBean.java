@@ -126,11 +126,14 @@ public abstract class GeographyManagerBean
 
 	/**
 	 * @ejb.interface-method
-	 * @ejb.transaction type = "Required"
-	 * @ejb.permission role-name="_Guest_"
+	 * @ejb.transaction type="Required"
+	 * @ejb.permission role-name="_System_"
 	 */
-	public void initialize()
+	public void initialise()
 	{
+//		GeographyImplResourceCSV.register();
+		GeographyImplJDO.register();
+
 //		PersistenceManager pm = getPersistenceManager();
 //		try {
 //			Geography.getGeography(pm);

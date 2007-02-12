@@ -36,12 +36,14 @@ import org.nightlabs.jfire.geography.id.LocationID;
  * @author Marco Schulze - marco at nightlabs dot de
  *
  * @jdo.persistence-capable
- *		identity-type = "application"
- *		objectid-class = "org.nightlabs.jfire.geography.id.LocationID"
- *		detachable = "true"
- *		table = "JFireGeography_Location"
+ *		identity-type="application"
+ *		objectid-class="org.nightlabs.jfire.geography.id.LocationID"
+ *		detachable="true"
+ *		table="JFireGeography_Location"
  *
- * @jdo.inheritance strategy = "new-table"
+ * @jdo.inheritance strategy="new-table"
+ *
+ * @jdo.create-objectid-class field-order="countryID, organisationID, locationID"
  *
  * @jdo.fetch-group name="Location.name" fields="name"
  * @jdo.fetch-group name="Location.city" fields="city"
@@ -81,7 +83,7 @@ public class Location implements Serializable
 	/**
 	 * @jdo.field persistence-modifier="none"
 	 */
-	protected transient GeographySystem geographySystem;
+	protected transient Geography geography;
 
 	/**
 	 * @jdo.field persistence-modifier="persistent"
@@ -115,17 +117,17 @@ public class Location implements Serializable
 		this(null, organisationID, locationID, district);
 	}
 
-	public Location(GeographySystem geographySystem, String organisationID, String locationID, District district)
+	public Location(Geography geography, String organisationID, String locationID, District district)
 	{
-		init(geographySystem, organisationID, locationID, null, district);
+		init(geography, organisationID, locationID, null, district);
 	}
 
-	public Location(GeographySystem geographySystem, String organisationID, String locationID, City city)
+	public Location(Geography geography, String organisationID, String locationID, City city)
 	{
-		init(geographySystem, organisationID, locationID, city, null);
+		init(geography, organisationID, locationID, city, null);
 	}
 
-	protected void init(GeographySystem geographySystem, String organisationID, String locationID, City city, District district)
+	protected void init(Geography geography, String organisationID, String locationID, City city, District district)
 	{
 		if (organisationID == null)
 			throw new NullPointerException("organisationID");
@@ -139,7 +141,7 @@ public class Location implements Serializable
 		if (city == null)
 			city = district.getCity();
 
-		this.geographySystem = geographySystem;
+		this.geography = geography;
 		this.countryID = city.getCountryID();
 		this.organisationID = organisationID;
 		this.locationID = locationID;

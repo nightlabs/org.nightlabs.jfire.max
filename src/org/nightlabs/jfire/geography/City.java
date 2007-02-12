@@ -93,7 +93,7 @@ public class City implements Serializable
 	/**
 	 * @jdo.field persistence-modifier="none"
 	 */
-	protected transient GeographySystem geographySystem;
+	protected transient Geography geography;
 
 	/**
 	 * @jdo.field persistence-modifier="persistent"
@@ -153,7 +153,7 @@ public class City implements Serializable
 	{
 		this(null, organisationID, cityID, region);
 	}
-	public City(GeographySystem geographySystem, String organisationID, String cityID, Region region)
+	public City(Geography geography, String organisationID, String cityID, Region region)
 	{
 		if (organisationID == null)
 			throw new NullPointerException("organisationID");
@@ -161,7 +161,7 @@ public class City implements Serializable
 		if (cityID == null)
 			throw new NullPointerException("cityID");
 
-		this.geographySystem = geographySystem;
+		this.geography = geography;
 		this.countryID = region.getCountryID();
 		this.organisationID = organisationID;
 		this.cityID = cityID;
@@ -227,16 +227,16 @@ public class City implements Serializable
 
 	public Collection getLocations()
 	{
-		if (geographySystem != null)
-			geographySystem.needLocations(countryID);
+		if (geography != null)
+			geography.needLocations(countryID);
 
 		return Collections.unmodifiableCollection(locations.values());
 	}
 
 	public Collection getDistricts()
 	{
-		if (geographySystem != null)
-			geographySystem.needDistricts(countryID);
+		if (geography != null)
+			geography.needDistricts(countryID);
 
 		return Collections.unmodifiableCollection(districts.values());
 	}

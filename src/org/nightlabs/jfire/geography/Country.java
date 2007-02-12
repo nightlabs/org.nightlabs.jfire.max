@@ -40,12 +40,14 @@ import javax.jdo.PersistenceManager;
  * @author Marco Schulze - marco at nightlabs dot de
  * 
  * @jdo.persistence-capable
- *		identity-type = "application"
- *		objectid-class = "org.nightlabs.jfire.geography.id.CountryID"
- *		detachable = "true"
- *		table = "JFireGeography_Country"
+ *		identity-type="application"
+ *		objectid-class="org.nightlabs.jfire.geography.id.CountryID"
+ *		detachable="true"
+ *		table="JFireGeography_Country"
  *
- * @jdo.inheritance strategy = "new-table"
+ * @jdo.inheritance strategy="new-table"
+ *
+ * @jdo.create-objectid-class
  *
  * @jdo.fetch-group name="Country.name" fields="name"
  * @jdo.fetch-group name="Country.regions" fields="regions"
@@ -70,7 +72,7 @@ public class Country implements Serializable
 	/**
 	 * @jdo.field persistence-modifier="none"
 	 */
-	protected transient GeographySystem geographySystem;
+	protected transient Geography geography;
 
 	/**
 	 * @jdo.field persistence-modifier="persistent"
@@ -93,7 +95,7 @@ public class Country implements Serializable
 	 *
 	 * @!jdo.map-vendor-extension vendor-name="jpox" key="key-field" value="primaryKey"
 	 */
-	protected Map regions = new HashMap();
+	protected Map<String, Region> regions = new HashMap<String, Region>();
 	/////// end normal fields ///////
 	
 	public static final String DEFAULT_LANGUAGEID = Locale.ENGLISH.getLanguage();
@@ -109,12 +111,12 @@ public class Country implements Serializable
 	{
 		this(null, countryID);
 	}
-	public Country(GeographySystem geographySystem, String countryID)
+	public Country(Geography geography, String countryID)
 	{
 		if (countryID == null)
 			throw new NullPointerException("countryID");
 
-		this.geographySystem = geographySystem;
+		this.geography = geography;
 		this.countryID = countryID;
 		this.name = new CountryName(this);
 	}
@@ -158,10 +160,11 @@ public class Country implements Serializable
 		regions.put(region.getPrimaryKey(), region);
 		return res;
 	}
-	public Collection getRegions()
+
+	public Collection<Region> getRegions()
 	{
-		if (geographySystem != null)
-			geographySystem.needRegions(countryID);
+		if (geography != null)
+			geography.needRegions(countryID);
 
 		return Collections.unmodifiableCollection(regions.values());
 	}

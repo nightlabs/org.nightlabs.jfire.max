@@ -37,12 +37,14 @@ import org.nightlabs.jfire.geography.id.DistrictID;
  * @author Marco Schulze - marco at nightlabs dot de
  *
  * @jdo.persistence-capable
- *		identity-type = "application"
- *		objectid-class = "org.nightlabs.jfire.geography.id.DistrictID"
- *		detachable = "true"
- *		table = "JFireGeography_District"
+ *		identity-type="application"
+ *		objectid-class="org.nightlabs.jfire.geography.id.DistrictID"
+ *		detachable="true"
+ *		table="JFireGeography_District"
  *
- * @jdo.inheritance strategy = "new-table"
+ * @jdo.inheritance strategy="new-table"
+ *
+ * @jdo.create-objectid-class field-order="countryID, organisationID, districtID"
  */
 public class District implements Serializable // , StoreCallback
 {
@@ -75,7 +77,7 @@ public class District implements Serializable // , StoreCallback
 	/**
 	 * @jdo.field persistence-modifier="none"
 	 */
-	protected transient GeographySystem geographySystem;
+	protected transient Geography geography;
 
 	/**
 	 * @jdo.field persistence-modifier="persistent"
@@ -118,7 +120,7 @@ public class District implements Serializable // , StoreCallback
 	{
 		this(null, organisationID, districtID, city);
 	}
-	public District(GeographySystem geographySystem, String organisationID, String districtID, City city)
+	public District(Geography geography, String organisationID, String districtID, City city)
 	{
 		if (organisationID == null)
 			throw new NullPointerException("organisationID");
@@ -126,7 +128,7 @@ public class District implements Serializable // , StoreCallback
 		if (districtID == null)
 			throw new NullPointerException("districtID");
 
-		this.geographySystem = geographySystem;
+		this.geography = geography;
 		this.city = city;
 		this.countryID = city.getCountryID();
 		this.organisationID = organisationID;
@@ -208,8 +210,8 @@ public class District implements Serializable // , StoreCallback
 	 */
 	public Collection getZips()
 	{
-		if (geographySystem != null)
-			geographySystem.needZips(countryID);
+		if (geography != null)
+			geography.needZips(countryID);
 
 		return zips;
 	}

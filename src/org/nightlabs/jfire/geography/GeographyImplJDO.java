@@ -42,17 +42,15 @@ extends GeographyImplResourceCSV
 		setSharedInstance(new GeographyImplJDO());
 	}
 
-	private PersistenceManager getPersistenceManager()
-	{
-		return new Lookup(getOrganisationID()).getPersistenceManager();
-	}
-
 	/**
-	 * @param in The {@link InputStream} from which to read. This stream will be closed!
-	 * @return Returns the contents of the given {@link InputStream}.
+	 * @param in The {@link InputStream} from which to read. This stream will be closed! May be <code>null</code>.
+	 * @return Returns the contents of the given {@link InputStream} or <code>null</code>, if <code>in == null</code>.
 	 */
 	protected static byte[] deflate(InputStream in)
 	{
+		if (in == null)
+			return null;
+
 		try {
 			try {
 				DataBuffer db = new DataBuffer(10240);
@@ -71,6 +69,12 @@ extends GeographyImplResourceCSV
 		}
 	}
 
+
+	private PersistenceManager getPersistenceManager()
+	{
+		return new Lookup(getOrganisationID()).getPersistenceManager();
+	}
+
 	@Override
 	protected InputStream createCountryCSVInputStream()
 	{
@@ -81,7 +85,7 @@ extends GeographyImplResourceCSV
 			data = deflate(super.createCountryCSVInputStream());
 			CSV.setCSVData(pm, organisationID, CSV.CSV_TYPE_COUNTRY, "", data);
 		}
-		return new InflaterInputStream(new ByteArrayInputStream(data));
+		return data == null ? null : new InflaterInputStream(new ByteArrayInputStream(data));
 	}
 
 	@Override
@@ -94,7 +98,7 @@ extends GeographyImplResourceCSV
 			data = deflate(super.createRegionCSVInputStream(countryID));
 			CSV.setCSVData(pm, organisationID, CSV.CSV_TYPE_REGION, countryID, data);
 		}
-		return new InflaterInputStream(new ByteArrayInputStream(data));
+		return data == null ? null : new InflaterInputStream(new ByteArrayInputStream(data));
 	}
 
 	@Override
@@ -107,7 +111,7 @@ extends GeographyImplResourceCSV
 			data = deflate(super.createCityCSVInputStream(countryID));
 			CSV.setCSVData(pm, organisationID, CSV.CSV_TYPE_CITY, countryID, data);
 		}
-		return new InflaterInputStream(new ByteArrayInputStream(data));
+		return data == null ? null : new InflaterInputStream(new ByteArrayInputStream(data));
 	}
 
 	@Override
@@ -120,7 +124,7 @@ extends GeographyImplResourceCSV
 			data = deflate(super.createDistrictCSVInputStream(countryID));
 			CSV.setCSVData(pm, organisationID, CSV.CSV_TYPE_DISTRICT, countryID, data);
 		}
-		return new InflaterInputStream(new ByteArrayInputStream(data));
+		return data == null ? null : new InflaterInputStream(new ByteArrayInputStream(data));
 	}
 
 	@Override
@@ -133,7 +137,7 @@ extends GeographyImplResourceCSV
 			data = deflate(super.createZipCSVInputStream(countryID));
 			CSV.setCSVData(pm, organisationID, CSV.CSV_TYPE_ZIP, countryID, data);
 		}
-		return new InflaterInputStream(new ByteArrayInputStream(data));
+		return data == null ? null : new InflaterInputStream(new ByteArrayInputStream(data));
 	}
 
 	@Override
@@ -146,6 +150,6 @@ extends GeographyImplResourceCSV
 			data = deflate(super.createLocationCSVInputStream(countryID));
 			CSV.setCSVData(pm, organisationID, CSV.CSV_TYPE_LOCATION, countryID, data);
 		}
-		return new InflaterInputStream(new ByteArrayInputStream(data));
+		return data == null ? null : new InflaterInputStream(new ByteArrayInputStream(data));
 	}
 }

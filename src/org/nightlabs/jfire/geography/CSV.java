@@ -36,6 +36,13 @@ implements Serializable
 	public static final String CSV_TYPE_ZIP = "Zip";
 	public static final String CSV_TYPE_LOCATION = "Location";
 
+	/**
+	 * @param pm The PersistenceManager.
+	 * @param organisationID This <code>must</code> be the root-organisation's ID, because only this organisation is allowed to edit the geography data.
+	 * @param csvType One of the <code>CSV_TYPE_</code>-constants.
+	 * @param countryID The country-ID or "" (empty string), if <code>csvType == {@link #CSV_TYPE_COUNTRY}</code>.
+	 * @return the data (deflated csv)
+	 */
 	public static byte[] getCSVData(PersistenceManager pm, String organisationID, String csvType, String countryID)
 	{
 		try {
@@ -46,13 +53,29 @@ implements Serializable
 		}
 	}
 
+	/**
+	 * @param pm The PersistenceManager.
+	 * @param organisationID This <code>must</code> be the root-organisation's ID, because only this organisation is allowed to edit the geography data.
+	 * @param csvType One of the <code>CSV_TYPE_</code>-constants.
+	 * @param countryID The country-ID or "" (empty string), if <code>csvType == {@link #CSV_TYPE_COUNTRY}</code>.
+	 * @param data The new data to set.
+	 * @return the CSV object that has been modified.
+	 */
 	public static CSV setCSVData(PersistenceManager pm, String organisationID, String csvType, String countryID, byte[] data)
 	{
 		CSV csv;
 		try {
 			csv = (CSV) pm.getObjectById(CSVID.create(organisationID, csvType, countryID));
 			csv.setData(data);
+
+			if (data == null) {
+				pm.deletePersistent(csv);
+				csv = null;
+			}
 		} catch (JDOObjectNotFoundException x) {
+			if (data == null)
+				return null;
+
 			csv = new CSV(organisationID, csvType, countryID);
 			csv.setData(data);
 			csv = (CSV) pm.makePersistent(csv);
@@ -61,8 +84,8 @@ implements Serializable
 	}
 
 	/**
-	 * This field is always the organisationID of the organisation in which the object
-	 * is stored.
+	 * This field is always the root-organisationID, because only the root organisation is allowed to add/modify
+	 * geography data.
 	 *
 	 * @jdo.field primary-key="true"
 	 * @jdo.column length="100"

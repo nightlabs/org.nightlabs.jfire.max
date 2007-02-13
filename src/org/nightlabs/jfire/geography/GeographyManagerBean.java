@@ -35,7 +35,10 @@ import javax.ejb.CreateException;
 import javax.ejb.EJBException;
 import javax.ejb.SessionBean;
 import javax.ejb.SessionContext;
+import javax.jdo.FetchPlan;
 import javax.jdo.PersistenceManager;
+import javax.naming.InitialContext;
+import javax.naming.NamingException;
 
 import org.apache.log4j.Logger;
 import org.nightlabs.jdo.NLJDOHelper;
@@ -44,6 +47,7 @@ import org.nightlabs.jfire.geography.id.CityID;
 import org.nightlabs.jfire.geography.id.CountryID;
 import org.nightlabs.jfire.geography.id.LocationID;
 import org.nightlabs.jfire.geography.id.RegionID;
+import org.nightlabs.jfire.organisation.Organisation;
 
 /**
  * @ejb.bean name="jfire/ejb/JFireGeography/GeographyManager"	
@@ -145,8 +149,9 @@ public abstract class GeographyManagerBean
 	/**
 	 * @ejb.interface-method
 	 * @ejb.permission role-name="_Guest_"
+	 * @ejb.transaction type="Supports"
 	 */
-	public Collection getCountries(String[] fetchGroups, int maxFetchDepth)
+	public Collection<Country> getCountries(String[] fetchGroups, int maxFetchDepth)
 	{
 		PersistenceManager pm = getPersistenceManager();
 		try {
@@ -154,11 +159,11 @@ public abstract class GeographyManagerBean
 			if (fetchGroups != null)
 				pm.getFetchPlan().setGroups(fetchGroups);
 
-			ArrayList res = new ArrayList();
+			ArrayList<Country> res = new ArrayList<Country>();
 			for (Iterator it = pm.getExtent(Country.class).iterator(); it.hasNext(); ) {
 				Country country = (Country) it.next();
 
-				res.add(pm.detachCopy(country));
+				res.add((Country) pm.detachCopy(country));
 			}
 
 			return res;
@@ -170,6 +175,7 @@ public abstract class GeographyManagerBean
 	/**
 	 * @ejb.interface-method
 	 * @ejb.permission role-name="_Guest_"
+	 * @ejb.transaction type="Supports"
 	 */
 	public Country getCountry(CountryID countryID, String[] fetchGroups, int maxFetchDepth)
 	{
@@ -190,6 +196,7 @@ public abstract class GeographyManagerBean
 	/**
 	 * @ejb.interface-method
 	 * @ejb.permission role-name="_Guest_"
+	 * @ejb.transaction type="Supports"
 	 */
 	public Region getRegion(RegionID regionID, String[] fetchGroups, int maxFetchDepth)
 	{
@@ -210,6 +217,7 @@ public abstract class GeographyManagerBean
 	/**
 	 * @ejb.interface-method
 	 * @ejb.permission role-name="_Guest_"
+	 * @ejb.transaction type="Supports"
 	 */
 	public City getCity(CityID cityID, String[] fetchGroups, int maxFetchDepth)
 	{
@@ -230,6 +238,7 @@ public abstract class GeographyManagerBean
 	/**
 	 * @ejb.interface-method
 	 * @ejb.permission role-name="_Guest_"
+	 * @ejb.transaction type="Supports"
 	 */
 	public Location getLocation(LocationID locationID, String[] fetchGroups, int maxFetchDepth)
 	{
@@ -285,6 +294,42 @@ public abstract class GeographyManagerBean
 		PersistenceManager pm = getPersistenceManager();
 		try {
 			return (City) NLJDOHelper.storeJDO(pm, city, get, fetchGroups, maxFetchDepth);
+		} finally {
+			pm.close();
+		}
+	}
+
+	/**
+	 * @ejb.interface-method
+	 * @ejb.permission role-name="_Guest_"
+	 */
+	public byte[] getCSVData(String csvType, String countryID)
+	{
+		PersistenceManager pm = getPersistenceManager();
+		try {
+			pm.getFetchPlan().setMaxFetchDepth(1);
+			pm.getFetchPlan().setGroup(FetchPlan.ALL);
+
+			try {
+				InitialContext initialContext = new InitialContext();
+				try {
+					byte[] data = CSV.getCSVData(pm, Organisation.getRootOrganisationID(initialContext), csvType, countryID);
+					if (data == null) {
+						Geography.sharedInstance().needCountries();
+						Geography.sharedInstance().needRegions(countryID);
+						Geography.sharedInstance().needCities(countryID);
+						Geography.sharedInstance().needDistricts(countryID);
+						Geography.sharedInstance().needZips(countryID);
+						Geography.sharedInstance().needLocations(countryID);
+						data = CSV.getCSVData(pm, Organisation.getRootOrganisationID(initialContext), csvType, countryID);
+					}
+					return data;
+				} finally {
+					initialContext.close();
+				}
+			} catch (NamingException x) {
+				throw new RuntimeException(x); // it's definitely an unexpected exception if we can't access the local JNDI.
+			}
 		} finally {
 			pm.close();
 		}

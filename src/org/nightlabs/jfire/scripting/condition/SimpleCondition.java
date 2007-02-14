@@ -101,5 +101,5 @@ implements ISimpleCondition
 //	{
 //		return scriptRegistryItemID.hashCode() + value.hashCode() + compareOperator.hashCode();
 //	}
-
+	
 }

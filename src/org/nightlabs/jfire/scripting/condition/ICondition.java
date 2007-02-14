@@ -35,27 +35,6 @@ package org.nightlabs.jfire.scripting.condition;
  */
 public interface ICondition 
 {
-//	/**
-//	 * returns the result of the condition as boolean
-//	 * 
-//	 * @return the result of the condition as boolean
-//	 */
-//	boolean getResult();
-	
-//	/**
-//	 * returns the text of the script of the condition
-//	 * 
-//	 * @return the text of the script of the condition
-//	 */
-//	String getScriptText();
-	
-//	/**
-//	 * returns the name of the script language
-//	 * 
-//	 * @return the name of the script language
-//	 */
-//	String getLanguage();
-	
-//	Script getScript();	
-//	void setScript(Script script);
+	public IConditionContainer getParent();
+	public void setParent(IConditionContainer parent);
 }

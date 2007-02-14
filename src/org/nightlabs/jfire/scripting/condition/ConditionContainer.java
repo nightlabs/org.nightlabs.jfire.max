@@ -46,10 +46,12 @@ implements IConditionContainer
 	
 	public void addCondition(ICondition condition) {
 		conditions.add(condition);
+		condition.setParent(this);
 	}
 	
 	public void removeCondition(ICondition condition) {
-		conditions.remove(condition);		
+		conditions.remove(condition);	
+		condition.setParent(null);
 	}
 
 	private CombineOperator combineOperator = CombineOperator.LOGICAL_AND;

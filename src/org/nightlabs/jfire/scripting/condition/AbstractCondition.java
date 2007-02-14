@@ -38,4 +38,12 @@ implements ICondition
 //	public String getLanguage() {
 //		return language;
 //	}
+	
+	private IConditionContainer parent = null;
+	public IConditionContainer getParent() {
+		return parent;
+	}	
+	public void setParent(IConditionContainer parent) {
+		this.parent = parent;
+	}	
 }

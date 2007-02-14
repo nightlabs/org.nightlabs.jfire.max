@@ -30,6 +30,7 @@ package org.nightlabs.jfire.scripting.condition;
  *
  */
 public class SimpleStringCondition 
+extends AbstractCondition
 implements ISimpleStringCondition
 {
 	public SimpleStringCondition(String variable, String compareOperator, String value) {

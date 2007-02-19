@@ -32,6 +32,7 @@ import java.util.HashSet;
 import java.util.Set;
 
 import org.nightlabs.jfire.geography.id.DistrictID;
+import org.nightlabs.util.Utils;
 
 /**
  * @author Marco Schulze - marco at nightlabs dot de
@@ -257,4 +258,24 @@ public class District implements Serializable // , StoreCallback
 //				setDistrictID(geo.generateDistrictID());
 //		}
 //	}
+
+	@Override
+	public boolean equals(Object obj)
+	{
+		if (this == obj) return true;
+		if (!(obj instanceof District)) return false;
+		District o = (District) obj;
+		return
+				Utils.equals(this.countryID, o.countryID) &&
+				Utils.equals(this.organisationID, o.organisationID) &&
+				Utils.equals(this.districtID, o.districtID);
+	}
+	@Override
+	public int hashCode()
+	{
+		return
+				Utils.hashCode(countryID) ^
+				Utils.hashCode(organisationID) ^
+				Utils.hashCode(districtID);
+	}
 }

@@ -36,6 +36,8 @@ import java.util.Map;
 import javax.jdo.JDOHelper;
 import javax.jdo.PersistenceManager;
 
+import org.nightlabs.util.Utils;
+
 /**
  * @author Marco Schulze - marco at nightlabs dot de
  * 
@@ -54,6 +56,8 @@ import javax.jdo.PersistenceManager;
  */
 public class Country implements Serializable
 {
+	private static final long serialVersionUID = 1L;
+
 	public static final String FETCH_GROUP_NAME = "Country.name";
 	public static final String FETCH_GROUP_REGIONS = "Country.regions";
 
@@ -180,5 +184,20 @@ public class Country implements Serializable
 		Country n = new Country(this.countryID);
 		n.name.copyFrom(this.name);
 		return n;
+	}
+
+	@Override
+	public boolean equals(Object obj)
+	{
+		if (this == obj) return true;
+		if (!(obj instanceof Country)) return false;
+		Country o = (Country) obj;
+		return Utils.equals(this.countryID, o.countryID);
+	}
+
+	@Override
+	public int hashCode()
+	{
+		return Utils.hashCode(countryID);
 	}
 }

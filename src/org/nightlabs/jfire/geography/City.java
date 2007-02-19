@@ -36,6 +36,7 @@ import java.util.Map;
 import javax.jdo.JDOHelper;
 
 import org.nightlabs.jfire.geography.id.CityID;
+import org.nightlabs.util.Utils;
 
 /**
  * @author Marco Schulze - marco at nightlabs dot de
@@ -275,5 +276,25 @@ public class City implements Serializable
 
 		locations.put(location.getPrimaryKey(), location);
 		return location;
+	}
+
+	@Override
+	public boolean equals(Object obj)
+	{
+		if (this == obj) return true;
+		if (!(obj instanceof City)) return false;
+		City o = (City) obj;
+		return
+				Utils.equals(this.countryID, o.countryID) &&
+				Utils.equals(this.organisationID, o.organisationID) &&
+				Utils.equals(this.cityID, o.cityID);
+	}
+	@Override
+	public int hashCode()
+	{
+		return
+				Utils.hashCode(countryID) ^
+				Utils.hashCode(organisationID) ^
+				Utils.hashCode(cityID);
 	}
 }

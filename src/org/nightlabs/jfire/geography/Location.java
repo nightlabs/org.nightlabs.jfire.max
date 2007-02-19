@@ -31,6 +31,7 @@ import java.io.Serializable;
 import javax.jdo.JDOHelper;
 
 import org.nightlabs.jfire.geography.id.LocationID;
+import org.nightlabs.util.Utils;
 
 /**
  * @author Marco Schulze - marco at nightlabs dot de
@@ -224,5 +225,25 @@ public class Location implements Serializable
 		Location n = new Location(organisationID, locationID, persistentCity);
 		n.name.copyFrom(this.name);
 		return n;
+	}
+
+	@Override
+	public boolean equals(Object obj)
+	{
+		if (this == obj) return true;
+		if (!(obj instanceof Location)) return false;
+		Location  o = (Location) obj;
+		return
+				Utils.equals(this.countryID, o.countryID) &&
+				Utils.equals(this.organisationID, o.organisationID) &&
+				Utils.equals(this.locationID, o.locationID);
+	}
+	@Override
+	public int hashCode()
+	{
+		return
+				Utils.hashCode(countryID) ^
+				Utils.hashCode(organisationID) ^
+				Utils.hashCode(locationID);
 	}
 }

@@ -28,6 +28,7 @@ package org.nightlabs.jfire.chezfrancois;
 
 import org.apache.log4j.Logger;
 import org.nightlabs.ModuleException;
+import org.nightlabs.annotation.Implement;
 import org.nightlabs.jfire.init.InitException;
 import org.nightlabs.jfire.serverinit.ServerInitialiserDelegate;
 import org.nightlabs.jfire.servermanager.JFireServerManager;
@@ -37,7 +38,7 @@ public class ChezFrancoisServerInitialiser extends ServerInitialiserDelegate
 {
 	public static final String ORGANISATION_ID_WINE_STORE = "chezfrancois.jfire.org";
 
-	@Override
+	@Implement
 	public void initialise() throws InitException
 	{
 //		TransactionManager transactionManager = getJ2EEVendorAdapter().getTransactionManager(getInitialContext());

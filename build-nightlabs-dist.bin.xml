@@ -15,6 +15,10 @@
       	<include name="META-INF/ejb-rolegroup.xml"/>
        	<include name="META-INF/jboss.xml"/>
         <include name="META-INF/datastoreinit.xml"/>
+<!--
+  the following line (serverinit.xml) is missing in the normal build-nightlabs.xml - shall we
+  add it there (EVERYWHERE) and remove this file?
+-->
         <include name="META-INF/serverinit.xml"/>
         <include name="META-INF/*-ds.xml"/>
         <include name="META-INF/ra.xml"/>

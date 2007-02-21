@@ -29,8 +29,12 @@ package org.nightlabs.jfire.simpletrade;
 import java.rmi.RemoteException;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.HashSet;
+import java.util.Hashtable;
+import java.util.List;
 import java.util.Locale;
 import java.util.Map;
+import java.util.Set;
 
 import javax.ejb.CreateException;
 import javax.ejb.EJBException;
@@ -48,14 +52,23 @@ import org.nightlabs.jdo.NLJDOHelper;
 import org.nightlabs.jdo.moduleregistry.ModuleMetaData;
 import org.nightlabs.jfire.accounting.Tariff;
 import org.nightlabs.jfire.accounting.id.TariffID;
+import org.nightlabs.jfire.accounting.priceconfig.FetchGroupsPriceConfig;
 import org.nightlabs.jfire.accounting.tariffpriceconfig.FormulaPriceConfig;
 import org.nightlabs.jfire.accounting.tariffpriceconfig.IResultPriceConfig;
 import org.nightlabs.jfire.accounting.tariffpriceconfig.PriceCalculator;
+import org.nightlabs.jfire.accounting.tariffpriceconfig.TariffPriceConfig;
 import org.nightlabs.jfire.base.BaseSessionBeanImpl;
+import org.nightlabs.jfire.base.JFireException;
+import org.nightlabs.jfire.jdo.notification.persistent.PersistentNotificationEJB;
+import org.nightlabs.jfire.jdo.notification.persistent.PersistentNotificationEJBUtil;
+import org.nightlabs.jfire.jdo.notification.persistent.SubscriptionUtil;
 import org.nightlabs.jfire.organisation.Organisation;
 import org.nightlabs.jfire.security.User;
+import org.nightlabs.jfire.simpletrade.notification.SimpleProductTypeNotificationFilter;
+import org.nightlabs.jfire.simpletrade.notification.SimpleProductTypeNotificationReceiver;
 import org.nightlabs.jfire.simpletrade.store.SimpleProductType;
 import org.nightlabs.jfire.simpletrade.store.SimpleProductTypeActionHandler;
+import org.nightlabs.jfire.simpletrade.store.SimpleProductTypeName;
 import org.nightlabs.jfire.store.NestedProductType;
 import org.nightlabs.jfire.store.ProductType;
 import org.nightlabs.jfire.store.Store;
@@ -64,10 +77,12 @@ import org.nightlabs.jfire.store.deliver.ModeOfDelivery;
 import org.nightlabs.jfire.store.deliver.id.ModeOfDeliveryID;
 import org.nightlabs.jfire.store.id.ProductTypeID;
 import org.nightlabs.jfire.trade.ArticleCreator;
+import org.nightlabs.jfire.trade.CustomerGroup;
 import org.nightlabs.jfire.trade.Offer;
 import org.nightlabs.jfire.trade.Order;
 import org.nightlabs.jfire.trade.Segment;
 import org.nightlabs.jfire.trade.Trader;
+import org.nightlabs.jfire.trade.id.CustomerGroupID;
 import org.nightlabs.jfire.trade.id.SegmentID;
 
 
@@ -643,4 +658,122 @@ implements SessionBean
 			pm.close();
 		}
 	}
+
+	/**
+	 * @ejb.interface-method
+	 * @ejb.permission role-name="_Guest_"
+	 */
+	public List<SimpleProductType> getSimpleProductTypesForReseller(Collection<ProductTypeID> productTypeIDs, boolean includeChildrenRecursively)
+	{
+		PersistenceManager pm = getPersistenceManager();
+		try {
+			pm.getExtent(SimpleProductType.class);
+			pm.getFetchPlan().setGroups(new String[] { FetchPlan.DEFAULT });
+			pm.getFetchPlan().setMaxFetchDepth(NLJDOHelper.MAX_FETCH_DEPTH_NO_LIMIT);
+			pm.getFetchPlan().setDetachmentOptions(FetchPlan.DETACH_LOAD_FIELDS);
+
+			List<SimpleProductType> res = new ArrayList<SimpleProductType>(productTypeIDs.size());
+			for (ProductTypeID productTypeID : productTypeIDs) {
+				SimpleProductType simpleProductType = (SimpleProductType) pm.getObjectById(productTypeID);
+
+				// we need to strip off the nested product types (they're out of business ;-)
+				// and we need to replace the price config - actually it should be sufficient to simply omit the inner price config
+				// as the package price config contains only stable prices
+
+				// we simply touch every field we need - the others should not be loaded and thus not detached then.
+				simpleProductType.getName().getTexts();
+				simpleProductType.getPackagePriceConfig();
+				simpleProductType.getOwner();
+				simpleProductType.getExtendedProductType();
+
+				// and detach
+				simpleProductType = (SimpleProductType) pm.detachCopy(simpleProductType);
+
+				// TODO load CustomerGroups of the other customer-organisation
+				// and remove all prices from the package price config that are for
+				// different customer groups (not available to the client)
+				if (simpleProductType.getPackagePriceConfig() == null) {
+					// nothing to do
+				}
+				else if (simpleProductType.getPackagePriceConfig() instanceof TariffPriceConfig) {
+					Set<CustomerGroupID> unavailableCustomerGroupIDs = new HashSet<CustomerGroupID>();
+					TariffPriceConfig tariffPriceConfig = (TariffPriceConfig) simpleProductType.getPackagePriceConfig();
+					for (CustomerGroup customerGroup : tariffPriceConfig.getCustomerGroups()) {
+					}
+	
+					for (CustomerGroupID customerGroupID : unavailableCustomerGroupIDs)
+						tariffPriceConfig.removeCustomerGroup(customerGroupID.organisationID, customerGroupID.customerGroupID);
+				}
+				else
+					throw new IllegalStateException("SimpleProductType.packagePriceConfig unsupported! " + productTypeID);
+
+				res.add(simpleProductType);
+			}
+			return res;
+		} finally {
+			pm.close();
+		}
+	}
+
+	/**
+	 * @ejb.interface-method
+	 * @ejb.permission role-name="_Guest_"
+	 * @ejb.transaction type="Required"
+	 */
+	public SimpleProductType importSimpleProductTypeForReselling(ProductTypeID productTypeID, String[] fetchGroups, int maxFetchDepth)
+	throws JFireException
+	{
+		try {
+			PersistenceManager pm = getPersistenceManager();
+			try {
+				Hashtable initialContextProperties = getInitialContextProperties(productTypeID.organisationID);
+
+				PersistentNotificationEJB persistentNotificationEJB = PersistentNotificationEJBUtil.getHome(initialContextProperties).create();
+				SimpleProductTypeNotificationFilter notificationFilter = new SimpleProductTypeNotificationFilter(
+						productTypeID.organisationID, SubscriptionUtil.SUBSCRIBER_TYPE_ORGANISATION, getOrganisationID(),
+						SimpleProductTypeNotificationFilter.class.getName());
+				SimpleProductTypeNotificationReceiver notificationReceiver = new SimpleProductTypeNotificationReceiver(notificationFilter);
+				notificationReceiver = (SimpleProductTypeNotificationReceiver) pm.makePersistent(notificationReceiver);
+				persistentNotificationEJB.storeNotificationFilter(notificationFilter, false, null, 1);
+
+				ArrayList<ProductTypeID> productTypeIDs = new ArrayList<ProductTypeID>(1);
+				productTypeIDs.add(productTypeID);
+
+				SimpleTradeManager simpleTradeManager = SimpleTradeManagerUtil.getHome(initialContextProperties).create();
+
+				Collection<SimpleProductType> productTypes = simpleTradeManager.getSimpleProductTypesForReseller(productTypeIDs, true);
+				if (productTypes.size() != 1)
+					throw new IllegalStateException("productTypes.size() != 1");
+
+				// currently we only support subscribing root-producttypes
+				for (SimpleProductType productType : productTypes) {
+					if (productType.getExtendedProductType() != null)
+						throw new UnsupportedOperationException("The given SimpleProductType is not a root node (not yet supported!): " + productTypeID);
+				}
+
+				productTypes = pm.makePersistentAll(productTypes);
+				return productTypes.iterator().next();
+			} finally {
+				pm.close();
+			}
+		} catch (Exception x) {
+			logger.error("Import of SimpleProductType failed!", x);
+			throw new JFireException(x);
+		}
+	}
+
+//	/**
+//	 * @ejb.interface-method
+//	 * @ejb.permission role-name="_Guest_"
+//	 * @ejb.transaction type="Required"
+//	 */
+//	public SimpleProductType backend_subscribe(ProductTypeID productTypeID, String[] fetchGroups, int maxFetchDepth)
+//	{
+//		PersistenceManager pm = getPersistenceManager();
+//		try {
+//			
+//		} finally {
+//			pm.close();
+//		}
+//	}
 }

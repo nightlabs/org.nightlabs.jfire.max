@@ -291,7 +291,7 @@ public class Store
 		if (productType.isClosed())
 			return;
 
-		productType.setSaleable(true);
+		productType.setClosed(true);
 		getProductTypeStatusTracker(productType, true).newCurrentStatus(user);
 	}
 

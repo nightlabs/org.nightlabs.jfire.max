@@ -46,7 +46,7 @@ import org.nightlabs.i18n.I18nText;
  *
  * @jdo.fetch-group name="PriceConfig.name" fields="priceConfig, names"
  *
- * @jdo.fetch-group name="FetchGroupsPriceConfig.edit" fetch-groups="default" fields="names"
+ * @jdo.fetch-group name="FetchGroupsPriceConfig.edit" fetch-groups="default" fields="priceConfig, names"
  */
 public class PriceConfigName extends I18nText
 {

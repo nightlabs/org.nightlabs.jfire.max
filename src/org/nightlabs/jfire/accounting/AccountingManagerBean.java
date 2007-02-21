@@ -87,7 +87,6 @@ import org.nightlabs.jfire.accounting.pay.id.ModeOfPaymentFlavourID;
 import org.nightlabs.jfire.accounting.pay.id.PaymentDataID;
 import org.nightlabs.jfire.accounting.pay.id.PaymentID;
 import org.nightlabs.jfire.accounting.priceconfig.FetchGroupsPriceConfig;
-import org.nightlabs.jfire.accounting.priceconfig.PriceConfig;
 import org.nightlabs.jfire.accounting.query.InvoiceQuery;
 import org.nightlabs.jfire.accounting.tariffpriceconfig.TariffPriceConfig;
 import org.nightlabs.jfire.accounting.tariffpriceconfig.TariffPriceConfigManagerBean;
@@ -2246,8 +2245,7 @@ public abstract class AccountingManagerBean
 			fetchPlan.setMaxFetchDepth(-1);
 			fetchPlan.setGroups(new String[] {
 					FetchPlan.DEFAULT, 
-					FetchGroupsPriceConfig.FETCH_GROUP_EDIT,
-					PriceConfig.FETCH_GROUP_NAME});
+					FetchGroupsPriceConfig.FETCH_GROUP_EDIT});
 
 			detachmentOptions = fetchPlan.getDetachmentOptions();
 			System.out.println("***********************************************************************");

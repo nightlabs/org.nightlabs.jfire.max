@@ -28,14 +28,13 @@ package org.nightlabs.jfire.accounting.tariffpriceconfig;
 
 import java.io.Serializable;
 
-import javax.jdo.JDOHelper;
-import javax.jdo.PersistenceManager;
 import javax.jdo.listener.StoreCallback;
 
-import org.nightlabs.jfire.accounting.Accounting;
+import org.apache.log4j.Logger;
 import org.nightlabs.jfire.accounting.Currency;
 import org.nightlabs.jfire.accounting.Tariff;
 import org.nightlabs.jfire.accounting.priceconfig.PriceConfig;
+import org.nightlabs.jfire.idgenerator.IDGenerator;
 import org.nightlabs.jfire.trade.CustomerGroup;
 
 /**
@@ -58,6 +57,8 @@ import org.nightlabs.jfire.trade.CustomerGroup;
  */
 public class PriceCoordinate implements Serializable, StoreCallback, IPriceCoordinate
 {
+	private static final Logger logger = Logger.getLogger(PriceCoordinate.class);
+
 	public static final String FETCH_GROUP_PRICE_CONFIG = "PriceCoordinate.priceConfig";
 	public static final String FETCH_GROUP_THIS_PRICE_COORDINATE = "PriceCoordinate.this";
 
@@ -72,22 +73,22 @@ public class PriceCoordinate implements Serializable, StoreCallback, IPriceCoord
 	private long priceCoordinateID = -1;
 
 	/**
-	 * @jdo.field persistence-modifier="persistent"
+	 * @jdo.field persistence-modifier="persistent" null-value="exception"
 	 */
 	private String customerGroupPK;
 
 	/**
-	 * @jdo.field persistence-modifier="persistent"
+	 * @jdo.field persistence-modifier="persistent" null-value="exception"
 	 */
 	private String tariffPK;
 
 	/**
-	 * @jdo.field persistence-modifier="persistent"
+	 * @jdo.field persistence-modifier="persistent" null-value="exception"
 	 */
 	private String currencyID;
 
 	/**
-	 * @jdo.field persistence-modifier="persistent"
+	 * @jdo.field persistence-modifier="persistent" null-value="exception"
 	 */
 	private PriceConfig priceConfig;
 
@@ -300,19 +301,20 @@ public class PriceCoordinate implements Serializable, StoreCallback, IPriceCoord
 		thisHashCode = 0;
 	}
 
-	/**
-	 * @see javax.jdo.listener.StoreCallback#jdoPreStore()
-	 */
 	public void jdoPreStore()
 	{
 		if (priceConfig == null)
-			throw new IllegalStateException("The field 'priceConfig' is null! This means, this PriceCoordinate has only been created on the fly for calculation reasons. How the hell did it come here? I cannot persist it!");
+			logger.error("The field 'priceConfig' is null! This means, this PriceCoordinate has only been created on the fly for calculation reasons.", new Exception());
+//			throw new IllegalStateException("The field 'priceConfig' is null! This means, this PriceCoordinate has only been created on the fly for calculation reasons. How the hell did it come here? I cannot persist it!");
 
 		if (organisationID == null || priceCoordinateID < 0) {
-			PersistenceManager pm = JDOHelper.getPersistenceManager(this);
-			Accounting accounting = Accounting.getAccounting(pm);
-			this.organisationID = accounting.getOrganisationID();
-			this.priceCoordinateID = accounting.createPriceCoordinateID();
+//			logger.info("This PriceCoordinate does not have an ID - will assign one!", new Exception());
+			organisationID = IDGenerator.getOrganisationID();
+			priceCoordinateID = IDGenerator.nextID(PriceCoordinate.class);
+//			PersistenceManager pm = JDOHelper.getPersistenceManager(this);
+//			Accounting accounting = Accounting.getAccounting(pm);
+//			this.organisationID = accounting.getOrganisationID();
+//			this.priceCoordinateID = accounting.createPriceCoordinateID();
 		}
 	}
 }

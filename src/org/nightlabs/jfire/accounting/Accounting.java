@@ -176,24 +176,24 @@ public class Accounting
 		return organisationID;
 	}
 
-	/**
-	 * @jdo.field persistence-modifier="persistent"
-	 */
-	private long nextPriceCoordinateID = 0;
-	private static long _nextPriceCoordinateID = -1;
-	private static Object _nextPriceCoordinateIDMutex = new Object();
+//	/**
+//	 * @jdo.field persistence-modifier="persistent"
+//	 */
+//	private long nextPriceCoordinateID = 0;
+//	private static long _nextPriceCoordinateID = -1;
+//	private static Object _nextPriceCoordinateIDMutex = new Object();
 
-	public long createPriceCoordinateID()
-	{
-		synchronized (_nextPriceCoordinateIDMutex) {
-			if (_nextPriceCoordinateID < 0)
-				_nextPriceCoordinateID = nextPriceCoordinateID;
-
-			long res = _nextPriceCoordinateID++;
-			nextPriceCoordinateID = _nextPriceCoordinateID;
-			return res;
-		}
-	}
+//	public long createPriceCoordinateID()
+//	{
+//		synchronized (_nextPriceCoordinateIDMutex) {
+//			if (_nextPriceCoordinateID < 0)
+//				_nextPriceCoordinateID = nextPriceCoordinateID;
+//
+//			long res = _nextPriceCoordinateID++;
+//			nextPriceCoordinateID = _nextPriceCoordinateID;
+//			return res;
+//		}
+//	}
 
 	protected PersistenceManager getPersistenceManager() {
 		PersistenceManager accountingPM = JDOHelper.getPersistenceManager(this);
@@ -1146,8 +1146,8 @@ public class Accounting
 		if (_nextTransferID >= 0 && nextTransferID != _nextTransferID)
 			nextTransferID = _nextTransferID;
 
-		if (_nextPriceCoordinateID >= 0 && nextPriceCoordinateID != _nextPriceCoordinateID)
-			nextPriceCoordinateID = _nextPriceCoordinateID;
+//		if (_nextPriceCoordinateID >= 0 && nextPriceCoordinateID != _nextPriceCoordinateID)
+//			nextPriceCoordinateID = _nextPriceCoordinateID;
 	}
 
 	private static void setStateDefinitionProperties(

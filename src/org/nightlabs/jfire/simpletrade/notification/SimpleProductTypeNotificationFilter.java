@@ -4,6 +4,8 @@ import java.util.Collection;
 import java.util.Iterator;
 import java.util.List;
 
+import javax.jdo.PersistenceManager;
+
 import org.nightlabs.annotation.Implement;
 import org.nightlabs.jfire.jdo.notification.DirtyObjectID;
 import org.nightlabs.jfire.jdo.notification.JDOLifecycleState;
@@ -42,11 +44,20 @@ public class SimpleProductTypeNotificationFilter
 	@Implement
 	public Collection<DirtyObjectID> filter(List<DirtyObjectID> dirtyObjectIDs)
 	{
+		PersistenceManager pm = null;
+
 		// we notify only about modified ProductTypes that are owned by this organisation
 		for (Iterator<DirtyObjectID> it = dirtyObjectIDs.iterator(); it.hasNext(); ) {
 			DirtyObjectID dirtyObjectID = it.next();
 			ProductTypeID productTypeID = (ProductTypeID) dirtyObjectID.getObjectID();
-			if (!getOrganisationID().equals(productTypeID.organisationID))
+			if (!getOrganisationID().equals(productTypeID.organisationID)) {
+				it.remove();
+				continue;
+			}
+
+			if (pm == null) pm = getPersistenceManager();
+			SimpleProductType simpleProductType = (SimpleProductType) pm.getObjectById(productTypeID);
+			if (!simpleProductType.isPublished())
 				it.remove();
 		}
 		return dirtyObjectIDs;

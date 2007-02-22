@@ -29,12 +29,10 @@ package org.nightlabs.jfire.simpletrade;
 import java.rmi.RemoteException;
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.HashSet;
 import java.util.Hashtable;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
-import java.util.Set;
 
 import javax.ejb.CreateException;
 import javax.ejb.EJBException;
@@ -56,7 +54,6 @@ import org.nightlabs.jfire.accounting.priceconfig.FetchGroupsPriceConfig;
 import org.nightlabs.jfire.accounting.tariffpriceconfig.FormulaPriceConfig;
 import org.nightlabs.jfire.accounting.tariffpriceconfig.IResultPriceConfig;
 import org.nightlabs.jfire.accounting.tariffpriceconfig.PriceCalculator;
-import org.nightlabs.jfire.accounting.tariffpriceconfig.TariffPriceConfig;
 import org.nightlabs.jfire.base.BaseSessionBeanImpl;
 import org.nightlabs.jfire.base.JFireException;
 import org.nightlabs.jfire.jdo.notification.persistent.PersistentNotificationEJB;
@@ -68,7 +65,6 @@ import org.nightlabs.jfire.simpletrade.notification.SimpleProductTypeNotificatio
 import org.nightlabs.jfire.simpletrade.notification.SimpleProductTypeNotificationReceiver;
 import org.nightlabs.jfire.simpletrade.store.SimpleProductType;
 import org.nightlabs.jfire.simpletrade.store.SimpleProductTypeActionHandler;
-import org.nightlabs.jfire.simpletrade.store.SimpleProductTypeName;
 import org.nightlabs.jfire.store.NestedProductType;
 import org.nightlabs.jfire.store.ProductType;
 import org.nightlabs.jfire.store.Store;
@@ -77,12 +73,10 @@ import org.nightlabs.jfire.store.deliver.ModeOfDelivery;
 import org.nightlabs.jfire.store.deliver.id.ModeOfDeliveryID;
 import org.nightlabs.jfire.store.id.ProductTypeID;
 import org.nightlabs.jfire.trade.ArticleCreator;
-import org.nightlabs.jfire.trade.CustomerGroup;
 import org.nightlabs.jfire.trade.Offer;
 import org.nightlabs.jfire.trade.Order;
 import org.nightlabs.jfire.trade.Segment;
 import org.nightlabs.jfire.trade.Trader;
-import org.nightlabs.jfire.trade.id.CustomerGroupID;
 import org.nightlabs.jfire.trade.id.SegmentID;
 
 
@@ -668,7 +662,7 @@ implements SessionBean
 		PersistenceManager pm = getPersistenceManager();
 		try {
 			pm.getExtent(SimpleProductType.class);
-			pm.getFetchPlan().setGroups(new String[] { FetchPlan.DEFAULT });
+			pm.getFetchPlan().setGroups(new String[] { FetchPlan.DEFAULT, FetchGroupsPriceConfig.FETCH_GROUP_EDIT });
 			pm.getFetchPlan().setMaxFetchDepth(NLJDOHelper.MAX_FETCH_DEPTH_NO_LIMIT);
 			pm.getFetchPlan().setDetachmentOptions(FetchPlan.DETACH_LOAD_FIELDS);
 
@@ -682,30 +676,30 @@ implements SessionBean
 
 				// we simply touch every field we need - the others should not be loaded and thus not detached then.
 				simpleProductType.getName().getTexts();
-				simpleProductType.getPackagePriceConfig();
+//				simpleProductType.getPackagePriceConfig();
 				simpleProductType.getOwner();
 				simpleProductType.getExtendedProductType();
 
 				// and detach
 				simpleProductType = (SimpleProductType) pm.detachCopy(simpleProductType);
 
-				// TODO load CustomerGroups of the other customer-organisation
-				// and remove all prices from the package price config that are for
-				// different customer groups (not available to the client)
-				if (simpleProductType.getPackagePriceConfig() == null) {
-					// nothing to do
-				}
-				else if (simpleProductType.getPackagePriceConfig() instanceof TariffPriceConfig) {
-					Set<CustomerGroupID> unavailableCustomerGroupIDs = new HashSet<CustomerGroupID>();
-					TariffPriceConfig tariffPriceConfig = (TariffPriceConfig) simpleProductType.getPackagePriceConfig();
-					for (CustomerGroup customerGroup : tariffPriceConfig.getCustomerGroups()) {
-					}
-	
-					for (CustomerGroupID customerGroupID : unavailableCustomerGroupIDs)
-						tariffPriceConfig.removeCustomerGroup(customerGroupID.organisationID, customerGroupID.customerGroupID);
-				}
-				else
-					throw new IllegalStateException("SimpleProductType.packagePriceConfig unsupported! " + productTypeID);
+//				// TODO load CustomerGroups of the other customer-organisation
+//				// and remove all prices from the package price config that are for
+//				// different customer groups (not available to the client)
+//				if (simpleProductType.getPackagePriceConfig() == null) {
+//					// nothing to do
+//				}
+//				else if (simpleProductType.getPackagePriceConfig() instanceof TariffPriceConfig) {
+//					Set<CustomerGroupID> unavailableCustomerGroupIDs = new HashSet<CustomerGroupID>();
+//					TariffPriceConfig tariffPriceConfig = (TariffPriceConfig) simpleProductType.getPackagePriceConfig();
+//					for (CustomerGroup customerGroup : tariffPriceConfig.getCustomerGroups()) {
+//					}
+//	
+//					for (CustomerGroupID customerGroupID : unavailableCustomerGroupIDs)
+//						tariffPriceConfig.removeCustomerGroup(customerGroupID.organisationID, customerGroupID.customerGroupID);
+//				}
+//				else
+//					throw new IllegalStateException("SimpleProductType.packagePriceConfig unsupported! " + productTypeID);
 
 				res.add(simpleProductType);
 			}

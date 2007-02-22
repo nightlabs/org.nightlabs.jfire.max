@@ -3,10 +3,13 @@ package org.nightlabs.jfire.simpletrade.notification;
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.Hashtable;
+import java.util.Iterator;
 
 import javax.jdo.PersistenceManager;
 
+import org.apache.log4j.Logger;
 import org.nightlabs.annotation.Implement;
+import org.nightlabs.jdo.NLJDOHelper;
 import org.nightlabs.jfire.base.Lookup;
 import org.nightlabs.jfire.jdo.notification.DirtyObjectID;
 import org.nightlabs.jfire.jdo.notification.JDOLifecycleState;
@@ -15,6 +18,7 @@ import org.nightlabs.jfire.jdo.notification.persistent.NotificationFilter;
 import org.nightlabs.jfire.jdo.notification.persistent.NotificationReceiver;
 import org.nightlabs.jfire.simpletrade.SimpleTradeManager;
 import org.nightlabs.jfire.simpletrade.SimpleTradeManagerUtil;
+import org.nightlabs.jfire.simpletrade.store.SimpleProductType;
 
 /**
  * @author Marco Schulze - Marco at NightLabs dot de
@@ -29,6 +33,8 @@ import org.nightlabs.jfire.simpletrade.SimpleTradeManagerUtil;
 public class SimpleProductTypeNotificationReceiver
 extends NotificationReceiver
 {
+	private static final Logger logger = Logger.getLogger(SimpleProductTypeNotificationReceiver.class);
+
 	/**
 	 * @deprecated Only for JDO!
 	 */
@@ -72,6 +78,36 @@ extends NotificationReceiver
 		Hashtable initialContextProperties = Lookup.getInitialContextProperties(pm, notificationBundle.getOrganisationID());
 		SimpleTradeManager simpleTradeManager = SimpleTradeManagerUtil.getHome(initialContextProperties).create();
 		Collection productTypes = simpleTradeManager.getSimpleProductTypesForReseller(productTypeIDs_load, false);
-		pm.makePersistentAll(productTypes);
+
+		int previousProductTypesSize = productTypes.size();
+		while (!productTypes.isEmpty()) {
+			for (Iterator it = productTypes.iterator(); it.hasNext(); ) {
+				SimpleProductType simpleProductType = (SimpleProductType) it.next();
+
+				if (simpleProductType.getExtendedProductType() == null || NLJDOHelper.exists(pm, simpleProductType.getExtendedProductType())) {
+					pm.makePersistent(simpleProductType);
+					it.remove();
+				}
+			}
+
+			if (previousProductTypesSize == productTypes.size())
+				break;
+
+			previousProductTypesSize = productTypes.size();
+		}
+
+		if (!productTypes.isEmpty()) {
+			logger.error("Could not persist the following SimpleProductTypes because of missing extendedProductType:");
+			for (Iterator it = productTypes.iterator(); it.hasNext(); ) {
+				SimpleProductType simpleProductType = (SimpleProductType) it.next();
+				String name;
+				try {
+					name = simpleProductType.getName().getText();
+				} catch (Exception x) {
+					name = "ERROR: " + x.getMessage();
+				}
+				logger.error("  - " + simpleProductType.getPrimaryKey() + " (" + name + ")");
+			}
+		}
 	}
 }

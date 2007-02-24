@@ -424,7 +424,7 @@ implements
 	 * If a ProductType of this nature does package other product types, their price
 	 * can only be dependent on the price of this ProductType. This means, a special
 	 * price config is required for this multi-level-nesting
-	 * (the {@link org.nightlabs.jfire.accounting.gridpriceconfig.TariffPriceConfig}
+	 * (the {@link org.nightlabs.jfire.accounting.gridpriceconfig.GridPriceConfig}
 	 * cannot be used for the second [and 3rd...] level of nesting).
 	 * </p>
 	 */

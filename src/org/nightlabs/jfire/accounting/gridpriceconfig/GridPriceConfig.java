@@ -55,19 +55,19 @@ import org.nightlabs.jfire.trade.CustomerGroup;
  *		identity-type="application"
  *		persistence-capable-superclass="org.nightlabs.jfire.accounting.priceconfig.PriceConfig"
  *		detachable="true"
- *		table="JFireTrade_TariffPriceConfig"
+ *		table="JFireTrade_GridPriceConfig"
  *
  * @jdo.inheritance strategy="new-table"
  *
- * @jdo.fetch-group name="TariffPriceConfig.customerGroups" fields="customerGroups"
- * @jdo.fetch-group name="TariffPriceConfig.tariffs" fields="tariffs"
+ * @jdo.fetch-group name="GridPriceConfig.customerGroups" fields="customerGroups"
+ * @jdo.fetch-group name="GridPriceConfig.tariffs" fields="tariffs"
  *
  * @jdo.fetch-group name="FetchGroupsPriceConfig.edit" fetch-groups="default" fields="customerGroups, tariffs"
  */
-public abstract class TariffPriceConfig extends PriceConfig
+public abstract class GridPriceConfig extends PriceConfig
 {
-	public static final String FETCH_GROUP_CUSTOMER_GROUPS = "TariffPriceConfig.customerGroups";
-	public static final String FETCH_GROUP_TARIFFS = "TariffPriceConfig.tariffs";
+	public static final String FETCH_GROUP_CUSTOMER_GROUPS = "GridPriceConfig.customerGroups";
+	public static final String FETCH_GROUP_TARIFFS = "GridPriceConfig.tariffs";
 
 	/**
 	 * key: String customerGroupPK<br/>
@@ -78,7 +78,7 @@ public abstract class TariffPriceConfig extends PriceConfig
 	 *		collection-type="map"
 	 *		key-type="java.lang.String"
 	 *		value-type="CustomerGroup"
-	 *		table="JFireTrade_TariffPriceConfig_customerGroups"
+	 *		table="JFireTrade_GridPriceConfig_customerGroups"
 	 *
 	 * @jdo.join
 	 */
@@ -93,20 +93,20 @@ public abstract class TariffPriceConfig extends PriceConfig
 	 *		collection-type="map"
 	 *		key-type="java.lang.String"
 	 *		value-type="Tariff"
-	 *		table="JFireTrade_TariffPriceConfig_tariffs"
+	 *		table="JFireTrade_GridPriceConfig_tariffs"
 	 *
 	 * @jdo.join
 	 */
 	private Map<String, Tariff> tariffs = new HashMap<String, Tariff>();
 
-	protected TariffPriceConfig()
+	protected GridPriceConfig()
 	{
 	}
 	/**
 	 * @param organisationID
 	 * @param priceConfigID
 	 */
-	public TariffPriceConfig(String organisationID, long priceConfigID)
+	public GridPriceConfig(String organisationID, long priceConfigID)
 	{
 		super(organisationID, priceConfigID);
 	}
@@ -176,7 +176,7 @@ public abstract class TariffPriceConfig extends PriceConfig
 	}
 	
 	/**
-	 * Calls {@link #adoptParameters(TariffPriceConfig, boolean)} with <tt>onlyAdd=false</tt>.
+	 * Calls {@link #adoptParameters(GridPriceConfig, boolean)} with <tt>onlyAdd=false</tt>.
 	 */
 	public void adoptParameters(IPriceConfig other)
 	{
@@ -198,7 +198,7 @@ public abstract class TariffPriceConfig extends PriceConfig
 	 * inner price config defines, but <tt>PriceFragmentType</tt> s are merged (i.e. one
 	 * occurence anywhere in the package forces the packagePriceConfig to know it).
 	 *
-	 * @param other The other TariffPriceConfig from which to take over the parameter config.
+	 * @param other The other GridPriceConfig from which to take over the parameter config.
 	 * @param onlyAdd If this is true, no parameter will be removed and only missing params added.
 	 */
 	public void adoptParameters(IPriceConfig _other, boolean onlyAdd)
@@ -206,10 +206,10 @@ public abstract class TariffPriceConfig extends PriceConfig
 		if (_other == null)
 			throw new IllegalArgumentException("Param 'IPriceConfig other' must not be null!");
 
-		if (!(_other instanceof TariffPriceConfig))
-			throw new IllegalArgumentException("other is an instance of \""+_other.getClass().getName()+"\" but must be TariffPriceConfig!");
+		if (!(_other instanceof GridPriceConfig))
+			throw new IllegalArgumentException("other is an instance of \""+_other.getClass().getName()+"\" but must be GridPriceConfig!");
 
-		TariffPriceConfig other = (TariffPriceConfig)_other;
+		GridPriceConfig other = (GridPriceConfig)_other;
 
 		// assimilate CustomerGroup s
 		HashSet customerGroupsToRemove = onlyAdd ? null : new HashSet();

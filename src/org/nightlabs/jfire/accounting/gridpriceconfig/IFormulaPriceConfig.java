@@ -36,7 +36,7 @@ import org.nightlabs.jfire.accounting.priceconfig.IPriceConfig;
 public interface IFormulaPriceConfig extends IInnerPriceConfig
 {
 	/**
-	 * Calls {@link #adoptParameters(TariffPriceConfig, boolean)} with <tt>onlyAdd=false</tt>.
+	 * Calls {@link #adoptParameters(GridPriceConfig, boolean)} with <tt>onlyAdd=false</tt>.
 	 */
 	void adoptParameters(IPriceConfig other);
 	
@@ -55,7 +55,7 @@ public interface IFormulaPriceConfig extends IInnerPriceConfig
 	 * inner price config defines, but <tt>PriceFragmentType</tt> s are merged (i.e. one
 	 * occurence anywhere in the package forces the packagePriceConfig to know it).
 	 *
-	 * @param other The other TariffPriceConfig from which to take over the parameter config.
+	 * @param other The other GridPriceConfig from which to take over the parameter config.
 	 * @param onlyAdd If this is true, no parameter will be removed and only missing params added.
 	 */
 	void adoptParameters(IPriceConfig _other, boolean onlyAdd);

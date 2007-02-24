@@ -48,7 +48,7 @@ import org.nightlabs.jfire.trade.CustomerGroup;
  *
  * @jdo.persistence-capable
  *		identity-type = "application"
- *		persistence-capable-superclass = "org.nightlabs.jfire.accounting.gridpriceconfig.TariffPriceConfig"
+ *		persistence-capable-superclass = "org.nightlabs.jfire.accounting.gridpriceconfig.GridPriceConfig"
  *		detachable = "true"
  *		table="JFireTrade_FormulaPriceConfig"
  *
@@ -62,7 +62,7 @@ import org.nightlabs.jfire.trade.CustomerGroup;
  * @jdo.fetch-group name="FetchGroupsPriceConfig.edit" fetch-groups="default" fields="fallbackFormulaCell, formulaCells, packagingResultPriceConfigs, productTypes"
  */
 public class FormulaPriceConfig
-extends TariffPriceConfig
+extends GridPriceConfig
 implements IFormulaPriceConfig
 {
 	public static final String FETCH_GROUP_FALLBACK_FORMULA_CELL = "FormulaPriceConfig.fallbackFormulaCell";
@@ -81,7 +81,7 @@ implements IFormulaPriceConfig
 	 *		persistence-modifier="persistent"
 	 *		collection-type="map"
 	 *		key-type="String"
-	 *		value-type="TariffPriceConfig"
+	 *		value-type="GridPriceConfig"
 	 *		dependent-value="true"
 	 *		table="JFireTrade_FormulaPriceConfig_packagingResultPriceConfigs"
 	 *
@@ -367,7 +367,7 @@ implements IFormulaPriceConfig
 		formulaCells.remove(priceCoordinate);
 	}
 //	/**
-//	 * @see org.nightlabs.jfire.accounting.gridpriceconfig.TariffPriceConfig#getPriceCell(org.nightlabs.jfire.accounting.gridpriceconfig.PriceCoordinate, boolean)
+//	 * @see org.nightlabs.jfire.accounting.gridpriceconfig.GridPriceConfig#getPriceCell(org.nightlabs.jfire.accounting.gridpriceconfig.PriceCoordinate, boolean)
 //	 */
 //	public PriceCell getPriceCell(PriceCoordinate priceCoordinate, boolean throwExceptionIfNotExistent)
 //	{
@@ -375,9 +375,9 @@ implements IFormulaPriceConfig
 //	}
 
 //	/**
-//	 * @see org.nightlabs.jfire.accounting.gridpriceconfig.TariffPriceConfig#adoptParameters(org.nightlabs.jfire.accounting.gridpriceconfig.TariffPriceConfig)
+//	 * @see org.nightlabs.jfire.accounting.gridpriceconfig.GridPriceConfig#adoptParameters(org.nightlabs.jfire.accounting.gridpriceconfig.GridPriceConfig)
 //	 */
-//	public void adoptParameters(TariffPriceConfig other)
+//	public void adoptParameters(GridPriceConfig other)
 //	{
 //		super.adoptParameters(other);
 //		// TODO This is expensive! Is it really necessary? Can we  

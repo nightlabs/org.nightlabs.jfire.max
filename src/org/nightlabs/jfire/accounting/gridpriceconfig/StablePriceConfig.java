@@ -51,7 +51,7 @@ import org.nightlabs.jfire.trade.CustomerGroup;
  * 
  * @jdo.persistence-capable
  *		identity-type="application"
- *		persistence-capable-superclass="org.nightlabs.jfire.accounting.gridpriceconfig.TariffPriceConfig"
+ *		persistence-capable-superclass="org.nightlabs.jfire.accounting.gridpriceconfig.GridPriceConfig"
  *		detachable="true"
  *		table="JFireTrade_StablePriceConfig"
  *
@@ -71,7 +71,7 @@ import org.nightlabs.jfire.trade.CustomerGroup;
  * @jdo.fetch-group name="FetchGroupsPriceConfig.edit" fetch-groups="default" fields="priceCells"
  */
 public class StablePriceConfig
-extends TariffPriceConfig
+extends GridPriceConfig
 implements IPackagePriceConfig, IResultPriceConfig
 {
 	public static final String FETCH_GROUP_PRICE_CELLS = "StablePriceConfig.priceCells";
@@ -270,7 +270,7 @@ implements IPackagePriceConfig, IResultPriceConfig
 	}
 
 	/**
-	 * @see org.nightlabs.jfire.accounting.gridpriceconfig.TariffPriceConfig#addCustomerGroup(org.nightlabs.jfire.accounting.CustomerGroup)
+	 * @see org.nightlabs.jfire.accounting.gridpriceconfig.GridPriceConfig#addCustomerGroup(org.nightlabs.jfire.accounting.CustomerGroup)
 	 */
 	public void addCustomerGroup(CustomerGroup customerGroup)
 	{
@@ -279,7 +279,7 @@ implements IPackagePriceConfig, IResultPriceConfig
 			createPriceCells(customerGroup, null, null);
 	}
 	/**
-	 * @see org.nightlabs.jfire.accounting.gridpriceconfig.TariffPriceConfig#addTariff(org.nightlabs.jfire.accounting.Tariff)
+	 * @see org.nightlabs.jfire.accounting.gridpriceconfig.GridPriceConfig#addTariff(org.nightlabs.jfire.accounting.Tariff)
 	 */
 	public void addTariff(Tariff tariff)
 	{
@@ -298,7 +298,7 @@ implements IPackagePriceConfig, IResultPriceConfig
 	}
 
 	/**
-	 * @see org.nightlabs.jfire.accounting.gridpriceconfig.TariffPriceConfig#removeCustomerGroup(java.lang.String, java.lang.String)
+	 * @see org.nightlabs.jfire.accounting.gridpriceconfig.GridPriceConfig#removeCustomerGroup(java.lang.String, java.lang.String)
 	 */
 	public CustomerGroup removeCustomerGroup(String organisationID,
 			String customerGroupID)
@@ -309,7 +309,7 @@ implements IPackagePriceConfig, IResultPriceConfig
 		return cg;
 	}
 	/**
-	 * @see org.nightlabs.jfire.accounting.gridpriceconfig.TariffPriceConfig#removeTariff(java.lang.String, long)
+	 * @see org.nightlabs.jfire.accounting.gridpriceconfig.GridPriceConfig#removeTariff(java.lang.String, long)
 	 */
 	public Tariff removeTariff(String organisationID, long tariffID)
 	{

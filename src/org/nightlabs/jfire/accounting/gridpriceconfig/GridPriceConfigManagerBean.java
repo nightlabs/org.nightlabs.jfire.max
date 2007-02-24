@@ -64,14 +64,14 @@ import org.nightlabs.jfire.trade.CustomerGroup;
 import org.nightlabs.jfire.trade.id.CustomerGroupID;
 
 /**
- * @ejb.bean name="jfire/ejb/JFireTrade/TariffPriceConfigManager"	
- *           jndi-name="jfire/ejb/JFireTrade/TariffPriceConfigManager"
+ * @ejb.bean name="jfire/ejb/JFireTrade/GridPriceConfigManager"	
+ *           jndi-name="jfire/ejb/JFireTrade/GridPriceConfigManager"
  *           type="Stateless" 
  *           transaction-type="Container"
  *
  * @ejb.util generate = "physical"
  */
-public abstract class TariffPriceConfigManagerBean
+public abstract class GridPriceConfigManagerBean
 extends BaseSessionBeanImpl
 implements SessionBean
 {
@@ -129,7 +129,7 @@ implements SessionBean
 		logger.debug(this.getClass().getName() + ".ejbPassivate()");
 	}
 
-	public static void logTariffPriceConfig(TariffPriceConfig priceConfig)
+	public static void logGridPriceConfig(GridPriceConfig priceConfig)
 	{
 		if (!logger.isDebugEnabled())
 			return;
@@ -186,23 +186,23 @@ implements SessionBean
 	 * @ejb.transaction type="Required"
 	 * @ejb.permission role-name="_Guest_"
 	 */
-	public Collection<TariffPriceConfig> storePriceConfigs(Collection<TariffPriceConfig> _priceConfigs, boolean get, String[] fetchGroups, int maxFetchDepth)
+	public Collection<GridPriceConfig> storePriceConfigs(Collection<GridPriceConfig> _priceConfigs, boolean get, String[] fetchGroups, int maxFetchDepth)
 	throws ModuleException
 	{
 		PersistenceManager pm = getPersistenceManager();
 		try {
 			if (logger.isDebugEnabled()) {
-				for (TariffPriceConfig priceConfig : _priceConfigs) {
+				for (GridPriceConfig priceConfig : _priceConfigs) {
 					logger.debug("storePriceConfig: PriceConfig BEFORE attach:");
-					logTariffPriceConfig(priceConfig);
+					logGridPriceConfig(priceConfig);
 				}
 			}
 
 			// store all price configs and put the living objects into priceConfigs
-			Set<TariffPriceConfig> priceConfigs = new HashSet<TariffPriceConfig>();
+			Set<GridPriceConfig> priceConfigs = new HashSet<GridPriceConfig>();
 			List<AffectedProductType> affectedProductTypes = null;
-			for (TariffPriceConfig priceConfig : _priceConfigs) {
-				priceConfig = (TariffPriceConfig) pm.makePersistent(priceConfig);
+			for (GridPriceConfig priceConfig : _priceConfigs) {
+				priceConfig = (GridPriceConfig) pm.makePersistent(priceConfig);
 				priceConfigs.add(priceConfig);
 				
 				if (affectedProductTypes == null)

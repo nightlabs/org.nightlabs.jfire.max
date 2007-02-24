@@ -64,8 +64,8 @@ import org.nightlabs.jfire.accounting.book.fragmentbased.OwnerDimension;
 import org.nightlabs.jfire.accounting.book.fragmentbased.PriceFragmentDimension;
 import org.nightlabs.jfire.accounting.book.fragmentbased.SourceOrganisationDimension;
 import org.nightlabs.jfire.accounting.book.id.LocalAccountantDelegateID;
-import org.nightlabs.jfire.accounting.gridpriceconfig.TariffPriceConfig;
-import org.nightlabs.jfire.accounting.gridpriceconfig.TariffPriceConfigManagerBean;
+import org.nightlabs.jfire.accounting.gridpriceconfig.GridPriceConfig;
+import org.nightlabs.jfire.accounting.gridpriceconfig.GridPriceConfigManagerBean;
 import org.nightlabs.jfire.accounting.id.CurrencyID;
 import org.nightlabs.jfire.accounting.id.InvoiceID;
 import org.nightlabs.jfire.accounting.id.InvoiceLocalID;
@@ -2311,13 +2311,13 @@ public abstract class AccountingManagerBean
 
 				for (ProductType productType : productTypes) {
 					logger.debug("getProductTypeForPriceConfigEditing: productType="+productType.getPrimaryKey());
-					if (productType.getInnerPriceConfig() instanceof TariffPriceConfig) {
+					if (productType.getInnerPriceConfig() instanceof GridPriceConfig) {
 						logger.debug("innerPriceConfig:");
-						TariffPriceConfigManagerBean.logTariffPriceConfig((TariffPriceConfig)productType.getInnerPriceConfig());
+						GridPriceConfigManagerBean.logGridPriceConfig((GridPriceConfig)productType.getInnerPriceConfig());
 					}
-					if (productType.getPackagePriceConfig() instanceof TariffPriceConfig) {
+					if (productType.getPackagePriceConfig() instanceof GridPriceConfig) {
 						logger.debug("packagePriceConfig:");
-						TariffPriceConfigManagerBean.logTariffPriceConfig((TariffPriceConfig)productType.getPackagePriceConfig());
+						GridPriceConfigManagerBean.logGridPriceConfig((GridPriceConfig)productType.getPackagePriceConfig());
 					}
 				}
 			}

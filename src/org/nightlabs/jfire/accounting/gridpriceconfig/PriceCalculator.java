@@ -296,7 +296,7 @@ public class PriceCalculator
 			}
 		}
 		
-//		TariffPriceConfig aipipc = (TariffPriceConfig) packageProductType.getInnerProductType().getPriceConfig();
+//		GridPriceConfig aipipc = (GridPriceConfig) packageProductType.getInnerProductType().getPriceConfig();
 //
 //		// We need to assign all the parameters from the inner PriceConfig to our
 //		// packagePriceConfig, because it is the inner PConfig that defines which

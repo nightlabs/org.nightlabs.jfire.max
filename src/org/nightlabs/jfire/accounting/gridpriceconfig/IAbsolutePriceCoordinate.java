@@ -24,52 +24,21 @@
  *                                                                             *
  ******************************************************************************/
 
-package org.nightlabs.jfire.accounting.tariffpriceconfig;
+package org.nightlabs.jfire.accounting.gridpriceconfig;
 
 /**
  * @author Marco Schulze - marco at nightlabs dot de
  */
-public class MissingResultException extends InvalidResultException
+public interface IAbsolutePriceCoordinate
+extends IPriceCoordinate
 {
+	/**
+	 * @return Returns the priceFragmentTypePK.
+	 */
+	String getPriceFragmentTypePK();
 
 	/**
-	 * @param absolutePriceCoordinate
+	 * @return Returns the productTypePK.
 	 */
-	public MissingResultException(IAbsolutePriceCoordinate absolutePriceCoordinate)
-	{
-		super(absolutePriceCoordinate);
-	}
-
-	/**
-	 * @param absolutePriceCoordinate
-	 * @param message
-	 */
-	public MissingResultException(
-			IAbsolutePriceCoordinate absolutePriceCoordinate, String message)
-	{
-		super(absolutePriceCoordinate, message);
-	}
-
-	/**
-	 * @param absolutePriceCoordinate
-	 * @param message
-	 * @param cause
-	 */
-	public MissingResultException(
-			IAbsolutePriceCoordinate absolutePriceCoordinate, String message,
-			Throwable cause)
-	{
-		super(absolutePriceCoordinate, message, cause);
-	}
-
-	/**
-	 * @param absolutePriceCoordinate
-	 * @param cause
-	 */
-	public MissingResultException(
-			IAbsolutePriceCoordinate absolutePriceCoordinate, Throwable cause)
-	{
-		super(absolutePriceCoordinate, cause);
-	}
-
+	String getProductTypePK();
 }

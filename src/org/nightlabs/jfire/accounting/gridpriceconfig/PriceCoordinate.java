@@ -24,7 +24,7 @@
  *                                                                             *
  ******************************************************************************/
 
-package org.nightlabs.jfire.accounting.tariffpriceconfig;
+package org.nightlabs.jfire.accounting.gridpriceconfig;
 
 import java.io.Serializable;
 
@@ -42,7 +42,7 @@ import org.nightlabs.jfire.trade.CustomerGroup;
  *
  * @jdo.persistence-capable
  *		identity-type="application"
- *		objectid-class="org.nightlabs.jfire.accounting.tariffpriceconfig.id.PriceCoordinateID"
+ *		objectid-class="org.nightlabs.jfire.accounting.gridpriceconfig.id.PriceCoordinateID"
  *		detachable="true"
  *		table="JFireTrade_PriceCoordinate"
  *

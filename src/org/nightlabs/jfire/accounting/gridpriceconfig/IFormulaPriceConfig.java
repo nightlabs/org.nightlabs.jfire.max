@@ -24,7 +24,7 @@
  *                                                                             *
  ******************************************************************************/
 
-package org.nightlabs.jfire.accounting.tariffpriceconfig;
+package org.nightlabs.jfire.accounting.gridpriceconfig;
 
 import org.nightlabs.jfire.accounting.PriceFragmentType;
 import org.nightlabs.jfire.accounting.priceconfig.IInnerPriceConfig;

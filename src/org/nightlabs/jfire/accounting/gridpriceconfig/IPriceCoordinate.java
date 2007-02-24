@@ -24,50 +24,47 @@
  *                                                                             *
  ******************************************************************************/
 
-package org.nightlabs.jfire.accounting.tariffpriceconfig;
+package org.nightlabs.jfire.accounting.gridpriceconfig;
 
+import org.nightlabs.jfire.accounting.priceconfig.PriceConfig;
 
 /**
  * @author Marco Schulze - marco at nightlabs dot de
  */
-public class CircularReferenceException extends PriceCalculationException
+public interface IPriceCoordinate
 {
-	
 	/**
-	 * @param absolutePriceCoordinate
+	 * @return Returns the currencyID.
 	 */
-	public CircularReferenceException(
-			IAbsolutePriceCoordinate absolutePriceCoordinate)
-	{
-		super(absolutePriceCoordinate);
-	}
+	String getCurrencyID();
+
 	/**
-	 * @param absolutePriceCoordinate
-	 * @param message
+	 * @return Returns the customerGroupPK.
 	 */
-	public CircularReferenceException(
-			IAbsolutePriceCoordinate absolutePriceCoordinate, String message)
-	{
-		super(absolutePriceCoordinate, message);
-	}
+	String getCustomerGroupPK();
+
 	/**
-	 * @param absolutePriceCoordinate
-	 * @param message
-	 * @param cause
+	 * @return Returns the priceConfig.
 	 */
-	public CircularReferenceException(
-			IAbsolutePriceCoordinate absolutePriceCoordinate, String message,
-			Throwable cause)
-	{
-		super(absolutePriceCoordinate, message, cause);
-	}
+	PriceConfig getPriceConfig();
+
 	/**
-	 * @param absolutePriceCoordinate
-	 * @param cause
+	 * @return Returns the tariffPK.
 	 */
-	public CircularReferenceException(
-			IAbsolutePriceCoordinate absolutePriceCoordinate, Throwable cause)
-	{
-		super(absolutePriceCoordinate, cause);
-	}
+	String getTariffPK();
+
+	/**
+	 * @param currencyID The currencyID to set.
+	 */
+	void setCurrencyID(String currencyID);
+
+	/**
+	 * @param customerGroupPK The customerGroupPK to set.
+	 */
+	void setCustomerGroupPK(String customerGroupPK);
+
+	/**
+	 * @param tariffPK The tariffPK to set.
+	 */
+	void setTariffPK(String tariffPK);
 }

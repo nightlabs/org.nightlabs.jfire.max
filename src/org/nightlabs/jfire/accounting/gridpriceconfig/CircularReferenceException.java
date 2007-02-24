@@ -24,58 +24,50 @@
  *                                                                             *
  ******************************************************************************/
 
-package org.nightlabs.jfire.accounting.tariffpriceconfig;
+package org.nightlabs.jfire.accounting.gridpriceconfig;
 
-import java.io.Serializable;
-
-import org.nightlabs.jfire.accounting.Price;
-import org.nightlabs.jfire.accounting.Tariff;
 
 /**
  * @author Marco Schulze - marco at nightlabs dot de
  */
-public class TariffPricePair
-implements Serializable
+public class CircularReferenceException extends PriceCalculationException
 {
-	private Tariff tariff;
-	private Price price;
-
-	public TariffPricePair()
-	{
-	}
 	
-	public TariffPricePair(Tariff tariff, Price price)
-	{
-		this.tariff = tariff;
-		this.price = price;
-	}
-
 	/**
-	 * @return Returns the price.
+	 * @param absolutePriceCoordinate
 	 */
-	public Price getPrice()
+	public CircularReferenceException(
+			IAbsolutePriceCoordinate absolutePriceCoordinate)
 	{
-		return price;
+		super(absolutePriceCoordinate);
 	}
-//	/**
-//	 * @param price The price to set.
-//	 */
-//	public void setPrice(Price price)
-//	{
-//		this.price = price;
-//	}
 	/**
-	 * @return Returns the tariff.
+	 * @param absolutePriceCoordinate
+	 * @param message
 	 */
-	public Tariff getTariff()
+	public CircularReferenceException(
+			IAbsolutePriceCoordinate absolutePriceCoordinate, String message)
 	{
-		return tariff;
+		super(absolutePriceCoordinate, message);
 	}
-//	/**
-//	 * @param tariff The tariff to set.
-//	 */
-//	public void setTariff(Tariff tariff)
-//	{
-//		this.tariff = tariff;
-//	}
+	/**
+	 * @param absolutePriceCoordinate
+	 * @param message
+	 * @param cause
+	 */
+	public CircularReferenceException(
+			IAbsolutePriceCoordinate absolutePriceCoordinate, String message,
+			Throwable cause)
+	{
+		super(absolutePriceCoordinate, message, cause);
+	}
+	/**
+	 * @param absolutePriceCoordinate
+	 * @param cause
+	 */
+	public CircularReferenceException(
+			IAbsolutePriceCoordinate absolutePriceCoordinate, Throwable cause)
+	{
+		super(absolutePriceCoordinate, cause);
+	}
 }

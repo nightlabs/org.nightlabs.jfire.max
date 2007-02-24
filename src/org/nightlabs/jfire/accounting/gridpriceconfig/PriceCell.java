@@ -24,7 +24,7 @@
  *                                                                             *
  ******************************************************************************/
 
-package org.nightlabs.jfire.accounting.tariffpriceconfig;
+package org.nightlabs.jfire.accounting.gridpriceconfig;
 
 import java.io.Serializable;
 import java.util.HashMap;
@@ -40,7 +40,7 @@ import org.nightlabs.jfire.accounting.priceconfig.PriceConfig;
  *
  * @jdo.persistence-capable
  *		identity-type="application"
- *		objectid-class="org.nightlabs.jfire.accounting.tariffpriceconfig.id.PriceCellID"
+ *		objectid-class="org.nightlabs.jfire.accounting.gridpriceconfig.id.PriceCellID"
  *		detachable="true"
  *		table="JFireTrade_PriceCell"
  *
@@ -61,7 +61,7 @@ import org.nightlabs.jfire.accounting.priceconfig.PriceConfig;
  *			this.priceCoordinate.customerGroupPK == paramCustomerGroupPK &&
  *			this.priceCoordinate.currencyID == paramCurrencyID
  *		PARAMETERS StablePriceConfig paramPriceConfig, String paramCustomerGroupPK, String paramCurrencyID
- *		import java.lang.String; import org.nightlabs.jfire.accounting.tariffpriceconfig.StablePriceConfig"
+ *		import java.lang.String; import org.nightlabs.jfire.accounting.gridpriceconfig.StablePriceConfig"
  */
 public class PriceCell implements Serializable
 {

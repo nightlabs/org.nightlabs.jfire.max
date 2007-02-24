@@ -24,52 +24,58 @@
  *                                                                             *
  ******************************************************************************/
 
-package org.nightlabs.jfire.accounting.tariffpriceconfig;
+package org.nightlabs.jfire.accounting.gridpriceconfig;
+
+import java.io.Serializable;
+
+import org.nightlabs.jfire.accounting.Price;
+import org.nightlabs.jfire.accounting.Tariff;
 
 /**
  * @author Marco Schulze - marco at nightlabs dot de
  */
-public class InvalidResultException extends PriceCalculationException
+public class TariffPricePair
+implements Serializable
 {
+	private Tariff tariff;
+	private Price price;
 
-	/**
-	 * @param absolutePriceCoordinate
-	 */
-	public InvalidResultException(IAbsolutePriceCoordinate absolutePriceCoordinate)
+	public TariffPricePair()
 	{
-		super(absolutePriceCoordinate);
+	}
+	
+	public TariffPricePair(Tariff tariff, Price price)
+	{
+		this.tariff = tariff;
+		this.price = price;
 	}
 
 	/**
-	 * @param absolutePriceCoordinate
-	 * @param message
+	 * @return Returns the price.
 	 */
-	public InvalidResultException(
-			IAbsolutePriceCoordinate absolutePriceCoordinate, String message)
+	public Price getPrice()
 	{
-		super(absolutePriceCoordinate, message);
+		return price;
 	}
-
+//	/**
+//	 * @param price The price to set.
+//	 */
+//	public void setPrice(Price price)
+//	{
+//		this.price = price;
+//	}
 	/**
-	 * @param absolutePriceCoordinate
-	 * @param message
-	 * @param cause
+	 * @return Returns the tariff.
 	 */
-	public InvalidResultException(
-			IAbsolutePriceCoordinate absolutePriceCoordinate, String message,
-			Throwable cause)
+	public Tariff getTariff()
 	{
-		super(absolutePriceCoordinate, message, cause);
+		return tariff;
 	}
-
-	/**
-	 * @param absolutePriceCoordinate
-	 * @param cause
-	 */
-	public InvalidResultException(
-			IAbsolutePriceCoordinate absolutePriceCoordinate, Throwable cause)
-	{
-		super(absolutePriceCoordinate, cause);
-	}
-
+//	/**
+//	 * @param tariff The tariff to set.
+//	 */
+//	public void setTariff(Tariff tariff)
+//	{
+//		this.tariff = tariff;
+//	}
 }

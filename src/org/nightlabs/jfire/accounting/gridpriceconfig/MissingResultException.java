@@ -24,55 +24,52 @@
  *                                                                             *
  ******************************************************************************/
 
-package org.nightlabs.jfire.accounting.tariffpriceconfig;
-
-import org.nightlabs.ModuleException;
+package org.nightlabs.jfire.accounting.gridpriceconfig;
 
 /**
  * @author Marco Schulze - marco at nightlabs dot de
  */
-public class PriceCalculationException extends ModuleException
+public class MissingResultException extends InvalidResultException
 {
-	private IAbsolutePriceCoordinate absolutePriceCoordinate;
 
-	public PriceCalculationException(IAbsolutePriceCoordinate absolutePriceCoordinate)
+	/**
+	 * @param absolutePriceCoordinate
+	 */
+	public MissingResultException(IAbsolutePriceCoordinate absolutePriceCoordinate)
 	{
-		this.absolutePriceCoordinate = absolutePriceCoordinate;
+		super(absolutePriceCoordinate);
 	}
 
 	/**
+	 * @param absolutePriceCoordinate
 	 * @param message
 	 */
-	public PriceCalculationException(IAbsolutePriceCoordinate absolutePriceCoordinate, String message)
+	public MissingResultException(
+			IAbsolutePriceCoordinate absolutePriceCoordinate, String message)
 	{
-		super(message);
-		this.absolutePriceCoordinate = absolutePriceCoordinate;
+		super(absolutePriceCoordinate, message);
 	}
 
 	/**
+	 * @param absolutePriceCoordinate
 	 * @param message
 	 * @param cause
 	 */
-	public PriceCalculationException(IAbsolutePriceCoordinate absolutePriceCoordinate, String message, Throwable cause)
+	public MissingResultException(
+			IAbsolutePriceCoordinate absolutePriceCoordinate, String message,
+			Throwable cause)
 	{
-		super(message, cause);
-		this.absolutePriceCoordinate = absolutePriceCoordinate;
+		super(absolutePriceCoordinate, message, cause);
 	}
 
 	/**
+	 * @param absolutePriceCoordinate
 	 * @param cause
 	 */
-	public PriceCalculationException(IAbsolutePriceCoordinate absolutePriceCoordinate, Throwable cause)
+	public MissingResultException(
+			IAbsolutePriceCoordinate absolutePriceCoordinate, Throwable cause)
 	{
-		super(cause);
-		this.absolutePriceCoordinate = absolutePriceCoordinate;
+		super(absolutePriceCoordinate, cause);
 	}
 
-	/**
-	 * @return Returns the absolutePriceCoordinate.
-	 */
-	public IAbsolutePriceCoordinate getAbsolutePriceCoordinate()
-	{
-		return absolutePriceCoordinate;
-	}
 }

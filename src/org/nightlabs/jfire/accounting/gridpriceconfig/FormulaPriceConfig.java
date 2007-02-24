@@ -24,7 +24,7 @@
  *                                                                             *
  ******************************************************************************/
 
-package org.nightlabs.jfire.accounting.tariffpriceconfig;
+package org.nightlabs.jfire.accounting.gridpriceconfig;
 
 import java.util.Collection;
 import java.util.HashMap;
@@ -48,7 +48,7 @@ import org.nightlabs.jfire.trade.CustomerGroup;
  *
  * @jdo.persistence-capable
  *		identity-type = "application"
- *		persistence-capable-superclass = "org.nightlabs.jfire.accounting.tariffpriceconfig.TariffPriceConfig"
+ *		persistence-capable-superclass = "org.nightlabs.jfire.accounting.gridpriceconfig.TariffPriceConfig"
  *		detachable = "true"
  *		table="JFireTrade_FormulaPriceConfig"
  *
@@ -272,7 +272,7 @@ implements IFormulaPriceConfig
 		removeFormulaCell(priceCoordinate);
 	}
 	/**
-	 * @see org.nightlabs.jfire.accounting.tariffpriceconfig.IFormulaPriceConfig#getFallbackFormulaCell(boolean)
+	 * @see org.nightlabs.jfire.accounting.gridpriceconfig.IFormulaPriceConfig#getFallbackFormulaCell(boolean)
 	 */
 	public FormulaCell getFallbackFormulaCell(boolean throwExceptionIfNotExistent)
 	{
@@ -367,7 +367,7 @@ implements IFormulaPriceConfig
 		formulaCells.remove(priceCoordinate);
 	}
 //	/**
-//	 * @see org.nightlabs.jfire.accounting.tariffpriceconfig.TariffPriceConfig#getPriceCell(org.nightlabs.jfire.accounting.tariffpriceconfig.PriceCoordinate, boolean)
+//	 * @see org.nightlabs.jfire.accounting.gridpriceconfig.TariffPriceConfig#getPriceCell(org.nightlabs.jfire.accounting.gridpriceconfig.PriceCoordinate, boolean)
 //	 */
 //	public PriceCell getPriceCell(PriceCoordinate priceCoordinate, boolean throwExceptionIfNotExistent)
 //	{
@@ -375,7 +375,7 @@ implements IFormulaPriceConfig
 //	}
 
 //	/**
-//	 * @see org.nightlabs.jfire.accounting.tariffpriceconfig.TariffPriceConfig#adoptParameters(org.nightlabs.jfire.accounting.tariffpriceconfig.TariffPriceConfig)
+//	 * @see org.nightlabs.jfire.accounting.gridpriceconfig.TariffPriceConfig#adoptParameters(org.nightlabs.jfire.accounting.gridpriceconfig.TariffPriceConfig)
 //	 */
 //	public void adoptParameters(TariffPriceConfig other)
 //	{

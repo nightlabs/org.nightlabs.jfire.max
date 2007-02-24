@@ -24,7 +24,7 @@
  *                                                                             *
  ******************************************************************************/
 
-package org.nightlabs.jfire.accounting.tariffpriceconfig;
+package org.nightlabs.jfire.accounting.gridpriceconfig;
 
 import java.io.Serializable;
 import java.util.HashMap;
@@ -38,7 +38,7 @@ import org.nightlabs.jfire.accounting.priceconfig.PriceConfig;
  *
  * @jdo.persistence-capable
  *		identity-type="application"
- *		objectid-class="org.nightlabs.jfire.accounting.tariffpriceconfig.id.FormulaCellID"
+ *		objectid-class="org.nightlabs.jfire.accounting.gridpriceconfig.id.FormulaCellID"
  *		detachable="true"
  *		table="JFireTrade_FormulaCell"
  *

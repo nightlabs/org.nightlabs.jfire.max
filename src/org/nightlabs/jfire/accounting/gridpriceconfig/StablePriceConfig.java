@@ -24,7 +24,7 @@
  *                                                                             *
  ******************************************************************************/
 
-package org.nightlabs.jfire.accounting.tariffpriceconfig;
+package org.nightlabs.jfire.accounting.gridpriceconfig;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -51,20 +51,20 @@ import org.nightlabs.jfire.trade.CustomerGroup;
  * 
  * @jdo.persistence-capable
  *		identity-type="application"
- *		persistence-capable-superclass="org.nightlabs.jfire.accounting.tariffpriceconfig.TariffPriceConfig"
+ *		persistence-capable-superclass="org.nightlabs.jfire.accounting.gridpriceconfig.TariffPriceConfig"
  *		detachable="true"
  *		table="JFireTrade_StablePriceConfig"
  *
  * @jdo.inheritance strategy="new-table"
  *
  * @!jdo.query name="getPriceCellsForCustomerGroupAndCurrency" query="SELECT
- *		FROM org.nightlabs.jfire.accounting.tariffpriceconfig.PriceCell 
+ *		FROM org.nightlabs.jfire.accounting.gridpriceconfig.PriceCell 
  *		WHERE
  *			this.priceConfig == paramPriceConfig &&
  *			this.priceCoordinate.customerGroupPK == paramCustomerGroupPK &&
  *			this.priceCoordinate.currencyID == paramCurrencyID
  *		PARAMETERS StablePriceConfig paramPriceConfig, String paramCustomerGroupPK, String paramCurrencyID
- *		import java.lang.String; import org.nightlabs.jfire.accounting.tariffpriceconfig.StablePriceConfig"
+ *		import java.lang.String; import org.nightlabs.jfire.accounting.gridpriceconfig.StablePriceConfig"
  *
  * @jdo.fetch-group name="StablePriceConfig.priceCells" fields="priceCells"
  *
@@ -270,7 +270,7 @@ implements IPackagePriceConfig, IResultPriceConfig
 	}
 
 	/**
-	 * @see org.nightlabs.jfire.accounting.tariffpriceconfig.TariffPriceConfig#addCustomerGroup(org.nightlabs.jfire.accounting.CustomerGroup)
+	 * @see org.nightlabs.jfire.accounting.gridpriceconfig.TariffPriceConfig#addCustomerGroup(org.nightlabs.jfire.accounting.CustomerGroup)
 	 */
 	public void addCustomerGroup(CustomerGroup customerGroup)
 	{
@@ -279,7 +279,7 @@ implements IPackagePriceConfig, IResultPriceConfig
 			createPriceCells(customerGroup, null, null);
 	}
 	/**
-	 * @see org.nightlabs.jfire.accounting.tariffpriceconfig.TariffPriceConfig#addTariff(org.nightlabs.jfire.accounting.Tariff)
+	 * @see org.nightlabs.jfire.accounting.gridpriceconfig.TariffPriceConfig#addTariff(org.nightlabs.jfire.accounting.Tariff)
 	 */
 	public void addTariff(Tariff tariff)
 	{
@@ -298,7 +298,7 @@ implements IPackagePriceConfig, IResultPriceConfig
 	}
 
 	/**
-	 * @see org.nightlabs.jfire.accounting.tariffpriceconfig.TariffPriceConfig#removeCustomerGroup(java.lang.String, java.lang.String)
+	 * @see org.nightlabs.jfire.accounting.gridpriceconfig.TariffPriceConfig#removeCustomerGroup(java.lang.String, java.lang.String)
 	 */
 	public CustomerGroup removeCustomerGroup(String organisationID,
 			String customerGroupID)
@@ -309,7 +309,7 @@ implements IPackagePriceConfig, IResultPriceConfig
 		return cg;
 	}
 	/**
-	 * @see org.nightlabs.jfire.accounting.tariffpriceconfig.TariffPriceConfig#removeTariff(java.lang.String, long)
+	 * @see org.nightlabs.jfire.accounting.gridpriceconfig.TariffPriceConfig#removeTariff(java.lang.String, long)
 	 */
 	public Tariff removeTariff(String organisationID, long tariffID)
 	{

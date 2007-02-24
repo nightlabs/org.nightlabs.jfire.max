@@ -24,47 +24,52 @@
  *                                                                             *
  ******************************************************************************/
 
-package org.nightlabs.jfire.accounting.tariffpriceconfig;
-
-import org.nightlabs.jfire.accounting.priceconfig.PriceConfig;
+package org.nightlabs.jfire.accounting.gridpriceconfig;
 
 /**
  * @author Marco Schulze - marco at nightlabs dot de
  */
-public interface IPriceCoordinate
+public class InvalidResultException extends PriceCalculationException
 {
-	/**
-	 * @return Returns the currencyID.
-	 */
-	String getCurrencyID();
 
 	/**
-	 * @return Returns the customerGroupPK.
+	 * @param absolutePriceCoordinate
 	 */
-	String getCustomerGroupPK();
+	public InvalidResultException(IAbsolutePriceCoordinate absolutePriceCoordinate)
+	{
+		super(absolutePriceCoordinate);
+	}
 
 	/**
-	 * @return Returns the priceConfig.
+	 * @param absolutePriceCoordinate
+	 * @param message
 	 */
-	PriceConfig getPriceConfig();
+	public InvalidResultException(
+			IAbsolutePriceCoordinate absolutePriceCoordinate, String message)
+	{
+		super(absolutePriceCoordinate, message);
+	}
 
 	/**
-	 * @return Returns the tariffPK.
+	 * @param absolutePriceCoordinate
+	 * @param message
+	 * @param cause
 	 */
-	String getTariffPK();
+	public InvalidResultException(
+			IAbsolutePriceCoordinate absolutePriceCoordinate, String message,
+			Throwable cause)
+	{
+		super(absolutePriceCoordinate, message, cause);
+	}
 
 	/**
-	 * @param currencyID The currencyID to set.
+	 * @param absolutePriceCoordinate
+	 * @param cause
 	 */
-	void setCurrencyID(String currencyID);
+	public InvalidResultException(
+			IAbsolutePriceCoordinate absolutePriceCoordinate, Throwable cause)
+	{
+		super(absolutePriceCoordinate, cause);
+	}
 
-	/**
-	 * @param customerGroupPK The customerGroupPK to set.
-	 */
-	void setCustomerGroupPK(String customerGroupPK);
-
-	/**
-	 * @param tariffPK The tariffPK to set.
-	 */
-	void setTariffPK(String tariffPK);
 }

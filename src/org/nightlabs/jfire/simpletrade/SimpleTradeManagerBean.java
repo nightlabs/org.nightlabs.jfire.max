@@ -30,9 +30,11 @@ import java.rmi.RemoteException;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Hashtable;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
+import java.util.regex.Pattern;
 
 import javax.ejb.CreateException;
 import javax.ejb.EJBException;
@@ -48,12 +50,21 @@ import org.apache.log4j.Logger;
 import org.nightlabs.ModuleException;
 import org.nightlabs.jdo.NLJDOHelper;
 import org.nightlabs.jdo.moduleregistry.ModuleMetaData;
+import org.nightlabs.jfire.accounting.Price;
 import org.nightlabs.jfire.accounting.Tariff;
 import org.nightlabs.jfire.accounting.gridpriceconfig.FormulaPriceConfig;
+import org.nightlabs.jfire.accounting.gridpriceconfig.GridPriceConfig;
+import org.nightlabs.jfire.accounting.gridpriceconfig.GridPriceConfigUtil;
 import org.nightlabs.jfire.accounting.gridpriceconfig.IResultPriceConfig;
+import org.nightlabs.jfire.accounting.gridpriceconfig.PriceCalculationException;
 import org.nightlabs.jfire.accounting.gridpriceconfig.PriceCalculator;
+import org.nightlabs.jfire.accounting.gridpriceconfig.PriceCell;
+import org.nightlabs.jfire.accounting.gridpriceconfig.StablePriceConfig;
+import org.nightlabs.jfire.accounting.gridpriceconfig.TariffPricePair;
+import org.nightlabs.jfire.accounting.id.CurrencyID;
 import org.nightlabs.jfire.accounting.id.TariffID;
 import org.nightlabs.jfire.accounting.priceconfig.FetchGroupsPriceConfig;
+import org.nightlabs.jfire.accounting.priceconfig.id.PriceConfigID;
 import org.nightlabs.jfire.base.BaseSessionBeanImpl;
 import org.nightlabs.jfire.base.JFireException;
 import org.nightlabs.jfire.jdo.notification.persistent.PersistentNotificationEJB;
@@ -73,10 +84,12 @@ import org.nightlabs.jfire.store.deliver.ModeOfDelivery;
 import org.nightlabs.jfire.store.deliver.id.ModeOfDeliveryID;
 import org.nightlabs.jfire.store.id.ProductTypeID;
 import org.nightlabs.jfire.trade.ArticleCreator;
+import org.nightlabs.jfire.trade.CustomerGroup;
 import org.nightlabs.jfire.trade.Offer;
 import org.nightlabs.jfire.trade.Order;
 import org.nightlabs.jfire.trade.Segment;
 import org.nightlabs.jfire.trade.Trader;
+import org.nightlabs.jfire.trade.id.CustomerGroupID;
 import org.nightlabs.jfire.trade.id.SegmentID;
 
 
@@ -691,12 +704,12 @@ implements SessionBean
 //				}
 //				else if (simpleProductType.getPackagePriceConfig() instanceof GridPriceConfig) {
 //					Set<CustomerGroupID> unavailableCustomerGroupIDs = new HashSet<CustomerGroupID>();
-//					GridPriceConfig tariffPriceConfig = (GridPriceConfig) simpleProductType.getPackagePriceConfig();
-//					for (CustomerGroup customerGroup : tariffPriceConfig.getCustomerGroups()) {
+//					GridPriceConfig gridPriceConfig = (GridPriceConfig) simpleProductType.getPackagePriceConfig();
+//					for (CustomerGroup customerGroup : gridPriceConfig.getCustomerGroups()) {
 //					}
 //	
 //					for (CustomerGroupID customerGroupID : unavailableCustomerGroupIDs)
-//						tariffPriceConfig.removeCustomerGroup(customerGroupID.organisationID, customerGroupID.customerGroupID);
+//						gridPriceConfig.removeCustomerGroup(customerGroupID.organisationID, customerGroupID.customerGroupID);
 //				}
 //				else
 //					throw new IllegalStateException("SimpleProductType.packagePriceConfig unsupported! " + productTypeID);
@@ -770,4 +783,77 @@ implements SessionBean
 //			pm.close();
 //		}
 //	}
+
+	private static Pattern tariffPKSplitPattern = null;
+
+	/**
+	 * @return a <tt>Collection</tt> of {@link TariffPricePair}
+	 *
+	 * @ejb.interface-method
+	 * @ejb.transaction type="Supports"
+	 * @ejb.permission role-name="_Guest_"
+	 */
+	public Collection<TariffPricePair> getTariffPricePairs(
+			PriceConfigID priceConfigID, CustomerGroupID customerGroupID, CurrencyID currencyID,
+			String[] tariffFetchGroups, String[] priceFetchGroups)
+	{
+		PersistenceManager pm = getPersistenceManager();
+		try {
+			if (tariffPKSplitPattern == null)
+				tariffPKSplitPattern = Pattern.compile("/");
+
+			// TODO use setResult and put all this logic into the JDO query!
+			StablePriceConfig priceConfig = (StablePriceConfig) pm.getObjectById(priceConfigID);
+			Collection priceCells = priceConfig.getPriceCells(
+					CustomerGroup.getPrimaryKey(customerGroupID.organisationID, customerGroupID.customerGroupID),
+					currencyID.currencyID);
+
+			Collection<TariffPricePair> res = new ArrayList<TariffPricePair>();
+
+			for (Iterator it = priceCells.iterator(); it.hasNext(); ) {
+				PriceCell priceCell = (PriceCell) it.next();
+				String tariffPK = priceCell.getPriceCoordinate().getTariffPK();
+				String[] tariffPKParts = tariffPKSplitPattern.split(tariffPK);
+				if (tariffPKParts.length != 2)
+					throw new IllegalStateException("How the hell can it happen that the tariffPK does not consist out of two parts?");
+
+				String tariffOrganisationID = tariffPKParts[0];
+				long tariffID = Long.parseLong(tariffPKParts[1]);
+
+				if (tariffFetchGroups != null)
+					pm.getFetchPlan().setGroups(tariffFetchGroups);
+
+				Tariff tariff = (Tariff) pm.getObjectById(TariffID.create(tariffOrganisationID, tariffID));
+				tariff = (Tariff) pm.detachCopy(tariff);
+
+				if (priceFetchGroups != null)
+					pm.getFetchPlan().setGroups(priceFetchGroups);
+
+				Price price = (Price) pm.detachCopy(priceCell.getPrice());
+
+				res.add(new TariffPricePair(tariff, price));
+			}
+
+			return res;
+		} finally {
+			pm.close();
+		}
+	}
+
+	/**
+	 * @ejb.interface-method
+	 * @ejb.transaction type="Required"
+	 * @ejb.permission role-name="_Guest_"
+	 */
+	public Collection<GridPriceConfig> storePriceConfigs(Collection<GridPriceConfig> priceConfigs, boolean get) // , String[] fetchGroups, int maxFetchDepth)
+	throws PriceCalculationException
+	{
+		PersistenceManager pm = getPersistenceManager();
+		try {
+			return GridPriceConfigUtil.storePriceConfigs(pm, priceConfigs, PriceCalculator.class, get); // , fetchGroups, maxFetchDepth);
+		} finally {
+			pm.close();
+		}
+	}
+
 }

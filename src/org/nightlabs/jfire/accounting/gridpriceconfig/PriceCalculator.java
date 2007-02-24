@@ -105,7 +105,6 @@ public class PriceCalculator
 	protected Map resolvableProductTypes = null;
 
 	public void preparePriceCalculation()
-	throws ModuleException
 	{
 		preparePriceCalculation_createResolvableProductTypesMap(); // must be first to create virtualPackagedProductTypes
 		preparePriceCalculation_createPackagedResultPriceConfigs();
@@ -127,7 +126,7 @@ public class PriceCalculator
 //	}
 	
 	protected IResultPriceConfig createResultPriceConfig()
-	throws ModuleException
+//	throws ModuleException
 	{
 		return new StablePriceConfig(
 				IDGenerator.getOrganisationID(),
@@ -144,7 +143,7 @@ public class PriceCalculator
 	 * @throws ModuleException
 	 */
 	public void preparePriceCalculation_createPackagedResultPriceConfigs()
-	throws ModuleException
+//	throws ModuleException
 	{
 //	 Create an instance of StablePriceConfig for each FormulaPriceConfig
 		// (if not yet existing) to store the results of the FormulaPriceConfig.
@@ -266,7 +265,7 @@ public class PriceCalculator
 	 * @see #prepareResolvableProductTypes()
 	 */
 	public void calculatePrices()
-		throws ModuleException
+	throws PriceCalculationException
 	{
 		if (resolvableProductTypes == null)
 			throw new IllegalStateException("The method prepareResolvableProductTypes(..) has not been called!");
@@ -391,12 +390,12 @@ public class PriceCalculator
 	
 	/**
 	 * @return Returns a PriceCell which calculated or <tt>null</tt>.
-	 * @throws ModuleException 
 	 */
 	public PriceCell calculatePriceCell(
 			NestedProductType packagedProductType, PriceFragmentType priceFragmentType,
 			IPriceCoordinate localPriceCoordinate)
-		throws ModuleException
+	throws PriceCalculationException
+//		throws ModuleException
 	{
 		ProductType innerProductType = packagedProductType.getInnerProductType();
 		IPriceConfig innerPriceConfig;
@@ -488,13 +487,15 @@ public class PriceCalculator
 	 * @param priceCell Must <b>not</b> be <tt>null</tt>.
 	 * @param productInfo The productInfo to which the cell belongs.
 	 * @param priceFragmentType The current PriceFragmentType for which to calculate a price.
+	 * @throws PriceCalculationException 
 	 *
 	 * @throws ModuleException
 	 */
 	protected void calculatePriceCell(
 			FormulaCell formulaCell, PriceCell priceCell,
 			NestedProductType nestedProductType, PriceFragmentType priceFragmentType)
-		throws ModuleException
+	throws PriceCalculationException
+//		throws ModuleException
 	{
 		// formulaCell can be null!
 		if (priceCell == null)

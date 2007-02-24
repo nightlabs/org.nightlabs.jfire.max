@@ -28,14 +28,19 @@ package org.nightlabs.jfire.accounting.priceconfig;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.HashMap;
 import java.util.Iterator;
 import java.util.LinkedList;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
 import javax.jdo.JDOHelper;
 import javax.jdo.PersistenceManager;
 import javax.jdo.Query;
 
 import org.nightlabs.jfire.accounting.Price;
+import org.nightlabs.jfire.accounting.priceconfig.id.PriceConfigID;
 import org.nightlabs.jfire.store.NestedProductType;
 import org.nightlabs.jfire.store.Product;
 import org.nightlabs.jfire.store.ProductLocal;
@@ -372,6 +377,22 @@ public class PriceConfigUtil
 			res.addAll(getProductTypesNestingThis(q2, pt, 1));
 		}
 
+		return res;
+	}
+
+	/**
+	 * @return The returned Map&lt;PriceConfigID, List&lt;AffectedProductType&gt;&gt; indicates which modified
+	 *		price config would result in which products to have their prices recalculated.
+	 */
+	public static Map<PriceConfigID, List<AffectedProductType>> getAffectedProductTypes(PersistenceManager pm, Set<PriceConfigID> priceConfigIDs)
+	{
+		Map<PriceConfigID, List<AffectedProductType>> res = new HashMap<PriceConfigID, List<AffectedProductType>>(priceConfigIDs.size());
+		for (PriceConfigID priceConfigID : priceConfigIDs) {
+			IPriceConfig priceConfig = (IPriceConfig) pm.getObjectById(priceConfigID);
+			ArrayList<AffectedProductType> affectedProductTypes = PriceConfigUtil.getAffectedProductTypes(pm, priceConfig);
+			affectedProductTypes.trimToSize();
+			res.put(priceConfigID, affectedProductTypes);
+		}
 		return res;
 	}
 }

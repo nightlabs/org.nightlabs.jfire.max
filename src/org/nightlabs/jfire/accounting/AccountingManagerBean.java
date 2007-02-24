@@ -65,7 +65,7 @@ import org.nightlabs.jfire.accounting.book.fragmentbased.PriceFragmentDimension;
 import org.nightlabs.jfire.accounting.book.fragmentbased.SourceOrganisationDimension;
 import org.nightlabs.jfire.accounting.book.id.LocalAccountantDelegateID;
 import org.nightlabs.jfire.accounting.gridpriceconfig.GridPriceConfig;
-import org.nightlabs.jfire.accounting.gridpriceconfig.GridPriceConfigManagerBean;
+import org.nightlabs.jfire.accounting.gridpriceconfig.GridPriceConfigUtil;
 import org.nightlabs.jfire.accounting.id.CurrencyID;
 import org.nightlabs.jfire.accounting.id.InvoiceID;
 import org.nightlabs.jfire.accounting.id.InvoiceLocalID;
@@ -88,7 +88,10 @@ import org.nightlabs.jfire.accounting.pay.ServerPaymentProcessorSaferPay;
 import org.nightlabs.jfire.accounting.pay.id.ModeOfPaymentFlavourID;
 import org.nightlabs.jfire.accounting.pay.id.PaymentDataID;
 import org.nightlabs.jfire.accounting.pay.id.PaymentID;
+import org.nightlabs.jfire.accounting.priceconfig.AffectedProductType;
 import org.nightlabs.jfire.accounting.priceconfig.FetchGroupsPriceConfig;
+import org.nightlabs.jfire.accounting.priceconfig.PriceConfigUtil;
+import org.nightlabs.jfire.accounting.priceconfig.id.PriceConfigID;
 import org.nightlabs.jfire.accounting.query.InvoiceQuery;
 import org.nightlabs.jfire.base.BaseSessionBeanImpl;
 import org.nightlabs.jfire.idgenerator.IDNamespaceDefault;
@@ -2313,11 +2316,11 @@ public abstract class AccountingManagerBean
 					logger.debug("getProductTypeForPriceConfigEditing: productType="+productType.getPrimaryKey());
 					if (productType.getInnerPriceConfig() instanceof GridPriceConfig) {
 						logger.debug("innerPriceConfig:");
-						GridPriceConfigManagerBean.logGridPriceConfig((GridPriceConfig)productType.getInnerPriceConfig());
+						GridPriceConfigUtil.logGridPriceConfig((GridPriceConfig)productType.getInnerPriceConfig());
 					}
 					if (productType.getPackagePriceConfig() instanceof GridPriceConfig) {
 						logger.debug("packagePriceConfig:");
-						GridPriceConfigManagerBean.logGridPriceConfig((GridPriceConfig)productType.getPackagePriceConfig());
+						GridPriceConfigUtil.logGridPriceConfig((GridPriceConfig)productType.getPackagePriceConfig());
 					}
 				}
 			}
@@ -2366,6 +2369,24 @@ public abstract class AccountingManagerBean
 			} finally {
 				jbpmContext.close();
 			}
+		} finally {
+			pm.close();
+		}
+	}
+
+	/**
+	 * @return The returned Map&lt;PriceConfigID, List&lt;AffectedProductType&gt;&gt; indicates which modified
+	 *		price config would result in which products to have their prices recalculated.
+	 *
+	 * @ejb.interface-method
+	 * @ejb.transaction type="Supports"
+	 * @ejb.permission role-name="_Guest_"
+	 */
+	public Map<PriceConfigID, List<AffectedProductType>> getAffectedProductTypes(Set<PriceConfigID> priceConfigIDs)
+	{
+		PersistenceManager pm = getPersistenceManager();
+		try {
+			return PriceConfigUtil.getAffectedProductTypes(pm, priceConfigIDs);
 		} finally {
 			pm.close();
 		}

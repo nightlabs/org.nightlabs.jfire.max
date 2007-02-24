@@ -689,9 +689,9 @@ implements SessionBean
 //				if (simpleProductType.getPackagePriceConfig() == null) {
 //					// nothing to do
 //				}
-//				else if (simpleProductType.getPackagePriceConfig() instanceof TariffPriceConfig) {
+//				else if (simpleProductType.getPackagePriceConfig() instanceof GridPriceConfig) {
 //					Set<CustomerGroupID> unavailableCustomerGroupIDs = new HashSet<CustomerGroupID>();
-//					TariffPriceConfig tariffPriceConfig = (TariffPriceConfig) simpleProductType.getPackagePriceConfig();
+//					GridPriceConfig tariffPriceConfig = (GridPriceConfig) simpleProductType.getPackagePriceConfig();
 //					for (CustomerGroup customerGroup : tariffPriceConfig.getCustomerGroups()) {
 //					}
 //	

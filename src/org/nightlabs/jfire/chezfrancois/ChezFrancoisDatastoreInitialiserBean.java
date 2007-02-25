@@ -27,6 +27,7 @@
 package org.nightlabs.jfire.chezfrancois;
 
 import java.rmi.RemoteException;
+import java.util.Date;
 import java.util.Iterator;
 import java.util.Locale;
 
@@ -51,6 +52,8 @@ import org.nightlabs.jfire.accounting.gridpriceconfig.FormulaPriceConfig;
 import org.nightlabs.jfire.base.BaseSessionBeanImpl;
 import org.nightlabs.jfire.idgenerator.IDGenerator;
 import org.nightlabs.jfire.organisation.Organisation;
+import org.nightlabs.jfire.person.Person;
+import org.nightlabs.jfire.person.PersonStruct;
 import org.nightlabs.jfire.security.Authority;
 import org.nightlabs.jfire.security.RoleGroup;
 import org.nightlabs.jfire.security.RoleGroupRef;
@@ -424,13 +427,20 @@ implements SessionBean
 				User user01 = dataCreator.createUser("user01", "test", "Chez Francois", "Miller", "Eva", "eva.miller@chezfrancois.co.th");
 				LegalEntity legalEntity01 = dataCreator.createLegalEntity(user01.getPerson());
 				legalEntity01.setDefaultCustomerGroup(customerGroupDefault);
-				User user02 = dataCreator.createUser("marco", "test", "NightLabs GmbH", "Schulze", "Marco", "marco@nightlabs.de");
-				LegalEntity legalEntity02 = dataCreator.createLegalEntity(user02.getPerson());
-				legalEntity02.setDefaultCustomerGroup(customerGroupDefault);
 				User user03 = dataCreator.createUser("alex", "test", "NightLabs GmbH", "Bieber", "Alex", "alex@nightlabs.de");
 				LegalEntity legalEntity03 = dataCreator.createLegalEntity(user03.getPerson());
 				legalEntity03.setDefaultCustomerGroup(customerGroupDefault);
-
+				
+//				User user02 = dataCreator.createUser("marco", "test", "NightLabs GmbH", "Schulze", "Marco", "marco@nightlabs.de");
+//				LegalEntity legalEntity02 = dataCreator.createLegalEntity(user02.getPerson());
+//				legalEntity02.setDefaultCustomerGroup(customerGroupDefault);
+				Person person = dataCreator.createPerson("NightLabs GmbH", "Marco", "Schulze", "marco@nightlabs.de", new Date(), 
+						PersonStruct.PERSONALDATA_SALUTATION_MR, "Dr.", "Teststrasse", "79100", "Freiburg", "Baden-Württemberg", "Deutschland",
+						"49", "761", "123456789", "49", "761", "987654321", "Marco Schulze", 123456789, "68090000", "TestBank", 
+						"Marco Schulze", "1234567890", 
+						01, 2008, "Comment for Marco Schulze");
+				User user02 = dataCreator.createUser("marco", "test", person);				
+				
 				userGroup = new UserGroup(organisationID, UserGroup.USERID_PREFIX_TYPE_USERGROUP + "Administrators");
 				userGroup.setName("Administrators");
 				userGroup.setDescription("This group has all access rights within its organisation.");

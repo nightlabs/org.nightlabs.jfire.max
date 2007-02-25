@@ -27,6 +27,7 @@
 package org.nightlabs.jfire.chezfrancois;
 
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 import java.util.Locale;
 
@@ -58,11 +59,23 @@ import org.nightlabs.jfire.person.PersonStruct;
 import org.nightlabs.jfire.prop.IStruct;
 import org.nightlabs.jfire.prop.Property;
 import org.nightlabs.jfire.prop.Struct;
+import org.nightlabs.jfire.prop.StructLocal;
+import org.nightlabs.jfire.prop.datafield.DateDataField;
+import org.nightlabs.jfire.prop.datafield.NumberDataField;
+import org.nightlabs.jfire.prop.datafield.PhoneNumberDataField;
 import org.nightlabs.jfire.prop.datafield.RegexDataField;
+import org.nightlabs.jfire.prop.datafield.SelectionDataField;
 import org.nightlabs.jfire.prop.datafield.TextDataField;
 import org.nightlabs.jfire.prop.exception.DataBlockGroupNotFoundException;
 import org.nightlabs.jfire.prop.exception.DataBlockNotFoundException;
 import org.nightlabs.jfire.prop.exception.DataFieldNotFoundException;
+import org.nightlabs.jfire.prop.exception.StructBlockNotFoundException;
+import org.nightlabs.jfire.prop.exception.StructFieldNotFoundException;
+import org.nightlabs.jfire.prop.exception.StructFieldValueNotFoundException;
+import org.nightlabs.jfire.prop.structfield.DateStructField;
+import org.nightlabs.jfire.prop.structfield.PhoneNumberStructField;
+import org.nightlabs.jfire.prop.structfield.SelectionStructField;
+import org.nightlabs.jfire.prop.structfield.StructFieldValue;
 import org.nightlabs.jfire.security.SecurityException;
 import org.nightlabs.jfire.security.User;
 import org.nightlabs.jfire.security.UserLocal;
@@ -449,6 +462,76 @@ public class DataCreator
 		return user;
 	}
 
+	public User createUser(String userID, String password, Person person)
+//	throws SecurityException, DataBlockNotFoundException, DataBlockGroupNotFoundException, DataFieldNotFoundException
+	{
+		User user = new User(organisationID, userID);
+		UserLocal userLocal = new UserLocal(user);
+		userLocal.setPasswordPlain(password);
+		user.setPerson(person);
+		pm.makePersistent(user);
+		return user;		
+	}
+	
+	public Person createPerson(String company, String name, String firstName, String eMail,
+			Date dateOfBirth, String salutation, String title, String postAdress, String postCode,
+			String postCity, String postRegion, String postCountry, String phoneCountryCode, 
+			String phoneAreaCode, String phoneNumber, String faxCountryCode, 
+			String faxAreaCode, String faxNumber, String bankAccountHolder, int bankAccountNumber, 
+			String bankCode, String bankName, String creditCardHolder, String creditCardNumber, 
+			int creditCardExpiryMonth, int creditCardExpiryYear, String comment)
+	throws DataBlockNotFoundException, DataBlockGroupNotFoundException, DataFieldNotFoundException, StructFieldValueNotFoundException, StructFieldNotFoundException, StructBlockNotFoundException
+	{		
+		IStruct personStruct = getPersonStruct();
+		Person person = new Person(IDGenerator.getOrganisationID(), IDGenerator.nextID(Property.class));
+		personStruct.explodeProperty(person);
+//		Person person = createPerson(personCompany, personName, personFirstName, personEMail);
+		((TextDataField)person.getDataField(PersonStruct.PERSONALDATA_COMPANY)).setText(company);
+		((TextDataField)person.getDataField(PersonStruct.PERSONALDATA_NAME)).setText(name);
+		((TextDataField)person.getDataField(PersonStruct.PERSONALDATA_FIRSTNAME)).setText(firstName);
+		((RegexDataField)person.getDataField(PersonStruct.INTERNET_EMAIL)).setText(eMail);
+		((DateDataField)person.getDataField(PersonStruct.PERSONALDATA_DATEOFBIRTH)).setDate(dateOfBirth);
+		
+		StructLocal structLocal = StructLocal.getStructLocal(Person.class, pm);
+		SelectionStructField salutationSelectionStructField = (SelectionStructField) structLocal.getStructField(
+				PersonStruct.PERSONALDATA, PersonStruct.PERSONALDATA_SALUTATION);		
+		StructFieldValue sfv = salutationSelectionStructField.getStructFieldValue(PersonStruct.PERSONALDATA_SALUTATION_MR);
+		((SelectionDataField)person.getDataField(PersonStruct.PERSONALDATA_SALUTATION)).setSelection(sfv);
+
+		((TextDataField)person.getDataField(PersonStruct.PERSONALDATA_TITLE)).setText(title);
+		((TextDataField)person.getDataField(PersonStruct.POSTADDRESS_ADDRESS)).setText(postAdress);
+		((TextDataField)person.getDataField(PersonStruct.POSTADDRESS_POSTCODE)).setText(postCode);
+		((TextDataField)person.getDataField(PersonStruct.POSTADDRESS_CITY)).setText(postCity);
+		((TextDataField)person.getDataField(PersonStruct.POSTADDRESS_REGION)).setText(postRegion);
+		((TextDataField)person.getDataField(PersonStruct.POSTADDRESS_COUNTRY)).setText(postCountry);
+		
+		((PhoneNumberDataField)person.getDataField(PersonStruct.PHONE_PRIMARY)).setCountryCode(phoneCountryCode);
+		((PhoneNumberDataField)person.getDataField(PersonStruct.PHONE_PRIMARY)).setAreaCode(phoneAreaCode);		
+		((PhoneNumberDataField)person.getDataField(PersonStruct.PHONE_PRIMARY)).setLocalNumber(phoneNumber);
+		
+		((PhoneNumberDataField)person.getDataField(PersonStruct.FAX)).setCountryCode(faxCountryCode);
+		((PhoneNumberDataField)person.getDataField(PersonStruct.FAX)).setAreaCode(faxAreaCode);
+		((PhoneNumberDataField)person.getDataField(PersonStruct.FAX)).setLocalNumber(faxNumber);		
+		
+		((TextDataField)person.getDataField(PersonStruct.BANKDATA_ACCOUNTHOLDER)).setText(bankAccountHolder);
+		((NumberDataField)person.getDataField(PersonStruct.BANKDATA_ACCOUNTNUMBER)).setValue(bankAccountNumber);	
+		((TextDataField)person.getDataField(PersonStruct.BANKDATA_BANKCODE)).setText(bankCode);
+		((TextDataField)person.getDataField(PersonStruct.BANKDATA_BANKNAME)).setText(bankName);
+		
+		((TextDataField)person.getDataField(PersonStruct.CREDITCARD_CREDITCARDHOLDER)).setText(creditCardHolder);
+		((TextDataField)person.getDataField(PersonStruct.CREDITCARD_NUMBER)).setText(creditCardNumber);
+		((NumberDataField)person.getDataField(PersonStruct.CREDITCARD_EXPIRYMONTH)).setValue(creditCardExpiryMonth);		
+		((NumberDataField)person.getDataField(PersonStruct.CREDITCARD_EXPIRYYEAR)).setValue(creditCardExpiryYear);		
+		
+		((TextDataField)person.getDataField(PersonStruct.COMMENT_COMMENT)).setText(comment);
+		
+		person.setAutoGenerateDisplayName(true);
+		person.setDisplayName(null, personStruct);
+		personStruct.implodeProperty(person);
+		pm.makePersistent(person);
+		return person;
+	}
+	
 	private IStruct personStruct = null;
 	protected IStruct getPersonStruct()
 	{

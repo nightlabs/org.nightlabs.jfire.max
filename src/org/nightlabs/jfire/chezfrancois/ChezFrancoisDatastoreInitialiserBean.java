@@ -63,7 +63,9 @@ import org.nightlabs.jfire.simpletrade.store.SimpleProductType;
 import org.nightlabs.jfire.timer.Task;
 import org.nightlabs.jfire.timer.id.TaskID;
 import org.nightlabs.jfire.trade.Article;
+import org.nightlabs.jfire.trade.CustomerGroup;
 import org.nightlabs.jfire.trade.LegalEntity;
+import org.nightlabs.jfire.trade.Trader;
 
 
 /**
@@ -412,15 +414,22 @@ implements SessionBean
 				new UserLocal(userGroup);
 				userGroup = (UserGroup) pm.makePersistent(userGroup);
 
+				Trader trader = Trader.getTrader(pm);
+				CustomerGroup customerGroupDefault = trader.getDefaultCustomerGroupForKnownCustomer();
+				
 				// create some more users
 				User user00 = dataCreator.createUser("user00", "test", "Chez Francois", "Miller", "Adam", "adam.miller@chezfrancois.co.th");
 				LegalEntity legalEntity00 = dataCreator.createLegalEntity(user00.getPerson());
+				legalEntity00.setDefaultCustomerGroup(customerGroupDefault);
 				User user01 = dataCreator.createUser("user01", "test", "Chez Francois", "Miller", "Eva", "eva.miller@chezfrancois.co.th");
 				LegalEntity legalEntity01 = dataCreator.createLegalEntity(user01.getPerson());
+				legalEntity01.setDefaultCustomerGroup(customerGroupDefault);
 				User user02 = dataCreator.createUser("marco", "test", "NightLabs GmbH", "Schulze", "Marco", "marco@nightlabs.de");
 				LegalEntity legalEntity02 = dataCreator.createLegalEntity(user02.getPerson());
+				legalEntity02.setDefaultCustomerGroup(customerGroupDefault);
 				User user03 = dataCreator.createUser("alex", "test", "NightLabs GmbH", "Bieber", "Alex", "alex@nightlabs.de");
 				LegalEntity legalEntity03 = dataCreator.createLegalEntity(user03.getPerson());
+				legalEntity03.setDefaultCustomerGroup(customerGroupDefault);
 
 				userGroup = new UserGroup(organisationID, UserGroup.USERID_PREFIX_TYPE_USERGROUP + "Administrators");
 				userGroup.setName("Administrators");

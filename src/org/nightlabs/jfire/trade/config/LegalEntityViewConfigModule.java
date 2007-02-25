@@ -66,13 +66,15 @@ public class LegalEntityViewConfigModule extends ConfigModule {
 	 *
 	 * @jdo.join
 	 */
-	private List personStructFields = new ArrayList();
+	private List personStructFields;
 	
 	public List getStructFields() {
 		return personStructFields;
 	}
 
 	public void init() {
+		if (personStructFields == null)
+			personStructFields = new ArrayList();
 		personStructFields.add(PersonStruct.PERSONALDATA_COMPANY.toString());
 		personStructFields.add(PersonStruct.PERSONALDATA_NAME.toString());
 		personStructFields.add(PersonStruct.PERSONALDATA_FIRSTNAME.toString());

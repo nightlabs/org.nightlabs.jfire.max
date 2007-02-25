@@ -126,9 +126,9 @@ public abstract class GridPriceConfig extends PriceConfig
 	{
 		return customerGroups.values();
 	}
-	public void addCustomerGroup(CustomerGroup customerGroup)
+	public boolean addCustomerGroup(CustomerGroup customerGroup)
 	{
-		customerGroups.put(customerGroup.getPrimaryKey(), customerGroup);
+		return null == customerGroups.put(customerGroup.getPrimaryKey(), customerGroup);
 	}
 	public CustomerGroup getCustomerGroup(String organisationID, String customerGroupID, boolean throwExceptionIfNotExistent)
 	{
@@ -154,9 +154,9 @@ public abstract class GridPriceConfig extends PriceConfig
 	{
 		return tariffs.values();
 	}
-	public void addTariff(Tariff tariff)
+	public boolean addTariff(Tariff tariff)
 	{
-		tariffs.put(tariff.getPrimaryKey(), tariff);
+		return null == tariffs.put(tariff.getPrimaryKey(), tariff);
 	}
 	public Tariff getTariff(String organisationID, long tariffID, boolean throwExceptionIfNotExistent)
 	{
@@ -212,13 +212,14 @@ public abstract class GridPriceConfig extends PriceConfig
 		GridPriceConfig other = (GridPriceConfig)_other;
 
 		// assimilate CustomerGroup s
-		HashSet customerGroupsToRemove = onlyAdd ? null : new HashSet();
-		for (Iterator it = this.getCustomerGroups().iterator(); it.hasNext(); ) {
-			CustomerGroup cg = (CustomerGroup)it.next();
-			if (!onlyAdd && !other.containsCustomerGroup(cg))
-				customerGroupsToRemove.add(cg);
-		}
 		if (!onlyAdd) {
+			HashSet customerGroupsToRemove = onlyAdd ? null : new HashSet();
+			for (Iterator it = this.getCustomerGroups().iterator(); it.hasNext(); ) {
+				CustomerGroup cg = (CustomerGroup)it.next();
+				if (!onlyAdd && !other.containsCustomerGroup(cg))
+					customerGroupsToRemove.add(cg);
+			}
+//		if (!onlyAdd) {
 			for (Iterator it = customerGroupsToRemove.iterator(); it.hasNext(); ) {
 				CustomerGroup cg = (CustomerGroup)it.next();
 				this.removeCustomerGroup(cg.getOrganisationID(), cg.getCustomerGroupID());
@@ -229,13 +230,14 @@ public abstract class GridPriceConfig extends PriceConfig
 
 
 		// assimilate Tariff s
-		HashSet tariffsToRemove = onlyAdd ? null : new HashSet();
-		for (Iterator it = this.getTariffs().iterator(); it.hasNext(); ) {
-			Tariff t = (Tariff)it.next();
-			if (!onlyAdd && !other.containsTariff(t))
-				tariffsToRemove.add(t);
-		}
 		if (!onlyAdd) {
+			HashSet tariffsToRemove = onlyAdd ? null : new HashSet();
+			for (Iterator it = this.getTariffs().iterator(); it.hasNext(); ) {
+				Tariff t = (Tariff)it.next();
+				if (!onlyAdd && !other.containsTariff(t))
+					tariffsToRemove.add(t);
+			}
+//			if (!onlyAdd) {
 			for (Iterator it = tariffsToRemove.iterator(); it.hasNext(); ) {
 				Tariff t = (Tariff)it.next();
 				this.removeTariff(t.getOrganisationID(), t.getTariffID());
@@ -246,13 +248,14 @@ public abstract class GridPriceConfig extends PriceConfig
 
 
 		// assimilate Currency s
-		HashSet currenciesToRemove = onlyAdd ? null : new HashSet();
-		for (Iterator it = this.getCurrencies().iterator(); it.hasNext(); ) {
-			Currency c = (Currency)it.next();
-			if (!onlyAdd && !other.containsCurrency(c))
-				currenciesToRemove.add(c);
-		}
 		if (!onlyAdd) {
+			HashSet currenciesToRemove = onlyAdd ? null : new HashSet();
+			for (Iterator it = this.getCurrencies().iterator(); it.hasNext(); ) {
+				Currency c = (Currency)it.next();
+				if (!onlyAdd && !other.containsCurrency(c))
+					currenciesToRemove.add(c);
+			}
+//			if (!onlyAdd) {
 			for (Iterator it = currenciesToRemove.iterator(); it.hasNext(); ) {
 				Currency c = (Currency)it.next();
 				this.removeCurrency(c.getCurrencyID());
@@ -263,13 +266,14 @@ public abstract class GridPriceConfig extends PriceConfig
 
 
 		// assimilate PriceFragmenType s
-		HashSet priceFragmenTypesToRemove = onlyAdd ? null : new HashSet();
-		for (Iterator it = this.getPriceFragmentTypes().iterator(); it.hasNext(); ) {
-			PriceFragmentType pft = (PriceFragmentType)it.next();
-			if (!onlyAdd && !other.containsPriceFragmentType(pft))
-				priceFragmenTypesToRemove.add(pft);
-		}
 		if (!onlyAdd) {
+			HashSet priceFragmenTypesToRemove = onlyAdd ? null : new HashSet();
+			for (Iterator it = this.getPriceFragmentTypes().iterator(); it.hasNext(); ) {
+				PriceFragmentType pft = (PriceFragmentType)it.next();
+				if (!onlyAdd && !other.containsPriceFragmentType(pft))
+					priceFragmenTypesToRemove.add(pft);
+			}
+//			if (!onlyAdd) {
 			for (Iterator it = priceFragmenTypesToRemove.iterator(); it.hasNext(); ) {
 				PriceFragmentType pft = (PriceFragmentType)it.next();
 				this.removePriceFragmentType(pft.getOrganisationID(), pft.getPriceFragmentTypeID());

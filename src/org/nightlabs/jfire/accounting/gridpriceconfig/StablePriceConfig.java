@@ -272,29 +272,32 @@ implements IPackagePriceConfig, IResultPriceConfig
 	/**
 	 * @see org.nightlabs.jfire.accounting.gridpriceconfig.GridPriceConfig#addCustomerGroup(org.nightlabs.jfire.accounting.CustomerGroup)
 	 */
-	public void addCustomerGroup(CustomerGroup customerGroup)
+	public boolean addCustomerGroup(CustomerGroup customerGroup)
 	{
-		super.addCustomerGroup(customerGroup);
+		boolean res = super.addCustomerGroup(customerGroup);
 		if (customerGroup != null)
 			createPriceCells(customerGroup, null, null);
+		return res;
 	}
 	/**
 	 * @see org.nightlabs.jfire.accounting.gridpriceconfig.GridPriceConfig#addTariff(org.nightlabs.jfire.accounting.Tariff)
 	 */
-	public void addTariff(Tariff tariff)
+	public boolean addTariff(Tariff tariff)
 	{
-		super.addTariff(tariff);
+		boolean res = super.addTariff(tariff);
 		if (tariff != null)
 			createPriceCells(null, tariff, null);
+		return res;
 	}
 	/**
 	 * @see org.nightlabs.jfire.accounting.priceconfig.PriceConfig#addCurrency(org.nightlabs.jfire.accounting.Currency)
 	 */
-	public void addCurrency(Currency currency)
+	public boolean addCurrency(Currency currency)
 	{
-		super.addCurrency(currency);
+		boolean res = super.addCurrency(currency);
 		if (currency != null)
 			createPriceCells(null, null, currency);
+		return res;
 	}
 
 	/**

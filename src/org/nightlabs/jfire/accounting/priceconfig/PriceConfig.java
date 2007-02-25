@@ -177,9 +177,9 @@ public abstract class PriceConfig implements Serializable, StoreCallback, IPrice
 	 * @see #beginAdjustParameters()
 	 * @see #endAdjustParameters()
 	 */
-	public void addCurrency(Currency currency)
+	public boolean addCurrency(Currency currency)
 	{
-		currencies.put(currency.getCurrencyID(), currency);
+		return null == currencies.put(currency.getCurrencyID(), currency);
 	}
 
 	/**
@@ -225,9 +225,9 @@ public abstract class PriceConfig implements Serializable, StoreCallback, IPrice
 	{
 		return priceFragmentTypes.values();
 	}
-	public void addPriceFragmentType(PriceFragmentType priceFragmentType)
+	public boolean addPriceFragmentType(PriceFragmentType priceFragmentType)
 	{
-		priceFragmentTypes.put(priceFragmentType.getPrimaryKey(), priceFragmentType);
+		return null == priceFragmentTypes.put(priceFragmentType.getPrimaryKey(), priceFragmentType);
 	}
 	public PriceFragmentType getPriceFragmentType(String organisationID, String priceFragmentTypeID, boolean throwExceptionIfNotExistent)
 	{

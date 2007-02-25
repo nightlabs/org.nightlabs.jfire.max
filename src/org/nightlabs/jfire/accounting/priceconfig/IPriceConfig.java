@@ -62,7 +62,7 @@ public interface IPriceConfig
 	 * @see #beginAdjustParameters()
 	 * @see #endAdjustParameters()
 	 */
-	void addCurrency(Currency currency);
+	boolean addCurrency(Currency currency);
 
 	/**
 	 * @return Returns the desired Currency if registered or <tt>null</tt> if the
@@ -79,7 +79,7 @@ public interface IPriceConfig
 
 	Collection<PriceFragmentType> getPriceFragmentTypes();
 
-	void addPriceFragmentType(PriceFragmentType priceFragmentType);
+	boolean addPriceFragmentType(PriceFragmentType priceFragmentType);
 
 	PriceFragmentType getPriceFragmentType(String organisationID,
 			String priceFragmentTypeID, boolean throwExceptionIfNotExistent);

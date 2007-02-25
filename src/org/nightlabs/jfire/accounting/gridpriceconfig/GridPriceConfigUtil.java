@@ -220,6 +220,10 @@ public class GridPriceConfigUtil
 
 			if (productType.getPackageNature() == ProductType.PACKAGE_NATURE_OUTER) {
 				++recalculatedCounter;
+
+				((IResultPriceConfig)productType.getPackagePriceConfig()).adoptParameters(
+						productType.getInnerPriceConfig());
+
 				PriceCalculator priceCalculator;
 				try {
 					priceCalculator = (PriceCalculator) priceCalculatorConstructor.newInstance(new Object[] { productType });

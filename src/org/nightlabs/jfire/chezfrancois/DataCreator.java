@@ -44,14 +44,14 @@ import org.nightlabs.jfire.accounting.Currency;
 import org.nightlabs.jfire.accounting.PriceFragmentType;
 import org.nightlabs.jfire.accounting.Tariff;
 import org.nightlabs.jfire.accounting.book.fragmentbased.PFMoneyFlowMapping;
-import org.nightlabs.jfire.accounting.id.CurrencyID;
-import org.nightlabs.jfire.accounting.id.PriceFragmentTypeID;
-import org.nightlabs.jfire.accounting.priceconfig.IInnerPriceConfig;
-import org.nightlabs.jfire.accounting.priceconfig.PriceConfig;
 import org.nightlabs.jfire.accounting.gridpriceconfig.FormulaCell;
 import org.nightlabs.jfire.accounting.gridpriceconfig.FormulaPriceConfig;
 import org.nightlabs.jfire.accounting.gridpriceconfig.PriceCalculator;
 import org.nightlabs.jfire.accounting.gridpriceconfig.StablePriceConfig;
+import org.nightlabs.jfire.accounting.id.CurrencyID;
+import org.nightlabs.jfire.accounting.id.PriceFragmentTypeID;
+import org.nightlabs.jfire.accounting.priceconfig.IInnerPriceConfig;
+import org.nightlabs.jfire.accounting.priceconfig.PriceConfig;
 import org.nightlabs.jfire.idgenerator.IDGenerator;
 import org.nightlabs.jfire.organisation.Organisation;
 import org.nightlabs.jfire.person.Person;
@@ -59,12 +59,10 @@ import org.nightlabs.jfire.person.PersonStruct;
 import org.nightlabs.jfire.prop.IStruct;
 import org.nightlabs.jfire.prop.Property;
 import org.nightlabs.jfire.prop.Struct;
-import org.nightlabs.jfire.prop.StructLocal;
 import org.nightlabs.jfire.prop.datafield.DateDataField;
 import org.nightlabs.jfire.prop.datafield.NumberDataField;
 import org.nightlabs.jfire.prop.datafield.PhoneNumberDataField;
 import org.nightlabs.jfire.prop.datafield.RegexDataField;
-import org.nightlabs.jfire.prop.datafield.SelectionDataField;
 import org.nightlabs.jfire.prop.datafield.TextDataField;
 import org.nightlabs.jfire.prop.exception.DataBlockGroupNotFoundException;
 import org.nightlabs.jfire.prop.exception.DataBlockNotFoundException;
@@ -72,10 +70,6 @@ import org.nightlabs.jfire.prop.exception.DataFieldNotFoundException;
 import org.nightlabs.jfire.prop.exception.StructBlockNotFoundException;
 import org.nightlabs.jfire.prop.exception.StructFieldNotFoundException;
 import org.nightlabs.jfire.prop.exception.StructFieldValueNotFoundException;
-import org.nightlabs.jfire.prop.structfield.DateStructField;
-import org.nightlabs.jfire.prop.structfield.PhoneNumberStructField;
-import org.nightlabs.jfire.prop.structfield.SelectionStructField;
-import org.nightlabs.jfire.prop.structfield.StructFieldValue;
 import org.nightlabs.jfire.security.SecurityException;
 import org.nightlabs.jfire.security.User;
 import org.nightlabs.jfire.security.UserLocal;
@@ -191,7 +185,8 @@ public class DataCreator
 		store.setProductTypeStatus_published(user, pt);
 		store.setProductTypeStatus_confirmed(user, pt);
 		store.setProductTypeStatus_saleable(user, pt, true);
-		
+
+//		createdLeafs.add((ProductTypeID) JDOHelper.getObjectId(pt));
 		createdLeafs.add(pt);
 
 		return pt;
@@ -200,7 +195,9 @@ public class DataCreator
 	public void calculatePrices()
 	throws ModuleException
 	{
-		for (SimpleProductType pt : createdLeafs) {
+//		for (ProductTypeID ptID : createdLeafs) {
+//			SimpleProductType pt = (SimpleProductType) pm.getObjectById(ptID);
+		for (SimpleProductType pt : createdLeafs){
 			if (pt.getInnerPriceConfig() != null && pt.getPackagePriceConfig() != null)
 				((StablePriceConfig)pt.getPackagePriceConfig()).adoptParameters(pt.getInnerPriceConfig());
 
@@ -491,12 +488,20 @@ public class DataCreator
 		((TextDataField)person.getDataField(PersonStruct.PERSONALDATA_FIRSTNAME)).setText(firstName);
 		((RegexDataField)person.getDataField(PersonStruct.INTERNET_EMAIL)).setText(eMail);
 		((DateDataField)person.getDataField(PersonStruct.PERSONALDATA_DATEOFBIRTH)).setDate(dateOfBirth);
-		
-		StructLocal structLocal = StructLocal.getStructLocal(Person.class, pm);
-		SelectionStructField salutationSelectionStructField = (SelectionStructField) structLocal.getStructField(
-				PersonStruct.PERSONALDATA, PersonStruct.PERSONALDATA_SALUTATION);		
-		StructFieldValue sfv = salutationSelectionStructField.getStructFieldValue(PersonStruct.PERSONALDATA_SALUTATION_MR);
-		((SelectionDataField)person.getDataField(PersonStruct.PERSONALDATA_SALUTATION)).setSelection(sfv);
+
+
+//		StructLocal structLocal = StructLocal.getStructLocal(Person.class, pm);
+//// TODO  the following method fails - Tobias needs to fix this:
+////		Caused by: org.nightlabs.jfire.prop.exception.StructBlockNotFoundException: No StructBlock found with key devil.NightLabs.org/PersonalData
+////    at org.nightlabs.jfire.prop.AbstractStruct.getStructBlock(AbstractStruct.java:71)
+////    at org.nightlabs.jfire.prop.AbstractStruct.getStructField(AbstractStruct.java:125)
+////    at org.nightlabs.jfire.prop.AbstractStruct.getStructField(AbstractStruct.java:114)
+////    at org.nightlabs.jfire.chezfrancois.DataCreator.createPerson(DataCreator.java:495)
+////    at org.nightlabs.jfire.chezfrancois.ChezFrancoisDatastoreInitialiserBean.initialise(ChezFrancoisDatastoreInitialiserBean.java:437)
+//		SelectionStructField salutationSelectionStructField = (SelectionStructField) structLocal.getStructField(
+//				PersonStruct.PERSONALDATA, PersonStruct.PERSONALDATA_SALUTATION);		
+//		StructFieldValue sfv = salutationSelectionStructField.getStructFieldValue(PersonStruct.PERSONALDATA_SALUTATION_MR);
+//		((SelectionDataField)person.getDataField(PersonStruct.PERSONALDATA_SALUTATION)).setSelection(sfv);
 
 		((TextDataField)person.getDataField(PersonStruct.PERSONALDATA_TITLE)).setText(title);
 		((TextDataField)person.getDataField(PersonStruct.POSTADDRESS_ADDRESS)).setText(postAdress);
@@ -535,8 +540,9 @@ public class DataCreator
 	private IStruct personStruct = null;
 	protected IStruct getPersonStruct()
 	{
-		if (personStruct == null)
+		if (personStruct == null) {
 			personStruct = Struct.getStruct(getOrganisationLegalEntity().getOrganisationID(), Person.class, pm);
+		}
 
 		return personStruct;
 	}

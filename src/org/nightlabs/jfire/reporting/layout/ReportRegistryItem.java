@@ -36,6 +36,7 @@ import javax.jdo.Query;
 import javax.jdo.listener.StoreCallback;
 
 import org.nightlabs.jfire.reporting.layout.id.ReportRegistryItemID;
+import org.nightlabs.util.Utils;
 
 /**
  * Common type for report registry item (ReportCategory, ReportLayout).
@@ -248,5 +249,26 @@ public abstract class ReportRegistryItem implements Serializable, StoreCallback
 			throw new IllegalStateException("No PersistenceManager assigned!");
 		
 		return pm;
+	}
+	
+	@Override
+	public int hashCode() {
+		return 
+			Utils.hashCode(organisationID) ^
+			Utils.hashCode(reportRegistryItemType) ^
+			Utils.hashCode(reportRegistryItemID);
+	}
+	
+	@Override
+	public boolean equals(Object obj) {
+		if (this == obj)
+			return true;
+		if (!(obj instanceof ReportRegistryItem))
+			return false;
+		ReportRegistryItem other = (ReportRegistryItem) obj;
+		return
+			Utils.equals(this.organisationID, other.organisationID) &&
+			Utils.equals(this.reportRegistryItemType, other.reportRegistryItemType) &&
+			Utils.equals(this.reportRegistryItemID, other.reportRegistryItemID);
 	}
 }

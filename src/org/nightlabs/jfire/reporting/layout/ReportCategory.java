@@ -96,6 +96,7 @@ public class ReportCategory extends ReportRegistryItem implements NestableReport
 	 *		collection-type="collection"
 	 *		element-type="org.nightlabs.jfire.reporting.layout.ReportRegistryItem"
 	 *		mapped-by="parentItem"
+	 *		dependent-element="true"
 	 */
 	private Set<ReportRegistryItem> childItems;	
 

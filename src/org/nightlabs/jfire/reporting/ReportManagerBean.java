@@ -40,6 +40,7 @@ import javax.ejb.EJBException;
 import javax.ejb.SessionBean;
 import javax.ejb.SessionContext;
 import javax.jdo.FetchPlan;
+import javax.jdo.JDOObjectNotFoundException;
 import javax.jdo.PersistenceManager;
 import javax.jdo.Query;
 import javax.naming.NamingException;
@@ -60,6 +61,7 @@ import org.nightlabs.jfire.base.BaseSessionBeanImpl;
 import org.nightlabs.jfire.config.ConfigSetup;
 import org.nightlabs.jfire.config.UserConfigSetup;
 import org.nightlabs.jfire.reporting.config.ReportLayoutConfigModule;
+import org.nightlabs.jfire.reporting.layout.ReportCategory;
 import org.nightlabs.jfire.reporting.layout.ReportRegistry;
 import org.nightlabs.jfire.reporting.layout.ReportRegistryItem;
 import org.nightlabs.jfire.reporting.layout.ReportRegistryItemCarrier;
@@ -733,6 +735,37 @@ implements SessionBean
 		pm = getPersistenceManager();
 		try {
 			return (ReportRegistryItem)NLJDOHelper.storeJDO(pm, reportRegistryItem, get, fetchGroups, maxFetchDepth);
+		} finally {
+			pm.close();
+		}
+	}
+	
+	
+	/**
+	 * @throws ModuleException
+	 *
+	 * @ejb.interface-method
+	 * @ejb.permission role-name="_Guest_"
+	 * @ejb.transaction type="Required"
+	 */
+	public void deleteRegistryItem (ReportRegistryItemID reportRegistryItemID)
+	throws ModuleException
+	{
+		PersistenceManager pm;
+		pm = getPersistenceManager();
+		try {
+			ReportRegistryItem item = null;
+			try {
+				item = (ReportRegistryItem) pm.getObjectById(reportRegistryItemID);
+			} catch (JDOObjectNotFoundException e) {
+				return;
+			}
+			ReportRegistryItem parent = item.getParentItem();
+			if (parent != null && (parent instanceof ReportCategory)) {
+				ReportCategory cat = (ReportCategory) parent;
+				cat.getChildItems().remove(item);
+			}
+			pm.deletePersistent(item);
 		} finally {
 			pm.close();
 		}

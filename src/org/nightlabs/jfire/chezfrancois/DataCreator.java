@@ -59,10 +59,12 @@ import org.nightlabs.jfire.person.PersonStruct;
 import org.nightlabs.jfire.prop.IStruct;
 import org.nightlabs.jfire.prop.Property;
 import org.nightlabs.jfire.prop.Struct;
+import org.nightlabs.jfire.prop.StructLocal;
 import org.nightlabs.jfire.prop.datafield.DateDataField;
 import org.nightlabs.jfire.prop.datafield.NumberDataField;
 import org.nightlabs.jfire.prop.datafield.PhoneNumberDataField;
 import org.nightlabs.jfire.prop.datafield.RegexDataField;
+import org.nightlabs.jfire.prop.datafield.SelectionDataField;
 import org.nightlabs.jfire.prop.datafield.TextDataField;
 import org.nightlabs.jfire.prop.exception.DataBlockGroupNotFoundException;
 import org.nightlabs.jfire.prop.exception.DataBlockNotFoundException;
@@ -70,6 +72,8 @@ import org.nightlabs.jfire.prop.exception.DataFieldNotFoundException;
 import org.nightlabs.jfire.prop.exception.StructBlockNotFoundException;
 import org.nightlabs.jfire.prop.exception.StructFieldNotFoundException;
 import org.nightlabs.jfire.prop.exception.StructFieldValueNotFoundException;
+import org.nightlabs.jfire.prop.structfield.SelectionStructField;
+import org.nightlabs.jfire.prop.structfield.StructFieldValue;
 import org.nightlabs.jfire.security.SecurityException;
 import org.nightlabs.jfire.security.User;
 import org.nightlabs.jfire.security.UserLocal;
@@ -480,28 +484,19 @@ public class DataCreator
 	throws DataBlockNotFoundException, DataBlockGroupNotFoundException, DataFieldNotFoundException, StructFieldValueNotFoundException, StructFieldNotFoundException, StructBlockNotFoundException
 	{		
 		IStruct personStruct = getPersonStruct();
+		
 		Person person = new Person(IDGenerator.getOrganisationID(), IDGenerator.nextID(Property.class));
 		personStruct.explodeProperty(person);
-//		Person person = createPerson(personCompany, personName, personFirstName, personEMail);
 		((TextDataField)person.getDataField(PersonStruct.PERSONALDATA_COMPANY)).setText(company);
 		((TextDataField)person.getDataField(PersonStruct.PERSONALDATA_NAME)).setText(name);
 		((TextDataField)person.getDataField(PersonStruct.PERSONALDATA_FIRSTNAME)).setText(firstName);
 		((RegexDataField)person.getDataField(PersonStruct.INTERNET_EMAIL)).setText(eMail);
 		((DateDataField)person.getDataField(PersonStruct.PERSONALDATA_DATEOFBIRTH)).setDate(dateOfBirth);
 
-
-//		StructLocal structLocal = StructLocal.getStructLocal(Person.class, pm);
-//// TODO  the following method fails - Tobias needs to fix this:
-////		Caused by: org.nightlabs.jfire.prop.exception.StructBlockNotFoundException: No StructBlock found with key devil.NightLabs.org/PersonalData
-////    at org.nightlabs.jfire.prop.AbstractStruct.getStructBlock(AbstractStruct.java:71)
-////    at org.nightlabs.jfire.prop.AbstractStruct.getStructField(AbstractStruct.java:125)
-////    at org.nightlabs.jfire.prop.AbstractStruct.getStructField(AbstractStruct.java:114)
-////    at org.nightlabs.jfire.chezfrancois.DataCreator.createPerson(DataCreator.java:495)
-////    at org.nightlabs.jfire.chezfrancois.ChezFrancoisDatastoreInitialiserBean.initialise(ChezFrancoisDatastoreInitialiserBean.java:437)
-//		SelectionStructField salutationSelectionStructField = (SelectionStructField) structLocal.getStructField(
-//				PersonStruct.PERSONALDATA, PersonStruct.PERSONALDATA_SALUTATION);		
-//		StructFieldValue sfv = salutationSelectionStructField.getStructFieldValue(PersonStruct.PERSONALDATA_SALUTATION_MR);
-//		((SelectionDataField)person.getDataField(PersonStruct.PERSONALDATA_SALUTATION)).setSelection(sfv);
+		SelectionStructField salutationSelectionStructField = (SelectionStructField) personStruct.getStructField(
+				PersonStruct.PERSONALDATA, PersonStruct.PERSONALDATA_SALUTATION);		
+		StructFieldValue sfv = salutationSelectionStructField.getStructFieldValue(PersonStruct.PERSONALDATA_SALUTATION_MR);
+		((SelectionDataField)person.getDataField(PersonStruct.PERSONALDATA_SALUTATION)).setSelection(sfv);
 
 		((TextDataField)person.getDataField(PersonStruct.PERSONALDATA_TITLE)).setText(title);
 		((TextDataField)person.getDataField(PersonStruct.POSTADDRESS_ADDRESS)).setText(postAdress);
@@ -541,7 +536,9 @@ public class DataCreator
 	protected IStruct getPersonStruct()
 	{
 		if (personStruct == null) {
-			personStruct = Struct.getStruct(getOrganisationLegalEntity().getOrganisationID(), Person.class, pm);
+			// We have to work with the StructLocal here...
+			// personStruct = Struct.getStruct(getOrganisationLegalEntity().getOrganisationID(), Person.class, pm);
+			personStruct = StructLocal.getStructLocal(getOrganisationLegalEntity().getOrganisationID(), Person.class.getName(), pm);
 		}
 
 		return personStruct;

@@ -1,5 +1,5 @@
 <!--
-  Generic j2ee (jboss/jpox) ant build file (version 2006-10-09.02)
+  Generic j2ee (jboss/jpox) ant build file (version 2007-02-26.00)
   Author: marc [at] nightlabs [dot] de
   Author: marco [at] nightlabs [dot] de
 
@@ -554,7 +554,7 @@
 	<target name="compile.main.impl">
     <mkdir dir="${project.dir}/${bin.dir}"/>
     <mkdir dir="${project.dir}/${ejbsrc.dir}"/>
-    <javac debug="${javac.debug}" source="${javac.source}" target="${javac.target}" destdir="${project.dir}/${bin.dir}" classpath="${project.path}">
+    <javac debug="${javac.debug}" encoding="UTF-8" source="${javac.source}" target="${javac.target}" destdir="${project.dir}/${bin.dir}" classpath="${project.path}">
       <src path="${project.dir}/${src.dir}"/>
       <src path="${project.dir}/${ejbsrc.dir}"/>
     </javac>
@@ -604,12 +604,13 @@
       	<include name="META-INF/ejb-rolegroup.xml"/>
        	<include name="META-INF/jboss.xml"/>
 		<include name="META-INF/datastoreinit.xml"/>
+      	<include name="META-INF/serverinit.xml"/>
         <include name="META-INF/*-ds.xml"/>
         <include name="META-INF/ra.xml"/>
       </fileset>
     </jar>
 	</target>	
-	
+
 	<!-- Create the server rar file -->
   <target name="dist.bin.rar.impl">
     <copy file="${project.dir}/${dist.dir}/${project.jar}" tofile="${project.dir}/${dist.dir}/${project.rar}"/>

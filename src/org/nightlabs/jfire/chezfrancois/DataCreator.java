@@ -564,11 +564,13 @@ public class DataCreator
 
 	public LegalEntity createLegalEntity(Person person)
 	{
-		LegalEntity legalEntity = new LegalEntity(
-				person.getOrganisationID(), LegalEntity.ANCHOR_TYPE_ID_PARTNER, Long.toHexString(person.getPropertyID()));
-		legalEntity.setPerson(person);
-		pm.makePersistent(legalEntity);
-		return legalEntity;
+		Trader trader = Trader.getTrader(pm);
+		return trader.setPersonToLegalEntity(person, true);
+//		LegalEntity legalEntity = new LegalEntity(
+//				person.getOrganisationID(), LegalEntity.ANCHOR_TYPE_ID_PARTNER, Long.toHexString(person.getPropertyID()));
+//		legalEntity.setPerson(person);
+//		pm.makePersistent(legalEntity);
+//		return legalEntity;
 	}
 
 	public Order createOrderForEndcustomer(LegalEntity customer)

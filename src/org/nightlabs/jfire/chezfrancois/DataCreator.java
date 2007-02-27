@@ -58,7 +58,6 @@ import org.nightlabs.jfire.person.Person;
 import org.nightlabs.jfire.person.PersonStruct;
 import org.nightlabs.jfire.prop.IStruct;
 import org.nightlabs.jfire.prop.Property;
-import org.nightlabs.jfire.prop.Struct;
 import org.nightlabs.jfire.prop.StructLocal;
 import org.nightlabs.jfire.prop.datafield.DateDataField;
 import org.nightlabs.jfire.prop.datafield.NumberDataField;
@@ -91,9 +90,9 @@ import org.nightlabs.jfire.trade.Trader;
 
 public class DataCreator
 {
-	private String languageID = "en";
+	private String languageID = Locale.ENGLISH.getLanguage();
 	private String[] languages = new String[] {
-			"en",
+			Locale.ENGLISH.getLanguage(),
 			Locale.GERMAN.getLanguage(),
 			Locale.FRENCH.getLanguage()
 	};

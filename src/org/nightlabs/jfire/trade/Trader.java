@@ -65,6 +65,7 @@ import org.nightlabs.jfire.jbpm.graph.def.State;
 import org.nightlabs.jfire.jbpm.graph.def.StateDefinition;
 import org.nightlabs.jfire.jbpm.graph.def.Transition;
 import org.nightlabs.jfire.jbpm.graph.def.id.ProcessDefinitionID;
+import org.nightlabs.jfire.organisation.LocalOrganisation;
 import org.nightlabs.jfire.person.Person;
 import org.nightlabs.jfire.security.SecurityReflector;
 import org.nightlabs.jfire.security.User;
@@ -214,7 +215,21 @@ public class Trader
 	 */
 	public String getOrganisationID()
 	{
-		return organisationID;
+		String res = organisationID;
+		// should never happen, but better we try a workaround than to get an exception
+		if (res == null) {
+			try {
+				res = accounting.getOrganisationID();
+				organisationID = res;
+			} catch (Exception x) {
+				res = null;
+			}
+			if (res == null) {
+				res = LocalOrganisation.getLocalOrganisation(getPersistenceManager()).getOrganisationID();
+				organisationID = res;
+			}
+		}
+		return res;
 	}
 
 	/**
@@ -250,7 +265,7 @@ public class Trader
 	public void setDefaultCustomerGroupForKnownCustomer(
 			CustomerGroup customerGroupForEndCustomer)
 	{
-		if (!organisationID.equals(customerGroupForEndCustomer.getOrganisationID()))
+		if (!getOrganisationID().equals(customerGroupForEndCustomer.getOrganisationID()))
 			throw new IllegalArgumentException(
 					"defaultCustomerGroupForKnownCustomer.organisationID is foreign!");
 
@@ -366,7 +381,7 @@ public class Trader
 	 */
 	public Segment createSegment(Order order, SegmentType segmentType)
 	{
-		if (!organisationID.equals(order.getOrganisationID())) // TODO implement
+		if (!getOrganisationID().equals(order.getOrganisationID())) // TODO implement
 																														// later.
 			throw new UnsupportedOperationException(
 					"Cannot yet create a Segment in a foreign order.");
@@ -377,7 +392,7 @@ public class Trader
 			segmentType = SegmentType.getDefaultSegmentType(pm);
 		} // if (segmentType == null) {
 
-		Segment segment = new Segment(organisationID, Segment.createSegmentID(),
+		Segment segment = new Segment(getOrganisationID(), Segment.createSegmentID(),
 				segmentType, order);
 		order.addSegment(segment);
 
@@ -405,7 +420,7 @@ public class Trader
 			TradeConfigModule tradeConfigModule;
 			try {
 				tradeConfigModule = (TradeConfigModule) Config.getConfig(
-						getPersistenceManager(), organisationID, user).createConfigModule(TradeConfigModule.class);
+						getPersistenceManager(), getOrganisationID(), user).createConfigModule(TradeConfigModule.class);
 			} catch (ModuleException x) {
 				throw new RuntimeException(x); // should not happen.
 			}
@@ -426,6 +441,11 @@ public class Trader
 				offerIDPrefix, IDGenerator.nextID(Offer.class, offerIDPrefix));
 		new OfferLocal(offer); // self-registering
 		offer = (Offer) getPersistenceManager().makePersistent(offer);
+
+		ProcessDefinitionAssignment processDefinitionAssignment = (ProcessDefinitionAssignment) getPersistenceManager().getObjectById(
+				ProcessDefinitionAssignmentID.create(Offer.class, TradeSide.vendor));
+		processDefinitionAssignment.createProcessInstance(null, user, offer);
+
 		reverseArticles(user, offer, reversedArticles);
 		return offer;
 	}
@@ -455,7 +475,7 @@ public class Trader
 				TradeConfigModule tradeConfigModule;
 				try {
 					tradeConfigModule = (TradeConfigModule) Config.getConfig(
-							getPersistenceManager(), organisationID, user).createConfigModule(TradeConfigModule.class);
+							getPersistenceManager(), getOrganisationID(), user).createConfigModule(TradeConfigModule.class);
 				} catch (ModuleException x) {
 					throw new RuntimeException(x); // should not happen.
 				}

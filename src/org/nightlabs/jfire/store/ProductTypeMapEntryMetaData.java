@@ -38,11 +38,13 @@ import org.nightlabs.inheritance.NotWritableException;
  *		identity-type="application"
  *		objectid-class="org.nightlabs.jfire.store.id.ProductTypeMapEntryMetaDataID"
  *		detachable="true"
- *		table="JFireTrade_MapEntryMetaData"
+ *		table="JFireTrade_ProductTypeMapEntryMetaData"
  *
  * @jdo.create-objectid-class field-order="organisationID, productTypeID, fieldName, key"
  *
  * @jdo.inheritance strategy="new-table"
+ *
+ * @jdo.fetch-group name="ProductType.fieldMetaDataMap" fields="mapFieldMetaData" fetch-groups="default"
  */
 public class ProductTypeMapEntryMetaData
 	implements org.nightlabs.inheritance.MapEntryMetaData, Serializable

@@ -218,7 +218,7 @@ public class GridPriceConfigUtil
 			}
 			processedProductTypes.add(productType);
 
-			if (productType.getPackageNature() == ProductType.PACKAGE_NATURE_OUTER) {
+			if (productType.getPackageNature() == ProductType.PACKAGE_NATURE_OUTER && productType.getPackagePriceConfig() != null) {
 				++recalculatedCounter;
 
 				((IResultPriceConfig)productType.getPackagePriceConfig()).adoptParameters(

@@ -333,11 +333,9 @@ implements
 	 *		key-type="java.lang.String"
 	 *		value-type="NestedProductType"
 	 *		mapped-by="packageProductType"
+	 *		dependent-value="true"
 	 *
 	 * @jdo.key mapped-by="innerProductTypePrimaryKey"
-	 *
-	 * @!jdo.map-vendor-extension vendor-name="jpox" key="key-field" value="innerProductTypePrimaryKey"
-	 * @!jdo.join
 	 */
 	private Map<String, NestedProductType> nestedProductTypes;
 
@@ -938,7 +936,8 @@ implements
 	public FieldInheriter getFieldInheriter(String fieldName)
 	{
 		if ("nestedProductTypes".equals(fieldName)) {		
-			return new MapFieldInheriter();
+//			return new MapFieldInheriter();
+			return new NestedProductTypeMapInheriter();
 		}
 
 		return new JDOSimpleFieldInheriter();

@@ -37,9 +37,10 @@ import java.util.Map;
  *		identity-type="application"
  *		persistence-capable-superclass="ProductTypeFieldMetaData"
  *		detachable="true"
- *		table="JFireTrade_MapFieldMetaData"
  *
- * @jdo.inheritance strategy="new-table"
+ * @jdo.inheritance strategy="superclass-table"
+ *
+ * @jdo.fetch-group name="ProductType.fieldMetaDataMap" fields="mapEntryMetaDataMap" fetch-groups="default"
  */
 public class ProductTypeMapFieldMetaData
 	extends ProductTypeFieldMetaData

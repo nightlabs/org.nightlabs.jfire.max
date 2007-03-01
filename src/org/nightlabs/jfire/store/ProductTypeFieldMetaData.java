@@ -40,8 +40,11 @@ import org.nightlabs.inheritance.NotWritableException;
  *		table="JFireTrade_ProductTypeFieldMetaData"
  *
  * @jdo.inheritance strategy="new-table"
+ * @jdo.inheritance-discriminator strategy="class-name"
  *
  * @jdo.create-objectid-class field-order="organisationID, productTypeID, fieldName"
+ *
+ * @jdo.fetch-group name="ProductType.fieldMetaDataMap" fields="productType" fetch-groups="default"
  */
 public class ProductTypeFieldMetaData
 	implements

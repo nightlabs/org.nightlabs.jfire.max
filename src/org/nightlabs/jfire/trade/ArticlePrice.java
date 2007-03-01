@@ -117,16 +117,30 @@ public class ArticlePrice extends org.nightlabs.jfire.accounting.Price
 	 */
 	private String nestKey;
 
+//	/**
+//	 * If this <tt>ArticlePrice</tt> is nested, then this points to the
+//	 * <tt>NestedProductType</tt> for which this price has been calculated and assigned.
+//	 * This <tt>ArticlePrice</tt> represents always the TOTAL price, means it might
+//	 * differ from the <tt>origPrice</tt>, if the quantity of <tt>ProductType</tt> within
+//	 * the <tt>nestedProductType</tt> is not 1. 
+//	 *
+//	 * @jdo.field persistence-modifier="persistent"
+//	 */
+//	private NestedProductType nestedProductType = null;
+
 	/**
-	 * If this <tt>ArticlePrice</tt> is nested, then this points to the
-	 * <tt>NestedProductType</tt> for which this price has been calculated and assigned.
-	 * This <tt>ArticlePrice</tt> represents always the TOTAL price, means it might
-	 * differ from the <tt>origPrice</tt>, if the quantity of <tt>ProductType</tt> within
-	 * the <tt>nestedProductType</tt> is not 1. 
+	 * @see #getPackageProductType()
 	 *
 	 * @jdo.field persistence-modifier="persistent"
 	 */
-	private NestedProductType nestedProductType = null;
+	private ProductType packageProductType;
+
+	/**
+	 * @see #getInnerProductTypeQuantity()
+	 *
+	 * @jdo.field persistence-modifier="persistent"
+	 */
+	private int innerProductTypeQuantity = 0;
 
 	/**
 	 * This points always to the <tt>ProductType</tt> for which this price has been
@@ -146,7 +160,7 @@ public class ArticlePrice extends org.nightlabs.jfire.accounting.Price
 	private Product product = null;
 
 	/**
-	 *  @jdo.field persistence-modifier="persistent"
+	 * @jdo.field persistence-modifier="persistent"
 	 */
 	private boolean virtualInner;
 
@@ -190,6 +204,41 @@ public class ArticlePrice extends org.nightlabs.jfire.accounting.Price
 			boolean virtualInner,
 			boolean refund)
 	{
+		this(
+				article,
+				origPrice,
+				organisationID, priceConfigID,
+				priceID,
+				packageArticlePrice,
+				(
+						nestedProductType == null ||
+						nestedProductType.getInnerProductTypePrimaryKey().equals(nestedProductType.getPackageProductType().getPrimaryKey()) ?
+								null : nestedProductType.getPackageProductType()
+				),
+				(
+						nestedProductType == null ||
+						nestedProductType.getInnerProductTypePrimaryKey().equals(nestedProductType.getPackageProductType().getPrimaryKey()) ?
+								0 : nestedProductType.getQuantity()
+				),
+				productType,
+				product,
+				virtualInner,
+				refund
+		);
+	}
+	public ArticlePrice(
+			Article article,
+			org.nightlabs.jfire.accounting.Price origPrice,
+			String organisationID, long priceConfigID,
+			long priceID,
+			ArticlePrice packageArticlePrice,
+			ProductType packageProductType,
+			int innerProductTypeQuantity,
+			ProductType productType,
+			Product product,
+			boolean virtualInner,
+			boolean refund)
+	{
 		super(organisationID, priceConfigID, priceID, origPrice.getCurrency());
 		if (article == null)
 			throw new NullPointerException("article");
@@ -203,8 +252,8 @@ public class ArticlePrice extends org.nightlabs.jfire.accounting.Price
 		this.article = article;
 		this.packageArticlePrice = packageArticlePrice;
 
-		if (nestedProductType != null && !nestedProductType.getInnerProductTypePrimaryKey().equals(nestedProductType.getPackageProductType().getPrimaryKey()))
-			this.nestedProductType = nestedProductType;
+		this.packageProductType = packageProductType;
+		this.innerProductTypeQuantity = innerProductTypeQuantity;
 
 		this.product = product;
 		this.productType = productType;
@@ -307,7 +356,8 @@ public class ArticlePrice extends org.nightlabs.jfire.accounting.Price
 						accountingPriceConfig.getPriceConfigID(),
 						accountingPriceConfig.createPriceID(),
 						this,
-						origNestedArticlePrice.nestedProductType,
+						origNestedArticlePrice.packageProductType,
+						origNestedArticlePrice.innerProductTypeQuantity,
 						origNestedArticlePrice.productType,
 						origNestedArticlePrice.product,
 						origNestedArticlePrice.virtualInner,
@@ -422,12 +472,35 @@ public class ArticlePrice extends org.nightlabs.jfire.accounting.Price
 		return article;
 	}
 	/**
-	 * @return Returns the nestedProductType.
+	 * Because {@link NestedProductType}s can be removed (and thus deleted) or modified,
+	 * we do not reference them here. Instead, if this <code>ArticlePrice</code> is
+	 * created for a <code>NestedProductType.innerProductType</code>, we store the
+	 * <code>packageProductType</code> (i.e. the container) here and copy
+	 * {@link NestedProductType#getQuantity()} in {@link #innerProductTypeQuantity}.
 	 */
-	public NestedProductType getNestedProductType()
+	public ProductType getPackageProductType()
 	{
-		return nestedProductType;
+		return packageProductType;
 	}
+	/**
+	 * If {@link #packageProductType} is not <code>null</code>, this <code>ArticlePrice</code> has
+	 * been created for the inner product[type] and the result of {@link NestedProductType#getQuantity()}
+	 * is copied here.
+	 * If this is not created for a nested product[type], it defaults to 0. If it is created for nested
+	 * products (not types!), it still contains the value copied from {@link NestedProductType#getQuantity()}
+	 * even though there is one instance of ArticlePrice for every Product.
+	 */
+	public int getInnerProductTypeQuantity()
+	{
+		return innerProductTypeQuantity;
+	}
+//	/**
+//	 * @return Returns the nestedProductType.
+//	 */
+//	public NestedProductType getNestedProductType()
+//	{
+//		return nestedProductType;
+//	}
 	/**
 	 * @return Returns the origPrice.
 	 */

@@ -29,6 +29,7 @@ package org.nightlabs.jfire.simpletrade;
 import java.rmi.RemoteException;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.HashMap;
 import java.util.Hashtable;
 import java.util.Iterator;
 import java.util.List;
@@ -41,6 +42,7 @@ import javax.ejb.EJBException;
 import javax.ejb.SessionBean;
 import javax.ejb.SessionContext;
 import javax.jdo.FetchPlan;
+import javax.jdo.JDODetachedFieldAccessException;
 import javax.jdo.JDOHelper;
 import javax.jdo.JDOObjectNotFoundException;
 import javax.jdo.PersistenceManager;
@@ -466,12 +468,41 @@ implements SessionBean
 
 		PersistenceManager pm = getPersistenceManager();
 		try {
-			pm.getFetchPlan().setGroup(FetchPlan.DEFAULT);
+			pm.getFetchPlan().setMaxFetchDepth(maxFetchDepth);
+			if (fetchGroups == null)
+				pm.getFetchPlan().setGroup(FetchPlan.DEFAULT);
+			else
+				pm.getFetchPlan().setGroups(fetchGroups);
 
-			SimpleProductType result = null;
+			boolean priceCalculationNeeded = false;
 			if (NLJDOHelper.exists(pm, productType)) {
-				result = (SimpleProductType) NLJDOHelper.storeJDO(pm, productType, get, fetchGroups, maxFetchDepth);
-				productType = (SimpleProductType) pm.getObjectById(JDOHelper.getObjectId(productType));
+				// if the nestedProductTypes changed, we need to recalculate prices
+				Map<String, NestedProductType> newNestedProductTypes = new HashMap<String, NestedProductType>();
+				try {
+					for (NestedProductType npt : productType.getNestedProductTypes()) {
+						newNestedProductTypes.put(npt.getInnerProductTypePrimaryKey(), npt);
+						npt.getQuantity();
+					}
+				} catch (JDODetachedFieldAccessException x) {
+					newNestedProductTypes = null;
+				}
+
+				if (newNestedProductTypes != null) {
+					SimpleProductType original = (SimpleProductType) pm.getObjectById(JDOHelper.getObjectId(productType));
+					if (original.getNestedProductTypes().size() != newNestedProductTypes.size())
+						priceCalculationNeeded = true;
+					else {
+						for (NestedProductType orgNPT : original.getNestedProductTypes()) {
+							NestedProductType newNPT = newNestedProductTypes.get(orgNPT.getInnerProductTypePrimaryKey());
+							if (newNPT == null || newNPT.getQuantity() != orgNPT.getQuantity()) {
+								priceCalculationNeeded = true;
+								break;
+							}
+						}
+					}
+				}
+
+				productType = (SimpleProductType) pm.makePersistent(productType);
 			}
 			else {
 				Store.getStore(pm).addProductType(
@@ -480,24 +511,29 @@ implements SessionBean
 						SimpleProductTypeActionHandler.getDefaultHome(pm, productType));
 
 				// make sure the prices are correct
+				priceCalculationNeeded = true;
+			}
+
+			if (priceCalculationNeeded) {
+				logger.info("storeProductType: price-calculation is necessary! Will recalculate the prices of " + JDOHelper.getObjectId(productType));
 				((IResultPriceConfig)productType.getPackagePriceConfig()).adoptParameters(
 						productType.getInnerPriceConfig());
 				PriceCalculator priceCalculator = new PriceCalculator(productType);
 				priceCalculator.preparePriceCalculation();
 				priceCalculator.calculatePrices();
+				// TODO find out what is affected and recalculate the affected prices as well!
 			}
-			// now, productType is attached to the datastore in any case
+			else
+				logger.info("storeProductType: price-calculation is NOT necessary! Stored ProductType without recalculation: " + JDOHelper.getObjectId(productType));
 
 			// take care about the inheritance
 			productType.applyInheritance();
+			// TODO when price-calculation was necessary (e.g. because of changes to the nesting), then we must recalculate the prices for the inherited ProductTypes as well!
 
 			if (!get)
 				return null;
 
-			if (result == null)
-				result = (SimpleProductType) pm.detachCopy(pm.getObjectById(JDOHelper.getObjectId(productType)));
-
-			return result;
+			return (SimpleProductType) pm.detachCopy(pm.getObjectById(JDOHelper.getObjectId(productType)));
 		} finally {
 			pm.close();
 		}

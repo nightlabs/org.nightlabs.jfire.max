@@ -351,30 +351,88 @@ public class PriceConfigUtil
 		return articlePrice;
 	}
 
-	private static ArrayList<AffectedProductType> getProductTypesNestingThis(Query q, ProductType productType, int nestingLevel)
+	/**
+	 * This method finds out, which ProductTypes are affected by a price-change to the given <code>productType</code>.
+	 * Therefore, it recursively goes through all nest-levels (by recursing up the package-ProductTypes) and collects
+	 * the parents and the siblings. Because jfire currently supports only forward price configurations (a package price
+	 * is dependent on its contents) and reverse price configs over one level (siblings dependent on each other), we
+	 * do not need to go down the nesting-path - upward is sufficient.
+	 *
+	 * @param pm The PersistenceManager to access the datastore.
+	 * @param productType The ProductType whose prices are about to be changed.
+	 * @return Returns a List referencing the affected product types. This list starts with the given
+	 *		<code>productType</code> having the nesting-level (see {@link AffectedProductType#getNestingLevel()}) 0. The
+	 *		direct packages around this productType will follow with nesting-level 1 and so on. 
+	 */
+	public static ArrayList<AffectedProductType> getAffectedProductTypes(PersistenceManager pm, ProductType productType)
 	{
 		ArrayList<AffectedProductType> res = new ArrayList<AffectedProductType>();
-		for (ProductType pt : (Collection<ProductType>)q.execute(productType)) {
-			res.add(new AffectedProductType((ProductTypeID) JDOHelper.getObjectId(pt), nestingLevel));
-			res.addAll(getProductTypesNestingThis(q, pt, nestingLevel + 1));
-		}
+		res.add(new AffectedProductType(null, AffectedProductType.CauseType.ROOT, (ProductTypeID) JDOHelper.getObjectId(productType)));
+		populateAffectedProductTypeListWithSiblings(res, productType);
+		populateProductTypesNestingThis(res, pm, productType, true);
 		return res;
 	}
 
-	public static ArrayList<AffectedProductType> getAffectedProductTypes(PersistenceManager pm, IPriceConfig priceConfig)
+	private static void populateAffectedProductTypeListWithSiblings(List<AffectedProductType> affectedProductTypes, ProductType productType)
+	{
+		ProductTypeID productTypeID = (ProductTypeID) JDOHelper.getObjectId(productType);
+		for (NestedProductType nestedProductType : productType.getExtendedProductType().getNestedProductTypes()) {
+			ProductTypeID nestedPTID = ProductTypeID.create(
+					nestedProductType.getInnerProductTypeOrganisationID(), nestedProductType.getInnerProductTypeProductTypeID());
+
+			if (!productTypeID.equals(nestedPTID))
+				affectedProductTypes.add(new AffectedProductType(productTypeID, AffectedProductType.CauseType.SIBLING, nestedPTID));
+		}
+	}
+
+	private static void populateProductTypesNestingThis(List<AffectedProductType> affectedProductTypes, PersistenceManager pm, ProductType productType, boolean includeSiblings)
+	{
+		List<ProductType> productTypes = ProductType.getProductTypesNestingThis(pm, productType);
+		ArrayList<AffectedProductType> res = new ArrayList<AffectedProductType>(productTypes.size());
+		for (ProductType pt : productTypes) {
+			res.add(new AffectedProductType(
+					(ProductTypeID) JDOHelper.getObjectId(productType),
+					AffectedProductType.CauseType.NESTED,
+					(ProductTypeID) JDOHelper.getObjectId(pt)));
+
+			if (includeSiblings) {
+				populateAffectedProductTypeListWithSiblings(affectedProductTypes, pt);
+			}
+
+			populateProductTypesNestingThis(affectedProductTypes, pm, pt, includeSiblings);
+		}
+//		ArrayList<AffectedProductType> res = new ArrayList<AffectedProductType>();
+//		for (ProductType pt : (Collection<ProductType>)q.execute(productType)) {
+//			res.add(new AffectedProductType((ProductTypeID) JDOHelper.getObjectId(pt), nestingLevel));
+//			res.addAll(getProductTypesNestingThis(q, pt, nestingLevel + 1));
+//		}
+	}
+
+	/**
+	 * This method finds out which ProductTypes (identified by their ID) were affected, if the given <code>priceConfig</code>
+	 * is changed. This means both, ProductTypes that use the given priceConfig (see {@link ProductType#getInnerPriceConfig()}
+	 * and {@link ProductType#getPackagePriceConfig()})
+	 */
+	public static ArrayList<AffectedProductType> getAffectedProductTypes(PersistenceManager pm, IPriceConfig priceConfig, boolean includeSiblings)
 	{
 		ArrayList<AffectedProductType> res = new ArrayList<AffectedProductType>();
 
 		Query q1 = pm.newQuery(ProductType.class);
 		q1.setFilter("this.innerPriceConfig == :priceConfig || this.packagePriceConfig == :priceConfig");
 
-		Query q2 = pm.newQuery(ProductType.class);
-		q2.declareVariables(NestedProductType.class.getName() + " nestedProductType");
-		q2.setFilter("this.nestedProductTypes.containsValue(nestedProductType) && nestedProductType.innerProductType == :productType");
+//		Query q2 = pm.newQuery(ProductType.class);
+//		q2.declareVariables(NestedProductType.class.getName() + " nestedProductType");
+//		q2.setFilter("this.nestedProductTypes.containsValue(nestedProductType) && nestedProductType.innerProductType == :productType");
 
 		for (ProductType pt : (Collection<ProductType>)q1.execute(priceConfig)) {
-			res.add(new AffectedProductType((ProductTypeID) JDOHelper.getObjectId(pt), 0));
-			res.addAll(getProductTypesNestingThis(q2, pt, 1));
+			ProductTypeID productTypeID = (ProductTypeID) JDOHelper.getObjectId(pt);
+			res.add(new AffectedProductType(null, AffectedProductType.CauseType.ROOT, productTypeID));
+
+			if (includeSiblings) {
+				populateAffectedProductTypeListWithSiblings(res, pt);
+			}
+
+			populateProductTypesNestingThis(res, pm, pt, true);
 		}
 
 		return res;
@@ -389,7 +447,7 @@ public class PriceConfigUtil
 		Map<PriceConfigID, List<AffectedProductType>> res = new HashMap<PriceConfigID, List<AffectedProductType>>(priceConfigIDs.size());
 		for (PriceConfigID priceConfigID : priceConfigIDs) {
 			IPriceConfig priceConfig = (IPriceConfig) pm.getObjectById(priceConfigID);
-			ArrayList<AffectedProductType> affectedProductTypes = PriceConfigUtil.getAffectedProductTypes(pm, priceConfig);
+			ArrayList<AffectedProductType> affectedProductTypes = PriceConfigUtil.getAffectedProductTypes(pm, priceConfig, true);
 			affectedProductTypes.trimToSize();
 			res.put(priceConfigID, affectedProductTypes);
 		}

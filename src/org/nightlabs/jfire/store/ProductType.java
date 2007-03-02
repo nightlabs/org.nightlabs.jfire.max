@@ -27,11 +27,13 @@
 package org.nightlabs.jfire.store;
 
 import java.io.Serializable;
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
@@ -44,9 +46,9 @@ import org.nightlabs.inheritance.FieldInheriter;
 import org.nightlabs.inheritance.Inheritable;
 import org.nightlabs.inheritance.InheritanceCallbacks;
 import org.nightlabs.inheritance.InheritanceManager;
-import org.nightlabs.inheritance.MapFieldInheriter;
 import org.nightlabs.jdo.inheritance.JDOSimpleFieldInheriter;
 import org.nightlabs.jfire.accounting.book.LocalAccountantDelegate;
+import org.nightlabs.jfire.accounting.priceconfig.AffectedProductType;
 import org.nightlabs.jfire.accounting.priceconfig.IInnerPriceConfig;
 import org.nightlabs.jfire.accounting.priceconfig.IPackagePriceConfig;
 import org.nightlabs.jfire.accounting.priceconfig.IPriceConfig;
@@ -152,6 +154,14 @@ import org.nightlabs.util.Utils;
  *		    this.extendedProductType.productTypeID == parentProductTypeProductTypeID
  *		  PARAMETERS String parentProductTypeOrganisationID, String parentProductTypeProductTypeID
  *		  import java.lang.String"
+ *
+ * @jdo.query
+ *		name="getProductTypesNestingThis"
+ *		query="SELECT
+ *			WHERE
+ *				this.nestedProductTypes.containsValue(nestedProductType) &&
+ *				nestedProductType.innerProductType == :productType
+ *				VARIABLES org.nightlabs.jfire.store.NestedProductType nestedProductType"
  **/
 public abstract class ProductType
 implements
@@ -182,6 +192,19 @@ implements
 	public static final String FETCH_GROUP_LOCAL_ACCOUNTANT_DELEGATE = "ProductType.localAccountantDelegate";
 	public static final String FETCH_GROUP_LOCAL_STOREKEEPER_DELEGATE = "ProductType.localStorekeeperDelegate";
 	public static final String FETCH_GROUP_THIS_PRODUCT_TYPE = "ProductType.this";
+
+	public static List<ProductType> getProductTypesNestingThis(PersistenceManager pm, ProductTypeID productTypeID)
+	{
+		pm.getExtent(ProductType.class);
+		ProductType productType = (ProductType) pm.getObjectById(productTypeID);
+		return getProductTypesNestingThis(pm, productType);
+	}
+	@SuppressWarnings("unchecked")
+	public static List<ProductType> getProductTypesNestingThis(PersistenceManager pm, ProductType productType)
+	{
+		Query q = pm.newNamedQuery(ProductType.class, "getProductTypesNestingThis");
+		return (List<ProductType>)q.execute(productType);
+	}
 
 	/**
 	 * @param pm The <code>PersistenceManager</code> that should be used to access the datastore.
@@ -912,7 +935,7 @@ implements
 				nonInheritableFields.add("published");
 				nonInheritableFields.add("saleable");
 				nonInheritableFields.add("selfForVirtualSelfPackaging");
-				nonInheritableFields.add("innerPriceConfig");
+				nonInheritableFields.add("innerPriceConfig"); // TODO this price config must be inheritable
 				nonInheritableFields.add("packagePriceConfig");
 			}
 
@@ -983,6 +1006,12 @@ implements
 		Collection children = getChildProductTypes(pm, (ProductTypeID) JDOHelper.getObjectId(this));
 		for (Iterator it = children.iterator(); it.hasNext();) {
 			ProductType child = (ProductType) it.next();
+
+			// before inheriting, we need to check, whether the following things change:
+			// - a priceConfig
+			// - the NestedProductTypes
+			// if one of these will change due to the inheritance, we must update (recalculate) the price configs
+
 			im.inheritAllFields(this, child);
 			child.applyInheritance(pm, im);
 		}

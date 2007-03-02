@@ -65,7 +65,9 @@ import org.nightlabs.jfire.accounting.gridpriceconfig.StablePriceConfig;
 import org.nightlabs.jfire.accounting.gridpriceconfig.TariffPricePair;
 import org.nightlabs.jfire.accounting.id.CurrencyID;
 import org.nightlabs.jfire.accounting.id.TariffID;
+import org.nightlabs.jfire.accounting.priceconfig.AffectedProductType;
 import org.nightlabs.jfire.accounting.priceconfig.FetchGroupsPriceConfig;
+import org.nightlabs.jfire.accounting.priceconfig.PriceConfigUtil;
 import org.nightlabs.jfire.accounting.priceconfig.id.PriceConfigID;
 import org.nightlabs.jfire.base.BaseSessionBeanImpl;
 import org.nightlabs.jfire.base.JFireException;
@@ -518,10 +520,21 @@ implements SessionBean
 				logger.info("storeProductType: price-calculation is necessary! Will recalculate the prices of " + JDOHelper.getObjectId(productType));
 				((IResultPriceConfig)productType.getPackagePriceConfig()).adoptParameters(
 						productType.getInnerPriceConfig());
-				PriceCalculator priceCalculator = new PriceCalculator(productType);
-				priceCalculator.preparePriceCalculation();
-				priceCalculator.calculatePrices();
 				// TODO find out what is affected and recalculate the affected prices as well!
+				
+				// find out which productTypes package this one and recalculate their prices as well - recursively! and with siblings!
+				ProductTypeID productTypeID = (ProductTypeID) JDOHelper.getObjectId(productType);
+				for (AffectedProductType apt : PriceConfigUtil.getAffectedProductTypes(pm, productType)) {
+					ProductType pt;
+					if (apt.getProductTypeID().equals(productTypeID))
+						pt = productType;
+					else
+						pt = (ProductType) pm.getObjectById(apt.getProductTypeID());
+
+					PriceCalculator priceCalculator = new PriceCalculator(pt);
+					priceCalculator.preparePriceCalculation();
+					priceCalculator.calculatePrices();
+				}
 			}
 			else
 				logger.info("storeProductType: price-calculation is NOT necessary! Stored ProductType without recalculation: " + JDOHelper.getObjectId(productType));

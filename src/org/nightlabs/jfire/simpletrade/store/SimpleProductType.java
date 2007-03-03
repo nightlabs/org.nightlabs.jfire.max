@@ -31,11 +31,14 @@ import java.util.Collection;
 import javax.jdo.PersistenceManager;
 import javax.jdo.Query;
 
+import org.nightlabs.annotation.Implement;
 import org.nightlabs.i18n.I18nText;
 import org.nightlabs.inheritance.FieldInheriter;
 import org.nightlabs.inheritance.FieldMetaData;
 import org.nightlabs.inheritance.Inheritable;
 import org.nightlabs.inheritance.InheritableFieldInheriter;
+import org.nightlabs.jfire.accounting.gridpriceconfig.PriceCalculationException;
+import org.nightlabs.jfire.accounting.gridpriceconfig.PriceCalculator;
 import org.nightlabs.jfire.store.ProductType;
 import org.nightlabs.jfire.store.id.ProductTypeID;
 import org.nightlabs.jfire.trade.LegalEntity;
@@ -262,4 +265,16 @@ public class SimpleProductType extends ProductType
 	}
 	// /// *** end inheritance *** ///
 	// ******************************
+
+	@Implement
+	protected void calculatePrices()
+	{
+		PriceCalculator priceCalculator = new PriceCalculator(this);
+		priceCalculator.preparePriceCalculation();
+		try {
+			priceCalculator.calculatePrices();
+		} catch (PriceCalculationException e) {
+			throw new RuntimeException(e);
+		}
+	}
 }

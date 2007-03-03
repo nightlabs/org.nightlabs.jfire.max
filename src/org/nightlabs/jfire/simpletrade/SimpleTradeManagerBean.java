@@ -30,6 +30,7 @@ import java.rmi.RemoteException;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Hashtable;
 import java.util.Iterator;
 import java.util.List;
@@ -479,6 +480,7 @@ implements SessionBean
 			boolean priceCalculationNeeded = false;
 			if (NLJDOHelper.exists(pm, productType)) {
 				// if the nestedProductTypes changed, we need to recalculate prices
+				// test first, whether they were detached
 				Map<String, NestedProductType> newNestedProductTypes = new HashMap<String, NestedProductType>();
 				try {
 					for (NestedProductType npt : productType.getNestedProductTypes()) {
@@ -491,17 +493,20 @@ implements SessionBean
 
 				if (newNestedProductTypes != null) {
 					SimpleProductType original = (SimpleProductType) pm.getObjectById(JDOHelper.getObjectId(productType));
-					if (original.getNestedProductTypes().size() != newNestedProductTypes.size())
-						priceCalculationNeeded = true;
-					else {
-						for (NestedProductType orgNPT : original.getNestedProductTypes()) {
-							NestedProductType newNPT = newNestedProductTypes.get(orgNPT.getInnerProductTypePrimaryKey());
-							if (newNPT == null || newNPT.getQuantity() != orgNPT.getQuantity()) {
-								priceCalculationNeeded = true;
-								break;
-							}
-						}
-					}
+
+					priceCalculationNeeded = !ProductType.compareNestedProductTypes(original.getNestedProductTypes(), newNestedProductTypes);
+
+//					if (original.getNestedProductTypes().size() != newNestedProductTypes.size())
+//						priceCalculationNeeded = true;
+//					else {
+//						for (NestedProductType orgNPT : original.getNestedProductTypes()) {
+//							NestedProductType newNPT = newNestedProductTypes.get(orgNPT.getInnerProductTypePrimaryKey());
+//							if (newNPT == null || newNPT.getQuantity() != orgNPT.getQuantity()) {
+//								priceCalculationNeeded = true;
+//								break;
+//							}
+//						}
+//					}
 				}
 
 				productType = (SimpleProductType) pm.makePersistent(productType);
@@ -518,22 +523,33 @@ implements SessionBean
 
 			if (priceCalculationNeeded) {
 				logger.info("storeProductType: price-calculation is necessary! Will recalculate the prices of " + JDOHelper.getObjectId(productType));
-				((IResultPriceConfig)productType.getPackagePriceConfig()).adoptParameters(
-						productType.getInnerPriceConfig());
-				// TODO find out what is affected and recalculate the affected prices as well!
-				
-				// find out which productTypes package this one and recalculate their prices as well - recursively! and with siblings!
+				if (productType.getPackagePriceConfig() != null) {
+					((IResultPriceConfig)productType.getPackagePriceConfig()).adoptParameters(
+							productType.getInnerPriceConfig());
+				}
+
+				// find out which productTypes package this one and recalculate their prices as well - recursively! siblings are automatically included in the package-recalculation
+				HashSet<ProductTypeID> processedProductTypeIDs = new HashSet<ProductTypeID>();
 				ProductTypeID productTypeID = (ProductTypeID) JDOHelper.getObjectId(productType);
 				for (AffectedProductType apt : PriceConfigUtil.getAffectedProductTypes(pm, productType)) {
+					if (!processedProductTypeIDs.add(apt.getProductTypeID()))
+						continue;
+
 					ProductType pt;
 					if (apt.getProductTypeID().equals(productTypeID))
 						pt = productType;
 					else
 						pt = (ProductType) pm.getObjectById(apt.getProductTypeID());
 
-					PriceCalculator priceCalculator = new PriceCalculator(pt);
-					priceCalculator.preparePriceCalculation();
-					priceCalculator.calculatePrices();
+					if (ProductType.PACKAGE_NATURE_OUTER == pt.getPackageNature() && pt.getPackagePriceConfig() != null) {
+						logger.info("storeProductType: price-calculation starting for: " + JDOHelper.getObjectId(pt));
+
+						PriceCalculator priceCalculator = new PriceCalculator(pt);
+						priceCalculator.preparePriceCalculation();
+						priceCalculator.calculatePrices();
+
+						logger.info("storeProductType: price-calculation complete for: " + JDOHelper.getObjectId(pt));
+					}
 				}
 			}
 			else

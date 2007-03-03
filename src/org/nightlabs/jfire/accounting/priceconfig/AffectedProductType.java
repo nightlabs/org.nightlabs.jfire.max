@@ -21,7 +21,10 @@ implements Serializable
 	/**
 	 * This defines, how the {@link #productTypeID} is affected by {@link #causeProductTypeID}.
 	 * If {@link #causeProductTypeID} is a sibling of {@link #productTypeID}, the type will be
-	 * {@link CauseType#SIBLING}. If {@link #causeProductTypeID} is nested within {@link #productTypeID},
+	 * {@link CauseType#SIBLING}. If {@link #causeProductTypeID} references a package producttype
+	 * ({@link ProductType#getPackageNature()} == {@link ProductType#PACKAGE_NATURE_OUTER}) and
+	 * it contains an inner-price-config (virtual self-packaging)
+	 * If {@link #causeProductTypeID} is nested within {@link #productTypeID},
 	 * it is {@link CauseType#NESTED}.
 	 */
 	private CauseType causeType;

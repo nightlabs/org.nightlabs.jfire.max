@@ -200,9 +200,9 @@ public class GridPriceConfigUtil
 			priceConfigs.add(priceConfig);
 
 			if (affectedProductTypes == null)
-				affectedProductTypes = PriceConfigUtil.getAffectedProductTypes(pm, priceConfig, true);
+				affectedProductTypes = PriceConfigUtil.getAffectedProductTypes(pm, priceConfig);
 			else
-				affectedProductTypes.addAll(PriceConfigUtil.getAffectedProductTypes(pm, priceConfig, true));
+				affectedProductTypes.addAll(PriceConfigUtil.getAffectedProductTypes(pm, priceConfig));
 		}
 
 		// and recalculate the prices for all affected ProductTypes

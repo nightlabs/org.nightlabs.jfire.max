@@ -27,7 +27,6 @@
 package org.nightlabs.jfire.store;
 
 import java.io.Serializable;
-import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
@@ -37,10 +36,13 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import javax.jdo.FetchPlan;
 import javax.jdo.JDOHelper;
 import javax.jdo.PersistenceManager;
 import javax.jdo.Query;
 
+import org.apache.log4j.Logger;
+import org.nightlabs.annotation.Implement;
 import org.nightlabs.i18n.I18nText;
 import org.nightlabs.inheritance.FieldInheriter;
 import org.nightlabs.inheritance.Inheritable;
@@ -53,6 +55,8 @@ import org.nightlabs.jfire.accounting.priceconfig.IInnerPriceConfig;
 import org.nightlabs.jfire.accounting.priceconfig.IPackagePriceConfig;
 import org.nightlabs.jfire.accounting.priceconfig.IPriceConfig;
 import org.nightlabs.jfire.accounting.priceconfig.PriceConfig;
+import org.nightlabs.jfire.accounting.priceconfig.PriceConfigUtil;
+import org.nightlabs.jfire.accounting.priceconfig.id.PriceConfigID;
 import org.nightlabs.jfire.organisation.LocalOrganisation;
 import org.nightlabs.jfire.organisation.Organisation;
 import org.nightlabs.jfire.security.User;
@@ -169,6 +173,8 @@ implements
 		InheritanceCallbacks,
 		Serializable
 {
+	private static final Logger logger = Logger.getLogger(ProductType.class);
+
 	/**
 	 * This fetch-group (named "ProductType.name") must be used in all descendents of this class
 	 * to ensure that the method {@link #getName()} can be used. 
@@ -914,6 +920,9 @@ implements
 		if (fieldName.startsWith("jdo"))
 			return null;
 
+		if (fieldName.startsWith("tmpInherit"))
+			return null;
+
 		synchronized (nonInheritableFields) {
 			if (nonInheritableFields.isEmpty()) {
 				// PK fields
@@ -935,7 +944,7 @@ implements
 				nonInheritableFields.add("published");
 				nonInheritableFields.add("saleable");
 				nonInheritableFields.add("selfForVirtualSelfPackaging");
-				nonInheritableFields.add("innerPriceConfig"); // TODO this price config must be inheritable
+//				nonInheritableFields.add("innerPriceConfig"); // this price config must be inheritable - its change should already be detected and cause recalculation
 				nonInheritableFields.add("packagePriceConfig");
 			}
 
@@ -965,9 +974,64 @@ implements
 
 		return new JDOSimpleFieldInheriter();
 	}
-	
+
+	/**
+	 * @return <code>true</code> if they are equal, <code>false</code> if they are different
+	 */
+	public static boolean compareNestedProductTypes(
+			Collection<NestedProductType> nestedProductTypes1,
+			Map<String, NestedProductType> nestedProductTypes2)
+	{
+		if (nestedProductTypes1.size() != nestedProductTypes2.size())
+			return false;
+
+		for (NestedProductType orgNPT : nestedProductTypes1) {
+			NestedProductType newNPT = nestedProductTypes2.get(orgNPT.getInnerProductTypePrimaryKey());
+			if (newNPT == null)
+				return false;
+
+			if (newNPT.getQuantity() != orgNPT.getQuantity())
+				return false;
+		}
+
+		return true;
+	}
+
+	/**
+	 * @jdo.field persistence-modifier="none"
+	 */
+	private transient PriceConfigID tmpInherit_innerPriceConfigID = null;
+	/**
+	 * @jdo.field persistence-modifier="none"
+	 */
+	private transient Map<String, NestedProductType> tmpInherit_nestedProductTypes = null;
+
 	public void preInherit(Inheritable mother, Inheritable child)
 	{
+		if (child == this) {
+			// check whether the nestedPoductTypes change - in this case we will recalculate prices after inheritance in postInherit(...) 
+			// we copy the current nestedProductTypes to tmpInherit_nestedProductTypes - then we compare them afterwards
+			PersistenceManager pm = getPersistenceManager();
+			int orgMaxFetchDepth = pm.getFetchPlan().getMaxFetchDepth();
+			Set orgFetchGroups = new HashSet(pm.getFetchPlan().getGroups());
+			pm.getFetchPlan().setGroup(FetchPlan.DEFAULT);
+			pm.getFetchPlan().setMaxFetchDepth(1);
+			try {
+				tmpInherit_nestedProductTypes = new HashMap<String, NestedProductType>(nestedProductTypes.size());
+				for (Iterator it = nestedProductTypes.entrySet().iterator(); it.hasNext(); ) {
+					Map.Entry me = (Map.Entry) it.next();
+					NestedProductType npt = (NestedProductType) pm.detachCopy(me.getValue());
+					tmpInherit_nestedProductTypes.put((String) me.getKey(), npt);
+				}
+			} finally {
+				pm.getFetchPlan().setGroups(orgFetchGroups);
+				pm.getFetchPlan().setMaxFetchDepth(orgMaxFetchDepth);
+			}
+
+			// additionally, we need to check, whether the innerPriceConfig is replaced, which would cause recalculation, too
+			tmpInherit_innerPriceConfigID = (PriceConfigID) JDOHelper.getObjectId(innerPriceConfig);
+		}
+
 		// access all non-simple fields in order to ensure, they're loaded by JDO
 		if (deliveryConfiguration == null);
 		if (innerPriceConfig == null);
@@ -978,7 +1042,56 @@ implements
 		if (owner == null);
 	}
 
-	public void postInherit(Inheritable mother, Inheritable child) { }
+	@Implement
+	public void postInherit(Inheritable mother, Inheritable child) {
+		if (child == this) {
+			if (!Utils.equals(tmpInherit_innerPriceConfigID, JDOHelper.getObjectId(innerPriceConfig)) ||
+					!compareNestedProductTypes(nestedProductTypes.values(), tmpInherit_nestedProductTypes)) {
+				// there are changes => recalculate prices!
+				PersistenceManager pm = getPersistenceManager();
+
+				HashSet processedProductTypeIDs = new HashSet();
+				ProductTypeID productTypeID = (ProductTypeID) JDOHelper.getObjectId(this);
+				for (AffectedProductType apt : PriceConfigUtil.getAffectedProductTypes(pm, this)) {
+					if (!processedProductTypeIDs.add(apt.getProductTypeID()))
+						continue;
+
+					ProductType pt;
+					if (apt.getProductTypeID().equals(productTypeID))
+						pt = this;
+					else
+						pt = (ProductType) pm.getObjectById(apt.getProductTypeID());
+
+					if (pt.isResponsibleForPriceCalculation()) {
+						logger.info("postInherit: price-calculation starting for: " + JDOHelper.getObjectId(pt));
+
+						pt.calculatePrices();
+
+						logger.info("postInherit: price-calculation complete for: " + JDOHelper.getObjectId(pt));
+					}
+				}
+			}
+		}
+	}
+
+	/**
+	 * The default implementation of this method returns <code>true</code> if it is {@link #PACKAGE_NATURE_OUTER}
+	 * and the {@link #packagePriceConfig} is assigned (i.e. not <code>null</code>).
+	 *
+	 * @see #calculatePrices()
+	 * @see #postInherit(Inheritable, Inheritable)
+	 */
+	protected boolean isResponsibleForPriceCalculation()
+	{
+		return ProductType.PACKAGE_NATURE_OUTER == this.getPackageNature() && this.getPackagePriceConfig() != null;
+	}
+
+	/**
+	 * This method is called, when this ProductType should recalculate its prices and {@link #isResponsibleForPriceCalculation()}
+	 * returned <code>true</code>. This happens for example during inheritance application, if the packaging
+	 * (i.e. {@link #nestedProductTypes}) changed or an inner price config changed.
+	 */
+	protected abstract void calculatePrices();
 
 	/**
 	 * This method causes all settings of this instance to be passed to all children

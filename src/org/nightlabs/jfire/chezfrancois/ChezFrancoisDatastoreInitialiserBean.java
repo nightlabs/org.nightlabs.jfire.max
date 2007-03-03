@@ -124,6 +124,9 @@ implements SessionBean
 	public void initialise() 
 	throws ModuleException 
 	{
+		if (getOrganisationID().equals(getRootOrganisationID()))
+			return;
+
 		try {
 			PersistenceManager pm = this.getPersistenceManager();
 			try {
@@ -435,7 +438,7 @@ implements SessionBean
 //				LegalEntity legalEntity02 = dataCreator.createLegalEntity(user02.getPerson());
 //				legalEntity02.setDefaultCustomerGroup(customerGroupDefault);
 				Person person = dataCreator.createPerson("NightLabs GmbH", "Marco", "Schulze", "marco@nightlabs.de", new Date(), 
-						PersonStruct.PERSONALDATA_SALUTATION_MR, "Dr.", "Teststrasse", "79100", "Freiburg", "Baden-Württemberg", "Deutschland",
+						PersonStruct.PERSONALDATA_SALUTATION_MR, "Dr.", "Teststrasse", "79100", "Freiburg", "Baden-Wï¿½rttemberg", "Deutschland",
 						"49", "761", "123456789", "49", "761", "987654321", "Marco Schulze", 123456789, "68090000", "TestBank", 
 						"Marco Schulze", "1234567890", 
 						01, 2008, "Comment for Marco Schulze");

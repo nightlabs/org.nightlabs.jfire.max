@@ -182,6 +182,7 @@ public class DataCreator
 				organisationID, productTypeID, category, null, ProductType.INHERITANCE_NATURE_LEAF, ProductType.PACKAGE_NATURE_OUTER);
 		setNames(pt.getName(), names);
 		pt.setPackagePriceConfig(new StablePriceConfig(organisationID, PriceConfig.createPriceConfigID()));
+		pt.getFieldMetaData("innerPriceConfig").setValueInherited(false);
 		pt.setInnerPriceConfig(innerPriceConfig);
 		store.addProductType(user, pt, SimpleProductTypeActionHandler.getDefaultHome(pm, pt));
 

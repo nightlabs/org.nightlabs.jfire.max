@@ -523,7 +523,7 @@ implements SessionBean
 
 			if (priceCalculationNeeded) {
 				logger.info("storeProductType: price-calculation is necessary! Will recalculate the prices of " + JDOHelper.getObjectId(productType));
-				if (productType.getPackagePriceConfig() != null) {
+				if (productType.getPackagePriceConfig() != null && productType.getInnerPriceConfig() != null) {
 					((IResultPriceConfig)productType.getPackagePriceConfig()).adoptParameters(
 							productType.getInnerPriceConfig());
 				}

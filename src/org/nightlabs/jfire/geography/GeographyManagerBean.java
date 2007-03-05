@@ -303,6 +303,32 @@ public abstract class GeographyManagerBean
 	 * @ejb.interface-method
 	 * @ejb.permission role-name="_Guest_"
 	 */
+	public byte[] storeCSVData(String csvType, String countryID, byte[] data){
+		PersistenceManager pm = getPersistenceManager();
+		try {
+			pm.getFetchPlan().setMaxFetchDepth(1);
+			pm.getFetchPlan().setGroup(FetchPlan.ALL);
+
+			try {
+				InitialContext initialContext = new InitialContext();
+				try {
+					CSV csv = CSV.setCSVData(pm, Organisation.getRootOrganisationID(initialContext), csvType, countryID, data);
+					return csv.getData();
+				} finally {
+					initialContext.close();
+				}
+			} catch (NamingException x) {
+				throw new RuntimeException(x); // it's definitely an unexpected exception if we can't access the local JNDI.
+			}
+		} finally {
+			pm.close();
+		}
+	}
+	
+	/**
+	 * @ejb.interface-method
+	 * @ejb.permission role-name="_Guest_"
+	 */
 	public byte[] getCSVData(String csvType, String countryID)
 	{
 		PersistenceManager pm = getPersistenceManager();

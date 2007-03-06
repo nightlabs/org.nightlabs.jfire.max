@@ -36,6 +36,7 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
+import java.util.Set;
 import java.util.regex.Pattern;
 
 import javax.ejb.CreateException;
@@ -76,6 +77,7 @@ import org.nightlabs.jfire.jdo.notification.persistent.PersistentNotificationEJB
 import org.nightlabs.jfire.jdo.notification.persistent.PersistentNotificationEJBUtil;
 import org.nightlabs.jfire.jdo.notification.persistent.SubscriptionUtil;
 import org.nightlabs.jfire.organisation.Organisation;
+import org.nightlabs.jfire.organisation.id.OrganisationID;
 import org.nightlabs.jfire.security.User;
 import org.nightlabs.jfire.simpletrade.notification.SimpleProductTypeNotificationFilter;
 import org.nightlabs.jfire.simpletrade.notification.SimpleProductTypeNotificationReceiver;
@@ -921,4 +923,41 @@ implements SessionBean
 		}
 	}
 
+	/**
+	 * This method returns {@link OrganisationID}s for all {@link Organisation}s that are known to
+	 * the current organisation, but excluding:
+	 * <ul>
+	 * <li>the current organisation</li>
+	 * <li>all organisations for which already a subscribed root-simple-producttype exists</li>
+	 * </ul>
+	 *
+	 * @ejb.interface-method
+	 * @ejb.transaction type="Required"
+	 * @ejb.permission role-name="_Guest_"
+	 */
+	public Collection<OrganisationID> getCandidateOrganisationIDsForCrossTrade()
+	{
+		PersistenceManager pm = getPersistenceManager();
+		try {
+			Set<OrganisationID> res = new HashSet<OrganisationID>();
+
+			Query q = pm.newQuery(Organisation.class);
+			q.setResult("JDOHelper.getObjectId(this)");
+			for (OrganisationID organisationID : (Collection<OrganisationID>)q.execute()) {
+				if (getOrganisationID().equals(organisationID.organisationID))
+					continue;
+
+				try {
+					pm.getObjectById(
+							ProductTypeID.create(organisationID.organisationID, SimpleProductType.class.getName()));
+				} catch (JDOObjectNotFoundException x) {
+					res.add(organisationID);
+				}
+			}
+
+			return res;
+		} finally {
+			pm.close();
+		}
+	} 
 }

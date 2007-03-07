@@ -26,10 +26,16 @@
 
 package org.nightlabs.jfire.geography;
 
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
 import java.rmi.RemoteException;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Iterator;
+import java.util.zip.Deflater;
 
 import javax.ejb.CreateException;
 import javax.ejb.EJBException;
@@ -305,6 +311,7 @@ public abstract class GeographyManagerBean
 	 */
 	public byte[] storeCSVData(String csvType, String countryID, byte[] data){
 		PersistenceManager pm = getPersistenceManager();
+		CSV csv = null;
 		try {
 			pm.getFetchPlan().setMaxFetchDepth(1);
 			pm.getFetchPlan().setGroup(FetchPlan.ALL);
@@ -312,21 +319,57 @@ public abstract class GeographyManagerBean
 			try {
 				InitialContext initialContext = new InitialContext();
 				try {
-					CSV csv = CSV.setCSVData(pm, Organisation.getRootOrganisationID(initialContext), csvType, countryID, data);
+					ByteArrayInputStream bais = new ByteArrayInputStream(data);
+					ObjectInputStream ois = new ObjectInputStream(bais);
+
+					Object obj = ois.readObject();
+
+					if(csvType.equals(CSV.CSV_TYPE_LOCATION)){
+						Location location = (Location)obj;
+						Collection<Location> locations = location.getCity().getLocations();
+						Collection<Location> newLocations = new ArrayList<Location>();
+						newLocations.addAll(locations);
+						newLocations.add(location);
+						
+						ByteArrayOutputStream baos = new ByteArrayOutputStream();
+						ObjectOutputStream oos = new ObjectOutputStream(baos);
+						oos.writeObject(newLocations);
+						oos.flush();
+						byte[] serializedBytes = baos.toByteArray();
+						
+						byte[] output = new byte[100];
+
+						Deflater compresser  = new Deflater();
+						compresser.setInput(serializedBytes);
+						compresser.finish();
+						int compressedDataLength = compresser.deflate(output);
+
+						csv = CSV.setCSVData(pm, Organisation.getRootOrganisationID(initialContext), csvType, countryID, output);
+					}//if
 					return csv.getData();
-				} finally {
+				}//try 
+				finally {
 					initialContext.close();
-				}
-			} catch (NamingException x) {
+				}//finally
+			}//try
+			catch (NamingException x) {
 				throw new RuntimeException(x); // it's definitely an unexpected exception if we can't access the local JNDI.
-			}
-		} finally {
+			}//catch
+			catch (IOException x) {
+				throw new RuntimeException(x); // it's definitely an unexpected exception if we can't access the local JNDI.
+			}//catch
+			catch (ClassNotFoundException x) {
+				throw new RuntimeException(x); // it's definitely an unexpected exception if we can't access the local JNDI.
+			}//catch
+		}//try
+		finally {
 			pm.close();
-		}
+		}//finally
 	}
 	
 	/**
 	 * @ejb.interface-method
+	 * @ejb.transaction type="Required"
 	 * @ejb.permission role-name="_Guest_"
 	 */
 	public byte[] getCSVData(String csvType, String countryID)

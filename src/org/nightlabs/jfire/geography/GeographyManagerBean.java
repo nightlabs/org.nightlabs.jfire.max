@@ -26,15 +26,14 @@
 
 package org.nightlabs.jfire.geography;
 
-import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
-import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.rmi.RemoteException;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Iterator;
+import java.util.List;
 import java.util.zip.Deflater;
 
 import javax.ejb.CreateException;
@@ -307,9 +306,10 @@ public abstract class GeographyManagerBean
 
 	/**
 	 * @ejb.interface-method
+	 * @ejb.transaction type="Required"
 	 * @ejb.permission role-name="_Guest_"
 	 */
-	public byte[] storeCSVData(String csvType, String countryID, byte[] data){
+	public byte[] storeCSVData(String csvType, String countryID, Object obj){
 		PersistenceManager pm = getPersistenceManager();
 		CSV csv = null;
 		try {
@@ -319,34 +319,49 @@ public abstract class GeographyManagerBean
 			try {
 				InitialContext initialContext = new InitialContext();
 				try {
-					ByteArrayInputStream bais = new ByteArrayInputStream(data);
-					ObjectInputStream ois = new ObjectInputStream(bais);
-
-					Object obj = ois.readObject();
-
 					if(csvType.equals(CSV.CSV_TYPE_LOCATION)){
 						Location location = (Location)obj;
-						Collection<Location> locations = location.getCity().getLocations();
-						Collection<Location> newLocations = new ArrayList<Location>();
-						newLocations.addAll(locations);
-						newLocations.add(location);
+					
+						Country country = GeographyImplJDO.sharedInstance().getCountry(CountryID.create(location.getCountryID()), false);
 						
-						ByteArrayOutputStream baos = new ByteArrayOutputStream();
-						ObjectOutputStream oos = new ObjectOutputStream(baos);
-						oos.writeObject(newLocations);
-						oos.flush();
-						byte[] serializedBytes = baos.toByteArray();
+						List<Object> locationList = new ArrayList();
+						Collection<Region> regions = country.getRegions();
+						for(Iterator<Region> it = regions.iterator(); it.hasNext();){
+							Region region = (Region)it.next();
+							Collection<City> cities = region.getCities();
+							for(Iterator<City> it2 = cities.iterator(); it2.hasNext();){
+								City city = (City)it2.next();
+								Collection<Location> locations = city.getLocations();
+								if(locations != null && locations.size() > 0){
+									for(Iterator it3 = locations.iterator(); it3.hasNext();){
+										locationList.add((Location)it3.next());
+									}//for
+								}//if
+							}//for
+						}//for
+						
+						System.out.println("========> Location List: " + locationList);
+						locationList.add(location);
+						
+						String csvLines = GeographyImplResourceCSV.collection2csvLines(locationList);
+						
+//						ByteArrayOutputStream baos = new ByteArrayOutputStream();
+//						ObjectOutputStream oos = new ObjectOutputStream(baos);
+//						oos.writeObject(csvLines.getBytes(););
+//						oos.flush();
+//						byte[] serializedBytes = baos.toByteArray();
 						
 						byte[] output = new byte[100];
 
 						Deflater compresser  = new Deflater();
-						compresser.setInput(serializedBytes);
+						compresser.setInput(csvLines.getBytes());
 						compresser.finish();
-						int compressedDataLength = compresser.deflate(output);
+						compresser.deflate(output);
 
 						csv = CSV.setCSVData(pm, Organisation.getRootOrganisationID(initialContext), csvType, countryID, output);
+						Geography.sharedInstance().loadLocations(location.getCountryID());
 					}//if
-					return csv.getData();
+					return null;
 				}//try 
 				finally {
 					initialContext.close();
@@ -355,12 +370,9 @@ public abstract class GeographyManagerBean
 			catch (NamingException x) {
 				throw new RuntimeException(x); // it's definitely an unexpected exception if we can't access the local JNDI.
 			}//catch
-			catch (IOException x) {
-				throw new RuntimeException(x); // it's definitely an unexpected exception if we can't access the local JNDI.
-			}//catch
-			catch (ClassNotFoundException x) {
-				throw new RuntimeException(x); // it's definitely an unexpected exception if we can't access the local JNDI.
-			}//catch
+//			catch (IOException x) {
+//				throw new RuntimeException(x); // it's definitely an unexpected exception if we can't access the local JNDI.
+//			}//catch
 		}//try
 		finally {
 			pm.close();
@@ -369,7 +381,6 @@ public abstract class GeographyManagerBean
 	
 	/**
 	 * @ejb.interface-method
-	 * @ejb.transaction type="Required"
 	 * @ejb.permission role-name="_Guest_"
 	 */
 	public byte[] getCSVData(String csvType, String countryID)

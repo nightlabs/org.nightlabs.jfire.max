@@ -1,15 +1,22 @@
 package org.nightlabs.jfire.geography;
 
 import java.io.BufferedReader;
+import java.io.ByteArrayInputStream;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.io.ObjectInputStream;
+import java.util.Collection;
+import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.Locale;
 import java.util.StringTokenizer;
 
+import javax.xml.registry.infomodel.Organization;
+
 import org.apache.log4j.Logger;
 import org.nightlabs.annotation.Implement;
 import org.nightlabs.jdo.ObjectIDUtil;
+import org.nightlabs.jfire.organisation.Organisation;
 import org.nightlabs.jfire.security.SecurityReflector;
 import org.nightlabs.util.CollectionUtil;
 
@@ -71,6 +78,37 @@ extends Geography
 		return (String[]) CollectionUtil.collection2TypedArray(res, String.class);
 	}
 
+	protected static String collection2csvLines(Collection<Object> collection)
+	{
+		StringBuffer csvLines = new StringBuffer();
+		for(Iterator<Object> iterator = collection.iterator(); iterator.hasNext();){
+			Object obj = iterator.next();
+			csvLines.append(obj2csvLine(obj)).append("\n");
+		}//for
+		
+		System.out.println("+++++" + csvLines.toString());
+		
+		return csvLines.toString();
+	}
+	
+	protected static String obj2csvLine(Object obj)
+	{
+		StringBuffer csvLine = new StringBuffer();
+		
+		if(obj instanceof Location){
+			Location location = (Location)obj;
+			
+			csvLine.append(location.getCountryID()).append(";");
+			csvLine.append(location.getLocationID()).append(";");
+			csvLine.append(location.getCity().getCityID()).append(";");
+			csvLine.append(location.getDistrict() == null ? "" : location.getDistrict().getDistrictID()).append(";");
+			csvLine.append("DE").append(";");
+			csvLine.append(location.getName().getText());
+		}//if
+		
+		return csvLine.toString();
+	}
+	
 	protected InputStream createCountryCSVInputStream()
 	{
 		String file = "resource/Data-Country.csv";

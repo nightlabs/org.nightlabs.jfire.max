@@ -23,6 +23,13 @@ public class AcquisitionParameterConfig implements ValueConsumer {
 		this.valueAcquisitionSetupID = valueAcquisitionSetupID;		
 	}
 
+	public AcquisitionParameterConfig(String organisationID, long valueAcquisitionSetupID, String parameterID, String parameterType) {
+		this.organisationID = organisationID;
+		this.valueAcquisitionSetupID = valueAcquisitionSetupID;
+		this.parameterID = parameterID;
+		this.parameterType = parameterType;
+	}
+	
 	/**
 	 * @return the parameterID
 	 */
@@ -63,6 +70,10 @@ public class AcquisitionParameterConfig implements ValueConsumer {
 	 */
 	public long getValueAcquisitionSetupID() {
 		return valueAcquisitionSetupID;
+	}
+
+	public String getConsumerKey() {
+		return organisationID + "/" + parameterID;
 	}
 	
 	

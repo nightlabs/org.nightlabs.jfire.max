@@ -3,9 +3,20 @@
  */
 package org.nightlabs.jfire.reporting.parameter.config;
 
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.LinkedList;
+import java.util.List;
 import java.util.Map;
+import java.util.Set;
+import java.util.SortedMap;
+import java.util.TreeMap;
+import java.util.Map.Entry;
 
 import org.nightlabs.jfire.reporting.parameter.ValueProvider;
+import org.nightlabs.jfire.reporting.parameter.ValueProviderInputParameter;
 
 /**
  * @author Alexander Bieber <!-- alex [AT] nightlabs [DOT] de -->
@@ -13,30 +24,214 @@ import org.nightlabs.jfire.reporting.parameter.ValueProvider;
  */
 public class AcquisitionTest {
 
-	public class ProviderProvider implements ValueProviderProvider {
-		Map<String, ValueProvider> providers;
+	private static String organsiationID = "chezfrancois.jfire.org";
+	
+	public static ValueAcquisitionSetup createSetup() {
+		ValueAcquisitionSetup setup = new ValueAcquisitionSetup(organsiationID, 0);
+		
+		List<AcquisitionParameterConfig> parameterConfigs = new ArrayList<AcquisitionParameterConfig>();
+		AcquisitionParameterConfig pc1 = new AcquisitionParameterConfig(organsiationID, setup.getValueAcquisitionSetupID());
+		pc1.setParameterID("param1");
+		pc1.setParameterType(String.class.getName());
+		AcquisitionParameterConfig pc2 = new AcquisitionParameterConfig(organsiationID, setup.getValueAcquisitionSetupID());
+		pc2.setParameterID("param2");
+		pc2.setParameterType(Integer.class.getName());
+		parameterConfigs.add(pc1);
+		parameterConfigs.add(pc2);
+		setup.setParameterConfigs(parameterConfigs);
+		
+		Set<ValueProviderConfig> providerConfigs = new HashSet<ValueProviderConfig>();
+		ValueProviderConfig vpc1 = new ValueProviderConfig(organsiationID, setup.getValueAcquisitionSetupID());
+		vpc1.setValueProviderID("vp1");
+		ValueProviderConfig vpc2 = new ValueProviderConfig(organsiationID, setup.getValueAcquisitionSetupID());
+		vpc2.setValueProviderID("vp2");
+		ValueProviderConfig vpc3 = new ValueProviderConfig(organsiationID, setup.getValueAcquisitionSetupID());
+		vpc3.setValueProviderID("vp3");
+		ValueProviderConfig vpc4 = new ValueProviderConfig(organsiationID, setup.getValueAcquisitionSetupID());
+		vpc4.setValueProviderID("vp4");
+		ValueProviderConfig vpc5 = new ValueProviderConfig(organsiationID, setup.getValueAcquisitionSetupID());
+		vpc5.setValueProviderID("vp5");
+		ValueProviderConfig vpc6 = new ValueProviderConfig(organsiationID, setup.getValueAcquisitionSetupID());
+		vpc6.setValueProviderID("vp6");
+		providerConfigs.add(vpc1);
+		providerConfigs.add(vpc2);
+		providerConfigs.add(vpc3);
+		providerConfigs.add(vpc4);
+		providerConfigs.add(vpc5);
+		setup.setValueProviderConfigs(providerConfigs);
+		
+		Set<ValueConsumerBinding> bindings = new HashSet<ValueConsumerBinding>();
+		ValueConsumerBinding b1 = new ValueConsumerBinding(organsiationID, 0);
+		b1.setConsumer(pc1);
+		b1.setParameterID("param1");
+		b1.setProvider(vpc1);
+		
+		ValueConsumerBinding b2 = new ValueConsumerBinding(organsiationID, 1);
+		b2.setConsumer(vpc1);
+		b2.setParameterID("param1");
+		b2.setProvider(vpc2);
+		
+		ValueConsumerBinding b3 = new ValueConsumerBinding(organsiationID, 2);
+		b3.setConsumer(vpc1);
+		b3.setParameterID("param2");
+		b3.setProvider(vpc3);
+		
+		ValueConsumerBinding b4 = new ValueConsumerBinding(organsiationID, 3);
+		b4.setConsumer(vpc2);
+		b4.setParameterID("param1");
+		b4.setProvider(vpc4);
+		
+		ValueConsumerBinding b5 = new ValueConsumerBinding(organsiationID, 4);
+		b5.setConsumer(pc2);
+		b5.setParameterID("param2");
+		b5.setProvider(vpc5);
+		
+		ValueConsumerBinding b6 = new ValueConsumerBinding(organsiationID, 5);
+		b6.setConsumer(vpc5);
+		b6.setParameterID("param1");
+		b6.setProvider(vpc6);
+		bindings.add(b1);
+		bindings.add(b2);
+		bindings.add(b3);
+		bindings.add(b4);
+		bindings.add(b5);
+		bindings.add(b6);
+		setup.setValueConsumerBindings(bindings);
+		
+		
+//		setup.getValueProviderConfigs()
+		return setup;
+	}
+	
+	public static class DummyProviderProvider implements ValueProviderProvider {
 
+		private Map<String, ValueProvider> providers = new HashMap<String, ValueProvider>();
+		
+		public DummyProviderProvider() {
+			ValueProvider vp1 = new ValueProvider(organsiationID, "vp1", String.class.getName());
+			vp1.addInputParameter(new ValueProviderInputParameter("param1", Integer.class.getName()));
+			vp1.addInputParameter(new ValueProviderInputParameter("param2", String.class.getName()));
+			providers.put("vp1", vp1);
+			
+			ValueProvider vp2 = new ValueProvider(organsiationID, "vp2", Integer.class.getName());
+			vp2.addInputParameter(new ValueProviderInputParameter("param1", Date.class.getName()));
+			providers.put("vp2", vp2);
+
+			ValueProvider vp3 = new ValueProvider(organsiationID, "vp3", String.class.getName());
+			providers.put("vp3", vp3);
+			
+			ValueProvider vp4 = new ValueProvider(organsiationID, "vp4", Date.class.getName());
+			providers.put("vp4", vp4);
+			
+			ValueProvider vp5 = new ValueProvider(organsiationID, "vp5", Integer.class.getName());
+			vp5.addInputParameter(new ValueProviderInputParameter("param1", String.class.getName()));
+			providers.put("vp5", vp5);
+
+			ValueProvider vp6 = new ValueProvider(organsiationID, "vp6", String.class.getName());
+			providers.put("vp6", vp6);
+		}
+		
 		public ValueProvider getValueProvider(ValueProviderConfig valueProviderConfig) {
 			return providers.get(valueProviderConfig.getValueProviderID());
 		}
 		
-		public void addValueProvider(ValueProvider valueProvider) {
-			providers.put(valueProvider.getValueProviderID(), valueProvider);
+	}
+	
+	
+	public SortedMap<Integer, List<ValueProviderConfig>> createAcquisitionSequence(
+			ValueAcquisitionSetup setup, ValueProviderProvider provider
+		) 
+	{
+		List<AcquisitionParameterConfig> parameterConfigs = setup.getParameterConfigs();
+		int levelOffset = 0;
+		SortedMap<Integer, List<ValueProviderConfig>> levels = new TreeMap<Integer, List<ValueProviderConfig>>();
+		for (AcquisitionParameterConfig parameterConfig : parameterConfigs) {
+			resolveProviderLevel(setup, provider, parameterConfig, levels, levelOffset);
+			for (Integer rLevel : levels.keySet()) {
+				levelOffset = Math.max(levelOffset, rLevel);				
+			}
+			levelOffset ++;
 		}
-	}
-	
-	private static String organsiationID = "chezfrancois.jfire.org";
-	
-	public ValueAcquisitionSetup createSetup(ProviderProvider providerProvider) {
-		ValueAcquisitionSetup setup = new ValueAcquisitionSetup(organsiationID, 0);
 		
-		return setup;
+		int inverseLevel = Integer.MIN_VALUE;
+		for (Entry<Integer, List<ValueProviderConfig>> entry : levels.entrySet()) {
+			inverseLevel = Math.max(entry.getKey(), inverseLevel);
+		}
+		SortedMap<Integer, List<ValueProviderConfig>> result = new TreeMap<Integer, List<ValueProviderConfig>>();
+		for (Entry<Integer, List<ValueProviderConfig>> entry : levels.entrySet()) {
+			int i = 0;
+			for (ValueProviderConfig config : entry.getValue()) {
+				config.setPageIndex(inverseLevel);
+				config.setPageOrder(i++);
+			}
+			result.put(new Integer(inverseLevel--), entry.getValue());
+		}
+		
+		return result;
 	}
 	
+	public void resolveProviderLevel(
+			ValueAcquisitionSetup setup, ValueProviderProvider provider, 
+			ValueConsumer consumer, 
+			Map<Integer, List<ValueProviderConfig>> levels, int level
+		) 
+	{
+		if (consumer instanceof AcquisitionParameterConfig) {
+			AcquisitionParameterConfig parameterConfig = (AcquisitionParameterConfig) consumer;
+			ValueConsumerBinding binding = setup.getValueConsumerBinding(parameterConfig, parameterConfig.getParameterID());
+			if (binding == null)
+				return;
+			resolveProviderLevel(setup, provider, binding.getProvider(), levels, level);
+		}
+		else if (consumer instanceof ValueProviderConfig) {
+			ValueProviderConfig providerConfig = (ValueProviderConfig) consumer;
+			addToLevel(level, levels, providerConfig);
+			ValueProvider valueProvider = provider.getValueProvider(providerConfig);
+			if (valueProvider == null || valueProvider.getInputParameters() == null)
+				return;
+			for (ValueProviderInputParameter inputParameter : valueProvider.getInputParameters()) {
+				ValueConsumerBinding binding = setup.getValueConsumerBinding(providerConfig, inputParameter.getParameterID());
+				if (binding == null)
+					continue;
+				resolveProviderLevel(setup, provider, binding.getProvider(), levels, (level+1));
+			}
+		}
+		else 
+			throw new IllegalStateException("resolveProviderLevel called with unknown consumer type: "+consumer.getClass().getName());
+	}
+	
+	private void addToLevel(int level, Map<Integer, List<ValueProviderConfig>> levels, ValueProviderConfig providerConfig) {
+		Integer l = new Integer(level);
+		List<ValueProviderConfig> configs = levels.get(l);
+		if (configs == null) { 
+			configs = new LinkedList<ValueProviderConfig>();
+			levels.put(l, configs);
+		}
+		configs.add(providerConfig);
+	}
+	
+	
+
 	/**
 	 * 
 	 */
 	public AcquisitionTest() {
+	}
+	
+	public static void main(String[] args) {
+		DummyProviderProvider provider = new DummyProviderProvider();
+		ValueAcquisitionSetup setup = createSetup();
+		AcquisitionTest test = new AcquisitionTest();
+		SortedMap<Integer, List<ValueProviderConfig>> result = test.createAcquisitionSequence(setup, provider);
+
+		
+		for (Entry<Integer, List<ValueProviderConfig>> entry : result.entrySet()) {
+			System.out.println("*** Page "+entry.getKey()+" ***");
+			for (ValueProviderConfig config : entry.getValue()) {
+				System.out.println("    -> part "+config.getPageOrder()+": "+config.getValueProviderID());
+			}
+		}
+		
 	}
 
 }

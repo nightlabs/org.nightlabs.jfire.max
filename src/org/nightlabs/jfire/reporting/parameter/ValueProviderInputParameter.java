@@ -17,33 +17,13 @@ public class ValueProviderInputParameter {
 
 	private ValueProvider valueProvider;
 	
-	private int orderNumber;
-	
 	protected ValueProviderInputParameter() {
 		
 	}
 	
-	public ValueProviderInputParameter(ValueProvider valueProvider, String parameterID, String parameterType) {
-		this.organisationID = valueProvider.getOrganisationID();
-		this.valueProviderID = valueProvider.getValueProviderID();
-		this.valueProvider = valueProvider;
+	public ValueProviderInputParameter(String parameterID, String parameterType) {
 		this.parameterID = parameterID;
 		this.parameterType = parameterType;
-		this.orderNumber = Integer.MAX_VALUE / 2;
-	}
-
-	/**
-	 * @return the orderNumber
-	 */
-	public int getOrderNumber() {
-		return orderNumber;
-	}
-
-	/**
-	 * @param orderNumber the orderNumber to set
-	 */
-	public void setOrderNumber(int orderNumber) {
-		this.orderNumber = orderNumber;
 	}
 
 	/**
@@ -94,7 +74,15 @@ public class ValueProviderInputParameter {
 	public String getValueProviderID() {
 		return valueProviderID;
 	}
-	
-	
-	
+
+	/**
+	 * Used when adding a parameter to a Value Provider.
+	 * 
+	 * @param provider
+	 */
+	protected void setValueProvider(ValueProvider provider) {
+		this.organisationID = provider.getOrganisationID();
+		this.valueProviderID = provider.getValueProviderID();
+		this.valueProvider = provider;
+	}
 }

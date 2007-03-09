@@ -3,7 +3,9 @@
  */
 package org.nightlabs.jfire.reporting.parameter.config;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 /**
@@ -21,6 +23,8 @@ public class ValueAcquisitionSetup {
 	
 	private Set<ValueConsumerBinding> valueConsumerBindings;
 
+	private transient Map<String, ValueConsumerBinding> consumer2Binding = null;
+	
 	protected ValueAcquisitionSetup() {
 		
 	}
@@ -89,5 +93,16 @@ public class ValueAcquisitionSetup {
 		return organisationID;
 	}
 	
+	public ValueConsumerBinding getValueConsumerBinding(ValueConsumer consumer, String parameterID) {
+		String key = consumer.getConsumerKey() + "/" + parameterID;
+		if (consumer2Binding == null) {
+			consumer2Binding = new HashMap<String, ValueConsumerBinding>();			
+			for (ValueConsumerBinding binding : valueConsumerBindings) {
+				String bindingKey = binding.getConsumer().getConsumerKey() + "/" + binding.getParameterID();
+				consumer2Binding.put(bindingKey, binding);
+			}
+		}
+		return consumer2Binding.get(key);
+	}
 	
 }

@@ -1,6 +1,7 @@
 package org.nightlabs.jfire.reporting.parameter;
 
-import java.util.Map;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * 
@@ -15,15 +16,16 @@ public class ValueProvider {
 	
 	private String outputType;
 	
-	private Map<String, ValueProviderInputParameter> inputParameters;
+	private List<ValueProviderInputParameter> inputParameters;
 
 	protected ValueProvider() {
 		
 	}
 	
-	public ValueProvider(String organisationID, String valueProviderID) {
+	public ValueProvider(String organisationID, String valueProviderID, String outputType) {
 		this.organisationID = organisationID;
 		this.valueProviderID = valueProviderID;
+		this.outputType = outputType;
 	}
 	
 	/**
@@ -43,10 +45,17 @@ public class ValueProvider {
 	/**
 	 * @return the inputParameters
 	 */
-	public Map<String, ValueProviderInputParameter> getInputParameters() {
+	public List<ValueProviderInputParameter> getInputParameters() {
 		return inputParameters;
 	}
-
+	
+	public void addInputParameter(ValueProviderInputParameter inputParameter) {
+		inputParameter.setValueProvider(this);
+		if (inputParameters == null)
+			inputParameters = new ArrayList<ValueProviderInputParameter>();
+		inputParameters.add(inputParameter);
+	}
+	
 	/**
 	 * @return the organisationID
 	 */

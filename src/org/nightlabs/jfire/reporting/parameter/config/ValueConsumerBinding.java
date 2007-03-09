@@ -1,6 +1,5 @@
 package org.nightlabs.jfire.reporting.parameter.config;
 
-import com.sun.jdi.Value;
 
 public class ValueConsumerBinding {
 	private String organisationID;

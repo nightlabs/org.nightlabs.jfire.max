@@ -6,5 +6,7 @@ package org.nightlabs.jfire.reporting.parameter.config;
  *
  */
 public interface ValueConsumer {
+	
+	String getConsumerKey();
 
 }

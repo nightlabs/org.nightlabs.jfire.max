@@ -85,6 +85,7 @@ extends GeographyImplResourceCSV
 			data = deflate(super.createCountryCSVInputStream());
 			CSV.setCSVData(pm, organisationID, CSV.CSV_TYPE_COUNTRY, "", data);
 		}
+		pm.close();
 		return data == null ? null : new InflaterInputStream(new ByteArrayInputStream(data));
 	}
 
@@ -98,6 +99,7 @@ extends GeographyImplResourceCSV
 			data = deflate(super.createRegionCSVInputStream(countryID));
 			CSV.setCSVData(pm, organisationID, CSV.CSV_TYPE_REGION, countryID, data);
 		}
+		pm.close();
 		return data == null ? null : new InflaterInputStream(new ByteArrayInputStream(data));
 	}
 
@@ -111,6 +113,7 @@ extends GeographyImplResourceCSV
 			data = deflate(super.createCityCSVInputStream(countryID));
 			CSV.setCSVData(pm, organisationID, CSV.CSV_TYPE_CITY, countryID, data);
 		}
+		pm.close();
 		return data == null ? null : new InflaterInputStream(new ByteArrayInputStream(data));
 	}
 
@@ -124,6 +127,7 @@ extends GeographyImplResourceCSV
 			data = deflate(super.createDistrictCSVInputStream(countryID));
 			CSV.setCSVData(pm, organisationID, CSV.CSV_TYPE_DISTRICT, countryID, data);
 		}
+		pm.close();
 		return data == null ? null : new InflaterInputStream(new ByteArrayInputStream(data));
 	}
 
@@ -137,6 +141,7 @@ extends GeographyImplResourceCSV
 			data = deflate(super.createZipCSVInputStream(countryID));
 			CSV.setCSVData(pm, organisationID, CSV.CSV_TYPE_ZIP, countryID, data);
 		}
+		pm.close();
 		return data == null ? null : new InflaterInputStream(new ByteArrayInputStream(data));
 	}
 
@@ -150,6 +155,7 @@ extends GeographyImplResourceCSV
 			data = deflate(super.createLocationCSVInputStream(countryID));
 			CSV.setCSVData(pm, organisationID, CSV.CSV_TYPE_LOCATION, countryID, data);
 		}
+		pm.close();
 		return data == null ? null : new InflaterInputStream(new ByteArrayInputStream(data));
 	}
 }

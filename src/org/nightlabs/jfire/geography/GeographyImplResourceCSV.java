@@ -85,9 +85,6 @@ extends Geography
 			Object obj = iterator.next();
 			csvLines.append(obj2csvLine(obj)).append("\n");
 		}//for
-		
-		System.out.println("+++++" + csvLines.toString());
-		
 		return csvLines.toString();
 	}
 	
@@ -104,7 +101,27 @@ extends Geography
 			csvLine.append(location.getDistrict() == null ? "" : location.getDistrict().getDistrictID()).append(";");
 			csvLine.append("DE").append(";");
 			csvLine.append(location.getName().getText());
-		}//if
+		}//else if
+		else if(obj instanceof City){
+			City city = (City)obj;
+			
+			csvLine.append(city.getCountryID()).append(";");
+			csvLine.append(city.getCityID()).append(";");
+			csvLine.append(city.getRegion().getRegionID()).append(";");
+			csvLine.append("DE").append(";");
+			csvLine.append(city.getName().getText());
+		}//else if
+		else if(obj instanceof District){
+			District district = (District)obj;
+			
+			csvLine.append(district.getCountryID()).append(";");
+			csvLine.append(district.getCity().getCityID()).append(";");
+			csvLine.append(district.getDistrictID()).append(";");
+			csvLine.append("DE").append(";");
+			csvLine.append(district.getName());
+			csvLine.append(district.getLatitude());
+			csvLine.append(district.getLongitude());
+		}//else if
 		
 		return csvLine.toString();
 	}

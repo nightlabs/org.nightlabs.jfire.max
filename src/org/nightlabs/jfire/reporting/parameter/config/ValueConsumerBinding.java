@@ -16,6 +16,8 @@ package org.nightlabs.jfire.reporting.parameter.config;
  *		table="JFireReporting_ValueConsumerBinding"
  *
  * @jdo.create-objectid-class field-order="organisationID, valueConsumerBindingID"
+ * 
+ * @jdo.implements name="org.nightlabs.jfire.reporting.parameter.config.ValueConsumer"
  */
 public class ValueConsumerBinding {
 	

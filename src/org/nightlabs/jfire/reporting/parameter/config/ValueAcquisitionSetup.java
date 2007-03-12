@@ -63,6 +63,8 @@ public class ValueAcquisitionSetup {
 	private Set<ValueConsumerBinding> valueConsumerBindings;
 
 	/**
+	 * Used internally to provide bindings.
+	 * 
 	 * @jdo.field persistence-modifier="none"
 	 **/
 	private transient Map<String, ValueConsumerBinding> consumer2Binding = null;

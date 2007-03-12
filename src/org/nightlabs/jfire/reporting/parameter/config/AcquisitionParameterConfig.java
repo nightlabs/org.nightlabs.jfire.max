@@ -7,7 +7,7 @@ import org.nightlabs.jfire.reporting.parameter.ValueProvider;
 
 /**
  * This is used to represent a BIRT parameter within a {@link ValueAcquisitionSetup}.
- * These objects are alway the end of the {@link ValueProvider} chain when
+ * These objects are always the end of the {@link ValueProvider} chain when
  * quering paraeters from the user.
  *  
  * @author Alexander Bieber <!-- alex [AT] nightlabs [DOT] de -->
@@ -22,6 +22,9 @@ import org.nightlabs.jfire.reporting.parameter.ValueProvider;
  * 
  * @jdo.inheritance strategy = "new-table" 
  * @jdo.inheritance-discriminator strategy="class-name"
+ * 
+ * @jdo.implements name="org.nightlabs.jfire.reporting.parameter.config.ValueConsumer"
+ * 
  */
 public class AcquisitionParameterConfig implements ValueConsumer {
 	

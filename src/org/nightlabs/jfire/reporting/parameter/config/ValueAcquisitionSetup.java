@@ -11,27 +11,76 @@ import java.util.Set;
 /**
  * @author Alexander Bieber <!-- alex [AT] nightlabs [DOT] de -->
  *
+ * @jdo.persistence-capable
+ *		identity-type = "application"
+ *		objectid-class = "org.nightlabs.jfire.reporting.parameter.config.id.ValueAcquisitionSetupID"
+ *		detachable = "true"
+ *		table="JFireReporting_AcquisistionParameterConfig"
+ *
+ * @jdo.create-objectid-class field-order="organisationID, valueAcquisitionSetupID"
+ * 
  */
 public class ValueAcquisitionSetup {
+	/**
+	 * @jdo.field primary-key="true"
+	 * @jdo.column length="100"
+	 */
 	private String organisationID;
 	
+	/**
+	 * @jdo.field primary-key="true"
+	 */
 	private long valueAcquisitionSetupID;
 	
+	/**
+	 * @jdo.field
+	 *		persistence-modifier="persistent"
+	 *		collection-type="collection"
+	 *		element-type="org.nightlabs.jfire.reporting.parameter.config.AcquisitionParameterConfig"
+	 *		mapped-by="setup"
+	 *		dependent-element="true"
+	 */
 	private List<AcquisitionParameterConfig> parameterConfigs;
 	
+	/**
+	 * @jdo.field
+	 *		persistence-modifier="persistent"
+	 *		collection-type="collection"
+	 *		element-type="org.nightlabs.jfire.reporting.parameter.config.ValueProviderConfig"
+	 *		mapped-by="setup"
+	 *		dependent-element="true"
+	 */
 	private Set<ValueProviderConfig> valueProviderConfigs;
 	
+	/**
+	 * @jdo.field
+	 *		persistence-modifier="persistent"
+	 *		collection-type="collection"
+	 *		element-type="org.nightlabs.jfire.reporting.parameter.config.ValueConsumerBinding"
+	 *		mapped-by="setup"
+	 *		dependent-element="true"
+	 */
 	private Set<ValueConsumerBinding> valueConsumerBindings;
 
+	/**
+	 * @jdo.field persistence-modifier="none"
+	 **/
 	private transient Map<String, ValueConsumerBinding> consumer2Binding = null;
 	
-	protected ValueAcquisitionSetup() {
-		
-	}
-	
-	public ValueAcquisitionSetup(String organisationID, long valueAcquisitionID) {
+	/**
+	 * @deprecated Only for JDO
+	 */
+	protected ValueAcquisitionSetup() {	}
+
+	/**
+	 * Create a new ValueAcquisitionSetup
+	 * 
+	 * @param organisationID The organisationID.
+	 * @param valueAcquisitionSetupID The setup ID.
+	 */
+	public ValueAcquisitionSetup(String organisationID, long valueAcquisitionSetupID) {
 		this.organisationID = organisationID;
-		this.valueAcquisitionSetupID = valueAcquisitionID;		
+		this.valueAcquisitionSetupID = valueAcquisitionSetupID;		
 	}
 	
 	/**

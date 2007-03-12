@@ -30,10 +30,10 @@ public class AcquisitionTest {
 		ValueAcquisitionSetup setup = new ValueAcquisitionSetup(organsiationID, 0);
 		
 		List<AcquisitionParameterConfig> parameterConfigs = new ArrayList<AcquisitionParameterConfig>();
-		AcquisitionParameterConfig pc1 = new AcquisitionParameterConfig(organsiationID, setup.getValueAcquisitionSetupID());
+		AcquisitionParameterConfig pc1 = new AcquisitionParameterConfig(setup);
 		pc1.setParameterID("param1");
 		pc1.setParameterType(String.class.getName());
-		AcquisitionParameterConfig pc2 = new AcquisitionParameterConfig(organsiationID, setup.getValueAcquisitionSetupID());
+		AcquisitionParameterConfig pc2 = new AcquisitionParameterConfig(setup);
 		pc2.setParameterID("param2");
 		pc2.setParameterType(Integer.class.getName());
 		parameterConfigs.add(pc1);
@@ -41,17 +41,17 @@ public class AcquisitionTest {
 		setup.setParameterConfigs(parameterConfigs);
 		
 		Set<ValueProviderConfig> providerConfigs = new HashSet<ValueProviderConfig>();
-		ValueProviderConfig vpc1 = new ValueProviderConfig(organsiationID, setup.getValueAcquisitionSetupID());
+		ValueProviderConfig vpc1 = new ValueProviderConfig(setup);
 		vpc1.setValueProviderID("vp1");
-		ValueProviderConfig vpc2 = new ValueProviderConfig(organsiationID, setup.getValueAcquisitionSetupID());
+		ValueProviderConfig vpc2 = new ValueProviderConfig(setup);
 		vpc2.setValueProviderID("vp2");
-		ValueProviderConfig vpc3 = new ValueProviderConfig(organsiationID, setup.getValueAcquisitionSetupID());
+		ValueProviderConfig vpc3 = new ValueProviderConfig(setup);
 		vpc3.setValueProviderID("vp3");
-		ValueProviderConfig vpc4 = new ValueProviderConfig(organsiationID, setup.getValueAcquisitionSetupID());
+		ValueProviderConfig vpc4 = new ValueProviderConfig(setup);
 		vpc4.setValueProviderID("vp4");
-		ValueProviderConfig vpc5 = new ValueProviderConfig(organsiationID, setup.getValueAcquisitionSetupID());
+		ValueProviderConfig vpc5 = new ValueProviderConfig(setup);
 		vpc5.setValueProviderID("vp5");
-		ValueProviderConfig vpc6 = new ValueProviderConfig(organsiationID, setup.getValueAcquisitionSetupID());
+		ValueProviderConfig vpc6 = new ValueProviderConfig(setup);
 		vpc6.setValueProviderID("vp6");
 		providerConfigs.add(vpc1);
 		providerConfigs.add(vpc2);
@@ -61,32 +61,32 @@ public class AcquisitionTest {
 		setup.setValueProviderConfigs(providerConfigs);
 		
 		Set<ValueConsumerBinding> bindings = new HashSet<ValueConsumerBinding>();
-		ValueConsumerBinding b1 = new ValueConsumerBinding(organsiationID, 0);
+		ValueConsumerBinding b1 = new ValueConsumerBinding(organsiationID, 0, setup);
 		b1.setConsumer(pc1);
 		b1.setParameterID("param1");
 		b1.setProvider(vpc1);
 		
-		ValueConsumerBinding b2 = new ValueConsumerBinding(organsiationID, 1);
+		ValueConsumerBinding b2 = new ValueConsumerBinding(organsiationID, 1, setup);
 		b2.setConsumer(vpc1);
 		b2.setParameterID("param1");
 		b2.setProvider(vpc2);
 		
-		ValueConsumerBinding b3 = new ValueConsumerBinding(organsiationID, 2);
+		ValueConsumerBinding b3 = new ValueConsumerBinding(organsiationID, 2, setup);
 		b3.setConsumer(vpc1);
 		b3.setParameterID("param2");
 		b3.setProvider(vpc3);
 		
-		ValueConsumerBinding b4 = new ValueConsumerBinding(organsiationID, 3);
+		ValueConsumerBinding b4 = new ValueConsumerBinding(organsiationID, 3, setup);
 		b4.setConsumer(vpc2);
 		b4.setParameterID("param1");
 		b4.setProvider(vpc4);
 		
-		ValueConsumerBinding b5 = new ValueConsumerBinding(organsiationID, 4);
+		ValueConsumerBinding b5 = new ValueConsumerBinding(organsiationID, 4, setup);
 		b5.setConsumer(pc2);
 		b5.setParameterID("param2");
 		b5.setProvider(vpc5);
 		
-		ValueConsumerBinding b6 = new ValueConsumerBinding(organsiationID, 5);
+		ValueConsumerBinding b6 = new ValueConsumerBinding(organsiationID, 5, setup);
 		b6.setConsumer(vpc5);
 		b6.setParameterID("param1");
 		b6.setProvider(vpc6);

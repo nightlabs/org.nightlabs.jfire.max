@@ -3,29 +3,71 @@
  */
 package org.nightlabs.jfire.reporting.parameter.config;
 
+import org.nightlabs.jfire.reporting.parameter.ValueProvider;
+
 /**
+ * This is used to represent a BIRT parameter within a {@link ValueAcquisitionSetup}.
+ * These objects are alway the end of the {@link ValueProvider} chain when
+ * quering paraeters from the user.
+ *  
  * @author Alexander Bieber <!-- alex [AT] nightlabs [DOT] de -->
+ * 
+ * @jdo.persistence-capable
+ *		identity-type = "application"
+ *		objectid-class = "org.nightlabs.jfire.reporting.parameter.config.id.AcquisitionParameterConfigID"
+ *		detachable = "true"
+ *		table="JFireReporting_ValueProvider"
  *
+ * @jdo.create-objectid-class field-order="organisationID, valueAcquisitionSetupID, parameterID"
+ * 
+ * @jdo.inheritance strategy = "new-table" 
+ * @jdo.inheritance-discriminator strategy="class-name"
  */
 public class AcquisitionParameterConfig implements ValueConsumer {
+	
+	/**
+	 * @jdo.field primary-key="true"
+	 * @jdo.column length="100"
+	 */
 	private String organisationID;
+	
+	/**
+	 * @jdo.field primary-key="true"
+	 */
 	private long valueAcquisitionSetupID;
 	
+	/**
+	 * @jdo.field primary-key="true"
+	 * @jdo.column length="100"
+	 */
 	private String parameterID;
+	
+	/**
+	 * @jdo.field persistence-modifier="persistent"
+	 */
 	private String parameterType;
+	
+	/**
+	 * @jdo.field persistence-modifier="persistent"
+	 */
+	private ValueAcquisitionSetup setup;
 	
 	// Maybe need to add x,y for GEF editor
 	
 	protected AcquisitionParameterConfig() {}
 	
-	public AcquisitionParameterConfig(String organisationID, long valueAcquisitionSetupID) {
-		this.organisationID = organisationID;
-		this.valueAcquisitionSetupID = valueAcquisitionSetupID;		
+	public AcquisitionParameterConfig(ValueAcquisitionSetup setup) {
+		this.organisationID = setup.getOrganisationID();
+		this.valueAcquisitionSetupID = setup.getValueAcquisitionSetupID();
+		this.setup = setup;
 	}
 
-	public AcquisitionParameterConfig(String organisationID, long valueAcquisitionSetupID, String parameterID, String parameterType) {
-		this.organisationID = organisationID;
-		this.valueAcquisitionSetupID = valueAcquisitionSetupID;
+	public AcquisitionParameterConfig(
+			ValueAcquisitionSetup setup, 
+			String parameterID, String parameterType
+		) 
+	{
+		this(setup);
 		this.parameterID = parameterID;
 		this.parameterType = parameterType;
 	}
@@ -75,6 +117,13 @@ public class AcquisitionParameterConfig implements ValueConsumer {
 	public String getConsumerKey() {
 		return organisationID + "/" + parameterID;
 	}
-	
+
+	/**
+	 * @return the setup
+	 */
+	public ValueAcquisitionSetup getSetup() {
+		return setup;
+	}
+
 	
 }

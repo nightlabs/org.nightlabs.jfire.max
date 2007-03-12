@@ -1,21 +1,69 @@
 package org.nightlabs.jfire.reporting.parameter.config;
 
 
+/**
+ * {@link ValueConsumerBinding} define a binding from a {@link ValueProviderConfig}
+ * to a {@link ValueConsumer} (that can be an {@link AcquisitionParameterConfig} or {@link ValueProviderConfig}).
+ * The output of the bindings {@link ValueProviderConfig} will be the input for its 
+ * {@link ValueConsumer} and the given {@link #parameterID}.
+ * 
+ * @author Alexander Bieber <!-- alex [AT] nightlabs [DOT] de -->
+ *
+ * @jdo.persistence-capable
+ *		identity-type = "application"
+ *		objectid-class = "org.nightlabs.jfire.reporting.parameter.config.id.ValueConsumerBindingID"
+ *		detachable = "true"
+ *		table="JFireReporting_ValueConsumerBinding"
+ *
+ * @jdo.create-objectid-class field-order="organisationID, valueConsumerBindingID"
+ */
 public class ValueConsumerBinding {
+	
+	/**
+	 * @jdo.field primary-key="true"
+	 * @jdo.column length="100"
+	 */
 	private String organisationID;
+	
+	/**
+	 * @jdo.field primary-key="true"
+	 */
 	private long valueConsumerBindingID;
+	
+	/**
+	 * @jdo.field persistence-modifier="persistent"
+	 */
 	private ValueConsumer consumer;
+	/**
+	 * @jdo.field persistence-modifier="persistent"
+	 */
 	private String parameterID;	
+	/**
+	 * @jdo.field persistence-modifier="persistent"
+	 */
 	private ValueProviderConfig provider;
 	
-	protected ValueConsumerBinding() {
-		
-	}
+	/**
+	 * @jdo.field persistence-modifier="persistent"
+	 */
+	private ValueAcquisitionSetup setup;
 	
-	public ValueConsumerBinding(String organisationID, long valueConsumerBindingID) {
+	/**
+	 * @deprecated Only for JDO
+	 */
+	protected ValueConsumerBinding() {}
+
+	/**
+	 * Create a new ValueConsumerBinding.
+	 * 
+	 * @param organisationID The organisationID
+	 * @param valueConsumerBindingID The binding ID.
+	 */
+	public ValueConsumerBinding(String organisationID, long valueConsumerBindingID, ValueAcquisitionSetup setup) {
 		this.organisationID = organisationID;
 		this.valueConsumerBindingID = valueConsumerBindingID;
-	}
+		this.setup = setup;
+	}	
 	
 	/**
 	 * @return the consumer
@@ -64,6 +112,13 @@ public class ValueConsumerBinding {
 	 */
 	public long getValueConsumerBindingID() {
 		return valueConsumerBindingID;
+	}
+
+	/**
+	 * @return the setup
+	 */
+	public ValueAcquisitionSetup getSetup() {
+		return setup;
 	}
 	
 }

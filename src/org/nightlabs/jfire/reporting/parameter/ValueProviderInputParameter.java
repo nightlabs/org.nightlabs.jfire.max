@@ -4,28 +4,64 @@ package org.nightlabs.jfire.reporting.parameter;
  * 
  * @author Alexander Bieber <!-- alex [AT] nightlabs [DOT] de -->
  *
+ * @jdo.persistence-capable
+ *		identity-type = "application"
+ *		objectid-class = "org.nightlabs.jfire.reporting.parameter.id.ValueProviderInputParameterID"
+ *		detachable = "true"
+ *		table="JFireReporting_ValueProviderInputParameter"
+ *
+ * @jdo.create-objectid-class field-order="organisationID, valueProviderID, parameterID"
+ * 
+ * @jdo.inheritance strategy = "new-table" 
+ * @jdo.inheritance-discriminator strategy="class-name"
+ * 
+ * @jdo.fetch-group name="ValueProviderInputProvider.this" fetch-groups="default" fields="name, description"
  */
 public class ValueProviderInputParameter {
 
+	/**
+	 * @jdo.field primary-key="true"
+	 * @jdo.column length="100"
+	 */
 	private String organisationID;
 	
+	/**
+	 * @jdo.field primary-key="true"
+	 */
 	private String valueProviderID;
 	
+	/**
+	 * @jdo.field primary-key="true"
+	 */
 	private String parameterID;
 	
+	/**
+	 * @jdo.field persistence-modifier="persistent"
+	 */
 	private String parameterType;	
 
+	/**
+	 * @jdo.field persistence-modifier="persistent"
+	 */
 	private ValueProvider valueProvider;
 	
-	protected ValueProviderInputParameter() {
-		
-	}
+	/**
+	 * @deprecated Only for JDO
+	 */
+	protected ValueProviderInputParameter() {}
 	
 	public ValueProviderInputParameter(String parameterID, String parameterType) {
 		this.parameterID = parameterID;
 		this.parameterType = parameterType;
 	}
 
+	public ValueProviderInputParameter(String parameterID, String parameterType, ValueProvider provider) {
+		this.parameterID = parameterID;
+		this.parameterType = parameterType;
+		if (provider != null)
+			setValueProvider(provider);
+	}
+	
 	/**
 	 * @return the parameterID
 	 */

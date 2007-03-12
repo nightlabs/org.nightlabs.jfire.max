@@ -3,25 +3,56 @@ package org.nightlabs.jfire.reporting.parameter.config;
 /**
  * 
  * @author Alexander Bieber <!-- alex [AT] nightlabs [DOT] de -->
+ * 
+ * @jdo.persistence-capable
+ *		identity-type = "application"
+ *		objectid-class = "org.nightlabs.jfire.reporting.parameter.config.id.ValueProviderConfigID"
+ *		detachable = "true"
+ *		table="JFireReporting_ValueProviderConfig"
+ *
+ * @jdo.create-objectid-class field-order="organisationID, valueAcquisitionSetupID, valueProviderID"
  *
  */
 public class ValueProviderConfig implements ValueConsumer {
+	/**
+	 * @jdo.field primary-key="true"
+	 * @jdo.column length="100"
+	 */
 	private String organisationID;
+	
+	/**
+	 * @jdo.field primary-key="true"
+	 */
 	private long valueAcquisitionSetupID;
+	
+	/**
+	 * @jdo.field primary-key="true"
+	 */
 	private String valueProviderID;
 	
+	/**
+	 * @jdo.field persistence-modifier="persistent"
+	 */
 	private int pageIndex;
+	/**
+	 * @jdo.field persistence-modifier="persistent"
+	 */
 	private int pageOrder;
+	
+	/**
+	 * @jdo.field persistence-modifier="persistent"
+	 */
+	private ValueAcquisitionSetup setup;
+	
 	
 	// Maybe need to add x,y for GEF editor
 	
-	// int wizard
-	
 	protected ValueProviderConfig() {}
 	
-	public ValueProviderConfig(String organisationID, long valueAcquisitionSetupID)  {
-		this.organisationID = organisationID;
-		this.valueAcquisitionSetupID = valueAcquisitionSetupID;
+	public ValueProviderConfig(ValueAcquisitionSetup setup)  {		
+		this.organisationID = setup.getOrganisationID();
+		this.valueAcquisitionSetupID = setup.getValueAcquisitionSetupID();
+		this.setup = setup;
 	}
 
 	/**
@@ -89,4 +120,12 @@ public class ValueProviderConfig implements ValueConsumer {
 	public void setPageOrder(int pageOrder) {
 		this.pageOrder = pageOrder;
 	}
+
+	/**
+	 * @return the setup
+	 */
+	public ValueAcquisitionSetup getSetup() {
+		return setup;
+	}
+	
 }

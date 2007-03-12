@@ -309,14 +309,23 @@ public abstract class GeographyManagerBean
 	 * @ejb.permission role-name="_Guest_"
 	 */
 	public void storeCSVData(String csvType, String countryID, Object obj){
-		PersistenceManager pm = getPersistenceManager();
-		CSV csv = null;
-		pm.getFetchPlan().setMaxFetchDepth(1);
-		pm.getFetchPlan().setGroup(FetchPlan.ALL);
+		// Hello Chairat, just a few short notes: this method should be named
+		// differently as the current name implies that it stores a whole CSVData object.
+		// But it ADDS a template object.
 
+		PersistenceManager pm = getPersistenceManager();
 		try {
+			// I moved these lines within the try ... catch block because the try should always come
+			// directly after the line that requires clean-up. It's not harmful here, because the PM
+			// would be closed by the container anyway, but we should be consequent ;-)
+			CSV csv = null;
+			pm.getFetchPlan().setMaxFetchDepth(1);
+			pm.getFetchPlan().setGroup(FetchPlan.ALL);
+
 			InitialContext initialContext = new InitialContext();
 			try {
+				// Maybe it would be better not to check for the csvType (and simply omit this parameter) but
+				// to check via instanceof what's the type of the passed object.
 				if(csvType.equals(CSV.CSV_TYPE_LOCATION)){
 					Location newLocation = (Location)obj;
 

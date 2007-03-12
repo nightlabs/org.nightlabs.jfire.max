@@ -91,7 +91,7 @@ extends Geography
 	protected static String obj2csvLine(Object obj)
 	{
 		StringBuffer csvLine = new StringBuffer();
-		
+
 		if(obj instanceof Location){
 			Location location = (Location)obj;
 			
@@ -122,7 +122,11 @@ extends Geography
 			csvLine.append(district.getLatitude());
 			csvLine.append(district.getLongitude());
 		}//else if
-		
+		else
+			throw new IllegalArgumentException("obj is an instance of " + (obj == null ? null : obj.getClass().getName()) + " which is not supported!");
+// Please don't forget to handle ALL situations. It's better to get an Exception here (and know exactly where
+// the problem is) than to wonder why there are empty lines in the file and search for the problem, later. Marco :-)
+
 		return csvLine.toString();
 	}
 	

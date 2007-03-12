@@ -80,13 +80,16 @@ extends GeographyImplResourceCSV
 	{
 		String organisationID = getRootOrganisationID();
 		PersistenceManager pm = getPersistenceManager();
-		byte[] data = CSV.getCSVData(pm, organisationID, CSV.CSV_TYPE_COUNTRY, "");
-		if (data == null) {
-			data = deflate(super.createCountryCSVInputStream());
-			CSV.setCSVData(pm, organisationID, CSV.CSV_TYPE_COUNTRY, "", data);
+		try {
+			byte[] data = CSV.getCSVData(pm, organisationID, CSV.CSV_TYPE_COUNTRY, "");
+			if (data == null) {
+				data = deflate(super.createCountryCSVInputStream());
+				CSV.setCSVData(pm, organisationID, CSV.CSV_TYPE_COUNTRY, "", data);
+			}
+			return data == null ? null : new InflaterInputStream(new ByteArrayInputStream(data));
+		} finally {
+//			pm.close(); // This should be correct, but causes some problems in certain situations. And as it's a RA, the container will close it for us anyway (even though there might be a warning). Marco.
 		}
-		pm.close();
-		return data == null ? null : new InflaterInputStream(new ByteArrayInputStream(data));
 	}
 
 	@Override
@@ -94,13 +97,16 @@ extends GeographyImplResourceCSV
 	{
 		String organisationID = getRootOrganisationID();
 		PersistenceManager pm = getPersistenceManager();
-		byte[] data = CSV.getCSVData(pm, organisationID, CSV.CSV_TYPE_REGION, countryID);
-		if (data == null) {
-			data = deflate(super.createRegionCSVInputStream(countryID));
-			CSV.setCSVData(pm, organisationID, CSV.CSV_TYPE_REGION, countryID, data);
+		try {
+			byte[] data = CSV.getCSVData(pm, organisationID, CSV.CSV_TYPE_REGION, countryID);
+			if (data == null) {
+				data = deflate(super.createRegionCSVInputStream(countryID));
+				CSV.setCSVData(pm, organisationID, CSV.CSV_TYPE_REGION, countryID, data);
+			}
+			return data == null ? null : new InflaterInputStream(new ByteArrayInputStream(data));
+		} finally {
+//			pm.close(); // This should be correct, but causes some problems in certain situations. And as it's a RA, the container will close it for us anyway (even though there might be a warning). Marco.
 		}
-		pm.close();
-		return data == null ? null : new InflaterInputStream(new ByteArrayInputStream(data));
 	}
 
 	@Override
@@ -108,13 +114,16 @@ extends GeographyImplResourceCSV
 	{
 		String organisationID = getRootOrganisationID();
 		PersistenceManager pm = getPersistenceManager();
-		byte[] data = CSV.getCSVData(pm, organisationID, CSV.CSV_TYPE_CITY, countryID);
-		if (data == null) {
-			data = deflate(super.createCityCSVInputStream(countryID));
-			CSV.setCSVData(pm, organisationID, CSV.CSV_TYPE_CITY, countryID, data);
+		try {
+			byte[] data = CSV.getCSVData(pm, organisationID, CSV.CSV_TYPE_CITY, countryID);
+			if (data == null) {
+				data = deflate(super.createCityCSVInputStream(countryID));
+				CSV.setCSVData(pm, organisationID, CSV.CSV_TYPE_CITY, countryID, data);
+			}
+			return data == null ? null : new InflaterInputStream(new ByteArrayInputStream(data));
+		} finally {
+//			pm.close(); // This should be correct, but causes some problems in certain situations. And as it's a RA, the container will close it for us anyway (even though there might be a warning). Marco.
 		}
-		pm.close();
-		return data == null ? null : new InflaterInputStream(new ByteArrayInputStream(data));
 	}
 
 	@Override
@@ -122,13 +131,16 @@ extends GeographyImplResourceCSV
 	{
 		String organisationID = getRootOrganisationID();
 		PersistenceManager pm = getPersistenceManager();
-		byte[] data = CSV.getCSVData(pm, organisationID, CSV.CSV_TYPE_DISTRICT, countryID);
-		if (data == null) {
-			data = deflate(super.createDistrictCSVInputStream(countryID));
-			CSV.setCSVData(pm, organisationID, CSV.CSV_TYPE_DISTRICT, countryID, data);
+		try {
+			byte[] data = CSV.getCSVData(pm, organisationID, CSV.CSV_TYPE_DISTRICT, countryID);
+			if (data == null) {
+				data = deflate(super.createDistrictCSVInputStream(countryID));
+				CSV.setCSVData(pm, organisationID, CSV.CSV_TYPE_DISTRICT, countryID, data);
+			}
+			return data == null ? null : new InflaterInputStream(new ByteArrayInputStream(data));
+		} finally {
+//			pm.close(); // This should be correct, but causes some problems in certain situations. And as it's a RA, the container will close it for us anyway (even though there might be a warning). Marco.
 		}
-		pm.close();
-		return data == null ? null : new InflaterInputStream(new ByteArrayInputStream(data));
 	}
 
 	@Override
@@ -136,13 +148,16 @@ extends GeographyImplResourceCSV
 	{
 		String organisationID = getRootOrganisationID();
 		PersistenceManager pm = getPersistenceManager();
-		byte[] data = CSV.getCSVData(pm, organisationID, CSV.CSV_TYPE_ZIP, countryID);
-		if (data == null) {
-			data = deflate(super.createZipCSVInputStream(countryID));
-			CSV.setCSVData(pm, organisationID, CSV.CSV_TYPE_ZIP, countryID, data);
+		try {
+			byte[] data = CSV.getCSVData(pm, organisationID, CSV.CSV_TYPE_ZIP, countryID);
+			if (data == null) {
+				data = deflate(super.createZipCSVInputStream(countryID));
+				CSV.setCSVData(pm, organisationID, CSV.CSV_TYPE_ZIP, countryID, data);
+			}
+			return data == null ? null : new InflaterInputStream(new ByteArrayInputStream(data));
+		} finally {
+//			pm.close(); // This should be correct, but causes some problems in certain situations. And as it's a RA, the container will close it for us anyway (even though there might be a warning). Marco.
 		}
-		pm.close();
-		return data == null ? null : new InflaterInputStream(new ByteArrayInputStream(data));
 	}
 
 	@Override
@@ -150,12 +165,15 @@ extends GeographyImplResourceCSV
 	{
 		String organisationID = getRootOrganisationID();
 		PersistenceManager pm = getPersistenceManager();
-		byte[] data = CSV.getCSVData(pm, organisationID, CSV.CSV_TYPE_LOCATION, countryID);
-		if (data == null) {
-			data = deflate(super.createLocationCSVInputStream(countryID));
-			CSV.setCSVData(pm, organisationID, CSV.CSV_TYPE_LOCATION, countryID, data);
+		try {
+			byte[] data = CSV.getCSVData(pm, organisationID, CSV.CSV_TYPE_LOCATION, countryID);
+			if (data == null) {
+				data = deflate(super.createLocationCSVInputStream(countryID));
+				CSV.setCSVData(pm, organisationID, CSV.CSV_TYPE_LOCATION, countryID, data);
+			}
+			return data == null ? null : new InflaterInputStream(new ByteArrayInputStream(data));
+		} finally {
+//			pm.close(); // This should be correct, but causes some problems in certain situations. And as it's a RA, the container will close it for us anyway (even though there might be a warning). Marco.
 		}
-		pm.close();
-		return data == null ? null : new InflaterInputStream(new ByteArrayInputStream(data));
 	}
 }

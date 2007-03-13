@@ -19,8 +19,18 @@ import java.util.Set;
  *
  * @jdo.create-objectid-class field-order="organisationID, valueAcquisitionSetupID"
  * 
+ * @jdo.fetch-group name="ValueAcquisitionSetup.parameterConfigs" fetch-groups="default" fields="parameterConfigs"
+ * @jdo.fetch-group name="ValueAcquisitionSetup.valueProviderConfigs" fetch-groups="default" fields="valueProviderConfigs"
+ * @jdo.fetch-group name="ValueAcquisitionSetup.valueConsumerBindings" fetch-groups="default" fields="valueConsumerBindings"
+ * @jdo.fetch-group name="ValueAcquisitionSetup.this" fetch-groups="default" fields="parameterConfigs, valueProviderConfigs, valueConsumerBindings"
  */
 public class ValueAcquisitionSetup {
+	
+	public static final String FETCH_GROUP_PARAMETER_CONFIGS = "ValueAcquisitionSetup.parameterConfigs";
+	public static final String FETCH_GROUP_VALUE_PROVIDER_CONFIGS = "ValueAcquisitionSetup.valueProviderConfigs";
+	public static final String FETCH_GROUP_VALUE_CONSUMER_BINDINGS = "ValueAcquisitionSetup.valueConsumerBindings";
+	public static final String FETCH_GROUP_THIS_VALUE_ACQUISITION_SETUP = "ValueAcquisitionSetup.this";
+	
 	/**
 	 * @jdo.field primary-key="true"
 	 * @jdo.column length="100"

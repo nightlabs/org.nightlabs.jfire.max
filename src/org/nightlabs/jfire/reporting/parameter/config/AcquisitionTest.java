@@ -16,6 +16,7 @@ import java.util.TreeMap;
 import java.util.Map.Entry;
 
 import org.nightlabs.jfire.reporting.parameter.ValueProvider;
+import org.nightlabs.jfire.reporting.parameter.ValueProviderCategory;
 import org.nightlabs.jfire.reporting.parameter.ValueProviderInputParameter;
 
 /**
@@ -108,26 +109,27 @@ public class AcquisitionTest {
 		private Map<String, ValueProvider> providers = new HashMap<String, ValueProvider>();
 		
 		public DummyProviderProvider() {
-			ValueProvider vp1 = new ValueProvider(organsiationID, "vp1", String.class.getName());
-			vp1.addInputParameter(new ValueProviderInputParameter("param1", Integer.class.getName()));
-			vp1.addInputParameter(new ValueProviderInputParameter("param2", String.class.getName()));
+			ValueProviderCategory cat = new ValueProviderCategory(null, organsiationID, "cat1", false);
+			ValueProvider vp1 = new ValueProvider(cat, "vp1", String.class.getName());
+			vp1.addInputParameter(new ValueProviderInputParameter(vp1, "param1", Integer.class.getName()));
+			vp1.addInputParameter(new ValueProviderInputParameter(vp1, "param2", String.class.getName()));
 			providers.put("vp1", vp1);
 			
-			ValueProvider vp2 = new ValueProvider(organsiationID, "vp2", Integer.class.getName());
-			vp2.addInputParameter(new ValueProviderInputParameter("param1", Date.class.getName()));
+			ValueProvider vp2 = new ValueProvider(cat, "vp2", Integer.class.getName());
+			vp2.addInputParameter(new ValueProviderInputParameter(vp2, "param1", Date.class.getName()));
 			providers.put("vp2", vp2);
 
-			ValueProvider vp3 = new ValueProvider(organsiationID, "vp3", String.class.getName());
+			ValueProvider vp3 = new ValueProvider(cat, "vp3", String.class.getName());
 			providers.put("vp3", vp3);
 			
-			ValueProvider vp4 = new ValueProvider(organsiationID, "vp4", Date.class.getName());
+			ValueProvider vp4 = new ValueProvider(cat, "vp4", Date.class.getName());
 			providers.put("vp4", vp4);
 			
-			ValueProvider vp5 = new ValueProvider(organsiationID, "vp5", Integer.class.getName());
-			vp5.addInputParameter(new ValueProviderInputParameter("param1", String.class.getName()));
+			ValueProvider vp5 = new ValueProvider(cat, "vp5", Integer.class.getName());
+			vp5.addInputParameter(new ValueProviderInputParameter(vp5, "param1", String.class.getName()));
 			providers.put("vp5", vp5);
 
-			ValueProvider vp6 = new ValueProvider(organsiationID, "vp6", String.class.getName());
+			ValueProvider vp6 = new ValueProvider(cat, "vp6", String.class.getName());
 			providers.put("vp6", vp6);
 		}
 		

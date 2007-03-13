@@ -14,9 +14,17 @@ package org.nightlabs.jfire.reporting.parameter.config;
  *
  * @jdo.create-objectid-class field-order="organisationID, reportParameterAcquisitionSetupID, reportParameterAcquisitionUseCaseID"
  *
+ * @jdo.fetch-group name="ReportParameterAcquisitionUseCase.name" fetch-groups="default" fields="name"
+ * @jdo.fetch-group name="ReportParameterAcquisitionUseCase.description" fetch-groups="default" fields="description"
+ * @jdo.fetch-group name="ReportParameterAcquisitionUseCase.this" fetch-groups="default" fields="name, description"
+ *
  */
 public class ReportParameterAcquisitionUseCase {
 
+	public static final String FETCH_GROUP_NAME = "ReportParameterAcquisitionUseCase.name";
+	public static final String FETCH_GROUP_DESCRIPTION = "ReportParameterAcquisitionUseCase.description";
+	public static final String FETCH_GROUP_THIS_REPORT_PARAMETER_ACQUISITION_USE_CASE = "ReportParameterAcquisitionUseCase.this";
+			 
 	/**
 	 * @jdo.field primary-key="true"
 	 * @jdo.column length="100"

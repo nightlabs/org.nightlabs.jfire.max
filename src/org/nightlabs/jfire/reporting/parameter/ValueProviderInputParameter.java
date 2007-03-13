@@ -10,20 +10,29 @@ package org.nightlabs.jfire.reporting.parameter;
  *		detachable = "true"
  *		table="JFireReporting_ValueProviderInputParameter"
  *
- * @jdo.create-objectid-class field-order="organisationID, valueProviderID, parameterID"
+ * @jdo.create-objectid-class field-order="organisationID, valueProviderCategoryID, valueProviderID, parameterID"
  * 
  * @jdo.inheritance strategy = "new-table" 
  * @jdo.inheritance-discriminator strategy="class-name"
  * 
- * @jdo.fetch-group name="ValueProviderInputProvider.this" fetch-groups="default" fields="name, description"
+ * @jdo.fetch-group name="ValueProviderInputParameter.valueProvider" fetch-groups="default" fields="valueProvider"
+ * @jdo.fetch-group name="ValueProviderInputParameter.this" fetch-groups="default" fields="valueProvider"
  */
 public class ValueProviderInputParameter {
 
+	public static final String FETCH_GROUP_VALUE_PROVIDER = "ValueProviderInputParameter.valueProvider";
+	public static final String FETCH_GROUP_THIS_VALUE_PROVIDER_INPUT_PARAMETER = "ValueProviderInputParameter.this";
+			 
 	/**
 	 * @jdo.field primary-key="true"
 	 * @jdo.column length="100"
 	 */
 	private String organisationID;
+	
+	/**
+	 * @jdo.field primary-key="true"
+	 */
+	private String valueProviderCategoryID;
 	
 	/**
 	 * @jdo.field primary-key="true"
@@ -50,16 +59,11 @@ public class ValueProviderInputParameter {
 	 */
 	protected ValueProviderInputParameter() {}
 	
-	public ValueProviderInputParameter(String parameterID, String parameterType) {
+	public ValueProviderInputParameter(ValueProvider valueProvider, String parameterID, String parameterType) {
 		this.parameterID = parameterID;
 		this.parameterType = parameterType;
-	}
-
-	public ValueProviderInputParameter(String parameterID, String parameterType, ValueProvider provider) {
-		this.parameterID = parameterID;
-		this.parameterType = parameterType;
-		if (provider != null)
-			setValueProvider(provider);
+		if (valueProvider != null)
+			setValueProvider(valueProvider);
 	}
 	
 	/**
@@ -118,7 +122,15 @@ public class ValueProviderInputParameter {
 	 */
 	protected void setValueProvider(ValueProvider provider) {
 		this.organisationID = provider.getOrganisationID();
+		this.valueProviderCategoryID = provider.getValueProviderCategoryID();
 		this.valueProviderID = provider.getValueProviderID();
 		this.valueProvider = provider;
+	}
+
+	/**
+	 * @return the valueProviderCategoryID
+	 */
+	public String getValueProviderCategoryID() {
+		return valueProviderCategoryID;
 	}
 }

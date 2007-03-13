@@ -18,8 +18,17 @@ package org.nightlabs.jfire.reporting.parameter.config;
  * @jdo.create-objectid-class field-order="organisationID, valueConsumerBindingID"
  * 
  * @jdo.implements name="org.nightlabs.jfire.reporting.parameter.config.ValueConsumer"
+ * 
+ * @jdo.fetch-group name="ValueConsumerBinding.consumer" fetch-groups="default" fields="consumer"
+ * @jdo.fetch-group name="ValueConsumerBinding.provider" fetch-groups="default" fields="provider"
+ * @jdo.fetch-group name="ValueConsumerBinding.this" fetch-groups="default" fields="consumer, provider"
+ * 
  */
 public class ValueConsumerBinding {
+	
+	public static final String FETCH_GROUP_CONSUMER = "ValueConsumerBinding.consumer";
+	public static final String FETCH_GROUP_PROVIDER = "ValueConsumerBinding.provider";
+	public static final String FETCH_GROUP_THIS_VALUE_CONSUMER_BINDING = "ValueConsumerBinding.this";
 	
 	/**
 	 * @jdo.field primary-key="true"

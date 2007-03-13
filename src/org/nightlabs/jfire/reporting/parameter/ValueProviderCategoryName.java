@@ -24,7 +24,7 @@
  *                                                                             *
  ******************************************************************************/
 
-package org.nightlabs.jfire.reporting.parameter.config;
+package org.nightlabs.jfire.reporting.parameter;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -32,23 +32,23 @@ import java.util.Map;
 import org.nightlabs.i18n.I18nText;
 
 /**
- * Description i18n text for {@link ReportParameterAcquisitionUseCase}s.
+ * Name i18n text for {@link ValueProvider}s.
  * 
  * @author Alexander Bieber <alex[AT]nightlabs[DOT]de>
  * 
  * @jdo.persistence-capable
  *		identity-type="application"
- *		objectid-class="org.nightlabs.jfire.reporting.parameter.config.id.ReportParameterAcquisitionUseCaseDescriptionID"
+ *		objectid-class="org.nightlabs.jfire.reporting.parameter.id.ValueProviderCategoryNameID"
  *		detachable="true"
  *		table="JFireReporting_ValueProviderName"
  *
  * @jdo.inheritance strategy="new-table"
  *
- * @jdo.create-objectid-class field-order="organisationID, reportParameterAcquisitionSetupID, reportParameterAcquisitionUseCaseID"
+ * @jdo.create-objectid-class field-order="organisationID, valueProviderCategoryID"
  *
- * @jdo.fetch-group name="ReportParameterAcquisitionUseCase.description" fields="valueProvider, names"
+ * @jdo.fetch-group name="ValueProvider.name" fields="valueProvider, names"
  */
-public class ReportParameterAcquisitionUseCaseDescription extends I18nText {
+public class ValueProviderCategoryName extends I18nText {
 	
 	/**
 	 * 
@@ -65,30 +65,23 @@ public class ReportParameterAcquisitionUseCaseDescription extends I18nText {
 	/**
 	 * @jdo.field primary-key="true"
 	 */
-	private long reportParameterAcquisitionSetupID;	
-	
-	/**
-	 * @jdo.field primary-key="true"
-	 * @jdo.column length="100"
-	 */
-	private String reportParameterAcquisitionUseCaseID;
+	private String valueProviderCategoryID;
 	
 	/**
 	 * @jdo.field persistence-modifier="persistent"
 	 */
-	private ReportParameterAcquisitionUseCase useCase;
+	private ValueProviderCategory valueProviderCategory;
 	
 	/**
 	 * @deprecated Only for JDO!
 	 */
-	protected ReportParameterAcquisitionUseCaseDescription() {
+	protected ValueProviderCategoryName() {
 	}
 
-	public ReportParameterAcquisitionUseCaseDescription(ReportParameterAcquisitionUseCase useCase) {
-		this.organisationID = useCase.getOrganisationID();
-		this.reportParameterAcquisitionSetupID = useCase.getReportParameterAcquisitionSetupID();
-		this.reportParameterAcquisitionUseCaseID = useCase.getReportParameterAcquisitionUseCaseID();
-		this.useCase = useCase;
+	public ValueProviderCategoryName(ValueProviderCategory valueProviderCategory) {
+		this.organisationID = valueProviderCategory.getOrganisationID();
+		this.valueProviderCategoryID = valueProviderCategory.getValueProviderCategoryID();
+		this.valueProviderCategory = valueProviderCategory;
 		this.names = new HashMap();
 	}
 
@@ -102,7 +95,7 @@ public class ReportParameterAcquisitionUseCaseDescription extends I18nText {
 	 *		key-type="java.lang.String"
 	 *		value-type="java.lang.String"
 	 *		default-fetch-group="true"
-	 *		table="JFireReporting_ReportParameterAcquisitionUseCaseDescription_names"
+	 *		table="JFireReporting_ValueProviderCategoryName_names"
 	 *
 	 * @jdo.join
 	 */
@@ -119,7 +112,7 @@ public class ReportParameterAcquisitionUseCaseDescription extends I18nText {
 	 * @see com.nightlabs.i18n.I18nText#getFallBackValue(java.lang.String)
 	 */
 	protected String getFallBackValue(String languageID) {
-		return organisationID + "/" + String.valueOf(reportParameterAcquisitionSetupID) + "/" + String.valueOf(reportParameterAcquisitionUseCaseID);
+		return organisationID + "/" + valueProviderCategoryID;
 	}
 
 	public String getOrganisationID() {
@@ -127,24 +120,17 @@ public class ReportParameterAcquisitionUseCaseDescription extends I18nText {
 	}
 
 	/**
-	 * @return the reportParameterAcquisitionSetupID
+	 * @return the valueProviderCategory
 	 */
-	public long getReportParameterAcquisitionSetupID() {
-		return reportParameterAcquisitionSetupID;
+	public ValueProviderCategory getValueProviderCategory() {
+		return valueProviderCategory;
 	}
 
 	/**
-	 * @return the reportParameterAcquisitionUseCaseID
+	 * @return the valueProviderCategoryID
 	 */
-	public String getReportParameterAcquisitionUseCaseID() {
-		return reportParameterAcquisitionUseCaseID;
-	}
-
-	/**
-	 * @return the useCase
-	 */
-	public ReportParameterAcquisitionUseCase getUseCase() {
-		return useCase;
+	public String getValueProviderCategoryID() {
+		return valueProviderCategoryID;
 	}
 	
 }

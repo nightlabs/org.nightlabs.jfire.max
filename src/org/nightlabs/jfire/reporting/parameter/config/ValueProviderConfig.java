@@ -1,5 +1,7 @@
 package org.nightlabs.jfire.reporting.parameter.config;
 
+import org.nightlabs.jfire.reporting.parameter.ValueProvider;
+
 /**
  * 
  * @author Alexander Bieber <!-- alex [AT] nightlabs [DOT] de -->
@@ -10,7 +12,7 @@ package org.nightlabs.jfire.reporting.parameter.config;
  *		detachable = "true"
  *		table="JFireReporting_ValueProviderConfig"
  *
- * @jdo.create-objectid-class field-order="organisationID, valueAcquisitionSetupID, valueProviderID"
+ * @jdo.create-objectid-class field-order="organisationID, valueAcquisitionSetupID, valueProviderOrganisationID, valueProviderCategoryID, valueProviderID"
  *
  */
 public class ValueProviderConfig implements ValueConsumer {
@@ -24,6 +26,16 @@ public class ValueProviderConfig implements ValueConsumer {
 	 * @jdo.field primary-key="true"
 	 */
 	private long valueAcquisitionSetupID;
+	
+	/**
+	 * @jdo.field primary-key="true"
+	 */
+	private String valueProviderOrganisationID;
+	
+	/**
+	 * @jdo.field primary-key="true"
+	 */
+	private String valueProviderCategoryID;
 	
 	/**
 	 * @jdo.field primary-key="true"
@@ -84,7 +96,7 @@ public class ValueProviderConfig implements ValueConsumer {
 	}
 
 	public String getConsumerKey() {
-		return organisationID + "/" + valueProviderID;
+		return valueProviderOrganisationID + "/" + valueProviderCategoryID + "/" + valueProviderID;
 	}
 
 	/**
@@ -126,6 +138,40 @@ public class ValueProviderConfig implements ValueConsumer {
 	 */
 	public ValueAcquisitionSetup getSetup() {
 		return setup;
+	}
+
+	/**
+	 * @return the valueProviderCategoryID
+	 */
+	public String getValueProviderCategoryID() {
+		return valueProviderCategoryID;
+	}
+
+	/**
+	 * @param valueProviderCategoryID the valueProviderCategoryID to set
+	 */
+	public void setValueProviderCategoryID(String valueProviderCategoryID) {
+		this.valueProviderCategoryID = valueProviderCategoryID;
+	}
+	
+	/**
+	 * @return the valueProviderOrganisationID
+	 */
+	public String getValueProviderOrganisationID() {
+		return valueProviderOrganisationID;
+	}
+
+	/**
+	 * @param valueProviderOrganisationID the valueProviderOrganisationID to set
+	 */
+	public void setValueProviderOrganisationID(String valueProviderOrganisationID) {
+		this.valueProviderOrganisationID = valueProviderOrganisationID;
+	}
+
+	public void setValueProvider(ValueProvider valueProvider) {
+		this.valueProviderOrganisationID = valueProvider.getOrganisationID();
+		this.valueProviderCategoryID = valueProvider.getValueProviderCategoryID();
+		this.valueProviderID = valueProvider.getValueProviderID();
 	}
 	
 }

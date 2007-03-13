@@ -25,18 +25,26 @@ import org.nightlabs.jfire.reporting.parameter.config.ValueProviderConfig;
  *		detachable = "true"
  *		table="JFireReporting_ValueProvider"
  *
- * @jdo.create-objectid-class field-order="organisationID, valueProviderID"
+ * @jdo.create-objectid-class field-order="organisationID, valueProviderCategoryID, valueProviderID"
  * 
  * @jdo.inheritance strategy = "new-table" 
  * @jdo.inheritance-discriminator strategy="class-name"
  * 
  * @jdo.fetch-group name="ValueProvider.name" fetch-groups="default" fields="name"
  * @jdo.fetch-group name="ValueProvider.description" fetch-groups="default" fields="description"
- * @jdo.fetch-group name="ValueProvider.this" fetch-groups="default" fields="name, description"
+ * @jdo.fetch-group name="ValueProvider.category" fetch-groups="default" fields="category"
+ * @jdo.fetch-group name="ValueProvider.inputParameters" fetch-groups="default" fields="inputParameters"
+ * @jdo.fetch-group name="ValueProvider.this" fetch-groups="default" fields="name, description, category, inputParameters"
  *
  */
 public class ValueProvider {
 
+	public static final String FETCH_GROUP_NAME = "ValueProvider.name";
+	public static final String FETCH_GROUP_DESCRIPTION = "ValueProvider.description";
+	public static final String FETCH_GROUP_CATEGORY = "ValueProvider.category";
+	public static final String FETCH_GROUP_INPUT_PARAMETERS = "ValueProvider.inputParameters";
+	public static final String FETCH_GROUP_THIS_VALUE_PROVIDER = "ValueProvider.this";
+			 
 	/**
 	 * @jdo.field primary-key="true"
 	 * @jdo.column length="100"
@@ -46,12 +54,22 @@ public class ValueProvider {
 	/**
 	 * @jdo.field primary-key="true"
 	 */
-	private String valueProviderID;
+	private String valueProviderCategoryID;
+	
+	/**
+	 * @jdo.field primary-key="true"
+	 */
+	private String valueProviderID;	
 	
 	/**
 	 * @jdo.field persistence-modifier="persistent"
 	 */
 	private String outputType;
+	
+	/**
+	 * @jdo.field persistence-modifier="persistent"
+	 */
+	private ValueProviderCategory category;
 	
 	/**
 	 * @jdo.field
@@ -76,8 +94,10 @@ public class ValueProvider {
 	protected ValueProvider() {
 	}
 	
-	public ValueProvider(String organisationID, String valueProviderID, String outputType) {
-		this.organisationID = organisationID;
+	public ValueProvider(ValueProviderCategory category, String valueProviderID, String outputType) {
+		this.organisationID = category.getOrganisationID();		
+		this.valueProviderCategoryID = category.getValueProviderCategoryID();
+		this.category = category;
 		this.valueProviderID = valueProviderID;
 		this.outputType = outputType;
 		this.name = new ValueProviderName(this);
@@ -140,5 +160,25 @@ public class ValueProvider {
 	public ValueProviderDescription getDescription() {
 		return description;
 	}
+
+	/**
+	 * @return The valueProviderCategoryID
+	 */
+	public String getValueProviderCategoryID() {
+		return valueProviderCategoryID;
+	}
+
+	/**
+	 * @return the category
+	 */
+	public ValueProviderCategory getCategory() {
+		return category;
+	}
 	
+	/**
+	 * @return the category
+	 */
+	void setCategory(ValueProviderCategory category) {
+		this.category = category;
+	}
 }

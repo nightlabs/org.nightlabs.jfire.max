@@ -18,11 +18,21 @@ import org.nightlabs.jfire.reporting.layout.ReportLayout;
  *		table="JFireReporting_ReportParameterAcquisitionSetup"
  *
  * @jdo.create-objectid-class field-order="organisationID, reportParameterAcquisitionSetupID"
- *
+ * 
+ * @jdo.fetch-group name="ReportParameterAcquisitionSetup.defaultSetup" fetch-groups="default" fields="defaultSetup"
+ * @jdo.fetch-group name="ReportParameterAcquisitionSetup.reportLayout" fetch-groups="default" fields="reportLayout"
+ * @jdo.fetch-group name="ReportParameterAcquisitionSetup.valueAcquisitionSetups" fetch-groups="default" fields="valueAcquisitionSetups"
+ * @jdo.fetch-group name="ReportParameterAcquisitionSetup.this" fetch-groups="default" fields="defaultSetup, reportLayout, valueAcquisitionSetups"
  */
 public class ReportParameterAcquisitionSetup {
 
 	
+	public static final String FETCH_GROUP_DEFAULT_SETUP = "ReportParameterAcquisitionSetup.defaultSetup";
+	public static final String FETCH_GROUP_REPORT_LAYOUT = "ReportParameterAcquisitionSetup.reportLayout";
+	public static final String FETCH_GROUP_VALUE_ACQUISITION_SETUPS = "ReportParameterAcquisitionSetup.valueAcquisitionSetups";
+	public static final String FETCH_GROUP_THIS_REPORT_PARAMETER_ACQUISITION_SETUP = "ReportParameterAcquisitionSetup.this";
+			 
+			 
 	/**
 	 * @jdo.field primary-key="true"
 	 * @jdo.column length="100"

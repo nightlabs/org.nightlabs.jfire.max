@@ -44,7 +44,7 @@ import org.nightlabs.i18n.I18nText;
  *
  * @jdo.inheritance strategy="new-table"
  *
- * @jdo.create-objectid-class field-order="organisationID, valueProviderID"
+ * @jdo.create-objectid-class field-order="organisationID, valueProviderCategoryID, valueProviderID"
  *
  * @jdo.fetch-group name="ValueProvider.description" fields="valueProvider, names"
  */
@@ -65,6 +65,11 @@ public class ValueProviderDescription extends I18nText {
 	/**
 	 * @jdo.field primary-key="true"
 	 */
+	private String valueProviderCategoryID;
+	
+	/**
+	 * @jdo.field primary-key="true"
+	 */
 	private String valueProviderID;
 	
 	/**
@@ -80,6 +85,7 @@ public class ValueProviderDescription extends I18nText {
 
 	public ValueProviderDescription(ValueProvider valueProvider) {
 		this.organisationID = valueProvider.getOrganisationID();
+		this.valueProviderCategoryID = valueProvider.getValueProviderCategoryID();
 		this.valueProviderID = valueProvider.getValueProviderID();
 		this.valueProvider = valueProvider;
 		this.names = new HashMap();
@@ -132,5 +138,11 @@ public class ValueProviderDescription extends I18nText {
 	public String getValueProviderID() {
 		return valueProviderID;
 	}
-	
+
+	/**
+	 * @return the valueProviderCategoryID
+	 */
+	public String getValueProviderCategoryID() {
+		return valueProviderCategoryID;
+	}
 }

@@ -55,6 +55,7 @@ import org.nightlabs.jfire.transfer.Anchor;
  *		table="JFireTrade_Product"
  *
  * @jdo.inheritance strategy="new-table"
+ * @jdo.inheritance-discriminator strategy="class-name"
  *
  * @jdo.create-objectid-class field-order="organisationID, productID"
  */

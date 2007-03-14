@@ -26,7 +26,7 @@ import org.nightlabs.jfire.transfer.id.AnchorID;
  *		detachable="true"
  *		table="JFireSimpleTrade_SimpleProductTypeActionHandler"
  *
- * @jdo.inheritance strategy="new-table"
+ * @jdo.inheritance strategy="superclass-table"
  */
 public class SimpleProductTypeActionHandler
 		extends ProductTypeActionHandler

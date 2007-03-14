@@ -41,7 +41,7 @@ import org.nightlabs.jfire.store.ProductType;
  *		detachable="true"
  *		table="JFireSimpleTrade_SimpleProduct"
  *
- * @jdo.inheritance strategy="superclass-table"
+ * @jdo.inheritance strategy="new-table"
  */
 public class SimpleProduct extends Product
 {

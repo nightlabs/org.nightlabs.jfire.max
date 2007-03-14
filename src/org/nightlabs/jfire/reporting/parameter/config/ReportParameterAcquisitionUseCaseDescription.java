@@ -26,6 +26,7 @@
 
 package org.nightlabs.jfire.reporting.parameter.config;
 
+import java.io.Serializable;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -40,7 +41,7 @@ import org.nightlabs.i18n.I18nText;
  *		identity-type="application"
  *		objectid-class="org.nightlabs.jfire.reporting.parameter.config.id.ReportParameterAcquisitionUseCaseDescriptionID"
  *		detachable="true"
- *		table="JFireReporting_ValueProviderName"
+ *		table="JFireReporting_ReportParameterAcquisitionUseCaseDescription"
  *
  * @jdo.inheritance strategy="new-table"
  *
@@ -48,7 +49,7 @@ import org.nightlabs.i18n.I18nText;
  *
  * @jdo.fetch-group name="ReportParameterAcquisitionUseCase.description" fields="valueProvider, names"
  */
-public class ReportParameterAcquisitionUseCaseDescription extends I18nText {
+public class ReportParameterAcquisitionUseCaseDescription extends I18nText implements Serializable {
 	
 	/**
 	 * 

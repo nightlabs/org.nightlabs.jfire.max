@@ -3,6 +3,8 @@
  */
 package org.nightlabs.jfire.reporting.parameter.config;
 
+import java.io.Serializable;
+
 import org.nightlabs.jfire.reporting.parameter.ValueProvider;
 
 /**
@@ -16,7 +18,7 @@ import org.nightlabs.jfire.reporting.parameter.ValueProvider;
  *		identity-type = "application"
  *		objectid-class = "org.nightlabs.jfire.reporting.parameter.config.id.AcquisitionParameterConfigID"
  *		detachable = "true"
- *		table="JFireReporting_ValueProvider"
+ *		table="JFireReporting_AcquisitionParameterConfig"
  *
  * @jdo.create-objectid-class field-order="organisationID, valueAcquisitionSetupID, parameterID"
  * 
@@ -26,8 +28,10 @@ import org.nightlabs.jfire.reporting.parameter.ValueProvider;
  * @jdo.implements name="org.nightlabs.jfire.reporting.parameter.config.ValueConsumer"
  * 
  */
-public class AcquisitionParameterConfig implements ValueConsumer {
+public class AcquisitionParameterConfig implements ValueConsumer, Serializable {
 	
+	private static final long serialVersionUID = 1L;
+
 	/**
 	 * @jdo.field primary-key="true"
 	 * @jdo.column length="100"

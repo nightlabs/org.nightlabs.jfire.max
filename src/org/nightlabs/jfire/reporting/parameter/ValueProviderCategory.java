@@ -3,6 +3,7 @@
  */
 package org.nightlabs.jfire.reporting.parameter;
 
+import java.io.Serializable;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -13,7 +14,7 @@ import java.util.Set;
  *		identity-type = "application"
  *		objectid-class = "org.nightlabs.jfire.reporting.parameter.id.ValueProviderCategoryID"
  *		detachable = "true"
- *		table="JFireReporting_ValueProvider"
+ *		table="JFireReporting_ValueProviderCategory"
  *
  * @jdo.create-objectid-class field-order="organisationID, valueProviderCategoryID"
  * 
@@ -27,8 +28,10 @@ import java.util.Set;
  * @jdo.fetch-group name="ValueProviderCategory.this" fetch-groups="default" fields="name, parent, childCategories"
  *
  */
-public class ValueProviderCategory {
+public class ValueProviderCategory implements Serializable {
 
+	private static final long serialVersionUID = 1L;
+	
 	public static final String FETCH_GROUP_VALUE_PROVIDERS = "ValueProviderCategory.valueProviders";
 	public static final String FETCH_GROUP_PARENT = "ValueProviderCategory.parent";
 	public static final String FETCH_GROUP_CHILD_CATEGORIES = "ValueProviderCategory.childCategories";
@@ -72,7 +75,9 @@ public class ValueProviderCategory {
 	private Set<ValueProviderCategory> childCategories;
 	
 	/**
-	 * @jdo.field persistence-modifier="persistent"
+	 * @jdo.field 
+	 * 		persistence-modifier="persistent"
+	 * 		mapped-by="valueProviderCategory"
 	 */
 	private ValueProviderCategoryName name;
 	

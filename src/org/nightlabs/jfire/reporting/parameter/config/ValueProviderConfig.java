@@ -1,5 +1,7 @@
 package org.nightlabs.jfire.reporting.parameter.config;
 
+import java.io.Serializable;
+
 import org.nightlabs.jfire.reporting.parameter.ValueProvider;
 
 /**
@@ -15,7 +17,10 @@ import org.nightlabs.jfire.reporting.parameter.ValueProvider;
  * @jdo.create-objectid-class field-order="organisationID, valueAcquisitionSetupID, valueProviderOrganisationID, valueProviderCategoryID, valueProviderID"
  *
  */
-public class ValueProviderConfig implements ValueConsumer {
+public class ValueProviderConfig implements ValueConsumer, Serializable {
+
+	private static final long serialVersionUID = 1L;
+
 	/**
 	 * @jdo.field primary-key="true"
 	 * @jdo.column length="100"

@@ -26,6 +26,7 @@
 
 package org.nightlabs.jfire.reporting.parameter;
 
+import java.io.Serializable;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -48,7 +49,7 @@ import org.nightlabs.i18n.I18nText;
  *
  * @jdo.fetch-group name="ValueProvider.name" fields="valueProvider, names"
  */
-public class ValueProviderName extends I18nText {
+public class ValueProviderName extends I18nText implements Serializable {
 	
 	/**
 	 * 

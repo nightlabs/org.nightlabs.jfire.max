@@ -28,7 +28,7 @@ public class AcquisitionTest {
 	private static String organsiationID = "chezfrancois.jfire.org";
 	
 	public static ValueAcquisitionSetup createSetup() {
-		ValueAcquisitionSetup setup = new ValueAcquisitionSetup(organsiationID, 0);
+		ValueAcquisitionSetup setup = new ValueAcquisitionSetup(organsiationID, 0, null, null);
 		
 		List<AcquisitionParameterConfig> parameterConfigs = new ArrayList<AcquisitionParameterConfig>();
 		AcquisitionParameterConfig pc1 = new AcquisitionParameterConfig(setup);

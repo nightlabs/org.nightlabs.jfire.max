@@ -1,5 +1,9 @@
 package org.nightlabs.jfire.reporting.parameter.config;
 
+import java.io.Serializable;
+
+import org.nightlabs.jfire.reporting.parameter.id.ValueProviderID;
+
 
 /**
  * {@link ValueConsumerBinding} define a binding from a {@link ValueProviderConfig}
@@ -24,7 +28,9 @@ package org.nightlabs.jfire.reporting.parameter.config;
  * @jdo.fetch-group name="ValueConsumerBinding.this" fetch-groups="default" fields="consumer, provider"
  * 
  */
-public class ValueConsumerBinding {
+public class ValueConsumerBinding implements Serializable {
+	
+	private static final long serialVersionUID = 1L;
 	
 	public static final String FETCH_GROUP_CONSUMER = "ValueConsumerBinding.consumer";
 	public static final String FETCH_GROUP_PROVIDER = "ValueConsumerBinding.provider";
@@ -130,6 +136,16 @@ public class ValueConsumerBinding {
 	 */
 	public ValueAcquisitionSetup getSetup() {
 		return setup;
+	}
+	
+	public ValueProviderID getValueProviderID() {
+		if (getProvider() == null)
+			return null;
+		return ValueProviderID.create(
+				getProvider().getValueProviderOrganisationID(), 
+				getProvider().getValueProviderCategoryID(), 
+				getProvider().getValueProviderID()
+			);		
 	}
 	
 }

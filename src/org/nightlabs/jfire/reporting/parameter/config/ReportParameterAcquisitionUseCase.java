@@ -3,6 +3,8 @@
  */
 package org.nightlabs.jfire.reporting.parameter.config;
 
+import java.io.Serializable;
+
 /**
  * @author Alexander Bieber <!-- alex [AT] nightlabs [DOT] de -->
  *
@@ -19,11 +21,16 @@ package org.nightlabs.jfire.reporting.parameter.config;
  * @jdo.fetch-group name="ReportParameterAcquisitionUseCase.this" fetch-groups="default" fields="name, description"
  *
  */
-public class ReportParameterAcquisitionUseCase {
+public class ReportParameterAcquisitionUseCase implements Serializable {
 
+	private static final long serialVersionUID = 1L;
+	
 	public static final String FETCH_GROUP_NAME = "ReportParameterAcquisitionUseCase.name";
 	public static final String FETCH_GROUP_DESCRIPTION = "ReportParameterAcquisitionUseCase.description";
 	public static final String FETCH_GROUP_THIS_REPORT_PARAMETER_ACQUISITION_USE_CASE = "ReportParameterAcquisitionUseCase.this";
+			 
+
+	public static final String USE_CASE_ID_DEFAULT = "DefaultUseCase";
 			 
 	/**
 	 * @jdo.field primary-key="true"
@@ -42,18 +49,22 @@ public class ReportParameterAcquisitionUseCase {
 	 */
 	private String reportParameterAcquisitionUseCaseID;
 		
-	/**
-	 * @jdo.field persistence-modifier="persistent"
-	 */
-	private ReportParameterAcquisitionSetup setup;
+//	/**
+//	 * @jdo.field persistence-modifier="persistent"
+//	 */
+//	private ReportParameterAcquisitionSetup parameterAcquisitionSetup;
 	
 	/**
-	 * @jdo.field persistence-modifier="persistent"
+	 * @jdo.field 
+	 * 		persistence-modifier="persistent"
+	 * 		mapped-by="useCase"
 	 */
 	private ReportParameterAcquisitionUseCaseName name;
 	
 	/**
-	 * @jdo.field persistence-modifier="persistent"
+	 * @jdo.field 
+	 * 		persistence-modifier="persistent"
+	 * 		mapped-by="useCase"
 	 */
 	private ReportParameterAcquisitionUseCaseDescription description;
 	
@@ -65,9 +76,9 @@ public class ReportParameterAcquisitionUseCase {
 		this.organisationID = setup.getOrganisationID();
 		this.reportParameterAcquisitionSetupID = setup.getReportParameterAcquisitionSetupID();
 		this.reportParameterAcquisitionUseCaseID = reportParameterAcquisitionUseCaseID;
-		this.setup = setup;
 		this.name = new ReportParameterAcquisitionUseCaseName(this);
 		this.description = new ReportParameterAcquisitionUseCaseDescription(this);
+//		this.parameterAcquisitionSetup = setup;
 	}
 
 
@@ -95,12 +106,12 @@ public class ReportParameterAcquisitionUseCase {
 	}
 
 
-	/**
-	 * @return the setup
-	 */
-	public ReportParameterAcquisitionSetup getSetup() {
-		return setup;
-	}
+//	/**
+//	 * @return the setup
+//	 */
+//	public ReportParameterAcquisitionSetup getParameterAcquisitionSetup() {
+//		return parameterAcquisitionSetup;
+//	}
 
 
 	/**

@@ -1,5 +1,6 @@
 package org.nightlabs.jfire.reporting.parameter;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -37,8 +38,10 @@ import org.nightlabs.jfire.reporting.parameter.config.ValueProviderConfig;
  * @jdo.fetch-group name="ValueProvider.this" fetch-groups="default" fields="name, description, category, inputParameters"
  *
  */
-public class ValueProvider {
+public class ValueProvider implements Serializable {
 
+	private static final long serialVersionUID = 1L;
+	
 	public static final String FETCH_GROUP_NAME = "ValueProvider.name";
 	public static final String FETCH_GROUP_DESCRIPTION = "ValueProvider.description";
 	public static final String FETCH_GROUP_CATEGORY = "ValueProvider.category";
@@ -82,12 +85,16 @@ public class ValueProvider {
 	private List<ValueProviderInputParameter> inputParameters;
 	
 	/**
-	 * @jdo.field persistence-modifier="persistent"
+	 * @jdo.field 
+	 * 		persistence-modifier="persistent"
+	 * 		mapped-by="valueProvider"
 	 */
 	private ValueProviderName name;
 
 	/**
-	 * @jdo.field persistence-modifier="persistent"
+	 * @jdo.field 
+	 * 		persistence-modifier="persistent"
+	 * 		mapped-by="valueProvider"
 	 */
 	private ValueProviderDescription description;
 	

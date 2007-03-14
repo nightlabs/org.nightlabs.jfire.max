@@ -1,5 +1,7 @@
 package org.nightlabs.jfire.reporting.parameter;
 
+import java.io.Serializable;
+
 /**
  * 
  * @author Alexander Bieber <!-- alex [AT] nightlabs [DOT] de -->
@@ -18,8 +20,10 @@ package org.nightlabs.jfire.reporting.parameter;
  * @jdo.fetch-group name="ValueProviderInputParameter.valueProvider" fetch-groups="default" fields="valueProvider"
  * @jdo.fetch-group name="ValueProviderInputParameter.this" fetch-groups="default" fields="valueProvider"
  */
-public class ValueProviderInputParameter {
+public class ValueProviderInputParameter implements Serializable {
 
+	private static final long serialVersionUID = 1L;
+	
 	public static final String FETCH_GROUP_VALUE_PROVIDER = "ValueProviderInputParameter.valueProvider";
 	public static final String FETCH_GROUP_THIS_VALUE_PROVIDER_INPUT_PARAMETER = "ValueProviderInputParameter.this";
 			 

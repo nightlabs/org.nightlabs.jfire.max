@@ -3,10 +3,15 @@
  */
 package org.nightlabs.jfire.reporting.parameter.config;
 
+import java.io.Serializable;
 import java.util.HashMap;
 import java.util.Map;
 
+import javax.jdo.PersistenceManager;
+import javax.jdo.Query;
+
 import org.nightlabs.jfire.reporting.layout.ReportLayout;
+import org.nightlabs.jfire.reporting.layout.id.ReportRegistryItemID;
 
 /**
  * @author Alexander Bieber <!-- alex [AT] nightlabs [DOT] de -->
@@ -23,9 +28,21 @@ import org.nightlabs.jfire.reporting.layout.ReportLayout;
  * @jdo.fetch-group name="ReportParameterAcquisitionSetup.reportLayout" fetch-groups="default" fields="reportLayout"
  * @jdo.fetch-group name="ReportParameterAcquisitionSetup.valueAcquisitionSetups" fetch-groups="default" fields="valueAcquisitionSetups"
  * @jdo.fetch-group name="ReportParameterAcquisitionSetup.this" fetch-groups="default" fields="defaultSetup, reportLayout, valueAcquisitionSetups"
+ * 
+ * @jdo.query
+ * 		name="getSetupForReportLayout"
+ *		query="SELECT UNIQUE
+ *			WHERE 
+ *				this.reportLayout.organisationID == paramOrganisationID &&
+ *				this.reportLayout.reportRegistryItemType == paramRegistryItemType &&
+ *				this.reportLayout.reportRegistryItemID == paramRegistryItemID
+ *			PARAMETERS String paramOrganisationID, String paramRegistryItemType, String paramRegistryItemID
+ *			import java.lang.String"
+ * 
  */
-public class ReportParameterAcquisitionSetup {
+public class ReportParameterAcquisitionSetup implements Serializable {
 
+	private static final long serialVersionUID = 1L;
 	
 	public static final String FETCH_GROUP_DEFAULT_SETUP = "ReportParameterAcquisitionSetup.defaultSetup";
 	public static final String FETCH_GROUP_REPORT_LAYOUT = "ReportParameterAcquisitionSetup.reportLayout";
@@ -60,11 +77,12 @@ public class ReportParameterAcquisitionSetup {
 	 *		collection-type="map"
 	 *		key-type="org.nightlabs.jfire.reporting.parameter.config.ReportParameterAcquisitionUseCase"
 	 *		value-type="org.nightlabs.jfire.reporting.parameter.config.ValueAcquisitionSetup"
-	 *		table="JFireReporting_ReportParameterAcquisitionSetup_valueAcquisitionSetups"
+	 *		mapped-by="parameterAcquisitionSetup"
 	 *		dependent-key="true"
 	 *		dependent-value="true"
 	 *
-	 * @jdo.join
+	 * @jdo.key
+	 * 		mapped-by="useCase"
 	 */
 	private Map<ReportParameterAcquisitionUseCase, ValueAcquisitionSetup> valueAcquisitionSetups;
 	
@@ -141,5 +159,10 @@ public class ReportParameterAcquisitionSetup {
 	 */
 	public ReportLayout getReportLayout() {
 		return reportLayout;
+	}
+	
+	public static ReportParameterAcquisitionSetup getSetupForReportLayout(PersistenceManager pm, ReportRegistryItemID reportRegistryItemID) {
+		Query q = pm.newNamedQuery(ReportParameterAcquisitionSetup.class, "getSetupForReportLayout");
+		return (ReportParameterAcquisitionSetup) q.execute(reportRegistryItemID.organisationID, reportRegistryItemID.reportRegistryItemType, reportRegistryItemID.reportRegistryItemID);
 	}
 }

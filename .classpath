@@ -13,7 +13,6 @@
 	<classpathentry kind="var" path="JBOSS/server/default/lib/jnpserver.jar"/>
 	<classpathentry kind="var" path="JBOSS/server/default/lib/jpl-pattern.jar"/>
 	<classpathentry kind="var" path="JBOSS/server/default/lib/jpl-util.jar"/>
-	<classpathentry sourcepath="/WORKSPACE/JFireReporting" kind="var" path="WORKSPACE/JFireReporting/dist/JFireReporting.jar"/>
 	<classpathentry sourcepath="/WORKSPACE/JFireScripting" kind="var" path="WORKSPACE/JFireScripting/dist/JFireScripting.jar"/>
 	<classpathentry sourcepath="/WORKSPACE/JFireSimpleTrade/src" kind="var" path="WORKSPACE/JFireSimpleTrade/dist/JFireSimpleTrade.jar"/>
 	<classpathentry sourcepath="/WORKSPACE/JFireTrade" kind="var" path="WORKSPACE/JFireTrade/dist/JFireTrade.jar"/>
@@ -24,5 +23,6 @@
 	<classpathentry sourcepath="WORKSPACE/JFireBaseBean/src" kind="var" path="WORKSPACE/JFireBaseBean/dist/JFireBaseBean.jar"/>
 	<classpathentry kind="var" path="LOG4J"/>
 	<classpathentry kind="lib" path="/JFireReporting/dist/birt/lib/oda.jar"/>
+	<classpathentry sourcepath="/WORKSPACE/JFireReporting" kind="var" path="WORKSPACE/JFireReporting/dist/JFireReporting.jar"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>

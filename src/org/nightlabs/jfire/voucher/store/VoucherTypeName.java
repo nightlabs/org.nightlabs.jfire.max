@@ -90,7 +90,7 @@ implements Inheritable
 	 *		collection-type="map"
 	 *		key-type="java.lang.String"
 	 *		value-type="java.lang.String"
-	 *		table="JFireVoucher_SimpleProductTypeName_names"
+	 *		table="JFireVoucher_VoucherTypeName_names"
 	 *
 	 * @jdo.join
 	 */

@@ -16,7 +16,7 @@ import org.nightlabs.jfire.store.ProductType;
  *		detachable="true"
  *		table="JFireVoucher_Voucher"
  *
- * @jdo.inheritance strategy="superclass-table"
+ * @jdo.inheritance strategy="new-table"
  */
 public class Voucher
 extends Product

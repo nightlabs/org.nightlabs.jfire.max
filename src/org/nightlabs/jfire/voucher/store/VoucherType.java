@@ -65,6 +65,11 @@ extends ProductType
 	}
 
 	/**
+	 * @jdo.field persistence-modifier="persistent" mapped-by="voucherType"
+	 */
+	private VoucherTypeName name;
+
+	/**
 	 * @deprecated Only for JDO!
 	 */
 	protected VoucherType() { }
@@ -75,6 +80,14 @@ extends ProductType
 	{
 		super(organisationID, productTypeID, extendedProductType, owner,
 				inheritanceNature, packageNature);
+
+		this.name = new VoucherTypeName(this);
+	}
+
+	@Implement
+	public I18nText getName()
+	{
+		return name;
 	}
 
 	@Implement
@@ -89,13 +102,6 @@ extends ProductType
 	{
 		// TODO Auto-generated method stub
 
-	}
-
-	@Implement
-	public I18nText getName()
-	{
-		// TODO Auto-generated method stub
-		return null;
 	}
 
 }

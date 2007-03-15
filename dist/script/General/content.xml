@@ -20,7 +20,7 @@
 	<script 
 		file="GeneralSalesStatistic.javaclass" 
 		id="GeneralSalesStatistic"
-		resultClass="org.nightlabs.jfire.reporting.oda.jfs.ResultSet"
+		resultClass="org.nightlabs.jfire.reporting.oda.ResultSet"
 	>
 	<!-- id is optional and defaults to the value of file -->
 		<name language="de">Allgemeine Verkaufs-statistik</name>

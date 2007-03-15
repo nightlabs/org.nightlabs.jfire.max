@@ -14,6 +14,7 @@ import org.eclipse.datatools.connectivity.oda.IResultSetMetaData;
 import org.eclipse.datatools.connectivity.oda.OdaException;
 import org.nightlabs.ModuleException;
 import org.nightlabs.jfire.base.Lookup;
+import org.nightlabs.jfire.organisation.Organisation;
 import org.nightlabs.jfire.reporting.oda.ParameterMetaData;
 import org.nightlabs.jfire.reporting.oda.jfs.AbstractJFSQueryProxy;
 import org.nightlabs.jfire.reporting.oda.jfs.ReportingScriptExecutor;
@@ -137,7 +138,9 @@ public class ServerJFSQueryProxy extends AbstractJFSQueryProxy {
 	 * 	thrown when the script registry item referenced is not a Script (maybe a category).
 	 */
 	private static Script getScript(PersistenceManager pm, ScriptRegistryItemID itemID) {
-		itemID.organisationID = SecurityReflector.getUserDescriptor().getOrganisationID();
+		if (!Organisation.DEVIL_ORGANISATION_ID.equals(itemID.organisationID))
+			itemID.organisationID = SecurityReflector.getUserDescriptor().getOrganisationID();
+			// TODO: does this make sense ?!?
 		return validateScriptRegistryItem((ScriptRegistryItem) pm.getObjectById(itemID));
 	}
 	

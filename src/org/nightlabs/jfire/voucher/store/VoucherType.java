@@ -7,6 +7,10 @@ import javax.jdo.Query;
 
 import org.nightlabs.annotation.Implement;
 import org.nightlabs.i18n.I18nText;
+import org.nightlabs.inheritance.FieldInheriter;
+import org.nightlabs.inheritance.FieldMetaData;
+import org.nightlabs.inheritance.Inheritable;
+import org.nightlabs.inheritance.InheritableFieldInheriter;
 import org.nightlabs.jfire.store.ProductType;
 import org.nightlabs.jfire.store.id.ProductTypeID;
 import org.nightlabs.jfire.trade.LegalEntity;
@@ -103,5 +107,34 @@ extends ProductType
 		// TODO Auto-generated method stub
 
 	}
+
+	// ******************************
+	// /// *** begin inheritance *** ///
+	@Override
+	public FieldMetaData getFieldMetaData(String fieldName)
+	{
+//		if ("createdProductCount".equals(fieldName)) // TODO track the capacity!
+//			return null;
+
+		return super.getFieldMetaData(fieldName);
+	}
+
+	@Override
+	public FieldInheriter getFieldInheriter(String fieldName)
+	{
+		if ("name".equals(fieldName))
+			return new InheritableFieldInheriter();
+
+		return super.getFieldInheriter(fieldName);
+	}
+
+	@Override
+	public void preInherit(Inheritable mother, Inheritable child)
+	{
+		super.preInherit(mother, child);
+		name.getI18nMap();
+	}
+	// /// *** end inheritance *** ///
+	// ******************************
 
 }

@@ -559,7 +559,7 @@ implements SessionBean
 
 			// take care about the inheritance
 			productType.applyInheritance();
-			// TODO when price-calculation was necessary (e.g. because of changes to the nesting), then we must recalculate the prices for the inherited ProductTypes as well!
+			// imho, the recalculation of the prices for the inherited ProductTypes is already implemented in JFireTrade. Marco.
 
 			if (!get)
 				return null;

@@ -19,6 +19,7 @@ import org.nightlabs.jfire.reporting.oda.jfs.ScriptExecutorJavaClassReportingDel
 import org.nightlabs.jfire.scripting.ScriptException;
 import org.nightlabs.jfire.scripting.ScriptExecutorJavaClass;
 import org.nightlabs.jfire.simpletrade.store.SimpleProductType;
+import org.nightlabs.jfire.store.ProductType;
 import org.nightlabs.jfire.trade.Article;
 
 /**
@@ -77,7 +78,7 @@ public class ScriptExecutorGeneralSalesStatistic implements
 		for (Iterator iter = products.iterator(); iter.hasNext();) {
 			Object[] row = (Object[]) iter.next();
 			Object[] nRow = new Object[3];
-			nRow[0] = ((SimpleProductType)row[0]).getName().getText(Locale.getDefault().getLanguage());
+			nRow[0] = ((ProductType)row[0]).getName().getText(Locale.getDefault().getLanguage());
 			nRow[1] = row[1];
 			nRow[2] = row[2];
 			resultSet.addRow(nRow);

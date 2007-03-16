@@ -7,7 +7,7 @@ package org.nightlabs.jfire.reporting.trade;
  * @author Alexander Bieber <alex [AT] nightlabs [DOT] de>
  *
  */
-public class ScriptingConstants {
+public class ScriptingTradeConstants {
 
 	public static final String SCRIPT_REGISTRY_ITEM_TYPE_ROOT = "JFireReportingTrade-Scripting-Root";
 	public static final String SCRIPT_REGISTRY_ITEM_TYPE_GENERAL = "JFireReportingTrade-Scripting-General";

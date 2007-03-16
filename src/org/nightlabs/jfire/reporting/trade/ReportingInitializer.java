@@ -28,8 +28,8 @@ public class ReportingInitializer {
 		ReportCategory rootCategory = org.nightlabs.jfire.reporting.ReportingInitializer.createCategory(
 				pm, null, 
 				organisationID, 
-				ReportingConstants.REPORT_REGISTRY_ITEM_TYPE_ROOT, 
-				ReportingConstants.REPORT_REGISTRY_ITEM_ID_CATEGORY_ROOT, true
+				ReportingTradeConstants.REPORT_REGISTRY_ITEM_TYPE_ROOT, 
+				ReportingTradeConstants.REPORT_REGISTRY_ITEM_ID_CATEGORY_ROOT, true
 			);
 		rootCategory.getName().setText(Locale.ENGLISH.getLanguage(), "JFire Trade Scripting");
 		rootCategory.getName().setText(Locale.GERMAN.getLanguage(), "JFire Trade Scripting");
@@ -44,7 +44,7 @@ public class ReportingInitializer {
 				new org.nightlabs.jfire.reporting.ReportingInitializer(
 						reportDirSuffix+File.separator+subDirs[i].getName(),
 						rootCategory,
-						ScriptingConstants.SCRIPT_REGISTRY_ITEM_TYPE_TRADE_SCRIPT,
+						ScriptingTradeConstants.SCRIPT_REGISTRY_ITEM_TYPE_TRADE_SCRIPT,
 						jfireServerManager,
 						pm, 
 						organisationID

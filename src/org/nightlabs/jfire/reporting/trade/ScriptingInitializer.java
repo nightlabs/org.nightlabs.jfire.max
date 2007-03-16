@@ -37,8 +37,8 @@ public class ScriptingInitializer {
 		ScriptCategory rootCategory = org.nightlabs.jfire.scripting.ScriptingInitializer.createCategory(
 				pm, null, 
 				organisationID, 
-				ScriptingConstants.SCRIPT_REGISTRY_ITEM_TYPE_ROOT, 
-				ScriptingConstants.SCRIPT_REGISTRY_ITEM_ID_CATEGORY_ROOT);
+				ScriptingTradeConstants.SCRIPT_REGISTRY_ITEM_TYPE_ROOT, 
+				ScriptingTradeConstants.SCRIPT_REGISTRY_ITEM_ID_CATEGORY_ROOT);
 		rootCategory.getName().setText(Locale.ENGLISH.getLanguage(), "JFire Trade Scripting");
 		rootCategory.getName().setText(Locale.GERMAN.getLanguage(), "JFire Trade Scripting");
 		
@@ -52,7 +52,7 @@ public class ScriptingInitializer {
 				new org.nightlabs.jfire.scripting.ScriptingInitializer(
 						scriptDirSuffix+File.separator+subDirs[i].getName(),
 						rootCategory,
-						ScriptingConstants.SCRIPT_REGISTRY_ITEM_TYPE_TRADE_SCRIPT,
+						ScriptingTradeConstants.SCRIPT_REGISTRY_ITEM_TYPE_TRADE_SCRIPT,
 						jfireServerManager,
 						pm, 
 						organisationID

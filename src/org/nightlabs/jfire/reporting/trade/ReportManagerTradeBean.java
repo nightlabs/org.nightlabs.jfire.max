@@ -173,35 +173,35 @@ implements SessionBean
 	}
 	
 	private void initializeReportParameterAcquisition(final PersistenceManager pm) {
-		ValueProviderCategoryID categoryID = ValueProviderCategoryID.create(Organisation.DEVIL_ORGANISATION_ID, ReportingConstants.VALUE_PROVIDER_CATEGORY_ID_TRADE_REPORTS);
+		ValueProviderCategoryID categoryID = ValueProviderCategoryID.create(Organisation.DEVIL_ORGANISATION_ID, ReportingTradeConstants.VALUE_PROVIDER_CATEGORY_ID_TRADE_REPORTS);
 		ValueProviderCategory rootCategory = createValueProviderCategory(pm, null, categoryID);
 		rootCategory.getName().setText(Locale.ENGLISH.getLanguage(), "Trade reports");
 		
-		ValueProviderCategoryID leCategoryID = ValueProviderCategoryID.create(Organisation.DEVIL_ORGANISATION_ID, ReportingConstants.VALUE_PROVIDER_CATEGORY_ID_LEGAL_ENTITY);
+		ValueProviderCategoryID leCategoryID = ValueProviderCategoryID.create(Organisation.DEVIL_ORGANISATION_ID, ReportingTradeConstants.VALUE_PROVIDER_CATEGORY_ID_LEGAL_ENTITY);
 		ValueProviderCategory leCategory = createValueProviderCategory(pm, rootCategory, leCategoryID);
 		leCategory.getName().setText(Locale.ENGLISH.getLanguage(), "Legal entity parameters");
 		
 		ValueProviderID leSearchID = ValueProviderID.create(
 				Organisation.DEVIL_ORGANISATION_ID, 
-				ReportingConstants.VALUE_PROVIDER_CATEGORY_ID_LEGAL_ENTITY, 
-				ReportingConstants.VALUE_PROVIDER_ID_LEGAL_ENTITY_SEARCH
+				ReportingTradeConstants.VALUE_PROVIDER_CATEGORY_ID_LEGAL_ENTITY, 
+				ReportingTradeConstants.VALUE_PROVIDER_ID_LEGAL_ENTITY_SEARCH
 			);
 		ValueProvider leSearch = createValueProvider(pm, leCategory, leSearchID, AnchorID.class.getName());
 		leSearch.getName().setText(Locale.ENGLISH.getLanguage(), "Customer search");
 		leSearch.getDescription().setText(Locale.ENGLISH.getLanguage(), "Customer search");
 		
-		ValueProviderCategoryID docsCategoryID = ValueProviderCategoryID.create(Organisation.DEVIL_ORGANISATION_ID, ReportingConstants.VALUE_PROVIDER_CATEGORY_ID_TRADE_DOCUMENTS);
+		ValueProviderCategoryID docsCategoryID = ValueProviderCategoryID.create(Organisation.DEVIL_ORGANISATION_ID, ReportingTradeConstants.VALUE_PROVIDER_CATEGORY_ID_TRADE_DOCUMENTS);
 		ValueProviderCategory docsCategory = createValueProviderCategory(pm, rootCategory, docsCategoryID);
 		docsCategory.getName().setText(Locale.ENGLISH.getLanguage(), "Trade documents parameters");
 		
-		ValueProviderCategoryID invoiceCategoryID = ValueProviderCategoryID.create(Organisation.DEVIL_ORGANISATION_ID, ReportingConstants.VALUE_PROVIDER_CATEGORY_ID_TRADE_DOCUMENTS_INVOICE);
+		ValueProviderCategoryID invoiceCategoryID = ValueProviderCategoryID.create(Organisation.DEVIL_ORGANISATION_ID, ReportingTradeConstants.VALUE_PROVIDER_CATEGORY_ID_TRADE_DOCUMENTS_INVOICE);
 		ValueProviderCategory invoiceCategory = createValueProviderCategory(pm, rootCategory, invoiceCategoryID);
 		invoiceCategory.getName().setText(Locale.ENGLISH.getLanguage(), "Invoice parameters");
 		
 		ValueProviderID invoiceByCustomerID = ValueProviderID.create(
 				Organisation.DEVIL_ORGANISATION_ID, 
-				ReportingConstants.VALUE_PROVIDER_CATEGORY_ID_TRADE_DOCUMENTS_INVOICE, 
-				ReportingConstants.VALUE_PROVIDER_ID_TRADE_DOCUMENTS_INVOICE_BY_CUSTOMER
+				ReportingTradeConstants.VALUE_PROVIDER_CATEGORY_ID_TRADE_DOCUMENTS_INVOICE, 
+				ReportingTradeConstants.VALUE_PROVIDER_ID_TRADE_DOCUMENTS_INVOICE_BY_CUSTOMER
 			);
 		ValueProvider invoiceByCustomer = createValueProvider(pm, invoiceCategory, invoiceByCustomerID, InvoiceID.class.getName());
 		invoiceByCustomer.getName().setText(Locale.ENGLISH.getLanguage(), "Invoice of customer");
@@ -214,8 +214,8 @@ implements SessionBean
 		
 		ValueProviderID invoiceByCustomerAndPeriodID = ValueProviderID.create(
 				Organisation.DEVIL_ORGANISATION_ID, 
-				ReportingConstants.VALUE_PROVIDER_CATEGORY_ID_TRADE_DOCUMENTS_INVOICE, 
-				ReportingConstants.VALUE_PROVIDER_ID_TRADE_DOCUMENTS_INVOICE_BY_CUSTOMER_AND_PERIOD
+				ReportingTradeConstants.VALUE_PROVIDER_CATEGORY_ID_TRADE_DOCUMENTS_INVOICE, 
+				ReportingTradeConstants.VALUE_PROVIDER_ID_TRADE_DOCUMENTS_INVOICE_BY_CUSTOMER_AND_PERIOD
 			);
 		ValueProvider invoiceByCustomerAndPeriod = createValueProvider(pm, invoiceCategory, invoiceByCustomerAndPeriodID, InvoiceID.class.getName());
 		invoiceByCustomerAndPeriod.getName().setText(Locale.ENGLISH.getLanguage(), "Invoice of customer in period");
@@ -230,8 +230,8 @@ implements SessionBean
 		
 		ValueProviderID invoiceByArticleTypeID = ValueProviderID.create(
 				Organisation.DEVIL_ORGANISATION_ID, 
-				ReportingConstants.VALUE_PROVIDER_CATEGORY_ID_TRADE_DOCUMENTS_INVOICE, 
-				ReportingConstants.VALUE_PROVIDER_ID_TRADE_DOCUMENTS_INVOICE_BY_ARTICLE_TYPE
+				ReportingTradeConstants.VALUE_PROVIDER_CATEGORY_ID_TRADE_DOCUMENTS_INVOICE, 
+				ReportingTradeConstants.VALUE_PROVIDER_ID_TRADE_DOCUMENTS_INVOICE_BY_ARTICLE_TYPE
 			);
 		ValueProvider invoiceByArticleType = createValueProvider(pm, invoiceCategory, invoiceByArticleTypeID, InvoiceID.class.getName());
 		invoiceByArticleType.getName().setText(Locale.ENGLISH.getLanguage(), "Invoice by article type");
@@ -247,8 +247,8 @@ implements SessionBean
 		
 		ReportRegistryItemID defInvoiceID = ReportRegistryItemID.create(
 				Organisation.DEVIL_ORGANISATION_ID, 
-				ReportingConstants.REPORT_REGISTRY_ITEM_TYPE_INVOICE, 
-				ReportingConstants.REPORT_REGISTRY_ITEM_ID_DEFAULT_INVOICE_LAYOUT
+				ReportingTradeConstants.REPORT_REGISTRY_ITEM_TYPE_INVOICE, 
+				ReportingTradeConstants.REPORT_REGISTRY_ITEM_ID_DEFAULT_INVOICE_LAYOUT
 			);
 		ReportLayout defInvoice = (ReportLayout) pm.getObjectById(defInvoiceID);
 		logger.debug("Have report layout");

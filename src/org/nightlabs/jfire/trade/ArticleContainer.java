@@ -50,9 +50,19 @@ public interface ArticleContainer
 	 */
 	Collection getArticles();
 
+	/**
+	 * adds an {@link Article} to the ArticleContainer
+	 * @param article the article to add
+	 * @throws ArticleContainerException
+	 */
 	void addArticle(Article article)
 	throws ArticleContainerException;
 
+	/**
+	 * removes an {@link Article} from the ArticleContainer
+	 * @param article the article to remove
+	 * @throws ArticleContainerException
+	 */
 	void removeArticle(Article article)
 	throws ArticleContainerException;
 
@@ -65,4 +75,16 @@ public interface ArticleContainer
 	 * @return Returns the <code>User</code> who is responsible for creation of this <code>ArticleContainer</code>.
 	 */
 	User getCreateUser();
+	
+//	/**
+//	 * adds an {@link ArticleContainerListener} to listen for article changes
+//	 * @param listener the {@link ArticleContainerListener} to add
+//	 */
+//	void addArticleContainerListener(ArticleContainerListener listener);
+//
+//	/**
+//	 * removes an previously added {@link ArticleContainerListener}
+//	 * @param listener the {@link ArticleContainerListener} to remove
+//	 */	
+//	void removeArticleContainerListener(ArticleContainerListener listener);
 }

@@ -28,7 +28,9 @@ package org.nightlabs.jfire.reporting.parameter;
 
 import java.rmi.RemoteException;
 import java.util.Collection;
+import java.util.Date;
 import java.util.HashMap;
+import java.util.Locale;
 import java.util.Map;
 import java.util.Set;
 
@@ -37,15 +39,19 @@ import javax.ejb.EJBException;
 import javax.ejb.SessionBean;
 import javax.ejb.SessionContext;
 import javax.jdo.JDOHelper;
+import javax.jdo.JDOObjectNotFoundException;
 import javax.jdo.PersistenceManager;
 
 import org.apache.log4j.Logger;
 import org.nightlabs.ModuleException;
 import org.nightlabs.jdo.NLJDOHelper;
 import org.nightlabs.jfire.base.BaseSessionBeanImpl;
+import org.nightlabs.jfire.organisation.Organisation;
+import org.nightlabs.jfire.reporting.ReportingConstants;
 import org.nightlabs.jfire.reporting.layout.id.ReportRegistryItemID;
 import org.nightlabs.jfire.reporting.parameter.config.ReportParameterAcquisitionSetup;
 import org.nightlabs.jfire.reporting.parameter.config.id.ReportParameterAcquisitionSetupID;
+import org.nightlabs.jfire.reporting.parameter.id.ValueProviderCategoryID;
 import org.nightlabs.jfire.reporting.parameter.id.ValueProviderID;
 
 /**
@@ -96,7 +102,94 @@ implements SessionBean
 	 */
 	public void ejbRemove() throws EJBException, RemoteException { }
 
-
+	public void initDefaultValueProviders() {
+		PersistenceManager pm = getPersistenceManager();
+		try {
+			
+			ValueProviderCategoryID categoryID = ValueProviderCategoryID.create(Organisation.DEVIL_ORGANISATION_ID, ReportingConstants.VALUE_PROVIDER_CATEGORY_ID_SIMPLE_TYPES);
+			ValueProviderCategory rootCategory = createValueProviderCategory(pm, null, categoryID);
+			rootCategory.getName().setText(Locale.ENGLISH.getLanguage(), "Simple types");
+			
+			ValueProviderID stringID = ValueProviderID.create(
+					Organisation.DEVIL_ORGANISATION_ID, 
+					ReportingConstants.VALUE_PROVIDER_CATEGORY_ID_SIMPLE_TYPES, 
+					ReportingConstants.VALUE_PROVIDER_ID_STRING
+				);
+			ValueProvider string = createValueProvider(pm, rootCategory, stringID, String.class.getName());
+			string.getName().setText(Locale.ENGLISH.getLanguage(), "String");
+			string.getDescription().setText(Locale.ENGLISH.getLanguage(), "Query a Text from the user");
+			
+			ValueProviderID integerID = ValueProviderID.create(
+					Organisation.DEVIL_ORGANISATION_ID, 
+					ReportingConstants.VALUE_PROVIDER_CATEGORY_ID_SIMPLE_TYPES, 
+					ReportingConstants.VALUE_PROVIDER_ID_INTEGER
+				);
+			ValueProvider integer = createValueProvider(pm, rootCategory, integerID, Integer.class.getName());
+			integer.getName().setText(Locale.ENGLISH.getLanguage(), "Integer");
+			integer.getDescription().setText(Locale.ENGLISH.getLanguage(), "Query a number from the user");
+			
+			ValueProviderID doubleID = ValueProviderID.create(
+					Organisation.DEVIL_ORGANISATION_ID, 
+					ReportingConstants.VALUE_PROVIDER_CATEGORY_ID_SIMPLE_TYPES, 
+					ReportingConstants.VALUE_PROVIDER_ID_DOUBLE
+				);
+			ValueProvider doub = createValueProvider(pm, rootCategory, doubleID, Double.class.getName());
+			doub.getName().setText(Locale.ENGLISH.getLanguage(), "Double");
+			doub.getDescription().setText(Locale.ENGLISH.getLanguage(), "Query a decimal number from the user");
+			
+			ValueProviderID dateID = ValueProviderID.create(
+					Organisation.DEVIL_ORGANISATION_ID, 
+					ReportingConstants.VALUE_PROVIDER_CATEGORY_ID_SIMPLE_TYPES, 
+					ReportingConstants.VALUE_PROVIDER_ID_DATE
+				);
+			ValueProvider date = createValueProvider(pm, rootCategory, dateID, Date.class.getName());
+			date.getName().setText(Locale.ENGLISH.getLanguage(), "Date");
+			date.getDescription().setText(Locale.ENGLISH.getLanguage(), "Query a date/time from the user");
+			
+			ValueProviderID timePeriodID = ValueProviderID.create(
+					Organisation.DEVIL_ORGANISATION_ID, 
+					ReportingConstants.VALUE_PROVIDER_CATEGORY_ID_SIMPLE_TYPES, 
+					ReportingConstants.VALUE_PROVIDER_ID_TIME_PERIOD
+				);
+			ValueProvider timePeriod = createValueProvider(pm, rootCategory, timePeriodID, Date.class.getName());
+			timePeriod.getName().setText(Locale.ENGLISH.getLanguage(), "Timeperiod");
+			timePeriod.getDescription().setText(Locale.ENGLISH.getLanguage(), "Query a time period from the user");
+			
+		} finally {
+			pm.close();
+		}
+		
+	}
+	
+	private ValueProviderCategory createValueProviderCategory(PersistenceManager pm, ValueProviderCategory parent, ValueProviderCategoryID categoryID) {
+		ValueProviderCategory category = null;
+		try {
+			category = (ValueProviderCategory) pm.getObjectById(categoryID);
+			logger.debug("Have ValueProviderCategory "+categoryID);
+		} catch (JDOObjectNotFoundException e) {
+			logger.debug("Creating ValueProviderCategory "+categoryID);
+			category = new ValueProviderCategory(parent, categoryID.organisationID, categoryID.valueProviderCategoryID, true);
+			category = (ValueProviderCategory) pm.makePersistent(category);
+			logger.debug("Created ValueProviderCategory "+categoryID);
+		}
+		return category;
+	}
+	
+	private ValueProvider createValueProvider(PersistenceManager pm, ValueProviderCategory category, ValueProviderID valueProviderID, String outputType) {
+		ValueProvider valueProvider = null;
+		try {
+			valueProvider = (ValueProvider) pm.getObjectById(valueProviderID);
+			logger.debug("Have ValueProvider "+valueProviderID);
+		} catch (JDOObjectNotFoundException e) {
+			logger.debug("Creating ValueProvider "+valueProviderID);
+			valueProvider = new ValueProvider(category, valueProviderID.valueProviderID, outputType);
+			valueProvider = (ValueProvider) pm.makePersistent(valueProvider);
+			logger.debug("Created ValueProvider "+valueProviderID);
+		}
+		return valueProvider;
+	}
+	
+	
 	/**
 	 * @throws ModuleException
 	 *
@@ -168,5 +261,6 @@ implements SessionBean
 			pm.close();
 		}
 	}
+	
 	
 }

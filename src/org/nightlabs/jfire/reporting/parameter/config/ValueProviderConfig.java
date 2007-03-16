@@ -3,6 +3,7 @@ package org.nightlabs.jfire.reporting.parameter.config;
 import java.io.Serializable;
 
 import org.nightlabs.jfire.reporting.parameter.ValueProvider;
+import org.nightlabs.jfire.reporting.parameter.id.ValueProviderID;
 
 /**
  * 
@@ -171,6 +172,14 @@ public class ValueProviderConfig implements ValueConsumer, Serializable {
 	 */
 	public void setValueProviderOrganisationID(String valueProviderOrganisationID) {
 		this.valueProviderOrganisationID = valueProviderOrganisationID;
+	}
+	
+	public ValueProviderID getConfigValueProviderID() {
+		return ValueProviderID.create(
+				getValueProviderOrganisationID(), 
+				getValueProviderCategoryID(), 
+				getValueProviderID()
+			);		
 	}
 
 	public void setValueProvider(ValueProvider valueProvider) {

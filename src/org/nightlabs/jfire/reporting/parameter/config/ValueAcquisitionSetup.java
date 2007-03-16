@@ -98,7 +98,7 @@ public class ValueAcquisitionSetup implements Serializable {
 	 * 
 	 * @jdo.field persistence-modifier="none"
 	 **/
-	private transient Map<String, ValueConsumerBinding> consumer2Binding = null;
+	private transient Map<String, Map<String, ValueConsumerBinding>> consumer2Binding = null;
 	
 	/**
 	 * Used internally to provide bindings.
@@ -284,16 +284,28 @@ public class ValueAcquisitionSetup implements Serializable {
 	
 	
 	
-	public ValueConsumerBinding getValueConsumerBinding(ValueConsumer consumer, String parameterID) {
-		String key = consumer.getConsumerKey() + "/" + parameterID;
+	public Map<String, ValueConsumerBinding> getValueConsumerBindings(ValueConsumer consumer) {
+		// TODO: Rewrite with generics when bcel bug fixed
 		if (consumer2Binding == null) {
-			consumer2Binding = new HashMap<String, ValueConsumerBinding>();			
+			consumer2Binding = new HashMap<String, Map<String, ValueConsumerBinding>>();			
 			for (ValueConsumerBinding binding : valueConsumerBindings) {
-				String bindingKey = binding.getConsumer().getConsumerKey() + "/" + binding.getParameterID();
-				consumer2Binding.put(bindingKey, binding);
+				String bindingKey = binding.getConsumer().getConsumerKey();
+				Map bindings = consumer2Binding.get(bindingKey);
+				if (bindings == null) {
+					bindings = new HashMap();
+					consumer2Binding.put(bindingKey, bindings);
+				}
+				bindings.put(binding.getParameterID(), binding);
 			}
 		}
-		return consumer2Binding.get(key);
+		return consumer2Binding.get(consumer.getConsumerKey());
+	}
+	
+	public ValueConsumerBinding getValueConsumerBinding(ValueConsumer consumer, String parameterID) {
+		Map bindings = getValueConsumerBindings(consumer);
+		if (bindings != null)
+			return (ValueConsumerBinding) bindings.get(parameterID);
+		return null;
 	}
 	
 	public ValueConsumerBinding getValueProviderBinding(ValueProviderConfig provider) {

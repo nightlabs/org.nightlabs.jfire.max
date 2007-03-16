@@ -77,10 +77,25 @@ extends JDOQuery<Set<Invoice>>
 			filter.append("\n && this.bookDT >= :bookDTMax");
 
 		if (vendorID != null)
-			filter.append("\n && JDOHelper.getObjectId(this.vendor) == :vendorID");
+			// TODO: JDOHelper.getObjectId(this.*) does not seem to work (java.lang.IndexOutOfBoundsException: Index: 3, Size: 3)
+//			filter.append("\n && JDOHelper.getObjectId(this.vendor) == :vendorID");
+			// WORKAROUND:
+			filter.append("\n && (" +
+					"this.vendor.organisationID == \""+vendorID.organisationID+"\" && " +
+					"this.vendor.anchorTypeID == \""+vendorID.anchorTypeID+"\" && " +
+					"this.vendor.anchorID == \""+vendorID.anchorID+"\"" +
+							")");
 
-		if (customerID != null)
-			filter.append("\n && JDOHelper.getObjectId(this.customer) == :customerID");
+		if (customerID != null) {
+			// TODO: JDOHelper.getObjectId(this.*) does not seem to work (java.lang.IndexOutOfBoundsException: Index: 3, Size: 3)
+//			filter.append("\n && JDOHelper.getObjectId(this.customer) == :customerID");
+			// WORKAROUND:
+			filter.append("\n && (" +
+					"this.customer.organisationID == \""+customerID.organisationID+"\" && " +
+					"this.customer.anchorTypeID == \""+customerID.anchorTypeID+"\" && " +
+					"this.customer.anchorID == \""+customerID.anchorID+"\"" +
+							")");
+		}
 
 		q.setFilter(filter.toString());
 		return q;

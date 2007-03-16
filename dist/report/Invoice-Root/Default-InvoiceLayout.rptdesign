@@ -1,8 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!-- Written by Eclipse BIRT 2.0 -->
-<report xmlns="http://www.eclipse.org/birt/2005/design" version="3.2.1" id="1">
+<report xmlns="http://www.eclipse.org/birt/2005/design" version="3.2.2" id="1">
     <property name="createdBy">Eclipse BIRT Designer Version 1.0.1 Build &lt;20051201-1157></property>
     <property name="units">in</property>
+    <property name="includeResource">xx</property>
     <list-property name="configVars">
         <structure>
             <property name="name">invoiceOrganisationID</property>
@@ -60,6 +61,14 @@
             <structure name="format">
                 <property name="category">Unformatted</property>
                 <property name="pattern">Unformatted</property>
+            </structure>
+        </scalar-parameter>
+        <scalar-parameter name="invoiceID" id="119">
+            <property name="valueType">static</property>
+            <property name="dataType">string</property>
+            <property name="controlType">text-box</property>
+            <structure name="format">
+                <property name="category">Unformatted</property>
             </structure>
         </scalar-parameter>
     </parameters>
@@ -166,42 +175,42 @@ if (customer == null)
 
 resultSet.addRow();
 try {
-	company = person.getPersonDataField(PersonStruct.PERSONALDATA_COMPANY).getText();
+	company = person.getDataField(PersonStruct.PERSONALDATA_COMPANY).getText();
 	resultSet.addColumn(company);
 } catch (e) {
 	resultSet.addColumn("");
 }
 
 try {
-	name = person.getPersonDataField(PersonStruct.PERSONALDATA_NAME).getText();
+	name = person.getDataField(PersonStruct.PERSONALDATA_NAME).getText();
 	resultSet.addColumn(name);
 } catch (e) {
 	resultSet.addColumn("");
 }
 
 try {
-	firstName = person.getPersonDataField(PersonStruct.PERSONALDATA_FIRSTNAME).getText();
+	firstName = person.getDataField(PersonStruct.PERSONALDATA_FIRSTNAME).getText();
 	resultSet.addColumn(firstName);
 } catch (e) {
 	resultSet.addColumn("");
 }
 
 try {
-	address = person.getPersonDataField(PersonStruct.POSTADDRESS_ADDRESS).getText();
+	address = person.getDataField(PersonStruct.POSTADDRESS_ADDRESS).getText();
 	resultSet.addColumn(address);
 } catch (e) {
 	resultSet.addColumn("");
 }
 
 try {
-	city = person.getPersonDataField(PersonStruct.POSTADDRESS_CITY).getText();
+	city = person.getDataField(PersonStruct.POSTADDRESS_CITY).getText();
 	resultSet.addColumn(city);
 } catch (e) {
 	resultSet.addColumn("");
 }
 
 try {
-	postCode = person.getPersonDataField(PersonStruct.POSTADDRESS_POSTCODE).getText();
+	postCode = person.getDataField(PersonStruct.POSTADDRESS_POSTCODE).getText();
 	resultSet.addColumn(postCode);
 } catch (e) {
 	resultSet.addColumn("");
@@ -328,11 +337,11 @@ Invoice - Chez Francois
             <list-property name="paramBindings">
                 <structure>
                     <property name="paramName">invoiceOrganisationID</property>
-                    <expression name="expression">params["invoiceOrganisationID"]</expression>
+                    <expression name="expression">params["invoiceID"].organisationID</expression>
                 </structure>
                 <structure>
                     <property name="paramName">invoiceInvoiceID</property>
-                    <expression name="expression">params["invoiceInvoiceID"]</expression>
+                    <expression name="expression">new Packages.java.math.BigDecimal(params["invoiceID"].invoiceID)</expression>
                 </structure>
                 <structure>
                     <property name="paramName">languageID</property>
@@ -402,6 +411,7 @@ result</expression>
                                         <row id="102">
                                             <cell id="103">
                                                 <data id="104">
+                                                    <property name="fontWeight">bold</property>
                                                     <property name="resultSetColumn">Company</property>
                                                 </data>
                                             </cell>
@@ -409,6 +419,7 @@ result</expression>
                                         <row id="107">
                                             <cell id="108">
                                                 <data id="109">
+                                                    <property name="fontWeight">bold</property>
                                                     <property name="resultSetColumn">result = "";
 if (!"".equals(row["Name"]))
 	result = row["Name"]+", ";
@@ -420,6 +431,7 @@ result</property>
                                         <row id="110">
                                             <cell id="111">
                                                 <data id="112">
+                                                    <property name="fontWeight">bold</property>
                                                     <property name="resultSetColumn">Address</property>
                                                 </data>
                                             </cell>
@@ -427,6 +439,7 @@ result</property>
                                         <row id="113">
                                             <cell id="114">
                                                 <data id="115">
+                                                    <property name="fontWeight">bold</property>
                                                     <property name="resultSetColumn">row["PostCode"]+" "+row["City"]</property>
                                                 </data>
                                             </cell>
@@ -475,11 +488,11 @@ result</property>
             <list-property name="paramBindings">
                 <structure>
                     <property name="paramName">invoiceOrganisationID</property>
-                    <expression name="expression">params["invoiceOrganisationID"]</expression>
+                    <expression name="expression">params["invoiceID"].organisationID</expression>
                 </structure>
                 <structure>
                     <property name="paramName">invoiceInvoiceID</property>
-                    <expression name="expression">params["invoiceInvoiceID"]</expression>
+                    <expression name="expression">new Packages.java.math.BigDecimal(params["invoiceID"].invoiceID)</expression>
                 </structure>
                 <structure>
                     <property name="paramName">languageID</property>
@@ -487,7 +500,7 @@ result</property>
                 </structure>
                 <structure>
                     <property name="paramName">invoiceIDPrefix</property>
-                    <expression name="expression">params["invoiceIDPrefix"]</expression>
+                    <expression name="expression">params["invoiceID"].invoiceIDPrefix</expression>
                 </structure>
             </list-property>
             <list-property name="boundDataColumns">

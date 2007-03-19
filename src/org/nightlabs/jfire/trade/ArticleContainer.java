@@ -75,16 +75,4 @@ public interface ArticleContainer
 	 * @return Returns the <code>User</code> who is responsible for creation of this <code>ArticleContainer</code>.
 	 */
 	User getCreateUser();
-	
-//	/**
-//	 * adds an {@link ArticleContainerListener} to listen for article changes
-//	 * @param listener the {@link ArticleContainerListener} to add
-//	 */
-//	void addArticleContainerListener(ArticleContainerListener listener);
-//
-//	/**
-//	 * removes an previously added {@link ArticleContainerListener}
-//	 * @param listener the {@link ArticleContainerListener} to remove
-//	 */	
-//	void removeArticleContainerListener(ArticleContainerListener listener);
 }

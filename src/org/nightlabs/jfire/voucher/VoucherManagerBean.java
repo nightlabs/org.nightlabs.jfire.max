@@ -18,6 +18,7 @@ import javax.jdo.JDODetachedFieldAccessException;
 import javax.jdo.JDOHelper;
 import javax.jdo.JDOObjectNotFoundException;
 import javax.jdo.PersistenceManager;
+import javax.jdo.Query;
 
 import org.apache.log4j.Logger;
 import org.nightlabs.ModuleException;
@@ -28,6 +29,7 @@ import org.nightlabs.jfire.accounting.gridpriceconfig.IResultPriceConfig;
 import org.nightlabs.jfire.accounting.gridpriceconfig.PriceCalculator;
 import org.nightlabs.jfire.accounting.priceconfig.AffectedProductType;
 import org.nightlabs.jfire.accounting.priceconfig.PriceConfigUtil;
+import org.nightlabs.jfire.accounting.priceconfig.id.PriceConfigID;
 import org.nightlabs.jfire.base.BaseSessionBeanImpl;
 import org.nightlabs.jfire.organisation.Organisation;
 import org.nightlabs.jfire.security.User;
@@ -38,7 +40,15 @@ import org.nightlabs.jfire.store.deliver.DeliveryConfiguration;
 import org.nightlabs.jfire.store.deliver.ModeOfDelivery;
 import org.nightlabs.jfire.store.deliver.id.ModeOfDeliveryID;
 import org.nightlabs.jfire.store.id.ProductTypeID;
+import org.nightlabs.jfire.trade.Article;
+import org.nightlabs.jfire.trade.ArticleCreator;
+import org.nightlabs.jfire.trade.Offer;
+import org.nightlabs.jfire.trade.Order;
+import org.nightlabs.jfire.trade.Segment;
 import org.nightlabs.jfire.trade.Trader;
+import org.nightlabs.jfire.trade.id.OfferID;
+import org.nightlabs.jfire.trade.id.SegmentID;
+import org.nightlabs.jfire.voucher.accounting.VoucherPriceConfig;
 import org.nightlabs.jfire.voucher.store.VoucherType;
 import org.nightlabs.jfire.voucher.store.VoucherTypeActionHandler;
 
@@ -106,6 +116,10 @@ implements SessionBean
 			moduleMetaData = (ModuleMetaData) pm.makePersistent(moduleMetaData);
 
 			User user = User.getUser(pm, getPrincipal());
+
+			VoucherTypeActionHandler voucherTypeActionHandler = new VoucherTypeActionHandler(
+					Organisation.DEVIL_ORGANISATION_ID, VoucherTypeActionHandler.class.getName(), VoucherType.class);
+			pm.makePersistent(voucherTypeActionHandler);
 
 //		 create a default DeliveryConfiguration with all default ModeOfDelivery s
 			DeliveryConfiguration deliveryConfiguration = new DeliveryConfiguration(
@@ -181,6 +195,40 @@ implements SessionBean
 		PersistenceManager pm = getPersistenceManager();
 		try {
 			return NLJDOHelper.getDetachedObjectList(pm, voucherTypeIDs, VoucherType.class, fetchGroups, maxFetchDepth);
+		} finally {
+			pm.close();
+		}
+	}
+
+	/**
+	 * @ejb.interface-method
+	 * @ejb.transaction type="Supports"
+	 * @ejb.permission role-name="_Guest_"
+	 */
+	@SuppressWarnings("unchecked")
+	public Set<PriceConfigID> getVoucherPriceConfigIDs()
+	{
+		PersistenceManager pm = getPersistenceManager();
+		try {
+			Query q = pm.newQuery(VoucherPriceConfig.class);
+			q.setResult("JDOHelper.getObjectId(this)");
+			return new HashSet<PriceConfigID>((Collection)q.execute());
+		} finally {
+			pm.close();
+		}
+	}
+
+	/**
+	 * @ejb.interface-method
+	 * @ejb.transaction type="Supports"
+	 * @ejb.permission role-name="_Guest_"
+	 */
+	@SuppressWarnings("unchecked")
+	public List<VoucherPriceConfig> getVoucherPriceConfigs(Collection<PriceConfigID> voucherPriceConfigIDs, String[] fetchGroups, int maxFetchDepth)
+	{
+		PersistenceManager pm = getPersistenceManager();
+		try {
+			return NLJDOHelper.getDetachedObjectList(pm, voucherPriceConfigIDs, VoucherPriceConfig.class, fetchGroups, maxFetchDepth);
 		} finally {
 			pm.close();
 		}
@@ -279,6 +327,77 @@ implements SessionBean
 				return null;
 
 			return (VoucherType) pm.detachCopy(pm.getObjectById(JDOHelper.getObjectId(voucherType)));
+		} finally {
+			pm.close();
+		}
+	}
+
+	/**
+	 * @return <tt>Collection</tt> of {@link org.nightlabs.jfire.trade.Article}
+	 * @throws org.nightlabs.jfire.store.NotAvailableException in case there are not enough <tt>Voucher</tt>s available and the <tt>Product</tt>s cannot be created (because of a limit). 
+	 *
+	 * @ejb.interface-method
+	 * @ejb.permission role-name="_Guest_"
+	 * @ejb.transaction type = "Required"
+	 */
+	public Collection<Article> createArticles(
+			SegmentID segmentID,
+			OfferID offerID,
+			ProductTypeID productTypeID,
+			int quantity,
+			String[] fetchGroups, int maxFetchDepth)
+	throws ModuleException
+	{
+		PersistenceManager pm = getPersistenceManager();
+		try {
+			Trader trader = Trader.getTrader(pm);
+			Store store = Store.getStore(pm);
+			Segment segment = (Segment) pm.getObjectById(segmentID);
+			Order order = segment.getOrder();
+
+			User user = User.getUser(pm, getPrincipal());
+
+			pm.getExtent(VoucherType.class);
+			ProductType pt = (ProductType) pm.getObjectById(productTypeID);
+			if (!(pt instanceof VoucherType))
+				throw new IllegalArgumentException("productTypeID \""+productTypeID+"\" specifies a ProductType of type \""+pt.getClass().getName()+"\", but must be \""+VoucherType.class.getName()+"\"!");
+			
+			VoucherType voucherType = (VoucherType)pt;
+
+			// find an Offer within the Order which is not finalized - or create one
+			Offer offer;
+			if (offerID == null) {
+				Collection offers = Offer.getNonFinalizedOffers(pm, order);
+				if (!offers.isEmpty()) {
+					offer = (Offer) offers.iterator().next();
+				}
+				else {
+					offer = trader.createOffer(user, order, null); // TODO offerIDPrefix ???
+				}
+			}
+			else {
+				pm.getExtent(Offer.class);
+				offer = (Offer) pm.getObjectById(offerID);
+			}
+
+			// find / create Products
+			NestedProductType pseudoNestedPT = null;
+			if (quantity != 1)
+				pseudoNestedPT = new NestedProductType(null, voucherType, quantity);
+
+			Collection products = store.findProducts(user, voucherType, pseudoNestedPT, null);
+
+			Collection articles = trader.createArticles(
+					user, offer, segment,
+					products,
+					new ArticleCreator(null),
+					true, false, true);
+
+			pm.getFetchPlan().setMaxFetchDepth(maxFetchDepth);
+			if (fetchGroups != null)
+				pm.getFetchPlan().setGroups(fetchGroups);
+
+			return pm.detachCopyAll(articles);
 		} finally {
 			pm.close();
 		}

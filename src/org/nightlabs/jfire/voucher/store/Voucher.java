@@ -4,8 +4,10 @@ import org.nightlabs.annotation.Implement;
 import org.nightlabs.jfire.security.User;
 import org.nightlabs.jfire.store.NestedProductType;
 import org.nightlabs.jfire.store.Product;
+import org.nightlabs.jfire.store.ProductLocal;
 import org.nightlabs.jfire.store.ProductLocator;
 import org.nightlabs.jfire.store.ProductType;
+import org.nightlabs.jfire.store.Repository;
 
 /**
  * @author Marco Schulze - marco at nightlabs dot de
@@ -39,5 +41,11 @@ extends Product
 	public ProductLocator getProductLocator(User user, NestedProductType nestedProductType)
 	{
 		return null;
+	}
+
+	@Override
+	protected ProductLocal createProductLocal(User user, Repository initialRepository)
+	{
+		return new VoucherLocal(user, this, initialRepository);
 	}
 }

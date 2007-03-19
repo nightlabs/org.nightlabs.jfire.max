@@ -37,7 +37,6 @@ import javax.ejb.CreateException;
 import javax.ejb.EJBException;
 import javax.ejb.SessionBean;
 import javax.ejb.SessionContext;
-import javax.jdo.JDOHelper;
 import javax.jdo.PersistenceManager;
 
 import org.apache.log4j.Logger;
@@ -48,7 +47,6 @@ import org.nightlabs.jdo.moduleregistry.ModuleMetaData;
 import org.nightlabs.jfire.base.BaseSessionBeanImpl;
 import org.nightlabs.jfire.idgenerator.IDGenerator;
 import org.nightlabs.jfire.scripting.id.ScriptParameterSetID;
-import org.nightlabs.jfire.scripting.id.ScriptRegistryID;
 import org.nightlabs.jfire.scripting.id.ScriptRegistryItemID;
 
 /**
@@ -146,7 +144,6 @@ implements SessionBean
 			ScriptRegistryItemID scriptRegistryItemID,
 			String[] fetchGroups, int maxFetchDepth
 		)
-	throws ModuleException
 	{
 		PersistenceManager pm;
 		pm = getPersistenceManager();
@@ -174,7 +171,6 @@ implements SessionBean
 			List<ScriptRegistryItemID> scriptRegistryItemIDs,
 			String[] fetchGroups, int maxFetchDepth
 		)
-	throws ModuleException
 	{
 		PersistenceManager pm;
 		pm = getPersistenceManager();
@@ -206,7 +202,6 @@ implements SessionBean
 			String organisationID,
 			String[] fetchGroups, int maxFetchDepth
 		)
-	throws ModuleException
 	{
 		PersistenceManager pm;
 		pm = getPersistenceManager();
@@ -233,7 +228,6 @@ implements SessionBean
 	 * @ejb.transaction type = "Required"
 	 */
 	public Collection<ScriptRegistryItemCarrier> getTopLevelScriptRegistryItemCarriers (String organisationID)
-	throws ModuleException
 	{
 		PersistenceManager pm;
 		pm = getPersistenceManager();
@@ -290,7 +284,6 @@ implements SessionBean
 			boolean get,
 			String[] fetchGroups, int maxFetchDepth
 		)
-	throws ModuleException
 	{
 		PersistenceManager pm;
 		pm = getPersistenceManager();
@@ -312,7 +305,6 @@ implements SessionBean
 			String organisationID, 
 			String[] fetchGroups, int maxFetchDepth
 		)
-	throws ModuleException
 	{
 		PersistenceManager pm;
 		pm = getPersistenceManager();
@@ -344,7 +336,6 @@ implements SessionBean
 			ScriptParameterSetID scriptParameterSetID, 
 			String[] fetchGroups, int maxFetchDepth
 		)
-	throws ModuleException
 	{
 		PersistenceManager pm;
 		pm = getPersistenceManager();
@@ -359,6 +350,39 @@ implements SessionBean
 		}
 	}
 	
+	/**
+	 * Returns the {@link ScriptParameterSet}s associated with the
+	 * {@link ScriptRegistryItem}s referenced by the given {@link ScriptRegistryItemID}s.
+	 * 
+	 * @throws ModuleException
+	 *
+	 * @ejb.interface-method
+	 * @ejb.permission role-name="_Guest_"
+	 * @ejb.transaction type = "Required"
+	 */
+	@SuppressWarnings("unchecked")
+	public Collection<ScriptParameterSet> getScriptParameterSets(
+			Collection<ScriptRegistryItemID> scriptParameterSetID, 
+			String[] fetchGroups, int maxFetchDepth
+		)
+	{
+		PersistenceManager pm;
+		pm = getPersistenceManager();
+		try {			
+			pm.getFetchPlan().setMaxFetchDepth(maxFetchDepth);
+			if (fetchGroups != null)
+				pm.getFetchPlan().setGroups(fetchGroups);
+			Collection<ScriptParameterSet> parameterSets = new HashSet<ScriptParameterSet>();
+			for (ScriptRegistryItemID itemID : scriptParameterSetID) {
+				ScriptRegistryItem item = (ScriptRegistryItem) pm.getObjectById(itemID);
+				if (item.getParameterSet() != null)
+					parameterSets.add(item.getParameterSet());				
+			}
+			return (Collection<ScriptParameterSet>)pm.detachCopyAll(parameterSets);
+		} finally {
+			pm.close();
+		}
+	}
 	
 	/**
 	 * @throws ModuleException
@@ -368,7 +392,6 @@ implements SessionBean
 	 * @ejb.transaction type="Required"
 	 */
 	public ScriptParameterSet createParameterSet (I18nText name, String[] fetchGroups, int maxFetchDepth)
-	throws ModuleException
 	{
 		PersistenceManager pm;
 		pm = getPersistenceManager();
@@ -399,7 +422,6 @@ implements SessionBean
 			boolean get,
 			String[] fetchGroups, int maxFetchDepth
 		)
-	throws ModuleException
 	{
 		PersistenceManager pm;
 		pm = getPersistenceManager();
@@ -423,7 +445,6 @@ implements SessionBean
 	 */
 	public Collection<ScriptRegistryItemCarrier> getTopLevelScriptRegistryItemCarriers (
 			String organisationID, String scriptRegistryItemType)
-	throws ModuleException
 	{
 		PersistenceManager pm;
 		pm = getPersistenceManager();
@@ -449,7 +470,6 @@ implements SessionBean
 	 * @ejb.transaction type = "Required"
 	 */	
 	public ScriptRegistry getScriptRegistry(String[] fetchGroups, int maxFetchDepth)
-	throws ModuleException
 	{
 		PersistenceManager pm;
 		pm = getPersistenceManager();
@@ -472,7 +492,6 @@ implements SessionBean
 	 * @ejb.transaction type = "Required"
 	 */	
 	public ScriptRegistry getScriptRegistry()
-	throws ModuleException
 	{
 		PersistenceManager pm;
 		pm = getPersistenceManager();

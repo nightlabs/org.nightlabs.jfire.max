@@ -57,7 +57,7 @@ import org.nightlabs.jfire.trade.CustomerGroup;
  *		detachable="true"
  *		table="JFireTrade_GridPriceConfig"
  *
- * @jdo.inheritance strategy="new-table"
+ * @jdo.inheritance strategy="superclass-table"
  *
  * @jdo.fetch-group name="GridPriceConfig.customerGroups" fields="customerGroups"
  * @jdo.fetch-group name="GridPriceConfig.tariffs" fields="tariffs"

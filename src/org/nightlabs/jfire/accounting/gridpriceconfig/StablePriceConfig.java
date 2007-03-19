@@ -55,7 +55,7 @@ import org.nightlabs.jfire.trade.CustomerGroup;
  *		detachable="true"
  *		table="JFireTrade_StablePriceConfig"
  *
- * @jdo.inheritance strategy="new-table"
+ * @jdo.inheritance strategy="superclass-table"
  *
  * @!jdo.query name="getPriceCellsForCustomerGroupAndCurrency" query="SELECT
  *		FROM org.nightlabs.jfire.accounting.gridpriceconfig.PriceCell 

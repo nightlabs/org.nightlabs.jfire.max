@@ -194,6 +194,11 @@ public class PriceConfigUtil
 	 * This method keeps track about adding and removing items to/from the stacks. Hence,
 	 * you can simply call this method without touching the parameters in your
 	 * <tt>IPriceConfig</tt>.
+	 * <p>
+	 * The new <tt>ArticlePrice</tt> stores the
+	 * original price iff priceID >= 0. Hence, if this price is
+	 * calculated dynamically, it must have the priceID -1.
+	 * </p>
 	 *
 	 * @param topLevelPriceConfig This <tt>IPriceConfig</tt> will create the ID for the new <tt>ArticlePrice</tt>.
 	 */

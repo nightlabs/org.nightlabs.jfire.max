@@ -28,6 +28,8 @@ package org.nightlabs.jfire.accounting;
 
 import java.io.Serializable;
 
+import org.nightlabs.util.Utils;
+
 /**
  * @author Marco Schulze - marco at nightlabs dot de
  * 
@@ -43,8 +45,10 @@ import java.io.Serializable;
  * @jdo.inheritance strategy = "new-table"
  */
 public class Currency
-	implements Serializable, org.nightlabs.l10n.Currency
+implements Serializable, org.nightlabs.l10n.Currency
 {
+	private static final long serialVersionUID = 1L;
+
 	/**
 	 * This is the ISO or whatever standard for the currency. Usually a two or three-letter-abbreviation.
 	 *
@@ -103,5 +107,20 @@ public class Currency
 	public void setCurrencySymbol(String currencySymbol)
 	{
 		this.currencySymbol = currencySymbol;
+	}
+
+	@Override
+	public boolean equals(Object obj)
+	{
+		if (obj == this) return true;
+		if (!(obj instanceof Currency)) return false;
+		Currency o = (Currency) obj;
+		return Utils.equals(o.currencyID, this.currencyID);
+	}
+
+	@Override
+	public int hashCode()
+	{
+		return Utils.hashCode(currencyID);
 	}
 }

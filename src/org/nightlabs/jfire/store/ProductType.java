@@ -1201,23 +1201,23 @@ implements
 		return productAvailable;
 	}
 
-	/**
-	 * Your implementation of this method should check whether it can
-	 * return a <code>Product</code> in <code>provideAvailableProduct()</code>
-	 * or whether there's none available anymore.
-	 * <p>
-	 * If there is no <code>Product</code> available anymore, the <code>ProductType</code>
-	 * will be listed as not available (or even filtered out) in sale lists.
-	 * <p>
-	 * This method is only called while this <code>ProductType</code> is persistent. 
-	 */
-	protected abstract boolean _checkProductAvailability();
-
-	public boolean checkProductAvailability()
-	{
-		this.productAvailable = _checkProductAvailability();
-		return productAvailable;
-	}
+//	/**
+//	 * Your implementation of this method should check whether it can
+//	 * return a <code>Product</code> in <code>provideAvailableProduct()</code>
+//	 * or whether there's none available anymore.
+//	 * <p>
+//	 * If there is no <code>Product</code> available anymore, the <code>ProductType</code>
+//	 * will be listed as not available (or even filtered out) in sale lists.
+//	 * <p>
+//	 * This method is only called while this <code>ProductType</code> is persistent. 
+//	 */
+//	protected abstract boolean _checkProductAvailability();
+//
+//	public boolean checkProductAvailability()
+//	{
+//		this.productAvailable = _checkProductAvailability();
+//		return productAvailable;
+//	}
 
 	/**
 	 * @return Returns the inheritance nature: {@link #INHERITANCE_NATURE_BRANCH} or {@link #INHERITANCE_NATURE_LEAF}
@@ -1565,7 +1565,7 @@ implements
 
 	protected ProductTypeLocal createProductTypeLocal(User user, Anchor home)
 	{
-		return new ProductTypeLocal(this, home); // self-registering
+		return new ProductTypeLocal(user, this, home); // self-registering
 	}
 
 	@Override

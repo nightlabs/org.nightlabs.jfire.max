@@ -60,6 +60,7 @@ import org.nightlabs.util.Utils;
  *		table="JFireTrade_PriceConfig"
  *
  * @jdo.inheritance strategy="new-table"
+ * @jdo.inheritance-discriminator strategy="class-name"
  *
  * @jdo.create-objectid-class field-order="organisationID, priceConfigID"
  *
@@ -78,7 +79,7 @@ public abstract class PriceConfig implements Serializable, StoreCallback, IPrice
 	public static long createPriceConfigID() {
 		return IDGenerator.nextID(PriceConfig.class);
 	}
-	
+
 	/**
 	 * @jdo.field primary-key="true"
 	 * @jdo.column length="100"
@@ -102,7 +103,11 @@ public abstract class PriceConfig implements Serializable, StoreCallback, IPrice
 
 //	protected PriceConfig extendedPriceConfig = null;
 
+	/**
+	 * @deprecated Only for JDO!
+	 */
 	protected PriceConfig() { }
+
 	public PriceConfig(String organisationID, long priceConfigID)
 	{
 		if (organisationID == null)
@@ -292,12 +297,12 @@ public abstract class PriceConfig implements Serializable, StoreCallback, IPrice
 //	public abstract ArticlePrice getPrice(ProductInfo productInfo, LegalEntity customer, Currency currency);
 
 	/**
-	 * This method sets the ArticlePrice of a product in a certain context in the offerItem. 
-	 * The context is defined by offerItem, which knows the product, the customer and all the
+	 * This method sets the ArticlePrice of a product in a certain context in the <code>article</code>. 
+	 * The context is defined by <code>article</code>, which knows the product, the customer and all the
 	 * other items in the offer and even the whole order.
 	 * <p>
-	 * The returned ArticlePrice should contain nested OfferItemPrices according to
-	 * the packaging-structure of the top-level product within the offerItem
+	 * The returned ArticlePrice should contain nested {@link ArticlePrice}s according to
+	 * the packaging-structure of the top-level product within the <code>article</code>.
 	 * </p>
 	 * <p>
 	 * In a simple PriceConfig, the result is usually dependent only on the customer
@@ -309,11 +314,14 @@ public abstract class PriceConfig implements Serializable, StoreCallback, IPrice
 	 * twice whenever it is validated. If the second result does not match the first,
 	 * the offer is not valid and marked as not stable. Only if it is marked stable,
 	 * it can be finalized (and confirmed).
+	 * <p>
+	 * It's urgently recommended to delegate to
+	 * {@link PriceConfigUtil#createArticlePrice(IPackagePriceConfig, Article, org.nightlabs.jfire.accounting.Price)}
+	 * </p>
+	 *
 	 * @param article
-	 * @return TODO
-	 * @return The ArticlePrice for this offerItem already with nested offerItemPrices nested 
-	 * accordingly to packaging-structure of the top-level offerItem product.
-	 * 					
+	 * @return The ArticlePrice for this <code>article</code> NOT YET with nested {@link ArticlePrice}s. They're
+	 *		filled later.
 	 */
 	public abstract ArticlePrice createArticlePrice(Article article);
 	

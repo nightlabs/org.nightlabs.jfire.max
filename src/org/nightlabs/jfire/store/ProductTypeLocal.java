@@ -28,6 +28,7 @@ package org.nightlabs.jfire.store;
 
 import java.io.Serializable;
 
+import org.nightlabs.jfire.security.User;
 import org.nightlabs.jfire.transfer.Anchor;
 
 /**
@@ -46,6 +47,8 @@ import org.nightlabs.jfire.transfer.Anchor;
 public class ProductTypeLocal
 implements Serializable
 {
+	private static final long serialVersionUID = 1L;
+
 	/**
 	 * @jdo.field primary-key="true"
 	 * @jdo.column length="100"
@@ -73,7 +76,8 @@ implements Serializable
 	 */
 	protected ProductTypeLocal() { }
 
-	public ProductTypeLocal(ProductType productType, Anchor home)
+	// TODO we should pass the user here and store it somehow
+	public ProductTypeLocal(User user, ProductType productType, Anchor home)
 	{
 		if (productType == null)
 			throw new IllegalArgumentException("productType must not be null!");

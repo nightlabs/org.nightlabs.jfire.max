@@ -44,6 +44,8 @@ public class ParameterMetaData implements NamedParameterMetaData, Serializable {
 		private int scale;
 		private int nullable;
 		
+		private String realDataTypeName;
+		
 		/**
 		 * @return the dataType
 		 */
@@ -128,7 +130,22 @@ public class ParameterMetaData implements NamedParameterMetaData, Serializable {
 		public void setParameterName(String parameterName) {
 			this.parameterName = parameterName;
 		}
-				
+		
+		/**
+		 * The realDataTypeName can be used to store the original 
+		 * type name (which might have been a class name).
+		 * 
+		 * @return the realDataTypeName
+		 */
+		public String getRealDataTypeName() {
+			return realDataTypeName;
+		}
+		/**
+		 * @param realDataTypeName the realDataTypeName to set
+		 */
+		public void setRealDataTypeName(String realDataTypeName) {
+			this.realDataTypeName = realDataTypeName;
+		}
 	}
 	
 	private List<ParameterDescriptor> parameters = new ArrayList<ParameterDescriptor>();
@@ -141,7 +158,7 @@ public class ParameterMetaData implements NamedParameterMetaData, Serializable {
 		return parameters.size();
 	}
 
-	private ParameterDescriptor getDescriptor(int pPosition) {
+	public ParameterDescriptor getDescriptor(int pPosition) {
 		int pIdx = pPosition -1;
 		if (pIdx >= parameters.size() || pIdx < 0)
 			throw new IllegalArgumentException("No parameter at index "+pPosition+" can be found in this ParameterMetaData set.");
@@ -240,6 +257,7 @@ public class ParameterMetaData implements NamedParameterMetaData, Serializable {
 			descriptor.setDataType(dataType);
 			descriptor.setDataTypeName(DataType.getTypeName(dataType));
 			descriptor.setParameterName(parameter.getScriptParameterID());
+			descriptor.setRealDataTypeName(parameter.getScriptParameterClassName());
 			result.addParameterDescriptor(descriptor);
 		}
 		if (logger.isDebugEnabled()) {

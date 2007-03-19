@@ -8,8 +8,10 @@ import javax.jdo.JDOObjectNotFoundException;
 import javax.jdo.PersistenceManager;
 import javax.jdo.Query;
 
+import org.nightlabs.annotation.Implement;
 import org.nightlabs.jfire.security.User;
 import org.nightlabs.jfire.store.NestedProductType;
+import org.nightlabs.jfire.store.Product;
 import org.nightlabs.jfire.store.ProductLocator;
 import org.nightlabs.jfire.store.ProductType;
 import org.nightlabs.jfire.store.ProductTypeActionHandler;
@@ -124,11 +126,13 @@ public class SimpleProductTypeActionHandler
 		super(organisationID, productTypeActionHandlerID, productTypeClass);
 	}
 
-	@Override
-	public Collection findProducts(User user,
+	@SuppressWarnings("unchecked")
+	@Implement
+	public Collection<Product> findProducts(User user,
 			ProductType productType, NestedProductType nestedProductType, ProductLocator productLocator)
 	{
 		SimpleProductType spt = (SimpleProductType) productType;
+		SimpleProductTypeLocal sptl = (SimpleProductTypeLocal) productType.getProductTypeLocal();
 		int qty = nestedProductType == null ? 1 : nestedProductType.getQuantity();
 		PersistenceManager pm = getPersistenceManager();
 
@@ -150,10 +154,10 @@ public class SimpleProductTypeActionHandler
 			else {
 				// create products only if this product type is ours
 				if (productType.getOrganisationID().equals(store.getOrganisationID())) {
-					long createdProductCount = spt.getCreatedProductCount();
-					if (spt.getMaxProductCount() < 0 || createdProductCount + 1 <= spt.getMaxProductCount()) {
+					long createdProductCount = sptl.getCreatedProductCount();
+					if (sptl.getMaxProductCount() < 0 || createdProductCount + 1 <= sptl.getMaxProductCount()) {
 						product = new SimpleProduct(spt, SimpleProduct.createProductID());
-						spt.setCreatedProductCount(createdProductCount + 1);
+						sptl.setCreatedProductCount(createdProductCount + 1);
 
 						store.addProduct(user, product, (Repository)spt.getProductTypeLocal().getHome());
 						res.add(product);

@@ -39,9 +39,12 @@ import org.nightlabs.inheritance.Inheritable;
 import org.nightlabs.inheritance.InheritableFieldInheriter;
 import org.nightlabs.jfire.accounting.gridpriceconfig.PriceCalculationException;
 import org.nightlabs.jfire.accounting.gridpriceconfig.PriceCalculator;
+import org.nightlabs.jfire.security.User;
 import org.nightlabs.jfire.store.ProductType;
+import org.nightlabs.jfire.store.ProductTypeLocal;
 import org.nightlabs.jfire.store.id.ProductTypeID;
 import org.nightlabs.jfire.trade.LegalEntity;
+import org.nightlabs.jfire.transfer.Anchor;
 
 /**
  * @author Marco Schulze - marco at nightlabs dot de
@@ -128,23 +131,23 @@ public class SimpleProductType extends ProductType
 	 */
 	private SimpleProductTypeName name;
 
-	/**
-	 * If <tt>maxProductCount</tt> has a value <tt>&gt;=0</tt>, this is the maximum number of
-	 * <tt>Product</tt>s that can be created and sold, To have an unlimited amount of
-	 * <tt>Product</tt>s available, set this to <tt>-1</tt>.
-	 *
-	 * @jdo.field persistence-modifier="persistent"
-	 */
-	private long maxProductCount = -1;
-	
-	/**
-	 * Keeps track, how many <tt>Product</tt>s have already been created. If this number
-	 * reaches <tt>maxProductCount</tt> and <tt>maxProductCount</tt> is a positive number,
-	 * the {@link SimpleProductTypeActionHandler} will stop to create new <tt>SimpleProduct</tt>s.
-	 *
-	 * @jdo.field persistence-modifier="persistent"
-	 */
-	private long createdProductCount = 0;
+//	/**
+//	 * If <tt>maxProductCount</tt> has a value <tt>&gt;=0</tt>, this is the maximum number of
+//	 * <tt>Product</tt>s that can be created and sold, To have an unlimited amount of
+//	 * <tt>Product</tt>s available, set this to <tt>-1</tt>.
+//	 *
+//	 * @jdo.field persistence-modifier="persistent"
+//	 */
+//	private long maxProductCount = -1;
+//	
+//	/**
+//	 * Keeps track, how many <tt>Product</tt>s have already been created. If this number
+//	 * reaches <tt>maxProductCount</tt> and <tt>maxProductCount</tt> is a positive number,
+//	 * the {@link SimpleProductTypeActionHandler} will stop to create new <tt>SimpleProduct</tt>s.
+//	 *
+//	 * @jdo.field persistence-modifier="persistent"
+//	 */
+//	private long createdProductCount = 0;
 
 	/**
 	 * @return Returns the name.
@@ -152,6 +155,12 @@ public class SimpleProductType extends ProductType
 	public I18nText getName()
 	{
 		return name;
+	}
+
+	@Override
+	protected ProductTypeLocal createProductTypeLocal(User user, Anchor home)
+	{
+		return new SimpleProductTypeLocal(user, this, home);
 	}
 
 //	/**
@@ -186,18 +195,19 @@ public class SimpleProductType extends ProductType
 //		return newProduct;
 //	}
 
-	/**
-	 * @see org.nightlabs.jfire.store.ProductType#_checkProductAvailability()
-	 */
-	protected boolean _checkProductAvailability()
-	{
-		if (maxProductCount >= 0) {
-			if (createdProductCount >= maxProductCount)
-				return false;
-		}
+//	/**
+//	 * @see org.nightlabs.jfire.store.ProductType#_checkProductAvailability()
+//	 */
+//	protected boolean _checkProductAvailability()
+//	{
+//		if (maxProductCount >= 0) {
+//			if (createdProductCount >= maxProductCount)
+//				return false;
+//		}
+//
+//		return true;
+//	}
 
-		return true;
-	}
 //	/**
 //	 * WORKAROUND Because of a JPOX bug, we have to re-set the member extendedProductType in the EJBean.
 //	 * 
@@ -207,34 +217,36 @@ public class SimpleProductType extends ProductType
 //	{
 //		super.setExtendedProductType(extendedProductType);
 //	}
-	/**
-	 * @return Returns the createdProductCount.
-	 */
-	public long getCreatedProductCount()
-	{
-		return createdProductCount;
-	}
-	/**
-	 * @param createdProductCount The createdProductCount to set.
-	 */
-	public void setCreatedProductCount(long createdProductCount)
-	{
-		this.createdProductCount = createdProductCount;
-	}
-	/**
-	 * @return Returns the maxProductCount.
-	 */
-	public long getMaxProductCount()
-	{
-		return maxProductCount;
-	}
-	/**
-	 * @param maxProductCount The maxProductCount to set.
-	 */
-	public void setMaxProductCount(long maxProductCount)
-	{
-		this.maxProductCount = maxProductCount;
-	}
+
+
+//	/**
+//	 * @return Returns the createdProductCount.
+//	 */
+//	public long getCreatedProductCount()
+//	{
+//		return createdProductCount;
+//	}
+//	/**
+//	 * @param createdProductCount The createdProductCount to set.
+//	 */
+//	public void setCreatedProductCount(long createdProductCount)
+//	{
+//		this.createdProductCount = createdProductCount;
+//	}
+//	/**
+//	 * @return Returns the maxProductCount.
+//	 */
+//	public long getMaxProductCount()
+//	{
+//		return maxProductCount;
+//	}
+//	/**
+//	 * @param maxProductCount The maxProductCount to set.
+//	 */
+//	public void setMaxProductCount(long maxProductCount)
+//	{
+//		this.maxProductCount = maxProductCount;
+//	}
 
 
 	// ******************************

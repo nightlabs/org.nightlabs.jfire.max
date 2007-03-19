@@ -97,6 +97,7 @@ import org.nightlabs.jfire.trade.Order;
 import org.nightlabs.jfire.trade.Segment;
 import org.nightlabs.jfire.trade.Trader;
 import org.nightlabs.jfire.trade.id.CustomerGroupID;
+import org.nightlabs.jfire.trade.id.OfferID;
 import org.nightlabs.jfire.trade.id.SegmentID;
 
 
@@ -666,6 +667,7 @@ implements SessionBean
 	 */
 	public Collection createArticles(
 			SegmentID segmentID,
+			OfferID offerID,
 			ProductTypeID productTypeID,
 			int quantity,
 			TariffID tariffID, String[] fetchGroups, int maxFetchDepth)
@@ -690,13 +692,19 @@ implements SessionBean
 			Tariff tariff = (Tariff) pm.getObjectById(tariffID);
 
 			// find an Offer within the Order which is not finalized - or create one
-			Collection offers = Offer.getNonFinalizedOffers(pm, order);
 			Offer offer;
-			if (!offers.isEmpty()) {
-				offer = (Offer) offers.iterator().next();
+			if (offerID == null) {
+				Collection offers = Offer.getNonFinalizedOffers(pm, order);
+				if (!offers.isEmpty()) {
+					offer = (Offer) offers.iterator().next();
+				}
+				else {
+					offer = trader.createOffer(user, order, null); // TODO offerIDPrefix ???
+				}
 			}
 			else {
-				offer = trader.createOffer(user, order, null); // TODO offerIDPrefix ???
+				pm.getExtent(Offer.class);
+				offer = (Offer) pm.getObjectById(offerID);
 			}
 
 			// find / create Products

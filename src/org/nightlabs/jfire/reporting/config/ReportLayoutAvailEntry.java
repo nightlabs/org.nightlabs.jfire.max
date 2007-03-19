@@ -48,6 +48,8 @@ import org.nightlabs.jfire.reporting.layout.id.ReportRegistryItemID;
  */
 public class ReportLayoutAvailEntry implements Serializable {
 	
+	private static final long serialVersionUID = 1L;
+
 	/**
 	 * @jdo.field persistence-modifier="persistent"
 	 */

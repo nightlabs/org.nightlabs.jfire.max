@@ -42,6 +42,8 @@ import org.nightlabs.jfire.reporting.layout.id.ReportRegistryItemID;
  */
 public class ReportRegistryItemCarrier implements Serializable {
 
+	private static final long serialVersionUID = 1L;
+
 	/**
 	 * 
 	 */

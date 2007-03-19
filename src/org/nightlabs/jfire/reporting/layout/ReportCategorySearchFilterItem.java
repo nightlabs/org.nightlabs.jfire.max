@@ -37,6 +37,8 @@ import org.nightlabs.jdo.search.SearchFilterItem;
  */
 public class ReportCategorySearchFilterItem extends SearchFilterItem {
 
+	private static final long serialVersionUID = 1L;
+	
 	public static final int INTERNAL_FILTER_BOTH = 0;
 	public static final int INTERNAL_FILTER_INTERNAL = 1;
 	public static final int INTERNAL_FILTER__NOT_INTERNAL = 2;

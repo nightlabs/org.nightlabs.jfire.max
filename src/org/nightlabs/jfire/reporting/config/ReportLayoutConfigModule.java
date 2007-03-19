@@ -30,7 +30,6 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.nightlabs.jfire.config.Config;
 import org.nightlabs.jfire.config.ConfigModule;
 import org.nightlabs.jfire.reporting.layout.id.ReportRegistryItemID;
 
@@ -46,6 +45,9 @@ import org.nightlabs.jfire.reporting.layout.id.ReportRegistryItemID;
  * @jdo.inheritance strategy="new-table"
  */
 public class ReportLayoutConfigModule extends ConfigModule {
+
+	private static final long serialVersionUID = 1L;
+
 
 	/* (non-Javadoc)
 	 * @see org.nightlabs.jfire.config.ConfigModule#init()

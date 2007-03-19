@@ -26,8 +26,8 @@
 
 package org.nightlabs.jfire.reporting.layout.render;
 
-import java.io.ByteArrayInputStream;
 import java.io.File;
+import java.io.IOException;
 import java.io.InputStream;
 import java.util.Collection;
 import java.util.HashMap;
@@ -44,12 +44,11 @@ import org.eclipse.birt.report.engine.api.IReportRunnable;
 import org.eclipse.birt.report.engine.api.IRunAndRenderTask;
 import org.eclipse.birt.report.engine.api.IScalarParameterDefn;
 import org.eclipse.birt.report.engine.api.ReportEngine;
-import org.nightlabs.jfire.reporting.Birt;
 import org.nightlabs.jfire.reporting.JFireReportingHelper;
 import org.nightlabs.jfire.reporting.ReportingManagerFactory;
 import org.nightlabs.jfire.reporting.layout.ReportLayout;
 import org.nightlabs.jfire.reporting.layout.ReportRegistry;
-import org.nightlabs.jfire.reporting.layout.id.ReportRegistryItemID;
+import org.nightlabs.jfire.reporting.platform.ServerResourceLocator;
 
 /**
  * Helper to render reports on the server. Instances of {@link RenderManager}
@@ -134,31 +133,46 @@ public class RenderManager {
 		
 		ReportEngine reportEngine = factory.getReportEngine();
 		
-		InputStream inputStream = new ByteArrayInputStream(reportLayout.getReportDesign());
-//		Platform.
-		IReportRunnable report = reportEngine.openReportDesign(inputStream);
-		IRunAndRenderTask task = reportEngine.createRunAndRenderTask(report);
-	
-		ReportRegistry registry = ReportRegistry.getReportRegistry(pm);
-		ReportLayoutRenderer renderer = null; 
+		ServerResourceLocator.setCurrentReportLayout(reportLayout);
 		try {
-			renderer = registry.createReportRenderer(renderRequest.getOutputFormat());
-		} catch (Exception e) {
-			throw new EngineException("Could not create ReportLayoutRenderer for OutputFormat "+renderRequest.getOutputFormat(), e.getMessage());
-		}
-		
-		HashMap<String,Object> parsedParams = parseReportParams(reportEngine, report, renderRequest.getParameters());
-		renderRequest.setParameters(parsedParams);
-		
-		logger.debug("Have report renderer, delegating render work");
-		JFireReportingHelper.open(pm, false);
-		RenderedReportLayout result = null;
-		try {
-			result = renderer.renderReport(pm, renderRequest, task, fileName, layoutRoot, prepareForTransfer);
+
+			InputStream inputStream = reportLayout.createReportDesignInputStream();
+			IReportRunnable report = null;
+			try {
+				report = reportEngine.openReportDesign(inputStream);
+			} finally {
+				try {
+					inputStream.close();
+				} catch (IOException e) {
+					throw new RuntimeException(e);
+				}
+			}
+			IRunAndRenderTask task = reportEngine.createRunAndRenderTask(report);
+
+			ReportRegistry registry = ReportRegistry.getReportRegistry(pm);
+			ReportLayoutRenderer renderer = null; 
+			try {
+				renderer = registry.createReportRenderer(renderRequest.getOutputFormat());
+			} catch (Exception e) {
+				throw new EngineException("Could not create ReportLayoutRenderer for OutputFormat "+renderRequest.getOutputFormat(), e.getMessage());
+			}
+
+			HashMap<String,Object> parsedParams = parseReportParams(reportEngine, report, renderRequest.getParameters());
+			renderRequest.setParameters(parsedParams);
+
+			logger.debug("Have report renderer, delegating render work");
+			JFireReportingHelper.open(pm, false);
+			RenderedReportLayout result = null;
+			try {
+				result = renderer.renderReport(pm, renderRequest, task, fileName, layoutRoot, prepareForTransfer);
+			} finally {
+				JFireReportingHelper.close();
+			}
+			return result;
+			
 		} finally {
-			JFireReportingHelper.close();
+			ServerResourceLocator.setCurrentReportLayout(null);
 		}
-		return result;
 	}
 
 

@@ -38,6 +38,8 @@ import org.nightlabs.jdo.search.SearchFilter;
 public class ReportCategorySearchFilter extends SearchFilter {
 
 	
+	private static final long serialVersionUID = 1L;
+
 	protected ReportCategorySearchFilter() {
 		super(SearchFilter.CONJUNCTION_DEFAULT);
 	}

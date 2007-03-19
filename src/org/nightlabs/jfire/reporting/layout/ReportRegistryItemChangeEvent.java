@@ -47,6 +47,8 @@ import org.nightlabs.jfire.reporting.layout.id.ReportRegistryItemID;
  */
 public class ReportRegistryItemChangeEvent extends JDOObjectChangeEvent {
 
+	private static final long serialVersionUID = 1L;
+	
 	public static final String EVENT_TYPE_ITEM_ADDED = "itemAdded";
 	public static final String EVENT_TYPE_ITEM_MOVED = "itemMoved";
 	public static final String EVENT_TYPE_ITEM_DELETED = "itemDeleted";

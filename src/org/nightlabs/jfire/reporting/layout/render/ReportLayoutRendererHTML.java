@@ -41,6 +41,7 @@ public class ReportLayoutRendererHTML implements ReportLayoutRenderer {
 	 * (non-Javadoc)
 	 * @see org.nightlabs.jfire.reporting.layout.render.ReportLayoutRenderer#renderReport(javax.jdo.PersistenceManager, org.nightlabs.jfire.reporting.layout.render.RenderReportRequest, org.eclipse.birt.report.engine.api.IRunAndRenderTask, java.lang.String, java.io.File, boolean)
 	 */
+	@SuppressWarnings("unchecked")
 	public RenderedReportLayout renderReport(PersistenceManager pm,
 			RenderReportRequest renderRequest,
 			IRunAndRenderTask task,

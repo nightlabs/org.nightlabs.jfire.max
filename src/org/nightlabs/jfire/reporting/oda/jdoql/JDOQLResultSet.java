@@ -58,6 +58,7 @@ public class JDOQLResultSet extends ResultSet implements IResultSet {
 		}
 	}
 	
+	@SuppressWarnings("unchecked")
 	private void setMetaData(JDOQLResultSetMetaData guessedMetaData, Collection collection) {
 		setCollection(collection);
 		setIterator(getCollection().iterator());

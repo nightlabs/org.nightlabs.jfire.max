@@ -284,6 +284,7 @@ public class ValueAcquisitionSetup implements Serializable {
 	
 	
 	
+	@SuppressWarnings("unchecked")
 	public Map<String, ValueConsumerBinding> getValueConsumerBindings(ValueConsumer consumer) {
 		// TODO: Rewrite with generics when bcel bug fixed
 		if (consumer2Binding == null) {

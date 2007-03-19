@@ -39,6 +39,7 @@ import org.eclipse.birt.report.engine.api.HTMLRenderOption;
 import org.eclipse.birt.report.engine.api.ReportEngine;
 import org.nightlabs.jfire.reporting.layout.ReportLayout;
 import org.nightlabs.jfire.reporting.layout.render.RenderManager;
+import org.nightlabs.jfire.reporting.platform.ServerResourceLocator;
 
 /**
  * {@link ReportingManagerFactory} is the entry point for operations with 
@@ -108,7 +109,8 @@ public class ReportingManagerFactory implements Serializable {
 			hc.setImageHandler( imageHandler );
 //			 Associate the configuration with the HTML output format.
 			config.setEmitterConfiguration( HTMLRenderOption.OUTPUT_FORMAT_HTML, hc );			
-			reportEngine = new ReportEngine(config);				
+			reportEngine = new ReportEngine(config);
+			reportEngine.getConfig().setResourceLocator(new ServerResourceLocator());
 		}
 		return reportEngine;
 	}

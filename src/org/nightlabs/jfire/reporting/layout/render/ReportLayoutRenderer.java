@@ -4,16 +4,13 @@
 package org.nightlabs.jfire.reporting.layout.render;
 
 import java.io.File;
-import java.util.Map;
 
 import javax.jdo.PersistenceManager;
 
 import org.eclipse.birt.report.engine.api.EngineException;
 import org.eclipse.birt.report.engine.api.IRunAndRenderTask;
-import org.nightlabs.jfire.reporting.Birt;
 import org.nightlabs.jfire.reporting.Birt.OutputFormat;
 import org.nightlabs.jfire.reporting.layout.ReportRegistry;
-import org.nightlabs.jfire.reporting.layout.id.ReportRegistryItemID;
 
 /**
  * ReportLayoutRenderer are responsible for rendering a report to a specific

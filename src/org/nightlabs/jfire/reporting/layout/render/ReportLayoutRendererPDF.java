@@ -40,6 +40,7 @@ public class ReportLayoutRendererPDF implements ReportLayoutRenderer {
 	 * (non-Javadoc)
 	 * @see org.nightlabs.jfire.reporting.layout.render.ReportLayoutRenderer#renderReport(javax.jdo.PersistenceManager, org.nightlabs.jfire.reporting.layout.id.ReportRegistryItemID, org.eclipse.birt.report.engine.api.IRunAndRenderTask, java.util.Map, org.nightlabs.jfire.reporting.Birt.OutputFormat, java.lang.String, java.io.File, boolean)
 	 */
+	@SuppressWarnings("unchecked")
 	public RenderedReportLayout renderReport(PersistenceManager pm,
 			RenderReportRequest renderRequest,
 			IRunAndRenderTask task,

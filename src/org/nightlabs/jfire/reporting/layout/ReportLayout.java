@@ -26,15 +26,21 @@
 
 package org.nightlabs.jfire.reporting.layout;
 
+import java.io.ByteArrayInputStream;
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
 import java.util.Date;
-
-import javax.jdo.JDOHelper;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.zip.DeflaterOutputStream;
+import java.util.zip.InflaterInputStream;
 
 import org.apache.log4j.Logger;
 import org.nightlabs.io.DataBuffer;
-import org.nightlabs.jfire.reporting.layout.id.ReportRegistryItemID;
+import org.nightlabs.util.Utils;
 
 /**
  * A ReportLayout holds the BIRT report definition.
@@ -52,6 +58,7 @@ import org.nightlabs.jfire.reporting.layout.id.ReportRegistryItemID;
  * @jdo.inheritance strategy="new-table"
  *
  * @jdo.fetch-group name="ReportLayout.reportDesign" fetch-groups="default" fields="reportDesign"
+ * @jdo.fetch-group name="ReportLayout.localisationData" fetch-groups="default" fields="localisationData"
  * @jdo.fetch-group name="ReportLayout.this" fetch-groups="default, ReportRegistryItem.this" fields="reportDesign"
  */
 public class ReportLayout extends ReportRegistryItem {
@@ -62,6 +69,7 @@ public class ReportLayout extends ReportRegistryItem {
 	private static final Logger logger = Logger.getLogger(ReportLayout.class);
 	
 	public static final String FETCH_GROUP_REPORT_DESIGN = "ReportLayout.reportDesign";
+	public static final String FETCH_GROUP_REPORT_LOCALISATION_DATA = "ReportLayout.localisationData";
 	public static final String FETCH_GROUP_THIS_REPORT_LAYOUT = "ReportLayout.this";
 	
 	/**
@@ -92,6 +100,7 @@ public class ReportLayout extends ReportRegistryItem {
 	{
 		super(parentItem, parentItem.getOrganisationID(), parentItem.getReportRegistryItemType(), reportRegistryItemID);
 		this.reportDesign = reportDesign;
+		this.localisationData = new HashMap<String, ReportLayoutLocalisationData>();
 	}
 
 	/**
@@ -111,6 +120,7 @@ public class ReportLayout extends ReportRegistryItem {
 		) 
 	{
 		super(parentItem, organisationID, reportRegistryItemType, reportRegistryItemID);
+		this.localisationData = new HashMap<String, ReportLayoutLocalisationData>();
 	}
 	
 	
@@ -129,14 +139,39 @@ public class ReportLayout extends ReportRegistryItem {
 	 */
 	private String fileName;
 	
+	
+	/**
+	 * @jdo.field
+	 *		persistence-modifier="persistent"
+	 *		collection-type="map"
+	 *		key-type="java.lang.String"
+	 *		value-type="org.nightlabs.jfire.reporting.layout.ReportLayoutLocalisationData"
+	 *		mapped-by="reportLayout"
+	 *		dependent-value="true"
+	 *
+	 * @jdo.key
+	 * 		mapped-by="locale"
+	 */
+	private Map<String, ReportLayoutLocalisationData> localisationData;
+	
 	public void loadFile(File f)
 	throws IOException
 	{
-		logger.info("loadFile(\""+f.getAbsolutePath()+"\"): loading " + f.length() + " bytes into RAM.");
-
+		logger.debug("Loading file "+f+" as ReportLayout");
 		boolean error = true;
 		try {
-			DataBuffer db = new DataBuffer(f.length(), f);
+			DataBuffer db = new DataBuffer((long) (f.length() * 0.6));
+			OutputStream out = new DeflaterOutputStream(db.createOutputStream());
+			try {
+				FileInputStream in = new FileInputStream(f);
+				try {
+					Utils.transferStreamData(in, out);
+				} finally {
+					in.close();
+				}
+			} finally {
+				out.close();
+			}
 			reportDesign = db.createByteArray();
 
 			fileTimestamp = new Date(f.lastModified());
@@ -152,8 +187,13 @@ public class ReportLayout extends ReportRegistryItem {
 		}
 	}
 
-	public byte[] getReportDesign() { 
-		return reportDesign;
+	/**
+	 * Creates a new {@link InputStream} for the report design
+	 * that is wrapped by an {@link InflaterInputStream}.
+	 * This means you can read the report design unzipped from the returend stream.
+	 */
+	public InputStream createReportDesignInputStream() {
+		return new InflaterInputStream(new ByteArrayInputStream(reportDesign));
 	}
 	
 	public String getFileName() {
@@ -164,6 +204,15 @@ public class ReportLayout extends ReportRegistryItem {
 		return fileTimestamp;
 	}
 
+	/**
+	 * Returns the map of localisation data (message files).
+	 * 
+	 * @return the localisationData
+	 */
+	public Map<String, ReportLayoutLocalisationData> getLocalisationData() {
+		return localisationData;
+	}
+	
 //	@Override
 //	public void jdoPreStore() {
 //		super.jdoPreStore();

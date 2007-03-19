@@ -67,6 +67,7 @@ implements IJDOQLQueryMetaData
 	/**
 	 * Build the metadata on basis of the given metaData and resultSet.
 	 */
+	@SuppressWarnings("unchecked")
 	public void setCollectionMetaData(IResultSetMetaData metaData, Collection collection) {
 		Iterator it = collection.iterator();
 		if (!it.hasNext()) {

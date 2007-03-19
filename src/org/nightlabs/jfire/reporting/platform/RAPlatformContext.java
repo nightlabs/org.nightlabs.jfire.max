@@ -55,6 +55,7 @@ public class RAPlatformContext implements IPlatformContext {
 	/* (non-Javadoc)
 	 * @see org.eclipse.birt.core.framework.IPlatformContext#getFileList(java.lang.String, java.lang.String, boolean, boolean)
 	 */
+	@SuppressWarnings("unchecked")
 	public List getFileList(String homeFolder, String subFolder, boolean includingFiles, boolean relativeFileList) 
 	{
 		File file = new File(homeFolder, subFolder);

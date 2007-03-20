@@ -9,10 +9,20 @@ import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.io.Serializable;
+import java.util.Collection;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 import java.util.zip.DeflaterOutputStream;
 import java.util.zip.InflaterInputStream;
 
+import javax.jdo.JDOHelper;
+import javax.jdo.PersistenceManager;
+import javax.jdo.Query;
+import javax.jdo.listener.StoreCallback;
+
 import org.nightlabs.io.DataBuffer;
+import org.nightlabs.jfire.reporting.layout.id.ReportRegistryItemID;
 import org.nightlabs.util.Utils;
 
 /**
@@ -28,12 +38,24 @@ import org.nightlabs.util.Utils;
  *
  * @jdo.inheritance strategy = "new-table" 
  * 
- * @jdo.fetch-group name="ReportLayout.localisationData" fetch-groups="default" fields="reportLayout, localisationData"
+ * @jdo.fetch-group name="ReportLayoutLocalisationData.localisationData" fetch-groups="default" fields="localisationData"
+ *
+ *  @jdo.query
+ *		name="getReportLayoutLocalisationBundle"
+ *		query="SELECT 
+ *			WHERE this.reportLayout == :paramReportLayout"
  *
  */
-public class ReportLayoutLocalisationData {
+public class ReportLayoutLocalisationData implements StoreCallback, Serializable {
+
+	private static final long serialVersionUID = 1L;
 
 	public static final String PROPERIES_FILE_PREFIX = "reportMessages";
+	
+	private static final Pattern localePattern = Pattern.compile(".*_(([a-z]+)(?:_*)([A-Z]*))\\.properties");
+
+	public static final String FETCH_GROUP_LOCALISATOIN_DATA = "ReportLayoutLocalisationData.localisationData";
+
 	
 	/**
 	 * @jdo.field primary-key="true"
@@ -77,11 +99,20 @@ public class ReportLayoutLocalisationData {
 
 	/**
 	 */
-	protected ReportLayoutLocalisationData(ReportLayout reportLayout, String locale) {
+	public ReportLayoutLocalisationData(ReportLayout reportLayout, String locale) {
 		this.organisationID = reportLayout.getOrganisationID();
 		this.reportRegistryItemType = reportLayout.getReportRegistryItemType();
 		this.reportRegistryItemID = reportLayout.getReportRegistryItemID();
 		this.reportLayout = reportLayout;
+		this.locale = locale;
+	}
+	
+	/**
+	 */
+	public ReportLayoutLocalisationData(ReportRegistryItemID reportRegistryItemID, String locale) {
+		this.organisationID = reportRegistryItemID.organisationID;
+		this.reportRegistryItemType = reportRegistryItemID.reportRegistryItemType;
+		this.reportRegistryItemID = reportRegistryItemID.reportRegistryItemID;
 		this.locale = locale;
 	}
 	
@@ -154,9 +185,50 @@ public class ReportLayoutLocalisationData {
 	 * that is wrapped by an {@link InflaterInputStream}.
 	 * This means you can read the messages unzipped from the returend stream.
 	 */
-	public InputStream createReportDesignInputStream() {
+	public InputStream createLocalisationDataInputStream() {
 		return new InflaterInputStream(new ByteArrayInputStream(localisationData));
 	}
-	
 
+	/**
+	 * Returns all {@link ReportLayoutLocalisationData} objects related to the given ReportLayout.
+	 * 
+	 * @param pm
+	 * @param reportLayout
+	 * @return
+	 */
+	public static Collection<ReportLayoutLocalisationData> getReportLayoutLocalisationBundle(PersistenceManager pm, ReportLayout reportLayout) {
+		Query q = pm.newNamedQuery(ReportLayoutLocalisationData.class, "getReportLayoutLocalisationBundle");
+		return (Collection<ReportLayoutLocalisationData>) q.execute(reportLayout);
+	}
+
+	public static String extractLocale(String fileName) {
+		Matcher matcher = localePattern.matcher(fileName);
+		if (matcher.matches())
+			return matcher.group(1);
+		return null;
+	}
+	
+	public static String extractLanguage(String fileName) {
+		Matcher matcher = localePattern.matcher(fileName);
+		if (matcher.matches())
+			return matcher.group(2);
+		return null;
+	}
+	
+	public static String extractCountry(String fileName) {
+		Matcher matcher = localePattern.matcher(fileName);
+		if (matcher.matches())
+			return matcher.group(3);
+		return null;
+	}
+
+	public void jdoPreStore() {
+		if (this.reportLayout == null) {
+			PersistenceManager pm = JDOHelper.getPersistenceManager(this);
+			ReportRegistryItemID itemID = ReportRegistryItemID.create(organisationID, reportRegistryItemType, reportRegistryItemID);
+			ReportLayout layout = (ReportLayout) pm.getObjectById(itemID);
+			this.reportLayout = layout;
+		}
+	}
+	
 }

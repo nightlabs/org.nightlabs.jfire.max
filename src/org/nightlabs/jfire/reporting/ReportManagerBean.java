@@ -62,6 +62,8 @@ import org.nightlabs.jfire.config.ConfigSetup;
 import org.nightlabs.jfire.config.UserConfigSetup;
 import org.nightlabs.jfire.reporting.config.ReportLayoutConfigModule;
 import org.nightlabs.jfire.reporting.layout.ReportCategory;
+import org.nightlabs.jfire.reporting.layout.ReportLayout;
+import org.nightlabs.jfire.reporting.layout.ReportLayoutLocalisationData;
 import org.nightlabs.jfire.reporting.layout.ReportRegistry;
 import org.nightlabs.jfire.reporting.layout.ReportRegistryItem;
 import org.nightlabs.jfire.reporting.layout.ReportRegistryItemCarrier;
@@ -84,6 +86,8 @@ import org.nightlabs.jfire.scripting.ScriptRegistry;
 import org.nightlabs.jfire.scripting.id.ScriptRegistryItemID;
 import org.nightlabs.jfire.servermanager.JFireServerManager;
 import org.nightlabs.util.Utils;
+
+import com.sun.org.apache.regexp.internal.REProgram;
 
 /**
  * TODO: Unify method names for ResultSet and ResultSetMetaData getter (also in Dirvers, and Queries)
@@ -858,5 +862,67 @@ implements SessionBean
 		}
 	}
 	
+	/**
+	 * @throws ModuleException
+	 *
+	 * @ejb.interface-method
+	 * @ejb.permission role-name="_Guest_"
+	 * @ejb.transaction type = "Required"
+	 */
+	@SuppressWarnings("unchecked")
+	public Collection<ReportLayoutLocalisationData> getReportLayoutLocalisationBundle(ReportRegistryItemID reportLayoutID, String[] fetchGroups, int maxFetchDepth)
+	throws ModuleException
+	{
+		PersistenceManager pm;
+		pm = getPersistenceManager();
+		try {
+			pm.getFetchPlan().setMaxFetchDepth(maxFetchDepth);
+			if (fetchGroups != null)
+				pm.getFetchPlan().setGroups(fetchGroups);
+			
+			ReportLayout reportLayout = (ReportLayout) pm.getObjectById(reportLayoutID);
+			Collection<ReportLayoutLocalisationData> bundle = ReportLayoutLocalisationData.getReportLayoutLocalisationBundle(pm, reportLayout);
+			return pm.detachCopyAll(bundle);
+		} finally {
+			pm.close();
+		}
+	}
 	
+	/**
+	 * @throws ModuleException
+	 *
+	 * @ejb.interface-method
+	 * @ejb.permission role-name="_Guest_"
+	 * @ejb.transaction type = "Required"
+	 */
+	@SuppressWarnings("unchecked")
+	public Collection<ReportLayoutLocalisationData> storeReportLayoutLocalisationBundle(
+			Collection<ReportLayoutLocalisationData> bundle, boolean get, String[] fetchGroups, int maxFetchDepth
+		)
+	throws ModuleException
+	{
+		PersistenceManager pm;
+		pm = getPersistenceManager();
+		try {
+			pm.getFetchPlan().setMaxFetchDepth(maxFetchDepth);
+			if (fetchGroups != null)
+				pm.getFetchPlan().setGroups(fetchGroups);
+
+			if (get) {
+				Collection<ReportLayoutLocalisationData> result = new ArrayList<ReportLayoutLocalisationData>(bundle.size());
+				for (ReportLayoutLocalisationData data : bundle) {
+					result.add((ReportLayoutLocalisationData) NLJDOHelper.storeJDO(pm, data, get, fetchGroups, maxFetchDepth));
+				}
+				return result;
+			}
+			else {
+				for (ReportLayoutLocalisationData data : bundle) {
+					pm.makePersistent(data);
+				}
+				return null;
+			}
+		} finally {
+			pm.close();
+		}
+	}	
 }

@@ -8,8 +8,6 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URL;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
 import javax.jdo.JDOHelper;
 import javax.jdo.JDOObjectNotFoundException;
@@ -34,8 +32,6 @@ public class ServerResourceLocator extends DefaultResourceLocator implements IRe
 	private static Logger logger = Logger.getLogger(ServerResourceLocator.class);
 	private static ThreadLocal<ReportLayout> currentReportLayout = new ThreadLocal<ReportLayout>();
 	
-	private static final Pattern localePattern = Pattern.compile(".*_(([a-z]+)(?:_*)([A-Z]*))\\.properties");
-
 	public static void setCurrentReportLayout(ReportLayout reportLayout)
 	{
 		currentReportLayout.set(reportLayout);
@@ -59,7 +55,7 @@ public class ServerResourceLocator extends DefaultResourceLocator implements IRe
 	 * @see org.eclipse.birt.report.model.api.IResourceLocator#findResource(org.eclipse.birt.report.model.api.ModuleHandle, java.lang.String, int)
 	 */
 	public URL findResource(ModuleHandle handle, String fileName, int type) {
-		String locale = extractLocale(fileName);
+		String locale = ReportLayoutLocalisationData.extractLocale(fileName);
 		if (locale != null) {
 			ReportLayout layout = getCurrentReportLayout();
 			if (layout != null) {
@@ -81,7 +77,7 @@ public class ServerResourceLocator extends DefaultResourceLocator implements IRe
 				}
 				File layoutRoot = ReportLayoutRendererUtil.prepareRenderedLayoutOutputFolder();
 				File outputFile = new File(layoutRoot, fileName);
-				InputStream in = localisationData.createReportDesignInputStream();
+				InputStream in = localisationData.createLocalisationDataInputStream();
 				try {
 					try {
 						FileOutputStream out = new FileOutputStream(outputFile);
@@ -101,26 +97,5 @@ public class ServerResourceLocator extends DefaultResourceLocator implements IRe
 			}
 		}
 		return super.findResource(handle, fileName, type);
-	}
-
-	public static String extractLocale(String fileName) {
-		Matcher matcher = localePattern.matcher(fileName);
-		if (matcher.matches())
-			return matcher.group(1);
-		return null;
-	}
-	
-	public static String extractLanguage(String fileName) {
-		Matcher matcher = localePattern.matcher(fileName);
-		if (matcher.matches())
-			return matcher.group(2);
-		return null;
-	}
-	
-	public static String extractCountry(String fileName) {
-		Matcher matcher = localePattern.matcher(fileName);
-		if (matcher.matches())
-			return matcher.group(3);
-		return null;
 	}
 }

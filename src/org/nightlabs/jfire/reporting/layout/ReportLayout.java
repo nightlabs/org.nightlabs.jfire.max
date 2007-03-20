@@ -58,7 +58,7 @@ import org.nightlabs.util.Utils;
  * @jdo.inheritance strategy="new-table"
  *
  * @jdo.fetch-group name="ReportLayout.reportDesign" fetch-groups="default" fields="reportDesign"
- * @jdo.fetch-group name="ReportLayout.localisationData" fetch-groups="default" fields="localisationData"
+ * @!jdo.fetch-group name="ReportLayout.localisationData" fetch-groups="default" fields="localisationData"
  * @jdo.fetch-group name="ReportLayout.this" fetch-groups="default, ReportRegistryItem.this" fields="reportDesign"
  */
 public class ReportLayout extends ReportRegistryItem {
@@ -100,7 +100,7 @@ public class ReportLayout extends ReportRegistryItem {
 	{
 		super(parentItem, parentItem.getOrganisationID(), parentItem.getReportRegistryItemType(), reportRegistryItemID);
 		this.reportDesign = reportDesign;
-		this.localisationData = new HashMap<String, ReportLayoutLocalisationData>();
+//		this.localisationData = new HashMap<String, RepsortLayoutLocalisationData>();
 	}
 
 	/**
@@ -120,7 +120,7 @@ public class ReportLayout extends ReportRegistryItem {
 		) 
 	{
 		super(parentItem, organisationID, reportRegistryItemType, reportRegistryItemID);
-		this.localisationData = new HashMap<String, ReportLayoutLocalisationData>();
+//		this.localisationData = new HashMap<String, ReportLayoutLocalisationData>();
 	}
 	
 	
@@ -140,19 +140,19 @@ public class ReportLayout extends ReportRegistryItem {
 	private String fileName;
 	
 	
-	/**
-	 * @jdo.field
-	 *		persistence-modifier="persistent"
-	 *		collection-type="map"
-	 *		key-type="java.lang.String"
-	 *		value-type="org.nightlabs.jfire.reporting.layout.ReportLayoutLocalisationData"
-	 *		mapped-by="reportLayout"
-	 *		dependent-value="true"
-	 *
-	 * @jdo.key
-	 * 		mapped-by="locale"
-	 */
-	private Map<String, ReportLayoutLocalisationData> localisationData;
+//	/**
+//	 * @jdo.field
+//	 *		persistence-modifier="persistent"
+//	 *		collection-type="map"
+//	 *		key-type="java.lang.String"
+//	 *		value-type="org.nightlabs.jfire.reporting.layout.ReportLayoutLocalisationData"
+//	 *		mapped-by="reportLayout"
+//	 *		dependent-value="true"
+//	 *
+//	 * @jdo.key
+//	 * 		mapped-by="locale"
+//	 */
+//	private Map<String, ReportLayoutLocalisationData> localisationData;
 	
 	public void loadFile(File f)
 	throws IOException
@@ -204,14 +204,14 @@ public class ReportLayout extends ReportRegistryItem {
 		return fileTimestamp;
 	}
 
-	/**
-	 * Returns the map of localisation data (message files).
-	 * 
-	 * @return the localisationData
-	 */
-	public Map<String, ReportLayoutLocalisationData> getLocalisationData() {
-		return localisationData;
-	}
+//	/**
+//	 * Returns the map of localisation data (message files).
+//	 * 
+//	 * @return the localisationData
+//	 */
+//	public Map<String, ReportLayoutLocalisationData> getLocalisationData() {
+//		return localisationData;
+//	}
 	
 //	@Override
 //	public void jdoPreStore() {

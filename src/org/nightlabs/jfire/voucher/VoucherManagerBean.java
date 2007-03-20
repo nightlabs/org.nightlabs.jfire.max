@@ -2,11 +2,9 @@ package org.nightlabs.jfire.voucher;
 
 import java.rmi.RemoteException;
 import java.util.Collection;
-import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Locale;
-import java.util.Map;
 import java.util.Set;
 
 import javax.ejb.CreateException;
@@ -14,7 +12,6 @@ import javax.ejb.EJBException;
 import javax.ejb.SessionBean;
 import javax.ejb.SessionContext;
 import javax.jdo.FetchPlan;
-import javax.jdo.JDODetachedFieldAccessException;
 import javax.jdo.JDOHelper;
 import javax.jdo.JDOObjectNotFoundException;
 import javax.jdo.PersistenceManager;
@@ -25,10 +22,6 @@ import org.nightlabs.ModuleException;
 import org.nightlabs.annotation.Implement;
 import org.nightlabs.jdo.NLJDOHelper;
 import org.nightlabs.jdo.moduleregistry.ModuleMetaData;
-import org.nightlabs.jfire.accounting.gridpriceconfig.IResultPriceConfig;
-import org.nightlabs.jfire.accounting.gridpriceconfig.PriceCalculator;
-import org.nightlabs.jfire.accounting.priceconfig.AffectedProductType;
-import org.nightlabs.jfire.accounting.priceconfig.PriceConfigUtil;
 import org.nightlabs.jfire.accounting.priceconfig.id.PriceConfigID;
 import org.nightlabs.jfire.base.BaseSessionBeanImpl;
 import org.nightlabs.jfire.organisation.Organisation;
@@ -253,26 +246,28 @@ implements SessionBean
 			else
 				pm.getFetchPlan().setGroups(fetchGroups);
 
-			boolean priceCalculationNeeded = false;
+//		 we don't need any price calculation as we have fixed prices only
+
+//			boolean priceCalculationNeeded = false;
 			if (NLJDOHelper.exists(pm, voucherType)) {
-				// if the nestedProductTypes changed, we need to recalculate prices
-				// test first, whether they were detached
-				Map<String, NestedProductType> newNestedProductTypes = new HashMap<String, NestedProductType>();
-				try {
-					for (NestedProductType npt : voucherType.getNestedProductTypes()) {
-						newNestedProductTypes.put(npt.getInnerProductTypePrimaryKey(), npt);
-						npt.getQuantity();
-					}
-				} catch (JDODetachedFieldAccessException x) {
-					newNestedProductTypes = null;
-				}
-
-				if (newNestedProductTypes != null) {
-					VoucherType original = (VoucherType) pm.getObjectById(JDOHelper.getObjectId(voucherType));
-
-					priceCalculationNeeded = !ProductType.compareNestedProductTypes(original.getNestedProductTypes(), newNestedProductTypes);
-				}
-
+//				// if the nestedProductTypes changed, we need to recalculate prices
+//				// test first, whether they were detached
+//				Map<String, NestedProductType> newNestedProductTypes = new HashMap<String, NestedProductType>();
+//				try {
+//					for (NestedProductType npt : voucherType.getNestedProductTypes()) {
+//						newNestedProductTypes.put(npt.getInnerProductTypePrimaryKey(), npt);
+//						npt.getQuantity();
+//					}
+//				} catch (JDODetachedFieldAccessException x) {
+//					newNestedProductTypes = null;
+//				}
+//
+//				if (newNestedProductTypes != null) {
+//					VoucherType original = (VoucherType) pm.getObjectById(JDOHelper.getObjectId(voucherType));
+//
+//					priceCalculationNeeded = !ProductType.compareNestedProductTypes(original.getNestedProductTypes(), newNestedProductTypes);
+//				}
+//
 				voucherType = (VoucherType) pm.makePersistent(voucherType);
 			}
 			else {
@@ -280,44 +275,45 @@ implements SessionBean
 						User.getUser(pm, getPrincipal()),
 						voucherType,
 						VoucherTypeActionHandler.getDefaultHome(pm, voucherType));
-
-				// make sure the prices are correct
-				priceCalculationNeeded = true;
+//
+//				// make sure the prices are correct
+//				priceCalculationNeeded = true;
 			}
-
-			if (priceCalculationNeeded) {
-				logger.info("storeProductType: price-calculation is necessary! Will recalculate the prices of " + JDOHelper.getObjectId(voucherType));
-				if (voucherType.getPackagePriceConfig() != null && voucherType.getInnerPriceConfig() != null) {
-					((IResultPriceConfig)voucherType.getPackagePriceConfig()).adoptParameters(
-							voucherType.getInnerPriceConfig());
-				}
-
-				// find out which productTypes package this one and recalculate their prices as well - recursively! siblings are automatically included in the package-recalculation
-				HashSet<ProductTypeID> processedProductTypeIDs = new HashSet<ProductTypeID>();
-				ProductTypeID productTypeID = (ProductTypeID) JDOHelper.getObjectId(voucherType);
-				for (AffectedProductType apt : PriceConfigUtil.getAffectedProductTypes(pm, voucherType)) {
-					if (!processedProductTypeIDs.add(apt.getProductTypeID()))
-						continue;
-
-					ProductType pt;
-					if (apt.getProductTypeID().equals(productTypeID))
-						pt = voucherType;
-					else
-						pt = (ProductType) pm.getObjectById(apt.getProductTypeID());
-
-					if (ProductType.PACKAGE_NATURE_OUTER == pt.getPackageNature() && pt.getPackagePriceConfig() != null) {
-						logger.info("storeProductType: price-calculation starting for: " + JDOHelper.getObjectId(pt));
-
-						PriceCalculator priceCalculator = new PriceCalculator(pt); // TODO we need another PriceCalculator!!!
-						priceCalculator.preparePriceCalculation();
-						priceCalculator.calculatePrices();
-
-						logger.info("storeProductType: price-calculation complete for: " + JDOHelper.getObjectId(pt));
-					}
-				}
-			}
-			else
-				logger.info("storeProductType: price-calculation is NOT necessary! Stored ProductType without recalculation: " + JDOHelper.getObjectId(voucherType));
+//
+//
+//			if (priceCalculationNeeded) {
+//				logger.info("storeProductType: price-calculation is necessary! Will recalculate the prices of " + JDOHelper.getObjectId(voucherType));
+//				if (voucherType.getPackagePriceConfig() != null && voucherType.getInnerPriceConfig() != null) {
+//					((IResultPriceConfig)voucherType.getPackagePriceConfig()).adoptParameters(
+//							voucherType.getInnerPriceConfig());
+//				}
+//
+//				// find out which productTypes package this one and recalculate their prices as well - recursively! siblings are automatically included in the package-recalculation
+//				HashSet<ProductTypeID> processedProductTypeIDs = new HashSet<ProductTypeID>();
+//				ProductTypeID productTypeID = (ProductTypeID) JDOHelper.getObjectId(voucherType);
+//				for (AffectedProductType apt : PriceConfigUtil.getAffectedProductTypes(pm, voucherType)) {
+//					if (!processedProductTypeIDs.add(apt.getProductTypeID()))
+//						continue;
+//
+//					ProductType pt;
+//					if (apt.getProductTypeID().equals(productTypeID))
+//						pt = voucherType;
+//					else
+//						pt = (ProductType) pm.getObjectById(apt.getProductTypeID());
+//
+//					if (ProductType.PACKAGE_NATURE_OUTER == pt.getPackageNature() && pt.getPackagePriceConfig() != null) {
+//						logger.info("storeProductType: price-calculation starting for: " + JDOHelper.getObjectId(pt));
+//
+//						PriceCalculator priceCalculator = new PriceCalculator(pt);
+//						priceCalculator.preparePriceCalculation();
+//						priceCalculator.calculatePrices();
+//
+//						logger.info("storeProductType: price-calculation complete for: " + JDOHelper.getObjectId(pt));
+//					}
+//				}
+//			}
+//			else
+//				logger.info("storeProductType: price-calculation is NOT necessary! Stored ProductType without recalculation: " + JDOHelper.getObjectId(voucherType));
 
 			// take care about the inheritance
 			voucherType.applyInheritance();

@@ -1,5 +1,6 @@
 package org.nightlabs.jfire.voucher.accounting;
 
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.Map;
@@ -129,8 +130,28 @@ implements IPackagePriceConfig
 		PriceConfigUtil.fillArticlePrice(this, article);
 	}
 
+	/**
+	 * @jdo.field persistence-modifier="none"
+	 */
+	private transient Map<Currency, Long> readOnlyPrices = null;
+
 	public Map<Currency, Long> getPrices()
 	{
-		return prices;
+		if (readOnlyPrices == null)
+			readOnlyPrices = Collections.unmodifiableMap(prices);
+
+		return readOnlyPrices;
+	}
+
+	public void setPrice(Currency currency, Long value)
+	{
+		if (value == null) {
+			removeCurrency(currency.getCurrencyID());
+			prices.remove(currency);
+		}
+		else {
+			addCurrency(currency);
+			prices.put(currency, value);
+		}
 	}
 }

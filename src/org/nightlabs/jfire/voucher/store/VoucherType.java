@@ -12,6 +12,8 @@ import org.nightlabs.inheritance.FieldMetaData;
 import org.nightlabs.inheritance.Inheritable;
 import org.nightlabs.inheritance.InheritableFieldInheriter;
 import org.nightlabs.jfire.store.ProductType;
+import org.nightlabs.jfire.store.ProductTypeFieldMetaData;
+import org.nightlabs.jfire.store.ProductTypeMapFieldMetaData;
 import org.nightlabs.jfire.store.id.ProductTypeID;
 import org.nightlabs.jfire.trade.LegalEntity;
 
@@ -113,8 +115,14 @@ extends ProductType
 	@Override
 	public FieldMetaData getFieldMetaData(String fieldName)
 	{
-//		if ("createdProductCount".equals(fieldName)) // TODO track the capacity!
-//			return null;
+		if ("packagePriceConfig".equals(fieldName)) { // this is normally not inheritable as it usually stores per-ProductType-data, but for the VoucherType it is
+			ProductTypeFieldMetaData fmd = fieldMetaDataMap.get(fieldName);
+			if (fmd == null) {
+				fmd = new ProductTypeFieldMetaData(this, fieldName);
+				fieldMetaDataMap.put(fieldName, fmd);
+			} // if (fmd == null) {
+			return fmd;
+		}
 
 		return super.getFieldMetaData(fieldName);
 	}

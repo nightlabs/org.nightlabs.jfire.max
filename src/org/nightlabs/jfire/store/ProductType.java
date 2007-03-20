@@ -890,7 +890,7 @@ implements
 	 * Fields:
 	 * <ul>
 	 *   <li>jdo* (you must never inherit an internal jdo field!)</li>
-	 *   <li>organisationID  (you must never inherit a primary key field!)</li>
+	 *   <li>organisationID (you must never inherit a primary key field!)</li>
 	 *   <li>productTypeID (primary key field)</li>
 	 *   <li>primaryKey (concatenated primary key - must never be inherited as well)</li>
 	 *   <li>closed</li>
@@ -906,8 +906,7 @@ implements
 	 *   <li>published</li>
 	 *   <li>saleable</li>
 	 *   <li>selfForVirtualSelfPackaging (transient and a must-not-inherit, too)</li>
-	 *   <li>innerPriceConfig</li>
-	 *   <li>packagePriceConfig</li>
+	 *   <li>packagePriceConfig (usually stores results of price calculations, as normally the innerPriceConfig is formula based - in rare cases this might different, but you can override the behaviour if you want to)</li>
 	 * </ul>
 	 * </p>
 	 * <p>
@@ -944,7 +943,6 @@ implements
 				nonInheritableFields.add("published");
 				nonInheritableFields.add("saleable");
 				nonInheritableFields.add("selfForVirtualSelfPackaging");
-//				nonInheritableFields.add("innerPriceConfig"); // this price config must be inheritable - its change should already be detected and cause recalculation
 				nonInheritableFields.add("packagePriceConfig");
 			}
 
@@ -952,7 +950,7 @@ implements
 				return null;
 		}
 
-		ProductTypeFieldMetaData fmd = (ProductTypeFieldMetaData)fieldMetaDataMap.get(fieldName);
+		ProductTypeFieldMetaData fmd = fieldMetaDataMap.get(fieldName);
 		if (fmd == null) {
 			if ("nestedProductTypes".equals(fieldName))
 				fmd = new ProductTypeMapFieldMetaData(this, fieldName);

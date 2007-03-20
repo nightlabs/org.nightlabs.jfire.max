@@ -570,14 +570,11 @@ public abstract class AccountingManagerBean
 			
 	}
 	/**
-	 * @throws ModuleException
-	 *
 	 * @ejb.interface-method
-	 * @ejb.transaction type = "Required"
+	 * @ejb.transaction type="Supports"
 	 * @ejb.permission role-name="_Guest_"
 	 */
 	public Collection getAccounts(AccountSearchFilter searchFilter,  String[] fetchGroups, int maxFetchDepth)
-	throws ModuleException
 	{
 		PersistenceManager pm = getPersistenceManager();
 		try {
@@ -592,6 +589,38 @@ public abstract class AccountingManagerBean
 			
 			Collection result = pm.detachCopyAll(accounts);
 			return result;
+		} finally {
+			pm.close();
+		}
+	}
+
+	/**
+	 * @ejb.interface-method
+	 * @ejb.transaction type="Supports"
+	 * @ejb.permission role-name="_Guest_"
+	 */
+	@SuppressWarnings("unchecked")
+	public Set<AnchorID> getAccountIDs(AccountSearchFilter searchFilter)
+	{
+		PersistenceManager pm = getPersistenceManager();
+		try {
+			return NLJDOHelper.getObjectIDSet(searchFilter.executeQuery(pm));
+		} finally {
+			pm.close();
+		}
+	}
+
+	/**
+	 * @ejb.interface-method
+	 * @ejb.transaction type="Supports"
+	 * @ejb.permission role-name="_Guest_"
+	 */
+	@SuppressWarnings("unchecked")
+	public List<Account> getAccounts(Collection<AnchorID> accountIDs,  String[] fetchGroups, int maxFetchDepth)
+	{
+		PersistenceManager pm = getPersistenceManager();
+		try {
+			return NLJDOHelper.getDetachedObjectList(pm, accountIDs, Account.class, fetchGroups, maxFetchDepth);
 		} finally {
 			pm.close();
 		}

@@ -12,6 +12,7 @@ import javax.ejb.EJBException;
 import javax.ejb.SessionBean;
 import javax.ejb.SessionContext;
 import javax.jdo.FetchPlan;
+import javax.jdo.JDODetachedFieldAccessException;
 import javax.jdo.JDOHelper;
 import javax.jdo.JDOObjectNotFoundException;
 import javax.jdo.PersistenceManager;
@@ -22,6 +23,8 @@ import org.nightlabs.ModuleException;
 import org.nightlabs.annotation.Implement;
 import org.nightlabs.jdo.NLJDOHelper;
 import org.nightlabs.jdo.moduleregistry.ModuleMetaData;
+import org.nightlabs.jfire.accounting.Account;
+import org.nightlabs.jfire.accounting.book.id.LocalAccountantDelegateID;
 import org.nightlabs.jfire.accounting.priceconfig.id.PriceConfigID;
 import org.nightlabs.jfire.base.BaseSessionBeanImpl;
 import org.nightlabs.jfire.organisation.Organisation;
@@ -37,10 +40,12 @@ import org.nightlabs.jfire.trade.Article;
 import org.nightlabs.jfire.trade.ArticleCreator;
 import org.nightlabs.jfire.trade.Offer;
 import org.nightlabs.jfire.trade.Order;
+import org.nightlabs.jfire.trade.OrganisationLegalEntity;
 import org.nightlabs.jfire.trade.Segment;
 import org.nightlabs.jfire.trade.Trader;
 import org.nightlabs.jfire.trade.id.OfferID;
 import org.nightlabs.jfire.trade.id.SegmentID;
+import org.nightlabs.jfire.voucher.accounting.VoucherLocalAccountantDelegate;
 import org.nightlabs.jfire.voucher.accounting.VoucherPriceConfig;
 import org.nightlabs.jfire.voucher.store.VoucherType;
 import org.nightlabs.jfire.voucher.store.VoucherTypeActionHandler;
@@ -233,7 +238,6 @@ implements SessionBean
 	 * @ejb.transaction type="Required"
 	 */
 	public VoucherType storeVoucherType(VoucherType voucherType, boolean get, String[] fetchGroups, int maxFetchDepth)
-	throws ModuleException
 	{
 		if (voucherType == null)
 			throw new IllegalArgumentException("voucherType must not be null!");
@@ -246,28 +250,31 @@ implements SessionBean
 			else
 				pm.getFetchPlan().setGroups(fetchGroups);
 
+			try {
+				VoucherLocalAccountantDelegate delegate = (VoucherLocalAccountantDelegate) voucherType.getLocalAccountantDelegate();
+				if (delegate != null) {
+					OrganisationLegalEntity organisationLegalEntity = null;
+
+					for (Account account : delegate.getAccounts().values()) {
+						try {
+							if (account.getOwner() == null) {
+								if (organisationLegalEntity == null)
+									organisationLegalEntity = OrganisationLegalEntity.getOrganisationLegalEntity(pm, getOrganisationID(), OrganisationLegalEntity.ANCHOR_TYPE_ID_ORGANISATION, true);
+
+								account.setOwner(organisationLegalEntity);
+							}
+						} catch (JDODetachedFieldAccessException x) {
+							// ignore
+						}
+					}
+				}
+			} catch (JDODetachedFieldAccessException x) {
+				// ignore
+			}
+
 //		 we don't need any price calculation as we have fixed prices only
 
-//			boolean priceCalculationNeeded = false;
 			if (NLJDOHelper.exists(pm, voucherType)) {
-//				// if the nestedProductTypes changed, we need to recalculate prices
-//				// test first, whether they were detached
-//				Map<String, NestedProductType> newNestedProductTypes = new HashMap<String, NestedProductType>();
-//				try {
-//					for (NestedProductType npt : voucherType.getNestedProductTypes()) {
-//						newNestedProductTypes.put(npt.getInnerProductTypePrimaryKey(), npt);
-//						npt.getQuantity();
-//					}
-//				} catch (JDODetachedFieldAccessException x) {
-//					newNestedProductTypes = null;
-//				}
-//
-//				if (newNestedProductTypes != null) {
-//					VoucherType original = (VoucherType) pm.getObjectById(JDOHelper.getObjectId(voucherType));
-//
-//					priceCalculationNeeded = !ProductType.compareNestedProductTypes(original.getNestedProductTypes(), newNestedProductTypes);
-//				}
-//
 				voucherType = (VoucherType) pm.makePersistent(voucherType);
 			}
 			else {
@@ -275,49 +282,10 @@ implements SessionBean
 						User.getUser(pm, getPrincipal()),
 						voucherType,
 						VoucherTypeActionHandler.getDefaultHome(pm, voucherType));
-//
-//				// make sure the prices are correct
-//				priceCalculationNeeded = true;
 			}
-//
-//
-//			if (priceCalculationNeeded) {
-//				logger.info("storeProductType: price-calculation is necessary! Will recalculate the prices of " + JDOHelper.getObjectId(voucherType));
-//				if (voucherType.getPackagePriceConfig() != null && voucherType.getInnerPriceConfig() != null) {
-//					((IResultPriceConfig)voucherType.getPackagePriceConfig()).adoptParameters(
-//							voucherType.getInnerPriceConfig());
-//				}
-//
-//				// find out which productTypes package this one and recalculate their prices as well - recursively! siblings are automatically included in the package-recalculation
-//				HashSet<ProductTypeID> processedProductTypeIDs = new HashSet<ProductTypeID>();
-//				ProductTypeID productTypeID = (ProductTypeID) JDOHelper.getObjectId(voucherType);
-//				for (AffectedProductType apt : PriceConfigUtil.getAffectedProductTypes(pm, voucherType)) {
-//					if (!processedProductTypeIDs.add(apt.getProductTypeID()))
-//						continue;
-//
-//					ProductType pt;
-//					if (apt.getProductTypeID().equals(productTypeID))
-//						pt = voucherType;
-//					else
-//						pt = (ProductType) pm.getObjectById(apt.getProductTypeID());
-//
-//					if (ProductType.PACKAGE_NATURE_OUTER == pt.getPackageNature() && pt.getPackagePriceConfig() != null) {
-//						logger.info("storeProductType: price-calculation starting for: " + JDOHelper.getObjectId(pt));
-//
-//						PriceCalculator priceCalculator = new PriceCalculator(pt);
-//						priceCalculator.preparePriceCalculation();
-//						priceCalculator.calculatePrices();
-//
-//						logger.info("storeProductType: price-calculation complete for: " + JDOHelper.getObjectId(pt));
-//					}
-//				}
-//			}
-//			else
-//				logger.info("storeProductType: price-calculation is NOT necessary! Stored ProductType without recalculation: " + JDOHelper.getObjectId(voucherType));
 
 			// take care about the inheritance
 			voucherType.applyInheritance();
-			// imho, the recalculation of the prices for the inherited ProductTypes is already implemented in JFireTrade. Marco.
 
 			if (!get)
 				return null;
@@ -394,6 +362,40 @@ implements SessionBean
 				pm.getFetchPlan().setGroups(fetchGroups);
 
 			return pm.detachCopyAll(articles);
+		} finally {
+			pm.close();
+		}
+	}
+
+	/**
+	 * @ejb.interface-method
+	 * @ejb.permission role-name="_Guest_"
+	 * @ejb.transaction type="Supports"
+	 */
+	public Set<LocalAccountantDelegateID> getVoucherLocalAccountantDelegateIDs()
+	{
+		PersistenceManager pm = getPersistenceManager();
+		try {
+			Query q = pm.newQuery(VoucherLocalAccountantDelegate.class);
+			q.setResult("JDOHelper.getObjectId(this)");
+			return new HashSet<LocalAccountantDelegateID>((Collection<? extends LocalAccountantDelegateID>) q.execute());
+		} finally {
+			pm.close();
+		}
+	}
+
+	/**
+	 * @ejb.interface-method
+	 * @ejb.permission role-name="_Guest_"
+	 * @ejb.transaction type="Supports"
+	 */
+	@SuppressWarnings("unchecked")
+	public List<VoucherLocalAccountantDelegate> getVoucherLocalAccountantDelegates(
+			Collection<LocalAccountantDelegateID> voucherLocalAccountantDelegateIDs, String[] fetchGroups, int maxFetchDepth)
+	{
+		PersistenceManager pm = getPersistenceManager();
+		try {
+			return NLJDOHelper.getDetachedObjectList(pm, voucherLocalAccountantDelegateIDs, VoucherLocalAccountantDelegate.class, fetchGroups, maxFetchDepth);
 		} finally {
 			pm.close();
 		}

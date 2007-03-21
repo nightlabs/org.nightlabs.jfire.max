@@ -44,8 +44,12 @@ import org.nightlabs.i18n.I18nText;
  * 
  * @jdo.create-objectid-class
  *		field-order="organisationID, anchorTypeID, anchorID"
+ *
+ * @jdo.fetch-group name="Account.name" fields="account, names"
  */
-public class AccountName extends I18nText {
+public class AccountName extends I18nText
+{
+	private static final long serialVersionUID = 1L;
 
 	/**
 	 * @jdo.field primary-key="true"

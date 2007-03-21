@@ -87,6 +87,7 @@ public class OrganisationLegalEntity extends LegalEntity
 
 	protected OrganisationLegalEntity() { }
 
+	// TODO Why do I have to pass the anchorTypeID? Isn't this the same for all OrganisationLegalEntities?! Marco.
 	protected OrganisationLegalEntity(org.nightlabs.jfire.organisation.Organisation organisation, String anchorTypeID)
 	{
 		super(organisation.getOrganisationID(), anchorTypeID, OrganisationLegalEntity.class.getName());
@@ -161,6 +162,7 @@ public class OrganisationLegalEntity extends LegalEntity
 	 * will either throw an exception or return <tt>null</tt> - dependent on the parameter
 	 * <tt>throwExceptionIfNotExistent</tt>.  
 	 */
+	// TODO Why do I have to pass the anchorTypeID? Isn't this the same for all OrganisationLegalEntities?! Marco.
 	public static OrganisationLegalEntity getOrganisationLegalEntity(
 			PersistenceManager pm, String organisationID, String anchorTypeID, boolean throwExceptionIfNotExistent)
 	{

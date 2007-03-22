@@ -289,7 +289,7 @@ public abstract class GeographyTemplateDataManagerBean
 					Location updateLocation = (Location)obj;
 					
 					Collection locations = GeographyImplJDO.sharedInstance().getLocations(CityID.create(
-							updateLocation.getCountryID(), updateLocation.getOrganisationID(), updateLocation.getCity().getCityID()), true);
+							updateLocation.getCity().getCountryID(), updateLocation.getCity().getOrganisationID(), updateLocation.getCity().getCityID()), true);
 					List locationList = new ArrayList();
 					for(Iterator locationIterator = locations.iterator(); locationIterator.hasNext();){
 						Location location = (Location)locationIterator.next();
@@ -317,7 +317,7 @@ public abstract class GeographyTemplateDataManagerBean
 
 					Collection cities = GeographyImplJDO.sharedInstance().getCities(
 							RegionID.create(
-									updateCity.getCountryID(), updateCity.getOrganisationID(), updateCity.getRegion().getRegionID()), true);
+									updateCity.getRegion().getCountryID(), updateCity.getRegion().getOrganisationID(), updateCity.getRegion().getRegionID()), true);
 					List cityList = new ArrayList();
 					for(Iterator cityIterator = cities.iterator(); cityIterator.hasNext();){
 						City city = (City)cityIterator.next();

@@ -26,13 +26,18 @@
 
 package org.nightlabs.jfire.geography;
 
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
+import java.io.OutputStream;
+import java.io.OutputStreamWriter;
+import java.io.Writer;
 import java.rmi.RemoteException;
-import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Iterator;
 import java.util.List;
 import java.util.zip.Deflater;
+import java.util.zip.DeflaterOutputStream;
 
 import javax.ejb.CreateException;
 import javax.ejb.EJBException;
@@ -49,6 +54,7 @@ import org.nightlabs.jfire.geography.id.CityID;
 import org.nightlabs.jfire.geography.id.CountryID;
 import org.nightlabs.jfire.geography.id.RegionID;
 import org.nightlabs.jfire.organisation.Organisation;
+import org.nightlabs.util.Utils;
 
 /**
  * @ejb.bean name="jfire/ejb/JFireGeography/GeographyTemplateDataManager"	
@@ -138,7 +144,7 @@ public abstract class GeographyTemplateDataManagerBean
 	 * @ejb.interface-method
 	 * @ejb.permission role-name="_Guest_"
 	 */
-	public void addGeographyTemplateData(String csvType, String countryID, Object obj){
+	public void addGeographyTemplateData(String countryID, Object obj){
 		PersistenceManager pm = getPersistenceManager();
 		try {
 			CSV csv = null;
@@ -147,9 +153,7 @@ public abstract class GeographyTemplateDataManagerBean
 
 			InitialContext initialContext = new InitialContext();
 			try {
-				// Maybe it would be better not to check for the csvType (and simply omit this parameter) but
-				// to check via instanceof what's the type of the passed object.
-				if(csvType.equals(CSV.CSV_TYPE_LOCATION)){
+				if(obj instanceof Location){
 					Location newLocation = (Location)obj;
 
 					Country country = GeographyImplJDO.sharedInstance().getCountry(CountryID.create(newLocation.getCountryID()), false);
@@ -174,17 +178,18 @@ public abstract class GeographyTemplateDataManagerBean
 
 					String csvLines = GeographyImplResourceCSV.collection2csvLines(locationList);
 
-					byte[] output = new byte[csvLines.getBytes().length];
 
 					Deflater compresser  = new Deflater();
 					compresser.setInput(csvLines.getBytes());
 					compresser.finish();
+					
+					byte[] output = new byte[compresser.getTotalOut()];
 					compresser.deflate(output);
 
-					csv = CSV.setCSVData(pm, Organisation.getRootOrganisationID(initialContext), csvType, country.getCountryID(), output);
+					csv = CSV.setCSVData(pm, Organisation.getRootOrganisationID(initialContext), CSV.CSV_TYPE_LOCATION, country.getCountryID(), output);
 					Geography.sharedInstance().loadLocations(newLocation.getCountryID());
 				}//if
-				else if(csvType.equals(CSV.CSV_TYPE_CITY)){
+				else if(obj instanceof City){
 					City newCity = (City)obj;
 
 					Country country = GeographyImplJDO.sharedInstance().getCountry(CountryID.create(newCity.getCountryID()), false);
@@ -203,17 +208,20 @@ public abstract class GeographyTemplateDataManagerBean
 
 					String csvLines = GeographyImplResourceCSV.collection2csvLines(cityList);
 
-					byte[] output = new byte[csvLines.getBytes().length];
-
-					Deflater compresser  = new Deflater();
-					compresser.setInput(csvLines.getBytes());
-					compresser.finish();
-					compresser.deflate(output);
-
-					csv = CSV.setCSVData(pm, Organisation.getRootOrganisationID(initialContext), csvType, country.getCountryID(), output);
-					Geography.sharedInstance().loadCities(newCity.getCountryID());
+					ByteArrayOutputStream outp = new ByteArrayOutputStream();
+					OutputStream out = new DeflaterOutputStream(outp);
+					Writer w = new OutputStreamWriter(out, Utils.CHARSET_UTF_8);
+					try{
+						w.write(csvLines);
+					}//try
+					finally {
+						w.close(); // this closes all the underlying streams as well
+					}//finally
+					csv = CSV.setCSVData(pm, Organisation.getRootOrganisationID(initialContext), CSV.CSV_TYPE_CITY, country.getCountryID(), outp.toByteArray());
+					
+					Geography.sharedInstance().loadCities(country.getCountryID());
 				}//else if
-				else if(csvType.equals(CSV.CSV_TYPE_DISTRICT)){
+				else if(obj instanceof District){
 					District newDistrict = (District)obj;
 
 					Country country = GeographyImplJDO.sharedInstance().getCountry(CountryID.create(newDistrict.getCountryID()), false);
@@ -238,17 +246,20 @@ public abstract class GeographyTemplateDataManagerBean
 
 					String csvLines = GeographyImplResourceCSV.collection2csvLines(districtList);
 
-					byte[] output = new byte[csvLines.getBytes().length];
 
 					Deflater compresser  = new Deflater();
 					compresser.setInput(csvLines.getBytes());
 					compresser.finish();
+					
+					byte[] output = new byte[compresser.getTotalOut()];
 					compresser.deflate(output);
 
-					csv = CSV.setCSVData(pm, Organisation.getRootOrganisationID(initialContext), csvType, country.getCountryID(), output);
-					Geography.sharedInstance().loadDistricts(newDistrict.getCountryID());
+					csv = CSV.setCSVData(pm, Organisation.getRootOrganisationID(initialContext), CSV.CSV_TYPE_DISTRICT, country.getCountryID(), output);
 				}//else if
 			}//try 
+			catch(IOException ex){
+				ex.printStackTrace();
+			}
 			finally {
 				initialContext.close();
 			}//finally
@@ -265,7 +276,7 @@ public abstract class GeographyTemplateDataManagerBean
 	 * @ejb.interface-method
 	 * @ejb.permission role-name="_Guest_"
 	 */
-	public void updateGeographyTemplateData(String csvType, Object obj){
+	public void updateGeographyTemplateData(Object obj){
 		PersistenceManager pm = getPersistenceManager();
 		try {
 			CSV csv = null;
@@ -274,9 +285,7 @@ public abstract class GeographyTemplateDataManagerBean
 
 			InitialContext initialContext = new InitialContext();
 			try {
-				// Maybe it would be better not to check for the csvType (and simply omit this parameter) but
-				// to check via instanceof what's the type of the passed object.
-				if(csvType.equals(CSV.CSV_TYPE_LOCATION)){
+				if(obj instanceof Location){
 					Location updateLocation = (Location)obj;
 					
 					Collection locations = GeographyImplJDO.sharedInstance().getLocations(CityID.create(
@@ -301,10 +310,9 @@ public abstract class GeographyTemplateDataManagerBean
 					compresser.finish();
 					compresser.deflate(output);
 
-					csv = CSV.setCSVData(pm, Organisation.getRootOrganisationID(initialContext), csvType, updateLocation.getCountryID(), output);
-					Geography.sharedInstance().loadLocations(updateLocation.getCountryID());
+					csv = CSV.setCSVData(pm, Organisation.getRootOrganisationID(initialContext), CSV.CSV_TYPE_LOCATION, updateLocation.getCountryID(), output);
 				}//if
-				else if(csvType.equals(CSV.CSV_TYPE_CITY)){
+				else if(obj instanceof City){
 					City updateCity = (City)obj;
 
 					Collection cities = GeographyImplJDO.sharedInstance().getCities(
@@ -330,10 +338,9 @@ public abstract class GeographyTemplateDataManagerBean
 					compresser.finish();
 					compresser.deflate(output);
 
-					csv = CSV.setCSVData(pm, Organisation.getRootOrganisationID(initialContext), csvType, updateCity.getCountryID(), output);
-					Geography.sharedInstance().loadCities(updateCity.getCountryID());
+					csv = CSV.setCSVData(pm, Organisation.getRootOrganisationID(initialContext), CSV.CSV_TYPE_CITY, updateCity.getCountryID(), output);
 				}//else if
-				else if(csvType.equals(CSV.CSV_TYPE_DISTRICT)){
+				else if(obj instanceof District){
 //					District updateDistrict = (District)obj;
 //
 //					Collection districts = GeographyImplJDO.sharedInstance().getDistricts(new CityID(updateLocation.getCity().getCityID()), true);

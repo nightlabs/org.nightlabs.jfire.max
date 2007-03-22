@@ -36,6 +36,7 @@ import javax.jdo.PersistenceManager;
 import javax.jdo.listener.StoreCallback;
 
 import org.nightlabs.jfire.accounting.Currency;
+import org.nightlabs.jfire.accounting.Price;
 import org.nightlabs.jfire.accounting.PriceFragmentType;
 import org.nightlabs.jfire.idgenerator.IDGenerator;
 import org.nightlabs.jfire.trade.Article;
@@ -356,23 +357,38 @@ public abstract class PriceConfig implements Serializable, StoreCallback, IPrice
 	 */
 	public abstract boolean requiresProductTypePackageInternal();
 
-	/**
-	 * @jdo.field persistence-modifier="persistent"
-	 */
-	private long nextPriceID = 0;
+//	/**
+//	 * @jdo.field persistence-modifier="persistent"
+//	 */
+//	private long nextPriceID = 0;
+//
+//	/**
+//	 * Creates a <tt>priceID</tt> by incrementing the member nextPriceID.
+//	 * The new ID is unique within the context of this <tt>PriceConfig</tt>
+//	 * (<tt>organisationID</tt> & <tt>priceConfigID</tt>).
+//	 *
+//	 * @return Returns a price id, which is unique within the context of this <tt>PriceConfig</tt>.
+//	 */
+//	public synchronized long createPriceID()
+//	{
+//		long res = nextPriceID;
+//		nextPriceID = res + 1;
+//		return res;
+//	}
 
-	/**
-	 * Creates a <tt>priceID</tt> by incrementing the member nextPriceID.
-	 * The new ID is unique within the context of this <tt>PriceConfig</tt>
-	 * (<tt>organisationID</tt> & <tt>priceConfigID</tt>).
-	 *
-	 * @return Returns a price id, which is unique within the context of this <tt>PriceConfig</tt>.
-	 */
-	public synchronized long createPriceID()
+	public static long createPriceID(String priceConfigOrganisationID, long priceConfigID)
 	{
-		long res = nextPriceID;
-		nextPriceID = res + 1;
-		return res;
+		if (IDGenerator.getOrganisationID().equals(priceConfigOrganisationID))
+			return IDGenerator.nextID(Price.class, getPrimaryKey(priceConfigOrganisationID, priceConfigID));
+
+		// TODO On the long run, we must be able to obtain the ID from another organisation if we cooperate with it because
+		// we might do price calculations "abroad" - but currently, this doesn't happen.
+		throw new UnsupportedOperationException("This method does not yet support to generate a priceID when called outside its organisation!");
+	}
+
+	public long createPriceID()
+	{
+		return createPriceID(organisationID, priceConfigID);
 	}
 
 	/**

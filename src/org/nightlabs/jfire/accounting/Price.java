@@ -224,6 +224,9 @@ public class Price
 		priceFragmentTotal.setAmount(amount);
 	}
 
+	/**
+	 * This method is called by {@link PriceFragment#setAmount(long)}, if it represents the total price.
+	 */
 	protected void _setAmount(long amount)
 	{
 		this.amount = amount;

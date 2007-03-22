@@ -5,7 +5,10 @@ import javax.jdo.PersistenceManager;
 import javax.jdo.listener.DetachCallback;
 
 import org.nightlabs.annotation.Implement;
+import org.nightlabs.jfire.accounting.Accounting;
 import org.nightlabs.jfire.accounting.Price;
+import org.nightlabs.jfire.accounting.priceconfig.PriceConfig;
+import org.nightlabs.jfire.idgenerator.IDGenerator;
 import org.nightlabs.jfire.security.User;
 import org.nightlabs.jfire.store.Product;
 import org.nightlabs.jfire.store.ProductLocal;
@@ -82,9 +85,27 @@ implements DetachCallback
 		return restValue;
 	}
 
-	public void setRestValue(Price restValue)
+//	public void setRestValue(Price restValue)
+//	{
+//		this.restValue = restValue;
+//	}
+
+	public long decrementRestValue(long amount)
 	{
-		this.restValue = restValue;
+		return incrementRestValue(-amount);
+	}
+
+	public long incrementRestValue(long amount)
+	{
+		if (restValue == null)
+			throw new IllegalStateException("This Voucher is currently not allocated within an Article - there is no restValue existing.");
+
+		long newAmount = restValue.getAmount() + amount;
+		if (newAmount < 0)
+			throw new IllegalStateException("restValue.amount would become negative!");
+
+		restValue.setAmount(newAmount);
+		return newAmount;
 	}
 
 	@Implement
@@ -106,4 +127,15 @@ implements DetachCallback
 		// nothing
 	}
 
+	protected void onAssemble(User user)
+	{
+		Price origPrice = getArticle().getPrice();
+		long priceID = PriceConfig.createPriceID(origPrice.getOrganisationID(), origPrice.getPriceConfigID());
+		restValue = new Price(origPrice.getOrganisationID(), origPrice.getPriceConfigID(), priceID, origPrice.getCurrency()); 
+	}
+
+	protected void onDisassemble(User user, boolean onRelease)
+	{
+		restValue = null;
+	}
 }

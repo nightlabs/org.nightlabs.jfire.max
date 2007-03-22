@@ -8,6 +8,7 @@ import java.util.Map;
 import org.nightlabs.annotation.Implement;
 import org.nightlabs.jfire.accounting.Currency;
 import org.nightlabs.jfire.accounting.Price;
+import org.nightlabs.jfire.accounting.PriceFragmentType;
 import org.nightlabs.jfire.accounting.priceconfig.IPackagePriceConfig;
 import org.nightlabs.jfire.accounting.priceconfig.PriceConfig;
 import org.nightlabs.jfire.accounting.priceconfig.PriceConfigUtil;
@@ -77,9 +78,12 @@ implements IPackagePriceConfig
 	{
 		Long amount = prices.get(article.getCurrency());
 
+		PriceFragmentType priceFragmentTypeTotal = getPriceFragmentType(
+				PriceFragmentType.PRICE_FRAGMENT_TYPE_ID_TOTAL.organisationID, PriceFragmentType.PRICE_FRAGMENT_TYPE_ID_TOTAL.priceFragmentTypeID, true);
+
 		Price price = new Price("", -1, -1, article.getCurrency());
 		if (amount != null)
-			price.setAmount(amount);
+			price.setAmount(priceFragmentTypeTotal, amount);
 
 		return PriceConfigUtil.createArticlePrice(this, article, price);
 	}
@@ -93,9 +97,12 @@ implements IPackagePriceConfig
 	{
 		Long amount = prices.get(article.getCurrency());
 
+		PriceFragmentType priceFragmentTypeTotal = getPriceFragmentType(
+				PriceFragmentType.PRICE_FRAGMENT_TYPE_ID_TOTAL.organisationID, PriceFragmentType.PRICE_FRAGMENT_TYPE_ID_TOTAL.priceFragmentTypeID, true);
+
 		Price origPrice = new Price("", -1, -1, article.getCurrency());
 		if (amount != null)
-			origPrice.setAmount(amount);
+			origPrice.setAmount(priceFragmentTypeTotal, amount);
 
 		return PriceConfigUtil.createNestedArticlePrice(
 				topLevelPriceConfig, this, article, priceConfigStack,
@@ -113,9 +120,12 @@ implements IPackagePriceConfig
 	{
 		Long amount = prices.get(article.getCurrency());
 
+		PriceFragmentType priceFragmentTypeTotal = getPriceFragmentType(
+				PriceFragmentType.PRICE_FRAGMENT_TYPE_ID_TOTAL.organisationID, PriceFragmentType.PRICE_FRAGMENT_TYPE_ID_TOTAL.priceFragmentTypeID, true);
+
 		Price origPrice = new Price("", -1, -1, article.getCurrency());
 		if (amount != null)
-			origPrice.setAmount(amount);
+			origPrice.setAmount(priceFragmentTypeTotal, amount);
 
 		return PriceConfigUtil.createNestedArticlePrice(
 				topLevelPriceConfig, this, article, priceConfigStack,

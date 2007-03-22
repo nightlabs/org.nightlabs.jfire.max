@@ -184,4 +184,12 @@ extends LocalAccountantDelegate
 
 		return unmodifiableAccounts;
 	}
+
+	public void setAccount(String currencyID, Account account)
+	{
+		if (account == null)
+			accounts.remove(currencyID);
+		else
+			accounts.put(currencyID, account);
+	}
 }

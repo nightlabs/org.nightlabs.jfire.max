@@ -1,5 +1,6 @@
 package org.nightlabs.jfire.voucher.store;
 
+import org.nightlabs.ModuleException;
 import org.nightlabs.annotation.Implement;
 import org.nightlabs.jfire.security.User;
 import org.nightlabs.jfire.store.NestedProductType;
@@ -47,5 +48,24 @@ extends Product
 	protected ProductLocal createProductLocal(User user, Repository initialRepository)
 	{
 		return new VoucherLocal(user, this, initialRepository);
+	}
+
+	@Override
+	public void assemble(User user)
+			throws ModuleException
+	{
+		super.assemble(user);
+
+		VoucherLocal voucherLocal = (VoucherLocal) getProductLocal();
+		voucherLocal.onAssemble(user);
+	}
+
+	@Override
+	public void disassemble(User user, boolean onRelease)
+	{
+		super.disassemble(user, onRelease);
+
+		VoucherLocal voucherLocal = (VoucherLocal) getProductLocal();
+		voucherLocal.onDisassemble(user, onRelease);
 	}
 }

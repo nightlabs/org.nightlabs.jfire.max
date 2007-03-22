@@ -11,11 +11,13 @@ import org.nightlabs.inheritance.FieldInheriter;
 import org.nightlabs.inheritance.FieldMetaData;
 import org.nightlabs.inheritance.Inheritable;
 import org.nightlabs.inheritance.InheritableFieldInheriter;
+import org.nightlabs.jfire.security.User;
 import org.nightlabs.jfire.store.ProductType;
 import org.nightlabs.jfire.store.ProductTypeFieldMetaData;
-import org.nightlabs.jfire.store.ProductTypeMapFieldMetaData;
+import org.nightlabs.jfire.store.ProductTypeLocal;
 import org.nightlabs.jfire.store.id.ProductTypeID;
 import org.nightlabs.jfire.trade.LegalEntity;
+import org.nightlabs.jfire.transfer.Anchor;
 
 /**
  * @author Marco Schulze - marco at nightlabs dot de
@@ -96,11 +98,10 @@ extends ProductType
 		return name;
 	}
 
-	@Implement
-	protected boolean _checkProductAvailability()
+	@Override
+	protected ProductTypeLocal createProductTypeLocal(User user, Anchor home)
 	{
-		// TODO Auto-generated method stub
-		return false;
+		return new VoucherTypeLocal(user, this, home);
 	}
 
 	@Implement

@@ -1,22 +1,19 @@
 package org.nightlabs.jfire.geography;
 
 import java.io.BufferedReader;
-import java.io.ByteArrayInputStream;
 import java.io.InputStream;
 import java.io.InputStreamReader;
-import java.io.ObjectInputStream;
 import java.util.Collection;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.Locale;
+import java.util.Set;
 import java.util.StringTokenizer;
-
-import javax.xml.registry.infomodel.Organization;
+import java.util.Map.Entry;
 
 import org.apache.log4j.Logger;
 import org.nightlabs.annotation.Implement;
 import org.nightlabs.jdo.ObjectIDUtil;
-import org.nightlabs.jfire.organisation.Organisation;
 import org.nightlabs.jfire.security.SecurityReflector;
 import org.nightlabs.util.CollectionUtil;
 
@@ -85,35 +82,87 @@ extends Geography
 			Object obj = iterator.next();
 			csvLines.append(obj2csvLine(obj)).append("\n");
 		}//for
+		System.out.println("======================================");
+		System.out.println(csvLines.toString());
 		return csvLines.toString();
 	}
-	
+
 	protected static String obj2csvLine(Object obj)
 	{
 		StringBuffer csvLine = new StringBuffer();
 
 		if(obj instanceof Location){
 			Location location = (Location)obj;
-			
-			csvLine.append(location.getCountryID()).append(";");
-			csvLine.append(location.getLocationID()).append(";");
-			csvLine.append(location.getCity().getCityID()).append(";");
-			csvLine.append(location.getDistrict() == null ? "" : location.getDistrict().getDistrictID()).append(";");
-			csvLine.append("DE").append(";");
-			csvLine.append(location.getName().getText());
+			Set nameTexts = location.getName().getTexts();
+
+			for(Iterator<Entry<String, String>> entryMap = nameTexts.iterator(); entryMap.hasNext();){
+				Entry<String, String> nameMap = entryMap.next();
+				csvLine.append(location.getCountryID()).append(";");
+				csvLine.append(location.getLocationID()).append(";");
+				csvLine.append(location.getCity().getCityID()).append(";");
+				csvLine.append(location.getDistrict() == null ? "" : location.getDistrict().getDistrictID()).append(";");
+
+				String languageID = nameMap.getKey();
+				csvLine.append(languageID).append(";");
+
+				String text = nameMap.getValue(); 
+				csvLine.append(text == null?"":text);
+			}//for
 		}//else if
 		else if(obj instanceof City){
 			City city = (City)obj;
-			
-			csvLine.append(city.getCountryID()).append(";");
-			csvLine.append(city.getCityID()).append(";");
-			csvLine.append(city.getRegion().getRegionID()).append(";");
-			csvLine.append("DE").append(";");
-			csvLine.append(city.getName().getText());
+			Set nameTexts = city.getName().getTexts();
+
+			for(Iterator<Entry<String, String>> entryMap = nameTexts.iterator(); entryMap.hasNext();){
+				Entry<String, String> nameMap = entryMap.next();
+				csvLine.append(city.getCountryID()).append(";");
+				csvLine.append(city.getCityID()).append(";");
+				csvLine.append(city.getRegion().getRegionID()).append(";");
+
+				String languageID = nameMap.getKey();
+				csvLine.append(languageID).append(";");
+
+				String text = nameMap.getValue(); 
+				csvLine.append(text == null?"":text);
+			}//for
+		}//else if
+		else if(obj instanceof Region){
+			Region region = (Region)obj;
+			Set nameTexts = region.getName().getTexts();
+
+//			for(Iterator<Entry<String, String>> entryMap = nameTexts.iterator(); entryMap.hasNext();){
+//			Entry<String, String> nameMap = entryMap.next();
+//			csvLine.append(region.getCountryID()).append(";");
+//			csvLine.append(region.getCityID()).append(";");
+//			csvLine.append(region.getRegion().getRegionID()).append(";");
+
+//			String languageID = nameMap.getKey();
+//			csvLine.append(languageID).append(";");
+
+//			String text = nameMap.getValue(); 
+//			csvLine.append(text == null?"":text);
+//			}//for
+		}//else if
+		else if(obj instanceof Country){
+			Country country = (Country)obj;
+			Set nameTexts = country.getName().getTexts();
+
+//			for(Iterator<Entry<String, String>> entryMap = nameTexts.iterator(); entryMap.hasNext();){
+//			Entry<String, String> nameMap = entryMap.next();
+//			csvLine.append(country.getCountryID()).append(";");
+//			csvLine.append(country.getCityID()).append(";");
+//			csvLine.append(country.getRegion().getRegionID()).append(";");
+
+//			String languageID = nameMap.getKey();
+//			csvLine.append(languageID).append(";");
+
+//			String text = nameMap.getValue(); 
+//			csvLine.append(text == null?"":text);
+//			}//for
 		}//else if
 		else if(obj instanceof District){
 			District district = (District)obj;
-			
+
 			csvLine.append(district.getCountryID()).append(";");
 			csvLine.append(district.getCity().getCityID()).append(";");
 			csvLine.append(district.getDistrictID()).append(";");
@@ -124,12 +173,10 @@ extends Geography
 		}//else if
 		else
 			throw new IllegalArgumentException("obj is an instance of " + (obj == null ? null : obj.getClass().getName()) + " which is not supported!");
-// Please don't forget to handle ALL situations. It's better to get an Exception here (and know exactly where
-// the problem is) than to wonder why there are empty lines in the file and search for the problem, later. Marco :-)
 
 		return csvLine.toString();
 	}
-	
+
 	protected InputStream createCountryCSVInputStream()
 	{
 		String file = "resource/Data-Country.csv";
@@ -159,22 +206,22 @@ extends Geography
 				BufferedReader reader = new BufferedReader(r);
 				try {
 					String line;
-	        while ((line = reader.readLine()) != null) {
-	        	++row;
-	
-	        	if ("".equals(line) || line.startsWith("#"))
-	        		continue;
-	
-	        	String[] fields = csvLine2Fields(line); // line.replaceAll("\"", "").split(";");
+					while ((line = reader.readLine()) != null) {
+						++row;
 
-	        	if (row == 1)
-	        		continue; // 1st line is header.
+						if ("".equals(line) || line.startsWith("#"))
+							continue;
+
+						String[] fields = csvLine2Fields(line); // line.replaceAll("\"", "").split(";");
+
+						if (row == 1)
+							continue; // 1st line is header.
 
 						String countryID = fields[0];
 						String languageID = fields[1];
 						String countryName = fields[2];
 
-	        	if ("".equals(countryID))
+						if ("".equals(countryID))
 							countryID = null;
 
 						if (countryID != null) {
@@ -243,21 +290,21 @@ extends Geography
 				BufferedReader reader = new BufferedReader(r);
 				try {
 					String line;
-	        while ((line = reader.readLine()) != null) {
-	        	++row;
-	
-	        	if ("".equals(line) || line.startsWith("#"))
-	        		continue;
-	
-	        	String[] fields = csvLine2Fields(line); // line.replaceAll("\"", "").split(";");
+					while ((line = reader.readLine()) != null) {
+						++row;
 
-	        	if (fields.length != 4) {
-	        		logger.warn("Region-CSV for countryID \""+countryID+"\": Invalid number of fields in row "+row+"! Row ignored.");
-	        		continue;
-	        	}
-	
-	        	if (row == 1)
-	        		continue; // 1st line is header.
+						if ("".equals(line) || line.startsWith("#"))
+							continue;
+
+						String[] fields = csvLine2Fields(line); // line.replaceAll("\"", "").split(";");
+
+						if (fields.length != 4) {
+							logger.warn("Region-CSV for countryID \""+countryID+"\": Invalid number of fields in row "+row+"! Row ignored.");
+							continue;
+						}
+
+						if (row == 1)
+							continue; // 1st line is header.
 
 						String fcountryID = fields[0];
 						String regionID = fields[1];
@@ -342,38 +389,38 @@ extends Geography
 				BufferedReader reader = new BufferedReader(r);
 				try {
 					String line;
-	        while ((line = reader.readLine()) != null) {
-	        	++row;
-	
-	        	if ("".equals(line) || line.startsWith("#"))
-	        		continue;
-	
-	        	String[] fields = csvLine2Fields(line); // line.replaceAll("\"", "").split(";");
+					while ((line = reader.readLine()) != null) {
+						++row;
 
-	        	if (fields.length != 5) {
-	        		logger.warn("City-CSV for countryID \""+countryID+"\": Invalid number of fields in row "+row+"! Row ignored.");
-	        		continue;
-	        	}
+						if ("".equals(line) || line.startsWith("#"))
+							continue;
 
-	        	if (row == 1)
-	        		continue; // 1st line is header
-	
-	        	String fcountryID = fields[0];
+						String[] fields = csvLine2Fields(line); // line.replaceAll("\"", "").split(";");
+
+						if (fields.length != 5) {
+							logger.warn("City-CSV for countryID \""+countryID+"\": Invalid number of fields in row "+row+"! Row ignored.");
+							continue;
+						}
+
+						if (row == 1)
+							continue; // 1st line is header
+
+						String fcountryID = fields[0];
 						String cityID = fields[1];
 						String regionID = fields[2];
 						String languageID = fields[3];
 						String cityName = fields[4];
-	
+
 						if (!countryID.equals(fcountryID)) {
 							logger.warn("City-CSV for countryID \""+countryID+"\": Row "+row+" does declare the wrong country! Should be \""+countryID+"\" but is \""+fcountryID+"\"! Row ignored.");
 							continue;
 						}
-	
+
 						if (!ObjectIDUtil.isValidIDString(cityID)) {
 							logger.warn("City-CSV for countryID \""+countryID+"\", line "+row+": cityID \"" + cityID + "\" is not a valid ID String! Row ignored!");
 							continue;
 						}
-	
+
 						Country country = countries.get(countryID);
 						if (country == null) {
 							logger.warn("City-CSV for countryID \""+countryID+"\", line "+row+": country with ID \""+countryID+"\" does not exist! Row ignored.");
@@ -389,7 +436,7 @@ extends Geography
 							logger.warn("City-CSV for countryID \""+countryID+"\", line "+row+": Region with PK \""+regionPK+"\" does not exist! Row ignored.");
 							continue;
 						}
-	
+
 						City city = cities.get(
 								City.getPrimaryKey(countryID, csvOrganisationID, cityID));
 						if (city == null) {
@@ -400,16 +447,16 @@ extends Geography
 						}
 						city.getName().setText(languageID, cityName);
 						++cityLangCount;
-	        }
-	      } finally {
-	 				reader.close();
-	 				r.close();
-	 			}
-	 		} finally {
-	 			in.close();
-	 		}
+					}
+				} finally {
+					reader.close();
+					r.close();
+				}
+			} finally {
+				in.close();
+			}
 
-	 		logger.info("Read " +row+ " rows and added " + cityCount + " new cities & " + cityLangCount + " names for country \"" + countryID + "\".");
+			logger.info("Read " +row+ " rows and added " + cityCount + " new cities & " + cityLangCount + " names for country \"" + countryID + "\".");
 
 		} catch (Exception x) {
 			throw new RuntimeException(x);
@@ -445,66 +492,66 @@ extends Geography
 				BufferedReader reader = new BufferedReader(r);
 				try {
 					String line;
-	        while ((line = reader.readLine()) != null) {
-	        	++row;
-	
-	        	if ("".equals(line) || line.startsWith("#"))
-	        		continue;
-	
-	        	String[] fields = csvLine2Fields(line); // line.replaceAll("\"", "").split(";");
+					while ((line = reader.readLine()) != null) {
+						++row;
 
-	        	if (fields.length != 7) {
-	        		logger.warn("District-CSV for countryID \""+countryID+"\": Invalid number of fields ("+fields.length+") in row "+row+"! Row ignored.");
-	        		continue;
-	        	}
-	
-	        	if (row == 1)
-	        		continue; // 1st line is header
-	
-	        	String fcountryID = fields[0];
+						if ("".equals(line) || line.startsWith("#"))
+							continue;
+
+						String[] fields = csvLine2Fields(line); // line.replaceAll("\"", "").split(";");
+
+						if (fields.length != 7) {
+							logger.warn("District-CSV for countryID \""+countryID+"\": Invalid number of fields ("+fields.length+") in row "+row+"! Row ignored.");
+							continue;
+						}
+
+						if (row == 1)
+							continue; // 1st line is header
+
+						String fcountryID = fields[0];
 						String cityID = fields[1];
 						String districtID = fields[2];
-	// TODO					String languageID = fields[3];
+						// TODO					String languageID = fields[3];
 						String districtName = fields[4];
 						String latitudeStr = fields[5];
 						String longitudeStr = fields[6];
-	
+
 						if (!countryID.equals(fcountryID)) {
 							logger.warn("District-CSV for countryID \""+countryID+"\": Row "+row+" does declare the wrong country! Should be \""+countryID+"\" but is \""+fcountryID+"\"! Row ignored.");
 							continue;
 						}
-	
+
 						Country country = countries.get(countryID);
 						if (country == null) {
 							logger.warn("District-CSV for countryID \""+countryID+"\", line "+row+": country with ID \""+countryID+"\" does not exist! Row ignored.");
 							continue;
 						}
-	
+
 						if ("".equals(districtID))
 							districtID = cityID;
-	
+
 						if (!ObjectIDUtil.isValidIDString(districtID)) {
 							logger.warn("District-CSV for countryID \""+countryID+"\", line "+row+": districtID \"" + districtID + "\" is not a valid ID String! Row ignored!");
 							continue;
 						}
-	
+
 						String cityPK = City.getPrimaryKey(countryID, csvOrganisationID, cityID);
 						City city = (City) cities.get(cityPK);
 						if (city == null) {
 							logger.warn("District-CSV for countryID \""+countryID+"\", line "+row+": City with PK \""+cityPK+"\" does not exist! Row ignored.");
 							continue;
 						}
-	
+
 						if ("".equals(districtName))
 							districtName = city.getName().getText(Locale.getDefault().getLanguage());
-	
+
 						double latitude = 0;
 						try {
 							latitude = Double.parseDouble(latitudeStr);
 						} catch (NumberFormatException x) {
 							logger.warn("District-CSV for countryID \""+countryID+"\", line "+row+": latitude \"" + latitudeStr + "\" is not a double! Setting latitude = 0.");
 						}
-	
+
 						double longitude = 0;
 						try {
 							longitude = Double.parseDouble(longitudeStr);
@@ -521,21 +568,21 @@ extends Geography
 							districts.put(district.getPrimaryKey(), district);
 							++districtCount;
 						}
-	//					district.getName().setText(languageID, districtName);
+						//					district.getName().setText(languageID, districtName);
 						district.setName(districtName);
 						district.setLatitude(latitude);
 						district.setLongitude(longitude);
 						++districtLangCount;
-	        }
-	      } finally {
-	 				reader.close();
-	 				r.close();
-	 			}
-	 		} finally {
-	 			in.close();
-	 		}
+					}
+				} finally {
+					reader.close();
+					r.close();
+				}
+			} finally {
+				in.close();
+			}
 
-	 		logger.info("Read " +row+ " rows and added " + districtCount + " new districts & " + districtLangCount + " names for country \"" + countryID + "\".");
+			logger.info("Read " +row+ " rows and added " + districtCount + " new districts & " + districtLangCount + " names for country \"" + countryID + "\".");
 
 		} catch (Exception x) {
 			throw new RuntimeException(x);
@@ -570,46 +617,46 @@ extends Geography
 				BufferedReader reader = new BufferedReader(r);
 				try {
 					String line;
-	        while ((line = reader.readLine()) != null) {
-	        	++row;
+					while ((line = reader.readLine()) != null) {
+						++row;
 
-	        	if ("".equals(line) || line.startsWith("#"))
-	        		continue;
+						if ("".equals(line) || line.startsWith("#"))
+							continue;
 
-	        	String[] fields = csvLine2Fields(line); // line.replaceAll("\"", "").split(";");
+						String[] fields = csvLine2Fields(line); // line.replaceAll("\"", "").split(";");
 
-	        	if (fields.length != 4) {
-	        		logger.warn("Zip-CSV for countryID \""+countryID+"\": Invalid number of fields in row "+row+"! Row ignored.");
-	        		continue;
-	        	}
+						if (fields.length != 4) {
+							logger.warn("Zip-CSV for countryID \""+countryID+"\": Invalid number of fields in row "+row+"! Row ignored.");
+							continue;
+						}
 
-	        	if (row == 1)
-	        		continue; // 1st line is header
+						if (row == 1)
+							continue; // 1st line is header
 
-	        	String fcountryID = fields[0];
+						String fcountryID = fields[0];
 						String cityID = fields[1];
 						String districtID = fields[2];
 						String zip = fields[3];
-	
+
 						if (!countryID.equals(fcountryID)) {
 							logger.warn("Zip-CSV for countryID \""+countryID+"\": Row "+row+" does declare the wrong country! Should be \""+countryID+"\" but is \""+fcountryID+"\"! Row ignored.");
 							continue;
 						}
-	
+
 						if ("".equals(districtID))
 							districtID = cityID;
-	
+
 						if ("".equals(zip)) {
 							logger.warn("Zip-CSV for countryID \""+countryID+"\", line "+row+": zip field is empty! Row ignored!");
 							continue;
 						}
-	
+
 						Country country = countries.get(countryID);
 						if (country == null) {
 							logger.warn("Zip-CSV for countryID \""+countryID+"\", line "+row+": country with ID \""+countryID+"\" does not exist! Row ignored.");
 							continue;
 						}
-	
+
 						if (!ObjectIDUtil.isValidIDString(cityID)) {
 							logger.warn("Zip-CSV for countryID \""+countryID+"\", line "+row+": cityID \"" + cityID + "\" is not a valid ID String! Row ignored!");
 							continue;
@@ -629,19 +676,19 @@ extends Geography
 
 							logger.warn("Zip-CSV for countryID \""+countryID+"\", line "+row+": District with PK \""+districtPK+"\" (named \""+district.getName()+"\") has cityID \""+district.getCity().getCityID()+"\" (named \""+district.getCity().getName().getText(languageID)+"\") but csv row declares cityID \""+cityID+"\" (named \"" + csvCityName + "\")! Will add zip \""+zip+"\" to district \""+districtPK+"\" anyway.");
 						}
-	
+
 						district.addZip(zip);
 						++zipCount;
-	        }
-	      } finally {
-	 				reader.close();
-	 				r.close();
-	 			}
-	 		} finally {
-	 			in.close();
-	 		}
+					}
+				} finally {
+					reader.close();
+					r.close();
+				}
+			} finally {
+				in.close();
+			}
 
-	 		logger.info("Read " +row+ " rows and added " + zipCount + " new zips for country \"" + countryID + "\".");
+			logger.info("Read " +row+ " rows and added " + zipCount + " new zips for country \"" + countryID + "\".");
 		} catch (Exception x) {
 			throw new RuntimeException(x);
 		}
@@ -676,23 +723,23 @@ extends Geography
 				BufferedReader reader = new BufferedReader(r);
 				try {
 					String line;
-	        while ((line = reader.readLine()) != null) {
-	        	++row;
-	
-	        	if ("".equals(line) || line.startsWith("#"))
-	        		continue;
+					while ((line = reader.readLine()) != null) {
+						++row;
 
-	        	String[] fields = csvLine2Fields(line); // line.replaceAll("\"", "").split(";");
+						if ("".equals(line) || line.startsWith("#"))
+							continue;
 
-	        	if (fields.length != 6) {
-	        		logger.warn("Location-CSV for countryID \""+countryID+"\": Invalid number of fields in row "+row+"! Row ignored.");
-	        		continue;
-	        	}
+						String[] fields = csvLine2Fields(line); // line.replaceAll("\"", "").split(";");
 
-	        	if (row == 1)
-	        		continue; // 1st line is header
+						if (fields.length != 6) {
+							logger.warn("Location-CSV for countryID \""+countryID+"\": Invalid number of fields in row "+row+"! Row ignored.");
+							continue;
+						}
 
-	        	String fcountryID = fields[0];
+						if (row == 1)
+							continue; // 1st line is header
+
+						String fcountryID = fields[0];
 						String locationID = fields[1];
 						String cityID = fields[2];
 						String districtID = fields[3];
@@ -703,7 +750,7 @@ extends Geography
 							logger.warn("Location-CSV for countryID \""+countryID+"\": Row "+row+" declares the wrong country! Should be \""+countryID+"\" but is \""+fcountryID+"\"! Row ignored.");
 							continue;
 						}
-	
+
 						if (!ObjectIDUtil.isValidIDString(locationID)) {
 							logger.warn("Location-CSV for countryID \""+countryID+"\", line "+row+": locationID \"" + locationID + "\" is not a valid ID String! Row ignored!");
 							continue;
@@ -742,16 +789,16 @@ extends Geography
 						}
 						location.getName().setText(languageID, locationName);
 						++locationLangCount;
-	        }
-	      } finally {
-	 				reader.close();
-	 				r.close();
-	 			}
-	 		} finally {
-	 			in.close();
-	 		}
+					}
+				} finally {
+					reader.close();
+					r.close();
+				}
+			} finally {
+				in.close();
+			}
 
-	 		logger.info("Read " +row+ " rows and added " + locationCount + " new locations & " + locationLangCount + " names for country \"" + countryID + "\".");
+			logger.info("Read " +row+ " rows and added " + locationCount + " new locations & " + locationLangCount + " names for country \"" + countryID + "\".");
 
 		} catch (Exception x) {
 			throw new RuntimeException(x);

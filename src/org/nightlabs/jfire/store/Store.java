@@ -47,6 +47,10 @@ import org.apache.log4j.Logger;
 import org.jbpm.JbpmContext;
 import org.jbpm.graph.exe.ProcessInstance;
 import org.nightlabs.ModuleException;
+import org.nightlabs.jfire.accounting.Invoice;
+import org.nightlabs.jfire.accounting.InvoiceActionHandler;
+import org.nightlabs.jfire.accounting.pay.PaymentException;
+import org.nightlabs.jfire.accounting.pay.PaymentResult;
 import org.nightlabs.jfire.config.Config;
 import org.nightlabs.jfire.idgenerator.IDGenerator;
 import org.nightlabs.jfire.jbpm.JbpmLookup;
@@ -530,26 +534,36 @@ public class Store
 		return mandator;
 	}
 
-	public void addArticlesToDeliveryNote(User user, DeliveryNote deliveryNote, Collection articles)
+	protected static Map<ProductTypeActionHandler, Set<Article>> getProductTypeActionHandler2ArticlesMap(
+			PersistenceManager pm, Collection<? extends Article> articles)
+	{
+		Map<ProductTypeActionHandler, Set<Article>> productTypeActionHandler2Articles = new HashMap<ProductTypeActionHandler, Set<Article>>();
+		for (Article article : articles) {
+			ProductTypeActionHandler productTypeActionHandler = ProductTypeActionHandler.getProductTypeActionHandler(
+					pm, article.getProductType().getClass());
+			Set<Article> as = (Set<Article>) productTypeActionHandler2Articles.get(productTypeActionHandler);
+			if (as == null) {
+				as = new HashSet<Article>();
+				productTypeActionHandler2Articles.put(productTypeActionHandler, as);
+			}
+			as.add(article);
+		}
+
+		return productTypeActionHandler2Articles;
+	}
+
+	public void addArticlesToDeliveryNote(User user, DeliveryNote deliveryNote, Collection<? extends Article> articles)
 	throws DeliveryNoteEditException
 	{
-		Map productTypeActionHandler2Articles = new HashMap();
 		for (Iterator it = articles.iterator(); it.hasNext(); ) {
 			Article article = (Article) it.next();
 			deliveryNote.addArticle(article);
-
-			ProductTypeActionHandler productTypeActionHandler = ProductTypeActionHandler.getProductTypeActionHandler(
-					getPersistenceManager(), article.getProductType().getClass());
-			List al = (List) productTypeActionHandler2Articles.get(productTypeActionHandler);
-			if (al == null) {
-				al = new LinkedList();
-				productTypeActionHandler2Articles.put(productTypeActionHandler, al);
-			}
-			al.add(article);
 		}
+
+		Map productTypeActionHandler2Articles = getProductTypeActionHandler2ArticlesMap(getPersistenceManager(), articles);
 		for (Iterator it = productTypeActionHandler2Articles.entrySet().iterator(); it.hasNext();) {
 			Map.Entry me = (Map.Entry) it.next();
-			((ProductTypeActionHandler) me.getKey()).onAddArticlesToDeliveryNote(user, this, deliveryNote, (List) me.getValue());
+			((ProductTypeActionHandler) me.getKey()).onAddArticlesToDeliveryNote(user, this, deliveryNote, (Collection) me.getValue());
 		}
 	}
 
@@ -669,6 +683,12 @@ public class Store
 		for (Iterator iter = articles.iterator(); iter.hasNext();) {
 			Article article = (Article) iter.next();
 			deliveryNote.addArticle(article);
+		}
+
+		Map productTypeActionHandler2Articles = getProductTypeActionHandler2ArticlesMap(getPersistenceManager(), articles);
+		for (Iterator it = productTypeActionHandler2Articles.entrySet().iterator(); it.hasNext();) {
+			Map.Entry me = (Map.Entry) it.next();
+			((ProductTypeActionHandler) me.getKey()).onAddArticlesToDeliveryNote(user, this, deliveryNote, (Collection) me.getValue());
 		}
 
 		return deliveryNote;
@@ -942,6 +962,10 @@ public class Store
 		}
 
 		deliveryNoteLocal.setBooked(initiator);
+
+		for (DeliveryNoteActionHandler deliveryNoteActionHandler : deliveryNoteLocal.getDeliveryNoteActionHandlers()) {
+			deliveryNoteActionHandler.onBook(initiator, deliveryNote);
+		}
 	}
 
 	/**
@@ -1120,6 +1144,8 @@ public class Store
 		if (deliveryData.getDelivery() == null)
 			throw new NullPointerException("deliveryData.getDelivery() returns null!");
 
+		PersistenceManager pm = getPersistenceManager();
+
 		ServerDeliveryProcessor serverDeliveryProcessor = getServerDeliveryProcessor(
 				deliveryData.getDelivery());
 
@@ -1163,6 +1189,25 @@ public class Store
 
 //		// I don't know why, but without the following line, it is not set in the datastore.
 //		deliveryData.getDelivery().setDeliverBeginServerResult(serverDeliveryResult);
+
+
+		try {
+			for (DeliveryNote deliveryNote : deliveryData.getDelivery().getDeliveryNotes()) {
+				for (DeliveryNoteActionHandler deliveryNoteActionHandler : deliveryNote.getDeliveryNoteLocal().getDeliveryNoteActionHandlers()) {
+					deliveryNoteActionHandler.onDeliverBegin(user, deliveryData, deliveryNote);
+				}
+			}
+		} catch (DeliveryException x) {
+			throw x;
+		} catch (Exception x) {
+			throw new DeliveryException(
+					new DeliveryResult(
+							getOrganisationID(),
+							DeliveryResult.CODE_FAILED,
+							"Calling DeliveryNoteActionHandler.onDeliverBegin failed!",
+							x));
+		}
+
 
 		if (deliveryData.getDelivery().isPostponed()) {
 			// if we have a DeliverProductTransfer, we need to delete it from datastore
@@ -1273,6 +1318,23 @@ public class Store
 		if (!serverDeliveryResult.isDelivered())
 			throw new DeliveryException(serverDeliveryResult);
 
+		try {
+			for (DeliveryNote deliveryNote : deliveryData.getDelivery().getDeliveryNotes()) {
+				for (DeliveryNoteActionHandler deliveryNoteActionHandler : deliveryNote.getDeliveryNoteLocal().getDeliveryNoteActionHandlers()) {
+					deliveryNoteActionHandler.onDeliverDoWork(user, deliveryData, deliveryNote);
+				}
+			}
+		} catch (DeliveryException x) {
+			throw x;
+		} catch (Exception x) {
+			throw new DeliveryException(
+					new DeliveryResult(
+							getOrganisationID(),
+							DeliveryResult.CODE_FAILED,
+							"Calling DeliveryNoteActionHandler.onDeliverDoWork failed!",
+							x));
+		}
+
 		return serverDeliveryResult;
 	}
 
@@ -1331,50 +1393,50 @@ public class Store
 			throw new IllegalStateException("Delivery should not be pending anymore, because failed is false! How's that possible?");
 
 
-// TODO do we need DeliveryActionHandlers?
-//		try {
-//			for (DeliveryNote deliveryNote : deliveryData.getDelivery().getDeliveryNotes()) {
-//				for (DeliveryNoteActionHandler deliveryNoteActionHandler : deliveryNote.getDeliveryNoteLocal().getDeliveryNoteActionHandlers()) {
-//					deliveryNoteActionHandler.onDeliverEnd(user, deliveryData, deliveryNote);
-//				}
-//			}
-//		} catch (Exception x) {
-//			throw new DeliveryException(
-//					new DeliveryResult(
-//							getOrganisationID(),
-//							DeliveryResult.CODE_FAILED,
-//							"Calling DeliveryNoteActionHandler.onDeliverEnd failed!",
-//							x));
-//		}
+		try {
+			for (DeliveryNote deliveryNote : deliveryData.getDelivery().getDeliveryNotes()) {
+				for (DeliveryNoteActionHandler deliveryNoteActionHandler : deliveryNote.getDeliveryNoteLocal().getDeliveryNoteActionHandlers()) {
+					deliveryNoteActionHandler.onDeliverEnd(user, deliveryData, deliveryNote);
+				}
+			}
+		} catch (Exception x) {
+			throw new DeliveryException(
+					new DeliveryResult(
+							getOrganisationID(),
+							DeliveryResult.CODE_FAILED,
+							"Calling DeliveryNoteActionHandler.onDeliverEnd failed!",
+							x));
+		}
 
-//		try {
-//			for (DeliveryNote deliveryNote : deliveryData.getDelivery().getDeliveryNotes()) {
-//				DeliveryNoteLocal deliveryNoteLocal = deliveryNote.getDeliveryNoteLocal();
-//				for (Article article : deliveryNote.getArticles()) {
-//					article.getArticleLocal().isDelivered()
-//				}
-//				
-//				
-//				if (!deliveryNoteLocal.isOutstanding()) {
-//					JbpmContext jbpmContext = JbpmLookup.getJbpmConfiguration().createJbpmContext();
-//					try {
-//						ProcessInstance processInstance = jbpmContext.getProcessInstanceForUpdate(deliveryNoteLocal.getJbpmProcessInstanceId());
-//						if (!JbpmConstantsDeliveryNote.Both.NODE_NAME_DELIVERED.equals(processInstance.getRootToken().getNode().getName())) {
-//							processInstance.signal(JbpmConstantsDeliveryNote.Both.TRANSITION_NAME_DELIVER);
-//						}
-//					} finally {
-//						jbpmContext.close();
-//					}
-//				}
-//			}
-//		} catch (Exception x) {
-//			throw new DeliveryException(
-//					new DeliveryResult(
-//							getOrganisationID(),
-//							DeliveryResult.CODE_FAILED,
-//							"Signalling transition \"" + JbpmConstantsDeliveryNote.Both.TRANSITION_NAME_DELIVER + "\" failed!",
-//							x));
-//		}
+		try {
+			for (DeliveryNote deliveryNote : deliveryData.getDelivery().getDeliveryNotes()) {
+				DeliveryNoteLocal deliveryNoteLocal = deliveryNote.getDeliveryNoteLocal();
+				boolean outstanding = false;
+				for (Article article : deliveryNote.getArticles()) {
+					if (!article.getArticleLocal().isDelivered())
+						outstanding = true;
+				}
+
+				if (!outstanding) { // deliveryNoteLocal.isOutstanding()) {
+					JbpmContext jbpmContext = JbpmLookup.getJbpmConfiguration().createJbpmContext();
+					try {
+						ProcessInstance processInstance = jbpmContext.getProcessInstanceForUpdate(deliveryNoteLocal.getJbpmProcessInstanceId());
+						if (!JbpmConstantsDeliveryNote.Both.NODE_NAME_DELIVERED.equals(processInstance.getRootToken().getNode().getName())) {
+							processInstance.signal(JbpmConstantsDeliveryNote.Both.TRANSITION_NAME_DELIVER);
+						}
+					} finally {
+						jbpmContext.close();
+					}
+				}
+			}
+		} catch (Exception x) {
+			throw new DeliveryException(
+					new DeliveryResult(
+							getOrganisationID(),
+							DeliveryResult.CODE_FAILED,
+							"Signalling transition \"" + JbpmConstantsDeliveryNote.Both.TRANSITION_NAME_DELIVER + "\" failed!",
+							x));
+		}
 
 		return serverDeliveryResult;
 	}

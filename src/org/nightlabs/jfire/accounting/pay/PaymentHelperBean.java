@@ -434,6 +434,12 @@ implements SessionBean
 //			}
 			payment.setPayBeginServerResult(payBeginServerResult);
 
+//			// trigger the ProductTypeActionHandler s
+//			Map<Class, Set<Article>> productTypeClass2articleSet = Article.getProductTypeClass2articleSetMapFromArticleContainers(payment.getInvoices());
+//			for (Map.Entry<Class, Set<Article>> me : productTypeClass2articleSet.entrySet()) {
+//				ProductTypeActionHandler.getProductTypeActionHandler(pm, me.getKey()).onPayBegin_storePayBeginServerResult(getPrincipal(), payment, me.getValue());
+//			}
+
 			if (!get)
 				return null;
 
@@ -469,6 +475,12 @@ implements SessionBean
 
 			payment.setPayDoWorkServerResult(payDoWorkServerResult);
 
+//			// trigger the ProductTypeActionHandler s
+//			Map<Class, Set<Article>> productTypeClass2articleSet = Article.getProductTypeClass2articleSetMapFromArticleContainers(payment.getInvoices());
+//			for (Map.Entry<Class, Set<Article>> me : productTypeClass2articleSet.entrySet()) {
+//				ProductTypeActionHandler.getProductTypeActionHandler(pm, me.getKey()).onPayDoWork_storePayDoWorkServerResult(getPrincipal(), payment, me.getValue());
+//			}
+
 			if (!get)
 				return null;
 
@@ -503,6 +515,12 @@ implements SessionBean
 				pm.makePersistent(payEndServerResult);
 
 			payment.setPayEndServerResult(payEndServerResult);
+
+//			// trigger the ProductTypeActionHandler s
+//			Map<Class, Set<Article>> productTypeClass2articleSet = Article.getProductTypeClass2articleSetMapFromArticleContainers(payment.getInvoices());
+//			for (Map.Entry<Class, Set<Article>> me : productTypeClass2articleSet.entrySet()) {
+//				ProductTypeActionHandler.getProductTypeActionHandler(pm, me.getKey()).onPayEnd_storePayEndServerResult(getPrincipal(), payment, me.getValue());
+//			}
 
 			if (!get)
 				return null;

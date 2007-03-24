@@ -26,6 +26,7 @@
 package org.nightlabs.jfire.store;
 
 import java.util.Collection;
+import java.util.Set;
 
 import javax.jdo.JDOHelper;
 import javax.jdo.PersistenceManager;
@@ -34,8 +35,17 @@ import javax.jdo.Query;
 import org.nightlabs.jdo.ObjectIDUtil;
 import org.nightlabs.jfire.accounting.Accounting;
 import org.nightlabs.jfire.accounting.Invoice;
+import org.nightlabs.jfire.accounting.pay.Payment;
+import org.nightlabs.jfire.accounting.pay.PaymentData;
+import org.nightlabs.jfire.accounting.pay.PaymentHelperBean;
+import org.nightlabs.jfire.accounting.pay.id.PaymentDataID;
+import org.nightlabs.jfire.base.JFirePrincipal;
 import org.nightlabs.jfire.organisation.Organisation;
 import org.nightlabs.jfire.security.User;
+import org.nightlabs.jfire.store.deliver.Delivery;
+import org.nightlabs.jfire.store.deliver.DeliveryData;
+import org.nightlabs.jfire.store.deliver.DeliveryHelperBean;
+import org.nightlabs.jfire.store.deliver.id.DeliveryDataID;
 import org.nightlabs.jfire.trade.Article;
 import org.nightlabs.jfire.trade.Trader;
 import org.nightlabs.util.Utils;
@@ -243,7 +253,7 @@ public abstract class ProductTypeActionHandler
 	 * @param trader The trader.
 	 * @param articles The {@link Article}s that are being allocated.
 	 */
-	public void onAllocateArticlesBegin(User user, Trader trader, Collection<Article> articles)
+	public void onAllocateArticlesBegin(User user, Trader trader, Collection<? extends Article> articles)
 	{
 	}
 
@@ -261,7 +271,7 @@ public abstract class ProductTypeActionHandler
 	 * @param trader The trader.
 	 * @param articles The {@link Article}s that are being allocated.
 	 */
-	public void onAllocateArticlesEnd(User user, Trader trader, Collection<Article> articles)
+	public void onAllocateArticlesEnd(User user, Trader trader, Collection<? extends Article> articles)
 	{
 	}
 
@@ -274,7 +284,7 @@ public abstract class ProductTypeActionHandler
 	 * @param trader The trader.
 	 * @param articles The {@link Article}s that are being released.
 	 */
-	public void onReleaseArticlesBegin(User user, Trader trader, Collection<Article> articles)
+	public void onReleaseArticlesBegin(User user, Trader trader, Collection<? extends Article> articles)
 	{
 	}
 
@@ -287,7 +297,7 @@ public abstract class ProductTypeActionHandler
 	 * @param trader The trader.
 	 * @param articles The {@link Article}s that are being released.
 	 */
-	public void onReleaseArticlesEnd(User user, Trader trader, Collection<Article> articles)
+	public void onReleaseArticlesEnd(User user, Trader trader, Collection<? extends Article> articles)
 	{
 	}
 
@@ -299,7 +309,7 @@ public abstract class ProductTypeActionHandler
 	 * @param invoice The invoice to which articles are added. This is the same as {@link Article#getInvoice()}.
 	 * @param articles The {@link Article}s that are being added to the invoice.
 	 */
-	public void onAddArticlesToInvoice(User user, Accounting accounting, Invoice invoice, Collection<Article> articles)
+	public void onAddArticlesToInvoice(User user, Accounting accounting, Invoice invoice, Collection<? extends Article> articles)
 	{		
 	}
 
@@ -311,9 +321,79 @@ public abstract class ProductTypeActionHandler
 	 * @param deliveryNote The delivery note to which articles are added. This is the same as {@link Article#getDeliveryNote()}.
 	 * @param articles The {@link Article}s that are added.
 	 */
-	public void onAddArticlesToDeliveryNote(User user, Store store, DeliveryNote deliveryNote, Collection<Article> articles)
+	public void onAddArticlesToDeliveryNote(User user, Store store, DeliveryNote deliveryNote, Collection<? extends Article> articles)
 	{
 	}
+
+	/**
+	 * This method is called by {@link DeliveryHelperBean#deliverBegin_storeDeliverBeginServerResult(org.nightlabs.jfire.store.deliver.id.DeliveryID, org.nightlabs.jfire.store.deliver.DeliveryResult, boolean, String[], int)}
+	 * at the end of its action. You should not cause any exception here as this will cause the <code>DeliveryResult</code> not to be written and
+	 * this situation is not handled.
+	 *
+	 * @param principal The user who initiated this action. If you need a {@link User} instance, call {@link User#getUser(PersistenceManager, org.nightlabs.jfire.base.JFireBasePrincipal)}.
+	 * @param delivery The currently performed delivery. If you need the {@link DeliveryData}, you can use {@link PersistenceManager#getObjectById(Object)} with {@link DeliveryDataID#create(org.nightlabs.jfire.store.deliver.id.DeliveryID)}
+	 * @param articles The articles containing {@link ProductType} implementations that are linked to this <code>ProductTypeActionHandler</code>.
+	 */
+	public void onDeliverBegin_storeDeliverBeginServerResult(JFirePrincipal principal, Delivery delivery, Set<? extends Article> articles)
+	{
+	}
+	/**
+	 * This method is called by {@link DeliveryHelperBean#deliverDoWork_storeDeliverDoWorkServerResult(org.nightlabs.jfire.store.deliver.id.DeliveryID, org.nightlabs.jfire.store.deliver.DeliveryResult, boolean, String[], int)} at the end of its action.
+	 *
+	 * @param principal The user who initiated this action. If you need a {@link User} instance, call {@link User#getUser(PersistenceManager, org.nightlabs.jfire.base.JFireBasePrincipal)}.
+	 * @param delivery The currently performed delivery. If you need the {@link DeliveryData}, you can use {@link PersistenceManager#getObjectById(Object)} with {@link DeliveryDataID#create(org.nightlabs.jfire.store.deliver.id.DeliveryID)}
+	 * @param articles The articles containing {@link ProductType} implementations that are linked to this <code>ProductTypeActionHandler</code>.
+	 */
+	public void onDeliverDoWork_storeDeliverDoWorkServerResult(JFirePrincipal principal, Delivery delivery, Set<? extends Article> articles)
+	{
+	}
+	/**
+	 * This method is called by {@link Store#deliverEnd(User, DeliveryData)} at the end of its action.
+	 *
+	 * @param principal The user who initiated this action. If you need a {@link User} instance, call {@link User#getUser(PersistenceManager, org.nightlabs.jfire.base.JFireBasePrincipal)}.
+	 * @param delivery The currently performed delivery. If you need the {@link DeliveryData}, you can use {@link PersistenceManager#getObjectById(Object)} with {@link DeliveryDataID#create(org.nightlabs.jfire.store.deliver.id.DeliveryID)}
+	 * @param articles The articles containing {@link ProductType} implementations that are linked to this <code>ProductTypeActionHandler</code>.
+	 */
+	public void onDeliverEnd_storeDeliverEndServerResult(JFirePrincipal principal, Delivery delivery, Set<? extends Article> articles)
+	{
+	}
+
+//	/**
+//	 * This method is called by {@link PaymentHelperBean#payBegin_storePayBeginServerResult(org.nightlabs.jfire.accounting.pay.id.PaymentID, org.nightlabs.jfire.accounting.pay.PaymentResult, boolean, String[], int)}
+//	 * at the end of its action. You should not cause any exception here as this will cause the <code>PaymentResult</code> not to be written and
+//	 * this situation is not handled.
+//	 * <p>
+//	 * Note, that payments are only very loosely coupled to the articles as you can do many payments for one or more {@link Invoice}s
+//	 * (thus allowing partial payments or instalment sales).
+//	 * </p>
+//	 *
+//	 * @param principal The user who initiated this action. If you need a {@link User} instance, call {@link User#getUser(PersistenceManager, org.nightlabs.jfire.base.JFireBasePrincipal)}.
+//	 * @param payment The currently performed payment. If you need the {@link PaymentData}, you can use {@link PersistenceManager#getObjectById(Object)} with {@link PaymentDataID#create(org.nightlabs.jfire.accounting.pay.id.PaymentID)}
+//	 * @param articles The articles containing {@link ProductType} implementations that are linked to this <code>ProductTypeActionHandler</code>.
+//	 */
+//	public void onPayBegin_storePayBeginServerResult(JFirePrincipal principal, Payment payment, Set<? extends Article> articles)
+//	{
+//	}
+//	/**
+//	 * This method is called by {@link PaymentHelperBean#payDoWork_storePayDoWorkServerResult(org.nightlabs.jfire.accounting.pay.id.PaymentID, org.nightlabs.jfire.accounting.pay.PaymentResult, boolean, String[], int)} at the end of its action.
+//	 *
+//	 * @param principal The user who initiated this action. If you need a {@link User} instance, call {@link User#getUser(PersistenceManager, org.nightlabs.jfire.base.JFireBasePrincipal)}.
+//	 * @param payment The currently performed payment. If you need the {@link PaymentData}, you can use {@link PersistenceManager#getObjectById(Object)} with {@link PaymentDataID#create(org.nightlabs.jfire.accounting.pay.id.PaymentID)}
+//	 * @param articles The articles containing {@link ProductType} implementations that are linked to this <code>ProductTypeActionHandler</code>.
+//	 */
+//	public void onPayDoWork_storePayDoWorkServerResult(JFirePrincipal principal, Payment payment, Set<? extends Article> articles)
+//	{
+//	}
+//	/**
+//	 * This method is called by {@link Store#payEnd(User, PaymentData)} at the end of its action.
+//	 *
+//	 * @param principal The user who initiated this action. If you need a {@link User} instance, call {@link User#getUser(PersistenceManager, org.nightlabs.jfire.base.JFireBasePrincipal)}.
+//	 * @param payment The currently performed payment. If you need the {@link PaymentData}, you can use {@link PersistenceManager#getObjectById(Object)} with {@link PaymentDataID#create(org.nightlabs.jfire.accounting.pay.id.PaymentID)}
+//	 * @param articles The articles containing {@link ProductType} implementations that are linked to this <code>ProductTypeActionHandler</code>.
+//	 */
+//	public void onPayEnd_storePayEndServerResult(JFirePrincipal principal, Payment payment, Set<? extends Article> articles)
+//	{
+//	}
 
 	@Override
 	public int hashCode()

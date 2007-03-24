@@ -30,6 +30,7 @@ import java.io.Serializable;
 import java.util.Collections;
 import java.util.Date;
 import java.util.List;
+import java.util.Set;
 
 import org.nightlabs.jfire.jbpm.graph.def.ActionHandlerNodeEnter;
 import org.nightlabs.jfire.jbpm.graph.def.Statable;
@@ -185,6 +186,44 @@ implements Serializable, StatableLocal
 	}
 	public boolean isBooked() {
 		return bookDT != null;
+	}
+
+	/**
+	 * @jdo.field
+	 *		persistence-modifier="persistent"
+	 *		collection-type="collection"
+	 *		element-type="DeliveryNoteActionHandler"
+	 *		table="JFireTrade_DeliveryNoteLocal_deliveryNoteActionHandlers"
+	 *
+	 * @jdo.join
+	 */
+	private Set<DeliveryNoteActionHandler> deliveryNoteActionHandlers;
+
+	/**
+	 * @jdo.field persistence-modifier="none"
+	 */
+	private transient Set<DeliveryNoteActionHandler> _deliveryNoteActionHandlers = null;
+
+	/**
+	 * @return Instances of {@link DeliveryNoteActionHandler}.
+	 */
+	public Set<DeliveryNoteActionHandler> getDeliveryNoteActionHandlers()
+	{
+		if (_deliveryNoteActionHandlers == null)
+			_deliveryNoteActionHandlers = Collections.unmodifiableSet(deliveryNoteActionHandlers);
+
+		return _deliveryNoteActionHandlers;
+	}
+
+	public void addDeliveryNoteActionHandler(DeliveryNoteActionHandler deliveryNoteActionHandler)
+	{
+		if (!deliveryNoteActionHandlers.contains(deliveryNoteActionHandler))
+			deliveryNoteActionHandlers.add(deliveryNoteActionHandler);
+	}
+
+	public boolean removeDeliveryNoteActionHandler(DeliveryNoteActionHandler deliveryNoteActionHandler)
+	{
+		return deliveryNoteActionHandlers.remove(deliveryNoteActionHandler);
 	}
 
 //	public boolean isDelivered() {

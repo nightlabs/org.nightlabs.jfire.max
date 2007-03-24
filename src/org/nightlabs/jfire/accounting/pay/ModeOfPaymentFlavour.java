@@ -377,9 +377,11 @@ implements Serializable
 	}
 
 	/**
-	 * Calls {@link #loadIconFromResource(Class, String) } with <code>resourceLoaderClass == </code>
+	 * Calls {@link #loadIconFromResource(Class, String) } with <code>resourceLoaderClass == this.getClass()</code>
 	 * {@link ModeOfPaymentFlavour} and <code>fileName == "ModeOfPaymentFlavour-" + modeOfPaymentFlavourID + ".16x16.png"</code>.
 	 * This method is used for the default {@link ModeOfPaymentFlavour}s populated by JFireTrade.
+	 * If you want to load icons for a ModeOfPaymentFlavour outside of JFireTrade, you should
+	 * use {@link #loadIconFromResource(Class, String)} instead.
 	 *
 	 * @throws IOException
 	 */

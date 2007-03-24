@@ -58,7 +58,7 @@ public class InvoiceActionHandler
 	}
 
 	/**
-	 * This method is called by {@link Accounting#bookInvoice(User, Invoice, boolean, boolean)} after
+	 * This method is called by {@link Accounting#onBookInvoice(User, Invoice)} after
 	 * all work is done.
 	 *
 	 * @param user The responsible user.
@@ -128,7 +128,7 @@ public class InvoiceActionHandler
 	{
 		PersistenceManager pm = JDOHelper.getPersistenceManager(this);
 		if (pm == null)
-			throw new IllegalStateException("no PersistenceManager assigned!");
+			throw new IllegalStateException("This instance of " + this.getClass().getName() + " is not yet persistent or currently not attached to a datastore! Cannot obtain PersistenceManager!");
 
 		return pm;
 	}

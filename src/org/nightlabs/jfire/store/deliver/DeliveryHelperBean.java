@@ -29,8 +29,10 @@ package org.nightlabs.jfire.store.deliver;
 import java.io.Serializable;
 import java.rmi.RemoteException;
 import java.util.Collection;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
+import java.util.Map;
 import java.util.Set;
 
 import javax.ejb.CreateException;
@@ -47,6 +49,7 @@ import org.nightlabs.jfire.asyncinvoke.Invocation;
 import org.nightlabs.jfire.base.BaseSessionBeanImpl;
 import org.nightlabs.jfire.security.User;
 import org.nightlabs.jfire.store.DeliveryNote;
+import org.nightlabs.jfire.store.ProductTypeActionHandler;
 import org.nightlabs.jfire.store.Store;
 import org.nightlabs.jfire.store.deliver.id.DeliveryDataID;
 import org.nightlabs.jfire.store.deliver.id.DeliveryID;
@@ -124,7 +127,7 @@ implements SessionBean
 //			else
 
 			deliveryData.getDelivery().initUser(User.getUser(pm, getPrincipal()));
-			pm.makePersistent(deliveryData);
+			deliveryData = (DeliveryData) pm.makePersistent(deliveryData);
 
 			if (deliveryData.getDelivery().getPartner() == null) {
 				String mandatorPK = Store.getStore(pm).getMandator().getPrimaryKey();
@@ -260,7 +263,7 @@ implements SessionBean
 					deliveryData
 					);
 
-			if (deliveryData.getDelivery().isFailed()) {
+			if (deliveryData.getDelivery().isFailed()) { // FIXME this is already called within deliverEnd - should it really be called twice?!?! Marco.
 				Store.getStore(pm).deliverRollback(user, deliveryData);
 			}
 
@@ -556,13 +559,18 @@ implements SessionBean
 		try {
 			pm.getExtent(Delivery.class);
 			Delivery delivery = (Delivery) pm.getObjectById(deliveryID);
+//			DeliveryData deliveryData = (DeliveryData) pm.getObjectById(DeliveryDataID.create(deliveryID));
+//			Delivery delivery = deliveryData.getDelivery();
 
-			if (JDOHelper.isDetached(deliverBeginServerResult))
-				deliverBeginServerResult = (DeliveryResult) pm.makePersistent(deliverBeginServerResult);
-			else
-				pm.makePersistent(deliverBeginServerResult);
+			deliverBeginServerResult = (DeliveryResult) pm.makePersistent(deliverBeginServerResult);
 
 			delivery.setDeliverBeginServerResult(deliverBeginServerResult);
+
+			// trigger the ProductTypeActionHandler s
+			Map<Class, Set<Article>> productTypeClass2articleSet = Article.getProductTypeClass2articleSetMap(delivery.getArticles());
+			for (Map.Entry<Class, Set<Article>> me : productTypeClass2articleSet.entrySet()) {
+				ProductTypeActionHandler.getProductTypeActionHandler(pm, me.getKey()).onDeliverBegin_storeDeliverBeginServerResult(getPrincipal(), delivery, me.getValue());
+			}
 
 			if (!get)
 				return null;
@@ -599,6 +607,12 @@ implements SessionBean
 
 			delivery.setDeliverDoWorkServerResult(deliverDoWorkServerResult);
 
+			// trigger the ProductTypeActionHandler s
+			Map<Class, Set<Article>> productTypeClass2articleSet = Article.getProductTypeClass2articleSetMap(delivery.getArticles());
+			for (Map.Entry<Class, Set<Article>> me : productTypeClass2articleSet.entrySet()) {
+				ProductTypeActionHandler.getProductTypeActionHandler(pm, me.getKey()).onDeliverDoWork_storeDeliverDoWorkServerResult(getPrincipal(), delivery, me.getValue());
+			}
+
 			if (!get)
 				return null;
 
@@ -633,6 +647,12 @@ implements SessionBean
 				pm.makePersistent(deliverEndServerResult);
 
 			delivery.setDeliverEndServerResult(deliverEndServerResult);
+
+			// trigger the ProductTypeActionHandler s
+			Map<Class, Set<Article>> productTypeClass2articleSet = Article.getProductTypeClass2articleSetMap(delivery.getArticles());
+			for (Map.Entry<Class, Set<Article>> me : productTypeClass2articleSet.entrySet()) {
+				ProductTypeActionHandler.getProductTypeActionHandler(pm, me.getKey()).onDeliverEnd_storeDeliverEndServerResult(getPrincipal(), delivery, me.getValue());
+			}
 
 			if (!get)
 				return null;

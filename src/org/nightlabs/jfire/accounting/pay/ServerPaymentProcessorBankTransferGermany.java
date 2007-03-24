@@ -55,7 +55,7 @@ public class ServerPaymentProcessorBankTransferGermany extends ServerPaymentProc
 					ServerPaymentProcessorID.create(Organisation.DEVIL_ORGANISATION_ID, ServerPaymentProcessorBankTransferGermany.class.getName()));
 		} catch (JDOObjectNotFoundException e) {
 			serverPaymentProcessorBankTransfer = new ServerPaymentProcessorBankTransferGermany(Organisation.DEVIL_ORGANISATION_ID, ServerPaymentProcessorBankTransferGermany.class.getName());
-//			pm.makePersistent(serverPaymentProcessorBankTransfer);
+			serverPaymentProcessorBankTransfer = (ServerPaymentProcessorBankTransferGermany) pm.makePersistent(serverPaymentProcessorBankTransfer);
 		}
 
 		return serverPaymentProcessorBankTransfer;

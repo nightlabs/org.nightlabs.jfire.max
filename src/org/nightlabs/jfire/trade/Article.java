@@ -28,6 +28,10 @@ package org.nightlabs.jfire.trade;
 
 import java.io.Serializable;
 import java.util.Collection;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Map;
+import java.util.Set;
 
 import javax.jdo.JDOHelper;
 import javax.jdo.PersistenceManager;
@@ -133,6 +137,38 @@ public class Article
 	public static final String FETCH_GROUP_REVERSING_ARTICLE_ID = "Article.reversingArticleID";
 	public static final String FETCH_GROUP_VENDOR_ID = "Article.vendorID";
 	public static final String FETCH_GROUP_CUSTOMER_ID = "Article.customerID";
+
+	public static Map<Class, Set<Article>> getProductTypeClass2articleSetMapFromArticleContainers(Collection<? extends ArticleContainer> articleContainers)
+	{
+		Map<Class, Set<Article>> result = new HashMap<Class, Set<Article>>();
+		for (ArticleContainer articleContainer : articleContainers) {
+			populateProductTypeClass2articleSetMap(result, articleContainer.getArticles());
+		}
+		return result;
+	}
+
+	public static Map<Class, Set<Article>> getProductTypeClass2articleSetMap(Collection<? extends Article> articles)
+	{
+		Map<Class, Set<Article>> result = new HashMap<Class, Set<Article>>();
+		populateProductTypeClass2articleSetMap(result, articles);
+		return result;
+	}
+
+	public static void populateProductTypeClass2articleSetMap(Map<Class, Set<Article>> productTypeClass2articleSetMap, Collection<? extends Article> articles)
+	{
+		if (productTypeClass2articleSetMap == null)
+			throw new IllegalArgumentException("productTypeClass2articleSetMap is null!");
+
+		for (Article article : articles) {
+			Class clazz = article.getProductType().getClass();
+			Set<Article> articleSet = productTypeClass2articleSetMap.get(clazz);
+			if (articleSet == null) {
+				articleSet = new HashSet<Article>();
+				productTypeClass2articleSetMap.put(clazz, articleSet);
+			}
+			articleSet.add(article);
+		}
+	}
 
 	/**
 	 * @jdo.field primary-key="true"

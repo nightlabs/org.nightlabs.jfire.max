@@ -27,6 +27,8 @@ import org.nightlabs.jfire.trade.Article;
  * @jdo.inheritance strategy="new-table"
  *
  * @jdo.fetch-group name="VoucherLocal.restValue" fields="restValue"
+ *
+ * @deprecated I think this is not needed anymore as we store the restValue in the VoucherKey. It should not be instantiated by {@link Voucher#createProductLocal(User, Repository)} anymore. We can probably delete this class soon. Marco.
  */
 public class VoucherLocal
 extends ProductLocal
@@ -127,15 +129,15 @@ implements DetachCallback
 		// nothing
 	}
 
-	protected void onAssemble(User user)
-	{
-		Price origPrice = getArticle().getPrice();
-		long priceID = PriceConfig.createPriceID(origPrice.getOrganisationID(), origPrice.getPriceConfigID());
-		restValue = new Price(origPrice.getOrganisationID(), origPrice.getPriceConfigID(), priceID, origPrice.getCurrency()); 
-	}
-
-	protected void onDisassemble(User user, boolean onRelease)
-	{
-		restValue = null;
-	}
+//	protected void onAssemble(User user)
+//	{
+//		Price origPrice = getArticle().getPrice();
+//		long priceID = PriceConfig.createPriceID(origPrice.getOrganisationID(), origPrice.getPriceConfigID());
+//		restValue = new Price(origPrice.getOrganisationID(), origPrice.getPriceConfigID(), priceID, origPrice.getCurrency()); 
+//	}
+//
+//	protected void onDisassemble(User user, boolean onRelease)
+//	{
+//		restValue = null;
+//	}
 }

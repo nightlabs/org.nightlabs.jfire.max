@@ -25,6 +25,8 @@ import org.nightlabs.jdo.NLJDOHelper;
 import org.nightlabs.jdo.moduleregistry.ModuleMetaData;
 import org.nightlabs.jfire.accounting.Account;
 import org.nightlabs.jfire.accounting.book.id.LocalAccountantDelegateID;
+import org.nightlabs.jfire.accounting.pay.ModeOfPayment;
+import org.nightlabs.jfire.accounting.pay.ModeOfPaymentFlavour;
 import org.nightlabs.jfire.accounting.priceconfig.id.PriceConfigID;
 import org.nightlabs.jfire.base.BaseSessionBeanImpl;
 import org.nightlabs.jfire.organisation.Organisation;
@@ -45,8 +47,12 @@ import org.nightlabs.jfire.trade.Segment;
 import org.nightlabs.jfire.trade.Trader;
 import org.nightlabs.jfire.trade.id.OfferID;
 import org.nightlabs.jfire.trade.id.SegmentID;
+import org.nightlabs.jfire.voucher.accounting.ModeOfPaymentConst;
 import org.nightlabs.jfire.voucher.accounting.VoucherLocalAccountantDelegate;
 import org.nightlabs.jfire.voucher.accounting.VoucherPriceConfig;
+import org.nightlabs.jfire.voucher.accounting.pay.ServerPaymentProcessorVoucher;
+import org.nightlabs.jfire.voucher.store.VoucherDeliveryNoteActionHandler;
+import org.nightlabs.jfire.voucher.store.VoucherStore;
 import org.nightlabs.jfire.voucher.store.VoucherType;
 import org.nightlabs.jfire.voucher.store.VoucherTypeActionHandler;
 
@@ -119,6 +125,9 @@ implements SessionBean
 					Organisation.DEVIL_ORGANISATION_ID, VoucherTypeActionHandler.class.getName(), VoucherType.class);
 			pm.makePersistent(voucherTypeActionHandler);
 
+			VoucherDeliveryNoteActionHandler voucherDeliveryNoteActionHandler = new VoucherDeliveryNoteActionHandler(Organisation.DEVIL_ORGANISATION_ID, VoucherDeliveryNoteActionHandler.class.getName());
+			pm.makePersistent(voucherDeliveryNoteActionHandler);
+
 //		 create a default DeliveryConfiguration with all default ModeOfDelivery s
 			DeliveryConfiguration deliveryConfiguration = new DeliveryConfiguration(
 					getOrganisationID(), "JFireVoucher.default");
@@ -159,6 +168,26 @@ implements SessionBean
 				store.addProductType(user, rootVoucherType, VoucherTypeActionHandler.getDefaultHome(pm, rootVoucherType));
 				store.setProductTypeStatus_published(user, rootVoucherType);
 			}
+
+			ModeOfPayment modeOfPayment = new ModeOfPayment(ModeOfPaymentConst.MODE_OF_PAYMENT_ID_VOUCHER);
+			modeOfPayment.getName().setText(Locale.ENGLISH.getLanguage(), "Voucher");
+			modeOfPayment.getName().setText(Locale.GERMAN.getLanguage(), "Gutschein");
+			ModeOfPaymentFlavour modeOfPaymentFlavour = modeOfPayment.createFlavour(ModeOfPaymentConst.MODE_OF_PAYMENT_FLAVOUR_ID_VOUCHER);
+			modeOfPaymentFlavour.getName().setText(Locale.ENGLISH.getLanguage(), "Voucher");
+			modeOfPaymentFlavour.getName().setText(Locale.GERMAN.getLanguage(), "Gutschein");
+			modeOfPaymentFlavour.loadIconFromResource(
+					ModeOfPaymentConst.class,
+					"resource/" + ModeOfPaymentConst.class.getSimpleName() + '-' + ModeOfPaymentFlavour.class.getSimpleName() + '-' + modeOfPaymentFlavour.getModeOfPaymentFlavourID() + ".16x16.png");
+			pm.makePersistent(modeOfPayment);
+			trader.getDefaultCustomerGroupForKnownCustomer().addModeOfPayment(modeOfPayment);
+
+			ServerPaymentProcessorVoucher serverPaymentProcessorVoucher = ServerPaymentProcessorVoucher.getServerPaymentProcessorVoucher(pm);
+			serverPaymentProcessorVoucher.getName().setText(Locale.ENGLISH.getLanguage(), "Voucher");
+			serverPaymentProcessorVoucher.getName().setText(Locale.GERMAN.getLanguage(), "Gutschein");
+			serverPaymentProcessorVoucher.addModeOfPayment(modeOfPayment);
+
+			// FIXME We should obtain our numeric voucherOrganisationID from the root-organisation as soon as the root-organisation-feature works!!!
+			VoucherStore.getVoucherStore(pm).setVoucherOrganisationID(VoucherStore.MAX_VOUCHER_ORGANISATION_ID);
 
 			logger.info("Initialization of JFireVoucher done!");
 		} finally {

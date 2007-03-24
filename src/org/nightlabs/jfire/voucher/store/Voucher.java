@@ -1,6 +1,5 @@
 package org.nightlabs.jfire.voucher.store;
 
-import org.nightlabs.ModuleException;
 import org.nightlabs.annotation.Implement;
 import org.nightlabs.jfire.security.User;
 import org.nightlabs.jfire.store.NestedProductType;
@@ -32,6 +31,12 @@ extends Product
 	}
 
 	/**
+	 * @see #getVoucherKey()
+	 * @jdo.field persistence-modifier="persistent"
+	 */
+	private VoucherKey voucherKey;
+
+	/**
 	 * This implementation returns <code>null</code>, because <code>Voucher</code>s don't support
 	 * {@link ProductLocator}s (they don't support nesting either - a Voucher is only valid within
 	 * one organisation).
@@ -47,25 +52,44 @@ extends Product
 	@Override
 	protected ProductLocal createProductLocal(User user, Repository initialRepository)
 	{
-		return new VoucherLocal(user, this, initialRepository);
+//		return new VoucherLocal(user, this, initialRepository);
+		return super.createProductLocal(user, initialRepository);
 	}
 
-	@Override
-	public void assemble(User user)
-			throws ModuleException
+	/**
+	 * @param voucherKey the new voucherKey to set
+	 * @see #getVoucherKey()
+	 */
+	public void setVoucherKey(VoucherKey voucherKey)
 	{
-		super.assemble(user);
-
-		VoucherLocal voucherLocal = (VoucherLocal) getProductLocal();
-		voucherLocal.onAssemble(user);
+		this.voucherKey = voucherKey;
 	}
 
-	@Override
-	public void disassemble(User user, boolean onRelease)
+	/**
+	 * @return the newest <code>VoucherKey</code> that has been created for this voucher.
+	 *		If we would allow the trade of vouchers between organisations, this should probably be in the VoucherLocal
+	 */
+	public VoucherKey getVoucherKey()
 	{
-		super.disassemble(user, onRelease);
-
-		VoucherLocal voucherLocal = (VoucherLocal) getProductLocal();
-		voucherLocal.onDisassemble(user, onRelease);
+		return voucherKey;
 	}
+
+//	@Override
+//	public void assemble(User user)
+//			throws ModuleException
+//	{
+//		super.assemble(user);
+//
+//		VoucherLocal voucherLocal = (VoucherLocal) getProductLocal();
+//		voucherLocal.onAssemble(user);
+//	}
+//
+//	@Override
+//	public void disassemble(User user, boolean onRelease)
+//	{
+//		super.disassemble(user, onRelease);
+//
+//		VoucherLocal voucherLocal = (VoucherLocal) getProductLocal();
+//		voucherLocal.onDisassemble(user, onRelease);
+//	}
 }

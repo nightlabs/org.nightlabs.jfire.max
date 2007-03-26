@@ -32,11 +32,6 @@ import javax.jdo.PersistenceManager;
 import javax.jdo.Query;
 
 import org.nightlabs.annotation.Implement;
-import org.nightlabs.i18n.I18nText;
-import org.nightlabs.inheritance.FieldInheriter;
-import org.nightlabs.inheritance.FieldMetaData;
-import org.nightlabs.inheritance.Inheritable;
-import org.nightlabs.inheritance.InheritableFieldInheriter;
 import org.nightlabs.jfire.accounting.gridpriceconfig.PriceCalculationException;
 import org.nightlabs.jfire.accounting.gridpriceconfig.PriceCalculator;
 import org.nightlabs.jfire.security.User;
@@ -74,14 +69,14 @@ import org.nightlabs.jfire.transfer.Anchor;
  *		  PARAMETERS String parentProductTypeOrganisationID, String parentProductTypeProductTypeID
  *		  import java.lang.String"
  * 
- * @jdo.fetch-group name="SimpleProductType.this" fetch-groups="default, ProductType.this" fields="name"
+ * @jdo.fetch-group name="SimpleProductType.this" fetch-groups="default, ProductType.this"
  *
- * @jdo.fetch-group name="ProductType.name" fields="name"
+ * !@jdo.fetch-group name="ProductType.name" fields="name"
  *
- * @jdo.fetch-group name="FetchGroupsTrade.articleInOrderEditor" fetch-groups="default" fields="name"
- * @jdo.fetch-group name="FetchGroupsTrade.articleInOfferEditor" fetch-groups="default" fields="name"
- * @jdo.fetch-group name="FetchGroupsTrade.articleInInvoiceEditor" fetch-groups="default" fields="name"
- * @jdo.fetch-group name="FetchGroupsTrade.articleInDeliveryNoteEditor" fetch-groups="default" fields="name"
+ * !@jdo.fetch-group name="FetchGroupsTrade.articleInOrderEditor" fetch-groups="default" fields="name"
+ * !@jdo.fetch-group name="FetchGroupsTrade.articleInOfferEditor" fetch-groups="default" fields="name"
+ * !@jdo.fetch-group name="FetchGroupsTrade.articleInInvoiceEditor" fetch-groups="default" fields="name"
+ * !@jdo.fetch-group name="FetchGroupsTrade.articleInDeliveryNoteEditor" fetch-groups="default" fields="name"
  */
 public class SimpleProductType extends ProductType
 {
@@ -122,15 +117,28 @@ public class SimpleProductType extends ProductType
 	{
 		super(organisationID, productTypeID, extendedProductType, owner, inheritanceNature, packageNature);
 
-		this.name = new SimpleProductTypeName(this);
-		getFieldMetaData("name").setValueInherited(false);
+//		this.name = new SimpleProductTypeName(this);
+//		getFieldMetaData("name").setValueInherited(false);
 	}
 
-	/**
-	 * @jdo.field persistence-modifier="persistent" mapped-by="simpleProductType"
-	 */
-	private SimpleProductTypeName name;
-
+	@Override
+	protected ProductTypeLocal createProductTypeLocal(User user, Anchor home)
+	{
+		return new SimpleProductTypeLocal(user, this, home);
+	}
+	
+	@Implement
+	protected void calculatePrices()
+	{
+		PriceCalculator priceCalculator = new PriceCalculator(this);
+		priceCalculator.preparePriceCalculation();
+		try {
+			priceCalculator.calculatePrices();
+		} catch (PriceCalculationException e) {
+			throw new RuntimeException(e);
+		}
+	}
+	
 //	/**
 //	 * If <tt>maxProductCount</tt> has a value <tt>&gt;=0</tt>, this is the maximum number of
 //	 * <tt>Product</tt>s that can be created and sold, To have an unlimited amount of
@@ -149,19 +157,18 @@ public class SimpleProductType extends ProductType
 //	 */
 //	private long createdProductCount = 0;
 
-	/**
-	 * @return Returns the name.
-	 */
-	public I18nText getName()
-	{
-		return name;
-	}
-
-	@Override
-	protected ProductTypeLocal createProductTypeLocal(User user, Anchor home)
-	{
-		return new SimpleProductTypeLocal(user, this, home);
-	}
+//	/**
+//	 * @jdo.field persistence-modifier="persistent" mapped-by="simpleProductType"
+//	 */
+//	private SimpleProductTypeName name;
+//		
+//	/**
+//	 * @return Returns the name.
+//	 */
+//	public I18nText getName()
+//	{
+//		return name;
+//	}
 
 //	/**
 //	 * @see org.nightlabs.jfire.store.ProductType#isProductProvider()
@@ -251,42 +258,31 @@ public class SimpleProductType extends ProductType
 
 	// ******************************
 	// /// *** begin inheritance *** ///
-	@Override
-	public FieldMetaData getFieldMetaData(String fieldName)
-	{
-		if ("createdProductCount".equals(fieldName))
-			return null;
-
-		return super.getFieldMetaData(fieldName);
-	}
-
-	@Override
-	public FieldInheriter getFieldInheriter(String fieldName)
-	{
-		if ("name".equals(fieldName))
-			return new InheritableFieldInheriter();
-
-		return super.getFieldInheriter(fieldName);
-	}
-
-	@Override
-	public void preInherit(Inheritable mother, Inheritable child)
-	{
-		super.preInherit(mother, child);
-		name.getI18nMap();
-	}
+//	@Override
+//	public FieldMetaData getFieldMetaData(String fieldName)
+//	{
+//		if ("createdProductCount".equals(fieldName))
+//			return null;
+//
+//		return super.getFieldMetaData(fieldName);
+//	}
+//
+//	@Override
+//	public FieldInheriter getFieldInheriter(String fieldName)
+//	{
+//		if ("name".equals(fieldName))
+//			return new InheritableFieldInheriter();
+//
+//		return super.getFieldInheriter(fieldName);
+//	}
+//
+//	@Override
+//	public void preInherit(Inheritable mother, Inheritable child)
+//	{
+//		super.preInherit(mother, child);
+//		name.getI18nMap();
+//	}
 	// /// *** end inheritance *** ///
 	// ******************************
 
-	@Implement
-	protected void calculatePrices()
-	{
-		PriceCalculator priceCalculator = new PriceCalculator(this);
-		priceCalculator.preparePriceCalculation();
-		try {
-			priceCalculator.calculatePrices();
-		} catch (PriceCalculationException e) {
-			throw new RuntimeException(e);
-		}
-	}
 }

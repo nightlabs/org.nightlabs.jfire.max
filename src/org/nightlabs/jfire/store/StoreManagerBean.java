@@ -30,6 +30,7 @@ import java.io.IOException;
 import java.rmi.RemoteException;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Locale;
@@ -77,6 +78,7 @@ import org.nightlabs.jfire.store.deliver.id.ModeOfDeliveryID;
 import org.nightlabs.jfire.store.id.DeliveryNoteID;
 import org.nightlabs.jfire.store.id.DeliveryNoteLocalID;
 import org.nightlabs.jfire.store.id.ProductTypeID;
+import org.nightlabs.jfire.store.search.ProductTypeQuery;
 import org.nightlabs.jfire.trade.Article;
 import org.nightlabs.jfire.trade.ArticleContainer;
 import org.nightlabs.jfire.trade.CustomerGroup;
@@ -1374,6 +1376,31 @@ implements SessionBean
 		}
 	}
 
+	/**
+	 *
+	 * @ejb.interface-method
+	 * @ejb.permission role-name="_Guest_"
+	 * @ejb.transaction type="Supports"
+	 */
+	public Set<ProductTypeID> getProductTypeIDs(Collection<ProductTypeQuery> productTypeQueries)
+	{
+		PersistenceManager pm = getPersistenceManager();
+		try {
+			pm.getFetchPlan().setMaxFetchDepth(1);
+			pm.getFetchPlan().setGroup(FetchPlan.DEFAULT);
+
+			Set<ProductType> productTypes = null;
+			for (ProductTypeQuery query : productTypeQueries) {
+				query.setPersistenceManager(pm);
+				query.setCandidates(productTypes);
+				productTypes = new HashSet<ProductType>(query.getResult());
+			}
+
+			return NLJDOHelper.getObjectIDSet(productTypes);
+		} finally {
+			pm.close();
+		}
+	}		
 //	/**
 //	 * Sets the <tt>published</tt> property of the specified <tt>ProductType</tt>
 //	 * to <tt>true</tt>.

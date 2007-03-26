@@ -46,6 +46,7 @@ import org.nightlabs.annotation.Implement;
 import org.nightlabs.i18n.I18nText;
 import org.nightlabs.inheritance.FieldInheriter;
 import org.nightlabs.inheritance.Inheritable;
+import org.nightlabs.inheritance.InheritableFieldInheriter;
 import org.nightlabs.inheritance.InheritanceCallbacks;
 import org.nightlabs.inheritance.InheritanceManager;
 import org.nightlabs.jdo.inheritance.JDOSimpleFieldInheriter;
@@ -126,12 +127,13 @@ import org.nightlabs.util.Utils;
  * @jdo.fetch-group name="ProductType.managedProductTypeGroup" fields="managedProductTypeGroup"
  * @jdo.fetch-group name="ProductType.localAccountantDelegate" fields="localAccountantDelegate"
  * @jdo.fetch-group name="ProductType.localStorekeeperDelegate" fields="localStorekeeperDelegate"
- * @jdo.fetch-group name="ProductType.this" fetch-groups="default" fields="nonInheritableFields, extendedProductType, fieldMetaDataMap, innerPriceConfig, nestedProductTypes, packagePriceConfig, localAccountantDelegate, localStorekeeperDelegate"
+ * @jdo.fetch-group name="ProductType.this" fetch-groups="default" fields="nonInheritableFields, extendedProductType, fieldMetaDataMap, innerPriceConfig, nestedProductTypes, packagePriceConfig, localAccountantDelegate, localStorekeeperDelegate, name"
+ * @jdo.fetch-group name="ProductType.name" fields="name" 
  *
- * @jdo.fetch-group name="FetchGroupsTrade.articleInOrderEditor" fetch-groups="default"
- * @jdo.fetch-group name="FetchGroupsTrade.articleInOfferEditor" fetch-groups="default"
- * @jdo.fetch-group name="FetchGroupsTrade.articleInInvoiceEditor" fetch-groups="default"
- * @jdo.fetch-group name="FetchGroupsTrade.articleInDeliveryNoteEditor" fetch-groups="default"
+ * @jdo.fetch-group name="FetchGroupsTrade.articleInOrderEditor" fetch-groups="default" fields="name"
+ * @jdo.fetch-group name="FetchGroupsTrade.articleInOfferEditor" fetch-groups="default" fields="name"
+ * @jdo.fetch-group name="FetchGroupsTrade.articleInInvoiceEditor" fetch-groups="default" fields="name"
+ * @jdo.fetch-group name="FetchGroupsTrade.articleInDeliveryNoteEditor" fetch-groups="default" fields="name"
  *
  * @jdo.query name="getProductTypesOfProductTypeGroup" query="
  *		SELECT
@@ -573,6 +575,9 @@ implements
 		productTypeGroups = new HashMap<String, ProductTypeGroup>();
 		fieldMetaDataMap = new HashMap<String, ProductTypeFieldMetaData>();
 		nestedProductTypes = new HashMap<String, NestedProductType>();
+		
+		this.name = new ProductTypeName(this);
+		getFieldMetaData("name").setValueInherited(false);
 //	initFieldMetaData();
 	}
 
@@ -970,6 +975,9 @@ implements
 			return new NestedProductTypeMapInheriter();
 		}
 
+		if ("name".equals(fieldName))
+			return new InheritableFieldInheriter();
+		
 		return new JDOSimpleFieldInheriter();
 	}
 
@@ -1038,6 +1046,7 @@ implements
 		nestedProductTypes.size();
 		if (packagePriceConfig == null);
 		if (owner == null);
+		name.getI18nMap();
 	}
 
 	@Implement
@@ -1479,8 +1488,22 @@ implements
 		else
 			return this.getInnerPriceConfig();
 	}
-
-	public abstract I18nText getName();
+	
+//public abstract I18nText getName();
+	
+	/**
+	 * @jdo.field persistence-modifier="persistent" mapped-by="productType"
+	 */
+	private ProductTypeName name;
+	/**
+	 * return the multilanguage capable name of the productType 
+	 * 
+	 * @return the {@link I18nText} which stores the name of the productType 
+	 * in a  {@link ProductTypeName}
+	 */
+	public I18nText getName() {
+		return name;
+	}
 
 	/**
 	 * @return Returns either <code>null</code> or the ProductTypeGroup

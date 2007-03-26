@@ -6,11 +6,7 @@ import javax.jdo.PersistenceManager;
 import javax.jdo.Query;
 
 import org.nightlabs.annotation.Implement;
-import org.nightlabs.i18n.I18nText;
-import org.nightlabs.inheritance.FieldInheriter;
 import org.nightlabs.inheritance.FieldMetaData;
-import org.nightlabs.inheritance.Inheritable;
-import org.nightlabs.inheritance.InheritableFieldInheriter;
 import org.nightlabs.jfire.security.User;
 import org.nightlabs.jfire.store.ProductType;
 import org.nightlabs.jfire.store.ProductTypeFieldMetaData;
@@ -47,12 +43,12 @@ import org.nightlabs.jfire.transfer.Anchor;
  *		  PARAMETERS String parentProductTypeOrganisationID, String parentProductTypeProductTypeID
  *		  import java.lang.String"
  *
- * @jdo.fetch-group name="ProductType.name" fields="name"
+ * !@jdo.fetch-group name="ProductType.name" fields="name"
  *
- * @jdo.fetch-group name="FetchGroupsTrade.articleInOrderEditor" fetch-groups="default" fields="name"
- * @jdo.fetch-group name="FetchGroupsTrade.articleInOfferEditor" fetch-groups="default" fields="name"
- * @jdo.fetch-group name="FetchGroupsTrade.articleInInvoiceEditor" fetch-groups="default" fields="name"
- * @jdo.fetch-group name="FetchGroupsTrade.articleInDeliveryNoteEditor" fetch-groups="default" fields="name"
+ * !@jdo.fetch-group name="FetchGroupsTrade.articleInOrderEditor" fetch-groups="default" fields="name"
+ * !@jdo.fetch-group name="FetchGroupsTrade.articleInOfferEditor" fetch-groups="default" fields="name"
+ * !@jdo.fetch-group name="FetchGroupsTrade.articleInInvoiceEditor" fetch-groups="default" fields="name"
+ * !@jdo.fetch-group name="FetchGroupsTrade.articleInDeliveryNoteEditor" fetch-groups="default" fields="name"
  */
 public class VoucherType
 extends ProductType
@@ -72,10 +68,10 @@ extends ProductType
 			parentVoucherTypeID.organisationID, parentVoucherTypeID.productTypeID);
 	}
 
-	/**
-	 * @jdo.field persistence-modifier="persistent" mapped-by="voucherType"
-	 */
-	private VoucherTypeName name;
+//	/**
+//	 * @jdo.field persistence-modifier="persistent" mapped-by="voucherType"
+//	 */
+//	private VoucherTypeName name;
 
 	/**
 	 * @deprecated Only for JDO!
@@ -89,14 +85,14 @@ extends ProductType
 		super(organisationID, productTypeID, extendedProductType, owner,
 				inheritanceNature, packageNature);
 
-		this.name = new VoucherTypeName(this);
+//		this.name = new VoucherTypeName(this);
 	}
 
-	@Implement
-	public I18nText getName()
-	{
-		return name;
-	}
+//	@Implement
+//	public I18nText getName()
+//	{
+//		return name;
+//	}
 
 	@Override
 	protected ProductTypeLocal createProductTypeLocal(User user, Anchor home)
@@ -128,21 +124,21 @@ extends ProductType
 		return super.getFieldMetaData(fieldName);
 	}
 
-	@Override
-	public FieldInheriter getFieldInheriter(String fieldName)
-	{
-		if ("name".equals(fieldName))
-			return new InheritableFieldInheriter();
-
-		return super.getFieldInheriter(fieldName);
-	}
-
-	@Override
-	public void preInherit(Inheritable mother, Inheritable child)
-	{
-		super.preInherit(mother, child);
-		name.getI18nMap();
-	}
+//	@Override
+//	public FieldInheriter getFieldInheriter(String fieldName)
+//	{
+//		if ("name".equals(fieldName))
+//			return new InheritableFieldInheriter();
+//
+//		return super.getFieldInheriter(fieldName);
+//	}
+//
+//	@Override
+//	public void preInherit(Inheritable mother, Inheritable child)
+//	{
+//		super.preInherit(mother, child);
+//		name.getI18nMap();
+//	}
 	// /// *** end inheritance *** ///
 	// ******************************
 

@@ -75,17 +75,17 @@ extends Geography
 		return (String[]) CollectionUtil.collection2TypedArray(res, String.class);
 	}
 
-	protected static String collection2csvLines(Collection<Object> collection)
-	{
-		StringBuffer csvLines = new StringBuffer();
-		for(Iterator<Object> iterator = collection.iterator(); iterator.hasNext();){
-			Object obj = iterator.next();
-			csvLines.append(obj2csvLine(obj)).append("\n");
-		}//for
-		System.out.println("======================================");
-		System.out.println(csvLines.toString());
-		return csvLines.toString();
-	}
+//	protected static String collection2csvLines(Collection<Object> collection)
+//	{
+//		StringBuffer csvLines = new StringBuffer();
+//		for(Iterator<Object> iterator = collection.iterator(); iterator.hasNext();){
+//			Object obj = iterator.next();
+//			csvLines.append(obj2csvLine(obj)).append("\n");
+//		}//for
+//		System.out.println("======================================");
+//		System.out.println(csvLines.toString());
+//		return csvLines.toString();
+//	}
 
 	protected static String obj2csvLine(Object obj)
 	{

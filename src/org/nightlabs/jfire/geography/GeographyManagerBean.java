@@ -26,15 +26,10 @@
 
 package org.nightlabs.jfire.geography;
 
-import java.io.ByteArrayOutputStream;
-import java.io.IOException;
-import java.io.ObjectOutputStream;
 import java.rmi.RemoteException;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Iterator;
-import java.util.List;
-import java.util.zip.Deflater;
 
 import javax.ejb.CreateException;
 import javax.ejb.EJBException;

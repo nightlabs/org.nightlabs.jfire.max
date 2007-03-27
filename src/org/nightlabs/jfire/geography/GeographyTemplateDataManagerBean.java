@@ -36,7 +36,6 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Iterator;
 import java.util.List;
-import java.util.zip.Deflater;
 import java.util.zip.DeflaterOutputStream;
 
 import javax.ejb.CreateException;
@@ -65,8 +64,8 @@ import org.nightlabs.util.Utils;
  * @ejb.util generate = "physical" 
  */
 public abstract class GeographyTemplateDataManagerBean
-	extends BaseSessionBeanImpl
-	implements SessionBean
+extends BaseSessionBeanImpl
+implements SessionBean
 {
 	/**
 	 * LOG4J logger used by this class
@@ -77,7 +76,7 @@ public abstract class GeographyTemplateDataManagerBean
 	 * @see org.nightlabs.jfire.base.BaseSessionBeanImpl#setSessionContext(javax.ejb.SessionContext)
 	 */
 	public void setSessionContext(SessionContext sessionContext)
-			throws EJBException, RemoteException
+	throws EJBException, RemoteException
 	{
 		logger.debug(this.getClass().getName() + ".setSessionContext("+sessionContext+")");
 		super.setSessionContext(sessionContext);
@@ -106,7 +105,7 @@ public abstract class GeographyTemplateDataManagerBean
 	{
 		logger.debug(this.getClass().getName() + ".ejbRemove()");
 	}
-	
+
 	/**
 	 * @see javax.ejb.SessionBean#ejbActivate()
 	 */
@@ -134,17 +133,19 @@ public abstract class GeographyTemplateDataManagerBean
 
 //		PersistenceManager pm = getPersistenceManager();
 //		try {
-//			Geography.getGeography(pm);
+//		Geography.getGeography(pm);
 //		} finally {
-//			pm.close();
+//		pm.close();
 //		}
 	}
 
 	/**
 	 * @ejb.interface-method
+	 * @ejb.transaction type="Required"
 	 * @ejb.permission role-name="_Guest_"
 	 */
 	public void addGeographyTemplateData(String countryID, Object obj){
+		logger.info("Adding Geography Template Data...");
 		PersistenceManager pm = getPersistenceManager();
 		try {
 			CSV csv = null;
@@ -158,8 +159,13 @@ public abstract class GeographyTemplateDataManagerBean
 
 					Country country = GeographyImplJDO.sharedInstance().getCountry(CountryID.create(newLocation.getCountryID()), false);
 
-					List<Object> locationList = new ArrayList();
 					Collection<Region> regions = country.getRegions();
+
+					ByteArrayOutputStream outp = new ByteArrayOutputStream();
+					OutputStream out = new DeflaterOutputStream(outp);
+					Writer w = new OutputStreamWriter(out, Utils.CHARSET_UTF_8);
+					
+					logger.info("Preparing old data...");
 					for(Iterator<Region> it = regions.iterator(); it.hasNext();){
 						Region region = (Region)it.next();
 						Collection<City> cities = region.getCities();
@@ -167,59 +173,91 @@ public abstract class GeographyTemplateDataManagerBean
 							City city = (City)it2.next();
 							Collection<Location> locations = city.getLocations();
 							if(locations != null && locations.size() > 0){
-								for(Iterator it3 = locations.iterator(); it3.hasNext();){
-									locationList.add((Location)it3.next());
+								for(Iterator<Location> it3 = locations.iterator(); it3.hasNext();){
+									Location location = it3.next();
+									String csvLine = GeographyImplResourceCSV.obj2csvLine(location);
+									w.write(csvLine);
 								}//for
 							}//if
 						}//for
 					}//for
 
-					locationList.add(newLocation);
-
-					String csvLines = GeographyImplResourceCSV.collection2csvLines(locationList);
-
-
-					Deflater compresser  = new Deflater();
-					compresser.setInput(csvLines.getBytes());
-					compresser.finish();
+					String csvLine = GeographyImplResourceCSV.obj2csvLine(newLocation);
+					try{
+						logger.info("Writing new data...");
+						w.write(csvLine);
+					}//try
+					finally {
+						w.close(); // this closes all the underlying streams as well
+					}//finally
 					
-					byte[] output = new byte[compresser.getTotalOut()];
-					compresser.deflate(output);
-
-					csv = CSV.setCSVData(pm, Organisation.getRootOrganisationID(initialContext), CSV.CSV_TYPE_LOCATION, country.getCountryID(), output);
-					Geography.sharedInstance().loadLocations(newLocation.getCountryID());
+					logger.info("Writing Geography Template Data to Data Store...");
+					csv = CSV.setCSVData(pm, Organisation.getRootOrganisationID(initialContext), CSV.CSV_TYPE_LOCATION, country.getCountryID(), outp.toByteArray());
 				}//if
+				else if(obj instanceof Region){
+					Region newRegion = (Region)obj;
+
+					Country country = GeographyImplJDO.sharedInstance().getCountry(CountryID.create(newRegion.getCountryID()), false);
+
+					Collection<Region> regions = country.getRegions();
+
+					ByteArrayOutputStream outp = new ByteArrayOutputStream();
+					OutputStream out = new DeflaterOutputStream(outp);
+					Writer w = new OutputStreamWriter(out, Utils.CHARSET_UTF_8);
+
+					for(Iterator<Region> it = regions.iterator(); it.hasNext();){
+						Region region = (Region)it.next();
+						String csvLine = GeographyImplResourceCSV.obj2csvLine(region);
+						try{
+							w.write(csvLine);
+						}//try
+						finally {
+							w.close(); // this closes all the underlying streams as well
+						}//finally
+					}//for
+
+					String csvLine = GeographyImplResourceCSV.obj2csvLine(newRegion);
+					try{
+						w.write(csvLine);
+					}//try
+					finally {
+						w.close(); // this closes all the underlying streams as well
+					}//finally
+
+					csv = CSV.setCSVData(pm, Organisation.getRootOrganisationID(initialContext), CSV.CSV_TYPE_CITY, country.getCountryID(), outp.toByteArray());
+				}//else if
 				else if(obj instanceof City){
 					City newCity = (City)obj;
 
 					Country country = GeographyImplJDO.sharedInstance().getCountry(CountryID.create(newCity.getCountryID()), false);
 
-					List<Object> cityList = new ArrayList();
 					Collection<Region> regions = country.getRegions();
-					for(Iterator<Region> it = regions.iterator(); it.hasNext();){
-						Region region = (Region)it.next();
-						Collection<City> cities = region.getCities();
-						for(Iterator<City> it2 = cities.iterator(); it2.hasNext();){
-							cityList.add((City)it2.next());
-						}//for
-					}//for
-
-					cityList.add(newCity);
-
-					String csvLines = GeographyImplResourceCSV.collection2csvLines(cityList);
 
 					ByteArrayOutputStream outp = new ByteArrayOutputStream();
 					OutputStream out = new DeflaterOutputStream(outp);
 					Writer w = new OutputStreamWriter(out, Utils.CHARSET_UTF_8);
+
+					for(Iterator<Region> it = regions.iterator(); it.hasNext();){
+						Region region = (Region)it.next();
+						Collection<City> cities = region.getCities();
+						for(Iterator<City> it2 = cities.iterator(); it2.hasNext();){
+							City city = (City)it2.next();
+							String csvLine = GeographyImplResourceCSV.obj2csvLine(city);
+							w.write(csvLine);
+							logger.info("=========" +csvLine);
+						}//for
+					}//for
+
+					String csvLine = GeographyImplResourceCSV.obj2csvLine(newCity);
+					logger.info("++++++++" + csvLine);
+					logger.info(Organisation.getRootOrganisationID(initialContext)+":"+country.getCountryID()+":"+outp.toByteArray());
 					try{
-						w.write(csvLines);
+						w.write(csvLine);
+						csv = CSV.setCSVData(pm, Organisation.getRootOrganisationID(initialContext), CSV.CSV_TYPE_CITY, country.getCountryID(), outp.toByteArray());
 					}//try
 					finally {
 						w.close(); // this closes all the underlying streams as well
 					}//finally
-					csv = CSV.setCSVData(pm, Organisation.getRootOrganisationID(initialContext), CSV.CSV_TYPE_CITY, country.getCountryID(), outp.toByteArray());
-					
-					Geography.sharedInstance().loadCities(country.getCountryID());
 				}//else if
 				else if(obj instanceof District){
 					District newDistrict = (District)obj;
@@ -244,17 +282,17 @@ public abstract class GeographyTemplateDataManagerBean
 
 					districtList.add(newDistrict);
 
-					String csvLines = GeographyImplResourceCSV.collection2csvLines(districtList);
+//					String csvLines = GeographyImplResourceCSV.collection2csvLines(districtList);
 
 
-					Deflater compresser  = new Deflater();
-					compresser.setInput(csvLines.getBytes());
-					compresser.finish();
-					
-					byte[] output = new byte[compresser.getTotalOut()];
-					compresser.deflate(output);
-
-					csv = CSV.setCSVData(pm, Organisation.getRootOrganisationID(initialContext), CSV.CSV_TYPE_DISTRICT, country.getCountryID(), output);
+//					Deflater compresser  = new Deflater();
+//					compresser.setInput(csvLines.getBytes());
+//					compresser.finish();
+//
+//					byte[] output = new byte[compresser.getTotalOut()];
+//					compresser.deflate(output);
+//
+//					csv = CSV.setCSVData(pm, Organisation.getRootOrganisationID(initialContext), CSV.CSV_TYPE_DISTRICT, country.getCountryID(), output);
 				}//else if
 			}//try 
 			catch(IOException ex){
@@ -271,7 +309,7 @@ public abstract class GeographyTemplateDataManagerBean
 			pm.close();
 		}//finally
 	}
-	
+
 	/**
 	 * @ejb.interface-method
 	 * @ejb.permission role-name="_Guest_"
@@ -287,7 +325,7 @@ public abstract class GeographyTemplateDataManagerBean
 			try {
 				if(obj instanceof Location){
 					Location updateLocation = (Location)obj;
-					
+
 					Collection locations = GeographyImplJDO.sharedInstance().getLocations(CityID.create(
 							updateLocation.getCity().getCountryID(), updateLocation.getCity().getOrganisationID(), updateLocation.getCity().getCityID()), true);
 					List locationList = new ArrayList();
@@ -301,16 +339,16 @@ public abstract class GeographyTemplateDataManagerBean
 						}//else
 					}//for
 
-					String csvLines = GeographyImplResourceCSV.collection2csvLines(locationList);
-
-					byte[] output = new byte[csvLines.getBytes().length];
-
-					Deflater compresser  = new Deflater();
-					compresser.setInput(csvLines.getBytes());
-					compresser.finish();
-					compresser.deflate(output);
-
-					csv = CSV.setCSVData(pm, Organisation.getRootOrganisationID(initialContext), CSV.CSV_TYPE_LOCATION, updateLocation.getCountryID(), output);
+//					String csvLines = GeographyImplResourceCSV.collection2csvLines(locationList);
+//
+//					byte[] output = new byte[csvLines.getBytes().length];
+//
+//					Deflater compresser  = new Deflater();
+//					compresser.setInput(csvLines.getBytes());
+//					compresser.finish();
+//					compresser.deflate(output);
+//
+//					csv = CSV.setCSVData(pm, Organisation.getRootOrganisationID(initialContext), CSV.CSV_TYPE_LOCATION, updateLocation.getCountryID(), output);
 				}//if
 				else if(obj instanceof City){
 					City updateCity = (City)obj;
@@ -329,34 +367,7 @@ public abstract class GeographyTemplateDataManagerBean
 						}//else
 					}//for
 
-					String csvLines = GeographyImplResourceCSV.collection2csvLines(cityList);
-
-					byte[] output = new byte[csvLines.getBytes().length];
-
-					Deflater compresser  = new Deflater();
-					compresser.setInput(csvLines.getBytes());
-					compresser.finish();
-					compresser.deflate(output);
-
-					csv = CSV.setCSVData(pm, Organisation.getRootOrganisationID(initialContext), CSV.CSV_TYPE_CITY, updateCity.getCountryID(), output);
-				}//else if
-				else if(obj instanceof District){
-//					District updateDistrict = (District)obj;
-//
-//					Collection districts = GeographyImplJDO.sharedInstance().getDistricts(new CityID(updateLocation.getCity().getCityID()), true);
-//					List districtList = new ArrayList();
-//					for(Iterator locationIterator = locations.iterator(); locationIterator.hasNext();){
-//						Location location = (Location)locationIterator.next();
-//						if(location.getLocationID().equals(updateDistrict.getLocationID())){
-//							locationList.add(updateDistrict);
-//						}//if
-//						else{
-//							locationList.add(location);
-//						}//else
-//					}//for
-//
-//
-//					String csvLines = GeographyImplResourceCSV.collection2csvLines(districtList);
+//					String csvLines = GeographyImplResourceCSV.collection2csvLines(cityList);
 //
 //					byte[] output = new byte[csvLines.getBytes().length];
 //
@@ -365,6 +376,33 @@ public abstract class GeographyTemplateDataManagerBean
 //					compresser.finish();
 //					compresser.deflate(output);
 //
+//					csv = CSV.setCSVData(pm, Organisation.getRootOrganisationID(initialContext), CSV.CSV_TYPE_CITY, updateCity.getCountryID(), output);
+				}//else if
+				else if(obj instanceof District){
+//					District updateDistrict = (District)obj;
+
+//					Collection districts = GeographyImplJDO.sharedInstance().getDistricts(new CityID(updateLocation.getCity().getCityID()), true);
+//					List districtList = new ArrayList();
+//					for(Iterator locationIterator = locations.iterator(); locationIterator.hasNext();){
+//					Location location = (Location)locationIterator.next();
+//					if(location.getLocationID().equals(updateDistrict.getLocationID())){
+//					locationList.add(updateDistrict);
+//					}//if
+//					else{
+//					locationList.add(location);
+//					}//else
+//					}//for
+
+
+//					String csvLines = GeographyImplResourceCSV.collection2csvLines(districtList);
+
+//					byte[] output = new byte[csvLines.getBytes().length];
+
+//					Deflater compresser  = new Deflater();
+//					compresser.setInput(csvLines.getBytes());
+//					compresser.finish();
+//					compresser.deflate(output);
+
 //					csv = CSV.setCSVData(pm, Organisation.getRootOrganisationID(initialContext), csvType, countryID, output);
 //					Geography.sharedInstance().loadDistricts(updateDistrict.getCountryID());
 				}//else if

@@ -32,18 +32,21 @@ extends JDOQuery<Set<ProductType>>
 	@Override
 	protected Query prepareQuery() 
 	{
-		// TODO: Query also subclasses when JPOX problem is solved
-		Query q = getPersistenceManager().newQuery(getPersistenceManager().getExtent(ProductType.class, true));
+		// FIXME: Query also subclasses when JPOX problem is solved
+		Query q = getPersistenceManager().newQuery(getPersistenceManager().getExtent(
+				ProductType.class, false));
 		
 		StringBuffer filter = new StringBuffer();
 		StringBuffer vars = new StringBuffer();
-		StringBuffer imports = new StringBuffer();
+//		StringBuffer imports = new StringBuffer();
 		
+		filter.append("\n");
 		filter.append("true");		
 		
 		if (fullTextSearch != null) {
-			filter.append("\n && ( ");
+			filter.append("\n && ( ");			
 			addFullTextSearch(filter, vars, "name");
+			filter.append("\n )");
 		}
 		
 		if (published != null)

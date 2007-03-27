@@ -53,10 +53,15 @@ import org.nightlabs.jfire.transfer.Anchor;
  * @jdo.inheritance-discriminator strategy="class-name"
  *
  * @jdo.create-objectid-class field-order="organisationID, productID"
+ *
+ * @jdo.fetch-group name="ProductLocal.article" fields="article"
  */
 public class ProductLocal
 implements Serializable
 {
+	// TODO create fetch-groups for all object-fields
+	public static final String FETCH_GROUP_ARTICLE = "ProductLocal.article";
+
 //	/**
 //	 * This method creates a new instance of <code>ProductLocal</code> if it is necessesary. If there exists
 //	 * already one for the given <code>product</code>, the previously created one will be returned.
@@ -202,7 +207,7 @@ implements Serializable
 	 *		collection-type="map"
 	 *		key-type="java.lang.String"
 	 *		value-type="Product"
-	 *		table="JFireTrade_ProductLocal_nestedProducts"
+	 *		table="JFireTrade_ProductLocal_nestedProductLocals"
 	 *
 	 * @!jdo.join
 	 */

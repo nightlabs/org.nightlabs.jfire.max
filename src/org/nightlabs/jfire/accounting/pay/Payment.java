@@ -67,6 +67,21 @@ import org.nightlabs.math.Base62Coder;
  * @jdo.create-objectid-class
  *		field-order="organisationID, paymentID"
  *		include-body="id/PaymentID.body.inc"
+ *
+ * @jdo.fetch-group name="Payment.precursor" fields="precursor"
+ * @jdo.fetch-group name="Payment.followUp" fields="followUp"
+ * @jdo.fetch-group name="Payment.user" fields="user"
+ * @jdo.fetch-group name="Payment.payBeginClientResult" fields="payBeginClientResult"
+ * @jdo.fetch-group name="Payment.payBeginServerResult" fields="payBeginServerResult"
+ * @jdo.fetch-group name="Payment.payDoWorkClientResult" fields="payDoWorkClientResult"
+ * @jdo.fetch-group name="Payment.payDoWorkServerResult" fields="payDoWorkServerResult"
+ * @jdo.fetch-group name="Payment.payEndClientResult" fields="payEndClientResult"
+ * @jdo.fetch-group name="Payment.payEndServerResult" fields="payEndServerResult"
+ * @jdo.fetch-group name="Payment.currency" fields="currency"
+ * @jdo.fetch-group name="Payment.invoices" fields="invoices"
+ * @jdo.fetch-group name="Payment.partner" fields="partner"
+ * @jdo.fetch-group name="Payment.partnerAccount" fields="partnerAccount"
+ * @jdo.fetch-group name="Payment.modeOfPaymentFlavour" fields="modeOfPaymentFlavour"
  */
 public class Payment
 implements Serializable, StoreCallback
@@ -74,6 +89,21 @@ implements Serializable, StoreCallback
 	public static final String PAYMENT_DIRECTION_INCOMING = "incoming";
 
 	public static final String PAYMENT_DIRECTION_OUTGOING = "outgoing";
+
+	public static final String FETCH_GROUP_PRECURSOR = "Payment.precursor";
+	public static final String FETCH_GROUP_FOLLOW_UP = "Payment.followUp";
+	public static final String FETCH_GROUP_USER = "Payment.user";
+	public static final String FETCH_GROUP_PAY_BEGIN_CLIENT_RESULT = "Payment.payBeginClientResult";
+	public static final String FETCH_GROUP_PAY_BEGIN_SERVER_RESULT = "Payment.payBeginServerResult";
+	public static final String FETCH_GROUP_PAY_DO_WORK_CLIENT_RESULT = "Payment.payDoWorkClientResult";
+	public static final String FETCH_GROUP_PAY_DO_WORK_SERVER_RESULT = "Payment.payDoWorkServerResult";
+	public static final String FETCH_GROUP_PAY_END_CLIENT_RESULT = "Payment.payEndClientResult";
+	public static final String FETCH_GROUP_PAY_END_SERVER_RESULT = "Payment.payEndServerResult";
+	public static final String FETCH_GROUP_CURRENCY = "Payment.currency";
+	public static final String FETCH_GROUP_INVOICES = "Payment.invoices";
+	public static final String FETCH_GROUP_PARTNER = "Payment.partner";
+	public static final String FETCH_GROUP_PARTNER_ACCOUNT = "Payment.partnerAccount";
+	public static final String FETCH_GROUP_MODE_OF_PAYMENT_FLAVOUR = "Payment.modeOfPaymentFlavour";
 
 	/**
 	 * @jdo.field primary-key="true"

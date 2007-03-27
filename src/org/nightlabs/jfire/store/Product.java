@@ -59,10 +59,13 @@ import org.nightlabs.jfire.transfer.Anchor;
  * @!jdo.inheritance strategy="subclass-table"
  *
  * @jdo.create-objectid-class field-order="organisationID, productID"
+ *
+ * @jdo.fetch-group name="Product.productLocal" fields="productLocal"
  */
 public abstract class Product
 implements Serializable
 {
+	public static final String FETCH_GROUP_PRODUCT_LOCAL = "Product.productLocal";
 
 	/**
 	 * @jdo.field primary-key="true"

@@ -121,14 +121,15 @@ extends LocalAccountantDelegate
 
 		amount = Math.abs(amount);
 
-		InvoiceMoneyTransfer imt = new InvoiceMoneyTransfer(
+		VoucherMoneyTransfer moneyTransfer = new VoucherMoneyTransfer(
 				InvoiceMoneyTransfer.BOOK_TYPE_BOOK,
 				accounting,
 				container,
 				from, to,
 				invoice,
-				amount);
-		imt.bookTransfer(user, involvedAnchors);
+				amount,
+				article);
+		moneyTransfer.bookTransfer(user, involvedAnchors);
 	}
 
 	@Implement

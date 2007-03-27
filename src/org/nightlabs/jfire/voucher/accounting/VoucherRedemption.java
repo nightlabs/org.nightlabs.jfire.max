@@ -1,5 +1,7 @@
 package org.nightlabs.jfire.voucher.accounting;
 
+import java.io.Serializable;
+
 import org.nightlabs.jfire.accounting.pay.Payment;
 import org.nightlabs.jfire.voucher.store.VoucherKey;
 import org.nightlabs.util.Utils;
@@ -16,9 +18,18 @@ import org.nightlabs.util.Utils;
  * @jdo.inheritance strategy="new-table"
  *
  * @jdo.create-objectid-class field-order="organisationID, voucherRedemptionID"
+ *
+ * @jdo.fetch-group name="VoucherRedemption.voucherKey" fields="voucherKey"
+ * @jdo.fetch-group name="VoucherRedemption.payment" fields="payment"
  */
 public class VoucherRedemption
+implements Serializable
 {
+	private static final long serialVersionUID = 1L;
+
+	public static final String FETCH_GROUP_VOUCHER_KEY = "VoucherRedemption.voucherKey";
+	public static final String FETCH_GROUP_PAYMENT = "VoucherRedemption.payment";
+
 	/**
 	 * @jdo.field primary-key="true"
 	 * @jdo.column length="100"

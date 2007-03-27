@@ -12,12 +12,14 @@ import javax.jdo.PersistenceManager;
 import javax.jdo.Query;
 
 import org.nightlabs.jfire.accounting.Price;
+import org.nightlabs.jfire.accounting.PriceFragmentType;
 import org.nightlabs.jfire.accounting.pay.Payment;
 import org.nightlabs.jfire.accounting.priceconfig.PriceConfig;
 import org.nightlabs.jfire.security.User;
 import org.nightlabs.jfire.store.Product;
 import org.nightlabs.jfire.trade.Article;
 import org.nightlabs.jfire.voucher.accounting.VoucherRedemption;
+import org.nightlabs.jfire.voucher.store.id.VoucherKeyID;
 import org.nightlabs.math.Base62Coder;
 import org.nightlabs.util.Utils;
 
@@ -42,6 +44,7 @@ import org.nightlabs.util.Utils;
  *
  * @jdo.create-objectid-class field-order="voucherOrganisationID, voucherNumber"
  *
+ * @jdo.fetch-group name="VoucherKey.voucher" fields="voucher"
  * @jdo.fetch-group name="VoucherKey.nominalValue" fields="nominalValue"
  * @jdo.fetch-group name="VoucherKey.restValue" fields="restValue"
  * @jdo.fetch-group name="VoucherKey.createUser" fields="createUser"
@@ -51,23 +54,42 @@ import org.nightlabs.util.Utils;
  *
  * @jdo.query name="getVoucherKeysForVoucherAndValidity"
  *		query="SELECT WHERE this.voucher == :voucher && this.validity == :validity"
+ *
+ * @jdo.query name="getVoucherKeyIDByVoucherKeyString"
+ *		query="SELECT UNIQUE JDOHelper.getObjectId(this) WHERE this.voucherKey == :voucherKey"
+ *
+ * @jdo.query name="getVoucherKeyByVoucherKeyString"
+ *		query="SELECT UNIQUE WHERE this.voucherKey == :voucherKey"
  */
 public class VoucherKey
 implements Serializable
 {
 	private static final long serialVersionUID = 1L;
 
-	public static final String FETCH_GROUPS_REST_VALUE = "VoucherKey.restValue";
-	public static final String FETCH_GROUPS_NOMINAL_VALUE = "VoucherKey.nominalValue";
-	public static final String FETCH_GROUPS_CREATE_USER = "VoucherKey.createUser";
-	public static final String FETCH_GROUPS_VALID_USER = "VoucherKey.validUser";
-	public static final String FETCH_GROUPS_REVERSED_USER = "VoucherKey.reversedUser";
-	public static final String fETCH_GROUPS_REDEMPTIONS = "VoucherKey.redemptions";
+	public static final String FETCH_GROUP_VOUCHER = "VoucherKey.voucher";
+	public static final String FETCH_GROUP_REST_VALUE = "VoucherKey.restValue";
+	public static final String FETCH_GROUP_NOMINAL_VALUE = "VoucherKey.nominalValue";
+	public static final String FETCH_GROUP_CREATE_USER = "VoucherKey.createUser";
+	public static final String FETCH_GROUP_VALID_USER = "VoucherKey.validUser";
+	public static final String FETCH_GROUP_REVERSED_USER = "VoucherKey.reversedUser";
+	public static final String FETCH_GROUP_REDEMPTIONS = "VoucherKey.redemptions";
 
 	public static List<? extends VoucherKey> getVoucherKeys(PersistenceManager pm, Voucher voucher, byte validity)
 	{
 		Query q = pm.newNamedQuery(VoucherKey.class, "getVoucherKeysForVoucherAndValidity");
 		return (List<? extends VoucherKey>) q.execute(voucher, validity);
+	}
+
+	public static VoucherKeyID getVoucherKeyID(PersistenceManager pm, String voucherKey)
+	{
+		Query q = pm.newNamedQuery(VoucherKey.class, "getVoucherKeyIDByVoucherKeyString");
+		return (VoucherKeyID) q.execute(voucherKey);
+	}
+
+	public static VoucherKey getVoucherKey(PersistenceManager pm, String voucherKey)
+	{
+		Query q = pm.newNamedQuery(VoucherKey.class, "getVoucherKeyByVoucherKeyString");
+		return (VoucherKey) q.execute(voucherKey);
 	}
 
 	/**
@@ -110,7 +132,7 @@ implements Serializable
 
 	/**
 	 * @jdo.field persistence-modifier="persistent" unique="true"
-	 * @jdo.column length="12"
+	 * @jdo.column length="50"
 	 */
 	private String voucherKey;
 
@@ -175,6 +197,9 @@ implements Serializable
 
 		long priceID = PriceConfig.createPriceID(nominalValue.getOrganisationID(), nominalValue.getPriceConfigID());
 		restValue = new Price(nominalValue.getOrganisationID(), nominalValue.getPriceConfigID(), priceID, nominalValue.getCurrency());
+		restValue.createPriceFragment(
+				nominalValue.getPriceFragment(PriceFragmentType.PRICE_FRAGMENT_TYPE_ID_TOTAL.organisationID, PriceFragmentType.PRICE_FRAGMENT_TYPE_ID_TOTAL.priceFragmentTypeID, true).getPriceFragmentType()).
+				setAmount(nominalValue.getAmount());
 	}
 
 	private static Random random;
@@ -193,7 +218,7 @@ implements Serializable
 				base62Coder.encode(voucherOrganisationID, 4));
 
 		if (sb.length() != 5)
-			throw new IllegalStateException("Encoding ticketingOrganisationID went wrong! So far generated ticketKey (should have a length of 5 but doesn't): " + sb.toString());
+			throw new IllegalStateException("Encoding voucherOrganisationID went wrong! So far generated voucherKey (should have a length of 5 but doesn't): " + sb.toString());
 
 		if (random == null)
 			random = new Random(System.currentTimeMillis());
@@ -206,6 +231,10 @@ implements Serializable
 				base62Coder.encode(voucherNumber * 1000L + randomNumber, 7));
 
 		String res = sb.toString();
+
+		if (res.length() != 12)
+			throw new IllegalStateException("Encoding voucherNumber or randomNumber went wrong! Generated voucherKey (should have a length of 12 but doesn't): " + res);
+
 		return res;
 	}
 

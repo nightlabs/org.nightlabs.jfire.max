@@ -40,6 +40,8 @@ import org.nightlabs.jfire.store.deliver.id.ModeOfDeliveryID;
 import org.nightlabs.jfire.store.id.ProductTypeID;
 import org.nightlabs.jfire.trade.Article;
 import org.nightlabs.jfire.trade.ArticleCreator;
+import org.nightlabs.jfire.trade.CustomerGroup;
+import org.nightlabs.jfire.trade.LegalEntity;
 import org.nightlabs.jfire.trade.Offer;
 import org.nightlabs.jfire.trade.Order;
 import org.nightlabs.jfire.trade.OrganisationLegalEntity;
@@ -52,9 +54,11 @@ import org.nightlabs.jfire.voucher.accounting.VoucherLocalAccountantDelegate;
 import org.nightlabs.jfire.voucher.accounting.VoucherPriceConfig;
 import org.nightlabs.jfire.voucher.accounting.pay.ServerPaymentProcessorVoucher;
 import org.nightlabs.jfire.voucher.store.VoucherDeliveryNoteActionHandler;
+import org.nightlabs.jfire.voucher.store.VoucherKey;
 import org.nightlabs.jfire.voucher.store.VoucherStore;
 import org.nightlabs.jfire.voucher.store.VoucherType;
 import org.nightlabs.jfire.voucher.store.VoucherTypeActionHandler;
+import org.nightlabs.jfire.voucher.store.id.VoucherKeyID;
 
 /**
  * @ejb.bean name="jfire/ejb/JFireVoucher/VoucherManager"	
@@ -169,6 +173,9 @@ implements SessionBean
 				store.setProductTypeStatus_published(user, rootVoucherType);
 			}
 
+			LegalEntity anonymousCustomer = LegalEntity.getAnonymousCustomer(pm);
+			CustomerGroup anonymousCustomerGroup = anonymousCustomer.getDefaultCustomerGroup();
+
 			ModeOfPayment modeOfPayment = new ModeOfPayment(ModeOfPaymentConst.MODE_OF_PAYMENT_ID_VOUCHER);
 			modeOfPayment.getName().setText(Locale.ENGLISH.getLanguage(), "Voucher");
 			modeOfPayment.getName().setText(Locale.GERMAN.getLanguage(), "Gutschein");
@@ -180,6 +187,7 @@ implements SessionBean
 					"resource/" + ModeOfPaymentConst.class.getSimpleName() + '-' + ModeOfPaymentFlavour.class.getSimpleName() + '-' + modeOfPaymentFlavour.getModeOfPaymentFlavourID() + ".16x16.png");
 			pm.makePersistent(modeOfPayment);
 			trader.getDefaultCustomerGroupForKnownCustomer().addModeOfPayment(modeOfPayment);
+			anonymousCustomerGroup.addModeOfPayment(modeOfPayment);
 
 			ServerPaymentProcessorVoucher serverPaymentProcessorVoucher = ServerPaymentProcessorVoucher.getServerPaymentProcessorVoucher(pm);
 			serverPaymentProcessorVoucher.getName().setText(Locale.ENGLISH.getLanguage(), "Voucher");
@@ -429,4 +437,37 @@ implements SessionBean
 			pm.close();
 		}
 	}
+
+	/**
+	 * @ejb.interface-method
+	 * @ejb.permission role-name="_Guest_"
+	 * @ejb.transaction type="Supports"
+	 */
+	public VoucherKeyID getVoucherKeyID(String voucherKeyString)
+	{
+		PersistenceManager pm = getPersistenceManager();
+		try {
+			return VoucherKey.getVoucherKeyID(pm, voucherKeyString);
+		} finally {
+			pm.close();
+		}
+	}
+
+	/**
+	 * @ejb.interface-method
+	 * @ejb.permission role-name="_Guest_"
+	 * @ejb.transaction type="Supports"
+	 */
+	@SuppressWarnings("unchecked")
+	public List<VoucherKey> getVoucherKeys(
+			Collection<VoucherKeyID> voucherKeyIDs, String[] fetchGroups, int maxFetchDepth)
+	{
+		PersistenceManager pm = getPersistenceManager();
+		try {
+			return NLJDOHelper.getDetachedObjectList(pm, voucherKeyIDs, VoucherKey.class, fetchGroups, maxFetchDepth);
+		} finally {
+			pm.close();
+		}
+	}
+	
 }

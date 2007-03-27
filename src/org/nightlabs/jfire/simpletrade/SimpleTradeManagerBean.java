@@ -893,7 +893,7 @@ implements SessionBean
 					throw new IllegalStateException("How the hell can it happen that the tariffPK does not consist out of two parts?");
 
 				String tariffOrganisationID = tariffPKParts[0];
-				long tariffID = Long.parseLong(tariffPKParts[1]);
+				long tariffID = Long.parseLong(tariffPKParts[1], 16);
 
 				if (tariffFetchGroups != null)
 					pm.getFetchPlan().setGroups(tariffFetchGroups);

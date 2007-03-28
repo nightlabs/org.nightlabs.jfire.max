@@ -14,6 +14,7 @@ import org.nightlabs.jfire.store.ProductTypeLocal;
 import org.nightlabs.jfire.store.id.ProductTypeID;
 import org.nightlabs.jfire.trade.LegalEntity;
 import org.nightlabs.jfire.transfer.Anchor;
+import org.nightlabs.jfire.voucher.scripting.VoucherLayout;
 
 /**
  * @author Marco Schulze - marco at nightlabs dot de
@@ -43,16 +44,13 @@ import org.nightlabs.jfire.transfer.Anchor;
  *		  PARAMETERS String parentProductTypeOrganisationID, String parentProductTypeProductTypeID
  *		  import java.lang.String"
  *
- * !@jdo.fetch-group name="ProductType.name" fields="name"
- *
- * !@jdo.fetch-group name="FetchGroupsTrade.articleInOrderEditor" fetch-groups="default" fields="name"
- * !@jdo.fetch-group name="FetchGroupsTrade.articleInOfferEditor" fetch-groups="default" fields="name"
- * !@jdo.fetch-group name="FetchGroupsTrade.articleInInvoiceEditor" fetch-groups="default" fields="name"
- * !@jdo.fetch-group name="FetchGroupsTrade.articleInDeliveryNoteEditor" fetch-groups="default" fields="name"
+ * @jdo.fetch-group name="VoucherType.voucherLayout" fields="voucherLayout"
  */
 public class VoucherType
 extends ProductType
 {
+	public static final String FETCH_GROUP_VOUCHER_LAYOUT = "VoucherType.voucherLayout";	
+	
 	private static final long serialVersionUID = 1L;
 
 	@SuppressWarnings("unchecked")
@@ -142,4 +140,18 @@ extends ProductType
 	// /// *** end inheritance *** ///
 	// ******************************
 
+	/**
+	 * @jdo.field persistence-modifier="persistent"
+	 */
+	private VoucherLayout voucherLayout;
+	
+	public VoucherLayout getVoucherLayout()
+	{
+		return voucherLayout;
+	}
+	
+	public void setVoucherLayout(VoucherLayout voucherLayout)
+	{
+		this.voucherLayout = voucherLayout;
+	}	
 }

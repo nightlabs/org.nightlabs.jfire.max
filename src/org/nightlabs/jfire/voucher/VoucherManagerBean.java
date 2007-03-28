@@ -1,10 +1,13 @@
 package org.nightlabs.jfire.voucher;
 
 import java.rmi.RemoteException;
+import java.util.ArrayList;
 import java.util.Collection;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Locale;
+import java.util.Map;
 import java.util.Set;
 
 import javax.ejb.CreateException;
@@ -30,6 +33,9 @@ import org.nightlabs.jfire.accounting.pay.ModeOfPaymentFlavour;
 import org.nightlabs.jfire.accounting.priceconfig.id.PriceConfigID;
 import org.nightlabs.jfire.base.BaseSessionBeanImpl;
 import org.nightlabs.jfire.organisation.Organisation;
+import org.nightlabs.jfire.scripting.Script;
+import org.nightlabs.jfire.scripting.ScriptRegistry;
+import org.nightlabs.jfire.scripting.id.ScriptRegistryItemID;
 import org.nightlabs.jfire.security.User;
 import org.nightlabs.jfire.store.NestedProductType;
 import org.nightlabs.jfire.store.ProductType;
@@ -37,6 +43,7 @@ import org.nightlabs.jfire.store.Store;
 import org.nightlabs.jfire.store.deliver.DeliveryConfiguration;
 import org.nightlabs.jfire.store.deliver.ModeOfDelivery;
 import org.nightlabs.jfire.store.deliver.id.ModeOfDeliveryID;
+import org.nightlabs.jfire.store.id.ProductID;
 import org.nightlabs.jfire.store.id.ProductTypeID;
 import org.nightlabs.jfire.trade.Article;
 import org.nightlabs.jfire.trade.ArticleCreator;
@@ -53,6 +60,9 @@ import org.nightlabs.jfire.voucher.accounting.ModeOfPaymentConst;
 import org.nightlabs.jfire.voucher.accounting.VoucherLocalAccountantDelegate;
 import org.nightlabs.jfire.voucher.accounting.VoucherPriceConfig;
 import org.nightlabs.jfire.voucher.accounting.pay.ServerPaymentProcessorVoucher;
+import org.nightlabs.jfire.voucher.scripting.ScriptingInitializer;
+import org.nightlabs.jfire.voucher.scripting.VoucherScriptingConstants;
+import org.nightlabs.jfire.voucher.store.Voucher;
 import org.nightlabs.jfire.voucher.store.VoucherDeliveryNoteActionHandler;
 import org.nightlabs.jfire.voucher.store.VoucherKey;
 import org.nightlabs.jfire.voucher.store.VoucherStore;
@@ -109,6 +119,9 @@ implements SessionBean
 	{
 		PersistenceManager pm = getPersistenceManager();
 		try {
+			// init scripts
+			new ScriptingInitializer(getJFireServerManager(), pm, Organisation.DEVIL_ORGANISATION_ID).initialize(); // this is a throw-away-instance
+			
 			ModuleMetaData moduleMetaData = ModuleMetaData.getModuleMetaData(pm, "JFireVoucher");
 			if (moduleMetaData != null)
 				return;
@@ -339,7 +352,7 @@ implements SessionBean
 	 *
 	 * @ejb.interface-method
 	 * @ejb.permission role-name="_Guest_"
-	 * @ejb.transaction type = "Required"
+	 * @ejb.transaction type="Required"
 	 */
 	public Collection<Article> createArticles(
 			SegmentID segmentID,
@@ -467,6 +480,64 @@ implements SessionBean
 			return NLJDOHelper.getDetachedObjectList(pm, voucherKeyIDs, VoucherKey.class, fetchGroups, maxFetchDepth);
 		} finally {
 			pm.close();
+		}
+	}
+	
+	/**
+	 * @ejb.interface-method
+	 * @ejb.permission role-name="_Guest_"
+	 * @ejb.transaction type="Supports"
+	 */
+	public Map<ProductID, Map<ScriptRegistryItemID, Object>> getVoucherScriptingResults(
+			Collection<ProductID> voucherIDs, boolean allScripts)
+	throws ModuleException
+	{
+		allScripts = true; // TODO remove this line!
+		// TODO obtain the scripts via the voucher-layout-file,
+		try {
+				PersistenceManager pm = getPersistenceManager();
+			try {
+				ScriptRegistry scriptRegistry = ScriptRegistry.getScriptRegistry(pm);	
+				pm.getExtent(Voucher.class);
+				Map<ProductID, Map<ScriptRegistryItemID, Object>> res = new HashMap<ProductID, Map<ScriptRegistryItemID, Object>>();
+				for (ProductID voucherID : voucherIDs) {
+					Voucher voucher = (Voucher) pm.getObjectById(voucherID);
+
+					// obtain list of scripts for current voucher
+					VoucherType voucherType = (VoucherType) voucher.getProductType();
+					List<Script> scripts = new ArrayList<Script>();
+					if (allScripts) {
+						Query q = pm.newQuery("SELECT FROM " + Script.class.getName() + " \n" +
+								"WHERE \n" +
+								"  this.scriptRegistryItemType == pScriptRegistryItemType \n" +
+								"PARAMETERS java.lang.String pScriptRegistryItemType");
+
+						scripts.addAll((Collection)q.execute(VoucherScriptingConstants.SCRIPT_REGISTRY_ITEM_TYPE_VOUCHER));						
+					}
+					else {
+						// TODO obtain the scripts via the voucher-layout-file, 
+						// scriptRegistryItemIDs from scriptDrawComponents as well as from visibleScripts 
+						if (voucherType.getVoucherLayout() == null)
+							throw new IllegalStateException("voucher.getVoucherLayout() == null");
+					}
+
+					Map<String, Object> paramValues = new HashMap<String, Object>();
+					paramValues.put(VoucherScriptingConstants.PARAMETER_ID_PERSISTENCE_MANAGER, pm);
+					paramValues.put(VoucherScriptingConstants.PARAMETER_ID_VOUCHER_ID, voucherID);
+					res.put(
+							voucherID,
+							scriptRegistry.execute(scripts, paramValues));
+				}
+				return res;
+			} finally {
+				pm.close();				
+			}
+		} catch (RuntimeException x) {
+			throw x;
+		} catch (ModuleException x) {
+			throw x;
+		} catch (Exception x) {
+			throw new ModuleException(x);
 		}
 	}
 	

@@ -1,11 +1,17 @@
 package org.nightlabs.jfire.geography;
 
+import java.io.BufferedReader;
+import java.io.ByteArrayInputStream;
+import java.io.InputStreamReader;
 import java.io.Serializable;
+import java.util.zip.InflaterInputStream;
 
 import javax.jdo.JDOObjectNotFoundException;
 import javax.jdo.PersistenceManager;
 
+import org.apache.log4j.Logger;
 import org.nightlabs.jfire.geography.id.CSVID;
+import org.nightlabs.util.Utils;
 
 /**
  * @author Marco Schulze - marco at nightlabs dot de
@@ -47,6 +53,12 @@ implements Serializable
 	{
 		try {
 			CSV csv = (CSV) pm.getObjectById(CSVID.create(organisationID, csvType, countryID));
+
+			// TODO remove this DEBUG stuff
+			if ("FL".equals(countryID))
+				csv.debugDumpCSV();
+			// END DEBUG
+
 			return csv.getData();
 		} catch (JDOObjectNotFoundException x) {
 			return null;
@@ -80,6 +92,12 @@ implements Serializable
 			csv.setData(data);
 			csv = (CSV) pm.makePersistent(csv);
 		}
+
+		// TODO remove this DEBUG stuff
+		if ("FL".equals(countryID))
+			csv.debugDumpCSV();
+		// END DEBUG
+
 		return csv;
 	}
 
@@ -149,5 +167,30 @@ implements Serializable
 	public void setData(byte[] data)
 	{
 		this.data = data;
+	}
+
+	private void debugDumpCSV()
+	{
+		Logger logger = Logger.getLogger(CSV.class);
+		if (!logger.isDebugEnabled())
+			return;
+
+		try {
+			BufferedReader r = new BufferedReader(new InputStreamReader(new InflaterInputStream(new ByteArrayInputStream(getData())), Utils.CHARSET_UTF_8));
+			try {
+				String line;
+				while (true) {
+					line = r.readLine();
+					if (line == null)
+						break;
+
+					logger.debug(line);
+				}
+			} finally {
+				r.close();
+			}
+		} catch (Exception x) {
+			logger.error("Reading CSV failed!", x);
+		}
 	}
 }

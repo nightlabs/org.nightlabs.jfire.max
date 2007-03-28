@@ -49,7 +49,10 @@ import org.nightlabs.util.Utils;
  *
  * @jdo.inheritance strategy = "new-table"
  *
- * @jdo.create-objectid-class field-order="countryID, organisationID, cityID"
+ * @jdo.create-objectid-class
+ *		field-order="countryID, organisationID, cityID"
+ *		include-imports="id/CityID.imports.inc"
+ *		include-body="id/CityID.body.inc"
  *
  * @jdo.fetch-group name="City.name" fields="name"
  * @jdo.fetch-group name="City.locations" fields="locations"

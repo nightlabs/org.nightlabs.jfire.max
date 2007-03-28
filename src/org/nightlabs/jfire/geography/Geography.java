@@ -48,6 +48,7 @@ import org.nightlabs.jfire.geography.id.CityID;
 import org.nightlabs.jfire.geography.id.CountryID;
 import org.nightlabs.jfire.geography.id.LocationID;
 import org.nightlabs.jfire.geography.id.RegionID;
+import org.nightlabs.jfire.idgenerator.IDGenerator;
 import org.nightlabs.jfire.organisation.Organisation;
 import org.nightlabs.jfire.security.SecurityReflector;
 import org.nightlabs.util.FulltextMap;
@@ -504,7 +505,7 @@ public abstract class Geography
 	 *		value: List countries (instances of {@link Country}
 	 * }
 	 */
-	protected Map<String, FulltextMap> countriesByCountryNameByLanguageID = null;
+	protected transient Map<String, FulltextMap> countriesByCountryNameByLanguageID = null;
 	protected FulltextMap getCountriesByCountryNameMap(String languageID)
 	{
 		logger.debug("getCountriesByCountryNameMap(languageID=\""+languageID+"\") entered.");
@@ -1037,4 +1038,51 @@ public abstract class Geography
 
  		loadedZipsCountryIDSet.add(countryID);
 	}
+
+	/**
+	 * This method clears the complete cache in order to reload all data again. Call this method after you
+	 * modified data.
+	 */
+	public synchronized void clearCache()
+	{
+		loadedCountries = false;
+		loadedCitiesCountryIDSet.clear();
+		loadedDistrictsCountryIDSet.clear();
+		loadedLocationsCountryIDSet.clear();
+		loadedRegionsCountryIDSet.clear();
+		loadedZipsCountryIDSet.clear();
+
+		countries.clear();
+		regions.clear();
+		cities.clear();
+		districts.clear();
+		locations.clear();
+
+		countriesByCountryNameByLanguageID = null;
+		countriesSortedByLanguageID = null;
+		regionsByRegionNameByLanguageIDByCountryID = null;
+		regionsSortedByLanguageIDByCountryID = null;
+		citiesByCityNameByLanguageIDByRegionID = null;
+		citiesSortedByLanguageIDByRegionID = null;
+		districtsByZipByRegionID = null;
+		locationsByLocationNameByLanguageIDByCityID = null;
+		locationsSortedByLanguageIDByCountryID = null;
+	}
+
+	// countryIDs are ISO standard Strings - we don't need an ID generator method for them!
+
+	public static String nextRegionID(String countryID, String organisationID)
+	{
+		throw new UnsupportedOperationException("NYI");
+	}
+
+	public static String nextCityID(String countryID, String organisationID)
+	{
+		if (!IDGenerator.getOrganisationID().equals(organisationID))
+			throw new IllegalArgumentException("Can only generate an ID for the organisation '"+IDGenerator.getOrganisationID()+"' - the argument is invalid: " + organisationID);
+
+		return String.valueOf(IDGenerator.nextID(City.class.getName() + "#" + countryID));
+	}
+
+	// TODO implement the other ID generator methods - don't forget to initialise the namespace correctly!
 }

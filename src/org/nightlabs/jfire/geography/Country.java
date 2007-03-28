@@ -50,6 +50,8 @@ import org.nightlabs.util.Utils;
  * @jdo.inheritance strategy="new-table"
  *
  * @jdo.create-objectid-class
+ *		include-imports="id/CountryID.imports.inc"
+ *		include-body="id/CountryID.body.inc"
  *
  * @jdo.fetch-group name="Country.name" fields="name"
  * @jdo.fetch-group name="Country.regions" fields="regions"

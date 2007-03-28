@@ -3,13 +3,10 @@ package org.nightlabs.jfire.geography;
 import java.io.BufferedReader;
 import java.io.InputStream;
 import java.io.InputStreamReader;
-import java.util.Collection;
-import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.Locale;
-import java.util.Set;
+import java.util.Map;
 import java.util.StringTokenizer;
-import java.util.Map.Entry;
 
 import org.apache.log4j.Logger;
 import org.nightlabs.annotation.Implement;
@@ -75,110 +72,140 @@ extends Geography
 		return (String[]) CollectionUtil.collection2TypedArray(res, String.class);
 	}
 
-	protected static String collection2csvLines(Collection<Object> collection)
-	{
-		StringBuffer csvLines = new StringBuffer();
-		for(Iterator<Object> iterator = collection.iterator(); iterator.hasNext();){
-			Object obj = iterator.next();
-			csvLines.append(obj2csvLine(obj));
-		}//for
-		return csvLines.toString();
-	}
+//	protected static String collection2csvLines(Collection<Object> collection)
+//	{
+//		StringBuffer csvLines = new StringBuffer();
+//		for(Iterator<Object> iterator = collection.iterator(); iterator.hasNext();){
+//			Object obj = iterator.next();
+//			csvLines.append(obj2csvLine(obj));
+//		}//for
+//		return csvLines.toString();
+//	}
 
-	protected static String obj2csvLine(Object obj)
+	/**
+	 * This method encodes a {@link City} instance into
+	 * one or more lines (one for each language) formatted
+	 * according to the CSV file format.
+	 *
+	 * @param city The city to be encoded.
+	 * @return A String containing one or more lines to be written to the CSV.
+	 */
+	protected static String city2csvLines(City city)
 	{
 		StringBuffer csvLine = new StringBuffer();
 
-		if(obj instanceof Location){
-			Location location = (Location)obj;
-			Set nameTexts = location.getName().getTexts();
+		if (city.getName().getTexts().isEmpty()) // we ensure that at least one line will be written
+			city.getName().setText(Locale.ENGLISH.getLanguage(), city.getName().getText(Locale.ENGLISH.getLanguage()));
 
-			for(Iterator<Entry<String, String>> entryMap = nameTexts.iterator(); entryMap.hasNext();){
-				Entry<String, String> nameMap = entryMap.next();
-				csvLine.append(location.getCountryID()).append(";");
-				csvLine.append(location.getLocationID()).append(";");
-				csvLine.append(location.getCity().getCityID()).append(";");
-				csvLine.append(location.getDistrict() == null ? "" : location.getDistrict().getDistrictID()).append(";");
+		for (Map.Entry<String, String> me : city.getName().getTexts()) {
+			String languageID = me.getKey();
+			String text = me.getValue();
 
-				String languageID = nameMap.getKey();
-				csvLine.append(languageID).append(";");
-
-				String text = nameMap.getValue(); 
-				csvLine.append(text == null?"":text);
-				csvLine.append("\n");
-			}//for
-		}//else if
-		else if(obj instanceof City){
-			City city = (City)obj;
-			Set nameTexts = city.getName().getTexts();
-
-			for(Iterator<Entry<String, String>> entryMap = nameTexts.iterator(); entryMap.hasNext();){
-				Entry<String, String> nameMap = entryMap.next();
-				csvLine.append(city.getCountryID()).append(";");
-				csvLine.append(city.getCityID()).append(";");
-				csvLine.append(city.getRegion().getRegionID()).append(";");
-
-				String languageID = nameMap.getKey();
-				csvLine.append(languageID).append(";");
-
-				String text = nameMap.getValue(); 
-				csvLine.append(text == null?"":text);
-				csvLine.append("\n");
-			}//for
-		}//else if
-		else if(obj instanceof Region){
-			Region region = (Region)obj;
-			Set nameTexts = region.getName().getTexts();
-
-//			for(Iterator<Entry<String, String>> entryMap = nameTexts.iterator(); entryMap.hasNext();){
-//			Entry<String, String> nameMap = entryMap.next();
-//			csvLine.append(region.getCountryID()).append(";");
-//			csvLine.append(region.getCityID()).append(";");
-//			csvLine.append(region.getRegion().getRegionID()).append(";");
-
-//			String languageID = nameMap.getKey();
-//			csvLine.append(languageID).append(";");
-
-//			String text = nameMap.getValue(); 
-//			csvLine.append(text == null?"":text);
-//			}//for
-		}//else if
-		else if(obj instanceof Country){
-			Country country = (Country)obj;
-			Set nameTexts = country.getName().getTexts();
-
-//			for(Iterator<Entry<String, String>> entryMap = nameTexts.iterator(); entryMap.hasNext();){
-//			Entry<String, String> nameMap = entryMap.next();
-//			csvLine.append(country.getCountryID()).append(";");
-//			csvLine.append(country.getCityID()).append(";");
-//			csvLine.append(country.getRegion().getRegionID()).append(";");
-
-//			String languageID = nameMap.getKey();
-//			csvLine.append(languageID).append(";");
-
-//			String text = nameMap.getValue(); 
-//			csvLine.append(text == null?"":text);
-//			}//for
-		}//else if
-		else if(obj instanceof District){
-			District district = (District)obj;
-
-			csvLine.append(district.getCountryID()).append(";");
-			csvLine.append(district.getCity().getCityID()).append(";");
-			csvLine.append(district.getDistrictID()).append(";");
-			csvLine.append("DE").append(";");
-			csvLine.append(district.getName());
-			csvLine.append(district.getLatitude());
-			csvLine.append(district.getLongitude());
-			
+			csvLine.append(city.getCountryID()).append(";");
+			csvLine.append(city.getCityID()).append(";");
+			csvLine.append(city.getRegion().getRegionID()).append(";");
+			csvLine.append(languageID).append(";");
+			csvLine.append(text == null ? "" : text);
 			csvLine.append("\n");
-		}//else if
-		else
-			throw new IllegalArgumentException("obj is an instance of " + (obj == null ? null : obj.getClass().getName()) + " which is not supported!");
+		}
 
-		logger.info(csvLine.toString());
 		return csvLine.toString();
 	}
+
+//	protected static String obj2csvLine(Object obj)
+//	{
+//		StringBuffer csvLine = new StringBuffer();
+//
+//		if(obj instanceof Location){
+//			Location location = (Location)obj;
+//			Set nameTexts = location.getName().getTexts();
+//
+//			for(Iterator<Entry<String, String>> entryMap = nameTexts.iterator(); entryMap.hasNext();){
+//				Entry<String, String> nameMap = entryMap.next();
+//				csvLine.append(location.getCountryID()).append(";");
+//				csvLine.append(location.getLocationID()).append(";");
+//				csvLine.append(location.getCity().getCityID()).append(";");
+//				csvLine.append(location.getDistrict() == null ? "" : location.getDistrict().getDistrictID()).append(";");
+//
+//				String languageID = nameMap.getKey();
+//				csvLine.append(languageID).append(";");
+//
+//				String text = nameMap.getValue(); 
+//				csvLine.append(text == null?"":text);
+//				csvLine.append("\n");
+//			}//for
+//		}//else if
+//		else if(obj instanceof City){
+//			City city = (City)obj;
+//			Set nameTexts = city.getName().getTexts();
+//
+//			for(Iterator<Entry<String, String>> entryMap = nameTexts.iterator(); entryMap.hasNext();){
+//				Entry<String, String> nameMap = entryMap.next();
+//				csvLine.append(city.getCountryID()).append(";");
+//				csvLine.append(city.getCityID()).append(";");
+//				csvLine.append(city.getRegion().getRegionID()).append(";");
+//
+//				String languageID = nameMap.getKey();
+//				csvLine.append(languageID).append(";");
+//
+//				String text = nameMap.getValue(); 
+//				csvLine.append(text == null?"":text);
+//				csvLine.append("\n");
+//			}//for
+//		}//else if
+//		else if(obj instanceof Region){
+//			Region region = (Region)obj;
+//			Set nameTexts = region.getName().getTexts();
+//
+////			for(Iterator<Entry<String, String>> entryMap = nameTexts.iterator(); entryMap.hasNext();){
+////			Entry<String, String> nameMap = entryMap.next();
+////			csvLine.append(region.getCountryID()).append(";");
+////			csvLine.append(region.getCityID()).append(";");
+////			csvLine.append(region.getRegion().getRegionID()).append(";");
+//
+////			String languageID = nameMap.getKey();
+////			csvLine.append(languageID).append(";");
+//
+////			String text = nameMap.getValue(); 
+////			csvLine.append(text == null?"":text);
+////			}//for
+//		}//else if
+//		else if(obj instanceof Country){
+//			Country country = (Country)obj;
+//			Set nameTexts = country.getName().getTexts();
+//
+////			for(Iterator<Entry<String, String>> entryMap = nameTexts.iterator(); entryMap.hasNext();){
+////			Entry<String, String> nameMap = entryMap.next();
+////			csvLine.append(country.getCountryID()).append(";");
+////			csvLine.append(country.getCityID()).append(";");
+////			csvLine.append(country.getRegion().getRegionID()).append(";");
+//
+////			String languageID = nameMap.getKey();
+////			csvLine.append(languageID).append(";");
+//
+////			String text = nameMap.getValue(); 
+////			csvLine.append(text == null?"":text);
+////			}//for
+//		}//else if
+//		else if(obj instanceof District){
+//			District district = (District)obj;
+//
+//			csvLine.append(district.getCountryID()).append(";");
+//			csvLine.append(district.getCity().getCityID()).append(";");
+//			csvLine.append(district.getDistrictID()).append(";");
+//			csvLine.append("DE").append(";");
+//			csvLine.append(district.getName());
+//			csvLine.append(district.getLatitude());
+//			csvLine.append(district.getLongitude());
+//			
+//			csvLine.append("\n");
+//		}//else if
+//		else
+//			throw new IllegalArgumentException("obj is an instance of " + (obj == null ? null : obj.getClass().getName()) + " which is not supported!");
+//
+//		logger.info(csvLine.toString());
+//		return csvLine.toString();
+//	}
 
 	protected InputStream createCountryCSVInputStream()
 	{

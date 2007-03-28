@@ -49,7 +49,10 @@ import org.nightlabs.util.Utils;
  *
  * @jdo.inheritance strategy="new-table"
  *
- * @jdo.create-objectid-class field-order="countryID, organisationID, regionID"
+ * @jdo.create-objectid-class
+ *		field-order="countryID, organisationID, regionID"
+ *		include-imports="id/RegionID.imports.inc"
+ *		include-body="id/RegionID.body.inc"
  *
  * @jdo.fetch-group name="Region.country" fields="country"
  * @jdo.fetch-group name="Region.name" fields="name"

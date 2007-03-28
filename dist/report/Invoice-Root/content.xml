@@ -14,7 +14,7 @@
 	>
 	<!-- id is optional and defaults to the value of file without extension -->
 	<!-- overwriteOnInit is optional and defaults to true -->
-		<name language="de">Standart-Rechnung</name>
+		<name language="de">Standard-Rechnung</name>
 		<name language="en">Default-Invoice</name>
 	</report>
 </report-category>

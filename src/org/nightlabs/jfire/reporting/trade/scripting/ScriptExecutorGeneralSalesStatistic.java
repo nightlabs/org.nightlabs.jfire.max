@@ -18,7 +18,6 @@ import org.nightlabs.jfire.reporting.oda.jfs.JFSResultSetMetaData;
 import org.nightlabs.jfire.reporting.oda.jfs.ScriptExecutorJavaClassReportingDelegate;
 import org.nightlabs.jfire.scripting.ScriptException;
 import org.nightlabs.jfire.scripting.ScriptExecutorJavaClass;
-import org.nightlabs.jfire.simpletrade.store.SimpleProductType;
 import org.nightlabs.jfire.store.ProductType;
 import org.nightlabs.jfire.trade.Article;
 
@@ -62,7 +61,7 @@ public class ScriptExecutorGeneralSalesStatistic implements
 		System.out.println("**********************************************");
 		JFSResultSet resultSet = new JFSResultSet((JFSResultSetMetaData)getResultSetMetaData());
 		Map<String, Object> param = getScriptExecutorJavaClass().getParameterValues();
-		PersistenceManager pm = (PersistenceManager)param.get("persistenceManager");
+		PersistenceManager pm = getScriptExecutorJavaClass().getPersistenceManager();
 		Query q = pm.newQuery(
 				"SELECT "+
 				 "  this.product.productType, "+

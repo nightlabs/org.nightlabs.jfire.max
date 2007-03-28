@@ -5,4 +5,14 @@
 	<name language="de">Allgemeine Berichte</name>
 	<name language="en">General Reports</name>
 
+	<report
+		file="General-Sales-Statistic.rptdesign" 
+		id="General-Sales-Statistic"
+		overwriteOnInit="false"
+	>
+	<!-- id is optional and defaults to the value of file without extension -->
+	<!-- overwriteOnInit is optional and defaults to true -->
+		<name language="de">Allemeine Verkaufsstatistik</name>
+		<name language="en">General sales statistic</name>
+	</report>
 </report-category>

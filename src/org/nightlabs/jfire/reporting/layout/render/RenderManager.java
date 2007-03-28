@@ -148,6 +148,8 @@ public class RenderManager {
 				}
 			}
 			IRunAndRenderTask task = reportEngine.createRunAndRenderTask(report);
+			if (renderRequest.getLocale() != null)				
+				task.setLocale(renderRequest.getLocale());
 
 			ReportRegistry registry = ReportRegistry.getReportRegistry(pm);
 			ReportLayoutRenderer renderer = null; 

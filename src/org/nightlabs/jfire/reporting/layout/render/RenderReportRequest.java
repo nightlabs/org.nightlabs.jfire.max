@@ -4,6 +4,7 @@
 package org.nightlabs.jfire.reporting.layout.render;
 
 import java.io.Serializable;
+import java.util.Locale;
 import java.util.Map;
 
 import org.nightlabs.jfire.reporting.Birt.OutputFormat;
@@ -25,6 +26,7 @@ public class RenderReportRequest implements Serializable {
 	
 	private ReportRegistryItemID reportRegistryItemID;
 	private OutputFormat outputFormat;
+	private Locale locale;
 	private Map<String,Object> parameters;
 	
 	/**
@@ -88,7 +90,18 @@ public class RenderReportRequest implements Serializable {
 	public void setReportRegistryItemID(ReportRegistryItemID reportRegistryItemID) {
 		this.reportRegistryItemID = reportRegistryItemID;
 	}
-	
-	
 
+	/**
+	 * @return The locale that should be used to render the report 
+	 */
+	public Locale getLocale() {
+		return locale;
+	}
+
+	/**
+	 * @param locale The locale that should be used to render the report
+	 */
+	public void setLocale(Locale locale) {
+		this.locale = locale;
+	}
 }

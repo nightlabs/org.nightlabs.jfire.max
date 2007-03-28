@@ -75,7 +75,7 @@ public class ServerResourceLocator extends DefaultResourceLocator implements IRe
 				} catch (JDOObjectNotFoundException e) {
 					return null;
 				}
-				File layoutRoot = ReportLayoutRendererUtil.prepareRenderedLayoutOutputFolder();
+				File layoutRoot = ReportLayoutRendererUtil.getRenderedLayoutOutputFolder();
 				File outputFile = new File(layoutRoot, fileName);
 				InputStream in = localisationData.createLocalisationDataInputStream();
 				try {

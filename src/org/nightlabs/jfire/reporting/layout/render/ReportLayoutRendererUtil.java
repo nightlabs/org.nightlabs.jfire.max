@@ -27,14 +27,8 @@ public class ReportLayoutRendererUtil {
 	 * Logger used by this class.
 	 */
 	private static final Logger logger = Logger.getLogger(ReportLayoutRendererUtil.class);
-	
-	/**
-	 * Retruns after asuring that a folder exists, that can be uniquely addressed
-	 * using the sessionID of the actual user.
-	 *  
-	 * @return The root folder for renderedReportLayouts of the actual session.
-	 */
-	public static File prepareRenderedLayoutOutputFolder() {
+
+	public static File getRenderedLayoutOutputFolder() {
 		File earDir;
 		try {
 			earDir = JFireReportingEAR.getEARDir();
@@ -43,6 +37,17 @@ public class ReportLayoutRendererUtil {
 		}
 		File layoutRoot;
 		layoutRoot = new File(earDir, "birt"+File.separator+"rendered"+File.separator+SecurityReflector.getUserDescriptor().getSessionID()+"-"+Long.toHexString(Thread.currentThread().getId()));
+		return layoutRoot;
+	}
+	
+	/**
+	 * Retruns after asuring that a folder exists, that can be uniquely addressed
+	 * using the sessionID of the actual user.
+	 *  
+	 * @return The root folder for renderedReportLayouts of the actual session.
+	 */
+	public static File prepareRenderedLayoutOutputFolder() {
+		File layoutRoot = getRenderedLayoutOutputFolder();
 		if (layoutRoot.exists()) {
 			if (!Utils.deleteDirectoryRecursively(layoutRoot))
 				throw new IllegalStateException("Could not delete rendered report tmp folder "+layoutRoot);

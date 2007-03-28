@@ -32,5 +32,6 @@
 	<classpathentry sourcepath="WORKSPACE/NightLabsJDO/src" kind="var" path="WORKSPACE/NightLabsJDO/dist/NightLabsJDO.jar"/>
 	<classpathentry kind="var" path="XERCES"/>
 	<classpathentry kind="lib" path="dist/birt/lib/dataadapterapi.jar"/>
+	<classpathentry kind="lib" path="dist/birt/lib/com.ibm.icu_3.4.4.1.jar"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>

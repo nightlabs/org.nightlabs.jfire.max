@@ -7,5 +7,6 @@
 	<classpathentry sourcepath="/WORKSPACE/NightLabsBase/src" kind="var" path="WORKSPACE/NightLabsBase/dist/NightLabsBase.jar"/>
 	<classpathentry kind="var" path="LOG4J"/>
 	<classpathentry sourcepath="WORKSPACE/NightLabsJDO/src" kind="var" path="WORKSPACE/NightLabsJDO/dist/NightLabsJDO.jar"/>
+	<classpathentry kind="lib" path="lib/barbecue-1.0.6d.jar"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>

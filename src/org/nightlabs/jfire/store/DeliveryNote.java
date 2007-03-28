@@ -59,6 +59,7 @@ import org.nightlabs.jfire.trade.Offer;
 import org.nightlabs.jfire.trade.Order;
 import org.nightlabs.jfire.trade.OrganisationLegalEntity;
 import org.nightlabs.jfire.trade.id.ArticleID;
+import org.nightlabs.jfire.transfer.Anchor;
 import org.nightlabs.jfire.transfer.Transfer;
 import org.nightlabs.jfire.transfer.id.AnchorID;
 import org.nightlabs.util.CollectionUtil;
@@ -698,11 +699,13 @@ implements Serializable, ArticleContainer, Statable, DetachCallback
 		return _receptionNotes;
 	}
 
-	public void bookDeliveryNoteProductTransfer(DeliveryNoteProductTransfer transfer, boolean rollback)
+	public void bookDeliveryNoteProductTransfer(DeliveryNoteProductTransfer transfer, Map<String, Anchor> involvedAnchors, boolean rollback)
 	{
-		if (!DeliveryNoteProductTransfer.BOOK_TYPE_DELIVER.equals(transfer.getBookType()))
-			return;
-
+//		if (!DeliveryNoteProductTransfer.BOOK_TYPE_DELIVER.equals(transfer.getBookType()))
+//			return;
+	}
+	public void bookDeliverProductTransfer(DeliverProductTransfer transfer, Map<String, Anchor> involvedAnchors, boolean rollback)
+	{
 		boolean vendorIsFrom = transfer.getAnchorType(vendor) == Transfer.ANCHORTYPE_FROM;
 		boolean vendorIsTo = transfer.getAnchorType(vendor) == Transfer.ANCHORTYPE_TO;
 		boolean customerIsFrom = transfer.getAnchorType(customer) == Transfer.ANCHORTYPE_FROM;
@@ -713,7 +716,8 @@ implements Serializable, ArticleContainer, Statable, DetachCallback
 
 		int articleCount = 0;
 
-		Delivery delivery = ((DeliverProductTransfer)transfer.getContainer()).getDelivery();
+//		Delivery delivery = ((DeliverProductTransfer)transfer.getContainer()).getDelivery();
+		Delivery delivery = transfer.getDelivery();
 		for (Article article : delivery.getArticles()) {
 			if (this.equals(article.getDeliveryNote())) {
 				++articleCount;

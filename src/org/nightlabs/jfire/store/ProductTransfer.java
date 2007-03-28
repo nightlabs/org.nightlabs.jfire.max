@@ -110,6 +110,7 @@ public class ProductTransfer extends Transfer implements Serializable
 		return products;
 	}
 
+	@Override
 	public void bookTransfer(User user, Map<String, Anchor> involvedAnchors)
 	{
 		// TODO We must - either here or somewhere else - ensure that all the nested products are transferred, too (and have the same repository as the package product afterwards).

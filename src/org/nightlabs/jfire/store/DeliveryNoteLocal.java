@@ -30,6 +30,7 @@ import java.io.Serializable;
 import java.util.Collections;
 import java.util.Date;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 import org.nightlabs.jfire.jbpm.graph.def.ActionHandlerNodeEnter;
@@ -287,7 +288,7 @@ implements Serializable, StatableLocal
 	}
 
 	/**
-	 * This method is called by {@link DeliveryNote#bookDeliveryNoteProductTransfer(DeliveryNoteProductTransfer, boolean)}.
+	 * This method is called by {@link DeliveryNote#bookDeliverProductTransfer(org.nightlabs.jfire.store.deliver.DeliverProductTransfer, Map, boolean)}.
 	 *
 	 * @return the new value after incrementing it
 	 */
@@ -306,7 +307,7 @@ implements Serializable, StatableLocal
 	}
 
 	/**
-	 * This method is called by {@link DeliveryNote#bookDeliveryNoteProductTransfer(DeliveryNoteProductTransfer, boolean)}.
+	 * This method is called by {@link DeliveryNote#bookDeliverProductTransfer(org.nightlabs.jfire.store.deliver.DeliverProductTransfer, Map, boolean)}.
 	 *
 	 * @return the new value after decrementing it
 	 */

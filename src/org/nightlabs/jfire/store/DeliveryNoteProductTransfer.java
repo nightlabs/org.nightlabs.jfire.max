@@ -130,7 +130,7 @@ public class DeliveryNoteProductTransfer extends ProductTransfer
 
 	protected void bookTransferAtDeliveryNote(User user, Map involvedAnchors)
 	{
-		deliveryNote.bookDeliveryNoteProductTransfer(this, false);
+		deliveryNote.bookDeliveryNoteProductTransfer(this, involvedAnchors, false);
 	}
 
 
@@ -146,6 +146,6 @@ public class DeliveryNoteProductTransfer extends ProductTransfer
 
 	protected void rollbackTransferAtDeliveryNote(User user, Map involvedAnchors)
 	{
-		deliveryNote.bookDeliveryNoteProductTransfer(this, true);
+		deliveryNote.bookDeliveryNoteProductTransfer(this, involvedAnchors, true);
 	}
 }

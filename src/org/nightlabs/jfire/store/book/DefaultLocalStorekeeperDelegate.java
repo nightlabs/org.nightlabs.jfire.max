@@ -97,7 +97,7 @@ public class DefaultLocalStorekeeperDelegate extends LocalStorekeeperDelegate
 			DefaultLocalStorekeeperDelegate delegate = new DefaultLocalStorekeeperDelegate(
 					organisationID,
 					DefaultLocalStorekeeperDelegate.class.getName());
-			pm.makePersistent(delegate);
+			delegate = (DefaultLocalStorekeeperDelegate) pm.makePersistent(delegate);
 			localStorekeeperDelegateID = (LocalStorekeeperDelegateID) JDOHelper.getObjectId(delegate);
 			return delegate;
 		}

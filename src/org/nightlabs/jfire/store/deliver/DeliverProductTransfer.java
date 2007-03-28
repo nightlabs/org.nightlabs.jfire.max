@@ -28,13 +28,17 @@ package org.nightlabs.jfire.store.deliver;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.HashSet;
 import java.util.Iterator;
+import java.util.Map;
+import java.util.Set;
 
 import javax.jdo.JDOHelper;
 import javax.jdo.PersistenceManager;
 import javax.jdo.Query;
 
 import org.nightlabs.jfire.security.User;
+import org.nightlabs.jfire.store.DeliveryNote;
 import org.nightlabs.jfire.store.Product;
 import org.nightlabs.jfire.store.ProductTransfer;
 import org.nightlabs.jfire.store.deliver.id.DeliveryID;
@@ -182,5 +186,31 @@ public class DeliverProductTransfer extends ProductTransfer
 	public Delivery getDelivery()
 	{
 		return delivery;
+	}
+
+	@Override
+	public void bookTransfer(User user, Map<String, Anchor> involvedAnchors)
+	{
+		super.bookTransfer(user, involvedAnchors);
+		bookAtDeliveryNotes(user, involvedAnchors, false);
+	}
+
+	private void bookAtDeliveryNotes(User user, Map<String, Anchor> involvedAnchors, boolean rollback)
+	{
+		Set<DeliveryNote> processedDeliveryNotes = new HashSet<DeliveryNote>();
+		for (Article article : delivery.getArticles()) {
+			DeliveryNote deliveryNote = article.getDeliveryNote();
+			if (!processedDeliveryNotes.add(deliveryNote))
+				continue;
+
+			deliveryNote.bookDeliverProductTransfer(this, involvedAnchors, rollback);
+		}
+	}
+
+	@Override
+	public void rollbackTransfer(User user, Map<String, Anchor> involvedAnchors)
+	{
+		bookAtDeliveryNotes(user, involvedAnchors, true);
+		super.rollbackTransfer(user, involvedAnchors);
 	}
 }

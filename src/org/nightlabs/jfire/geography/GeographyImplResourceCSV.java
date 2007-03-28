@@ -75,17 +75,15 @@ extends Geography
 		return (String[]) CollectionUtil.collection2TypedArray(res, String.class);
 	}
 
-//	protected static String collection2csvLines(Collection<Object> collection)
-//	{
-//		StringBuffer csvLines = new StringBuffer();
-//		for(Iterator<Object> iterator = collection.iterator(); iterator.hasNext();){
-//			Object obj = iterator.next();
-//			csvLines.append(obj2csvLine(obj)).append("\n");
-//		}//for
-//		System.out.println("======================================");
-//		System.out.println(csvLines.toString());
-//		return csvLines.toString();
-//	}
+	protected static String collection2csvLines(Collection<Object> collection)
+	{
+		StringBuffer csvLines = new StringBuffer();
+		for(Iterator<Object> iterator = collection.iterator(); iterator.hasNext();){
+			Object obj = iterator.next();
+			csvLines.append(obj2csvLine(obj));
+		}//for
+		return csvLines.toString();
+	}
 
 	protected static String obj2csvLine(Object obj)
 	{
@@ -107,6 +105,7 @@ extends Geography
 
 				String text = nameMap.getValue(); 
 				csvLine.append(text == null?"":text);
+				csvLine.append("\n");
 			}//for
 		}//else if
 		else if(obj instanceof City){
@@ -124,6 +123,7 @@ extends Geography
 
 				String text = nameMap.getValue(); 
 				csvLine.append(text == null?"":text);
+				csvLine.append("\n");
 			}//for
 		}//else if
 		else if(obj instanceof Region){
@@ -170,10 +170,13 @@ extends Geography
 			csvLine.append(district.getName());
 			csvLine.append(district.getLatitude());
 			csvLine.append(district.getLongitude());
+			
+			csvLine.append("\n");
 		}//else if
 		else
 			throw new IllegalArgumentException("obj is an instance of " + (obj == null ? null : obj.getClass().getName()) + " which is not supported!");
 
+		logger.info(csvLine.toString());
 		return csvLine.toString();
 	}
 

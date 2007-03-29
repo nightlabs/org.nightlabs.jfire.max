@@ -1,10 +1,13 @@
 package org.nightlabs.jfire.voucher;
 
+import java.io.IOException;
 import java.rmi.RemoteException;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Iterator;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
@@ -14,27 +17,42 @@ import javax.ejb.CreateException;
 import javax.ejb.EJBException;
 import javax.ejb.SessionBean;
 import javax.ejb.SessionContext;
+import javax.jdo.Extent;
 import javax.jdo.FetchPlan;
 import javax.jdo.JDODetachedFieldAccessException;
 import javax.jdo.JDOHelper;
 import javax.jdo.JDOObjectNotFoundException;
 import javax.jdo.PersistenceManager;
 import javax.jdo.Query;
+import javax.naming.NamingException;
 
 import org.apache.log4j.Logger;
 import org.nightlabs.ModuleException;
 import org.nightlabs.annotation.Implement;
 import org.nightlabs.jdo.NLJDOHelper;
+import org.nightlabs.jdo.ObjectIDUtil;
 import org.nightlabs.jdo.moduleregistry.ModuleMetaData;
 import org.nightlabs.jfire.accounting.Account;
+import org.nightlabs.jfire.accounting.Accounting;
+import org.nightlabs.jfire.accounting.Currency;
 import org.nightlabs.jfire.accounting.book.id.LocalAccountantDelegateID;
+import org.nightlabs.jfire.accounting.id.CurrencyID;
 import org.nightlabs.jfire.accounting.pay.ModeOfPayment;
 import org.nightlabs.jfire.accounting.pay.ModeOfPaymentFlavour;
+import org.nightlabs.jfire.accounting.priceconfig.PriceConfig;
 import org.nightlabs.jfire.accounting.priceconfig.id.PriceConfigID;
 import org.nightlabs.jfire.base.BaseSessionBeanImpl;
+import org.nightlabs.jfire.idgenerator.IDGenerator;
 import org.nightlabs.jfire.organisation.Organisation;
+import org.nightlabs.jfire.person.Person;
+import org.nightlabs.jfire.person.PersonStruct;
+import org.nightlabs.jfire.prop.IStruct;
+import org.nightlabs.jfire.prop.Property;
+import org.nightlabs.jfire.prop.Struct;
+import org.nightlabs.jfire.prop.datafield.TextDataField;
 import org.nightlabs.jfire.scripting.Script;
 import org.nightlabs.jfire.scripting.ScriptRegistry;
+import org.nightlabs.jfire.scripting.ScriptRegistryItem;
 import org.nightlabs.jfire.scripting.id.ScriptRegistryItemID;
 import org.nightlabs.jfire.security.User;
 import org.nightlabs.jfire.store.NestedProductType;
@@ -42,6 +60,7 @@ import org.nightlabs.jfire.store.ProductType;
 import org.nightlabs.jfire.store.Store;
 import org.nightlabs.jfire.store.deliver.DeliveryConfiguration;
 import org.nightlabs.jfire.store.deliver.ModeOfDelivery;
+import org.nightlabs.jfire.store.deliver.id.DeliveryConfigurationID;
 import org.nightlabs.jfire.store.deliver.id.ModeOfDeliveryID;
 import org.nightlabs.jfire.store.id.ProductID;
 import org.nightlabs.jfire.store.id.ProductTypeID;
@@ -53,6 +72,7 @@ import org.nightlabs.jfire.trade.Offer;
 import org.nightlabs.jfire.trade.Order;
 import org.nightlabs.jfire.trade.OrganisationLegalEntity;
 import org.nightlabs.jfire.trade.Segment;
+import org.nightlabs.jfire.trade.SegmentType;
 import org.nightlabs.jfire.trade.Trader;
 import org.nightlabs.jfire.trade.id.OfferID;
 import org.nightlabs.jfire.trade.id.SegmentID;
@@ -60,6 +80,8 @@ import org.nightlabs.jfire.voucher.accounting.ModeOfPaymentConst;
 import org.nightlabs.jfire.voucher.accounting.VoucherLocalAccountantDelegate;
 import org.nightlabs.jfire.voucher.accounting.VoucherPriceConfig;
 import org.nightlabs.jfire.voucher.accounting.pay.ServerPaymentProcessorVoucher;
+import org.nightlabs.jfire.voucher.scripting.PreviewParameterSet;
+import org.nightlabs.jfire.voucher.scripting.PreviewParameterValuesResult;
 import org.nightlabs.jfire.voucher.scripting.ScriptingInitializer;
 import org.nightlabs.jfire.voucher.scripting.VoucherScriptingConstants;
 import org.nightlabs.jfire.voucher.store.Voucher;
@@ -348,6 +370,70 @@ implements SessionBean
 
 	/**
 	 * @return <tt>Collection</tt> of {@link org.nightlabs.jfire.trade.Article}
+	 * @throws org.nightlabs.jfire.store.NotAvailableException in case there are not 
+	 * 	enough <tt>Voucher</tt>s available and the <tt>Product</tt>s cannot be created (because of a limit). 
+	 */
+	protected Collection<Article> createArticles(
+			PersistenceManager pm,
+			SegmentID segmentID,
+			OfferID offerID,
+			ProductTypeID productTypeID,
+			int quantity,
+			String[] fetchGroups, int maxFetchDepth)
+	throws ModuleException
+	{
+		Trader trader = Trader.getTrader(pm);
+		Store store = Store.getStore(pm);
+		Segment segment = (Segment) pm.getObjectById(segmentID);
+		Order order = segment.getOrder();
+
+		User user = User.getUser(pm, getPrincipal());
+
+		pm.getExtent(VoucherType.class);
+		ProductType pt = (ProductType) pm.getObjectById(productTypeID);
+		if (!(pt instanceof VoucherType))
+			throw new IllegalArgumentException("productTypeID \""+productTypeID+"\" specifies a ProductType of type \""+pt.getClass().getName()+"\", but must be \""+VoucherType.class.getName()+"\"!");
+		
+		VoucherType voucherType = (VoucherType)pt;
+
+		// find an Offer within the Order which is not finalized - or create one
+		Offer offer;
+		if (offerID == null) {
+			Collection offers = Offer.getNonFinalizedOffers(pm, order);
+			if (!offers.isEmpty()) {
+				offer = (Offer) offers.iterator().next();
+			}
+			else {
+				offer = trader.createOffer(user, order, null); // TODO offerIDPrefix ???
+			}
+		}
+		else {
+			pm.getExtent(Offer.class);
+			offer = (Offer) pm.getObjectById(offerID);
+		}
+
+		// find / create Products
+		NestedProductType pseudoNestedPT = null;
+		if (quantity != 1)
+			pseudoNestedPT = new NestedProductType(null, voucherType, quantity);
+
+		Collection products = store.findProducts(user, voucherType, pseudoNestedPT, null);
+
+		Collection articles = trader.createArticles(
+				user, offer, segment,
+				products,
+				new ArticleCreator(null),
+				true, false, true);
+
+		pm.getFetchPlan().setMaxFetchDepth(maxFetchDepth);
+		if (fetchGroups != null)
+			pm.getFetchPlan().setGroups(fetchGroups);
+
+		return pm.detachCopyAll(articles);		
+	}
+	
+	/**
+	 * @return <tt>Collection</tt> of {@link org.nightlabs.jfire.trade.Article}
 	 * @throws org.nightlabs.jfire.store.NotAvailableException in case there are not enough <tt>Voucher</tt>s available and the <tt>Product</tt>s cannot be created (because of a limit). 
 	 *
 	 * @ejb.interface-method
@@ -364,54 +450,7 @@ implements SessionBean
 	{
 		PersistenceManager pm = getPersistenceManager();
 		try {
-			Trader trader = Trader.getTrader(pm);
-			Store store = Store.getStore(pm);
-			Segment segment = (Segment) pm.getObjectById(segmentID);
-			Order order = segment.getOrder();
-
-			User user = User.getUser(pm, getPrincipal());
-
-			pm.getExtent(VoucherType.class);
-			ProductType pt = (ProductType) pm.getObjectById(productTypeID);
-			if (!(pt instanceof VoucherType))
-				throw new IllegalArgumentException("productTypeID \""+productTypeID+"\" specifies a ProductType of type \""+pt.getClass().getName()+"\", but must be \""+VoucherType.class.getName()+"\"!");
-			
-			VoucherType voucherType = (VoucherType)pt;
-
-			// find an Offer within the Order which is not finalized - or create one
-			Offer offer;
-			if (offerID == null) {
-				Collection offers = Offer.getNonFinalizedOffers(pm, order);
-				if (!offers.isEmpty()) {
-					offer = (Offer) offers.iterator().next();
-				}
-				else {
-					offer = trader.createOffer(user, order, null); // TODO offerIDPrefix ???
-				}
-			}
-			else {
-				pm.getExtent(Offer.class);
-				offer = (Offer) pm.getObjectById(offerID);
-			}
-
-			// find / create Products
-			NestedProductType pseudoNestedPT = null;
-			if (quantity != 1)
-				pseudoNestedPT = new NestedProductType(null, voucherType, quantity);
-
-			Collection products = store.findProducts(user, voucherType, pseudoNestedPT, null);
-
-			Collection articles = trader.createArticles(
-					user, offer, segment,
-					products,
-					new ArticleCreator(null),
-					true, false, true);
-
-			pm.getFetchPlan().setMaxFetchDepth(maxFetchDepth);
-			if (fetchGroups != null)
-				pm.getFetchPlan().setGroups(fetchGroups);
-
-			return pm.detachCopyAll(articles);
+			return createArticles(pm, segmentID, offerID, productTypeID, quantity, fetchGroups, maxFetchDepth);
 		} finally {
 			pm.close();
 		}
@@ -484,18 +523,37 @@ implements SessionBean
 	}
 	
 	/**
+	 * @param voucherIDs Specifies which vouchers shall be evaluated.
+	 * @param allScripts If <code>false</code>, only those scripts are evaluated that are imported
+	 *		into the voucher design. If <code>true</code>, all scripts with the
+	 *		{@link ScriptRegistryItem#getScriptRegistryItemType()}
+	 *		{@link VoucherScriptingConstants#SCRIPT_REGISTRY_ITEM_TYPE_VOUCHER} 
+	 *		will be executed and
+	 *		included in the result. 
+	 *
 	 * @ejb.interface-method
+	 * @ejb.transaction type = "Required"
 	 * @ejb.permission role-name="_Guest_"
-	 * @ejb.transaction type="Supports"
 	 */
 	public Map<ProductID, Map<ScriptRegistryItemID, Object>> getVoucherScriptingResults(
 			Collection<ProductID> voucherIDs, boolean allScripts)
 	throws ModuleException
 	{
+		return getVoucherScriptingResults((PersistenceManager)null, voucherIDs, allScripts);
+	}	
+	
+	protected Map<ProductID, Map<ScriptRegistryItemID, Object>> getVoucherScriptingResults(
+			PersistenceManager pm, Collection<ProductID> voucherIDs, boolean allScripts)
+	throws ModuleException
+	{
 		allScripts = true; // TODO remove this line!
 		// TODO obtain the scripts via the voucher-layout-file,
 		try {
-				PersistenceManager pm = getPersistenceManager();
+			boolean closePM = false;
+			if (pm == null) {
+				closePM = true;
+				pm = getPersistenceManager();
+			}
 			try {
 				ScriptRegistry scriptRegistry = ScriptRegistry.getScriptRegistry(pm);	
 				pm.getExtent(Voucher.class);
@@ -530,7 +588,8 @@ implements SessionBean
 				}
 				return res;
 			} finally {
-				pm.close();				
+				if (closePM)
+					pm.close();
 			}
 		} catch (RuntimeException x) {
 			throw x;
@@ -541,4 +600,228 @@ implements SessionBean
 		}
 	}
 	
+	private static class PreviewParameterSetExtension {
+		public VoucherType voucherType;
+		public Currency currency;
+	}
+	
+	/**
+	 * @ejb.interface-method
+	 * @ejb.transaction type="RequiresNew"
+	 * @ejb.permission role-name="_Guest_"
+	 */
+	public PreviewParameterValuesResult getPreviewParameterValues(ProductTypeID voucherTypeID)
+	throws ModuleException
+	{
+		try {
+			PersistenceManager pm = getPersistenceManager();
+			try {
+				sessionContext.setRollbackOnly();
+
+				User user = User.getUser(pm, getPrincipal());
+				PreviewParameterSet previewParameterSet = new PreviewParameterSet(voucherTypeID);
+
+				PreviewParameterSetExtension previewParameterSetExtension =
+					ensureFinishedConfiguration(pm, user, previewParameterSet);
+
+				pm.getExtent(VoucherType.class);
+				VoucherType voucherType = (VoucherType) pm.getObjectById(voucherTypeID);
+				return new PreviewParameterValuesResult(voucherType);
+			} finally {
+				pm.close();
+			}
+		} catch (RuntimeException x) {
+			throw x;
+		} catch (ModuleException x) {
+			throw x;
+		} catch (Exception x) {
+			throw new ModuleException(x);
+		}
+	}
+	
+	/**
+	 * This method ensures that the event specified by <code>previewParameterSet</code>
+	 * is completely configured. If it's not, it will be configured using
+	 * the other IDs in <code>previewParameterSet</code>. All of them except voucherTypeID
+	 * can be <code>null</code>. They'll be set to an arbitrary value then.
+	 * <p>
+	 * <b>Warning:</b> This method modifies the database with arbitrary data! Thus,
+	 * it requires the bean method to have the <code>transaction type="RequiresNew"</code> and
+	 * to rollback the transaction using <code>sessionContext.setRollbackOnly();</code>.
+	 * </p>
+	 * @param pm The PersistenceManager used for the datastore access.
+	 * @param user Who is responsible?
+	 * @param previewParameterSet Various parameters necessary for generating
+	 *		preview data. If a property is <code>null</code>, it will be set to
+	 *		a meaningful value. Therefore, this object may be modified during
+	 *		execution. Note, that all properties are non-<code>null</code> afterwards.
+	 * @throws ModuleException 
+	 * @throws NamingException 
+	 * @throws IOException 
+	 */
+	private static PreviewParameterSetExtension ensureFinishedConfiguration(
+			PersistenceManager pm, User user,
+			PreviewParameterSet previewParameterSet)
+	throws ModuleException, NamingException, IOException
+	{
+		if (user == null)
+			throw new IllegalArgumentException("user must not be null!");
+
+		if (previewParameterSet == null)
+			throw new IllegalArgumentException("previewParameterSet must not be null!");
+
+		if (previewParameterSet.getVoucherTypeID() == null)
+			throw new IllegalArgumentException("previewParameterSet.voucherTypeID must not be null!");
+		
+//	 configure the given event, create an order, add an article and query the ticket data
+		// finally, rollback the transaction
+
+		String organisationID = user.getOrganisationID();
+		Accounting accounting = Accounting.getAccounting(pm);
+		Store store = Store.getStore(pm);
+
+		PreviewParameterSetExtension previewParameterSetExtension = new PreviewParameterSetExtension();
+
+		// ensure the event is correctly configured and confirmed
+		pm.getExtent(VoucherType.class);
+		previewParameterSetExtension.voucherType = (VoucherType) pm.getObjectById(
+				previewParameterSet.getVoucherTypeID());
+
+		// Currency
+		Extent extent = pm.getExtent(Currency.class);
+		if (previewParameterSet.getCurrencyID() == null) {
+			Iterator it = extent.iterator();
+			if (it.hasNext())
+				previewParameterSetExtension.currency = (Currency) it.next();
+			else {
+				previewParameterSetExtension.currency = new Currency("EUR", "EUR", 2);
+				pm.makePersistent(previewParameterSetExtension.currency);
+			}
+			previewParameterSet.setCurrencyID(
+					(CurrencyID) JDOHelper.getObjectId(previewParameterSetExtension.currency));
+		}
+		else
+			previewParameterSetExtension.currency = (Currency) pm.getObjectById(
+					previewParameterSet.getCurrencyID());
+		
+		
+		if (!previewParameterSetExtension.voucherType.isConfirmed()) 
+		{
+			if (previewParameterSetExtension.voucherType.getDeliveryConfiguration() == null) {
+				pm.getExtent(DeliveryConfiguration.class);
+				previewParameterSetExtension.voucherType.setDeliveryConfiguration(
+						(DeliveryConfiguration) pm.getObjectById(DeliveryConfigurationID.create(
+								organisationID, JFireVoucherEAR.DEFAULT_DELIVERY_CONFIGURATION_ID)));
+			}
+
+			boolean calculatePrices = false;
+			if (previewParameterSetExtension.voucherType.getPackagePriceConfig() == null) {
+				calculatePrices = true;
+				VoucherPriceConfig packagePriceConfig = new VoucherPriceConfig(organisationID, PriceConfig.createPriceConfigID());
+				pm.makePersistent(packagePriceConfig);
+				previewParameterSetExtension.voucherType.setPackagePriceConfig(packagePriceConfig);
+			}
+			
+			if (previewParameterSetExtension.voucherType.getInnerPriceConfig() == null) {
+				// Ignore as vouchers don't have innerPriceConfig
+			}
+
+			VoucherPriceConfig voucherPriceConfig = (VoucherPriceConfig) previewParameterSetExtension.
+				voucherType.getPackagePriceConfig();
+			
+			if (voucherPriceConfig.getCurrency(previewParameterSet.getCurrencyID().currencyID, false) == null) {
+				calculatePrices = true;
+				voucherPriceConfig.addCurrency(previewParameterSetExtension.currency);
+			}
+
+			if (calculatePrices) 
+			{				
+				long defaultValue = 5000;
+				voucherPriceConfig.setPrice(previewParameterSetExtension.currency, defaultValue);				
+				// the PriceCalculator may do some detaching stuff
+				pm.getFetchPlan().setMaxFetchDepth(1);
+				pm.getFetchPlan().setGroup(FetchPlan.DEFAULT);
+			}
+			
+			store.setProductTypeStatus_confirmed(
+					user,
+					previewParameterSetExtension.voucherType);			
+		} // if (!previewParameterSetExtension.voucherType.isConfirmed())		
+		return previewParameterSetExtension;
+	}	
+	
+	/**
+	 * @ejb.interface-method
+	 * @ejb.transaction type="RequiresNew"
+	 * @ejb.permission role-name="_Guest_"
+	 */	
+	public Map<ProductID, Map<ScriptRegistryItemID, Object>> getPreviewVoucherData(
+			PreviewParameterSet previewParameterSet)
+	throws ModuleException
+	{
+		try {
+			PersistenceManager pm = getPersistenceManager();
+			try {
+				pm.getFetchPlan().setMaxFetchDepth(1);
+				pm.getFetchPlan().setGroup(FetchPlan.DEFAULT);
+
+				User user = User.getUser(pm, getPrincipal());
+				Store store = Store.getStore(pm);
+
+				PreviewParameterSetExtension previewParameterSetExtension =
+						ensureFinishedConfiguration(pm, user, previewParameterSet);
+
+				// find or create an Order
+				Trader trader = Trader.getTrader(pm);
+
+				// FIXME should be StructLocal				
+				IStruct personStruct = Struct.getStruct(getOrganisationID(), Person.class, pm);
+				Person person = new Person(getOrganisationID(), IDGenerator.nextID(Property.class));
+				personStruct.explodeProperty(person);
+				((TextDataField)person.getDataField(PersonStruct.PERSONALDATA_COMPANY)).setText("NightLabs GmbH");
+				((TextDataField)person.getDataField(PersonStruct.PERSONALDATA_NAME)).setText("Schulze");
+				((TextDataField)person.getDataField(PersonStruct.PERSONALDATA_FIRSTNAME)).setText("Marco");
+				personStruct.implodeProperty(person);
+
+				LegalEntity customer = new LegalEntity(getOrganisationID(), LegalEntity.ANCHOR_TYPE_ID_PARTNER, ObjectIDUtil.makeValidIDString(null, true));
+				customer.setPerson(person);
+				customer.setDefaultCustomerGroup(trader.getDefaultCustomerGroupForKnownCustomer());
+				pm.makePersistent(customer);
+
+				Order order = trader.createOrder(trader.getMandator(), customer, null, previewParameterSetExtension.currency);
+				trader.createOffer(user, order, null);
+				String lockKey = ObjectIDUtil.makeValidIDString(null, true);
+
+				SegmentType segmentType = SegmentType.getDefaultSegmentType(pm);
+				Segment segment = trader.createSegment(order, segmentType);
+				SegmentID segmentID = (SegmentID) JDOHelper.getObjectId(segment);				
+				Collection<Article> articles = createArticles(
+						pm,
+						segmentID, 
+						null,
+						previewParameterSet.getVoucherTypeID(), 
+						1, 
+						new String[] {FetchPlan.DEFAULT, FetchPlan.ALL}, 
+						NLJDOHelper.MAX_FETCH_DEPTH_NO_LIMIT);
+				
+				Article article = articles.iterator().next();
+				Voucher voucher = (Voucher) article.getProduct();
+				Collection<ProductID> voucherIDs = new LinkedList<ProductID>();
+				voucherIDs.add((ProductID) JDOHelper.getObjectId(voucher)); 				
+				Map<ProductID, Map<ScriptRegistryItemID, Object>> voucherScriptingResult = 
+					getVoucherScriptingResults(pm, voucherIDs, true);				
+				return voucherScriptingResult;
+			} finally {
+				sessionContext.setRollbackOnly();
+				pm.close();
+			}
+		} catch (RuntimeException x) {
+			throw x;
+		} catch (ModuleException x) {
+			throw x;
+		} catch (Exception x) {
+			throw new ModuleException(x);
+		}
+	}
+		
 }

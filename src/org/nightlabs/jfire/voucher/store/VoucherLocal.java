@@ -5,10 +5,7 @@ import javax.jdo.PersistenceManager;
 import javax.jdo.listener.DetachCallback;
 
 import org.nightlabs.annotation.Implement;
-import org.nightlabs.jfire.accounting.Accounting;
 import org.nightlabs.jfire.accounting.Price;
-import org.nightlabs.jfire.accounting.priceconfig.PriceConfig;
-import org.nightlabs.jfire.idgenerator.IDGenerator;
 import org.nightlabs.jfire.security.User;
 import org.nightlabs.jfire.store.Product;
 import org.nightlabs.jfire.store.ProductLocal;

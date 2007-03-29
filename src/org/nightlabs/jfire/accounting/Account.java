@@ -112,7 +112,13 @@ public class Account extends Anchor
 	/**
 	 * anchorTypeID for accounts of trading partners when they acting as customer
 	 */
-	public static final String ANCHOR_TYPE_ID_PARTNER_CUSTOMER = "Account.Partner.Customer";	
+	public static final String ANCHOR_TYPE_ID_PARTNER_CUSTOMER = "Account.Partner.Customer";
+
+	/**
+	 * anchorTypeID for accounts of trading partners when they overpay an i TODO document this!
+	 */
+	public static final String ANCHOR_TYPE_ID_PARTNER_NEUTRAL = "Account.Partner.Neutral";
+
 	/**
 	 * anchorTypeID for accounts that are used during payment. They represent money that's outside
 	 * the organisation (means paid to a partner).

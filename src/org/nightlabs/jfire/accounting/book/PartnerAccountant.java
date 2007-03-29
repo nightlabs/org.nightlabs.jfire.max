@@ -186,7 +186,10 @@ public class PartnerAccountant extends Accountant
 	{
 		if (amountToPay < 0)
 			throw new IllegalArgumentException("amountToPay=="+amountToPay+"! amountToPay must be positive or zero!");
-		
+
+		if (amountToPay == 0 && !invoice.getInvoiceLocal().isOutstanding())
+			return 0;
+
 		Anchor from = null;
 		Anchor to = null;
 		boolean partnerTransferFrom = transfer.getAnchorType(partner) == Transfer.ANCHORTYPE_FROM; // mandator.getPrimaryKey().equals(transfer.getFrom().getPrimaryKey());
@@ -672,8 +675,30 @@ public class PartnerAccountant extends Accountant
 		} // if (restAmount > 0) {
 
 
-		if (capital != 0)
-			throw new UnsupportedOperationException("capital=="+capital+"! The case capital != 0 after payment is not yet supported!");
+		if (capital != 0) {
+//			throw new UnsupportedOperationException("capital=="+capital+"! The case capital != 0 after payment is not yet supported!");
+			Anchor from, to;
+			long amountToTransfer;
+			if (capital > 0) {
+				amountToTransfer = capital;
+				from = partner;
+				to = accounting.getPartnerAccount(Account.ANCHOR_TYPE_ID_PARTNER_NEUTRAL, partner, payMoneyTransfer.getCurrency());
+			}
+			else {
+				amountToTransfer = -capital;
+				from = accounting.getPartnerAccount(Account.ANCHOR_TYPE_ID_PARTNER_NEUTRAL, partner, payMoneyTransfer.getCurrency());
+				to = partner;
+			}
+
+			MoneyTransfer moneyTransfer = new MoneyTransfer(
+					accounting,
+					payMoneyTransfer,
+					from,
+					to,
+					amountToTransfer);
+
+			moneyTransfer.bookTransfer(user, involvedAnchors);
+		}
 	}
 	
 //	private PersistenceManager accountantPM = null;

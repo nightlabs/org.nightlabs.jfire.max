@@ -31,6 +31,7 @@ import javax.jdo.PersistenceManager;
 
 import org.nightlabs.jfire.accounting.pay.id.ServerPaymentProcessorID;
 import org.nightlabs.jfire.organisation.Organisation;
+import org.nightlabs.jfire.store.deliver.id.ServerDeliveryProcessorID;
 import org.nightlabs.jfire.transfer.Anchor;
 
 /**
@@ -45,7 +46,6 @@ import org.nightlabs.jfire.transfer.Anchor;
  *		identity-type="application"
  *		persistence-capable-superclass="org.nightlabs.jfire.store.deliver.ServerDeliveryProcessor"
  *		detachable="true"
- *		table="JFireTrade_ServerDeliveryProcessorManual"
  *
  * @jdo.inheritance strategy="superclass-table"
  */
@@ -57,10 +57,10 @@ public class ServerDeliveryProcessorManual extends ServerDeliveryProcessor
 		try {
 			pm.getExtent(ServerDeliveryProcessorManual.class);
 			serverDeliveryProcessorManual = (ServerDeliveryProcessorManual) pm.getObjectById(
-					ServerPaymentProcessorID.create(Organisation.DEVIL_ORGANISATION_ID, ServerDeliveryProcessorManual.class.getName()));
+					ServerDeliveryProcessorID.create(Organisation.DEVIL_ORGANISATION_ID, ServerDeliveryProcessorManual.class.getName()));
 		} catch (JDOObjectNotFoundException e) {
 			serverDeliveryProcessorManual = new ServerDeliveryProcessorManual(Organisation.DEVIL_ORGANISATION_ID, ServerDeliveryProcessorManual.class.getName());
-			pm.makePersistent(serverDeliveryProcessorManual);
+			serverDeliveryProcessorManual = (ServerDeliveryProcessorManual) pm.makePersistent(serverDeliveryProcessorManual);
 		}
 
 		return serverDeliveryProcessorManual;

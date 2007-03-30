@@ -28,9 +28,11 @@ package org.nightlabs.jfire.reporting.parameter;
 
 import java.math.BigDecimal;
 import java.rmi.RemoteException;
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Locale;
 import java.util.Map;
 import java.util.Set;
@@ -89,7 +91,7 @@ implements SessionBean
 	public void unsetSessionContext() {
 		super.unsetSessionContext();
 	}
-	
+
 	/**
 	 * @ejb.create-method
 	 * @ejb.permission role-name="_Guest_"	
@@ -112,7 +114,7 @@ implements SessionBean
 			this.name = name;
 		}
 	}
-	
+
 	/**
 	 * 
 	 * @ejb.interface-method
@@ -185,12 +187,12 @@ implements SessionBean
 			pm.close();
 		}
 	}
-	
+
 	private static ValueProviderCategory createValueProviderCategory(
 			PersistenceManager pm, ValueProviderCategory parent, ValueProviderCategoryID categoryID,
 			NameEntry[] names 
-			
-		) {
+
+	) {
 		ValueProviderCategory category = null;
 		try {
 			category = (ValueProviderCategory) pm.getObjectById(categoryID);
@@ -206,11 +208,11 @@ implements SessionBean
 		}
 		return category;
 	}
-	
+
 	private static ValueProvider createValueProvider(
 			PersistenceManager pm, ValueProviderCategory category, ValueProviderID valueProviderID, String outputType,
 			NameEntry[] names, NameEntry[] descriptions
-		) 
+	) 
 	{
 		ValueProvider valueProvider = null;
 		try {
@@ -230,8 +232,8 @@ implements SessionBean
 		}
 		return valueProvider;
 	}
-	
-	
+
+
 	/**
 	 * @throws ModuleException
 	 *
@@ -240,20 +242,20 @@ implements SessionBean
 	 * @ejb.transaction type = "Required"
 	 */
 	@SuppressWarnings("unchecked")
-	public Collection<ReportParameterAcquisitionSetup> getValueProviders(
+	public Set<ReportParameterAcquisitionSetup> getValueProviders(
 			Set<ValueProviderID> providerIDs, String[] fetchGroups, int maxFetchDepth
-		)
+	)
 	throws ModuleException
 	{
 		PersistenceManager pm;
 		pm = getPersistenceManager();
 		try {
-			return NLJDOHelper.getDetachedObjectList(pm, providerIDs, ValueProvider.class, fetchGroups, maxFetchDepth);
+			return NLJDOHelper.getDetachedObjectSet(pm, providerIDs, ValueProvider.class, fetchGroups, maxFetchDepth);
 		} finally {
 			pm.close();
 		}
 	}
-	
+
 	/**
 	 * @throws ModuleException
 	 *
@@ -281,7 +283,7 @@ implements SessionBean
 			pm.close();
 		}		
 	}	
-	
+
 	/**
 	 * @throws ModuleException
 	 *
@@ -290,19 +292,81 @@ implements SessionBean
 	 * @ejb.transaction type = "Required"
 	 */
 	@SuppressWarnings("unchecked")
-	public Collection<ReportParameterAcquisitionSetup> getReportParameterAcquisitionSetups(
+	public Set<ReportParameterAcquisitionSetup> getReportParameterAcquisitionSetups(
 			Set<ReportParameterAcquisitionSetupID> setupIDs, String[] fetchGroups, int maxFetchDepth
-		)
+	)
 	throws ModuleException
 	{
 		PersistenceManager pm;
 		pm = getPersistenceManager();
 		try {
-			return NLJDOHelper.getDetachedObjectList(pm, setupIDs, ReportParameterAcquisitionSetup.class, fetchGroups, maxFetchDepth);
+			return NLJDOHelper.getDetachedObjectSet(pm, setupIDs, ReportParameterAcquisitionSetup.class, fetchGroups, maxFetchDepth);
 		} finally {
 			pm.close();
 		}
 	}
-	
-	
+
+
+	/**
+	 * @throws ModuleException
+	 *
+	 * @ejb.interface-method
+	 * @ejb.permission role-name="_Guest_"
+	 * @ejb.transaction type = "Required"
+	 */
+	public Set<ValueProviderCategoryID> getValueProviderCategoryIDsForParent(ValueProviderCategoryID valueProviderCategoryID)
+	throws ModuleException
+	{
+		PersistenceManager pm;
+		pm = getPersistenceManager();
+		try {
+			ValueProviderCategory category = valueProviderCategoryID != null ? (ValueProviderCategory) pm.getObjectById(valueProviderCategoryID) : null;
+			return new HashSet<ValueProviderCategoryID>(ValueProviderCategory.getValueProviderCategoryIDsForParent(pm, category));
+		} finally {
+			pm.close();
+		}
+	}
+
+	/**
+	 * @throws ModuleException
+	 *
+	 * @ejb.interface-method
+	 * @ejb.permission role-name="_Guest_"
+	 * @ejb.transaction type = "Required"
+	 */
+	public Set<ValueProviderCategory> getValueProviderCategories(
+			Set<ValueProviderCategoryID> categoryIDs, String[] fetchGroups, int maxFetchDepth
+	)
+	throws ModuleException
+	{
+		PersistenceManager pm;
+		pm = getPersistenceManager();
+		try {
+			return NLJDOHelper.getDetachedObjectSet(pm, categoryIDs, ValueProviderCategory.class, fetchGroups, maxFetchDepth);
+		} finally {
+			pm.close();
+		}
+	}
+
+	/**
+	 * @throws ModuleException
+	 *
+	 * @ejb.interface-method
+	 * @ejb.permission role-name="_Guest_"
+	 * @ejb.transaction type = "Required"
+	 */
+	public Set<ValueProviderID> getValueProviderIDsForParent(ValueProviderCategoryID valueProviderCategoryID)
+	throws ModuleException
+	{
+		PersistenceManager pm;
+		pm = getPersistenceManager();
+		try {
+			ValueProviderCategory category = (ValueProviderCategory) pm.getObjectById(valueProviderCategoryID);
+			return new HashSet<ValueProviderID>(ValueProvider.getValueProviderIDsForParent(pm, category));
+		} finally {
+			pm.close();
+		}
+	}
+
+
 }

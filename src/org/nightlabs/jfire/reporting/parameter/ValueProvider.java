@@ -2,10 +2,18 @@ package org.nightlabs.jfire.reporting.parameter;
 
 import java.io.Serializable;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
+
+import javax.jdo.JDOHelper;
+import javax.jdo.PersistenceManager;
+import javax.jdo.Query;
+import javax.jdo.listener.DetachCallback;
 
 import org.nightlabs.jfire.reporting.parameter.config.ValueAcquisitionSetup;
 import org.nightlabs.jfire.reporting.parameter.config.ValueProviderConfig;
+import org.nightlabs.jfire.reporting.parameter.id.ValueProviderCategoryID;
+import org.nightlabs.jfire.reporting.parameter.id.ValueProviderID;
 
 /**
  * ValueProviders are used to declare the process of acquiring 
@@ -37,14 +45,21 @@ import org.nightlabs.jfire.reporting.parameter.config.ValueProviderConfig;
  * @jdo.fetch-group name="ValueProvider.inputParameters" fetch-groups="default" fields="inputParameters"
  * @jdo.fetch-group name="ValueProvider.this" fetch-groups="default" fields="name, description, category, inputParameters"
  *
+ *  @jdo.query
+ *		name="getValueProviderIDsForParent"
+ *		query="SELECT JDOHelper.getObjectId(this)
+ *			WHERE this.category == :parentCategory
+ *			"
+ *
  */
-public class ValueProvider implements Serializable {
+public class ValueProvider implements Serializable, DetachCallback {
 
 	private static final long serialVersionUID = 1L;
 	
 	public static final String FETCH_GROUP_NAME = "ValueProvider.name";
 	public static final String FETCH_GROUP_DESCRIPTION = "ValueProvider.description";
 	public static final String FETCH_GROUP_CATEGORY = "ValueProvider.category";
+	public static final String FETCH_GROUP_CATEGORY_ID = "ValueProvider.categoryID";
 	public static final String FETCH_GROUP_INPUT_PARAMETERS = "ValueProvider.inputParameters";
 	public static final String FETCH_GROUP_THIS_VALUE_PROVIDER = "ValueProvider.this";
 			 
@@ -97,6 +112,12 @@ public class ValueProvider implements Serializable {
 	 * 		mapped-by="valueProvider"
 	 */
 	private ValueProviderDescription description;
+	
+	
+	/**
+	 * @jdo.field persistence-modifier="none"
+	 */
+	private ValueProviderCategoryID categoryID;
 	
 	protected ValueProvider() {
 	}
@@ -188,4 +209,37 @@ public class ValueProvider implements Serializable {
 	void setCategory(ValueProviderCategory category) {
 		this.category = category;
 	}
+	
+	protected PersistenceManager getPersistenceManager()
+	{
+		PersistenceManager pm = JDOHelper.getPersistenceManager(this);
+		if (pm == null)
+			throw new IllegalStateException("No PersistenceManager assigned!");
+		
+		return pm;
+	}
+	
+	public ValueProviderCategoryID getCategoryID() {
+		if (categoryID == null)
+			categoryID = (ValueProviderCategoryID) JDOHelper.getObjectId(category); 
+		return categoryID;
+	}
+	
+	public void jdoPostDetach(Object obj) {
+		ValueProvider attached = (ValueProvider) obj;
+		ValueProvider detached = this;
+		if (attached.getPersistenceManager().getFetchPlan().getGroups().contains(FETCH_GROUP_CATEGORY_ID))
+			detached.categoryID = attached.getCategoryID();
+	}
+	
+	public void jdoPreDetach() {
+	}
+	
+	
+	@SuppressWarnings("unchecked")
+	public static Collection<ValueProviderID> getValueProviderIDsForParent(PersistenceManager pm, ValueProviderCategory category) {
+		Query q = pm.newNamedQuery(ValueProvider.class, "getValueProviderIDsForParent");
+		return (Collection<ValueProviderID>) q.execute(category);
+	}
+
 }

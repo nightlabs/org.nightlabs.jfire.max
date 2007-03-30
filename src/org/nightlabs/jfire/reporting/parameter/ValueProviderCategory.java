@@ -8,10 +8,14 @@ import java.util.Collection;
 import java.util.HashSet;
 import java.util.Set;
 
+import javax.jdo.JDOHelper;
 import javax.jdo.PersistenceManager;
 import javax.jdo.Query;
+import javax.jdo.listener.DetachCallback;
 
-import org.nightlabs.jfire.reporting.layout.ReportCategory;
+import org.nightlabs.jfire.reporting.layout.ReportRegistryItem;
+import org.nightlabs.jfire.reporting.layout.id.ReportRegistryItemID;
+import org.nightlabs.jfire.reporting.parameter.id.ValueProviderCategoryID;
 
 /**
  * @author Alexander Bieber <!-- alex [AT] nightlabs [DOT] de -->
@@ -34,18 +38,24 @@ import org.nightlabs.jfire.reporting.layout.ReportCategory;
  * @jdo.fetch-group name="ValueProviderCategory.this" fetch-groups="default" fields="name, parent, childCategories"
  *
  *  @jdo.query
- *		name="getValueProviderCategoriesByParent"
+ *		name="getValueProviderCategoriesForParent"
  *		query="SELECT
  *			WHERE this.parent == :parentCategory
  *			"
  *
+ *  @jdo.query
+ *		name="getValueProviderCategoryIDsForParent"
+ *		query="SELECT JDOHelper.getObjectId(this)
+ *			WHERE this.parent == :parentCategory
+ *			"
  */
-public class ValueProviderCategory implements Serializable {
+public class ValueProviderCategory implements Serializable, DetachCallback {
 
 	private static final long serialVersionUID = 1L;
 	
 	public static final String FETCH_GROUP_VALUE_PROVIDERS = "ValueProviderCategory.valueProviders";
 	public static final String FETCH_GROUP_PARENT = "ValueProviderCategory.parent";
+	public static final String FETCH_GROUP_PARENT_ID = "ValueProviderCategory.parentID";
 	public static final String FETCH_GROUP_CHILD_CATEGORIES = "ValueProviderCategory.childCategories";
 	public static final String FETCH_GROUP_NAME = "ValueProviderCategory.name";
 	public static final String FETCH_GROUP_THIS_VALUE_PROVIDER_CATEGORY = "ValueProviderCategory.this";
@@ -92,6 +102,12 @@ public class ValueProviderCategory implements Serializable {
 	 * 		mapped-by="valueProviderCategory"
 	 */
 	private ValueProviderCategoryName name;
+	
+	/**
+	 * @jdo.field persistence-modifier="none"
+	 * 		mapped-by="valueProviderCategory"
+	 */
+	private ValueProviderCategoryID parentID;
 	
 	/**
 	 * @deprecated Only for JDO
@@ -181,9 +197,43 @@ public class ValueProviderCategory implements Serializable {
 		this.parent = parent;
 	}
 	
+
+	protected PersistenceManager getPersistenceManager()
+
+	{
+		PersistenceManager pm = JDOHelper.getPersistenceManager(this);
+		if (pm == null)
+			throw new IllegalStateException("No PersistenceManager assigned!");
+		
+		return pm;
+	}
+	
+	public ValueProviderCategoryID getParentID() {
+		if (parentID == null)
+			parentID = (ValueProviderCategoryID) JDOHelper.getObjectId(parent); 
+		return parentID;
+	}
+	
+	public void jdoPostDetach(Object obj) {
+		ValueProviderCategory attached = (ValueProviderCategory) obj;
+		ValueProviderCategory detached = this;
+		if (attached.getPersistenceManager().getFetchPlan().getGroups().contains(FETCH_GROUP_PARENT_ID))
+			detached.parentID = attached.getParentID();
+	}
+
+	public void jdoPreDetach() {
+	}
+	
+	
 	@SuppressWarnings("unchecked")
-	public static Collection<ValueProviderCategory> getValueProviderCategoriesByParent(PersistenceManager pm, ReportCategory category) {
+	public static Collection<ValueProviderCategory> getValueProviderCategoriesForParent(PersistenceManager pm, ValueProviderCategory category) {
 		Query q = pm.newNamedQuery(ValueProviderCategory.class, "getValueProviderCategoriesByParent");
 		return (Collection<ValueProviderCategory>) q.execute(category);
+	}
+	
+	@SuppressWarnings("unchecked")
+	public static Collection<ValueProviderCategoryID> getValueProviderCategoryIDsForParent(PersistenceManager pm, ValueProviderCategory category) {
+		Query q = pm.newNamedQuery(ValueProviderCategory.class, "getValueProviderCategoryIDsForParent");
+		return (Collection<ValueProviderCategoryID>) q.execute(category);
 	}
 }

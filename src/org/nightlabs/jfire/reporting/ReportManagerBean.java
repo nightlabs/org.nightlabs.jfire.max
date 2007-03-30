@@ -40,9 +40,11 @@ import javax.ejb.EJBException;
 import javax.ejb.SessionBean;
 import javax.ejb.SessionContext;
 import javax.jdo.FetchPlan;
+import javax.jdo.JDOHelper;
 import javax.jdo.JDOObjectNotFoundException;
 import javax.jdo.PersistenceManager;
 import javax.jdo.Query;
+import javax.naming.InitialContext;
 import javax.naming.NamingException;
 
 import org.apache.log4j.Level;
@@ -86,8 +88,6 @@ import org.nightlabs.jfire.scripting.ScriptRegistry;
 import org.nightlabs.jfire.scripting.id.ScriptRegistryItemID;
 import org.nightlabs.jfire.servermanager.JFireServerManager;
 import org.nightlabs.util.Utils;
-
-import com.sun.org.apache.regexp.internal.REProgram;
 
 /**
  * TODO: Unify method names for ResultSet and ResultSetMetaData getter (also in Dirvers, and Queries)
@@ -140,7 +140,6 @@ implements SessionBean
 	
 	
 	private void initRegisterConfigModules(PersistenceManager pm) 
-	throws ModuleException 
 	{
 		// Register all Reporing config-Modules
 		ConfigSetup configSetup = ConfigSetup.getConfigSetup(
@@ -332,27 +331,23 @@ implements SessionBean
 //			);
 //	}
 	
-	private void initRegisterScripts(PersistenceManager pm, JFireServerManager jfireServerManager) 
-	throws ModuleException 
+	private void initRegisterScripts(PersistenceManager pm, JFireServerManager jfireServerManager) throws InstantiationException, IllegalAccessException 
 	{
-		try {
-			ScriptRegistry.getScriptRegistry(pm).registerScriptExecutorClass(ScriptExecutorJavaClassReporting.class);
-		} catch (Exception e) {
-			throw new ModuleException(e);
-		}
+		ScriptRegistry.getScriptRegistry(pm).registerScriptExecutorClass(ScriptExecutorJavaClassReporting.class);
 	}
 	
 	/**
 	 * This method is called by the datastore initialization mechanism.
-	 * 
+	 * @throws IllegalAccessException 
+	 * @throws InstantiationException 
+	 * @throws ModuleException 
 	 * @throws ModuleException
 	 *
 	 * @ejb.interface-method
-	 * @ejb.permission role-name="JFireReport-admin"
+	 * @ejb.permission role-name="_System_"
 	 * @ejb.transaction type = "Required"
 	 */
-	public void initialise() 
-	throws ModuleException 
+	public void initialise() throws InstantiationException, IllegalAccessException, ModuleException 
 	{
 		// TODO: Better check if platform initialized. Propose on birt forum.
 		if (true) {
@@ -383,14 +378,17 @@ implements SessionBean
 				jfireServerManager.close();
 			}
 		}
-		
-		try {
-			new ReportingManagerFactory(getInitialContext(getOrganisationID()), getOrganisationID()); // registers itself in JNDI
-		} catch (Exception e) {
-			logger.error("Creating ReportingManagerFactory for organisation \""+getOrganisationID()+"\" failed!", e);
-			throw new ModuleException(e);
-		}
 
+		try {
+			InitialContext initialContext = new InitialContext();
+			try {
+				new ReportingManagerFactory(initialContext, getOrganisationID()); // registers itself in JNDI
+			} finally {
+				initialContext.close();
+			}
+		} catch (NamingException x) {
+			throw new RuntimeException(x); // local JNDI should always be available!
+		}
 
 		PersistenceManager pm;
 		pm = getPersistenceManager();
@@ -428,6 +426,8 @@ implements SessionBean
 				logger.info("Initialized Reporting Categories and Layouts");
 				
 			}
+			
+			
 			
 		} finally {
 			pm.close();
@@ -665,6 +665,26 @@ implements SessionBean
 	 * @ejb.permission role-name="_Guest_"
 	 * @ejb.transaction type = "Required"
 	 */
+	public Collection<ReportRegistryItemID> getReportRegistryItemIDsForParent(ReportRegistryItemID reportRegistryItemID)
+	throws ModuleException
+	{
+		PersistenceManager pm;
+		pm = getPersistenceManager();
+		try {
+			ReportRegistryItem item = (ReportRegistryItem) pm.getObjectById(reportRegistryItemID);
+			return new ArrayList<ReportRegistryItemID>(ReportRegistryItem.getReportRegistryItemIDsForParent(pm, item));
+		} finally {
+			pm.close();
+		}
+	}
+	
+	/**
+	 * @throws ModuleException
+	 *
+	 * @ejb.interface-method
+	 * @ejb.permission role-name="_Guest_"
+	 * @ejb.transaction type = "Required"
+	 */
 	public Collection getTopLevelReportRegistryItems (
 			String organisationID,
 			String[] fetchGroups, int maxFetchDepth
@@ -679,6 +699,30 @@ implements SessionBean
 			if (fetchGroups != null)
 				pm.getFetchPlan().setGroups(fetchGroups);
 			Collection result = (Collection) pm.detachCopyAll(topLevelItems);
+			return result;
+		} finally {
+			pm.close();
+		}
+	}
+	
+	/**
+	 * @throws ModuleException
+	 *
+	 * @ejb.interface-method
+	 * @ejb.permission role-name="_Guest_"
+	 * @ejb.transaction type = "Required"
+	 */
+	public Collection<ReportRegistryItemID> getTopLevelReportRegistryItemIDs ()
+	throws ModuleException
+	{
+		PersistenceManager pm;
+		pm = getPersistenceManager();
+		try {
+			Collection<ReportRegistryItem> topLevelItems = ReportRegistryItem.getTopReportRegistryItems(pm);
+			Collection<ReportRegistryItemID> result = new HashSet<ReportRegistryItemID>(topLevelItems.size());
+			for (ReportRegistryItem item : topLevelItems) {
+				result.add((ReportRegistryItemID) JDOHelper.getObjectId(item));
+			}
 			return result;
 		} finally {
 			pm.close();

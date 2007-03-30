@@ -14,5 +14,10 @@
 			bean="jfire/ejb/JFireScripting/ScriptManager"
 			method="initialise" />
 	</init>
-	
+	<init bean="jfire/ejb/JFireReporting/ReportParameterManager" method="initDefaultValueProviders">
+		<depends
+			module="JFireReporting.ear" 
+			archive="JFireReporting.jar"
+			bean="jfire/ejb/JFireReporting/ReportManager" />
+	</init>
 </datastore-initialisation>

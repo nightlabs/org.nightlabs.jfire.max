@@ -33,6 +33,7 @@ import javax.jdo.JDOHelper;
 import javax.jdo.JDOObjectNotFoundException;
 import javax.jdo.PersistenceManager;
 import javax.jdo.Query;
+import javax.jdo.listener.DetachCallback;
 import javax.jdo.listener.StoreCallback;
 
 import org.nightlabs.jfire.reporting.layout.id.ReportRegistryItemID;
@@ -90,8 +91,18 @@ import org.nightlabs.util.Utils;
  *		query="SELECT
  *			WHERE this.parentItem == null
  *			import java.lang.String"
+ *
+ * @jdo.query
+ *	name="getReportRegistryItemsForParent"
+ *	query="SELECT 
+ *		WHERE this.parentItem == :paramParent"
+ *
+ * @jdo.query
+ *	name="getReportRegistryItemIDsForParent"
+ *	query="SELECT JDOHelper.getObjectId(this) 
+ *		WHERE this.parentItem == :paramParent"
  */
-public abstract class ReportRegistryItem implements Serializable, StoreCallback
+public abstract class ReportRegistryItem implements Serializable, StoreCallback, DetachCallback
 {
 	
 	/**
@@ -106,6 +117,10 @@ public abstract class ReportRegistryItem implements Serializable, StoreCallback
 	public static final String QUERY_TOP_LEVEL_GET_REPORT_REGISTRY_ITEMS = "getTopLevelReportRegistryItems";
 
 	public static final String FETCH_GROUP_PARENT_ITEM = "ReportRegistryItem.parentItem";
+	/**
+	 * Virtual. The {@link #parentItemID} is set 
+	 */
+	public static final String FETCH_GROUP_PARENT_ITEM_ID = "ReportRegistryItem.parentItemID";
 	public static final String FETCH_GROUP_NAME = "ReportRegistryItem.name";
 	public static final String FETCH_GROUP_THIS_REPORT_REGISTRY_ITEM = "ReportRegistryItem.this";
 	
@@ -139,6 +154,11 @@ public abstract class ReportRegistryItem implements Serializable, StoreCallback
 	 * @jdo.field persistence-modifier="persistent"
 	 */
 	private ReportRegistryItem parentItem;
+	
+	/**
+	 * @jdo.field persistence-modifier="none"
+	 */
+	private ReportRegistryItemID parentItemID;
 
 
 	/**
@@ -190,6 +210,13 @@ public abstract class ReportRegistryItem implements Serializable, StoreCallback
 	protected void setParentItem(ReportRegistryItem parentItem) {
 		this.parentItem = parentItem;
 	}
+
+	public ReportRegistryItemID getParentItemID() {
+		if (parentItemID == null) {
+			parentItemID = (ReportRegistryItemID) JDOHelper.getObjectId(parentItem);
+		}
+		return parentItemID;
+	}
 	
 	public static Collection getReportRegistryItemByType(PersistenceManager pm, String organisatinID, String reportRegistryItemType) {
 		Query q = pm.newNamedQuery(ReportRegistryItem.class, QUERY_GET_REPORT_REGISTRY_ITEM_BY_TYPE);
@@ -201,18 +228,32 @@ public abstract class ReportRegistryItem implements Serializable, StoreCallback
 		return (ReportRegistryItem)q.execute(organisatinID, reportRegistryItemType);
 	}
 	
-	public static Collection getTopReportRegistryItems(PersistenceManager pm, String organisatinID) {
+	@SuppressWarnings("unchecked")
+	public static Collection<ReportRegistryItem> getTopReportRegistryItems(PersistenceManager pm, String organisatinID) {
 		if (organisatinID == null || "".equals(organisatinID))
 			return getTopReportRegistryItems(pm);
 		Query q = pm.newNamedQuery(ReportRegistryItem.class, QUERY_TOP_LEVEL_GET_REPORT_REGISTRY_ITEMS_BY_ORGANISATION);
 		return (Collection)q.execute(organisatinID);
 	}
 	
-	public static Collection getTopReportRegistryItems(PersistenceManager pm) {
+	@SuppressWarnings("unchecked")
+	public static Collection<ReportRegistryItem> getTopReportRegistryItems(PersistenceManager pm) {
 		Query q = pm.newNamedQuery(ReportRegistryItem.class, QUERY_TOP_LEVEL_GET_REPORT_REGISTRY_ITEMS);
 		return (Collection)q.execute();
 	}
+	
+	@SuppressWarnings("unchecked")
+	public static Collection<ReportRegistryItem> getReportRegistryItemsForParent(PersistenceManager pm, ReportRegistryItem reportRegistryItem) {
+		Query q = pm.newNamedQuery(ReportRegistryItem.class, "getReportRegistryItemsForParent");
+		return (Collection<ReportRegistryItem>) q.execute(reportRegistryItem);
+	}
 
+	@SuppressWarnings("unchecked")
+	public static Collection<ReportRegistryItemID> getReportRegistryItemIDsForParent(PersistenceManager pm, ReportRegistryItem reportRegistryItem) {
+		Query q = pm.newNamedQuery(ReportRegistryItem.class, "getReportRegistryItemIDsForParent");
+		return (Collection<ReportRegistryItemID>) q.execute(reportRegistryItem);
+	}
+	
 	/**
 	 * TODO isn't this wrong: Assigns a reportRegistryItemID for this ReportRegistryItem it this is not set yet.
 	 *
@@ -271,4 +312,22 @@ public abstract class ReportRegistryItem implements Serializable, StoreCallback
 			Utils.equals(this.reportRegistryItemType, other.reportRegistryItemType) &&
 			Utils.equals(this.reportRegistryItemID, other.reportRegistryItemID);
 	}
+
+	/* (non-Javadoc)
+	 * @see javax.jdo.listener.DetachCallback#jdoPostDetach(java.lang.Object)
+	 */
+	public void jdoPostDetach(Object obj) {
+		ReportRegistryItem attached = (ReportRegistryItem) obj;
+		ReportRegistryItem detached = this;
+		if (attached.getPersistenceManager().getFetchPlan().getGroups().contains(FETCH_GROUP_PARENT_ITEM_ID))
+			detached.parentItemID = attached.getParentItemID();
+	}
+
+	/* (non-Javadoc)
+	 * @see javax.jdo.listener.DetachCallback#jdoPreDetach()
+	 */
+	public void jdoPreDetach() {
+	}
+	
+	
 }

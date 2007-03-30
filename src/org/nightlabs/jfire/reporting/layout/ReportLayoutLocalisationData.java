@@ -196,6 +196,7 @@ public class ReportLayoutLocalisationData implements StoreCallback, Serializable
 	 * @param reportLayout
 	 * @return
 	 */
+	@SuppressWarnings("unchecked")
 	public static Collection<ReportLayoutLocalisationData> getReportLayoutLocalisationBundle(PersistenceManager pm, ReportLayout reportLayout) {
 		Query q = pm.newNamedQuery(ReportLayoutLocalisationData.class, "getReportLayoutLocalisationBundle");
 		return (Collection<ReportLayoutLocalisationData>) q.execute(reportLayout);

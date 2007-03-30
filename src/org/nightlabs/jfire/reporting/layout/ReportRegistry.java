@@ -31,7 +31,6 @@ import java.util.Map;
 
 import javax.jdo.PersistenceManager;
 
-import org.apache.log4j.Logger;
 import org.nightlabs.jfire.reporting.Birt;
 import org.nightlabs.jfire.reporting.Birt.OutputFormat;
 import org.nightlabs.jfire.reporting.layout.id.ReportRegistryID;
@@ -58,7 +57,7 @@ public class ReportRegistry {
 	/**
 	 * LOG4J logger used by this class
 	 */
-	private static final Logger logger = Logger.getLogger(ReportRegistry.class);
+//	private static final Logger logger = Logger.getLogger(ReportRegistry.class);
 	
 	/**
 	 * @jdo.field primary-key="true"

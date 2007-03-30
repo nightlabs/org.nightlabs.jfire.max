@@ -53,13 +53,13 @@ import javax.jdo.Query;
  * @jdo.fetch-group name="ReportCategory.childItems" fetch-groups="default" fields="childItems"
  * @jdo.fetch-group name="ReportCategory.this" fetch-groups="default, ReportRegistryItem.this" fields="childItems"
  * 
- *  @jdo.query
- *		name="getReportCategory"
- *		query="SELECT UNIQUE
- *			WHERE this.organisationID == paramOrganisationID &&
- *            this.reportRegistryItemType == paramCategoryType            
- *			PARAMETERS String paramOrganisationID, String paramCategoryType
- *			import java.lang.String"
+ * @jdo.query
+ *	name="getReportCategory"
+ *	query="SELECT UNIQUE
+ *		WHERE this.organisationID == paramOrganisationID &&
+ *           this.reportRegistryItemType == paramCategoryType            
+ *		PARAMETERS String paramOrganisationID, String paramCategoryType
+ *		import java.lang.String"
  * 
  */
 public class ReportCategory extends ReportRegistryItem implements NestableReportRegistryItem {
@@ -151,7 +151,8 @@ public class ReportCategory extends ReportRegistryItem implements NestableReport
 		Query q = pm.newNamedQuery(ReportCategory.class, QUERY_GET_REPORT_CATEGORY);
 		return (ReportCategory)q.execute(organisationID, categoryType);
 	}
-
+	
+	
 	public Set<ReportRegistryItem> getChildItems() {
 		return childItems;
 	}

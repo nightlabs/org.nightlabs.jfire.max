@@ -4,8 +4,14 @@
 package org.nightlabs.jfire.reporting.parameter;
 
 import java.io.Serializable;
+import java.util.Collection;
 import java.util.HashSet;
 import java.util.Set;
+
+import javax.jdo.PersistenceManager;
+import javax.jdo.Query;
+
+import org.nightlabs.jfire.reporting.layout.ReportCategory;
 
 /**
  * @author Alexander Bieber <!-- alex [AT] nightlabs [DOT] de -->
@@ -26,6 +32,12 @@ import java.util.Set;
  * @jdo.fetch-group name="ValueProviderCategory.childCategories" fetch-groups="default" fields="childCategories"
  * @jdo.fetch-group name="ValueProviderCategory.name" fetch-groups="default" fields="name"
  * @jdo.fetch-group name="ValueProviderCategory.this" fetch-groups="default" fields="name, parent, childCategories"
+ *
+ *  @jdo.query
+ *		name="getValueProviderCategoriesByParent"
+ *		query="SELECT
+ *			WHERE this.parent == :parentCategory
+ *			"
  *
  */
 public class ValueProviderCategory implements Serializable {
@@ -167,5 +179,11 @@ public class ValueProviderCategory implements Serializable {
 	 */
 	public void setParent(ValueProviderCategory parent) {
 		this.parent = parent;
+	}
+	
+	@SuppressWarnings("unchecked")
+	public static Collection<ValueProviderCategory> getValueProviderCategoriesByParent(PersistenceManager pm, ReportCategory category) {
+		Query q = pm.newNamedQuery(ValueProviderCategory.class, "getValueProviderCategoriesByParent");
+		return (Collection<ValueProviderCategory>) q.execute(category);
 	}
 }

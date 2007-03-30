@@ -104,65 +104,93 @@ implements SessionBean
 	 */
 	public void ejbRemove() throws EJBException, RemoteException { }
 
+	private static class NameEntry {
+		String language;
+		String name;
+		NameEntry(String language, String name) {
+			this.language = language;
+			this.name = name;
+		}
+	}
+	
+	/**
+	 * 
+	 * @ejb.interface-method
+	 * @ejb.permission role-name="_System_"
+	 * @ejb.transaction type = "Required"
+	 */
 	public void initDefaultValueProviders() {
 		PersistenceManager pm = getPersistenceManager();
 		try {
-			
 			ValueProviderCategoryID categoryID = ReportingConstants.VALUE_PROVIDER_CATEGORY_ID_SIMPLE_TYPES;
-			ValueProviderCategory simpleTypes = createValueProviderCategory(pm, null, categoryID);
-			simpleTypes.getName().setText(Locale.ENGLISH.getLanguage(), "Simple types");
-			
-			ValueProvider string = createValueProvider(pm, simpleTypes, ReportingConstants.VALUE_PROVIDER_ID_STRING, String.class.getName());
-			string.getName().setText(Locale.ENGLISH.getLanguage(), "String");
-			string.getDescription().setText(Locale.ENGLISH.getLanguage(), "Query a Text from the user");
-			
-			ValueProvider integer = createValueProvider(pm, simpleTypes, ReportingConstants.VALUE_PROVIDER_ID_INTEGER, Integer.class.getName());
-			integer.getName().setText(Locale.ENGLISH.getLanguage(), "Integer");
-			integer.getDescription().setText(Locale.ENGLISH.getLanguage(), "Query a number from the user");
-			
-			ValueProvider bigDecimal = createValueProvider(pm, simpleTypes, ReportingConstants.VALUE_PROVIDER_ID_BIG_DECIMAL, BigDecimal.class.getName());
-			bigDecimal.getName().setText(Locale.ENGLISH.getLanguage(), "BigDecimal");
-			bigDecimal.getDescription().setText(Locale.ENGLISH.getLanguage(), "Query a long number from the user");
-			
-			ValueProvider doub = createValueProvider(pm, simpleTypes, ReportingConstants.VALUE_PROVIDER_ID_DOUBLE, Double.class.getName());
-			doub.getName().setText(Locale.ENGLISH.getLanguage(), "Double");
-			doub.getDescription().setText(Locale.ENGLISH.getLanguage(), "Query a decimal number from the user");
-			
-			ValueProvider date = createValueProvider(pm, simpleTypes, ReportingConstants.VALUE_PROVIDER_ID_DATE, Date.class.getName());
-			date.getName().setText(Locale.ENGLISH.getLanguage(), "Date");
-			date.getDescription().setText(Locale.ENGLISH.getLanguage(), "Query a date/time from the user");
-			
-			ValueProvider timePeriod = createValueProvider(pm, simpleTypes, ReportingConstants.VALUE_PROVIDER_ID_TIME_PERIOD, Date.class.getName());
-			timePeriod.getName().setText(Locale.ENGLISH.getLanguage(), "Timeperiod");
-			timePeriod.getDescription().setText(Locale.ENGLISH.getLanguage(), "Query a time period from the user");
-			
+			ValueProviderCategory simpleTypes = createValueProviderCategory(pm, null, categoryID, new NameEntry[] {
+					new NameEntry(Locale.ENGLISH.getLanguage(), "Simple types")
+			});
 
-			ValueProviderCategory jfireObjects = createValueProviderCategory(pm, null, ReportingConstants.VALUE_PROVIDER_CATEGORY_ID_JFIRE_OBJECTS);
-			jfireObjects.getName().setText(Locale.ENGLISH.getLanguage(), "JFire objects");
+			createValueProvider(pm, simpleTypes, ReportingConstants.VALUE_PROVIDER_ID_STRING, String.class.getName(),
+					new NameEntry[] {new NameEntry(Locale.ENGLISH.getLanguage(), "String")},
+					new NameEntry[] {new NameEntry(Locale.ENGLISH.getLanguage(), "Query a Text from the user")}
+			);
 
-			ValueProvider user = createValueProvider(pm, simpleTypes, ReportingConstants.VALUE_PROVIDER_ID_USER, UserID.class.getName());
-			user.getName().setText(Locale.ENGLISH.getLanguage(), "User");
-			user.getDescription().setText(Locale.ENGLISH.getLanguage(), "Let the user select a user.");
-			
-			ValueProvider userGroup = createValueProvider(pm, simpleTypes, ReportingConstants.VALUE_PROVIDER_ID_USER_GROUP, UserID.class.getName());
-			userGroup.getName().setText(Locale.ENGLISH.getLanguage(), "User group");
-			userGroup.getDescription().setText(Locale.ENGLISH.getLanguage(), "Let the user select a user group.");
-			
-			ValueProvider organisation = createValueProvider(pm, simpleTypes, ReportingConstants.VALUE_PROVIDER_ID_ORGANISATION, OrganisationID.class.getName());
-			organisation.getName().setText(Locale.ENGLISH.getLanguage(), "Organisation");
-			organisation.getDescription().setText(Locale.ENGLISH.getLanguage(), "Let the user select an organisation.");
-			
-			ValueProvider workstation = createValueProvider(pm, simpleTypes, ReportingConstants.VALUE_PROVIDER_ID_ORGANISATION, OrganisationID.class.getName());
-			workstation.getName().setText(Locale.ENGLISH.getLanguage(), "Workstation");
-			workstation.getDescription().setText(Locale.ENGLISH.getLanguage(), "Let the user select a workstation.");
-			
+			createValueProvider(pm, simpleTypes, ReportingConstants.VALUE_PROVIDER_ID_INTEGER, Integer.class.getName(),
+					new NameEntry[] {new NameEntry(Locale.ENGLISH.getLanguage(), "Integer")},
+					new NameEntry[] {new NameEntry(Locale.ENGLISH.getLanguage(), "Query a number from the user")}
+			);
+
+			createValueProvider(pm, simpleTypes, ReportingConstants.VALUE_PROVIDER_ID_BIG_DECIMAL, BigDecimal.class.getName(),
+					new NameEntry[] {new NameEntry(Locale.ENGLISH.getLanguage(), "BigDecimal")},
+					new NameEntry[] {new NameEntry(Locale.ENGLISH.getLanguage(), "Query a long number from the user")}
+			);
+
+			createValueProvider(pm, simpleTypes, ReportingConstants.VALUE_PROVIDER_ID_DOUBLE, Double.class.getName(),
+					new NameEntry[] {new NameEntry(Locale.ENGLISH.getLanguage(), "Double")},
+					new NameEntry[] {new NameEntry(Locale.ENGLISH.getLanguage(), "Query a decimal number from the user")}
+			);
+
+			createValueProvider(pm, simpleTypes, ReportingConstants.VALUE_PROVIDER_ID_DATE, Date.class.getName(),
+					new NameEntry[] {new NameEntry(Locale.ENGLISH.getLanguage(), "Date")},
+					new NameEntry[] {new NameEntry(Locale.ENGLISH.getLanguage(), "Query a date/time from the user")}
+			);
+
+			createValueProvider(pm, simpleTypes, ReportingConstants.VALUE_PROVIDER_ID_TIME_PERIOD, Date.class.getName(),
+					new NameEntry[] {new NameEntry(Locale.ENGLISH.getLanguage(), "Timeperiod")},
+					new NameEntry[] {new NameEntry(Locale.ENGLISH.getLanguage(), "Query a time period from the user")}
+			);
+
+
+			ValueProviderCategory jfireObjects = createValueProviderCategory(pm, null, ReportingConstants.VALUE_PROVIDER_CATEGORY_ID_JFIRE_OBJECTS,
+					new NameEntry[]{new NameEntry(Locale.ENGLISH.getLanguage(), "JFire objects")}
+			);
+
+			createValueProvider(pm, jfireObjects, ReportingConstants.VALUE_PROVIDER_ID_USER, UserID.class.getName(),
+					new NameEntry[] {new NameEntry(Locale.ENGLISH.getLanguage(), "User")},
+					new NameEntry[] {new NameEntry(Locale.ENGLISH.getLanguage(), "Let the user select a user.")}
+			);
+
+			createValueProvider(pm, jfireObjects, ReportingConstants.VALUE_PROVIDER_ID_USER_GROUP, UserID.class.getName(),
+					new NameEntry[] {new NameEntry(Locale.ENGLISH.getLanguage(), "User group")},
+					new NameEntry[] {new NameEntry(Locale.ENGLISH.getLanguage(), "Let the user select a user group.")}
+			);
+
+			createValueProvider(pm, jfireObjects, ReportingConstants.VALUE_PROVIDER_ID_ORGANISATION, OrganisationID.class.getName(),
+					new NameEntry[] {new NameEntry(Locale.ENGLISH.getLanguage(), "Organisation")},
+					new NameEntry[] {new NameEntry(Locale.ENGLISH.getLanguage(), "Let the user select an organisation.")}
+			);
+
+			createValueProvider(pm, jfireObjects, ReportingConstants.VALUE_PROVIDER_ID_ORGANISATION, OrganisationID.class.getName(),
+					new NameEntry[] {new NameEntry(Locale.ENGLISH.getLanguage(), "Workstation")},
+					new NameEntry[] {new NameEntry(Locale.ENGLISH.getLanguage(), "Let the user select a workstation.")}
+			);
 		} finally {
 			pm.close();
 		}
-		
 	}
 	
-	private ValueProviderCategory createValueProviderCategory(PersistenceManager pm, ValueProviderCategory parent, ValueProviderCategoryID categoryID) {
+	private static ValueProviderCategory createValueProviderCategory(
+			PersistenceManager pm, ValueProviderCategory parent, ValueProviderCategoryID categoryID,
+			NameEntry[] names 
+			
+		) {
 		ValueProviderCategory category = null;
 		try {
 			category = (ValueProviderCategory) pm.getObjectById(categoryID);
@@ -171,12 +199,19 @@ implements SessionBean
 			logger.debug("Creating ValueProviderCategory "+categoryID);
 			category = new ValueProviderCategory(parent, categoryID.organisationID, categoryID.valueProviderCategoryID, true);
 			category = (ValueProviderCategory) pm.makePersistent(category);
+			for (NameEntry entry : names) {
+				category.getName().setText(entry.language, entry.name);
+			}
 			logger.debug("Created ValueProviderCategory "+categoryID);
 		}
 		return category;
 	}
 	
-	private ValueProvider createValueProvider(PersistenceManager pm, ValueProviderCategory category, ValueProviderID valueProviderID, String outputType) {
+	private static ValueProvider createValueProvider(
+			PersistenceManager pm, ValueProviderCategory category, ValueProviderID valueProviderID, String outputType,
+			NameEntry[] names, NameEntry[] descriptions
+		) 
+	{
 		ValueProvider valueProvider = null;
 		try {
 			valueProvider = (ValueProvider) pm.getObjectById(valueProviderID);
@@ -185,6 +220,12 @@ implements SessionBean
 			logger.debug("Creating ValueProvider "+valueProviderID);
 			valueProvider = new ValueProvider(category, valueProviderID.valueProviderID, outputType);
 			valueProvider = (ValueProvider) pm.makePersistent(valueProvider);
+			for (NameEntry entry : names) {
+				valueProvider.getName().setText(entry.language, entry.name);
+			}
+			for (NameEntry entry : descriptions) {
+				valueProvider.getName().setText(entry.language, entry.name);
+			}
 			logger.debug("Created ValueProvider "+valueProviderID);
 		}
 		return valueProvider;

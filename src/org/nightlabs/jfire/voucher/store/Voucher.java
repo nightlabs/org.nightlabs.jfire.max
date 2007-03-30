@@ -19,6 +19,11 @@ import org.nightlabs.jfire.store.Repository;
  *		table="JFireVoucher_Voucher"
  *
  * @jdo.inheritance strategy="new-table"
+ *
+ * @jdo.fetch-group name="FetchGroupsTrade.articleInOrderEditor" fetch-groups="default" fields="voucherKey"
+ * @jdo.fetch-group name="FetchGroupsTrade.articleInOfferEditor" fetch-groups="default" fields="voucherKey"
+ * @jdo.fetch-group name="FetchGroupsTrade.articleInInvoiceEditor" fetch-groups="default" fields="voucherKey"
+ * @jdo.fetch-group name="FetchGroupsTrade.articleInDeliveryNoteEditor" fetch-groups="default" fields="voucherKey"
  */
 public class Voucher
 extends Product

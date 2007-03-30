@@ -150,10 +150,50 @@ implements Serializable
 	 */
 	private Set<VoucherRedemption> redemptions;
 
+	/**
+	 * @jdo.field persistence-modifier="persistent"
+	 */
+	private boolean redemptionExisting = false;
+
 	public static final byte VALIDITY_NOT_YET_VALID = 11;
 	public static final byte VALIDITY_VALID = 22;
 	public static final byte VALIDITY_REVERSED = 33;
 	public static final byte VALIDITY_REDEEMED_COMPLETELY = 44;
+
+	/**
+	 * This method calls {@link #getValidityString(byte)} with
+	 * the value of {@link #getValidity()}.
+	 *
+	 * @return name of the constant for each validity.
+	 * @see #getValidityString(byte)
+	 */
+	public String getValidityString()
+	{
+		return getValidityString(getValidity());
+	}
+
+	/**
+	 * This method converts the byte value to the name of the constant (public static final). The resulting
+	 * <code>String</code> may be used for example in l10n properties files.
+	 *
+	 * @param validity One of the validities: {@link #VALIDITY_NOT_YET_VALID}, {@link #VALIDITY_VALID}, {@link #VALIDITY_REVERSED}, {@link #VALIDITY_REDEEMED_COMPLETELY}
+	 * @return the name of the constant
+	 */
+	public static String getValidityString(byte validity)
+	{
+		switch (validity) {
+			case VoucherKey.VALIDITY_NOT_YET_VALID:
+				return "VALIDITY_NOT_YET_VALID";
+			case VoucherKey.VALIDITY_REDEEMED_COMPLETELY:
+				return "VALIDITY_REDEEMED_COMPLETELY";
+			case VoucherKey.VALIDITY_REVERSED:
+				return "VALIDITY_REVERSED";
+			case VoucherKey.VALIDITY_VALID:
+				return "VALIDITY_VALID";
+			default:
+				throw new IllegalArgumentException("Unknown validity: " + validity);
+		}
+	}	
 
 	/**
 	 * @see #getValidity()
@@ -425,6 +465,9 @@ implements Serializable
 		if (newAmount == 0)
 			setValidity(VALIDITY_REDEEMED_COMPLETELY, redemption.getPayment().getUser()); // the user isn't stored, but it doesn't hurt to pass it - imho it's cleaner. Marco.
 
+		if (!redemptionExisting)
+			redemptionExisting = true;
+
 		redemptions.add(redemption);
 	}
 
@@ -439,6 +482,18 @@ implements Serializable
 			unmodifiableRedemptions = Collections.unmodifiableSet(redemptions);
 
 		return unmodifiableRedemptions;
+	}
+
+	/**
+	 * As soon as the first call to {@link #addRedemption(VoucherRedemption)} has happened, this method
+	 * returns <code>true</code> and the voucher cannot be reversed (i.e. refunded) anymore.
+	 *
+	 * @return <code>true</code> if {@link #getRedemptions()} is not empty. <code>false</code> if no {@link VoucherRedemption} exists
+	 *		for this <code>VoucherKey</code>
+	 */
+	public boolean isRedemptionExisting()
+	{
+		return redemptionExisting;
 	}
 
 	@Override

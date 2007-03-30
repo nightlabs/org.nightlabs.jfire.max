@@ -9,9 +9,9 @@ import org.nightlabs.jfire.scripting.id.ScriptRegistryItemID;
  */
 public class VoucherScriptingConstants 
 {
-	public static final String SCRIPT_REGISTRY_ITEM_TYPE_VOUCHER = "voucher";
+//	public static final String SCRIPT_REGISTRY_ITEM_TYPE_VOUCHER = "voucher";
 	public static final String PARAMETER_ID_PERSISTENCE_MANAGER = "persistenceManager";
-	public static final String PARAMETER_ID_VOUCHER_ID = "voucherID";
+//	public static final String PARAMETER_ID_VOUCHER_ID = "voucherID";
 	public static final String PARAMETER_ID_VOUCHER_KEY_ID = "voucherKeyID";
 	
 	public static final String SCRIPT_REGISTRY_ITEM_TYPE_TRADE_ROOT = "JFireTrade-Type";

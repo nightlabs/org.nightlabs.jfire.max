@@ -13,6 +13,7 @@ import org.nightlabs.jfire.scripting.ScriptParameterSet;
 import org.nightlabs.jfire.scripting.ScriptRegistry;
 import org.nightlabs.jfire.servermanager.JFireServerManager;
 import org.nightlabs.jfire.store.id.ProductID;
+import org.nightlabs.jfire.voucher.store.id.VoucherKeyID;
 
 /**
  * @author Daniel.Mazurek [at] NightLabs [dot] de
@@ -70,7 +71,8 @@ public class ScriptingInitializer
 		if (baseCategory.getParameterSet() == null) {
 			paramSet = new ScriptParameterSet(organisationID, IDGenerator.nextID(ScriptParameterSet.class));
 			paramSet.createParameter(VoucherScriptingConstants.PARAMETER_ID_PERSISTENCE_MANAGER).setScriptParameterClass(PersistenceManager.class);
-			paramSet.createParameter(VoucherScriptingConstants.PARAMETER_ID_VOUCHER_ID).setScriptParameterClass(ProductID.class);
+//			paramSet.createParameter(VoucherScriptingConstants.PARAMETER_ID_VOUCHER_ID).setScriptParameterClass(ProductID.class);
+			paramSet.createParameter(VoucherScriptingConstants.PARAMETER_ID_VOUCHER_KEY_ID).setScriptParameterClass(VoucherKeyID.class);
 			baseCategory.setParameterSet(paramSet);
 		}
 

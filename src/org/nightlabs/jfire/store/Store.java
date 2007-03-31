@@ -1000,8 +1000,8 @@ public class Store
 			// Give every involved Anchor the possibility to check itself.
 			anchor.checkIntegrity(containers);
 
-			// LegalEntity checked itself already! Therefore all its ProductHoles have quantity = 0
-			// and we don't need to iterate the products (and search for ProductHoles).
+			// LegalEntity checked itself already! Therefore all its ProductReferences have quantity = 0
+			// and we don't need to iterate the products (and search for ProductReferences).
 			if (anchor instanceof LegalEntity)
 				continue;
 
@@ -1009,7 +1009,10 @@ public class Store
 			// any product, put it into one of the product2xxxMaps 
 			for (Iterator itP = products.iterator(); itP.hasNext(); ) {
 				Product product = (Product) itP.next();
-				ProductReference productReference = ProductReference.getProductReference(pm, anchor, product, true);
+				ProductReference productReference = ProductReference.getProductReference(pm, anchor, product, false); // not every involved anchor has a reference to every product, because the transfers take different routes. hence the result may be null
+				if (productReference == null)
+					continue;
+
 				int qty = productReference.getQuantity();
 				switch (qty) {
 					case -1: {

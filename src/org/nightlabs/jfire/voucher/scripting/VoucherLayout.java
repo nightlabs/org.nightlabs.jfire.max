@@ -8,6 +8,7 @@ import java.util.Date;
 
 import org.apache.log4j.Logger;
 import org.nightlabs.io.DataBuffer;
+import org.nightlabs.jfire.trade.ILayout;
 
 /**
  * @author Daniel.Mazurek [at] NightLabs [dot] de
@@ -26,7 +27,7 @@ import org.nightlabs.io.DataBuffer;
  *
  */
 public class VoucherLayout 
-implements Serializable 
+implements Serializable, ILayout
 {
 	private static final long serialVersionUID = 1L;
 

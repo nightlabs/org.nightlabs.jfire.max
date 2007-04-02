@@ -11,7 +11,7 @@ extends AbstractVoucherScript
 {
 	
 	public Object doExecute() throws ScriptException {
-		return getVoucher().getVoucherKey().getVoucherKey();
+		return getVoucherKey().getVoucherKey();
 	}
 
 }

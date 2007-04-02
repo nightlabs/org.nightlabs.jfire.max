@@ -26,6 +26,7 @@
 
 package org.nightlabs.jfire.reporting.oda.jdoql;
 
+import java.sql.ResultSetMetaData;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -73,7 +74,8 @@ public class JDOQLMetaDataParser {
 			metaData.setColumn(
 				colCount,
 				columnName,
-				getResultColumnDataType(candidate, selectStatement)
+				getResultColumnDataType(candidate, selectStatement),
+				ResultSetMetaData.columnNullable
 			);
 		}		
 		

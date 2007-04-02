@@ -28,6 +28,7 @@ package org.nightlabs.jfire.reporting.oda;
 
 import java.io.Serializable;
 import java.math.BigDecimal;
+import java.sql.Types;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
@@ -51,6 +52,7 @@ public class DataType {
 	public static final int TIMESTAMP = 93;
 	public static final int BLOB = 0;
 	public static final int CLOB = 10;
+	public static final int JAVA_OBJECT = 2000;
 	public static final int UNKNOWN = 0;
 
 	public static final String N_STRING = "String"; 
@@ -81,6 +83,7 @@ public class DataType {
 	private static final Map<Class, Integer> classes2Types = new HashMap<Class, Integer>();
 	private static final Map<Integer, String> types2Names = new HashMap<Integer, String>();
 	private static final Map<Integer, Integer> sqlTypes2dataTypes = new HashMap<Integer, Integer>();
+	private static final Map<Integer, Integer> dataTypes2sqlTypes = new HashMap<Integer, Integer>();
 	
 	static {
 		types2Classes.put(STRING, new Class[] {String.class});
@@ -113,36 +116,41 @@ public class DataType {
 		types2Names.put(BLOB, N_BLOB);
 		types2Names.put(CLOB, N_CLOB);
 		
-		sqlTypes2dataTypes.put(java.sql.Types.BIT, BOOLEAN);
-		sqlTypes2dataTypes.put(java.sql.Types.TINYINT, INTEGER);
-		sqlTypes2dataTypes.put(java.sql.Types.SMALLINT, INTEGER);
-		sqlTypes2dataTypes.put(java.sql.Types.INTEGER, INTEGER);
-		sqlTypes2dataTypes.put(java.sql.Types.BIGINT, BIGDECIMAL);
-		sqlTypes2dataTypes.put(java.sql.Types.FLOAT, DOUBLE);
-		sqlTypes2dataTypes.put(java.sql.Types.REAL, DOUBLE);
-		sqlTypes2dataTypes.put(java.sql.Types.DOUBLE, DOUBLE);
-		sqlTypes2dataTypes.put(java.sql.Types.NUMERIC, BIGDECIMAL);
-		sqlTypes2dataTypes.put(java.sql.Types.DECIMAL, DOUBLE);
-		sqlTypes2dataTypes.put(java.sql.Types.CHAR, STRING);
-		sqlTypes2dataTypes.put(java.sql.Types.VARCHAR, STRING);
-		sqlTypes2dataTypes.put(java.sql.Types.LONGVARCHAR, STRING);
-		sqlTypes2dataTypes.put(java.sql.Types.DATE, DATE);
-		sqlTypes2dataTypes.put(java.sql.Types.LONGVARCHAR, STRING);
-		sqlTypes2dataTypes.put(java.sql.Types.TIME, TIME);
-		sqlTypes2dataTypes.put(java.sql.Types.TIMESTAMP, TIMESTAMP);
-		sqlTypes2dataTypes.put(java.sql.Types.BINARY, BLOB);
-		sqlTypes2dataTypes.put(java.sql.Types.VARBINARY, BLOB);
-		sqlTypes2dataTypes.put(java.sql.Types.LONGVARBINARY, BLOB);
-		sqlTypes2dataTypes.put(java.sql.Types.LONGVARCHAR, UNKNOWN);
-		sqlTypes2dataTypes.put(java.sql.Types.OTHER, UNKNOWN);
-		sqlTypes2dataTypes.put(java.sql.Types.JAVA_OBJECT, UNKNOWN);
-		sqlTypes2dataTypes.put(java.sql.Types.LONGVARCHAR, UNKNOWN);
-		sqlTypes2dataTypes.put(java.sql.Types.ARRAY, UNKNOWN);
-		sqlTypes2dataTypes.put(java.sql.Types.BLOB, BLOB);
-		sqlTypes2dataTypes.put(java.sql.Types.CLOB, CLOB);
-		sqlTypes2dataTypes.put(java.sql.Types.REF, UNKNOWN);
-		sqlTypes2dataTypes.put(java.sql.Types.DATALINK, UNKNOWN);
-		sqlTypes2dataTypes.put(java.sql.Types.BOOLEAN, BOOLEAN);
+		indexDataTypeToSQLType(java.sql.Types.BIT, BOOLEAN);
+		indexDataTypeToSQLType(java.sql.Types.TINYINT, INTEGER);
+		indexDataTypeToSQLType(java.sql.Types.SMALLINT, INTEGER);
+		indexDataTypeToSQLType(java.sql.Types.INTEGER, INTEGER);
+		indexDataTypeToSQLType(java.sql.Types.BIGINT, BIGDECIMAL);
+		indexDataTypeToSQLType(java.sql.Types.FLOAT, DOUBLE);
+		indexDataTypeToSQLType(java.sql.Types.REAL, DOUBLE);
+		indexDataTypeToSQLType(java.sql.Types.DOUBLE, DOUBLE);
+		indexDataTypeToSQLType(java.sql.Types.NUMERIC, BIGDECIMAL);
+		indexDataTypeToSQLType(java.sql.Types.DECIMAL, DOUBLE);
+		indexDataTypeToSQLType(java.sql.Types.CHAR, STRING);
+		indexDataTypeToSQLType(java.sql.Types.VARCHAR, STRING);
+		indexDataTypeToSQLType(java.sql.Types.LONGVARCHAR, STRING);
+		indexDataTypeToSQLType(java.sql.Types.DATE, DATE);
+		indexDataTypeToSQLType(java.sql.Types.LONGVARCHAR, STRING);
+		indexDataTypeToSQLType(java.sql.Types.TIME, TIME);
+		indexDataTypeToSQLType(java.sql.Types.TIMESTAMP, TIMESTAMP);
+		indexDataTypeToSQLType(java.sql.Types.BINARY, BLOB);
+		indexDataTypeToSQLType(java.sql.Types.VARBINARY, BLOB);
+		indexDataTypeToSQLType(java.sql.Types.LONGVARBINARY, BLOB);
+		indexDataTypeToSQLType(java.sql.Types.LONGVARCHAR, UNKNOWN);
+		indexDataTypeToSQLType(java.sql.Types.OTHER, UNKNOWN);
+		indexDataTypeToSQLType(java.sql.Types.JAVA_OBJECT, JAVA_OBJECT);
+		indexDataTypeToSQLType(java.sql.Types.LONGVARCHAR, UNKNOWN);
+		indexDataTypeToSQLType(java.sql.Types.ARRAY, UNKNOWN);
+		indexDataTypeToSQLType(java.sql.Types.BLOB, BLOB);
+		indexDataTypeToSQLType(java.sql.Types.CLOB, CLOB);
+		indexDataTypeToSQLType(java.sql.Types.REF, UNKNOWN);
+		indexDataTypeToSQLType(java.sql.Types.DATALINK, UNKNOWN);
+		indexDataTypeToSQLType(java.sql.Types.BOOLEAN, BOOLEAN);
+	}
+	
+	private static void indexDataTypeToSQLType(int sqlType, int dataType) {
+		sqlTypes2dataTypes.put(sqlType, dataType);
+		dataTypes2sqlTypes.put(dataType, sqlType);
 	}
 	
 	public static Class[] dataTypeToClasses(int dataType) {		
@@ -170,6 +178,13 @@ public class DataType {
 		Integer result = sqlTypes2dataTypes.get(sqlType);
 		if (result == null)
 			return UNKNOWN;
+		return result;
+	}
+	
+	public static int dataTypeToSQLType(int dataType) {
+		Integer result = dataTypes2sqlTypes.get(dataType);
+		if (result == null)
+			return Types.NULL; // TODO: Find better solution for UNKNOWN sql type
 		return result;
 	}
 	

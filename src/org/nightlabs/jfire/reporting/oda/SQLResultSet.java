@@ -10,6 +10,7 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Time;
 import java.sql.Timestamp;
+import java.sql.Types;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -96,7 +97,9 @@ public class SQLResultSet implements IResultSet, Serializable {
 	/* (non-Javadoc)
 	 * @see org.eclipse.datatools.connectivity.oda.IResultSet#getBlob(int)
 	 */
-	public IBlob getBlob(int arg0) throws OdaException {
+	public IBlob getBlob(int columnIndex) throws OdaException {
+		if (getMetaData().getColumnType(columnIndex) == DataType.JAVA_OBJECT)
+			return new JavaObjectBlob(getObject(columnIndex));
 		throw new UnsupportedOperationException("NIY");
 	}
 
@@ -104,6 +107,8 @@ public class SQLResultSet implements IResultSet, Serializable {
 	 * @see org.eclipse.datatools.connectivity.oda.IResultSet#getBlob(java.lang.String)
 	 */
 	public IBlob getBlob(String columnName) throws OdaException {
+		if (getMetaData().getColumnType(findColumn(columnName)) == DataType.JAVA_OBJECT)
+			return new JavaObjectBlob(getObject(columnName));
 		throw new UnsupportedOperationException("NIY");
 	}
 
@@ -170,7 +175,10 @@ public class SQLResultSet implements IResultSet, Serializable {
 	 */
 	public int getInt(int columnIndex) throws OdaException {
 		try {
-			return resultSet.getInt(columnIndex);
+			if (resultSet.getMetaData().getColumnType(columnIndex) == Types.BOOLEAN)
+				return resultSet.getBoolean(columnIndex) ? 1 : 0;
+			else
+				return resultSet.getInt(columnIndex);
 		} catch (Exception e) {
 			throw new OdaException(e);
 		}
@@ -181,7 +189,11 @@ public class SQLResultSet implements IResultSet, Serializable {
 	 */
 	public int getInt(String columnName) throws OdaException {
 		try {
-			return resultSet.getInt(columnName);
+			int columnIndex = findColumn(columnName);
+			if (resultSet.getMetaData().getColumnType(columnIndex) == Types.BOOLEAN)
+				return resultSet.getBoolean(columnIndex) ? 1 : 0;
+			else
+				return resultSet.getInt(columnIndex);
 		} catch (Exception e) {
 			throw new OdaException(e);
 		}
@@ -398,7 +410,8 @@ public class SQLResultSet implements IResultSet, Serializable {
 		for (int i=1; i<=resultSet.getMetaData().getColumnCount(); i++) {
 			metaData.addColumn(
 					resultSet.getMetaData().getColumnName(i),
-					DataType.sqlTypeToDataType(resultSet.getMetaData().getColumnType(i))
+					DataType.sqlTypeToDataType(resultSet.getMetaData().getColumnType(i)),
+					resultSet.getMetaData().isNullable(i)
 				);
 		}
 		return metaData;

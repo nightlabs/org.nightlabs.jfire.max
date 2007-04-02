@@ -48,10 +48,12 @@ public class ResultSetMetaData implements IResultSetMetaData, Serializable {
 		
 		private String name;
 		private int dataType;
+		private int nullable;
 		
-		public Column(String name, int dataType) {
+		public Column(String name, int dataType, int nullable) {
 			this.name = name;
 			this.dataType = dataType;
+			this.nullable = nullable;
 		}
 		public int getDataType() {
 			return dataType;
@@ -64,6 +66,9 @@ public class ResultSetMetaData implements IResultSetMetaData, Serializable {
 		}
 		public void setName(String name) {
 			this.name = name;
+		}
+		public int isNullable() {
+			return nullable;
 		}
 	}
 	
@@ -113,23 +118,31 @@ public class ResultSetMetaData implements IResultSetMetaData, Serializable {
 	 * Sets the metaData for the given 1-based column to the given
 	 * name and datatype. 
 	 */
-	public void setColumn(int index, String colName, Class dataType) {
-		setColumn(index, new Column(colName, DataType.classToDataType(dataType)));
+	public void setColumn(int index, String colName, Class dataType, int nullable) {
+		setColumn(index, new Column(colName, DataType.classToDataType(dataType), nullable));
 	}
 	
 	/**
 	 * Sets the column meta data for the given index.
 	 *  
 	 */
-	public void setColumn(int index, String colName, int dataType) {
-		setColumn(index, new Column(colName, dataType));		
+	public void setColumn(int index, String colName, int dataType, int nullable) {
+		setColumn(index, new Column(colName, dataType, nullable));		
 	}
 
 	/**
 	 * Sets the column metadata for the column with index 'columns.size()+1'.
 	 */
+	public void addColumn(String colName, int dataType, int nullable) {
+		setColumn(columns.size()+1, colName, dataType, nullable);
+	}
+	
+	/**
+	 * Sets the column metadata for the column with index 'columns.size()+1'.
+	 * Nullable will be {@link java.sql.ResultSetMetaData#columnNullable}.
+	 */
 	public void addColumn(String colName, int dataType) {
-		setColumn(columns.size()+1, colName, dataType);
+		setColumn(columns.size()+1, colName, dataType, ResultSetMetaData.columnNullable);
 	}
 	
 	/* (non-Javadoc)
@@ -190,7 +203,7 @@ public class ResultSetMetaData implements IResultSetMetaData, Serializable {
 	 * @see org.eclipse.datatools.connectivity.oda.IResultSetMetaData#isNullable(int)
 	 */
 	public int isNullable(int index) throws OdaException {
-		return 0;
+		return getColumn(index).isNullable();
 	}
 }
 

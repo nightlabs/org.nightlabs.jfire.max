@@ -122,7 +122,7 @@ public class Region implements Serializable
 	 *
 	 * @!jdo.map-vendor-extension vendor-name="jpox" key="key-field" value="primaryKey"
 	 */
-	protected Map cities = new HashMap();	
+	protected Map<String, City> cities = new HashMap();	
 	/////// end normal fields ///////
 	
 	
@@ -246,7 +246,7 @@ public class Region implements Serializable
 		cities.put(city.getPrimaryKey(), city);
 		return res;
 	}
-	public Collection getCities()
+	public Collection<City> getCities()
 	{
 		if (geography != null)
 			geography.needCities(countryID);

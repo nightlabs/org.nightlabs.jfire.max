@@ -32,6 +32,7 @@ import java.util.Iterator;
 import java.util.List;
 
 import org.nightlabs.jfire.accounting.Tariff;
+import org.nightlabs.jfire.security.User;
 import org.nightlabs.jfire.store.Product;
 import org.nightlabs.jfire.store.ProductType;
 
@@ -67,6 +68,7 @@ public class ArticleCreator
 	 * </p>
 	 *
 	 * @param trader The <code>Trader</code> which is calling this method in one of its <code>createArticles(...)</code> methods.
+	 * @param user TODO
 	 * @param offer The <code>Offer</code> into which the new <code>Article</code>s shall be created.
 	 * @param segment The <code>Segment</code> into which the new <code>Article</code>s shall be created.
 	 * @param products The {@link Product}s for which to create the <code>Article</code>s. Note, that this
@@ -75,12 +77,12 @@ public class ArticleCreator
 	 *		{@link ArticlePrice} assigned and they must NOT yet be allocated. This is done by the {@link Trader}
 	 *		afterwards (if at all).
 	 */
-	public List createProductArticles(Trader trader, Offer offer, Segment segment, Collection products)
+	public List createProductArticles(Trader trader, User user, Offer offer, Segment segment, Collection products)
 	{
 		List res = new ArrayList(products.size());
 		for (Iterator iter = products.iterator(); iter.hasNext();) {
 			Product product = (Product) iter.next();
-			res.add(new Article(offer, segment, Article.createArticleID(), product, tariff));
+			res.add(new Article(user, offer, segment, Article.createArticleID(), product, tariff));
 		}
 		return res;
 	}
@@ -93,17 +95,18 @@ public class ArticleCreator
 	 * </p>
 	 *
 	 * @param trader The <code>Trader</code> which is calling this method in one of its <code>createArticles(...)</code> method.
+	 * @param user TODO
 	 * @param offer The <code>Offer</code> into which the new <code>Article</code>s shall be created.
 	 * @param segment The <code>Segment</code> into which the new <code>Article</code>s shall be created.
 	 * @param productTypes The {@link ProductType}s for which to create <code>Article</code>s.
 	 * @return Returns new instances of {@link Article} (or descendants) which might later be linked to concrete <code>Product</code>s.
 	 */
-	public List createProductTypeArticles(Trader trader, Offer offer, Segment segment, Collection productTypes)
+	public List createProductTypeArticles(Trader trader, User user, Offer offer, Segment segment, Collection productTypes)
 	{
 		List res = new ArrayList(productTypes.size());
 		for (Iterator iter = productTypes.iterator(); iter.hasNext();) {
 			ProductType productType = (ProductType) iter.next();
-			res.add(new Article(offer, segment, Article.createArticleID(), productType, tariff));
+			res.add(new Article(user, offer, segment, Article.createArticleID(), productType, tariff));
 		}
 		return res;
 	}

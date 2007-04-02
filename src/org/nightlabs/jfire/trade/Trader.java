@@ -735,8 +735,8 @@ public class Trader
 			Collection products, ArticleCreator articleCreator, boolean allocate,
 			boolean allocateSynchronously, boolean enableXA) throws ModuleException
 	{
-		List articles = articleCreator.createProductArticles(this, offer, segment,
-				products);
+		List articles = articleCreator.createProductArticles(this, user, offer,
+				segment, products);
 
 		createArticleLocals(user, articles);
 

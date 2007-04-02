@@ -28,6 +28,7 @@ package org.nightlabs.jfire.trade;
 
 import java.io.Serializable;
 import java.util.Collection;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
@@ -243,6 +244,20 @@ public class Article
 	 */
 	private Product product = null;
 
+	/**
+	 * Creation date of this Invoice.
+	 * 
+	 * @jdo.field persistence-modifier="persistent"
+	 */
+	private Date createDT;
+	
+	/**
+	 * The user who created this Invoice.
+	 * 
+	 * @jdo.field persistence-modifier="persistent"
+	 */
+	private User createUser = null;
+	
 	/**
 	 * @jdo.field persistence-modifier="none"
 	 */
@@ -551,7 +566,7 @@ public class Article
 	 * This method is used by all constructors to check common parameters and to
 	 * initialize the related fields.
 	 */
-	protected void init(Offer offer, Segment segment, long articleID)
+	protected void init(User user, Offer offer, Segment segment, long articleID)
 	{
 		if (offer == null)
 			throw new NullPointerException("offer");
@@ -562,6 +577,8 @@ public class Article
 		if (articleID < 0)
 			throw new IllegalArgumentException("articleID < 0!");
 
+		this.createUser = user;
+		this.createDT = new Date();
 		this.offer = offer;
 		this.order = offer.getOrder();
 		this.segment = segment;
@@ -580,7 +597,7 @@ public class Article
 	 */
 	protected Article(User user, long articleID, Article referencedArticle)
 	{
-		init(referencedArticle.getOffer(), referencedArticle.getSegment(), articleID);
+		init(user, referencedArticle.getOffer(), referencedArticle.getSegment(), articleID);
 
 		this.setReferencedArticle(referencedArticle);
 		this.productType = referencedArticle.getProductType();
@@ -604,7 +621,7 @@ public class Article
 	 */
 	protected Article(User user, Offer offer, long articleID, Article reversedArticle)
 	{
-		init(offer, reversedArticle.getSegment(), articleID);
+		init(user, offer, reversedArticle.getSegment(), articleID);
 
 		if (reversedArticle == null)
 			throw new IllegalArgumentException("reversedArticle == null!");
@@ -642,9 +659,9 @@ public class Article
 	 * subclassing of <tt>Article</tt> and making prices dependent on the new fields
 	 * of the subclass.
 	 */
-	public Article(Offer offer, Segment segment, long articleID, Product product, Tariff tariff)
+	public Article(User user, Offer offer, Segment segment, long articleID, Product product, Tariff tariff)
 	{
-		this(offer, segment, articleID, product.getProductType(), product, tariff);
+		this(user, offer, segment, articleID, product.getProductType(), product, tariff);
 	}
 
 	/**
@@ -659,9 +676,9 @@ public class Article
 	 * subclassing of <tt>Article</tt> and making prices dependent on the new fields
 	 * of the subclass.
 	 */
-	public Article(Offer offer, Segment segment, long articleID, ProductType productType, Tariff tariff)
+	public Article(User user, Offer offer, Segment segment, long articleID, ProductType productType, Tariff tariff)
 	{
-		this(offer, segment, articleID, productType, null, tariff);
+		this(user, offer, segment, articleID, productType, null, tariff);
 	}
 
 	/**
@@ -673,10 +690,10 @@ public class Article
 	 * @param currency must not be null
 	 */
 	protected Article(
-			Offer offer, Segment segment, long articleID, ProductType productType,
+			User user, Offer offer, Segment segment, long articleID, ProductType productType,
 			Product product, Tariff tariff)
 	{
-		init(offer, segment, articleID);
+		init(user, offer, segment, articleID);
 
 		if (productType == null)
 			throw new NullPointerException("productType");

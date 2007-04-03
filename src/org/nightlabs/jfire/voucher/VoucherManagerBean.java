@@ -218,6 +218,10 @@ implements SessionBean
 				modeOfDeliveryFlavour.getName().setText(Locale.ENGLISH.getLanguage(), "Print To Operating System Printer");
 				modeOfDeliveryFlavour.getName().setText(Locale.GERMAN.getLanguage(), "Druck via Betriebssystem-Drucker");
 
+				modeOfDeliveryFlavour = modeOfDelivery.createFlavour(JFireVoucherEAR.MODE_OF_DELIVERY_FLAVOUR_ID_VOUCHER_PRINT_VIA_TICKET_PRINTER);
+				modeOfDeliveryFlavour.getName().setText(Locale.ENGLISH.getLanguage(), "Print To Ticket Printer");
+				modeOfDeliveryFlavour.getName().setText(Locale.GERMAN.getLanguage(), "Druck via Ticket-Drucker");				
+
 				deliveryConfiguration.addModeOfDelivery(modeOfDelivery);
 
 				ServerDeliveryProcessorClientSideVoucherPrint.getServerDeliveryProcessorClientSideVoucherPrint(pm).addModeOfDelivery(modeOfDelivery);

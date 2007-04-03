@@ -152,10 +152,11 @@
                nativeDataType="BigDecimal(Long)"
                nativeDataTypeCode="6"
                odaScalarDataType="Decimal"/>
-         <dataTypeMapping
+<!--         <dataTypeMapping
                nativeDataType="JavaObject"
                nativeDataTypeCode="2000"
-               odaScalarDataType="Blob"/>
+               />
+               -->
       </dataSet>
     </extension>    
 

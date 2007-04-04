@@ -72,16 +72,36 @@ extends Geography
 		return (String[]) CollectionUtil.collection2TypedArray(res, String.class);
 	}
 
-//	protected static String collection2csvLines(Collection<Object> collection)
-//	{
-//	StringBuffer csvLines = new StringBuffer();
-//	for(Iterator<Object> iterator = collection.iterator(); iterator.hasNext();){
-//	Object obj = iterator.next();
-//	csvLines.append(obj2csvLine(obj));
-//	}//for
-//	return csvLines.toString();
-//	}
+	/**
+	 * This method encodes a {@link Country} instance into
+	 * one or more lines (one for each language) formatted
+	 * according to the CSV file format.
+	 *
+	 * @param country The region to be encoded.
+	 * @return A String containing one or more lines to be written to the CSV.
+	 */
+	protected static String country2csvLines(Country country)
+	{
+		StringBuffer csvLine = new StringBuffer();
 
+		if (country.getName().getTexts().isEmpty()) // we ensure that at least one line will be written
+			country.getName().setText(Locale.ENGLISH.getLanguage(), country.getName().getText(Locale.ENGLISH.getLanguage()));
+
+		//CountryID;LanguageID;CountryName
+		for(Map.Entry<String, String> me : country.getName().getTexts()){
+			String languageID = me.getKey();
+			String text = me.getValue();
+
+			csvLine.append(country.getCountryID()).append(";");
+
+			csvLine.append(languageID).append(";");
+			csvLine.append(text == null ? "" : text);
+			csvLine.append("\n");
+		}
+
+		return csvLine.toString();
+	}
+	
 	/**
 	 * This method encodes a {@link Region} instance into
 	 * one or more lines (one for each language) formatted
@@ -124,8 +144,6 @@ extends Geography
 	protected static String city2csvLines(City city)
 	{
 		StringBuffer csvLine = new StringBuffer();
-
-		logger.info("================" + city);
 
 		if(city != null){
 			if (city.getName().getTexts().isEmpty()) // we ensure that at least one line will be written

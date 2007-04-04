@@ -10,7 +10,7 @@ import org.nightlabs.jfire.reporting.parameter.ValueProvider;
 /**
  * This is used to represent a BIRT parameter within a {@link ValueAcquisitionSetup}.
  * These objects are always the end of the {@link ValueProvider} chain when
- * quering paraeters from the user.
+ * quering parameters from the user.
  *  
  * @author Alexander Bieber <!-- alex [AT] nightlabs [DOT] de -->
  * 

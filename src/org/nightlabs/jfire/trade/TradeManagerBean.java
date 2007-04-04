@@ -42,6 +42,7 @@ import javax.ejb.SessionBean;
 import javax.ejb.SessionContext;
 import javax.jdo.JDOHelper;
 import javax.jdo.PersistenceManager;
+import javax.jdo.Query;
 
 import org.apache.log4j.Logger;
 import org.jbpm.JbpmContext;
@@ -60,6 +61,7 @@ import org.nightlabs.jfire.jbpm.JbpmLookup;
 import org.nightlabs.jfire.jbpm.graph.def.ProcessDefinition;
 import org.nightlabs.jfire.person.Person;
 import org.nightlabs.jfire.security.User;
+import org.nightlabs.jfire.security.id.UserID;
 import org.nightlabs.jfire.trade.config.LegalEntityViewConfigModule;
 import org.nightlabs.jfire.trade.id.ArticleID;
 import org.nightlabs.jfire.trade.id.OfferID;
@@ -1076,7 +1078,7 @@ implements SessionBean
 	 * @throws ModuleException 
 	 *
 	 * @ejb.interface-method
-	 * @ejb.transaction type = "Required"
+	 * @ejb.transaction type="Required"
 	 * @ejb.permission role-name="_Guest_"
 	 */
 	public Order assignCustomer(OrderID orderID, AnchorID customerID, boolean get, String[] fetchGroups, int maxFetchDepth)
@@ -1112,5 +1114,29 @@ implements SessionBean
 			pm.close();
 		}
 	}
-	
+
+	/**
+	 * @ejb.interface-method
+	 * @ejb.transaction type="Required"
+	 * @ejb.permission role-name="_Guest_"
+	 */
+	public OrderID createQuickSaleWorkOrder(AnchorID customerID)
+	throws ModuleException
+	{
+		PersistenceManager pm = getPersistenceManager();
+		try {
+			Trader trader = Trader.getTrader(pm);
+			AnchorID vendorID = (AnchorID) JDOHelper.getObjectId(trader.getMandator());
+
+			List<OrderID> orderIDs = Order.getQuickSaleWorkOrderIDCandidates(pm, vendorID, customerID, UserID.create(getPrincipal()), -1, -1);
+			for (OrderID orderID : orderIDs) {
+				
+			}
+
+			// TODO implement this
+			throw new UnsupportedOperationException("NYI");
+		} finally {
+			pm.close();
+		}
+	}
 }

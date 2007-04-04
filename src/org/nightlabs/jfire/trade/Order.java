@@ -44,6 +44,7 @@ import javax.jdo.listener.DetachCallback;
 import org.nightlabs.jdo.ObjectIDUtil;
 import org.nightlabs.jfire.accounting.Currency;
 import org.nightlabs.jfire.security.User;
+import org.nightlabs.jfire.security.id.UserID;
 import org.nightlabs.jfire.trade.id.OrderID;
 import org.nightlabs.jfire.transfer.id.AnchorID;
 import org.nightlabs.util.Utils;
@@ -88,6 +89,18 @@ import org.nightlabs.util.Utils;
  *			import java.lang.String
  *			ORDER BY orderID DESC"
  *
+ * @jdo.query
+ *		name="getQuickSaleWorkOrderIDCandidates"
+ *		query="SELECT JDOHelper.getObjectId(this)
+ *			WHERE vendor.organisationID == :paramVendorID_organisationID &&
+ *            vendor.anchorID == :paramVendorID_anchorID &&
+ *			      customer.organisationID == :paramCustomerID_organisationID &&
+ *            customer.anchorID == :paramCustomerID_anchorID &&
+ *            createUser.organisationID == :paramCreateUser_organisationID &&
+ *            createUser.userID == :paramCreateUser_userID &&
+ *            !offers.contains(finalizedOffer) && finalizedOffer.finalizeDT != null
+ *			ORDER BY orderID DESC"
+ *
  * @jdo.fetch-group name="Order.vendor" fields="vendor"
  * @jdo.fetch-group name="Order.currency" fields="currency"
  * @jdo.fetch-group name="Order.customer" fields="customer"
@@ -102,6 +115,8 @@ import org.nightlabs.util.Utils;
 public class Order
 implements Serializable, ArticleContainer, SegmentContainer, DetachCallback
 {
+	private static final long serialVersionUID = 1L;
+
 	public static final String FETCH_GROUP_VENDOR = "Order.vendor";
 	public static final String FETCH_GROUP_CUSTOMER = "Order.customer";
 	public static final String FETCH_GROUP_CUSTOMER_GROUP = "Order.customerGroup";
@@ -144,6 +159,28 @@ implements Serializable, ArticleContainer, SegmentContainer, DetachCallback
 			query.setRange(rangeBeginIdx, rangeEndIdx);
 
 		return (List<OrderID>) query.executeWithMap(params);
+	}
+
+	@SuppressWarnings("unchecked")
+	public static List<OrderID> getQuickSaleWorkOrderIDCandidates(
+			PersistenceManager pm, AnchorID vendorID, AnchorID customerID,
+			UserID createUserID, long rangeBeginIdx, long rangeEndIdx)
+	{
+		Query q = pm.newNamedQuery(Order.class, "getQuickSaleWorkOrderIDCandidates");
+
+//	 WORKAROUND JDOQL with ObjectID doesn't work yet.
+		Map params = new HashMap();
+		params.put("paramVendorID_organisationID", vendorID.organisationID);
+		params.put("paramVendorID_anchorID", vendorID.anchorID);
+		params.put("paramCustomerID_organisationID", customerID.organisationID);
+		params.put("paramCustomerID_anchorID", customerID.anchorID);
+		params.put("paramCreateUser_organisationID", createUserID.organisationID);
+		params.put("paramCreateUser_userID", createUserID.userID);
+
+		if (rangeBeginIdx >= 0 && rangeEndIdx >= 0)
+			q.setRange(rangeBeginIdx, rangeEndIdx);
+
+		return (List<OrderID>) q.executeWithMap(params);
 	}
 
 	/**

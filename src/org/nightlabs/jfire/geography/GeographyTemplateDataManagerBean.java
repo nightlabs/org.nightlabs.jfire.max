@@ -239,7 +239,7 @@ implements SessionBean
 				for (Country existCountry : geography.getCountries()) {
 					if (CountryID.create(existCountry).equals(countryID)) {
 						existCountry = storedCountry;
-						storedCountry = null; countryID = null;
+						storedCountry = null;
 					}//if
 
 					String csvLines = GeographyImplResourceCSV.country2csvLines(existCountry);

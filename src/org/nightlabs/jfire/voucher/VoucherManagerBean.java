@@ -158,6 +158,11 @@ implements SessionBean
 			new ScriptingInitializer(getJFireServerManager(), pm,
 					Organisation.DEVIL_ORGANISATION_ID).initialize(); // this is a
 																														// throw-away-instance
+ 
+			DeliveryConfiguration deliveryConfiguration = checkDeliveryConfiguration(pm);
+			// check each time for ticketPrinter module, to register corresponding 
+			// modeOfDeliveryFlavour if necessary
+			checkModeOfDeliveryFlavourTicketPrinter(pm);
 
 			ModuleMetaData moduleMetaData = ModuleMetaData.getModuleMetaData(pm,
 					"JFireVoucher");
@@ -185,55 +190,9 @@ implements SessionBean
 					Organisation.DEVIL_ORGANISATION_ID,
 					VoucherDeliveryNoteActionHandler.class.getName());
 			pm.makePersistent(voucherDeliveryNoteActionHandler);
-
-			// create a default DeliveryConfiguration with all default ModeOfDeliverys
-			DeliveryConfiguration deliveryConfiguration = new DeliveryConfiguration(
-					getOrganisationID(), "JFireVoucher.default");
-			deliveryConfiguration.getName().setText(Locale.ENGLISH.getLanguage(),
-					"Default Delivery Configuration");
-			deliveryConfiguration.getName().setText(Locale.GERMAN.getLanguage(),
-					"Standard-Liefer-Konfiguration");
-			pm.getExtent(ModeOfDelivery.class);
-
-			try {
-				ModeOfDelivery modeOfDelivery;
-				ModeOfDeliveryFlavour modeOfDeliveryFlavour;
-				
-				modeOfDelivery = (ModeOfDelivery) pm.getObjectById(ModeOfDeliveryID
-						.create(Organisation.DEVIL_ORGANISATION_ID,
-								ModeOfDelivery.MODE_OF_DELIVERY_ID_MANUAL));
-				deliveryConfiguration.addModeOfDelivery(modeOfDelivery);
-
-				modeOfDelivery = new ModeOfDelivery(JFireVoucherEAR.MODE_OF_DELIVERY_ID_VOUCHER_PRINT);
-				modeOfDelivery.getName().setText(Locale.ENGLISH.getLanguage(), "Voucher Print");
-				modeOfDelivery.getName().setText(Locale.GERMAN.getLanguage(), "Gutschein-Druck");
-				modeOfDelivery = (ModeOfDelivery) pm.makePersistent(modeOfDelivery);
-
-				for (Iterator it = pm.getExtent(CustomerGroup.class).iterator(); it.hasNext(); ) {
-					CustomerGroup customerGroup = (CustomerGroup) it.next();
-					customerGroup.addModeOfDelivery(modeOfDelivery);
-				}
-				
-				modeOfDeliveryFlavour = modeOfDelivery.createFlavour(JFireVoucherEAR.MODE_OF_DELIVERY_FLAVOUR_ID_VOUCHER_PRINT_VIA_OPERATING_SYSTEM_PRINTER);
-				modeOfDeliveryFlavour.getName().setText(Locale.ENGLISH.getLanguage(), "Print To Operating System Printer");
-				modeOfDeliveryFlavour.getName().setText(Locale.GERMAN.getLanguage(), "Druck via Betriebssystem-Drucker");
-
-				modeOfDeliveryFlavour = modeOfDelivery.createFlavour(JFireVoucherEAR.MODE_OF_DELIVERY_FLAVOUR_ID_VOUCHER_PRINT_VIA_TICKET_PRINTER);
-				modeOfDeliveryFlavour.getName().setText(Locale.ENGLISH.getLanguage(), "Print To Ticket Printer");
-				modeOfDeliveryFlavour.getName().setText(Locale.GERMAN.getLanguage(), "Druck via Ticket-Drucker");				
-
-				deliveryConfiguration.addModeOfDelivery(modeOfDelivery);
-
-				ServerDeliveryProcessorClientSideVoucherPrint.getServerDeliveryProcessorClientSideVoucherPrint(pm).addModeOfDelivery(modeOfDelivery);
-
-				pm.makePersistent(deliveryConfiguration);
-			} catch (JDOObjectNotFoundException x) {
-				logger
-						.warn(
-								"Could not populate default DeliveryConfiguration for JFireVoucher with ModeOfDelivery s!",
-								x);
-			}
-
+			
+//			DeliveryConfiguration deliveryConfiguration = checkDeliveryConfiguration(pm);
+			
 			// create root-VoucherType (if not yet existing)
 			pm.getExtent(VoucherType.class);
 			try {
@@ -296,6 +255,83 @@ implements SessionBean
 		}
 	}
 
+	protected void checkModeOfDeliveryFlavourTicketPrinter(PersistenceManager pm) 
+	{
+		try {
+			pm.getObjectById(JFireVoucherEAR.MODE_OF_DELIVERY_FLAVOUR_ID_VOUCHER_PRINT_VIA_TICKET_PRINTER);
+		} catch (JDOObjectNotFoundException e) {
+			ModeOfDelivery modeOfDelivery = (ModeOfDelivery) pm.getObjectById(JFireVoucherEAR.MODE_OF_DELIVERY_ID_VOUCHER_PRINT);
+			String ticketPrinterClassName = "org.nightlabs.ticketprinter.TicketPrinter";
+			try {
+				Class.forName(ticketPrinterClassName);
+				ModeOfDeliveryFlavour modeOfDeliveryFlavour = modeOfDelivery.createFlavour(JFireVoucherEAR.MODE_OF_DELIVERY_FLAVOUR_ID_VOUCHER_PRINT_VIA_TICKET_PRINTER);
+				modeOfDeliveryFlavour.getName().setText(Locale.ENGLISH.getLanguage(), "Print To Ticket Printer");
+				modeOfDeliveryFlavour.getName().setText(Locale.GERMAN.getLanguage(), "Druck via Ticket-Drucker");				
+			} catch (ClassNotFoundException e2) {
+				logger.info("Class "+ticketPrinterClassName+" could not be resolved, means TicketPrinter Module " +
+						"is not deployed, will skip registering of ModeOfDeliveryFlavour " + 
+						JFireVoucherEAR.MODE_OF_DELIVERY_FLAVOUR_ID_VOUCHER_PRINT_VIA_TICKET_PRINTER, e2);
+			}			
+		}		
+	}
+		
+	protected DeliveryConfiguration checkDeliveryConfiguration(PersistenceManager pm) 
+	{		
+		DeliveryConfiguration deliveryConfiguration = null;
+		try {
+			deliveryConfiguration = (DeliveryConfiguration) pm.getObjectById(
+					DeliveryConfigurationID.create(getOrganisationID(), "JFireVoucher.default"));
+			return deliveryConfiguration;
+		} 
+		catch (JDOObjectNotFoundException jdoonfe) 
+		{
+				// create a default DeliveryConfiguration with all default ModeOfDeliverys
+				deliveryConfiguration = new DeliveryConfiguration(
+						getOrganisationID(), "JFireVoucher.default");
+				deliveryConfiguration.getName().setText(Locale.ENGLISH.getLanguage(),
+						"Default Delivery Configuration");
+				deliveryConfiguration.getName().setText(Locale.GERMAN.getLanguage(),
+						"Standard-Liefer-Konfiguration");
+				pm.getExtent(ModeOfDelivery.class);
+
+				try {
+					ModeOfDelivery modeOfDelivery;
+					ModeOfDeliveryFlavour modeOfDeliveryFlavour;
+					
+					modeOfDelivery = (ModeOfDelivery) pm.getObjectById(ModeOfDeliveryID
+							.create(Organisation.DEVIL_ORGANISATION_ID,
+									ModeOfDelivery.MODE_OF_DELIVERY_ID_MANUAL));
+					deliveryConfiguration.addModeOfDelivery(modeOfDelivery);
+
+					modeOfDelivery = new ModeOfDelivery(JFireVoucherEAR.MODE_OF_DELIVERY_ID_VOUCHER_PRINT);
+					modeOfDelivery.getName().setText(Locale.ENGLISH.getLanguage(), "Voucher Print");
+					modeOfDelivery.getName().setText(Locale.GERMAN.getLanguage(), "Gutschein-Druck");
+					modeOfDelivery = (ModeOfDelivery) pm.makePersistent(modeOfDelivery);
+
+					for (Iterator it = pm.getExtent(CustomerGroup.class).iterator(); it.hasNext(); ) {
+						CustomerGroup customerGroup = (CustomerGroup) it.next();
+						customerGroup.addModeOfDelivery(modeOfDelivery);
+					}
+					
+					modeOfDeliveryFlavour = modeOfDelivery.createFlavour(JFireVoucherEAR.MODE_OF_DELIVERY_FLAVOUR_ID_VOUCHER_PRINT_VIA_OPERATING_SYSTEM_PRINTER);
+					modeOfDeliveryFlavour.getName().setText(Locale.ENGLISH.getLanguage(), "Print To Operating System Printer");
+					modeOfDeliveryFlavour.getName().setText(Locale.GERMAN.getLanguage(), "Druck via Betriebssystem-Drucker");
+					
+					deliveryConfiguration.addModeOfDelivery(modeOfDelivery);
+
+					ServerDeliveryProcessorClientSideVoucherPrint.getServerDeliveryProcessorClientSideVoucherPrint(pm).addModeOfDelivery(modeOfDelivery);
+
+					pm.makePersistent(deliveryConfiguration);
+				} catch (JDOObjectNotFoundException x) {
+					logger
+							.warn(
+									"Could not populate default DeliveryConfiguration for JFireVoucher with ModeOfDelivery s!",
+									x);			
+				}			
+		}		
+		return deliveryConfiguration;
+	}
+	
 	/**
 	 * @ejb.interface-method
 	 * @ejb.transaction type="Supports"

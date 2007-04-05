@@ -20,7 +20,10 @@ import org.nightlabs.jfire.reporting.parameter.ValueProvider;
  *		detachable = "true"
  *		table="JFireReporting_AcquisitionParameterConfig"
  *
- * @jdo.create-objectid-class field-order="organisationID, valueAcquisitionSetupID, parameterID"
+ * @jdo.create-objectid-class 
+ * 		field-order="organisationID, valueAcquisitionSetupID, parameterID"
+ * 		include-imports="id/AcquistionParameterConfig.imports.inc"
+ *		include-body="id/AcquistionParameterConfig.body.inc"
  * 
  * @jdo.inheritance strategy = "new-table" 
  * @jdo.inheritance-discriminator strategy="class-name"

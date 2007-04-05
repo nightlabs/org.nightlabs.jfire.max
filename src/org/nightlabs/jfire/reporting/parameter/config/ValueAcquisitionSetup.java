@@ -25,7 +25,10 @@ import org.nightlabs.jfire.reporting.parameter.ValueProviderInputParameter;
  *		detachable = "true"
  *		table="JFireReporting_ValueAcquisitionSetup"
  *
- * @jdo.create-objectid-class field-order="organisationID, valueAcquisitionSetupID"
+ * @jdo.create-objectid-class 
+ * 		field-order="organisationID, valueAcquisitionSetupID"
+ * 		include-imports="id/ValueAcquisitionSetup.imports.inc"
+ *		include-body="id/ValueAcquisitionSetup.body.inc"	 
  * 
  * @jdo.fetch-group name="ValueAcquisitionSetup.parameterConfigs" fetch-groups="default" fields="parameterConfigs"
  * @jdo.fetch-group name="ValueAcquisitionSetup.valueProviderConfigs" fetch-groups="default" fields="valueProviderConfigs"

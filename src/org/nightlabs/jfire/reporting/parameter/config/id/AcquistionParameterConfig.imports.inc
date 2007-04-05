@@ -1,0 +1,1 @@
+import org.nightlabs.jfire.reporting.parameter.config.AcquisitionParameterConfig;

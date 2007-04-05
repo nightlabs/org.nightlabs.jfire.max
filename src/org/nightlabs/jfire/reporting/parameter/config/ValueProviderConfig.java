@@ -15,7 +15,10 @@ import org.nightlabs.jfire.reporting.parameter.id.ValueProviderID;
  *		detachable = "true"
  *		table="JFireReporting_ValueProviderConfig"
  *
- * @jdo.create-objectid-class field-order="organisationID, valueAcquisitionSetupID, valueProviderOrganisationID, valueProviderCategoryID, valueProviderID"
+ * @jdo.create-objectid-class 
+ * 		field-order="organisationID, valueAcquisitionSetupID, valueProviderOrganisationID, valueProviderCategoryID, valueProviderID"
+ * 		include-imports="id/ValueProviderConfig.imports.inc"
+ *		include-body="id/ValueProviderConfig.body.inc"	
  *
  */
 public class ValueProviderConfig 

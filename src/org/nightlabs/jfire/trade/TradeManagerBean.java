@@ -59,6 +59,7 @@ import org.nightlabs.jfire.config.UserConfigSetup;
 import org.nightlabs.jfire.idgenerator.IDNamespaceDefault;
 import org.nightlabs.jfire.jbpm.JbpmLookup;
 import org.nightlabs.jfire.jbpm.graph.def.ProcessDefinition;
+import org.nightlabs.jfire.organisation.Organisation;
 import org.nightlabs.jfire.person.Person;
 import org.nightlabs.jfire.security.User;
 import org.nightlabs.jfire.security.id.UserID;
@@ -1063,6 +1064,8 @@ implements SessionBean
 			idNamespaceDefault.setCacheSizeServer(0);
 			idNamespaceDefault.setCacheSizeClient(0);
 
+
+			pm.makePersistent(new WorklockTypeOrder(WorklockTypeOrder.WORKLOCK_TYPE_ID.organisationID, WorklockTypeOrder.WORKLOCK_TYPE_ID.worklockTypeID));
 		} finally {
 			pm.close();
 		}

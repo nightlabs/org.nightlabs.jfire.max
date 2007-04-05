@@ -152,7 +152,10 @@ implements SessionBean
 
 
 				// registering demo timer task
-				TaskID taskID = TaskID.create(Organisation.DEVIL_ORGANISATION_ID, Task.TASK_TYPE_ID_SYSTEM, "ChezFrancois-DemoTimerTask");
+				TaskID taskID = TaskID.create(
+						// Organisation.DEVIL_ORGANISATION_ID, // the task can be modified by the organisation and thus it's maybe more logical to use the real organisationID - not devil
+						getOrganisationID(),
+						Task.TASK_TYPE_ID_SYSTEM, "ChezFrancois-DemoTimerTask");
 				try {
 					Task task = (Task) pm.getObjectById(taskID);
 					task.getActiveExecID();

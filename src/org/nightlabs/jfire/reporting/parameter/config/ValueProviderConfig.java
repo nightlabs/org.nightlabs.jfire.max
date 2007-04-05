@@ -18,7 +18,9 @@ import org.nightlabs.jfire.reporting.parameter.id.ValueProviderID;
  * @jdo.create-objectid-class field-order="organisationID, valueAcquisitionSetupID, valueProviderOrganisationID, valueProviderCategoryID, valueProviderID"
  *
  */
-public class ValueProviderConfig implements ValueConsumer, Serializable {
+public class ValueProviderConfig 
+implements ValueConsumer, Serializable, IGraphicalInfoProvider 
+{
 
 	private static final long serialVersionUID = 1L;
 
@@ -61,7 +63,16 @@ public class ValueProviderConfig implements ValueConsumer, Serializable {
 	 * @jdo.field persistence-modifier="persistent"
 	 */
 	private ValueAcquisitionSetup setup;
-	
+
+	/**
+	 * @jdo.field persistence-modifier="persistent"
+	 */	
+	private int x;
+
+	/**
+	 * @jdo.field persistence-modifier="persistent"
+	 */	
+	private int y;
 	
 	// Maybe need to add x,y for GEF editor
 	
@@ -187,5 +198,37 @@ public class ValueProviderConfig implements ValueConsumer, Serializable {
 		this.valueProviderCategoryID = valueProvider.getValueProviderCategoryID();
 		this.valueProviderID = valueProvider.getValueProviderID();
 	}
-	
+
+	/**
+	 * returns the x coordinate
+	 * @return the x coordinate
+	 */
+	public int getX() {
+		return x;
+	}
+
+	/**
+	 * returns the y coordinate
+	 * @return the y coordinate
+	 */	
+	public int getY() {
+		return y;
+	}
+
+	/**
+	 * sets the x coordinate
+	 * @param x the x coordinate to set
+	 */	
+	public void setX(int x) {
+		this.x = x;
+	}
+
+	/**
+	 * sets the y coordinate
+	 * @param y the y coordinate to set
+	 */		
+	public void setY(int y) {
+		this.y = y;
+	}
+		
 }

@@ -28,7 +28,9 @@ import org.nightlabs.jfire.reporting.parameter.ValueProvider;
  * @jdo.implements name="org.nightlabs.jfire.reporting.parameter.config.ValueConsumer"
  * 
  */
-public class AcquisitionParameterConfig implements ValueConsumer, Serializable {
+public class AcquisitionParameterConfig 
+implements ValueConsumer, Serializable, IGraphicalInfoProvider 
+{
 	
 	private static final long serialVersionUID = 1L;
 
@@ -58,6 +60,16 @@ public class AcquisitionParameterConfig implements ValueConsumer, Serializable {
 	 * @jdo.field persistence-modifier="persistent"
 	 */
 	private ValueAcquisitionSetup setup;
+	
+	/**
+	 * @jdo.field persistence-modifier="persistent"
+	 */	
+	private int x;
+
+	/**
+	 * @jdo.field persistence-modifier="persistent"
+	 */	
+	private int y;
 	
 	// Maybe need to add x,y for GEF editor
 	
@@ -132,5 +144,35 @@ public class AcquisitionParameterConfig implements ValueConsumer, Serializable {
 		return setup;
 	}
 
-	
+	/**
+	 * returns the x coordinate
+	 * @return the x coordinate
+	 */
+	public int getX() {
+		return x;
+	}
+
+	/**
+	 * returns the y coordinate
+	 * @return the y coordinate
+	 */	
+	public int getY() {
+		return y;
+	}
+
+	/**
+	 * sets the x coordinate
+	 * @param x the x coordinate to set
+	 */	
+	public void setX(int x) {
+		this.x = x;
+	}
+
+	/**
+	 * sets the y coordinate
+	 * @param y the y coordinate to set
+	 */		
+	public void setY(int y) {
+		this.y = y;
+	}	
 }

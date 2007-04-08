@@ -42,7 +42,6 @@ import javax.ejb.SessionBean;
 import javax.ejb.SessionContext;
 import javax.jdo.JDOHelper;
 import javax.jdo.PersistenceManager;
-import javax.jdo.Query;
 
 import org.apache.log4j.Logger;
 import org.jbpm.JbpmContext;
@@ -59,7 +58,6 @@ import org.nightlabs.jfire.config.UserConfigSetup;
 import org.nightlabs.jfire.idgenerator.IDNamespaceDefault;
 import org.nightlabs.jfire.jbpm.JbpmLookup;
 import org.nightlabs.jfire.jbpm.graph.def.ProcessDefinition;
-import org.nightlabs.jfire.organisation.Organisation;
 import org.nightlabs.jfire.person.Person;
 import org.nightlabs.jfire.security.User;
 import org.nightlabs.jfire.security.id.UserID;
@@ -71,6 +69,7 @@ import org.nightlabs.jfire.trade.id.OrderID;
 import org.nightlabs.jfire.trade.id.SegmentTypeID;
 import org.nightlabs.jfire.trade.jbpm.ProcessDefinitionAssignment;
 import org.nightlabs.jfire.transfer.id.AnchorID;
+import org.nightlabs.jfire.worklock.Worklock;
 
 
 /**
@@ -124,6 +123,62 @@ implements SessionBean
 	// //// end EJB stuff ////
 
 	/**
+	 * This method only creates a new <code>Order</code>, if there is no unlocked, empty
+	 * quick-sale-order existing. If it can re-use a previously created <code>Order</code>,
+	 * it is locked and its ID returned.
+	 *
+	 * @ejb.interface-method
+	 * @ejb.transaction type="Required"
+	 * @ejb.permission role-name="_Guest_"
+	 */
+	public OrderID createQuickSaleWorkOrder(AnchorID customerID, String orderIDPrefix, String currencyID,
+			SegmentTypeID[] segmentTypeIDs)
+	throws ModuleException
+	{
+		PersistenceManager pm = getPersistenceManager();
+		try {
+			Trader trader = Trader.getTrader(pm);
+			OrganisationLegalEntity vendor = trader.getMandator();
+			AnchorID vendorID = (AnchorID) JDOHelper.getObjectId(vendor);
+			User user = User.getUser(pm, getPrincipal());
+			UserID userID = (UserID) JDOHelper.getObjectId(user);
+
+			pm.getExtent(WorklockTypeOrder.class);
+			WorklockTypeOrder worklockTypeOrder = (WorklockTypeOrder) pm.getObjectById(WorklockTypeOrder.WORKLOCK_TYPE_ID);
+
+			orderIDPrefix = trader.getOrderIDPrefix(user, orderIDPrefix);
+
+			OrderID orderID = null;
+			// TODO we need to take the SegmentTypes into account - either we ensure they exist after taking just any Order returned now or we reduce the candidates.
+			List<OrderID> orderIDs = Order.getQuickSaleWorkOrderIDCandidates(pm, vendorID, customerID, userID, orderIDPrefix, currencyID);
+			for (OrderID oID : orderIDs) {
+				if (Worklock.getWorklockCount(pm, oID) == 0) {
+					orderID = oID;
+					break;
+				}
+			}
+
+			if (orderID == null) {
+				LegalEntity customer = (LegalEntity) pm.getObjectById(customerID);
+				Currency currency = (Currency) pm.getObjectById(CurrencyID.create(currencyID));
+				Order order = trader.createOrder(vendor, customer, orderIDPrefix, currency);
+				if (segmentTypeIDs != null)
+					createSegments(pm, trader, order, segmentTypeIDs);
+
+				order.setQuickSaleWorkOrder(true);
+				orderID = (OrderID) JDOHelper.getObjectId(order);
+			}
+
+			Worklock worklock = new Worklock(worklockTypeOrder, user, getSessionID(), orderID, "QuickSaleWorkOrder"); // TODO nice description
+			worklock = (Worklock) pm.makePersistent(worklock);
+
+			return orderID;
+		} finally {
+			pm.close();
+		}
+	}
+
+	/**
 	 * Creates a new order. This method is intended to be called by a user (not another
 	 * organisation).
 	 *
@@ -155,17 +210,8 @@ implements SessionBean
 
 			Order order = trader.createOrder(trader.getMandator(), customer, orderIDPrefix, currency);
 
-			if (segmentTypeIDs != null) {
-				pm.getExtent(SegmentType.class);
-				for (int i = 0; i < segmentTypeIDs.length; ++i) {
-					SegmentTypeID segmentTypeID = segmentTypeIDs[i];
-					SegmentType segmentType = null;
-					if (segmentTypeID != null) {
-						segmentType = (SegmentType) pm.getObjectById(segmentTypeID);
-					}
-					trader.createSegment(order, segmentType);
-				}
-			} // if (segmentTypeIDs != null) {
+			if (segmentTypeIDs != null)
+				createSegments(pm, trader, order, segmentTypeIDs);
 
 			pm.getFetchPlan().setMaxFetchDepth(maxFetchDepth);
 			if (fetchGroups != null)
@@ -174,6 +220,19 @@ implements SessionBean
 			return (Order)pm.detachCopy(order);
 		} finally {
 			pm.close();
+		}
+	}
+
+	private static void createSegments(PersistenceManager pm, Trader trader, Order order, SegmentTypeID[] segmentTypeIDs)
+	{
+		pm.getExtent(SegmentType.class);
+		for (int i = 0; i < segmentTypeIDs.length; ++i) {
+			SegmentTypeID segmentTypeID = segmentTypeIDs[i];
+			SegmentType segmentType = null;
+			if (segmentTypeID != null) {
+				segmentType = (SegmentType) pm.getObjectById(segmentTypeID);
+			}
+			trader.createSegment(order, segmentType);
 		}
 	}
 
@@ -1118,28 +1177,4 @@ implements SessionBean
 		}
 	}
 
-	/**
-	 * @ejb.interface-method
-	 * @ejb.transaction type="Required"
-	 * @ejb.permission role-name="_Guest_"
-	 */
-	public OrderID createQuickSaleWorkOrder(AnchorID customerID)
-	throws ModuleException
-	{
-		PersistenceManager pm = getPersistenceManager();
-		try {
-			Trader trader = Trader.getTrader(pm);
-			AnchorID vendorID = (AnchorID) JDOHelper.getObjectId(trader.getMandator());
-
-			List<OrderID> orderIDs = Order.getQuickSaleWorkOrderIDCandidates(pm, vendorID, customerID, UserID.create(getPrincipal()), -1, -1);
-			for (OrderID orderID : orderIDs) {
-				
-			}
-
-			// TODO implement this
-			throw new UnsupportedOperationException("NYI");
-		} finally {
-			pm.close();
-		}
-	}
 }

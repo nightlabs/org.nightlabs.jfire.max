@@ -450,6 +450,22 @@ public class Trader
 		return offer;
 	}
 
+	public String getOrderIDPrefix(User user, String orderIDPrefix)
+	{
+		if (orderIDPrefix == null) {
+			TradeConfigModule tradeConfigModule;
+			try {
+				tradeConfigModule = (TradeConfigModule) Config.getConfig(
+						getPersistenceManager(), getOrganisationID(), user).createConfigModule(TradeConfigModule.class);
+			} catch (ModuleException x) {
+				throw new RuntimeException(x); // should not happen.
+			}
+
+			orderIDPrefix = tradeConfigModule.getActiveIDPrefixCf(Order.class.getName()).getDefaultIDPrefix();
+		}
+		return orderIDPrefix;
+	}
+
 	public Order createOrder(OrganisationLegalEntity vendor,
 			LegalEntity customer, String orderIDPrefix, Currency currency) throws ModuleException
 	{
@@ -471,17 +487,18 @@ public class Trader
 			// local: the vendor is owning the datastore
 			User user = SecurityReflector.getUserDescriptor().getUser(pm);
 
-			if (orderIDPrefix == null) {
-				TradeConfigModule tradeConfigModule;
-				try {
-					tradeConfigModule = (TradeConfigModule) Config.getConfig(
-							getPersistenceManager(), getOrganisationID(), user).createConfigModule(TradeConfigModule.class);
-				} catch (ModuleException x) {
-					throw new RuntimeException(x); // should not happen.
-				}
-
-				orderIDPrefix = tradeConfigModule.getActiveIDPrefixCf(Order.class.getName()).getDefaultIDPrefix();
-			}
+			orderIDPrefix = getOrderIDPrefix(user, orderIDPrefix);
+//			if (orderIDPrefix == null) {
+//				TradeConfigModule tradeConfigModule;
+//				try {
+//					tradeConfigModule = (TradeConfigModule) Config.getConfig(
+//							getPersistenceManager(), getOrganisationID(), user).createConfigModule(TradeConfigModule.class);
+//				} catch (ModuleException x) {
+//					throw new RuntimeException(x); // should not happen.
+//				}
+//
+//				orderIDPrefix = tradeConfigModule.getActiveIDPrefixCf(Order.class.getName()).getDefaultIDPrefix();
+//			}
 
 			Order order = new Order(
 					getMandator(), customer,

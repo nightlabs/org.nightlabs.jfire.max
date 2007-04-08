@@ -27,11 +27,13 @@
 package org.nightlabs.jfire.trade;
 
 import java.io.Serializable;
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -89,17 +91,36 @@ import org.nightlabs.util.Utils;
  *			import java.lang.String
  *			ORDER BY orderID DESC"
  *
- * @jdo.query
+ * @!jdo.query
  *		name="getQuickSaleWorkOrderIDCandidates"
  *		query="SELECT JDOHelper.getObjectId(this)
- *			WHERE vendor.organisationID == :paramVendorID_organisationID &&
+ *			WHERE
+ *						quickSaleWorkOrder &&
+ *						orderIDPrefix == :orderIDPrefix &&
+ *						currency.currencyID == :currencyID &&
+ *						vendor.organisationID == :paramVendorID_organisationID &&
  *            vendor.anchorID == :paramVendorID_anchorID &&
  *			      customer.organisationID == :paramCustomerID_organisationID &&
  *            customer.anchorID == :paramCustomerID_anchorID &&
  *            createUser.organisationID == :paramCreateUser_organisationID &&
  *            createUser.userID == :paramCreateUser_userID &&
- *            !offers.contains(finalizedOffer) && finalizedOffer.finalizeDT != null
- *			ORDER BY orderID DESC"
+ *            !offers.contains(finalizedOffer) && finalizedOffer.finalizeDT != null &&
+ *            articles.isEmpty()
+ *			ORDER BY orderID ASC"
+ *
+ * // TODO Switch to the code above when the JPOX bug is fixed: as soon as this.offers or this.articles is included in the WHERE block, the criteria above (at least this.quickSaleWorkOrder) are ignored.
+ * @jdo.query
+ *		name="getQuickSaleWorkOrderIDCandidates_WORKAROUND"
+ *		query="SELECT
+ *			WHERE
+ *						this.quickSaleWorkOrder &&
+ *						this.orderIDPrefix == :orderIDPrefix &&
+ *						this.currency.currencyID == :currencyID &&
+ *						this.vendor.organisationID == :paramVendorID_organisationID &&
+ *            this.vendor.anchorID == :paramVendorID_anchorID &&
+ *			      this.customer.organisationID == :paramCustomerID_organisationID &&
+ *            this.customer.anchorID == :paramCustomerID_anchorID
+ *			ORDER BY orderID ASC"
  *
  * @jdo.fetch-group name="Order.vendor" fields="vendor"
  * @jdo.fetch-group name="Order.currency" fields="currency"
@@ -164,11 +185,9 @@ implements Serializable, ArticleContainer, SegmentContainer, DetachCallback
 	@SuppressWarnings("unchecked")
 	public static List<OrderID> getQuickSaleWorkOrderIDCandidates(
 			PersistenceManager pm, AnchorID vendorID, AnchorID customerID,
-			UserID createUserID, long rangeBeginIdx, long rangeEndIdx)
+			UserID createUserID, String orderIDPrefix, String currencyID)
 	{
-		Query q = pm.newNamedQuery(Order.class, "getQuickSaleWorkOrderIDCandidates");
-
-//	 WORKAROUND JDOQL with ObjectID doesn't work yet.
+		Query q = pm.newNamedQuery(Order.class, "getQuickSaleWorkOrderIDCandidates_WORKAROUND");
 		Map params = new HashMap();
 		params.put("paramVendorID_organisationID", vendorID.organisationID);
 		params.put("paramVendorID_anchorID", vendorID.anchorID);
@@ -176,11 +195,47 @@ implements Serializable, ArticleContainer, SegmentContainer, DetachCallback
 		params.put("paramCustomerID_anchorID", customerID.anchorID);
 		params.put("paramCreateUser_organisationID", createUserID.organisationID);
 		params.put("paramCreateUser_userID", createUserID.userID);
+		params.put("orderIDPrefix", orderIDPrefix);
+		params.put("currencyID", currencyID);
+		Collection<Order> orders = (Collection<Order>) q.executeWithMap(params);
+		List<OrderID> orderIDs = new ArrayList<OrderID>();
+		for (Iterator<Order> it = orders.iterator(); it.hasNext(); ) {
+			Order order = it.next();
 
-		if (rangeBeginIdx >= 0 && rangeEndIdx >= 0)
-			q.setRange(rangeBeginIdx, rangeEndIdx);
+			if (!order.getArticles().isEmpty())
+				continue;
 
-		return (List<OrderID>) q.executeWithMap(params);
+			boolean skipOrder = false;
+			for (Offer offer : order.getOffers()) {
+				if (offer.isFinalized())
+					skipOrder = true;
+			}
+			if (skipOrder)
+				continue;
+
+			orderIDs.add((OrderID) JDOHelper.getObjectId(order));
+		}
+		return orderIDs;
+
+// TODO switch to the real query as soon as the jpox bug is fixed. Currently we cannot query on this.offers or this.articles
+
+//		Query q = pm.newNamedQuery(Order.class, "getQuickSaleWorkOrderIDCandidates");
+//
+////	 WORKAROUND JDOQL with ObjectID doesn't work yet.
+//		Map params = new HashMap();
+//		params.put("paramVendorID_organisationID", vendorID.organisationID);
+//		params.put("paramVendorID_anchorID", vendorID.anchorID);
+//		params.put("paramCustomerID_organisationID", customerID.organisationID);
+//		params.put("paramCustomerID_anchorID", customerID.anchorID);
+//		params.put("paramCreateUser_organisationID", createUserID.organisationID);
+//		params.put("paramCreateUser_userID", createUserID.userID);
+//		params.put("orderIDPrefix", orderIDPrefix);
+//		params.put("currencyID", currencyID);
+//
+////		if (rangeBeginIdx >= 0 && rangeEndIdx >= 0)
+////			q.setRange(rangeBeginIdx, rangeEndIdx);
+//
+//		return (List<OrderID>) q.executeWithMap(params);
 	}
 
 	/**
@@ -226,6 +281,11 @@ implements Serializable, ArticleContainer, SegmentContainer, DetachCallback
 	 * The same applies to the {@link #customerGroup}.
 	 */
 	protected boolean customerChangeable = true;
+
+	/**
+	 * @jdo.field persistence-modifier="persistent"
+	 */
+	private boolean quickSaleWorkOrder;
 
 //	/**
 //	 * key: String articlePK<br/>
@@ -602,6 +662,15 @@ implements Serializable, ArticleContainer, SegmentContainer, DetachCallback
 		if (pm == null)
 			throw new IllegalStateException("This instance of Order is currently not attached to the datastore. Cannot obtain PersistenceManager!");
 		return pm;
+	}
+
+	public boolean isQuickSaleWorkOrder()
+	{
+		return quickSaleWorkOrder;
+	}
+	public void setQuickSaleWorkOrder(boolean quickSaleWorkOrder)
+	{
+		this.quickSaleWorkOrder = quickSaleWorkOrder;
 	}
 
 	public void jdoPreDetach()

@@ -144,7 +144,6 @@ implements SessionBean
 			UserID userID = (UserID) JDOHelper.getObjectId(user);
 
 			pm.getExtent(EditLockTypeOrder.class);
-			EditLockTypeOrder editLockTypeOrder = (EditLockTypeOrder) pm.getObjectById(EditLockTypeOrder.EDIT_LOCK_TYPE_ID);
 
 			orderIDPrefix = trader.getOrderIDPrefix(user, orderIDPrefix);
 
@@ -169,8 +168,7 @@ implements SessionBean
 				orderID = (OrderID) JDOHelper.getObjectId(order);
 			}
 
-			EditLock editLock = new EditLock(editLockTypeOrder, user, getSessionID(), orderID, "QuickSaleWorkOrder"); // TODO nice description
-			editLock = (EditLock) pm.makePersistent(editLock);
+			EditLock.acquireEditLock(pm, userID, getSessionID(), EditLockTypeOrder.EDIT_LOCK_TYPE_ID, orderID, "QuickSaleWorkOrder"); // TODO nice description
 
 			return orderID;
 		} finally {

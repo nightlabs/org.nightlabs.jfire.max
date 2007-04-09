@@ -52,21 +52,24 @@ extends EditLockType
 		Order order = (Order) pm.getObjectById(editLock.getLockedObjectID());
 		// release all products and delete articles if it's a QuickSaleOrder without finalized offers
 		if (order.isQuickSaleWorkOrder()) {
-			boolean containsFinalizedOffer = false;
-			for (Offer offer : order.getOffers()) {
-				if (offer.isFinalized()) {
-					containsFinalizedOffer = true;
-					break;
+			// check whether there are other EditLocks - maybe the user re-opened the Order after his client died when the power supply was interrupted
+			if (EditLock.getEditLockCount(pm, editLock.getLockedObjectID()) == 1) {
+				boolean containsFinalizedOffer = false;
+				for (Offer offer : order.getOffers()) {
+					if (offer.isFinalized()) {
+						containsFinalizedOffer = true;
+						break;
+					}
 				}
-			}
-			if (!containsFinalizedOffer) {
-				Trader trader = Trader.getTrader(pm);
-				User user = SecurityReflector.getUserDescriptor().getUser(pm);
-				if (!order.getArticles().isEmpty()) {
-					trader.releaseArticles(user, order.getArticles(), true, true);
-					trader.deleteArticles(user, order.getArticles());
-				}
-			}
-		}
+				if (!containsFinalizedOffer) {
+					Trader trader = Trader.getTrader(pm);
+					User user = SecurityReflector.getUserDescriptor().getUser(pm);
+					if (!order.getArticles().isEmpty()) {
+						trader.releaseArticles(user, order.getArticles(), true, true);
+						trader.deleteArticles(user, order.getArticles());
+					}
+				} // if (!containsFinalizedOffer) {
+			} // if (EditLock.getEditLockCount(pm, editLock.getLockedObjectID()) == 1) {
+		} // if (order.isQuickSaleWorkOrder()) {
 	}
 }

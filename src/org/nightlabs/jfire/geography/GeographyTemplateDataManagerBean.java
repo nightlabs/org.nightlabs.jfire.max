@@ -74,6 +74,7 @@ implements SessionBean
 	 */
 	private static final Logger logger = Logger.getLogger(GeographyTemplateDataManagerBean.class);
 
+	private static final String COUNTRY_CSV_HEADER = "CountryID;LanguageID;CountryName\n";
 	private static final String REGION_CSV_HEADER = "CountryID;RegionID;LanguageID;RegionName\n";
 	private static final String CITY_CSV_HEADER = "CountryID;CityID;RegionID;LanguageID;CityName\n";
 	private static final String LOCATION_CSV_HEADER = "CountryID;LocationID;CityID;DistrictID;LanguageID;LocationName\n";
@@ -235,7 +236,7 @@ implements SessionBean
 			ByteArrayOutputStream out = new ByteArrayOutputStream();
 			Writer w = new OutputStreamWriter(new DeflaterOutputStream(out), Utils.CHARSET_UTF_8);
 			try {
-				w.write(REGION_CSV_HEADER);
+				w.write(COUNTRY_CSV_HEADER);
 				for (Country existCountry : geography.getCountries()) {
 					if (CountryID.create(existCountry).equals(countryID)) {
 						existCountry = storedCountry;

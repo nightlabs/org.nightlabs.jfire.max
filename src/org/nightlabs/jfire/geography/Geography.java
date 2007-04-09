@@ -1073,7 +1073,11 @@ public abstract class Geography
 
 	public static String nextRegionID(String countryID, String organisationID)
 	{
-		throw new UnsupportedOperationException("NYI");
+		if (!IDGenerator.getOrganisationID().equals(organisationID))
+			throw new IllegalArgumentException("Can only generate an ID for the organisation '"+IDGenerator.getOrganisationID()+"' - the argument is invalid: " + organisationID);
+
+		return String.valueOf(IDGenerator.nextID(Region.class.getName() + "#" + countryID));
+//		throw new UnsupportedOperationException("NYI");
 	}
 
 	public static String nextCityID(String countryID, String organisationID)
@@ -1085,4 +1089,11 @@ public abstract class Geography
 	}
 
 	// TODO implement the other ID generator methods - don't forget to initialise the namespace correctly!
+	public static String nextLocationID(String countryID, String organisationID)
+	{
+		if (!IDGenerator.getOrganisationID().equals(organisationID))
+			throw new IllegalArgumentException("Can only generate an ID for the organisation '"+IDGenerator.getOrganisationID()+"' - the argument is invalid: " + organisationID);
+
+		return String.valueOf(IDGenerator.nextID(Location.class.getName() + "#" + countryID));
+	}
 }

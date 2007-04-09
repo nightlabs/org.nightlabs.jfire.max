@@ -3,13 +3,13 @@ package org.nightlabs.jfire.trade;
 import javax.jdo.PersistenceManager;
 
 import org.nightlabs.ModuleException;
+import org.nightlabs.jfire.editlock.EditLock;
+import org.nightlabs.jfire.editlock.EditLockType;
+import org.nightlabs.jfire.editlock.ReleaseReason;
+import org.nightlabs.jfire.editlock.id.EditLockTypeID;
 import org.nightlabs.jfire.organisation.Organisation;
 import org.nightlabs.jfire.security.SecurityReflector;
 import org.nightlabs.jfire.security.User;
-import org.nightlabs.jfire.worklock.ReleaseReason;
-import org.nightlabs.jfire.worklock.Worklock;
-import org.nightlabs.jfire.worklock.WorklockType;
-import org.nightlabs.jfire.worklock.id.WorklockTypeID;
 
 /**
  * @author Marco Schulze - Marco at NightLabs dot de
@@ -17,34 +17,39 @@ import org.nightlabs.jfire.worklock.id.WorklockTypeID;
  * @jdo.persistence-capable
  *		identity-type="application"
  *		detachable="true"
- *		persistence-capable-superclass="org.nightlabs.jfire.worklock.WorklockType"
+ *		persistence-capable-superclass="org.nightlabs.jfire.editlock.EditLockType"
  *
  * @jdo.inheritance strategy="superclass-table"
  */
-public class WorklockTypeOrder
-extends WorklockType
+public class EditLockTypeOrder
+extends EditLockType
 {
 	private static final long serialVersionUID = 1L;
 
-	public static final WorklockTypeID WORKLOCK_TYPE_ID = WorklockTypeID.create(Organisation.DEVIL_ORGANISATION_ID, WorklockTypeOrder.class.getName());
+	public static final EditLockTypeID EDIT_LOCK_TYPE_ID = EditLockTypeID.create(Organisation.DEVIL_ORGANISATION_ID, EditLockTypeOrder.class.getName());
 
 	/**
 	 * @deprecated Only for JDO!
 	 */
-	protected WorklockTypeOrder() { }
+	protected EditLockTypeOrder() { }
 
-	public WorklockTypeOrder(String organisationID, String worklockTypeID)
+	public EditLockTypeOrder(EditLockTypeID editLockTypeID)
 	{
-		super(organisationID, worklockTypeID);
+		super(editLockTypeID);
+	}
+
+	public EditLockTypeOrder(String organisationID, String editLockTypeID)
+	{
+		super(organisationID, editLockTypeID);
 	}
 
 	@Override
-	public void onReleaseWorklock(Worklock worklock, ReleaseReason releaseReason)
+	public void onReleaseEditLock(EditLock editLock, ReleaseReason releaseReason)
 	throws ModuleException
 	{
 		PersistenceManager pm = getPersistenceManager();
 		pm.getExtent(Order.class);
-		Order order = (Order) pm.getObjectById(worklock.getLockedObjectID());
+		Order order = (Order) pm.getObjectById(editLock.getLockedObjectID());
 		// release all products and delete articles if it's a QuickSaleOrder without finalized offers
 		if (order.isQuickSaleWorkOrder()) {
 			boolean containsFinalizedOffer = false;

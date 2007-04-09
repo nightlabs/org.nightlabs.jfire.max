@@ -55,6 +55,7 @@ import org.nightlabs.jfire.accounting.id.CurrencyID;
 import org.nightlabs.jfire.base.BaseSessionBeanImpl;
 import org.nightlabs.jfire.config.ConfigSetup;
 import org.nightlabs.jfire.config.UserConfigSetup;
+import org.nightlabs.jfire.editlock.EditLock;
 import org.nightlabs.jfire.idgenerator.IDNamespaceDefault;
 import org.nightlabs.jfire.jbpm.JbpmLookup;
 import org.nightlabs.jfire.jbpm.graph.def.ProcessDefinition;
@@ -69,7 +70,6 @@ import org.nightlabs.jfire.trade.id.OrderID;
 import org.nightlabs.jfire.trade.id.SegmentTypeID;
 import org.nightlabs.jfire.trade.jbpm.ProcessDefinitionAssignment;
 import org.nightlabs.jfire.transfer.id.AnchorID;
-import org.nightlabs.jfire.worklock.Worklock;
 
 
 /**
@@ -143,8 +143,8 @@ implements SessionBean
 			User user = User.getUser(pm, getPrincipal());
 			UserID userID = (UserID) JDOHelper.getObjectId(user);
 
-			pm.getExtent(WorklockTypeOrder.class);
-			WorklockTypeOrder worklockTypeOrder = (WorklockTypeOrder) pm.getObjectById(WorklockTypeOrder.WORKLOCK_TYPE_ID);
+			pm.getExtent(EditLockTypeOrder.class);
+			EditLockTypeOrder editLockTypeOrder = (EditLockTypeOrder) pm.getObjectById(EditLockTypeOrder.EDIT_LOCK_TYPE_ID);
 
 			orderIDPrefix = trader.getOrderIDPrefix(user, orderIDPrefix);
 
@@ -152,7 +152,7 @@ implements SessionBean
 			// TODO we need to take the SegmentTypes into account - either we ensure they exist after taking just any Order returned now or we reduce the candidates.
 			List<OrderID> orderIDs = Order.getQuickSaleWorkOrderIDCandidates(pm, vendorID, customerID, userID, orderIDPrefix, currencyID);
 			for (OrderID oID : orderIDs) {
-				if (Worklock.getWorklockCount(pm, oID) == 0) {
+				if (EditLock.getEditLockCount(pm, oID) == 0) {
 					orderID = oID;
 					break;
 				}
@@ -169,8 +169,8 @@ implements SessionBean
 				orderID = (OrderID) JDOHelper.getObjectId(order);
 			}
 
-			Worklock worklock = new Worklock(worklockTypeOrder, user, getSessionID(), orderID, "QuickSaleWorkOrder"); // TODO nice description
-			worklock = (Worklock) pm.makePersistent(worklock);
+			EditLock editLock = new EditLock(editLockTypeOrder, user, getSessionID(), orderID, "QuickSaleWorkOrder"); // TODO nice description
+			editLock = (EditLock) pm.makePersistent(editLock);
 
 			return orderID;
 		} finally {
@@ -1124,7 +1124,7 @@ implements SessionBean
 			idNamespaceDefault.setCacheSizeClient(0);
 
 
-			pm.makePersistent(new WorklockTypeOrder(WorklockTypeOrder.WORKLOCK_TYPE_ID.organisationID, WorklockTypeOrder.WORKLOCK_TYPE_ID.worklockTypeID));
+			pm.makePersistent(new EditLockTypeOrder(EditLockTypeOrder.EDIT_LOCK_TYPE_ID));
 		} finally {
 			pm.close();
 		}

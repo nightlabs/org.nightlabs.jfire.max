@@ -28,7 +28,6 @@ package org.nightlabs.jfire.reporting.parameter;
 
 import java.math.BigDecimal;
 import java.rmi.RemoteException;
-import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Date;
 import java.util.HashMap;
@@ -353,7 +352,7 @@ implements SessionBean
 	 *
 	 * @ejb.interface-method
 	 * @ejb.permission role-name="_Guest_"
-	 * @ejb.transaction type = "Required"
+	 * @ejb.transaction type="Supports"
 	 */
 	public Set<ValueProviderID> getValueProviderIDsForParent(ValueProviderCategoryID valueProviderCategoryID)
 	throws ModuleException
@@ -368,5 +367,20 @@ implements SessionBean
 		}
 	}
 
+	/**
+	 * @ejb.interface-method
+	 * @ejb.permission role-name="_Guest_"
+	 * @ejb.transaction type="Required"
+	 */
+	public ReportParameterAcquisitionSetup storeReportParameterAcquisitionSetup(
+			ReportParameterAcquisitionSetup setup,
+			boolean get,
+			String[] fetchGroups, int maxFetchDepth)
+	{
+		if (setup == null)
+			throw new IllegalArgumentException("ReportParameterAcquisitionSetup must not be null!");
 
+		return (ReportParameterAcquisitionSetup) NLJDOHelper.storeJDO(getPersistenceManager(), 
+				setup, get, fetchGroups, maxFetchDepth);
+	}
 }

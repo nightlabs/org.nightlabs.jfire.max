@@ -1123,6 +1123,7 @@ implements SessionBean
 
 
 			pm.makePersistent(new EditLockTypeOrder(EditLockTypeOrder.EDIT_LOCK_TYPE_ID));
+			pm.makePersistent(new EditLockTypeOffer(EditLockTypeOffer.EDIT_LOCK_TYPE_ID));
 		} finally {
 			pm.close();
 		}

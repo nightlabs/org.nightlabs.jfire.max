@@ -6,6 +6,9 @@ package org.nightlabs.jfire.reporting.parameter.config;
  */
 public interface IGraphicalInfoProvider 
 {
+	public static final String PROP_X = "X";
+	public static final String PROP_Y = "Y";
+	
 	/**
 	 * returns the x coordinate
 	 * @return the x coordinate

@@ -152,28 +152,23 @@ public class ReportLayout extends ReportRegistryItem {
 //	 */
 //	private Map<String, ReportLayoutLocalisationData> localisationData;
 	
-	public void loadFile(File f)
+	public void loadStream(InputStream in, long length, Date timeStamp, String name)
 	throws IOException
 	{
-		logger.debug("Loading file "+f+" as ReportLayout");
+		logger.debug("Loading stream as ReportLayout");
 		boolean error = true;
 		try {
-			DataBuffer db = new DataBuffer((long) (f.length() * 0.6));
+			DataBuffer db = new DataBuffer((long) (length * 0.6));
 			OutputStream out = new DeflaterOutputStream(db.createOutputStream());
 			try {
-				FileInputStream in = new FileInputStream(f);
-				try {
-					Utils.transferStreamData(in, out);
-				} finally {
-					in.close();
-				}
+				Utils.transferStreamData(in, out);
 			} finally {
 				out.close();
 			}
 			reportDesign = db.createByteArray();
 
-			fileTimestamp = new Date(f.lastModified());
-			fileName = f.getName();
+			fileTimestamp = timeStamp;
+			fileName = name;
 
 			error = false;
 		} finally {
@@ -182,6 +177,24 @@ public class ReportLayout extends ReportRegistryItem {
 				fileTimestamp = null;
 				reportDesign = null;
 			}
+		}
+	}
+	
+	public void loadStream(InputStream in, String name) 
+	throws IOException 
+	{
+		loadStream(in, 10 * 1024, new Date(), name);
+	}
+	
+	public void loadFile(File f)
+	throws IOException
+	{
+		logger.debug("Loading file "+f+" as ReportLayout");
+		FileInputStream in = new FileInputStream(f);
+		try {
+			loadStream(in, f.length(), new Date(f.lastModified()), f.getName());
+		} finally {
+			in.close();
 		}
 	}
 

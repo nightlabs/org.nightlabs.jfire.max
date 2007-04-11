@@ -4,7 +4,9 @@
 package org.nightlabs.jfire.reporting.parameter.config;
 
 import java.io.Serializable;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
@@ -126,6 +128,12 @@ public class ValueAcquisitionSetup implements Serializable {
 		this.valueAcquisitionSetupID = valueAcquisitionSetupID;
 		this.parameterAcquisitionSetup = parameterAcquisitionSetup;
 		this.useCase = useCase;
+		
+		consumer2Binding = new HashMap<String, Map<String,ValueConsumerBinding>>();
+		parameterConfigs = new ArrayList<AcquisitionParameterConfig>();
+		provider2Binding = new HashMap<String, ValueConsumerBinding>();
+		valueConsumerBindings = new HashSet<ValueConsumerBinding>();
+		valueProviderConfigs = new HashSet<ValueProviderConfig>();
 	}
 	
 	/**

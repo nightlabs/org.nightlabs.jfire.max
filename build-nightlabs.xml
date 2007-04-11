@@ -1,5 +1,6 @@
 <!--
-  Generic j2ee (jboss/jpox) ant build file (version 2007-02-26.00)
+  Generic j2ee and webapp (jboss/tomcat/jpox/xdoclet) ant build file 
+  Version: 2007-04-07.00
   Author: marc [at] nightlabs [dot] de
   Author: marco [at] nightlabs [dot] de
 
@@ -86,7 +87,7 @@
 		<attribute name="else-buildfile" default="" />
 		<sequential>
 			<tempfile property="tmpbuildfile.@{then-target}-@{then-buildfile}-@{else-target}-@{else-buildfile}-@{boolean}.name" prefix=".tmpbuild-" suffix=".xml" />
-			<property name="tmpbuildfile.@{then-target}-@{then-buildfile}-@{else-target}-@{else-buildfile}-@{boolean}.content.pre" value="&lt;project name=&quot;tmp-build&quot; default=&quot;run&quot;&gt;&lt;target name=&quot;run&quot;&gt;"/>
+			<property name="tmpbuildfile.@{then-target}-@{then-buildfile}-@{else-target}-@{else-buildfile}-@{boolean}.content.pre" value="&lt;project name=&quot;tmp-build&quot; default=&quot;run&quot;&gt;&lt;delete file=&quot;${tmpbuildfile.@{then-target}-@{then-buildfile}-@{else-target}-@{else-buildfile}-@{boolean}.name}&quot; deleteonexit=&quot;true&quot; quiet=&quot;true&quot;/&gt;&lt;target name=&quot;run&quot;&gt;"/>
 			<property name="tmpbuildfile.@{then-target}-@{then-buildfile}-@{else-target}-@{else-buildfile}-@{boolean}.content.post" value="&lt;/target&gt;&lt;/project&gt;"/>
 			<condition property="tmpbuildfile.@{then-target}-@{then-buildfile}-@{else-target}-@{else-buildfile}-@{boolean}.content" value="&lt;ant antfile=&quot;@{then-buildfile}&quot; target=&quot;@{then-target}&quot;/&gt;">
 				<istrue value="@{boolean}"/>
@@ -103,7 +104,9 @@
 			</condition>
 			<echo file="${tmpbuildfile.@{then-target}-@{then-buildfile}-@{else-target}-@{else-buildfile}-@{boolean}.name}">${tmpbuildfile.@{then-target}-@{then-buildfile}-@{else-target}-@{else-buildfile}-@{boolean}.content.pre}${tmpbuildfile.@{then-target}-@{then-buildfile}-@{else-target}-@{else-buildfile}-@{boolean}.content}${tmpbuildfile.@{then-target}-@{then-buildfile}-@{else-target}-@{else-buildfile}-@{boolean}.content.post}</echo>
 			<ant antfile="${tmpbuildfile.@{then-target}-@{then-buildfile}-@{else-target}-@{else-buildfile}-@{boolean}.name}"/>
-			<delete file="${tmpbuildfile.@{then-target}-@{then-buildfile}-@{else-target}-@{else-buildfile}-@{boolean}.name}"/>
+			<!--
+			<delete quiet="true" file="${tmpbuildfile.@{then-target}-@{then-buildfile}-@{else-target}-@{else-buildfile}-@{boolean}.name}"/>
+			-->
 		</sequential>
 	</macrodef>
 
@@ -152,6 +155,7 @@
     <!-- print properties for debugging -->
     <echo>project name: ${project.name}</echo>
     <echo>project dir: ${project.dir}</echo>
+    <echo>meta dir: ${meta.dir}</echo>
     <echo>project jar: ${project.jar}</echo>
     <echo>src dir: ${project.dir}/${src.dir}</echo>
     <echo>bin dir: ${project.dir}/${bin.dir}</echo>
@@ -171,6 +175,7 @@
     <echo>dist.bin.includes: ${dist.bin.includes}</echo>
     <echo>dist.bin.excludes: ${dist.bin.excludes}</echo>
   	<echo>project.path: ${project.path}</echo>
+  	<echo>project.path.includes: ${project.path.includes}</echo>
   </target>
 	
 	
@@ -180,9 +185,9 @@
     <property name="build.file" value="build-nightlabs.xml"/>
 
     <!-- Read properties and xml files -->
-    <property file="build-nightlabs-path.properties"/>
-    <property file="build-nightlabs.properties"/>
     <property file="build.properties"/>
+    <property file="build-nightlabs.properties"/>
+    <property file="build-nightlabs-path.properties"/>
     <xmlproperty file=".project" collapseAttributes="true"/>
 
 		<!-- Initialize used properties to default values -->
@@ -215,6 +220,8 @@
         <isset property="projectDescription.name"/>
       </and>
     </condition>
+  	<!-- set meta.dir to project.name if not defined -->
+    <setdefault property="meta.dir" value="${project.name}"/>
     <!-- set project.jar to "${project.name}.jar" if not already defined -->
     <condition property="project.jar" value="${project.name}.jar">
       <and>
@@ -226,13 +233,14 @@
     </condition>
     <!-- set j2ee.war.enable to false if not already defined -->
     <setdefault property="j2ee.war.enable" value="false" />
+    <setdefault property="web.deploy.name" value="${project.name}" />
     <!-- set project.war to "${project.name}.war" if not already defined -->
-    <condition property="project.war" value="${project.name}.war">
+    <condition property="project.war" value="${web.deploy.name}.war">
       <and>
         <not>
           <isset property="project.war"/>
         </not>
-        <isset property="project.name"/>
+        <isset property="web.deploy.name"/>
       </and>
     </condition>
     <!-- set j2ee.rar.enable to false if not already defined -->
@@ -272,6 +280,16 @@
 	-->
     <setdefault property="j2ee.deploymetainf.includes" value="application.xml" />
     <setdefault property="j2ee.deploymetainf.excludes" value="" />
+  	
+    <setdefault property="j2ee.jpoxenhance.enable" value="false" />
+    <setdefault property="j2ee.xdoclet.jdodoclet.enable" value="false" />
+    <setdefault property="j2ee.xdoclet.ejbdoclet.enable" value="false" />
+  	
+    <setdefault property="j2ee.deploy.enable" value="true" />
+    <setdefault property="web.deploy.enable" value="false" />
+    <setdefault property="web.deployaswar.enable" value="true" />
+    <setdefault property="web.deploy.dir" value="${j2ee.deploy.dir}" />
+  	
     <setdefault property="dist.bin.includes" value="**/*" />
     <setdefault property="dist.bin.excludes" value="**/log4j.*" />
 
@@ -352,8 +370,8 @@
   
   <!-- Invoke xdoclet for EJB interface/utility-class generation -->
   <target name="xdoclet.ejbdoclet" description="internal: Run EJB-Doclet">
-    <property name="ejb.dd.dir" value="${project.dir}/${project.name}/META-INF"/>
-    <property name="web.dd.dir" value="${project.dir}/${project.name}/WEB-INF"/>
+    <property name="ejb.dd.dir" value="${project.dir}/${meta.dir}/META-INF"/>
+    <property name="web.dd.dir" value="${project.dir}/${meta.dir}/WEB-INF"/>
     <property name="xdoclet.force" value="true"/>
     <property name="container.type" value="ejb-jar"/>
     <taskdef name="ejbdoclet" classname="xdoclet.modules.ejb.EjbDocletTask">
@@ -490,8 +508,14 @@
 	  <if boolean="${j2ee.client.enable}" then-target="dist.bin.client"/>
   </target>
 	
-	<!-- deploy all from j2ee.deploy.includes to the server -->
+	<!-- deploy all enabled formats -->
 	<target name="deploy.impl">
+	  <if boolean="${j2ee.deploy.enable}" then-target="deploy.j2ee.impl"/>
+	  <if boolean="${web.deploy.enable}" then-target="deploy.web.impl"/>
+	</target>
+	
+	<!-- deploy all from j2ee.deploy.includes to the server -->
+	<target name="deploy.j2ee.impl">
     <mkdir dir="${j2ee.deploy.dir}/${j2ee.deploy.subdir}"/>
     <copy todir="${j2ee.deploy.dir}/${j2ee.deploy.subdir}">
       <fileset dir="${project.dir}/${dist.dir}" includes="${j2ee.deploysubdir.includes}" excludes="${j2ee.deploysubdir.excludes}"/>
@@ -509,7 +533,34 @@
     </copy>
     <delete verbose="true" includeemptydirs="true"><fileset dir="${j2ee.deploy.dir}/${j2ee.deploy.subdir}/${j2ee.ear}" includes="META-INF"/></delete>
 	</target>
+
+	<!-- deploy war file or contents as directory to the web server -->
+	<target name="deploy.web.impl">
+	  <if boolean="${web.deployaswar.enable}" then-target="deploy.web.war.impl" else-target="deploy.web.dir.impl"/>
+	</target>
 		
+	<!-- deploy war file to the web server -->
+	<target name="deploy.web.war.impl">
+    <mkdir dir="${web.deploy.dir}"/>
+		<!-- copy the war file directly -->
+    <copy file="${project.dir}/${dist.dir}/${project.war}" todir="${web.deploy.dir}" />
+	</target>
+
+	<!-- deploy war file contents as directory to the web server -->
+	<target name="deploy.web.dir.impl">
+    <mkdir dir="${web.deploy.dir}/${web.deploy.name}"/>
+		<!-- unzip war file and copy contents -->
+	  <property name="rawdist" value=".build-tmp" />
+    <mkdir dir="${project.dir}/${rawdist}"/>
+		<unjar src="${project.dir}/${dist.dir}/${project.war}" dest="${project.dir}/${rawdist}" />
+    <copy todir="${web.deploy.dir}/${web.deploy.name}" >
+    	<fileset dir="${project.dir}/${rawdist}" includes="**/*" />
+		</copy>
+		<delete includeEmptyDirs="true">
+		  <fileset dir="${project.dir}" includes="${rawdist}/**/*,${rawdist}"/>
+		</delete>
+	</target>
+	
 	<!-- Set up environment for xdoclet. Then call the needed
        xdoclet subtasks -->
 	<target name="xdoclet.impl">
@@ -525,6 +576,8 @@
       <pathelement path="${java.class.path}" />
       <!-- append the path sent through eclipse to classpath -->
       <pathelement path="${project.path}" />
+    	<!-- append ${project.path.includes} -->
+    	<fileset dir="." includes="${project.path.includes}" />
     </path>
     <if boolean="${j2ee.xdoclet.jdodoclet.enable}" then-target="xdoclet.jdodoclet"/>
     <if boolean="${j2ee.xdoclet.ejbdoclet.enable}" then-target="xdoclet.ejbdoclet"/>
@@ -537,6 +590,7 @@
       <pathelement path="${project.dir}/${ejbsrc.dir}"/>
       <pathelement path="${project.path}" />
       <pathelement path="${java.class.path}" />
+    	<fileset dir="." includes="${project.path.includes}" />
     </path>
     <taskdef name="jpoxenhancer" classname="org.jpox.enhancer.tools.EnhancerTask">
       <classpath refid="jpoxenhancer.classpath"/>
@@ -554,7 +608,12 @@
 	<target name="compile.main.impl">
     <mkdir dir="${project.dir}/${bin.dir}"/>
     <mkdir dir="${project.dir}/${ejbsrc.dir}"/>
-    <javac debug="${javac.debug}" encoding="UTF-8" source="${javac.source}" target="${javac.target}" destdir="${project.dir}/${bin.dir}" classpath="${project.path}">
+    <path id="javac.classpath">
+      <pathelement path="${project.path}" />
+      <pathelement path="${java.class.path}" />
+    	<fileset dir="." includes="${project.path.includes}" />
+    </path>
+    <javac debug="${javac.debug}" encoding="UTF-8" source="${javac.source}" target="${javac.target}" destdir="${project.dir}/${bin.dir}" classpathref="javac.classpath">
       <src path="${project.dir}/${src.dir}"/>
       <src path="${project.dir}/${ejbsrc.dir}"/>
     </javac>
@@ -569,7 +628,12 @@
 	<target name="compile.client.main.impl">
     <mkdir dir="${project.dir}/${bin.dir}"/>
     <mkdir dir="${project.dir}/${ejbsrc.dir}"/>
-    <javac debug="${javac.debug}" source="${javac.source}" target="${javac.target}" destdir="${project.dir}/${bin.dir}" classpath="${project.path}" excludes="${j2ee.clientbuild.excludes}" includes="${j2ee.clientbuild.includes}">
+    <path id="javac.classpath">
+      <pathelement path="${project.path}" />
+      <pathelement path="${java.class.path}" />
+    	<fileset dir="." includes="${project.path.includes}" />
+    </path>
+    <javac debug="${javac.debug}" source="${javac.source}" target="${javac.target}" destdir="${project.dir}/${bin.dir}" classpathref="javac.classpath" excludes="${j2ee.clientbuild.excludes}" includes="${j2ee.clientbuild.includes}">
       <src path="${project.dir}/${src.dir}"/>
       <src path="${project.dir}/${ejbsrc.dir}"/>
     </javac>
@@ -590,16 +654,12 @@
 	
 	<!-- Create the server jar file -->
 	<target name="dist.bin.impl">
-    <mkdir dir="${project.dir}/${dist.dir}/" />
+    <mkdir dir="${project.dir}/${dist.dir}" />
+    <mkdir dir="${project.dir}/${meta.dir}" />
     <delete file="${project.dir}/${dist.dir}/${project.jar}" failonerror="false" />
     <jar jarfile="${project.dir}/${dist.dir}/${project.jar}">
       <fileset dir="${project.dir}/${bin.dir}" excludes="${dist.bin.excludes}" includes="${dist.bin.includes}"/>
-<!--
-      <fileset dir="${project.dir}/${bin.dir}">
-        <include name="**/*.*"/>
-      </fileset>
--->
-      <fileset dir="${project.dir}/${project.name}">
+      <fileset dir="${project.dir}/${meta.dir}">
         <include name="META-INF/ejb-jar.xml"/>
       	<include name="META-INF/ejb-rolegroup.xml"/>
        	<include name="META-INF/jboss.xml"/>
@@ -626,21 +686,18 @@
     <mkdir dir="${project.dir}/${rawdist}/WEB-INF/classes"/>
     <mkdir dir="${project.dir}/${rawdist}/WEB-INF/lib"/>
     <copy todir="${project.dir}/${rawdist}">
-      <fileset dir="${project.dir}/${project.name}">
+      <fileset dir="${project.dir}/${meta.dir}">
         <include name="**/*.*"/>
-        <exclude name="**/jsp_servlet/*.class"/>
-        <exclude name="**/build.xml"/>
-        <exclude name="**/deploy.xml"/>
-        <exclude name="**/build.properties"/>
-        <exclude name="**/servers.xml"/>
-        <exclude name="**/targets.xml"/>
-        <exclude name="**/*.war"/>
       </fileset>
     </copy>
     <copy todir="${project.dir}/${rawdist}/WEB-INF/classes">
       <fileset dir="${project.dir}/${bin.dir}">
         <include name="**/*.*"/>
-        <exclude name="**/jsp_servlet/*.class"/>
+      </fileset>
+    </copy>
+    <copy todir="${project.dir}/${rawdist}/WEB-INF/lib">
+      <fileset dir="${project.dir}/${lib.dir}">
+        <include name="**/*.*"/>
       </fileset>
     </copy>
   	<jar jarfile="${project.dir}/${dist.dir}/${project.war}" basedir="${rawdist}"/>

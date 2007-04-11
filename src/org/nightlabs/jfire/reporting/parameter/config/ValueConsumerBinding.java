@@ -19,7 +19,10 @@ import org.nightlabs.jfire.reporting.parameter.id.ValueProviderID;
  *		detachable = "true"
  *		table="JFireReporting_ValueConsumerBinding"
  *
- * @jdo.create-objectid-class field-order="organisationID, valueConsumerBindingID"
+ * @jdo.create-objectid-class 
+ * 		field-order="organisationID, valueConsumerBindingID"
+ * 		include-imports="id/ValueConsumerBinding.imports.inc"
+ *		include-body="id/ValueConsumerBinding.body.inc"	  
  * 
  * @jdo.implements name="org.nightlabs.jfire.reporting.parameter.config.ValueConsumer"
  * 

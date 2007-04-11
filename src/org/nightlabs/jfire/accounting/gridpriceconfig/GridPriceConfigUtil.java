@@ -36,6 +36,7 @@ import java.util.Set;
 import javax.jdo.FetchPlan;
 import javax.jdo.JDODetachedFieldAccessException;
 import javax.jdo.PersistenceManager;
+import javax.jdo.Query;
 
 import org.apache.log4j.Logger;
 import org.nightlabs.jdo.NLJDOHelper;
@@ -46,6 +47,7 @@ import org.nightlabs.jfire.accounting.Tariff;
 import org.nightlabs.jfire.accounting.priceconfig.AffectedProductType;
 import org.nightlabs.jfire.accounting.priceconfig.FetchGroupsPriceConfig;
 import org.nightlabs.jfire.accounting.priceconfig.PriceConfigUtil;
+import org.nightlabs.jfire.accounting.priceconfig.id.PriceConfigID;
 import org.nightlabs.jfire.store.ProductType;
 import org.nightlabs.jfire.trade.CustomerGroup;
 
@@ -64,6 +66,28 @@ public class GridPriceConfigUtil
 	private static final Logger logger = Logger.getLogger(GridPriceConfigUtil.class);
 
 	protected GridPriceConfigUtil() { }
+
+	/**
+	 * This method is a workaround-method as we cannot tag certain fields as not-null-fields, because
+	 * this causes errors during replication to other datastores. Therefore, we call this method after
+	 * persisting one or more price-configs before the transaction is committed.
+	 *
+	 * @param pm The door to the datastore ;-)
+	 */
+	public static void assertConsistency(PersistenceManager pm, Set<PriceConfigID> priceConfigIDs)
+	{
+		long start = System.currentTimeMillis();
+		Query q = pm.newQuery(PriceCoordinate.class);
+		q.setResult("count(this.priceCoordinateID)");
+		q.setFilter("this.priceConfig == null");
+		Long count = (Long) q.execute();
+		if (count.intValue() != 0)
+			throw new IllegalStateException("Datastore is inconsistent! Found " + count + " priceCoordinates with PriceCoordinate.priceConfig == null!");
+
+		long duration = System.currentTimeMillis() - start;
+		if (duration > 1000)
+			Logger.getLogger(GridPriceConfig.class).warn("Consistency check took very long: " + duration + " msec", new Exception());
+	}
 
 //	/**
 //	 * @see org.nightlabs.jfire.base.BaseSessionBeanImpl#setSessionContext(javax.ejb.SessionContext)
@@ -244,6 +268,8 @@ public class GridPriceConfigUtil
 		}
 
 		logger.info("storePriceConfig: Recalculated prices for " + recalculatedCounter + " ProductTypes in " + (System.currentTimeMillis() - startDT) + " msec. // affectedProductTypes.size()=" + affectedProductTypes.size() + " // skippedBecauseAlreadyProcessed=" + skippedBecauseAlreadyProcessed);
+
+		assertConsistency(pm, NLJDOHelper.getObjectIDSet(priceConfigs));
 
 		if (!get)
 			return null;

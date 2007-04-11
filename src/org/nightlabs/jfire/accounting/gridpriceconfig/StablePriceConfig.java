@@ -356,12 +356,13 @@ implements IPackagePriceConfig, IResultPriceConfig
 		if (paramCount != 1)
 			throw new IllegalArgumentException("Less or more than one parameter defined!");
 
-		if (_customerGroup != null && !containsCustomerGroup(_customerGroup))
-			throw new IllegalArgumentException("Given CustomerGroup is not a registered parameter!");
-		if (_tariff != null && !containsTariff(_tariff))
-			throw new IllegalArgumentException("Given Tariff is not a registered parameter!");
-		if (_currency != null && !containsCurrency(_currency))
-			throw new IllegalArgumentException("Given Currency is not a registered parameter!");
+// methods like removeCurrency(String) remove first from the map and then call this method - therefore, containsCurrency(...) or similar methods return always false.
+//		if (_customerGroup != null && !containsCustomerGroup(_customerGroup))
+//			throw new IllegalArgumentException("Given CustomerGroup is not a registered parameter!");
+//		if (_tariff != null && !containsTariff(_tariff))
+//			throw new IllegalArgumentException("Given Tariff is not a registered parameter!");
+//		if (_currency != null && !containsCurrency(_currency))
+//			throw new IllegalArgumentException("Given Currency is not a registered parameter!");
 
 		Collection customerGroups = _customerGroup == null ? getCustomerGroups() : new SingleObjectList(_customerGroup);
 		Collection tariffs = _tariff == null ? getTariffs() : new SingleObjectList(_tariff);

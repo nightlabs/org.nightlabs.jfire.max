@@ -88,7 +88,9 @@ public class PriceCoordinate implements Serializable, StoreCallback, IPriceCoord
 	private String currencyID;
 
 	/**
-	 * @jdo.field persistence-modifier="persistent" null-value="exception"
+	 * @!jdo.field persistence-modifier="persistent" null-value="exception"
+	 * TODO the above null-value="exception" is correct but causes a problem when replicating to another datastore due to a jpox bug
+	 * @jdo.field persistence-modifier="persistent"
 	 */
 	private PriceConfig priceConfig;
 

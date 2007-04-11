@@ -124,7 +124,7 @@ public interface IPriceConfig
 	/**
 	 * @return Returns the name.
 	 */
-	public PriceConfigName getName();
+	PriceConfigName getName();
 
 	/**
 	 * This method must create a new instance of <tt>ArticlePrice</tt> which itself
@@ -166,7 +166,7 @@ public interface IPriceConfig
 	 *
 	 * @return Returns a new instance of <tt>ArticlePrice</tt>
 	 */
-	public ArticlePrice createNestedArticlePrice(
+	ArticlePrice createNestedArticlePrice(
 			IPackagePriceConfig topLevelPriceConfig,
 			Article article,
 			LinkedList priceConfigStack,
@@ -187,7 +187,7 @@ public interface IPriceConfig
 	 * {@link PriceConfigUtil#createNestedArticlePrice(IPackagePriceConfig, IPriceConfig, Article, LinkedList, ArticlePrice, ArticlePrice, LinkedList, NestedProductType, LinkedList, Product, LinkedList, Price)}!
 	 * </p>
 	 */
-	public ArticlePrice createNestedArticlePrice(
+	ArticlePrice createNestedArticlePrice(
 			IPackagePriceConfig topLevelPriceConfig,
 			Article article,
 			LinkedList priceConfigStack,
@@ -198,5 +198,4 @@ public interface IPriceConfig
 			LinkedList nestedProductTypeStack,
 			Product nestedProduct,
 			LinkedList productStack);
-
 }

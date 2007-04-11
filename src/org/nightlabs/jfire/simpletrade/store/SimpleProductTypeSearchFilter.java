@@ -29,6 +29,7 @@ package org.nightlabs.jfire.simpletrade.store;
 import java.util.Map;
 import java.util.Set;
 
+import org.nightlabs.jfire.organisation.LocalOrganisation;
 import org.nightlabs.jfire.store.ProductTypeSearchFilter;
 
 /**
@@ -55,7 +56,9 @@ public class SimpleProductTypeSearchFilter extends ProductTypeSearchFilter {
 	protected void prepareQuery(Set<Class> imports, StringBuffer vars,
 			StringBuffer filter, StringBuffer params, Map<String, Object> paramMap,
 			StringBuffer result) {
-		filter.append("this.published && this.saleable");
+		filter.append("this.published && this.saleable && this.organisationID == myOrganisationID");
+		params.append("java.lang.String myOrganisationID");
+		paramMap.put("myOrganisationID", LocalOrganisation.getLocalOrganisation(getPersistenceManager()).getOrganisationID());
 	}
 
 }

@@ -764,30 +764,31 @@ implements SessionBean
 
 				// we simply touch every field we need - the others should not be loaded and thus not detached then.
 				simpleProductType.getName().getTexts();
-//				simpleProductType.getPackagePriceConfig();
+				simpleProductType.getPackagePriceConfig();
 				simpleProductType.getOwner();
 				simpleProductType.getExtendedProductType();
 
 				// and detach
 				simpleProductType = (SimpleProductType) pm.detachCopy(simpleProductType);
 
-//				// TODO load CustomerGroups of the other customer-organisation
-//				// and remove all prices from the package price config that are for
-//				// different customer groups (not available to the client)
-//				if (simpleProductType.getPackagePriceConfig() == null) {
-//					// nothing to do
-//				}
-//				else if (simpleProductType.getPackagePriceConfig() instanceof GridPriceConfig) {
-//					Set<CustomerGroupID> unavailableCustomerGroupIDs = new HashSet<CustomerGroupID>();
-//					GridPriceConfig gridPriceConfig = (GridPriceConfig) simpleProductType.getPackagePriceConfig();
-//					for (CustomerGroup customerGroup : gridPriceConfig.getCustomerGroups()) {
-//					}
-//	
-//					for (CustomerGroupID customerGroupID : unavailableCustomerGroupIDs)
-//						gridPriceConfig.removeCustomerGroup(customerGroupID.organisationID, customerGroupID.customerGroupID);
-//				}
-//				else
-//					throw new IllegalStateException("SimpleProductType.packagePriceConfig unsupported! " + productTypeID);
+				// TODO load CustomerGroups of the other customer-organisation
+				// and remove all prices from the package price config that are for
+				// different customer groups (not available to the client)
+				if (simpleProductType.getPackagePriceConfig() == null) {
+					// nothing to do
+				}
+				else if (simpleProductType.getPackagePriceConfig() instanceof GridPriceConfig) {
+					Set<CustomerGroupID> unavailableCustomerGroupIDs = new HashSet<CustomerGroupID>();
+					GridPriceConfig gridPriceConfig = (GridPriceConfig) simpleProductType.getPackagePriceConfig();
+					for (CustomerGroup customerGroup : gridPriceConfig.getCustomerGroups()) {
+						
+					}
+	
+					for (CustomerGroupID customerGroupID : unavailableCustomerGroupIDs)
+						gridPriceConfig.removeCustomerGroup(customerGroupID.organisationID, customerGroupID.customerGroupID);
+				}
+				else
+					throw new IllegalStateException("SimpleProductType.packagePriceConfig unsupported! " + productTypeID);
 
 				res.add(simpleProductType);
 			}

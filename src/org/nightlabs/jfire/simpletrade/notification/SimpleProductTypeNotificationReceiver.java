@@ -4,12 +4,16 @@ import java.util.Collection;
 import java.util.HashSet;
 import java.util.Hashtable;
 import java.util.Iterator;
+import java.util.Set;
 
+import javax.jdo.JDOHelper;
 import javax.jdo.PersistenceManager;
 
 import org.apache.log4j.Logger;
 import org.nightlabs.annotation.Implement;
 import org.nightlabs.jdo.NLJDOHelper;
+import org.nightlabs.jfire.accounting.gridpriceconfig.GridPriceConfigUtil;
+import org.nightlabs.jfire.accounting.priceconfig.id.PriceConfigID;
 import org.nightlabs.jfire.base.Lookup;
 import org.nightlabs.jfire.jdo.notification.DirtyObjectID;
 import org.nightlabs.jfire.jdo.notification.JDOLifecycleState;
@@ -79,14 +83,41 @@ extends NotificationReceiver
 		SimpleTradeManager simpleTradeManager = SimpleTradeManagerUtil.getHome(initialContextProperties).create();
 		Collection productTypes = simpleTradeManager.getSimpleProductTypesForReseller(productTypeIDs_load, false);
 
+		Set<PriceConfigID> priceConfigIDs = new HashSet<PriceConfigID>();
+
 		int previousProductTypesSize = productTypes.size();
 		while (!productTypes.isEmpty()) {
-			for (Iterator it = productTypes.iterator(); it.hasNext(); ) {
-				SimpleProductType simpleProductType = (SimpleProductType) it.next();
-
+			for (Iterator itPT = productTypes.iterator(); itPT.hasNext(); ) {
+				SimpleProductType simpleProductType = (SimpleProductType) itPT.next();
 				if (simpleProductType.getExtendedProductType() == null || NLJDOHelper.exists(pm, simpleProductType.getExtendedProductType())) {
-					pm.makePersistent(simpleProductType);
-					it.remove();
+
+//					// TODO remove this JPOX bug workaround
+//					try {
+//						if (simpleProductType.getPackagePriceConfig() != null) {
+//							StablePriceConfig pc = (StablePriceConfig) Utils.cloneSerializable(simpleProductType.getPackagePriceConfig());
+//							for (Iterator itCurr = simpleProductType.getPackagePriceConfig().getCurrencies().iterator(); itCurr.hasNext(); ) {
+//								Currency currency = (Currency) itCurr.next();
+//								pc.removeCurrency(currency.getCurrencyID());
+//							}
+//							// now there should not exist any PriceCoordinate anymore in pc
+//							pm.makePersistent(pc);
+//						}
+//					} catch (Throwable t) {
+//						logger.warn("Workaround for JPOX bug failed!", t);
+//					}
+//					// TODO end workaround
+
+					if (simpleProductType.getPackagePriceConfig() != null)
+						priceConfigIDs.add((PriceConfigID) JDOHelper.getObjectId(simpleProductType.getPackagePriceConfig()));
+
+					try {
+						simpleProductType = (SimpleProductType) pm.makePersistent(simpleProductType);
+					} catch (Exception x) {
+						logger.error("Persisting SimpleProductType \"" + simpleProductType.getPrimaryKey() + "\" failed!", x);
+						throw x;
+					}
+
+					itPT.remove();
 				}
 			}
 
@@ -95,6 +126,9 @@ extends NotificationReceiver
 
 			previousProductTypesSize = productTypes.size();
 		}
+
+		if (!priceConfigIDs.isEmpty())
+			GridPriceConfigUtil.assertConsistency(pm, priceConfigIDs);
 
 		if (!productTypes.isEmpty()) {
 			logger.error("Could not persist the following SimpleProductTypes because of missing extendedProductType:");

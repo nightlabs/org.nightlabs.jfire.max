@@ -1,13 +1,16 @@
 package org.nightlabs.jfire.simpletrade.notification;
 
+import java.rmi.RemoteException;
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.Hashtable;
 import java.util.Iterator;
 import java.util.Set;
 
+import javax.ejb.CreateException;
 import javax.jdo.JDOHelper;
 import javax.jdo.PersistenceManager;
+import javax.naming.NamingException;
 
 import org.apache.log4j.Logger;
 import org.nightlabs.annotation.Implement;
@@ -73,15 +76,20 @@ extends NotificationReceiver
 			else
 				productTypeIDs_load.add(dirtyObjectID.getObjectID());
 		}
+		replicateSimpleProductTypes(notificationBundle.getOrganisationID(), productTypeIDs_load, productTypeIDs_delete);
+	}
 
+	public void replicateSimpleProductTypes(String emitterOrganisationID, Set productTypeIDs_load, Set productTypeIDs_delete)
+	throws NamingException, RemoteException, CreateException
+	{
 		if (productTypeIDs_load.isEmpty())
 			return;
 
 		PersistenceManager pm = getPersistenceManager();
 
-		Hashtable initialContextProperties = Lookup.getInitialContextProperties(pm, notificationBundle.getOrganisationID());
+		Hashtable initialContextProperties = Lookup.getInitialContextProperties(pm, emitterOrganisationID);
 		SimpleTradeManager simpleTradeManager = SimpleTradeManagerUtil.getHome(initialContextProperties).create();
-		Collection productTypes = simpleTradeManager.getSimpleProductTypesForReseller(productTypeIDs_load, false);
+		Collection productTypes = simpleTradeManager.getSimpleProductTypesForReseller(productTypeIDs_load);
 
 		Set<PriceConfigID> priceConfigIDs = new HashSet<PriceConfigID>();
 
@@ -90,23 +98,6 @@ extends NotificationReceiver
 			for (Iterator itPT = productTypes.iterator(); itPT.hasNext(); ) {
 				SimpleProductType simpleProductType = (SimpleProductType) itPT.next();
 				if (simpleProductType.getExtendedProductType() == null || NLJDOHelper.exists(pm, simpleProductType.getExtendedProductType())) {
-
-//					// TODO remove this JPOX bug workaround
-//					try {
-//						if (simpleProductType.getPackagePriceConfig() != null) {
-//							StablePriceConfig pc = (StablePriceConfig) Utils.cloneSerializable(simpleProductType.getPackagePriceConfig());
-//							for (Iterator itCurr = simpleProductType.getPackagePriceConfig().getCurrencies().iterator(); itCurr.hasNext(); ) {
-//								Currency currency = (Currency) itCurr.next();
-//								pc.removeCurrency(currency.getCurrencyID());
-//							}
-//							// now there should not exist any PriceCoordinate anymore in pc
-//							pm.makePersistent(pc);
-//						}
-//					} catch (Throwable t) {
-//						logger.warn("Workaround for JPOX bug failed!", t);
-//					}
-//					// TODO end workaround
-
 					if (simpleProductType.getPackagePriceConfig() != null)
 						priceConfigIDs.add((PriceConfigID) JDOHelper.getObjectId(simpleProductType.getPackagePriceConfig()));
 
@@ -114,7 +105,7 @@ extends NotificationReceiver
 						simpleProductType = (SimpleProductType) pm.makePersistent(simpleProductType);
 					} catch (Exception x) {
 						logger.error("Persisting SimpleProductType \"" + simpleProductType.getPrimaryKey() + "\" failed!", x);
-						throw x;
+						throw x instanceof RuntimeException ? (RuntimeException)x : new RuntimeException(x);
 					}
 
 					itPT.remove();

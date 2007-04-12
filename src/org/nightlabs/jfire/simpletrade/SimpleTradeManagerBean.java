@@ -56,6 +56,7 @@ import org.nightlabs.jdo.NLJDOHelper;
 import org.nightlabs.jdo.moduleregistry.ModuleMetaData;
 import org.nightlabs.jfire.accounting.Price;
 import org.nightlabs.jfire.accounting.Tariff;
+import org.nightlabs.jfire.accounting.TariffMapping;
 import org.nightlabs.jfire.accounting.gridpriceconfig.FormulaPriceConfig;
 import org.nightlabs.jfire.accounting.gridpriceconfig.GridPriceConfig;
 import org.nightlabs.jfire.accounting.gridpriceconfig.GridPriceConfigUtil;
@@ -547,7 +548,7 @@ implements SessionBean
 					if (ProductType.PACKAGE_NATURE_OUTER == pt.getPackageNature() && pt.getPackagePriceConfig() != null) {
 						logger.info("storeProductType: price-calculation starting for: " + JDOHelper.getObjectId(pt));
 
-						PriceCalculator priceCalculator = new PriceCalculator(pt);
+						PriceCalculator priceCalculator = new PriceCalculator(pt, TariffMapping.getTariffMappings(pm));
 						priceCalculator.preparePriceCalculation();
 						priceCalculator.calculatePrices();
 
@@ -741,11 +742,32 @@ implements SessionBean
 		}
 	}
 
+
 	/**
 	 * @ejb.interface-method
+	 * @ejb.transaction type="Supports"
 	 * @ejb.permission role-name="_Guest_"
 	 */
-	public List<SimpleProductType> getSimpleProductTypesForReseller(Collection<ProductTypeID> productTypeIDs, boolean includeChildrenRecursively)
+	public Set<ProductTypeID> getPublishedSimpleProductTypeIDs()
+	{
+		PersistenceManager pm = getPersistenceManager();
+		try {
+			Query q = pm.newQuery(SimpleProductType.class);
+			q.setResult("JDOHelper.getObjectId(this)");
+			q.setFilter("this.published");
+			return new HashSet<ProductTypeID>((Collection<? extends ProductTypeID>) q.execute());
+		} finally {
+			pm.close();
+		}
+	}
+
+
+	/**
+	 * @ejb.interface-method
+	 * @ejb.transaction type="Supports"
+	 * @ejb.permission role-name="_Guest_"
+	 */
+	public List<SimpleProductType> getSimpleProductTypesForReseller(Collection<ProductTypeID> productTypeIDs)
 	{
 		PersistenceManager pm = getPersistenceManager();
 		try {
@@ -803,39 +825,43 @@ implements SessionBean
 	 * @ejb.permission role-name="_Guest_"
 	 * @ejb.transaction type="Required"
 	 */
-	public SimpleProductType importSimpleProductTypeForReselling(ProductTypeID productTypeID, String[] fetchGroups, int maxFetchDepth)
+	public void importSimpleProductTypesForReselling(String emitterOrganisationID)
 	throws JFireException
 	{
 		try {
 			PersistenceManager pm = getPersistenceManager();
 			try {
-				Hashtable initialContextProperties = getInitialContextProperties(productTypeID.organisationID);
+				Hashtable initialContextProperties = getInitialContextProperties(emitterOrganisationID);
 
 				PersistentNotificationEJB persistentNotificationEJB = PersistentNotificationEJBUtil.getHome(initialContextProperties).create();
 				SimpleProductTypeNotificationFilter notificationFilter = new SimpleProductTypeNotificationFilter(
-						productTypeID.organisationID, SubscriptionUtil.SUBSCRIBER_TYPE_ORGANISATION, getOrganisationID(),
+						emitterOrganisationID, SubscriptionUtil.SUBSCRIBER_TYPE_ORGANISATION, getOrganisationID(),
 						SimpleProductTypeNotificationFilter.class.getName());
 				SimpleProductTypeNotificationReceiver notificationReceiver = new SimpleProductTypeNotificationReceiver(notificationFilter);
 				notificationReceiver = (SimpleProductTypeNotificationReceiver) pm.makePersistent(notificationReceiver);
 				persistentNotificationEJB.storeNotificationFilter(notificationFilter, false, null, 1);
 
-				ArrayList<ProductTypeID> productTypeIDs = new ArrayList<ProductTypeID>(1);
-				productTypeIDs.add(productTypeID);
+//				ArrayList<ProductTypeID> productTypeIDs = new ArrayList<ProductTypeID>(1);
+//				productTypeIDs.add(productTypeID);
 
 				SimpleTradeManager simpleTradeManager = SimpleTradeManagerUtil.getHome(initialContextProperties).create();
 
-				Collection<SimpleProductType> productTypes = simpleTradeManager.getSimpleProductTypesForReseller(productTypeIDs, true);
-				if (productTypes.size() != 1)
-					throw new IllegalStateException("productTypes.size() != 1");
+				Set<ProductTypeID> productTypeIDs = simpleTradeManager.getPublishedSimpleProductTypeIDs();
+				Collection<SimpleProductType> productTypes = simpleTradeManager.getSimpleProductTypesForReseller(productTypeIDs);
 
-				// currently we only support subscribing root-producttypes
-				for (SimpleProductType productType : productTypes) {
-					if (productType.getExtendedProductType() != null)
-						throw new UnsupportedOperationException("The given SimpleProductType is not a root node (not yet supported!): " + productTypeID);
-				}
+				notificationReceiver.replicateSimpleProductTypes(emitterOrganisationID, productTypeIDs, new HashSet<ProductTypeID>(0));
 
-				productTypes = pm.makePersistentAll(productTypes);
-				return productTypes.iterator().next();
+//				if (productTypes.size() != 1)
+//					throw new IllegalStateException("productTypes.size() != 1");
+//
+//				// currently we only support subscribing root-producttypes
+//				for (SimpleProductType productType : productTypes) {
+//					if (productType.getExtendedProductType() != null)
+//						throw new UnsupportedOperationException("The given SimpleProductType is not a root node (not yet supported!): " + productTypeID);
+//				}
+//
+//				productTypes = pm.makePersistentAll(productTypes);
+//				return productTypes.iterator().next();
 			} finally {
 				pm.close();
 			}

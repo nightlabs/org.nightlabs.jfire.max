@@ -32,6 +32,7 @@ import javax.jdo.PersistenceManager;
 import javax.jdo.Query;
 
 import org.nightlabs.annotation.Implement;
+import org.nightlabs.jfire.accounting.TariffMapping;
 import org.nightlabs.jfire.accounting.gridpriceconfig.PriceCalculationException;
 import org.nightlabs.jfire.accounting.gridpriceconfig.PriceCalculator;
 import org.nightlabs.jfire.security.User;
@@ -130,7 +131,7 @@ public class SimpleProductType extends ProductType
 	@Implement
 	protected void calculatePrices()
 	{
-		PriceCalculator priceCalculator = new PriceCalculator(this);
+		PriceCalculator priceCalculator = new PriceCalculator(this, TariffMapping.getTariffMappings(getPersistenceManager())); // this method is never called when this instance is detached
 		priceCalculator.preparePriceCalculation();
 		try {
 			priceCalculator.calculatePrices();

@@ -49,6 +49,7 @@ import java.io.Serializable;
  * 
  * @jdo.create-objectid-class
  *		field-order="organisationID, tariffID"
+ *		include-body="id/TariffID.body.inc"
  *
  * @jdo.fetch-group name="Tariff.name" fields="name"
  * @jdo.fetch-group name="Tariff.this" fetch-groups="default" fields="name"

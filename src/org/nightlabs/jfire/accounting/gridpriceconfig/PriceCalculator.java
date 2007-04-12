@@ -26,6 +26,8 @@
 
 package org.nightlabs.jfire.accounting.gridpriceconfig;
 
+import java.util.Collection;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.LinkedList;
@@ -40,11 +42,18 @@ import org.mozilla.javascript.ScriptableObject;
 import org.mozilla.javascript.Undefined;
 import org.nightlabs.ModuleException;
 import org.nightlabs.jfire.accounting.PriceFragmentType;
+import org.nightlabs.jfire.accounting.Tariff;
+import org.nightlabs.jfire.accounting.TariffMapper;
+import org.nightlabs.jfire.accounting.TariffMapping;
+import org.nightlabs.jfire.accounting.id.TariffID;
 import org.nightlabs.jfire.accounting.priceconfig.IPriceConfig;
 import org.nightlabs.jfire.accounting.priceconfig.PriceConfig;
 import org.nightlabs.jfire.idgenerator.IDGenerator;
 import org.nightlabs.jfire.store.NestedProductType;
 import org.nightlabs.jfire.store.ProductType;
+import org.nightlabs.jfire.trade.CustomerGroup;
+import org.nightlabs.jfire.trade.id.CustomerGroupID;
+import org.nightlabs.util.Utils;
 
 /**
  * @author Marco Schulze - marco at nightlabs dot de
@@ -60,19 +69,36 @@ public class PriceCalculator
 	private IResultPriceConfig packagePriceConfig;
 
 	/**
-	 * key: String productTypePK
+	 * key: String innerProductTypePK
 	 * value: NestedProductType
 	 */
 	protected Map virtualPackagedProductTypes = new HashMap();
+
+	private Collection<TariffMapping> tariffMappings;
+
+	public Collection<TariffMapping> getTariffMappings()
+	{
+		return tariffMappings;
+	}
+
+	private TariffMapper tariffMapper;
+
+	public TariffMapper getTariffMapper()
+	{
+		return tariffMapper;
+	}
 
 	/**
 	 * @param packageProductType The <tt>ProductType</tt> which encloses all the other <tt>ProductType</tt>s and
 	 * which has a {@link IResultPriceConfig} assigned as
 	 * {@link ProductType#packagePriceConfig}.
+	 * @param tariffMappings TODO
 	 */
-	public PriceCalculator(ProductType packageProductType)
+	public PriceCalculator(ProductType packageProductType, Collection<TariffMapping> tariffMappings)
 	{
 		this.packageProductType = packageProductType;
+		this.tariffMappings = Collections.unmodifiableCollection(tariffMappings);
+		this.tariffMapper = new TariffMapper(tariffMappings);
 		if (packageProductType.isPackageInner())
 			throw new IllegalArgumentException("packageProductType.isPackageInner() is true! Cannot calculate prices if the carrier ProductType is not a package!");
 
@@ -385,9 +411,25 @@ public class PriceCalculator
 			}
 		}
 	}
-	
-	
-	
+
+	protected IPriceCoordinate createMappedLocalPriceCoordinate(
+			NestedProductType nestedProductType, PriceFragmentType priceFragmentType, IPriceCoordinate localPriceCoordinate)
+	{
+		ProductType innerProductType = nestedProductType.getInnerProductType();
+		if (nestedProductType.getPackageProductTypeOrganisationID().equals(nestedProductType.getInnerProductTypeOrganisationID()))
+			return localPriceCoordinate;
+
+		CustomerGroupID orgCustomerGroupID = CustomerGroupID.create(localPriceCoordinate.getCustomerGroupPK());
+
+		TariffID orgTariffID = TariffID.create(localPriceCoordinate.getTariffPK());
+		TariffID newTariffID = getTariffMapper().getTariffIDForProductType(orgTariffID, nestedProductType.getInnerProductTypeOrganisationID(), true);
+
+		IPriceCoordinate res = Utils.cloneSerializable(localPriceCoordinate);
+		res.setTariffPK(Tariff.getPrimaryKey(newTariffID.organisationID, newTariffID.tariffID));
+		res.setCustomerGroupPK(CustomerGroup.getPrimaryKey(newTariffID.organisationID, orgCustomerGroupID.customerGroupID)); // TODO we MUST have a mapping for this!!!
+		return res;
+	}
+
 	/**
 	 * @return Returns a PriceCell which calculated or <tt>null</tt>.
 	 */
@@ -398,6 +440,9 @@ public class PriceCalculator
 //		throws ModuleException
 	{
 		ProductType innerProductType = packagedProductType.getInnerProductType();
+
+		localPriceCoordinate = createMappedLocalPriceCoordinate(packagedProductType, priceFragmentType, localPriceCoordinate);
+
 		IPriceConfig innerPriceConfig;
 		if (innerProductType.isPackageOuter() && innerProductType != packageProductType)
 			innerPriceConfig = innerProductType.getPackagePriceConfig();
@@ -433,7 +478,7 @@ public class PriceCalculator
 		// that provides only one price for all situations or a TariffDependentPriceConfig...
 		throw new UnsupportedOperationException("Unsupported IPriceConfig in packaged ProductType \""+innerProductType.getPrimaryKey()+"\"!");
 	}
-	
+
 	protected IAbsolutePriceCoordinate createAbsolutePriceCoordinate(
 			IPriceCoordinate priceCoordinate,
 			ProductType productType, PriceFragmentType priceFragmentType)
@@ -581,7 +626,9 @@ public class PriceCalculator
 						else
 							throw new InvalidResultException(absolutePriceCoordinate, "The formula returns a result which is not a number! The last line in the formula is the result. Check, whether this is what you want to return.");
 
-// TODO To multiply here doesn't work, because the quantity is then multiple times multiplicated multiple times.
+// Note: To multiply here doesn't work, because the quantity would then be multiplicated multiple times.
+// Thus, within the scope of one ProductType, the prices are always for ONE item - even if there are multiple
+// in the package. Marco.
 //						res = packagedProductType.getQuantity() * res;
 
 						if (logger.isDebugEnabled())

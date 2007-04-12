@@ -154,6 +154,19 @@ public class AbsolutePriceCoordinate extends PriceCoordinate implements IAbsolut
 		return productTypePK;
 	}
 
+//	/**
+//	 * @jdo.field persistence-modifier="none"
+//	 */
+//	private transient String productTypeOrganisationID = null;
+//
+//	public String getProductTypeOrganisationID()
+//	{
+//		if (productTypeOrganisationID == null)
+//			productTypeOrganisationID = getFirstPartOfPrimaryKeyString(productTypePK);
+//
+//		return productTypeOrganisationID;
+//	}
+
 	@Override
 	public String toString()
 	{

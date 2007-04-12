@@ -70,6 +70,7 @@ import org.nightlabs.jfire.accounting.id.CurrencyID;
 import org.nightlabs.jfire.accounting.id.InvoiceID;
 import org.nightlabs.jfire.accounting.id.InvoiceLocalID;
 import org.nightlabs.jfire.accounting.id.PriceFragmentTypeID;
+import org.nightlabs.jfire.accounting.id.TariffID;
 import org.nightlabs.jfire.accounting.pay.ModeOfPayment;
 import org.nightlabs.jfire.accounting.pay.ModeOfPaymentConst;
 import org.nightlabs.jfire.accounting.pay.ModeOfPaymentFlavour;
@@ -420,14 +421,107 @@ public abstract class AccountingManagerBean
 	}
 
 	/**
-	 * @throws ModuleException
-	 *
 	 * @ejb.interface-method
-	 * @ejb.transaction type = "Required"
+	 * @ejb.transaction type="Supports"
 	 * @ejb.permission role-name="_Guest_"
 	 */
-	public Collection getTariffs(String[] fetchGroups, int maxFetchDepth)
-		throws ModuleException
+	public Set<TariffMappingID> getTariffMappingIDs()
+	{
+		PersistenceManager pm = getPersistenceManager();
+		try {
+			Query q = pm.newQuery(TariffMapping.class);
+			q.setResult("JDOHelper.getObjectId(this)");
+			return new HashSet<TariffMappingID>((Collection<? extends TariffMappingID>) q.execute());
+		} finally {
+			pm.close();
+		}
+	}
+
+	/**
+	 * @ejb.interface-method
+	 * @ejb.transaction type="Supports"
+	 * @ejb.permission role-name="_Guest_"
+	 */
+	@SuppressWarnings("unchecked")
+	public Collection<TariffMapping> getTariffMappings(Collection<TariffMappingID> tariffMappingIDs, String[] fetchGroups, int maxFetchDepth)
+	{
+		PersistenceManager pm = getPersistenceManager();
+		try {
+			return NLJDOHelper.getDetachedObjectList(pm, tariffMappingIDs, TariffMapping.class, fetchGroups, maxFetchDepth);
+		} finally {
+			pm.close();
+		}
+	}
+
+	/**
+	 * @ejb.interface-method
+	 * @ejb.transaction type="Required"
+	 * @ejb.permission role-name="_Guest_"
+	 */
+	public TariffMapping createTariffMapping(TariffID partnerTariffID, TariffID localTariffID, boolean get, String[] fetchGroups, int maxFetchDepth)
+	{
+		PersistenceManager pm = getPersistenceManager();
+		try {
+			pm.getFetchPlan().setMaxFetchDepth(maxFetchDepth);
+			if (fetchGroups != null)
+				pm.getFetchPlan().setGroups(fetchGroups);
+
+			TariffMapping tm = TariffMapping.createTariffMapping(pm, partnerTariffID, localTariffID);
+			if (!get)
+				return null;
+
+			return (TariffMapping) pm.detachCopy(tm);
+		} finally {
+			pm.close();
+		}
+	}
+
+	/**
+	 * @param organisationID <code>null</code> in order to get all tariffs (no filtering). non-<code>null</code> to filter by <code>organisationID</code>.
+	 * @param inverse This applies only if <code>organisationID != null</code>. If <code>true</code>, it will return all {@link TariffID}s where the <code>organisationID</code>
+	 *		is NOT the one passed as parameter <code>organisationID</code>.
+	 *
+	 * @ejb.interface-method
+	 * @ejb.transaction type="Supports"
+	 * @ejb.permission role-name="_Guest_"
+	 */
+	public Set<TariffID> getTariffIDs(String organisationID, boolean inverse)
+	{
+		PersistenceManager pm = getPersistenceManager();
+		try {
+			Query q = pm.newQuery(Tariff.class);
+			q.setResult("JDOHelper.getObjectId(this)");
+			if (organisationID != null)
+				q.setFilter("this.organisationID " + (inverse ? "!=" : "==") + " :organisationID");
+
+			return new HashSet<TariffID>((Collection<? extends TariffID>) q.execute(organisationID));
+		} finally {
+			pm.close();
+		}
+	}
+
+	/**
+	 * @ejb.interface-method
+	 * @ejb.transaction type="Supports"
+	 * @ejb.permission role-name="_Guest_"
+	 */
+	@SuppressWarnings("unchecked")
+	public Collection<Tariff> getTariffs(Collection<TariffID> tariffIDs, String[] fetchGroups, int maxFetchDepth)
+	{
+		PersistenceManager pm = getPersistenceManager();
+		try {
+			return NLJDOHelper.getDetachedObjectList(pm, tariffIDs, Tariff.class, fetchGroups, maxFetchDepth);
+		} finally {
+			pm.close();
+		}
+	}
+
+	/**
+	 * @ejb.interface-method
+	 * @ejb.transaction type="Supports"
+	 * @ejb.permission role-name="_Guest_"
+	 */
+	public Collection<Tariff> getTariffs(String[] fetchGroups, int maxFetchDepth)
 	{
 		PersistenceManager pm = getPersistenceManager();
 		try {
@@ -436,10 +530,10 @@ public abstract class AccountingManagerBean
 			if (fetchGroups != null)
 				fetchPlan.setGroups(fetchGroups);
 
-			Collection res = new ArrayList();
+			Collection<Tariff> res = new ArrayList<Tariff>();
 			for (Iterator it = pm.getExtent(Tariff.class, true).iterator(); it.hasNext(); ) {
 				Tariff t = (Tariff)it.next();
-				res.add(pm.detachCopy(t));
+				res.add((Tariff) pm.detachCopy(t));
 			}
 
 			return res;

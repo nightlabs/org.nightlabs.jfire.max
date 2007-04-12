@@ -28,6 +28,8 @@ package org.nightlabs.jfire.store;
 
 import java.io.Serializable;
 
+import org.nightlabs.jfire.store.id.ProductTypeID;
+
 /**
  * This class is a carrier for packaging a {@link org.nightlabs.jfire.store.ProductType}
  * within another. It adds additional information for the <tt>ProductType</tt> within a
@@ -101,6 +103,15 @@ implements Serializable
 	 * @jdo.field persistence-modifier="persistent"
 	 */
 	private int quantity = 1;
+
+	/**
+	 * @jdo.field persistence-modifier="none"
+	 */
+	private transient ProductTypeID packageProductTypeID;
+	/**
+	 * @jdo.field persistence-modifier="none"
+	 */
+	private transient ProductTypeID innerProductTypeID;
 
 	/**
 	 * @deprecated This constructor exists only for JDO.
@@ -197,5 +208,20 @@ implements Serializable
 			throw new IllegalArgumentException("quantity=" + quantity + " not allowed! Must be >= 1!");
 
 		this.quantity = quantity;
+	}
+
+	public ProductTypeID getPackageProductTypeID()
+	{
+		if (packageProductTypeID == null)
+			packageProductTypeID = ProductTypeID.create(packageProductTypeOrganisationID, packageProductTypeProductTypeID);
+
+		return packageProductTypeID;
+	}
+	public ProductTypeID getInnerProductTypeID()
+	{
+		if (innerProductTypeID == null)
+			innerProductTypeID = ProductTypeID.create(innerProductTypeOrganisationID, innerProductTypeProductTypeID);
+
+		return innerProductTypeID;
 	}
 }

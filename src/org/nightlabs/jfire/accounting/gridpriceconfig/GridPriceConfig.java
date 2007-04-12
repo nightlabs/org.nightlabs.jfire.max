@@ -99,9 +99,11 @@ public abstract class GridPriceConfig extends PriceConfig
 	 */
 	private Map<String, Tariff> tariffs = new HashMap<String, Tariff>();
 
-	protected GridPriceConfig()
-	{
-	}
+	/**
+	 * @deprecated Only for JDO!
+	 */
+	protected GridPriceConfig() { }
+
 	/**
 	 * @param organisationID
 	 * @param priceConfigID

@@ -67,4 +67,9 @@ public interface IPriceCoordinate
 	 * @param tariffPK The tariffPK to set.
 	 */
 	void setTariffPK(String tariffPK);
+
+	/**
+	 * @return The organisationID-part of the tariffPK that is returned by {@link #getTariffPK()} or <code>null</code>, if no tariffPK set.
+	 */
+	String getTariffOrganisationID();
 }

@@ -196,6 +196,31 @@ public class PriceCoordinate implements Serializable, StoreCallback, IPriceCoord
 	}
 
 	/**
+	 * @jdo.field persistence-modifier="none"
+	 */
+	private transient String tariffOrganisationID = null;
+
+	protected String getFirstPartOfPrimaryKeyString(String pk)
+	{
+		if (pk == null)
+			return null;
+
+		int i = pk.indexOf('/');
+		if (i < 0)
+			throw new IllegalStateException("pk does not contain '/': " + pk);
+
+		return pk.substring(0, i);
+	}
+
+	public String getTariffOrganisationID()
+	{
+		if (tariffOrganisationID == null)
+			tariffOrganisationID = getFirstPartOfPrimaryKeyString(tariffPK);
+
+		return tariffOrganisationID;
+	}
+
+	/**
 	 * This method ignores the member <tt>PriceCoordinate.priceConfig</tt> <strong>and
 	 * the primary key</strong> to allow
 	 * cross-PriceConfig-addressing of cells using <tt>PriceCoordinate</tt> instances.
@@ -299,6 +324,7 @@ public class PriceCoordinate implements Serializable, StoreCallback, IPriceCoord
 	public void setTariffPK(String tariffPK)
 	{
 		this.tariffPK = tariffPK;
+		this.tariffOrganisationID = null;
 		thisString = null;
 		thisHashCode = 0;
 	}
@@ -306,7 +332,7 @@ public class PriceCoordinate implements Serializable, StoreCallback, IPriceCoord
 	public void jdoPreStore()
 	{
 		if (priceConfig == null)
-			logger.error("The field 'priceConfig' is null! This means, this PriceCoordinate has only been created on the fly for calculation reasons.", new Exception());
+			logger.warn("The field 'priceConfig' is null! This means, this PriceCoordinate has only been created on the fly for calculation reasons.", new Exception());
 //			throw new IllegalStateException("The field 'priceConfig' is null! This means, this PriceCoordinate has only been created on the fly for calculation reasons. How the hell did it come here? I cannot persist it!");
 
 		if (organisationID == null || priceCoordinateID < 0) {

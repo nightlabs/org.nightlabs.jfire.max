@@ -263,50 +263,50 @@ public class CellReflector
 //		return resolvePriceCells(searchedCoordinate, _productTypePK, _priceFragmentTypePK);
 //	}
 
-protected IAbsolutePriceCoordinate createAbsolutePriceCoordinate(IAbsolutePriceCoordinate address)
-{
-	return new AbsolutePriceCoordinate(coordinate, address);
-}
+	protected IAbsolutePriceCoordinate createAbsolutePriceCoordinate(IAbsolutePriceCoordinate address)
+	{
+		return new AbsolutePriceCoordinate(coordinate, address);
+	}
 
-protected IPriceCoordinate createLocalPriceCoordinate(IPriceCoordinate address)
-{
-	return new PriceCoordinate(coordinate, address);
-}
+	protected IPriceCoordinate createLocalPriceCoordinate(IPriceCoordinate address)
+	{
+		return new PriceCoordinate(coordinate, address);
+	}
 
-/**
- * This method finds all <tt>PriceCell</tt> s that match the given criteria.
- * Because the <tt>address.productTypePK</tt> does not need to point to a
- * <tt>ProductType</tt>
- * in the package but can point to an anchestor, it might happen that multiple
- * <tt>ProductType</tt> s in the package inherit the defined <tt>ProductType</tt>.
- * Thus, this method returns a <tt>Collection</tt> of <tt>PriceCell</tt>.
- * <p>
- * The <tt>PriceCell</tt> s are calculated and valid in case they come from a
- * <tt>FormulaPriceConfig</tt> (in this case they come out of the associated
- * result-<tt>StablePriceConfig</tt>). Note, that only the <tt>PriceFragment</tt>s are
- * calculated which match the given <tt>priceFragmentTypePK</tt>! Other <tt>PriceFragment</tt>s
- * are probably wrong and you should not access them!
- * <p>
- * Every parameter can be <tt>null</tt>. If a parameter is <tt>null</tt>,
- * it is set to the value in <tt>CellReflector.coordinate</tt> - means the current
- * cell itself.
- * <p>
- * If this method references the current <tt>PriceCell</tt> itself <b>directly</b>
- * with the current <tt>priceFragmentTypePK</tt>,
- * this cell is filtered out - means <b>no</b> <tt>CircularReferenceException</tt>
- * is thrown. This allows a cell to reference e.g. the absolute root product and
- * therefore make itself dependent on all other products in the same package (but
- * itself silently excluded).
- * <p>
- * If the cell is <b>indirectly<b> referencing itself (means a cell on which this cell
- * is dependent, depends back on this cell), a <tt>CircularReferenceException</tt>
- * is thrown.
- *
- * @param searchedCoordinate
- *
- * @return Returns a <tt>Collection</tt> of {@link ResolvedPriceCell}. Never <tt>null</tt>, but the <tt>Collection</tt> may be empty.
- * @throws ModuleException 
- */
+	/**
+	 * This method finds all <tt>PriceCell</tt> s that match the given criteria.
+	 * Because the <tt>address.productTypePK</tt> does not need to point to a
+	 * <tt>ProductType</tt>
+	 * in the package but can point to an anchestor, it might happen that multiple
+	 * <tt>ProductType</tt> s in the package inherit the defined <tt>ProductType</tt>.
+	 * Thus, this method returns a <tt>Collection</tt> of <tt>PriceCell</tt>.
+	 * <p>
+	 * The <tt>PriceCell</tt> s are calculated and valid in case they come from a
+	 * <tt>FormulaPriceConfig</tt> (in this case they come out of the associated
+	 * result-<tt>StablePriceConfig</tt>). Note, that only the <tt>PriceFragment</tt>s are
+	 * calculated which match the given <tt>priceFragmentTypePK</tt>! Other <tt>PriceFragment</tt>s
+	 * are probably wrong and you should not access them!
+	 * <p>
+	 * Every parameter can be <tt>null</tt>. If a parameter is <tt>null</tt>,
+	 * it is set to the value in <tt>CellReflector.coordinate</tt> - means the current
+	 * cell itself.
+	 * <p>
+	 * If this method references the current <tt>PriceCell</tt> itself <b>directly</b>
+	 * with the current <tt>priceFragmentTypePK</tt>,
+	 * this cell is filtered out - means <b>no</b> <tt>CircularReferenceException</tt>
+	 * is thrown. This allows a cell to reference e.g. the absolute root product and
+	 * therefore make itself dependent on all other products in the same package (but
+	 * itself silently excluded).
+	 * <p>
+	 * If the cell is <b>indirectly<b> referencing itself (means a cell on which this cell
+	 * is dependent, depends back on this cell), a <tt>CircularReferenceException</tt>
+	 * is thrown.
+	 *
+	 * @param searchedCoordinate
+	 *
+	 * @return Returns a <tt>Collection</tt> of {@link ResolvedPriceCell}. Never <tt>null</tt>, but the <tt>Collection</tt> may be empty.
+	 * @throws ModuleException 
+	 */
 	public Collection<ResolvedPriceCell> resolvePriceCells(
 			IAbsolutePriceCoordinate address)
 	throws ModuleException
@@ -345,6 +345,17 @@ protected IPriceCoordinate createLocalPriceCoordinate(IPriceCoordinate address)
 			if (!foundProductTypePK.equals(this.getCoordinate().getProductTypePK()) ||
 					!localPriceCoordinate.equals(this.getCoordinate()) ||
 					!priceFragmentTypePK.equals(this.getCoordinate().getPriceFragmentTypePK())) {
+
+//				String innerProductTypeOrganisationID = packagedProductType.getInnerProductTypeOrganisationID();
+////				String packageProductTypeOrganisationID = packagedProductType.getPackageProductTypeOrganisationID();
+//
+//				IPriceCoordinate realLocalPriceCoordinate = localPriceCoordinate;
+////				if (!packageProductTypeOrganisationID.equals(innerProductTypeOrganisationID))
+//				if (!innerProductTypeOrganisationID.equals(localPriceCoordinate.getTariffOrganisationID()))
+//					realLocalPriceCoordinate = createMappedLocalPriceCoordinateForDifferentOrganisation(localPriceCoordinate, nestedProductType);
+
+//				priceCell = priceCalculator.calculatePriceCell(
+//						packagedProductType, priceFragmentType, realLocalPriceCoordinate);
 				priceCell = priceCalculator.calculatePriceCell(
 						packagedProductType, priceFragmentType, localPriceCoordinate);
 			}
@@ -362,4 +373,13 @@ protected IPriceCoordinate createLocalPriceCoordinate(IPriceCoordinate address)
 
 		return priceCells;
 	}
+
+//	protected IPriceCoordinate createMappedLocalPriceCoordinateForDifferentOrganisation(IPriceCoordinate priceCoordinate, NestedProductType nestedProductType)
+//	{
+//		TariffID orgTariffID = TariffID.create(priceCoordinate.getTariffPK());
+//		TariffID newTariffID = priceCalculator.getTariffMapper().getTariffIDForProductType(orgTariffID, nestedProductType.getInnerProductTypeOrganisationID(), true);
+//		IPriceCoordinate res = createLocalPriceCoordinate(priceCoordinate);
+//		res.setTariffPK(Tariff.getPrimaryKey(newTariffID.organisationID, newTariffID.tariffID));
+//		return res;
+//	}
 }

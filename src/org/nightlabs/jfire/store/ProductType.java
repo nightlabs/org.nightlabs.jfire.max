@@ -1097,12 +1097,20 @@ implements
 	 * This method is called, when this ProductType should recalculate its prices and {@link #isResponsibleForPriceCalculation()}
 	 * returned <code>true</code>. This happens for example during inheritance application, if the packaging
 	 * (i.e. {@link #nestedProductTypes}) changed or an inner price config changed.
+	 * <p>
+	 * This method is never be called when the object is detached. It assumes that it is currently persistent and thus
+	 * has a {@link PersistenceManager} assigned (which can be obtained via {@link #getPersistenceManager()}).
+	 * </p>
 	 */
 	protected abstract void calculatePrices();
 
 	/**
 	 * This method causes all settings of this instance to be passed to all children
 	 * (recursively).
+	 * <p>
+	 * This method should never be called when the object is detached. It assumes that it is currently persistent and thus
+	 * has a {@link PersistenceManager} assigned (which can be obtained via {@link #getPersistenceManager()}).
+	 * </p>
 	 * <p>
 	 * Alternative wordings: bequeath, devise, entail<br/>
 	 * Note: it is the opposite of inherit (=receive), because calling this

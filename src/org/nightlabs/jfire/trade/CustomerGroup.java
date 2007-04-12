@@ -48,7 +48,9 @@ import org.nightlabs.jfire.store.deliver.ModeOfDeliveryFlavour;
  *
  * @jdo.inheritance strategy="new-table"
  *
- * @jdo.create-objectid-class field-order="organisationID, customerGroupID"
+ * @jdo.create-objectid-class
+ *		field-order="organisationID, customerGroupID"
+ *		include-body="id/CustomerGroupID.body.inc"
  *
  * @jdo.fetch-group name="FetchGroupsPriceConfig.edit" fields="name"
  */

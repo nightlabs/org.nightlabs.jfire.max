@@ -195,7 +195,7 @@ public class GridPriceConfigUtil
 	 */
 	public static Collection<GridPriceConfig> storePriceConfigs(
 			PersistenceManager pm, Collection<GridPriceConfig> _priceConfigs,
-			Class priceCalculatorClass,
+			Class priceCalculatorClass, // TODO pass a factory instead of this as we need additional parameters now!
 			boolean get) // , String[] fetchGroups, int maxFetchDepth)
 	throws PriceCalculationException
 	{

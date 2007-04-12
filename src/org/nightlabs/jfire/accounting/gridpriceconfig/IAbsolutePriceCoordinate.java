@@ -41,4 +41,9 @@ extends IPriceCoordinate
 	 * @return Returns the productTypePK.
 	 */
 	String getProductTypePK();
+
+//	/**
+//	 * @return Returns the organisationID which is part of the string returned by {@link #getProductTypePK()} or <code>null</code> if <code>productTypePK</code> is null.
+//	 */
+//	String getProductTypeOrganisationID();
 }

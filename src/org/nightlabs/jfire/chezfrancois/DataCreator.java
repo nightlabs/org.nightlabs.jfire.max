@@ -43,6 +43,7 @@ import org.nightlabs.jfire.accounting.Accounting;
 import org.nightlabs.jfire.accounting.Currency;
 import org.nightlabs.jfire.accounting.PriceFragmentType;
 import org.nightlabs.jfire.accounting.Tariff;
+import org.nightlabs.jfire.accounting.TariffMapping;
 import org.nightlabs.jfire.accounting.book.fragmentbased.PFMoneyFlowMapping;
 import org.nightlabs.jfire.accounting.gridpriceconfig.FormulaCell;
 import org.nightlabs.jfire.accounting.gridpriceconfig.FormulaPriceConfig;
@@ -205,7 +206,7 @@ public class DataCreator
 			if (pt.getInnerPriceConfig() != null && pt.getPackagePriceConfig() != null)
 				((StablePriceConfig)pt.getPackagePriceConfig()).adoptParameters(pt.getInnerPriceConfig());
 
-			PriceCalculator priceCalculator = new PriceCalculator(pt);
+			PriceCalculator priceCalculator = new PriceCalculator(pt, TariffMapping.getTariffMappings(pm));
 			priceCalculator.preparePriceCalculation();
 			priceCalculator.calculatePrices();
 		}

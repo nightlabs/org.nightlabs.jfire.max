@@ -40,7 +40,6 @@ import javax.ejb.EJBException;
 import javax.ejb.SessionBean;
 import javax.ejb.SessionContext;
 import javax.jdo.JDOHelper;
-import javax.jdo.JDOObjectNotFoundException;
 import javax.jdo.PersistenceManager;
 
 import org.apache.log4j.Logger;
@@ -51,9 +50,11 @@ import org.nightlabs.jfire.idgenerator.IDGenerator;
 import org.nightlabs.jfire.organisation.Organisation;
 import org.nightlabs.jfire.reporting.layout.ReportLayout;
 import org.nightlabs.jfire.reporting.layout.id.ReportRegistryItemID;
+import org.nightlabs.jfire.reporting.parameter.ReportParameterUtil;
 import org.nightlabs.jfire.reporting.parameter.ValueProvider;
 import org.nightlabs.jfire.reporting.parameter.ValueProviderCategory;
 import org.nightlabs.jfire.reporting.parameter.ValueProviderInputParameter;
+import org.nightlabs.jfire.reporting.parameter.ReportParameterUtil.NameEntry;
 import org.nightlabs.jfire.reporting.parameter.config.AcquisitionParameterConfig;
 import org.nightlabs.jfire.reporting.parameter.config.ReportParameterAcquisitionSetup;
 import org.nightlabs.jfire.reporting.parameter.config.ReportParameterAcquisitionUseCase;
@@ -174,53 +175,52 @@ implements SessionBean
 	
 	private void initializeReportParameterAcquisition(final PersistenceManager pm) {
 		ValueProviderCategoryID categoryID = ValueProviderCategoryID.create(Organisation.DEVIL_ORGANISATION_ID, ReportingTradeConstants.VALUE_PROVIDER_CATEGORY_ID_TRADE_REPORTS);
-		ValueProviderCategory rootCategory = createValueProviderCategory(pm, null, categoryID);
-		rootCategory.getName().setText(Locale.ENGLISH.getLanguage(), "Trade reports");
+		ValueProviderCategory rootCategory = ReportParameterUtil.createValueProviderCategory(
+				pm, null, categoryID, 
+				new NameEntry[] {new NameEntry(Locale.ENGLISH.getLanguage(), "Trade reports")}
+			);
 		
 		ValueProviderCategoryID leCategoryID = ValueProviderCategoryID.create(Organisation.DEVIL_ORGANISATION_ID, ReportingTradeConstants.VALUE_PROVIDER_CATEGORY_ID_LEGAL_ENTITY);
-		ValueProviderCategory leCategory = createValueProviderCategory(pm, rootCategory, leCategoryID);
-		leCategory.getName().setText(Locale.ENGLISH.getLanguage(), "Legal entity parameters");
-		
-		ValueProviderID leSearchID = ValueProviderID.create(
-				Organisation.DEVIL_ORGANISATION_ID, 
-				ReportingTradeConstants.VALUE_PROVIDER_CATEGORY_ID_LEGAL_ENTITY, 
-				ReportingTradeConstants.VALUE_PROVIDER_ID_LEGAL_ENTITY_SEARCH
+		ValueProviderCategory leCategory = ReportParameterUtil.createValueProviderCategory(
+				pm, rootCategory, leCategoryID, 
+				new NameEntry[] {new NameEntry(Locale.ENGLISH.getLanguage(), "Legal entity parameters")}
 			);
-		ValueProvider leSearch = createValueProvider(pm, leCategory, leSearchID, AnchorID.class.getName());
-		leSearch.getName().setText(Locale.ENGLISH.getLanguage(), "Customer search");
-		leSearch.getDescription().setText(Locale.ENGLISH.getLanguage(), "Customer search");
+		
+		ValueProvider leSearch = ReportParameterUtil.createValueProvider(pm, leCategory, ReportingTradeConstants.VALUE_PROVIDER_ID_LEGAL_ENTITY_SEARCH, AnchorID.class.getName(),
+				new NameEntry[] {new NameEntry(Locale.ENGLISH.getLanguage(), "Customer search")},
+				new NameEntry[] {new NameEntry(Locale.ENGLISH.getLanguage(), "Customer search")},
+				new NameEntry[] {new NameEntry(Locale.ENGLISH.getLanguage(), "Select a customer")}
+				);
 		
 		ValueProviderCategoryID docsCategoryID = ValueProviderCategoryID.create(Organisation.DEVIL_ORGANISATION_ID, ReportingTradeConstants.VALUE_PROVIDER_CATEGORY_ID_TRADE_DOCUMENTS);
-		ValueProviderCategory docsCategory = createValueProviderCategory(pm, rootCategory, docsCategoryID);
-		docsCategory.getName().setText(Locale.ENGLISH.getLanguage(), "Trade documents parameters");
+		ReportParameterUtil.createValueProviderCategory(
+				pm, null, docsCategoryID, 
+				new NameEntry[] {new NameEntry(Locale.ENGLISH.getLanguage(), "Trade documents parameters")}
+			);
 		
 		ValueProviderCategoryID invoiceCategoryID = ValueProviderCategoryID.create(Organisation.DEVIL_ORGANISATION_ID, ReportingTradeConstants.VALUE_PROVIDER_CATEGORY_ID_TRADE_DOCUMENTS_INVOICE);
-		ValueProviderCategory invoiceCategory = createValueProviderCategory(pm, rootCategory, invoiceCategoryID);
-		invoiceCategory.getName().setText(Locale.ENGLISH.getLanguage(), "Invoice parameters");
-		
-		ValueProviderID invoiceByCustomerID = ValueProviderID.create(
-				Organisation.DEVIL_ORGANISATION_ID, 
-				ReportingTradeConstants.VALUE_PROVIDER_CATEGORY_ID_TRADE_DOCUMENTS_INVOICE, 
-				ReportingTradeConstants.VALUE_PROVIDER_ID_TRADE_DOCUMENTS_INVOICE_BY_CUSTOMER
+		ValueProviderCategory invoiceCategory = ReportParameterUtil.createValueProviderCategory(
+				pm, rootCategory, invoiceCategoryID, 
+				new NameEntry[] {new NameEntry(Locale.ENGLISH.getLanguage(), "Invoice parameters")}
 			);
-		ValueProvider invoiceByCustomer = createValueProvider(pm, invoiceCategory, invoiceByCustomerID, InvoiceID.class.getName());
-		invoiceByCustomer.getName().setText(Locale.ENGLISH.getLanguage(), "Invoice of customer");
-		invoiceByCustomer.getDescription().setText(Locale.ENGLISH.getLanguage(), "Invoice of customer");
-		logger.debug("Creating parameters for "+invoiceByCustomerID);
+		
+		ValueProvider invoiceByCustomer = ReportParameterUtil.createValueProvider(
+				pm, invoiceCategory, ReportingTradeConstants.VALUE_PROVIDER_ID_TRADE_DOCUMENTS_INVOICE_BY_CUSTOMER, InvoiceID.class.getName(),
+				new NameEntry[] {new NameEntry(Locale.ENGLISH.getLanguage(), "Invoice of customer")},
+				new NameEntry[] {new NameEntry(Locale.ENGLISH.getLanguage(), "Invoice of customer")},
+				new NameEntry[] {new NameEntry(Locale.ENGLISH.getLanguage(), "Select an invoice")}
+			);
 		invoiceByCustomer.getInputParameters().clear();
 		pm.flush();
 		invoiceByCustomer.addInputParameter(new ValueProviderInputParameter(invoiceByCustomer, "customer", AnchorID.class.getName()));
 		
 		
-		ValueProviderID invoiceByCustomerAndPeriodID = ValueProviderID.create(
-				Organisation.DEVIL_ORGANISATION_ID, 
-				ReportingTradeConstants.VALUE_PROVIDER_CATEGORY_ID_TRADE_DOCUMENTS_INVOICE, 
-				ReportingTradeConstants.VALUE_PROVIDER_ID_TRADE_DOCUMENTS_INVOICE_BY_CUSTOMER_AND_PERIOD
+		ValueProvider invoiceByCustomerAndPeriod = ReportParameterUtil.createValueProvider(
+				pm, invoiceCategory, ReportingTradeConstants.VALUE_PROVIDER_ID_TRADE_DOCUMENTS_INVOICE_BY_CUSTOMER_AND_PERIOD, InvoiceID.class.getName(),
+				new NameEntry[] {new NameEntry(Locale.ENGLISH.getLanguage(), "Invoice of customer in period")},
+				new NameEntry[] {new NameEntry(Locale.ENGLISH.getLanguage(), "Invoice of customer in period")},
+				new NameEntry[] {new NameEntry(Locale.ENGLISH.getLanguage(), "Select an invoice")}
 			);
-		ValueProvider invoiceByCustomerAndPeriod = createValueProvider(pm, invoiceCategory, invoiceByCustomerAndPeriodID, InvoiceID.class.getName());
-		invoiceByCustomerAndPeriod.getName().setText(Locale.ENGLISH.getLanguage(), "Invoice of customer in period");
-		invoiceByCustomerAndPeriod.getDescription().setText(Locale.ENGLISH.getLanguage(), "Invoice of customer in period");
-		logger.debug("Creating parameters for "+invoiceByCustomerAndPeriodID);
 		invoiceByCustomerAndPeriod.getInputParameters().clear();
 		pm.flush();
 		invoiceByCustomerAndPeriod.addInputParameter(new ValueProviderInputParameter(invoiceByCustomer, "customer", AnchorID.class.getName()));
@@ -228,15 +228,12 @@ implements SessionBean
 		invoiceByCustomerAndPeriod.addInputParameter(new ValueProviderInputParameter(invoiceByCustomer, "to", Date.class.getName()));
 		
 		
-		ValueProviderID invoiceByArticleTypeID = ValueProviderID.create(
-				Organisation.DEVIL_ORGANISATION_ID, 
-				ReportingTradeConstants.VALUE_PROVIDER_CATEGORY_ID_TRADE_DOCUMENTS_INVOICE, 
-				ReportingTradeConstants.VALUE_PROVIDER_ID_TRADE_DOCUMENTS_INVOICE_BY_ARTICLE_TYPE
+		ValueProvider invoiceByArticleType = ReportParameterUtil.createValueProvider(
+				pm, invoiceCategory, ReportingTradeConstants.VALUE_PROVIDER_ID_TRADE_DOCUMENTS_INVOICE_BY_ARTICLE_TYPE, InvoiceID.class.getName(),
+				new NameEntry[] {new NameEntry(Locale.ENGLISH.getLanguage(), "Invoice by article type")},
+				new NameEntry[] {new NameEntry(Locale.ENGLISH.getLanguage(), "Invoice by article type")},
+				new NameEntry[] {new NameEntry(Locale.ENGLISH.getLanguage(), "Select an invoice")}
 			);
-		ValueProvider invoiceByArticleType = createValueProvider(pm, invoiceCategory, invoiceByArticleTypeID, InvoiceID.class.getName());
-		invoiceByArticleType.getName().setText(Locale.ENGLISH.getLanguage(), "Invoice by article type");
-		invoiceByArticleType.getDescription().setText(Locale.ENGLISH.getLanguage(), "Invoice by article type");
-		logger.debug("Creating parameters for "+invoiceByArticleTypeID);
 		invoiceByArticleType.getInputParameters().clear();
 		pm.flush();
 		invoiceByArticleType.addInputParameter(new ValueProviderInputParameter(invoiceByCustomer, "productType", ProductTypeID.class.getName()));		
@@ -331,33 +328,5 @@ implements SessionBean
 		
 		setup.getDefaultSetup().createAcquisitionSequence(provider);
 		logger.debug("Persisted setup");
-	}
-	
-	private ValueProviderCategory createValueProviderCategory(PersistenceManager pm, ValueProviderCategory parent, ValueProviderCategoryID categoryID) {
-		ValueProviderCategory category = null;
-		try {
-			category = (ValueProviderCategory) pm.getObjectById(categoryID);
-			logger.debug("Have ValueProviderCategory "+categoryID);
-		} catch (JDOObjectNotFoundException e) {
-			logger.debug("Creating ValueProviderCategory "+categoryID);
-			category = new ValueProviderCategory(parent, categoryID.organisationID, categoryID.valueProviderCategoryID, true);
-			category = (ValueProviderCategory) pm.makePersistent(category);
-			logger.debug("Created ValueProviderCategory "+categoryID);
-		}
-		return category;
-	}
-	
-	private ValueProvider createValueProvider(PersistenceManager pm, ValueProviderCategory category, ValueProviderID valueProviderID, String outputType) {
-		ValueProvider valueProvider = null;
-		try {
-			valueProvider = (ValueProvider) pm.getObjectById(valueProviderID);
-			logger.debug("Have ValueProvider "+valueProviderID);
-		} catch (JDOObjectNotFoundException e) {
-			logger.debug("Creating ValueProvider "+valueProviderID);
-			valueProvider = new ValueProvider(category, valueProviderID.valueProviderID, outputType);
-			valueProvider = (ValueProvider) pm.makePersistent(valueProvider);
-			logger.debug("Created ValueProvider "+valueProviderID);
-		}
-		return valueProvider;
 	}
 }

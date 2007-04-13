@@ -3,6 +3,9 @@
  */
 package org.nightlabs.jfire.reporting.trade;
 
+import org.nightlabs.jfire.organisation.Organisation;
+import org.nightlabs.jfire.reporting.parameter.id.ValueProviderID;
+
 /**
  * @author Alexander Bieber <alex [AT] nightlabs [DOT] de>
  *
@@ -34,12 +37,17 @@ public class ReportingTradeConstants {
 	public static final String VALUE_PROVIDER_CATEGORY_ID_TRADE_REPORTS = "JFireReportingTrade-ValueProviderCategory-TradeReports";
 
 	public static final String VALUE_PROVIDER_CATEGORY_ID_LEGAL_ENTITY = "JFireReportingTrade-ValueProviderCategory-LegalEntity";
-	public static final String VALUE_PROVIDER_ID_LEGAL_ENTITY_SEARCH = "Search";
+	public static final ValueProviderID VALUE_PROVIDER_ID_LEGAL_ENTITY_SEARCH = ValueProviderID.create( 
+			Organisation.DEVIL_ORGANISATION_ID, VALUE_PROVIDER_CATEGORY_ID_LEGAL_ENTITY, "Search");
 
 	public static final String VALUE_PROVIDER_CATEGORY_ID_TRADE_DOCUMENTS = "JFireReportingTrade-ValueProviderCategory-TradeDocuments";
 	public static final String VALUE_PROVIDER_CATEGORY_ID_TRADE_DOCUMENTS_INVOICE = "JFireReportingTrade-ValueProviderCategory-TradeDocuments-Invoice";
-	public static final String VALUE_PROVIDER_ID_TRADE_DOCUMENTS_INVOICE_BY_CUSTOMER = "ByCustomer";
-	public static final String VALUE_PROVIDER_ID_TRADE_DOCUMENTS_INVOICE_BY_CUSTOMER_AND_PERIOD = "ByCustomerAndPeriod";
-	public static final String VALUE_PROVIDER_ID_TRADE_DOCUMENTS_INVOICE_BY_ARTICLE_TYPE = "ByArticleType";
+	
+	public static final ValueProviderID VALUE_PROVIDER_ID_TRADE_DOCUMENTS_INVOICE_BY_CUSTOMER = ValueProviderID.create(
+			Organisation.DEVIL_ORGANISATION_ID, VALUE_PROVIDER_CATEGORY_ID_TRADE_DOCUMENTS_INVOICE, "ByCustomer");
+	public static final ValueProviderID VALUE_PROVIDER_ID_TRADE_DOCUMENTS_INVOICE_BY_CUSTOMER_AND_PERIOD = ValueProviderID.create(
+			Organisation.DEVIL_ORGANISATION_ID, VALUE_PROVIDER_CATEGORY_ID_TRADE_DOCUMENTS_INVOICE, "ByCustomerAndPeriod");
+	public static final ValueProviderID VALUE_PROVIDER_ID_TRADE_DOCUMENTS_INVOICE_BY_ARTICLE_TYPE = ValueProviderID.create(
+			Organisation.DEVIL_ORGANISATION_ID, VALUE_PROVIDER_CATEGORY_ID_TRADE_DOCUMENTS_INVOICE, "ByArticleType");
 	
 }

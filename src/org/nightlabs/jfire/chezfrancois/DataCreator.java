@@ -43,7 +43,7 @@ import org.nightlabs.jfire.accounting.Accounting;
 import org.nightlabs.jfire.accounting.Currency;
 import org.nightlabs.jfire.accounting.PriceFragmentType;
 import org.nightlabs.jfire.accounting.Tariff;
-import org.nightlabs.jfire.accounting.TariffMapping;
+import org.nightlabs.jfire.accounting.TariffMapper;
 import org.nightlabs.jfire.accounting.book.fragmentbased.PFMoneyFlowMapping;
 import org.nightlabs.jfire.accounting.gridpriceconfig.FormulaCell;
 import org.nightlabs.jfire.accounting.gridpriceconfig.FormulaPriceConfig;
@@ -83,6 +83,7 @@ import org.nightlabs.jfire.store.ProductType;
 import org.nightlabs.jfire.store.Store;
 import org.nightlabs.jfire.store.id.ProductTypeID;
 import org.nightlabs.jfire.trade.CustomerGroup;
+import org.nightlabs.jfire.trade.CustomerGroupMapper;
 import org.nightlabs.jfire.trade.LegalEntity;
 import org.nightlabs.jfire.trade.Order;
 import org.nightlabs.jfire.trade.OrganisationLegalEntity;
@@ -206,7 +207,7 @@ public class DataCreator
 			if (pt.getInnerPriceConfig() != null && pt.getPackagePriceConfig() != null)
 				((StablePriceConfig)pt.getPackagePriceConfig()).adoptParameters(pt.getInnerPriceConfig());
 
-			PriceCalculator priceCalculator = new PriceCalculator(pt, TariffMapping.getTariffMappings(pm));
+			PriceCalculator priceCalculator = new PriceCalculator(pt, new CustomerGroupMapper(pm), new TariffMapper(pm));
 			priceCalculator.preparePriceCalculation();
 			priceCalculator.calculatePrices();
 		}

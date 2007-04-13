@@ -56,13 +56,14 @@ import org.nightlabs.jdo.NLJDOHelper;
 import org.nightlabs.jdo.moduleregistry.ModuleMetaData;
 import org.nightlabs.jfire.accounting.Price;
 import org.nightlabs.jfire.accounting.Tariff;
-import org.nightlabs.jfire.accounting.TariffMapping;
+import org.nightlabs.jfire.accounting.TariffMapper;
 import org.nightlabs.jfire.accounting.gridpriceconfig.FormulaPriceConfig;
 import org.nightlabs.jfire.accounting.gridpriceconfig.GridPriceConfig;
 import org.nightlabs.jfire.accounting.gridpriceconfig.GridPriceConfigUtil;
 import org.nightlabs.jfire.accounting.gridpriceconfig.IResultPriceConfig;
 import org.nightlabs.jfire.accounting.gridpriceconfig.PriceCalculationException;
 import org.nightlabs.jfire.accounting.gridpriceconfig.PriceCalculator;
+import org.nightlabs.jfire.accounting.gridpriceconfig.PriceCalculatorFactory;
 import org.nightlabs.jfire.accounting.gridpriceconfig.PriceCell;
 import org.nightlabs.jfire.accounting.gridpriceconfig.StablePriceConfig;
 import org.nightlabs.jfire.accounting.gridpriceconfig.TariffPricePair;
@@ -93,6 +94,7 @@ import org.nightlabs.jfire.store.deliver.id.ModeOfDeliveryID;
 import org.nightlabs.jfire.store.id.ProductTypeID;
 import org.nightlabs.jfire.trade.ArticleCreator;
 import org.nightlabs.jfire.trade.CustomerGroup;
+import org.nightlabs.jfire.trade.CustomerGroupMapper;
 import org.nightlabs.jfire.trade.Offer;
 import org.nightlabs.jfire.trade.Order;
 import org.nightlabs.jfire.trade.Segment;
@@ -548,7 +550,7 @@ implements SessionBean
 					if (ProductType.PACKAGE_NATURE_OUTER == pt.getPackageNature() && pt.getPackagePriceConfig() != null) {
 						logger.info("storeProductType: price-calculation starting for: " + JDOHelper.getObjectId(pt));
 
-						PriceCalculator priceCalculator = new PriceCalculator(pt, TariffMapping.getTariffMappings(pm));
+						PriceCalculator priceCalculator = new PriceCalculator(pt, new CustomerGroupMapper(pm), new TariffMapper(pm));
 						priceCalculator.preparePriceCalculation();
 						priceCalculator.calculatePrices();
 
@@ -952,7 +954,17 @@ implements SessionBean
 	{
 		PersistenceManager pm = getPersistenceManager();
 		try {
-			return GridPriceConfigUtil.storePriceConfigs(pm, priceConfigs, PriceCalculator.class, get); // , fetchGroups, maxFetchDepth);
+			final CustomerGroupMapper cgm = new CustomerGroupMapper(pm);
+			final TariffMapper tm = new TariffMapper(pm);
+
+			PriceCalculatorFactory pcf = new PriceCalculatorFactory() {
+				public PriceCalculator createPriceCalculator(ProductType productType)
+				{
+					return new PriceCalculator(productType, cgm, tm);
+				}
+			};
+
+			return GridPriceConfigUtil.storePriceConfigs(pm, priceConfigs, pcf, get);
 		} finally {
 			pm.close();
 		}

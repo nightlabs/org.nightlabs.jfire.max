@@ -85,7 +85,6 @@ import org.nightlabs.jfire.accounting.pay.ServerPaymentProcessorCash;
 import org.nightlabs.jfire.accounting.pay.ServerPaymentProcessorCreditCardDummyForClientPayment;
 import org.nightlabs.jfire.accounting.pay.ServerPaymentProcessorDebitNoteGermany;
 import org.nightlabs.jfire.accounting.pay.ServerPaymentProcessorNonPayment;
-import org.nightlabs.jfire.accounting.pay.ServerPaymentProcessorSaferPay;
 import org.nightlabs.jfire.accounting.pay.id.ModeOfPaymentFlavourID;
 import org.nightlabs.jfire.accounting.pay.id.PaymentDataID;
 import org.nightlabs.jfire.accounting.pay.id.PaymentID;
@@ -382,10 +381,6 @@ public abstract class AccountingManagerBean
 			serverPaymentProcessorCreditCardDummyForClientPayment.getName().setText(Locale.ENGLISH.getLanguage(), "Dummy for client-sided Credit Card Payment");
 			serverPaymentProcessorCreditCardDummyForClientPayment.getName().setText(Locale.GERMAN.getLanguage(), "Pseudo-Modul für client-seitige Kreditkarten-Zahlungen");
 			serverPaymentProcessorCreditCardDummyForClientPayment.addModeOfPayment(modeOfPaymentCreditCard);
-
-			ServerPaymentProcessorSaferPay serverPaymentProcessorSaferPay = ServerPaymentProcessorSaferPay.getServerPaymentProcessorSaferPay(pm);
-			serverPaymentProcessorSaferPay.getName().setText(Locale.ENGLISH.getLanguage(), "SaferPay");
-			serverPaymentProcessorSaferPay.addModeOfPayment(modeOfPaymentCreditCard);
 
 			ServerPaymentProcessorBankTransferGermany serverPaymentProcessorBankTransferGermany = ServerPaymentProcessorBankTransferGermany.getServerPaymentProcessorBankTransferGermany(pm);
 			serverPaymentProcessorBankTransferGermany.getName().setText(Locale.ENGLISH.getLanguage(), "Bank transfer within Germany");

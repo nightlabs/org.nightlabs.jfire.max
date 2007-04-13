@@ -30,11 +30,9 @@ import java.io.Serializable;
 import java.util.Collection;
 
 import javax.jdo.JDOHelper;
-import javax.jdo.JDOObjectNotFoundException;
 import javax.jdo.PersistenceManager;
 import javax.jdo.Query;
 import javax.jdo.listener.DetachCallback;
-import javax.jdo.listener.StoreCallback;
 
 import org.nightlabs.jfire.reporting.layout.id.ReportRegistryItemID;
 import org.nightlabs.util.Utils;
@@ -146,7 +144,7 @@ public abstract class ReportRegistryItem implements Serializable, DetachCallback
 	private String reportRegistryItemID;
 	
 	/**
-	 * @jdo.field persistence-modifier="persistent"
+	 * @jdo.field persistence-modifier="persistent" mapped-by="reportRegistryItem"
 	 */
 	private ReportRegistryItemName name;
 	

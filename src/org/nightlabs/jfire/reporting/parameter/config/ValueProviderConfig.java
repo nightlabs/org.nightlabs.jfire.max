@@ -18,7 +18,9 @@ import org.nightlabs.jfire.reporting.parameter.id.ValueProviderID;
  * @jdo.create-objectid-class 
  * 		field-order="organisationID, valueAcquisitionSetupID, valueProviderOrganisationID, valueProviderCategoryID, valueProviderID"
  * 		include-imports="id/ValueProviderConfig.imports.inc"
- *		include-body="id/ValueProviderConfig.body.inc"	
+ *		include-body="id/ValueProviderConfig.body.inc"
+ *	
+ * @jdo.fetch-group name="ValueProviderConfig.message" fetch-groups="default" fields="message"
  *
  */
 public class ValueProviderConfig 
@@ -26,6 +28,8 @@ implements ValueConsumer, Serializable, IGraphicalInfoProvider
 {
 
 	private static final long serialVersionUID = 1L;
+
+	public static final String FETCH_GROUP_MESSAGE = "ValueProviderConfig.message";
 
 	/**
 	 * @jdo.field primary-key="true"
@@ -77,7 +81,11 @@ implements ValueConsumer, Serializable, IGraphicalInfoProvider
 	 */	
 	private int y;
 	
-	// Maybe need to add x,y for GEF editor
+	/**
+	 * @jdo.field persistence-modifier="persistent" mapped-by="valueProviderConfig"
+	 */	
+	private ValueProviderConfigMessage message;
+	
 	
 	protected ValueProviderConfig() {}
 	
@@ -85,6 +93,7 @@ implements ValueConsumer, Serializable, IGraphicalInfoProvider
 		this.organisationID = setup.getOrganisationID();
 		this.valueAcquisitionSetupID = setup.getValueAcquisitionSetupID();
 		this.setup = setup;
+		this.message = new ValueProviderConfigMessage(this);
 	}
 
 	/**
@@ -200,6 +209,7 @@ implements ValueConsumer, Serializable, IGraphicalInfoProvider
 		this.valueProviderOrganisationID = valueProvider.getOrganisationID();
 		this.valueProviderCategoryID = valueProvider.getValueProviderCategoryID();
 		this.valueProviderID = valueProvider.getValueProviderID();
+		this.message.validatePrimaryKeyFields(this);
 	}
 
 	/**
@@ -232,6 +242,13 @@ implements ValueConsumer, Serializable, IGraphicalInfoProvider
 	 */		
 	public void setY(int y) {
 		this.y = y;
+	}
+	
+	/**
+	 * @return The message that should be shown when this config is used
+	 */
+	public ValueProviderConfigMessage getMessage() {
+		return message;
 	}
 		
 }

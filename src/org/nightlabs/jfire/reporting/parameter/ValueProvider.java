@@ -41,6 +41,7 @@ import org.nightlabs.jfire.reporting.parameter.id.ValueProviderID;
  * 
  * @jdo.fetch-group name="ValueProvider.name" fetch-groups="default" fields="name"
  * @jdo.fetch-group name="ValueProvider.description" fetch-groups="default" fields="description"
+ * @jdo.fetch-group name="ValueProvider.defaultMessage" fetch-groups="default" fields="defaultMessage"
  * @jdo.fetch-group name="ValueProvider.category" fetch-groups="default" fields="category"
  * @jdo.fetch-group name="ValueProvider.inputParameters" fetch-groups="default" fields="inputParameters"
  * @jdo.fetch-group name="ValueProvider.this" fetch-groups="default" fields="name, description, category, inputParameters"
@@ -58,6 +59,7 @@ public class ValueProvider implements Serializable, DetachCallback {
 	
 	public static final String FETCH_GROUP_NAME = "ValueProvider.name";
 	public static final String FETCH_GROUP_DESCRIPTION = "ValueProvider.description";
+	public static final String FETCH_GROUP_DEFAULT_MESSAGE = "ValueProvider.defaultMessage";
 	public static final String FETCH_GROUP_CATEGORY = "ValueProvider.category";
 	public static final String FETCH_GROUP_CATEGORY_ID = "ValueProvider.categoryID";
 	public static final String FETCH_GROUP_INPUT_PARAMETERS = "ValueProvider.inputParameters";
@@ -113,6 +115,12 @@ public class ValueProvider implements Serializable, DetachCallback {
 	 */
 	private ValueProviderDescription description;
 	
+	/**
+	 * @jdo.field 
+	 * 		persistence-modifier="persistent"
+	 * 		mapped-by="valueProvider"
+	 */
+	private ValueProviderDefaultMessage defaultMessage;
 	
 	/**
 	 * @jdo.field persistence-modifier="none"
@@ -130,6 +138,7 @@ public class ValueProvider implements Serializable, DetachCallback {
 		this.outputType = outputType;
 		this.name = new ValueProviderName(this);
 		this.description = new ValueProviderDescription(this);
+		this.defaultMessage = new ValueProviderDefaultMessage(this);
 	}
 	
 	/**
@@ -189,6 +198,14 @@ public class ValueProvider implements Serializable, DetachCallback {
 		return description;
 	}
 
+	/**
+	 * 
+	 * @return the default message shown when using this value provider
+	 */
+	public ValueProviderDefaultMessage getDefaultMessage() {
+		return defaultMessage;
+	}
+	
 	/**
 	 * @return The valueProviderCategoryID
 	 */

@@ -4,6 +4,8 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
 
+import javax.jdo.PersistenceManager;
+
 import org.nightlabs.jfire.accounting.id.TariffID;
 
 public class TariffMapper
@@ -15,6 +17,18 @@ public class TariffMapper
 
 	private Map<TariffID, TariffMapping> partnerTariffID2tariffMapping = null;
 	private Map<TariffID, Map<String, TariffMapping>> localTariffID2partnerOrganisationID2tariffMapping = null;
+
+	/**
+	 * This is a convenience constructor calling {@link #TariffMapper(Collection)} with the result of
+	 * {@link TariffMapping#getTariffMappings(PersistenceManager)}.
+	 *
+	 * @param pm This <code>PersistenceManager</code> is used only within the constructor in order to load the {@link TariffMapping}s. It is not kept within
+	 *		the instance of <code>TariffMapper</code>.
+	 */
+	public TariffMapper(PersistenceManager pm)
+	{
+		this(TariffMapping.getTariffMappings(pm));
+	}
 
 	public TariffMapper(Collection<TariffMapping> tariffMappings)
 	{
@@ -107,7 +121,8 @@ public class TariffMapper
 				res = tm.getLocalTariffID();
 
 				if (!productTypeOrganisationID.equals(res.organisationID)) { // should never happen that we map from one partner-org to another partner-org
-					throw new IllegalArgumentException("None of these organisations seem to be my local one! Cannot map from sourceTariffID.organisationID=\"" + sourceTariffID.organisationID + "\" to productTypeOrganisationID=\"" + productTypeOrganisationID + "\"!");
+					return getTariffIDForProductType(res, productTypeOrganisationID, throwExceptionIfNotFound);
+//					throw new IllegalArgumentException("None of these organisations seem to be my local one! Cannot map from sourceTariffID.organisationID=\"" + sourceTariffID.organisationID + "\" to productTypeOrganisationID=\"" + productTypeOrganisationID + "\"!");
 				}
 			}
 		}

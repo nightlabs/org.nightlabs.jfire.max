@@ -44,6 +44,8 @@ import org.nightlabs.i18n.I18nText;
  *
  * @jdo.create-objectid-class field-order="organisationID, customerGroupID"
  *
+ * @jdo.fetch-group name="CustomerGroup.name" fields="customerGroup, names"
+ *
  * @jdo.fetch-group name="FetchGroupsPriceConfig.edit" fields="customerGroup, names"
  */
 public class CustomerGroupName extends I18nText

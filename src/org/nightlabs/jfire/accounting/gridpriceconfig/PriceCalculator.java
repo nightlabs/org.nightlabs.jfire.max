@@ -52,6 +52,7 @@ import org.nightlabs.jfire.idgenerator.IDGenerator;
 import org.nightlabs.jfire.store.NestedProductType;
 import org.nightlabs.jfire.store.ProductType;
 import org.nightlabs.jfire.trade.CustomerGroup;
+import org.nightlabs.jfire.trade.CustomerGroupMapper;
 import org.nightlabs.jfire.trade.id.CustomerGroupID;
 import org.nightlabs.util.Utils;
 
@@ -74,11 +75,11 @@ public class PriceCalculator
 	 */
 	protected Map virtualPackagedProductTypes = new HashMap();
 
-	private Collection<TariffMapping> tariffMappings;
+	private CustomerGroupMapper customerGroupMapper;
 
-	public Collection<TariffMapping> getTariffMappings()
+	public CustomerGroupMapper getCustomerGroupMapper()
 	{
-		return tariffMappings;
+		return customerGroupMapper;
 	}
 
 	private TariffMapper tariffMapper;
@@ -92,13 +93,14 @@ public class PriceCalculator
 	 * @param packageProductType The <tt>ProductType</tt> which encloses all the other <tt>ProductType</tt>s and
 	 * which has a {@link IResultPriceConfig} assigned as
 	 * {@link ProductType#packagePriceConfig}.
-	 * @param tariffMappings TODO
+	 * @param customerGroupMapper TODO
+	 * @param tariffMapper TODO
 	 */
-	public PriceCalculator(ProductType packageProductType, Collection<TariffMapping> tariffMappings)
+	public PriceCalculator(ProductType packageProductType, CustomerGroupMapper customerGroupMapper, TariffMapper tariffMapper)
 	{
 		this.packageProductType = packageProductType;
-		this.tariffMappings = Collections.unmodifiableCollection(tariffMappings);
-		this.tariffMapper = new TariffMapper(tariffMappings);
+		this.customerGroupMapper = customerGroupMapper;
+		this.tariffMapper = tariffMapper;
 		if (packageProductType.isPackageInner())
 			throw new IllegalArgumentException("packageProductType.isPackageInner() is true! Cannot calculate prices if the carrier ProductType is not a package!");
 
@@ -412,21 +414,21 @@ public class PriceCalculator
 		}
 	}
 
-	protected IPriceCoordinate createMappedLocalPriceCoordinate(
+	public IPriceCoordinate createMappedLocalPriceCoordinate(
 			NestedProductType nestedProductType, PriceFragmentType priceFragmentType, IPriceCoordinate localPriceCoordinate)
 	{
-		ProductType innerProductType = nestedProductType.getInnerProductType();
-		if (nestedProductType.getPackageProductTypeOrganisationID().equals(nestedProductType.getInnerProductTypeOrganisationID()))
+		if (nestedProductType.getPackageProductTypeOrganisationID().equals(nestedProductType.getInnerProductTypeOrganisationID())) // TODO or better check the organisationIDs of the price-configs?
 			return localPriceCoordinate;
 
 		CustomerGroupID orgCustomerGroupID = CustomerGroupID.create(localPriceCoordinate.getCustomerGroupPK());
+		CustomerGroupID newCustomerGroupID = getCustomerGroupMapper().getCustomerGroupIDForProductType(orgCustomerGroupID, nestedProductType.getInnerProductTypeOrganisationID(), true);
 
 		TariffID orgTariffID = TariffID.create(localPriceCoordinate.getTariffPK());
 		TariffID newTariffID = getTariffMapper().getTariffIDForProductType(orgTariffID, nestedProductType.getInnerProductTypeOrganisationID(), true);
 
 		IPriceCoordinate res = Utils.cloneSerializable(localPriceCoordinate);
 		res.setTariffPK(Tariff.getPrimaryKey(newTariffID.organisationID, newTariffID.tariffID));
-		res.setCustomerGroupPK(CustomerGroup.getPrimaryKey(newTariffID.organisationID, orgCustomerGroupID.customerGroupID)); // TODO we MUST have a mapping for this!!!
+		res.setCustomerGroupPK(CustomerGroup.getPrimaryKey(newCustomerGroupID.organisationID, newCustomerGroupID.customerGroupID));
 		return res;
 	}
 

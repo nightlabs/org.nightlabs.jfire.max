@@ -26,7 +26,6 @@
 
 package org.nightlabs.jfire.accounting.gridpriceconfig;
 
-import java.lang.reflect.Constructor;
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.List;
@@ -48,6 +47,7 @@ import org.nightlabs.jfire.accounting.priceconfig.AffectedProductType;
 import org.nightlabs.jfire.accounting.priceconfig.FetchGroupsPriceConfig;
 import org.nightlabs.jfire.accounting.priceconfig.PriceConfigUtil;
 import org.nightlabs.jfire.accounting.priceconfig.id.PriceConfigID;
+import org.nightlabs.jfire.organisation.LocalOrganisation;
 import org.nightlabs.jfire.store.ProductType;
 import org.nightlabs.jfire.trade.CustomerGroup;
 
@@ -195,7 +195,8 @@ public class GridPriceConfigUtil
 	 */
 	public static Collection<GridPriceConfig> storePriceConfigs(
 			PersistenceManager pm, Collection<GridPriceConfig> _priceConfigs,
-			Class priceCalculatorClass, // TODO pass a factory instead of this as we need additional parameters now!
+			PriceCalculatorFactory priceCalculatorFactory,
+//			Class priceCalculatorClass, // TODO pass a factory instead of this as we need additional parameters now!
 			boolean get) // , String[] fetchGroups, int maxFetchDepth)
 	throws PriceCalculationException
 	{
@@ -206,20 +207,26 @@ public class GridPriceConfigUtil
 			}
 		}
 
-		if (!PriceCalculator.class.isAssignableFrom(priceCalculatorClass))
-			throw new IllegalArgumentException("priceCalculatorClass " + (priceCalculatorClass == null ? null : priceCalculatorClass.getName()) + " does not extend " + PriceCalculator.class.getName());
+		// prevent writing a partner-PriceConfig
+		String localOrganisationID = LocalOrganisation.getLocalOrganisation(pm).getOrganisationID();
 
-		Constructor priceCalculatorConstructor;
-		try {
-			priceCalculatorConstructor = priceCalculatorClass.getConstructor(new Class[] { ProductType.class });
-		} catch (NoSuchMethodException x) {
-			throw new IllegalArgumentException("priceCalculatorClass " + priceCalculatorClass.getName() + " does not have a constructor taking one parameter of type " + ProductType.class.getName(), x);
-		}
+//		if (!PriceCalculator.class.isAssignableFrom(priceCalculatorClass))
+//			throw new IllegalArgumentException("priceCalculatorClass " + (priceCalculatorClass == null ? null : priceCalculatorClass.getName()) + " does not extend " + PriceCalculator.class.getName());
+//
+//		Constructor priceCalculatorConstructor;
+//		try {
+//			priceCalculatorConstructor = priceCalculatorClass.getConstructor(new Class[] { ProductType.class });
+//		} catch (NoSuchMethodException x) {
+//			throw new IllegalArgumentException("priceCalculatorClass " + priceCalculatorClass.getName() + " does not have a constructor taking one parameter of type " + ProductType.class.getName(), x);
+//		}
 
 		// store all price configs and put the living objects into priceConfigs
 		Set<GridPriceConfig> priceConfigs = new HashSet<GridPriceConfig>();
 		List<AffectedProductType> affectedProductTypes = null;
 		for (GridPriceConfig priceConfig : _priceConfigs) {
+			if (!localOrganisationID.equals(priceConfig.getOrganisationID()))
+				throw new IllegalArgumentException("Cannot store a partner's price config: " + priceConfig.getPrimaryKey());
+
 			priceConfig = (GridPriceConfig) pm.makePersistent(priceConfig);
 			priceConfigs.add(priceConfig);
 
@@ -235,6 +242,7 @@ public class GridPriceConfigUtil
 		int skippedBecauseAlreadyProcessed = 0;
 		Set<ProductType> processedProductTypes = new HashSet<ProductType>();
 		for (AffectedProductType affectedProductType : affectedProductTypes) {
+
 			ProductType productType = (ProductType) pm.getObjectById(affectedProductType.getProductTypeID());
 			if (processedProductTypes.contains(productType)) {
 				++skippedBecauseAlreadyProcessed;
@@ -248,12 +256,13 @@ public class GridPriceConfigUtil
 				((IResultPriceConfig)productType.getPackagePriceConfig()).adoptParameters(
 						productType.getInnerPriceConfig());
 
-				PriceCalculator priceCalculator;
-				try {
-					priceCalculator = (PriceCalculator) priceCalculatorConstructor.newInstance(new Object[] { productType });
-				} catch (Exception e) {
-					throw new RuntimeException("priceCalculatorClass " + priceCalculatorClass.getName() + " could not be instantiated!", e);
-				}
+//				PriceCalculator priceCalculator;
+//				try {
+//					priceCalculator = (PriceCalculator) priceCalculatorConstructor.newInstance(new Object[] { productType });
+//				} catch (Exception e) {
+//					throw new RuntimeException("priceCalculatorClass " + priceCalculatorClass.getName() + " could not be instantiated!", e);
+//				}
+				PriceCalculator priceCalculator = priceCalculatorFactory.createPriceCalculator(productType);
 //				PriceCalculator priceCalculator = new PriceCalculator(productType);
 				priceCalculator.preparePriceCalculation();
 				priceCalculator.calculatePrices();

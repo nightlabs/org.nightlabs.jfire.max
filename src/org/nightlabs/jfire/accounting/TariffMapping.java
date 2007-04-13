@@ -12,6 +12,7 @@ import javax.jdo.Query;
 
 import org.nightlabs.jfire.accounting.gridpriceconfig.GridPriceConfig;
 import org.nightlabs.jfire.accounting.id.TariffID;
+import org.nightlabs.jfire.accounting.id.TariffMappingID;
 import org.nightlabs.jfire.store.ProductType;
 import org.nightlabs.util.Utils;
 
@@ -30,7 +31,7 @@ import org.nightlabs.util.Utils;
  *
  * @jdo.persistence-capable
  *		identity-type="application"
- *		objectid-class="org.nightlabs.jfire.accounting.TariffMappingID"
+ *		objectid-class="org.nightlabs.jfire.accounting.id.TariffMappingID"
  *		detachable="true"
  *		table="JFireTrade_TariffMapping"
  *

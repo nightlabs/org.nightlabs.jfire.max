@@ -46,7 +46,6 @@ import org.nightlabs.jfire.transfer.Anchor;
  *		identity-type="application"
  *		persistence-capable-superclass="org.nightlabs.jfire.accounting.pay.ServerPaymentProcessor"
  *		detachable="true"
- *		table="JFireTrade_ServerPaymentProcessorCash"
  *
  * @jdo.inheritance strategy="superclass-table"
  */

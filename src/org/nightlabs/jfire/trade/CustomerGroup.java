@@ -52,12 +52,16 @@ import org.nightlabs.jfire.store.deliver.ModeOfDeliveryFlavour;
  *		field-order="organisationID, customerGroupID"
  *		include-body="id/CustomerGroupID.body.inc"
  *
+ * @jdo.fetch-group name="CustomerGroup.name" fields="name"
+ *
  * @jdo.fetch-group name="FetchGroupsPriceConfig.edit" fields="name"
  */
 public class CustomerGroup implements Serializable
 {
 	public static final String CUSTOMER_GROUP_ID_ANONYMOUS = "CustomerGroup-anonymous";
 	public static final String CUSTOMER_GROUP_ID_DEFAULT = "CustomerGroup-default";
+
+	public static final String FETCH_GROUP_NAME = "CustomerGroup.name";
 
 //	public static final String DEFAULT_CUSTOMER_GROUP_ID = "default";
 //

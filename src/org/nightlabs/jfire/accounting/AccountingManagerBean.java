@@ -71,6 +71,7 @@ import org.nightlabs.jfire.accounting.id.InvoiceID;
 import org.nightlabs.jfire.accounting.id.InvoiceLocalID;
 import org.nightlabs.jfire.accounting.id.PriceFragmentTypeID;
 import org.nightlabs.jfire.accounting.id.TariffID;
+import org.nightlabs.jfire.accounting.id.TariffMappingID;
 import org.nightlabs.jfire.accounting.pay.ModeOfPayment;
 import org.nightlabs.jfire.accounting.pay.ModeOfPaymentConst;
 import org.nightlabs.jfire.accounting.pay.ModeOfPaymentFlavour;
@@ -511,41 +512,38 @@ public abstract class AccountingManagerBean
 		}
 	}
 
+//	/**
+//	 * @ejb.interface-method
+//	 * @ejb.transaction type="Supports"
+//	 * @ejb.permission role-name="_Guest_"
+//	 */
+//	public Collection<Tariff> getTariffs(String[] fetchGroups, int maxFetchDepth)
+//	{
+//		PersistenceManager pm = getPersistenceManager();
+//		try {
+//			FetchPlan fetchPlan = pm.getFetchPlan();
+//			fetchPlan.setMaxFetchDepth(maxFetchDepth);
+//			if (fetchGroups != null)
+//				fetchPlan.setGroups(fetchGroups);
+//
+//			Collection<Tariff> res = new ArrayList<Tariff>();
+//			for (Iterator it = pm.getExtent(Tariff.class, true).iterator(); it.hasNext(); ) {
+//				Tariff t = (Tariff)it.next();
+//				res.add((Tariff) pm.detachCopy(t));
+//			}
+//
+//			return res;
+//		} finally {
+//			pm.close();
+//		}
+//	}
+
 	/**
 	 * @ejb.interface-method
-	 * @ejb.transaction type="Supports"
-	 * @ejb.permission role-name="_Guest_"
-	 */
-	public Collection<Tariff> getTariffs(String[] fetchGroups, int maxFetchDepth)
-	{
-		PersistenceManager pm = getPersistenceManager();
-		try {
-			FetchPlan fetchPlan = pm.getFetchPlan();
-			fetchPlan.setMaxFetchDepth(maxFetchDepth);
-			if (fetchGroups != null)
-				fetchPlan.setGroups(fetchGroups);
-
-			Collection<Tariff> res = new ArrayList<Tariff>();
-			for (Iterator it = pm.getExtent(Tariff.class, true).iterator(); it.hasNext(); ) {
-				Tariff t = (Tariff)it.next();
-				res.add((Tariff) pm.detachCopy(t));
-			}
-
-			return res;
-		} finally {
-			pm.close();
-		}
-	}
-
-	/**
-	 * @throws ModuleException
-	 *
-	 * @ejb.interface-method
-	 * @ejb.transaction type = "Required"
+	 * @ejb.transaction type="Required"
 	 * @ejb.permission role-name="_Guest_"
 	 */
 	public Tariff storeTariff(Tariff tariff, boolean get, String[] fetchGroups, int maxFetchDepth)
-	throws ModuleException
 	{
 		PersistenceManager pm = getPersistenceManager();
 		try {
@@ -555,45 +553,44 @@ public abstract class AccountingManagerBean
 		}
 	}
 
-	/**
-	 * @throws ModuleException
-	 *
-	 * @ejb.interface-method
-	 * @ejb.transaction type = "Required"
-	 * @ejb.permission role-name="_Guest_"
-	 */
-	public Collection getCustomerGroups(String[] fetchGroups, int maxFetchDepth)
-	throws ModuleException
-	{
-		PersistenceManager pm = getPersistenceManager();
-		try {
-			pm.getFetchPlan().setMaxFetchDepth(maxFetchDepth);
-			if (fetchGroups != null)
-				pm.getFetchPlan().setGroups(fetchGroups);
-			Query q = pm.newQuery(CustomerGroup.class);
-			return pm.detachCopyAll((Collection)q.execute());
-		} finally {
-			pm.close();
-		}
-	}
-
-	/**
-	 * @throws ModuleException
-	 *
-	 * @ejb.interface-method
-	 * @ejb.transaction type = "Required"
-	 * @ejb.permission role-name="_Guest_"
-	 */
-	public CustomerGroup storeCustomerGroup(CustomerGroup customerGroup, boolean get, String[] fetchGroups, int maxFetchDepth)
-	throws ModuleException
-	{
-		PersistenceManager pm = getPersistenceManager();
-		try {
-			return (CustomerGroup) NLJDOHelper.storeJDO(pm, customerGroup, get, fetchGroups, maxFetchDepth);
-		} finally {
-			pm.close();
-		}
-	}
+//	/**
+//	 * @throws ModuleException
+//	 *
+//	 * @ejb.interface-method
+//	 * @ejb.transaction type="Required"
+//	 * @ejb.permission role-name="_Guest_"
+//	 */
+//	public Collection getCustomerGroups(String[] fetchGroups, int maxFetchDepth)
+//	throws ModuleException
+//	{
+//		PersistenceManager pm = getPersistenceManager();
+//		try {
+//			pm.getFetchPlan().setMaxFetchDepth(maxFetchDepth);
+//			if (fetchGroups != null)
+//				pm.getFetchPlan().setGroups(fetchGroups);
+//			Query q = pm.newQuery(CustomerGroup.class);
+//			return pm.detachCopyAll((Collection)q.execute());
+//		} finally {
+//			pm.close();
+//		}
+//	}
+//
+//	/**
+//	 * @throws ModuleException
+//	 *
+//	 * @ejb.interface-method
+//	 * @ejb.transaction type = "Required"
+//	 * @ejb.permission role-name="_Guest_"
+//	 */
+//	public CustomerGroup storeCustomerGroup(CustomerGroup customerGroup, boolean get, String[] fetchGroups, int maxFetchDepth)
+//	{
+//		PersistenceManager pm = getPersistenceManager();
+//		try {
+//			return (CustomerGroup) NLJDOHelper.storeJDO(pm, customerGroup, get, fetchGroups, maxFetchDepth);
+//		} finally {
+//			pm.close();
+//		}
+//	}
 
 	/**
 	 * @throws ModuleException

@@ -42,6 +42,7 @@ import javax.ejb.SessionBean;
 import javax.ejb.SessionContext;
 import javax.jdo.JDOHelper;
 import javax.jdo.PersistenceManager;
+import javax.jdo.Query;
 
 import org.apache.log4j.Logger;
 import org.jbpm.JbpmContext;
@@ -64,6 +65,8 @@ import org.nightlabs.jfire.security.User;
 import org.nightlabs.jfire.security.id.UserID;
 import org.nightlabs.jfire.trade.config.LegalEntityViewConfigModule;
 import org.nightlabs.jfire.trade.id.ArticleID;
+import org.nightlabs.jfire.trade.id.CustomerGroupID;
+import org.nightlabs.jfire.trade.id.CustomerGroupMappingID;
 import org.nightlabs.jfire.trade.id.OfferID;
 import org.nightlabs.jfire.trade.id.OfferLocalID;
 import org.nightlabs.jfire.trade.id.OrderID;
@@ -1176,4 +1179,115 @@ implements SessionBean
 		}
 	}
 
+
+	/**
+	 * @ejb.interface-method
+	 * @ejb.transaction type="Supports"
+	 * @ejb.permission role-name="_Guest_"
+	 */
+	public Set<CustomerGroupMappingID> getCustomerGroupMappingIDs()
+	{
+		PersistenceManager pm = getPersistenceManager();
+		try {
+			Query q = pm.newQuery(CustomerGroupMapping.class);
+			q.setResult("JDOHelper.getObjectId(this)");
+			return new HashSet<CustomerGroupMappingID>((Collection<? extends CustomerGroupMappingID>) q.execute());
+		} finally {
+			pm.close();
+		}
+	}
+
+	/**
+	 * @ejb.interface-method
+	 * @ejb.transaction type="Supports"
+	 * @ejb.permission role-name="_Guest_"
+	 */
+	@SuppressWarnings("unchecked")
+	public Collection<CustomerGroupMapping> getCustomerGroupMappings(Collection<CustomerGroupMappingID> customerGroupMappingIDs, String[] fetchGroups, int maxFetchDepth)
+	{
+		PersistenceManager pm = getPersistenceManager();
+		try {
+			return NLJDOHelper.getDetachedObjectList(pm, customerGroupMappingIDs, CustomerGroupMapping.class, fetchGroups, maxFetchDepth);
+		} finally {
+			pm.close();
+		}
+	}
+
+	/**
+	 * @ejb.interface-method
+	 * @ejb.transaction type="Required"
+	 * @ejb.permission role-name="_Guest_"
+	 */
+	public CustomerGroupMapping createCustomerGroupMapping(CustomerGroupID partnerCustomerGroupID, CustomerGroupID localCustomerGroupID, boolean get, String[] fetchGroups, int maxFetchDepth)
+	{
+		PersistenceManager pm = getPersistenceManager();
+		try {
+			pm.getFetchPlan().setMaxFetchDepth(maxFetchDepth);
+			if (fetchGroups != null)
+				pm.getFetchPlan().setGroups(fetchGroups);
+
+			CustomerGroupMapping tm = CustomerGroupMapping.createCustomerGroupMapping(pm, partnerCustomerGroupID, localCustomerGroupID);
+			if (!get)
+				return null;
+
+			return (CustomerGroupMapping) pm.detachCopy(tm);
+		} finally {
+			pm.close();
+		}
+	}
+
+	/**
+	 * @param organisationID <code>null</code> in order to get all customerGroups (no filtering). non-<code>null</code> to filter by <code>organisationID</code>.
+	 * @param inverse This applies only if <code>organisationID != null</code>. If <code>true</code>, it will return all {@link CustomerGroupID}s where the <code>organisationID</code>
+	 *		is NOT the one passed as parameter <code>organisationID</code>.
+	 *
+	 * @ejb.interface-method
+	 * @ejb.transaction type="Supports"
+	 * @ejb.permission role-name="_Guest_"
+	 */
+	public Set<CustomerGroupID> getCustomerGroupIDs(String organisationID, boolean inverse)
+	{
+		PersistenceManager pm = getPersistenceManager();
+		try {
+			Query q = pm.newQuery(CustomerGroup.class);
+			q.setResult("JDOHelper.getObjectId(this)");
+			if (organisationID != null)
+				q.setFilter("this.organisationID " + (inverse ? "!=" : "==") + " :organisationID");
+
+			return new HashSet<CustomerGroupID>((Collection<? extends CustomerGroupID>) q.execute(organisationID));
+		} finally {
+			pm.close();
+		}
+	}
+
+	/**
+	 * @ejb.interface-method
+	 * @ejb.transaction type="Supports"
+	 * @ejb.permission role-name="_Guest_"
+	 */
+	@SuppressWarnings("unchecked")
+	public Collection<CustomerGroup> getCustomerGroups(Collection<CustomerGroupID> customerGroupIDs, String[] fetchGroups, int maxFetchDepth)
+	{
+		PersistenceManager pm = getPersistenceManager();
+		try {
+			return NLJDOHelper.getDetachedObjectList(pm, customerGroupIDs, CustomerGroup.class, fetchGroups, maxFetchDepth);
+		} finally {
+			pm.close();
+		}
+	}
+
+	/**
+	 * @ejb.interface-method
+	 * @ejb.transaction type="Required"
+	 * @ejb.permission role-name="_Guest_"
+	 */
+	public CustomerGroup storeCustomerGroup(CustomerGroup customerGroup, boolean get, String[] fetchGroups, int maxFetchDepth)
+	{
+		PersistenceManager pm = getPersistenceManager();
+		try {
+			return (CustomerGroup) NLJDOHelper.storeJDO(pm, customerGroup, get, fetchGroups, maxFetchDepth);
+		} finally {
+			pm.close();
+		}
+	}
 }

@@ -129,9 +129,9 @@ public class ValueAcquisitionSetup implements Serializable {
 		this.parameterAcquisitionSetup = parameterAcquisitionSetup;
 		this.useCase = useCase;
 		
-		consumer2Binding = new HashMap<String, Map<String,ValueConsumerBinding>>();
+//		consumer2Binding = new HashMap<String, Map<String,ValueConsumerBinding>>();
 		parameterConfigs = new ArrayList<AcquisitionParameterConfig>();
-		provider2Binding = new HashMap<String, ValueConsumerBinding>();
+//		provider2Binding = new HashMap<String, ValueConsumerBinding>();
 		valueConsumerBindings = new HashSet<ValueConsumerBinding>();
 		valueProviderConfigs = new HashSet<ValueProviderConfig>();
 	}

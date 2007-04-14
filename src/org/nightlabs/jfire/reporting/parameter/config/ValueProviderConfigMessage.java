@@ -47,7 +47,7 @@ import org.nightlabs.jfire.reporting.parameter.ValueProvider;
  *		detachable = "true"
  *		table="JFireReporting_ValueProviderConfigMessage"
  *
- * @jdo.create-objectid-class field-order="organisationID, valueAcquisitionSetupID, valueProviderOrganisationID, valueProviderCategoryID, valueProviderID"
+ * @jdo.create-objectid-class field-order="organisationID, valueAcquisitionSetupID, valueProviderOrganisationID, valueProviderCategoryID, valueProviderID, valueProviderConfigID"
  * 
  * @jdo.fetch-group name="ValueProviderConfig.message" fetch-groups="default" fields="names"
  */
@@ -86,6 +86,12 @@ public class ValueProviderConfigMessage extends I18nText implements Serializable
 	private String valueProviderID;
 	
 	/**
+	 * @jdo.field primary-key="true"
+	 */
+	private long valueProviderConfigID;
+	
+	
+	/**
 	 * @jdo.field persistence-modifier="persistent"
 	 */
 	private ValueProviderConfig valueProviderConfig;
@@ -108,6 +114,7 @@ public class ValueProviderConfigMessage extends I18nText implements Serializable
 		this.valueProviderCategoryID = valueProviderConfig.getValueProviderCategoryID();
 		this.valueProviderID = valueProviderConfig.getValueProviderID();
 		this.valueProviderConfig = valueProviderConfig;
+		this.valueProviderConfigID = valueProviderConfig.getValueProviderConfigID();
 	}
 
 	/**
@@ -179,5 +186,8 @@ public class ValueProviderConfigMessage extends I18nText implements Serializable
 		return valueProviderOrganisationID;
 	}
 	
+	public long getValueProviderConfigID() {
+		return valueProviderConfigID;
+	}
 	
 }

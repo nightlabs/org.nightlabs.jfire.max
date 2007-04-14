@@ -16,7 +16,7 @@ import org.nightlabs.jfire.reporting.parameter.id.ValueProviderID;
  *		table="JFireReporting_ValueProviderConfig"
  *
  * @jdo.create-objectid-class 
- * 		field-order="organisationID, valueAcquisitionSetupID, valueProviderOrganisationID, valueProviderCategoryID, valueProviderID"
+ * 		field-order="organisationID, valueAcquisitionSetupID, valueProviderOrganisationID, valueProviderCategoryID, valueProviderID, valueProviderConfigID"
  * 		include-imports="id/ValueProviderConfig.imports.inc"
  *		include-body="id/ValueProviderConfig.body.inc"
  *	
@@ -58,6 +58,11 @@ implements ValueConsumer, Serializable, IGraphicalInfoProvider
 	private String valueProviderID;
 	
 	/**
+	 * @jdo.field primary-key="true"
+	 */
+	private long valueProviderConfigID;
+	
+	/**
 	 * @jdo.field persistence-modifier="persistent"
 	 */
 	private int pageIndex;
@@ -70,6 +75,11 @@ implements ValueConsumer, Serializable, IGraphicalInfoProvider
 	 * @jdo.field persistence-modifier="persistent"
 	 */
 	private ValueAcquisitionSetup setup;
+	
+	/**
+	 * @jdo.field persistence-modifier="persistent"
+	 */	
+	private boolean allowNullOutputValue;
 
 	/**
 	 * @jdo.field persistence-modifier="persistent"
@@ -89,11 +99,12 @@ implements ValueConsumer, Serializable, IGraphicalInfoProvider
 	
 	protected ValueProviderConfig() {}
 	
-	public ValueProviderConfig(ValueAcquisitionSetup setup)  {		
+	public ValueProviderConfig(ValueAcquisitionSetup setup, long valueProviderConfigID)  {		
 		this.organisationID = setup.getOrganisationID();
 		this.valueAcquisitionSetupID = setup.getValueAcquisitionSetupID();
 		this.setup = setup;
 		this.message = new ValueProviderConfigMessage(this);
+		this.valueProviderConfigID = valueProviderConfigID;
 	}
 
 	/**
@@ -125,7 +136,7 @@ implements ValueConsumer, Serializable, IGraphicalInfoProvider
 	}
 
 	public String getConsumerKey() {
-		return valueProviderOrganisationID + "/" + valueProviderCategoryID + "/" + valueProviderID;
+		return valueProviderOrganisationID + "/" + valueProviderCategoryID + "/" + valueProviderID + "/" + Long.toHexString(valueProviderConfigID);
 	}
 
 	/**
@@ -250,5 +261,28 @@ implements ValueConsumer, Serializable, IGraphicalInfoProvider
 	public ValueProviderConfigMessage getMessage() {
 		return message;
 	}
+
+	/**
+	 * @return the valueProviderConfigID
+	 */
+	public long getValueProviderConfigID() {
+		return valueProviderConfigID;
+	}
+
+	/**
+	 * @return the allowNullOutputValue
+	 */
+	public boolean isAllowNullOutputValue() {
+		return allowNullOutputValue;
+	}
+
+	/**
+	 * @param allowNullOutputValue the allowNullOutputValue to set
+	 */
+	public void setAllowNullOutputValue(boolean allowNullOutputValue) {
+		this.allowNullOutputValue = allowNullOutputValue;
+	}
 		
+	
+	
 }

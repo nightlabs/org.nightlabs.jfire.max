@@ -328,4 +328,9 @@ public class ValueAcquisitionSetup implements Serializable {
 		}
 		return provider2Binding.get(key);
 	}
+	
+	public void clearBindingIndexes() {
+		provider2Binding = null;
+		consumer2Binding = null;
+	}
 }

@@ -15,6 +15,7 @@ import java.util.SortedMap;
 import java.util.TreeMap;
 import java.util.Map.Entry;
 
+import org.nightlabs.jfire.idgenerator.IDGenerator;
 import org.nightlabs.jfire.reporting.parameter.ValueProvider;
 import org.nightlabs.jfire.reporting.parameter.ValueProviderCategory;
 import org.nightlabs.jfire.reporting.parameter.ValueProviderInputParameter;
@@ -42,17 +43,17 @@ public class AcquisitionTest {
 		setup.setParameterConfigs(parameterConfigs);
 		
 		Set<ValueProviderConfig> providerConfigs = new HashSet<ValueProviderConfig>();
-		ValueProviderConfig vpc1 = new ValueProviderConfig(setup);
+		ValueProviderConfig vpc1 = new ValueProviderConfig(setup, IDGenerator.nextID(ValueProviderConfig.class));
 		vpc1.setValueProviderID("vp1");
-		ValueProviderConfig vpc2 = new ValueProviderConfig(setup);
+		ValueProviderConfig vpc2 = new ValueProviderConfig(setup, IDGenerator.nextID(ValueProviderConfig.class));
 		vpc2.setValueProviderID("vp2");
-		ValueProviderConfig vpc3 = new ValueProviderConfig(setup);
+		ValueProviderConfig vpc3 = new ValueProviderConfig(setup, IDGenerator.nextID(ValueProviderConfig.class));
 		vpc3.setValueProviderID("vp3");
-		ValueProviderConfig vpc4 = new ValueProviderConfig(setup);
+		ValueProviderConfig vpc4 = new ValueProviderConfig(setup, IDGenerator.nextID(ValueProviderConfig.class));
 		vpc4.setValueProviderID("vp4");
-		ValueProviderConfig vpc5 = new ValueProviderConfig(setup);
+		ValueProviderConfig vpc5 = new ValueProviderConfig(setup, IDGenerator.nextID(ValueProviderConfig.class));
 		vpc5.setValueProviderID("vp5");
-		ValueProviderConfig vpc6 = new ValueProviderConfig(setup);
+		ValueProviderConfig vpc6 = new ValueProviderConfig(setup, IDGenerator.nextID(ValueProviderConfig.class));
 		vpc6.setValueProviderID("vp6");
 		providerConfigs.add(vpc1);
 		providerConfigs.add(vpc2);

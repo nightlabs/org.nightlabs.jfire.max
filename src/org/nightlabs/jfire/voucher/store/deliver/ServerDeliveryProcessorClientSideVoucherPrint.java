@@ -34,7 +34,7 @@ extends ServerDeliveryProcessor
 	{
 		ServerDeliveryProcessorClientSideVoucherPrint serverDeliveryProcessor;
 		try {
-			pm.getExtent(ServerDeliveryProcessorManual.class);
+			pm.getExtent(ServerDeliveryProcessorClientSideVoucherPrint.class);
 			serverDeliveryProcessor = (ServerDeliveryProcessorClientSideVoucherPrint) pm.getObjectById(
 					ServerPaymentProcessorID.create(Organisation.DEVIL_ORGANISATION_ID, 
 							ServerDeliveryProcessorClientSideVoucherPrint.class.getName()));

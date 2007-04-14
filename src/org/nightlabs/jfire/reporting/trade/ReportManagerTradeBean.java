@@ -291,10 +291,10 @@ implements SessionBean
 		logger.debug("Created parameter config");
 		
 		Set<ValueProviderConfig> providerConfigs = new HashSet<ValueProviderConfig>();
-		ValueProviderConfig vpc1 = new ValueProviderConfig(valueAcquisitionSetup);
+		ValueProviderConfig vpc1 = new ValueProviderConfig(valueAcquisitionSetup, IDGenerator.nextID(ValueProviderConfig.class));
 		vpc1.setValueProvider(leSearch);
 		
-		ValueProviderConfig vpc2 = new ValueProviderConfig(valueAcquisitionSetup);
+		ValueProviderConfig vpc2 = new ValueProviderConfig(valueAcquisitionSetup, IDGenerator.nextID(ValueProviderConfig.class));
 		vpc2.setValueProvider(invoiceByCustomer);
 		
 		providerConfigs.add(vpc1);

@@ -45,6 +45,8 @@ import javax.naming.NamingException;
 
 import org.apache.log4j.Logger;
 import org.nightlabs.annotation.Implement;
+import org.nightlabs.jdo.moduleregistry.MalformedVersionException;
+import org.nightlabs.jdo.moduleregistry.ModuleMetaData;
 import org.nightlabs.jfire.asyncinvoke.AsyncInvoke;
 import org.nightlabs.jfire.asyncinvoke.Invocation;
 import org.nightlabs.jfire.base.BaseSessionBeanImpl;
@@ -136,12 +138,25 @@ implements SessionBean
 	 * @ejb.permission role-name="_System_"
 	 */
 	public void initialise()
+	throws MalformedVersionException
 	{
 		Geography geography = Geography.sharedInstance();
 		String organisationID = getOrganisationID();
 
 		PersistenceManager pm = getPersistenceManager();
 		try {
+			// As the ModuleMetaData is not managed by GeographyManagerBean, we can do it here (this stuff is expensive and we should therefore avoid to
+			// run it on every boot).
+			ModuleMetaData moduleMetaData = ModuleMetaData.getModuleMetaData(pm, JFireGeographyEAR.MODULE_NAME);
+			if (moduleMetaData != null)
+				return;
+
+			// version is {major}.{minor}.{release}-{patchlevel}-{suffix}
+			moduleMetaData = new ModuleMetaData(
+					JFireGeographyEAR.MODULE_NAME, "1.0.0-0-beta", "1.0.0-0-beta");
+			pm.makePersistent(moduleMetaData);
+
+
 			iterateCountries: for (Country country : geography.getCountries()) {
 				// CityIDs are local within the namespace of countryID and organisationID
 

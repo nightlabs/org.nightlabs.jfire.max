@@ -30,6 +30,11 @@ import java.io.Serializable;
 import java.util.HashMap;
 import java.util.Map;
 
+import javax.jdo.JDOObjectNotFoundException;
+import javax.jdo.PersistenceManager;
+
+import org.nightlabs.jfire.trade.id.OrderRequirementID;
+
 /**
  * There exists one instance of OrderRequirement for each Order on the side of
  * its vendor. It bundles all orders that are used to fulfill the main order.
@@ -47,7 +52,7 @@ import java.util.Map;
  *
  * @jdo.inheritance strategy="new-table"
  *
- * @jdo.create-objectid-class field-order="organisationID, orderID"
+ * @jdo.create-objectid-class field-order="organisationID, orderIDPrefix, orderID"
  */
 public class OrderRequirement
 	implements Serializable
@@ -57,7 +62,11 @@ public class OrderRequirement
 	 * @jdo.column length="100"
 	 */
 	private String organisationID;
-
+	/**
+	 * @jdo.field primary-key="true"
+	 * @jdo.column length="50"
+	 */
+	private String orderIDPrefix;
 	/**
 	 * @jdo.field primary-key="true"
 	 */
@@ -67,45 +76,68 @@ public class OrderRequirement
 	 * @jdo.field persistence-modifier="persistent"
 	 */
 	private Order order;
-	
+
 	/**
-	 * @jdo.field persistence-modifier="persistent"
+	 * This method returns a previously existing {@link OrderRequirement} or creates and persists
+	 * a new instance if not existent.
 	 */
-	private Trader trader;
+	public static OrderRequirement getOrderRequirement(PersistenceManager pm, Order order)
+	{
+		OrderRequirementID orderRequirementID = OrderRequirementID.create(order.getOrganisationID(), order.getOrderIDPrefix(), order.getOrderID());
+		pm.getExtent(OrderRequirement.class);
+		try {
+			OrderRequirement res = (OrderRequirement) pm.getObjectById(orderRequirementID);
+			res.getOrder();
+			return res;
+		} catch (JDOObjectNotFoundException x) {
+			return (OrderRequirement) pm.makePersistent(new OrderRequirement(order));
+		}
+	}
 
 	public OrderRequirement() { }
-	
-	public OrderRequirement(Trader trader, Order order)
+
+	public OrderRequirement(Order order)
 	{
-		if (trader == null)
-			throw new NullPointerException("trader");
-		
 		if (order == null)
 			throw new NullPointerException("order");
 
 		this.order = order;
 		this.organisationID = order.getOrganisationID();
+		this.orderIDPrefix = order.getOrderIDPrefix();
 		this.orderID = order.getOrderID();
 	}
-	
+
+	public Order getOrder()
+	{
+		return order;
+	}
+
 	/**
-	 * key: String anchorPK (of the vendor LegalEntity)<br/>
+	 * key: LegalEntity vendor<br/>
 	 * value: Order order
 	 * <br/><br/>
 	 *
 	 * @jdo.field
 	 *		persistence-modifier="persistent"
 	 *		collection-type="map"
-	 *		key-type="java.lang.String"
+	 *		key-type="LegalEntity"
 	 *		value-type="Order"
 	 *
 	 * @jdo.join
 	 */
-	private Map ordersByVendor = new HashMap();
-	
-	
+	private Map vendor2order = new HashMap();
+
 	public void addOrder(Order order) {
-		ordersByVendor.put(order.getVendor().getPrimaryKey(), order);
+		LegalEntity vendor = order.getVendor();
+
+		Order other = (Order) vendor2order.get(vendor);
+		if (order.equals(other))
+			return; // nothing to do
+
+		if (other != null)
+			throw new IllegalStateException("Vendor-Order cannot be added, because another Order is already assigned for this vendor! order.primaryKey=" + order.getPrimaryKey() + " otherOrder.primaryKey=" + other.getPrimaryKey());
+
+		vendor2order.put(vendor, order);
 	}
 	
 	/**
@@ -115,8 +147,8 @@ public class OrderRequirement
 	 * @param vendor
 	 * @return Returns the order for the given vendor or <tt>null</tt>.
 	 */
-	public Order getOrder(OrganisationLegalEntity vendor)
+	public Order getPartnerOrder(LegalEntity vendor)
 	{
-		return (Order)ordersByVendor.get(vendor.getPrimaryKey());
+		return (Order)vendor2order.get(vendor);
 	}
 }

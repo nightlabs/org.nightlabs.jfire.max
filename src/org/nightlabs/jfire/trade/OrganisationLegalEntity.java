@@ -175,7 +175,7 @@ public class OrganisationLegalEntity extends LegalEntity
 			Organisation organisation = Organisation.getOrganisation(
 					pm, organisationID, throwExceptionIfNotExistent);
 
-			if (organisationID != null) {
+			if (organisation != null) {
 				
 				organisationLegalEntity = new OrganisationLegalEntity(organisation, anchorTypeID);
 				try {

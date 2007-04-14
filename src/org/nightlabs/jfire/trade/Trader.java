@@ -32,6 +32,7 @@ import java.net.URL;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Hashtable;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
@@ -39,9 +40,11 @@ import java.util.Locale;
 import java.util.Map;
 import java.util.Set;
 
+import javax.jdo.FetchPlan;
 import javax.jdo.JDOHelper;
 import javax.jdo.JDOObjectNotFoundException;
 import javax.jdo.PersistenceManager;
+import javax.naming.NamingException;
 
 import org.apache.log4j.Logger;
 import org.jbpm.JbpmContext;
@@ -56,6 +59,7 @@ import org.nightlabs.jfire.asyncinvoke.AsyncInvokeEnvelope;
 import org.nightlabs.jfire.asyncinvoke.ErrorCallback;
 import org.nightlabs.jfire.asyncinvoke.Invocation;
 import org.nightlabs.jfire.asyncinvoke.UndeliverableCallback;
+import org.nightlabs.jfire.base.Lookup;
 import org.nightlabs.jfire.config.Config;
 import org.nightlabs.jfire.idgenerator.IDGenerator;
 import org.nightlabs.jfire.jbpm.JbpmLookup;
@@ -71,6 +75,7 @@ import org.nightlabs.jfire.security.SecurityReflector;
 import org.nightlabs.jfire.security.User;
 import org.nightlabs.jfire.security.id.UserID;
 import org.nightlabs.jfire.store.DeliveryNote;
+import org.nightlabs.jfire.store.NestedProductType;
 import org.nightlabs.jfire.store.NotAvailableException;
 import org.nightlabs.jfire.store.Product;
 import org.nightlabs.jfire.store.ProductLocal;
@@ -475,10 +480,7 @@ public class Trader
 		if (currency == null)
 			throw new NullPointerException("currency");
 
-		PersistenceManager pm = JDOHelper.getPersistenceManager(this);
-		if (pm == null)
-			throw new IllegalStateException(
-					"This OrganisationLegalEntity is currently not persistent! Can invoke this method only on a persistent object!");
+		PersistenceManager pm = getPersistenceManager();
 
 		// LocalOrganisation localOrganisation =
 		// LocalOrganisation.getLocalOrganisation(pm);
@@ -508,6 +510,18 @@ public class Trader
 			getPersistenceManager().makePersistent(order);
 			return order;
 		}
+//		if (!getOrganisationID().equals(vendor.getOrganisation())) {
+//			try {
+//				
+//				
+//
+//			} catch (ModuleException x) {
+//				throw x;
+//			} catch (Exception x) {
+//				throw new ModuleException(x);
+//			}
+//		}
+
 		// TODO: Implement foreign stuff
 		// // not local, means it's a remote organisation...
 		// // Thus, we delegate to the TradeManager of the other organisation.
@@ -529,87 +543,87 @@ public class Trader
 		throw new UnsupportedOperationException("NYI");
 	}
 
-	public OrderRequirement createOrderRequirement(Order order)
-	{
-		if (!order.getOrganisationID().equals(this.getOrganisationID()))
-			throw new IllegalArgumentException(
-					"Cannot create an instance of OrderRequirement for a foreign Organisation!");
-
-		// TODO implement this
-		throw new UnsupportedOperationException("NYI");
-		// OrderRequirement orderRequirement =
-		// (OrderRequirement)orderRequirements.get(order.getPrimaryKey());
-		// if (orderRequirement == null) {
-		// orderRequirement = new OrderRequirement(this, order);
-		// orderRequirements.put(order.getPrimaryKey(), orderRequirement);
-		// }
-		// return orderRequirement;
-	}
-
-	public OfferRequirement createOfferRequirement(Offer offer)
-	{
-		if (!offer.getOrganisationID().equals(this.getOrganisationID()))
-			throw new IllegalArgumentException(
-					"Cannot create an instance of OfferRequirement for a foreign Organisation!");
-
-		// TODO implement this
-		throw new UnsupportedOperationException("NYI");
-		// OfferRequirement offerRequirement =
-		// (OfferRequirement)offerRequirements.get(offer.getPrimaryKey());
-		// if (offerRequirement == null) {
-		// offerRequirement = new OfferRequirement(this, offer);
-		// offerRequirements.put(offer.getPrimaryKey(), offerRequirement);
-		// }
-		// return offerRequirement;
-	}
-
-	/**
-	 * This method creates a new Offer for the given vendor or returns a
-	 * previously created one.
-	 * 
-	 * @param vendor
-	 * @return Returns the offer for the given vendor. Never returns <tt>null</tt>.
-	 * @throws ModuleException
-	 */
-	public Offer createOfferRequirementOffer(OfferRequirement offerRequirement,
-			OrganisationLegalEntity vendor, String orderIDPrefix) throws ModuleException // TODO shouldn't orderIDPrefix be looked up or generated automatically?
-	{
-		Offer offer = offerRequirement.getOfferByVendor(vendor);
-		if (offer == null) {
-			// We don't have an Offer registered, thus we need to create one.
-			// Therefore, we first need the OrderRequirement instance assigned
-			// for the order equivalent.
-			OrderRequirement orderRequirement = createOrderRequirement(offerRequirement
-					.getOffer().getOrder());
-
-			// From the OrderRequirement, we obtain the order for the given vendor.
-			// Order order = orderRequirement.createOrder(vendor);
-			Order order = createOrderRequirementOrder(orderRequirement, vendor, orderIDPrefix);
-
-			// offer = createOffer();
-			offerRequirement.addOffer(offer);
-		}
-		return offer;
-	}
-
-	/**
-	 * This method creates a new Order for the given vendor or returns a
-	 * previously created one.
-	 * 
-	 * @param vendor
-	 * @return Returns the order for the given vendor. Never returns <tt>null</tt>.
-	 * @throws ModuleException
-	 */
-	public Order createOrderRequirementOrder(OrderRequirement orderRequirement,
-			OrganisationLegalEntity vendor, String orderIDPrefix) throws ModuleException // TODO shouldn't orderIDPrefix be looked up or generated automatically?
-	{
-		Order order = orderRequirement.getOrder(vendor);
-		if (order == null) {
-			order = createOrder(vendor, getMandator(), orderIDPrefix, order.getCurrency());
-			orderRequirement.addOrder(order);
-		}
-		return order;
-	}
+//	public OrderRequirement createOrderRequirement(Order order)
+//	{
+//		if (!order.getOrganisationID().equals(this.getOrganisationID()))
+//			throw new IllegalArgumentException(
+//					"Cannot create an instance of OrderRequirement for a foreign Organisation!");
+//
+//		// TODO implement this
+//		throw new UnsupportedOperationException("NYI");
+//		// OrderRequirement orderRequirement =
+//		// (OrderRequirement)orderRequirements.get(order.getPrimaryKey());
+//		// if (orderRequirement == null) {
+//		// orderRequirement = new OrderRequirement(this, order);
+//		// orderRequirements.put(order.getPrimaryKey(), orderRequirement);
+//		// }
+//		// return orderRequirement;
+//	}
+//
+//	public OfferRequirement createOfferRequirement(Offer offer)
+//	{
+//		if (!offer.getOrganisationID().equals(this.getOrganisationID()))
+//			throw new IllegalArgumentException(
+//					"Cannot create an instance of OfferRequirement for a foreign Organisation!");
+//
+//		// TODO implement this
+//		throw new UnsupportedOperationException("NYI");
+//		// OfferRequirement offerRequirement =
+//		// (OfferRequirement)offerRequirements.get(offer.getPrimaryKey());
+//		// if (offerRequirement == null) {
+//		// offerRequirement = new OfferRequirement(this, offer);
+//		// offerRequirements.put(offer.getPrimaryKey(), offerRequirement);
+//		// }
+//		// return offerRequirement;
+//	}
+//
+//	/**
+//	 * This method creates a new Offer for the given vendor or returns a
+//	 * previously created one.
+//	 * 
+//	 * @param vendor
+//	 * @return Returns the offer for the given vendor. Never returns <tt>null</tt>.
+//	 * @throws ModuleException
+//	 */
+//	public Offer createOfferRequirementOffer(OfferRequirement offerRequirement,
+//			OrganisationLegalEntity vendor, String orderIDPrefix) throws ModuleException // TODO shouldn't orderIDPrefix be looked up or generated automatically?
+//	{
+//		Offer offer = offerRequirement.getOfferByVendor(vendor);
+//		if (offer == null) {
+//			// We don't have an Offer registered, thus we need to create one.
+//			// Therefore, we first need the OrderRequirement instance assigned
+//			// for the order equivalent.
+//			OrderRequirement orderRequirement = createOrderRequirement(offerRequirement
+//					.getOffer().getOrder());
+//
+//			// From the OrderRequirement, we obtain the order for the given vendor.
+//			// Order order = orderRequirement.createOrder(vendor);
+//			Order order = createOrderRequirementOrder(orderRequirement, vendor, orderIDPrefix);
+//
+//			// offer = createOffer();
+//			offerRequirement.addOffer(offer);
+//		}
+//		return offer;
+//	}
+//
+//	/**
+//	 * This method creates a new Order for the given vendor or returns a
+//	 * previously created one.
+//	 * 
+//	 * @param vendor
+//	 * @return Returns the order for the given vendor. Never returns <tt>null</tt>.
+//	 * @throws ModuleException
+//	 */
+//	public Order createOrderRequirementOrder(OrderRequirement orderRequirement,
+//			OrganisationLegalEntity vendor, String orderIDPrefix) throws ModuleException // TODO shouldn't orderIDPrefix be looked up or generated automatically?
+//	{
+//		Order order = orderRequirement.getPartnerOrder(vendor);
+//		if (order == null) {
+//			order = createOrder(vendor, getMandator(), orderIDPrefix, order.getCurrency());
+//			orderRequirement.addOrder(order);
+//		}
+//		return order;
+//	}
 
 	public Offer createOffer(User user, Order order, String offerIDPrefix) throws ModuleException
 	{
@@ -1617,5 +1631,31 @@ public class Trader
 		}
 
 		return processDefinition;
+	}
+
+	public void onProductAssemble_importNestedProduct(Product packageProduct, String partnerOrganisationID, Collection<NestedProductType> partnerNestedProductTypes)
+	{
+		try {
+			PersistenceManager pm = getPersistenceManager();
+			Order localOrder = packageProduct.getProductLocal().getArticle().getOrder();
+
+			// TODO we should remove the anchorTypeID from the following method's parameter list
+			OrganisationLegalEntity partner = OrganisationLegalEntity.getOrganisationLegalEntity(pm, partnerOrganisationID, OrganisationLegalEntity.ANCHOR_TYPE_ID_ORGANISATION, true);
+
+			// for the current order, we create/find an instance of OrderRequirement
+			OrderRequirement orderRequirement = OrderRequirement.getOrderRequirement(pm, localOrder);
+			Order partnerOrder = orderRequirement.getPartnerOrder(partner);
+			Hashtable initialContextProperties = Lookup.getInitialContextProperties(pm, partnerOrganisationID);
+			if (partnerOrder == null) {
+				TradeManager tradeManager = TradeManagerUtil.getHome(initialContextProperties).create();
+				Order order = tradeManager.createOrder(null, localOrder.getCurrency().getCurrencyID()); // TODO should we somehow configure the orderIDPrefix on this side? I don't think so. Marco.
+				partnerOrder = (Order) pm.makePersistent(order);
+				orderRequirement.addOrder(partnerOrder);
+			}
+			
+
+		} catch (Exception e) {
+			throw new RuntimeException(e);
+		}
 	}
 }

@@ -45,7 +45,7 @@ import java.util.Map;
  *
  * @jdo.inheritance strategy="new-table"
  *
- * @jdo.create-objectid-class field-order="organisationID, offerID"
+ * @jdo.create-objectid-class field-order="organisationID, offerIDPrefix, offerID"
  */
 public class OfferRequirement
 	implements Serializable
@@ -55,7 +55,11 @@ public class OfferRequirement
 	 * @jdo.column length="100"
 	 */
 	private String organisationID;
-
+	/**
+	 * @jdo.field primary-key="true"
+	 * @jdo.column length="50"
+	 */
+	private String offerIDPrefix;
 	/**
 	 * @jdo.field primary-key="true"
 	 */
@@ -66,19 +70,19 @@ public class OfferRequirement
 	private Offer offer;
 
 	/**
-	 * key: String anchorPK (of the vendor LegalEntity)<br/>
+	 * key: LegalEntity vendor<br/>
 	 * value: Offer offer
 	 * <br/><br/>
 	 *
 	 * @jdo.field
 	 *		persistence-modifier="persistent"
 	 *		collection-type="map"
-	 *		key-type="java.lang.String"
+	 *		key-type="LegalEntity"
 	 *		value-type="Offer"
 	 *
 	 * @jdo.join
 	 */
-	private Map offersByVendor = new HashMap();
+	private Map vendor2offer = new HashMap();
 
 	public OfferRequirement() { }
 
@@ -93,20 +97,22 @@ public class OfferRequirement
 		this.trader = trader;
 		this.offer = offer;
 		this.organisationID = offer.getOrganisationID();
+		this.offerIDPrefix = offer.getOfferIDPrefix();
 		this.offerID = offer.getOfferID();
 	}
 	
 	public void addOffer(Offer offer) {
 		OrganisationLegalEntity vendor = offer.getOrder().getVendor();
-		offersByVendor.put(vendor.getPrimaryKey(), vendor);
+		// TODO check whether there is already an assignment!
+		vendor2offer.put(vendor, offer);
 	}
 	
 	/**
 	 * Returns the Offer for this vendor or null. 
 	 * @param vendor
 	 */
-	public Offer getOfferByVendor(OrganisationLegalEntity vendor) {
-		return (Offer)offersByVendor.get(vendor.getPrimaryKey());
+	public Offer getOffer(LegalEntity vendor) {
+		return (Offer)vendor2offer.get(vendor);
 	}
 	
 	/**
@@ -116,6 +122,5 @@ public class OfferRequirement
 	public Offer getOffer() {
 		return offer;
 	}
-	
 
 }

@@ -27,11 +27,13 @@
 package org.nightlabs.jfire.store;
 
 import java.io.Serializable;
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.LinkedList;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
@@ -187,8 +189,7 @@ implements Serializable
 //	}
 
 	/**
-	 * This method is called by
-	 * {@link org.nightlabs.jfire.trade.Trader#allocateArticle(User, Article)}.
+	 * This method is called during the allocation-process.
 	 * It must return a <code>ProductLocator</code> that is suitable for
 	 * {@link ProductType#findProducts(User, ProductType, NestedProductType, ProductLocator)}
 	 * of the <code>nestedProductType</code>s. This method assumes that a wrapping
@@ -236,14 +237,30 @@ implements Serializable
 		// value: Set<Product> products
 		Map nestedProductsByHome = new HashMap();
 
+		// All nestedProductTypes that come from a partner-organisation are collected and grouped in this map in order
+		// to import them more efficiently
+//		Map<String, List<NestedProductType>> organisationID2partnerNestedProductType = new HashMap<String, List<NestedProductType>>();
+		Map organisationID2partnerNestedProductType = null; // lazy creation
+// The above generic notation causes the class Product to be destroyed during enhancement with BCEL + JPOX-Enhancer. This results
+// in the following exception when afterwards enhancing JFireSimpleTrade (which extends the class Product):
+//		[jpoxenhancer] Exception in thread "main" java.lang.ClassFormatError: LVTT entry for 'me' in class file org/nightlabs/jfire/store/Product does not match any LVT entry
+//		[jpoxenhancer] at java.lang.ClassLoader.defineClass1(Native Method)
+//		[jpoxenhancer] at java.lang.ClassLoader.defineClass(ClassLoader.java:620)
+//		[jpoxenhancer] at java.security.SecureClassLoader.defineClass(SecureClassLoader.java:124)
+//		[jpoxenhancer] at java.net.URLClassLoader.defineClass(URLClassLoader.java:260)
+//		[jpoxenhancer] at java.net.URLClassLoader.access$100(URLClassLoader.java:56)
+//		[jpoxenhancer] at java.net.URLClassLoader$1.run(URLClassLoader.java:195)
+//		[jpoxenhancer] at java.security.AccessController.doPrivileged(Native Method)
+//		[jpoxenhancer] at java.net.URLClassLoader.findClass(URLClassLoader.java:188)
+
 		// local product => create/find nested products
 		ProductType productType = this.getProductType();
 		for (Iterator itNPT = productType.getNestedProductTypes().iterator(); itNPT.hasNext(); ) {
 			NestedProductType nestedProductType = (NestedProductType) itNPT.next();
 
-			ProductLocator productLocator = this.getProductLocator(user, nestedProductType);
-
 			if (this.organisationID.equals(nestedProductType.getInnerProductTypeOrganisationID())) {
+				ProductLocator productLocator = this.getProductLocator(user, nestedProductType);
+
 				// nested productType is our own, so we can just package it without buying it from someone else.
 				Collection nestedProducts = store.findProducts(user, null, nestedProductType, productLocator);
 				if (nestedProducts == null || nestedProducts.size() != nestedProductType.getQuantity())
@@ -256,10 +273,11 @@ implements Serializable
 					nestedProduct.assemble(user);
 					nestedProductLocal.decQuantity();
 
-					// We need to transfer the nested product back to its home repositories and update productLocal.quantity
-					// To reduce transfers, we group them by dest-repository (source is the same for all nested products)
-					// source: this.productType.productTypeLocal.home
-					// dest nestedProduct.productType.productTypeLocal.home
+					// We need to transfer the nested product from wherever it is to the same repository as the
+					// package-product and then update productLocal.quantity
+					// To reduce transfers, we group them by source-repository (dest is the same for all nested products)
+					// dest: this.productType.productTypeLocal.home
+					// source: nestedProduct.productType.productTypeLocal.home
 					Anchor nestedProductHome = nestedProduct.getProductType().getProductTypeLocal().getHome();
 					Set nestedProductSet = (Set) nestedProductsByHome.get(nestedProductHome);
 					if (nestedProductSet == null) {
@@ -270,13 +288,21 @@ implements Serializable
 				}
 			}
 			else {
+				if (organisationID2partnerNestedProductType == null)
+					organisationID2partnerNestedProductType = new HashMap();
+				
 				// nested productType is coming from a remote organisation and must be acquired from there
 				// this means: an Offer must be created (or a previously created one used) and an Article be added
-				// TODO This work should be done by the Trader!
-
+				// we group them in order to make it more efficient
+				List partnerNestedProductTypes = (List) organisationID2partnerNestedProductType.get(nestedProductType.getInnerProductTypeOrganisationID());
+				if (partnerNestedProductTypes == null) {
+					partnerNestedProductTypes = new ArrayList<NestedProductType>();
+					organisationID2partnerNestedProductType.put(nestedProductType.getInnerProductTypeOrganisationID(), partnerNestedProductTypes);
+				}
+				partnerNestedProductTypes.add(nestedProductType);
 
 //				// We need to transfer the nested product back to its home repositories and update productLocal.quantity
-//				// To reduce transfers, we group them by dest-repository (source is the same for all nested products)
+//				// To reduce transfers, we group them by source-repository (dest is the same for all nested products)
 //				// source: this.productType.productTypeLocal.home
 //				// dest nestedProduct.productType.productTypeLocal.home
 //				Anchor nestedProductHome = nestedProduct.getProductType().getProductTypeLocal().getHome();
@@ -286,11 +312,20 @@ implements Serializable
 //					nestedProductsByHome.put(nestedProductHome, nestedProductSet);
 //				}
 //				nestedProductSet.add(nestedProduct);
-
-				throw new UnsupportedOperationException("NYI");
 			}
+		} // for (Iterator itNPT = productType.getNestedProductTypes().iterator(); itNPT.hasNext(); ) {
 
+//		for (Iterator<Map.Entry<String, List<NestedProductType>>> itPNPT = organisationID2partnerNestedProductType.entrySet().iterator(); itPNPT.hasNext(); ) {
+		if (organisationID2partnerNestedProductType != null) {
+			for (Iterator itPNPT = organisationID2partnerNestedProductType.entrySet().iterator(); itPNPT.hasNext(); ) {
+	//			Map.Entry<String, List<NestedProductType>> me = (Entry<String, List<NestedProductType>>) itPNPT.next();
+				Map.Entry me = (Map.Entry) itPNPT.next();
+				String organisationID = (String) me.getKey();
+				List nestedProductTypes = (List) me.getValue();
+				trader.onProductAssemble_importNestedProduct(this, organisationID, nestedProductTypes);
+			}
 		}
+		// TODO are the ProductTransfers for the foreign products already created correctly?
 
 		// create the ProductTransfers for the grouped nested products
 		Map<String, Anchor> involvedAnchors = new HashMap<String, Anchor>();

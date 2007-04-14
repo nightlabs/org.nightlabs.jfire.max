@@ -40,6 +40,7 @@ import javax.ejb.CreateException;
 import javax.ejb.EJBException;
 import javax.ejb.SessionBean;
 import javax.ejb.SessionContext;
+import javax.jdo.FetchPlan;
 import javax.jdo.JDOHelper;
 import javax.jdo.PersistenceManager;
 import javax.jdo.Query;
@@ -192,7 +193,7 @@ implements SessionBean
 	 *
 	 * @ejb.interface-method
 	 * @ejb.permission role-name="TradeManager-write"
-	 * @ejb.transaction type = "Required"
+	 * @ejb.transaction type="Required"
 	 **/
 	public Order createOrder(
 			AnchorID customerID, String orderIDPrefix, String currencyID,
@@ -242,13 +243,11 @@ implements SessionBean
 	 * is an organisation, because this organisation will automatically be set
 	 * as the customer for the new Order. 
 	 *
-	 * @throws ModuleException
-	 *
 	 * @ejb.interface-method
-	 * @ejb.permission role-name="TradeManager-write"
-	 * @ejb.transaction type = "Required"
+	 * @ejb.permission role-name="_Guest_"
+	 * @ejb.transaction type="Required"
 	 **/
-	public Order createOrder(String orderIDPrefix, String currencyID, String[] fetchGroups, int maxFetchDepth)
+	public Order createOrder(String orderIDPrefix, String currencyID) // TODO pass the desired customerGroup!!!
 		throws ModuleException
 	{
 		PersistenceManager pm = getPersistenceManager();
@@ -260,14 +259,19 @@ implements SessionBean
 			if (!getPrincipal().userIsOrganisation())
 				throw new IllegalStateException("This method cannot be called by a user who is not an organisation!");
 
-			OrganisationLegalEntity customer = trader.getOrganisationLegalEntity(getPrincipal().getUserID());
-			// TODO: create foreign order ...really? Isn't that todo garbage?
+			// cut off the User.USERID_PREFIX_TYPE_ORGANISATION
+			String customerOrganisationID = getPrincipal().getUserID().substring(User.USERID_PREFIX_TYPE_ORGANISATION.length());
+			OrganisationLegalEntity customer = trader.getOrganisationLegalEntity(customerOrganisationID);
+
+			pm.getFetchPlan().setMaxFetchDepth(NLJDOHelper.MAX_FETCH_DEPTH_NO_LIMIT);
+			pm.getFetchPlan().setGroups(new String[] {
+				FetchPlan.DEFAULT, Order.FETCH_GROUP_CHANGE_USER, Order.FETCH_GROUP_CREATE_USER,
+				Order.FETCH_GROUP_CURRENCY, Order.FETCH_GROUP_CUSTOMER, Order.FETCH_GROUP_CUSTOMER_GROUP,
+				Order.FETCH_GROUP_SEGMENTS, Order.FETCH_GROUP_VENDOR
+			});
+			pm.getFetchPlan().setDetachmentOptions(FetchPlan.DETACH_LOAD_FIELDS);
+
 			Order order = trader.createOrder(trader.getMandator(), customer, orderIDPrefix, currency);
-
-			pm.getFetchPlan().setMaxFetchDepth(maxFetchDepth);
-			if (fetchGroups != null)
-				pm.getFetchPlan().setGroups(fetchGroups);
-
 			return (Order)pm.detachCopy(order);
 		} finally {
 			pm.close();

@@ -64,7 +64,7 @@ public class ValueProviderCategoryName extends I18nText implements Serializable 
 	private String organisationID;
 	
 	/**
-	 * @jdo.field primary-key="true"
+	 * @jdo.field primary-key="true" @jdo.column length="100"
 	 */
 	private String valueProviderCategoryID;
 	

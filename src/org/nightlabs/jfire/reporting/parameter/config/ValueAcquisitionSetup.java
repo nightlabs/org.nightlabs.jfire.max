@@ -229,10 +229,14 @@ public class ValueAcquisitionSetup implements Serializable {
 		SortedMap<Integer, List<ValueProviderConfig>> levels = new TreeMap<Integer, List<ValueProviderConfig>>();
 		for (AcquisitionParameterConfig parameterConfig : parameterConfigs) {
 			resolveProviderLevel(provider, parameterConfig, levels, levelOffset);
+			int newLevelOffset = levelOffset;
 			for (Integer rLevel : levels.keySet()) {
-				levelOffset = Math.max(levelOffset, rLevel);				
+				newLevelOffset = Math.max(levelOffset, rLevel);				
 			}
-			levelOffset ++;
+			levelOffset = newLevelOffset;
+			// only increase levelOffset when new levels were found
+			if (newLevelOffset > levelOffset)
+				levelOffset++;
 		}
 		
 		int inverseLevel = Integer.MIN_VALUE;

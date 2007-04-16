@@ -2,6 +2,7 @@ package org.nightlabs.jfire.voucher.store;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Hashtable;
 import java.util.Iterator;
 
 import javax.jdo.JDOObjectNotFoundException;
@@ -22,6 +23,9 @@ import org.nightlabs.jfire.store.Repository;
 import org.nightlabs.jfire.store.Store;
 import org.nightlabs.jfire.store.id.DeliveryNoteActionHandlerID;
 import org.nightlabs.jfire.trade.Article;
+import org.nightlabs.jfire.trade.Offer;
+import org.nightlabs.jfire.trade.id.OfferID;
+import org.nightlabs.jfire.trade.id.SegmentID;
 import org.nightlabs.jfire.transfer.id.AnchorID;
 
 /**
@@ -130,7 +134,7 @@ public class VoucherTypeActionHandler
 
 	@SuppressWarnings("unchecked")
 	@Implement
-	public Collection<Product> findProducts(User user,
+	public Collection<? extends Product> findProducts(User user,
 			ProductType productType, NestedProductType nestedProductType, ProductLocator productLocator)
 	{
 		if (logger.isDebugEnabled())
@@ -187,5 +191,14 @@ public class VoucherTypeActionHandler
 		pm.getExtent(VoucherDeliveryNoteActionHandler.class);
 		VoucherDeliveryNoteActionHandler deliveryNoteActionHandler = (VoucherDeliveryNoteActionHandler) pm.getObjectById(DeliveryNoteActionHandlerID.create(Organisation.DEVIL_ORGANISATION_ID, VoucherDeliveryNoteActionHandler.class.getName()));
 		deliveryNote.getDeliveryNoteLocal().addDeliveryNoteActionHandler(deliveryNoteActionHandler);
+	}
+
+	@Implement
+	public Collection<? extends Article> createCrossTradeArticles(
+			User user, Product localPackageProduct, Article localArticle,
+			String partnerOrganisationID, Hashtable partnerInitialContextProperties,
+			Offer partnerOffer, OfferID partnerOfferID, SegmentID partnerSegmentID, ProductType nestedProductType, Collection<NestedProductType> nestedProductTypes) throws Exception
+	{
+		throw new UnsupportedOperationException("Vouchers cannot be traded accross organisations!");
 	}
 }

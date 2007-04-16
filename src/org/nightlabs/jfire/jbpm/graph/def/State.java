@@ -93,17 +93,23 @@ implements Serializable
 
 
 	/**
-	 * @jdo.field persistence-modifier="persistent" null-value="exception"
+	 * TODO JPOX Bug WORKAROUND: null-value="exception" causes problems in replication to another datastore
+	 * @!jdo.field persistence-modifier="persistent" null-value="exception"
+	 * @jdo.field persistence-modifier="persistent"
 	 */
 	private User user;
 
 	/**
-	 * @jdo.field persistence-modifier="persistent" null-value="exception"
+	 * TODO JPOX Bug WORKAROUND: null-value="exception" causes problems in replication to another datastore
+	 * @!jdo.field persistence-modifier="persistent" null-value="exception"
+	 * @jdo.field persistence-modifier="persistent"
 	 */
 	private Statable statable;
 
 	/**
-	 * @jdo.field persistence-modifier="persistent" null-value="exception"
+	 * TODO JPOX Bug WORKAROUND: null-value="exception" causes problems in replication to another datastore
+	 * @!jdo.field persistence-modifier="persistent" null-value="exception"
+	 * @jdo.field persistence-modifier="persistent"
 	 */
 	private StateDefinition stateDefinition;
 

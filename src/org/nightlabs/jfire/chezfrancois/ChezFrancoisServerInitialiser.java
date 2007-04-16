@@ -37,6 +37,7 @@ import org.nightlabs.jfire.servermanager.OrganisationNotFoundException;
 public class ChezFrancoisServerInitialiser extends ServerInitialiserDelegate
 {
 	public static final String ORGANISATION_ID_WINE_STORE = "chezfrancois.jfire.org";
+	public static final String ORGANISATION_ID_RESELLER = "reseller.jfire.org"; // this is used if the project is deployed together with JFireDemoSetupMultiOrganisation (there are no inter-dependencies between these two projects, but they still cooperate if optionally deployed together)
 
 	@Implement
 	public void initialise() throws InitException

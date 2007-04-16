@@ -145,11 +145,16 @@ public class DataCreator
 	 */
 	protected void setNames(I18nText name, String[] names)
 	{
+		String prefix = "";
+		if (ChezFrancoisServerInitialiser.ORGANISATION_ID_RESELLER.equals(organisationID)) {
+			prefix = "R ";
+		}
+		
 		int langIdx = 0;
 		for (String string : names) {
 			if(langIdx >= languages.length)
 				break;
-			name.setText(languages[langIdx], string);
+			name.setText(languages[langIdx], prefix + string);
 			langIdx++;
 		}
 	}

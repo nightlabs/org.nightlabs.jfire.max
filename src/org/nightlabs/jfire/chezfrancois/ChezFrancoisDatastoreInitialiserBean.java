@@ -132,8 +132,14 @@ implements SessionBean
 			try {
 				pm.getFetchPlan().setGroup(FetchPlan.DEFAULT);
 				pm.getFetchPlan().setMaxFetchDepth(1);
-	
+
 				String organisationID = getOrganisationID();
+
+				String displayName = "Chez Francois";
+				if (ChezFrancoisServerInitialiser.ORGANISATION_ID_RESELLER.equals(organisationID)) {
+					displayName = "Reseller";
+				}
+
 
 // currently I need it for all organisations. Marco ;-)
 //				if (!ChezFrancoisServerInitialiser.ORGANISATION_ID_WINE_STORE.equals(organisationID))
@@ -166,7 +172,7 @@ implements SessionBean
 							ChezFrancoisDatastoreInitialiserHome.JNDI_NAME,
 							"demoTimerTask");
 
-					task.getName().setText(Locale.ENGLISH.getLanguage(), "Chez Francois Demo Timer Task");
+					task.getName().setText(Locale.ENGLISH.getLanguage(), displayName + " Demo Timer Task");
 					task.getDescription().setText(Locale.ENGLISH.getLanguage(), "This task demonstrates how to use the JFire Timer.");
 
 					task.getTimePatternSet().createTimePattern(
@@ -213,7 +219,7 @@ implements SessionBean
 
 				DataCreator dataCreator = new DataCreator(pm, User.getUser(pm, getPrincipal()));
 
-				dataCreator.getRootSimpleProductType().getName().setText(languageID, "Chez Francois Wine Store");
+				dataCreator.getRootSimpleProductType().getName().setText(languageID, displayName + " Wine Store");
 
 				// create ProductTypes: wine (bottle)
 				SimpleProductType wine = dataCreator.createCategory(null, "wine", 

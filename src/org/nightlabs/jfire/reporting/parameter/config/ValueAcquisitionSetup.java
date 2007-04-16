@@ -324,7 +324,7 @@ public class ValueAcquisitionSetup implements Serializable {
 		if (provider2Binding == null) {
 			provider2Binding = new HashMap<String, ValueConsumerBinding>();			
 			for (ValueConsumerBinding binding : valueConsumerBindings) {
-				if (binding.getProvider() != null) {
+				if (binding != null && binding.getProvider() != null) {
 					String bindingKey = binding.getProvider().getConsumerKey();
 					provider2Binding.put(bindingKey, binding);					
 				}

@@ -673,7 +673,10 @@ implements SessionBean
 			OfferID offerID,
 			ProductTypeID productTypeID,
 			int quantity,
-			TariffID tariffID, String[] fetchGroups, int maxFetchDepth)
+			TariffID tariffID,
+			boolean allocate,
+			boolean allocateSynchronously,
+			String[] fetchGroups, int maxFetchDepth)
 	throws ModuleException
 	{
 		PersistenceManager pm = getPersistenceManager();
@@ -721,7 +724,7 @@ implements SessionBean
 					user, offer, segment,
 					products,
 					new ArticleCreator(tariff),
-					true, false, true);
+					allocate, allocateSynchronously, true);
 //			Collection articles = new ArrayList();
 //			for (Iterator it = products.iterator(); it.hasNext(); ) {
 //				SimpleProduct product = (SimpleProduct) it.next();
@@ -734,6 +737,7 @@ implements SessionBean
 //				articles.add(article);
 //			}
 
+			pm.getFetchPlan().setDetachmentOptions(FetchPlan.DETACH_LOAD_FIELDS | FetchPlan.DETACH_UNLOAD_FIELDS);
 			pm.getFetchPlan().setMaxFetchDepth(maxFetchDepth);
 			if (fetchGroups != null)
 				pm.getFetchPlan().setGroups(fetchGroups);

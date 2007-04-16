@@ -2,14 +2,22 @@ package org.nightlabs.jfire.simpletrade.store;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Hashtable;
 import java.util.Iterator;
 
+import javax.jdo.FetchPlan;
+import javax.jdo.JDOHelper;
 import javax.jdo.JDOObjectNotFoundException;
 import javax.jdo.PersistenceManager;
 import javax.jdo.Query;
 
 import org.nightlabs.annotation.Implement;
+import org.nightlabs.jdo.NLJDOHelper;
+import org.nightlabs.jfire.accounting.TariffMapping;
+import org.nightlabs.jfire.accounting.id.TariffID;
 import org.nightlabs.jfire.security.User;
+import org.nightlabs.jfire.simpletrade.SimpleTradeManager;
+import org.nightlabs.jfire.simpletrade.SimpleTradeManagerUtil;
 import org.nightlabs.jfire.store.NestedProductType;
 import org.nightlabs.jfire.store.Product;
 import org.nightlabs.jfire.store.ProductLocator;
@@ -17,6 +25,12 @@ import org.nightlabs.jfire.store.ProductType;
 import org.nightlabs.jfire.store.ProductTypeActionHandler;
 import org.nightlabs.jfire.store.Repository;
 import org.nightlabs.jfire.store.Store;
+import org.nightlabs.jfire.store.id.ProductTypeID;
+import org.nightlabs.jfire.trade.Article;
+import org.nightlabs.jfire.trade.ArticlePrice;
+import org.nightlabs.jfire.trade.Offer;
+import org.nightlabs.jfire.trade.id.OfferID;
+import org.nightlabs.jfire.trade.id.SegmentID;
 import org.nightlabs.jfire.transfer.id.AnchorID;
 
 /**
@@ -128,7 +142,7 @@ public class SimpleProductTypeActionHandler
 
 	@SuppressWarnings("unchecked")
 	@Implement
-	public Collection<Product> findProducts(User user,
+	public Collection<? extends Product> findProducts(User user,
 			ProductType productType, NestedProductType nestedProductType, ProductLocator productLocator)
 	{
 		SimpleProductType spt = (SimpleProductType) productType;
@@ -169,5 +183,57 @@ public class SimpleProductTypeActionHandler
 		}
 		return res;
 	}
+
+
+	@Implement
+	public Collection<? extends Article> createCrossTradeArticles(
+			User user, Product localPackageProduct, Article localArticle,
+			String partnerOrganisationID, Hashtable partnerInitialContextProperties,
+			Offer partnerOffer, OfferID partnerOfferID, SegmentID partnerSegmentID,
+			ProductType nestedProductType, Collection<NestedProductType> nestedProductTypes) throws Exception
+	{
+		SimpleTradeManager stm = SimpleTradeManagerUtil.getHome(partnerInitialContextProperties).create();
+		int qty = 0;
+		for (NestedProductType npt : nestedProductTypes) {
+			qty += npt.getQuantity();
+		}
+
+		TariffID localTariffID = (TariffID) JDOHelper.getObjectId(localArticle.getTariff());
+		TariffMapping tariffMapping = TariffMapping.getTariffMappingForLocalTariffAndPartner(getPersistenceManager(), localTariffID, partnerOrganisationID);
+		if (tariffMapping == null)
+			throw new IllegalStateException("No TariffMapping existing for localTariff \"" + localArticle.getTariff().getPrimaryKey() + "\" and partnerOrganisationID \"" + partnerOrganisationID + "\"!");
+
+		return stm.createArticles(
+				partnerSegmentID, partnerOfferID,
+				(ProductTypeID)JDOHelper.getObjectId(nestedProductType),
+				qty, tariffMapping.getPartnerTariffID(), true, true,
+				new String[] {
+					FetchPlan.DEFAULT, Article.FETCH_GROUP_OFFER, Article.FETCH_GROUP_ORDER, Article.FETCH_GROUP_PRICE,
+					Article.FETCH_GROUP_PRODUCT, Article.FETCH_GROUP_PRODUCT_TYPE, Article.FETCH_GROUP_SEGMENT, ArticlePrice.FETCH_GROUP_CURRENCY,
+					ArticlePrice.FETCH_GROUP_FRAGMENTS, ArticlePrice.FETCH_GROUP_PACKAGE_ARTICLE_PRICE
+				}, NLJDOHelper.MAX_FETCH_DEPTH_NO_LIMIT);
+	}
+
+
+//	@Implement
+//	public Collection<? extends Article> createCrossTradeArticles(User user, ProductType productType, int quantity, ProductLocator productLocators)
+//	{
+//		PersistenceManager pm = getPersistenceManager();
+//		Store store = Store.getStore(pm);
+//		Trader trader = Trader.getTrader(pm);
+//		NestedProductType pseudoNestedPT = null;
+//		if (quantity != 1)
+//			pseudoNestedPT = new NestedProductType(null, productType, quantity);
+//
+//		Collection products = store.findProducts(user, productType, pseudoNestedPT, null);
+//
+//		Collection articles = trader.createArticles(
+//				user, offer, segment,
+//				products,
+//				new ArticleCreator(tariff),
+//				true, false, true);
+//
+//		return null;
+//	}
 
 }

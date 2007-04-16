@@ -33,7 +33,6 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
-import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -47,10 +46,6 @@ import org.apache.log4j.Logger;
 import org.jbpm.JbpmContext;
 import org.jbpm.graph.exe.ProcessInstance;
 import org.nightlabs.ModuleException;
-import org.nightlabs.jfire.accounting.Invoice;
-import org.nightlabs.jfire.accounting.InvoiceActionHandler;
-import org.nightlabs.jfire.accounting.pay.PaymentException;
-import org.nightlabs.jfire.accounting.pay.PaymentResult;
 import org.nightlabs.jfire.config.Config;
 import org.nightlabs.jfire.idgenerator.IDGenerator;
 import org.nightlabs.jfire.jbpm.JbpmLookup;
@@ -144,7 +139,7 @@ public class Store
 		store.mandator.setStorekeeper(store.localStorekeeper);
 		store.partnerStorekeeper = new PartnerStorekeeper(organisationID, PartnerStorekeeper.class.getName());
 
-		pm.makePersistent(store);
+		store = (Store) pm.makePersistent(store);
 		return store;
 	}
 

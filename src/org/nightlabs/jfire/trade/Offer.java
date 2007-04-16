@@ -89,7 +89,7 @@ import org.nightlabs.util.Utils;
  * @jdo.fetch-group name="Offer.currency" fields="currency"
  * @jdo.fetch-group name="Offer.order" fields="order"
  * @jdo.fetch-group name="Offer.createUser" fields="createUser"
- * @jdo.fetch-group name="Offer.this" fetch-groups="default" fields="offerLocal, order, currency, articles, price, state, states"
+ * @jdo.fetch-group name="Offer.this" fetch-groups="default" fields="offerLocal, order, articles, price, state, states"
  *
  * @jdo.fetch-group name="Statable.state" fields="state"
  * @jdo.fetch-group name="Statable.states" fields="states"
@@ -99,11 +99,14 @@ import org.nightlabs.util.Utils;
 public class Offer
 implements
 		Serializable,
-		ArticleContainer, // TODO shall we implement SegmentContainer here? Do we need it? Yes, i think so... but I'll do it later. Marco.
+		ArticleContainer,
+//		SegmentContainer, // TODO we must implement SegmentContainer here!
 		Statable,
 		DetachCallback,
 		AttachCallback
 {
+	private static final long serialVersionUID = 1L;
+
 	public static final String FETCH_GROUP_OFFER_LOCAL = "Offer.offerLocal";
 	public static final String FETCH_GROUP_PRICE = "Offer.price";
 	public static final String FETCH_GROUP_ARTICLES = "Offer.articles";
@@ -161,6 +164,18 @@ implements
 	 * @jdo.field persistence-modifier="persistent"
 	 */
 	private Currency currency;
+
+// TODO Offer must implement SegmentContainer!
+//	/**
+//	 * @jdo.field
+//	 *		persistence-modifier="persistent"
+//	 *		collection-type="collection"
+//	 *		element-type="Segment"
+//	 *		table="JFireTrade_Offer_segments"
+//	 *
+//	 * @jdo.join
+//	 */
+//	private Set<Segment> segments;
 
 //	/**
 //	 * key: String invoicePK<br/>
@@ -330,7 +345,7 @@ implements
 		AccountingPriceConfig accountingPriceConfig = accounting.getAccountingPriceConfig();
 		this.price = new Price(
 				accountingPriceConfig.getOrganisationID(), accountingPriceConfig.getPriceConfigID(),
-				accountingPriceConfig.createPriceID(), getCurrency());
+				accountingPriceConfig.createPriceID(), order.getCurrency());
 
 		articles = new HashSet<Article>();
 	}

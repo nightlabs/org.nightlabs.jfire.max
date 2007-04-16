@@ -94,6 +94,7 @@ import org.nightlabs.util.Utils;
  * @jdo.fetch-group name="Article.offer" fields="offer"
  * @jdo.fetch-group name="Article.invoice" fields="invoice"
  * @jdo.fetch-group name="Article.deliveryNote" fields="deliveryNote"
+ * @jdo.fetch-group name="Article.receptionNote" fields="receptionNote"
  * @jdo.fetch-group name="Article.delivery" fields="delivery"
  *
  * @jdo.fetch-group name="FetchGroupsTrade.articleInOrderEditor" fields="articleLocal, segment, productType, product, tariff, price"
@@ -125,6 +126,7 @@ public class Article
 	public static final String FETCH_GROUP_OFFER = "Article.offer";
 	public static final String FETCH_GROUP_INVOICE = "Article.invoice";
 	public static final String FETCH_GROUP_DELIVERY_NOTE = "Article.deliveryNote";
+	public static final String FETCH_GROUP_RECEPTION_NOTE = "Article.receptionNote";
 	public static final String FETCH_GROUP_DELIVERY = "Article.delivery";
 
 	// the following fetch-groups are virtual and processed in the detach callback

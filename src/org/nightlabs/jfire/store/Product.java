@@ -206,7 +206,7 @@ implements Serializable
 	public abstract ProductLocator getProductLocator(User user, NestedProductType nestedProductType);
 
 	/**
-	 * This method is called by {@link Trader#allocateArticleEnd(User, Article)} and
+	 * This method is called by {@link Trader#allocateArticlesEnd(User user, Collection articles)} and
 	 * must ensure that this product is fully allocated and assembled.
 	 * <p>
 	 * This method DOES NOT set the allocated status in {@link ProductLocal} - this
@@ -322,7 +322,7 @@ implements Serializable
 				Map.Entry me = (Map.Entry) itPNPT.next();
 				String organisationID = (String) me.getKey();
 				List nestedProductTypes = (List) me.getValue();
-				trader.onProductAssemble_importNestedProduct(this, organisationID, nestedProductTypes);
+				trader.onProductAssemble_importNestedProduct(user, this, organisationID, nestedProductTypes);
 			}
 		}
 		// TODO are the ProductTransfers for the foreign products already created correctly?

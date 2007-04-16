@@ -61,6 +61,7 @@ import org.nightlabs.jfire.editlock.EditLock;
 import org.nightlabs.jfire.idgenerator.IDNamespaceDefault;
 import org.nightlabs.jfire.jbpm.JbpmLookup;
 import org.nightlabs.jfire.jbpm.graph.def.ProcessDefinition;
+import org.nightlabs.jfire.jbpm.graph.def.State;
 import org.nightlabs.jfire.person.Person;
 import org.nightlabs.jfire.security.User;
 import org.nightlabs.jfire.security.id.UserID;
@@ -239,29 +240,73 @@ implements SessionBean
 	}
 
 	/**
-	 * Creates a new order. This method is only usable, if the user (principal)
-	 * is an organisation, because this organisation will automatically be set
-	 * as the customer for the new Order. 
+	 * This method is called, if the cross-trade-{@link Order} already exists (from a previous call to {@link #createCrossTradeOrder(String, String, CustomerGroupID, Set)}),
+	 * but additional Segments are required.
+	 *
+	 * @param orderID The ID of the {@link Order} for which the new {@link Segment}s shall be created.
+	 * @param segmentTypeIDs For each {@link SegmentTypeID} in this {@link Collection}, a new instance of {@link Segment} will be created and returned. If you pass
+	 *		a {@link List} here with multiple references to the same {@link SegmentTypeID}, multiple instances of <code>Segment</code> will be created for this
+	 *		same {@link SegmentType}.
 	 *
 	 * @ejb.interface-method
 	 * @ejb.permission role-name="_Guest_"
 	 * @ejb.transaction type="Required"
-	 **/
-	public Order createOrder(String orderIDPrefix, String currencyID) // TODO pass the desired customerGroup!!!
+	 */
+	public Collection<Segment> createCrossTradeSegments(OrderID orderID, Collection<SegmentTypeID> segmentTypeIDs)
 		throws ModuleException
 	{
+		PersistenceManager pm = getPersistenceManager();
+		try {
+			pm.getExtent(Order.class);
+			Order order = (Order) pm.getObjectById(orderID);
+			Collection<Segment> segments = Trader.getTrader(pm).createSegments(order, NLJDOHelper.getObjectList(pm, segmentTypeIDs, SegmentType.class));
+
+			pm.getFetchPlan().setMaxFetchDepth(NLJDOHelper.MAX_FETCH_DEPTH_NO_LIMIT);
+			pm.getFetchPlan().setGroups(new String[] {
+				FetchPlan.DEFAULT, Segment.FETCH_GROUP_ORDER, Segment.FETCH_GROUP_SEGMENT_TYPE
+			});
+			pm.getFetchPlan().setDetachmentOptions(FetchPlan.DETACH_LOAD_FIELDS);
+
+			return pm.detachCopyAll(segments);
+		} finally {
+			pm.close();
+		}
+	}
+
+	/**
+	 * Creates a new order. This method is only usable, if the user (principal)
+	 * is an organisation, because this organisation will automatically be set
+	 * as the customer for the new Order.
+	 *
+	 * @param customerGroupID Either <code>null</code> (then the default will be used) or an ID of a {@link CustomerGroup} which is allowed to the customer.
+	 *
+	 * @ejb.interface-method
+	 * @ejb.permission role-name="_Guest_"
+	 * @ejb.transaction type="Required"
+	 */
+	public Order createCrossTradeOrder(String orderIDPrefix, String currencyID, CustomerGroupID customerGroupID, Collection<SegmentTypeID> segmentTypeIDs)
+		throws ModuleException
+	{
+		if (!getPrincipal().userIsOrganisation())
+			throw new IllegalStateException("This method cannot be called by a user who is not an organisation!");
+
 		PersistenceManager pm = getPersistenceManager();
 		try {
 			Trader trader = Trader.getTrader(pm);
 			pm.getExtent(Currency.class);
 			Currency currency = (Currency)pm.getObjectById(CurrencyID.create(currencyID), true);
 
-			if (!getPrincipal().userIsOrganisation())
-				throw new IllegalStateException("This method cannot be called by a user who is not an organisation!");
-
 			// cut off the User.USERID_PREFIX_TYPE_ORGANISATION
 			String customerOrganisationID = getPrincipal().getUserID().substring(User.USERID_PREFIX_TYPE_ORGANISATION.length());
 			OrganisationLegalEntity customer = trader.getOrganisationLegalEntity(customerOrganisationID);
+
+			CustomerGroup customerGroup = null;
+			if (customerGroupID != null) {
+				pm.getExtent(CustomerGroup.class);
+				customerGroup = (CustomerGroup) pm.getObjectById(customerGroupID);
+				if (!customer.containsCustomerGroup(customerGroup))
+					throw new IllegalArgumentException("The given CustomerGroupID cannot be assigned, because it is not available to the customer! " + customerGroupID + " customer="+customer.getPrimaryKey());
+			}
 
 			pm.getFetchPlan().setMaxFetchDepth(NLJDOHelper.MAX_FETCH_DEPTH_NO_LIMIT);
 			pm.getFetchPlan().setGroups(new String[] {
@@ -272,11 +317,92 @@ implements SessionBean
 			pm.getFetchPlan().setDetachmentOptions(FetchPlan.DETACH_LOAD_FIELDS);
 
 			Order order = trader.createOrder(trader.getMandator(), customer, orderIDPrefix, currency);
+
+			if (customerGroup != null)
+				order.setCustomerGroup(customerGroup);
+
+			if (segmentTypeIDs != null)
+				Trader.getTrader(pm).createSegments(order, NLJDOHelper.getObjectList(pm, segmentTypeIDs, SegmentType.class));
+
 			return (Order)pm.detachCopy(order);
 		} finally {
 			pm.close();
 		}
 	}
+
+	/**
+	 * Creates a new Offer within a given Order. This method is only usable, if the user (principal)
+	 * is an organisation.
+	 *
+	 * @param orderID The orderID defining the Order in which to create a new Offer.
+	 * @throws ModuleException
+	 *
+	 * @ejb.interface-method
+	 * @ejb.permission role-name="_Guest_"
+	 * @ejb.transaction type="Required"
+	 */
+	public Offer createCrossTradeOffer(OrderID orderID, String offerIDPrefix)
+	throws ModuleException
+	{
+		if (!getPrincipal().userIsOrganisation())
+			throw new IllegalStateException("This method cannot be called by a user who is not an organisation!");
+
+		PersistenceManager pm = getPersistenceManager();
+		try {
+			Trader trader = Trader.getTrader(pm);
+			pm.getExtent(Order.class);
+			Offer offer = trader.createOffer(
+					User.getUser(pm, getPrincipal()), (Order) pm.getObjectById(orderID, true), offerIDPrefix);
+
+			pm.getFetchPlan().setMaxFetchDepth(NLJDOHelper.MAX_FETCH_DEPTH_NO_LIMIT);
+			pm.getFetchPlan().setGroups(new String[] {
+				FetchPlan.DEFAULT, Offer.FETCH_GROUP_CREATE_USER, Offer.FETCH_GROUP_ORDER,
+				Offer.FETCH_GROUP_CURRENCY, Offer.FETCH_GROUP_STATE, Offer.FETCH_GROUP_STATES,
+				State.FETCH_GROUP_STATABLE, State.FETCH_GROUP_STATE_DEFINITION, State.FETCH_GROUP_USER
+			});
+			pm.getFetchPlan().setDetachmentOptions(FetchPlan.DETACH_LOAD_FIELDS);
+
+			return (Offer) pm.detachCopy(offer);
+		} finally {
+			pm.close();
+		}
+	}
+
+//	/**
+//	 * @ejb.interface-method
+//	 * @ejb.permission role-name="_Guest_"
+//	 * @ejb.transaction type = "Required"
+//	 **/
+//	public Map<Integer, Collection<? extends Article>> createCrossTradeArticles(
+//			OfferID offerID, ProductTypeID[] productTypeIDs, int[] quantities, ProductLocator[] productLocators)
+//	{
+//		if (!getPrincipal().userIsOrganisation())
+//			throw new IllegalStateException("This method cannot be called by a user who is not an organisation!");
+//
+//		if (productTypeIDs.length != quantities.length)
+//			throw new IllegalArgumentException("productTypeIDs.length != quantities.length");
+//
+//		if (productTypeIDs.length != productLocators.length)
+//			throw new IllegalArgumentException("productTypeIDs.length != productLocators.length");
+//
+//		PersistenceManager pm = getPersistenceManager();
+//		try {
+//			User user = User.getUser(pm, getPrincipal());
+//
+//			Map<Integer, Collection<? extends Article>> res = new HashMap<Integer, Collection<? extends Article>>();
+//
+//			for (int index = 0; index < productTypeIDs.length; ++index) {
+//				ProductType productType = (ProductType) pm.getObjectById(productTypeIDs[index]);
+//				ProductTypeActionHandler productTypeActionHandler = ProductTypeActionHandler.getProductTypeActionHandler(pm, productType.getClass());
+//				Collection<? extends Article> articles = productTypeActionHandler.createCrossTradeArticles(user, productType, quantities[index], productLocators[index]);
+//				res.put(index, articles);
+//			}
+//
+//			return res;
+//		} finally {
+//			pm.close();
+//		}
+//	}
 
 	/**
 	 * Creates a new Offer within a given Order. 

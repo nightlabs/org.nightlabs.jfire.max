@@ -35,6 +35,7 @@ import org.nightlabs.jfire.accounting.pay.ModeOfPayment;
 import org.nightlabs.jfire.accounting.pay.ModeOfPaymentFlavour;
 import org.nightlabs.jfire.store.deliver.ModeOfDelivery;
 import org.nightlabs.jfire.store.deliver.ModeOfDeliveryFlavour;
+import org.nightlabs.util.Utils;
 
 
 /**
@@ -317,5 +318,19 @@ public class CustomerGroup implements Serializable
 	public void removeModeOfDeliveryFlavour(String modeOfDeliveryFlavourPK)
 	{
 		modeOfDeliveryFlavours.remove(modeOfDeliveryFlavourPK);
+	}
+
+	@Override
+	public boolean equals(Object obj)
+	{
+		if (this == obj) return true;
+		if (!(obj instanceof CustomerGroup)) return false;
+		CustomerGroup o = (CustomerGroup) obj;
+		return Utils.equals(this.organisationID, o.organisationID) && Utils.equals(this.customerGroupID, o.customerGroupID);
+	}
+	@Override
+	public int hashCode()
+	{
+		return Utils.hashCode(organisationID) + Utils.hashCode(customerGroupID);
 	}
 }

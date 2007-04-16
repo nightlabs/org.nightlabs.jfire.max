@@ -26,17 +26,13 @@
 
 package org.nightlabs.jfire.trade;
 
-import java.util.Map;
-
 import javax.jdo.JDODataStoreException;
 import javax.jdo.JDOObjectNotFoundException;
 import javax.jdo.PersistenceManager;
-import javax.jdo.listener.StoreCallback;
 
+import org.nightlabs.jfire.organisation.LocalOrganisation;
 import org.nightlabs.jfire.organisation.Organisation;
-import org.nightlabs.jfire.security.User;
 import org.nightlabs.jfire.transfer.Anchor;
-import org.nightlabs.jfire.transfer.Transfer;
 import org.nightlabs.jfire.transfer.id.AnchorID;
 
 /**
@@ -91,25 +87,25 @@ public class OrganisationLegalEntity extends LegalEntity
 	protected OrganisationLegalEntity(org.nightlabs.jfire.organisation.Organisation organisation, String anchorTypeID)
 	{
 		super(organisation.getOrganisationID(), anchorTypeID, OrganisationLegalEntity.class.getName());
-		System.out.println("******************************************");
-		System.out.println("******************************************");
-		System.out.println("******************************************");
-		System.out.println("******************************************");
-		System.out.println("******************************************");
-		System.out.println("******************************************");
-		System.out.println("******************************************");
-		System.out.println("******************************************");
-		System.out.println("******************************************");
-		System.out.println("*************OrganisationLegalEntity****************");
-		System.out.println("******************************************");
-		System.out.println("******************************************");
-		System.out.println("******************************************");
-		System.out.println("******************************************");
-		System.out.println("******************************************");
-		System.out.println("******************************************");
-		System.out.println("******************************************");
-		System.out.println("******************************************");
-		// TODO: The person and organisation should be set here, but is not because of JPOX but, see
+//		System.out.println("******************************************");
+//		System.out.println("******************************************");
+//		System.out.println("******************************************");
+//		System.out.println("******************************************");
+//		System.out.println("******************************************");
+//		System.out.println("******************************************");
+//		System.out.println("******************************************");
+//		System.out.println("******************************************");
+//		System.out.println("******************************************");
+//		System.out.println("*************OrganisationLegalEntity****************");
+//		System.out.println("******************************************");
+//		System.out.println("******************************************");
+//		System.out.println("******************************************");
+//		System.out.println("******************************************");
+//		System.out.println("******************************************");
+//		System.out.println("******************************************");
+//		System.out.println("******************************************");
+//		System.out.println("******************************************");
+		// TODO: The person and organisation should be set here, but is not because of JPOX bug, see public static OrganisationLegalEntity getOrganisationLegalEntity(...)
 //		this.organisation = organisation;
 //		this.setPerson(organisation.getPerson());
 		
@@ -204,6 +200,14 @@ public class OrganisationLegalEntity extends LegalEntity
 				// TODO: This should be done in the constructor of OrganisationLegalEntity
 				organisationLegalEntity.organisation = organisation;
 				organisationLegalEntity.setPerson(organisation.getPerson());
+
+				// We MUST NOT call Trader.getTrader(...) here if it's the local organisation, because this would result in an endless recursion.
+				// This method here is called by Accounting.getAccounting(...) and Trader.getTrader(...) calls Accounting.getAccounting(...).
+				// As the mandator-organisation doesn't need a customer-group anyway, it's no problem to filter out this situation.
+				if (!organisationID.equals(LocalOrganisation.getLocalOrganisation(pm).getOrganisationID())) {
+					organisationLegalEntity.setDefaultCustomerGroup(Trader.getTrader(pm).getDefaultCustomerGroupForKnownCustomer());
+					// TODO should we use another defaultCustomerGroup for organisation-legal-entities?
+				}
 			}
 		}
 		return organisationLegalEntity;

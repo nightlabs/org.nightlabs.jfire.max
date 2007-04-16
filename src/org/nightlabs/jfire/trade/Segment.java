@@ -27,10 +27,18 @@
 package org.nightlabs.jfire.trade;
 
 import java.io.Serializable;
+import java.util.Collection;
+import java.util.HashSet;
+import java.util.Set;
+
+import javax.jdo.PersistenceManager;
+import javax.jdo.Query;
 
 import org.nightlabs.jfire.accounting.Invoice;
 import org.nightlabs.jfire.idgenerator.IDGenerator;
 import org.nightlabs.jfire.store.DeliveryNote;
+import org.nightlabs.jfire.trade.id.SegmentID;
+import org.nightlabs.jfire.trade.id.SegmentTypeID;
 import org.nightlabs.util.Utils;
 
 /**
@@ -56,12 +64,29 @@ import org.nightlabs.util.Utils;
  * @jdo.fetch-group name="Segment.order" fields="order"
  * @jdo.fetch-group name="Segment.segmentType" fields="segmentType"
  * @jdo.fetch-group name="Segment.this" fetch-groups="default" fields="order, segmentType"
+ *
+ * @jdo.query name="getSegmentTypeIDsOfOrder" query="SELECT JDOHelper.getObjectId(this.segmentType) WHERE this.order == :order"
+ * @jdo.query name="getSegmentIDsOfOrderAndSegmentType" query="SELECT JDOHelper.getObjectId(this) WHERE this.order == :order && this.segmentType == :segmentType"
  */
 public class Segment implements Serializable
 {
+	private static final long serialVersionUID = 1L;
+
 	public static final String FETCH_GROUP_ORDER = "Segment.order";
 	public static final String FETCH_GROUP_SEGMENT_TYPE = "Segment.segmentType";
 	public static final String FETCH_GROUP_THIS_SEGMENT = "Segment.this";
+
+	public static Set<SegmentTypeID> getSegmentTypeIDs(PersistenceManager pm, Order order)
+	{
+		Query q = pm.newNamedQuery(Segment.class, "getSegmentTypeIDsOfOrder");
+		return new HashSet<SegmentTypeID>((Collection<? extends SegmentTypeID>) q.execute(order));
+	}
+
+	public static Set<SegmentID> getSegmentIDs(PersistenceManager pm, Order order, SegmentType segmentType)
+	{
+		Query q = pm.newNamedQuery(Segment.class, "getSegmentIDsOfOrderAndSegmentType");
+		return new HashSet<SegmentID>((Collection<? extends SegmentID>) q.execute(order, segmentType));
+	}
 
 	/**
 	 * @jdo.field primary-key="true"

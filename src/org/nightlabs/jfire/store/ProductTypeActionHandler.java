@@ -26,6 +26,7 @@
 package org.nightlabs.jfire.store;
 
 import java.util.Collection;
+import java.util.Hashtable;
 import java.util.Set;
 
 import javax.jdo.JDOHelper;
@@ -35,10 +36,6 @@ import javax.jdo.Query;
 import org.nightlabs.jdo.ObjectIDUtil;
 import org.nightlabs.jfire.accounting.Accounting;
 import org.nightlabs.jfire.accounting.Invoice;
-import org.nightlabs.jfire.accounting.pay.Payment;
-import org.nightlabs.jfire.accounting.pay.PaymentData;
-import org.nightlabs.jfire.accounting.pay.PaymentHelperBean;
-import org.nightlabs.jfire.accounting.pay.id.PaymentDataID;
 import org.nightlabs.jfire.base.JFirePrincipal;
 import org.nightlabs.jfire.organisation.Organisation;
 import org.nightlabs.jfire.security.User;
@@ -47,7 +44,14 @@ import org.nightlabs.jfire.store.deliver.DeliveryData;
 import org.nightlabs.jfire.store.deliver.DeliveryHelperBean;
 import org.nightlabs.jfire.store.deliver.id.DeliveryDataID;
 import org.nightlabs.jfire.trade.Article;
+import org.nightlabs.jfire.trade.Offer;
+import org.nightlabs.jfire.trade.Order;
+import org.nightlabs.jfire.trade.Segment;
+import org.nightlabs.jfire.trade.SegmentType;
+import org.nightlabs.jfire.trade.TradeManagerUtil;
 import org.nightlabs.jfire.trade.Trader;
+import org.nightlabs.jfire.trade.id.OfferID;
+import org.nightlabs.jfire.trade.id.SegmentID;
 import org.nightlabs.util.Utils;
 
 /**
@@ -232,13 +236,45 @@ public abstract class ProductTypeActionHandler
 	 * it is handled as if you return <code>null</code>.
 	 *
 	 * @param user The <code>User</code> who is responsible for this creation.
-	 * @param productType TODO
+	 * @param productType If <code>nestedProductType</code> is defined, it is the same as {@link NestedProductType#getInnerProductType()}. This is passed, because
+	 *		<code>nestedProductType</code> might be <code>null</code> for top-level products.
 	 * @param nestedProductType This will be <code>null</code> if the top-level product shall be found/created.
 	 * @param productLocator A specialized Object defining for YOUR implementation of <code>ProductType</code> which <code>Product</code> to find.
 	 * @return Return either <code>null</code> if no suitable <code>Product</code>s can be allocated or a <code>Collection</code> of <code>Product</code>.
 	 */
-	public abstract Collection<Product> findProducts(
+	public abstract Collection<? extends Product> findProducts(
 			User user, ProductType productType, NestedProductType nestedProductType, ProductLocator productLocator);
+
+	/**
+	 * This method is called on the client-side (i.e. the reseller-side) and needs to create {@link Article}s
+	 * (or specific decendents of the class {@link Article}) on the vendor-side. It must not persist them on
+	 * the client-side or do anything else except for creating them on the vendor-side and returning them.
+	 *
+	 * @param user The user who is creating the package-article and thus responsible for creating the nested (remote) <code>Product</code>s.
+	 * @param localPackageProduct The {@link Product} into which the nested products are put after having been obtained from the vendor.
+	 * @param localArticle The local {@link Article} which is a convenience (could be read from {@link Product#getProductLocal()} and
+	 *		{@link ProductLocal#getArticle()}).
+	 * @param partnerOrganisationID The ID of the vendor-organisation.
+	 * @param partnerInitialContextProperties This parameter is passed for convenience and performance reasons. This <code>Hashtable</code> contains
+	 *		initial-context-properties for communication with the vendor-organisation and can be passed to xdoclet-generated Util-classes - for
+	 *		example {@link TradeManagerUtil#getHome(Hashtable)}.
+	 * @param partnerOffer The vendor's (= business partner's) {@link Offer} into which the new {@link Article}s shall be created.
+	 * @param partnerOfferID This parameter is passed for convenience and performance reasons. It's the result of
+	 *		{@link JDOHelper#getObjectId(Object)} applied to <code>partnerOffer</code>.
+	 * @param partnerSegmentID For every {@link SegmentType} of the local {@link Order}, a Segment is created in the vendor's {@link Order}. This is the ID
+	 *		of the {@link Segment} in the partner's Order that has been created for the <code>SegmentType</code> returned by <code>localArticle.getSegment().getSegmentType()</code>.
+	 * @param nestedProductType The {@link NestedProductType}s passed as parameter <code>nestedProductTypes</code> are grouped by {@link ProductType} as returned
+	 *		by {@link NestedProductType#getInnerProductType()}. This instance is then passed to this method here.
+	 * @param nestedProductTypes The {@link NestedProductType}s for whose inner-{@link ProductType}s the {@link Article}s shall be created.
+	 * @return the {@link Article}s which have been created by the vendor and detached from the vendor's organisation's datastore. They must not yet be
+	 *		attached locally - this is done by the framework.
+	 * @throws Exception As this method communicates with a remote server and calls implementation-specific methods, it can throw a wide variety of exceptions.
+	 */
+	public abstract Collection<? extends Article> createCrossTradeArticles(
+			User user, Product localPackageProduct, Article localArticle,
+			String partnerOrganisationID, Hashtable partnerInitialContextProperties,
+			Offer partnerOffer, OfferID partnerOfferID, SegmentID partnerSegmentID,
+			ProductType nestedProductType, Collection<NestedProductType> nestedProductTypes) throws Exception;
 
 	/**
 	 * This method is called by {@link Trader#allocateArticlesBegin(User, Collection)}

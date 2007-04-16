@@ -138,7 +138,7 @@ public class Accounting
 		accounting.mandator.setAccountant(accounting.localAccountant);
 		accounting.partnerAccountant = new PartnerAccountant(organisationID, PartnerAccountant.class.getName());
 
-		pm.makePersistent(accounting);
+		accounting = (Accounting) pm.makePersistent(accounting);
 		return accounting;
 	}
 

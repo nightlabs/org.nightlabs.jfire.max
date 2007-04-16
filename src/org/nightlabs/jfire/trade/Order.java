@@ -369,7 +369,7 @@ implements Serializable, ArticleContainer, SegmentContainer, DetachCallback
 	 *		element-type="Segment"
 	 *		mapped-by="order"
 	 */
-	private Set segments;
+	private Set<Segment> segments;
 
 	/**
 	 * @jdo.field persistence-modifier="persistent"

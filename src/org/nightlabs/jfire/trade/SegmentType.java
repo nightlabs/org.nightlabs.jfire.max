@@ -75,7 +75,7 @@ public class SegmentType implements Serializable
 	 * forms of sales with higher logic, this defines the default <tt>SegmentType</tt> that
 	 * is used in most of the cases.
 	 */
-	public static final String DEFAULT_SEGMENT_TYPE_ID = "default";
+	public static final SegmentTypeID DEFAULT_SEGMENT_TYPE_ID = SegmentTypeID.create(Organisation.DEVIL_ORGANISATION_ID, "default");
 
 	/**
 	 * @jdo.field primary-key="true"
@@ -99,9 +99,10 @@ public class SegmentType implements Serializable
 	 */
 	private SegmentTypeName name;
 
-	protected SegmentType()
-	{
-	}
+	/**
+	 * @deprecated Only for JDO!
+	 */
+	protected SegmentType() { }
 
 	public static SegmentType getDefaultSegmentType(PersistenceManager pm)
 	{
@@ -109,10 +110,9 @@ public class SegmentType implements Serializable
 
 		pm.getExtent(SegmentType.class);
 		try {
-			segmentType = (SegmentType) pm.getObjectById(
-					SegmentTypeID.create(Organisation.DEVIL_ORGANISATION_ID, SegmentType.DEFAULT_SEGMENT_TYPE_ID));
+			segmentType = (SegmentType) pm.getObjectById(DEFAULT_SEGMENT_TYPE_ID);
 		} catch (JDOObjectNotFoundException x) {
-			segmentType = new SegmentType(Organisation.DEVIL_ORGANISATION_ID, SegmentType.DEFAULT_SEGMENT_TYPE_ID);
+			segmentType = new SegmentType(DEFAULT_SEGMENT_TYPE_ID.organisationID, DEFAULT_SEGMENT_TYPE_ID.segmentTypeID);
 			segmentType.getName().setText(LanguageID.SYSTEM, "Default");
 			pm.makePersistent(segmentType);
 		}

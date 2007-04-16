@@ -508,6 +508,16 @@ public class ArticlePrice extends org.nightlabs.jfire.accounting.Price
 	{
 		return origPrice;
 	}
+//	/**
+//	 * <b>Warning!</b> You should never call this method! It is called during replication to a reseller-organisation.
+//	 * <p>
+//	 * This method sets the <code>origPrice</code> to <code>null</code>.
+//	 * </p>
+//	 */
+//	public void __clearOrigPrice()
+//	{
+//		this.origPrice = null;
+//	}
 	/**
 	 * @return Returns the product.
 	 */

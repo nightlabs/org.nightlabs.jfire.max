@@ -127,7 +127,7 @@ public class OrderRequirement
 	 */
 	private Map vendor2order = new HashMap();
 
-	public void addOrder(Order order) {
+	public void addPartnerOrder(Order order) {
 		LegalEntity vendor = order.getVendor();
 
 		Order other = (Order) vendor2order.get(vendor);

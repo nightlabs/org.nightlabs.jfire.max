@@ -29,6 +29,7 @@ package org.nightlabs.jfire.trade;
 import java.io.IOException;
 import java.io.Serializable;
 import java.net.URL;
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -40,11 +41,9 @@ import java.util.Locale;
 import java.util.Map;
 import java.util.Set;
 
-import javax.jdo.FetchPlan;
 import javax.jdo.JDOHelper;
 import javax.jdo.JDOObjectNotFoundException;
 import javax.jdo.PersistenceManager;
-import javax.naming.NamingException;
 
 import org.apache.log4j.Logger;
 import org.jbpm.JbpmContext;
@@ -84,6 +83,8 @@ import org.nightlabs.jfire.store.ProductTypeActionHandler;
 import org.nightlabs.jfire.store.Store;
 import org.nightlabs.jfire.trade.id.ArticleID;
 import org.nightlabs.jfire.trade.id.OfferID;
+import org.nightlabs.jfire.trade.id.OrderID;
+import org.nightlabs.jfire.trade.id.SegmentID;
 import org.nightlabs.jfire.trade.jbpm.ActionHandlerAcceptOffer;
 import org.nightlabs.jfire.trade.jbpm.ActionHandlerAcceptOfferImplicitelyVendor;
 import org.nightlabs.jfire.trade.jbpm.ActionHandlerFinalizeOffer;
@@ -130,6 +131,8 @@ public class Trader
 		if (it.hasNext())
 			return (Trader) it.next();
 
+		logger.info("getTrader: The Trader instance does not yet exist! Creating it...");
+
 		Trader trader = new Trader();
 
 		trader.store = Store.getStore(pm);
@@ -146,7 +149,9 @@ public class Trader
 		trader.defaultCustomerGroupForKnownCustomer.getName().setText(
 				Locale.ENGLISH.getLanguage(), "Default");
 
-		pm.makePersistent(trader);
+		trader = (Trader) pm.makePersistent(trader);
+
+		logger.info("getTrader: ...new Trader instance created and persisted!");
 		return trader;
 	}
 
@@ -370,6 +375,15 @@ public class Trader
 			if (!JDOHelper.isPersistent(legalEntity))
 				pm.makePersistent(legalEntity);
 		return legalEntity;
+	}
+
+	public Collection<Segment> createSegments(Order order, Collection<SegmentType> segmentTypes)
+	{
+		List segments = new ArrayList();
+		for (SegmentType segmentType : segmentTypes) {
+			segments.add(createSegment(order, segmentType));
+		}
+		return segments;
 	}
 
 	/**
@@ -818,7 +832,7 @@ public class Trader
 						new AllocateArticlesEndInvocation(user, articles),
 						null,
 						new AllocateArticlesEndErrorCallback(),
-						new AllocateArticlesEndUndeliverableCallback(), enableXA);
+						new AllocateArticlesEndUndeliverableCallback(), true);
 
 		} catch (RuntimeException x) {
 			throw x;
@@ -1263,6 +1277,17 @@ public class Trader
 							+ getToStringList(articles)
 							+ "\" cannot be allocated, because it is currently in state releasePending!");
 
+		Map productTypeClass2ProductTypeActionHandler = new HashMap();
+		for (Iterator iter = articles.iterator(); iter.hasNext();) {
+			Article article = (Article) iter.next();
+			Class ptClazz = article.getProductType().getClass();
+			if (productTypeClass2ProductTypeActionHandler.containsKey(ptClazz))
+				continue;
+
+			productTypeClass2ProductTypeActionHandler.put(ptClazz, ProductTypeActionHandler.getProductTypeActionHandler(
+					getPersistenceManager(), ptClazz));
+		}
+
 		Map productTypeActionHandler2Articles = new HashMap();
 		for (Iterator iter = articles.iterator(); iter.hasNext();) {
 			Article article = (Article) iter.next();
@@ -1296,8 +1321,9 @@ public class Trader
 					.getPackagePriceConfig();
 			article.setPrice(packagePriceConfig.createArticlePrice(article));
 
-			ProductTypeActionHandler productTypeActionHandler = ProductTypeActionHandler.getProductTypeActionHandler(
-					getPersistenceManager(), article.getProductType().getClass());
+//			ProductTypeActionHandler productTypeActionHandler = ProductTypeActionHandler.getProductTypeActionHandler(
+//					getPersistenceManager(), article.getProductType().getClass());
+			ProductTypeActionHandler productTypeActionHandler = (ProductTypeActionHandler) productTypeClass2ProductTypeActionHandler.get(article.getProductType().getClass());
 			List al = (List) productTypeActionHandler2Articles.get(productTypeActionHandler);
 			if (al == null) {
 				al = new LinkedList();
@@ -1305,6 +1331,7 @@ public class Trader
 			}
 			al.add(article);
 		}
+		getPersistenceManager().flush(); // TODO is this necessary? JPOX Bug
 		for (Iterator it = productTypeActionHandler2Articles.entrySet().iterator(); it.hasNext();) {
 			Map.Entry me = (Map.Entry) it.next();
 			((ProductTypeActionHandler) me.getKey()).onAllocateArticlesBegin(user, this, (List) me.getValue());
@@ -1633,26 +1660,114 @@ public class Trader
 		return processDefinition;
 	}
 
-	public void onProductAssemble_importNestedProduct(Product packageProduct, String partnerOrganisationID, Collection<NestedProductType> partnerNestedProductTypes)
+	public void onProductAssemble_importNestedProduct(User user, Product packageProduct, String partnerOrganisationID, Collection<NestedProductType> partnerNestedProductTypes)
 	{
 		try {
 			PersistenceManager pm = getPersistenceManager();
-			Order localOrder = packageProduct.getProductLocal().getArticle().getOrder();
+			Article localArticle = packageProduct.getProductLocal().getArticle();
+			Order localOrder = localArticle.getOrder();
+			Offer localOffer = localArticle.getOffer();
+			SegmentType segmentType = localArticle.getSegment().getSegmentType();
+
+			Set segmentTypeIDsWithTheCurrentInstanceOnly = new HashSet();
+			segmentTypeIDsWithTheCurrentInstanceOnly.add(JDOHelper.getObjectId(segmentType));
 
 			// TODO we should remove the anchorTypeID from the following method's parameter list
 			OrganisationLegalEntity partner = OrganisationLegalEntity.getOrganisationLegalEntity(pm, partnerOrganisationID, OrganisationLegalEntity.ANCHOR_TYPE_ID_ORGANISATION, true);
 
+			Hashtable initialContextProperties = Lookup.getInitialContextProperties(pm, partnerOrganisationID);
+			TradeManager tradeManager = TradeManagerUtil.getHome(initialContextProperties).create();
+
+//			Set segmentTypeIDs = Segment.getSegmentTypeIDs(pm, localOrder);
+
 			// for the current order, we create/find an instance of OrderRequirement
 			OrderRequirement orderRequirement = OrderRequirement.getOrderRequirement(pm, localOrder);
 			Order partnerOrder = orderRequirement.getPartnerOrder(partner);
-			Hashtable initialContextProperties = Lookup.getInitialContextProperties(pm, partnerOrganisationID);
+			OrderID partnerOrderID;
+			SegmentID partnerSegmentID;
 			if (partnerOrder == null) {
-				TradeManager tradeManager = TradeManagerUtil.getHome(initialContextProperties).create();
-				Order order = tradeManager.createOrder(null, localOrder.getCurrency().getCurrencyID()); // TODO should we somehow configure the orderIDPrefix on this side? I don't think so. Marco.
+				Order order = tradeManager.createCrossTradeOrder(null, // TODO should we somehow configure the orderIDPrefix on this side? I don't think so. Marco.
+						localOrder.getCurrency().getCurrencyID(),
+						null, // TODO we should find out and pass the CustomerGroupID
+//						segmentTypeIDs);
+						segmentTypeIDsWithTheCurrentInstanceOnly);
 				partnerOrder = (Order) pm.makePersistent(order);
-				orderRequirement.addOrder(partnerOrder);
+				orderRequirement.addPartnerOrder(partnerOrder);
+				partnerOrderID = (OrderID) JDOHelper.getObjectId(partnerOrder);
+				partnerSegmentID = Segment.getSegmentIDs(pm, partnerOrder, segmentType).iterator().next();
 			}
-			
+			else {
+				partnerOrderID = (OrderID) JDOHelper.getObjectId(partnerOrder);
+				Set segmentIDs = Segment.getSegmentIDs(pm, partnerOrder, segmentType);
+				if (segmentIDs.isEmpty()) {
+					Collection segments = tradeManager.createCrossTradeSegments(partnerOrderID, segmentTypeIDsWithTheCurrentInstanceOnly);
+					segments = pm.makePersistentAll(segments);
+					segmentIDs = NLJDOHelper.getObjectIDSet(segments);
+				}
+				partnerSegmentID = (SegmentID) segmentIDs.iterator().next();
+//				Set partnerSegmentTypeIDs = Segment.getSegmentTypeIDs(pm, partnerOrder);
+//				if (!segmentTypeIDs.equals(partnerSegmentTypeIDs))
+//					tradeManager.createCrossTradeSegments(partnerOrderID, segmentTypeIDs);
+			}
+
+			// for the current offer, we create/find an instance of OfferRequirement
+			OfferRequirement offerRequirement = OfferRequirement.getOfferRequirement(pm, localOffer);
+			Offer partnerOffer = offerRequirement.getPartnerOffer(partner);
+			if (partnerOffer == null) {
+				{
+					Offer offer = tradeManager.createCrossTradeOffer(partnerOrderID, null); // we don't pass the offerIDPrefix - or should we?
+					new OfferLocal(offer);
+					partnerOffer = (Offer) pm.makePersistent(offer);
+					offerRequirement.addPartnerOffer(partnerOffer);
+				}
+
+				ProcessDefinitionAssignment processDefinitionAssignment = (ProcessDefinitionAssignment) getPersistenceManager().getObjectById(
+						ProcessDefinitionAssignmentID.create(Offer.class, TradeSide.customer));
+				processDefinitionAssignment.createProcessInstance(null, user, partnerOffer);
+			}
+			OfferID partnerOfferID = (OfferID) JDOHelper.getObjectId(partnerOffer);
+
+//			ProductTypeID[] productTypeIDs = new ProductTypeID[partnerNestedProductTypes.size()];
+//			int[] quantities = new int[partnerNestedProductTypes.size()];
+//			ProductLocator[] productLocators = new ProductLocator[partnerNestedProductTypes.size()];
+//
+//			int idx = 0;
+//			for (NestedProductType partnerNestedProductType : partnerNestedProductTypes) {
+//				ProductLocator productLocator = packageProduct.getProductLocator(user, partnerNestedProductType);
+//				productTypeIDs[idx] = (ProductTypeID) JDOHelper.getObjectId(partnerNestedProductType.getInnerProductType());
+//				quantities[idx] = partnerNestedProductType.getQuantity();
+//				productLocators[idx] = productLocator;
+//				++idx;
+//			}
+//
+//			Map<Integer, Collection<? extends Article>> articleMap = tradeManager.createCrossTradeArticles(partnerOfferID, productTypeIDs, quantities, productLocators);
+
+			Map productType2NestedProductTypes = new HashMap();
+			for (NestedProductType partnerNestedProductType : partnerNestedProductTypes) {
+				Collection nestedProductTypes = (Collection) productType2NestedProductTypes.get(partnerNestedProductType.getInnerProductType());
+				if (nestedProductTypes == null) {
+					nestedProductTypes = new ArrayList();
+					productType2NestedProductTypes.put(partnerNestedProductType.getInnerProductType(), nestedProductTypes);
+				}
+				nestedProductTypes.add(partnerNestedProductType);
+			}
+
+			for (Iterator itME = productType2NestedProductTypes.entrySet().iterator(); itME.hasNext();) {
+				Map.Entry me = (Map.Entry) itME.next();
+				ProductType productType = (ProductType) me.getKey();
+				Collection nestedProductTypes = (Collection) me.getValue();
+				ProductTypeActionHandler productTypeActionHandler = ProductTypeActionHandler.getProductTypeActionHandler(pm, productType.getClass());
+				Collection articles = productTypeActionHandler.createCrossTradeArticles(
+						user, packageProduct, localArticle,
+						partnerOrganisationID, initialContextProperties,
+						partnerOffer, partnerOfferID, partnerSegmentID,
+						productType, nestedProductTypes);
+//				for (Iterator itA = articles.iterator(); itA.hasNext();) {
+//					Article article = (Article) itA.next();
+//					article.getPrice().__clearOrigPrice();
+//				}
+				pm.makePersistentAll(articles);
+			}
 
 		} catch (Exception e) {
 			throw new RuntimeException(e);

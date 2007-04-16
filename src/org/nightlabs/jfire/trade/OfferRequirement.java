@@ -30,6 +30,11 @@ import java.io.Serializable;
 import java.util.HashMap;
 import java.util.Map;
 
+import javax.jdo.JDOObjectNotFoundException;
+import javax.jdo.PersistenceManager;
+
+import org.nightlabs.jfire.trade.id.OfferRequirementID;
+
 /**
  * One instance of OfferRequirement exists for each Offer on the side of the vendor.
  * The OfferRequirement bundles all other offers that the vendor needs to create to
@@ -50,6 +55,25 @@ import java.util.Map;
 public class OfferRequirement
 	implements Serializable
 {
+	private static final long serialVersionUID = 1L;
+
+	/**
+	 * This method returns a previously existing {@link OfferRequirement} or creates and persists
+	 * a new instance if not existent.
+	 */
+	public static OfferRequirement getOfferRequirement(PersistenceManager pm, Offer offer)
+	{
+		OfferRequirementID offerRequirementID = OfferRequirementID.create(offer.getOrganisationID(), offer.getOfferIDPrefix(), offer.getOfferID());
+		pm.getExtent(OfferRequirement.class);
+		try {
+			OfferRequirement res = (OfferRequirement) pm.getObjectById(offerRequirementID);
+			res.getOffer();
+			return res;
+		} catch (JDOObjectNotFoundException x) {
+			return (OfferRequirement) pm.makePersistent(new OfferRequirement(offer));
+		}
+	}
+
 	/**
 	 * @jdo.field primary-key="true"
 	 * @jdo.column length="100"
@@ -64,8 +88,6 @@ public class OfferRequirement
 	 * @jdo.field primary-key="true"
 	 */
 	private long offerID;
-
-	private Trader trader;
 
 	private Offer offer;
 
@@ -86,24 +108,26 @@ public class OfferRequirement
 
 	public OfferRequirement() { }
 
-	public OfferRequirement(Trader trader, Offer offer)
+	public OfferRequirement(Offer offer)
 	{
-		if (trader == null)
-			throw new NullPointerException("trader");
-		
 		if (offer == null)
 			throw new NullPointerException("offer");
 
-		this.trader = trader;
 		this.offer = offer;
 		this.organisationID = offer.getOrganisationID();
 		this.offerIDPrefix = offer.getOfferIDPrefix();
 		this.offerID = offer.getOfferID();
 	}
 	
-	public void addOffer(Offer offer) {
+	public void addPartnerOffer(Offer offer) {
 		OrganisationLegalEntity vendor = offer.getOrder().getVendor();
-		// TODO check whether there is already an assignment!
+		Offer other = (Offer) vendor2offer.get(vendor);
+		if (offer.equals(other))
+			return; // already registered - ignore
+
+		if (other != null)
+			throw new IllegalStateException("Vendor-Offer cannot be added, because another Offer is already assigned for this vendor! offer.primaryKey=" + offer.getPrimaryKey() + " otherOffer.primaryKey=" + other.getPrimaryKey());
+
 		vendor2offer.put(vendor, offer);
 	}
 	
@@ -111,7 +135,7 @@ public class OfferRequirement
 	 * Returns the Offer for this vendor or null. 
 	 * @param vendor
 	 */
-	public Offer getOffer(LegalEntity vendor) {
+	public Offer getPartnerOffer(LegalEntity vendor) {
 		return (Offer)vendor2offer.get(vendor);
 	}
 	

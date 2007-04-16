@@ -27,10 +27,13 @@
 package org.nightlabs.jfire.trade;
 
 import java.util.Collection;
+import java.util.Collections;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Locale;
 import java.util.Map;
+import java.util.Set;
 
 import javax.jdo.JDOHelper;
 import javax.jdo.JDOObjectNotFoundException;
@@ -150,24 +153,39 @@ public class LegalEntity extends Anchor
 	 */
 	private CustomerGroup defaultCustomerGroup;
 
+//	/**
+//	 * This <tt>Map</tt> stores all {@link CustomerGroup}s as which this
+//	 * <tt>LegalEntity</tt> might buy sth. It must include the
+//	 * {@link #defaultCustomerGroup}, hence this is always added.
+//	 * <p>
+//	 * key: String customerGroupPK<br/>
+//	 * value: CustomerGroup customerGroup
+//	 *
+//	 * @jdo.field
+//	 *		persistence-modifier="persistent"
+//	 *		collection-type="map"
+//	 *		key-type="String"
+//	 *		value-type="CustomerGroup"
+//	 *		table="JFireTrade_LegalEntity_customerGroups"
+//	 *
+//	 * @jdo.join
+//	 */
+//	private Map customerGroups = new HashMap();
+
 	/**
-	 * This <tt>Map</tt> stores all {@link CustomerGroup}s as which this
+	 * This <tt>Set</tt> stores all {@link CustomerGroup}s as which this
 	 * <tt>LegalEntity</tt> might buy sth. It must include the
 	 * {@link #defaultCustomerGroup}, hence this is always added.
-	 * <p>
-	 * key: String customerGroupPK<br/>
-	 * value: CustomerGroup customerGroup
 	 *
 	 * @jdo.field
 	 *		persistence-modifier="persistent"
-	 *		collection-type="map"
-	 *		key-type="String"
-	 *		value-type="CustomerGroup"
+	 *		collection-type="collection"
+	 *		element-type="CustomerGroup"
 	 *		table="JFireTrade_LegalEntity_customerGroups"
 	 *
 	 * @jdo.join
 	 */
-	private Map customerGroups = new HashMap();
+	private Set<CustomerGroup> customerGroups;
 
 	public LegalEntity() { }
 	/**
@@ -177,6 +195,7 @@ public class LegalEntity extends Anchor
 	public LegalEntity(String organisationID, String anchorTypeID, String anchorID)
 	{
 		super(organisationID, anchorTypeID, anchorID);
+		this.customerGroups = new HashSet<CustomerGroup>();
 	}
 
 	/**
@@ -483,27 +502,35 @@ public class LegalEntity extends Anchor
 		addCustomerGroup(defaultCustomerGroup);
 		this.defaultCustomerGroup = defaultCustomerGroup;
 	}
+
+	/**
+	 * @jdo.field persistence-modifier="none"
+	 */
+	private transient Set<CustomerGroup> unmodifiableCustomerGroups = null;
+
 	/**
 	 * @return Returns the {@link CustomerGroup}s as which this <tt>LegalEntity</tt>
 	 *		is allowed to buy sth.
 	 */
 	public Collection getCustomerGroups()
 	{
-		return customerGroups.values();
+		if (unmodifiableCustomerGroups == null)
+			unmodifiableCustomerGroups = Collections.unmodifiableSet(customerGroups);
+
+		return unmodifiableCustomerGroups;
 	}
 
 	public void addCustomerGroup(CustomerGroup customerGroup)
 	{
-		String pk = customerGroup.getPrimaryKey();
-		if (customerGroups.containsKey(pk))
-			customerGroups.put(pk, customerGroup);
+		if (!customerGroups.contains(customerGroup))
+			customerGroups.add(customerGroup);
 	}
 	public void removeCustomerGroup(CustomerGroup customerGroup)
 	{
-		removeCustomerGroup(customerGroup.getPrimaryKey());
+		customerGroups.remove(customerGroup);
 	}
-	public void removeCustomerGroup(String customerGroupPK)
+	public boolean containsCustomerGroup(CustomerGroup customerGroup)
 	{
-		customerGroups.remove(customerGroupPK);
-	} 
+		return customerGroups.contains(customerGroup);
+	}
 }

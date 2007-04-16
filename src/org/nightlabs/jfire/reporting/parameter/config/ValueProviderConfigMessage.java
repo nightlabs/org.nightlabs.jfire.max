@@ -71,17 +71,20 @@ public class ValueProviderConfigMessage extends I18nText implements Serializable
 	private long valueAcquisitionSetupID;
 	
 	/**
-	 * @jdo.field primary-key="true" @jdo.column length="100"
+	 * @jdo.field primary-key="true" 
+	 * @jdo.column length="100"
 	 */
 	private String valueProviderOrganisationID;
 	
 	/**
-	 * @jdo.field primary-key="true" @jdo.column length="100"
+	 * @jdo.field primary-key="true" 
+	 * @jdo.column length="100"
 	 */ 
 	private String valueProviderCategoryID;
 	
 	/**
-	 * @jdo.field primary-key="true" @jdo.column length="100"
+	 * @jdo.field primary-key="true" 
+	 * @jdo.column length="100"
 	 */
 	private String valueProviderID;
 	

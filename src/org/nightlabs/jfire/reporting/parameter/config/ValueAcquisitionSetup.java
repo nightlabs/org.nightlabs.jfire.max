@@ -298,13 +298,15 @@ public class ValueAcquisitionSetup implements Serializable {
 		if (consumer2Binding == null) {
 			consumer2Binding = new HashMap<String, Map<String, ValueConsumerBinding>>();			
 			for (ValueConsumerBinding binding : valueConsumerBindings) {
-				String bindingKey = binding.getConsumer().getConsumerKey();
-				Map bindings = consumer2Binding.get(bindingKey);
-				if (bindings == null) {
-					bindings = new HashMap();
-					consumer2Binding.put(bindingKey, bindings);
+				if (binding.getConsumer() != null) {
+					String bindingKey = binding.getConsumer().getConsumerKey();
+					Map bindings = consumer2Binding.get(bindingKey);
+					if (bindings == null) {
+						bindings = new HashMap();
+						consumer2Binding.put(bindingKey, bindings);
+					}
+					bindings.put(binding.getParameterID(), binding);					
 				}
-				bindings.put(binding.getParameterID(), binding);
 			}
 		}
 		return consumer2Binding.get(consumer.getConsumerKey());
@@ -322,8 +324,10 @@ public class ValueAcquisitionSetup implements Serializable {
 		if (provider2Binding == null) {
 			provider2Binding = new HashMap<String, ValueConsumerBinding>();			
 			for (ValueConsumerBinding binding : valueConsumerBindings) {
-				String bindingKey = binding.getProvider().getConsumerKey();
-				provider2Binding.put(bindingKey, binding);
+				if (binding.getProvider() != null) {
+					String bindingKey = binding.getProvider().getConsumerKey();
+					provider2Binding.put(bindingKey, binding);					
+				}
 			}
 		}
 		return provider2Binding.get(key);

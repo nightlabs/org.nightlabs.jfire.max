@@ -132,7 +132,7 @@ public class DeliverProductTransfer extends ProductTransfer
 	 */
 	public static DeliverProductTransfer getDeliverProductTransferForDelivery(
 			PersistenceManager pm,
-			String organisationID, String deliveryID)
+			String organisationID, long deliveryID)
 	{
 		Query query = pm.newNamedQuery(DeliverProductTransfer.class, "getDeliverProductTransferForDelivery");
 		return (DeliverProductTransfer) query.execute(organisationID, deliveryID);

@@ -63,9 +63,9 @@ implements Serializable
 	private String organisationID;
 	/**
 	 * @jdo.field primary-key="true"
-	 * @jdo.column length="100"
+	 * @!jdo.column length="100"
 	 */
-	private String deliveryID;
+	private long deliveryID;
 
 	/**
 	 * @jdo.field persistence-modifier="persistent"
@@ -106,7 +106,7 @@ implements Serializable
 	/**
 	 * @return Returns the deliveryID.
 	 */
-	public String getDeliveryID()
+	public long getDeliveryID()
 	{
 		return deliveryID;
 	}

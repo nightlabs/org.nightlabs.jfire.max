@@ -38,6 +38,7 @@ import javax.jdo.JDOHelper;
 import javax.jdo.PersistenceManager;
 import javax.jdo.listener.StoreCallback;
 
+import org.nightlabs.jfire.idgenerator.IDGenerator;
 import org.nightlabs.jfire.security.User;
 import org.nightlabs.jfire.store.DeliveryNote;
 import org.nightlabs.jfire.store.deliver.ServerDeliveryProcessor.DeliverParams;
@@ -51,7 +52,7 @@ import org.nightlabs.jfire.trade.LegalEntity;
 import org.nightlabs.jfire.trade.id.ArticleID;
 import org.nightlabs.jfire.transfer.Transfer;
 import org.nightlabs.jfire.transfer.id.AnchorID;
-import org.nightlabs.math.Base62Coder;
+import org.nightlabs.math.Base36Coder;
 
 /**
  * @author Marco Schulze - marco at nightlabs dot de
@@ -82,9 +83,9 @@ implements Serializable, StoreCallback
 	private String organisationID;
 	/**
 	 * @jdo.field primary-key="true"
-	 * @jdo.column length="100"
+	 * @!jdo.column length="100"
 	 */
-	private String deliveryID;
+	private long deliveryID;
 
 	/**
 	 * This is used for postponed <tt>Delivery</tt>s. To follow up a previously
@@ -314,14 +315,14 @@ implements Serializable, StoreCallback
 	 */
 	private byte rollbackStatus = ROLLBACK_STATUS_NOT_DONE;
 
-	protected static Base62Coder base62Coder = null;
-	protected static Base62Coder getBase62Coder()
-	{
-		if (base62Coder == null)
-			base62Coder = new Base62Coder();
-
-		return base62Coder;
-	}
+//	protected static Base62Coder base62Coder = null;
+//	protected static Base62Coder getBase62Coder()
+//	{
+//		if (base62Coder == null)
+//			base62Coder = new Base62Coder();
+//
+//		return base62Coder;
+//	}
 
 	public Delivery(String organisationID, DeliveryID precursorID)
 	{
@@ -335,19 +336,21 @@ implements Serializable, StoreCallback
 	 */
 	public Delivery(String organisationID)
 	{
-		this(organisationID,
-				getBase62Coder().encode(System.currentTimeMillis(), 1)
-				+ '-' +
-				getBase62Coder().encode((long)(Math.random() * Integer.MAX_VALUE), 1));
+		this(organisationID, IDGenerator.nextID(Delivery.class));
+//				getBase62Coder().encode(System.currentTimeMillis(), 1)
+//				+ '-' +
+//				getBase62Coder().encode((long)(Math.random() * Integer.MAX_VALUE), 1));
 	}
 
-	public Delivery(String organisationID, String deliveryID)
+	public Delivery(String organisationID, long deliveryID)
 	{
 		if (organisationID == null)
-			throw new NullPointerException("organisationID");
+			throw new IllegalArgumentException("organisationID is null");
 
-		if (deliveryID == null)
-			throw new NullPointerException("deliveryID");
+		if (deliveryID < 0)
+			throw new IllegalArgumentException("deliveryID < 0");
+//		if (deliveryID == null)
+//			throw new NullPointerException("deliveryID");
 
 		this.organisationID = organisationID;
 		this.deliveryID = deliveryID;
@@ -371,14 +374,14 @@ implements Serializable, StoreCallback
 	/**
 	 * @return Returns the deliveryID.
 	 */
-	public String getDeliveryID()
+	public long getDeliveryID()
 	{
 		return deliveryID;
 	}
 
-	public static String getPrimaryKey(String organisationID, String deliveryID)
+	public static String getPrimaryKey(String organisationID, long deliveryID)
 	{
-		return organisationID + '/' + deliveryID;
+		return organisationID + '/' + Base36Coder.sharedInstance(false).encode(deliveryID, 1);
 	}
 
 	public String getPrimaryKey()

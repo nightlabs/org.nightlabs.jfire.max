@@ -52,6 +52,7 @@ import org.nightlabs.jfire.security.User;
 import org.nightlabs.jfire.trade.LegalEntity;
 import org.nightlabs.jfire.transfer.Transfer;
 import org.nightlabs.jfire.transfer.id.AnchorID;
+import org.nightlabs.math.Base36Coder;
 import org.nightlabs.math.Base62Coder;
 
 /**
@@ -377,8 +378,10 @@ implements Serializable, StoreCallback
 	public Payment(String organisationID, long paymentID)
 	{
 		if (organisationID == null)
-			throw new NullPointerException("organisationID");
+			throw new IllegalArgumentException("organisationID is null");
 
+		if (paymentID < 0)
+			throw new IllegalArgumentException("paymentID < 0");
 //		if (paymentID == null)
 //			throw new NullPointerException("paymentID");
 
@@ -411,7 +414,8 @@ implements Serializable, StoreCallback
 
 	public static String getPrimaryKey(String organisationID, long paymentID)
 	{
-		return organisationID + '/' + String.valueOf(paymentID);
+//		return organisationID + '/' + String.valueOf(paymentID);
+		return organisationID + '/' + Base36Coder.sharedInstance(false).encode(paymentID, 1);
 	}
 
 	public String getPrimaryKey()

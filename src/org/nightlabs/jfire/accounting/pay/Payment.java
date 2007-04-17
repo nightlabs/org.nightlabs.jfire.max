@@ -47,6 +47,7 @@ import org.nightlabs.jfire.accounting.pay.ServerPaymentProcessor.PayParams;
 import org.nightlabs.jfire.accounting.pay.id.ModeOfPaymentFlavourID;
 import org.nightlabs.jfire.accounting.pay.id.PaymentID;
 import org.nightlabs.jfire.accounting.pay.id.ServerPaymentProcessorID;
+import org.nightlabs.jfire.idgenerator.IDGenerator;
 import org.nightlabs.jfire.security.User;
 import org.nightlabs.jfire.trade.LegalEntity;
 import org.nightlabs.jfire.transfer.Transfer;
@@ -110,11 +111,11 @@ implements Serializable, StoreCallback
 	 * @jdo.column length="100"
 	 */
 	private String organisationID;
+	
 	/**
 	 * @jdo.field primary-key="true"
-	 * @jdo.column length="100"
 	 */
-	private String paymentID;
+	private long paymentID;
 
 	/**
 	 * This is used for postponed <tt>Payment</tt>s. To follow up a previously
@@ -365,19 +366,21 @@ implements Serializable, StoreCallback
 	 */
 	public Payment(String organisationID)
 	{
-		this(organisationID,
-				getBase62Coder().encode(System.currentTimeMillis(), 1)
-				+ '-' +
-				getBase62Coder().encode((long)(Math.random() * Integer.MAX_VALUE), 1));
+		this(organisationID, IDGenerator.nextID(Payment.class));
+		
+//		this(organisationID,
+//				getBase62Coder().encode(System.currentTimeMillis(), 1)
+//				+ '-' +
+//				getBase62Coder().encode((long)(Math.random() * Integer.MAX_VALUE), 1));
 	}
 
-	public Payment(String organisationID, String paymentID)
+	public Payment(String organisationID, long paymentID)
 	{
 		if (organisationID == null)
 			throw new NullPointerException("organisationID");
 
-		if (paymentID == null)
-			throw new NullPointerException("paymentID");
+//		if (paymentID == null)
+//			throw new NullPointerException("paymentID");
 
 		this.organisationID = organisationID;
 		this.paymentID = paymentID;
@@ -401,14 +404,14 @@ implements Serializable, StoreCallback
 	/**
 	 * @return Returns the paymentID.
 	 */
-	public String getPaymentID()
+	public long getPaymentID()
 	{
 		return paymentID;
 	}
 
-	public static String getPrimaryKey(String organisationID, String paymentID)
+	public static String getPrimaryKey(String organisationID, long paymentID)
 	{
-		return organisationID + '/' + paymentID;
+		return organisationID + '/' + String.valueOf(paymentID);
 	}
 
 	public String getPrimaryKey()

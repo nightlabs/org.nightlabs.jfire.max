@@ -136,7 +136,7 @@ public class PayMoneyTransfer extends MoneyTransfer
 	 */
 	public static PayMoneyTransfer getPayMoneyTransferForPayment(
 			PersistenceManager pm,
-			String organisationID, String paymentID)
+			String organisationID, long paymentID)
 	{
 		Query query = pm.newNamedQuery(PayMoneyTransfer.class, "getPayMoneyTransferForPayment");
 		return (PayMoneyTransfer) query.execute(organisationID, paymentID);

@@ -28,6 +28,8 @@ package org.nightlabs.jfire.accounting.pay;
 
 import java.io.Serializable;
 
+import org.nightlabs.jfire.idgenerator.IDGenerator;
+
 /**
  * Subclass in order to hold specific data for your payment process.
  * This additional data can be defined by the client payment processor (gathered by
@@ -62,11 +64,11 @@ implements Serializable
 	 * @jdo.column length="100"
 	 */
 	private String organisationID;
+	
 	/**
-	 * @jdo.field primary-key="true"
-	 * @jdo.column length="100"
+	 * @jdo.field primary-key="true" 
 	 */
-	private String paymentID;
+	private long paymentID;
 
 	/**
 	 * @jdo.field persistence-modifier="persistent"
@@ -115,7 +117,7 @@ implements Serializable
 	/**
 	 * @return Returns the paymentID.
 	 */
-	public String getPaymentID()
+	public long getPaymentID()
 	{
 		return paymentID;
 	}

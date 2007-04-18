@@ -1174,10 +1174,10 @@ public class Article
 
 	public void jdoPreStore()
 	{
-		if (primaryKey == null) {
-			primaryKey = getPrimaryKey(organisationID, articleID);
-			logger.info("Seems, the JPOX bug still exists: primaryKey == null! Resetting it to " + primaryKey);
-		}
+//		if (primaryKey == null) {
+//			primaryKey = getPrimaryKey(organisationID, articleID);
+//			logger.info("Seems, the JPOX bug still exists: primaryKey == null! Resetting it to " + primaryKey);
+//		}
 	}
 
 	public String toString()

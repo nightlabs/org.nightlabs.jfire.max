@@ -780,12 +780,32 @@ public class Trader
 			Collection products, ArticleCreator articleCreator, boolean allocate,
 			boolean allocateSynchronously, boolean enableXA) throws ModuleException
 	{
-		List articles = articleCreator.createProductArticles(this, user, offer,
+		Collection articles = articleCreator.createProductArticles(this, user, offer,
 				segment, products);
 
 		createArticleLocals(user, articles);
 
+		// WORKAROUND begin
+		PersistenceManager pm = getPersistenceManager();
+		articles = pm.makePersistentAll(articles);
+		// WORKAROUND end
+
+
 		offer.addArticles(articles);
+
+
+		// WORKAROUND begin
+//		pm.flush();
+//
+//		OfferID offerID = (OfferID) JDOHelper.getObjectId(offer);
+//		List articleIDs = NLJDOHelper.getObjectIDList(articles);
+//
+//		pm.evictAll();
+//
+//		offer = (Offer) pm.getObjectById(offerID);
+//		articles = NLJDOHelper.getObjectList(pm, articleIDs, Article.class);
+		// WORKAROUND end
+
 
 		if (allocate) {
 			// allocateArticle (re)creates the price already => no need to create the
@@ -1288,6 +1308,8 @@ public class Trader
 					getPersistenceManager(), ptClazz));
 		}
 
+		PersistenceManager pm = getPersistenceManager();
+
 		Map productTypeActionHandler2Articles = new HashMap();
 		for (Iterator iter = articles.iterator(); iter.hasNext();) {
 			Article article = (Article) iter.next();
@@ -1319,7 +1341,23 @@ public class Trader
 			article.setAllocationPending(true);
 			IPackagePriceConfig packagePriceConfig = product.getProductType()
 					.getPackagePriceConfig();
-			article.setPrice(packagePriceConfig.createArticlePrice(article));
+
+			pm.flush();
+
+			// TODO remove this JPOX Workaround - getting:
+			// com.mysql.jdbc.exceptions.MySQLIntegrityConstraintViolationException: Duplicate entry 'chezfrancois.jfire.org-9-8' for key 1
+			ArticlePrice articlePrice = packagePriceConfig.createArticlePrice(article);
+			for (int tryCounter = 0; tryCounter < 10; ++tryCounter) {
+				try {
+					articlePrice = (ArticlePrice) pm.makePersistent(articlePrice);
+					break;
+				} catch (Exception x) {
+					logger.warn("Persisting articlePrice instance failed! Trying it again. tryCounter=" + tryCounter, x);
+				}
+			}
+			article.setPrice(articlePrice);
+
+			pm.flush();
 
 //			ProductTypeActionHandler productTypeActionHandler = ProductTypeActionHandler.getProductTypeActionHandler(
 //					getPersistenceManager(), article.getProductType().getClass());

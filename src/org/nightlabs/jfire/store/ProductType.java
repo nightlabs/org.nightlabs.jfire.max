@@ -49,6 +49,7 @@ import org.nightlabs.inheritance.Inheritable;
 import org.nightlabs.inheritance.InheritableFieldInheriter;
 import org.nightlabs.inheritance.InheritanceCallbacks;
 import org.nightlabs.inheritance.InheritanceManager;
+import org.nightlabs.jdo.inheritance.JDOInheritanceManager;
 import org.nightlabs.jdo.inheritance.JDOSimpleFieldInheriter;
 import org.nightlabs.jfire.accounting.book.LocalAccountantDelegate;
 import org.nightlabs.jfire.accounting.priceconfig.AffectedProductType;
@@ -1038,15 +1039,17 @@ implements
 			tmpInherit_innerPriceConfigID = (PriceConfigID) JDOHelper.getObjectId(innerPriceConfig);
 		}
 
+		// Tobias: This is not necessary anymore when the JDOInheritanceManager is used
+		
 		// access all non-simple fields in order to ensure, they're loaded by JDO
-		if (deliveryConfiguration == null);
-		if (innerPriceConfig == null);
-		if (localAccountantDelegate == null);
-		if (localStorekeeperDelegate == null);
-		nestedProductTypes.size();
-		if (packagePriceConfig == null);
-		if (owner == null);
-		name.getI18nMap();
+//		if (deliveryConfiguration == null);
+//		if (innerPriceConfig == null);
+//		if (localAccountantDelegate == null);
+//		if (localStorekeeperDelegate == null);
+//		nestedProductTypes.size();
+//		if (packagePriceConfig == null);
+//		if (owner == null);
+//		name.getI18nMap();
 	}
 
 	@Implement
@@ -1122,7 +1125,7 @@ implements
 	public void applyInheritance()
 	{
 		PersistenceManager pm = getPersistenceManager();
-		InheritanceManager im = new InheritanceManager();
+		InheritanceManager im = new JDOInheritanceManager();
 		ProductType extendedProductType = getExtendedProductType();
 		if (extendedProductType != null)
 			im.inheritAllFields(extendedProductType, this);

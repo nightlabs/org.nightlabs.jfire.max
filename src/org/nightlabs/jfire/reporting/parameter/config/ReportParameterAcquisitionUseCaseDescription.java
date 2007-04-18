@@ -47,7 +47,7 @@ import org.nightlabs.i18n.I18nText;
  *
  * @jdo.create-objectid-class field-order="organisationID, reportParameterAcquisitionSetupID, reportParameterAcquisitionUseCaseID"
  *
- * @jdo.fetch-group name="ReportParameterAcquisitionUseCase.description" fields="valueProvider, names"
+ * @jdo.fetch-group name="ReportParameterAcquisitionUseCase.description" fields="useCase, names"
  */
 public class ReportParameterAcquisitionUseCaseDescription extends I18nText implements Serializable {
 	

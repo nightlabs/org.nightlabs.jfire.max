@@ -92,6 +92,7 @@ import org.nightlabs.jfire.store.deliver.DeliveryConfiguration;
 import org.nightlabs.jfire.store.deliver.ModeOfDelivery;
 import org.nightlabs.jfire.store.deliver.id.ModeOfDeliveryID;
 import org.nightlabs.jfire.store.id.ProductTypeID;
+import org.nightlabs.jfire.trade.Article;
 import org.nightlabs.jfire.trade.ArticleCreator;
 import org.nightlabs.jfire.trade.CustomerGroup;
 import org.nightlabs.jfire.trade.CustomerGroupMapper;
@@ -741,6 +742,72 @@ implements SessionBean
 			pm.getFetchPlan().setMaxFetchDepth(maxFetchDepth);
 			if (fetchGroups != null)
 				pm.getFetchPlan().setGroups(fetchGroups);
+
+			// TODO remove this JPOX WORKAROUND! getting sometimes:
+//			Caused by: javax.jdo.JDOUserException: Cannot read fields from a deleted object
+//			FailedObject:jdo/org.nightlabs.jfire.accounting.id.PriceFragmentID?organisationID=chezfrancois.jfire.org&priceConfigID=9&priceID=232&priceFragmentTypePK=devil.NightLabs.org%2F_Total_
+//			        at org.jpox.state.jdo.PersistentNewDeleted.transitionReadField(PersistentNewDeleted.java:105)
+//			        at org.jpox.state.StateManagerImpl.transitionReadField(StateManagerImpl.java:3394)
+//			        at org.jpox.state.StateManagerImpl.isLoaded(StateManagerImpl.java:1982)
+//			        at org.jpox.store.rdbms.scostore.FKMapStore.put(FKMapStore.java:764)
+//			        at org.jpox.store.rdbms.scostore.AbstractMapStore.putAll(AbstractMapStore.java:320)
+//			        at org.jpox.store.mapping.MapMapping.postUpdate(MapMapping.java:175)
+//			        at org.jpox.store.rdbms.request.UpdateRequest.execute(UpdateRequest.java:318)
+//			        at org.jpox.store.rdbms.table.ClassTable.update(ClassTable.java:2573)
+//			        at org.jpox.store.rdbms.table.ClassTable.update(ClassTable.java:2568)
+//			        at org.jpox.store.StoreManager.update(StoreManager.java:967)
+//			        at org.jpox.state.StateManagerImpl.flush(StateManagerImpl.java:4928)
+//			        at org.jpox.AbstractPersistenceManager.flush(AbstractPersistenceManager.java:3233)
+//			        at org.jpox.store.rdbms.RDBMSManagedTransaction.getConnection(RDBMSManagedTransaction.java:172)
+//			        at org.jpox.store.rdbms.AbstractRDBMSTransaction.getConnection(AbstractRDBMSTransaction.java:97)
+//			        at org.jpox.resource.JdoTransactionHandle.getConnection(JdoTransactionHandle.java:246)
+//			        at org.jpox.store.rdbms.RDBMSManager.getConnection(RDBMSManager.java:426)
+//			        at org.jpox.store.rdbms.scostore.AbstractSetStore.iterator(AbstractSetStore.java:123)
+//			        at org.jpox.store.rdbms.scostore.FKMapStore.clear(FKMapStore.java:991)
+//			        at org.jpox.sco.HashMap.clear(HashMap.java:717)
+//			        at org.jpox.sco.HashMap.setValueFrom(HashMap.java:232)
+//			        at org.jpox.sco.SCOUtils.newSCOInstance(SCOUtils.java:100)
+//			        at org.jpox.state.StateManagerImpl.newSCOInstance(StateManagerImpl.java:3339)
+//			        at org.jpox.state.StateManagerImpl.replaceSCOField(StateManagerImpl.java:3356)
+//			        at org.jpox.state.DetachFieldManager.internalFetchObjectField(DetachFieldManager.java:88)
+//			        at org.jpox.state.AbstractFetchFieldManager.fetchObjectField(AbstractFetchFieldManager.java:108)
+//			        at org.jpox.state.StateManagerImpl.replacingObjectField(StateManagerImpl.java:2951)
+//			        at org.nightlabs.jfire.accounting.Price.jdoReplaceField(Price.java)
+//			        at org.nightlabs.jfire.trade.ArticlePrice.jdoReplaceField(ArticlePrice.java)
+//			        at org.nightlabs.jfire.accounting.Price.jdoReplaceFields(Price.java)
+//			        at org.jpox.state.StateManagerImpl.replaceFields(StateManagerImpl.java:3170)
+//			        at org.jpox.state.StateManagerImpl.replaceFields(StateManagerImpl.java:3188)
+//			        at org.jpox.state.StateManagerImpl.detachCopy(StateManagerImpl.java:4193)
+//			        at org.jpox.AbstractPersistenceManager.internalDetachCopy(AbstractPersistenceManager.java:1944)
+//			        at org.jpox.AbstractPersistenceManager.detachCopyInternal(AbstractPersistenceManager.java:1974)
+//			        at org.jpox.resource.PersistenceManagerImpl.detachCopyInternal(PersistenceManagerImpl.java:961)
+//			        at org.jpox.state.DetachFieldManager.internalFetchObjectField(DetachFieldManager.java:144)
+//			        at org.jpox.state.AbstractFetchFieldManager.fetchObjectField(AbstractFetchFieldManager.java:108)
+//			        at org.jpox.state.StateManagerImpl.replacingObjectField(StateManagerImpl.java:2951)
+//			        at org.nightlabs.jfire.trade.Article.jdoReplaceField(Article.java)
+//			        at org.nightlabs.jfire.trade.Article.jdoReplaceFields(Article.java)
+//			        at org.jpox.state.StateManagerImpl.replaceFields(StateManagerImpl.java:3170)
+//			        at org.jpox.state.StateManagerImpl.replaceFields(StateManagerImpl.java:3188)
+//			        at org.jpox.state.StateManagerImpl.detachCopy(StateManagerImpl.java:4193)
+//			        at org.jpox.AbstractPersistenceManager.internalDetachCopy(AbstractPersistenceManager.java:1944)
+//			        at org.jpox.AbstractPersistenceManager.detachCopyInternal(AbstractPersistenceManager.java:1974)
+//			        at org.jpox.AbstractPersistenceManager.detachCopyAll(AbstractPersistenceManager.java:2043)
+//			        at org.jpox.resource.PersistenceManagerImpl.detachCopyAll(PersistenceManagerImpl.java:1000)
+//			        at org.nightlabs.jfire.simpletrade.SimpleTradeManagerBean.createArticles(SimpleTradeManagerBean.java:745)
+
+			List articleIDs = NLJDOHelper.getObjectIDList(articles);
+			for (int tryCounter = 0; tryCounter < 10; ++tryCounter) {
+				pm.flush();
+				pm.evictAll();
+				articles = NLJDOHelper.getObjectList(pm, articleIDs, Article.class);
+				try {
+					Collection detachedArticles = null;
+					detachedArticles = pm.detachCopyAll(articles);
+					return detachedArticles;
+				} catch (Exception x) {
+					logger.warn("Detaching Articles failed! Trying it again. tryCounter="+tryCounter, x);
+				}
+			}
 
 			return pm.detachCopyAll(articles);
 		} finally {

@@ -173,7 +173,7 @@ public class SimpleProductTypeActionHandler
 						product = new SimpleProduct(spt, SimpleProduct.createProductID());
 						sptl.setCreatedProductCount(createdProductCount + 1);
 
-						store.addProduct(user, product, (Repository)spt.getProductTypeLocal().getHome());
+						product = (SimpleProduct) store.addProduct(user, product, (Repository)spt.getProductTypeLocal().getHome());
 						res.add(product);
 					}
 				} // This productType is factored by this organisation

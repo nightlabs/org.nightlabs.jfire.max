@@ -56,6 +56,7 @@ import org.nightlabs.jfire.reporting.parameter.config.id.ReportParameterAcquisit
 import org.nightlabs.jfire.reporting.parameter.id.ValueProviderCategoryID;
 import org.nightlabs.jfire.reporting.parameter.id.ValueProviderID;
 import org.nightlabs.jfire.security.id.UserID;
+import org.nightlabs.util.TimePeriod;
 
 /**
  * @author Alexander Bieber <alex[AT]nightlabs[DOT]de>
@@ -149,7 +150,7 @@ implements SessionBean
 					new NameEntry[] {new NameEntry(Locale.ENGLISH.getLanguage(), "Select a date")}
 			);
 
-			ReportParameterUtil.createValueProvider(pm, simpleTypes, ReportingConstants.VALUE_PROVIDER_ID_TIME_PERIOD, Date.class.getName(),
+			ReportParameterUtil.createValueProvider(pm, simpleTypes, ReportingConstants.VALUE_PROVIDER_ID_TIME_PERIOD, TimePeriod.class.getName(),
 					new NameEntry[] {new NameEntry(Locale.ENGLISH.getLanguage(), "Timeperiod")},
 					new NameEntry[] {new NameEntry(Locale.ENGLISH.getLanguage(), "Query a time period from the user")},
 					new NameEntry[] {new NameEntry(Locale.ENGLISH.getLanguage(), "Select a time period")}

@@ -29,9 +29,12 @@ package org.nightlabs.jfire.reporting;
 import java.util.HashMap;
 import java.util.Map;
 
+import javax.jdo.JDOObjectNotFoundException;
 import javax.jdo.PersistenceManager;
 
 import org.apache.log4j.Logger;
+import org.nightlabs.jdo.ObjectID;
+import org.nightlabs.jdo.ObjectIDUtil;
 import org.nightlabs.jfire.reporting.layout.render.RenderManager;
 
 /**
@@ -159,6 +162,25 @@ public class JFireReportingHelper {
 	 */
 	public static Map<String, Object> getVars() {
 		return helpers.get().getVars();
+	}
+	
+	/**
+	 * Returns the JDO object with the given jdo id. Assumes that the given
+	 * {@link String} parameter is the string representation of an {@link ObjectID}
+	 * and tries to get this Object from the datastore.
+	 *  
+	 * @param jdoIDString The {@link String} representation of the {@link ObjectID} of the object to retrieve.	 * 
+	 * @return The persistent object of with the given id or null if this can not be found. 
+	 */
+	public static Object getJDOObject(String jdoIDString) {
+		ObjectID id = ObjectIDUtil.createObjectID(jdoIDString);
+		Object result = null;
+		try {
+			result = helpers.get().getPersistenceManager().getObjectById(id);
+		} catch (JDOObjectNotFoundException e) {
+			result = null;
+		}
+		return result;
 	}
 	
 }

@@ -154,6 +154,7 @@ public abstract class ScriptExecutor
 	
 			this.parameterValues = parameterValues;
 	
+			// TODO: Reactivate and add add nullable to ScriptParameters
 //			validateParameters();
 			doPrepare();
 			prepared = true;

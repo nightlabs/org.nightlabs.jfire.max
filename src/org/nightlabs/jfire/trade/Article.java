@@ -749,6 +749,25 @@ public class Article
 	public String getPrimaryKey() {
 		return primaryKey;
 	}
+	
+	/**
+	 * Returns the creation {@link Date} of this {@link Article}.
+	 * 
+	 * @return The creation {@link Date} of this {@link Article}.
+	 */
+	public Date getCreateDT() {
+		return createDT;
+	}
+	
+	/**
+	 * Returns the {@link User} who created this {@link Article}
+	 * 
+	 * @return The {@link User} who created this {@link Article}
+	 */
+	public User getCreateUser() {
+		return createUser;
+	}
+	
 	/**
 	 * @return Returns the productType.
 	 */

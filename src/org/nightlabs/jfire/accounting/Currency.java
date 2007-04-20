@@ -123,4 +123,17 @@ implements Serializable, org.nightlabs.l10n.Currency
 	{
 		return Utils.hashCode(currencyID);
 	}
+	
+	/**
+	 * Returns the given amount in the double value of this currency.
+	 * <p>
+	 *   amount / 10^(decimalDigitCount)
+	 * <p>
+	 *  
+	 * @param amount The amount to convert
+	 * @return
+	 */
+	public double toDouble(long amount) {		
+		return (double)amount / Math.pow(10, getDecimalDigitCount());		
+	}
 }

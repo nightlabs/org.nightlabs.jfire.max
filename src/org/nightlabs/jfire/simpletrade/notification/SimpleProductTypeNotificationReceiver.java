@@ -23,9 +23,13 @@ import org.nightlabs.jfire.jdo.notification.JDOLifecycleState;
 import org.nightlabs.jfire.jdo.notification.persistent.NotificationBundle;
 import org.nightlabs.jfire.jdo.notification.persistent.NotificationFilter;
 import org.nightlabs.jfire.jdo.notification.persistent.NotificationReceiver;
+import org.nightlabs.jfire.security.SecurityReflector;
+import org.nightlabs.jfire.security.User;
 import org.nightlabs.jfire.simpletrade.SimpleTradeManager;
 import org.nightlabs.jfire.simpletrade.SimpleTradeManagerUtil;
 import org.nightlabs.jfire.simpletrade.store.SimpleProductType;
+import org.nightlabs.jfire.simpletrade.store.SimpleProductTypeActionHandler;
+import org.nightlabs.jfire.store.Store;
 
 /**
  * @author Marco Schulze - Marco at NightLabs dot de
@@ -93,6 +97,9 @@ extends NotificationReceiver
 
 		Set<PriceConfigID> priceConfigIDs = new HashSet<PriceConfigID>();
 
+		Store store = Store.getStore(pm);
+		User user = SecurityReflector.getUserDescriptor().getUser(pm);
+
 		int previousProductTypesSize = productTypes.size();
 		while (!productTypes.isEmpty()) {
 			for (Iterator itPT = productTypes.iterator(); itPT.hasNext(); ) {
@@ -102,9 +109,13 @@ extends NotificationReceiver
 						priceConfigIDs.add((PriceConfigID) JDOHelper.getObjectId(simpleProductType.getPackagePriceConfig()));
 
 					try {
-						simpleProductType = (SimpleProductType) pm.makePersistent(simpleProductType);
+						store.addProductType(
+								user,
+								simpleProductType,
+								SimpleProductTypeActionHandler.getDefaultHome(pm, simpleProductType));
+//						simpleProductType = (SimpleProductType) pm.makePersistent(simpleProductType);
 					} catch (Exception x) {
-						logger.error("Persisting SimpleProductType \"" + simpleProductType.getPrimaryKey() + "\" failed!", x);
+						logger.error("Adding SimpleProductType \"" + simpleProductType.getPrimaryKey() + "\" to Store failed!", x);
 						throw x instanceof RuntimeException ? (RuntimeException)x : new RuntimeException(x);
 					}
 

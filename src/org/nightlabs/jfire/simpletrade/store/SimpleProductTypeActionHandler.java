@@ -210,6 +210,7 @@ public class SimpleProductTypeActionHandler
 				new String[] {
 					FetchPlan.DEFAULT, Article.FETCH_GROUP_OFFER, Article.FETCH_GROUP_ORDER, Article.FETCH_GROUP_PRICE,
 					Article.FETCH_GROUP_PRODUCT, Article.FETCH_GROUP_PRODUCT_TYPE, Article.FETCH_GROUP_SEGMENT, ArticlePrice.FETCH_GROUP_CURRENCY,
+					Product.FETCH_GROUP_PRODUCT_TYPE,
 					ArticlePrice.FETCH_GROUP_FRAGMENTS, ArticlePrice.FETCH_GROUP_PACKAGE_ARTICLE_PRICE
 				}, NLJDOHelper.MAX_FETCH_DEPTH_NO_LIMIT);
 	}

@@ -39,6 +39,7 @@ import org.nightlabs.jfire.accounting.gridpriceconfig.PriceCalculator;
 import org.nightlabs.jfire.security.User;
 import org.nightlabs.jfire.store.ProductType;
 import org.nightlabs.jfire.store.ProductTypeLocal;
+import org.nightlabs.jfire.store.Repository;
 import org.nightlabs.jfire.store.id.ProductTypeID;
 import org.nightlabs.jfire.trade.CustomerGroupMapper;
 import org.nightlabs.jfire.trade.LegalEntity;
@@ -125,11 +126,11 @@ public class SimpleProductType extends ProductType
 	}
 
 	@Override
-	protected ProductTypeLocal createProductTypeLocal(User user, Anchor home)
+	protected ProductTypeLocal createProductTypeLocal(User user, Repository home)
 	{
 		return new SimpleProductTypeLocal(user, this, home);
 	}
-	
+
 	@Implement
 	protected void calculatePrices()
 	{

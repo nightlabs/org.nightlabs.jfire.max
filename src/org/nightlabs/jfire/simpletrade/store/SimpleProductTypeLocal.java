@@ -3,7 +3,7 @@ package org.nightlabs.jfire.simpletrade.store;
 import org.nightlabs.jfire.security.User;
 import org.nightlabs.jfire.store.ProductType;
 import org.nightlabs.jfire.store.ProductTypeLocal;
-import org.nightlabs.jfire.transfer.Anchor;
+import org.nightlabs.jfire.store.Repository;
 
 /**
  * @author Marco Schulze - Marco at NightLabs dot de
@@ -44,7 +44,7 @@ extends ProductTypeLocal
 	 */
 	protected SimpleProductTypeLocal() { }
 
-	public SimpleProductTypeLocal(User user, ProductType productType, Anchor home)
+	public SimpleProductTypeLocal(User user, ProductType productType, Repository home)
 	{
 		super(user, productType, home);
 	}

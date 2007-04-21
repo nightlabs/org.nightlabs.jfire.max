@@ -63,11 +63,13 @@ import org.nightlabs.jfire.transfer.Anchor;
  * @jdo.create-objectid-class field-order="organisationID, productID"
  *
  * @jdo.fetch-group name="Product.productLocal" fields="productLocal"
+ * @jdo.fetch-group name="Product.productType" fields="productType"
  */
 public abstract class Product
 implements Serializable
 {
 	public static final String FETCH_GROUP_PRODUCT_LOCAL = "Product.productLocal";
+	public static final String FETCH_GROUP_PRODUCT_TYPE = "Product.productType";
 
 	/**
 	 * @jdo.field primary-key="true"
@@ -300,18 +302,6 @@ implements Serializable
 					organisationID2partnerNestedProductType.put(nestedProductType.getInnerProductTypeOrganisationID(), partnerNestedProductTypes);
 				}
 				partnerNestedProductTypes.add(nestedProductType);
-
-//				// We need to transfer the nested product back to its home repositories and update productLocal.quantity
-//				// To reduce transfers, we group them by source-repository (dest is the same for all nested products)
-//				// source: this.productType.productTypeLocal.home
-//				// dest nestedProduct.productType.productTypeLocal.home
-//				Anchor nestedProductHome = nestedProduct.getProductType().getProductTypeLocal().getHome();
-//				Set nestedProductSet = (Set) nestedProductsByHome.get(nestedProductHome);
-//				if (nestedProductSet == null) {
-//					nestedProductSet = new HashSet();
-//					nestedProductsByHome.put(nestedProductHome, nestedProductSet);
-//				}
-//				nestedProductSet.add(nestedProduct);
 			}
 		} // for (Iterator itNPT = productType.getNestedProductTypes().iterator(); itNPT.hasNext(); ) {
 
@@ -322,7 +312,21 @@ implements Serializable
 				Map.Entry me = (Map.Entry) itPNPT.next();
 				String organisationID = (String) me.getKey();
 				List nestedProductTypes = (List) me.getValue();
-				trader.onProductAssemble_importNestedProduct(user, this, organisationID, nestedProductTypes);
+				Collection articlesWithNestedProducts = trader.onProductAssemble_importNestedProduct(user, this, organisationID, nestedProductTypes);
+
+				// dest: this.productType.productTypeLocal.home
+				// source: nestedProduct.productType.productTypeLocal.home
+				for (Iterator itArticle = articlesWithNestedProducts.iterator(); itArticle.hasNext(); ) {
+					Article articleWithNestedProduct = (Article) itArticle.next();
+					Product nestedProduct = articleWithNestedProduct.getProduct();
+					Anchor nestedProductHome = nestedProduct.getProductType().getProductTypeLocal().getHome();
+					Set nestedProductSet = (Set) nestedProductsByHome.get(nestedProductHome);
+					if (nestedProductSet == null) {
+						nestedProductSet = new HashSet();
+						nestedProductsByHome.put(nestedProductHome, nestedProductSet);
+					}
+					nestedProductSet.add(nestedProduct);
+				}
 			}
 		}
 		// TODO are the ProductTransfers for the foreign products already created correctly?

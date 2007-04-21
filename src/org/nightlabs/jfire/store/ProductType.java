@@ -1595,7 +1595,7 @@ implements
 		return this.getClass().getName() + '{' + getPrimaryKey() + '}';
 	}
 
-	protected ProductTypeLocal createProductTypeLocal(User user, Anchor home)
+	protected ProductTypeLocal createProductTypeLocal(User user, Repository home)
 	{
 		return new ProductTypeLocal(user, this, home); // self-registering
 	}

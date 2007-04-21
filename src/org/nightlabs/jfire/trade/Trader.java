@@ -80,6 +80,7 @@ import org.nightlabs.jfire.store.Product;
 import org.nightlabs.jfire.store.ProductLocal;
 import org.nightlabs.jfire.store.ProductType;
 import org.nightlabs.jfire.store.ProductTypeActionHandler;
+import org.nightlabs.jfire.store.ProductTypeLocal;
 import org.nightlabs.jfire.store.Store;
 import org.nightlabs.jfire.trade.id.ArticleID;
 import org.nightlabs.jfire.trade.id.OfferID;
@@ -1408,7 +1409,7 @@ public class Trader
 			Product product = article.getProduct();
 
 			// delegate assembling to the product (give it a chance to intercept)
-			product.assemble(user);
+			product.assemble(user); // TODO delegate to ProductTypeActionHandler instead?! (and thus remove the Product.assemble(...)
 
 			IPackagePriceConfig packagePriceConfig = product.getProductType()
 					.getPackagePriceConfig();
@@ -1698,7 +1699,7 @@ public class Trader
 		return processDefinition;
 	}
 
-	public void onProductAssemble_importNestedProduct(User user, Product packageProduct, String partnerOrganisationID, Collection<NestedProductType> partnerNestedProductTypes)
+	public Collection<? extends Article> onProductAssemble_importNestedProduct(User user, Product packageProduct, String partnerOrganisationID, Collection<NestedProductType> partnerNestedProductTypes)
 	{
 		try {
 			PersistenceManager pm = getPersistenceManager();
@@ -1790,23 +1791,49 @@ public class Trader
 				nestedProductTypes.add(partnerNestedProductType);
 			}
 
+			Collection resultArticles = null;
+
 			for (Iterator itME = productType2NestedProductTypes.entrySet().iterator(); itME.hasNext();) {
 				Map.Entry me = (Map.Entry) itME.next();
 				ProductType productType = (ProductType) me.getKey();
 				Collection nestedProductTypes = (Collection) me.getValue();
 				ProductTypeActionHandler productTypeActionHandler = ProductTypeActionHandler.getProductTypeActionHandler(pm, productType.getClass());
+
 				Collection articles = productTypeActionHandler.createCrossTradeArticles(
 						user, packageProduct, localArticle,
 						partnerOrganisationID, initialContextProperties,
 						partnerOffer, partnerOfferID, partnerSegmentID,
 						productType, nestedProductTypes);
-//				for (Iterator itA = articles.iterator(); itA.hasNext();) {
-//					Article article = (Article) itA.next();
-//					article.getPrice().__clearOrigPrice();
-//				}
-				pm.makePersistentAll(articles);
+
+				articles = pm.makePersistentAll(articles);
+
+				if (resultArticles == null)
+					resultArticles = new ArrayList(articles);
+				else
+					resultArticles.addAll(articles);
+
+				for (Iterator itA = articles.iterator(); itA.hasNext();) {
+					Article article = (Article) itA.next();
+					article.createArticleLocal(user);
+
+					ProductType articleProductType = article.getProductType();
+					if (articleProductType == null)
+						throw new IllegalStateException("article.getProductType() == null for imported Article: " + article.getPrimaryKey());
+
+					ProductTypeLocal articleProductTypeLocal = articleProductType.getProductTypeLocal();
+					if (articleProductTypeLocal == null)
+						throw new IllegalStateException("article.getProductType().getProductTypeLocal() == null for imported Article (" + article.getPrimaryKey() + "). ProductType: " + articleProductType.getPrimaryKey());
+
+					store.addProduct(user, article.getProduct(), articleProductTypeLocal.getHome());
+				}
 			}
 
+			pm.flush();
+
+			if (resultArticles == null) // can this ever happen?!
+				resultArticles = new ArrayList(0);
+
+			return resultArticles;
 		} catch (Exception e) {
 			throw new RuntimeException(e);
 		}

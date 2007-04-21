@@ -29,7 +29,6 @@ package org.nightlabs.jfire.store;
 import java.io.Serializable;
 
 import org.nightlabs.jfire.security.User;
-import org.nightlabs.jfire.transfer.Anchor;
 
 /**
  * @author Marco Schulze - marco at nightlabs dot de
@@ -69,7 +68,7 @@ implements Serializable
 	/**
 	 * @jdo.field persistence-modifier="persistent"
 	 */
-	private Anchor home;
+	private Repository home;
 
 	/**
 	 * @deprecated Only for JDO!
@@ -77,7 +76,7 @@ implements Serializable
 	protected ProductTypeLocal() { }
 
 	// TODO we should pass the user here and store it somehow
-	public ProductTypeLocal(User user, ProductType productType, Anchor home)
+	public ProductTypeLocal(User user, ProductType productType, Repository home)
 	{
 		if (productType == null)
 			throw new IllegalArgumentException("productType must not be null!");
@@ -104,15 +103,15 @@ implements Serializable
 	}
 
 	/**
-	 * Home is an <code>Anchor</code> (normally a {@link Repository}), into which every newly created 
+	 * Home is a {@link Repository}, into which every newly created Product or newly bought product will be put.
 	 *
 	 * @return
 	 */
-	public Anchor getHome()
+	public Repository getHome()
 	{
 		return home;
 	}
-	public void setHome(Anchor home)
+	public void setHome(Repository home)
 	{
 		if (home == null)
 			throw new IllegalArgumentException("home must not be null!");

@@ -346,24 +346,29 @@ public class Store
 	 * @param user Which user is adding this productType.
 	 * @param productType
 	 */
-	public ProductType addProductType(User user, ProductType productType, Anchor home)
+	public ProductType addProductType(User user, ProductType productType, Repository home)
 	{
 		PersistenceManager pm = getPersistenceManager();
-		try {
-			ProductType pt = (ProductType) pm.getObjectById(ProductTypeID.create(
-				productType.getOrganisationID(), productType.getProductTypeID()));
-			pt.getProductTypeID();
-
-			throw new IllegalStateException("ProductType \""+productType.getPrimaryKey()+"\" exists already!");
-		} catch (JDOObjectNotFoundException x) {
-			// we expect this.
-		}
+//		try {
+//			ProductType pt = (ProductType) pm.getObjectById(ProductTypeID.create(
+//				productType.getOrganisationID(), productType.getProductTypeID()));
+//			pt.getProductTypeID();
+//
+//			throw new IllegalStateException("ProductType \""+productType.getPrimaryKey()+"\" exists already!");
+//		} catch (JDOObjectNotFoundException x) {
+//			// we expect this.
+//		}
 
 		productType = (ProductType) pm.makePersistent(productType);
 
+		if (productType.getProductTypeLocal() != null)
+			throw new IllegalArgumentException("This ProductType has already a ProductTypeLocal assigned! Obviously you either called Store.addProductType(...) twice or you detached a ProductTypeLocal from a remote organisation! Both is illegal!");
+
 		// TODO remove this and put all the logic from ProductTypeStatusTracker into ProductTypeLocal!
-		ProductTypeStatusTracker productTypeStatusTracker = new ProductTypeStatusTracker(productType, user);
-		pm.makePersistent(productTypeStatusTracker);
+		if (organisationID.equals(productType.getOrganisationID())) {
+			ProductTypeStatusTracker productTypeStatusTracker = new ProductTypeStatusTracker(productType, user);
+			pm.makePersistent(productTypeStatusTracker);
+		}
 
 		productType.createProductTypeLocal(user, home);
 		return productType;
@@ -376,22 +381,12 @@ public class Store
 	 */
 	public Product addProduct(User user, Product product, Repository initialRepository)
 	{
+		// note that the product might already be persistent - e.g. when importing from another organisation (cross-trade).
 		PersistenceManager pm = getPersistenceManager();
+		product = (Product) pm.makePersistent(product);
 
-// TODO uncomment the following once the JPOX bug is solved.
-//		try {
-//			pm.getObjectById(ProductID.create(
-//				product.getOrganisationID(), product.getProductID()));
-//
-//			throw new IllegalStateException("Product \""+product.getPrimaryKey()+"\" exists already!");
-//		} catch (JDOObjectNotFoundException x) {
-//			// we expect this.
-//		}
-
-		if (JDOHelper.isDetached(product))
-			product = (Product) pm.makePersistent(product);
-		else
-			pm.makePersistent(product);
+		if (product.getProductLocal() != null)
+			throw new IllegalArgumentException("This Product has already a ProductLocal assigned! Obviously you either called Store.addProduct(...) twice or you detached a ProductLocal from a remote organisation! Both is illegal!");
 
 		product.createProductLocal(user, initialRepository);
 		return product;

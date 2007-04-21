@@ -11,6 +11,7 @@ import org.nightlabs.jfire.security.User;
 import org.nightlabs.jfire.store.ProductType;
 import org.nightlabs.jfire.store.ProductTypeFieldMetaData;
 import org.nightlabs.jfire.store.ProductTypeLocal;
+import org.nightlabs.jfire.store.Repository;
 import org.nightlabs.jfire.store.id.ProductTypeID;
 import org.nightlabs.jfire.trade.LegalEntity;
 import org.nightlabs.jfire.transfer.Anchor;
@@ -93,7 +94,7 @@ extends ProductType
 //	}
 
 	@Override
-	protected ProductTypeLocal createProductTypeLocal(User user, Anchor home)
+	protected ProductTypeLocal createProductTypeLocal(User user, Repository home)
 	{
 		return new VoucherTypeLocal(user, this, home);
 	}

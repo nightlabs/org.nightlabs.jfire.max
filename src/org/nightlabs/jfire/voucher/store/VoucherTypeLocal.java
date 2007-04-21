@@ -3,6 +3,7 @@ package org.nightlabs.jfire.voucher.store;
 import org.nightlabs.jfire.security.User;
 import org.nightlabs.jfire.store.ProductType;
 import org.nightlabs.jfire.store.ProductTypeLocal;
+import org.nightlabs.jfire.store.Repository;
 import org.nightlabs.jfire.transfer.Anchor;
 
 /**
@@ -44,7 +45,7 @@ extends ProductTypeLocal
 	 */
 	protected VoucherTypeLocal() { }
 
-	public VoucherTypeLocal(User user, ProductType productType, Anchor home)
+	public VoucherTypeLocal(User user, ProductType productType, Repository home)
 	{
 		super(user, productType, home);
 	}

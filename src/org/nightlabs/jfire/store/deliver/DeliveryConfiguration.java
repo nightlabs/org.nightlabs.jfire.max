@@ -255,6 +255,11 @@ implements Serializable
 	private DeliveryConfigurationName name;
 
 	/**
+	 * @jdo.field persistence-modifier="persistent"
+	 */
+	private CrossTradeDeliveryCoordinator crossTradeDeliveryCoordinator = null;
+
+	/**
 	 * @deprecated Constructor only for JDO!
 	 */
 	protected DeliveryConfiguration() { }
@@ -356,5 +361,14 @@ implements Serializable
 	public DeliveryConfigurationName getName()
 	{
 		return name;
+	}
+
+	public CrossTradeDeliveryCoordinator getCrossTradeDeliveryCoordinator()
+	{
+		return crossTradeDeliveryCoordinator;
+	}
+	public void setCrossTradeDeliveryCoordinator(CrossTradeDeliveryCoordinator crossTradeDeliveryCoordinator)
+	{
+		this.crossTradeDeliveryCoordinator = crossTradeDeliveryCoordinator;
 	}
 }

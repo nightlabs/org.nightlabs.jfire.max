@@ -118,12 +118,12 @@ implements Serializable, DetachCallback
 	 */
 	protected ArticleLocal() { }
 
-	public ArticleLocal(Article article)
+	protected ArticleLocal(Article article)
 	{
 		this.article = article;
 		this.organisationID = article.getOrganisationID();
 		this.articleID = article.getArticleID();
-		article.setArticleLocal(this);
+//		article.setArticleLocal(this);
 	}
 
 	public String getOrganisationID()

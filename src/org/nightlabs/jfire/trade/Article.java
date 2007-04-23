@@ -1295,9 +1295,14 @@ public class Article
 		this.articleLocal = articleLocal;
 	}
 
-	protected ArticleLocal createArticleLocal(User user)
+	public ArticleLocal createArticleLocal(User user)
 	{
-		return new ArticleLocal(this);
+		if (articleLocal != null)
+			throw new IllegalStateException("There is already an instance of ArticleLocal assigned to this Article: " + getPrimaryKey());
+
+		ArticleLocal al = new ArticleLocal(this);
+		setArticleLocal(al);
+		return al;
 	}
 
 	@Override

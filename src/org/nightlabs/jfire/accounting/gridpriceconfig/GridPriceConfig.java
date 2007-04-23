@@ -38,10 +38,14 @@ import javax.jdo.PersistenceManager;
 import org.nightlabs.jfire.accounting.Currency;
 import org.nightlabs.jfire.accounting.PriceFragmentType;
 import org.nightlabs.jfire.accounting.Tariff;
+import org.nightlabs.jfire.accounting.TariffMapping;
+import org.nightlabs.jfire.accounting.id.TariffID;
 import org.nightlabs.jfire.accounting.priceconfig.IPriceConfig;
 import org.nightlabs.jfire.accounting.priceconfig.PriceConfig;
 import org.nightlabs.jfire.trade.Article;
 import org.nightlabs.jfire.trade.CustomerGroup;
+import org.nightlabs.jfire.trade.CustomerGroupMapping;
+import org.nightlabs.jfire.trade.id.CustomerGroupID;
 
 /**
  * This implementation of <tt>PriceConfig</tt> manages cells
@@ -296,19 +300,40 @@ public abstract class GridPriceConfig extends PriceConfig
 
 //	public abstract PriceCell getPriceCell(PriceCoordinate priceCoordinate, boolean throwExceptionIfNotExistent);
 
+	protected Tariff getTariff(Article article)
+	{
+		if (this.getOrganisationID().equals(article.getOrganisationID()))
+			return article.getTariff();
+		else {
+			PersistenceManager pm = getPersistenceManager();
+
+			TariffID localTariffID = (TariffID) JDOHelper.getObjectId(article.getTariff());
+			String partnerTariffOrganisationID = this.getOrganisationID();
+			TariffMapping tariffMapping = TariffMapping.getTariffMappingForLocalTariffAndPartner(pm, localTariffID, partnerTariffOrganisationID);
+
+			if (tariffMapping == null)
+				throw new IllegalStateException("Could not find TariffMapping for local Tariff \"" + localTariffID + "\" and partnerOrganisation \"" + partnerTariffOrganisationID + "\"!");
+
+			return tariffMapping.getPartnerTariff();
+		}
+	}
+
 	protected CustomerGroup getCustomerGroup(Article article)
 	{
-		PersistenceManager pm = getPersistenceManager();
+		if (this.getOrganisationID().equals(article.getOrganisationID()))
+			return article.getOffer().getOrder().getCustomerGroup();
+		else {
+			PersistenceManager pm = getPersistenceManager();
 
-		return article.getOffer().getOrder().getCustomerGroup();
-////	TODO we need to lookup the customerGroup differently later. We must not rely on it being an end customer
-////	In fact, it should be the same for the end customer as for every other customer: Store the desired customerGroup in the offer!
-//		CustomerGroup customerGroup;
-//		if (article.getOffer().getOrder().getCustomer() instanceof OrganisationLegalEntity)
-//			throw new UnsupportedOperationException("Currently only end-customers are supported!");
-//		else
-//			customerGroup = Accounting.getAccounting(pm).getCustomerGroupForEndCustomer();
-//
-//		return customerGroup;
+			CustomerGroupID localCustomerGroupID = (CustomerGroupID) JDOHelper.getObjectId(article.getOffer().getOrder().getCustomerGroup());
+			String partnerCustomerGroupOrganisationID = this.getOrganisationID();
+			CustomerGroupMapping customerGroupMapping = CustomerGroupMapping.getCustomerGroupMappingForLocalCustomerGroupAndPartner(
+					pm, localCustomerGroupID, partnerCustomerGroupOrganisationID);
+
+			if (customerGroupMapping == null)
+				throw new IllegalStateException("Could not find CustomerGroupMapping for local CustomerGroup \"" + localCustomerGroupID + "\" and partnerOrganisation \"" + partnerCustomerGroupOrganisationID + "\"!");
+
+			return customerGroupMapping.getPartnerCustomerGroup();
+		}
 	}
 }

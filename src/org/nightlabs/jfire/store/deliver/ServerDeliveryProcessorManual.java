@@ -29,7 +29,6 @@ package org.nightlabs.jfire.store.deliver;
 import javax.jdo.JDOObjectNotFoundException;
 import javax.jdo.PersistenceManager;
 
-import org.nightlabs.jfire.accounting.pay.id.ServerPaymentProcessorID;
 import org.nightlabs.jfire.organisation.Organisation;
 import org.nightlabs.jfire.store.deliver.id.ServerDeliveryProcessorID;
 import org.nightlabs.jfire.transfer.Anchor;
@@ -51,6 +50,8 @@ import org.nightlabs.jfire.transfer.Anchor;
  */
 public class ServerDeliveryProcessorManual extends ServerDeliveryProcessor
 {
+	private static final long serialVersionUID = 1L;
+
 	public static ServerDeliveryProcessorManual getServerDeliveryProcessorManual(PersistenceManager pm)
 	{
 		ServerDeliveryProcessorManual serverDeliveryProcessorManual;

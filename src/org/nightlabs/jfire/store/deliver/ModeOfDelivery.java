@@ -59,57 +59,6 @@ implements Serializable
 	public static final String FETCH_GROUP_THIS_MODE_OF_DELIVERY = "ModeOfDelivery.this";
 
 	/**
-	 * This is the ID (together with
-	 * {@link org.nightlabs.jfire.organisation.Organisation#ROOT_ORGANISATIONID})
-	 * of one of the default <tt>ModeOfDelivery</tt>s. You <b>must not</b> rely on
-	 * the existence of this ModeOfDelivery as the user might choose to delete the
-	 * default configuration.
-	 * <p>
-	 * It specifies the manual delivery outside of the control of the system (directly
-	 * by the personal contact between vendor and customer).
-	 */
-	public static final String MODE_OF_DELIVERY_ID_MANUAL = "manual";
-
-	/**
-	 * This is the ID (together with
-	 * {@link org.nightlabs.jfire.organisation.Organisation#ROOT_ORGANISATIONID})
-	 * of one of the default <tt>ModeOfDelivery</tt>s. You <b>must not</b> rely on
-	 * the existence of this ModeOfDelivery as the user might choose to delete the
-	 * default configuration.
-	 * <p>
-	 * It specifies the non-delivery, means the delivery is simply postponed without
-	 * any further action.
-	 */
-	public static final String MODE_OF_DELIVERY_ID_NON_DELIVERY = "nonDelivery";
-
-	/**
-	 * This is the ID (together with
-	 * {@link org.nightlabs.jfire.organisation.Organisation#ROOT_ORGANISATIONID})
-	 * of one of the default <tt>ModeOfDelivery</tt>s. You <b>must not</b> rely on
-	 * the existence of this ModeOfDelivery as the user might choose to delete the
-	 * default configuration.
-	 * <p>
-	 * It specifies the external delivery via a delivery agency like "Deutsche Post",
-	 * "UPS" or similar.
-	 */
-	public static final String MODE_OF_DELIVERY_ID_MAILING_PHYSICAL = "mailing.physical";
-
-	/**
-	 * This is the ID (together with
-	 * {@link org.nightlabs.jfire.organisation.Organisation#ROOT_ORGANISATIONID})
-	 * of one of the default <tt>ModeOfDelivery</tt>s. You <b>must not</b> rely on
-	 * the existence of this ModeOfDelivery as the user might choose to delete the
-	 * default configuration.
-	 * <p>
-	 * It specifies the system controlled virtual delivery via online channels like
-	 * eMail or similar. Usually the sensitive data would not be sent by email, but
-	 * rather stored somewhere on the server where the customer can fetch it by a
-	 * browser. Between organisations, a virtual delivery can be done directly within
-	 * jfire.
-	 */
-	public static final String MODE_OF_DELIVERY_ID_MAILING_VIRTUAL = "mailing.virtual";
-
-	/**
 	 * @jdo.field primary-key="true"
 	 * @jdo.column length="100"
 	 */

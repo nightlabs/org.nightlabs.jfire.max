@@ -386,7 +386,7 @@ implements IPackagePriceConfig, IResultPriceConfig
 	public ArticlePrice createArticlePrice(Article article)
 	{
 		CustomerGroup customerGroup = getCustomerGroup(article);
-		Tariff tariff = article.getTariff();
+		Tariff tariff = getTariff(article);
 		Currency currency = article.getCurrency();
 
 		PriceCell priceCell = getPriceCell(customerGroup, tariff, currency, true);
@@ -415,7 +415,7 @@ implements IPackagePriceConfig, IResultPriceConfig
 			NestedProductType nestedProductType, LinkedList nestedProductTypeStack, Product nestedProduct, LinkedList productStack)
 	{
 		CustomerGroup customerGroup = getCustomerGroup(article);
-		Tariff tariff = article.getTariff();
+		Tariff tariff = getTariff(article);
 		Currency currency = article.getCurrency();
 
 		PriceCell priceCell = getPriceCell(customerGroup, tariff, currency, true);

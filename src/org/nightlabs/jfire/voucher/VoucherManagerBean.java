@@ -65,6 +65,7 @@ import org.nightlabs.jfire.store.deliver.DeliveryConfiguration;
 import org.nightlabs.jfire.store.deliver.DeliveryData;
 import org.nightlabs.jfire.store.deliver.DeliveryResult;
 import org.nightlabs.jfire.store.deliver.ModeOfDelivery;
+import org.nightlabs.jfire.store.deliver.ModeOfDeliveryConst;
 import org.nightlabs.jfire.store.deliver.ModeOfDeliveryFlavour;
 import org.nightlabs.jfire.store.deliver.ServerDeliveryProcessorManual;
 import org.nightlabs.jfire.store.deliver.id.DeliveryConfigurationID;
@@ -298,9 +299,7 @@ implements SessionBean
 					ModeOfDelivery modeOfDelivery;
 					ModeOfDeliveryFlavour modeOfDeliveryFlavour;
 					
-					modeOfDelivery = (ModeOfDelivery) pm.getObjectById(ModeOfDeliveryID
-							.create(Organisation.DEVIL_ORGANISATION_ID,
-									ModeOfDelivery.MODE_OF_DELIVERY_ID_MANUAL));
+					modeOfDelivery = (ModeOfDelivery) pm.getObjectById(ModeOfDeliveryConst.MODE_OF_DELIVERY_ID_MANUAL);
 					deliveryConfiguration.addModeOfDelivery(modeOfDelivery);
 
 					modeOfDelivery = new ModeOfDelivery(JFireVoucherEAR.MODE_OF_DELIVERY_ID_VOUCHER_PRINT);

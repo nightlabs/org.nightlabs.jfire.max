@@ -15,6 +15,7 @@ import javax.ejb.CreateException;
 import javax.ejb.EJBException;
 import javax.ejb.SessionBean;
 import javax.ejb.SessionContext;
+import javax.jdo.FetchPlan;
 import javax.jdo.PersistenceManager;
 import javax.jdo.Query;
 
@@ -24,10 +25,14 @@ import org.nightlabs.jdo.NLJDOHelper;
 import org.nightlabs.jdo.ObjectID;
 import org.nightlabs.jdo.moduleregistry.ModuleMetaData;
 import org.nightlabs.jfire.base.BaseSessionBeanImpl;
+import org.nightlabs.jfire.jbpm.graph.def.ProcessDefinition;
+import org.nightlabs.jfire.jbpm.graph.def.Statable;
 import org.nightlabs.jfire.jbpm.graph.def.State;
 import org.nightlabs.jfire.jbpm.graph.def.StateDefinition;
 import org.nightlabs.jfire.jbpm.graph.def.Transition;
+import org.nightlabs.jfire.jbpm.graph.def.id.ProcessDefinitionID;
 import org.nightlabs.jfire.jbpm.graph.def.id.TransitionID;
+import org.nightlabs.jfire.jbpm.query.StatableQuery;
 import org.nightlabs.jfire.servermanager.JFireServerManager;
 import org.nightlabs.jfire.servermanager.config.JFireServerConfigModule;
 import org.nightlabs.jfire.servermanager.deploy.DeployOverwriteBehaviour;
@@ -336,4 +341,79 @@ implements SessionBean
 //			pm.close();
 //		}
 //	}
+		
+	/**
+	 * @ejb.interface-method
+	 * @ejb.transaction type="Required"
+	 * @ejb.permission role-name="_Guest_"
+	 */		
+	public Set<StateDefinitionID> getStateDefinitionIDs(ProcessDefinition processDefinition) 
+	{
+		PersistenceManager pm = getPersistenceManager();
+		try {
+			return NLJDOHelper.getObjectIDSet(StateDefinition.getStateDefinitions(pm, processDefinition));
+		} finally {
+			pm.close();
+		}				
+	}
+
+	/**
+	 * @ejb.interface-method
+	 * @ejb.transaction type="Required"
+	 * @ejb.permission role-name="_Guest_"
+	 */		
+	public Collection<StateDefinition> getStateDefinitions(Set<StateDefinitionID> objectIDs, 
+			String[] fetchGroups, int maxFetchDepth) 
+	{
+		PersistenceManager pm = getPersistenceManager();
+		try {
+			return NLJDOHelper.getDetachedObjectList(pm, objectIDs, StateDefinition.class, 
+					fetchGroups, maxFetchDepth);
+		} finally {
+			pm.close();
+		}				
+	}
+	
+	/**
+	 * @ejb.interface-method
+	 * @ejb.transaction type="Required"
+	 * @ejb.permission role-name="_Guest_"
+	 */		
+	public Collection<ProcessDefinition> getProcessDefinitions(Set<ProcessDefinitionID> objectIDs, 
+			String[] fetchGroups, int maxFetchDepth) 
+	{
+		PersistenceManager pm = getPersistenceManager();
+		try {
+			return NLJDOHelper.getDetachedObjectList(pm, objectIDs, ProcessDefinition.class, 
+					fetchGroups, maxFetchDepth);
+		} finally {
+			pm.close();
+		}				
+	}	
+	
+	/**
+	 *
+	 * @ejb.interface-method
+	 * @ejb.permission role-name="_Guest_"
+	 * @ejb.transaction type="Supports"
+	 */
+	public Set<Statable> getStatables(Collection<StatableQuery> statableQueries)
+	{
+		PersistenceManager pm = getPersistenceManager();
+		try {
+			pm.getFetchPlan().setMaxFetchDepth(1);
+			pm.getFetchPlan().setGroup(FetchPlan.DEFAULT);
+
+			Set<Statable> statables = null;
+			for (StatableQuery query : statableQueries) {
+				query.setPersistenceManager(pm);
+				query.setCandidates(statables);
+				statables = new HashSet<Statable>(query.getResult());
+			}
+
+			return (Set<Statable>) NLJDOHelper.getDetachedQueryResult(pm, statables);
+		} finally {
+			pm.close();
+		}
+	}			
 }

@@ -7,6 +7,10 @@ public interface StatableLocal
 	Statable getStatable();
 	void setState(State state);
 	State getState();
+
+	/**
+	 * @return all local {@link State}s (created by this organisation) no matter whether they're public or private.
+	 */
 	List<State> getStates();
 
 	long getJbpmProcessInstanceId();

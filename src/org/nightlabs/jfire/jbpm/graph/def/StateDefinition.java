@@ -1,6 +1,7 @@
 package org.nightlabs.jfire.jbpm.graph.def;
 
 import java.io.Serializable;
+import java.util.List;
 
 import javax.jdo.JDOHelper;
 import javax.jdo.PersistenceManager;
@@ -33,6 +34,9 @@ import org.nightlabs.jfire.trade.state.id.StateDefinitionID;
  *		WHERE
  *			this.processDefinition == :processDefinition &&
  *			this.jbpmNodeName == :jbpmNodeName"
+ *
+ * @jdo.query name="getStateDefinitionsForProcessDefinition"
+ *		query="SELECT WHERE this.processDefinition == :processDefinition"
  */
 public class StateDefinition
 implements Serializable
@@ -41,6 +45,13 @@ implements Serializable
 
 	public static final String FETCH_GROUP_NAME = "StateDefinition.name";
 	public static final String FETCH_GROUP_DESCRIPTION = "StateDefinition.description";
+
+	@SuppressWarnings("unchecked")
+	public static List<StateDefinition> getStateDefinitions(PersistenceManager pm, ProcessDefinition processDefinition)
+	{
+		Query q = pm.newNamedQuery(StateDefinition.class, "getStateDefinitionsForProcessDefinition");
+		return (List<StateDefinition>) q.execute(processDefinition);
+	}
 
 	public static StateDefinition getStateDefinition(
 			ProcessDefinition processDefinition, String jbpmNodeName)

@@ -52,8 +52,12 @@ import org.nightlabs.ModuleException;
 import org.nightlabs.jdo.NLJDOHelper;
 import org.nightlabs.jdo.moduleregistry.MalformedVersionException;
 import org.nightlabs.jdo.moduleregistry.ModuleMetaData;
+import org.nightlabs.jdo.query.JDOQuery;
 import org.nightlabs.jfire.accounting.Currency;
+import org.nightlabs.jfire.accounting.Invoice;
 import org.nightlabs.jfire.accounting.id.CurrencyID;
+import org.nightlabs.jfire.accounting.id.InvoiceID;
+import org.nightlabs.jfire.accounting.query.InvoiceQuery;
 import org.nightlabs.jfire.base.BaseSessionBeanImpl;
 import org.nightlabs.jfire.config.ConfigSetup;
 import org.nightlabs.jfire.config.UserConfigSetup;
@@ -62,10 +66,13 @@ import org.nightlabs.jfire.idgenerator.IDNamespaceDefault;
 import org.nightlabs.jfire.jbpm.JbpmLookup;
 import org.nightlabs.jfire.jbpm.graph.def.ProcessDefinition;
 import org.nightlabs.jfire.jbpm.graph.def.State;
+import org.nightlabs.jfire.jbpm.graph.def.StateDefinition;
+import org.nightlabs.jfire.jbpm.graph.def.id.ProcessDefinitionID;
 import org.nightlabs.jfire.person.Person;
 import org.nightlabs.jfire.security.User;
 import org.nightlabs.jfire.security.id.UserID;
 import org.nightlabs.jfire.trade.config.LegalEntityViewConfigModule;
+import org.nightlabs.jfire.trade.id.ArticleContainerID;
 import org.nightlabs.jfire.trade.id.ArticleID;
 import org.nightlabs.jfire.trade.id.CustomerGroupID;
 import org.nightlabs.jfire.trade.id.CustomerGroupMappingID;
@@ -74,6 +81,7 @@ import org.nightlabs.jfire.trade.id.OfferLocalID;
 import org.nightlabs.jfire.trade.id.OrderID;
 import org.nightlabs.jfire.trade.id.SegmentTypeID;
 import org.nightlabs.jfire.trade.jbpm.ProcessDefinitionAssignment;
+import org.nightlabs.jfire.trade.query.ArticleContainerQuery;
 import org.nightlabs.jfire.transfer.id.AnchorID;
 
 
@@ -1420,4 +1428,49 @@ implements SessionBean
 			pm.close();
 		}
 	}
+	
+	/**
+	 * @ejb.interface-method
+	 * @ejb.transaction type="Required"
+	 * @ejb.permission role-name="_Guest_"
+	 */	
+	public Set<ProcessDefinitionID> getProcessDefinitionIDs(String statableClassName) 
+	{
+		PersistenceManager pm = getPersistenceManager();
+		try {
+			return NLJDOHelper.getObjectIDSet(ProcessDefinitionAssignment.getProcessDefinitions(pm, statableClassName));
+		} finally {
+			pm.close();
+		}		
+	}
+		
+	/**
+	 * @param articleContainerQueries Instances of {@link ArticleContainerQuery} 
+	 * 		that shall be chained
+	 *		in order to retrieve the result. The result of one query is passed to the
+	 *		next one using the {@link JDOQuery#setCandidates(Collection)}.
+	 *
+	 * @ejb.interface-method
+	 * @ejb.permission role-name="_Guest_"
+	 * @ejb.transaction type="Supports"
+	 */
+	public Set<ArticleContainerID> getArticleContainerIDs(Collection<ArticleContainerQuery> articleContainerQueries)
+	{
+		PersistenceManager pm = getPersistenceManager();
+		try {
+			pm.getFetchPlan().setMaxFetchDepth(1);
+			pm.getFetchPlan().setGroup(FetchPlan.DEFAULT);
+
+			Set<ArticleContainer> articleContainers = null;
+			for (ArticleContainerQuery query : articleContainerQueries) {
+				query.setPersistenceManager(pm);
+				query.setCandidates(articleContainers);
+				articleContainers = new HashSet<ArticleContainer>(query.getResult());
+			}
+
+			return NLJDOHelper.getObjectIDSet(articleContainers);
+		} finally {
+			pm.close();
+		}
+	}	
 }

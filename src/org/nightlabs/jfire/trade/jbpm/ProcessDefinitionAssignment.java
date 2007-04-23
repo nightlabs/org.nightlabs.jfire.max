@@ -1,9 +1,11 @@
 package org.nightlabs.jfire.trade.jbpm;
 
 import java.io.Serializable;
+import java.util.List;
 
 import javax.jdo.JDOHelper;
 import javax.jdo.PersistenceManager;
+import javax.jdo.Query;
 
 import org.jbpm.JbpmContext;
 import org.jbpm.graph.exe.ProcessInstance;
@@ -13,6 +15,7 @@ import org.nightlabs.jfire.jbpm.graph.def.AbstractActionHandler;
 import org.nightlabs.jfire.jbpm.graph.def.ActionHandlerNodeEnter;
 import org.nightlabs.jfire.jbpm.graph.def.ProcessDefinition;
 import org.nightlabs.jfire.jbpm.graph.def.Statable;
+import org.nightlabs.jfire.jbpm.graph.def.StateDefinition;
 import org.nightlabs.jfire.security.User;
 import org.nightlabs.jfire.store.DeliveryNote;
 import org.nightlabs.jfire.trade.Offer;
@@ -35,6 +38,9 @@ import org.nightlabs.jfire.trade.TradeSide;
  *		field-order="statableClass, tradeSide"
  *		include-body="id/ProcessDefinitionAssignmentID.body.inc"
  *
+ * @jdo.query name="getProcessDefinitionsForStatableClass"
+ *		query="SELECT processDefinition WHERE this.statableClass == :statableClass"
+ *
  * @author Marco Schulze - marco at nightlabs dot de
  */
 public class ProcessDefinitionAssignment
@@ -42,6 +48,19 @@ implements Serializable
 {
 	private static final long serialVersionUID = 1L;
 
+	/**
+	 * returns a List of {@link ProcessDefinition} defined for the given {@link Statable} class
+	 * 
+	 * @param pm the {@link PersistenceManager} to use
+	 * @param statableClass the name of the {@link Statable} class as String 
+	 * @return a List of {@link ProcessDefinition} defined for the given statable class
+	 */
+	public static List<ProcessDefinition> getProcessDefinitions(PersistenceManager pm, String statableClass)
+	{
+		Query q = pm.newNamedQuery(ProcessDefinitionAssignment.class, "getProcessDefinitionsForStatableClass");
+		return (List<ProcessDefinition>) q.execute(statableClass);
+	}	
+	
 	/**
 	 * The fully qualified class name of a class implementing {@link Statable}. Usually, this
 	 * will be one of {@link Offer}, {@link Invoice} or {@link DeliveryNote}.

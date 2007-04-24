@@ -7,6 +7,7 @@ import javax.jdo.Query;
 
 import org.nightlabs.jdo.query.JDOQuery;
 import org.nightlabs.jfire.accounting.Currency;
+import org.nightlabs.jfire.jbpm.graph.def.Statable;
 import org.nightlabs.jfire.security.id.UserID;
 import org.nightlabs.jfire.trade.ArticleContainer;
 import org.nightlabs.jfire.transfer.id.AnchorID;
@@ -18,11 +19,26 @@ import org.nightlabs.jfire.transfer.id.AnchorID;
 public class ArticleContainerQuery 
 extends JDOQuery<Set<ArticleContainer>>
 {
-
+	public ArticleContainerQuery(Class articleContainerClass) 
+	{
+		if (articleContainerClass == null)
+			throw new IllegalArgumentException("Param articleContainerClass must not be null");
+		
+		if (!ArticleContainer.class.isAssignableFrom(articleContainerClass))
+			throw new IllegalArgumentException("Param articleContainerClass must implement the interface "+ArticleContainer.class);
+		
+		this.articleContainerClass = articleContainerClass;
+	}
+	
+	private Class articleContainerClass = null;
+	public Class getArticleContainerClass() {
+		return articleContainerClass;
+	}
+	
 	@Override
 	protected Query prepareQuery() 
 	{
-		Query q = getPersistenceManager().newQuery(ArticleContainerQuery.class);
+		Query q = getPersistenceManager().newQuery(getArticleContainerClass());
 		StringBuffer filter = new StringBuffer();
 		
 		filter.append(" true");

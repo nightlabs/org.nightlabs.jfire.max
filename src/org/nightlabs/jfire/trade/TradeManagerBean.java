@@ -71,6 +71,8 @@ import org.nightlabs.jfire.jbpm.graph.def.id.ProcessDefinitionID;
 import org.nightlabs.jfire.person.Person;
 import org.nightlabs.jfire.security.User;
 import org.nightlabs.jfire.security.id.UserID;
+import org.nightlabs.jfire.store.ReceptionNote;
+import org.nightlabs.jfire.store.id.ReceptionNoteID;
 import org.nightlabs.jfire.trade.config.LegalEntityViewConfigModule;
 import org.nightlabs.jfire.trade.id.ArticleContainerID;
 import org.nightlabs.jfire.trade.id.ArticleID;
@@ -1461,14 +1463,155 @@ implements SessionBean
 			pm.getFetchPlan().setMaxFetchDepth(1);
 			pm.getFetchPlan().setGroup(FetchPlan.DEFAULT);
 
-			Set<ArticleContainer> articleContainers = null;
+			Collection<ArticleContainer> articleContainers = null;
 			for (ArticleContainerQuery query : articleContainerQueries) {
 				query.setPersistenceManager(pm);
 				query.setCandidates(articleContainers);
-				articleContainers = new HashSet<ArticleContainer>(query.getResult());
+				articleContainers = (Collection) query.getResult();
 			}
 
 			return NLJDOHelper.getObjectIDSet(articleContainers);
+		} finally {
+			pm.close();
+		}
+	}	
+
+	/**
+	 * @ejb.interface-method
+	 * @ejb.permission role-name="_Guest_"
+	 * @ejb.transaction type="Supports"
+	 */	
+	public Set<InvoiceID> getInvoiceIDs(Collection<JDOQuery> queries) 
+	{
+		PersistenceManager pm = getPersistenceManager();
+		try {
+			pm.getFetchPlan().setMaxFetchDepth(1);
+			pm.getFetchPlan().setGroup(FetchPlan.DEFAULT);
+
+			Collection<Invoice> invoices = null;
+			for (JDOQuery query : queries) {
+				query.setPersistenceManager(pm);
+				query.setCandidates(invoices);
+				invoices = (Collection) query.getResult();
+			}
+
+			return NLJDOHelper.getObjectIDSet(invoices);
+		} finally {
+			pm.close();
+		}		
+	}
+	
+	/**
+	 * @ejb.interface-method
+	 * @ejb.permission role-name="_Guest_"
+	 * @ejb.transaction type="Supports"
+	 */	
+	public Set<OfferID> getOfferIDs(Collection<JDOQuery> queries) 
+	{
+		PersistenceManager pm = getPersistenceManager();
+		try {
+			pm.getFetchPlan().setMaxFetchDepth(1);
+			pm.getFetchPlan().setGroup(FetchPlan.DEFAULT);
+
+			Collection<Offer> offers = null;
+			for (JDOQuery query : queries) {
+				query.setPersistenceManager(pm);
+				query.setCandidates(offers);
+				offers = (Collection) query.getResult();
+			}
+
+			return NLJDOHelper.getObjectIDSet(offers);
+		} finally {
+			pm.close();
+		}		
+	}	
+	
+	/**
+	 * @ejb.interface-method
+	 * @ejb.permission role-name="_Guest_"
+	 * @ejb.transaction type="Supports"
+	 */	
+	public Set<OrderID> getOrderIDs(Collection<JDOQuery> queries) 
+	{
+		PersistenceManager pm = getPersistenceManager();
+		try {
+			pm.getFetchPlan().setMaxFetchDepth(1);
+			pm.getFetchPlan().setGroup(FetchPlan.DEFAULT);
+
+			Collection<Order> orders = null;
+			for (JDOQuery query : queries) {
+				query.setPersistenceManager(pm);
+				query.setCandidates(orders);
+				orders = (Collection) query.getResult();
+			}
+
+			return NLJDOHelper.getObjectIDSet(orders);
+		} finally {
+			pm.close();
+		}		
+	}	
+	
+	/**
+	 * @ejb.interface-method
+	 * @ejb.permission role-name="_Guest_"
+	 * @ejb.transaction type="Supports"
+	 */	
+	public Set<OrderID> getDeliveryNoteIDs(Collection<JDOQuery> queries) 
+	{
+		PersistenceManager pm = getPersistenceManager();
+		try {
+			pm.getFetchPlan().setMaxFetchDepth(1);
+			pm.getFetchPlan().setGroup(FetchPlan.DEFAULT);
+
+			Collection<Order> deliveryNotes = null;
+			for (JDOQuery query : queries) {
+				query.setPersistenceManager(pm);
+				query.setCandidates(deliveryNotes);
+				deliveryNotes = (Collection) query.getResult();
+			}
+
+			return NLJDOHelper.getObjectIDSet(deliveryNotes);
+		} finally {
+			pm.close();
+		}		
+	}
+	
+	/**
+	 * @ejb.interface-method
+	 * @ejb.permission role-name="_Guest_"
+	 * @ejb.transaction type="Supports"
+	 */	
+	public Set<ReceptionNoteID> getReceptionNoteIDs(Collection<JDOQuery> queries) 
+	{
+		PersistenceManager pm = getPersistenceManager();
+		try {
+			pm.getFetchPlan().setMaxFetchDepth(1);
+			pm.getFetchPlan().setGroup(FetchPlan.DEFAULT);
+
+			Collection<ReceptionNote> receptionNotes = null;
+			for (JDOQuery query : queries) {
+				query.setPersistenceManager(pm);
+				query.setCandidates(receptionNotes);
+				receptionNotes = (Collection) query.getResult();
+			}
+
+			return NLJDOHelper.getObjectIDSet(receptionNotes);
+		} finally {
+			pm.close();
+		}		
+	}		
+
+	/**
+	 * @ejb.interface-method
+	 * @ejb.permission role-name="_Guest_"
+	 * @ejb.transaction type="Supports"
+	 */ 
+	@SuppressWarnings("unchecked")
+	public List<ReceptionNote> getReceptionNotes(Set<ReceptionNoteID> receptionNoteIDs, String[] fetchGroups, int maxFetchDepth)
+	{
+		PersistenceManager pm = getPersistenceManager();
+		try {
+			return NLJDOHelper.getDetachedObjectList(pm, receptionNoteIDs, ReceptionNote.class, fetchGroups, maxFetchDepth);
 		} finally {
 			pm.close();
 		}

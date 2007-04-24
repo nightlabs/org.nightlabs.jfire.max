@@ -1449,6 +1449,39 @@ implements Serializable, StoreCallback
 			precursor = (Delivery) pm.getObjectById(precursorID);
 			precursor.followUp = this;
 		}
-
 	}
+	
+	/* (non-Javadoc)
+	 * @see java.lang.Object#hashCode
+	 */
+	@Override
+	public int hashCode() {
+		final int prime = 31;
+		int result = 1;
+		result = prime * result + (int) (deliveryID ^ (deliveryID >>> 32));
+		result = prime * result + ((organisationID == null) ? 0 : organisationID.hashCode());
+		return result;
+	}
+	
+	/* (non-Javadoc)
+	 * @see java.lang.Object#equals(java.lang.Object)
+	 */
+	@Override
+	public boolean equals(Object obj) {
+		if (this == obj)
+			return true;
+		if (obj == null)
+			return false;
+		if (!(obj instanceof Delivery))
+			return false;
+		final Delivery other = (Delivery) obj;
+		if (deliveryID != other.deliveryID)
+			return false;
+		if (organisationID == null) {
+			if (other.organisationID != null)
+				return false;
+		} else if (!organisationID.equals(other.organisationID))
+			return false;
+		return true;
+	}	
 }

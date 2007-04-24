@@ -712,4 +712,42 @@ public PayMoneyTransfer payBegin(PayParams payParams)
 	{
 		return null;
 	}
+	
+	/**
+	 * @jdo.field persistence-modifier="none"
+	 */
+	private String requirementCheckKey;
+	
+	/**
+	 * This method returns null if all requirements are met and a descriptive string
+	 * otherwise.
+	 * 
+	 * @return null if all requirements are met and a descriptive string otherwise.
+	 */
+	public String getRequirementCheckKey() {
+		return requirementCheckKey;
+	}
+	
+	public void setRequirementCheckKey(String reqMsg) {
+		this.requirementCheckKey = reqMsg;
+	}
+	
+	/**
+	 * This method is not supposed to be called from outside.
+	 * Extendors should implement {@link #_checkRequirements()} instead of this method.
+	 */
+	public void checkRequirements() {
+		requirementCheckKey = _checkRequirements();
+	}
+	
+	/**
+	 * Extendors should override this method if their {@link ServerPaymentProcessor} if
+	 * it needs to ensure some requirements before it can be used. If everything is ok, this
+	 * method should return null. Otherwise a string describing the failure should be returned.
+	 * 
+	 * @return null if everything is ok, a descriptive string otherwise.
+	 */
+	protected String _checkRequirements() {
+		return null;
+	}
 }

@@ -30,10 +30,12 @@ import java.io.IOException;
 import java.rmi.RemoteException;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Locale;
+import java.util.Map;
 import java.util.Set;
 
 import javax.ejb.CreateException;
@@ -53,6 +55,7 @@ import org.nightlabs.jdo.NLJDOHelper;
 import org.nightlabs.jfire.accounting.Accounting;
 import org.nightlabs.jfire.accounting.Invoice;
 import org.nightlabs.jfire.accounting.id.InvoiceID;
+import org.nightlabs.jfire.accounting.pay.ServerPaymentProcessor;
 import org.nightlabs.jfire.base.BaseSessionBeanImpl;
 import org.nightlabs.jfire.idgenerator.IDNamespaceDefault;
 import org.nightlabs.jfire.jbpm.JbpmLookup;
@@ -660,7 +663,7 @@ implements SessionBean
 	 * @ejb.permission role-name="_Guest_"
 	 * @ejb.transaction type = "Supports"
 	 */
-	public Collection getServerDeliveryProcessorsForOneModeOfDeliveryFlavour(
+	public Collection<ServerDeliveryProcessor> getServerDeliveryProcessorsForOneModeOfDeliveryFlavour(
 			ModeOfDeliveryFlavourID modeOfDeliveryFlavourID, String[] fetchGroups, int maxFetchDepth)
 	{
 		PersistenceManager pm = getPersistenceManager();
@@ -669,10 +672,25 @@ implements SessionBean
 			if (fetchGroups != null)
 				pm.getFetchPlan().setGroups(fetchGroups);
 
-			Collection c = ServerDeliveryProcessor.getServerDeliveryProcessorsForOneModeOfDeliveryFlavour(
+			Collection<ServerDeliveryProcessor> c = ServerDeliveryProcessor.getServerDeliveryProcessorsForOneModeOfDeliveryFlavour(
 					pm, modeOfDeliveryFlavourID);
+			
+			Map<String, String> requirementMsgMap = new HashMap<String, String>();
+			
+			for (ServerDeliveryProcessor pp : c) {
+				pp.checkRequirements();
+				requirementMsgMap.put(pp.getServerDeliveryProcessorID(), pp.getRequirementCheckKey());
+			}
 
-			return pm.detachCopyAll(c);
+			c = pm.detachCopyAll(c);
+			
+			for (ServerDeliveryProcessor pp : c) {
+				String reqMsg = requirementMsgMap.get(pp.getServerDeliveryProcessorID());
+				pp.setRequirementCheckKey(reqMsg);
+			}
+
+			return c;
+			
 		} finally {
 			pm.close();
 		}

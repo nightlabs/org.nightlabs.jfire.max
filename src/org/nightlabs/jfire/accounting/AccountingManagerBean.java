@@ -89,6 +89,7 @@ import org.nightlabs.jfire.accounting.pay.ServerPaymentProcessorNonPayment;
 import org.nightlabs.jfire.accounting.pay.id.ModeOfPaymentFlavourID;
 import org.nightlabs.jfire.accounting.pay.id.PaymentDataID;
 import org.nightlabs.jfire.accounting.pay.id.PaymentID;
+import org.nightlabs.jfire.accounting.pay.id.ServerPaymentProcessorID;
 import org.nightlabs.jfire.accounting.priceconfig.AffectedProductType;
 import org.nightlabs.jfire.accounting.priceconfig.FetchGroupsPriceConfig;
 import org.nightlabs.jfire.accounting.priceconfig.PriceConfigUtil;
@@ -2298,7 +2299,7 @@ public abstract class AccountingManagerBean
 	 * @ejb.permission role-name="_Guest_"
 	 * @ejb.transaction type = "Supports"
 	 */
-	public Collection getServerPaymentProcessorsForOneModeOfPaymentFlavour(
+	public Collection<ServerPaymentProcessor> getServerPaymentProcessorsForOneModeOfPaymentFlavour(
 			ModeOfPaymentFlavourID modeOfPaymentFlavourID, String[] fetchGroups, int maxFetchDepth)
 	{
 		PersistenceManager pm = getPersistenceManager();
@@ -2307,10 +2308,24 @@ public abstract class AccountingManagerBean
 			if (fetchGroups != null)
 				pm.getFetchPlan().setGroups(fetchGroups);
 
-			Collection c = ServerPaymentProcessor.getServerPaymentProcessorsForOneModeOfPaymentFlavour(
+			Collection<ServerPaymentProcessor> c = ServerPaymentProcessor.getServerPaymentProcessorsForOneModeOfPaymentFlavour(
 					pm, modeOfPaymentFlavourID);
+			
+			Map<String, String> requirementMsgMap = new HashMap<String, String>();
+			
+			for (ServerPaymentProcessor pp : c) {
+				pp.checkRequirements();
+				requirementMsgMap.put(pp.getServerPaymentProcessorID(), pp.getRequirementCheckKey());
+			}
 
-			return pm.detachCopyAll(c);
+			c = pm.detachCopyAll(c);
+			
+			for (ServerPaymentProcessor pp : c) {
+				String reqMsg = requirementMsgMap.get(pp.getServerPaymentProcessorID());
+				pp.setRequirementCheckKey(reqMsg);
+			}
+			
+			return c;
 		} finally {
 			pm.close();
 		}

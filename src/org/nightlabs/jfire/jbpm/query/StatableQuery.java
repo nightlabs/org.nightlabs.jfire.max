@@ -19,10 +19,28 @@ import org.nightlabs.jfire.trade.state.id.StateDefinitionID;
 public class StatableQuery 
 extends JDOQuery<Set<Statable>> 
 {	
+//	public abstract Class getStatableClass();
+	
+	public StatableQuery(Class statableClass) 
+	{
+		if (statableClass == null)
+			throw new IllegalArgumentException("Param statableClass must not be null");
+		
+		if (!Statable.class.isAssignableFrom(statableClass))
+			throw new IllegalArgumentException("Param statableClass must implement the interface "+Statable.class);
+		
+		this.statableClass = statableClass;
+	}
+	
+	private Class statableClass = null;	
+	public Class getStatableClass() {
+		return statableClass;
+	}
+	
 	@Override
 	protected Query prepareQuery() 
 	{
-		Query q = getPersistenceManager().newQuery(Statable.class);
+		Query q = getPersistenceManager().newQuery(getStatableClass());
 		StringBuffer filter = new StringBuffer();
 		
 		filter.append(" true");

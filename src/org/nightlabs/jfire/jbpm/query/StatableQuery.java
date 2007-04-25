@@ -62,7 +62,7 @@ extends JDOQuery<Set<Statable>>
 			filter.append("\n && this.createDT >= :stateCreateDTMin");
 
 		if (stateCreateDTMax != null)
-			filter.append("\n && this.createDT >= :stateCreateDTMax");		
+			filter.append("\n && this.createDT <= :stateCreateDTMax");		
 		
 		return q;
 	}

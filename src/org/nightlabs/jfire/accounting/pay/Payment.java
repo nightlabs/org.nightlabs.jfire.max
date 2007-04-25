@@ -47,13 +47,11 @@ import org.nightlabs.jfire.accounting.pay.ServerPaymentProcessor.PayParams;
 import org.nightlabs.jfire.accounting.pay.id.ModeOfPaymentFlavourID;
 import org.nightlabs.jfire.accounting.pay.id.PaymentID;
 import org.nightlabs.jfire.accounting.pay.id.ServerPaymentProcessorID;
-import org.nightlabs.jfire.idgenerator.IDGenerator;
 import org.nightlabs.jfire.security.User;
 import org.nightlabs.jfire.trade.LegalEntity;
 import org.nightlabs.jfire.transfer.Transfer;
 import org.nightlabs.jfire.transfer.id.AnchorID;
 import org.nightlabs.math.Base36Coder;
-import org.nightlabs.math.Base62Coder;
 
 /**
  * @author Marco Schulze - marco at nightlabs dot de
@@ -346,33 +344,10 @@ implements Serializable, StoreCallback
 	 */
 	private byte rollbackStatus = ROLLBACK_STATUS_NOT_DONE;
 
-	protected static Base62Coder base62Coder = null;
-	protected static Base62Coder getBase62Coder()
+	public Payment(String organisationID, long paymentID, PaymentID precursorID)
 	{
-		if (base62Coder == null)
-			base62Coder = new Base62Coder();
-
-		return base62Coder;
-	}
-
-	public Payment(String organisationID, PaymentID precursorID)
-	{
-		this(organisationID);
+		this(organisationID, paymentID);
 		this.precursorID = precursorID;
-	}
-
-	/**
-	 * This constructor will autogenerate the <tt>paymentID</tt> with timestamp
-	 * + '-' + random. The numbers are base62encoded.
-	 */
-	public Payment(String organisationID)
-	{
-		this(organisationID, IDGenerator.nextID(Payment.class));
-		
-//		this(organisationID,
-//				getBase62Coder().encode(System.currentTimeMillis(), 1)
-//				+ '-' +
-//				getBase62Coder().encode((long)(Math.random() * Integer.MAX_VALUE), 1));
 	}
 
 	public Payment(String organisationID, long paymentID)

@@ -29,7 +29,6 @@ package org.nightlabs.jfire.store.deliver;
 import java.io.Serializable;
 import java.rmi.RemoteException;
 import java.util.Collection;
-import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Map;

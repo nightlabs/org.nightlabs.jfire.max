@@ -25,11 +25,20 @@
  ******************************************************************************/
 package org.nightlabs.jfire.store.deliver;
 
+import java.util.Set;
+
+import javax.jdo.JDOHelper;
 import javax.jdo.JDOObjectNotFoundException;
 import javax.jdo.PersistenceManager;
 
+import org.nightlabs.jfire.idgenerator.IDGenerator;
 import org.nightlabs.jfire.organisation.Organisation;
+import org.nightlabs.jfire.store.Store;
 import org.nightlabs.jfire.store.deliver.id.CrossTradeDeliveryCoordinatorID;
+import org.nightlabs.jfire.store.deliver.id.ServerDeliveryProcessorID;
+import org.nightlabs.jfire.trade.Article;
+import org.nightlabs.jfire.trade.LegalEntity;
+import org.nightlabs.jfire.trade.OrganisationLegalEntity;
 
 /**
  * @author Marco Schulze - marco at nightlabs dot de
@@ -115,5 +124,129 @@ public class CrossTradeDeliveryCoordinator
 	public void setServerDeliveryProcessor(ServerDeliveryProcessor serverDeliveryProcessor)
 	{
 		this.serverDeliveryProcessor = serverDeliveryProcessor;
+	}
+
+	protected PersistenceManager getPersistenceManager()
+	{
+		PersistenceManager pm = JDOHelper.getPersistenceManager(this);
+		if (pm == null)
+			throw new IllegalStateException("This instance of " + this.getClass().getName() + " is currently not persistent!");
+
+		return pm;
+	}
+
+	public void performCrossTradeDelivery(Set<Article> articles)
+	{
+		if (articles.isEmpty())
+			throw new IllegalArgumentException("Param articles is empty!");
+
+		// check whether all articles are to be delivered between the same LegalEntities and in the same direction
+		// and whether they are both OrganisationLegalEntities
+		OrganisationLegalEntity from = null;
+		OrganisationLegalEntity to = null;
+		for (Article article : articles) {
+			LegalEntity _from = article.getOrder().getVendor();
+			LegalEntity _to = article.getOrder().getCustomer();
+
+			if (!(_from instanceof OrganisationLegalEntity))
+				throw new IllegalArgumentException("Article.vendor is not an OrganisationLegalEntity: " + article.getPrimaryKey());
+
+			if (!(_to instanceof OrganisationLegalEntity))
+				throw new IllegalArgumentException("Article.customer is not an OrganisationLegalEntity: " + article.getPrimaryKey());
+
+			if (article.isReversing()) {
+				LegalEntity tmp = _from;
+				_from = _to;
+				_to = tmp;
+			}
+
+			if (from == null)
+				from = (OrganisationLegalEntity) _from;
+			else {
+				if (!from.equals(_from))
+					throw new IllegalArgumentException("Not all articles have the same from-LegalEntity (= sender) for the delivery!");
+			}
+
+			if (to == null)
+				to = (OrganisationLegalEntity) _to;
+			else {
+				if (!to.equals(_to))
+					throw new IllegalArgumentException("Not all articles have the same to-LegalEntity (= receipient) for the delivery!");				
+			}
+		}
+
+		PersistenceManager pm = getPersistenceManager();
+		Store store = Store.getStore(pm);
+		OrganisationLegalEntity mandator = store.getMandator();
+
+		if (!mandator.equals(from) && !mandator.equals(to))
+				throw new IllegalStateException("Neither from-LegalEntity nor to-LegalEntity is the local organisation!");
+
+		// from and to are now defined and we have to create a Delivery
+		// we actually create TWO deliveries - one for the local side and one for the remote side, where the client-side of each is fake
+		Delivery localDelivery = createDelivery(mandator, from, to, articles, false);
+		Delivery remoteDelivery = createDelivery(mandator, from, to, articles, true);
+
+		DeliveryData localDeliveryData = createDeliveryData(mandator, from, to, localDelivery, localDelivery, remoteDelivery);
+		DeliveryData remoteDeliveryData = createDeliveryData(mandator, from, to, remoteDelivery, localDelivery, remoteDelivery);
+
+		// the local stuff is stored here - the remote stuff is solely stored in the remote organisation - at least for now
+
+		// simulate 
+	}
+
+
+	/**
+	 * @param mandator The {@link OrganisationLegalEntity} representing the local organisation. This is identical with either <code>from</code> or <code>to</code>.
+	 * @param from The {@link OrganisationLegalEntity} which sends out the {@link Article}s (and is thus the from-side of the delivery).
+	 * @param to The {@link OrganisationLegalEntity} which reveices the {@link Article}s (and is thus the to-side of the delivery).
+	 * @param articles The {@link Article}s that are to be delivered.
+	 * @param remote <code>false</code>, if this method should create a {@link Delivery} instance for the local organisation; <code>true</code>, if
+	 *		the {@link Delivery} is to be used on the remote-side.
+	 * @return the newly created and parameterised {@link Delivery}.
+	 */
+	protected Delivery createDelivery(
+			OrganisationLegalEntity mandator,
+			OrganisationLegalEntity from,
+			OrganisationLegalEntity to,
+			Set<Article> articles,
+			boolean remote)
+	{
+		Delivery delivery = new Delivery(IDGenerator.getOrganisationID(), IDGenerator.nextID(Delivery.class));
+		delivery.setArticles(articles);
+		delivery.setModeOfDeliveryFlavour(getModeOfDeliveryFlavour());
+		delivery.setServerDeliveryProcessorID((ServerDeliveryProcessorID) JDOHelper.getObjectId(getServerDeliveryProcessor()));
+
+		delivery.setPartner(mandator.equals(from) ? to : from);
+		if (mandator.equals(from) ^ remote) // if we create the Delivery for the remote side, we inverse the direction, which is done by XOR in the most elegant way
+			delivery.setDeliveryDirection(Delivery.DELIVERY_DIRECTION_OUTGOING);
+		else
+			delivery.setDeliveryDirection(Delivery.DELIVERY_DIRECTION_INCOMING);
+
+		return delivery;
+	}
+
+	/**
+	 * The default implementation of this method creates an instance of {@link DeliveryDataCrossTrade}. You can override this method
+	 * if you need a different implementation. Note, that they need to be compatible with the {@link ServerDeliveryProcessor} which
+	 * is referenced by the property {@link #getServerDeliveryProcessor()}.
+	 *
+	 * @param mandator The {@link OrganisationLegalEntity} representing the local organisation. This is identical with either <code>from</code> or <code>to</code>.
+	 * @param from The {@link OrganisationLegalEntity} which sends out the {@link Article}s (and is thus the from-side of the delivery).
+	 * @param to The {@link OrganisationLegalEntity} which reveices the {@link Article}s (and is thus the to-side of the delivery).
+	 * @param delivery The {@link Delivery} for which to create a {@link DeliveryData} - this is either identical with <code>localDelivery</code> or with <code>remoteDelivery</code>.
+	 * @param localDelivery The {@link Delivery} instance which is used to handle the delivery in the local organisation.
+	 * @param remoteDelivery The {@link Delivery} instance which is used to handle the delivery in the remote organisation.
+	 * @return the newly created {@link DeliveryData}.
+	 */
+	protected DeliveryData createDeliveryData(
+			OrganisationLegalEntity mandator,
+			OrganisationLegalEntity from,
+			OrganisationLegalEntity to,
+			Delivery delivery,
+			Delivery localDelivery,
+			Delivery remoteDelivery)
+	{
+		return new DeliveryDataCrossTrade(delivery, localDelivery, remoteDelivery);
 	}
 }

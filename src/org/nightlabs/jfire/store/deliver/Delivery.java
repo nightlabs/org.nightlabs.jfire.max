@@ -38,7 +38,6 @@ import javax.jdo.JDOHelper;
 import javax.jdo.PersistenceManager;
 import javax.jdo.listener.StoreCallback;
 
-import org.nightlabs.jfire.idgenerator.IDGenerator;
 import org.nightlabs.jfire.security.User;
 import org.nightlabs.jfire.store.DeliveryNote;
 import org.nightlabs.jfire.store.deliver.ServerDeliveryProcessor.DeliverParams;
@@ -315,31 +314,10 @@ implements Serializable, StoreCallback
 	 */
 	private byte rollbackStatus = ROLLBACK_STATUS_NOT_DONE;
 
-//	protected static Base62Coder base62Coder = null;
-//	protected static Base62Coder getBase62Coder()
-//	{
-//		if (base62Coder == null)
-//			base62Coder = new Base62Coder();
-//
-//		return base62Coder;
-//	}
-
-	public Delivery(String organisationID, DeliveryID precursorID)
+	public Delivery(String organisationID, long deliveryID, DeliveryID precursorID)
 	{
-		this(organisationID);
+		this(organisationID, deliveryID);
 		this.precursorID = precursorID;
-	}
-
-	/**
-	 * This constructor will autogenerate the <tt>deliveryID</tt> with timestamp
-	 * + '-' + random. The numbers are base62encoded.
-	 */
-	public Delivery(String organisationID)
-	{
-		this(organisationID, IDGenerator.nextID(Delivery.class));
-//				getBase62Coder().encode(System.currentTimeMillis(), 1)
-//				+ '-' +
-//				getBase62Coder().encode((long)(Math.random() * Integer.MAX_VALUE), 1));
 	}
 
 	public Delivery(String organisationID, long deliveryID)
@@ -349,8 +327,6 @@ implements Serializable, StoreCallback
 
 		if (deliveryID < 0)
 			throw new IllegalArgumentException("deliveryID < 0");
-//		if (deliveryID == null)
-//			throw new NullPointerException("deliveryID");
 
 		this.organisationID = organisationID;
 		this.deliveryID = deliveryID;
@@ -940,7 +916,7 @@ implements Serializable, StoreCallback
 //		return articleLocals;
 //	}
 
-	public Set<Article> getArticles()
+	public Set<? extends Article> getArticles()
 	{
 		return articles;
 	}
@@ -963,7 +939,7 @@ implements Serializable, StoreCallback
 	/**
 	 * @param articleIDs Instances of {@link org.nightlabs.jfire.trade.id.ArticleID}
 	 */
-	public void setArticleIDs(Collection articleIDs)
+	public void setArticleIDs(Collection<ArticleID> articleIDs)
 	{
 		if (articleIDs == null)
 			throw new IllegalArgumentException("articleIDs must not be null!");
@@ -973,33 +949,33 @@ implements Serializable, StoreCallback
 			throw new IllegalStateException("Articles cannot be changed afterwards! They have already been set!");
 //			articles = null;
 
-		// check types in collection
-		for (Iterator it = articleIDs.iterator(); it.hasNext(); ) {
-			ArticleID articleID = (ArticleID) it.next();
-		}
+//		// check types in collection
+//		for (Iterator it = articleIDs.iterator(); it.hasNext(); ) {
+//			ArticleID articleID = (ArticleID) it.next();
+//		}
 		this.articleIDs = articleIDs;
 		this.deliveryNoteIDs = null; // hmmm... I think this is not necessary, but it doesn't hurt either
 	}
 
-//	/**
-//	 * @param articles Instances of {@link org.nightlabs.jfire.trade.Article}.
-//	 */
-//	public void setArticles(Collection articles)
-//	{
-//		if (articles == null)
-//			throw new IllegalArgumentException("articles must not be null!");
-//		
-//		if (articleIDs == null)
-//			articleIDs = new HashSet();
-//		else
-//			articleIDs.clear();
-//
-//		for (Iterator it = articles.iterator(); it.hasNext(); ) {
-//			Article article = (Article) it.next();
-//			articleIDs.add(JDOHelper.getObjectId(article));
-//		}
-//		this.articles = articles;
-//	}
+	/**
+	 * @param articles Instances of {@link org.nightlabs.jfire.trade.Article} or descendants of this class.
+	 */
+	public void setArticles(Set<Article> articles)
+	{
+		if (articles == null)
+			throw new IllegalArgumentException("articles must not be null!");
+
+		if (articleIDs == null)
+			articleIDs = new HashSet<ArticleID>();
+		else
+			articleIDs.clear();
+
+		for (Iterator it = articles.iterator(); it.hasNext(); ) {
+			Article article = (Article) it.next();
+			articleIDs.add((ArticleID) JDOHelper.getObjectId(article));
+		}
+		this.articles = articles;
+	}
 
 //	/**
 //	 * @return Returns instances of {@link ProductID}.

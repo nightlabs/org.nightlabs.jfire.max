@@ -55,7 +55,6 @@ import org.nightlabs.jdo.NLJDOHelper;
 import org.nightlabs.jfire.accounting.Accounting;
 import org.nightlabs.jfire.accounting.Invoice;
 import org.nightlabs.jfire.accounting.id.InvoiceID;
-import org.nightlabs.jfire.accounting.pay.ServerPaymentProcessor;
 import org.nightlabs.jfire.base.BaseSessionBeanImpl;
 import org.nightlabs.jfire.idgenerator.IDNamespaceDefault;
 import org.nightlabs.jfire.jbpm.JbpmLookup;
@@ -319,24 +318,6 @@ implements SessionBean
 			idNamespaceDefault.setCacheSizeClient(0);
 
 			pm.makePersistent(new EditLockTypeDeliveryNote(EditLockTypeDeliveryNote.EDIT_LOCK_TYPE_ID));
-		} finally {
-			pm.close();
-		}
-	}
-
-	/**
-	 * @throws ModuleException
-	 * 
-	 * @ejb.interface-method
-	 * @ejb.permission role-name="StoreManager.createProductTypeID"
-	 * @ejb.transaction type = "Required"
-	 **/
-	public String createProductTypeID() 
-	{
-		PersistenceManager pm = getPersistenceManager();
-		try {
-			logger.info("createProductTypeID() called by " + getPrincipalString());
-			return Store.getStore(pm).createProductTypeID();
 		} finally {
 			pm.close();
 		}

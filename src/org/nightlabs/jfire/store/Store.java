@@ -161,13 +161,6 @@ public class Store
 	
 	/**
 	 * @jdo.field persistence-modifier="persistent"
-	 */
-	private long nextProductTypeID = 0;
-	private static long _nextProductTypeID = -1;
-	private static Object _nextProductTypeIDMutex = new Object();
-
-	/**
-	 * @jdo.field persistence-modifier="persistent"
 	 */ 
 	private OrganisationLegalEntity mandator;
 
@@ -307,18 +300,6 @@ public class Store
 	protected void setOrganisationID(String organisationID)
 	{
 		this.organisationID = organisationID;
-	}
-
-	public String createProductTypeID()
-	{
-		synchronized (_nextProductTypeIDMutex) {
-			if (_nextProductTypeID < 0)
-				_nextProductTypeID = nextProductTypeID;
-
-			long res = _nextProductTypeID++;
-			nextProductTypeID = _nextProductTypeID;
-			return Long.toHexString(res);
-		}
 	}
 
 	protected PersistenceManager getPersistenceManager()
@@ -1495,6 +1476,7 @@ public class Store
 
 
 /////////// begin implementation of TransferRegistry /////////////
+	// TODO remove this - and use IDGenerator
 	private long nextTransferID = 0;
 	private static long _nextTransferID = -1;
 	private static Object _nextTransferIDMutex = new Object();
@@ -1539,9 +1521,6 @@ public class Store
 	{
 		if (_nextTransferID >= 0 && nextTransferID != _nextTransferID)
 			nextTransferID = _nextTransferID;
-
-		if (_nextProductTypeID >= 0 && nextProductTypeID != _nextProductTypeID)
-			nextProductTypeID = _nextProductTypeID;
 	}
 
 	public ProcessDefinition storeProcessDefinitionReceptionNote(TradeSide tradeSide, URL jbpmProcessDefinitionURL)

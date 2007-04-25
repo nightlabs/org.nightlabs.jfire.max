@@ -966,7 +966,7 @@ implements SessionBean
 				store.finalizeDeliveryNote(user, deliveryNote);
 
 				// now the delivery itself
-				Delivery delivery = new Delivery(getOrganisationID());
+				Delivery delivery = new Delivery(IDGenerator.getOrganisationID(), IDGenerator.nextID(Delivery.class));
 				delivery.setDeliveryDirection(Delivery.DELIVERY_DIRECTION_OUTGOING);
 				
 				delivery.setPartner(

@@ -89,7 +89,7 @@ import org.nightlabs.util.Utils;
  * @jdo.fetch-group name="Offer.currency" fields="currency"
  * @jdo.fetch-group name="Offer.order" fields="order"
  * @jdo.fetch-group name="Offer.createUser" fields="createUser"
- * @jdo.fetch-group name="Offer.this" fetch-groups="default" fields="offerLocal, order, articles, price, state, states"
+ * @jdo.fetch-group name="Offer.this" fetch-groups="default" fields="offerLocal, createUser, currency, order, articles, price, state, states"
  *
  * @jdo.fetch-group name="Statable.state" fields="state"
  * @jdo.fetch-group name="Statable.states" fields="states"

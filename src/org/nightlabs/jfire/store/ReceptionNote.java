@@ -47,6 +47,7 @@ import org.nightlabs.util.Utils;
  *
  * @jdo.fetch-group name="Statable.state" fields="state"
  * @jdo.fetch-group name="Statable.states" fields="states"
+ * @jdo.fetch-group name="ReceptionNote.this" fetch-groups="default" fields="receptionNoteLocal, articles, createDT, createUser, customerID, state, states, vendorID";
  */
 public class ReceptionNote
 implements
@@ -61,7 +62,7 @@ implements
 	// the following fetch-groups are virtual and processed in the detach callback
 	public static final String FETCH_GROUP_VENDOR_ID = "ReceptionNote.vendorID";
 	public static final String FETCH_GROUP_CUSTOMER_ID = "ReceptionNote.customerID";
-
+	public static final String FETCH_GROUP_THIS_RECEPTION_NOTE = "ReceptionNote.this";
 	/**
 	 * @jdo.field primary-key="true"
 	 * @jdo.column length="100"

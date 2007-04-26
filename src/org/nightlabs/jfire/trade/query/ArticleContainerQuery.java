@@ -5,6 +5,7 @@ import java.util.Set;
 
 import javax.jdo.Query;
 
+import org.apache.log4j.Logger;
 import org.nightlabs.jdo.query.JDOQuery;
 import org.nightlabs.jfire.accounting.Currency;
 import org.nightlabs.jfire.jbpm.graph.def.Statable;
@@ -19,6 +20,8 @@ import org.nightlabs.jfire.transfer.id.AnchorID;
 public class ArticleContainerQuery 
 extends JDOQuery<Set<ArticleContainer>>
 {
+	private static final Logger logger = Logger.getLogger(ArticleContainerQuery.class);
+	
 	public ArticleContainerQuery(Class articleContainerClass) 
 	{
 		if (articleContainerClass == null)
@@ -62,7 +65,7 @@ extends JDOQuery<Set<ArticleContainer>>
 		// WORKAROUND:
 		filter.append("\n && (" +
 				"this.createUser.organisationID == \""+createUserID.organisationID+"\" && " +
-				"this.createUser.userID == \""+createUserID.userID+"\" && " +
+				"this.createUser.userID == \""+createUserID.userID+"\"" +
 						")");			
 		}
 		if (vendorID != null) 
@@ -96,6 +99,10 @@ extends JDOQuery<Set<ArticleContainer>>
 //		
 //		if (priceAmountMax >= 0)
 //			filter.append("\n && this.price.amount <= :priceAmountMax");
+		
+		logger.debug("filter = "+filter);
+		
+		q.setFilter(filter.toString());
 		
 		return q;
 	}

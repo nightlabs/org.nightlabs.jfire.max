@@ -83,6 +83,11 @@ implements ValueConsumer, Serializable, IGraphicalInfoProvider
 	 * @jdo.field persistence-modifier="persistent"
 	 */	
 	private boolean allowNullOutputValue;
+	
+	/**
+	 * @jdo.field persistence-modifier="persistent"
+	 */	
+	private boolean showMessageInHeader;
 
 	/**
 	 * @jdo.field persistence-modifier="persistent"
@@ -285,7 +290,19 @@ implements ValueConsumer, Serializable, IGraphicalInfoProvider
 	public void setAllowNullOutputValue(boolean allowNullOutputValue) {
 		this.allowNullOutputValue = allowNullOutputValue;
 	}
+
+	/**
+	 * @return the showMessageInHeader
+	 */
+	public boolean isShowMessageInHeader() {
+		return showMessageInHeader;
+	}
+
+	/**
+	 * @param showMessageInHeader the showMessageInHeader to set
+	 */
+	public void setShowMessageInHeader(boolean showMessageInHeader) {
+		this.showMessageInHeader = showMessageInHeader;
+	}
 		
-	
-	
 }

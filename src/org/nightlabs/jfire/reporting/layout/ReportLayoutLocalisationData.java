@@ -26,6 +26,8 @@ import org.nightlabs.jfire.reporting.layout.id.ReportRegistryItemID;
 import org.nightlabs.util.Utils;
 
 /**
+ * Holds the contents of a properties file that is used in report localisation.
+ * 
  * @author Alexander Bieber <!-- alex [AT] nightlabs [DOT] de -->
  *
  * @jdo.persistence-capable
@@ -153,6 +155,12 @@ public class ReportLayoutLocalisationData implements StoreCallback, Serializable
 		return localisationData;
 	}
 	
+	/**
+	 * Loads the contents of the given file into the {@link #localisationData} member.
+	 * 
+	 * @param f The {@link File} to load. 
+	 * @throws IOException
+	 */
 	public void loadFile(File f)
 	throws IOException
 	{
@@ -201,7 +209,14 @@ public class ReportLayoutLocalisationData implements StoreCallback, Serializable
 		Query q = pm.newNamedQuery(ReportLayoutLocalisationData.class, "getReportLayoutLocalisationBundle");
 		return (Collection<ReportLayoutLocalisationData>) q.execute(reportLayout);
 	}
-
+	
+	/**
+	 * Assuming the given file name is was build by the naming conventions of
+	 * resouce bundle properties files, this method extracts the whole locale part of a given file name.
+	 * 
+	 * @param fileName The fileName the locale part should be extractd from.
+	 * @return The locale part of a given file name, null if none could be found.
+	 */
 	public static String extractLocale(String fileName) {
 		Matcher matcher = localePattern.matcher(fileName);
 		if (matcher.matches())
@@ -209,6 +224,14 @@ public class ReportLayoutLocalisationData implements StoreCallback, Serializable
 		return null;
 	}
 	
+	/**
+	 * Assuming the given file name is was build by the naming conventions of
+	 * resouce bundle properties files, this method extracts the language out
+	 * of the locale part of the given file name.
+	 * 
+	 * @param fileName The fileName the language part should be extractd from.
+	 * @return The language part of a given file name, null if none could be found.
+	 */
 	public static String extractLanguage(String fileName) {
 		Matcher matcher = localePattern.matcher(fileName);
 		if (matcher.matches())
@@ -216,6 +239,14 @@ public class ReportLayoutLocalisationData implements StoreCallback, Serializable
 		return null;
 	}
 	
+	/**
+	 * Assuming the given file name is was build by the naming conventions of
+	 * resouce bundle properties files, this method extracts the country out
+	 * of the locale part of the given file name.
+	 * 
+	 * @param fileName The fileName the language part should be extractd from.
+	 * @return The language part of a given file name, null if none could be found.
+	 */
 	public static String extractCountry(String fileName) {
 		Matcher matcher = localePattern.matcher(fileName);
 		if (matcher.matches())

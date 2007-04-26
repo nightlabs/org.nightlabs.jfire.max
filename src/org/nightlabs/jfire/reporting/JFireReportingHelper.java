@@ -64,6 +64,7 @@ public class JFireReportingHelper {
 		private boolean closePM;
 		private PersistenceManager pm;		
 		private Map<String, Object> vars = new HashMap<String, Object>();
+		private Map<String, Object> parameters = new HashMap<String, Object>();
 	
 		public PersistenceManager getPersistenceManager() {
 			return pm;
@@ -77,11 +78,17 @@ public class JFireReportingHelper {
 			return vars;
 		}
 
-		public void open(PersistenceManager pm, boolean closePM) {
+		public Map<String, Object> getParameters() {
+			return parameters;
+		}
+		
+		public void open(PersistenceManager pm, Map<String, Object> params, boolean closePM) {
 			JFireReportingHelper.logger.debug("Opening (JFireReporting)Helper with pm = "+pm+" and closePM="+closePM);
 			this.closePM = closePM;
 			setPersistenceManager(pm);
 			getVars().clear();
+			getParameters().clear();
+			getParameters().putAll(params);
 		}
 		
 		public void close() {
@@ -91,6 +98,7 @@ public class JFireReportingHelper {
 				pm.close();
 			}
 			getVars().clear();
+			getParameters().clear();
 		}
 	}
 	
@@ -115,10 +123,11 @@ public class JFireReportingHelper {
 	 * Do not call this method direcly, it is called by the {@link RenderManager}.+
 	 * 
 	 * @param pm The PersistenceManager to use
+	 * @param params The report params set for the next execution.
 	 * @param closePM Whether to close the pm after using the Helper.
 	 */
-	public static void open(PersistenceManager pm, boolean closePM) {
-		helpers.get().open(pm, closePM);
+	public static void open(PersistenceManager pm, Map<String, Object> params, boolean closePM) {
+		helpers.get().open(pm, params, closePM);
 	}
 	
 	/**
@@ -162,6 +171,26 @@ public class JFireReportingHelper {
 	 */
 	public static Map<String, Object> getVars() {
 		return helpers.get().getVars();
+	}
+	
+	/**
+	 * Get the map of all parameters of the currently running report.
+	 * This will be set by {@link RenderManager} before starting rendering the report.
+	 * 
+	 * @return The map named parameters for the currently running report.
+	 */
+	public static Map<String, Object> getParameters() {
+		return helpers.get().getParameters();
+	}
+	
+	/**
+	 * Get the parameter with the given name for the currently running report.
+	 * 
+	 * @return The parameter with the given name for the currently running report.
+	 * @see #getParameters()
+	 */
+	public static Object getParameter(String name) {
+		return helpers.get().getParameters().get(name);
 	}
 	
 	/**

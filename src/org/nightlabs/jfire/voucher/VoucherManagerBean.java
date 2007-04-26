@@ -70,7 +70,6 @@ import org.nightlabs.jfire.store.deliver.ModeOfDeliveryFlavour;
 import org.nightlabs.jfire.store.deliver.ServerDeliveryProcessorManual;
 import org.nightlabs.jfire.store.deliver.id.DeliveryConfigurationID;
 import org.nightlabs.jfire.store.deliver.id.ModeOfDeliveryFlavourID;
-import org.nightlabs.jfire.store.deliver.id.ModeOfDeliveryID;
 import org.nightlabs.jfire.store.deliver.id.ServerDeliveryProcessorID;
 import org.nightlabs.jfire.store.id.ProductID;
 import org.nightlabs.jfire.store.id.ProductTypeID;
@@ -988,15 +987,15 @@ implements SessionBean
 				DeliveryData deliveryData = new DeliveryData(delivery);
 				deliveryData = (DeliveryData) pm.makePersistent(deliveryData);
 				delivery.setDeliverBeginClientResult(new DeliveryResult(
-						getOrganisationID(), DeliveryResult.CODE_APPROVED_NO_EXTERNAL,
+						DeliveryResult.CODE_APPROVED_NO_EXTERNAL,
 						null, null));
 				store.deliverBegin(user, deliveryData);
 				delivery.setDeliverDoWorkClientResult(new DeliveryResult(
-						getOrganisationID(), DeliveryResult.CODE_DELIVERED_NO_EXTERNAL,
+						DeliveryResult.CODE_DELIVERED_NO_EXTERNAL,
 						null, null));
 				store.deliverDoWork(user, deliveryData);
 				delivery.setDeliverEndClientResult(new DeliveryResult(
-						getOrganisationID(), DeliveryResult.CODE_COMMITTED_NO_EXTERNAL,
+						DeliveryResult.CODE_COMMITTED_NO_EXTERNAL,
 						null, null));
 				store.deliverEnd(user, deliveryData);
 				// ...pseudo delivery done

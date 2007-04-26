@@ -38,6 +38,8 @@ import org.nightlabs.jfire.jbpm.graph.def.id.ProcessDefinitionID;
  *
  * @jdo.create-objectid-class
  *		field-order="organisationID, processDefinitionID"
+ *
+ * @jdo.fetch-group name="ProcessDefinition.this" fetch-groups="default" fields="processDefinitionVersion, processDefinitionVersions"
  */
 public class ProcessDefinition
 implements Serializable
@@ -45,6 +47,8 @@ implements Serializable
 	private static final Logger logger = Logger.getLogger(ProcessDefinition.class);
 	private static final long serialVersionUID = 1L;
 
+	public static final String FETCH_GROUP_THIS_PROCESS_DEFINITION = "ProcessDefinition.this"; 
+	
 	public static ProcessDefinitionID getProcessDefinitionID(org.jbpm.graph.def.ProcessDefinition jbpmProcessDefinition)
 	{
 		String pdName = jbpmProcessDefinition.getName();

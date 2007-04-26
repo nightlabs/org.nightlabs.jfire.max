@@ -11,6 +11,7 @@ import org.nightlabs.jfire.idgenerator.IDGenerator;
 import org.nightlabs.jfire.jbpm.graph.def.id.ProcessDefinitionID;
 import org.nightlabs.jfire.security.User;
 import org.nightlabs.jfire.trade.state.id.StateDefinitionID;
+import org.nightlabs.util.Utils;
 
 /**
  * @author Marco Schulze - marco at nightlabs dot de
@@ -285,5 +286,32 @@ implements Serializable
 
 		return state;
 	}
+
+	@Override
+	public boolean equals(Object obj) 
+	{
+		if (obj == null)
+			return false;
 		
+		if (!(obj instanceof StateDefinition))
+			return false;
+		
+		StateDefinition stateDefinition = (StateDefinition) obj;
+
+		return
+			Utils.equals(stateDefinition.processDefinitionID, this.processDefinitionID) && 
+			Utils.equals(stateDefinition.processDefinitionOrganisationID, this.processDefinitionOrganisationID) &&
+			Utils.equals(stateDefinition.stateDefinitionOrganisationID, this.stateDefinitionOrganisationID) &&
+			Utils.equals(stateDefinition.stateDefinitionID, this.stateDefinitionID);
+	}
+		
+	@Override
+	public int hashCode()
+	{
+		return
+				Utils.hashCode(this.processDefinitionID) ^ 
+				Utils.hashCode(this.processDefinitionOrganisationID) ^
+				Utils.hashCode(this.stateDefinitionOrganisationID) ^
+				Utils.hashCode(this.stateDefinitionID);
+	}
 }

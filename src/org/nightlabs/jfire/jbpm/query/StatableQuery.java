@@ -5,20 +5,22 @@ import java.util.Set;
 
 import javax.jdo.Query;
 
+import org.apache.log4j.Logger;
 import org.nightlabs.jdo.query.JDOQuery;
 import org.nightlabs.jfire.jbpm.graph.def.Statable;
 import org.nightlabs.jfire.trade.state.id.StateDefinitionID;
 
 /**
  * A Query for searching for Implementations of {@link Statable}
- * This {@link JDOQuery} assumes that the fields implementated
- * 
+ * org.nightlabs.jfire.jbpm.query
  * @author Daniel.Mazurek [at] NightLabs [dot] de
  *
  */
 public class StatableQuery 
 extends JDOQuery<Set<Statable>> 
 {	
+	private static final Logger logger = Logger.getLogger(StatableQuery.class);
+	
 //	public abstract Class getStatableClass();
 	
 	public StatableQuery(Class statableClass) 
@@ -51,10 +53,10 @@ extends JDOQuery<Set<Statable>>
 //				filter.append("\n && JDOHelper.getObjectId(this.stateDefinition) == :stateDefinitionID");
 			// WORKAROUND:
 			filter.append("\n && (" +
-					"this.stateDefinition.organisationID == \""+stateDefinitionID.processDefinitionOrganisationID+"\" && " +
-					"this.stateDefinition.processDefinitionID == \""+stateDefinitionID.processDefinitionID+"\" && " +
-					"this.stateDefinition.stateDefinitionOrganisationID == \""+stateDefinitionID.stateDefinitionOrganisationID+"\"" +
-					"this.stateDefinition.stateDefinitionID == \""+stateDefinitionID.stateDefinitionID+"\"" +					
+					"this.state.stateDefinition.processDefinitionOrganisationID == \""+stateDefinitionID.processDefinitionOrganisationID+"\" && " +
+					"this.state.stateDefinition.processDefinitionID == \""+stateDefinitionID.processDefinitionID+"\" && " +
+					"this.state.stateDefinition.stateDefinitionOrganisationID == \""+stateDefinitionID.stateDefinitionOrganisationID+"\" && " +
+					"this.state.stateDefinition.stateDefinitionID == \""+stateDefinitionID.stateDefinitionID+"\"" +					
 							")");
 		}
 
@@ -63,6 +65,10 @@ extends JDOQuery<Set<Statable>>
 
 		if (stateCreateDTMax != null)
 			filter.append("\n && this.createDT <= :stateCreateDTMax");		
+	
+		logger.debug("filter == "+filter);
+		
+		q.setFilter(filter.toString());
 		
 		return q;
 	}

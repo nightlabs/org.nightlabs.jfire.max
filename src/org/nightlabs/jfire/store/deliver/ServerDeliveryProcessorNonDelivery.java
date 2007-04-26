@@ -96,7 +96,7 @@ public class ServerDeliveryProcessorNonDelivery extends ServerDeliveryProcessor
 	 */
 	protected DeliveryResult externalDeliverBegin(DeliverParams deliverParams) throws DeliveryException
 	{
-		return new DeliveryResult(deliverParams.store.getOrganisationID(),
+		return new DeliveryResult(
 				DeliveryResult.CODE_POSTPONED,
 				(String)null,
 				(Throwable)null);
@@ -108,7 +108,7 @@ public class ServerDeliveryProcessorNonDelivery extends ServerDeliveryProcessor
 	protected DeliveryResult externalDeliverDoWork(DeliverParams deliverParams)
 			throws DeliveryException
 	{
-		return new DeliveryResult(deliverParams.store.getOrganisationID(),
+		return new DeliveryResult(
 				DeliveryResult.CODE_POSTPONED,
 				(String)null,
 				(Throwable)null);
@@ -119,7 +119,7 @@ public class ServerDeliveryProcessorNonDelivery extends ServerDeliveryProcessor
 	 */
 	protected DeliveryResult externalDeliverCommit(DeliverParams deliverParams) throws DeliveryException
 	{
-		return new DeliveryResult(deliverParams.store.getOrganisationID(),
+		return new DeliveryResult(
 				DeliveryResult.CODE_POSTPONED,
 				(String)null,
 				(Throwable)null);

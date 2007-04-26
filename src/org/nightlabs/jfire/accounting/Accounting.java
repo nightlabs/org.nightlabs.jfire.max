@@ -589,7 +589,6 @@ public class Accounting
 		if (serverPaymentResult == null)
 			throw new PaymentException(
 					new PaymentResult(
-							getOrganisationID(),
 							PaymentResult.CODE_FAILED,
 							"paymentData.getPayment().getPayDoWorkServerResult() returned null! You probably forgot to set it in your ServerPaymentProcessor (\""+serverPaymentProcessor.getPrimaryKey()+"\")!",
 							(Throwable)null));
@@ -611,7 +610,6 @@ public class Accounting
 		} catch (Exception x) {
 			throw new PaymentException(
 					new PaymentResult(
-							getOrganisationID(),
 							PaymentResult.CODE_FAILED,
 							"Calling InvoiceActionHandler.onPayDoWork failed!",
 							x));
@@ -644,7 +642,6 @@ public class Accounting
 		if (serverPaymentResult == null)
 			throw new PaymentException(
 					new PaymentResult(
-							getOrganisationID(),
 							PaymentResult.CODE_FAILED,
 							"paymentData.getPayment().getPayEndServerResult() returned null! You probably forgot to set it in your ServerPaymentProcessor (\""+serverPaymentProcessor.getPrimaryKey()+"\")!",
 							(Throwable)null));
@@ -687,7 +684,6 @@ public class Accounting
 		} catch (Exception x) {
 			throw new PaymentException(
 					new PaymentResult(
-							getOrganisationID(),
 							PaymentResult.CODE_FAILED,
 							"Calling InvoiceActionHandler.onPayEnd failed!",
 							x));
@@ -711,7 +707,6 @@ public class Accounting
 		} catch (Exception x) {
 			throw new PaymentException(
 					new PaymentResult(
-							getOrganisationID(),
 							PaymentResult.CODE_FAILED,
 							"Signalling transition \"" + JbpmConstantsInvoice.Both.TRANSITION_NAME_PAY + "\" failed!",
 							x));
@@ -867,7 +862,6 @@ public class Accounting
 		if (serverPaymentResult == null)
 			throw new PaymentException(
 					new PaymentResult(
-							getOrganisationID(),
 							PaymentResult.CODE_FAILED,
 							"paymentData.getPayment().getPayBeginServerResult() returned null! You probably forgot to set it in your ServerPaymentProcessor (\""+serverPaymentProcessor.getPrimaryKey()+"\")!",
 							(Throwable)null));
@@ -889,7 +883,6 @@ public class Accounting
 		} catch (Exception x) {
 			throw new PaymentException(
 					new PaymentResult(
-							getOrganisationID(),
 							PaymentResult.CODE_FAILED,
 							"Calling InvoiceActionHandler.onPayBegin failed!",
 							x));

@@ -29,7 +29,7 @@ package org.nightlabs.jfire.accounting.pay;
 import java.io.Serializable;
 
 import org.nightlabs.jfire.accounting.pay.ServerPaymentProcessor.PayParams;
-import org.nightlabs.math.Base62Coder;
+import org.nightlabs.jfire.idgenerator.IDGenerator;
 import org.nightlabs.util.Utils;
 
 /**
@@ -48,6 +48,8 @@ import org.nightlabs.util.Utils;
 public class PaymentResult
 implements Serializable
 {
+	private static final long serialVersionUID = 1L;
+
 	/**
 	 * @jdo.field primary-key="true"
 	 * @jdo.column length="100"
@@ -55,9 +57,8 @@ implements Serializable
 	private String organisationID;
 	/**
 	 * @jdo.field primary-key="true"
-	 * @jdo.column length="100"
 	 */
-	private String paymentResultID;
+	private long paymentResultID;
 
 	/**
 	 * @deprecated Only for JDO!
@@ -66,23 +67,23 @@ implements Serializable
 	{
 	}
 
-	protected static Base62Coder base62Coder = null;
-	protected static Base62Coder getBase62Coder()
-	{
-		if (base62Coder == null)
-			base62Coder = new Base62Coder();
-
-		return base62Coder;
-	}
-
-	public static String createPaymentResultID()
-	{
-		return
-				getBase62Coder().encode(System.currentTimeMillis(), 1)
-				+ '-' +
-				getBase62Coder().encode((long)(Math.random() * Integer.MAX_VALUE), 1);
-	}
-
+//	protected static Base62Coder base62Coder = null;
+//	protected static Base62Coder getBase62Coder()
+//	{
+//		if (base62Coder == null)
+//			base62Coder = new Base62Coder();
+//
+//		return base62Coder;
+//	}
+//
+//	public static String createPaymentResultID()
+//	{
+//		return
+//				getBase62Coder().encode(System.currentTimeMillis(), 1)
+//				+ '-' +
+//				getBase62Coder().encode((long)(Math.random() * Integer.MAX_VALUE), 1);
+//	}
+//
 //	public PaymentResult(String organisationID)
 //	{
 //		this(organisationID, createPaymentResultID());
@@ -94,15 +95,15 @@ implements Serializable
 //		this.paymentResultID = paymentResultID;
 //	}
 
-	public PaymentResult(String organisationID, String code, String text, Throwable error)
+	public PaymentResult(String code, String text, Throwable error)
 	{
 		this(
-				organisationID,
-				createPaymentResultID(),
+				IDGenerator.getOrganisationID(),
+				IDGenerator.nextID(PaymentResult.class),
 				code, text, error);
 	}
 
-	public PaymentResult(String organisationID, String paymentResultID, String code, String text, Throwable error)
+	public PaymentResult(String organisationID, long paymentResultID, String code, String text, Throwable error)
 	{
 		this.organisationID = organisationID;
 		this.paymentResultID = paymentResultID;
@@ -114,8 +115,8 @@ implements Serializable
 	public PaymentResult(String organisationID, Throwable error)
 	{
 		this(
-				organisationID,
-				createPaymentResultID(),
+				IDGenerator.getOrganisationID(),
+				IDGenerator.nextID(PaymentResult.class),
 				error instanceof PaymentException ? ((PaymentException)error).getPaymentResult().getCode() : CODE_FAILED,
 				error instanceof PaymentException ? ((PaymentException)error).getPaymentResult().getText() : error.getLocalizedMessage(),
 				error instanceof PaymentException ? ((PaymentException)error).getPaymentResult().getError() : error);
@@ -249,7 +250,7 @@ implements Serializable
 	/**
 	 * @return Returns the paymentResultID.
 	 */
-	public String getPaymentResultID()
+	public long getPaymentResultID()
 	{
 		return paymentResultID;
 	}

@@ -28,6 +28,7 @@ package org.nightlabs.jfire.store.deliver;
 
 import java.io.Serializable;
 
+import org.nightlabs.jfire.idgenerator.IDGenerator;
 import org.nightlabs.math.Base62Coder;
 import org.nightlabs.util.Utils;
 
@@ -47,6 +48,8 @@ import org.nightlabs.util.Utils;
 public class DeliveryResult
 implements Serializable
 {
+	private static final long serialVersionUID = 1L;
+
 	/**
 	 * @jdo.field primary-key="true"
 	 * @jdo.column length="100"
@@ -54,9 +57,8 @@ implements Serializable
 	private String organisationID;
 	/**
 	 * @jdo.field primary-key="true"
-	 * @jdo.column length="100"
 	 */
-	private String deliveryResultID;
+	private long deliveryResultID;
 
 	/**
 	 * @deprecated Only for JDO!
@@ -65,23 +67,23 @@ implements Serializable
 	{
 	}
 
-	protected static Base62Coder base62Coder = null;
-	protected static Base62Coder getBase62Coder()
-	{
-		if (base62Coder == null)
-			base62Coder = new Base62Coder();
-
-		return base62Coder;
-	}
-
-	public static String createDeliveryResultID()
-	{
-		return
-				getBase62Coder().encode(System.currentTimeMillis(), 1)
-				+ '-' +
-				getBase62Coder().encode((long)(Math.random() * Integer.MAX_VALUE), 1);
-	}
-
+//	protected static Base62Coder base62Coder = null;
+//	protected static Base62Coder getBase62Coder()
+//	{
+//		if (base62Coder == null)
+//			base62Coder = new Base62Coder();
+//
+//		return base62Coder;
+//	}
+//
+//	public static String createDeliveryResultID()
+//	{
+//		return
+//				getBase62Coder().encode(System.currentTimeMillis(), 1)
+//				+ '-' +
+//				getBase62Coder().encode((long)(Math.random() * Integer.MAX_VALUE), 1);
+//	}
+//
 //	public DeliveryResult(String organisationID)
 //	{
 //		this(organisationID, createDeliveryResultID());
@@ -93,15 +95,15 @@ implements Serializable
 //		this.deliveryResultID = deliveryResultID;
 //	}
 
-	public DeliveryResult(String organisationID, String code, String text, Throwable error)
+	public DeliveryResult(String code, String text, Throwable error)
 	{
 		this(
-				organisationID,
-				createDeliveryResultID(),
+				IDGenerator.getOrganisationID(),
+				IDGenerator.nextID(DeliveryResult.class),
 				code, text, error);
 	}
 
-	public DeliveryResult(String organisationID, String deliveryResultID, String code, String text, Throwable error)
+	public DeliveryResult(String organisationID, long deliveryResultID, String code, String text, Throwable error)
 	{
 		this.organisationID = organisationID;
 		this.deliveryResultID = deliveryResultID;
@@ -110,11 +112,11 @@ implements Serializable
 		this.setError(error);
 	}
 
-	public DeliveryResult(String organisationID, Throwable error)
+	public DeliveryResult(Throwable error)
 	{
 		this(
-				organisationID,
-				createDeliveryResultID(),
+				IDGenerator.getOrganisationID(),
+				IDGenerator.nextID(DeliveryResult.class),
 				error instanceof DeliveryException ? ((DeliveryException)error).getDeliveryResult().getCode() : CODE_FAILED,
 				error instanceof DeliveryException ? ((DeliveryException)error).getDeliveryResult().getText() : error.getLocalizedMessage(),
 				error instanceof DeliveryException ? ((DeliveryException)error).getDeliveryResult().getError() : error);
@@ -248,7 +250,7 @@ implements Serializable
 	/**
 	 * @return Returns the deliveryResultID.
 	 */
-	public String getDeliveryResultID()
+	public long getDeliveryResultID()
 	{
 		return deliveryResultID;
 	}

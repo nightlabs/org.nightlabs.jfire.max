@@ -25,16 +25,25 @@
  ******************************************************************************/
 package org.nightlabs.jfire.store.deliver;
 
+import java.rmi.RemoteException;
 import java.util.Set;
 
+import javax.ejb.CreateException;
 import javax.jdo.JDOHelper;
 import javax.jdo.JDOObjectNotFoundException;
 import javax.jdo.PersistenceManager;
+import javax.naming.NamingException;
 
+import org.apache.log4j.Logger;
+import org.nightlabs.ModuleException;
+import org.nightlabs.jfire.base.Lookup;
 import org.nightlabs.jfire.idgenerator.IDGenerator;
 import org.nightlabs.jfire.organisation.Organisation;
 import org.nightlabs.jfire.store.Store;
+import org.nightlabs.jfire.store.StoreManager;
+import org.nightlabs.jfire.store.StoreManagerUtil;
 import org.nightlabs.jfire.store.deliver.id.CrossTradeDeliveryCoordinatorID;
+import org.nightlabs.jfire.store.deliver.id.DeliveryID;
 import org.nightlabs.jfire.store.deliver.id.ServerDeliveryProcessorID;
 import org.nightlabs.jfire.trade.Article;
 import org.nightlabs.jfire.trade.LegalEntity;
@@ -136,65 +145,253 @@ public class CrossTradeDeliveryCoordinator
 	}
 
 	public void performCrossTradeDelivery(Set<Article> articles)
+	throws ModuleException
 	{
-		if (articles.isEmpty())
-			throw new IllegalArgumentException("Param articles is empty!");
+		try {
+			if (articles.isEmpty())
+				throw new IllegalArgumentException("Param articles is empty!");
 
-		// check whether all articles are to be delivered between the same LegalEntities and in the same direction
-		// and whether they are both OrganisationLegalEntities
-		OrganisationLegalEntity from = null;
-		OrganisationLegalEntity to = null;
-		for (Article article : articles) {
-			LegalEntity _from = article.getOrder().getVendor();
-			LegalEntity _to = article.getOrder().getCustomer();
+			// check whether all articles are to be delivered between the same LegalEntities and in the same direction
+			// and whether they are both OrganisationLegalEntities
+			OrganisationLegalEntity from = null;
+			OrganisationLegalEntity to = null;
+			for (Article article : articles) {
+				LegalEntity _from = article.getOrder().getVendor();
+				LegalEntity _to = article.getOrder().getCustomer();
 
-			if (!(_from instanceof OrganisationLegalEntity))
-				throw new IllegalArgumentException("Article.vendor is not an OrganisationLegalEntity: " + article.getPrimaryKey());
+				if (!(_from instanceof OrganisationLegalEntity))
+					throw new IllegalArgumentException("Article.vendor is not an OrganisationLegalEntity: " + article.getPrimaryKey());
 
-			if (!(_to instanceof OrganisationLegalEntity))
-				throw new IllegalArgumentException("Article.customer is not an OrganisationLegalEntity: " + article.getPrimaryKey());
+				if (!(_to instanceof OrganisationLegalEntity))
+					throw new IllegalArgumentException("Article.customer is not an OrganisationLegalEntity: " + article.getPrimaryKey());
 
-			if (article.isReversing()) {
-				LegalEntity tmp = _from;
-				_from = _to;
-				_to = tmp;
+				if (article.isReversing()) {
+					LegalEntity tmp = _from;
+					_from = _to;
+					_to = tmp;
+				}
+
+				if (from == null)
+					from = (OrganisationLegalEntity) _from;
+				else {
+					if (!from.equals(_from))
+						throw new IllegalArgumentException("Not all articles have the same from-LegalEntity (= sender) for the delivery!");
+				}
+
+				if (to == null)
+					to = (OrganisationLegalEntity) _to;
+				else {
+					if (!to.equals(_to))
+						throw new IllegalArgumentException("Not all articles have the same to-LegalEntity (= receipient) for the delivery!");				
+				}
 			}
 
-			if (from == null)
-				from = (OrganisationLegalEntity) _from;
-			else {
-				if (!from.equals(_from))
-					throw new IllegalArgumentException("Not all articles have the same from-LegalEntity (= sender) for the delivery!");
-			}
+			PersistenceManager pm = getPersistenceManager();
+			Store store = Store.getStore(pm);
+			OrganisationLegalEntity mandator = store.getMandator();
 
-			if (to == null)
-				to = (OrganisationLegalEntity) _to;
-			else {
-				if (!to.equals(_to))
-					throw new IllegalArgumentException("Not all articles have the same to-LegalEntity (= receipient) for the delivery!");				
-			}
-		}
-
-		PersistenceManager pm = getPersistenceManager();
-		Store store = Store.getStore(pm);
-		OrganisationLegalEntity mandator = store.getMandator();
-
-		if (!mandator.equals(from) && !mandator.equals(to))
+			if (!mandator.equals(from) && !mandator.equals(to))
 				throw new IllegalStateException("Neither from-LegalEntity nor to-LegalEntity is the local organisation!");
 
-		// from and to are now defined and we have to create a Delivery
-		// we actually create TWO deliveries - one for the local side and one for the remote side, where the client-side of each is fake
-		Delivery localDelivery = createDelivery(mandator, from, to, articles, false);
-		Delivery remoteDelivery = createDelivery(mandator, from, to, articles, true);
+			// from and to are now defined and we have to create a Delivery
+			// we actually create TWO deliveries - one for the local side and one for the remote side, where the client-side of each is fake
+			Delivery localDelivery = createDelivery(mandator, from, to, articles, false);
+			DeliveryID localDeliveryID = DeliveryID.create(localDelivery.getOrganisationID(), localDelivery.getDeliveryID());
+			Delivery remoteDelivery = createDelivery(mandator, from, to, articles, true);
+			DeliveryID remoteDeliveryID = DeliveryID.create(remoteDelivery.getOrganisationID(), remoteDelivery.getDeliveryID());
 
-		DeliveryData localDeliveryData = createDeliveryData(mandator, from, to, localDelivery, localDelivery, remoteDelivery);
-		DeliveryData remoteDeliveryData = createDeliveryData(mandator, from, to, remoteDelivery, localDelivery, remoteDelivery);
+			DeliveryData localDeliveryData = createDeliveryData(mandator, from, to, localDelivery, localDelivery, remoteDelivery);
+			DeliveryData remoteDeliveryData = createDeliveryData(mandator, from, to, remoteDelivery, localDelivery, remoteDelivery);
 
-		// the local stuff is stored here - the remote stuff is solely stored in the remote organisation - at least for now
+			StoreManager localStoreManager = createStoreManager(null);
+			StoreManager remoteStoreManager = createStoreManager(localDelivery.getPartner().getOrganisationID());
 
-		// simulate 
+			// the local stuff is stored here - the remote stuff is solely stored in the remote organisation - at least for now
+
+			boolean forceRollback = false;
+
+//			// step 1: simulate the client delivery for local side
+//			localDelivery.setDeliverBeginClientResult(new DeliveryResult(DeliveryResult.CODE_APPROVED_NO_EXTERNAL, null, null));
+//
+//			// step 2: deliver begin with local server
+//			DeliveryResult remoteClientDeliverBeginResult;
+//			try {
+//				DeliveryResult localServerDeliverBeginResult = localStoreManager.deliverBegin(localDeliveryData);
+//				if (localServerDeliverBeginResult.isFailed()) {
+//					forceRollback = true;
+//					remoteClientDeliverBeginResult = new DeliveryResult(localServerDeliverBeginResult.getCode(), localServerDeliverBeginResult.getText(), null);
+//				}
+//				else
+//					remoteClientDeliverBeginResult = new DeliveryResult(DeliveryResult.CODE_APPROVED_NO_EXTERNAL, null, null);
+//			} catch (Throwable t) {
+//				forceRollback = true;
+//				remoteClientDeliverBeginResult = new DeliveryResult(t);
+//			}
+//
+//			// step 3: simulate the client delivery for REMOTE side
+//			remoteDelivery.setDeliverBeginClientResult(remoteClientDeliverBeginResult);
+//
+//			// step 4: deliver begin with REMOTE server
+//			DeliveryResult localClientDeliveryDoWorkResult;
+//			try {
+//				DeliveryResult remoteServerDeliverBeginResult = remoteStoreManager.deliverBegin(remoteDeliveryData);
+//				if (remoteServerDeliverBeginResult.isFailed()) {
+//					forceRollback = true;
+//					localClientDeliveryDoWorkResult = new DeliveryResult(remoteServerDeliverBeginResult.getCode(), remoteServerDeliverBeginResult.getText(), null);
+//				}
+//				else
+//					localClientDeliveryDoWorkResult = new DeliveryResult(DeliveryResult.CODE_APPROVED_NO_EXTERNAL, null, null);
+//			} catch (Throwable t) {
+//				forceRollback = true;
+//				localClientDeliveryDoWorkResult = new DeliveryResult(t);
+//			}
+//
+//			// step 5: deliver doWork with local server
+//			DeliveryResult remoteClientDeliveryDoWorkResult;
+//			try {
+//				DeliveryResult localServerDeliverDoWorkResult = localStoreManager.deliverDoWork(localDeliveryID, localClientDeliveryDoWorkResult, forceRollback);
+//				if (localServerDeliverDoWorkResult.isFailed()) {
+//					forceRollback = true;
+//					remoteClientDeliveryDoWorkResult = new DeliveryResult(localServerDeliverDoWorkResult.getCode(), localServerDeliverDoWorkResult.getText(), null);
+//				}
+//				else
+//					remoteClientDeliveryDoWorkResult = new DeliveryResult(DeliveryResult.CODE_APPROVED_NO_EXTERNAL, null, null);
+//			} catch (Throwable t) {
+//				forceRollback = true;
+//				remoteClientDeliveryDoWorkResult = new DeliveryResult(t);
+//			}
+//
+//			// step 6: deliver doWork with REMOTE server
+//			DeliveryResult localClientDeliveryEndResult;
+//			try {
+//				DeliveryResult remoteServerDeliverDoWorkResult = remoteStoreManager.deliverDoWork(remoteDeliveryID, remoteClientDeliveryDoWorkResult, forceRollback);
+//				if (remoteServerDeliverDoWorkResult.isFailed()) {
+//					forceRollback = true;
+//					localClientDeliveryEndResult = new DeliveryResult(remoteServerDeliverDoWorkResult.getCode(), remoteServerDeliverDoWorkResult.getText(), null);
+//				}
+//				else
+//					localClientDeliveryEndResult = new DeliveryResult(DeliveryResult.CODE_APPROVED_NO_EXTERNAL, null, null);
+//			} catch (Throwable t) {
+//				forceRollback = true;
+//				localClientDeliveryEndResult = new DeliveryResult(t);
+//			}
+//
+//			// step 7: deliver end with local server
+//			DeliveryResult remoteClientDeliveryEndResult;
+//			try {
+//				DeliveryResult localServerDeliverEndResult = localStoreManager.deliverEnd(localDeliveryID, localClientDeliveryEndResult, forceRollback);
+//
+//			} catch (Throwable t) {
+//				forceRollback = true;
+//				remoteClientDeliveryEndResult = new DeliveryResult(t);
+//			}
+//
+//			DeliveryResult remoteServerDeliverEndResult = remoteStoreManager.deliverEnd(localDeliveryID, new DeliveryResult(DeliveryResult.CODE_APPROVED_NO_EXTERNAL, null, null), forceRollback);
+
+			// step 1: simulate the client delivery for remote side
+			remoteDelivery.setDeliverBeginClientResult(new DeliveryResult(DeliveryResult.CODE_APPROVED_NO_EXTERNAL, null, null));
+
+			// step 2: deliver begin with remote server
+			DeliveryResult localClientDeliverBeginResult;
+			try {
+				DeliveryResult remoteServerDeliverBeginResult = remoteStoreManager.deliverBegin(remoteDeliveryData);
+				if (remoteServerDeliverBeginResult.isFailed()) {
+					forceRollback = true;
+					localClientDeliverBeginResult = new DeliveryResult(remoteServerDeliverBeginResult.getCode(), remoteServerDeliverBeginResult.getText(), null);
+				}
+				else
+					localClientDeliverBeginResult = new DeliveryResult(DeliveryResult.CODE_APPROVED_NO_EXTERNAL, null, null);
+			} catch (Throwable t) {
+				forceRollback = true;
+				localClientDeliverBeginResult = new DeliveryResult(t);
+			}
+
+			// step 3: simulate the client delivery for local side
+			localDelivery.setDeliverBeginClientResult(localClientDeliverBeginResult);
+
+			// step 4: deliver begin with local server
+			DeliveryResult remoteClientDeliveryDoWorkResult;
+			try {
+				DeliveryResult localServerDeliverBeginResult = localStoreManager.deliverBegin(localDeliveryData);
+				if (localServerDeliverBeginResult.isFailed()) {
+					forceRollback = true;
+					remoteClientDeliveryDoWorkResult = new DeliveryResult(localServerDeliverBeginResult.getCode(), localServerDeliverBeginResult.getText(), null);
+				}
+				else
+					remoteClientDeliveryDoWorkResult = new DeliveryResult(DeliveryResult.CODE_DELIVERED_NO_EXTERNAL, null, null);
+			} catch (Throwable t) {
+				forceRollback = true;
+				remoteClientDeliveryDoWorkResult = new DeliveryResult(t);
+			}
+
+			// step 5: deliver doWork with remote server
+			DeliveryResult localClientDeliveryDoWorkResult;
+			try {
+				DeliveryResult remoteServerDeliverDoWorkResult = remoteStoreManager.deliverDoWork(remoteDeliveryID, remoteClientDeliveryDoWorkResult, forceRollback);
+				if (remoteServerDeliverDoWorkResult.isFailed()) {
+					forceRollback = true;
+					localClientDeliveryDoWorkResult = new DeliveryResult(remoteServerDeliverDoWorkResult.getCode(), remoteServerDeliverDoWorkResult.getText(), null);
+				}
+				else
+					localClientDeliveryDoWorkResult = new DeliveryResult(DeliveryResult.CODE_DELIVERED_NO_EXTERNAL, null, null);
+			} catch (Throwable t) {
+				forceRollback = true;
+				localClientDeliveryDoWorkResult = new DeliveryResult(t);
+			}
+
+			// step 6: deliver doWork with local server
+			DeliveryResult remoteClientDeliveryEndResult;
+			try {
+				DeliveryResult localServerDeliverDoWorkResult = localStoreManager.deliverDoWork(localDeliveryID, localClientDeliveryDoWorkResult, forceRollback);
+				if (localServerDeliverDoWorkResult.isFailed()) {
+					forceRollback = true;
+					remoteClientDeliveryEndResult = new DeliveryResult(localServerDeliverDoWorkResult.getCode(), localServerDeliverDoWorkResult.getText(), null);
+				}
+				else
+					remoteClientDeliveryEndResult = new DeliveryResult(DeliveryResult.CODE_COMMITTED_NO_EXTERNAL, null, null);
+			} catch (Throwable t) {
+				forceRollback = true;
+				remoteClientDeliveryEndResult = new DeliveryResult(t);
+			}
+
+			// step 7: deliver end with remote server
+			DeliveryResult localClientDeliveryEndResult;
+			try {
+				DeliveryResult remoteServerDeliverEndResult = remoteStoreManager.deliverEnd(remoteDeliveryID, remoteClientDeliveryEndResult, forceRollback);
+				if (remoteServerDeliverEndResult.isApproved()) {
+					forceRollback = true;
+					localClientDeliveryEndResult = new DeliveryResult(remoteServerDeliverEndResult.getCode(), remoteServerDeliverEndResult.getText(), null);
+				}
+				else
+					localClientDeliveryEndResult = new DeliveryResult(DeliveryResult.CODE_COMMITTED_NO_EXTERNAL, null, null);
+			} catch (Throwable t) {
+				forceRollback = true;
+				localClientDeliveryEndResult = new DeliveryResult(t);
+			}
+
+			// step 8: deliver end with local server
+			try {
+				DeliveryResult localServerDeliverEndResult = localStoreManager.deliverEnd(localDeliveryID, localClientDeliveryEndResult, forceRollback);
+				if (localServerDeliverEndResult.isFailed())
+					Logger.getLogger(CrossTradeDeliveryCoordinator.class).error("localStoreManager.deliverEnd(...) failed! localServerDeliverEndResult.code=" + localServerDeliverEndResult.getCode() + " localServerDeliverEndResult.text=" + localServerDeliverEndResult.getText() + " localDeliveryID=" + localDeliveryID);
+			} catch (Throwable t) {
+				Logger.getLogger(CrossTradeDeliveryCoordinator.class).error("localStoreManager.deliverEnd(...) failed with Exception!", t);
+			}
+
+		} catch (Exception x) {
+			throw new ModuleException(x);
+		}
 	}
 
+
+	protected StoreManager createStoreManager(String organisationID)
+	throws RemoteException, CreateException, NamingException
+	{
+		if (organisationID == null || IDGenerator.getOrganisationID().equals(organisationID))
+			return StoreManagerUtil.getHome().create();
+
+		return StoreManagerUtil.getHome(Lookup.getInitialContextProperties(getPersistenceManager(), organisationID)).create();
+	}
 
 	/**
 	 * @param mandator The {@link OrganisationLegalEntity} representing the local organisation. This is identical with either <code>from</code> or <code>to</code>.

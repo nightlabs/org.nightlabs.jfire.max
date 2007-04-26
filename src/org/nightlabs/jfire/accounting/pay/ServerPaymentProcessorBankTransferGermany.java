@@ -99,7 +99,6 @@ public class ServerPaymentProcessorBankTransferGermany extends ServerPaymentProc
 		// If we have no precursor, we have to postpone the payment.
 		if (payParams.paymentData.getPayment().getPrecursor() == null)
 			return new PaymentResult(
-					payParams.accounting.getOrganisationID(),
 					PaymentResult.CODE_POSTPONED,
 					(String)null, (Throwable)null);
 
@@ -119,7 +118,6 @@ public class ServerPaymentProcessorBankTransferGermany extends ServerPaymentProc
 		// If we have no precursor, we have to postpone the payment.
 		if (payParams.paymentData.getPayment().getPrecursor() == null)
 			return new PaymentResult(
-					payParams.accounting.getOrganisationID(),
 					PaymentResult.CODE_POSTPONED,
 					(String)null, (Throwable)null);
 
@@ -138,7 +136,6 @@ public class ServerPaymentProcessorBankTransferGermany extends ServerPaymentProc
 		// If we have no precursor, we have to postpone the payment.
 		if (payParams.paymentData.getPayment().getPrecursor() == null)
 			return new PaymentResult(
-					payParams.accounting.getOrganisationID(),
 					PaymentResult.CODE_POSTPONED,
 					(String)null, (Throwable)null);
 

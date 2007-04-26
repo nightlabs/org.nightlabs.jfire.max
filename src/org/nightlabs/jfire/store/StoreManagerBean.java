@@ -27,6 +27,7 @@
 package org.nightlabs.jfire.store;
 
 import java.io.IOException;
+import java.io.Serializable;
 import java.rmi.RemoteException;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -51,11 +52,15 @@ import org.apache.log4j.Logger;
 import org.jbpm.JbpmContext;
 import org.jbpm.graph.exe.ProcessInstance;
 import org.nightlabs.ModuleException;
+import org.nightlabs.annotation.Implement;
 import org.nightlabs.jdo.NLJDOHelper;
 import org.nightlabs.jfire.accounting.Accounting;
 import org.nightlabs.jfire.accounting.Invoice;
 import org.nightlabs.jfire.accounting.id.InvoiceID;
+import org.nightlabs.jfire.asyncinvoke.AsyncInvoke;
+import org.nightlabs.jfire.asyncinvoke.Invocation;
 import org.nightlabs.jfire.base.BaseSessionBeanImpl;
+import org.nightlabs.jfire.base.InvokeUtil;
 import org.nightlabs.jfire.idgenerator.IDNamespaceDefault;
 import org.nightlabs.jfire.jbpm.JbpmLookup;
 import org.nightlabs.jfire.jbpm.graph.def.ProcessDefinition;
@@ -936,7 +941,7 @@ implements SessionBean
 					if (x != null)
 						res = x.getDeliveryResult();
 					else
-						res = new DeliveryResult(getOrganisationID(), t);
+						res = new DeliveryResult(t);
 				}
 				if (res != null)
 					resList.add(res);
@@ -1033,7 +1038,7 @@ implements SessionBean
 			return deliveryHelperLocal.deliverBegin_internal(deliveryDataID, fetchGroups, NLJDOHelper.MAX_FETCH_DEPTH_NO_LIMIT);
 
 		} catch (Throwable t) {
-			DeliveryResult deliverBeginServerResult = new DeliveryResult(getOrganisationID(), t);
+			DeliveryResult deliverBeginServerResult = new DeliveryResult(t);
 
 			try {
 				return deliveryHelperLocal.deliverBegin_storeDeliverBeginServerResult(
@@ -1093,7 +1098,7 @@ implements SessionBean
 					if (x != null)
 						res = x.getDeliveryResult();
 					else
-						res = new DeliveryResult(getOrganisationID(), t);
+						res = new DeliveryResult(t);
 				}
 				if (res != null)
 					resList.add(res);
@@ -1150,7 +1155,7 @@ implements SessionBean
 					if (x != null)
 						res = x.getDeliveryResult();
 					else
-						res = new DeliveryResult(getOrganisationID(), t);
+						res = new DeliveryResult(t);
 				}
 				if (res != null)
 					resList.add(res);
@@ -1220,7 +1225,7 @@ implements SessionBean
 			return deliveryHelperLocal.deliverDoWork_internal(deliveryID, fetchGroups, NLJDOHelper.MAX_FETCH_DEPTH_NO_LIMIT);
 
 		} catch (Throwable t) {
-			DeliveryResult deliverDoWorkServerResult = new DeliveryResult(getOrganisationID(), t);
+			DeliveryResult deliverDoWorkServerResult = new DeliveryResult(t);
 
 			try {
 				DeliveryResult deliverDoWorkServerResult_detached = deliveryHelperLocal.deliverDoWork_storeDeliverDoWorkServerResult(
@@ -1292,10 +1297,14 @@ implements SessionBean
 
 		try {
 
-			return deliveryHelperLocal.deliverEnd_internal(deliveryID, fetchGroups, NLJDOHelper.MAX_FETCH_DEPTH_NO_LIMIT);
+			DeliveryResult res = deliveryHelperLocal.deliverEnd_internal(deliveryID, fetchGroups, NLJDOHelper.MAX_FETCH_DEPTH_NO_LIMIT);
+			if (!res.isFailed())
+				AsyncInvoke.exec(new CrossTradeDeliverInvocation(deliveryID), false); // no xa necessary, because deliveryHelperLocal.deliverEnd_internal(...) used a new transaction before
+
+			return res;
 
 		} catch (Throwable t) {
-			DeliveryResult deliverEndServerResult = new DeliveryResult(getOrganisationID(), t);
+			DeliveryResult deliverEndServerResult = new DeliveryResult(t);
 
 			try {
 				DeliveryResult deliverEndServerResult_detached = deliveryHelperLocal.deliverEnd_storeDeliverEndServerResult(
@@ -1311,6 +1320,27 @@ implements SessionBean
 			} catch (Exception x) {
 				throw new ModuleException(x);
 			}
+		}
+	}
+
+	protected static class CrossTradeDeliverInvocation
+	extends Invocation
+	{
+		private DeliveryID deliveryID;
+
+		public CrossTradeDeliverInvocation(DeliveryID deliveryID)
+		{
+			this.deliveryID = deliveryID;
+		}
+
+		@Implement
+		public Serializable invoke()
+				throws Exception
+		{
+			PersistenceManager pm = getPersistenceManager();
+
+
+			return null;
 		}
 	}
 

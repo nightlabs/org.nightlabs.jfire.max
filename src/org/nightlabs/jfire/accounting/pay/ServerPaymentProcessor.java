@@ -499,7 +499,6 @@ public PayMoneyTransfer payBegin(PayParams payParams)
 
 		if (payBeginServerResult == null) {
 			payBeginServerResult = new PaymentResult(
-					payParams.accounting.getOrganisationID(),
 					PaymentResult.CODE_APPROVED_NO_EXTERNAL,
 					(String)null,
 					(Throwable)null
@@ -556,7 +555,6 @@ public PayMoneyTransfer payBegin(PayParams payParams)
 	
 		if (payDoWorkServerResult == null) {
 			payDoWorkServerResult = new PaymentResult(
-					payParams.accounting.getOrganisationID(),
 					PaymentResult.CODE_PAID_NO_EXTERNAL,
 					(String)null,
 					(Throwable)null);
@@ -612,7 +610,6 @@ public PayMoneyTransfer payBegin(PayParams payParams)
 	
 			if (payEndServerResult == null) {
 				payEndServerResult = new PaymentResult(
-						payParams.accounting.getOrganisationID(),
 						PaymentResult.CODE_ROLLED_BACK_NO_EXTERNAL,
 						(String)null,
 						(Throwable)null);
@@ -623,7 +620,6 @@ public PayMoneyTransfer payBegin(PayParams payParams)
 			
 			if (payEndServerResult == null) {
 				payEndServerResult = new PaymentResult(
-						payParams.accounting.getOrganisationID(),
 						PaymentResult.CODE_COMMITTED_NO_EXTERNAL,
 						(String)null,
 						(Throwable)null);

@@ -495,7 +495,6 @@ implements Serializable
 
 		if (deliverBeginServerResult == null) {
 			deliverBeginServerResult = new DeliveryResult(
-					deliverParams.store.getOrganisationID(),
 					DeliveryResult.CODE_APPROVED_NO_EXTERNAL,
 					(String)null,
 					(Throwable)null
@@ -534,7 +533,6 @@ implements Serializable
 	
 		if (deliverDoWorkServerResult == null) {
 			deliverDoWorkServerResult = new DeliveryResult(
-					deliverParams.store.getOrganisationID(),
 					DeliveryResult.CODE_DELIVERED_NO_EXTERNAL,
 					(String)null,
 					(Throwable)null);
@@ -614,7 +612,6 @@ implements Serializable
 
 			if (deliverEndServerResult == null) {
 				deliverEndServerResult = new DeliveryResult(
-						deliverParams.store.getOrganisationID(),
 						DeliveryResult.CODE_ROLLED_BACK_NO_EXTERNAL,
 						(String)null,
 						(Throwable)null);
@@ -625,7 +622,6 @@ implements Serializable
 
 			if (deliverEndServerResult == null) {
 				deliverEndServerResult = new DeliveryResult(
-						deliverParams.store.getOrganisationID(),
 						DeliveryResult.CODE_COMMITTED_NO_EXTERNAL,
 						(String)null,
 						(Throwable)null);

@@ -99,7 +99,6 @@ extends ServerPaymentProcessor
 	protected PaymentResult externalPayBegin(PayParams payParams) throws PaymentException
 	{
 		return new PaymentResult(
-				payParams.accounting.getOrganisationID(),
 				PaymentResult.CODE_POSTPONED,
 				(String)null,
 				(Throwable)null);
@@ -112,7 +111,6 @@ extends ServerPaymentProcessor
 			throws PaymentException
 	{
 		return new PaymentResult(
-				payParams.accounting.getOrganisationID(),
 				PaymentResult.CODE_POSTPONED,
 				(String)null,
 				(Throwable)null);
@@ -124,7 +122,6 @@ extends ServerPaymentProcessor
 	protected PaymentResult externalPayCommit(PayParams payParams) throws PaymentException
 	{
 		return new PaymentResult(
-				payParams.accounting.getOrganisationID(),
 				PaymentResult.CODE_POSTPONED,
 				(String)null,
 				(Throwable)null);

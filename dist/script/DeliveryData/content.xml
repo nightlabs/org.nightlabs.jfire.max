@@ -11,13 +11,13 @@
 		id="DeliveryList"
 		resultClass="org.eclipse.datatools.connectivity.oda.IResultSet"
 	>
-	<!-- id is optional and defaults to the value of file -->
 		<name language="de">Lieferungen: Liste</name>
 		<name language="en">Deliveries: List</name>
 		<parameter-set>
 			<name language="de">ParameterSet: Lieferungen-Liste</name>
 			<name language="en">ParameterSet: Order-List</name>
 			<parameter name="createUserID" type="org.nightlabs.jfire.security.id.UserID"/>	
+			<parameter name="createGroupID" type="org.nightlabs.jfire.security.id.UserID"/>	
 			<parameter name="createTimePeriod" type="org.nightlabs.timepattern.TimePattern"/>	
 			<parameter name="deliveryTimePeriod" type="org.nightlabs.timepattern.TimePattern"/>	
 		</parameter-set>

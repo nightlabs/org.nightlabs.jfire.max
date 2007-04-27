@@ -8,6 +8,7 @@ import javax.jdo.Query;
 import org.apache.log4j.Logger;
 import org.nightlabs.jdo.query.JDOQuery;
 import org.nightlabs.jfire.jbpm.graph.def.Statable;
+import org.nightlabs.jfire.jbpm.graph.def.State;
 import org.nightlabs.jfire.trade.state.id.StateDefinitionID;
 
 /**
@@ -34,6 +35,9 @@ extends JDOQuery<Set<Statable>>
 		this.statableClass = statableClass;
 	}
 	
+	/**
+	 * the Implementation class of the {@link Statable} Interface
+	 */
 	private Class statableClass = null;	
 	public Class getStatableClass() {
 		return statableClass;
@@ -49,15 +53,27 @@ extends JDOQuery<Set<Statable>>
 		
 		if (stateDefinitionID != null) 
 		{
-			// TODO: JDOHelper.getObjectId(this.*) does not seem to work (java.lang.IndexOutOfBoundsException: Index: 3, Size: 3)
+			if (!onlyInSelectedState) {
+				filter.append("\n && (this.states.contains(stateVar) && ( " +
+						"stateVar.stateDefinition.processDefinitionOrganisationID == \""+stateDefinitionID.processDefinitionOrganisationID+"\" && " +
+						"stateVar.stateDefinition.processDefinitionID == \""+stateDefinitionID.processDefinitionID+"\" && " +
+						"stateVar.stateDefinition.stateDefinitionOrganisationID == \""+stateDefinitionID.stateDefinitionOrganisationID+"\" && " +
+						"stateVar.stateDefinition.stateDefinitionID == \""+stateDefinitionID.stateDefinitionID+"\"" +					
+						"))");
+				
+				q.declareImports("import "+State.class.getName());
+				q.declareVariables(State.class.getName()+" stateVar");
+			} else { 
+				// TODO: JDOHelper.getObjectId(this.*) does not seem to work (java.lang.IndexOutOfBoundsException: Index: 3, Size: 3)
 //				filter.append("\n && JDOHelper.getObjectId(this.stateDefinition) == :stateDefinitionID");
-			// WORKAROUND:
-			filter.append("\n && (" +
-					"this.state.stateDefinition.processDefinitionOrganisationID == \""+stateDefinitionID.processDefinitionOrganisationID+"\" && " +
-					"this.state.stateDefinition.processDefinitionID == \""+stateDefinitionID.processDefinitionID+"\" && " +
-					"this.state.stateDefinition.stateDefinitionOrganisationID == \""+stateDefinitionID.stateDefinitionOrganisationID+"\" && " +
-					"this.state.stateDefinition.stateDefinitionID == \""+stateDefinitionID.stateDefinitionID+"\"" +					
-							")");
+				// WORKAROUND:
+				filter.append("\n && (" +
+						"this.state.stateDefinition.processDefinitionOrganisationID == \""+stateDefinitionID.processDefinitionOrganisationID+"\" && " +
+						"this.state.stateDefinition.processDefinitionID == \""+stateDefinitionID.processDefinitionID+"\" && " +
+						"this.state.stateDefinition.stateDefinitionOrganisationID == \""+stateDefinitionID.stateDefinitionOrganisationID+"\" && " +
+						"this.state.stateDefinition.stateDefinitionID == \""+stateDefinitionID.stateDefinitionID+"\"" +					
+						")");
+			}
 		}
 
 		if (stateCreateDTMin != null)
@@ -73,6 +89,9 @@ extends JDOQuery<Set<Statable>>
 		return q;
 	}
 
+	/**
+	 * the {@link StateDefinitionID} to search for
+	 */
 	private StateDefinitionID stateDefinitionID = null;
 	public StateDefinitionID getStateDefinitionID() {
 		return stateDefinitionID;
@@ -80,7 +99,11 @@ extends JDOQuery<Set<Statable>>
 	public void setStateDefinitionID(StateDefinitionID stateDefinitionID) {
 		this.stateDefinitionID = stateDefinitionID;
 	}
-	
+
+	/**
+	 * determines the lower limit of the createDT of the {@link Statable} for the given
+	 * stateDefinitionID 
+	 */	
 	private Date stateCreateDTMin = null;
 	public Date getStateCreateDTMin() {
 		return stateCreateDTMin;
@@ -89,6 +112,10 @@ extends JDOQuery<Set<Statable>>
 		this.stateCreateDTMin = stateCreateDTMin;
 	}
 
+	/**
+	 * determines the upper limit of the createDT of the {@link Statable} for the given
+	 * stateDefinitionID 
+	 */
 	private Date stateCreateDTMax = null;
 	public Date getStateCreateDTMax() {
 		return stateCreateDTMax;
@@ -97,4 +124,20 @@ extends JDOQuery<Set<Statable>>
 		this.stateCreateDTMax = stateCreateDTMax;
 	}
 
+	/**
+	 * if onlyInSelectedState is true, the query matches only, if the StateDefinitionID of the
+	 * Statable.getState().getStateDefinition() is exact the one in the query
+	 * 
+	 * if onlyInSelectedState is false the query matches, if the {@link Statable} once, 
+	 * has passed the getStateDefinitionID() of the query 
+	 *  
+	 */
+	private boolean onlyInSelectedState = false;
+	public boolean isOnlyInSelectedState() {
+		return onlyInSelectedState;
+	}
+	public void setOnlyInSelectedState(boolean onlyInSelectedState) {
+		this.onlyInSelectedState = onlyInSelectedState;
+	}
+	
 }

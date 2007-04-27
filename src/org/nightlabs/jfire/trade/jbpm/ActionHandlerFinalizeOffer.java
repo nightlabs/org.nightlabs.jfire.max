@@ -1,5 +1,7 @@
 package org.nightlabs.jfire.trade.jbpm;
 
+import java.util.Iterator;
+
 import javax.jdo.JDOHelper;
 import javax.jdo.PersistenceManager;
 
@@ -10,11 +12,17 @@ import org.jbpm.graph.exe.ExecutionContext;
 import org.jbpm.instantiation.Delegation;
 import org.nightlabs.annotation.Implement;
 import org.nightlabs.jfire.asyncinvoke.AsyncInvoke;
+import org.nightlabs.jfire.base.Lookup;
 import org.nightlabs.jfire.jbpm.graph.def.AbstractActionHandler;
 import org.nightlabs.jfire.security.SecurityReflector;
 import org.nightlabs.jfire.security.User;
+import org.nightlabs.jfire.trade.LegalEntity;
 import org.nightlabs.jfire.trade.Offer;
 import org.nightlabs.jfire.trade.OfferActionHandler;
+import org.nightlabs.jfire.trade.OfferRequirement;
+import org.nightlabs.jfire.trade.OrganisationLegalEntity;
+import org.nightlabs.jfire.trade.TradeManager;
+import org.nightlabs.jfire.trade.TradeManagerUtil;
 import org.nightlabs.jfire.trade.id.OfferID;
 
 public class ActionHandlerFinalizeOffer
@@ -57,6 +65,24 @@ extends AbstractActionHandler
 			return;
 
 		User user = SecurityReflector.getUserDescriptor().getUser(pm);
+
+		// check whether we have to finalize remote offers as well
+		OfferRequirement offerRequirement = OfferRequirement.getOfferRequirement(pm, offer, false);
+		if (offerRequirement != null) {
+			for (Iterator itO = offerRequirement.getPartnerOffers().iterator(); itO.hasNext(); ) {
+				Offer partnerOffer = (Offer) itO.next();
+
+				LegalEntity vendor = partnerOffer.getOrder().getVendor();
+				if (!(vendor instanceof OrganisationLegalEntity))
+					throw new IllegalStateException("Vendor of Offer " + partnerOffer.getPrimaryKey() + " is not an OrganisationLegalEntity, even though this Offer is part of the OfferRequirements for Offer " + offer.getPrimaryKey());
+
+				String partnerOrganisationID = vendor.getOrganisationID();
+
+				TradeManager tradeManager = TradeManagerUtil.getHome(Lookup.getInitialContextProperties(pm, partnerOrganisationID)).create();
+				tradeManager.signalOffer((OfferID) JDOHelper.getObjectId(partnerOffer), JbpmConstantsOffer.Vendor.TRANSITION_NAME_ACCEPT_FOR_CROSS_TRADE);
+				// TODO this is not yet the right handling of JBPM - needs to be fixed!
+			} // for (Iterator itO = offerRequirement.getPartnerOffers().iterator(); itO.hasNext(); ) {
+		} // if (offerRequirement != null) {
 
 		offer.setFinalized(user);
 		for (OfferActionHandler offerActionHandler : offer.getOfferLocal().getOfferActionHandlers()) {

@@ -6,6 +6,7 @@
       <transition name="finalize" to="devil.NightLabs.org:finalized"></transition>
       <transition name="abort" to="devil.NightLabs.org:aborted"></transition>
       <transition name="devil.NightLabs.org:acceptImplicitely" to="devil.NightLabs.org:acceptedImplicitely"></transition>
+      <transition name="devil.NightLabs.org:prepareForCrossTrade" to="devil.NightLabs.org:sent"></transition>
    </start-state>
    <end-state name="devil.NightLabs.org:rejected"></end-state>
    <end-state name="devil.NightLabs.org:accepted"></end-state>
@@ -30,8 +31,16 @@
    <node name="devil.NightLabs.org:sent">
       <transition name="devil.NightLabs.org:send" to="devil.NightLabs.org:finalized"></transition>
       <transition name="sendImplicitely" to="devil.NightLabs.org:accepted"></transition>
+      <transition name="" to="devil.NightLabs.org:accepted"></transition>
+      <transition name="devil.NightLabs.org:prepareForCrossTrade" to="devil.NightLabs.org:preparedForCrossTrade"></transition>
    </node>
    <node name="devil.NightLabs.org:acceptedImplicitely">
       <transition name="sendImplicitely" to="devil.NightLabs.org:sent"></transition>
+   </node>
+   <state name="devil.NightLabs.org:preparedForCrossTrade">
+      <transition name="devil.NightLabs.org:acceptForCrossTrade" to="devil.NightLabs.org:acceptedForCrossTrade"></transition>
+   </state>
+   <node name="devil.NightLabs.org:acceptedForCrossTrade">
+      <transition name="" to="devil.NightLabs.org:accepted"></transition>
    </node>
 </process-definition>

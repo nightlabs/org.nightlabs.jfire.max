@@ -14,6 +14,7 @@ public class JbpmConstantsOffer
 		public static final String NODE_NAME_REVOKED   = Organisation.DEVIL_ORGANISATION_ID + ":revoked";
 
 		public static final String NODE_NAME_ACCEPTED_IMPLICITELY = Organisation.DEVIL_ORGANISATION_ID + ":acceptedImplicitely";
+		public static final String NODE_NAME_ACCEPTED_FOR_CROSS_TRADE = "devil.NightLabs.org:acceptedForCrossTrade";
 	}
 
 	public static class Vendor {
@@ -36,6 +37,8 @@ public class JbpmConstantsOffer
 		public static final String NODE_NAME_ACCEPTED  = Organisation.DEVIL_ORGANISATION_ID + ":accepted";
 		public static final String NODE_NAME_REJECTED  = Organisation.DEVIL_ORGANISATION_ID + ":rejected";
 
+		public static final String NODE_NAME_PREPARED_FOR_CROSS_TRADE = "devil.NightLabs.org:preparedForCrossTrade";
+
 		/**
 		 * This transition is automatically triggered asynchronously as soon as the document has been finalized.
 		 */
@@ -52,6 +55,9 @@ public class JbpmConstantsOffer
 
 		public static final String TRANSITION_NAME_CUSTOMER_ACCEPTED = JbpmConstantsOffer.Customer.NODE_NAME_CUSTOMER_ACCEPTED;
 		public static final String TRANSITION_NAME_CUSTOMER_REJECTED = JbpmConstantsOffer.Customer.NODE_NAME_CUSTOMER_REJECTED;
+
+		public static final String TRANSITION_NAME_PREPARE_FOR_CROSS_TRADE = "devil.NightLabs.org:prepareForCrossTrade";
+		public static final String TRANSITION_NAME_ACCEPT_FOR_CROSS_TRADE = "devil.NightLabs.org:acceptForCrossTrade";
 
 //		public static TransitionID getTransitionID_created_2_accept(ProcessDefinitionID processDefinitionID) {
 //			return TransitionID.create(
@@ -102,6 +108,8 @@ public class JbpmConstantsOffer
 		public static final String TRANSITION_NAME_ACCEPTED_IMPLICITELY = JbpmConstantsOffer.Both.NODE_NAME_ACCEPTED_IMPLICITELY;
 		public static final String TRANSITION_NAME_EXPIRED = JbpmConstantsOffer.Both.NODE_NAME_EXPIRED;
 		public static final String TRANSITION_NAME_REVOKED = JbpmConstantsOffer.Both.NODE_NAME_REVOKED;
+
+		public static final String TRANSITION_NAME_ACCEPTED_FOR_CROSS_TRADE = "devil.NightLabs.org:acceptedForCrossTrade";
 
 //		public static TransitionID getTransitionID_sent_2_revoked(ProcessDefinitionID processDefinitionID) {
 //			return TransitionID.create(

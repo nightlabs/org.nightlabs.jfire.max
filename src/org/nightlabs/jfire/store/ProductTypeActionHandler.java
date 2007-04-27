@@ -513,7 +513,7 @@ public abstract class ProductTypeActionHandler
 			}
 
 			// for the current offer, we create/find an instance of OfferRequirement
-			OfferRequirement offerRequirement = OfferRequirement.getOfferRequirement(pm, localOffer);
+			OfferRequirement offerRequirement = OfferRequirement.createOfferRequirement(pm, localOffer);
 			Offer partnerOffer = offerRequirement.getPartnerOffer(partner);
 			if (partnerOffer == null) {
 				{

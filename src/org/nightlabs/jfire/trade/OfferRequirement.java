@@ -27,6 +27,7 @@
 package org.nightlabs.jfire.trade;
 
 import java.io.Serializable;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -59,18 +60,39 @@ public class OfferRequirement
 
 	/**
 	 * This method returns a previously existing {@link OfferRequirement} or creates and persists
-	 * a new instance if not existent.
+	 * a new instance, if not existent.
 	 */
-	public static OfferRequirement getOfferRequirement(PersistenceManager pm, Offer offer)
+	public static OfferRequirement createOfferRequirement(PersistenceManager pm, Offer offer)
+	{
+		OfferRequirement res = getOfferRequirement(pm, offer, false);
+		if (res != null)
+			return res;
+
+		return (OfferRequirement) pm.makePersistent(new OfferRequirement(offer));
+	}
+
+	/**
+	 * This method returns a previously existing {@link OfferRequirement} or <code>null</code>, if none exists
+	 * and <code>throwExceptionIfNotExistent == false</code>.
+	 *
+	 * @param pm The <code>PersistenceManager</code> used for accessing the datastore.
+	 * @param offer The <code>Offer</code> for which to search an <code>OfferRequirement</code> instance.
+	 * @param throwExceptionIfNotExistent if <code>true</code> and there exists no <code>OfferRequirement</code>, this method will throw a {@link JDOObjectNotFoundException} - if <code>false</code>, it will simply return <code>null</code> instead.
+	 * @throws JDOObjectNotFoundException if <code>throwExceptionIfNotExistent == true</code> and the <code>OfferRequirement</code> does not exist.
+	 */
+	public static OfferRequirement getOfferRequirement(PersistenceManager pm, Offer offer, boolean throwExceptionIfNotExistent)
 	{
 		OfferRequirementID offerRequirementID = OfferRequirementID.create(offer.getOrganisationID(), offer.getOfferIDPrefix(), offer.getOfferID());
 		pm.getExtent(OfferRequirement.class);
 		try {
 			OfferRequirement res = (OfferRequirement) pm.getObjectById(offerRequirementID);
-			res.getOffer();
+			res.getOffer(); // TODO remove workaround for JPOX bug
 			return res;
 		} catch (JDOObjectNotFoundException x) {
-			return (OfferRequirement) pm.makePersistent(new OfferRequirement(offer));
+			if (throwExceptionIfNotExistent)
+				throw x;
+
+			return null;
 		}
 	}
 
@@ -104,7 +126,7 @@ public class OfferRequirement
 	 *
 	 * @jdo.join
 	 */
-	private Map vendor2offer = new HashMap();
+	private Map<LegalEntity, Offer> vendor2offer = new HashMap<LegalEntity, Offer>();
 
 	public OfferRequirement() { }
 
@@ -138,9 +160,13 @@ public class OfferRequirement
 	public Offer getPartnerOffer(LegalEntity vendor) {
 		return (Offer)vendor2offer.get(vendor);
 	}
-	
+
+	public Collection<Offer> getPartnerOffers()
+	{
+		return vendor2offer.values();
+	}
+
 	/**
-	 * 
 	 * @return The associated Offer.
 	 */
 	public Offer getOffer() {

@@ -1,7 +1,5 @@
 package org.nightlabs.jfire.trade.jbpm;
 
-import javax.jdo.PersistenceManager;
-
 import org.apache.log4j.Logger;
 import org.jbpm.graph.def.Action;
 import org.jbpm.graph.def.Node;
@@ -41,7 +39,7 @@ extends AbstractActionHandler
 
 		// send the offer to the customer, if the customer is an organisation
 		if (offer.getOrder().getCustomer() instanceof OrganisationLegalEntity) {
-			throw new UnsupportedOperationException("NYI"); // TODO implement!
+			// CrossTrade stuff is handled already outside - we don't need to send it here!
 		}
 
 		String transitionName = ActionHandlerNodeEnter.getLastNodeEnterTransitionName();

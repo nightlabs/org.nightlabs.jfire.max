@@ -259,22 +259,43 @@ implements SessionBean
 	{
 		try {
 			pm.getObjectById(JFireVoucherEAR.MODE_OF_DELIVERY_FLAVOUR_ID_VOUCHER_PRINT_VIA_TICKET_PRINTER);
+			return; // fine - it is already persistent and we don't need to do it
 		} catch (JDOObjectNotFoundException e) {
-			ModeOfDelivery modeOfDelivery = (ModeOfDelivery) pm.getObjectById(JFireVoucherEAR.MODE_OF_DELIVERY_ID_VOUCHER_PRINT);
-			String ticketPrinterClassName = "org.nightlabs.ticketprinter.TicketPrinter";
-			try {
-				Class.forName(ticketPrinterClassName);
-				ModeOfDeliveryFlavour modeOfDeliveryFlavour = modeOfDelivery.createFlavour(JFireVoucherEAR.MODE_OF_DELIVERY_FLAVOUR_ID_VOUCHER_PRINT_VIA_TICKET_PRINTER);
-				modeOfDeliveryFlavour.getName().setText(Locale.ENGLISH.getLanguage(), "Print To Ticket Printer");
-				modeOfDeliveryFlavour.getName().setText(Locale.GERMAN.getLanguage(), "Druck via Ticket-Drucker");				
-			} catch (ClassNotFoundException e2) {
-				logger.info("Class "+ticketPrinterClassName+" could not be resolved, means TicketPrinter Module " +
-						"is not deployed, will skip registering of ModeOfDeliveryFlavour " + 
-						JFireVoucherEAR.MODE_OF_DELIVERY_FLAVOUR_ID_VOUCHER_PRINT_VIA_TICKET_PRINTER, e2);
-			}			
-		}		
+			// the object is not persisted => ignore this exception and continue creating + persisting it
+		}
+
+		String ticketPrinterClassName = "org.nightlabs.ticketprinter.TicketPrinter"; // check whether this class exists and only do things, if it does
+		try {
+			Class.forName(ticketPrinterClassName);
+		} catch (ClassNotFoundException e2) {
+			logger.info("Class "+ticketPrinterClassName+" could not be resolved, means TicketPrinter Module " +
+					"is not deployed, will skip registering of ModeOfDeliveryFlavour " + 
+					JFireVoucherEAR.MODE_OF_DELIVERY_FLAVOUR_ID_VOUCHER_PRINT_VIA_TICKET_PRINTER, e2);
+
+			// the class does not exist => no need for this ModeOfDelivery[Flavour]
+			return;
+		}
+
+		ModeOfDelivery modeOfDelivery = getModeOfDeliveryVoucherPrint(pm);
+		ModeOfDeliveryFlavour modeOfDeliveryFlavour = modeOfDelivery.createFlavour(JFireVoucherEAR.MODE_OF_DELIVERY_FLAVOUR_ID_VOUCHER_PRINT_VIA_TICKET_PRINTER);
+		modeOfDeliveryFlavour.getName().setText(Locale.ENGLISH.getLanguage(), "Print Voucher To Ticket Printer");
+		modeOfDeliveryFlavour.getName().setText(Locale.GERMAN.getLanguage(), "Gutschein-Druck via Ticket-Drucker");
 	}
-		
+
+	protected ModeOfDelivery getModeOfDeliveryVoucherPrint(PersistenceManager pm)
+	{
+		ModeOfDelivery modeOfDelivery;
+		try {
+			modeOfDelivery = (ModeOfDelivery) pm.getObjectById(JFireVoucherEAR.MODE_OF_DELIVERY_ID_VOUCHER_PRINT);
+		} catch (JDOObjectNotFoundException x) {
+			modeOfDelivery = new ModeOfDelivery(JFireVoucherEAR.MODE_OF_DELIVERY_ID_VOUCHER_PRINT);
+			modeOfDelivery.getName().setText(Locale.ENGLISH.getLanguage(), "Print Voucher");
+			modeOfDelivery.getName().setText(Locale.GERMAN.getLanguage(), "Gutschein-Druck");
+			modeOfDelivery = (ModeOfDelivery) pm.makePersistent(modeOfDelivery);
+		}
+		return modeOfDelivery;
+	}
+
 	protected DeliveryConfiguration checkDeliveryConfiguration(PersistenceManager pm) 
 	{		
 		DeliveryConfiguration deliveryConfiguration = null;
@@ -301,10 +322,7 @@ implements SessionBean
 					modeOfDelivery = (ModeOfDelivery) pm.getObjectById(ModeOfDeliveryConst.MODE_OF_DELIVERY_ID_MANUAL);
 					deliveryConfiguration.addModeOfDelivery(modeOfDelivery);
 
-					modeOfDelivery = new ModeOfDelivery(JFireVoucherEAR.MODE_OF_DELIVERY_ID_VOUCHER_PRINT);
-					modeOfDelivery.getName().setText(Locale.ENGLISH.getLanguage(), "Voucher Print");
-					modeOfDelivery.getName().setText(Locale.GERMAN.getLanguage(), "Gutschein-Druck");
-					modeOfDelivery = (ModeOfDelivery) pm.makePersistent(modeOfDelivery);
+					modeOfDelivery = getModeOfDeliveryVoucherPrint(pm);
 
 					for (Iterator it = pm.getExtent(CustomerGroup.class).iterator(); it.hasNext(); ) {
 						CustomerGroup customerGroup = (CustomerGroup) it.next();

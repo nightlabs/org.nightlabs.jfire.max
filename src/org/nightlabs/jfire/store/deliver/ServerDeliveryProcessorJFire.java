@@ -8,6 +8,16 @@ import org.nightlabs.jfire.organisation.Organisation;
 import org.nightlabs.jfire.store.deliver.id.ServerDeliveryProcessorID;
 import org.nightlabs.jfire.transfer.Anchor;
 
+/**
+ * @author Marco Schulze - marco at nightlabs dot de
+ *
+ * @jdo.persistence-capable
+ *		identity-type="application"
+ *		persistence-capable-superclass="org.nightlabs.jfire.store.deliver.ServerDeliveryProcessor"
+ *		detachable="true"
+ *
+ * @jdo.inheritance strategy="superclass-table"
+ */
 public class ServerDeliveryProcessorJFire
 extends ServerDeliveryProcessor
 {

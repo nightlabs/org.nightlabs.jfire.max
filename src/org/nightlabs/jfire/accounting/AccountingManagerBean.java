@@ -2525,6 +2525,31 @@ public abstract class AccountingManagerBean
 		}
 	}
 
+	/**
+	 * @ejb.interface-method
+	 * @ejb.permission role-name="_Guest_"
+	 * @ejb.transaction type="Supports"
+	 */	
+	public Set<AnchorID> getAccountIDs(Collection<JDOQuery> queries) 
+	{
+		PersistenceManager pm = getPersistenceManager();
+		try {
+			pm.getFetchPlan().setMaxFetchDepth(1);
+			pm.getFetchPlan().setGroup(FetchPlan.DEFAULT);
+
+			Collection<Account> accounts = null;
+			for (JDOQuery query : queries) {
+				query.setPersistenceManager(pm);
+				query.setCandidates(accounts);
+				accounts = (Collection) query.getResult();
+			}
+
+			return NLJDOHelper.getObjectIDSet(accounts);
+		} finally {
+			pm.close();
+		}		
+	}
+	
 //	/**
 //	 * @param productTypeID The object ID of the desired ProductType.
 //	 * @param fetchGroups These fetch-groups are applied to the main
@@ -2690,4 +2715,5 @@ public abstract class AccountingManagerBean
 //			e.printStackTrace();
 //		}
 	}
+	
 }

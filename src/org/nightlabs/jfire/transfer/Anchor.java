@@ -58,7 +58,7 @@ import org.nightlabs.util.Utils;
  * @jdo.create-objectid-class field-order="organisationID, anchorTypeID, anchorID"
  *
  * @jdo.fetch-group name="Anchor.transfers" fields="transfers"
- * @jdo.fetch-group name="Anchor.this" fetch-groups="default" fields="transfers"
+ * @jdo.fetch-group name="Anchor.this" fetch-groups="default"
  */
 public abstract class Anchor
 	implements Serializable

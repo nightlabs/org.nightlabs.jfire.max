@@ -71,7 +71,9 @@ import org.nightlabs.jfire.jbpm.graph.def.id.ProcessDefinitionID;
 import org.nightlabs.jfire.person.Person;
 import org.nightlabs.jfire.security.User;
 import org.nightlabs.jfire.security.id.UserID;
+import org.nightlabs.jfire.store.DeliveryNote;
 import org.nightlabs.jfire.store.ReceptionNote;
+import org.nightlabs.jfire.store.id.DeliveryNoteID;
 import org.nightlabs.jfire.store.id.ReceptionNoteID;
 import org.nightlabs.jfire.trade.config.LegalEntityViewConfigModule;
 import org.nightlabs.jfire.trade.id.ArticleContainerID;
@@ -1556,14 +1558,14 @@ implements SessionBean
 	 * @ejb.permission role-name="_Guest_"
 	 * @ejb.transaction type="Supports"
 	 */	
-	public Set<OrderID> getDeliveryNoteIDs(Collection<JDOQuery> queries) 
+	public Set<DeliveryNoteID> getDeliveryNoteIDs(Collection<JDOQuery> queries) 
 	{
 		PersistenceManager pm = getPersistenceManager();
 		try {
 			pm.getFetchPlan().setMaxFetchDepth(1);
 			pm.getFetchPlan().setGroup(FetchPlan.DEFAULT);
 
-			Collection<Order> deliveryNotes = null;
+			Collection<DeliveryNote> deliveryNotes = null;
 			for (JDOQuery query : queries) {
 				query.setPersistenceManager(pm);
 				query.setCandidates(deliveryNotes);

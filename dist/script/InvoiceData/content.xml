@@ -1,6 +1,6 @@
 <!DOCTYPE script-category PUBLIC "-//NightLabs//DTD ScriptingInitializer V 1.0//EN" "http://www.nightlabs.de/dtd/scripting-initializer-content_1_0.dtd">
 <script-category 
-	id="OrderData"
+	id="InvoceData"
 	type="JFireReportingTrade-InvoiceData"
 >
 	<name language="de">Rechnungs-Daten</name>

@@ -112,13 +112,29 @@ implements SessionBean
 	public void ejbRemove() throws EJBException, RemoteException { }
 
 	/**
+	 * There seems to be a heisenbug in JPOX which causes it to fail sometimes with a "mc closed" error. Therefore, we simply perform
+	 * the initialisation twice (if the first time succeeded, the second call is a noop anymway).
+	 * 
+	 * @throws ModuleException
+	 *
+	 * @ejb.interface-method
+	 * @ejb.permission role-name="_System_"
+	 * @ejb.transaction type = "Required"
+	 */
+	public void initialise2() 
+	throws ModuleException 
+	{
+		initialise();
+	}
+
+	/**
 	 * This method is called by the datastore initialization mechanism.
 	 * It populates the datastore with the demo data.
 	 * 
 	 * @throws ModuleException
 	 *
 	 * @ejb.interface-method
-	 * @ejb.permission role-name="_Guest_"
+	 * @ejb.permission role-name="_System_"
 	 * @ejb.transaction type = "Required"
 	 */
 	public void initialise() 

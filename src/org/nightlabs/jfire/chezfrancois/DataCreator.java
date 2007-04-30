@@ -77,6 +77,7 @@ import org.nightlabs.jfire.prop.structfield.StructFieldValue;
 import org.nightlabs.jfire.security.SecurityException;
 import org.nightlabs.jfire.security.User;
 import org.nightlabs.jfire.security.UserLocal;
+import org.nightlabs.jfire.security.id.UserID;
 import org.nightlabs.jfire.simpletrade.store.SimpleProductType;
 import org.nightlabs.jfire.simpletrade.store.SimpleProductTypeActionHandler;
 import org.nightlabs.jfire.store.ProductType;
@@ -459,6 +460,15 @@ public class DataCreator
 	throws
 		SecurityException, DataBlockNotFoundException, DataBlockGroupNotFoundException, DataFieldNotFoundException
 	{
+		pm.getExtent(User.class);
+		try {
+			User user = (User) pm.getObjectById(UserID.create(organisationID, userID));
+			// it already exists => return
+			return user;
+		} catch (JDOObjectNotFoundException x) {
+			// fine, it doesn't exist yet
+		}
+
 		User user = new User(organisationID, userID);
 		UserLocal userLocal = new UserLocal(user);
 		userLocal.setPasswordPlain(password);
@@ -466,18 +476,27 @@ public class DataCreator
 		Person person = createPerson(personCompany, personName, personFirstName, personEMail);
 		user.setPerson(person);
 //		personStruct.implodePerson(person);
-		pm.makePersistent(user);
+		user = (User) pm.makePersistent(user);
 		return user;
 	}
 
 	public User createUser(String userID, String password, Person person)
 //	throws SecurityException, DataBlockNotFoundException, DataBlockGroupNotFoundException, DataFieldNotFoundException
 	{
+		pm.getExtent(User.class);
+		try {
+			User user = (User) pm.getObjectById(UserID.create(organisationID, userID));
+			// it already exists => return
+			return user;
+		} catch (JDOObjectNotFoundException x) {
+			// fine, it doesn't exist yet
+		}
+
 		User user = new User(organisationID, userID);
 		UserLocal userLocal = new UserLocal(user);
 		userLocal.setPasswordPlain(password);
 		user.setPerson(person);
-		pm.makePersistent(user);
+		user = (User) pm.makePersistent(user);
 		return user;		
 	}
 	

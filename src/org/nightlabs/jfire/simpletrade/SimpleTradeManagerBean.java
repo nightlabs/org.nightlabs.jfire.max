@@ -111,7 +111,7 @@ import org.nightlabs.jfire.trade.id.SegmentID;
  *					 type="Stateless" 
  *					 transaction-type="Container"
  *
- * @ejb.util generate = "physical"
+ * @ejb.util generate="physical"
  */
 public abstract class SimpleTradeManagerBean
 extends BaseSessionBeanImpl
@@ -160,7 +160,7 @@ implements SessionBean
 	 *
 	 * @ejb.interface-method
 	 * @ejb.permission role-name="_System_"
-	 * @ejb.transaction type = "Required"
+	 * @ejb.transaction type="Required"
 	 */
 	public void initialise() 
 	throws ModuleException 

@@ -14,6 +14,7 @@ import java.util.HashMap;
 import java.util.Locale;
 import java.util.Map;
 
+import javax.jdo.JDOHelper;
 import javax.jdo.JDOObjectNotFoundException;
 import javax.jdo.PersistenceManager;
 import javax.xml.transform.TransformerException;
@@ -21,11 +22,23 @@ import javax.xml.transform.TransformerException;
 import org.apache.log4j.Logger;
 import org.nightlabs.ModuleException;
 import org.nightlabs.i18n.I18nText;
+import org.nightlabs.jfire.idgenerator.IDGenerator;
 import org.nightlabs.jfire.organisation.Organisation;
 import org.nightlabs.jfire.reporting.layout.ReportCategory;
 import org.nightlabs.jfire.reporting.layout.ReportLayout;
 import org.nightlabs.jfire.reporting.layout.ReportRegistryItem;
 import org.nightlabs.jfire.reporting.layout.id.ReportRegistryItemID;
+import org.nightlabs.jfire.reporting.parameter.ValueProvider;
+import org.nightlabs.jfire.reporting.parameter.config.AcquisitionParameterConfig;
+import org.nightlabs.jfire.reporting.parameter.config.IGraphicalInfoProvider;
+import org.nightlabs.jfire.reporting.parameter.config.ReportParameterAcquisitionSetup;
+import org.nightlabs.jfire.reporting.parameter.config.ReportParameterAcquisitionUseCase;
+import org.nightlabs.jfire.reporting.parameter.config.ValueAcquisitionSetup;
+import org.nightlabs.jfire.reporting.parameter.config.ValueConsumer;
+import org.nightlabs.jfire.reporting.parameter.config.ValueConsumerBinding;
+import org.nightlabs.jfire.reporting.parameter.config.ValueProviderConfig;
+import org.nightlabs.jfire.reporting.parameter.config.id.ReportParameterAcquisitionUseCaseID;
+import org.nightlabs.jfire.reporting.parameter.id.ValueProviderID;
 import org.nightlabs.jfire.scripting.ScriptRegistry;
 import org.nightlabs.jfire.servermanager.JFireServerManager;
 import org.nightlabs.util.Utils;
@@ -144,7 +157,7 @@ public class ReportingInitializer {
 	 * @throws ModuleException
 	 */	
 	public void initialize() 
-	throws ModuleException 
+	throws ReportingInitializerException 
 	{
 		String j2eeBaseDir = jfsm.getJFireServerConfigModule().getJ2ee().getJ2eeDeployBaseDirectory();
 		File scriptDir = new File(j2eeBaseDir, scriptSubDir);
@@ -209,12 +222,12 @@ public class ReportingInitializer {
 		return null;
 	}
 	
-	private void createElementName(Node elementNode, I18nText name, String def) 
+	private void createElementName(Node elementNode, String elementName, I18nText name, String def) 
 	{
 		// script name
 		boolean nameSet = false;
 		if (elementNode != null) {
-			Collection<Node> nodes = NLDOMUtil.findNodeList(elementNode, "name");
+			Collection<Node> nodes = NLDOMUtil.findNodeList(elementNode, elementName);
 			for (Node node : nodes) {
 				Node lIDNode = node.getAttributes().getNamedItem("language");
 				if (lIDNode != null && !"".equals(lIDNode.getTextContent())) {
@@ -225,12 +238,12 @@ public class ReportingInitializer {
 					logger.warn("name element of node "+elementNode.getNodeName()+" has an invalid/missing language attribute");
 			}
 		}
-		if (!nameSet)
+		if (!nameSet && def != null)
 			name.setText(Locale.ENGLISH.getLanguage(), def);
 	}
 	
 	private void createReportCategories(File dir, ReportCategory parent) 
-	throws ModuleException
+	throws ReportingInitializerException
 	{
 		try {
 			String categoryID = dir.getName();
@@ -259,7 +272,7 @@ public class ReportingInitializer {
 			ReportCategory category = createCategory(pm, parent, organisationID, itemType, categoryID, internal);
 
 			// create the category name
-			createElementName(catNode, category.getName(), categoryID);
+			createElementName(catNode, "name", category.getName(), categoryID);
 			logger.info("create Script Category = "+category.getName());
 			
 
@@ -305,7 +318,9 @@ public class ReportingInitializer {
 						layout.loadFile(reportFile);
 					}
 					
-					createElementName(reportNode, layout.getName(), reportID);
+					createElementName(reportNode, "name", layout.getName(), reportID);
+					
+					createReportParameterAcquisitionSetup(reportFile, reportNode, layout);
 					
 				} catch (Exception e) {
 					logger.warn("could NOT create ReportLayout "+reportID+"!", e);
@@ -319,11 +334,11 @@ public class ReportingInitializer {
 				createReportCategories(subDirs[i], category);
 			}
 		} catch (IOException e) {
-			throw new ModuleException(e);
+			throw new ReportingInitializerException(e);
 		} catch (TransformerException e) {
-			throw new ModuleException(e);
+			throw new ReportingInitializerException(e);
 		} catch (SAXException e) {
-			throw new ModuleException(e);
+			throw new ReportingInitializerException(e);
 		}
 	}
 
@@ -341,5 +356,266 @@ public class ReportingInitializer {
 			return "rptdesign".equals(fileExtension);
 		}	
 	};
+
 	
+	protected void createReportParameterAcquisitionSetup(File reportFile, Node reportNode, ReportLayout layout)
+	throws ReportingInitializerException
+	{
+		Node acquisitionNode = NLDOMUtil.findSingleNode(reportNode, "parameter-acquisition");
+		if (acquisitionNode == null)
+			return;
+		
+		// the setup already persistent
+		ReportParameterAcquisitionSetup setup = ReportParameterAcquisitionSetup.getSetupForReportLayout(pm, (ReportRegistryItemID)JDOHelper.getObjectId(layout));
+		
+		Map<String, Object> id2BindingObject = new HashMap<String, Object>();
+		
+		Collection<Node> useCaseNodes = NLDOMUtil.findNodeList(acquisitionNode, "use-case");
+		for (Node useCaseNode : useCaseNodes) {
+			Node useCaseIDNode = useCaseNode.getAttributes().getNamedItem("id");
+			if (useCaseIDNode == null)
+				throw new ReportingInitializerException("ReportParameterAcquisitionUseCase element <use-case> must define an id attribute. See file "+reportFile.toString());
+			String useCaseID = useCaseIDNode.getNodeValue();
+			
+			boolean overwriteOnInit = false;			
+			Node overwriteNode = reportNode.getAttributes().getNamedItem("overwriteOnInit");
+			if (overwriteNode != null && !"".equals(overwriteNode.getTextContent()))
+				overwriteOnInit = Boolean.parseBoolean(overwriteNode.getTextContent());
+			
+			ReportParameterAcquisitionUseCase useCase = getUseCase(setup, useCaseID);
+			if (!overwriteOnInit && useCase != null)
+				// use-case was already created sometime and should not be overwritten
+				// continue with next use-case
+				continue;
+			
+			if (useCase != null && overwriteOnInit) {
+				// use-case should be overwritten
+				useCase = resetUseCaseAndAcquisitionSetup(setup, useCase);
+			}
+
+			if (setup == null) {
+				// if setup not created by now, create it
+				setup = new ReportParameterAcquisitionSetup(organisationID, IDGenerator.nextID(ReportParameterAcquisitionSetup.class), layout);
+				setup = (ReportParameterAcquisitionSetup) pm.makePersistent(setup);
+			}
+			
+			// (re-)create the use case
+			if (useCase == null)
+				useCase = new ReportParameterAcquisitionUseCase(setup, useCaseID);
+			createElementName(useCaseNode, "name", useCase.getName(), useCaseID);
+			createElementName(useCaseNode, "description", useCase.getDescription(), useCaseID);
+
+			ValueAcquisitionSetup acquisitionSetup = new ValueAcquisitionSetup(organisationID, IDGenerator.nextID(ValueAcquisitionSetup.class), setup, useCase);
+			
+			id2BindingObject.clear();
+
+			// Read parameter list
+			Collection<Node> parameters = NLDOMUtil.findNodeList(useCaseNode, "parameters/parameter");
+			for (Node paramNode : parameters) {
+				try {
+					String id = NLDOMUtil.getNonEmptyAttributeValue(paramNode, "id");
+					String name = NLDOMUtil.getNonEmptyAttributeValue(paramNode, "name");
+					String type = NLDOMUtil.getNonEmptyAttributeValue(paramNode, "type");
+					AcquisitionParameterConfig parameterConfig = new AcquisitionParameterConfig(acquisitionSetup, name, type);					
+					setGraphicalData(paramNode, parameterConfig);
+					id2BindingObject.put(id, parameterConfig);
+					acquisitionSetup.getParameterConfigs().add(parameterConfig);
+				} catch (IllegalArgumentException e) {
+					throw new ReportingInitializerException("Some attribute is missing for the parameters declaration in the parameter-acquisition in file "+reportFile, e);
+				}
+			}
+			
+			// Read value provider Config List
+			Collection<Node> providerConfigs = NLDOMUtil.findNodeList(useCaseNode, "value-provider-configs/config");
+			for (Node providerNode : providerConfigs) {
+				try {
+					String id = NLDOMUtil.getNonEmptyAttributeValue(providerNode, "id");
+					String providerOrganisationID = NLDOMUtil.getNonEmptyAttributeValue(providerNode, "organisationID");
+					String providerCategoryID = NLDOMUtil.getNonEmptyAttributeValue(providerNode, "categoryID");
+					String valueProviderID = NLDOMUtil.getNonEmptyAttributeValue(providerNode, "valueProviderID");
+					String pageIndexStr = NLDOMUtil.getNonEmptyAttributeValue(providerNode, "pageIndex");
+					if (pageIndexStr == null)
+						pageIndexStr = "0";
+					String pageOrderStr = NLDOMUtil.getNonEmptyAttributeValue(providerNode, "pageOrder");
+					if (pageOrderStr == null)
+						pageOrderStr = "0";
+					int pageIndex = 0;
+					try {
+						pageIndex = Integer.parseInt(pageIndexStr);
+					} catch (Exception e) {
+						pageIndex = 0;
+					}
+					int pageOrder = 0;
+					try {
+						pageIndex = Integer.parseInt(pageIndexStr);
+					} catch (Exception e) {
+						pageIndex = 0;
+					}
+
+					ValueProviderConfig config = new ValueProviderConfig(acquisitionSetup, IDGenerator.nextID(ValueProviderConfig.class));
+					ValueProviderID providerID = ValueProviderID.create(providerOrganisationID, providerCategoryID, valueProviderID);
+					ValueProvider provider = null;
+					try {
+						provider = (ValueProvider) pm.getObjectById(providerID);
+						provider.getCategory();
+					} catch (JDOObjectNotFoundException e) {
+						throw new ReportingInitializerException("Referenced ValueProvider does not exist "+providerID+". See "+reportFile, e);
+					}
+					config.setValueProvider(provider);
+					config.setPageIndex(pageIndex);					
+					config.setPageOrder(pageOrder);
+					
+					boolean allowOutputNull = false;
+					String allowNullValue = NLDOMUtil.getAttributeValue(providerNode, "allowNullOutputValue");
+					if (allowNullValue != null) {
+						try {
+							allowOutputNull = Boolean.parseBoolean(allowNullValue);
+						} catch (Exception e) {
+							allowOutputNull = false;
+						}
+					}
+					config.setAllowNullOutputValue(allowOutputNull);
+					
+					boolean showMessageInHeader = true;
+					String showMessage = NLDOMUtil.getAttributeValue(providerNode, "showMessageInHeader");
+					if (showMessage != null) {
+						try {
+							showMessageInHeader = Boolean.parseBoolean(showMessage);
+						} catch (Exception e) {
+							showMessageInHeader = true;
+						}
+					}
+					config.setShowMessageInHeader(showMessageInHeader);
+					
+					createElementName(providerNode, "message", config.getMessage(), null);
+					
+					setGraphicalData(providerNode, config);
+					
+					id2BindingObject.put(id, config);
+					acquisitionSetup.getValueProviderConfigs().add(config);					
+				} catch (IllegalArgumentException e) {
+					throw new ReportingInitializerException("Some attribute is missing for the value-provider-configs declaration in the parameter-acquisition in file "+reportFile, e);
+				}
+			}
+			
+			// Read binding list
+			Collection<Node> bindings = NLDOMUtil.findNodeList(useCaseNode, "value-consumer-bindings/binding");
+			for (Node bindingNode : bindings) {
+				try {
+					Node providerNode = NLDOMUtil.findElementNode("provider", bindingNode);
+					if (providerNode == null)
+						throw new ReportingInitializerException("Element value-consumer-binding/binding has to define sub-element provider. See file "+reportFile);
+					String providerID = NLDOMUtil.getNonEmptyAttributeValue(providerNode, "id");
+					Node parameterNode = NLDOMUtil.findElementNode("parameter", bindingNode);
+					if (parameterNode == null)
+						throw new ReportingInitializerException("Element value-consumer-binding/binding has to define sub-element parameter. See file "+reportFile);
+					String parameterName = NLDOMUtil.getNonEmptyAttributeValue(parameterNode, "name");
+					Node consumerNode = NLDOMUtil.findElementNode("consumer", bindingNode);
+					if (consumerNode == null)
+						throw new ReportingInitializerException("Element value-consumer-binding/binding has to define sub-element consumer. See file "+reportFile);
+					String consumerID = NLDOMUtil.getNonEmptyAttributeValue(consumerNode, "id");
+
+					ValueProviderConfig provider = null; 
+					try {
+						provider = (ValueProviderConfig) id2BindingObject.get(providerID);
+						if (provider == null)
+							throw new IllegalArgumentException("Could not resolve the provider with id=\""+providerID+"\".");
+					} catch (Exception e) {
+						throw new ReportingInitializerException("The provider-id of a binding does not point to a ValueProviderConfig. File "+reportFile, e);
+					}
+					ValueConsumer consumer = null;
+					try {
+						consumer = (ValueConsumer) id2BindingObject.get(consumerID);
+						if (consumer == null)
+							throw new IllegalArgumentException("Could not resolve the consumer with id=\""+consumerID+"\".");
+					} catch (Exception e) {
+						throw new ReportingInitializerException("The provider-id of a binding does not point to a ValueProviderConfig. File "+reportFile, e);
+					}
+
+					ValueConsumerBinding binding = new ValueConsumerBinding(organisationID, IDGenerator.nextID(ValueConsumerBinding.class), acquisitionSetup);
+					binding.setProvider(provider);
+					binding.setParameterID(parameterName);
+					binding.setConsumer(consumer);
+					acquisitionSetup.getValueConsumerBindings().add(binding);
+				} catch (IllegalArgumentException e) {
+					throw new ReportingInitializerException("Some attribute is missing for the value-consumer-bindings declaration in the parameter-acquisition in file "+reportFile, e);
+				}
+			}			
+			// make the usecase setup persistent
+			setup.getValueAcquisitionSetups().put(useCase, acquisitionSetup);
+			
+			// check if its the default use case
+			boolean defUseCase = false;
+			String defaultStr = NLDOMUtil.getAttributeValue(useCaseNode, "default");
+			if (defaultStr != null || "".equals(defaultStr.trim())) {
+				try {
+					defUseCase = Boolean.parseBoolean(defaultStr);
+				} catch (Exception e) {
+					defUseCase = false;
+				}
+			}
+			if (defUseCase)
+				setup.setDefaultSetup(acquisitionSetup);
+		}
+	}
+	
+	private ReportParameterAcquisitionUseCase getUseCase(ReportParameterAcquisitionSetup setup, String useCaseID) {
+		if (setup == null)
+			return null;
+		for (Map.Entry<ReportParameterAcquisitionUseCase, ValueAcquisitionSetup> entry : setup.getValueAcquisitionSetups().entrySet()) {
+			if (entry.getKey().getReportParameterAcquisitionUseCaseID().equals(useCaseID))
+				return entry.getKey();
+		}
+		if (setup.getDefaultSetup() != null &&
+			setup.getDefaultSetup().getUseCase() != null &&
+			setup.getDefaultSetup().getUseCase().getReportParameterAcquisitionUseCaseID().equals(useCaseID)
+		)
+			return setup.getDefaultSetup().getUseCase();
+		ReportParameterAcquisitionUseCaseID id = ReportParameterAcquisitionUseCaseID.create(setup.getOrganisationID(), setup.getReportParameterAcquisitionSetupID(), useCaseID);
+		ReportParameterAcquisitionUseCase useCase = null;
+		try {			
+			useCase = (ReportParameterAcquisitionUseCase) pm.getObjectById(id);
+			useCase.getReportParameterAcquisitionSetupID();
+		} catch (JDOObjectNotFoundException e) {
+			useCase = null;
+		}
+		return useCase;
+	}
+	
+	private void setGraphicalData(Node elementNode, IGraphicalInfoProvider graphicalInfoProvider) {
+		String xStr = NLDOMUtil.getAttributeValue(elementNode, "x");
+		int x = 0;
+		try {
+			x = Integer.parseInt(xStr);
+		} catch (Exception e) {
+			x = 0;
+		}
+		graphicalInfoProvider.setX(x);
+		
+		String yStr = NLDOMUtil.getAttributeValue(elementNode, "y");
+		int y = 0;
+		try {
+			y = Integer.parseInt(yStr);
+		} catch (Exception e) {
+			y = 0;
+		}
+		graphicalInfoProvider.setY(y);
+	}
+	
+	private ReportParameterAcquisitionUseCase resetUseCaseAndAcquisitionSetup(ReportParameterAcquisitionSetup setup, ReportParameterAcquisitionUseCase useCase) {
+		if (setup.getDefaultSetup() != null && setup.getDefaultSetup().getUseCase() != null && setup.getDefaultSetup().getUseCase().equals(useCase))
+			setup.setDefaultSetup(null);
+		for (Map.Entry<ReportParameterAcquisitionUseCase, ValueAcquisitionSetup> entry : setup.getValueAcquisitionSetups().entrySet()) {
+			if (entry.getKey().getReportParameterAcquisitionUseCaseID().equals(useCase.getReportParameterAcquisitionUseCaseID())) {
+				for (ValueConsumerBinding binding : entry.getValue().getValueConsumerBindings()) {
+					pm.deletePersistent(binding);
+				}
+				entry.getValue().getValueConsumerBindings().clear();
+				entry.getValue().getParameterConfigs().clear();
+				entry.getValue().getValueProviderConfigs().clear();
+				return entry.getKey();
+			}
+		}
+		return useCase;
+	}
 }

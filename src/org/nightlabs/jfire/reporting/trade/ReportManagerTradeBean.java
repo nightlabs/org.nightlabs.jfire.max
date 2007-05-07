@@ -27,44 +27,27 @@
 package org.nightlabs.jfire.reporting.trade;
 
 import java.rmi.RemoteException;
-import java.util.ArrayList;
 import java.util.Date;
-import java.util.HashSet;
-import java.util.List;
 import java.util.Locale;
-import java.util.Map;
-import java.util.Set;
 
 import javax.ejb.CreateException;
 import javax.ejb.EJBException;
 import javax.ejb.SessionBean;
 import javax.ejb.SessionContext;
-import javax.jdo.JDOHelper;
 import javax.jdo.PersistenceManager;
 
 import org.apache.log4j.Logger;
 import org.nightlabs.ModuleException;
 import org.nightlabs.jfire.accounting.id.InvoiceID;
 import org.nightlabs.jfire.base.BaseSessionBeanImpl;
-import org.nightlabs.jfire.idgenerator.IDGenerator;
 import org.nightlabs.jfire.organisation.Organisation;
-import org.nightlabs.jfire.reporting.layout.ReportLayout;
-import org.nightlabs.jfire.reporting.layout.id.ReportRegistryItemID;
+import org.nightlabs.jfire.reporting.ReportingInitializerException;
 import org.nightlabs.jfire.reporting.parameter.ReportParameterUtil;
 import org.nightlabs.jfire.reporting.parameter.ValueProvider;
 import org.nightlabs.jfire.reporting.parameter.ValueProviderCategory;
 import org.nightlabs.jfire.reporting.parameter.ValueProviderInputParameter;
 import org.nightlabs.jfire.reporting.parameter.ReportParameterUtil.NameEntry;
-import org.nightlabs.jfire.reporting.parameter.config.AcquisitionParameterConfig;
-import org.nightlabs.jfire.reporting.parameter.config.ReportParameterAcquisitionSetup;
-import org.nightlabs.jfire.reporting.parameter.config.ReportParameterAcquisitionUseCase;
-import org.nightlabs.jfire.reporting.parameter.config.ValueAcquisitionSetup;
-import org.nightlabs.jfire.reporting.parameter.config.ValueConsumerBinding;
-import org.nightlabs.jfire.reporting.parameter.config.ValueProviderConfig;
-import org.nightlabs.jfire.reporting.parameter.config.ValueProviderProvider;
 import org.nightlabs.jfire.reporting.parameter.id.ValueProviderCategoryID;
-import org.nightlabs.jfire.reporting.parameter.id.ValueProviderID;
-import org.nightlabs.jfire.security.SecurityReflector;
 import org.nightlabs.jfire.servermanager.JFireServerManager;
 import org.nightlabs.jfire.store.id.ProductTypeID;
 import org.nightlabs.jfire.transfer.id.AnchorID;
@@ -146,6 +129,7 @@ implements SessionBean
 	
 	/**
 	 * This method is called by the datastore initialization mechanism.
+	 * @throws ReportingInitializerException 
 	 * 
 	 * @throws ModuleException
 	 *
@@ -153,17 +137,17 @@ implements SessionBean
 	 * @ejb.permission role-name="JFireReporting-admin"
 	 * @ejb.transaction type = "Required"
 	 */
-	public void initializeReporting() 
-	throws ModuleException 
+	public void initializeReporting() throws ReportingInitializerException 
 	{
 		PersistenceManager pm;
 		pm = getPersistenceManager();
 		JFireServerManager jfireServerManager = getJFireServerManager();
 		try {
 			
+			initializeReportParameterAcquisition(pm);
+			
 			ReportingInitializer.initialize(pm, jfireServerManager, Organisation.DEVIL_ORGANISATION_ID);
 			
-			initializeReportParameterAcquisition(pm);
 			
 		} finally {
 			pm.close();
@@ -186,7 +170,7 @@ implements SessionBean
 				new NameEntry[] {new NameEntry(Locale.ENGLISH.getLanguage(), "Legal entity parameters")}
 			);
 		
-		ValueProvider leSearch = ReportParameterUtil.createValueProvider(pm, leCategory, ReportingTradeConstants.VALUE_PROVIDER_ID_LEGAL_ENTITY_SEARCH, AnchorID.class.getName(),
+		ReportParameterUtil.createValueProvider(pm, leCategory, ReportingTradeConstants.VALUE_PROVIDER_ID_LEGAL_ENTITY_SEARCH, AnchorID.class.getName(),
 				new NameEntry[] {new NameEntry(Locale.ENGLISH.getLanguage(), "Customer search")},
 				new NameEntry[] {new NameEntry(Locale.ENGLISH.getLanguage(), "Customer search")},
 				new NameEntry[] {new NameEntry(Locale.ENGLISH.getLanguage(), "Select a customer")}
@@ -240,93 +224,93 @@ implements SessionBean
 		
 		
 		
-		// Configure report layout
-		
-		ReportRegistryItemID defInvoiceID = ReportRegistryItemID.create(
-				Organisation.DEVIL_ORGANISATION_ID, 
-				ReportingTradeConstants.REPORT_REGISTRY_ITEM_TYPE_INVOICE, 
-				ReportingTradeConstants.REPORT_REGISTRY_ITEM_ID_DEFAULT_INVOICE_LAYOUT
-			);
-		ReportLayout defInvoice = (ReportLayout) pm.getObjectById(defInvoiceID);
-		logger.debug("Have report layout");
-		
-		String organisationID = SecurityReflector.getUserDescriptor().getOrganisationID();
-		
-		ReportParameterAcquisitionSetup setup = ReportParameterAcquisitionSetup.getSetupForReportLayout(pm, (ReportRegistryItemID)JDOHelper.getObjectId(defInvoice));
-		if (setup != null) {
-			for (Map.Entry<ReportParameterAcquisitionUseCase, ValueAcquisitionSetup> entry : setup.getValueAcquisitionSetups().entrySet()) {
-//				pm.deletePersistent(entry.getKey());
-//				pm.deletePersistent(entry.getValue());
-				for (ValueConsumerBinding binding : entry.getValue().getValueConsumerBindings()) {
-					pm.deletePersistent(binding);
-				}				
-			}
-			setup.setDefaultSetup(null);
+//		// Configure report layout
+//		
+//		ReportRegistryItemID defInvoiceID = ReportRegistryItemID.create(
+//				Organisation.DEVIL_ORGANISATION_ID, 
+//				ReportingTradeConstants.REPORT_REGISTRY_ITEM_TYPE_INVOICE, 
+//				ReportingTradeConstants.REPORT_REGISTRY_ITEM_ID_DEFAULT_INVOICE_LAYOUT
+//			);
+//		ReportLayout defInvoice = (ReportLayout) pm.getObjectById(defInvoiceID);
+//		logger.debug("Have report layout");
+//		
+//		String organisationID = SecurityReflector.getUserDescriptor().getOrganisationID();
+//		
+//		ReportParameterAcquisitionSetup setup = ReportParameterAcquisitionSetup.getSetupForReportLayout(pm, (ReportRegistryItemID)JDOHelper.getObjectId(defInvoice));
+//		if (setup != null) {
+//			for (Map.Entry<ReportParameterAcquisitionUseCase, ValueAcquisitionSetup> entry : setup.getValueAcquisitionSetups().entrySet()) {
+////				pm.deletePersistent(entry.getKey());
+////				pm.deletePersistent(entry.getValue());
+//				for (ValueConsumerBinding binding : entry.getValue().getValueConsumerBindings()) {
+//					pm.deletePersistent(binding);
+//				}				
+//			}
+//			setup.setDefaultSetup(null);
+////			pm.flush();
+////			setup.getValueAcquisitionSetups().clear();
 //			pm.flush();
-//			setup.getValueAcquisitionSetups().clear();
-			pm.flush();
-			pm.deletePersistent(setup);
-			pm.flush();
-		}
-		setup = new ReportParameterAcquisitionSetup(organisationID, IDGenerator.nextID(ReportParameterAcquisitionSetup.class), defInvoice);
-		setup = (ReportParameterAcquisitionSetup) pm.makePersistent(setup);
-//		else  {
-//			setup.getValueAcquisitionSetups().clear();
+//			pm.deletePersistent(setup);
 //			pm.flush();
 //		}
-		logger.debug("Created NEW setup");
-
-		ReportParameterAcquisitionUseCase defUseCase = new ReportParameterAcquisitionUseCase(setup, ReportParameterAcquisitionUseCase.USE_CASE_ID_DEFAULT);
-		defUseCase.getName().setText(Locale.ENGLISH.getLanguage(), "Default Usecase");
-		logger.debug("Created NEW default use case");
-		
-		ValueAcquisitionSetup valueAcquisitionSetup = new ValueAcquisitionSetup(organisationID, IDGenerator.nextID(ValueAcquisitionSetup.class), setup, defUseCase);
-		logger.debug("Created ValueAcquisitionSetup");
-		List<AcquisitionParameterConfig> parameterConfigs = new ArrayList<AcquisitionParameterConfig>();
-		AcquisitionParameterConfig pc1 = new AcquisitionParameterConfig(valueAcquisitionSetup);
-		pc1.setParameterID("invoiceID");
-		pc1.setParameterType(InvoiceID.class.getName());
-		parameterConfigs.add(pc1);
-		valueAcquisitionSetup.setParameterConfigs(parameterConfigs);
-		logger.debug("Created parameter config");
-		
-		Set<ValueProviderConfig> providerConfigs = new HashSet<ValueProviderConfig>();
-		ValueProviderConfig vpc1 = new ValueProviderConfig(valueAcquisitionSetup, IDGenerator.nextID(ValueProviderConfig.class));
-		vpc1.setValueProvider(leSearch);
-		
-		ValueProviderConfig vpc2 = new ValueProviderConfig(valueAcquisitionSetup, IDGenerator.nextID(ValueProviderConfig.class));
-		vpc2.setValueProvider(invoiceByCustomer);
-		
-		providerConfigs.add(vpc1);
-		providerConfigs.add(vpc2);
-		valueAcquisitionSetup.setValueProviderConfigs(providerConfigs);
-		logger.debug("Created value provider config");
-		
-		Set<ValueConsumerBinding> bindings = new HashSet<ValueConsumerBinding>();
-		ValueConsumerBinding b1 = new ValueConsumerBinding(organisationID, IDGenerator.nextID(ValueConsumerBinding.class), valueAcquisitionSetup);
-		b1.setConsumer(pc1);
-		b1.setParameterID("invoiceID");
-		b1.setProvider(vpc2);
-		
-		ValueConsumerBinding b2 = new ValueConsumerBinding(organisationID, IDGenerator.nextID(ValueConsumerBinding.class), valueAcquisitionSetup);
-		b2.setConsumer(vpc2);
-		b2.setParameterID("customer");
-		b2.setProvider(vpc1);
-		bindings.add(b1);
-		bindings.add(b2);
-		valueAcquisitionSetup.setValueConsumerBindings(bindings);
-		logger.debug("Created bindings");
-
-		setup.getValueAcquisitionSetups().put(defUseCase, valueAcquisitionSetup);
-		setup.setDefaultSetup(valueAcquisitionSetup);
-
-		ValueProviderProvider provider = new ValueProviderProvider() {
-			public ValueProvider getValueProvider(ValueProviderConfig valueProviderConfig) {
-				return (ValueProvider) pm.getObjectById(ValueProviderID.create(valueProviderConfig.getValueProviderOrganisationID(), valueProviderConfig.getValueProviderCategoryID(), valueProviderConfig.getValueProviderID()));
-			}
-		};
-		
-		setup.getDefaultSetup().createAcquisitionSequence(provider);
-		logger.debug("Persisted setup");
+//		setup = new ReportParameterAcquisitionSetup(organisationID, IDGenerator.nextID(ReportParameterAcquisitionSetup.class), defInvoice);
+//		setup = (ReportParameterAcquisitionSetup) pm.makePersistent(setup);
+////		else  {
+////			setup.getValueAcquisitionSetups().clear();
+////			pm.flush();
+////		}
+//		logger.debug("Created NEW setup");
+//
+//		ReportParameterAcquisitionUseCase defUseCase = new ReportParameterAcquisitionUseCase(setup, ReportParameterAcquisitionUseCase.USE_CASE_ID_DEFAULT);
+//		defUseCase.getName().setText(Locale.ENGLISH.getLanguage(), "Default Usecase");
+//		logger.debug("Created NEW default use case");
+//		
+//		ValueAcquisitionSetup valueAcquisitionSetup = new ValueAcquisitionSetup(organisationID, IDGenerator.nextID(ValueAcquisitionSetup.class), setup, defUseCase);
+//		logger.debug("Created ValueAcquisitionSetup");
+//		List<AcquisitionParameterConfig> parameterConfigs = new ArrayList<AcquisitionParameterConfig>();
+//		AcquisitionParameterConfig pc1 = new AcquisitionParameterConfig(valueAcquisitionSetup);
+//		pc1.setParameterID("invoiceID");
+//		pc1.setParameterType(InvoiceID.class.getName());
+//		parameterConfigs.add(pc1);
+//		valueAcquisitionSetup.setParameterConfigs(parameterConfigs);
+//		logger.debug("Created parameter config");
+//		
+//		Set<ValueProviderConfig> providerConfigs = new HashSet<ValueProviderConfig>();
+//		ValueProviderConfig vpc1 = new ValueProviderConfig(valueAcquisitionSetup, IDGenerator.nextID(ValueProviderConfig.class));
+//		vpc1.setValueProvider(leSearch);
+//		
+//		ValueProviderConfig vpc2 = new ValueProviderConfig(valueAcquisitionSetup, IDGenerator.nextID(ValueProviderConfig.class));
+//		vpc2.setValueProvider(invoiceByCustomer);
+//		
+//		providerConfigs.add(vpc1);
+//		providerConfigs.add(vpc2);
+//		valueAcquisitionSetup.setValueProviderConfigs(providerConfigs);
+//		logger.debug("Created value provider config");
+//		
+//		Set<ValueConsumerBinding> bindings = new HashSet<ValueConsumerBinding>();
+//		ValueConsumerBinding b1 = new ValueConsumerBinding(organisationID, IDGenerator.nextID(ValueConsumerBinding.class), valueAcquisitionSetup);
+//		b1.setConsumer(pc1);
+//		b1.setParameterID("invoiceID");
+//		b1.setProvider(vpc2);
+//		
+//		ValueConsumerBinding b2 = new ValueConsumerBinding(organisationID, IDGenerator.nextID(ValueConsumerBinding.class), valueAcquisitionSetup);
+//		b2.setConsumer(vpc2);
+//		b2.setParameterID("customer");
+//		b2.setProvider(vpc1);
+//		bindings.add(b1);
+//		bindings.add(b2);
+//		valueAcquisitionSetup.setValueConsumerBindings(bindings);
+//		logger.debug("Created bindings");
+//
+//		setup.getValueAcquisitionSetups().put(defUseCase, valueAcquisitionSetup);
+//		setup.setDefaultSetup(valueAcquisitionSetup);
+//
+//		ValueProviderProvider provider = new ValueProviderProvider() {
+//			public ValueProvider getValueProvider(ValueProviderConfig valueProviderConfig) {
+//				return (ValueProvider) pm.getObjectById(ValueProviderID.create(valueProviderConfig.getValueProviderOrganisationID(), valueProviderConfig.getValueProviderCategoryID(), valueProviderConfig.getValueProviderID()));
+//			}
+//		};
+//		
+//		setup.getDefaultSetup().createAcquisitionSequence(provider);
+//		logger.debug("Persisted setup");
 	}
 }

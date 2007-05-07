@@ -9,6 +9,7 @@ import java.util.Locale;
 import javax.jdo.PersistenceManager;
 
 import org.nightlabs.ModuleException;
+import org.nightlabs.jfire.reporting.ReportingInitializerException;
 import org.nightlabs.jfire.reporting.layout.ReportCategory;
 import org.nightlabs.jfire.servermanager.JFireServerManager;
 
@@ -22,8 +23,7 @@ public class ReportingInitializer {
 			PersistenceManager pm, 
 			JFireServerManager jfireServerManager,
 			String organisationID
-		) 
-	throws ModuleException 
+		) throws ReportingInitializerException 
 	{
 		ReportCategory rootCategory = org.nightlabs.jfire.reporting.ReportingInitializer.createCategory(
 				pm, null, 

@@ -10,11 +10,42 @@
 	<report
 		file="Default-InvoiceLayout.rptdesign" 
 		id="Default-InvoiceLayout"
-		overwriteOnInit="false"
+		overwriteOnInit="true"
 	>
 	<!-- id is optional and defaults to the value of file without extension -->
 	<!-- overwriteOnInit is optional and defaults to true -->
 		<name language="de">Standard-Rechnung</name>
 		<name language="en">Default-Invoice</name>
+		
+		<parameter-acquisition>
+			<use-case id="DefaultUseCase" default="true" overwriteOnInit="true">
+				<name language="en">Default Usecase</name>
+				<parameters>
+					<parameter id="0" name="invoiceID" type="org.nightlabs.jfire.accounting.id.InvoiceID" x="554" y="43" />
+				</parameters>
+				<value-provider-configs>
+					<config id="1" organisationID="devil.NightLabs.org" categoryID="JFireReportingTrade-ValueProviderCategory-LegalEntity" valueProviderID="Search" pageIndex="0" pageOrder="0" allowNullOutputValue="false" showMessageInHeader="true" x="4" y="43" >
+						<message language="de">Suchen Sie den Rechnungs-Kunden</message>
+						<message language="en">Search the invoice customer</message>
+					</config>
+					<config id="2" organisationID="devil.NightLabs.org" categoryID="JFireReportingTrade-ValueProviderCategory-TradeDocuments-Invoice" valueProviderID="ByCustomer" pageIndex="1" pageOrder="0" allowNullOutputValue="false" showMessageInHeader="true" x="279" y="43" >
+						<message language="de">Wählen Sie eine der Rechnungen</message>
+						<message language="en">Select one of the customers invoices</message>
+					</config>
+				</value-provider-configs>
+				<value-consumer-bindings>
+					<binding>
+						<provider id="2"/>
+						<parameter name="invoiceID"/>
+						<consumer id="0"/>
+					</binding>
+					<binding>
+						<provider id="1"/>
+						<parameter name="customer"/>
+						<consumer id="2"/>
+					</binding>
+				</value-consumer-bindings>
+			</use-case>
+		</parameter-acquisition>
 	</report>
 </report-category>

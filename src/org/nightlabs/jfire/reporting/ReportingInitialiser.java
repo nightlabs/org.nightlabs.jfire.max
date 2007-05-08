@@ -25,8 +25,11 @@ import org.nightlabs.i18n.I18nText;
 import org.nightlabs.jfire.idgenerator.IDGenerator;
 import org.nightlabs.jfire.organisation.Organisation;
 import org.nightlabs.jfire.reporting.layout.ReportCategory;
+import org.nightlabs.jfire.reporting.layout.ReportInitializer;
 import org.nightlabs.jfire.reporting.layout.ReportLayout;
+import org.nightlabs.jfire.reporting.layout.ReportLayoutLocalisationData;
 import org.nightlabs.jfire.reporting.layout.ReportRegistryItem;
+import org.nightlabs.jfire.reporting.layout.id.ReportLayoutLocalisationDataID;
 import org.nightlabs.jfire.reporting.layout.id.ReportRegistryItemID;
 import org.nightlabs.jfire.reporting.parameter.ValueProvider;
 import org.nightlabs.jfire.reporting.parameter.config.AcquisitionParameterConfig;
@@ -52,27 +55,41 @@ import org.xml.sax.SAXException;
 import org.xml.sax.SAXParseException;
 
 /**
- * Helper class to initialize report layouts. The ReportingInitializer will
+ * <p>
+ * Helper class to initialize report layouts. The ReportingInitialiser will
  * recusursively scan a given directory and create a tree of {@link ReportCategory}s
- * and {@link ReportLayout}s according to the directory structure it finds.<br/>
- * 
+ * and {@link ReportLayout}s according to the directory structure it finds.
+ * </p>
+ * <p>
  * For each folder the initializer finds a category will be created as child of
- * the upper directory's one. A descriptor file 'content.xml' can be placed in
+ * the upper directorys one. A descriptor file 'content.xml' can be placed in
  * the directory to define in detail what id and names the category and report layous 
- * should get. <br/>
- * 
+ * should get.
+ * </p> 
+ * <p>
+ * The {@link ReportInitializer} will also create a parameter acquisition workflow
+ * defined in the content.xml for the report layout. For further details about how to 
+ * define the acquisition workflow see the content.xml dtd (http://www.nightlabs.de/dtd/reporting_initializer_*.dtd) 
+ * </p>
+ * <p>
+ * Additionally resource bundles used for localisation of the reports are created by the
+ * initialzer. These files should be placed in a subfolder 'resource' for each category and should be 
+ * prefixed with the report layout id. (e.g. DefaultInvoiceLayout_en_EN.properties)
+ * </p> 
+ * <p> 
  * The recommended usage is 
  * <ul>
- * <li><b>Create the initializer</b>: Use {@link #ReportingInitializer(String, ReportCategory, String, JFireServerManager, PersistenceManager, String)} to create the initializer and set the
+ * <li><b>Create the initializer</b>: Use {@link #ReportingInitialiser(String, ReportCategory, String, JFireServerManager, PersistenceManager, String)} to create the initializer and set the
  * base category, root directory and fallback values for ids</li>
  * <li><b>Initialize (sub)directories</b>: Use {@link #initialize()} to start the initialization</li>
+ * </p>
  * 
  * @author Alexander Bieber <alex [AT] nightlabs [DOT] de>
  *
  */
-public class ReportingInitializer {
+public class ReportingInitialiser {
 
-	protected static Logger logger = Logger.getLogger(ReportingInitializer.class);
+	protected static Logger logger = Logger.getLogger(ReportingInitialiser.class);
 
 	private String scriptSubDir;
 	private ReportCategory baseCategory;
@@ -120,7 +137,7 @@ public class ReportingInitializer {
 	}
 	
 	/**
-	 * Creates a new ReportingInitializer with the given parameters.
+	 * Creates a new ReportingInitialiser with the given parameters.
 	 * 
 	 * @param scriptSubDir This is the relative directory under the deploy base directory (e.g. "JFireReporting.ear/script/General")
 	 * @param baseCategory The base category from where the category-tree will be build.
@@ -129,7 +146,7 @@ public class ReportingInitializer {
 	 * @param registryItemType is the type (identifier) for the reports in categories, sub-categories get the scriptRegistryItemType from their parent 
 	 * @param organisationID If you're writing a JFire Community Project, this is {@link Organisation#DEVIL_ORGANISATION_ID}.
 	 */
-	public ReportingInitializer(
+	public ReportingInitialiser(
 			String scriptSubDir, ReportCategory baseCategory, String reportRegistryItemType, 
 			JFireServerManager jfsm, PersistenceManager pm, String organisationID
 		)
@@ -314,12 +331,14 @@ public class ReportingInitializer {
 						layout = (ReportLayout)pm.makePersistent(layout);
 						hadToBeCreated = true;
 					}
-					if (overwriteOnInit || hadToBeCreated) {
+					
+					boolean doInit = overwriteOnInit || hadToBeCreated; 
+					if (doInit) {
 						layout.loadFile(reportFile);
+						createElementName(reportNode, "name", layout.getName(), reportID);
+						createReportLocalisationBundle(reportFile, reportID, reportNode, layout);
 					}
-					
-					createElementName(reportNode, "name", layout.getName(), reportID);
-					
+					// This has its own overwriteOnInit
 					createReportParameterAcquisitionSetup(reportFile, reportNode, layout);
 					
 				} catch (Exception e) {
@@ -344,7 +363,7 @@ public class ReportingInitializer {
 
 	protected FileFilter dirFileFilter = new FileFilter() {	
 		public boolean accept(File pathname) {
-			return pathname.isDirectory();
+			return pathname.isDirectory() && !(pathname.toString().endsWith("resource"));
 		}	
 	};
 
@@ -426,7 +445,7 @@ public class ReportingInitializer {
 			}
 			
 			// Read value provider Config List
-			Collection<Node> providerConfigs = NLDOMUtil.findNodeList(useCaseNode, "value-provider-configs/config");
+			Collection<Node> providerConfigs = NLDOMUtil.findNodeList(useCaseNode, "value-provider-configs/provider-config");
 			for (Node providerNode : providerConfigs) {
 				try {
 					String id = NLDOMUtil.getNonEmptyAttributeValue(providerNode, "id");
@@ -617,5 +636,45 @@ public class ReportingInitializer {
 			}
 		}
 		return useCase;
+	}
+	
+	/**
+	 * Create the {@link ReportLayoutLocalisationData} objects for the given layout. It will search in a subfolder 'resource'
+	 * for entries named like reportID_{locale}.properties
+	 * 
+	 * @param reportFile The report file currently processed.
+	 * @param reportID The id of the {@link ReportLayout} currently processed. 
+	 * @param reportNode The 'report' node of the content.xml document currenty processed
+	 * @param layout The {@link ReportLayout} currently processed.
+	 * @throws ReportingInitializerException
+	 */
+	protected void createReportLocalisationBundle(File reportFile, final String reportID, Node reportNode, ReportLayout layout)
+	throws ReportingInitializerException
+	{		
+		File resourceFolder = new File(reportFile.getParentFile(), "resource");
+		File[] resourceFiles = resourceFolder.listFiles(new FileFilter() {
+			public boolean accept(File pathname) {
+				return pathname.isFile() && pathname.getName().startsWith(reportID);
+			}
+		});
+		for (File resFile : resourceFiles) {
+			String locale = ReportLayoutLocalisationData.extractLocale(reportFile.getName());
+			ReportLayoutLocalisationDataID localisationDataID = ReportLayoutLocalisationDataID.create(
+					layout.getOrganisationID(), layout.getReportRegistryItemType(), layout.getReportRegistryItemID(), locale  
+			);
+			ReportLayoutLocalisationData localisationData = null;
+			try {
+				localisationData = (ReportLayoutLocalisationData) pm.getObjectById(localisationDataID);
+				localisationData.getLocale();
+			} catch (JDOObjectNotFoundException e) {
+				localisationData = new ReportLayoutLocalisationData(layout, locale);
+				localisationData = (ReportLayoutLocalisationData) pm.makePersistent(localisationData);
+			}
+			try {
+				localisationData.loadFile(resFile);
+			} catch (IOException e) {
+				throw new ReportingInitializerException("Could not load localisatino file "+resFile, e);
+			}
+		}
 	}
 }

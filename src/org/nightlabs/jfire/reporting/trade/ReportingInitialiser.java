@@ -8,7 +8,6 @@ import java.util.Locale;
 
 import javax.jdo.PersistenceManager;
 
-import org.nightlabs.ModuleException;
 import org.nightlabs.jfire.reporting.ReportingInitializerException;
 import org.nightlabs.jfire.reporting.layout.ReportCategory;
 import org.nightlabs.jfire.servermanager.JFireServerManager;
@@ -17,7 +16,7 @@ import org.nightlabs.jfire.servermanager.JFireServerManager;
  * @author Alexander Bieber <alex [AT] nightlabs [DOT] de>
  *
  */
-public class ReportingInitializer {
+public class ReportingInitialiser {
 
 	public static void initialize(
 			PersistenceManager pm, 
@@ -25,7 +24,7 @@ public class ReportingInitializer {
 			String organisationID
 		) throws ReportingInitializerException 
 	{
-		ReportCategory rootCategory = org.nightlabs.jfire.reporting.ReportingInitializer.createCategory(
+		ReportCategory rootCategory = org.nightlabs.jfire.reporting.ReportingInitialiser.createCategory(
 				pm, null, 
 				organisationID, 
 				ReportingTradeConstants.REPORT_REGISTRY_ITEM_TYPE_ROOT, 
@@ -41,7 +40,7 @@ public class ReportingInitializer {
 		File[] subDirs = reportDir.listFiles();
 		for (int i = 0; i < subDirs.length; i++) {
 			if (subDirs[i].isDirectory()) {
-				new org.nightlabs.jfire.reporting.ReportingInitializer(
+				new org.nightlabs.jfire.reporting.ReportingInitialiser(
 						reportDirSuffix+File.separator+subDirs[i].getName(),
 						rootCategory,
 						ScriptingTradeConstants.SCRIPT_REGISTRY_ITEM_TYPE_TRADE_SCRIPT,

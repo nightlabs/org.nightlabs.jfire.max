@@ -146,7 +146,7 @@ implements SessionBean
 			
 			initializeReportParameterAcquisition(pm);
 			
-			ReportingInitializer.initialize(pm, jfireServerManager, Organisation.DEVIL_ORGANISATION_ID);
+			ReportingInitialiser.initialize(pm, jfireServerManager, Organisation.DEVIL_ORGANISATION_ID);
 			
 			
 		} finally {

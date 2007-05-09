@@ -142,13 +142,13 @@
   <value-consumer-bindings> complete the parameter acquisition workflow by mapping the
   output of <value-provider-configs> to the input of either a <parameter> of another <value-provider-config>.
   The objects are referenced by the ids given in the individual elements.
-  A <binding> therfore consists of three sub elements:
+  A <value-consumer-binding> therfore consists of three sub elements:
     <binding-provider>: references with the id a <value-provider-config> whose output will server the input of the following consumer
     <binding-parameter>: references with its 'name' attribute the parameter name that is served by the providers output.
                          The parameter name can either be the id of a providers input parameter or the name of a report parameter
     <binding-consumer>: references with the id the consumer of the providers output value. This can be a <parameter> of a <value-provider-config>
 -->
-<!ELEMENT value-consumer-bindings ( binding+ ) >
+<!ELEMENT value-consumer-bindings ( value-consumer-binding+ ) >
 
 <!ELEMENT value-consumer-binding ( binding-provider, binding-parameter, binding-consumer ) >
 

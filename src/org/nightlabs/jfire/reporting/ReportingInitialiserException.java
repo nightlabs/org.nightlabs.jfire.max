@@ -7,7 +7,7 @@ package org.nightlabs.jfire.reporting;
  * @author Alexander Bieber <!-- alex [AT] nightlabs [DOT] de -->
  *
  */
-public class ReportingInitializerException extends Exception {
+public class ReportingInitialiserException extends Exception {
 
 	/**
 	 * 
@@ -17,20 +17,20 @@ public class ReportingInitializerException extends Exception {
 	/**
 	 * 
 	 */
-	public ReportingInitializerException() {
+	public ReportingInitialiserException() {
 	}
 
 	/**
 	 * @param message
 	 */
-	public ReportingInitializerException(String message) {
+	public ReportingInitialiserException(String message) {
 		super(message);
 	}
 
 	/**
 	 * @param cause
 	 */
-	public ReportingInitializerException(Throwable cause) {
+	public ReportingInitialiserException(Throwable cause) {
 		super(cause);
 	}
 
@@ -38,7 +38,7 @@ public class ReportingInitializerException extends Exception {
 	 * @param message
 	 * @param cause
 	 */
-	public ReportingInitializerException(String message, Throwable cause) {
+	public ReportingInitialiserException(String message, Throwable cause) {
 		super(message, cause);
 	}
 

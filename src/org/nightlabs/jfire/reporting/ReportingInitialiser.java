@@ -25,7 +25,6 @@ import org.nightlabs.i18n.I18nText;
 import org.nightlabs.jfire.idgenerator.IDGenerator;
 import org.nightlabs.jfire.organisation.Organisation;
 import org.nightlabs.jfire.reporting.layout.ReportCategory;
-import org.nightlabs.jfire.reporting.layout.ReportInitializer;
 import org.nightlabs.jfire.reporting.layout.ReportLayout;
 import org.nightlabs.jfire.reporting.layout.ReportLayoutLocalisationData;
 import org.nightlabs.jfire.reporting.layout.ReportRegistryItem;
@@ -67,9 +66,9 @@ import org.xml.sax.SAXParseException;
  * should get.
  * </p> 
  * <p>
- * The {@link ReportInitializer} will also create a parameter acquisition workflow
+ * The {@link ReportInitialiser} will also create a parameter acquisition workflow
  * defined in the content.xml for the report layout. For further details about how to 
- * define the acquisition workflow see the content.xml dtd (http://www.nightlabs.de/dtd/reporting_initializer_*.dtd) 
+ * define the acquisition workflow see the content.xml dtd (http://www.nightlabs.de/dtd/reporting_initialiser_*.dtd) 
  * </p>
  * <p>
  * Additionally resource bundles used for localisation of the reports are created by the
@@ -81,7 +80,7 @@ import org.xml.sax.SAXParseException;
  * <ul>
  * <li><b>Create the initializer</b>: Use {@link #ReportingInitialiser(String, ReportCategory, String, JFireServerManager, PersistenceManager, String)} to create the initializer and set the
  * base category, root directory and fallback values for ids</li>
- * <li><b>Initialize (sub)directories</b>: Use {@link #initialize()} to start the initialization</li>
+ * <li><b>Initialise (sub)directories</b>: Use {@link #initialise()} to start the initialisation</li>
  * </p>
  * 
  * @author Alexander Bieber <alex [AT] nightlabs [DOT] de>
@@ -173,8 +172,8 @@ public class ReportingInitialiser {
 	 * 
 	 * @throws ModuleException
 	 */	
-	public void initialize() 
-	throws ReportingInitializerException 
+	public void initialise() 
+	throws ReportingInitialiserException 
 	{
 		String j2eeBaseDir = jfsm.getJFireServerConfigModule().getJ2ee().getJ2eeDeployBaseDirectory();
 		File scriptDir = new File(j2eeBaseDir, scriptSubDir);
@@ -260,7 +259,7 @@ public class ReportingInitialiser {
 	}
 	
 	private void createReportCategories(File dir, ReportCategory parent) 
-	throws ReportingInitializerException
+	throws ReportingInitialiserException
 	{
 		try {
 			String categoryID = dir.getName();
@@ -353,11 +352,11 @@ public class ReportingInitialiser {
 				createReportCategories(subDirs[i], category);
 			}
 		} catch (IOException e) {
-			throw new ReportingInitializerException(e);
+			throw new ReportingInitialiserException(e);
 		} catch (TransformerException e) {
-			throw new ReportingInitializerException(e);
+			throw new ReportingInitialiserException(e);
 		} catch (SAXException e) {
-			throw new ReportingInitializerException(e);
+			throw new ReportingInitialiserException(e);
 		}
 	}
 
@@ -378,7 +377,7 @@ public class ReportingInitialiser {
 
 	
 	protected void createReportParameterAcquisitionSetup(File reportFile, Node reportNode, ReportLayout layout)
-	throws ReportingInitializerException
+	throws ReportingInitialiserException
 	{
 		Node acquisitionNode = NLDOMUtil.findSingleNode(reportNode, "parameter-acquisition");
 		if (acquisitionNode == null)
@@ -393,7 +392,7 @@ public class ReportingInitialiser {
 		for (Node useCaseNode : useCaseNodes) {
 			Node useCaseIDNode = useCaseNode.getAttributes().getNamedItem("id");
 			if (useCaseIDNode == null)
-				throw new ReportingInitializerException("ReportParameterAcquisitionUseCase element <use-case> must define an id attribute. See file "+reportFile.toString());
+				throw new ReportingInitialiserException("ReportParameterAcquisitionUseCase element <use-case> must define an id attribute. See file "+reportFile.toString());
 			String useCaseID = useCaseIDNode.getNodeValue();
 			
 			boolean overwriteOnInit = false;			
@@ -440,7 +439,7 @@ public class ReportingInitialiser {
 					id2BindingObject.put(id, parameterConfig);
 					acquisitionSetup.getParameterConfigs().add(parameterConfig);
 				} catch (IllegalArgumentException e) {
-					throw new ReportingInitializerException("Some attribute is missing for the parameters declaration in the parameter-acquisition in file "+reportFile, e);
+					throw new ReportingInitialiserException("Some attribute is missing for the parameters declaration in the parameter-acquisition in file "+reportFile, e);
 				}
 			}
 			
@@ -478,7 +477,7 @@ public class ReportingInitialiser {
 						provider = (ValueProvider) pm.getObjectById(providerID);
 						provider.getCategory();
 					} catch (JDOObjectNotFoundException e) {
-						throw new ReportingInitializerException("Referenced ValueProvider does not exist "+providerID+". See "+reportFile, e);
+						throw new ReportingInitialiserException("Referenced ValueProvider does not exist "+providerID+". See "+reportFile, e);
 					}
 					config.setValueProvider(provider);
 					config.setPageIndex(pageIndex);					
@@ -513,25 +512,25 @@ public class ReportingInitialiser {
 					id2BindingObject.put(id, config);
 					acquisitionSetup.getValueProviderConfigs().add(config);					
 				} catch (IllegalArgumentException e) {
-					throw new ReportingInitializerException("Some attribute is missing for the value-provider-configs declaration in the parameter-acquisition in file "+reportFile, e);
+					throw new ReportingInitialiserException("Some attribute is missing for the value-provider-configs declaration in the parameter-acquisition in file "+reportFile, e);
 				}
 			}
 			
 			// Read binding list
-			Collection<Node> bindings = NLDOMUtil.findNodeList(useCaseNode, "value-consumer-bindings/binding");
+			Collection<Node> bindings = NLDOMUtil.findNodeList(useCaseNode, "value-consumer-bindings/value-consumer-binding");
 			for (Node bindingNode : bindings) {
 				try {
-					Node providerNode = NLDOMUtil.findElementNode("provider", bindingNode);
+					Node providerNode = NLDOMUtil.findElementNode("binding-provider", bindingNode);
 					if (providerNode == null)
-						throw new ReportingInitializerException("Element value-consumer-binding/binding has to define sub-element provider. See file "+reportFile);
+						throw new ReportingInitialiserException("Element value-consumer-binding/binding has to define sub-element provider. See file "+reportFile);
 					String providerID = NLDOMUtil.getNonEmptyAttributeValue(providerNode, "id");
-					Node parameterNode = NLDOMUtil.findElementNode("parameter", bindingNode);
+					Node parameterNode = NLDOMUtil.findElementNode("binding-parameter", bindingNode);
 					if (parameterNode == null)
-						throw new ReportingInitializerException("Element value-consumer-binding/binding has to define sub-element parameter. See file "+reportFile);
+						throw new ReportingInitialiserException("Element value-consumer-binding/binding has to define sub-element parameter. See file "+reportFile);
 					String parameterName = NLDOMUtil.getNonEmptyAttributeValue(parameterNode, "name");
-					Node consumerNode = NLDOMUtil.findElementNode("consumer", bindingNode);
+					Node consumerNode = NLDOMUtil.findElementNode("binding-consumer", bindingNode);
 					if (consumerNode == null)
-						throw new ReportingInitializerException("Element value-consumer-binding/binding has to define sub-element consumer. See file "+reportFile);
+						throw new ReportingInitialiserException("Element value-consumer-binding/binding has to define sub-element consumer. See file "+reportFile);
 					String consumerID = NLDOMUtil.getNonEmptyAttributeValue(consumerNode, "id");
 
 					ValueProviderConfig provider = null; 
@@ -540,7 +539,7 @@ public class ReportingInitialiser {
 						if (provider == null)
 							throw new IllegalArgumentException("Could not resolve the provider with id=\""+providerID+"\".");
 					} catch (Exception e) {
-						throw new ReportingInitializerException("The provider-id of a binding does not point to a ValueProviderConfig. File "+reportFile, e);
+						throw new ReportingInitialiserException("The provider-id of a binding does not point to a ValueProviderConfig. File "+reportFile, e);
 					}
 					ValueConsumer consumer = null;
 					try {
@@ -548,7 +547,7 @@ public class ReportingInitialiser {
 						if (consumer == null)
 							throw new IllegalArgumentException("Could not resolve the consumer with id=\""+consumerID+"\".");
 					} catch (Exception e) {
-						throw new ReportingInitializerException("The provider-id of a binding does not point to a ValueProviderConfig. File "+reportFile, e);
+						throw new ReportingInitialiserException("The provider-id of a binding does not point to a ValueProviderConfig. File "+reportFile, e);
 					}
 
 					ValueConsumerBinding binding = new ValueConsumerBinding(organisationID, IDGenerator.nextID(ValueConsumerBinding.class), acquisitionSetup);
@@ -557,7 +556,7 @@ public class ReportingInitialiser {
 					binding.setConsumer(consumer);
 					acquisitionSetup.getValueConsumerBindings().add(binding);
 				} catch (IllegalArgumentException e) {
-					throw new ReportingInitializerException("Some attribute is missing for the value-consumer-bindings declaration in the parameter-acquisition in file "+reportFile, e);
+					throw new ReportingInitialiserException("Some attribute is missing for the value-consumer-bindings declaration in the parameter-acquisition in file "+reportFile, e);
 				}
 			}			
 			// make the usecase setup persistent
@@ -646,10 +645,10 @@ public class ReportingInitialiser {
 	 * @param reportID The id of the {@link ReportLayout} currently processed. 
 	 * @param reportNode The 'report' node of the content.xml document currenty processed
 	 * @param layout The {@link ReportLayout} currently processed.
-	 * @throws ReportingInitializerException
+	 * @throws ReportingInitialiserException
 	 */
 	protected void createReportLocalisationBundle(File reportFile, final String reportID, Node reportNode, ReportLayout layout)
-	throws ReportingInitializerException
+	throws ReportingInitialiserException
 	{		
 		File resourceFolder = new File(reportFile.getParentFile(), "resource");
 		File[] resourceFiles = resourceFolder.listFiles(new FileFilter() {
@@ -657,6 +656,8 @@ public class ReportingInitialiser {
 				return pathname.isFile() && pathname.getName().startsWith(reportID);
 			}
 		});
+		if (resourceFiles == null)
+			return;
 		for (File resFile : resourceFiles) {
 			String locale = ReportLayoutLocalisationData.extractLocale(reportFile.getName());
 			ReportLayoutLocalisationDataID localisationDataID = ReportLayoutLocalisationDataID.create(
@@ -673,7 +674,7 @@ public class ReportingInitialiser {
 			try {
 				localisationData.loadFile(resFile);
 			} catch (IOException e) {
-				throw new ReportingInitializerException("Could not load localisatino file "+resFile, e);
+				throw new ReportingInitialiserException("Could not load localisatino file "+resFile, e);
 			}
 		}
 	}

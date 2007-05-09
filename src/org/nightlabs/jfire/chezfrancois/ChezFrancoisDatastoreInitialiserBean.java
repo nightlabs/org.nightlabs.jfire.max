@@ -223,6 +223,8 @@ implements SessionBean
 				} catch (JDOObjectNotFoundException x) {
 					tariffNormalPrice = (Tariff) pm.makePersistent(new Tariff(organisationID, IDGenerator.nextID(Tariff.class)));
 					tariffNormalPrice.getName().setText(languageID, "Normal Price");
+					tariffNormalPrice.getName().setText(Locale.GERMAN.getLanguage(), "Normaler Preis");
+					tariffNormalPrice.getName().setText(Locale.FRENCH.getLanguage(), "Prix normal");
 				}
 	
 				Tariff tariffGoldCard;
@@ -231,10 +233,10 @@ implements SessionBean
 				} catch (JDOObjectNotFoundException x) {
 					tariffGoldCard = (Tariff) pm.makePersistent(new Tariff(organisationID, IDGenerator.nextID(Tariff.class)));
 					tariffGoldCard.getName().setText(languageID, "Gold Card");
+					tariffGoldCard.getName().setText(Locale.GERMAN.getLanguage(), "Goldene Kundenkarte");
+					tariffGoldCard.getName().setText(Locale.FRENCH.getLanguage(), "Carte d'or");
 				}
-
 				DataCreator dataCreator = new DataCreator(pm, User.getUser(pm, getPrincipal()));
-
 				dataCreator.getRootSimpleProductType().getName().setText(languageID, displayName + " Wine Store");
 
 				// create ProductTypes: wine (bottle)

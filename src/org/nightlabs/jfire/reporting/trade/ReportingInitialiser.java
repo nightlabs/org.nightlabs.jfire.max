@@ -8,7 +8,7 @@ import java.util.Locale;
 
 import javax.jdo.PersistenceManager;
 
-import org.nightlabs.jfire.reporting.ReportingInitializerException;
+import org.nightlabs.jfire.reporting.ReportingInitialiserException;
 import org.nightlabs.jfire.reporting.layout.ReportCategory;
 import org.nightlabs.jfire.servermanager.JFireServerManager;
 
@@ -18,11 +18,11 @@ import org.nightlabs.jfire.servermanager.JFireServerManager;
  */
 public class ReportingInitialiser {
 
-	public static void initialize(
+	public static void initialise(
 			PersistenceManager pm, 
 			JFireServerManager jfireServerManager,
 			String organisationID
-		) throws ReportingInitializerException 
+		) throws ReportingInitialiserException 
 	{
 		ReportCategory rootCategory = org.nightlabs.jfire.reporting.ReportingInitialiser.createCategory(
 				pm, null, 
@@ -47,7 +47,7 @@ public class ReportingInitialiser {
 						jfireServerManager,
 						pm, 
 						organisationID
-					).initialize();
+					).initialise();
 			}
 		}
 		

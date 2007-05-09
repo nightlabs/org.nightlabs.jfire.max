@@ -41,7 +41,7 @@ import org.nightlabs.ModuleException;
 import org.nightlabs.jfire.accounting.id.InvoiceID;
 import org.nightlabs.jfire.base.BaseSessionBeanImpl;
 import org.nightlabs.jfire.organisation.Organisation;
-import org.nightlabs.jfire.reporting.ReportingInitializerException;
+import org.nightlabs.jfire.reporting.ReportingInitialiserException;
 import org.nightlabs.jfire.reporting.parameter.ReportParameterUtil;
 import org.nightlabs.jfire.reporting.parameter.ValueProvider;
 import org.nightlabs.jfire.reporting.parameter.ValueProviderCategory;
@@ -137,7 +137,7 @@ implements SessionBean
 	 * @ejb.permission role-name="JFireReporting-admin"
 	 * @ejb.transaction type = "Required"
 	 */
-	public void initializeReporting() throws ReportingInitializerException 
+	public void initializeReporting() throws ReportingInitialiserException 
 	{
 		PersistenceManager pm;
 		pm = getPersistenceManager();
@@ -146,7 +146,7 @@ implements SessionBean
 			
 			initializeReportParameterAcquisition(pm);
 			
-			ReportingInitialiser.initialize(pm, jfireServerManager, Organisation.DEVIL_ORGANISATION_ID);
+			ReportingInitialiser.initialise(pm, jfireServerManager, Organisation.DEVIL_ORGANISATION_ID);
 			
 			
 		} finally {

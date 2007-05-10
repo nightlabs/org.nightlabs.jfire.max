@@ -1,12 +1,12 @@
 package org.nightlabs.jfire.trade;
 
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
 
 import org.nightlabs.annotation.Implement;
 import org.nightlabs.jfire.accounting.Currency;
 import org.nightlabs.jfire.accounting.Invoice;
-import org.nightlabs.jfire.config.Config;
 import org.nightlabs.jfire.config.ConfigModule;
 import org.nightlabs.jfire.idgenerator.IDGenerator;
 import org.nightlabs.jfire.store.DeliveryNote;
@@ -120,5 +120,36 @@ public class TradeConfigModule
 			throw new IllegalStateException("No IDPrefixCf registered for articleContainerClassName=\"" + articleContainerClassName + "\"");
 
 		return res;
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * @see org.nightlabs.jfire.config.ConfigModule#isEqualTo(org.nightlabs.jfire.config.ConfigModule)
+	 */
+	@Implement
+	public boolean isEqualTo(ConfigModule other) {
+		if (this == other)
+			return true;
+		if (other.getClass() != this.getClass())
+			return false;
+		final TradeConfigModule otherTradeModule =  (TradeConfigModule) other;
+		
+		if (currency.equals(otherTradeModule.getCurrency()))
+			return false;
+		
+		Collection<IDPrefixCf> otherPrefixes = otherTradeModule.idPrefixCfs.values();
+		if (idPrefixCfs == null && otherPrefixes == null)
+			return true;
+		
+		if ((idPrefixCfs == null && otherPrefixes != null) || (idPrefixCfs != null && otherPrefixes == null))
+			return false;
+		
+		// FIXME: Warum ist die Map nicht typisiert?? (WorkstationFeatureCfMod geht das auch ohne ByteCodeEnhancer Probleme)
+		for (Object prefix : idPrefixCfs.values()) {
+			if (! otherPrefixes.contains((IDPrefixCf)prefix))
+				return false;
+		}
+		
+		return true;
 	}
 }

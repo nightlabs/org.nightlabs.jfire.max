@@ -29,6 +29,7 @@ package org.nightlabs.jfire.trade.config;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.nightlabs.annotation.Implement;
 import org.nightlabs.jfire.config.ConfigModule;
 import org.nightlabs.jfire.person.PersonStruct;
 
@@ -83,6 +84,33 @@ public class LegalEntityViewConfigModule extends ConfigModule {
 		personStructFields.add(PersonStruct.POSTADDRESS_POSTCODE.toString());
 		personStructFields.add(PersonStruct.POSTADDRESS_CITY.toString());
 		personStructFields.add(PersonStruct.INTERNET_EMAIL.toString());
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * @see org.nightlabs.jfire.config.ConfigModule#isEqualTo(org.nightlabs.jfire.config.ConfigModule)
+	 */
+	@Implement
+	public boolean isEqualTo(ConfigModule other) {
+		if (this == other)
+			return true;
+		if (other.getClass() != this.getClass())
+			return false;
+		final LegalEntityViewConfigModule otherViewModule =  (LegalEntityViewConfigModule) other;
+		
+		List<String> otherPersonStructFields = otherViewModule.getStructFields();
+		if (personStructFields == null && otherPersonStructFields == null)
+			return true;
+		
+		if ((personStructFields == null && otherPersonStructFields != null) || (personStructFields != null && otherPersonStructFields == null))
+			return false;
+		
+		for (Object field : personStructFields) {
+			if (! otherPersonStructFields.contains((String) field))
+				return false;
+		}
+		
+		return true;
 	}
 	
 }

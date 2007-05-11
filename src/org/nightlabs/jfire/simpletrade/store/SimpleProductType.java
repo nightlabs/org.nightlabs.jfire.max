@@ -124,7 +124,7 @@ public class SimpleProductType extends ProductType
 			byte inheritanceNature, byte packageNature)
 	{
 		super(organisationID, productTypeID, extendedProductType, owner, inheritanceNature, packageNature);
-		this.propertySet = new Property(organisationID, IDGenerator.nextID(Property.class));
+		this.propertySet = new Property(IDGenerator.getOrganisationID(), IDGenerator.nextID(Property.class));
 //		this.name = new SimpleProductTypeName(this);
 //		getFieldMetaData("name").setValueInherited(false);
 	}

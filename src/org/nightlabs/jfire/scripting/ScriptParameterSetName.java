@@ -29,6 +29,7 @@ package org.nightlabs.jfire.scripting;
 import java.util.HashMap;
 import java.util.Map;
 
+import org.nightlabs.annotation.Implement;
 import org.nightlabs.i18n.I18nText;
 
 /**
@@ -80,7 +81,7 @@ extends I18nText
 	 *
 	 * @jdo.join
 	 */
-	protected Map names = new HashMap();
+	protected Map<String, String> names = new HashMap<String, String>();
 
 	/**
 	 * @deprecated Only for JDO!
@@ -96,17 +97,13 @@ extends I18nText
 		this.scriptParameterSetID = scriptParameterSet.getScriptParameterSetID();
 	}
 
-	/**
-	 * @see org.nightlabs.i18n.I18nText#getI18nMap()
-	 */
-	protected Map getI18nMap()
+	@Implement
+	protected Map<String, String> getI18nMap()
 	{
 		return names;
 	}
 
-	/**
-	 * @see org.nightlabs.i18n.I18nText#getFallBackValue(java.lang.String)
-	 */
+	@Implement
 	protected String getFallBackValue(String languageID)
 	{
 		return ScriptParameterSet.getPrimaryKey(organisationID, scriptParameterSetID);
@@ -127,6 +124,4 @@ extends I18nText
 	public long getScriptParameterSetID() {
 		return scriptParameterSetID;
 	}
-	
-	
 }

@@ -42,7 +42,9 @@ import javax.naming.NamingException;
 
 import org.apache.log4j.Logger;
 import org.nightlabs.jdo.NLJDOHelper;
+import org.nightlabs.jdo.ObjectID;
 import org.nightlabs.jfire.base.BaseSessionBeanImpl;
+import org.nightlabs.jfire.geography.id.CSVID;
 import org.nightlabs.jfire.geography.id.CityID;
 import org.nightlabs.jfire.geography.id.CountryID;
 import org.nightlabs.jfire.geography.id.LocationID;
@@ -58,8 +60,8 @@ import org.nightlabs.jfire.organisation.Organisation;
  * @ejb.util generate = "physical" 
  */
 public abstract class GeographyManagerBean
-	extends BaseSessionBeanImpl
-	implements SessionBean
+extends BaseSessionBeanImpl
+implements SessionBean
 {
 	/**
 	 * LOG4J logger used by this class
@@ -70,7 +72,7 @@ public abstract class GeographyManagerBean
 	 * @see org.nightlabs.jfire.base.BaseSessionBeanImpl#setSessionContext(javax.ejb.SessionContext)
 	 */
 	public void setSessionContext(SessionContext sessionContext)
-			throws EJBException, RemoteException
+	throws EJBException, RemoteException
 	{
 		logger.debug(this.getClass().getName() + ".setSessionContext("+sessionContext+")");
 		super.setSessionContext(sessionContext);
@@ -99,7 +101,7 @@ public abstract class GeographyManagerBean
 	{
 		logger.debug(this.getClass().getName() + ".ejbRemove()");
 	}
-	
+
 	/**
 	 * @see javax.ejb.SessionBean#ejbActivate()
 	 */
@@ -117,15 +119,15 @@ public abstract class GeographyManagerBean
 
 //	protected static StreamTokenizer getCSVTokenizer(InputStreamReader reader)
 //	{
-//		StreamTokenizer tokenizer = new StreamTokenizer(reader);
-//		tokenizer.resetSyntax();
-//		tokenizer.wordChars(0, Integer.MAX_VALUE);
-//		tokenizer.quoteChar('"');
-//		tokenizer.whitespaceChars(';', ';');
-//		tokenizer.whitespaceChars('\r', '\r');
-//		tokenizer.whitespaceChars('\n', '\n');
-//		tokenizer.eolIsSignificant(true);
-//		return tokenizer;
+//	StreamTokenizer tokenizer = new StreamTokenizer(reader);
+//	tokenizer.resetSyntax();
+//	tokenizer.wordChars(0, Integer.MAX_VALUE);
+//	tokenizer.quoteChar('"');
+//	tokenizer.whitespaceChars(';', ';');
+//	tokenizer.whitespaceChars('\r', '\r');
+//	tokenizer.whitespaceChars('\n', '\n');
+//	tokenizer.eolIsSignificant(true);
+//	return tokenizer;
 //	}
 
 	/**
@@ -140,9 +142,9 @@ public abstract class GeographyManagerBean
 
 //		PersistenceManager pm = getPersistenceManager();
 //		try {
-//			Geography.getGeography(pm);
+//		Geography.getGeography(pm);
 //		} finally {
-//			pm.close();
+//		pm.close();
 //		}
 	}
 
@@ -334,450 +336,469 @@ public abstract class GeographyManagerBean
 		}
 	} 
 
-//		/**
-//		 * @ejb.interface-method
-//		 * @!ejb.transaction type = "Required"
-//		 * @ejb.permission role-name="_Guest_"
-//		 */
-//		public void initialize()
-//			throws ModuleException
-//		{
-//			try {
-//				GeographyManagerLocal geoMan = GeographyManagerUtil.getLocalHome().create();
-//				
-//	//			PersistenceManager pm = getPersistenceManager();
-//	//			try {
-//	//				Geography geography = Geography.getGeography(pm);
-//	//	//		 initialize the meta data
-//	//				pm.getExtent(Country.class);
-//	//				pm.getExtent(Region.class);
-//	//				pm.getExtent(City.class);
-//	//				pm.getExtent(District.class);
-//				
-//				geoMan._importCountries();
-//				geoMan._importRegions();
-//		
-//	//				// import countries
-//	//				String file = "resource/Country.csv";
-//	//				InputStream in = Geography.class.getResourceAsStream(file);
-//	//				try {
-//	//					InputStreamReader reader = new InputStreamReader(in, IMPORTCHARSET);
-//	//					try {
-//	//						StreamTokenizer tokenizer = getCSVTokenizer(reader);
-//	//						tokenizer.nextToken();
-//	//						while (tokenizer.ttype != StreamTokenizer.TT_EOF) {
-//	//							System.out.println("line no: " + tokenizer.lineno());
-//	//							String countryID = tokenizer.sval;
-//	//							tokenizer.nextToken();
-//	//							String languageID = tokenizer.sval;
-//	//							tokenizer.nextToken();
-//	//							String countryName = tokenizer.sval;
-//	//							System.out.println(" countryID = \""+countryID+"\" countryName=\""+countryName+"\"");
-//	//	
-//	//							if (tokenizer.lineno() != 1) {
-//	//								Country country;
-//	//								try {
-//	//									country = (Country) pm.getObjectById(
-//	//											CountryID.create(Organisation.ROOT_ORGANISATIONID, countryID));
-//	//								} catch (JDOObjectNotFoundException x) {
-//	//									country = new Country(Organisation.ROOT_ORGANISATIONID, countryID);
-//	//								}
-//	//								country.getName().setText(languageID, countryName);
-//	//	
-//	//								if (!JDOHelper.isPersistent(country))
-//	//									pm.makePersistent(country);
-//	//							}
-//	//	
-//	//							while (tokenizer.ttype != StreamTokenizer.TT_EOL)
-//	//								tokenizer.nextToken();
-//	//							tokenizer.nextToken();
-//	//						}
-//	//					} finally {
-//	//						reader.close();
-//	//					}
-//	//				} finally {
-//	//					in.close();
-//	//				}
-//					
-//	//				// import regions
-//	//				file = "resource/Region.csv";
-//	//				in = Geography.class.getResourceAsStream(file);
-//	//				try {
-//	//					InputStreamReader reader = new InputStreamReader(in, IMPORTCHARSET);
-//	//					try {
-//	//						StreamTokenizer tokenizer = getCSVTokenizer(reader);
-//	//						tokenizer.nextToken();
-//	//						while (tokenizer.ttype != StreamTokenizer.TT_EOF) {
-//	//							System.out.println("line no: " + tokenizer.lineno());
-//	//							String countryID = tokenizer.sval;
-//	//							tokenizer.nextToken();
-//	//							String regionID = tokenizer.sval;
-//	//							tokenizer.nextToken();
-//	//							String languageID = tokenizer.sval;
-//	//							tokenizer.nextToken();
-//	//							String regionName = tokenizer.sval;
-//	//							System.out.println(" countryID=\""+countryID+"\" regionID=\""+regionID+"\" regionName=\""+regionName+"\"");
-//	//	
-//	//							if (tokenizer.lineno() != 1) {
-//	//								Country country;
-//	//								try {
-//	//									country = (Country) pm.getObjectById(
-//	//											CountryID.create(Organisation.ROOT_ORGANISATIONID, countryID));
-//	//								} catch (JDOObjectNotFoundException x) {
-//	//									throw new RuntimeException("CSV \""+file+"\", line "+tokenizer.lineno()+": country with ID \""+countryID+"\" does not exist!");
-//	//								}
-//	//	
-//	//								Region region;
-//	//								try {
-//	//									region = (Region) pm.getObjectById(
-//	//											RegionID.create(
-//	//													Organisation.ROOT_ORGANISATIONID, countryID,
-//	//													Organisation.ROOT_ORGANISATIONID, regionID));
-//	//								} catch (JDOObjectNotFoundException x) {
-//	//									region = new Region(Organisation.ROOT_ORGANISATIONID, regionID, country);
-//	//								}
-//	//								region.getName().setText(languageID, regionName);
-//	//	
-//	//								if (!JDOHelper.isPersistent(region))
-//	//									pm.makePersistent(region);
-//	//							}
-//	//	
-//	//							while (tokenizer.ttype != StreamTokenizer.TT_EOL)
-//	//								tokenizer.nextToken();
-//	//							tokenizer.nextToken();
-//	//						}
-//	//					} finally {
-//	//						reader.close();
-//	//					}
-//	//				} finally {
-//	//					in.close();
-//	//				}
-//		
-//		
-//					// import cities and districts
-//					for (int mode = 0; mode <= 1; ++mode) {
-//						String file = "resource/City.csv";
-//						InputStream in = Geography.class.getResourceAsStream(file);
-//						try {
-//							InputStreamReader reader = new InputStreamReader(in, IMPORTCHARSET);
-//							try {
-//								StreamTokenizer tokenizer = getCSVTokenizer(reader);
-//								tokenizer.nextToken();
-//								while (tokenizer.ttype != StreamTokenizer.TT_EOF) {
-//									String cityIDStr = tokenizer.sval;
-//									tokenizer.nextToken();
-//									String languageID = tokenizer.sval;
-//									tokenizer.nextToken();
-//									String countryID = tokenizer.sval;
-//									tokenizer.nextToken();
-//									String regionID = tokenizer.sval;
-//									tokenizer.nextToken();
-//									String cityName = tokenizer.sval;
-//									tokenizer.nextToken();
-//									String districtName = tokenizer.sval;
-//									tokenizer.nextToken();
-//									String zipStr = tokenizer.sval;
-//									tokenizer.nextToken();
-//									String latitudeStr = tokenizer.sval;
-//									tokenizer.nextToken();
-//									String longitudeStr = tokenizer.sval;
-//		
-//									System.out.println("lineno=\""+tokenizer.lineno()+"\" cityIDStr=\""+cityIDStr+"\" countryID=\""+countryID+"\" regionID=\""+regionID+"\" cityName=\""+cityName+"\" districtName=\""+districtName+"\" zipStr=\""+zipStr+"\" latitudeStr=\""+latitudeStr+"\" longitudeStr=\""+longitudeStr+"\"");
-//		
-//									if (tokenizer.lineno() != 1 &&
-//											((mode == 0 && "".equals(districtName)) || (mode == 1 && !"".equals(districtName))))
-//									{
-//										long cityID;
-//										try {
-//											cityID = Long.parseLong(cityIDStr);
-//										} catch (NumberFormatException x) {
-//											throw new RuntimeException("CSV \""+file+"\", line "+tokenizer.lineno()+": cityID is not a long!", x);
-//										}
-//		
-//										double latitude;
-//										try {
-//											latitude = Double.parseDouble(latitudeStr);
-//										} catch (NumberFormatException x) {
-//											throw new RuntimeException("CSV \""+file+"\", line "+tokenizer.lineno()+": latitude is not a double!", x);
-//										}
-//		
-//										double longitude;
-//										try {
-//											longitude = Double.parseDouble(longitudeStr);
-//										} catch (NumberFormatException x) {
-//											throw new RuntimeException("CSV \""+file+"\", line "+tokenizer.lineno()+": longitude is not a double!", x);
-//										}
-//		
-//										Set zips = new HashSet();
-//										StringTokenizer zipTokenizer = new StringTokenizer(zipStr, ",");
-//										while (zipTokenizer.hasMoreTokens()) {
-//											String zip = zipTokenizer.nextToken();
-//											zips.add(zip);
-//										}
-//										
-//		//								Country country;
-//		//								try {
-//		//									country = (Country) pm.getObjectById(
-//		//											CountryID.create(Organisation.ROOT_ORGANISATIONID, countryID));
-//		//								} catch (JDOObjectNotFoundException x) {
-//		//									throw new RuntimeException("CSV \""+file+"\", line "+tokenizer.lineno()+": country with ID \""+countryID+"\" does not exist!");
-//		//								}
-//	
-//										geoMan._storeDistrictRecord(
-//												file, tokenizer.lineno(), mode == 1,
-//												cityIDStr, languageID, 
-//												countryID, regionID, cityName,
-//												districtName, cityID, latitude, longitude,
-//												zips);
-//									}
-//		
-//									while (tokenizer.ttype != StreamTokenizer.TT_EOL)
-//										tokenizer.nextToken();
-//									tokenizer.nextToken();
-//								}
-//							} finally {
-//								reader.close();
-//							}
-//						} finally {
-//							in.close();
-//						}
-//					} // for (int mode = 0; mode <= 1; ++mode) {
-//	//			} finally {
-//	//				pm.close();
-//	//			}
-//			} catch (RuntimeException x) {
-//				throw x;
-//			} catch (ModuleException x) {
-//				throw x;
-//			} catch (Exception x) {
-//				throw new ModuleException(x);
-//			}
-//		}
-	
-//	/**
-//	 * @ejb.interface-method view-type="local"
-//	 * @ejb.transaction type = "RequiresNew"
-//	 * @ejb.permission role-name="_Guest_"
-//	 */
-//	public void _importCountries()
-//		throws ModuleException
-//	{
-//		try {
-//			PersistenceManager pm = getPersistenceManager();
-//			try {
-//				Geography geography = Geography.getGeography(pm);
-//				pm.getExtent(Country.class);
-//
-//				// import countries
-//				String file = "resource/Country.csv";
-//				InputStream in = Geography.class.getResourceAsStream(file);
-//				try {
-//					InputStreamReader reader = new InputStreamReader(in, IMPORTCHARSET);
-//					try {
-//						StreamTokenizer tokenizer = getCSVTokenizer(reader);
-//						tokenizer.nextToken();
-//						while (tokenizer.ttype != StreamTokenizer.TT_EOF) {
-//							System.out.println("line no: " + tokenizer.lineno());
-//							String countryID = tokenizer.sval;
-//							tokenizer.nextToken();
-//							String languageID = tokenizer.sval;
-//							tokenizer.nextToken();
-//							String countryName = tokenizer.sval;
-//							System.out.println(" countryID = \""+countryID+"\" countryName=\""+countryName+"\"");
-//	
-//							if (tokenizer.lineno() != 1) {
-//								Country country;
-//								try {
-//									country = (Country) pm.getObjectById(
-//											CountryID.create(Organisation.ROOT_ORGANISATIONID, countryID));
-//								} catch (JDOObjectNotFoundException x) {
-//									country = new Country(Organisation.ROOT_ORGANISATIONID, countryID);
-//								}
-//								country.getName().setText(languageID, countryName);
-//	
-//								if (!JDOHelper.isPersistent(country))
-//									pm.makePersistent(country);
-//							}
-//	
-//							while (tokenizer.ttype != StreamTokenizer.TT_EOL)
-//								tokenizer.nextToken();
-//							tokenizer.nextToken();
-//						}
-//					} finally {
-//						reader.close();
-//					}
-//				} finally {
-//					in.close();
-//				}
-//			} finally {
-//				pm.close();
-//			}
-//		} catch (RuntimeException x) {
-//			throw x;
-//		} catch (ModuleException x) {
-//			throw x;
-//		} catch (Exception x) {
-//			throw new ModuleException(x);
-//		}
-//	}
-//
-//	/**
-//	 * @ejb.interface-method view-type="local"
-//	 * @ejb.transaction type = "RequiresNew"
-//	 * @ejb.permission role-name="_Guest_"
-//	 */
-//	public void _importRegions()
-//		throws ModuleException
-//	{
-//		try {
-//			PersistenceManager pm = getPersistenceManager();
-//			try {
-//				pm.getExtent(Region.class);
-//
-//				String file = "resource/Region.csv";
-//				InputStream in = Geography.class.getResourceAsStream(file);
-//				try {
-//					InputStreamReader reader = new InputStreamReader(in, IMPORTCHARSET);
-//					try {
-//						StreamTokenizer tokenizer = getCSVTokenizer(reader);
-//						tokenizer.nextToken();
-//						while (tokenizer.ttype != StreamTokenizer.TT_EOF) {
-//							System.out.println("line no: " + tokenizer.lineno());
-//							String countryID = tokenizer.sval;
-//							tokenizer.nextToken();
-//							String regionID = tokenizer.sval;
-//							tokenizer.nextToken();
-//							String languageID = tokenizer.sval;
-//							tokenizer.nextToken();
-//							String regionName = tokenizer.sval;
-//							System.out.println(" countryID=\""+countryID+"\" regionID=\""+regionID+"\" regionName=\""+regionName+"\"");
-//	
-//							if (tokenizer.lineno() != 1) {
-//								Country country;
-//								try {
-//									country = (Country) pm.getObjectById(
-//											CountryID.create(Organisation.ROOT_ORGANISATIONID, countryID));
-//								} catch (JDOObjectNotFoundException x) {
-//									throw new RuntimeException("CSV \""+file+"\", line "+tokenizer.lineno()+": country with ID \""+countryID+"\" does not exist!");
-//								}
-//	
-//								Region region;
-//								try {
-//									region = (Region) pm.getObjectById(
-//											RegionID.create(
-//													Organisation.ROOT_ORGANISATIONID, countryID,
-//													Organisation.ROOT_ORGANISATIONID, regionID));
-//								} catch (JDOObjectNotFoundException x) {
-//									region = new Region(Organisation.ROOT_ORGANISATIONID, regionID, country);
-//								}
-//								region.getName().setText(languageID, regionName);
-//	
-//								if (!JDOHelper.isPersistent(region))
-//									pm.makePersistent(region);
-//							}
-//	
-//							while (tokenizer.ttype != StreamTokenizer.TT_EOL)
-//								tokenizer.nextToken();
-//							tokenizer.nextToken();
-//						}
-//					} finally {
-//						reader.close();
-//					}
-//				} finally {
-//					in.close();
-//				}
-//
-//			} finally {
-//				pm.close();
-//			}
-//		} catch (RuntimeException x) {
-//			throw x;
-//		} catch (ModuleException x) {
-//			throw x;
-//		} catch (Exception x) {
-//			throw new ModuleException(x);
-//		}
-//	}
-//
-//
-//	/**
-//	 * @ejb.interface-method view-type="local"
-//	 * @ejb.transaction type = "RequiresNew"
-//	 * @ejb.permission role-name="_Guest_"
-//	 */
-//	public void _storeDistrictRecord(
-//			String file, int lineno, boolean searchCityByName,
-//			String cityIDStr, String languageID, 
-//			String countryID, String regionID, String cityName,
-//			String districtName, long cityID, double latitude, double longitude,
-//			Set zips)
-//		throws ModuleException
-//	{
-//		PersistenceManager pm = getPersistenceManager();
-//		try {
-//			Region region;
-//			try {
-//				region = (Region) pm.getObjectById(
-//						RegionID.create(
-//								Organisation.ROOT_ORGANISATIONID, countryID,
-//								Organisation.ROOT_ORGANISATIONID, regionID));
-//			} catch (JDOObjectNotFoundException x) {
-//				throw new RuntimeException("CSV \""+file+"\", line "+lineno+": region with countyID=\""+countryID+"\" regionID=\""+regionID+"\" does not exist!");
-//			}
-//			
-//			City city = null;
-//			if (searchCityByName) {
-//				// find the city that matches the name
-//				Query query = pm.newQuery(City.class);
-//				query.declareImports("import java.lang.String");
-//				query.declareVariables("District district");
-//				query.declareParameters("String languageID, String cityName");
-//				query.setFilter("this.name.names.containsEntry(languageID, cityName)");
-//				Collection c = (Collection)query.execute(languageID, cityName);
-//				if (!c.isEmpty()) 
-//					city = (City)c.iterator().next();
-//				else {
-//					query.setFilter("this.name.names.containsValue(cityName)");
-//					c = (Collection)query.execute(languageID, cityName);
-//
-//					if (!c.isEmpty())
-//						city = (City)c.iterator().next();
-//				}
-//			} // if (mode == 1) {
-//
-//			if (city == null) {
-//				try {
-//					city = (City)pm.getObjectById(CityID.create(Organisation.ROOT_ORGANISATIONID, cityID));
-//				} catch (JDOObjectNotFoundException x) {
-//					city = new City(Organisation.ROOT_ORGANISATIONID, cityID, region);
-//				}
-//				city.getName().setText(languageID, cityName);
-//
-//				if (!JDOHelper.isPersistent(city))
-//					pm.makePersistent(city);
-//			}
-//
-//			District district;
-//			try {
-//				district = (District)pm.getObjectById(DistrictID.create(Organisation.ROOT_ORGANISATIONID, cityID));
-//			} catch (JDOObjectNotFoundException x) {
-//				district = new District(Organisation.ROOT_ORGANISATIONID, cityID, city);
-//			}
-//			district.setName(districtName);
-//			district.setLatitude(latitude);
-//			district.setLongitude(longitude);
-//			for (Iterator it = zips.iterator(); it.hasNext(); ) {
-//				String zip = (String)it.next();
-//				district.addZip(zip);
-//			}
-//			
-//			if (!JDOHelper.isPersistent(district))
-//				pm.makePersistent(district);
-//
-//			
-//		} finally {
-//			pm.close();
-//		}
-//	}
+	/**
+	 * @ejb.interface-method
+	 * @ejb.permission role-name="_Guest_"
+	 */
+	public Object getGeographyObject(ObjectID objectID, String[] fetchGroups, int maxFetchDepth){
+		PersistenceManager pm = getPersistenceManager();
+		try {
+			pm.getFetchPlan().setMaxFetchDepth(maxFetchDepth);
+			if (fetchGroups != null)
+				pm.getFetchPlan().setGroups(fetchGroups);
+
+			pm.getExtent(CSV.class);
+			Object obj = (Object) pm.getObjectById((CSVID)objectID, true);
+			return (CSV) pm.detachCopy(obj);
+		} finally {
+			pm.close();
+		}
+	}
+
+///**
+//* @ejb.interface-method
+//* @!ejb.transaction type = "Required"
+//* @ejb.permission role-name="_Guest_"
+//*/
+//public void initialize()
+//throws ModuleException
+//{
+//try {
+//GeographyManagerLocal geoMan = GeographyManagerUtil.getLocalHome().create();
+
+////			PersistenceManager pm = getPersistenceManager();
+////			try {
+////				Geography geography = Geography.getGeography(pm);
+////	//		 initialize the meta data
+////				pm.getExtent(Country.class);
+////				pm.getExtent(Region.class);
+////				pm.getExtent(City.class);
+////				pm.getExtent(District.class);
+
+//geoMan._importCountries();
+//geoMan._importRegions();
+
+////				// import countries
+////				String file = "resource/Country.csv";
+////				InputStream in = Geography.class.getResourceAsStream(file);
+////				try {
+////					InputStreamReader reader = new InputStreamReader(in, IMPORTCHARSET);
+////					try {
+////						StreamTokenizer tokenizer = getCSVTokenizer(reader);
+////						tokenizer.nextToken();
+////						while (tokenizer.ttype != StreamTokenizer.TT_EOF) {
+////							System.out.println("line no: " + tokenizer.lineno());
+////							String countryID = tokenizer.sval;
+////							tokenizer.nextToken();
+////							String languageID = tokenizer.sval;
+////							tokenizer.nextToken();
+////							String countryName = tokenizer.sval;
+////							System.out.println(" countryID = \""+countryID+"\" countryName=\""+countryName+"\"");
+////	
+////							if (tokenizer.lineno() != 1) {
+////								Country country;
+////								try {
+////									country = (Country) pm.getObjectById(
+////											CountryID.create(Organisation.ROOT_ORGANISATIONID, countryID));
+////								} catch (JDOObjectNotFoundException x) {
+////									country = new Country(Organisation.ROOT_ORGANISATIONID, countryID);
+////								}
+////								country.getName().setText(languageID, countryName);
+////	
+////								if (!JDOHelper.isPersistent(country))
+////									pm.makePersistent(country);
+////							}
+////	
+////							while (tokenizer.ttype != StreamTokenizer.TT_EOL)
+////								tokenizer.nextToken();
+////							tokenizer.nextToken();
+////						}
+////					} finally {
+////						reader.close();
+////					}
+////				} finally {
+////					in.close();
+////				}
+
+////				// import regions
+////				file = "resource/Region.csv";
+////				in = Geography.class.getResourceAsStream(file);
+////				try {
+////					InputStreamReader reader = new InputStreamReader(in, IMPORTCHARSET);
+////					try {
+////						StreamTokenizer tokenizer = getCSVTokenizer(reader);
+////						tokenizer.nextToken();
+////						while (tokenizer.ttype != StreamTokenizer.TT_EOF) {
+////							System.out.println("line no: " + tokenizer.lineno());
+////							String countryID = tokenizer.sval;
+////							tokenizer.nextToken();
+////							String regionID = tokenizer.sval;
+////							tokenizer.nextToken();
+////							String languageID = tokenizer.sval;
+////							tokenizer.nextToken();
+////							String regionName = tokenizer.sval;
+////							System.out.println(" countryID=\""+countryID+"\" regionID=\""+regionID+"\" regionName=\""+regionName+"\"");
+////	
+////							if (tokenizer.lineno() != 1) {
+////								Country country;
+////								try {
+////									country = (Country) pm.getObjectById(
+////											CountryID.create(Organisation.ROOT_ORGANISATIONID, countryID));
+////								} catch (JDOObjectNotFoundException x) {
+////									throw new RuntimeException("CSV \""+file+"\", line "+tokenizer.lineno()+": country with ID \""+countryID+"\" does not exist!");
+////								}
+////	
+////								Region region;
+////								try {
+////									region = (Region) pm.getObjectById(
+////											RegionID.create(
+////													Organisation.ROOT_ORGANISATIONID, countryID,
+////													Organisation.ROOT_ORGANISATIONID, regionID));
+////								} catch (JDOObjectNotFoundException x) {
+////									region = new Region(Organisation.ROOT_ORGANISATIONID, regionID, country);
+////								}
+////								region.getName().setText(languageID, regionName);
+////	
+////								if (!JDOHelper.isPersistent(region))
+////									pm.makePersistent(region);
+////							}
+////	
+////							while (tokenizer.ttype != StreamTokenizer.TT_EOL)
+////								tokenizer.nextToken();
+////							tokenizer.nextToken();
+////						}
+////					} finally {
+////						reader.close();
+////					}
+////				} finally {
+////					in.close();
+////				}
+
+
+//// import cities and districts
+//for (int mode = 0; mode <= 1; ++mode) {
+//String file = "resource/City.csv";
+//InputStream in = Geography.class.getResourceAsStream(file);
+//try {
+//InputStreamReader reader = new InputStreamReader(in, IMPORTCHARSET);
+//try {
+//StreamTokenizer tokenizer = getCSVTokenizer(reader);
+//tokenizer.nextToken();
+//while (tokenizer.ttype != StreamTokenizer.TT_EOF) {
+//String cityIDStr = tokenizer.sval;
+//tokenizer.nextToken();
+//String languageID = tokenizer.sval;
+//tokenizer.nextToken();
+//String countryID = tokenizer.sval;
+//tokenizer.nextToken();
+//String regionID = tokenizer.sval;
+//tokenizer.nextToken();
+//String cityName = tokenizer.sval;
+//tokenizer.nextToken();
+//String districtName = tokenizer.sval;
+//tokenizer.nextToken();
+//String zipStr = tokenizer.sval;
+//tokenizer.nextToken();
+//String latitudeStr = tokenizer.sval;
+//tokenizer.nextToken();
+//String longitudeStr = tokenizer.sval;
+
+//System.out.println("lineno=\""+tokenizer.lineno()+"\" cityIDStr=\""+cityIDStr+"\" countryID=\""+countryID+"\" regionID=\""+regionID+"\" cityName=\""+cityName+"\" districtName=\""+districtName+"\" zipStr=\""+zipStr+"\" latitudeStr=\""+latitudeStr+"\" longitudeStr=\""+longitudeStr+"\"");
+
+//if (tokenizer.lineno() != 1 &&
+//((mode == 0 && "".equals(districtName)) || (mode == 1 && !"".equals(districtName))))
+//{
+//long cityID;
+//try {
+//cityID = Long.parseLong(cityIDStr);
+//} catch (NumberFormatException x) {
+//throw new RuntimeException("CSV \""+file+"\", line "+tokenizer.lineno()+": cityID is not a long!", x);
+//}
+
+//double latitude;
+//try {
+//latitude = Double.parseDouble(latitudeStr);
+//} catch (NumberFormatException x) {
+//throw new RuntimeException("CSV \""+file+"\", line "+tokenizer.lineno()+": latitude is not a double!", x);
+//}
+
+//double longitude;
+//try {
+//longitude = Double.parseDouble(longitudeStr);
+//} catch (NumberFormatException x) {
+//throw new RuntimeException("CSV \""+file+"\", line "+tokenizer.lineno()+": longitude is not a double!", x);
+//}
+
+//Set zips = new HashSet();
+//StringTokenizer zipTokenizer = new StringTokenizer(zipStr, ",");
+//while (zipTokenizer.hasMoreTokens()) {
+//String zip = zipTokenizer.nextToken();
+//zips.add(zip);
+//}
+
+////								Country country;
+////								try {
+////									country = (Country) pm.getObjectById(
+////											CountryID.create(Organisation.ROOT_ORGANISATIONID, countryID));
+////								} catch (JDOObjectNotFoundException x) {
+////									throw new RuntimeException("CSV \""+file+"\", line "+tokenizer.lineno()+": country with ID \""+countryID+"\" does not exist!");
+////								}
+
+//geoMan._storeDistrictRecord(
+//file, tokenizer.lineno(), mode == 1,
+//cityIDStr, languageID, 
+//countryID, regionID, cityName,
+//districtName, cityID, latitude, longitude,
+//zips);
+//}
+
+//while (tokenizer.ttype != StreamTokenizer.TT_EOL)
+//tokenizer.nextToken();
+//tokenizer.nextToken();
+//}
+//} finally {
+//reader.close();
+//}
+//} finally {
+//in.close();
+//}
+//} // for (int mode = 0; mode <= 1; ++mode) {
+////			} finally {
+////				pm.close();
+////			}
+//} catch (RuntimeException x) {
+//throw x;
+//} catch (ModuleException x) {
+//throw x;
+//} catch (Exception x) {
+//throw new ModuleException(x);
+//}
+//}
+
+///**
+//* @ejb.interface-method view-type="local"
+//* @ejb.transaction type = "RequiresNew"
+//* @ejb.permission role-name="_Guest_"
+//*/
+//public void _importCountries()
+//throws ModuleException
+//{
+//try {
+//PersistenceManager pm = getPersistenceManager();
+//try {
+//Geography geography = Geography.getGeography(pm);
+//pm.getExtent(Country.class);
+
+//// import countries
+//String file = "resource/Country.csv";
+//InputStream in = Geography.class.getResourceAsStream(file);
+//try {
+//InputStreamReader reader = new InputStreamReader(in, IMPORTCHARSET);
+//try {
+//StreamTokenizer tokenizer = getCSVTokenizer(reader);
+//tokenizer.nextToken();
+//while (tokenizer.ttype != StreamTokenizer.TT_EOF) {
+//System.out.println("line no: " + tokenizer.lineno());
+//String countryID = tokenizer.sval;
+//tokenizer.nextToken();
+//String languageID = tokenizer.sval;
+//tokenizer.nextToken();
+//String countryName = tokenizer.sval;
+//System.out.println(" countryID = \""+countryID+"\" countryName=\""+countryName+"\"");
+
+//if (tokenizer.lineno() != 1) {
+//Country country;
+//try {
+//country = (Country) pm.getObjectById(
+//CountryID.create(Organisation.ROOT_ORGANISATIONID, countryID));
+//} catch (JDOObjectNotFoundException x) {
+//country = new Country(Organisation.ROOT_ORGANISATIONID, countryID);
+//}
+//country.getName().setText(languageID, countryName);
+
+//if (!JDOHelper.isPersistent(country))
+//pm.makePersistent(country);
+//}
+
+//while (tokenizer.ttype != StreamTokenizer.TT_EOL)
+//tokenizer.nextToken();
+//tokenizer.nextToken();
+//}
+//} finally {
+//reader.close();
+//}
+//} finally {
+//in.close();
+//}
+//} finally {
+//pm.close();
+//}
+//} catch (RuntimeException x) {
+//throw x;
+//} catch (ModuleException x) {
+//throw x;
+//} catch (Exception x) {
+//throw new ModuleException(x);
+//}
+//}
+
+///**
+//* @ejb.interface-method view-type="local"
+//* @ejb.transaction type = "RequiresNew"
+//* @ejb.permission role-name="_Guest_"
+//*/
+//public void _importRegions()
+//throws ModuleException
+//{
+//try {
+//PersistenceManager pm = getPersistenceManager();
+//try {
+//pm.getExtent(Region.class);
+
+//String file = "resource/Region.csv";
+//InputStream in = Geography.class.getResourceAsStream(file);
+//try {
+//InputStreamReader reader = new InputStreamReader(in, IMPORTCHARSET);
+//try {
+//StreamTokenizer tokenizer = getCSVTokenizer(reader);
+//tokenizer.nextToken();
+//while (tokenizer.ttype != StreamTokenizer.TT_EOF) {
+//System.out.println("line no: " + tokenizer.lineno());
+//String countryID = tokenizer.sval;
+//tokenizer.nextToken();
+//String regionID = tokenizer.sval;
+//tokenizer.nextToken();
+//String languageID = tokenizer.sval;
+//tokenizer.nextToken();
+//String regionName = tokenizer.sval;
+//System.out.println(" countryID=\""+countryID+"\" regionID=\""+regionID+"\" regionName=\""+regionName+"\"");
+
+//if (tokenizer.lineno() != 1) {
+//Country country;
+//try {
+//country = (Country) pm.getObjectById(
+//CountryID.create(Organisation.ROOT_ORGANISATIONID, countryID));
+//} catch (JDOObjectNotFoundException x) {
+//throw new RuntimeException("CSV \""+file+"\", line "+tokenizer.lineno()+": country with ID \""+countryID+"\" does not exist!");
+//}
+
+//Region region;
+//try {
+//region = (Region) pm.getObjectById(
+//RegionID.create(
+//Organisation.ROOT_ORGANISATIONID, countryID,
+//Organisation.ROOT_ORGANISATIONID, regionID));
+//} catch (JDOObjectNotFoundException x) {
+//region = new Region(Organisation.ROOT_ORGANISATIONID, regionID, country);
+//}
+//region.getName().setText(languageID, regionName);
+
+//if (!JDOHelper.isPersistent(region))
+//pm.makePersistent(region);
+//}
+
+//while (tokenizer.ttype != StreamTokenizer.TT_EOL)
+//tokenizer.nextToken();
+//tokenizer.nextToken();
+//}
+//} finally {
+//reader.close();
+//}
+//} finally {
+//in.close();
+//}
+
+//} finally {
+//pm.close();
+//}
+//} catch (RuntimeException x) {
+//throw x;
+//} catch (ModuleException x) {
+//throw x;
+//} catch (Exception x) {
+//throw new ModuleException(x);
+//}
+//}
+
+
+///**
+//* @ejb.interface-method view-type="local"
+//* @ejb.transaction type = "RequiresNew"
+//* @ejb.permission role-name="_Guest_"
+//*/
+//public void _storeDistrictRecord(
+//String file, int lineno, boolean searchCityByName,
+//String cityIDStr, String languageID, 
+//String countryID, String regionID, String cityName,
+//String districtName, long cityID, double latitude, double longitude,
+//Set zips)
+//throws ModuleException
+//{
+//PersistenceManager pm = getPersistenceManager();
+//try {
+//Region region;
+//try {
+//region = (Region) pm.getObjectById(
+//RegionID.create(
+//Organisation.ROOT_ORGANISATIONID, countryID,
+//Organisation.ROOT_ORGANISATIONID, regionID));
+//} catch (JDOObjectNotFoundException x) {
+//throw new RuntimeException("CSV \""+file+"\", line "+lineno+": region with countyID=\""+countryID+"\" regionID=\""+regionID+"\" does not exist!");
+//}
+
+//City city = null;
+//if (searchCityByName) {
+//// find the city that matches the name
+//Query query = pm.newQuery(City.class);
+//query.declareImports("import java.lang.String");
+//query.declareVariables("District district");
+//query.declareParameters("String languageID, String cityName");
+//query.setFilter("this.name.names.containsEntry(languageID, cityName)");
+//Collection c = (Collection)query.execute(languageID, cityName);
+//if (!c.isEmpty()) 
+//city = (City)c.iterator().next();
+//else {
+//query.setFilter("this.name.names.containsValue(cityName)");
+//c = (Collection)query.execute(languageID, cityName);
+
+//if (!c.isEmpty())
+//city = (City)c.iterator().next();
+//}
+//} // if (mode == 1) {
+
+//if (city == null) {
+//try {
+//city = (City)pm.getObjectById(CityID.create(Organisation.ROOT_ORGANISATIONID, cityID));
+//} catch (JDOObjectNotFoundException x) {
+//city = new City(Organisation.ROOT_ORGANISATIONID, cityID, region);
+//}
+//city.getName().setText(languageID, cityName);
+
+//if (!JDOHelper.isPersistent(city))
+//pm.makePersistent(city);
+//}
+
+//District district;
+//try {
+//district = (District)pm.getObjectById(DistrictID.create(Organisation.ROOT_ORGANISATIONID, cityID));
+//} catch (JDOObjectNotFoundException x) {
+//district = new District(Organisation.ROOT_ORGANISATIONID, cityID, city);
+//}
+//district.setName(districtName);
+//district.setLatitude(latitude);
+//district.setLongitude(longitude);
+//for (Iterator it = zips.iterator(); it.hasNext(); ) {
+//String zip = (String)it.next();
+//district.addZip(zip);
+//}
+
+//if (!JDOHelper.isPersistent(district))
+//pm.makePersistent(district);
+
+
+//} finally {
+//pm.close();
+//}
+//}
 
 }

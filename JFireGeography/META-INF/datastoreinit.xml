@@ -11,4 +11,8 @@
 			method="initialise"
 		/>
 	</init>
+	<init
+		bean="jfire/ejb/JFireGeography/GeographyTemplateDataManager"
+		method="initialiseJDOLifecycleListeners"
+		priority="980" />
 </datastore-initialisation>

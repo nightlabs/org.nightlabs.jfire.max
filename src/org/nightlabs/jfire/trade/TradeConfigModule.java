@@ -127,7 +127,7 @@ public class TradeConfigModule
 	 * @see org.nightlabs.jfire.config.ConfigModule#isEqualTo(org.nightlabs.jfire.config.ConfigModule)
 	 */
 	@Implement
-	public boolean isEqualTo(ConfigModule other) {
+	public boolean isContentEqual(ConfigModule other) {
 		if (this == other)
 			return true;
 		if (other.getClass() != this.getClass())

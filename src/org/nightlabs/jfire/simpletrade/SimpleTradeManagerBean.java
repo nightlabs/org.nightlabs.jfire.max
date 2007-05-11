@@ -80,11 +80,14 @@ import org.nightlabs.jfire.jdo.notification.persistent.PersistentNotificationEJB
 import org.nightlabs.jfire.jdo.notification.persistent.SubscriptionUtil;
 import org.nightlabs.jfire.organisation.Organisation;
 import org.nightlabs.jfire.organisation.id.OrganisationID;
+import org.nightlabs.jfire.prop.Property;
+import org.nightlabs.jfire.prop.id.StructFieldID;
 import org.nightlabs.jfire.security.User;
 import org.nightlabs.jfire.simpletrade.notification.SimpleProductTypeNotificationFilter;
 import org.nightlabs.jfire.simpletrade.notification.SimpleProductTypeNotificationReceiver;
 import org.nightlabs.jfire.simpletrade.store.SimpleProductType;
 import org.nightlabs.jfire.simpletrade.store.SimpleProductTypeActionHandler;
+import org.nightlabs.jfire.simpletrade.store.prop.SimpleProductTypeStruct;
 import org.nightlabs.jfire.store.NestedProductType;
 import org.nightlabs.jfire.store.ProductType;
 import org.nightlabs.jfire.store.Store;
@@ -179,6 +182,8 @@ implements SessionBean
 			moduleMetaData = new ModuleMetaData(
 					"JFireSimpleTrade", "1.0.0-0-beta", "1.0.0-0-beta");
 			pm.makePersistent(moduleMetaData);
+			
+			SimpleProductTypeStruct.getSimpleProductTypeStruct(organisationID, pm);
 
 			SimpleProductTypeActionHandler simpleProductTypeActionHandler = new SimpleProductTypeActionHandler(
 					Organisation.DEVIL_ORGANISATION_ID, SimpleProductTypeActionHandler.class.getName(), SimpleProductType.class);
@@ -460,6 +465,8 @@ implements SessionBean
 		}
 	}
 
+	
+	
 	/**
 	 * @return Returns a newly detached instance of <tt>SimpleProductType</tt> if <tt>get</tt> is true - otherwise <tt>null</tt>.
 	 *
@@ -572,6 +579,38 @@ implements SessionBean
 		}
 	}
 
+	/**
+	 * @return Returns the {@link Property}s for the given simpleProductTypeIDs trimmed so that they only contain the given structFieldIDs.
+	 * @see Property#detachPropertyWithTrimmedFieldList(PersistenceManager, Property, Set, String[], int)
+	 *
+	 * @ejb.interface-method
+	 * @ejb.permission role-name="SimpleTradeManager.Admin"
+	 * @ejb.transaction type = "Required"
+	 */
+	public Map<ProductTypeID, Property> getSimpleProductTypesPropertySets(
+			Set<ProductTypeID> simpleProductTypeIDs,
+			Set<StructFieldID> structFieldIDs,
+			String[] fetchGroups, int maxFetchDepth
+		) 
+	{
+		Map<ProductTypeID, Property> result = new HashMap<ProductTypeID, Property>(simpleProductTypeIDs.size());
+		PersistenceManager pm = getPersistenceManager();
+		try {
+			for (ProductTypeID productTypeID : simpleProductTypeIDs) {
+				SimpleProductType productType = (SimpleProductType) pm.getObjectById(productTypeID);
+				Property detached = Property.detachPropertyWithTrimmedFieldList(
+						pm, 
+						productType.getPropertySet(), structFieldIDs, 
+						fetchGroups, maxFetchDepth
+					);
+				result.put(productTypeID, detached);
+			}
+			return result;
+		} finally {
+			pm.close();
+		}
+	}
+	
 //	/**
 //	 * @return Returns a newly detached instance of <tt>SimpleProductType</tt> if <tt>get</tt> is true - otherwise <tt>null</tt>.
 //	 *

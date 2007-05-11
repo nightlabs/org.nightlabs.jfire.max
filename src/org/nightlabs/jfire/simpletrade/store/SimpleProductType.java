@@ -33,9 +33,10 @@ import javax.jdo.Query;
 
 import org.nightlabs.annotation.Implement;
 import org.nightlabs.jfire.accounting.TariffMapper;
-import org.nightlabs.jfire.accounting.TariffMapping;
 import org.nightlabs.jfire.accounting.gridpriceconfig.PriceCalculationException;
 import org.nightlabs.jfire.accounting.gridpriceconfig.PriceCalculator;
+import org.nightlabs.jfire.idgenerator.IDGenerator;
+import org.nightlabs.jfire.prop.Property;
 import org.nightlabs.jfire.security.User;
 import org.nightlabs.jfire.store.ProductType;
 import org.nightlabs.jfire.store.ProductTypeLocal;
@@ -43,7 +44,6 @@ import org.nightlabs.jfire.store.Repository;
 import org.nightlabs.jfire.store.id.ProductTypeID;
 import org.nightlabs.jfire.trade.CustomerGroupMapper;
 import org.nightlabs.jfire.trade.LegalEntity;
-import org.nightlabs.jfire.transfer.Anchor;
 
 /**
  * @author Marco Schulze - marco at nightlabs dot de
@@ -74,6 +74,7 @@ import org.nightlabs.jfire.transfer.Anchor;
  *		  import java.lang.String"
  * 
  * @jdo.fetch-group name="SimpleProductType.this" fetch-groups="default, ProductType.this"
+ * @jdo.fetch-group name="SimpleProductType.propertySet" fetch-groups="default" fields="propertySet"
  *
  * !@jdo.fetch-group name="ProductType.name" fields="name"
  *
@@ -84,7 +85,10 @@ import org.nightlabs.jfire.transfer.Anchor;
  */
 public class SimpleProductType extends ProductType
 {
+	private static final long serialVersionUID = 1L;
+	
 	public static final String FETCH_GROUP_THIS_SIMPLE_PRODUCT_TYPE = "SimpleProductType.this";
+	public static final String FETCH_GROUP_PROPERTY_SET = "SimpleProductType.propertySet";
 
 	/**
 	 * Note, that this method does only return instances of {@link SimpleProductType} while
@@ -120,7 +124,7 @@ public class SimpleProductType extends ProductType
 			byte inheritanceNature, byte packageNature)
 	{
 		super(organisationID, productTypeID, extendedProductType, owner, inheritanceNature, packageNature);
-
+		this.propertySet = new Property(organisationID, IDGenerator.nextID(Property.class));
 //		this.name = new SimpleProductTypeName(this);
 //		getFieldMetaData("name").setValueInherited(false);
 	}
@@ -142,6 +146,20 @@ public class SimpleProductType extends ProductType
 		} catch (PriceCalculationException e) {
 			throw new RuntimeException(e);
 		}
+	}
+	
+	/**
+	 * @jdo.field persistence-modifier="persistent"
+	 */
+	private Property propertySet;
+
+	/**
+	 * Returns the property set of this {@link SimpleProductType}.
+	 * 
+	 * @return The property set of this {@link SimpleProductType}.
+	 */
+	public Property getPropertySet() {
+		return propertySet;
 	}
 	
 //	/**

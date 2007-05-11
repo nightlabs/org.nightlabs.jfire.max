@@ -26,16 +26,20 @@
 
 package org.nightlabs.jfire.chezfrancois;
 
+import java.io.IOException;
+import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.Locale;
 
+import javax.jdo.FetchPlan;
 import javax.jdo.JDOObjectNotFoundException;
 import javax.jdo.PersistenceManager;
 import javax.naming.InitialContext;
 import javax.naming.NamingException;
 
+import org.apache.log4j.Logger;
 import org.nightlabs.ModuleException;
 import org.nightlabs.i18n.I18nText;
 import org.nightlabs.jfire.accounting.Account;
@@ -61,6 +65,8 @@ import org.nightlabs.jfire.prop.IStruct;
 import org.nightlabs.jfire.prop.Property;
 import org.nightlabs.jfire.prop.StructLocal;
 import org.nightlabs.jfire.prop.datafield.DateDataField;
+import org.nightlabs.jfire.prop.datafield.I18nTextDataField;
+import org.nightlabs.jfire.prop.datafield.ImageDataField;
 import org.nightlabs.jfire.prop.datafield.NumberDataField;
 import org.nightlabs.jfire.prop.datafield.PhoneNumberDataField;
 import org.nightlabs.jfire.prop.datafield.RegexDataField;
@@ -80,6 +86,7 @@ import org.nightlabs.jfire.security.UserLocal;
 import org.nightlabs.jfire.security.id.UserID;
 import org.nightlabs.jfire.simpletrade.store.SimpleProductType;
 import org.nightlabs.jfire.simpletrade.store.SimpleProductTypeActionHandler;
+import org.nightlabs.jfire.simpletrade.store.prop.SimpleProductTypeStruct;
 import org.nightlabs.jfire.store.ProductType;
 import org.nightlabs.jfire.store.Store;
 import org.nightlabs.jfire.store.id.ProductTypeID;
@@ -93,6 +100,8 @@ import org.nightlabs.jfire.trade.Trader;
 
 public class DataCreator
 {
+	private static Logger logger = Logger.getLogger(DataCreator.class);
+	
 	private String languageID = Locale.ENGLISH.getLanguage();
 	private String[] languages = new String[] {
 			Locale.ENGLISH.getLanguage(),
@@ -196,12 +205,79 @@ public class DataCreator
 
 		store.setProductTypeStatus_published(user, pt);
 		store.setProductTypeStatus_confirmed(user, pt);
-		store.setProductTypeStatus_saleable(user, pt, true);
-
+		store.setProductTypeStatus_saleable(user, pt, true);		
+		
 //		createdLeafs.add((ProductTypeID) JDOHelper.getObjectId(pt));
 		createdLeafs.add(pt);
 
 		return pt;
+	}
+	
+	public void createWineProperties(PersistenceManager pm, SimpleProductType productType, String englishShort, String germanShort, String englishLong, String germanLong, String smallImage, String largeImage) {
+		IStruct struct = SimpleProductTypeStruct.getSimpleProductTypeStruct(productType.getOrganisationID(), pm);
+		Property props = productType.getPropertySet();
+		productType.getFieldMetaData("propertySet").setValueInherited(false);
+		pm.getFetchPlan().setGroups(new String[] {FetchPlan.DEFAULT, Property.FETCH_GROUP_DATA_FIELDS, Property.FETCH_GROUP_FULL_DATA});
+//		props = (Property) pm.detachCopy(props);
+		struct.explodeProperty(props);
+		I18nTextDataField shortDesc;
+		try {
+			shortDesc = (I18nTextDataField)props.getDataField(SimpleProductTypeStruct.DESCRIPTION_SHORT);
+		} catch (Exception e) {
+			throw new RuntimeException(e);
+		}  
+		shortDesc.getI18nText().setText(Locale.ENGLISH.getLanguage(), englishShort);
+		shortDesc.getI18nText().setText(Locale.GERMAN.getLanguage(), germanShort);
+		I18nTextDataField longDesc;
+		try {
+			longDesc = (I18nTextDataField)props.getDataField(SimpleProductTypeStruct.DESCRIPTION_LONG);
+		} catch (Exception e) {
+			throw new RuntimeException(e);
+		}  
+		longDesc.getI18nText().setText(Locale.ENGLISH.getLanguage(), englishLong);
+		longDesc.getI18nText().setText(Locale.GERMAN.getLanguage(), germanLong);
+		ImageDataField smallImg;
+		try {
+			smallImg = (ImageDataField)props.getDataField(SimpleProductTypeStruct.IMAGES_SMALL_IMAGE);
+		} catch (Exception e) {
+			throw new RuntimeException(e);
+		}
+		InputStream in = getClass().getResourceAsStream("resource/"+smallImage);
+		if (in != null) {
+			try {
+				smallImg.loadStream(in, smallImage);
+			} catch (IOException e) {
+				logger.error(e);
+			} finally {
+				try {
+					in.close();
+				} catch (IOException e) {
+					logger.error(e);
+				}
+			}
+		}
+		ImageDataField largeImg;
+		try {
+			largeImg = (ImageDataField)props.getDataField(SimpleProductTypeStruct.IMAGES_LARGE_IMAGE);
+		} catch (Exception e) {
+			throw new RuntimeException(e);
+		}
+		in = getClass().getResourceAsStream("resource/"+largeImage);
+		if (in != null) {
+			try {
+				largeImg.loadStream(in, smallImage);
+			} catch (IOException e) {
+				logger.error(e);
+			} finally {
+				try {
+					in.close();
+				} catch (IOException e) {
+					logger.error(e);
+				}
+			}
+		}		
+//		struct.implodeProperty(props);
+		pm.makePersistent(props);
 	}
 	
 	public void calculatePrices()

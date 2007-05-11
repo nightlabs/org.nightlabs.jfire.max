@@ -44,6 +44,7 @@ import java.util.Set;
 import javax.naming.InitialContext;
 
 import org.apache.log4j.Logger;
+import org.nightlabs.datastructure.FulltextMap;
 import org.nightlabs.jfire.geography.id.CityID;
 import org.nightlabs.jfire.geography.id.CountryID;
 import org.nightlabs.jfire.geography.id.LocationID;
@@ -51,7 +52,6 @@ import org.nightlabs.jfire.geography.id.RegionID;
 import org.nightlabs.jfire.idgenerator.IDGenerator;
 import org.nightlabs.jfire.organisation.Organisation;
 import org.nightlabs.jfire.security.SecurityReflector;
-import org.nightlabs.util.FulltextMap;
 
 /**
  * @author Marco Schulze - marco at nightlabs dot de

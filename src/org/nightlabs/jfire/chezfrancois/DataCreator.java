@@ -220,7 +220,10 @@ public class DataCreator
 		productType.getFieldMetaData("propertySet").setValueInherited(false);
 		pm.getFetchPlan().setGroups(new String[] {FetchPlan.DEFAULT, Property.FETCH_GROUP_DATA_FIELDS, Property.FETCH_GROUP_FULL_DATA});
 
-		// PropertySet should always be detached before exploding! never explode while being attached! I got an SQL error because this line was commented out! Marco.  
+		// PropertySet should always be detached before exploding! 
+		// never explode while being attached! 
+		// I got an SQL error because this line was commented out! Marco.
+		// Why not explode attached, when intending to set all properties ;-)
 		if (JDOHelper.isPersistent(props))
 			props = (Property) pm.detachCopy(props);
 
@@ -705,7 +708,7 @@ public class DataCreator
 		if (personStruct == null) {
 			// We have to work with the StructLocal here...
 			// personStruct = Struct.getStruct(getOrganisationLegalEntity().getOrganisationID(), Person.class, pm);
-			personStruct = StructLocal.getStructLocal(getOrganisationLegalEntity().getOrganisationID(), Person.class.getName(), pm);
+			personStruct = StructLocal.getStructLocal(getOrganisationLegalEntity().getOrganisationID(), Person.class.getName(), StructLocal.DEFAULT_SCOPE, pm);
 		}
 
 		return personStruct;

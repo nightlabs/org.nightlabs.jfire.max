@@ -34,6 +34,7 @@ import java.util.List;
 import java.util.Locale;
 
 import javax.jdo.FetchPlan;
+import javax.jdo.JDOHelper;
 import javax.jdo.JDOObjectNotFoundException;
 import javax.jdo.PersistenceManager;
 import javax.naming.InitialContext;
@@ -218,7 +219,11 @@ public class DataCreator
 		Property props = productType.getPropertySet();
 		productType.getFieldMetaData("propertySet").setValueInherited(false);
 		pm.getFetchPlan().setGroups(new String[] {FetchPlan.DEFAULT, Property.FETCH_GROUP_DATA_FIELDS, Property.FETCH_GROUP_FULL_DATA});
-//		props = (Property) pm.detachCopy(props);
+
+		// PropertySet should always be detached before exploding! never explode while being attached! I got an SQL error because this line was commented out! Marco.  
+		if (JDOHelper.isPersistent(props))
+			props = (Property) pm.detachCopy(props);
+
 		struct.explodeProperty(props);
 		I18nTextDataField shortDesc;
 		try {
@@ -276,8 +281,22 @@ public class DataCreator
 				}
 			}
 		}		
-//		struct.implodeProperty(props);
-		pm.makePersistent(props);
+		struct.implodeProperty(props); // and it should always be imploded before storing it into the datastore. Marco.
+
+		// TODO JPOX WORKAROUND : this fails sometimes - hence we retry a few times
+		for (int tryCounter = 0; tryCounter < 10; ++tryCounter) {
+			try {
+				pm.makePersistent(props);
+				props = null;
+				break; // successful => break retry loop
+			} catch (Exception x) {
+				// ignore and try again
+			}
+			pm.flush();
+			pm.evictAll();
+		}
+		if (props != null)
+			pm.makePersistent(props);
 	}
 	
 	public void calculatePrices()
@@ -306,51 +325,72 @@ public class DataCreator
 		formulaPriceConfig.getName().setText(languageID, name);
 		FormulaCell fallbackFormulaCell = formulaPriceConfig.createFallbackFormulaCell();
 		fallbackFormulaCell.setFormula(
-				Organisation.DEVIL_ORGANISATION_ID,
-				PriceFragmentType.TOTAL_PRICEFRAGMENTTYPEID,
+				PriceFragmentType.PRICE_FRAGMENT_TYPE_ID_TOTAL.organisationID,
+				PriceFragmentType.PRICE_FRAGMENT_TYPE_ID_TOTAL.priceFragmentTypeID,
 				"cell.resolvePriceCellsAmount(\n" +
-				"	new AbsolutePriceCoordinate(\n" +
-				"		null,\n" +
-				"		null,\n" +
-				"		null,\n" +
-				"		\""+packageProductType.getPrimaryKey()+"\",\n" +
-				"		null\n" +
+				"	new Array(\n" +
+				"		ProductTypeID.create(\"" + packageProductType.getOrganisationID() + "\", \"" + packageProductType.getProductTypeID() + "\")\n" +
 				"	)\n" +
 				") * 0.1;");
+//				"	new AbsolutePriceCoordinate(\n" +
+//				"		null,\n" +
+//				"		null,\n" +
+//				"		null,\n" +
+//				"		\""+packageProductType.getPrimaryKey()+"\",\n" +
+//				"		null\n" +
+//				"	)\n" +
+//				") * 0.1;");
 
-		fallbackFormulaCell.setFormula(vatNet, "cell.resolvePriceCellsAmount(\n" +
-				"	new AbsolutePriceCoordinate(\n" +
-				"		null,\n" +
-				"		null,\n" +
-				"		null,\n" +
-				"		null,\n" +
-				"		\""+Organisation.DEVIL_ORGANISATION_ID+"/_Total_\"\n" +
-				"	)\n"+
+		fallbackFormulaCell.setFormula(vatNet,
+				"cell.resolvePriceCellsAmount(\n" +
+				"	new Array(\n" +
+				"		PriceFragmentTypeID.create(\"" + PriceFragmentType.PRICE_FRAGMENT_TYPE_ID_TOTAL.organisationID + "\", \"" + PriceFragmentType.PRICE_FRAGMENT_TYPE_ID_TOTAL.priceFragmentTypeID + "\")\n" +
+				"	)\n" +
 				") / 1.16;");
-		fallbackFormulaCell.setFormula(vatVal, "cell.resolvePriceCellsAmount(\n" +
-				"	new AbsolutePriceCoordinate(\n" +
-				"		null,\n" +
-				"		null,\n" +
-				"		null,\n" +
-				"		null,\n" +
-				"		\""+Organisation.DEVIL_ORGANISATION_ID+"/_Total_\"\n" +
-				"	)\n"+
+//				"cell.resolvePriceCellsAmount(\n" +
+//				"	new AbsolutePriceCoordinate(\n" +
+//				"		null,\n" +
+//				"		null,\n" +
+//				"		null,\n" +
+//				"		null,\n" +
+//				"		\""+Organisation.DEVIL_ORGANISATION_ID+"/_Total_\"\n" +
+//				"	)\n"+
+//				") / 1.16;");
+		fallbackFormulaCell.setFormula(vatVal,
+				"cell.resolvePriceCellsAmount(\n" +
+				"	new Array(\n" +
+				"		PriceFragmentTypeID.create(\"" + PriceFragmentType.PRICE_FRAGMENT_TYPE_ID_TOTAL.organisationID + "\", \"" + PriceFragmentType.PRICE_FRAGMENT_TYPE_ID_TOTAL.priceFragmentTypeID + "\")\n" +
+				"	)\n" +
 				")\n" +
-				
-//					"/ 1.16 * 0.16;");
-				
 				"\n" +
-				"-\n" +
+				"-" +
 				"\n" +
 				"cell.resolvePriceCellsAmount(\n" +
-				"	new AbsolutePriceCoordinate(\n" +
-				"		null,\n" +
-				"		null,\n" +
-				"		null,\n" +
-				"		null,\n" +
-				"		\""+rootOrganisationID+"/vat-de-16-net\"\n" +
-				"	)\n"+
+				"	new Array(\n" +
+				"		PriceFragmentTypeID.create(\"" + rootOrganisationID + "\", \"vat-de-16-net\")\n" +
+				"	)\n" +
 				");");
+//				"cell.resolvePriceCellsAmount(\n" +
+//				"	new AbsolutePriceCoordinate(\n" +
+//				"		null,\n" +
+//				"		null,\n" +
+//				"		null,\n" +
+//				"		null,\n" +
+//				"		\""+Organisation.DEVIL_ORGANISATION_ID+"/_Total_\"\n" +
+//				"	)\n"+
+//				")\n" +
+//				"\n" +
+//				"-\n" +
+//				"\n" +
+//				"cell.resolvePriceCellsAmount(\n" +
+//				"	new AbsolutePriceCoordinate(\n" +
+//				"		null,\n" +
+//				"		null,\n" +
+//				"		null,\n" +
+//				"		null,\n" +
+//				"		\""+rootOrganisationID+"/vat-de-16-net\"\n" +
+//				"	)\n"+
+//				");");
 
 		return formulaPriceConfig;
 	}
@@ -434,47 +474,72 @@ public class DataCreator
 		FormulaCell fallbackFormulaCell = formulaPriceConfig.createFallbackFormulaCell();
 		fallbackFormulaCell.setFormula(totalPriceFragmentType,
 				"cell.resolvePriceCellsAmount(\n" +
-				"	new AbsolutePriceCoordinate(\n" +
-				"		\""+organisationID+"/"+CustomerGroup.CUSTOMER_GROUP_ID_DEFAULT+"\",\n" +
-				"		null,\n" +
-				"		null,\n" +
-				"		null,\n" +
-				"		null\n" +
+				"	new Array(\n" +
+				"		CustomerGroupID.create(\"" + organisationID + "\", \"" + CustomerGroup.CUSTOMER_GROUP_ID_DEFAULT + "\")\n" +
 				"	)\n" +
 				");");
-		fallbackFormulaCell.setFormula(vatNet, "cell.resolvePriceCellsAmount(\n" +
-				"	new AbsolutePriceCoordinate(\n" +
-				"		null,\n" +
-				"		null,\n" +
-				"		null,\n" +
-				"		null,\n" +
-				"		\""+Organisation.DEVIL_ORGANISATION_ID+"/_Total_\"\n" +
+//				"cell.resolvePriceCellsAmount(\n" +
+//				"	new AbsolutePriceCoordinate(\n" +
+//				"		\""+organisationID+"/"+CustomerGroup.CUSTOMER_GROUP_ID_DEFAULT+"\",\n" +
+//				"		null,\n" +
+//				"		null,\n" +
+//				"		null,\n" +
+//				"		null\n" +
+//				"	)\n" +
+//				");");
+		fallbackFormulaCell.setFormula(vatNet,
+				"cell.resolvePriceCellsAmount(\n" +
+				"	new Array(\n" +
+				"		PriceFragmentTypeID.create(\"" + PriceFragmentType.PRICE_FRAGMENT_TYPE_ID_TOTAL.organisationID + "\", \"" + PriceFragmentType.PRICE_FRAGMENT_TYPE_ID_TOTAL.priceFragmentTypeID + "\")\n" +
 				"	)\n" +
 				") / 1.16;");
-		fallbackFormulaCell.setFormula(vatVal, "cell.resolvePriceCellsAmount(\n" +
-				"	new AbsolutePriceCoordinate(\n" +
-				"		null,\n" +
-				"		null,\n" +
-				"		null,\n" +
-				"		null,\n" +
-				"		\""+Organisation.DEVIL_ORGANISATION_ID+"/_Total_\"\n" +
+		fallbackFormulaCell.setFormula(vatVal,
+				"cell.resolvePriceCellsAmount(\n" +
+				"	new Array(\n" +
+				"		PriceFragmentTypeID.create(\"" + PriceFragmentType.PRICE_FRAGMENT_TYPE_ID_TOTAL.organisationID + "\", \"" + PriceFragmentType.PRICE_FRAGMENT_TYPE_ID_TOTAL.priceFragmentTypeID + "\")\n" +
 				"	)\n" +
 				")\n" +
-
-//					"/ 1.16 * 0.16");
-
 				"\n" +
-				"-\n" +
+				"-" +
 				"\n" +
 				"cell.resolvePriceCellsAmount(\n" +
-				"	new AbsolutePriceCoordinate(\n" +
-				"		null,\n" +
-				"		null,\n" +
-				"		null,\n" +
-				"		null,\n" +
-				"		\""+rootOrganisationID+"/vat-de-16-net\"\n" +
+				"	new Array(\n" +
+				"		PriceFragmentTypeID.create(\"" + rootOrganisationID + "\", \"vat-de-16-net\")\n" +
 				"	)\n" +
 				");");
+//		fallbackFormulaCell.setFormula(vatNet, "cell.resolvePriceCellsAmount(\n" +
+//				"	new AbsolutePriceCoordinate(\n" +
+//				"		null,\n" +
+//				"		null,\n" +
+//				"		null,\n" +
+//				"		null,\n" +
+//				"		\""+Organisation.DEVIL_ORGANISATION_ID+"/_Total_\"\n" +
+//				"	)\n" +
+//				") / 1.16;");
+//		fallbackFormulaCell.setFormula(vatVal, "cell.resolvePriceCellsAmount(\n" +
+//				"	new AbsolutePriceCoordinate(\n" +
+//				"		null,\n" +
+//				"		null,\n" +
+//				"		null,\n" +
+//				"		null,\n" +
+//				"		\""+Organisation.DEVIL_ORGANISATION_ID+"/_Total_\"\n" +
+//				"	)\n" +
+//				")\n" +
+//
+////					"/ 1.16 * 0.16");
+//
+//				"\n" +
+//				"-\n" +
+//				"\n" +
+//				"cell.resolvePriceCellsAmount(\n" +
+//				"	new AbsolutePriceCoordinate(\n" +
+//				"		null,\n" +
+//				"		null,\n" +
+//				"		null,\n" +
+//				"		null,\n" +
+//				"		\""+rootOrganisationID+"/vat-de-16-net\"\n" +
+//				"	)\n" +
+//				");");
 
 		for (int i = 0; i < formulas.length; i++) {
 			String formula = formulas[i];

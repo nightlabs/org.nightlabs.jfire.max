@@ -34,7 +34,7 @@ public class SimpleProductTypeStruct {
 			productTypeStruct = new Struct(organisationID, SimpleProductType.class.getName());
 			createStandardStructure(productTypeStruct);
 			productTypeStruct = (Struct) pm.makePersistent(productTypeStruct);
-			personStructLocal = new StructLocal(productTypeStruct);
+			personStructLocal = new StructLocal(productTypeStruct, StructLocal.DEFAULT_SCOPE);
 			pm.makePersistent(personStructLocal);
 		}
 		return productTypeStruct;

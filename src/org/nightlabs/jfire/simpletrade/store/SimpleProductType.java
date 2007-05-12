@@ -37,6 +37,7 @@ import org.nightlabs.jfire.accounting.gridpriceconfig.PriceCalculationException;
 import org.nightlabs.jfire.accounting.gridpriceconfig.PriceCalculator;
 import org.nightlabs.jfire.idgenerator.IDGenerator;
 import org.nightlabs.jfire.prop.Property;
+import org.nightlabs.jfire.prop.StructLocal;
 import org.nightlabs.jfire.security.User;
 import org.nightlabs.jfire.store.ProductType;
 import org.nightlabs.jfire.store.ProductTypeLocal;
@@ -124,7 +125,8 @@ public class SimpleProductType extends ProductType
 			byte inheritanceNature, byte packageNature)
 	{
 		super(organisationID, productTypeID, extendedProductType, owner, inheritanceNature, packageNature);
-		this.propertySet = new Property(IDGenerator.getOrganisationID(), IDGenerator.nextID(Property.class));
+		this.structLocalScope = StructLocal.DEFAULT_SCOPE;
+		this.propertySet = new Property(organisationID, IDGenerator.nextID(Property.class));
 //		this.name = new SimpleProductTypeName(this);
 //		getFieldMetaData("name").setValueInherited(false);
 	}
@@ -146,6 +148,21 @@ public class SimpleProductType extends ProductType
 		} catch (PriceCalculationException e) {
 			throw new RuntimeException(e);
 		}
+	}
+	
+	/**
+	 * The scope of the StructLocal by which the propertySet is build from.
+	 * 
+	 * @jdo.field persistence-modifier="persistent" null-value="exception" indexed="true"
+	 */
+	private String structLocalScope;
+	
+	/**
+	 * Returns the scope of the StructLocal by which the propertySet is build from.
+	 * @return The scope of the StructLocal by which the propertySet is build from.
+	 */
+	public String getStructLocalScope() {
+		return structLocalScope;
 	}
 	
 	/**

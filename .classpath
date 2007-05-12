@@ -18,7 +18,7 @@
 	<classpathentry kind="var" path="LOG4J"/>
 	<classpathentry sourcepath="/WORKSPACE/NightLabsBase" kind="var" path="WORKSPACE/NightLabsBase/dist/NightLabsBase.jar"/>
 	<classpathentry sourcepath="/WORKSPACE/JFireBaseBean" kind="var" path="WORKSPACE/JFireBaseBean/dist/JFireBaseBean.jar"/>
-	<classpathentry sourcepath="/JPOX_SRC" kind="var" path="JDO2"/>
+	<classpathentry sourcepath="JPOX_SRC" kind="var" path="JDO2"/>
 	<classpathentry sourcepath="JPOX_SRC" kind="var" path="JPOX"/>
 	<classpathentry sourcepath="/JPOXENHANCER_SRC" kind="var" path="JPOXENHANCER"/>
 	<classpathentry kind="var" path="WORKSPACE/JFireServerManager/dist/JFireServerManager.jar"/>

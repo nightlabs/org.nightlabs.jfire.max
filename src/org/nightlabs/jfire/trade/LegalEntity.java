@@ -48,6 +48,7 @@ import org.nightlabs.jfire.person.PersonStruct;
 import org.nightlabs.jfire.prop.IStruct;
 import org.nightlabs.jfire.prop.Property;
 import org.nightlabs.jfire.prop.Struct;
+import org.nightlabs.jfire.prop.StructLocal;
 import org.nightlabs.jfire.prop.datafield.TextDataField;
 import org.nightlabs.jfire.security.User;
 import org.nightlabs.jfire.store.Product;
@@ -89,6 +90,8 @@ public class LegalEntity extends Anchor
 
 	public static final String ANCHOR_TYPE_ID_PARTNER = "Partner";
 
+	public static final String PROPERY_SCOPE = StructLocal.DEFAULT_SCOPE;
+	
 	/**
 	 * @param pm The <tt>PersistenceManager</tt> to use.
 	 * @return the <tt>LegalEntity</tt> which represents the anonymous customer. If this

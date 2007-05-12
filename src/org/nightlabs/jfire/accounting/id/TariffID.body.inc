@@ -14,3 +14,8 @@
 		}
 		return n;
 	}
+
+	public String getPrimaryKey()
+	{
+		return org.nightlabs.jfire.accounting.Tariff.getPrimaryKey(organisationID, tariffID);
+	}

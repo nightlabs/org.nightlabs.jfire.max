@@ -65,6 +65,8 @@ public class FormulaPriceConfig
 extends GridPriceConfig
 implements IFormulaPriceConfig
 {
+	private static final long serialVersionUID = 1L;
+
 	public static final String FETCH_GROUP_FALLBACK_FORMULA_CELL = "FormulaPriceConfig.fallbackFormulaCell";
 	public static final String FETCH_GROUP_FORMULA_CELLS = "FormulaPriceConfig.formulaCells";
 	public static final String FETCH_GROUP_PACKAGING_RESULT_PRICE_CONFIGS = "FormulaPriceConfig.packagingResultPriceConfigs";
@@ -87,11 +89,14 @@ implements IFormulaPriceConfig
 	 *
 	 * @jdo.join
 	 */
-	private Map packagingResultPriceConfigs = new HashMap();
+	private Map<String, GridPriceConfig> packagingResultPriceConfigs = new HashMap<String, GridPriceConfig>();
 
 	public void setPackagingResultPriceConfig(String innerProductTypePK, String packageProductTypePK, IPriceConfig resultPriceConfig)
 	{
-		packagingResultPriceConfigs.put(innerProductTypePK+'-'+packageProductTypePK, resultPriceConfig);
+		if (!(resultPriceConfig instanceof GridPriceConfig))
+			throw new IllegalArgumentException("This implementation of IInnerPriceConfig only supports instances of type " + GridPriceConfig.class.getName() + " as resultPriceConfig, but you passed an instance of " + (resultPriceConfig == null ? null : resultPriceConfig.getClass().getName()));
+
+		packagingResultPriceConfigs.put(innerProductTypePK+'-'+packageProductTypePK, (GridPriceConfig)resultPriceConfig);
 	}
 	public IPriceConfig getPackagingResultPriceConfig(String innerProductTypePK, String packageProductTypePK, boolean throwExceptionIfNotExistent)
 	{
@@ -119,7 +124,7 @@ implements IFormulaPriceConfig
 	 *
 	 * @!jdo.map-vendor-extension vendor-name="jpox" key="key-field" value="priceCoordinate"
 	 */
-	private Map formulaCells = new HashMap();
+	private Map<IPriceCoordinate, FormulaCell> formulaCells = new HashMap<IPriceCoordinate, FormulaCell>();
 
 	/**
 	 * In case, there is a cell missing for a certain coordinate, this
@@ -131,6 +136,9 @@ implements IFormulaPriceConfig
 	 */
 	private FormulaCell fallbackFormulaCell;
 
+	/**
+	 * @deprecated Only for JDO!
+	 */
 	protected FormulaPriceConfig()
 	{
 	}
@@ -199,7 +207,7 @@ implements IFormulaPriceConfig
 	 *
 	 * @jdo.join
 	 */
-	private Map productTypes = new HashMap();
+	private Map<String, ProductType> productTypes = new HashMap<String, ProductType>();
 
 	public Collection getProductTypes()
 	{

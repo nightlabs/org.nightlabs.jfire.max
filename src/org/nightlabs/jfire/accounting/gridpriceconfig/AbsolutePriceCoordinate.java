@@ -29,8 +29,10 @@ package org.nightlabs.jfire.accounting.gridpriceconfig;
 import org.nightlabs.jfire.accounting.Currency;
 import org.nightlabs.jfire.accounting.PriceFragmentType;
 import org.nightlabs.jfire.accounting.Tariff;
+import org.nightlabs.jfire.accounting.id.PriceFragmentTypeID;
 import org.nightlabs.jfire.accounting.priceconfig.PriceConfig;
 import org.nightlabs.jfire.store.ProductType;
+import org.nightlabs.jfire.store.id.ProductTypeID;
 import org.nightlabs.jfire.trade.CustomerGroup;
 
 /**
@@ -71,11 +73,9 @@ public class AbsolutePriceCoordinate extends PriceCoordinate implements IAbsolut
 //		this.priceFragmentTypePK = priceFragmentTypePK != null ? priceFragmentTypePK : priceCoordinate.getPriceFragmentTypePK();
 //	}
 	/**
-	 * @deprecated This constructor should not be used in java code! An instance
+	 * <strong>WARNING:</strong> This constructor should not be used in java code! An instance
 	 * created by it, cannot be persisted into the database! It is
-	 * only intended for usage as address in javascript formulas! Though it's
-	 * marked as deprecated, it will NOT vanish. Deprecation is only set to make you
-	 * aware of the special function of this constructor. 
+	 * only intended for usage as address in javascript formulas!
 	 *
 	 * @param customerGroupPK Either <tt>null</tt> (which means the same <tt>CustomerGroup</tt>
 	 *		as the current cell's location) or the PK of another cell's location
@@ -93,6 +93,22 @@ public class AbsolutePriceCoordinate extends PriceCoordinate implements IAbsolut
 	 * @param priceFragmentTypePK Either <tt>null</tt> (which means the same <tt>PriceFragmentType</tt>
 	 *		as the current cell's location) or the PK of another cell's location
 	 *		(see {@link PriceFragmentType#getPrimaryKey()}).
+	 */
+	public AbsolutePriceCoordinate(Object ... dimensionValues)
+	{
+		super(dimensionValues);
+
+		ProductTypeID productTypeID = (ProductTypeID) getDimensionValue(dimensionValues, ProductTypeID.class);
+		if (productTypeID != null)
+			this.productTypePK = productTypeID.getPrimaryKey();
+
+		PriceFragmentTypeID priceFragmentTypeID = (PriceFragmentTypeID) getDimensionValue(dimensionValues, PriceFragmentTypeID.class);
+		if (priceFragmentTypeID != null)
+			this.priceFragmentTypePK = priceFragmentTypeID.getPrimaryKey();
+	}
+
+	/**
+	 * @deprecated Use {@link #AbsolutePriceCoordinate(Object[])} instead!
 	 */
 	public AbsolutePriceCoordinate(
 			String customerGroupPK, String tariffPK, String currencyID,

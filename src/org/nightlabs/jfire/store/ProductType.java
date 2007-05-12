@@ -113,7 +113,9 @@ import org.nightlabs.util.Utils;
  *
  * @jdo.inheritance strategy="new-table"
  *
- * @jdo.create-objectid-class field-order="organisationID, productTypeID"
+ * @jdo.create-objectid-class
+ *		field-order="organisationID, productTypeID"
+ *		include-body="id/ProductTypeID.body.inc"
  *
  * @jdo.fetch-group name="ProductType.extendedProductType" fields="extendedProductType"
  * @jdo.fetch-group name="ProductType.extendedProductType[2]" fields="extendedProductType[2]"

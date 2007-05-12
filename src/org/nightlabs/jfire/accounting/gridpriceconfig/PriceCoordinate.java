@@ -27,15 +27,22 @@
 package org.nightlabs.jfire.accounting.gridpriceconfig;
 
 import java.io.Serializable;
+import java.util.HashSet;
+import java.util.Set;
 
 import javax.jdo.listener.StoreCallback;
 
 import org.apache.log4j.Logger;
+import org.nightlabs.jdo.ObjectID;
+import org.nightlabs.jdo.ObjectIDUtil;
 import org.nightlabs.jfire.accounting.Currency;
 import org.nightlabs.jfire.accounting.Tariff;
+import org.nightlabs.jfire.accounting.id.CurrencyID;
+import org.nightlabs.jfire.accounting.id.TariffID;
 import org.nightlabs.jfire.accounting.priceconfig.PriceConfig;
 import org.nightlabs.jfire.idgenerator.IDGenerator;
 import org.nightlabs.jfire.trade.CustomerGroup;
+import org.nightlabs.jfire.trade.id.CustomerGroupID;
 
 /**
  * @author Marco Schulze - marco at nightlabs dot de
@@ -57,6 +64,8 @@ import org.nightlabs.jfire.trade.CustomerGroup;
  */
 public class PriceCoordinate implements Serializable, StoreCallback, IPriceCoordinate
 {
+	private static final long serialVersionUID = 1L;
+
 	private static final Logger logger = Logger.getLogger(PriceCoordinate.class);
 
 	public static final String FETCH_GROUP_PRICE_CONFIG = "PriceCoordinate.priceConfig";
@@ -108,25 +117,136 @@ public class PriceCoordinate implements Serializable, StoreCallback, IPriceCoord
 	}
 
 	/**
-	 * <strong>WARNING:</strong> An instance created by this constructor, cannot be persisted
+	 * <strong>WARNING:</strong> An instance created by this constructor cannot be persisted
 	 * into the database! It is only intended for usage as address in javascript formulas or
-	 * similar purposes! 
+	 * similar purposes!
+	 * <p>
+	 * This constructor takes the values for each dimension as the java5 open parameter
+	 * (internally handled as array) <code>dimensionValues</code>. Every class
+	 * (usually implementing {@link ObjectID}) defines one dimension of the coordinate.
+	 * This means, every instance in the array <code>dimensionValues</code>
+	 * must have a different type.
+	 * </p>
+	 * <p>
+	 * Additionally, it converts {@link String}s starting with {@link ObjectIDUtil#JDO_PREFIX} + 
+	 * {@link ObjectIDUtil#JDO_PREFIX_SEPARATOR} to {@link ObjectID}s using the method
+	 * {@link ObjectIDUtil#createObjectID(String)}.
+	 * </p>
+	 * <p>
+	 * The base implementation of <code>PriceCoordinate</code> processes values for the following classes:
+	 * <ul>
+	 * <li>{@link CustomerGroupID}</li>
+	 * <li>{@link TariffID}</li>
+	 * <li>{@link CurrencyID}</li>
+	 * </ul>
+	 * In order to make extending <code>PriceCoordinate</code> easier, you can pass instances of other classes as
+	 * well! Hence, when you extend <code>PriceCoordinate</code>, you can simply first pass all <code>dimensionValues</code>
+	 * to the super constructor and then search for your additional classes in the array. It's recommended
+	 * to use the method {@link #getDimensionValue(Object[], Class)} for this purpose.
+	 * </p>
+	 * <p>
+	 * It is the contract of a <code>PriceCoordinate</code> created by this constructor that every
+	 * missing dimension value will refer to the current cell's location. Means, if you create an
+	 * instance of this class in the cell [customerGroup="default", tariff="normal", currency="EUR"]
+	 * and you specify only [customerGroup="anonymous", tariff="students"], then the currency will
+	 * stay <code>null</code> and thus point to "EUR".
+	 * </p>
 	 *
-	 * @param customerGroupPK Either <tt>null</tt> (which means the same <tt>CustomerGroup</tt>
+	 * @!param customerGroupPK Either <tt>null</tt> (which means the same <tt>CustomerGroup</tt>
 	 *		as the current cell's location) or the PK of another cell's location
 	 *		(see {@link CustomerGroup#getPrimaryKey()}).
-	 * @param tariffPK Either <tt>null</tt> (which means the same <tt>Tariff</tt>
+	 * @!param tariffPK Either <tt>null</tt> (which means the same <tt>Tariff</tt>
 	 *		as the current cell's location) or the PK of another cell's location
 	 *		(see {@link Tariff#getPrimaryKey()}).
-	 * @param currencyID Either <tt>null</tt> (which means the same <tt>Currency</tt>
+	 * @!param currencyID Either <tt>null</tt> (which means the same <tt>Currency</tt>
 	 *		as the current cell's location) or the PK of another cell's location
 	 *		(see {@link Currency#getCurrencyID()}).
+	 *
+	 * @param dimensionValues values for each dimension, together making up the coordinate.
+	 */
+	public PriceCoordinate(Object ... dimensionValues)
+	{
+		convertStringsToObjectIDs(dimensionValues);
+		assertDimensionValuesUniqueClasses(dimensionValues);
+
+		CustomerGroupID customerGroupID = (CustomerGroupID) getDimensionValue(dimensionValues, CustomerGroupID.class);
+		if (customerGroupID != null)
+			this.customerGroupPK = customerGroupID.getPrimaryKey();
+
+		TariffID tariffID = (TariffID) getDimensionValue(dimensionValues, TariffID.class);
+		if (tariffID != null)
+			this.tariffPK = tariffID.getPrimaryKey();
+
+		CurrencyID currencyID = (CurrencyID) getDimensionValue(dimensionValues, CurrencyID.class);
+		if (currencyID != null)
+			this.currencyID = currencyID.currencyID;
+	}
+	/**
+	 * @deprecated Only used for downward compatibility! Use {@link #PriceCoordinate(Object[])} instead!
 	 */
 	public PriceCoordinate(String customerGroupPK, String tariffPK, String currencyID)
 	{
 		this.customerGroupPK = customerGroupPK;
 		this.tariffPK = tariffPK;
 		this.currencyID = currencyID;
+	}
+
+	private static void convertStringsToObjectIDs(Object[] dimensionValues)
+	{
+		String jdoStart = null;
+		for (int i = 0; i < dimensionValues.length; i++) {
+			Object dimensionValue = dimensionValues[i];
+			if (dimensionValue instanceof String) {
+				String s = (String)dimensionValue;
+
+				if (jdoStart == null)
+					jdoStart = ObjectIDUtil.JDO_PREFIX + ObjectIDUtil.JDO_PREFIX_SEPARATOR;
+				
+				if (s.startsWith(jdoStart))
+					dimensionValues[i] = ObjectIDUtil.createObjectID(s);
+			}
+		}
+	}
+
+	/**
+	 * This method ensures that in <code>dimensionValues</code> each class exists
+	 * only once. As every class defines one dimension, multiple instances of the same class are not valid.
+	 *
+	 * @param dimensionValues values for each dimension, together making up the coordinate.
+	 */
+	private static void assertDimensionValuesUniqueClasses(Object[] dimensionValues)
+	{
+		if (dimensionValues == null || dimensionValues.length == 0)
+			return;
+
+		Set dimensionValueClasses = new HashSet(dimensionValues.length);
+		for (int i = 0; i < dimensionValues.length; i++) {
+			Object dimensionValue = dimensionValues[i];
+			if (dimensionValue == null)
+				continue;
+
+			Class dimensionValueClass = dimensionValue.getClass();
+			if (dimensionValueClasses.contains(dimensionValueClass))
+				throw new IllegalArgumentException("dimensionValues contains multiple values for the same dimensionClass: " + dimensionValueClass.getName());
+		}
+	}
+
+	/**
+	 * This method searches the first instance of the type specified by <code>dimensionClass</code>
+	 * in the given <code>dimensionValues</code> and returns it. If there is none, it returns <code>null</code>.
+	 *
+	 * @param dimensionValues the parts (i.e. one value per dimension) of the coordinate
+	 * @param dimensionClass the class specifying the dimension
+	 * @return the first instance of the specified class or <code>null</code>, if it does not exist.
+	 */
+	protected static Object getDimensionValue(Object[] dimensionValues, Class<? extends Object> dimensionClass)
+	{
+		for (int i = 0; i < dimensionValues.length; i++) {
+			Object dimensionValue = dimensionValues[i];
+			if (dimensionClass.isInstance(dimensionValue))
+				return dimensionValue;
+		}
+		return null;
 	}
 
 	public PriceCoordinate(IPriceCoordinate priceCoordinate)

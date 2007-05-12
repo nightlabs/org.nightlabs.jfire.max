@@ -26,13 +26,13 @@
 
 package org.nightlabs.jfire.accounting.gridpriceconfig;
 
-import java.util.Collection;
-import java.util.Collections;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import org.apache.log4j.Logger;
 import org.mozilla.javascript.Context;
@@ -44,13 +44,15 @@ import org.nightlabs.ModuleException;
 import org.nightlabs.jfire.accounting.PriceFragmentType;
 import org.nightlabs.jfire.accounting.Tariff;
 import org.nightlabs.jfire.accounting.TariffMapper;
-import org.nightlabs.jfire.accounting.TariffMapping;
+import org.nightlabs.jfire.accounting.id.CurrencyID;
+import org.nightlabs.jfire.accounting.id.PriceFragmentTypeID;
 import org.nightlabs.jfire.accounting.id.TariffID;
 import org.nightlabs.jfire.accounting.priceconfig.IPriceConfig;
 import org.nightlabs.jfire.accounting.priceconfig.PriceConfig;
 import org.nightlabs.jfire.idgenerator.IDGenerator;
 import org.nightlabs.jfire.store.NestedProductType;
 import org.nightlabs.jfire.store.ProductType;
+import org.nightlabs.jfire.store.id.ProductTypeID;
 import org.nightlabs.jfire.trade.CustomerGroup;
 import org.nightlabs.jfire.trade.CustomerGroupMapper;
 import org.nightlabs.jfire.trade.id.CustomerGroupID;
@@ -500,6 +502,13 @@ public class PriceCalculator
 	}
 
 	/**
+	 * <code>Important:</code> You should not override this method! Override
+	 * {@link #populateImportPackages(Set)} instead!
+	 * <p>
+	 * This method calls {@link #populateImportPackages(Set)} and returns
+	 * a correctly formatted <code>String</code>.
+	 * </p>
+	 *
 	 * @return Return either <tt>null</tt> (if you don't want to import any package) or
 	 *		a comma separated list of package names. Note, that all packages need to be
 	 *		prefixed with "Packages.". For the "java" package, this prefix is not
@@ -510,12 +519,38 @@ public class PriceCalculator
 	 */
 	protected String getImportPackages()
 	{
-		return null;
+		Set<Package> packages = new HashSet<Package>();
+		populateImportPackages(packages);
+		if (packages.isEmpty())
+			return null;
+
+		StringBuffer sb = new StringBuffer();
+		for (Iterator it = packages.iterator(); it.hasNext();) {
+			Package pakkage = (Package) it.next();
+			if (sb.length() != 0)
+				sb.append(", ");
+
+			sb.append("Packages.");
+			sb.append(pakkage.getName());
+		}
+		return sb.toString();
 	//	return "Packages.org.nightlabs.jfire.accounting.tariffpriceconfig";
 	}
 
+	protected void populateImportPackages(Set<Package> packages)
+	{
+		// we don't need to import any packages - we import individual classes
+	}
+
 	/**
-	 * @return Return either <tt>null</tt> (if you don't want to import any classes) or
+	 * <code>Important:</code> You should not override this method! Override
+	 * {@link #populateImportClasses(Set)} instead!
+	 * <p>
+	 * This method calls {@link #populateImportClasses(Set)} and returns
+	 * a correctly formatted <code>String</code>.
+	 * </p>
+	 *
+	 * @return either <tt>null</tt> (if no classes should be imported) or
 	 *		a comma separated list of fully qualified class names. Note, that all packages
 	 *		need to be
 	 *		prefixed with "Packages.". For the "java" package, this prefix is not
@@ -526,7 +561,44 @@ public class PriceCalculator
 	 */
 	protected String getImportClasses()
 	{
-		return "Packages." + AbsolutePriceCoordinate.class.getName();
+		Set<Class<?>> classes = new HashSet<Class<?>>();
+		populateImportClasses(classes);
+		if (classes.isEmpty())
+			return null;
+
+		StringBuffer sb = new StringBuffer();
+		for (Iterator it = classes.iterator(); it.hasNext();) {
+			Class clazz = (Class) it.next();
+			if (sb.length() != 0)
+				sb.append(", ");
+
+			sb.append("Packages.");
+			sb.append(clazz.getName());
+		}
+		return sb.toString();
+
+//		return
+//			"Packages." + AbsolutePriceCoordinate.class.getName()
+//			+ ", " +
+//			"Packages." + CustomerGroupID.class.getName()
+//			+ ", " +
+//			"Packages." + TariffID.class.getName()
+//			+ ", " +
+//			"Packages." + CurrencyID.class.getName();
+	}
+
+	protected void populateImportClasses(Set<Class<?>> classes)
+	{
+		classes.add(AbsolutePriceCoordinate.class);
+
+		// types passed to the constructor of PriceCoordinate in JavaScript formulas (which actually instantiate AbsolutePriceCoordinate s)
+		classes.add(CustomerGroupID.class);
+		classes.add(TariffID.class);
+		classes.add(CurrencyID.class);
+
+		// types passed to the constructor of AbsolutePriceCoordinate (additionally) in JavaScript formulas
+		classes.add(ProductTypeID.class);
+		classes.add(PriceFragmentTypeID.class);
 	}
 
 	/**

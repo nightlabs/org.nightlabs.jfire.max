@@ -33,6 +33,7 @@ import javax.jdo.PersistenceManager;
 
 import org.nightlabs.jfire.accounting.id.PriceFragmentTypeID;
 import org.nightlabs.jfire.organisation.Organisation;
+import org.nightlabs.util.Utils;
 
 /**
  * A PriceFragmentType defines a part out of which a <tt>Price</tt> may consist.
@@ -53,7 +54,8 @@ import org.nightlabs.jfire.organisation.Organisation;
  *
  * @jdo.create-objectid-class
  *		field-order="organisationID, priceFragmentTypeID"
- * 
+ *		include-body="id/PriceFragmentTypeID.body.inc"
+ *
  * @jdo.inheritance strategy="new-table"
  *
  * @jdo.fetch-group name="PriceFragmentType.name" fields="name"
@@ -63,6 +65,7 @@ import org.nightlabs.jfire.organisation.Organisation;
 public class PriceFragmentType
 	implements Serializable
 {
+	private static final long serialVersionUID = 1L;
 
 	public static final String FETCH_GROUP_NAME = "PriceFragmentType.name";
 
@@ -192,4 +195,17 @@ public class PriceFragmentType
 		return priceFragmentType;
 	}
 
+	@Override
+	public boolean equals(Object obj)
+	{
+		if (this == obj) return true;
+		if (!(obj instanceof PriceFragmentType)) return false;
+		PriceFragmentType o = (PriceFragmentType) obj;
+		return Utils.equals(this.organisationID, o.organisationID) && Utils.equals(this.priceFragmentTypeID, o.priceFragmentTypeID);
+	}
+	@Override
+	public int hashCode()
+	{
+		return Utils.hashCode(organisationID) + Utils.hashCode(priceFragmentTypeID);
+	}
 }

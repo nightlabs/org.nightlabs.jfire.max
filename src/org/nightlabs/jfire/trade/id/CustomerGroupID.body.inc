@@ -11,3 +11,8 @@
 		n.customerGroupID = sa[1];
 		return n;
 	}
+
+	public String getPrimaryKey()
+	{
+		return org.nightlabs.jfire.trade.CustomerGroup.getPrimaryKey(organisationID, customerGroupID);
+	}

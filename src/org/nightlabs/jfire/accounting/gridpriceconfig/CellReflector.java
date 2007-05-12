@@ -153,6 +153,17 @@ public class CellReflector
 		return getNestedProductType().getQuantity();
 	}
 
+	protected IAbsolutePriceCoordinate createAbsolutePriceCoordinate(Object ... dimensionValues)
+	{
+		return new AbsolutePriceCoordinate(dimensionValues);
+	}
+
+	public long resolvePriceCellsAmount(Object ... dimensionValues)
+	throws ModuleException
+	{
+		return resolvePriceCellsAmount(createAbsolutePriceCoordinate(dimensionValues));
+	}
+
 	/**
 	 * This method calls <tt>resolvePriceCells(..)</tt> and sums all values.
 	 *

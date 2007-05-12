@@ -363,7 +363,7 @@ public class DataCreator
 				"	)\n" +
 				")\n" +
 				"\n" +
-				"-" +
+				"-\n" +
 				"\n" +
 				"cell.resolvePriceCellsAmount(\n" +
 				"	new Array(\n" +
@@ -500,7 +500,7 @@ public class DataCreator
 				"	)\n" +
 				")\n" +
 				"\n" +
-				"-" +
+				"-\n" +
 				"\n" +
 				"cell.resolvePriceCellsAmount(\n" +
 				"	new Array(\n" +

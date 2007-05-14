@@ -87,6 +87,7 @@ import org.nightlabs.jfire.simpletrade.notification.SimpleProductTypeNotificatio
 import org.nightlabs.jfire.simpletrade.notification.SimpleProductTypeNotificationReceiver;
 import org.nightlabs.jfire.simpletrade.store.SimpleProductType;
 import org.nightlabs.jfire.simpletrade.store.SimpleProductTypeActionHandler;
+import org.nightlabs.jfire.simpletrade.store.SimpleProductTypeSearchFilter;
 import org.nightlabs.jfire.simpletrade.store.prop.SimpleProductTypeStruct;
 import org.nightlabs.jfire.store.NestedProductType;
 import org.nightlabs.jfire.store.ProductType;
@@ -1114,4 +1115,29 @@ implements SessionBean
 			pm.close();
 		}
 	} 
+
+
+	/**
+	 * Searches with the given searchFilter for {@link SimpleProductType}s.
+	 *  
+	 * @ejb.interface-method
+	 * @ejb.permission role-name="_Guest_"
+	 * @ejb.transaction type="Supports"
+	 * 
+	 * FIXME: Use {@link JDOQuery} instead of search filter and get only ids from the datastore
+	 */ 
+	public Collection<ProductTypeID> searchProductTypes(SimpleProductTypeSearchFilter searchFilter)
+	{
+		PersistenceManager pm = getPersistenceManager();
+		try {
+			pm.getFetchPlan().clearGroups();
+			Collection<ProductType> productTypes = searchFilter.executeQuery(pm);
+			Collection<ProductTypeID> ids = new ArrayList<ProductTypeID>(productTypes.size());
+			for (ProductType	productType : productTypes)
+				ids.add((ProductTypeID)productType.getObjectId());
+			return ids;
+		} finally {
+			pm.close();
+		}
+	}
 }

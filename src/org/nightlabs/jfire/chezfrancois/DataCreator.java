@@ -43,6 +43,7 @@ import javax.naming.NamingException;
 import org.apache.log4j.Logger;
 import org.nightlabs.ModuleException;
 import org.nightlabs.i18n.I18nText;
+import org.nightlabs.jdo.NLJDOHelper;
 import org.nightlabs.jfire.accounting.Account;
 import org.nightlabs.jfire.accounting.Accounting;
 import org.nightlabs.jfire.accounting.Currency;
@@ -98,6 +99,7 @@ import org.nightlabs.jfire.trade.Order;
 import org.nightlabs.jfire.trade.OrganisationLegalEntity;
 import org.nightlabs.jfire.trade.SegmentType;
 import org.nightlabs.jfire.trade.Trader;
+import org.nightlabs.xml.NLDOMUtil;
 
 public class DataCreator
 {
@@ -219,6 +221,7 @@ public class DataCreator
 		Property props = productType.getPropertySet();
 		productType.getFieldMetaData("propertySet").setValueInherited(false);
 		pm.getFetchPlan().setGroups(new String[] {FetchPlan.DEFAULT, Property.FETCH_GROUP_DATA_FIELDS, Property.FETCH_GROUP_FULL_DATA});
+		pm.getFetchPlan().setMaxFetchDepth(NLJDOHelper.MAX_FETCH_DEPTH_NO_LIMIT);
 
 		// PropertySet should always be detached before exploding! 
 		// never explode while being attached! 

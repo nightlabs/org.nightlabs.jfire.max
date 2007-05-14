@@ -585,6 +585,15 @@ implements
 	}
 
 	/**
+	 * Get the JDO object id.
+	 * @return the JDO object id.
+	 */
+	public ProductTypeID getObjectId()
+	{
+		return (ProductTypeID)JDOHelper.getObjectId(this);
+	}
+	
+	/**
 	 * @return Returns the organisationID.
 	 */
 	public String getOrganisationID()

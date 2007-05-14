@@ -369,6 +369,8 @@ implements SessionBean
 	 * @ejb.interface-method
 	 * @ejb.permission role-name="_Guest_"
 	 * @ejb.transaction type="Supports"
+	 * 
+	 * FIXME: move to SimpleTradeManager and others, check permissions there and return only the ids!
 	 */ 
 	public Collection searchProductTypes(ProductTypeSearchFilter searchFilter, String[] fetchGroups, int maxFetchDepth)
 	{

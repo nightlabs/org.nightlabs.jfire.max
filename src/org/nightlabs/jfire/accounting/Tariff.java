@@ -28,6 +28,10 @@ package org.nightlabs.jfire.accounting;
 
 import java.io.Serializable;
 
+import javax.jdo.JDOHelper;
+
+import org.nightlabs.jfire.accounting.id.TariffID;
+
 /**
  * TODO Shall I really put this class into JFireTrade? Or is it Ticketing specific?
  *			Does it help me here or does it make things complicated?
@@ -64,6 +68,11 @@ import java.io.Serializable;
 public class Tariff
 	implements Serializable
 {
+	/**
+	 * The serial version of this class.
+	 */
+	private static final long serialVersionUID = 1L;
+	
 	public static final String FETCH_GROUP_NAME = "Tariff.name";
 	public static final String FETCH_GROUP_THIS_TARIFF = "Tariff.this";
 
@@ -101,6 +110,15 @@ public class Tariff
 	public static String getPrimaryKey(String organisationID, long tariffID)
 	{
 		return organisationID + '/' + Long.toHexString(tariffID);
+	}
+	
+	/**
+	 * Get the JDO object id.
+	 * @return the JDO object id.
+	 */
+	public TariffID getObjectId()
+	{
+		return (TariffID)JDOHelper.getObjectId(this);
 	}
 
 	/**

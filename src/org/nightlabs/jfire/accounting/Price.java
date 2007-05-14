@@ -196,7 +196,15 @@ public class Price
 	{
 		return fragments.values();
 	}
-
+	/**
+	 * This is a convenience method for JSTL
+	 * @return Returns the amount as a double.
+	 */
+	public double getAmountAsDouble() 
+	{
+		return getCurrency().toDouble(amount);
+	}
+	
 	/**
 	 * @return Returns the amount.
 	 */

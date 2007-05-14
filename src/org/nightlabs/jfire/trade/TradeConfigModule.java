@@ -1,6 +1,5 @@
 package org.nightlabs.jfire.trade;
 
-import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -50,13 +49,13 @@ public class TradeConfigModule
 	 * @!jdo.key mapped-by="articleContainerClassName"
 	 * @jdo.join
 	 */
-	private Map idPrefixCfs = null;
+	private Map<String, IDPrefixCf> idPrefixCfs = null;
 
 	public TradeConfigModule() { }
 
 	@Implement
 	public void init() {
-		idPrefixCfs = new HashMap();
+		idPrefixCfs = new HashMap<String, IDPrefixCf>();
 	}
 
 	public Currency getCurrency()
@@ -122,34 +121,4 @@ public class TradeConfigModule
 		return res;
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * @see org.nightlabs.jfire.config.ConfigModule#isEqualTo(org.nightlabs.jfire.config.ConfigModule)
-	 */
-	@Implement
-	public boolean isContentEqual(ConfigModule other) {
-		if (this == other)
-			return true;
-		if (other.getClass() != this.getClass())
-			return false;
-		final TradeConfigModule otherTradeModule =  (TradeConfigModule) other;
-		
-		if (currency.equals(otherTradeModule.getCurrency()))
-			return false;
-		
-		Collection<IDPrefixCf> otherPrefixes = otherTradeModule.idPrefixCfs.values();
-		if (idPrefixCfs == null && otherPrefixes == null)
-			return true;
-		
-		if ((idPrefixCfs == null && otherPrefixes != null) || (idPrefixCfs != null && otherPrefixes == null))
-			return false;
-		
-		// FIXME: Warum ist die Map nicht typisiert?? (WorkstationFeatureCfMod geht das auch ohne ByteCodeEnhancer Probleme)
-		for (Object prefix : idPrefixCfs.values()) {
-			if (! otherPrefixes.contains((IDPrefixCf)prefix))
-				return false;
-		}
-		
-		return true;
-	}
 }

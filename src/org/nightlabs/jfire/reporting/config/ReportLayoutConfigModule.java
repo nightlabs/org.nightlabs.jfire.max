@@ -30,7 +30,6 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.nightlabs.annotation.Implement;
 import org.nightlabs.jfire.config.ConfigModule;
 import org.nightlabs.jfire.reporting.layout.id.ReportRegistryItemID;
 
@@ -155,32 +154,4 @@ public class ReportLayoutConfigModule extends ConfigModule {
 		return availEntry.getAvailableReportLayoutIDs();		
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * @see org.nightlabs.jfire.config.ConfigModule#isEqualTo(org.nightlabs.jfire.config.ConfigModule)
-	 */
-	@Implement
-	public boolean isContentEqual(ConfigModule other) {
-		if (this == other)
-			return true;
-		if (! ReportLayoutConfigModule.class.equals(other.getClass()))
-			return false;
-		
-		final ReportLayoutConfigModule oModule = (ReportLayoutConfigModule) other;
-		Collection<ReportLayoutAvailEntry> otherEntries = oModule.getAvailEntries().values();
-		
-		if (availEntries == null && otherEntries == null)
-			return true;
-		if ((availEntries == null && otherEntries != null) || (availEntries != null && otherEntries == null))
-			return false;
-		
-		for (ReportLayoutAvailEntry entry : availEntries.values()) {
-			// FIXME: ReportLayoutEntry does not implement equals && hashCode!!!
-			if (! otherEntries.contains(entry))
-				return false;
-		}
-		
-		return true;
-	}
-	
 }

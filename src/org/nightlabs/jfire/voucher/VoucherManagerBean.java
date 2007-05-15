@@ -44,6 +44,7 @@ import org.nightlabs.jfire.accounting.priceconfig.PriceConfig;
 import org.nightlabs.jfire.accounting.priceconfig.id.PriceConfigID;
 import org.nightlabs.jfire.base.BaseSessionBeanImpl;
 import org.nightlabs.jfire.idgenerator.IDGenerator;
+import org.nightlabs.jfire.organisation.LocalOrganisation;
 import org.nightlabs.jfire.organisation.Organisation;
 import org.nightlabs.jfire.person.Person;
 import org.nightlabs.jfire.person.PersonStruct;
@@ -206,6 +207,7 @@ implements SessionBean
 						VoucherType.class.getName(), null, trader.getMandator(),
 						ProductType.INHERITANCE_NATURE_BRANCH,
 						ProductType.PACKAGE_NATURE_OUTER);
+				rootVoucherType.getName().setText(Locale.ENGLISH.getLanguage(), LocalOrganisation.getLocalOrganisation(pm).getOrganisation().getPerson().getDisplayName());
 				rootVoucherType.setDeliveryConfiguration(deliveryConfiguration);
 				store.addProductType(user, rootVoucherType, VoucherTypeActionHandler
 						.getDefaultHome(pm, rootVoucherType));

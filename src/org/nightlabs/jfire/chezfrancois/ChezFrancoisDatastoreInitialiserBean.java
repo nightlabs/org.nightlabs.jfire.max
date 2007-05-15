@@ -234,7 +234,7 @@ implements SessionBean
 					tariffGoldCard.getName().setText(Locale.FRENCH.getLanguage(), "Carte d'or");
 				}
 				DataCreator dataCreator = new DataCreator(pm, User.getUser(pm, getPrincipal()));
-				dataCreator.getRootSimpleProductType().getName().setText(languageID, displayName + " Wine Store");
+//				dataCreator.getRootSimpleProductType().getName().setText(languageID, displayName + " Wine Store");
 
 				// create ProductTypes: wine (bottle)
 				SimpleProductType wine = dataCreator.createCategory(null, "wine", 

@@ -78,6 +78,7 @@ import org.nightlabs.jfire.base.JFireException;
 import org.nightlabs.jfire.jdo.notification.persistent.PersistentNotificationEJB;
 import org.nightlabs.jfire.jdo.notification.persistent.PersistentNotificationEJBUtil;
 import org.nightlabs.jfire.jdo.notification.persistent.SubscriptionUtil;
+import org.nightlabs.jfire.organisation.LocalOrganisation;
 import org.nightlabs.jfire.organisation.Organisation;
 import org.nightlabs.jfire.organisation.id.OrganisationID;
 import org.nightlabs.jfire.prop.Property;
@@ -222,6 +223,7 @@ implements SessionBean
 					organisationID, SimpleProductType.class.getName(),
 					null, store.getMandator(),
 					ProductType.INHERITANCE_NATURE_BRANCH, ProductType.PACKAGE_NATURE_OUTER);
+			rootSimpleProductType.getName().setText(Locale.ENGLISH.getLanguage(), LocalOrganisation.getLocalOrganisation(pm).getOrganisation().getPerson().getDisplayName());
 			rootSimpleProductType.setDeliveryConfiguration(deliveryConfiguration);
 			store.addProductType(user, rootSimpleProductType, SimpleProductTypeActionHandler.getDefaultHome(pm, rootSimpleProductType));
 			store.setProductTypeStatus_published(user, rootSimpleProductType);

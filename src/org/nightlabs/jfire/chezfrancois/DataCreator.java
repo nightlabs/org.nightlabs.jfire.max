@@ -216,7 +216,7 @@ public class DataCreator
 		return pt;
 	}
 	
-	public void createWineProperties(PersistenceManager pm, SimpleProductType productType, String englishShort, String germanShort, String englishLong, String germanLong, String smallImage, String largeImage) {
+	public void createWineProperties(PersistenceManager pm, SimpleProductType productType, String englishShort, String germanShort, String englishLong, String germanLong, String smallImage, String smallImageContentType, String largeImage, String largeImageContentType) {
 		IStruct struct = SimpleProductTypeStruct.getSimpleProductTypeStruct(productType.getOrganisationID(), pm);
 		Property props = productType.getPropertySet();
 		productType.getFieldMetaData("propertySet").setValueInherited(false);
@@ -229,7 +229,7 @@ public class DataCreator
 		// Why not explode attached, when intending to set all properties ;-)
 		if (JDOHelper.isPersistent(props))
 			props = (Property) pm.detachCopy(props);
-
+		
 		struct.explodeProperty(props);
 		I18nTextDataField shortDesc;
 		try {
@@ -256,7 +256,7 @@ public class DataCreator
 		InputStream in = getClass().getResourceAsStream("resource/"+smallImage);
 		if (in != null) {
 			try {
-				smallImg.loadStream(in, smallImage);
+				smallImg.loadStream(in, smallImage, smallImageContentType);
 			} catch (IOException e) {
 				logger.error(e);
 			} finally {
@@ -276,7 +276,7 @@ public class DataCreator
 		in = getClass().getResourceAsStream("resource/"+largeImage);
 		if (in != null) {
 			try {
-				largeImg.loadStream(in, smallImage);
+				largeImg.loadStream(in, smallImage, largeImageContentType);
 			} catch (IOException e) {
 				logger.error(e);
 			} finally {

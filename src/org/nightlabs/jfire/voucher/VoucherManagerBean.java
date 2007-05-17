@@ -469,7 +469,7 @@ implements SessionBean
 			if (NLJDOHelper.exists(pm, voucherType)) {
 				voucherType = (VoucherType) pm.makePersistent(voucherType);
 			} else {
-				Store.getStore(pm).addProductType(User.getUser(pm, getPrincipal()),
+				voucherType = (VoucherType) Store.getStore(pm).addProductType(User.getUser(pm, getPrincipal()),
 						voucherType,
 						VoucherTypeActionHandler.getDefaultHome(pm, voucherType));
 			}
@@ -480,8 +480,7 @@ implements SessionBean
 			if (!get)
 				return null;
 
-			return (VoucherType) pm.detachCopy(pm.getObjectById(JDOHelper
-					.getObjectId(voucherType)));
+			return (VoucherType) pm.detachCopy(voucherType);
 		} finally {
 			pm.close();
 		}

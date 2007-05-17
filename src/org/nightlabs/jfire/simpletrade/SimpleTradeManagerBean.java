@@ -54,6 +54,7 @@ import org.apache.log4j.Logger;
 import org.nightlabs.ModuleException;
 import org.nightlabs.jdo.NLJDOHelper;
 import org.nightlabs.jdo.moduleregistry.ModuleMetaData;
+import org.nightlabs.jdo.query.JDOQuery;
 import org.nightlabs.jfire.accounting.Price;
 import org.nightlabs.jfire.accounting.Tariff;
 import org.nightlabs.jfire.accounting.TariffMapper;
@@ -526,7 +527,7 @@ implements SessionBean
 				productType = (SimpleProductType) pm.makePersistent(productType);
 			}
 			else {
-				Store.getStore(pm).addProductType(
+				productType = (SimpleProductType) Store.getStore(pm).addProductType(
 						User.getUser(pm, getPrincipal()),
 						productType,
 						SimpleProductTypeActionHandler.getDefaultHome(pm, productType));
@@ -576,7 +577,8 @@ implements SessionBean
 			if (!get)
 				return null;
 
-			return (SimpleProductType) pm.detachCopy(pm.getObjectById(JDOHelper.getObjectId(productType)));
+//			return (SimpleProductType) pm.detachCopy(pm.getObjectById(JDOHelper.getObjectId(productType)));
+			return (SimpleProductType) pm.detachCopy(productType);
 		} finally {
 			pm.close();
 		}

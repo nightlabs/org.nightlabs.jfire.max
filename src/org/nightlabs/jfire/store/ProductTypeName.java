@@ -7,8 +7,8 @@ import org.nightlabs.i18n.I18nText;
 import org.nightlabs.inheritance.FieldInheriter;
 import org.nightlabs.inheritance.FieldMetaData;
 import org.nightlabs.inheritance.Inheritable;
-import org.nightlabs.inheritance.SimpleFieldInheriter;
 import org.nightlabs.inheritance.StaticFieldMetaData;
+import org.nightlabs.jdo.inheritance.JDOSimpleFieldInheriter;
 
 /**
  * @jdo.persistence-capable
@@ -64,17 +64,19 @@ implements Inheritable
 	 *
 	 * @jdo.join
 	 */
-	protected Map names = new HashMap();
-	
-	protected ProductTypeName()
-	{
-	}
+	protected Map<String, String> names;
+
+	/**
+	 * @deprecated Only for JDO!
+	 */
+	protected ProductTypeName() { }
 
 	public ProductTypeName(ProductType product)
 	{
 		this.productType = product;
 		this.organisationID = product.getOrganisationID();
 		this.productTypeID = product.getProductTypeID();
+		this.names = new HashMap<String, String>();
 	}
 	
 	/**
@@ -126,6 +128,6 @@ implements Inheritable
 
 	public FieldInheriter getFieldInheriter(String fieldName)
 	{
-		return new SimpleFieldInheriter();
+		return new JDOSimpleFieldInheriter();
 	}
 }

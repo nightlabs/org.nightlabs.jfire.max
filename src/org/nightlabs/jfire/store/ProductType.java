@@ -46,9 +46,9 @@ import org.nightlabs.annotation.Implement;
 import org.nightlabs.i18n.I18nText;
 import org.nightlabs.inheritance.FieldInheriter;
 import org.nightlabs.inheritance.Inheritable;
-import org.nightlabs.inheritance.InheritableFieldInheriter;
 import org.nightlabs.inheritance.InheritanceCallbacks;
 import org.nightlabs.inheritance.InheritanceManager;
+import org.nightlabs.jdo.inheritance.JDOInheritableFieldInheriter;
 import org.nightlabs.jdo.inheritance.JDOInheritanceManager;
 import org.nightlabs.jdo.inheritance.JDOSimpleFieldInheriter;
 import org.nightlabs.jfire.accounting.book.LocalAccountantDelegate;
@@ -67,7 +67,6 @@ import org.nightlabs.jfire.store.deliver.DeliveryConfiguration;
 import org.nightlabs.jfire.store.id.ProductTypeGroupID;
 import org.nightlabs.jfire.store.id.ProductTypeID;
 import org.nightlabs.jfire.trade.LegalEntity;
-import org.nightlabs.jfire.transfer.Anchor;
 import org.nightlabs.util.Utils;
 
 /**
@@ -988,7 +987,7 @@ implements
 		}
 
 		if ("name".equals(fieldName))
-			return new InheritableFieldInheriter();
+			return new JDOInheritableFieldInheriter();
 		
 		return new JDOSimpleFieldInheriter();
 	}
@@ -1076,7 +1075,7 @@ implements
 				for (AffectedProductType apt : PriceConfigUtil.getAffectedProductTypes(pm, this)) {
 					if (!processedProductTypeIDs.add(apt.getProductTypeID()))
 						continue;
-
+					
 					ProductType pt;
 					if (apt.getProductTypeID().equals(productTypeID))
 						pt = this;

@@ -28,5 +28,6 @@
 	<classpathentry kind="var" path="APACHE_COMMONS/commons-lang.jar"/>
 	<classpathentry sourcepath="/WORKSPACE/JFireJbpm/src" kind="var" path="WORKSPACE/JFireJbpm/dist/JFireJbpm.jar"/>
 	<classpathentry kind="var" path="WORKSPACE/JFireJbpm/lib/jbpm/jbpm-3.1.2.jar"/>
+	<classpathentry kind="var" path="WORKSPACE/JFireBaseClientLib/dist/JFireBaseClientLib.jar"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>

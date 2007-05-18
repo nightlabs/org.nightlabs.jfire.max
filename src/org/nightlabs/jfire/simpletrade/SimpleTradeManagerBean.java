@@ -1061,7 +1061,7 @@ implements SessionBean
 	 * @ejb.transaction type="Required"
 	 * @ejb.permission role-name="_Guest_"
 	 */
-	public Collection<GridPriceConfig> storePriceConfigs(Collection<GridPriceConfig> priceConfigs, boolean get) // , String[] fetchGroups, int maxFetchDepth)
+	public Collection<GridPriceConfig> storePriceConfigs(Collection<GridPriceConfig> priceConfigs, boolean get)
 	throws PriceCalculationException
 	{
 		PersistenceManager pm = getPersistenceManager();

@@ -932,6 +932,9 @@ implements
 	 */
 	public org.nightlabs.inheritance.FieldMetaData getFieldMetaData(String fieldName)
 	{
+		if (isClosed())
+			return null;
+		
 		if (fieldName.startsWith("jdo"))
 			return null;
 

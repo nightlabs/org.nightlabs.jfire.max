@@ -99,7 +99,6 @@ import org.nightlabs.jfire.trade.Order;
 import org.nightlabs.jfire.trade.OrganisationLegalEntity;
 import org.nightlabs.jfire.trade.SegmentType;
 import org.nightlabs.jfire.trade.Trader;
-import org.nightlabs.xml.NLDOMUtil;
 
 public class DataCreator
 {
@@ -201,7 +200,7 @@ public class DataCreator
 		SimpleProductType pt = new SimpleProductType(
 				organisationID, productTypeID, category, null, ProductType.INHERITANCE_NATURE_LEAF, ProductType.PACKAGE_NATURE_OUTER);
 		setNames(pt.getName(), names);
-		pt.setPackagePriceConfig(new StablePriceConfig(organisationID, PriceConfig.createPriceConfigID()));
+		pt.setPackagePriceConfig(new StablePriceConfig(IDGenerator.getOrganisationID(), IDGenerator.nextID(PriceConfig.class)));
 		pt.getFieldMetaData("innerPriceConfig").setValueInherited(false);
 		pt.setInnerPriceConfig(innerPriceConfig);
 		store.addProductType(user, pt, SimpleProductTypeActionHandler.getDefaultHome(pm, pt));
@@ -322,7 +321,7 @@ public class DataCreator
 
 	public IInnerPriceConfig createInnerPercentagePriceConfig(String name, int percentage, ProductType packageProductType)
 	{
-		FormulaPriceConfig formulaPriceConfig = new FormulaPriceConfig(organisationID, PriceConfig.createPriceConfigID());
+		FormulaPriceConfig formulaPriceConfig = new FormulaPriceConfig(IDGenerator.getOrganisationID(), IDGenerator.nextID(PriceConfig.class));
 		PriceFragmentType vatNet = (PriceFragmentType) pm.getObjectById(PriceFragmentTypeID.create(rootOrganisationID, "vat-de-16-net"));
 		PriceFragmentType vatVal = (PriceFragmentType) pm.getObjectById(PriceFragmentTypeID.create(rootOrganisationID, "vat-de-16-val"));
 		formulaPriceConfig.addProductType(packageProductType);
@@ -458,8 +457,8 @@ public class DataCreator
 
 		Accounting accounting = Accounting.getAccounting(pm);
 		Trader trader = Trader.getTrader(pm);
-		StablePriceConfig stablePriceConfig = new StablePriceConfig(organisationID, PriceConfig.createPriceConfigID());
-		FormulaPriceConfig formulaPriceConfig = new FormulaPriceConfig(organisationID, PriceConfig.createPriceConfigID());
+		StablePriceConfig stablePriceConfig = new StablePriceConfig(IDGenerator.getOrganisationID(), IDGenerator.nextID(PriceConfig.class));
+		FormulaPriceConfig formulaPriceConfig = new FormulaPriceConfig(IDGenerator.getOrganisationID(), IDGenerator.nextID(PriceConfig.class));
 		setNames(formulaPriceConfig.getName(), names);
 		
 		CustomerGroup customerGroupDefault = trader.getDefaultCustomerGroupForKnownCustomer();

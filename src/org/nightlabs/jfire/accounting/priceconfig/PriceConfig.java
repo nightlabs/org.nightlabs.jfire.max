@@ -77,9 +77,9 @@ public abstract class PriceConfig implements Serializable, StoreCallback, IPrice
 	public static final String FETCH_GROUP_NAME = "PriceConfig.name";
 	public static final String FETCH_GROUP_PRICE_FRAGMENT_TYPES = "PriceConfig.priceFragmentTypes";
 
-	public static long createPriceConfigID() {
-		return IDGenerator.nextID(PriceConfig.class);
-	}
+//	public static long createPriceConfigID() {
+//		return IDGenerator.nextID(PriceConfig.class);
+//	}
 
 	/**
 	 * @jdo.field primary-key="true"

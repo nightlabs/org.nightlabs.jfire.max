@@ -47,12 +47,13 @@ import org.nightlabs.jfire.trade.CustomerGroup;
  * @author Marco Schulze - marco at nightlabs dot de
  *
  * @jdo.persistence-capable
- *		identity-type = "application"
- *		persistence-capable-superclass = "org.nightlabs.jfire.accounting.gridpriceconfig.GridPriceConfig"
- *		detachable = "true"
+ *		identity-type="application"
+ *		persistence-capable-superclass="org.nightlabs.jfire.accounting.gridpriceconfig.GridPriceConfig"
+ *		detachable="true"
  *		table="JFireTrade_FormulaPriceConfig"
  *
- * @jdo.inheritance strategy = "new-table"
+ * @jdo.inheritance strategy="new-table"
+ * @jdo.inheritance-discriminator strategy="class-name"
  *
  * @jdo.fetch-group name="FormulaPriceConfig.fallbackFormulaCell" fields="fallbackFormulaCell"
  * @jdo.fetch-group name="FormulaPriceConfig.formulaCells" fields="formulaCells"
@@ -104,6 +105,10 @@ implements IFormulaPriceConfig
 		if (throwExceptionIfNotExistent && res == null)
 			throw new IllegalArgumentException("There is no PriceConfig registered as the result of the combination of the innerProductType \""+innerProductTypePK+"\" packaged in the packageProductType \""+packageProductTypePK+"\"!");
 		return res;
+	}
+	protected void clearPackagingResultPriceConfigs()
+	{
+		packagingResultPriceConfigs.clear();
 	}
 
 	/**

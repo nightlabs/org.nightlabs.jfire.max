@@ -45,10 +45,12 @@ import org.nightlabs.jfire.accounting.PriceFragmentType;
 import org.nightlabs.jfire.accounting.Tariff;
 import org.nightlabs.jfire.accounting.priceconfig.AffectedProductType;
 import org.nightlabs.jfire.accounting.priceconfig.FetchGroupsPriceConfig;
+import org.nightlabs.jfire.accounting.priceconfig.IInnerPriceConfig;
 import org.nightlabs.jfire.accounting.priceconfig.PriceConfigUtil;
 import org.nightlabs.jfire.accounting.priceconfig.id.PriceConfigID;
 import org.nightlabs.jfire.organisation.LocalOrganisation;
 import org.nightlabs.jfire.store.ProductType;
+import org.nightlabs.jfire.store.id.ProductTypeID;
 import org.nightlabs.jfire.trade.CustomerGroup;
 
 /**
@@ -189,15 +191,14 @@ public class GridPriceConfigUtil
 	}
 
 	/**
-	 * @!ejb.interface-method
-	 * @!ejb.transaction type="Required"
-	 * @!ejb.permission role-name="_Guest_"
+	 * @param productTypeID If not <code>null</code>, this ProductType can get an <code>innerPriceConfig</code> assigned (specified by <code>innerPriceConfigID</code>).
+	 * @param innerPriceConfigID If not <code>null</code> (and <code>productTypeID</code> not <code>null</code>, too), this priceConfig will be assigned to the specified {@link ProductType}.
 	 */
-	public static Collection<GridPriceConfig> storePriceConfigs(
-			PersistenceManager pm, Collection<GridPriceConfig> _priceConfigs,
+	public static <T extends GridPriceConfig> Collection<T> storePriceConfigs(
+			PersistenceManager pm, Collection<T> _priceConfigs,
 			PriceCalculatorFactory priceCalculatorFactory,
-//			Class priceCalculatorClass, // TODO pass a factory instead of this as we need additional parameters now!
-			boolean get) // , String[] fetchGroups, int maxFetchDepth)
+			boolean get,
+			ProductTypeID productTypeID, PriceConfigID innerPriceConfigID)
 	throws PriceCalculationException
 	{
 		if (logger.isDebugEnabled()) {
@@ -229,7 +230,15 @@ public class GridPriceConfigUtil
 
 			priceConfig = (GridPriceConfig) pm.makePersistent(priceConfig);
 			priceConfigs.add(priceConfig);
+		}
 
+		if (productTypeID != null && innerPriceConfigID != null) {
+			ProductType pt = (ProductType) pm.getObjectById(productTypeID);
+			IInnerPriceConfig pc = (IInnerPriceConfig) pm.getObjectById(innerPriceConfigID);
+			pt.setInnerPriceConfig(pc);
+		}
+
+		for (GridPriceConfig priceConfig : _priceConfigs) {
 			if (affectedProductTypes == null)
 				affectedProductTypes = PriceConfigUtil.getAffectedProductTypes(pm, priceConfig);
 			else

@@ -89,7 +89,6 @@ import org.nightlabs.jfire.accounting.pay.ServerPaymentProcessorNonPayment;
 import org.nightlabs.jfire.accounting.pay.id.ModeOfPaymentFlavourID;
 import org.nightlabs.jfire.accounting.pay.id.PaymentDataID;
 import org.nightlabs.jfire.accounting.pay.id.PaymentID;
-import org.nightlabs.jfire.accounting.pay.id.ServerPaymentProcessorID;
 import org.nightlabs.jfire.accounting.priceconfig.AffectedProductType;
 import org.nightlabs.jfire.accounting.priceconfig.FetchGroupsPriceConfig;
 import org.nightlabs.jfire.accounting.priceconfig.PriceConfigUtil;
@@ -846,6 +845,7 @@ public abstract class AccountingManagerBean
 	)
 	throws ModuleException
 	{
+		// TODO we should check the Authority of the given ProductType! => authorize this action via the authority!
 		PersistenceManager pm = getPersistenceManager();
 		try {
 			ProductType productType = (ProductType) pm.getObjectById(productTypeID);
@@ -2392,6 +2392,8 @@ public abstract class AccountingManagerBean
 			pm.getExtent(ProductType.class);
 			ProductType res = (ProductType) pm.getObjectById(productTypeID);
 			res.getName().getTexts();
+			res.getFieldMetaData("innerPriceConfig");
+			res.getFieldMetaData("packagePriceConfig");
 
 			// load main price configs
 			res.getPackagePriceConfig();
@@ -2515,11 +2517,12 @@ public abstract class AccountingManagerBean
 	 * @ejb.transaction type="Supports"
 	 * @ejb.permission role-name="_Guest_"
 	 */
-	public Map<PriceConfigID, List<AffectedProductType>> getAffectedProductTypes(Set<PriceConfigID> priceConfigIDs)
+	public Map<PriceConfigID, List<AffectedProductType>> getAffectedProductTypes(Set<PriceConfigID> priceConfigIDs, ProductTypeID productTypeID, PriceConfigID innerPriceConfigID)
 	{
 		PersistenceManager pm = getPersistenceManager();
 		try {
-			return PriceConfigUtil.getAffectedProductTypes(pm, priceConfigIDs);
+			// TODO implement this method correctly to take the will-be-assigned innerPriceConfig into account instead of the currently assigned one!
+			return PriceConfigUtil.getAffectedProductTypes(pm, priceConfigIDs, productTypeID, innerPriceConfigID);
 		} finally {
 			pm.close();
 		}

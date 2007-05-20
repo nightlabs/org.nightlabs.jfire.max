@@ -47,6 +47,7 @@ import org.nightlabs.jfire.accounting.TariffMapper;
 import org.nightlabs.jfire.accounting.id.CurrencyID;
 import org.nightlabs.jfire.accounting.id.PriceFragmentTypeID;
 import org.nightlabs.jfire.accounting.id.TariffID;
+import org.nightlabs.jfire.accounting.priceconfig.IInnerPriceConfig;
 import org.nightlabs.jfire.accounting.priceconfig.IPriceConfig;
 import org.nightlabs.jfire.accounting.priceconfig.PriceConfig;
 import org.nightlabs.jfire.idgenerator.IDGenerator;
@@ -93,13 +94,25 @@ public class PriceCalculator
 
 	/**
 	 * @param packageProductType The <tt>ProductType</tt> which encloses all the other <tt>ProductType</tt>s and
-	 * which has a {@link IResultPriceConfig} assigned as
-	 * {@link ProductType#packagePriceConfig}.
+	 * which has an {@link IResultPriceConfig} assigned as {@link ProductType#packagePriceConfig} or <code>null</code>
+	 * (= no <code>packagePriceConfig</code> e.g. for fully dynamic prices). If the packagePriceConfig is null, this
+	 * <code>PriceCalculator</code> will create a temporary one via {@link #createResultPriceConfig()}. This might be changed
+	 * though for optimization later.
+	 *
 	 * @param customerGroupMapper TODO
 	 * @param tariffMapper TODO
 	 */
 	public PriceCalculator(ProductType packageProductType, CustomerGroupMapper customerGroupMapper, TariffMapper tariffMapper)
 	{
+		if (packageProductType == null)
+			throw new IllegalArgumentException("packageProductType must not be null!");
+
+		if (customerGroupMapper == null)
+			throw new IllegalArgumentException("customerGroupMapper must not be null!");
+
+		if (tariffMapper == null)
+			throw new IllegalArgumentException("tariffMapper must not be null!");
+
 		this.packageProductType = packageProductType;
 		this.customerGroupMapper = customerGroupMapper;
 		this.tariffMapper = tariffMapper;
@@ -107,10 +120,17 @@ public class PriceCalculator
 			throw new IllegalArgumentException("packageProductType.isPackageInner() is true! Cannot calculate prices if the carrier ProductType is not a package!");
 
 		IPriceConfig packagePriceConfig = packageProductType.getPackagePriceConfig();
-		if (!(packagePriceConfig instanceof IResultPriceConfig))
+		if (packagePriceConfig != null && !(packagePriceConfig instanceof IResultPriceConfig))
 			throw new IllegalArgumentException("packageProductType.priceConfig is not an instance of " + IResultPriceConfig.class.getName() + " but " + (packagePriceConfig == null ? "null" : packagePriceConfig.getClass().getName()));
-		
+
 		this.packagePriceConfig = (IResultPriceConfig) packagePriceConfig;
+		if (this.packagePriceConfig == null) {
+			this.packagePriceConfig = createResultPriceConfig(); // we use a dummy price config, if the packageProductType does not have one.
+			IInnerPriceConfig innerPC = packageProductType.getInnerPriceConfig();
+			if (innerPC == null)
+				throw new IllegalArgumentException("packageProductType does neither have a packagePriceConfig nor an innerPriceConfig! " + packageProductType.getPrimaryKey());
+			this.packagePriceConfig.adoptParameters(innerPC);
+		}
 	}
 
 	/**
@@ -160,7 +180,8 @@ public class PriceCalculator
 	{
 		return new StablePriceConfig(
 				IDGenerator.getOrganisationID(),
-				PriceConfig.createPriceConfigID());
+				IDGenerator.nextID(PriceConfig.class));
+//				PriceConfig.createPriceConfigID());
 	}
 
 	/**

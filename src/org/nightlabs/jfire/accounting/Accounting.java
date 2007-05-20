@@ -133,7 +133,7 @@ public class Accounting
 		String organisationID = LocalOrganisation.getLocalOrganisation(pm).getOrganisationID();
 		accounting.organisationID = organisationID;
 		accounting.mandator = OrganisationLegalEntity.getOrganisationLegalEntity(pm, organisationID, OrganisationLegalEntity.ANCHOR_TYPE_ID_ORGANISATION, true); // new OrganisationLegalEntity(localOrganisation.getOrganisation());
-		accounting.accountingPriceConfig = new AccountingPriceConfig(organisationID, PriceConfig.createPriceConfigID());
+		accounting.accountingPriceConfig = new AccountingPriceConfig(IDGenerator.getOrganisationID(), IDGenerator.nextID(PriceConfig.class));
 		accounting.localAccountant = new LocalAccountant(accounting.mandator, LocalAccountant.class.getName());
 		accounting.mandator.setAccountant(accounting.localAccountant);
 		accounting.partnerAccountant = new PartnerAccountant(organisationID, PartnerAccountant.class.getName());

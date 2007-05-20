@@ -453,9 +453,29 @@ public class PriceConfigUtil
 	 * @return The returned Map&lt;PriceConfigID, List&lt;AffectedProductType&gt;&gt; indicates which modified
 	 *		price config would result in which products to have their prices recalculated.
 	 */
-	public static Map<PriceConfigID, List<AffectedProductType>> getAffectedProductTypes(PersistenceManager pm, Set<PriceConfigID> priceConfigIDs)
+	private static Map<PriceConfigID, List<AffectedProductType>> getAffectedProductTypes(PersistenceManager pm, Set<PriceConfigID> priceConfigIDs)
+	{
+		return getAffectedProductTypes(pm, priceConfigIDs, null, null);
+	}
+
+	// TODO continue with this: the currently assigned innerPriceConfig should be handled as if it was NOT assigned and the given
+	// new one (innerPriceConfigID) should instead be taken into account!
+	public static Map<PriceConfigID, List<AffectedProductType>> getAffectedProductTypes(PersistenceManager pm, Set<PriceConfigID> priceConfigIDs, ProductTypeID productTypeID, PriceConfigID innerPriceConfigID)
 	{
 		Map<PriceConfigID, List<AffectedProductType>> res = new HashMap<PriceConfigID, List<AffectedProductType>>(priceConfigIDs.size());
+//		if (productTypeID != null && innerPriceConfigID != null) {
+//			if (!priceConfigIDs.contains(innerPriceConfigID)) {
+//				priceConfigIDs = new HashSet<PriceConfigID>(priceConfigIDs);
+//				priceConfigIDs.add(innerPriceConfigID);
+//			}
+//
+//			ProductType pt = (ProductType) pm.getObjectById(productTypeID);
+//			if (innerPriceConfigID.equals(JDOHelper.getObjectId(pt.getInnerPriceConfig()))) {
+//				productTypeID = null; // there will be no change to this productType => set it to null
+//				innerPriceConfigID = null;
+//			}
+//		}
+
 		for (PriceConfigID priceConfigID : priceConfigIDs) {
 			IPriceConfig priceConfig = (IPriceConfig) pm.getObjectById(priceConfigID);
 			ArrayList<AffectedProductType> affectedProductTypes = PriceConfigUtil.getAffectedProductTypes(pm, priceConfig);

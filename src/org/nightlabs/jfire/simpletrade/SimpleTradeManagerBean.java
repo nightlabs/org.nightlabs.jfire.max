@@ -72,6 +72,7 @@ import org.nightlabs.jfire.accounting.id.CurrencyID;
 import org.nightlabs.jfire.accounting.id.TariffID;
 import org.nightlabs.jfire.accounting.priceconfig.AffectedProductType;
 import org.nightlabs.jfire.accounting.priceconfig.FetchGroupsPriceConfig;
+import org.nightlabs.jfire.accounting.priceconfig.IInnerPriceConfig;
 import org.nightlabs.jfire.accounting.priceconfig.PriceConfigUtil;
 import org.nightlabs.jfire.accounting.priceconfig.id.PriceConfigID;
 import org.nightlabs.jfire.base.BaseSessionBeanImpl;
@@ -431,45 +432,78 @@ implements SessionBean
 		}
 	}
 
+//	/**
+//	 * @return Returns a <tt>Collection</tt> of <tt>SimpleProductType</tt>.
+//	 *
+//	 * @ejb.interface-method
+//	 * @ejb.permission role-name="SimpleTradeManager-user"
+//	 * @ejb.transaction type = "Required"
+//	 */
+//	public Collection<SimpleProductType> test(Map<String, SimpleProductType> m)
+//		throws ModuleException
+//	{
+//		return new ArrayList<SimpleProductType>(m.values());
+//	}
+//
+//	/**
+//	 * @return Returns a <tt>Collection</tt> of <tt>SimpleProductType</tt>.
+//	 *
+//	 * @ejb.interface-method
+//	 * @ejb.permission role-name="SimpleTradeManager-user"
+//	 * @ejb.transaction type = "Required"
+//	 */
+//	public Collection getChildProductTypes(ProductTypeID parentProductTypeID, String[] fetchGroups, int maxFetchDepth)
+//		throws ModuleException
+//	{
+//		PersistenceManager pm = getPersistenceManager();
+//		try {
+//			Collection res = SimpleProductType.getChildProductTypes(pm, parentProductTypeID);
+//
+//			FetchPlan fetchPlan = pm.getFetchPlan();
+//			fetchPlan.setMaxFetchDepth(maxFetchDepth);
+//			if (fetchGroups != null)
+//				fetchPlan.setGroups(fetchGroups);
+//
+//			return pm.detachCopyAll(res);
+//		} finally {
+//			pm.close();
+//		}
+//	}
+	
 	/**
-	 * @return Returns a <tt>Collection</tt> of <tt>SimpleProductType</tt>.
-	 *
 	 * @ejb.interface-method
-	 * @ejb.permission role-name="SimpleTradeManager-user"
-	 * @ejb.transaction type = "Required"
+	 * @ejb.transaction type="Supports"
+	 * @ejb.permission role-name="_Guest_"
 	 */
-	public Collection<SimpleProductType> test(Map<String, SimpleProductType> m)
-		throws ModuleException
-	{
-		return new ArrayList<SimpleProductType>(m.values());
-	}
-
-	/**
-	 * @return Returns a <tt>Collection</tt> of <tt>SimpleProductType</tt>.
-	 *
-	 * @ejb.interface-method
-	 * @ejb.permission role-name="SimpleTradeManager-user"
-	 * @ejb.transaction type = "Required"
-	 */
-	public Collection getChildProductTypes(ProductTypeID parentProductTypeID, String[] fetchGroups, int maxFetchDepth)
-		throws ModuleException
-	{
+	@SuppressWarnings("unchecked")
+	public Set<ProductTypeID> getChildSimpleProductTypeIDs(
+			ProductTypeID parentSimpleProductTypeID) {
 		PersistenceManager pm = getPersistenceManager();
 		try {
-			Collection res = SimpleProductType.getChildProductTypes(pm, parentProductTypeID);
-
-			FetchPlan fetchPlan = pm.getFetchPlan();
-			fetchPlan.setMaxFetchDepth(maxFetchDepth);
-			if (fetchGroups != null)
-				fetchPlan.setGroups(fetchGroups);
-
-			return pm.detachCopyAll(res);
+			return NLJDOHelper.getObjectIDSet(SimpleProductType.getChildProductTypes(pm,
+					parentSimpleProductTypeID));
 		} finally {
 			pm.close();
 		}
 	}
 
-	
+	/**
+	 * @ejb.interface-method
+	 * @ejb.transaction type="Supports"
+	 * @ejb.permission role-name="_Guest_"
+	 */
+	@SuppressWarnings("unchecked")
+	public List<SimpleProductType> getSimpleProductTypes(
+			Collection<ProductTypeID> simpleProductTypeIDs, String[] fetchGroups,
+			int maxFetchDepth) {
+		PersistenceManager pm = getPersistenceManager();
+		try {
+			return NLJDOHelper.getDetachedObjectList(pm, simpleProductTypeIDs,
+					SimpleProductType.class, fetchGroups, maxFetchDepth);
+		} finally {
+			pm.close();
+		}
+	}
 	
 	/**
 	 * @return Returns a newly detached instance of <tt>SimpleProductType</tt> if <tt>get</tt> is true - otherwise <tt>null</tt>.
@@ -680,23 +714,33 @@ implements SessionBean
 //	}
 
 	/**
-	 * @return Returns a <tt>Collection</tt> of {@link FormulaPriceConfig}</tt>.
-	 *
 	 * @ejb.interface-method
-	 * @ejb.permission role-name="SimpleTradeManager.Admin"
+	 * @ejb.permission role-name="_Guest_"
 	 * @ejb.transaction type = "Required"
 	 */
-	public Collection getFormulaPriceConfigs(String[] fetchGroups, int maxFetchDepth)
-		throws ModuleException
+	public Set<PriceConfigID> getFormulaPriceConfigIDs()
 	{
 		PersistenceManager pm = getPersistenceManager();
 		try {
-			pm.getFetchPlan().setMaxFetchDepth(maxFetchDepth);
-			if (fetchGroups != null)
-				pm.getFetchPlan().setGroups(fetchGroups);
-
 			Query q = pm.newQuery(FormulaPriceConfig.class);
-			return pm.detachCopyAll((Collection)q.execute());
+			q.setResult("JDOHelper.getObjectId(this)");
+			return new HashSet<PriceConfigID>((Collection<? extends PriceConfigID>) q.execute());
+		} finally {
+			pm.close();
+		}
+	}
+
+	/**
+	 * @ejb.interface-method
+	 * @ejb.permission role-name="_Guest_"
+	 * @ejb.transaction type = "Required"
+	 */
+	@SuppressWarnings("unchecked")
+	public List<FormulaPriceConfig> getFormulaPriceConfigs(Collection<PriceConfigID> formulaPriceConfigIDs, String[] fetchGroups, int maxFetchDepth)
+	{
+		PersistenceManager pm = getPersistenceManager();
+		try {
+			return NLJDOHelper.getDetachedObjectList(pm, formulaPriceConfigIDs, FormulaPriceConfig.class, fetchGroups, maxFetchDepth);
 		} finally {
 			pm.close();
 		}
@@ -1061,7 +1105,7 @@ implements SessionBean
 	 * @ejb.transaction type="Required"
 	 * @ejb.permission role-name="_Guest_"
 	 */
-	public Collection<GridPriceConfig> storePriceConfigs(Collection<GridPriceConfig> priceConfigs, boolean get)
+	public Collection<GridPriceConfig> storePriceConfigs(Collection<GridPriceConfig> priceConfigs, boolean get, ProductTypeID productTypeID, PriceConfigID innerPriceConfigID)
 	throws PriceCalculationException
 	{
 		PersistenceManager pm = getPersistenceManager();
@@ -1076,7 +1120,7 @@ implements SessionBean
 				}
 			};
 
-			return GridPriceConfigUtil.storePriceConfigs(pm, priceConfigs, pcf, get);
+			return GridPriceConfigUtil.storePriceConfigs(pm, priceConfigs, pcf, get, productTypeID, innerPriceConfigID);
 		} finally {
 			pm.close();
 		}

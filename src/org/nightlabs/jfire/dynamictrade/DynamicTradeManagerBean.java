@@ -187,11 +187,11 @@ implements SessionBean
 	 */
 	@SuppressWarnings("unchecked")
 	public List<DynamicProductType> getDynamicProductTypes(
-			Collection<ProductTypeID> swiftProductTypeIDs, String[] fetchGroups,
+			Collection<ProductTypeID> dynamicProductTypeIDs, String[] fetchGroups,
 			int maxFetchDepth) {
 		PersistenceManager pm = getPersistenceManager();
 		try {
-			return NLJDOHelper.getDetachedObjectList(pm, swiftProductTypeIDs,
+			return NLJDOHelper.getDetachedObjectList(pm, dynamicProductTypeIDs,
 					DynamicProductType.class, fetchGroups, maxFetchDepth);
 		} finally {
 			pm.close();
@@ -206,7 +206,7 @@ implements SessionBean
 	public DynamicProductType storeDynamicProductType(DynamicProductType dynamicProductType, boolean get,
 			String[] fetchGroups, int maxFetchDepth) {
 		if (dynamicProductType == null)
-			throw new IllegalArgumentException("swiftProductType must not be null!");
+			throw new IllegalArgumentException("dynamicProductType must not be null!");
 
 		PersistenceManager pm = getPersistenceManager();
 		try {
@@ -217,7 +217,7 @@ implements SessionBean
 				pm.getFetchPlan().setGroups(fetchGroups);
 
 //			try {
-//				DynamicProductLocalAccountantDelegate delegate = (DynamicProductLocalAccountantDelegate) swiftProductType
+//				DynamicProductLocalAccountantDelegate delegate = (DynamicProductLocalAccountantDelegate) dynamicProductType
 //						.getLocalAccountantDelegate();
 //				if (delegate != null) {
 //					OrganisationLegalEntity organisationLegalEntity = null;
@@ -326,11 +326,11 @@ implements SessionBean
 	 * @ejb.transaction type="Supports"
 	 */
 	@SuppressWarnings("unchecked")
-	public List<DynamicTradePriceConfig> getDynamicPriceConfigs(Collection<PriceConfigID> swiftPriceConfigIDs, String[] fetchGroups, int maxFetchDepth)
+	public List<DynamicTradePriceConfig> getDynamicPriceConfigs(Collection<PriceConfigID> dynamicPriceConfigIDs, String[] fetchGroups, int maxFetchDepth)
 	{
 		PersistenceManager pm = getPersistenceManager();
 		try {
-			return NLJDOHelper.getDetachedObjectList(pm, swiftPriceConfigIDs, DynamicTradePriceConfig.class, fetchGroups, maxFetchDepth);
+			return NLJDOHelper.getDetachedObjectList(pm, dynamicPriceConfigIDs, DynamicTradePriceConfig.class, fetchGroups, maxFetchDepth);
 		} finally {
 			pm.close();
 		}

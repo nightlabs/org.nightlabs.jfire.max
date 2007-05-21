@@ -34,7 +34,7 @@ extends BaseJDOObjectDAO<UnitID, Unit>
 	protected Collection<Unit> retrieveJDOObjects(Set<UnitID> unitIDs, String[] fetchGroups, int maxFetchDepth, ProgressMonitor monitor)
 			throws Exception
 	{
-		DynamicTradeManager stm = swiftTradeManager;
+		DynamicTradeManager stm = dynamicTradeManager;
 		if (stm == null)
 			stm = DynamicTradeManagerUtil.getHome(SecurityReflector.getInitialContextProperties()).create();
 
@@ -49,18 +49,18 @@ extends BaseJDOObjectDAO<UnitID, Unit>
 		return getJDOObjects(null, unitIDs, fetchGroups, maxFetchDepth, monitor);
 	}
 
-	private DynamicTradeManager swiftTradeManager = null;
+	private DynamicTradeManager dynamicTradeManager = null;
 
 	@SuppressWarnings("unchecked")
 	public List<Unit> getUnits(String[] fetchGroups, int maxFetchDepth, ProgressMonitor monitor)
 	{
 		try {
-			swiftTradeManager = DynamicTradeManagerUtil.getHome(SecurityReflector.getInitialContextProperties()).create();
+			dynamicTradeManager = DynamicTradeManagerUtil.getHome(SecurityReflector.getInitialContextProperties()).create();
 			try {
-				Set<UnitID> unitIDs = swiftTradeManager.getUnitIDs();
+				Set<UnitID> unitIDs = dynamicTradeManager.getUnitIDs();
 				return getJDOObjects(null, unitIDs, fetchGroups, maxFetchDepth, monitor);
 			} finally {
-				swiftTradeManager = null;
+				dynamicTradeManager = null;
 			}
 		} catch (Exception e) {
 			throw new RuntimeException(e);

@@ -28,7 +28,7 @@ extends Product
 	private static final long serialVersionUID = 1L;
 
 	/**
-	 * @jdo.field persistence-modifier="persistent" mapped-by="swiftTradeProduct" dependent="true"
+	 * @jdo.field persistence-modifier="persistent" mapped-by="dynamicTradeProduct" dependent="true"
 	 */
 	private DynamicProductName name;
 

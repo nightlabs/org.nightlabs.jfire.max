@@ -32,58 +32,58 @@ extends BaseJDOObjectDAO<PriceConfigID, DynamicTradePriceConfig>
 	@SuppressWarnings("unchecked")
 	@Implement
 	protected Collection<DynamicTradePriceConfig> retrieveJDOObjects(
-			Set<PriceConfigID> swiftPriceConfigIDs, String[] fetchGroups, int maxFetchDepth,
+			Set<PriceConfigID> dynamicPriceConfigIDs, String[] fetchGroups, int maxFetchDepth,
 			ProgressMonitor monitor)
 			throws Exception
 	{
 		monitor.beginTask("Loading DynamicPriceConfigs", 1);
 		try {
-			DynamicTradeManager vm = swiftTradeManager;
+			DynamicTradeManager vm = dynamicTradeManager;
 			if (vm == null)
 				vm = DynamicTradeManagerUtil.getHome(SecurityReflector.getInitialContextProperties()).create();
 
-			return vm.getDynamicPriceConfigs(swiftPriceConfigIDs, fetchGroups, maxFetchDepth);
+			return vm.getDynamicPriceConfigs(dynamicPriceConfigIDs, fetchGroups, maxFetchDepth);
 		} finally {
 			monitor.worked(1);
 		}
 	}
 
-	private DynamicTradeManager swiftTradeManager;
+	private DynamicTradeManager dynamicTradeManager;
 
 	@SuppressWarnings("unchecked")
 	public List<DynamicTradePriceConfig> getDynamicPriceConfigs(String[] fetchGroups, int maxFetchDepth,
 			ProgressMonitor monitor)
 	{
 		try {
-			swiftTradeManager = DynamicTradeManagerUtil.getHome(SecurityReflector.getInitialContextProperties()).create();
+			dynamicTradeManager = DynamicTradeManagerUtil.getHome(SecurityReflector.getInitialContextProperties()).create();
 			try {
-				Collection<PriceConfigID> swiftPriceConfigIDs = swiftTradeManager.getDynamicPriceConfigIDs();
-				return getJDOObjects(null, swiftPriceConfigIDs, fetchGroups, maxFetchDepth, monitor);
+				Collection<PriceConfigID> dynamicPriceConfigIDs = dynamicTradeManager.getDynamicPriceConfigIDs();
+				return getJDOObjects(null, dynamicPriceConfigIDs, fetchGroups, maxFetchDepth, monitor);
 			} finally {
-				swiftTradeManager = null;
+				dynamicTradeManager = null;
 			}
 		} catch (Exception x) {
 			throw new RuntimeException(x);
 		}
 	}
 
-	public List<DynamicTradePriceConfig> getDynamicPriceConfigs(Collection<PriceConfigID> swiftPriceConfigIDs,
+	public List<DynamicTradePriceConfig> getDynamicPriceConfigs(Collection<PriceConfigID> dynamicPriceConfigIDs,
 			String[] fetchGroups, int maxFetchDepth,
 			ProgressMonitor monitor)
 	{
-		if (swiftPriceConfigIDs == null)
-			throw new IllegalArgumentException("swiftPriceConfigIDs must not be null!");
+		if (dynamicPriceConfigIDs == null)
+			throw new IllegalArgumentException("dynamicPriceConfigIDs must not be null!");
 
-		return getJDOObjects(null, swiftPriceConfigIDs, fetchGroups, maxFetchDepth, monitor);
+		return getJDOObjects(null, dynamicPriceConfigIDs, fetchGroups, maxFetchDepth, monitor);
 	}
 
-	public DynamicTradePriceConfig getDynamicPriceConfig(PriceConfigID swiftPriceConfigID,
+	public DynamicTradePriceConfig getDynamicPriceConfig(PriceConfigID dynamicPriceConfigID,
 			String[] fetchGroups, int maxFetchDepth,
 			ProgressMonitor monitor)
 	{
-		if (swiftPriceConfigID == null)
-			throw new IllegalArgumentException("swiftPriceConfigID must not be null!");
+		if (dynamicPriceConfigID == null)
+			throw new IllegalArgumentException("dynamicPriceConfigID must not be null!");
 
-		return getJDOObject(null, swiftPriceConfigID, fetchGroups, maxFetchDepth, monitor);
+		return getJDOObject(null, dynamicPriceConfigID, fetchGroups, maxFetchDepth, monitor);
 	}
 }

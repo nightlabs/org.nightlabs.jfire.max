@@ -6,24 +6,24 @@ import java.util.Set;
 
 import org.nightlabs.annotation.Implement;
 import org.nightlabs.jfire.base.jdo.BaseJDOObjectDAO;
-import org.nightlabs.jfire.dynamictrade.SwiftTradeManager;
-import org.nightlabs.jfire.dynamictrade.SwiftTradeManagerUtil;
+import org.nightlabs.jfire.dynamictrade.DynamicTradeManager;
+import org.nightlabs.jfire.dynamictrade.DynamicTradeManagerUtil;
 import org.nightlabs.jfire.dynamictrade.store.DynamicProductType;
 import org.nightlabs.jfire.security.SecurityReflector;
 import org.nightlabs.jfire.store.id.ProductTypeID;
 import org.nightlabs.progress.ProgressMonitor;
 
-public class SwiftProductTypeDAO
+public class DynamicProductTypeDAO
 extends BaseJDOObjectDAO<ProductTypeID, DynamicProductType>
 {
-	private static SwiftProductTypeDAO sharedInstance = null;
+	private static DynamicProductTypeDAO sharedInstance = null;
 
-	public static SwiftProductTypeDAO sharedInstance()
+	public static DynamicProductTypeDAO sharedInstance()
 	{
 		if (sharedInstance == null) {
-			synchronized (SwiftProductTypeDAO.class) {
+			synchronized (DynamicProductTypeDAO.class) {
 				if (sharedInstance == null)
-					sharedInstance = new SwiftProductTypeDAO();
+					sharedInstance = new DynamicProductTypeDAO();
 			}
 		}
 		return sharedInstance;
@@ -36,29 +36,29 @@ extends BaseJDOObjectDAO<ProductTypeID, DynamicProductType>
 			ProgressMonitor monitor)
 			throws Exception
 	{
-		monitor.beginTask("Loading SwiftProductTypes", 1);
+		monitor.beginTask("Loading DynamicProductTypes", 1);
 		try {
-			SwiftTradeManager vm = swiftTradeManager;
+			DynamicTradeManager vm = swiftTradeManager;
 			if (vm == null)
-				vm = SwiftTradeManagerUtil.getHome(SecurityReflector.getInitialContextProperties()).create();
+				vm = DynamicTradeManagerUtil.getHome(SecurityReflector.getInitialContextProperties()).create();
 
-			return vm.getSwiftProductTypes(swiftProductTypeIDs, fetchGroups, maxFetchDepth);
+			return vm.getDynamicProductTypes(swiftProductTypeIDs, fetchGroups, maxFetchDepth);
 		} finally {
 			monitor.worked(1);
 		}
 	}
 
-	private SwiftTradeManager swiftTradeManager;
+	private DynamicTradeManager swiftTradeManager;
 
 	@SuppressWarnings("unchecked")
-	public synchronized List<DynamicProductType> getChildSwiftProductTypes(ProductTypeID parentSwiftProductTypeID,
+	public synchronized List<DynamicProductType> getChildDynamicProductTypes(ProductTypeID parentDynamicProductTypeID,
 			String[] fetchGroups, int maxFetchDepth,
 			ProgressMonitor monitor)
 	{
 		try {
-			swiftTradeManager = SwiftTradeManagerUtil.getHome(SecurityReflector.getInitialContextProperties()).create();
+			swiftTradeManager = DynamicTradeManagerUtil.getHome(SecurityReflector.getInitialContextProperties()).create();
 			try {
-				Collection<ProductTypeID> swiftProductTypeIDs = swiftTradeManager.getChildSwiftProductTypeIDs(parentSwiftProductTypeID);
+				Collection<ProductTypeID> swiftProductTypeIDs = swiftTradeManager.getChildDynamicProductTypeIDs(parentDynamicProductTypeID);
 				return getJDOObjects(null, swiftProductTypeIDs, fetchGroups, maxFetchDepth, monitor);
 			} finally {
 				swiftTradeManager = null;
@@ -69,13 +69,13 @@ extends BaseJDOObjectDAO<ProductTypeID, DynamicProductType>
 	}
 
 	@SuppressWarnings("unchecked")
-	public List<DynamicProductType> getSwiftProductTypes(Byte inheritanceNature, Boolean saleable, String[] fetchGroups, int maxFetchDepth,
+	public List<DynamicProductType> getDynamicProductTypes(Byte inheritanceNature, Boolean saleable, String[] fetchGroups, int maxFetchDepth,
 			ProgressMonitor monitor)
 	{
 		try {
-			swiftTradeManager = SwiftTradeManagerUtil.getHome(SecurityReflector.getInitialContextProperties()).create();
+			swiftTradeManager = DynamicTradeManagerUtil.getHome(SecurityReflector.getInitialContextProperties()).create();
 			try {
-				Collection<ProductTypeID> swiftProductTypeIDs = swiftTradeManager.getSwiftProductTypeIDs(inheritanceNature, saleable);
+				Collection<ProductTypeID> swiftProductTypeIDs = swiftTradeManager.getDynamicProductTypeIDs(inheritanceNature, saleable);
 				return getJDOObjects(null, swiftProductTypeIDs, fetchGroups, maxFetchDepth, monitor);
 			} finally {
 				swiftTradeManager = null;
@@ -85,7 +85,7 @@ extends BaseJDOObjectDAO<ProductTypeID, DynamicProductType>
 		}
 	}
 
-	public List<DynamicProductType> getSwiftProductTypes(Collection<ProductTypeID> swiftProductTypeIDs,
+	public List<DynamicProductType> getDynamicProductTypes(Collection<ProductTypeID> swiftProductTypeIDs,
 			String[] fetchGroups, int maxFetchDepth,
 			ProgressMonitor monitor)
 	{
@@ -95,7 +95,7 @@ extends BaseJDOObjectDAO<ProductTypeID, DynamicProductType>
 		return getJDOObjects(null, swiftProductTypeIDs, fetchGroups, maxFetchDepth, monitor);
 	}
 
-	public DynamicProductType getSwiftProductType(ProductTypeID swiftProductTypeID,
+	public DynamicProductType getDynamicProductType(ProductTypeID swiftProductTypeID,
 			String[] fetchGroups, int maxFetchDepth,
 			ProgressMonitor monitor)
 	{

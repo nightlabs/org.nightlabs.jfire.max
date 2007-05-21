@@ -6,8 +6,8 @@ import java.util.Set;
 
 import org.nightlabs.annotation.Implement;
 import org.nightlabs.jfire.base.jdo.BaseJDOObjectDAO;
-import org.nightlabs.jfire.dynamictrade.SwiftTradeManager;
-import org.nightlabs.jfire.dynamictrade.SwiftTradeManagerUtil;
+import org.nightlabs.jfire.dynamictrade.DynamicTradeManager;
+import org.nightlabs.jfire.dynamictrade.DynamicTradeManagerUtil;
 import org.nightlabs.jfire.dynamictrade.store.Unit;
 import org.nightlabs.jfire.dynamictrade.store.id.UnitID;
 import org.nightlabs.jfire.security.SecurityReflector;
@@ -34,9 +34,9 @@ extends BaseJDOObjectDAO<UnitID, Unit>
 	protected Collection<Unit> retrieveJDOObjects(Set<UnitID> unitIDs, String[] fetchGroups, int maxFetchDepth, ProgressMonitor monitor)
 			throws Exception
 	{
-		SwiftTradeManager stm = swiftTradeManager;
+		DynamicTradeManager stm = swiftTradeManager;
 		if (stm == null)
-			stm = SwiftTradeManagerUtil.getHome(SecurityReflector.getInitialContextProperties()).create();
+			stm = DynamicTradeManagerUtil.getHome(SecurityReflector.getInitialContextProperties()).create();
 
 		return stm.getUnits(unitIDs, fetchGroups, maxFetchDepth);
 	}
@@ -49,13 +49,13 @@ extends BaseJDOObjectDAO<UnitID, Unit>
 		return getJDOObjects(null, unitIDs, fetchGroups, maxFetchDepth, monitor);
 	}
 
-	private SwiftTradeManager swiftTradeManager = null;
+	private DynamicTradeManager swiftTradeManager = null;
 
 	@SuppressWarnings("unchecked")
 	public List<Unit> getUnits(String[] fetchGroups, int maxFetchDepth, ProgressMonitor monitor)
 	{
 		try {
-			swiftTradeManager = SwiftTradeManagerUtil.getHome(SecurityReflector.getInitialContextProperties()).create();
+			swiftTradeManager = DynamicTradeManagerUtil.getHome(SecurityReflector.getInitialContextProperties()).create();
 			try {
 				Set<UnitID> unitIDs = swiftTradeManager.getUnitIDs();
 				return getJDOObjects(null, unitIDs, fetchGroups, maxFetchDepth, monitor);

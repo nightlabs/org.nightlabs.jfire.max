@@ -40,7 +40,7 @@ import org.nightlabs.i18n.I18nText;
  *		identity-type="application"
  *		objectid-class="org.nightlabs.jfire.dynamictrade.store.id.UnitNameID"
  *		detachable="true"
- *		table="JFireSwiftTrade_UnitName"
+ *		table="JFireDynamicTrade_UnitName"
  *
  * @jdo.inheritance strategy="new-table"
  *
@@ -78,7 +78,7 @@ extends I18nText
 	 *		collection-type="map"
 	 *		key-type="java.lang.String"
 	 *		value-type="java.lang.String"
-	 *		table="JFireSwiftTrade_UnitName_names"
+	 *		table="JFireDynamicTrade_UnitName_names"
 	 *
 	 * @jdo.join
 	 */

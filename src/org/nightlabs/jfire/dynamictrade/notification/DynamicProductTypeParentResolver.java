@@ -6,7 +6,7 @@ import org.nightlabs.jdo.ObjectID;
 import org.nightlabs.jfire.dynamictrade.store.DynamicProductType;
 import org.nightlabs.jfire.jdo.notification.TreeNodeParentResolver;
 
-public class SwiftProductTypeParentResolver
+public class DynamicProductTypeParentResolver
 implements TreeNodeParentResolver
 {
 	private static final long serialVersionUID = 1L;

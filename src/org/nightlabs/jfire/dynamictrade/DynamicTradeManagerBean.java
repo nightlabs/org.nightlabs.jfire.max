@@ -36,8 +36,8 @@ import org.nightlabs.jfire.store.Store;
 import org.nightlabs.jfire.store.id.ProductTypeID;
 
 /**
- * @ejb.bean name="jfire/ejb/JFireSwiftTrade/SwiftTradeManager"	
- *					 jndi-name="jfire/ejb/JFireSwiftTrade/SwiftTradeManager"
+ * @ejb.bean name="jfire/ejb/JFireDynamicTrade/DynamicTradeManager"	
+ *					 jndi-name="jfire/ejb/JFireDynamicTrade/DynamicTradeManager"
  *					 type="Stateless" 
  *					 transaction-type="Container"
  *
@@ -73,7 +73,7 @@ implements SessionBean
 	/**
 	 * This method is called by the datastore initialisation mechanism.
 	 * It creates the root DynamicProductType for the organisation itself.
-	 * SwiftProductTypes of other organisations cannot be imported or
+	 * DynamicProductTypes of other organisations cannot be imported or
 	 * traded as reseller.
 	 *
 	 * @ejb.interface-method
@@ -133,12 +133,12 @@ implements SessionBean
 	 * @ejb.permission role-name="_Guest_"
 	 */
 	@SuppressWarnings("unchecked")
-	public Set<ProductTypeID> getChildSwiftProductTypeIDs(
-			ProductTypeID parentSwiftProductTypeID) {
+	public Set<ProductTypeID> getChildDynamicProductTypeIDs(
+			ProductTypeID parentDynamicProductTypeID) {
 		PersistenceManager pm = getPersistenceManager();
 		try {
 			return NLJDOHelper.getObjectIDSet(DynamicProductType.getChildProductTypes(pm,
-					parentSwiftProductTypeID));
+					parentDynamicProductTypeID));
 		} finally {
 			pm.close();
 		}
@@ -149,7 +149,7 @@ implements SessionBean
 	 * @ejb.transaction type="Supports"
 	 * @ejb.permission role-name="_Guest_"
 	 */
-	public Set<ProductTypeID> getSwiftProductTypeIDs(Byte inheritanceNature, Boolean saleable) {
+	public Set<ProductTypeID> getDynamicProductTypeIDs(Byte inheritanceNature, Boolean saleable) {
 		PersistenceManager pm = getPersistenceManager();
 		try {
 			Query q = pm.newQuery(DynamicProductType.class);
@@ -186,7 +186,7 @@ implements SessionBean
 	 * @ejb.permission role-name="_Guest_"
 	 */
 	@SuppressWarnings("unchecked")
-	public List<DynamicProductType> getSwiftProductTypes(
+	public List<DynamicProductType> getDynamicProductTypes(
 			Collection<ProductTypeID> swiftProductTypeIDs, String[] fetchGroups,
 			int maxFetchDepth) {
 		PersistenceManager pm = getPersistenceManager();
@@ -203,7 +203,7 @@ implements SessionBean
 	 * @ejb.permission role-name="_Guest_"
 	 * @ejb.transaction type="Required"
 	 */
-	public DynamicProductType storeSwiftProductType(DynamicProductType dynamicProductType, boolean get,
+	public DynamicProductType storeDynamicProductType(DynamicProductType dynamicProductType, boolean get,
 			String[] fetchGroups, int maxFetchDepth) {
 		if (dynamicProductType == null)
 			throw new IllegalArgumentException("swiftProductType must not be null!");
@@ -217,7 +217,7 @@ implements SessionBean
 				pm.getFetchPlan().setGroups(fetchGroups);
 
 //			try {
-//				SwiftProductLocalAccountantDelegate delegate = (SwiftProductLocalAccountantDelegate) swiftProductType
+//				DynamicProductLocalAccountantDelegate delegate = (DynamicProductLocalAccountantDelegate) swiftProductType
 //						.getLocalAccountantDelegate();
 //				if (delegate != null) {
 //					OrganisationLegalEntity organisationLegalEntity = null;
@@ -270,7 +270,7 @@ implements SessionBean
 	 * @ejb.permission role-name="_Guest_"
 	 */
 	@SuppressWarnings("unchecked")
-	public Collection<DynamicTradePriceConfig> storeSwiftPriceConfigs(Collection<DynamicTradePriceConfig> priceConfigs, boolean get, ProductTypeID productTypeID, PriceConfigID innerPriceConfigID)
+	public Collection<DynamicTradePriceConfig> storeDynamicPriceConfigs(Collection<DynamicTradePriceConfig> priceConfigs, boolean get, ProductTypeID productTypeID, PriceConfigID innerPriceConfigID)
 	throws PriceCalculationException
 	{
 		PersistenceManager pm = getPersistenceManager();
@@ -308,7 +308,7 @@ implements SessionBean
 	 * @ejb.permission role-name="_Guest_"
 	 * @ejb.transaction type="Supports"
 	 */
-	public Set<PriceConfigID> getSwiftPriceConfigIDs()
+	public Set<PriceConfigID> getDynamicPriceConfigIDs()
 	{
 		PersistenceManager pm = getPersistenceManager();
 		try {
@@ -326,7 +326,7 @@ implements SessionBean
 	 * @ejb.transaction type="Supports"
 	 */
 	@SuppressWarnings("unchecked")
-	public List<DynamicTradePriceConfig> getSwiftPriceConfigs(Collection<PriceConfigID> swiftPriceConfigIDs, String[] fetchGroups, int maxFetchDepth)
+	public List<DynamicTradePriceConfig> getDynamicPriceConfigs(Collection<PriceConfigID> swiftPriceConfigIDs, String[] fetchGroups, int maxFetchDepth)
 	{
 		PersistenceManager pm = getPersistenceManager();
 		try {

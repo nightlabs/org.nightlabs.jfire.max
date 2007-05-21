@@ -38,9 +38,9 @@ import org.nightlabs.i18n.I18nText;
  * 
  * @jdo.persistence-capable
  *		identity-type="application"
- *		objectid-class="org.nightlabs.jfire.dynamictrade.store.id.SwiftProductNameID"
+ *		objectid-class="org.nightlabs.jfire.dynamictrade.store.id.DynamicProductNameID"
  *		detachable="true"
- *		table="JFireSwiftTrade_SwiftProductName"
+ *		table="JFireDynamicTrade_DynamicProductName"
  *
  * @jdo.inheritance strategy="new-table"
  *
@@ -78,7 +78,7 @@ extends I18nText
 	 *		collection-type="map"
 	 *		key-type="java.lang.String"
 	 *		value-type="java.lang.String"
-	 *		table="JFireSwiftTrade_SwiftProductName_names"
+	 *		table="JFireDynamicTrade_DynamicProductName_names"
 	 *
 	 * @jdo.join
 	 */
@@ -123,7 +123,7 @@ extends I18nText
 		return productID;
 	}
 
-	public DynamicProduct getSwiftProduct()
+	public DynamicProduct getDynamicProduct()
 	{
 		return dynamicProduct;
 	}

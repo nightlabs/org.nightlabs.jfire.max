@@ -13,7 +13,7 @@ import org.nightlabs.jdo.ObjectIDUtil;
  *		identity-type="application"
  *		objectid-class="org.nightlabs.jfire.dynamictrade.store.id.UnitID"
  *		detachable="true"
- *		table="JFireSwiftTrade_Unit"
+ *		table="JFireDynamicTrade_Unit"
  *
  * @jdo.inheritance strategy="new-table"
  *

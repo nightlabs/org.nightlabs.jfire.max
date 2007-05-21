@@ -38,7 +38,7 @@ extends FormulaPriceConfig
 	 *		persistence-modifier="persistent"
 	 *		collection-type="collection"
 	 *		element-type="PriceFragmentType"
-	 *		table="JFireSwiftTrade_SwiftPriceConfig_inputPriceFragmentTypes"
+	 *		table="JFireDynamicTrade_DynamicPriceConfig_inputPriceFragmentTypes"
 	 *
 	 * @jdo.join
 	 */

@@ -29,7 +29,7 @@ import org.nightlabs.jfire.transfer.id.AnchorID;
  *		identity-type="application"
  *		persistence-capable-superclass="org.nightlabs.jfire.store.ProductTypeActionHandler"
  *		detachable="true"
- *		table="JFireSwiftTrade_SwiftProductTypeActionHandler"
+ *		table="JFireDynamicTrade_DynamicProductTypeActionHandler"
  *
  * @jdo.inheritance strategy="superclass-table"
  */
@@ -55,7 +55,7 @@ public class DynamicProductTypeActionHandler
 		if (store.getOrganisationID().equals(simpleProductType.getOrganisationID()))
 			return getDefaultLocalHome(pm, store);
 		else
-			throw new UnsupportedOperationException("SwiftTrade does not support cross-trade-functionality!");
+			throw new UnsupportedOperationException("DynamicTrade does not support cross-trade-functionality!");
 //			return getDefaultForeignHome(pm, store);
 	}
 
@@ -147,7 +147,7 @@ public class DynamicProductTypeActionHandler
 		}
 		return res;
 //		DynamicProductType spt = (DynamicProductType) productType;
-//		SwiftProductTypeLocal sptl = (SwiftProductTypeLocal) productType.getProductTypeLocal();
+//		DynamicProductTypeLocal sptl = (DynamicProductTypeLocal) productType.getProductTypeLocal();
 //		int qty = nestedProductType == null ? 1 : nestedProductType.getQuantity();
 //		PersistenceManager pm = getPersistenceManager();
 //
@@ -193,7 +193,7 @@ public class DynamicProductTypeActionHandler
 			Offer partnerOffer, OfferID partnerOfferID, SegmentID partnerSegmentID,
 			ProductType nestedProductType, Collection<NestedProductType> nestedProductTypes) throws Exception
 	{
-		throw new UnsupportedOperationException("SwiftProductTypes do not support cross-trade!");
+		throw new UnsupportedOperationException("DynamicProductTypes do not support cross-trade!");
 	}
 
 }

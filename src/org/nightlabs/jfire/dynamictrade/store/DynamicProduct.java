@@ -18,7 +18,7 @@ import org.nightlabs.jfire.trade.ArticlePrice;
  *		identity-type="application"
  *		persistence-capable-superclass="org.nightlabs.jfire.store.Product"
  *		detachable="true"
- *		table="JFireSwiftTrade_SwiftProduct"
+ *		table="JFireDynamicTrade_DynamicProduct"
  *
  * @jdo.inheritance strategy="new-table"
  */

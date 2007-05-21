@@ -17,7 +17,7 @@ import org.nightlabs.jfire.trade.LegalEntity;
  *		identity-type="application"
  *		persistence-capable-superclass="org.nightlabs.jfire.store.ProductType"
  *		detachable="true"
- *		table="JFireSwiftTrade_SwiftProductType"
+ *		table="JFireDynamicTrade_DynamicProductType"
  *
  * @jdo.inheritance strategy="new-table"
  *
@@ -85,7 +85,7 @@ extends ProductType
 	@Implement
 	protected void calculatePrices()
 	{
-		// Nothing to do, because SwiftProducts have dynamic prices that are entered
+		// Nothing to do, because DynamicProducts have dynamic prices that are entered
 		// on-the-fly when an Article is created.
 	}
 

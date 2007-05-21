@@ -7,23 +7,23 @@ import java.util.Set;
 import org.nightlabs.annotation.Implement;
 import org.nightlabs.jfire.accounting.priceconfig.id.PriceConfigID;
 import org.nightlabs.jfire.base.jdo.BaseJDOObjectDAO;
-import org.nightlabs.jfire.dynamictrade.SwiftTradeManager;
-import org.nightlabs.jfire.dynamictrade.SwiftTradeManagerUtil;
+import org.nightlabs.jfire.dynamictrade.DynamicTradeManager;
+import org.nightlabs.jfire.dynamictrade.DynamicTradeManagerUtil;
 import org.nightlabs.jfire.dynamictrade.accounting.priceconfig.DynamicTradePriceConfig;
 import org.nightlabs.jfire.security.SecurityReflector;
 import org.nightlabs.progress.ProgressMonitor;
 
-public class SwiftPriceConfigDAO
+public class DynamicTradePriceConfigDAO
 extends BaseJDOObjectDAO<PriceConfigID, DynamicTradePriceConfig>
 {
-	private static SwiftPriceConfigDAO sharedInstance = null;
+	private static DynamicTradePriceConfigDAO sharedInstance = null;
 
-	public static SwiftPriceConfigDAO sharedInstance()
+	public static DynamicTradePriceConfigDAO sharedInstance()
 	{
 		if (sharedInstance == null) {
-			synchronized (SwiftPriceConfigDAO.class) {
+			synchronized (DynamicTradePriceConfigDAO.class) {
 				if (sharedInstance == null)
-					sharedInstance = new SwiftPriceConfigDAO();
+					sharedInstance = new DynamicTradePriceConfigDAO();
 			}
 		}
 		return sharedInstance;
@@ -36,28 +36,28 @@ extends BaseJDOObjectDAO<PriceConfigID, DynamicTradePriceConfig>
 			ProgressMonitor monitor)
 			throws Exception
 	{
-		monitor.beginTask("Loading SwiftPriceConfigs", 1);
+		monitor.beginTask("Loading DynamicPriceConfigs", 1);
 		try {
-			SwiftTradeManager vm = swiftTradeManager;
+			DynamicTradeManager vm = swiftTradeManager;
 			if (vm == null)
-				vm = SwiftTradeManagerUtil.getHome(SecurityReflector.getInitialContextProperties()).create();
+				vm = DynamicTradeManagerUtil.getHome(SecurityReflector.getInitialContextProperties()).create();
 
-			return vm.getSwiftPriceConfigs(swiftPriceConfigIDs, fetchGroups, maxFetchDepth);
+			return vm.getDynamicPriceConfigs(swiftPriceConfigIDs, fetchGroups, maxFetchDepth);
 		} finally {
 			monitor.worked(1);
 		}
 	}
 
-	private SwiftTradeManager swiftTradeManager;
+	private DynamicTradeManager swiftTradeManager;
 
 	@SuppressWarnings("unchecked")
-	public List<DynamicTradePriceConfig> getSwiftPriceConfigs(String[] fetchGroups, int maxFetchDepth,
+	public List<DynamicTradePriceConfig> getDynamicPriceConfigs(String[] fetchGroups, int maxFetchDepth,
 			ProgressMonitor monitor)
 	{
 		try {
-			swiftTradeManager = SwiftTradeManagerUtil.getHome(SecurityReflector.getInitialContextProperties()).create();
+			swiftTradeManager = DynamicTradeManagerUtil.getHome(SecurityReflector.getInitialContextProperties()).create();
 			try {
-				Collection<PriceConfigID> swiftPriceConfigIDs = swiftTradeManager.getSwiftPriceConfigIDs();
+				Collection<PriceConfigID> swiftPriceConfigIDs = swiftTradeManager.getDynamicPriceConfigIDs();
 				return getJDOObjects(null, swiftPriceConfigIDs, fetchGroups, maxFetchDepth, monitor);
 			} finally {
 				swiftTradeManager = null;
@@ -67,7 +67,7 @@ extends BaseJDOObjectDAO<PriceConfigID, DynamicTradePriceConfig>
 		}
 	}
 
-	public List<DynamicTradePriceConfig> getSwiftPriceConfigs(Collection<PriceConfigID> swiftPriceConfigIDs,
+	public List<DynamicTradePriceConfig> getDynamicPriceConfigs(Collection<PriceConfigID> swiftPriceConfigIDs,
 			String[] fetchGroups, int maxFetchDepth,
 			ProgressMonitor monitor)
 	{
@@ -77,7 +77,7 @@ extends BaseJDOObjectDAO<PriceConfigID, DynamicTradePriceConfig>
 		return getJDOObjects(null, swiftPriceConfigIDs, fetchGroups, maxFetchDepth, monitor);
 	}
 
-	public DynamicTradePriceConfig getSwiftPriceConfig(PriceConfigID swiftPriceConfigID,
+	public DynamicTradePriceConfig getDynamicPriceConfig(PriceConfigID swiftPriceConfigID,
 			String[] fetchGroups, int maxFetchDepth,
 			ProgressMonitor monitor)
 	{

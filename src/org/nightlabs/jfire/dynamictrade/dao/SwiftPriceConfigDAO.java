@@ -9,12 +9,12 @@ import org.nightlabs.jfire.accounting.priceconfig.id.PriceConfigID;
 import org.nightlabs.jfire.base.jdo.BaseJDOObjectDAO;
 import org.nightlabs.jfire.dynamictrade.SwiftTradeManager;
 import org.nightlabs.jfire.dynamictrade.SwiftTradeManagerUtil;
-import org.nightlabs.jfire.dynamictrade.accounting.priceconfig.SwiftPriceConfig;
+import org.nightlabs.jfire.dynamictrade.accounting.priceconfig.DynamicTradePriceConfig;
 import org.nightlabs.jfire.security.SecurityReflector;
 import org.nightlabs.progress.ProgressMonitor;
 
 public class SwiftPriceConfigDAO
-extends BaseJDOObjectDAO<PriceConfigID, SwiftPriceConfig>
+extends BaseJDOObjectDAO<PriceConfigID, DynamicTradePriceConfig>
 {
 	private static SwiftPriceConfigDAO sharedInstance = null;
 
@@ -31,7 +31,7 @@ extends BaseJDOObjectDAO<PriceConfigID, SwiftPriceConfig>
 
 	@SuppressWarnings("unchecked")
 	@Implement
-	protected Collection<SwiftPriceConfig> retrieveJDOObjects(
+	protected Collection<DynamicTradePriceConfig> retrieveJDOObjects(
 			Set<PriceConfigID> swiftPriceConfigIDs, String[] fetchGroups, int maxFetchDepth,
 			ProgressMonitor monitor)
 			throws Exception
@@ -51,7 +51,7 @@ extends BaseJDOObjectDAO<PriceConfigID, SwiftPriceConfig>
 	private SwiftTradeManager swiftTradeManager;
 
 	@SuppressWarnings("unchecked")
-	public List<SwiftPriceConfig> getSwiftPriceConfigs(String[] fetchGroups, int maxFetchDepth,
+	public List<DynamicTradePriceConfig> getSwiftPriceConfigs(String[] fetchGroups, int maxFetchDepth,
 			ProgressMonitor monitor)
 	{
 		try {
@@ -67,7 +67,7 @@ extends BaseJDOObjectDAO<PriceConfigID, SwiftPriceConfig>
 		}
 	}
 
-	public List<SwiftPriceConfig> getSwiftPriceConfigs(Collection<PriceConfigID> swiftPriceConfigIDs,
+	public List<DynamicTradePriceConfig> getSwiftPriceConfigs(Collection<PriceConfigID> swiftPriceConfigIDs,
 			String[] fetchGroups, int maxFetchDepth,
 			ProgressMonitor monitor)
 	{
@@ -77,7 +77,7 @@ extends BaseJDOObjectDAO<PriceConfigID, SwiftPriceConfig>
 		return getJDOObjects(null, swiftPriceConfigIDs, fetchGroups, maxFetchDepth, monitor);
 	}
 
-	public SwiftPriceConfig getSwiftPriceConfig(PriceConfigID swiftPriceConfigID,
+	public DynamicTradePriceConfig getSwiftPriceConfig(PriceConfigID swiftPriceConfigID,
 			String[] fetchGroups, int maxFetchDepth,
 			ProgressMonitor monitor)
 	{

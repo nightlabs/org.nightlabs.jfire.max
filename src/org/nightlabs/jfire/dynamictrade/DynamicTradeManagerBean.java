@@ -23,7 +23,7 @@ import org.nightlabs.jfire.accounting.priceconfig.FetchGroupsPriceConfig;
 import org.nightlabs.jfire.accounting.priceconfig.IInnerPriceConfig;
 import org.nightlabs.jfire.accounting.priceconfig.id.PriceConfigID;
 import org.nightlabs.jfire.base.BaseSessionBeanImpl;
-import org.nightlabs.jfire.dynamictrade.accounting.priceconfig.SwiftPriceConfig;
+import org.nightlabs.jfire.dynamictrade.accounting.priceconfig.DynamicTradePriceConfig;
 import org.nightlabs.jfire.dynamictrade.store.SwiftProductType;
 import org.nightlabs.jfire.dynamictrade.store.SwiftProductTypeActionHandler;
 import org.nightlabs.jfire.dynamictrade.store.Unit;
@@ -43,7 +43,7 @@ import org.nightlabs.jfire.store.id.ProductTypeID;
  *
  * @ejb.util generate="physical"
  */
-public abstract class SwiftTradeManagerBean
+public abstract class DynamicTradeManagerBean
 extends BaseSessionBeanImpl
 implements SessionBean
 {
@@ -270,7 +270,7 @@ implements SessionBean
 	 * @ejb.permission role-name="_Guest_"
 	 */
 	@SuppressWarnings("unchecked")
-	public Collection<SwiftPriceConfig> storeSwiftPriceConfigs(Collection<SwiftPriceConfig> priceConfigs, boolean get, ProductTypeID productTypeID, PriceConfigID innerPriceConfigID)
+	public Collection<DynamicTradePriceConfig> storeSwiftPriceConfigs(Collection<DynamicTradePriceConfig> priceConfigs, boolean get, ProductTypeID productTypeID, PriceConfigID innerPriceConfigID)
 	throws PriceCalculationException
 	{
 		PersistenceManager pm = getPersistenceManager();
@@ -312,7 +312,7 @@ implements SessionBean
 	{
 		PersistenceManager pm = getPersistenceManager();
 		try {
-			Query q = pm.newQuery(SwiftPriceConfig.class);
+			Query q = pm.newQuery(DynamicTradePriceConfig.class);
 			q.setResult("JDOHelper.getObjectId(this)");
 			return new HashSet<PriceConfigID>((Collection<? extends PriceConfigID>) q.execute());
 		} finally {
@@ -326,11 +326,11 @@ implements SessionBean
 	 * @ejb.transaction type="Supports"
 	 */
 	@SuppressWarnings("unchecked")
-	public List<SwiftPriceConfig> getSwiftPriceConfigs(Collection<PriceConfigID> swiftPriceConfigIDs, String[] fetchGroups, int maxFetchDepth)
+	public List<DynamicTradePriceConfig> getSwiftPriceConfigs(Collection<PriceConfigID> swiftPriceConfigIDs, String[] fetchGroups, int maxFetchDepth)
 	{
 		PersistenceManager pm = getPersistenceManager();
 		try {
-			return NLJDOHelper.getDetachedObjectList(pm, swiftPriceConfigIDs, SwiftPriceConfig.class, fetchGroups, maxFetchDepth);
+			return NLJDOHelper.getDetachedObjectList(pm, swiftPriceConfigIDs, DynamicTradePriceConfig.class, fetchGroups, maxFetchDepth);
 		} finally {
 			pm.close();
 		}

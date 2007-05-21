@@ -2,7 +2,7 @@ package org.nightlabs.jfire.dynamictrade.store;
 
 import org.nightlabs.annotation.Implement;
 import org.nightlabs.jfire.accounting.Price;
-import org.nightlabs.jfire.dynamictrade.accounting.priceconfig.SwiftPriceConfig;
+import org.nightlabs.jfire.dynamictrade.accounting.priceconfig.DynamicTradePriceConfig;
 import org.nightlabs.jfire.security.User;
 import org.nightlabs.jfire.store.NestedProductType;
 import org.nightlabs.jfire.store.Product;
@@ -67,7 +67,7 @@ extends Product
 	}
 
 	/**
-	 * The single price is the price calculated by the {@link SwiftPriceConfig}. Therefore it does not take the quantity
+	 * The single price is the price calculated by the {@link DynamicTradePriceConfig}. Therefore it does not take the quantity
 	 * into account. The quantity is incorporated into the {@link ArticlePrice} of the corresponding {@link Article}.
 	 *
 	 * @return the price for one single <code>Product</code> - i.e. without the quantity ({@link #getQuantity()}) taken into account.

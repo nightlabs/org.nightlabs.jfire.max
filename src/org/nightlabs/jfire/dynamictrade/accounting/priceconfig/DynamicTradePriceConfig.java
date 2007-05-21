@@ -17,11 +17,11 @@ import org.nightlabs.jfire.accounting.gridpriceconfig.FormulaPriceConfig;
  *
  * @jdo.inheritance strategy="superclass-table"
  *
- * @jdo.fetch-group name="SwiftPriceConfig.inputPriceFragmentTypes" fields="inputPriceFragmentTypes"
+ * @jdo.fetch-group name="DynamicTradePriceConfig.inputPriceFragmentTypes" fields="inputPriceFragmentTypes"
  *
  * @jdo.fetch-group name="FetchGroupsPriceConfig.edit" fetch-groups="default" fields="inputPriceFragmentTypes"
  */
-public class SwiftPriceConfig
+public class DynamicTradePriceConfig
 extends FormulaPriceConfig
 {
 	private static final long serialVersionUID = 1L;
@@ -52,9 +52,9 @@ extends FormulaPriceConfig
 	/**
 	 * @deprecated Only for JDO!
 	 */
-	protected SwiftPriceConfig() { }
+	protected DynamicTradePriceConfig() { }
 
-	public SwiftPriceConfig(String organisationID, long priceConfigID)
+	public DynamicTradePriceConfig(String organisationID, long priceConfigID)
 	{
 		super(organisationID, priceConfigID);
 		this.inputPriceFragmentTypes = new HashSet<PriceFragmentType>();
@@ -81,7 +81,7 @@ extends FormulaPriceConfig
 //	@Override
 //	public void addProductType(ProductType productType)
 //	{
-//		throw new UnsupportedOperationException("SwiftPriceConfig does not support nesting of other ProductTypes!");
+//		throw new UnsupportedOperationException("DynamicTradePriceConfig does not support nesting of other ProductTypes!");
 //	}
 
 	@Override

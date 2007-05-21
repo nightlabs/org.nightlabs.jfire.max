@@ -7,6 +7,7 @@ import org.eclipse.datatools.connectivity.oda.IParameterMetaData;
 import org.eclipse.datatools.connectivity.oda.OdaException;
 import org.nightlabs.jdo.ObjectID;
 import org.nightlabs.jdo.ObjectIDUtil;
+import org.nightlabs.jfire.reporting.JFireReportingHelper;
 import org.nightlabs.jfire.reporting.oda.Query;
 import org.nightlabs.jfire.scripting.Script;
 import org.nightlabs.jfire.scripting.id.ScriptRegistryItemID;
@@ -74,6 +75,17 @@ public abstract class AbstractJFSQueryProxy extends Query implements IJFSQueryPr
 	 */
 	public ScriptRegistryItemID getScriptRegistryItemID() {
 		return getScriptRegistryItemID(true);
+	}
+	
+	/**
+	 * Delegates to {@link JFireReportingHelper#getDataSetParamObject(Object)}
+	 * with the parameter obtained by {@link #getParameter(String)}.
+	 * 
+	 * @param name The parameter name.
+	 * @return The parameter (possibly de-serialized) with the given name.
+	 */
+	protected Object getDataSetParameter(String name) {
+		return JFireReportingHelper.getDataSetParamObject(getParameter(name));
 	}
 
 }

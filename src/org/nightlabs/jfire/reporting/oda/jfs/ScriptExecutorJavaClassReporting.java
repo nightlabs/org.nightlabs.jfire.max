@@ -3,9 +3,11 @@ package org.nightlabs.jfire.reporting.oda.jfs;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
+import java.util.Map.Entry;
 
 import org.eclipse.datatools.connectivity.oda.IResultSet;
 import org.eclipse.datatools.connectivity.oda.IResultSetMetaData;
+import org.nightlabs.jfire.reporting.JFireReportingHelper;
 import org.nightlabs.jfire.reporting.oda.jfs.server.ServerJFSQueryProxy;
 import org.nightlabs.jfire.scripting.Script;
 import org.nightlabs.jfire.scripting.ScriptException;
@@ -19,7 +21,7 @@ import org.nightlabs.jfire.scripting.ScriptRegistry;
  * to be the executor for scripts with the language {@link ScriptExecutorJavaClass#LANGUAGE_JAVA_CLASS}.
  * <p>
  * It implements the {@link ReportingScriptExecutor} interface and serves as helper
- * for the JFS ODA Driver. {@link ServerJFSQueryProxy} for an the usage of this executor.
+ * for the JFS ODA Driver. See {@link ServerJFSQueryProxy} for an the usage of this executor.
  * 
  * @author Alexander Bieber <alex [AT] nightlabs [DOT] de>
  *
@@ -86,6 +88,13 @@ implements ReportingScriptExecutor
 	 * <p>
 	 * Prepares and executes the Query. It assumes the result to be an instance
 	 * of {@link IResultSet} and throws an {@link ScriptException} otherwise.
+	 * </p>
+	 * <p>
+	 * Additionally it will convert the parameters of the script to the value
+	 * according to {@link JFireReportingHelper#getDataSetParamObject(Object)} in
+	 * order to provide the scripts with the actual object parameter instead of
+	 * its String representation.
+	 * </p>
 	 * 
 	 * @throws ScriptException Not only when execution fails, but also if the returned result is
 	 * 	not of type {@link IResultSet}.
@@ -95,7 +104,11 @@ implements ReportingScriptExecutor
 	public IResultSet getResultSet(Script script, Map<String, Object> parameters)
 	throws ScriptException
 	{
-		prepare(script, parameters);
+		Map<String, Object> convertedParams = new HashMap<String, Object>();
+		for (Entry<String, Object> entry : parameters.entrySet()) {
+			convertedParams.put(entry.getKey(), JFireReportingHelper.getDataSetParamObject(entry.getValue()));
+		}
+		prepare(script, convertedParams);
 		Object result = execute();
 		try {
 			return (IResultSet)result;

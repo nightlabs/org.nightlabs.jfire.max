@@ -26,16 +26,22 @@
 
 package org.nightlabs.jfire.reporting;
 
+import java.io.StringWriter;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.regex.Pattern;
 
 import javax.jdo.JDOObjectNotFoundException;
 import javax.jdo.PersistenceManager;
 
 import org.apache.log4j.Logger;
+import org.eclipse.datatools.connectivity.oda.IQuery;
 import org.nightlabs.jdo.ObjectID;
 import org.nightlabs.jdo.ObjectIDUtil;
 import org.nightlabs.jfire.reporting.layout.render.RenderManager;
+
+import com.thoughtworks.xstream.XStream;
+import com.thoughtworks.xstream.io.xml.XppDriver;
 
 /**
  * Helper to be used static by the ODA runtime driver implementations
@@ -212,4 +218,52 @@ public class JFireReportingHelper {
 		return result;
 	}
 	
+	private static final Pattern dataSetParamPattern = Pattern.compile("^<dataSetParameter");
+	private static final String dataSetparameterOpenTag = "<dataSetParameter>";
+	private static final String dataSetparameterCloseTag = "</dataSetParameter>";
+	
+	/**
+	 * Creates a String representation of the given object that
+	 * can be used as parameter for JFS data sets.  
+	 * <p>
+	 * Currently, the XStream serializer is used for this purpose.
+	 * </p>
+	 * @param obj The object to serialize and 
+	 * @return A String serialization of the given object.
+	 */
+	public static String createDataSetParam(Object obj) {
+		XStream xStream = new XStream(new XppDriver());
+		StringWriter writer = new StringWriter();
+		writer.append(dataSetparameterOpenTag);
+		xStream.toXML(obj, writer);
+		writer.append(dataSetparameterCloseTag);
+		return writer.toString();
+	}
+
+	/**
+	 * This method expects to receive a data set parameter as it is passed
+	 * by the ODA driver to the {@link IQuery} implementation.
+	 * <p>
+	 * This method then checks whether the parameter was serialized using the
+	 * {@link #createDataSetParam(Object)} method and returns the appropriate
+	 * de-serialized object than. Otherwise it will return the object as
+	 * it is passed (i.e. passing <code>null</code> will return <code>null</code> as well). 
+	 * </p>
+	 * @param obj The data set parameter.
+	 * @return The data set parameter either de-serialized to the object it originally was or as passed to this method.
+	 */
+	public static Object getDataSetParamObject(Object obj) {
+		if (obj == null)
+			return null;
+		if (!(obj instanceof String))
+			return obj;
+		String paramStr = (String) obj;
+		if (dataSetParamPattern.matcher(paramStr).find()) {
+			String stripped = paramStr.replace(dataSetparameterOpenTag, "");
+			stripped = stripped.replace(dataSetparameterCloseTag, "");
+			XStream xStream = new XStream(new XppDriver());
+			return xStream.fromXML(stripped);
+		} else
+			return obj;			
+	}
 }

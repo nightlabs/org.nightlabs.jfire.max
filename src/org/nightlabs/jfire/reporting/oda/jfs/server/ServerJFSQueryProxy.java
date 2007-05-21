@@ -181,64 +181,6 @@ s	 */
 		return (ReportingScriptExecutor)executor;
 	}
 	
-//	private PersistenceManager pm; 
-//	
-//	/**
-//	 * Obtains the PersistenceManager for this proxy. If none created yet, 
-//	 * it will be obtained with the help of {@link Lookup#getPersistenceManager()}.
-//	 */
-//	protected PersistenceManager getPersistenceManager() 
-//	{
-//		logger.debug("getPersistenceManager() called on "+this);
-//		if (pm == null) {
-//			Lookup lookup;
-//			lookup = new Lookup(SecurityReflector.getUserDescriptor().getOrganisationID());
-//			pm = lookup.getPersistenceManager();
-//			logger.debug("getPersistenceManager() created new PersistenceManager "+pm);
-//		}
-//		logger.debug("getPersistenceManager() returns "+pm);
-//		return pm;
-//	}
-	
-//	/**
-//	 * Closes the PersistenceManager if it was created.
-//	 */
-//	protected void closePersistenceManager() {
-//		logger.debug("Close persistenceManager, doing nothing");
-////		if (pm != null && !pm.isClosed()) {
-////			logger.debug("Closing PersistenceManager");
-////			pm.close();
-////		}
-//	}
-	
-//	/**
-//	 * Shorcut to {@link #getJFSResultSetMetaData(PersistenceManager, ScriptRegistryItemID)}
-//	 */
-//	public static IResultSetMetaData getJFSResultSetMetaData(PersistenceManager pm, ScriptRegistryItemID scriptRegistryItemID)
-//	throws ModuleException
-//	{
-//		PersistenceManager pm = getPersistenceManager();
-//		try {
-//			return getJFSResultSetMetaData(pm, scriptRegistryItemID);
-//		} finally {
-//			pm.close();
-//		}
-//	}
-//
-//	/**
-//	 * Shortcut to #getJFSResultSet(PersistenceManager, ScriptRegistryItemID, Map<String, Object>)}
-//	 */
-//	public static IResultSet getJFSResultSet(ScriptRegistryItemID scriptRegistryItemID, Map<String, Object> parameters)
-//	throws ModuleException
-//	{
-//		PersistenceManager pm = getPersistenceManager();
-//		try {			
-//			return getJFSResultSet(pm, scriptRegistryItemID, parameters);
-//		} finally {
-//			pm.close();
-//		}
-//	}
-	
 	/**
 	 * Lookup the {@link ReportingScriptExecutor} and let him execute {@link ReportingScriptExecutor#getResultSetMetaData(Script)}.
 	 * 
@@ -269,7 +211,7 @@ s	 */
 	{
 		Script script = getScript(pm, scriptRegistryItemID);
 		// if this script relies on a persistenceManager parameter, provide one ;-)
-		// this is legacy code (JavaClass)scripts can now obtain the pm from their executor
+		// FIXME: this is legacy code (JavaClass)scripts can now obtain the pm from their executor
 		if (script.getParameterSet().getParameter("persistenceManager", false) != null)
 			parameters.put("persistenceManager", pm);
 		return createReportingScriptExecutor(pm, script).getResultSet(script, parameters);

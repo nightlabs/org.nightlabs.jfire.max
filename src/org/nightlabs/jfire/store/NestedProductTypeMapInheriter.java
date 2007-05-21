@@ -19,6 +19,9 @@ public class NestedProductTypeMapInheriter
 			FieldMetaData motherFieldMetaData, FieldMetaData childFieldMetaData)
 	{
 		ProductType childProductType = (ProductType) child;
+		ProductType motherProductType = (ProductType) mother;
+		childProductType.getNestedProductTypes();
+		motherProductType.getNestedProductTypes();
 		MapFieldMetaData motherMeta = (MapFieldMetaData) motherFieldMetaData;
 		MapFieldMetaData childMeta = (MapFieldMetaData) childFieldMetaData;
 

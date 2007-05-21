@@ -27,13 +27,13 @@ import org.nightlabs.jfire.dynamictrade.accounting.priceconfig.SwiftPriceConfig;
 import org.nightlabs.jfire.dynamictrade.store.SwiftProductType;
 import org.nightlabs.jfire.dynamictrade.store.SwiftProductTypeActionHandler;
 import org.nightlabs.jfire.dynamictrade.store.Unit;
+import org.nightlabs.jfire.dynamictrade.store.id.UnitID;
 import org.nightlabs.jfire.idgenerator.IDGenerator;
 import org.nightlabs.jfire.organisation.LocalOrganisation;
 import org.nightlabs.jfire.security.User;
 import org.nightlabs.jfire.store.ProductType;
 import org.nightlabs.jfire.store.Store;
 import org.nightlabs.jfire.store.id.ProductTypeID;
-import org.nightlabs.jfire.swifttrade.store.id.UnitID;
 
 /**
  * @ejb.bean name="jfire/ejb/JFireSwiftTrade/SwiftTradeManager"	

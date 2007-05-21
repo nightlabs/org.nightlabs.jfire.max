@@ -5,7 +5,6 @@ package org.nightlabs.jfire.reporting.trade.scripting.javaclass.invoice;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 import java.util.SortedMap;
 import java.util.TreeMap;
 
@@ -17,7 +16,6 @@ import org.nightlabs.db.Record;
 import org.nightlabs.db.TableBuffer;
 import org.nightlabs.jfire.accounting.Invoice;
 import org.nightlabs.jfire.accounting.id.InvoiceID;
-import org.nightlabs.jfire.reporting.JFireReportingHelper;
 import org.nightlabs.jfire.reporting.oda.SQLResultSet;
 import org.nightlabs.jfire.reporting.oda.jfs.JFSResultSetMetaData;
 import org.nightlabs.jfire.reporting.oda.jfs.JFSResultUtil;
@@ -28,6 +26,8 @@ import org.nightlabs.jfire.scripting.ScriptException;
 import org.nightlabs.jfire.trade.Article;
 
 /**
+ * Script that returns all articles for a given Invoice.
+ * 
  * @author Alexander Bieber <alex [AT] nightlabs [DOT] de>
  *
  */
@@ -60,10 +60,8 @@ implements ScriptExecutorJavaClassReportingDelegate {
 	 * @see org.nightlabs.jfire.scripting.ScriptExecutorJavaClassDelegate#doExecute()
 	 */
 	public Object doExecute() throws ScriptException {
-		Map<String, Object> param = getScriptExecutorJavaClass().getParameterValues();
-		// WORKAROUND: This should really be passed to the query by the oda type.
-//		InvoiceID invoiceID = (InvoiceID) param.get("invoiceID");
-		InvoiceID invoiceID = (InvoiceID) JFireReportingHelper.getParameter("invoiceID");
+		InvoiceID invoiceID = (InvoiceID) getParameterValue("invoiceID");
+//		InvoiceID invoiceID = (InvoiceID) JFireReportingHelper.getParameter("invoiceID");
 		if (invoiceID == null)
 			throw new IllegalArgumentException("The parameter invoiceID was not set.");
 		PersistenceManager pm = getScriptExecutorJavaClass().getPersistenceManager();

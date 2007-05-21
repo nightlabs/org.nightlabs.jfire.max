@@ -24,8 +24,8 @@ import org.nightlabs.jfire.accounting.priceconfig.IInnerPriceConfig;
 import org.nightlabs.jfire.accounting.priceconfig.id.PriceConfigID;
 import org.nightlabs.jfire.base.BaseSessionBeanImpl;
 import org.nightlabs.jfire.dynamictrade.accounting.priceconfig.DynamicTradePriceConfig;
-import org.nightlabs.jfire.dynamictrade.store.SwiftProductType;
-import org.nightlabs.jfire.dynamictrade.store.SwiftProductTypeActionHandler;
+import org.nightlabs.jfire.dynamictrade.store.DynamicProductType;
+import org.nightlabs.jfire.dynamictrade.store.DynamicProductTypeActionHandler;
 import org.nightlabs.jfire.dynamictrade.store.Unit;
 import org.nightlabs.jfire.dynamictrade.store.id.UnitID;
 import org.nightlabs.jfire.idgenerator.IDGenerator;
@@ -72,7 +72,7 @@ implements SessionBean
 
 	/**
 	 * This method is called by the datastore initialisation mechanism.
-	 * It creates the root SwiftProductType for the organisation itself.
+	 * It creates the root DynamicProductType for the organisation itself.
 	 * SwiftProductTypes of other organisations cannot be imported or
 	 * traded as reseller.
 	 *
@@ -84,21 +84,21 @@ implements SessionBean
 	{
 		PersistenceManager pm = getPersistenceManager();
 		try {
-			ProductTypeID rootID = ProductTypeID.create(getOrganisationID(), SwiftProductType.class.getName());
+			ProductTypeID rootID = ProductTypeID.create(getOrganisationID(), DynamicProductType.class.getName());
 			try {
 				pm.getObjectById(rootID);
 				return; // already existing
 			} catch (JDOObjectNotFoundException x) {
 				Store store = Store.getStore(pm);
 				User user = User.getUser(pm, getPrincipal());
-				SwiftProductType root = new SwiftProductType(
+				DynamicProductType root = new DynamicProductType(
 						rootID.organisationID, rootID.productTypeID,
 						null,
 						store.getMandator(),
 						ProductType.INHERITANCE_NATURE_BRANCH,
 						ProductType.PACKAGE_NATURE_OUTER);
 				root.getName().setText(Locale.ENGLISH.getLanguage(), LocalOrganisation.getLocalOrganisation(pm).getOrganisation().getPerson().getDisplayName());
-				store.addProductType(user, root, SwiftProductTypeActionHandler.getDefaultHome(pm, root));
+				store.addProductType(user, root, DynamicProductTypeActionHandler.getDefaultHome(pm, root));
 				store.setProductTypeStatus_published(user, root);
 			}
 
@@ -137,7 +137,7 @@ implements SessionBean
 			ProductTypeID parentSwiftProductTypeID) {
 		PersistenceManager pm = getPersistenceManager();
 		try {
-			return NLJDOHelper.getObjectIDSet(SwiftProductType.getChildProductTypes(pm,
+			return NLJDOHelper.getObjectIDSet(DynamicProductType.getChildProductTypes(pm,
 					parentSwiftProductTypeID));
 		} finally {
 			pm.close();
@@ -152,7 +152,7 @@ implements SessionBean
 	public Set<ProductTypeID> getSwiftProductTypeIDs(Byte inheritanceNature, Boolean saleable) {
 		PersistenceManager pm = getPersistenceManager();
 		try {
-			Query q = pm.newQuery(SwiftProductType.class);
+			Query q = pm.newQuery(DynamicProductType.class);
 			q.setResult("JDOHelper.getObjectId(this)");
 			if (inheritanceNature != null || saleable != null) {
 				StringBuffer filter = new StringBuffer();
@@ -186,13 +186,13 @@ implements SessionBean
 	 * @ejb.permission role-name="_Guest_"
 	 */
 	@SuppressWarnings("unchecked")
-	public List<SwiftProductType> getSwiftProductTypes(
+	public List<DynamicProductType> getSwiftProductTypes(
 			Collection<ProductTypeID> swiftProductTypeIDs, String[] fetchGroups,
 			int maxFetchDepth) {
 		PersistenceManager pm = getPersistenceManager();
 		try {
 			return NLJDOHelper.getDetachedObjectList(pm, swiftProductTypeIDs,
-					SwiftProductType.class, fetchGroups, maxFetchDepth);
+					DynamicProductType.class, fetchGroups, maxFetchDepth);
 		} finally {
 			pm.close();
 		}
@@ -203,9 +203,9 @@ implements SessionBean
 	 * @ejb.permission role-name="_Guest_"
 	 * @ejb.transaction type="Required"
 	 */
-	public SwiftProductType storeSwiftProductType(SwiftProductType swiftProductType, boolean get,
+	public DynamicProductType storeSwiftProductType(DynamicProductType dynamicProductType, boolean get,
 			String[] fetchGroups, int maxFetchDepth) {
-		if (swiftProductType == null)
+		if (dynamicProductType == null)
 			throw new IllegalArgumentException("swiftProductType must not be null!");
 
 		PersistenceManager pm = getPersistenceManager();
@@ -244,21 +244,21 @@ implements SessionBean
 
 			// we don't need any price calculation as we have dynamic prices only - no cached values
 
-			if (NLJDOHelper.exists(pm, swiftProductType)) {
-				swiftProductType = (SwiftProductType) pm.makePersistent(swiftProductType);
+			if (NLJDOHelper.exists(pm, dynamicProductType)) {
+				dynamicProductType = (DynamicProductType) pm.makePersistent(dynamicProductType);
 			} else {
-				swiftProductType = (SwiftProductType) Store.getStore(pm).addProductType(User.getUser(pm, getPrincipal()),
-						swiftProductType,
-						SwiftProductTypeActionHandler.getDefaultHome(pm, swiftProductType));
+				dynamicProductType = (DynamicProductType) Store.getStore(pm).addProductType(User.getUser(pm, getPrincipal()),
+						dynamicProductType,
+						DynamicProductTypeActionHandler.getDefaultHome(pm, dynamicProductType));
 			}
 
 			// take care about the inheritance
-			swiftProductType.applyInheritance();
+			dynamicProductType.applyInheritance();
 
 			if (!get)
 				return null;
 
-			return (SwiftProductType) pm.detachCopy(swiftProductType);
+			return (DynamicProductType) pm.detachCopy(dynamicProductType);
 		} finally {
 			pm.close();
 		}

@@ -22,7 +22,7 @@ import org.nightlabs.jfire.trade.ArticlePrice;
  *
  * @jdo.inheritance strategy="new-table"
  */
-public class SwiftProduct
+public class DynamicProduct
 extends Product
 {
 	private static final long serialVersionUID = 1L;
@@ -30,7 +30,7 @@ extends Product
 	/**
 	 * @jdo.field persistence-modifier="persistent" mapped-by="swiftTradeProduct" dependent="true"
 	 */
-	private SwiftProductName name;
+	private DynamicProductName name;
 
 	/**
 	 * @jdo.field persistence-modifier="persistent"
@@ -50,12 +50,12 @@ extends Product
 	/**
 	 * @deprecated Only for JDO!
 	 */
-	protected SwiftProduct() { }
+	protected DynamicProduct() { }
 
-	public SwiftProduct(ProductType productType, long productID)
+	public DynamicProduct(ProductType productType, long productID)
 	{
 		super(productType, productID);
-		this.name = new SwiftProductName(this);
+		this.name = new DynamicProductName(this);
 		this.quantity = 1;
 	}
 
@@ -81,7 +81,7 @@ extends Product
 		this.singlePrice = singlePrice;
 	}
 
-	public SwiftProductName getName()
+	public DynamicProductName getName()
 	{
 		return name;
 	}

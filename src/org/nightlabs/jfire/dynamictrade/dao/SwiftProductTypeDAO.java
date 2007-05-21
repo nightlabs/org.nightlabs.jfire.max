@@ -8,13 +8,13 @@ import org.nightlabs.annotation.Implement;
 import org.nightlabs.jfire.base.jdo.BaseJDOObjectDAO;
 import org.nightlabs.jfire.dynamictrade.SwiftTradeManager;
 import org.nightlabs.jfire.dynamictrade.SwiftTradeManagerUtil;
-import org.nightlabs.jfire.dynamictrade.store.SwiftProductType;
+import org.nightlabs.jfire.dynamictrade.store.DynamicProductType;
 import org.nightlabs.jfire.security.SecurityReflector;
 import org.nightlabs.jfire.store.id.ProductTypeID;
 import org.nightlabs.progress.ProgressMonitor;
 
 public class SwiftProductTypeDAO
-extends BaseJDOObjectDAO<ProductTypeID, SwiftProductType>
+extends BaseJDOObjectDAO<ProductTypeID, DynamicProductType>
 {
 	private static SwiftProductTypeDAO sharedInstance = null;
 
@@ -31,7 +31,7 @@ extends BaseJDOObjectDAO<ProductTypeID, SwiftProductType>
 
 	@SuppressWarnings("unchecked")
 	@Implement
-	protected Collection<SwiftProductType> retrieveJDOObjects(
+	protected Collection<DynamicProductType> retrieveJDOObjects(
 			Set<ProductTypeID> swiftProductTypeIDs, String[] fetchGroups, int maxFetchDepth,
 			ProgressMonitor monitor)
 			throws Exception
@@ -51,7 +51,7 @@ extends BaseJDOObjectDAO<ProductTypeID, SwiftProductType>
 	private SwiftTradeManager swiftTradeManager;
 
 	@SuppressWarnings("unchecked")
-	public synchronized List<SwiftProductType> getChildSwiftProductTypes(ProductTypeID parentSwiftProductTypeID,
+	public synchronized List<DynamicProductType> getChildSwiftProductTypes(ProductTypeID parentSwiftProductTypeID,
 			String[] fetchGroups, int maxFetchDepth,
 			ProgressMonitor monitor)
 	{
@@ -69,7 +69,7 @@ extends BaseJDOObjectDAO<ProductTypeID, SwiftProductType>
 	}
 
 	@SuppressWarnings("unchecked")
-	public List<SwiftProductType> getSwiftProductTypes(Byte inheritanceNature, Boolean saleable, String[] fetchGroups, int maxFetchDepth,
+	public List<DynamicProductType> getSwiftProductTypes(Byte inheritanceNature, Boolean saleable, String[] fetchGroups, int maxFetchDepth,
 			ProgressMonitor monitor)
 	{
 		try {
@@ -85,7 +85,7 @@ extends BaseJDOObjectDAO<ProductTypeID, SwiftProductType>
 		}
 	}
 
-	public List<SwiftProductType> getSwiftProductTypes(Collection<ProductTypeID> swiftProductTypeIDs,
+	public List<DynamicProductType> getSwiftProductTypes(Collection<ProductTypeID> swiftProductTypeIDs,
 			String[] fetchGroups, int maxFetchDepth,
 			ProgressMonitor monitor)
 	{
@@ -95,7 +95,7 @@ extends BaseJDOObjectDAO<ProductTypeID, SwiftProductType>
 		return getJDOObjects(null, swiftProductTypeIDs, fetchGroups, maxFetchDepth, monitor);
 	}
 
-	public SwiftProductType getSwiftProductType(ProductTypeID swiftProductTypeID,
+	public DynamicProductType getSwiftProductType(ProductTypeID swiftProductTypeID,
 			String[] fetchGroups, int maxFetchDepth,
 			ProgressMonitor monitor)
 	{

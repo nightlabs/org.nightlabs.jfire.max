@@ -46,9 +46,9 @@ import org.nightlabs.i18n.I18nText;
  *
  * @jdo.create-objectid-class field-order="organisationID, productID"
  *
- * @jdo.fetch-group name="SwiftProduct.name" fields="swiftProduct, names"
+ * @jdo.fetch-group name="DynamicProduct.name" fields="dynamicProduct, names"
  */
-public class SwiftProductName
+public class DynamicProductName
 extends I18nText
 {
 	private static final long serialVersionUID = 1L;
@@ -67,7 +67,7 @@ extends I18nText
 	/**
 	 * @jdo.field persistence-modifier="persistent"
 	 */
-	private SwiftProduct swiftProduct;
+	private DynamicProduct dynamicProduct;
 
 	/**
 	 * key: String languageID<br/>
@@ -87,15 +87,15 @@ extends I18nText
 	/**
 	 * @deprecated Only for JDO!
 	 */
-	protected SwiftProductName()
+	protected DynamicProductName()
 	{
 	}
 
-	public SwiftProductName(SwiftProduct swiftProduct)
+	public DynamicProductName(DynamicProduct dynamicProduct)
 	{
-		this.swiftProduct = swiftProduct;
-		this.organisationID = swiftProduct.getOrganisationID();
-		this.productID = swiftProduct.getProductID();
+		this.dynamicProduct = dynamicProduct;
+		this.organisationID = dynamicProduct.getOrganisationID();
+		this.productID = dynamicProduct.getProductID();
 	}
 
 	@Implement
@@ -107,7 +107,7 @@ extends I18nText
 	@Implement
 	protected String getFallBackValue(String languageID)
 	{
-		return SwiftProduct.getPrimaryKey(organisationID, productID);
+		return DynamicProduct.getPrimaryKey(organisationID, productID);
 	}
 
 	/**
@@ -123,8 +123,8 @@ extends I18nText
 		return productID;
 	}
 
-	public SwiftProduct getSwiftProduct()
+	public DynamicProduct getSwiftProduct()
 	{
-		return swiftProduct;
+		return dynamicProduct;
 	}
 }

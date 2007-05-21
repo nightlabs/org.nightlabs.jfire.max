@@ -38,28 +38,28 @@ import org.nightlabs.jfire.trade.LegalEntity;
  *		  PARAMETERS String parentProductTypeOrganisationID, String parentProductTypeProductTypeID
  *		  import java.lang.String"
  */
-public class SwiftProductType
+public class DynamicProductType
 extends ProductType
 {
 	private static final long serialVersionUID = 1L;
 
 	/**
-	 * Note, that this method does only return instances of {@link SwiftProductType} while
+	 * Note, that this method does only return instances of {@link DynamicProductType} while
 	 * the same-named method {@link ProductType#getChildProductTypes(PersistenceManager, ProductTypeID)}
 	 * returns all types inherited from {@link ProductType}.
 	 *
 	 * @param pm The <tt>PersistenceManager</tt> that should be used to access the datastore.
-	 * @param parentProductTypeID The <tt>ProductType</tt> of which to find all children or <tt>null</tt> to find all top-level-<tt>SwiftProductType</tt>s.
-	 * @return Returns instances of <tt>SwiftProductType</tt>.
+	 * @param parentProductTypeID The <tt>ProductType</tt> of which to find all children or <tt>null</tt> to find all top-level-<tt>DynamicProductType</tt>s.
+	 * @return Returns instances of <tt>DynamicProductType</tt>.
 	 */
 	public static Collection getChildProductTypes(PersistenceManager pm, ProductTypeID parentProductTypeID)
 	{
 		if (parentProductTypeID == null) {
-			Query q = pm.newNamedQuery(SwiftProductType.class, "getChildProductTypes_topLevel");
+			Query q = pm.newNamedQuery(DynamicProductType.class, "getChildProductTypes_topLevel");
 			return (Collection)q.execute();
 		}
 
-		Query q = pm.newNamedQuery(SwiftProductType.class, "getChildProductTypes_hasParent");
+		Query q = pm.newNamedQuery(DynamicProductType.class, "getChildProductTypes_hasParent");
 		return (Collection) q.execute(
 			parentProductTypeID.organisationID, parentProductTypeID.productTypeID);
 	}
@@ -67,9 +67,9 @@ extends ProductType
 	/**
 	 * @deprecated Only for JDO!
 	 */
-	protected SwiftProductType() { }
+	protected DynamicProductType() { }
 
-	public SwiftProductType(
+	public DynamicProductType(
 			String organisationID, String productTypeID,
 			ProductType extendedProductType, LegalEntity owner,
 			byte inheritanceNature,

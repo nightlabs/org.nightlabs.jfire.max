@@ -33,23 +33,23 @@ import org.nightlabs.jfire.transfer.id.AnchorID;
  *
  * @jdo.inheritance strategy="superclass-table"
  */
-public class SwiftProductTypeActionHandler
+public class DynamicProductTypeActionHandler
 		extends ProductTypeActionHandler
 {
 	/**
 	 * This is the {@link org.nightlabs.jfire.transfer.Anchor#getAnchorID()} of
 	 * the {@link Repository} which becomes the factory-output-repository for all
-	 * newly created {@link SwiftProduct}s.
+	 * newly created {@link DynamicProduct}s.
 	 */
-	public static final String ANCHOR_ID_REPOSITORY_HOME_LOCAL = SwiftProductType.class.getName() + ".local";
+	public static final String ANCHOR_ID_REPOSITORY_HOME_LOCAL = DynamicProductType.class.getName() + ".local";
 
 //	/**
 //	 * This is the {@link org.nightlabs.jfire.transfer.Anchor#getAnchorID()} of
 //	 * the {@link Repository} which is used for products that are bought from a foreign organisation.
 //	 */
-//	public static final String ANCHOR_ID_REPOSITORY_HOME_FOREIGN = SwiftProductType.class.getName() + ".foreign";
+//	public static final String ANCHOR_ID_REPOSITORY_HOME_FOREIGN = DynamicProductType.class.getName() + ".foreign";
 
-	public static Repository getDefaultHome(PersistenceManager pm, SwiftProductType simpleProductType)
+	public static Repository getDefaultHome(PersistenceManager pm, DynamicProductType simpleProductType)
 	{
 		Store store = Store.getStore(pm);
 		if (store.getOrganisationID().equals(simpleProductType.getOrganisationID()))
@@ -119,12 +119,12 @@ public class SwiftProductTypeActionHandler
 	/**
 	 * @deprecated Only for JDO!
 	 */
-	protected SwiftProductTypeActionHandler() { }
+	protected DynamicProductTypeActionHandler() { }
 
 	/**
 	 * @see ProductTypeActionHandler#ProductTypeActionHandler(String, String, Class)
 	 */
-	public SwiftProductTypeActionHandler(String organisationID,
+	public DynamicProductTypeActionHandler(String organisationID,
 			String productTypeActionHandlerID, Class productTypeClass)
 	{
 		super(organisationID, productTypeActionHandlerID, productTypeClass);
@@ -135,35 +135,35 @@ public class SwiftProductTypeActionHandler
 	public Collection<? extends Product> findProducts(User user,
 			ProductType productType, NestedProductType nestedProductType, ProductLocator productLocator)
 	{
-		SwiftProductType spt = (SwiftProductType) productType;
+		DynamicProductType spt = (DynamicProductType) productType;
 		PersistenceManager pm = getPersistenceManager();
 		Store store = Store.getStore(pm);
 		ArrayList res = new ArrayList();
 		int qty = nestedProductType == null ? 1 : nestedProductType.getQuantity();
 		for (int i = 0; i < qty; ++i) {
-			SwiftProduct product = new SwiftProduct(spt, SwiftProduct.createProductID());
-			product = (SwiftProduct) store.addProduct(user, product, (Repository)spt.getProductTypeLocal().getHome());
+			DynamicProduct product = new DynamicProduct(spt, DynamicProduct.createProductID());
+			product = (DynamicProduct) store.addProduct(user, product, (Repository)spt.getProductTypeLocal().getHome());
 			res.add(product);
 		}
 		return res;
-//		SwiftProductType spt = (SwiftProductType) productType;
+//		DynamicProductType spt = (DynamicProductType) productType;
 //		SwiftProductTypeLocal sptl = (SwiftProductTypeLocal) productType.getProductTypeLocal();
 //		int qty = nestedProductType == null ? 1 : nestedProductType.getQuantity();
 //		PersistenceManager pm = getPersistenceManager();
 //
 //		Store store = Store.getStore(pm);
 //		// search for an available product
-//		Query q = pm.newQuery(SwiftProduct.class);
+//		Query q = pm.newQuery(DynamicProduct.class);
 //		q.setFilter("productType == pProductType && productLocal.available");
-//		q.declareParameters("SwiftProductType pProductType");
-//		q.declareImports("import " + SwiftProductType.class.getName());
+//		q.declareParameters("DynamicProductType pProductType");
+//		q.declareImports("import " + DynamicProductType.class.getName());
 //		Collection availableProducts = (Collection) q.execute(this); // Product.getProducts(pm, this, ProductStatus.STATUS_AVAILABLE);
 //		ArrayList res = new ArrayList();
 //		Iterator iteratorAvailableProducts = availableProducts.iterator();
 //		for (int i = 0; i < qty; ++i) {
-//			SwiftProduct product = null;
+//			DynamicProduct product = null;
 //			if (iteratorAvailableProducts.hasNext()) {
-//				product = (SwiftProduct) iteratorAvailableProducts.next();
+//				product = (DynamicProduct) iteratorAvailableProducts.next();
 //				res.add(product);
 //			}
 //			else {
@@ -171,10 +171,10 @@ public class SwiftProductTypeActionHandler
 //				if (productType.getOrganisationID().equals(store.getOrganisationID())) {
 //					long createdProductCount = sptl.getCreatedProductCount();
 //					if (sptl.getMaxProductCount() < 0 || createdProductCount + 1 <= sptl.getMaxProductCount()) {
-//						product = new SwiftProduct(spt, SwiftProduct.createProductID());
+//						product = new DynamicProduct(spt, DynamicProduct.createProductID());
 //						sptl.setCreatedProductCount(createdProductCount + 1);
 //
-//						product = (SwiftProduct) store.addProduct(user, product, (Repository)spt.getProductTypeLocal().getHome());
+//						product = (DynamicProduct) store.addProduct(user, product, (Repository)spt.getProductTypeLocal().getHome());
 //						res.add(product);
 //					}
 //				} // This productType is factored by this organisation

@@ -109,7 +109,7 @@ extends ProductType
 	// ******************************
 	// /// *** begin inheritance *** ///
 	@Override
-	public FieldMetaData getFieldMetaData(String fieldName)
+	public FieldMetaData getFieldMetaData(String fieldName, boolean createMissingMetaData)
 	{
 		if ("packagePriceConfig".equals(fieldName)) { // this is normally not inheritable as it usually stores per-ProductType-data, but for the VoucherType it is
 			ProductTypeFieldMetaData fmd = fieldMetaDataMap.get(fieldName);
@@ -120,7 +120,7 @@ extends ProductType
 			return fmd;
 		}
 
-		return super.getFieldMetaData(fieldName);
+		return super.getFieldMetaData(fieldName, createMissingMetaData);
 	}
 
 //	@Override

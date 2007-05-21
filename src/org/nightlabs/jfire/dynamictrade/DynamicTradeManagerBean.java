@@ -270,7 +270,7 @@ implements SessionBean
 	 * @ejb.permission role-name="_Guest_"
 	 */
 	@SuppressWarnings("unchecked")
-	public Collection<DynamicTradePriceConfig> storeDynamicPriceConfigs(Collection<DynamicTradePriceConfig> priceConfigs, boolean get, ProductTypeID productTypeID, PriceConfigID innerPriceConfigID)
+	public Collection<DynamicTradePriceConfig> storeDynamicTradePriceConfigs(Collection<DynamicTradePriceConfig> priceConfigs, boolean get, ProductTypeID productTypeID, PriceConfigID innerPriceConfigID)
 	throws PriceCalculationException
 	{
 		PersistenceManager pm = getPersistenceManager();
@@ -308,7 +308,7 @@ implements SessionBean
 	 * @ejb.permission role-name="_Guest_"
 	 * @ejb.transaction type="Supports"
 	 */
-	public Set<PriceConfigID> getDynamicPriceConfigIDs()
+	public Set<PriceConfigID> getDynamicTradePriceConfigIDs()
 	{
 		PersistenceManager pm = getPersistenceManager();
 		try {
@@ -326,11 +326,11 @@ implements SessionBean
 	 * @ejb.transaction type="Supports"
 	 */
 	@SuppressWarnings("unchecked")
-	public List<DynamicTradePriceConfig> getDynamicPriceConfigs(Collection<PriceConfigID> dynamicPriceConfigIDs, String[] fetchGroups, int maxFetchDepth)
+	public List<DynamicTradePriceConfig> getDynamicTradePriceConfigs(Collection<PriceConfigID> dynamicTradePriceConfigIDs, String[] fetchGroups, int maxFetchDepth)
 	{
 		PersistenceManager pm = getPersistenceManager();
 		try {
-			return NLJDOHelper.getDetachedObjectList(pm, dynamicPriceConfigIDs, DynamicTradePriceConfig.class, fetchGroups, maxFetchDepth);
+			return NLJDOHelper.getDetachedObjectList(pm, dynamicTradePriceConfigIDs, DynamicTradePriceConfig.class, fetchGroups, maxFetchDepth);
 		} finally {
 			pm.close();
 		}

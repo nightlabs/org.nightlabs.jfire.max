@@ -291,7 +291,10 @@ implements SessionBean
 			if (productTypeID != null && innerPriceConfigID != null) {
 				ProductType pt = (ProductType) pm.getObjectById(productTypeID);
 				IInnerPriceConfig pc = (IInnerPriceConfig) pm.getObjectById(innerPriceConfigID);
-				pt.setInnerPriceConfig(pc);
+				if (!pc.equals(pt.getInnerPriceConfig())) {
+					pt.setInnerPriceConfig(pc);
+					pt.applyInheritance();
+				}
 			}
 
 			if (get)

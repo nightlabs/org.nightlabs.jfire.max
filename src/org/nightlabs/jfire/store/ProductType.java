@@ -930,7 +930,11 @@ implements
 	 * And please update the javadoc, if you encounter differences!
 	 * </p>
 	 */
-	public org.nightlabs.inheritance.FieldMetaData getFieldMetaData(String fieldName)
+	public final org.nightlabs.inheritance.FieldMetaData getFieldMetaData(String fieldName)
+	{
+		return getFieldMetaData(fieldName, true);
+	}
+	public org.nightlabs.inheritance.FieldMetaData getFieldMetaData(String fieldName, boolean createMissingMetaData)
 	{
 		if (isClosed())
 			return null;
@@ -970,7 +974,7 @@ implements
 		}
 
 		ProductTypeFieldMetaData fmd = fieldMetaDataMap.get(fieldName);
-		if (fmd == null) {
+		if (fmd == null && createMissingMetaData) {
 			if ("nestedProductTypes".equals(fieldName))
 				fmd = new ProductTypeMapFieldMetaData(this, fieldName);
 			else

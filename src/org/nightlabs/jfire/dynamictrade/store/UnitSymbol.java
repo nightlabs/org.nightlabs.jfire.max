@@ -24,7 +24,7 @@
  *                                                                             *
  ******************************************************************************/
 
-package org.nightlabs.jfire.swifttrade.store;
+package org.nightlabs.jfire.dynamictrade.store;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -38,17 +38,17 @@ import org.nightlabs.i18n.I18nText;
  * 
  * @jdo.persistence-capable
  *		identity-type="application"
- *		objectid-class="org.nightlabs.jfire.swifttrade.store.id.SwiftProductNameID"
+ *		objectid-class="org.nightlabs.jfire.dynamictrade.store.id.UnitSymbolID"
  *		detachable="true"
- *		table="JFireSwiftTrade_SwiftProductName"
+ *		table="JFireSwiftTrade_UnitSymbol"
  *
  * @jdo.inheritance strategy="new-table"
  *
- * @jdo.create-objectid-class field-order="organisationID, productID"
+ * @jdo.create-objectid-class field-order="organisationID, unitID"
  *
- * @jdo.fetch-group name="SwiftProduct.name" fields="swiftProduct, names"
+ * @jdo.fetch-group name="Unit.symbol" fields="unit, names"
  */
-public class SwiftProductName
+public class UnitSymbol
 extends I18nText
 {
 	private static final long serialVersionUID = 1L;
@@ -62,12 +62,12 @@ extends I18nText
 	/**
 	 * @jdo.field primary-key="true"
 	 */
-	private long productID;
-	
+	private long unitID;
+
 	/**
 	 * @jdo.field persistence-modifier="persistent"
 	 */
-	private SwiftProduct swiftProduct;
+	private Unit unit;
 
 	/**
 	 * key: String languageID<br/>
@@ -78,7 +78,7 @@ extends I18nText
 	 *		collection-type="map"
 	 *		key-type="java.lang.String"
 	 *		value-type="java.lang.String"
-	 *		table="JFireSwiftTrade_SwiftProductName_names"
+	 *		table="JFireSwiftTrade_UnitSymbol_names"
 	 *
 	 * @jdo.join
 	 */
@@ -87,15 +87,15 @@ extends I18nText
 	/**
 	 * @deprecated Only for JDO!
 	 */
-	protected SwiftProductName()
+	protected UnitSymbol()
 	{
 	}
 
-	public SwiftProductName(SwiftProduct swiftProduct)
+	public UnitSymbol(Unit unit)
 	{
-		this.swiftProduct = swiftProduct;
-		this.organisationID = swiftProduct.getOrganisationID();
-		this.productID = swiftProduct.getProductID();
+		this.unit = unit;
+		this.organisationID = unit.getOrganisationID();
+		this.unitID = unit.getUnitID();
 	}
 
 	@Implement
@@ -107,7 +107,7 @@ extends I18nText
 	@Implement
 	protected String getFallBackValue(String languageID)
 	{
-		return SwiftProduct.getPrimaryKey(organisationID, productID);
+		return String.valueOf(unitID);
 	}
 
 	/**
@@ -118,13 +118,13 @@ extends I18nText
 		return organisationID;
 	}
 
-	public long getProductID()
+	public long getUnitID()
 	{
-		return productID;
+		return unitID;
 	}
 
-	public SwiftProduct getSwiftProduct()
+	public Unit getUnit()
 	{
-		return swiftProduct;
+		return unit;
 	}
 }

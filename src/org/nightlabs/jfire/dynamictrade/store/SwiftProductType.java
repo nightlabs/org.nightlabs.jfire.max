@@ -1,4 +1,4 @@
-package org.nightlabs.jfire.swifttrade.store;
+package org.nightlabs.jfire.dynamictrade.store;
 
 import java.util.Collection;
 

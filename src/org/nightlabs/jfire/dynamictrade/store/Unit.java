@@ -1,4 +1,4 @@
-package org.nightlabs.jfire.swifttrade.store;
+package org.nightlabs.jfire.dynamictrade.store;
 
 import java.io.Serializable;
 
@@ -11,7 +11,7 @@ import org.nightlabs.jdo.ObjectIDUtil;
  *
  * @jdo.persistence-capable
  *		identity-type="application"
- *		objectid-class="org.nightlabs.jfire.swifttrade.store.id.UnitID"
+ *		objectid-class="org.nightlabs.jfire.dynamictrade.store.id.UnitID"
  *		detachable="true"
  *		table="JFireSwiftTrade_Unit"
  *

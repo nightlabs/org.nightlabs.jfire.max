@@ -24,7 +24,7 @@
  *                                                                             *
  ******************************************************************************/
 
-package org.nightlabs.jfire.swifttrade.store;
+package org.nightlabs.jfire.dynamictrade.store;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -38,17 +38,17 @@ import org.nightlabs.i18n.I18nText;
  * 
  * @jdo.persistence-capable
  *		identity-type="application"
- *		objectid-class="org.nightlabs.jfire.swifttrade.store.id.UnitSymbolID"
+ *		objectid-class="org.nightlabs.jfire.dynamictrade.store.id.UnitNameID"
  *		detachable="true"
- *		table="JFireSwiftTrade_UnitSymbol"
+ *		table="JFireSwiftTrade_UnitName"
  *
  * @jdo.inheritance strategy="new-table"
  *
  * @jdo.create-objectid-class field-order="organisationID, unitID"
  *
- * @jdo.fetch-group name="Unit.symbol" fields="unit, names"
+ * @jdo.fetch-group name="Unit.name" fields="unit, names"
  */
-public class UnitSymbol
+public class UnitName
 extends I18nText
 {
 	private static final long serialVersionUID = 1L;
@@ -78,7 +78,7 @@ extends I18nText
 	 *		collection-type="map"
 	 *		key-type="java.lang.String"
 	 *		value-type="java.lang.String"
-	 *		table="JFireSwiftTrade_UnitSymbol_names"
+	 *		table="JFireSwiftTrade_UnitName_names"
 	 *
 	 * @jdo.join
 	 */
@@ -87,11 +87,11 @@ extends I18nText
 	/**
 	 * @deprecated Only for JDO!
 	 */
-	protected UnitSymbol()
+	protected UnitName()
 	{
 	}
 
-	public UnitSymbol(Unit unit)
+	public UnitName(Unit unit)
 	{
 		this.unit = unit;
 		this.organisationID = unit.getOrganisationID();

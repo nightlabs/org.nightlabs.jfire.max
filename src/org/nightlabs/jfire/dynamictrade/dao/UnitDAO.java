@@ -1,4 +1,4 @@
-package org.nightlabs.jfire.swifttrade.dao;
+package org.nightlabs.jfire.dynamictrade.dao;
 
 import java.util.Collection;
 import java.util.List;
@@ -6,10 +6,10 @@ import java.util.Set;
 
 import org.nightlabs.annotation.Implement;
 import org.nightlabs.jfire.base.jdo.BaseJDOObjectDAO;
+import org.nightlabs.jfire.dynamictrade.store.Unit;
 import org.nightlabs.jfire.security.SecurityReflector;
 import org.nightlabs.jfire.swifttrade.SwiftTradeManager;
 import org.nightlabs.jfire.swifttrade.SwiftTradeManagerUtil;
-import org.nightlabs.jfire.swifttrade.store.Unit;
 import org.nightlabs.jfire.swifttrade.store.id.UnitID;
 import org.nightlabs.progress.ProgressMonitor;
 

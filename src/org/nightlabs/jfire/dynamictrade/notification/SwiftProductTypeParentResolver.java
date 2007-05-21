@@ -1,10 +1,10 @@
-package org.nightlabs.jfire.swifttrade.notification;
+package org.nightlabs.jfire.dynamictrade.notification;
 
 import javax.jdo.JDOHelper;
 
 import org.nightlabs.jdo.ObjectID;
+import org.nightlabs.jfire.dynamictrade.store.SwiftProductType;
 import org.nightlabs.jfire.jdo.notification.TreeNodeParentResolver;
-import org.nightlabs.jfire.swifttrade.store.SwiftProductType;
 
 public class SwiftProductTypeParentResolver
 implements TreeNodeParentResolver

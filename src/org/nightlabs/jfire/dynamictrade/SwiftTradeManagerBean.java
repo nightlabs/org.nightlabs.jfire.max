@@ -1,4 +1,4 @@
-package org.nightlabs.jfire.swifttrade;
+package org.nightlabs.jfire.dynamictrade;
 
 import java.rmi.RemoteException;
 import java.util.Collection;
@@ -23,16 +23,16 @@ import org.nightlabs.jfire.accounting.priceconfig.FetchGroupsPriceConfig;
 import org.nightlabs.jfire.accounting.priceconfig.IInnerPriceConfig;
 import org.nightlabs.jfire.accounting.priceconfig.id.PriceConfigID;
 import org.nightlabs.jfire.base.BaseSessionBeanImpl;
+import org.nightlabs.jfire.dynamictrade.accounting.priceconfig.SwiftPriceConfig;
+import org.nightlabs.jfire.dynamictrade.store.SwiftProductType;
+import org.nightlabs.jfire.dynamictrade.store.SwiftProductTypeActionHandler;
+import org.nightlabs.jfire.dynamictrade.store.Unit;
 import org.nightlabs.jfire.idgenerator.IDGenerator;
 import org.nightlabs.jfire.organisation.LocalOrganisation;
 import org.nightlabs.jfire.security.User;
 import org.nightlabs.jfire.store.ProductType;
 import org.nightlabs.jfire.store.Store;
 import org.nightlabs.jfire.store.id.ProductTypeID;
-import org.nightlabs.jfire.swifttrade.accounting.priceconfig.SwiftPriceConfig;
-import org.nightlabs.jfire.swifttrade.store.SwiftProductType;
-import org.nightlabs.jfire.swifttrade.store.SwiftProductTypeActionHandler;
-import org.nightlabs.jfire.swifttrade.store.Unit;
 import org.nightlabs.jfire.swifttrade.store.id.UnitID;
 
 /**

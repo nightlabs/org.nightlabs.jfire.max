@@ -1,13 +1,13 @@
-package org.nightlabs.jfire.swifttrade.store;
+package org.nightlabs.jfire.dynamictrade.store;
 
 import org.nightlabs.annotation.Implement;
 import org.nightlabs.jfire.accounting.Price;
+import org.nightlabs.jfire.dynamictrade.accounting.priceconfig.SwiftPriceConfig;
 import org.nightlabs.jfire.security.User;
 import org.nightlabs.jfire.store.NestedProductType;
 import org.nightlabs.jfire.store.Product;
 import org.nightlabs.jfire.store.ProductLocator;
 import org.nightlabs.jfire.store.ProductType;
-import org.nightlabs.jfire.swifttrade.accounting.priceconfig.SwiftPriceConfig;
 import org.nightlabs.jfire.trade.Article;
 import org.nightlabs.jfire.trade.ArticlePrice;
 

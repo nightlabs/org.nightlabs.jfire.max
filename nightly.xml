@@ -2,13 +2,13 @@
 <!DOCTYPE nightlybuild PUBLIC "-//NightLabs//DTD NightlyBuild V 0.13//EN" "http://www.nightlabs.de/dtd/nightlybuild_0_13.dtd">
 <nightlybuild>
 
-	<project name="JFireSwiftTrade">
-		<ant path="JFireSwiftTrade" file="build-nightlabs.xml" target="deploy" />
+	<project name="JFireDynamicTrade">
+		<ant path="JFireDynamicTrade" file="build-nightlabs.xml" target="deploy" />
 		<requires />
 		<provides />
-		<publishes location="JFireSwiftTrade/dist/JFireSwiftTrade.jar" />
-		<javadoc path="JFireSwiftTrade/src" />
-		<javadoc path="JFireSwiftTrade/ejbsrc" />
+		<publishes location="JFireDynamicTrade/dist/JFireDynamicTrade.jar" />
+		<javadoc path="JFireDynamicTrade/src" />
+		<javadoc path="JFireDynamicTrade/ejbsrc" />
 	</project>
 
 </nightlybuild>

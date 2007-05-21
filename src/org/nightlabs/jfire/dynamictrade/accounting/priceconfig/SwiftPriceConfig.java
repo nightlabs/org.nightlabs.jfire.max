@@ -1,4 +1,4 @@
-package org.nightlabs.jfire.swifttrade.accounting.priceconfig;
+package org.nightlabs.jfire.dynamictrade.accounting.priceconfig;
 
 import java.util.Collections;
 import java.util.HashSet;

@@ -32,6 +32,7 @@ import javax.jdo.PersistenceManager;
 import javax.jdo.Query;
 
 import org.nightlabs.annotation.Implement;
+import org.nightlabs.inheritance.FieldMetaData;
 import org.nightlabs.jfire.accounting.TariffMapper;
 import org.nightlabs.jfire.accounting.gridpriceconfig.PriceCalculationException;
 import org.nightlabs.jfire.accounting.gridpriceconfig.PriceCalculator;
@@ -177,6 +178,15 @@ public class SimpleProductType extends ProductType
 	 */
 	public Property getPropertySet() {
 		return propertySet;
+	}
+
+	@Override
+	public FieldMetaData getFieldMetaData(String fieldName, boolean createMissingMetaData)
+	{
+		if ("packagePriceConfig".equals(fieldName))
+			return null;
+
+		return super.getFieldMetaData(fieldName, createMissingMetaData);
 	}
 	
 //	/**

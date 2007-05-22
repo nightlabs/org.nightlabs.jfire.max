@@ -17,13 +17,20 @@ import javax.jdo.JDOObjectNotFoundException;
 import javax.jdo.PersistenceManager;
 import javax.jdo.Query;
 
+import org.nightlabs.ModuleException;
+import org.nightlabs.i18n.I18nText;
 import org.nightlabs.jdo.NLJDOHelper;
+import org.nightlabs.jfire.accounting.Price;
+import org.nightlabs.jfire.accounting.Tariff;
 import org.nightlabs.jfire.accounting.gridpriceconfig.PriceCalculationException;
+import org.nightlabs.jfire.accounting.id.TariffID;
 import org.nightlabs.jfire.accounting.priceconfig.FetchGroupsPriceConfig;
 import org.nightlabs.jfire.accounting.priceconfig.IInnerPriceConfig;
 import org.nightlabs.jfire.accounting.priceconfig.id.PriceConfigID;
 import org.nightlabs.jfire.base.BaseSessionBeanImpl;
 import org.nightlabs.jfire.dynamictrade.accounting.priceconfig.DynamicTradePriceConfig;
+import org.nightlabs.jfire.dynamictrade.accounting.priceconfig.PackagePriceConfig;
+import org.nightlabs.jfire.dynamictrade.store.DynamicProduct;
 import org.nightlabs.jfire.dynamictrade.store.DynamicProductType;
 import org.nightlabs.jfire.dynamictrade.store.DynamicProductTypeActionHandler;
 import org.nightlabs.jfire.dynamictrade.store.Unit;
@@ -34,6 +41,14 @@ import org.nightlabs.jfire.security.User;
 import org.nightlabs.jfire.store.ProductType;
 import org.nightlabs.jfire.store.Store;
 import org.nightlabs.jfire.store.id.ProductTypeID;
+import org.nightlabs.jfire.trade.Article;
+import org.nightlabs.jfire.trade.ArticleCreator;
+import org.nightlabs.jfire.trade.Offer;
+import org.nightlabs.jfire.trade.Order;
+import org.nightlabs.jfire.trade.Segment;
+import org.nightlabs.jfire.trade.Trader;
+import org.nightlabs.jfire.trade.id.OfferID;
+import org.nightlabs.jfire.trade.id.SegmentID;
 
 /**
  * @ejb.bean name="jfire/ejb/JFireDynamicTrade/DynamicTradeManager"	
@@ -98,7 +113,10 @@ implements SessionBean
 						ProductType.INHERITANCE_NATURE_BRANCH,
 						ProductType.PACKAGE_NATURE_OUTER);
 				root.getName().setText(Locale.ENGLISH.getLanguage(), LocalOrganisation.getLocalOrganisation(pm).getOrganisation().getPerson().getDisplayName());
-				store.addProductType(user, root, DynamicProductTypeActionHandler.getDefaultHome(pm, root));
+				root = (DynamicProductType) store.addProductType(user, root, DynamicProductTypeActionHandler.getDefaultHome(pm, root));
+				root.setPackagePriceConfig(PackagePriceConfig.getPackagePriceConfig(pm));
+				// TODO we need a DeliveryConfiguration!
+//				root.setDeliveryConfiguration(deliveryConfiguration);
 				store.setProductTypeStatus_published(user, root);
 			}
 
@@ -368,6 +386,96 @@ implements SessionBean
 		PersistenceManager pm = getPersistenceManager();
 		try {
 			return NLJDOHelper.getDetachedObjectList(pm, unitIDs, Unit.class, fetchGroups, maxFetchDepth);
+		} finally {
+			pm.close();
+		}
+	}
+
+	/**
+	 * @ejb.interface-method
+	 * @ejb.permission role-name="_Guest_"
+	 * @ejb.transaction type = "Required"
+	 */
+	public Article createArticle(
+			SegmentID segmentID,
+			OfferID offerID,
+			ProductTypeID productTypeID,
+			double quantity,
+			TariffID tariffID,
+			I18nText productName,
+			Price singlePrice,
+			boolean allocate,
+			boolean allocateSynchronously,
+			String[] fetchGroups, int maxFetchDepth)
+	throws ModuleException
+	{
+		if (segmentID == null)     throw new IllegalArgumentException("segmentID must not be null!");
+		// offerID can be null
+		if (productTypeID == null) throw new IllegalArgumentException("productTypeID must not be null!");
+		// quantity can be everything
+		if (tariffID == null)      throw new IllegalArgumentException("tariffID must not be null!");
+		if (productName == null)   throw new IllegalArgumentException("productName must not be null!");
+		if (singlePrice == null)   throw new IllegalArgumentException("singlePrice must not be null!");
+
+		PersistenceManager pm = getPersistenceManager();
+		try {
+			Trader trader = Trader.getTrader(pm);
+			Store store = Store.getStore(pm);
+			Segment segment = (Segment) pm.getObjectById(segmentID);
+			Order order = segment.getOrder();
+
+			User user = User.getUser(pm, getPrincipal());
+
+			pm.getExtent(DynamicProductType.class);
+			ProductType pt = (ProductType) pm.getObjectById(productTypeID);
+			if (!(pt instanceof DynamicProductType))
+				throw new IllegalArgumentException("productTypeID \""+productTypeID+"\" specifies a ProductType of type \""+pt.getClass().getName()+"\", but must be \""+DynamicProductType.class.getName()+"\"!");
+
+			DynamicProductType productType = (DynamicProductType)pt;
+
+			Tariff tariff = (Tariff) pm.getObjectById(tariffID);
+
+			// find an Offer within the Order which is not finalized - or create one
+			Offer offer;
+			if (offerID == null) {
+				Collection offers = Offer.getNonFinalizedOffers(pm, order);
+				if (!offers.isEmpty()) {
+					offer = (Offer) offers.iterator().next();
+				}
+				else {
+					offer = trader.createOffer(user, order, null); // TODO offerIDPrefix ???
+				}
+			}
+			else {
+				pm.getExtent(Offer.class);
+				offer = (Offer) pm.getObjectById(offerID);
+			}
+
+			// find / create Products
+			Collection products = store.findProducts(user, productType, null, null); // we create exactly one => no NestedProductType needed
+			if (products.size() != 1)
+				throw new IllegalStateException("store.findProducts(...) created " + products.size() + " instead of exactly 1 product!");
+
+			DynamicProduct product = (DynamicProduct) products.iterator().next();
+			product.setSinglePrice(singlePrice);
+			product.getName().copyFrom(productName);
+			product.setQuantity(quantity);
+
+			Collection articles = trader.createArticles(
+					user, offer, segment,
+					products,
+					new ArticleCreator(tariff),
+					allocate, allocateSynchronously, true);
+
+			if (articles.size() != 1)
+				throw new IllegalStateException("trader.createArticles(...) created " + articles.size() + " instead of exactly 1 article!");
+
+			pm.getFetchPlan().setDetachmentOptions(FetchPlan.DETACH_LOAD_FIELDS | FetchPlan.DETACH_UNLOAD_FIELDS);
+			pm.getFetchPlan().setMaxFetchDepth(maxFetchDepth);
+			if (fetchGroups != null)
+				pm.getFetchPlan().setGroups(fetchGroups);
+
+			return (Article) pm.detachCopy(articles.iterator().next());
 		} finally {
 			pm.close();
 		}

@@ -1,0 +1,109 @@
+package org.nightlabs.jfire.dynamictrade.accounting.priceconfig;
+
+import java.util.Iterator;
+import java.util.LinkedList;
+
+import javax.jdo.PersistenceManager;
+
+import org.nightlabs.annotation.Implement;
+import org.nightlabs.jfire.accounting.Price;
+import org.nightlabs.jfire.accounting.PriceFragment;
+import org.nightlabs.jfire.accounting.priceconfig.IPackagePriceConfig;
+import org.nightlabs.jfire.accounting.priceconfig.PriceConfig;
+import org.nightlabs.jfire.dynamictrade.store.DynamicProduct;
+import org.nightlabs.jfire.idgenerator.IDGenerator;
+import org.nightlabs.jfire.store.NestedProductType;
+import org.nightlabs.jfire.store.Product;
+import org.nightlabs.jfire.trade.Article;
+import org.nightlabs.jfire.trade.ArticlePrice;
+
+/**
+ * @author Marco Schulze - marco at nightlabs dot de
+ *
+ * @jdo.persistence-capable
+ *		identity-type="application"
+ *		persistence-capable-superclass="org.nightlabs.jfire.accounting.priceconfig.PriceConfig"
+ *		detachable="true"
+ *
+ * @jdo.inheritance strategy="superclass-table"
+ */
+public class PackagePriceConfig
+extends PriceConfig
+implements IPackagePriceConfig
+{
+	private static final long serialVersionUID = 1L;
+
+	public static PackagePriceConfig getPackagePriceConfig(PersistenceManager pm)
+	{
+		Iterator it = pm.getExtent(PackagePriceConfig.class, false).iterator();
+		if (it.hasNext())
+			return (PackagePriceConfig) it.next();
+
+		PackagePriceConfig packagePriceConfig = new PackagePriceConfig(IDGenerator.getOrganisationID(), IDGenerator.nextID(PriceConfig.class));
+		return (PackagePriceConfig) pm.makePersistent(packagePriceConfig);
+	}
+
+	public PackagePriceConfig(String organisationID, long priceConfigID)
+	{
+		super(organisationID, priceConfigID);
+	}
+
+	@Implement
+	public ArticlePrice createArticlePrice(Article article)
+	{
+		DynamicProduct dynamicProduct = (DynamicProduct) article.getProduct();
+		Price singlePrice = dynamicProduct.getSinglePrice();
+		long priceID = PriceConfig.createPriceID(singlePrice.getOrganisationID(), singlePrice.getPriceConfigID());
+		ArticlePrice articlePrice = new ArticlePrice(
+				article, singlePrice,
+				singlePrice.getOrganisationID(), singlePrice.getPriceConfigID(), priceID,
+				false);
+		for (Iterator it = articlePrice.getFragments().iterator(); it.hasNext(); ) {
+			PriceFragment pf = (PriceFragment) it.next();
+			articlePrice.setAmount(pf.getPriceFragmentType(), (long) (pf.getAmount() * dynamicProduct.getQuantity()));
+		}
+		return articlePrice;
+	}
+
+	@Implement
+	public boolean isDependentOnOffer()
+	{
+		return false;
+	}
+
+	@Implement
+	public boolean requiresProductTypePackageInternal()
+	{
+		return false;
+	}
+
+	@Implement
+	public ArticlePrice createNestedArticlePrice(
+			IPackagePriceConfig topLevelPriceConfig, Article article,
+			LinkedList priceConfigStack, ArticlePrice topLevelArticlePrice,
+			ArticlePrice nextLevelArticlePrice, LinkedList articlePriceStack,
+			NestedProductType nestedProductType, LinkedList nestedProductTypeStack)
+	{
+		throw new UnsupportedOperationException("There should be nothing nested?!");
+	}
+
+	@Implement
+	public ArticlePrice createNestedArticlePrice(
+			IPackagePriceConfig topLevelPriceConfig, Article article,
+			LinkedList priceConfigStack, ArticlePrice topLevelArticlePrice,
+			ArticlePrice nextLevelArticlePrice, LinkedList articlePriceStack,
+			NestedProductType nestedProductType, LinkedList nestedProductTypeStack,
+			Product nestedProduct, LinkedList productStack)
+	{
+//		if (nestedProduct.getProductType().equals(article.getProductType()))
+//			return;
+		throw new UnsupportedOperationException("There should be nothing nested?!");
+	}
+
+	@Implement
+	public void fillArticlePrice(Article article)
+	{
+		throw new UnsupportedOperationException("There should be nothing nested?!");
+	}
+
+}

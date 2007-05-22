@@ -1,0 +1,24 @@
+<!DOCTYPE script-category PUBLIC "-//NightLabs//DTD ScriptingInitializer V 1.0//EN" "http://www.nightlabs.de/dtd/scripting-initializer-content_1_0.dtd">
+<script-category 
+	id="InvoceData"
+	type="JFireReporting-Scripting-PropertySet"
+>
+	<name language="de">PropertySet Daten</name>
+	<name language="en">PropertySet data</name>
+
+	<parameter-set>
+		<name language="de">ParameterSet: PropertySet</name>
+		<name language="en">ParameterSet: PropertySet</name>
+		<parameter name="propertyID" type="org.nightlabs.jfire.prop.id.PropertyID"/>			
+	</parameter-set>
+		
+	<script 
+		file="PropertySet.javaclass" 
+		id="PropertySet"
+		resultClass="org.nightlabs.jfire.reporting.oda.ResultSet"
+	>
+		<name language="de">PropertySet</name>
+		<name language="en">PropertySet</name>
+	</script>
+	
+</script-category>

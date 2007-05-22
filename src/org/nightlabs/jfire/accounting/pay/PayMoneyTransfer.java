@@ -76,8 +76,8 @@ import org.nightlabs.jfire.transfer.id.TransferID;
  *				WHERE
  *					this.payment.organisationID == paramOrganisationID &&
  *					this.payment.paymentID == paramPaymentID
- *				PARAMETERS String paramOrganisationID, String paramPaymentID
- *				import java.lang.String"
+ *				PARAMETERS String paramOrganisationID, Long paramPaymentID
+ *				import java.lang.String; import java.lang.Long"
  */
 public class PayMoneyTransfer extends MoneyTransfer
 {

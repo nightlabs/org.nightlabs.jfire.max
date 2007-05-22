@@ -48,7 +48,7 @@ public interface ArticleContainer
 	/**
 	 * @return A <tt>Collection</tt> of {@link Article}
 	 */
-	Collection getArticles();
+	Collection<Article> getArticles();
 
 	/**
 	 * adds an {@link Article} to the ArticleContainer

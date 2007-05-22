@@ -37,6 +37,7 @@ import org.nightlabs.jfire.dynamictrade.store.Unit;
 import org.nightlabs.jfire.dynamictrade.store.id.UnitID;
 import org.nightlabs.jfire.idgenerator.IDGenerator;
 import org.nightlabs.jfire.organisation.LocalOrganisation;
+import org.nightlabs.jfire.organisation.Organisation;
 import org.nightlabs.jfire.security.User;
 import org.nightlabs.jfire.store.ProductType;
 import org.nightlabs.jfire.store.Store;
@@ -119,6 +120,10 @@ implements SessionBean
 //				root.setDeliveryConfiguration(deliveryConfiguration);
 				store.setProductTypeStatus_published(user, root);
 			}
+
+			DynamicProductTypeActionHandler dynamicProductTypeActionHandler = new DynamicProductTypeActionHandler(
+					Organisation.DEVIL_ORGANISATION_ID, DynamicProductTypeActionHandler.class.getName(), DynamicProductType.class);
+			pm.makePersistent(dynamicProductTypeActionHandler);
 
 			Unit unit = new Unit(IDGenerator.getOrganisationID(), IDGenerator.nextID(Unit.class));
 			unit.getSymbol().setText(Locale.ENGLISH.getLanguage(), "h");
@@ -401,6 +406,7 @@ implements SessionBean
 			OfferID offerID,
 			ProductTypeID productTypeID,
 			double quantity,
+			UnitID unitID,
 			TariffID tariffID,
 			I18nText productName,
 			Price singlePrice,
@@ -413,6 +419,7 @@ implements SessionBean
 		// offerID can be null
 		if (productTypeID == null) throw new IllegalArgumentException("productTypeID must not be null!");
 		// quantity can be everything
+		if (unitID == null) throw new IllegalArgumentException("unitID must not be null!");
 		if (tariffID == null)      throw new IllegalArgumentException("tariffID must not be null!");
 		if (productName == null)   throw new IllegalArgumentException("productName must not be null!");
 		if (singlePrice == null)   throw new IllegalArgumentException("singlePrice must not be null!");
@@ -425,6 +432,9 @@ implements SessionBean
 			Order order = segment.getOrder();
 
 			User user = User.getUser(pm, getPrincipal());
+
+			pm.getExtent(Unit.class);
+			Unit unit = (Unit) pm.getObjectById(unitID);
 
 			pm.getExtent(DynamicProductType.class);
 			ProductType pt = (ProductType) pm.getObjectById(productTypeID);
@@ -460,6 +470,7 @@ implements SessionBean
 			product.setSinglePrice(singlePrice);
 			product.getName().copyFrom(productName);
 			product.setQuantity(quantity);
+			product.setUnit(unit);
 
 			Collection articles = trader.createArticles(
 					user, offer, segment,

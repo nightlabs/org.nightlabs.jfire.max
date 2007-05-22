@@ -16,7 +16,7 @@
 	<classpathentry sourcepath="/WORKSPACE/JFireScripting" kind="var" path="WORKSPACE/JFireScripting/dist/JFireScripting.jar"/>
 	<classpathentry sourcepath="/WORKSPACE/JFireSimpleTrade/src" kind="var" path="WORKSPACE/JFireSimpleTrade/dist/JFireSimpleTrade.jar"/>
 	<classpathentry sourcepath="/WORKSPACE/JFireTrade" kind="var" path="WORKSPACE/JFireTrade/dist/JFireTrade.jar"/>
-	<classpathentry sourcepath="JPOX_SRC" kind="var" path="JDO2"/>
+	<classpathentry sourcepath="/JDO2" kind="var" path="JDO2"/>
 	<classpathentry sourcepath="WORKSPACE/JFireBase/src" kind="var" path="WORKSPACE/JFireBase/dist/JFireBase.jar"/>
 	<classpathentry sourcepath="/WORKSPACE/org.nightlabs.base/src" kind="var" path="WORKSPACE/NightLabsBase/dist/NightLabsBase.jar"/>
 	<classpathentry sourcepath="/WORKSPACE/JFireServerManager/src" kind="var" path="WORKSPACE/JFireServerManager/dist/JFireServerManager.jar"/>
@@ -24,5 +24,6 @@
 	<classpathentry kind="var" path="LOG4J"/>
 	<classpathentry kind="lib" path="/JFireReporting/dist/birt/lib/oda.jar"/>
 	<classpathentry sourcepath="/WORKSPACE/JFireReporting" kind="var" path="WORKSPACE/JFireReporting/dist/JFireReporting.jar"/>
+	<classpathentry sourcepath="WORKSPACE/NightLabsJDO/src" kind="var" path="WORKSPACE/NightLabsJDO/dist/NightLabsJDO.jar"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>

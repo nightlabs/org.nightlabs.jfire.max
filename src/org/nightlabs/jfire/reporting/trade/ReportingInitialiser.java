@@ -30,8 +30,8 @@ public class ReportingInitialiser {
 				ReportingTradeConstants.REPORT_REGISTRY_ITEM_TYPE_ROOT, 
 				ReportingTradeConstants.REPORT_REGISTRY_ITEM_ID_CATEGORY_ROOT, true
 			);
-		rootCategory.getName().setText(Locale.ENGLISH.getLanguage(), "JFire Trade Scripting");
-		rootCategory.getName().setText(Locale.GERMAN.getLanguage(), "JFire Trade Scripting");
+		rootCategory.getName().setText(Locale.ENGLISH.getLanguage(), "JFire Trade Reports");
+		rootCategory.getName().setText(Locale.GERMAN.getLanguage(), "JFire Trade Berichte");
 		
 		
 		String j2eeBaseDir = jfireServerManager.getJFireServerConfigModule().getJ2ee().getJ2eeDeployBaseDirectory();

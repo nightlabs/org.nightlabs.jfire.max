@@ -38,7 +38,6 @@ import javax.jdo.PersistenceManager;
 
 import org.apache.log4j.Logger;
 import org.nightlabs.ModuleException;
-import org.nightlabs.jfire.accounting.id.InvoiceID;
 import org.nightlabs.jfire.base.BaseSessionBeanImpl;
 import org.nightlabs.jfire.organisation.Organisation;
 import org.nightlabs.jfire.reporting.ReportingInitialiserException;
@@ -50,6 +49,7 @@ import org.nightlabs.jfire.reporting.parameter.ReportParameterUtil.NameEntry;
 import org.nightlabs.jfire.reporting.parameter.id.ValueProviderCategoryID;
 import org.nightlabs.jfire.servermanager.JFireServerManager;
 import org.nightlabs.jfire.store.id.ProductTypeID;
+import org.nightlabs.jfire.trade.id.ArticleContainerID;
 import org.nightlabs.jfire.transfer.id.AnchorID;
 
 /**
@@ -189,7 +189,7 @@ implements SessionBean
 			);
 		
 		ValueProvider invoiceByCustomer = ReportParameterUtil.createValueProvider(
-				pm, invoiceCategory, ReportingTradeConstants.VALUE_PROVIDER_ID_TRADE_DOCUMENTS_INVOICE_BY_CUSTOMER, InvoiceID.class.getName(),
+				pm, invoiceCategory, ReportingTradeConstants.VALUE_PROVIDER_ID_TRADE_DOCUMENTS_INVOICE_BY_CUSTOMER, ArticleContainerID.class.getName(),
 				new NameEntry[] {new NameEntry(Locale.ENGLISH.getLanguage(), "Invoice of customer")},
 				new NameEntry[] {new NameEntry(Locale.ENGLISH.getLanguage(), "Invoice of customer")},
 				new NameEntry[] {new NameEntry(Locale.ENGLISH.getLanguage(), "Select an invoice")}
@@ -200,7 +200,7 @@ implements SessionBean
 		
 		
 		ValueProvider invoiceByCustomerAndPeriod = ReportParameterUtil.createValueProvider(
-				pm, invoiceCategory, ReportingTradeConstants.VALUE_PROVIDER_ID_TRADE_DOCUMENTS_INVOICE_BY_CUSTOMER_AND_PERIOD, InvoiceID.class.getName(),
+				pm, invoiceCategory, ReportingTradeConstants.VALUE_PROVIDER_ID_TRADE_DOCUMENTS_INVOICE_BY_CUSTOMER_AND_PERIOD, ArticleContainerID.class.getName(),
 				new NameEntry[] {new NameEntry(Locale.ENGLISH.getLanguage(), "Invoice of customer in period")},
 				new NameEntry[] {new NameEntry(Locale.ENGLISH.getLanguage(), "Invoice of customer in period")},
 				new NameEntry[] {new NameEntry(Locale.ENGLISH.getLanguage(), "Select an invoice")}
@@ -213,7 +213,7 @@ implements SessionBean
 		
 		
 		ValueProvider invoiceByArticleType = ReportParameterUtil.createValueProvider(
-				pm, invoiceCategory, ReportingTradeConstants.VALUE_PROVIDER_ID_TRADE_DOCUMENTS_INVOICE_BY_ARTICLE_TYPE, InvoiceID.class.getName(),
+				pm, invoiceCategory, ReportingTradeConstants.VALUE_PROVIDER_ID_TRADE_DOCUMENTS_INVOICE_BY_ARTICLE_TYPE, ArticleContainerID.class.getName(),
 				new NameEntry[] {new NameEntry(Locale.ENGLISH.getLanguage(), "Invoice by article type")},
 				new NameEntry[] {new NameEntry(Locale.ENGLISH.getLanguage(), "Invoice by article type")},
 				new NameEntry[] {new NameEntry(Locale.ENGLISH.getLanguage(), "Select an invoice")}

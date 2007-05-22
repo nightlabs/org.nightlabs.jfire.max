@@ -1057,16 +1057,17 @@ implements
 		}
 
 		// Tobias: This is not necessary anymore when the JDOInheritanceManager is used
+		// hmmm... JDOInheritanceManager doesn't work reliably => we need this! :-( Marco.
 		
 		// access all non-simple fields in order to ensure, they're loaded by JDO
-//		if (deliveryConfiguration == null);
-//		if (innerPriceConfig == null);
-//		if (localAccountantDelegate == null);
-//		if (localStorekeeperDelegate == null);
-//		nestedProductTypes.size();
-//		if (packagePriceConfig == null);
-//		if (owner == null);
-//		name.getI18nMap();
+		if (deliveryConfiguration == null);
+		if (innerPriceConfig == null);
+		if (localAccountantDelegate == null);
+		if (localStorekeeperDelegate == null);
+		nestedProductTypes.size();
+		if (packagePriceConfig == null);
+		if (owner == null);
+		name.getI18nMap();
 	}
 
 	@Implement

@@ -966,7 +966,7 @@ implements
 				nonInheritableFields.add("published");
 				nonInheritableFields.add("saleable");
 				nonInheritableFields.add("selfForVirtualSelfPackaging");
-				nonInheritableFields.add("packagePriceConfig");
+//				nonInheritableFields.add("packagePriceConfig");
 			}
 
 			if (nonInheritableFields.contains(fieldName))

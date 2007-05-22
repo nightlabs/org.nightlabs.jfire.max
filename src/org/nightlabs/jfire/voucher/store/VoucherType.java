@@ -108,20 +108,22 @@ extends ProductType
 
 	// ******************************
 	// /// *** begin inheritance *** ///
-	@Override
-	public FieldMetaData getFieldMetaData(String fieldName, boolean createMissingMetaData)
-	{
-		if ("packagePriceConfig".equals(fieldName)) { // this is normally not inheritable as it usually stores per-ProductType-data, but for the VoucherType it is
-			ProductTypeFieldMetaData fmd = fieldMetaDataMap.get(fieldName);
-			if (fmd == null) {
-				fmd = new ProductTypeFieldMetaData(this, fieldName);
-				fieldMetaDataMap.put(fieldName, fmd);
-			} // if (fmd == null) {
-			return fmd;
-		}
-
-		return super.getFieldMetaData(fieldName, createMissingMetaData);
-	}
+// Marco: important change: the basic ProductType does NOT filter packagePriceConfig anymore, because there are about the same number of implementations 
+// needing inheritance as there are which must not have inheritance for this field!
+//	@Override
+//	public FieldMetaData getFieldMetaData(String fieldName, boolean createMissingMetaData)
+//	{
+//		if ("packagePriceConfig".equals(fieldName)) { // this is normally not inheritable as it usually stores per-ProductType-data, but for the VoucherType it is
+//			ProductTypeFieldMetaData fmd = fieldMetaDataMap.get(fieldName);
+//			if (fmd == null) {
+//				fmd = new ProductTypeFieldMetaData(this, fieldName);
+//				fieldMetaDataMap.put(fieldName, fmd);
+//			} // if (fmd == null) {
+//			return fmd;
+//		}
+//
+//		return super.getFieldMetaData(fieldName, createMissingMetaData);
+//	}
 
 //	@Override
 //	public FieldInheriter getFieldInheriter(String fieldName)

@@ -21,6 +21,12 @@ import org.nightlabs.jdo.ObjectIDUtil;
  *
  * @jdo.fetch-group name="Unit.name" fields="name"
  * @jdo.fetch-group name="Unit.symbol" fields="symbol"
+ *
+ * @jdo.fetch-group name="FetchGroupsTrade.articleInOrderEditor" fetch-groups="default" fields="name, symbol"
+ * @jdo.fetch-group name="FetchGroupsTrade.articleInOfferEditor" fetch-groups="default" fields="name, symbol"
+ * @jdo.fetch-group name="FetchGroupsTrade.articleInInvoiceEditor" fetch-groups="default" fields="name, symbol"
+ * @jdo.fetch-group name="FetchGroupsTrade.articleInDeliveryNoteEditor" fetch-groups="default" fields="name, symbol"
+ * @jdo.fetch-group name="FetchGroupsTrade.articleInReceptionNoteEditor" fetch-groups="default" fields="name, symbol"
  */
 public class Unit
 implements Serializable, StoreCallback

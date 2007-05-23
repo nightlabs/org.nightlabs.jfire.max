@@ -21,11 +21,25 @@ import org.nightlabs.jfire.trade.ArticlePrice;
  *		table="JFireDynamicTrade_DynamicProduct"
  *
  * @jdo.inheritance strategy="new-table"
+ *
+ * @jdo.fetch-group name="DynamicProduct.name" fields="name"
+ * @jdo.fetch-group name="DynamicProduct.unit" fields="unit"
+ * @jdo.fetch-group name="DynamicProduct.singlePrice" fields="singlePrice"
+ *
+ * @jdo.fetch-group name="FetchGroupsTrade.articleInOrderEditor" fetch-groups="default" fields="name, unit, singlePrice"
+ * @jdo.fetch-group name="FetchGroupsTrade.articleInOfferEditor" fetch-groups="default" fields="name, unit, singlePrice"
+ * @jdo.fetch-group name="FetchGroupsTrade.articleInInvoiceEditor" fetch-groups="default" fields="name, unit, singlePrice"
+ * @jdo.fetch-group name="FetchGroupsTrade.articleInDeliveryNoteEditor" fetch-groups="default" fields="name, unit, singlePrice"
+ * @jdo.fetch-group name="FetchGroupsTrade.articleInReceptionNoteEditor" fetch-groups="default" fields="name, unit, singlePrice"
  */
 public class DynamicProduct
 extends Product
 {
 	private static final long serialVersionUID = 1L;
+
+	public static final String FETCH_GROUP_NAME = "DynamicProduct.name";
+	public static final String FETCH_GROUP_UNIT = "DynamicProduct.unit";
+	public static final String FETCH_GROUP_SINGLE_PRICE = "DynamicProduct.singlePrice";
 
 	/**
 	 * @jdo.field persistence-modifier="persistent" mapped-by="dynamicProduct" dependent="true"

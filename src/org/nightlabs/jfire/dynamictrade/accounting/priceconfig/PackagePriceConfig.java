@@ -103,7 +103,8 @@ implements IPackagePriceConfig
 	@Implement
 	public void fillArticlePrice(Article article)
 	{
-		throw new UnsupportedOperationException("There should be nothing nested?!");
+		// this method is always called - and doesn't need to do anything, because DynamicProductTypes cannot be nested
+//		throw new UnsupportedOperationException("There should be nothing nested?!");
 	}
 
 }

@@ -47,6 +47,12 @@ import org.nightlabs.i18n.I18nText;
  * @jdo.create-objectid-class field-order="organisationID, productID"
  *
  * @jdo.fetch-group name="DynamicProduct.name" fields="dynamicProduct, names"
+ *
+ * @jdo.fetch-group name="FetchGroupsTrade.articleInOrderEditor" fetch-groups="default, DynamicProduct.name"
+ * @jdo.fetch-group name="FetchGroupsTrade.articleInOfferEditor" fetch-groups="default, DynamicProduct.name"
+ * @jdo.fetch-group name="FetchGroupsTrade.articleInInvoiceEditor" fetch-groups="default, DynamicProduct.name"
+ * @jdo.fetch-group name="FetchGroupsTrade.articleInDeliveryNoteEditor" fetch-groups="default, DynamicProduct.name"
+ * @jdo.fetch-group name="FetchGroupsTrade.articleInReceptionNoteEditor" fetch-groups="default, DynamicProduct.name"
  */
 public class DynamicProductName
 extends I18nText

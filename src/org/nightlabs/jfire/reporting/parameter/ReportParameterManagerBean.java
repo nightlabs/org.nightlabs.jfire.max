@@ -43,7 +43,6 @@ import javax.ejb.SessionContext;
 import javax.jdo.JDOHelper;
 import javax.jdo.PersistenceManager;
 
-import org.apache.log4j.Logger;
 import org.nightlabs.ModuleException;
 import org.nightlabs.jdo.NLJDOHelper;
 import org.nightlabs.jfire.base.BaseSessionBeanImpl;
@@ -72,11 +71,6 @@ public abstract class ReportParameterManagerBean
 extends BaseSessionBeanImpl
 implements SessionBean
 {
-	/**
-	 * LOG4J logger used by this class
-	 */
-	private static final Logger logger = Logger.getLogger(ReportParameterManagerBean.class);
-
 	/**
 	 * @see com.nightlabs.jfire.base.BaseSessionBeanImpl#setSessionContext(javax.ejb.SessionContext)
 	 */
@@ -290,6 +284,7 @@ implements SessionBean
 	 * @ejb.permission role-name="_Guest_"
 	 * @ejb.transaction type = "Required"
 	 */
+	@SuppressWarnings("unchecked")
 	public Set<ValueProviderCategory> getValueProviderCategories(
 			Set<ValueProviderCategoryID> categoryIDs, String[] fetchGroups, int maxFetchDepth
 	)

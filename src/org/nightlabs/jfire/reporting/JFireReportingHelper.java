@@ -28,6 +28,7 @@ package org.nightlabs.jfire.reporting;
 
 import java.io.StringWriter;
 import java.util.HashMap;
+import java.util.Locale;
 import java.util.Map;
 import java.util.regex.Pattern;
 
@@ -71,6 +72,7 @@ public class JFireReportingHelper {
 		private PersistenceManager pm;		
 		private Map<String, Object> vars = new HashMap<String, Object>();
 		private Map<String, Object> parameters = new HashMap<String, Object>();
+		private Locale locale;
 	
 		public PersistenceManager getPersistenceManager() {
 			return pm;
@@ -88,9 +90,14 @@ public class JFireReportingHelper {
 			return parameters;
 		}
 		
-		public void open(PersistenceManager pm, Map<String, Object> params, boolean closePM) {
+		public Locale getLocale() {
+			return locale;
+		}
+		
+		public void open(PersistenceManager pm, Map<String, Object> params, Locale locale, boolean closePM) {
 			JFireReportingHelper.logger.debug("Opening (JFireReporting)Helper with pm = "+pm+" and closePM="+closePM);
 			this.closePM = closePM;
+			this.locale = locale;
 			setPersistenceManager(pm);
 			getVars().clear();
 			getParameters().clear();
@@ -130,10 +137,11 @@ public class JFireReportingHelper {
 	 * 
 	 * @param pm The PersistenceManager to use
 	 * @param params The report params set for the next execution.
+	 * @param locale The Locale used by this helper for the next run.
 	 * @param closePM Whether to close the pm after using the Helper.
 	 */
-	public static void open(PersistenceManager pm, Map<String, Object> params, boolean closePM) {
-		helpers.get().open(pm, params, closePM);
+	public static void open(PersistenceManager pm, Map<String, Object> params, Locale locale, boolean closePM) {
+		helpers.get().open(pm, params, locale, closePM);
 	}
 	
 	/**
@@ -197,6 +205,14 @@ public class JFireReportingHelper {
 	 */
 	public static Object getParameter(String name) {
 		return helpers.get().getParameters().get(name);
+	}
+	
+	/**
+	 * Returns the locale the report for this helper currently runs with.
+	 * @return The locale the report for this helper currently runs with.
+	 */
+	public static Locale getLocale() {
+		return helpers.get().getLocale();
 	}
 	
 	/**

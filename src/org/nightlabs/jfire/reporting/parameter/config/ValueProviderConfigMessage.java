@@ -107,7 +107,7 @@ public class ValueProviderConfigMessage extends I18nText implements Serializable
 
 	public ValueProviderConfigMessage(ValueProviderConfig valueProviderConfig) {
 		validatePrimaryKeyFields(valueProviderConfig);
-		this.names = new HashMap();
+		this.names = new HashMap<String, String>();
 	}
 	
 	void validatePrimaryKeyFields(ValueProviderConfig valueProviderConfig) {
@@ -134,12 +134,12 @@ public class ValueProviderConfigMessage extends I18nText implements Serializable
 	 *
 	 * @jdo.join
 	 */
-	protected Map names;
+	protected Map<String, String> names;
 	
 	/**
 	 * @see com.nightlabs.i18n.I18nText#getI18nMap()
 	 */
-	protected Map getI18nMap() {
+	protected Map<String, String> getI18nMap() {
 		return names;
 	}
 

@@ -226,10 +226,10 @@ public abstract class ResultSet implements IResultSet, Serializable {
 	 * @see org.eclipse.datatools.connectivity.oda.IResultSet#getDate(int)
 	 */
 	public Date getDate(int index) throws OdaException {
-		return new Date(
-				((java.util.Date)checkColObject(index, java.util.Date.class))
-					.getTime()
-						);
+		java.util.Date date = (java.util.Date) checkColObject(index, java.util.Date.class);
+		if (date == null)
+			return new Date(0);
+		return new Date(date.getTime());
 	}
 
 	/* (non-Javadoc)

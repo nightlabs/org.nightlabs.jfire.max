@@ -13,8 +13,6 @@ import javax.jdo.PersistenceManager;
 import javax.jdo.Query;
 import javax.jdo.listener.DetachCallback;
 
-import org.nightlabs.jfire.reporting.layout.ReportRegistryItem;
-import org.nightlabs.jfire.reporting.layout.id.ReportRegistryItemID;
 import org.nightlabs.jfire.reporting.parameter.id.ValueProviderCategoryID;
 
 /**

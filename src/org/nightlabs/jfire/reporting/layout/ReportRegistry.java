@@ -100,6 +100,10 @@ public class ReportRegistry {
 		return newReportItemID;
 	}
 	
+	public int getReportRegistryID() {
+		return reportRegistryID;
+	}
+	
 	/**
 	 * Register the given ReportRender class to a Birt OutputFormat. 
 	 * The ReportLayoutRenderer will be instantiated and asked for the format.

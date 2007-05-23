@@ -84,6 +84,7 @@ import org.nightlabs.jfire.reporting.oda.jdoql.server.ServerJDOQLProxy;
 import org.nightlabs.jfire.reporting.oda.jfs.ScriptExecutorJavaClassReporting;
 import org.nightlabs.jfire.reporting.oda.jfs.server.ServerJFSQueryProxy;
 import org.nightlabs.jfire.reporting.platform.RAPlatformContext;
+import org.nightlabs.jfire.reporting.scripting.ScriptingInitializer;
 import org.nightlabs.jfire.scripting.ScriptRegistry;
 import org.nightlabs.jfire.scripting.id.ScriptRegistryItemID;
 import org.nightlabs.jfire.servermanager.JFireServerManager;
@@ -139,6 +140,7 @@ implements SessionBean
 	public void ejbRemove() throws EJBException, RemoteException { }
 	
 	
+	@SuppressWarnings("unchecked")
 	private void initRegisterConfigModules(PersistenceManager pm) 
 	{
 		// Register all Reporing config-Modules
@@ -427,7 +429,8 @@ implements SessionBean
 				
 			}
 			
-			
+			logger.info("Intializing JFireReporing basic scripts");
+			ScriptingInitializer.initialize(pm, jfireServerManager, getOrganisationID());
 			
 		} finally {
 			pm.close();

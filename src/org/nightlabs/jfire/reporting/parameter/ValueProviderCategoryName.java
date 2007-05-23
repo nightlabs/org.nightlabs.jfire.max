@@ -83,7 +83,7 @@ public class ValueProviderCategoryName extends I18nText implements Serializable 
 		this.organisationID = valueProviderCategory.getOrganisationID();
 		this.valueProviderCategoryID = valueProviderCategory.getValueProviderCategoryID();
 		this.valueProviderCategory = valueProviderCategory;
-		this.names = new HashMap();
+		this.names = new HashMap<String, String>();
 	}
 
 	/**
@@ -100,12 +100,12 @@ public class ValueProviderCategoryName extends I18nText implements Serializable 
 	 *
 	 * @jdo.join
 	 */
-	protected Map names;
+	protected Map<String, String> names;
 	
 	/**
 	 * @see com.nightlabs.i18n.I18nText#getI18nMap()
 	 */
-	protected Map getI18nMap() {
+	protected Map<String, String> getI18nMap() {
 		return names;
 	}
 

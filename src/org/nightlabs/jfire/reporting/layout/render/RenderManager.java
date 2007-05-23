@@ -32,6 +32,7 @@ import java.io.InputStream;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Iterator;
+import java.util.Locale;
 import java.util.Map;
 
 import javax.jdo.PersistenceManager;
@@ -148,11 +149,15 @@ public class RenderManager {
 				}
 			}
 			IRunAndRenderTask task = reportEngine.createRunAndRenderTask(report);
+			
+			Locale locale = Locale.getDefault();
 			if (renderRequest.getLocale() != null)				
-				task.setLocale(renderRequest.getLocale());
+				locale = renderRequest.getLocale();
 			else {
 				// TODO: Add the users locale
 			}
+			
+			task.setLocale(locale);
 
 			ReportRegistry registry = ReportRegistry.getReportRegistry(pm);
 			ReportLayoutRenderer renderer = null; 
@@ -166,7 +171,7 @@ public class RenderManager {
 			renderRequest.setParameters(parsedParams);
 
 			logger.debug("Have report renderer, delegating render work");
-			JFireReportingHelper.open(pm, parsedParams, false);
+			JFireReportingHelper.open(pm, parsedParams, locale, false);
 			RenderedReportLayout result = null;
 			try {
 				result = renderer.renderReport(pm, renderRequest, task, fileName, layoutRoot, prepareForTransfer);

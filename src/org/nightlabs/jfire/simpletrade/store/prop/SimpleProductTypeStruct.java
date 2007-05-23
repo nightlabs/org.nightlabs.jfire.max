@@ -47,7 +47,9 @@ public class SimpleProductTypeStruct {
 			StructBlock sb = PropHelper.createStructBlock(productTypeStruct, DESCRIPTION, "Description", "Beschreibung");
 			sb.setUnique(false);
 			I18nTextStructField descShort = PropHelper.createI18nTextField(sb, DESCRIPTION_SHORT, "Short description", "Kurzbeschreibung");
+			descShort.setLineCount(5);
 			I18nTextStructField descLong = PropHelper.createI18nTextField(sb, DESCRIPTION_LONG, "Long description", "Ausführliche Beschreibung");
+			descLong.setLineCount(10);
 
 			sb.addStructField(descShort);
 			sb.addStructField(descLong);

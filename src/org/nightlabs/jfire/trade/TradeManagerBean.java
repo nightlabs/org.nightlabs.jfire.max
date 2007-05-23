@@ -209,7 +209,7 @@ implements SessionBean
 	 * @ejb.transaction type="Required"
 	 **/
 	public Order createOrder(
-			AnchorID customerID, String orderIDPrefix, String currencyID,
+			AnchorID customerID, String orderIDPrefix, CurrencyID currencyID,
 			SegmentTypeID[] segmentTypeIDs, String[] fetchGroups, int maxFetchDepth)
 	throws ModuleException
 	{
@@ -218,7 +218,7 @@ implements SessionBean
 			Trader trader = Trader.getTrader(pm);
 
 			pm.getExtent(Currency.class);
-			Currency currency = (Currency)pm.getObjectById(CurrencyID.create(currencyID));
+			Currency currency = (Currency)pm.getObjectById(currencyID);
 
 			pm.getExtent(LegalEntity.class);
 			LegalEntity customer = (LegalEntity) pm.getObjectById(customerID);

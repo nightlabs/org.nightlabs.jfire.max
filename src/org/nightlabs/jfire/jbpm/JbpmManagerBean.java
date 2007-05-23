@@ -47,6 +47,9 @@ import org.nightlabs.jfire.trade.state.id.StateID;
  *           transaction-type="Container"
  *
  * @ejb.util generate = "physical"
+ * 
+ * @author Marco Schulze
+ * @author Marc Klinger - marc[at]nightlabs[dot]de
  */
 public abstract class JbpmManagerBean
 extends BaseSessionBeanImpl
@@ -123,7 +126,7 @@ implements SessionBean
 				JFireServerManager jfireServerManager = getJFireServerManager();
 				try {
 					JFireServerConfigModule cfmod = jfireServerManager.getJFireServerConfigModule();
-					File jfireJbpmEarDirectory = new File(cfmod.getJ2ee().getJ2eeDeployBaseDirectory() + "JFireJbpm.ear");
+					File jfireJbpmEarDirectory = new File(cfmod.getJ2ee().getJ2eeDeployBaseDirectory(), "JFireJbpm.ear");
 
 					// the ehcache.xml seems to be global in all cases :-( as I didn't find how to specify its name somewhere
 					List<DeploymentJarItem> deploymentJarItems = new LinkedList<DeploymentJarItem>();
@@ -159,7 +162,7 @@ implements SessionBean
 									null));
 
 					jfireServerManager.createDeploymentJar(
-							new File("JFire_JBPM_"+getOrganisationID()+".last/jbpm-"+getOrganisationID()+"-cfg.jar"),
+							new File("JFire_JBPM_"+getOrganisationID()+".last", "jbpm-"+getOrganisationID()+"-cfg.jar"),
 							deploymentJarItems,
 							DeployOverwriteBehaviour.EXCEPTION);
 				} finally {
@@ -220,6 +223,7 @@ implements SessionBean
 	 * @ejb.transaction type="Supports"
 	 * @ejb.permission role-name="_Guest_"
 	 */
+	@SuppressWarnings("unchecked")
 	public List<State> getStates(Set<StateID> stateIDs, String[] fetchGroups, int maxFetchDepth)
 	{
 		PersistenceManager pm = getPersistenceManager();
@@ -347,6 +351,7 @@ implements SessionBean
 	 * @ejb.transaction type="Required"
 	 * @ejb.permission role-name="_Guest_"
 	 */		
+	@SuppressWarnings("unchecked")
 	public Set<StateDefinitionID> getStateDefinitionIDs(ProcessDefinition processDefinition) 
 	{
 		PersistenceManager pm = getPersistenceManager();
@@ -362,6 +367,7 @@ implements SessionBean
 	 * @ejb.transaction type="Required"
 	 * @ejb.permission role-name="_Guest_"
 	 */		
+	@SuppressWarnings("unchecked")
 	public Collection<StateDefinition> getStateDefinitions(Set<StateDefinitionID> objectIDs, 
 			String[] fetchGroups, int maxFetchDepth) 
 	{
@@ -379,6 +385,7 @@ implements SessionBean
 	 * @ejb.transaction type="Required"
 	 * @ejb.permission role-name="_Guest_"
 	 */		
+	@SuppressWarnings("unchecked")
 	public Collection<ProcessDefinition> getProcessDefinitions(Set<ProcessDefinitionID> objectIDs, 
 			String[] fetchGroups, int maxFetchDepth) 
 	{

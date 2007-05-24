@@ -318,12 +318,12 @@ try {
                     </structure>
                     <structure>
                         <property name="position">29</property>
-                        <property name="name">jfire_nightlabs_org/vat-de-16-net</property>
+                        <property name="name">jfire_nightlabs_org/vat-de-19-net</property>
                         <property name="dataType">float</property>
                     </structure>
                     <structure>
                         <property name="position">30</property>
-                        <property name="name">jfire_nightlabs_org/vat-de-16-val</property>
+                        <property name="name">jfire_nightlabs_org/vat-de-19-val</property>
                         <property name="dataType">float</property>
                     </structure>
                     <structure>
@@ -907,13 +907,13 @@ JFireReportingHelper.createDataSetParam(params["articleContainerID"])</expressio
                     <property name="dataType">float</property>
                 </structure>
                 <structure>
-                    <property name="name">jfire_nightlabs_org/vat-de-16-net</property>
-                    <expression name="expression">dataSetRow["jfire_nightlabs_org/vat-de-16-net"]</expression>
+                    <property name="name">jfire_nightlabs_org/vat-de-19-net</property>
+                    <expression name="expression">dataSetRow["jfire_nightlabs_org/vat-de-19-net"]</expression>
                     <property name="dataType">float</property>
                 </structure>
                 <structure>
-                    <property name="name">jfire_nightlabs_org/vat-de-16-val</property>
-                    <expression name="expression">dataSetRow["jfire_nightlabs_org/vat-de-16-val"]</expression>
+                    <property name="name">jfire_nightlabs_org/vat-de-19-val</property>
+                    <expression name="expression">dataSetRow["jfire_nightlabs_org/vat-de-19-val"]</expression>
                     <property name="dataType">float</property>
                 </structure>
                 <structure>
@@ -928,7 +928,7 @@ JFireReportingHelper.createDataSetParam(params["articleContainerID"])</expressio
                 </structure>
                 <structure>
                     <property name="name">SumVAT</property>
-                    <expression name="expression">Total.sum(dataSetRow["jfire_nightlabs_org/vat-de-16-val"])</expression>
+                    <expression name="expression">Total.sum(dataSetRow["jfire_nightlabs_org/vat-de-19-val"])</expression>
                     <property name="dataType">float</property>
                 </structure>
                 <structure>

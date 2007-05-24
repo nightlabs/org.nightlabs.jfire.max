@@ -73,6 +73,8 @@ extends Initialiser
 		priceConfig.addPriceFragmentType(vatVal);
 		priceConfig.addPriceFragmentType(vatNet);
 
+		priceConfig.addInputPriceFragmentType(vatNet);
+
 		CustomerGroupID customerGroupID = (CustomerGroupID) JDOHelper.getObjectId(dataCreator.getCustomerGroupAnonymous());
 		priceConfig.addCustomerGroup(dataCreator.getCustomerGroupDefault());
 		priceConfig.addCustomerGroup(dataCreator.getCustomerGroupAnonymous());
@@ -100,7 +102,8 @@ extends Initialiser
 				"cell.resolvePriceCellsAmount(\n" +
 				"	new Array(\n" +
 				"		PriceFragmentTypeID.create(\"" + vatVal.getOrganisationID() + "\", \"" + vatVal.getPriceFragmentTypeID() + "\")\n" +
-				"	)");
+				"	)\n" +
+				")");
 
 		fallbackFormulaCell.setFormula(vatNet,
 				"cell.resolvePriceCellsAmount(\n" +

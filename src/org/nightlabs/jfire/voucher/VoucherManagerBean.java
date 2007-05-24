@@ -312,9 +312,9 @@ implements SessionBean
 				deliveryConfiguration = new DeliveryConfiguration(
 						getOrganisationID(), "JFireVoucher.default");
 				deliveryConfiguration.getName().setText(Locale.ENGLISH.getLanguage(),
-						"Default Delivery Configuration");
+						"Default Delivery Configuration for Vouchers");
 				deliveryConfiguration.getName().setText(Locale.GERMAN.getLanguage(),
-						"Standard-Liefer-Konfiguration");
+						"Standard-Liefer-Konfiguration für Gutscheine");
 				pm.getExtent(ModeOfDelivery.class);
 
 				try {

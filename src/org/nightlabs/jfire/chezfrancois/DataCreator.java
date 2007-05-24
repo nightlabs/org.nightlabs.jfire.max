@@ -77,9 +77,9 @@ import org.nightlabs.jfire.trade.OrganisationLegalEntity;
 import org.nightlabs.jfire.trade.SegmentType;
 import org.nightlabs.jfire.trade.Trader;
 
-public abstract class AbstractDataCreator
+public class DataCreator
 {
-	private static Logger logger = Logger.getLogger(AbstractDataCreator.class);
+	private static Logger logger = Logger.getLogger(DataCreator.class);
 
 	public static final String languageID = Locale.ENGLISH.getLanguage();
 	public static final String[] languages = new String[] {
@@ -96,7 +96,7 @@ public abstract class AbstractDataCreator
 	protected Accounting accounting;
 	protected String rootOrganisationID;
 
-	public AbstractDataCreator(PersistenceManager pm, User user)
+	public DataCreator(PersistenceManager pm, User user)
 	{
 		this.pm = pm;
 		this.user = user;

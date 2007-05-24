@@ -67,7 +67,7 @@ import org.nightlabs.jfire.trade.CustomerGroupMapper;
 import org.nightlabs.jfire.trade.LegalEntity;
 
 public class DataCreatorSimpleTrade
-extends AbstractDataCreator
+extends DataCreator
 {
 	private static Logger logger = Logger.getLogger(DataCreatorSimpleTrade.class);
 

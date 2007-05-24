@@ -163,7 +163,7 @@ public class DataCreator
 	private PriceFragmentType priceFragmentTypeVatNet = null;
 	public PriceFragmentType getPriceFragmentTypeVatNet() {
 		if (priceFragmentTypeVatNet == null)
-			priceFragmentTypeVatNet = (PriceFragmentType) pm.getObjectById(PriceFragmentTypeID.create(rootOrganisationID, "vat-de-16-net"));
+			priceFragmentTypeVatNet = (PriceFragmentType) pm.getObjectById(PriceFragmentTypeID.create(rootOrganisationID, "vat-de-19-net"));
 
 		return priceFragmentTypeVatNet;			
 	}
@@ -171,7 +171,7 @@ public class DataCreator
 	private PriceFragmentType priceFragmentTypeVatVal = null;
 	public PriceFragmentType getPriceFragmentTypeVatVal() {
 		if (priceFragmentTypeVatVal == null)
-			priceFragmentTypeVatVal = (PriceFragmentType) pm.getObjectById(PriceFragmentTypeID.create(rootOrganisationID, "vat-de-16-val"));
+			priceFragmentTypeVatVal = (PriceFragmentType) pm.getObjectById(PriceFragmentTypeID.create(rootOrganisationID, "vat-de-19-val"));
 
 		return priceFragmentTypeVatVal;
 	}

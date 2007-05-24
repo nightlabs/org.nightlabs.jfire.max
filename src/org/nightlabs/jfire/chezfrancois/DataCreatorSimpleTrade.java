@@ -81,8 +81,8 @@ extends DataCreator
 		rootSimpleProductType = (SimpleProductType) pm.getObjectById(
 				ProductTypeID.create(organisationID, SimpleProductType.class.getName()));
 	}
-	
-	protected SimpleProductType createCategory(SimpleProductType parent, String productTypeID, String ... names)
+
+	public SimpleProductType createCategory(SimpleProductType parent, String productTypeID, String ... names)
 	{
 		if (parent == null)
 			parent = rootSimpleProductType;
@@ -108,6 +108,9 @@ extends DataCreator
 
 	public SimpleProductType createLeaf(SimpleProductType category, String productTypeID, IInnerPriceConfig innerPriceConfig, String ... names)
 	{
+		if (category == null)
+			category = rootSimpleProductType;
+
 		SimpleProductType pt = new SimpleProductType(
 				organisationID, productTypeID, category, null, ProductType.INHERITANCE_NATURE_LEAF, ProductType.PACKAGE_NATURE_OUTER);
 		setNames(pt.getName(), names);
@@ -233,8 +236,8 @@ extends DataCreator
 	public IInnerPriceConfig createInnerPercentagePriceConfig(String name, int percentage, ProductType packageProductType)
 	{
 		FormulaPriceConfig formulaPriceConfig = new FormulaPriceConfig(IDGenerator.getOrganisationID(), IDGenerator.nextID(PriceConfig.class));
-		PriceFragmentType vatNet = (PriceFragmentType) pm.getObjectById(PriceFragmentTypeID.create(rootOrganisationID, "vat-de-16-net"));
-		PriceFragmentType vatVal = (PriceFragmentType) pm.getObjectById(PriceFragmentTypeID.create(rootOrganisationID, "vat-de-16-val"));
+		PriceFragmentType vatNet = (PriceFragmentType) pm.getObjectById(PriceFragmentTypeID.create(rootOrganisationID, "vat-de-19-net"));
+		PriceFragmentType vatVal = (PriceFragmentType) pm.getObjectById(PriceFragmentTypeID.create(rootOrganisationID, "vat-de-19-val"));
 		formulaPriceConfig.addProductType(packageProductType);
 		formulaPriceConfig.addPriceFragmentType(vatVal);
 		formulaPriceConfig.addPriceFragmentType(vatNet);
@@ -283,7 +286,7 @@ extends DataCreator
 				"\n" +
 				"cell.resolvePriceCellsAmount(\n" +
 				"	new Array(\n" +
-				"		PriceFragmentTypeID.create(\"" + rootOrganisationID + "\", \"vat-de-16-net\")\n" +
+				"		PriceFragmentTypeID.create(\"" + rootOrganisationID + "\", \"vat-de-19-net\")\n" +
 				"	)\n" +
 				");");
 //				"cell.resolvePriceCellsAmount(\n" +
@@ -304,7 +307,7 @@ extends DataCreator
 //				"		null,\n" +
 //				"		null,\n" +
 //				"		null,\n" +
-//				"		\""+rootOrganisationID+"/vat-de-16-net\"\n" +
+//				"		\""+rootOrganisationID+"/vat-de-19-net\"\n" +
 //				"	)\n"+
 //				");");
 
@@ -382,7 +385,7 @@ extends DataCreator
 				"\n" +
 				"cell.resolvePriceCellsAmount(\n" +
 				"	new Array(\n" +
-				"		PriceFragmentTypeID.create(\"" + rootOrganisationID + "\", \"vat-de-16-net\")\n" +
+				"		PriceFragmentTypeID.create(\"" + rootOrganisationID + "\", \"vat-de-19-net\")\n" +
 				"	)\n" +
 				");");
 //		fallbackFormulaCell.setFormula(vatNet, "cell.resolvePriceCellsAmount(\n" +
@@ -415,7 +418,7 @@ extends DataCreator
 //				"		null,\n" +
 //				"		null,\n" +
 //				"		null,\n" +
-//				"		\""+rootOrganisationID+"/vat-de-16-net\"\n" +
+//				"		\""+rootOrganisationID+"/vat-de-19-net\"\n" +
 //				"	)\n" +
 //				");");
 

@@ -41,9 +41,11 @@ import org.nightlabs.jfire.accounting.Account;
 import org.nightlabs.jfire.accounting.Accounting;
 import org.nightlabs.jfire.accounting.Currency;
 import org.nightlabs.jfire.accounting.PriceFragmentType;
+import org.nightlabs.jfire.accounting.Tariff;
 import org.nightlabs.jfire.accounting.book.fragmentbased.PFMoneyFlowMapping;
 import org.nightlabs.jfire.accounting.id.CurrencyID;
 import org.nightlabs.jfire.accounting.id.PriceFragmentTypeID;
+import org.nightlabs.jfire.accounting.id.TariffID;
 import org.nightlabs.jfire.idgenerator.IDGenerator;
 import org.nightlabs.jfire.organisation.Organisation;
 import org.nightlabs.jfire.person.Person;
@@ -71,11 +73,13 @@ import org.nightlabs.jfire.security.UserLocal;
 import org.nightlabs.jfire.security.id.UserID;
 import org.nightlabs.jfire.store.ProductType;
 import org.nightlabs.jfire.store.Store;
+import org.nightlabs.jfire.trade.CustomerGroup;
 import org.nightlabs.jfire.trade.LegalEntity;
 import org.nightlabs.jfire.trade.Order;
 import org.nightlabs.jfire.trade.OrganisationLegalEntity;
 import org.nightlabs.jfire.trade.SegmentType;
 import org.nightlabs.jfire.trade.Trader;
+import org.nightlabs.jfire.trade.id.CustomerGroupID;
 
 public class DataCreator
 {
@@ -140,8 +144,45 @@ public class DataCreator
 		}
 	}
 
+
+	private Tariff tariffNormalPrice = null;
+	private Tariff tariffGoldCard = null;
+
+	public Tariff getTariffNormalPrice()
+	{
+		if (tariffNormalPrice == null) {
+			pm.getExtent(Tariff.class);
+			try {
+				tariffNormalPrice = (Tariff) pm.getObjectById(TariffID.create(organisationID, 0));
+			} catch (JDOObjectNotFoundException x) {
+				tariffNormalPrice = (Tariff) pm.makePersistent(new Tariff(organisationID, IDGenerator.nextID(Tariff.class)));
+				tariffNormalPrice.getName().setText(Locale.ENGLISH.getLanguage(), "Normal Price");
+				tariffNormalPrice.getName().setText(Locale.GERMAN.getLanguage(), "Normaler Preis");
+				tariffNormalPrice.getName().setText(Locale.FRENCH.getLanguage(), "Prix normal");
+			}
+		}
+		return tariffNormalPrice;
+	}
+
+	public Tariff getTariffGoldCard()
+	{
+		if (tariffGoldCard == null) {
+			pm.getExtent(Tariff.class);
+			try {
+				tariffGoldCard = (Tariff) pm.getObjectById(TariffID.create(organisationID, 1));
+			} catch (JDOObjectNotFoundException x) {
+				tariffGoldCard = (Tariff) pm.makePersistent(new Tariff(organisationID, IDGenerator.nextID(Tariff.class)));
+				tariffGoldCard.getName().setText(Locale.ENGLISH.getLanguage(), "Gold Card");
+				tariffGoldCard.getName().setText(Locale.GERMAN.getLanguage(), "Goldene Kundenkarte");
+				tariffGoldCard.getName().setText(Locale.FRENCH.getLanguage(), "Carte d'or");
+			}
+		}
+		return tariffGoldCard;
+	}
+
+
 	private Currency euro = null;	
-	protected Currency getCurrencyEUR()
+	public Currency getCurrencyEUR()
 	{
 		if (euro == null) {
 			pm.getExtent(Currency.class);
@@ -185,6 +226,24 @@ public class DataCreator
 				pm, organisationID, OrganisationLegalEntity.ANCHOR_TYPE_ID_ORGANISATION, true);
 
 		return organisationLegalEntity;
+	}
+
+	private CustomerGroup customerGroupDefault = null;
+	public CustomerGroup getCustomerGroupDefault()
+	{
+		if (customerGroupDefault == null)
+			customerGroupDefault = (CustomerGroup) pm.getObjectById(CustomerGroupID.create(organisationID, CustomerGroup.CUSTOMER_GROUP_ID_DEFAULT));
+
+		return customerGroupDefault;
+	}
+
+	private CustomerGroup customerGroupAnonymous = null;
+	public CustomerGroup getCustomerGroupAnonymous()
+	{
+		if (customerGroupAnonymous == null)
+			customerGroupAnonymous = (CustomerGroup) pm.getObjectById(CustomerGroupID.create(organisationID, CustomerGroup.CUSTOMER_GROUP_ID_ANONYMOUS));
+
+		return customerGroupAnonymous;
 	}
 
 	public Account createLocalAccount(String anchorID, String name)

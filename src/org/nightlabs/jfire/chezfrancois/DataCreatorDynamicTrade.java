@@ -29,6 +29,11 @@ extends DataCreator
 				ProductTypeID.create(organisationID, DynamicProductType.class.getName()));
 	}
 
+	public DynamicProductType getRootDynamicProductType()
+	{
+		return rootDynamicProductType;
+	}
+
 	public DynamicProductType createCategory(DynamicProductType parent, String productTypeID, String ... names)
 	{
 		if (parent == null)

@@ -41,6 +41,9 @@ import org.nightlabs.jfire.organisation.Organisation;
 import org.nightlabs.jfire.security.User;
 import org.nightlabs.jfire.store.ProductType;
 import org.nightlabs.jfire.store.Store;
+import org.nightlabs.jfire.store.deliver.DeliveryConfiguration;
+import org.nightlabs.jfire.store.deliver.ModeOfDelivery;
+import org.nightlabs.jfire.store.deliver.ModeOfDeliveryConst;
 import org.nightlabs.jfire.store.id.ProductTypeID;
 import org.nightlabs.jfire.trade.Article;
 import org.nightlabs.jfire.trade.ArticleCreator;
@@ -100,45 +103,62 @@ implements SessionBean
 	{
 		PersistenceManager pm = getPersistenceManager();
 		try {
-			ProductTypeID rootID = ProductTypeID.create(getOrganisationID(), DynamicProductType.class.getName());
+			String organisationID = getOrganisationID();
+
+			ProductTypeID rootID = ProductTypeID.create(organisationID, DynamicProductType.class.getName());
 			try {
 				pm.getObjectById(rootID);
 				return; // already existing
 			} catch (JDOObjectNotFoundException x) {
-				Store store = Store.getStore(pm);
-				User user = User.getUser(pm, getPrincipal());
-				DynamicProductType root = new DynamicProductType(
-						rootID.organisationID, rootID.productTypeID,
-						null,
-						store.getMandator(),
-						ProductType.INHERITANCE_NATURE_BRANCH,
-						ProductType.PACKAGE_NATURE_OUTER);
-				root.getName().setText(Locale.ENGLISH.getLanguage(), LocalOrganisation.getLocalOrganisation(pm).getOrganisation().getPerson().getDisplayName());
-				root = (DynamicProductType) store.addProductType(user, root, DynamicProductTypeActionHandler.getDefaultHome(pm, root));
-				root.setPackagePriceConfig(PackagePriceConfig.getPackagePriceConfig(pm));
-				// TODO we need a DeliveryConfiguration!
-//				root.setDeliveryConfiguration(deliveryConfiguration);
-				store.setProductTypeStatus_published(user, root);
+				// ignore and create it below
 			}
+
+			// create a default DeliveryConfiguration with one ModeOfDelivery
+			DeliveryConfiguration deliveryConfiguration = new DeliveryConfiguration(organisationID, "JFireDynamicTrade.default");
+			deliveryConfiguration.getName().setText(Locale.ENGLISH.getLanguage(), "Default Delivery Configuration for JFireDynamicTrade");
+			deliveryConfiguration.getName().setText(Locale.GERMAN.getLanguage(), "Standard-Liefer-Konfiguration für JFireDynamicTrade");
+			pm.getExtent(ModeOfDelivery.class);
+
+			ModeOfDelivery modeOfDelivery;
+			modeOfDelivery = (ModeOfDelivery) pm.getObjectById(ModeOfDeliveryConst.MODE_OF_DELIVERY_ID_MANUAL);
+			deliveryConfiguration.addModeOfDelivery(modeOfDelivery);
+
+			deliveryConfiguration = (DeliveryConfiguration) pm.makePersistent(deliveryConfiguration);
+
+
+			// create the root-ProductType
+			Store store = Store.getStore(pm);
+			User user = User.getUser(pm, getPrincipal());
+			DynamicProductType root = new DynamicProductType(
+					rootID.organisationID, rootID.productTypeID,
+					null,
+					store.getMandator(),
+					ProductType.INHERITANCE_NATURE_BRANCH,
+					ProductType.PACKAGE_NATURE_OUTER);
+			root.getName().setText(Locale.ENGLISH.getLanguage(), LocalOrganisation.getLocalOrganisation(pm).getOrganisation().getPerson().getDisplayName());
+			root = (DynamicProductType) store.addProductType(user, root, DynamicProductTypeActionHandler.getDefaultHome(pm, root));
+			root.setPackagePriceConfig(PackagePriceConfig.getPackagePriceConfig(pm));
+			root.setDeliveryConfiguration(deliveryConfiguration);
+			store.setProductTypeStatus_published(user, root);
 
 			DynamicProductTypeActionHandler dynamicProductTypeActionHandler = new DynamicProductTypeActionHandler(
 					Organisation.DEVIL_ORGANISATION_ID, DynamicProductTypeActionHandler.class.getName(), DynamicProductType.class);
 			pm.makePersistent(dynamicProductTypeActionHandler);
 
-			Unit unit = new Unit(IDGenerator.getOrganisationID(), IDGenerator.nextID(Unit.class));
+			Unit unit = new Unit(organisationID, IDGenerator.nextID(Unit.class));
 			unit.getSymbol().setText(Locale.ENGLISH.getLanguage(), "h");
 			unit.getName().setText(Locale.ENGLISH.getLanguage(), "hour");
 			unit.getName().setText(Locale.GERMAN.getLanguage(), "Stunde");
 			pm.makePersistent(unit);
 
-			unit = new Unit(IDGenerator.getOrganisationID(), IDGenerator.nextID(Unit.class));
+			unit = new Unit(organisationID, IDGenerator.nextID(Unit.class));
 			unit.getSymbol().setText(Locale.ENGLISH.getLanguage(), "pcs.");
 			unit.getName().setText(Locale.ENGLISH.getLanguage(), "pieces");
 			unit.getSymbol().setText(Locale.GERMAN.getLanguage(), "Stk.");
 			unit.getName().setText(Locale.GERMAN.getLanguage(), "Stück");
 			pm.makePersistent(unit);
 
-			unit = new Unit(IDGenerator.getOrganisationID(), IDGenerator.nextID(Unit.class));
+			unit = new Unit(organisationID, IDGenerator.nextID(Unit.class));
 			unit.getSymbol().setText(Locale.ENGLISH.getLanguage(), "()");
 			unit.getName().setText(Locale.ENGLISH.getLanguage(), "(spot-rate)");
 			unit.getSymbol().setText(Locale.GERMAN.getLanguage(), "()");

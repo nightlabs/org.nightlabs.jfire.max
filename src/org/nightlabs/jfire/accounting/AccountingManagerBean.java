@@ -232,15 +232,15 @@ public abstract class AccountingManagerBean
 
 
 			// create PriceFragmentTypes for Swiss and German VAT
-			PriceFragmentType priceFragmentType = new PriceFragmentType(getRootOrganisationID(), "vat-de-16-net");
-			priceFragmentType.getName().setText(Locale.ENGLISH.getLanguage(), "VAT Germany 16% Net");
-			priceFragmentType.getName().setText(Locale.GERMAN.getLanguage(), "MwSt. Deutschland 16% Netto");
+			PriceFragmentType priceFragmentType = new PriceFragmentType(getRootOrganisationID(), "vat-de-19-net");
+			priceFragmentType.getName().setText(Locale.ENGLISH.getLanguage(), "VAT Germany 19% Net");
+			priceFragmentType.getName().setText(Locale.GERMAN.getLanguage(), "MwSt. Deutschland 19% Netto");
 			priceFragmentType.setContainerPriceFragmentType(PriceFragmentType.getTotalPriceFragmentType(pm));
 			pm.makePersistent(priceFragmentType);
 
-			priceFragmentType = new PriceFragmentType(getRootOrganisationID(), "vat-de-16-val");
-			priceFragmentType.getName().setText(Locale.ENGLISH.getLanguage(), "VAT Germany 16% Value");
-			priceFragmentType.getName().setText(Locale.GERMAN.getLanguage(), "MwSt. Deutschland 16% Wert");
+			priceFragmentType = new PriceFragmentType(getRootOrganisationID(), "vat-de-19-val");
+			priceFragmentType.getName().setText(Locale.ENGLISH.getLanguage(), "VAT Germany 19% Value");
+			priceFragmentType.getName().setText(Locale.GERMAN.getLanguage(), "MwSt. Deutschland 19% Wert");
 			priceFragmentType.setContainerPriceFragmentType(PriceFragmentType.getTotalPriceFragmentType(pm));
 			pm.makePersistent(priceFragmentType);
 

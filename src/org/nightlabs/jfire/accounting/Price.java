@@ -104,7 +104,7 @@ public class Price
 	 * <p>
 	 * A total price can contain various fragments that need to be known for
 	 * legal reasons. E.g. the VAT is managed as a fragment with a certain key
-	 * like "vat-de-16" or "vat-de-7". Other data that one trade partner
+	 * like "vat-de-19" or "vat-de-7". Other data that one trade partner
 	 * wants/allows the other to be known might be transferred in here as well
 	 * E.g. the system fees might be declared like this. The price fragments
 	 * declared here are used by an Accountant to book the right amounts on the

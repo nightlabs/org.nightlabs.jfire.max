@@ -37,7 +37,7 @@ import org.nightlabs.util.Utils;
 
 /**
  * A PriceFragmentType defines a part out of which a <tt>Price</tt> may consist.
- * Normally, these are taxes. Examples are: vat-de-16, vat-de-7 or vat-ch-6_5
+ * Normally, these are taxes. Examples are: vat-de-19, vat-de-7 or vat-ch-6_5
  * <br/><br/>
  * Not all <tt>Price</tt> s contain <tt>PriceFragment</tt> s for all <tt>PriceFragmentType</tt> s.
  * <tt>PriceFragmentType</tt> s are defined globally, but that does not mean that

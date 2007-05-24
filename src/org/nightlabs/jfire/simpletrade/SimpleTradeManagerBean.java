@@ -72,7 +72,6 @@ import org.nightlabs.jfire.accounting.id.CurrencyID;
 import org.nightlabs.jfire.accounting.id.TariffID;
 import org.nightlabs.jfire.accounting.priceconfig.AffectedProductType;
 import org.nightlabs.jfire.accounting.priceconfig.FetchGroupsPriceConfig;
-import org.nightlabs.jfire.accounting.priceconfig.IInnerPriceConfig;
 import org.nightlabs.jfire.accounting.priceconfig.PriceConfigUtil;
 import org.nightlabs.jfire.accounting.priceconfig.id.PriceConfigID;
 import org.nightlabs.jfire.base.BaseSessionBeanImpl;
@@ -199,8 +198,8 @@ implements SessionBean
 			// create a default DeliveryConfiguration with all default ModeOfDelivery s
 			DeliveryConfiguration deliveryConfiguration = new DeliveryConfiguration(
 					organisationID, "JFireSimpleTrade.default");
-			deliveryConfiguration.getName().setText(Locale.ENGLISH.getLanguage(), "Default Delivery Configuration");
-			deliveryConfiguration.getName().setText(Locale.GERMAN.getLanguage(), "Standard-Liefer-Konfiguration");
+			deliveryConfiguration.getName().setText(Locale.ENGLISH.getLanguage(), "Default Delivery Configuration for JFireSimpleTrade");
+			deliveryConfiguration.getName().setText(Locale.GERMAN.getLanguage(), "Standard-Liefer-Konfiguration für JFireSimpleTrade");
 			pm.getExtent(ModeOfDelivery.class);
 
 			try {

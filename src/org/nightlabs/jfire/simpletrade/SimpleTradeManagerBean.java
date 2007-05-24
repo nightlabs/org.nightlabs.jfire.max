@@ -262,8 +262,8 @@ implements SessionBean
 //
 //				// create the price config "Car - Middle Class"
 //				PriceFragmentType totalPriceFragmentType = PriceFragmentType.getTotalPriceFragmentType(pm);
-//				PriceFragmentType vatNet = (PriceFragmentType) pm.getObjectById(PriceFragmentTypeID.create(getRootOrganisationID(), "vat-de-16-net"));
-//				PriceFragmentType vatVal = (PriceFragmentType) pm.getObjectById(PriceFragmentTypeID.create(getRootOrganisationID(), "vat-de-16-val"));
+//				PriceFragmentType vatNet = (PriceFragmentType) pm.getObjectById(PriceFragmentTypeID.create(getRootOrganisationID(), "vat-de-19-net"));
+//				PriceFragmentType vatVal = (PriceFragmentType) pm.getObjectById(PriceFragmentTypeID.create(getRootOrganisationID(), "vat-de-19-val"));
 //
 //				Accounting accounting = Accounting.getAccounting(pm);
 //				Trader trader = Trader.getTrader(pm);
@@ -324,7 +324,7 @@ implements SessionBean
 //						"		null,\n" +
 //						"		null,\n" +
 //						"		null,\n" +
-//						"		\""+getRootOrganisationID()+"/vat-de-16-net\"\n" +
+//						"		\""+getRootOrganisationID()+"/vat-de-19-net\"\n" +
 //						"	)\n" +
 //						");");
 //
@@ -408,7 +408,7 @@ implements SessionBean
 //						"		null,\n" +
 //						"		null,\n" +
 //						"		null,\n" +
-//						"		\""+getRootOrganisationID()+"/vat-de-16-net\"\n" +
+//						"		\""+getRootOrganisationID()+"/vat-de-19-net\"\n" +
 //						"	)\n"+
 //						");");
 //

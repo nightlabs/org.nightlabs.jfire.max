@@ -53,20 +53,6 @@ extends Initialiser
 		Tariff tariffNormalPrice = dataCreator.getTariffNormalPrice();
 		Tariff tariffGoldCard = dataCreator.getTariffGoldCard();
 
-		DynamicProductType softwareDevelopment = dataCreator.createCategory(null, softwareDevelopmentID.productTypeID, "Software Development", "Software-Entwicklung");
-		DynamicProductType swDevJFire = dataCreator.createLeaf(softwareDevelopment, "softwareDevelopment.jfire", "JFire");
-		DynamicProductType swDevProjectA = dataCreator.createLeaf(softwareDevelopment, "softwareDevelopment.projectA", "Project A", "Projekt A");
-		DynamicProductType swDevProjectB = dataCreator.createLeaf(softwareDevelopment, "softwareDevelopment.projectB", "Project B", "Projekt B");
-		DynamicProductType swDevProjectC = dataCreator.createLeaf(softwareDevelopment, "softwareDevelopment.projectC", "Project C", "Projekt C");
-
-		DynamicProductType service = dataCreator.createCategory(null, "service", "Service", "Dienstleistung");
-		DynamicProductType serviceJFire = dataCreator.createLeaf(service, "service.jfire", "JFire");
-		DynamicProductType serviceNetwork = dataCreator.createLeaf(service, "service.network", "Network", "Netzwerk");
-		DynamicProductType serviceWebserver = dataCreator.createLeaf(service, "service.webserver", "Webserver");
-
-		DynamicProductType misc = dataCreator.createLeaf(null, "softwareDevelopment.misc", "Miscellaneous", "Verschiedenes");
-
-
 		DynamicTradePriceConfig priceConfig = new DynamicTradePriceConfig(IDGenerator.getOrganisationID(), IDGenerator.nextID(PriceConfig.class));
 		PriceFragmentType vatNet = dataCreator.getPriceFragmentTypeVatNet();
 		PriceFragmentType vatVal = dataCreator.getPriceFragmentTypeVatVal();
@@ -124,6 +110,20 @@ extends Initialiser
 		priceConfig.createFormulaCell(new PriceCoordinate(customerGroupID, currencyID, tariffIDGoldCard)).setFormula(vatNet, "10000");
 
 		dataCreator.getRootDynamicProductType().setInnerPriceConfig(priceConfig);
+
+		DynamicProductType softwareDevelopment = dataCreator.createCategory(null, softwareDevelopmentID.productTypeID, null, "Software Development", "Software-Entwicklung");
+		DynamicProductType swDevJFire = dataCreator.createLeaf(softwareDevelopment, "softwareDevelopment.jfire", null, "JFire");
+		DynamicProductType swDevProjectA = dataCreator.createLeaf(softwareDevelopment, "softwareDevelopment.projectA", null, "Project A", "Projekt A");
+		DynamicProductType swDevProjectB = dataCreator.createLeaf(softwareDevelopment, "softwareDevelopment.projectB", null, "Project B", "Projekt B");
+		DynamicProductType swDevProjectC = dataCreator.createLeaf(softwareDevelopment, "softwareDevelopment.projectC", null, "Project C", "Projekt C");
+
+		DynamicProductType service = dataCreator.createCategory(null, "service", null, "Service", "Dienstleistung");
+		DynamicProductType serviceJFire = dataCreator.createLeaf(service, "service.jfire", null, "JFire");
+		DynamicProductType serviceNetwork = dataCreator.createLeaf(service, "service.network", null, "Network", "Netzwerk");
+		DynamicProductType serviceWebserver = dataCreator.createLeaf(service, "service.webserver", null, "Webserver");
+
+		DynamicProductType misc = dataCreator.createLeaf(null, "softwareDevelopment.misc", null, "Miscellaneous", "Verschiedenes");
+
 		dataCreator.getRootDynamicProductType().applyInheritance();
 	}
 }

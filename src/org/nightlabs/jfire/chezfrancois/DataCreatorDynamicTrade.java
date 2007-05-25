@@ -6,6 +6,7 @@ import java.util.List;
 import javax.jdo.JDOObjectNotFoundException;
 import javax.jdo.PersistenceManager;
 
+import org.nightlabs.jfire.accounting.priceconfig.IInnerPriceConfig;
 import org.nightlabs.jfire.accounting.priceconfig.PriceConfig;
 import org.nightlabs.jfire.dynamictrade.accounting.priceconfig.PackagePriceConfig;
 import org.nightlabs.jfire.dynamictrade.store.DynamicProductType;
@@ -34,7 +35,8 @@ extends DataCreator
 		return rootDynamicProductType;
 	}
 
-	public DynamicProductType createCategory(DynamicProductType parent, String productTypeID, String ... names)
+	public DynamicProductType createCategory(DynamicProductType parent, String productTypeID,
+			IInnerPriceConfig innerPriceConfig, String ... names)
 	{
 		if (parent == null)
 			parent = rootDynamicProductType;
@@ -50,6 +52,14 @@ extends DataCreator
 				ProductType.INHERITANCE_NATURE_BRANCH, ProductType.PACKAGE_NATURE_OUTER);
 		setNames(pt.getName(), names);
 
+		if (innerPriceConfig != null) {
+			pt.getFieldMetaData("innerPriceConfig").setValueInherited(false);
+			pt.setInnerPriceConfig(innerPriceConfig);
+		}
+		else {
+			pt.setInnerPriceConfig(parent.getInnerPriceConfig());
+		}
+
 		store.addProductType(user, pt, DynamicProductTypeActionHandler.getDefaultHome(pm, pt));
 		store.setProductTypeStatus_published(user, pt);
 
@@ -59,7 +69,7 @@ extends DataCreator
 	private List<DynamicProductType> createdLeafs = new ArrayList<DynamicProductType>();
 
 	public DynamicProductType createLeaf(DynamicProductType category, String productTypeID,
-//			IInnerPriceConfig innerPriceConfig,
+			IInnerPriceConfig innerPriceConfig,
 			String ... names)
 	{
 		if (category == null)
@@ -69,8 +79,13 @@ extends DataCreator
 				organisationID, productTypeID, category, null, ProductType.INHERITANCE_NATURE_LEAF, ProductType.PACKAGE_NATURE_OUTER);
 		setNames(pt.getName(), names);
 		pt.setPackagePriceConfig(new PackagePriceConfig(IDGenerator.getOrganisationID(), IDGenerator.nextID(PriceConfig.class)));
-//		pt.getFieldMetaData("innerPriceConfig").setValueInherited(false);
-//		pt.setInnerPriceConfig(innerPriceConfig);
+		if (innerPriceConfig != null) {
+			pt.getFieldMetaData("innerPriceConfig").setValueInherited(false);
+			pt.setInnerPriceConfig(innerPriceConfig);
+		}
+		else {
+			pt.setInnerPriceConfig(category.getInnerPriceConfig());
+		}
 		store.addProductType(user, pt, DynamicProductTypeActionHandler.getDefaultHome(pm, pt));
 
 		store.setProductTypeStatus_published(user, pt);

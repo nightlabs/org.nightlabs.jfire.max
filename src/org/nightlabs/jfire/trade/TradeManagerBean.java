@@ -57,7 +57,6 @@ import org.nightlabs.jfire.accounting.Currency;
 import org.nightlabs.jfire.accounting.Invoice;
 import org.nightlabs.jfire.accounting.id.CurrencyID;
 import org.nightlabs.jfire.accounting.id.InvoiceID;
-import org.nightlabs.jfire.accounting.query.InvoiceQuery;
 import org.nightlabs.jfire.base.BaseSessionBeanImpl;
 import org.nightlabs.jfire.config.ConfigSetup;
 import org.nightlabs.jfire.config.UserConfigSetup;
@@ -66,7 +65,6 @@ import org.nightlabs.jfire.idgenerator.IDNamespaceDefault;
 import org.nightlabs.jfire.jbpm.JbpmLookup;
 import org.nightlabs.jfire.jbpm.graph.def.ProcessDefinition;
 import org.nightlabs.jfire.jbpm.graph.def.State;
-import org.nightlabs.jfire.jbpm.graph.def.StateDefinition;
 import org.nightlabs.jfire.jbpm.graph.def.id.ProcessDefinitionID;
 import org.nightlabs.jfire.person.Person;
 import org.nightlabs.jfire.security.User;
@@ -1246,6 +1244,8 @@ implements SessionBean
 
 			Trader trader = Trader.getTrader(pm);
 
+			// ensure that the anonymous customer exists
+			LegalEntity.getAnonymousCustomer(pm);
 
 			// persist process definitions
 			ProcessDefinition processDefinitionOfferCustomer;
@@ -1265,7 +1265,6 @@ implements SessionBean
 			idNamespaceDefault = IDNamespaceDefault.createIDNamespaceDefault(pm, getOrganisationID(), Offer.class);
 			idNamespaceDefault.setCacheSizeServer(0);
 			idNamespaceDefault.setCacheSizeClient(0);
-
 
 			pm.makePersistent(new EditLockTypeOrder(EditLockTypeOrder.EDIT_LOCK_TYPE_ID));
 			pm.makePersistent(new EditLockTypeOffer(EditLockTypeOffer.EDIT_LOCK_TYPE_ID));

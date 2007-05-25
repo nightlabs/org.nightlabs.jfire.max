@@ -988,6 +988,36 @@ implements SessionBean
 	/**
 	 * @ejb.interface-method
 	 * @ejb.permission role-name="_Guest_"
+	 * @ejb.transaction type = "Required"
+	 */ 
+	public Collection<LegalEntity> getLegalEntities(Set<AnchorID> anchorIDs, String[] fetchGroups, int maxFetchDepth)
+	throws ModuleException
+	{
+		PersistenceManager pm = getPersistenceManager();
+		try {
+			Collection les = new LinkedList();
+			pm.getFetchPlan().setMaxFetchDepth(maxFetchDepth);
+			if (fetchGroups != null)
+				pm.getFetchPlan().setGroups(fetchGroups);
+
+			for (AnchorID anchorID : anchorIDs) {
+				les.add(pm.getObjectById(anchorID));
+			}
+			
+			long time = System.currentTimeMillis();
+			Collection result = pm.detachCopyAll(les);
+			time = System.currentTimeMillis() - time;
+			logger.debug("Detach of "+result.size()+" LegalEntities took "+((double)time / (double)1000));
+			return result;
+		}
+		finally {
+			pm.close();
+		}
+	}
+	
+	/**
+	 * @ejb.interface-method
+	 * @ejb.permission role-name="_Guest_"
 	 * @ejb.transaction type="Supports"
 	 */ 
 	public Offer getOffer(OfferID offerID, String[] fetchGroups, int maxFetchDepth)

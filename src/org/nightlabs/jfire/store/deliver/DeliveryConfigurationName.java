@@ -43,15 +43,11 @@ import org.nightlabs.i18n.I18nText;
  * @jdo.create-objectid-class field-order="organisationID, deliveryConfigurationID"
  *
  * @jdo.inheritance strategy="new-table"
- *
- * @jdo.fetch-group name="DeliveryConfigurationName.names" fields="names"
- * @jdo.fetch-group name="DeliveryConfigurationName.this" fetch-groups="default" fields="names"
+ *  
+ * @jdo.fetch-group name="DeliveryConfiguration.name" fields="deliveryConfiguration, names"
  */
 public class DeliveryConfigurationName extends I18nText
 {
-	public static final String FETCH_GROUP_NAMES = "DeliveryConfigurationName.names";
-	public static final String FETCH_GROUP_THIS_DELIVERY_CONFIGURATION_NAME = "DeliveryConfigurationName.this";
-
 	/**
 	 * @jdo.field primary-key="true"
 	 * @jdo.column length="100"

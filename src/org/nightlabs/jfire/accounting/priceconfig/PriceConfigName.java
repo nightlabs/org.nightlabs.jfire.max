@@ -50,7 +50,6 @@ import org.nightlabs.i18n.I18nText;
  */
 public class PriceConfigName extends I18nText
 {
-
 	/**
 	 * @jdo.field primary-key="true"
 	 * @jdo.column length="100"

@@ -44,9 +44,12 @@ import org.nightlabs.i18n.I18nText;
  * 
  * @jdo.create-objectid-class
  *		field-order="organisationID, localAccountantDelegateID"
+ *
+ * @jdo.fetch-group name="LocalAccountantDelegate.name" fields="localAccountantDelegate, names"
  */
-public class LocalAccountantDelegateName extends I18nText {
-
+public class LocalAccountantDelegateName 
+extends I18nText 
+{	
 	/**
 	 * @jdo.field primary-key="true"
 	 * @jdo.column length="100"

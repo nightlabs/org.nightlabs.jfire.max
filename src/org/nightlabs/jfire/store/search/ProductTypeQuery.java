@@ -162,6 +162,22 @@ extends JDOQuery<Set<P>>
 				" )");
 	}
 
+	protected void addImport(String importClass) {
+//		getImports().append("import "+importClass+"; "+"\n");
+		if (getImports().length() > 0)
+			getImports().append("; ");
+		
+		getImports().append("import "+importClass);		
+	}
+
+	protected void addVariable(String className, String variableName) {
+//		getVars().append(className+" "+variableName+"; ");
+		if (getVars().length() > 0)
+			getVars().append("; ");
+		
+		getVars().append(className+" "+variableName);
+	}
+	
 	/**
 	 * @return the confirmed
 	 */

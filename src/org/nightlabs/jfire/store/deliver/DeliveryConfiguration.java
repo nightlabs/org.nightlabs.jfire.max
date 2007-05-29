@@ -52,10 +52,14 @@ import java.util.Set;
  * @jdo.create-objectid-class field-order="organisationID, deliveryConfigurationID"
  *
  * @jdo.inheritance strategy="new-table"
+ * 
+ * @jdo.fetch-group name="DeliveryConfiguration.name" fields="name"
  */
 public class DeliveryConfiguration
 implements Serializable
 {
+	public static final String FETCH_GROUP_NAME = "DeliveryConfiguration.name";
+	
 	/**
 	 * @jdo.field primary-key="true"
 	 * @jdo.column length="100"

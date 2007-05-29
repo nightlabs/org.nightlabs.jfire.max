@@ -129,7 +129,7 @@ import org.nightlabs.util.Utils;
  * @jdo.fetch-group name="ProductType.managedProductTypeGroup" fields="managedProductTypeGroup"
  * @jdo.fetch-group name="ProductType.localAccountantDelegate" fields="localAccountantDelegate"
  * @jdo.fetch-group name="ProductType.localStorekeeperDelegate" fields="localStorekeeperDelegate"
- * @jdo.fetch-group name="ProductType.this" fetch-groups="default" fields="nonInheritableFields, extendedProductType, fieldMetaDataMap, innerPriceConfig, nestedProductTypes, packagePriceConfig, localAccountantDelegate, localStorekeeperDelegate, name"
+ * @jdo.fetch-group name="ProductType.this" fetch-groups="default" fields="deliveryConfiguration, extendedProductType, fieldMetaDataMap, innerPriceConfig, localAccountantDelegate, localStorekeeperDelegate, managedProductTypeGroup, name, nestedProductTypes, owner, packagePriceConfig, productTypeGroups, productTypeLocal"
  * @jdo.fetch-group name="ProductType.name" fields="name" 
  *
  * @jdo.fetch-group name="FetchGroupsTrade.articleInOrderEditor" fetch-groups="default" fields="name"

@@ -43,27 +43,22 @@ import org.nightlabs.jfire.reporting.layout.id.ReportRegistryItemID;
  *		table="JFireReporting_ReportLayoutConfigModule"
  *
  * @jdo.inheritance strategy="new-table"
+ * @jdo.fetch-group name="ReportLayoutConfigModule.availEntries" fields="availEntries"
  */
 public class ReportLayoutConfigModule extends ConfigModule {
 
 	private static final long serialVersionUID = 1L;
 
+	public static final String FETCH_GROUP_AVAILABLE_LAYOUTS = "ReportLayoutConfigModule.availEntries";
 
 	/* (non-Javadoc)
 	 * @see org.nightlabs.jfire.config.ConfigModule#init()
 	 */
 	@Override
 	public void init() {
+		availEntries = new HashMap<String, ReportLayoutAvailEntry>();
 	}
 	
-	public ReportLayoutConfigModule() {
-		super();
-	}
-	
-//	public ReportLayoutConfigModule(String organisationID, Config config, String cfModID) {
-//		super(organisationID, config, cfModID);
-//	}
-
 	/**
 	 * key: String reportRegistryItemType
 	 * value: ReportLayoutAvailEntry available entries for this itemType
@@ -78,7 +73,7 @@ public class ReportLayoutConfigModule extends ConfigModule {
 	 *
 	 * @jdo.key mapped-by="reportRegistryItemType"
 	 */
-	private Map<String, ReportLayoutAvailEntry> availEntries = new HashMap<String, ReportLayoutAvailEntry>();
+	private Map<String, ReportLayoutAvailEntry> availEntries;
 	
 	
 	/**

@@ -46,6 +46,7 @@ import org.nightlabs.jfire.security.User;
 public class ProductTypeLocal
 implements Serializable
 {
+	// TODO: add field authority for security checking 
 	private static final long serialVersionUID = 1L;
 
 	/**

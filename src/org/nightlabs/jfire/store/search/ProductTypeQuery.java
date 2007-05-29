@@ -20,8 +20,8 @@ import org.nightlabs.jfire.transfer.id.AnchorID;
  * @author Daniel.Mazurek [at] NightLabs [dot] de
  *
  */
-public class ProductTypeQuery 
-extends JDOQuery<Set<ProductType>> 
+public class ProductTypeQuery<P extends ProductType>
+extends JDOQuery<Set<P>> 
 {
 	private static final Logger logger = Logger.getLogger(ProductTypeQuery.class);
 	

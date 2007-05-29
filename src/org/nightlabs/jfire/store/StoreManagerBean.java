@@ -1425,15 +1425,16 @@ implements SessionBean
 	 * @ejb.permission role-name="_Guest_"
 	 * @ejb.transaction type="Supports"
 	 */
-	public Set<ProductTypeID> getProductTypeIDs(Collection<ProductTypeQuery> productTypeQueries)
+	public Set<ProductTypeID> getProductTypeIDs(Collection<ProductTypeQuery<? extends ProductType>> productTypeQueries)
 	{
+		// TODO: Implement Authority checking here
 		PersistenceManager pm = getPersistenceManager();
 		try {
 			pm.getFetchPlan().setMaxFetchDepth(1);
 			pm.getFetchPlan().setGroup(FetchPlan.DEFAULT);
 
 			Set<ProductType> productTypes = null;
-			for (ProductTypeQuery query : productTypeQueries) {
+			for (ProductTypeQuery<? extends ProductType> query : productTypeQueries) {
 				query.setPersistenceManager(pm);
 				query.setCandidates(productTypes);
 				productTypes = new HashSet<ProductType>(query.getResult());
@@ -1443,7 +1444,8 @@ implements SessionBean
 		} finally {
 			pm.close();
 		}
-	}		
+	}
+	
 //	/**
 //	 * Sets the <tt>published</tt> property of the specified <tt>ProductType</tt>
 //	 * to <tt>true</tt>.

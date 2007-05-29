@@ -29,12 +29,10 @@ package org.nightlabs.jfire.trade.config;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.nightlabs.annotation.Implement;
 import org.nightlabs.jfire.config.ConfigModule;
 import org.nightlabs.jfire.person.PersonStruct;
 
 /**
- * 
  * ConfigModule for the LegalEntity view. Wich Fields to display in
  * wich order etc.
  * 
@@ -46,18 +44,16 @@ import org.nightlabs.jfire.person.PersonStruct;
  *
  * @jdo.inheritance strategy="new-table"
  * 
+ * @jdo.fetch-group name="LegalEntityViewConfigModule.personStructFields" fields="personStructFields"
+ *  
  * @author Alexander Bieber <alex[AT]nightlabs[DOT]de>
- *
  */
 public class LegalEntityViewConfigModule extends ConfigModule {
 
-	/**
-	 * 
-	 */
-	public LegalEntityViewConfigModule() {
-		super();
-	}
+	private static final long serialVersionUID = 1L;
 
+	public static final String FETCH_GROUP_PERSONSTRUCTFIELDS = "LegalEntityViewConfigModule.personStructFields";
+	
 	/**
 	 * @jdo.field
 	 *		persistence-modifier="persistent"
@@ -67,15 +63,14 @@ public class LegalEntityViewConfigModule extends ConfigModule {
 	 *
 	 * @jdo.join
 	 */
-	private List personStructFields;
+	private List<String> personStructFields;
 	
-	public List getStructFields() {
+	public List<String> getStructFields() {
 		return personStructFields;
 	}
 
 	public void init() {
-		if (personStructFields == null)
-			personStructFields = new ArrayList();
+		personStructFields = new ArrayList<String>();
 		personStructFields.add(PersonStruct.PERSONALDATA_COMPANY.toString());
 		personStructFields.add(PersonStruct.PERSONALDATA_NAME.toString());
 		personStructFields.add(PersonStruct.PERSONALDATA_FIRSTNAME.toString());
@@ -86,31 +81,4 @@ public class LegalEntityViewConfigModule extends ConfigModule {
 		personStructFields.add(PersonStruct.INTERNET_EMAIL.toString());
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * @see org.nightlabs.jfire.config.ConfigModule#isEqualTo(org.nightlabs.jfire.config.ConfigModule)
-	 */
-	@Implement
-	public boolean isContentEqual(ConfigModule other) {
-		if (this == other)
-			return true;
-		if (other.getClass() != this.getClass())
-			return false;
-		final LegalEntityViewConfigModule otherViewModule =  (LegalEntityViewConfigModule) other;
-		
-		List<String> otherPersonStructFields = otherViewModule.getStructFields();
-		if (personStructFields == null && otherPersonStructFields == null)
-			return true;
-		
-		if ((personStructFields == null && otherPersonStructFields != null) || (personStructFields != null && otherPersonStructFields == null))
-			return false;
-		
-		for (Object field : personStructFields) {
-			if (! otherPersonStructFields.contains((String) field))
-				return false;
-		}
-		
-		return true;
-	}
-	
 }

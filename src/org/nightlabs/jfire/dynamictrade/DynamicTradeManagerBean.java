@@ -47,10 +47,12 @@ import org.nightlabs.jfire.store.deliver.ModeOfDeliveryConst;
 import org.nightlabs.jfire.store.id.ProductTypeID;
 import org.nightlabs.jfire.trade.Article;
 import org.nightlabs.jfire.trade.ArticleCreator;
+import org.nightlabs.jfire.trade.ArticlePrice;
 import org.nightlabs.jfire.trade.Offer;
 import org.nightlabs.jfire.trade.Order;
 import org.nightlabs.jfire.trade.Segment;
 import org.nightlabs.jfire.trade.Trader;
+import org.nightlabs.jfire.trade.id.ArticleID;
 import org.nightlabs.jfire.trade.id.OfferID;
 import org.nightlabs.jfire.trade.id.SegmentID;
 
@@ -419,7 +421,7 @@ implements SessionBean
 	/**
 	 * @ejb.interface-method
 	 * @ejb.permission role-name="_Guest_"
-	 * @ejb.transaction type = "Required"
+	 * @ejb.transaction type="Required"
 	 */
 	public Article createArticle(
 			SegmentID segmentID,
@@ -507,6 +509,94 @@ implements SessionBean
 				pm.getFetchPlan().setGroups(fetchGroups);
 
 			return (Article) pm.detachCopy(articles.iterator().next());
+		} finally {
+			pm.close();
+		}
+	}
+
+	/**
+	 * @param articleID Specifies the {@link Article} that should be changed. Must not be <code>null</code>.
+	 * @param quantity If <code>null</code>, no change will happen to this property - otherwise it will be updated (causes recalculation of the offer's price).
+	 * @param unitID If <code>null</code>, no change will happen to this property - otherwise it will be updated.
+	 * @param productName If <code>null</code>, no change will happen to this property - otherwise it will be updated.
+	 * @param singlePrice If <code>null</code>, no change will happen to this property - otherwise it will be updated (causes recalculation of the offer's price).
+	 *
+	 * @ejb.interface-method
+	 * @ejb.permission role-name="_Guest_"
+	 * @ejb.transaction type="Required"
+	 */
+	public Article modifyArticle(
+			ArticleID articleID,
+			Double quantity,
+			UnitID unitID,
+			TariffID tariffID,
+			I18nText productName,
+			Price singlePrice,
+			boolean get,
+			String[] fetchGroups, int maxFetchDepth)
+	{
+		PersistenceManager pm = getPersistenceManager();
+		try {
+			Article article = (Article) pm.getObjectById(articleID);
+			Offer offer = article.getOffer();
+			if (offer.isFinalized())
+				throw new IllegalStateException("Offer is already finalized! Cannot modify!");
+
+			DynamicProduct product = (DynamicProduct) article.getProduct();
+
+			boolean recalculatePrice = false;
+
+			if (quantity != null) {
+				product.setQuantity(quantity.doubleValue());
+				recalculatePrice = true;
+			}
+
+			if (unitID != null) {
+				Unit unit = (Unit) pm.getObjectById(unitID);
+				product.setUnit(unit);
+			}
+
+			if (tariffID != null) {
+				Tariff tariff = (Tariff) pm.getObjectById(tariffID);
+				article.setTariff(tariff);
+			}
+
+			if (productName != null)
+				product.getName().copyFrom(productName);
+
+			if (singlePrice != null) {
+				product.getSinglePrice().setAmount(0);
+				product.getSinglePrice().clearFragments();
+				pm.flush();
+				product.getSinglePrice().sumPrice(singlePrice);
+				recalculatePrice = true;
+				pm.flush();
+			}
+
+			if (recalculatePrice) {
+				int tryCounter = 0;
+				ArticlePrice price = article.getProductType().getPackagePriceConfig().createArticlePrice(article);
+				while (++tryCounter < 20) { // TODO remove this workaround!
+					try {
+						price = (ArticlePrice) pm.makePersistent(price);
+						pm.flush();
+						break;
+					} catch (Exception x) {
+						// ignore
+					}
+				}
+				article.setPrice(price);
+				Trader.getTrader(pm).validateOffer(offer, true);
+			}
+
+			if (!get)
+				return null;
+
+			pm.getFetchPlan().setMaxFetchDepth(maxFetchDepth);
+			if (fetchGroups != null)
+				pm.getFetchPlan().setGroups(fetchGroups);
+
+			return (Article) pm.detachCopy(article);
 		} finally {
 			pm.close();
 		}

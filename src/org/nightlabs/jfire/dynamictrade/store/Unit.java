@@ -5,6 +5,7 @@ import java.io.Serializable;
 import javax.jdo.listener.StoreCallback;
 
 import org.nightlabs.jdo.ObjectIDUtil;
+import org.nightlabs.util.Utils;
 
 /**
  * @author Marco Schulze - Marco at NightLabs dot de
@@ -91,5 +92,20 @@ implements Serializable, StoreCallback
 	public UnitSymbol getSymbol()
 	{
 		return symbol;
+	}
+
+	@Override
+	public boolean equals(Object obj)
+	{
+		if (obj == this) return true;
+		if (!(obj instanceof Unit)) return false;
+		Unit o = (Unit)obj;
+		return Utils.equals(o.organisationID, this.organisationID) && Utils.equals(o.unitID, this.unitID);
+	}
+
+	@Override
+	public int hashCode()
+	{
+		return Utils.hashCode(organisationID) + Utils.hashCode(unitID);
 	}
 }

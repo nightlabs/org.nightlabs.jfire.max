@@ -31,6 +31,7 @@ import java.io.Serializable;
 import javax.jdo.JDOHelper;
 
 import org.nightlabs.jfire.accounting.id.TariffID;
+import org.nightlabs.util.Utils;
 
 /**
  * TODO Shall I really put this class into JFireTrade? Or is it Ticketing specific?
@@ -66,7 +67,7 @@ import org.nightlabs.jfire.accounting.id.TariffID;
  * @jdo.fetch-group name="FetchGroupsPriceConfig.edit" fields="name"
  */
 public class Tariff
-	implements Serializable
+implements Serializable
 {
 	/**
 	 * The serial version of this class.
@@ -195,4 +196,19 @@ public class Tariff
 //		tariff.name.localize(languageID, this.name);
 //		return tariff;
 //	}
+
+	@Override
+	public boolean equals(Object obj)
+	{
+		if (obj == this) return true;
+		if (!(obj instanceof Tariff)) return false;
+		Tariff o = (Tariff) obj;
+		return Utils.equals(o.organisationID, this.organisationID) && Utils.equals(o.tariffID, this.tariffID);
+	}
+
+	@Override
+	public int hashCode()
+	{
+		return Utils.hashCode(organisationID) + Utils.hashCode(tariffID);
+	}
 }

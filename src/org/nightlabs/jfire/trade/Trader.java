@@ -1438,12 +1438,21 @@ public class Trader
 		}
 	}
 
-	public void validateOffer(Offer offer)
+	public void validateOffer(Offer offer, boolean force)
 	{
-		if (offer.isValid())
-			return;
+		if (force)
+			offer.setValid(false);
+		else {
+			if (offer.isValid())
+				return;
+		}
 
 		offer.validate();
+	}
+
+	public void validateOffer(Offer offer)
+	{
+		validateOffer(offer, false);
 	}
 
 // has been moved into the ActionHandler

@@ -32,7 +32,9 @@ import javax.jdo.PersistenceManager;
 import javax.jdo.Query;
 
 import org.nightlabs.annotation.Implement;
+import org.nightlabs.inheritance.FieldInheriter;
 import org.nightlabs.inheritance.FieldMetaData;
+import org.nightlabs.jdo.inheritance.JDOInheritableFieldInheriter;
 import org.nightlabs.jfire.accounting.TariffMapper;
 import org.nightlabs.jfire.accounting.gridpriceconfig.PriceCalculationException;
 import org.nightlabs.jfire.accounting.gridpriceconfig.PriceCalculator;
@@ -178,6 +180,14 @@ public class SimpleProductType extends ProductType
 	 */
 	public Property getPropertySet() {
 		return propertySet;
+	}
+
+	@Override
+	public FieldInheriter getFieldInheriter(String fieldName) {
+		if ("propertySet".equals(fieldName))
+			return new JDOInheritableFieldInheriter();
+
+		return super.getFieldInheriter(fieldName);
 	}
 
 	@Override

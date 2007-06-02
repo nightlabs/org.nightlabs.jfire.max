@@ -5,23 +5,22 @@ import java.util.Locale;
 import javax.jdo.PersistenceManager;
 
 import org.apache.log4j.Logger;
-import org.nightlabs.ModuleException;
 import org.nightlabs.jfire.idgenerator.IDGenerator;
 import org.nightlabs.jfire.organisation.Organisation;
 import org.nightlabs.jfire.scripting.ScriptCategory;
 import org.nightlabs.jfire.scripting.ScriptParameterSet;
 import org.nightlabs.jfire.scripting.ScriptRegistry;
+import org.nightlabs.jfire.scripting.ScriptingIntialiserException;
 import org.nightlabs.jfire.servermanager.JFireServerManager;
-import org.nightlabs.jfire.store.id.ProductID;
 import org.nightlabs.jfire.voucher.store.id.VoucherKeyID;
 
 /**
  * @author Daniel.Mazurek [at] NightLabs [dot] de
  *
  */
-public class ScriptingInitializer 
+public class ScriptingInitialiser 
 {
-	protected Logger LOGGER = Logger.getLogger(ScriptingInitializer.class);
+	protected Logger LOGGER = Logger.getLogger(ScriptingInitialiser.class);
 
 	private JFireServerManager jfsm;
 	private String organisationID;
@@ -34,7 +33,7 @@ public class ScriptingInitializer
 	 * @param pm
 	 * @param organisationID If you're writing a JFire Community Project, this is {@link Organisation#DEVIL_ORGANISATION_ID}.
 	 */
-	public ScriptingInitializer(JFireServerManager jfsm, PersistenceManager pm, String organisationID)
+	public ScriptingInitialiser(JFireServerManager jfsm, PersistenceManager pm, String organisationID)
 	{
 		this.jfsm = jfsm;
 		this.organisationID = organisationID;
@@ -42,8 +41,7 @@ public class ScriptingInitializer
 	}
 
 	// init Default ParameterSets
-	public void initialize() 
-	throws ModuleException
+	public void initialise() throws ScriptingIntialiserException 
 	{
 		ScriptRegistry scriptRegistry = ScriptRegistry.getScriptRegistry(pm);
 		ScriptCategory baseCategory;
@@ -51,7 +49,7 @@ public class ScriptingInitializer
 		ScriptParameterSet paramSet;
 
 		// JFire Trade Root Category
-		rootCategory = org.nightlabs.jfire.scripting.ScriptingInitializer.createCategory(
+		rootCategory = org.nightlabs.jfire.scripting.ScriptingInitialiser.createCategory(
 				pm, null, 
 				organisationID,  
 				VoucherScriptingConstants.SCRIPT_REGISTRY_ITEM_TYPE_TRADE_ROOT,				
@@ -60,7 +58,7 @@ public class ScriptingInitializer
 		rootCategory.getName().setText(Locale.GERMAN.getLanguage(), "JFireTrade");
 		
 		// Voucher category
-		baseCategory = org.nightlabs.jfire.scripting.ScriptingInitializer.createCategory(
+		baseCategory = org.nightlabs.jfire.scripting.ScriptingInitialiser.createCategory(
 				pm, rootCategory, organisationID,
 				VoucherScriptingConstants.SCRIPT_REGISTRY_ITEM_TYPE_TRADE_VOUCHER,				
 				VoucherScriptingConstants.SCRIPT_REGISTRY_ITEM_ID_CATEGORY_VOUCHER);
@@ -76,10 +74,10 @@ public class ScriptingInitializer
 			baseCategory.setParameterSet(paramSet);
 		}
 
-		new org.nightlabs.jfire.scripting.ScriptingInitializer(
+		new org.nightlabs.jfire.scripting.ScriptingInitialiser(
 				"JFireVoucher.ear/script/Voucher",
 				baseCategory,
 				VoucherScriptingConstants.SCRIPT_REGISTRY_ITEM_TYPE_TRADE_VOUCHER,				
-				jfsm, pm, Organisation.DEVIL_ORGANISATION_ID).initialize(); // this is a throw-away-instance
+				jfsm, pm, Organisation.DEVIL_ORGANISATION_ID).initialise(); // this is a throw-away-instance
 	}
 }

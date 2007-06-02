@@ -94,7 +94,7 @@ import org.nightlabs.jfire.voucher.accounting.VoucherPriceConfig;
 import org.nightlabs.jfire.voucher.accounting.pay.ServerPaymentProcessorVoucher;
 import org.nightlabs.jfire.voucher.scripting.PreviewParameterSet;
 import org.nightlabs.jfire.voucher.scripting.PreviewParameterValuesResult;
-import org.nightlabs.jfire.voucher.scripting.ScriptingInitializer;
+import org.nightlabs.jfire.voucher.scripting.ScriptingInitialiser;
 import org.nightlabs.jfire.voucher.scripting.VoucherLayout;
 import org.nightlabs.jfire.voucher.scripting.VoucherScriptingConstants;
 import org.nightlabs.jfire.voucher.scripting.id.VoucherLayoutID;
@@ -156,8 +156,8 @@ implements SessionBean
 		PersistenceManager pm = getPersistenceManager();
 		try {
 			// init scripts
-			new ScriptingInitializer(getJFireServerManager(), pm,
-					Organisation.DEVIL_ORGANISATION_ID).initialize(); // this is a
+			new ScriptingInitialiser(getJFireServerManager(), pm,
+					Organisation.DEVIL_ORGANISATION_ID).initialise(); // this is a
 																														// throw-away-instance
  
 			DeliveryConfiguration deliveryConfiguration = checkDeliveryConfiguration(pm);

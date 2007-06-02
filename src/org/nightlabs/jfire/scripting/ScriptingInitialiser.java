@@ -86,17 +86,17 @@ import org.xml.sax.SAXParseException;
  * <ul>
  * <li><b>Create the initializer</b>: Use {@link #ScriptingInitializer(String, ScriptCategory, String, JFireServerManager, PersistenceManager, String)} 
  * to create the initializer and set the base category, root directory and fallback values for ids</li>
- * <li><b>Initialize from (sub)directories</b>: Use {@link #initialize()} to start the initialization</li>
+ * <li><b>Initialize from (sub)directories</b>: Use {@link #initialise()} to start the initialization</li>
  * 
  * @author Alexander Bieber <alex [AT] nightlabs [DOT] de>
  *
  */
-public class ScriptingInitializer 
+public class ScriptingInitialiser 
 {
 	/**
 	 * LOG4J logger used by this class
 	 */
-	private static final Logger logger = Logger.getLogger(ScriptingInitializer.class);
+	private static final Logger logger = Logger.getLogger(ScriptingInitialiser.class);
 
 	private String scriptSubDir;
 	private ScriptCategory baseCategory;
@@ -141,7 +141,7 @@ public class ScriptingInitializer
 	 * @param scriptRegistryItemType is the type (identifier) for the scripts in categories, categories get the scriptRegistryItemType from their parent 
 	 * @param organisationID If you're writing a JFire Community Project, this is {@link Organisation#DEVIL_ORGANISATION_ID}.
 	 */
-	public ScriptingInitializer(
+	public ScriptingInitialiser(
 			String scriptSubDir, ScriptCategory baseCategory, String scriptRegistryItemType,
 			JFireServerManager jfsm, PersistenceManager pm, String organisationID)
 	{
@@ -175,8 +175,8 @@ public class ScriptingInitializer
 	 * @ejb.transaction type = "Required"
 	 * @ejb.permission role-name="_Guest_"
 	 */	
-	public void initialize() 
-	throws ModuleException 
+	public void initialise() 
+	throws ScriptingIntialiserException 
 	{
 		String j2eeBaseDir = jfsm.getJFireServerConfigModule().getJ2ee().getJ2eeDeployBaseDirectory();
 		File scriptDir = new File(j2eeBaseDir, scriptSubDir);
@@ -301,7 +301,7 @@ public class ScriptingInitializer
 	}
 	
 	private void createScriptCategories(File dir, ScriptCategory parent) 
-	throws ModuleException
+	throws ScriptingIntialiserException
 	{
 		try {
 			String categoryID = dir.getName();
@@ -462,11 +462,11 @@ public class ScriptingInitializer
 				createScriptCategories(subDirs[i], category);
 			}
 		} catch (IOException e) {
-			throw new ModuleException(e);
+			throw new ScriptingIntialiserException(e);
 		} catch (TransformerException e) {
-			throw new ModuleException(e);
+			throw new ScriptingIntialiserException(e);
 		} catch (SAXException e) {
-			throw new ModuleException(e);
+			throw new ScriptingIntialiserException(e);
 		}
 	}
 

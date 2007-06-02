@@ -65,9 +65,9 @@ implements ReportingScriptExecutor
 	 * After preparation the {@link ScriptExecutorJavaClassReportingDelegate#getResultSetMetaData()}
 	 * method will be called for the delegate to obtain the meta data.
 	 * 
-	 * @see org.nightlabs.jfire.reporting.oda.jfs.ReportingScriptExecutor#getResultSetMetaData(org.nightlabs.jfire.scripting.Script)
+	 * @see org.nightlabs.jfire.reporting.oda.jfs.ReportingScriptExecutor#getResultSetMetaData(org.nightlabs.jfire.scripting.Script, JFSQueryPropertySet)
 	 */
-	public IResultSetMetaData getResultSetMetaData(Script script)
+	public IResultSetMetaData getResultSetMetaData(Script script, JFSQueryPropertySet queryPropertySet)
 	throws ScriptException
 	{
 		ScriptParameterSet parameterSet = script.getParameterSet();
@@ -99,9 +99,9 @@ implements ReportingScriptExecutor
 	 * @throws ScriptException Not only when execution fails, but also if the returned result is
 	 * 	not of type {@link IResultSet}.
 	 * 
-	 * @see org.nightlabs.jfire.reporting.oda.jfs.ReportingScriptExecutor#getResultSet(org.nightlabs.jfire.scripting.Script, java.util.Map)
+	 * @see org.nightlabs.jfire.reporting.oda.jfs.ReportingScriptExecutor#getResultSet(org.nightlabs.jfire.scripting.Script, java.util.Map, JFSQueryPropertySet)
 	 */
-	public IResultSet getResultSet(Script script, Map<String, Object> parameters)
+	public IResultSet getResultSet(Script script, Map<String, Object> parameters, JFSQueryPropertySet queryPropertySet)
 	throws ScriptException
 	{
 		Map<String, Object> convertedParams = new HashMap<String, Object>();

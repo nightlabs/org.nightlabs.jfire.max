@@ -35,5 +35,6 @@
 	<classpathentry kind="lib" path="dist/birt/lib/com.ibm.icu_3.4.4.1.jar"/>
 	<classpathentry kind="var" path="WORKSPACE/NightLabsXStream/dist/lib/xpp3-1.1.3.4.jar"/>
 	<classpathentry kind="var" path="WORKSPACE/NightLabsXStream/dist/lib/xstream-1.2.jar"/>
+	<classpathentry sourcepath="/WORKSPACE/JFireBaseClientLib/src" kind="var" path="WORKSPACE/JFireBaseClientLib/dist/JFireBaseClientLib.jar"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>

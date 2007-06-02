@@ -236,10 +236,9 @@ public class ParameterMetaData implements NamedParameterMetaData, Serializable {
 	 * 
 	 * @param parameterSet The parameter set to create meta data for.
 	 * @return A ParameterMetaData representing the parameter of the given script parameter set.
-	 * @throws OdaException
+	 * @throws JFireReportingOdaException 
 	 */
-	public static ParameterMetaData createMetaDataFromParameterSet(ScriptParameterSet parameterSet)
-	throws OdaException
+	public static ParameterMetaData createMetaDataFromParameterSet(ScriptParameterSet parameterSet) throws JFireReportingOdaException
 	{
 		ParameterMetaData result = new ParameterMetaData();
 		for (Iterator iter = parameterSet.getSortedParameters().iterator(); iter.hasNext();) {
@@ -252,7 +251,7 @@ public class ParameterMetaData implements NamedParameterMetaData, Serializable {
 			try {
 				dataType = DataType.classToDataType(parameter.getScriptParameterClass());
 			} catch (ClassNotFoundException e) {
-				throw new OdaException("Could not create ParameterMetaData from ScriptParameterSet as one parameter's class could not be found or mapped to a scalar datatype. "+e.getMessage());
+				throw new JFireReportingOdaException("Could not create ParameterMetaData from ScriptParameterSet as one parameter's class could not be found or mapped to a scalar datatype. "+e.getMessage());
 			}			
 			descriptor.setDataType(dataType);
 			descriptor.setDataTypeName(DataType.getTypeName(dataType));
@@ -261,8 +260,12 @@ public class ParameterMetaData implements NamedParameterMetaData, Serializable {
 			result.addParameterDescriptor(descriptor);
 		}
 		if (logger.isDebugEnabled()) {
-			for (int i = 0; i < result.getParameterCount(); i++) {
-				logger.debug("Parameter "+(i+1)+": "+result.getParameterName(i+1)+", "+result.getParameterTypeName(i+1));
+			try {
+				for (int i = 0; i < result.getParameterCount(); i++) {
+					logger.debug("Parameter "+(i+1)+": "+result.getParameterName(i+1)+", "+result.getParameterTypeName(i+1));
+				}
+			} catch (OdaException e) {
+				throw new JFireReportingOdaException(e);
 			}
 		}
 		return result;

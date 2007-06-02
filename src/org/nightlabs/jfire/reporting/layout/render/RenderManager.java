@@ -99,7 +99,7 @@ public class RenderManager {
 			PersistenceManager pm,
 			RenderReportRequest renderRequest
 		)
-	throws EngineException
+	throws RenderReportException
 	{
 		File layoutRoot = ReportLayoutRendererUtil.prepareRenderedLayoutOutputFolder();
 		return renderReport(pm, renderRequest, "renderedLayout", layoutRoot, true);
@@ -122,7 +122,7 @@ public class RenderManager {
 			File layoutRoot,
 			boolean prepareForTransfer
 		) 
-	throws EngineException
+	throws RenderReportException
 	{
 		ReportLayout reportLayout = null;
 		try {
@@ -130,9 +130,12 @@ public class RenderManager {
 		} catch (ClassCastException e) {
 			throw new IllegalArgumentException("The ReportRegistryItemID with id "+renderRequest.getReportRegistryItemID()+" is not of type ReportLayout.");
 		}
-		logger.debug("Rendering report "+reportLayout.getReportRegistryItemID()+" to outputformat: "+renderRequest.getOutputFormat());
+		if (logger.isDebugEnabled())
+			logger.debug("Rendering report "+reportLayout.getReportRegistryItemID()+" to outputformat: "+renderRequest.getOutputFormat());
 		
 		ReportEngine reportEngine = factory.getReportEngine();
+		if (logger.isDebugEnabled())
+			logger.debug("Have report engine");
 		
 		ServerResourceLocator.setCurrentReportLayout(reportLayout);
 		try {
@@ -141,6 +144,8 @@ public class RenderManager {
 			IReportRunnable report = null;
 			try {
 				report = reportEngine.openReportDesign(inputStream);
+			} catch (EngineException e) {
+				throw new RenderReportException(e);
 			} finally {
 				try {
 					inputStream.close();
@@ -148,6 +153,8 @@ public class RenderManager {
 					throw new RuntimeException(e);
 				}
 			}
+			if (logger.isDebugEnabled())
+				logger.debug("Opened reportlayout, creating RunAndRenderTask");
 			IRunAndRenderTask task = reportEngine.createRunAndRenderTask(report);
 			
 			Locale locale = Locale.getDefault();
@@ -159,13 +166,17 @@ public class RenderManager {
 			
 			task.setLocale(locale);
 
+			if (logger.isDebugEnabled())
+				logger.debug("Creating ReportLayoutRenderer");
 			ReportRegistry registry = ReportRegistry.getReportRegistry(pm);
 			ReportLayoutRenderer renderer = null; 
 			try {
 				renderer = registry.createReportRenderer(renderRequest.getOutputFormat());
 			} catch (Exception e) {
-				throw new EngineException("Could not create ReportLayoutRenderer for OutputFormat "+renderRequest.getOutputFormat(), e.getMessage());
+				throw new RenderReportException("Could not create ReportLayoutRenderer for OutputFormat "+renderRequest.getOutputFormat(), e);
 			}
+			if (logger.isDebugEnabled())
+				logger.debug("Have ReportLayoutRenderer: "+renderer.getClass().getName());
 
 			HashMap<String,Object> parsedParams = parseReportParams(reportEngine, report, renderRequest.getParameters());
 			renderRequest.setParameters(parsedParams);
@@ -175,6 +186,8 @@ public class RenderManager {
 			RenderedReportLayout result = null;
 			try {
 				result = renderer.renderReport(pm, renderRequest, task, fileName, layoutRoot, prepareForTransfer);
+			} catch (EngineException e) {
+				throw new RenderReportException(e);
 			} finally {
 				JFireReportingHelper.close();
 			}

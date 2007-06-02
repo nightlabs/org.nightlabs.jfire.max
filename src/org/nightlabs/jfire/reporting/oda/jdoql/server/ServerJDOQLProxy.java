@@ -39,7 +39,6 @@ import javax.jdo.spi.PersistenceCapable;
 import org.eclipse.datatools.connectivity.oda.IResultSet;
 import org.eclipse.datatools.connectivity.oda.IResultSetMetaData;
 import org.eclipse.datatools.connectivity.oda.OdaException;
-import org.nightlabs.ModuleException;
 import org.nightlabs.jfire.reporting.oda.jdoql.AbstractJDOQLProxy;
 import org.nightlabs.jfire.reporting.oda.jdoql.JDOQLMetaDataParser;
 import org.nightlabs.jfire.reporting.oda.jdoql.JDOQLResultSet;
@@ -99,22 +98,8 @@ public class ServerJDOQLProxy extends AbstractJDOQLProxy {
 			boolean doDetach,
 			String[] detachFetchGroups
 		) 
-	throws ModuleException 
 	{
-//		SecurityReflector securityReflector = null;
-//		try {
-//			securityReflector = SecurityReflector.lookupSecurityReflector(new InitialContext());
-//		} catch (NamingException e) {
-//			throw new ModuleException(e);
-//		}
-//		UserDescriptor userDescriptor = securityReflector.whoAmI();
-//
-//		Lookup lookup = null;
-//		lookup = new Lookup(userDescriptor.getOrganisationID());
-//		PersistenceManager pm = ;
 		try {
-//			pm = lookup.getPersistenceManager();
-//			Query q = pm.newQuery(IJDOQueryProxy.LANGUAGE_JDOQL, getQuery());
 			Query q = pm.newQuery(query);
 			Object o = null;
 			try {

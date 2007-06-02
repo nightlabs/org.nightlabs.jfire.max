@@ -51,13 +51,12 @@ import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
 import org.eclipse.birt.core.framework.Platform;
 import org.eclipse.birt.report.engine.api.EngineConfig;
-import org.eclipse.birt.report.engine.api.EngineException;
 import org.eclipse.datatools.connectivity.oda.IParameterMetaData;
 import org.eclipse.datatools.connectivity.oda.IResultSet;
 import org.eclipse.datatools.connectivity.oda.IResultSetMetaData;
-import org.eclipse.datatools.connectivity.oda.OdaException;
 import org.nightlabs.ModuleException;
 import org.nightlabs.jdo.NLJDOHelper;
+import org.nightlabs.jdo.moduleregistry.MalformedVersionException;
 import org.nightlabs.jdo.moduleregistry.ModuleMetaData;
 import org.nightlabs.jfire.base.BaseSessionBeanImpl;
 import org.nightlabs.jfire.config.ConfigSetup;
@@ -71,21 +70,26 @@ import org.nightlabs.jfire.reporting.layout.ReportRegistryItem;
 import org.nightlabs.jfire.reporting.layout.ReportRegistryItemCarrier;
 import org.nightlabs.jfire.reporting.layout.id.ReportRegistryItemID;
 import org.nightlabs.jfire.reporting.layout.render.RenderManager;
+import org.nightlabs.jfire.reporting.layout.render.RenderReportException;
 import org.nightlabs.jfire.reporting.layout.render.RenderReportRequest;
 import org.nightlabs.jfire.reporting.layout.render.RenderedReportLayout;
 import org.nightlabs.jfire.reporting.layout.render.ReportLayoutRendererHTML;
 import org.nightlabs.jfire.reporting.layout.render.ReportLayoutRendererPDF;
+import org.nightlabs.jfire.reporting.oda.JFireReportingOdaException;
 import org.nightlabs.jfire.reporting.oda.jdojs.JDOJSResultSet;
 import org.nightlabs.jfire.reporting.oda.jdojs.JDOJSResultSetMetaData;
 import org.nightlabs.jfire.reporting.oda.jdojs.server.ServerJDOJSProxy;
 import org.nightlabs.jfire.reporting.oda.jdoql.JDOQLMetaDataParser;
 import org.nightlabs.jfire.reporting.oda.jdoql.JDOQLResultSetMetaData;
 import org.nightlabs.jfire.reporting.oda.jdoql.server.ServerJDOQLProxy;
+import org.nightlabs.jfire.reporting.oda.jfs.JFSQueryPropertySet;
 import org.nightlabs.jfire.reporting.oda.jfs.ScriptExecutorJavaClassReporting;
 import org.nightlabs.jfire.reporting.oda.jfs.server.ServerJFSQueryProxy;
 import org.nightlabs.jfire.reporting.platform.RAPlatformContext;
-import org.nightlabs.jfire.reporting.scripting.ScriptingInitializer;
+import org.nightlabs.jfire.reporting.scripting.ScriptingInitialiser;
+import org.nightlabs.jfire.scripting.ScriptException;
 import org.nightlabs.jfire.scripting.ScriptRegistry;
+import org.nightlabs.jfire.scripting.ScriptingIntialiserException;
 import org.nightlabs.jfire.scripting.id.ScriptRegistryItemID;
 import org.nightlabs.jfire.servermanager.JFireServerManager;
 import org.nightlabs.util.Utils;
@@ -342,6 +346,8 @@ implements SessionBean
 	 * This method is called by the datastore initialization mechanism.
 	 * @throws IllegalAccessException 
 	 * @throws InstantiationException 
+	 * @throws MalformedVersionException 
+	 * @throws ScriptingIntialiserException 
 	 * @throws ModuleException 
 	 * @throws ModuleException
 	 *
@@ -349,7 +355,7 @@ implements SessionBean
 	 * @ejb.permission role-name="_System_"
 	 * @ejb.transaction type = "Required"
 	 */
-	public void initialise() throws InstantiationException, IllegalAccessException, ModuleException 
+	public void initialise() throws InstantiationException, IllegalAccessException, MalformedVersionException, ScriptingIntialiserException 
 	{
 		// TODO: Better check if platform initialized. Propose on birt forum.
 		if (true) {
@@ -430,7 +436,7 @@ implements SessionBean
 			}
 			
 			logger.info("Intializing JFireReporing basic scripts");
-			ScriptingInitializer.initialize(pm, jfireServerManager, getOrganisationID());
+			ScriptingInitialiser.initialise(pm, jfireServerManager, getOrganisationID());
 			
 		} finally {
 			pm.close();
@@ -441,6 +447,7 @@ implements SessionBean
 	}
 	
 	/**
+	 * @throws ModuleException 
 	 * @throws ModuleException
 	 *
 	 * @ejb.interface-method
@@ -452,7 +459,6 @@ implements SessionBean
 			Map parameters,
 			JDOQLResultSetMetaData metaData
 		) 
-	throws ModuleException
 	{
 		PersistenceManager pm = getPersistenceManager();
 		try {
@@ -464,8 +470,6 @@ implements SessionBean
 					true,
 					new String[] {FetchPlan.ALL}
 				);
-		} catch (Throwable t) {
-			throw new ModuleException(t);
 		} finally {
 			pm.close();
 		}
@@ -479,13 +483,8 @@ implements SessionBean
 	 * @ejb.transaction type = "Required"
 	 */
 	public JDOQLResultSetMetaData getQueryMetaData(String organisationID, String queryText) 
-	throws ModuleException
 	{
-		try {
-			return JDOQLMetaDataParser.parseJDOQLMetaData(queryText);
-		} catch (Throwable t) {
-			throw new ModuleException(t);
-		}
+		return JDOQLMetaDataParser.parseJDOQLMetaData(queryText);
 	}
 	
 	/**
@@ -498,7 +497,6 @@ implements SessionBean
 	 * @ejb.transaction type = "Required"
 	 */
 	public JDOJSResultSetMetaData prepareJDOJSQuery(String prepareScript)
-	throws ModuleException
 	{
 		return ServerJDOJSProxy.prepareJDOJSQuery(prepareScript);
 	}
@@ -516,7 +514,6 @@ implements SessionBean
 			String prepareScript,
 			Map<String, Object> parameters
 		)
-	throws ModuleException
 	{
 		PersistenceManager pm = getPersistenceManager();
 		try {
@@ -532,41 +529,42 @@ implements SessionBean
 	}
 	
 	/**
-	 * @throws ModuleException
+	 * @throws InstantiationException 
+	 * @throws ScriptException 
 	 *
 	 * @ejb.interface-method
 	 * @ejb.permission role-name="_Guest_"
 	 * @ejb.transaction type = "Never"
 	 */
-	public IResultSetMetaData getJFSResultSetMetaData(ScriptRegistryItemID scriptRegistryItemID)
-	throws ModuleException
+	public IResultSetMetaData getJFSResultSetMetaData(JFSQueryPropertySet queryPropertySet) throws ScriptException, InstantiationException
 	{
 		PersistenceManager pm = getPersistenceManager();
 		try {
-			return ServerJFSQueryProxy.getJFSResultSetMetaData(pm, scriptRegistryItemID);
+			return ServerJFSQueryProxy.getJFSResultSetMetaData(pm, queryPropertySet.getScriptRegistryItemID(), queryPropertySet);
 		} finally {
 			pm.close();
 		}
 	}
 	
 	/**
-	 * @throws ModuleException
+	 * @throws InstantiationException 
+	 * @throws ScriptException 
 	 *
 	 * @ejb.interface-method
 	 * @ejb.permission role-name="_Guest_"
 	 * @ejb.transaction type = "Never"
 	 */
 	public IResultSet getJFSResultSet(
-			ScriptRegistryItemID scriptRegistryItemID,
+			JFSQueryPropertySet queryPropertySet,
 			Map<String, Object> parameters
-		)
-	throws ModuleException
+		) throws ScriptException, InstantiationException
 	{
 		PersistenceManager pm = getPersistenceManager();
 		try {
 			return ServerJFSQueryProxy.getJFSResultSet(
 					pm,
-					scriptRegistryItemID,
+					queryPropertySet.getScriptRegistryItemID(),
+					queryPropertySet,
 					parameters
 			);
 		} finally {
@@ -575,27 +573,22 @@ implements SessionBean
 	}
 	
 	/**
-	 * @throws ModuleException
 	 *
+	 * @throws JFireReportingOdaException 
 	 * @ejb.interface-method
 	 * @ejb.permission role-name="_Guest_"
 	 * @ejb.transaction type = "Never"
 	 */
 	public IParameterMetaData getJFSParameterMetaData(
 			ScriptRegistryItemID scriptRegistryItemID
-		)
-	throws ModuleException
+		) throws JFireReportingOdaException
 	{
 		PersistenceManager pm = getPersistenceManager();
 		try {
-			try {
-				return ServerJFSQueryProxy.getScriptParameterMetaData(
-						pm,
-						scriptRegistryItemID
-				);
-			} catch (OdaException e) {
-				throw new ModuleException("Failed to create parameterMetaData for JFS Query!", e);
-			}
+			return ServerJFSQueryProxy.getScriptParameterMetaData(
+					pm,
+					scriptRegistryItemID
+			);
 		} finally {
 			pm.close();
 		}
@@ -603,7 +596,6 @@ implements SessionBean
 	
 	
 	/**
-	 * @throws ModuleException
 	 *
 	 * @ejb.interface-method
 	 * @ejb.permission role-name="_Guest_"
@@ -613,7 +605,6 @@ implements SessionBean
 			ReportRegistryItemID reportRegistryItemID,
 			String[] fetchGroups, int maxFetchDepth
 		)
-	throws ModuleException
 	{
 		PersistenceManager pm;
 		pm = getPersistenceManager();
@@ -630,7 +621,6 @@ implements SessionBean
 	}
 	
 	/**
-	 * @throws ModuleException
 	 *
 	 * @ejb.interface-method
 	 * @ejb.permission role-name="_Guest_"
@@ -640,7 +630,6 @@ implements SessionBean
 			List<ReportRegistryItemID> reportRegistryItemIDs,
 			String[] fetchGroups, int maxFetchDepth
 		)
-	throws ModuleException
 	{
 		PersistenceManager pm;
 		pm = getPersistenceManager();
@@ -662,14 +651,12 @@ implements SessionBean
 	}
 	
 	/**
-	 * @throws ModuleException
 	 *
 	 * @ejb.interface-method
 	 * @ejb.permission role-name="_Guest_"
 	 * @ejb.transaction type = "Required"
 	 */
 	public Collection<ReportRegistryItemID> getReportRegistryItemIDsForParent(ReportRegistryItemID reportRegistryItemID)
-	throws ModuleException
 	{
 		PersistenceManager pm;
 		pm = getPersistenceManager();
@@ -682,7 +669,6 @@ implements SessionBean
 	}
 	
 	/**
-	 * @throws ModuleException
 	 *
 	 * @ejb.interface-method
 	 * @ejb.permission role-name="_Guest_"
@@ -692,7 +678,6 @@ implements SessionBean
 			String organisationID,
 			String[] fetchGroups, int maxFetchDepth
 		)
-	throws ModuleException
 	{
 		PersistenceManager pm;
 		pm = getPersistenceManager();
@@ -709,14 +694,12 @@ implements SessionBean
 	}
 	
 	/**
-	 * @throws ModuleException
 	 *
 	 * @ejb.interface-method
 	 * @ejb.permission role-name="_Guest_"
 	 * @ejb.transaction type = "Required"
 	 */
 	public Collection<ReportRegistryItemID> getTopLevelReportRegistryItemIDs ()
-	throws ModuleException
 	{
 		PersistenceManager pm;
 		pm = getPersistenceManager();
@@ -733,14 +716,12 @@ implements SessionBean
 	}
 	
 	/**
-	 * @throws ModuleException
 	 *
 	 * @ejb.interface-method
 	 * @ejb.permission role-name="_Guest_"
 	 * @ejb.transaction type = "Required"
 	 */
 	public Collection<ReportRegistryItemCarrier> getTopLevelReportRegistryItemCarriers (String organisationID)
-	throws ModuleException
 	{
 		PersistenceManager pm;
 		pm = getPersistenceManager();
@@ -758,14 +739,9 @@ implements SessionBean
 	}
 	
 	
-	protected ReportingManagerFactory getReportingManagerFactory()
-	throws ModuleException
+	protected ReportingManagerFactory getReportingManagerFactory() throws NamingException
 	{
-		try {
-			return ReportingManagerFactory.getReportingManagerFactory(getInitialContext(getOrganisationID()), getOrganisationID());
-		} catch (NamingException e) {
-			throw new ModuleException(e);
-		}
+		return ReportingManagerFactory.getReportingManagerFactory(getInitialContext(getOrganisationID()), getOrganisationID());
 	}
 	
 	/**
@@ -780,7 +756,6 @@ implements SessionBean
 			boolean get,
 			String[] fetchGroups, int maxFetchDepth
 		)
-	throws ModuleException
 	{
 		PersistenceManager pm;
 		pm = getPersistenceManager();
@@ -800,7 +775,6 @@ implements SessionBean
 	 * @ejb.transaction type="Required"
 	 */
 	public void deleteRegistryItem (ReportRegistryItemID reportRegistryItemID)
-	throws ModuleException
 	{
 		PersistenceManager pm;
 		pm = getPersistenceManager();
@@ -832,20 +806,17 @@ implements SessionBean
 	 * 
 	 * @param renderReportRequest
 	 * @return
+	 * @throws NamingException 
+	 * @throws RenderReportException 
 	 */
-	public RenderedReportLayout renderReportLayout(RenderReportRequest renderReportRequest)
-	throws ModuleException
+	public RenderedReportLayout renderReportLayout(RenderReportRequest renderReportRequest) throws NamingException, RenderReportException
 	{
 		PersistenceManager pm;
 		pm = getPersistenceManager();
 		try {
 			RenderManager rm = getReportingManagerFactory().createRenderManager();
 			try {
-				try {
-					return rm.renderReport(pm, renderReportRequest);
-				} catch (EngineException e) {
-					throw new ModuleException(e);
-				}
+				return rm.renderReport(pm, renderReportRequest);
 			} finally {
 				rm.close();
 			}
@@ -879,7 +850,6 @@ implements SessionBean
 	
 	
 	/**
-	 * @throws ModuleException
 	 *
 	 * @ejb.interface-method
 	 * @ejb.permission role-name="_Guest_"
@@ -890,7 +860,6 @@ implements SessionBean
 			Map params,
 			String[] fetchGroups
 		)
-	throws ModuleException
 	{
 		PersistenceManager pm;
 		pm = getPersistenceManager();
@@ -910,7 +879,6 @@ implements SessionBean
 	}
 	
 	/**
-	 * @throws ModuleException
 	 *
 	 * @ejb.interface-method
 	 * @ejb.permission role-name="_Guest_"
@@ -918,7 +886,6 @@ implements SessionBean
 	 */
 	@SuppressWarnings("unchecked")
 	public Collection<ReportLayoutLocalisationData> getReportLayoutLocalisationBundle(ReportRegistryItemID reportLayoutID, String[] fetchGroups, int maxFetchDepth)
-	throws ModuleException
 	{
 		PersistenceManager pm;
 		pm = getPersistenceManager();
@@ -946,7 +913,6 @@ implements SessionBean
 	public Collection<ReportLayoutLocalisationData> storeReportLayoutLocalisationBundle(
 			Collection<ReportLayoutLocalisationData> bundle, boolean get, String[] fetchGroups, int maxFetchDepth
 		)
-	throws ModuleException
 	{
 		PersistenceManager pm;
 		pm = getPersistenceManager();

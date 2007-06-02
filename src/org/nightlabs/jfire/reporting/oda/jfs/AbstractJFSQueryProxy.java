@@ -5,8 +5,6 @@ package org.nightlabs.jfire.reporting.oda.jfs;
 
 import org.eclipse.datatools.connectivity.oda.IParameterMetaData;
 import org.eclipse.datatools.connectivity.oda.OdaException;
-import org.nightlabs.jdo.ObjectID;
-import org.nightlabs.jdo.ObjectIDUtil;
 import org.nightlabs.jfire.reporting.JFireReportingHelper;
 import org.nightlabs.jfire.reporting.oda.Query;
 import org.nightlabs.jfire.scripting.Script;
@@ -25,7 +23,8 @@ import org.nightlabs.jfire.scripting.id.ScriptRegistryItemID;
  */
 public abstract class AbstractJFSQueryProxy extends Query implements IJFSQueryProxy {
 
-	private ScriptRegistryItemID scriptRegistryItemID;
+//	private ScriptRegistryItemID scriptRegistryItemID;
+	private JFSQueryPropertySet queryPropertySet;
 	
 	/**
 	 * 
@@ -47,12 +46,9 @@ public abstract class AbstractJFSQueryProxy extends Query implements IJFSQueryPr
 	 * @see org.eclipse.datatools.connectivity.oda.IQuery#prepare(java.lang.String)
 	 */
 	public void prepare(String query) throws OdaException {
-		if (!query.startsWith("jdo/"))
-			throw new IllegalArgumentException("Queries for JFS DataSets have to refer to a JFire ScriptRegistryItemID, but instead "+query+" was passed.");
-		ObjectID idObject = ObjectIDUtil.createObjectID(query);
-		if (!(idObject instanceof ScriptRegistryItemID))
-			throw new IllegalArgumentException("The query string of this JFS DataSet does refer to a JDO object but not to an ScriptRegistryItem. The query was "+query);
-		scriptRegistryItemID = (ScriptRegistryItemID)idObject;
+		queryPropertySet = JFSQueryUtil.createPropertySetFromQueryString(query);
+		if (queryPropertySet == null)
+			throw new IllegalStateException("QueryPropertySet has not been created.");
 	}
 	
 	/**
@@ -61,10 +57,20 @@ public abstract class AbstractJFSQueryProxy extends Query implements IJFSQueryPr
 	 */
 	public ScriptRegistryItemID getScriptRegistryItemID(boolean checkPrepare) {
 		if (checkPrepare) {
-			if (scriptRegistryItemID == null)
+			if (queryPropertySet == null)
 				throw new IllegalStateException("The scriptRegistryItemID is null, this indicates that prepare(String) was not called prior to this method.");
 		}
-		return scriptRegistryItemID;
+		return queryPropertySet != null ? queryPropertySet.getScriptRegistryItemID() : null;
+	}
+
+	/**
+	 * Returns the property set for this query that was created through the 
+	 * query string.
+	 * 
+	 * @return The property set for this query.
+	 */
+	public JFSQueryPropertySet getJFSQueryPropertySet() {
+		return queryPropertySet;
 	}
 	
 	/**
@@ -89,3 +95,4 @@ public abstract class AbstractJFSQueryProxy extends Query implements IJFSQueryPr
 	}
 
 }
+

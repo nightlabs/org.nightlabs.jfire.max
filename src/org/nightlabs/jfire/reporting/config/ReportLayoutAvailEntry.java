@@ -45,8 +45,13 @@ import org.nightlabs.jfire.reporting.layout.id.ReportRegistryItemID;
  *		table="JFireReporting_ReportLayoutAvailEntry"
  *
  * @jdo.create-objectid-class
+ * 
+ * @jdo.fetch-group name="ReportLayoutAvailEntry.availableReportLayoutKeys" fields="availableReportLayoutKeys"
  */
-public class ReportLayoutAvailEntry implements Serializable {
+public class ReportLayoutAvailEntry 
+implements Serializable 
+{
+	public static final String FETCH_GROUP_AVAILABLE_REPORT_LAYOUT_KEYS = "ReportLayoutAvailEntry.availableReportLayoutKeys";
 	
 	private static final long serialVersionUID = 1L;
 

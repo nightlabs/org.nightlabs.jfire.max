@@ -27,12 +27,14 @@
 package org.nightlabs.jfire.accounting;
 
 import java.util.Collection;
+import java.util.Collections;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 
 import org.nightlabs.jfire.security.User;
 import org.nightlabs.jfire.trade.LegalEntity;
+import org.nightlabs.jfire.transfer.Anchor;
 import org.nightlabs.jfire.transfer.Transfer;
 
 /**
@@ -42,26 +44,27 @@ import org.nightlabs.jfire.transfer.Transfer;
  *		identity-type="application"
  *		persistence-capable-superclass="org.nightlabs.jfire.accounting.Account"
  *		detachable="true"
- *		table="JFireTrade_ShadowAccount"
+ *		table="JFireTrade_SummaryAccount"
  *
  * @jdo.inheritance strategy="new-table"
  *
- * @jdo.fetch-group name="ShadowAccount.shadowedAccounts" fields="shadowedAccounts"
- * @jdo.fetch-group name="ShadowAccount.this" fetch-groups="default, Account.this" fields="shadowedAccounts"
+ * @jdo.fetch-group name="SummaryAccount.summedAccounts" fields="summedAccounts"
+ * @jdo.fetch-group name="SummaryAccount.this" fetch-groups="default, Account.this" fields="summedAccounts"
  */
-public class ShadowAccount extends Account
+public class SummaryAccount extends Account
 {
+	private static final long serialVersionUID = 1L;
 
 	/**
-	 * anchorTypeID for shadow accounts of the Local organisation
+	 * anchorTypeID for {@link SummaryAccount}s
 	 */
-	public static final String ANCHOR_TYPE_ID_LOCAL_SHADOW = "LocalAccount.Shadow";
+	public static final String ANCHOR_TYPE_ID_SUMMARY = "Account.Summary";
 
-	public static final String FETCH_GROUP_SHADOWED_ACCOUNTS = "ShadowAccount.shadowedAccounts";
-	public static final String FETCH_GROUP_THIS_SHADOW_ACCOUNT = "ShadowAccount.this";
-	
+	public static final String FETCH_GROUP_SUMMED_ACCOUNTS = "SummaryAccount.summedAccounts";
+	public static final String FETCH_GROUP_THIS_SUMMARY_ACCOUNT = "SummaryAccount.this";
 
-	protected ShadowAccount() {
+
+	protected SummaryAccount() {
 	}
 
 	/**
@@ -69,33 +72,41 @@ public class ShadowAccount extends Account
 	 *		persistence-modifier="persistent"
 	 *		collection-type="collection"
 	 *		element-type="Account"
-	 *		table="JFireTrade_ShadowAccount_shadowedAccounts"
+	 *		table="JFireTrade_SummaryAccount_summedAccounts"
 	 *
 	 * @jdo.join
 	 */
-	protected Set shadowedAccounts = new HashSet();
+	protected Set<Account> summedAccounts;
 
-	public void addShadowedAccount(Account account) {
-		_addShadowedAccount(account);
-		account._addShadowAccount(this);
-	}
-	
-	protected void _addShadowedAccount(Account account) {
-		shadowedAccounts.add(account);
-	}
-	
-	public void removeShadowedAccount(Account account) {
-		_removeShadowedAccount(account);
-		account._removeShadowAccount(this);
-	}
-	
-	public void _removeShadowedAccount(Account account) {
-		shadowedAccounts.remove(account);
+	public void addSummedAccount(Account account) {
+		_addSummedAccount(account);
+		account._addSummaryAccount(this);
 	}
 
-	public Collection getShadowedAccounts() {
-		return shadowedAccounts;
+	protected void _addSummedAccount(Account account) {
+		summedAccounts.add(account);
 	}
+
+	public void removeSummedAccount(Account account) {
+		_removeSummedAccount(account);
+		account._removeSummaryAccount(this);
+	}
+
+	public void _removeSummedAccount(Account account) {
+		summedAccounts.remove(account);
+	}
+
+	public Collection<Account> getSummedAccounts() {
+		return Collections.unmodifiableCollection(summedAccounts);
+	}
+
+//	@SuppressWarnings("unchecked")
+//	public void clearSummedAccounts() {
+//		for (Iterator it = new ArrayList(summedAccounts).iterator(); it.hasNext();) {
+//			Account account = (Account) it.next();
+//			removeSummedAccount(account);
+//		}
+//	}
 
 	/**
 	 * @param organisationID
@@ -103,39 +114,43 @@ public class ShadowAccount extends Account
 	 * @param currency
 	 * @param statistical
 	 */
-	public ShadowAccount(String organisationID, String anchorID,
+	public SummaryAccount(String organisationID, String anchorID,
 			LegalEntity owner, Currency currency) {
-		super(organisationID, ANCHOR_TYPE_ID_LOCAL_SHADOW, anchorID, owner, currency);
+		super(organisationID, ANCHOR_TYPE_ID_SUMMARY, anchorID, owner, currency);
+		summedAccounts = new HashSet<Account>();
 	}
 
-	protected void rollbackAccountMoneyTransfer(User user, MoneyTransfer moneyTransfer, Map involvedAnchors)
+	protected void rollbackAccountMoneyTransfer(User user, MoneyTransfer moneyTransfer, Map<String, Anchor> involvedAnchors)
 	{
-		if (moneyTransfer instanceof ShadowMoneyTransfer) {
+		if (moneyTransfer instanceof SummaryMoneyTransfer) {
 			boolean isDebit = Transfer.ANCHORTYPE_TO == moneyTransfer.getAnchorType(this);
 //			boolean isDebit = moneyTransfer.getTo().getPrimaryKey().equals(this.getPrimaryKey());
 			adjustBalance(isDebit, moneyTransfer.getAmount());
 		}
 		else
-			throw new IllegalStateException("moneyTransfer is not an instance of ShadowMoneyTransfer!"); // can this happen?
+			throw new IllegalStateException("moneyTransfer is not an instance of SummaryMoneyTransfer!"); // can this happen?
 	}
 
 	/**
 	 * @see org.nightlabs.jfire.accounting.Account#bookAccountMoneyTransfer(org.nightlabs.jfire.security.User, org.nightlabs.jfire.accounting.MoneyTransfer, java.util.Map)
 	 */
 	protected void bookAccountMoneyTransfer(User user,
-			MoneyTransfer moneyTransfer, Map involvedAnchors)
+			MoneyTransfer moneyTransfer, Map<String, Anchor> involvedAnchors)
 	{
-//	 only ShadowMoneyTransfers are stored in ShadowAccounts
-		if (moneyTransfer instanceof ShadowMoneyTransfer) {
+		if (skip_bookAccountMoneyTransfer)
+			return;
+
+//	 only SummaryMoneyTransfers are stored in SummaryAccounts
+		if (moneyTransfer instanceof SummaryMoneyTransfer) {
 			boolean isDebit = Transfer.ANCHORTYPE_FROM == moneyTransfer.getAnchorType(this);
 //			boolean isDebit = moneyTransfer.getFrom().getPrimaryKey().equals(this.getPrimaryKey());
 			adjustBalance(isDebit, moneyTransfer.getAmount());
 //			addTransfer(moneyTransfer);
-			// book shadow transfers to shadowing accounts
-			bookShadowTransfers(user, moneyTransfer, involvedAnchors);
+			// book summary transfers to SummaryAccounts
+			bookSummaryTransfers(user, moneyTransfer, involvedAnchors);
 		}
 		else
-			throw new IllegalStateException("moneyTransfer is not an instance of ShadowMoneyTransfer!"); // can this happen?
+			throw new IllegalStateException("moneyTransfer is not an instance of SummaryMoneyTransfer!"); // can this happen?
 	}
 
 }

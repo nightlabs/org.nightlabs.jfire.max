@@ -27,6 +27,7 @@
 package org.nightlabs.jfire.accounting;
 
 import java.util.Collection;
+import java.util.Collections;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Map;
@@ -54,8 +55,8 @@ import org.nightlabs.jfire.transfer.Transfer;
  * @jdo.fetch-group name="Account.owner" fields="owner"
  * @jdo.fetch-group name="Account.currency" fields="currency"
  * @jdo.fetch-group name="Account.name" fields="name"
- * @jdo.fetch-group name="Account.shadowAccounts" fields="shadowAccounts"
- * @jdo.fetch-group name="Account.this" fetch-groups="default, Anchor.this" fields="owner, currency, name, shadowAccounts, revenueInAccount, revenueOutAccount"
+ * @jdo.fetch-group name="Account.summaryAccounts" fields="summaryAccounts"
+ * @jdo.fetch-group name="Account.this" fetch-groups="default, Anchor.this" fields="owner, currency, name, summaryAccounts, revenueInAccount, revenueOutAccount"
  */
 public class Account extends Anchor
 {
@@ -64,17 +65,17 @@ public class Account extends Anchor
 	public static final String FETCH_GROUP_OWNER = "Account.owner";
 	public static final String FETCH_GROUP_CURRENCY = "Account.currency";
 	public static final String FETCH_GROUP_NAME = "Account.name";
-	public static final String FETCH_GROUP_SHADOW_ACCOUNTS = "Account.shadowAccounts";
+	public static final String FETCH_GROUP_SUMMARY_ACCOUNTS = "Account.summaryAccounts";
 	public static final String FETCH_GROUP_THIS_ACCOUNT = "Account.this";
 	
-	/**
-	 * anchorTypeID for normal accounts of the Local organisation
-	 *
-	 * @deprecated This type will be deleted very soon. It must be one of
-	 *		{@link #ANCHOR_TYPE_ID_LOCAL_REVENUE_IN}, {@link #ANCHOR_TYPE_ID_LOCAL_REVENUE_OUT} or
-	 *		{@link #ANCHOR_TYPE_ID_LOCAL_COST} instead!
-	 */
-	public static final String ANCHOR_TYPE_ID_LOCAL_NORMAL = "Account.Local.Normal";
+//	/**
+//	 * anchorTypeID for normal accounts of the Local organisation
+//	 *
+//	 * @deprecated This type will be deleted very soon. It must be one of
+//	 *		{@link #ANCHOR_TYPE_ID_LOCAL_REVENUE_IN}, {@link #ANCHOR_TYPE_ID_LOCAL_REVENUE_OUT} or
+//	 *		{@link #ANCHOR_TYPE_ID_LOCAL_COST} instead!
+//	 */
+//	public static final String ANCHOR_TYPE_ID_LOCAL_NORMAL = "Account.Local.Normal";
 
 	/**
 	 * anchorTypeID for revenue accounts of the local organisation. This is the default revenue account. In case
@@ -151,7 +152,8 @@ public class Account extends Anchor
 		this.currency = currency;
 		this.owner = owner;
 		this.name = new AccountName(this);
-		// TODO: What about an accountType (Erlös/Aufwandt)
+		this.summaryAccounts = new HashSet<SummaryAccount>();
+		// TODO: What about an accountType (Erlös/Aufwandt) - isn't this realised now with REVENUE_IN/REVENUE_OUT/COST?
 	}
 //	/**
 //	 * The accountant who is responsible for MoneyTransfers from and to this Account. The Accountant
@@ -215,7 +217,7 @@ public class Account extends Anchor
 	/**
 	 * @see org.nightlabs.jfire.transfer.Anchor#internalRollbackTransfer(org.nightlabs.jfire.transfer.Transfer, org.nightlabs.jfire.security.User, java.util.Map)
 	 */
-	protected void internalRollbackTransfer(Transfer transfer, User user, Map involvedAnchors)
+	protected void internalRollbackTransfer(Transfer transfer, User user, Map<String, Anchor> involvedAnchors)
 	{
 		MoneyTransfer moneyTransfer = (MoneyTransfer) transfer;
 
@@ -223,12 +225,12 @@ public class Account extends Anchor
 	}
 
 	/**
-	 * This method is overridden by {@link ShadowAccount}.
+	 * This method is overridden by {@link SummaryAccount}.
 	 */
-	protected void rollbackAccountMoneyTransfer(User user, MoneyTransfer moneyTransfer, Map involvedAnchors)
+	protected void rollbackAccountMoneyTransfer(User user, MoneyTransfer moneyTransfer, Map<String, Anchor> involvedAnchors)
 	{
-//	 ShadowMoneyTransfers are only stored in ShadowAccounts
-		if (! (moneyTransfer instanceof ShadowMoneyTransfer) ) {
+//	 SummaryMoneyTransfers are only stored in SummaryAccounts
+		if (! (moneyTransfer instanceof SummaryMoneyTransfer) ) {
 			boolean isDebit = Transfer.ANCHORTYPE_TO == moneyTransfer.getAnchorType(this);
 //			boolean isDebit = moneyTransfer.getTo().getPrimaryKey().equals(this.getPrimaryKey());
 			adjustBalance(isDebit, moneyTransfer.getAmount());
@@ -269,48 +271,62 @@ public class Account extends Anchor
 	}
 
 	/**
-	 * This method is overridden by {@link ShadowAccount}.
+	 * This method is overridden by {@link SummaryAccount}.
 	 */
-	protected void bookAccountMoneyTransfer(User user, MoneyTransfer moneyTransfer, Map involvedAnchors)
+	protected void bookAccountMoneyTransfer(User user, MoneyTransfer moneyTransfer, Map<String, Anchor> involvedAnchors)
 	{
-//	 ShadowMoneyTransfers are only stored in ShadowAccounts
-		if (! (moneyTransfer instanceof ShadowMoneyTransfer) ) {
+		if (skip_bookAccountMoneyTransfer)
+			return;
+
+//	 SummaryMoneyTransfers are only stored in SummaryAccounts
+		if (! (moneyTransfer instanceof SummaryMoneyTransfer) ) {
 			boolean isDebit = Transfer.ANCHORTYPE_FROM == moneyTransfer.getAnchorType(this);
 //			boolean isDebit = moneyTransfer.getFrom().getPrimaryKey().equals(this.getPrimaryKey());
 			adjustBalance(isDebit, moneyTransfer.getAmount());
 //			addTransfer(moneyTransfer);
-			
-			bookShadowTransfers(user, moneyTransfer, involvedAnchors);
+
+			bookSummaryTransfers(user, moneyTransfer, involvedAnchors);
 		}
 	}
-		
-	protected void bookShadowTransfers(User user, MoneyTransfer moneyTransfer, Map<String, Anchor> involvedAnchors) {
-		Accounting accounting = Accounting.getAccounting(JDOHelper.getPersistenceManager(this));
-		boolean isDebit = Transfer.ANCHORTYPE_FROM == moneyTransfer.getAnchorType(this);
-		for (Iterator iter = getShadowAccounts().iterator(); iter.hasNext();) {
-			ShadowAccount shadowAccount = (ShadowAccount) iter.next();
-//			Account from;
-//			Account to;
-//			if (isDebit) {
-//			from = shadowAccount;
-//			to = this;
-//			}
-//			else {
-//			to = shadowAccount;
-//			from = this;
-//			}
-//			
-			ShadowMoneyTransfer shadowMoneyTransfer = new ShadowMoneyTransfer(
-					accounting,
-					(InvoiceMoneyTransfer)(moneyTransfer.getContainer() == null ? moneyTransfer : moneyTransfer.getContainer()),
-//					from, to,
-					(isDebit) ? shadowAccount : this,
-					(isDebit) ? this : shadowAccount,
-					moneyTransfer.getAmount()
-			);
-//			JDOHelper.getPersistenceManager(this).makePersistent(shadowMoneyTransfer); // done in constructor
-			shadowMoneyTransfer.bookTransfer(user, involvedAnchors);
-//			shadowAccount.bookTransfer(user, shadowMoneyTransfer, involvedAnchors);
+
+	/**
+	 * @jdo.field persistence-modifier="none"
+	 */
+	protected transient boolean skip_bookAccountMoneyTransfer = false;
+
+	protected void bookSummaryTransfers(User user, MoneyTransfer moneyTransfer, Map<String, Anchor> involvedAnchors) {
+		skip_bookAccountMoneyTransfer = true;
+		try {
+			Accounting accounting = Accounting.getAccounting(JDOHelper.getPersistenceManager(this));
+			boolean isDebit = Transfer.ANCHORTYPE_FROM == moneyTransfer.getAnchorType(this);
+			for (Iterator iter = getSummaryAccounts().iterator(); iter.hasNext();) {
+				SummaryAccount summaryAccount = (SummaryAccount) iter.next();
+	
+	//			Account from;
+	//			Account to;
+	//			if (isDebit) {
+	//			from = SummaryAccount;
+	//			to = this;
+	//			}
+	//			else {
+	//			to = SummaryAccount;
+	//			from = this;
+	//			}
+	
+				SummaryMoneyTransfer summaryMoneyTransfer = new SummaryMoneyTransfer(
+						accounting,
+						(InvoiceMoneyTransfer)(moneyTransfer.getContainer() == null ? moneyTransfer : moneyTransfer.getContainer()),
+	//					from, to,
+						(isDebit) ? summaryAccount : this,
+						(isDebit) ? this : summaryAccount,
+						moneyTransfer.getAmount()
+				);
+	//			JDOHelper.getPersistenceManager(this).makePersistent(summaryMoneyTransfer); // done in constructor
+				summaryMoneyTransfer.bookTransfer(user, involvedAnchors);
+	//			SummaryAccount.bookTransfer(user, summaryMoneyTransfer, involvedAnchors);
+			}
+		} finally {
+			skip_bookAccountMoneyTransfer = false;
 		}
 	}
 
@@ -318,34 +334,42 @@ public class Account extends Anchor
 	 * @jdo.field
 	 *		persistence-modifier="persistent"
 	 *		collection-type="collection"
-	 *		element-type="ShadowAccount"
-	 *		table="JFireTrade_Account_shadowAccounts"
+	 *		element-type="SummaryAccount"
+	 *		table="JFireTrade_Account_summaryAccounts"
 	 *
 	 * @jdo.join
 	 */
-	protected Set shadowAccounts = new HashSet();
+	protected Set<SummaryAccount> summaryAccounts;
 
-	public void addShadowAccount(ShadowAccount shadowAccount) {
-		_addShadowAccount(shadowAccount);
-		shadowAccount._addShadowedAccount(this);
+	public void addSummaryAccount(SummaryAccount summaryAccount) {
+		_addSummaryAccount(summaryAccount);
+		summaryAccount._addSummedAccount(this);
 	}
 	
-	protected void _addShadowAccount(ShadowAccount shadowAccount) {
-		shadowAccounts.add(shadowAccount);
+	protected void _addSummaryAccount(SummaryAccount summaryAccount) {
+		summaryAccounts.add(summaryAccount);
 	}
 	
-	public void removeShadowAccount(ShadowAccount shadowAccount) {
-		_removeShadowAccount(shadowAccount);
-		shadowAccount._removeShadowedAccount(this);
+	public void removeSummaryAccount(SummaryAccount summaryAccount) {
+		_removeSummaryAccount(summaryAccount);
+		summaryAccount._removeSummedAccount(this);
 	}
 	
-	public void _removeShadowAccount(ShadowAccount shadowAccount) {
-		shadowAccounts.remove(shadowAccount);
+	public void _removeSummaryAccount(SummaryAccount summaryAccount) {
+		summaryAccounts.remove(summaryAccount);
 	}
 
-	public Collection getShadowAccounts() {
-		return shadowAccounts;
+	public Collection<SummaryAccount> getSummaryAccounts() {
+		return Collections.unmodifiableCollection(summaryAccounts);
 	}
+
+//	@SuppressWarnings("unchecked")
+//	public void clearSummaryAccounts() {
+//		for (Iterator it = new ArrayList(summaryAccounts).iterator(); it.hasNext();) {
+//			SummaryAccount sa = (SummaryAccount) it.next();
+//			removeSummaryAccount(sa);
+//		}
+//	}
 
 	public LegalEntity getOwner() {
 		return owner;

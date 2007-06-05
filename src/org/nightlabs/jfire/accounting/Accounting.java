@@ -1057,35 +1057,35 @@ public class Accounting
 //		}
 //	}
 
-	/**
-	 * Creates and persists a new Account for the mandator.
-	 * 
-	 * @param anchorID
-	 * @param currency
-	 * @return
-	 */
-	public Account createMandatorAccount(String anchorID, Currency currency, boolean createShadowAccount) {
-		Account newAccount = null;
-		if (createShadowAccount) {
-			newAccount = new ShadowAccount(
-					getMandator().getOrganisationID(),
-					anchorID, 
-					getMandator(), 
-					currency
-			);
-		}
-		else {
-			newAccount = new Account(
-					getMandator().getOrganisationID(),
-					Account.ANCHOR_TYPE_ID_LOCAL_NORMAL,
-					anchorID,
-					getMandator(),
-					currency
-			);
-		}
-		getPersistenceManager().makePersistent(newAccount);
-		return newAccount;
-	}
+//	/**
+//	 * Creates and persists a new Account for the mandator.
+//	 * 
+//	 * @param anchorID
+//	 * @param currency
+//	 * @return
+//	 */
+//	public Account createMandatorAccount(String anchorID, Currency currency, boolean createSummaryAccount) {
+//		Account newAccount = null;
+//		if (createSummaryAccount) {
+//			newAccount = new SummaryAccount(
+//					getMandator().getOrganisationID(),
+//					anchorID, 
+//					getMandator(), 
+//					currency
+//			);
+//		}
+//		else {
+//			newAccount = new Account(
+//					getMandator().getOrganisationID(),
+//					Account.ANCHOR_TYPE_ID_LOCAL_NORMAL,
+//					anchorID,
+//					getMandator(),
+//					currency
+//			);
+//		}
+//		getPersistenceManager().makePersistent(newAccount);
+//		return newAccount;
+//	}
 	
 	/**
 	 * Finds (and creates if neccessary) the right Account for the given LegalEntity and Currency.

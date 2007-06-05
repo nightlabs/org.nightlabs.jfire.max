@@ -35,14 +35,14 @@ import org.nightlabs.jfire.transfer.TransferRegistry;
  *		identity-type="application"
  *		persistence-capable-superclass="org.nightlabs.jfire.accounting.MoneyTransfer"
  *		detachable="true"
- *		table="JFireTrade_ShadowMoneyTransfer"
+ *		table="JFireTrade_SummaryMoneyTransfer"
  *
  * @jdo.inheritance strategy = "new-table"
  */
-public class ShadowMoneyTransfer extends MoneyTransfer
+public class SummaryMoneyTransfer extends MoneyTransfer
 {
 
-	protected ShadowMoneyTransfer() { }
+	protected SummaryMoneyTransfer() { }
 
 	/**
 	 * BookMoneyTransfer associated to only one Invoice, used for invoice-bookings.
@@ -56,7 +56,7 @@ public class ShadowMoneyTransfer extends MoneyTransfer
 	 * @param currency
 	 * @param amount
 	 */
-	public ShadowMoneyTransfer(TransferRegistry transferRegistry,
+	public SummaryMoneyTransfer(TransferRegistry transferRegistry,
 			InvoiceMoneyTransfer container, Account from, Account to, long amount)
 	{
 		super(transferRegistry, container, // container.getInitiator(), 

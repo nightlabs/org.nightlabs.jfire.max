@@ -715,38 +715,38 @@ public abstract class AccountingManagerBean
 		}
 	}
 
-	/**
-	 * @throws ModuleException
-	 *
-	 * @ejb.interface-method
-	 * @ejb.transaction type = "Required"
-	 * @ejb.permission role-name="_Guest_"
-	 */
-	public Account createMandatorAccount(String anchorID, String currencyID, boolean createShadowAccount, boolean get, String[] fetchGroups, int maxFetchDepth)
-	throws ModuleException
-	{
-		PersistenceManager pm = getPersistenceManager();
-		try {
-			Currency currency = null;
-			try {
-				currency = (Currency)pm.getObjectById(CurrencyID.create(currencyID));
-			} catch(JDOObjectNotFoundException e) {
-				throw new ModuleException("No currency with currencyID "+currencyID+" known.", e);
-			}
-			
-			Account newAccount = Accounting.getAccounting(pm).createMandatorAccount(anchorID, currency, createShadowAccount);
-			if (get) {
-				pm.getFetchPlan().setMaxFetchDepth(maxFetchDepth);
-				if (fetchGroups != null)
-					pm.getFetchPlan().setGroups(fetchGroups);
-
-				return (Account)pm.detachCopy(newAccount);
-			}
-			return null;			
-		} finally {
-			pm.close();
-		}
-	}
+//	/**
+//	 * @throws ModuleException
+//	 *
+//	 * @ejb.interface-method
+//	 * @ejb.transaction type = "Required"
+//	 * @ejb.permission role-name="_Guest_"
+//	 */
+//	public Account createMandatorAccount(String anchorID, String currencyID, boolean createSummaryAccount, boolean get, String[] fetchGroups, int maxFetchDepth)
+//	throws ModuleException
+//	{
+//		PersistenceManager pm = getPersistenceManager();
+//		try {
+//			Currency currency = null;
+//			try {
+//				currency = (Currency)pm.getObjectById(CurrencyID.create(currencyID));
+//			} catch(JDOObjectNotFoundException e) {
+//				throw new ModuleException("No currency with currencyID "+currencyID+" known.", e);
+//			}
+//			
+//			Account newAccount = Accounting.getAccounting(pm).createMandatorAccount(anchorID, currency, createSummaryAccount);
+//			if (get) {
+//				pm.getFetchPlan().setMaxFetchDepth(maxFetchDepth);
+//				if (fetchGroups != null)
+//					pm.getFetchPlan().setGroups(fetchGroups);
+//
+//				return (Account)pm.detachCopy(newAccount);
+//			}
+//			return null;			
+//		} finally {
+//			pm.close();
+//		}
+//	}
 	
 	/**
 	 * @throws ModuleException
@@ -760,11 +760,11 @@ public abstract class AccountingManagerBean
 	{
 		PersistenceManager pm = getPersistenceManager();
 		try {
-			if (!JDOHelper.isDetached(account))
-				throw new IllegalArgumentException("storeAccount can only accept detached Accounts. Use create_*_Account methods to create an Account.");
+//			if (!JDOHelper.isDetached(account))
+//				throw new IllegalArgumentException("storeAccount can only accept detached Accounts. Use create_*_Account methods to create an Account.");
 			if (!account.getOrganisationID().equals(getOrganisationID()))
 				throw new IllegalArgumentException("Given Account was created for a different organisation, can not store to this datastore!");
-			
+
 			Account result = (Account)NLJDOHelper.storeJDO(pm, account, get, fetchGroups, maxFetchDepth);
 			return result;
 		} finally {
@@ -773,27 +773,35 @@ public abstract class AccountingManagerBean
 	}
 
 	/**
-	 * @param anchorID The anchorID of the Account wich shadowAccounts are to be set
-	 * @param shadowAccounts A Collection of the AnchorIDs of the ShadowAccounts to be set to the given Account.
+	 * @param anchorID The anchorID of the Account wich SummaryAccounts are to be set
+	 * @param SummaryAccounts A Collection of the AnchorIDs of the SummaryAccounts to be set to the given Account.
 	 * @throws ModuleException
 	 *
 	 * @ejb.interface-method
-	 * @ejb.transaction type = "Required"
+	 * @ejb.transaction type="Required"
 	 * @ejb.permission role-name="_Guest_"
 	 */
-	public void setAccountShadowAccounts(AnchorID anchorID, Collection shadowAccounts)
+	public void setAccountSummaryAccounts(AnchorID anchorID, Collection<AnchorID> _summaryAccountIDs)
 	throws ModuleException
 	{
 		PersistenceManager pm = getPersistenceManager();
 		try {
+			Set<AnchorID> summaryAccountIDs = new HashSet<AnchorID>(_summaryAccountIDs);
+
 			Account account = (Account)pm.getObjectById(anchorID);
-			account.getShadowAccounts().clear();
-			for (Iterator iter = shadowAccounts.iterator(); iter.hasNext();) {
-				AnchorID shadowID = (AnchorID) iter.next();
-				ShadowAccount shadowAccount = (ShadowAccount)pm.getObjectById(shadowID);
-				account.getShadowAccounts().add(shadowAccount);
-				shadowAccount.getShadowedAccounts().remove(account);
-				shadowAccount.getShadowedAccounts().add(account);
+			Set<SummaryAccount> summaryAccountsToRemove = new HashSet<SummaryAccount>();
+			for (SummaryAccount sa : account.getSummaryAccounts()) {
+				if (!summaryAccountIDs.remove(JDOHelper.getObjectId(sa)))
+					summaryAccountsToRemove.add(sa);
+			}
+
+			for (SummaryAccount summaryAccount : summaryAccountsToRemove)
+				account.removeSummaryAccount(summaryAccount);
+
+			for (Iterator iter = summaryAccountIDs.iterator(); iter.hasNext();) {
+				AnchorID summaryAccountID = (AnchorID) iter.next();
+				SummaryAccount summaryAccount = (SummaryAccount)pm.getObjectById(summaryAccountID);
+				account.addSummaryAccount(summaryAccount);
 			}
 		} finally {
 			pm.close();
@@ -801,27 +809,35 @@ public abstract class AccountingManagerBean
 	}
 
 	/**
-	 * @param anchorID The anchorID of the ShadowAccount wich shadowedAccounts are to be set
-	 * @param accounts A Collection of the AnchorIDs of the Accounts to be shadowed by the given ShadowAccount.
+	 * @param summaryAccountID The anchorID of the SummaryAccount wich summedAccounts are to be set
+	 * @param summedAccountIDs A Collection of the AnchorIDs of the Accounts to be summed up by the given SummaryAccount.
 	 * @throws ModuleException
 	 *
 	 * @ejb.interface-method
-	 * @ejb.transaction type = "Required"
+	 * @ejb.transaction type="Required"
 	 * @ejb.permission role-name="_Guest_"
 	 */
-	public void setShadowAccountShadowedAccounts(AnchorID anchorID, Collection accounts)
+	public void setSummaryAccountSummedAccounts(AnchorID summaryAccountID, Collection<AnchorID> _summedAccountIDs)
 	throws ModuleException
 	{
 		PersistenceManager pm = getPersistenceManager();
 		try {
-			ShadowAccount shadowAccount = (ShadowAccount)pm.getObjectById(anchorID);
-			shadowAccount.getShadowedAccounts().clear();			
-			for (Iterator iter = accounts.iterator(); iter.hasNext();) {
+			Set<AnchorID> summedAccountIDs = new HashSet<AnchorID>(_summedAccountIDs);
+
+			SummaryAccount summaryAccount = (SummaryAccount)pm.getObjectById(summaryAccountID);
+			Set<Account> accountsToRemove = new HashSet<Account>();
+			for (Account a : summaryAccount.getSummedAccounts()) {
+				if (!summedAccountIDs.remove(JDOHelper.getObjectId(a)))
+					accountsToRemove.add(a);
+			}
+
+			for (Account account : accountsToRemove)
+				summaryAccount.removeSummedAccount(account);
+
+			for (Iterator iter = summedAccountIDs.iterator(); iter.hasNext();) {
 				AnchorID accountID = (AnchorID) iter.next();
 				Account account = (Account)pm.getObjectById(accountID);
-				account.getShadowAccounts().remove(shadowAccount);
-				account.getShadowAccounts().add(shadowAccount);
-				shadowAccount.getShadowedAccounts().add(account);
+				summaryAccount.addSummedAccount(account);
 			}
 		} finally {
 			pm.close();

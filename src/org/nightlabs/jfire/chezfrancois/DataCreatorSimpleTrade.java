@@ -53,6 +53,7 @@ import org.nightlabs.jfire.accounting.priceconfig.PriceConfig;
 import org.nightlabs.jfire.idgenerator.IDGenerator;
 import org.nightlabs.jfire.prop.IStruct;
 import org.nightlabs.jfire.prop.Property;
+import org.nightlabs.jfire.prop.StructLocal;
 import org.nightlabs.jfire.prop.datafield.I18nTextDataField;
 import org.nightlabs.jfire.prop.datafield.ImageDataField;
 import org.nightlabs.jfire.security.User;
@@ -129,7 +130,8 @@ extends DataCreator
 	}
 	
 	public void createWineProperties(PersistenceManager pm, SimpleProductType productType, String englishShort, String germanShort, String englishLong, String germanLong, String smallImage, String smallImageContentType, String largeImage, String largeImageContentType) {
-		IStruct struct = SimpleProductTypeStruct.getSimpleProductTypeStruct(productType.getOrganisationID(), pm);
+		SimpleProductTypeStruct.getSimpleProductTypeStruct(productType.getOrganisationID(), pm);
+		IStruct struct = StructLocal.getStructLocal(SimpleProductType.class, StructLocal.DEFAULT_SCOPE, pm);
 		Property props = productType.getPropertySet();
 		productType.getFieldMetaData("propertySet").setValueInherited(false);
 		pm.getFetchPlan().setGroups(new String[] {FetchPlan.DEFAULT, Property.FETCH_GROUP_DATA_FIELDS, Property.FETCH_GROUP_FULL_DATA});

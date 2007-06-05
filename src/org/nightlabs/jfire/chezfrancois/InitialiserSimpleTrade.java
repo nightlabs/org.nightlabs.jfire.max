@@ -2,12 +2,14 @@ package org.nightlabs.jfire.chezfrancois;
 
 import java.util.Date;
 import java.util.Iterator;
+import java.util.Set;
 
 import javax.jdo.JDOObjectNotFoundException;
 import javax.jdo.PersistenceManager;
 
 import org.apache.log4j.Logger;
 import org.nightlabs.ModuleException;
+import org.nightlabs.config.Config;
 import org.nightlabs.jfire.accounting.Account;
 import org.nightlabs.jfire.accounting.Tariff;
 import org.nightlabs.jfire.accounting.book.LocalAccountantDelegate;
@@ -25,6 +27,8 @@ import org.nightlabs.jfire.security.UserGroup;
 import org.nightlabs.jfire.security.UserGroupRef;
 import org.nightlabs.jfire.security.UserLocal;
 import org.nightlabs.jfire.security.id.AuthorityID;
+import org.nightlabs.jfire.servermanager.config.OrganisationCf;
+import org.nightlabs.jfire.servermanager.config.OrganisationConfigModule;
 import org.nightlabs.jfire.simpletrade.store.SimpleProductType;
 import org.nightlabs.jfire.store.id.ProductTypeID;
 import org.nightlabs.jfire.trade.Article;
@@ -293,6 +297,18 @@ extends Initialiser
 		Trader trader = Trader.getTrader(pm);
 		CustomerGroup customerGroupDefault = trader.getDefaultCustomerGroupForKnownCustomer();
 
+		OrganisationConfigModule cfMod = (OrganisationConfigModule) Config.sharedInstance().createConfigModule(OrganisationConfigModule.class);
+		for (Iterator iter = cfMod.getOrganisations().iterator(); iter.hasNext();) {
+			OrganisationCf orgCf = (OrganisationCf) iter.next();
+			if (!orgCf.getOrganisationID().equals(getOrganisationID()))
+				continue;
+			Set<String> adminIDs = orgCf.getServerAdmins();
+			for (String adminID	: adminIDs) {
+				User admin = User.getUser(pm, orgCf.getOrganisationID(), adminID);
+				dataCreator.setUserReportLayoutAvailEntries(pm, admin);
+			}
+		} 
+		
 		// create some more users
 		User user00 = dataCreator.createUser("user00", "test", "Chez Francois", "Miller", "Adam", "adam.miller@chezfrancois.co.th");
 		LegalEntity legalEntity00 = dataCreator.createLegalEntity(user00.getPerson());

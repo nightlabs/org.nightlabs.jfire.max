@@ -89,6 +89,8 @@ public class ReportLayoutConfigModule extends ConfigModule {
 	}
 	
 	public ReportLayoutAvailEntry getAvailEntry(String reportRegistryItemType) {
+		if (availEntries == null) // WORKAROUND: This should never happen, still it was the case, although set in init()
+			availEntries = new HashMap<String, ReportLayoutAvailEntry>();
 		ReportLayoutAvailEntry result = availEntries.get(reportRegistryItemType);
 		if (result == null) {
 			result = new ReportLayoutAvailEntry(reportRegistryItemType, this);

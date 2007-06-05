@@ -62,9 +62,8 @@ import org.nightlabs.util.Utils;
  * @jdo.query
  *		name="getReportRegistryItemByType"
  *		query="SELECT 
- *			WHERE this.organisationID == paramOrganisationID &&
- *            this.reportRegistryItemType == paramReportRegistryItemType            
- *			PARAMETERS String paramOrganisationID, String reportRegistryItemType
+ *			WHERE this.organisationID == :paramOrganisationID &&
+ *            this.reportRegistryItemType == :paramReportRegistryItemType            
  *			import java.lang.String"
  * 
  * @jdo.query
@@ -210,9 +209,9 @@ public abstract class ReportRegistryItem implements Serializable, DetachCallback
 		return parentItemID;
 	}
 	
-	public static Collection getReportRegistryItemByType(PersistenceManager pm, String organisatinID, String reportRegistryItemType) {
+	public static Collection getReportRegistryItemByType(PersistenceManager pm, String organisationID, String reportRegistryItemType) {
 		Query q = pm.newNamedQuery(ReportRegistryItem.class, QUERY_GET_REPORT_REGISTRY_ITEM_BY_TYPE);
-		return (Collection)q.execute(organisatinID, reportRegistryItemType);
+		return (Collection)q.execute(organisationID, reportRegistryItemType);
 	}
 
 	public static ReportRegistryItem getTopReportRegistryItemByType(PersistenceManager pm, String organisatinID, String reportRegistryItemType) {

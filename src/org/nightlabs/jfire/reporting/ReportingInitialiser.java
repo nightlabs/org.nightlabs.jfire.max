@@ -659,7 +659,7 @@ public class ReportingInitialiser {
 		if (resourceFiles == null)
 			return;
 		for (File resFile : resourceFiles) {
-			String locale = ReportLayoutLocalisationData.extractLocale(reportFile.getName());
+			String locale = ReportLayoutLocalisationData.extractLocale(resFile.getName());
 			ReportLayoutLocalisationDataID localisationDataID = ReportLayoutLocalisationDataID.create(
 					layout.getOrganisationID(), layout.getReportRegistryItemType(), layout.getReportRegistryItemID(), locale  
 			);

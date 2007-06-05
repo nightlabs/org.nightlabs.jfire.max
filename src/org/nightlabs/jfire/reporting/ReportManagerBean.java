@@ -430,12 +430,9 @@ implements SessionBean
 				initRegisterConfigModules(pm);
 				logger.info("Initialized Reporting ConfigModules");
 				
-//				initRegisterCategoriesAndLayouts(pm, jfireServerManager);
-				logger.info("Initialized Reporting Categories and Layouts");
-				
 			}
 			
-			logger.info("Intializing JFireReporing basic scripts");
+			logger.info("Intializing JFireReporting basic scripts");
 			ScriptingInitialiser.initialise(pm, jfireServerManager, getOrganisationID());
 			
 		} finally {

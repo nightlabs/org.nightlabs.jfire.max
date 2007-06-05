@@ -181,7 +181,7 @@ public class ReportingInitialiser {
 		if (!scriptDir.exists())
 			throw new IllegalStateException("Script directory does not exist: " + scriptDir.getAbsolutePath());
 
-		logger.info("BEGIN initialization of Scripts");	
+		logger.debug("BEGIN initialization of Scripts");	
 //		initDefaultParameterSets();
 		createReportCategories(scriptDir, baseCategory);
 	}
@@ -289,7 +289,7 @@ public class ReportingInitialiser {
 
 			// create the category name
 			createElementName(catNode, "name", category.getName(), categoryID);
-			logger.info("create Script Category = "+category.getName());
+			logger.debug("create Script Category = "+category.getName());
 			
 
 			// Create reports
@@ -315,7 +315,7 @@ public class ReportingInitialiser {
 				}
 				
 				try {			
-					logger.info("create ReportLayout = " + reportID);				
+					logger.debug("create ReportLayout = " + reportID);				
 					ReportLayout layout;
 					boolean hadToBeCreated = false;
 					try {

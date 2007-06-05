@@ -12,7 +12,7 @@
 	<report
 		file="Default-InvoiceLayout.rptdesign" 
 		id="Default-InvoiceLayout"
-		overwriteOnInit="false"
+		overwriteOnInit="true"
 	>
 	<!-- id is optional and defaults to the value of file without extension -->
 	<!-- overwriteOnInit is optional and defaults to true -->
@@ -20,31 +20,32 @@
 		<name language="en">Default-Invoice</name>
 		
 		<parameter-acquisition>
-			<use-case id="DefaultUseCase" default="true" overwriteOnInit="true">
+			<use-case id="DefaultUseCase" default="true">
 				<name language="en">Default Usecase</name>
+				<description language="en">DefaultUseCase</description>
 				<parameters>
-					<parameter id="0" name="invoiceID" type="org.nightlabs.jfire.accounting.id.InvoiceID" x="554" y="43" />
+					<parameter id="0" name="articleContainerID" type="org.nightlabs.jfire.trade.id.ArticleContainerID" x="550" y="20" />
 				</parameters>
 				<value-provider-configs>
-					<provider-config id="1" organisationID="devil.NightLabs.org" categoryID="JFireReportingTrade-ValueProviderCategory-LegalEntity" valueProviderID="Search" pageIndex="0" pageOrder="0" allowNullOutputValue="false" showMessageInHeader="true" x="4" y="43" >
-						<message language="de">Suchen Sie den Rechnungs-Kunden</message>
-						<message language="en">Search the invoice customer</message>
-					</provider-config>
-					<provider-config id="2" organisationID="devil.NightLabs.org" categoryID="JFireReportingTrade-ValueProviderCategory-TradeDocuments-Invoice" valueProviderID="ByCustomer" pageIndex="1" pageOrder="0" allowNullOutputValue="false" showMessageInHeader="true" x="279" y="43" >
+					<provider-config id="1" organisationID="devil.NightLabs.org" categoryID="JFireReportingTrade-ValueProviderCategory-TradeDocuments-Invoice" valueProviderID="ByCustomer" pageIndex="1" pageOrder="0" allowNullOutputValue="false" showMessageInHeader="true" x="275" y="20" >
 						<message language="de">Wählen Sie eine der Rechnungen</message>
 						<message language="en">Select one of the customers invoices</message>
+					</provider-config>
+					<provider-config id="2" organisationID="devil.NightLabs.org" categoryID="JFireReportingTrade-ValueProviderCategory-LegalEntity" valueProviderID="Search" pageIndex="0" pageOrder="0" allowNullOutputValue="false" showMessageInHeader="true" x="0" y="20" >
+						<message language="de">Suchen Sie den Rechnungs-Kunden</message>
+						<message language="en">Search the invoice customer</message>
 					</provider-config>
 				</value-provider-configs>
 				<value-consumer-bindings>
 					<value-consumer-binding>
 						<binding-provider id="2"/>
-						<binding-parameter name="invoiceID"/>
-						<binding-consumer id="0"/>
+						<binding-parameter name="customer"/>
+						<binding-consumer id="1"/>
 					</value-consumer-binding>
 					<value-consumer-binding>
 						<binding-provider id="1"/>
-						<binding-parameter name="customer"/>
-						<binding-consumer id="2"/>
+						<binding-parameter name="articleContainerID"/>
+						<binding-consumer id="0"/>
 					</value-consumer-binding>
 				</value-consumer-bindings>
 			</use-case>

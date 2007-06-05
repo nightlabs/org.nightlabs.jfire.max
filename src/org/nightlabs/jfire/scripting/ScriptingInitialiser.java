@@ -184,7 +184,7 @@ public class ScriptingInitialiser
 		if (!scriptDir.exists())
 			throw new IllegalStateException("Script directory does not exist: " + scriptDir.getAbsolutePath());
 
-		logger.info("BEGIN initialization of Scripts");	
+		logger.debug("BEGIN initialization of Scripts");	
 //		initDefaultParameterSets();
 		createScriptCategories(scriptDir, baseCategory);
 	}
@@ -357,7 +357,7 @@ public class ScriptingInitialiser
 				}
 			}
 			createElementName(catNode, category.getName(), categoryID);
-			logger.info("create Script Category = "+itemType + "/" + categoryID);
+			logger.debug("create Script Category = "+itemType + "/" + categoryID);
 			
 
 			// Create scripts
@@ -420,7 +420,7 @@ public class ScriptingInitialiser
 				}
 				
 				try {			
-					logger.info("create Script = "+scriptRegistryItemType + "/" + scriptID);				
+					logger.debug("create Script = "+scriptRegistryItemType + "/" + scriptID);				
 					String scriptContent = Utils.readTextFile(scriptFile);
 					logger.debug("scriptContent = " + scriptContent);
 					Script script;

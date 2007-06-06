@@ -336,6 +336,7 @@ public class DataCreator
 	}
 	
 	public void setUserReportLayoutAvailEntries(PersistenceManager pm, User user) {
+		logger.debug("Setting ReportLayoutEntries for User "+user.getUserID());
 		Config config = Config.getConfig(pm, user.getOrganisationID(), user);
 		ReportLayoutConfigModule cfMod;
 		try {
@@ -343,6 +344,7 @@ public class DataCreator
 		} catch (ModuleException e) {
 			throw new RuntimeException(e);
 		}
+		logger.debug("Have config module");
 		setUserReportLayoutAvailEntry(pm, user, cfMod, ReportingTradeConstants.REPORT_REGISTRY_ITEM_TYPE_INVOICE);
 		setUserReportLayoutAvailEntry(pm, user, cfMod, ReportingTradeConstants.REPORT_REGISTRY_ITEM_TYPE_OFFER);
 		setUserReportLayoutAvailEntry(pm, user, cfMod, ReportingTradeConstants.REPORT_REGISTRY_ITEM_TYPE_ORDER);
@@ -350,14 +352,17 @@ public class DataCreator
 	}
 	
 	private void setUserReportLayoutAvailEntry(PersistenceManager pm, User user, ReportLayoutConfigModule cfMod, String reportRegistryItemType) {
+		logger.debug("Setting ReportLayoutAvailEntry for type "+reportRegistryItemType);
 		ReportLayoutAvailEntry entry = cfMod.getAvailEntry(reportRegistryItemType);
 		Collection items = ReportLayout.getReportRegistryItemByType(pm, user.getOrganisationID(), reportRegistryItemType);
+		logger.debug("Search for ReportLayouts produced "+items.size()+" items");
 		for (Iterator iter = items.iterator(); iter.hasNext();) {
 			ReportRegistryItem item = (ReportRegistryItem) iter.next();
 			if (item instanceof ReportLayout) {
 				entry.getAvailableReportLayoutKeys().add(JDOHelper.getObjectId(item).toString());
 				// set the default, the last one will then be the real default
 				entry.setDefaultReportLayoutKey(JDOHelper.getObjectId(item).toString());
+				logger.debug("Added "+JDOHelper.getObjectId(item).toString()+" to availability set.");
 			}
 		}
 	}

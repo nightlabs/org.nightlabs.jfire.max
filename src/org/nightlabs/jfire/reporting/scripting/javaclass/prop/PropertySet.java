@@ -22,7 +22,6 @@ import org.nightlabs.jfire.person.PersonStruct;
 import org.nightlabs.jfire.prop.AbstractDataField;
 import org.nightlabs.jfire.prop.AbstractStructField;
 import org.nightlabs.jfire.prop.IStruct;
-import org.nightlabs.jfire.prop.Property;
 import org.nightlabs.jfire.prop.StructBlock;
 import org.nightlabs.jfire.prop.StructLocal;
 import org.nightlabs.jfire.prop.datafield.DateDataField;
@@ -43,7 +42,7 @@ import org.nightlabs.jfire.scripting.ScriptExecutorJavaClass;
 import org.nightlabs.jfire.security.SecurityReflector;
 
 /**
- * A reporting data set script that gives access to the datafields of a {@link Property}.
+ * A reporting data set script that gives access to the datafields of a {@link org.nightlabs.jfire.prop.PropertySet}.
  * Currently only {@link NumberDataField} and {@link II18nTextDataField} field types are supported.
  * The script takes one parameter:
  * <ul>
@@ -123,14 +122,14 @@ implements ScriptExecutorJavaClassReportingDelegate
 		PersistenceManager pm = getScriptExecutorJavaClass().getPersistenceManager();
 		Set oldGroups = pm.getFetchPlan().getGroups();
 		int oldFetchDepth = pm.getFetchPlan().getMaxFetchDepth();
-		pm.getFetchPlan().setGroups(new String[] {FetchPlan.DEFAULT, Property.FETCH_GROUP_FULL_DATA});
+		pm.getFetchPlan().setGroups(new String[] {FetchPlan.DEFAULT, org.nightlabs.jfire.prop.PropertySet.FETCH_GROUP_FULL_DATA});
 		pm.getFetchPlan().setMaxFetchDepth(NLJDOHelper.MAX_FETCH_DEPTH_NO_LIMIT);
 		
-		Property property = (Property) pm.getObjectById(propertyID);
+		org.nightlabs.jfire.prop.PropertySet property = (org.nightlabs.jfire.prop.PropertySet) pm.getObjectById(propertyID);
 		logger.debug("Have property");
 		
 		IStruct struct = StructLocal.getStructLocal(property.getStructLocalLinkClass(), property.getStructLocalScope(), pm);
-		property = (Property) pm.detachCopy(property);
+		property = (org.nightlabs.jfire.prop.PropertySet) pm.detachCopy(property);
 		pm.getFetchPlan().setGroups(oldGroups);
 		pm.getFetchPlan().setMaxFetchDepth(oldFetchDepth);
 		logger.debug("Property detached");

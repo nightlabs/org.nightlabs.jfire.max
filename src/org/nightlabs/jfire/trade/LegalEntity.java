@@ -46,7 +46,7 @@ import org.nightlabs.jfire.organisation.LocalOrganisation;
 import org.nightlabs.jfire.person.Person;
 import org.nightlabs.jfire.person.PersonStruct;
 import org.nightlabs.jfire.prop.IStruct;
-import org.nightlabs.jfire.prop.Property;
+import org.nightlabs.jfire.prop.PropertySet;
 import org.nightlabs.jfire.prop.StructLocal;
 import org.nightlabs.jfire.prop.datafield.TextDataField;
 import org.nightlabs.jfire.security.User;
@@ -120,7 +120,7 @@ public class LegalEntity extends Anchor
 		}
 
 		// It's better to have a Person for EVERY LegalEntity
-		Person person = new Person(IDGenerator.getOrganisationID(), IDGenerator.nextID(Property.class));
+		Person person = new Person(IDGenerator.getOrganisationID(), IDGenerator.nextID(PropertySet.class));
 		IStruct struct = StructLocal.getStructLocal(Person.class, PROPERY_SCOPE, pm);
 		struct.explodeProperty(person);
 		try {

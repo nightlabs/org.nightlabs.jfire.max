@@ -55,7 +55,7 @@ import org.nightlabs.jfire.organisation.Organisation;
 import org.nightlabs.jfire.person.Person;
 import org.nightlabs.jfire.person.PersonStruct;
 import org.nightlabs.jfire.prop.IStruct;
-import org.nightlabs.jfire.prop.Property;
+import org.nightlabs.jfire.prop.PropertySet;
 import org.nightlabs.jfire.prop.StructLocal;
 import org.nightlabs.jfire.prop.datafield.DateDataField;
 import org.nightlabs.jfire.prop.datafield.NumberDataField;
@@ -373,7 +373,7 @@ public class DataCreator
 	{		
 		IStruct personStruct = getPersonStruct();
 		
-		Person person = new Person(IDGenerator.getOrganisationID(), IDGenerator.nextID(Property.class));
+		Person person = new Person(IDGenerator.getOrganisationID(), IDGenerator.nextID(PropertySet.class));
 		personStruct.explodeProperty(person);
 		((TextDataField)person.getDataField(PersonStruct.PERSONALDATA_COMPANY)).setText(company);
 		((TextDataField)person.getDataField(PersonStruct.PERSONALDATA_NAME)).setText(name);
@@ -437,7 +437,7 @@ public class DataCreator
 	throws DataBlockNotFoundException, DataBlockGroupNotFoundException, DataFieldNotFoundException
 	{
 		IStruct personStruct = getPersonStruct();
-		Person person = new Person(IDGenerator.getOrganisationID(), IDGenerator.nextID(Property.class));
+		Person person = new Person(IDGenerator.getOrganisationID(), IDGenerator.nextID(PropertySet.class));
 		personStruct.explodeProperty(person);
 		((TextDataField)person.getDataField(PersonStruct.PERSONALDATA_COMPANY)).setText(company);
 		((TextDataField)person.getDataField(PersonStruct.PERSONALDATA_NAME)).setText(name);

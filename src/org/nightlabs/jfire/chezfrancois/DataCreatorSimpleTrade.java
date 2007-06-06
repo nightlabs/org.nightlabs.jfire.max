@@ -52,7 +52,7 @@ import org.nightlabs.jfire.accounting.priceconfig.IInnerPriceConfig;
 import org.nightlabs.jfire.accounting.priceconfig.PriceConfig;
 import org.nightlabs.jfire.idgenerator.IDGenerator;
 import org.nightlabs.jfire.prop.IStruct;
-import org.nightlabs.jfire.prop.Property;
+import org.nightlabs.jfire.prop.PropertySet;
 import org.nightlabs.jfire.prop.StructLocal;
 import org.nightlabs.jfire.prop.datafield.I18nTextDataField;
 import org.nightlabs.jfire.prop.datafield.ImageDataField;
@@ -132,9 +132,9 @@ extends DataCreator
 	public void createWineProperties(PersistenceManager pm, SimpleProductType productType, String englishShort, String germanShort, String englishLong, String germanLong, String smallImage, String smallImageContentType, String largeImage, String largeImageContentType) {
 		SimpleProductTypeStruct.getSimpleProductTypeStruct(productType.getOrganisationID(), pm);
 		IStruct struct = StructLocal.getStructLocal(SimpleProductType.class, StructLocal.DEFAULT_SCOPE, pm);
-		Property props = productType.getPropertySet();
+		PropertySet props = productType.getPropertySet();
 		productType.getFieldMetaData("propertySet").setValueInherited(false);
-		pm.getFetchPlan().setGroups(new String[] {FetchPlan.DEFAULT, Property.FETCH_GROUP_DATA_FIELDS, Property.FETCH_GROUP_FULL_DATA});
+		pm.getFetchPlan().setGroups(new String[] {FetchPlan.DEFAULT, PropertySet.FETCH_GROUP_DATA_FIELDS, PropertySet.FETCH_GROUP_FULL_DATA});
 		pm.getFetchPlan().setMaxFetchDepth(NLJDOHelper.MAX_FETCH_DEPTH_NO_LIMIT);
 
 		// PropertySet should always be detached before exploding! 
@@ -142,7 +142,7 @@ extends DataCreator
 		// I got an SQL error because this line was commented out! Marco.
 		// Why not explode attached, when intending to set all properties ;-)
 		if (JDOHelper.isPersistent(props))
-			props = (Property) pm.detachCopy(props);
+			props = (PropertySet) pm.detachCopy(props);
 		
 		struct.explodeProperty(props);
 		I18nTextDataField shortDesc;

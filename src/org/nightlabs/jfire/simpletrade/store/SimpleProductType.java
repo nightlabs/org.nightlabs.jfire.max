@@ -39,7 +39,7 @@ import org.nightlabs.jfire.accounting.TariffMapper;
 import org.nightlabs.jfire.accounting.gridpriceconfig.PriceCalculationException;
 import org.nightlabs.jfire.accounting.gridpriceconfig.PriceCalculator;
 import org.nightlabs.jfire.idgenerator.IDGenerator;
-import org.nightlabs.jfire.prop.Property;
+import org.nightlabs.jfire.prop.PropertySet;
 import org.nightlabs.jfire.prop.StructLocal;
 import org.nightlabs.jfire.security.User;
 import org.nightlabs.jfire.store.ProductType;
@@ -129,7 +129,7 @@ public class SimpleProductType extends ProductType
 	{
 		super(organisationID, productTypeID, extendedProductType, owner, inheritanceNature, packageNature);
 		this.structLocalScope = StructLocal.DEFAULT_SCOPE;
-		this.propertySet = new Property(organisationID, IDGenerator.nextID(Property.class));
+		this.propertySet = new PropertySet(organisationID, IDGenerator.nextID(PropertySet.class));
 //		this.name = new SimpleProductTypeName(this);
 //		getFieldMetaData("name").setValueInherited(false);
 	}
@@ -171,14 +171,14 @@ public class SimpleProductType extends ProductType
 	/**
 	 * @jdo.field persistence-modifier="persistent"
 	 */
-	private Property propertySet;
+	private PropertySet propertySet;
 
 	/**
 	 * Returns the property set of this {@link SimpleProductType}.
 	 * 
 	 * @return The property set of this {@link SimpleProductType}.
 	 */
-	public Property getPropertySet() {
+	public PropertySet getPropertySet() {
 		return propertySet;
 	}
 

@@ -82,7 +82,7 @@ import org.nightlabs.jfire.jdo.notification.persistent.SubscriptionUtil;
 import org.nightlabs.jfire.organisation.LocalOrganisation;
 import org.nightlabs.jfire.organisation.Organisation;
 import org.nightlabs.jfire.organisation.id.OrganisationID;
-import org.nightlabs.jfire.prop.Property;
+import org.nightlabs.jfire.prop.PropertySet;
 import org.nightlabs.jfire.prop.id.StructFieldID;
 import org.nightlabs.jfire.security.User;
 import org.nightlabs.jfire.simpletrade.notification.SimpleProductTypeNotificationFilter;
@@ -625,18 +625,18 @@ implements SessionBean
 	 * @ejb.permission role-name="SimpleTradeManager.Admin"
 	 * @ejb.transaction type = "Required"
 	 */
-	public Map<ProductTypeID, Property> getSimpleProductTypesPropertySets(
+	public Map<ProductTypeID, PropertySet> getSimpleProductTypesPropertySets(
 			Set<ProductTypeID> simpleProductTypeIDs,
 			Set<StructFieldID> structFieldIDs,
 			String[] fetchGroups, int maxFetchDepth
 		) 
 	{
-		Map<ProductTypeID, Property> result = new HashMap<ProductTypeID, Property>(simpleProductTypeIDs.size());
+		Map<ProductTypeID, PropertySet> result = new HashMap<ProductTypeID, PropertySet>(simpleProductTypeIDs.size());
 		PersistenceManager pm = getPersistenceManager();
 		try {
 			for (ProductTypeID productTypeID : simpleProductTypeIDs) {
 				SimpleProductType productType = (SimpleProductType) pm.getObjectById(productTypeID);
-				Property detached = Property.detachPropertyWithTrimmedFieldList(
+				PropertySet detached = PropertySet.detachPropertyWithTrimmedFieldList(
 						pm, 
 						productType.getPropertySet(), structFieldIDs, 
 						fetchGroups, maxFetchDepth

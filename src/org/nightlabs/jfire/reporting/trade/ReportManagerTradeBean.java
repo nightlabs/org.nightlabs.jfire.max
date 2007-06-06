@@ -143,7 +143,8 @@ implements SessionBean
 			
 			initializeReportParameterAcquisition(pm);
 			
-			ReportingInitialiser.initialise(pm, jfireServerManager, Organisation.DEVIL_ORGANISATION_ID);
+			// better have the layouts for the local organisation, than for the devil organisation			
+			ReportingInitialiser.initialise(pm, jfireServerManager, getOrganisationID()); 
 			
 			
 		} finally {

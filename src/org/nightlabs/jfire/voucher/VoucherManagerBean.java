@@ -49,7 +49,7 @@ import org.nightlabs.jfire.organisation.Organisation;
 import org.nightlabs.jfire.person.Person;
 import org.nightlabs.jfire.person.PersonStruct;
 import org.nightlabs.jfire.prop.IStruct;
-import org.nightlabs.jfire.prop.Property;
+import org.nightlabs.jfire.prop.PropertySet;
 import org.nightlabs.jfire.prop.Struct;
 import org.nightlabs.jfire.prop.datafield.TextDataField;
 import org.nightlabs.jfire.scripting.Script;
@@ -937,7 +937,7 @@ implements SessionBean
 				IStruct personStruct = Struct.getStruct(getOrganisationID(),
 						Person.class, pm);
 				Person person = new Person(getOrganisationID(), IDGenerator
-						.nextID(Property.class));
+						.nextID(PropertySet.class));
 				personStruct.explodeProperty(person);
 				((TextDataField) person.getDataField(PersonStruct.PERSONALDATA_COMPANY))
 						.setText("NightLabs GmbH");

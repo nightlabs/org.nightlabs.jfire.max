@@ -27,6 +27,7 @@
 package org.nightlabs.jfire.trade;
 
 import java.util.Collection;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
@@ -34,6 +35,8 @@ import java.util.Map;
 import org.nightlabs.jfire.store.ProductType;
 
 /**
+ * New (2007-06-07): Since this class is used in the client with Jobs, it is now Thread-safe.
+ *
  * @author Marco Schulze - marco at nightlabs dot de
  */
 public class ArticleSegmentGroup
@@ -45,7 +48,7 @@ public class ArticleSegmentGroup
 	 * key: String productTypeClassName<br/>
 	 * value: {@link ArticleProductTypeClassGroup} articleProductTypeGroup 
 	 */
-	private Map articleProductTypeClassGroups = new HashMap();
+	private Map<String, ArticleProductTypeClassGroup> articleProductTypeClassGroups = Collections.synchronizedMap(new HashMap<String, ArticleProductTypeClassGroup>());
 
 	public ArticleSegmentGroup(ArticleSegmentGroups articleSegmentGroups, Segment segment)
 	{
@@ -58,20 +61,20 @@ public class ArticleSegmentGroup
 		return articleSegmentGroups;
 	}
 
-	public ArticleCarrier addArticle(Article article)
+	public synchronized ArticleCarrier addArticle(Article article)
 	{
 		ArticleProductTypeClassGroup aptg = createArticleProductTypeClassGroup(article.getProductType().getClass());
 		return aptg.addArticle(article);
 	}
 
-	public void removeArticle(Article article)
+	public synchronized void removeArticle(Article article)
 	{
 		ArticleProductTypeClassGroup aptg = getArticleProductTypeClassGroup(article.getProductType(), false);
 		if (aptg != null)
 			aptg.removeArticle(article);
 	}
 
-	public void addArticles(Collection articles)
+	public synchronized void addArticles(Collection articles)
 	{
 		for (Iterator it = articles.iterator(); it.hasNext(); ) {
 			Article article = (Article)it.next();
@@ -79,7 +82,7 @@ public class ArticleSegmentGroup
 		}
 	}
 
-	public void removeArticles(Collection articles)
+	public synchronized void removeArticles(Collection articles)
 	{
 		for (Iterator it = articles.iterator(); it.hasNext(); ) {
 			Article article = (Article)it.next();
@@ -97,7 +100,7 @@ public class ArticleSegmentGroup
 	/**
 	 * @return Returns a <tt>Collection</tt> of {@link ArticleProductTypeClassGroup}.
 	 */
-	public Collection getArticleProductTypeGroups()
+	public Collection<ArticleProductTypeClassGroup> getArticleProductTypeGroups()
 	{
 		return articleProductTypeClassGroups.values();
 	}
@@ -133,7 +136,7 @@ public class ArticleSegmentGroup
 	 * @param productType
 	 * @return a newly created group or an old one if already existent before
 	 */
-	public ArticleProductTypeClassGroup createArticleProductTypeClassGroup(Class productTypeClass)
+	public synchronized ArticleProductTypeClassGroup createArticleProductTypeClassGroup(Class productTypeClass)
 	{
 		String productTypeClassName = productTypeClass.getName();
 

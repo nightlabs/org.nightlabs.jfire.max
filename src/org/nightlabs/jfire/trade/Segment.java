@@ -65,6 +65,11 @@ import org.nightlabs.util.Utils;
  * @jdo.fetch-group name="Segment.segmentType" fields="segmentType"
  * @jdo.fetch-group name="Segment.this" fetch-groups="default" fields="order, segmentType"
  *
+ * @!jdo.fetch-group name="FetchGroupsTrade.articleInOrderEditor" fields=""
+ * @!jdo.fetch-group name="FetchGroupsTrade.articleInOfferEditor" fields=""
+ * @jdo.fetch-group name="FetchGroupsTrade.articleInInvoiceEditor" fields="segmentType"
+ * @jdo.fetch-group name="FetchGroupsTrade.articleInDeliveryNoteEditor" fields="segmentType"
+ *
  * @jdo.query name="getSegmentTypeIDsOfOrder" query="SELECT JDOHelper.getObjectId(this.segmentType) WHERE this.order == :order"
  * @jdo.query name="getSegmentIDsOfOrderAndSegmentType" query="SELECT JDOHelper.getObjectId(this) WHERE this.order == :order && this.segmentType == :segmentType"
  */

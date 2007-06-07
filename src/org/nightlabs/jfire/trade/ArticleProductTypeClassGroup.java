@@ -37,6 +37,8 @@ import java.util.Set;
 import org.nightlabs.jfire.store.ProductType;
 
 /**
+ * New (2007-06-07): Since this class is used in the client with Jobs, it is now Thread-safe.
+ * 
  * @author Marco Schulze - marco at nightlabs dot de
  */
 public class ArticleProductTypeClassGroup
@@ -49,7 +51,7 @@ public class ArticleProductTypeClassGroup
 	 * key: String articlePK<br/>
 	 * value: {@link ArticleCarrier} articleCarrier
 	 */
-	private Map<String, ArticleCarrier> articleCarriers = new HashMap<String, ArticleCarrier>();
+	private Map<String, ArticleCarrier> articleCarriers = Collections.synchronizedMap(new HashMap<String, ArticleCarrier>());
 
 //	/**
 //	 * Cache for articles, which is normally <code>null</code>!!!
@@ -135,17 +137,12 @@ public class ArticleProductTypeClassGroup
 	 */
 	public Collection<Article> getArticles()
 	{
-//		if (articles == null) {
-			Set<Article> s = new HashSet<Article>(articleCarriers.size());
-			for (Iterator it = articleCarriers.values().iterator(); it.hasNext();) {
-				ArticleCarrier articleCarrier = (ArticleCarrier) it.next();
-				s.add(articleCarrier.getArticle());
-			}
-			return Collections.unmodifiableCollection(s);
-//			articles = s;
-//		}
-
-//		return articles;
+		Set<Article> s = new HashSet<Article>(articleCarriers.size());
+		for (Iterator it = articleCarriers.values().iterator(); it.hasNext();) {
+			ArticleCarrier articleCarrier = (ArticleCarrier) it.next();
+			s.add(articleCarrier.getArticle());
+		}
+		return Collections.unmodifiableCollection(s);
 	}
 
 	public Collection<ArticleCarrier> getArticleCarriers(Collection<Article> articles)

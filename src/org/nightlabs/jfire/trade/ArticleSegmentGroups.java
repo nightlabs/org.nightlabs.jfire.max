@@ -41,6 +41,8 @@ import org.nightlabs.jfire.trade.id.ArticleContainerID;
 import org.nightlabs.jfire.trade.id.ArticleID;
 
 /**
+ * New (2007-06-07): Since this class is used in the client with Jobs, it is now Thread-safe.
+ *
  * @author Marco Schulze - marco at nightlabs dot de
  */
 public class ArticleSegmentGroups
@@ -51,13 +53,13 @@ public class ArticleSegmentGroups
 	 * key: String segmentPK<br/>
 	 * value: {@link ArticleSegmentGroup} articleSegmentGroup
 	 */
-	private Map<String, ArticleSegmentGroup> articleSegmentGroups = new HashMap<String, ArticleSegmentGroup>();
+	private Map<String, ArticleSegmentGroup> articleSegmentGroups = Collections.synchronizedMap(new HashMap<String, ArticleSegmentGroup>());
 
 	/**
 	 * key: {@link org.nightlabs.jfire.trade.id.ArticleID} articleID<br/>
 	 * value: {@link ArticleCarrier} articleCarrier
 	 */
-	private Map<ArticleID, ArticleCarrier> articleCarriers = new HashMap<ArticleID, ArticleCarrier>();
+	private Map<ArticleID, ArticleCarrier> articleCarriers = Collections.synchronizedMap(new HashMap<ArticleID, ArticleCarrier>());
 
 	public boolean containsArticle(ArticleID articleID) {
 		return articleCarriers.containsKey(articleID);
@@ -107,10 +109,12 @@ public class ArticleSegmentGroups
 			Segment segment = (Segment) it.next();
 
 			String segmentPK = segment.getPrimaryKey();
-			ArticleSegmentGroup asg = (ArticleSegmentGroup) articleSegmentGroups.get(segmentPK);
-			if (asg == null) {
-				asg = _createArticleSegmentGroup(segment);
-				articleSegmentGroups.put(segmentPK, asg);
+			synchronized (articleSegmentGroups) {
+				ArticleSegmentGroup asg = articleSegmentGroups.get(segmentPK);
+				if (asg == null) {
+					asg = _createArticleSegmentGroup(segment);
+					articleSegmentGroups.put(segmentPK, asg);
+				}
 			}
 		}
 	}
@@ -127,10 +131,13 @@ public class ArticleSegmentGroups
 	protected ArticleCarrier addArticle(Article article)
 	{
 		String segmentPK = article.getSegment().getPrimaryKey();
-		ArticleSegmentGroup asg = (ArticleSegmentGroup) articleSegmentGroups.get(segmentPK);
-		if (asg == null) {
-			asg = _createArticleSegmentGroup(article.getSegment());
-			articleSegmentGroups.put(segmentPK, asg);
+		ArticleSegmentGroup asg;
+		synchronized (articleSegmentGroups) {
+			asg = articleSegmentGroups.get(segmentPK);
+			if (asg == null) {
+				asg = _createArticleSegmentGroup(article.getSegment());
+				articleSegmentGroups.put(segmentPK, asg);
+			}
 		}
 
 		// we want to have the same instance of Segment if they're equal - deduplicate if necessary

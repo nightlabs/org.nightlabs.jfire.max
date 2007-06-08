@@ -6,15 +6,12 @@ import javax.jdo.PersistenceManager;
 import javax.jdo.Query;
 
 import org.nightlabs.annotation.Implement;
-import org.nightlabs.inheritance.FieldMetaData;
 import org.nightlabs.jfire.security.User;
 import org.nightlabs.jfire.store.ProductType;
-import org.nightlabs.jfire.store.ProductTypeFieldMetaData;
 import org.nightlabs.jfire.store.ProductTypeLocal;
 import org.nightlabs.jfire.store.Repository;
 import org.nightlabs.jfire.store.id.ProductTypeID;
 import org.nightlabs.jfire.trade.LegalEntity;
-import org.nightlabs.jfire.transfer.Anchor;
 import org.nightlabs.jfire.voucher.scripting.VoucherLayout;
 
 /**

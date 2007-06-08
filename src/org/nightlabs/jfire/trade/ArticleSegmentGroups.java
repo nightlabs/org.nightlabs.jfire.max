@@ -181,7 +181,7 @@ public class ArticleSegmentGroups
 	/**
 	 * @return Returns a <tt>Collection</tt> of {@link ArticleSegmentGroup}.
 	 */
-	public Collection getArticleSegmentGroups()
+	public Collection<ArticleSegmentGroup> getArticleSegmentGroups()
 	{
 		return articleSegmentGroups.values();
 	}
@@ -195,10 +195,10 @@ public class ArticleSegmentGroups
 		return res;
 	}
 
-	public Set getArticles()
+	public Set<Article> getArticles()
 	{
 //		if (articles == null) {
-			Set s = new HashSet();
+			Set<Article> s = new HashSet<Article>();
 
 			for (Iterator it = articleCarriers.values().iterator(); it.hasNext();) {
 				ArticleCarrier articleCarrier = (ArticleCarrier) it.next();

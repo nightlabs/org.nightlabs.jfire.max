@@ -873,7 +873,7 @@ public abstract class AccountingManagerBean
 	}
 
 	/**
-	 * Returns a Clloection of {@link LocalAccountantDelegateID} not detached
+	 * Returns a Collection of {@link LocalAccountantDelegateID} not detached
 	 * delegates.
 	 * 
 	 * @param delegateClass The class/type of delegates that should be returned.
@@ -2568,171 +2568,44 @@ public abstract class AccountingManagerBean
 			pm.close();
 		}		
 	}
-	
+		
 //	/**
-//	 * @param productTypeID The object ID of the desired ProductType.
-//	 * @param fetchGroups These fetch-groups are applied to the main
-//	 *		ProductType which is specified by <tt>productTypeID</tt> and
-//	 *		the {@link NestedProductType}s. They should NOT
-//	 *		include anything within the price config! Unlike as usual, they do not
-//	 *		replace the fetchGroups
-//	 *		used per default by this method, but they are appended.
-//	 *
+//	 * assign a new {@link LocalAccountantDelegate} to a {@link ProductType}
+//	 * 
+//	 * @param productTypeID the id of the productType to assign a new {@link LocalAccountantDelegate} to
+//	 * @param delegateID The ID of the LocalAccountantDelegate to assign
+//	 * @param get Whether or not to return the a newly detached version of the stored productType
+//	 * @param fetchGroups The fetchGroups to detach
+//	 * @param maxFetchDepth the maxium fetchDepth 
+//	 * @throws ModuleException
+//	 * 
 //	 * @ejb.interface-method
 //	 * @ejb.transaction type = "Required"
 //	 * @ejb.permission role-name="_Guest_"
 //	 */
-//	public ProductType getProductTypeForPriceConfigEditing(
-//			ProductTypeID productTypeID,
-//			String[] fetchGroups, int maxFetchDepth)
+//	public ProductType assignLocalAccountantDelegate(ProductTypeID productTypeID,
+//			LocalAccountantDelegateID delegateID, 
+//			boolean get, 
+//			String[] fetchGroups, int maxFetchDepth
+//		)
 //	throws ModuleException
 //	{
 //		PersistenceManager pm = getPersistenceManager();
 //		try {
-//			pm.getExtent(ProductType.class);
-//
-//			pm.getFetchPlan().setGroups(new String[] {
-//					FetchPlan.DEFAULT,
-//					ProductType.FETCH_GROUP_NESTED_PRODUCT_TYPES,
-//					NestedProductType.FETCH_GROUP_INNER_PRODUCT_TYPE
-//			});
-//			if (fetchGroups != null) {
-//				for (int i = 0; i < fetchGroups.length; ++i)
-//					pm.getFetchPlan().addGroup(fetchGroups[i]);
-//			}
 //			ProductType productType = (ProductType) pm.getObjectById(productTypeID);
-//			ProductType _productType = (ProductType) pm.detachCopy(productType);
-//
-//			pm.getFetchPlan().setGroups(new String[] {
-//					FetchPlan.DEFAULT,
-//					FetchGroupsPriceConfig.FETCH_GROUP_EDIT
-//			});
-//			detachCopyPriceConfigs(pm, productType, _productType);
-//			for (Iterator it = _productType.getNestedProductTypes(false).iterator(); it.hasNext(); ) {
-//				NestedProductType _npt = (NestedProductType) it.next();
-//				NestedProductType npt = productType.getNestedProductType(
-//						_npt.getInnerProductTypePrimaryKey(), true);
-//				detachCopyPriceConfigs(
-//						pm, npt.getInnerProductType(), _npt.getInnerProductType());
-//			}
-//
-//			return _productType;
+//			LocalAccountantDelegate localAccountantDelegate = (LocalAccountantDelegate) pm.getObjectById(delegateID);
+//			productType.setLocalAccountantDelegate(localAccountantDelegate);
+//			if (!get)
+//				return null;
+//			
+//		 	pm.getFetchPlan().setMaxFetchDepth(maxFetchDepth);
+//	  	if (fetchGroups != null)
+//	  		pm.getFetchPlan().setGroups(fetchGroups);
+//	  	
+//	  	return (ProductType) pm.detachCopy(productType);
 //		} finally {
 //			pm.close();
 //		}
-//	}
-//
-//	private static void detachCopyPriceConfigs(
-//			PersistenceManager pm, ProductType livingPT, ProductType detachedPT)
-//	{
-//		if (livingPT.getInnerPriceConfig() == null)
-//			detachedPT.setInnerPriceConfig(null);
-//		else
-//			detachedPT.setInnerPriceConfig(
-//					(IInnerPriceConfig) pm.detachCopy(livingPT.getInnerPriceConfig()));
-//
-//		if (livingPT.getPackagePriceConfig() == null)
-//			detachedPT.setPackagePriceConfig(null);
-//		else
-//			detachedPT.setPackagePriceConfig(
-//					(IPackagePriceConfig) pm.detachCopy(livingPT.getPackagePriceConfig()));
-//	}
-
-	/**
-	 * @ejb.interface-method
-	 * @ejb.transaction type = "Required"
-	 * @ejb.permission role-name="_Guest_"
-	 */
-	public void test()
-	{
-//		try {
-////			System.out.println(getPrincipalString());
-////			System.out.println("AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA");
-////			StoreManager storeManager = StoreManagerUtil.getHome(getInitialContextProps("orga00.nightlabs.de")).create();
-////			storeManager.createProductTypeID();
-//
-//			AsyncInvoke.exec(
-//					new Invocation() {
-//						public Serializable invoke() throws Exception
-//						{
-//							System.out.println("AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA");
-//							System.out.println("AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA");
-//							System.out.println("AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA");
-//							System.out.println("AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA");
-//							System.out.println("AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA");
-//							System.out.println("AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA");
-//							System.out.println("AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA");
-//							System.out.println(getPrincipalString());
-//							System.out.println("AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA");
-////							System.out.println("sleeping 1 minute");
-////							try { Thread.sleep(60000); } catch (InterruptedException x) { }
-////							System.out.println("waking up after sleeping 1 minute");
-////							System.out.println("AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA");
-////							System.out.println("AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA");
-////							System.out.println("AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA");
-//
-//							StoreManager storeManager = StoreManagerUtil.getHome(getInitialContextProps("orga00.nightlabs.de")).create();
-//							String res = storeManager.createProductTypeID();
-//							System.out.println("AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA");
-//							return res;
-//						}
-//					},
-//					new SuccessCallback() {
-//						public void handle(AsyncInvokeEnvelope envelope,Object result) throws Exception
-//						{
-//							System.out.println("BBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBB");
-//							System.out.println("BBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBB");
-//							System.out.println("BBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBB");
-//							System.out.println("BBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBB");
-//							System.out.println("BBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBB");
-//							System.out.println("BBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBB");
-//							System.out.println("BBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBB");
-//							System.out.println("BBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBB");
-//							System.out.println("BBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBB");
-//							System.out.println(getPrincipalString());
-//							System.out.println(result);
-//							System.out.println("BBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBB");
-//						}
-//					},
-//					new ErrorCallback(){
-//						public void handle(AsyncInvokeEnvelope envelope, Throwable error)
-//						throws Exception
-//						{
-//							System.out.println("CCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCC");
-//							System.out.println("CCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCC");
-//							System.out.println("CCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCC");
-//							System.out.println("CCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCC");
-//							System.out.println("CCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCC");
-//							System.out.println("CCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCC");
-//							System.out.println("CCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCC");
-//							System.out.println("CCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCC");
-//							System.out.println(getPrincipalString());
-//							error.printStackTrace(System.out);
-//							System.out.println("CCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCC");
-//						}
-//					},
-//					new UndeliverableCallback() {
-//						/**
-//						 * @see org.nightlabs.jfire.asyncinvoke.UndeliverableCallback#handle(org.nightlabs.jfire.asyncinvoke.AsyncInvokeEnvelope)
-//						 */
-//						public void handle(AsyncInvokeEnvelope envelope) throws Exception
-//						{
-//							System.out.println("DDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDD");
-//							System.out.println("DDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDD");
-//							System.out.println("DDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDD");
-//							System.out.println("DDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDD");
-//							System.out.println("DDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDD");
-//							System.out.println("DDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDD");
-//							System.out.println("DDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDD");
-//							System.out.println("DDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDD");
-//							System.out.println("DDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDD");
-//							System.out.println(getPrincipalString());
-//							System.out.println("DDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDD");
-//						}
-//					});
-//		} catch (Exception e) {
-//			e.printStackTrace();
-//		}
-	}
+//	}	
 	
 }

@@ -60,7 +60,6 @@ import org.nightlabs.jfire.accounting.id.InvoiceID;
 import org.nightlabs.jfire.asyncinvoke.AsyncInvoke;
 import org.nightlabs.jfire.asyncinvoke.Invocation;
 import org.nightlabs.jfire.base.BaseSessionBeanImpl;
-import org.nightlabs.jfire.base.InvokeUtil;
 import org.nightlabs.jfire.idgenerator.IDNamespaceDefault;
 import org.nightlabs.jfire.jbpm.JbpmLookup;
 import org.nightlabs.jfire.jbpm.graph.def.ProcessDefinition;
@@ -1446,284 +1445,108 @@ implements SessionBean
 		}
 	}
 	
+	// TODO: when all jpox bugs are fixed, implement generic storeProductType-Method
 //	/**
-//	 * Sets the <tt>published</tt> property of the specified <tt>ProductType</tt>
-//	 * to <tt>true</tt>.
+//	 * @return Returns a newly detached instance of <tt>ProductType</tt> 
+//	 * if <tt>get</tt> is true - otherwise <tt>null</tt>.
 //	 *
 //	 * @ejb.interface-method
 //	 * @ejb.permission role-name="_Guest_"
 //	 * @ejb.transaction type = "Required"
-//	 */ 
-//	public ProductType publishProductType(ProductTypeID productTypeID, boolean get, String[] fetchGroups, int maxFetchDepth)
+//	 */	
+//	public ProductType storeProductType(ProductType productType, boolean get, String[] fetchGroups, int maxFetchDepth)
 //	throws ModuleException
 //	{
+//		if (productType == null)
+//			throw new NullPointerException("productType");
+//
 //		PersistenceManager pm = getPersistenceManager();
 //		try {
-//			pm.getExtent(ProductType.class);
-//			ProductType pt = (ProductType) pm.getObjectById(productTypeID);
-//			pt.setPublished(true);
-//			
+//			pm.getFetchPlan().setMaxFetchDepth(maxFetchDepth);
+//			if (fetchGroups == null)
+//				pm.getFetchPlan().setGroup(FetchPlan.DEFAULT);
+//			else
+//				pm.getFetchPlan().setGroups(fetchGroups);
+//						
+//			boolean priceCalculationNeeded = false;
+//			if (NLJDOHelper.exists(pm, productType)) {
+//				// if the nestedProductTypes changed, we need to recalculate prices
+//				// test first, whether they were detached
+//				Map<String, NestedProductType> newNestedProductTypes = new HashMap<String, NestedProductType>();
+//				try {
+//					for (NestedProductType npt : productType.getNestedProductTypes()) {
+//						newNestedProductTypes.put(npt.getInnerProductTypePrimaryKey(), npt);
+//						npt.getQuantity();
+//					}
+//				} catch (JDODetachedFieldAccessException x) {
+//					newNestedProductTypes = null;
+//				}
+//
+//				if (newNestedProductTypes != null) {
+//					ProductType original = (ProductType) pm.getObjectById(JDOHelper.getObjectId(productType));
+//					priceCalculationNeeded = !ProductType.compareNestedProductTypes(original.getNestedProductTypes(), newNestedProductTypes);
+//				}
+//
+//				productType = (ProductType) pm.makePersistent(productType);
+//			}
+//			else {
+//				// TODO: ProductTypeActionHandler.getDefaultHome() should be abstract 
+//				// and not static in implementation to make generic implementation possible 				
+//				productType = (ProductType) Store.getStore(pm).addProductType(
+//						User.getUser(pm, getPrincipal()),
+//						productType,						
+//						ProductTypeActionHandler.getProductTypeActionHandler(
+//								pm, productType.getClass().getDefaultHome(pm, productType)));
+//
+//				// make sure the prices are correct
+//				priceCalculationNeeded = true;
+//			}
+//
+//			if (priceCalculationNeeded) {
+//				logger.info("storeProductType: price-calculation is necessary! Will recalculate the prices of " + JDOHelper.getObjectId(productType));
+//				if (productType.getPackagePriceConfig() != null && productType.getInnerPriceConfig() != null) {
+//					((IResultPriceConfig)productType.getPackagePriceConfig()).adoptParameters(
+//							productType.getInnerPriceConfig());
+//				}
+//
+//				// find out which productTypes package this one and recalculate their prices as well - recursively! siblings are automatically included in the package-recalculation
+//				HashSet<ProductTypeID> processedProductTypeIDs = new HashSet<ProductTypeID>();
+//				ProductTypeID productTypeID = (ProductTypeID) JDOHelper.getObjectId(productType);
+//				for (AffectedProductType apt : PriceConfigUtil.getAffectedProductTypes(pm, productType)) {
+//					if (!processedProductTypeIDs.add(apt.getProductTypeID()))
+//						continue;
+//
+//					ProductType pt;
+//					if (apt.getProductTypeID().equals(productTypeID))
+//						pt = productType;
+//					else
+//						pt = (ProductType) pm.getObjectById(apt.getProductTypeID());
+//
+//					if (ProductType.PACKAGE_NATURE_OUTER == pt.getPackageNature() && pt.getPackagePriceConfig() != null) {
+//						logger.info("storeProductType: price-calculation starting for: " + JDOHelper.getObjectId(pt));
+//
+//						PriceCalculator priceCalculator = new PriceCalculator(pt, new CustomerGroupMapper(pm), new TariffMapper(pm));
+//						priceCalculator.preparePriceCalculation();
+//						priceCalculator.calculatePrices();
+//
+//						logger.info("storeProductType: price-calculation complete for: " + JDOHelper.getObjectId(pt));
+//					}
+//				}
+//			}
+//			else
+//				logger.info("storeProductType: price-calculation is NOT necessary! Stored ProductType without recalculation: " + JDOHelper.getObjectId(productType));
+//
+//			// take care about the inheritance
+//			productType.applyInheritance();
+//			// imho, the recalculation of the prices for the inherited ProductTypes is already implemented in JFireTrade. Marco.
+//
 //			if (!get)
 //				return null;
-//				
-//			if (fetchGroups != null)
-//				pm.getFetchPlan().setGroups(fetchGroups);
 //
-//			return (ProductType) pm.detachCopy(pt);
+//			return (ProductType) pm.detachCopy(productType);
 //		} finally {
 //			pm.close();
-//		}
-//	}
-
-//	////////////////////// product types ////////////////////////////
-//
-//	/**
-//	 * Adds a product type. If the productID is null, a new one
-//	 * will be created.
-//	 * 
-//	 * @throws ModuleException
-//	 * 
-//	 * @ejb.interface-method
-//	 * @ejb.permission role-name="StoreManager-addProductType"
-//	 * @ejb.transaction type = "Required"
-//	 **/
-//	public void addProductType(ProductType productType) 
-//	throws StoreException
-//	{
-//		try {
-//			PersistenceManager pm = getPersistenceManager();
-//			try {
-//				IDGenerator idgen = IDGeneratorUtil.getHome().create();
-//				try {
-//					String compID = productType.getProductID();
-//					if(compID == null)
-//					{
-//						long newID = idgen.generateIDLong(ProductType.class.getName());
-//						compID = this.getOrganisationID() + "/" + new Long(newID);
-//					}
-//					ProductType pt = new ProductType(compID);
-//					pm.makePersistent(pt);
-//				} finally	{
-//					idgen.remove();
-//				}
-//			} finally {
-//				pm.close();
-//			}
-//		} catch (Exception e) {
-//			throw new StoreException(e);
 //		}		
 //	}
-//	
-//	/**
-//	 * update a product type
-//	 * @throws ModuleException
-//	 *
-//	 * @ejb.interface-method
-//	 * @ejb.permission role-name="StoreManager-updateProductType"
-//	 * @ejb.transaction type = "Required"
-//	 **/
-//	public void updateProductType(ProductType productType) 
-//	throws StoreException
-//	{
-//		try {
-//			PersistenceManager pm = getPersistenceManager();
-//			try {
-//				pm.attachCopy(productType, false);
-////				pm.getExtent(ProductType.class, true);
-////				try {
-////					ProductType pt = (ProductType)pm.getObjectId(productType.getProductTypeID());
-////					// TO_DO: implement update with detach/attach
-////					// pm.attachCopy(productType, true);
-////					throw new StoreException("NYI");
-////				}
-////				catch (JDOObjectNotFoundException e) 
-////				{
-////					throw new StoreException("Could not find product type whith ID " + productType.getProductTypeID(), e);
-////				}
-//			} finally {
-//				pm.close();
-//			}
-//		} catch (Exception x) {
-//			throw new StoreException(x);
-//		}
-//	}
-//	
-////	/**
-////	 * add a product type
-////	 * @throws ModuleException
-////	 * 
-////	 * @ejb.interface-method
-////	 * @ejb.permission role-name="StoreManager-remove-producttype"
-////	 * @ejb.transaction type = "Required"
-////	 **/
-////	public void removeProductType(String productID) 
-////	throws StoreException
-////	{
-////		initialize();
-////		pm.getExtent(ProductType.class, true);
-////		try
-////		{
-////			ProductType pt = (ProductType)pm.getObjectId(productID);
-////			pm.deletePersistent(pt);
-////		}
-////		catch (JDOObjectNotFoundException e) 
-////		{
-////			// do nothing
-////		}
-////	}
-//
-//	////////////////////// products ////////////////////////////
-//	
-//	/**
-//	 * add a product
-//	 * @throws ModuleException
-//	 * 
-//	 * @ejb.interface-method
-//	 * @ejb.permission role-name="StoreManager-add-product"
-//	 * @ejb.transaction type = "Required"
-//	 **/
-//	public void addProduct(OldProduct product) 
-//	throws StoreException
-//	{
-//		if (product == null)
-//			throw new NullPointerException("product must not be null!");
-//		
-//		if(product.getProductType() == null)
-//			throw new NullPointerException("product.productType must not be null!");
-//
-//		try {
-//			PersistenceManager pm = getPersistenceManager();
-//			try {
-//				IDGenerator idgen = IDGeneratorUtil.getHome().create();
-//				try {
-//					if (product.getProductID() == null) 
-//						product.setProductID(this.getOrganisationID() + "/" + new Long(idgen.generateIDLong(OldProduct.class.getName())));
-//
-//					ProductStatus pw = new ProductStatus(product.getProductID(), product);
-//					pm.makePersistent(pw);
-//				} finally {
-//					idgen.remove();
-//				}
-//			} finally {
-//				pm.close();
-//			}
-//		} catch (Exception e) {
-//			throw new StoreException(e);
-//		}
-//	}
-//	
-//	
-//	/**
-//	 * update a product type
-//	 * @throws ModuleException
-//	 * 
-//	 * @ejb.interface-method
-//	 * @ejb.permission role-name="StoreManager-update-product"
-//	 * @ejb.transaction type = "Required"
-//	 **/
-//	public void updateProduct(OldProduct product) 
-//	throws StoreException
-//	{
-//		try {
-//			PersistenceManager pm = getPersistenceManager();
-//			try {
-//				pm.attachCopy(product, false);
-////				pm.getExtent(OldProduct.class, true);
-////				try
-////				{
-////					OldProduct p = (OldProduct)pm.getObjectId(product.getProductID());
-////					// TO DO: implement update with detach/attach
-////					throw new StoreException("NYI");
-////				}
-////				catch (JDOObjectNotFoundException e) 
-////				{
-////					throw new StoreException("Could not find product whith ID " + product.getProductID(), e);
-////				}
-//			} finally {
-//				pm.close();
-//			}
-//		} catch (Exception x) {
-//			throw new StoreException(x);
-//		}
-//	}
-//	
-////	/**
-////	 * remove a product
-////	 * @throws ModuleException
-////	 * 
-////	 * @ejb.interface-method
-////	 * @ejb.permission role-name="StoreManager-remove-product"
-////	 * @ejb.transaction type = "Required"
-////	 **/
-////	public void removeProduct(String productID) 
-////	throws StoreException
-////	{
-////		initialize();
-////		pm.getExtent(OldProduct.class, true);
-////		try
-////		{
-////			ProductStatus pw = (ProductStatus)pm.getObjectId(productID);
-////			pm.deletePersistent(pw);
-////		}
-////		catch (JDOObjectNotFoundException e) 
-////		{
-////			// do nothing
-////		}
-////	}
-//	
-//	/**
-//	 * remove a product
-//	 * @throws ModuleException
-//	 * 
-//	 * @ejb.interface-method
-//	 * @ejb.permission role-name="_Guest_"
-//	 * @ejb.transaction type = "Required"
-//	 **/
-//	public void test() 
-//	throws StoreException
-//	{
-//		try {
-//			PersistenceManager pm = getPersistenceManager();
-//			try {
-//				ProductType productType = new ProductType(getOrganisationID()+"/"+"productType"+System.currentTimeMillis());
-//				pm.makePersistent(productType);
-//				
-//				
-//			} finally {
-//				pm.close();
-//			}
-//		} catch (Exception x) {
-//			throw new StoreException(x);
-//		}
-//	}
-//	
-//	////////////////////// operations ////////////////////////////
-//	
-//	
-//	
-//	////////////////////// EJB stuff ////////////////////////////
-//	
-//	public void ejbActivate() throws EJBException, RemoteException
-//	{
-////		try
-////		{
-////			initialize();
-////		}
-////		catch (StoreException e)
-////		{
-////			throw new EJBException(e);
-////		}
-//	}
-//
-//	public void ejbPassivate() throws EJBException, RemoteException
-//	{
-//		ejbRemove();
-//	}
-//	
-//	public void ejbRemove() throws EJBException, RemoteException
-//	{
-//	}
-//	
-	////////////////////// internal ////////////////////////////
-
+	
 }

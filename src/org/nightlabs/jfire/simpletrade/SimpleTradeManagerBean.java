@@ -543,18 +543,6 @@ implements SessionBean
 					SimpleProductType original = (SimpleProductType) pm.getObjectById(JDOHelper.getObjectId(productType));
 
 					priceCalculationNeeded = !ProductType.compareNestedProductTypes(original.getNestedProductTypes(), newNestedProductTypes);
-
-//					if (original.getNestedProductTypes().size() != newNestedProductTypes.size())
-//						priceCalculationNeeded = true;
-//					else {
-//						for (NestedProductType orgNPT : original.getNestedProductTypes()) {
-//							NestedProductType newNPT = newNestedProductTypes.get(orgNPT.getInnerProductTypePrimaryKey());
-//							if (newNPT == null || newNPT.getQuantity() != orgNPT.getQuantity()) {
-//								priceCalculationNeeded = true;
-//								break;
-//							}
-//						}
-//					}
 				}
 
 				productType = (SimpleProductType) pm.makePersistent(productType);
@@ -610,7 +598,6 @@ implements SessionBean
 			if (!get)
 				return null;
 
-//			return (SimpleProductType) pm.detachCopy(pm.getObjectById(JDOHelper.getObjectId(productType)));
 			return (SimpleProductType) pm.detachCopy(productType);
 		} finally {
 			pm.close();

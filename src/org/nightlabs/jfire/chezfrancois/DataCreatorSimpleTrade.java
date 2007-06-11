@@ -190,7 +190,7 @@ extends DataCreator
 		in = getClass().getResourceAsStream("resource/"+largeImage);
 		if (in != null) {
 			try {
-				largeImg.loadStream(in, smallImage, largeImageContentType);
+				largeImg.loadStream(in, largeImage, largeImageContentType);
 			} catch (IOException e) {
 				logger.error(e);
 			} finally {

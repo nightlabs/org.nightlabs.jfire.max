@@ -73,6 +73,9 @@ import org.nightlabs.util.Utils;
 public class ScriptRegistry
 implements Serializable
 {
+	
+	private static final long serialVersionUID = 1L;
+
 	public static final String FETCH_GROUP_THIS_SCRIPT_REGISTRY = "ScriptRegistry.this";
 	
 	/**
@@ -143,11 +146,6 @@ implements Serializable
 	private String organisationID;
 
 	/**
-	 * @jdo.field persistence-modifier="persistent"
-	 */
-	private long nextScriptParameterSetID = 0;
-
-	/**
 	 * @deprecated for JDO only 
 	 */
 	protected ScriptRegistry() { }
@@ -206,6 +204,7 @@ implements Serializable
 		if (language2ScriptExecutorClassName.remove(language) == null)
 			return;
 
+		// WORKAROUND: Cannot parameterize because of BCEL bug
 		Set fileExtensions = new HashSet();
 		for (Iterator it = fileExtension2Language.entrySet().iterator(); it.hasNext(); ) {
 			Map.Entry entry = (Map.Entry)it.next();
@@ -283,6 +282,7 @@ implements Serializable
 		if (scripts.size() == 1)
 			return (Script) scripts.iterator().next();
 
+		// WORKAROUND: Cannot parameterize because of BCEL bug
 		Map scriptsByOrganisationID = new HashMap();
 		for (Iterator it = scripts.iterator(); it.hasNext(); ) {
 			Script script = (Script) it.next();
@@ -324,11 +324,11 @@ implements Serializable
 		throw new IllegalStateException("Have multiple scripts for scriptRegistryItemType=\"" + scriptRegistryItemType + "\" and scriptRegistryItemID=\"" + scriptRegistryItemID + "\" and they do neither come from the root nor from the devil organisation!");
 	}
 	
-	public Collection getRegisteredLanguages() {
+	public Collection<String> getRegisteredLanguages() {
 		return language2ScriptExecutorClassName.keySet();
 	}
 	
-	public Collection getRegisteredFileExtensions() {
+	public Collection<String> getRegisteredFileExtensions() {
 		return fileExtension2Language.keySet();
 	}
 

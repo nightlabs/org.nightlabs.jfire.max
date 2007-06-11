@@ -185,7 +185,6 @@ public class ScriptingInitialiser
 			throw new IllegalStateException("Script directory does not exist: " + scriptDir.getAbsolutePath());
 
 		logger.debug("BEGIN initialization of Scripts");	
-//		initDefaultParameterSets();
 		createScriptCategories(scriptDir, baseCategory);
 	}
 
@@ -258,11 +257,10 @@ public class ScriptingInitialiser
 			parameterSet = null;
 		
 		if (parameterSet == null) {
-			ScriptRegistry registry = ScriptRegistry.getScriptRegistry(pm);
 			parameterSet = new ScriptParameterSet(organisationID, IDGenerator.nextID(ScriptParameterSet.class));
 			pm.makePersistent(parameterSet);
 		}
-		createElementName(setNode, parameterSet.getName(), "ParameterSet"+parameterSet.getScriptParameterSetID());
+		createElementName(setNode, parameterSet.getName(), "ParameterSet"+parameterSet.getScriptParameterSetID(), "name");
 		Collection<Node> nodes = NLDOMUtil.findNodeList(parentNode, "parameter-set/parameter");
 		parameterSet.removeAllParameters();
 		for (Node node : nodes) {
@@ -280,12 +278,12 @@ public class ScriptingInitialiser
 		return parameterSet;
 	}
 	
-	private void createElementName(Node elementNode, I18nText name, String def) 
+	private void createElementName(Node elementNode, I18nText name, String def, String elementName) 
 	{
 		// script name
 		boolean nameSet = false;
 		if (elementNode != null) {
-			Collection<Node> nodes = NLDOMUtil.findNodeList(elementNode, "name");
+			Collection<Node> nodes = NLDOMUtil.findNodeList(elementNode, elementName);
 			for (Node node : nodes) {
 				Node lIDNode = node.getAttributes().getNamedItem("language");
 				if (lIDNode != null && !"".equals(lIDNode.getTextContent())) {
@@ -293,10 +291,10 @@ public class ScriptingInitialiser
 					nameSet = true;
 				}
 				else
-					logger.warn("name element of node "+elementNode.getNodeName()+" has an invalid/missing language attribute");
+					logger.warn("\" " + elementName + "\" element of node "+elementNode.getNodeName()+" has an invalid/missing language attribute");
 			}
 		}
-		if (!nameSet)
+		if (!nameSet && def != null)
 			name.setText(Locale.ENGLISH.getLanguage(), def);
 	}
 	
@@ -356,7 +354,8 @@ public class ScriptingInitialiser
 						category.setParameterSet(parameterSet);
 				}
 			}
-			createElementName(catNode, category.getName(), categoryID);
+			createElementName(catNode, category.getName(), categoryID, "name");
+			createElementName(catNode, category.getDescription(), null, "description");
 			logger.debug("create Script Category = "+itemType + "/" + categoryID);
 			
 
@@ -448,7 +447,8 @@ public class ScriptingInitialiser
 						if (parameterSet != null)
 							script.setParameterSet(parameterSet);
 					}
-					createElementName(scriptNode, script.getName(), scriptID);
+					createElementName(scriptNode, script.getName(), scriptID, "name");
+					createElementName(scriptNode, script.getDescription(), null, "description");
 					
 				} catch (Exception e) {
 					logger.warn("could NOT create script "+scriptID+"!", e);

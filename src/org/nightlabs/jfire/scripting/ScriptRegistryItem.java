@@ -40,6 +40,14 @@ import org.apache.log4j.Logger;
 import org.nightlabs.util.Utils;
 
 /**
+ * Base class for objects in the JFire scripting tree and provides the 
+ * common properties of these objects like a name, a description and
+ * a {@link ScriptParameterSet}.
+ * <p> 
+ * Subclasses are {@link ScriptCategory} that is a container for other categories and
+ * {@link Script} the actual script.
+ * </p>
+ * 
  * @author Marco Schulze - marco at nightlabs dot de
  * @author Alexander Bieber <alex[AT]nightlabs[DOT]de>
  *
@@ -55,7 +63,8 @@ import org.nightlabs.util.Utils;
  * 
  * @jdo.fetch-group name="ScriptRegistryItem.parent" fetch-groups="default" fields="parent"
  * @jdo.fetch-group name="ScriptRegistryItem.name" fetch-groups="default" fields="name"
- * @jdo.fetch-group name="ScriptRegistryItem.this" fetch-groups="default" fields="parent, name"
+ * @jdo.fetch-group name="ScriptRegistryItem.description" fetch-groups="default" fields="description"
+ * @jdo.fetch-group name="ScriptRegistryItem.this" fetch-groups="default, ScriptRegistryItem.name, ScriptRegistryItem.description" fields="parent, name, description"
  * 
  * @jdo.query
  *		name="getTopLevelScriptRegistryItemsByOrganisationID"
@@ -101,6 +110,7 @@ public abstract class ScriptRegistryItem
 
 	public static final String FETCH_GROUP_PARENT = "ScriptRegistryItem.parentItem";
 	public static final String FETCH_GROUP_NAME = "ScriptRegistryItem.name";
+	public static final String FETCH_GROUP_DESCRIPTION = "ScriptRegistryItem.description";
 	public static final String FETCH_GROUP_THIS_SCRIPT_REGISTRY_ITEM = "ScriptRegistryItem.this";
 	
 	
@@ -132,66 +142,153 @@ public abstract class ScriptRegistryItem
 	private ScriptParameterSet parameterSet;
 	
 	/**
-	 * @jdo.field persistence-modifier="persistent"
+	 * @jdo.field persistence-modifier="persistent" mapped-by="scriptRegistryItem"
 	 */
 	private ScriptRegistryItemName name;
 
+	/**
+	 * @jdo.field persistence-modifier="persistent"  mapped-by="scriptRegistryItem"
+	 */
+	private ScriptRegistryItemDescription description;
+	
 	/**
 	 * @deprecated Only for JDO! 
 	 */
 	protected ScriptRegistryItem() { }
 
-	public ScriptRegistryItem(String organisationID, String scriptRegistryItemType, String scriptRegistryItemID)
+	/**
+	 * Create a new {@link ScriptRegistryItem} with the given primary key parameters. 
+	 * This is intended to be used as superconstructor of extending classes.
+	 * 
+	 * @param organisationID The organisationID. 
+	 * @param scriptRegistryItemType The scriptRegistryItemType.
+	 * @param scriptRegistryItemID The scriptRegistryItemID.
+	 */
+	protected ScriptRegistryItem(String organisationID, String scriptRegistryItemType, String scriptRegistryItemID)
 	{
 		this.organisationID = organisationID;
 		this.scriptRegistryItemType = scriptRegistryItemType;
 		this.scriptRegistryItemID = scriptRegistryItemID;
 		this.name = new ScriptRegistryItemName(this);
+		this.description = new ScriptRegistryItemDescription(this);
 	}
 
+	/**
+	 * Returns the String representation of the primary key of the item
+	 * represented by the given parameters. It is the "/" separated 
+	 * concatination of the given parameters.
+	 * 
+	 * @param organisationID The organisationID.
+	 * @param scriptRegistryItemType The scriptRegistryItemType.
+	 * @param scriptRegistryItemID The scriptRegistryItemID.
+	 * @return The String representation of the primary key of the item
+	 * 		represented by the given parameters. 
+	 */
 	public static String getPrimaryKey(String organisationID, String scriptRegistryItemType, String scriptRegistryItemID)
 	{
 		return organisationID + '/' + scriptRegistryItemType + '/' + scriptRegistryItemID;
 	}
 
+	/**
+	 * Returns the organisationID of this item.
+	 * This is part of the primary key.
+	 *  
+	 * @return The organisationID of this item.
+	 */
 	public String getOrganisationID()
 	{
 		return organisationID;
 	}
+	
+	/**
+	 * Returns the scriptRegistryItemType of this item.
+	 * This is part of the primary key.
+	 *  
+	 * @return The scriptRegistryItemType of this item.
+	 */
 	public String getScriptRegistryItemType()
 	{
 		return scriptRegistryItemType;
 	}
 
-		
+	/**
+	 * Returns the scriptRegistryItemID of this item.
+	 * This is part of the primary key.
+	 * 
+	 * @return The scriptRegistryItemID of this item.
+	 */
 	public String getScriptRegistryItemID()
 	{
 		return scriptRegistryItemID;
 	}
 
+	/**
+	 * Returns the parent of this item. 
+	 * Parents always are {@link ScriptCategory}s.
+	 * 
+	 * @return The parent of this item.
+	 */
 	protected ScriptCategory getParent()
 	{
 		return parent;
 	}
+	
+	/**
+	 * Sets the parent of this item.
+	 * 
+	 * @param parent The parent of this item.
+	 */
 	protected void setParent(ScriptCategory parent)
 	{
 		this.parent = parent;
 	}
 
+	/**
+	 * Returns the {@link ScriptParameterSet} of this
+	 * {@link ScriptRegistryItem}. In case this is a 
+	 * {@link ScriptCategory} this parameter-set is 
+	 * applied to {@link Script}s created with this as
+	 * parent.
+	 * 
+	 * @return the {@link ScriptParameterSet} of this {@link ScriptRegistryItem}
+	 */
 	public ScriptParameterSet getParameterSet()
 	{
 		return parameterSet;
 	}
 	
+	/**
+	 * Returns the name of this {@link ScriptRegistryItem}.
+	 * 
+	 * @return The name of this {@link ScriptRegistryItem}.
+	 */
 	public ScriptRegistryItemName getName() {
 		return name;
 	}
 
+	/**
+	 * Returns the desciption of this {@link ScriptRegistryItem}.
+	 * 
+	 * @return The desciption of this {@link ScriptRegistryItem}.
+	 */
+	public ScriptRegistryItemDescription getDescription() {
+		return description;
+	}
+	
+	/**
+	 * Set the {@link ScriptParameterSet} of this item. 
+	 * 
+	 * @param parameterSet The parameterSet to set for this item.
+	 */
 	public void setParameterSet(ScriptParameterSet parameterSet)
 	{
 		this.parameterSet = (ScriptParameterSet) parameterSet;
 	}
 
+	/**
+	 * Checks for equality of the primary key fields.
+	 * @return Whether the primary key fields match.
+	 */
 	@Override
 	public boolean equals(Object obj)
 	{
@@ -209,6 +306,10 @@ public abstract class ScriptRegistryItem
 				Utils.equals(this.scriptRegistryItemID,     other.scriptRegistryItemID);
 	}
 
+	/**
+	 * {@inheritDoc}
+	 * @see java.lang.Object#hashCode()
+	 */
 	@Override
 	public int hashCode()
 	{
@@ -311,15 +412,6 @@ public abstract class ScriptRegistryItem
 				}
 			}
 		}
-
-		if (true) return; // TODO @Bieber: Change Event Tracking should only be done if there is an interested client! Marco.
-
-		ScriptRegistryItemChangeEvent.addChangeEventToController(
-				pm,
-				ScriptRegistryItemChangeEvent.EVENT_TYPE_ITEM_ADDED,
-				this,
-				getParent()
-			);		
 	}
 	
 }

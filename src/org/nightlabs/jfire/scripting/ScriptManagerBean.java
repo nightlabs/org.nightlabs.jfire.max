@@ -505,44 +505,4 @@ implements SessionBean
 			pm.close();
 		}
 	}	
-	
-//	/**
-//	 * @throws ModuleException
-//	 *
-//	 * @ejb.interface-method
-//	 * @ejb.permission role-name="_Guest_"
-//	 * @ejb.transaction type="Required"
-//	 */
-//	public Map<ScriptRegistryItemID, Script> getScripts(Collection<ScriptRegistryItemID> scriptItemsIDs)
-//	throws ModuleException
-//	{
-//		PersistenceManager pm;
-//		pm = getPersistenceManager();
-//		try {
-//			return ScriptRegistry.getScriptRegistry(pm).getScripts(scriptItemsIDs);
-//		} finally {
-//			pm.close();
-//		}
-//	} 
-//	
-//	/**
-//	 * @throws ModuleException
-//	 *
-//	 * @ejb.interface-method
-//	 * @ejb.permission role-name="_Guest_"
-//	 * @ejb.transaction type="Required"
-//	 */	
-////	public Set<ScriptRegistryItemID> getScriptIDs(String organisationID, String scriptRegistryItemType, int depth)
-//	public Set<ScriptRegistryItemID> getScriptIDs(String organisationID, String scriptRegistryItemType)	
-//	throws ModuleException
-//	{
-//		Collection<ScriptRegistryItemCarrier> topLevelCarrier = getTopLevelScriptRegistryItemCarriers(organisationID, scriptRegistryItemType);
-//		Set<ScriptRegistryItemID> scriptIDs = new HashSet<ScriptRegistryItemID>();		
-//		for (ScriptRegistryItemCarrier carrier : topLevelCarrier) {
-//			scriptIDs.add(carrier.getRegistryItemID());
-//			scriptIDs.addAll(carrier.getChildScriptRegistryItemIDs());
-//		}
-//		return scriptIDs;
-//	}
-
 }

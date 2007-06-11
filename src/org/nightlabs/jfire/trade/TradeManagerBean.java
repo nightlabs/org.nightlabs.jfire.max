@@ -61,6 +61,7 @@ import org.nightlabs.jfire.base.BaseSessionBeanImpl;
 import org.nightlabs.jfire.config.ConfigSetup;
 import org.nightlabs.jfire.config.UserConfigSetup;
 import org.nightlabs.jfire.editlock.EditLock;
+import org.nightlabs.jfire.editlock.EditLockType;
 import org.nightlabs.jfire.idgenerator.IDNamespaceDefault;
 import org.nightlabs.jfire.jbpm.JbpmLookup;
 import org.nightlabs.jfire.jbpm.graph.def.ProcessDefinition;
@@ -1255,6 +1256,7 @@ implements SessionBean
 		PersistenceManager pm = getPersistenceManager();
 		try {
 			ModuleMetaData moduleMetaData = ModuleMetaData.getModuleMetaData(pm, JFireTradeEAR.MODULE_NAME);
+			
 			if (moduleMetaData != null)
 				return;
 
@@ -1298,6 +1300,7 @@ implements SessionBean
 
 			pm.makePersistent(new EditLockTypeOrder(EditLockTypeOrder.EDIT_LOCK_TYPE_ID));
 			pm.makePersistent(new EditLockTypeOffer(EditLockTypeOffer.EDIT_LOCK_TYPE_ID));
+			pm.makePersistent(new EditLockType(JFireTradeEAR.EDIT_LOCK_TYPE_ID_PRODUCTTYPE));
 		} finally {
 			pm.close();
 		}

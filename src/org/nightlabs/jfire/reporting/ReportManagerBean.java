@@ -30,8 +30,8 @@ import java.io.File;
 import java.rmi.RemoteException;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.HashSet;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
@@ -67,7 +67,6 @@ import org.nightlabs.jfire.reporting.layout.ReportLayout;
 import org.nightlabs.jfire.reporting.layout.ReportLayoutLocalisationData;
 import org.nightlabs.jfire.reporting.layout.ReportRegistry;
 import org.nightlabs.jfire.reporting.layout.ReportRegistryItem;
-import org.nightlabs.jfire.reporting.layout.ReportRegistryItemCarrier;
 import org.nightlabs.jfire.reporting.layout.id.ReportRegistryItemID;
 import org.nightlabs.jfire.reporting.layout.render.RenderManager;
 import org.nightlabs.jfire.reporting.layout.render.RenderReportException;
@@ -593,7 +592,13 @@ implements SessionBean
 	
 	
 	/**
-	 *
+	 * Returns the {@link ReportRegistryItem} with the given id. 
+	 * It will be detached with the given fetch-groups and fetch-depth.
+	 * 
+	 * @param reportRegistryItemID The id of the {@link ReportRegistryItem} to fetch.
+	 * @param fetchGroups The fetch-groups to detach the item with.
+	 * @param maxFetchDepth The maximum fetch-depth while detaching.
+	 * 
 	 * @ejb.interface-method
 	 * @ejb.permission role-name="_Guest_"
 	 * @ejb.transaction type = "Required"
@@ -618,7 +623,13 @@ implements SessionBean
 	}
 	
 	/**
-	 *
+	 * Returns the {@link ReportRegistryItem}s represented by the given list of {@link ReportRegistryItemID}s.
+	 * All will be detached with the given fetch-groups.
+	 * 
+	 * @param reportRegistryItemIDs The list of id of items to fetch.
+	 * @param fetchGroups The fetch-groups to detach the items with.
+	 * @param maxFetchDepth The maximum fetch-depth while detaching.
+	 * 
 	 * @ejb.interface-method
 	 * @ejb.permission role-name="_Guest_"
 	 * @ejb.transaction type = "Required"
@@ -648,7 +659,11 @@ implements SessionBean
 	}
 	
 	/**
-	 *
+	 * Returns the {@link ReportRegistryItemID}s of all {@link ReportRegistryItem}s
+	 * that are direct children of the given reportRegistryItemID.
+	 * 
+	 * @param reportRegistryItemID The id of the parent to search the children for.
+	 * 
 	 * @ejb.interface-method
 	 * @ejb.permission role-name="_Guest_"
 	 * @ejb.transaction type = "Required"
@@ -659,14 +674,25 @@ implements SessionBean
 		pm = getPersistenceManager();
 		try {
 			ReportRegistryItem item = (ReportRegistryItem) pm.getObjectById(reportRegistryItemID);
-			return new ArrayList<ReportRegistryItemID>(ReportRegistryItem.getReportRegistryItemIDsForParent(pm, item));
+			if (item instanceof ReportCategory) {
+				return new ArrayList<ReportRegistryItemID>(ReportRegistryItem.getReportRegistryItemIDsForParent(pm, (ReportCategory) item));				
+			} else {
+				// only ReportCategorys can have children
+				return Collections.emptyList();
+			}
 		} finally {
 			pm.close();
 		}
 	}
 	
 	/**
-	 *
+	 * Returns all {@link ReportRegistryItem}s for the given organisationID that do
+	 * not have a parent.
+	 * 
+	 * @param organisationID The organisationID to search top-level items for.
+	 * @param fetchGroups The fetch-groups to detach the found items with.
+	 * @param maxFetchDepth The maximum fetch-depth while detaching.
+	 * 
 	 * @ejb.interface-method
 	 * @ejb.permission role-name="_Guest_"
 	 * @ejb.transaction type = "Required"
@@ -691,6 +717,8 @@ implements SessionBean
 	}
 	
 	/**
+	 * Returns all {@link ReportRegistryItemID}s that do not have a parent.
+	 * These will be only for the organisationID of the calling user.
 	 *
 	 * @ejb.interface-method
 	 * @ejb.permission role-name="_Guest_"
@@ -701,7 +729,7 @@ implements SessionBean
 		PersistenceManager pm;
 		pm = getPersistenceManager();
 		try {
-			Collection<ReportRegistryItem> topLevelItems = ReportRegistryItem.getTopReportRegistryItems(pm);
+			Collection<ReportRegistryItem> topLevelItems = ReportRegistryItem.getTopReportRegistryItems(pm, getOrganisationID());
 			Collection<ReportRegistryItemID> result = new HashSet<ReportRegistryItemID>(topLevelItems.size());
 			for (ReportRegistryItem item : topLevelItems) {
 				result.add((ReportRegistryItemID) JDOHelper.getObjectId(item));
@@ -713,37 +741,26 @@ implements SessionBean
 	}
 	
 	/**
-	 *
-	 * @ejb.interface-method
-	 * @ejb.permission role-name="_Guest_"
-	 * @ejb.transaction type = "Required"
+	 * Get the {@link ReportingManagerFactory} for the actual organisationID.
+	 * 
+	 * @return The {@link ReportingManagerFactory} for the actual organisationID.
 	 */
-	public Collection<ReportRegistryItemCarrier> getTopLevelReportRegistryItemCarriers (String organisationID)
-	{
-		PersistenceManager pm;
-		pm = getPersistenceManager();
-		try {
-			Collection topLevelItems = ReportRegistryItem.getTopReportRegistryItems(pm, organisationID);
-			Collection<ReportRegistryItemCarrier> result = new HashSet<ReportRegistryItemCarrier>();
-			for (Iterator iter = topLevelItems.iterator(); iter.hasNext();) {
-				ReportRegistryItem item = (ReportRegistryItem) iter.next();
-				result.add(new ReportRegistryItemCarrier(null, item, true));
-			}
-			return result;
-		} finally {
-			pm.close();
-		}
-	}
-	
-	
 	protected ReportingManagerFactory getReportingManagerFactory() throws NamingException
 	{
 		return ReportingManagerFactory.getReportingManagerFactory(getInitialContext(getOrganisationID()), getOrganisationID());
 	}
 	
 	/**
-	 * @throws ModuleException
-	 *
+	 * Stores the given {@link ReportRegistryItem} to the datastore
+	 * of the organiation of the calling user.
+	 * 
+	 * @param reportRegistryItem The item to store.
+	 * @param get Wheter a detached copy of the stored item should be returned.
+	 * @param fetchGroups If get is <code>true</code>, this defines the fetch-groups the
+	 * 		retuned item will be detached with.
+	 * @param maxFetchDepth If get is <code>true</code>, this defines the maximum fetch-depth
+	 * 		when detaching.
+	 * 
 	 * @ejb.interface-method
 	 * @ejb.permission role-name="_Guest_"
 	 * @ejb.transaction type="Required"
@@ -765,8 +782,10 @@ implements SessionBean
 	
 	
 	/**
-	 * @throws ModuleException
-	 *
+	 * Delete the {@link ReportRegistryItem} with the given id.
+	 * 
+	 * @param reportRegistryItemID The id of the item to delete.
+	 * 
 	 * @ejb.interface-method
 	 * @ejb.permission role-name="_Guest_"
 	 * @ejb.transaction type="Required"
@@ -782,10 +801,9 @@ implements SessionBean
 			} catch (JDOObjectNotFoundException e) {
 				return;
 			}
-			ReportRegistryItem parent = item.getParentItem();
+			ReportCategory parent = item.getParentCategory();
 			if (parent != null && (parent instanceof ReportCategory)) {
-				ReportCategory cat = (ReportCategory) parent;
-				cat.getChildItems().remove(item);
+				parent.getChildItems().remove(item);
 			}
 			pm.deletePersistent(item);
 		} finally {
@@ -795,18 +813,21 @@ implements SessionBean
 	
 
 	/**
-	 * @throws ModuleException
+	 * Renders the {@link ReportLayout} referenced by the given {@link RenderReportRequest}
+	 * and returns the resulting {@link RenderedReportLayout}.
+	 * 
+	 * @param renderReportRequest The request defining wich report to render, to which format it
+	 * 		should be rendered and wich Locale should be applied etc.
+	 * 
+	 * @throws NamingException Might be thrown while resoving the {@link ReportingManagerFactory}.
+	 * @throws RenderReportException Might be thrown if rendering the report fails.
 	 *
 	 * @ejb.interface-method
 	 * @ejb.permission role-name="_Guest_"
 	 * @ejb.transaction type="Never"
-	 * 
-	 * @param renderReportRequest
-	 * @return
-	 * @throws NamingException 
-	 * @throws RenderReportException 
 	 */
-	public RenderedReportLayout renderReportLayout(RenderReportRequest renderReportRequest) throws NamingException, RenderReportException
+	public RenderedReportLayout renderReportLayout(RenderReportRequest renderReportRequest) 
+	throws NamingException, RenderReportException
 	{
 		PersistenceManager pm;
 		pm = getPersistenceManager();
@@ -821,30 +842,6 @@ implements SessionBean
 			pm.close();
 		}
 	}
-	
-//	/**
-//	 * @throws ModuleException
-//	 *
-//	 * @ejb.interface-method
-//	 * @ejb.permission role-name="_Guest_"
-//	 * @ejb.transaction type="Required"
-//	 * 
-//	 * @deprecated Use {@link #renderReportLayout(RenderReportRequest)} instead.
-//	 */
-//	public RenderedReportLayout renderReportLayout (
-//			ReportRegistryItemID reportLayoutID,
-//			Map params,
-//			String format
-//		)
-//	throws ModuleException
-//	{
-//		RenderReportRequest request = new RenderReportRequest();
-//		request.setReportRegistryItemID(reportLayoutID);
-//		request.setParameters(params);
-//		request.setOutputFormat(Birt.parseOutputFormat(format));
-//		return renderReportLayout(request);
-//	}
-	
 	
 	/**
 	 *
@@ -876,13 +873,22 @@ implements SessionBean
 	}
 	
 	/**
-	 *
+	 * Returns the {@link ReportLayoutLocalisationData} for the given report layout id.
+	 * The localisation data contains localisation labels for the report.
+	 * 
+	 * @param reportLayoutID The id of the layout to get the localisation data for.
+	 * @param fetchGroups The fetch-groups to detach the localisation data with.
+	 * @param maxFetchDepth The maximum fetch-depth when detaching.
+	 * 
 	 * @ejb.interface-method
 	 * @ejb.permission role-name="_Guest_"
 	 * @ejb.transaction type = "Required"
 	 */
 	@SuppressWarnings("unchecked")
-	public Collection<ReportLayoutLocalisationData> getReportLayoutLocalisationBundle(ReportRegistryItemID reportLayoutID, String[] fetchGroups, int maxFetchDepth)
+	public Collection<ReportLayoutLocalisationData> getReportLayoutLocalisationBundle(
+			ReportRegistryItemID reportLayoutID, 
+			String[] fetchGroups, int maxFetchDepth
+		)
 	{
 		PersistenceManager pm;
 		pm = getPersistenceManager();
@@ -900,7 +906,15 @@ implements SessionBean
 	}
 	
 	/**
-	 * @throws ModuleException
+	 * Stores the given {@link ReportLayoutLocalisationData} to the datastore
+	 * of the organiation of the calling user.
+	 * 
+	 * @param bundle The bundle to store.
+	 * @param get Wheter a detached copy of the stored bundle should be returned.
+	 * @param fetchGroups If get is <code>true</code>, this defines the fetch-groups the
+	 * 		retuned bundle will be detached with.
+	 * @param maxFetchDepth If get is <code>true</code>, this defines the maximum fetch-depth
+	 * 		when detaching.
 	 *
 	 * @ejb.interface-method
 	 * @ejb.permission role-name="_Guest_"

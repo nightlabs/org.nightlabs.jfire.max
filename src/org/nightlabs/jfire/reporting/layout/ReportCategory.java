@@ -95,41 +95,31 @@ public class ReportCategory extends ReportRegistryItem implements NestableReport
 	 *		persistence-modifier="persistent"
 	 *		collection-type="collection"
 	 *		element-type="org.nightlabs.jfire.reporting.layout.ReportRegistryItem"
-	 *		mapped-by="parentItem"
+	 *		mapped-by="parentCategory"
 	 *		dependent-element="true"
 	 */
 	private Set<ReportRegistryItem> childItems;	
 
-//// TODO This constructor should not exist, because it is very likely, that the child item
-////		is created by another organisation! It's error prone - better get rid of this constructor.
-//	/**
-//	 * Creates a new ReportCategory with the given one as parent.
-//	 * 
-//	 * @param pm PersistenceManager to retrieve the ReportRegistry with.
-//	 * @param parentItem A non null ReportCategory that will be the parent of the new one.
-//	 * @throws NullPointerException if parentItem is null
-//	 */
-//	public ReportCategory(
-//			ReportCategory parentItem,
-//			String reportRegistryItemID 
-//		) 
-//	{
-//		super(parentItem, parentItem.getOrganisationID(), parentItem.getReportRegistryItemType(), reportRegistryItemID);
-//		this.internal = parentItem.isInternal();
-//		this.childItems = new HashSet<ReportRegistryItem>();
-//	}
-	
+	/**
+	 * Create a new {@link ReportCategory} wth the given parent and primary key fields.
+	 * 
+	 * @param parentCategory The parent of the new category.
+	 * @param organisationID The orgaisatoinID.
+	 * @param reportRegistryItemType The reportRegistryItemType.
+	 * @param reportRegistryItemID The reportRegistryItemID.
+	 * @param internal Whether the new cateory is for internal use of the system. 
+	 */
 	public ReportCategory(
-			ReportCategory parentItem,
+			ReportCategory parentCategory,
 			String organisationID,
 			String reportRegistryItemType,
 			String reportRegistryItemID,
 			boolean internal
 		)
 	{
-		super(parentItem, organisationID, reportRegistryItemType, reportRegistryItemID);
-		if (parentItem != null)
-			this.internal = parentItem.isInternal();
+		super(parentCategory, organisationID, reportRegistryItemType, reportRegistryItemID);
+		if (parentCategory != null)
+			this.internal = parentCategory.isInternal();
 		else
 			this.internal = internal;		
 		this.childItems = new HashSet<ReportRegistryItem>();
@@ -158,28 +148,7 @@ public class ReportCategory extends ReportRegistryItem implements NestableReport
 	}
 	
 	public void addChildItem(ReportRegistryItem childItem) {
-		childItem.setParentItem(this);
+		childItem.setParentCategory(this);
 		this.childItems.add(childItem);
 	}
-
-//	public static void ensureRelationWithParent(ReportRegistryItem parent, ReportRegistryItem childItem) {
-//		if (parent == null)
-//			return;
-//
-//		if (parent instanceof ReportCategory) {
-//			ReportCategory category = (ReportCategory)parent;
-////			if (category.getChildItems().contains(childItem))
-//				category.addChildItem(childItem);
-//		}
-//	}
-
-//	@Override
-//	public void jdoPreStore() {
-//		super.jdoPreStore();
-//		ReportRegistryItemID parentID = (ReportRegistryItemID) JDOHelper.getObjectId(this.getParentItem());
-//		if (parentID == null)
-//			return;
-//		ReportRegistryItem parent = (ReportRegistryItem) getPersistenceManager().getObjectById(parentID);
-//		ReportCategory.ensureRelationWithParent(parent, this);
-//	}
 }

@@ -1,4 +1,4 @@
-<!DOCTYPE script-category PUBLIC "-//NightLabs//DTD ScriptingInitializer V 1.0//EN" "http://www.nightlabs.de/dtd/scripting-initializer-content_1_0.dtd">
+<!DOCTYPE script-category PUBLIC "-//NightLabs//DTD ScriptingInitializer V 1.1//EN" "http://www.nightlabs.de/dtd/scripting-initializer-content_1_1.dtd">
 <script-category 
 	id="InvoceData"
 	type="JFireReporting-Scripting-PropertySet"
@@ -19,6 +19,35 @@
 	>
 		<name language="de">PropertySet</name>
 		<name language="en">PropertySet</name>
+		<description language="de">Dieses Skript ermöglicht die Ausgabe eines JFire PropertySets.
+PropertySets kennen zwar ihre Struktur, ein Berichte Skript kann 
+dies zur Zeit des Berichte Designs nicht kennen, daher müssen für 
+dieses Skript zwei Skript-Eigenschaften definiert werden:
+
+  * linkClass: Das gibt die Klasse des Objektes an, 
+               an das das PropertySet gelinktist.
+    Bsp:
+      org.nightlabs.jfire.person.Person
+      org.nightlabs.jfire.simpletrade.store.SimpleProductType
+      
+  * scope: Dies gibt die Variante der Struktur an.
+    Bsp:
+      default
+		</description>
+		<description language="en">This script enables the output of a JFire PropertySet.
+Though PropertySets know their associated structure, a report script
+cannot know this a the time the report is designe. That's why this
+script need to be passed two script-properties:
+
+  * linkClass: This defines the class the PropertySet is linked to.
+    example:
+      org.nightlabs.jfire.person.Person
+      org.nightlabs.jfire.simpletrade.store.SimpleProductType
+      
+  * scope: This defines the variant of the PropertySet
+    example:
+      default
+		</description>
 	</script>
 	
 </script-category>

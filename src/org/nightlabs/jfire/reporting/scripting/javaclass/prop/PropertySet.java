@@ -16,9 +16,9 @@ import javax.jdo.JDOHelper;
 import javax.jdo.PersistenceManager;
 
 import org.apache.log4j.Logger;
+import org.eclipse.birt.report.model.css.Property;
 import org.eclipse.datatools.connectivity.oda.IResultSetMetaData;
 import org.nightlabs.jdo.NLJDOHelper;
-import org.nightlabs.jfire.person.PersonStruct;
 import org.nightlabs.jfire.prop.AbstractDataField;
 import org.nightlabs.jfire.prop.AbstractStructField;
 import org.nightlabs.jfire.prop.IStruct;
@@ -33,10 +33,9 @@ import org.nightlabs.jfire.prop.structfield.DateStructField;
 import org.nightlabs.jfire.prop.structfield.NumberStructField;
 import org.nightlabs.jfire.reporting.JFireReportingHelper;
 import org.nightlabs.jfire.reporting.oda.DataType;
+import org.nightlabs.jfire.reporting.oda.jfs.AbstractJFSScriptExecutorDelegate;
 import org.nightlabs.jfire.reporting.oda.jfs.JFSResultSet;
 import org.nightlabs.jfire.reporting.oda.jfs.JFSResultSetMetaData;
-import org.nightlabs.jfire.reporting.oda.jfs.ScriptExecutorJavaClassReportingDelegate;
-import org.nightlabs.jfire.scripting.AbstractScriptExecutorJavaClassDelegate;
 import org.nightlabs.jfire.scripting.ScriptException;
 import org.nightlabs.jfire.scripting.ScriptExecutorJavaClass;
 import org.nightlabs.jfire.security.SecurityReflector;
@@ -48,18 +47,27 @@ import org.nightlabs.jfire.security.SecurityReflector;
  * <ul>
  *   <li><code>propertyID</code>: The {@link PropertyID} of the {@link Property} to access.</li>
  * </ul>
- *  
+ * <p>
+ * At design-time the script does not know for which linkClass and scope the metad-data should be created, 
+ * that's why the script requires two query-properties, that are available before the query is prepared.
+ * <ul>
+ *   <li><code>linkClass</code>: The linkClass of the structure</li>
+ *   <li><code>scope</code>: The scope of the structure</li>
+ * </ul>
+ * </p>
  * @author Alexander Bieber <!-- alex [AT] nightlabs [DOT] de -->
  */
 public class PropertySet
-extends AbstractScriptExecutorJavaClassDelegate
-implements ScriptExecutorJavaClassReportingDelegate
+extends AbstractJFSScriptExecutorDelegate
 {
 	
 	/**
 	 * Logger used by this class.
 	 */
 	private static final Logger logger = Logger.getLogger(PropertySet.class);
+	
+	public static final String PROPERTY_NAME_LINK_CLASS = "linkClass";
+	public static final String PROPERTY_NAME_SCOPE = "scope";
 
 	public PropertySet() {
 		super();
@@ -71,8 +79,15 @@ implements ScriptExecutorJavaClassReportingDelegate
 		if (metaData == null) {
 			metaData = new JFSResultSetMetaData();
 			PersistenceManager pm = getScriptExecutorJavaClass().getPersistenceManager();
-			IStruct struct = PersonStruct.getPersonStruct(getOrganisation(), pm);
-//			IStruct struct = StructLocal.getStructLocal(, pm);
+			String linkClass = getJFSQueryPropertySet().getProperties().get(PROPERTY_NAME_LINK_CLASS);;
+			if (linkClass == null || "".equals(linkClass)) {
+				throw new IllegalArgumentException("Query property linkClass was not set.");
+			}
+			String scope = getJFSQueryPropertySet().getProperties().get(PROPERTY_NAME_SCOPE);
+			if (scope == null || "".equals(scope)) {
+				throw new IllegalArgumentException("Query property scope was not set.");
+			}
+			IStruct struct = StructLocal.getStructLocal(linkClass, scope, pm);
 			SortedMap<String, StructBlock> sortedBlocks = new TreeMap<String, StructBlock>();
 			for (Iterator iter = struct.getStructBlocks().iterator(); iter.hasNext();) {			
 				StructBlock structBlock = (StructBlock) iter.next();
@@ -167,8 +182,13 @@ implements ScriptExecutorJavaClassReportingDelegate
 				else if (structField instanceof DateStructField) {
 					elements.add(((DateDataField)field).getDate());
 				}
-				else if (II18nTextDataField.class.isAssignableFrom(structField.getDataFieldClass()))
-					elements.add(((II18nTextDataField)field).getText(locale));
+				else if (II18nTextDataField.class.isAssignableFrom(structField.getDataFieldClass())) {
+					if (field.isEmpty()) {
+						elements.add("");
+					} else {
+						elements.add(((II18nTextDataField) field).getText(locale));
+					}
+				}
 			}			
 		}
 		resultSet.addRow(elements.toArray());

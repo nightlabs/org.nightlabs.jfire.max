@@ -43,15 +43,18 @@ implements ReportingScriptExecutor
 	 * 
 	 * @throws ScriptException when the delegate can't be casted to {@link ScriptExecutorJavaClassReportingDelegate}
 	 */
-	protected ScriptExecutorJavaClassReportingDelegate getReportingDelegate()
+	protected ScriptExecutorJavaClassReportingDelegate getReportingDelegate(JFSQueryPropertySet queryPropertySet)
 	throws ScriptException
 	{
 		ScriptExecutorJavaClassDelegate delegate = getDelegate();
+		ScriptExecutorJavaClassReportingDelegate reportingDelegate = null;
 		try {
-			return (ScriptExecutorJavaClassReportingDelegate)delegate;
+			reportingDelegate = (ScriptExecutorJavaClassReportingDelegate) delegate;
 		} catch (ClassCastException e) {
-			throw new ScriptException("Delegate of type "+delegate.getClass().getName()+" does not implement "+ScriptExecutorJavaClassReportingDelegate.class.getName(), e);
+			throw new ScriptException("Delegate of type " + delegate.getClass().getName() + " does not implement " + ScriptExecutorJavaClassReportingDelegate.class.getName(), e);
 		}
+		reportingDelegate.setJFSQueryPropertySet(queryPropertySet);
+		return reportingDelegate;
 	}
 
 	/**
@@ -80,7 +83,8 @@ implements ReportingScriptExecutor
 			}
 		}
 		prepare(script, fakeParams);
-		return getReportingDelegate().getResultSetMetaData();
+		ScriptExecutorJavaClassReportingDelegate reportingDelegate = getReportingDelegate(queryPropertySet);
+		return reportingDelegate.getResultSetMetaData();
 	}
 
 	/**
@@ -109,9 +113,10 @@ implements ReportingScriptExecutor
 			convertedParams.put(entry.getKey(), JFireReportingHelper.getDataSetParamObject(entry.getValue()));
 		}
 		prepare(script, convertedParams);
+		getReportingDelegate(queryPropertySet);
 		Object result = execute();
 		try {
-			return (IResultSet)result;
+			return (IResultSet) result;
 		} catch (ClassCastException e) {
 			throw new ScriptException("The delegate of type "+getDelegate().getClass().getName()+" did not return an implementation of "+IResultSet.class.getName()+" upon execution but "+result.getClass().getName(), e);
 		}

@@ -121,7 +121,7 @@ public class ReportingInitialiser {
 		try {
 			category = (ReportCategory) pm.getObjectById(ReportRegistryItemID.create(organisationID, reportRegistryItemType, reportRegistryItemID));
 			if (logger.isDebugEnabled()) {
-				ReportRegistryItem p = category.getParentItem();
+				ReportRegistryItem p = category.getParentCategory();
 				logger.debug("createCategory: already exists: categoryPK=\""+category.getOrganisationID()+'/'+category.getReportRegistryItemType()+'/'+category.getReportRegistryItemID()+"\" parent=\"" + (p == null ? null : (p.getOrganisationID()+'/'+p.getReportRegistryItemType()+'/'+p.getReportRegistryItemID())) + "\" internal="+category.isInternal());
 			}
 		} catch (JDOObjectNotFoundException e) {
@@ -289,6 +289,7 @@ public class ReportingInitialiser {
 
 			// create the category name
 			createElementName(catNode, "name", category.getName(), categoryID);
+			createElementName(catNode, "description", category.getDescription(), null);
 			logger.debug("create Script Category = "+category.getName());
 			
 
@@ -335,6 +336,7 @@ public class ReportingInitialiser {
 					if (doInit) {
 						layout.loadFile(reportFile);
 						createElementName(reportNode, "name", layout.getName(), reportID);
+						createElementName(reportNode, "description", layout.getDescription(), null);
 						createReportLocalisationBundle(reportFile, reportID, reportNode, layout);
 					}
 					// This has its own overwriteOnInit

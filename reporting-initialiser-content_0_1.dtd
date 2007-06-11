@@ -13,7 +13,7 @@
   id: to specify the category id (defaults to the folder name)
   type: to specify the category type (defaults to its parent type)  
 -->
-<!ELEMENT report-category ( name*, report+ ) >
+<!ELEMENT report-category ( name*, description*, report+ ) >
 <!ATTLIST report-category 
 	id NMTOKEN #IMPLIED
 	type NMTOKEN #IMPLIED
@@ -31,7 +31,7 @@
   The 'overwriteOnInit' attribute is optional. It defaults to false and can
   be used to force resetting of report layouts. 
 -->
-<!ELEMENT report ( name*, parameter-acquisition? ) >
+<!ELEMENT report ( name*, description*, parameter-acquisition? ) >
 <!ATTLIST report 
 	file NMTOKEN #REQUIRED
 	id NMTOKEN #IMPLIED
@@ -46,6 +46,13 @@
 <!ELEMENT name ( #PCDATA ) >
 <!ATTLIST name language NMTOKEN #REQUIRED >
 
+<!-- 
+  <description> elements are used for elements that carry a long i18n description.
+  They are used like
+  <description language="en">MyName</description>
+-->
+<!ELEMENT description ( #PCDATA ) >
+<!ATTLIST description language NMTOKEN #REQUIRED >
 
 <!--
   The <parameter-acquisition> element is the root element to define a 
@@ -73,7 +80,7 @@
        to the input of some value-consumer. value-consumer can either be
        value-provider-configs or parameters
 -->
-<!ELEMENT use-case ( name*, parameters, value-provider-configs, value-consumer-bindings ) >
+<!ELEMENT use-case ( name*, description*, parameters, value-provider-configs, value-consumer-bindings ) >
 <!ATTLIST use-case 
 	id NMTOKEN #REQUIRED
 	default NMTOKEN #IMPLIED

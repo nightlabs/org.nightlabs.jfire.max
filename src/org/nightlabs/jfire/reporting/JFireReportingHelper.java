@@ -282,4 +282,21 @@ public class JFireReportingHelper {
 		} else
 			return obj;			
 	}
+	
+	/**
+	 * Pattern used for {@link #setBRLineBreaks(String)}
+	 */
+	private static final Pattern patLineBreak = Pattern.compile("\\r?\\n");
+	
+	/**
+	 * Returns the given Sting with all occurences of the Pattern \r?\n with &lt;br/&gt;.
+	 * 
+	 * @param str The String to replace the linebreaks in. 
+	 * @return The given Sting with all occurences of the Pattern \r?\n with &lt;br/&gt;.
+	 */
+	public static String setBRLineBreaks(String str) {
+		if (str == null)
+			return null;
+		return patLineBreak.matcher(str).replaceAll("<br/>");
+	}
 }

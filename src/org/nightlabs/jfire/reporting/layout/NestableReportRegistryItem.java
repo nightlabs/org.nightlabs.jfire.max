@@ -29,14 +29,14 @@ package org.nightlabs.jfire.reporting.layout;
 import java.util.Set;
 
 /**
- * Interface for nestable registry items (ReportCategory).
+ * Interface for nestable registry items like (ReportCategory).
  *  
  * @author Alexander Bieber <alex[AT]nightlabs[DOT]de>
  *
  */
 public interface NestableReportRegistryItem {
 	
-	public ReportRegistryItem getParentItem();
+	public ReportCategory getParentCategory();
 	public Set<ReportRegistryItem> getChildItems();
 	
 }

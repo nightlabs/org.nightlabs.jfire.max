@@ -25,5 +25,13 @@ public interface ScriptExecutorJavaClassReportingDelegate extends ScriptExecutor
 	 * @return A ResultSetMetaData describing the colums this delegate returns on execution.
 	 * @throws ScriptException When the script fails to return the metadata
 	 */
-	public IResultSetMetaData getResultSetMetaData() throws ScriptException;
+	IResultSetMetaData getResultSetMetaData() throws ScriptException;
+	
+	/**
+	 * Set the {@link JFSQueryPropertySet} for the execution of this script delegate.
+	 * This will be set before the associated BIRT query will be prepared.
+	 * 
+	 * @param queryPropertySet The properties for this script delegate.
+	 */
+	void setJFSQueryPropertySet(JFSQueryPropertySet queryPropertySet);
 }

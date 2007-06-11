@@ -21,7 +21,7 @@ public class ReportRegistryItemParentResolver implements TreeNodeParentResolver 
 	 * @see org.nightlabs.jfire.jdo.notification.TreeNodeParentResolver#getParentObjectID(java.lang.Object)
 	 */
 	public ObjectID getParentObjectID(Object jdoObject) {
-		return ((ReportRegistryItem)jdoObject).getParentItemID();
+		return ((ReportRegistryItem)jdoObject).getParentCategoryID();
 	}
 
 }

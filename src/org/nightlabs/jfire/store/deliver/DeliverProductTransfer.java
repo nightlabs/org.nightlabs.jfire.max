@@ -70,10 +70,9 @@ import org.nightlabs.jfire.transfer.id.TransferID;
  *		name = "getDeliverProductTransferForDelivery"
  *		query = "SELECT UNIQUE
  *				WHERE
- *					this.delivery.organisationID == paramOrganisationID &&
- *					this.delivery.deliveryID == paramDeliveryID
- *				PARAMETERS String paramOrganisationID, String paramDeliveryID
- *				import java.lang.String"
+ *					this.delivery.organisationID == :paramOrganisationID &&
+ *					this.delivery.deliveryID == :paramDeliveryID				
+ *				import java.lang.String, java.lang.Long"
  */
 public class DeliverProductTransfer extends ProductTransfer
 {

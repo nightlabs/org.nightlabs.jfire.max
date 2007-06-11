@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<!DOCTYPE reporting_initialiser PUBLIC "-//NightLabs//Reporting Initialiser DTD V 0.1//EN" "http://www.nightlabs.de/dtd/reporting_initialiser_0_1.dtd">
+<!DOCTYPE reporting_initialiser PUBLIC "-//NightLabs//Reporting Initialiser DTD V 0.1//EN" "http://www.nightlabs.de/dtd/reporting-initialiser-content_0_1.dtd">
 <report-category 
 	id="Invoice-Root"
 	type="JFireReportingTrade-Reporting-Invoice"
@@ -18,6 +18,14 @@
 	<!-- overwriteOnInit is optional and defaults to true -->
 		<name language="de">Standard-Rechnung</name>
 		<name language="en">Default-Invoice</name>
+		<description language="de">Dies ist das Standard Rechnungslayout.
+Es kann mit allen Produkttypen verwendet werden:
+SimpleProductType, DynamicProductType and VoucherType		
+		</description>
+		<description language="en">This is the default invoice layout.
+It can be used with all ProductTypes:
+SimpleProductType, DynamicProductType and VoucherType		
+		</description>
 		
 		<parameter-acquisition>
 			<use-case id="DefaultUseCase" default="true">

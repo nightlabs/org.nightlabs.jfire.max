@@ -15,11 +15,10 @@ import org.nightlabs.db.Record;
 import org.nightlabs.db.TableBuffer;
 import org.nightlabs.jdo.ObjectID;
 import org.nightlabs.jfire.reporting.oda.SQLResultSet;
+import org.nightlabs.jfire.reporting.oda.jfs.AbstractJFSScriptExecutorDelegate;
 import org.nightlabs.jfire.reporting.oda.jfs.JFSResultSetMetaData;
 import org.nightlabs.jfire.reporting.oda.jfs.JFSResultUtil;
-import org.nightlabs.jfire.reporting.oda.jfs.ScriptExecutorJavaClassReportingDelegate;
 import org.nightlabs.jfire.reporting.trade.scripting.ReportingTradeScriptingUtil;
-import org.nightlabs.jfire.scripting.AbstractScriptExecutorJavaClassDelegate;
 import org.nightlabs.jfire.scripting.ScriptException;
 import org.nightlabs.jfire.trade.Article;
 import org.nightlabs.jfire.trade.ArticleContainer;
@@ -35,9 +34,7 @@ import org.nightlabs.jfire.trade.ArticleContainer;
  * @author Alexander Bieber <alex [AT] nightlabs [DOT] de>
  *
  */
-public class ArticleList
-extends AbstractScriptExecutorJavaClassDelegate
-implements ScriptExecutorJavaClassReportingDelegate {
+public class ArticleList extends AbstractJFSScriptExecutorDelegate {
 
 	/**
 	 * 

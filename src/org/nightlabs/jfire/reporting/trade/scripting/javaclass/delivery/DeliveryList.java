@@ -18,12 +18,11 @@ import org.nightlabs.db.Record;
 import org.nightlabs.db.TableBuffer;
 import org.nightlabs.jfire.reporting.oda.DataType;
 import org.nightlabs.jfire.reporting.oda.SQLResultSet;
+import org.nightlabs.jfire.reporting.oda.jfs.AbstractJFSScriptExecutorDelegate;
 import org.nightlabs.jfire.reporting.oda.jfs.JFSResultSetMetaData;
 import org.nightlabs.jfire.reporting.oda.jfs.JFSResultUtil;
 import org.nightlabs.jfire.reporting.oda.jfs.ReportingScriptUtil;
-import org.nightlabs.jfire.reporting.oda.jfs.ScriptExecutorJavaClassReportingDelegate;
 import org.nightlabs.jfire.reporting.trade.scripting.ReportingTradeScriptingUtil;
-import org.nightlabs.jfire.scripting.AbstractScriptExecutorJavaClassDelegate;
 import org.nightlabs.jfire.scripting.ScriptException;
 import org.nightlabs.jfire.security.id.UserID;
 import org.nightlabs.jfire.trade.Article;
@@ -34,9 +33,7 @@ import org.nightlabs.util.TimePeriod;
  * @author Alexander Bieber <alex [AT] nightlabs [DOT] de>
  *
  */
-public class DeliveryList 
-extends AbstractScriptExecutorJavaClassDelegate
-implements ScriptExecutorJavaClassReportingDelegate {
+public class DeliveryList extends AbstractJFSScriptExecutorDelegate {
 
 	/**
 	 * 

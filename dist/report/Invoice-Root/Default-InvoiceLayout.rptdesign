@@ -520,7 +520,24 @@ JFireReportingHelper.getJDOObject(row["productJDOID"]);</expression>
                 </list-property>
             </structure>
             <property name="dataSource">JFS-Datasource</property>
-            <property name="queryText">jdo/org.nightlabs.jfire.scripting.id.ScriptRegistryItemID?organisationID=chezfrancois.jfire.org&amp;scriptRegistryItemType=JFireReporting-Scripting-PropertySet&amp;scriptRegistryItemID=PropertySet</property>
+            <property name="queryText">&lt;queryPropertySet>&lt;org.nightlabs.jfire.reporting.oda.jfs.JFSQueryPropertySet>
+  &lt;scriptRegistryItemID>
+    &lt;organisationID>chezfrancois.jfire.org&lt;/organisationID>
+    &lt;scriptRegistryItemType>JFireReporting-Scripting-PropertySet&lt;/scriptRegistryItemType>
+    &lt;scriptRegistryItemID>PropertySet&lt;/scriptRegistryItemID>
+  &lt;/scriptRegistryItemID>
+  &lt;properties class="tree-map">
+    &lt;no-comparator/>
+    &lt;entry>
+      &lt;string>linkClass&lt;/string>
+      &lt;string>org.nightlabs.jfire.person.Person&lt;/string>
+    &lt;/entry>
+    &lt;entry>
+      &lt;string>scope&lt;/string>
+      &lt;string>default&lt;/string>
+    &lt;/entry>
+  &lt;/properties>
+&lt;/org.nightlabs.jfire.reporting.oda.jfs.JFSQueryPropertySet>&lt;/queryPropertySet></property>
         </oda-data-set>
     </data-sets>
     <page-setup>
@@ -543,9 +560,9 @@ JFireReportingHelper.getJDOObject(row["productJDOID"]);</expression>
                     <property name="paramName">propertyID</property>
                     <expression name="expression">importClass(Packages.org.nightlabs.jfire.reporting.JFireReportingHelper);
 importClass(Packages.javax.jdo.JDOHelper);
-invoice = JFireReportingHelper.getJDOObject(params["articleContainerID"]);
-customer = invoice.getCustomer();
-JFireReportingHelper.createDataSetParam(JDOHelper.getObjectId(customer.getPerson()))</expression>
+articleContainer = JFireReportingHelper.getJDOObject(params["articleContainerID"]);
+customer = JFireReportingHelper.getJDOObject(articleContainer.getCustomerID());
+JFireReportingHelper.createDataSetParam(JDOHelper.getObjectId(customer.getPerson()));</expression>
                 </structure>
             </list-property>
             <list-property name="boundDataColumns">
@@ -689,7 +706,7 @@ JFireReportingHelper.createDataSetParam(JDOHelper.getObjectId(customer.getPerson
                             </column>
                             <row id="96">
                                 <cell id="97">
-                                    <property name="paddingTop">10pt</property>
+                                    <property name="paddingTop">35pt</property>
                                     <property name="paddingLeft">10pt</property>
                                     <grid id="99">
                                         <property name="width">100%</property>
@@ -744,27 +761,22 @@ if (!"".equals(row["City"]))
                                 </cell>
                                 <cell id="98">
                                     <property name="textAlign">right</property>
-                                    <image id="122">
-                                        <property name="imageName">jFire_logo.jpg</property>
+                                    <image id="213">
+                                        <property name="imageName">JFire-Logo.jpg</property>
                                     </image>
                                     <text-data id="127">
-                                        <property name="fontFamily">"Impact"</property>
-                                        <property name="fontSize">16pt</property>
-                                        <property name="fontWeight">bold</property>
-                                        <property name="fontStyle">italic</property>
-                                        <property name="color">#C0C0C0</property>
+                                        <property name="fontFamily">"Arial"</property>
+                                        <property name="fontSize">larger</property>
+                                        <property name="paddingTop">10pt</property>
                                         <property name="paddingRight">8pt</property>
                                         <expression name="valueExpr">"Invoice "+params["articleContainerID"].organisationID</expression>
                                         <property name="contentType">html</property>
                                     </text-data>
                                     <text-data id="170">
-                                        <property name="fontFamily">"Impact"</property>
-                                        <property name="fontSize">16pt</property>
-                                        <property name="fontWeight">bold</property>
-                                        <property name="fontStyle">italic</property>
-                                        <property name="color">#C0C0C0</property>
+                                        <property name="fontFamily">"Arial"</property>
+                                        <property name="fontSize">larger</property>
                                         <property name="paddingRight">8pt</property>
-                                        <expression name="valueExpr">"Invoiceno: "+params["articleContainerID"].invoiceIDPrefix+"/"+params["articleContainerID"].invoiceID</expression>
+                                        <expression name="valueExpr">"Invoice # "+params["articleContainerID"].invoiceIDPrefix+"/"+params["articleContainerID"].invoiceID</expression>
                                         <property name="contentType">html</property>
                                     </text-data>
                                 </cell>
@@ -1084,25 +1096,33 @@ isDynamicProduct(row["product"])</expression>
                         </structure>
                     </list-property>
                     <cell id="71">
+                        <property name="paddingTop">3pt</property>
                         <property name="paddingLeft">5pt</property>
+                        <property name="paddingBottom">10pt</property>
                         <data id="138">
                             <property name="fontFamily">"Arial"</property>
                             <property name="resultSetColumn">articleID</property>
                         </data>
                     </cell>
                     <cell id="73">
+                        <property name="paddingTop">3pt</property>
+                        <property name="paddingBottom">10pt</property>
                         <data id="139">
                             <property name="fontFamily">"Arial"</property>
                             <property name="resultSetColumn">productTypeName</property>
                         </data>
                     </cell>
                     <cell id="142">
+                        <property name="paddingTop">3pt</property>
+                        <property name="paddingBottom">10pt</property>
                         <data id="147">
                             <property name="fontFamily">"Arial"</property>
                             <property name="resultSetColumn">tariffName</property>
                         </data>
                     </cell>
                     <cell id="187">
+                        <property name="paddingTop">3pt</property>
+                        <property name="paddingBottom">10pt</property>
                         <data id="208">
                             <property name="fontFamily">"Arial"</property>
                             <structure name="numberFormat">
@@ -1114,6 +1134,8 @@ isDynamicProduct(row["product"])</expression>
                         </data>
                     </cell>
                     <cell id="178">
+                        <property name="paddingTop">3pt</property>
+                        <property name="paddingBottom">10pt</property>
                         <text-data id="212">
                             <property name="fontFamily">"Arial"</property>
                             <property name="textAlign">right</property>
@@ -1122,6 +1144,8 @@ isDynamicProduct(row["product"])</expression>
                         </text-data>
                     </cell>
                     <cell id="75">
+                        <property name="paddingTop">3pt</property>
+                        <property name="paddingBottom">10pt</property>
                         <data id="148">
                             <property name="fontFamily">"Arial"</property>
                             <structure name="numberFormat">
@@ -1133,6 +1157,8 @@ isDynamicProduct(row["product"])</expression>
                         </data>
                     </cell>
                     <cell id="161">
+                        <property name="paddingTop">3pt</property>
+                        <property name="paddingBottom">10pt</property>
                         <data id="167">
                             <property name="fontFamily">"Arial"</property>
                             <property name="resultSetColumn">currencyID</property>
@@ -1147,26 +1173,35 @@ isDynamicProduct(row["product"])</expression>
                         </structure>
                     </list-property>
                     <cell id="194">
+                        <property name="paddingTop">3pt</property>
                         <property name="paddingLeft">5pt</property>
+                        <property name="paddingBottom">10pt</property>
                         <data id="201">
                             <property name="fontFamily">"Arial"</property>
                             <property name="resultSetColumn">articleID</property>
                         </data>
                     </cell>
                     <cell id="195">
+                        <property name="paddingTop">3pt</property>
+                        <property name="paddingBottom">10pt</property>
                         <text-data id="202">
                             <property name="fontFamily">"Arial"</property>
-                            <expression name="valueExpr">if (isDynamicProduct(row["product"])) row["product"].getName().getText()</expression>
+                            <expression name="valueExpr">if (isDynamicProduct(row["product"])) 
+  JFireReportingHelper.setBRLineBreaks(row["product"].getName().getText());</expression>
                             <property name="contentType">html</property>
                         </text-data>
                     </cell>
                     <cell id="196">
+                        <property name="paddingTop">3pt</property>
+                        <property name="paddingBottom">10pt</property>
                         <data id="203">
                             <property name="fontFamily">"Arial"</property>
                             <property name="resultSetColumn">tariffName</property>
                         </data>
                     </cell>
                     <cell id="197">
+                        <property name="paddingTop">3pt</property>
+                        <property name="paddingBottom">10pt</property>
                         <text-data id="204">
                             <property name="fontFamily">"Arial"</property>
                             <property name="textAlign">right</property>
@@ -1178,6 +1213,8 @@ isDynamicProduct(row["product"])</expression>
                         </text-data>
                     </cell>
                     <cell id="198">
+                        <property name="paddingTop">3pt</property>
+                        <property name="paddingBottom">10pt</property>
                         <text-data id="207">
                             <property name="fontFamily">"Arial"</property>
                             <property name="textAlign">right</property>
@@ -1186,6 +1223,8 @@ isDynamicProduct(row["product"])</expression>
                         </text-data>
                     </cell>
                     <cell id="199">
+                        <property name="paddingTop">3pt</property>
+                        <property name="paddingBottom">10pt</property>
                         <data id="205">
                             <property name="fontFamily">"Arial"</property>
                             <structure name="numberFormat">
@@ -1197,6 +1236,8 @@ isDynamicProduct(row["product"])</expression>
                         </data>
                     </cell>
                     <cell id="200">
+                        <property name="paddingTop">3pt</property>
+                        <property name="paddingBottom">10pt</property>
                         <data id="206">
                             <property name="fontFamily">"Arial"</property>
                             <property name="resultSetColumn">currencyID</property>
@@ -1316,107 +1357,79 @@ isDynamicProduct(row["product"])</expression>
     </body>
     <list-property name="images">
         <structure>
-            <property name="name">jFire_logo.jpg</property>
+            <property name="name">JFire-Logo.jpg</property>
             <property name="data">
-                /9j/4AAQSkZJRgABAgAAZABkAAD/7AARRHVja3kAAQAEAAAARAAA/+4ADkFkb2JlAGTAAAAAAf/bAIQA
-                BAMDAwMDBAMDBAYEBAQGBwUEBAUHCAcHBwcHCAsICQkJCQgLCwwMDAwMCw0NDg4NDRMSEhITFRUVFRUV
-                FRUVFQEFBQUJCAkQCwsQFA4ODhQVFRUVFRUVFRUVFRUVFRUVFRUVFRUVFRUVFRUVFRUVFRUVFRUVFRUV
-                FRUVFRUVFRUV/8AAEQgAKAD9AwERAAIRAQMRAf/EALgAAAICAwEBAQAAAAAAAAAAAAcIAAYEBQkDAQIB
-                AAICAwEAAAAAAAAAAAAAAAQGAAUCAwcBEAABAwIEBAEEDQgGCwAAAAABAgMEBQYAERIHITETCEFRYSIU
-                cYGRwTJScqLSw9MVFqGxQoIjJRcJ0WLCc2QYQ1NjoyQ0lNRVlUYRAAEDAgMEBwUIAgMBAAAAAAEAAgMR
-                BCEFBjFBoRJRgZHR4UITYXEiMqLwscFSkkMUFlMVYoIzY//aAAwDAQACEQMRAD8Af7EUUxFFMRRTEUWF
-                WKpEodJn1qerRFp0d6ZJX5G2UFxR9wYigFVznf8A5jG5b094wrUpDMRTijHadVIW4lvP0QpYUkE5cyEj
-                GBeAt7ICTQokbP8AeduJuFuBb9p1C26YI1XlIiyFxS+h1tCgSpxJWtQOgDVkRxwMLk8wbTarV+VsETn1
-                PwiqdWfPh0uE/Uag8mPFioU6++4ckoQkZknBL3tY0ucaAKmjjc9wa0VJ2IEVXuAqlQnKj2rTW2YgUQ3L
-                mgrccTyCumkgIz85OE6+1Q4GkLRTpPcnK20uxrazOJPQN3XvW7pe492yWwqSI+Z8UtEf2sUztW3Y2cvZ
-                4rCXI7ZuyvavSTuVcTBIzj+22fpY8Grbz/j2eKjMhgd09qHd3797gUcKNOMLhy6kcq/tjB9tqW5efi5e
-                zxVtbaTtXjHm7fBBqu94G+lPUoRE0hYHLOEs/W4YLfNXP+aiGvNLQs+Tm7VhUzvJ37mDN1NGT7EFf22N
-                0uZluyiFt9MNftqm37cL8vvcewn7mvxmI2+7UZDFNXCbU0lyKylCdSkqUvj1eonPPwxYWkxlZzFL2b2L
-                bWb0xuAQY3Y7yLgt+6qnb9h0iC5EpL7kRypVPquGQ60dDmhttTelAUCASok8+GBJcxo7laK0VxZ6a54g
-                +QkFwrRUy1e9vdiZclMgVS36TUIk2UzFXGhNyGX1dZwNgNrU64NXHhmnHrL8k0ovJtPsa0kE4BOzfF4U
-                qwLRq95VvV6jR46pLyG8tbhHoobRmQNS1kIT5zixe4NFSlmCF0rwxu0rnvcfftvG5UnnqLT6PTIKj/w8
-                J1hyStCfALdLiNSvOEgebArbguVxLlbGYGtVhMd9HcBJ4sNUIjzwXPt8eOuuXaso8m9T5V5yu+buEjkq
-                eFEQPipgLyHuvHHrboO2LCXKDH8y1zvf/vs2OCqMVeT1BX2uN7XOKAkijavrHf1v+6eCaJl54K/tsRz6
-                LyO3D9yY7tT7n9wd4LunWjedLhuJbgrqDNTpra2ej03EIKHkLWsEL1+iU5HMcjzGEcxLqLbc2QjjDwd6
-                aG67roVk0CZc1yS0w6dBSFPOniSVEJShCRxUtaiEpSOZxtkkaxpcdiDggdK8MaKkpXav3T3nX5S02hTo
-                1Gg5kMvTE+syFDwUoAhCT/VyV7OFi7z54PwAAJvt9NRgVkJcfZgFXJvcVvRCeANRhLbV4+otDLAzM8mc
-                NvAIwadtjuPatBV+6HfOKgri1CFkPLAaOCoc3kdtP3LXJp23pgD2qj1PvU37gJUPvGnhQ5E09nFrDcvd
-                vVXc5TDGNh7VVV9+3cOlZAqVMIHL93M4sglp4AJAXz/Px3Ef+Rpn/rmv6ce0WCZf+Oe/v+UP+NGVP/EX
-                3j1er6mdP3P1/V+p0c9OvqcdXwelx58ceVUTlYyUUxFFMRRTEUQL7uruFr7I1yI06G5dxluhxc/iycy+
-                fDkylz28D3MvIyqs8ptfXnA3DH7da5Ypt/puBxKgvM8hiuN1UUTP/qaGoNU2/ZLY7dT3IcuV1oKat6E4
-                6knkJEn9i38wuYxsqvmruaFozukNsGja806hj3Jn+46uqjUSl2406Ufeb5flIGXpNR8ilJ8xWpJ/VwHq
-                a5LYmxjzHH3DxWrSVpzyulI+QUHvPggtRnW42lBQdR8Tjn8mKeJIqo9WTa1Pq1DZqUqohpTxUEstlGaQ
-                lRT6WrPics8X+U6dhuYRJJJyk1wFMPfVJWa5jJDMWNZWm/FbGXtlb0pRU5WnUZ+AUz74xajSdqP3T9KF
-                jz+dowjHFVurbDWbVkFuRcUhAPilcf3xgiPTNuw4SHgjotWXTNkQ+pU6V2kbbyQoLu6YkK55Lie+nB7M
-                niHnPBenVt0f2m/Uv3C7QNt05MsXNNeJ5JSqKSfYyRiOyeNx+c8Fl/cblo/8m/UjNNj0jajbKUxRmy3E
-                oMBwQ0rOalukHSVEZZqW4rifPg+UttbckbGD7cUvQ+pmN63n+aVwr7vALmxc9ObQ2ta83HlkrcWrmVKO
-                ZJPnOEy2mc41K7FPC3loBgrJ2rWk/de+VED6dcKgJdrMpORyzYGljM/3q0K9rDLYxhzgehI2fzmKFwB+
-                bD7dSYDv23BRb9jUOyI7uUm45hkyWxn/AMrCAUc8uHF1TfuYsbtvM2iV8mcGS8x3D71zpeUqU+EoQVlZ
-                ASAOJJ5ADAzG0CuZXh7l0Ls7sLsc21SpFzVysIrL0Vl2pNw3IzbLb60BTjaAtlZ0oJ0jM4INo1wxVUM7
-                kjJDAKdfettJ7BNq5SdLlw3Dl/fw/wDtsestGN2LCbO5pBQgJBN67Msm09yKtbO3VQl1mi0tSYrlRmlp
-                SlykDJ8NqaSgKQhXohWniQeYyJyMgGFVrbbSSUcRtWnoFsPVKXFp0JhyVMmOIYixWQVOOuuKCUIQkcyo
-                nIYBknJNAru3y9rW1caALq724bHQdlLJEOQlDtx1fRJuCYjIgLAPTjtq/wBWyCQPjKKleOQPgj5RjtS3
-                e3Ilf8PyjZ3oMd4d2rql0UawmHSYtLZFSnMg+iZL5KGtQ+MhsKI+Xikzm4PMGDcm3SuX80bpSNpoPcNv
-                29iFdvMpQykODkOGXPCdcOxTgbcpkrd2EsytUCBUq1XnfWZjKJC24rsdLaOokK0emlZJTnkThjsskhfE
-                1z5MXCuBCTbzUNxFK5jIxRppiDu7FkyO2LbGQkoVcM5IPPKRE+ywa3JbcfuHtCG/s93/AI29ju9VGsdk
-                uzVXJMi6qo0Tz6cqCPzsnFhBaxx7H17EDd5zPOKOjA9wKrp/l97FH/7Osf8AV0/7DB3OOkKiLT0L1i/y
-                9tjnpDbbV21qSrPV0ESoJUoJ4n4LGfuYyBrvXhBG5NV+AbV/An8NfUE/hr7t+5Pu/UrL1Po9DRqz1Z6f
-                0s88+PPGVMKLFUjuN3clbObdO1+kstP1mfIRTqQiRmWkPOJUtTq0jIqCEIUdOfE5DGqeX0xVGWNoZ38u
-                4YpMKP3T9x9TJcVccZDfh+7YfH/d4qp80LEz2+nY34mqdDtzu69b228+/r5lNTJzk2Q1HkMsoY1MN6Uj
-                UlvJOYVq4gYPsbh00fMelUOcWkdtNyM6Ai3gxVSR3vgqUq5Lpt+zISz0aPFXOlpTy60shKAfOEN/OxSZ
-                neNY8N6E8aYy0vidJ+Y07EssOxpUZAc4n5WeKWTMA5OUOVho2p9ez+zvw9t5MrjzYTIr01S0qyOZYijo
-                o+f1Di/ydtYi/wDMfuSBq6UfyREP228Tj91FTN9a8avuPJiMKCm6Oy1DT5NeXVc/KvL2sKuoZ+e5I3NF
-                PxTVpW09OyDjtkJd+A+5UNNTdSRnmSOA08cL5jTGIQrBFYuZbYUmmywkjNKug7xB/Vx6bN/5XdhQrpLc
-                H52/qC8H6BckpKtdPljP/YuZ/mxkLeQeR3YVk28gb5m9oVOrdh3WpZWYMxaSOADLvvJwdCHDyHsK3jMY
-                Tse3tCpEuxbn9YCF0icUZ8T6u9+fTixZzU+U9i9F1CT87f1BGDZHbmrSb0oqVwZkaPDfTMlyFtuNpShj
-                0wCtQHwlAJy58cSxt5ZrltQQAak+5V2f5nDDZSUc0lw5QKg7cPFHjuVrph2tAoLKsnKnI6rqfKzHGo/P
-                UjFzqW45Ymx/mPAeNEn6Hs/UuHSnZG2nW7wqk0q7DbhUVDVnhWhcQupmOoTL9nFjtUul3HerjelyrPt0
-                +Icv9DFBWsj5Ti8v1cOmSAmMuPTRcr1tI0TsiG4VPvPgOKWju+r7l672VJpsKdiW4y1RogGZRqbzdfUP
-                DMuOKSfkjGy5uBzEV2LXlOXkQtcRi7FaLt52u/GG7ltNTGdNPpkgViorVwSGYP7Yaj5FLCE+3jVaz88n
-                Kic2txFAX0xOA95R3uTur3RcuOq/hn7tYoqJTrdMQ7GLjio6FFKFqWVjNSwNR4cM8sDTZ04OPLSi3Wul
-                YDG31Obmpjiq3W+5neOt0qZSF1CHERMaUy5JhRuk+lKxkrpr1HScv0hxHhjS7OJSKYI6HS1o1wdQmnSc
-                Eu0u1mkoIS3llyyGNTLwqwlsGncm17IdrbVeFT3HnLTMrtLkqp1PiKHCElbKVKfyPNboWUJV4AHLiTle
-                ZeA8F29JWopHxkRDBpFff7E6brrbDS3nVBKG0la1HkEpGZOLImgqlYCpoFzAvK8Xr0vmvXaviKlNcdYB
-                46Y6T02E+00lIwj3TvUeXHeu25ZZCCBkf5Rx38Vm0qdNecajw2XHnnTpbaZSVrUfIlKcyTisdDUo2Roa
-                Kk0AVlkUC6X2tb1CqJWPAwpH0MYi2eD8p7EO27gH7jP1N71qXbYugtr/AHBUh5MoMj6GNwgfXYVn/Mg/
-                yM/UO9UWtWbeLrpCbZqi0nyU+Sfq8WsEbgNiAur6I4B7T/2HetR/DO6XCCbWqfHnnT5H2eCfUeOlCj+M
-                7a5n6gj72kbI1ZrdFF7VmlS6dDt6M6qOuS05HDkuQnpISNYTrCUFalDkOGfMYsMuc97sQaBLepTbxxAM
-                LS5x3EHBP1i6SMkY/mB1uU5U7FtiIorShubUpTA5ekptlpR9xwYAvXDYSmHIo3kuLRXYlspcqe1EALQy
-                y8BllhZla0u2rocMbuXEIl2j3Db2WPRItsWu5TjTIynFRxJhh1wBxZWoFYWnPiTzGLG3zERM5ehUt9pv
-                +RKZOn2okW/3Fb+VV5DTr8EZ/CPqLYH5DgS41A9gwIWxmkbVoq+vasxyzavdFUmXNc0lUyp1BQckv6Qg
-                KKUhCQEpAASlKQkAeGFO7zV8ry47SraGaK1YIoxRrVjPbePyXOgwn0s9Kch4nlgdt2UW3MWtFSnGtqkx
-                rOtCn0lOQapMJCHD5S2jNZ9s5nHWYGCCAA+RuP4rj15Obq5c/fI77zgk3dp9WrNbqNSdbyfnyHZLhVx4
-                urK8vazxyy5uxI4vPmNV2SMxwxNYDg0AdiIW1NiuO3jBXPYC2YxVLdCxmCWx6HzynB2Qxi4u2jc34j1b
-                OKodQ5kGWjuU4u+Ht28E0mOnrlamIopiKKYiimIolP35lyK9e0lpvP1elMohtZ8irLqOEfrKy9rHO9QX
-                YfdEbmCn4ldc0hCILMHfIS78B9yBb8Ba3i04kgDlwzxXteAKpwL8E89nU5jbTaiEy+jSaTTlS5aBzU+p
-                JecHHxK1EY6FBS1tAXeVtT79q4fmEpzDMHcv7j+Ue7YOCSx22vvadIqU9nXKmPOSJDhHwnHVFaj7pxz2
-                S9cSTXaup8zI2hoGDRQdSY/trsCLR4dZuF+Okrm6aezqSD+yR6bo9hSikH5OGvTTC9j5Dv8AhH4pD1Zf
-                czmRNPy/Effu+3tRTO1m2x52nSTn/g2fo4vv4MH5G9iXP9td/wCV/wCorVXBsrtxV6HPpkW2qdAfksrR
-                HmRYzTTrTpHoLSpAB4Kyxrny+J7CA0A0wNERa55dRSNcZHOAOIJJBCSOu2DUKU6/EcbIcaUpDicuSknI
-                j3cc+bdUNHYEYLrEczJAC04FXztcr0m0Ny10GXmiFcrBiq8AJTGbjBPsjWj2VDDHk14BLy1+b70u6qsP
-                VtfUG2M16jgfwKZHuIud61tpK/IikiVUW00qOocCkzD01qz8ClsrUPPi+zKXkhPtwSZp619e8YDsb8R/
-                6+NEgdJozbvEDLgMsJE0xC7C00RM2zvtG0lbkV00ZusOPRzGaC3OktnNQUVIVpV8LLI8MEZdfCGTm5eZ
-                Vmc5Yb+ER8/JQ16aomK72Utq0vWeU+xNz+qwwf7onYzj4JU/pIG2X6fFYD/fdFZWWxZxUR/jgPqcbW5o
-                4j5OK0P0g1pp6v0+K82O/Fl53pmyyBnkFevg/U4ydmZAry8VgzSTXGnq/T4raN965cWEiy1lPxhOB+qx
-                oOd08vFFf0j/AOv0+KZOxLndvO0qVdD0BdNNUZEhMNxYWUoUTpOoAZhQyUOHI4t7aYyxh9KVSdmNoLad
-                0Qdz8hpVWLG9BIJ7/wCwad4kUqpUyoNU2tUcOMtOSEFbL7DpCi24UekkpUnNKhnzPDjgG9s/WAoaFXuS
-                Zx/CcQ5vM13aEHofZvebSdEmt0lSTzCDJ99oYpn5JKdjm8e5NrdaWwH/AJv+nvVppPajOgIAenQFkeKe
-                r76MBS6dunedvHuWLtaw7mO4d6uFI2CkUxYUZcU/J1/RwHJpO5d52ce5BT6uY8YNdw71cWduX2Wekl5j
-                539GNP8ATbj87OPcql2etJrQrOoNgM02cJ01xDpbUFtNNg6dQ5KUSPDyYtMq0p6EokmcHcuwDZXpNVov
-                M6MrORgpXaVaarCNRpsqAF9MyW1Na/JqGWGi+tzPA+MHlLgRVVFtL6UjX0rymqGyNppKXw96ywMuQGv6
-                OET+nXP52ce5NB1K0tpyu4d6uVr2uKB1nnXEuvvAIzQDklA45cfKcMWQ5EbHmc9wc92GGwBUmY5j/IoA
-                KAKx4Y1VqYiimIopiKKYiiEVw7QVCq1CZLiTI4TJdW6Otr1DWoqyOlJ5Z4RLrSk75nva9tHOJxrXHqTp
-                Y6njija1zXfCAMKbutV+j9vlRYrkKbV58RyCw8l59lgOFawg6gka0AZEjI+bG+10vIyRpe5paDjSvcjr
-                vWcboXNjY4PIoCaUFetF68qBIuagP0aM+mOX1IKyvPSpKVBRScsyM8sMWbWclzAY2O5SabUm5ZeNtpxI
-                4VpVDFnY6ey4ViZGIP6P7T6OFA6RuT52ce5Mz9Uxu8ruHei1b1GZt+jRKSyQRHR6awMtS1HUpXtk4dMu
-                sxbQNiGPKMffvSleXJnldId62eDUMpiKIX3jtOq4qs/UYT7LKZGS1odCgQ5lkojSDwPPCbmemZJrh0kT
-                mtDsaGu3fsHWmnLdQi3iDHgnl6OhU1Hb1V49Ti1SHUIbD8V5t9p0dXUlTagoKHocwRjTDpq6Y4H1G4H2
-                9ytXauhcwscxxDgRu39aLV/2NS9w7YkWzWFrbbdKHWpDWWpp5vilYBzB8hHiDhuvLUTx8hNPb7Uo5ZmL
-                7OcSsFfYd4S8jtPuOG+fUK5AdZB9EuoebUR5wlKx+XC0/Tsp87eKeRra3IxjcD1HuX2X2sXdJTl97Uz2
-                zI+zxizTkw8zePcoNaWw8j/p71oZnZzeEnVprNKTn55H2WCWZHMPM3j3L12tLY+R/wBPeqvO7E7+kOlx
-                i4qM37Jle8zg+PLpGihIVdNqe3cahrx2d6/EPsR3AYcC3rko6svimV77OPX5e8jAha49SwNNS13DvVvo
-                3ZtdLEuOmp1+npia0iUuMH1O9PP0tAW2lOrLlmcBOySRxxcKI/8AukTWnlY4u3VpTrxTgQocenw48CIg
-                NR4rSGGGxyShtISkD2AMMbGBrQ0bAufSSF7i520mpXvjJYL/2Q==
+                /9j/4AAQSkZJRgABAQEASABIAAD/4QAWRXhpZgAATU0AKgAAAAgAAAAAAAD/2wBDAAUDBAQEAwUEBAQF
+                BQUGBwwIBwcHBw8LCwkMEQ8SEhEPERETFhwXExQaFRERGCEYGh0dHx8fExciJCIeJBweHx7/2wBDAQUF
+                BQcGBw4ICA4eFBEUHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4e
+                Hh7/wAARCABPAOsDASIAAhEBAxEB/8QAHAAAAgIDAQEAAAAAAAAAAAAAAAYFBwEECAID/8QARxAAAQIF
+                AQMHBwkHAQkAAAAAAQIDAAQFBhEHEiExE0FRYXGBkRQWIpSh0dIIFRcyQlaEkrFSVWJygpOi4SQlMzVG
+                U3ODwf/EABoBAQACAwEAAAAAAAAAAAAAAAAFBgECBAP/xAAuEQABAwIEAgoDAQEAAAAAAAABAAMEAhEF
+                EiExQZEGEyJRYXGBscHhMtHwM6H/2gAMAwEAAhEDEQA/AOy4IIIIiCCCCIggggiIIIIIiCCCCIggggiI
+                IIIIiCCMbSc42hntgizBBBBEQQQQREEfKXmGZgLLLiVhCyhRHAKHER9YwCDqFki26I8uuNstlx1aUISM
+                lSjgAQsXfe9KoKVMpUJud5mW1fV/mPN+sVDct0VevukzkwUs59Fhvcgd3P2mIXEMdjw70jtVdw+SpiBg
+                j8u1R7NPefgK1K7qPQacpTUspc+8N2GtyQf5j/8AMwuM33dlcmDL0Kksp6wkrKe1RISIr+miQS5y1QLi
+                208GWjhTnVn7I698WTaKrmrbCUUxti36OnclTLWVr7CeJ64hGMSlz3MprIHdSNeZ28yfRTT+GxYLeYUg
+                nvqOnIb+QHqt+Vod/TuF1C40SQP2GUgqHgAPbEizataa9IXlUyv+JAUPAmJum0tySWlXzpPzO70hMLCw
+                r2bu6JKLIzhzYF681/Go/BVcdnuE2py28KR8hQkmxckmQHZ2TqLQ47bZac8RkHwiZbUpSApSCgniknhH
+                qCO5tvqxYE+uv2uKtw1m5A9NPpEEEEei0RBBBBEQQQQREEEEERBBBBEQQQQRELd9XZLW1Jp9APzjoPJN
+                Z/yPVDJFJ11ldy6prp7zhS2ZjkOxCAc48D4xE4vMcjtClr86jYeqlMJiNyHSXfxpFz6LyzM3zeDq1yzs
+                yWM4PJq5JpPVnn9sbCtOrt2dvyiXUro8pVn9Idqzd9v2mtujoYeUplAHJMIGEDG7JJG+Jq2rhptwSin6
+                e6SUHDjaxhaD1iItrC4j1ZbeeNTnHVSbuJy2qOsZZFLfDT3VSP06/qECsGppbTvJadLiB3AmPchqRc0o
+                diYWxNAbiHWsHxGIu6IC5bRotdbUZmWDUwR6L7Q2Vjt6e+PR3BJDIvEeI8Cf72Xm1jMd42lsg+IH97pG
+                TqzOBGFUZgq6Q8QPDEQ9b1Gr9RaUyypqRbVuPIj0sfzHh3YjRu+z6pbzhW4nyiTJ9F9A3dihzGFyK5Lx
+                HEqCWnqyOQ9lYouH4dWA6zQCOfurSo+oFBolDl5CTlp2ZcbR6SlJCQpZ3kk5PEwvXHqHXKolTMsRT2Fb
+                ilo+mR1q4+GIToI83cZluNhsVWpGlhp9r0aweI3WXDTc766/SFEqUVKJJO8k88EABJAAyTFg2Hp/MTrr
+                dQrbSmJRJCksK3Ld7ege2OWJDeluZGhf4811S5jMRvO4bfPkvOm9jmqFFVqzZTJA5aaO4vdZ/h/WLgab
+                Q02lttCUISMJSkYAEQ9ZuOhUFsNTc402pKcJZb9JWOjA4Qpv6pS7j4Zp1GmZkk4TtKAJ7hmL1GqgYVR1
+                RrGbjxJ5KjyBOxSvrBQcvDgBzVjQQpSF01p1sOzNoVJDZ521BR/KcGJuTrDMwBtSs/LqP2XpVY9oGIlG
+                pjTv4nmCPcKMciut7jkQfZSUEYQoKTkcIzHSudEEEEERBBBBEQRqP1OmsOll+oSjTg4oW8lJHcTHtifk
+                ZhYQxOS7qjwCHQonwMEWxBBEdPV6hyD3Iz1Zp0q5+w9NIQrwJgikYIhvOy1vvLRvXm/ijIuq1zwuSjn8
+                c38UEUxBER502x946P66374Bc9tHhcNIP41v3wRS8VBqLS5yh3YLjppC0FxLq8by2vn2h0Hp6zFrU+oS
+                FQbU5ITstNoSdlSmHUrAPQSDGhccpb8+15PWFSoJHolx0IWOw5zEbikQSmcoNqgbg7WKkMNlmM9mtcHQ
+                jvCRpmu2BXFNVWrsusz6ACtsIX6ZHNu3EduI+ml4XP3hVq3KSypanOJKUoxgFRUCP0J74k6fYFnrmdtp
+                5ybA38n5SFD2b4bx83UengFUtIyjQxlRDaE953RwRIElx2l1/KLG/ZGpO2pXdKnR22qmmMxuLdrYDfQL
+                bgiG87LW+8tG9eb+KAXXa5OBclHP45v4osKgVLutodQptxCVoUMFKhkEQhXLpnTp5an6U6ZF07+TIy2T
+                2cRDR502x946P66374yLnto8LhpB7J1v3xyyoTEqnK7TddMaW9FqzNVWVNVWxLmp5JNPMy2PtsKC893H
+                2QvzEnNy6tmYlX2lDmW2Un2x0jIVGn1FClSE9KzaUnCiw6lYHbgxsLQhScLSlQ6xmK+90VZqN26yPPX9
+                KfZ6UPUizlAPlp+1zbR5yep84mYkEjlx9UloLI7Mg4MNzCNR6+nY255tlXFSiGE49hMWTMXFaVPmFNPV
+                qjSzw+skzDaVDtGYBeNpfeaj+ut++PSP0dqbGWp6rL3DT9rzkdIKXDmpZpv3nX9JPoulidsPVqoKdJOS
+                2xuz2qO/2Q+0ei0ukNcnT5JpgYwVJT6R7TxMafnjaX3mo/rrfvjPnfan3mo3rrfviYi4bGi/5Ua9+55q
+                IlYhIlf6VXHdw5KbgiE877U+81G9db98SdPn5Goy/lFPnJebZzs8ow6lac9GQcZjuXEtiCCCCIghOvzU
+                WgWdOMSVRTNPzLqOU5OXQCUpyQCckDfgxE0HWK2azWJSly0nVEPzbyWkFbSNkEnAzhR3QsisePnNPNy0
+                s7MOqCW2kFayeYAZMfSEfXKsfNGnM/sL2XpvZlW/6j6X+IVBFzJclScrFfn6o6TtTUwt3fzAkkDuEOXy
+                fae5PakSrqSQiTacfWR2bIHioRXsX58l6kclS6pW3E+k+4mXbP8ACkZV7SPCNjssKV+UBec7btLlqVSn
+                ixOTwUpbyT6TbY3bugk8/UY5xWpx50qWpbjizvJOSow9a9Vb501HnEJVtNSSUyyO0DKv8iYSJCZdkp5i
+                cYKQ6w4l1G0MjaScjI5+EAinm7DvNxAWi2amUkZB5AiPY0+vYjItmo/2oZhrdeY4ppp/Dn4oz9N95f8A
+                apn9g/FDVEtDTu9yM+bU/wDk/wBY9DTi+D/01O+A98Mg1wvEDezSz/6FfFGzTNZ70nqjLSTUtS1OPupa
+                SORVvKiAPtdcNUVkaOUGYs2wH3quz5PNOLXMvoJBKUgYAPXgZ74qmpTsxUJ56cmXFLddWVEk5480XPq5
+                UTI2etjaAdm1pa3dHFX6Y74pCKL0pkmp6lkHYX9T/f8AVdujEbK1U8eJsPIJ+0SklvXFMToJDcuxsnHA
+                lR3ewGFf5SlecnLsaobTyvJ5FpJcQDuLihnJ6wkjxMWlpJJt0yzHKk/hHLqU8tR5kJGB+hPfHM90VNyt
+                XHUKq6TtTT63B1AncO4YEWLAY/UwqAdzrz+lX8bf66bWRsNOX2vFDotVrk0qVpEg/OvJTtqQ0nJA6TE2
+                dOr3Az5tT/cge+H/AEaqVIsayn7nrhdSanNeTy4bRtKUhA4gdGdrwENa9cLOTwYqiuxhPxRMXUSuf67b
+                tcoQaNYpkzJB7PJ8qnG1jjjxERcM+pN3TV43G5UHQpqWQNiVZJ/4aOvrPExKaN2Qq768XZsEUuTIVMHO
+                Cs8yB28/VGUVifJqtmdkZKauObK2251Aal2ju2kg5Kz37h3xpfKGvmflZ4WrSphUukNhc442rClbW8Iz
+                zDG89ORF1nyeRkiQlDMvLt8AMBCUj9ABHG93VZdcuao1Zwn/AGl9S055k59EdwxGo1RaEpLzM7Nty0qy
+                4/MOq2UNoSVKUTzAc8T4sG9Dwtiqf2DEZbNbnrerTFXpxbEyxnYLiNobwQd3YYeBrXeoP16efw/+sbao
+                lvzAvX7s1P8AsmMjT69iM+bNR/tQyfTbevTTvV/9YyrW29CMAU4dYlz74xqiWxp5exIHmzUN/S3HSOlN
+                vO2zY8jTZlCUTRBdmADnC1HOM9QwO6Ky031OvO5L0p9JdEkuXdUS/ssYIQASTnO6L3jBugRBBBGFlcn6
+                2VBVR1LqyicpYcEunqCAAfbmIax621bt0yNaelPK0yqyrktvZycEA5weGcxauoejlcqdyz9Xo85JutTb
+                xeLTyihSCo5IzggjMLf0J3t0U31k+6NlhNh1/l+a13T2zo+CETVXUV690SbCaf5BLSxUvYL3KFazuznA
+                4D9TEgNEb1PE0wdswfhjI0RvT9ql+sH4YaIqyjrSwJRq1NL5IzA2BLyZmn88ckFas+OO6K0s/Q+pN1hi
+                ZuKclBKNLC1MsKKlO4+ySQMCLevmjzVbtCoUaQfblnplnk0rXnZAyMg45iMiMEoFyBUpp2eqExOvnLr7
+                qnFnrUcmLS+T9ZNKuL5xqdbkxNSzBSyy2okJKyMqJxxwNnxj5/QVdO1j5wpWOnlF/DFz6ZWv5o2mxSVu
+                oef21OvuIGApaujsAA7oySi+A02sYHPm3J/5e+PQ04sccLake9J98NcEarKVhp3ZA4W1T+9vMbNPsm0q
+                fNtTcnb9PZmGlbTbiWhtJPSOuGCCCKndbKj5RX2KchWUyrWVD+JW/wDTHjCJKsrmJlqXbGVurCEjpJOI
+                si79Pq7U7inKhLPSq2n17SdtwhQGBu4c0fSzdO6nT6/LVCpuSvIy6tsIbUVFSsbubp390UCXhsyXOqqq
+                oNid/Db2V8iYjEiwqaaaxcDbx391v6uTyLY0nekmVBK3WUSLWOJyMKP5QqOYWGnH322WkFbjiglCRxJJ
+                wBHTms1k1u9BTmabOyjEvLbanEPFQ2lnAB3A8AD4wp2Jo1VqTdkhU6tOSDsrKucqUNFRUpQ+rxA58Hui
+                /wBAFFIA4Kh1E1G5TfU9LKNWLeolLn5qdZFLl+TSJdaQFKOConKTvyIihoTaeP8AmFYz/wCVv4ItaCF0
+                XGt7UNy27pn6M4VKEu5htSuKkHek94Ih3+TlXzTLyVSXV4YqTewMng4nJT4jI7xFg6x6Zzt3VWVqlJfl
+                WJhLXJPh4kBQBykggHfvI8ISqXoxedOqctPS8/Skuy7yXEKDq9xBz+zG11hWbrpWvmbTydDa9l+dxKt/
+                1fW/xBjlaOtNUrNVelutyCZsSsyw6HWllOUE4III6N8VF9BV05P+8KX+dfwwCFaumlW0xptB2bmprk1U
+                1OKK1OS5cSE82zvwN0NAubREnfQmx+BPviB+gq6f3hS/zr+GMjQm5+epUsf1r+GGiKd84tDv3Kj1Jfvj
+                Kbi0Ozn5mbHbJLMQX0E3N+86X+ZfwwDQi5uep0sf1L+GGiK2tN27JnpRytWjS5eXTtlhToly2okAEjfv
+                xvEOEQdh283a9qyVGQsOKZSS64BgLWTlR8YnI1WUQQQQRf/Z
             </property>
         </structure>
     </list-property>

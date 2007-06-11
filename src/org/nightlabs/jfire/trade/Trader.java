@@ -657,6 +657,7 @@ public class Trader
 			new OfferLocal(offer); // OfferLocal registers itself in Offer
 
 			offer = (Offer) getPersistenceManager().makePersistent(offer);
+			validateOffer(offer);
 
 			ProcessDefinitionAssignment processDefinitionAssignment = (ProcessDefinitionAssignment) getPersistenceManager().getObjectById(
 					ProcessDefinitionAssignmentID.create(Offer.class, TradeSide.vendor));

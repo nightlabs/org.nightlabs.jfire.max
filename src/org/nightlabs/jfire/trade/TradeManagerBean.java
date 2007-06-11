@@ -1300,7 +1300,7 @@ implements SessionBean
 
 			pm.makePersistent(new EditLockTypeOrder(EditLockTypeOrder.EDIT_LOCK_TYPE_ID));
 			pm.makePersistent(new EditLockTypeOffer(EditLockTypeOffer.EDIT_LOCK_TYPE_ID));
-			pm.makePersistent(new EditLockType(JFireTradeEAR.EDIT_LOCK_TYPE_ID_PRODUCTTYPE));
+			pm.makePersistent(new EditLockType(JFireTradeEAR.EDIT_LOCK_TYPE_ID_PRODUCT_TYPE));
 		} finally {
 			pm.close();
 		}

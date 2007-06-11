@@ -42,6 +42,6 @@ public class JFireTradeEAR {
 	/**
 	 * {@link EditLockType} for {@link ProductType}s. Used in the TradeAdminPrespective.
 	 */
-	public final static EditLockTypeID EDIT_LOCK_TYPE_ID_PRODUCTTYPE = EditLockTypeID.create(
+	public final static EditLockTypeID EDIT_LOCK_TYPE_ID_PRODUCT_TYPE = EditLockTypeID.create(
 			Organisation.DEVIL_ORGANISATION_ID, "EditLockTypeProductType"); 
 }

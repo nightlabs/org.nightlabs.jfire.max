@@ -53,8 +53,9 @@ public class JFireReportingEAR {
 		}
 		try {
 			File earDir = new File(
-					jFireServerManager.getJFireServerConfigModule()
-					.getJ2ee().getJ2eeDeployBaseDirectory()+
+						new File(jFireServerManager.getJFireServerConfigModule()
+								.getJ2ee().getJ2eeDeployBaseDirectory()
+							),
 					"JFireReporting.ear"
 				);
 			return earDir;

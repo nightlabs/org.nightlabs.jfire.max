@@ -290,7 +290,8 @@ public class GridPriceConfigUtil
 
 		logger.info("storePriceConfig: Recalculated prices for " + recalculatedCounter + " ProductTypes in " + (System.currentTimeMillis() - startDT) + " msec. // affectedProductTypes.size()=" + affectedProductTypes.size() + " // skippedBecauseAlreadyProcessed=" + skippedBecauseAlreadyProcessed);
 
-		assertConsistency(pm, NLJDOHelper.getObjectIDSet(priceConfigs));
+		Set<PriceConfigID> priceConfigIDs = NLJDOHelper.getObjectIDSet(priceConfigs);
+		assertConsistency(pm, priceConfigIDs);
 
 		if (!get)
 			return null;

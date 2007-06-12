@@ -270,7 +270,8 @@ implements SessionBean
 		try {
 			pm.getExtent(Order.class);
 			Order order = (Order) pm.getObjectById(orderID);
-			Collection<Segment> segments = Trader.getTrader(pm).createSegments(order, NLJDOHelper.getObjectList(pm, segmentTypeIDs, SegmentType.class));
+			List<SegmentType> segmentTypes = NLJDOHelper.getObjectList(pm, segmentTypeIDs, SegmentType.class, false);
+			Collection<Segment> segments = Trader.getTrader(pm).createSegments(order, segmentTypes);
 
 			pm.getFetchPlan().setMaxFetchDepth(NLJDOHelper.MAX_FETCH_DEPTH_NO_LIMIT);
 			pm.getFetchPlan().setGroups(new String[] {
@@ -332,8 +333,10 @@ implements SessionBean
 			if (customerGroup != null)
 				order.setCustomerGroup(customerGroup);
 
-			if (segmentTypeIDs != null)
-				Trader.getTrader(pm).createSegments(order, NLJDOHelper.getObjectList(pm, segmentTypeIDs, SegmentType.class));
+			if (segmentTypeIDs != null) {
+				List<SegmentType> segmentTypes = NLJDOHelper.getObjectList(pm, segmentTypeIDs, SegmentType.class, false);
+				Trader.getTrader(pm).createSegments(order, segmentTypes);
+			}
 
 			return (Order)pm.detachCopy(order);
 		} finally {
@@ -1081,27 +1084,29 @@ implements SessionBean
 	 * @ejb.permission role-name="_Guest_"
 	 * @ejb.transaction type = "Required"
 	 */ 
-	public Collection getArticles(Collection articleIDs, String[] fetchGroups, int maxFetchDepth)
+	public Collection<Article> getArticles(Collection<ArticleID> articleIDs, String[] fetchGroups, int maxFetchDepth)
 	throws ModuleException
 	{
 		PersistenceManager pm = getPersistenceManager();
 		try {
-			pm.getFetchPlan().setMaxFetchDepth(maxFetchDepth);
-			if (fetchGroups != null)
-				pm.getFetchPlan().setGroups(fetchGroups);
+			return NLJDOHelper.getDetachedObjectList(pm, articleIDs, Article.class, fetchGroups, maxFetchDepth);
 
-			if (!(articleIDs instanceof Set)) // make sure the entries are unique (prevent duplicate lookups)
-				articleIDs = new HashSet(articleIDs);
-
-			pm.getExtent(Article.class);
-
-			Collection res = new ArrayList(articleIDs.size());
-			for (Iterator it = articleIDs.iterator(); it.hasNext(); ) {
-				ArticleID articleID = (ArticleID) it.next();
-				res.add(pm.getObjectById(articleID));
-			}
-
-			return (Collection) pm.detachCopyAll(res);
+//			pm.getFetchPlan().setMaxFetchDepth(maxFetchDepth);
+//			if (fetchGroups != null)
+//				pm.getFetchPlan().setGroups(fetchGroups);
+//
+//			if (!(articleIDs instanceof Set)) // make sure the entries are unique (prevent duplicate lookups)
+//				articleIDs = new HashSet(articleIDs);
+//
+//			pm.getExtent(Article.class);
+//
+//			Collection res = new ArrayList(articleIDs.size());
+//			for (Iterator it = articleIDs.iterator(); it.hasNext(); ) {
+//				ArticleID articleID = (ArticleID) it.next();
+//				res.add(pm.getObjectById(articleID));
+//			}
+//
+//			return (Collection) pm.detachCopyAll(res);
 		} finally {
 			pm.close();
 		}

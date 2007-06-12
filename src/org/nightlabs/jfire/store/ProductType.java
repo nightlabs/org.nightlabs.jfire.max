@@ -1411,6 +1411,8 @@ implements
 		if (saleable && closed)
 			throw new IllegalStateException("Cannot make ProductType \"" + getPrimaryKey() + "\" saleable, because it is already closed!");
 
+		// TODO: Check if LocalAccountantDelegate is assigned
+		
 		this.saleable = saleable;
 	}
 

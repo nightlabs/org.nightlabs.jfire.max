@@ -57,10 +57,12 @@ implements Serializable
 // WORKAROUND begin
 		Set<StateID> res = new HashSet<StateID>();
 		Statable statable = (Statable) pm.getObjectById(statableID);
-		res.addAll(NLJDOHelper.getObjectIDSet(statable.getStates()));
+		Set<StateID> stateIDs = NLJDOHelper.getObjectIDSet(statable.getStates());
+		res.addAll(stateIDs);
 
 		StatableLocal statableLocal = statable.getStatableLocal();
-		res.addAll(NLJDOHelper.getObjectIDSet(statableLocal.getStates()));
+		stateIDs = NLJDOHelper.getObjectIDSet(statableLocal.getStates());
+		res.addAll(stateIDs);
 		return res;
 // WORKAROUND end
 	}

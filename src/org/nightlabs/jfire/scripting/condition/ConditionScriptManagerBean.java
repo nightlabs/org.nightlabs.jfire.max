@@ -42,8 +42,6 @@ import javax.jdo.JDOObjectNotFoundException;
 import javax.jdo.PersistenceManager;
 
 import org.apache.log4j.Logger;
-import org.nightlabs.ModuleException;
-import org.nightlabs.jdo.NLJDOHelper;
 import org.nightlabs.jfire.base.BaseSessionBeanImpl;
 import org.nightlabs.jfire.scripting.Script;
 import org.nightlabs.jfire.scripting.ScriptRegistry;
@@ -154,20 +152,16 @@ implements SessionBean
 //		}
 		return sc;
 	}
-	
+
 	/**
-	 * @throws ModuleException
-	 *
 	 * @ejb.interface-method
 	 * @ejb.permission role-name="_Guest_"
-	 * @ejb.transaction type = "Required"
+	 * @ejb.transaction type="Supports"
 	 */
 	public ScriptConditioner getScriptConditioner(ScriptRegistryItemID scriptRegistryItemID, 
 			Map<String, Object> parameterValues, int valueLimit)
-	throws ModuleException
 	{
-		PersistenceManager pm;
-		pm = getPersistenceManager();
+		PersistenceManager pm = getPersistenceManager();
 		try {
 			return getScriptConditioner(pm, scriptRegistryItemID, parameterValues, valueLimit);
 		} finally {
@@ -176,31 +170,25 @@ implements SessionBean
 	}
 	
 	/**
-	 * @throws ModuleException
-	 *
 	 * @ejb.interface-method
 	 * @ejb.permission role-name="_Guest_"
-	 * @ejb.transaction type = "Required"
+	 * @ejb.transaction type="Supports"
 	 */
 	public Map<ScriptRegistryItemID, ScriptConditioner> getScriptConditioner(
 			Map<ScriptRegistryItemID, Map<String, Object>> scriptID2Paramters, int valueLimit)
-	throws ModuleException
 	{
 		PersistenceManager pm = getPersistenceManager();
 		return getScriptConditioner(pm, scriptID2Paramters, valueLimit);
 	}
-	
+
 	/**
-	 * @throws ModuleException
-	 *
 	 * @ejb.interface-method
 	 * @ejb.permission role-name="_Guest_"
-	 * @ejb.transaction type = "Required"
+	 * @ejb.transaction type="Supports"
 	 */	
 	public Map<ScriptRegistryItemID, ScriptConditioner> getScriptConditioner(
 			PersistenceManager pm, Map<ScriptRegistryItemID, 
 			Map<String, Object>> scriptID2Paramters, int valueLimit)
-	throws ModuleException
 	{
 		Map<ScriptRegistryItemID, ScriptConditioner> scriptID2ScriptConditioner = 
 			new HashMap<ScriptRegistryItemID, ScriptConditioner>(scriptID2Paramters.size());		
@@ -210,30 +198,18 @@ implements SessionBean
 		}
 		return scriptID2ScriptConditioner;
 	}
-	
+
 	/**
-	 * @throws ModuleException
-	 *
 	 * @ejb.interface-method
 	 * @ejb.permission role-name="_Guest_"
-	 * @ejb.transaction type = "Required"
+	 * @ejb.transaction type="Supports"
 	 */	
-	public Set<ScriptRegistryItemID> getConditionContextScriptIDs(String organisationID, 
-			String conditionContextProviderID)
-	throws ModuleException
+	public Set<ScriptRegistryItemID> getConditionContextScriptIDs(ConditionContextProviderID providerID)
 	{
-		PersistenceManager pm;
-		pm = getPersistenceManager();
+		PersistenceManager pm = getPersistenceManager();
 		try {
-			ConditionContextProviderID providerID = ConditionContextProviderID.create(organisationID, conditionContextProviderID);
-			List providers = NLJDOHelper.getDetachedObjectList(
-					pm, new Object[] {providerID}, null, 
-					new String[] {ConditionContextProvider.FETCH_GROUP_SCRIPT_REGISTRY_ITEM_IDS}, 
-					NLJDOHelper.MAX_FETCH_DEPTH_NO_LIMIT);
-			
-			ConditionContextProvider provider = (ConditionContextProvider) providers.iterator().next();
-			Set<ScriptRegistryItemID> scriptIDs = provider.getScriptRegistryItemIDs();			
-			return scriptIDs;
+			ConditionContextProvider provider = (ConditionContextProvider) pm.getObjectById(providerID);
+			return provider.getScriptRegistryItemIDs();
 		} finally {
 			pm.close();
 		}		

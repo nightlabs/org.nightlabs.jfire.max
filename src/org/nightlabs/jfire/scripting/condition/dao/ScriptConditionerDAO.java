@@ -6,6 +6,7 @@ import java.util.Set;
 import org.nightlabs.jfire.scripting.condition.ConditionScriptManager;
 import org.nightlabs.jfire.scripting.condition.ConditionScriptManagerUtil;
 import org.nightlabs.jfire.scripting.condition.ScriptConditioner;
+import org.nightlabs.jfire.scripting.condition.id.ConditionContextProviderID;
 import org.nightlabs.jfire.scripting.id.ScriptRegistryItemID;
 import org.nightlabs.jfire.security.SecurityReflector;
 import org.nightlabs.progress.ProgressMonitor;
@@ -42,20 +43,19 @@ public class ScriptConditionerDAO
 			throw new RuntimeException(e);
 		}			
 	}
-	
-	public Set<ScriptRegistryItemID> getConditionContextScriptIDs(String organisationID, 
-			String conditionContextProviderID, ProgressMonitor monitor) 
+
+	public Set<ScriptRegistryItemID> getConditionContextScriptIDs(ConditionContextProviderID conditionContextProviderID, ProgressMonitor monitor)
 	{
 		try {
 			monitor.beginTask("Getting ScriptConditioners", 
 					1);			
 			ConditionScriptManager csm = ConditionScriptManagerUtil.getHome(SecurityReflector.getInitialContextProperties()).create();
-			Set<ScriptRegistryItemID> scriptIDs = csm.getConditionContextScriptIDs(organisationID, conditionContextProviderID);
+			Set<ScriptRegistryItemID> scriptIDs = csm.getConditionContextScriptIDs(conditionContextProviderID);
 			monitor.worked(1);
 			return scriptIDs;
 		} catch(Exception e) {
 			throw new RuntimeException(e);
 		}			
 	}
-	
+
 }

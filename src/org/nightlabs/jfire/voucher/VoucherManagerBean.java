@@ -104,6 +104,7 @@ import org.nightlabs.jfire.voucher.store.VoucherKey;
 import org.nightlabs.jfire.voucher.store.VoucherStore;
 import org.nightlabs.jfire.voucher.store.VoucherType;
 import org.nightlabs.jfire.voucher.store.VoucherTypeActionHandler;
+import org.nightlabs.jfire.voucher.store.deliver.PrintabilityStatus;
 import org.nightlabs.jfire.voucher.store.deliver.ServerDeliveryProcessorClientSideVoucherPrint;
 import org.nightlabs.jfire.voucher.store.id.VoucherKeyID;
 
@@ -648,7 +649,7 @@ implements SessionBean
 	 *          will be executed and included in the result.
 	 * 
 	 * @ejb.interface-method
-	 * @ejb.transaction type = "Required"
+	 * @ejb.transaction type="Supports"
 	 * @ejb.permission role-name="_Guest_"
 	 */
 	public Map<ProductID, Map<ScriptRegistryItemID, Object>> getVoucherScriptingResults(
@@ -1039,7 +1040,7 @@ implements SessionBean
 
 	/**
 	 * @ejb.interface-method
-	 * @ejb.transaction type = "Required"
+	 * @ejb.transaction type="Supports"
 	 * @ejb.permission role-name="_Guest_"
 	 */
 	public LayoutMapForArticleIDSet getVoucherLayoutMapForArticleIDSet(
@@ -1072,7 +1073,7 @@ implements SessionBean
 	
 	/**
 	 * @ejb.interface-method
-	 * @ejb.transaction type = "Required"
+	 * @ejb.transaction type="Supports"
 	 * @ejb.permission role-name="_Guest_"
 	 */
 	@SuppressWarnings("unchecked")
@@ -1088,5 +1089,41 @@ implements SessionBean
 		} finally {
 			pm.close();
 		}
-	}	
+	}
+
+	/**
+	 * This method checks, whether all specified <code>Article</code>s have a VoucherLayout assigned and thus can be printed. 
+	 *
+	 * @ejb.interface-method
+	 * @ejb.transaction type="Required"
+	 * @ejb.permission role-name="_Guest_"
+	 */
+	public Map<ArticleID, PrintabilityStatus> getArticleID2PrintabilityStatusMap(Set<ArticleID> articleIDs)
+	{
+		if (articleIDs == null)
+			throw new IllegalArgumentException("articleIDs must not be null!");
+
+		PersistenceManager pm = getPersistenceManager();
+		try {
+			pm.getExtent(Article.class);
+			Map<ArticleID, PrintabilityStatus> res = new HashMap<ArticleID, PrintabilityStatus>(articleIDs.size());
+
+			for (ArticleID articleID : articleIDs) {
+				Article article = (Article) pm.getObjectById(articleID);
+				if (!(article.getProductType() instanceof VoucherType))
+					res.put(articleID, PrintabilityStatus.NOT_A_VOUCHER_TYPE);
+				else {
+					VoucherType voucherType = (VoucherType) article.getProductType();
+					if (voucherType.getVoucherLayout() == null)
+						res.put(articleID, PrintabilityStatus.MISSING_VOUCHER_LAYOUT);
+					else
+						res.put(articleID, PrintabilityStatus.OK);
+				}
+			} // for (ArticleID articleID : articleIDs) {
+
+			return res;
+		} finally {
+			pm.close();
+		}
+	}
 }

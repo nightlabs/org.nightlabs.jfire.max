@@ -10,7 +10,6 @@ import org.nightlabs.jfire.organisation.Organisation;
 import org.nightlabs.jfire.store.deliver.DeliveryException;
 import org.nightlabs.jfire.store.deliver.DeliveryResult;
 import org.nightlabs.jfire.store.deliver.ServerDeliveryProcessor;
-import org.nightlabs.jfire.store.deliver.ServerDeliveryProcessorManual;
 import org.nightlabs.jfire.transfer.Anchor;
 
 /**
@@ -44,7 +43,7 @@ extends ServerDeliveryProcessor
 					ServerDeliveryProcessorClientSideVoucherPrint.class.getName());
 			serverDeliveryProcessor.getName().setText(
 					Locale.ENGLISH.getLanguage(), 
-					"Server Delivery Processor for delivering tickets to print on the client");			
+					"Server Delivery Processor for delivering vouchers to print on the client");
 			serverDeliveryProcessor = (ServerDeliveryProcessorClientSideVoucherPrint) pm.makePersistent(serverDeliveryProcessor);
 		}
 
@@ -84,5 +83,4 @@ extends ServerDeliveryProcessor
 	public Anchor getAnchorOutside(DeliverParams deliverParams) {
 		return getRepositoryOutside(deliverParams, "anchorOutside.voucherPrint");
 	}
-
 }

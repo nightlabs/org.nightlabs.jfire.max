@@ -18,8 +18,6 @@ import javax.jdo.PersistenceManager;
 import org.apache.log4j.Logger;
 import org.jbpm.JbpmContext;
 import org.jbpm.graph.def.Node;
-import org.jbpm.graph.node.EndState;
-import org.jbpm.graph.node.StartState;
 import org.jbpm.jpdl.xml.JpdlXmlReader;
 import org.nightlabs.jfire.jbpm.JbpmLookup;
 import org.nightlabs.jfire.jbpm.graph.def.id.ProcessDefinitionID;

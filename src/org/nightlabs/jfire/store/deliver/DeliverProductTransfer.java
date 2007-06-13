@@ -72,7 +72,7 @@ import org.nightlabs.jfire.transfer.id.TransferID;
  *				WHERE
  *					this.delivery.organisationID == :paramOrganisationID &&
  *					this.delivery.deliveryID == :paramDeliveryID				
- *				import java.lang.String, java.lang.Long"
+ *				import java.lang.String; import java.lang.Long"
  */
 public class DeliverProductTransfer extends ProductTransfer
 {

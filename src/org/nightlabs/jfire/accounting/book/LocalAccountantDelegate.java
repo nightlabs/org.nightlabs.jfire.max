@@ -29,6 +29,7 @@ package org.nightlabs.jfire.accounting.book;
 import java.io.Serializable;
 import java.util.Collection;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
@@ -135,7 +136,7 @@ public abstract class LocalAccountantDelegate implements Serializable {
 	 *		mapped-by="localAccountantDelegate"
 	 *
 	 */
-	private Set moneyFlowMappings;
+	private Set<MoneyFlowMapping> moneyFlowMappings;
 	
 	/**
 	 * @jdo.field persistence-modifier="persistent" dependent="true" mapped-by="localAccountantDelegate"
@@ -154,11 +155,13 @@ public abstract class LocalAccountantDelegate implements Serializable {
 		this.organisationID = organisationID;
 		this.localAccountantDelegateID = localAccountantDelegateID;
 		this.name = new LocalAccountantDelegateName(this);
+		this.moneyFlowMappings = new HashSet<MoneyFlowMapping>();
 	}
 	
 	public LocalAccountantDelegate(LocalAccountantDelegate parent, String organisationID, String localAccountantDelegateID) {
 		this(organisationID, localAccountantDelegateID);
 		this.extendedAccountantDelegate = parent;
+		this.moneyFlowMappings = new HashSet<MoneyFlowMapping>();
 	}
 	
 	public void addMoneyFlowMapping(MoneyFlowMapping mapping) {

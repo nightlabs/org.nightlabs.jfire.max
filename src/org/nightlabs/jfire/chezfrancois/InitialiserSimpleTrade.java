@@ -269,7 +269,10 @@ extends Initialiser
 		accessories.getFieldMetaData("localAccountantDelegate").setValueInherited(false);
 		accessories.applyInheritance();
 
-
+		logger.info("Chezfrancois Created all SimpleProductTypes, publishing now!");
+		dataCreator.makeAllLeavesSaleable();
+		
+		
 		UserGroup userGroup = new UserGroup(organisationID, UserGroup.USERID_PREFIX_TYPE_USERGROUP + "SalesAgents");
 		userGroup.setName("Sales Agents");
 		userGroup.setDescription("This group is blablabla.");

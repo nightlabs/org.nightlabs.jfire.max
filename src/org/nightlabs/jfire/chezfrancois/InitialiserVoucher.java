@@ -78,5 +78,7 @@ extends Initialiser
 		dataCreator.createLeaf(xmas, "voucherType.xmas.50", priceConfig50, null, "Voucher Christmas Special 50", "Weihnachts-Spezial-Gutschein 50");
 
 		dataCreator.getRootVoucherType().applyInheritance();
+		
+		dataCreator.makeAllLeafsSaleable();
 	}
 }

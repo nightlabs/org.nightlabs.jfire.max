@@ -102,10 +102,16 @@ public class DataCreatorVoucher
 
 		store.setProductTypeStatus_published(user, pt);
 		store.setProductTypeStatus_confirmed(user, pt);
-		store.setProductTypeStatus_saleable(user, pt, true);		
+//		store.setProductTypeStatus_saleable(user, pt, true);		
 
 		createdLeafs.add(pt);
 
 		return pt;
+	}
+	
+	public void makeAllLeafsSaleable() {
+		for (ProductType pt : createdLeafs) {
+			store.setProductTypeStatus_saleable(user, pt, true);
+		}
 	}
 }

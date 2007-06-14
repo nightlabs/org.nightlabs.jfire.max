@@ -121,12 +121,18 @@ extends DataCreator
 
 		store.setProductTypeStatus_published(user, pt);
 		store.setProductTypeStatus_confirmed(user, pt);
-		store.setProductTypeStatus_saleable(user, pt, true);		
+//		store.setProductTypeStatus_saleable(user, pt, true);		
 		
 //		createdLeafs.add((ProductTypeID) JDOHelper.getObjectId(pt));
 		createdLeafs.add(pt);
 
 		return pt;
+	}
+	
+	public void makeAllLeavesSaleable() {
+		for (ProductType pt : createdLeafs) {
+			store.setProductTypeStatus_saleable(user, pt, true);
+		}
 	}
 	
 	public void createWineProperties(PersistenceManager pm, SimpleProductType productType, String englishShort, String germanShort, String englishLong, String germanLong, String smallImage, String smallImageContentType, String largeImage, String largeImageContentType) {

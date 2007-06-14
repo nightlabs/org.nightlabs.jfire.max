@@ -3,6 +3,7 @@ package org.nightlabs.jfire.chezfrancois;
 import java.util.ArrayList;
 import java.util.List;
 
+import javax.jdo.JDOHelper;
 import javax.jdo.JDOObjectNotFoundException;
 import javax.jdo.PersistenceManager;
 
@@ -60,6 +61,8 @@ extends DataCreator
 			pt.setInnerPriceConfig(parent.getInnerPriceConfig());
 		}
 
+		pt.getFieldMetaData("localAccountantDelegate").setValueInherited(false);
+		
 		store.addProductType(user, pt, DynamicProductTypeActionHandler.getDefaultHome(pm, pt));
 		store.setProductTypeStatus_published(user, pt);
 
@@ -69,7 +72,7 @@ extends DataCreator
 	private List<DynamicProductType> createdLeafs = new ArrayList<DynamicProductType>();
 
 	public DynamicProductType createLeaf(DynamicProductType category, String productTypeID,
-			IInnerPriceConfig innerPriceConfig,
+			IInnerPriceConfig innerPriceConfig,			
 			String ... names)
 	{
 		if (category == null)
@@ -87,14 +90,18 @@ extends DataCreator
 			pt.setInnerPriceConfig(category.getInnerPriceConfig());
 		}
 		store.addProductType(user, pt, DynamicProductTypeActionHandler.getDefaultHome(pm, pt));
-
 		store.setProductTypeStatus_published(user, pt);
 		store.setProductTypeStatus_confirmed(user, pt);
-		store.setProductTypeStatus_saleable(user, pt, true);		
 
 		createdLeafs.add(pt);
 
 		return pt;
 	}
 
+	public void makeAllLeavesSaleable() {
+		for (ProductType pt : createdLeafs) {
+			ProductType productType = (ProductType) pm.getObjectById(JDOHelper.getObjectId(pt));
+			store.setProductTypeStatus_saleable(user, productType, true);
+		}
+	}
 }

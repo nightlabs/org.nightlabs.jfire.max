@@ -82,6 +82,7 @@ import org.nightlabs.jfire.security.UserLocal;
 import org.nightlabs.jfire.security.id.UserID;
 import org.nightlabs.jfire.store.ProductType;
 import org.nightlabs.jfire.store.Store;
+import org.nightlabs.jfire.store.id.ProductTypeID;
 import org.nightlabs.jfire.trade.CustomerGroup;
 import org.nightlabs.jfire.trade.LegalEntity;
 import org.nightlabs.jfire.trade.Order;
@@ -270,6 +271,25 @@ public class DataCreator
 
 	public PFMoneyFlowMapping createPFMoneyFlowMapping(
 			ProductType productType, PriceFragmentType priceFragmentType, Account account)
+	{
+		Currency euro = getCurrencyEUR();
+		PFMoneyFlowMapping mapping = new PFMoneyFlowMapping(
+				organisationID,
+				accounting.createMoneyFlowMappingID(),
+				productType.getPrimaryKey(),
+				PFMoneyFlowMapping.PACKAGE_TYPE_PACKAGE,
+				priceFragmentType.getPrimaryKey(),
+				euro.getCurrencyID()
+		);
+		mapping.setOwnerPK(getOrganisationLegalEntity().getPrimaryKey());
+		mapping.setSourceOrganisationID(organisationID);
+		mapping.setAccountPK(account.getPrimaryKey());
+
+		return mapping;
+	}
+	
+	public PFMoneyFlowMapping createPFMoneyFlowMapping(
+			ProductTypeID productType, PriceFragmentType priceFragmentType, Account account)
 	{
 		Currency euro = getCurrencyEUR();
 		PFMoneyFlowMapping mapping = new PFMoneyFlowMapping(

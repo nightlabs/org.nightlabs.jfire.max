@@ -8,8 +8,11 @@ import javax.jdo.PersistenceManager;
 
 import org.apache.log4j.Logger;
 import org.nightlabs.ModuleException;
+import org.nightlabs.jfire.accounting.Account;
 import org.nightlabs.jfire.accounting.PriceFragmentType;
 import org.nightlabs.jfire.accounting.Tariff;
+import org.nightlabs.jfire.accounting.book.LocalAccountantDelegate;
+import org.nightlabs.jfire.accounting.book.fragmentbased.PFMappingAccountantDelegate;
 import org.nightlabs.jfire.accounting.gridpriceconfig.FormulaCell;
 import org.nightlabs.jfire.accounting.gridpriceconfig.PriceCoordinate;
 import org.nightlabs.jfire.accounting.id.CurrencyID;
@@ -40,6 +43,8 @@ extends Initialiser
 
 		pm.getExtent(DynamicProductType.class);
 		ProductTypeID softwareDevelopmentID = ProductTypeID.create(organisationID, "softwareDevelopment");
+		ProductTypeID serviceID = ProductTypeID.create(organisationID, "service");
+		ProductTypeID miscID = ProductTypeID.create(organisationID, "softwareDevelopment.misc");
 		try {
 			pm.getObjectById(softwareDevelopmentID);
 			return; // it exists => do nothing
@@ -110,6 +115,35 @@ extends Initialiser
 		priceConfig.createFormulaCell(new PriceCoordinate(customerGroupID, currencyID, tariffIDGoldCard)).setFormula(vatNet, "10000");
 
 		dataCreator.getRootDynamicProductType().setInnerPriceConfig(priceConfig);
+		
+		// create Accounts
+		Account accountSoftwareDevelopmentVatNet = dataCreator.createLocalAccount("software-development-vat-net.eur", "Software Development Net (EUR)");
+		Account accountSoftwareDevelopmentVatVal = dataCreator.createLocalAccount("software-development-vat-val.eur", "Software Development VAT (EUR)");
+		Account accountServiceVatNet = dataCreator.createLocalAccount("service-vat-net.eur", "Service Net (EUR)");
+		Account accountServiceVatVal = dataCreator.createLocalAccount("service-vat-val.eur", "Service VAT (EUR)");
+		
+		// configure moneyflow
+		LocalAccountantDelegate swDelegate = new PFMappingAccountantDelegate(organisationID, "softwareAccountantDelegate");
+
+		swDelegate.addMoneyFlowMapping(
+				dataCreator.createPFMoneyFlowMapping(softwareDevelopmentID, dataCreator.getPriceFragmentTypeTotal(), accountSoftwareDevelopmentVatNet));
+		swDelegate.addMoneyFlowMapping(
+				dataCreator.createPFMoneyFlowMapping(softwareDevelopmentID, dataCreator.getPriceFragmentTypeVatVal(), accountSoftwareDevelopmentVatVal));
+
+		LocalAccountantDelegate serviceDelegate = new PFMappingAccountantDelegate(organisationID, "serviceAccountantDelegate");
+
+		serviceDelegate.addMoneyFlowMapping(
+				dataCreator.createPFMoneyFlowMapping(serviceID, dataCreator.getPriceFragmentTypeTotal(), accountServiceVatNet));
+		serviceDelegate.addMoneyFlowMapping(
+				dataCreator.createPFMoneyFlowMapping(serviceID, dataCreator.getPriceFragmentTypeVatVal(), accountServiceVatVal));
+
+		
+		LocalAccountantDelegate miscDelegate = new PFMappingAccountantDelegate(organisationID, "miscAccountantDelegate");
+
+		miscDelegate.addMoneyFlowMapping(
+				dataCreator.createPFMoneyFlowMapping(miscID, dataCreator.getPriceFragmentTypeTotal(), accountServiceVatNet));
+		miscDelegate.addMoneyFlowMapping(
+				dataCreator.createPFMoneyFlowMapping(miscID, dataCreator.getPriceFragmentTypeVatVal(), accountServiceVatVal));
 
 		DynamicProductType softwareDevelopment = dataCreator.createCategory(null, softwareDevelopmentID.productTypeID, null, "Software Development", "Software-Entwicklung");
 		DynamicProductType swDevJFire = dataCreator.createLeaf(softwareDevelopment, "softwareDevelopment.jfire", null, "JFire");
@@ -117,13 +151,26 @@ extends Initialiser
 		DynamicProductType swDevProjectB = dataCreator.createLeaf(softwareDevelopment, "softwareDevelopment.projectB", null, "Project B", "Projekt B");
 		DynamicProductType swDevProjectC = dataCreator.createLeaf(softwareDevelopment, "softwareDevelopment.projectC", null, "Project C", "Projekt C");
 
-		DynamicProductType service = dataCreator.createCategory(null, "service", null, "Service", "Dienstleistung");
+		
+		DynamicProductType service = dataCreator.createCategory(null, serviceID.productTypeID, null, "Service", "Dienstleistung");
 		DynamicProductType serviceJFire = dataCreator.createLeaf(service, "service.jfire", null, "JFire");
 		DynamicProductType serviceNetwork = dataCreator.createLeaf(service, "service.network", null, "Network", "Netzwerk");
 		DynamicProductType serviceWebserver = dataCreator.createLeaf(service, "service.webserver", null, "Webserver");
 
-		DynamicProductType misc = dataCreator.createLeaf(null, "softwareDevelopment.misc", null, "Miscellaneous", "Verschiedenes");
+		
+		DynamicProductType misc = dataCreator.createLeaf(null, miscID.productTypeID, null, "Miscellaneous", "Verschiedenes");
+		
 
 		dataCreator.getRootDynamicProductType().applyInheritance();
+		
+		softwareDevelopment.setLocalAccountantDelegate(swDelegate);
+		softwareDevelopment.applyInheritance();
+		service.setLocalAccountantDelegate(serviceDelegate);
+		service.applyInheritance();
+		misc.getFieldMetaData("localAccountantDelegate").setValueInherited(false);
+		misc.setLocalAccountantDelegate(miscDelegate);
+		misc.applyInheritance();
+		
+		dataCreator.makeAllLeavesSaleable();
 	}
 }

@@ -29,7 +29,14 @@
     <property name="hibernate.connection.url">${databaseURL}</property>
     <property name="hibernate.connection.username">${databaseUserName}</property>
     <property name="hibernate.connection.password">${databasePassword}</property>
+
+<!--
+	Because we want to use the transactions of the Java EE server, we can't do this: Unfortunately, with this update
+	option it tries to commit the transactions, which is of course not allowed (since they're managed). That's
+	why we now launch the SchemaExport in JFireJbpm's datastore-init.
+
     <property name="hibernate.hbm2ddl.auto">update</property>
+ -->
 
 	<property name="hibernate.cache.provider_class">org.hibernate.cache.EhCacheProvider</property>
 	<property name="hibernate.cache.provider_configuration_file_resource_path">ehcache-${organisationID}-cfg.xml</property>

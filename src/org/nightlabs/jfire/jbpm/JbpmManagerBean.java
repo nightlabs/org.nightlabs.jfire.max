@@ -1,6 +1,7 @@
 package org.nightlabs.jfire.jbpm;
 
 import java.io.File;
+import java.io.InputStream;
 import java.net.URL;
 import java.rmi.RemoteException;
 import java.util.Collection;
@@ -20,6 +21,8 @@ import javax.jdo.PersistenceManager;
 import javax.jdo.Query;
 
 import org.apache.log4j.Logger;
+import org.hibernate.cfg.Configuration;
+import org.hibernate.tool.hbm2ddl.SchemaExport;
 import org.jbpm.JbpmConfiguration;
 import org.nightlabs.jdo.NLJDOHelper;
 import org.nightlabs.jdo.ObjectID;
@@ -39,6 +42,7 @@ import org.nightlabs.jfire.servermanager.deploy.DeployOverwriteBehaviour;
 import org.nightlabs.jfire.servermanager.deploy.DeploymentJarItem;
 import org.nightlabs.jfire.trade.state.id.StateDefinitionID;
 import org.nightlabs.jfire.trade.state.id.StateID;
+import org.nightlabs.util.Utils;
 
 /**
  * @ejb.bean name="jfire/ejb/JFireJbpm/JbpmManager"
@@ -123,10 +127,11 @@ implements SessionBean
 
 
 				// perform deployment
+				File jfireJbpmEarDirectory;
 				JFireServerManager jfireServerManager = getJFireServerManager();
 				try {
 					JFireServerConfigModule cfmod = jfireServerManager.getJFireServerConfigModule();
-					File jfireJbpmEarDirectory = new File(cfmod.getJ2ee().getJ2eeDeployBaseDirectory(), "JFireJbpm.ear");
+					jfireJbpmEarDirectory = new File(cfmod.getJ2ee().getJ2eeDeployBaseDirectory(), "JFireJbpm.ear");
 
 					// the ehcache.xml seems to be global in all cases :-( as I didn't find how to specify its name somewhere
 					List<DeploymentJarItem> deploymentJarItems = new LinkedList<DeploymentJarItem>();
@@ -196,9 +201,9 @@ implements SessionBean
 					}
 				} while (!deploymentComplete);
 
-				logger.info("Deployment complete!");
+				logger.info("Deployment complete! Starting Schema Creation...");
 
-//				Configuration configuration = new Configuration();
+				Configuration configuration = new Configuration();
 //				String xml;
 //				InputStream in = hibernateConfigFileResource.openStream();
 //				try {
@@ -206,9 +211,25 @@ implements SessionBean
 //				} finally {
 //					in.close();
 //				}
+
+//				File jar;
+//				jar = new File(jfireJbpmEarDirectory, "jbpm/jbpm-3.1.2.jar");
+//				if (!jar.exists())
+//					throw new IllegalStateException("File does not exist: " + jar.getAbsolutePath());
+//				configuration.addJar(jar);
+//
+//				jar = new File(jfireJbpmEarDirectory, "jbpm/jbpm-identity-3.1.2.jar");
+//				if (!jar.exists())
+//					throw new IllegalStateException("File does not exist: " + jar.getAbsolutePath());
+//				configuration.addJar(jar);
+
 //				configuration.addXML(xml);
-//				SchemaExport schemaExport = new SchemaExport(configuration);
-//				schemaExport.create(false, true);
+
+				configuration.configure(hibernateConfigFileResource);
+				SchemaExport schemaExport = new SchemaExport(configuration);
+				schemaExport.create(true, true);
+
+				logger.info("Schema Creation complete!");
 			} // if (moduleMetaData == null) {
 
 			JbpmConfiguration jbpmConfiguration = JbpmConfiguration.getInstance(JbpmLookup.getJbpmConfigFileName(getOrganisationID()));

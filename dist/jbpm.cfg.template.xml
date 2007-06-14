@@ -14,6 +14,6 @@
 		<service name='authentication' factory='org.nightlabs.jfire.jbpm.JFireJbpmAuthenticationServiceFactory' />
 	</jbpm-context>
 	
-	<string name="resource.hibernate.cfg.xml" value="hibernate-${organisationID}-cfg.xml" />
+	<string name="resource.hibernate.cfg.xml" value="hibernate-${organisationID}-RUNTIME-cfg.xml" />
 
 </jbpm-configuration>

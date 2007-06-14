@@ -1,0 +1,5 @@
+<project>
+	<target name="deploy.post">
+	    <delete file="${j2ee.deploy.dir}/${j2ee.deploy.subdir}/${j2ee.ear}/hibernate-com.mysql.jdbc.Driver-cfg.template.xml"/>
+	</target>
+</project>

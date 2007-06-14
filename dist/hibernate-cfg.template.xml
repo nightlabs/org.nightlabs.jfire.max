@@ -7,44 +7,13 @@
 <hibernate-configuration>
   <session-factory>
 
-    <!-- jdbc connection properties -->
-<!-- 
-    <property name="hibernate.dialect">org.hibernate.dialect.HSQLDialect</property>
-    <property name="hibernate.connection.datasource">java:/DefaultDS</property>
+<!-- $INCLUDE DATASOURCE
+  This comment will be replaced by the appropriate include file. Do not change this comment!
 -->
-
-<!-- 
-  Unfortunately, the schema-creation doesn't work this way. Will temporarily use a direct connection. Marco.
-
-    <property name="hibernate.dialect">org.hibernate.dialect.MySQLDialect</property>
-    <property name="hibernate.connection.datasource">${datasourceJNDIName_absolute}</property>
-    
-    <property name="hibernate.transaction.factory_class">org.hibernate.transaction.JTATransactionFactory</property>
-	<property name="hibernate.transaction.manager_lookup_class">org.hibernate.transaction.JBossTransactionManagerLookup</property>
-	<property name="hibernate.hbm2ddl.auto">update</property>
--->
-	<property name="hibernate.dialect">org.hibernate.dialect.MySQLInnoDBDialect</property>
-<!--   <property name="hibernate.dialect">org.hibernate.dialect.MySQLDialect</property> -->
-    <property name="hibernate.connection.driver_class">${databaseDriverName}</property>
-    <property name="hibernate.connection.url">${databaseURL}</property>
-    <property name="hibernate.connection.username">${databaseUserName}</property>
-    <property name="hibernate.connection.password">${databasePassword}</property>
-
-<!--
-	Because we want to use the transactions of the Java EE server, we can't do this: Unfortunately, with this update
-	option it tries to commit the transactions, which is of course not allowed (since they're managed). That's
-	why we now launch the SchemaExport in JFireJbpm's datastore-init.
-
-    <property name="hibernate.hbm2ddl.auto">update</property>
- -->
 
 	<property name="hibernate.cache.provider_class">org.hibernate.cache.EhCacheProvider</property>
 	<property name="hibernate.cache.provider_configuration_file_resource_path">ehcache-${organisationID}-cfg.xml</property>
 
-<!-- 	delimiter=type=InnoDB
-	<property name="delimiter">type=InnoDB</property>
-	<property name="hibernate.hbm2ddl.delimiter">type=InnoDB</property>
--->
 
     <!-- other hibernate properties 
     <property name="hibernate.show_sql">true</property>
@@ -65,7 +34,7 @@
     <mapping resource="org/jbpm/graph/action/Script.hbm.xml"/>
 -->
 
-    <!-- following mapping files have a dependendy on  -->
+    <!-- following mapping files have a dependency on  -->
     <!-- 'jbpm-identity-{version}.jar', mapping files  -->
     <!-- of the pluggable jbpm identity component.     -->
     <!-- comment out the following 3 lines if you don't-->

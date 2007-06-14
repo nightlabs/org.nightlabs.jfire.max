@@ -22,9 +22,9 @@ public class JbpmLookup
 		return "jbpm-"+organisationID+"-cfg.xml";
 	}
 
-	protected static String getHibernateConfigFileName(String organisationID)
+	protected static String getHibernateConfigFileName(String organisationID, HibernateEnvironmentMode hibernateEnvironmentMode)
 	{
-		return "hibernate-"+organisationID+"-cfg.xml";
+		return "hibernate-" + organisationID + '-' + hibernateEnvironmentMode + "-cfg.xml";
 	}
 
 	protected static final String JNDI_PREFIX = "java:/jfire/jbpmConfiguration";

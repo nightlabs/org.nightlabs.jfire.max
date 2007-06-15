@@ -12,6 +12,9 @@ import org.nightlabs.jfire.accounting.priceconfig.PriceConfig;
 import org.nightlabs.jfire.base.JFirePrincipal;
 import org.nightlabs.jfire.idgenerator.IDGenerator;
 import org.nightlabs.jfire.security.User;
+import org.nightlabs.jfire.store.CannotConfirmProductTypeException;
+import org.nightlabs.jfire.store.CannotMakeProductTypeSaleableException;
+import org.nightlabs.jfire.store.CannotPublishProductTypeException;
 import org.nightlabs.jfire.store.id.ProductTypeID;
 import org.nightlabs.jfire.voucher.accounting.VoucherLocalAccountantDelegate;
 import org.nightlabs.jfire.voucher.accounting.VoucherPriceConfig;
@@ -28,7 +31,7 @@ extends Initialiser
 	}
 
 	public void createDemoData()
-	throws ModuleException 
+	throws ModuleException, CannotPublishProductTypeException, CannotConfirmProductTypeException, CannotMakeProductTypeSaleableException 
 	{
 		String organisationID = getOrganisationID();
 

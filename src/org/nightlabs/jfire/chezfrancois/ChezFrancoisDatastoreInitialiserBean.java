@@ -233,7 +233,7 @@ implements SessionBean
 	 * @ejb.transaction type="RequiresNew"
 	 */
 	public void createDemoData_JFireVoucher()
-	throws ModuleException 
+	throws Exception 
 	{
 		try {
 			Class.forName("org.nightlabs.jfire.voucher.store.VoucherType");
@@ -256,7 +256,7 @@ implements SessionBean
 	 * @ejb.transaction type="RequiresNew"
 	 */
 	public void createDemoData_JFireDynamicTrade()
-	throws ModuleException 
+	throws Exception 
 	{
 		try {
 			Class.forName("org.nightlabs.jfire.dynamictrade.store.DynamicProductType");
@@ -279,7 +279,7 @@ implements SessionBean
 	 * @ejb.transaction type="RequiresNew"
 	 */
 	public void createDemoData_JFireSimpleTrade()
-	throws ModuleException 
+	throws Exception 
 	{
 		try {
 			Class.forName("org.nightlabs.jfire.simpletrade.store.SimpleProductType");

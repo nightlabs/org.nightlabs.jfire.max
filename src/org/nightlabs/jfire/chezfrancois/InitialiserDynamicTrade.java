@@ -23,6 +23,9 @@ import org.nightlabs.jfire.dynamictrade.accounting.priceconfig.DynamicTradePrice
 import org.nightlabs.jfire.dynamictrade.store.DynamicProductType;
 import org.nightlabs.jfire.idgenerator.IDGenerator;
 import org.nightlabs.jfire.security.User;
+import org.nightlabs.jfire.store.CannotConfirmProductTypeException;
+import org.nightlabs.jfire.store.CannotMakeProductTypeSaleableException;
+import org.nightlabs.jfire.store.CannotPublishProductTypeException;
 import org.nightlabs.jfire.store.id.ProductTypeID;
 import org.nightlabs.jfire.trade.id.CustomerGroupID;
 
@@ -37,7 +40,7 @@ extends Initialiser
 	}
 
 	public void createDemoData()
-	throws ModuleException 
+	throws ModuleException, CannotPublishProductTypeException, CannotConfirmProductTypeException, CannotMakeProductTypeSaleableException 
 	{
 		String organisationID = getOrganisationID();
 

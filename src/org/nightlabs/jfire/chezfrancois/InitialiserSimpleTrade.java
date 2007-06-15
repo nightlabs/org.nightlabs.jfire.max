@@ -30,6 +30,9 @@ import org.nightlabs.jfire.security.id.AuthorityID;
 import org.nightlabs.jfire.servermanager.config.OrganisationCf;
 import org.nightlabs.jfire.servermanager.config.OrganisationConfigModule;
 import org.nightlabs.jfire.simpletrade.store.SimpleProductType;
+import org.nightlabs.jfire.store.CannotConfirmProductTypeException;
+import org.nightlabs.jfire.store.CannotMakeProductTypeSaleableException;
+import org.nightlabs.jfire.store.CannotPublishProductTypeException;
 import org.nightlabs.jfire.store.id.ProductTypeID;
 import org.nightlabs.jfire.trade.Article;
 import org.nightlabs.jfire.trade.CustomerGroup;
@@ -47,7 +50,7 @@ extends Initialiser
 	}
 
 	public void createDemoData()
-	throws ModuleException 
+	throws ModuleException, CannotPublishProductTypeException, CannotConfirmProductTypeException, CannotMakeProductTypeSaleableException 
 	{
 		String organisationID = getOrganisationID();
 

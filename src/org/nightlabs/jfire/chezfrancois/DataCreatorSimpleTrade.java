@@ -60,6 +60,9 @@ import org.nightlabs.jfire.security.User;
 import org.nightlabs.jfire.simpletrade.store.SimpleProductType;
 import org.nightlabs.jfire.simpletrade.store.SimpleProductTypeActionHandler;
 import org.nightlabs.jfire.simpletrade.store.prop.SimpleProductTypeStruct;
+import org.nightlabs.jfire.store.CannotConfirmProductTypeException;
+import org.nightlabs.jfire.store.CannotMakeProductTypeSaleableException;
+import org.nightlabs.jfire.store.CannotPublishProductTypeException;
 import org.nightlabs.jfire.store.ProductType;
 import org.nightlabs.jfire.store.id.ProductTypeID;
 import org.nightlabs.jfire.trade.CustomerGroup;
@@ -82,7 +85,7 @@ extends DataCreator
 				ProductTypeID.create(organisationID, SimpleProductType.class.getName()));
 	}
 
-	public SimpleProductType createCategory(SimpleProductType parent, String productTypeID, String ... names)
+	public SimpleProductType createCategory(SimpleProductType parent, String productTypeID, String ... names) throws CannotPublishProductTypeException
 	{
 		if (parent == null)
 			parent = rootSimpleProductType;
@@ -106,7 +109,7 @@ extends DataCreator
 
 	private List<SimpleProductType> createdLeafs = new ArrayList<SimpleProductType>(); 
 
-	public SimpleProductType createLeaf(SimpleProductType category, String productTypeID, IInnerPriceConfig innerPriceConfig, String ... names)
+	public SimpleProductType createLeaf(SimpleProductType category, String productTypeID, IInnerPriceConfig innerPriceConfig, String ... names) throws CannotPublishProductTypeException, CannotConfirmProductTypeException
 	{
 		if (category == null)
 			category = rootSimpleProductType;
@@ -129,7 +132,7 @@ extends DataCreator
 		return pt;
 	}
 	
-	public void makeAllLeavesSaleable() {
+	public void makeAllLeavesSaleable() throws CannotMakeProductTypeSaleableException {
 		for (ProductType pt : createdLeafs) {
 			store.setProductTypeStatus_saleable(user, pt, true);
 		}

@@ -14,6 +14,9 @@ import org.nightlabs.jfire.dynamictrade.store.DynamicProductType;
 import org.nightlabs.jfire.dynamictrade.store.DynamicProductTypeActionHandler;
 import org.nightlabs.jfire.idgenerator.IDGenerator;
 import org.nightlabs.jfire.security.User;
+import org.nightlabs.jfire.store.CannotConfirmProductTypeException;
+import org.nightlabs.jfire.store.CannotMakeProductTypeSaleableException;
+import org.nightlabs.jfire.store.CannotPublishProductTypeException;
 import org.nightlabs.jfire.store.ProductType;
 import org.nightlabs.jfire.store.id.ProductTypeID;
 
@@ -37,7 +40,7 @@ extends DataCreator
 	}
 
 	public DynamicProductType createCategory(DynamicProductType parent, String productTypeID,
-			IInnerPriceConfig innerPriceConfig, String ... names)
+			IInnerPriceConfig innerPriceConfig, String ... names) throws CannotPublishProductTypeException
 	{
 		if (parent == null)
 			parent = rootDynamicProductType;
@@ -73,7 +76,7 @@ extends DataCreator
 
 	public DynamicProductType createLeaf(DynamicProductType category, String productTypeID,
 			IInnerPriceConfig innerPriceConfig,			
-			String ... names)
+			String ... names) throws CannotPublishProductTypeException, CannotConfirmProductTypeException
 	{
 		if (category == null)
 			category = rootDynamicProductType;
@@ -98,7 +101,7 @@ extends DataCreator
 		return pt;
 	}
 
-	public void makeAllLeavesSaleable() {
+	public void makeAllLeavesSaleable() throws CannotMakeProductTypeSaleableException {
 		for (ProductType pt : createdLeafs) {
 			ProductType productType = (ProductType) pm.getObjectById(JDOHelper.getObjectId(pt));
 			store.setProductTypeStatus_saleable(user, productType, true);

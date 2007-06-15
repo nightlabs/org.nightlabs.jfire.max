@@ -8,6 +8,9 @@ import javax.jdo.PersistenceManager;
 
 import org.nightlabs.jfire.accounting.priceconfig.IPackagePriceConfig;
 import org.nightlabs.jfire.security.User;
+import org.nightlabs.jfire.store.CannotConfirmProductTypeException;
+import org.nightlabs.jfire.store.CannotMakeProductTypeSaleableException;
+import org.nightlabs.jfire.store.CannotPublishProductTypeException;
 import org.nightlabs.jfire.store.ProductType;
 import org.nightlabs.jfire.store.id.ProductTypeID;
 import org.nightlabs.jfire.voucher.accounting.VoucherLocalAccountantDelegate;
@@ -35,7 +38,7 @@ public class DataCreatorVoucher
 
 	public VoucherType createCategory(
 			VoucherType parent, String productTypeID, VoucherLocalAccountantDelegate localAccountantDelegate,
-			IPackagePriceConfig packagePriceConfig, String ... names)
+			IPackagePriceConfig packagePriceConfig, String ... names) throws CannotPublishProductTypeException
 	{
 		if (parent == null)
 			parent = rootVoucherType;
@@ -76,7 +79,7 @@ public class DataCreatorVoucher
 
 	public VoucherType createLeaf(VoucherType category, String productTypeID,
 			IPackagePriceConfig packagePriceConfig, VoucherLocalAccountantDelegate localAccountantDelegate,
-			String ... names)
+			String ... names) throws CannotPublishProductTypeException, CannotConfirmProductTypeException
 	{
 		if (category == null)
 			category = rootVoucherType;
@@ -109,7 +112,7 @@ public class DataCreatorVoucher
 		return pt;
 	}
 	
-	public void makeAllLeafsSaleable() {
+	public void makeAllLeafsSaleable() throws CannotMakeProductTypeSaleableException {
 		for (ProductType pt : createdLeafs) {
 			store.setProductTypeStatus_saleable(user, pt, true);
 		}

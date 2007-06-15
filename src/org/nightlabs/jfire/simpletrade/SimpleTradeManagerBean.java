@@ -91,6 +91,7 @@ import org.nightlabs.jfire.simpletrade.store.SimpleProductType;
 import org.nightlabs.jfire.simpletrade.store.SimpleProductTypeActionHandler;
 import org.nightlabs.jfire.simpletrade.store.SimpleProductTypeSearchFilter;
 import org.nightlabs.jfire.simpletrade.store.prop.SimpleProductTypeStruct;
+import org.nightlabs.jfire.store.CannotPublishProductTypeException;
 import org.nightlabs.jfire.store.NestedProductType;
 import org.nightlabs.jfire.store.ProductType;
 import org.nightlabs.jfire.store.Store;
@@ -163,13 +164,14 @@ implements SessionBean
 	 * Simple products of other organisations must be imported.
 	 * 
 	 * @throws ModuleException
+	 * @throws CannotPublishProductTypeException 
 	 *
 	 * @ejb.interface-method
 	 * @ejb.permission role-name="_System_"
 	 * @ejb.transaction type="Required"
 	 */
 	public void initialise() 
-	throws ModuleException 
+	throws ModuleException, CannotPublishProductTypeException 
 	{
 		PersistenceManager pm = this.getPersistenceManager();
 		try {
@@ -229,6 +231,8 @@ implements SessionBean
 			store.addProductType(user, rootSimpleProductType, SimpleProductTypeActionHandler.getDefaultHome(pm, rootSimpleProductType));
 			store.setProductTypeStatus_published(user, rootSimpleProductType);
 
+			// give the root product type a property set
+			
 
 //			// TEST add test products
 //			// TODO remove this test stuff

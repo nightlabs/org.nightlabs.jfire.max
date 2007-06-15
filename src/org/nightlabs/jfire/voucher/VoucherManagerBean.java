@@ -57,6 +57,7 @@ import org.nightlabs.jfire.scripting.ScriptRegistry;
 import org.nightlabs.jfire.scripting.ScriptRegistryItem;
 import org.nightlabs.jfire.scripting.id.ScriptRegistryItemID;
 import org.nightlabs.jfire.security.User;
+import org.nightlabs.jfire.store.CannotConfirmProductTypeException;
 import org.nightlabs.jfire.store.DeliveryNote;
 import org.nightlabs.jfire.store.NestedProductType;
 import org.nightlabs.jfire.store.ProductType;
@@ -818,10 +819,11 @@ implements SessionBean
 	 * @throws ModuleException
 	 * @throws NamingException
 	 * @throws IOException
+	 * @throws CannotConfirmProductTypeException 
 	 */
 	private PreviewParameterSetExtension ensureFinishedConfiguration(
 			PersistenceManager pm, User user, PreviewParameterSet previewParameterSet)
-			throws ModuleException, NamingException, IOException {
+			throws ModuleException, NamingException, IOException, CannotConfirmProductTypeException {
 		if (user == null)
 			throw new IllegalArgumentException("user must not be null!");
 

@@ -6,6 +6,7 @@ import javax.jdo.PersistenceManager;
 import javax.jdo.Query;
 
 import org.nightlabs.annotation.Implement;
+import org.nightlabs.jfire.accounting.priceconfig.IPriceConfig;
 import org.nightlabs.jfire.security.User;
 import org.nightlabs.jfire.store.ProductType;
 import org.nightlabs.jfire.store.ProductTypeLocal;
@@ -153,5 +154,18 @@ extends ProductType
 	public void setVoucherLayout(VoucherLayout voucherLayout)
 	{
 		this.voucherLayout = voucherLayout;
-	}	
+	}
+	
+	/**
+	 * {@inheritDoc}
+	 * <p>
+	 * This implementation always returns the {@link #getPackagePriceConfig()} as 
+	 * vouchers have a special PriceConfig that does not virtual self packaging.
+	 * </p>
+	 * @see org.nightlabs.jfire.store.ProductType#getPriceConfigInPackage(java.lang.String)
+	 */
+	@Override
+	public IPriceConfig getPriceConfigInPackage(String packageProductTypePK) {
+		return getPackagePriceConfig();
+	}
 }

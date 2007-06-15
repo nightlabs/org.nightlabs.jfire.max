@@ -39,6 +39,7 @@ import org.nightlabs.jfire.idgenerator.IDGenerator;
 import org.nightlabs.jfire.organisation.LocalOrganisation;
 import org.nightlabs.jfire.organisation.Organisation;
 import org.nightlabs.jfire.security.User;
+import org.nightlabs.jfire.store.CannotPublishProductTypeException;
 import org.nightlabs.jfire.store.ProductType;
 import org.nightlabs.jfire.store.Store;
 import org.nightlabs.jfire.store.deliver.DeliveryConfiguration;
@@ -96,12 +97,13 @@ implements SessionBean
 	 * It creates the root DynamicProductType for the organisation itself.
 	 * DynamicProductTypes of other organisations cannot be imported or
 	 * traded as reseller.
+	 * @throws CannotPublishProductTypeException 
 	 *
 	 * @ejb.interface-method
 	 * @ejb.permission role-name="_System_"
 	 * @ejb.transaction type="Required"
 	 */
-	public void initialise()
+	public void initialise() throws CannotPublishProductTypeException
 	{
 		PersistenceManager pm = getPersistenceManager();
 		try {

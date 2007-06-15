@@ -483,11 +483,13 @@ implements SessionBean
 	}
 
 	/**
+	 * @throws CannotPublishProductTypeException 
 	 * @ejb.interface-method
 	 * @ejb.permission role-name="_Guest_"
 	 * @ejb.transaction type = "Required"
 	 */ 
-	public ProductTypeStatus setProductTypeStatus_published(ProductTypeID productTypeID, boolean get, String[] fetchGroups, int maxFetchDepth)
+	public ProductTypeStatus setProductTypeStatus_published(ProductTypeID productTypeID, boolean get, String[] fetchGroups, int maxFetchDepth) 
+	throws CannotPublishProductTypeException
 	{
 		PersistenceManager pm = getPersistenceManager();
 		try {
@@ -512,11 +514,13 @@ implements SessionBean
 	}
 
 	/**
+	 * @throws CannotConfirmProductTypeException 
 	 * @ejb.interface-method
 	 * @ejb.permission role-name="_Guest_"
 	 * @ejb.transaction type = "Required"
 	 */ 
-	public ProductTypeStatus setProductTypeStatus_confirmed(ProductTypeID productTypeID, boolean get, String[] fetchGroups, int maxFetchDepth)
+	public ProductTypeStatus setProductTypeStatus_confirmed(ProductTypeID productTypeID, boolean get, String[] fetchGroups, int maxFetchDepth) 
+	throws CannotConfirmProductTypeException
 	{
 		PersistenceManager pm = getPersistenceManager();
 		try {
@@ -541,11 +545,13 @@ implements SessionBean
 	}
 
 	/**
+	 * @throws CannotMakeProductTypeSaleableException 
 	 * @ejb.interface-method
 	 * @ejb.permission role-name="_Guest_"
 	 * @ejb.transaction type = "Required"
 	 */ 
-	public ProductTypeStatus setProductTypeStatus_saleable(ProductTypeID productTypeID, boolean saleable, boolean get, String[] fetchGroups, int maxFetchDepth)
+	public ProductTypeStatus setProductTypeStatus_saleable(ProductTypeID productTypeID, boolean saleable, boolean get, String[] fetchGroups, int maxFetchDepth) 
+	throws CannotMakeProductTypeSaleableException
 	{
 		PersistenceManager pm = getPersistenceManager();
 		try {

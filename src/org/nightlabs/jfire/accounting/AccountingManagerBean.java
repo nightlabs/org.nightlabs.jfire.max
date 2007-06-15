@@ -39,6 +39,7 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.Set;
+import java.util.Map.Entry;
 
 import javax.ejb.CreateException;
 import javax.ejb.EJBException;
@@ -60,6 +61,8 @@ import org.nightlabs.jdo.query.JDOQuery;
 import org.nightlabs.jfire.accounting.book.LocalAccountantDelegate;
 import org.nightlabs.jfire.accounting.book.MoneyFlowDimension;
 import org.nightlabs.jfire.accounting.book.MoneyFlowMapping;
+import org.nightlabs.jfire.accounting.book.LocalAccountantDelegate.ResolvedMapEntry;
+import org.nightlabs.jfire.accounting.book.LocalAccountantDelegate.ResolvedMapKey;
 import org.nightlabs.jfire.accounting.book.fragmentbased.OwnerDimension;
 import org.nightlabs.jfire.accounting.book.fragmentbased.PriceFragmentDimension;
 import org.nightlabs.jfire.accounting.book.fragmentbased.SourceOrganisationDimension;
@@ -1042,47 +1045,76 @@ public abstract class AccountingManagerBean
 		}
 	}
 	
+	protected Map<ResolvedMapKey, ResolvedMapEntry> getResolvedMoneyFlowMappings(
+			PersistenceManager pm,
+			LocalAccountantDelegateID localAccountantDelegateID, 
+			ProductTypeID productTypeID, 
+			String[] mappingFetchGroups,
+			int maxFetchDepth
+		) 
+	{
+		if (mappingFetchGroups != null)
+			pm.getFetchPlan().setGroups(mappingFetchGroups);
+		pm.getFetchPlan().setMaxFetchDepth(maxFetchDepth);
+		
+		ProductType productType = (ProductType) pm.getObjectById(productTypeID);
+		LocalAccountantDelegate delegate = (LocalAccountantDelegate) pm.getObjectById(localAccountantDelegateID);
+		Map<ResolvedMapKey, ResolvedMapEntry> resolvedMappings = delegate.resolveProductTypeMappings(productType);
+		Map<ResolvedMapKey, ResolvedMapEntry> result = new HashMap<ResolvedMapKey, ResolvedMapEntry>();
+		for (Entry<ResolvedMapKey, ResolvedMapEntry> entry : resolvedMappings.entrySet()) {
+			LocalAccountantDelegate.ResolvedMapEntry persitentMapEntry = (LocalAccountantDelegate.ResolvedMapEntry)entry.getValue();				
+			LocalAccountantDelegate.ResolvedMapEntry mapEntry = new LocalAccountantDelegate.ResolvedMapEntry();
+			
+			for (Iterator iterator = persitentMapEntry.getResolvedMappings().entrySet().iterator(); iterator.hasNext();) {
+				Map.Entry resolvedEntry = (Map.Entry) iterator.next();
+				MoneyFlowMapping persistentMapping = (MoneyFlowMapping)resolvedEntry.getValue();
+				MoneyFlowMapping detachedMapping = (MoneyFlowMapping)pm.detachCopy(persistentMapping);
+				mapEntry.getResolvedMappings().put((String)resolvedEntry.getKey(), detachedMapping);
+			}
+			result.put(entry.getKey(), mapEntry);				
+		}
+		return result;
+		
+	}
 	
 	/**
 	 * @ejb.interface-method
 	 * @ejb.transaction type = "Required"
 	 * @ejb.permission role-name="_Guest_"
 	 */
-	public Map getResolvedMoneyFlowMappings(ProductTypeID productTypeID, String[] mappingFetchGroups)
+	public Map<ResolvedMapKey, ResolvedMapEntry> getResolvedMoneyFlowMappings(ProductTypeID productTypeID, String[] mappingFetchGroups, int maxFetchDepth)
+	throws ModuleException
+	{
+		PersistenceManager pm = getPersistenceManager();
+		try {
+			ProductType productType = (ProductType)pm.getObjectById(productTypeID);
+			LocalAccountantDelegate delegate = productType.getLocalAccountantDelegate();
+			if (delegate == null)
+				throw new IllegalArgumentException("The ProductType with id "+productTypeID+" does not have a LocalAccountantDelegate assigned to it.");
+			return getResolvedMoneyFlowMappings(pm, (LocalAccountantDelegateID) JDOHelper.getObjectId(delegate), productTypeID, mappingFetchGroups, maxFetchDepth);
+		} finally {
+			pm.close();
+		}
+	}
+	
+	/**
+	 * @ejb.interface-method
+	 * @ejb.transaction type = "Required"
+	 * @ejb.permission role-name="_Guest_"
+	 */
+	public Map<ResolvedMapKey, ResolvedMapEntry> getResolvedMoneyFlowMappings(ProductTypeID productTypeID, LocalAccountantDelegateID delegateID, String[] mappingFetchGroups, int maxFetchDepth)
 	throws ModuleException
 	{
 		PersistenceManager pm = getPersistenceManager();
 		try {
 			if (mappingFetchGroups != null)
 				pm.getFetchPlan().setGroups(mappingFetchGroups);
-			
-			ProductType productType = (ProductType)pm.getObjectById(productTypeID);
-			LocalAccountantDelegate delegate = productType.getLocalAccountantDelegate();
-			if (delegate == null)
-				throw new IllegalArgumentException("The ProductType with id "+productTypeID+" does not have a LocalAccountantDelegate assigned to it.");
-			Map resolvedMappings = delegate.resolveProductTypeMappings(productType);
-			Map result = new HashMap();
-			for (Iterator iter = resolvedMappings.entrySet().iterator(); iter.hasNext();) {
-				Map.Entry entry = (Map.Entry) iter.next();
-				
-				LocalAccountantDelegate.ResolvedMapEntry persitentMapEntry = (LocalAccountantDelegate.ResolvedMapEntry)entry.getValue();				
-				LocalAccountantDelegate.ResolvedMapEntry mapEntry = new LocalAccountantDelegate.ResolvedMapEntry();
-				
-				for (Iterator iterator = persitentMapEntry.getResolvedMappings().entrySet().iterator(); iterator.hasNext();) {
-					Map.Entry resolvedEntry = (Map.Entry) iterator.next();
-					MoneyFlowMapping persistentMapping = (MoneyFlowMapping)resolvedEntry.getValue();
-					MoneyFlowMapping detachedMapping = (MoneyFlowMapping)pm.detachCopy(persistentMapping);
-					mapEntry.getResolvedMappings().put((String)resolvedEntry.getKey(), detachedMapping);
-				}
-				
-				result.put(entry.getKey(), mapEntry);				
-			}
-			return result;
-			
+			return getResolvedMoneyFlowMappings(pm, delegateID, productTypeID, mappingFetchGroups, maxFetchDepth);
 		} finally {
 			pm.close();
 		}
 	}
+	
 
 //	/**
 //	 * @throws ModuleException

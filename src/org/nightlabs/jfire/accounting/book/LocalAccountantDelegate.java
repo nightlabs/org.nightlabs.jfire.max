@@ -458,7 +458,7 @@ public abstract class LocalAccountantDelegate implements Serializable {
 	 * @param productType The ProductType to resolve mappings for.
 	 * @return A map with key {@link ResolvedMapKey} and value {@link ResolvedMapEntry}
 	 */
-	public Map resolveProductTypeMappings(ProductType productType) {
+	public Map<ResolvedMapKey, ResolvedMapEntry> resolveProductTypeMappings(ProductType productType) {
 //		Map<ResolvedMapKey, ResolvedMapEntry> result = new HashMap<ResolvedMapKey, ResolvedMapEntry>();
 		Map result = new HashMap();
 		resolveProductTypeMappings(productType, result, 0);

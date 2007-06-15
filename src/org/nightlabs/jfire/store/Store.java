@@ -251,7 +251,8 @@ public class Store
 //	 */
 //	protected Map productTransferTrackers = new HashMap();
 
-	public void setProductTypeStatus_published(User user, ProductType productType)
+	public void setProductTypeStatus_published(User user, ProductType productType) 
+	throws CannotPublishProductTypeException
 	{
 		if (productType.isPublished())
 			return;
@@ -260,7 +261,8 @@ public class Store
 		getProductTypeStatusTracker(productType, true).newCurrentStatus(user);
 	}
 
-	public void setProductTypeStatus_confirmed(User user, ProductType productType)
+	public void setProductTypeStatus_confirmed(User user, ProductType productType) 
+	throws CannotConfirmProductTypeException
 	{
 		if (productType.isConfirmed())
 			return;
@@ -269,7 +271,8 @@ public class Store
 		getProductTypeStatusTracker(productType, true).newCurrentStatus(user);
 	}
 
-	public void setProductTypeStatus_saleable(User user, ProductType productType, boolean saleable)
+	public void setProductTypeStatus_saleable(User user, ProductType productType, boolean saleable) 
+	throws CannotMakeProductTypeSaleableException
 	{
 		if (productType.isSaleable() == saleable)
 			return;

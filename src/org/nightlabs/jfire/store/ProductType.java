@@ -48,6 +48,7 @@ import org.nightlabs.inheritance.FieldInheriter;
 import org.nightlabs.inheritance.Inheritable;
 import org.nightlabs.inheritance.InheritanceCallbacks;
 import org.nightlabs.inheritance.InheritanceManager;
+import org.nightlabs.jdo.ObjectIDUtil;
 import org.nightlabs.jdo.inheritance.JDOInheritableFieldInheriter;
 import org.nightlabs.jdo.inheritance.JDOInheritanceManager;
 import org.nightlabs.jdo.inheritance.JDOSimpleFieldInheriter;
@@ -202,7 +203,18 @@ implements
 	public static final String FETCH_GROUP_LOCAL_ACCOUNTANT_DELEGATE = "ProductType.localAccountantDelegate";
 	public static final String FETCH_GROUP_LOCAL_STOREKEEPER_DELEGATE = "ProductType.localStorekeeperDelegate";
 	public static final String FETCH_GROUP_THIS_PRODUCT_TYPE = "ProductType.this";
+	
+	public static final String CANNOT_MAKE_SALEABLE_REASON_NOT_PUBLISHED = "ProductType.cannotMakeSaleable.notPublished";
+	public static final String CANNOT_MAKE_SALEABLE_REASON_NOT_CONFIRMED = "ProductType.cannotMakeSaleable.notConfirmed";
+	public static final String CANNOT_MAKE_SALEABLE_REASON_ALREADY_CLOSED = "ProductType.cannotMakeSaleable.alreadyClosed";
+	public static final String CANNOT_MAKE_SALEABLE_REASON_NO_PRICECONFIG = "ProductType.cannotMakeSaleable.noPriceConfig";
+	public static final String CANNOT_MAKE_SALEABLE_REASON_NO_ACCOUNTANT_DELEGATE = "ProductType.cannotMakeSaleable.noAccountantDelegate";
 
+	public static final String CANNOT_CONFIRM_REASON_IMMUTABLE = "ProductType.cannotConfirm.immutable";
+	
+	public static final String CANNOT_PUBLISH_REASON_IMMUTABLE = "ProductType.cannotPublish.immutable";
+	public static final String CANNOT_PUBLISH_REASON_PARENT_NOT_PUBLISHED = "ProductType.cannotPublish.parentNotPublished";
+	
 	public static List<ProductType> getProductTypesNestingThis(PersistenceManager pm, ProductTypeID productTypeID)
 	{
 		pm.getExtent(ProductType.class);
@@ -539,11 +551,11 @@ implements
 			byte inheritanceNature,
 			byte packageNature)
 	{
-		if (organisationID == null)
-			throw new NullPointerException("organisationID");
+		if (!ObjectIDUtil.isValidIDString(organisationID))
+			throw new NullPointerException("organisationID is not a valid ID-String");
 
-		if (productTypeID == null)
-			throw new IllegalArgumentException("productTypeID == null!");
+		if (!ObjectIDUtil.isValidIDString(productTypeID))
+			throw new IllegalArgumentException("productTypeID is not a valid ID-String!");
 
 		if (INHERITANCE_NATURE_BRANCH != inheritanceNature &&
 				INHERITANCE_NATURE_LEAF != inheritanceNature)
@@ -1343,17 +1355,29 @@ implements
 	 * Sets whether this ProductType is published.  This flag is immutable after once set to true.
 	 *  
 	 * @param published Weather the ProductType should be published.
+	 * @throws CannotPublishProductTypeException If the ProductType cannot be published.
 	 */
-	protected void setPublished(boolean published) {
+	protected void setPublished(boolean published) throws CannotPublishProductTypeException {
 		getPersistenceManager();
 
 		if (published == false && this.published == true)
-			throw new IllegalArgumentException("The published flag of a ProductType is immutable after once set to true");
-
-		if (extendedProductType != null && !extendedProductType.isPublished())
-			throw new IllegalStateException("The ProductType \""+getPrimaryKey()+"\" cannot be published, because it extends \""+extendedProductType.getPrimaryKey()+"\", which is not yet published! Publish the parent first!");
+			throw new CannotPublishProductTypeException(CANNOT_PUBLISH_REASON_IMMUTABLE, "The published flag of a ProductType is immutable after once set to true");
 
 		this.published = published;
+	}
+	
+	/**
+	 * Checks if the ProductType can be confirmed. 
+	 * This implementation checks whether the parent ProductType (the productType this extends) is published.
+	 * <p>
+	 * This method might be overridden, however the super implementation should be invoked then.
+	 * </p>
+	 * 
+	 * @throws CannotPublishProductTypeException If the ProductType cannot be published.
+	 */
+	protected void checkCanPublish() throws CannotPublishProductTypeException {
+		if (extendedProductType != null && !extendedProductType.isPublished())
+			throw new CannotPublishProductTypeException(CANNOT_PUBLISH_REASON_PARENT_NOT_PUBLISHED, "The ProductType \""+getPrimaryKey()+"\" cannot be published, because it extends \""+extendedProductType.getPrimaryKey()+"\", which is not yet published! Publish the parent first!");
 	}
 
 	/**
@@ -1374,15 +1398,30 @@ implements
 	 * when confirmed. You can {@link #setSaleable(boolean)} however.
 	 *
 	 * @param confirmed
+	 * @throws CannotConfirmProductTypeException If the ProductType cannot be confirmed.
 	 */
-	protected void setConfirmed(boolean confirmed)
+	protected void setConfirmed(boolean confirmed) throws CannotConfirmProductTypeException
 	{
 		getPersistenceManager();
 
 		if (confirmed == false && this.confirmed == true)
-			throw new IllegalArgumentException("The confirmed flag of a ProductType is immutable after once set to true");
+			throw new CannotConfirmProductTypeException(CANNOT_CONFIRM_REASON_IMMUTABLE, "The confirmed flag of a ProductType is immutable after once set to true");
 
+		checkCanConfirm();
+		
 		this.confirmed = confirmed;
+	}
+	
+	/**
+	 * Checks if the ProductType can be confirmed. This implementation does nothing.
+	 * <p>
+	 * This method might be overridden, however the super implementation should be invoked then.
+	 * </p>
+	 * 
+	 * @throws CannotConfirmProductTypeException If the ProductType cannot be confirmed.
+	 */
+	protected void checkCanConfirm() throws CannotConfirmProductTypeException {
+		// Nothing to do
 	}
 
 	/**
@@ -1400,22 +1439,48 @@ implements
 	 * published is true. This is used as a filter flag.
 	 * 
 	 * @param saleable Wheather this ProductType is saleable
+	 * @throws CannotMakeProductTypeSaleableException If the ProductType cannot be made saleable.
 	 */
-	protected void setSaleable(boolean saleable)
+	protected void setSaleable(boolean saleable) throws CannotMakeProductTypeSaleableException
 	{
 		getPersistenceManager();
-
-		if (saleable && !confirmed)
-			throw new IllegalStateException("Cannot make ProductType \"" + getPrimaryKey() + "\" saleable, because it is not yet confirmed!");
-
-		if (saleable && closed)
-			throw new IllegalStateException("Cannot make ProductType \"" + getPrimaryKey() + "\" saleable, because it is already closed!");
-
-		if (localAccountantDelegate == null)
-			throw new IllegalStateException("Cannot make ProductType \"" + getPrimaryKey() + "\" saleable, because it has not LocalAccountantDelegate assigned!");
+		
+		if (saleable)
+			checkCanMakeSaleable();
 		
 		this.saleable = saleable;
 	}
+	
+	/**
+	 * Checks if the productType can be made saleable (saleable can be set to <code>true</code>).
+	 * <p>
+	 * This implementation checks if the productType:
+	 * <ul>
+	 *   <li>is confirmed</li>
+	 *   <li>is not closed</li>
+	 *   <li>has a {@link LocalAccountantDelegate} assigned</li>
+	 *   <li>has a correct {@link IPriceConfig} assigned</li>
+	 * </ul> 
+	 * </p>
+	 * <p>
+	 * This method might be overridden, however the super implementation should be invoked then.
+	 * </p>
+	 * @throws CannotMakeProductTypeSaleableException If the ProductType cannot be made saleable.
+	 */
+	protected void checkCanMakeSaleable() throws CannotMakeProductTypeSaleableException {
+		if (!confirmed)
+			throw new CannotMakeProductTypeSaleableException(CANNOT_MAKE_SALEABLE_REASON_NOT_CONFIRMED, "Cannot make ProductType \"" + getPrimaryKey() + "\" saleable, because it is not yet confirmed!");
+
+		if (closed)
+			throw new CannotMakeProductTypeSaleableException(CANNOT_MAKE_SALEABLE_REASON_ALREADY_CLOSED, "Cannot make ProductType \"" + getPrimaryKey() + "\" saleable, because it is already closed!");
+
+		if (localAccountantDelegate == null)
+			throw new CannotMakeProductTypeSaleableException(CANNOT_MAKE_SALEABLE_REASON_NO_ACCOUNTANT_DELEGATE, "Cannot make ProductType \"" + getPrimaryKey() + "\" saleable, because it has no LocalAccountantDelegate assigned!");
+		
+		if (getPriceConfigInPackage(this.getPrimaryKey()) == null)
+			throw new CannotMakeProductTypeSaleableException(CANNOT_MAKE_SALEABLE_REASON_NO_PRICECONFIG, "Cannot make ProductType \"" + getPrimaryKey() + "\" saleable, because it has no PriceConfig assigned!");
+	}
+	
 
 	/**
 	 * A ProductType can be closed. This is irreversile.

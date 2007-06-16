@@ -109,10 +109,13 @@ extends NotificationReceiver
 						priceConfigIDs.add((PriceConfigID) JDOHelper.getObjectId(simpleProductType.getPackagePriceConfig()));
 
 					try {
-						store.addProductType(
-								user,
-								simpleProductType,
-								SimpleProductTypeActionHandler.getDefaultHome(pm, simpleProductType));
+						if (NLJDOHelper.exists(pm, simpleProductType))
+							simpleProductType = (SimpleProductType) pm.makePersistent(simpleProductType);
+						else						
+							simpleProductType = (SimpleProductType) store.addProductType(
+									user,
+									simpleProductType,
+									SimpleProductTypeActionHandler.getDefaultHome(pm, simpleProductType));
 //						simpleProductType = (SimpleProductType) pm.makePersistent(simpleProductType);
 					} catch (Exception x) {
 						logger.error("Adding SimpleProductType \"" + simpleProductType.getPrimaryKey() + "\" to Store failed!", x);

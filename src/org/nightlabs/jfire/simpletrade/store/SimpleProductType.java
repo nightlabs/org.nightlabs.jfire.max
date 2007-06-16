@@ -34,6 +34,7 @@ import javax.jdo.Query;
 import org.nightlabs.annotation.Implement;
 import org.nightlabs.inheritance.FieldInheriter;
 import org.nightlabs.inheritance.FieldMetaData;
+import org.nightlabs.inheritance.Inheritable;
 import org.nightlabs.jdo.inheritance.JDOInheritableFieldInheriter;
 import org.nightlabs.jfire.accounting.TariffMapper;
 import org.nightlabs.jfire.accounting.gridpriceconfig.PriceCalculationException;
@@ -198,7 +199,17 @@ public class SimpleProductType extends ProductType
 
 		return super.getFieldMetaData(fieldName, createMissingMetaData);
 	}
-	
+
+	@Override
+	public void preInherit(Inheritable mother, Inheritable child)
+	{
+		super.preInherit(mother, child);
+		if (propertySet != null)
+			; // do nothing, just ensure the field is loaded by jdo
+		if (structLocalScope != null)
+			; // do nothing, just ensure the field is loaded by jdo
+	}
+
 //	/**
 //	 * If <tt>maxProductCount</tt> has a value <tt>&gt;=0</tt>, this is the maximum number of
 //	 * <tt>Product</tt>s that can be created and sold, To have an unlimited amount of

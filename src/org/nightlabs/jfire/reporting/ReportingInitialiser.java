@@ -242,6 +242,7 @@ public class ReportingInitialiser {
 	{
 		if (name == null) {
 			logger.warn("createElementName called with null element!", new NullPointerException("name"));
+			return;
 		}		
 		boolean nameSet = false;
 		if (elementNode != null) {

@@ -33,6 +33,7 @@ import org.nightlabs.jfire.accounting.PriceFragmentType;
 import org.nightlabs.jfire.accounting.book.MoneyFlowMapping;
 import org.nightlabs.jfire.store.ProductType;
 import org.nightlabs.jfire.trade.ArticlePrice;
+import org.nightlabs.jfire.trade.LegalEntity;
 
 /**
  * Defines a mapping of ProductType, PriceFragmentTypes 
@@ -47,6 +48,7 @@ import org.nightlabs.jfire.trade.ArticlePrice;
  *		table="JFireTrade_PFMoneyFlowMapping"
  *
  * @jdo.inheritance strategy="new-table"
+ * @jdo.fetch-group name="MoneyFlowMapping.allDimensions" fetch-groups="default" fields="owner, priceFragmentType, sourceOrganisationID"
  */
 public class PFMoneyFlowMapping extends MoneyFlowMapping {
 
@@ -69,19 +71,6 @@ public class PFMoneyFlowMapping extends MoneyFlowMapping {
 		setCurrency(currency);
 	}
 
-	public PFMoneyFlowMapping(String organisationID, int moneyFlowMappingID, String productTypePK, String packageType, String priceFragmentTypePK, String currencyID) {
-		this(organisationID, moneyFlowMappingID);		
-		setProductTypePK(productTypePK);
-		setPackageType(packageType);
-		setPriceFragmentTypePK(priceFragmentTypePK);
-		setCurrencyID(currencyID);
-	}
-
-	/**
-	 * @jdo.field persistence-modifier="persistent"
-	 */
-	private String priceFragmentTypePK;
-	
 	/**
 	 * @jdo.field persistence-modifier="persistent"
 	 */
@@ -90,12 +79,12 @@ public class PFMoneyFlowMapping extends MoneyFlowMapping {
 	/**
 	 * @jdo.field persistence-modifier="persistent"
 	 */
-	private String ownerPK;
+	private String sourceOrganisationID;
 	
 	/**
 	 * @jdo.field persistence-modifier="persistent"
 	 */
-	private String sourceOrganisationID;
+	private LegalEntity owner;
 	
 	/**
 	 * @return Returns the priceFragmentType.
@@ -110,38 +99,8 @@ public class PFMoneyFlowMapping extends MoneyFlowMapping {
 	 */
 	public void setPriceFragmentType(PriceFragmentType priceFragmentType) {
 		this.priceFragmentType = priceFragmentType;
-		setPriceFragmentTypePK(priceFragmentType.getPrimaryKey());
 	}
 	
-
-	/**
-	 * @return Returns the priceFragmentTypePK.
-	 */
-	public String getPriceFragmentTypePK() {
-		return priceFragmentTypePK;
-	}
-	
-
-	/**
-	 * @param priceFragmentTypePK The priceFragmentTypePK to set.
-	 */
-	public void setPriceFragmentTypePK(String priceFragmentTypePK) {
-		this.priceFragmentTypePK = priceFragmentTypePK;
-	}
-
-	/**
-	 * @return Returns the ownerPK.
-	 */
-	public String getOwnerPK() {
-		return ownerPK;
-	}
-
-	/**
-	 * @param ownerPK The ownerPK to set.
-	 */
-	public void setOwnerPK(String ownerPK) {
-		this.ownerPK = ownerPK;
-	}
 
 	/**
 	 * @return Returns the sourceOrganisationID.
@@ -158,7 +117,15 @@ public class PFMoneyFlowMapping extends MoneyFlowMapping {
 	}
 
 	public String getMappingConditionKey(ProductType productType) {
-		return priceFragmentTypePK; 
+		return priceFragmentType.getPrimaryKey(); 
+	}
+	
+	public LegalEntity getOwner() {
+		return owner;
+	}
+	
+	public void setOwner(LegalEntity owner) {
+		this.owner = owner;
 	}
 	
 	/**
@@ -184,7 +151,6 @@ public class PFMoneyFlowMapping extends MoneyFlowMapping {
 	}
 
 	public void validateMapping() {
-		setPriceFragmentType((PriceFragmentType)getPersistenceManager().getObjectById(PriceFragmentType.primaryKeyToPriceFragmentTypeID(getPriceFragmentTypePK())));
 	}	
 	
 	public void addMappingsToMap(ProductType productType, Map<String, MoneyFlowMapping> resolvedMappings) {
@@ -194,7 +160,7 @@ public class PFMoneyFlowMapping extends MoneyFlowMapping {
 		validate();
 		resolvedMappings.put(
 				simulateMappingKeyPartForProductType(productType)+
-				productType.getOwner().getPrimaryKey() + "/" + productType.getOrganisationID() + "/" + priceFragmentTypePK, 
+				productType.getOwner().getPrimaryKey() + "/" + productType.getOrganisationID() + "/" + priceFragmentType.getPrimaryKey(), 
 				this
 			);
 	}
@@ -203,7 +169,7 @@ public class PFMoneyFlowMapping extends MoneyFlowMapping {
 		if (getProductTypePK().equals(productType.getPrimaryKey()) && 
 				getPackageType().equals(packageType))
 		{
-			if (getOwnerPK() == null)
+			if (getOwner() == null)
 				return (getSourceOrganisationID() == null) 
 					? 
 						true 
@@ -212,9 +178,9 @@ public class PFMoneyFlowMapping extends MoneyFlowMapping {
 			else
 				return (getSourceOrganisationID() == null) 
 					? 
-						productType.getOwner().getPrimaryKey().equals(getOwnerPK())
+						productType.getOwner().getPrimaryKey().equals(getOwner().getPrimaryKey())
 					:
-						productType.getOwner().getPrimaryKey().equals(getOwnerPK()) &&
+						productType.getOwner().getPrimaryKey().equals(getOwner().getPrimaryKey()) &&
 						productType.getOrganisationID().equals(getSourceOrganisationID());
 		}
 		return false;

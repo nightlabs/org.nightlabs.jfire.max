@@ -60,6 +60,7 @@ import org.nightlabs.util.Utils;
  * @jdo.fetch-group name="MoneyFlowMapping.productType" fields="productType"
  * @jdo.fetch-group name="MoneyFlowMapping.currency" fields="currency"
  * @jdo.fetch-group name="MoneyFlowMapping.account" fields="account"
+ * @jdo.fetch-group name="MoneyFlowMapping.allDimensions" fetch-groups="default" fields="productType, currency, account"
  */
 public abstract class MoneyFlowMapping implements Serializable {
 
@@ -71,6 +72,8 @@ public abstract class MoneyFlowMapping implements Serializable {
 	public static final String FETCH_GROUP_CURRENCY = "MoneyFlowMapping.currency";
 	public static final String FETCH_GROUP_ACCOUNT = "MoneyFlowMapping.account";
 			 
+	public static final String FETCH_GROUP_ALL_DIMENSIONS = "MoneyFlowMapping.allDimensions";
+	
 	public static interface Registry {
 		public String getOrganisationID();
 		public int createMoneyFlowMappingID(); // String organisationID);
@@ -90,11 +93,6 @@ public abstract class MoneyFlowMapping implements Serializable {
 	/**
 	 * @jdo.field persistence-modifier="persistent"
 	 */
-	private String productTypePK;
-	
-	/**
-	 * @jdo.field persistence-modifier="persistent"
-	 */
 	private ProductType productType;
 	
 	/**
@@ -109,25 +107,10 @@ public abstract class MoneyFlowMapping implements Serializable {
 	/**
 	 * @jdo.field persistence-modifier="persistent"
 	 */
-	private String currencyID;
-
-	/**
-	 * @jdo.field persistence-modifier="persistent"
-	 */
 	private Currency currency;
 	
 	/**
-	 * TODO this should be persistence-modifier="none"
-	 *
-	 * @jdo.field persistence-modifier="persistent"
-	 */
-	private String accountPK;
-	
-	/**
-	 * TODO this should have null-value="exception"
-	 * TODO check all other fields and add such constraints!!!
-	 *
-	 * @jdo.field persistence-modifier="persistent"
+	 * @jdo.field persistence-modifier="persistent" null-value="exception"
 	 */
 	private Account account;
 	
@@ -162,7 +145,6 @@ public abstract class MoneyFlowMapping implements Serializable {
 	 */
 	public void setProductType(ProductType productType) {
 		this.productType = productType;
-		setProductTypePK(productType.getPrimaryKey());
 	}
 	
 
@@ -170,18 +152,9 @@ public abstract class MoneyFlowMapping implements Serializable {
 	 * @return Returns the productTypePK.
 	 */
 	public String getProductTypePK() {
-		return productTypePK;
+		return productType.getPrimaryKey();
 	}
 	
-
-	/**
-	 * @param productTypePK The productTypePK to set.
-	 */
-	public void setProductTypePK(String productTypePK) {
-		this.productTypePK = productTypePK;
-	}
-	
-
 	/**
 	 * 
 	 * @return The packageType
@@ -204,16 +177,11 @@ public abstract class MoneyFlowMapping implements Serializable {
 	}
 	
 	public String getCurrencyID() {
-		return currencyID;
+		return currency != null ? currency.getCurrencyID() : null;
 	}
 
-	public void setCurrencyID(String currencyID) {
-		this.currencyID = currencyID;
-	}
-		
 	public void setCurrency(Currency currency) {
 		this.currency = currency;
-		setCurrencyID(currency.getCurrencyID());
 	}
 	
 	
@@ -229,15 +197,13 @@ public abstract class MoneyFlowMapping implements Serializable {
 	 */
 	public void setAccount(Account account) {
 		this.account = account;
-		accountPK = (account == null) ? null : account.getPrimaryKey();
-			
 	}
 
 	/**
 	 * @return Returns the accountPK.
 	 */
 	public String getAccountPK() {
-		return accountPK;
+		return (account != null) ? account.getPrimaryKey() : null;
 	}
 	
 	public String getOrganisationID() {
@@ -246,13 +212,6 @@ public abstract class MoneyFlowMapping implements Serializable {
 	
 	public int getMoneyFlowMappingID() {
 		return moneyFlowMappingID;
-	}
-	
-	/**
-	 * @param accountPK The Account primary key to set
-	 */
-	public void setAccountPK(String accountPK) {
-		this.accountPK = accountPK;
 	}
 	
 	public LocalAccountantDelegate getLocalAccountantDelegate() {
@@ -269,15 +228,15 @@ public abstract class MoneyFlowMapping implements Serializable {
 	 * @return
 	 */
 	public String getMappingKey(ProductType productType) {
-		return getMappingKey(productTypePK, packageType, currencyID)+"/"+getMappingConditionKey(productType);
+		return getMappingKey(getProductTypePK(), packageType, getCurrencyID())+"/"+getMappingConditionKey(productType);
 	}
 	
 	public String simulateMappingKeyForProductType(ProductType productType) {
-		return getMappingKey(productType.getPrimaryKey(), packageType, currencyID)+"/"+getMappingConditionKey(productType);
+		return getMappingKey(productType.getPrimaryKey(), packageType, getCurrencyID())+"/"+getMappingConditionKey(productType);
 	}
 	
 	protected String simulateMappingKeyPartForProductType(ProductType productType) {
-		return getMappingKey(productType.getPrimaryKey(), packageType, currencyID)+"/";		
+		return getMappingKey(productType.getPrimaryKey(), packageType, getCurrencyID())+"/";		
 	}
 	
 	/**

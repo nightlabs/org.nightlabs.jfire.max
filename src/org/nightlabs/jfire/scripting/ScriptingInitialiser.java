@@ -280,7 +280,9 @@ public class ScriptingInitialiser
 	
 	private void createElementName(Node elementNode, I18nText name, String def, String elementName) 
 	{
-		// script name
+		if (name == null) {
+			logger.warn("createElementName called with null element!", new NullPointerException("name"));
+		}		
 		boolean nameSet = false;
 		if (elementNode != null) {
 			Collection<Node> nodes = NLDOMUtil.findNodeList(elementNode, elementName);

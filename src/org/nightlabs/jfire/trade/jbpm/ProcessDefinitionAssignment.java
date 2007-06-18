@@ -15,7 +15,6 @@ import org.nightlabs.jfire.jbpm.graph.def.AbstractActionHandler;
 import org.nightlabs.jfire.jbpm.graph.def.ActionHandlerNodeEnter;
 import org.nightlabs.jfire.jbpm.graph.def.ProcessDefinition;
 import org.nightlabs.jfire.jbpm.graph.def.Statable;
-import org.nightlabs.jfire.jbpm.graph.def.StateDefinition;
 import org.nightlabs.jfire.security.User;
 import org.nightlabs.jfire.store.DeliveryNote;
 import org.nightlabs.jfire.trade.Offer;

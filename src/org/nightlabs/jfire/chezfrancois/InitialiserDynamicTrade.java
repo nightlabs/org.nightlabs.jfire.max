@@ -125,29 +125,6 @@ extends Initialiser
 		Account accountServiceVatNet = dataCreator.createLocalAccount("service-vat-net.eur", "Service Net (EUR)");
 		Account accountServiceVatVal = dataCreator.createLocalAccount("service-vat-val.eur", "Service VAT (EUR)");
 		
-		// configure moneyflow
-		LocalAccountantDelegate swDelegate = new PFMappingAccountantDelegate(organisationID, "softwareAccountantDelegate");
-
-		swDelegate.addMoneyFlowMapping(
-				dataCreator.createPFMoneyFlowMapping(softwareDevelopmentID, dataCreator.getPriceFragmentTypeTotal(), accountSoftwareDevelopmentVatNet));
-		swDelegate.addMoneyFlowMapping(
-				dataCreator.createPFMoneyFlowMapping(softwareDevelopmentID, dataCreator.getPriceFragmentTypeVatVal(), accountSoftwareDevelopmentVatVal));
-
-		LocalAccountantDelegate serviceDelegate = new PFMappingAccountantDelegate(organisationID, "serviceAccountantDelegate");
-
-		serviceDelegate.addMoneyFlowMapping(
-				dataCreator.createPFMoneyFlowMapping(serviceID, dataCreator.getPriceFragmentTypeTotal(), accountServiceVatNet));
-		serviceDelegate.addMoneyFlowMapping(
-				dataCreator.createPFMoneyFlowMapping(serviceID, dataCreator.getPriceFragmentTypeVatVal(), accountServiceVatVal));
-
-		
-		LocalAccountantDelegate miscDelegate = new PFMappingAccountantDelegate(organisationID, "miscAccountantDelegate");
-
-		miscDelegate.addMoneyFlowMapping(
-				dataCreator.createPFMoneyFlowMapping(miscID, dataCreator.getPriceFragmentTypeTotal(), accountServiceVatNet));
-		miscDelegate.addMoneyFlowMapping(
-				dataCreator.createPFMoneyFlowMapping(miscID, dataCreator.getPriceFragmentTypeVatVal(), accountServiceVatVal));
-
 		DynamicProductType softwareDevelopment = dataCreator.createCategory(null, softwareDevelopmentID.productTypeID, null, "Software Development", "Software-Entwicklung");
 		DynamicProductType swDevJFire = dataCreator.createLeaf(softwareDevelopment, "softwareDevelopment.jfire", null, "JFire");
 		DynamicProductType swDevProjectA = dataCreator.createLeaf(softwareDevelopment, "softwareDevelopment.projectA", null, "Project A", "Projekt A");
@@ -163,6 +140,29 @@ extends Initialiser
 		
 		DynamicProductType misc = dataCreator.createLeaf(null, miscID.productTypeID, null, "Miscellaneous", "Verschiedenes");
 		
+
+		// configure moneyflow
+		LocalAccountantDelegate swDelegate = new PFMappingAccountantDelegate(organisationID, "softwareAccountantDelegate");
+
+		swDelegate.addMoneyFlowMapping(
+				dataCreator.createPFMoneyFlowMapping(softwareDevelopment, dataCreator.getPriceFragmentTypeTotal(), accountSoftwareDevelopmentVatNet));
+		swDelegate.addMoneyFlowMapping(
+				dataCreator.createPFMoneyFlowMapping(softwareDevelopment, dataCreator.getPriceFragmentTypeVatVal(), accountSoftwareDevelopmentVatVal));
+
+		LocalAccountantDelegate serviceDelegate = new PFMappingAccountantDelegate(organisationID, "serviceAccountantDelegate");
+
+		serviceDelegate.addMoneyFlowMapping(
+				dataCreator.createPFMoneyFlowMapping(service, dataCreator.getPriceFragmentTypeTotal(), accountServiceVatNet));
+		serviceDelegate.addMoneyFlowMapping(
+				dataCreator.createPFMoneyFlowMapping(service, dataCreator.getPriceFragmentTypeVatVal(), accountServiceVatVal));
+
+		
+		LocalAccountantDelegate miscDelegate = new PFMappingAccountantDelegate(organisationID, "miscAccountantDelegate");
+
+		miscDelegate.addMoneyFlowMapping(
+				dataCreator.createPFMoneyFlowMapping(misc, dataCreator.getPriceFragmentTypeTotal(), accountServiceVatNet));
+		miscDelegate.addMoneyFlowMapping(
+				dataCreator.createPFMoneyFlowMapping(misc, dataCreator.getPriceFragmentTypeVatVal(), accountServiceVatVal));
 
 		dataCreator.getRootDynamicProductType().applyInheritance();
 		

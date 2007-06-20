@@ -24,49 +24,68 @@
  *                                                                             *
  ******************************************************************************/
 
-package org.nightlabs.jfire.accounting.book.fragmentbased;
+package org.nightlabs.jfire.accounting.book.mappingbased;
+
+import java.util.Collection;
+import java.util.Iterator;
 
 import javax.jdo.JDOHelper;
+import javax.jdo.PersistenceManager;
 
-import org.nightlabs.jfire.accounting.book.MoneyFlowDimension;
+import org.nightlabs.jfire.accounting.PriceFragmentType;
+import org.nightlabs.jfire.accounting.priceconfig.IPriceConfig;
 import org.nightlabs.jfire.store.ProductType;
+import org.nightlabs.jfire.trade.Article;
 
 /**
  * @author Alexander Bieber <alex[AT]nightlabs[DOT]de>
- * 
+ *
  * @jdo.persistence-capable
  *		identity-type="application"
- *		persistence-capable-superclass="org.nightlabs.jfire.accounting.book.MoneyFlowDimension"
+ *		persistence-capable-superclass="org.nightlabs.jfire.accounting.book.mappingbased.MoneyFlowDimension"
  *		detachable="true"
- *		table="JFireTrade_OwnerDimension"
+ *		table="JFireTrade_PriceFragmentDimension"
  *
  * @jdo.inheritance strategy="new-table"
  */
-public class OwnerDimension extends MoneyFlowDimension {
-	
-	public static final String MONEY_FLOW_DIMENSION_ID = OwnerDimension.class.getName();
+public class PriceFragmentDimension extends MoneyFlowDimension {
+
+	public static final String MONEY_FLOW_DIMENSION_ID = PriceFragmentDimension.class.getName(); 
 	
 	/**
-	 * 
 	 */
-	public OwnerDimension() {
+	public PriceFragmentDimension() {
 		super();
 	}
 
 	/**
-	 * @see org.nightlabs.jfire.accounting.book.MoneyFlowDimension#getMoneyFlowDimensionID()
+	 * @see org.nightlabs.jfire.accounting.book.mappingbased.MoneyFlowDimension#getMoneyFlowDimensionID()
 	 */
 	public String getMoneyFlowDimensionID() {
 		return MONEY_FLOW_DIMENSION_ID;
 	}
 
 	/**
-	 * @see org.nightlabs.jfire.accounting.book.MoneyFlowDimension#getValues(org.nightlabs.jfire.store.ProductType)
+	 * @see org.nightlabs.jfire.accounting.book.mappingbased.MoneyFlowDimension#getValues()
 	 */
-	public String[] getValues(ProductType productType) {
-		if (!(JDOHelper.isPersistent(productType) && !JDOHelper.isDetached(productType)))
-			throw new IllegalStateException("OwnerDimension can only return values for attached ProductTypes.");
-		return new String[] { productType.getOwner().getPrimaryKey() };
+	public String[] getValues(ProductType productType, Article bookArticle) {
+		ProductType rootType = bookArticle.getProductType();
+		IPriceConfig priceConfig = productType.getPriceConfigInPackage(rootType.getPrimaryKey());
+		Collection<PriceFragmentType> pfs = priceConfig.getPriceFragmentTypes();
+		String[] result = new String[pfs.size()];
+		int i = 0;
+		for (Iterator iter = pfs.iterator(); iter.hasNext();) {
+			PriceFragmentType pft = (PriceFragmentType) iter.next();
+			result[i++] = pft.getPrimaryKey();
+		}
+		return result;		
+	}
+	
+	public PersistenceManager getPersistenceManager() {
+		PersistenceManager pm = JDOHelper.getPersistenceManager(this);
+		if (pm == null)
+			throw new IllegalStateException("This instance of PriceFragmentDimension is not persistent. Can't get PersistenceManager");
+		return pm;
 	}
 
 }

@@ -24,19 +24,19 @@
  *                                                                             *
  ******************************************************************************/
 
-package org.nightlabs.jfire.accounting.book.fragmentbased;
+package org.nightlabs.jfire.accounting.book.mappingbased;
 
 import javax.jdo.JDOHelper;
 
-import org.nightlabs.jfire.accounting.book.MoneyFlowDimension;
 import org.nightlabs.jfire.store.ProductType;
+import org.nightlabs.jfire.trade.Article;
 
 /**
  * @author Alexander Bieber <alex[AT]nightlabs[DOT]de>
  *
  * @jdo.persistence-capable
  *		identity-type="application"
- *		persistence-capable-superclass="org.nightlabs.jfire.accounting.book.MoneyFlowDimension"
+ *		persistence-capable-superclass="org.nightlabs.jfire.accounting.book.mappingbased.MoneyFlowDimension"
  *		detachable="true"
  *		table="JFireTrade_SourceOrganisationDimension"
  *
@@ -54,23 +54,23 @@ public class SourceOrganisationDimension extends MoneyFlowDimension {
 	}
 
 	/**
-	 * @see org.nightlabs.jfire.accounting.book.MoneyFlowMapping#getMappingConditionKey()
+	 * @see org.nightlabs.jfire.accounting.book.mappingbased.MoneyFlowMapping#getMappingConditionKey()
 	 */
 	public String getMappingConditionKey() {
 		return MONEY_FLOW_DIMENSION_ID;
 	}
 
 	/**
-	 * @see org.nightlabs.jfire.accounting.book.MoneyFlowDimension#getMoneyFlowDimensionID()
+	 * @see org.nightlabs.jfire.accounting.book.mappingbased.MoneyFlowDimension#getMoneyFlowDimensionID()
 	 */
 	public String getMoneyFlowDimensionID() {
 		return MONEY_FLOW_DIMENSION_ID;
 	}
 
 	/**
-	 * @see org.nightlabs.jfire.accounting.book.MoneyFlowDimension#getValues(org.nightlabs.jfire.store.ProductType)
+	 * @see org.nightlabs.jfire.accounting.book.mappingbased.MoneyFlowDimension#getValues(org.nightlabs.jfire.store.ProductType, Article)
 	 */
-	public String[] getValues(ProductType productType) {
+	public String[] getValues(ProductType productType, Article bookArticle) {
 		if (!(JDOHelper.isPersistent(productType) && !JDOHelper.isDetached(productType)))
 			throw new IllegalStateException("OwnerDimension can only return values for attached ProductTypes.");
 		return new String[] { productType.getOrganisationID() };

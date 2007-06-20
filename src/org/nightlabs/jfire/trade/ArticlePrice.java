@@ -59,13 +59,18 @@ import org.nightlabs.jfire.store.ProductType;
  *
  * @jdo.fetch-group name="ArticlePrice.packageArticlePrice" fields="packageArticlePrice"
  * @jdo.fetch-group name="ArticlePrice.nestedArticlePrices" fields="nestedArticlePrices"
+ * @jdo.fetch-group name="ArticlePrice.nestedArticlePrices[-1]" fields="nestedArticlePrices[-1]"
  * @jdo.fetch-group name="ArticlePrice.origPrice" fields="origPrice"
- * @jdo.fetch-group name="ArticlePrice.this" fetch-groups="default" fields="origPrice, nestedArticlePrices, packageArticlePrice"
+ * @jdo.fetch-group name="ArticlePrice.productType" fields="productType"
+ * @jdo.fetch-group name="ArticlePrice.packageProductType" fields="packageProductType"
+ * @jdo.fetch-group name="ArticlePrice.product" fields="product"
+ * @jdo.fetch-group name="ArticlePrice.this" fetch-groups="default" fields="origPrice, nestedArticlePrices, packageArticlePrice, productType, packageProductType, product"
  */
 public class ArticlePrice extends org.nightlabs.jfire.accounting.Price
 {
 	public static final String FETCH_GROUP_PACKAGE_ARTICLE_PRICE = "ArticlePrice.packageArticlePrice";
 	public static final String FETCH_GROUP_NESTED_ARTICLE_PRICES = "ArticlePrice.nestedArticlePrices";
+	public static final String FETCH_GROUP_NESTED_ARTICLE_PRICES_NO_LIMIT = "ArticlePrice.nestedArticlePrices[-1]";
 	public static final String FETCH_GROUP_ORIG_PRICE = "ArticlePrice.origPrice";
 	public static final String FETCH_GROUP_THIS_ARTICLE_PRICE = "ArticlePrice.this";
 
@@ -90,7 +95,7 @@ public class ArticlePrice extends org.nightlabs.jfire.accounting.Price
 	 *
 	 * @!jdo.map-vendor-extension vendor-name="jpox" key="key-field" value="nestKey"
 	 */
-	protected Map nestedArticlePrices = new HashMap();
+	protected Map nestedArticlePrices;
 
 	/**
 	 * This is to map entries in nestedArticlePrices.
@@ -267,7 +272,8 @@ public class ArticlePrice extends org.nightlabs.jfire.accounting.Price
 			this.origPrice = origPrice;
 		
 		this.virtualInner = virtualInner;
-
+		
+		this.nestedArticlePrices = new HashMap();
 		assign(origPrice, refund);
 
 		if (packageArticlePrice != null)

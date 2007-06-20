@@ -24,7 +24,7 @@
  *                                                                             *
  ******************************************************************************/
 
-package org.nightlabs.jfire.accounting.book;
+package org.nightlabs.jfire.accounting.book.mappingbased;
 
 import java.io.Serializable;
 import java.util.Map;
@@ -34,6 +34,7 @@ import javax.jdo.PersistenceManager;
 
 import org.nightlabs.jfire.accounting.Account;
 import org.nightlabs.jfire.accounting.Currency;
+import org.nightlabs.jfire.accounting.book.LocalAccountantDelegate;
 import org.nightlabs.jfire.accounting.id.CurrencyID;
 import org.nightlabs.jfire.store.ProductType;
 import org.nightlabs.jfire.trade.ArticlePrice;

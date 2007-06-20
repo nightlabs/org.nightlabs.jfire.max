@@ -24,72 +24,49 @@
  *                                                                             *
  ******************************************************************************/
 
-package org.nightlabs.jfire.accounting.book;
+package org.nightlabs.jfire.accounting.book.mappingbased;
 
-import javax.jdo.PersistenceManager;
-import javax.jdo.Query;
+import javax.jdo.JDOHelper;
 
 import org.nightlabs.jfire.store.ProductType;
+import org.nightlabs.jfire.trade.Article;
 
 /**
- * Abstract Dimension for MoneyFlowMappings.
- *  
  * @author Alexander Bieber <alex[AT]nightlabs[DOT]de>
- *
+ * 
  * @jdo.persistence-capable
  *		identity-type="application"
- *		objectid-class="org.nightlabs.jfire.accounting.book.id.MoneyFlowDimensionID"
+ *		persistence-capable-superclass="org.nightlabs.jfire.accounting.book.mappingbased.MoneyFlowDimension"
  *		detachable="true"
- *		table="JFireTrade_MoneyFlowDimension"
+ *		table="JFireTrade_OwnerDimension"
  *
  * @jdo.inheritance strategy="new-table"
- * 
- * @jdo.create-objectid-class
- *
- * @jdo.query
- *		name="getMoneyFlowDimension"
- *		query="SELECT UNIQUE this
- *			WHERE moneyFlowDimensionID == paramMoneyFlowDimensionID
- *			PARAMETERS String paramMoneyFlowDimensionID
- *			import java.lang.String"
  */
-public abstract class MoneyFlowDimension {
-
-	private static final String FETCH_GROUP_GET_MONEY_FLOW_DIMENSION = "getMoneyFlowDimension";
+public class OwnerDimension extends MoneyFlowDimension {
+	
+	public static final String MONEY_FLOW_DIMENSION_ID = OwnerDimension.class.getName();
 	
 	/**
-	 * @jdo.field persistence-modifier="persistent" primary-key="true"
-	 * @jdo.column length="200"
-	 */
-	private String moneyFlowDimensionID;
-	
-	public MoneyFlowDimension() {
-		this.moneyFlowDimensionID = getMoneyFlowDimensionID();
-	}
-	
-	/**
-	 * Returns the ID of this MoneyFlowDimension.
-	 */
-	public abstract String getMoneyFlowDimensionID();
-
-	/**
-	 * Returns all possible values this dimension might have.
-	 */
-	public abstract String[] getValues(ProductType productType);
-	
-	
-	/**
-	 * Returns the MoneyFlowDimension with the given organisationID and
-	 * moneyFlowDimensionID. 
 	 * 
-	 * @param pm The PersistenceManager to use.
-	 * @param organisationID The organisationID of the dimension.
-	 * @param moneyFlowDimensionID The moneyFlowDimensionID of the dimension.
-	 * @return The MoneyFlowDimension with for the given keys.  
 	 */
-	public static MoneyFlowDimension getMoneyFlowDimension(PersistenceManager pm, String moneyFlowDimensionID) {
-		Query q = pm.newNamedQuery(MoneyFlowDimension.class, FETCH_GROUP_GET_MONEY_FLOW_DIMENSION);
-		return (MoneyFlowDimension)q.execute(moneyFlowDimensionID);
+	public OwnerDimension() {
+		super();
 	}
-	
+
+	/**
+	 * @see org.nightlabs.jfire.accounting.book.mappingbased.MoneyFlowDimension#getMoneyFlowDimensionID()
+	 */
+	public String getMoneyFlowDimensionID() {
+		return MONEY_FLOW_DIMENSION_ID;
+	}
+
+	/**
+	 * @see org.nightlabs.jfire.accounting.book.mappingbased.MoneyFlowDimension#getValues(org.nightlabs.jfire.store.ProductType, Article)
+	 */
+	public String[] getValues(ProductType productType, Article bookArticle) {
+		if (!(JDOHelper.isPersistent(productType) && !JDOHelper.isDetached(productType)))
+			throw new IllegalStateException("OwnerDimension can only return values for attached ProductTypes.");
+		return new String[] { productType.getOwner().getPrimaryKey() };
+	}
+
 }

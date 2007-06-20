@@ -59,6 +59,7 @@ import org.nightlabs.util.Utils;
  * @jdo.inheritance strategy="new-table"
  *
  * @jdo.fetch-group name="PriceFragmentType.name" fields="name"
+ * @jdo.fetch-group name="PriceFragmentType.containerPriceFragmentType" fields="containerPriceFragmentType"
  *
  * @jdo.fetch-group name="FetchGroupsPriceConfig.edit" fields="name"
  */
@@ -68,6 +69,7 @@ public class PriceFragmentType
 	private static final long serialVersionUID = 1L;
 
 	public static final String FETCH_GROUP_NAME = "PriceFragmentType.name";
+	public static final String FETCH_GROUP_CONTAINER_PRICE_FRAGMENT_TYPE = "PriceFragmentType.containerPriceFragmentType";
 
 	/**
 	 * @jdo.field primary-key="true"
@@ -127,7 +129,18 @@ public class PriceFragmentType
 		return PriceFragmentTypeID.create(parts[0], parts[1]);
 	}
 
+	/**
+	 * The {@link PriceFragmentTypeID} of the system-internal {@link PriceFragmentType} 'Total', that is the total price of a ProductType.
+	 */
 	public static final PriceFragmentTypeID PRICE_FRAGMENT_TYPE_ID_TOTAL = PriceFragmentTypeID.create(Organisation.DEVIL_ORGANISATION_ID, "_Total_");
+	/**
+	 * The {@link PriceFragmentTypeID} of the system-internal {@link PriceFragmentType} 'Rest', that is the missing amount of the parts of 'Total' 
+	 * (those parts not defined in a {@link Price}), to form the 'Total' amount.
+	 * <p>
+	 * Note that the PriceFragment for this type is used as virtual price fragment and is not persisted to the datastore.
+	 * </p>
+	 */
+	public static final PriceFragmentTypeID PRICE_FRAGMENT_TYPE_ID_REST = PriceFragmentTypeID.create(Organisation.DEVIL_ORGANISATION_ID, "_Rest_");
 
 	/**
 	 * This predefined priceFragmentType exists to allow a unified API for accesses
@@ -186,10 +199,9 @@ public class PriceFragmentType
 		pm.getExtent(PriceFragmentType.class);
 		PriceFragmentType priceFragmentType;
 		try {
-			priceFragmentType = (PriceFragmentType) pm.getObjectById(PriceFragmentTypeID.create(
-					Organisation.DEVIL_ORGANISATION_ID, PriceFragmentType.TOTAL_PRICEFRAGMENTTYPEID));
+			priceFragmentType = (PriceFragmentType) pm.getObjectById(PRICE_FRAGMENT_TYPE_ID_TOTAL);
 		} catch (JDOObjectNotFoundException x) {
-			priceFragmentType = new PriceFragmentType(Organisation.DEVIL_ORGANISATION_ID, PriceFragmentType.TOTAL_PRICEFRAGMENTTYPEID);
+			priceFragmentType = new PriceFragmentType(PRICE_FRAGMENT_TYPE_ID_TOTAL.organisationID, PRICE_FRAGMENT_TYPE_ID_TOTAL.priceFragmentTypeID);
 			pm.makePersistent(priceFragmentType);
 		}
 		return priceFragmentType;

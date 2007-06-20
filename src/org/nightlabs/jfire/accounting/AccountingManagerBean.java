@@ -59,14 +59,15 @@ import org.nightlabs.ModuleException;
 import org.nightlabs.jdo.NLJDOHelper;
 import org.nightlabs.jdo.query.JDOQuery;
 import org.nightlabs.jfire.accounting.book.LocalAccountantDelegate;
-import org.nightlabs.jfire.accounting.book.MoneyFlowDimension;
-import org.nightlabs.jfire.accounting.book.MoneyFlowMapping;
-import org.nightlabs.jfire.accounting.book.LocalAccountantDelegate.ResolvedMapEntry;
-import org.nightlabs.jfire.accounting.book.LocalAccountantDelegate.ResolvedMapKey;
-import org.nightlabs.jfire.accounting.book.fragmentbased.OwnerDimension;
-import org.nightlabs.jfire.accounting.book.fragmentbased.PriceFragmentDimension;
-import org.nightlabs.jfire.accounting.book.fragmentbased.SourceOrganisationDimension;
 import org.nightlabs.jfire.accounting.book.id.LocalAccountantDelegateID;
+import org.nightlabs.jfire.accounting.book.mappingbased.MoneyFlowDimension;
+import org.nightlabs.jfire.accounting.book.mappingbased.MoneyFlowMapping;
+import org.nightlabs.jfire.accounting.book.mappingbased.OwnerDimension;
+import org.nightlabs.jfire.accounting.book.mappingbased.PFMappingAccountantDelegate;
+import org.nightlabs.jfire.accounting.book.mappingbased.PriceFragmentDimension;
+import org.nightlabs.jfire.accounting.book.mappingbased.SourceOrganisationDimension;
+import org.nightlabs.jfire.accounting.book.mappingbased.PFMappingAccountantDelegate.ResolvedMapEntry;
+import org.nightlabs.jfire.accounting.book.mappingbased.PFMappingAccountantDelegate.ResolvedMapKey;
 import org.nightlabs.jfire.accounting.gridpriceconfig.GridPriceConfig;
 import org.nightlabs.jfire.accounting.gridpriceconfig.GridPriceConfigUtil;
 import org.nightlabs.jfire.accounting.id.CurrencyID;
@@ -1059,11 +1060,13 @@ public abstract class AccountingManagerBean
 		
 		ProductType productType = (ProductType) pm.getObjectById(productTypeID);
 		LocalAccountantDelegate delegate = (LocalAccountantDelegate) pm.getObjectById(localAccountantDelegateID);
-		Map<ResolvedMapKey, ResolvedMapEntry> resolvedMappings = delegate.resolveProductTypeMappings(productType);
+		if (!(delegate instanceof PFMappingAccountantDelegate))
+			throw new IllegalArgumentException("MoneyFlowMappings can only be resolved for ");
+		Map<ResolvedMapKey, ResolvedMapEntry> resolvedMappings = ((PFMappingAccountantDelegate) delegate).resolveProductTypeMappings(productType);
 		Map<ResolvedMapKey, ResolvedMapEntry> result = new HashMap<ResolvedMapKey, ResolvedMapEntry>();
 		for (Entry<ResolvedMapKey, ResolvedMapEntry> entry : resolvedMappings.entrySet()) {
-			LocalAccountantDelegate.ResolvedMapEntry persitentMapEntry = (LocalAccountantDelegate.ResolvedMapEntry)entry.getValue();				
-			LocalAccountantDelegate.ResolvedMapEntry mapEntry = new LocalAccountantDelegate.ResolvedMapEntry();
+			ResolvedMapEntry persitentMapEntry = entry.getValue();				
+			ResolvedMapEntry mapEntry = new ResolvedMapEntry();
 			
 			for (Iterator iterator = persitentMapEntry.getResolvedMappings().entrySet().iterator(); iterator.hasNext();) {
 				Map.Entry resolvedEntry = (Map.Entry) iterator.next();

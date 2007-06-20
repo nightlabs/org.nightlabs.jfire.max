@@ -24,13 +24,13 @@
  *                                                                             *
  ******************************************************************************/
 
-package org.nightlabs.jfire.accounting.book.fragmentbased;
+package org.nightlabs.jfire.accounting.book.mappingbased;
 
 import java.util.Map;
 
+import org.nightlabs.annotation.Implement;
 import org.nightlabs.jfire.accounting.Currency;
 import org.nightlabs.jfire.accounting.PriceFragmentType;
-import org.nightlabs.jfire.accounting.book.MoneyFlowMapping;
 import org.nightlabs.jfire.store.ProductType;
 import org.nightlabs.jfire.trade.ArticlePrice;
 import org.nightlabs.jfire.trade.LegalEntity;
@@ -43,7 +43,7 @@ import org.nightlabs.jfire.trade.LegalEntity;
  * 
  * @jdo.persistence-capable
  *		identity-type="application"
- *		persistence-capable-superclass="org.nightlabs.jfire.accounting.book.MoneyFlowMapping"
+ *		persistence-capable-superclass="org.nightlabs.jfire.accounting.book.mappingbased.MoneyFlowMapping"
  *		detachable="true"
  *		table="JFireTrade_PFMoneyFlowMapping"
  *
@@ -153,11 +153,13 @@ public class PFMoneyFlowMapping extends MoneyFlowMapping {
 	public void validateMapping() {
 	}	
 	
+	/**
+	 * {@inheritDoc}
+	 * @see org.nightlabs.jfire.accounting.book.mappingbased.MoneyFlowMapping#addMappingsToMap(org.nightlabs.jfire.store.ProductType, java.util.Map)
+	 */
+	@Implement
 	public void addMappingsToMap(ProductType productType, Map<String, MoneyFlowMapping> resolvedMappings) {
 		// TODO: Add here instance multiple times for wildcards
-		getProductType();
-		getAccount();
-		validate();
 		resolvedMappings.put(
 				simulateMappingKeyPartForProductType(productType)+
 				productType.getOwner().getPrimaryKey() + "/" + productType.getOrganisationID() + "/" + priceFragmentType.getPrimaryKey(), 

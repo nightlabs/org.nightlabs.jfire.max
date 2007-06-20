@@ -51,6 +51,7 @@ import java.io.Serializable;
  * @jdo.fetch-group name="PriceFragment.price" fields="price"
  * @jdo.fetch-group name="PriceFragment.currency" fields="currency"
  * @jdo.fetch-group name="PriceFragment.priceFragmentType" fields="priceFragmentType"
+ * @jdo.fetch-group name="PriceFragment.this" fields="priceFragmentType, price, currency"
  *
  * @jdo.fetch-group name="Price.fragments" fields="price"
  *
@@ -61,9 +62,10 @@ public class PriceFragment
 {
 	private static final long serialVersionUID = 1L;
 
-	public static final String FETCH_GROUP_PRICE = "Price.price";
-	public static final String FETCH_GROUP_CURRENCY = "Price.currency";
-	public static final String FETCH_GROUP_PRICE_FRAGMENT_TYPE = "Price.priceFragmentType";
+	public static final String FETCH_GROUP_PRICE = "PriceFragment.price";
+	public static final String FETCH_GROUP_CURRENCY = "PriceFragment.currency";
+	public static final String FETCH_GROUP_PRICE_FRAGMENT_TYPE = "PriceFragment.priceFragmentType";
+	public static final String FETCH_GROUP_THIS_PRICE_FRAGMENT = "PriceFragment.this";
 
 	/**
 	 * @jdo.field primary-key="true"
@@ -119,6 +121,11 @@ public class PriceFragment
 	 */
 	private long amount = 0;
 
+	/**
+	 * @jdo.field persistence-modifier="none"
+	 */
+	private boolean virtual = false;
+	
 	protected PriceFragment() { }
 
 	public PriceFragment(Price price, PriceFragmentType priceFragmentType)
@@ -228,5 +235,13 @@ public class PriceFragment
 
 	public Price getPrice() {
 		return price;
+	}
+	
+	public boolean isVirtual() {
+		return virtual;
+	}
+	
+	void setVirtual(boolean virtual) {
+		this.virtual = virtual;
 	}
 }

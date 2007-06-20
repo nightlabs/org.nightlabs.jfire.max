@@ -12,7 +12,7 @@ import org.nightlabs.jfire.accounting.Account;
 import org.nightlabs.jfire.accounting.PriceFragmentType;
 import org.nightlabs.jfire.accounting.Tariff;
 import org.nightlabs.jfire.accounting.book.LocalAccountantDelegate;
-import org.nightlabs.jfire.accounting.book.fragmentbased.PFMappingAccountantDelegate;
+import org.nightlabs.jfire.accounting.book.mappingbased.PFMappingAccountantDelegate;
 import org.nightlabs.jfire.accounting.gridpriceconfig.FormulaCell;
 import org.nightlabs.jfire.accounting.gridpriceconfig.PriceCoordinate;
 import org.nightlabs.jfire.accounting.id.CurrencyID;
@@ -142,14 +142,14 @@ extends Initialiser
 		
 
 		// configure moneyflow
-		LocalAccountantDelegate swDelegate = new PFMappingAccountantDelegate(organisationID, "softwareAccountantDelegate");
+		PFMappingAccountantDelegate swDelegate = new PFMappingAccountantDelegate(organisationID, "softwareAccountantDelegate");
 
 		swDelegate.addMoneyFlowMapping(
 				dataCreator.createPFMoneyFlowMapping(softwareDevelopment, dataCreator.getPriceFragmentTypeTotal(), accountSoftwareDevelopmentVatNet));
 		swDelegate.addMoneyFlowMapping(
 				dataCreator.createPFMoneyFlowMapping(softwareDevelopment, dataCreator.getPriceFragmentTypeVatVal(), accountSoftwareDevelopmentVatVal));
 
-		LocalAccountantDelegate serviceDelegate = new PFMappingAccountantDelegate(organisationID, "serviceAccountantDelegate");
+		PFMappingAccountantDelegate serviceDelegate = new PFMappingAccountantDelegate(organisationID, "serviceAccountantDelegate");
 
 		serviceDelegate.addMoneyFlowMapping(
 				dataCreator.createPFMoneyFlowMapping(service, dataCreator.getPriceFragmentTypeTotal(), accountServiceVatNet));
@@ -157,7 +157,7 @@ extends Initialiser
 				dataCreator.createPFMoneyFlowMapping(service, dataCreator.getPriceFragmentTypeVatVal(), accountServiceVatVal));
 
 		
-		LocalAccountantDelegate miscDelegate = new PFMappingAccountantDelegate(organisationID, "miscAccountantDelegate");
+		PFMappingAccountantDelegate miscDelegate = new PFMappingAccountantDelegate(organisationID, "miscAccountantDelegate");
 
 		miscDelegate.addMoneyFlowMapping(
 				dataCreator.createPFMoneyFlowMapping(misc, dataCreator.getPriceFragmentTypeTotal(), accountServiceVatNet));

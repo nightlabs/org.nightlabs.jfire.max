@@ -5,12 +5,14 @@ import java.util.List;
 import java.util.Properties;
 import java.util.Set;
 
+import javax.jdo.JDODetachedFieldAccessException;
+import javax.jdo.JDOHelper;
+
 import org.nightlabs.annotation.Implement;
 import org.nightlabs.jdo.NLJDOHelper;
 import org.nightlabs.jfire.base.jdo.BaseJDOObjectDAO;
+import org.nightlabs.jfire.base.jdo.IJDOObjectDAO;
 import org.nightlabs.jfire.prop.IStruct;
-import org.nightlabs.jfire.prop.PropertyManager;
-import org.nightlabs.jfire.prop.PropertyManagerUtil;
 import org.nightlabs.jfire.prop.PropertySet;
 import org.nightlabs.jfire.security.SecurityReflector;
 import org.nightlabs.jfire.simpletrade.SimpleTradeManager;
@@ -22,6 +24,7 @@ import org.nightlabs.util.Utils;
 
 public class SimpleProductTypeDAO
 extends BaseJDOObjectDAO<ProductTypeID, SimpleProductType>
+implements IJDOObjectDAO<SimpleProductType>
 {
 	private static SimpleProductTypeDAO sharedInstance = null;
 
@@ -102,34 +105,44 @@ extends BaseJDOObjectDAO<ProductTypeID, SimpleProductType>
 	 */
 	public synchronized void storeSimpleProductType(SimpleProductType productType, ProgressMonitor monitor)
 	{
-		if(productType == null)
-			throw new NullPointerException("SimpleProductType to save must not be null");
+		storeJDOObject(productType, false, null, NLJDOHelper.MAX_FETCH_DEPTH_NO_LIMIT, monitor);
+	}
 
-		productType = Utils.cloneSerializable(productType);
+	/**
+	 * {@inheritDoc}
+	 * @see org.nightlabs.jfire.base.jdo.IJDOObjectDAO#storeJDOObject(java.lang.Object, boolean, java.lang.String[], int, org.nightlabs.progress.ProgressMonitor)
+	 */
+	@Implement
+	public SimpleProductType storeJDOObject(SimpleProductType jdoObject, boolean get, String[] fetchGroups, int maxFetchDepth, ProgressMonitor monitor) {
+		if(jdoObject == null)
+			throw new NullPointerException("SimpleProductType to save must not be null");
+		if (!(jdoObject instanceof SimpleProductType))
+			throw new IllegalArgumentException("ProductType to save must be of type " + SimpleProductType.class.getSimpleName() + ", passed was " + jdoObject.getClass().getSimpleName());
+		SimpleProductType productType = (SimpleProductType) Utils.cloneSerializable(jdoObject);
+		SimpleProductType result = null;		
 		monitor.beginTask("Saving SimpleProductType PropertySet", 3);
 		Properties initialContextProperties = SecurityReflector.getInitialContextProperties();		
 		try {
-			PropertySet propertySet = productType.getPropertySet();
-			IStruct struct = propertySet.getStructure();
-			if (struct != null)			
-				struct.implodeProperty(propertySet);			
-//			long activePropertyID = propertySet.getPropertyID();
-//			if (activePropertyID == PropertySet.TEMPORARY_PROP_ID) {
-//				propertySet.assignID(IDGenerator.nextID(PropertySet.class));
-//				PropertyManager pm = PropertyManagerUtil.getHome(initialContextProperties).create();		
-//				monitor.worked(1);
-//				pm.storeProperty(propertySet, false, null, NLJDOHelper.MAX_FETCH_DEPTH_NO_LIMIT);				
-//				monitor.worked(1);				
-//			}
+			PropertySet propertySet = null; 
+			try {
+				productType.getPropertySet();
+			} catch (JDODetachedFieldAccessException e) {
+				// propertySet not detached
+				propertySet = null;
+			}
+			if (propertySet != null) {
+				IStruct struct = propertySet.getStructure();
+				if (struct != null)			
+					struct.implodeProperty(propertySet);
+			}
 			SimpleTradeManager simpleTradeManager = SimpleTradeManagerUtil.getHome(initialContextProperties).create();
-			simpleTradeManager.storeProductType(productType, false, null, NLJDOHelper.MAX_FETCH_DEPTH_NO_LIMIT);
+			result = simpleTradeManager.storeProductType(productType, get, fetchGroups, maxFetchDepth);
 			monitor.worked(1);
-//			struct.explodeProperty(propertySet);    
-//			monitor.worked(1);
 			monitor.done();
 		} catch(Exception e) {
 			monitor.done();
 			throw new RuntimeException("PropertySet Save failed", e);
 		}
+		return result;
 	}	
 }

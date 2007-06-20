@@ -6,6 +6,7 @@ import java.util.Set;
 
 import org.nightlabs.annotation.Implement;
 import org.nightlabs.jfire.base.jdo.BaseJDOObjectDAO;
+import org.nightlabs.jfire.base.jdo.IJDOObjectDAO;
 import org.nightlabs.jfire.dynamictrade.DynamicTradeManager;
 import org.nightlabs.jfire.dynamictrade.DynamicTradeManagerUtil;
 import org.nightlabs.jfire.dynamictrade.store.DynamicProductType;
@@ -15,6 +16,7 @@ import org.nightlabs.progress.ProgressMonitor;
 
 public class DynamicProductTypeDAO
 extends BaseJDOObjectDAO<ProductTypeID, DynamicProductType>
+implements IJDOObjectDAO<DynamicProductType>
 {
 	private static DynamicProductTypeDAO sharedInstance = null;
 
@@ -103,5 +105,19 @@ extends BaseJDOObjectDAO<ProductTypeID, DynamicProductType>
 			throw new IllegalArgumentException("dynamicProductTypeID must not be null!");
 
 		return getJDOObject(null, dynamicProductTypeID, fetchGroups, maxFetchDepth, monitor);
+	}
+
+	/**
+	 * {@inheritDoc}
+	 * @see org.nightlabs.jfire.base.jdo.IJDOObjectDAO#storeJDOObject(java.lang.Object, boolean, java.lang.String[], int, org.nightlabs.progress.ProgressMonitor)
+	 */
+	@Implement
+	public DynamicProductType storeJDOObject(DynamicProductType jdoObject, boolean get, String[] fetchGroups, int maxFetchDepth, ProgressMonitor monitor) {
+		try {
+			DynamicTradeManager dtm = DynamicTradeManagerUtil.getHome(SecurityReflector.getInitialContextProperties()).create();
+			return dtm.storeDynamicProductType(jdoObject, get, fetchGroups, maxFetchDepth);
+		} catch (Exception e) {
+			throw new RuntimeException(e);
+		}
 	}
 }

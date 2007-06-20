@@ -6,6 +6,7 @@ import java.util.Set;
 
 import org.nightlabs.annotation.Implement;
 import org.nightlabs.jfire.base.jdo.BaseJDOObjectDAO;
+import org.nightlabs.jfire.base.jdo.IJDOObjectDAO;
 import org.nightlabs.jfire.security.SecurityReflector;
 import org.nightlabs.jfire.store.id.ProductTypeID;
 import org.nightlabs.jfire.voucher.VoucherManager;
@@ -15,6 +16,7 @@ import org.nightlabs.progress.ProgressMonitor;
 
 public class VoucherTypeDAO
 extends BaseJDOObjectDAO<ProductTypeID, VoucherType>
+implements IJDOObjectDAO<VoucherType>
 {
 	private static VoucherTypeDAO sharedInstance = null;
 
@@ -86,5 +88,19 @@ extends BaseJDOObjectDAO<ProductTypeID, VoucherType>
 			throw new IllegalArgumentException("voucherTypeID must not be null!");
 
 		return getJDOObject(null, voucherTypeID, fetchGroups, maxFetchDepth, monitor);
+	}
+
+	/**
+	 * {@inheritDoc}
+	 * @see org.nightlabs.jfire.base.jdo.IJDOObjectDAO#storeJDOObject(java.lang.Object, boolean, java.lang.String[], int, org.nightlabs.progress.ProgressMonitor)
+	 */
+	@Implement
+	public VoucherType storeJDOObject(VoucherType jdoObject, boolean get, String[] fetchGroups, int maxFetchDepth, ProgressMonitor monitor) {
+		try {
+			VoucherManager vm = VoucherManagerUtil.getHome(SecurityReflector.getInitialContextProperties()).create();
+			return vm.storeVoucherType(jdoObject, get, fetchGroups, maxFetchDepth);
+		} catch (Exception e) {
+			throw new RuntimeException(e);
+		}
 	}
 }

@@ -8,7 +8,6 @@ import org.nightlabs.jfire.accounting.InvoiceMoneyTransfer;
 import org.nightlabs.jfire.accounting.MoneyTransfer;
 import org.nightlabs.jfire.trade.Article;
 import org.nightlabs.jfire.transfer.Anchor;
-import org.nightlabs.jfire.transfer.TransferRegistry;
 
 /**
  * @author Marco Schulze - Marco at NightLabs dot de
@@ -46,10 +45,10 @@ extends InvoiceMoneyTransfer
 	protected VoucherMoneyTransfer() { }
 
 	public VoucherMoneyTransfer(String bookType,
-			TransferRegistry transferRegistry, MoneyTransfer containerMoneyTransfer,
+			MoneyTransfer containerMoneyTransfer,
 			Anchor from, Anchor to, Invoice invoice, long amount, Article article)
 	{
-		super(bookType, transferRegistry, containerMoneyTransfer, from, to, invoice, amount);
+		super(bookType, containerMoneyTransfer, from, to, invoice, amount);
 		this.article = article;
 	}
 

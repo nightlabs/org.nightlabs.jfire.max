@@ -6,10 +6,10 @@ import java.util.LinkedList;
 import java.util.Map;
 
 import javax.jdo.JDOHelper;
+import javax.jdo.PersistenceManager;
 
 import org.nightlabs.annotation.Implement;
 import org.nightlabs.jfire.accounting.Account;
-import org.nightlabs.jfire.accounting.Accounting;
 import org.nightlabs.jfire.accounting.Currency;
 import org.nightlabs.jfire.accounting.Invoice;
 import org.nightlabs.jfire.accounting.InvoiceMoneyTransfer;
@@ -110,7 +110,7 @@ extends LocalAccountantDelegate
 	@Override
 	public void bookProductTypeParts(OrganisationLegalEntity mandator, User user, LinkedList<ArticlePrice> articlePriceStack, int delegationLevel, BookMoneyTransfer container, Map<String, Anchor> involvedAnchors) {
 		ArticlePrice articlePrice = articlePriceStack.peek();
-		Accounting accounting = Accounting.getAccounting(getPersistenceManager());
+		PersistenceManager pm = getPersistenceManager();
 		String currencyID = articlePrice.getCurrency().getCurrencyID();
 		Account account = accounts.get(currencyID);
 		if (account == null) // TODO maybe this should be a different exception in order to react on it specifically
@@ -130,12 +130,12 @@ extends LocalAccountantDelegate
 
 		VoucherMoneyTransfer moneyTransfer = new VoucherMoneyTransfer(
 				InvoiceMoneyTransfer.BOOK_TYPE_BOOK,
-				accounting,
 				container,
 				from, to,
 				container.getInvoice(),
 				amount,
 				articlePrice.getArticle());
+		moneyTransfer = (VoucherMoneyTransfer) pm.makePersistent(moneyTransfer);
 		moneyTransfer.bookTransfer(user, involvedAnchors);
 	}
 }

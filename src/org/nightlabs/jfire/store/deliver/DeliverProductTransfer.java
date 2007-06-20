@@ -45,7 +45,6 @@ import org.nightlabs.jfire.store.deliver.id.DeliveryID;
 import org.nightlabs.jfire.trade.Article;
 import org.nightlabs.jfire.transfer.Anchor;
 import org.nightlabs.jfire.transfer.Transfer;
-import org.nightlabs.jfire.transfer.TransferRegistry;
 import org.nightlabs.jfire.transfer.id.TransferID;
 
 /**
@@ -76,6 +75,8 @@ import org.nightlabs.jfire.transfer.id.TransferID;
  */
 public class DeliverProductTransfer extends ProductTransfer
 {
+	private static final long serialVersionUID = 1L;
+
 	public static Collection getChildren(
 			PersistenceManager pm, TransferID transferID)
 	{
@@ -174,11 +175,11 @@ public class DeliverProductTransfer extends ProductTransfer
 	 * @param to
 	 * @param delivery
 	 */
-	public DeliverProductTransfer(TransferRegistry transferRegistry,
+	public DeliverProductTransfer(
 			Transfer container, User initiator, Anchor from, Anchor to,
 			Delivery delivery)
 	{
-		super(transferRegistry, container, initiator, from, to, getProductsFromArticles(delivery.getArticles()));
+		super(container, initiator, from, to, getProductsFromArticles(delivery.getArticles()));
 		this.delivery = delivery;
 	}
 

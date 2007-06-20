@@ -89,7 +89,6 @@ import org.nightlabs.jfire.trade.jbpm.ProcessDefinitionAssignment;
 import org.nightlabs.jfire.trade.jbpm.id.ProcessDefinitionAssignmentID;
 import org.nightlabs.jfire.transfer.Anchor;
 import org.nightlabs.jfire.transfer.Transfer;
-import org.nightlabs.jfire.transfer.TransferRegistry;
 
 /**
  * The Store is responsible for managing all ProductTypes and Products
@@ -108,7 +107,7 @@ import org.nightlabs.jfire.transfer.TransferRegistry;
  * @jdo.inheritance strategy="new-table"
  */
 public class Store
-	implements TransferRegistry, StoreCallback
+implements StoreCallback
 {
 	/**
 	 * LOG4J logger used by this class
@@ -919,7 +918,7 @@ public class Store
 
 		// The booking works only with ProductHoles - the ProductLocal is not touched (Product is never touched anyway by deliveries or bookings) 
 		Map<String, Anchor> involvedAnchors = new HashMap<String, Anchor>();
-		List bookProductTransfers = BookProductTransfer.createBookProductTransfers(this, initiator, deliveryNote);
+		List bookProductTransfers = BookProductTransfer.createBookProductTransfers(initiator, deliveryNote);
 		boolean failed = true;
 		try {
 			for (Iterator it = bookProductTransfers.iterator(); it.hasNext(); ) {
@@ -1469,54 +1468,8 @@ public class Store
 		delivery.setRollbackStatus(Delivery.ROLLBACK_STATUS_DONE_NORMAL);
 	}
 
-
-
-/////////// begin implementation of TransferRegistry /////////////
-	// TODO remove this - and use IDGenerator
-	private long nextTransferID = 0;
-	private static long _nextTransferID = -1;
-	private static Object _nextTransferIDMutex = new Object();
-
-	/**
-	 * This method adds an instance of Transfer. This is not necessary, if the Transfer has been created
-	 * by this organisation, because every Transfer does a self-registration.
-	 *
-	 * @param transfer
-	 */
-	public void addTransfer(Transfer transfer)
-	{
-		if (transfer == null)
-			throw new NullPointerException("transfer is null!");
-		
-		if (transfer.getOrganisationID() == null)
-			throw new NullPointerException("transfer.organisationID is null!");
-
-		if (transfer.getTransferID() < 0)
-			throw new NullPointerException("transfer.transferID < 0!");
-
-		getPersistenceManager().makePersistent(transfer);
-	}
-
-	public long createTransferID(String transferTypeID)
-	{
-		if (!ProductTransfer.TRANSFERTYPEID.equals(transferTypeID))
-			throw new IllegalArgumentException("This implementation of TransferRegistry manages only Transfers with transferTypeID=\""+ProductTransfer.TRANSFERTYPEID+"\"!");
-
-		synchronized (_nextTransferIDMutex) {
-			if (_nextTransferID < 0)
-				_nextTransferID = nextTransferID;
-
-			long res = _nextTransferID++;
-			nextTransferID = _nextTransferID;
-			return res;
-		}
-	}
-/////////// end implementation of TransferRegistry /////////////
-
 	public void jdoPreStore()
 	{
-		if (_nextTransferID >= 0 && nextTransferID != _nextTransferID)
-			nextTransferID = _nextTransferID;
 	}
 
 	public ProcessDefinition storeProcessDefinitionReceptionNote(TradeSide tradeSide, URL jbpmProcessDefinitionURL)
@@ -1529,6 +1482,7 @@ public class Store
 		// we add the events+actionhandlers
 		ActionHandlerNodeEnter.register(jbpmProcessDefinition);
 
+		// TODO implement this completely!
 
 		// store it
 		ProcessDefinition processDefinition = ProcessDefinition.storeProcessDefinition(pm, null, jbpmProcessDefinition, jbpmProcessDefinitionURL);

@@ -430,6 +430,8 @@ public abstract class ProductTypeActionHandler
 		}
 		// TODO are the ProductTransfers for the foreign products already created correctly?
 
+		PersistenceManager pm = getPersistenceManager();
+
 		// create the ProductTransfers for the grouped nested products
 		Map<String, Anchor> involvedAnchors = new HashMap<String, Anchor>();
 		LinkedList productTransfers = new LinkedList();
@@ -442,7 +444,8 @@ public abstract class ProductTypeActionHandler
 				Set nestedProducts = (Set) me.getValue();
 				// transfer from nested to this
 				if (!thisProductHome.getPrimaryKey().equals(nestedProductHome.getPrimaryKey())) {
-					ProductTransfer productTransfer = new ProductTransfer(store, null, user, nestedProductHome, thisProductHome, nestedProducts);
+					ProductTransfer productTransfer = new ProductTransfer(null, user, nestedProductHome, thisProductHome, nestedProducts);
+					productTransfer = (ProductTransfer) pm.makePersistent(productTransfer);
 					productTransfer.bookTransfer(user, involvedAnchors);
 					productTransfers.add(productTransfer);
 				}
@@ -615,8 +618,9 @@ public abstract class ProductTypeActionHandler
 		if (!productLocal.isAssembled())
 			return; // nothing to do
 
+		PersistenceManager pm = getPersistenceManager();
+
 		Trader trader = Trader.getTrader(getPersistenceManager());
-		Store store = trader.getStore();
 
 		if (!product.getOrganisationID().equals(trader.getOrganisationID())) {
 			// remote product => cannot be disassembled, but must be returned instead
@@ -670,7 +674,8 @@ public abstract class ProductTypeActionHandler
 				Set nestedProducts = (Set) me.getValue();
 				// transfer from this to nested
 				if (!thisProductHome.getPrimaryKey().equals(nestedProductHome.getPrimaryKey())) {
-					ProductTransfer productTransfer = new ProductTransfer(store, null, user, thisProductHome, nestedProductHome, nestedProducts);
+					ProductTransfer productTransfer = new ProductTransfer(null, user, thisProductHome, nestedProductHome, nestedProducts);
+					productTransfer = (ProductTransfer) pm.makePersistent(productTransfer);
 					productTransfer.bookTransfer(user, involvedAnchors);
 					productTransfers.add(productTransfer);
 				}

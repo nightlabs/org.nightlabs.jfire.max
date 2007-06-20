@@ -37,7 +37,6 @@ import org.nightlabs.jfire.accounting.pay.id.PaymentID;
 import org.nightlabs.jfire.security.User;
 import org.nightlabs.jfire.transfer.Anchor;
 import org.nightlabs.jfire.transfer.Transfer;
-import org.nightlabs.jfire.transfer.TransferRegistry;
 import org.nightlabs.jfire.transfer.id.TransferID;
 
 /**
@@ -162,11 +161,11 @@ public class PayMoneyTransfer extends MoneyTransfer
 	 * @param currency
 	 * @param amount
 	 */
-	public PayMoneyTransfer(TransferRegistry transferRegistry,
+	public PayMoneyTransfer(
 			Transfer container, User initiator, Anchor from, Anchor to,
 			Payment payment)
 	{		
-		super(transferRegistry, container, initiator, from, to, payment.getCurrency(),
+		super(container, initiator, from, to, payment.getCurrency(),
 				payment.getAmount());
 		this.payment = payment;
 	}

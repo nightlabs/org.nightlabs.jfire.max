@@ -509,13 +509,13 @@ implements Serializable, DetachCallback
 			return null;
 
 		DeliverProductTransfer deliverProductTransfer = new DeliverProductTransfer(
-				deliverParams.store,
 				null,
 				deliverParams.user,
 				from,
 				to,
 				deliverParams.deliveryData.getDelivery()
 			);
+		deliverProductTransfer = (DeliverProductTransfer) getPersistenceManager().makePersistent(deliverProductTransfer);
 
 		return deliverProductTransfer;
 	}

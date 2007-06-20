@@ -116,20 +116,20 @@ public class PartnerStorekeeper extends Storekeeper
 		Repository partnerInsideRepository = createPartnerInsideRepository(
 				pm, getOrganisationID(), mandator);
 
-		Store store = Store.getStore(pm);
-
 		if (transfer.getAnchorType(mandator) == Transfer.ANCHORTYPE_FROM) {
 			// In this case, the products are transferred from the inside
 			// perPartner-Repository to the mandator.
 			ProductTransfer productTransfer = new ProductTransfer(
-					store, transfer, user, partnerInsideRepository, mandator, transfer.getProducts());
+					transfer, user, partnerInsideRepository, mandator, transfer.getProducts());
+			productTransfer = (ProductTransfer) pm.makePersistent(productTransfer);
 			productTransfer.bookTransfer(user, involvedAnchors);
 		}
 		else if (transfer.getAnchorType(mandator) == Transfer.ANCHORTYPE_TO) {
 			// In this case, the products come from the mandator and are transferred
 			// to the inside perPartner-Repository.
 			ProductTransfer productTransfer = new ProductTransfer(
-					store, transfer, user, mandator, partnerInsideRepository, transfer.getProducts());
+					transfer, user, mandator, partnerInsideRepository, transfer.getProducts());
+			productTransfer = (ProductTransfer) pm.makePersistent(productTransfer);
 			productTransfer.bookTransfer(user, involvedAnchors);
 		}
 		else

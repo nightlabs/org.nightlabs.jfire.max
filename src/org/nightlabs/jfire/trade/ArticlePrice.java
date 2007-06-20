@@ -390,23 +390,30 @@ public class ArticlePrice extends org.nightlabs.jfire.accounting.Price
 	 * This method creates a new instance of ArticlePrice in which
 	 * the original price represented by this instance of ArticlePrice
 	 * is negated.
-	 * 
-	 * @param priceConfig The priceConfig is used to create an ID for the
-	 * new ArticlePrice
 	 *
-	 * @return
+	 * @return a newly created instance of ArticlePrice which will
+	 *		have the same but <b>negative</b> value of this original
+	 *		price. The newly created ArticlePrice will point (via {@link ArticlePrice#getArticle()})
+	 *		back to the reversing Article (which is obtained by this method via <code>this.article.getReversingArticle()</code>).
 	 */
-	public ArticlePrice createRefundPrice()
+	public ArticlePrice createReversingArticlePrice()
 	{
 		PersistenceManager pm = JDOHelper.getPersistenceManager(this);
 		if (pm == null)
 			throw new IllegalStateException("This instance of ArticlePrice is currently not persistent!");
 
+		if (!this.article.isReversed())
+			throw new IllegalStateException("this.article is not reversed! Cannot create a reversing price!");
+
+		Article reversingArticle = this.article.getReversingArticle();
+		if (reversingArticle == null)
+			throw new IllegalStateException("this.article.getReversingArticle() returned null, even though this.article.isReversed() returned true!");
+
 		Accounting accounting = Accounting.getAccounting(pm);
 		AccountingPriceConfig accountingPriceConfig = accounting.getAccountingPriceConfig();
 
 		ArticlePrice articlePrice = new ArticlePrice(
-				this.article,
+				reversingArticle,
 				this,
 				accounting.getOrganisationID(),
 				accountingPriceConfig.getPriceConfigID(),

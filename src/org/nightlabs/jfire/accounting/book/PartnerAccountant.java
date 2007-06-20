@@ -134,11 +134,11 @@ public class PartnerAccountant extends Accountant
 		}
 
 		MoneyTransfer moneyTransfer = new MoneyTransfer(
-			accounting,
 			transfer,
 			createTransferFrom,
 			createTransferTo
 		);
+		moneyTransfer = (MoneyTransfer) getPersistenceManager().makePersistent(moneyTransfer);
 
 //		createTransferFrom.bookTransfer(user, moneyTransfer, involvedAnchors);
 //		createTransferTo.bookTransfer(user, moneyTransfer, involvedAnchors);
@@ -194,7 +194,8 @@ public class PartnerAccountant extends Accountant
 		Anchor to = null;
 		boolean partnerTransferFrom = transfer.getAnchorType(partner) == Transfer.ANCHORTYPE_FROM; // mandator.getPrimaryKey().equals(transfer.getFrom().getPrimaryKey());
 
-		Accounting accounting = Accounting.getAccounting(getPersistenceManager());
+		PersistenceManager pm = getPersistenceManager();
+		Accounting accounting = Accounting.getAccounting(pm);
 
 		if (partnerTransferFrom) {
 			to = partner;
@@ -227,12 +228,12 @@ public class PartnerAccountant extends Accountant
 		}
 		InvoiceMoneyTransfer moneyTransfer = new InvoiceMoneyTransfer(
 				InvoiceMoneyTransfer.BOOK_TYPE_PAY,
-				accounting,
 				transfer,
 				from,
 				to,
 				invoice,
 				amountToPay);
+		moneyTransfer = (InvoiceMoneyTransfer) pm.makePersistent(moneyTransfer);
 
 //		invoice.bookPayInvoiceMoneyTransfer(moneyTransfer, false);
 //		from.bookTransfer(user, moneyTransfer, involvedAnchors);
@@ -273,6 +274,7 @@ public class PartnerAccountant extends Accountant
 			User user, LegalEntity partner,
 			PayMoneyTransfer payMoneyTransfer, Map involvedAnchors)
 	{
+		PersistenceManager pm = getPersistenceManager();
 		Account partnerAccount = payMoneyTransfer.getPayment().getPartnerAccount();
 
 		if (partnerAccount != null && partner != null && !partnerAccount.getOwner().getPrimaryKey().equals(partner.getPrimaryKey()))
@@ -326,7 +328,7 @@ public class PartnerAccountant extends Accountant
 		List invoicesPayMoney = new LinkedList();
 		List invoicesReceiveMoney = new LinkedList();
 
-		Accounting accounting = Accounting.getAccounting(getPersistenceManager());
+		Accounting accounting = Accounting.getAccounting(pm);
 
 		/* allInvoicesBalance is the amount after summarizing all invoices
 		 * It is negative if the local organisation looses money to
@@ -691,12 +693,11 @@ public class PartnerAccountant extends Accountant
 			}
 
 			MoneyTransfer moneyTransfer = new MoneyTransfer(
-					accounting,
 					payMoneyTransfer,
 					from,
 					to,
 					amountToTransfer);
-
+			moneyTransfer = (MoneyTransfer) pm.makePersistent(moneyTransfer);
 			moneyTransfer.bookTransfer(user, involvedAnchors);
 		}
 	}

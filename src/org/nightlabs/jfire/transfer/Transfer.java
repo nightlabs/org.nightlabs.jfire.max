@@ -30,6 +30,9 @@ import java.io.Serializable;
 import java.util.Date;
 import java.util.Map;
 
+import javax.jdo.JDOHelper;
+
+import org.nightlabs.jfire.idgenerator.IDGenerator;
 import org.nightlabs.jfire.security.User;
 
 /**
@@ -111,17 +114,16 @@ public abstract class Transfer
 	/**
 	 * This constructor creates an instance of Transfer and automatically registers it in the TransferRegistry.
 	 *
-	 * @param transferRegistry The transferRegistry is used to obtain a primary key and to register this instance automatically there.
 	 * @param container Can be null. If not null, container defines the enclosing Transfer of which this Transfer is a part.
 	 * @param initiator The user which is responsible for this transfer. Must not be null.
 	 * @param from The source of this transfer. Must not be null.
 	 * @param to The destination of this transfer. Must not be null.
 	 */
-	public Transfer(TransferRegistry transferRegistry, String transferTypeID, Transfer container, User initiator, Anchor from, Anchor to)
+	public Transfer(String transferTypeID, Transfer container, User initiator, Anchor from, Anchor to)
 	{
-		this.organisationID = transferRegistry.getOrganisationID();
+		this.organisationID = IDGenerator.getOrganisationID();
 		this.transferTypeID = transferTypeID;
-		this.transferID = transferRegistry.createTransferID(transferTypeID);
+		this.transferID = IDGenerator.nextID(Transfer.class, transferTypeID);
 		this.container = container;
 		if (initiator == null)
 			throw new NullPointerException("initiator must not be null! Someone must be responsible!");
@@ -133,7 +135,6 @@ public abstract class Transfer
 			throw new NullPointerException("to must not be null! Even nirvana must be known as Anchor!");
 		this.to = to;
 		this.timestamp = new Date();
-		transferRegistry.addTransfer(this);
 	}
 
 	public static String getPrimaryKey(String organisationID, String transferTypeID, long transferID)
@@ -284,12 +285,18 @@ public abstract class Transfer
 	 */
 	public void bookTransfer(User user, Map<String, Anchor> involvedAnchors)
 	{
+		if (JDOHelper.getPersistenceManager(this) == null)
+			throw new IllegalStateException("This Transfer has not yet been persisted or it has been detached!");
+
 		from.bookTransfer(user, this, involvedAnchors);
 		to.bookTransfer(user, this, involvedAnchors);
 	}
 
 	public void rollbackTransfer(User user, Map<String, Anchor> involvedAnchors)
 	{
+		if (JDOHelper.getPersistenceManager(this) == null)
+			throw new IllegalStateException("This Transfer has not yet been persisted or it has been detached!");
+
 		from.rollbackTransfer(user, this, involvedAnchors);
 		to.rollbackTransfer(user, this, involvedAnchors);
 	}

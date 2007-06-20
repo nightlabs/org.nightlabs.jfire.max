@@ -40,7 +40,6 @@ import java.util.Set;
 import javax.jdo.JDOHelper;
 import javax.jdo.PersistenceManager;
 
-import org.nightlabs.jfire.accounting.Accounting;
 import org.nightlabs.jfire.accounting.Currency;
 import org.nightlabs.jfire.accounting.Invoice;
 import org.nightlabs.jfire.accounting.InvoiceMoneyTransfer;
@@ -1122,6 +1121,7 @@ public class PFMappingAccountantDelegate extends
 	
 	
 	protected void bookInvoiceTransfers(User user, Map<Anchor, Map<Anchor, Collection<BookInvoiceTransfer>>> bookInvoiceTransfers, BookMoneyTransfer container, Map<String, Anchor> involvedAnchors) {
+		PersistenceManager pm = getPersistenceManager();
 		for (Iterator iter = bookInvoiceTransfers.entrySet().iterator(); iter.hasNext();) {
 			Map.Entry entry = (Map.Entry) iter.next();
 			Anchor from = (Anchor)entry.getKey();
@@ -1142,12 +1142,11 @@ public class PFMappingAccountantDelegate extends
 				if (balance != 0) {
 					InvoiceMoneyTransfer moneyTransfer = new InvoiceMoneyTransfer(
 							InvoiceMoneyTransfer.BOOK_TYPE_BOOK,
-							Accounting.getAccounting(getPersistenceManager()),
 							container, aFrom, aTo,
 							container.getInvoice(),
 							Math.abs(balance)				
 						);
-//					getPersistenceManager().makePersistent(moneyTransfer); // done in constructor
+					moneyTransfer = (InvoiceMoneyTransfer) pm.makePersistent(moneyTransfer);
 					moneyTransfer.bookTransfer(user, involvedAnchors);					
 				}
 			}
@@ -1349,7 +1348,7 @@ public class PFMappingAccountantDelegate extends
 					from,
 					to,
 					amount
-				); 
+				);
 		}
 		result.add(transfer);
 		logBookInvoiceTransfers("getBookInvoiceTransferForSingleFragmentType ", result);

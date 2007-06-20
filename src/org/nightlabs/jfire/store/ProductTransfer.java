@@ -35,7 +35,6 @@ import java.util.Set;
 import org.nightlabs.jfire.security.User;
 import org.nightlabs.jfire.transfer.Anchor;
 import org.nightlabs.jfire.transfer.Transfer;
-import org.nightlabs.jfire.transfer.TransferRegistry;
 
 /**
  * @author Marco Schulze - marco at nightlabs dot de
@@ -50,6 +49,8 @@ import org.nightlabs.jfire.transfer.TransferRegistry;
  */
 public class ProductTransfer extends Transfer implements Serializable
 {
+	private static final long serialVersionUID = 1L;
+
 	public static final String TRANSFERTYPEID = "ProductTransfer";
 
 	/**
@@ -68,7 +69,7 @@ public class ProductTransfer extends Transfer implements Serializable
 	 *
 	 * @!jdo.map-vendor-extension vendor-name="jpox" key="key-length" value="max 130"
 	 */
-	private Set products = null;
+	private Set<Product> products = null;
 
 	/**
 	 * @deprecated Only for JDO!
@@ -83,11 +84,11 @@ public class ProductTransfer extends Transfer implements Serializable
 	 * @param products
 	 */
 	public ProductTransfer(
-			TransferRegistry transferRegistry, Transfer container, User initiator,
-			Anchor from, Anchor to, Collection products)
+			Transfer container, User initiator,
+			Anchor from, Anchor to, Collection<Product> products)
 	{
-		super(transferRegistry, TRANSFERTYPEID, container, initiator, from, to);
-		this.products = new HashSet(products);
+		super(TRANSFERTYPEID, container, initiator, from, to);
+		this.products = new HashSet<Product>(products);
 //		this.products = new HashMap();
 //
 //		// WORKAROUND begin

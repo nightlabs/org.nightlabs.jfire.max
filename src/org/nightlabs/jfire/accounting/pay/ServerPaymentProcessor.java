@@ -515,13 +515,13 @@ public PayMoneyTransfer payBegin(PayParams payParams)
 			return null;
 
 		PayMoneyTransfer payMoneyTransfer = new PayMoneyTransfer(
-				payParams.accounting,
 				null,
 				payParams.user,
 				from,
 				to,
 				payParams.paymentData.getPayment()
 			);
+		payMoneyTransfer = (PayMoneyTransfer) getPersistenceManager().makePersistent(payMoneyTransfer);
 
 		return payMoneyTransfer;
 	}

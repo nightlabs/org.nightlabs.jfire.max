@@ -40,7 +40,6 @@ import org.nightlabs.jfire.security.User;
 import org.nightlabs.jfire.store.DeliveryNote;
 import org.nightlabs.jfire.store.ProductTransfer;
 import org.nightlabs.jfire.store.ProductType;
-import org.nightlabs.jfire.store.Store;
 import org.nightlabs.jfire.store.book.id.LocalStorekeeperDelegateID;
 import org.nightlabs.jfire.trade.Article;
 import org.nightlabs.jfire.trade.OrganisationLegalEntity;
@@ -252,8 +251,6 @@ public class DefaultLocalStorekeeperDelegate extends LocalStorekeeperDelegate
 	@Override
 	public void postBookArticles(OrganisationLegalEntity mandator, User user, DeliveryNote deliveryNote, BookProductTransfer bookTransfer, Map<String, Anchor> involvedAnchors)
 	{
-		Store store = getStore();
-
 		Map productsByProductType = (Map) productsByProductTypeTL.get();
 		for (Iterator it = productsByProductType.entrySet().iterator(); it.hasNext(); ) {
 			Map.Entry me = (Map.Entry) it.next();
@@ -266,12 +263,13 @@ public class DefaultLocalStorekeeperDelegate extends LocalStorekeeperDelegate
 			// transfer products
 			ProductTransfer productTransfer;
 			if (bookTransfer.getAnchorType(mandator) == Transfer.ANCHORTYPE_TO)
-				productTransfer = new ProductTransfer(store, bookTransfer, user, mandator, home, products);
+				productTransfer = new ProductTransfer(bookTransfer, user, mandator, home, products);
 			else if (bookTransfer.getAnchorType(mandator) == Transfer.ANCHORTYPE_FROM)
-				productTransfer = new ProductTransfer(store, bookTransfer, user, home, mandator, products);
+				productTransfer = new ProductTransfer(bookTransfer, user, home, mandator, products);
 			else
 				throw new IllegalStateException("mandator is neither 'from' nor 'to' of bookTransfer!");
 
+			productTransfer = (ProductTransfer) getPersistenceManager().makePersistent(productTransfer);
 			productTransfer.bookTransfer(user, involvedAnchors);
 		}
 

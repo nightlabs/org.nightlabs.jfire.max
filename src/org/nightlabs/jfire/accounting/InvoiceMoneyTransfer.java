@@ -30,7 +30,6 @@ import java.util.Map;
 
 import org.nightlabs.jfire.security.User;
 import org.nightlabs.jfire.transfer.Anchor;
-import org.nightlabs.jfire.transfer.TransferRegistry;
 
 /**
  * @author Marco Schulze - marco at nightlabs dot de
@@ -46,6 +45,8 @@ import org.nightlabs.jfire.transfer.TransferRegistry;
 public class InvoiceMoneyTransfer
 extends MoneyTransfer
 {
+	private static final long serialVersionUID = 1L;
+
 	public static final String BOOK_TYPE_BOOK = "book";
 	public static final String BOOK_TYPE_PAY = "pay";
 
@@ -82,11 +83,11 @@ extends MoneyTransfer
 	 * @param amount
 	 */
 	public InvoiceMoneyTransfer(
-			String bookType, TransferRegistry transferRegistry,
+			String bookType,
 			User initiator, Anchor from, Anchor to,
 			Invoice invoice, long amount)
 	{
-		super(transferRegistry, null, initiator, from, to, getCurrency(invoice), amount);
+		super(null, initiator, from, to, getCurrency(invoice), amount);
 		this.invoice = invoice;
 		this.setBookType(bookType);
 	}
@@ -100,11 +101,11 @@ extends MoneyTransfer
 	 * @param amount
 	 */
 	public InvoiceMoneyTransfer(
-			String bookType, TransferRegistry transferRegistry,
+			String bookType,
 			MoneyTransfer containerMoneyTransfer, Anchor from, Anchor to,
 			Invoice invoice, long amount)
 	{
-		super(transferRegistry, containerMoneyTransfer, from, to, amount);
+		super(containerMoneyTransfer, from, to, amount);
 		this.invoice = invoice;
 		this.setBookType(bookType);
 	}

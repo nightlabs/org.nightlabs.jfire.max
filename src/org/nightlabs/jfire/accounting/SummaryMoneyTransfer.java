@@ -26,7 +26,6 @@
 
 package org.nightlabs.jfire.accounting;
 
-import org.nightlabs.jfire.transfer.TransferRegistry;
 
 /**
  * @author Alexander Bieber <alex[AT]nightlabs[DOT]de>
@@ -56,10 +55,9 @@ public class SummaryMoneyTransfer extends MoneyTransfer
 	 * @param currency
 	 * @param amount
 	 */
-	public SummaryMoneyTransfer(TransferRegistry transferRegistry,
-			InvoiceMoneyTransfer container, Account from, Account to, long amount)
+	public SummaryMoneyTransfer(InvoiceMoneyTransfer container, Account from, Account to, long amount)
 	{
-		super(transferRegistry, container, // container.getInitiator(), 
+		super(container, // container.getInitiator(), 
 					from, to, // container.getInvoice(),
 					amount);
 	}

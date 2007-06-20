@@ -89,8 +89,6 @@ import org.nightlabs.jfire.trade.id.ArticleID;
 import org.nightlabs.jfire.trade.jbpm.ProcessDefinitionAssignment;
 import org.nightlabs.jfire.trade.jbpm.id.ProcessDefinitionAssignmentID;
 import org.nightlabs.jfire.transfer.Anchor;
-import org.nightlabs.jfire.transfer.Transfer;
-import org.nightlabs.jfire.transfer.TransferRegistry;
 import org.nightlabs.jfire.transfer.id.AnchorID;
 
 /**
@@ -108,7 +106,7 @@ import org.nightlabs.jfire.transfer.id.AnchorID;
  * @jdo.inheritance strategy="new-table"
  */
 public class Accounting
-	implements TransferRegistry, StoreCallback, MoneyFlowMapping.Registry
+	implements StoreCallback, MoneyFlowMapping.Registry
 {
 	/**
 	 * LOG4J logger used by this class
@@ -216,58 +214,14 @@ public class Accounting
 		return accountingPriceConfig;
 	}
 
-
-/////////// begin implementation of TransferRegistry /////////////
-	/**
-	 * @jdo.field persistence-modifier="persistent"
-	 */	
-	private long nextTransferID = 0;
-	private static long _nextTransferID = -1;
-	private static Object _nextTransferIDMutex = new Object();
-
-	/**
-	 * This method adds an instance of Transfer. This is not necessary, if the Transfer has been created
-	 * by this organisation, because every Transfer does a self-registration.
-	 *
-	 * @param transfer
-	 */
-	public void addTransfer(Transfer transfer)
-	{
-		if (transfer == null)
-			throw new NullPointerException("transfer is null!");
-
-		if (transfer.getOrganisationID() == null)
-			throw new NullPointerException("transfer.organisationID is null!");
-
-		if (transfer.getTransferID() < 0)
-			throw new NullPointerException("transfer.transferID < 0!");
-
-		getPersistenceManager().makePersistent(transfer);
-	}
-
-	public long createTransferID(String transferTypeID)
-	{
-		if (!MoneyTransfer.TRANSFERTYPEID.equals(transferTypeID))
-			throw new IllegalArgumentException("This implementation of TransferRegistry manages only Transfers with transferTypeID=\""+MoneyTransfer.TRANSFERTYPEID+"\"!");
-
-		synchronized (_nextTransferIDMutex) {
-			if (_nextTransferID < 0)
-				_nextTransferID = nextTransferID;
-
-			long res = _nextTransferID++;
-			nextTransferID = _nextTransferID;
-			return res;
-		}
-	}
-/////////// end implementation of TransferRegistry /////////////
-
 	/**
 	 * @jdo.field persistence-modifier="persistent"
 	 */	
 	private int nextMoneyFlowMappingID = 0;
 	private static int _nextMoneyFlowMappingID = -1;
 	private static Object _nextMoneyFlowMappingIDMutex = new Object();
-	
+
+	// TODO replace this by usage of IDGenerator!
 	public int createMoneyFlowMappingID() {
 		synchronized(_nextMoneyFlowMappingIDMutex) {
 			if (_nextMoneyFlowMappingID < 0)
@@ -505,6 +459,9 @@ public class Accounting
 		if (invoiceLocal.isBooked())
 			return;
 
+
+		PersistenceManager pm = getPersistenceManager();
+
 		LegalEntity from = invoice.getCustomer();
 		LegalEntity to = invoice.getVendor();
 
@@ -537,12 +494,12 @@ public class Accounting
 		}
 
 		BookMoneyTransfer bookMoneyTransfer = new BookMoneyTransfer(
-				this,
 				user,
 				from,
 				to,			
 				invoice
 			);
+		bookMoneyTransfer = (BookMoneyTransfer) pm.makePersistent(bookMoneyTransfer);
 
 		Map<String, Anchor> involvedAnchors = new HashMap<String, Anchor>();
 		ArrayList containers = new ArrayList(1);
@@ -1135,12 +1092,6 @@ public class Accounting
 	{
 		if (_nextMoneyFlowMappingID >= 0 && nextMoneyFlowMappingID != _nextMoneyFlowMappingID)
 			nextMoneyFlowMappingID = _nextMoneyFlowMappingID;
-
-		if (_nextTransferID >= 0 && nextTransferID != _nextTransferID)
-			nextTransferID = _nextTransferID;
-
-//		if (_nextPriceCoordinateID >= 0 && nextPriceCoordinateID != _nextPriceCoordinateID)
-//			nextPriceCoordinateID = _nextPriceCoordinateID;
 	}
 
 	private static void setStateDefinitionProperties(

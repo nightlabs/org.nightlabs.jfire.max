@@ -29,7 +29,6 @@ package org.nightlabs.jfire.accounting;
 import org.nightlabs.jfire.security.User;
 import org.nightlabs.jfire.transfer.Anchor;
 import org.nightlabs.jfire.transfer.Transfer;
-import org.nightlabs.jfire.transfer.TransferRegistry;
 
 /**
  * @author Alexander Bieber <alex[AT]nightlabs[DOT]de>
@@ -44,6 +43,8 @@ import org.nightlabs.jfire.transfer.TransferRegistry;
  */
 public class MoneyTransfer extends Transfer
 {
+	private static final long serialVersionUID = 1L;
+
 	public static final String TRANSFERTYPEID = "MoneyTransfer";
 
 	/**
@@ -71,10 +72,10 @@ public class MoneyTransfer extends Transfer
 	 * @param currency
 	 * @param amount
 	 */
-	public MoneyTransfer(TransferRegistry transferRegistry, Transfer container,
+	public MoneyTransfer(Transfer container,
 			User initiator, Anchor from, Anchor to, Currency currency, long amount)
 	{
-		super(transferRegistry, TRANSFERTYPEID, container, initiator, from, to);
+		super(TRANSFERTYPEID, container, initiator, from, to);
 
 		if (currency == null)
 			throw new NullPointerException("currency must not be null!");
@@ -120,11 +121,10 @@ public class MoneyTransfer extends Transfer
 	 * @param currency
 	 * @param amount
 	 */
-	public MoneyTransfer(TransferRegistry transferRegistry,
-			MoneyTransfer containerMoneyTransfer, Anchor from, Anchor to, 
+	public MoneyTransfer(MoneyTransfer containerMoneyTransfer, Anchor from, Anchor to, 
 			long amount)
 	{
-		this(transferRegistry, containerMoneyTransfer, containerMoneyTransfer.getInitiator(),
+		this(containerMoneyTransfer, containerMoneyTransfer.getInitiator(),
 				from, to,
 				containerMoneyTransfer.getCurrency(),
 				amount);
@@ -163,10 +163,9 @@ public class MoneyTransfer extends Transfer
 	 * @param from
 	 * @param to
 	 */
-	public MoneyTransfer(TransferRegistry transferRegistry,
-			MoneyTransfer containerMoneyTransfer, Anchor from, Anchor to) 
+	public MoneyTransfer(MoneyTransfer containerMoneyTransfer, Anchor from, Anchor to) 
 	{
-		this(transferRegistry, containerMoneyTransfer, containerMoneyTransfer.getInitiator(),
+		this(containerMoneyTransfer, containerMoneyTransfer.getInitiator(),
 				from, to,
 				containerMoneyTransfer.getCurrency(),
 				containerMoneyTransfer.getAmount()

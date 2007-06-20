@@ -31,13 +31,15 @@ import java.util.Collection;
 import java.util.Iterator;
 import java.util.List;
 
+import javax.jdo.JDOHelper;
+import javax.jdo.PersistenceManager;
+
 import org.nightlabs.jfire.security.User;
 import org.nightlabs.jfire.store.DeliveryNote;
 import org.nightlabs.jfire.store.DeliveryNoteProductTransfer;
 import org.nightlabs.jfire.trade.Article;
 import org.nightlabs.jfire.trade.LegalEntity;
 import org.nightlabs.jfire.transfer.Anchor;
-import org.nightlabs.jfire.transfer.TransferRegistry;
 
 /**
  * @author Marco Schulze - marco at nightlabs dot de
@@ -85,35 +87,37 @@ public class BookProductTransfer extends DeliveryNoteProductTransfer
 	 * @return
 	 */
 	public static List createBookProductTransfers(
-			TransferRegistry transferRegistry, User initiator, DeliveryNote deliveryNote)
+			User initiator, DeliveryNote deliveryNote)
 	{
 		if (deliveryNote.getDeliveryNoteLocal().isBooked())
 			throw new IllegalArgumentException("deliveryNote is already booked!");
+
+		PersistenceManager pm = JDOHelper.getPersistenceManager(deliveryNote);
 
 		List res = new ArrayList(2);
 		Collection productsNormal = getProducts(deliveryNote, false);
 		Collection productsReversing = getProducts(deliveryNote, true);
 
 		if (productsNormal != null)
-			res.add(new BookProductTransfer(
-					transferRegistry, initiator,
+			res.add(pm.makePersistent(new BookProductTransfer(
+					initiator,
 					deliveryNote.getVendor(), deliveryNote.getCustomer(),
-					deliveryNote, productsNormal));
+					deliveryNote, productsNormal)));
 
 		if (productsReversing != null)
-			res.add(new BookProductTransfer(
-					transferRegistry, initiator,
+			res.add(pm.makePersistent(new BookProductTransfer(
+					initiator,
 					deliveryNote.getCustomer(), deliveryNote.getVendor(),
-					deliveryNote, productsReversing));
+					deliveryNote, productsReversing)));
 
 		return res;
 	}
 
 	protected BookProductTransfer(
-			TransferRegistry transferRegistry, User initiator,
+			User initiator,
 			Anchor from, Anchor to, DeliveryNote deliveryNote, Collection products)
 	{
-		super(BOOK_TYPE_BOOK, transferRegistry, initiator, from, to, deliveryNote, products);
+		super(BOOK_TYPE_BOOK, initiator, from, to, deliveryNote, products);
 
 		if (!(from instanceof LegalEntity))
 			throw new IllegalArgumentException("from must be an instance of LegalEntity, but is of type " + from.getClass().getName());

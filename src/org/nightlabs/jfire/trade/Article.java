@@ -642,7 +642,7 @@ public class Article
 		this.productType = reversedArticle.getProductType();
 		this.product = reversedArticle.getProduct();
 		this.tariff = reversedArticle.getTariff();
-		this.price = reversedArticle.getPrice().createRefundPrice();
+		this.price = reversedArticle.getPrice().createReversingArticlePrice();
 
 		// copy status
 		this.allocated = reversedArticle.isAllocated();

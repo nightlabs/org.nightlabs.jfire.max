@@ -34,6 +34,7 @@ import java.util.Map;
 import java.util.Set;
 
 import javax.jdo.JDOHelper;
+import javax.jdo.PersistenceManager;
 
 import org.nightlabs.jfire.security.User;
 import org.nightlabs.jfire.trade.LegalEntity;
@@ -297,7 +298,7 @@ public class Account extends Anchor
 	protected void bookSummaryTransfers(User user, MoneyTransfer moneyTransfer, Map<String, Anchor> involvedAnchors) {
 		skip_bookAccountMoneyTransfer = true;
 		try {
-			Accounting accounting = Accounting.getAccounting(JDOHelper.getPersistenceManager(this));
+			PersistenceManager pm = JDOHelper.getPersistenceManager(this);
 			boolean isDebit = Transfer.ANCHORTYPE_FROM == moneyTransfer.getAnchorType(this);
 			for (Iterator iter = getSummaryAccounts().iterator(); iter.hasNext();) {
 				SummaryAccount summaryAccount = (SummaryAccount) iter.next();
@@ -314,13 +315,13 @@ public class Account extends Anchor
 	//			}
 	
 				SummaryMoneyTransfer summaryMoneyTransfer = new SummaryMoneyTransfer(
-						accounting,
 						(InvoiceMoneyTransfer)(moneyTransfer.getContainer() == null ? moneyTransfer : moneyTransfer.getContainer()),
 	//					from, to,
 						(isDebit) ? summaryAccount : this,
 						(isDebit) ? this : summaryAccount,
 						moneyTransfer.getAmount()
 				);
+				summaryMoneyTransfer = (SummaryMoneyTransfer) pm.makePersistent(summaryMoneyTransfer);
 	//			JDOHelper.getPersistenceManager(this).makePersistent(summaryMoneyTransfer); // done in constructor
 				summaryMoneyTransfer.bookTransfer(user, involvedAnchors);
 	//			SummaryAccount.bookTransfer(user, summaryMoneyTransfer, involvedAnchors);

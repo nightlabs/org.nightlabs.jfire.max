@@ -32,7 +32,6 @@ import org.nightlabs.jfire.accounting.InvoiceMoneyTransfer;
 import org.nightlabs.jfire.security.User;
 import org.nightlabs.jfire.trade.LegalEntity;
 import org.nightlabs.jfire.transfer.Anchor;
-import org.nightlabs.jfire.transfer.TransferRegistry;
 
 /**
  * An <tt>BookMoneyTransfer</tt> is a <tt>MoneyTransfer</tt> which
@@ -51,6 +50,8 @@ import org.nightlabs.jfire.transfer.TransferRegistry;
  */
 public class BookMoneyTransfer extends InvoiceMoneyTransfer
 {
+	private static final long serialVersionUID = 1L;
+
 	private static final Logger logger = Logger.getLogger(BookMoneyTransfer.class);
 
 	/**
@@ -76,9 +77,9 @@ public class BookMoneyTransfer extends InvoiceMoneyTransfer
 	 * @param invoice
 	 * @param amount
 	 */
-	public BookMoneyTransfer(TransferRegistry transferRegistry, User initiator, Anchor from, Anchor to, Invoice invoice)
+	public BookMoneyTransfer(User initiator, Anchor from, Anchor to, Invoice invoice)
 	{
-		super(BOOK_TYPE_BOOK, transferRegistry, initiator, from, to, invoice, getAmountAbsoluteValue(invoice));
+		super(BOOK_TYPE_BOOK, initiator, from, to, invoice, getAmountAbsoluteValue(invoice));
 
 		if (!(from instanceof LegalEntity))
 			throw new IllegalArgumentException("from must be an instance of LegalEntity, but is of type " + from.getClass().getName());

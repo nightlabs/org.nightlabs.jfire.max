@@ -32,7 +32,6 @@ import java.util.Map;
 import org.nightlabs.jfire.security.User;
 import org.nightlabs.jfire.transfer.Anchor;
 import org.nightlabs.jfire.transfer.Transfer;
-import org.nightlabs.jfire.transfer.TransferRegistry;
 
 /**
  * @author Marco Schulze - marco at nightlabs dot de
@@ -66,11 +65,11 @@ public class DeliveryNoteProductTransfer extends ProductTransfer
 	protected DeliveryNoteProductTransfer() { }
 
 	public DeliveryNoteProductTransfer(
-			String bookType, TransferRegistry transferRegistry,
+			String bookType,
 			User initiator, Anchor from, Anchor to,
-			DeliveryNote deliveryNote, Collection products)
+			DeliveryNote deliveryNote, Collection<Product> products)
 	{
-		super(transferRegistry, (ProductTransfer)null, initiator, from, to, products);
+		super((ProductTransfer)null, initiator, from, to, products);
 
 		if (deliveryNote == null)
 			throw new IllegalArgumentException("deliveryNote must not be null!");
@@ -81,11 +80,11 @@ public class DeliveryNoteProductTransfer extends ProductTransfer
 	}
 
 	public DeliveryNoteProductTransfer(
-			String bookType, TransferRegistry transferRegistry,
+			String bookType,
 			Transfer container, Anchor from, Anchor to,
-			DeliveryNote deliveryNote, Collection products)
+			DeliveryNote deliveryNote, Collection<Product> products)
 	{
-		super(transferRegistry, container, (User)null, from, to, products);
+		super(container, (User)null, from, to, products);
 
 		if (deliveryNote == null)
 			throw new IllegalArgumentException("deliveryNote must not be null!");

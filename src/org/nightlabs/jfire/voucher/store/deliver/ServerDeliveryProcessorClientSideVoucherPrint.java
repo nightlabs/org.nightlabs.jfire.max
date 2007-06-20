@@ -7,10 +7,14 @@ import javax.jdo.PersistenceManager;
 
 import org.nightlabs.jfire.accounting.pay.id.ServerPaymentProcessorID;
 import org.nightlabs.jfire.organisation.Organisation;
+import org.nightlabs.jfire.store.deliver.CheckRequirementsEnvironment;
 import org.nightlabs.jfire.store.deliver.DeliveryException;
 import org.nightlabs.jfire.store.deliver.DeliveryResult;
 import org.nightlabs.jfire.store.deliver.ServerDeliveryProcessor;
+import org.nightlabs.jfire.trade.Article;
+import org.nightlabs.jfire.trade.id.ArticleID;
 import org.nightlabs.jfire.transfer.Anchor;
+import org.nightlabs.jfire.voucher.store.VoucherType;
 
 /**
  * This implementation of {@link ServerDeliveryProcessor} is used for client-sided voucher print.
@@ -82,5 +86,23 @@ extends ServerDeliveryProcessor
 	@Override
 	public Anchor getAnchorOutside(DeliverParams deliverParams) {
 		return getRepositoryOutside(deliverParams, "anchorOutside.voucherPrint");
+	}
+
+	@Override
+	protected String _checkRequirements(CheckRequirementsEnvironment checkRequirementsEnvironment)
+	{
+		PersistenceManager pm = getPersistenceManager();
+		for (ArticleID articleID : checkRequirementsEnvironment.getArticleIDs()) {
+			Article article = (Article) pm.getObjectById(articleID);
+			if (!(article.getProductType() instanceof VoucherType))
+				throw new IllegalArgumentException("The Article does not contain VoucherType! " + articleID);
+
+			VoucherType voucherType = (VoucherType) article.getProductType();
+
+			if (voucherType.getVoucherLayout() == null)
+				return this.getClass().getName() + ".MISSING_VOUCHER_LAYOUT";
+		} // for (ArticleID articleID : articleIDs) {
+
+		return null;
 	}
 }

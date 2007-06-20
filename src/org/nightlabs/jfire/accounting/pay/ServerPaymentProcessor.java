@@ -37,6 +37,7 @@ import javax.jdo.JDOHelper;
 import javax.jdo.JDOObjectNotFoundException;
 import javax.jdo.PersistenceManager;
 import javax.jdo.Query;
+import javax.jdo.listener.DetachCallback;
 
 import org.nightlabs.jfire.accounting.Account;
 import org.nightlabs.jfire.accounting.Accounting;
@@ -124,7 +125,8 @@ import org.nightlabs.jfire.transfer.id.AnchorID;
  *            	import java.lang.String;
  *            	import org.nightlabs.jfire.accounting.pay.ModeOfPaymentFlavour"
  */
-public abstract class ServerPaymentProcessor implements Serializable
+public abstract class ServerPaymentProcessor
+implements Serializable, DetachCallback
 {
 	public static final String FETCH_GROUP_NAME = "ServerPaymentProcessor.name";
 
@@ -723,27 +725,41 @@ public PayMoneyTransfer payBegin(PayParams payParams)
 	public String getRequirementCheckKey() {
 		return requirementCheckKey;
 	}
-	
-	public void setRequirementCheckKey(String reqMsg) {
-		this.requirementCheckKey = reqMsg;
-	}
-	
+
+//	public void setRequirementCheckKey(String reqMsg) {
+//		this.requirementCheckKey = reqMsg;
+//	}
+
 	/**
 	 * This method is not supposed to be called from outside.
-	 * Extendors should implement {@link #_checkRequirements()} instead of this method.
+	 * Extendors should implement {@link #_checkRequirements(CheckRequirementsEnvironment)} instead of this method.
+	 * @param checkRequirementsEnvironment TODO
 	 */
-	public void checkRequirements() {
-		requirementCheckKey = _checkRequirements();
+	public void checkRequirements(CheckRequirementsEnvironment checkRequirementsEnvironment) {
+		requirementCheckKey = _checkRequirements(checkRequirementsEnvironment);
 	}
-	
+
 	/**
 	 * Extendors should override this method if their {@link ServerPaymentProcessor} if
 	 * it needs to ensure some requirements before it can be used. If everything is ok, this
 	 * method should return null. Otherwise a string describing the failure should be returned.
+	 * @param checkRequirementsEnvironment TODO
 	 * 
 	 * @return null if everything is ok, a descriptive string otherwise.
 	 */
-	protected String _checkRequirements() {
+	protected String _checkRequirements(CheckRequirementsEnvironment checkRequirementsEnvironment) {
 		return null;
+	}
+
+	public void jdoPreDetach()
+	{
+		// nothing to do
+	}
+	public void jdoPostDetach(Object o)
+	{
+		ServerPaymentProcessor detached = this;
+		ServerPaymentProcessor attached = (ServerPaymentProcessor) o;
+
+		detached.requirementCheckKey = attached.requirementCheckKey;
 	}
 }

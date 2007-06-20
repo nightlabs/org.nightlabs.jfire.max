@@ -800,7 +800,7 @@ implements Serializable, StoreCallback
 	/**
 	 * @jdo.field persistence-modifier="transactional"
 	 */
-	private Collection<ArticleID> articleIDs = null;
+	private Set<ArticleID> articleIDs = null;
 
 //	/**
 //	 * @jdo.field persistence-modifier="transactional"
@@ -895,7 +895,7 @@ implements Serializable, StoreCallback
 	/**
 	 * @return Returns instances of {@link org.nightlabs.jfire.trade.id.ArticleID}.
 	 */
-	public Collection<ArticleID> getArticleIDs()
+	public Set<ArticleID> getArticleIDs()
 	{
 		if (articleIDs == null) {
 			HashSet s = new HashSet();
@@ -939,7 +939,7 @@ implements Serializable, StoreCallback
 	/**
 	 * @param articleIDs Instances of {@link org.nightlabs.jfire.trade.id.ArticleID}
 	 */
-	public void setArticleIDs(Collection<ArticleID> articleIDs)
+	public void setArticleIDs(Set<ArticleID> articleIDs)
 	{
 		if (articleIDs == null)
 			throw new IllegalArgumentException("articleIDs must not be null!");

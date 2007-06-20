@@ -31,12 +31,10 @@ import java.io.Serializable;
 import java.rmi.RemoteException;
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Locale;
-import java.util.Map;
 import java.util.Set;
 
 import javax.ejb.CreateException;
@@ -65,6 +63,7 @@ import org.nightlabs.jfire.jbpm.JbpmLookup;
 import org.nightlabs.jfire.jbpm.graph.def.ProcessDefinition;
 import org.nightlabs.jfire.organisation.Organisation;
 import org.nightlabs.jfire.security.User;
+import org.nightlabs.jfire.store.deliver.CheckRequirementsEnvironment;
 import org.nightlabs.jfire.store.deliver.DeliveryData;
 import org.nightlabs.jfire.store.deliver.DeliveryException;
 import org.nightlabs.jfire.store.deliver.DeliveryHelperLocal;
@@ -654,10 +653,12 @@ implements SessionBean
 	 *
 	 * @ejb.interface-method
 	 * @ejb.permission role-name="_Guest_"
-	 * @ejb.transaction type = "Supports"
+	 * @ejb.transaction type="Supports"
 	 */
 	public Collection<ServerDeliveryProcessor> getServerDeliveryProcessorsForOneModeOfDeliveryFlavour(
-			ModeOfDeliveryFlavourID modeOfDeliveryFlavourID, String[] fetchGroups, int maxFetchDepth)
+			ModeOfDeliveryFlavourID modeOfDeliveryFlavourID,
+			CheckRequirementsEnvironment checkRequirementsEnvironment,
+			String[] fetchGroups, int maxFetchDepth)
 	{
 		PersistenceManager pm = getPersistenceManager();
 		try {
@@ -668,19 +669,19 @@ implements SessionBean
 			Collection<ServerDeliveryProcessor> c = ServerDeliveryProcessor.getServerDeliveryProcessorsForOneModeOfDeliveryFlavour(
 					pm, modeOfDeliveryFlavourID);
 			
-			Map<String, String> requirementMsgMap = new HashMap<String, String>();
-			
+//			Map<String, String> requirementMsgMap = new HashMap<String, String>();
+//
 			for (ServerDeliveryProcessor pp : c) {
-				pp.checkRequirements();
-				requirementMsgMap.put(pp.getServerDeliveryProcessorID(), pp.getRequirementCheckKey());
+				pp.checkRequirements(checkRequirementsEnvironment);
+//				requirementMsgMap.put(pp.getServerDeliveryProcessorID(), pp.getRequirementCheckKey());
 			}
 
 			c = pm.detachCopyAll(c);
 			
-			for (ServerDeliveryProcessor pp : c) {
-				String reqMsg = requirementMsgMap.get(pp.getServerDeliveryProcessorID());
-				pp.setRequirementCheckKey(reqMsg);
-			}
+//			for (ServerDeliveryProcessor pp : c) {
+//				String reqMsg = requirementMsgMap.get(pp.getServerDeliveryProcessorID());
+//				pp.setRequirementCheckKey(reqMsg);
+//			}
 
 			return c;
 			

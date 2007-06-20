@@ -76,6 +76,7 @@ import org.nightlabs.jfire.accounting.id.InvoiceLocalID;
 import org.nightlabs.jfire.accounting.id.PriceFragmentTypeID;
 import org.nightlabs.jfire.accounting.id.TariffID;
 import org.nightlabs.jfire.accounting.id.TariffMappingID;
+import org.nightlabs.jfire.accounting.pay.CheckRequirementsEnvironment;
 import org.nightlabs.jfire.accounting.pay.ModeOfPayment;
 import org.nightlabs.jfire.accounting.pay.ModeOfPaymentConst;
 import org.nightlabs.jfire.accounting.pay.ModeOfPaymentFlavour;
@@ -2348,10 +2349,12 @@ public abstract class AccountingManagerBean
 	 *
 	 * @ejb.interface-method
 	 * @ejb.permission role-name="_Guest_"
-	 * @ejb.transaction type = "Supports"
+	 * @ejb.transaction type="Supports"
 	 */
 	public Collection<ServerPaymentProcessor> getServerPaymentProcessorsForOneModeOfPaymentFlavour(
-			ModeOfPaymentFlavourID modeOfPaymentFlavourID, String[] fetchGroups, int maxFetchDepth)
+			ModeOfPaymentFlavourID modeOfPaymentFlavourID,
+			CheckRequirementsEnvironment checkRequirementsEnvironment,
+			String[] fetchGroups, int maxFetchDepth)
 	{
 		PersistenceManager pm = getPersistenceManager();
 		try {
@@ -2362,20 +2365,20 @@ public abstract class AccountingManagerBean
 			Collection<ServerPaymentProcessor> c = ServerPaymentProcessor.getServerPaymentProcessorsForOneModeOfPaymentFlavour(
 					pm, modeOfPaymentFlavourID);
 			
-			Map<String, String> requirementMsgMap = new HashMap<String, String>();
-			
+//			Map<String, String> requirementMsgMap = new HashMap<String, String>();
+//
 			for (ServerPaymentProcessor pp : c) {
-				pp.checkRequirements();
-				requirementMsgMap.put(pp.getServerPaymentProcessorID(), pp.getRequirementCheckKey());
+				pp.checkRequirements(checkRequirementsEnvironment);
+//				requirementMsgMap.put(pp.getPrimaryKey(), pp.getRequirementCheckKey());
 			}
 
 			c = pm.detachCopyAll(c);
-			
-			for (ServerPaymentProcessor pp : c) {
-				String reqMsg = requirementMsgMap.get(pp.getServerPaymentProcessorID());
-				pp.setRequirementCheckKey(reqMsg);
-			}
-			
+
+//			for (ServerPaymentProcessor pp : c) {
+//				String reqMsg = requirementMsgMap.get(pp.getServerPaymentProcessorID());
+//				pp.setRequirementCheckKey(reqMsg);
+//			}
+
 			return c;
 		} finally {
 			pm.close();

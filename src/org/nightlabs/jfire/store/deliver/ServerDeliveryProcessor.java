@@ -36,6 +36,7 @@ import java.util.Set;
 import javax.jdo.JDOHelper;
 import javax.jdo.PersistenceManager;
 import javax.jdo.Query;
+import javax.jdo.listener.DetachCallback;
 
 import org.nightlabs.jfire.security.User;
 import org.nightlabs.jfire.store.Repository;
@@ -103,7 +104,7 @@ import org.nightlabs.jfire.transfer.Anchor;
  *            	import org.nightlabs.jfire.store.deliver.ModeOfDelivery"
  */
 public abstract class ServerDeliveryProcessor
-implements Serializable
+implements Serializable, DetachCallback
 {
 	public static final String FETCH_GROUP_NAME = "ServerDeliveryProcessor.name";
 
@@ -672,27 +673,41 @@ implements Serializable
 	public String getRequirementCheckKey() {
 		return requirementCheckKey;
 	}
-	
-	public void setRequirementCheckKey(String reqCheckKey) {
-		this.requirementCheckKey = reqCheckKey;
-	}
-	
+
+//	public void setRequirementCheckKey(String reqCheckKey) {
+//		this.requirementCheckKey = reqCheckKey;
+//	}
+
 	/**
 	 * This method is not supposed to be called from outside.
-	 * Extendors should implement {@link #_checkRequirements()} instead of this method.
+	 * Extendors should implement {@link #_checkRequirements(CheckRequirementsEnvironment)} instead of this method.
+	 * @param checkRequirementsEnvironment TODO
 	 */
-	public void checkRequirements() {
-		requirementCheckKey = _checkRequirements();
+	public void checkRequirements(CheckRequirementsEnvironment checkRequirementsEnvironment) {
+		requirementCheckKey = _checkRequirements(checkRequirementsEnvironment);
 	}
-	
+
 	/**
 	 * Extendors should override this method if their {@link ServerDeliveryProcessor} if
 	 * it needs to ensure some requirements before it can be used. If everything is ok, this
 	 * method should return null. Otherwise a string describing the failure should be returned.
+	 * @param checkRequirementsEnvironment TODO
 	 * 
 	 * @return null if everything is ok, a descriptive string otherwise.
 	 */
-	protected String _checkRequirements() {
+	protected String _checkRequirements(CheckRequirementsEnvironment checkRequirementsEnvironment) {
 		return null;
+	}
+
+	public void jdoPreDetach()
+	{
+		// nothing to do
+	}
+	public void jdoPostDetach(Object o)
+	{
+		ServerDeliveryProcessor detached = this;
+		ServerDeliveryProcessor attached = (ServerDeliveryProcessor) o;
+
+		detached.requirementCheckKey = attached.requirementCheckKey;
 	}
 }

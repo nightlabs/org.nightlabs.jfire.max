@@ -42,6 +42,7 @@ import javax.jdo.PersistenceManager;
 import javax.jdo.Query;
 import javax.jdo.listener.StoreCallback;
 
+import org.nightlabs.jdo.ObjectIDUtil;
 import org.nightlabs.util.CollectionUtil;
 
 /**
@@ -222,7 +223,7 @@ import org.nightlabs.util.CollectionUtil;
 	
 	public static String getPrimaryKey(String organisationID, long scriptParameterSetID)
 	{
-		return organisationID + '/' + scriptParameterSetID;
+		return organisationID + '/' + ObjectIDUtil.longObjectIDFieldToString(scriptParameterSetID);
 	}
 
 	public ScriptParameterSetName getName() {

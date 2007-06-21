@@ -1063,17 +1063,18 @@ implements SessionBean
 			for (Iterator it = priceCells.iterator(); it.hasNext(); ) {
 				PriceCell priceCell = (PriceCell) it.next();
 				String tariffPK = priceCell.getPriceCoordinate().getTariffPK();
-				String[] tariffPKParts = tariffPKSplitPattern.split(tariffPK);
-				if (tariffPKParts.length != 2)
-					throw new IllegalStateException("How the hell can it happen that the tariffPK does not consist out of two parts?");
-
-				String tariffOrganisationID = tariffPKParts[0];
-				long tariffID = Long.parseLong(tariffPKParts[1], 16);
+				TariffID tariffID = TariffID.create(tariffPK);
+//				String[] tariffPKParts = tariffPKSplitPattern.split(tariffPK);
+//				if (tariffPKParts.length != 2)
+//					throw new IllegalStateException("How the hell can it happen that the tariffPK does not consist out of two parts?");
+//
+//				String tariffOrganisationID = tariffPKParts[0];
+//				long tariffID = Long.parseLong(tariffPKParts[1], 16);
 
 				if (tariffFetchGroups != null)
 					pm.getFetchPlan().setGroups(tariffFetchGroups);
 
-				Tariff tariff = (Tariff) pm.getObjectById(TariffID.create(tariffOrganisationID, tariffID));
+				Tariff tariff = (Tariff) pm.getObjectById(tariffID); // TariffID.create(tariffOrganisationID, tariffID));
 				tariff = (Tariff) pm.detachCopy(tariff);
 
 				if (priceFetchGroups != null)

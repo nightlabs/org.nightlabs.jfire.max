@@ -28,6 +28,8 @@ package org.nightlabs.jfire.store;
 
 import java.io.Serializable;
 
+import org.nightlabs.jdo.ObjectIDUtil;
+
 /**
  * @author Marco Schulze - marco at nightlabs dot de
  *
@@ -119,7 +121,7 @@ implements Serializable
 
 	public String getPrimaryKey()
 	{
-		return organisationID + '/' + anchorTypeID + '/' + productReferenceGroupID + '/' + productOrganisationID + '/' + Long.toHexString(productProductID);
+		return organisationID + '/' + anchorTypeID + '/' + productReferenceGroupID + '/' + productOrganisationID + '/' + ObjectIDUtil.longObjectIDFieldToString(productProductID);
 	}
 
 	public int getQuantity()

@@ -36,6 +36,8 @@ import java.util.Map;
 import javax.jdo.JDOHelper;
 import javax.jdo.PersistenceManager;
 
+import org.nightlabs.jdo.ObjectIDUtil;
+
 /**
  * @author Marco Schulze - marco at nightlabs dot de
  *
@@ -162,7 +164,7 @@ public class Price
 	
 	public static String getPrimaryKey(String organisationID, long priceConfigID, long priceID)
 	{
-		return organisationID + '/' + Long.toHexString(priceConfigID) + '/' + Long.toHexString(priceID);
+		return organisationID + '/' + ObjectIDUtil.longObjectIDFieldToString(priceConfigID) + '/' + ObjectIDUtil.longObjectIDFieldToString(priceID);
 	}
 
 	public String getPrimaryKey()

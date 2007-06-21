@@ -370,7 +370,7 @@ implements
 	}
 	public static String getPrimaryKey(String organisationID, String offerIDPrefix, long offerID)
 	{
-		return organisationID + '/' + offerIDPrefix + '/' + Long.toHexString(offerID);
+		return organisationID + '/' + offerIDPrefix + '/' + ObjectIDUtil.longObjectIDFieldToString(offerID);
 	}
 
 	public String getPrimaryKey()

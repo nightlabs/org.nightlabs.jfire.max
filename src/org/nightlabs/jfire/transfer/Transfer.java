@@ -32,6 +32,7 @@ import java.util.Map;
 
 import javax.jdo.JDOHelper;
 
+import org.nightlabs.jdo.ObjectIDUtil;
 import org.nightlabs.jfire.idgenerator.IDGenerator;
 import org.nightlabs.jfire.security.User;
 
@@ -139,7 +140,7 @@ public abstract class Transfer
 
 	public static String getPrimaryKey(String organisationID, String transferTypeID, long transferID)
 	{
-		return organisationID + '/' + transferTypeID + '/' + Long.toHexString(transferID);
+		return organisationID + '/' + transferTypeID + '/' + ObjectIDUtil.longObjectIDFieldToString(transferID);
 	}
 
 	public String getPrimaryKey()

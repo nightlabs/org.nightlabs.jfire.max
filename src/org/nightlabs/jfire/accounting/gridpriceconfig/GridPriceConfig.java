@@ -35,6 +35,7 @@ import java.util.Map;
 import javax.jdo.JDOHelper;
 import javax.jdo.PersistenceManager;
 
+import org.nightlabs.annotation.Implement;
 import org.nightlabs.jfire.accounting.Currency;
 import org.nightlabs.jfire.accounting.PriceFragmentType;
 import org.nightlabs.jfire.accounting.Tariff;
@@ -117,9 +118,7 @@ public abstract class GridPriceConfig extends PriceConfig
 		super(organisationID, priceConfigID);
 	}
 
-	/**
-	 * @see org.nightlabs.jfire.accounting.priceconfig.PriceConfig#isDependentOnOffer()
-	 */
+	@Implement
 	public boolean isDependentOnOffer()
 	{
 		return false;
@@ -164,7 +163,7 @@ public abstract class GridPriceConfig extends PriceConfig
 	{
 		return null == tariffs.put(tariff.getPrimaryKey(), tariff);
 	}
-	public Tariff getTariff(String organisationID, long tariffID, boolean throwExceptionIfNotExistent)
+	public Tariff getTariff(String organisationID, String tariffID, boolean throwExceptionIfNotExistent)
 	{
 		Tariff tariff = (Tariff) tariffs.get(Tariff.getPrimaryKey(organisationID, tariffID));
 		if (tariff == null && throwExceptionIfNotExistent)
@@ -176,7 +175,7 @@ public abstract class GridPriceConfig extends PriceConfig
 	{
 		return tariffs.containsKey(tariff.getPrimaryKey());
 	}
-	public Tariff removeTariff(String organisationID, long tariffID)
+	public Tariff removeTariff(String organisationID, String tariffID)
 	{
 		return (Tariff) tariffs.remove(Tariff.getPrimaryKey(organisationID, tariffID));
 	}

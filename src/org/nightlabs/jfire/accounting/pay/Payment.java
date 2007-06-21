@@ -38,6 +38,7 @@ import javax.jdo.JDOHelper;
 import javax.jdo.PersistenceManager;
 import javax.jdo.listener.StoreCallback;
 
+import org.nightlabs.jdo.ObjectIDUtil;
 import org.nightlabs.jfire.accounting.Account;
 import org.nightlabs.jfire.accounting.Currency;
 import org.nightlabs.jfire.accounting.Invoice;
@@ -389,8 +390,7 @@ implements Serializable, StoreCallback
 
 	public static String getPrimaryKey(String organisationID, long paymentID)
 	{
-//		return organisationID + '/' + String.valueOf(paymentID);
-		return organisationID + '/' + Base36Coder.sharedInstance(false).encode(paymentID, 1);
+		return organisationID + '/' + ObjectIDUtil.longObjectIDFieldToString(paymentID);
 	}
 
 	public String getPrimaryKey()

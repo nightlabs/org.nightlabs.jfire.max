@@ -469,11 +469,11 @@ implements Serializable, ArticleContainer, SegmentContainer, DetachCallback
 
 	public static String getPrimaryKey(String organisationID, String orderIDPrefix, long orderID)
 	{
-		return organisationID +'/' + orderIDPrefix + '/' + Long.toHexString(orderID);
+		return organisationID +'/' + orderIDPrefix + '/' + ObjectIDUtil.longObjectIDFieldToString(orderID);
 	}
 	public String getPrimaryKey()
 	{
-		return organisationID + '/' + orderIDPrefix + '/' + Long.toHexString(orderID);
+		return organisationID + '/' + orderIDPrefix + '/' + ObjectIDUtil.longObjectIDFieldToString(orderID);
 	}
 
 	/**

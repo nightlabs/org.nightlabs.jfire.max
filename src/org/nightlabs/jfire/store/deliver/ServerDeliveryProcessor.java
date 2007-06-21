@@ -259,8 +259,7 @@ implements Serializable, DetachCallback
 		return serverDeliveryProcessorID;
 	}
 	
-	public static String getPrimaryKey(String organisationID,
-			String serverDeliveryProcessorID)
+	public static String getPrimaryKey(String organisationID, String serverDeliveryProcessorID)
 	{
 		return organisationID + '/' + serverDeliveryProcessorID;
 	}

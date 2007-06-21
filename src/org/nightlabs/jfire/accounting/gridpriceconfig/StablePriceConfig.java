@@ -36,6 +36,7 @@ import java.util.Map;
 import javax.jdo.PersistenceManager;
 import javax.jdo.Query;
 
+import org.nightlabs.annotation.Implement;
 import org.nightlabs.jfire.accounting.Currency;
 import org.nightlabs.jfire.accounting.Tariff;
 import org.nightlabs.jfire.accounting.priceconfig.IPackagePriceConfig;
@@ -74,6 +75,8 @@ public class StablePriceConfig
 extends GridPriceConfig
 implements IPackagePriceConfig, IResultPriceConfig
 {
+	private static final long serialVersionUID = 1L;
+
 	public static final String FETCH_GROUP_PRICE_CELLS = "StablePriceConfig.priceCells";
 
 	/**
@@ -111,11 +114,12 @@ implements IPackagePriceConfig, IResultPriceConfig
 	 *
 	 * @!jdo.map-vendor-extension vendor-name="jpox" key="key-field" value="priceCoordinate"
 	 */
-	private Map priceCells = new HashMap();
+	private Map<IPriceCoordinate, PriceCell> priceCells;
 
-	protected StablePriceConfig()
-	{
-	}
+	/**
+	 * @deprecated Only for JDO!
+	 */
+	protected StablePriceConfig() { }
 
 	/**
 	 * @param organisationID
@@ -124,18 +128,16 @@ implements IPackagePriceConfig, IResultPriceConfig
 	public StablePriceConfig(String organisationID, long priceConfigID)
 	{
 		super(organisationID, priceConfigID);
+		priceCells = new HashMap<IPriceCoordinate, PriceCell>();
 	}
 
-	/**
-	 * @see org.nightlabs.jfire.accounting.priceconfig.PriceConfig#requiresProductTypePackageInternal()
-	 */
+	@Implement
 	public boolean requiresProductTypePackageInternal()
 	{
 		return false;
 	}
-	/**
-	 * @return Returns the priceCells.
-	 */
+
+	@Implement
 	public Collection getPriceCells()
 	{
 		return priceCells.values();
@@ -145,6 +147,7 @@ implements IPackagePriceConfig, IResultPriceConfig
 	 * in all <tt>PriceCell</tt> s which is equivalent to setting
 	 * them to <tt>CALCULATIONSTATUS_DIRTY</tt>.
 	 */
+	@Implement
 	public void resetPriceFragmentCalculationStati()
 	{
 		for (Iterator itPriceCells = this.getPriceCells().iterator(); itPriceCells.hasNext(); ) {
@@ -174,6 +177,7 @@ implements IPackagePriceConfig, IResultPriceConfig
 		return getPriceCell(priceCoordinate, throwExceptionIfNotExistent);
 	}
 
+	@Implement
 	public PriceCell getPriceCell(IPriceCoordinate priceCoordinate, boolean throwExceptionIfNotExistent)
 	{
 		PriceCell priceCell = (PriceCell) priceCells.get(priceCoordinate);
@@ -182,6 +186,7 @@ implements IPackagePriceConfig, IResultPriceConfig
 		return priceCell;
 	}
 
+	@Implement
 	public PriceCell createPriceCell(IPriceCoordinate priceCoordinate)
 	{
 		if (priceCoordinate.getPriceConfig() == null ||
@@ -269,9 +274,7 @@ implements IPackagePriceConfig, IResultPriceConfig
 		} // iterate CustomerGroup
 	}
 
-	/**
-	 * @see org.nightlabs.jfire.accounting.gridpriceconfig.GridPriceConfig#addCustomerGroup(org.nightlabs.jfire.accounting.CustomerGroup)
-	 */
+	@Override
 	public boolean addCustomerGroup(CustomerGroup customerGroup)
 	{
 		boolean res = super.addCustomerGroup(customerGroup);
@@ -279,9 +282,8 @@ implements IPackagePriceConfig, IResultPriceConfig
 			createPriceCells(customerGroup, null, null);
 		return res;
 	}
-	/**
-	 * @see org.nightlabs.jfire.accounting.gridpriceconfig.GridPriceConfig#addTariff(org.nightlabs.jfire.accounting.Tariff)
-	 */
+
+	@Override
 	public boolean addTariff(Tariff tariff)
 	{
 		boolean res = super.addTariff(tariff);
@@ -289,9 +291,8 @@ implements IPackagePriceConfig, IResultPriceConfig
 			createPriceCells(null, tariff, null);
 		return res;
 	}
-	/**
-	 * @see org.nightlabs.jfire.accounting.priceconfig.PriceConfig#addCurrency(org.nightlabs.jfire.accounting.Currency)
-	 */
+
+	@Override
 	public boolean addCurrency(Currency currency)
 	{
 		boolean res = super.addCurrency(currency);
@@ -300,9 +301,7 @@ implements IPackagePriceConfig, IResultPriceConfig
 		return res;
 	}
 
-	/**
-	 * @see org.nightlabs.jfire.accounting.gridpriceconfig.GridPriceConfig#removeCustomerGroup(java.lang.String, java.lang.String)
-	 */
+	@Override
 	public CustomerGroup removeCustomerGroup(String organisationID,
 			String customerGroupID)
 	{
@@ -311,10 +310,9 @@ implements IPackagePriceConfig, IResultPriceConfig
 			removePriceCells(cg, null, null);
 		return cg;
 	}
-	/**
-	 * @see org.nightlabs.jfire.accounting.gridpriceconfig.GridPriceConfig#removeTariff(java.lang.String, long)
-	 */
-	public Tariff removeTariff(String organisationID, long tariffID)
+
+	@Override
+	public Tariff removeTariff(String organisationID, String tariffID)
 	{
 		Tariff t = super.removeTariff(organisationID, tariffID);
 		if (t != null)
@@ -322,9 +320,7 @@ implements IPackagePriceConfig, IResultPriceConfig
 		return t;
 	}
 
-	/**
-	 * @see org.nightlabs.jfire.accounting.priceconfig.PriceConfig#removeCurrency(java.lang.String)
-	 */
+	@Override
 	public Currency removeCurrency(String currencyID)
 	{
 		Currency c = super.removeCurrency(currencyID);

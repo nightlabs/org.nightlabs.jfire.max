@@ -33,6 +33,7 @@ import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Set;
 
+import org.nightlabs.jdo.ObjectIDUtil;
 import org.nightlabs.jfire.security.User;
 import org.nightlabs.jfire.trade.Article;
 import org.nightlabs.jfire.transfer.Anchor;
@@ -359,7 +360,7 @@ implements Serializable
 
 	protected String getPrimaryKey()
 	{
-		return organisationID + '/' + Long.toHexString(productID);
+		return organisationID + '/' + ObjectIDUtil.longObjectIDFieldToString(productID);
 	}
 
 	public void addNestedProductLocal(ProductLocal productLocal)

@@ -7,11 +7,12 @@
 			throw new IllegalArgumentException("tariffPK does not contain exactly 2 parts: " + tariffPK);
 
 		n.organisationID = sa[0];
-		try {
-			n.tariffID = Long.parseLong(sa[1], 16);
-		} catch (NumberFormatException x) {
-			throw new IllegalArgumentException("2nd part of tariffPK is not a valid hex-number-string: " + tariffPK, x);
-		}
+		n.tariffID = sa[1];
+//		try {
+//			n.tariffID = Long.parseLong(sa[1], 16);
+//		} catch (NumberFormatException x) {
+//			throw new IllegalArgumentException("2nd part of tariffPK is not a valid hex-number-string: " + tariffPK, x);
+//		}
 		return n;
 	}
 

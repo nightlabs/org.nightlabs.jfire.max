@@ -35,6 +35,7 @@ import javax.jdo.JDOHelper;
 import javax.jdo.PersistenceManager;
 import javax.jdo.listener.StoreCallback;
 
+import org.nightlabs.jdo.ObjectIDUtil;
 import org.nightlabs.jfire.accounting.Currency;
 import org.nightlabs.jfire.accounting.Price;
 import org.nightlabs.jfire.accounting.PriceFragmentType;
@@ -143,7 +144,7 @@ public abstract class PriceConfig implements Serializable, StoreCallback, IPrice
 		if (priceConfigID < 0)
 			throw new IllegalArgumentException("priceConfigID < 0!");
 
-		return organisationID + '/' + Long.toHexString(priceConfigID);
+		return organisationID + '/' + ObjectIDUtil.longObjectIDFieldToString(priceConfigID);
 	}
 
 	public String getPrimaryKey()

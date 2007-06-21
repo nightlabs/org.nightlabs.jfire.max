@@ -42,6 +42,7 @@ import javax.jdo.listener.StoreCallback;
 
 import org.apache.commons.lang.exception.ExceptionUtils;
 import org.apache.log4j.Logger;
+import org.nightlabs.jdo.ObjectIDUtil;
 import org.nightlabs.jfire.accounting.Currency;
 import org.nightlabs.jfire.accounting.Invoice;
 import org.nightlabs.jfire.accounting.Tariff;
@@ -741,10 +742,9 @@ public class Article
 	{
 		return articleID;
 	}
-	public static String getPrimaryKey(
-			String organisationID, long articleID)
+	public static String getPrimaryKey(String organisationID, long articleID)
 	{
-		return organisationID + '/' + Long.toHexString(articleID);
+		return organisationID + '/' + ObjectIDUtil.longObjectIDFieldToString(articleID);
 	}
 	public String getPrimaryKey() {
 		return primaryKey;

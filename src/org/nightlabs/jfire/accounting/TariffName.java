@@ -69,10 +69,15 @@ implements StoreCallback
 	 */
 	private String organisationID;
 
+//	/**
+//	 * @jdo.field primary-key="true"
+//	 */
+//	private long tariffID = -1;
 	/**
 	 * @jdo.field primary-key="true"
+	 * @jdo.column length="100"
 	 */
-	private long tariffID = -1;
+	private String tariffID;
 
 	public TariffName()
 	{
@@ -129,17 +134,17 @@ implements StoreCallback
 	/**
 	 * @return Returns the tariffID.
 	 */
-	public long getTariffID()
+	public String getTariffID()
 	{
 		return tariffID;
 	}
-	/**
-	 * @param tariffID The tariffID to set.
-	 */
-	protected void setTariffID(long tariffID)
-	{
-		this.tariffID = tariffID;
-	}
+//	/**
+//	 * @param tariffID The tariffID to set.
+//	 */
+//	protected void setTariffID(long tariffID)
+//	{
+//		this.tariffID = tariffID;
+//	}
 	/**
 	 * @see org.nightlabs.i18n.I18nText#getI18nMap()
 	 */
@@ -148,21 +153,15 @@ implements StoreCallback
 		return names;
 	}
 
-	/**
-	 * @see org.nightlabs.i18n.I18nText#getFallBackValue(java.lang.String)
-	 */
 	protected String getFallBackValue(String languageID)
 	{
 		return Tariff.getPrimaryKey(organisationID, tariffID);
 	}
 
-	/**
-	 * @see javax.jdo.listener.StoreCallback#jdoPreStore()
-	 */
 	public void jdoPreStore()
 	{
-		if (tariffID < 0)
-			throw new IllegalStateException("tariffID < 0!!!");
+//		if (tariffID < 0)
+//			throw new IllegalStateException("tariffID < 0!!!");
 	}
 
 }

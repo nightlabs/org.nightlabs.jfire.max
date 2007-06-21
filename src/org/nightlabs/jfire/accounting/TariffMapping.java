@@ -147,8 +147,9 @@ implements Serializable
 	private String partnerTariffOrganisationID;
 	/**
 	 * @jdo.field primary-key="true"
+	 * @jdo.column length="100"
 	 */
-	private long partnerTariffTariffID;
+	private String partnerTariffTariffID;
 
 	/**
 	 * @jdo.field primary-key="true"
@@ -157,8 +158,9 @@ implements Serializable
 	private String localTariffOrganisationID;
 	/**
 	 * @jdo.field primary-key="true"
+	 * @jdo.column length="100"
 	 */
-	private long localTariffTariffID;
+	private String localTariffTariffID;
 
 	/**
 	 * @jdo.field persistence-modifier="persistent" null-value="exception"
@@ -208,7 +210,7 @@ implements Serializable
 	{
 		return partnerTariffOrganisationID;
 	}
-	public long getPartnerTariffTariffID()
+	public String getPartnerTariffTariffID()
 	{
 		return partnerTariffTariffID;
 	}
@@ -221,7 +223,7 @@ implements Serializable
 	{
 		return localTariffOrganisationID;
 	}
-	public long getLocalTariffTariffID()
+	public String getLocalTariffTariffID()
 	{
 		return localTariffTariffID;
 	}

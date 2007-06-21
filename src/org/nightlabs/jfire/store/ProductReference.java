@@ -36,6 +36,7 @@ import javax.jdo.PersistenceManager;
 import javax.jdo.Query;
 import javax.jdo.listener.DeleteCallback;
 
+import org.nightlabs.jdo.ObjectIDUtil;
 import org.nightlabs.jfire.store.id.ProductID;
 import org.nightlabs.jfire.store.id.ProductReferenceGroupID;
 import org.nightlabs.jfire.store.id.ProductReferenceID;
@@ -307,7 +308,7 @@ implements Serializable, DeleteCallback
 
 	public String getPrimaryKey()
 	{
-		return anchorOrganisationID + '/' + anchorAnchorTypeID + '/' + anchorAnchorID + '/' + productOrganisationID + '/' + Long.toHexString(productProductID);
+		return anchorOrganisationID + '/' + anchorAnchorTypeID + '/' + anchorAnchorID + '/' + productOrganisationID + '/' + ObjectIDUtil.longObjectIDFieldToString(productProductID);
 	}
 
 	/**

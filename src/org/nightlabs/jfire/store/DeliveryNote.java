@@ -358,9 +358,9 @@ implements Serializable, ArticleContainer, Statable, DetachCallback
 		return deliveryNoteID;
 	}
 
-	public static String getPrimaryKey(String organisationID, String deliveryNoteIDPrefix, long deliveryID)
+	public static String getPrimaryKey(String organisationID, String deliveryNoteIDPrefix, long deliveryNoteID)
 	{
-		return organisationID + '/' + deliveryNoteIDPrefix + '/' + Long.toHexString(deliveryID);
+		return organisationID + '/' + deliveryNoteIDPrefix + '/' + ObjectIDUtil.longObjectIDFieldToString(deliveryNoteID);
 	}
 	public String getPrimaryKey()
 	{

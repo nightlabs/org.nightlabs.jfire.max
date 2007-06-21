@@ -34,6 +34,7 @@ import java.util.Set;
 import javax.jdo.PersistenceManager;
 import javax.jdo.Query;
 
+import org.nightlabs.jdo.ObjectIDUtil;
 import org.nightlabs.jfire.accounting.Invoice;
 import org.nightlabs.jfire.idgenerator.IDGenerator;
 import org.nightlabs.jfire.store.DeliveryNote;
@@ -140,7 +141,7 @@ public class Segment implements Serializable
 
 	public static String getPrimaryKey(String organisationID, long segmentID)
 	{
-		return organisationID + '/' + Long.toHexString(segmentID);
+		return organisationID + '/' + ObjectIDUtil.longObjectIDFieldToString(segmentID);
 	}
 	/**
 	 * @return Returns the primaryKey.

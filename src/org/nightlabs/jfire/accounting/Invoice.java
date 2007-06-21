@@ -514,7 +514,7 @@ implements Serializable, ArticleContainer, Statable, DetachCallback
 
 	public static String getPrimaryKey(String organisationID, String invoiceIDPrefix, long invoiceID)
 	{
-		return organisationID + '/' + invoiceIDPrefix + '/' + Long.toHexString(invoiceID);
+		return organisationID + '/' + invoiceIDPrefix + '/' + ObjectIDUtil.longObjectIDFieldToString(invoiceID);
 	}
 
 	public String getPrimaryKey()

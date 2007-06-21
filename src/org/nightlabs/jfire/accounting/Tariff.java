@@ -30,7 +30,9 @@ import java.io.Serializable;
 
 import javax.jdo.JDOHelper;
 
+import org.nightlabs.jdo.ObjectIDUtil;
 import org.nightlabs.jfire.accounting.id.TariffID;
+import org.nightlabs.jfire.idgenerator.IDGenerator;
 import org.nightlabs.util.Utils;
 
 /**
@@ -83,10 +85,15 @@ implements Serializable
 	 */
 	private String organisationID;
 
+//	/**
+//	 * @jdo.field primary-key="true"
+//	 */
+//	private long tariffID = -1;
 	/**
 	 * @jdo.field primary-key="true"
+	 * @jdo.column length="100"
 	 */
-	private long tariffID = -1;
+	private String tariffID;
 
 	/**
 	 * @jdo.field persistence-modifier="persistent"
@@ -100,7 +107,7 @@ implements Serializable
 
 	public Tariff() { }
 
-	public Tariff(String organisationID, long tariffID)
+	public Tariff(String organisationID, String tariffID)
 	{
 		this.organisationID = organisationID;
 		this.tariffID = tariffID;
@@ -108,11 +115,17 @@ implements Serializable
 		this.name = new TariffName(this);
 	}
 
-	public static String getPrimaryKey(String organisationID, long tariffID)
+	public static String getPrimaryKey(String organisationID, String tariffID)
 	{
-		return organisationID + '/' + Long.toHexString(tariffID);
+//		return organisationID + '/' + ObjectIDUtil.longObjectIDFieldToString(tariffID);
+		return organisationID + '/' + tariffID;
 	}
-	
+
+	public static String createTariffID()
+	{
+		return ObjectIDUtil.longObjectIDFieldToString(IDGenerator.nextID(Tariff.class));
+	}
+
 	/**
 	 * Get the JDO object id.
 	 * @return the JDO object id.
@@ -132,10 +145,8 @@ implements Serializable
 	/**
 	 * @return Returns the tariffID.
 	 */
-	public long getTariffID()
+	public String getTariffID()
 	{
-//		if (tariffID == null)
-//			return -1;
 		return tariffID;
 	}
 //	/**

@@ -2,6 +2,7 @@ package org.nightlabs.jfire.reporting.parameter.config;
 
 import java.io.Serializable;
 
+import org.nightlabs.jdo.ObjectIDUtil;
 import org.nightlabs.jfire.reporting.parameter.ValueProvider;
 import org.nightlabs.jfire.reporting.parameter.id.ValueProviderID;
 
@@ -144,7 +145,7 @@ implements ValueConsumer, Serializable, IGraphicalInfoProvider
 	}
 
 	public String getConsumerKey() {
-		return valueProviderOrganisationID + "/" + valueProviderCategoryID + "/" + valueProviderID + "/" + Long.toHexString(valueProviderConfigID);
+		return valueProviderOrganisationID + "/" + valueProviderCategoryID + "/" + valueProviderID + "/" + ObjectIDUtil.longObjectIDFieldToString(valueProviderConfigID);
 	}
 
 	/**

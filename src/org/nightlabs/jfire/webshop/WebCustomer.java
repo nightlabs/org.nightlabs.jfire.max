@@ -3,6 +3,7 @@
  */
 package org.nightlabs.jfire.webshop;
 
+import org.nightlabs.jdo.ObjectIDUtil;
 import org.nightlabs.jfire.trade.LegalEntity;
 
 /**
@@ -32,10 +33,13 @@ public class WebCustomer
 	 * @param webCustomerID the webCustomerID
 	 */
 	public WebCustomer(String organisationID, String webCustomerID) {
+		ObjectIDUtil.assertValidIDString(organisationID, "organisationID");
+		ObjectIDUtil.assertValidIDString(webCustomerID, "webCustomerID");
+
 		this.organisationID = organisationID;
 		this.webCustomerID = webCustomerID;
 	}
-	
+
 	/**
 	 * This is the organisationID to which the customer belongs.
 	 * 

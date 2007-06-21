@@ -5,22 +5,21 @@ package org.nightlabs.jfire.webshop;
 
 /**
  * @author Khaled
- *
  */
-public class DoublicateIDException 
+public class DuplicateIDException 
 extends Throwable
 {
 	/**
 	 * 
 	 */
-	public DoublicateIDException()
+	public DuplicateIDException()
 	{
 	}
 
 	/**
 	 * @param arg0
 	 */
-	public DoublicateIDException(String arg0)
+	public DuplicateIDException(String arg0)
 	{
 		super(arg0);
 	}
@@ -28,7 +27,7 @@ extends Throwable
 	/**
 	 * @param arg0
 	 */
-	public DoublicateIDException(Throwable arg0)
+	public DuplicateIDException(Throwable arg0)
 	{
 		super(arg0);
 	}
@@ -37,7 +36,7 @@ extends Throwable
 	 * @param arg0
 	 * @param arg1
 	 */
-	public DoublicateIDException(String arg0, Throwable arg1)
+	public DuplicateIDException(String arg0, Throwable arg1)
 	{
 		super(arg0, arg1);
 	}

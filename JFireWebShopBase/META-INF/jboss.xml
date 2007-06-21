@@ -29,9 +29,9 @@
      -->
 
       <session>
-         <ejb-name>WebShop</ejb-name>
-         <jndi-name>WebShop</jndi-name>
-         <local-jndi-name>WebShopLocal</local-jndi-name>
+         <ejb-name>jfire/ejb/JFireWebShopBase/WebShop</ejb-name>
+         <jndi-name>jfire/ejb/JFireWebShopBase/WebShop</jndi-name>
+         <local-jndi-name>jfire/ejb/JFireWebShopBase/WebShopLocal</local-jndi-name>
 
         <method-attributes>
         </method-attributes>

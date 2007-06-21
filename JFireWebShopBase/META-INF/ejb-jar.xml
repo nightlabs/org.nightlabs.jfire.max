@@ -13,7 +13,7 @@
       <session >
          <description><![CDATA[]]></description>
 
-         <ejb-name>WebShop</ejb-name>
+         <ejb-name>jfire/ejb/JFireWebShopBase/WebShop</ejb-name>
 
          <home>org.nightlabs.jfire.webshop.WebShopHome</home>
          <remote>org.nightlabs.jfire.webshop.WebShop</remote>
@@ -77,7 +77,7 @@
          <role-name>_Guest_</role-name>
       <method >
          <description><![CDATA[]]></description>
-         <ejb-name>WebShop</ejb-name>
+         <ejb-name>jfire/ejb/JFireWebShopBase/WebShop</ejb-name>
          <method-intf>LocalHome</method-intf>
          <method-name>create</method-name>
          <method-params>
@@ -89,7 +89,7 @@
          <role-name>_Guest_</role-name>
       <method >
          <description><![CDATA[]]></description>
-         <ejb-name>WebShop</ejb-name>
+         <ejb-name>jfire/ejb/JFireWebShopBase/WebShop</ejb-name>
          <method-intf>Home</method-intf>
          <method-name>create</method-name>
          <method-params>
@@ -101,7 +101,7 @@
       <unchecked/>
       <method >
          <description><![CDATA[]]></description>
-         <ejb-name>WebShop</ejb-name>
+         <ejb-name>jfire/ejb/JFireWebShopBase/WebShop</ejb-name>
          <method-name>remove</method-name>
          <method-params>
          </method-params>
@@ -112,7 +112,7 @@
       <unchecked/>
       <method >
          <description><![CDATA[]]></description>
-         <ejb-name>WebShop</ejb-name>
+         <ejb-name>jfire/ejb/JFireWebShopBase/WebShop</ejb-name>
          <method-name>remove</method-name>
          <method-params>
          </method-params>
@@ -123,7 +123,7 @@
          <role-name>_Guest_</role-name>
       <method >
          <description><![CDATA[]]></description>
-         <ejb-name>WebShop</ejb-name>
+         <ejb-name>jfire/ejb/JFireWebShopBase/WebShop</ejb-name>
          <method-intf>Local</method-intf>
          <method-name>getWebCustomers</method-name>
          <method-params>
@@ -138,7 +138,7 @@
          <role-name>_Guest_</role-name>
       <method >
          <description><![CDATA[]]></description>
-         <ejb-name>WebShop</ejb-name>
+         <ejb-name>jfire/ejb/JFireWebShopBase/WebShop</ejb-name>
          <method-intf>Remote</method-intf>
          <method-name>getWebCustomers</method-name>
          <method-params>
@@ -153,13 +153,46 @@
          <role-name>_Guest_</role-name>
       <method >
          <description><![CDATA[]]></description>
-         <ejb-name>WebShop</ejb-name>
+         <ejb-name>jfire/ejb/JFireWebShopBase/WebShop</ejb-name>
+         <method-intf>Local</method-intf>
+         <method-name>getWebCustomer</method-name>
+         <method-params>
+            <method-param>org.nightlabs.jfire.webshop.id.WebCustomerID</method-param>
+            <method-param>java.lang.String[]</method-param>
+            <method-param>int</method-param>
+         </method-params>
+      </method>
+   </method-permission>
+   <method-permission >
+      <description><![CDATA[description not supported yet by ejbdoclet]]></description>
+         <role-name>_Guest_</role-name>
+      <method >
+         <description><![CDATA[]]></description>
+         <ejb-name>jfire/ejb/JFireWebShopBase/WebShop</ejb-name>
+         <method-intf>Remote</method-intf>
+         <method-name>getWebCustomer</method-name>
+         <method-params>
+            <method-param>org.nightlabs.jfire.webshop.id.WebCustomerID</method-param>
+            <method-param>java.lang.String[]</method-param>
+            <method-param>int</method-param>
+         </method-params>
+      </method>
+   </method-permission>
+   <method-permission >
+      <description><![CDATA[description not supported yet by ejbdoclet]]></description>
+         <role-name>_Guest_</role-name>
+      <method >
+         <description><![CDATA[]]></description>
+         <ejb-name>jfire/ejb/JFireWebShopBase/WebShop</ejb-name>
          <method-intf>Local</method-intf>
          <method-name>createWebCustomer</method-name>
          <method-params>
             <method-param>java.lang.String</method-param>
             <method-param>java.lang.String</method-param>
             <method-param>org.nightlabs.jfire.person.Person</method-param>
+            <method-param>boolean</method-param>
+            <method-param>java.lang.String[]</method-param>
+            <method-param>int</method-param>
          </method-params>
       </method>
    </method-permission>
@@ -168,13 +201,16 @@
          <role-name>_Guest_</role-name>
       <method >
          <description><![CDATA[]]></description>
-         <ejb-name>WebShop</ejb-name>
+         <ejb-name>jfire/ejb/JFireWebShopBase/WebShop</ejb-name>
          <method-intf>Remote</method-intf>
          <method-name>createWebCustomer</method-name>
          <method-params>
             <method-param>java.lang.String</method-param>
             <method-param>java.lang.String</method-param>
             <method-param>org.nightlabs.jfire.person.Person</method-param>
+            <method-param>boolean</method-param>
+            <method-param>java.lang.String[]</method-param>
+            <method-param>int</method-param>
          </method-params>
       </method>
    </method-permission>
@@ -183,7 +219,61 @@
          <role-name>_Guest_</role-name>
       <method >
          <description><![CDATA[]]></description>
-         <ejb-name>WebShop</ejb-name>
+         <ejb-name>jfire/ejb/JFireWebShopBase/WebShop</ejb-name>
+         <method-intf>Local</method-intf>
+         <method-name>isWebCustomerIDExisting</method-name>
+         <method-params>
+            <method-param>java.lang.String</method-param>
+            <method-param>javax.jdo.PersistenceManager</method-param>
+         </method-params>
+      </method>
+   </method-permission>
+   <method-permission >
+      <description><![CDATA[description not supported yet by ejbdoclet]]></description>
+         <role-name>_Guest_</role-name>
+      <method >
+         <description><![CDATA[]]></description>
+         <ejb-name>jfire/ejb/JFireWebShopBase/WebShop</ejb-name>
+         <method-intf>Remote</method-intf>
+         <method-name>isWebCustomerIDExisting</method-name>
+         <method-params>
+            <method-param>java.lang.String</method-param>
+            <method-param>javax.jdo.PersistenceManager</method-param>
+         </method-params>
+      </method>
+   </method-permission>
+   <method-permission >
+      <description><![CDATA[description not supported yet by ejbdoclet]]></description>
+         <role-name>_Guest_</role-name>
+      <method >
+         <description><![CDATA[This is to accelerate a demand by not detaching the webCustomer.]]></description>
+         <ejb-name>jfire/ejb/JFireWebShopBase/WebShop</ejb-name>
+         <method-intf>Local</method-intf>
+         <method-name>getPassword</method-name>
+         <method-params>
+            <method-param>java.lang.String</method-param>
+         </method-params>
+      </method>
+   </method-permission>
+   <method-permission >
+      <description><![CDATA[description not supported yet by ejbdoclet]]></description>
+         <role-name>_Guest_</role-name>
+      <method >
+         <description><![CDATA[This is to accelerate a demand by not detaching the webCustomer.]]></description>
+         <ejb-name>jfire/ejb/JFireWebShopBase/WebShop</ejb-name>
+         <method-intf>Remote</method-intf>
+         <method-name>getPassword</method-name>
+         <method-params>
+            <method-param>java.lang.String</method-param>
+         </method-params>
+      </method>
+   </method-permission>
+   <method-permission >
+      <description><![CDATA[description not supported yet by ejbdoclet]]></description>
+         <role-name>_Guest_</role-name>
+      <method >
+         <description><![CDATA[]]></description>
+         <ejb-name>jfire/ejb/JFireWebShopBase/WebShop</ejb-name>
          <method-intf>Local</method-intf>
          <method-name>isWebCustomerIDExisting</method-name>
          <method-params>
@@ -196,7 +286,7 @@
          <role-name>_Guest_</role-name>
       <method >
          <description><![CDATA[]]></description>
-         <ejb-name>WebShop</ejb-name>
+         <ejb-name>jfire/ejb/JFireWebShopBase/WebShop</ejb-name>
          <method-intf>Remote</method-intf>
          <method-name>isWebCustomerIDExisting</method-name>
          <method-params>
@@ -209,7 +299,7 @@
          <role-name>_Guest_</role-name>
       <method >
          <description><![CDATA[]]></description>
-         <ejb-name>WebShop</ejb-name>
+         <ejb-name>jfire/ejb/JFireWebShopBase/WebShop</ejb-name>
          <method-intf>Local</method-intf>
          <method-name>storeWebCustomer</method-name>
          <method-params>
@@ -225,7 +315,7 @@
          <role-name>_Guest_</role-name>
       <method >
          <description><![CDATA[]]></description>
-         <ejb-name>WebShop</ejb-name>
+         <ejb-name>jfire/ejb/JFireWebShopBase/WebShop</ejb-name>
          <method-intf>Remote</method-intf>
          <method-name>storeWebCustomer</method-name>
          <method-params>
@@ -233,32 +323,6 @@
             <method-param>boolean</method-param>
             <method-param>java.lang.String[]</method-param>
             <method-param>int</method-param>
-         </method-params>
-      </method>
-   </method-permission>
-   <method-permission >
-      <description><![CDATA[description not supported yet by ejbdoclet]]></description>
-         <role-name>_Guest_</role-name>
-      <method >
-         <description><![CDATA[]]></description>
-         <ejb-name>WebShop</ejb-name>
-         <method-intf>Local</method-intf>
-         <method-name>getNewPassword</method-name>
-         <method-params>
-            <method-param>org.nightlabs.jfire.webshop.id.WebCustomerID</method-param>
-         </method-params>
-      </method>
-   </method-permission>
-   <method-permission >
-      <description><![CDATA[description not supported yet by ejbdoclet]]></description>
-         <role-name>_Guest_</role-name>
-      <method >
-         <description><![CDATA[]]></description>
-         <ejb-name>WebShop</ejb-name>
-         <method-intf>Remote</method-intf>
-         <method-name>getNewPassword</method-name>
-         <method-params>
-            <method-param>org.nightlabs.jfire.webshop.id.WebCustomerID</method-param>
          </method-params>
       </method>
    </method-permission>
@@ -270,7 +334,7 @@
      -->
    <container-transaction >
       <method >
-         <ejb-name>WebShop</ejb-name>
+         <ejb-name>jfire/ejb/JFireWebShopBase/WebShop</ejb-name>
          <method-intf>Local</method-intf>
          <method-name>getWebCustomers</method-name>
          <method-params>
@@ -283,7 +347,7 @@
    </container-transaction>
    <container-transaction >
       <method >
-         <ejb-name>WebShop</ejb-name>
+         <ejb-name>jfire/ejb/JFireWebShopBase/WebShop</ejb-name>
          <method-intf>Remote</method-intf>
          <method-name>getWebCustomers</method-name>
          <method-params>
@@ -296,33 +360,111 @@
    </container-transaction>
    <container-transaction >
       <method >
-         <ejb-name>WebShop</ejb-name>
+         <ejb-name>jfire/ejb/JFireWebShopBase/WebShop</ejb-name>
+         <method-intf>Local</method-intf>
+         <method-name>getWebCustomer</method-name>
+         <method-params>
+            <method-param>org.nightlabs.jfire.webshop.id.WebCustomerID</method-param>
+            <method-param>java.lang.String[]</method-param>
+            <method-param>int</method-param>
+         </method-params>
+      </method>
+      <trans-attribute>Supports</trans-attribute>
+   </container-transaction>
+   <container-transaction >
+      <method >
+         <ejb-name>jfire/ejb/JFireWebShopBase/WebShop</ejb-name>
+         <method-intf>Remote</method-intf>
+         <method-name>getWebCustomer</method-name>
+         <method-params>
+            <method-param>org.nightlabs.jfire.webshop.id.WebCustomerID</method-param>
+            <method-param>java.lang.String[]</method-param>
+            <method-param>int</method-param>
+         </method-params>
+      </method>
+      <trans-attribute>Supports</trans-attribute>
+   </container-transaction>
+   <container-transaction >
+      <method >
+         <ejb-name>jfire/ejb/JFireWebShopBase/WebShop</ejb-name>
          <method-intf>Local</method-intf>
          <method-name>createWebCustomer</method-name>
          <method-params>
             <method-param>java.lang.String</method-param>
             <method-param>java.lang.String</method-param>
             <method-param>org.nightlabs.jfire.person.Person</method-param>
+            <method-param>boolean</method-param>
+            <method-param>java.lang.String[]</method-param>
+            <method-param>int</method-param>
          </method-params>
       </method>
       <trans-attribute>Required</trans-attribute>
    </container-transaction>
    <container-transaction >
       <method >
-         <ejb-name>WebShop</ejb-name>
+         <ejb-name>jfire/ejb/JFireWebShopBase/WebShop</ejb-name>
          <method-intf>Remote</method-intf>
          <method-name>createWebCustomer</method-name>
          <method-params>
             <method-param>java.lang.String</method-param>
             <method-param>java.lang.String</method-param>
             <method-param>org.nightlabs.jfire.person.Person</method-param>
+            <method-param>boolean</method-param>
+            <method-param>java.lang.String[]</method-param>
+            <method-param>int</method-param>
          </method-params>
       </method>
       <trans-attribute>Required</trans-attribute>
    </container-transaction>
    <container-transaction >
       <method >
-         <ejb-name>WebShop</ejb-name>
+         <ejb-name>jfire/ejb/JFireWebShopBase/WebShop</ejb-name>
+         <method-intf>Local</method-intf>
+         <method-name>isWebCustomerIDExisting</method-name>
+         <method-params>
+            <method-param>java.lang.String</method-param>
+            <method-param>javax.jdo.PersistenceManager</method-param>
+         </method-params>
+      </method>
+      <trans-attribute>Supports</trans-attribute>
+   </container-transaction>
+   <container-transaction >
+      <method >
+         <ejb-name>jfire/ejb/JFireWebShopBase/WebShop</ejb-name>
+         <method-intf>Remote</method-intf>
+         <method-name>isWebCustomerIDExisting</method-name>
+         <method-params>
+            <method-param>java.lang.String</method-param>
+            <method-param>javax.jdo.PersistenceManager</method-param>
+         </method-params>
+      </method>
+      <trans-attribute>Supports</trans-attribute>
+   </container-transaction>
+   <container-transaction >
+      <method >
+         <ejb-name>jfire/ejb/JFireWebShopBase/WebShop</ejb-name>
+         <method-intf>Local</method-intf>
+         <method-name>getPassword</method-name>
+         <method-params>
+            <method-param>java.lang.String</method-param>
+         </method-params>
+      </method>
+      <trans-attribute>Supports</trans-attribute>
+   </container-transaction>
+   <container-transaction >
+      <method >
+         <ejb-name>jfire/ejb/JFireWebShopBase/WebShop</ejb-name>
+         <method-intf>Remote</method-intf>
+         <method-name>getPassword</method-name>
+         <method-params>
+            <method-param>java.lang.String</method-param>
+         </method-params>
+      </method>
+      <trans-attribute>Supports</trans-attribute>
+   </container-transaction>
+   <container-transaction >
+      <method >
+         <ejb-name>jfire/ejb/JFireWebShopBase/WebShop</ejb-name>
          <method-intf>Local</method-intf>
          <method-name>isWebCustomerIDExisting</method-name>
          <method-params>
@@ -333,7 +475,7 @@
    </container-transaction>
    <container-transaction >
       <method >
-         <ejb-name>WebShop</ejb-name>
+         <ejb-name>jfire/ejb/JFireWebShopBase/WebShop</ejb-name>
          <method-intf>Remote</method-intf>
          <method-name>isWebCustomerIDExisting</method-name>
          <method-params>
@@ -344,7 +486,7 @@
    </container-transaction>
    <container-transaction >
       <method >
-         <ejb-name>WebShop</ejb-name>
+         <ejb-name>jfire/ejb/JFireWebShopBase/WebShop</ejb-name>
          <method-intf>Local</method-intf>
          <method-name>storeWebCustomer</method-name>
          <method-params>
@@ -358,7 +500,7 @@
    </container-transaction>
    <container-transaction >
       <method >
-         <ejb-name>WebShop</ejb-name>
+         <ejb-name>jfire/ejb/JFireWebShopBase/WebShop</ejb-name>
          <method-intf>Remote</method-intf>
          <method-name>storeWebCustomer</method-name>
          <method-params>
@@ -369,28 +511,6 @@
          </method-params>
       </method>
       <trans-attribute>Required</trans-attribute>
-   </container-transaction>
-   <container-transaction >
-      <method >
-         <ejb-name>WebShop</ejb-name>
-         <method-intf>Local</method-intf>
-         <method-name>getNewPassword</method-name>
-         <method-params>
-            <method-param>org.nightlabs.jfire.webshop.id.WebCustomerID</method-param>
-         </method-params>
-      </method>
-      <trans-attribute>Supports</trans-attribute>
-   </container-transaction>
-   <container-transaction >
-      <method >
-         <ejb-name>WebShop</ejb-name>
-         <method-intf>Remote</method-intf>
-         <method-name>getNewPassword</method-name>
-         <method-params>
-            <method-param>org.nightlabs.jfire.webshop.id.WebCustomerID</method-param>
-         </method-params>
-      </method>
-      <trans-attribute>Supports</trans-attribute>
    </container-transaction>
 
    <!-- finder transactions -->

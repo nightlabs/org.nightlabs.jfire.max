@@ -40,6 +40,7 @@ import javax.naming.NamingException;
 import org.apache.log4j.Logger;
 import org.nightlabs.ModuleException;
 import org.nightlabs.i18n.I18nText;
+import org.nightlabs.jdo.ObjectIDUtil;
 import org.nightlabs.jfire.accounting.Account;
 import org.nightlabs.jfire.accounting.Accounting;
 import org.nightlabs.jfire.accounting.Currency;
@@ -161,10 +162,11 @@ public class DataCreator
 	{
 		if (tariffNormalPrice == null) {
 			pm.getExtent(Tariff.class);
+			TariffID tariffID = TariffID.create(organisationID, "_normal_price_");
 			try {
-				tariffNormalPrice = (Tariff) pm.getObjectById(TariffID.create(organisationID, 0));
+				tariffNormalPrice = (Tariff) pm.getObjectById(tariffID);
 			} catch (JDOObjectNotFoundException x) {
-				tariffNormalPrice = (Tariff) pm.makePersistent(new Tariff(organisationID, IDGenerator.nextID(Tariff.class)));
+				tariffNormalPrice = (Tariff) pm.makePersistent(new Tariff(tariffID.organisationID, tariffID.tariffID));
 				tariffNormalPrice.getName().setText(Locale.ENGLISH.getLanguage(), "Normal Price");
 				tariffNormalPrice.getName().setText(Locale.GERMAN.getLanguage(), "Normaler Preis");
 				tariffNormalPrice.getName().setText(Locale.FRENCH.getLanguage(), "Prix normal");
@@ -177,10 +179,11 @@ public class DataCreator
 	{
 		if (tariffGoldCard == null) {
 			pm.getExtent(Tariff.class);
+			TariffID tariffID = TariffID.create(organisationID, "_gold_card_");
 			try {
-				tariffGoldCard = (Tariff) pm.getObjectById(TariffID.create(organisationID, 1));
+				tariffGoldCard = (Tariff) pm.getObjectById(tariffID);
 			} catch (JDOObjectNotFoundException x) {
-				tariffGoldCard = (Tariff) pm.makePersistent(new Tariff(organisationID, IDGenerator.nextID(Tariff.class)));
+				tariffGoldCard = (Tariff) pm.makePersistent(new Tariff(tariffID.organisationID, tariffID.tariffID));
 				tariffGoldCard.getName().setText(Locale.ENGLISH.getLanguage(), "Gold Card");
 				tariffGoldCard.getName().setText(Locale.GERMAN.getLanguage(), "Goldene Kundenkarte");
 				tariffGoldCard.getName().setText(Locale.FRENCH.getLanguage(), "Carte d'or");
@@ -461,7 +464,7 @@ public class DataCreator
 		Trader trader = Trader.getTrader(pm);
 		return trader.setPersonToLegalEntity(person, true);
 //		LegalEntity legalEntity = new LegalEntity(
-//				person.getOrganisationID(), LegalEntity.ANCHOR_TYPE_ID_PARTNER, Long.toHexString(person.getPropertyID()));
+//				person.getOrganisationID(), LegalEntity.ANCHOR_TYPE_ID_PARTNER, ObjectIDUtil.longObjectIDFieldToString(person.getPropertyID()));
 //		legalEntity.setPerson(person);
 //		pm.makePersistent(legalEntity);
 //		return legalEntity;

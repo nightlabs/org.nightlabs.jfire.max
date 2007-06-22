@@ -104,7 +104,7 @@ extends Initialiser
 				"	new Array(\n" +
 				"		CustomerGroupID.create(\"" + organisationID + "\", \"CustomerGroup-anonymous\")\n" +
 				"	)\n" +
-				") / 1.19;");
+				");");
 
 		fallbackFormulaCell.setFormula(vatVal,
 				"cell.resolvePriceCellsAmount(\n" +

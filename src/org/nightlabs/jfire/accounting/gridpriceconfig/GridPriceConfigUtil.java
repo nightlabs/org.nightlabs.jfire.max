@@ -203,7 +203,7 @@ public class GridPriceConfigUtil
 	{
 		if (logger.isDebugEnabled()) {
 			for (GridPriceConfig priceConfig : _priceConfigs) {
-				logger.debug("storePriceConfig: PriceConfig BEFORE attach:");
+				logger.debug("storePriceConfigs: PriceConfig BEFORE attach:");
 				logGridPriceConfig(priceConfig);
 			}
 		}
@@ -225,6 +225,9 @@ public class GridPriceConfigUtil
 		Set<GridPriceConfig> priceConfigs = new HashSet<GridPriceConfig>();
 		List<AffectedProductType> affectedProductTypes = null;
 		for (GridPriceConfig priceConfig : _priceConfigs) {
+			if (logger.isInfoEnabled())
+				logger.info("storePriceConfigs: storing GridPriceConfig: " + priceConfig.getPrimaryKey());
+
 			if (!localOrganisationID.equals(priceConfig.getOrganisationID()))
 				throw new IllegalArgumentException("Cannot store a partner's price config: " + priceConfig.getPrimaryKey());
 

@@ -11,6 +11,7 @@ import javax.ejb.CreateException;
 import javax.ejb.EJBException;
 import javax.ejb.SessionBean;
 import javax.ejb.SessionContext;
+import javax.jdo.JDOHelper;
 import javax.jdo.JDOObjectNotFoundException;
 import javax.jdo.PersistenceManager;
 
@@ -20,6 +21,7 @@ import org.nightlabs.jfire.base.BaseSessionBeanImpl;
 import org.nightlabs.jfire.person.Person;
 import org.nightlabs.jfire.trade.LegalEntity;
 import org.nightlabs.jfire.trade.Trader;
+import org.nightlabs.jfire.transfer.id.AnchorID;
 import org.nightlabs.jfire.webshop.id.WebCustomerID;
 
 /**
@@ -97,6 +99,7 @@ implements SessionBean
 			pm.close();
 		}		
 	}
+	
 	/**
 	 * @ejb.interface-method
 	 * @ejb.permission role-name="_Guest_"
@@ -115,6 +118,23 @@ implements SessionBean
 			pm.close();
 		}	
 	}
+	
+	/**
+	 * @ejb.interface-method
+	 * @ejb.permission role-name="_Guest_"
+	 * @ejb.transaction type="Supports"
+	 */	
+	public AnchorID getWebCustomerLegalEntityID(WebCustomerID webCustomerID) 
+	{
+		PersistenceManager pm = getPersistenceManager();
+		try {
+			WebCustomer webCustomer = (WebCustomer)pm.getObjectById(webCustomerID);
+			return (AnchorID) (webCustomer.getLegalEntity() != null ? JDOHelper.getObjectId(webCustomer.getLegalEntity()) : null);
+		} finally {
+			pm.close();
+		}	
+	}
+	
 	/**
 	 * @ejb.interface-method
 	 * @ejb.permission role-name="_Guest_"
@@ -191,7 +211,9 @@ implements SessionBean
 		}	
 		catch (JDOObjectNotFoundException e) {
 			e.printStackTrace();
-		}
+		} finally {
+			pm.close();
+		}	
 		return null;
 	}
 

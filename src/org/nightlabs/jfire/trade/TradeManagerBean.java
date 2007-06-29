@@ -153,6 +153,12 @@ implements SessionBean
 	{
 		PersistenceManager pm = getPersistenceManager();
 		try {
+			pm.getFetchPlan().setMaxFetchDepth(NLJDOHelper.MAX_FETCH_DEPTH_NO_LIMIT);
+			pm.getFetchPlan().setGroups(new String[] {
+					FetchPlan.DEFAULT,
+					Order.FETCH_GROUP_OFFERS
+					});
+
 			Trader trader = Trader.getTrader(pm);
 			OrganisationLegalEntity vendor = trader.getMandator();
 			AnchorID vendorID = (AnchorID) JDOHelper.getObjectId(vendor);

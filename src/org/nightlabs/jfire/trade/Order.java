@@ -205,11 +205,128 @@ implements Serializable, ArticleContainer, SegmentContainer, DetachCallback
 			if (!order.getArticles().isEmpty())
 				continue;
 
-			if (order.getOffers() == null || order.getOffers().isEmpty())
-				continue;
-			
+			// this should *never* be null, because JDO should not allow it
+//			if (order.getOffers() == null || order.getOffers().isEmpty())
+//				continue;
+
+//// TODO JPOX WORKAROUND - begin - this has been (hopefully) fixed by in Lookup.getPersistenceManager()
+////			Caused by: java.lang.NullPointerException
+////			at org.jpox.store.expression.ObjectLiteral.getEqualityExpressionForObjectExpression(ObjectLiteral.java:216)
+////			at org.jpox.store.expression.ObjectLiteral.eq(ObjectLiteral.java:115)
+////			at org.jpox.store.expression.ObjectExpression.eq(ObjectExpression.java:286)
+////			at org.jpox.store.rdbms.scostore.FKSetStore.getIteratorStatement(FKSetStore.java:949)
+////			at org.jpox.store.rdbms.scostore.AbstractSetStore.iterator(AbstractSetStore.java:101)
+////			at org.jpox.sco.Set.loadFromStore(Set.java:907)
+////			at org.jpox.sco.Set.iterator(Set.java:607)
+////			at java.util.Collections$UnmodifiableCollection$1.<init>(Collections.java:1007)
+////			at java.util.Collections$UnmodifiableCollection.iterator(Collections.java:1006)
+////			at org.nightlabs.jfire.trade.Order.getQuickSaleWorkOrderIDCandidates(Order.java:215)
+////			at org.nightlabs.jfire.trade.TradeManagerBean.createQuickSaleWorkOrder(TradeManagerBean.java:168)
+////			at sun.reflect.GeneratedMethodAccessor154.invoke(Unknown Source)
+////			at sun.reflect.DelegatingMethodAccessorImpl.invoke(DelegatingMethodAccessorImpl.java:25)
+////			at java.lang.reflect.Method.invoke(Method.java:585)
+////			at org.jboss.invocation.Invocation.performCall(Invocation.java:359)
+////			at org.jboss.ejb.StatelessSessionContainer$ContainerInterceptor.invoke(StatelessSessionContainer.java:237)
+////			at org.jboss.resource.connectionmanager.CachedConnectionInterceptor.invoke(CachedConnectionInterceptor.java:158)
+////			at org.jboss.ejb.plugins.StatelessSessionInstanceInterceptor.invoke(StatelessSessionInstanceInterceptor.java:169)
+////			at org.jboss.ejb.plugins.CallValidationInterceptor.invoke(CallValidationInterceptor.java:63)
+////			at org.jboss.ejb.plugins.AbstractTxInterceptor.invokeNext(AbstractTxInterceptor.java:121)
+////			at org.jboss.ejb.plugins.TxInterceptorCMT.runWithTransactions(TxInterceptorCMT.java:350)
+////			at org.jboss.ejb.plugins.TxInterceptorCMT.invoke(TxInterceptorCMT.java:181)
+////			at org.jboss.ejb.plugins.SecurityInterceptor.invoke(SecurityInterceptor.java:168)
+////			at org.jboss.ejb.plugins.LogInterceptor.invoke(LogInterceptor.java:205)
+////			at org.jboss.ejb.plugins.ProxyFactoryFinderInterceptor.invoke(ProxyFactoryFinderInterceptor.java:138)
+////			at org.jboss.ejb.SessionContainer.internalInvoke(SessionContainer.java:648)
+////			at org.jboss.ejb.Container.invoke(Container.java:960)
+////			at sun.reflect.GeneratedMethodAccessor118.invoke(Unknown Source)
+////			at sun.reflect.DelegatingMethodAccessorImpl.invoke(DelegatingMethodAccessorImpl.java:25)
+////			at java.lang.reflect.Method.invoke(Method.java:585)
+////			at org.jboss.mx.interceptor.ReflectedDispatcher.invoke(ReflectedDispatcher.java:155)
+////			at org.jboss.mx.server.Invocation.dispatch(Invocation.java:94)
+////			at org.jboss.mx.server.Invocation.invoke(Invocation.java:86)
+////			at org.jboss.mx.server.AbstractMBeanInvoker.invoke(AbstractMBeanInvoker.java:264)
+////			at org.jboss.mx.server.MBeanServerImpl.invoke(MBeanServerImpl.java:659)
+////			at org.jboss.invocation.unified.server.UnifiedInvoker.invoke(UnifiedInvoker.java:231)
+////			at sun.reflect.GeneratedMethodAccessor132.invoke(Unknown Source)
+////			at sun.reflect.DelegatingMethodAccessorImpl.invoke(DelegatingMethodAccessorImpl.java:25)
+////			at java.lang.reflect.Method.invoke(Method.java:585)
+////			at org.jboss.mx.interceptor.ReflectedDispatcher.invoke(ReflectedDispatcher.java:155)
+////			at org.jboss.mx.server.Invocation.dispatch(Invocation.java:94)
+////			at org.jboss.mx.server.Invocation.invoke(Invocation.java:86)
+////			at org.jboss.mx.server.AbstractMBeanInvoker.invoke(AbstractMBeanInvoker.java:264)
+////			at org.jboss.mx.server.MBeanServerImpl.invoke(MBeanServerImpl.java:659)
+////			at javax.management.MBeanServerInvocationHandler.invoke(MBeanServerInvocationHandler.java:201)
+////			at $Proxy16.invoke(Unknown Source)
+////			at org.jboss.remoting.ServerInvoker.invoke(ServerInvoker.java:734)
+////			at org.jboss.remoting.transport.socket.ServerThread.processInvocation(ServerThread.java:560)
+////			at org.jboss.remoting.transport.socket.ServerThread.dorun(ServerThread.java:383)
+////			at org.jboss.remoting.transport.socket.ServerThread.run(ServerThread.java:165)
+////			at org.jboss.remoting.MicroRemoteClientInvoker.invoke(MicroRemoteClientInvoker.java:163)
+////			at org.jboss.remoting.Client.invoke(Client.java:1550)
+////			at org.jboss.remoting.Client.invoke(Client.java:530)
+////			at org.jboss.invocation.unified.interfaces.UnifiedInvokerProxy.invoke(UnifiedInvokerProxy.java:183)
+////			at org.jboss.invocation.InvokerInterceptor.invokeInvoker(InvokerInterceptor.java:365)
+////			at org.jboss.invocation.InvokerInterceptor.invoke(InvokerInterceptor.java:197)
+////			at org.jboss.proxy.TransactionInterceptor.invoke(TransactionInterceptor.java:61)
+////			at org.jboss.proxy.SecurityInterceptor.invoke(SecurityInterceptor.java:70)
+////			at org.jboss.proxy.ejb.StatelessSessionInterceptor.invoke(StatelessSessionInterceptor.java:112)
+////			at org.nightlabs.jfire.jboss.cascadedauthentication.CascadedAuthenticationClientInterceptor.invoke(CascadedAuthenticationClientInterceptor.java:124)
+////			at org.jboss.proxy.ClientContainer.invoke(ClientContainer.java:100)
+////			at $Proxy10.createQuickSaleWorkOrder(Unknown Source)
+////			at org.nightlabs.jfire.trade.articlecontainer.detail.GeneralQuickSaleEditorComposite.createEditorInput(GeneralQuickSaleEditorComposite.java:174)
+////			at org.nightlabs.jfire.trade.QuickSalePerspective.checkOrderOpen(QuickSalePerspective.java:129)
+////			at org.nightlabs.jfire.trade.articlecontainer.detail.GeneralQuickSaleEditor$1.partClosed(GeneralQuickSaleEditor.java:87)
+////			at org.eclipse.ui.internal.PartListenerList$3.run(PartListenerList.java:102)
+////			at org.eclipse.core.runtime.SafeRunner.run(SafeRunner.java:37)
+////			at org.eclipse.core.runtime.Platform.run(Platform.java:843)
+////			at org.eclipse.ui.internal.PartListenerList.fireEvent(PartListenerList.java:57)
+////			at org.eclipse.ui.internal.PartListenerList.firePartClosed(PartListenerList.java:100)
+////			at org.eclipse.ui.internal.PartService.firePartClosed(PartService.java:100)
+////			at org.eclipse.ui.internal.WorkbenchPagePartList.firePartClosed(WorkbenchPagePartList.java:38)
+////			at org.eclipse.ui.internal.PartList.partClosed(PartList.java:255)
+////			at org.eclipse.ui.internal.PartList.removePart(PartList.java:176)
+////			at org.eclipse.ui.internal.WorkbenchPage.disposePart(WorkbenchPage.java:1566)
+////			at org.eclipse.ui.internal.WorkbenchPage.handleDeferredEvents(WorkbenchPage.java:1330)
+////			at org.eclipse.ui.internal.WorkbenchPage.deferUpdates(WorkbenchPage.java:1313)
+////			at org.eclipse.ui.internal.WorkbenchPage.closeEditors(WorkbenchPage.java:1287)
+////			at org.eclipse.ui.internal.WorkbenchPage.closeEditor(WorkbenchPage.java:1343)
+////			at org.eclipse.ui.internal.EditorPane.doHide(EditorPane.java:54)
+////			at org.eclipse.ui.internal.PartStack.close(PartStack.java:499)
+////			at org.eclipse.ui.internal.EditorStack.close(EditorStack.java:205)
+////			at org.eclipse.ui.internal.PartStack$1.close(PartStack.java:106)
+////			at org.eclipse.ui.internal.presentations.util.TabbedStackPresentation$1.handleEvent(TabbedStackPresentation.java:81)
+////			at org.eclipse.ui.internal.presentations.util.AbstractTabFolder.fireEvent(AbstractTabFolder.java:267)
+////			at org.eclipse.ui.internal.presentations.util.AbstractTabFolder.fireEvent(AbstractTabFolder.java:276)
+////			at org.eclipse.ui.internal.presentations.defaultpresentation.DefaultTabFolder.access$1(DefaultTabFolder.java:1)
+////			at org.eclipse.ui.internal.presentations.defaultpresentation.DefaultTabFolder$1.closeButtonPressed(DefaultTabFolder.java:67)
+////			at org.eclipse.ui.internal.presentations.PaneFolder.notifyCloseListeners(PaneFolder.java:580)
+////			at org.eclipse.ui.internal.presentations.PaneFolder$3.close(PaneFolder.java:187)
+////			at org.eclipse.swt.custom.CTabFolder.onMouse(CTabFolder.java:2107)
+////			at org.eclipse.swt.custom.CTabFolder$1.handleEvent(CTabFolder.java:292)
+////			at org.eclipse.swt.widgets.EventTable.sendEvent(EventTable.java:66)
+////			at org.eclipse.swt.widgets.Widget.sendEvent(Widget.java:1085)
+////			at org.eclipse.swt.widgets.Display.runDeferredEvents(Display.java:3180)
+////			at org.eclipse.swt.widgets.Display.readAndDispatch(Display.java:2856)
+////			at org.eclipse.ui.internal.Workbench.runEventLoop(Workbench.java:1967)
+////			at org.eclipse.ui.internal.Workbench.runUI(Workbench.java:1931)
+////			at org.eclipse.ui.internal.Workbench.createAndRunWorkbench(Workbench.java:419)
+////			at org.eclipse.ui.PlatformUI.createAndRunWorkbench(PlatformUI.java:149)
+////			at org.nightlabs.base.app.AbstractApplicationThread.run(AbstractApplicationThread.java:121)
+//
+//			Collection offers;
+//			try {
+//				offers = new ArrayList(order.getOffers());
+//			} catch (Exception x) {
+//				offers = new ArrayList(order.getOffers());
+//			}
+////		 TODO JPOX WORKAROUND - begin
+
+			// If an Offer is finalized, it would prevent the Order from being re-assignable to another
+			// customer/vendor. Therefore we check for finalized Offers.
 			boolean skipOrder = false;
-			for (Offer offer : order.getOffers()) {
+			for (Iterator itO = order.getOffers().iterator(); itO.hasNext(); ) {
+//			for (Iterator itO = offers.iterator(); itO.hasNext(); ) {
+				Offer offer = (Offer) itO.next();
 				if (offer.isFinalized())
 					skipOrder = true;
 			}
@@ -412,7 +529,10 @@ implements Serializable, ArticleContainer, SegmentContainer, DetachCallback
 	 */
 	private boolean customerID_detached = false;
 
-	public Order() {}
+	/**
+	 * @deprecated Only for JDO!
+	 */
+	protected Order() {}
 
 	public Order(
 			OrganisationLegalEntity vendor, LegalEntity customer,
@@ -446,9 +566,9 @@ implements Serializable, ArticleContainer, SegmentContainer, DetachCallback
 		this.changeDT = new Date();
 		this.changeUser = user;
 
-		articles = new HashSet();
-		offers = new HashSet();
-		segments = new HashSet();
+		articles = new HashSet<Article>();
+		offers = new HashSet<Offer>();
+		segments = new HashSet<Segment>();
 	}
 
 	/**

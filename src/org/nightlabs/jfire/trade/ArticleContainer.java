@@ -40,6 +40,9 @@ public interface ArticleContainer
 	AnchorID getCustomerID();
 	AnchorID getVendorID();
 
+	LegalEntity getCustomer();
+	LegalEntity getVendor();
+
 	/**
 	 * @return Returns the organisation that issued the ArticleContainer - usually the vendor organisation.
 	 */

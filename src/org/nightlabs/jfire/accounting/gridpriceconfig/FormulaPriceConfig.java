@@ -28,6 +28,7 @@ package org.nightlabs.jfire.accounting.gridpriceconfig;
 
 import java.util.Collection;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.Map;
 
@@ -244,7 +245,7 @@ implements IFormulaPriceConfig
 				!priceCoordinate.getPriceConfig().getPrimaryKey().equals(this.getPrimaryKey()))
 			priceCoordinate = new PriceCoordinate(this, priceCoordinate);
 
-		FormulaCell formulaCell = (FormulaCell) formulaCells.get(priceCoordinate);
+		FormulaCell formulaCell = getFormulaCell(priceCoordinate, false);
 		if (formulaCell == null) {
 			formulaCell = new FormulaCell((PriceCoordinate)priceCoordinate);
 			formulaCell.setMapOwner(this);
@@ -267,8 +268,17 @@ implements IFormulaPriceConfig
 	{
 		FormulaCell formulaCell = (FormulaCell) formulaCells.get(priceCoordinate);
 
-//		if (returnFallbackCellIfNecessary && formulaCell == null)
-//			formulaCell = fallbackFormulaCell;
+		// If the JDO implementation uses a shortcut (a direct JDOQL instead of loading the whole Map and then
+		// searching for the key), the cell might exist and not be found. Hence, we load the whole Map and try it again.
+		if (formulaCell == null) {
+			for (Iterator it = formulaCells.entrySet().iterator(); it.hasNext();) {
+				Map.Entry me = (Map.Entry) it.next();
+				if (me.getKey().equals(priceCoordinate)) {
+					formulaCell = (FormulaCell) me.getValue();
+					break;
+				}
+			}
+		}
 
 		if (throwExceptionIfNotExistent && formulaCell == null)
 			throw new IllegalArgumentException("No FormulaCell found for "+priceCoordinate);

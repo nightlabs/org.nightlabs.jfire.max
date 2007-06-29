@@ -21,6 +21,7 @@ import org.nightlabs.jfire.security.User;
 import org.nightlabs.jfire.trade.Article;
 import org.nightlabs.jfire.trade.ArticleContainer;
 import org.nightlabs.jfire.trade.ArticleContainerException;
+import org.nightlabs.jfire.trade.LegalEntity;
 import org.nightlabs.jfire.transfer.id.AnchorID;
 import org.nightlabs.util.CollectionUtil;
 import org.nightlabs.util.Utils;
@@ -47,7 +48,7 @@ import org.nightlabs.util.Utils;
  *
  * @jdo.fetch-group name="Statable.state" fields="state"
  * @jdo.fetch-group name="Statable.states" fields="states"
- * @jdo.fetch-group name="ReceptionNote.this" fetch-groups="default" fields="receptionNoteLocal, articles, createDT, createUser, customerID, state, states, vendorID";
+ * @jdo.fetch-group name="ReceptionNote.this" fetch-groups="default" fields="receptionNoteLocal, articles, createDT, createUser, state, states";
  */
 public class ReceptionNote
 implements
@@ -59,10 +60,14 @@ implements
 {
 	private static final long serialVersionUID = 1L;
 
+	public static final String FETCH_GROUP_THIS_RECEPTION_NOTE = "ReceptionNote.this";
+
 	// the following fetch-groups are virtual and processed in the detach callback
 	public static final String FETCH_GROUP_VENDOR_ID = "ReceptionNote.vendorID";
 	public static final String FETCH_GROUP_CUSTOMER_ID = "ReceptionNote.customerID";
-	public static final String FETCH_GROUP_THIS_RECEPTION_NOTE = "ReceptionNote.this";
+	public static final String FETCH_GROUP_VENDOR = "ReceptionNote.vendor";
+	public static final String FETCH_GROUP_CUSTOMER = "ReceptionNote.customer";
+
 	/**
 	 * @jdo.field primary-key="true"
 	 * @jdo.column length="100"
@@ -105,6 +110,23 @@ implements
 	 *		mapped-by="receptionNote"
 	 */
 	private Set<Article> articles;
+
+	/**
+	 * @jdo.field persistence-modifier="none"
+	 */
+	private LegalEntity vendor = null;
+	/**
+	 * @jdo.field persistence-modifier="none"
+	 */
+	private boolean vendor_detached = false;
+	/**
+	 * @jdo.field persistence-modifier="none"
+	 */
+	private LegalEntity customer = null;
+	/**
+	 * @jdo.field persistence-modifier="none"
+	 */
+	private boolean customer_detached = false;
 
 	/**
 	 * @jdo.field persistence-modifier="none"
@@ -222,6 +244,22 @@ implements
 		return createUser;
 	}
 
+	public LegalEntity getVendor()
+	{
+		if (vendor == null && !vendor_detached)
+			vendor = deliveryNote.getVendor();
+
+		return vendor;
+	}
+
+	public LegalEntity getCustomer()
+	{
+		if (customer == null && !customer_detached)
+			customer = deliveryNote.getCustomer();
+
+		return customer;
+	}
+
 	public AnchorID getVendorID()
 	{
 		if (vendorID == null && !vendorID_detached)
@@ -268,14 +306,25 @@ implements
 	{
 		ReceptionNote attached = (ReceptionNote)_attached;
 		ReceptionNote detached = this;
-		Collection fetchGroups = attached.getPersistenceManager().getFetchPlan().getGroups();
+		PersistenceManager pm = attached.getPersistenceManager();
+		Collection fetchGroups = pm.getFetchPlan().getGroups();
 
-		if (fetchGroups.contains(FETCH_GROUP_VENDOR_ID)) {
+		if (fetchGroups.contains(FETCH_GROUP_THIS_RECEPTION_NOTE) || fetchGroups.contains(FETCH_GROUP_VENDOR)) {
+			detached.vendor = (LegalEntity) pm.detachCopy(attached.getVendor());
+			detached.vendor_detached = true;
+		}
+
+		if (fetchGroups.contains(FETCH_GROUP_THIS_RECEPTION_NOTE) || fetchGroups.contains(FETCH_GROUP_CUSTOMER)) {
+			detached.customer = (LegalEntity) pm.detachCopy(attached.getCustomer());
+			detached.customer_detached = true;
+		}
+
+		if (fetchGroups.contains(FETCH_GROUP_THIS_RECEPTION_NOTE) || fetchGroups.contains(FETCH_GROUP_VENDOR_ID)) {
 			detached.vendorID = attached.getVendorID();
 			detached.vendorID_detached = true;
 		}
 
-		if (fetchGroups.contains(FETCH_GROUP_CUSTOMER_ID)) {
+		if (fetchGroups.contains(FETCH_GROUP_THIS_RECEPTION_NOTE) || fetchGroups.contains(FETCH_GROUP_CUSTOMER_ID)) {
 			detached.customerID = attached.getCustomerID();
 			detached.customerID_detached = true;
 		}

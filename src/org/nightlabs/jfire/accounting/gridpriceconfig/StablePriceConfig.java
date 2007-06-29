@@ -181,6 +181,19 @@ implements IPackagePriceConfig, IResultPriceConfig
 	public PriceCell getPriceCell(IPriceCoordinate priceCoordinate, boolean throwExceptionIfNotExistent)
 	{
 		PriceCell priceCell = (PriceCell) priceCells.get(priceCoordinate);
+
+		// If the JDO implementation uses a shortcut (a direct JDOQL instead of loading the whole Map and then
+		// search for the key), the cell might exist and not be found. Hence, we load the whole Map and try it again.
+		if (priceCell == null) {
+			for (Iterator it = priceCells.entrySet().iterator(); it.hasNext();) {
+				Map.Entry me = (Map.Entry) it.next();
+				if (me.getKey().equals(priceCoordinate)) {
+					priceCell = (PriceCell) me.getValue();
+					break;
+				}
+			}
+		}
+
 		if (throwExceptionIfNotExistent && priceCell == null)
 			throw new IllegalArgumentException("No PriceCell found for "+priceCoordinate);
 		return priceCell;
@@ -193,7 +206,7 @@ implements IPackagePriceConfig, IResultPriceConfig
 				!priceCoordinate.getPriceConfig().getPrimaryKey().equals(this.getPrimaryKey()))
 			priceCoordinate = new PriceCoordinate(this, priceCoordinate);
 
-		PriceCell priceCell = (PriceCell) priceCells.get(priceCoordinate);
+		PriceCell priceCell = getPriceCell(priceCoordinate, false);
 		if (priceCell == null) {
 			priceCell = new PriceCell(priceCoordinate);
 			priceCells.put(priceCoordinate, priceCell);

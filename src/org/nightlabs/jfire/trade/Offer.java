@@ -118,6 +118,9 @@ implements
 	// the following fetch-groups are virtual and processed in the detach callback
 	public static final String FETCH_GROUP_VENDOR_ID = "Offer.vendorID";
 	public static final String FETCH_GROUP_CUSTOMER_ID = "Offer.customerID";
+	public static final String FETCH_GROUP_VENDOR = "Offer.vendor";
+	public static final String FETCH_GROUP_CUSTOMER = "Offer.customer";
+	
 
 	/**
 	 * @return a <tt>Collection</tt> of <tt>Offer</tt>
@@ -275,6 +278,23 @@ implements
 	 * @jdo.field persistence-modifier="persistent"
 	 */
 	private boolean containsPricesDependentOnOffer = false;
+
+	/**
+	 * @jdo.field persistence-modifier="none"
+	 */
+	private LegalEntity vendor = null;
+	/**
+	 * @jdo.field persistence-modifier="none"
+	 */
+	private boolean vendor_detached = false;
+	/**
+	 * @jdo.field persistence-modifier="none"
+	 */
+	private LegalEntity customer = null;
+	/**
+	 * @jdo.field persistence-modifier="none"
+	 */
+	private boolean customer_detached = false;
 
 	/**
 	 * @jdo.field persistence-modifier="none"
@@ -537,6 +557,14 @@ implements
 		return order;
 	}
 
+	public LegalEntity getVendor()
+	{
+		if (vendor == null && !vendor_detached)
+			vendor = order.getVendor();
+
+		return vendor;
+	}
+
 	/**
 	 * @return Returns the ID of the vendor, which is either obtained via {@link Order#getVendorID()} or
 	 *		manually detached in {@link #jdoPostDetach(Object)}.
@@ -547,6 +575,14 @@ implements
 			vendorID = order.getVendorID();
 
 		return vendorID;
+	}
+
+	public LegalEntity getCustomer()
+	{
+		if (customer == null && !customer_detached)
+			customer = order.getCustomer();
+
+		return customer;
 	}
 
 	/**
@@ -725,14 +761,25 @@ implements
 	{
 		Offer attached = (Offer)_attached;
 		Offer detached = this;
-		Collection fetchGroups = attached.getPersistenceManager().getFetchPlan().getGroups();
+		PersistenceManager pm = attached.getPersistenceManager();
+		Collection fetchGroups = pm.getFetchPlan().getGroups();
 
-		if (fetchGroups.contains(FETCH_GROUP_VENDOR_ID)) {
+		if (fetchGroups.contains(FETCH_GROUP_THIS_OFFER) || fetchGroups.contains(FETCH_GROUP_VENDOR)) {
+			detached.vendor = (LegalEntity) pm.detachCopy(attached.getVendor());
+			detached.vendor_detached = true;
+		}
+
+		if (fetchGroups.contains(FETCH_GROUP_THIS_OFFER) || fetchGroups.contains(FETCH_GROUP_CUSTOMER)) {
+			detached.customer = (LegalEntity) pm.detachCopy(attached.getCustomer());
+			detached.customer_detached = true;
+		}
+
+		if (fetchGroups.contains(FETCH_GROUP_THIS_OFFER) || fetchGroups.contains(FETCH_GROUP_VENDOR_ID)) {
 			detached.vendorID = attached.getVendorID();
 			detached.vendorID_detached = true;
 		}
 
-		if (fetchGroups.contains(FETCH_GROUP_CUSTOMER_ID)) {
+		if (fetchGroups.contains(FETCH_GROUP_THIS_OFFER) || fetchGroups.contains(FETCH_GROUP_CUSTOMER_ID)) {
 			detached.customerID = attached.getCustomerID();
 			detached.customerID_detached = true;
 		}

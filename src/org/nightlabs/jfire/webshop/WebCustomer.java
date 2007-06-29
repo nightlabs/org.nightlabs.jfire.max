@@ -7,6 +7,9 @@ import org.nightlabs.jdo.ObjectIDUtil;
 import org.nightlabs.jfire.trade.LegalEntity;
 
 /**
+ * The WebCustomer assembles datas like username and password that are only used for the web 
+ * and a legalEntity within the core system.
+ * 
  * @author Khaled
  *
  * @jdo.persistence-capable

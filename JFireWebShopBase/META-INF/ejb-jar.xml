@@ -272,11 +272,12 @@
       <description><![CDATA[description not supported yet by ejbdoclet]]></description>
          <role-name>_Guest_</role-name>
       <method >
-         <description><![CDATA[This is to accelerate a demand by not detaching the webCustomer.]]></description>
+         <description><![CDATA[]]></description>
          <ejb-name>jfire/ejb/JFireWebShopBase/WebShop</ejb-name>
          <method-intf>Local</method-intf>
-         <method-name>getPassword</method-name>
+         <method-name>checkPassword</method-name>
          <method-params>
+            <method-param>java.lang.String</method-param>
             <method-param>java.lang.String</method-param>
          </method-params>
       </method>
@@ -285,11 +286,12 @@
       <description><![CDATA[description not supported yet by ejbdoclet]]></description>
          <role-name>_Guest_</role-name>
       <method >
-         <description><![CDATA[This is to accelerate a demand by not detaching the webCustomer.]]></description>
+         <description><![CDATA[]]></description>
          <ejb-name>jfire/ejb/JFireWebShopBase/WebShop</ejb-name>
          <method-intf>Remote</method-intf>
-         <method-name>getPassword</method-name>
+         <method-name>checkPassword</method-name>
          <method-params>
+            <method-param>java.lang.String</method-param>
             <method-param>java.lang.String</method-param>
          </method-params>
       </method>
@@ -492,8 +494,9 @@
       <method >
          <ejb-name>jfire/ejb/JFireWebShopBase/WebShop</ejb-name>
          <method-intf>Local</method-intf>
-         <method-name>getPassword</method-name>
+         <method-name>checkPassword</method-name>
          <method-params>
+            <method-param>java.lang.String</method-param>
             <method-param>java.lang.String</method-param>
          </method-params>
       </method>
@@ -503,8 +506,9 @@
       <method >
          <ejb-name>jfire/ejb/JFireWebShopBase/WebShop</ejb-name>
          <method-intf>Remote</method-intf>
-         <method-name>getPassword</method-name>
+         <method-name>checkPassword</method-name>
          <method-params>
+            <method-param>java.lang.String</method-param>
             <method-param>java.lang.String</method-param>
          </method-params>
       </method>

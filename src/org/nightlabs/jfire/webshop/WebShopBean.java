@@ -196,27 +196,27 @@ implements SessionBean
 		return true;
 	}
 	/**
-	 * This is to accelerate a demand by not detaching the webCustomer.
 	 * @ejb.interface-method
 	 * @ejb.permission role-name="_Guest_"
 	 * @ejb.transaction type="Supports"
-	 */			
-	public String getPassword(String webCustomerID) 
+	 */
+	public boolean checkPassword(String webCustomerID, String password) 
 	{
 		PersistenceManager pm = getPersistenceManager();
 		WebCustomerID id = WebCustomerID.create(getOrganisationID(), webCustomerID);
 		try {
 			WebCustomer wbc = (WebCustomer)pm.getObjectById(id);
-			return wbc.getPassword();
+			if(wbc.getPassword().equals(password)) return true;
+			else return false;
 		}	
 		catch (JDOObjectNotFoundException e) {
 			e.printStackTrace();
 		} finally {
 			pm.close();
 		}	
-		return null;
+		return false;
 	}
-
+	
 	/**
 	 * @ejb.interface-method
 	 * @ejb.permission role-name="_Guest_"

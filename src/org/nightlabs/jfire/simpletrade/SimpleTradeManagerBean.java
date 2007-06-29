@@ -110,6 +110,7 @@ import org.nightlabs.jfire.trade.Trader;
 import org.nightlabs.jfire.trade.id.CustomerGroupID;
 import org.nightlabs.jfire.trade.id.OfferID;
 import org.nightlabs.jfire.trade.id.SegmentID;
+import org.nightlabs.util.CollectionUtil;
 
 
 /**
@@ -490,6 +491,26 @@ implements SessionBean
 		}
 	}
 
+	/**
+	 * @ejb.interface-method
+	 * @ejb.transaction type="Supports"
+	 * @ejb.permission role-name="_Guest_"
+	 */
+	@SuppressWarnings("unchecked")
+	public SimpleProductType getSimpleProductType(
+			ProductTypeID simpleProductTypeID, String[] fetchGroups,
+			int maxFetchDepth) {
+		PersistenceManager pm = getPersistenceManager();
+		try {
+			List<SimpleProductType> spts = getSimpleProductTypes(CollectionUtil.array2HashSet(new ProductTypeID[] {simpleProductTypeID}), fetchGroups, maxFetchDepth);
+			if (spts.size() > 0)
+				return spts.get(0);
+			return null;
+		} finally {
+			pm.close();
+		}
+	}
+	
 	/**
 	 * @ejb.interface-method
 	 * @ejb.transaction type="Supports"

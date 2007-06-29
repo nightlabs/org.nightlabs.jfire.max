@@ -256,7 +256,7 @@ public abstract class ReportRegistryItem implements Serializable, DetachCallback
 	 * @return The object-id of the parent of this item.
 	 */
 	public ReportRegistryItemID getParentCategoryID() {
-		if (parentCategoryID == null) {
+		if (!parentCategoryIDDetached && parentCategoryID == null) {
 			parentCategoryID = (ReportRegistryItemID) JDOHelper.getObjectId(parentCategory);
 		}
 		return parentCategoryID;
@@ -386,6 +386,10 @@ public abstract class ReportRegistryItem implements Serializable, DetachCallback
 			Utils.equals(this.reportRegistryItemID, other.reportRegistryItemID);
 	}
 
+	/**
+	 * @jdo.field persistence-modifier="none"
+	 */
+	private boolean parentCategoryIDDetached = false;
 	/** 
 	 * {@inheritDoc}
 	 * Sets the {@link #parentCategoryID} member if {@link #FETCH_GROUP_PARENT_CATEGORY_ID} is in the fetch-plan.
@@ -395,8 +399,10 @@ public abstract class ReportRegistryItem implements Serializable, DetachCallback
 	public void jdoPostDetach(Object obj) {
 		ReportRegistryItem attached = (ReportRegistryItem) obj;
 		ReportRegistryItem detached = this;
-		if (attached.getPersistenceManager().getFetchPlan().getGroups().contains(FETCH_GROUP_PARENT_CATEGORY_ID))
+		if (attached.getPersistenceManager().getFetchPlan().getGroups().contains(FETCH_GROUP_PARENT_CATEGORY_ID)) {
 			detached.parentCategoryID = attached.getParentCategoryID();
+			detached.parentCategoryIDDetached = true; 
+		}
 	}
 
 	/** 

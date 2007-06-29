@@ -205,6 +205,9 @@ implements Serializable, ArticleContainer, SegmentContainer, DetachCallback
 			if (!order.getArticles().isEmpty())
 				continue;
 
+			if (order.getOffers() == null || order.getOffers().isEmpty())
+				continue;
+			
 			boolean skipOrder = false;
 			for (Offer offer : order.getOffers()) {
 				if (offer.isFinalized())

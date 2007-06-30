@@ -34,10 +34,12 @@ import javax.ejb.CreateException;
 import javax.ejb.EJBException;
 import javax.ejb.SessionBean;
 import javax.ejb.SessionContext;
+import javax.jdo.JDOObjectNotFoundException;
 import javax.jdo.PersistenceManager;
 
 import org.apache.log4j.Logger;
 import org.nightlabs.jfire.base.BaseSessionBeanImpl;
+import org.nightlabs.jfire.config.id.ConfigModuleInitialiserID;
 import org.nightlabs.jfire.organisation.Organisation;
 import org.nightlabs.jfire.reporting.ReportingInitialiserException;
 import org.nightlabs.jfire.reporting.parameter.ReportParameterUtil;
@@ -46,6 +48,7 @@ import org.nightlabs.jfire.reporting.parameter.ValueProviderCategory;
 import org.nightlabs.jfire.reporting.parameter.ValueProviderInputParameter;
 import org.nightlabs.jfire.reporting.parameter.ReportParameterUtil.NameEntry;
 import org.nightlabs.jfire.reporting.parameter.id.ValueProviderCategoryID;
+import org.nightlabs.jfire.reporting.trade.config.ReportLayoutCfModInitialiserArticleContainerLayouts;
 import org.nightlabs.jfire.scripting.ScriptingIntialiserException;
 import org.nightlabs.jfire.servermanager.JFireServerManager;
 import org.nightlabs.jfire.store.id.ProductTypeID;
@@ -146,6 +149,14 @@ implements SessionBean
 			// better have the layouts for the local organisation, than for the devil organisation			
 			ReportingInitialiser.initialise(pm, jfireServerManager, getOrganisationID()); 
 			
+			ConfigModuleInitialiserID initialiserID = ReportLayoutCfModInitialiserArticleContainerLayouts.getConfigModuleInitialiserID(getOrganisationID());
+			ReportLayoutCfModInitialiserArticleContainerLayouts initialiser = null;
+			try {
+				initialiser = (ReportLayoutCfModInitialiserArticleContainerLayouts) pm.getObjectById(initialiserID);
+			} catch (JDOObjectNotFoundException e) {
+				initialiser = new ReportLayoutCfModInitialiserArticleContainerLayouts(getOrganisationID());
+				pm.makePersistent(initialiser);
+			}
 			
 		} finally {
 			pm.close();

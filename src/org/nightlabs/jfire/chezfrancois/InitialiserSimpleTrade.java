@@ -310,7 +310,6 @@ extends Initialiser
 			Set<String> adminIDs = orgCf.getServerAdmins();
 			for (String adminID	: adminIDs) {
 				User admin = User.getUser(pm, orgCf.getOrganisationID(), adminID);
-				dataCreator.setUserReportLayoutAvailEntries(pm, admin);
 			}
 		} 
 		

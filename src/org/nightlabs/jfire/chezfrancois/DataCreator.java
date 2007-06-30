@@ -26,12 +26,9 @@
 
 package org.nightlabs.jfire.chezfrancois;
 
-import java.util.Collection;
 import java.util.Date;
-import java.util.Iterator;
 import java.util.Locale;
 
-import javax.jdo.JDOHelper;
 import javax.jdo.JDOObjectNotFoundException;
 import javax.jdo.PersistenceManager;
 import javax.naming.InitialContext;
@@ -40,7 +37,6 @@ import javax.naming.NamingException;
 import org.apache.log4j.Logger;
 import org.nightlabs.ModuleException;
 import org.nightlabs.i18n.I18nText;
-import org.nightlabs.jdo.ObjectIDUtil;
 import org.nightlabs.jfire.accounting.Account;
 import org.nightlabs.jfire.accounting.Accounting;
 import org.nightlabs.jfire.accounting.Currency;
@@ -50,7 +46,6 @@ import org.nightlabs.jfire.accounting.book.mappingbased.PFMoneyFlowMapping;
 import org.nightlabs.jfire.accounting.id.CurrencyID;
 import org.nightlabs.jfire.accounting.id.PriceFragmentTypeID;
 import org.nightlabs.jfire.accounting.id.TariffID;
-import org.nightlabs.jfire.config.Config;
 import org.nightlabs.jfire.idgenerator.IDGenerator;
 import org.nightlabs.jfire.organisation.Organisation;
 import org.nightlabs.jfire.person.Person;
@@ -72,11 +67,6 @@ import org.nightlabs.jfire.prop.exception.StructFieldNotFoundException;
 import org.nightlabs.jfire.prop.exception.StructFieldValueNotFoundException;
 import org.nightlabs.jfire.prop.structfield.SelectionStructField;
 import org.nightlabs.jfire.prop.structfield.StructFieldValue;
-import org.nightlabs.jfire.reporting.config.ReportLayoutAvailEntry;
-import org.nightlabs.jfire.reporting.config.ReportLayoutConfigModule;
-import org.nightlabs.jfire.reporting.layout.ReportLayout;
-import org.nightlabs.jfire.reporting.layout.ReportRegistryItem;
-import org.nightlabs.jfire.reporting.trade.ReportingTradeConstants;
 import org.nightlabs.jfire.security.SecurityException;
 import org.nightlabs.jfire.security.User;
 import org.nightlabs.jfire.security.UserLocal;
@@ -300,7 +290,6 @@ public class DataCreator
 		try {
 			User user = (User) pm.getObjectById(UserID.create(organisationID, userID));
 			// it already exists => return
-			setUserReportLayoutAvailEntries(pm, user);
 			return user;
 		} catch (JDOObjectNotFoundException x) {
 			// fine, it doesn't exist yet
@@ -313,7 +302,6 @@ public class DataCreator
 		Person person = createPerson(personCompany, personName, personFirstName, personEMail);
 		user.setPerson(person);
 		user = (User) pm.makePersistent(user);
-		setUserReportLayoutAvailEntries(pm, user);
 		return user;
 	}
 
@@ -334,40 +322,7 @@ public class DataCreator
 		userLocal.setPasswordPlain(password);
 		user.setPerson(person);
 		user = (User) pm.makePersistent(user);
-		setUserReportLayoutAvailEntries(pm, user);
 		return user;		
-	}
-	
-	public void setUserReportLayoutAvailEntries(PersistenceManager pm, User user) {
-		logger.debug("Setting ReportLayoutEntries for User "+user.getUserID());
-		Config config = Config.getConfig(pm, user.getOrganisationID(), user);
-		ReportLayoutConfigModule cfMod;
-		try {
-			cfMod = (ReportLayoutConfigModule) config.createConfigModule(ReportLayoutConfigModule.class);
-		} catch (ModuleException e) {
-			throw new RuntimeException(e);
-		}
-		logger.debug("Have config module");
-		setUserReportLayoutAvailEntry(pm, user, cfMod, ReportingTradeConstants.REPORT_REGISTRY_ITEM_TYPE_INVOICE);
-		setUserReportLayoutAvailEntry(pm, user, cfMod, ReportingTradeConstants.REPORT_REGISTRY_ITEM_TYPE_OFFER);
-		setUserReportLayoutAvailEntry(pm, user, cfMod, ReportingTradeConstants.REPORT_REGISTRY_ITEM_TYPE_ORDER);
-		setUserReportLayoutAvailEntry(pm, user, cfMod, ReportingTradeConstants.REPORT_REGISTRY_ITEM_TYPE_DELIVERY_NOTE);
-	}
-	
-	private void setUserReportLayoutAvailEntry(PersistenceManager pm, User user, ReportLayoutConfigModule cfMod, String reportRegistryItemType) {
-		logger.debug("Setting ReportLayoutAvailEntry for type "+reportRegistryItemType);
-		ReportLayoutAvailEntry entry = cfMod.getAvailEntry(reportRegistryItemType);
-		Collection items = ReportLayout.getReportRegistryItemByType(pm, user.getOrganisationID(), reportRegistryItemType);
-		logger.debug("Search for ReportLayouts produced "+items.size()+" items");
-		for (Iterator iter = items.iterator(); iter.hasNext();) {
-			ReportRegistryItem item = (ReportRegistryItem) iter.next();
-			if (item instanceof ReportLayout) {
-				entry.getAvailableReportLayoutKeys().add(JDOHelper.getObjectId(item).toString());
-				// set the default, the last one will then be the real default
-				entry.setDefaultReportLayoutKey(JDOHelper.getObjectId(item).toString());
-				logger.debug("Added "+JDOHelper.getObjectId(item).toString()+" to availability set.");
-			}
-		}
 	}
 	
 	public Person createPerson(String company, String name, String firstName, String eMail,

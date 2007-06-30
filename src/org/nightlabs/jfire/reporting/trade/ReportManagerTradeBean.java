@@ -102,7 +102,17 @@ implements SessionBean
 	 */
 	public void ejbRemove() throws EJBException, RemoteException { }
 	
-	
+	/**
+	 * TODO JPOX WORKAROUND
+	 *
+	 * @ejb.interface-method
+	 * @ejb.permission role-name="_System_"
+	 * @ejb.transaction type="Required"
+	 */
+	public void initializeScripting2() throws ScriptingIntialiserException 
+	{
+		initializeScripting();
+	}
 	/**
 	 * This method is called by the datastore initialization mechanism.
 	 * 
@@ -110,7 +120,7 @@ implements SessionBean
 	 * 
 	 * @ejb.interface-method
 	 * @ejb.permission role-name="_System_"
-	 * @ejb.transaction type = "Required"
+	 * @ejb.transaction type="Required"
 	 */
 	public void initializeScripting() throws ScriptingIntialiserException 
 	{
@@ -125,17 +135,27 @@ implements SessionBean
 			pm.close();
 			jfireServerManager.close();
 		}
-		
-		
 	}
-	
+
+	/**
+	 * TODO JPOX WORKAROUND
+	 *
+	 * @ejb.interface-method
+	 * @ejb.permission role-name="_System_"
+	 * @ejb.transaction type="Required"
+	 */
+	public void initializeReporting2() throws ReportingInitialiserException 
+	{
+		initializeReporting();
+	}
+
 	/**
 	 * This method is called by the datastore initialization mechanism.
 	 * @throws ReportingInitializerException 
 	 * 
 	 * @ejb.interface-method
-	 * @ejb.permission role-name="JFireReporting-admin"
-	 * @ejb.transaction type = "Required"
+	 * @ejb.permission role-name="_System_"
+	 * @ejb.transaction type="Required"
 	 */
 	public void initializeReporting() throws ReportingInitialiserException 
 	{

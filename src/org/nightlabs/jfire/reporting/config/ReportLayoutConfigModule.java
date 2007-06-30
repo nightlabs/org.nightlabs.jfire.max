@@ -28,10 +28,20 @@ package org.nightlabs.jfire.reporting.config;
 
 import java.util.Collection;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.Map;
 
+import javax.jdo.JDOHelper;
+import javax.jdo.PersistenceManager;
+
+import org.apache.log4j.Logger;
+import org.nightlabs.ModuleException;
+import org.nightlabs.jfire.config.Config;
 import org.nightlabs.jfire.config.ConfigModule;
+import org.nightlabs.jfire.reporting.layout.ReportLayout;
+import org.nightlabs.jfire.reporting.layout.ReportRegistryItem;
 import org.nightlabs.jfire.reporting.layout.id.ReportRegistryItemID;
+import org.nightlabs.jfire.security.User;
 
 /**
  * @author Alexander Bieber <alex[AT]nightlabs[DOT]de>
@@ -47,6 +57,11 @@ import org.nightlabs.jfire.reporting.layout.id.ReportRegistryItemID;
  */
 public class ReportLayoutConfigModule extends ConfigModule {
 
+	/**
+	 * Log4J Logger for this class
+	 */
+	private static final Logger logger = Logger.getLogger(ReportLayoutConfigModule.class);
+	
 	private static final long serialVersionUID = 1L;
 
 	public static final String FETCH_GROUP_AVAILABLE_LAYOUTS = "ReportLayoutConfigModule.availEntries";
@@ -150,5 +165,4 @@ public class ReportLayoutConfigModule extends ConfigModule {
 			throw new IllegalStateException("Could not get ReportLayoutAvailEntry even with auto-create");
 		return availEntry.getAvailableReportLayoutIDs();		
 	}
-
 }

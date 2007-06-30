@@ -5,4 +5,22 @@
 	<name language="de">Angebots-Layouts</name>
 	<name language="en">Offer-Layouts</name>
 
+	<report
+		file="Default-OfferLayout.rptdesign" 
+		id="Default-OfferLayout"
+		overwriteOnInit="true"
+	>
+	<!-- id is optional and defaults to the value of file without extension -->
+	<!-- overwriteOnInit is optional and defaults to true -->
+		<name language="de">Standard-Angebot</name>
+		<name language="en">Default-Offer</name>
+		<description language="de">Dies ist das Standard Angebotslayout.
+Es kann mit allen Produkttypen verwendet werden:
+SimpleProductType, DynamicProductType and VoucherType		
+		</description>
+		<description language="en">This is the default offer layout.
+It can be used with all ProductTypes:
+SimpleProductType, DynamicProductType and VoucherType		
+		</description>
+	</report>	
 </report-category>

@@ -6,5 +6,24 @@
 >
 	<name language="de">Lieferschein-Layouts</name>
 	<name language="en">Deliverynote-Layouts</name>
+	
+	<report
+		file="Default-DeliveryNoteLayout.rptdesign" 
+		id="Default-DeliveryNoteLayout"
+		overwriteOnInit="false"
+	>
+	<!-- id is optional and defaults to the value of file without extension -->
+	<!-- overwriteOnInit is optional and defaults to true -->
+		<name language="de">Standard-Lieferschein</name>
+		<name language="en">Default-Deliverynote</name>
+		<description language="de">Dies ist das Standard Lieferscheinlayout.
+Es kann mit allen Produkttypen verwendet werden:
+SimpleProductType, DynamicProductType and VoucherType		
+		</description>
+		<description language="en">This is the default delivery note layout.
+It can be used with all ProductTypes:
+SimpleProductType, DynamicProductType and VoucherType		
+		</description>
+	</report>	
 
 </report-category>

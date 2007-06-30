@@ -1255,6 +1255,20 @@ implements SessionBean
 	}
 
 	/**
+	 * TODO JPOX WORKAROUND
+	 * This is a workaround - see datastoreinit.xml
+
+	 * @ejb.interface-method
+	 * @ejb.transaction type="Required"
+	 * @ejb.permission role-name="_System_"
+	 */
+	public void initialise2()
+	throws IOException, MalformedVersionException
+	{
+		initialise();
+	}
+
+	/**
 	 * @throws ModuleException
 	 *
 	 * @ejb.interface-method

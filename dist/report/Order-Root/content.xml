@@ -5,4 +5,22 @@
 	<name language="de">Auftrags-Layouts</name>
 	<name language="en">Order-Layouts</name>
 
+	<report
+		file="Default-OrderLayout.rptdesign" 
+		id="Default-OrderLayout"
+		overwriteOnInit="true"
+	>
+	<!-- id is optional and defaults to the value of file without extension -->
+	<!-- overwriteOnInit is optional and defaults to true -->
+		<name language="de">Standard-Auftrag</name>
+		<name language="en">Default-Order</name>
+		<description language="de">Dies ist das Standard Auftragslayout.
+Es kann mit allen Produkttypen verwendet werden:
+SimpleProductType, DynamicProductType and VoucherType		
+		</description>
+		<description language="en">This is the default order layout.
+It can be used with all ProductTypes:
+SimpleProductType, DynamicProductType and VoucherType		
+		</description>
+	</report>	
 </report-category>

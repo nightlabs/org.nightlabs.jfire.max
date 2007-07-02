@@ -177,8 +177,8 @@ implements SessionBean
 			Store store = Store.getStore(pm);
 
 			// version is {major}.{minor}.{release}-{patchlevel}-{suffix}
-			moduleMetaData = new ModuleMetaData("JFireVoucher", "1.0.0-0-beta",
-					"1.0.0-0-beta");
+			moduleMetaData = new ModuleMetaData("JFireVoucher", "0.9.0-0-beta", // TODO use constant for "JFireVoucher" like in other EARs
+					"0.9.0-0-beta");
 			moduleMetaData = (ModuleMetaData) pm.makePersistent(moduleMetaData);
 
 			User user = User.getUser(pm, getPrincipal());

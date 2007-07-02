@@ -10,8 +10,8 @@
     <javadoc path="JFireJbpm/src"/>
     <javadoc path="JFireJbpm/ejbsrc"/>
     <provides
-    	path="WORKSPACE/JFireJbpm/lib/jbpm/jbpm-3.1.2.jar"
-    	location="JFireJbpm/lib/jbpm/jbpm-3.1.2.jar"/>
+    	path="WORKSPACE/JFireJbpm/lib/jbpm/jbpm-3.1.4.jar"
+    	location="JFireJbpm/lib/jbpm/jbpm-3.1.4.jar"/>
   </project>
 
 </nightlybuild>

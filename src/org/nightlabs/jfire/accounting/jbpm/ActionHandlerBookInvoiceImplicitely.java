@@ -11,6 +11,8 @@ import org.nightlabs.annotation.Implement;
 import org.nightlabs.jfire.accounting.Accounting;
 import org.nightlabs.jfire.accounting.Invoice;
 import org.nightlabs.jfire.jbpm.graph.def.AbstractActionHandler;
+import org.nightlabs.jfire.security.SecurityReflector;
+import org.nightlabs.jfire.security.User;
 
 public class ActionHandlerBookInvoiceImplicitely
 extends AbstractActionHandler
@@ -38,8 +40,11 @@ extends AbstractActionHandler
 	{
 		PersistenceManager pm = getPersistenceManager();
 		Invoice invoice = (Invoice) getStatable();
-		Accounting.getAccounting(pm).validateInvoice(invoice);
-		ActionHandlerFinalizeInvoice.doExecute(pm, invoice);
+		Accounting accounting = Accounting.getAccounting(pm);
+		accounting.validateInvoice(invoice);
+		User user = SecurityReflector.getUserDescriptor().getUser(pm);
+		invoice.setFinalized(user);
+//		ActionHandlerFinalizeInvoice.doExecute(pm, invoice);
 	}
 
 }

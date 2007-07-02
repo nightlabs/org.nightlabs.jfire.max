@@ -1,7 +1,5 @@
 package org.nightlabs.jfire.store.jbpm;
 
-import java.util.ArrayList;
-
 import javax.jdo.JDOHelper;
 import javax.jdo.PersistenceManager;
 
@@ -11,14 +9,13 @@ import org.jbpm.graph.def.Node;
 import org.jbpm.graph.exe.ExecutionContext;
 import org.jbpm.instantiation.Delegation;
 import org.nightlabs.annotation.Implement;
-import org.nightlabs.jfire.asyncinvoke.AsyncInvoke;
 import org.nightlabs.jfire.jbpm.graph.def.AbstractActionHandler;
+import org.nightlabs.jfire.jbpm.graph.def.State;
 import org.nightlabs.jfire.security.SecurityReflector;
 import org.nightlabs.jfire.security.User;
 import org.nightlabs.jfire.store.DeliveryNote;
 import org.nightlabs.jfire.store.Store;
 import org.nightlabs.jfire.store.id.DeliveryNoteID;
-import org.nightlabs.jfire.trade.Article;
 
 public class ActionHandlerBookDeliveryNote
 extends AbstractActionHandler
@@ -57,7 +54,10 @@ extends AbstractActionHandler
 //		store.consolidateProductReferences(products); // TODO is the consolidate here at the right position?
 
 		// send asynchronously
-		AsyncInvoke.exec(new SendDeliveryNoteInvocation((DeliveryNoteID) JDOHelper.getObjectId(deliveryNote)), true);
+//		AsyncInvoke.exec(new SendDeliveryNoteInvocation((DeliveryNoteID) JDOHelper.getObjectId(deliveryNote)), true);
+		DeliveryNoteID deliveryNoteID = (DeliveryNoteID) JDOHelper.getObjectId(deliveryNote);
+		if (!State.hasState(pm, deliveryNoteID, JbpmConstantsDeliveryNote.Both.NODE_NAME_SENT))
+			executionContext.leaveNode(JbpmConstantsDeliveryNote.Vendor.TRANSITION_NAME_SEND);
 	}
 
 }

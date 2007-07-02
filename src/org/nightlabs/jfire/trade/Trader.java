@@ -482,7 +482,8 @@ public class Trader
 	}
 
 	public Order createOrder(OrganisationLegalEntity vendor,
-			LegalEntity customer, String orderIDPrefix, Currency currency) throws ModuleException
+			LegalEntity customer, String orderIDPrefix, Currency currency)
+//	throws ModuleException
 	{
 		if (customer == null)
 			throw new NullPointerException("customer");

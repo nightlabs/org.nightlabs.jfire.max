@@ -9,10 +9,7 @@ import org.jbpm.graph.exe.ExecutionContext;
 import org.jbpm.instantiation.Delegation;
 import org.nightlabs.annotation.Implement;
 import org.nightlabs.jfire.jbpm.graph.def.AbstractActionHandler;
-import org.nightlabs.jfire.security.SecurityReflector;
-import org.nightlabs.jfire.security.User;
 import org.nightlabs.jfire.trade.Offer;
-import org.nightlabs.jfire.trade.OfferActionHandler;
 import org.nightlabs.jfire.trade.OrganisationLegalEntity;
 
 public class ActionHandlerAcceptOfferImplicitelyVendor
@@ -43,14 +40,14 @@ extends AbstractActionHandler
 		Offer offer = (Offer) getStatable();
 
 		if (!offer.isFinalized())
-			ActionHandlerFinalizeOffer.doExecute(pm, offer);
+			ActionHandlerFinalizeOffer.finalizeOffer(pm, offer);
 
-		User user = SecurityReflector.getUserDescriptor().getUser(pm);
-
-		offer.setFinalized(user);
-		for (OfferActionHandler offerActionHandler : offer.getOfferLocal().getOfferActionHandlers()) {
-			offerActionHandler.onFinalizeOffer(user, offer);
-		}
+//		User user = SecurityReflector.getUserDescriptor().getUser(pm);
+//
+//		offer.setFinalized(user);
+//		for (OfferActionHandler offerActionHandler : offer.getOfferLocal().getOfferActionHandlers()) {
+//			offerActionHandler.onFinalizeOffer(user, offer);
+//		}
 
 		// send the offer to the customer, if the customer is an organisation
 		if (offer.getOrder().getCustomer() instanceof OrganisationLegalEntity) {

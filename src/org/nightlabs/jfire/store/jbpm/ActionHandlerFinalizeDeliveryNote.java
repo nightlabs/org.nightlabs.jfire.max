@@ -10,8 +10,8 @@ import org.jbpm.graph.exe.ExecutionContext;
 import org.jbpm.instantiation.Delegation;
 import org.nightlabs.annotation.Implement;
 import org.nightlabs.jfire.accounting.Accounting;
-import org.nightlabs.jfire.asyncinvoke.AsyncInvoke;
 import org.nightlabs.jfire.jbpm.graph.def.AbstractActionHandler;
+import org.nightlabs.jfire.jbpm.graph.def.State;
 import org.nightlabs.jfire.security.SecurityReflector;
 import org.nightlabs.jfire.security.User;
 import org.nightlabs.jfire.store.DeliveryNote;
@@ -43,14 +43,14 @@ extends AbstractActionHandler
 	{
 		PersistenceManager pm = getPersistenceManager();
 		DeliveryNote deliveryNote = (DeliveryNote) getStatable();
-		doExecute(pm, deliveryNote);
-	}
-
-	protected static void doExecute(PersistenceManager pm, DeliveryNote deliveryNote)
-	throws Exception
-	{
-		if (deliveryNote.isFinalized())
-			return;
+//		doExecute(pm, deliveryNote);
+//	}
+//
+//	protected static void doExecute(PersistenceManager pm, DeliveryNote deliveryNote)
+//	throws Exception
+//	{
+//		if (deliveryNote.isFinalized())
+//			return;
 
 		Accounting accounting = Accounting.getAccounting(pm);
 		User user = SecurityReflector.getUserDescriptor().getUser(pm);
@@ -62,6 +62,20 @@ extends AbstractActionHandler
 		deliveryNote.setFinalized(user);
 
 		// book asynchronously
-		AsyncInvoke.exec(new BookDeliveryNoteInvocation((DeliveryNoteID) JDOHelper.getObjectId(deliveryNote)), true);
+//		AsyncInvoke.exec(new BookDeliveryNoteInvocation((DeliveryNoteID) JDOHelper.getObjectId(deliveryNote)), true);
+
+		DeliveryNoteID deliveryNoteID = (DeliveryNoteID) JDOHelper.getObjectId(deliveryNote);
+		if (!State.hasState(pm, deliveryNoteID, JbpmConstantsDeliveryNote.Both.NODE_NAME_BOOKED)) // in case a manual booking has occured (though this should be more-or-less impossible in the short time)
+			executionContext.leaveNode(JbpmConstantsDeliveryNote.Both.TRANSITION_NAME_BOOK);
+
+//	JbpmContext jbpmContext = JbpmLookup.getJbpmConfiguration().createJbpmContext();
+//	try {
+//		pm.getExtent(DeliveryNoteLocal.class);
+//		DeliveryNoteLocal deliveryNoteLocal = (DeliveryNoteLocal) pm.getObjectById(DeliveryNoteLocalID.create(deliveryNoteID));
+//		ProcessInstance processInstance = jbpmContext.getProcessInstance(deliveryNoteLocal.getJbpmProcessInstanceId());
+//		processInstance.signal(JbpmConstantsDeliveryNote.Both.TRANSITION_NAME_BOOK);
+//	} finally {
+//		jbpmContext.close();
+//	}
 	}
 }

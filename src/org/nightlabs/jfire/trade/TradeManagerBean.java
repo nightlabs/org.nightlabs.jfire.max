@@ -216,8 +216,14 @@ implements SessionBean
 	public Order createOrder(
 			AnchorID customerID, String orderIDPrefix, CurrencyID currencyID,
 			SegmentTypeID[] segmentTypeIDs, String[] fetchGroups, int maxFetchDepth)
-	throws ModuleException
+//	throws ModuleException
 	{
+		if (customerID == null)
+			throw new IllegalArgumentException("customerID must not be null!");
+
+		if (currencyID == null)
+			throw new IllegalArgumentException("currencyID must not be null!");
+
 		PersistenceManager pm = getPersistenceManager();
 		try {
 			Trader trader = Trader.getTrader(pm);

@@ -12,8 +12,8 @@ import org.nightlabs.annotation.Implement;
 import org.nightlabs.jfire.accounting.Accounting;
 import org.nightlabs.jfire.accounting.Invoice;
 import org.nightlabs.jfire.accounting.id.InvoiceID;
-import org.nightlabs.jfire.asyncinvoke.AsyncInvoke;
 import org.nightlabs.jfire.jbpm.graph.def.AbstractActionHandler;
+import org.nightlabs.jfire.jbpm.graph.def.State;
 import org.nightlabs.jfire.security.SecurityReflector;
 import org.nightlabs.jfire.security.User;
 
@@ -48,7 +48,10 @@ extends AbstractActionHandler
 		accounting.onBookInvoice(user, invoice);
 
 		// send asynchronously
-		AsyncInvoke.exec(new SendInvoiceInvocation((InvoiceID) JDOHelper.getObjectId(invoice)), true);
+		InvoiceID invoiceID = (InvoiceID) JDOHelper.getObjectId(invoice);
+//		AsyncInvoke.exec(new SendInvoiceInvocation(invoiceID, true);
+		if (!State.hasState(pm, invoiceID, JbpmConstantsInvoice.Both.NODE_NAME_SENT))
+			executionContext.leaveNode(JbpmConstantsInvoice.Vendor.TRANSITION_NAME_SEND);
 	}
 
 }

@@ -1,9 +1,12 @@
 package org.nightlabs.jfire.trade.jbpm;
 
+import java.rmi.RemoteException;
 import java.util.Iterator;
 
+import javax.ejb.CreateException;
 import javax.jdo.JDOHelper;
 import javax.jdo.PersistenceManager;
+import javax.naming.NamingException;
 
 import org.jbpm.graph.def.Action;
 import org.jbpm.graph.def.Event;
@@ -11,9 +14,9 @@ import org.jbpm.graph.def.Node;
 import org.jbpm.graph.exe.ExecutionContext;
 import org.jbpm.instantiation.Delegation;
 import org.nightlabs.annotation.Implement;
-import org.nightlabs.jfire.asyncinvoke.AsyncInvoke;
 import org.nightlabs.jfire.base.Lookup;
 import org.nightlabs.jfire.jbpm.graph.def.AbstractActionHandler;
+import org.nightlabs.jfire.jbpm.graph.def.State;
 import org.nightlabs.jfire.security.SecurityReflector;
 import org.nightlabs.jfire.security.User;
 import org.nightlabs.jfire.trade.LegalEntity;
@@ -45,25 +48,9 @@ extends AbstractActionHandler
 		finalized.addEvent(event);
 	}
 
-	@Implement
-	protected void doExecute(ExecutionContext executionContext)
-	throws Exception
+	protected static void finalizeOffer(PersistenceManager pm, Offer offer)
+	throws RemoteException, CreateException, NamingException
 	{
-		PersistenceManager pm = getPersistenceManager();
-		Offer offer = (Offer) getStatable();
-
-		doExecute(pm, offer);
-	}
-
-	/**
-	 * This method is called by {@link #doExecute(ExecutionContext)} and by {@link ActionHandlerAcceptOfferImplicitelyVendor#doExecute(ExecutionContext)}.
-	 */
-	protected static void doExecute(PersistenceManager pm, Offer offer)
-	throws Exception
-	{
-		if (offer.isFinalized())
-			return;
-
 		User user = SecurityReflector.getUserDescriptor().getUser(pm);
 
 		// check whether we have to finalize remote offers as well
@@ -88,7 +75,32 @@ extends AbstractActionHandler
 		for (OfferActionHandler offerActionHandler : offer.getOfferLocal().getOfferActionHandlers()) {
 			offerActionHandler.onFinalizeOffer(user, offer);
 		}
+	}
 
-		AsyncInvoke.exec(new SendOfferInvocation((OfferID) JDOHelper.getObjectId(offer)), true);
+	@Implement
+	protected void doExecute(ExecutionContext executionContext)
+	throws Exception
+	{
+		PersistenceManager pm = getPersistenceManager();
+		Offer offer = (Offer) getStatable();
+
+//		doExecute(pm, offer);
+//	}
+//
+//	/**
+//	 * This method is called by {@link #doExecute(ExecutionContext)} and by {@link ActionHandlerAcceptOfferImplicitelyVendor#doExecute(ExecutionContext)}.
+//	 */
+//	protected static void doExecute(PersistenceManager pm, Offer offer)
+//	throws Exception
+//	{
+//		if (offer.isFinalized())
+//			return;
+
+		finalizeOffer(pm, offer);
+
+//		AsyncInvoke.exec(new SendOfferInvocation((OfferID) JDOHelper.getObjectId(offer)), true);
+		OfferID offerID = (OfferID) JDOHelper.getObjectId(offer);
+		if (!State.hasState(pm, offerID, JbpmConstantsOffer.Both.NODE_NAME_SENT))
+			executionContext.leaveNode(JbpmConstantsOffer.Vendor.TRANSITION_NAME_SEND);
 	}
 }

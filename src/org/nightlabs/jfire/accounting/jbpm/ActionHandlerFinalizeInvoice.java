@@ -12,11 +12,10 @@ import org.nightlabs.annotation.Implement;
 import org.nightlabs.jfire.accounting.Accounting;
 import org.nightlabs.jfire.accounting.Invoice;
 import org.nightlabs.jfire.accounting.id.InvoiceID;
-import org.nightlabs.jfire.asyncinvoke.AsyncInvoke;
 import org.nightlabs.jfire.jbpm.graph.def.AbstractActionHandler;
+import org.nightlabs.jfire.jbpm.graph.def.State;
 import org.nightlabs.jfire.security.SecurityReflector;
 import org.nightlabs.jfire.security.User;
-import org.nightlabs.jfire.trade.OrganisationLegalEntity;
 
 public class ActionHandlerFinalizeInvoice
 extends AbstractActionHandler
@@ -44,12 +43,12 @@ extends AbstractActionHandler
 	{
 		PersistenceManager pm = getPersistenceManager();
 		Invoice invoice = (Invoice) getStatable();
-		doExecute(pm, invoice);
-	}
-
-	protected static void doExecute(PersistenceManager pm, Invoice invoice)
-	throws Exception
-	{
+//		doExecute(pm, invoice);
+//	}
+//
+//	protected static void doExecute(PersistenceManager pm, Invoice invoice)
+//	throws Exception
+//	{
 		if (invoice.isFinalized())
 			return;
 
@@ -63,6 +62,9 @@ extends AbstractActionHandler
 		invoice.setFinalized(user);
 
 		// book asynchronously
-		AsyncInvoke.exec(new BookInvoiceInvocation((InvoiceID) JDOHelper.getObjectId(invoice)), true);
+//		AsyncInvoke.exec(new BookInvoiceInvocation((InvoiceID) JDOHelper.getObjectId(invoice)), true);
+		InvoiceID invoiceID = (InvoiceID) JDOHelper.getObjectId(invoice);
+		if (!State.hasState(pm, invoiceID, JbpmConstantsInvoice.Both.NODE_NAME_BOOKED))
+			executionContext.leaveNode(JbpmConstantsInvoice.Vendor.TRANSITION_NAME_BOOK);
 	}
 }

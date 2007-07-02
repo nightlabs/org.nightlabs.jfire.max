@@ -8,8 +8,9 @@ import org.jbpm.graph.def.Node;
 import org.jbpm.graph.exe.ExecutionContext;
 import org.jbpm.instantiation.Delegation;
 import org.nightlabs.annotation.Implement;
-import org.nightlabs.jfire.accounting.Accounting;
 import org.nightlabs.jfire.jbpm.graph.def.AbstractActionHandler;
+import org.nightlabs.jfire.security.SecurityReflector;
+import org.nightlabs.jfire.security.User;
 import org.nightlabs.jfire.store.DeliveryNote;
 import org.nightlabs.jfire.store.Store;
 
@@ -40,7 +41,9 @@ extends AbstractActionHandler
 		PersistenceManager pm = getPersistenceManager();
 		DeliveryNote deliveryNote = (DeliveryNote) getStatable();
 		Store.getStore(pm).validateDeliveryNote(deliveryNote);
-		ActionHandlerFinalizeDeliveryNote.doExecute(pm, deliveryNote);
+		User user = SecurityReflector.getUserDescriptor().getUser(pm);
+		deliveryNote.setFinalized(user);
+//		ActionHandlerFinalizeDeliveryNote.doExecute(pm, deliveryNote);
 	}
 
 }

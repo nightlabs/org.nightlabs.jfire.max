@@ -94,8 +94,27 @@ extends AbstractActionHandler
 	protected void doExecute(ExecutionContext executionContext)
 			throws Exception
 	{
-		setLastNodeEnterTransitionName(executionContext.getTransition().getName());
-		GraphElement graphElement = executionContext.getEventSource();
+		if (executionContext == null)
+			throw new IllegalArgumentException("executionContext == null");
+
+		Action action = executionContext.getAction();
+		if (action == null)
+			throw new IllegalArgumentException("executionContext.getAction() == null");
+
+		if (executionContext.getToken() == null)
+			throw new IllegalArgumentException("executionContext.getToken() == null");
+
+		GraphElement graphElement = executionContext.getToken().getNode();
+		if (graphElement == null)
+			throw new IllegalArgumentException("executionContext.getToken().getNode() == null");
+
+		if (executionContext.getTransition() == null) {
+			// TODO JBPM WORKAROUND - this seems to be a jBPM bug - hence we don't throw an exception but only log it.
+			logger.warn("graphElement \"" + graphElement.getName() + "\": executionContext.getTransition() == null", new IllegalArgumentException("graphElement \"" + graphElement.getName() + "\": executionContext.getTransition() == null"));
+			setLastNodeEnterTransitionName(null);
+		}
+		else
+			setLastNodeEnterTransitionName(executionContext.getTransition().getName());
 
 		if (logger.isDebugEnabled())
 			logger.debug("doExecute: graphElement.class=" + (graphElement == null ? null : graphElement.getClass().getName()) + " graphElement=" + graphElement);

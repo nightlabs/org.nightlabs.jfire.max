@@ -22,9 +22,9 @@
 	<classpathentry kind="var" path="LOG4J"/>
 	<classpathentry sourcepath="WORKSPACE/JFireBaseBean/src" kind="var" path="WORKSPACE/JFireBaseBean/dist/JFireBaseBean.jar"/>
 	<classpathentry sourcepath="/WORKSPACE/JFireServerManager/src" kind="var" path="WORKSPACE/JFireServerManager/dist/JFireServerManager.jar"/>
-	<classpathentry sourcepath="/home/marco/workspaces/jbpm/jbpm-3.1.2/src/java.jbpm" kind="lib" path="lib/jbpm/jbpm-3.1.2.jar"/>
 	<classpathentry sourcepath="JPOX_SRC" kind="var" path="JPOX"/>
 	<classpathentry sourcepath="/JPOXENHANCER_SRC" kind="var" path="JPOXENHANCER"/>
 	<classpathentry kind="var" path="JBOSS/server/default/lib/hibernate3.jar"/>
+	<classpathentry kind="lib" path="lib/jbpm/jbpm-3.1.4.jar"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>

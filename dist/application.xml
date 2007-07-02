@@ -5,12 +5,22 @@
 	<module>
 		<java>jbpm/ehcache-1.2.3.jar</java>
 	</module>
+
+<!--
 	<module>
 		<java>jbpm/jbpm-3.1.2.jar</java>
 	</module>
 	<module>
 		<java>jbpm/jbpm-identity-3.1.2.jar</java>
 	</module>
+-->
+	<module>
+		<java>jbpm/jbpm-3.1.4.jar</java>
+	</module>
+	<module>
+		<java>jbpm/jbpm-identity-3.1.4.jar</java>
+	</module>
+
 	<module>
 		<ejb>JFireJbpm.jar</ejb>
 	</module>

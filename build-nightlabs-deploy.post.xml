@@ -1,5 +1,9 @@
 <project>
 	<target name="deploy.post">
 	    <delete file="${j2ee.deploy.dir}/${j2ee.deploy.subdir}/${j2ee.ear}/hibernate-com.mysql.jdbc.Driver-cfg.template.xml"/>
+
+	    <delete file="${j2ee.deploy.dir}/${j2ee.deploy.subdir}/${j2ee.ear}/jbpm/jbpm-3.1.2.jar"/>
+		<delete file="${j2ee.deploy.dir}/${j2ee.deploy.subdir}/${j2ee.ear}/jbpm/jbpm-identity-3.1.2.jar"/>
+		<delete file="${j2ee.deploy.dir}/${j2ee.deploy.subdir}/${j2ee.ear}/jbpm/jbpm-3.1.4.zip"/>
 	</target>
 </project>

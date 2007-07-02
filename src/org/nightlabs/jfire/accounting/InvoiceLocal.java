@@ -61,7 +61,7 @@ import org.nightlabs.util.CollectionUtil;
  * @jdo.fetch-group name="Invoice.invoiceLocal" fields="invoice"
  * @jdo.fetch-group name="InvoiceLocal.invoice" fields="invoice"
  * @jdo.fetch-group name="InvoiceLocal.bookUser" fields="bookUser"
- * @jdo.fetch-group name="InvoiceLocal.this" fields="invoice, bookUser"
+ * @jdo.fetch-group name="InvoiceLocal.this" fields="invoice, bookUser, state, states"
  *
  * @jdo.fetch-group name="StatableLocal.state" fields="state"
  * @jdo.fetch-group name="StatableLocal.states" fields="states"

@@ -61,7 +61,7 @@ import org.nightlabs.jfire.security.User;
  * @jdo.fetch-group name="OfferLocal.offer" fields="offer"
  * @jdo.fetch-group name="OfferLocal.acceptUser" fields="acceptUser"
  * @jdo.fetch-group name="OfferLocal.rejectUser" fields="rejectUser"
- * @jdo.fetch-group name="OfferLocal.this" fields="offer, acceptUser, rejectUser"
+ * @jdo.fetch-group name="OfferLocal.this" fields="offer, acceptUser, rejectUser, state, states"
  *
  * @jdo.fetch-group name="StatableLocal.state" fields="state"
  * @jdo.fetch-group name="StatableLocal.states" fields="states"

@@ -60,7 +60,7 @@ import org.nightlabs.util.CollectionUtil;
  * @jdo.fetch-group name="DeliveryNote.deliveryNoteLocal" fields="deliveryNote"
  * @jdo.fetch-group name="DeliveryNoteLocal.deliveryNote" fields="deliveryNote"
  * @jdo.fetch-group name="DeliveryNoteLocal.bookUser" fields="bookUser"
- * @jdo.fetch-group name="DeliveryNoteLocal.this" fields="deliveryNote, bookUser"
+ * @jdo.fetch-group name="DeliveryNoteLocal.this" fields="deliveryNote, bookUser, state, states"
  *
  * @jdo.fetch-group name="StatableLocal.state" fields="state"
  * @jdo.fetch-group name="StatableLocal.states" fields="states"

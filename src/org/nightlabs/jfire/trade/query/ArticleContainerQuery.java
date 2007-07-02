@@ -60,7 +60,7 @@ extends JDOQuery<Set<ArticleContainer>>
 		
 		if (createUserID != null) 
 		{
-			// TODO: JDOHelper.getObjectId(this.*) does not seem to work (java.lang.IndexOutOfBoundsException: Index: 3, Size: 3)
+			// FIXME: JPOX Bug JDOHelper.getObjectId(this.*) does not seem to work (java.lang.IndexOutOfBoundsException: Index: 3, Size: 3)
 //		filter.append("\n && JDOHelper.getObjectId(this.createUser) == :createUserID");
 		// WORKAROUND:
 		filter.append("\n && (" +
@@ -70,7 +70,7 @@ extends JDOQuery<Set<ArticleContainer>>
 		}
 		if (vendorID != null) 
 		{
-			// TODO: JDOHelper.getObjectId(this.*) does not seem to work (java.lang.IndexOutOfBoundsException: Index: 3, Size: 3)
+			// FIXME: JPOX Bug JDOHelper.getObjectId(this.*) does not seem to work (java.lang.IndexOutOfBoundsException: Index: 3, Size: 3)
 //			filter.append("\n && JDOHelper.getObjectId(this.vendor) == :vendorID");
 			// WORKAROUND:
 			filter.append("\n && (" +
@@ -79,17 +79,18 @@ extends JDOQuery<Set<ArticleContainer>>
 					"this.vendor.anchorID == \""+vendorID.anchorID+"\"" +
 							")");
 		}
-		if (customerID != null) 
-		{
-			// TODO: JDOHelper.getObjectId(this.*) does not seem to work (java.lang.IndexOutOfBoundsException: Index: 3, Size: 3)
-//			filter.append("\n && JDOHelper.getObjectId(this.customer) == :customerID");
-			// WORKAROUND:
-			filter.append("\n && (" +
-					"this.customer.organisationID == \""+customerID.organisationID+"\" && " +
-					"this.customer.anchorTypeID == \""+customerID.anchorTypeID+"\" && " +
-					"this.customer.anchorID == \""+customerID.anchorID+"\"" +
-							")");
-		}
+		checkCustomer(filter);
+//		if (customerID != null) 
+//		{
+//			// FIXME: JPOX Bug JDOHelper.getObjectId(this.*) does not seem to work (java.lang.IndexOutOfBoundsException: Index: 3, Size: 3)
+////			filter.append("\n && JDOHelper.getObjectId(this.customer) == :customerID");
+//			// WORKAROUND:
+//			filter.append("\n && (" +
+//					"this.customer.organisationID == \""+customerID.organisationID+"\" && " +
+//					"this.customer.anchorTypeID == \""+customerID.anchorTypeID+"\" && " +
+//					"this.customer.anchorID == \""+customerID.anchorID+"\"" +
+//							")");
+//		}
 		
 //		if (currency != null)
 //			filter.append("\n && this.price.currency == :currency");
@@ -107,6 +108,20 @@ extends JDOQuery<Set<ArticleContainer>>
 		return q;
 	}
 
+	protected void checkCustomer(StringBuffer filter) {
+		if (getCustomerID() != null) 
+		{
+			// FIXME: JPOX Bug JDOHelper.getObjectId(this.*) does not seem to work (java.lang.IndexOutOfBoundsException: Index: 3, Size: 3)
+//			filter.append("\n && JDOHelper.getObjectId(this.customer) == :customerID");
+			// WORKAROUND:
+			filter.append("\n && (" +
+					"this.customer.organisationID == \""+customerID.organisationID+"\" && " +
+					"this.customer.anchorTypeID == \""+customerID.anchorTypeID+"\" && " +
+					"this.customer.anchorID == \""+customerID.anchorID+"\"" +
+							")");
+		}		
+	}
+	
 	private int articleCountMin = -1;
 	public int getArticleCountMin() {
 		return articleCountMin;

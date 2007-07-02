@@ -205,20 +205,26 @@ implements SessionBean
 				new NameEntry[] {new NameEntry(Locale.ENGLISH.getLanguage(), "Select a customer")}
 				);
 		
-		ValueProviderCategoryID docsCategoryID = ValueProviderCategoryID.create(Organisation.DEVIL_ORGANISATION_ID, ReportingTradeConstants.VALUE_PROVIDER_CATEGORY_ID_TRADE_DOCUMENTS);
+		ValueProviderCategoryID docsCategoryID = ValueProviderCategoryID.create(
+				Organisation.DEVIL_ORGANISATION_ID, 
+				ReportingTradeConstants.VALUE_PROVIDER_CATEGORY_ID_TRADE_DOCUMENTS);
 		ReportParameterUtil.createValueProviderCategory(
 				pm, null, docsCategoryID, 
 				new NameEntry[] {new NameEntry(Locale.ENGLISH.getLanguage(), "Trade documents parameters")}
 			);
 		
-		ValueProviderCategoryID invoiceCategoryID = ValueProviderCategoryID.create(Organisation.DEVIL_ORGANISATION_ID, ReportingTradeConstants.VALUE_PROVIDER_CATEGORY_ID_TRADE_DOCUMENTS_INVOICE);
+		ValueProviderCategoryID invoiceCategoryID = ValueProviderCategoryID.create(
+				Organisation.DEVIL_ORGANISATION_ID, 
+				ReportingTradeConstants.VALUE_PROVIDER_CATEGORY_ID_TRADE_DOCUMENTS_INVOICE);
 		ValueProviderCategory invoiceCategory = ReportParameterUtil.createValueProviderCategory(
 				pm, rootCategory, invoiceCategoryID, 
 				new NameEntry[] {new NameEntry(Locale.ENGLISH.getLanguage(), "Invoice parameters")}
 			);
 		
 		ValueProvider invoiceByCustomer = ReportParameterUtil.createValueProvider(
-				pm, invoiceCategory, ReportingTradeConstants.VALUE_PROVIDER_ID_TRADE_DOCUMENTS_INVOICE_BY_CUSTOMER, ArticleContainerID.class.getName(),
+				pm, invoiceCategory, 
+				ReportingTradeConstants.VALUE_PROVIDER_ID_TRADE_DOCUMENTS_INVOICE_BY_CUSTOMER, 
+				ArticleContainerID.class.getName(),
 				new NameEntry[] {new NameEntry(Locale.ENGLISH.getLanguage(), "Invoice of customer")},
 				new NameEntry[] {new NameEntry(Locale.ENGLISH.getLanguage(), "Invoice of customer")},
 				new NameEntry[] {new NameEntry(Locale.ENGLISH.getLanguage(), "Select an invoice")}
@@ -250,6 +256,74 @@ implements SessionBean
 		invoiceByArticleType.getInputParameters().clear();
 		pm.flush();
 		invoiceByArticleType.addInputParameter(new ValueProviderInputParameter(invoiceByCustomer, "productType", ProductTypeID.class.getName()));		
+		
+/** New Parameters **/
+		
+		// order category
+		ValueProviderCategoryID orderCategoryID = ValueProviderCategoryID.create(
+				Organisation.DEVIL_ORGANISATION_ID, 
+				ReportingTradeConstants.VALUE_PROVIDER_CATEGORY_ID_TRADE_DOCUMENTS_ORDER);
+		ValueProviderCategory orderCategory = ReportParameterUtil.createValueProviderCategory(
+				pm, rootCategory, orderCategoryID, 
+				new NameEntry[] {new NameEntry(Locale.ENGLISH.getLanguage(), "Order parameters")}
+			);	
+		
+		// order by customer category
+		ValueProvider orderByCustomer = ReportParameterUtil.createValueProvider(
+				pm, orderCategory, 
+				ReportingTradeConstants.VALUE_PROVIDER_ID_TRADE_DOCUMENTS_ORDER_BY_CUSTOMER, 
+				ArticleContainerID.class.getName(),
+				new NameEntry[] {new NameEntry(Locale.ENGLISH.getLanguage(), "Order of customer")},
+				new NameEntry[] {new NameEntry(Locale.ENGLISH.getLanguage(), "Order of customer")},
+				new NameEntry[] {new NameEntry(Locale.ENGLISH.getLanguage(), "Select an order")}
+			);
+		orderByCustomer.getInputParameters().clear();
+		pm.flush();
+		orderByCustomer.addInputParameter(new ValueProviderInputParameter(orderByCustomer, "customer", AnchorID.class.getName()));
+		
+		// offer category
+		ValueProviderCategoryID offerCategoryID = ValueProviderCategoryID.create(
+				Organisation.DEVIL_ORGANISATION_ID, 
+				ReportingTradeConstants.VALUE_PROVIDER_CATEGORY_ID_TRADE_DOCUMENTS_OFFER);
+		ValueProviderCategory offerCategory = ReportParameterUtil.createValueProviderCategory(
+				pm, rootCategory, offerCategoryID, 
+				new NameEntry[] {new NameEntry(Locale.ENGLISH.getLanguage(), "Offer parameters")}
+			);	
+		
+		// offer by customer category
+		ValueProvider offerByCustomer = ReportParameterUtil.createValueProvider(
+				pm, offerCategory, 
+				ReportingTradeConstants.VALUE_PROVIDER_ID_TRADE_DOCUMENTS_OFFER_BY_CUSTOMER, 
+				ArticleContainerID.class.getName(),
+				new NameEntry[] {new NameEntry(Locale.ENGLISH.getLanguage(), "Offer of customer")},
+				new NameEntry[] {new NameEntry(Locale.ENGLISH.getLanguage(), "Offer of customer")},
+				new NameEntry[] {new NameEntry(Locale.ENGLISH.getLanguage(), "Select an offer")}
+			);
+		offerByCustomer.getInputParameters().clear();
+		pm.flush();
+		offerByCustomer.addInputParameter(new ValueProviderInputParameter(offerByCustomer, "customer", AnchorID.class.getName()));
+		
+		// deliveryNote category
+		ValueProviderCategoryID deliveryNoteCategoryID = ValueProviderCategoryID.create(
+				Organisation.DEVIL_ORGANISATION_ID, 
+				ReportingTradeConstants.VALUE_PROVIDER_CATEGORY_ID_TRADE_DOCUMENTS_DELIVERY_NOTE);
+		ValueProviderCategory deliveryNoteCategory = ReportParameterUtil.createValueProviderCategory(
+				pm, rootCategory, deliveryNoteCategoryID, 
+				new NameEntry[] {new NameEntry(Locale.ENGLISH.getLanguage(), "DeliveryNote parameters")}
+			);	
+		
+		// deliveryNote by customer category
+		ValueProvider deliveryNoteByCustomer = ReportParameterUtil.createValueProvider(
+				pm, deliveryNoteCategory, 
+				ReportingTradeConstants.VALUE_PROVIDER_ID_TRADE_DOCUMENTS_DELIVERY_NOTE_BY_CUSTOMER, 
+				ArticleContainerID.class.getName(),
+				new NameEntry[] {new NameEntry(Locale.ENGLISH.getLanguage(), "DeliveryNote of customer")},
+				new NameEntry[] {new NameEntry(Locale.ENGLISH.getLanguage(), "DeliveryNote of customer")},
+				new NameEntry[] {new NameEntry(Locale.ENGLISH.getLanguage(), "Select an delivery note")}
+			);
+		deliveryNoteByCustomer.getInputParameters().clear();
+		pm.flush();
+		deliveryNoteByCustomer.addInputParameter(new ValueProviderInputParameter(deliveryNoteByCustomer, "customer", AnchorID.class.getName()));
 		
 	}
 }

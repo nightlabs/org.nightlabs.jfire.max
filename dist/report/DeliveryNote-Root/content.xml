@@ -24,6 +24,27 @@ SimpleProductType, DynamicProductType and VoucherType
 It can be used with all ProductTypes:
 SimpleProductType, DynamicProductType and VoucherType		
 		</description>
+		
+		<parameter-acquisition>
+			<use-case id="DefaultUseCase" default="true">
+				<parameters>
+					<parameter id="0" name="articleContainerID" type="string" x="650" y="46" />
+				</parameters>
+				<value-provider-configs>
+					<provider-config id="1" organisationID="devil.NightLabs.org" categoryID="JFireReportingTrade-ValueProviderCategory-LegalEntity" valueProviderID="Search" pageIndex="0" pageOrder="0" allowNullOutputValue="false" showMessageInHeader="false" x="49" y="54" >
+						<message language="en">Select a customer</message>
+						<message language="de">Suchen Sie einen Kunden aus</message>						
+					</provider-config>
+					<provider-config id="2" organisationID="devil.NightLabs.org" categoryID="JFireReportingTrade-ValueProviderCategory-TradeDocuments-DeliveryNote" valueProviderID="ByDeliveryNote" pageIndex="1" pageOrder="0" allowNullOutputValue="false" showMessageInHeader="false" x="337" y="56" >
+						<message language="en">Select an delivery note</message>
+						<message language="en">Suchen Sie einen Lieferschein aus</message>						
+					</provider-config>
+				</value-provider-configs>
+				<value-consumer-bindings>
+				</value-consumer-bindings>
+			</use-case>
+		</parameter-acquisition>
+				
 	</report>	
 
 </report-category>

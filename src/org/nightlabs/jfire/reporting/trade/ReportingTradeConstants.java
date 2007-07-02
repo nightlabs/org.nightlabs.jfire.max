@@ -42,6 +42,9 @@ public class ReportingTradeConstants {
 
 	public static final String VALUE_PROVIDER_CATEGORY_ID_TRADE_DOCUMENTS = "JFireReportingTrade-ValueProviderCategory-TradeDocuments";
 	public static final String VALUE_PROVIDER_CATEGORY_ID_TRADE_DOCUMENTS_INVOICE = "JFireReportingTrade-ValueProviderCategory-TradeDocuments-Invoice";
+	public static final String VALUE_PROVIDER_CATEGORY_ID_TRADE_DOCUMENTS_ORDER = "JFireReportingTrade-ValueProviderCategory-TradeDocuments-Order";	
+	public static final String VALUE_PROVIDER_CATEGORY_ID_TRADE_DOCUMENTS_OFFER = "JFireReportingTrade-ValueProviderCategory-TradeDocuments-Offer";
+	public static final String VALUE_PROVIDER_CATEGORY_ID_TRADE_DOCUMENTS_DELIVERY_NOTE = "JFireReportingTrade-ValueProviderCategory-TradeDocuments-DeliveryNote";	
 	
 	public static final ValueProviderID VALUE_PROVIDER_ID_TRADE_DOCUMENTS_INVOICE_BY_CUSTOMER = ValueProviderID.create(
 			Organisation.DEVIL_ORGANISATION_ID, VALUE_PROVIDER_CATEGORY_ID_TRADE_DOCUMENTS_INVOICE, "ByCustomer");
@@ -49,5 +52,12 @@ public class ReportingTradeConstants {
 			Organisation.DEVIL_ORGANISATION_ID, VALUE_PROVIDER_CATEGORY_ID_TRADE_DOCUMENTS_INVOICE, "ByCustomerAndPeriod");
 	public static final ValueProviderID VALUE_PROVIDER_ID_TRADE_DOCUMENTS_INVOICE_BY_ARTICLE_TYPE = ValueProviderID.create(
 			Organisation.DEVIL_ORGANISATION_ID, VALUE_PROVIDER_CATEGORY_ID_TRADE_DOCUMENTS_INVOICE, "ByArticleType");
+
+	public static final ValueProviderID VALUE_PROVIDER_ID_TRADE_DOCUMENTS_ORDER_BY_CUSTOMER = ValueProviderID.create(
+			Organisation.DEVIL_ORGANISATION_ID, VALUE_PROVIDER_CATEGORY_ID_TRADE_DOCUMENTS_ORDER, "ByOrder");
+	public static final ValueProviderID VALUE_PROVIDER_ID_TRADE_DOCUMENTS_OFFER_BY_CUSTOMER = ValueProviderID.create(
+			Organisation.DEVIL_ORGANISATION_ID, VALUE_PROVIDER_CATEGORY_ID_TRADE_DOCUMENTS_OFFER, "ByOffer");
+	public static final ValueProviderID VALUE_PROVIDER_ID_TRADE_DOCUMENTS_DELIVERY_NOTE_BY_CUSTOMER = ValueProviderID.create(
+			Organisation.DEVIL_ORGANISATION_ID, VALUE_PROVIDER_CATEGORY_ID_TRADE_DOCUMENTS_DELIVERY_NOTE, "ByDeliveryNote");
 	
 }

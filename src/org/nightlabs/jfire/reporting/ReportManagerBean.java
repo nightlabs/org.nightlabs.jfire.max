@@ -424,7 +424,7 @@ implements SessionBean
 				moduleMetaData = new ModuleMetaData(
 						JFireReportingEAR.MODULE_NAME, "0.9.0-0-beta", "0.9.0-0-beta");
 				pm.makePersistent(moduleMetaData);
-				logger.info("Persisted ModuleMetaData for JFireReporting with version 1.0.0-0-beta");
+				logger.info("Persisted ModuleMetaData for JFireReporting with version 0.9.0-0-beta");
 
 				initRegisterConfigModules(pm);
 				logger.info("Initialized Reporting ConfigModules");

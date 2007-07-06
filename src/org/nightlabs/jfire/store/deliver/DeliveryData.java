@@ -168,4 +168,32 @@ implements Serializable
 		deliveryBackupForUpload = null;
 	}
 
+	@Override
+	public int hashCode() {
+		final int PRIME = 31;
+		int result = 1;
+		result = PRIME * result + (int) (deliveryID ^ (deliveryID >>> 32));
+		result = PRIME * result + ((organisationID == null) ? 0 : organisationID.hashCode());
+		return result;
+	}
+
+	@Override
+	public boolean equals(Object obj) {
+		if (this == obj)
+			return true;
+		if (obj == null)
+			return false;
+		if (getClass() != obj.getClass())
+			return false;
+		final DeliveryData other = (DeliveryData) obj;
+		if (deliveryID != other.deliveryID)
+			return false;
+		if (organisationID == null) {
+			if (other.organisationID != null)
+				return false;
+		} else if (!organisationID.equals(other.organisationID))
+			return false;
+		return true;
+	}
+
 }

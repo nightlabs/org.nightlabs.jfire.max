@@ -28,8 +28,6 @@ package org.nightlabs.jfire.accounting.pay;
 
 import java.io.Serializable;
 
-import org.nightlabs.jfire.idgenerator.IDGenerator;
-
 /**
  * Subclass in order to hold specific data for your payment process.
  * This additional data can be defined by the client payment processor (gathered by
@@ -169,5 +167,33 @@ implements Serializable
 
 		payment = paymentBackupForUpload;
 		paymentBackupForUpload = null;
+	}
+
+	@Override
+	public int hashCode() {
+		final int PRIME = 31;
+		int result = 1;
+		result = PRIME * result + ((organisationID == null) ? 0 : organisationID.hashCode());
+		result = PRIME * result + (int) (paymentID ^ (paymentID >>> 32));
+		return result;
+	}
+
+	@Override
+	public boolean equals(Object obj) {
+		if (this == obj)
+			return true;
+		if (obj == null)
+			return false;
+		if (getClass() != obj.getClass())
+			return false;
+		final PaymentData other = (PaymentData) obj;
+		if (organisationID == null) {
+			if (other.organisationID != null)
+				return false;
+		} else if (!organisationID.equals(other.organisationID))
+			return false;
+		if (paymentID != other.paymentID)
+			return false;
+		return true;
 	}
 }

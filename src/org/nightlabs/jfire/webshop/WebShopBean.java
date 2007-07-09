@@ -118,7 +118,28 @@ implements SessionBean
 			pm.close();
 		}	
 	}
-	
+	/**
+	 * @ejb.interface-method
+	 * @ejb.permission role-name="_Guest_"
+	 * @ejb.transaction type="Supports"
+	 */	
+	public WebCustomer getPerson(WebCustomerID webCustomerID, String[] fetchGroups, int maxFetchDepth) 
+	{
+		PersistenceManager pm = getPersistenceManager();
+		AnchorID anchorID = null;
+		try {
+			pm.getFetchPlan().setMaxFetchDepth(maxFetchDepth);
+			if (fetchGroups != null)
+				pm.getFetchPlan().setGroups(fetchGroups);
+			
+			WebCustomer webCustomer = (WebCustomer)pm.getObjectById(webCustomerID);
+			anchorID = (AnchorID) (webCustomer.getLegalEntity() != null ? JDOHelper.getObjectId(webCustomer.getLegalEntity()) : null);
+			
+			return (WebCustomer) pm.detachCopy(webCustomer);
+		} finally {
+			pm.close();
+		}	
+	}
 	/**
 	 * @ejb.interface-method
 	 * @ejb.permission role-name="_Guest_"

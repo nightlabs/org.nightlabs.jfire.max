@@ -207,7 +207,7 @@ implements SessionBean
 
 					// Create the 1st descriptor TEMPLATE (which will be processed again) for SchemaExport in the tmp dir.
 					hibernateConfigTemplateIncludeFiles.clear();
-					hibernateConfigTemplateIncludeFiles.put("DATASOURCE", new File(jfireJbpmEarDirectory, "hibernate-" + HibernateEnvironmentMode.SCHEMA_EXPORT + '-' + cfmod.getDatabase().getDatabaseDriverName()+"-cfg.template.xml.inc"));
+					hibernateConfigTemplateIncludeFiles.put("DATASOURCE", new File(jfireJbpmEarDirectory, "hibernate-" + HibernateEnvironmentMode.SCHEMA_EXPORT + '-' + cfmod.getDatabase().getDatabaseDriverName_noTx()+"-cfg.template.xml.inc"));
 					File hibernateConfigTemplateSchemaExport = new File(tmpFolder, "hibernate-"+ HibernateEnvironmentMode.SCHEMA_EXPORT +"-cfg.template.xml");
 					createHibernateConfigTemplate(hibernateConfigTemplateSchemaExport, hibernateMainConfigTemplateFile, hibernateConfigTemplateIncludeFiles);
 
@@ -220,7 +220,7 @@ implements SessionBean
 
 					// Create the 2nd descriptor TEMPLATE for Runtime.
 					hibernateConfigTemplateIncludeFiles.clear();
-					hibernateConfigTemplateIncludeFiles.put("DATASOURCE", new File(jfireJbpmEarDirectory, "hibernate-" + HibernateEnvironmentMode.RUNTIME + '-' + cfmod.getDatabase().getDatabaseDriverName()+"-cfg.template.xml.inc"));
+					hibernateConfigTemplateIncludeFiles.put("DATASOURCE", new File(jfireJbpmEarDirectory, "hibernate-" + HibernateEnvironmentMode.RUNTIME + '-' + cfmod.getDatabase().getDatabaseDriverName_xa()+"-cfg.template.xml.inc"));
 					File hibernateConfigTemplateRuntime = new File(tmpFolder, "hibernate-"+ HibernateEnvironmentMode.RUNTIME +"-cfg.template.xml");
 					createHibernateConfigTemplate(hibernateConfigTemplateRuntime, hibernateMainConfigTemplateFile, hibernateConfigTemplateIncludeFiles);
 

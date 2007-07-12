@@ -33,6 +33,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.Iterator;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Locale;
 import java.util.Set;
@@ -68,6 +69,7 @@ import org.nightlabs.jfire.store.deliver.DeliveryData;
 import org.nightlabs.jfire.store.deliver.DeliveryException;
 import org.nightlabs.jfire.store.deliver.DeliveryHelperLocal;
 import org.nightlabs.jfire.store.deliver.DeliveryHelperUtil;
+import org.nightlabs.jfire.store.deliver.DeliveryQueue;
 import org.nightlabs.jfire.store.deliver.DeliveryResult;
 import org.nightlabs.jfire.store.deliver.ModeOfDelivery;
 import org.nightlabs.jfire.store.deliver.ModeOfDeliveryConst;
@@ -1461,6 +1463,104 @@ implements SessionBean
 			}
 
 			return NLJDOHelper.getObjectIDSet(productTypes);
+		} finally {
+			pm.close();
+		}
+	}
+	
+	/**
+	 * Returns all {@link DeliveryQueue}s available.
+	 * @return All {@link DeliveryQueue}s available.
+	 * 
+	 * @ejb.interface-method
+	 * @ejb.permission role-name="_Guest_"
+	 * 
+	 * @param fetchGroups The desired fetch groups
+	 * @param fetchDepth The desired JDO fetch depth
+	 * @param includeDeleted Determines whether print queues marked as deleted are also returned.
+	 */
+	public Collection<DeliveryQueue> getAvailableDeliveryQueues(String[] fetchGroups, int fetchDepth, boolean includeDeleted) {
+		PersistenceManager pm = getPersistenceManager();
+		try {
+			pm.getFetchPlan().setMaxFetchDepth(fetchDepth);
+			
+			if (fetchGroups != null)
+				pm.getFetchPlan().setGroups(fetchGroups);
+			
+			return pm.detachCopyAll(DeliveryQueue.getDeliveryQueues(pm, includeDeleted));
+		} finally {
+			pm.close();
+		}
+	}
+	
+	/**
+	 * Returns all {@link DeliveryQueue}s available without the ones that have been marked as deleted.
+	 * @return All {@link DeliveryQueue}s available without the ones that have been marked as deleted.
+	 * 
+	 * @ejb.interface-method
+	 * @ejb.permission role-name="_Guest_"
+	 * 
+	 * @param fetchGroups The desired fetch groups
+	 * @param fetchDepth The desired JDO fetch depth
+	 */
+	public Collection<DeliveryQueue> getAvailableDeliveryQueues(String[] fetchGroups, int fetchDepth) {
+		return getAvailableDeliveryQueues(fetchGroups, fetchDepth, false);
+	}
+	
+	/**
+	 * Stores the given {@link DeliveryQueue}.
+	 * @param pq The {@link DeliveryQueue} to be stored.
+	 * @return A detached copy of the persisted {@link DeliveryQueue}.
+	 * 
+	 * @ejb.interface-method
+	 * @ejb.permission role-name="_Guest_"
+	 */
+	public DeliveryQueue storeDeliveryQueue(DeliveryQueue pq) {
+		List<DeliveryQueue> tmp = new LinkedList<DeliveryQueue>();
+		tmp.add(pq);
+		return storeDeliveryQueues(tmp).get(0);
+	}
+	
+	/**
+	 * Stores all {@link DeliveryQueue}s in the given collection.
+	 * @param deliveryQueues The collection of the {@link DeliveryQueue}s to be stored.
+	 * @return A list of detached copies of the stored print queues.
+	 * 
+	 * @ejb.interface-method
+	 * @ejb.permission role-name="_Guest_"
+	 */
+	public List<DeliveryQueue> storeDeliveryQueues(Collection<DeliveryQueue> deliveryQueues) {
+		PersistenceManager pm = getPersistenceManager();
+		try {
+			deliveryQueues = storeDeliveryQueues(deliveryQueues, pm);
+			return (List<DeliveryQueue>) pm.detachCopyAll(deliveryQueues);
+		} finally {
+			pm.close();
+		}
+	}
+	
+	private List<DeliveryQueue> storeDeliveryQueues(Collection<DeliveryQueue> deliveryQueues, PersistenceManager pm) {
+		List<DeliveryQueue> pqs = new LinkedList<DeliveryQueue>();
+		for (DeliveryQueue clientPQ : deliveryQueues) {
+			logger.debug("TicketingManagerBean.storeDeliveryQueue: Storing deliveryQueue " + clientPQ.getName().getText());
+			clientPQ = (DeliveryQueue) pm.makePersistent(clientPQ);
+			pqs.add(clientPQ);
+		}
+
+		return pqs;
+	}
+	
+	/**
+	 * This method returns whether the print queue is set as activeDeliveryQueue in at least one DeliveryQueueConfigModule.
+	 * @param deliveryQueue The DeliveryQueue in question.
+	 * 
+	 * @ejb.interface-method
+	 * @ejb.permission role-name="_Guest_"
+	 */
+	public boolean isActiveDeliveryQueue(DeliveryQueue deliveryQueue) {
+		PersistenceManager pm = getPersistenceManager();
+		try {
+			return deliveryQueue.isActiveDeliveryQueue(pm);
 		} finally {
 			pm.close();
 		}

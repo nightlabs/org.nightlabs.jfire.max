@@ -28,6 +28,8 @@ package org.nightlabs.jfire.store.deliver;
 
 import java.io.Serializable;
 
+import org.nightlabs.jfire.transfer.TransferData;
+
 /**
  * Subclass in order to hold specific data for your delivery process.
  * This additional data can be defined by the client delivery processor (gathered by
@@ -54,7 +56,7 @@ import java.io.Serializable;
  *
  */
 public class DeliveryData
-implements Serializable
+implements Serializable, TransferData
 {
 	/**
 	 * @jdo.field primary-key="true"

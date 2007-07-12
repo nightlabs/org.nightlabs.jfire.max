@@ -1,5 +1,7 @@
 package org.nightlabs.jfire.store;
 
+import java.io.Serializable;
+
 import javax.jdo.JDOHelper;
 import javax.jdo.PersistenceManager;
 
@@ -25,8 +27,10 @@ import org.nightlabs.util.Utils;
  *
  * @jdo.create-objectid-class field-order="organisationID, deliveryNoteActionHandlerID"
  */
-public class DeliveryNoteActionHandler
+public class DeliveryNoteActionHandler implements Serializable
 {
+	private static final long serialVersionUID = 1L;
+	
 	/**
 	 * @jdo.field primary-key="true"
 	 * @jdo.column length="100"

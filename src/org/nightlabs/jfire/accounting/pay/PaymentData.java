@@ -28,6 +28,8 @@ package org.nightlabs.jfire.accounting.pay;
 
 import java.io.Serializable;
 
+import org.nightlabs.jfire.transfer.TransferData;
+
 /**
  * Subclass in order to hold specific data for your payment process.
  * This additional data can be defined by the client payment processor (gathered by
@@ -55,7 +57,7 @@ import java.io.Serializable;
  *		include-body="id/PaymentDataID.body.inc"
  */
 public class PaymentData
-implements Serializable
+implements Serializable, TransferData
 {
 	/**
 	 * @jdo.field primary-key="true"

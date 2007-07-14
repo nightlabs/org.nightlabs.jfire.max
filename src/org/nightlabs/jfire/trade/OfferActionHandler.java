@@ -79,6 +79,10 @@ public class OfferActionHandler
 	{
 	}
 
+	public void onAcceptOffer(User user, Offer offer)
+	{
+	}
+
 	protected PersistenceManager getPersistenceManager()
 	{
 		PersistenceManager pm = JDOHelper.getPersistenceManager(this);

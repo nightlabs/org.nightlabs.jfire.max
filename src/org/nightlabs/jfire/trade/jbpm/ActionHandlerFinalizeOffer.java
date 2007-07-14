@@ -66,8 +66,9 @@ extends AbstractActionHandler
 				String partnerOrganisationID = vendor.getOrganisationID();
 
 				TradeManager tradeManager = TradeManagerUtil.getHome(Lookup.getInitialContextProperties(pm, partnerOrganisationID)).create();
-				tradeManager.signalOffer((OfferID) JDOHelper.getObjectId(partnerOffer), JbpmConstantsOffer.Vendor.TRANSITION_NAME_ACCEPT_FOR_CROSS_TRADE);
-				// TODO this is not yet the right handling of JBPM - needs to be fixed!
+//				tradeManager.signalOffer((OfferID) JDOHelper.getObjectId(partnerOffer), JbpmConstantsOffer.Vendor.TRANSITION_NAME_ACCEPT_FOR_CROSS_TRADE);
+				tradeManager.signalOffer((OfferID) JDOHelper.getObjectId(partnerOffer), JbpmConstantsOffer.Vendor.TRANSITION_NAME_FINALIZE_FOR_CROSS_TRADE);
+				// TODO this is not yet the right handling of JBPM - needs to be fixed! Isn't this correct, now? Marco.
 			} // for (Iterator itO = offerRequirement.getPartnerOffers().iterator(); itO.hasNext(); ) {
 		} // if (offerRequirement != null) {
 

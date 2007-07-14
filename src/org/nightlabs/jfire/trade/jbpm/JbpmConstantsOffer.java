@@ -37,7 +37,9 @@ public class JbpmConstantsOffer
 		public static final String NODE_NAME_ACCEPTED  = Organisation.DEVIL_ORGANISATION_ID + ":accepted";
 		public static final String NODE_NAME_REJECTED  = Organisation.DEVIL_ORGANISATION_ID + ":rejected";
 
-		public static final String NODE_NAME_PREPARED_FOR_CROSS_TRADE = "devil.NightLabs.org:preparedForCrossTrade";
+//		public static final String NODE_NAME_PREPARED_FOR_CROSS_TRADE = "devil.NightLabs.org:preparedForCrossTrade";
+		public static final String NODE_NAME_FINALIZED_FOR_CROSS_TRADE = "devil.NightLabs.org:finalizedForCrossTrade";
+		public static final String NODE_NAME_SENT_FOR_CROSS_TRADE = "devil.NightLabs.org:sentForCrossTrade";
 
 		/**
 		 * This transition is automatically triggered asynchronously as soon as the document has been finalized.
@@ -56,7 +58,8 @@ public class JbpmConstantsOffer
 		public static final String TRANSITION_NAME_CUSTOMER_ACCEPTED = JbpmConstantsOffer.Customer.NODE_NAME_CUSTOMER_ACCEPTED;
 		public static final String TRANSITION_NAME_CUSTOMER_REJECTED = JbpmConstantsOffer.Customer.NODE_NAME_CUSTOMER_REJECTED;
 
-		public static final String TRANSITION_NAME_PREPARE_FOR_CROSS_TRADE = "devil.NightLabs.org:prepareForCrossTrade";
+//		public static final String TRANSITION_NAME_PREPARE_FOR_CROSS_TRADE = "devil.NightLabs.org:prepareForCrossTrade";
+		public static final String TRANSITION_NAME_FINALIZE_FOR_CROSS_TRADE = "devil.NightLabs.org:finalizeForCrossTrade";
 		public static final String TRANSITION_NAME_ACCEPT_FOR_CROSS_TRADE = "devil.NightLabs.org:acceptForCrossTrade";
 
 //		public static TransitionID getTransitionID_created_2_accept(ProcessDefinitionID processDefinitionID) {

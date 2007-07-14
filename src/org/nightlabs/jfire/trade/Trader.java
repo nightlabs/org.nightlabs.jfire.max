@@ -29,6 +29,7 @@ package org.nightlabs.jfire.trade;
 import java.io.IOException;
 import java.io.Serializable;
 import java.net.URL;
+import java.rmi.RemoteException;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
@@ -40,9 +41,11 @@ import java.util.Locale;
 import java.util.Map;
 import java.util.Set;
 
+import javax.ejb.CreateException;
 import javax.jdo.JDOHelper;
 import javax.jdo.JDOObjectNotFoundException;
 import javax.jdo.PersistenceManager;
+import javax.naming.NamingException;
 
 import org.apache.log4j.Logger;
 import org.jbpm.JbpmContext;
@@ -57,6 +60,7 @@ import org.nightlabs.jfire.asyncinvoke.AsyncInvokeEnvelope;
 import org.nightlabs.jfire.asyncinvoke.ErrorCallback;
 import org.nightlabs.jfire.asyncinvoke.Invocation;
 import org.nightlabs.jfire.asyncinvoke.UndeliverableCallback;
+import org.nightlabs.jfire.base.Lookup;
 import org.nightlabs.jfire.config.Config;
 import org.nightlabs.jfire.idgenerator.IDGenerator;
 import org.nightlabs.jfire.jbpm.JbpmLookup;
@@ -84,6 +88,7 @@ import org.nightlabs.jfire.trade.id.OfferID;
 import org.nightlabs.jfire.trade.jbpm.ActionHandlerAcceptOffer;
 import org.nightlabs.jfire.trade.jbpm.ActionHandlerAcceptOfferImplicitelyVendor;
 import org.nightlabs.jfire.trade.jbpm.ActionHandlerFinalizeOffer;
+import org.nightlabs.jfire.trade.jbpm.ActionHandlerFinalizeOfferForCrossTrade;
 import org.nightlabs.jfire.trade.jbpm.ActionHandlerSendOffer;
 import org.nightlabs.jfire.trade.jbpm.JbpmConstantsOffer;
 import org.nightlabs.jfire.trade.jbpm.ProcessDefinitionAssignment;
@@ -1496,8 +1501,31 @@ public class Trader
 	 * You must NOT call this method directly. It is called by {@link ActionHandlerAcceptOffer}.
 	 */
 	public void onAcceptOffer(User user, Offer offer)
+	throws RemoteException, CreateException, NamingException
 	{
+		// check whether we have to finalize remote offers as well
+		PersistenceManager pm = getPersistenceManager();
+		OfferRequirement offerRequirement = OfferRequirement.getOfferRequirement(pm, offer, false);
+		if (offerRequirement != null) {
+			for (Iterator itO = offerRequirement.getPartnerOffers().iterator(); itO.hasNext(); ) {
+				Offer partnerOffer = (Offer) itO.next();
+
+				LegalEntity vendor = partnerOffer.getOrder().getVendor();
+				if (!(vendor instanceof OrganisationLegalEntity))
+					throw new IllegalStateException("Vendor of Offer " + partnerOffer.getPrimaryKey() + " is not an OrganisationLegalEntity, even though this Offer is part of the OfferRequirements for Offer " + offer.getPrimaryKey());
+
+				String partnerOrganisationID = vendor.getOrganisationID();
+
+				TradeManager tradeManager = TradeManagerUtil.getHome(Lookup.getInitialContextProperties(pm, partnerOrganisationID)).create();
+				tradeManager.signalOffer((OfferID) JDOHelper.getObjectId(partnerOffer), JbpmConstantsOffer.Vendor.TRANSITION_NAME_ACCEPT_FOR_CROSS_TRADE);
+				// TODO this is not yet the right handling of JBPM - needs to be fixed! Isn't this fine now? Marco.
+			} // for (Iterator itO = offerRequirement.getPartnerOffers().iterator(); itO.hasNext(); ) {
+		} // if (offerRequirement != null) {
+
 		offer.getOfferLocal().accept(user);
+		for (OfferActionHandler offerActionHandler : offer.getOfferLocal().getOfferActionHandlers()) {
+			offerActionHandler.onAcceptOffer(user, offer);
+		}
 	}
 
 	public void rejectOffer(User user, OfferLocal offerLocal)
@@ -1580,6 +1608,7 @@ public class Trader
 
 		if (TradeSide.vendor == tradeSide) {
 			ActionHandlerFinalizeOffer.register(jbpmProcessDefinition);
+			ActionHandlerFinalizeOfferForCrossTrade.register(jbpmProcessDefinition);
 			ActionHandlerSendOffer.register(jbpmProcessDefinition);
 			ActionHandlerAcceptOffer.register(jbpmProcessDefinition);
 			ActionHandlerAcceptOfferImplicitelyVendor.register(jbpmProcessDefinition);

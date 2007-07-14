@@ -138,53 +138,57 @@ implements SessionBean
 	public void initialise()
 	throws Exception
 	{
-		PersistenceManager pm = getPersistenceManager();
+		String jbpmDeploymentSubDir = "JFire_JBPM_"+getOrganisationID()+".last";
+
+		JFireServerManager jfireServerManager = getJFireServerManager();
 		try {
-			// Unfortunately, the JbpmService didn't accept the attribute "JbpmCfgResource".
-			// Though this property of the class exists. That's why we use a not-so-clean way
-			// and register the JbpmConfiguration manually in JNDI here.
+			PersistenceManager pm = getPersistenceManager();
+			boolean successful = false; boolean deploymentStarted = false;
+			try {
+				// Unfortunately, the JbpmService didn't accept the attribute "JbpmCfgResource".
+				// Though this property of the class exists. That's why we use a not-so-clean way
+				// and register the JbpmConfiguration manually in JNDI here.
 
-			boolean firstRun = false;
+				boolean firstRun = false;
 
-			// First, we check whether this is the first time for this organisation.
-			ModuleMetaData moduleMetaData = ModuleMetaData.getModuleMetaData(pm, JFireJbpmEAR.MODULE_NAME);
-			if (moduleMetaData == null) {
-				firstRun = true;
-				// this is the first time for the current organisation => deploy configuration
+				// First, we check whether this is the first time for this organisation.
+				ModuleMetaData moduleMetaData = ModuleMetaData.getModuleMetaData(pm, JFireJbpmEAR.MODULE_NAME);
+				if (moduleMetaData == null) {
+					firstRun = true;
+					// this is the first time for the current organisation => deploy configuration
 
-				// version is {major}.{minor}.{release}-{patchlevel}-{suffix}
-				moduleMetaData = new ModuleMetaData(
-						JFireJbpmEAR.MODULE_NAME, "0.9.0-0-beta", "0.9.0-0-beta");
-				pm.makePersistent(moduleMetaData);
+					// version is {major}.{minor}.{release}-{patchlevel}-{suffix}
+					moduleMetaData = new ModuleMetaData(
+							JFireJbpmEAR.MODULE_NAME, "0.9.0-0-beta", "0.9.0-0-beta");
+					pm.makePersistent(moduleMetaData);
 
 
-				// perform deployment
-				File jfireJbpmEarDirectory;
-				JFireServerManager jfireServerManager = getJFireServerManager();
-				try {
+					// perform deployment
+					File jfireJbpmEarDirectory;
+
 					JFireServerConfigModule cfmod = jfireServerManager.getJFireServerConfigModule();
 					jfireJbpmEarDirectory = new File(cfmod.getJ2ee().getJ2eeDeployBaseDirectory(), "JFireJbpm.ear");
 
 					// the ehcache.xml seems to be global in all cases :-( as I didn't find how to specify its name somewhere - this is solved, right? ehcache-config is created per organisation now?!
 					List<DeploymentJarItem> deploymentJarItems = new LinkedList<DeploymentJarItem>();
 //					deploymentJarItems.add(
-//							new DeploymentJarItem(
-//									new File("ehcache.xml"),
-//									new File(jfireJbpmEarDirectory, "ehcache.template.xml"),
-//									null));
-//
+//					new DeploymentJarItem(
+//					new File("ehcache.xml"),
+//					new File(jfireJbpmEarDirectory, "ehcache.template.xml"),
+//					null));
+
 //					jfireServerManager.createDeploymentJar(
-//							new File("JFire_ehcache_global.last/ehcache-cfg.jar"),
-//							deploymentJarItems,
-//							DeployOverwriteBehaviour.KEEP);
+//					new File("JFire_ehcache_global.last/ehcache-cfg.jar"),
+//					deploymentJarItems,
+//					DeployOverwriteBehaviour.KEEP);
 
 					deploymentJarItems.clear();
 
 					deploymentJarItems.add(
-						new DeploymentJarItem(
-								new File(JbpmLookup.getEhCacheConfigFileName(getOrganisationID())),
-								new File(jfireJbpmEarDirectory, "ehcache.template.xml"),
-								null));
+							new DeploymentJarItem(
+									new File(JbpmLookup.getEhCacheConfigFileName(getOrganisationID())),
+									new File(jfireJbpmEarDirectory, "ehcache.template.xml"),
+									null));
 
 					deploymentJarItems.add(
 							new DeploymentJarItem(
@@ -232,66 +236,78 @@ implements SessionBean
 
 
 //					deploymentJarItems.add(
-//							new DeploymentJarItem(
-//									new File(JbpmLookup.getHibernateConfigFileName(getOrganisationID())),
-//									new File(jfireJbpmEarDirectory, "hibernate-"+cfmod.getDatabase().getDatabaseDriverName()+"-cfg.template.xml"),
-//									null));
+//					new DeploymentJarItem(
+//					new File(JbpmLookup.getHibernateConfigFileName(getOrganisationID())),
+//					new File(jfireJbpmEarDirectory, "hibernate-"+cfmod.getDatabase().getDatabaseDriverName()+"-cfg.template.xml"),
+//					null));
 
+					deploymentStarted = true;
 					jfireServerManager.createDeploymentJar(
-							new File("JFire_JBPM_"+getOrganisationID()+".last", "jbpm-"+getOrganisationID()+"-cfg.jar"),
+							new File(jbpmDeploymentSubDir, "jbpm-"+getOrganisationID()+"-cfg.jar"),
 							deploymentJarItems,
 							DeployOverwriteBehaviour.EXCEPTION);
-				} finally {
-					jfireServerManager.close();
-				}
 
-				ClassLoader cl = this.getClass().getClassLoader();
 
-				// wait until the stuff is deployed
-				URL hibernateConfigFileResourceSchemaExport = null;
-				long startDT = System.currentTimeMillis();
-				boolean deploymentComplete;
-				do {
-					deploymentComplete = true;
-					if (cl.getResource(JbpmLookup.getEhCacheConfigFileName(getOrganisationID())) == null)
-						deploymentComplete = false;
+					ClassLoader cl = this.getClass().getClassLoader();
 
-					if (cl.getResource(JbpmLookup.getJbpmConfigFileName(getOrganisationID())) == null)
-						deploymentComplete = false;
+					// wait until the stuff is deployed
+					URL hibernateConfigFileResourceSchemaExport = null;
+					long startDT = System.currentTimeMillis();
+					boolean deploymentComplete;
+					do {
+						deploymentComplete = true;
+						if (cl.getResource(JbpmLookup.getEhCacheConfigFileName(getOrganisationID())) == null)
+							deploymentComplete = false;
 
-					hibernateConfigFileResourceSchemaExport = cl.getResource(
-							JbpmLookup.getHibernateConfigFileName(getOrganisationID(), HibernateEnvironmentMode.SCHEMA_EXPORT));
+						if (cl.getResource(JbpmLookup.getJbpmConfigFileName(getOrganisationID())) == null)
+							deploymentComplete = false;
 
-					if (hibernateConfigFileResourceSchemaExport == null)
-						deploymentComplete = false;
+						hibernateConfigFileResourceSchemaExport = cl.getResource(
+								JbpmLookup.getHibernateConfigFileName(getOrganisationID(), HibernateEnvironmentMode.SCHEMA_EXPORT));
 
-					if (!deploymentComplete) {
-						if (System.currentTimeMillis() - startDT > 60000)
-							throw new IllegalStateException("The deployed files did not pop up within the timeout!");
+						if (hibernateConfigFileResourceSchemaExport == null)
+							deploymentComplete = false;
 
-						logger.info("The deployed files didn't pop up yet => Will wait a few seconds...");
-						try { Thread.sleep(1000); } catch (InterruptedException x) { /* ignored */ }
+						if (!deploymentComplete) {
+							if (System.currentTimeMillis() - startDT > 60000)
+								throw new IllegalStateException("The deployed files did not pop up within the timeout!");
+
+							logger.info("The deployed files didn't pop up yet => Will wait a few seconds...");
+							try { Thread.sleep(1000); } catch (InterruptedException x) { /* ignored */ }
+						}
+					} while (!deploymentComplete);
+
+					logger.info("Deployment complete!");
+
+					if (firstRun) {
+						logger.info("Starting Schema Creation...");
+
+						Configuration configuration = new Configuration();
+						configuration.configure(hibernateConfigFileResourceSchemaExport);
+						SchemaExport schemaExport = new SchemaExport(configuration);
+						schemaExport.create(true, true);
+
+						logger.info("Schema Creation complete!");
 					}
-				} while (!deploymentComplete);
+				} // if (moduleMetaData == null) {
 
-				logger.info("Deployment complete!");
-
-				if (firstRun) {
-					logger.info("Starting Schema Creation...");
-
-					Configuration configuration = new Configuration();
-					configuration.configure(hibernateConfigFileResourceSchemaExport);
-					SchemaExport schemaExport = new SchemaExport(configuration);
-					schemaExport.create(true, true);
-
-					logger.info("Schema Creation complete!");
+				JbpmConfiguration jbpmConfiguration = JbpmConfiguration.getInstance(JbpmLookup.getJbpmConfigFileName(getOrganisationID()));
+				JbpmLookup.bindJbpmConfiguration(getOrganisationID(), jbpmConfiguration);
+				successful = true;
+			} finally {
+				if (deploymentStarted && !successful) {
+					try {
+						logger.error("An error occured after deployment was started! Will try to undeploy all deployed jbpm stuff...");
+						jfireServerManager.undeploy(new File(jbpmDeploymentSubDir));
+						logger.error("An error occured after deployment was started! But undeployed all deployed jbpm stuff successfully.");
+					} catch (Exception x) {
+						logger.error("An error occured after deployment was started! And undeploying all deployed jbpm stuff failed!!!", x);
+					}
 				}
-			} // if (moduleMetaData == null) {
-
-			JbpmConfiguration jbpmConfiguration = JbpmConfiguration.getInstance(JbpmLookup.getJbpmConfigFileName(getOrganisationID()));
-			JbpmLookup.bindJbpmConfiguration(getOrganisationID(), jbpmConfiguration);
+				pm.close();
+			}
 		} finally {
-			pm.close();
+			jfireServerManager.close();
 		}
 	}
 

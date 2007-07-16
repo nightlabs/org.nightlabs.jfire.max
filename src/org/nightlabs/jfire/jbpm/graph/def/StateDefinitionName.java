@@ -86,6 +86,7 @@ public class StateDefinitionName extends I18nText
 	 *		value-type="java.lang.String"
 	 *		default-fetch-group="true"
 	 *		table="JFireJbpm_StateDefinitionName_names"
+	 *		null-value="exception"
 	 *
 	 * @jdo.join
 	 */

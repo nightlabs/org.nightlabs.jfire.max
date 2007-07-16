@@ -86,6 +86,7 @@ public class StateDefinitionDescription extends I18nText
 	 *		value-type="java.lang.String"
 	 *		default-fetch-group="true"
 	 *		table="JFireJbpm_StateDefinitionDescription_descriptions"
+	 *		null-value="exception"
 	 *
 	 * @jdo.key-column length="5"
 	 * @jdo.value-column jdbc-type="LONGVARCHAR"

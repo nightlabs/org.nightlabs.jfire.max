@@ -101,6 +101,7 @@ public class TransitionName extends I18nText
 	 *		value-type="java.lang.String"
 	 *		default-fetch-group="true"
 	 *		table="JFireJbpm_TransitionName_names"
+	 *		null-value="exception"
 	 *
 	 * @jdo.join
 	 */

@@ -50,6 +50,7 @@ extends LocalAccountantDelegate
 	 *		key-type="String"
 	 *		value-type="Account"
 	 *		table="JFireVoucher_VoucherLocalAccountantDelegate_accounts"
+	 *		null-value="exception"
 	 *
 	 * @jdo.join
 	 */

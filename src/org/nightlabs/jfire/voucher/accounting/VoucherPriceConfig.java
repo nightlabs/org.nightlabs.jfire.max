@@ -45,6 +45,7 @@ implements IPackagePriceConfig
 	 *		key-type="Currency"
 	 *		value-type="Long"
 	 *		table="JFireVoucher_VoucherPriceConfig_prices"
+	 *		null-value="exception"
 	 *
 	 * @jdo.join
 	 */

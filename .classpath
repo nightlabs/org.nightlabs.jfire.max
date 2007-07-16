@@ -19,5 +19,6 @@
 	<classpathentry kind="var" path="BCEL"/>
 	<classpathentry kind="var" path="WORKSPACE/NightLabsJDO/dist/NightLabsJDO.jar" sourcepath="WORKSPACE/NightLabsJDO/src"/>
 	<classpathentry kind="var" path="WORKSPACE/NightLabsBase/dist/NightLabsBase.jar" sourcepath="/WORKSPACE/NightLabsBase/src"/>
+	<classpathentry kind="var" path="JBOSS/server/default/lib/mail.jar"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>

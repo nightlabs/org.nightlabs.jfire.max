@@ -36,6 +36,14 @@
         <method-attributes>
         </method-attributes>
       </session>
+      <session>
+         <ejb-name>jfire/ejb/JFireWebShopBase/MailService</ejb-name>
+         <jndi-name>jfire/ejb/JFireWebShopBase/MailService</jndi-name>
+         <local-jndi-name>jfire/ejb/JFireWebShopBase/MailServiceLocal</local-jndi-name>
+
+        <method-attributes>
+        </method-attributes>
+      </session>
 
     <!--
       write a merge file jboss-webservices.ent for webservice-description 

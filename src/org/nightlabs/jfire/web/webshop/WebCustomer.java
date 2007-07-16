@@ -1,7 +1,7 @@
 /**
  * 
  */
-package org.nightlabs.jfire.webshop;
+package org.nightlabs.jfire.web.webshop;
 
 import org.nightlabs.jdo.ObjectIDUtil;
 import org.nightlabs.jfire.trade.LegalEntity;

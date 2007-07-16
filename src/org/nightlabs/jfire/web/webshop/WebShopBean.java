@@ -1,7 +1,7 @@
 /**
  * 
  */
-package org.nightlabs.jfire.webshop;
+package org.nightlabs.jfire.web.webshop;
 
 import java.rmi.RemoteException;
 import java.util.List;
@@ -37,6 +37,10 @@ public abstract class WebShopBean
 extends BaseSessionBeanImpl
 implements SessionBean
 {
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = 1L;
 	/**
 	 * LOG4J logger used by this class
 	 */

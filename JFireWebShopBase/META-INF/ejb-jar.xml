@@ -15,11 +15,26 @@
 
          <ejb-name>jfire/ejb/JFireWebShopBase/WebShop</ejb-name>
 
-         <home>org.nightlabs.jfire.webshop.WebShopHome</home>
-         <remote>org.nightlabs.jfire.webshop.WebShop</remote>
-         <local-home>org.nightlabs.jfire.webshop.WebShopLocalHome</local-home>
-         <local>org.nightlabs.jfire.webshop.WebShopLocal</local>
-         <ejb-class>org.nightlabs.jfire.webshop.WebShopSession</ejb-class>
+         <home>org.nightlabs.jfire.web.webshop.WebShopHome</home>
+         <remote>org.nightlabs.jfire.web.webshop.WebShop</remote>
+         <local-home>org.nightlabs.jfire.web.webshop.WebShopLocalHome</local-home>
+         <local>org.nightlabs.jfire.web.webshop.WebShopLocal</local>
+         <ejb-class>org.nightlabs.jfire.web.webshop.WebShopSession</ejb-class>
+         <session-type>Stateless</session-type>
+         <transaction-type>Container</transaction-type>
+
+      </session>
+
+      <session >
+         <description><![CDATA[]]></description>
+
+         <ejb-name>jfire/ejb/JFireWebShopBase/MailService</ejb-name>
+
+         <home>org.nightlabs.jfire.web.mail.MailServiceHome</home>
+         <remote>org.nightlabs.jfire.web.mail.MailService</remote>
+         <local-home>org.nightlabs.jfire.web.mail.MailServiceLocalHome</local-home>
+         <local>org.nightlabs.jfire.web.mail.MailServiceLocal</local>
+         <ejb-class>org.nightlabs.jfire.web.mail.MailServiceSession</ejb-class>
          <session-type>Stateless</session-type>
          <transaction-type>Container</transaction-type>
 
@@ -361,7 +376,7 @@
          <method-intf>Local</method-intf>
          <method-name>storeWebCustomer</method-name>
          <method-params>
-            <method-param>org.nightlabs.jfire.webshop.WebCustomer</method-param>
+            <method-param>org.nightlabs.jfire.web.webshop.WebCustomer</method-param>
             <method-param>boolean</method-param>
             <method-param>java.lang.String[]</method-param>
             <method-param>int</method-param>
@@ -377,10 +392,87 @@
          <method-intf>Remote</method-intf>
          <method-name>storeWebCustomer</method-name>
          <method-params>
-            <method-param>org.nightlabs.jfire.webshop.WebCustomer</method-param>
+            <method-param>org.nightlabs.jfire.web.webshop.WebCustomer</method-param>
             <method-param>boolean</method-param>
             <method-param>java.lang.String[]</method-param>
             <method-param>int</method-param>
+         </method-params>
+      </method>
+   </method-permission>
+
+   <method-permission >
+      <description><![CDATA[description not supported yet by ejbdoclet]]></description>
+         <role-name>_Guest_</role-name>
+      <method >
+         <description><![CDATA[]]></description>
+         <ejb-name>jfire/ejb/JFireWebShopBase/MailService</ejb-name>
+         <method-intf>LocalHome</method-intf>
+         <method-name>create</method-name>
+         <method-params>
+         </method-params>
+      </method>
+   </method-permission>
+   <method-permission >
+      <description><![CDATA[description not supported yet by ejbdoclet]]></description>
+         <role-name>_Guest_</role-name>
+      <method >
+         <description><![CDATA[]]></description>
+         <ejb-name>jfire/ejb/JFireWebShopBase/MailService</ejb-name>
+         <method-intf>Home</method-intf>
+         <method-name>create</method-name>
+         <method-params>
+         </method-params>
+      </method>
+   </method-permission>
+   <method-permission >
+      <description><![CDATA[description not supported yet by ejbdoclet]]></description>
+      <unchecked/>
+      <method >
+         <description><![CDATA[]]></description>
+         <ejb-name>jfire/ejb/JFireWebShopBase/MailService</ejb-name>
+         <method-name>remove</method-name>
+         <method-params>
+         </method-params>
+      </method>
+   </method-permission>
+   <method-permission >
+      <description><![CDATA[description not supported yet by ejbdoclet]]></description>
+      <unchecked/>
+      <method >
+         <description><![CDATA[]]></description>
+         <ejb-name>jfire/ejb/JFireWebShopBase/MailService</ejb-name>
+         <method-name>remove</method-name>
+         <method-params>
+         </method-params>
+      </method>
+   </method-permission>
+   <method-permission >
+      <description><![CDATA[description not supported yet by ejbdoclet]]></description>
+         <role-name>_Guest_</role-name>
+      <method >
+         <description><![CDATA[]]></description>
+         <ejb-name>jfire/ejb/JFireWebShopBase/MailService</ejb-name>
+         <method-intf>Local</method-intf>
+         <method-name>sendMail</method-name>
+         <method-params>
+            <method-param>java.lang.String</method-param>
+            <method-param>java.lang.String</method-param>
+            <method-param>java.lang.String</method-param>
+         </method-params>
+      </method>
+   </method-permission>
+   <method-permission >
+      <description><![CDATA[description not supported yet by ejbdoclet]]></description>
+         <role-name>_Guest_</role-name>
+      <method >
+         <description><![CDATA[]]></description>
+         <ejb-name>jfire/ejb/JFireWebShopBase/MailService</ejb-name>
+         <method-intf>Remote</method-intf>
+         <method-name>sendMail</method-name>
+         <method-params>
+            <method-param>java.lang.String</method-param>
+            <method-param>java.lang.String</method-param>
+            <method-param>java.lang.String</method-param>
          </method-params>
       </method>
    </method-permission>
@@ -598,7 +690,7 @@
          <method-intf>Local</method-intf>
          <method-name>storeWebCustomer</method-name>
          <method-params>
-            <method-param>org.nightlabs.jfire.webshop.WebCustomer</method-param>
+            <method-param>org.nightlabs.jfire.web.webshop.WebCustomer</method-param>
             <method-param>boolean</method-param>
             <method-param>java.lang.String[]</method-param>
             <method-param>int</method-param>
@@ -612,13 +704,39 @@
          <method-intf>Remote</method-intf>
          <method-name>storeWebCustomer</method-name>
          <method-params>
-            <method-param>org.nightlabs.jfire.webshop.WebCustomer</method-param>
+            <method-param>org.nightlabs.jfire.web.webshop.WebCustomer</method-param>
             <method-param>boolean</method-param>
             <method-param>java.lang.String[]</method-param>
             <method-param>int</method-param>
          </method-params>
       </method>
       <trans-attribute>Required</trans-attribute>
+   </container-transaction>
+   <container-transaction >
+      <method >
+         <ejb-name>jfire/ejb/JFireWebShopBase/MailService</ejb-name>
+         <method-intf>Local</method-intf>
+         <method-name>sendMail</method-name>
+         <method-params>
+            <method-param>java.lang.String</method-param>
+            <method-param>java.lang.String</method-param>
+            <method-param>java.lang.String</method-param>
+         </method-params>
+      </method>
+      <trans-attribute>Supports</trans-attribute>
+   </container-transaction>
+   <container-transaction >
+      <method >
+         <ejb-name>jfire/ejb/JFireWebShopBase/MailService</ejb-name>
+         <method-intf>Remote</method-intf>
+         <method-name>sendMail</method-name>
+         <method-params>
+            <method-param>java.lang.String</method-param>
+            <method-param>java.lang.String</method-param>
+            <method-param>java.lang.String</method-param>
+         </method-params>
+      </method>
+      <trans-attribute>Supports</trans-attribute>
    </container-transaction>
 
    <!-- finder transactions -->

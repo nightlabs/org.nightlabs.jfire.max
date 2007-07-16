@@ -1,7 +1,7 @@
 /**
  * 
  */
-package org.nightlabs.jfire.webshop;
+package org.nightlabs.jfire.web.webshop;
 
 /**
  * @author Khaled

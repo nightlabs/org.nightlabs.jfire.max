@@ -61,6 +61,7 @@ implements Inheritable
 	 *		key-type="java.lang.String"
 	 *		value-type="java.lang.String"
 	 *		table="JFireTrade_ProductTypeName_names"
+	 *		null-value="exception"
 	 *
 	 * @jdo.join
 	 */

@@ -120,6 +120,7 @@ public class CustomerGroup implements Serializable
 	 *		key-type="String"
 	 *		value-type="ModeOfPayment"
 	 *		table="JFireTrade_CustomerGroup_modeOfPayments"
+	 *		null-value="exception"
 	 *
 	 * @jdo.join
 	 */
@@ -139,6 +140,7 @@ public class CustomerGroup implements Serializable
 	 *		key-type="String"
 	 *		value-type="ModeOfPaymentFlavour"
 	 *		table="JFireTrade_CustomerGroup_modeOfPaymentFlavours"
+	 *		null-value="exception"
 	 *
 	 * @jdo.join
 	 */
@@ -159,6 +161,7 @@ public class CustomerGroup implements Serializable
 	 *		key-type="String"
 	 *		value-type="ModeOfDelivery"
 	 *		table="JFireTrade_CustomerGroup_modeOfDeliveries"
+	 *		null-value="exception"
 	 *
 	 * @jdo.join
 	 */
@@ -178,6 +181,7 @@ public class CustomerGroup implements Serializable
 	 *		key-type="String"
 	 *		value-type="ModeOfDeliveryFlavour"
 	 *		table="JFireTrade_CustomerGroup_modeOfDeliveryFlavours"
+	 *		null-value="exception"
 	 *
 	 * @jdo.join
 	 */

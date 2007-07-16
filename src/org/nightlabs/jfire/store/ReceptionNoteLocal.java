@@ -103,6 +103,7 @@ implements
 	 *		collection-type="collection"
 	 *		element-type="State"
 	 *		table="JFireTrade_ReceptionNoteLocal_states"
+	 *		null-value="exception"
 	 *
 	 * @jdo.join
 	 */

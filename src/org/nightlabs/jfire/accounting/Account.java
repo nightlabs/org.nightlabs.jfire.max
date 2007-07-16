@@ -337,6 +337,7 @@ public class Account extends Anchor
 	 *		collection-type="collection"
 	 *		element-type="SummaryAccount"
 	 *		table="JFireTrade_Account_summaryAccounts"
+	 *		null-value="exception"
 	 *
 	 * @jdo.join
 	 */

@@ -62,6 +62,7 @@ public class ProductTransfer extends Transfer implements Serializable
 	 *		collection-type="collection"
 	 *		element-type="Product"
 	 *		table="JFireTrade_ProductTransfer_products"
+	 *		null-value="exception"
 	 *
 	 * @jdo.join
 	 *

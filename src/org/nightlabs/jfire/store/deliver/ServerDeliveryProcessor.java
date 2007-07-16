@@ -199,6 +199,7 @@ implements Serializable, DetachCallback
 	 *		key-type="String"
 	 *		value-type="ModeOfDelivery"
 	 *		table="JFireTrade_ServerDeliveryProcessor_modeOfDeliveries"
+	 *		null-value="exception"
 	 * 
 	 * @jdo.join
 	 */
@@ -219,6 +220,7 @@ implements Serializable, DetachCallback
 	 *		key-type="String"
 	 *		value-type="ModeOfDeliveryFlavour"
 	 *		table="JFireTrade_ServerDeliveryProcessor_modeOfDeliveryFlavours"
+	 *		null-value="exception"
 	 * 
 	 * @jdo.join
 	 */

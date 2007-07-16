@@ -60,6 +60,7 @@ public class LegalEntityViewConfigModule extends ConfigModule {
 	 *		collection-type="collection"
 	 *		element-type="java.lang.String"
 	 *		table="JFireTrade_LegalEntityViewConfigModule_personStructFields"
+	 *		null-value="exception"
 	 *
 	 * @jdo.join
 	 */

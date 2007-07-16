@@ -105,6 +105,7 @@ implements StoreCallback
 	 *		key-type="java.lang.String"
 	 *		value-type="java.lang.String"
 	 *		table="JFireTrade_TariffName_names"
+	 *		null-value="exception"
 	 *
 	 * @jdo.join
 	 */

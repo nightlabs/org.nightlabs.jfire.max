@@ -96,6 +96,7 @@ public class ServerPaymentProcessorName extends I18nText
 	 *		key-type="java.lang.String"
 	 *		value-type="java.lang.String"
 	 *		table="JFireTrade_ServerPaymentProcessorName_names"
+	 *		null-value="exception"
 	 *
 	 * @jdo.join
 	 */

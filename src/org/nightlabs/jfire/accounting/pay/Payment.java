@@ -760,6 +760,7 @@ implements Serializable, StoreCallback
 	 *		collection-type="collection"
 	 *		element-type="org.nightlabs.jfire.accounting.Invoice"
 	 *		table="JFireTrade_Payment_invoices"
+	 *		null-value="exception"
 	 *
 	 * @jdo.join
 	 */

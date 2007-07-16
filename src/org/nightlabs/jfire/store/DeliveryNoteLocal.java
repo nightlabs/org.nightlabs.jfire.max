@@ -130,6 +130,7 @@ implements Serializable, StatableLocal
 	 *		collection-type="collection"
 	 *		element-type="State"
 	 *		table="JFireTrade_DeliveryNoteLocal_states"
+	 *		null-value="exception"
 	 *
 	 * @jdo.join
 	 */
@@ -195,6 +196,7 @@ implements Serializable, StatableLocal
 	 *		collection-type="collection"
 	 *		element-type="DeliveryNoteActionHandler"
 	 *		table="JFireTrade_DeliveryNoteLocal_deliveryNoteActionHandlers"
+	 *		null-value="exception"
 	 *
 	 * @jdo.join
 	 */

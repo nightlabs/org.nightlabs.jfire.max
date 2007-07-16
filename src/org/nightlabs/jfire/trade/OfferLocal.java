@@ -149,6 +149,7 @@ implements Serializable, StatableLocal
 	 *		collection-type="collection"
 	 *		element-type="State"
 	 *		table="JFireTrade_OfferLocal_states"
+	 *		null-value="exception"
 	 *
 	 * @jdo.join
 	 */
@@ -318,6 +319,7 @@ implements Serializable, StatableLocal
 	 *		collection-type="collection"
 	 *		element-type="org.nightlabs.jfire.trade.OfferActionHandler"
 	 *		table="JFireTrade_OfferLocal_offerActionHandlers"
+	 *		null-value="exception"
 	 *
 	 * @jdo.join
 	 */

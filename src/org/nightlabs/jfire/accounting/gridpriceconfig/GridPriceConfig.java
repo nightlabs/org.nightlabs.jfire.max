@@ -84,6 +84,7 @@ public abstract class GridPriceConfig extends PriceConfig
 	 *		key-type="java.lang.String"
 	 *		value-type="CustomerGroup"
 	 *		table="JFireTrade_GridPriceConfig_customerGroups"
+	 *		null-value="exception"
 	 *
 	 * @jdo.join
 	 */
@@ -99,6 +100,7 @@ public abstract class GridPriceConfig extends PriceConfig
 	 *		key-type="java.lang.String"
 	 *		value-type="Tariff"
 	 *		table="JFireTrade_GridPriceConfig_tariffs"
+	 *		null-value="exception"
 	 *
 	 * @jdo.join
 	 */

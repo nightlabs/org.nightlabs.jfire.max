@@ -122,6 +122,7 @@ public class OrderRequirement
 	 *		collection-type="map"
 	 *		key-type="LegalEntity"
 	 *		value-type="Order"
+	 *		null-value="exception"
 	 *
 	 * @jdo.join
 	 */

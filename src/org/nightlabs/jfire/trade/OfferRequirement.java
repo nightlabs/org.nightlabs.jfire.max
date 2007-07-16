@@ -123,6 +123,7 @@ public class OfferRequirement
 	 *		collection-type="map"
 	 *		key-type="LegalEntity"
 	 *		value-type="Offer"
+	 *		null-value="exception"
 	 *
 	 * @jdo.join
 	 */

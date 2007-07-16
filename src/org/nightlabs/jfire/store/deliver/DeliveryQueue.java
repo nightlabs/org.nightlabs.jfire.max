@@ -77,6 +77,7 @@ public class DeliveryQueue implements Serializable, AttachCallback {
 	 * 		dependent-element="false"
 	 * 		element-type="org.nightlabs.jfire.store.deliver.Delivery"
 	 * 		table="JFireTrade_DeliveryQueue_deliverySet"
+	 *		null-value="exception"
 	 *  
 	 * @jdo.join
 	 */
@@ -91,6 +92,7 @@ public class DeliveryQueue implements Serializable, AttachCallback {
 	 * 		dependent-element="false"
 	 * 		element-type="org.nightlabs.jfire.store.deliver.Delivery"
 	 * 		table="JFireTrade_DeliveryQueue_outstandingDeliverySet"
+	 *		null-value="exception"
 	 * 
 	 * @jdo.join
 	 */

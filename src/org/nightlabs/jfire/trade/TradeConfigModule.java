@@ -44,6 +44,7 @@ public class TradeConfigModule
 	 *		key-type="java.lang.String"
 	 *		value-type="IDPrefixCf"
 	 *		table="JFireTrade_TradeConfigModule_idPrefixCfs"
+	 *		null-value="exception"
 	 *		@!mapped-by="tradeConfigModule" // not possible because of inheritance - we don't want to copy IDPrefixCfs!
 	 *
 	 * @!jdo.key mapped-by="articleContainerClassName"

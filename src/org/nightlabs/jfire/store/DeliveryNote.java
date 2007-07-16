@@ -288,6 +288,7 @@ implements Serializable, ArticleContainer, Statable, DetachCallback
 	 *		collection-type="collection"
 	 *		element-type="State"
 	 *		table="JFireTrade_DeliveryNote_states"
+	 *		null-value="exception"
 	 *
 	 * @jdo.join
 	 */

@@ -89,6 +89,7 @@ public class ProductTypeGroupName extends I18nText {
 	 *		value-type="java.lang.String"
 	 *		default-fetch-group="true"
 	 *		table="JFireTrade_ProductTypeGroupName_names"
+	 *		null-value="exception"
 	 *
 	 * @jdo.join
 	 */

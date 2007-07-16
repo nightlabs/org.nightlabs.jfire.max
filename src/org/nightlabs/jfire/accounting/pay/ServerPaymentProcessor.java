@@ -237,6 +237,7 @@ implements Serializable, DetachCallback
 	 *		key-type="String"
 	 *		value-type="ModeOfPayment"
 	 *		table="JFireTrade_ServerPaymentProcessor_modeOfPayments"
+	 *		null-value="exception"
 	 *
 	 * @jdo.join
 	 */
@@ -257,6 +258,7 @@ implements Serializable, DetachCallback
 	 *		key-type="String"
 	 *		value-type="ModeOfPaymentFlavour"
 	 *		table="JFireTrade_ServerPaymentProcessor_modeOfPaymentFlavours"
+	 *		null-value="exception"
 	 *
 	 * @jdo.join
 	 */

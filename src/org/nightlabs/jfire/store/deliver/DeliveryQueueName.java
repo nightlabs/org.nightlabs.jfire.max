@@ -46,6 +46,7 @@ public class DeliveryQueueName extends I18nText {
 	 *		value-type="java.lang.String"
 	 *		default-fetch-group="true"
 	 *		table="JFireTrade_DeliveryQueueName_names"
+	 *		null-value="exception"
 	 *
 	 * @jdo.join
 	 */

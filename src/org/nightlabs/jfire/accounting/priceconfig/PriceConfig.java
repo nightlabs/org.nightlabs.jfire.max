@@ -168,6 +168,7 @@ public abstract class PriceConfig implements Serializable, StoreCallback, IPrice
 	 *		key-type="java.lang.String"
 	 *		value-type="Currency"
 	 *		table="JFireTrade_PriceConfig_currencies"
+	 *		null-value="exception"
 	 *
 	 * @jdo.join
 	 */
@@ -223,6 +224,7 @@ public abstract class PriceConfig implements Serializable, StoreCallback, IPrice
 	 *		key-type="java.lang.String"
 	 *		value-type="PriceFragmentType"
 	 *		table="JFireTrade_PriceConfig_priceFragmentTypes"
+	 *		null-value="exception"
 	 *
 	 * @jdo.join
 	 */

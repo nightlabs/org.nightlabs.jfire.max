@@ -49,6 +49,7 @@ public class DeliveryQueueConfigModule extends ConfigModule {
 	 * 		dependent-element="false"
 	 * 		element-type="org.nightlabs.jfire.store.deliver.DeliveryQueue"
 	 * 		table="JFireTrade_DeliveryQueueConfigModule_visibleDeliveryQueues"
+	 *		null-value="exception"
 	 * 
 	 * @jdo.join
 	 */

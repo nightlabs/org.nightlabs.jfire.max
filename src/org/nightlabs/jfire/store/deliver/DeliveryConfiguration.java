@@ -82,6 +82,7 @@ implements Serializable
 	 *		key-type="java.lang.String"
 	 *		value-type="ModeOfDelivery"
 	 *		table="JFireTrade_DeliveryConfiguration_modeOfDeliveries"
+	 *		null-value="exception"
 	 *
 	 * @jdo.join
 	 */
@@ -97,6 +98,7 @@ implements Serializable
 	 *		key-type="java.lang.String"
 	 *		value-type="ModeOfDeliveryFlavour"
 	 *		table="JFireTrade_DeliveryConfiguration_modeOfDeliveryFlavours"
+	 *		null-value="exception"
 	 *
 	 * @jdo.join
 	 */
@@ -196,6 +198,7 @@ implements Serializable
 	 *		key-type="java.lang.String"
 	 *		value-type="ServerDeliveryProcessor"
 	 *		table="JFireTrade_DeliveryConfiguration_includedServerDeliveryProcessors"
+	 *		null-value="exception"
 	 *
 	 * @jdo.join
 	 */
@@ -216,6 +219,7 @@ implements Serializable
 	 *		key-type="java.lang.String"
 	 *		value-type="ServerDeliveryProcessor"
 	 *		table="JFireTrade_DeliveryConfiguration_excludedServerDeliveryProcessors"
+	 *		null-value="exception"
 	 *
 	 * @jdo.join
 	 */
@@ -232,6 +236,7 @@ implements Serializable
 	 *		collection-type="collection"
 	 *		element-type="java.lang.String"
 	 *		table="JFireTrade_DeliveryConfiguration_includedClientDeliveryProcessorFactoryIDs"
+	 *		null-value="exception"
 	 *
 	 * @jdo.join
 	 */
@@ -248,6 +253,7 @@ implements Serializable
 	 *		collection-type="collection"
 	 *		element-type="java.lang.String"
 	 *		table="JFireTrade_DeliveryConfiguration_excludedClientDeliveryProcessorFactoryIDs"
+	 *		null-value="exception"
 	 *
 	 * @jdo.join
 	 */

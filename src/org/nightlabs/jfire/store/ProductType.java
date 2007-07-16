@@ -303,6 +303,7 @@ implements
 	 *		key-type="String"
 	 *		value-type="ProductTypeGroup"
 	 *		table="JFireTrade_ProductType_productTypeGroups"
+	 *		null-value="exception"
 	 *
 	 * @jdo.join
 	 */

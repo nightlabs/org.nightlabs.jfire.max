@@ -88,6 +88,7 @@ implements IFormulaPriceConfig
 	 *		value-type="GridPriceConfig"
 	 *		dependent-value="true"
 	 *		table="JFireTrade_FormulaPriceConfig_packagingResultPriceConfigs"
+	 *		null-value="exception"
 	 *
 	 * @jdo.join
 	 */
@@ -210,6 +211,7 @@ implements IFormulaPriceConfig
 	 *		key-type="java.lang.String"
 	 *		value-type="ProductType"
 	 *		table="JFireTrade_FormulaPriceConfig_productTypes"
+	 *		null-value="exception"
 	 *
 	 * @jdo.join
 	 */

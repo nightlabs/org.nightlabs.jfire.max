@@ -95,6 +95,7 @@ public class ServerDeliveryProcessorName extends I18nText
 	 *		key-type="java.lang.String"
 	 *		value-type="java.lang.String"
 	 *		table="JFireTrade_ServerDeliveryProcessorName_names"
+	 *		null-value="exception"
 	 *
 	 * @jdo.join
 	 */

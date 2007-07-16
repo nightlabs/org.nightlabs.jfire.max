@@ -327,6 +327,7 @@ implements
 	 *		collection-type="collection"
 	 *		element-type="State"
 	 *		table="JFireTrade_Offer_states"
+	 *		null-value="exception"
 	 *
 	 * @jdo.join
 	 */

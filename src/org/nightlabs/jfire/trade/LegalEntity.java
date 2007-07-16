@@ -184,6 +184,7 @@ public class LegalEntity extends Anchor
 	 *		collection-type="collection"
 	 *		element-type="CustomerGroup"
 	 *		table="JFireTrade_LegalEntity_customerGroups"
+	 *		null-value="exception"
 	 *
 	 * @jdo.join
 	 */

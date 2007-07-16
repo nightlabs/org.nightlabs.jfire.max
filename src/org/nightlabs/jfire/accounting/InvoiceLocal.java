@@ -138,6 +138,7 @@ implements Serializable, StatableLocal
 	 *		collection-type="collection"
 	 *		element-type="State"
 	 *		table="JFireTrade_InvoiceLocal_states"
+	 *		null-value="exception"
 	 *
 	 * @jdo.join
 	 */
@@ -233,6 +234,7 @@ implements Serializable, StatableLocal
 	 *		collection-type="collection"
 	 *		element-type="InvoiceActionHandler"
 	 *		table="JFireTrade_InvoiceLocal_invoiceActionHandlers"
+	 *		null-value="exception"
 	 *
 	 * @jdo.join
 	 */

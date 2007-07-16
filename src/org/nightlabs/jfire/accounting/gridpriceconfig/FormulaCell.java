@@ -68,6 +68,7 @@ public class FormulaCell implements Serializable
 	 *		key-type="String"
 	 *		value-type="String"
 	 *		table="JFireTrade_FormulaCell_priceFragmentFormulas"
+	 *		null-value="exception"
 	 *
 	 * @jdo.key-column length="100"
 	 * @jdo.value-column jdbc-type="LONGVARCHAR"

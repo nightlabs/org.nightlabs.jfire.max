@@ -73,6 +73,7 @@ public class SummaryAccount extends Account
 	 *		collection-type="collection"
 	 *		element-type="Account"
 	 *		table="JFireTrade_SummaryAccount_summedAccounts"
+	 *		null-value="exception"
 	 *
 	 * @jdo.join
 	 */

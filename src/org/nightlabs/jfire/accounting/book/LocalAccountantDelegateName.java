@@ -90,6 +90,7 @@ extends I18nText
 	 *		value-type="java.lang.String"
 	 *		default-fetch-group="true"
 	 *		table="JFireTrade_LocalAccountantDelegateName_names"
+	 *		null-value="exception"
 	 *
 	 * @jdo.join
 	 */

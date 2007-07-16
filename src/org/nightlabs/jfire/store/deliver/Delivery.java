@@ -749,6 +749,7 @@ implements Serializable, StoreCallback
 	 *		collection-type="collection"
 	 *		element-type="org.nightlabs.jfire.trade.Article"
 	 *		table="JFireTrade_Delivery_articles"
+	 *		null-value="exception"
 	 *
 	 * @jdo.join
 	 */	
@@ -760,6 +761,7 @@ implements Serializable, StoreCallback
 	 *		collection-type="collection"
 	 *		element-type="org.nightlabs.jfire.store.DeliveryNote"
 	 *		table="JFireTrade_Delivery_deliveryNotes"
+	 *		null-value="exception"
 	 * 
 	 * @jdo.join
 	 */

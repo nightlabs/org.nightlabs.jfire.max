@@ -75,6 +75,7 @@ public class ModeOfPaymentName extends I18nText
 	 *		value-type="java.lang.String"
 	 *		default-fetch-group="true"
 	 *		table="JFireTrade_ModeOfPaymentName_names"
+	 *		null-value="exception"
 	 *
 	 * @jdo.join
 	 */

@@ -102,6 +102,7 @@ public class District implements Serializable // , StoreCallback
 	 *		element-type="String"
 	 *		dependent-element="true"
 	 *		table = "JFireGeography_District_zips"
+	 *		null-value="exception"
 	 *
 	 * @jdo.join
 	 */

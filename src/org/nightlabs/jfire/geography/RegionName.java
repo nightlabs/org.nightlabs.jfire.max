@@ -83,6 +83,7 @@ public class RegionName extends I18nText
 	 *		key-type="java.lang.String"
 	 *		value-type="java.lang.String"
 	 *		table="JFireGeography_RegionName_names"
+	 *		null-value="exception"
 	 *
 	 * @jdo.join
 	 */

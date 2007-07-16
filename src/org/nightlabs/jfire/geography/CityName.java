@@ -83,6 +83,7 @@ public class CityName extends I18nText
 	 *		key-type="java.lang.String"
 	 *		value-type="java.lang.String"
 	 *		table="JFireGeography_CityName_names"
+	 *		null-value="exception"
 	 *
 	 * @jdo.join
 	 */

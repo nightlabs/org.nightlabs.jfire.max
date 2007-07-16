@@ -85,6 +85,7 @@ public class LocationName extends I18nText
 	 *		key-type="java.lang.String"
 	 *		value-type="java.lang.String"
 	 *		table="JFireGeography_LocationName_names"
+	 *		null-value="exception"
 	 *
 	 * @jdo.join
 	 */

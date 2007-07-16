@@ -119,6 +119,7 @@ implements Serializable
 	 *		key-type="java.lang.String"
 	 *		value-type="java.lang.String"
 	 *		table="JFireScripting_ScriptRegistry_language2ScriptExecutorClassName"
+	 *		null-value="exception"
 	 *
 	 * @jdo.join
 	 */
@@ -134,6 +135,7 @@ implements Serializable
 	 *		key-type="java.lang.String"
 	 *		value-type="java.lang.String"
 	 *		table="JFireScripting_ScriptRegistry_fileExtension2Language"
+	 *		null-value="exception"
 	 *
 	 * @jdo.join
 	 */

@@ -84,6 +84,7 @@ extends I18nText
 	 *		key-type="java.lang.String"
 	 *		value-type="java.lang.String"
 	 *		table="JFireScripting_ScriptRegistryItemName_names"
+	 *		null-value="exception"
 	 *
 	 * @jdo.join
 	 */

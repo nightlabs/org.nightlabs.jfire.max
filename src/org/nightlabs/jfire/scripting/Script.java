@@ -221,6 +221,7 @@ public class Script
 	 *		collection-type="array"
 	 *		element-type="String"
 	 *		table="JFireScripting_Script_fetchGroups"
+	 *		null-value="exception"
 	 *
 	 * @jdo.join
 	 */

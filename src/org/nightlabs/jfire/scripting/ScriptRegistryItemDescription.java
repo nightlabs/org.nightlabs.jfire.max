@@ -84,12 +84,13 @@ extends I18nText
 	 *		key-type="java.lang.String"
 	 *		value-type="java.lang.String"
 	 *		table="JFireScripting_ScriptRegistryItemDescription_texts"
+	 *		null-value="exception"
 	 *
 	 * @jdo.join
-	 * 
+	 *
 	 * @jdo.value-column jdbc-type="LONGVARCHAR"
 	 */
-	protected Map texts = new HashMap();
+	protected Map texts;
 
 	/**
 	 * @deprecated Only for JDO!
@@ -104,6 +105,7 @@ extends I18nText
 		this.organisationID = scriptRegistryItem.getOrganisationID();
 		this.scriptRegistryItemType = scriptRegistryItem.getScriptRegistryItemType();
 		this.scriptRegistryItemID = scriptRegistryItem.getScriptRegistryItemID();
+		this.texts = new HashMap();
 	}
 
 	/**

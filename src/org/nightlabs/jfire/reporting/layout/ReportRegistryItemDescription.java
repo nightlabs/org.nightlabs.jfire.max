@@ -103,6 +103,7 @@ public class ReportRegistryItemDescription extends I18nText {
 	 *		value-type="java.lang.String"
 	 *		default-fetch-group="true"
 	 *		table="JFireReporting_ReportRegistryItemDescription_texts"
+	 *		null-value="exception"
 	 *
 	 * @jdo.join
 	 * 

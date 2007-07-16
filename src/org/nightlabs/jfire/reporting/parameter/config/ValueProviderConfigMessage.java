@@ -131,6 +131,7 @@ public class ValueProviderConfigMessage extends I18nText implements Serializable
 	 *		value-type="java.lang.String"
 	 *		default-fetch-group="true"
 	 *		table="JFireReporting_ValueProviderConfigMessage_names"
+	 *		null-value="exception"
 	 *
 	 * @jdo.join
 	 */

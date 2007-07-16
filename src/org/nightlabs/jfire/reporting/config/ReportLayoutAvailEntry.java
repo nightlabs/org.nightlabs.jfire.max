@@ -104,6 +104,7 @@ implements Serializable
 	 *		collection-type="collection"
 	 *		element-type="java.lang.String"
 	 *		table="JFireReporting_ReportLayoutAvailEntry_availableReportLayoutKeys"
+	 *		null-value="exception"
 	 *
 	 * @jdo.join
 	 */

@@ -80,6 +80,7 @@ public class ReportRegistry {
 	 *		key-type="java.lang.String"
 	 *		value-type="java.lang.String"
 	 *		table="JFireReporting_ReportRegistry_format2ReportRendererClassName"
+	 *		null-value="exception"
 	 *
 	 * @jdo.join
 	 */

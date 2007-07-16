@@ -104,6 +104,7 @@ public class ReportParameterAcquisitionUseCaseDescription extends I18nText imple
 	 *		value-type="java.lang.String"
 	 *		default-fetch-group="true"
 	 *		table="JFireReporting_ReportParameterAcquisitionUseCaseDescription_names"
+	 *		null-value="exception"
 	 *
 	 * @jdo.join
 	 */

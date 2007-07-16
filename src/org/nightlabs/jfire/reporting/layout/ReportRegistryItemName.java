@@ -103,6 +103,7 @@ public class ReportRegistryItemName extends I18nText {
 	 *		value-type="java.lang.String"
 	 *		default-fetch-group="true"
 	 *		table="JFireReporting_ReportRegistryItemName_names"
+	 *		null-value="exception"
 	 *
 	 * @jdo.join
 	 */

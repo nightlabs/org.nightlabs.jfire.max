@@ -104,6 +104,7 @@ public class ReportParameterAcquisitionUseCaseName extends I18nText implements S
 	 *		value-type="java.lang.String"
 	 *		default-fetch-group="true"
 	 *		table="JFireReporting_ReportParameterAcquisitionUseCaseName_names"
+	 *		null-value="exception"
 	 *
 	 * @jdo.join
 	 */

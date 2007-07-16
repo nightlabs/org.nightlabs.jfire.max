@@ -39,6 +39,7 @@ extends FormulaPriceConfig
 	 *		collection-type="collection"
 	 *		element-type="PriceFragmentType"
 	 *		table="JFireDynamicTrade_DynamicTradePriceConfig_inputPriceFragmentTypes"
+	 *		null-value="exception"
 	 *
 	 * @jdo.join
 	 */

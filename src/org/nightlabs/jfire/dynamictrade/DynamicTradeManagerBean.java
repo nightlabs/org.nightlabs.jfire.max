@@ -109,6 +109,9 @@ implements SessionBean
 		try {
 			String organisationID = getOrganisationID();
 
+			// initialise meta-data
+			pm.getExtent(DynamicProductType.class);
+
 			ProductTypeID rootID = ProductTypeID.create(organisationID, DynamicProductType.class.getName());
 			try {
 				pm.getObjectById(rootID);

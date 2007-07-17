@@ -28,7 +28,7 @@ package org.nightlabs.jfire.scripting;
 
 import java.io.Serializable;
 
-import org.nightlabs.util.Utils;
+import org.nightlabs.util.Util;
 
 /**
  * 
@@ -158,9 +158,9 @@ public class ScriptParameter
 	@Override
 	public int hashCode() {
 		return 
-			Utils.hashCode(organisationID) ^ 
-			Utils.hashCode(scriptParameterSetID) ^ 
-			Utils.hashCode(scriptParameterID);
+			Util.hashCode(organisationID) ^ 
+			Util.hashCode(scriptParameterSetID) ^ 
+			Util.hashCode(scriptParameterID);
 	}
 	
 	@Override
@@ -174,9 +174,9 @@ public class ScriptParameter
 		ScriptParameter other = (ScriptParameter) obj;
 		
 		return 
-			Utils.equals(this.organisationID, other.organisationID) &&
+			Util.equals(this.organisationID, other.organisationID) &&
 			this.scriptParameterSetID == other.scriptParameterSetID &&
-			Utils.equals(this.scriptParameterID, other.scriptParameterID);
+			Util.equals(this.scriptParameterID, other.scriptParameterID);
 	}
 
 	/**

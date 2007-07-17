@@ -120,6 +120,9 @@ public class ScriptingInitialiser
 	public static final ScriptCategory createCategory(PersistenceManager pm, ScriptCategory parent, String organisationID, 
 			String scriptRegistryItemType, String scriptRegistryItemID)  
 	{
+		// initialise meta-data
+		pm.getExtent(ScriptCategory.class);
+
 		ScriptCategory category;
 		try {
 			category = (ScriptCategory) pm.getObjectById(ScriptRegistryItemID.create(organisationID, scriptRegistryItemType, scriptRegistryItemID));			
@@ -185,6 +188,14 @@ public class ScriptingInitialiser
 			throw new IllegalStateException("Script directory does not exist: " + scriptDir.getAbsolutePath());
 
 		logger.debug("BEGIN initialization of Scripts");	
+
+		// initialise meta-data
+		pm.getExtent(ScriptParameter.class);
+		pm.getExtent(ScriptParameterSet.class);
+		pm.getExtent(ScriptRegistry.class);
+		pm.getExtent(Script.class);
+		pm.getExtent(ScriptCategory.class);
+
 		createScriptCategories(scriptDir, baseCategory);
 	}
 

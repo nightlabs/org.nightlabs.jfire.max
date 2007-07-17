@@ -199,8 +199,7 @@ implements SessionBean
 //			Accounting accounting = Accounting.getAccounting(pm);
 
 			// create a default DeliveryConfiguration with all default ModeOfDelivery s
-			DeliveryConfiguration deliveryConfiguration = new DeliveryConfiguration(
-					organisationID, "JFireSimpleTrade.default");
+			DeliveryConfiguration deliveryConfiguration = new DeliveryConfiguration(organisationID, "JFireSimpleTrade.default");
 			deliveryConfiguration.getName().setText(Locale.ENGLISH.getLanguage(), "Default Delivery Configuration for JFireSimpleTrade");
 			deliveryConfiguration.getName().setText(Locale.GERMAN.getLanguage(), "Standard-Liefer-Konfiguration für JFireSimpleTrade");
 			pm.getExtent(ModeOfDelivery.class);
@@ -215,6 +214,9 @@ implements SessionBean
 				deliveryConfiguration.addModeOfDelivery(modeOfDelivery);
 
 				modeOfDelivery = (ModeOfDelivery) pm.getObjectById(ModeOfDeliveryConst.MODE_OF_DELIVERY_ID_MAILING_PHYSICAL);
+				deliveryConfiguration.addModeOfDelivery(modeOfDelivery);
+				
+				modeOfDelivery = (ModeOfDelivery) pm.getObjectById(ModeOfDeliveryConst.MODE_OF_DELIVERY_ID_DELIVER_TO_DELIVERY_QUEUE);
 				deliveryConfiguration.addModeOfDelivery(modeOfDelivery);
 
 				pm.makePersistent(deliveryConfiguration);

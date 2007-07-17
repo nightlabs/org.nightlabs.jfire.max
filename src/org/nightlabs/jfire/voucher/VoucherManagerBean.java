@@ -165,7 +165,7 @@ implements SessionBean
 			// check each time for ticketPrinter module, to register corresponding 
 			// modeOfDeliveryFlavour if necessary
 			checkModeOfDeliveryFlavourTicketPrinter(pm);
-
+			
 			ModuleMetaData moduleMetaData = ModuleMetaData.getModuleMetaData(pm,
 					"JFireVoucher");
 			if (moduleMetaData != null)
@@ -303,8 +303,7 @@ implements SessionBean
 	{		
 		DeliveryConfiguration deliveryConfiguration = null;
 		try {
-			deliveryConfiguration = (DeliveryConfiguration) pm.getObjectById(
-					DeliveryConfigurationID.create(getOrganisationID(), "JFireVoucher.default"));
+			deliveryConfiguration = (DeliveryConfiguration) pm.getObjectById(DeliveryConfigurationID.create(getOrganisationID(), "JFireVoucher.default"));
 			return deliveryConfiguration;
 		} 
 		catch (JDOObjectNotFoundException jdoonfe) 
@@ -324,7 +323,7 @@ implements SessionBean
 					
 					modeOfDelivery = (ModeOfDelivery) pm.getObjectById(ModeOfDeliveryConst.MODE_OF_DELIVERY_ID_MANUAL);
 					deliveryConfiguration.addModeOfDelivery(modeOfDelivery);
-
+					
 					modeOfDelivery = getModeOfDeliveryVoucherPrint(pm);
 
 					for (Iterator it = pm.getExtent(CustomerGroup.class).iterator(); it.hasNext(); ) {
@@ -337,8 +336,12 @@ implements SessionBean
 					modeOfDeliveryFlavour.getName().setText(Locale.GERMAN.getLanguage(), "Druck via Betriebssystem-Drucker");
 					
 					deliveryConfiguration.addModeOfDelivery(modeOfDelivery);
-
+					
 					ServerDeliveryProcessorClientSideVoucherPrint.getServerDeliveryProcessorClientSideVoucherPrint(pm).addModeOfDelivery(modeOfDelivery);
+					
+					
+					modeOfDelivery = (ModeOfDelivery) pm.getObjectById(ModeOfDeliveryConst.MODE_OF_DELIVERY_ID_DELIVER_TO_DELIVERY_QUEUE);
+					deliveryConfiguration.addModeOfDelivery(modeOfDelivery);
 
 					pm.makePersistent(deliveryConfiguration);
 				} catch (JDOObjectNotFoundException x) {

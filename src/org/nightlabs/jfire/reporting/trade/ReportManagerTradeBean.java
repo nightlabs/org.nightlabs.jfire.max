@@ -163,27 +163,27 @@ implements SessionBean
 		pm = getPersistenceManager();
 		JFireServerManager jfireServerManager = getJFireServerManager();
 		try {
-			
+
+			// initialise meta-data
+			pm.getExtent(ReportLayoutCfModInitialiserArticleContainerLayouts.class);
+
 			initializeReportParameterAcquisition(pm);
-			
+
 			// better have the layouts for the local organisation, than for the devil organisation			
 			ReportingInitialiser.initialise(pm, jfireServerManager, getOrganisationID()); 
-			
+
 			ConfigModuleInitialiserID initialiserID = ReportLayoutCfModInitialiserArticleContainerLayouts.getConfigModuleInitialiserID(getOrganisationID());
 			ReportLayoutCfModInitialiserArticleContainerLayouts initialiser = null;
 			try {
 				initialiser = (ReportLayoutCfModInitialiserArticleContainerLayouts) pm.getObjectById(initialiserID);
 			} catch (JDOObjectNotFoundException e) {
 				initialiser = new ReportLayoutCfModInitialiserArticleContainerLayouts(getOrganisationID());
-				pm.makePersistent(initialiser);
+				initialiser = pm.makePersistent(initialiser);
 			}
-			
 		} finally {
 			pm.close();
 			jfireServerManager.close();
 		}
-		
-		
 	}
 	
 	private void initializeReportParameterAcquisition(final PersistenceManager pm) {

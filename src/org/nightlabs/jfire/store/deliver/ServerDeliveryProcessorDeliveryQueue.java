@@ -19,7 +19,7 @@ import org.nightlabs.jfire.transfer.Anchor;
  * This implementation of {@link org.nightlabs.jfire.store.deliver.ServerDeliveryProcessor}
  * represents delivery to a delivery queue. These delivers can be then processed later.
  *
- * @author Tobias Langner (tobias[dot]langner[at]nightlabs[dot]de)
+ * @author Tobias Langner <!-- tobias[dot]langner[at]nightlabs[dot]de -->
  * @author Marco Schulze - marco at nightlabs dot de
  *
  * @jdo.persistence-capable

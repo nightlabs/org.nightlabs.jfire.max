@@ -9,7 +9,7 @@ import java.util.Set;
 import org.nightlabs.jfire.config.ConfigModule;
 
 /**
- * @author Tobias Langner (tobias[dot]langner[at]nightlabs[dot]de)
+ * @author Tobias Langner <!-- tobias[dot]langner[at]nightlabs[dot]de -->
  *
  * @jdo.persistence-capable 
  *		identity-type="application"

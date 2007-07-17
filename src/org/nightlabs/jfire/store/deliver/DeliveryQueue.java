@@ -18,7 +18,7 @@ import org.nightlabs.jfire.store.deliver.id.DeliveryQueueID;
 
 
 /**
- * @author Tobias Langner (tobias[dot]langner[at]nightlabs[dot]de)
+ * @author Tobias Langner <!-- tobias[dot]langner[at]nightlabs[dot]de -->
  *
  * @jdo.persistence-capable
  *		identity-type="application"

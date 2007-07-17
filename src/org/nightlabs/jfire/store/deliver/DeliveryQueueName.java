@@ -6,7 +6,7 @@ import java.util.Map;
 import org.nightlabs.i18n.I18nText;
 
 /**
- * @author Tobias Langner (tobias[dot]langner[at]nightlabs[dot]de)
+ * @author Tobias Langner <!-- tobias[dot]langner[at]nightlabs[dot]de -->
  * 
  * @jdo.persistence-capable
  *		identity-type="application"

@@ -28,12 +28,13 @@ public class ReportParameterUtil {
 	}
 
 
-	
 	public static ValueProviderCategory createValueProviderCategory(
 			PersistenceManager pm, ValueProviderCategory parent, ValueProviderCategoryID categoryID,
-			NameEntry[] names 
+			NameEntry[] names)
+	{
+		// initialise meta-data
+		pm.getExtent(ValueProviderCategory.class);
 
-	) {
 		ValueProviderCategory category = null;
 		try {
 			category = (ValueProviderCategory) pm.getObjectById(categoryID);
@@ -53,8 +54,11 @@ public class ReportParameterUtil {
 	public static ValueProvider createValueProvider(
 			PersistenceManager pm, ValueProviderCategory category, ValueProviderID valueProviderID, String outputType,
 			NameEntry[] names, NameEntry[] descriptions, NameEntry[] defaultMessages
-	) 
+	)
 	{
+		// initialise meta-data
+		pm.getExtent(ValueProvider.class);
+
 		ValueProvider valueProvider = null;
 		try {
 			valueProvider = (ValueProvider) pm.getObjectById(valueProviderID);

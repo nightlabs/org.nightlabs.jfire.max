@@ -48,27 +48,28 @@ public class ReportParameterAcquisitionUseCase implements Serializable {
 	 * @jdo.column length="100"
 	 */
 	private String reportParameterAcquisitionUseCaseID;
-		
+
 //	/**
 //	 * @jdo.field persistence-modifier="persistent"
 //	 */
 //	private ReportParameterAcquisitionSetup parameterAcquisitionSetup;
-	
+
 	/**
 	 * @jdo.field 
-	 * 		persistence-modifier="persistent"
-	 * 		mapped-by="useCase"
+	 *		persistence-modifier="persistent"
+	 *		mapped-by="useCase"
+	 *		dependent="true"
 	 */
 	private ReportParameterAcquisitionUseCaseName name;
-	
+
 	/**
 	 * @jdo.field 
-	 * 		persistence-modifier="persistent"
-	 * 		mapped-by="useCase"
+	 *		persistence-modifier="persistent"
+	 *		mapped-by="useCase"
+	 *		dependent="true"
 	 */
 	private ReportParameterAcquisitionUseCaseDescription description;
-	
-	
+
 	/**
 	 * 
 	 */

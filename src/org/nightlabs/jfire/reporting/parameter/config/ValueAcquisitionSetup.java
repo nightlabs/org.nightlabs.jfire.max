@@ -94,7 +94,7 @@ public class ValueAcquisitionSetup implements Serializable {
 	private ReportParameterAcquisitionSetup parameterAcquisitionSetup;
 	
 	/**
-	 * @jdo.field persistence-modifier="persistent"
+	 * @jdo.field persistence-modifier="persistent" dependent="true"
 	 */
 	private ReportParameterAcquisitionUseCase useCase;
 

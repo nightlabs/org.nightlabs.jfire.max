@@ -117,6 +117,9 @@ public class ReportingInitialiser {
 		if (logger.isDebugEnabled())
 			logger.debug("createCategory: categoryPK=\""+organisationID+'/'+reportRegistryItemType+'/'+reportRegistryItemID+"\" parent=\""+ (parent == null ? null : (parent.getOrganisationID()+'/'+parent.getReportRegistryItemType()+'/'+parent.getReportRegistryItemID())) + "\" internal="+internal);
 
+		// initialise meta-data
+		pm.getExtent(ReportCategory.class);
+
 		ReportCategory category;
 		try {
 			category = (ReportCategory) pm.getObjectById(ReportRegistryItemID.create(organisationID, reportRegistryItemType, reportRegistryItemID));
@@ -183,6 +186,16 @@ public class ReportingInitialiser {
 
 		logger.debug("BEGIN initialization of Scripts");	
 //		initDefaultParameterSets();
+
+		// initialise meta-data
+		pm.getExtent(ReportCategory.class);
+		pm.getExtent(ReportLayout.class);
+		pm.getExtent(AcquisitionParameterConfig.class);
+		pm.getExtent(ReportParameterAcquisitionSetup.class);
+		pm.getExtent(ReportParameterAcquisitionUseCase.class);
+		pm.getExtent(ValueProvider.class);
+		pm.getExtent(ValueAcquisitionSetup.class);
+
 		createReportCategories(scriptDir, baseCategory);
 	}
 
@@ -387,7 +400,7 @@ public class ReportingInitialiser {
 		Node acquisitionNode = NLDOMUtil.findSingleNode(reportNode, "parameter-acquisition");
 		if (acquisitionNode == null)
 			return;
-		
+
 		// the setup already persistent
 		ReportParameterAcquisitionSetup setup = ReportParameterAcquisitionSetup.getSetupForReportLayout(pm, (ReportRegistryItemID)JDOHelper.getObjectId(layout));
 		
@@ -563,10 +576,26 @@ public class ReportingInitialiser {
 				} catch (IllegalArgumentException e) {
 					throw new ReportingInitialiserException("Some attribute is missing for the value-consumer-bindings declaration in the parameter-acquisition in file "+reportFile, e);
 				}
-			}			
+			}
+
+			// TODO JPOX WORKAROUND : To directly put the new acquisitionSetup causes a duplicate key exception
+			Object o = setup.getValueAcquisitionSetups().get(useCase);
+			if (o != null)
+				pm.deletePersistent(o);
+
+			pm.flush();
+
+//			acquisitionSetup = pm.makePersistent(acquisitionSetup);
+			// TODO end JPOX workaround
+
 			// make the usecase setup persistent
 			setup.getValueAcquisitionSetups().put(useCase, acquisitionSetup);
-			
+
+
+			// TODO JPOX WORKAROUND : this was not needed with JPOX 1.1 - but now we seem to need it
+			pm.flush();
+
+
 			// check if its the default use case
 			boolean defUseCase = false;
 			String defaultStr = NLDOMUtil.getAttributeValue(useCaseNode, "default");
@@ -639,6 +668,7 @@ public class ReportingInitialiser {
 				return entry.getKey();
 			}
 		}
+		pm.flush();
 		return useCase;
 	}
 	
@@ -652,9 +682,12 @@ public class ReportingInitialiser {
 	 * @param layout The {@link ReportLayout} currently processed.
 	 * @throws ReportingInitialiserException
 	 */
-	protected void createReportLocalisationBundle(File reportFile, final String reportID, Node reportNode, ReportLayout layout)
+	protected void createReportLocalisationBundle(File reportFile, final String reportID, Node reportNode, ReportLayout layout) // TODO shouldn't this method be named createReportLocalisationData ???
 	throws ReportingInitialiserException
-	{		
+	{
+		// initialise meta-data
+		pm.getExtent(ReportLayoutLocalisationData.class);
+
 		File resourceFolder = new File(reportFile.getParentFile(), "resource");
 		File[] resourceFiles = resourceFolder.listFiles(new FileFilter() {
 			public boolean accept(File pathname) {

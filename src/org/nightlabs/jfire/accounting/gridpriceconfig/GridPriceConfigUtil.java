@@ -222,16 +222,16 @@ public class GridPriceConfigUtil
 //		}
 
 		// store all price configs and put the living objects into priceConfigs
-		Set<GridPriceConfig> priceConfigs = new HashSet<GridPriceConfig>();
+		Set<T> priceConfigs = new HashSet<T>();
 		List<AffectedProductType> affectedProductTypes = null;
-		for (GridPriceConfig priceConfig : _priceConfigs) {
+		for (T priceConfig : _priceConfigs) {
 			if (logger.isInfoEnabled())
 				logger.info("storePriceConfigs: storing GridPriceConfig: " + priceConfig.getPrimaryKey());
 
 			if (!localOrganisationID.equals(priceConfig.getOrganisationID()))
 				throw new IllegalArgumentException("Cannot store a partner's price config: " + priceConfig.getPrimaryKey());
 
-			priceConfig = (GridPriceConfig) pm.makePersistent(priceConfig);
+			priceConfig = (T) pm.makePersistent(priceConfig);
 			priceConfigs.add(priceConfig);
 		}
 

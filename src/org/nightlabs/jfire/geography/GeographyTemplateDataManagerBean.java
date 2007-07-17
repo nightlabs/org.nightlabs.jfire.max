@@ -32,6 +32,7 @@ import java.io.OutputStreamWriter;
 import java.io.Serializable;
 import java.io.Writer;
 import java.rmi.RemoteException;
+import java.util.LinkedHashMap;
 import java.util.Set;
 import java.util.zip.DeflaterOutputStream;
 
@@ -174,9 +175,15 @@ implements SessionBean
 					rootOrganisationID, SubscriptionUtil.SUBSCRIBER_TYPE_ORGANISATION, subscriberOrganisationID,
 					GeographyTemplateDataNotificationFilter.class.getName());
 			PersistentNotificationEJB persistentNotificationEJB;
-			persistentNotificationEJB = PersistentNotificationEJBUtil.getHome(getInitialContextProperties(rootOrganisationID)).create();
-			persistentNotificationEJB.storeNotificationFilter(notificationFilter, false, null, 1);
 
+			try {
+				persistentNotificationEJB = PersistentNotificationEJBUtil.getHome(getInitialContextProperties(rootOrganisationID)).create();
+			} catch (JDOObjectNotFoundException x) {
+				logger.warn("Creating JDO lifecycle listeners for CSV instances in the root organisation failed. Reason: Root organisation " + rootOrganisationID + " does not exist.");
+				return;
+			}
+			
+			persistentNotificationEJB.storeNotificationFilter(notificationFilter, false, null, 1);
 
 			GeographyTemplateDataNotificationReceiver notificationReceiver = new GeographyTemplateDataNotificationReceiver(notificationFilter);
 			pm.makePersistent(notificationReceiver);

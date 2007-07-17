@@ -126,7 +126,10 @@ implements SessionBean
 			ModeOfDelivery modeOfDelivery;
 			modeOfDelivery = (ModeOfDelivery) pm.getObjectById(ModeOfDeliveryConst.MODE_OF_DELIVERY_ID_MANUAL);
 			deliveryConfiguration.addModeOfDelivery(modeOfDelivery);
-
+			
+			modeOfDelivery = (ModeOfDelivery) pm.getObjectById(ModeOfDeliveryConst.MODE_OF_DELIVERY_ID_DELIVER_TO_DELIVERY_QUEUE);
+			deliveryConfiguration.addModeOfDelivery(modeOfDelivery);
+			
 			deliveryConfiguration = (DeliveryConfiguration) pm.makePersistent(deliveryConfiguration);
 
 

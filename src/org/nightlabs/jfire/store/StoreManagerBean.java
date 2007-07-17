@@ -75,6 +75,7 @@ import org.nightlabs.jfire.store.deliver.ModeOfDelivery;
 import org.nightlabs.jfire.store.deliver.ModeOfDeliveryConst;
 import org.nightlabs.jfire.store.deliver.ModeOfDeliveryFlavour;
 import org.nightlabs.jfire.store.deliver.ServerDeliveryProcessor;
+import org.nightlabs.jfire.store.deliver.ServerDeliveryProcessorDeliveryQueue;
 import org.nightlabs.jfire.store.deliver.ServerDeliveryProcessorJFire;
 import org.nightlabs.jfire.store.deliver.ServerDeliveryProcessorManual;
 import org.nightlabs.jfire.store.deliver.ServerDeliveryProcessorNonDelivery;
@@ -259,10 +260,8 @@ implements SessionBean
 			modeOfDeliveryFlavour.getName().setText(Locale.GERMAN.getLanguage(), "Nichtversand");
 			pm.makePersistent(modeOfDelivery);
 			trader.getDefaultCustomerGroupForKnownCustomer().addModeOfDelivery(modeOfDelivery);
-
 			ModeOfDelivery modeOfDeliveryNonDelivery = modeOfDelivery;
-
-
+			
 			// mailing.physical
 			modeOfDelivery = new ModeOfDelivery(ModeOfDeliveryConst.MODE_OF_DELIVERY_ID_MAILING_PHYSICAL);
 			modeOfDelivery.getName().setText(Locale.ENGLISH.getLanguage(), "Mailing Delivery (physical)");
@@ -301,6 +300,18 @@ implements SessionBean
 			pm.makePersistent(modeOfDelivery);
 //			trader.getDefaultCustomerGroupForKnownCustomer().addModeOfDelivery(modeOfDelivery);
 //			anonymousCustomerGroup.addModeOfDelivery(modeOfDelivery);
+			
+			// deliveryQueue
+			modeOfDelivery = new ModeOfDelivery(ModeOfDeliveryConst.MODE_OF_DELIVERY_ID_DELIVER_TO_DELIVERY_QUEUE);
+			modeOfDelivery.getName().setText(Locale.ENGLISH.getLanguage(), "Deliver to Delivery Queue");
+			modeOfDelivery.getName().setText(Locale.GERMAN.getLanguage(), "Lieferung in Lieferwarteschlange");
+			modeOfDeliveryFlavour = modeOfDelivery.createFlavour(Organisation.DEVIL_ORGANISATION_ID, "deliverToDeliveryQueue");
+			modeOfDeliveryFlavour.getName().setText(Locale.ENGLISH.getLanguage(), "Deliver to Delivery Queue");
+			modeOfDeliveryFlavour.getName().setText(Locale.GERMAN.getLanguage(), "Lieferung in Lieferwarteschlange");
+			pm.makePersistent(modeOfDelivery);
+			ModeOfDelivery modeOfDeliveryDeliveryQueue = modeOfDelivery;
+			trader.getDefaultCustomerGroupForKnownCustomer().addModeOfDelivery(modeOfDelivery);
+			anonymousCustomerGroup.addModeOfDelivery(modeOfDeliveryDeliveryQueue);
 
 			// create some ServerDeliveryProcessor s
 			ServerDeliveryProcessorManual serverDeliveryProcessorManual = ServerDeliveryProcessorManual.getServerDeliveryProcessorManual(pm);
@@ -312,6 +323,9 @@ implements SessionBean
 			serverDeliveryProcessorNonDelivery.addModeOfDelivery(modeOfDeliveryNonDelivery);
 			serverDeliveryProcessorNonDelivery.getName().setText(Locale.ENGLISH.getLanguage(), "Non-Delivery (delivery will be postponed)");
 			serverDeliveryProcessorNonDelivery.getName().setText(Locale.GERMAN.getLanguage(), "Nichtlieferung (Lieferung wird verschoben)");
+			
+			ServerDeliveryProcessorDeliveryQueue serverDeliveryProcessorDeliveryQueue = ServerDeliveryProcessorDeliveryQueue.getServerDeliveryProcessorDeliveryQueue(pm);
+			serverDeliveryProcessorDeliveryQueue.addModeOfDelivery(modeOfDeliveryDeliveryQueue);
 
 			ServerDeliveryProcessorJFire serverDeliveryProcessorJFire = ServerDeliveryProcessorJFire.getServerDeliveryProcessorJFire(pm);
 			serverDeliveryProcessorJFire.addModeOfDeliveryFlavour(modeOfDeliveryFlavourJFire);
@@ -1477,7 +1491,7 @@ implements SessionBean
 	 * 
 	 * @param fetchGroups The desired fetch groups
 	 * @param fetchDepth The desired JDO fetch depth
-	 * @param includeDeleted Determines whether print queues marked as deleted are also returned.
+	 * @param includeDeleted Determines whether delivery queues marked as deleted are also returned.
 	 */
 	public Collection<DeliveryQueue> getAvailableDeliveryQueues(String[] fetchGroups, int fetchDepth, boolean includeDeleted) {
 		PersistenceManager pm = getPersistenceManager();
@@ -1524,7 +1538,7 @@ implements SessionBean
 	/**
 	 * Stores all {@link DeliveryQueue}s in the given collection.
 	 * @param deliveryQueues The collection of the {@link DeliveryQueue}s to be stored.
-	 * @return A list of detached copies of the stored print queues.
+	 * @return A list of detached copies of the stored delivery queues.
 	 * 
 	 * @ejb.interface-method
 	 * @ejb.permission role-name="_Guest_"
@@ -1548,22 +1562,6 @@ implements SessionBean
 		}
 
 		return pqs;
-	}
-	
-	/**
-	 * This method returns whether the print queue is set as activeDeliveryQueue in at least one DeliveryQueueConfigModule.
-	 * @param deliveryQueue The DeliveryQueue in question.
-	 * 
-	 * @ejb.interface-method
-	 * @ejb.permission role-name="_Guest_"
-	 */
-	public boolean isActiveDeliveryQueue(DeliveryQueue deliveryQueue) {
-		PersistenceManager pm = getPersistenceManager();
-		try {
-			return deliveryQueue.isActiveDeliveryQueue(pm);
-		} finally {
-			pm.close();
-		}
 	}
 	
 	// TODO: when all jpox bugs are fixed, implement generic storeProductType-Method

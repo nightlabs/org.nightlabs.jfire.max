@@ -30,6 +30,7 @@ import org.nightlabs.jfire.editlock.EditLockType;
 import org.nightlabs.jfire.editlock.id.EditLockTypeID;
 import org.nightlabs.jfire.organisation.Organisation;
 import org.nightlabs.jfire.store.ProductType;
+import org.nightlabs.jfire.store.deliver.id.ModeOfDeliveryFlavourID;
 
 /**
  * @author Alexander Bieber <alex[AT]nightlabs[DOT]de>
@@ -38,7 +39,7 @@ import org.nightlabs.jfire.store.ProductType;
 public class JFireTradeEAR {
 	
 	public static final String MODULE_NAME = "JFireTrade";
-
+	
 	/**
 	 * {@link EditLockType} for {@link ProductType}s. Used in the TradeAdminPrespective.
 	 */

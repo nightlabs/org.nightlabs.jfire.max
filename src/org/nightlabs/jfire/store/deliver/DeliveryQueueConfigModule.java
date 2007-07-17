@@ -18,8 +18,7 @@ import org.nightlabs.jfire.config.ConfigModule;
  *		table="JFireTrade_DeliveryQueueConfigModule"
  *
  * @jdo-fetch-group name="DeliveryQueueConfigModule.visibleDeliveryQueues" fetch-group="default, DeliveryQueue.name" fields="visibleDeliveryQueues"
- * @jdo-fetch-group name="DeliveryQueueConfigModule.activeDeliveryQueue" fetch-groups="default, DeliveryQueue.name" fields="activeDeliveryQueue"
- * @jdo-fetch-group name="DeliveryQueueConfigModule.this" fetch-groups="default, DeliveryQueue.this" fields="activeDeliveryQueue, visibleDeliveryQueues"
+ * @jdo-fetch-group name="DeliveryQueueConfigModule.this" fetch-groups="default, DeliveryQueue.this" fields="visibleDeliveryQueues"
  * 
  * @jdo.inheritance strategy="new-table"
  */
@@ -29,16 +28,7 @@ public class DeliveryQueueConfigModule extends ConfigModule {
 	
 	public static final String FETCH_GROUP_THIS_DELIVERY_QUEUE_CONFIG_MODULE = "DeliveryQueueConfigModule.this";
 	public static final String FETCH_GROUP_VISIBLE_DELIVERY_QUEUES = "DeliveryQueueConfigModule.visibleDeliveryQueues";
-	public static final String FETCH_GROUP_ACTIVE_DELIVERY_QUEUE = "DeliveryQueueConfigModule.activeDeliveryQueue";
 
-	/**
-	 * This field determines the {@link DeliveryQueue} that is used when the entity
-	 * configured by this config module adds a delivery to the print queue.
-	 * 
-	 * @jdo.field persistence-modifier="persistent"
-	 */
-	private DeliveryQueue activeDeliveryQueue;
-	
 	/**
 	 * This set contains all {@link DeliveryQueue}s that are visible for the entity 
 	 * configured by this config module.
@@ -58,18 +48,6 @@ public class DeliveryQueueConfigModule extends ConfigModule {
 	@Override
 	public void init() {
 		visibleDeliveryQueues = new HashSet<DeliveryQueue>();
-	}
-	
-	/**
-	 * Returns the currently active {@link DeliveryQueue}.
-	 * @return The currently active {@link DeliveryQueue}.
-	 */
-	public DeliveryQueue getActiveDeliveryQueue() {
-		return activeDeliveryQueue;
-	}
-	
-	public void setActiveDeliveryQueue(DeliveryQueue activeDeliveryQueue) {
-		this.activeDeliveryQueue = activeDeliveryQueue;
 	}
 	
 	/**

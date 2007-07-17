@@ -6,6 +6,7 @@ import java.util.Collections;
 import java.util.HashSet;
 import java.util.Set;
 
+import javax.jdo.JDODetachedFieldAccessException;
 import javax.jdo.JDOHelper;
 import javax.jdo.PersistenceManager;
 import javax.jdo.Query;
@@ -35,13 +36,6 @@ import org.nightlabs.jfire.store.deliver.id.DeliveryQueueID;
  * @jdo.query
  * 		name="getDeliveryQueues"
  * 		query="SELECT WHERE !defunct || defunct == :includeDefunct"
- * 
- * 
- * This query returns the number of config modules that have set this print queue as active print queue.
- * @jdo.query
- * 		name="getActiveDeliveryQueueCount"
- * 		query="SELECT DISTINCT COUNT FROM org.nightlabs.jfire.ticketing.store.deliver.DeliveryQueueConfigModule
- * 					 WHERE activeDeliveryQueue=this"
  */
 public class DeliveryQueue implements Serializable, AttachCallback {
 	
@@ -99,7 +93,7 @@ public class DeliveryQueue implements Serializable, AttachCallback {
 	private Set<Delivery> outstandingDeliverySet;
 	
 	/**
-	 * This field indicates whether a print queue has been deactivated irrevocably. In that state, no new deliveries
+	 * This field indicates whether a delivery queue has been deactivated irrevocably. In that state, no new deliveries
 	 * may be added to the DeliveryQueue anymore. However, outstanding deliveries may still be processed in order to empty the queue.
 	 * 
 	 * @jdo.field persistence-modifier="persistent"
@@ -188,18 +182,6 @@ public class DeliveryQueue implements Serializable, AttachCallback {
 		return defunct;
 	}
 	
-	/**
-	 * This method returns whether the print queue is set as activeDeliveryQueue in at least one DeliveryQueueConfigModule.
-	 * 
-	 * @return whether the print queue is set as activeDeliveryQueue in at least one DeliveryQueueConfigModule.
-	 */
-	public boolean isActiveDeliveryQueue(PersistenceManager pm) {
-		Query q = pm.newNamedQuery(DeliveryQueue.class, "getActiveDeliveryQueueCount");
-		long count = ((Long) q.execute()).longValue();
-		
-		return count > 0;
-	}
-
 	@Override
 	public int hashCode() {
 		final int prime = 31;
@@ -234,8 +216,16 @@ public class DeliveryQueue implements Serializable, AttachCallback {
 	}
 
 	public void jdoPreAttach() {
-		checkDirtyStates(outstandingDeliverySet);
-		checkDirtyStates(deliverySet);
+		try {
+			checkDirtyStates(outstandingDeliverySet);
+			checkDirtyStates(deliverySet);
+		} catch(JDODetachedFieldAccessException e) {
+			// do nothing
+			
+			// FIXME WORKAROUND
+			// Somehow the fetchgroups returned in DeliveryQueueConfigModuleController#getConfigModuleFetchGroups are not used properly
+			// when retrievingthe DeliveryQueueConfigModule along with its DeliveryQueues.
+		}
 	}
 	
 	public void jdoPostAttach(Object attached) {
@@ -243,12 +233,8 @@ public class DeliveryQueue implements Serializable, AttachCallback {
 	
 	private void checkDirtyStates(Collection<Delivery> deliveries) {
 		for (Delivery delivery : deliveries) {
-			if (JDOHelper.isDirty(delivery)) {
-				PersistenceManager pm = JDOHelper.getPersistenceManager(delivery);
-				Delivery orgDelivery = (Delivery) pm.getObjectById(DeliveryID.create(delivery.getOrganisationID(), delivery.getDeliveryID()));
-				
-				throw new IllegalArgumentException("You are not supposed to change the deliveries in a print queue.");				
-			}
+			if (JDOHelper.isDirty(delivery))
+				throw new IllegalArgumentException("You are not supposed to change the deliveries in a delivery queue.");				
 		}
 	}
 }

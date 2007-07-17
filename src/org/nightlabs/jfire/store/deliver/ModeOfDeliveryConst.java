@@ -27,6 +27,12 @@ public class ModeOfDeliveryConst
 	 * any further action.
 	 */
 	public static final ModeOfDeliveryID MODE_OF_DELIVERY_ID_NON_DELIVERY = ModeOfDeliveryID.create(Organisation.DEVIL_ORGANISATION_ID, "nonDelivery");
+	
+	/**
+	 * This is the ID of the ModeOfDelivery of delivering articles to a {@link DeliveryQueue} for
+	 * further processing later.
+	 */
+	public static final ModeOfDeliveryID MODE_OF_DELIVERY_ID_DELIVER_TO_DELIVERY_QUEUE = ModeOfDeliveryID.create(Organisation.DEVIL_ORGANISATION_ID, "deliverToDeliveryQueue");
 
 	/**
 	 * This is the ID of one of the default <tt>ModeOfDelivery</tt>s. However, you
@@ -56,4 +62,7 @@ public class ModeOfDeliveryConst
 	public static final ModeOfDeliveryID MODE_OF_DELIVERY_ID_JFIRE = ModeOfDeliveryID.create(Organisation.DEVIL_ORGANISATION_ID, "jfire");
 
 	public static final ModeOfDeliveryFlavourID MODE_OF_DELIVERY_FLAVOUR_ID_JFIRE = ModeOfDeliveryFlavourID.create(Organisation.DEVIL_ORGANISATION_ID, "jfire");
+	
+	
+	
 }

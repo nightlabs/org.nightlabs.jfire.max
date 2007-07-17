@@ -16,10 +16,8 @@ import org.nightlabs.jfire.store.deliver.id.ServerDeliveryProcessorID;
 import org.nightlabs.jfire.transfer.Anchor;
 
 /**
- * This implementation of
- * {@link org.nightlabs.jfire.store.deliver.ServerDeliveryProcessor}
- * represents delivery to a print queue. The printing of such deliveries
- * can be then processed later.
+ * This implementation of {@link org.nightlabs.jfire.store.deliver.ServerDeliveryProcessor}
+ * represents delivery to a delivery queue. These delivers can be then processed later.
  *
  * @author Tobias Langner (tobias[dot]langner[at]nightlabs[dot]de)
  * @author Marco Schulze - marco at nightlabs dot de
@@ -50,7 +48,7 @@ public class ServerDeliveryProcessorDeliveryQueue extends ServerDeliveryProcesso
 			
 		} catch (JDOObjectNotFoundException e) {
 			serverDeliveryProcessorDeliveryQueue = new ServerDeliveryProcessorDeliveryQueue(Organisation.DEVIL_ORGANISATION_ID,	ServerDeliveryProcessorDeliveryQueue.class.getName());
-			serverDeliveryProcessorDeliveryQueue.getName().setText(Locale.ENGLISH.getLanguage(), "Server Delivery Processor for delivering tickets to the active print queue");
+			serverDeliveryProcessorDeliveryQueue.getName().setText(Locale.ENGLISH.getLanguage(), "Server Delivery Processor for delivering tickets to the active delivery queue");
 
 			serverDeliveryProcessorDeliveryQueue = (ServerDeliveryProcessorDeliveryQueue) pm.makePersistent(serverDeliveryProcessorDeliveryQueue);
 		}
@@ -91,22 +89,30 @@ public class ServerDeliveryProcessorDeliveryQueue extends ServerDeliveryProcesso
 
 	@Implement
 	protected DeliveryResult externalDeliverCommit(DeliverParams deliverParams) throws DeliveryException {
-		DeliveryQueue activeDeliveryQueue = getDeliveryQueueConfigModule().getActiveDeliveryQueue();
-		activeDeliveryQueue.addDelivery(deliverParams.deliveryData.getDelivery());
-		
-		getPersistenceManager().makePersistent(activeDeliveryQueue);
-		
+		DeliveryQueue targetDeliveryQueue = getTargetDeliveryQueue(deliverParams);
+		targetDeliveryQueue.addDelivery(deliverParams.deliveryData.getDelivery());			
+		getPersistenceManager().makePersistent(targetDeliveryQueue);
+
 		return new DeliveryResult(DeliveryResult.CODE_POSTPONED, null, null);
 	}
 
 	@Implement
 	protected DeliveryResult externalDeliverRollback(DeliverParams deliverParams) throws DeliveryException {
-		DeliveryQueue activeDeliveryQueue = getDeliveryQueueConfigModule().getActiveDeliveryQueue();
-		activeDeliveryQueue.removeDelivery(deliverParams.deliveryData.getDelivery());
+		DeliveryQueue targetDeliveryQueue = getTargetDeliveryQueue(deliverParams);
+		targetDeliveryQueue.removeDelivery(deliverParams.deliveryData.getDelivery());
 		
-		getPersistenceManager().makePersistent(activeDeliveryQueue);
+		getPersistenceManager().makePersistent(targetDeliveryQueue);
 		
 		return new DeliveryResult(DeliveryResult.CODE_ROLLED_BACK_NO_EXTERNAL, null, null);
+	}
+	
+	private DeliveryQueue getTargetDeliveryQueue(DeliverParams deliverParams) {
+		if (deliverParams.deliveryData instanceof DeliveryDataDeliveryQueue) {
+			DeliveryDataDeliveryQueue dData = (DeliveryDataDeliveryQueue) deliverParams.deliveryData;
+
+			return dData.getTargetQueue();
+		}
+		throw new IllegalArgumentException("deliveryData is not of type DeliveryDataDeliveryQueue");
 	}
 	
 	private DeliveryQueueConfigModule getDeliveryQueueConfigModule() {
@@ -121,15 +127,9 @@ public class ServerDeliveryProcessorDeliveryQueue extends ServerDeliveryProcesso
 	
 	@Override
 	protected String _checkRequirements(CheckRequirementsEnvironment checkRequirementsEnvironment) {
-		DeliveryQueueConfigModule cfMod;
-		try {
-			cfMod = getDeliveryQueueConfigModule();
-		} catch (ConfigModuleNotFoundException e) {
-			return "No active print queue defined.";
-		}
-		
-		if (cfMod.getActiveDeliveryQueue() == null)
-			return "No active print queue defined.";
+		DeliveryQueueConfigModule cfMod = getDeliveryQueueConfigModule();
+		if (cfMod.getVisibleDeliveryQueues().isEmpty())
+			return "No delivery queues defined.";
 		else
 			return null;
 	}

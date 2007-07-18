@@ -178,7 +178,7 @@ implements SessionBean
 				initialiser = (ReportLayoutCfModInitialiserArticleContainerLayouts) pm.getObjectById(initialiserID);
 			} catch (JDOObjectNotFoundException e) {
 				initialiser = new ReportLayoutCfModInitialiserArticleContainerLayouts(getOrganisationID());
-				initialiser = pm.makePersistent(initialiser);
+				initialiser = (ReportLayoutCfModInitialiserArticleContainerLayouts) pm.makePersistent(initialiser);
 			}
 		} finally {
 			pm.close();

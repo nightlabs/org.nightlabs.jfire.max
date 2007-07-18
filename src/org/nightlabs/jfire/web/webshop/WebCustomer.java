@@ -3,6 +3,8 @@
  */
 package org.nightlabs.jfire.web.webshop;
 
+import java.util.Date;
+
 import org.nightlabs.jdo.ObjectIDUtil;
 import org.nightlabs.jfire.trade.LegalEntity;
 
@@ -22,9 +24,16 @@ import org.nightlabs.jfire.trade.LegalEntity;
  * 
  * @jdo.create-objectid-class
  *		field-order="organisationID, webCustomerID"
+ *
+ * @jdo.fetch-group name="WebCustomer.legalEntity" fields="legalEntity"
+ * @jdo.fetch-group name="WebCustomer.this" fields="legalEntity"
  */
 public class WebCustomer
 {
+	
+	public static final String FETCH_GROUP_LEGAL_ENTITY = "WebCustomer.legalEntity";
+	public static final String FETCH_GROUP_THIS_WEB_CUSTOMER = "WebCustomer.this"; 
+	
 	/**
 	 * @deprecated only for JDO
 	 */
@@ -64,6 +73,20 @@ public class WebCustomer
 	 * jdo.column length="100"
 	 */
 	private String password;
+	
+	/**
+	 * The second password used and stored temporarly when the customer triggers
+	 * the lostPassword procedure
+	 * @jdo.field persistence-modifier="persistent"
+	 * jdo.column length="100"
+	 */
+	private String secondPassword;
+	
+	/**
+	 * @jdo.field persistence-modifier="persistent"
+	 * jdo.column length="100"
+	 */
+	private Date secondPasswordDate ;
 	
 	/**
 	 * @jdo.field persistence-modifier="persistent" 
@@ -116,6 +139,29 @@ public class WebCustomer
 	public String getOrganisationID()
 	{
 		return organisationID;
+	}
+
+	/**
+	 * @return the secondPassword
+	 */
+	public String getSecondPassword() {
+		return secondPassword;
+	}
+
+	/**
+	 * @param secondPassword  to set
+	 */
+	public void setSecondPassword(String secondPassword) {
+			
+		this.secondPassword = secondPassword;
+	}
+
+	public Date getSecondPasswordDate() {
+		return secondPasswordDate;
+	}
+
+	public void setSecondPasswordDate(Date secondPasswordAge) {
+		this.secondPasswordDate = secondPasswordAge;
 	}
 	
 	

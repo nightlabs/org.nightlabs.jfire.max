@@ -49,7 +49,6 @@ import javax.jdo.JDOHelper;
 import javax.jdo.JDOObjectNotFoundException;
 import javax.jdo.PersistenceManager;
 import javax.jdo.Query;
-import javax.jdo.annotations.Property;
 
 import org.apache.log4j.Logger;
 import org.nightlabs.ModuleException;

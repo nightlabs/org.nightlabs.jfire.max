@@ -49,6 +49,7 @@ import javax.jdo.JDOHelper;
 import javax.jdo.JDOObjectNotFoundException;
 import javax.jdo.PersistenceManager;
 import javax.jdo.Query;
+import javax.jdo.annotations.Property;
 
 import org.apache.log4j.Logger;
 import org.nightlabs.ModuleException;
@@ -583,6 +584,64 @@ implements SessionBean
 				// make sure the prices are correct
 				priceCalculationNeeded = true;
 			}
+
+			// TODO JPOX WORKAROUND: In cross-organisation trade, we get JDODetachedFieldAccessExceptions, even though the object should be persistent - trying a workaround
+			{
+				ProductTypeID productTypeID = (ProductTypeID) JDOHelper.getObjectId(productType);
+				pm.flush();
+				pm.evictAll();
+				productType = (SimpleProductType) pm.getObjectById(productTypeID);
+			}
+
+//			03:09:47,950 ERROR [LogInterceptor] RuntimeException in method: public abstract org.nightlabs.jfire.simpletrade.store.SimpleProductType org.nightlabs.jfire.simpletrade.SimpleTradeManager.storeProductType(org.nightlabs.jfire.simpletrade.store.SimpleProductType,boolean,java.lang.String[],int) throws org.nightlabs.ModuleException,java.rmi.RemoteException:
+//				javax.jdo.JDODetachedFieldAccessException: You have just attempted to access field "extendedProductType" yet this field was not detached when you detached the object. Either dont access this field, or detach the field when detaching the object.
+//				        at org.nightlabs.jfire.store.ProductType.jdoGetextendedProductType(ProductType.java)
+//				        at org.nightlabs.jfire.store.ProductType.getExtendedProductType(ProductType.java:680)
+//				        at org.nightlabs.jfire.accounting.gridpriceconfig.PriceCalculator._resolvableProductTypes_registerWithAnchestors(PriceCalculator.java:300)
+//				        at org.nightlabs.jfire.accounting.gridpriceconfig.PriceCalculator.preparePriceCalculation_createResolvableProductTypesMap(PriceCalculator.java:282)
+//				        at org.nightlabs.jfire.accounting.gridpriceconfig.PriceCalculator.preparePriceCalculation(PriceCalculator.java:159)
+//				        at org.nightlabs.jfire.simpletrade.SimpleTradeManagerBean.storeProductType(SimpleTradeManagerBean.java:611)
+//				        at sun.reflect.NativeMethodAccessorImpl.invoke0(Native Method)
+//				        at sun.reflect.NativeMethodAccessorImpl.invoke(NativeMethodAccessorImpl.java:39)
+//				        at sun.reflect.DelegatingMethodAccessorImpl.invoke(DelegatingMethodAccessorImpl.java:25)
+//				        at java.lang.reflect.Method.invoke(Method.java:585)
+//				        at org.jboss.invocation.Invocation.performCall(Invocation.java:359)
+//				        at org.jboss.ejb.StatelessSessionContainer$ContainerInterceptor.invoke(StatelessSessionContainer.java:237)
+//				        at org.jboss.resource.connectionmanager.CachedConnectionInterceptor.invoke(CachedConnectionInterceptor.java:158)
+//				        at org.jboss.ejb.plugins.StatelessSessionInstanceInterceptor.invoke(StatelessSessionInstanceInterceptor.java:169)
+//				        at org.jboss.ejb.plugins.CallValidationInterceptor.invoke(CallValidationInterceptor.java:63)
+//				        at org.jboss.ejb.plugins.AbstractTxInterceptor.invokeNext(AbstractTxInterceptor.java:121)
+//				        at org.jboss.ejb.plugins.TxInterceptorCMT.runWithTransactions(TxInterceptorCMT.java:350)
+//				        at org.jboss.ejb.plugins.TxInterceptorCMT.invoke(TxInterceptorCMT.java:181)
+//				        at org.jboss.ejb.plugins.SecurityInterceptor.invoke(SecurityInterceptor.java:168)
+//				        at org.jboss.ejb.plugins.LogInterceptor.invoke(LogInterceptor.java:205)
+//				        at org.jboss.ejb.plugins.ProxyFactoryFinderInterceptor.invoke(ProxyFactoryFinderInterceptor.java:138)
+//				        at org.jboss.ejb.SessionContainer.internalInvoke(SessionContainer.java:648)
+//				        at org.jboss.ejb.Container.invoke(Container.java:960)
+//				        at sun.reflect.GeneratedMethodAccessor109.invoke(Unknown Source)
+//				        at sun.reflect.DelegatingMethodAccessorImpl.invoke(DelegatingMethodAccessorImpl.java:25)
+//				        at java.lang.reflect.Method.invoke(Method.java:585)
+//				        at org.jboss.mx.interceptor.ReflectedDispatcher.invoke(ReflectedDispatcher.java:155)
+//				        at org.jboss.mx.server.Invocation.dispatch(Invocation.java:94)
+//				        at org.jboss.mx.server.Invocation.invoke(Invocation.java:86)
+//				        at org.jboss.mx.server.AbstractMBeanInvoker.invoke(AbstractMBeanInvoker.java:264)
+//				        at org.jboss.mx.server.MBeanServerImpl.invoke(MBeanServerImpl.java:659)
+//				        at org.jboss.invocation.unified.server.UnifiedInvoker.invoke(UnifiedInvoker.java:231)
+//				        at sun.reflect.GeneratedMethodAccessor133.invoke(Unknown Source)
+//				        at sun.reflect.DelegatingMethodAccessorImpl.invoke(DelegatingMethodAccessorImpl.java:25)
+//				        at java.lang.reflect.Method.invoke(Method.java:585)
+//				        at org.jboss.mx.interceptor.ReflectedDispatcher.invoke(ReflectedDispatcher.java:155)
+//				        at org.jboss.mx.server.Invocation.dispatch(Invocation.java:94)
+//				        at org.jboss.mx.server.Invocation.invoke(Invocation.java:86)
+//				        at org.jboss.mx.server.AbstractMBeanInvoker.invoke(AbstractMBeanInvoker.java:264)
+//				        at org.jboss.mx.server.MBeanServerImpl.invoke(MBeanServerImpl.java:659)
+//				        at javax.management.MBeanServerInvocationHandler.invoke(MBeanServerInvocationHandler.java:201)
+//				        at $Proxy16.invoke(Unknown Source)
+//				        at org.jboss.remoting.ServerInvoker.invoke(ServerInvoker.java:734)
+//				        at org.jboss.remoting.transport.socket.ServerThread.processInvocation(ServerThread.java:560)
+//				        at org.jboss.remoting.transport.socket.ServerThread.dorun(ServerThread.java:383)
+//				        at org.jboss.remoting.transport.socket.ServerThread.run(ServerThread.java:165)
+
 
 			if (priceCalculationNeeded) {
 				logger.info("storeProductType: price-calculation is necessary! Will recalculate the prices of " + JDOHelper.getObjectId(productType));

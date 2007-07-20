@@ -50,7 +50,6 @@ import org.jbpm.JbpmContext;
 import org.jbpm.graph.exe.ProcessInstance;
 import org.nightlabs.ModuleException;
 import org.nightlabs.jdo.NLJDOHelper;
-import org.nightlabs.jdo.moduleregistry.MalformedVersionException;
 import org.nightlabs.jdo.moduleregistry.ModuleMetaData;
 import org.nightlabs.jdo.query.JDOQuery;
 import org.nightlabs.jfire.accounting.Currency;
@@ -86,6 +85,7 @@ import org.nightlabs.jfire.trade.id.SegmentTypeID;
 import org.nightlabs.jfire.trade.jbpm.ProcessDefinitionAssignment;
 import org.nightlabs.jfire.trade.query.ArticleContainerQuery;
 import org.nightlabs.jfire.transfer.id.AnchorID;
+import org.nightlabs.version.MalformedVersionException;
 
 
 /**

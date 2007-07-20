@@ -56,7 +56,6 @@ import org.eclipse.datatools.connectivity.oda.IResultSet;
 import org.eclipse.datatools.connectivity.oda.IResultSetMetaData;
 import org.nightlabs.ModuleException;
 import org.nightlabs.jdo.NLJDOHelper;
-import org.nightlabs.jdo.moduleregistry.MalformedVersionException;
 import org.nightlabs.jdo.moduleregistry.ModuleMetaData;
 import org.nightlabs.jfire.base.BaseSessionBeanImpl;
 import org.nightlabs.jfire.config.ConfigSetup;
@@ -92,6 +91,7 @@ import org.nightlabs.jfire.scripting.ScriptingIntialiserException;
 import org.nightlabs.jfire.scripting.id.ScriptRegistryItemID;
 import org.nightlabs.jfire.servermanager.JFireServerManager;
 import org.nightlabs.util.Utils;
+import org.nightlabs.version.MalformedVersionException;
 
 /**
  * TODO: Unify method names for ResultSet and ResultSetMetaData getter (also in Dirvers, and Queries)

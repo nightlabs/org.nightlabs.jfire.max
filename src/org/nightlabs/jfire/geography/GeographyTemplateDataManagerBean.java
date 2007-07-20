@@ -32,7 +32,6 @@ import java.io.OutputStreamWriter;
 import java.io.Serializable;
 import java.io.Writer;
 import java.rmi.RemoteException;
-import java.util.LinkedHashMap;
 import java.util.Set;
 import java.util.zip.DeflaterOutputStream;
 
@@ -49,7 +48,6 @@ import javax.naming.NamingException;
 import org.apache.log4j.Logger;
 import org.nightlabs.annotation.Implement;
 import org.nightlabs.jdo.NLJDOHelper;
-import org.nightlabs.jdo.moduleregistry.MalformedVersionException;
 import org.nightlabs.jdo.moduleregistry.ModuleMetaData;
 import org.nightlabs.jfire.asyncinvoke.AsyncInvoke;
 import org.nightlabs.jfire.asyncinvoke.Invocation;
@@ -69,6 +67,7 @@ import org.nightlabs.jfire.jdo.notification.persistent.SubscriptionUtil;
 import org.nightlabs.jfire.jdo.notification.persistent.id.NotificationReceiverID;
 import org.nightlabs.jfire.organisation.Organisation;
 import org.nightlabs.util.Utils;
+import org.nightlabs.version.MalformedVersionException;
 
 /**
  * @ejb.bean name="jfire/ejb/JFireGeography/GeographyTemplateDataManager"	

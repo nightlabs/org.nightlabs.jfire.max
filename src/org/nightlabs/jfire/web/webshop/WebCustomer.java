@@ -3,9 +3,16 @@
  */
 package org.nightlabs.jfire.web.webshop;
 
+import java.util.Collection;
 import java.util.Date;
+import java.util.HashMap;
+import java.util.Map;
+
+import javax.jdo.PersistenceManager;
+import javax.jdo.Query;
 
 import org.nightlabs.jdo.ObjectIDUtil;
+import org.nightlabs.jfire.person.PersonStruct;
 import org.nightlabs.jfire.trade.LegalEntity;
 
 /**
@@ -27,6 +34,23 @@ import org.nightlabs.jfire.trade.LegalEntity;
  *
  * @jdo.fetch-group name="WebCustomer.legalEntity" fields="legalEntity"
  * @jdo.fetch-group name="WebCustomer.this" fields="legalEntity"
+ * 
+ * @jdo.query name="getWebCustomerWithRegexField" query="
+ * 		SELECT
+ * 			DISTINCT this
+ * 		WHERE
+ * 			this.legalEntity != null &&
+ * 			this.legalEntity.person != null &&
+ * 			this.legalEntity.person.dataFields.contains(regexField) && 
+ * 			(
+ * 				regexField.structBlockOrganisationID == :regexFieldStructBlockOrganisationID && 
+ * 				regexField.structBlockID == :regexFieldStructBlockID && 
+ * 				regexField.structFieldOrganisationID == :regexFieldStructFieldOrganisationID && 
+ * 				regexField.structFieldID == :regexFieldStructFieldID &&
+ * 				regexField.text.toLowerCase() == :regexFieldValue
+ * 			)
+ * 		VARIABLES org.nightlabs.jfire.prop.datafield.RegexDataField regexField 
+ * "
  */
 public class WebCustomer
 {
@@ -87,6 +111,19 @@ public class WebCustomer
 	 * jdo.column length="100"
 	 */
 	private Date secondPasswordDate ;
+	
+	/**
+	 * The confirmation String that will be sent to the customer via E-mail
+	 * @jdo.field persistence-modifier="persistent"
+	 * jdo.column length="100"
+	 */
+	private String confirmationString ;
+	
+	/**
+	 * @jdo.field persistence-modifier="persistent"
+	 * jdo.column length="100"
+	 */
+	private Date confirmationStringDate ;
 	
 	/**
 	 * @jdo.field persistence-modifier="persistent" 
@@ -163,6 +200,32 @@ public class WebCustomer
 	public void setSecondPasswordDate(Date secondPasswordAge) {
 		this.secondPasswordDate = secondPasswordAge;
 	}
+
+	public String getConfirmationString() {
+		return confirmationString;
+	}
+
+	public void setConfirmationString(String confirmationString) {
+		this.confirmationString = confirmationString;
+	}
+
+	public Date getConfirmationStringDate() {
+		return confirmationStringDate;
+	}
+
+	public void setConfirmationStringDate(Date confirmationStringDate) {
+		this.confirmationStringDate = confirmationStringDate;
+	}
 	
-	
+
+	public static Collection<WebCustomer> getWebCustomersWithEmail(PersistenceManager pm, String email) {
+		Query q = pm.newNamedQuery(WebCustomer.class, "getWebCustomerWithRegexField");
+		Map<String, Object> params = new HashMap<String, Object>();
+		params.put("regexFieldStructBlockOrganisationID", PersonStruct.INTERNET_EMAIL.structBlockOrganisationID);
+		params.put("regexFieldStructBlockID", PersonStruct.INTERNET_EMAIL.structBlockID);
+		params.put("regexFieldStructFieldOrganisationID", PersonStruct.INTERNET_EMAIL.structFieldOrganisationID);
+		params.put("regexFieldStructFieldID", PersonStruct.INTERNET_EMAIL.structFieldID);
+		params.put("regexFieldValue", email.toLowerCase());
+		return (Collection<WebCustomer>) q.executeWithMap(params);
+	}
 }

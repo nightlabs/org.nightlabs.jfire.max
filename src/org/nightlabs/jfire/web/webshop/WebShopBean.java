@@ -155,15 +155,12 @@ implements SessionBean
 	public WebCustomer getPerson(WebCustomerID webCustomerID, String[] fetchGroups, int maxFetchDepth) 
 	{
 		PersistenceManager pm = getPersistenceManager();
-		AnchorID anchorID = null;
 		try {
 			pm.getFetchPlan().setMaxFetchDepth(maxFetchDepth);
 			if (fetchGroups != null)
 				pm.getFetchPlan().setGroups(fetchGroups);
-
 			WebCustomer webCustomer = (WebCustomer)pm.getObjectById(webCustomerID);
-			anchorID = (AnchorID) (webCustomer.getLegalEntity() != null ? JDOHelper.getObjectId(webCustomer.getLegalEntity()) : null);
-
+//			AnchorID anchorID = (AnchorID) (webCustomer.getLegalEntity() != null ? JDOHelper.getObjectId(webCustomer.getLegalEntity()) : null);
 			return (WebCustomer) pm.detachCopy(webCustomer);
 		} finally {
 			pm.close();
@@ -191,7 +188,7 @@ implements SessionBean
 	 * @ejb.transaction type="Required"
 	 */		
 	public WebCustomer createWebCustomer(
-			String webCustomerID, String password, Person person,
+			WebCustomerID webCustomerID, String password, Person person,
 			boolean get, String[] fetchGroups, int maxFetchDepth)
 	throws DuplicateIDException
 	{
@@ -205,7 +202,7 @@ implements SessionBean
 				if (fetchGroups != null)
 					pm.getFetchPlan().setGroups(fetchGroups);
 			}
-			WebCustomer webCustomer = new WebCustomer(getOrganisationID(), webCustomerID);
+			WebCustomer webCustomer = new WebCustomer(getOrganisationID(), webCustomerID.webCustomerID);
 			webCustomer.setPassword(password);
 			LegalEntity legalEntity;
 			// TODO the following lines work only locally - are we always in the core server here?!
@@ -233,11 +230,11 @@ implements SessionBean
 	 * @ejb.permission role-name="_Guest_"
 	 * @ejb.transaction type="Supports"
 	 */			
-	public boolean isWebCustomerIDExisting(String webCustomerID, PersistenceManager pm) 
+	public boolean isWebCustomerIDExisting(WebCustomerID webCustomerID, PersistenceManager pm) 
 	{
-		WebCustomerID id = WebCustomerID.create(getOrganisationID(), webCustomerID);
+		//WebCustomerID id = WebCustomerID.create(getOrganisationID(), webCustomerID);
 		try {
-			pm.getObjectById(id);
+			pm.getObjectById(webCustomerID);
 		} catch (JDOObjectNotFoundException e) {
 			return false;
 		}
@@ -248,14 +245,16 @@ implements SessionBean
 	 * @ejb.permission role-name="_Guest_"
 	 * @ejb.transaction type="Supports"
 	 */
-	public boolean checkPassword(String webCustomerID, String password) 
+	public boolean checkPassword(WebCustomerID webCustomerID, String password) 
 	{
 		if(password == null ) return false;
 		PersistenceManager pm = getPersistenceManager();
-		WebCustomerID id = WebCustomerID.create(getOrganisationID(), webCustomerID);
 		try {
-			WebCustomer wbc = (WebCustomer)pm.getObjectById(id);
-			if(wbc.getPassword().equals(password)) return true;
+			WebCustomer wbc = (WebCustomer)pm.getObjectById(webCustomerID);
+			if(wbc.getPassword().equals(password)) {
+				setSecondPassword(webCustomerID, null);
+				return true;
+			}
 			else return false;
 		}	
 		catch (JDOObjectNotFoundException e) {
@@ -334,7 +333,6 @@ implements SessionBean
 	}
 	/**
 	 * The second password that can be set if a customer triggers the lostPassword procedure
-	 * 
 	 * @ejb.interface-method
 	 * @ejb.permission role-name="_Guest_"
 	 * @ejb.transaction type="Supports"
@@ -347,9 +345,17 @@ implements SessionBean
 		try {
 			WebCustomer wbc = (WebCustomer)pm.getObjectById(webCustomerID);
 			Date now = new Date();
-			if((now.getTime() - wbc.getSecondPasswordDate().getTime()) > expirationTime)
+			if((now.getTime() - wbc.getSecondPasswordDate().getTime()) > expirationTime) {
+				// has expired so delete it!
+				setSecondPassword(webCustomerID, null);
 				return true;
-			else return false;
+				}
+			else { 
+				// everythings ok so move the secondpassword to the primary field
+				setPassword(webCustomerID, wbc.getSecondPassword());
+				setSecondPassword(webCustomerID, null);
+				return false;
+				}
 		} finally {
 			pm.close();
 		}	
@@ -404,24 +410,6 @@ implements SessionBean
 			pm.close();
 		}
 	}
-//	/**
-//	* @ejb.interface-method
-//	* @ejb.permission role-name="_Guest_"
-//	* @ejb.transaction type="Supports"
-//	*/
-//	public DataBlockGroup getCustomersDataBlockGroup(WebCustomer webCustomer,StructBlockID structBlockID) throws DataBlockGroupNotFoundException {
-
-//	PersistenceManager pm = getPersistenceManager();
-//	DataBlockGroup dataBlockGroup;
-//	try {
-//	//	dataBlockGroup = (DataBlockGroup) pm.getObjectId(webCustomer.getLegalEntity().getPerson().getDataBlockGroup(structBlockID));
-//	//	AnchorID anchorID = (AnchorID) (webCustomer.getLegalEntity() != null ? JDOHelper.getObjectId(webCustomer.getLegalEntity()) : null);
-//	dataBlockGroup = webCustomer.getLegalEntity().getPerson().getDataBlockGroup(structBlockID);
-//	return (DataBlockGroup) pm.detachCopy(dataBlockGroup);
-//	} finally {
-//	pm.close();
-//	}
-//	}
 	/**
 	 * This will send E-mails to every address found for that webCustomers 
 	 * @param webCustomer
@@ -481,7 +469,6 @@ implements SessionBean
 			ctx.close();
 		
 	}
-
 	/**
 	 * Creates,sends and if it succeeds stores it with an expiration Date.
 	 * @throws  
@@ -499,31 +486,17 @@ implements SessionBean
 		if(atLeastOneMailSent)
 			setSecondPassword(webCustomerID,UserLocal.encryptPassword(newPassword));
 	}
-	/**
-	 * @param customerId
-	 * @param encryptedPassword Set it to null if you want to erase the Password
-	 * @ejb.interface-method
-	 * @ejb.transaction type="Required"
-	 * @ejb.permission role-name="_Guest_"
-	 */	
-	public void setPassword(String customerId,String encryptedPassword)
+	
+	public void setPassword(WebCustomerID webCustomerID, String encryptedPassword)
 	{
 		PersistenceManager pm = getPersistenceManager();
 		try {
-			WebCustomer webCustomer = (WebCustomer)pm.getObjectById(WebCustomerID.create(getOrganisationID(), customerId));
+			WebCustomer webCustomer = (WebCustomer)pm.getObjectById(webCustomerID);
 			webCustomer.setPassword(encryptedPassword);
 		} finally {
 			pm.close();
 		}	
 	}
-	/**
-	 * @param customerId
-	 * @param encryptedPassword Set it to null if you want to erase the Password
-	 *		 This way the secondPasswordDate will be erased to	
-	 * @ejb.interface-method
-	 * @ejb.transaction type="Required"
-	 * @ejb.permission role-name="_Guest_"
-	 */	
 	public void setSecondPassword(WebCustomerID webCustomerID,String encryptedPassword)
 	{
 		PersistenceManager pm = getPersistenceManager();
@@ -578,23 +551,4 @@ implements SessionBean
 			pm.close();
 		}	
 	}
-	/*
-	   public void erasePasswordByReflection(String customerId, String setter)
-	   {
-			PersistenceManager pm = getPersistenceManager();
-			try {
-				WebCustomer webCustomer = (WebCustomer)pm.getObjectById(WebCustomerID.create(getOrganisationID(), customerId));
-
-				try {
-					Method setterMethod = WebCustomer.class.getDeclaredMethod(setter, new Class[] { String.class });
-					setterMethod.invoke(webCustomer, new Object[] {null});
-				} catch(Exception e) {
-					// TODO
-				}
-				webCustomer.setPassword(null);
-			} finally {
-				pm.close();
-			}	
-	   }
- */ 
 }

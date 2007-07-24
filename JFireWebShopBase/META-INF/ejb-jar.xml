@@ -243,7 +243,7 @@
          <method-intf>Local</method-intf>
          <method-name>createWebCustomer</method-name>
          <method-params>
-            <method-param>java.lang.String</method-param>
+            <method-param>org.nightlabs.jfire.webshop.id.WebCustomerID</method-param>
             <method-param>java.lang.String</method-param>
             <method-param>org.nightlabs.jfire.person.Person</method-param>
             <method-param>boolean</method-param>
@@ -261,7 +261,7 @@
          <method-intf>Remote</method-intf>
          <method-name>createWebCustomer</method-name>
          <method-params>
-            <method-param>java.lang.String</method-param>
+            <method-param>org.nightlabs.jfire.webshop.id.WebCustomerID</method-param>
             <method-param>java.lang.String</method-param>
             <method-param>org.nightlabs.jfire.person.Person</method-param>
             <method-param>boolean</method-param>
@@ -279,7 +279,7 @@
          <method-intf>Local</method-intf>
          <method-name>isWebCustomerIDExisting</method-name>
          <method-params>
-            <method-param>java.lang.String</method-param>
+            <method-param>org.nightlabs.jfire.webshop.id.WebCustomerID</method-param>
             <method-param>javax.jdo.PersistenceManager</method-param>
          </method-params>
       </method>
@@ -293,7 +293,7 @@
          <method-intf>Remote</method-intf>
          <method-name>isWebCustomerIDExisting</method-name>
          <method-params>
-            <method-param>java.lang.String</method-param>
+            <method-param>org.nightlabs.jfire.webshop.id.WebCustomerID</method-param>
             <method-param>javax.jdo.PersistenceManager</method-param>
          </method-params>
       </method>
@@ -307,7 +307,7 @@
          <method-intf>Local</method-intf>
          <method-name>checkPassword</method-name>
          <method-params>
-            <method-param>java.lang.String</method-param>
+            <method-param>org.nightlabs.jfire.webshop.id.WebCustomerID</method-param>
             <method-param>java.lang.String</method-param>
          </method-params>
       </method>
@@ -321,7 +321,7 @@
          <method-intf>Remote</method-intf>
          <method-name>checkPassword</method-name>
          <method-params>
-            <method-param>java.lang.String</method-param>
+            <method-param>org.nightlabs.jfire.webshop.id.WebCustomerID</method-param>
             <method-param>java.lang.String</method-param>
          </method-params>
       </method>
@@ -541,62 +541,6 @@
          <method-name>createPassword</method-name>
          <method-params>
             <method-param>org.nightlabs.jfire.webshop.id.WebCustomerID</method-param>
-         </method-params>
-      </method>
-   </method-permission>
-   <method-permission >
-      <description><![CDATA[description not supported yet by ejbdoclet]]></description>
-         <role-name>_Guest_</role-name>
-      <method >
-         <description><![CDATA[]]></description>
-         <ejb-name>jfire/ejb/JFireWebShopBase/WebShop</ejb-name>
-         <method-intf>Local</method-intf>
-         <method-name>setPassword</method-name>
-         <method-params>
-            <method-param>java.lang.String</method-param>
-            <method-param>java.lang.String</method-param>
-         </method-params>
-      </method>
-   </method-permission>
-   <method-permission >
-      <description><![CDATA[description not supported yet by ejbdoclet]]></description>
-         <role-name>_Guest_</role-name>
-      <method >
-         <description><![CDATA[]]></description>
-         <ejb-name>jfire/ejb/JFireWebShopBase/WebShop</ejb-name>
-         <method-intf>Remote</method-intf>
-         <method-name>setPassword</method-name>
-         <method-params>
-            <method-param>java.lang.String</method-param>
-            <method-param>java.lang.String</method-param>
-         </method-params>
-      </method>
-   </method-permission>
-   <method-permission >
-      <description><![CDATA[description not supported yet by ejbdoclet]]></description>
-         <role-name>_Guest_</role-name>
-      <method >
-         <description><![CDATA[]]></description>
-         <ejb-name>jfire/ejb/JFireWebShopBase/WebShop</ejb-name>
-         <method-intf>Local</method-intf>
-         <method-name>setSecondPassword</method-name>
-         <method-params>
-            <method-param>org.nightlabs.jfire.webshop.id.WebCustomerID</method-param>
-            <method-param>java.lang.String</method-param>
-         </method-params>
-      </method>
-   </method-permission>
-   <method-permission >
-      <description><![CDATA[description not supported yet by ejbdoclet]]></description>
-         <role-name>_Guest_</role-name>
-      <method >
-         <description><![CDATA[]]></description>
-         <ejb-name>jfire/ejb/JFireWebShopBase/WebShop</ejb-name>
-         <method-intf>Remote</method-intf>
-         <method-name>setSecondPassword</method-name>
-         <method-params>
-            <method-param>org.nightlabs.jfire.webshop.id.WebCustomerID</method-param>
-            <method-param>java.lang.String</method-param>
          </method-params>
       </method>
    </method-permission>
@@ -738,7 +682,7 @@
          <method-intf>Local</method-intf>
          <method-name>createWebCustomer</method-name>
          <method-params>
-            <method-param>java.lang.String</method-param>
+            <method-param>org.nightlabs.jfire.webshop.id.WebCustomerID</method-param>
             <method-param>java.lang.String</method-param>
             <method-param>org.nightlabs.jfire.person.Person</method-param>
             <method-param>boolean</method-param>
@@ -754,7 +698,7 @@
          <method-intf>Remote</method-intf>
          <method-name>createWebCustomer</method-name>
          <method-params>
-            <method-param>java.lang.String</method-param>
+            <method-param>org.nightlabs.jfire.webshop.id.WebCustomerID</method-param>
             <method-param>java.lang.String</method-param>
             <method-param>org.nightlabs.jfire.person.Person</method-param>
             <method-param>boolean</method-param>
@@ -770,7 +714,7 @@
          <method-intf>Local</method-intf>
          <method-name>isWebCustomerIDExisting</method-name>
          <method-params>
-            <method-param>java.lang.String</method-param>
+            <method-param>org.nightlabs.jfire.webshop.id.WebCustomerID</method-param>
             <method-param>javax.jdo.PersistenceManager</method-param>
          </method-params>
       </method>
@@ -782,7 +726,7 @@
          <method-intf>Remote</method-intf>
          <method-name>isWebCustomerIDExisting</method-name>
          <method-params>
-            <method-param>java.lang.String</method-param>
+            <method-param>org.nightlabs.jfire.webshop.id.WebCustomerID</method-param>
             <method-param>javax.jdo.PersistenceManager</method-param>
          </method-params>
       </method>
@@ -794,7 +738,7 @@
          <method-intf>Local</method-intf>
          <method-name>checkPassword</method-name>
          <method-params>
-            <method-param>java.lang.String</method-param>
+            <method-param>org.nightlabs.jfire.webshop.id.WebCustomerID</method-param>
             <method-param>java.lang.String</method-param>
          </method-params>
       </method>
@@ -806,7 +750,7 @@
          <method-intf>Remote</method-intf>
          <method-name>checkPassword</method-name>
          <method-params>
-            <method-param>java.lang.String</method-param>
+            <method-param>org.nightlabs.jfire.webshop.id.WebCustomerID</method-param>
             <method-param>java.lang.String</method-param>
          </method-params>
       </method>
@@ -994,54 +938,6 @@
          <method-name>createPassword</method-name>
          <method-params>
             <method-param>org.nightlabs.jfire.webshop.id.WebCustomerID</method-param>
-         </method-params>
-      </method>
-      <trans-attribute>Required</trans-attribute>
-   </container-transaction>
-   <container-transaction >
-      <method >
-         <ejb-name>jfire/ejb/JFireWebShopBase/WebShop</ejb-name>
-         <method-intf>Local</method-intf>
-         <method-name>setPassword</method-name>
-         <method-params>
-            <method-param>java.lang.String</method-param>
-            <method-param>java.lang.String</method-param>
-         </method-params>
-      </method>
-      <trans-attribute>Required</trans-attribute>
-   </container-transaction>
-   <container-transaction >
-      <method >
-         <ejb-name>jfire/ejb/JFireWebShopBase/WebShop</ejb-name>
-         <method-intf>Remote</method-intf>
-         <method-name>setPassword</method-name>
-         <method-params>
-            <method-param>java.lang.String</method-param>
-            <method-param>java.lang.String</method-param>
-         </method-params>
-      </method>
-      <trans-attribute>Required</trans-attribute>
-   </container-transaction>
-   <container-transaction >
-      <method >
-         <ejb-name>jfire/ejb/JFireWebShopBase/WebShop</ejb-name>
-         <method-intf>Local</method-intf>
-         <method-name>setSecondPassword</method-name>
-         <method-params>
-            <method-param>org.nightlabs.jfire.webshop.id.WebCustomerID</method-param>
-            <method-param>java.lang.String</method-param>
-         </method-params>
-      </method>
-      <trans-attribute>Required</trans-attribute>
-   </container-transaction>
-   <container-transaction >
-      <method >
-         <ejb-name>jfire/ejb/JFireWebShopBase/WebShop</ejb-name>
-         <method-intf>Remote</method-intf>
-         <method-name>setSecondPassword</method-name>
-         <method-params>
-            <method-param>org.nightlabs.jfire.webshop.id.WebCustomerID</method-param>
-            <method-param>java.lang.String</method-param>
          </method-params>
       </method>
       <trans-attribute>Required</trans-attribute>

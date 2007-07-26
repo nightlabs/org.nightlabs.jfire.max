@@ -30,7 +30,6 @@ import java.util.Set;
 
 import javax.ejb.CreateException;
 import javax.jdo.JDOHelper;
-import javax.jdo.JDOObjectNotFoundException;
 import javax.jdo.PersistenceManager;
 import javax.naming.NamingException;
 
@@ -38,16 +37,16 @@ import org.apache.log4j.Logger;
 import org.nightlabs.ModuleException;
 import org.nightlabs.jfire.base.Lookup;
 import org.nightlabs.jfire.idgenerator.IDGenerator;
-import org.nightlabs.jfire.organisation.Organisation;
 import org.nightlabs.jfire.store.Store;
 import org.nightlabs.jfire.store.StoreManager;
 import org.nightlabs.jfire.store.StoreManagerUtil;
-import org.nightlabs.jfire.store.deliver.id.CrossTradeDeliveryCoordinatorID;
 import org.nightlabs.jfire.store.deliver.id.DeliveryID;
+import org.nightlabs.jfire.store.deliver.id.ModeOfDeliveryFlavourID;
 import org.nightlabs.jfire.store.deliver.id.ServerDeliveryProcessorID;
 import org.nightlabs.jfire.trade.Article;
 import org.nightlabs.jfire.trade.LegalEntity;
 import org.nightlabs.jfire.trade.OrganisationLegalEntity;
+import org.nightlabs.jfire.transfer.id.AnchorID;
 
 /**
  * @author Marco Schulze - marco at nightlabs dot de
@@ -64,26 +63,26 @@ import org.nightlabs.jfire.trade.OrganisationLegalEntity;
  */
 public class CrossTradeDeliveryCoordinator
 {
-	public static CrossTradeDeliveryCoordinator getDefaultCrossTradeDeliveryCoordinator(PersistenceManager pm)
-	{
-		CrossTradeDeliveryCoordinatorID id = CrossTradeDeliveryCoordinatorID.create(Organisation.DEVIL_ORGANISATION_ID, CrossTradeDeliveryCoordinator.class.getName());
-		try {
-			CrossTradeDeliveryCoordinator ctdc = (CrossTradeDeliveryCoordinator) pm.getObjectById(id);
-			ctdc.getModeOfDeliveryFlavour();
-			return ctdc;
-		} catch (JDOObjectNotFoundException x) {
-			CrossTradeDeliveryCoordinator ctdc = new CrossTradeDeliveryCoordinator(id.organisationID, id.crossTradeDeliveryCoordinatorID);
-
-			ModeOfDeliveryFlavour modeOfDeliveryFlavour = (ModeOfDeliveryFlavour) pm.getObjectById(ModeOfDeliveryConst.MODE_OF_DELIVERY_FLAVOUR_ID_JFIRE);
-			ctdc.setModeOfDeliveryFlavour(modeOfDeliveryFlavour);
-
-			ServerDeliveryProcessor serverDeliveryProcessor = ServerDeliveryProcessorJFire.getServerDeliveryProcessorJFire(pm);
-			ctdc.setServerDeliveryProcessor(serverDeliveryProcessor);
-
-			ctdc = (CrossTradeDeliveryCoordinator) pm.makePersistent(ctdc);
-			return ctdc;
-		}
-	}
+//	public static CrossTradeDeliveryCoordinator getDefaultCrossTradeDeliveryCoordinator(PersistenceManager pm)
+//	{
+//		CrossTradeDeliveryCoordinatorID id = CrossTradeDeliveryCoordinatorID.create(Organisation.DEVIL_ORGANISATION_ID, CrossTradeDeliveryCoordinator.class.getName());
+//		try {
+//			CrossTradeDeliveryCoordinator ctdc = (CrossTradeDeliveryCoordinator) pm.getObjectById(id);
+//			ctdc.getModeOfDeliveryFlavour();
+//			return ctdc;
+//		} catch (JDOObjectNotFoundException x) {
+//			CrossTradeDeliveryCoordinator ctdc = new CrossTradeDeliveryCoordinator(id.organisationID, id.crossTradeDeliveryCoordinatorID);
+//
+//			ModeOfDeliveryFlavour modeOfDeliveryFlavour = (ModeOfDeliveryFlavour) pm.getObjectById(ModeOfDeliveryConst.MODE_OF_DELIVERY_FLAVOUR_ID_JFIRE);
+//			ctdc.setModeOfDeliveryFlavour(modeOfDeliveryFlavour);
+//
+//			ServerDeliveryProcessor serverDeliveryProcessor = ServerDeliveryProcessorJFire.getServerDeliveryProcessorJFire(pm);
+//			ctdc.setServerDeliveryProcessor(serverDeliveryProcessor);
+//
+//			ctdc = (CrossTradeDeliveryCoordinator) pm.makePersistent(ctdc);
+//			return ctdc;
+//		}
+//	}
 
 	/**
 	 * @jdo.field primary-key="true"
@@ -193,6 +192,10 @@ public class CrossTradeDeliveryCoordinator
 			if (!mandator.equals(from) && !mandator.equals(to))
 				throw new IllegalStateException("Neither from-LegalEntity nor to-LegalEntity is the local organisation!");
 
+
+			// TODO create DeliveryNote
+
+
 			// from and to are now defined and we have to create a Delivery
 			// we actually create TWO deliveries - one for the local side and one for the remote side, where the client-side of each is fake
 			Delivery localDelivery = createDelivery(mandator, from, to, articles, false);
@@ -204,7 +207,7 @@ public class CrossTradeDeliveryCoordinator
 			DeliveryData remoteDeliveryData = createDeliveryData(mandator, from, to, remoteDelivery, localDelivery, remoteDelivery);
 
 			StoreManager localStoreManager = createStoreManager(null);
-			StoreManager remoteStoreManager = createStoreManager(localDelivery.getPartner().getOrganisationID());
+			StoreManager remoteStoreManager = createStoreManager(localDelivery.getPartnerID().organisationID);
 
 			// the local stuff is stored here - the remote stuff is solely stored in the remote organisation - at least for now
 
@@ -411,10 +414,11 @@ public class CrossTradeDeliveryCoordinator
 	{
 		Delivery delivery = new Delivery(IDGenerator.getOrganisationID(), IDGenerator.nextID(Delivery.class));
 		delivery.setArticles(articles);
-		delivery.setModeOfDeliveryFlavour(getModeOfDeliveryFlavour());
+		delivery.setModeOfDeliveryFlavourID((ModeOfDeliveryFlavourID) JDOHelper.getObjectId(getModeOfDeliveryFlavour()));
 		delivery.setServerDeliveryProcessorID((ServerDeliveryProcessorID) JDOHelper.getObjectId(getServerDeliveryProcessor()));
+		delivery.setClientDeliveryProcessorFactoryID(this.getClass().getName());
 
-		delivery.setPartner(mandator.equals(from) ? to : from);
+		delivery.setPartnerID((AnchorID) JDOHelper.getObjectId(mandator.equals(from) ? to : from));
 		if (mandator.equals(from) ^ remote) // if we create the Delivery for the remote side, we inverse the direction, which is done by XOR in the most elegant way
 			delivery.setDeliveryDirection(Delivery.DELIVERY_DIRECTION_OUTGOING);
 		else

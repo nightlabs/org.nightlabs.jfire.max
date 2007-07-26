@@ -36,7 +36,7 @@ import javax.jdo.PersistenceManager;
 
 import org.nightlabs.jfire.security.User;
 import org.nightlabs.jfire.transfer.id.AnchorID;
-import org.nightlabs.util.Utils;
+import org.nightlabs.util.Util;
 
 /**
  * An Anchor is an end-point for a Transfer. Every Transfer has exactly two Anchors -
@@ -334,14 +334,14 @@ public abstract class Anchor
 		Anchor o = (Anchor) obj;
 
 		return
-				Utils.equals(this.organisationID, o.organisationID) &&
-				Utils.equals(this.anchorTypeID, o.anchorTypeID) &&
-				Utils.equals(this.anchorID, o.anchorID);
+				Util.equals(this.organisationID, o.organisationID) &&
+				Util.equals(this.anchorTypeID, o.anchorTypeID) &&
+				Util.equals(this.anchorID, o.anchorID);
 	}
 
 	@Override
 	public int hashCode()
 	{
-		return Utils.hashCode(organisationID) ^ Utils.hashCode(anchorTypeID) ^ Utils.hashCode(anchorID);
+		return Util.hashCode(organisationID) ^ Util.hashCode(anchorTypeID) ^ Util.hashCode(anchorID);
 	}
 }

@@ -37,6 +37,7 @@ import java.util.Map;
 import java.util.Set;
 
 import javax.jdo.JDOHelper;
+import javax.jdo.JDOObjectNotFoundException;
 import javax.jdo.PersistenceManager;
 import javax.jdo.Query;
 
@@ -49,9 +50,15 @@ import org.nightlabs.jfire.base.JFirePrincipal;
 import org.nightlabs.jfire.base.Lookup;
 import org.nightlabs.jfire.organisation.Organisation;
 import org.nightlabs.jfire.security.User;
+import org.nightlabs.jfire.store.deliver.CrossTradeDeliveryCoordinator;
 import org.nightlabs.jfire.store.deliver.Delivery;
 import org.nightlabs.jfire.store.deliver.DeliveryData;
 import org.nightlabs.jfire.store.deliver.DeliveryHelperBean;
+import org.nightlabs.jfire.store.deliver.ModeOfDeliveryConst;
+import org.nightlabs.jfire.store.deliver.ModeOfDeliveryFlavour;
+import org.nightlabs.jfire.store.deliver.ServerDeliveryProcessor;
+import org.nightlabs.jfire.store.deliver.ServerDeliveryProcessorJFire;
+import org.nightlabs.jfire.store.deliver.id.CrossTradeDeliveryCoordinatorID;
 import org.nightlabs.jfire.store.deliver.id.DeliveryDataID;
 import org.nightlabs.jfire.trade.Article;
 import org.nightlabs.jfire.trade.Offer;
@@ -72,7 +79,7 @@ import org.nightlabs.jfire.trade.id.SegmentID;
 import org.nightlabs.jfire.trade.jbpm.ProcessDefinitionAssignment;
 import org.nightlabs.jfire.trade.jbpm.id.ProcessDefinitionAssignmentID;
 import org.nightlabs.jfire.transfer.Anchor;
-import org.nightlabs.util.Utils;
+import org.nightlabs.util.Util;
 
 /**
  * <p>
@@ -592,7 +599,9 @@ public abstract class ProductTypeActionHandler
 					if (articleProductTypeLocal == null)
 						throw new IllegalStateException("article.getProductType().getProductTypeLocal() == null for imported Article (" + article.getPrimaryKey() + "). ProductType: " + articleProductType.getPrimaryKey());
 
-					store.addProduct(user, article.getProduct(), articleProductTypeLocal.getHome());
+					Product product = store.addProduct(user, article.getProduct(), articleProductTypeLocal.getHome());
+					product.getProductLocal().setAssembled(true); // since we receive it from another organisation, we always assume that it's assembled.
+//					product.getProductLocal().setArticle(article); // pointing back to the article which delivers it to us - NO! we do not point back, because the same product[Local] can be in multiple Articles (when being reversed - and maybe even resold and again reversed and so on) - it's cleaner to find the Article by a query - see the static method in class Article!
 				}
 			}
 
@@ -812,6 +821,29 @@ public abstract class ProductTypeActionHandler
 	{
 	}
 
+	public CrossTradeDeliveryCoordinator getCrossTradeDeliveryCoordinator()
+	{
+		PersistenceManager pm = getPersistenceManager();
+
+		CrossTradeDeliveryCoordinatorID id = CrossTradeDeliveryCoordinatorID.create(Organisation.DEVIL_ORGANISATION_ID, CrossTradeDeliveryCoordinator.class.getName());
+		try {
+			CrossTradeDeliveryCoordinator ctdc = (CrossTradeDeliveryCoordinator) pm.getObjectById(id);
+			ctdc.getModeOfDeliveryFlavour();
+			return ctdc;
+		} catch (JDOObjectNotFoundException x) {
+			CrossTradeDeliveryCoordinator ctdc = new CrossTradeDeliveryCoordinator(id.organisationID, id.crossTradeDeliveryCoordinatorID);
+
+			ModeOfDeliveryFlavour modeOfDeliveryFlavour = (ModeOfDeliveryFlavour) pm.getObjectById(ModeOfDeliveryConst.MODE_OF_DELIVERY_FLAVOUR_ID_JFIRE);
+			ctdc.setModeOfDeliveryFlavour(modeOfDeliveryFlavour);
+
+			ServerDeliveryProcessor serverDeliveryProcessor = ServerDeliveryProcessorJFire.getServerDeliveryProcessorJFire(pm);
+			ctdc.setServerDeliveryProcessor(serverDeliveryProcessor);
+
+			ctdc = (CrossTradeDeliveryCoordinator) pm.makePersistent(ctdc);
+			return ctdc;
+		}
+	}
+
 //	/**
 //	 * This method is called by {@link PaymentHelperBean#payBegin_storePayBeginServerResult(org.nightlabs.jfire.accounting.pay.id.PaymentID, org.nightlabs.jfire.accounting.pay.PaymentResult, boolean, String[], int)}
 //	 * at the end of its action. You should not cause any exception here as this will cause the <code>PaymentResult</code> not to be written and
@@ -852,7 +884,7 @@ public abstract class ProductTypeActionHandler
 	@Override
 	public int hashCode()
 	{
-		return Utils.hashCode(organisationID) ^ Utils.hashCode(productTypeActionHandlerID);
+		return Util.hashCode(organisationID) ^ Util.hashCode(productTypeActionHandlerID);
 	}
 
 	@Override
@@ -867,8 +899,8 @@ public abstract class ProductTypeActionHandler
 		ProductTypeActionHandler other = (ProductTypeActionHandler) obj;
 
 		return
-				Utils.equals(this.organisationID, other.organisationID) &&
-				Utils.equals(this.productTypeActionHandlerID, other.productTypeActionHandlerID);
+				Util.equals(this.organisationID, other.organisationID) &&
+				Util.equals(this.productTypeActionHandlerID, other.productTypeActionHandlerID);
 	}
 
 }

@@ -35,7 +35,9 @@ import java.util.Map;
 import java.util.Set;
 
 import javax.jdo.JDOHelper;
+import javax.jdo.JDOObjectNotFoundException;
 import javax.jdo.PersistenceManager;
+import javax.jdo.Query;
 import javax.jdo.listener.DeleteCallback;
 import javax.jdo.listener.DetachCallback;
 import javax.jdo.listener.StoreCallback;
@@ -55,12 +57,13 @@ import org.nightlabs.jfire.store.Product;
 import org.nightlabs.jfire.store.ProductType;
 import org.nightlabs.jfire.store.ReceptionNote;
 import org.nightlabs.jfire.store.id.DeliveryNoteID;
+import org.nightlabs.jfire.store.id.ProductID;
 import org.nightlabs.jfire.store.id.ReceptionNoteID;
 import org.nightlabs.jfire.trade.id.ArticleID;
 import org.nightlabs.jfire.trade.id.OfferID;
 import org.nightlabs.jfire.trade.id.OrderID;
 import org.nightlabs.jfire.transfer.id.AnchorID;
-import org.nightlabs.util.Utils;
+import org.nightlabs.util.Util;
 
 /**
  * An instance of <tt>Article</tt> occurs in the context of a {@link Segment}. It represents a
@@ -107,13 +110,15 @@ import org.nightlabs.util.Utils;
  * @!jdo.fetch-group name="FetchGroupsTrade.articleInOfferEditor" fields="segment, productType, product, tariff, price, order, invoice, deliveryNote"
  * @!jdo.fetch-group name="FetchGroupsTrade.articleInInvoiceEditor" fields="segment, productType, product, tariff, price, order, offer, deliveryNote"
  * @!jdo.fetch-group name="FetchGroupsTrade.articleInDeliveryNoteEditor" fields="segment, productType, product, tariff, price, order, offer, invoice"
+ *
+ * @jdo.query
+ *		name="getArticleByOfferAndProduct"
+ *		query="SELECT UNIQUE WHERE this.offer == :offer && this.product == :product"
  */
 public class Article
-	implements Serializable, DeleteCallback, DetachCallback, StoreCallback
+implements Serializable, DeleteCallback, DetachCallback, StoreCallback
 {
-	/**
-	 * LOG4J logger used by this class
-	 */
+	private static final long serialVersionUID = 1L;
 	private static final Logger logger = Logger.getLogger(Article.class);
 
 	public static final String FETCH_GROUP_ARTICLE_LOCAL = "Article.articleLocal";
@@ -141,6 +146,40 @@ public class Article
 	public static final String FETCH_GROUP_REVERSING_ARTICLE_ID = "Article.reversingArticleID";
 	public static final String FETCH_GROUP_VENDOR_ID = "Article.vendorID";
 	public static final String FETCH_GROUP_CUSTOMER_ID = "Article.customerID";
+
+	/**
+	 * @param pm The {@link PersistenceManager} used to access the datastore.
+	 * @param offerID The ID of the {@link Offer}.
+	 * @param productID The ID of the {@link Product}.
+	 * @return Either <code>null</code>, if the specified IDs don't match an {@link Article} or the {@link Article} which references the
+	 *		specified <code>Product</code> within the specified <code>Offer</code>. Note, that <code>null</code> is returned, too, if no
+	 *		<code>Offer</code> with the specified <code>offerID</code> exists, or no <code>Product</code> with the specified <code>productID</code> exists.
+	 */
+	public static Article getArticle(PersistenceManager pm, OfferID offerID, ProductID productID)
+	{
+		pm.getExtent(Offer.class); pm.getExtent(Product.class);
+		Offer offer; Product product;
+		try {
+			offer = (Offer) pm.getObjectById(offerID);
+			product = (Product) pm.getObjectById(productID);
+		} catch (JDOObjectNotFoundException x) {
+			return null;
+		}
+		return getArticle(pm, offer, product);
+	}
+
+	/**
+	 * @param pm The {@link PersistenceManager} used to access the datastore.
+	 * @param offer The {@link Offer} containing the searched <code>Article</code>.
+	 * @param product The {@link Product} referenced by the searched <code>Article</code>.
+	 * @return Either <code>null</code>, if no {@link Article} can be found matching the
+	 *		specified <code>Product</code> within the specified <code>Offer</code>.
+	 */
+	public static Article getArticle(PersistenceManager pm, Offer offer, Product product)
+	{
+		Query q = pm.newNamedQuery(Article.class, "getArticleByOfferAndProduct");
+		return (Article) q.execute(offer, product);
+	}
 
 	public static Map<Class, Set<Article>> getProductTypeClass2articleSetMapFromArticleContainers(Collection<? extends ArticleContainer> articleContainers)
 	{
@@ -1317,13 +1356,13 @@ public class Article
 		Article o = (Article)obj;
 
 		return
-				Utils.equals(this.organisationID, o.organisationID) &&
-				this.articleID == o.articleID;
+				Util.equals(this.organisationID, o.organisationID) &&
+				Util.equals(this.articleID, o.articleID);
 	}
 
 	@Override
 	public int hashCode()
 	{
-		return Utils.hashCode(organisationID) ^ Utils.hashCode(articleID);
+		return Util.hashCode(organisationID) ^ Util.hashCode(articleID);
 	}
 }

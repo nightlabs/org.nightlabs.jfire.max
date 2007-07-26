@@ -31,11 +31,13 @@ import java.io.Serializable;
 import java.rmi.RemoteException;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Locale;
+import java.util.Map;
 import java.util.Set;
 
 import javax.ejb.CreateException;
@@ -65,6 +67,8 @@ import org.nightlabs.jfire.jbpm.graph.def.ProcessDefinition;
 import org.nightlabs.jfire.organisation.Organisation;
 import org.nightlabs.jfire.security.User;
 import org.nightlabs.jfire.store.deliver.CheckRequirementsEnvironment;
+import org.nightlabs.jfire.store.deliver.CrossTradeDeliveryCoordinator;
+import org.nightlabs.jfire.store.deliver.Delivery;
 import org.nightlabs.jfire.store.deliver.DeliveryData;
 import org.nightlabs.jfire.store.deliver.DeliveryException;
 import org.nightlabs.jfire.store.deliver.DeliveryHelperLocal;
@@ -94,7 +98,9 @@ import org.nightlabs.jfire.trade.CustomerGroup;
 import org.nightlabs.jfire.trade.LegalEntity;
 import org.nightlabs.jfire.trade.Offer;
 import org.nightlabs.jfire.trade.OfferLocal;
+import org.nightlabs.jfire.trade.OfferRequirement;
 import org.nightlabs.jfire.trade.Order;
+import org.nightlabs.jfire.trade.OrganisationLegalEntity;
 import org.nightlabs.jfire.trade.TradeSide;
 import org.nightlabs.jfire.trade.Trader;
 import org.nightlabs.jfire.trade.id.ArticleContainerID;
@@ -1364,10 +1370,21 @@ implements SessionBean
 	protected static class CrossTradeDeliverInvocation
 	extends Invocation
 	{
+		private static final long serialVersionUID = 1L;
+
 		private DeliveryID deliveryID;
 
+		/**
+		 * @param deliveryID This ID references the {@link Delivery} to the end-customer-side (or next-reseller-side). Hence, this
+		 *		<code>CrossTradeDeliverInvocation</code> needs to split the <code>Article</code>s contained in this delivery by
+		 *		back-hand supplier and by ProductType class, obtain the {@link ProductTypeActionHandler} for them and ask it
+		 *		for the correct {@link CrossTradeDeliveryCoordinator} (via {@link ProductTypeActionHandler#getCrossTradeDeliveryCoordinator()}).
+		 */
 		public CrossTradeDeliverInvocation(DeliveryID deliveryID)
 		{
+			if (deliveryID == null)
+				throw new IllegalArgumentException("deliveryID must not be null!");
+
 			this.deliveryID = deliveryID;
 		}
 
@@ -1376,7 +1393,81 @@ implements SessionBean
 				throws Exception
 		{
 			PersistenceManager pm = getPersistenceManager();
+			String localOrganisationID = getOrganisationID();
 
+			Map<Class, Map<String, Map<Boolean, Set<Article>>>> productTypeClass2organisationID2articleSet = null; 
+
+			Delivery delivery = (Delivery) pm.getObjectById(deliveryID);
+			for (Article article : delivery.getArticles()) {
+				ProductLocal productLocal = article.getProduct().getProductLocal();
+
+				for (ProductLocal nestedProductLocal : productLocal.getNestedProductLocals()) {
+					if (!localOrganisationID.equals(nestedProductLocal.getOrganisationID())) {
+
+						if (productTypeClass2organisationID2articleSet == null)
+							productTypeClass2organisationID2articleSet = new HashMap<Class, Map<String,Map<Boolean,Set<Article>>>>();
+
+						ProductType nestedProductType = nestedProductLocal.getProduct().getProductType();
+						Class nestedProductTypeClass = nestedProductType.getClass();
+
+						Map<String, Map<Boolean, Set<Article>>> organisationID2articleSet = productTypeClass2organisationID2articleSet.get(nestedProductTypeClass);
+						if (organisationID2articleSet == null) {
+							organisationID2articleSet = new HashMap<String, Map<Boolean,Set<Article>>>();
+							productTypeClass2organisationID2articleSet.put(nestedProductTypeClass, organisationID2articleSet);
+						}
+
+						Map<Boolean, Set<Article>> direction2articleSet = organisationID2articleSet.get(nestedProductLocal.getOrganisationID());
+						if (direction2articleSet == null) {
+							direction2articleSet = new HashMap<Boolean, Set<Article>>();
+							organisationID2articleSet.put(nestedProductLocal.getOrganisationID(), direction2articleSet);
+						}
+
+						LegalEntity partner = OrganisationLegalEntity.getOrganisationLegalEntity(pm, nestedProductLocal.getOrganisationID(), OrganisationLegalEntity.ANCHOR_TYPE_ID_ORGANISATION, true);
+
+						Boolean directionIncoming = Boolean.TRUE;
+						if (article.isReversing())
+							directionIncoming = Boolean.FALSE;
+
+						Set<Article> articleSet = direction2articleSet.get(directionIncoming);
+						if (articleSet == null) {
+							articleSet = new HashSet<Article>();
+							direction2articleSet.put(directionIncoming, articleSet);
+						}
+
+						// find the backhand-Article for this nestedProductLocal
+						OfferRequirement backhandOfferRequirement = OfferRequirement.getOfferRequirement(pm, article.getOffer(), true);
+
+						Offer backhandOffer = backhandOfferRequirement.getPartnerOffer(partner);
+						if (backhandOffer == null)
+							throw new IllegalStateException("Cannot find backhand-Offer for local Article \"" + article.getPrimaryKey() + "\" + and nestedProductLocal \"" + nestedProductLocal.getPrimaryKey() + "\" and partnerLegalEntity \"" + partner.getPrimaryKey() + "\"");
+
+						Article backhandArticle = Article.getArticle(pm, backhandOffer, nestedProductLocal.getProduct());
+						if (backhandArticle == null)
+							throw new IllegalStateException("Cannot find backhand-Article for local Article \"" + article.getPrimaryKey() + "\" + and nestedProductLocal \"" + nestedProductLocal.getPrimaryKey() + "\"");
+
+						articleSet.add(backhandArticle);
+					}
+				}
+			}
+
+			if (productTypeClass2organisationID2articleSet != null) {
+				for (Map.Entry<Class, Map<String, Map<Boolean, Set<Article>>>> me1 : productTypeClass2organisationID2articleSet.entrySet()) {
+					Class productTypeClass = me1.getKey();
+					ProductTypeActionHandler productTypeActionHandler = ProductTypeActionHandler.getProductTypeActionHandler(pm, productTypeClass);
+					CrossTradeDeliveryCoordinator crossTradeDeliveryCoordinator = productTypeActionHandler.getCrossTradeDeliveryCoordinator();
+
+					for (Map.Entry<String, Map<Boolean, Set<Article>>> me2 : me1.getValue().entrySet()) {
+//						String organisationID = me2.getKey();
+
+						for (Map.Entry<Boolean, Set<Article>> me3 : me2.getValue().entrySet()) {
+//							Boolean directionIncoming = me3.getKey();
+							Set<Article> backhandArticles = me3.getValue();
+
+							crossTradeDeliveryCoordinator.performCrossTradeDelivery(backhandArticles);
+						}
+					}
+				}
+			}
 
 			return null;
 		}

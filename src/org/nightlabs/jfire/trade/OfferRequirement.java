@@ -124,6 +124,7 @@ public class OfferRequirement
 	 *		key-type="LegalEntity"
 	 *		value-type="Offer"
 	 *		null-value="exception"
+	 *		table="JFireTrade_OfferRequirement_vendor2offer"
 	 *
 	 * @jdo.join
 	 */

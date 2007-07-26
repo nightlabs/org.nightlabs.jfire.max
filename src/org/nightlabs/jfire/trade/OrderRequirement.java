@@ -123,6 +123,7 @@ public class OrderRequirement
 	 *		key-type="LegalEntity"
 	 *		value-type="Order"
 	 *		null-value="exception"
+	 *		table="JFireTrade_OrderRequirement_vendor2order"
 	 *
 	 * @jdo.join
 	 */

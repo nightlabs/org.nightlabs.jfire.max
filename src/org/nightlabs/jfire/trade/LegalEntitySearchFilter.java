@@ -49,14 +49,6 @@ public class LegalEntitySearchFilter extends PropSearchFilter {
 		super(_conjunction);
 	}
 
-	/**
-	 * @param _conjunction
-	 * @param personType
-	 */
-	public LegalEntitySearchFilter(int _conjunction, String personType) {
-		super(_conjunction, personType);
-	}
-
 	@Override
 	public void setPropVariableCondition(StringBuffer filter) {
 		filter.append(PROPERTY_VARNAME+" == this.person");

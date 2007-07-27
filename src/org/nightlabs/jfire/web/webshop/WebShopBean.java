@@ -522,10 +522,11 @@ implements SessionBean
 		try {
 			// the confirmation String is random encrypted String
 			String randomEncrypted = UserLocal.encryptPassword(UserLocal.createPassword(8,10));
-			String subject = "Account confirmation for the JFire demo webshop";
+			String subject = "Account confirmation for "+ webCustomerID.webCustomerID +" at the JFire demo webshop";
 			// very temporarly
-			String message = "Welcome to the JFire Web Shop . You can activate your account with" +
-			"this link: http://127.0.0.1:8080/jfire-webshop/customer/?customerId="+webCustomerID.webCustomerID +"&action=confirm&cf="+ randomEncrypted;  
+			String message = "Hello "+ webCustomerID.webCustomerID +
+			"\n Thank you for registering at the JFire demo shop. Your account is created and must be activated before you can use it."+
+			"To activate the account click on the following link or copy-paste it in your browser: http://127.0.0.1:8080/jfire-webshop/customer/?customerId="+webCustomerID.webCustomerID +"&action=confirm&cf="+ randomEncrypted;  
 
 			if(sendBlockGroupMails(webCustomerID,subject,message) == true) {
 				// Mail has been sent succesfully 

@@ -37,7 +37,6 @@ import java.util.Map;
 import java.util.Set;
 
 import javax.jdo.JDOHelper;
-import javax.jdo.JDOObjectNotFoundException;
 import javax.jdo.PersistenceManager;
 import javax.jdo.Query;
 
@@ -50,15 +49,9 @@ import org.nightlabs.jfire.base.JFirePrincipal;
 import org.nightlabs.jfire.base.Lookup;
 import org.nightlabs.jfire.organisation.Organisation;
 import org.nightlabs.jfire.security.User;
-import org.nightlabs.jfire.store.deliver.CrossTradeDeliveryCoordinator;
 import org.nightlabs.jfire.store.deliver.Delivery;
 import org.nightlabs.jfire.store.deliver.DeliveryData;
 import org.nightlabs.jfire.store.deliver.DeliveryHelperBean;
-import org.nightlabs.jfire.store.deliver.ModeOfDeliveryConst;
-import org.nightlabs.jfire.store.deliver.ModeOfDeliveryFlavour;
-import org.nightlabs.jfire.store.deliver.ServerDeliveryProcessor;
-import org.nightlabs.jfire.store.deliver.ServerDeliveryProcessorJFire;
-import org.nightlabs.jfire.store.deliver.id.CrossTradeDeliveryCoordinatorID;
 import org.nightlabs.jfire.store.deliver.id.DeliveryDataID;
 import org.nightlabs.jfire.trade.Article;
 import org.nightlabs.jfire.trade.Offer;
@@ -821,28 +814,28 @@ public abstract class ProductTypeActionHandler
 	{
 	}
 
-	public CrossTradeDeliveryCoordinator getCrossTradeDeliveryCoordinator()
-	{
-		PersistenceManager pm = getPersistenceManager();
-
-		CrossTradeDeliveryCoordinatorID id = CrossTradeDeliveryCoordinatorID.create(Organisation.DEVIL_ORGANISATION_ID, CrossTradeDeliveryCoordinator.class.getName());
-		try {
-			CrossTradeDeliveryCoordinator ctdc = (CrossTradeDeliveryCoordinator) pm.getObjectById(id);
-			ctdc.getModeOfDeliveryFlavour();
-			return ctdc;
-		} catch (JDOObjectNotFoundException x) {
-			CrossTradeDeliveryCoordinator ctdc = new CrossTradeDeliveryCoordinator(id.organisationID, id.crossTradeDeliveryCoordinatorID);
-
-			ModeOfDeliveryFlavour modeOfDeliveryFlavour = (ModeOfDeliveryFlavour) pm.getObjectById(ModeOfDeliveryConst.MODE_OF_DELIVERY_FLAVOUR_ID_JFIRE);
-			ctdc.setModeOfDeliveryFlavour(modeOfDeliveryFlavour);
-
-			ServerDeliveryProcessor serverDeliveryProcessor = ServerDeliveryProcessorJFire.getServerDeliveryProcessorJFire(pm);
-			ctdc.setServerDeliveryProcessor(serverDeliveryProcessor);
-
-			ctdc = (CrossTradeDeliveryCoordinator) pm.makePersistent(ctdc);
-			return ctdc;
-		}
-	}
+//	public CrossTradeDeliveryCoordinator getCrossTradeDeliveryCoordinator()
+//	{
+//		PersistenceManager pm = getPersistenceManager();
+//
+//		CrossTradeDeliveryCoordinatorID id = CrossTradeDeliveryCoordinatorID.create(Organisation.DEVIL_ORGANISATION_ID, CrossTradeDeliveryCoordinator.class.getName());
+//		try {
+//			CrossTradeDeliveryCoordinator ctdc = (CrossTradeDeliveryCoordinator) pm.getObjectById(id);
+//			ctdc.getModeOfDeliveryFlavour();
+//			return ctdc;
+//		} catch (JDOObjectNotFoundException x) {
+//			CrossTradeDeliveryCoordinator ctdc = new CrossTradeDeliveryCoordinator(id.organisationID, id.crossTradeDeliveryCoordinatorID);
+//
+//			ModeOfDeliveryFlavour modeOfDeliveryFlavour = (ModeOfDeliveryFlavour) pm.getObjectById(ModeOfDeliveryConst.MODE_OF_DELIVERY_FLAVOUR_ID_JFIRE);
+//			ctdc.setModeOfDeliveryFlavour(modeOfDeliveryFlavour);
+//
+//			ServerDeliveryProcessor serverDeliveryProcessor = ServerDeliveryProcessorJFire.getServerDeliveryProcessorJFire(pm);
+//			ctdc.setServerDeliveryProcessor(serverDeliveryProcessor);
+//
+//			ctdc = (CrossTradeDeliveryCoordinator) pm.makePersistent(ctdc);
+//			return ctdc;
+//		}
+//	}
 
 //	/**
 //	 * This method is called by {@link PaymentHelperBean#payBegin_storePayBeginServerResult(org.nightlabs.jfire.accounting.pay.id.PaymentID, org.nightlabs.jfire.accounting.pay.PaymentResult, boolean, String[], int)}

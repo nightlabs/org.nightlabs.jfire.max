@@ -86,15 +86,16 @@ public class Repository extends Anchor
 	 */
 	private boolean outside;
 
-	public static Repository createRepository(PersistenceManager pm, String organisationID, String anchorTypeID, String anchorID, LegalEntity owner, boolean outside)
+	public static Repository createRepository(
+			PersistenceManager pm, String organisationID, String anchorTypeID, String anchorID, LegalEntity owner, boolean outside)
 	{
 		Repository repository;
 		try {
-			repository = (Repository) pm.getObjectById(AnchorID.create(
-					organisationID, anchorTypeID, anchorID));
+			repository = (Repository) pm.getObjectById(
+					AnchorID.create(organisationID, anchorTypeID, anchorID));
 		} catch (JDOObjectNotFoundException x) {
 			repository = new Repository(organisationID, anchorTypeID, anchorID, owner, outside);
-			pm.makePersistent(repository);
+			repository = pm.makePersistent(repository);
 		}
 		return repository;
 	}
@@ -118,11 +119,14 @@ public class Repository extends Anchor
 		super(organisationID, anchorTypeID, anchorID);
 
 		if (owner == null)
-			throw new NullPointerException("owner");
+			throw new IllegalArgumentException("owner must not be null!");
 
 		this.owner = owner;
 		this.name = new RepositoryName(this);
 		this.outside = outside;
+
+//		if (!organisationID.equals(owner.getOrganisationID())) // TODO remove this temporary test - it is a legal state, but it should not occur in the current situation at all! it does already occur!
+//			throw new IllegalArgumentException("organisationID != owner.organisationID!!! organisationID=\"" + organisationID + "\" owner.organisationID=\"" + owner.getOrganisationID() + "\"");
 	}
 
 	protected void internalBookTransfer(Transfer transfer, User user,

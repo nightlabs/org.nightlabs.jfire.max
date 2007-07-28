@@ -28,18 +28,15 @@ package org.nightlabs.jfire.store.book;
 
 import java.util.Map;
 
-import javax.jdo.JDOObjectNotFoundException;
 import javax.jdo.PersistenceManager;
 
 import org.nightlabs.jfire.security.User;
 import org.nightlabs.jfire.store.ProductTransfer;
 import org.nightlabs.jfire.store.Repository;
-import org.nightlabs.jfire.store.Store;
 import org.nightlabs.jfire.store.deliver.DeliverProductTransfer;
 import org.nightlabs.jfire.trade.LegalEntity;
 import org.nightlabs.jfire.transfer.Anchor;
 import org.nightlabs.jfire.transfer.Transfer;
-import org.nightlabs.jfire.transfer.id.AnchorID;
 
 /**
  * @author Marco Schulze - marco at nightlabs dot de
@@ -81,32 +78,36 @@ public class PartnerStorekeeper extends Storekeeper
 			PersistenceManager pm, String organisationID, LegalEntity mandator)
 	{
 		String anchorID = mandator.getOrganisationID() + '.' + mandator.getAnchorTypeID() + '.' + mandator.getAnchorID();
-		try {
-			return (Repository) pm.getObjectById(AnchorID.create(
-					organisationID,
-					Repository.ANCHOR_TYPE_ID_BIN,
-					anchorID));
-		} catch (JDOObjectNotFoundException x) {
-			Repository repository = new Repository(organisationID, Repository.ANCHOR_TYPE_ID_BIN, anchorID, mandator, false);
-			pm.makePersistent(repository);
-			return repository;
-		}
+		return Repository.createRepository(pm, organisationID, Repository.ANCHOR_TYPE_ID_BIN, anchorID, mandator, false);
+
+//		try {
+//			return (Repository) pm.getObjectById(AnchorID.create(
+//					organisationID,
+//					Repository.ANCHOR_TYPE_ID_BIN,
+//					anchorID));
+//		} catch (JDOObjectNotFoundException x) {
+//			Repository repository = new Repository(organisationID, Repository.ANCHOR_TYPE_ID_BIN, anchorID, mandator, false);
+//			pm.makePersistent(repository);
+//			return repository;
+//		}
 	}
 
 	public static Repository createPartnerOutsideRepository(
 			PersistenceManager pm, String organisationID, LegalEntity mandator)
 	{
 		String anchorID = mandator.getOrganisationID() + '.' + mandator.getAnchorTypeID() + '.' + mandator.getAnchorID();
-		try {
-			return (Repository) pm.getObjectById(AnchorID.create(
-					organisationID,
-					Repository.ANCHOR_TYPE_ID_OUTSIDE,
-					anchorID));
-		} catch (JDOObjectNotFoundException x) {
-			Repository repository = new Repository(organisationID, Repository.ANCHOR_TYPE_ID_OUTSIDE, anchorID, mandator, true);
-			pm.makePersistent(repository);
-			return repository;
-		}
+		return Repository.createRepository(pm, organisationID, Repository.ANCHOR_TYPE_ID_OUTSIDE, anchorID, mandator, true);
+
+//		try {
+//			return (Repository) pm.getObjectById(AnchorID.create(
+//					organisationID,
+//					Repository.ANCHOR_TYPE_ID_OUTSIDE,
+//					anchorID));
+//		} catch (JDOObjectNotFoundException x) {
+//			Repository repository = new Repository(organisationID, Repository.ANCHOR_TYPE_ID_OUTSIDE, anchorID, mandator, true);
+//			pm.makePersistent(repository);
+//			return repository;
+//		}
 	}
 
 	protected void handleBookOrDeliveryProductTransfer(User user, LegalEntity mandator,

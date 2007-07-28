@@ -1138,7 +1138,7 @@ implements StoreCallback
 		}
 		else {
 			if (!partner.getPrimaryKey().equals(deliveryData.getDelivery().getPartner().getPrimaryKey()))
-				throw new IllegalArgumentException("deliveryData.getDelivery().getPartner() does not match the partner of deliveryData.getDelivery().getInvoices()!");
+				throw new IllegalArgumentException("deliveryData.getDelivery().getPartner() does not match the partner of deliveryData.getDelivery().getDeliveryNotes()! deliveryNotes' partner is \"" + partner.getPrimaryKey() + "\" but delivery.partner is \"" + deliveryData.getDelivery().getPartner().getPrimaryKey() + "\"");
 		}
 
 		deliverBegin_checkArticles(deliveryData.getDelivery().getArticles());

@@ -54,12 +54,31 @@ import java.util.Set;
  * @jdo.inheritance strategy="new-table"
  * 
  * @jdo.fetch-group name="DeliveryConfiguration.name" fields="name"
+ * @jdo.fetch-group name="DeliveryConfiguration.modeOfDeliveries" fields="modeOfDeliveries"
+ * @jdo.fetch-group name="DeliveryConfiguration.modeOfDeliveryFlavours" fields="modeOfDeliveryFlavours"
+ * @jdo.fetch-group name="DeliveryConfiguration.includedServerDeliveryProcessors" fields="includedServerDeliveryProcessors"
+ * @jdo.fetch-group name="DeliveryConfiguration.excludedServerDeliveryProcessors" fields="excludedServerDeliveryProcessors"
+ * @jdo.fetch-group name="DeliveryConfiguration.includedClientDeliveryProcessorFactoryIDs" fields="includedClientDeliveryProcessorFactoryIDs"
+ * @jdo.fetch-group name="DeliveryConfiguration.excludedClientDeliveryProcessorFactoryIDs" fields="excludedClientDeliveryProcessorFactoryIDs"
+ * @jdo.fetch-group name="DeliveryConfiguration.crossTradeDeliveryCoordinator" fields="crossTradeDeliveryCoordinator"
+ *
+ * @jdo.fetch-group name="DeliveryConfiguration.this" fields="name, modeOfDeliveries, modeOfDeliveryFlavours, includedServerDeliveryProcessors, excludedServerDeliveryProcessors, includedClientDeliveryProcessorFactoryIDs, excludedClientDeliveryProcessorFactoryIDs, crossTradeDeliveryCoordinator"
  */
 public class DeliveryConfiguration
 implements Serializable
 {
+	private static final long serialVersionUID = 1L;
+
 	public static final String FETCH_GROUP_NAME = "DeliveryConfiguration.name";
-	
+	public static final String FETCH_GROUP_MODE_OF_DELIVERIES = "DeliveryConfiguration.modeOfDeliveries";
+	public static final String FETCH_GROUP_MODE_OF_DELIVERY_FLAVOURS	= "DeliveryConfiguration.modeOfDeliveryFlavours";
+	public static final String FETCH_GROUP_INCLUDED_SERVER_DELIVERY_PROCESSORS = "DeliveryConfiguration.includedServerDeliveryProcessors";
+	public static final String FETCH_GROUP_EXCLUDED_SERVER_DELIVERY_PROCESSORS = "DeliveryConfiguration.excludedServerDeliveryProcessors";
+	public static final String FETCH_GROUP_INCLUDED_CLIENT_DELIVERY_PROCESSOR_FACTORY_IDS = "DeliveryConfiguration.includedClientDeliveryProcessorFactoryIDs";
+	public static final String FETCH_GROUP_EXCLUDED_CLIENT_DELIVERY_PROCESSOR_FACTORY_IDS = "DeliveryConfiguration.excludedClientDeliveryProcessorFactoryIDs";
+	public static final String FETCH_GROUP_CROSS_TRADE_DELIVERY_COORDINATOR = "DeliveryConfiguration.crossTradeDeliveryCoordinator";
+	public static final String FETCH_GROUP_THIS_DELIVERY_CONFIGURATION = "DeliveryConfiguration.this";
+
 	/**
 	 * @jdo.field primary-key="true"
 	 * @jdo.column length="100"

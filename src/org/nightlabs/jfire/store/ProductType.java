@@ -138,6 +138,8 @@ import org.nightlabs.util.Utils;
  * @jdo.fetch-group name="FetchGroupsTrade.articleInInvoiceEditor" fetch-groups="default" fields="name"
  * @jdo.fetch-group name="FetchGroupsTrade.articleInDeliveryNoteEditor" fetch-groups="default" fields="name"
  *
+ * @jdo.fetch-group name="FetchGroupsCrossTrade.ProductTypeForReseller" fetch-groups="default" fields="deliveryConfiguration, extendedProductType, fieldMetaDataMap, innerPriceConfig, localAccountantDelegate, localStorekeeperDelegate, managedProductTypeGroup, name, nestedProductTypes, owner, packagePriceConfig, productTypeGroups"
+ *
  * @jdo.query name="getProductTypesOfProductTypeGroup" query="
  *		SELECT
  *		WHERE

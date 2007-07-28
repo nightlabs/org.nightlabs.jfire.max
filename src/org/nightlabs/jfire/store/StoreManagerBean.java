@@ -1395,7 +1395,8 @@ implements SessionBean
 			PersistenceManager pm = getPersistenceManager();
 			String localOrganisationID = getOrganisationID();
 
-			Map<Class, Map<String, Map<Boolean, Set<Article>>>> productTypeClass2organisationID2articleSet = null; 
+//			Map<Class, Map<String, Map<Boolean, Set<Article>>>> productTypeClass2organisationID2articleSet = null;
+			Map<CrossTradeDeliveryCoordinator, Map<String, Map<Boolean, Set<Article>>>> productTypeClass2organisationID2articleSet = null;
 
 			Delivery delivery = (Delivery) pm.getObjectById(deliveryID);
 			for (Article article : delivery.getArticles()) {
@@ -1403,58 +1404,75 @@ implements SessionBean
 
 				for (ProductLocal nestedProductLocal : productLocal.getNestedProductLocals()) {
 					if (!localOrganisationID.equals(nestedProductLocal.getOrganisationID())) {
+						// supplier of the nested Product is a remote organisation => check, whether it's already here or needs delivery
+						if (nestedProductLocal.getQuantity() < 1) {
+							// quantity indicates that the product is not here - is it still at supplier?
 
-						if (productTypeClass2organisationID2articleSet == null)
-							productTypeClass2organisationID2articleSet = new HashMap<Class, Map<String,Map<Boolean,Set<Article>>>>();
+							if (!Repository.ANCHOR_TYPE_ID_HOME.equals(nestedProductLocal.getAnchor().getAnchorTypeID()))
+								throw new IllegalStateException("The nested product is not booked in a home repository. Cannot obtain it from supplier organisation! localArticle \"" + article.getPrimaryKey() + "\" + nestedProductLocal \"" + nestedProductLocal.getPrimaryKey() + "\"");
 
-						ProductType nestedProductType = nestedProductLocal.getProduct().getProductType();
-						Class nestedProductTypeClass = nestedProductType.getClass();
+							if (productTypeClass2organisationID2articleSet == null)
+//								productTypeClass2organisationID2articleSet = new HashMap<Class, Map<String,Map<Boolean,Set<Article>>>>();
+								productTypeClass2organisationID2articleSet = new HashMap<CrossTradeDeliveryCoordinator, Map<String,Map<Boolean,Set<Article>>>>();
 
-						Map<String, Map<Boolean, Set<Article>>> organisationID2articleSet = productTypeClass2organisationID2articleSet.get(nestedProductTypeClass);
-						if (organisationID2articleSet == null) {
-							organisationID2articleSet = new HashMap<String, Map<Boolean,Set<Article>>>();
-							productTypeClass2organisationID2articleSet.put(nestedProductTypeClass, organisationID2articleSet);
-						}
+							ProductType nestedProductType = nestedProductLocal.getProduct().getProductType();
+//							Class nestedProductTypeClass = nestedProductType.getClass();
 
-						Map<Boolean, Set<Article>> direction2articleSet = organisationID2articleSet.get(nestedProductLocal.getOrganisationID());
-						if (direction2articleSet == null) {
-							direction2articleSet = new HashMap<Boolean, Set<Article>>();
-							organisationID2articleSet.put(nestedProductLocal.getOrganisationID(), direction2articleSet);
-						}
+							if (nestedProductType.getDeliveryConfiguration() == null)
+								throw new IllegalStateException("productType.deliveryConfiguration is null!!! productType \"" + nestedProductType.getPrimaryKey() + "\" localArticle \"" + article.getPrimaryKey() + "\" + nestedProductLocal \"" + nestedProductLocal.getPrimaryKey() + "\"");
 
-						LegalEntity partner = OrganisationLegalEntity.getOrganisationLegalEntity(pm, nestedProductLocal.getOrganisationID(), OrganisationLegalEntity.ANCHOR_TYPE_ID_ORGANISATION, true);
+							CrossTradeDeliveryCoordinator crossTradeDeliveryCoordinator = nestedProductType.getDeliveryConfiguration().getCrossTradeDeliveryCoordinator();
+							if (crossTradeDeliveryCoordinator == null)
+								throw new IllegalStateException("productType.deliveryConfiguration.crossTradeDeliveryCoordinator is null!!! productType \"" + nestedProductType.getPrimaryKey() + "\" deliveryConfiguration \"" + nestedProductType.getDeliveryConfiguration().getPrimaryKey() + "\" localArticle \"" + article.getPrimaryKey() + "\" + nestedProductLocal \"" + nestedProductLocal.getPrimaryKey() + "\"");
 
-						Boolean directionIncoming = Boolean.TRUE;
-						if (article.isReversing())
-							directionIncoming = Boolean.FALSE;
+							Map<String, Map<Boolean, Set<Article>>> organisationID2articleSet = productTypeClass2organisationID2articleSet.get(crossTradeDeliveryCoordinator);
+							if (organisationID2articleSet == null) {
+								organisationID2articleSet = new HashMap<String, Map<Boolean,Set<Article>>>();
+								productTypeClass2organisationID2articleSet.put(crossTradeDeliveryCoordinator, organisationID2articleSet);
+							}
 
-						Set<Article> articleSet = direction2articleSet.get(directionIncoming);
-						if (articleSet == null) {
-							articleSet = new HashSet<Article>();
-							direction2articleSet.put(directionIncoming, articleSet);
-						}
+							Map<Boolean, Set<Article>> direction2articleSet = organisationID2articleSet.get(nestedProductLocal.getOrganisationID());
+							if (direction2articleSet == null) {
+								direction2articleSet = new HashMap<Boolean, Set<Article>>();
+								organisationID2articleSet.put(nestedProductLocal.getOrganisationID(), direction2articleSet);
+							}
 
-						// find the backhand-Article for this nestedProductLocal
-						OfferRequirement backhandOfferRequirement = OfferRequirement.getOfferRequirement(pm, article.getOffer(), true);
+							LegalEntity partner = OrganisationLegalEntity.getOrganisationLegalEntity(pm, nestedProductLocal.getOrganisationID(), OrganisationLegalEntity.ANCHOR_TYPE_ID_ORGANISATION, true);
 
-						Offer backhandOffer = backhandOfferRequirement.getPartnerOffer(partner);
-						if (backhandOffer == null)
-							throw new IllegalStateException("Cannot find backhand-Offer for local Article \"" + article.getPrimaryKey() + "\" + and nestedProductLocal \"" + nestedProductLocal.getPrimaryKey() + "\" and partnerLegalEntity \"" + partner.getPrimaryKey() + "\"");
+							Boolean directionIncoming = Boolean.TRUE;
+							if (article.isReversing())
+								directionIncoming = Boolean.FALSE;
 
-						Article backhandArticle = Article.getArticle(pm, backhandOffer, nestedProductLocal.getProduct());
-						if (backhandArticle == null)
-							throw new IllegalStateException("Cannot find backhand-Article for local Article \"" + article.getPrimaryKey() + "\" + and nestedProductLocal \"" + nestedProductLocal.getPrimaryKey() + "\"");
+							Set<Article> articleSet = direction2articleSet.get(directionIncoming);
+							if (articleSet == null) {
+								articleSet = new HashSet<Article>();
+								direction2articleSet.put(directionIncoming, articleSet);
+							}
 
-						articleSet.add(backhandArticle);
+							// find the backhand-Article for this nestedProductLocal
+							OfferRequirement backhandOfferRequirement = OfferRequirement.getOfferRequirement(pm, article.getOffer(), true);
+
+							Offer backhandOffer = backhandOfferRequirement.getPartnerOffer(partner);
+							if (backhandOffer == null)
+								throw new IllegalStateException("Cannot find backhand-Offer for local Article \"" + article.getPrimaryKey() + "\" + and nestedProductLocal \"" + nestedProductLocal.getPrimaryKey() + "\" and partnerLegalEntity \"" + partner.getPrimaryKey() + "\"");
+
+							Article backhandArticle = Article.getArticle(pm, backhandOffer, nestedProductLocal.getProduct());
+							if (backhandArticle == null)
+								throw new IllegalStateException("Cannot find backhand-Article for local Article \"" + article.getPrimaryKey() + "\" + and nestedProductLocal \"" + nestedProductLocal.getPrimaryKey() + "\"");
+
+							articleSet.add(backhandArticle);
+						} // if (nestedProductLocal.getQuantity() < 1) {
 					}
 				}
 			}
 
 			if (productTypeClass2organisationID2articleSet != null) {
-				for (Map.Entry<Class, Map<String, Map<Boolean, Set<Article>>>> me1 : productTypeClass2organisationID2articleSet.entrySet()) {
-					Class productTypeClass = me1.getKey();
-					ProductTypeActionHandler productTypeActionHandler = ProductTypeActionHandler.getProductTypeActionHandler(pm, productTypeClass);
-					CrossTradeDeliveryCoordinator crossTradeDeliveryCoordinator = productTypeActionHandler.getCrossTradeDeliveryCoordinator();
+//				for (Map.Entry<Class, Map<String, Map<Boolean, Set<Article>>>> me1 : productTypeClass2organisationID2articleSet.entrySet()) {
+//					Class productTypeClass = me1.getKey();
+//					ProductTypeActionHandler productTypeActionHandler = ProductTypeActionHandler.getProductTypeActionHandler(pm, productTypeClass);
+//					CrossTradeDeliveryCoordinator crossTradeDeliveryCoordinator = productTypeActionHandler.getCrossTradeDeliveryCoordinator();
+				for (Map.Entry<CrossTradeDeliveryCoordinator, Map<String, Map<Boolean, Set<Article>>>> me1 : productTypeClass2organisationID2articleSet.entrySet()) {
+					CrossTradeDeliveryCoordinator crossTradeDeliveryCoordinator = me1.getKey();
 
 					for (Map.Entry<String, Map<Boolean, Set<Article>>> me2 : me1.getValue().entrySet()) {
 //						String organisationID = me2.getKey();

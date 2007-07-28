@@ -4,7 +4,6 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Hashtable;
 
-import javax.jdo.JDOObjectNotFoundException;
 import javax.jdo.PersistenceManager;
 
 import org.nightlabs.annotation.Implement;
@@ -20,7 +19,6 @@ import org.nightlabs.jfire.trade.Article;
 import org.nightlabs.jfire.trade.Offer;
 import org.nightlabs.jfire.trade.id.OfferID;
 import org.nightlabs.jfire.trade.id.SegmentID;
-import org.nightlabs.jfire.transfer.id.AnchorID;
 
 /**
  * @author Marco Schulze - marco at nightlabs dot de
@@ -59,62 +57,15 @@ public class DynamicProductTypeActionHandler
 //			return getDefaultForeignHome(pm, store);
 	}
 
-	private static AnchorID localHomeID = null;
-
 	protected static Repository getDefaultLocalHome(PersistenceManager pm, Store store)
 	{
-		if (localHomeID == null) {
-			localHomeID = AnchorID.create(
-					store.getOrganisationID(),
-					Repository.ANCHOR_TYPE_ID_HOME,
-					ANCHOR_ID_REPOSITORY_HOME_LOCAL);
-		}
-
-		pm.getExtent(Repository.class);
-		Repository home;
-		try {
-			home = (Repository) pm.getObjectById(localHomeID);
-		} catch (JDOObjectNotFoundException x) {
-			home = new Repository(
-					localHomeID.organisationID,
-					localHomeID.anchorTypeID,
-					localHomeID.anchorID,
-					store.getMandator(), false);
-
-			pm.makePersistent(home);
-		}
-
-		return home;
+		return Repository.createRepository(
+				pm,
+				store.getOrganisationID(),
+				Repository.ANCHOR_TYPE_ID_HOME,
+				ANCHOR_ID_REPOSITORY_HOME_LOCAL,
+				store.getMandator(), false);
 	}
-
-	private static AnchorID foreignHomeID = null;
-
-//	protected static Repository getDefaultForeignHome(PersistenceManager pm, Store store)
-//	{
-//		if (foreignHomeID == null) {
-//			foreignHomeID = AnchorID.create(
-//					store.getOrganisationID(),
-//					Repository.ANCHOR_TYPE_ID_HOME,
-//					ANCHOR_ID_REPOSITORY_HOME_FOREIGN);
-//		}
-//
-//		pm.getExtent(Repository.class);
-//		Repository home;
-//		try {
-//			home = (Repository) pm.getObjectById(foreignHomeID);
-//		} catch (JDOObjectNotFoundException x) {
-//			home = new Repository(
-//					foreignHomeID.organisationID,
-//					foreignHomeID.anchorTypeID,
-//					foreignHomeID.anchorID,
-//					store.getMandator(), false);
-//
-//			pm.makePersistent(home);
-//		}
-//
-//		return home;
-//	}
-
 
 	/**
 	 * @deprecated Only for JDO!

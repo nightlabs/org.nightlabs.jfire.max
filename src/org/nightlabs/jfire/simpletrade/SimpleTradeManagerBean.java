@@ -49,6 +49,7 @@ import javax.jdo.JDOHelper;
 import javax.jdo.JDOObjectNotFoundException;
 import javax.jdo.PersistenceManager;
 import javax.jdo.Query;
+import javax.jdo.annotations.Property;
 
 import org.apache.log4j.Logger;
 import org.nightlabs.ModuleException;
@@ -95,6 +96,7 @@ import org.nightlabs.jfire.store.CannotPublishProductTypeException;
 import org.nightlabs.jfire.store.NestedProductType;
 import org.nightlabs.jfire.store.ProductType;
 import org.nightlabs.jfire.store.Store;
+import org.nightlabs.jfire.store.deliver.CrossTradeDeliveryCoordinator;
 import org.nightlabs.jfire.store.deliver.DeliveryConfiguration;
 import org.nightlabs.jfire.store.deliver.ModeOfDelivery;
 import org.nightlabs.jfire.store.deliver.ModeOfDeliveryConst;
@@ -202,6 +204,7 @@ implements SessionBean
 			DeliveryConfiguration deliveryConfiguration = new DeliveryConfiguration(organisationID, "JFireSimpleTrade.default");
 			deliveryConfiguration.getName().setText(Locale.ENGLISH.getLanguage(), "Default Delivery Configuration for JFireSimpleTrade");
 			deliveryConfiguration.getName().setText(Locale.GERMAN.getLanguage(), "Standard-Liefer-Konfiguration für JFireSimpleTrade");
+			deliveryConfiguration.setCrossTradeDeliveryCoordinator(CrossTradeDeliveryCoordinator.getDefaultCrossTradeDeliveryCoordinator(pm));
 			pm.getExtent(ModeOfDelivery.class);
 
 			try {
@@ -1001,7 +1004,11 @@ implements SessionBean
 		PersistenceManager pm = getPersistenceManager();
 		try {
 			pm.getExtent(SimpleProductType.class);
-			pm.getFetchPlan().setGroups(new String[] { FetchPlan.DEFAULT, FetchGroupsPriceConfig.FETCH_GROUP_EDIT });
+			pm.getFetchPlan().setGroups(new String[] {
+					FetchPlan.DEFAULT,
+					FetchGroupsPriceConfig.FETCH_GROUP_EDIT,
+					DeliveryConfiguration.FETCH_GROUP_THIS_DELIVERY_CONFIGURATION
+					});
 			pm.getFetchPlan().setMaxFetchDepth(NLJDOHelper.MAX_FETCH_DEPTH_NO_LIMIT);
 			pm.getFetchPlan().setDetachmentOptions(FetchPlan.DETACH_LOAD_FIELDS);
 
@@ -1018,6 +1025,7 @@ implements SessionBean
 				simpleProductType.getPackagePriceConfig();
 				simpleProductType.getOwner();
 				simpleProductType.getExtendedProductType();
+				simpleProductType.getDeliveryConfiguration();
 
 				// and detach
 				simpleProductType = (SimpleProductType) pm.detachCopy(simpleProductType);

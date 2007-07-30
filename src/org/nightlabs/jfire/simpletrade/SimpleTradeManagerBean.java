@@ -49,7 +49,6 @@ import javax.jdo.JDOHelper;
 import javax.jdo.JDOObjectNotFoundException;
 import javax.jdo.PersistenceManager;
 import javax.jdo.Query;
-import javax.jdo.annotations.Property;
 
 import org.apache.log4j.Logger;
 import org.nightlabs.ModuleException;
@@ -197,7 +196,7 @@ implements SessionBean
 
 			SimpleProductTypeActionHandler simpleProductTypeActionHandler = new SimpleProductTypeActionHandler(
 					Organisation.DEVIL_ORGANISATION_ID, SimpleProductTypeActionHandler.class.getName(), SimpleProductType.class);
-			simpleProductTypeActionHandler = pm.makePersistent(simpleProductTypeActionHandler);
+			simpleProductTypeActionHandler = (SimpleProductTypeActionHandler) pm.makePersistent(simpleProductTypeActionHandler);
 
 			Store store = Store.getStore(pm);
 //			Accounting accounting = Accounting.getAccounting(pm);

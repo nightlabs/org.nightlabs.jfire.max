@@ -61,8 +61,8 @@ extends Initialiser
 		priceConfig50.addCurrency(dataCreator.getCurrencyEUR());
 		priceConfig50.setPrice(dataCreator.getCurrencyEUR(), new Long(5000));
 
-		Account accountNormalEur = new Account(organisationID, VoucherLocalAccountantDelegate.ACCOUNT_ANCHOR_TYPE_ID_VOUCHER, "voucherType.normal.eur", dataCreator.getOrganisationLegalEntity(), dataCreator.getCurrencyEUR());
-		Account accountXmasEur = new Account(organisationID, VoucherLocalAccountantDelegate.ACCOUNT_ANCHOR_TYPE_ID_VOUCHER, "voucherType.xmas.eur", dataCreator.getOrganisationLegalEntity(), dataCreator.getCurrencyEUR());
+		Account accountNormalEur = new Account(organisationID, VoucherLocalAccountantDelegate.ACCOUNT_ANCHOR_TYPE_ID_VOUCHER, "voucherType.normal.eur", dataCreator.getOrganisationLegalEntity(), dataCreator.getCurrencyEUR(), false);
+		Account accountXmasEur = new Account(organisationID, VoucherLocalAccountantDelegate.ACCOUNT_ANCHOR_TYPE_ID_VOUCHER, "voucherType.xmas.eur", dataCreator.getOrganisationLegalEntity(), dataCreator.getCurrencyEUR(), false);
 
 		VoucherLocalAccountantDelegate localAccountantDelegateNormal = new VoucherLocalAccountantDelegate(organisationID, "voucherType.normal");
 		localAccountantDelegateNormal.setAccount(dataCreator.getCurrencyEUR().getCurrencyID(), accountNormalEur);

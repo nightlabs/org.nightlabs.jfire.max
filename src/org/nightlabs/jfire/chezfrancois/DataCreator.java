@@ -253,7 +253,7 @@ public class DataCreator
 		Currency euro = getCurrencyEUR();
 
 		Account account = new Account(
-				organisationID, Account.ANCHOR_TYPE_ID_LOCAL_REVENUE_IN, anchorID, organisationLegalEntity, euro);
+				organisationID, Account.ANCHOR_TYPE_ID_LOCAL_REVENUE_IN, anchorID, organisationLegalEntity, euro, false);
 		account.getName().setText(languageID, name);
 
 		pm.makePersistent(account);

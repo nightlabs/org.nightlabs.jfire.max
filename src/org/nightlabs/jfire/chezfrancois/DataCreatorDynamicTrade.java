@@ -11,7 +11,6 @@ import org.nightlabs.jfire.accounting.priceconfig.IInnerPriceConfig;
 import org.nightlabs.jfire.accounting.priceconfig.PriceConfig;
 import org.nightlabs.jfire.dynamictrade.accounting.priceconfig.PackagePriceConfig;
 import org.nightlabs.jfire.dynamictrade.store.DynamicProductType;
-import org.nightlabs.jfire.dynamictrade.store.DynamicProductTypeActionHandler;
 import org.nightlabs.jfire.idgenerator.IDGenerator;
 import org.nightlabs.jfire.security.User;
 import org.nightlabs.jfire.store.CannotConfirmProductTypeException;
@@ -66,7 +65,7 @@ extends DataCreator
 
 		pt.getFieldMetaData("localAccountantDelegate").setValueInherited(false);
 		
-		store.addProductType(user, pt, DynamicProductTypeActionHandler.getDefaultHome(pm, pt));
+		store.addProductType(user, pt); // , DynamicProductTypeActionHandler.getDefaultHome(pm, pt));
 		store.setProductTypeStatus_published(user, pt);
 
 		return pt;
@@ -92,7 +91,7 @@ extends DataCreator
 		else {
 			pt.setInnerPriceConfig(category.getInnerPriceConfig());
 		}
-		store.addProductType(user, pt, DynamicProductTypeActionHandler.getDefaultHome(pm, pt));
+		store.addProductType(user, pt); // , DynamicProductTypeActionHandler.getDefaultHome(pm, pt));
 		store.setProductTypeStatus_published(user, pt);
 		store.setProductTypeStatus_confirmed(user, pt);
 

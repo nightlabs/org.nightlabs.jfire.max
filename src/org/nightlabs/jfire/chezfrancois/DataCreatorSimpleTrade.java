@@ -58,7 +58,6 @@ import org.nightlabs.jfire.prop.datafield.I18nTextDataField;
 import org.nightlabs.jfire.prop.datafield.ImageDataField;
 import org.nightlabs.jfire.security.User;
 import org.nightlabs.jfire.simpletrade.store.SimpleProductType;
-import org.nightlabs.jfire.simpletrade.store.SimpleProductTypeActionHandler;
 import org.nightlabs.jfire.simpletrade.store.prop.SimpleProductTypeStruct;
 import org.nightlabs.jfire.store.CannotConfirmProductTypeException;
 import org.nightlabs.jfire.store.CannotMakeProductTypeSaleableException;
@@ -101,7 +100,7 @@ extends DataCreator
 				ProductType.INHERITANCE_NATURE_BRANCH, ProductType.PACKAGE_NATURE_OUTER);
 		setNames(pt.getName(), names);
 
-		store.addProductType(user, pt, SimpleProductTypeActionHandler.getDefaultHome(pm, pt));
+		store.addProductType(user, pt); // , SimpleProductTypeActionHandler.getDefaultHome(pm, pt));
 		store.setProductTypeStatus_published(user, pt);
 
 		return pt;
@@ -120,7 +119,7 @@ extends DataCreator
 		pt.setPackagePriceConfig(new StablePriceConfig(IDGenerator.getOrganisationID(), IDGenerator.nextID(PriceConfig.class)));
 		pt.getFieldMetaData("innerPriceConfig").setValueInherited(false);
 		pt.setInnerPriceConfig(innerPriceConfig);
-		store.addProductType(user, pt, SimpleProductTypeActionHandler.getDefaultHome(pm, pt));
+		store.addProductType(user, pt); // , SimpleProductTypeActionHandler.getDefaultHome(pm, pt));
 
 		store.setProductTypeStatus_published(user, pt);
 		store.setProductTypeStatus_confirmed(user, pt);

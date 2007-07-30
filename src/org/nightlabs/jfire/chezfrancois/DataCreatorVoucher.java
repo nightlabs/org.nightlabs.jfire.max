@@ -15,7 +15,6 @@ import org.nightlabs.jfire.store.ProductType;
 import org.nightlabs.jfire.store.id.ProductTypeID;
 import org.nightlabs.jfire.voucher.accounting.VoucherLocalAccountantDelegate;
 import org.nightlabs.jfire.voucher.store.VoucherType;
-import org.nightlabs.jfire.voucher.store.VoucherTypeActionHandler;
 
 public class DataCreatorVoucher
 		extends DataCreator
@@ -69,7 +68,7 @@ public class DataCreatorVoucher
 		else
 			pt.setLocalAccountantDelegate(parent.getLocalAccountantDelegate());
 
-		store.addProductType(user, pt, VoucherTypeActionHandler.getDefaultHome(pm, pt));
+		store.addProductType(user, pt); // , VoucherTypeActionHandler.getDefaultHome(pm, pt));
 		store.setProductTypeStatus_published(user, pt);
 
 		return pt;
@@ -101,7 +100,7 @@ public class DataCreatorVoucher
 		else
 			pt.setLocalAccountantDelegate(category.getLocalAccountantDelegate());
 
-		store.addProductType(user, pt, VoucherTypeActionHandler.getDefaultHome(pm, pt));
+		store.addProductType(user, pt); // , VoucherTypeActionHandler.getDefaultHome(pm, pt));
 
 		store.setProductTypeStatus_published(user, pt);
 		store.setProductTypeStatus_confirmed(user, pt);

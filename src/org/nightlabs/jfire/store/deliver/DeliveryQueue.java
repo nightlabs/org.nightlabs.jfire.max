@@ -12,8 +12,8 @@ import javax.jdo.PersistenceManager;
 import javax.jdo.Query;
 import javax.jdo.listener.AttachCallback;
 
+import org.apache.log4j.Logger;
 import org.nightlabs.jfire.idgenerator.IDGenerator;
-import org.nightlabs.jfire.store.deliver.id.DeliveryID;
 import org.nightlabs.jfire.store.deliver.id.DeliveryQueueID;
 
 
@@ -38,6 +38,8 @@ import org.nightlabs.jfire.store.deliver.id.DeliveryQueueID;
  * 		query="SELECT WHERE !defunct || defunct == :includeDefunct"
  */
 public class DeliveryQueue implements Serializable, AttachCallback {
+	
+	private static final Logger logger = Logger.getLogger(DeliveryQueue.class);
 	
 	public static final String FETCH_GROUP_DELIVERY_QUEUE = "DeliveryQueue.this";
 	public static final String FETCH_GROUP_NAME = "DeliveryQueue.name";
@@ -216,19 +218,24 @@ public class DeliveryQueue implements Serializable, AttachCallback {
 	}
 
 	public void jdoPreAttach() {
+		logger.debug("DeliveryQueue#jdoPreAttach() - start");
 		try {
 			checkDirtyStates(outstandingDeliverySet);
 			checkDirtyStates(deliverySet);
 		} catch(JDODetachedFieldAccessException e) {
+			logger.debug("JDODetachedFieldAccessException thrown.");
 			// do nothing
 			
 			// FIXME WORKAROUND
 			// Somehow the fetchgroups returned in DeliveryQueueConfigModuleController#getConfigModuleFetchGroups are not used properly
 			// when retrievingthe DeliveryQueueConfigModule along with its DeliveryQueues.
 		}
+		logger.debug("DeliveryQueue#jdoPreAttach() - end");
 	}
 	
 	public void jdoPostAttach(Object attached) {
+		logger.debug("DeliveryQueue#jdoPostAttach() - start");
+		logger.debug("DeliveryQueue#jdoPostAttach() - end");
 	}
 	
 	private void checkDirtyStates(Collection<Delivery> deliveries) {

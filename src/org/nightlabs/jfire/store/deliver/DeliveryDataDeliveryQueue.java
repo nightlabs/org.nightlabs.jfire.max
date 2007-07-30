@@ -1,7 +1,14 @@
 package org.nightlabs.jfire.store.deliver;
- 
+
+import javax.jdo.JDOHelper;
+import javax.jdo.PersistenceManager;
+import javax.jdo.listener.AttachCallback;
+import javax.jdo.listener.StoreCallback;
+
+import org.nightlabs.jfire.store.deliver.id.DeliveryQueueID;
+
 /**
- * @author Tobias Langner <!-- tobias[dot]langner[at]nightlabs[dot]de -->
+ * @author Tobias Langner (tobias[dot]langner[at]nightlabs[dot]de)
  *
  * @jdo.persistence-capable
  *    identity-type="application"
@@ -11,24 +18,51 @@ package org.nightlabs.jfire.store.deliver;
  *
  * @jdo.inheritance strategy="new-table"
  */
-public class DeliveryDataDeliveryQueue extends DeliveryData {
- 
-  private static final long serialVersionUID = 1L;
- 
-  /**
-   * @jdo.field persistence-modifier="persistent"
-   */
-  private DeliveryQueue targetQueue;
- 
-  public DeliveryDataDeliveryQueue(Delivery delivery) {
-    super(delivery);
-  }
- 
-  public void setTargetQueue(DeliveryQueue targetQueue) {
-    this.targetQueue = targetQueue;
-  }
- 
-  public DeliveryQueue getTargetQueue() {
-    return targetQueue;
-  }
+public class DeliveryDataDeliveryQueue extends DeliveryData implements StoreCallback, AttachCallback {
+	private static final long serialVersionUID = 1L;
+
+	/**
+	 * @jdo.field persistence-modifier="none"
+	 */
+	private DeliveryQueueID targetQueueID;
+
+	/**
+	 * @jdo.field persistence-modifier="persistent"
+	 */
+	private DeliveryQueue targetQueue;
+
+	public DeliveryDataDeliveryQueue(Delivery delivery) {
+		super(delivery);
+	}
+
+	public void setTargetQueue(DeliveryQueue targetQueue) {
+		this.targetQueue = targetQueue;
+	}
+
+	public DeliveryQueue getTargetQueue() {
+		return targetQueue;
+	}
+
+	public void jdoPreStore() {
+		ensureCorrectTargetQueue(targetQueueID);
+	}
+
+	public void jdoPostAttach(Object detached) {
+		ensureCorrectTargetQueue(((DeliveryDataDeliveryQueue) detached).targetQueueID);
+	}
+
+	private void ensureCorrectTargetQueue(DeliveryQueueID targetQueueID) {
+		if (targetQueueID == null)
+			return;
+		
+		PersistenceManager pm = JDOHelper.getPersistenceManager(this);
+		targetQueue = (DeliveryQueue) pm.getObjectById(targetQueueID);
+	}
+
+	public void prepareForUpload() {
+		targetQueueID = (DeliveryQueueID) JDOHelper.getObjectId(targetQueue);
+	}
+
+	public void jdoPreAttach() {
+	}
 }

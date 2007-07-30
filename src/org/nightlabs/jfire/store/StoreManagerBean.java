@@ -45,6 +45,7 @@ import javax.ejb.EJBException;
 import javax.ejb.SessionBean;
 import javax.ejb.SessionContext;
 import javax.jdo.FetchPlan;
+import javax.jdo.JDOHelper;
 import javax.jdo.JDOObjectNotFoundException;
 import javax.jdo.PersistenceManager;
 
@@ -88,6 +89,7 @@ import org.nightlabs.jfire.store.deliver.ModeOfDeliveryFlavour.ModeOfDeliveryFla
 import org.nightlabs.jfire.store.deliver.ModeOfDeliveryFlavour.ModeOfDeliveryFlavourProductTypeGroupCarrier;
 import org.nightlabs.jfire.store.deliver.id.DeliveryDataID;
 import org.nightlabs.jfire.store.deliver.id.DeliveryID;
+import org.nightlabs.jfire.store.deliver.id.DeliveryQueueID;
 import org.nightlabs.jfire.store.deliver.id.ModeOfDeliveryFlavourID;
 import org.nightlabs.jfire.store.id.DeliveryNoteID;
 import org.nightlabs.jfire.store.id.DeliveryNoteLocalID;
@@ -1616,6 +1618,59 @@ implements SessionBean
 			pm.close();
 		}
 	}
+
+	/**
+	 * Returns the {@link DeliveryQueue}s identified by the given IDs.
+	 * @param deliveryQueueIds The IDs of the DeliveryQueues to be returned.
+	 * @param fetchGroups The fetch groups to be used to detach the DeliveryQueues
+	 * @param fetchDepth The fetch depth to be used to detach the DeliveryQueues (-1 for unlimited)
+	 * @return the {@link DeliveryQueue}s identified by the given IDs.
+	 * 
+	 * @ejb.interface-method
+	 * @ejb.permission role-name="_Guest_"
+	 */
+	public Collection<DeliveryQueue> getDeliveryQueuesById(Set<DeliveryQueueID> deliveryQueueIds, String[] fetchGroups, int fetchDepth) {
+		PersistenceManager pm = getPersistenceManager();
+		try {
+			pm.getFetchPlan().setFetchSize(fetchDepth);
+			if (fetchGroups != null)
+				pm.getFetchPlan().setGroups(fetchGroups);
+			
+			return pm.detachCopyAll(pm.getObjectsById(deliveryQueueIds));
+		} finally {
+			pm.close();
+		}
+	}
+	
+	/**
+	 * Stores the given DeliveryQueues in the data store.
+	 * 
+	 * @param deliveryQueues The {@link DeliveryQueue} to be stored
+	 * @param get Indicates whether this method should return a collection containing the detached copies of the stored DeliveryQueues.
+	 * @param fetchGroups The fetchGroups to be used when get == true
+	 * @param fetchDepth The fetchDepth to be used when get == true
+	 * @return A collection of the detached copies of the stored {@link DeliveryQueue}s
+	 * 
+	 * @ejb.interface-method
+	 * @ejb.permission role-name="_Guest_"
+	 */
+	public Collection<DeliveryQueue> storeDeliveryQueues(Collection<DeliveryQueue> deliveryQueues, boolean get, String[] fetchGroups, int fetchDepth) {
+		PersistenceManager pm = getPersistenceManager();
+		try {
+			pm.getFetchPlan().setFetchSize(fetchDepth);
+			if (fetchGroups != null)
+				pm.getFetchPlan().setGroups(fetchGroups);
+			
+			deliveryQueues = pm.makePersistentAll(deliveryQueues);
+			
+			if (get)		
+				return pm.detachCopyAll(deliveryQueues);
+			else
+				return null;
+		} finally {
+			pm.close();
+		}
+	}
 	
 	/**
 	 * Returns all {@link DeliveryQueue}s available.
@@ -1642,19 +1697,7 @@ implements SessionBean
 		}
 	}
 	
-	/**
-	 * Returns all {@link DeliveryQueue}s available without the ones that have been marked as deleted.
-	 * @return All {@link DeliveryQueue}s available without the ones that have been marked as deleted.
-	 * 
-	 * @ejb.interface-method
-	 * @ejb.permission role-name="_Guest_"
-	 * 
-	 * @param fetchGroups The desired fetch groups
-	 * @param fetchDepth The desired JDO fetch depth
-	 */
-	public Collection<DeliveryQueue> getAvailableDeliveryQueues(String[] fetchGroups, int fetchDepth) {
-		return getAvailableDeliveryQueues(fetchGroups, fetchDepth, false);
-	}
+	
 	
 	/**
 	 * Stores the given {@link DeliveryQueue}.
@@ -1687,6 +1730,22 @@ implements SessionBean
 			pm.close();
 		}
 	}
+	
+	/**
+	 * Returns all {@link DeliveryQueue}s available without the ones that have been marked as deleted.
+	 * @return All {@link DeliveryQueue}s available without the ones that have been marked as deleted.
+	 * 
+	 * @ejb.interface-method
+	 * @ejb.permission role-name="_Guest_"
+	 * 
+	 * @param fetchGroups The desired fetch groups
+	 * @param fetchDepth The desired JDO fetch depth
+	 */
+	public Collection<DeliveryQueue> getAvailableDeliveryQueues(String[] fetchGroups, int fetchDepth) {
+		return getAvailableDeliveryQueues(fetchGroups, fetchDepth, false);
+	}
+	
+	
 	
 	private List<DeliveryQueue> storeDeliveryQueues(Collection<DeliveryQueue> deliveryQueues, PersistenceManager pm) {
 		List<DeliveryQueue> pqs = new LinkedList<DeliveryQueue>();

@@ -18,7 +18,6 @@ import org.nightlabs.jfire.store.Product;
 import org.nightlabs.jfire.store.ProductLocator;
 import org.nightlabs.jfire.store.ProductType;
 import org.nightlabs.jfire.store.ProductTypeActionHandler;
-import org.nightlabs.jfire.store.Repository;
 import org.nightlabs.jfire.store.Store;
 import org.nightlabs.jfire.store.id.DeliveryNoteActionHandlerID;
 import org.nightlabs.jfire.trade.Article;
@@ -41,47 +40,47 @@ public class VoucherTypeActionHandler
 {
 	private static final Logger logger = Logger.getLogger(VoucherTypeActionHandler.class);
 
-	/**
-	 * This is the {@link org.nightlabs.jfire.transfer.Anchor#getAnchorID()} of
-	 * the {@link Repository} which becomes the factory-output-repository for all
-	 * newly created {@link SimpleProduct}s.
-	 */
-	public static final String ANCHOR_ID_REPOSITORY_HOME_LOCAL = VoucherType.class.getName() + ".local";
-
-	/**
-	 * This is the {@link org.nightlabs.jfire.transfer.Anchor#getAnchorID()} of
-	 * the {@link Repository} which is used for products that are bought from a foreign organisation.
-	 */
-	public static final String ANCHOR_ID_REPOSITORY_HOME_FOREIGN = VoucherType.class.getName() + ".foreign";
-
-	public static Repository getDefaultHome(PersistenceManager pm, VoucherType voucherType)
-	{
-		Store store = Store.getStore(pm);
-		if (store.getOrganisationID().equals(voucherType.getOrganisationID()))
-			return getDefaultLocalHome(pm, store);
-		else
-			return getDefaultForeignHome(pm, store);
-	}
-
-	protected static Repository getDefaultLocalHome(PersistenceManager pm, Store store)
-	{
-		return Repository.createRepository(
-				pm,
-				store.getOrganisationID(),
-				Repository.ANCHOR_TYPE_ID_HOME,
-				ANCHOR_ID_REPOSITORY_HOME_LOCAL,
-				store.getMandator(), false);
-	}
-
-	protected static Repository getDefaultForeignHome(PersistenceManager pm, Store store)
-	{
-		return Repository.createRepository(
-				pm, 
-				store.getOrganisationID(),
-				Repository.ANCHOR_TYPE_ID_HOME,
-				ANCHOR_ID_REPOSITORY_HOME_FOREIGN,
-				store.getMandator(), false);
-	}
+//	/**
+//	 * This is the {@link org.nightlabs.jfire.transfer.Anchor#getAnchorID()} of
+//	 * the {@link Repository} which becomes the factory-output-repository for all
+//	 * newly created {@link SimpleProduct}s.
+//	 */
+//	public static final String ANCHOR_ID_REPOSITORY_HOME_LOCAL = VoucherType.class.getName() + ".local";
+//
+//	/**
+//	 * This is the {@link org.nightlabs.jfire.transfer.Anchor#getAnchorID()} of
+//	 * the {@link Repository} which is used for products that are bought from a foreign organisation.
+//	 */
+//	public static final String ANCHOR_ID_REPOSITORY_HOME_FOREIGN = VoucherType.class.getName() + ".foreign";
+//
+//	public static Repository getDefaultHome(PersistenceManager pm, VoucherType voucherType)
+//	{
+//		Store store = Store.getStore(pm);
+//		if (store.getOrganisationID().equals(voucherType.getOrganisationID()))
+//			return getDefaultLocalHome(pm, store);
+//		else
+//			return getDefaultForeignHome(pm, store);
+//	}
+//
+//	protected static Repository getDefaultLocalHome(PersistenceManager pm, Store store)
+//	{
+//		return Repository.createRepository(
+//				pm,
+//				store.getOrganisationID(),
+//				Repository.ANCHOR_TYPE_ID_HOME,
+//				ANCHOR_ID_REPOSITORY_HOME_LOCAL,
+//				store.getMandator(), false);
+//	}
+//
+//	protected static Repository getDefaultForeignHome(PersistenceManager pm, Store store)
+//	{
+//		return Repository.createRepository(
+//				pm, 
+//				store.getOrganisationID(),
+//				Repository.ANCHOR_TYPE_ID_HOME,
+//				ANCHOR_ID_REPOSITORY_HOME_FOREIGN,
+//				store.getMandator(), false);
+//	}
 
 	/**
 	 * @deprecated Only for JDO!
@@ -130,7 +129,7 @@ public class VoucherTypeActionHandler
 						product = new Voucher(vt, Voucher.createProductID());
 						vtl.setCreatedVoucherCount(createdProductCount + 1);
 
-						store.addProduct(user, product, (Repository)vt.getProductTypeLocal().getHome());
+						store.addProduct(user, product); // , (Repository)vt.getProductTypeLocal().getHome());
 						res.add(product);
 					}
 				} // This productType is factored by this organisation

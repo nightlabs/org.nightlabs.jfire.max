@@ -183,6 +183,7 @@ implements SessionBean
 
 			User user = User.getUser(pm, getPrincipal());
 
+			// create the ProductTypeActionHandler for VoucherTypes
 			VoucherTypeActionHandler voucherTypeActionHandler = new VoucherTypeActionHandler(
 					Organisation.DEVIL_ORGANISATION_ID, VoucherTypeActionHandler.class
 							.getName(), VoucherType.class);
@@ -210,8 +211,7 @@ implements SessionBean
 						ProductType.PACKAGE_NATURE_OUTER);
 				rootVoucherType.getName().setText(Locale.ENGLISH.getLanguage(), LocalOrganisation.getLocalOrganisation(pm).getOrganisation().getPerson().getDisplayName());
 				rootVoucherType.setDeliveryConfiguration(deliveryConfiguration);
-				store.addProductType(user, rootVoucherType, VoucherTypeActionHandler
-						.getDefaultHome(pm, rootVoucherType));
+				store.addProductType(user, rootVoucherType); // , VoucherTypeActionHandler.getDefaultHome(pm, rootVoucherType));
 				store.setProductTypeStatus_published(user, rootVoucherType);
 			}
 
@@ -474,8 +474,8 @@ implements SessionBean
 				voucherType = (VoucherType) pm.makePersistent(voucherType);
 			} else {
 				voucherType = (VoucherType) Store.getStore(pm).addProductType(User.getUser(pm, getPrincipal()),
-						voucherType,
-						VoucherTypeActionHandler.getDefaultHome(pm, voucherType));
+						voucherType);
+//						VoucherTypeActionHandler.getDefaultHome(pm, voucherType));
 			}
 
 			// take care about the inheritance

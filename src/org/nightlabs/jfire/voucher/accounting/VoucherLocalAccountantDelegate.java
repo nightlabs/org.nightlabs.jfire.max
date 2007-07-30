@@ -4,6 +4,7 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.Map;
+import java.util.Set;
 
 import javax.jdo.JDOHelper;
 import javax.jdo.PersistenceManager;
@@ -77,7 +78,7 @@ extends LocalAccountantDelegate
 	@Implement
 	public void bookArticle(OrganisationLegalEntity mandator, User user,
 			Invoice invoice, Article article, BookMoneyTransfer container,
-			Map<String, Anchor> involvedAnchors)
+			Set<Anchor> involvedAnchors)
 	{
 		LinkedList<ArticlePrice> articlePriceStack = new LinkedList<ArticlePrice>();
 		articlePriceStack.add(article.getPrice());
@@ -109,7 +110,7 @@ extends LocalAccountantDelegate
 	}
 
 	@Override
-	public void bookProductTypeParts(OrganisationLegalEntity mandator, User user, LinkedList<ArticlePrice> articlePriceStack, int delegationLevel, BookMoneyTransfer container, Map<String, Anchor> involvedAnchors) {
+	public void bookProductTypeParts(OrganisationLegalEntity mandator, User user, LinkedList<ArticlePrice> articlePriceStack, int delegationLevel, BookMoneyTransfer container, Set<Anchor> involvedAnchors) {
 		ArticlePrice articlePrice = articlePriceStack.peek();
 		PersistenceManager pm = getPersistenceManager();
 		String currencyID = articlePrice.getCurrency().getCurrencyID();

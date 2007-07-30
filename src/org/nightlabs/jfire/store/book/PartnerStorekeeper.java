@@ -26,15 +26,18 @@
 
 package org.nightlabs.jfire.store.book;
 
-import java.util.Map;
+import java.util.Set;
 
 import javax.jdo.PersistenceManager;
 
+import org.apache.log4j.Logger;
+import org.nightlabs.jfire.idgenerator.IDGenerator;
 import org.nightlabs.jfire.security.User;
 import org.nightlabs.jfire.store.ProductTransfer;
 import org.nightlabs.jfire.store.Repository;
 import org.nightlabs.jfire.store.deliver.DeliverProductTransfer;
 import org.nightlabs.jfire.trade.LegalEntity;
+import org.nightlabs.jfire.trade.OrganisationLegalEntity;
 import org.nightlabs.jfire.transfer.Anchor;
 import org.nightlabs.jfire.transfer.Transfer;
 
@@ -51,6 +54,8 @@ import org.nightlabs.jfire.transfer.Transfer;
  */
 public class PartnerStorekeeper extends Storekeeper
 {
+	private static final long serialVersionUID = 1L;
+
 	/**
 	 * @deprecated Only for JDO!
 	 */
@@ -62,7 +67,7 @@ public class PartnerStorekeeper extends Storekeeper
 	}
 
 	public void bookTransfer(User user, LegalEntity mandator,
-			ProductTransfer transfer, Map involvedAnchors)
+			ProductTransfer transfer, Set<Anchor> involvedAnchors)
 	{
 		if (transfer instanceof BookProductTransfer)
 			handleBookOrDeliveryProductTransfer(user, mandator, transfer, involvedAnchors);
@@ -74,11 +79,25 @@ public class PartnerStorekeeper extends Storekeeper
 			handleSimpleProductTransfer(user, mandator, transfer, involvedAnchors);
 	}
 
-	protected static Repository createPartnerInsideRepository(
-			PersistenceManager pm, String organisationID, LegalEntity mandator)
+	/**
+	 * @param pm Accessor to the datastore.
+	 * @param organisationID The organisationID of the new Repository.
+	 * @param repositoryOwner This will be the owner of the new repository. Should be the partner!
+	 * @return
+	 */
+	protected static Repository createPartnerInsideRepository( // the partner must be the owner of this inside repository
+			PersistenceManager pm, String organisationID, LegalEntity repositoryOwner)
 	{
-		String anchorID = mandator.getOrganisationID() + '.' + mandator.getAnchorTypeID() + '.' + mandator.getAnchorID();
-		return Repository.createRepository(pm, organisationID, Repository.ANCHOR_TYPE_ID_BIN, anchorID, mandator, false);
+		// TODO remove this! begin DEBUG check
+		if (repositoryOwner instanceof OrganisationLegalEntity) {
+			OrganisationLegalEntity rOwner = (OrganisationLegalEntity) repositoryOwner;
+			if (rOwner.getOrganisation().equals(IDGenerator.getOrganisationID()))
+				Logger.getLogger(PartnerStorekeeper.class).warn("", new IllegalStateException("The repositoryOwner is the local organisation but should be the partner!"));
+		}
+		// TODO remove this! end DEBUG check
+
+		String anchorID = repositoryOwner.getOrganisationID() + '#' + repositoryOwner.getAnchorTypeID() + '#' + repositoryOwner.getAnchorID();
+		return Repository.createRepository(pm, organisationID, Repository.ANCHOR_TYPE_ID_HOME, anchorID, repositoryOwner, false);
 
 //		try {
 //			return (Repository) pm.getObjectById(AnchorID.create(
@@ -92,11 +111,29 @@ public class PartnerStorekeeper extends Storekeeper
 //		}
 	}
 
+	/**
+	 * @param pm Accessor to the datastore.
+	 * @param organisationID The organisationID of the new Repository.
+	 * @param repositoryOwner This will be the owner of the new repository. Should be the partner!
+	 * @return
+	 */
 	public static Repository createPartnerOutsideRepository(
-			PersistenceManager pm, String organisationID, LegalEntity mandator)
+			PersistenceManager pm, String organisationID, LegalEntity repositoryOwner)
 	{
-		String anchorID = mandator.getOrganisationID() + '.' + mandator.getAnchorTypeID() + '.' + mandator.getAnchorID();
-		return Repository.createRepository(pm, organisationID, Repository.ANCHOR_TYPE_ID_OUTSIDE, anchorID, mandator, true);
+		// TODO remove this! begin DEBUG check
+		Logger.getLogger(PartnerStorekeeper.class).info("createPartnerOutsideRepository: organisationID=" + organisationID + " repositoryOwner=" + repositoryOwner.getPrimaryKey() + " IDGenerator.getOrganisationID()=" + IDGenerator.getOrganisationID());
+
+		if (repositoryOwner instanceof OrganisationLegalEntity) {
+			OrganisationLegalEntity rOwner = (OrganisationLegalEntity) repositoryOwner;
+			if (rOwner.getOrganisationID().equals(IDGenerator.getOrganisationID()))
+				Logger.getLogger(PartnerStorekeeper.class).warn("", new IllegalStateException("The repositoryOwner is the local organisation but should be the partner! organisationID=" + organisationID + " repositoryOwner=" + repositoryOwner.getPrimaryKey() + " IDGenerator.getOrganisationID()=" + IDGenerator.getOrganisationID()));
+			if (rOwner.getOrganisation() == null)
+				Logger.getLogger(PartnerStorekeeper.class).warn("", new IllegalStateException("repositoryOwner.getOrganisation() returns null! repositoryOwner.getOrganisationID()=" + repositoryOwner.getOrganisationID()));
+		}
+		// TODO remove this! end DEBUG check
+
+		String anchorID = repositoryOwner.getOrganisationID() + '#' + repositoryOwner.getAnchorTypeID() + '#' + repositoryOwner.getAnchorID();
+		return Repository.createRepository(pm, organisationID, Repository.ANCHOR_TYPE_ID_OUTSIDE, anchorID, repositoryOwner, true);
 
 //		try {
 //			return (Repository) pm.getObjectById(AnchorID.create(
@@ -111,7 +148,7 @@ public class PartnerStorekeeper extends Storekeeper
 	}
 
 	protected void handleBookOrDeliveryProductTransfer(User user, LegalEntity mandator,
-			ProductTransfer transfer, Map<String, Anchor> involvedAnchors)
+			ProductTransfer transfer, Set<Anchor> involvedAnchors)
 	{
 		PersistenceManager pm = getPersistenceManager();
 		Repository partnerInsideRepository = createPartnerInsideRepository(
@@ -138,7 +175,7 @@ public class PartnerStorekeeper extends Storekeeper
 	}
 
 	protected void handleSimpleProductTransfer(User user, LegalEntity mandator,
-			ProductTransfer transfer, Map involvedAnchors)
+			ProductTransfer transfer, Set<Anchor> involvedAnchors)
 	{
 		// nothing to do
 	}

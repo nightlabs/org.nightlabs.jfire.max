@@ -31,11 +31,13 @@ import java.net.URL;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
+import java.util.Set;
 
 import javax.jdo.JDOHelper;
 import javax.jdo.JDOObjectNotFoundException;
@@ -501,7 +503,7 @@ public class Accounting
 			);
 		bookMoneyTransfer = (BookMoneyTransfer) pm.makePersistent(bookMoneyTransfer);
 
-		Map<String, Anchor> involvedAnchors = new HashMap<String, Anchor>();
+		Set<Anchor> involvedAnchors = new HashSet<Anchor>();
 		ArrayList containers = new ArrayList(1);
 		containers.add(bookMoneyTransfer);
 		boolean failed = true;
@@ -699,7 +701,7 @@ public class Accounting
 
 		PersistenceManager pm = getPersistenceManager();
 
-		Map involvedAnchors = new HashMap();
+		Set involvedAnchors = new HashSet();
 		ArrayList containers = new ArrayList(1);
 		containers.add(payMoneyTransfer);
 		boolean failed = true;
@@ -862,7 +864,7 @@ public class Accounting
 			if (payMoneyTransfer == null)
 				throw new NullPointerException("serverPaymentProcessor.payBegin(...) returned null but Payment is NOT postponed! You are only allowed (and you should) return null, if you postpone a Payment! serverPaymentProcessorPK=\""+serverPaymentProcessor.getPrimaryKey()+"\"");
 
-			Map<String, Anchor> involvedAnchors = new HashMap<String, Anchor>();
+			Set involvedAnchors = new HashSet();
 			ArrayList containers = new ArrayList(1);
 			containers.add(payMoneyTransfer);
 			boolean failed = true;
@@ -1074,7 +1076,7 @@ public class Accounting
 		}
 		catch (JDOObjectNotFoundException je) {
 			// account not existing, create it 
-			account = new Account(this.getOrganisationID(), anchorTypeID, searchAccountID, partner, currency);
+			account = new Account(this.getOrganisationID(), anchorTypeID, searchAccountID, partner, currency, false);
 			getPersistenceManager().makePersistent(account);
 			account.setOwner(partner);
 		}

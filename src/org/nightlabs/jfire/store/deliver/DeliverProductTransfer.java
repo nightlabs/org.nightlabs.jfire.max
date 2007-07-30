@@ -189,13 +189,13 @@ public class DeliverProductTransfer extends ProductTransfer
 	}
 
 	@Override
-	public void bookTransfer(User user, Map<String, Anchor> involvedAnchors)
+	public void bookTransfer(User user, Set<Anchor> involvedAnchors)
 	{
 		super.bookTransfer(user, involvedAnchors);
 		bookAtDeliveryNotes(user, involvedAnchors, false);
 	}
 
-	private void bookAtDeliveryNotes(User user, Map<String, Anchor> involvedAnchors, boolean rollback)
+	private void bookAtDeliveryNotes(User user, Set<Anchor> involvedAnchors, boolean rollback)
 	{
 		Set<DeliveryNote> processedDeliveryNotes = new HashSet<DeliveryNote>();
 		for (Article article : delivery.getArticles()) {
@@ -208,7 +208,7 @@ public class DeliverProductTransfer extends ProductTransfer
 	}
 
 	@Override
-	public void rollbackTransfer(User user, Map<String, Anchor> involvedAnchors)
+	public void rollbackTransfer(User user, Set<Anchor> involvedAnchors)
 	{
 		bookAtDeliveryNotes(user, involvedAnchors, true);
 		super.rollbackTransfer(user, involvedAnchors);

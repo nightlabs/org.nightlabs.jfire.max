@@ -61,6 +61,7 @@ import org.nightlabs.jfire.accounting.id.InvoiceID;
 import org.nightlabs.jfire.asyncinvoke.AsyncInvoke;
 import org.nightlabs.jfire.asyncinvoke.Invocation;
 import org.nightlabs.jfire.base.BaseSessionBeanImpl;
+import org.nightlabs.jfire.idgenerator.IDGenerator;
 import org.nightlabs.jfire.idgenerator.IDNamespaceDefault;
 import org.nightlabs.jfire.jbpm.JbpmLookup;
 import org.nightlabs.jfire.jbpm.graph.def.ProcessDefinition;
@@ -1025,6 +1026,12 @@ implements SessionBean
 	public DeliveryResult _deliverBegin(DeliveryData deliveryData)
 	throws ModuleException
 	{
+		if (logger.isDebugEnabled()) {
+			logger.debug("_deliverBegin: *** begin ******************************************* ");
+			logger.debug("_deliverBegin: IDGenerator.getOrganisationID()=" + IDGenerator.getOrganisationID());
+			logger.debug("_deliverBegin: this.getOrganisationID()=" + this.getOrganisationID());
+		}
+
 		if (deliveryData == null)
 			throw new NullPointerException("deliveryData");
 
@@ -1405,11 +1412,30 @@ implements SessionBean
 				for (ProductLocal nestedProductLocal : productLocal.getNestedProductLocals()) {
 					if (!localOrganisationID.equals(nestedProductLocal.getOrganisationID())) {
 						// supplier of the nested Product is a remote organisation => check, whether it's already here or needs delivery
-						if (nestedProductLocal.getQuantity() < 1) {
+						//
+						// General info about ProductLocal.quantity:
+						// ProductLocal.quantity is > 0 (usually 1), if it's available (i.e. in this store AND not nested in another product)
+						// ProductLocal.quantity is = 0, if it's either (here in the store AND nested in another product) or (NOT here AND NOT nested)
+						// ProductLocal.quantity is < 0 (usually -1), if it's not here in the store AND nested in another product
+						//
+						// Info about ProductLocal.quantity at this point:
+						// Because we already delivered to our customer and now asynchronously obtain the supply, the quantity is normally -1.
+						// If the Product was already obtained before (e.g. because it was sold and refunded, but not given back to the supplier),
+						// then it should be 0, because the container has already been assembled and during assembling, the quantity of the nested
+						// product is decremented. Hence, in this case, it is here in the store, but not available (due to being part of another
+						// assembled product).
+						if (nestedProductLocal.getQuantity() < 0) {
 							// quantity indicates that the product is not here - is it still at supplier?
 
-							if (!Repository.ANCHOR_TYPE_ID_HOME.equals(nestedProductLocal.getAnchor().getAnchorTypeID()))
-								throw new IllegalStateException("The nested product is not booked in a home repository. Cannot obtain it from supplier organisation! localArticle \"" + article.getPrimaryKey() + "\" + nestedProductLocal \"" + nestedProductLocal.getPrimaryKey() + "\"");
+							if (!Repository.ANCHOR_TYPE_ID_OUTSIDE.equals(nestedProductLocal.getAnchor().getAnchorTypeID()))
+								throw new IllegalStateException("The nested product is not outside, but has a quanity < 0! localArticle \"" + article.getPrimaryKey() + "\" + nestedProductLocal \"" + nestedProductLocal.getPrimaryKey() + "\"");
+
+							if (!(nestedProductLocal.getAnchor() instanceof Repository))
+								throw new IllegalStateException("The nested product is not in a Repository, but its anchor is of type \"" + (nestedProductLocal.getAnchor() == null ? null : nestedProductLocal.getAnchor().getClass().getName()) + "\"! localArticle \"" + article.getPrimaryKey() + "\" + nestedProductLocal \"" + nestedProductLocal.getPrimaryKey() + "\"");
+
+							Repository nestedProductLocalRepository = (Repository) nestedProductLocal.getAnchor();
+							if (!nestedProductLocalRepository.getOwner().equals(OrganisationLegalEntity.getOrganisationLegalEntity(pm, nestedProductLocal.getOrganisationID(), OrganisationLegalEntity.ANCHOR_TYPE_ID_ORGANISATION, true)))
+								throw new IllegalStateException("The nested product is not in an outside Repository belonging to the supplier! Has it already been delivered to another customer? localArticle \"" + article.getPrimaryKey() + "\" + nestedProductLocal \"" + nestedProductLocal.getPrimaryKey() + "\"");
 
 							if (productTypeClass2organisationID2articleSet == null)
 //								productTypeClass2organisationID2articleSet = new HashMap<Class, Map<String,Map<Boolean,Set<Article>>>>();

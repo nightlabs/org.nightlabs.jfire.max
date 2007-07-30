@@ -30,6 +30,7 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.Map;
+import java.util.Set;
 
 import javax.jdo.JDOHelper;
 import javax.jdo.JDOObjectNotFoundException;
@@ -155,7 +156,7 @@ public class DefaultLocalStorekeeperDelegate extends LocalStorekeeperDelegate
 //		}
 //	};
 
-	public void preBookArticles(OrganisationLegalEntity mandator, User user, DeliveryNote deliveryNote, BookProductTransfer bookTransfer, Map involvedAnchors)
+	public void preBookArticles(OrganisationLegalEntity mandator, User user, DeliveryNote deliveryNote, BookProductTransfer bookTransfer, Set<Anchor> involvedAnchors)
 	{
 		Map productsByProductTypeClass = (Map) productsByProductTypeTL.get();
 		productsByProductTypeClass.clear();
@@ -200,7 +201,7 @@ public class DefaultLocalStorekeeperDelegate extends LocalStorekeeperDelegate
 	 */
 	public void bookArticle(OrganisationLegalEntity mandator, User user,
 			DeliveryNote deliveryNote, Article article,
-			BookProductTransfer bookTransfer, Map involvedAnchors)
+			BookProductTransfer bookTransfer, Set<Anchor> involvedAnchors)
 	{
 		Map productsByProductType = (Map) productsByProductTypeTL.get();
 		ProductType productType = article.getProductType();
@@ -249,7 +250,7 @@ public class DefaultLocalStorekeeperDelegate extends LocalStorekeeperDelegate
 	 * @see org.nightlabs.jfire.store.book.LocalStorekeeperDelegate#postBookArticles(org.nightlabs.jfire.trade.OrganisationLegalEntity, org.nightlabs.jfire.security.User, org.nightlabs.jfire.store.DeliveryNote, org.nightlabs.jfire.store.book.BookProductTransfer, java.util.Map)
 	 */
 	@Override
-	public void postBookArticles(OrganisationLegalEntity mandator, User user, DeliveryNote deliveryNote, BookProductTransfer bookTransfer, Map<String, Anchor> involvedAnchors)
+	public void postBookArticles(OrganisationLegalEntity mandator, User user, DeliveryNote deliveryNote, BookProductTransfer bookTransfer, Set<Anchor> involvedAnchors)
 	{
 		Map productsByProductType = (Map) productsByProductTypeTL.get();
 		for (Iterator it = productsByProductType.entrySet().iterator(); it.hasNext(); ) {

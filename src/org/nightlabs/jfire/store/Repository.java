@@ -28,7 +28,7 @@ package org.nightlabs.jfire.store;
 
 import java.util.Collection;
 import java.util.Iterator;
-import java.util.Map;
+import java.util.Set;
 
 import javax.jdo.JDOObjectNotFoundException;
 import javax.jdo.PersistenceManager;
@@ -53,21 +53,45 @@ import org.nightlabs.jfire.transfer.id.AnchorID;
 public class Repository extends Anchor
 {
 	/**
-	 * A repository with this type is the source of products - they are created here.
+	 * Local products will be created in a repository with this type. Foreign products, however, are created in
+	 * a repository with {@link #ANCHOR_TYPE_ID_OUTSIDE}. Foreign products are transferred here (i.e. to their home)
+	 * during the booking of their DeliveryNote / ReceptionNote.
+	 * <p>
+	 * Both local and foreign products are transferred from
+	 * this repository to the container product's repository
+	 * when the container product is assembled.
+	 * </p> 
+	 * <p>
+	 * Both local and foreign products are transferred into
+	 * this repository (from the container's repository) when
+	 * the container product is DISassembled.
+	 * </p>
 	 */
 	public static final String ANCHOR_TYPE_ID_HOME = "Repository.Home";
 
-	/**
-	 * A repository with this type is inside the organisation. It should have {@link #outside} == false!
-	 */
-	public static final String ANCHOR_TYPE_ID_BIN = "Repository.Bin";
+//	/**
+//   * A repository with this type is the source of products - they are created here. Therefore,
+//   * it's used as initial repository for local products and (if a local product nests foreign products)
+//   * foreign products might be transferred here during the assemble process. It should have {@link #isOutside()}<code> == false</code>.
+//   */
+//	public static final String ANCHOR_TYPE_ID_FACTORY = "Repository.Factory";
+
+//	/**
+//	 * A repository with this type is inside the organisation. It should have {@link #outside}<code> == false</code>!
+//	 */
+//	public static final String ANCHOR_TYPE_ID_BIN = "Repository.Bin";
 
 	/**
 	 * A repository with this type is used for virtually outside repositories. If a <tt>Product</tt>
-	 * is there, it means that the product is not here anymore and has already been delivered
-	 * to a partner. It should have {@link #outside} == true!
+	 * is there, it means that the product is not here anymore (or not yet) and has already been delivered
+	 * to a partner (or not yet been delivered from a supplier). It should have {@link #outside} == true!
 	 */
 	public static final String ANCHOR_TYPE_ID_OUTSIDE = "Repository.Outside";
+//	/**
+//	 * Repositories with this type are used by {@link ServerDeliveryProcessor}s to transfer their
+//	 * goods from and to. They're outside, hence they should have {@link #isOutside()}<code> == true</code>. 
+//	 */
+//	public static final String ANCHOR_TYPE_ID_DELIVERY = "Repository.Delivery";
 
 	/**
 	 * @jdo.field persistence-modifier="persistent"
@@ -94,9 +118,21 @@ public class Repository extends Anchor
 			repository = (Repository) pm.getObjectById(
 					AnchorID.create(organisationID, anchorTypeID, anchorID));
 		} catch (JDOObjectNotFoundException x) {
+			repository = null;
+		}
+
+		if (repository == null) { // create persist it
 			repository = new Repository(organisationID, anchorTypeID, anchorID, owner, outside);
 			repository = pm.makePersistent(repository);
 		}
+		else { // check, whether owner and outside is correct
+			if (!repository.getOwner().equals(owner))
+				throw new IllegalArgumentException("The repository \"" + repository.getPrimaryKey() + "\" already exists but does not match the specified owner \"" + owner.getPrimaryKey() + "\" - it already has the owner \"" + repository.getOwner().getPrimaryKey() + "\" assigned!");
+
+			if (repository.isOutside() != outside)
+				throw new IllegalArgumentException("The repository \"" + repository.getPrimaryKey() + "\" already exists but does not match the specified outside flag \"" + outside + "\" - it already has outside \"" + repository.isOutside() + "\" assigned!");
+		}
+
 		return repository;
 	}
 
@@ -130,7 +166,7 @@ public class Repository extends Anchor
 	}
 
 	protected void internalBookTransfer(Transfer transfer, User user,
-			Map<String, Anchor> involvedAnchors)
+			Set<Anchor> involvedAnchors)
 	{
 		ProductTransfer productTransfer = (ProductTransfer) transfer;
 
@@ -164,7 +200,7 @@ public class Repository extends Anchor
 	}
 
 	protected void internalRollbackTransfer(Transfer transfer, User user,
-			Map involvedAnchors)
+			Set<Anchor> involvedAnchors)
 	{
 		ProductTransfer productTransfer = (ProductTransfer) transfer;
 

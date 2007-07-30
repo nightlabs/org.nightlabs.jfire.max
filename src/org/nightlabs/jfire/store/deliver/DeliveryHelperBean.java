@@ -46,6 +46,7 @@ import org.nightlabs.ModuleException;
 import org.nightlabs.jfire.asyncinvoke.AsyncInvoke;
 import org.nightlabs.jfire.asyncinvoke.Invocation;
 import org.nightlabs.jfire.base.BaseSessionBeanImpl;
+import org.nightlabs.jfire.idgenerator.IDGenerator;
 import org.nightlabs.jfire.security.User;
 import org.nightlabs.jfire.store.DeliveryNote;
 import org.nightlabs.jfire.store.ProductTypeActionHandler;
@@ -117,6 +118,12 @@ implements SessionBean
 	public DeliveryDataID deliverBegin_storeDeliveryData(DeliveryData deliveryData)
 	throws ModuleException
 	{
+		if (logger.isDebugEnabled()) {
+			logger.debug("deliverBegin_storeDeliveryData: *** begin ******************************************* ");
+			logger.debug("deliverBegin_storeDeliveryData: IDGenerator.getOrganisationID()=" + IDGenerator.getOrganisationID());
+			logger.debug("deliverBegin_storeDeliveryData: this.getOrganisationID()=" + this.getOrganisationID());
+		}
+
 		PersistenceManager pm = getPersistenceManager();
 		try {
 //			if (!JDOHelper.isNew(deliveryData))
@@ -142,6 +149,9 @@ implements SessionBean
 			return (DeliveryDataID) JDOHelper.getObjectId(deliveryData);
 		} finally {
 			pm.close();
+			if (logger.isDebugEnabled()) {
+				logger.debug("deliverBegin_storeDeliveryData: *** end ******************************************* ");
+			}
 		}
 	}
 

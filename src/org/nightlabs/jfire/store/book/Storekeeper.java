@@ -27,7 +27,7 @@
 package org.nightlabs.jfire.store.book;
 
 import java.io.Serializable;
-import java.util.Map;
+import java.util.Set;
 
 import javax.jdo.JDOHelper;
 import javax.jdo.PersistenceManager;
@@ -35,6 +35,7 @@ import javax.jdo.PersistenceManager;
 import org.nightlabs.jfire.security.User;
 import org.nightlabs.jfire.store.ProductTransfer;
 import org.nightlabs.jfire.trade.LegalEntity;
+import org.nightlabs.jfire.transfer.Anchor;
 
 /**
  * The <code>Storekeeper</code> does a similar job in the store as the
@@ -90,7 +91,7 @@ implements Serializable
 		return storekeeperID;
 	}
 
-	public abstract void bookTransfer(User user, LegalEntity mandator, ProductTransfer transfer, Map involvedAnchors);
+	public abstract void bookTransfer(User user, LegalEntity mandator, ProductTransfer transfer, Set<Anchor> involvedAnchors);
 
 	protected PersistenceManager getPersistenceManager()
 	{

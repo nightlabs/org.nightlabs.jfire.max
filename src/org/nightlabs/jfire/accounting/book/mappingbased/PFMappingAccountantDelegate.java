@@ -527,7 +527,7 @@ public class PFMappingAccountantDelegate extends
 	/**
 	 * @see org.nightlabs.jfire.accounting.book.LocalAccountantDelegate#preBookArticles(org.nightlabs.jfire.trade.OrganisationLegalEntity, org.nightlabs.jfire.security.User, org.nightlabs.jfire.accounting.Invoice, BookMoneyTransfer, Map)
 	 */
-	public void preBookArticles(OrganisationLegalEntity mandator, User user, Invoice invoice, BookMoneyTransfer bookTransfer, Map<String, Anchor> involvedAnchors) {
+	public void preBookArticles(OrganisationLegalEntity mandator, User user, Invoice invoice, BookMoneyTransfer bookTransfer, Set<Anchor> involvedAnchors) {
 		if (resolvedPTypeMappings.containsKey(invoice))
 			return;
 		resolvedPTypeMappings.put(invoice, resolveProductTypeMappings(invoice));
@@ -536,7 +536,7 @@ public class PFMappingAccountantDelegate extends
 	/**
 	 * @see org.nightlabs.jfire.accounting.book.LocalAccountantDelegate#postBookArticles(org.nightlabs.jfire.trade.OrganisationLegalEntity, org.nightlabs.jfire.security.User, org.nightlabs.jfire.accounting.Invoice, BookMoneyTransfer, Map)
 	 */
-	public void postBookArticles(OrganisationLegalEntity mandator, User user, Invoice invoice, BookMoneyTransfer bookTransfer, Map<String, Anchor> involvedAnchors) {
+	public void postBookArticles(OrganisationLegalEntity mandator, User user, Invoice invoice, BookMoneyTransfer bookTransfer, Set<Anchor> involvedAnchors) {
 		if (resolvedPTypeMappings.containsKey(invoice))
 			resolvedPTypeMappings.remove(invoice);
 	}
@@ -546,7 +546,7 @@ public class PFMappingAccountantDelegate extends
 	 */
 	public void bookArticle(OrganisationLegalEntity mandator, User user,
 			Invoice invoice, Article article , BookMoneyTransfer container,
-			Map<String, Anchor> involvedAnchors) {
+			Set<Anchor> involvedAnchors) {
 		Map<ResolvedMapKey, ResolvedMapEntry> resolvedMappings = resolvedPTypeMappings.get(invoice);
 		if (resolvedMappings == null)
 			throw new IllegalStateException("Could not find resolved mappings for invoice "+JDOHelper.getObjectId(invoice)+" can not book article. Was preBookInvoice() called?");
@@ -574,7 +574,7 @@ public class PFMappingAccountantDelegate extends
 	}
 	
 	@Override
-	public void bookProductTypeParts(OrganisationLegalEntity mandator, User user, LinkedList<ArticlePrice> articlePriceStack, int delegationLevel, BookMoneyTransfer container, Map<String, Anchor> involvedAnchors) {
+	public void bookProductTypeParts(OrganisationLegalEntity mandator, User user, LinkedList<ArticlePrice> articlePriceStack, int delegationLevel, BookMoneyTransfer container, Set<Anchor> involvedAnchors) {
 		ArticlePrice articlePrice = articlePriceStack.peek();
 		ProductTypeID pTypeID = (ProductTypeID) JDOHelper.getObjectId(articlePrice.getProductType());
 		ProductType pType = (ProductType) getPersistenceManager().getObjectById(pTypeID);
@@ -593,7 +593,7 @@ public class PFMappingAccountantDelegate extends
 			LinkedList<ArticlePrice> articlePriceStack,
 			Map<Anchor, Map<Anchor, Collection<BookInvoiceTransfer>>> bookInvoiceTransfers,
 			int delegationLevel,
-			BookMoneyTransfer container, Map<String, Anchor> involvedAnchors
+			BookMoneyTransfer container, Set<Anchor> involvedAnchors
 		)
 	{
 		LocalAccountantDelegate delegate = productType.getLocalAccountantDelegate();
@@ -651,7 +651,7 @@ public class PFMappingAccountantDelegate extends
 			LinkedList<ArticlePrice> articlePriceStack,
 			Map<Anchor, Map<Anchor, Collection<BookInvoiceTransfer>>> bookInvoiceTransfers,
 			int delegationLevel,
-			BookMoneyTransfer container, Map<String, Anchor> involvedAnchors
+			BookMoneyTransfer container, Set<Anchor> involvedAnchors
 		)
 	{
 		ArticlePrice articlePrice = (ArticlePrice) articlePriceStack.peek();
@@ -700,7 +700,7 @@ public class PFMappingAccountantDelegate extends
 			ProductType productType, 
 			String packageType,
 			int delegationLevel,
-			BookMoneyTransfer container, Map<String, Anchor> involvedAnchors
+			BookMoneyTransfer container, Set<Anchor> involvedAnchors
 		) 
 	{
 		
@@ -1120,7 +1120,7 @@ public class PFMappingAccountantDelegate extends
 	
 	
 	
-	protected void bookInvoiceTransfers(User user, Map<Anchor, Map<Anchor, Collection<BookInvoiceTransfer>>> bookInvoiceTransfers, BookMoneyTransfer container, Map<String, Anchor> involvedAnchors) {
+	protected void bookInvoiceTransfers(User user, Map<Anchor, Map<Anchor, Collection<BookInvoiceTransfer>>> bookInvoiceTransfers, BookMoneyTransfer container, Set<Anchor> involvedAnchors) {
 		PersistenceManager pm = getPersistenceManager();
 		for (Iterator iter = bookInvoiceTransfers.entrySet().iterator(); iter.hasNext();) {
 			Map.Entry entry = (Map.Entry) iter.next();
@@ -1201,7 +1201,7 @@ public class PFMappingAccountantDelegate extends
 			Map<Anchor, Map<Anchor, Collection<BookInvoiceTransfer>>> bookInvoiceTransfers,
 			ProductType productType, String packageType,
 			int delegationLevel, 
-			BookMoneyTransfer container, Map<String, Anchor> involvedAnchors
+			BookMoneyTransfer container, Set<Anchor> involvedAnchors
 		)
 	{
 		internalBookProductTypePartsByDimension(

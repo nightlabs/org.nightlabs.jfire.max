@@ -123,9 +123,10 @@ public class Account extends Anchor
 
 	/**
 	 * anchorTypeID for accounts that are used during payment. They represent money that's outside
-	 * the organisation (means paid to a partner).
+	 * the organisation (means paid to a partner), hence their {@link #isOutside()} property is <code>true</code>.
 	 */
 	public static final String ANCHOR_TYPE_ID_OUTSIDE = "Account.Outside";
+//	public static final String ANCHOR_TYPE_ID_PAYMENT = "Account.Payment";
 
 	/**
 	 * @jdo.field persistence-modifier="persistent"
@@ -142,9 +143,16 @@ public class Account extends Anchor
 //	private Accountant accountant = null;
 //	private boolean statistical;
 
+	/**
+	 * Whether or not this Repository represents sth. outside.
+	 *
+	 * @jdo.field persistence-modifier="persistent"
+	 */
+	private boolean outside;
+
 	protected Account() { }
 
-	public Account(String organisationID, String anchorTypeID, String anchorID, LegalEntity owner, Currency currency) {
+	public Account(String organisationID, String anchorTypeID, String anchorID, LegalEntity owner, Currency currency, boolean outside) {
 		super(organisationID, anchorTypeID, anchorID);
 
 		if (currency == null)
@@ -154,6 +162,7 @@ public class Account extends Anchor
 		this.owner = owner;
 		this.name = new AccountName(this);
 		this.summaryAccounts = new HashSet<SummaryAccount>();
+		this.outside = outside;
 		// TODO: What about an accountType (Erlös/Aufwandt) - isn't this realised now with REVENUE_IN/REVENUE_OUT/COST?
 	}
 //	/**
@@ -218,7 +227,7 @@ public class Account extends Anchor
 	/**
 	 * @see org.nightlabs.jfire.transfer.Anchor#internalRollbackTransfer(org.nightlabs.jfire.transfer.Transfer, org.nightlabs.jfire.security.User, java.util.Map)
 	 */
-	protected void internalRollbackTransfer(Transfer transfer, User user, Map<String, Anchor> involvedAnchors)
+	protected void internalRollbackTransfer(Transfer transfer, User user, Set<Anchor> involvedAnchors)
 	{
 		MoneyTransfer moneyTransfer = (MoneyTransfer) transfer;
 
@@ -228,7 +237,7 @@ public class Account extends Anchor
 	/**
 	 * This method is overridden by {@link SummaryAccount}.
 	 */
-	protected void rollbackAccountMoneyTransfer(User user, MoneyTransfer moneyTransfer, Map<String, Anchor> involvedAnchors)
+	protected void rollbackAccountMoneyTransfer(User user, MoneyTransfer moneyTransfer, Set<Anchor> involvedAnchors)
 	{
 //	 SummaryMoneyTransfers are only stored in SummaryAccounts
 		if (! (moneyTransfer instanceof SummaryMoneyTransfer) ) {
@@ -238,7 +247,7 @@ public class Account extends Anchor
 		}
 	}
 
-//	public void bookTransfer(User user, Transfer transfer, Map involvedAnchors)
+//	public void bookTransfer(User user, Transfer transfer, Set<Anchor> involvedAnchors)
 //	{
 //		if (transfer == null)
 //			throw new NullPointerException("transfer must not be null!");
@@ -261,7 +270,7 @@ public class Account extends Anchor
 	 * 
 	 * @see org.nightlabs.jfire.transfer.Anchor#internalBookTransfer(Transfer, User, Map)
 	 */
-	protected void internalBookTransfer(Transfer transfer, User user, Map<String, Anchor> involvedAnchors)
+	protected void internalBookTransfer(Transfer transfer, User user, Set<Anchor> involvedAnchors)
 	{
 		MoneyTransfer moneyTransfer = (MoneyTransfer) transfer;
 
@@ -274,7 +283,7 @@ public class Account extends Anchor
 	/**
 	 * This method is overridden by {@link SummaryAccount}.
 	 */
-	protected void bookAccountMoneyTransfer(User user, MoneyTransfer moneyTransfer, Map<String, Anchor> involvedAnchors)
+	protected void bookAccountMoneyTransfer(User user, MoneyTransfer moneyTransfer, Set<Anchor> involvedAnchors)
 	{
 		if (skip_bookAccountMoneyTransfer)
 			return;
@@ -295,7 +304,7 @@ public class Account extends Anchor
 	 */
 	protected transient boolean skip_bookAccountMoneyTransfer = false;
 
-	protected void bookSummaryTransfers(User user, MoneyTransfer moneyTransfer, Map<String, Anchor> involvedAnchors) {
+	protected void bookSummaryTransfers(User user, MoneyTransfer moneyTransfer, Set<Anchor> involvedAnchors) {
 		skip_bookAccountMoneyTransfer = true;
 		try {
 			PersistenceManager pm = JDOHelper.getPersistenceManager(this);
@@ -486,7 +495,8 @@ public class Account extends Anchor
 				ANCHOR_TYPE_ID_LOCAL_REVENUE_OUT,
 				this.getAnchorID(),
 				this.getOwner(),
-				this.getCurrency());
+				this.getCurrency(),
+				false);
 	}
 
 	/**
@@ -510,5 +520,10 @@ public class Account extends Anchor
 		}
 
 		return revenueOutAccount;
+	}
+
+	public boolean isOutside()
+	{
+		return outside;
 	}
 }

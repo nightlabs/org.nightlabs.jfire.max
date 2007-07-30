@@ -116,12 +116,12 @@ public class SummaryAccount extends Account
 	 * @param statistical
 	 */
 	public SummaryAccount(String organisationID, String anchorID,
-			LegalEntity owner, Currency currency) {
-		super(organisationID, ANCHOR_TYPE_ID_SUMMARY, anchorID, owner, currency);
+			LegalEntity owner, Currency currency, boolean outside) {
+		super(organisationID, ANCHOR_TYPE_ID_SUMMARY, anchorID, owner, currency, outside);
 		summedAccounts = new HashSet<Account>();
 	}
 
-	protected void rollbackAccountMoneyTransfer(User user, MoneyTransfer moneyTransfer, Map<String, Anchor> involvedAnchors)
+	protected void rollbackAccountMoneyTransfer(User user, MoneyTransfer moneyTransfer, Set<Anchor> involvedAnchors)
 	{
 		if (moneyTransfer instanceof SummaryMoneyTransfer) {
 			boolean isDebit = Transfer.ANCHORTYPE_TO == moneyTransfer.getAnchorType(this);
@@ -136,7 +136,7 @@ public class SummaryAccount extends Account
 	 * @see org.nightlabs.jfire.accounting.Account#bookAccountMoneyTransfer(org.nightlabs.jfire.security.User, org.nightlabs.jfire.accounting.MoneyTransfer, java.util.Map)
 	 */
 	protected void bookAccountMoneyTransfer(User user,
-			MoneyTransfer moneyTransfer, Map<String, Anchor> involvedAnchors)
+			MoneyTransfer moneyTransfer, Set<Anchor> involvedAnchors)
 	{
 		if (skip_bookAccountMoneyTransfer)
 			return;

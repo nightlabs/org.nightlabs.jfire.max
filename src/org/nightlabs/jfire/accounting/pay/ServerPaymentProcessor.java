@@ -440,7 +440,8 @@ implements Serializable, DetachCallback
 					Account.ANCHOR_TYPE_ID_OUTSIDE,
 					accountID,
 					partner,
-					currency);
+					currency,
+					true);
 			pm.makePersistent(account);
 		}
 		return account;

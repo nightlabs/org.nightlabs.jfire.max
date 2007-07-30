@@ -30,6 +30,7 @@ import java.io.Serializable;
 import java.util.Collection;
 import java.util.Iterator;
 import java.util.Map;
+import java.util.Set;
 
 import javax.jdo.JDOHelper;
 import javax.jdo.PersistenceManager;
@@ -57,13 +58,13 @@ import org.nightlabs.util.Util;
  *
  * @jdo.create-objectid-class field-order="organisationID, anchorTypeID, anchorID"
  *
- * @jdo.fetch-group name="Anchor.transfers" fields="transfers"
+ * @!jdo.fetch-group name="Anchor.transfers" fields="transfers"
  * @jdo.fetch-group name="Anchor.this" fetch-groups="default"
  */
 public abstract class Anchor
 	implements Serializable
 {
-	public static final String FETCH_GROUP_TRANSFERS = "Anchor.transfers";
+//	public static final String FETCH_GROUP_TRANSFERS = "Anchor.transfers";
 	public static final String FETCH_GROUP_THIS_ANCHOR = "Anchor.this";
 
 	/**
@@ -167,7 +168,7 @@ public abstract class Anchor
 	 * Do NOT call this method directly! Use {@link Transfer#bookTransfer(User, Map)}
 	 * instead!
 	 */
-	public void rollbackTransfer(User user, Transfer transfer, Map<String, Anchor> involvedAnchors)
+	public void rollbackTransfer(User user, Transfer transfer, Set<Anchor> involvedAnchors)
 	{
 		if (transfer == null)
 			throw new NullPointerException("transfer must not be null!");
@@ -190,7 +191,7 @@ public abstract class Anchor
 		else
 			throw new AnchorMismatchException("This Anchor \""+this.getPrimaryKey()+"\" is not a side of the transfer \""+transfer.getPrimaryKey()+"\"!");
 
-		involvedAnchors.put(getPrimaryKey(), this);
+		involvedAnchors.add(this);
 
 		internalRollbackTransfer(transfer, user, involvedAnchors);
 
@@ -201,7 +202,7 @@ public abstract class Anchor
 			transfer.setBookedTo(false);
 	}
 
-	protected abstract void internalRollbackTransfer(Transfer transfer, User user, Map<String, Anchor> involvedAnchors);
+	protected abstract void internalRollbackTransfer(Transfer transfer, User user, Set<Anchor> involvedAnchors);
 
 	/**
 	 * Do NOT call this method directly! Use {@link Transfer#bookTransfer(User, Map)}
@@ -216,7 +217,7 @@ public abstract class Anchor
 	 *
 	 * @throws DuplicateTransferException If the given transfer has already been booked.
 	 */
-	public void bookTransfer(User user, Transfer transfer, Map<String, Anchor> involvedAnchors)
+	public void bookTransfer(User user, Transfer transfer, Set<Anchor> involvedAnchors)
 	{
 		if (transfer == null)
 			throw new NullPointerException("transfer must not be null!");
@@ -239,9 +240,7 @@ public abstract class Anchor
 		else
 			throw new AnchorMismatchException("This Anchor \""+this.getPrimaryKey()+"\" is not a side of the transfer \""+transfer.getPrimaryKey()+"\"!");
 
-		String pk = getPrimaryKey();
-		if (!involvedAnchors.containsKey(pk))
-			involvedAnchors.put(pk, this);
+		involvedAnchors.add(this);
 
 		internalBookTransfer(transfer, user, involvedAnchors);
 
@@ -252,7 +251,7 @@ public abstract class Anchor
 //		transfers.put(pk,transfer);
 	}
 
-	protected abstract void internalBookTransfer(Transfer transfer, User user, Map<String, Anchor> involvedAnchors);
+	protected abstract void internalBookTransfer(Transfer transfer, User user, Set<Anchor> involvedAnchors);
 
 //	protected void addTransfer(Transfer transfer)
 //	{
@@ -262,17 +261,17 @@ public abstract class Anchor
 //		transfers.put(transfer.getPrimaryKey(), transfer);
 //	}
 
-	public static void checkIntegrity(Collection<Transfer> containers, Map<String, Anchor> involvedAnchors)
+	public static void checkIntegrity(Collection<Transfer> containers, Set<Anchor> involvedAnchors)
 	{
-		for (Iterator it = involvedAnchors.values().iterator(); it.hasNext(); ) {
+		for (Iterator it = involvedAnchors.iterator(); it.hasNext(); ) {
 			Anchor anchor = (Anchor) it.next();
 			anchor.checkIntegrity(containers);
 		}
 	}
 
-	public static void resetIntegrity(Collection<Transfer> containers, Map<String, Anchor> involvedAnchors)
+	public static void resetIntegrity(Collection<Transfer> containers, Set<Anchor> involvedAnchors)
 	{
-		for (Iterator it = involvedAnchors.values().iterator(); it.hasNext(); ) {
+		for (Iterator it = involvedAnchors.iterator(); it.hasNext(); ) {
 			Anchor anchor = (Anchor) it.next();
 			anchor.resetIntegrity(containers);
 		}

@@ -49,11 +49,13 @@ import org.nightlabs.jfire.base.JFirePrincipal;
 import org.nightlabs.jfire.base.Lookup;
 import org.nightlabs.jfire.organisation.Organisation;
 import org.nightlabs.jfire.security.User;
+import org.nightlabs.jfire.store.book.PartnerStorekeeper;
 import org.nightlabs.jfire.store.deliver.Delivery;
 import org.nightlabs.jfire.store.deliver.DeliveryData;
 import org.nightlabs.jfire.store.deliver.DeliveryHelperBean;
 import org.nightlabs.jfire.store.deliver.id.DeliveryDataID;
 import org.nightlabs.jfire.trade.Article;
+import org.nightlabs.jfire.trade.LegalEntity;
 import org.nightlabs.jfire.trade.Offer;
 import org.nightlabs.jfire.trade.OfferLocal;
 import org.nightlabs.jfire.trade.OfferRequirement;
@@ -433,7 +435,7 @@ public abstract class ProductTypeActionHandler
 		PersistenceManager pm = getPersistenceManager();
 
 		// create the ProductTransfers for the grouped nested products
-		Map<String, Anchor> involvedAnchors = new HashMap<String, Anchor>();
+		Set involvedAnchors = new HashSet();
 		LinkedList productTransfers = new LinkedList();
 		boolean failed = true;
 		try {
@@ -592,7 +594,8 @@ public abstract class ProductTypeActionHandler
 					if (articleProductTypeLocal == null)
 						throw new IllegalStateException("article.getProductType().getProductTypeLocal() == null for imported Article (" + article.getPrimaryKey() + "). ProductType: " + articleProductType.getPrimaryKey());
 
-					Product product = store.addProduct(user, article.getProduct(), articleProductTypeLocal.getHome());
+//					Product product = store.addProduct(user, article.getProduct(), articleProductTypeLocal.getHome());
+					Product product = store.addProduct(user, article.getProduct());
 					product.getProductLocal().setAssembled(true); // since we receive it from another organisation, we always assume that it's assembled.
 //					product.getProductLocal().setArticle(article); // pointing back to the article which delivers it to us - NO! we do not point back, because the same product[Local] can be in multiple Articles (when being reversed - and maybe even resold and again reversed and so on) - it's cleaner to find the Article by a query - see the static method in class Article!
 				}
@@ -664,7 +667,7 @@ public abstract class ProductTypeActionHandler
 		}
 
 		// create the ProductTransfers for the grouped nested products
-		Map<String, Anchor> involvedAnchors = new HashMap<String, Anchor>();
+		Set involvedAnchors = new HashSet();
 		LinkedList productTransfers = new LinkedList();
 		boolean failed = true;
 		try {
@@ -813,6 +816,86 @@ public abstract class ProductTypeActionHandler
 	public void onDeliverEnd_storeDeliverEndServerResult(JFirePrincipal principal, Delivery delivery, Set<? extends Article> articles)
 	{
 	}
+
+	/**
+	 * Create/return an existing repository which is used to put a newly created product into it.
+	 *
+	 * @param product The new product before it is added to the store (it has no {@link ProductLocal} assigned yet).
+	 * @return the repository
+	 */
+	public Repository getInitialRepository(Product product)
+	{
+		PersistenceManager pm = getPersistenceManager();
+		Store store = Store.getStore(pm);
+
+		if (store.getOrganisationID().equals(product.getOrganisationID()))
+			return getInitialLocalRepository(product);
+		else
+			return getInitialForeignRepository(product);
+	}
+
+	protected String getAnchorIDForLocalHomeRepository(ProductType productType)
+	{
+		return productType.getClass().getName() + ".home";  
+	}
+
+	protected String getAnchorIDForForeignHomeRepository(ProductType productType)
+	{
+		return productType.getClass().getName() + ".home#" + productType.getOrganisationID();  
+	}
+
+	protected Repository getInitialLocalRepository(Product product)
+	{
+		return getDefaultHomeRepository(product.getProductType());
+	}
+
+	/**
+	 * This method is called by {@link Store#addProductType(User, ProductType)} in order to assign the default
+	 * value for {@link ProductTypeLocal#getHome()}.
+	 * <p>
+	 * Furthermore, it is called by {@link #getInitialLocalRepository(Product)} since the initial repository
+	 * for local products is the same as the home (while it is different for foreign products, which first need to
+	 * be delivered from their initial repository to their home).
+	 * </p>
+	 *
+	 * @param productType The <code>ProductType</code> for which to determine the default home.
+	 * @return the home repository
+	 */
+	public Repository getDefaultHomeRepository(ProductType productType)
+	{
+		PersistenceManager pm = getPersistenceManager();
+		Store store = Store.getStore(pm);
+
+		return Repository.createRepository(
+				pm,
+				store.getOrganisationID(),
+				Repository.ANCHOR_TYPE_ID_HOME,
+				store.getOrganisationID().equals(productType.getOrganisationID()) ?
+						getAnchorIDForLocalHomeRepository(productType) : getAnchorIDForForeignHomeRepository(productType),
+				store.getMandator(), false);
+	}
+
+	protected Repository getInitialForeignRepository(Product product)
+	{
+		PersistenceManager pm = getPersistenceManager();
+		Store store = Store.getStore(pm);
+
+		LegalEntity repositoryOwner = OrganisationLegalEntity.getOrganisationLegalEntity(
+				pm, product.getOrganisationID(), OrganisationLegalEntity.ANCHOR_TYPE_ID_ORGANISATION, true);
+
+		return PartnerStorekeeper.createPartnerOutsideRepository(pm, store.getOrganisationID(), repositoryOwner);
+//		Store store = Store.getStore(pm);
+//
+//		// local (i.e. produced here)
+//		return Repository.createRepository(
+//				pm,
+//				store.getOrganisationID(),
+//				Repository.ANCHOR_TYPE_,
+//				ANCHOR_ID_REPOSITORY_HOME_LOCAL,
+//				store.getMandator(), true);		
+	}
+
+
 
 //	public CrossTradeDeliveryCoordinator getCrossTradeDeliveryCoordinator()
 //	{

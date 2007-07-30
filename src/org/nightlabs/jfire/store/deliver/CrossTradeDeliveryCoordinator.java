@@ -70,6 +70,8 @@ import org.nightlabs.jfire.transfer.id.AnchorID;
  */
 public class CrossTradeDeliveryCoordinator
 {
+	private static final Logger logger = Logger.getLogger(CrossTradeDeliveryCoordinator.class);
+
 	public static CrossTradeDeliveryCoordinator getDefaultCrossTradeDeliveryCoordinator(PersistenceManager pm)
 	{
 		CrossTradeDeliveryCoordinatorID id = CrossTradeDeliveryCoordinatorID.create(Organisation.DEVIL_ORGANISATION_ID, CrossTradeDeliveryCoordinator.class.getName());
@@ -169,7 +171,11 @@ public class CrossTradeDeliveryCoordinator
 			DeliveryNote.FETCH_GROUP_CREATE_USER,
 			DeliveryNote.FETCH_GROUP_CUSTOMER,
 			DeliveryNote.FETCH_GROUP_FINALIZE_USER,
-			DeliveryNote.FETCH_GROUP_VENDOR
+			DeliveryNote.FETCH_GROUP_VENDOR,
+//			Article.FETCH_GROUP_ORDER, // should already be set - no need to detach
+//			Article.FETCH_GROUP_OFFER, // should already be set - no need to detach
+			Article.FETCH_GROUP_INVOICE,
+			Article.FETCH_GROUP_DELIVERY_NOTE,
 	};
 
 	public void performCrossTradeDelivery(Set<Article> articles)
@@ -221,6 +227,11 @@ public class CrossTradeDeliveryCoordinator
 				}
 			}
 
+			if (from == null)
+				throw new IllegalStateException("from is still null!");
+			if (to == null)
+				throw new IllegalStateException("to is still null!");
+
 			PersistenceManager pm = getPersistenceManager();
 			Store store = Store.getStore(pm);
 			OrganisationLegalEntity mandator = store.getMandator();
@@ -232,8 +243,7 @@ public class CrossTradeDeliveryCoordinator
 			// from and to are now defined and we have to create a Delivery
 			// we actually create TWO deliveries - one for the local side and one for
 			// the remote side, where the client-side of each is fake
-			Delivery localDelivery = createDelivery(mandator, from, to, articles,
-					false);
+			Delivery localDelivery = createDelivery(mandator, from, to, articles, false);
 			DeliveryID localDeliveryID = DeliveryID.create(localDelivery
 					.getOrganisationID(), localDelivery.getDeliveryID());
 			Delivery remoteDelivery = createDelivery(mandator, from, to, articles,
@@ -247,8 +257,7 @@ public class CrossTradeDeliveryCoordinator
 					remoteDelivery, localDelivery, remoteDelivery);
 
 			StoreManager localStoreManager = createStoreManager(null);
-			StoreManager remoteStoreManager = createStoreManager(
-					localDelivery.getPartnerID().organisationID);
+			StoreManager remoteStoreManager = createStoreManager(localDelivery.getPartnerID().organisationID);
 
 			// the local stuff is stored here - the remote stuff is solely stored in
 			// the remote organisation - at least for now
@@ -368,11 +377,17 @@ public class CrossTradeDeliveryCoordinator
 			// DeliveryResult(DeliveryResult.CODE_APPROVED_NO_EXTERNAL, null, null),
 			// forceRollback);
 
+			localDeliveryData.prepareUpload();
+			localDelivery = localDeliveryData.getDelivery();
+			remoteDeliveryData.prepareUpload();
+			remoteDelivery = remoteDeliveryData.getDelivery();
+
 			// step 1: simulate the client delivery for remote side
 			remoteDelivery.setDeliverBeginClientResult(new DeliveryResult(
 					DeliveryResult.CODE_APPROVED_NO_EXTERNAL, null, null));
 
 			// step 2: deliver begin with remote server
+			logger.info("performCrossTradeDelivery: step 2: deliver begin with remote organisation");
 			DeliveryResult localClientDeliverBeginResult;
 			try {
 				DeliveryResult remoteServerDeliverBeginResult = remoteStoreManager.deliverBegin(remoteDeliveryData);
@@ -392,8 +407,12 @@ public class CrossTradeDeliveryCoordinator
 
 			// step 3: simulate the client delivery for local side
 			localDelivery.setDeliverBeginClientResult(localClientDeliverBeginResult);
+			
+			// TODO WORKAROUND
+			localStoreManager = createStoreManager(null);
 
 			// step 4: deliver begin with local server
+			logger.info("performCrossTradeDelivery: step 4: deliver begin with local organisation");
 			DeliveryResult remoteClientDeliveryDoWorkResult;
 			try {
 				DeliveryResult localServerDeliverBeginResult = localStoreManager.deliverBegin(localDeliveryData);
@@ -410,6 +429,9 @@ public class CrossTradeDeliveryCoordinator
 				forceRollback = true;
 				remoteClientDeliveryDoWorkResult = new DeliveryResult(t);
 			}
+
+			// TODO WORKAROUND
+			remoteStoreManager = createStoreManager(localDelivery.getPartnerID().organisationID);
 
 			// step 5: deliver doWork with remote server
 			DeliveryResult localClientDeliveryDoWorkResult;
@@ -430,6 +452,9 @@ public class CrossTradeDeliveryCoordinator
 				localClientDeliveryDoWorkResult = new DeliveryResult(t);
 			}
 
+			// TODO WORKAROUND
+			localStoreManager = createStoreManager(null);
+
 			// step 6: deliver doWork with local server
 			DeliveryResult remoteClientDeliveryEndResult;
 			try {
@@ -448,6 +473,9 @@ public class CrossTradeDeliveryCoordinator
 				forceRollback = true;
 				remoteClientDeliveryEndResult = new DeliveryResult(t);
 			}
+
+			// TODO WORKAROUND
+			remoteStoreManager = createStoreManager(localDelivery.getPartnerID().organisationID);
 
 			// step 7: deliver end with remote server
 			DeliveryResult localClientDeliveryEndResult;
@@ -468,6 +496,9 @@ public class CrossTradeDeliveryCoordinator
 				forceRollback = true;
 				localClientDeliveryEndResult = new DeliveryResult(t);
 			}
+
+			// TODO WORKAROUND
+			localStoreManager = createStoreManager(null);
 
 			// step 8: deliver end with local server
 			try {
@@ -495,8 +526,13 @@ public class CrossTradeDeliveryCoordinator
 			throws RemoteException, CreateException, NamingException
 	{
 		if (organisationID == null
-				|| IDGenerator.getOrganisationID().equals(organisationID))
-			return StoreManagerUtil.getHome().create();
+				|| IDGenerator.getOrganisationID().equals(organisationID)) {
+// TODO Workaround: The CascadedAuthentication stuff seems to fail (i.e. the StoreManager proxy created here does not point to the local organisation anymore after the remote one has been used)
+//			return StoreManagerUtil.getHome().create();
+			return StoreManagerUtil.getHome(
+					Lookup.getInitialContextProperties(getPersistenceManager(),
+							IDGenerator.getOrganisationID())).create();
+		}
 
 		return StoreManagerUtil.getHome(
 				Lookup.getInitialContextProperties(getPersistenceManager(),

@@ -29,6 +29,7 @@ package org.nightlabs.jfire.trade;
 import javax.jdo.JDODataStoreException;
 import javax.jdo.JDOObjectNotFoundException;
 import javax.jdo.PersistenceManager;
+import javax.jdo.listener.StoreCallback;
 
 import org.nightlabs.jfire.organisation.LocalOrganisation;
 import org.nightlabs.jfire.organisation.Organisation;
@@ -50,8 +51,10 @@ import org.nightlabs.jfire.transfer.id.AnchorID;
  * @jdo.fetch-group name="OrganisationLegalEntity.this" fetch-groups="default" fields="organisation"
  */
 public class OrganisationLegalEntity extends LegalEntity
-//implements StoreCallback
+implements StoreCallback
 {
+	private static final long serialVersionUID = 1L;
+
 	public static final String FETCH_GROUP_ORGANISATION = "OrganisationLegalEntity.organisation";
 	public static final String FETCH_GROUP_THIS_ORGANISATION_LEGAL_ENTITY = "OrganisationLegalEntity.this";
 	
@@ -119,16 +122,18 @@ public class OrganisationLegalEntity extends LegalEntity
 	/**
 	 * @jdo.field persistence-modifier="persistent"
 	 */
-	private org.nightlabs.jfire.organisation.Organisation organisation;
+	private Organisation organisation;
 
 	/**
 	 * @return Returns the organisation.
 	 */
-	public org.nightlabs.jfire.organisation.Organisation getOrganisation()
+	public Organisation getOrganisation()
 	{
+		if (organisation == null)
+			organisation = Organisation.getOrganisation(getPersistenceManager(), getOrganisationID());
+
 		return organisation;
 	}
-	
 
 //	/**
 //	 * @return Returns the localOrganisation.
@@ -213,8 +218,12 @@ public class OrganisationLegalEntity extends LegalEntity
 		return organisationLegalEntity;
 	}
 
-//	public void jdoPreStore() {
+
+	public void jdoPreStore() {
+		// TODO JPOX Workaround - would be great to set this automatically
+//		if (organisation == null)
+//			organisation = Organisation.getOrganisation(getPersistenceManager(), getOrganisationID());
 //		if (getPerson() == null)
 //			setPerson(organisation.getPerson());
-//	}
+	}
 }

@@ -30,6 +30,7 @@ import java.io.Serializable;
 import java.util.Collection;
 import java.util.LinkedList;
 import java.util.Map;
+import java.util.Set;
 
 import javax.jdo.JDOHelper;
 import javax.jdo.PersistenceManager;
@@ -181,7 +182,7 @@ public abstract class LocalAccountantDelegate implements Serializable {
 			Invoice invoice,
 			Article article, 
 			BookMoneyTransfer container, 
-			Map<String, Anchor> involvedAnchors
+			Set<Anchor> involvedAnchors
 		);
 	
 	
@@ -191,7 +192,7 @@ public abstract class LocalAccountantDelegate implements Serializable {
 	 * @param bookTransfer TODO
 	 * @param involvedAnchors TODO
 	 */
-	public void preBookArticles(OrganisationLegalEntity mandator, User user, Invoice invoice, BookMoneyTransfer bookTransfer, Map<String, Anchor> involvedAnchors) {}
+	public void preBookArticles(OrganisationLegalEntity mandator, User user, Invoice invoice, BookMoneyTransfer bookTransfer, Set<Anchor> involvedAnchors) {}
 
 	/**
 	 * Called by LocalAccountant before all articles of an invoice are booked.
@@ -199,7 +200,7 @@ public abstract class LocalAccountantDelegate implements Serializable {
 	 * @param bookTransfer TODO
 	 * @param involvedAnchors TODO
 	 */
-	public void postBookArticles(OrganisationLegalEntity mandator, User user, Invoice invoice, BookMoneyTransfer bookTransfer, Map<String, Anchor> involvedAnchors) {}
+	public void postBookArticles(OrganisationLegalEntity mandator, User user, Invoice invoice, BookMoneyTransfer bookTransfer, Set<Anchor> involvedAnchors) {}
 	
 	
 	/**
@@ -218,7 +219,7 @@ public abstract class LocalAccountantDelegate implements Serializable {
 			LinkedList<ArticlePrice> articlePriceStack,
 			int delegationLevel,
 			BookMoneyTransfer container, 
-			Map<String, Anchor> involvedAnchors
+			Set<Anchor> involvedAnchors
 		);
 	
 	

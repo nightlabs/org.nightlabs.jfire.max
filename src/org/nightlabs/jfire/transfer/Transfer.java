@@ -29,6 +29,7 @@ package org.nightlabs.jfire.transfer;
 import java.io.Serializable;
 import java.util.Date;
 import java.util.Map;
+import java.util.Set;
 
 import javax.jdo.JDOHelper;
 
@@ -284,7 +285,7 @@ public abstract class Transfer
 	 * <tt>to.bookTransfer(...)</tt>. Some special implementations
 	 * might do other stuff, too.
 	 */
-	public void bookTransfer(User user, Map<String, Anchor> involvedAnchors)
+	public void bookTransfer(User user, Set<Anchor> involvedAnchors)
 	{
 		if (JDOHelper.getPersistenceManager(this) == null)
 			throw new IllegalStateException("This Transfer has not yet been persisted or it has been detached!");
@@ -293,7 +294,7 @@ public abstract class Transfer
 		to.bookTransfer(user, this, involvedAnchors);
 	}
 
-	public void rollbackTransfer(User user, Map<String, Anchor> involvedAnchors)
+	public void rollbackTransfer(User user, Set<Anchor> involvedAnchors)
 	{
 		if (JDOHelper.getPersistenceManager(this) == null)
 			throw new IllegalStateException("This Transfer has not yet been persisted or it has been detached!");

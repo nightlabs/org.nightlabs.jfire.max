@@ -68,6 +68,7 @@ import org.nightlabs.jfire.store.deliver.DeliveryConfiguration;
 import org.nightlabs.jfire.store.id.ProductTypeGroupID;
 import org.nightlabs.jfire.store.id.ProductTypeID;
 import org.nightlabs.jfire.trade.LegalEntity;
+import org.nightlabs.util.Util;
 import org.nightlabs.util.Utils;
 
 /**
@@ -1684,15 +1685,15 @@ implements
 		return this.getClass().getName() + '{' + getPrimaryKey() + '}';
 	}
 
-	protected ProductTypeLocal createProductTypeLocal(User user, Repository home)
+	protected ProductTypeLocal createProductTypeLocal(User user, Repository defaultHomeRepository)
 	{
-		return new ProductTypeLocal(user, this, home); // self-registering
+		return new ProductTypeLocal(user, this, defaultHomeRepository); // self-registering
 	}
 
 	@Override
 	public int hashCode()
 	{
-		return Utils.hashCode(organisationID) ^ Utils.hashCode(productTypeID);
+		return Util.hashCode(organisationID) ^ Util.hashCode(productTypeID);
 	}
 	@Override
 	public boolean equals(Object obj)
@@ -1706,7 +1707,7 @@ implements
 		ProductType o = (ProductType) obj;
 
 		return
-				Utils.equals(this.organisationID, o.organisationID) &&
-				Utils.equals(this.productTypeID, o.productTypeID);
+				Util.equals(this.organisationID, o.organisationID) &&
+				Util.equals(this.productTypeID, o.productTypeID);
 	}
 }

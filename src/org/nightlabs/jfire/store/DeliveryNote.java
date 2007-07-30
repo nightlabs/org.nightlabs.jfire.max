@@ -700,12 +700,12 @@ implements Serializable, ArticleContainer, Statable, DetachCallback
 		return _receptionNotes;
 	}
 
-	public void bookDeliveryNoteProductTransfer(DeliveryNoteProductTransfer transfer, Map<String, Anchor> involvedAnchors, boolean rollback)
+	public void bookDeliveryNoteProductTransfer(DeliveryNoteProductTransfer transfer, Set<Anchor> involvedAnchors, boolean rollback)
 	{
 //		if (!DeliveryNoteProductTransfer.BOOK_TYPE_DELIVER.equals(transfer.getBookType()))
 //			return;
 	}
-	public void bookDeliverProductTransfer(DeliverProductTransfer transfer, Map<String, Anchor> involvedAnchors, boolean rollback)
+	public void bookDeliverProductTransfer(DeliverProductTransfer transfer, Set<Anchor> involvedAnchors, boolean rollback)
 	{
 		boolean vendorIsFrom = transfer.getAnchorType(vendor) == Transfer.ANCHORTYPE_FROM;
 		boolean vendorIsTo = transfer.getAnchorType(vendor) == Transfer.ANCHORTYPE_TO;

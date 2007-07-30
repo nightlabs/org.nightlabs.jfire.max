@@ -113,7 +113,7 @@ public class ProductTransfer extends Transfer implements Serializable
 	}
 
 	@Override
-	public void bookTransfer(User user, Map<String, Anchor> involvedAnchors)
+	public void bookTransfer(User user, Set<Anchor> involvedAnchors)
 	{
 		// TODO We must - either here or somewhere else - ensure that all the nested products are transferred, too (and have the same repository as the package product afterwards).
 		super.bookTransfer(user, involvedAnchors);

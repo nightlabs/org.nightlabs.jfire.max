@@ -32,6 +32,7 @@ import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import javax.jdo.JDOHelper;
 import javax.jdo.PersistenceManager;
@@ -81,7 +82,7 @@ public class PartnerAccountant extends Accountant
 	/**
 	 * @see org.nightlabs.jfire.accounting.book.Accountant#bookTransfer(User, LegalEntity, MoneyTransfer, Map)
 	 */
-	public void bookTransfer(User user, LegalEntity mandator, MoneyTransfer transfer, Map involvedAnchors) {
+	public void bookTransfer(User user, LegalEntity mandator, MoneyTransfer transfer, Set<Anchor> involvedAnchors) {
 		if (transfer instanceof BookMoneyTransfer)
 			handleBookMoneyTransfer(mandator, (BookMoneyTransfer)transfer, user, involvedAnchors);
 		else if (transfer instanceof PayMoneyTransfer)
@@ -96,7 +97,7 @@ public class PartnerAccountant extends Accountant
 	 * @param mandator
 	 * @param transfer
 	 */
-	protected void handleBookMoneyTransfer(LegalEntity mandator, BookMoneyTransfer transfer, User user, Map<String, Anchor> involvedAnchors)
+	protected void handleBookMoneyTransfer(LegalEntity mandator, BookMoneyTransfer transfer, User user, Set<Anchor> involvedAnchors)
 	{
 		boolean mandatorIsVendor = transfer.getInvoice().getVendor().getPrimaryKey().equals(mandator.getPrimaryKey());
 		boolean mandatorIsCustomer = !mandatorIsVendor;
@@ -182,7 +183,7 @@ public class PartnerAccountant extends Accountant
 	 */
 	private long handleSingleInvoicePayment(
 			User user, LegalEntity partner, PayMoneyTransfer transfer,
-			Invoice invoice, long amountToPay, Map<String, Anchor> involvedAnchors)
+			Invoice invoice, long amountToPay, Set<Anchor> involvedAnchors)
 	{
 		if (amountToPay < 0)
 			throw new IllegalArgumentException("amountToPay=="+amountToPay+"! amountToPay must be positive or zero!");
@@ -272,7 +273,7 @@ public class PartnerAccountant extends Accountant
 	 */
 	protected void handlePayMoneyTransfer(
 			User user, LegalEntity partner,
-			PayMoneyTransfer payMoneyTransfer, Map involvedAnchors)
+			PayMoneyTransfer payMoneyTransfer, Set<Anchor> involvedAnchors)
 	{
 		PersistenceManager pm = getPersistenceManager();
 		Account partnerAccount = payMoneyTransfer.getPayment().getPartnerAccount();

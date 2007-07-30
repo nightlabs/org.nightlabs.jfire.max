@@ -478,17 +478,25 @@ implements Serializable, DetachCallback
 	throws DeliveryException
 	{
 		// find out from and to (one is the virtual treasury and one the partner's LegalEntity)
+
+		LegalEntity partner = deliverParams.deliveryData.getDelivery().getPartner();
+		if (partner == null)
+			throw new IllegalStateException("deliverParams.deliveryData.getDelivery().getPartner() returned null!");
+
+		Anchor anchorOutside = getAnchorOutside(deliverParams);
+		if (anchorOutside == null)
+			throw new IllegalStateException("getAnchorOutside(...) returned null! Check implementation of ServerDeliveryProcessor: " + this.getClass().getName());
+
 		Anchor from = null;
 		Anchor to = null;
-
 		if (Delivery.DELIVERY_DIRECTION_INCOMING.equals(
 				deliverParams.deliveryData.getDelivery().getDeliveryDirection())) {
-			from = getAnchorOutside(deliverParams);
-			to = deliverParams.deliveryData.getDelivery().getPartner();
+			from = anchorOutside;
+			to = partner;
 		}
 		else {
-			from = deliverParams.deliveryData.getDelivery().getPartner();
-			to = getAnchorOutside(deliverParams);
+			from = partner;
+			to = anchorOutside;
 		}
 
 		DeliveryResult deliverBeginServerResult;

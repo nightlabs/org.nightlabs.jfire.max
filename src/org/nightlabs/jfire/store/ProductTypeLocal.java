@@ -104,9 +104,7 @@ implements Serializable
 	}
 
 	/**
-	 * Home is a {@link Repository}, into which every newly created Product or newly bought product will be put.
-	 *
-	 * @return
+	 * @see Repository#ANCHOR_TYPE_ID_HOME
 	 */
 	public Repository getHome()
 	{

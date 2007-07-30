@@ -39,6 +39,7 @@ import javax.jdo.PersistenceManager;
 import javax.jdo.listener.StoreCallback;
 
 import org.nightlabs.jdo.ObjectIDUtil;
+import org.nightlabs.jfire.idgenerator.IDGenerator;
 import org.nightlabs.jfire.security.User;
 import org.nightlabs.jfire.store.DeliveryNote;
 import org.nightlabs.jfire.store.deliver.ServerDeliveryProcessor.DeliverParams;
@@ -1373,7 +1374,7 @@ implements Serializable, StoreCallback
 					ArticleLocal articleLocal = article.getArticleLocal();
 
 					if (articleLocal.isDelivered() && !getPrimaryKey().equals(articleLocal.getDelivery().getPrimaryKey()))
-						throw new IllegalStateException("The Article \""+article.getPrimaryKey()+"\" has already been delivered by another delivery!");
+						throw new IllegalStateException("The Article \""+article.getPrimaryKey()+"\" has already been delivered by another delivery! localOrganisationID=" + IDGenerator.getOrganisationID() + " thisDelivery=" + getPrimaryKey() + " articleLocal.getDelivery().getPrimaryKey()=" + articleLocal.getDelivery().getPrimaryKey());
 
 //					articleLocal.setDelivery(this); // this must be done when booking the transfer - not now
 

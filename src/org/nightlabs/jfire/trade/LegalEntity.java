@@ -303,7 +303,7 @@ public class LegalEntity extends Anchor
 			throw new IllegalArgumentException("I know only MoneyTransfer and ProductTransfer! Your container of type " + containers.getClass() + " cannot be processed!");
 	}
 
-	protected void bookMoneyTransfer(MoneyTransfer transfer, User user, Map involvedAnchors)
+	protected void bookMoneyTransfer(MoneyTransfer transfer, User user, Set<Anchor> involvedAnchors)
 	{
 		if (accountant == null)
 			throw new NullPointerException("There is no accountant existing in this LegalEntity (\""+this.getPrimaryKey()+"\")!");
@@ -324,7 +324,7 @@ public class LegalEntity extends Anchor
 	}
 
 	protected void rollbackMoneyTransfer(MoneyTransfer transfer, User user,
-			Map involvedAnchors)
+			Set<Anchor> involvedAnchors)
 	{
 		if (accountant == null)
 			throw new NullPointerException("There is no accountant existing in this LegalEntity (\""+this.getPrimaryKey()+"\")!");
@@ -355,7 +355,7 @@ public class LegalEntity extends Anchor
 		return productReference;
 	}
 
-	protected void bookProductTransfer(ProductTransfer transfer, org.nightlabs.jfire.security.User user, Map involvedAnchors)
+	protected void bookProductTransfer(ProductTransfer transfer, org.nightlabs.jfire.security.User user, Set<Anchor> involvedAnchors)
 	{
 		if (storekeeper == null)
 			throw new NullPointerException("There is no storekeeper existing in this LegalEntity (\""+this.getPrimaryKey()+"\")!");
@@ -380,7 +380,7 @@ public class LegalEntity extends Anchor
 	}
 
 	protected void rollbackProductTransfer(ProductTransfer transfer, User user,
-			Map involvedAnchors)
+			Set<Anchor> involvedAnchors)
 	{
 		Map productReferences = (Map) productReferencesTL.get();
 
@@ -398,7 +398,7 @@ public class LegalEntity extends Anchor
 		}
 	}
 
-	protected void internalBookTransfer(Transfer transfer, User user, Map<String, Anchor> involvedAnchors)
+	protected void internalBookTransfer(Transfer transfer, User user, Set<Anchor> involvedAnchors)
 	{
 		PersistenceManager pm = JDOHelper.getPersistenceManager(this);
 		if (pm == null)
@@ -415,7 +415,7 @@ public class LegalEntity extends Anchor
 	}
 
 	protected void internalRollbackTransfer(Transfer transfer, User user,
-			Map involvedAnchors)
+			Set<Anchor> involvedAnchors)
 	{
 //		PersistenceManager pm = JDOHelper.getPersistenceManager(this);
 //		if (pm == null)

@@ -92,7 +92,7 @@ import org.nightlabs.jfire.transfer.Transfer;
 
 /**
  * The Store is responsible for managing all ProductTypes and Products
- * within the store. There exists exactly one instance.
+ * within the store. There exists exactly one instance in the jdo datastore.
  * 
  * @author marco at nightlabs dot de
  *
@@ -329,7 +329,7 @@ implements StoreCallback
 	 * @param user Which user is adding this productType.
 	 * @param productType
 	 */
-	public ProductType addProductType(User user, ProductType productType, Repository home)
+	public ProductType addProductType(User user, ProductType productType)
 	{
 		PersistenceManager pm = getPersistenceManager();
 //		try {
@@ -353,16 +353,19 @@ implements StoreCallback
 			pm.makePersistent(productTypeStatusTracker);
 		}
 
-		productType.createProductTypeLocal(user, home);
+		ProductTypeActionHandler productTypeActionHandler = ProductTypeActionHandler.getProductTypeActionHandler(getPersistenceManager(), productType.getClass());
+		Repository defaultHomeRepository = productTypeActionHandler.getDefaultHomeRepository(productType);
+
+		productType.createProductTypeLocal(user, defaultHomeRepository);
 		return productType;
 	}
 
 	/**
 	 * @param user Which user is adding this product.
 	 * @param product The <tt>Product</tt> that shall be added.
-	 * @param initialRepository The <tt>Repository</tt> into which the <tt>product</tt> is "born"
+	 * @!param initialRepository The <tt>Repository</tt> into which the <tt>product</tt> is "born"
 	 */
-	public Product addProduct(User user, Product product, Repository initialRepository)
+	public Product addProduct(User user, Product product) // , Repository initialRepository)
 	{
 		// note that the product might already be persistent - e.g. when importing from another organisation (cross-trade).
 		PersistenceManager pm = getPersistenceManager();
@@ -371,6 +374,7 @@ implements StoreCallback
 		if (product.getProductLocal() != null)
 			throw new IllegalArgumentException("This Product has already a ProductLocal assigned! Obviously you either called Store.addProduct(...) twice or you detached a ProductLocal from a remote organisation! Both is illegal!");
 
+		Repository initialRepository = ProductTypeActionHandler.getProductTypeActionHandler(pm, product.getProductType().getClass()).getInitialRepository(product);
 		product.createProductLocal(user, initialRepository);
 		return product;
 	}
@@ -907,7 +911,7 @@ implements StoreCallback
 //			to,			
 //			deliveryNote
 //		);
-//		HashMap involvedAnchors = new HashMap();
+//		HashSet<Anchor> involvedAnchors = new HashMap();
 //		interLegalEntityMoneyTransfer.bookTransfer(initiator, involvedAnchors);
 
 		if (deliveryNote.getCustomer().getStorekeeper() == null)
@@ -917,7 +921,7 @@ implements StoreCallback
 			deliveryNote.getVendor().setStorekeeper(getPartnerStorekeeper());
 
 		// The booking works only with ProductHoles - the ProductLocal is not touched (Product is never touched anyway by deliveries or bookings) 
-		Map<String, Anchor> involvedAnchors = new HashMap<String, Anchor>();
+		Set involvedAnchors = new HashSet();
 		List bookProductTransfers = BookProductTransfer.createBookProductTransfers(initiator, deliveryNote);
 		boolean failed = true;
 		try {
@@ -951,7 +955,7 @@ implements StoreCallback
 	 * @param containers Instances of {@link Transfer}
 	 * @param involvedAnchors
 	 */
-	protected void checkIntegrity(Collection containers, Map involvedAnchors)
+	protected void checkIntegrity(Collection containers, Set<Anchor> involvedAnchors)
 	{
 		PersistenceManager pm = getPersistenceManager();
 
@@ -967,7 +971,7 @@ implements StoreCallback
 		Map fromProductReferenceByProductMap = new HashMap();
 		Map toProductReferenceByProductMap = new HashMap();
 
-		for (Iterator itA = involvedAnchors.values().iterator(); itA.hasNext(); ) {
+		for (Iterator itA = involvedAnchors.iterator(); itA.hasNext(); ) {
 			Anchor anchor = (Anchor) itA.next();
 
 			// Give every involved Anchor the possibility to check itself.
@@ -1118,7 +1122,7 @@ implements StoreCallback
 			throw new NullPointerException("deliveryData");
 
 		if (deliveryData.getDelivery() == null)
-			throw new NullPointerException("deliveryData.getDelivery() returns null!");
+			throw new NullPointerException("deliveryData.getDelivery() returns null! localOrganisation="+getOrganisationID());
 
 		PersistenceManager pm = getPersistenceManager();
 
@@ -1131,14 +1135,14 @@ implements StoreCallback
 					deliveryData.getDelivery().getDeliveryNotes());
 		}
 		else
-			throw new IllegalArgumentException("Delivery is not possible anymore without delivery notes! This exception should never happen.");
+			throw new IllegalArgumentException("Delivery is not possible anymore without delivery notes! This exception should never happen. localOrganisation="+getOrganisationID());
 
 		if (partner == null) {
 			partner = deliveryData.getDelivery().getPartner();
 		}
 		else {
 			if (!partner.getPrimaryKey().equals(deliveryData.getDelivery().getPartner().getPrimaryKey()))
-				throw new IllegalArgumentException("deliveryData.getDelivery().getPartner() does not match the partner of deliveryData.getDelivery().getDeliveryNotes()! deliveryNotes' partner is \"" + partner.getPrimaryKey() + "\" but delivery.partner is \"" + deliveryData.getDelivery().getPartner().getPrimaryKey() + "\"");
+				throw new IllegalArgumentException("deliveryData.getDelivery().getPartner() does not match the partner of deliveryData.getDelivery().getDeliveryNotes()! deliveryNotes' partner is \"" + partner.getPrimaryKey() + "\" but delivery.partner is \"" + deliveryData.getDelivery().getPartner().getPrimaryKey() + "\" localOrganisation="+getOrganisationID());
 		}
 
 		deliverBegin_checkArticles(deliveryData.getDelivery().getArticles());
@@ -1156,7 +1160,7 @@ implements StoreCallback
 			throw new DeliveryException(
 					new DeliveryResult(
 							DeliveryResult.CODE_FAILED,
-							"deliveryData.getDelivery().getDeliverBeginServerResult() returned null! You probably forgot to set it in your ServerDeliveryProcessor (\""+serverDeliveryProcessor.getPrimaryKey()+"\")!",
+							"deliveryData.getDelivery().getDeliverBeginServerResult() returned null! You probably forgot to set it in your ServerDeliveryProcessor (\""+serverDeliveryProcessor.getPrimaryKey()+"\")! localOrganisation="+getOrganisationID(),
 							(Throwable)null));
 
 		if (serverDeliveryResult.isFailed())
@@ -1178,7 +1182,7 @@ implements StoreCallback
 			throw new DeliveryException(
 					new DeliveryResult(
 							DeliveryResult.CODE_FAILED,
-							"Calling DeliveryNoteActionHandler.onDeliverBegin failed!",
+							"Calling DeliveryNoteActionHandler.onDeliverBegin failed! localOrganisation="+getOrganisationID(),
 							x));
 		}
 
@@ -1187,7 +1191,7 @@ implements StoreCallback
 			// if we have a DeliverProductTransfer, we need to delete it from datastore
 			if (deliverProductTransfer != null) {
 				if (deliverProductTransfer.isBookedFrom() || deliverProductTransfer.isBookedTo())
-					throw new IllegalStateException("DeliverProductTransfer is already booked! You should never book the DeliverProductTransfer in your ServerDeliveryProcessor! Check the class \""+serverDeliveryProcessor.getClass()+"\"!");
+					throw new IllegalStateException("DeliverProductTransfer is already booked! You should never book the DeliverProductTransfer in your ServerDeliveryProcessor! Check the class \""+serverDeliveryProcessor.getClass()+"\"! localOrganisation="+getOrganisationID());
 
 				getPersistenceManager().deletePersistent(deliverProductTransfer);
 				deliverProductTransfer = null;
@@ -1198,9 +1202,9 @@ implements StoreCallback
 				throw new DeliveryException(serverDeliveryResult);
 
 			if (deliverProductTransfer == null)
-				throw new NullPointerException("serverDeliveryProcessor.deliverBegin(...) returned null but Delivery is NOT postponed! You are only allowed (and you should) return null, if you postpone a Delivery! serverDeliveryProcessorPK=\""+serverDeliveryProcessor.getPrimaryKey()+"\"");
+				throw new NullPointerException("serverDeliveryProcessor.deliverBegin(...) returned null but Delivery is NOT postponed! You are only allowed (and you should) return null, if you postpone a Delivery! serverDeliveryProcessorPK=\""+serverDeliveryProcessor.getPrimaryKey()+"\" localOrganisation="+getOrganisationID());
 
-			Map<String, Anchor> involvedAnchors = new HashMap<String, Anchor>();
+			Set involvedAnchors = new HashSet();
 			ArrayList containers = new ArrayList(1);
 			containers.add(deliverProductTransfer);
 			boolean failed = true;
@@ -1437,7 +1441,7 @@ implements StoreCallback
 
 		PersistenceManager pm = getPersistenceManager();
 
-		Map involvedAnchors = new HashMap();
+		Set involvedAnchors = new HashSet();
 		ArrayList containers = new ArrayList(1);
 		containers.add(deliverProductTransfer);
 		boolean failed = true;

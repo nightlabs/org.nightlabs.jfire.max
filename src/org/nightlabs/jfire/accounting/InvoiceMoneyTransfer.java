@@ -27,6 +27,7 @@
 package org.nightlabs.jfire.accounting;
 
 import java.util.Map;
+import java.util.Set;
 
 import org.nightlabs.jfire.security.User;
 import org.nightlabs.jfire.transfer.Anchor;
@@ -142,13 +143,13 @@ extends MoneyTransfer
 	 * @see org.nightlabs.jfire.transfer.Transfer#bookTransfer(org.nightlabs.jfire.security.User, java.util.Map)
 	 */
 	@Override
-	public void bookTransfer(User user, Map<String, Anchor> involvedAnchors)
+	public void bookTransfer(User user, Set<Anchor> involvedAnchors)
 	{
 		bookTransferAtInvoice(user, involvedAnchors);
 		super.bookTransfer(user, involvedAnchors);
 	}
 
-	protected void bookTransferAtInvoice(User user, Map involvedAnchors)
+	protected void bookTransferAtInvoice(User user, Set<Anchor> involvedAnchors)
 	{
 		invoice.bookInvoiceMoneyTransfer(this, false);
 	}
@@ -158,13 +159,13 @@ extends MoneyTransfer
 	 * @see org.nightlabs.jfire.transfer.Transfer#rollbackTransfer(org.nightlabs.jfire.security.User, java.util.Map)
 	 */
 	@Override
-	public void rollbackTransfer(User user, Map<String, Anchor> involvedAnchors)
+	public void rollbackTransfer(User user, Set<Anchor> involvedAnchors)
 	{
 		rollbackTransferAtInvoice(user, involvedAnchors);
 		super.rollbackTransfer(user, involvedAnchors);
 	}
 
-	protected void rollbackTransferAtInvoice(User user, Map involvedAnchors)
+	protected void rollbackTransferAtInvoice(User user, Set<Anchor> involvedAnchors)
 	{
 		invoice.bookInvoiceMoneyTransfer(this, true);
 	}

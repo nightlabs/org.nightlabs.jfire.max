@@ -27,11 +27,12 @@
 package org.nightlabs.jfire.accounting.book;
 
 import java.io.Serializable;
-import java.util.Map;
+import java.util.Set;
 
 import org.nightlabs.jfire.accounting.MoneyTransfer;
 import org.nightlabs.jfire.security.User;
 import org.nightlabs.jfire.trade.LegalEntity;
+import org.nightlabs.jfire.transfer.Anchor;
 
 /**
  * An Accountant is responsible for splitting money into several accounts and for
@@ -90,5 +91,5 @@ public abstract class Accountant implements Serializable
 	{
 		return accountantID;
 	}
-	public abstract void bookTransfer(User user, LegalEntity mandator, MoneyTransfer transfer, Map involvedAnchors);
+	public abstract void bookTransfer(User user, LegalEntity mandator, MoneyTransfer transfer, Set<Anchor> involvedAnchors);
 }

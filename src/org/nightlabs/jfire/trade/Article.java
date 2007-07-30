@@ -99,7 +99,7 @@ import org.nightlabs.util.Util;
  * @jdo.fetch-group name="Article.invoice" fields="invoice"
  * @jdo.fetch-group name="Article.deliveryNote" fields="deliveryNote"
  * @jdo.fetch-group name="Article.receptionNote" fields="receptionNote"
- * @jdo.fetch-group name="Article.delivery" fields="delivery"
+ * @!jdo.fetch-group name="Article.delivery" fields="delivery"
  *
  * @jdo.fetch-group name="FetchGroupsTrade.articleInOrderEditor" fields="articleLocal, segment, productType, product, tariff, price"
  * @jdo.fetch-group name="FetchGroupsTrade.articleInOfferEditor" fields="articleLocal, segment, productType, product, tariff, price"
@@ -133,7 +133,7 @@ implements Serializable, DeleteCallback, DetachCallback, StoreCallback
 	public static final String FETCH_GROUP_INVOICE = "Article.invoice";
 	public static final String FETCH_GROUP_DELIVERY_NOTE = "Article.deliveryNote";
 	public static final String FETCH_GROUP_RECEPTION_NOTE = "Article.receptionNote";
-	public static final String FETCH_GROUP_DELIVERY = "Article.delivery";
+//	public static final String FETCH_GROUP_DELIVERY = "Article.delivery";
 
 	// the following fetch-groups are virtual and processed in the detach callback
 	// all of them are included virtually in the FetchGroupsTrade.articleInXXX fetch-groups

@@ -28,6 +28,7 @@ package org.nightlabs.jfire.store.book;
 
 import java.io.Serializable;
 import java.util.Map;
+import java.util.Set;
 
 import javax.jdo.JDOHelper;
 import javax.jdo.PersistenceManager;
@@ -104,7 +105,7 @@ implements Serializable
 			DeliveryNote deliveryNote,
 			Article article, 
 			BookProductTransfer container, 
-			Map involvedAnchors
+			Set<Anchor> involvedAnchors
 		);
 
 	/**
@@ -113,7 +114,7 @@ implements Serializable
 	 * @param bookTransfer TODO
 	 * @param involvedAnchors TODO
 	 */
-	public void preBookArticles(OrganisationLegalEntity mandator, User user, DeliveryNote deliveryNote, BookProductTransfer bookTransfer, Map<String, Anchor> involvedAnchors) {}
+	public void preBookArticles(OrganisationLegalEntity mandator, User user, DeliveryNote deliveryNote, BookProductTransfer bookTransfer, Set<Anchor> involvedAnchors) {}
 
 	/**
 	 * Called by LocalStorekeeper before all articles of a deliveryNote are booked.
@@ -121,7 +122,7 @@ implements Serializable
 	 * @param bookTransfer TODO
 	 * @param involvedAnchors TODO
 	 */
-	public void postBookArticles(OrganisationLegalEntity mandator, User user, DeliveryNote deliveryNote, BookProductTransfer bookTransfer, Map<String, Anchor> involvedAnchors) {}
+	public void postBookArticles(OrganisationLegalEntity mandator, User user, DeliveryNote deliveryNote, BookProductTransfer bookTransfer, Set<Anchor> involvedAnchors) {}
 
 	protected PersistenceManager getPersistenceManager()
 	{

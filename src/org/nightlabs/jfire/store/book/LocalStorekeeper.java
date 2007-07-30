@@ -41,6 +41,7 @@ import org.nightlabs.jfire.store.ProductTransfer;
 import org.nightlabs.jfire.trade.Article;
 import org.nightlabs.jfire.trade.LegalEntity;
 import org.nightlabs.jfire.trade.OrganisationLegalEntity;
+import org.nightlabs.jfire.transfer.Anchor;
 
 /**
  * @author Marco Schulze - marco at nightlabs dot de
@@ -77,7 +78,7 @@ public class LocalStorekeeper extends Storekeeper
 	}
 
 	public void bookTransfer(User user, LegalEntity mandator,
-			ProductTransfer transfer, Map involvedAnchors)
+			ProductTransfer transfer, Set<Anchor> involvedAnchors)
 	{
 		// A Storekeeper gets all bookings and has to decide himself what to do.
 		if (! (transfer instanceof BookProductTransfer))

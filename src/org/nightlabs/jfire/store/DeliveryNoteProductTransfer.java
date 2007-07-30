@@ -27,7 +27,7 @@
 package org.nightlabs.jfire.store;
 
 import java.util.Collection;
-import java.util.Map;
+import java.util.Set;
 
 import org.nightlabs.jfire.security.User;
 import org.nightlabs.jfire.transfer.Anchor;
@@ -121,13 +121,13 @@ public class DeliveryNoteProductTransfer extends ProductTransfer
 	 * @see org.nightlabs.jfire.transfer.Transfer#bookTransfer(org.nightlabs.jfire.security.User, java.util.Map)
 	 */
 	@Override
-	public void bookTransfer(User user, Map<String, Anchor> involvedAnchors)
+	public void bookTransfer(User user, Set<Anchor> involvedAnchors)
 	{
 		bookTransferAtDeliveryNote(user, involvedAnchors);
 		super.bookTransfer(user, involvedAnchors);
 	}
 
-	protected void bookTransferAtDeliveryNote(User user, Map involvedAnchors)
+	protected void bookTransferAtDeliveryNote(User user, Set<Anchor> involvedAnchors)
 	{
 		deliveryNote.bookDeliveryNoteProductTransfer(this, involvedAnchors, false);
 	}
@@ -137,13 +137,13 @@ public class DeliveryNoteProductTransfer extends ProductTransfer
 	 * @see org.nightlabs.jfire.transfer.Transfer#rollbackTransfer(org.nightlabs.jfire.security.User, java.util.Map)
 	 */
 	@Override
-	public void rollbackTransfer(User user, Map<String, Anchor> involvedAnchors)
+	public void rollbackTransfer(User user, Set<Anchor> involvedAnchors)
 	{
 		rollbackTransferAtDeliveryNote(user, involvedAnchors);
 		super.rollbackTransfer(user, involvedAnchors);
 	}
 
-	protected void rollbackTransferAtDeliveryNote(User user, Map involvedAnchors)
+	protected void rollbackTransferAtDeliveryNote(User user, Set<Anchor> involvedAnchors)
 	{
 		deliveryNote.bookDeliveryNoteProductTransfer(this, involvedAnchors, true);
 	}

@@ -41,6 +41,7 @@ import org.nightlabs.jfire.security.User;
 import org.nightlabs.jfire.trade.Article;
 import org.nightlabs.jfire.trade.LegalEntity;
 import org.nightlabs.jfire.trade.OrganisationLegalEntity;
+import org.nightlabs.jfire.transfer.Anchor;
 
 /**
  * @author Alexander Bieber <alex[AT]nightlabs[DOT]de>
@@ -84,7 +85,7 @@ public class LocalAccountant extends Accountant {
 	 * 
 	 * @see org.nightlabs.jfire.accounting.book.Accountant#bookTransfer(User, LegalEntity, MoneyTransfer, Map)
 	 */
-	public void bookTransfer(User user, LegalEntity mandator, MoneyTransfer transfer, Map involvedAnchors) {
+	public void bookTransfer(User user, LegalEntity mandator, MoneyTransfer transfer, Set<Anchor> involvedAnchors) {
 		// An Accountant gets all bookings and has to decide himself what to do.
 		if (! (transfer instanceof BookMoneyTransfer))
 			return;

@@ -123,7 +123,7 @@ implements SessionBean
 			// create the ProductTypeActionHandler for DynamicProductTypes
 			DynamicProductTypeActionHandler dynamicProductTypeActionHandler = new DynamicProductTypeActionHandler(
 					Organisation.DEVIL_ORGANISATION_ID, DynamicProductTypeActionHandler.class.getName(), DynamicProductType.class);
-			dynamicProductTypeActionHandler = pm.makePersistent(dynamicProductTypeActionHandler);
+			dynamicProductTypeActionHandler = (DynamicProductTypeActionHandler) pm.makePersistent(dynamicProductTypeActionHandler);
 
 			// create a default DeliveryConfiguration with one ModeOfDelivery
 			DeliveryConfiguration deliveryConfiguration = new DeliveryConfiguration(organisationID, "JFireDynamicTrade.default");

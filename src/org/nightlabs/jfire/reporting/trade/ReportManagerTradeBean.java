@@ -151,7 +151,7 @@ implements SessionBean
 
 	/**
 	 * This method is called by the datastore initialization mechanism.
-	 * @throws ReportingInitializerException 
+	 * @throws ReportingInitialiserException 
 	 * 
 	 * @ejb.interface-method
 	 * @ejb.permission role-name="_System_"

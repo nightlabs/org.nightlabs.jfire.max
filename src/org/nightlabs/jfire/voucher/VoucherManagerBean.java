@@ -271,9 +271,14 @@ implements SessionBean
 		try {
 			Class.forName(ticketPrinterClassName);
 		} catch (ClassNotFoundException e2) {
+			// Tobias: I don't think it is necessary to "pollute" the server log with the exception
+			
+//			logger.info("Class "+ticketPrinterClassName+" could not be resolved, means TicketPrinter Module " +
+//					"is not deployed, will skip registering of ModeOfDeliveryFlavour " + 
+//					JFireVoucherEAR.MODE_OF_DELIVERY_FLAVOUR_ID_VOUCHER_PRINT_VIA_TICKET_PRINTER, e2);
 			logger.info("Class "+ticketPrinterClassName+" could not be resolved, means TicketPrinter Module " +
 					"is not deployed, will skip registering of ModeOfDeliveryFlavour " + 
-					JFireVoucherEAR.MODE_OF_DELIVERY_FLAVOUR_ID_VOUCHER_PRINT_VIA_TICKET_PRINTER, e2);
+					JFireVoucherEAR.MODE_OF_DELIVERY_FLAVOUR_ID_VOUCHER_PRINT_VIA_TICKET_PRINTER);
 
 			// the class does not exist => no need for this ModeOfDelivery[Flavour]
 			return;

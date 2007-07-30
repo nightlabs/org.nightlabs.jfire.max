@@ -270,7 +270,7 @@ public class CrossTradeDeliveryCoordinator
 					null, // deliveryNoteIDPrefix => use default
 					true,
 					FETCH_GROUPS_DELIVERY_NOTE, NLJDOHelper.MAX_FETCH_DEPTH_NO_LIMIT);
-			deliveryNote = pm.makePersistent(deliveryNote);
+			deliveryNote = (DeliveryNote) pm.makePersistent(deliveryNote);
 
 
 			boolean forceRollback = false;

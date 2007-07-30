@@ -123,7 +123,7 @@ public class Repository extends Anchor
 
 		if (repository == null) { // create persist it
 			repository = new Repository(organisationID, anchorTypeID, anchorID, owner, outside);
-			repository = pm.makePersistent(repository);
+			repository = (Repository) pm.makePersistent(repository);
 		}
 		else { // check, whether owner and outside is correct
 			if (!repository.getOwner().equals(owner))

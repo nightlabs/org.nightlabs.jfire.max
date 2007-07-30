@@ -120,6 +120,11 @@ implements SessionBean
 				// ignore and create it below
 			}
 
+			// create the ProductTypeActionHandler for DynamicProductTypes
+			DynamicProductTypeActionHandler dynamicProductTypeActionHandler = new DynamicProductTypeActionHandler(
+					Organisation.DEVIL_ORGANISATION_ID, DynamicProductTypeActionHandler.class.getName(), DynamicProductType.class);
+			dynamicProductTypeActionHandler = pm.makePersistent(dynamicProductTypeActionHandler);
+
 			// create a default DeliveryConfiguration with one ModeOfDelivery
 			DeliveryConfiguration deliveryConfiguration = new DeliveryConfiguration(organisationID, "JFireDynamicTrade.default");
 			deliveryConfiguration.getName().setText(Locale.ENGLISH.getLanguage(), "Default Delivery Configuration for JFireDynamicTrade");
@@ -146,14 +151,10 @@ implements SessionBean
 					ProductType.INHERITANCE_NATURE_BRANCH,
 					ProductType.PACKAGE_NATURE_OUTER);
 			root.getName().setText(Locale.ENGLISH.getLanguage(), LocalOrganisation.getLocalOrganisation(pm).getOrganisation().getPerson().getDisplayName());
-			root = (DynamicProductType) store.addProductType(user, root, DynamicProductTypeActionHandler.getDefaultHome(pm, root));
+			root = (DynamicProductType) store.addProductType(user, root); // , DynamicProductTypeActionHandler.getDefaultHome(pm, root));
 			root.setPackagePriceConfig(PackagePriceConfig.getPackagePriceConfig(pm));
 			root.setDeliveryConfiguration(deliveryConfiguration);
 			store.setProductTypeStatus_published(user, root);
-
-			DynamicProductTypeActionHandler dynamicProductTypeActionHandler = new DynamicProductTypeActionHandler(
-					Organisation.DEVIL_ORGANISATION_ID, DynamicProductTypeActionHandler.class.getName(), DynamicProductType.class);
-			pm.makePersistent(dynamicProductTypeActionHandler);
 
 			Unit unit = new Unit(organisationID, IDGenerator.nextID(Unit.class));
 			unit.getSymbol().setText(Locale.ENGLISH.getLanguage(), "h");
@@ -301,8 +302,8 @@ implements SessionBean
 				dynamicProductType = (DynamicProductType) pm.makePersistent(dynamicProductType);
 			} else {
 				dynamicProductType = (DynamicProductType) Store.getStore(pm).addProductType(User.getUser(pm, getPrincipal()),
-						dynamicProductType,
-						DynamicProductTypeActionHandler.getDefaultHome(pm, dynamicProductType));
+						dynamicProductType);
+//						DynamicProductTypeActionHandler.getDefaultHome(pm, dynamicProductType));
 			}
 
 			// take care about the inheritance

@@ -13,7 +13,6 @@ import org.nightlabs.jfire.store.Product;
 import org.nightlabs.jfire.store.ProductLocator;
 import org.nightlabs.jfire.store.ProductType;
 import org.nightlabs.jfire.store.ProductTypeActionHandler;
-import org.nightlabs.jfire.store.Repository;
 import org.nightlabs.jfire.store.Store;
 import org.nightlabs.jfire.trade.Article;
 import org.nightlabs.jfire.trade.Offer;
@@ -34,38 +33,38 @@ import org.nightlabs.jfire.trade.id.SegmentID;
 public class DynamicProductTypeActionHandler
 		extends ProductTypeActionHandler
 {
-	/**
-	 * This is the {@link org.nightlabs.jfire.transfer.Anchor#getAnchorID()} of
-	 * the {@link Repository} which becomes the factory-output-repository for all
-	 * newly created {@link DynamicProduct}s.
-	 */
-	public static final String ANCHOR_ID_REPOSITORY_HOME_LOCAL = DynamicProductType.class.getName() + ".local";
-
 //	/**
 //	 * This is the {@link org.nightlabs.jfire.transfer.Anchor#getAnchorID()} of
-//	 * the {@link Repository} which is used for products that are bought from a foreign organisation.
+//	 * the {@link Repository} which becomes the factory-output-repository for all
+//	 * newly created {@link DynamicProduct}s.
 //	 */
-//	public static final String ANCHOR_ID_REPOSITORY_HOME_FOREIGN = DynamicProductType.class.getName() + ".foreign";
-
-	public static Repository getDefaultHome(PersistenceManager pm, DynamicProductType simpleProductType)
-	{
-		Store store = Store.getStore(pm);
-		if (store.getOrganisationID().equals(simpleProductType.getOrganisationID()))
-			return getDefaultLocalHome(pm, store);
-		else
-			throw new UnsupportedOperationException("DynamicTrade does not support cross-trade-functionality!");
-//			return getDefaultForeignHome(pm, store);
-	}
-
-	protected static Repository getDefaultLocalHome(PersistenceManager pm, Store store)
-	{
-		return Repository.createRepository(
-				pm,
-				store.getOrganisationID(),
-				Repository.ANCHOR_TYPE_ID_HOME,
-				ANCHOR_ID_REPOSITORY_HOME_LOCAL,
-				store.getMandator(), false);
-	}
+//	public static final String ANCHOR_ID_REPOSITORY_HOME_LOCAL = DynamicProductType.class.getName() + ".local";
+//
+////	/**
+////	 * This is the {@link org.nightlabs.jfire.transfer.Anchor#getAnchorID()} of
+////	 * the {@link Repository} which is used for products that are bought from a foreign organisation.
+////	 */
+////	public static final String ANCHOR_ID_REPOSITORY_HOME_FOREIGN = DynamicProductType.class.getName() + ".foreign";
+//
+//	public static Repository getDefaultHome(PersistenceManager pm, DynamicProductType simpleProductType)
+//	{
+//		Store store = Store.getStore(pm);
+//		if (store.getOrganisationID().equals(simpleProductType.getOrganisationID()))
+//			return getDefaultLocalHome(pm, store);
+//		else
+//			throw new UnsupportedOperationException("DynamicTrade does not support cross-trade-functionality!");
+////			return getDefaultForeignHome(pm, store);
+//	}
+//
+//	protected static Repository getDefaultLocalHome(PersistenceManager pm, Store store)
+//	{
+//		return Repository.createRepository(
+//				pm,
+//				store.getOrganisationID(),
+//				Repository.ANCHOR_TYPE_ID_HOME,
+//				ANCHOR_ID_REPOSITORY_HOME_LOCAL,
+//				store.getMandator(), false);
+//	}
 
 	/**
 	 * @deprecated Only for JDO!
@@ -93,7 +92,7 @@ public class DynamicProductTypeActionHandler
 		int qty = nestedProductType == null ? 1 : nestedProductType.getQuantity();
 		for (int i = 0; i < qty; ++i) {
 			DynamicProduct product = new DynamicProduct(spt, DynamicProduct.createProductID());
-			product = (DynamicProduct) store.addProduct(user, product, (Repository)spt.getProductTypeLocal().getHome());
+			product = (DynamicProduct) store.addProduct(user, product); // , (Repository)spt.getProductTypeLocal().getHome());
 			res.add(product);
 		}
 		return res;

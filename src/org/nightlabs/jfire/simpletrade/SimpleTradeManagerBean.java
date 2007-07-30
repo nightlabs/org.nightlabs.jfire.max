@@ -83,6 +83,7 @@ import org.nightlabs.jfire.jdo.notification.persistent.SubscriptionUtil;
 import org.nightlabs.jfire.organisation.LocalOrganisation;
 import org.nightlabs.jfire.organisation.Organisation;
 import org.nightlabs.jfire.organisation.id.OrganisationID;
+import org.nightlabs.jfire.person.Person;
 import org.nightlabs.jfire.prop.PropertySet;
 import org.nightlabs.jfire.prop.id.StructFieldID;
 import org.nightlabs.jfire.security.User;
@@ -107,6 +108,7 @@ import org.nightlabs.jfire.trade.CustomerGroup;
 import org.nightlabs.jfire.trade.CustomerGroupMapper;
 import org.nightlabs.jfire.trade.Offer;
 import org.nightlabs.jfire.trade.Order;
+import org.nightlabs.jfire.trade.OrganisationLegalEntity;
 import org.nightlabs.jfire.trade.Segment;
 import org.nightlabs.jfire.trade.Trader;
 import org.nightlabs.jfire.trade.id.CustomerGroupID;
@@ -195,7 +197,7 @@ implements SessionBean
 
 			SimpleProductTypeActionHandler simpleProductTypeActionHandler = new SimpleProductTypeActionHandler(
 					Organisation.DEVIL_ORGANISATION_ID, SimpleProductTypeActionHandler.class.getName(), SimpleProductType.class);
-			pm.makePersistent(simpleProductTypeActionHandler);
+			simpleProductTypeActionHandler = pm.makePersistent(simpleProductTypeActionHandler);
 
 			Store store = Store.getStore(pm);
 //			Accounting accounting = Accounting.getAccounting(pm);
@@ -234,7 +236,7 @@ implements SessionBean
 					ProductType.INHERITANCE_NATURE_BRANCH, ProductType.PACKAGE_NATURE_OUTER);
 			rootSimpleProductType.getName().setText(Locale.ENGLISH.getLanguage(), LocalOrganisation.getLocalOrganisation(pm).getOrganisation().getPerson().getDisplayName());
 			rootSimpleProductType.setDeliveryConfiguration(deliveryConfiguration);
-			store.addProductType(user, rootSimpleProductType, SimpleProductTypeActionHandler.getDefaultHome(pm, rootSimpleProductType));
+			store.addProductType(user, rootSimpleProductType); // , SimpleProductTypeActionHandler.getDefaultHome(pm, rootSimpleProductType));
 			store.setProductTypeStatus_published(user, rootSimpleProductType);
 
 			// give the root product type a property set
@@ -580,8 +582,8 @@ implements SessionBean
 			else {
 				productType = (SimpleProductType) Store.getStore(pm).addProductType(
 						User.getUser(pm, getPrincipal()),
-						productType,
-						SimpleProductTypeActionHandler.getDefaultHome(pm, productType));
+						productType);
+//						SimpleProductTypeActionHandler.getDefaultHome(pm, productType));
 
 				// make sure the prices are correct
 				priceCalculationNeeded = true;
@@ -1007,7 +1009,10 @@ implements SessionBean
 			pm.getFetchPlan().setGroups(new String[] {
 					FetchPlan.DEFAULT,
 					FetchGroupsPriceConfig.FETCH_GROUP_EDIT,
-					DeliveryConfiguration.FETCH_GROUP_THIS_DELIVERY_CONFIGURATION
+					DeliveryConfiguration.FETCH_GROUP_THIS_DELIVERY_CONFIGURATION,
+					OrganisationLegalEntity.FETCH_GROUP_ORGANISATION,
+					OrganisationLegalEntity.FETCH_GROUP_PERSON,
+					Person.FETCH_GROUP_FULL_DATA // TODO we should somehow filter this so only public data is exported
 					});
 			pm.getFetchPlan().setMaxFetchDepth(NLJDOHelper.MAX_FETCH_DEPTH_NO_LIMIT);
 			pm.getFetchPlan().setDetachmentOptions(FetchPlan.DETACH_LOAD_FIELDS);

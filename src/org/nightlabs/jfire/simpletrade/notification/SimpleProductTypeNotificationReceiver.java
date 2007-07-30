@@ -28,7 +28,7 @@ import org.nightlabs.jfire.security.User;
 import org.nightlabs.jfire.simpletrade.SimpleTradeManager;
 import org.nightlabs.jfire.simpletrade.SimpleTradeManagerUtil;
 import org.nightlabs.jfire.simpletrade.store.SimpleProductType;
-import org.nightlabs.jfire.simpletrade.store.SimpleProductTypeActionHandler;
+import org.nightlabs.jfire.store.ProductTypeActionHandler;
 import org.nightlabs.jfire.store.Store;
 
 /**
@@ -111,12 +111,15 @@ extends NotificationReceiver
 					try {
 						if (NLJDOHelper.exists(pm, simpleProductType))
 							simpleProductType = (SimpleProductType) pm.makePersistent(simpleProductType);
-						else						
+						else {
+							ProductTypeActionHandler productTypeActionHandler = ProductTypeActionHandler.getProductTypeActionHandler(pm, simpleProductType.getClass());
+
 							simpleProductType = (SimpleProductType) store.addProductType(
 									user,
-									simpleProductType,
-									SimpleProductTypeActionHandler.getDefaultHome(pm, simpleProductType));
+									simpleProductType);
+//									SimpleProductTypeActionHandler.getDefaultHome(pm, simpleProductType));
 //						simpleProductType = (SimpleProductType) pm.makePersistent(simpleProductType);
+						}
 					} catch (Exception x) {
 						logger.error("Adding SimpleProductType \"" + simpleProductType.getPrimaryKey() + "\" to Store failed!", x);
 						throw x instanceof RuntimeException ? (RuntimeException)x : new RuntimeException(x);

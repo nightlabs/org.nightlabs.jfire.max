@@ -44,6 +44,7 @@ import org.nightlabs.jfire.prop.PropertySet;
 import org.nightlabs.jfire.prop.StructLocal;
 import org.nightlabs.jfire.security.User;
 import org.nightlabs.jfire.store.ProductType;
+import org.nightlabs.jfire.store.ProductTypeActionHandler;
 import org.nightlabs.jfire.store.ProductTypeLocal;
 import org.nightlabs.jfire.store.Repository;
 import org.nightlabs.jfire.store.id.ProductTypeID;
@@ -136,9 +137,9 @@ public class SimpleProductType extends ProductType
 	}
 
 	@Override
-	protected ProductTypeLocal createProductTypeLocal(User user, Repository home)
+	protected ProductTypeLocal createProductTypeLocal(User user, Repository defaultHomeRepository)
 	{
-		return new SimpleProductTypeLocal(user, this, home);
+		return new SimpleProductTypeLocal(user, this, defaultHomeRepository);
 	}
 
 	@Implement

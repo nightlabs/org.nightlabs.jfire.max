@@ -71,6 +71,10 @@ implements Serializable
 			if (jbpmNodeName.equals(state.getStateDefinition().getJbpmNodeName()))
 				return true;
 		}
+
+		if (statable.getStatableLocal() == null)
+			throw new IllegalStateException("The Statable does not have a StatableLocal assigned: " + statableID);
+
 		for (State state : statable.getStatableLocal().getStates()) {
 			if (jbpmNodeName.equals(state.getStateDefinition().getJbpmNodeName()))
 				return true;

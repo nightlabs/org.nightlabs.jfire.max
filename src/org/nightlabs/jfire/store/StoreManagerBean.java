@@ -45,7 +45,6 @@ import javax.ejb.EJBException;
 import javax.ejb.SessionBean;
 import javax.ejb.SessionContext;
 import javax.jdo.FetchPlan;
-import javax.jdo.JDOHelper;
 import javax.jdo.JDOObjectNotFoundException;
 import javax.jdo.PersistenceManager;
 
@@ -120,7 +119,7 @@ import org.nightlabs.jfire.transfer.id.AnchorID;
  *					 type="Stateless" 
  *					 transaction-type="Container"
  *
- * @ejb.util generate = "physical"
+ * @ejb.util generate="physical"
  */
 public abstract class StoreManagerBean 
 extends BaseSessionBeanImpl
@@ -1011,7 +1010,7 @@ implements SessionBean
 	 * @see Store#deliverBegin(User, DeliveryData)
 	 *
 	 * @ejb.interface-method
-	 * @ejb.transaction type = "Supports"
+	 * @ejb.transaction type="Supports"
 	 * @ejb.permission role-name="_Guest_"
 	 */
 	public DeliveryResult deliverBegin(DeliveryData deliveryData)
@@ -1022,7 +1021,7 @@ implements SessionBean
 
 	/**
 	 * @ejb.interface-method view-type="local"
-	 * @ejb.transaction type = "RequiresNew"
+	 * @ejb.transaction type="RequiresNew"
 	 * @ejb.permission role-name="_Guest_"
 	 */
 	public DeliveryResult _deliverBegin(DeliveryData deliveryData)
@@ -1302,7 +1301,7 @@ implements SessionBean
 	 * @see Accounting#deliverEnd(User, DeliveryData)
 	 *
 	 * @ejb.interface-method
-	 * @ejb.transaction type = "Supports"
+	 * @ejb.transaction type="Supports"
 	 * @ejb.permission role-name="_Guest_"
 	 */
 	public DeliveryResult deliverEnd(
@@ -1316,7 +1315,7 @@ implements SessionBean
 
 	/**
 	 * @ejb.interface-method view-type="local"
-	 * @ejb.transaction type = "RequiresNew"
+	 * @ejb.transaction type="RequiresNew"
 	 * @ejb.permission role-name="_Guest_"
 	 */
 	public DeliveryResult _deliverEnd(
@@ -1509,6 +1508,9 @@ implements SessionBean
 //							Boolean directionIncoming = me3.getKey();
 							Set<Article> backhandArticles = me3.getValue();
 
+							// Because of transactional problems, crossTradeDeliveryCoordinator.performCrossTradeDelivery(...) will spawn an additional AsyncInvoke
+							// In the long run, we should implement a special "fast-track-delivery" which will be used between organisations and work within one
+							// transaction. See javadoc of the performCrossTradeDelivery method.
 							crossTradeDeliveryCoordinator.performCrossTradeDelivery(backhandArticles);
 						}
 					}

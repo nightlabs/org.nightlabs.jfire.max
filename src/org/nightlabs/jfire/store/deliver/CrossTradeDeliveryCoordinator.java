@@ -25,7 +25,10 @@
  ******************************************************************************/
 package org.nightlabs.jfire.store.deliver;
 
+import java.io.Serializable;
 import java.rmi.RemoteException;
+import java.util.HashSet;
+import java.util.Iterator;
 import java.util.Set;
 
 import javax.ejb.CreateException;
@@ -37,18 +40,23 @@ import javax.naming.NamingException;
 
 import org.apache.log4j.Logger;
 import org.nightlabs.ModuleException;
+import org.nightlabs.annotation.Implement;
 import org.nightlabs.jdo.NLJDOHelper;
+import org.nightlabs.jfire.asyncinvoke.Invocation;
 import org.nightlabs.jfire.base.Lookup;
 import org.nightlabs.jfire.idgenerator.IDGenerator;
 import org.nightlabs.jfire.organisation.Organisation;
 import org.nightlabs.jfire.store.DeliveryNote;
 import org.nightlabs.jfire.store.Store;
 import org.nightlabs.jfire.store.StoreManager;
+import org.nightlabs.jfire.store.StoreManagerHelperLocal;
+import org.nightlabs.jfire.store.StoreManagerHelperUtil;
 import org.nightlabs.jfire.store.StoreManagerUtil;
 import org.nightlabs.jfire.store.deliver.id.CrossTradeDeliveryCoordinatorID;
 import org.nightlabs.jfire.store.deliver.id.DeliveryID;
 import org.nightlabs.jfire.store.deliver.id.ModeOfDeliveryFlavourID;
 import org.nightlabs.jfire.store.deliver.id.ServerDeliveryProcessorID;
+import org.nightlabs.jfire.store.id.DeliveryNoteID;
 import org.nightlabs.jfire.trade.Article;
 import org.nightlabs.jfire.trade.LegalEntity;
 import org.nightlabs.jfire.trade.OrganisationLegalEntity;
@@ -65,8 +73,7 @@ import org.nightlabs.jfire.transfer.id.AnchorID;
  * 
  * @jdo.inheritance strategy="new-table"
  * 
- * @jdo.create-objectid-class field-order="organisationID,
- *                            crossTradeDeliveryCoordinatorID"
+ * @jdo.create-objectid-class field-order="organisationID, crossTradeDeliveryCoordinatorID"
  */
 public class CrossTradeDeliveryCoordinator
 {
@@ -178,8 +185,33 @@ public class CrossTradeDeliveryCoordinator
 			Article.FETCH_GROUP_DELIVERY_NOTE,
 	};
 
+	protected static class PerformDeliveryInvocation extends Invocation
+	{
+		@Implement
+		public Serializable invoke()
+		throws Exception
+		{
+			
+
+			return null;
+		}
+	}
+
+	/**
+	 * Perform a delivery between two organisations.
+	 * <p>
+	 * Since our current delivery API works with separate transactions, the newly created DeliveryNote
+	 * is not yet seen in the delivery-methods. Hence, this method will delegate to {@link StoreManagerHelperLocal#storeDeliveryNote(DeliveryNote)}
+	 * which is executed in a new, separate transaction.
+	 * In the long run, we should implement a special "fast-track-delivery" which will be used between organisations and work within one
+	 * transaction.
+	 * </p>
+	 *
+	 * @param articles The articles to be delivered.
+	 * @throws ModuleException If sth. goes wrong.
+	 */
 	public void performCrossTradeDelivery(Set<Article> articles)
-			throws ModuleException
+	throws ModuleException
 	{
 		try {
 			if (articles.isEmpty())
@@ -236,9 +268,48 @@ public class CrossTradeDeliveryCoordinator
 			Store store = Store.getStore(pm);
 			OrganisationLegalEntity mandator = store.getMandator();
 
-			if (!mandator.equals(from) && !mandator.equals(to))
+			LegalEntity partner;
+			if (mandator.equals(from))
+				partner = to;
+			else if (mandator.equals(to))
+				partner = from;
+			else
 				throw new IllegalStateException(
 						"Neither from-LegalEntity nor to-LegalEntity is the local organisation!");
+
+			StoreManager localStoreManager = createStoreManager(null);
+			StoreManager remoteStoreManager = createStoreManager(partner.getOrganisationID());
+
+			Set articlesMissingDeliveryNote = new HashSet(articles.size());
+			for (Iterator itA = articles.iterator(); itA.hasNext(); ) {
+				Article article = (Article) itA.next();
+				if (article.getDeliveryNote() == null)
+					articlesMissingDeliveryNote.add(article);
+			}
+
+			// before we deliver, we have to create a DeliveryNote
+			{
+				// TODO why does this work? Shouldn't the transaction on the remote side be pending as
+				// long as this one here is? We use XA - hence, it seems that XA doesn't work. Is this
+				// due to our CascadedAuthentication stuff?
+				// Once the XA works fine, we need to create (and use here) a 2nd method which is tagged
+				// @ejb.transaction type="RequiresNew"
+				DeliveryNote deliveryNote;
+				deliveryNote = remoteStoreManager.createDeliveryNote(
+						NLJDOHelper.getObjectIDList(articlesMissingDeliveryNote),
+						null, // deliveryNoteIDPrefix => use default
+						true,
+						FETCH_GROUPS_DELIVERY_NOTE, NLJDOHelper.MAX_FETCH_DEPTH_NO_LIMIT);
+
+				// Locally, the transactions work fine and cause a problem:
+				// Because we cannot deliver locally without the DeliveryNote
+				// and the current transaction is not yet finished when the
+				// delivery is performed in *separate* transactions, we delegate this
+				// to a sub-transaction as well.
+				StoreManagerHelperLocal storeManagerHelperLocal = StoreManagerHelperUtil.getLocalHome().create();
+				storeManagerHelperLocal.storeDeliveryNoteFromVendorOrganisation(deliveryNote);
+//				storeManagerHelperLocal.testDeliveryNote((DeliveryNoteID) JDOHelper.getObjectId(deliveryNote));
+			}
 
 			// from and to are now defined and we have to create a Delivery
 			// we actually create TWO deliveries - one for the local side and one for
@@ -256,126 +327,10 @@ public class CrossTradeDeliveryCoordinator
 			DeliveryData remoteDeliveryData = createDeliveryData(mandator, from, to,
 					remoteDelivery, localDelivery, remoteDelivery);
 
-			StoreManager localStoreManager = createStoreManager(null);
-			StoreManager remoteStoreManager = createStoreManager(localDelivery.getPartnerID().organisationID);
-
 			// the local stuff is stored here - the remote stuff is solely stored in
 			// the remote organisation - at least for now
 
-			// before we deliver, we have to create a DeliveryNote
-
-			DeliveryNote deliveryNote;
-			deliveryNote = remoteStoreManager.createDeliveryNote(
-					NLJDOHelper.getObjectIDList(articles),
-					null, // deliveryNoteIDPrefix => use default
-					true,
-					FETCH_GROUPS_DELIVERY_NOTE, NLJDOHelper.MAX_FETCH_DEPTH_NO_LIMIT);
-			deliveryNote = (DeliveryNote) pm.makePersistent(deliveryNote);
-
-
 			boolean forceRollback = false;
-
-			// // step 1: simulate the client delivery for local side
-			// localDelivery.setDeliverBeginClientResult(new
-			// DeliveryResult(DeliveryResult.CODE_APPROVED_NO_EXTERNAL, null, null));
-			//
-			// // step 2: deliver begin with local server
-			// DeliveryResult remoteClientDeliverBeginResult;
-			// try {
-			// DeliveryResult localServerDeliverBeginResult =
-			// localStoreManager.deliverBegin(localDeliveryData);
-			// if (localServerDeliverBeginResult.isFailed()) {
-			// forceRollback = true;
-			// remoteClientDeliverBeginResult = new
-			// DeliveryResult(localServerDeliverBeginResult.getCode(),
-			// localServerDeliverBeginResult.getText(), null);
-			// }
-			// else
-			// remoteClientDeliverBeginResult = new
-			// DeliveryResult(DeliveryResult.CODE_APPROVED_NO_EXTERNAL, null, null);
-			// } catch (Throwable t) {
-			// forceRollback = true;
-			// remoteClientDeliverBeginResult = new DeliveryResult(t);
-			// }
-			//
-			// // step 3: simulate the client delivery for REMOTE side
-			// remoteDelivery.setDeliverBeginClientResult(remoteClientDeliverBeginResult);
-			//
-			// // step 4: deliver begin with REMOTE server
-			// DeliveryResult localClientDeliveryDoWorkResult;
-			// try {
-			// DeliveryResult remoteServerDeliverBeginResult =
-			// remoteStoreManager.deliverBegin(remoteDeliveryData);
-			// if (remoteServerDeliverBeginResult.isFailed()) {
-			// forceRollback = true;
-			// localClientDeliveryDoWorkResult = new
-			// DeliveryResult(remoteServerDeliverBeginResult.getCode(),
-			// remoteServerDeliverBeginResult.getText(), null);
-			// }
-			// else
-			// localClientDeliveryDoWorkResult = new
-			// DeliveryResult(DeliveryResult.CODE_APPROVED_NO_EXTERNAL, null, null);
-			// } catch (Throwable t) {
-			// forceRollback = true;
-			// localClientDeliveryDoWorkResult = new DeliveryResult(t);
-			// }
-			//
-			// // step 5: deliver doWork with local server
-			// DeliveryResult remoteClientDeliveryDoWorkResult;
-			// try {
-			// DeliveryResult localServerDeliverDoWorkResult =
-			// localStoreManager.deliverDoWork(localDeliveryID,
-			// localClientDeliveryDoWorkResult, forceRollback);
-			// if (localServerDeliverDoWorkResult.isFailed()) {
-			// forceRollback = true;
-			// remoteClientDeliveryDoWorkResult = new
-			// DeliveryResult(localServerDeliverDoWorkResult.getCode(),
-			// localServerDeliverDoWorkResult.getText(), null);
-			// }
-			// else
-			// remoteClientDeliveryDoWorkResult = new
-			// DeliveryResult(DeliveryResult.CODE_APPROVED_NO_EXTERNAL, null, null);
-			// } catch (Throwable t) {
-			// forceRollback = true;
-			// remoteClientDeliveryDoWorkResult = new DeliveryResult(t);
-			// }
-			//
-			// // step 6: deliver doWork with REMOTE server
-			// DeliveryResult localClientDeliveryEndResult;
-			// try {
-			// DeliveryResult remoteServerDeliverDoWorkResult =
-			// remoteStoreManager.deliverDoWork(remoteDeliveryID,
-			// remoteClientDeliveryDoWorkResult, forceRollback);
-			// if (remoteServerDeliverDoWorkResult.isFailed()) {
-			// forceRollback = true;
-			// localClientDeliveryEndResult = new
-			// DeliveryResult(remoteServerDeliverDoWorkResult.getCode(),
-			// remoteServerDeliverDoWorkResult.getText(), null);
-			// }
-			// else
-			// localClientDeliveryEndResult = new
-			// DeliveryResult(DeliveryResult.CODE_APPROVED_NO_EXTERNAL, null, null);
-			// } catch (Throwable t) {
-			// forceRollback = true;
-			// localClientDeliveryEndResult = new DeliveryResult(t);
-			// }
-			//
-			// // step 7: deliver end with local server
-			// DeliveryResult remoteClientDeliveryEndResult;
-			// try {
-			// DeliveryResult localServerDeliverEndResult =
-			// localStoreManager.deliverEnd(localDeliveryID,
-			// localClientDeliveryEndResult, forceRollback);
-			//
-			// } catch (Throwable t) {
-			// forceRollback = true;
-			// remoteClientDeliveryEndResult = new DeliveryResult(t);
-			// }
-			//
-			// DeliveryResult remoteServerDeliverEndResult =
-			// remoteStoreManager.deliverEnd(localDeliveryID, new
-			// DeliveryResult(DeliveryResult.CODE_APPROVED_NO_EXTERNAL, null, null),
-			// forceRollback);
 
 			localDeliveryData.prepareUpload();
 			localDelivery = localDeliveryData.getDelivery();
@@ -408,8 +363,8 @@ public class CrossTradeDeliveryCoordinator
 			// step 3: simulate the client delivery for local side
 			localDelivery.setDeliverBeginClientResult(localClientDeliverBeginResult);
 			
-			// TODO WORKAROUND
-			localStoreManager = createStoreManager(null);
+//			// TODO WORKAROUND
+//			localStoreManager = createStoreManager(null);
 
 			// step 4: deliver begin with local server
 			logger.info("performCrossTradeDelivery: step 4: deliver begin with local organisation");
@@ -430,8 +385,8 @@ public class CrossTradeDeliveryCoordinator
 				remoteClientDeliveryDoWorkResult = new DeliveryResult(t);
 			}
 
-			// TODO WORKAROUND
-			remoteStoreManager = createStoreManager(localDelivery.getPartnerID().organisationID);
+//			// TODO WORKAROUND
+//			remoteStoreManager = createStoreManager(localDelivery.getPartnerID().organisationID);
 
 			// step 5: deliver doWork with remote server
 			DeliveryResult localClientDeliveryDoWorkResult;
@@ -452,8 +407,8 @@ public class CrossTradeDeliveryCoordinator
 				localClientDeliveryDoWorkResult = new DeliveryResult(t);
 			}
 
-			// TODO WORKAROUND
-			localStoreManager = createStoreManager(null);
+//			// TODO WORKAROUND
+//			localStoreManager = createStoreManager(null);
 
 			// step 6: deliver doWork with local server
 			DeliveryResult remoteClientDeliveryEndResult;
@@ -474,8 +429,8 @@ public class CrossTradeDeliveryCoordinator
 				remoteClientDeliveryEndResult = new DeliveryResult(t);
 			}
 
-			// TODO WORKAROUND
-			remoteStoreManager = createStoreManager(localDelivery.getPartnerID().organisationID);
+//			// TODO WORKAROUND
+//			remoteStoreManager = createStoreManager(localDelivery.getPartnerID().organisationID);
 
 			// step 7: deliver end with remote server
 			DeliveryResult localClientDeliveryEndResult;
@@ -497,8 +452,8 @@ public class CrossTradeDeliveryCoordinator
 				localClientDeliveryEndResult = new DeliveryResult(t);
 			}
 
-			// TODO WORKAROUND
-			localStoreManager = createStoreManager(null);
+//			// TODO WORKAROUND
+//			localStoreManager = createStoreManager(null);
 
 			// step 8: deliver end with local server
 			try {
@@ -582,10 +537,8 @@ public class CrossTradeDeliveryCoordinator
 			partner = mandator.equals(from) ? to : from;
 
 		delivery.setPartnerID((AnchorID) JDOHelper.getObjectId(partner));
-		if (mandator.equals(from) ^ remote) // if we create the Delivery for the
-																				// remote side, we inverse the
-																				// direction, which is done by XOR in
-																				// the most elegant way
+		if (mandator.equals(from) ^ remote) // if we create the Delivery for the remote side, we inverse the
+																				// direction, which is done by XOR in the most elegant way
 			delivery.setDeliveryDirection(Delivery.DELIVERY_DIRECTION_OUTGOING);
 		else
 			delivery.setDeliveryDirection(Delivery.DELIVERY_DIRECTION_INCOMING);

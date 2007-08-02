@@ -53,7 +53,6 @@ import org.nightlabs.jfire.trade.LegalEntity;
 import org.nightlabs.jfire.trade.id.ArticleID;
 import org.nightlabs.jfire.transfer.Transfer;
 import org.nightlabs.jfire.transfer.id.AnchorID;
-import org.nightlabs.math.Base36Coder;
 
 /**
  * @author Marco Schulze - marco at nightlabs dot de
@@ -73,6 +72,8 @@ import org.nightlabs.math.Base36Coder;
 public class Delivery
 implements Serializable, StoreCallback
 {
+	private static final long serialVersionUID = 1L;
+
 	public static final String DELIVERY_DIRECTION_INCOMING = "incoming";
 
 	public static final String DELIVERY_DIRECTION_OUTGOING = "outgoing";
@@ -1417,6 +1418,9 @@ implements Serializable, StoreCallback
 			for (Iterator it = articles.iterator(); it.hasNext(); ) {
 				Article article = (Article) it.next();
 				DeliveryNote deliveryNote = article.getDeliveryNote();
+				if (deliveryNote == null)
+					throw new IllegalStateException("Article \"" + article.getPrimaryKey() + "\" does not have a DeliveryNote assigned!");
+
 				DeliveryNoteID deliveryNoteID = (DeliveryNoteID) JDOHelper.getObjectId(deliveryNote);
 				if (!dnIDs.contains(deliveryNoteID)) {
 					deliveryNotes.add(deliveryNote);

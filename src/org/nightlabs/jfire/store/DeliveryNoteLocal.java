@@ -27,6 +27,7 @@
 package org.nightlabs.jfire.store;
 
 import java.io.Serializable;
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Date;
 import java.util.List;
@@ -69,6 +70,8 @@ import org.nightlabs.util.CollectionUtil;
 public class DeliveryNoteLocal
 implements Serializable, StatableLocal
 {
+	private static final long serialVersionUID = 1L;
+
 	public static final String FETCH_GROUP_DELIVERY_NOTE = "DeliveryNoteLocal.deliveryNote";
 	public static final String FETCH_GROUP_BOOK_USER = "DeliveryNoteLocal.bookUser";
 	public static final String FETCH_GROUP_THIS_DELIVERY_NOTE_LOCAL = "DeliveryNoteLocal.this";
@@ -147,6 +150,7 @@ implements Serializable, StatableLocal
 		this.deliveryNoteIDPrefix = deliveryNote.getDeliveryNoteIDPrefix();
 		this.deliveryNoteID = deliveryNote.getDeliveryNoteID();
 		this.deliveryNote = deliveryNote;
+		this.states = new ArrayList<State>();
 
 		deliveryNote.setDeliveryNoteLocal(this);
 	}

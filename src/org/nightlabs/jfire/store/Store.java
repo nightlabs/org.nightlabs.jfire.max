@@ -751,13 +751,20 @@ implements StoreCallback
 		}
 	}
 
+	protected static enum DeliverStage
+	{
+		deliverBegin,
+		deliverDoWork,
+		deliverEnd
+	}
+
 	/**
 	 * @param deliveryNotes Can be null. Should be a <tt>Collection</tt> of {@link DeliveryNote}
-	 * @param currency Can be null.
+	 * @param stage This method is called twice during 
 	 * @return Either <tt>null</tt>, in case no DeliveryNote was passed or the partner
 	 *		(if at least one DeliveryNote has been passed in <tt>deliveryNotes</tt>).
 	 */
-	protected LegalEntity bookDeliveryNotesImplicitelyAndGetPartner(Collection deliveryNotes)
+	protected LegalEntity bookDeliveryNotesImplicitelyAndGetPartner(DeliverStage deliverStage, Collection deliveryNotes)
 	{
 		if (deliveryNotes == null)
 			return null;
@@ -766,33 +773,35 @@ implements StoreCallback
 		// ...maybe it will later be possible to deliver an deliveryNote in a different
 		// currency, but currently this is not possible.
 //		LegalEntity mandator = getMandator();
-		String mandatorPK = getMandator().getPrimaryKey();
+		LegalEntity mandator = getMandator();
 		LegalEntity partner = null;
 		for (Iterator it = deliveryNotes.iterator(); it.hasNext(); ) {
 			DeliveryNote deliveryNote = (DeliveryNote) it.next();
 
-			bookDeliveryNoteImplicitely(deliveryNote);
-
-			if (mandatorPK.equals(deliveryNote.getVendor().getPrimaryKey())) {
+			if (mandator.equals(deliveryNote.getVendor())) {
 				if (partner == null)
 					partner = deliveryNote.getCustomer();
 				else {
-					String foundPartnerPK = deliveryNote.getCustomer().getPrimaryKey();
-					if (!partner.getPrimaryKey().equals(foundPartnerPK))
-						throw new IllegalArgumentException("Customer of deliveryNote \"" + deliveryNote.getPrimaryKey() + "\" does not match other deliveryNotes' partners! Expected partner \"" + partner.getPrimaryKey() + "\", but found \"" + foundPartnerPK + "\"!");
+					if (!partner.equals(deliveryNote.getCustomer()))
+						throw new IllegalArgumentException("Customer of deliveryNote \"" + deliveryNote.getPrimaryKey() + "\" does not match other deliveryNotes' partners! Expected partner \"" + partner.getPrimaryKey() + "\", but found \"" + deliveryNote.getCustomer().getPrimaryKey() + "\"!");
 				}
+
+				if (DeliverStage.deliverBegin == deliverStage)
+					bookDeliveryNoteImplicitely(deliveryNote);
 			} // vendor is mandator
 			else {
-				if (!mandatorPK.equals(deliveryNote.getCustomer().getPrimaryKey()))
+				if (!mandator.equals(deliveryNote.getCustomer()))
 					throw new IllegalArgumentException("The deliveryNote \""+deliveryNote.getPrimaryKey()+"\" has nothing to do with the mandator (\"" + mandator.getPrimaryKey() + "\")!");
 
 				if (partner == null)
 					partner = deliveryNote.getVendor();
 				else {
-					String foundPartnerPK = deliveryNote.getVendor().getPrimaryKey();
-					if (!partner.getPrimaryKey().equals(foundPartnerPK))
-						throw new IllegalArgumentException("Vendor of deliveryNote \"" + deliveryNote.getPrimaryKey() + "\" does not match other deliveryNotes' partners! Expected partner \"" + partner.getPrimaryKey() + "\", but found \"" + foundPartnerPK + "\"!");
+					if (!partner.equals(deliveryNote.getVendor()))
+						throw new IllegalArgumentException("Vendor of deliveryNote \"" + deliveryNote.getPrimaryKey() + "\" does not match other deliveryNotes' partners! Expected partner \"" + partner.getPrimaryKey() + "\", but found \"" + deliveryNote.getVendor().getPrimaryKey() + "\"!");
 				}
+
+				if (DeliverStage.deliverEnd == deliverStage)
+					bookDeliveryNoteImplicitely(deliveryNote);
 			}
 		}
 
@@ -1124,15 +1133,12 @@ implements StoreCallback
 		if (deliveryData.getDelivery() == null)
 			throw new NullPointerException("deliveryData.getDelivery() returns null! localOrganisation="+getOrganisationID());
 
-		PersistenceManager pm = getPersistenceManager();
-
 		ServerDeliveryProcessor serverDeliveryProcessor = getServerDeliveryProcessor(
 				deliveryData.getDelivery());
 
 		LegalEntity partner = null;
 		if (deliveryData.getDelivery().getDeliveryNotes() != null) {
-			partner = bookDeliveryNotesImplicitelyAndGetPartner(
-					deliveryData.getDelivery().getDeliveryNotes());
+			partner = bookDeliveryNotesImplicitelyAndGetPartner(DeliverStage.deliverBegin, deliveryData.getDelivery().getDeliveryNotes());
 		}
 		else
 			throw new IllegalArgumentException("Delivery is not possible anymore without delivery notes! This exception should never happen. localOrganisation="+getOrganisationID());
@@ -1401,6 +1407,9 @@ implements StoreCallback
 					} finally {
 						jbpmContext.close();
 					}
+
+					bookDeliveryNotesImplicitelyAndGetPartner(DeliverStage.deliverEnd, deliveryData.getDelivery().getDeliveryNotes());
+
 				}
 			}
 		} catch (Exception x) {

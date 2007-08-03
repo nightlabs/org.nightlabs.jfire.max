@@ -299,4 +299,12 @@ public class JFireReportingHelper {
 			return null;
 		return patLineBreak.matcher(str).replaceAll("<br/>");
 	}
+
+	/**
+	 * Returns the Log4J Logger of {@link JFireReportingHelper}. 
+	 * @return The Log4J Logger of {@link JFireReportingHelper}.
+	 */
+	public static Logger getLogger() {
+		return logger;
+	}
 }

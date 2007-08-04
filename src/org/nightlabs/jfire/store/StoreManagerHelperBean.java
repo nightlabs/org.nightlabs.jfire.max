@@ -27,7 +27,6 @@
 package org.nightlabs.jfire.store;
 
 import java.rmi.RemoteException;
-import java.util.Set;
 
 import javax.ejb.CreateException;
 import javax.ejb.EJBException;
@@ -36,17 +35,13 @@ import javax.ejb.SessionContext;
 import javax.jdo.JDOHelper;
 import javax.jdo.PersistenceManager;
 
-import org.apache.log4j.Logger;
 import org.nightlabs.ModuleException;
-import org.nightlabs.jdo.NLJDOHelper;
 import org.nightlabs.jfire.base.BaseSessionBeanImpl;
 import org.nightlabs.jfire.security.User;
 import org.nightlabs.jfire.trade.Article;
 import org.nightlabs.jfire.trade.TradeSide;
-import org.nightlabs.jfire.trade.id.ArticleID;
 import org.nightlabs.jfire.trade.jbpm.ProcessDefinitionAssignment;
 import org.nightlabs.jfire.trade.jbpm.id.ProcessDefinitionAssignmentID;
-import org.nightlabs.util.Util;
 
 /**
  * @ejb.bean name="jfire/ejb/JFireTrade/StoreManagerHelper"	

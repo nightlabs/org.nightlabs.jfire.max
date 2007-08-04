@@ -1389,6 +1389,8 @@ implements StoreCallback
 		}
 
 		try {
+			ArrayList deliveryNotesToBookImplicitely = new ArrayList(deliveryData.getDelivery().getDeliveryNotes().size());
+
 			for (DeliveryNote deliveryNote : deliveryData.getDelivery().getDeliveryNotes()) {
 				DeliveryNoteLocal deliveryNoteLocal = deliveryNote.getDeliveryNoteLocal();
 				boolean outstanding = false;
@@ -1407,11 +1409,11 @@ implements StoreCallback
 					} finally {
 						jbpmContext.close();
 					}
-
-					bookDeliveryNotesImplicitelyAndGetPartner(DeliverStage.deliverEnd, deliveryData.getDelivery().getDeliveryNotes());
-
+					deliveryNotesToBookImplicitely.add(deliveryNote);
 				}
 			}
+
+			bookDeliveryNotesImplicitelyAndGetPartner(DeliverStage.deliverEnd, deliveryNotesToBookImplicitely);
 		} catch (Exception x) {
 			throw new DeliveryException(
 					new DeliveryResult(

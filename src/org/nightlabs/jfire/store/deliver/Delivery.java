@@ -304,7 +304,7 @@ implements Serializable, StoreCallback
 	 * A rollback has been done and the {@link org.nightlabs.jfire.store.deliver.DeliverMoneyTransfer}
 	 * including all dependent {@link org.nightlabs.jfire.store.MoneyTransfer}s have
 	 * been deleted. All involved anchors got previously informed by
-	 * {@link org.nightlabs.jfire.transfer.Anchor#rollbackTransfer(User, Transfer, Map)}.
+	 * {@link org.nightlabs.jfire.transfer.Anchor#rollbackTransfer(User, Transfer, Set)}.
 	 * <p>
 	 * Note: If the <tt>DeliverMoneyTransfer</tt> has not been booked (but only created),
 	 * it will of course not be rolled back on the anchors, but the status will be

@@ -448,14 +448,14 @@ implements SessionBean
 			this.deliveryNoteIDs = deliveryNoteIDs;
 			this.delayMSec = delayMSec;
 
-			logger.info("Created BookDeliveryNoteInvocation for " + deliveryNoteIDs.size() + " deliveryNotes with "+delayMSec+" msec delay.");
+			logger.info("Created ConsolidateProductReferencesInvocation for " + deliveryNoteIDs.size() + " deliveryNotes with "+delayMSec+" msec delay.");
 		}
 
 		public Serializable invoke() throws Exception
 		{
 			long wait = createDT + delayMSec - System.currentTimeMillis();
 			if (wait > 0) {
-				logger.info("invoke() called: Waiting " + wait + " msec before starting to book.");
+				logger.info("invoke() called: Waiting " + wait + " msec before starting to consolidate.");
 				try { Thread.sleep(wait); } catch (InterruptedException x) { }
 			}
 
@@ -472,7 +472,6 @@ implements SessionBean
 				}
 
 				Collection products = new HashSet();
-				User user = null;
 				for (Iterator itD = deliveryNotes.iterator(); itD.hasNext(); ) {
 					DeliveryNote deliveryNote = (DeliveryNote) itD.next();
 

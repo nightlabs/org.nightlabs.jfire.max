@@ -356,6 +356,9 @@ public class Trader
 	 */
 	public LegalEntity setPersonToLegalEntity(Person person, boolean makePesistent)
 	{
+		if (person == null)
+			throw new IllegalArgumentException("person must not be null!");
+
 		String anchorID = person.getPrimaryKey();
 		AnchorID oAnchorID = AnchorID.create(getMandator().getOrganisationID(),
 				LegalEntity.ANCHOR_TYPE_ID_PARTNER, anchorID);

@@ -165,7 +165,7 @@ public abstract class Anchor
 	}
 
 	/**
-	 * Do NOT call this method directly! Use {@link Transfer#bookTransfer(User, Map)}
+	 * Do NOT call this method directly! Use {@link Transfer#bookTransfer(User, Set)}
 	 * instead!
 	 */
 	public void rollbackTransfer(User user, Transfer transfer, Set<Anchor> involvedAnchors)

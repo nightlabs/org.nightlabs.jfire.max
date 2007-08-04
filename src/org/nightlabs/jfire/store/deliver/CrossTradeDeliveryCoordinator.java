@@ -347,6 +347,10 @@ public class CrossTradeDeliveryCoordinator
 			try {
 				DeliveryResult remoteServerDeliverBeginResult = remoteStoreManager.deliverBegin(remoteDeliveryData);
 				if (remoteServerDeliverBeginResult.isFailed()) {
+					logger.error("performCrossTradeDelivery: deliver-step 2 failed with DeliveryResult! Will force rollback. DeliveryResult.code=\"" +
+							remoteServerDeliverBeginResult.getCode() +"\" DeliveryResult.text=\"" +
+							remoteServerDeliverBeginResult.getText() + "\"");
+
 					forceRollback = true;
 					localClientDeliverBeginResult = new DeliveryResult(
 							remoteServerDeliverBeginResult.getCode(),
@@ -356,6 +360,7 @@ public class CrossTradeDeliveryCoordinator
 					localClientDeliverBeginResult = new DeliveryResult(
 							DeliveryResult.CODE_APPROVED_NO_EXTERNAL, null, null);
 			} catch (Throwable t) {
+				logger.error("performCrossTradeDelivery: deliver-step 2 failed with unexpected exception! Will force rollback.", t);
 				forceRollback = true;
 				localClientDeliverBeginResult = new DeliveryResult(t);
 			}
@@ -372,6 +377,10 @@ public class CrossTradeDeliveryCoordinator
 			try {
 				DeliveryResult localServerDeliverBeginResult = localStoreManager.deliverBegin(localDeliveryData);
 				if (localServerDeliverBeginResult.isFailed()) {
+					logger.error("performCrossTradeDelivery: deliver-step 4 failed with DeliveryResult! Will force rollback. DeliveryResult.code=\"" +
+							localServerDeliverBeginResult.getCode() +"\" DeliveryResult.text=\"" +
+							localServerDeliverBeginResult.getText() + "\"");
+
 					forceRollback = true;
 					remoteClientDeliveryDoWorkResult = new DeliveryResult(
 							localServerDeliverBeginResult.getCode(),
@@ -381,6 +390,7 @@ public class CrossTradeDeliveryCoordinator
 					remoteClientDeliveryDoWorkResult = new DeliveryResult(
 							DeliveryResult.CODE_DELIVERED_NO_EXTERNAL, null, null);
 			} catch (Throwable t) {
+				logger.error("performCrossTradeDelivery: deliver-step 4 failed with unexpected exception! Will force rollback.", t);
 				forceRollback = true;
 				remoteClientDeliveryDoWorkResult = new DeliveryResult(t);
 			}
@@ -394,6 +404,10 @@ public class CrossTradeDeliveryCoordinator
 				DeliveryResult remoteServerDeliverDoWorkResult = remoteStoreManager.deliverDoWork(
 						remoteDeliveryID, remoteClientDeliveryDoWorkResult, forceRollback);
 				if (remoteServerDeliverDoWorkResult.isFailed()) {
+					logger.error("performCrossTradeDelivery: deliver-step 5 failed with DeliveryResult! Will force rollback. DeliveryResult.code=\"" +
+							remoteServerDeliverDoWorkResult.getCode() +"\" DeliveryResult.text=\"" +
+							remoteServerDeliverDoWorkResult.getText() + "\"");
+
 					forceRollback = true;
 					localClientDeliveryDoWorkResult = new DeliveryResult(
 							remoteServerDeliverDoWorkResult.getCode(),
@@ -403,6 +417,7 @@ public class CrossTradeDeliveryCoordinator
 					localClientDeliveryDoWorkResult = new DeliveryResult(
 							DeliveryResult.CODE_DELIVERED_NO_EXTERNAL, null, null);
 			} catch (Throwable t) {
+				logger.error("performCrossTradeDelivery: deliver-step 5 failed with unexpected exception! Will force rollback.", t);
 				forceRollback = true;
 				localClientDeliveryDoWorkResult = new DeliveryResult(t);
 			}
@@ -416,6 +431,10 @@ public class CrossTradeDeliveryCoordinator
 				DeliveryResult localServerDeliverDoWorkResult = localStoreManager.deliverDoWork(
 						localDeliveryID, localClientDeliveryDoWorkResult, forceRollback);
 				if (localServerDeliverDoWorkResult.isFailed()) {
+					logger.error("performCrossTradeDelivery: deliver-step 6 failed with DeliveryResult! Will force rollback. DeliveryResult.code=\"" +
+							localServerDeliverDoWorkResult.getCode() +"\" DeliveryResult.text=\"" +
+							localServerDeliverDoWorkResult.getText() + "\"");
+
 					forceRollback = true;
 					remoteClientDeliveryEndResult = new DeliveryResult(
 							localServerDeliverDoWorkResult.getCode(),
@@ -425,6 +444,7 @@ public class CrossTradeDeliveryCoordinator
 					remoteClientDeliveryEndResult = new DeliveryResult(
 							DeliveryResult.CODE_COMMITTED_NO_EXTERNAL, null, null);
 			} catch (Throwable t) {
+				logger.error("performCrossTradeDelivery: deliver-step 6 failed with unexpected exception! Will force rollback.", t);
 				forceRollback = true;
 				remoteClientDeliveryEndResult = new DeliveryResult(t);
 			}
@@ -438,7 +458,11 @@ public class CrossTradeDeliveryCoordinator
 				DeliveryResult remoteServerDeliverEndResult = remoteStoreManager
 						.deliverEnd(remoteDeliveryID, remoteClientDeliveryEndResult,
 								forceRollback);
-				if (remoteServerDeliverEndResult.isApproved()) {
+				if (remoteServerDeliverEndResult.isFailed()) {
+					logger.error("performCrossTradeDelivery: deliver-step 7 failed with DeliveryResult! Will force rollback. DeliveryResult.code=\"" +
+							remoteServerDeliverEndResult.getCode() +"\" DeliveryResult.text=\"" +
+							remoteServerDeliverEndResult.getText() + "\"");
+
 					forceRollback = true;
 					localClientDeliveryEndResult = new DeliveryResult(
 							remoteServerDeliverEndResult.getCode(),
@@ -448,6 +472,7 @@ public class CrossTradeDeliveryCoordinator
 					localClientDeliveryEndResult = new DeliveryResult(
 							DeliveryResult.CODE_COMMITTED_NO_EXTERNAL, null, null);
 			} catch (Throwable t) {
+				logger.error("performCrossTradeDelivery: deliver-step 7 failed with unexpected exception! Will force rollback.", t);
 				forceRollback = true;
 				localClientDeliveryEndResult = new DeliveryResult(t);
 			}
@@ -468,8 +493,7 @@ public class CrossTradeDeliveryCoordinator
 									+ localServerDeliverEndResult.getText() + " localDeliveryID="
 									+ localDeliveryID);
 			} catch (Throwable t) {
-				Logger.getLogger(CrossTradeDeliveryCoordinator.class).error(
-						"localStoreManager.deliverEnd(...) failed with Exception!", t);
+				logger.error("performCrossTradeDelivery: deliver-step 8: localStoreManager.deliverEnd(...) failed with Exception!", t);
 			}
 
 		} catch (Exception x) {
@@ -482,11 +506,11 @@ public class CrossTradeDeliveryCoordinator
 	{
 		if (organisationID == null
 				|| IDGenerator.getOrganisationID().equals(organisationID)) {
-// TODO Workaround: The CascadedAuthentication stuff seems to fail (i.e. the StoreManager proxy created here does not point to the local organisation anymore after the remote one has been used)
-//			return StoreManagerUtil.getHome().create();
-			return StoreManagerUtil.getHome(
-					Lookup.getInitialContextProperties(getPersistenceManager(),
-							IDGenerator.getOrganisationID())).create();
+// TO DO Workaround: The CascadedAuthentication stuff seems to fail (i.e. the StoreManager proxy created here does not point to the local organisation anymore after the remote one has been used) // I think, it works again. If this proves correct, remove these outcommented lines.
+			return StoreManagerUtil.getHome().create();
+//			return StoreManagerUtil.getHome(
+//					Lookup.getInitialContextProperties(getPersistenceManager(),
+//							IDGenerator.getOrganisationID())).create();
 		}
 
 		return StoreManagerUtil.getHome(

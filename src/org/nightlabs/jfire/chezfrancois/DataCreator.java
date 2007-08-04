@@ -286,18 +286,19 @@ public class DataCreator
 	throws
 		SecurityException, DataBlockNotFoundException, DataBlockGroupNotFoundException, DataFieldNotFoundException
 	{
+		User user = null;
 		pm.getExtent(User.class);
 		try {
-			User user = (User) pm.getObjectById(UserID.create(organisationID, userID));
-			// it already exists => return
-			return user;
+			user = (User) pm.getObjectById(UserID.create(organisationID, userID));
+			// it already exists => return, but before check for existing person
+			if (user.getPerson() != null)
+				return user;
 		} catch (JDOObjectNotFoundException x) {
-			// fine, it doesn't exist yet
+			// fine, it doesn't exist yet => create it
+			user = new User(organisationID, userID);
+			UserLocal userLocal = new UserLocal(user);
+			userLocal.setPasswordPlain(password);
 		}
-
-		User user = new User(organisationID, userID);
-		UserLocal userLocal = new UserLocal(user);
-		userLocal.setPasswordPlain(password);
 
 		Person person = createPerson(personCompany, personName, personFirstName, personEMail);
 		user.setPerson(person);
@@ -416,6 +417,9 @@ public class DataCreator
 
 	public LegalEntity createLegalEntity(Person person)
 	{
+		if (person == null)
+			throw new IllegalArgumentException("person must not be null!");
+
 		Trader trader = Trader.getTrader(pm);
 		return trader.setPersonToLegalEntity(person, true);
 //		LegalEntity legalEntity = new LegalEntity(

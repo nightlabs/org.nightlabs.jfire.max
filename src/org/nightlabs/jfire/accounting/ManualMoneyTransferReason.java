@@ -29,123 +29,135 @@ package org.nightlabs.jfire.accounting;
 import java.util.HashMap;
 import java.util.Map;
 
+import org.nightlabs.annotation.Implement;
 import org.nightlabs.i18n.I18nText;
+import org.nightlabs.jfire.transfer.Transfer;
 
 /**
  * @author Chairat Kongarayawetchakun - chairatk at nightlabs dot de
+ * @author Marco Schulze - Marco at NightLabs dot de
  *
  * @jdo.persistence-capable 
  *		identity-type="application"
- *		objectid-class="org.nightlabs.jfire.accounting.id.ProducedMoneyTransferSubjectID"
+ *		objectid-class="org.nightlabs.jfire.accounting.id.ManualMoneyTransferReasonID"
  *		detachable="true"
- *		table="JFireTrade_ProducedMoneyTransferSubject"
+ *		table="JFireTrade_ManualMoneyTransferReason"
  *
  * @jdo.inheritance strategy="new-table"
  *
- * @jdo.create-objectid-class field-order="producedMoneyTransferID"
+ * @jdo.create-objectid-class field-order="organisationID, transferTypeID, transferID"
  *
- * @jdo.fetch-group name="ProducedMoneyTransfer.subject" fields="producedMoneyTransfer, subjects"
+ * @jdo.fetch-group name="ManualMoneyTransfer.reason" fields="manualMoneyTransfer, texts"
  */
-public class ProducedMoneyTransferSubject extends I18nText
+public class ManualMoneyTransferReason extends I18nText
 {
-	/////// begin primary key ///////
-	/**
-	 * @jdo.field primary-key="true"
-	 * @jdo.column length="100"
-	 */
-	private String producedMoneyTransferID;
+	private static final long serialVersionUID = 1L; // Added this field. Marco.
 
+	// TODO incomplete and wrong primary key!!!
+	// Should be the same as the one of ManualMoneyTransfer (which is the one of the root-class in the hierarchy - i.e. Transfer).
+
+//	/////// begin primary key ///////
 //	/**
 //	 * @jdo.field primary-key="true"
 //	 * @jdo.column length="100"
 //	 */
-//	private String organisationID;
+//	private String producedMoneyTransferID;
+//
+////	/**
+////	 * @jdo.field primary-key="true"
+////	 * @jdo.column length="100"
+////	 */
+////	private String organisationID;
+//
+//	/**
+//	 * @jdo.field primary-key="true"
+//	 * @jdo.column length="100"
+//	 */
+//	private String producedMoneyTransferSubjectID;
+//	/////// end primary key ///////
+
+	// @Chairat: because it fails building, I already fixed the PK. And please update your XDoclet plugin (*DELETE* the old one):
+	// https://www.jfire.org/modules/newbb/forum_4_topic_id_155.html
 
 	/**
 	 * @jdo.field primary-key="true"
 	 * @jdo.column length="100"
 	 */
-	private String producedMoneyTransferSubjectID;
-	/////// end primary key ///////
+	private String organisationID;
+
+	/**
+	 * @jdo.field primary-key="true"
+	 * @jdo.column length="100"
+	 */
+	private String transferTypeID;
+
+	/**
+	 * @jdo.field primary-key="true"
+	 */
+	private long transferID;
 
 	/**
 	 * @jdo.field persistence-modifier="persistent"
 	 */
-	private ProducedMoneyTransfer producedMoneyTransfer;
+	private ManualMoneyTransfer manualMoneyTransfer;
 
 	/**
 	 * key: String languageID<br/>
-	 * value: String subject
+	 * value: String text
 	 * 
 	 * @jdo.field
 	 *		persistence-modifier="persistent"
 	 *		collection-type="map"
 	 *		key-type="java.lang.String"
 	 *		value-type="java.lang.String"
-	 *		table="JFireTrade_ProducedMoneyTransferSubject_subjects"
+	 *		table="JFireTrade_ManualMoneyTransferReason_texts"
 	 *		null-value="exception"
 	 *
 	 * @jdo.join
 	 */
-	protected Map subjects = new HashMap();
-
-	protected ProducedMoneyTransferSubject()
-	{
-	}
-
-	public ProducedMoneyTransferSubject(ProducedMoneyTransfer producedMoneyTransfer)
-	{
-//		this.producedMoneyTransferID = producedMoneyTransfer.getTransferTypeID();
-//		this.organisationID = producedMoneyTransfer.getOrganisationID();
-//		this.regionID = region.getRegionID();
-		this.producedMoneyTransfer = producedMoneyTransfer;
-	}
+	protected Map<String, String> texts;
 
 	/**
-	 * @return Returns the countryID.
+	 * @deprecated Only for JDO!
 	 */
-	public String getProducedMoneyTransferID()
+	protected ManualMoneyTransferReason() { }
+
+	public ManualMoneyTransferReason(ManualMoneyTransfer manualMoneyTransfer)
 	{
-		return producedMoneyTransferID;
+		this.organisationID = manualMoneyTransfer.getOrganisationID();
+		this.transferTypeID = manualMoneyTransfer.getTransferTypeID();
+		this.transferID = manualMoneyTransfer.getTransferID();
+		this.manualMoneyTransfer = manualMoneyTransfer;
+		this.texts = new HashMap<String, String>();
 	}
 
-//	/**
-//	 * @return Returns the organisationID.
-//	 */
-//	public String getOrganisationID()
-//	{
-//		return organisationID;
-//	}
-
-	/**
-	 * @return Returns the region.
-	 */
-	public ProducedMoneyTransfer getProducedMoneyTransfer()
+	public String getOrganisationID()
 	{
-		return producedMoneyTransfer;
+		return organisationID;
+	}
+	public String getTransferTypeID()
+	{
+		return transferTypeID;
+	}
+	public long getTransferID()
+	{
+		return transferID;
 	}
 
-	/**
-	 * @return Returns the regionID.
-	 */
-	public String getProducedMoneyTransferSubjectID()
+	public ManualMoneyTransfer getManualMoneyTransfer()
 	{
-		return producedMoneyTransferSubjectID;
+		return manualMoneyTransfer;
 	}
 
-	/**
-	 * @see org.nightlabs.i18n.I18nText#getI18nMap()
-	 */
-	protected Map getI18nMap()
+	@Implement
+	protected Map<String, String> getI18nMap()
 	{
-		return subjects;
+		return texts;
 	}
 
-	/**
-	 * @see org.nightlabs.i18n.I18nText#getFallBackValue(java.lang.String)
-	 */
+	@Implement
 	protected String getFallBackValue(String languageID)
 	{
-		return producedMoneyTransfer == null ? languageID : producedMoneyTransfer.getPrimaryKey();
+		return Transfer.getPrimaryKey(organisationID, transferTypeID, transferID);
 	}
 }

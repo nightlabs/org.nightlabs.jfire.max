@@ -59,8 +59,10 @@ public class MoneyTransfer extends Transfer
 
 //	private boolean statistical = false; // necessary?!
 
+	/**
+	 * @deprecated Only for JDO! This constructor must never be used directly.
+	 */
 	protected MoneyTransfer() {
-//		this.invoices = new ArrayList();
 	}
 
 	/**

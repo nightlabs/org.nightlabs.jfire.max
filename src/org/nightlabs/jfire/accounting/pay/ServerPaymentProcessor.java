@@ -559,10 +559,18 @@ public PayMoneyTransfer payBegin(PayParams payParams)
 		PaymentResult payDoWorkServerResult = externalPayDoWork(payParams); 
 	
 		if (payDoWorkServerResult == null) {
-			payDoWorkServerResult = new PaymentResult(
-					PaymentResult.CODE_PAID_NO_EXTERNAL,
-					(String)null,
-					(Throwable)null);
+			if (payment.isPostponed()) {
+				payDoWorkServerResult = new PaymentResult(
+						PaymentResult.CODE_POSTPONED,
+						(String)null,
+						(Throwable)null);
+			}
+			else {
+				payDoWorkServerResult = new PaymentResult(
+						PaymentResult.CODE_PAID_NO_EXTERNAL,
+						(String)null,
+						(Throwable)null);
+			}
 		}
 
 		payParams.paymentData.getPayment().setPayDoWorkServerResult(payDoWorkServerResult);
@@ -596,8 +604,8 @@ public PayMoneyTransfer payBegin(PayParams payParams)
 	 * <p>
 	 * Note, that you MUST either throw a <tt>PaymentException</tt> or call sth. like
 	 * <tt>payParams.paymentData.getPayment().setPayEndServerResult(payEndServerResult);</tt>.
-	 * It's much wiser not to override this method but just implement {@link #externalDeliverCommit(DeliverParams)
-	 * and {@link #externalDeliverRollback(DeliverParams).
+	 * It's much wiser not to override this method but just implement {@link #externalPayCommit(org.nightlabs.jfire.accounting.pay.ServerPaymentProcessor.PayParams)}
+	 * and {@link #externalPayRollback(org.nightlabs.jfire.accounting.pay.ServerPaymentProcessor.PayParams).
 	 *
 	 * @param payParams
 	 *
@@ -624,10 +632,18 @@ public PayMoneyTransfer payBegin(PayParams payParams)
 			payEndServerResult = externalPayCommit(payParams); 
 			
 			if (payEndServerResult == null) {
-				payEndServerResult = new PaymentResult(
-						PaymentResult.CODE_COMMITTED_NO_EXTERNAL,
-						(String)null,
-						(Throwable)null);
+				if (payment.isPostponed()) {
+					payEndServerResult = new PaymentResult(
+							PaymentResult.CODE_POSTPONED,
+							(String)null,
+							(Throwable)null);					
+				}
+				else {
+					payEndServerResult = new PaymentResult(
+							PaymentResult.CODE_COMMITTED_NO_EXTERNAL,
+							(String)null,
+							(Throwable)null);
+				}
 			}
 		}
 

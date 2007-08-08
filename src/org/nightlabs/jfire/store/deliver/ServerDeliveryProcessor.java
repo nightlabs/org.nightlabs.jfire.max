@@ -539,12 +539,20 @@ implements Serializable, DetachCallback
 	{
 		Delivery delivery = deliverParams.deliveryData.getDelivery();
 		DeliveryResult deliverDoWorkServerResult = externalDeliverDoWork(deliverParams); 
-	
+
 		if (deliverDoWorkServerResult == null) {
-			deliverDoWorkServerResult = new DeliveryResult(
-					DeliveryResult.CODE_DELIVERED_NO_EXTERNAL,
-					(String)null,
-					(Throwable)null);
+			if (delivery.isPostponed()) {
+				deliverDoWorkServerResult = new DeliveryResult(
+						DeliveryResult.CODE_POSTPONED,
+						(String)null,
+						(Throwable)null);
+			}
+			else {
+				deliverDoWorkServerResult = new DeliveryResult(
+						DeliveryResult.CODE_DELIVERED_NO_EXTERNAL,
+						(String)null,
+						(Throwable)null);
+			}
 		}
 
 		deliverParams.deliveryData.getDelivery().setDeliverDoWorkServerResult(deliverDoWorkServerResult);
@@ -630,10 +638,18 @@ implements Serializable, DetachCallback
 			deliverEndServerResult = externalDeliverCommit(deliverParams); 
 
 			if (deliverEndServerResult == null) {
-				deliverEndServerResult = new DeliveryResult(
-						DeliveryResult.CODE_COMMITTED_NO_EXTERNAL,
-						(String)null,
-						(Throwable)null);
+				if (delivery.isPostponed()) {
+					deliverEndServerResult = new DeliveryResult(
+							DeliveryResult.CODE_POSTPONED,
+							(String)null,
+							(Throwable)null);
+				}
+				else {
+					deliverEndServerResult = new DeliveryResult(
+							DeliveryResult.CODE_COMMITTED_NO_EXTERNAL,
+							(String)null,
+							(Throwable)null);
+				}
 			}
 		}
 

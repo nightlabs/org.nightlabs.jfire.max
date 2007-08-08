@@ -139,24 +139,13 @@ implements SessionBean
 	public void ejbCreate() 
 	throws CreateException
 	{
-//		try
-//		{
-//			LOGGER.debug("StoreManagerBean created by " + this.getPrincipalString());
-//		}
-//		catch (Exception e)
-//		{
-//			throw new CreateException(e.getMessage());
-//		}
 	}
 
 	/**
-	 * @see javax.ejb.SessionBean#ejbRemove()
-	 * 
 	 * @ejb.permission unchecked="true"
 	 */
 	public void ejbRemove() throws EJBException, RemoteException
 	{
-		logger.debug(this.getClass().getName() + ".ejbRemove()");
 	}
 
 	public void setSessionContext(SessionContext sessionContext)

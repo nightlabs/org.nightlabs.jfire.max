@@ -1279,6 +1279,8 @@ implements StoreCallback
 		if (deliveryData == null)
 			throw new NullPointerException("deliveryData");
 
+		boolean postponed = deliveryData.getDelivery().isPostponed();
+
 		ServerDeliveryProcessor serverDeliveryProcessor = getServerDeliveryProcessor(
 				deliveryData.getDelivery());
 
@@ -1298,8 +1300,16 @@ implements StoreCallback
 		if (serverDeliveryResult.isFailed())
 			throw new DeliveryException(serverDeliveryResult);
 
-		if (!serverDeliveryResult.isDelivered())
-			throw new DeliveryException(serverDeliveryResult);
+		if (postponed) {
+			if (!DeliveryResult.CODE_POSTPONED.equals(serverDeliveryResult.getCode()) && !serverDeliveryResult.isRolledBack()) {
+				String msg = "The Delivery \"" + deliveryData.getDelivery().getPrimaryKey() + "\" is marked postponed, but the DeliveryProcessor \"" + serverDeliveryProcessor.getPrimaryKey() + "\" did neither rollback nor return DeliveryResult.CODE_POSTPONED! Instead it returned code=\"" + serverDeliveryResult.getCode() + "\" text=\"" + serverDeliveryResult.getText() + "\"";
+				logger.warn(msg, new IllegalStateException(msg));
+			}
+		}
+		else {
+			if (!serverDeliveryResult.isDelivered())
+				throw new DeliveryException(serverDeliveryResult);
+		}
 
 		try {
 			for (DeliveryNote deliveryNote : deliveryData.getDelivery().getDeliveryNotes()) {
@@ -1331,6 +1341,8 @@ implements StoreCallback
 		if (deliveryData == null)
 			throw new NullPointerException("deliveryData");
 
+		boolean postponed = deliveryData.getDelivery().isPostponed();
+
 		ServerDeliveryProcessor serverDeliveryProcessor = getServerDeliveryProcessor(
 				deliveryData.getDelivery());
 
@@ -1349,6 +1361,13 @@ implements StoreCallback
 
 		if (serverDeliveryResult.isFailed())
 			throw new DeliveryException(serverDeliveryResult);
+
+		if (postponed) {
+			if (!DeliveryResult.CODE_POSTPONED.equals(serverDeliveryResult.getCode()) && !serverDeliveryResult.isRolledBack()) {
+				String msg = "The Delivery \"" + deliveryData.getDelivery().getPrimaryKey() + "\" is marked postponed, but the DeliveryProcessor \"" + serverDeliveryProcessor.getPrimaryKey() + "\" did neither rollback nor return DeliveryResult.CODE_POSTPONED! Instead it returned code=\"" + serverDeliveryResult.getCode() + "\" text=\"" + serverDeliveryResult.getText() + "\"";
+				logger.warn(msg, new IllegalStateException(msg));
+			}
+		}
 
 		if (deliveryData.getDelivery().isForceRollback() || deliveryData.getDelivery().isPostponed()) {
 			DeliverProductTransfer deliverProductTransfer = DeliverProductTransfer.getDeliverProductTransferForDelivery(

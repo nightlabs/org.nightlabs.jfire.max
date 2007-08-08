@@ -536,6 +536,8 @@ public class Accounting
 		if (paymentData == null)
 			throw new NullPointerException("paymentData");
 
+		boolean postponed = paymentData.getPayment().isPostponed();
+
 		ServerPaymentProcessor serverPaymentProcessor = getServerPaymentProcessor(
 				paymentData.getPayment());
 
@@ -555,8 +557,16 @@ public class Accounting
 		if (serverPaymentResult.isFailed())
 			throw new PaymentException(serverPaymentResult);
 
-		if (!serverPaymentResult.isPaid())
-			throw new PaymentException(serverPaymentResult);
+		if (postponed) {
+			if (!PaymentResult.CODE_POSTPONED.equals(serverPaymentResult.getCode()) && !serverPaymentResult.isRolledBack()) {
+				String msg = "The Payment \"" + paymentData.getPayment().getPrimaryKey() + "\" is marked postponed, but the PaymentProcessor \"" + serverPaymentProcessor.getPrimaryKey() + "\" did neither rollback nor return PaymentResult.CODE_POSTPONED! Instead it returned code=\"" + serverPaymentResult.getCode() + "\" text=\"" + serverPaymentResult.getText() + "\"";
+				logger.warn(msg, new IllegalStateException(msg));
+			}
+		}
+		else {
+			if (!serverPaymentResult.isPaid())
+				throw new PaymentException(serverPaymentResult);
+		}
 
 		try {
 			for (Invoice invoice : paymentData.getPayment().getInvoices()) {
@@ -587,6 +597,8 @@ public class Accounting
 		if (paymentData == null)
 			throw new NullPointerException("paymentData");
 
+		boolean postponed = paymentData.getPayment().isPostponed();
+
 		ServerPaymentProcessor serverPaymentProcessor = getServerPaymentProcessor(
 				paymentData.getPayment());
 
@@ -610,6 +622,13 @@ public class Accounting
 
 		if (serverPaymentResult.isFailed())
 			throw new PaymentException(serverPaymentResult);
+
+		if (postponed) {
+			if (!PaymentResult.CODE_POSTPONED.equals(serverPaymentResult.getCode()) && !serverPaymentResult.isRolledBack()) {
+				String msg = "The Payment \"" + paymentData.getPayment().getPrimaryKey() + "\" is marked postponed, but the PaymentProcessor \"" + serverPaymentProcessor.getPrimaryKey() + "\" did neither rollback nor return PaymentResult.CODE_POSTPONED! Instead it returned code=\"" + serverPaymentResult.getCode() + "\" text=\"" + serverPaymentResult.getText() + "\"";
+				logger.warn(msg, new IllegalStateException(msg));
+			}
+		}
 
 		if (paymentData.getPayment().isPostponed()) {
 			PayMoneyTransfer payMoneyTransfer = PayMoneyTransfer.getPayMoneyTransferForPayment(

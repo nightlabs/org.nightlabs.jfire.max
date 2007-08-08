@@ -7,7 +7,6 @@ import javax.jdo.PersistenceManager;
 
 import org.apache.log4j.Logger;
 import org.nightlabs.annotation.Implement;
-import org.nightlabs.config.ConfigModuleNotFoundException;
 import org.nightlabs.jfire.config.Config;
 import org.nightlabs.jfire.organisation.Organisation;
 import org.nightlabs.jfire.security.SecurityReflector;
@@ -30,22 +29,23 @@ import org.nightlabs.jfire.transfer.Anchor;
  *
  * @jdo.inheritance strategy="superclass-table"
  */
-public class ServerDeliveryProcessorDeliveryQueue extends ServerDeliveryProcessor {
-	
+public class ServerDeliveryProcessorDeliveryQueue
+extends ServerDeliveryProcessor
+{
 	private static final Logger logger = Logger.getLogger(ServerDeliveryProcessorDeliveryQueue.class);
-	
+
 	private static final long serialVersionUID = 1L;
-	
+
 	/** @jdo.field persistence-modifier="none" */
 	private DeliveryQueueConfigModule deliveryQueueConfigModule;
-	
+
 	public static ServerDeliveryProcessorDeliveryQueue getServerDeliveryProcessorDeliveryQueue(PersistenceManager pm) {
 		ServerDeliveryProcessorDeliveryQueue serverDeliveryProcessorDeliveryQueue;
 		try {
 			pm.getExtent(ServerDeliveryProcessorDeliveryQueue.class);
 			serverDeliveryProcessorDeliveryQueue = (ServerDeliveryProcessorDeliveryQueue) pm.getObjectById(ServerDeliveryProcessorID.create(
 					Organisation.DEVIL_ORGANISATION_ID, ServerDeliveryProcessorDeliveryQueue.class.getName()));
-			
+
 		} catch (JDOObjectNotFoundException e) {
 			serverDeliveryProcessorDeliveryQueue = new ServerDeliveryProcessorDeliveryQueue(Organisation.DEVIL_ORGANISATION_ID,	ServerDeliveryProcessorDeliveryQueue.class.getName());
 			serverDeliveryProcessorDeliveryQueue.getName().setText(Locale.ENGLISH.getLanguage(), "Server Delivery Processor for delivering tickets to the active delivery queue");
@@ -83,29 +83,27 @@ public class ServerDeliveryProcessorDeliveryQueue extends ServerDeliveryProcesso
 
 	@Implement
 	protected DeliveryResult externalDeliverDoWork(DeliverParams deliverParams) throws DeliveryException {
-		// Nothing to do
-		return new DeliveryResult(DeliveryResult.CODE_POSTPONED, null, null);
+		DeliveryQueue targetDeliveryQueue = getTargetDeliveryQueue(deliverParams);
+		targetDeliveryQueue.addDelivery(deliverParams.deliveryData.getDelivery());
+
+		return null;
 	}
 
 	@Implement
 	protected DeliveryResult externalDeliverCommit(DeliverParams deliverParams) throws DeliveryException {
-		DeliveryQueue targetDeliveryQueue = getTargetDeliveryQueue(deliverParams);
-		targetDeliveryQueue.addDelivery(deliverParams.deliveryData.getDelivery());			
-		getPersistenceManager().makePersistent(targetDeliveryQueue);
+		// Nothing to do					
 
-		return new DeliveryResult(DeliveryResult.CODE_POSTPONED, null, null);
+		return null; // should automatically be correct ;-)
 	}
 
 	@Implement
 	protected DeliveryResult externalDeliverRollback(DeliverParams deliverParams) throws DeliveryException {
 		DeliveryQueue targetDeliveryQueue = getTargetDeliveryQueue(deliverParams);
 		targetDeliveryQueue.removeDelivery(deliverParams.deliveryData.getDelivery());
-		
-		getPersistenceManager().makePersistent(targetDeliveryQueue);
-		
-		return new DeliveryResult(DeliveryResult.CODE_ROLLED_BACK_NO_EXTERNAL, null, null);
+
+		return null; // should automatically be correct ;-)
 	}
-	
+
 	private DeliveryQueue getTargetDeliveryQueue(DeliverParams deliverParams) {
 		if (deliverParams.deliveryData instanceof DeliveryDataDeliveryQueue) {
 			DeliveryDataDeliveryQueue dData = (DeliveryDataDeliveryQueue) deliverParams.deliveryData;
@@ -114,17 +112,17 @@ public class ServerDeliveryProcessorDeliveryQueue extends ServerDeliveryProcesso
 		}
 		throw new IllegalArgumentException("deliveryData is not of type DeliveryDataDeliveryQueue");
 	}
-	
+
 	private DeliveryQueueConfigModule getDeliveryQueueConfigModule() {
 		if (deliveryQueueConfigModule == null) {
 			String organisationID = SecurityReflector.getUserDescriptor().getOrganisationID();
 			User user = SecurityReflector.getUserDescriptor().getUser(getPersistenceManager());
 			deliveryQueueConfigModule = (DeliveryQueueConfigModule) Config.getConfig(getPersistenceManager(), organisationID, user).getConfigModule(DeliveryQueueConfigModule.class);
 		}
-		
+
 		return deliveryQueueConfigModule;
 	}
-	
+
 	@Override
 	protected String _checkRequirements(CheckRequirementsEnvironment checkRequirementsEnvironment) {
 		DeliveryQueueConfigModule cfMod = getDeliveryQueueConfigModule();

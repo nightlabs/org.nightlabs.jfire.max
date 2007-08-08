@@ -45,7 +45,8 @@ import org.nightlabs.jfire.person.PersonStruct;
  * @jdo.inheritance strategy="new-table"
  * 
  * @jdo.fetch-group name="LegalEntityViewConfigModule.personStructFields" fields="personStructFields"
- *  
+ * @jdo.fetch-group name="ConfigModule.this" fields="personStructFields"
+ *
  * @author Alexander Bieber <alex[AT]nightlabs[DOT]de>
  */
 public class LegalEntityViewConfigModule extends ConfigModule {

@@ -44,7 +44,7 @@ import org.nightlabs.jfire.servermanager.deploy.DeploymentJarItem;
 import org.nightlabs.jfire.trade.state.id.StateDefinitionID;
 import org.nightlabs.jfire.trade.state.id.StateID;
 import org.nightlabs.math.Base36Coder;
-import org.nightlabs.util.Utils;
+import org.nightlabs.util.IOUtil;
 
 /**
  * @ejb.bean name="jfire/ejb/JFireJbpm/JbpmManager"
@@ -118,16 +118,16 @@ implements SessionBean
 			Map<String, File> hibernateConfigTemplateIncludeFiles)
 	throws IOException
 	{
-		String mainConfigText = Utils.readTextFile(hibernateMainConfigTemplateFile);
+		String mainConfigText = IOUtil.readTextFile(hibernateMainConfigTemplateFile);
 		for (Map.Entry<String, File> me : hibernateConfigTemplateIncludeFiles.entrySet()) {
-			String includeText = Utils.readTextFile(me.getValue()).replace("\\", "\\\\").replace("$", "\\$"); // '\' and '$' have a specific meaning in the replacement text of a regular expression (reference groups), hence we need to escape
+			String includeText = IOUtil.readTextFile(me.getValue()).replace("\\", "\\\\").replace("$", "\\$"); // '\' and '$' have a specific meaning in the replacement text of a regular expression (reference groups), hence we need to escape
 			if (me.getKey().matches("[^A-Za-z0-9_.]"))
 				throw new IllegalArgumentException("Invalid characters in key (for $INCLUDE directive): " + me.getKey());
 
 			Pattern p = Pattern.compile("<!--(\\s*?)\\$INCLUDE(\\s*?)" + me.getKey() + "(.*?)-->", Pattern.DOTALL);
 			mainConfigText = p.matcher(mainConfigText).replaceAll(includeText);
 		}
-		Utils.writeTextFile(hibernateConfigTemplateOutputFile, mainConfigText);
+		IOUtil.writeTextFile(hibernateConfigTemplateOutputFile, mainConfigText);
 	}
 
 	/**
@@ -202,8 +202,8 @@ implements SessionBean
 					// must push DDL through it, which is not allowed by a managed datasource. For the Runtime, we
 					// use a managed datasource (and enable hibernate's transaction-manager-bridge) in order to
 					// ensure that transaction handling is done correctly.
-					File tmpFolder = Utils.createUniqueIncrementalFolder(
-							Utils.getTempDir(), "jBPM-hibernate-" + Base36Coder.sharedInstance(false).encode(System.currentTimeMillis(), 1) + '-');
+					File tmpFolder = IOUtil.createUniqueIncrementalFolder(
+							IOUtil.getTempDir(), "jBPM-hibernate-" + Base36Coder.sharedInstance(false).encode(System.currentTimeMillis(), 1) + '-');
 
 					File hibernateMainConfigTemplateFile = new File(jfireJbpmEarDirectory, "hibernate-cfg.template.xml");
 					Map<String, File> hibernateConfigTemplateIncludeFiles = new HashMap<String, File>();
@@ -511,7 +511,7 @@ implements SessionBean
 				statables = new HashSet<Statable>(query.getResult());
 			}
 
-			return (Set<Statable>) NLJDOHelper.getDetachedQueryResult(pm, statables);
+			return NLJDOHelper.getDetachedQueryResultAsSet(pm, statables);
 		} finally {
 			pm.close();
 		}

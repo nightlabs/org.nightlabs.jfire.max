@@ -65,12 +65,4 @@ public class ManualMoneyTransfer extends MoneyTransfer
 		super(container, initiator, from, to, currency, amount);
 		this.reason = reason;
 	}
-	
-	/**
-	 * @return Returns the reason.
-	 */
-	public ManualMoneyTransferReason getManualMoneyTransferReason()
-	{
-		return reason;
-	}
 }

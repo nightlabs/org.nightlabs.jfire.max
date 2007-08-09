@@ -104,6 +104,7 @@ import org.nightlabs.jfire.idgenerator.IDNamespaceDefault;
 import org.nightlabs.jfire.jbpm.JbpmLookup;
 import org.nightlabs.jfire.jbpm.graph.def.ProcessDefinition;
 import org.nightlabs.jfire.security.User;
+import org.nightlabs.jfire.security.id.UserID;
 import org.nightlabs.jfire.store.DeliveryNote;
 import org.nightlabs.jfire.store.NestedProductType;
 import org.nightlabs.jfire.store.ProductType;
@@ -125,6 +126,7 @@ import org.nightlabs.jfire.trade.id.OfferID;
 import org.nightlabs.jfire.trade.id.OrderID;
 import org.nightlabs.jfire.trade.jbpm.ProcessDefinitionAssignment;
 import org.nightlabs.jfire.transfer.Anchor;
+import org.nightlabs.jfire.transfer.Transfer;
 import org.nightlabs.jfire.transfer.id.AnchorID;
 
 /**
@@ -2665,10 +2667,12 @@ public abstract class AccountingManagerBean
 	 * @ejb.transaction type = "Required"
 	 * @ejb.permission role-name="_Guest_"
 	 */
-	public ManualMoneyTransfer createManualMoneyTransfer(Anchor from, Anchor to, Currency currency, long amount, ManualMoneyTransferReason reason){
+	public ManualMoneyTransfer createManualMoneyTransfer(Transfer container, UserID userID, Anchor from, Anchor to, Currency currency, long amount, ManualMoneyTransferReason reason){
 		PersistenceManager pm = getPersistenceManager();
 		try{
-			ManualMoneyTransfer manualMoneyTransfer = new ManualMoneyTransfer(null, null, from, to, currency, amount, reason);
+			User user = (User) pm.getObjectById(userID);
+			System.out.println(container + "::::::::" + user + "::::::::::::::" + from + ":" + to);
+			ManualMoneyTransfer manualMoneyTransfer = new ManualMoneyTransfer(container, user, from, to, currency, amount, reason);
 			return (ManualMoneyTransfer)pm.detachCopy(manualMoneyTransfer);
 		}
 		finally{

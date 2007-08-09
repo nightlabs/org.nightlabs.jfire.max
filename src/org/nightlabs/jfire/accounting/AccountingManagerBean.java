@@ -124,6 +124,7 @@ import org.nightlabs.jfire.trade.id.CustomerGroupID;
 import org.nightlabs.jfire.trade.id.OfferID;
 import org.nightlabs.jfire.trade.id.OrderID;
 import org.nightlabs.jfire.trade.jbpm.ProcessDefinitionAssignment;
+import org.nightlabs.jfire.transfer.Anchor;
 import org.nightlabs.jfire.transfer.id.AnchorID;
 
 /**
@@ -2658,5 +2659,20 @@ public abstract class AccountingManagerBean
 //			pm.close();
 //		}
 //	}	
-	
+
+	/**
+	 * @ejb.interface-method
+	 * @ejb.transaction type = "Required"
+	 * @ejb.permission role-name="_Guest_"
+	 */
+	public ManualMoneyTransfer createManualMoneyTransfer(Anchor from, Anchor to, Currency currency, long amount, ManualMoneyTransferReason reason){
+		PersistenceManager pm = getPersistenceManager();
+		try{
+			ManualMoneyTransfer manualMoneyTransfer = new ManualMoneyTransfer(null, null, from, to, currency, amount, reason);
+			return (ManualMoneyTransfer)pm.detachCopy(manualMoneyTransfer);
+		}
+		finally{
+			pm.close();
+		}
+	}
 }

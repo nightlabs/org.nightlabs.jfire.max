@@ -68,11 +68,15 @@ import org.nightlabs.jfire.transfer.id.AnchorID;
  * @jdo.create-objectid-class
  *		field-order="organisationID, deliveryID"
  *		include-body="id/DeliveryID.body.inc"
+ *
+ * @jdo.fetch-group name="DeliveryTableData" fetch-groups="default" fields="user, endDT, partner, articles, articleIDs"
  */
 public class Delivery
 implements Serializable, StoreCallback
 {
 	private static final long serialVersionUID = 1L;
+	
+	public static final String FETCH_GROUP_DELIVERY_TABLE_DATA = "DeliveryTableData";
 
 	public static final String DELIVERY_DIRECTION_INCOMING = "incoming";
 
@@ -85,7 +89,6 @@ implements Serializable, StoreCallback
 	private String organisationID;
 	/**
 	 * @jdo.field primary-key="true"
-	 * @!jdo.column length="100"
 	 */
 	private long deliveryID;
 

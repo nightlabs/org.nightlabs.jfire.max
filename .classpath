@@ -21,7 +21,7 @@
 	<classpathentry kind="var" path="WORKSPACE/NightLabsBase/dist/NightLabsBase.jar" sourcepath="WORKSPACE/NightLabsBase/src"/>
 	<classpathentry kind="var" path="WORKSPACE/NightLabsJDO/dist/NightLabsJDO.jar" sourcepath="WORKSPACE/NightLabsJDO/src"/>
 	<classpathentry kind="var" path="WORKSPACE/JFireBase/dist/JFireBase.jar" sourcepath="WORKSPACE/JFireBase/src"/>
-	<classpathentry kind="var" path="WORKSPACE/JFireBaseBean/dist/JFireBaseBean.jar" sourcepath="WORKSPACE/JFireBaseBean/src"/>
+	<classpathentry kind="var" path="WORKSPACE/JFireBaseBean/dist/JFireBaseBean.jar" sourcepath="/WORKSPACE/JFireBaseBean/src"/>
 	<classpathentry kind="var" path="WORKSPACE/JFireServerManager/dist/JFireServerManager.jar"/>
 	<classpathentry kind="var" path="RHINO" sourcepath="/RHINO_SRC"/>
 	<classpathentry kind="var" path="JPOXENHANCER"/>

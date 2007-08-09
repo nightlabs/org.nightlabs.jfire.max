@@ -48,7 +48,7 @@ extends ServerDeliveryProcessor
 
 		} catch (JDOObjectNotFoundException e) {
 			serverDeliveryProcessorDeliveryQueue = new ServerDeliveryProcessorDeliveryQueue(Organisation.DEVIL_ORGANISATION_ID,	ServerDeliveryProcessorDeliveryQueue.class.getName());
-			serverDeliveryProcessorDeliveryQueue.getName().setText(Locale.ENGLISH.getLanguage(), "Server Delivery Processor for delivering tickets to the active delivery queue");
+			serverDeliveryProcessorDeliveryQueue.getName().setText(Locale.ENGLISH.getLanguage(), "Server Delivery Processor for delivering to a delivery queue");
 
 			serverDeliveryProcessorDeliveryQueue = (ServerDeliveryProcessorDeliveryQueue) pm.makePersistent(serverDeliveryProcessorDeliveryQueue);
 		}

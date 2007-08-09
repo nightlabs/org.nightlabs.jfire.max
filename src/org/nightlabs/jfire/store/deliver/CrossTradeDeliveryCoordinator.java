@@ -75,8 +75,10 @@ import org.nightlabs.jfire.transfer.id.AnchorID;
  * 
  * @jdo.create-objectid-class field-order="organisationID, crossTradeDeliveryCoordinatorID"
  */
-public class CrossTradeDeliveryCoordinator
+public class CrossTradeDeliveryCoordinator implements Serializable
 {
+	private static final long serialVersionUID = 1L;
+
 	private static final Logger logger = Logger.getLogger(CrossTradeDeliveryCoordinator.class);
 
 	public static CrossTradeDeliveryCoordinator getDefaultCrossTradeDeliveryCoordinator(PersistenceManager pm)

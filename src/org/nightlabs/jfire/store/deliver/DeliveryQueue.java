@@ -6,7 +6,6 @@ import java.util.Collections;
 import java.util.HashSet;
 import java.util.Set;
 
-import javax.jdo.JDODetachedFieldAccessException;
 import javax.jdo.JDOHelper;
 import javax.jdo.PersistenceManager;
 import javax.jdo.Query;
@@ -14,6 +13,7 @@ import javax.jdo.listener.AttachCallback;
 
 import org.apache.log4j.Logger;
 import org.nightlabs.jfire.idgenerator.IDGenerator;
+import org.nightlabs.jfire.store.deliver.id.DeliveryID;
 import org.nightlabs.jfire.store.deliver.id.DeliveryQueueID;
 
 
@@ -30,8 +30,8 @@ import org.nightlabs.jfire.store.deliver.id.DeliveryQueueID;
  * 
  * @jdo.fetch-group name="DeliveryQueue.name" fields="name"
  * @jdo.fetch-group name="DeliveryQueue.deliverySet" fields="deliverySet"
- * @jdo.fetch-group name="DeliveryQueue.outstandingDeliverySet" fields="outstandingDeliverySet"
- * @jdo.fetch-group name="DeliveryQueue.this" fetch-groups="default" fields="name, deliverySet, outstandingDeliverySet"
+ * @jdo.fetch-group name="DeliveryQueue.pendingDeliverySet" fields="pendingDeliverySet"
+ * @jdo.fetch-group name="DeliveryQueue.this" fetch-groups="default" fields="name, deliverySet, pendingDeliverySet"
  * 
  * @jdo.query
  * 		name="getDeliveryQueues"
@@ -44,7 +44,7 @@ public class DeliveryQueue implements Serializable, AttachCallback {
 	public static final String FETCH_GROUP_DELIVERY_QUEUE = "DeliveryQueue.this";
 	public static final String FETCH_GROUP_NAME = "DeliveryQueue.name";
 	public static final String FETCH_GROUP_DELIVERY_SET = "DeliveryQueue.deliverySet";
-	public static final String FETCH_GROUP_OUTSTANDING_DELIVERY_SET = "DeliveryQueue.outstandingDeliverySet";
+	public static final String FETCH_GROUP_PENDING_DELIVERY_SET = "DeliveryQueue.pendingDeliverySet";
 	
 	private static final long serialVersionUID = 1L;	
 
@@ -60,7 +60,9 @@ public class DeliveryQueue implements Serializable, AttachCallback {
 	/**
 	 * A descriptive name for this {@link DeliveryQueue}.
 	 * 
-	 * @jdo.field persistence-modifier="persistent" mapped-by="deliveryQueue"
+	 * @jdo.field
+	 * 		persistence-modifier="persistent"
+	 * 		mapped-by="deliveryQueue"
 	 */
 	private DeliveryQueueName name; 
 	
@@ -80,7 +82,7 @@ public class DeliveryQueue implements Serializable, AttachCallback {
 	private Set<Delivery> deliverySet;
 	
 	/**
-	 * The list of the deliveries in this queue, that have not been printed yet.
+	 * The list of the deliveries in this queue, that have not been delivered yet.
 	 * 
 	 * @jdo.field
 	 * 		persistence-modifier="persistent"
@@ -92,7 +94,7 @@ public class DeliveryQueue implements Serializable, AttachCallback {
 	 * 
 	 * @jdo.join
 	 */
-	private Set<Delivery> outstandingDeliverySet;
+	private Set<Delivery> pendingDeliverySet;
 	
 	/**
 	 * This field indicates whether a delivery queue has been deactivated irrevocably. In that state, no new deliveries
@@ -110,7 +112,7 @@ public class DeliveryQueue implements Serializable, AttachCallback {
 		this.organisationID = organisationID;		
 		this.deliveryQueueID = IDGenerator.nextID(DeliveryQueue.class);
 		this.deliverySet = new HashSet<Delivery>();
-		this.outstandingDeliverySet = new HashSet<Delivery>();
+		this.pendingDeliverySet = new HashSet<Delivery>();
 		this.name = new DeliveryQueueName(this);
 	}
 	
@@ -143,7 +145,7 @@ public class DeliveryQueue implements Serializable, AttachCallback {
 			throw new IllegalStateException("DeliveryQueue is defunct. No new deliveries may be added.");
 		
 		deliverySet.add(delivery);
-		outstandingDeliverySet.add(delivery);
+		pendingDeliverySet.add(delivery);
 	}
 	
 	/**
@@ -155,7 +157,7 @@ public class DeliveryQueue implements Serializable, AttachCallback {
 			throw new IllegalStateException("DeliveryQueue is defunct. No new deliveries may be removed.");
 		
 		deliverySet.remove(delivery);
-		outstandingDeliverySet.remove(delivery);
+		pendingDeliverySet.remove(delivery);
 	}
 	
 	/**
@@ -165,15 +167,15 @@ public class DeliveryQueue implements Serializable, AttachCallback {
 	 * @param delivery The delivery that is to be marked as processed.
 	 */
 	public void markProcessed(Delivery delivery) {
-		outstandingDeliverySet.remove(delivery);
+		pendingDeliverySet.remove(delivery);
 	}
 	
-	public Set<Delivery> getOutstandingDeliveries() {
-		return Collections.unmodifiableSet(outstandingDeliverySet);
+	public Set<Delivery> getPendingDeliveries() {
+		return Collections.unmodifiableSet(pendingDeliverySet);
 	}
 	
-	public boolean hasOutstandingDeliveries() {
-		return outstandingDeliverySet.size() > 0;
+	public boolean hasPendingDeliveries() {
+		return pendingDeliverySet.size() > 0;
 	}
 	
 	public void markDeleted() {
@@ -218,30 +220,32 @@ public class DeliveryQueue implements Serializable, AttachCallback {
 	}
 
 	public void jdoPreAttach() {
-		logger.debug("DeliveryQueue#jdoPreAttach() - start");
-		try {
-			checkDirtyStates(outstandingDeliverySet);
-			checkDirtyStates(deliverySet);
-		} catch(JDODetachedFieldAccessException e) {
-			logger.debug("JDODetachedFieldAccessException thrown.");
-			// do nothing
-			
-			// FIXME WORKAROUND
-			// Somehow the fetchgroups returned in DeliveryQueueConfigModuleController#getConfigModuleFetchGroups are not used properly
-			// when retrievingthe DeliveryQueueConfigModule along with its DeliveryQueues.
-		}
-		logger.debug("DeliveryQueue#jdoPreAttach() - end");
 	}
 	
 	public void jdoPostAttach(Object attached) {
+		if (true) return;
+		
 		logger.debug("DeliveryQueue#jdoPostAttach() - start");
-		logger.debug("DeliveryQueue#jdoPostAttach() - end");
-	}
-	
-	private void checkDirtyStates(Collection<Delivery> deliveries) {
-		for (Delivery delivery : deliveries) {
-			if (JDOHelper.isDirty(delivery))
-				throw new IllegalArgumentException("You are not supposed to change the deliveries in a delivery queue.");				
+		DeliveryQueue detached = (DeliveryQueue) attached;
+		PersistenceManager pm = JDOHelper.getPersistenceManager(this);
+		
+		for (Delivery delivery : detached.getPendingDeliveries()) {
+			if (JDOHelper.isNew(delivery) || JDOHelper.isDeleted(delivery))
+				return;
+			
+			if (JDOHelper.isDirty(delivery)) {
+				Delivery dsDelivery = (Delivery) pm.getObjectById(DeliveryID.create(delivery.getOrganisationID(), delivery.getDeliveryID()));
+				throw new IllegalArgumentException("You are not supposed to change the deliveries in a delivery queue.");
+			}
 		}
+		
+//		try {
+//			checkDirtyStates(pendingDeliverySet);
+//			checkDirtyStates(deliverySet);
+//		} catch(JDODetachedFieldAccessException e) {
+//			logger.debug("JDODetachedFieldAccessException thrown.");
+//			// do nothing
+//		}
+		logger.debug("DeliveryQueue#jdoPostAttach() - end");
 	}
 }

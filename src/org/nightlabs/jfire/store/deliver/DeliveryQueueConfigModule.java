@@ -17,8 +17,8 @@ import org.nightlabs.jfire.config.ConfigModule;
  *		detachable="true"
  *		table="JFireTrade_DeliveryQueueConfigModule"
  *
- * @jdo-fetch-group name="DeliveryQueueConfigModule.visibleDeliveryQueues" fetch-group="default, DeliveryQueue.name" fields="visibleDeliveryQueues"
- * @jdo-fetch-group name="DeliveryQueueConfigModule.this" fetch-groups="default, DeliveryQueue.this" fields="visibleDeliveryQueues"
+ * @jdo.fetch-group name="DeliveryQueueConfigModule.visibleDeliveryQueues" fields="visibleDeliveryQueues"
+ * @jdo.fetch-group name="DeliveryQueueConfigModule.this" fetch-groups="default" fields="visibleDeliveryQueues"
  * 
  * @jdo.inheritance strategy="new-table"
  */

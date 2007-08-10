@@ -152,7 +152,7 @@ extends DataCreator
 		if (JDOHelper.isPersistent(props))
 			props = (PropertySet) pm.detachCopy(props);
 		
-		struct.explodeProperty(props);
+		struct.explodePropertySet(props);
 		I18nTextDataField shortDesc;
 		try {
 			shortDesc = (I18nTextDataField)props.getDataField(SimpleProductTypeStruct.DESCRIPTION_SHORT);
@@ -209,7 +209,7 @@ extends DataCreator
 				}
 			}
 		}		
-		struct.implodeProperty(props); // and it should always be imploded before storing it into the datastore. Marco.
+		struct.implodePropertySet(props); // and it should always be imploded before storing it into the datastore. Marco.
 
 		// TODO JPOX WORKAROUND : this fails sometimes - hence we retry a few times
 		for (int tryCounter = 0; tryCounter < 10; ++tryCounter) {

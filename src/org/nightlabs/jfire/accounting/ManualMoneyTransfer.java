@@ -1,11 +1,7 @@
 package org.nightlabs.jfire.accounting;
 
-import org.nightlabs.jfire.accounting.pay.Payment;
 import org.nightlabs.jfire.security.User;
 import org.nightlabs.jfire.transfer.Anchor;
-import org.nightlabs.jfire.transfer.Transfer;
-
-
 
 /**
  * @author Chairat Kongarayawetchakun <chairatk[AT]nightlabs[DOT]de>
@@ -23,18 +19,7 @@ import org.nightlabs.jfire.transfer.Transfer;
  */	
 public class ManualMoneyTransfer extends MoneyTransfer
 {
-	private static final long serialVersionUID = 1L; // Added this field. Marco.
-
-	/**
-	 * @deprecated Only for JDO!
-	 */
-	protected ManualMoneyTransfer(){
-	}
-
-	public ManualMoneyTransfer(MoneyTransfer containerMoneyTransfer)
-	{
-		this.reason = new ManualMoneyTransferReason(this);
-	}
+	private static final long serialVersionUID = 1L;
 
 	/**
 	 * @jdo.field
@@ -44,25 +29,25 @@ public class ManualMoneyTransfer extends MoneyTransfer
 	 */
 	private ManualMoneyTransferReason reason;
 
-	public ManualMoneyTransferReason getReason() {
-		return reason;
-	}
-	
 	/**
-	 * @param transferRegistry
-	 * @param container
-	 * @param initiator
-	 * @param from
-	 * @param to
-	 * @param currency
-	 * @param amount
-	 * @param reason
+	 * @deprecated Only for JDO!
+	 */
+	protected ManualMoneyTransfer() { }
+
+	/**
+	 * TODO document this constructor!
 	 */
 	public ManualMoneyTransfer(
-			Transfer container, User initiator, Anchor from, Anchor to, Currency currency, long amount,
-			ManualMoneyTransferReason reason)
+			User initiator, Anchor from, Anchor to, Currency currency, long amount)
 	{		
-		super(container, initiator, from, to, currency, amount);
-		this.reason = reason;
+		super(
+				null, // there is no container
+				initiator, from, to, currency, amount);
+
+		this.reason = new ManualMoneyTransferReason(this);
+	}
+
+	public ManualMoneyTransferReason getReason() {
+		return reason;
 	}
 }

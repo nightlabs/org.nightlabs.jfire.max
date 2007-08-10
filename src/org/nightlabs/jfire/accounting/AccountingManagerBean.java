@@ -56,6 +56,7 @@ import org.apache.log4j.Logger;
 import org.jbpm.JbpmContext;
 import org.jbpm.graph.exe.ProcessInstance;
 import org.nightlabs.ModuleException;
+import org.nightlabs.i18n.I18nText;
 import org.nightlabs.jdo.NLJDOHelper;
 import org.nightlabs.jdo.query.JDOQuery;
 import org.nightlabs.jfire.accounting.book.LocalAccountantDelegate;
@@ -100,11 +101,11 @@ import org.nightlabs.jfire.accounting.priceconfig.PriceConfigUtil;
 import org.nightlabs.jfire.accounting.priceconfig.id.PriceConfigID;
 import org.nightlabs.jfire.accounting.query.InvoiceQuery;
 import org.nightlabs.jfire.base.BaseSessionBeanImpl;
+import org.nightlabs.jfire.idgenerator.IDGenerator;
 import org.nightlabs.jfire.idgenerator.IDNamespaceDefault;
 import org.nightlabs.jfire.jbpm.JbpmLookup;
 import org.nightlabs.jfire.jbpm.graph.def.ProcessDefinition;
 import org.nightlabs.jfire.security.User;
-import org.nightlabs.jfire.security.id.UserID;
 import org.nightlabs.jfire.store.DeliveryNote;
 import org.nightlabs.jfire.store.NestedProductType;
 import org.nightlabs.jfire.store.ProductType;
@@ -125,8 +126,6 @@ import org.nightlabs.jfire.trade.id.CustomerGroupID;
 import org.nightlabs.jfire.trade.id.OfferID;
 import org.nightlabs.jfire.trade.id.OrderID;
 import org.nightlabs.jfire.trade.jbpm.ProcessDefinitionAssignment;
-import org.nightlabs.jfire.transfer.Anchor;
-import org.nightlabs.jfire.transfer.Transfer;
 import org.nightlabs.jfire.transfer.id.AnchorID;
 
 /**
@@ -1260,7 +1259,7 @@ public abstract class AccountingManagerBean
 	 * @ejb.permission role-name="_Guest_"
 	 */
 	public Invoice createInvoice(
-			Collection articleIDs, String invoiceIDPrefix, 
+			Collection<ArticleID> articleIDs, String invoiceIDPrefix, 
 			boolean get, String[] fetchGroups, int maxFetchDepth)
 		throws ModuleException
 	{
@@ -1638,7 +1637,7 @@ public abstract class AccountingManagerBean
 	 * @see Accounting#payBegin(User, PaymentData)
 	 *
 	 * @ejb.interface-method
-	 * @ejb.transaction type = "Supports"
+	 * @ejb.transaction type="Supports"
 	 * @ejb.permission role-name="_Guest_"
 	 */
 	public PaymentResult payBegin(PaymentData paymentData)
@@ -1649,7 +1648,7 @@ public abstract class AccountingManagerBean
 	
 	/**
 	 * @ejb.interface-method view-type="local"
-	 * @ejb.transaction type = "RequiresNew"
+	 * @ejb.transaction type="RequiresNew"
 	 * @ejb.permission role-name="_Guest_"
 	 */
 	public PaymentResult _payBegin(PaymentData paymentData)
@@ -1988,6 +1987,8 @@ public abstract class AccountingManagerBean
 	}
 
 	/**
+	 * TODO remove this and use {@link IDGenerator}
+	 *
 	 * @throws ModuleException
 	 *
 	 * @ejb.interface-method
@@ -2660,22 +2661,46 @@ public abstract class AccountingManagerBean
 //		} finally {
 //			pm.close();
 //		}
-//	}	
+//	}
 
 	/**
 	 * @ejb.interface-method
-	 * @ejb.transaction type = "Required"
+	 * @ejb.transaction type="Required"
 	 * @ejb.permission role-name="_Guest_"
 	 */
-	public ManualMoneyTransfer createManualMoneyTransfer(Transfer container, UserID userID, Anchor from, Anchor to, Currency currency, long amount, ManualMoneyTransferReason reason){
+	public ManualMoneyTransfer createManualMoneyTransfer(
+			AnchorID fromID, AnchorID toID, CurrencyID currencyID, long amount, I18nText reason,
+			boolean get, String[] fetchGroups, int maxFetchDepth)
+	{
 		PersistenceManager pm = getPersistenceManager();
 		try{
-			User user = (User) pm.getObjectById(userID);
-			System.out.println(container + "::::::::" + user + "::::::::::::::" + from + ":" + to);
-			ManualMoneyTransfer manualMoneyTransfer = new ManualMoneyTransfer(container, user, from, to, currency, amount, reason);
-			return (ManualMoneyTransfer)pm.detachCopy(manualMoneyTransfer);
-		}
-		finally{
+			// the JavaEE server knows who we are - get the User object corresponding to the currently working principal
+			User user = User.getUser(pm, getPrincipal());
+
+			// initialise meta-data for Account & Currency - not really necessary, but still safer
+			pm.getExtent(Account.class);
+			pm.getExtent(Currency.class);
+
+			// load the objects for the given IDs
+			Account from = (Account) pm.getObjectById(fromID);
+			Account to = (Account) pm.getObjectById(toID);
+			Currency currency = (Currency) pm.getObjectById(currencyID);
+
+			// delegate to Accounting for the actual creation + booking
+			ManualMoneyTransfer manualMoneyTransfer = Accounting.getAccounting(pm).createManualMoneyTransfer(user, from, to, currency, amount, reason);
+
+			// if the client doesn't need it, we simply return null here
+			if (!get)
+				return null;
+
+			// otherwise, we set the desired fetch-plan
+			pm.getFetchPlan().setMaxFetchDepth(maxFetchDepth);
+			if (fetchGroups != null)
+				pm.getFetchPlan().setGroups(fetchGroups);
+
+			// and return the detached ManualMoneyTransfer
+			return pm.detachCopy(manualMoneyTransfer);
+		} finally{
 			pm.close();
 		}
 	}

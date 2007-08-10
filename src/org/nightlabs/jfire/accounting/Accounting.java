@@ -48,6 +48,7 @@ import org.apache.log4j.Logger;
 import org.jbpm.JbpmContext;
 import org.jbpm.graph.exe.ProcessInstance;
 import org.nightlabs.ModuleException;
+import org.nightlabs.i18n.I18nText;
 import org.nightlabs.jfire.accounting.book.BookMoneyTransfer;
 import org.nightlabs.jfire.accounting.book.LocalAccountant;
 import org.nightlabs.jfire.accounting.book.PartnerAccountant;
@@ -91,6 +92,7 @@ import org.nightlabs.jfire.trade.id.ArticleID;
 import org.nightlabs.jfire.trade.jbpm.ProcessDefinitionAssignment;
 import org.nightlabs.jfire.trade.jbpm.id.ProcessDefinitionAssignmentID;
 import org.nightlabs.jfire.transfer.Anchor;
+import org.nightlabs.jfire.transfer.Transfer;
 import org.nightlabs.jfire.transfer.id.AnchorID;
 
 /**
@@ -1227,5 +1229,51 @@ public class Accounting
 
 
 		return processDefinition;
+	}
+
+	/**
+	 * Create and book a manual money transfer between two accounts.
+	 *
+	 * TODO document this method completely!
+	 *
+	 * @param user
+	 * @param from
+	 * @param to
+	 * @param currency
+	 * @param amount
+	 * @param reason
+	 * @return
+	 */
+	public ManualMoneyTransfer createManualMoneyTransfer(
+			User user, Account from, Account to,
+			Currency currency, long amount,
+			I18nText reason)
+	{
+		PersistenceManager pm = getPersistenceManager();
+
+		// create the new ManualMoneyTransfer and persist it
+		ManualMoneyTransfer manualMoneyTransfer = new ManualMoneyTransfer(user, from, to, currency, amount);
+		manualMoneyTransfer.getReason().copyFrom(reason);
+		manualMoneyTransfer = pm.makePersistent(manualMoneyTransfer);
+
+		// now we still have to book the new transfer
+		Set<Anchor> involvedAnchors = new HashSet<Anchor>();
+
+		ArrayList<Transfer> containers = new ArrayList<Transfer>(1);
+		containers.add(manualMoneyTransfer);
+		boolean failed = true;
+		try {
+			manualMoneyTransfer.bookTransfer(user, involvedAnchors);
+	
+			// check consistence
+			Anchor.checkIntegrity(containers, involvedAnchors);
+
+			failed = false;
+		} finally  {
+			if (failed)
+				Anchor.resetIntegrity(containers, involvedAnchors);
+		}
+
+		return manualMoneyTransfer;
 	}
 }

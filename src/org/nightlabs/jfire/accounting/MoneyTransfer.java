@@ -81,7 +81,7 @@ public class MoneyTransfer extends Transfer
 
 		if (currency == null)
 			throw new NullPointerException("currency must not be null!");
-		
+
 		if (amount < 0)
 			throw new IllegalArgumentException("amount must be positive! Switch from & to to inverse the direction!");
 

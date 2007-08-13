@@ -49,9 +49,19 @@ import org.nightlabs.jfire.transfer.id.AnchorID;
  *		table="JFireTrade_Repository"
  *
  * @jdo.inheritance strategy="new-table"
+ *
+ * @jdo.fetch-group name="Repository.owner" fields="owner"
+ * @jdo.fetch-group name="Repository.name" fields="name"
+ * @jdo.fetch-group name="Repository.this" fetch-groups="default, Anchor.this" fields="owner, name"
  */
 public class Repository extends Anchor
 {
+	private static final long serialVersionUID = 1L;
+
+	public static final String FETCH_GROUP_OWNER = "Repository.owner";
+	public static final String FETCH_GROUP_NAME = "Repository.name";
+	public static final String FETCH_GROUP_THIS_REPOSITORY = "Repository.this";
+
 	/**
 	 * Local products will be created in a repository with this type. Foreign products, however, are created in
 	 * a repository with {@link #ANCHOR_TYPE_ID_OUTSIDE}. Foreign products are transferred here (i.e. to their home)

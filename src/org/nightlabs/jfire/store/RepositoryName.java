@@ -29,6 +29,7 @@ package org.nightlabs.jfire.store;
 import java.util.HashMap;
 import java.util.Map;
 
+import org.nightlabs.annotation.Implement;
 import org.nightlabs.i18n.I18nText;
 
 /**
@@ -43,8 +44,12 @@ import org.nightlabs.i18n.I18nText;
  * @jdo.inheritance strategy="new-table"
  *
  * @jdo.create-objectid-class field-order="organisationID, anchorTypeID, anchorID"
+ *
+ * @jdo.fetch-group name="Repository.name" fields="repository, names"
  */
-public class RepositoryName extends I18nText {
+public class RepositoryName extends I18nText
+{
+	private static final long serialVersionUID = 1L;
 
 	/**
 	 * @jdo.field primary-key="true"
@@ -66,20 +71,19 @@ public class RepositoryName extends I18nText {
 	 * @jdo.field persistence-modifier="persistent"
 	 */
 	private Repository repository;
-	
-	
+
+
 	/**
 	 * @deprecated Only for JDO!
 	 */
-	protected RepositoryName() {
-	}
+	protected RepositoryName() { }
 
 	public RepositoryName(Repository repository) {
 		this.organisationID = repository.getOrganisationID();
 		this.anchorTypeID = repository.getAnchorTypeID();
 		this.anchorID = repository.getAnchorID();
 		this.repository = repository;
-		this.names = new HashMap();
+		this.names = new HashMap<String, String>();
 	}
 
 	/**
@@ -97,18 +101,14 @@ public class RepositoryName extends I18nText {
 	 *
 	 * @jdo.join
 	 */
-	protected Map names;
-	
-	/**
-	 * @see org.nightlabs.i18n.I18nText#getI18nMap()
-	 */
-	protected Map getI18nMap() {
+	protected Map<String, String> names;
+
+	@Implement
+	protected Map<String, String> getI18nMap() {
 		return names;
 	}
 
-	/**
-	 * @see org.nightlabs.i18n.I18nText#getFallBackValue(java.lang.String)
-	 */
+	@Implement
 	protected String getFallBackValue(String languageID) {
 		return anchorID;
 	}

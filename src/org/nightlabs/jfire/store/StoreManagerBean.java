@@ -55,6 +55,7 @@ import org.jbpm.graph.exe.ProcessInstance;
 import org.nightlabs.ModuleException;
 import org.nightlabs.annotation.Implement;
 import org.nightlabs.jdo.NLJDOHelper;
+import org.nightlabs.jdo.query.JDOQuery;
 import org.nightlabs.jfire.accounting.Accounting;
 import org.nightlabs.jfire.accounting.Invoice;
 import org.nightlabs.jfire.accounting.id.InvoiceID;
@@ -1748,7 +1749,50 @@ implements SessionBean
 
 		return pqs;
 	}
-	
+
+
+	/**
+	 * @ejb.interface-method
+	 * @ejb.permission role-name="_Guest_"
+	 * @ejb.transaction type="Supports"
+	 */	
+	public Set<AnchorID> getRepositoryIDs(Collection<JDOQuery> queries) 
+	{
+		PersistenceManager pm = getPersistenceManager();
+		try {
+			pm.getFetchPlan().setMaxFetchDepth(1);
+			pm.getFetchPlan().setGroup(FetchPlan.DEFAULT);
+
+			Collection<Repository> repositories = null;
+			for (JDOQuery query : queries) {
+				query.setPersistenceManager(pm);
+				query.setCandidates(repositories);
+				repositories = (Collection) query.getResult();
+			}
+
+			return NLJDOHelper.getObjectIDSet(repositories);
+		} finally {
+			pm.close();
+		}
+	}
+
+	/**
+	 * @ejb.interface-method
+	 * @ejb.transaction type="Supports"
+	 * @ejb.permission role-name="_Guest_"
+	 */
+	@SuppressWarnings("unchecked")
+	public List<Repository> getRepositories(Collection<AnchorID> repositoryIDs,  String[] fetchGroups, int maxFetchDepth)
+	{
+		PersistenceManager pm = getPersistenceManager();
+		try {
+			return NLJDOHelper.getDetachedObjectList(pm, repositoryIDs, Repository.class, fetchGroups, maxFetchDepth);
+		} finally {
+			pm.close();
+		}
+	}
+
+
 	// TODO: when all jpox bugs are fixed, implement generic storeProductType-Method
 //	/**
 //	 * @return Returns a newly detached instance of <tt>ProductType</tt> 

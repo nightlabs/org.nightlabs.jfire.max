@@ -1,41 +1,23 @@
-package org.nightlabs.jfire.accounting.query;
+package org.nightlabs.jfire.store.query;
 
 import javax.jdo.Query;
 
 import org.apache.log4j.Logger;
 import org.nightlabs.jdo.query.JDOQuery;
-import org.nightlabs.jfire.accounting.Account;
-import org.nightlabs.jfire.accounting.Currency;
-import org.nightlabs.jfire.accounting.id.CurrencyID;
+import org.nightlabs.jfire.store.Repository;
 
 /**
- * @author Daniel.Mazurek [at] NightLabs [dot] de
- *
+ * @author Marco Schulze - Marco at NightLabs dot de
  */
-public class AccountQuery 
-extends JDOQuery<Account>
+public class RepositoryQuery 
+extends JDOQuery<Repository>
 {
 	private static final long serialVersionUID = 1L;
 
-	private static final Logger logger = Logger.getLogger(AccountQuery.class);
-
-	/**
-	 * the minium balance of the account to search for
-	 */
-	private long minBalance = -1;
-	/**
-	 * the maximum balance of the account to search for
-	 */
-	private long maxBalance = -1;
-	/**
-	 * the {@link CurrencyID} of the currency to search for
-	 */
-	private CurrencyID currencyID = null;
+	private static final Logger logger = Logger.getLogger(RepositoryQuery.class);
 	
-	@SuppressWarnings("unused") // used as parameter in the JDOQL
-	private Currency currency = null;
 	/**
-	 * the name of the account to search for
+	 * the name of the repository to search for
 	 */
 	private String name = null;
 	private String nameLanguageID = null;
@@ -47,40 +29,29 @@ extends JDOQuery<Account>
 	 * the anchorTypeID to search for
 	 */
 	private String anchorTypeID = null;
-	
+
 	@Override
 	protected Query prepareQuery() 
 	{
-		Query q = getPersistenceManager().newQuery(Account.class);
+		Query q = getPersistenceManager().newQuery(Repository.class);
 		StringBuffer filter = new StringBuffer();
 		StringBuffer vars = new StringBuffer();
 //		StringBuffer imports = new StringBuffer();
 		
 		filter.append(" true");
 
-		if (currencyID != null) {
-			currency = (Currency) getPersistenceManager().getObjectById(currencyID);
-			filter.append("\n && this.currency == :currency");
-		}
-		
-		if (minBalance >= 0)
-			filter.append("\n && this.balance >= :minBalance");
-			
-		if (maxBalance >= 0)
-			filter.append("\n && this.balance <= :maxBalance");		
-		
 		if (anchorTypeID != null)
 			filter.append("\n && this.anchorTypeID == :anchorTypeID");
 			
 		if (anchorID != null)
 			filter.append("\n && this.anchorID == :anchorID");
-			
+
 		if (name != null) {
 			filter.append("\n && ( ");
 			addFullTextSearch(filter, vars, "name");
 			filter.append(")");
 		}
-		
+
 		if (logger.isDebugEnabled()) {
 			logger.debug("Vars:");
 			logger.debug(vars.toString());
@@ -108,54 +79,6 @@ extends JDOQuery<Account>
 				"  this."+member+".names."+containsStr+"\n" +
 				"  && "+varName+".toLowerCase().matches(:name.toLowerCase())" +
 				" )");
-	}
-
-	/**
-	 * returns the minBalance.
-	 * @return the minBalance
-	 */
-	public long getMinBalance() {
-		return minBalance;
-	}
-
-	/**
-	 * set the minBalance
-	 * @param minBalance the minBalance to set
-	 */
-	public void setMinBalance(long minBalance) {
-		this.minBalance = minBalance;
-	}
-
-	/**
-	 * returns the maxBalance.
-	 * @return the maxBalance
-	 */
-	public long getMaxBalance() {
-		return maxBalance;
-	}
-
-	/**
-	 * set the maxBalance
-	 * @param maxBalance the maxBalance to set
-	 */
-	public void setMaxBalance(long maxBalance) {
-		this.maxBalance = maxBalance;
-	}
-
-	/**
-	 * returns the currencyID.
-	 * @return the currencyID
-	 */
-	public CurrencyID getCurrencyID() {
-		return currencyID;
-	}
-
-	/**
-	 * set the currencyID
-	 * @param currencyID the currencyID to set
-	 */
-	public void setCurrencyID(CurrencyID currencyID) {
-		this.currencyID = currencyID;
 	}
 
 	/**

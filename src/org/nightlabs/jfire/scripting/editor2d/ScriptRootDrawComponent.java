@@ -29,26 +29,26 @@ import java.util.Map;
 import java.util.Set;
 
 import org.nightlabs.editor2d.DrawComponent;
-import org.nightlabs.editor2d.MultiLayerDrawComponent;
+import org.nightlabs.editor2d.RootDrawComponent;
 import org.nightlabs.jfire.scripting.condition.Script;
 import org.nightlabs.jfire.scripting.id.ScriptRegistryItemID;
 
 /**
- * The interface for the root drawcomponent {@link MultiLayerDrawComponent} which
+ * The interface for the root drawcomponent {@link RootDrawComponent} which
  * contains {@link ScriptDrawComponent}s and which is responsible for assigning the values
  * of the scripts to the corresponding {@link ScriptDrawComponent}s
  *    
  * @author Daniel.Mazurek <at> NightLabs <dot> de
  *
  */
-public interface ScriptMultiLayerDrawComponent 
-extends MultiLayerDrawComponent 
+public interface ScriptRootDrawComponent 
+extends RootDrawComponent 
 {
 	public static final String PROP_SCRIPT_VALUES = "Script Values";
 	
 	/**
 	 * returns a {@link Set} of all {@link ScriptRegistryItemID}s which are contained in 
-	 * the {@link ScriptMultiLayerDrawComponent}  
+	 * the {@link ScriptRootDrawComponent}  
 	 * @return a Set of all ScriptRegistryItemIDs
 	 */
 	public Set<ScriptRegistryItemID> getScriptRegistryItemIDs();
@@ -77,7 +77,7 @@ extends MultiLayerDrawComponent
 	
 	/**
 	 * assigns the visible property according to value of the visibleScript,
-	 * obtained from the Method {@link ScriptMultiLayerDrawComponent#getVisibleScripts()}
+	 * obtained from the Method {@link ScriptRootDrawComponent#getVisibleScripts()}
 	 * 
 	 * key: DrawComponentID {@link DrawComponent#getId()}
 	 * value: result of visibleScript {@link DrawComponent#getProperties().get(ScriptingConstants.PROP_VISIBLE_SCRIPT)}

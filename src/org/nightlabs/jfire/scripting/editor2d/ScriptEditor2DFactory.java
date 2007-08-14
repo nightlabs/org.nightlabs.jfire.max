@@ -47,7 +47,7 @@ extends Editor2DFactory
 	
 	TextScriptDrawComponent createTextScriptDrawComponent(String text, String fontName, int fontSize, int fontStyle, int x, int y, DrawComponentContainer parent);
 	
-	ScriptMultiLayerDrawComponent createScriptMultiLayerDrawComponent();
+	ScriptRootDrawComponent createScriptRootDrawComponent();
 	
 	BarcodeDrawComponent createBarcode();
 		

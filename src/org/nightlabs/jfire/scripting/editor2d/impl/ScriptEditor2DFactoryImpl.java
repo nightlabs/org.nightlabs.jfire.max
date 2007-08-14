@@ -30,10 +30,11 @@ import java.util.Set;
 
 import org.nightlabs.editor2d.DrawComponent;
 import org.nightlabs.editor2d.DrawComponentContainer;
+import org.nightlabs.editor2d.RootDrawComponent;
 import org.nightlabs.editor2d.impl.Editor2DFactoryImpl;
 import org.nightlabs.jfire.scripting.editor2d.BarcodeDrawComponent;
 import org.nightlabs.jfire.scripting.editor2d.ScriptEditor2DFactory;
-import org.nightlabs.jfire.scripting.editor2d.ScriptMultiLayerDrawComponent;
+import org.nightlabs.jfire.scripting.editor2d.ScriptRootDrawComponent;
 import org.nightlabs.jfire.scripting.editor2d.TextScriptDrawComponent;
 import org.nightlabs.jfire.scripting.editor2d.BarcodeDrawComponent.Orientation;
 import org.nightlabs.jfire.scripting.editor2d.BarcodeDrawComponent.Type;
@@ -62,10 +63,10 @@ implements ScriptEditor2DFactory
 				printHumanReadable, parent, scriptID);
 	}
 
-	public ScriptMultiLayerDrawComponent createScriptMultiLayerDrawComponent() {
-		ScriptMultiLayerDrawComponent scriptMLDC = new ScriptMultiLayerDrawComponentImpl(); 
-		validateMLDC(scriptMLDC);
-		return scriptMLDC;
+	public ScriptRootDrawComponent createScriptRootDrawComponent() {
+		ScriptRootDrawComponent scriptRoot = new ScriptRootDrawComponentImpl(); 
+		validateRoot(scriptRoot);
+		return scriptRoot;
 	}
 
 	public TextScriptDrawComponent createTextScriptDrawComponent() {
@@ -103,5 +104,11 @@ implements ScriptEditor2DFactory
 		supportedClasses.add(TextScriptDrawComponent.class);
 		supportedClasses.add(BarcodeDrawComponent.class);		
 		return super.getSupportedDrawComponentClasses();
+	}
+
+	@Override
+	public RootDrawComponent createRootDrawComponent() {
+		return createScriptRootDrawComponent();
 	}	
+	
 }

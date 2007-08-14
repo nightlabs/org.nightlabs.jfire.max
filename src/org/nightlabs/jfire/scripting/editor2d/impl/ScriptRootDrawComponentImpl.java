@@ -35,10 +35,10 @@ import java.util.Set;
 import org.apache.log4j.Logger;
 import org.nightlabs.editor2d.DrawComponent;
 import org.nightlabs.editor2d.DrawComponentContainer;
-import org.nightlabs.editor2d.impl.MultiLayerDrawComponentImpl;
+import org.nightlabs.editor2d.impl.RootDrawComponentImpl;
 import org.nightlabs.jfire.scripting.condition.Script;
 import org.nightlabs.jfire.scripting.editor2d.ScriptDrawComponent;
-import org.nightlabs.jfire.scripting.editor2d.ScriptMultiLayerDrawComponent;
+import org.nightlabs.jfire.scripting.editor2d.ScriptRootDrawComponent;
 import org.nightlabs.jfire.scripting.editor2d.ScriptingConstants;
 import org.nightlabs.jfire.scripting.id.ScriptRegistryItemID;
 
@@ -46,11 +46,11 @@ import org.nightlabs.jfire.scripting.id.ScriptRegistryItemID;
  * @author Daniel.Mazurek [at] NightLabs [dot] de
  *
  */
-public class ScriptMultiLayerDrawComponentImpl 
-extends MultiLayerDrawComponentImpl 
-implements ScriptMultiLayerDrawComponent
+public class ScriptRootDrawComponentImpl 
+extends RootDrawComponentImpl 
+implements ScriptRootDrawComponent
 {
-	private static final Logger logger = Logger.getLogger(ScriptMultiLayerDrawComponentImpl.class);
+	private static final Logger logger = Logger.getLogger(ScriptRootDrawComponentImpl.class);
 	
 	public void assignScriptResults(Map<ScriptRegistryItemID, Object> scriptValues) 
 	{

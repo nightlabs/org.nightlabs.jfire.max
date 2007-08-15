@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Hashtable;
 import java.util.Iterator;
+import java.util.List;
 
 import javax.jdo.FetchPlan;
 import javax.jdo.JDOHelper;
@@ -44,49 +45,6 @@ import org.nightlabs.jfire.trade.id.SegmentID;
 public class SimpleProductTypeActionHandler
 		extends ProductTypeActionHandler
 {
-//	/**
-//	 * This is the {@link org.nightlabs.jfire.transfer.Anchor#getAnchorID()} of
-//	 * the {@link Repository} which becomes the factory-output-repository for all
-//	 * newly created {@link SimpleProduct}s.
-//	 */
-//	public static final String ANCHOR_ID_REPOSITORY_HOME_LOCAL = SimpleProductType.class.getName() + ".local";
-//
-//	/**
-//	 * This is the {@link org.nightlabs.jfire.transfer.Anchor#getAnchorID()} of
-//	 * the {@link Repository} which is used for products that are bought from a foreign organisation.
-//	 */
-//	public static final String ANCHOR_ID_REPOSITORY_HOME_FOREIGN = SimpleProductType.class.getName() + ".foreign";
-//
-//	public static Repository getDefaultHome(PersistenceManager pm, SimpleProductType simpleProductType)
-//	{
-//		Store store = Store.getStore(pm);
-//		if (store.getOrganisationID().equals(simpleProductType.getOrganisationID()))
-//			return getDefaultLocalHome(pm, store);
-//		else
-//			return getDefaultForeignHome(pm, store);
-//	}
-//
-//	protected static Repository getDefaultLocalHome(PersistenceManager pm, Store store)
-//	{
-//		return Repository.createRepository(
-//				pm,
-//				store.getOrganisationID(),
-//				Repository.ANCHOR_TYPE_ID_HOME,
-//				ANCHOR_ID_REPOSITORY_HOME_LOCAL, store.getMandator(), false);
-//	}
-//
-//	protected static Repository getDefaultForeignHome(PersistenceManager pm, Store store)
-//	{
-//		return Repository.createRepository(
-//				pm,
-//				store.getOrganisationID(),
-//				Repository.ANCHOR_TYPE_ID_HOME,
-//				ANCHOR_ID_REPOSITORY_HOME_FOREIGN,
-//				store.getMandator(),
-//				false);
-//	}
-
-
 	/**
 	 * @deprecated Only for JDO!
 	 */
@@ -101,11 +59,24 @@ public class SimpleProductTypeActionHandler
 		super(organisationID, productTypeActionHandlerID, productTypeClass);
 	}
 
-	@SuppressWarnings("unchecked")
 	@Implement
 	public Collection<? extends Product> findProducts(User user,
 			ProductType productType, NestedProductType nestedProductType, ProductLocator productLocator)
 	{
+		System.out.println("**********************************************************************");
+		System.out.println("**********************************************************************");
+		System.out.println("**********************************************************************");
+		System.out.println("**********************************************************************");
+		System.out.println("**********************************************************************");
+		System.out.println("**********************************************************************");
+		System.out.println("**********************************************************************");
+		System.out.println("**********************************************************************");
+		System.out.println("**********************************************************************");
+		System.out.println("######################################################################");
+		System.out.println("######################################################################");
+		System.out.println("######################################################################");
+		System.out.println("######################################################################");
+		System.out.println("######################################################################");
 		SimpleProductType spt = (SimpleProductType) productType;
 		SimpleProductTypeLocal sptl = (SimpleProductTypeLocal) productType.getProductTypeLocal();
 		int qty = nestedProductType == null ? 1 : nestedProductType.getQuantity();
@@ -114,16 +85,14 @@ public class SimpleProductTypeActionHandler
 		Store store = Store.getStore(pm);
 		// search for an available product
 		Query q = pm.newQuery(SimpleProduct.class);
-		q.setFilter("productType == pProductType && productLocal.available");
-		q.declareParameters("SimpleProductType pProductType");
-		q.declareImports("import " + SimpleProductType.class.getName());
-		Collection availableProducts = (Collection) q.execute(this); // Product.getProducts(pm, this, ProductStatus.STATUS_AVAILABLE);
-		ArrayList res = new ArrayList();
-		Iterator iteratorAvailableProducts = availableProducts.iterator();
+		q.setFilter("this.productType == :productType && this.productLocal.available");
+		Collection<? extends SimpleProduct> availableProducts = (Collection<? extends SimpleProduct>) q.execute(productType);
+		List<SimpleProduct> res = new ArrayList<SimpleProduct>();
+		Iterator<? extends SimpleProduct> iteratorAvailableProducts = availableProducts.iterator();
 		for (int i = 0; i < qty; ++i) {
 			SimpleProduct product = null;
 			if (iteratorAvailableProducts.hasNext()) {
-				product = (SimpleProduct) iteratorAvailableProducts.next();
+				product = iteratorAvailableProducts.next();
 				res.add(product);
 			}
 			else {
@@ -134,18 +103,19 @@ public class SimpleProductTypeActionHandler
 						product = new SimpleProduct(spt, SimpleProduct.createProductID());
 						sptl.setCreatedProductCount(createdProductCount + 1);
 
-						product = (SimpleProduct) store.addProduct(user, product); // , (Repository)spt.getProductTypeLocal().getHome());
+						product = (SimpleProduct) store.addProduct(user, product);
 						res.add(product);
 					}
 				} // This productType is factored by this organisation
 				else
-					throw new UnsupportedOperationException("NYI");
+					throw new UnsupportedOperationException("Cannot create foreign products! The ProductType is not owned by this organisation!");
 			}
 		}
 		return res;
 	}
 
 
+	@SuppressWarnings("unchecked")
 	@Implement
 	public Collection<? extends Article> createCrossTradeArticles(
 			User user, Product localPackageProduct, Article localArticle,
@@ -175,27 +145,5 @@ public class SimpleProductTypeActionHandler
 					ArticlePrice.FETCH_GROUP_FRAGMENTS, ArticlePrice.FETCH_GROUP_PACKAGE_ARTICLE_PRICE
 				}, NLJDOHelper.MAX_FETCH_DEPTH_NO_LIMIT);
 	}
-
-
-//	@Implement
-//	public Collection<? extends Article> createCrossTradeArticles(User user, ProductType productType, int quantity, ProductLocator productLocators)
-//	{
-//		PersistenceManager pm = getPersistenceManager();
-//		Store store = Store.getStore(pm);
-//		Trader trader = Trader.getTrader(pm);
-//		NestedProductType pseudoNestedPT = null;
-//		if (quantity != 1)
-//			pseudoNestedPT = new NestedProductType(null, productType, quantity);
-//
-//		Collection products = store.findProducts(user, productType, pseudoNestedPT, null);
-//
-//		Collection articles = trader.createArticles(
-//				user, offer, segment,
-//				products,
-//				new ArticleCreator(tariff),
-//				true, false, true);
-//
-//		return null;
-//	}
 
 }

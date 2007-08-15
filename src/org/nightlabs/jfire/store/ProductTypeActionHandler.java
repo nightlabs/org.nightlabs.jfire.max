@@ -253,15 +253,21 @@ public abstract class ProductTypeActionHandler
 	 * Do NOT call this method directly!
 	 * Use {@link Store#findProducts(User, NestedProductType, ProductLocator)} instead! This is
 	 * necessary for interception.
+	 * </p>
 	 * <p>
 	 * You should return the same number of <code>Product</code>s as defined in <code>nestedProductType.quantity</code>! Otherwise,
 	 * it is handled as if you return <code>null</code>.
+	 * </p>
+	 * <p>
+	 * Dependent on your implementation, this method can create new instances of Products (e.g. if your products are not physical, an
+	 * on-the-fly creation might make sense) or simply search the storage area for existing ones.
+	 * </p>
 	 *
-	 * @param user The <code>User</code> who is responsible for this creation.
+	 * @param user The <code>User</code> who is responsible for this action.
 	 * @param productType If <code>nestedProductType</code> is defined, it is the same as {@link NestedProductType#getInnerProductType()}. This is passed, because
 	 *		<code>nestedProductType</code> might be <code>null</code> for top-level products.
-	 * @param nestedProductType This will be <code>null</code> if the top-level product shall be found/created.
-	 * @param productLocator A specialized Object defining for YOUR implementation of <code>ProductType</code> which <code>Product</code> to find.
+	 * @param nestedProductType This will be <code>null</code> if the top-level product (i.e. the container a package) shall be found/created.
+	 * @param productLocator A specialized Object defining for YOUR implementation which <code>Product</code> to find.
 	 * @return Return either <code>null</code> if no suitable <code>Product</code>s can be allocated or a <code>Collection</code> of <code>Product</code>.
 	 */
 	public abstract Collection<? extends Product> findProducts(

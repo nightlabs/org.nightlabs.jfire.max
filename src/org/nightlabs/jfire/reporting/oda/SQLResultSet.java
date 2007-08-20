@@ -291,6 +291,28 @@ public class SQLResultSet implements IResultSet, Serializable {
 			throw new OdaException(e);
 		}
 	}
+
+	/**
+	 * {@inheritDoc}
+	 */
+	public boolean getBoolean(String columnName) throws OdaException {
+		try {
+			return resultSet.getBoolean(columnName);
+		} catch (Exception e) {
+			throw new OdaException(e);
+		}
+	}
+
+	/**
+	 * {@inheritDoc} 
+	 */
+	public boolean getBoolean(int columnIndex) throws OdaException {
+		try {
+			return resultSet.getBoolean(columnIndex);
+		} catch (Exception e) {
+			throw new OdaException(e);
+		}
+	}
 	
 	public Object getObject(String columnName) throws OdaException {
 		try {

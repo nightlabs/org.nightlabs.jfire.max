@@ -40,7 +40,8 @@ public class JFireReportingEAR {
 
 	protected JFireReportingEAR() {}
 	
-	public static final String MODULE_NAME = "JFireReporting"; 
+	public static final String MODULE_NAME = "JFireReporting";
+	public static final String BIRT_RUNTIME_SUBDIR = "birt"; 
 	
 	public static File getEARDir() 
 	throws ModuleException 

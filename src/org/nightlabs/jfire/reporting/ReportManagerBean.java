@@ -83,7 +83,7 @@ import org.nightlabs.jfire.reporting.oda.jdoql.server.ServerJDOQLProxy;
 import org.nightlabs.jfire.reporting.oda.jfs.JFSQueryPropertySet;
 import org.nightlabs.jfire.reporting.oda.jfs.ScriptExecutorJavaClassReporting;
 import org.nightlabs.jfire.reporting.oda.jfs.server.ServerJFSQueryProxy;
-import org.nightlabs.jfire.reporting.platform.RAPlatformContext;
+import org.nightlabs.jfire.reporting.platform.ServerPlatformContext;
 import org.nightlabs.jfire.reporting.scripting.ScriptingInitialiser;
 import org.nightlabs.jfire.scripting.ScriptException;
 import org.nightlabs.jfire.scripting.ScriptRegistry;
@@ -357,24 +357,17 @@ implements SessionBean
 	public void initialise() throws InstantiationException, IllegalAccessException, MalformedVersionException, ScriptingIntialiserException 
 	{
 		// TODO: Better check if platform initialized. Propose on birt forum.
-		if (true) {
+		if (false) {
 			JFireServerManager jfireServerManager = getJFireServerManager();
 			try {
 				try {
-					String birtHome = Utils.addFinalSlash(
-							jfireServerManager.getJFireServerConfigModule()
-							.getJ2ee().getJ2eeDeployBaseDirectory())+
-							"JFireReporting.ear"+File.separator+"birt"+File.separator;
  
-					System.setProperty(Platform.PROPERTY_BIRT_HOME, birtHome);
+					ServerPlatformContext platformContext = new ServerPlatformContext();					
+					System.setProperty(Platform.PROPERTY_BIRT_HOME, platformContext.getPlatform());
 					EngineConfig config = new EngineConfig();
-					config.setEngineHome(birtHome);
-					config.setLogConfig(birtHome, java.util.logging.Level.ALL);					
-//					PlatformConfig config = new PlatformConfig();
-//					config.setProperty(Platform.PROPERTY_BIRT_HOME, birtHome);
-//					config.set
+					config.setEngineHome(platformContext.getPlatform());
+					config.setLogConfig(platformContext.getPlatform(), java.util.logging.Level.ALL);					
 					
-					RAPlatformContext platformContext = new RAPlatformContext(birtHome);					
 					config.setPlatformContext(platformContext);
 					Platform.startup(config);
 //					Platform.initialize(platformContext);

@@ -300,6 +300,21 @@ public abstract class ResultSet implements IResultSet, Serializable {
 	public IClob getClob(String columnName) throws OdaException {
 		return getClob(findColumn(columnName));
 	}
+	
+	/**
+	 * {@inheritDoc}
+	 */
+	public boolean getBoolean(String columnName) throws OdaException {
+		return getBoolean(findColumn(columnName));
+	}
+
+	/**
+	 * {@inheritDoc} 
+	 */
+	public boolean getBoolean(int index) throws OdaException {
+		return (Boolean) checkColObject(index, Boolean.class);
+	}
+	
 
 	/* (non-Javadoc)
 	 * @see org.eclipse.datatools.connectivity.oda.IResultSet#wasNull()

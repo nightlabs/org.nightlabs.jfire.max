@@ -269,6 +269,36 @@ public abstract class Query implements IQuery {
 		setParameter(parameterId, new java.util.Date(value.getTime()));
 	}
 
+	/**
+	 * Puts a parameter of type boolean
+	 * @see org.eclipse.datatools.connectivity.oda.IQuery#setBoolean(java.lang.String, boolean)
+	 */
+	public void setBoolean(String parameterName, boolean value) throws OdaException {
+		setBoolean(getParameterID(parameterName), value);
+	}
+
+	/* (non-Javadoc)
+	 * @see org.eclipse.datatools.connectivity.oda.IQuery#setBoolean(int, boolean)
+	 */
+	public void setBoolean(int parameterId, boolean value) throws OdaException {
+		setParameter(parameterId, value);
+	}
+
+	/**
+	 * Puts a parameter of value <code>null</code>.
+	 * @see org.eclipse.datatools.connectivity.oda.IQuery#setNull(java.lang.String)
+	 */
+	public void setNull(String parameterName) throws OdaException {
+		setNull(getParameterID(parameterName));
+	}
+
+	/* (non-Javadoc)
+	 * @see org.eclipse.datatools.connectivity.oda.IQuery#setNull(int)
+	 */
+	public void setNull(int parameterId) throws OdaException {
+		setParameter(parameterId, null);
+	}
+	
 	/* (non-Javadoc)
 	 * @see org.eclipse.datatools.connectivity.oda.IQuery#findInParameter(java.lang.String)
 	 */

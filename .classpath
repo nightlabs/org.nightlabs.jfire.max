@@ -32,9 +32,9 @@
 	<classpathentry kind="var" path="WORKSPACE/NightLabsJDO/dist/NightLabsJDO.jar" sourcepath="WORKSPACE/NightLabsJDO/src"/>
 	<classpathentry kind="var" path="XERCES"/>
 	<classpathentry kind="lib" path="dist/birt/lib/dataadapterapi.jar"/>
-	<classpathentry kind="lib" path="dist/birt/lib/com.ibm.icu_3.4.4.1.jar"/>
 	<classpathentry kind="var" path="WORKSPACE/NightLabsXStream/dist/lib/xpp3-1.1.3.4.jar"/>
 	<classpathentry kind="var" path="WORKSPACE/NightLabsXStream/dist/lib/xstream-1.2.jar"/>
 	<classpathentry kind="var" path="WORKSPACE/JFireBaseClientLib/dist/JFireBaseClientLib.jar" sourcepath="/WORKSPACE/JFireBaseClientLib/src"/>
+	<classpathentry kind="lib" path="dist/birt/lib/com.ibm.icu_3.6.1.v20070417.jar"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>

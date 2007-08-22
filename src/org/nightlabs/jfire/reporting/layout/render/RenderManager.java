@@ -37,6 +37,7 @@ import java.util.Map;
 
 import javax.jdo.PersistenceManager;
 
+import org.apache.commons.lang.exception.ExceptionUtils;
 import org.eclipse.birt.report.engine.api.EngineException;
 import org.eclipse.birt.report.engine.api.IGetParameterDefinitionTask;
 import org.eclipse.birt.report.engine.api.IParameterDefnBase;
@@ -186,10 +187,16 @@ public class RenderManager {
 			RenderedReportLayout result = null;
 			try {
 				result = renderer.renderReport(pm, renderRequest, task, fileName, layoutRoot, prepareForTransfer);
-			} catch (EngineException e) {
-				throw new RenderReportException(e);
+			} catch (Exception e) {
+				System.err.println("Caught RunAndRenderTask exception");
+				e.printStackTrace();
+				throw new RenderReportException("RunAndRenderTask aborted with errors", ExceptionUtils.getRootCause(e));
 			} finally {
 				JFireReportingHelper.close();
+			}
+			if (task.getErrors().size() > 0) {
+				Throwable t = (Throwable) task.getErrors().get(0);
+				throw new RenderReportException("RunAndRenderTask finished with errors.", t);
 			}
 			return result;
 			

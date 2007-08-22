@@ -71,15 +71,16 @@ public class ServerJFSQueryProxy extends AbstractJFSQueryProxy {
 	public IParameterMetaData getParameterMetaData() 
 	throws OdaException 
 	{
-		if (parameterMetaData == null) {
-			ScriptRegistryItemID itemID = getScriptRegistryItemID();
-			try {
-				parameterMetaData = getScriptParameterMetaData(itemID);
-			} catch (JFireReportingOdaException e) {
-				throw new OdaException(e);
-			}
-		}
-		return parameterMetaData;
+		throw new OdaException("This is a test exception");
+//		if (parameterMetaData == null) {
+//			ScriptRegistryItemID itemID = getScriptRegistryItemID();
+//			try {
+//				parameterMetaData = getScriptParameterMetaData(itemID);
+//			} catch (JFireReportingOdaException e) {
+//				throw new OdaException(e);
+//			}
+//		}
+//		return parameterMetaData;
 	}
 	
 	/**

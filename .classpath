@@ -24,8 +24,8 @@
 	<classpathentry kind="var" path="WORKSPACE/JFireServerManager/dist/JFireServerManager.jar"/>
 	<classpathentry kind="var" path="WORKSPACE/JFireBase/dist/JFireBase.jar" sourcepath="/WORKSPACE/JFireBase"/>
 	<classpathentry kind="lib" path="dist/birt/lib/js.jar"/>
-	<classpathentry kind="lib" path="dist/birt/lib/engineapi.jar" sourcepath="/home/alex/tmp/birt-runtime-src.zip"/>
-	<classpathentry kind="lib" path="dist/birt/lib/coreapi.jar" sourcepath="/home/alex/tmp/birt-core-src.zip"/>
+	<classpathentry kind="lib" path="dist/birt/lib/engineapi.jar" sourcepath="dist/birt/lib/birt-source-2_2_0.zip"/>
+	<classpathentry kind="lib" path="dist/birt/lib/coreapi.jar" sourcepath="dist/birt/lib/birt-source-2_2_0.zip"/>
 	<classpathentry kind="lib" path="dist/birt/lib/oda.jar"/>
 	<classpathentry kind="var" path="WORKSPACE/JFireScripting/dist/JFireScripting.jar" sourcepath="/WORKSPACE/JFireScripting"/>
 	<classpathentry kind="lib" path="dist/birt/lib/modelapi.jar"/>
@@ -36,5 +36,6 @@
 	<classpathentry kind="var" path="WORKSPACE/NightLabsXStream/dist/lib/xstream-1.2.jar"/>
 	<classpathentry kind="var" path="WORKSPACE/JFireBaseClientLib/dist/JFireBaseClientLib.jar" sourcepath="/WORKSPACE/JFireBaseClientLib/src"/>
 	<classpathentry kind="lib" path="dist/birt/lib/com.ibm.icu_3.6.1.v20070417.jar"/>
+	<classpathentry kind="var" path="APACHE_COMMONS/commons-lang.jar"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>

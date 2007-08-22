@@ -3,6 +3,11 @@
  */
 package org.nightlabs.jfire.reporting.layout.render;
 
+import java.io.Serializable;
+
+import org.nightlabs.util.Utils;
+import org.nightlabs.util.reflect.ReflectUtil;
+
 /**
  * Exception to wrap BIRT exceptions, so that clients
  * are not required to know BIRT when rendering reports.
@@ -32,7 +37,8 @@ public class RenderReportException extends Exception {
 	 * @param cause
 	 */
 	public RenderReportException(Throwable cause) {
-		super(cause);
+		super();
+		initCause(cause);
 	}
 
 	/**
@@ -40,7 +46,19 @@ public class RenderReportException extends Exception {
 	 * @param cause
 	 */
 	public RenderReportException(String message, Throwable cause) {
-		super(message, cause);
+		super(message);
+		initCause(cause);
+	}
+	
+	@Override
+	public synchronized Throwable initCause(Throwable cause) {
+		System.err.println("Init cause of " + RenderReportException.class.getSimpleName() + " called with " + cause);
+		if (cause != null) {
+			if (ReflectUtil.findContainedObjectsByClass(cause, Serializable.class, false)) {
+				cause = new RenderReportException(cause.getMessage());
+			}
+		}
+		return super.initCause(cause);
 	}
 
 }

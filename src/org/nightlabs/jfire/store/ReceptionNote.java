@@ -13,6 +13,7 @@ import javax.jdo.PersistenceManager;
 import javax.jdo.listener.AttachCallback;
 import javax.jdo.listener.DetachCallback;
 
+import org.nightlabs.jdo.ObjectIDUtil;
 import org.nightlabs.jfire.jbpm.graph.def.ActionHandlerNodeEnter;
 import org.nightlabs.jfire.jbpm.graph.def.Statable;
 import org.nightlabs.jfire.jbpm.graph.def.StatableLocal;
@@ -24,7 +25,7 @@ import org.nightlabs.jfire.trade.ArticleContainerException;
 import org.nightlabs.jfire.trade.LegalEntity;
 import org.nightlabs.jfire.transfer.id.AnchorID;
 import org.nightlabs.util.CollectionUtil;
-import org.nightlabs.util.Utils;
+import org.nightlabs.util.Util;
 
 /**
  * @author Marco Schulze - Marco at NightLabs dot de
@@ -41,7 +42,7 @@ import org.nightlabs.util.Utils;
  * @jdo.inheritance strategy="new-table"
  *
  * @jdo.create-objectid-class
- *		field-order="organisationID, deliveryNoteIDPrefix, deliveryNoteID, receptionNoteID"
+ *		field-order="organisationID, receptionNoteIDPrefix, receptionNoteID"
  *		add-interfaces="org.nightlabs.jfire.trade.id.ArticleContainerID"
  *
  * TODO other fetch-groups
@@ -77,15 +78,11 @@ implements
 	 * @jdo.field primary-key="true"
 	 * @jdo.column length="50"
 	 */
-	private String deliveryNoteIDPrefix;
+	private String receptionNoteIDPrefix;
 	/**
 	 * @jdo.field primary-key="true"
 	 */
-	private long deliveryNoteID;
-	/**
-	 * @jdo.field primary-key="true"
-	 */
-	private int receptionNoteID;
+	private long receptionNoteID;
 
 	/**
 	 * @jdo.field persistence-modifier="persistent"
@@ -156,14 +153,14 @@ implements
 	 */
 	protected ReceptionNote() { }
 
-	public ReceptionNote(User createUser, DeliveryNote deliveryNote)
+	public ReceptionNote(String organisationID, String receptionNoteIDPrefix, long receptionNoteID, User createUser, DeliveryNote deliveryNote)
 	{
 		this.createUser = createUser;
 		this.deliveryNote = deliveryNote;
-		this.organisationID = deliveryNote.getOrganisationID();
-		this.deliveryNoteIDPrefix = deliveryNote.getDeliveryNoteIDPrefix();
-		this.deliveryNoteID = deliveryNote.getDeliveryNoteID();
-		this.receptionNoteID = deliveryNote.createReceptionNoteID();
+		this.organisationID = organisationID;
+		this.receptionNoteIDPrefix = receptionNoteIDPrefix;
+		this.receptionNoteID = receptionNoteID;
+//		this.receptionNoteID = deliveryNote.createReceptionNoteID();
 
 		createDT = new Date();
 		articles = new HashSet<Article>();
@@ -173,17 +170,29 @@ implements
 	{
 		return organisationID;
 	}
-	public String getDeliveryNoteIDPrefix()
+	public String getReceptionNoteIDPrefix()
 	{
-		return deliveryNoteIDPrefix;
+		return receptionNoteIDPrefix;
 	}
-	public long getDeliveryNoteID()
+	public String getArticleContainerIDPrefix()
 	{
-		return deliveryNoteID;
+		return getReceptionNoteIDPrefix();
 	}
-	public int getReceptionNoteID()
+	public long getReceptionNoteID()
 	{
 		return receptionNoteID;
+	}
+	public long getArticleContainerID()
+	{
+		return getReceptionNoteID();
+	}
+	public String getReceptionNoteIDAsString()
+	{
+		return ObjectIDUtil.longObjectIDFieldToString(receptionNoteID);
+	}
+	public String getArticleContainerIDAsString()
+	{
+		return getReceptionNoteIDAsString();
 	}
 	public DeliveryNote getDeliveryNote()
 	{
@@ -197,15 +206,14 @@ implements
 		if (!(obj instanceof ReceptionNote)) return false;
 		ReceptionNote o = (ReceptionNote) obj;
 		return
-				Utils.equals(this.organisationID,       o.organisationID) &&
-				Utils.equals(this.deliveryNoteIDPrefix, o.deliveryNoteIDPrefix) &&
-				Utils.equals(this.deliveryNoteID,       o.deliveryNoteID) &&
-				Utils.equals(this.receptionNoteID,      o.receptionNoteID);
+				Util.equals(this.organisationID,        o.organisationID) &&
+				Util.equals(this.receptionNoteIDPrefix, o.receptionNoteIDPrefix) &&
+				Util.equals(this.receptionNoteID,       o.receptionNoteID);
 	}
 	@Override
 	public int hashCode()
 	{
-		return Utils.hashCode(organisationID) + Utils.hashCode(deliveryNoteIDPrefix) + Utils.hashCode(deliveryNoteID) + receptionNoteID;
+		return Util.hashCode(organisationID) + Util.hashCode(receptionNoteIDPrefix) + Util.hashCode(receptionNoteID);
 	}
 
 	public void addArticle(Article article)

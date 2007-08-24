@@ -29,6 +29,7 @@ package org.nightlabs.jfire.trade;
 import java.util.Collection;
 import java.util.Date;
 
+import org.nightlabs.jdo.ObjectIDUtil;
 import org.nightlabs.jfire.security.User;
 import org.nightlabs.jfire.transfer.id.AnchorID;
 
@@ -44,9 +45,32 @@ public interface ArticleContainer
 	LegalEntity getVendor();
 
 	/**
-	 * @return Returns the organisation that issued the ArticleContainer - usually the vendor organisation.
+	 * @return the organisation that issued the ArticleContainer - usually the vendor organisation. This is the first part
+	 * of the composite primary key.
+	 * @see #getArticleContainerIDPrefix()
+	 * @see #getArticleContainerID()
 	 */
 	String getOrganisationID();
+
+	/**
+	 * @return the prefix for the local ID, which can be used to have a namespace per year or per topic. This is the 2nd part
+	 * of the composite primary key.
+	 * @see #getOrganisationID()
+	 * @see #getArticleContainerID()
+	 */
+	String getArticleContainerIDPrefix();
+
+	/**
+	 * @return the id within the scope of the organisationID and the prefix. This is the 3rd part of the composite primary key.
+	 * @see #getOrganisationID()
+	 * @see #getArticleContainerIDPrefix()
+	 */
+	long getArticleContainerID();
+
+	/**
+	 * @return the result of {@link ObjectIDUtil#longObjectIDFieldToString(long)} applied to {@link #getArticleContainerID()}
+	 */
+	String getArticleContainerIDAsString();
 
 	/**
 	 * @return A <tt>Collection</tt> of {@link Article}

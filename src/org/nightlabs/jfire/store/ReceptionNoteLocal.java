@@ -24,7 +24,7 @@ import org.nightlabs.util.CollectionUtil;
  * @jdo.inheritance strategy="new-table"
  *
  * @jdo.create-objectid-class
- *		field-order="organisationID, deliveryNoteIDPrefix, deliveryNoteID, receptionNoteID"
+ *		field-order="organisationID, receptionNoteIDPrefix, receptionNoteID"
  */
 public class ReceptionNoteLocal
 implements
@@ -42,15 +42,11 @@ implements
 	 * @jdo.field primary-key="true"
 	 * @jdo.column length="50"
 	 */
-	private String deliveryNoteIDPrefix;
+	private String receptionNoteIDPrefix;
 	/**
 	 * @jdo.field primary-key="true"
 	 */
-	private long deliveryNoteID;
-	/**
-	 * @jdo.field primary-key="true"
-	 */
-	private int receptionNoteID;
+	private long receptionNoteID;
 
 	/**
 	 * @jdo.field persistence-modifier="persistent"
@@ -66,8 +62,7 @@ implements
 	{
 		this.receptionNote = receptionNote;
 		this.organisationID = receptionNote.getOrganisationID();
-		this.deliveryNoteIDPrefix = receptionNote.getDeliveryNoteIDPrefix();
-		this.deliveryNoteID = receptionNote.getDeliveryNoteID();
+		this.receptionNoteIDPrefix = receptionNote.getReceptionNoteIDPrefix();
 		this.receptionNoteID = receptionNote.getReceptionNoteID();
 
 		receptionNote.setReceptionNoteLocal(this);
@@ -77,15 +72,11 @@ implements
 	{
 		return organisationID;
 	}
-	public String getDeliveryNoteIDPrefix()
+	public String getReceptionNoteIDPrefix()
 	{
-		return deliveryNoteIDPrefix;
+		return receptionNoteIDPrefix;
 	}
-	public long getDeliveryNoteID()
-	{
-		return deliveryNoteID;
-	}
-	public int getReceptionNoteID()
+	public long getReceptionNoteID()
 	{
 		return receptionNoteID;
 	}
@@ -120,7 +111,7 @@ implements
 
 	/**
 	 * This method is <b>not</b> intended to be called directly. It is called by
-	 * {@link State#State(String, long, User, Statable, org.nightlabs.jfire.jbpm.graph.def.StateDefinition)}
+	 * {@link State#State(String, long, org.nightlabs.jfire.security.User, Statable, org.nightlabs.jfire.jbpm.graph.def.StateDefinition)}
 	 * which is called automatically by {@link ActionHandlerNodeEnter}, if this <code>ActionHandler</code> is registered.
 	 */
 	public void setState(State currentState)

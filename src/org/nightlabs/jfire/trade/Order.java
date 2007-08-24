@@ -582,12 +582,28 @@ implements Serializable, ArticleContainer, SegmentContainer, DetachCallback
 	{
 		return orderIDPrefix;
 	}
+	public String getArticleContainerIDPrefix()
+	{
+		return getOrderIDPrefix();
+	}
 	/**
 	 * @return Returns the orderID.
 	 */
 	public long getOrderID()
 	{
 		return orderID;
+	}
+	public long getArticleContainerID()
+	{
+		return getOrderID();
+	}
+	public String getOrderIDAsString()
+	{
+		return ObjectIDUtil.longObjectIDFieldToString(orderID);
+	}
+	public String getArticleContainerIDAsString()
+	{
+		return getOrderIDAsString();
 	}
 
 	public static String getPrimaryKey(String organisationID, String orderIDPrefix, long orderID)

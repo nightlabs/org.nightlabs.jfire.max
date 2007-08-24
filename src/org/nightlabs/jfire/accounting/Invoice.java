@@ -593,8 +593,23 @@ implements Serializable, ArticleContainer, Statable, DetachCallback
 	{
 		return invoiceIDPrefix;
 	}
+	public String getArticleContainerIDPrefix()
+	{
+		return getInvoiceIDPrefix();
+	}
 	public long getInvoiceID() {
 		return invoiceID;
+	}
+	public long getArticleContainerID()
+	{
+		return getInvoiceID();
+	}
+	public String getInvoiceIDAsString() {
+		return ObjectIDUtil.longObjectIDFieldToString(invoiceID);
+	}
+	public String getArticleContainerIDAsString()
+	{
+		return getInvoiceIDAsString();
 	}
 
 	/**

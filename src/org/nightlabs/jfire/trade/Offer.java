@@ -382,6 +382,10 @@ implements
 	{
 		return offerIDPrefix;
 	}
+	public String getArticleContainerIDPrefix()
+	{
+		return getOfferIDPrefix();
+	}
 	/**
 	 * @return Returns the offerID.
 	 */
@@ -389,6 +393,20 @@ implements
 	{
 		return offerID;
 	}
+	public long getArticleContainerID()
+	{
+		return getOfferID();
+	}
+
+	public String getOfferIDAsString()
+	{
+		return ObjectIDUtil.longObjectIDFieldToString(offerID);
+	}
+	public String getArticleContainerIDAsString()
+	{
+		return getOfferIDAsString();
+	}
+
 	public static String getPrimaryKey(String organisationID, String offerIDPrefix, long offerID)
 	{
 		return organisationID + '/' + offerIDPrefix + '/' + ObjectIDUtil.longObjectIDFieldToString(offerID);

@@ -355,8 +355,23 @@ implements Serializable, ArticleContainer, Statable, DetachCallback
 	{
 		return deliveryNoteIDPrefix;
 	}
+	public String getArticleContainerIDPrefix()
+	{
+		return getDeliveryNoteIDPrefix();
+	}
 	public long getDeliveryNoteID() {
 		return deliveryNoteID;
+	}
+	public long getArticleContainerID()
+	{
+		return getDeliveryNoteID();
+	}
+	public String getDeliveryNoteIDAsString() {
+		return ObjectIDUtil.longObjectIDFieldToString(deliveryNoteID);
+	}
+	public String getArticleContainerIDAsString()
+	{
+		return getDeliveryNoteIDAsString();
 	}
 
 	public static String getPrimaryKey(String organisationID, String deliveryNoteIDPrefix, long deliveryNoteID)
@@ -677,15 +692,15 @@ implements Serializable, ArticleContainer, Statable, DetachCallback
 		return _states;
 	}
 
-	/**
-	 * @jdo.field persistence-modifier="persistent"
-	 */
-	private int nextReceptionNoteID = 0;
-
-	public int createReceptionNoteID()
-	{
-		return nextReceptionNoteID++;
-	}
+//	/**
+//	 * @jdo.field persistence-modifier="persistent"
+//	 */
+//	private int nextReceptionNoteID = 0;
+//
+//	public int createReceptionNoteID()
+//	{
+//		return nextReceptionNoteID++;
+//	}
 
 	/**
 	 * @jdo.field persistence-modifier="none"

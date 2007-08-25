@@ -35,14 +35,16 @@ import net.sourceforge.barbecue.linear.code128.Code128Barcode;
 import org.apache.log4j.Logger;
 import org.nightlabs.editor2d.DrawComponentContainer;
 import org.nightlabs.editor2d.impl.DrawComponentImpl;
+import org.nightlabs.editor2d.render.BaseRenderer;
 import org.nightlabs.editor2d.render.Renderer;
+import org.nightlabs.editor2d.render.j2d.J2DRenderContext;
 import org.nightlabs.i18n.unit.IUnit;
 import org.nightlabs.i18n.unit.MMUnit;
 import org.nightlabs.i18n.unit.resolution.DPIResolutionUnit;
 import org.nightlabs.i18n.unit.resolution.IResolutionUnit;
 import org.nightlabs.jdo.ObjectIDUtil;
 import org.nightlabs.jfire.scripting.editor2d.BarcodeDrawComponent;
-import org.nightlabs.jfire.scripting.editor2d.render.BarcodeRenderer;
+import org.nightlabs.jfire.scripting.editor2d.render.j2d.J2DBarcodeDefaultRenderer;
 import org.nightlabs.jfire.scripting.id.ScriptRegistryItemID;
 
 /**
@@ -435,7 +437,9 @@ implements BarcodeDrawComponent
 
 	@Override
 	protected Renderer initDefaultRenderer() {
-		return new BarcodeRenderer();
+		Renderer r = new BaseRenderer();
+		r.addRenderContext(new J2DBarcodeDefaultRenderer());
+		return r;
 	}
 				
 	private transient String text = VALUE_DEFAULT;

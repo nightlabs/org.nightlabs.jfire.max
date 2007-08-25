@@ -28,9 +28,10 @@ package org.nightlabs.jfire.scripting.editor2d.util;
 import org.nightlabs.editor2d.render.RenderConstants;
 import org.nightlabs.editor2d.render.RenderModeDescriptor;
 import org.nightlabs.editor2d.render.RenderModeManager;
+import org.nightlabs.editor2d.render.Renderer;
 import org.nightlabs.editor2d.util.ImageGenerator;
 import org.nightlabs.jfire.scripting.editor2d.BarcodeDrawComponent;
-import org.nightlabs.jfire.scripting.editor2d.render.BarcodeRenderer;
+import org.nightlabs.jfire.scripting.editor2d.render.j2d.J2DBarcodeDefaultRenderer;
 
 /**
  * @author Daniel.Mazurek [at] NightLabs [dot] de
@@ -47,8 +48,8 @@ extends ImageGenerator
 			// Category Renderer
 			RenderModeDescriptor barcodeDesc = new RenderModeDescriptor(
 					RenderConstants.DEFAULT_MODE, "Default");
-			renderModeMan.addRenderer(barcodeDesc, BarcodeDrawComponent.class, 
-					new BarcodeRenderer());			
+			Renderer r = renderModeMan.addRenderModeDescriptor(barcodeDesc, BarcodeDrawComponent.class);
+			r.addRenderContext(new J2DBarcodeDefaultRenderer());
 		}
 		return renderModeMan;		
 	}

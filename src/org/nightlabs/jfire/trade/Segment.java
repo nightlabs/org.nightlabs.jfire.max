@@ -40,7 +40,7 @@ import org.nightlabs.jfire.idgenerator.IDGenerator;
 import org.nightlabs.jfire.store.DeliveryNote;
 import org.nightlabs.jfire.trade.id.SegmentID;
 import org.nightlabs.jfire.trade.id.SegmentTypeID;
-import org.nightlabs.util.Utils;
+import org.nightlabs.util.Util;
 
 /**
  * One {@link Order}, {@link Offer}, {@link Invoice} or {@link DeliveryNote} may contain
@@ -159,10 +159,15 @@ public class Segment implements Serializable
 	}
 	/**
 	 * @return Returns the segmentID.
+	 * @see #getSegmentIDAsString()
 	 */
 	public long getSegmentID()
 	{
 		return segmentID;
+	}
+	public String getSegmentIDAsString()
+	{
+		return ObjectIDUtil.longObjectIDFieldToString(segmentID);
 	}
 	/**
 	 * @return Returns the order.
@@ -190,12 +195,12 @@ public class Segment implements Serializable
 
 		Segment o = (Segment) obj;
 
-		return Utils.equals(this.organisationID, o.organisationID) && this.segmentID == o.segmentID;
+		return Util.equals(this.organisationID, o.organisationID) && Util.equals(this.segmentID, o.segmentID);
 	}
 
 	@Override
 	public int hashCode()
 	{
-		return Utils.hashCode(organisationID) ^ Utils.hashCode(segmentID);
+		return Util.hashCode(organisationID) ^ Util.hashCode(segmentID);
 	}
 }

@@ -63,7 +63,7 @@ public class ArticleList extends AbstractJFSScriptExecutorDelegate {
 	public Object doExecute() throws ScriptException {
 		ObjectID articleContainerID = (ObjectID) getParameterValue("articleContainerID");
 		if (articleContainerID == null)
-			throw new IllegalArgumentException("The parameter invoiceID was not set.");
+			throw new IllegalArgumentException("The parameter articleContainerID was not set.");
 		
 		PersistenceManager pm = getScriptExecutorJavaClass().getPersistenceManager();
 		ArticleContainer articleContainer = (ArticleContainer) pm.getObjectById(articleContainerID);

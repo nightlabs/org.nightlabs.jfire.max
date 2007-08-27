@@ -164,7 +164,8 @@ public class DataType {
 		Integer type = (Integer)classes2Types.get(dataType);
 		if (type != null)
 			return type.intValue();
-		return UNKNOWN;
+//		return UNKNOWN;
+		return STRING;
 	}
 	
 	public static String getTypeName(int dataType) {

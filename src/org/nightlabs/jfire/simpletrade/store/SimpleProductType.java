@@ -131,7 +131,7 @@ public class SimpleProductType extends ProductType
 	{
 		super(organisationID, productTypeID, extendedProductType, owner, inheritanceNature, packageNature);
 		this.structLocalScope = StructLocal.DEFAULT_SCOPE;
-		this.propertySet = new PropertySet(organisationID, IDGenerator.nextID(PropertySet.class));
+		this.propertySet = new PropertySet(organisationID, IDGenerator.nextID(PropertySet.class), getClass().getName(), structLocalScope);
 //		this.name = new SimpleProductTypeName(this);
 //		getFieldMetaData("name").setValueInherited(false);
 	}

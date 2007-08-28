@@ -43,7 +43,7 @@ public abstract class AbstractTransferController<D extends TransferData, ID exte
 		return lastStageResults;
 	}
 
-	private void setLastStageResults(List<R> lastStageResults) {
+	protected void setLastStageResults(List<R> lastStageResults) {
 		this.lastStageResults = lastStageResults;
 	}
 

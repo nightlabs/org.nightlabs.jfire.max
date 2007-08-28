@@ -12,20 +12,12 @@ import org.nightlabs.jfire.accounting.AccountingManager;
 import org.nightlabs.jfire.accounting.AccountingManagerUtil;
 import org.nightlabs.jfire.accounting.pay.id.PaymentID;
 import org.nightlabs.jfire.security.SecurityReflector;
-import org.nightlabs.jfire.transfer.Stage;
-import org.nightlabs.jfire.transfer.TransferController;
+import org.nightlabs.jfire.transfer.AbstractTransferController;
 
-public abstract class AbstractPaymentController extends TransferController<PaymentData, PaymentID, PaymentResult> {
+public abstract class AbstractPaymentController extends AbstractTransferController<PaymentData, PaymentID, PaymentResult> implements PaymentController {
 	
-	/*
-	 * (non-Javadoc)
-	 * @see org.nightlabs.jfire.trade.transfer.TransferController#serverBegin()
-	 */
 	@Override
-	public void serverBegin() throws LoginException {
-		assertLastStage(Stage.ClientBegin);
-		setLastStage(Stage.ServerBegin);
-		
+	protected void _serverBegin() {
 		if (isSkipServerStages())
 			return;
 		
@@ -57,8 +49,6 @@ public abstract class AbstractPaymentController extends TransferController<Payme
 			for (PaymentData paymentData : getTransferDatas())
 				paymentData.getPayment().setPayBeginServerResult(payBeginServerResult);
 		}
-
-		setLastStageResults(payBeginServerResults);		
 	}
 	
 	/*
@@ -66,10 +56,7 @@ public abstract class AbstractPaymentController extends TransferController<Payme
 	 * @see org.nightlabs.jfire.trade.transfer.TransferController#serverDoWork()
 	 */
 	@Override
-	public void serverDoWork() throws LoginException {
-		assertLastStage(Stage.ClientDoWork);
-		setLastStage(Stage.ServerDoWork);
-		
+	protected void _serverDoWork() {
 		if (isSkipServerStages())
 			return;
 		
@@ -105,8 +92,6 @@ public abstract class AbstractPaymentController extends TransferController<Payme
 			for (Iterator itD = getTransferDatas().iterator(); itD.hasNext();)
 				((PaymentData) itD.next()).getPayment().setPayDoWorkServerResult(payDoWorkServerResult);
 		}
-		
-		setLastStageResults(payDoWorkServerResults);
 	}
 	
 	/*
@@ -114,10 +99,7 @@ public abstract class AbstractPaymentController extends TransferController<Payme
 	 * @see org.nightlabs.jfire.trade.transfer.TransferController#serverEnd()
 	 */
 	@Override
-	public void serverEnd() throws LoginException {
-		assertLastStage(Stage.ClientEnd);
-		setLastStage(Stage.ServerEnd);
-		
+	protected void _serverEnd() {
 		if (isSkipServerStages())
 			return;
 		
@@ -148,8 +130,6 @@ public abstract class AbstractPaymentController extends TransferController<Payme
 			for (PaymentData paymentData : getTransferDatas())
 				paymentData.getPayment().setPayEndServerResult(payEndServerResult);
 		}
-		
-		setLastStageResults(payEndServerResults);
 	}
 	
 	/*
@@ -170,6 +150,7 @@ public abstract class AbstractPaymentController extends TransferController<Payme
 		return false;
 	}
 	
+	@Override
 	public AccountingManager getAccountingManager() throws RemoteException, LoginException, CreateException, NamingException {
 		return AccountingManagerUtil.getHome(SecurityReflector.getInitialContextProperties()).create();
 	}

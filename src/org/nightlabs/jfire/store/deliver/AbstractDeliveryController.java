@@ -1,31 +1,15 @@
 package org.nightlabs.jfire.store.deliver;
 
-import java.rmi.RemoteException;
 import java.util.Iterator;
 import java.util.List;
 
-import javax.ejb.CreateException;
-import javax.naming.NamingException;
-import javax.security.auth.login.LoginException;
-
-import org.nightlabs.jfire.security.SecurityReflector;
-import org.nightlabs.jfire.store.StoreManager;
-import org.nightlabs.jfire.store.StoreManagerUtil;
 import org.nightlabs.jfire.store.deliver.id.DeliveryID;
-import org.nightlabs.jfire.transfer.Stage;
-import org.nightlabs.jfire.transfer.TransferController;
+import org.nightlabs.jfire.transfer.AbstractTransferController;
 
-public abstract class AbstractDeliveryController extends TransferController<DeliveryData, DeliveryID, DeliveryResult> {
+public abstract class AbstractDeliveryController extends AbstractTransferController<DeliveryData, DeliveryID, DeliveryResult> implements DeliveryController {
 	
-	/*
-	 * (non-Javadoc)
-	 * @see org.nightlabs.jfire.trade.transfer.TransferController#serverBegin()
-	 */
 	@Override
-	public void serverBegin() {
-		assertLastStage(Stage.ClientBegin);
-		setLastStage(Stage.ServerBegin);
-		
+	protected void _serverBegin() {
 		if (isSkipServerStages())
 			return;
 		
@@ -57,19 +41,10 @@ public abstract class AbstractDeliveryController extends TransferController<Deli
 			for (DeliveryData deliveryData : getTransferDatas())
 				deliveryData.getDelivery().setDeliverBeginServerResult(deliverBeginServerResult);
 		}
-		
-		setLastStageResults(deliverBeginServerResults);
 	}
 	
-	/*
-	 * (non-Javadoc)
-	 * @see org.nightlabs.jfire.trade.transfer.TransferController#serverDoWork()
-	 */
 	@Override
-	public void serverDoWork() {
-		assertLastStage(Stage.ClientDoWork);
-		setLastStage(Stage.ServerDoWork);
-		
+	protected void _serverDoWork() {
 		if (isSkipServerStages())
 			return;
 		
@@ -104,18 +79,10 @@ public abstract class AbstractDeliveryController extends TransferController<Deli
 			for (DeliveryData deliveryData : getTransferDatas())
 				deliveryData.getDelivery().setDeliverDoWorkServerResult(deliverDoWorkServerResult);
 		}
-		setLastStageResults(serverDeliverDoWorkResults);
 	}
 	
-	/*
-	 * (non-Javadoc)
-	 * @see org.nightlabs.jfire.trade.transfer.TransferController#serverEnd()
-	 */
 	@Override
-	public void serverEnd() {
-		assertLastStage(Stage.ClientEnd);
-		setLastStage(Stage.ServerEnd);
-		
+	protected void _serverEnd() {
 		if (isSkipServerStages())
 			return;
 		
@@ -146,7 +113,5 @@ public abstract class AbstractDeliveryController extends TransferController<Deli
 			for (DeliveryData deliveryData : getTransferDatas())
 				deliveryData.getDelivery().setDeliverEndServerResult(deliverEndServerResult);
 		}
-		
-		setLastStageResults(deliverEndServerResults);
 	}
 }

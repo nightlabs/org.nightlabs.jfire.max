@@ -44,7 +44,6 @@ import org.nightlabs.jfire.prop.PropertySet;
 import org.nightlabs.jfire.prop.StructLocal;
 import org.nightlabs.jfire.security.User;
 import org.nightlabs.jfire.store.ProductType;
-import org.nightlabs.jfire.store.ProductTypeActionHandler;
 import org.nightlabs.jfire.store.ProductTypeLocal;
 import org.nightlabs.jfire.store.Repository;
 import org.nightlabs.jfire.store.id.ProductTypeID;
@@ -131,7 +130,7 @@ public class SimpleProductType extends ProductType
 	{
 		super(organisationID, productTypeID, extendedProductType, owner, inheritanceNature, packageNature);
 		this.structLocalScope = StructLocal.DEFAULT_SCOPE;
-		this.propertySet = new PropertySet(organisationID, IDGenerator.nextID(PropertySet.class), getClass().getName(), structLocalScope);
+		this.propertySet = new PropertySet(organisationID, IDGenerator.nextID(PropertySet.class), SimpleProductType.class.getName(), structLocalScope);
 //		this.name = new SimpleProductTypeName(this);
 //		getFieldMetaData("name").setValueInherited(false);
 	}

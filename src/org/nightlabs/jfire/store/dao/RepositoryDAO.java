@@ -7,6 +7,7 @@ import java.util.Set;
 import org.nightlabs.annotation.Implement;
 import org.nightlabs.jdo.query.JDOQuery;
 import org.nightlabs.jfire.base.jdo.BaseJDOObjectDAO;
+import org.nightlabs.jfire.base.jdo.cache.Cache;
 import org.nightlabs.jfire.security.SecurityReflector;
 import org.nightlabs.jfire.store.Repository;
 import org.nightlabs.jfire.store.StoreManager;
@@ -56,12 +57,12 @@ extends BaseJDOObjectDAO<AnchorID, Repository>
 			int maxFetchDepth, ProgressMonitor monitor)
 	{
 		try {
-			StoreManager am = StoreManagerUtil.getHome(SecurityReflector.getInitialContextProperties()).create();
-			Set<AnchorID> repositoryIDs = am.getRepositoryIDs(queries);
+			StoreManager sm = StoreManagerUtil.getHome(SecurityReflector.getInitialContextProperties()).create();
+			Set<AnchorID> repositoryIDs = sm.getRepositoryIDs(queries);
 			return getJDOObjects(null, repositoryIDs, fetchGroups, maxFetchDepth, monitor);			
 		} catch (Exception x) {
 			throw new RuntimeException(x);
-		} 
+		}
 	}
 
 	public List<Repository> getRepositories(Collection<AnchorID> repositoryIDs, String[] fetchGroups,
@@ -74,5 +75,20 @@ extends BaseJDOObjectDAO<AnchorID, Repository>
 			int maxFetchDepth, ProgressMonitor monitor) 
 	{
 		return getJDOObject(null, repositoryID, fetchGroups, maxFetchDepth, monitor);
+	}
+
+	public Repository storeRepository(Repository repository, boolean get, String[] fetchGroups, 
+			int maxFetchDepth, ProgressMonitor monitor)
+	{
+		StoreManager sm;
+		try {
+			sm = StoreManagerUtil.getHome(SecurityReflector.getInitialContextProperties()).create();
+			repository = sm.storeRepository(repository, get, fetchGroups, maxFetchDepth);
+			if (repository != null)
+				Cache.sharedInstance().put(null, repository, fetchGroups, maxFetchDepth);
+			return repository;
+		} catch (Exception x) {
+			throw new RuntimeException(x);
+		} 
 	}
 }

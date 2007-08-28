@@ -1546,7 +1546,7 @@ implements SessionBean
 	 *
  	 * @ejb.interface-method
 	 * @ejb.permission role-name="_Guest_"
-	 * @ejb.transaction type = "Required"
+	 * @ejb.transaction type="Required"
 	 */
 	public List getNonFinalizedDeliveryNotes(AnchorID vendorID, AnchorID customerID, String[] fetchGroups, int maxFetchDepth)
 	throws ModuleException
@@ -1782,7 +1782,7 @@ implements SessionBean
 	 * @ejb.permission role-name="_Guest_"
 	 */
 	@SuppressWarnings("unchecked")
-	public List<Repository> getRepositories(Collection<AnchorID> repositoryIDs,  String[] fetchGroups, int maxFetchDepth)
+	public List<Repository> getRepositories(Collection<AnchorID> repositoryIDs, String[] fetchGroups, int maxFetchDepth)
 	{
 		PersistenceManager pm = getPersistenceManager();
 		try {
@@ -1792,6 +1792,20 @@ implements SessionBean
 		}
 	}
 
+	/**
+	 * @ejb.interface-method
+	 * @ejb.transaction type="Required"
+	 * @ejb.permission role-name="_Guest_"
+	 */
+	public Repository storeRepository(Repository repository, boolean get, String[] fetchGroups, int maxFetchDepth)
+	{
+		PersistenceManager pm = getPersistenceManager();
+		try {
+			return NLJDOHelper.storeJDO(pm, repository, get, fetchGroups, maxFetchDepth);
+		} finally {
+			pm.close();
+		}
+	}
 
 	// TODO: when all jpox bugs are fixed, implement generic storeProductType-Method
 //	/**

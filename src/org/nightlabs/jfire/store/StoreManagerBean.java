@@ -1598,7 +1598,7 @@ implements SessionBean
 			pm.getFetchPlan().setMaxFetchDepth(1);
 			pm.getFetchPlan().setGroup(FetchPlan.DEFAULT);
 
-			Set<ProductType> productTypes = null;
+			Set<? extends ProductType> productTypes = null;
 			for (ProductTypeQuery<? extends ProductType> query : productTypeQueries) {
 				query.setPersistenceManager(pm);
 				query.setCandidates(productTypes);

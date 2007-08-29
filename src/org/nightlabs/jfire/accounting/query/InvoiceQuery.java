@@ -18,7 +18,7 @@ import org.nightlabs.jfire.transfer.id.AnchorID;
  * @author Marco Schulze - marco at nightlabs dot de
  */
 public class InvoiceQuery
-extends JDOQuery<Set<Invoice>>
+extends JDOQuery<Invoice>
 {
 	private static final long serialVersionUID = 1L;
 

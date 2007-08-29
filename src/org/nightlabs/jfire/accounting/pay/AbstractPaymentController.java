@@ -15,19 +15,19 @@ import org.nightlabs.jfire.security.SecurityReflector;
 import org.nightlabs.jfire.transfer.AbstractTransferController;
 
 public abstract class AbstractPaymentController extends AbstractTransferController<PaymentData, PaymentID, PaymentResult> implements PaymentController {
-	
+
 	@Override
 	protected void _serverBegin() {
 		if (isSkipServerStages())
 			return;
 		
-		List payBeginServerResults = null;
+		List<PaymentResult> payBeginServerResults = null;
 		try {
 			for (PaymentData paymentData : getTransferDatas())
 				paymentData.prepareUpload();
-			
+
 			try {
-				payBeginServerResults = getAccountingManager().payBegin(getTransferDatas());
+				payBeginServerResults = getAccountingManager().payBegin(getTransferDatasForServer());
 			} finally {
 				for (PaymentData paymentData : getTransferDatas())
 					paymentData.restoreAfterUpload();

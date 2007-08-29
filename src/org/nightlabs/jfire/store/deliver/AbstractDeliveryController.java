@@ -19,7 +19,7 @@ public abstract class AbstractDeliveryController extends AbstractTransferControl
 				deliveryData.prepareUpload();
 			
 			try {
-				deliverBeginServerResults = getStoreManager().deliverBegin(getTransferDatas());
+				deliverBeginServerResults = getStoreManager().deliverBegin(getTransferDatasForServer());
 			} finally {
 				for (DeliveryData deliveryData : getTransferDatas())
 					deliveryData.restoreAfterUpload();

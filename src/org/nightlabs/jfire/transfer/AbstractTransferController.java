@@ -10,13 +10,16 @@ import javax.security.auth.login.LoginException;
 import org.nightlabs.jdo.ObjectID;
 import org.nightlabs.jfire.accounting.AccountingManager;
 import org.nightlabs.jfire.accounting.AccountingManagerUtil;
+import org.nightlabs.jfire.accounting.pay.PaymentController;
 import org.nightlabs.jfire.accounting.pay.PaymentResult;
 import org.nightlabs.jfire.accounting.pay.id.PaymentID;
 import org.nightlabs.jfire.security.SecurityReflector;
 import org.nightlabs.jfire.store.StoreManager;
 import org.nightlabs.jfire.store.StoreManagerUtil;
+import org.nightlabs.jfire.store.deliver.DeliveryController;
 import org.nightlabs.jfire.store.deliver.DeliveryResult;
 import org.nightlabs.jfire.store.deliver.id.DeliveryID;
+import org.nightlabs.util.Util;
 
 /**
  * /**
@@ -136,6 +139,17 @@ public abstract class AbstractTransferController<D extends TransferData, ID exte
 	 */
 	public AccountingManager getAccountingManager() throws RemoteException, LoginException, CreateException, NamingException {
 		return AccountingManagerUtil.getHome(SecurityReflector.getInitialContextProperties()).create();
+	}
+	
+	private boolean isInServer() {
+		return SecurityReflector.getInitialContextProperties() == null; // TODO this is not clean! Extend SecurityReflector with a method like String getLocation() or sth. similar - needs further thoughts!
+	}
+	
+	protected List<D> getTransferDatasForServer() {
+		if (!isInServer())
+			return getTransferDatas();
+		else
+			return Util.cloneSerializable(getTransferDatas());
 	}
 
 	/*

@@ -18,7 +18,7 @@ import org.nightlabs.jfire.trade.state.id.StateDefinitionID;
  *
  */
 public class StatableQuery 
-extends JDOQuery<Set<Statable>> 
+extends JDOQuery<Statable> 
 {	
 	private static final Logger logger = Logger.getLogger(StatableQuery.class);
 	

@@ -238,7 +238,7 @@
       <description><![CDATA[description not supported yet by ejbdoclet]]></description>
          <role-name>_Guest_</role-name>
       <method >
-         <description><![CDATA[]]></description>
+         <description><![CDATA[Create a new web customer.]]></description>
          <ejb-name>jfire/ejb/JFireWebShopBase/WebShop</ejb-name>
          <method-intf>Local</method-intf>
          <method-name>createWebCustomer</method-name>
@@ -256,7 +256,7 @@
       <description><![CDATA[description not supported yet by ejbdoclet]]></description>
          <role-name>_Guest_</role-name>
       <method >
-         <description><![CDATA[]]></description>
+         <description><![CDATA[Create a new web customer.]]></description>
          <ejb-name>jfire/ejb/JFireWebShopBase/WebShop</ejb-name>
          <method-intf>Remote</method-intf>
          <method-name>createWebCustomer</method-name>
@@ -302,10 +302,10 @@
       <description><![CDATA[description not supported yet by ejbdoclet]]></description>
          <role-name>_Guest_</role-name>
       <method >
-         <description><![CDATA[]]></description>
+         <description><![CDATA[Check if a customer can login.]]></description>
          <ejb-name>jfire/ejb/JFireWebShopBase/WebShop</ejb-name>
          <method-intf>Local</method-intf>
-         <method-name>checkPassword</method-name>
+         <method-name>tryCustomerLogin</method-name>
          <method-params>
             <method-param>org.nightlabs.jfire.webshop.id.WebCustomerID</method-param>
             <method-param>java.lang.String</method-param>
@@ -316,40 +316,12 @@
       <description><![CDATA[description not supported yet by ejbdoclet]]></description>
          <role-name>_Guest_</role-name>
       <method >
-         <description><![CDATA[]]></description>
+         <description><![CDATA[Check if a customer can login.]]></description>
          <ejb-name>jfire/ejb/JFireWebShopBase/WebShop</ejb-name>
          <method-intf>Remote</method-intf>
-         <method-name>checkPassword</method-name>
+         <method-name>tryCustomerLogin</method-name>
          <method-params>
             <method-param>org.nightlabs.jfire.webshop.id.WebCustomerID</method-param>
-            <method-param>java.lang.String</method-param>
-         </method-params>
-      </method>
-   </method-permission>
-   <method-permission >
-      <description><![CDATA[description not supported yet by ejbdoclet]]></description>
-         <role-name>_Guest_</role-name>
-      <method >
-         <description><![CDATA[The second password that can be set if a customer triggers the lostPassword procedure]]></description>
-         <ejb-name>jfire/ejb/JFireWebShopBase/WebShop</ejb-name>
-         <method-intf>Local</method-intf>
-         <method-name>checkSecondPassword</method-name>
-         <method-params>
-            <method-param>java.lang.String</method-param>
-            <method-param>java.lang.String</method-param>
-         </method-params>
-      </method>
-   </method-permission>
-   <method-permission >
-      <description><![CDATA[description not supported yet by ejbdoclet]]></description>
-         <role-name>_Guest_</role-name>
-      <method >
-         <description><![CDATA[The second password that can be set if a customer triggers the lostPassword procedure]]></description>
-         <ejb-name>jfire/ejb/JFireWebShopBase/WebShop</ejb-name>
-         <method-intf>Remote</method-intf>
-         <method-name>checkSecondPassword</method-name>
-         <method-params>
-            <method-param>java.lang.String</method-param>
             <method-param>java.lang.String</method-param>
          </method-params>
       </method>
@@ -403,32 +375,6 @@
          <ejb-name>jfire/ejb/JFireWebShopBase/WebShop</ejb-name>
          <method-intf>Remote</method-intf>
          <method-name>hasEmailConfirmationExpired</method-name>
-         <method-params>
-            <method-param>org.nightlabs.jfire.webshop.id.WebCustomerID</method-param>
-         </method-params>
-      </method>
-   </method-permission>
-   <method-permission >
-      <description><![CDATA[description not supported yet by ejbdoclet]]></description>
-         <role-name>_Guest_</role-name>
-      <method >
-         <description><![CDATA[The second password that can be set if a customer triggers the lostPassword procedure]]></description>
-         <ejb-name>jfire/ejb/JFireWebShopBase/WebShop</ejb-name>
-         <method-intf>Local</method-intf>
-         <method-name>hasSecondPasswordDateExpired</method-name>
-         <method-params>
-            <method-param>org.nightlabs.jfire.webshop.id.WebCustomerID</method-param>
-         </method-params>
-      </method>
-   </method-permission>
-   <method-permission >
-      <description><![CDATA[description not supported yet by ejbdoclet]]></description>
-         <role-name>_Guest_</role-name>
-      <method >
-         <description><![CDATA[The second password that can be set if a customer triggers the lostPassword procedure]]></description>
-         <ejb-name>jfire/ejb/JFireWebShopBase/WebShop</ejb-name>
-         <method-intf>Remote</method-intf>
-         <method-name>hasSecondPasswordDateExpired</method-name>
          <method-params>
             <method-param>org.nightlabs.jfire.webshop.id.WebCustomerID</method-param>
          </method-params>
@@ -522,7 +468,7 @@
       <description><![CDATA[description not supported yet by ejbdoclet]]></description>
          <role-name>_Guest_</role-name>
       <method >
-         <description><![CDATA[Creates,sends and if it succeeds stores it with an expiration Date.]]></description>
+         <description><![CDATA[Creates, sends and if it succeeds stores it with an expiration Date.]]></description>
          <ejb-name>jfire/ejb/JFireWebShopBase/WebShop</ejb-name>
          <method-intf>Local</method-intf>
          <method-name>createPassword</method-name>
@@ -535,7 +481,7 @@
       <description><![CDATA[description not supported yet by ejbdoclet]]></description>
          <role-name>_Guest_</role-name>
       <method >
-         <description><![CDATA[Creates,sends and if it succeeds stores it with an expiration Date.]]></description>
+         <description><![CDATA[Creates, sends and if it succeeds stores it with an expiration Date.]]></description>
          <ejb-name>jfire/ejb/JFireWebShopBase/WebShop</ejb-name>
          <method-intf>Remote</method-intf>
          <method-name>createPassword</method-name>
@@ -554,6 +500,9 @@
          <method-name>storeAndSendConfirmation</method-name>
          <method-params>
             <method-param>org.nightlabs.jfire.webshop.id.WebCustomerID</method-param>
+            <method-param>java.lang.String</method-param>
+            <method-param>java.lang.String</method-param>
+            <method-param>java.lang.String</method-param>
          </method-params>
       </method>
    </method-permission>
@@ -567,6 +516,9 @@
          <method-name>storeAndSendConfirmation</method-name>
          <method-params>
             <method-param>org.nightlabs.jfire.webshop.id.WebCustomerID</method-param>
+            <method-param>java.lang.String</method-param>
+            <method-param>java.lang.String</method-param>
+            <method-param>java.lang.String</method-param>
          </method-params>
       </method>
    </method-permission>
@@ -736,49 +688,25 @@
       <method >
          <ejb-name>jfire/ejb/JFireWebShopBase/WebShop</ejb-name>
          <method-intf>Local</method-intf>
-         <method-name>checkPassword</method-name>
+         <method-name>tryCustomerLogin</method-name>
          <method-params>
             <method-param>org.nightlabs.jfire.webshop.id.WebCustomerID</method-param>
             <method-param>java.lang.String</method-param>
          </method-params>
       </method>
-      <trans-attribute>Supports</trans-attribute>
+      <trans-attribute>Required</trans-attribute>
    </container-transaction>
    <container-transaction >
       <method >
          <ejb-name>jfire/ejb/JFireWebShopBase/WebShop</ejb-name>
          <method-intf>Remote</method-intf>
-         <method-name>checkPassword</method-name>
+         <method-name>tryCustomerLogin</method-name>
          <method-params>
             <method-param>org.nightlabs.jfire.webshop.id.WebCustomerID</method-param>
             <method-param>java.lang.String</method-param>
          </method-params>
       </method>
-      <trans-attribute>Supports</trans-attribute>
-   </container-transaction>
-   <container-transaction >
-      <method >
-         <ejb-name>jfire/ejb/JFireWebShopBase/WebShop</ejb-name>
-         <method-intf>Local</method-intf>
-         <method-name>checkSecondPassword</method-name>
-         <method-params>
-            <method-param>java.lang.String</method-param>
-            <method-param>java.lang.String</method-param>
-         </method-params>
-      </method>
-      <trans-attribute>Supports</trans-attribute>
-   </container-transaction>
-   <container-transaction >
-      <method >
-         <ejb-name>jfire/ejb/JFireWebShopBase/WebShop</ejb-name>
-         <method-intf>Remote</method-intf>
-         <method-name>checkSecondPassword</method-name>
-         <method-params>
-            <method-param>java.lang.String</method-param>
-            <method-param>java.lang.String</method-param>
-         </method-params>
-      </method>
-      <trans-attribute>Supports</trans-attribute>
+      <trans-attribute>Required</trans-attribute>
    </container-transaction>
    <container-transaction >
       <method >
@@ -820,28 +748,6 @@
          <ejb-name>jfire/ejb/JFireWebShopBase/WebShop</ejb-name>
          <method-intf>Remote</method-intf>
          <method-name>hasEmailConfirmationExpired</method-name>
-         <method-params>
-            <method-param>org.nightlabs.jfire.webshop.id.WebCustomerID</method-param>
-         </method-params>
-      </method>
-      <trans-attribute>Supports</trans-attribute>
-   </container-transaction>
-   <container-transaction >
-      <method >
-         <ejb-name>jfire/ejb/JFireWebShopBase/WebShop</ejb-name>
-         <method-intf>Local</method-intf>
-         <method-name>hasSecondPasswordDateExpired</method-name>
-         <method-params>
-            <method-param>org.nightlabs.jfire.webshop.id.WebCustomerID</method-param>
-         </method-params>
-      </method>
-      <trans-attribute>Supports</trans-attribute>
-   </container-transaction>
-   <container-transaction >
-      <method >
-         <ejb-name>jfire/ejb/JFireWebShopBase/WebShop</ejb-name>
-         <method-intf>Remote</method-intf>
-         <method-name>hasSecondPasswordDateExpired</method-name>
          <method-params>
             <method-param>org.nightlabs.jfire.webshop.id.WebCustomerID</method-param>
          </method-params>
@@ -949,6 +855,9 @@
          <method-name>storeAndSendConfirmation</method-name>
          <method-params>
             <method-param>org.nightlabs.jfire.webshop.id.WebCustomerID</method-param>
+            <method-param>java.lang.String</method-param>
+            <method-param>java.lang.String</method-param>
+            <method-param>java.lang.String</method-param>
          </method-params>
       </method>
       <trans-attribute>Required</trans-attribute>
@@ -960,6 +869,9 @@
          <method-name>storeAndSendConfirmation</method-name>
          <method-params>
             <method-param>org.nightlabs.jfire.webshop.id.WebCustomerID</method-param>
+            <method-param>java.lang.String</method-param>
+            <method-param>java.lang.String</method-param>
+            <method-param>java.lang.String</method-param>
          </method-params>
       </method>
       <trans-attribute>Required</trans-attribute>

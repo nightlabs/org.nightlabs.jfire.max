@@ -4,10 +4,8 @@
 package org.nightlabs.jfire.web.webshop;
 
 import java.rmi.RemoteException;
-import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Date;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
 
@@ -23,7 +21,6 @@ import javax.mail.Message;
 import javax.mail.MessagingException;
 import javax.mail.Session;
 import javax.mail.Transport;
-import javax.mail.internet.AddressException;
 import javax.mail.internet.InternetAddress;
 import javax.mail.internet.MimeMessage;
 import javax.naming.InitialContext;
@@ -38,7 +35,6 @@ import org.nightlabs.jfire.prop.DataBlock;
 import org.nightlabs.jfire.prop.DataBlockGroup;
 import org.nightlabs.jfire.prop.datafield.RegexDataField;
 import org.nightlabs.jfire.prop.exception.DataBlockGroupNotFoundException;
-import org.nightlabs.jfire.prop.exception.DataFieldNotFoundException;
 import org.nightlabs.jfire.security.UserLocal;
 import org.nightlabs.jfire.trade.LegalEntity;
 import org.nightlabs.jfire.trade.Trader;
@@ -59,7 +55,7 @@ extends BaseSessionBeanImpl
 implements SessionBean
 {
 	/**
-	 * 
+	 * The serial version of this class.
 	 */
 	private static final long serialVersionUID = 1L;
 
@@ -117,17 +113,15 @@ implements SessionBean
 	 * @ejb.permission role-name="_Guest_"
 	 * @ejb.transaction type="Supports"
 	 */	
-	public List<WebCustomer> getWebCustomers(Set<WebCustomerID> webCustomerIDs, 
-			String[] fetchGroups, int maxFetchDepth) 
-			{
+	public List<WebCustomer> getWebCustomers(Set<WebCustomerID> webCustomerIDs, String[] fetchGroups, int maxFetchDepth)
+	{
 		PersistenceManager pm = getPersistenceManager();
 		try {
-			return NLJDOHelper.getDetachedObjectList(pm, webCustomerIDs, WebCustomer.class, 
-					fetchGroups, maxFetchDepth);
+			return NLJDOHelper.getDetachedObjectList(pm, webCustomerIDs, WebCustomer.class, fetchGroups, maxFetchDepth);
 		} finally {
 			pm.close();
-		}		
-			}
+		}
+	}
 
 	/**
 	 * @ejb.interface-method
@@ -183,42 +177,51 @@ implements SessionBean
 	}
 
 	/**
+	 * Create a new web customer.
+	 * 
+	 * @param webCustomerID The customer to create
+	 * @param password The plain text password for the customer
+	 * @param person The person for the new customer
+	 * @param get when set to <code>true</code> this method will return the
+	 * 		newly created customer
+	 * @param fetchGroups The fetch groups to use when <code>get</code> is set to <code>true</code>.
+	 * @param maxFetchDepth The fetch depth to use when <code>get</code> is set to <code>true</code>.
+	 * @return The newly created customer if the <code>get</code> parameter is <code>true</code> - 
+	 * 		<code>null</code> otherwise.
+	 * @throws DuplicateIDException If a customer with the same id already exists.
+	 * 
 	 * @ejb.interface-method
 	 * @ejb.permission role-name="_Guest_"
 	 * @ejb.transaction type="Required"
-	 */		
-	public WebCustomer createWebCustomer(
-			WebCustomerID webCustomerID, String password, Person person,
-			boolean get, String[] fetchGroups, int maxFetchDepth)
-	throws DuplicateIDException
+	 */
+	public WebCustomer createWebCustomer(WebCustomerID webCustomerID, String password, Person person, boolean get, String[] fetchGroups, int maxFetchDepth) throws DuplicateIDException
 	{
 		PersistenceManager pm = getPersistenceManager();
 		try {
 			if (isWebCustomerIDExisting(webCustomerID, pm))
-				throw new DuplicateIDException("webCustomerID \""+webCustomerID+"\" already exists!");
+				throw new DuplicateIDException("webCustomerID \"" + webCustomerID + "\" already exists!");
 
-			if (get) {
+			if(get) {
 				pm.getFetchPlan().setMaxFetchDepth(maxFetchDepth);
 				if (fetchGroups != null)
 					pm.getFetchPlan().setGroups(fetchGroups);
 			}
 			WebCustomer webCustomer = new WebCustomer(getOrganisationID(), webCustomerID.webCustomerID);
-			webCustomer.setPassword(password);
-			LegalEntity legalEntity;
-			// TODO the following lines work only locally - are we always in the core server here?!
+			webCustomer.setPassword(UserLocal.encryptPassword(password));
 			person = (Person) pm.makePersistent(person);
-			legalEntity = Trader.getTrader(pm).setPersonToLegalEntity(person, true);
-//			try {
-//			TradeManagerLocal tm = TradeManagerUtil.getLocalHome().create(); // TODO are we in the core server here?!
-//			legalEntity = tm.storePersonAsLegalEntity(person, false, 
-//			new String[] {FetchPlan.DEFAULT, Person.FETCH_GROUP_FULL_DATA}, 
-//			NLJDOHelper.MAX_FETCH_DEPTH_NO_LIMIT);
-//			} catch (Exception x) {
-//			throw new RuntimeException(x);
-//			}
+			LegalEntity legalEntity = Trader.getTrader(pm).setPersonToLegalEntity(person, true);
+			// try {
+			// TradeManagerLocal tm = TradeManagerUtil.getLocalHome().create(); //
+			// TODO are we in the core server here?!
+			// legalEntity = tm.storePersonAsLegalEntity(person, false,
+			// new String[] {FetchPlan.DEFAULT, Person.FETCH_GROUP_FULL_DATA},
+			// NLJDOHelper.MAX_FETCH_DEPTH_NO_LIMIT);
+			// } catch (Exception x) {
+			// throw new RuntimeException(x);
+			// }
 			webCustomer.setLegalEntity(legalEntity);
 			webCustomer = (WebCustomer) pm.makePersistent(webCustomer);
-			if (!get)
+			if(!get)
 				return null;
 			return (WebCustomer) pm.detachCopy(webCustomer);
 		} finally {
@@ -240,53 +243,140 @@ implements SessionBean
 		}
 		return true;
 	}
+
 	/**
+	 * Check if a customer can login. This is done by checking
+	 * the first and second password for the customer. If authentication
+	 * with the second password succeeds, the firsat password will be 
+	 * replaced by the second and the second password will be removed.
+	 * @param webCustomerID the customer to log in
+	 * @param password The plain text password to check
 	 * @ejb.interface-method
 	 * @ejb.permission role-name="_Guest_"
-	 * @ejb.transaction type="Supports"
+	 * @ejb.transaction type="Required"
 	 */
-	public boolean checkPassword(WebCustomerID webCustomerID, String password) 
+	public boolean tryCustomerLogin(WebCustomerID webCustomerID, String password) 
 	{
-		if(password == null ) return false;
+		logger.debug("Trying authentication for web customer: "+webCustomerID);
+		if(password == null) {
+			logger.debug("Customer authentication failed: No password given.");
+			return false;
+		}
+		String encryptedPassword = UserLocal.encryptPassword(password);
 		PersistenceManager pm = getPersistenceManager();
 		try {
 			WebCustomer wbc = (WebCustomer)pm.getObjectById(webCustomerID);
-			if(wbc.getPassword().equals(password)) {
-				setSecondPassword(webCustomerID, null);
+			if(wbc.getPassword().equals(encryptedPassword)) {
+				// login succeeded - reset second password
+				wbc.setSecondPassword(null);
+				wbc.setSecondPasswordDate(null);
+//				setSecondPassword(pm, webCustomerID, null);
+				logger.debug("Customer authentication successful.");
 				return true;
 			}
-			else return false;
-		}	
-		catch (JDOObjectNotFoundException e) {
-			e.printStackTrace();
-		} finally {
-			pm.close();
-		}	
-		return false;
-	}
-	/**
-	 * The second password that can be set if a customer triggers the lostPassword procedure
-	 * @ejb.interface-method
-	 * @ejb.permission role-name="_Guest_"
-	 * @ejb.transaction type="Supports"
-	 */
-	public boolean checkSecondPassword(String webCustomerID, String password) 
-	{
-		if(password == null ) return false;
-		PersistenceManager pm = getPersistenceManager();
-		WebCustomerID id = WebCustomerID.create(getOrganisationID(), webCustomerID);
-		try {
-			WebCustomer wbc = (WebCustomer)pm.getObjectById(id);
-			if(wbc.getSecondPassword().equals(password)) return true;
-			else return false;
-		}	
-		catch (JDOObjectNotFoundException e) {
-			e.printStackTrace();
+			else {
+				
+				// try second password:
+				String secondPassword = wbc.getSecondPassword();
+				if(secondPassword != null) {
+					logger.debug("Trying authentication (2nd pwd) for web customer: "+webCustomerID);
+					if(secondPassword.equals(encryptedPassword))  {
+						// login with second password succeeded - replace first password with second
+						logger.debug("Customer authentication (2nd pwd) successful.");
+						logger.debug("Replacing first password with second.");
+						wbc.setPassword(wbc.getSecondPassword());
+						wbc.setSecondPassword(null);
+//						setPassword(pm, webCustomerID, wbc.getSecondPassword());
+//						setSecondPassword(pm, webCustomerID, null);
+						return true;
+					} else { 
+						logger.debug("Customer authentication (2nd pwd) failed: Passwords don't match.");
+						return false;
+					}
+				} else {
+					logger.debug("No second password found");
+				}
+				
+				logger.debug("Customer authentication failed: Passwords don't match.");
+				return false;
+				
+			}
+		}	catch (JDOObjectNotFoundException e) {
+			logger.error("Customer authentication failed: Customer not found: "+webCustomerID, e);
 			return false;
 		} finally {
 			pm.close();
 		}	
 	}
+	
+//	/**
+//	 * @ejb.interface-method
+//	 * @ejb.permission role-name="_Guest_"
+//	 * @ejb.transaction type="Supports"
+//	 * @deprecated
+//	 */
+//	public boolean checkPassword(WebCustomerID webCustomerID, String password) 
+//	{
+//		logger.debug("Trying authentication for web customer: "+webCustomerID);
+//		if(password == null) {
+//			logger.debug("Customer authentication failed: No password given.");
+//			return false;
+//		}
+//		PersistenceManager pm = getPersistenceManager();
+//		try {
+//			WebCustomer wbc = (WebCustomer)pm.getObjectById(webCustomerID);
+//			if(wbc.getPassword().equals(password)) {
+//				// login succeeded - reset second password
+//				setSecondPassword(webCustomerID, null);
+//				logger.debug("Customer authentication successful.");
+//				return true;
+//			}
+//			else {
+//				logger.debug("Customer authentication failed: Passwords don't match.");
+//				return false;
+//			}
+//		}	catch (JDOObjectNotFoundException e) {
+//			logger.error("Customer authentication failed: Customer not found: "+webCustomerID, e);
+//			return false;
+//		} finally {
+//			pm.close();
+//		}	
+//	}
+	
+//	/**
+//	 * The second password that can be set if a customer triggers the lostPassword procedure
+//	 * @ejb.interface-method
+//	 * @ejb.permission role-name="_Guest_"
+//	 * @ejb.transaction type="Supports"
+//	 * @deprecated
+//	 */
+//	public boolean checkSecondPassword(WebCustomerID webCustomerID, String password) 
+//	{
+//		logger.debug("Trying authentication (2nd pwd) for web customer: "+webCustomerID);
+//		if(password == null) {
+//			logger.debug("Customer authentication (2nd pwd) failed: No password given.");
+//			return false;
+//		}
+//		PersistenceManager pm = getPersistenceManager();
+//		try {
+//			WebCustomer wbc = (WebCustomer)pm.getObjectById(webCustomerID);
+//			String secondPassword = wbc.getSecondPassword();
+//			if(secondPassword != null && secondPassword.equals(password))  {
+//				// TODO: login with second password succeeded - replace first password with second
+//				logger.debug("Customer authentication (2nd pwd) successful.");
+//				return true;
+//			} else { 
+//				logger.debug("Customer authentication (2nd pwd) failed: Passwords don't match.");
+//				return false;
+//			}
+//		}	catch (JDOObjectNotFoundException e) {
+//			logger.error("Customer authentication (2nd pwd) failed: Customer not found: "+webCustomerID, e);
+//			return false;
+//		} finally {
+//			pm.close();
+//		}	
+//	}
+	
 	/**
 	 * @ejb.interface-method
 	 * @ejb.permission role-name="_Guest_"
@@ -304,14 +394,14 @@ implements SessionBean
 			else return false;
 		}	
 		catch (JDOObjectNotFoundException e) {
-			e.printStackTrace();
+			logger.error("Customer not found: "+webCustomerID, e);
 			return false;
 		} finally {
 			pm.close();
 		}	
 	}
+	
 	/**
-	 * 
 	 * @ejb.interface-method
 	 * @ejb.permission role-name="_Guest_"
 	 * @ejb.transaction type="Supports"
@@ -331,36 +421,39 @@ implements SessionBean
 			pm.close();
 		}	
 	}
-	/**
-	 * The second password that can be set if a customer triggers the lostPassword procedure
-	 * @ejb.interface-method
-	 * @ejb.permission role-name="_Guest_"
-	 * @ejb.transaction type="Supports"
-	 */
-	public boolean hasSecondPasswordDateExpired(WebCustomerID webCustomerID)  
-	{
-		long expirationTime = 1000 * 60 * 60 * secondPasswordExpirationTimeInHours;
-		PersistenceManager pm = getPersistenceManager();
-		//	WebCustomerID id = WebCustomerID.create(getOrganisationID(), webCustomerID);
-		try {
-			WebCustomer wbc = (WebCustomer)pm.getObjectById(webCustomerID);
-			Date now = new Date();
-			if((now.getTime() - wbc.getSecondPasswordDate().getTime()) > expirationTime) {
-				// has expired so delete it!
-				setSecondPassword(webCustomerID, null);
-				return true;
-				}
-			else { 
-				// everythings ok so move the secondpassword to the primary field
-				setPassword(webCustomerID, wbc.getSecondPassword());
-				setSecondPassword(webCustomerID, null);
-				return false;
-				}
-		} finally {
-			pm.close();
-		}	
-
-	}
+	
+//	/**
+//	 * The second password that can be set if a customer triggers the lostPassword procedure
+//	 * @ejb.interface-method
+//	 * @ejb.permission role-name="_Guest_"
+//	 * @ejb.transaction type="Supports"
+//	 * @deprecated
+//	 */
+//	public boolean hasSecondPasswordDateExpired(WebCustomerID webCustomerID)  
+//	{
+//		long expirationTime = 1000 * 60 * 60 * secondPasswordExpirationTimeInHours;
+//		PersistenceManager pm = getPersistenceManager();
+//		//	WebCustomerID id = WebCustomerID.create(getOrganisationID(), webCustomerID);
+//		try {
+//			WebCustomer wbc = (WebCustomer)pm.getObjectById(webCustomerID);
+//			Date now = new Date();
+//			if((now.getTime() - wbc.getSecondPasswordDate().getTime()) > expirationTime) {
+//				// has expired so delete it!
+//				setSecondPassword(webCustomerID, null);
+//				return true;
+//			}
+//			else { 
+//				// everythings ok so move the secondpassword to the primary field
+//				setPassword(webCustomerID, wbc.getSecondPassword());
+//				setSecondPassword(webCustomerID, null);
+//				return false;
+//			}
+//		} finally {
+//			pm.close();
+//		}	
+//
+//	}
+	
 	/**
 	 * @ejb.interface-method
 	 * @ejb.permission role-name="_Guest_"
@@ -395,13 +488,13 @@ implements SessionBean
 			pm.close();
 		}		
 	}
+	
 	/**
 	 * @ejb.interface-method
 	 * @ejb.transaction type="Required"
 	 * @ejb.permission role-name="_Guest_"
 	 */	
-	public WebCustomer storeWebCustomer(WebCustomer webCustomer, boolean get, 
-			String[] fetchGroups, int maxFetchDepth) 
+	public WebCustomer storeWebCustomer(WebCustomer webCustomer, boolean get, String[] fetchGroups, int maxFetchDepth)
 	{
 		PersistenceManager pm = getPersistenceManager();
 		try {
@@ -410,6 +503,7 @@ implements SessionBean
 			pm.close();
 		}
 	}
+	
 	/**
 	 * This will send E-mails to every address found for that webCustomers 
 	 * @param webCustomer
@@ -419,7 +513,7 @@ implements SessionBean
 	 * @throws DataBlockGroupNotFoundException
 	 *
 	 */
-	public boolean sendBlockGroupMails(WebCustomerID webCustomerID, String subject ,String message) throws DataBlockGroupNotFoundException
+	public boolean sendBlockGroupMails(WebCustomerID webCustomerID, String subject, String message)
 	{
 		WebCustomer webCustomer = getWebCustomer(
 				webCustomerID, 
@@ -431,21 +525,28 @@ implements SessionBean
 		);
 
 		DataBlockGroup dataBlockGroupInternet = null;
-		dataBlockGroupInternet = webCustomer.getLegalEntity().getPerson().getDataBlockGroup(PersonStruct.INTERNET);
-		RegexDataField mailAddress = null;
+		try {
+			dataBlockGroupInternet = webCustomer.getLegalEntity().getPerson().getDataBlockGroup(PersonStruct.INTERNET);
+		} catch(DataBlockGroupNotFoundException e) {
+			logger.error("Cannot send email - no Internet Block Group found for customer: "+webCustomerID);
+			return false;
+		}
+		
 		// Now sending mails to every E-Mail address found
 		boolean atLeastOneMailSent = false;
 		//String newPassword = UserLocal.createPassword(8,10);
 		for (DataBlock dataBlock : dataBlockGroupInternet.getDataBlocks()) {
 			try {
-				mailAddress = (RegexDataField)dataBlock.getDataField(PersonStruct.INTERNET_EMAIL);
+				RegexDataField mailAddress = (RegexDataField)dataBlock.getDataField(PersonStruct.INTERNET_EMAIL);
 				sendMail(mailAddress.getText(), subject, message);
 				atLeastOneMailSent = true;
 			} catch (Exception e) {
-				// hoping that at least one mail is going out
-				e.printStackTrace();
+				logger.error("Sending email failed for customer: "+webCustomerID, e);
 			}
 		}
+		
+		if(!atLeastOneMailSent)
+			logger.error("No email could be sent to customer: "+webCustomerID);
 		
 		return atLeastOneMailSent;
 	}
@@ -457,20 +558,19 @@ implements SessionBean
 	 */
 	public void sendMail(String recipientAddress, String subject, String message) throws NamingException, MessagingException
 	{
-			InitialContext ctx = new InitialContext();
-			Session mailSession = (Session) ctx.lookup("java:/Mail");
-			Message mailMessage = new MimeMessage(mailSession);
-				mailMessage.setSubject(subject);
-				mailMessage.setRecipient(Message.RecipientType.TO,
-						new InternetAddress(recipientAddress));
-				mailMessage.setText(message);
-				Transport.send(mailMessage);
+		InitialContext ctx = new InitialContext();
+		Session mailSession = (Session) ctx.lookup("java:/Mail");
+		Message mailMessage = new MimeMessage(mailSession);
+		mailMessage.setSubject(subject);
+		mailMessage.setRecipient(Message.RecipientType.TO, new InternetAddress(recipientAddress));
+		mailMessage.setText(message);
+		Transport.send(mailMessage);
 
-			ctx.close();
-		
+		ctx.close();
 	}
+	
 	/**
-	 * Creates,sends and if it succeeds stores it with an expiration Date.
+	 * Creates, sends and if it succeeds stores it with an expiration Date.
 	 * @throws  
 	 * @ejb.interface-method
 	 * @ejb.transaction type="Required"
@@ -478,76 +578,88 @@ implements SessionBean
 	 */	
 	public void createPassword(WebCustomerID webCustomerID) throws DataBlockGroupNotFoundException
 	{
-		String newPassword = UserLocal.createPassword(8,10);
+		String newPassword = UserLocal.createHumanPassword(8,10);
 		String subject =  "New Password for the JFire-demoshop";
 		String message = "This is your new Password: "+ newPassword;
 		// sending the mail
-		boolean atLeastOneMailSent = sendBlockGroupMails(webCustomerID,subject,message);
-		if(atLeastOneMailSent)
-			setSecondPassword(webCustomerID,UserLocal.encryptPassword(newPassword));
+		boolean atLeastOneMailSent = sendBlockGroupMails(webCustomerID, subject, message);
+		if(atLeastOneMailSent) {
+			PersistenceManager pm = getPersistenceManager();
+			try {
+				WebCustomer wbc = (WebCustomer)pm.getObjectById(webCustomerID);
+				wbc.setSecondPassword(UserLocal.encryptPassword(newPassword));
+				wbc.setSecondPasswordDate(new Date());
+//				setSecondPassword(pm, webCustomerID, UserLocal.encryptPassword(newPassword));
+			} finally {
+				pm.close();
+			}	
+		}
 	}
 	
-	public void setPassword(WebCustomerID webCustomerID, String encryptedPassword)
-	{
-		PersistenceManager pm = getPersistenceManager();
-		try {
-			WebCustomer webCustomer = (WebCustomer)pm.getObjectById(webCustomerID);
-			webCustomer.setPassword(encryptedPassword);
-		} finally {
-			pm.close();
-		}	
-	}
-	public void setSecondPassword(WebCustomerID webCustomerID,String encryptedPassword)
-	{
-		PersistenceManager pm = getPersistenceManager();
-		try {
-			WebCustomer webCustomer = (WebCustomer)pm.getObjectById(webCustomerID);
-			webCustomer.setSecondPassword(encryptedPassword);
-			// if the password doesnt get erased we have to set the current Time for a possible expiration
-			if(encryptedPassword != null) 
-				webCustomer.setSecondPasswordDate(new Date());
-			else 
-				webCustomer.setSecondPasswordDate(null);
-		} finally {
-			pm.close();
-		}	
-	}
+//	private static void setPassword(PersistenceManager pm, WebCustomerID webCustomerID, String encryptedPassword)
+//	{
+////		PersistenceManager pm = getPersistenceManager();
+////		try {
+//			logger.debug("Setting customer password");
+//			WebCustomer webCustomer = (WebCustomer)pm.getObjectById(webCustomerID);
+//			webCustomer.setPassword(encryptedPassword);
+////		} finally {
+////			pm.close();
+////		}	
+//	}
+	
+//	private static void setSecondPassword(PersistenceManager pm, WebCustomerID webCustomerID, String encryptedPassword)
+//	{
+////		PersistenceManager pm = getPersistenceManager();
+////		try {
+//			logger.debug("Setting second customer password");
+//			WebCustomer webCustomer = (WebCustomer)pm.getObjectById(webCustomerID);
+//			webCustomer.setSecondPassword(encryptedPassword);
+//			// if the password doesnt get erased we have to set the current Time for a possible expiration
+//			if(encryptedPassword != null) 
+//				webCustomer.setSecondPasswordDate(new Date());
+//			else 
+//				webCustomer.setSecondPasswordDate(null);
+////		} finally {
+////			pm.close();
+////		}	
+//	}
+	
 	/**
 	 * @ejb.interface-method
 	 * @ejb.transaction type="Required"
 	 * @ejb.permission role-name="_Guest_"
 	 */	
-	public void storeAndSendConfirmation(WebCustomerID webCustomerID)
+	public void storeAndSendConfirmation(WebCustomerID webCustomerID, String subject, String messageText, String confirmationString) throws Exception
 	{
-		try {
+//		try {
 			// the confirmation String is random encrypted String
-			String randomEncrypted = UserLocal.encryptPassword(UserLocal.createPassword(8,10));
-			String subject = "Account confirmation for "+ webCustomerID.webCustomerID +" at the JFire demo webshop";
-			// very temporarly
-			String message = "Hello "+ webCustomerID.webCustomerID +
-			"\n Thank you for registering at the JFire demo shop. Your account is created and must be activated before you can use it."+
-			"To activate the account click on the following link or copy-paste it in your browser: http://127.0.0.1:8080/jfire-webshop/customer/?customerId="+webCustomerID.webCustomerID +"&action=confirm&cf="+ randomEncrypted;  
+//			String randomEncrypted = UserLocal.encryptPassword(UserLocal.createHumanPassword(8, 10));
+//			String subject = "Account confirmation for "+ webCustomerID.webCustomerID +" at the JFire demo webshop";
+//			// very temporarly
+//			String message = "Hello "+ webCustomerID.webCustomerID +
+//			"\n Thank you for registering at the JFire demo shop. Your account is created and must be activated before you can use it."+
+//			"To activate the account click on the following link or copy-paste it in your browser: http://127.0.0.1:8080/jfire-webshop/customer/?customerId="+webCustomerID.webCustomerID +"&action=confirm&cf="+ randomEncrypted;  
 
-			if(sendBlockGroupMails(webCustomerID,subject,message) == true) {
-				// Mail has been sent succesfully 
-				setConfirmationUrl(webCustomerID, randomEncrypted);
-			}		 
-		} catch (Exception e) {
-			e.printStackTrace();
-		}
+			if(sendBlockGroupMails(webCustomerID, subject, messageText))
+				// At least 1 mail has been sent succesfully
+				setConfirmationString(webCustomerID, confirmationString);
+			else
+				// sending all mails failed
+				throw new Exception("Sending mail failed");
+//		} catch (Exception e) {
+//			e.printStackTrace();
+//		}
 	}
-	public void setConfirmationUrl(WebCustomerID webCustomerID,String encryptedConfirmation)
+	
+	public void setConfirmationString(WebCustomerID webCustomerID, String confirmationString)
 	{
 		PersistenceManager pm = getPersistenceManager();
 		try {
 			WebCustomer wbc = (WebCustomer)pm.getObjectById(webCustomerID);
 			// if the password doesnt get erased we have to set the current Time for a possible expiration
-			wbc.setConfirmationString(encryptedConfirmation);
-			if(encryptedConfirmation != null) {
-				wbc.setConfirmationStringDate(new Date());
-			}
-			else 
-				wbc.setConfirmationStringDate(null);
+			wbc.setConfirmationString(confirmationString);
+			wbc.setConfirmationStringDate(confirmationString == null ? null : new Date());
 		} finally {
 			pm.close();
 		}	

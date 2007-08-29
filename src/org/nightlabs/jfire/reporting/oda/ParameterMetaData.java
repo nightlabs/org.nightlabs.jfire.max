@@ -42,7 +42,7 @@ public class ParameterMetaData implements NamedParameterMetaData, Serializable {
 		private String dataTypeName;		
 		private int precision;
 		private int scale;
-		private int nullable;
+		private int nullable = IParameterMetaData.parameterNullable;
 		
 		private String realDataTypeName;
 		

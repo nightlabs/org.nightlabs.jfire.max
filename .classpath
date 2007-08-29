@@ -26,7 +26,7 @@
 	<classpathentry kind="lib" path="dist/birt/lib/js.jar"/>
 	<classpathentry kind="lib" path="dist/birt/lib/engineapi.jar" sourcepath="dist/birt/lib/birt-source-2_2_0.zip"/>
 	<classpathentry kind="lib" path="dist/birt/lib/coreapi.jar" sourcepath="dist/birt/lib/birt-source-2_2_0.zip"/>
-	<classpathentry kind="lib" path="dist/birt/lib/oda.jar"/>
+	<classpathentry kind="lib" path="dist/birt/lib/oda.jar" sourcepath="/org.eclipse.datatools.connectivity.oda"/>
 	<classpathentry kind="var" path="WORKSPACE/JFireScripting/dist/JFireScripting.jar" sourcepath="/WORKSPACE/JFireScripting"/>
 	<classpathentry kind="lib" path="dist/birt/lib/modelapi.jar"/>
 	<classpathentry kind="var" path="WORKSPACE/NightLabsJDO/dist/NightLabsJDO.jar" sourcepath="WORKSPACE/NightLabsJDO/src"/>

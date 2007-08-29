@@ -194,10 +194,10 @@ public class RenderManager {
 			} finally {
 				JFireReportingHelper.close();
 			}
-			if (task.getErrors().size() > 0) {
-				Throwable t = (Throwable) task.getErrors().get(0);
-				throw new RenderReportException("RunAndRenderTask finished with errors.", t);
-			}
+//			if (task.getErrors().size() > 0) {
+//				Throwable t = (Throwable) task.getErrors().get(0);
+//				throw new RenderReportException("RunAndRenderTask finished with errors.", t);
+//			}
 			return result;
 			
 		} finally {

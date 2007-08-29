@@ -28,6 +28,7 @@ package org.nightlabs.jfire.reporting;
 
 import java.io.File;
 import java.io.Serializable;
+import java.util.logging.Level;
 
 import javax.naming.InitialContext;
 import javax.naming.NameAlreadyBoundException;
@@ -120,8 +121,10 @@ public class ReportingManagerFactory implements Serializable {
 				hc.setImageHandler( imageHandler );
 //				Associate the configuration with the HTML output format.
 				config.setEmitterConfiguration( HTMLRenderOption.OUTPUT_FORMAT_HTML, hc );			
+				config.setLogConfig(new File(JFireReportingEAR.getEARDir(), "log").getAbsolutePath(), Level.ALL);
 				reportEngine = new ReportEngine(config);
 				reportEngine.getConfig().setResourceLocator(new ServerResourceLocator());
+//				reportEngine.setLogger();
 			} catch (Exception e) {
 				logger.error("Could not create ReportEngine", e);
 				reportEngine = null;

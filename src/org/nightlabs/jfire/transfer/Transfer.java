@@ -32,6 +32,7 @@ import java.util.Map;
 import java.util.Set;
 
 import javax.jdo.JDOHelper;
+import javax.jdo.PersistenceManager;
 
 import org.nightlabs.jdo.ObjectIDUtil;
 import org.nightlabs.jfire.idgenerator.IDGenerator;
@@ -49,10 +50,22 @@ import org.nightlabs.jfire.security.User;
  * @jdo.create-objectid-class field-order="organisationID, transferTypeID, transferID"
  *
  * @jdo.inheritance strategy="new-table"
+ *
+ * @jdo.fetch-group name="Transfer.container" fields="container"
+ * @jdo.fetch-group name="Transfer.from" fields="from"
+ * @jdo.fetch-group name="Transfer.to" fields="to"
+ * @jdo.fetch-group name="Transfer.initiator" fields="initiator"
+ * @jdo.fetch-group name="Transfer.this" fields="container, from, to, initiator"
  */
 public abstract class Transfer
-	implements Serializable
+implements Serializable
 {
+	public static final String FETCH_GROUP_CONTAINER = "Transfer.container";
+	public static final String FETCH_GROUP_FROM = "Transfer.from";
+	public static final String FETCH_GROUP_TO = "Transfer.to";
+	public static final String FETCH_GROUP_INITIATOR = "Transfer.initiator";
+	public static final String FETCH_GROUP_THIS_TRANSFER = "Transfer.this";
+
 	/**
 	 * @jdo.field primary-key="true"
 	 * @jdo.column length="100"
@@ -287,8 +300,7 @@ public abstract class Transfer
 	 */
 	public void bookTransfer(User user, Set<Anchor> involvedAnchors)
 	{
-		if (JDOHelper.getPersistenceManager(this) == null)
-			throw new IllegalStateException("This Transfer has not yet been persisted or it has been detached!");
+		getPersistenceManager(); // ensure we're attached
 
 		from.bookTransfer(user, this, involvedAnchors);
 		to.bookTransfer(user, this, involvedAnchors);
@@ -296,10 +308,18 @@ public abstract class Transfer
 
 	public void rollbackTransfer(User user, Set<Anchor> involvedAnchors)
 	{
-		if (JDOHelper.getPersistenceManager(this) == null)
-			throw new IllegalStateException("This Transfer has not yet been persisted or it has been detached!");
+		getPersistenceManager(); // ensure we're attached
 
 		from.rollbackTransfer(user, this, involvedAnchors);
 		to.rollbackTransfer(user, this, involvedAnchors);
+	}
+
+	protected PersistenceManager getPersistenceManager()
+	{
+		PersistenceManager pm = JDOHelper.getPersistenceManager(this);
+		if (pm == null)
+			throw new IllegalStateException("This Transfer has not yet been persisted or it has been detached! Cannot obtain PersistenceManager!");
+
+		return pm;
 	}
 }

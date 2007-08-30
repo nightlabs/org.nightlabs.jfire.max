@@ -94,6 +94,8 @@ import org.nightlabs.jfire.store.deliver.id.ModeOfDeliveryFlavourID;
 import org.nightlabs.jfire.store.id.DeliveryNoteID;
 import org.nightlabs.jfire.store.id.DeliveryNoteLocalID;
 import org.nightlabs.jfire.store.id.ProductTypeID;
+import org.nightlabs.jfire.store.query.ProductTransferIDQuery;
+import org.nightlabs.jfire.store.query.ProductTransferQuery;
 import org.nightlabs.jfire.store.search.ProductTypeQuery;
 import org.nightlabs.jfire.trade.Article;
 import org.nightlabs.jfire.trade.ArticleContainer;
@@ -112,6 +114,7 @@ import org.nightlabs.jfire.trade.id.OfferID;
 import org.nightlabs.jfire.trade.id.OrderID;
 import org.nightlabs.jfire.trade.jbpm.ProcessDefinitionAssignment;
 import org.nightlabs.jfire.transfer.id.AnchorID;
+import org.nightlabs.jfire.transfer.id.TransferID;
 
 /**
  *
@@ -1802,6 +1805,77 @@ implements SessionBean
 		PersistenceManager pm = getPersistenceManager();
 		try {
 			return NLJDOHelper.storeJDO(pm, repository, get, fetchGroups, maxFetchDepth);
+		} finally {
+			pm.close();
+		}
+	}
+
+	/**
+	 * This method is faster than {@link #getProductTransferIDs(Collection)}, because
+	 * it directly queries object-ids.
+	 *
+	 * @param productTransferIDQuery The query to execute.
+	 *
+	 * @ejb.interface-method
+	 * @ejb.transaction type="Supports"
+	 * @ejb.permission role-name="_Guest_"
+	 */
+	public List<TransferID> getProductTransferIDs(ProductTransferIDQuery productTransferIDQuery)
+	{
+		PersistenceManager pm = getPersistenceManager();
+		try {
+			productTransferIDQuery.setPersistenceManager(pm);
+			return new ArrayList<TransferID>(productTransferIDQuery.getResult());
+		} finally {
+			pm.close();
+		}
+	}
+
+	/**
+	 * Unlike {@link #getProductTransferIDs(ProductTransferIDQuery)}, this method allows
+	 * for cascading multiple queries. It is slower than {@link #getProductTransferIDs(ProductTransferIDQuery)}
+	 * and should therefore only be used, if it's essentially necessary.
+	 *
+	 * @param productTransferQueries A <code>Collection</code> of {@link ProductTransferQuery}. They will be executed
+	 *		in the given order (if it's a <code>List</code>) and the result of the previous query will be passed as candidates
+	 *		to the next query.
+	 *
+	 * @ejb.interface-method
+	 * @ejb.transaction type="Supports"
+	 * @ejb.permission role-name="_Guest_"
+	 */
+	public List<TransferID> getProductTransferIDs(Collection<ProductTransferQuery> productTransferQueries)
+	{
+		PersistenceManager pm = getPersistenceManager();
+		try {
+			Collection<ProductTransfer> productTransfers = null;
+			for (ProductTransferQuery productTransferQuery : productTransferQueries) {
+				productTransferQuery.setPersistenceManager(pm);
+				productTransferQuery.setCandidates(productTransfers);
+				productTransfers = productTransferQuery.getResult();
+			}
+
+			return NLJDOHelper.getObjectIDList(productTransfers);
+		} finally {
+			pm.close();
+		}
+	}
+
+	/**
+	 * @ejb.interface-method
+	 * @ejb.transaction type="Supports"
+	 * @ejb.permission role-name="_Guest_"
+	 */
+	public List<ProductTransfer> getProductTransfers(Collection<TransferID> productTransferIDs, String[] fetchGroups, int maxFetchDepth)
+	{
+		PersistenceManager pm = getPersistenceManager();
+		try {
+			
+			// TODO temporary test!
+			if (!productTransferIDs.isEmpty())
+				((ProductTransfer)pm.getObjectById(productTransferIDs.iterator().next())).getProductTypeID2productCountMap();
+
+			return NLJDOHelper.getDetachedObjectList(pm, productTransferIDs, ProductTransfer.class, fetchGroups, maxFetchDepth);
 		} finally {
 			pm.close();
 		}

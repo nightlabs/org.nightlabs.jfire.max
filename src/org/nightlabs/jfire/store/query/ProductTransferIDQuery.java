@@ -3,10 +3,10 @@ package org.nightlabs.jfire.store.query;
 import javax.jdo.Query;
 
 import org.nightlabs.annotation.Implement;
-import org.nightlabs.jfire.store.ProductTransfer;
+import org.nightlabs.jfire.transfer.id.TransferID;
 
-public class ProductTransferQuery
-extends AbstractProductTransferQuery<ProductTransfer>
+public class ProductTransferIDQuery
+extends AbstractProductTransferQuery<TransferID>
 {
 	private static final long serialVersionUID = 1L;
 
@@ -14,6 +14,6 @@ extends AbstractProductTransferQuery<ProductTransfer>
 	@Override
 	protected void setQueryResult(Query q)
 	{
-		// nothing to do
+		q.setResult("JDOHelper.getObjectId(this)");
 	}
 }

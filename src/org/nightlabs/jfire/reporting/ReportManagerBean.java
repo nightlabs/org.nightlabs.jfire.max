@@ -26,7 +26,6 @@
 
 package org.nightlabs.jfire.reporting;
 
-import java.io.File;
 import java.rmi.RemoteException;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -90,7 +89,6 @@ import org.nightlabs.jfire.scripting.ScriptRegistry;
 import org.nightlabs.jfire.scripting.ScriptingIntialiserException;
 import org.nightlabs.jfire.scripting.id.ScriptRegistryItemID;
 import org.nightlabs.jfire.servermanager.JFireServerManager;
-import org.nightlabs.util.Utils;
 import org.nightlabs.version.MalformedVersionException;
 
 /**
@@ -859,7 +857,10 @@ implements SessionBean
 			if (fetchGroups != null)
 				pm.getFetchPlan().setGroups(fetchGroups);
 			Object result = q.executeWithMap(params);
-			return NLJDOHelper.getDetachedQueryResult(pm, result);
+			if (result instanceof Collection)
+				return NLJDOHelper.getDetachedQueryResultAsList(pm, (Collection<?>)result);
+			else
+				return NLJDOHelper.getDetachedQueryResultAsList(pm, result);
 		} finally {
 			pm.close();
 		}

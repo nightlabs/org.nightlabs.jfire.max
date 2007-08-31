@@ -25,10 +25,10 @@ extends ProductTypeQuery
 		Query q = getPersistenceManager().newQuery(getPersistenceManager().getExtent(
 				SimpleProductType.class, false));
 		
-		logger.info("Vars:");
-		logger.info(getVars().toString());
-		logger.info("Filter:");
-		logger.info(getFilter().toString());
+		logger.debug("Vars:");
+		logger.debug(getVars().toString());
+		logger.debug("Filter:");
+		logger.debug(getFilter().toString());
 		
 		q.setFilter(getFilter().toString());
 		q.declareVariables(getVars().toString());

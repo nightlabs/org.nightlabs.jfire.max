@@ -43,13 +43,13 @@ extends AbstractActionHandler
 		}
 
 		String transitionName = ActionHandlerNodeEnter.getLastNodeEnterTransitionName();
-		Logger.getLogger(ActionHandlerSendOffer.class).info("****************************************");
-		Logger.getLogger(ActionHandlerSendOffer.class).info("****************************************");
-		Logger.getLogger(ActionHandlerSendOffer.class).info("****************************************");
-		Logger.getLogger(ActionHandlerSendOffer.class).info("****************************************");
-		Logger.getLogger(ActionHandlerSendOffer.class).info("****************************************");
-		Logger.getLogger(ActionHandlerSendOffer.class).info("****************************************");
-		Logger.getLogger(ActionHandlerSendOffer.class).info("**************************** leaving via: " + transitionName);
+//		Logger.getLogger(ActionHandlerSendOffer.class).info("****************************************");
+//		Logger.getLogger(ActionHandlerSendOffer.class).info("****************************************");
+//		Logger.getLogger(ActionHandlerSendOffer.class).info("****************************************");
+//		Logger.getLogger(ActionHandlerSendOffer.class).info("****************************************");
+//		Logger.getLogger(ActionHandlerSendOffer.class).info("****************************************");
+//		Logger.getLogger(ActionHandlerSendOffer.class).info("****************************************");
+		Logger.getLogger(ActionHandlerSendOffer.class).debug("**************************** leaving via: " + transitionName);
 		executionContext.leaveNode(transitionName);
 	}
 }

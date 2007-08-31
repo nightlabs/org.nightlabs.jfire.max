@@ -100,6 +100,8 @@ import org.nightlabs.jfire.accounting.priceconfig.FetchGroupsPriceConfig;
 import org.nightlabs.jfire.accounting.priceconfig.PriceConfigUtil;
 import org.nightlabs.jfire.accounting.priceconfig.id.PriceConfigID;
 import org.nightlabs.jfire.accounting.query.InvoiceQuery;
+import org.nightlabs.jfire.accounting.query.MoneyTransferIDQuery;
+import org.nightlabs.jfire.accounting.query.MoneyTransferQuery;
 import org.nightlabs.jfire.base.BaseSessionBeanImpl;
 import org.nightlabs.jfire.idgenerator.IDGenerator;
 import org.nightlabs.jfire.idgenerator.IDNamespaceDefault;
@@ -127,6 +129,7 @@ import org.nightlabs.jfire.trade.id.OfferID;
 import org.nightlabs.jfire.trade.id.OrderID;
 import org.nightlabs.jfire.trade.jbpm.ProcessDefinitionAssignment;
 import org.nightlabs.jfire.transfer.id.AnchorID;
+import org.nightlabs.jfire.transfer.id.TransferID;
 
 /**
  * @author Alexander Bieber - alex[AT]nightlabs[DOT]de
@@ -2704,4 +2707,71 @@ public abstract class AccountingManagerBean
 			pm.close();
 		}
 	}
+
+	/**
+	 * This method is faster than {@link #getMoneyTransferIDs(Collection)}, because
+	 * it directly queries object-ids.
+	 *
+	 * @param productTransferIDQuery The query to execute.
+	 *
+	 * @ejb.interface-method
+	 * @ejb.transaction type="Supports"
+	 * @ejb.permission role-name="_Guest_"
+	 */
+	public List<TransferID> getMoneyTransferIDs(MoneyTransferIDQuery productTransferIDQuery)
+	{
+		PersistenceManager pm = getPersistenceManager();
+		try {
+			productTransferIDQuery.setPersistenceManager(pm);
+			return new ArrayList<TransferID>(productTransferIDQuery.getResult());
+		} finally {
+			pm.close();
+		}
+	}
+
+	/**
+	 * Unlike {@link #getMoneyTransferIDs(MoneyTransferIDQuery)}, this method allows
+	 * for cascading multiple queries. It is slower than {@link #getMoneyTransferIDs(MoneyTransferIDQuery)}
+	 * and should therefore only be used, if it's essentially necessary.
+	 *
+	 * @param productTransferQueries A <code>Collection</code> of {@link MoneyTransferQuery}. They will be executed
+	 *		in the given order (if it's a <code>List</code>) and the result of the previous query will be passed as candidates
+	 *		to the next query.
+	 *
+	 * @ejb.interface-method
+	 * @ejb.transaction type="Supports"
+	 * @ejb.permission role-name="_Guest_"
+	 */
+	public List<TransferID> getMoneyTransferIDs(Collection<MoneyTransferQuery> productTransferQueries)
+	{
+		PersistenceManager pm = getPersistenceManager();
+		try {
+			Collection<MoneyTransfer> productTransfers = null;
+			for (MoneyTransferQuery productTransferQuery : productTransferQueries) {
+				productTransferQuery.setPersistenceManager(pm);
+				productTransferQuery.setCandidates(productTransfers);
+				productTransfers = productTransferQuery.getResult();
+			}
+
+			return NLJDOHelper.getObjectIDList(productTransfers);
+		} finally {
+			pm.close();
+		}
+	}
+
+	/**
+	 * @ejb.interface-method
+	 * @ejb.transaction type="Supports"
+	 * @ejb.permission role-name="_Guest_"
+	 */
+	public List<MoneyTransfer> getMoneyTransfers(Collection<TransferID> productTransferIDs, String[] fetchGroups, int maxFetchDepth)
+	{
+		PersistenceManager pm = getPersistenceManager();
+		try {
+			return NLJDOHelper.getDetachedObjectList(pm, productTransferIDs, MoneyTransfer.class, fetchGroups, maxFetchDepth);
+		} finally {
+			pm.close();
+		}
+	}
+
 }

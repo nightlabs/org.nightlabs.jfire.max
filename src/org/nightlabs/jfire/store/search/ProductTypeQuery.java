@@ -137,10 +137,10 @@ extends JDOQuery<P>
 						")");
 		}
 		
-		logger.info("Vars:");
-		logger.info(vars.toString());
-		logger.info("Filter:");
-		logger.info(filter.toString());
+		logger.debug("Vars:");
+		logger.debug(vars.toString());
+		logger.debug("Filter:");
+		logger.debug(filter.toString());
 		
 		q.setFilter(filter.toString());
 		q.declareVariables(vars.toString());

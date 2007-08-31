@@ -118,7 +118,7 @@ implements StoreCallback
 //		localOrganisationID = LocalOrganisation.getLocalOrganisation(pm).getOrganisationID();
 //		localOrganisation = localOrganisationID.equals(getOrganisationID());
 	}
-
+	
 	/**
 	 * @jdo.field persistence-modifier="persistent"
 	 */

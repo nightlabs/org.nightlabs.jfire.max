@@ -28,7 +28,7 @@ public abstract class AbstractDeliveryController extends AbstractTransferControl
 			if (deliverBeginServerResults.size() != getTransferDatas().size())
 				throw new IllegalStateException("storeManager.deliverBegin(List) returned an invalid count of results! deliverBeginServerResults.size()=" + deliverBeginServerResults.size() + "; getTransferDatas().size()="+getTransferDatas().size());
 
-			for (Iterator itD = getTransferDatas().iterator(), itR = deliverBeginServerResults.iterator(); itD.hasNext(); ) {
+			for (Iterator<?> itD = getTransferDatas().iterator(), itR = deliverBeginServerResults.iterator(); itD.hasNext(); ) {
 				DeliveryData deliveryData = (DeliveryData) itD.next();
 				DeliveryResult deliverBeginServerResult = (DeliveryResult) itR.next();
 				deliveryData.getDelivery().setDeliverBeginServerResult(deliverBeginServerResult);
@@ -51,23 +51,16 @@ public abstract class AbstractDeliveryController extends AbstractTransferControl
 		List<DeliveryResult> serverDeliverDoWorkResults = null;
 		try {
 			List<DeliveryResult> clientDeliverDoWorkResults = getLastStageResults();
-			//			for (Iterator itD = getTransferDatas().iterator(); itD.hasNext(); )
-			//				((DeliveryData)itD.next()).prepareUpload();
-			//			try {
 			serverDeliverDoWorkResults = getStoreManager().deliverDoWork(getTransferIDs(), clientDeliverDoWorkResults, isForceRollback());
-			//			} finally {
-			//				for (Iterator itD = getTransferDatas().iterator(); itD.hasNext(); )
-			//					((DeliveryData)itD.next()).restoreAfterUpload();
-			//			}
 
 			if (serverDeliverDoWorkResults.size() != getTransferDatas().size())
 				throw new IllegalStateException(
 						"storeManager.deliverDoWork(List, List, boolean) returned an invalid count of results! deliverDoWorkServerResults.size()="
 								+ serverDeliverDoWorkResults.size() + "; deliveryIDs.size()=" + getTransferIDs().size() + "; getTransferDatas().size()=" + getTransferDatas().size());
 
-			Iterator itR = serverDeliverDoWorkResults.iterator();
+			Iterator<DeliveryResult> itR = serverDeliverDoWorkResults.iterator();
 			for (DeliveryData deliveryData : getTransferDatas()) {
-				DeliveryResult deliverDoWorkServerResult = (DeliveryResult) itR.next();
+				DeliveryResult deliverDoWorkServerResult = itR.next();
 				deliveryData.getDelivery().setDeliverDoWorkServerResult(deliverDoWorkServerResult);
 			}
 		} catch (DeliveryException x) {
@@ -88,19 +81,12 @@ public abstract class AbstractDeliveryController extends AbstractTransferControl
 		
 		List<DeliveryResult> deliverEndServerResults = null;
 		try {
-//			for (Iterator itD = getTransferDatas().iterator(); itD.hasNext(); )
-//				((DeliveryData)itD.next()).prepareUpload();
-//			try {
 			deliverEndServerResults = getStoreManager().deliverEnd(getTransferIDs(), getLastStageResults(), isForceRollback());
-//			} finally {
-//				for (Iterator itD = getTransferDatas().iterator(); itD.hasNext(); )
-//					((DeliveryData)itD.next()).restoreAfterUpload();
-//			}
 
 			if (deliverEndServerResults.size() != getTransferDatas().size())
 				throw new IllegalStateException("storeManager.deliverEnd(List, List, boolean) returned an invalid count of results! deliverEndServerResults.size()=" + deliverEndServerResults.size() + "; deliveryIDs.size()=" + getTransferIDs().size() + "; getTransferDatas().size()="+getTransferDatas().size());
 
-			for (Iterator itD = getTransferDatas().iterator(), itR = deliverEndServerResults.iterator(); itD.hasNext(); ) {
+			for (Iterator<?> itD = getTransferDatas().iterator(), itR = deliverEndServerResults.iterator(); itD.hasNext(); ) {
 				DeliveryData deliveryData = (DeliveryData) itD.next();
 				DeliveryResult deliverEndServerResult = (DeliveryResult) itR.next();
 				deliveryData.getDelivery().setDeliverEndServerResult(deliverEndServerResult);

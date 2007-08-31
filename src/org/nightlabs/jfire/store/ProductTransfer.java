@@ -35,12 +35,10 @@ import java.util.Map;
 import java.util.Set;
 
 import javax.jdo.FetchPlan;
-import javax.jdo.JDOHelper;
 import javax.jdo.PersistenceManager;
 import javax.jdo.listener.DetachCallback;
 
 import org.nightlabs.jfire.security.User;
-import org.nightlabs.jfire.store.id.ProductTypeID;
 import org.nightlabs.jfire.transfer.Anchor;
 import org.nightlabs.jfire.transfer.Transfer;
 
@@ -60,10 +58,10 @@ import org.nightlabs.jfire.transfer.Transfer;
  * @jdo.query
  *		name="getProductTypeID2productCount"
  *		query="
- *				SELECT JDOHelper.getObjectId(product.productType), count(product)
+ *				SELECT product.productType, count(product)
  *				WHERE this == :productTransfer && this.products.contains(product)
  *				VARIABLES org.nightlabs.jfire.store.Product product
- *				GROUP BY JDOHelper.getObjectId(product.productType)
+ *				GROUP BY product.productType
  *		"
  *
  * @jdo.query
@@ -98,7 +96,7 @@ implements Serializable, DetachCallback
 	/**
 	 * This is a virtual fetch-group that is handled in the detach-callback.
 	 */
-	public static final String FETCH_GROUP_PRODUCT_TYPE_ID_2_PRODUCT_COUNT_MAP = "ProductTransfer.productTypeID2productCountMap";
+	public static final String FETCH_GROUP_PRODUCT_TYPE_ID_2_PRODUCT_COUNT_MAP = "ProductTransfer.productType2productCountMap";
 
 	public static final String TRANSFERTYPEID = "ProductTransfer";
 
@@ -121,7 +119,7 @@ implements Serializable, DetachCallback
 	private Integer productCount = null;
 
 	/** @jdo.field persistence-modifier="none" */
-	private Map<ProductTypeID, Integer> productTypeID2productCountMap = null;
+	private Map<ProductType, Integer> productType2productCountMap = null;
 
 	/**
 	 * @deprecated Only for JDO!
@@ -160,9 +158,9 @@ implements Serializable, DetachCallback
 	}
 
 	@SuppressWarnings("unchecked")
-	public Map<ProductTypeID, Integer> getProductTypeID2productCountMap()
+	public Map<ProductType, Integer> getProductType2productCountMap()
 	{
-		if (productTypeID2productCountMap == null) {
+		if (productType2productCountMap == null) {
 			Map m = new HashMap();
 
 //			// TODO JPOX WORKAROUND begin
@@ -179,15 +177,16 @@ implements Serializable, DetachCallback
 
 				// Fuck, the workaround fails too! Will do it very inefficiently:
 			for (Product product : products) {
-				ProductTypeID productTypeID = (ProductTypeID) JDOHelper.getObjectId(product.getProductType());
-				Integer count = (Integer) m.get(productTypeID);
+				ProductType productType = product.getProductType();
+//				ProductTypeID productTypeID = (ProductTypeID) JDOHelper.getObjectId(product.getProductType());
+				Integer count = (Integer) m.get(productType);
 
 				if (count == null)
 					count = new Integer(1);
 				else
 					count = new Integer(count.intValue() + 1);
 
-				m.put(productTypeID, count);
+				m.put(productType, count);
 			}
 
 //			Query q = getPersistenceManager().newNamedQuery(ProductTransfer.class, "getProductTypeID2productCount");
@@ -198,10 +197,10 @@ implements Serializable, DetachCallback
 ////				m.put(JDOHelper.getObjectId(record[0]), record[1]);
 //			}
 
-			productTypeID2productCountMap = m;
+			productType2productCountMap = m;
 		}
 
-		return productTypeID2productCountMap;
+		return productType2productCountMap;
 	}
 
 	public void jdoPreDetach()
@@ -221,7 +220,7 @@ implements Serializable, DetachCallback
 		if (attached.productCount != null || fetchGroups.contains(FETCH_GROUP_PRODUCT_COUNT) || fetchGroups.contains(FetchPlan.ALL))
 			detached.productCount = attached.getProductCount();
 
-		if (attached.productTypeID2productCountMap != null || fetchGroups.contains(FETCH_GROUP_PRODUCT_TYPE_ID_2_PRODUCT_COUNT_MAP) || fetchGroups.contains(FetchPlan.ALL))
-			detached.productTypeID2productCountMap = attached.getProductTypeID2productCountMap();
+		if (attached.productType2productCountMap != null || fetchGroups.contains(FETCH_GROUP_PRODUCT_TYPE_ID_2_PRODUCT_COUNT_MAP) || fetchGroups.contains(FetchPlan.ALL))
+			detached.productType2productCountMap = attached.getProductType2productCountMap();
 	}
 }

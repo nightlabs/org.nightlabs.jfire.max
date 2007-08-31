@@ -1870,10 +1870,10 @@ implements SessionBean
 	{
 		PersistenceManager pm = getPersistenceManager();
 		try {
-			
-			// TODO temporary test!
-			if (!productTransferIDs.isEmpty())
-				((ProductTransfer)pm.getObjectById(productTransferIDs.iterator().next())).getProductTypeID2productCountMap();
+
+//			// TODO temporary test!
+//			if (!productTransferIDs.isEmpty())
+//				((ProductTransfer)pm.getObjectById(productTransferIDs.iterator().next())).getProductTypeID2productCountMap();
 
 			return NLJDOHelper.getDetachedObjectList(pm, productTransferIDs, ProductTransfer.class, fetchGroups, maxFetchDepth);
 		} finally {

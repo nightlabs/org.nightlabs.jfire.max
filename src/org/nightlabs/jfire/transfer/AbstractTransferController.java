@@ -1,12 +1,14 @@
 package org.nightlabs.jfire.transfer;
 
 import java.rmi.RemoteException;
+import java.util.LinkedList;
 import java.util.List;
 
 import javax.ejb.CreateException;
 import javax.naming.NamingException;
 import javax.security.auth.login.LoginException;
 
+import org.nightlabs.io.LimitedInputStream;
 import org.nightlabs.jdo.ObjectID;
 import org.nightlabs.jfire.accounting.AccountingManager;
 import org.nightlabs.jfire.accounting.AccountingManagerUtil;
@@ -38,7 +40,12 @@ public abstract class AbstractTransferController<D extends TransferData, ID exte
 	boolean forceRollback = false;
 	boolean skipServerStages = false;
 	
-	List<D> transferDatas;
+	public AbstractTransferController(List<D> transferDatas, List<ID> transferIDs) {
+		setTransferDatas(transferDatas);
+		setTransferIDs(transferIDs);
+	}
+	
+	private List<D> transferDatas;
 	private List<ID> transferIDs;
 	private List<R> lastStageResults;
 	
@@ -54,7 +61,7 @@ public abstract class AbstractTransferController<D extends TransferData, ID exte
 		return transferIDs;
 	}
 
-	protected void setTransferIDs(List<ID> transferIDs) {
+	private void setTransferIDs(List<ID> transferIDs) {
 		this.transferIDs = transferIDs;
 	}
 

@@ -489,7 +489,7 @@ public abstract class AccountingManagerBean
 			if (!get)
 				return null;
 
-			return (TariffMapping) pm.detachCopy(tm);
+			return pm.detachCopy(tm);
 		} finally {
 			pm.close();
 		}
@@ -570,7 +570,7 @@ public abstract class AccountingManagerBean
 	{
 		PersistenceManager pm = getPersistenceManager();
 		try {
-			return (Tariff) NLJDOHelper.storeJDO(pm, tariff, get, fetchGroups, maxFetchDepth);
+			return NLJDOHelper.storeJDO(pm, tariff, get, fetchGroups, maxFetchDepth);
 		} finally {
 			pm.close();
 		}
@@ -788,7 +788,7 @@ public abstract class AccountingManagerBean
 			if (!account.getOrganisationID().equals(getOrganisationID()))
 				throw new IllegalArgumentException("Given Account was created for a different organisation, can not store to this datastore!");
 
-			Account result = (Account)NLJDOHelper.storeJDO(pm, account, get, fetchGroups, maxFetchDepth);
+			Account result = NLJDOHelper.storeJDO(pm, account, get, fetchGroups, maxFetchDepth);
 			return result;
 		} finally {
 			pm.close();
@@ -821,8 +821,8 @@ public abstract class AccountingManagerBean
 			for (SummaryAccount summaryAccount : summaryAccountsToRemove)
 				account.removeSummaryAccount(summaryAccount);
 
-			for (Iterator iter = summaryAccountIDs.iterator(); iter.hasNext();) {
-				AnchorID summaryAccountID = (AnchorID) iter.next();
+			for (Iterator<AnchorID> iter = summaryAccountIDs.iterator(); iter.hasNext();) {
+				AnchorID summaryAccountID = iter.next();
 				SummaryAccount summaryAccount = (SummaryAccount)pm.getObjectById(summaryAccountID);
 				account.addSummaryAccount(summaryAccount);
 			}
@@ -857,8 +857,8 @@ public abstract class AccountingManagerBean
 			for (Account account : accountsToRemove)
 				summaryAccount.removeSummedAccount(account);
 
-			for (Iterator iter = summedAccountIDs.iterator(); iter.hasNext();) {
-				AnchorID accountID = (AnchorID) iter.next();
+			for (Iterator<AnchorID> iter = summedAccountIDs.iterator(); iter.hasNext();) {
+				AnchorID accountID = iter.next();
 				Account account = (Account)pm.getObjectById(accountID);
 				summaryAccount.addSummedAccount(account);
 			}
@@ -905,13 +905,13 @@ public abstract class AccountingManagerBean
 	 * @ejb.transaction type = "Required"
 	 * @ejb.permission role-name="_Guest_"
 	 */
-	public Collection getTopLevelAccountantDelegates(Class delegateClass) 
+	public Collection<Object> getTopLevelAccountantDelegates(Class delegateClass) 
 	throws ModuleException
 	{
 		PersistenceManager pm = getPersistenceManager();
 		try {
 			Collection delegates = LocalAccountantDelegate.getTopLevelDelegates(pm, delegateClass);
-			Collection result = new LinkedList();
+			Collection<Object> result = new LinkedList<Object>();
 			for (Iterator iter = delegates.iterator(); iter.hasNext();) {
 				LocalAccountantDelegate delegate = (LocalAccountantDelegate) iter.next();
 				result.add(JDOHelper.getObjectId(delegate));
@@ -932,7 +932,7 @@ public abstract class AccountingManagerBean
 	 * @ejb.transaction type = "Required"
 	 * @ejb.permission role-name="_Guest_"
 	 */
-	public Collection getChildAccountantDelegates(LocalAccountantDelegateID delegateID) 
+	public Collection<Object> getChildAccountantDelegates(LocalAccountantDelegateID delegateID) 
 	throws ModuleException
 	{
 		PersistenceManager pm = getPersistenceManager();
@@ -942,7 +942,7 @@ public abstract class AccountingManagerBean
 					delegateID.organisationID,
 					delegateID.localAccountantDelegateID
 				);
-			Collection result = new LinkedList();
+			Collection<Object> result = new LinkedList<Object>();
 			for (Iterator iter = delegates.iterator(); iter.hasNext();) {
 				LocalAccountantDelegate delegate = (LocalAccountantDelegate) iter.next();
 				result.add(JDOHelper.getObjectId(delegate));
@@ -965,7 +965,7 @@ public abstract class AccountingManagerBean
 	 * @ejb.transaction type = "Required"
 	 * @ejb.permission role-name="_Guest_"
 	 */
-	public Collection getLocalAccountantDelegates(Collection delegateIDs, String[] fetchGroups, int maxFetchDepth)
+	public Collection<LocalAccountantDelegate> getLocalAccountantDelegates(Collection delegateIDs, String[] fetchGroups, int maxFetchDepth)
 	throws ModuleException
 	{
 		PersistenceManager pm = getPersistenceManager();
@@ -974,7 +974,7 @@ public abstract class AccountingManagerBean
 			if (fetchGroups != null)
 				pm.getFetchPlan().setGroups(fetchGroups);
 			
-			Collection result = new LinkedList();
+			Collection<LocalAccountantDelegate> result = new LinkedList<LocalAccountantDelegate>();
 			for (Iterator iter = delegateIDs.iterator(); iter.hasNext();) {
 				LocalAccountantDelegateID delegateID = null;
 				try {
@@ -1013,7 +1013,7 @@ public abstract class AccountingManagerBean
 				pm.getFetchPlan().setGroups(fetchGroups);
 			
 			LocalAccountantDelegate delegate = (LocalAccountantDelegate)pm.getObjectById(delegateID);
-			return (LocalAccountantDelegate)pm.detachCopy(delegate);
+			return pm.detachCopy(delegate);
 		} finally {
 			pm.close();
 		}
@@ -1041,7 +1041,7 @@ public abstract class AccountingManagerBean
 	{
 		PersistenceManager pm = getPersistenceManager();
 		try {
-			return (LocalAccountantDelegate)NLJDOHelper.storeJDO(pm, delegate, get, fetchGroups, maxFetchDepth);
+			return NLJDOHelper.storeJDO(pm, delegate, get, fetchGroups, maxFetchDepth);
 		} finally {
 			pm.close();
 		}
@@ -1059,7 +1059,7 @@ public abstract class AccountingManagerBean
 		try {
 			if (fetchGroups != null)
 				pm.getFetchPlan().setGroups(fetchGroups);
-			return (MoneyFlowMapping) NLJDOHelper.storeJDO(pm, mapping, get, fetchGroups, maxFetchDepth);
+			return NLJDOHelper.storeJDO(pm, mapping, get, fetchGroups, maxFetchDepth);
 		} finally {
 			pm.close();
 		}
@@ -1090,7 +1090,7 @@ public abstract class AccountingManagerBean
 			for (Iterator iterator = persitentMapEntry.getResolvedMappings().entrySet().iterator(); iterator.hasNext();) {
 				Map.Entry resolvedEntry = (Map.Entry) iterator.next();
 				MoneyFlowMapping persistentMapping = (MoneyFlowMapping)resolvedEntry.getValue();
-				MoneyFlowMapping detachedMapping = (MoneyFlowMapping)pm.detachCopy(persistentMapping);
+				MoneyFlowMapping detachedMapping = pm.detachCopy(persistentMapping);
 				mapEntry.getResolvedMappings().put((String)resolvedEntry.getKey(), detachedMapping);
 			}
 			result.put(entry.getKey(), mapEntry);				
@@ -1169,7 +1169,7 @@ public abstract class AccountingManagerBean
 	 * @ejb.transaction type = "Required"
 	 * @ejb.permission role-name="_Guest_"
 	 */
-	public Collection getPriceFragmentTypes(Collection priceFragmentTypeIDs, String[] fetchGroups, int maxFetchDepth)
+	public Collection<PriceFragmentType> getPriceFragmentTypes(Collection priceFragmentTypeIDs, String[] fetchGroups, int maxFetchDepth)
 	throws ModuleException
 	{
 		PersistenceManager pm = getPersistenceManager();
@@ -1180,10 +1180,10 @@ public abstract class AccountingManagerBean
 
 			if (priceFragmentTypeIDs == null) {
 				Query q = pm.newQuery(PriceFragmentType.class);
-				return pm.detachCopyAll((Collection)q.execute());
+				return pm.detachCopyAll((Collection<PriceFragmentType>)q.execute());
 			}
 
-			Collection result = new LinkedList();
+			Collection<PriceFragmentType> result = new LinkedList<PriceFragmentType>();
 			for (Iterator iter = priceFragmentTypeIDs.iterator(); iter.hasNext();) {
 				PriceFragmentTypeID priceFragmentTypeID = (PriceFragmentTypeID) iter.next();
 				PriceFragmentType pType = (PriceFragmentType)pm.getObjectById(priceFragmentTypeID);
@@ -1204,14 +1204,14 @@ public abstract class AccountingManagerBean
 	 * @ejb.transaction type = "Required"
 	 * @ejb.permission role-name="_Guest_"
 	 */
-	public Collection getPriceFragmentTypeIDs()
+	public Collection<Object> getPriceFragmentTypeIDs()
 	throws ModuleException
 	{
 		PersistenceManager pm = getPersistenceManager();
 		try {
 			Query q = pm.newQuery(PriceFragmentType.class);
 			Collection pTypes = (Collection)q.execute();
-			Collection result = new LinkedList();
+			Collection<Object> result = new LinkedList<Object>();
 			for (Iterator iter = pTypes.iterator(); iter.hasNext();) {
 				PriceFragmentType pType = (PriceFragmentType) iter.next();
 				result.add(JDOHelper.getObjectId(pType));
@@ -1239,7 +1239,7 @@ public abstract class AccountingManagerBean
 				pm.getFetchPlan().setGroups(fetchGroups);
 
 			PriceFragmentType priceFragmentType = (PriceFragmentType)pm.getObjectById(priceFragmentTypeID);
-			return (PriceFragmentType)pm.detachCopy(priceFragmentType);
+			return pm.detachCopy(priceFragmentType);
 		} finally {
 			pm.close();
 		}
@@ -1273,9 +1273,9 @@ public abstract class AccountingManagerBean
 			Trader trader = Trader.getTrader(pm);
 			Accounting accounting = trader.getAccounting();
 
-			ArrayList articles = new ArrayList(articleIDs.size());
-			for (Iterator it = articleIDs.iterator(); it.hasNext(); ) {
-				ArticleID articleID = (ArticleID) it.next();
+			ArrayList<Article> articles = new ArrayList<Article>(articleIDs.size());
+			for (Iterator<ArticleID> it = articleIDs.iterator(); it.hasNext(); ) {
+				ArticleID articleID = it.next();
 				Article article = (Article) pm.getObjectById(articleID);
 				Offer offer = article.getOffer();
 				OfferLocal offerLocal = offer.getOfferLocal();
@@ -1296,7 +1296,7 @@ public abstract class AccountingManagerBean
 				if (fetchGroups != null)
 					pm.getFetchPlan().setGroups(fetchGroups);
 
-				return (Invoice)pm.detachCopy(invoice);
+				return pm.detachCopy(invoice);
 			}
 			return null;
 		} finally {
@@ -1355,14 +1355,14 @@ public abstract class AccountingManagerBean
 //				trader.confirmOffer(user, offerLocal);
 			}
 			else {
-				Set offers = new HashSet();
+				Set<Offer> offers = new HashSet<Offer>();
 				for (Iterator it = articleContainer.getArticles().iterator(); it.hasNext(); ) {
 					Article article = (Article) it.next();
 					Offer offer = article.getOffer();
 					offers.add(offer);
 				}
-				for (Iterator it = offers.iterator(); it.hasNext(); ) {
-					Offer offer = (Offer) it.next();
+				for (Iterator<Offer> it = offers.iterator(); it.hasNext(); ) {
+					Offer offer = it.next();
 					trader.validateOffer(offer);
 					trader.acceptOfferImplicitely(offer);
 //					trader.finalizeOffer(user, offer);
@@ -1380,7 +1380,7 @@ public abstract class AccountingManagerBean
 				if (fetchGroups != null)
 					pm.getFetchPlan().setGroups(fetchGroups);
 
-				return (Invoice)pm.detachCopy(invoice);
+				return pm.detachCopy(invoice);
 			}
 			return null;
 		} finally {
@@ -1405,7 +1405,7 @@ public abstract class AccountingManagerBean
 			pm.getExtent(Invoice.class);
 			pm.getExtent(Article.class);
 			Invoice invoice = (Invoice) pm.getObjectById(invoiceID);
-			Collection articles = new ArrayList(articleIDs.size());
+			Collection<Object> articles = new ArrayList<Object>(articleIDs.size());
 			for (Iterator it = articleIDs.iterator(); it.hasNext(); ) {
 				ArticleID articleID = (ArticleID) it.next();
 				articles.add(pm.getObjectById(articleID));
@@ -1424,7 +1424,7 @@ public abstract class AccountingManagerBean
 			if (fetchGroups != null)
 				pm.getFetchPlan().setGroups(fetchGroups);
 
-			return (Invoice)pm.detachCopy(invoice);
+			return pm.detachCopy(invoice);
 		} finally {
 			pm.close();
 		}
@@ -1447,7 +1447,7 @@ public abstract class AccountingManagerBean
 			pm.getExtent(Invoice.class);
 			pm.getExtent(Article.class);
 			Invoice invoice = (Invoice) pm.getObjectById(invoiceID);
-			Collection articles = new ArrayList(articleIDs.size());
+			Collection<Object> articles = new ArrayList<Object>(articleIDs.size());
 			for (Iterator it = articleIDs.iterator(); it.hasNext(); ) {
 				ArticleID articleID = (ArticleID) it.next();
 				articles.add(pm.getObjectById(articleID));
@@ -1466,7 +1466,7 @@ public abstract class AccountingManagerBean
 			if (fetchGroups != null)
 				pm.getFetchPlan().setGroups(fetchGroups);
 
-			return (Invoice)pm.detachCopy(invoice);
+			return pm.detachCopy(invoice);
 		} finally {
 			pm.close();
 		}
@@ -1591,13 +1591,13 @@ public abstract class AccountingManagerBean
 	 * @ejb.transaction type = "Supports"
 	 * @ejb.permission role-name="_Guest_"
 	 */
-	public List payBegin(List paymentDataList)
+	public List<PaymentResult> payBegin(List paymentDataList)
 	throws ModuleException
 	{
 		try {
 			AccountingManagerLocal accountingManagerLocal = AccountingManagerUtil.getLocalHome().create();
 
-			List resList = new ArrayList();
+			List<PaymentResult> resList = new ArrayList<PaymentResult>();
 			for (Iterator it = paymentDataList.iterator(); it.hasNext(); ) {
 				PaymentData paymentData = (PaymentData) it.next();
 
@@ -1737,7 +1737,7 @@ public abstract class AccountingManagerBean
 	 * @ejb.transaction type = "Supports"
 	 * @ejb.permission role-name="_Guest_"
 	 */
-	public List payDoWork(List paymentIDs, List payDoWorkClientResults, boolean forceRollback)
+	public List<PaymentResult> payDoWork(List paymentIDs, List payDoWorkClientResults, boolean forceRollback)
 	throws ModuleException
 	{
 		try {
@@ -1746,7 +1746,7 @@ public abstract class AccountingManagerBean
 			if (paymentIDs.size() != payDoWorkClientResults.size())
 				throw new IllegalArgumentException("paymentIDs.size() != payDoWorkClientResults.size()!!!");
 
-			List resList = new ArrayList();
+			List<PaymentResult> resList = new ArrayList<PaymentResult>();
 			Iterator itResults = payDoWorkClientResults.iterator();
 			for (Iterator itIDs = paymentIDs.iterator(); itIDs.hasNext(); ) {
 				PaymentID paymentID = (PaymentID) itIDs.next();
@@ -1870,7 +1870,7 @@ public abstract class AccountingManagerBean
 	 * @ejb.transaction type = "Supports"
 	 * @ejb.permission role-name="_Guest_"
 	 */
-	public List payEnd(List paymentIDs, List payEndClientResults, boolean forceRollback)
+	public List<PaymentResult> payEnd(List paymentIDs, List payEndClientResults, boolean forceRollback)
 	throws ModuleException
 	{
 		try {
@@ -1879,7 +1879,7 @@ public abstract class AccountingManagerBean
 			if (paymentIDs.size() != payEndClientResults.size())
 				throw new IllegalArgumentException("paymentIDs.size() != payEndClientResults.size()!!!");
 
-			List resList = new ArrayList();
+			List<PaymentResult> resList = new ArrayList<PaymentResult>();
 			Iterator itResults = payEndClientResults.iterator();
 			for (Iterator itIDs = paymentIDs.iterator(); itIDs.hasNext(); ) {
 				PaymentID paymentID = (PaymentID) itIDs.next();
@@ -2499,7 +2499,7 @@ public abstract class AccountingManagerBean
 //			System.out.println("***********************************************************************");
 //			System.out.println("***********************************************************************");
 
-			ProductType detachedRes = (ProductType) pm.detachCopy(res);
+			ProductType detachedRes = pm.detachCopy(res);
 
 			// FIXME WORKAROUND for JPOX - begin
 			resolveExtendedProductTypes(pm, res, detachedRes);
@@ -2548,7 +2548,7 @@ public abstract class AccountingManagerBean
 			System.out.println(attachedPT == null ? null : attachedPT.getPrimaryKey());
 			ProductType extPT = null;
 			if (attachedPT != null)
-				extPT = (ProductType) pm.detachCopy(attachedPT);
+				extPT = pm.detachCopy(attachedPT);
 			try {
 				Method method = ProductType.class.getDeclaredMethod("setExtendedProductType", new Class[] {ProductType.class});
 				method.setAccessible(true);

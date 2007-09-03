@@ -2,6 +2,7 @@ package org.nightlabs.jfire.accounting.pay;
 
 import java.rmi.RemoteException;
 import java.util.Iterator;
+import java.util.LinkedList;
 import java.util.List;
 
 import javax.ejb.CreateException;
@@ -15,6 +16,19 @@ import org.nightlabs.jfire.security.SecurityReflector;
 import org.nightlabs.jfire.transfer.AbstractTransferController;
 
 public abstract class AbstractPaymentController extends AbstractTransferController<PaymentData, PaymentID, PaymentResult> implements PaymentController {
+	
+	public AbstractPaymentController(List<PaymentData> transferDatas) {
+		super(transferDatas, getPaymentIDs(transferDatas));
+	}
+	
+	private static List<PaymentID> getPaymentIDs(List<PaymentData> transferDatas) {
+		List<PaymentID> paymentIDs = new LinkedList<PaymentID>();
+		for (PaymentData data : transferDatas)
+			paymentIDs.add(PaymentID.create(data.getPayment().getOrganisationID(), data.getPayment().getPaymentID()));
+		
+		return paymentIDs;
+	}
+	
 
 	@Override
 	protected void _serverBegin() {

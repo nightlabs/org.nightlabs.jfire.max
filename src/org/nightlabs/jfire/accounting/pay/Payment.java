@@ -87,6 +87,8 @@ import org.nightlabs.math.Base36Coder;
 public class Payment
 implements Serializable, StoreCallback
 {
+	private static final long serialVersionUID = 1L;
+
 	public static final String PAYMENT_DIRECTION_INCOMING = "incoming";
 
 	public static final String PAYMENT_DIRECTION_OUTGOING = "outgoing";

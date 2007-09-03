@@ -14,8 +14,7 @@ public class Tuple<E1, E2> {
 		return elem1;
 	}
 	
-	public E2 getElem2() {
+	public E2 getElement2() {
 		return elem2;
 	}
-	
 }

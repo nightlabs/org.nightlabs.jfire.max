@@ -1,6 +1,7 @@
 package org.nightlabs.jfire.store.deliver;
 
 import java.util.Iterator;
+import java.util.LinkedList;
 import java.util.List;
 
 import org.nightlabs.jfire.store.deliver.id.DeliveryID;
@@ -8,6 +9,18 @@ import org.nightlabs.jfire.transfer.AbstractTransferController;
 
 public abstract class AbstractDeliveryController extends AbstractTransferController<DeliveryData, DeliveryID, DeliveryResult> implements DeliveryController {
 	
+	public AbstractDeliveryController(List<DeliveryData> transferDatas) {
+		super(transferDatas, getDeliveryIDs(transferDatas));
+	}
+	
+	private static List<DeliveryID> getDeliveryIDs(List<DeliveryData> transferDatas) {
+		List<DeliveryID> deliveryIDs = new LinkedList<DeliveryID>();
+		for (DeliveryData data : transferDatas)
+			deliveryIDs.add(DeliveryID.create(data.getDelivery().getOrganisationID(), data.getDelivery().getDeliveryID()));
+		
+		return deliveryIDs;			
+	}
+
 	@Override
 	protected void _serverBegin() {
 		if (isSkipServerStages())

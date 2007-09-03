@@ -201,7 +201,7 @@ public class RenderManager {
 				Collection<Throwable> errors = new ArrayList<Throwable>(task.getErrors().size());
 				for (int i = 0; i < task.getErrors().size(); i++) {
 					Throwable t = (Throwable) task.getErrors().get(0);
-					errors.add(new RenderReportException(t)); // Exception wrapped as some things contain non-serializable members.
+					errors.add(new RenderReportException(t.getMessage(), t)); // Exception wrapped as some things contain non-serializable members.
 				}
 				result.getHeader().setRenderingErrors(errors);
 			}

@@ -29,6 +29,7 @@ package org.nightlabs.jfire.reporting.layout.render;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Iterator;
@@ -185,6 +186,7 @@ public class RenderManager {
 			logger.debug("Have report renderer, delegating render work");
 			JFireReportingHelper.open(pm, parsedParams, locale, false);
 			RenderedReportLayout result = null;
+			// Ask the renderer to do the work
 			try {
 				result = renderer.renderReport(pm, renderRequest, task, fileName, layoutRoot, prepareForTransfer);
 			} catch (Exception e) {
@@ -194,10 +196,15 @@ public class RenderManager {
 			} finally {
 				JFireReportingHelper.close();
 			}
-//			if (task.getErrors().size() > 0) {
-//				Throwable t = (Throwable) task.getErrors().get(0);
-//				throw new RenderReportException("RunAndRenderTask finished with errors.", t);
-//			}
+			// Check for rendering errors
+			if (task.getErrors().size() > 0) {
+				Collection<Throwable> errors = new ArrayList<Throwable>(task.getErrors().size());
+				for (int i = 0; i < task.getErrors().size(); i++) {
+					Throwable t = (Throwable) task.getErrors().get(0);
+					errors.add(new RenderReportException(t)); // Exception wrapped as some things contain non-serializable members.
+				}
+				result.getHeader().setRenderingErrors(errors);
+			}
 			return result;
 			
 		} finally {

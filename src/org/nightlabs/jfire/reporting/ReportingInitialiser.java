@@ -580,8 +580,10 @@ public class ReportingInitialiser {
 
 			// TODO JPOX WORKAROUND : To directly put the new acquisitionSetup causes a duplicate key exception
 			Object o = setup.getValueAcquisitionSetups().get(useCase);
-			if (o != null)
-				pm.deletePersistent(o);
+			if (o != null) {
+				setup.getValueAcquisitionSetups().remove(useCase);
+//				pm.deletePersistent(o);
+			}
 
 			pm.flush();
 

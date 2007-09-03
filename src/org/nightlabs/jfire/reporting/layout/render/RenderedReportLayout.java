@@ -27,6 +27,7 @@
 package org.nightlabs.jfire.reporting.layout.render;
 
 import java.io.Serializable;
+import java.util.Collection;
 import java.util.Date;
 
 import org.nightlabs.jfire.reporting.Birt;
@@ -47,13 +48,14 @@ public class RenderedReportLayout implements Serializable {
 	 * for a {@link RenderedReportLayout} 
 	 */
 	public class Header implements Serializable {
-		private static final long serialVersionUID = 1L;
+		private static final long serialVersionUID = 2L;
 
 		private ReportRegistryItemID reportRegistryItemID;		
 		private Birt.OutputFormat outputFormat;		
 		private Date timestamp;
 		private boolean zipped;
 		private String entryFileName;
+		private Collection<Throwable> renderingErrors;
 		
 		public Header(ReportRegistryItemID reportRegistryItemID, OutputFormat outputFormat, Date timestamp) {
 			this.reportRegistryItemID = reportRegistryItemID;
@@ -138,7 +140,35 @@ public class RenderedReportLayout implements Serializable {
 			this.zipped = zipped;
 		}
 		
+		/**
+		 * Returns the collection of BIRT errors that occurred 
+		 * during the rendering of the referenced layout.
+		 * 
+		 * @return The collection of BIRT errors that occurred during rendering.
+		 */
+		public Collection<Throwable> getRenderingErrors() {
+			return renderingErrors;
+		}
 		
+		/**
+		 * Set the rendering errors.
+		 * @param renderingErrors The rendering errors to set.
+		 */
+		public void setRenderingErrors(Collection<Throwable> renderingErrors) {
+			this.renderingErrors = renderingErrors;
+		}
+		
+		/**
+		 * Returns whether the rendering of the associated layout
+		 * produced BIRT errors. If this returns <code>true</code>
+		 * the errors can be accessed via {@link #getRenderingErrors()}.
+		 * 
+		 * @return Returns whether the rendering of the associated layout
+		 * 		produced BIRT errors
+		 */
+		public boolean hasRenderingErrors() {
+			return renderingErrors != null && renderingErrors.size() > 0;
+		}
 	}
 	
 	private Header header;

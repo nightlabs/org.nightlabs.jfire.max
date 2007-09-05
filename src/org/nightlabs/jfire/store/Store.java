@@ -334,17 +334,63 @@ implements StoreCallback
 	public ProductType addProductType(User user, ProductType productType)
 	{
 		PersistenceManager pm = getPersistenceManager();
-//		try {
-//			ProductType pt = (ProductType) pm.getObjectById(ProductTypeID.create(
-//				productType.getOrganisationID(), productType.getProductTypeID()));
-//			pt.getProductTypeID();
-//
-//			throw new IllegalStateException("ProductType \""+productType.getPrimaryKey()+"\" exists already!");
-//		} catch (JDOObjectNotFoundException x) {
-//			// we expect this.
-//		}
+		productType = pm.makePersistent(productType);
 
-		productType = (ProductType) pm.makePersistent(productType);
+		// JPOX WORKAROUND there seems to be a JPOX bug causing the object not to be cleanly replaced by the attached one
+		{
+			ProductTypeID productTypeID = (ProductTypeID) JDOHelper.getObjectId(productType);
+			pm.evictAll();
+			productType = (ProductType) pm.getObjectById(productTypeID);
+		}
+
+//		15:34:20,427 ERROR [LogInterceptor] RuntimeException in method: public abstract org.nightlabs.ipanema.ticketing.store.Event org.nightlabs.ipanema.ticketing.TicketingManager.storeEvent(org.nightlabs.ipanema.ticketing.store.Event,boolean,java.lang.String[],int) throws org.nightlabs.ModuleException,java.rmi.RemoteException:
+//			javax.jdo.JDODetachedFieldAccessException: You have just attempted to access field "extendedProductType" yet this field was not detached when you detached the object. Either dont access this field, or detach the field when detaching the object.
+//			        at org.nightlabs.jfire.store.ProductType.jdoGetextendedProductType(ProductType.java)
+//			        at org.nightlabs.jfire.store.ProductType.getExtendedProductType(ProductType.java:683)
+//			        at org.nightlabs.jfire.accounting.gridpriceconfig.PriceCalculator._resolvableProductTypes_registerWithAnchestors(PriceCalculator.java:300)
+//			        at org.nightlabs.jfire.accounting.gridpriceconfig.PriceCalculator.preparePriceCalculation_createResolvableProductTypesMap(PriceCalculator.java:282)
+//			        at org.nightlabs.jfire.accounting.gridpriceconfig.PriceCalculator.preparePriceCalculation(PriceCalculator.java:159)
+//			        at org.nightlabs.ipanema.ticketing.TicketingManagerBean.storeEvent(TicketingManagerBean.java:602)
+//			        at sun.reflect.NativeMethodAccessorImpl.invoke0(Native Method)
+//			        at sun.reflect.NativeMethodAccessorImpl.invoke(NativeMethodAccessorImpl.java:39)
+//			        at sun.reflect.DelegatingMethodAccessorImpl.invoke(DelegatingMethodAccessorImpl.java:25)
+//			        at java.lang.reflect.Method.invoke(Method.java:585)
+//			        at org.jboss.invocation.Invocation.performCall(Invocation.java:359)
+//			        at org.jboss.ejb.StatelessSessionContainer$ContainerInterceptor.invoke(StatelessSessionContainer.java:237)
+//			        at org.jboss.resource.connectionmanager.CachedConnectionInterceptor.invoke(CachedConnectionInterceptor.java:158)
+//			        at org.jboss.ejb.plugins.StatelessSessionInstanceInterceptor.invoke(StatelessSessionInstanceInterceptor.java:169)
+//			        at org.jboss.ejb.plugins.CallValidationInterceptor.invoke(CallValidationInterceptor.java:63)
+//			        at org.jboss.ejb.plugins.AbstractTxInterceptor.invokeNext(AbstractTxInterceptor.java:121)
+//			        at org.jboss.ejb.plugins.TxInterceptorCMT.runWithTransactions(TxInterceptorCMT.java:350)
+//			        at org.jboss.ejb.plugins.TxInterceptorCMT.invoke(TxInterceptorCMT.java:181)
+//			        at org.jboss.ejb.plugins.SecurityInterceptor.invoke(SecurityInterceptor.java:168)
+//			        at org.jboss.ejb.plugins.LogInterceptor.invoke(LogInterceptor.java:205)
+//			        at org.jboss.ejb.plugins.ProxyFactoryFinderInterceptor.invoke(ProxyFactoryFinderInterceptor.java:138)
+//			        at org.jboss.ejb.SessionContainer.internalInvoke(SessionContainer.java:648)
+//			        at org.jboss.ejb.Container.invoke(Container.java:960)
+//			        at sun.reflect.GeneratedMethodAccessor110.invoke(Unknown Source)
+//			        at sun.reflect.DelegatingMethodAccessorImpl.invoke(DelegatingMethodAccessorImpl.java:25)
+//			        at java.lang.reflect.Method.invoke(Method.java:585)
+//			        at org.jboss.mx.interceptor.ReflectedDispatcher.invoke(ReflectedDispatcher.java:155)
+//			        at org.jboss.mx.server.Invocation.dispatch(Invocation.java:94)
+//			        at org.jboss.mx.server.Invocation.invoke(Invocation.java:86)
+//			        at org.jboss.mx.server.AbstractMBeanInvoker.invoke(AbstractMBeanInvoker.java:264)
+//			        at org.jboss.mx.server.MBeanServerImpl.invoke(MBeanServerImpl.java:659)
+//			        at org.jboss.invocation.unified.server.UnifiedInvoker.invoke(UnifiedInvoker.java:231)
+//			        at sun.reflect.GeneratedMethodAccessor139.invoke(Unknown Source)
+//			        at sun.reflect.DelegatingMethodAccessorImpl.invoke(DelegatingMethodAccessorImpl.java:25)
+//			        at java.lang.reflect.Method.invoke(Method.java:585)
+//			        at org.jboss.mx.interceptor.ReflectedDispatcher.invoke(ReflectedDispatcher.java:155)
+//			        at org.jboss.mx.server.Invocation.dispatch(Invocation.java:94)
+//			        at org.jboss.mx.server.Invocation.invoke(Invocation.java:86)
+//			        at org.jboss.mx.server.AbstractMBeanInvoker.invoke(AbstractMBeanInvoker.java:264)
+//			        at org.jboss.mx.server.MBeanServerImpl.invoke(MBeanServerImpl.java:659)
+//			        at javax.management.MBeanServerInvocationHandler.invoke(MBeanServerInvocationHandler.java:201)
+//			        at $Proxy16.invoke(Unknown Source)
+//			        at org.jboss.remoting.ServerInvoker.invoke(ServerInvoker.java:734)
+//			        at org.jboss.remoting.transport.socket.ServerThread.processInvocation(ServerThread.java:560)
+//			        at org.jboss.remoting.transport.socket.ServerThread.dorun(ServerThread.java:383)
+//			        at org.jboss.remoting.transport.socket.ServerThread.run(ServerThread.java:165)
 
 		if (productType.getProductTypeLocal() != null)
 			throw new IllegalArgumentException("This ProductType has already a ProductTypeLocal assigned! Obviously you either called Store.addProductType(...) twice or you detached a ProductTypeLocal from a remote organisation! Both is illegal!");

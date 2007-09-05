@@ -33,7 +33,6 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
-import org.jbpm.JbpmContext;
 import org.nightlabs.jfire.jbpm.graph.def.ActionHandlerNodeEnter;
 import org.nightlabs.jfire.jbpm.graph.def.Statable;
 import org.nightlabs.jfire.jbpm.graph.def.StatableLocal;
@@ -70,6 +69,8 @@ import org.nightlabs.util.CollectionUtil;
 public class InvoiceLocal
 implements Serializable, StatableLocal
 {
+	private static final long serialVersionUID = 1L;
+	
 	public static final String FETCH_GROUP_INVOICE = "InvoiceLocal.invoice";
 	public static final String FETCH_GROUP_BOOK_USER = "InvoiceLocal.bookUser";
 	public static final String FETCH_GROUP_THIS_INVOICE_LOCAL = "InvoiceLocal.this";

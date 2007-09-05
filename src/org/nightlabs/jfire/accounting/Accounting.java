@@ -61,8 +61,10 @@ import org.nightlabs.jfire.accounting.jbpm.JbpmConstantsInvoice;
 import org.nightlabs.jfire.accounting.pay.ModeOfPaymentFlavour;
 import org.nightlabs.jfire.accounting.pay.PayMoneyTransfer;
 import org.nightlabs.jfire.accounting.pay.Payment;
+import org.nightlabs.jfire.accounting.pay.PaymentActionHandler;
 import org.nightlabs.jfire.accounting.pay.PaymentData;
 import org.nightlabs.jfire.accounting.pay.PaymentException;
+import org.nightlabs.jfire.accounting.pay.PaymentLocal;
 import org.nightlabs.jfire.accounting.pay.PaymentResult;
 import org.nightlabs.jfire.accounting.pay.ServerPaymentProcessor;
 import org.nightlabs.jfire.accounting.pay.ServerPaymentProcessor.PayParams;
@@ -80,6 +82,9 @@ import org.nightlabs.jfire.jbpm.graph.def.id.ProcessDefinitionID;
 import org.nightlabs.jfire.organisation.LocalOrganisation;
 import org.nightlabs.jfire.security.User;
 import org.nightlabs.jfire.store.ProductTypeActionHandler;
+import org.nightlabs.jfire.store.deliver.DeliveryActionHandler;
+import org.nightlabs.jfire.store.deliver.DeliveryException;
+import org.nightlabs.jfire.store.deliver.DeliveryResult;
 import org.nightlabs.jfire.trade.Article;
 import org.nightlabs.jfire.trade.ArticleContainer;
 import org.nightlabs.jfire.trade.LegalEntity;
@@ -585,6 +590,17 @@ public class Accounting
 							"Calling InvoiceActionHandler.onPayDoWork failed!",
 							x));
 		}
+		
+		try {
+			for (PaymentActionHandler paymentActionHandler : paymentData.getPayment().getPaymentLocal().getPaymentActionHandlers()) {
+				paymentActionHandler.onPayDoWork(paymentData);
+			}
+		} catch (PaymentException x) {
+			throw x;
+		} catch (Exception e) {
+			throw new PaymentException(new PaymentResult(
+					PaymentResult.CODE_FAILED, "Calling PaymentActionHandler.onPayDoWork failed! localOrganisation="+getOrganisationID(), e)); 
+		}
 
 		return serverPaymentResult;
 	}
@@ -667,6 +683,17 @@ public class Accounting
 							PaymentResult.CODE_FAILED,
 							"Calling InvoiceActionHandler.onPayEnd failed!",
 							x));
+		}
+		
+		try {
+			for (PaymentActionHandler paymentActionHandler : paymentData.getPayment().getPaymentLocal().getPaymentActionHandlers()) {
+				paymentActionHandler.onPayEnd(paymentData);
+			}
+		} catch (PaymentException x) {
+			throw x;
+		} catch (Exception e) {
+			throw new PaymentException(new PaymentResult(
+					PaymentResult.CODE_FAILED, "Calling PaymentActionHandler.onPayEnd failed! localOrganisation="+getOrganisationID(), e)); 
 		}
 
 		try {
@@ -778,17 +805,6 @@ public class Accounting
 			User user, PaymentData paymentData)
 	throws PaymentException
 	{
-
-// TODO remove this test.
-//		if (Math.random() < 10)
-//			throw new PaymentException(
-//					new PaymentResult(
-//							getOrganisationID(), 
-//							PaymentResult.CODE_FAILED,
-//							"Test",
-//							null));
-// END test
-
 		if (user == null)
 			throw new NullPointerException("user");
 
@@ -832,6 +848,11 @@ public class Accounting
 
 		if (partner.getAccountant() == null)
 			partner.setAccountant(getPartnerAccountant());
+		
+//	The PaymentLocal object is normally created in PaymentHelperBean#payBegin_storePaymentData(PaymentData).
+//	But some use cases do not use this API, this is why we create it here if it does not exist yet.  
+		if (paymentData.getPayment().getPaymentLocal() == null)
+			new PaymentLocal(paymentData.getPayment());
 
 		// call server-sided payment processor's first phase
 		PayMoneyTransfer payMoneyTransfer = serverPaymentProcessor.payBegin(
@@ -866,6 +887,17 @@ public class Accounting
 							PaymentResult.CODE_FAILED,
 							"Calling InvoiceActionHandler.onPayBegin failed!",
 							x));
+		}
+		
+		try {
+			for (PaymentActionHandler paymentActionHandler : paymentData.getPayment().getPaymentLocal().getPaymentActionHandlers()) {
+				paymentActionHandler.onPayBegin(paymentData);
+			}
+		} catch (PaymentException x) {
+			throw x;
+		} catch (Exception e) {
+			throw new PaymentException(new PaymentResult(
+					PaymentResult.CODE_FAILED, "Calling PaymentActionHandler.onPayBegin failed! localOrganisation="+getOrganisationID(), e)); 
 		}
 
 		if (paymentData.getPayment().isPostponed()) {

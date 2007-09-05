@@ -8,7 +8,7 @@ import org.nightlabs.jfire.accounting.pay.PaymentData;
 import org.nightlabs.jfire.accounting.pay.PaymentException;
 import org.nightlabs.jfire.accounting.pay.ServerPaymentProcessor;
 import org.nightlabs.jfire.security.User;
-import org.nightlabs.util.Utils;
+import org.nightlabs.util.Util;
 
 /**
  * @author Marco Schulze - marco at nightlabs dot de
@@ -35,7 +35,7 @@ public class InvoiceActionHandler
 	 * @jdo.field primary-key="true"
 	 * @jdo.column length="100"
 	 */
-	private String invoiceActionHandlerID;
+	private String invoiceActionHandlerID; // TODO: Tobias: Why is this field a string? Shouldn't it rather be a long so that it can be generated using the IDGenerator?
 
 	/**
 	 * @deprecated Only for JDO!
@@ -145,13 +145,13 @@ public class InvoiceActionHandler
 		InvoiceActionHandler o = (InvoiceActionHandler) obj;
 
 		return
-				Utils.equals(this.organisationID, o.organisationID) &&
-				Utils.equals(this.invoiceActionHandlerID, o.invoiceActionHandlerID);
+				Util.equals(this.organisationID, o.organisationID) &&
+				Util.equals(this.invoiceActionHandlerID, o.invoiceActionHandlerID);
 	}
 
 	@Override
 	public int hashCode()
 	{
-		return Utils.hashCode(organisationID) ^ Utils.hashCode(invoiceActionHandlerID);
+		return Util.hashCode(organisationID) ^ Util.hashCode(invoiceActionHandlerID);
 	}
 }

@@ -160,6 +160,11 @@ implements Serializable, StoreCallback
 	 * @jdo.field persistence-modifier="persistent"
 	 */
 	private String clientPaymentProcessorFactoryID;
+	
+	/**
+	 * @jdo.field persistence-modifier="persistent" mapped-by="payment"
+	 */
+	private PaymentLocal paymentLocal;
 
 	/**
 	 * @jdo.field persistence-modifier="none"
@@ -1119,6 +1124,22 @@ implements Serializable, StoreCallback
 			return (PaymentID) JDOHelper.getObjectId(precursor);
 
 		return precursorID;
+	}
+	
+	/**
+	 * Returns the associated {@link PaymentLocal}.
+	 * @return The associated {@link PaymentLocal}.
+	 */
+	public PaymentLocal getPaymentLocal() {
+		return paymentLocal;
+	}
+	
+	/**
+	 * Sets the associated {@link PaymentLocal}.
+	 * @param paymentLocal The {@link PaymentLocal} to be associated with this instance.
+	 */
+	public void setPaymentLocal(PaymentLocal paymentLocal) {
+		this.paymentLocal = paymentLocal;
 	}
 
 	/**

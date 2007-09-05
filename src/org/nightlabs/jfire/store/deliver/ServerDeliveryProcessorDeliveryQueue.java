@@ -77,7 +77,11 @@ extends ServerDeliveryProcessor
 
 	@Implement
 	protected DeliveryResult externalDeliverBegin(DeliverParams deliverParams) throws DeliveryException {
-		// Nothing to do
+		// Attach DeliveryActionHandlerDeliveryQueue
+		PersistenceManager pm = getPersistenceManager();
+		deliverParams.deliveryData.getDelivery().getDeliveryLocal().addDeliveryActionHandler(DeliveryActionHandlerDeliveryQueue.getDeliveryActionHandlerDeliveryQueue(pm));
+		logger.debug("Attached DeliveryActionHandlerDeliveryQueue to delivery '" + deliverParams.deliveryData.getDelivery().getPrimaryKey() + "'");
+		
 		return new DeliveryResult(DeliveryResult.CODE_POSTPONED, null, null);
 	}
 
@@ -92,7 +96,6 @@ extends ServerDeliveryProcessor
 	@Implement
 	protected DeliveryResult externalDeliverCommit(DeliverParams deliverParams) throws DeliveryException {
 		// Nothing to do					
-
 		return null; // should automatically be correct ;-)
 	}
 

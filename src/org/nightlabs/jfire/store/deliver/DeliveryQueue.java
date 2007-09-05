@@ -36,6 +36,10 @@ import org.nightlabs.jfire.store.deliver.id.DeliveryQueueID;
  * @jdo.query
  * 		name="getDeliveryQueues"
  * 		query="SELECT WHERE !defunct || defunct == :includeDefunct"
+ * 
+ * @jdo.query
+ * 		name="getDeliveryQueueForDelivery"
+ * 		query="SELECT WHERE pendingDeliverySet.contains(:delivery)"
  */
 public class DeliveryQueue implements Serializable, AttachCallback {
 	
@@ -217,6 +221,11 @@ public class DeliveryQueue implements Serializable, AttachCallback {
 	public static Collection<DeliveryQueue> getDeliveryQueues(PersistenceManager pm, boolean includeDefuncted) {
 		Query q = pm.newNamedQuery(DeliveryQueue.class, "getDeliveryQueues");
 		return (Collection<DeliveryQueue>) q.execute(includeDefuncted);
+	}
+	
+	public static DeliveryQueue getDeliveryQueueForDelivery(Delivery delivery, PersistenceManager pm) {
+		Query q = pm.newNamedQuery(DeliveryQueue.class, "getDeliveryQueueForDelivery");
+		return (DeliveryQueue) q.execute(delivery);
 	}
 
 	public void jdoPreAttach() {

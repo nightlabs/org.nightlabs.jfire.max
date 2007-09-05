@@ -61,8 +61,10 @@ import org.nightlabs.jfire.store.book.LocalStorekeeper;
 import org.nightlabs.jfire.store.book.PartnerStorekeeper;
 import org.nightlabs.jfire.store.deliver.DeliverProductTransfer;
 import org.nightlabs.jfire.store.deliver.Delivery;
+import org.nightlabs.jfire.store.deliver.DeliveryActionHandler;
 import org.nightlabs.jfire.store.deliver.DeliveryData;
 import org.nightlabs.jfire.store.deliver.DeliveryException;
+import org.nightlabs.jfire.store.deliver.DeliveryLocal;
 import org.nightlabs.jfire.store.deliver.DeliveryResult;
 import org.nightlabs.jfire.store.deliver.ModeOfDeliveryFlavour;
 import org.nightlabs.jfire.store.deliver.ServerDeliveryProcessor;
@@ -1155,6 +1157,11 @@ implements StoreCallback
 
 		if (partner.getStorekeeper() == null)
 			partner.setStorekeeper(getPartnerStorekeeper());
+		
+//		The DeliveryLocal object is normally created in DeliveryHelperBean#deliverBegin_storeDeliveryData(DeliveryData).
+//		But some use cases do not use this API, this is why we create it here if it does not exist yet.  
+		if (deliveryData.getDelivery().getDeliveryLocal() == null)
+			new DeliveryLocal(deliveryData.getDelivery());
 
 //	 call server-sided delivery processor's first phase
 		DeliverProductTransfer deliverProductTransfer = serverDeliveryProcessor.deliverBegin(
@@ -1190,6 +1197,20 @@ implements StoreCallback
 							DeliveryResult.CODE_FAILED,
 							"Calling DeliveryNoteActionHandler.onDeliverBegin failed! localOrganisation="+getOrganisationID(),
 							x));
+		}
+		
+		Set<Delivery> precursorDeliverySet = deliveryData.getDelivery().getPrecursorSet();		
+		for (Delivery precursorDelivery : precursorDeliverySet) {
+			try {
+				for (DeliveryActionHandler deliveryActionHandler : precursorDelivery.getDeliveryLocal().getDeliveryActionHandlers()) {
+					deliveryActionHandler.onFollowUpDeliverBegin(deliveryData.getDelivery(), precursorDelivery);
+				}
+			} catch (DeliveryException x) {
+				throw x;
+			} catch (Exception e) {
+				throw new DeliveryException(new DeliveryResult(
+						DeliveryResult.CODE_FAILED, "Calling DeliveryActionHandler.onFollowUpDeliverBegin failed! localOrganisation="+getOrganisationID(), e)); 
+			}
 		}
 
 
@@ -1326,6 +1347,20 @@ implements StoreCallback
 							"Calling DeliveryNoteActionHandler.onDeliverDoWork failed!",
 							x));
 		}
+		
+		Set<Delivery> precursorDeliverySet = deliveryData.getDelivery().getPrecursorSet();		
+		for (Delivery precursorDelivery : precursorDeliverySet) {
+			try {
+				for (DeliveryActionHandler deliveryActionHandler : precursorDelivery.getDeliveryLocal().getDeliveryActionHandlers()) {
+					deliveryActionHandler.onFollowUpDeliverDoWork(deliveryData.getDelivery(), precursorDelivery);
+				}
+			} catch (DeliveryException x) {
+				throw x;
+			} catch (Exception e) {
+				throw new DeliveryException(new DeliveryResult(
+						DeliveryResult.CODE_FAILED, "Calling DeliveryActionHandler.onFollowUpDeliverDoWork failed! localOrganisation="+getOrganisationID(), e)); 
+			}
+		}
 
 		return serverDeliveryResult;
 	}
@@ -1405,6 +1440,20 @@ implements StoreCallback
 							DeliveryResult.CODE_FAILED,
 							"Calling DeliveryNoteActionHandler.onDeliverEnd failed!",
 							x));
+		}
+		
+		Set<Delivery> precursorDeliverySet = deliveryData.getDelivery().getPrecursorSet();		
+		for (Delivery precursorDelivery : precursorDeliverySet) {
+			try {
+				for (DeliveryActionHandler deliveryActionHandler : precursorDelivery.getDeliveryLocal().getDeliveryActionHandlers()) {
+					deliveryActionHandler.onFollowUpDeliverEnd(deliveryData.getDelivery(), precursorDelivery);
+				}
+			} catch (DeliveryException x) {
+				throw x;
+			} catch (Exception e) {
+				throw new DeliveryException(new DeliveryResult(
+						DeliveryResult.CODE_FAILED, "Calling DeliveryActionHandler.onFollowUpDeliverEnd failed! localOrganisation="+getOrganisationID(), e)); 
+			}
 		}
 
 		try {

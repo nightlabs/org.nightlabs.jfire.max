@@ -28,16 +28,16 @@ package org.nightlabs.jfire.store.deliver;
 
 import java.io.Serializable;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.Date;
 import java.util.HashSet;
-import java.util.Iterator;
-import java.util.Map;
 import java.util.Set;
 
 import javax.jdo.JDOHelper;
 import javax.jdo.PersistenceManager;
 import javax.jdo.listener.StoreCallback;
 
+import org.nightlabs.jdo.NLJDOHelper;
 import org.nightlabs.jdo.ObjectIDUtil;
 import org.nightlabs.jfire.idgenerator.IDGenerator;
 import org.nightlabs.jfire.security.User;
@@ -93,41 +93,54 @@ implements Serializable, StoreCallback
 	private long deliveryID;
 
 	/**
-	 * This is used for postponed <tt>Delivery</tt>s. To follow up a previously
-	 * postponed delivery, you have to set this (or the {@link #precursorID})
-	 * to the previous delivery (which has not been completed, but postponed).
-	 * This will cause {@link #followUp} of the previous <tt>Delivery</tt> to point
-	 * to the new one while <tt>precursor</tt> in the new <tt>Delivery</tt> points
-	 * back to the old one.
-	 *
-	 * @jdo.field persistence-modifier="persistent"
+	 * This is used for postponed <tt>Delivery</tt>s. To follow up a previously postponed delivery, you have to add
+	 * the previous delivery (which has not been completed yet but instead postponed) to this set. You can also add
+	 * the {@link DeliveryID} to {@link #precursorIDSet} instead, what may provide better performance when exchanging
+	 * deliveries between server and client.
+	 * 
+	 * @jdo.field
+	 * 		persistence-modifier="persistent"
+	 *		collection-type="collection"
+	 *		element-type="org.nightlabs.jfire.store.deliver.Delivery"
+	 *		table="JFireTrade_Delivery_precursorDeliveries"
+	 *		null-value="exception"
+	 * 
+	 * @jdo.join
 	 */
-	private Delivery precursor = null;
+	private Set<Delivery> precursorSet = null;
 
 	/**
-	 * @see #precursor
+	 * @see #precursorSet
 	 *
 	 * @jdo.field persistence-modifier="none"
 	 */
-	private DeliveryID precursorID = null;
+	private Set<DeliveryID> precursorIDSet = null;
 	
-	/**
-	 * This is used for postponed <tt>Delivery</tt>s. If this <tt>Delivery</tt> has been
-	 * postponed and later followed up by a new one, this field will point to the
-	 * new <tt>Delivery</tt>. In case, the new <tt>Delivery</tt> failed and a second
-	 * follow-up-<tt>Delivery</tt> is done, this will point to the newest follow-up
-	 * <tt>Delivery</tt> (and therefore at the end always to one that did not fail).
-	 *
-	 * @see #precursor
-	 *
-	 * @jdo.field persistence-modifier="persistent"
-	 */
-	private Delivery followUp = null;
+//	Tobias: Since a delivery may have several follow up deliveries, this field is removed. Relations between
+//	postponed deliveries should be managed by using #precursor and #precursorIDSet
+//	
+//	/**
+//	 * This is used for postponed <tt>Delivery</tt>s. If this <tt>Delivery</tt> has been
+//	 * postponed and later followed up by a new one, this field will point to the
+//	 * new <tt>Delivery</tt>. In case, the new <tt>Delivery</tt> failed and a second
+//	 * follow-up-<tt>Delivery</tt> is done, this will point to the newest follow-up
+//	 * <tt>Delivery</tt> (and therefore at the end always to one that did not fail).
+//	 *
+//	 * @see #precursor
+//	 *
+//	 * @jdo.field persistence-modifier="persistent"
+//	 */
+//	private Delivery followUp = null;
 
 	/**
 	 * @jdo.field persistence-modifier="persistent"
 	 */
 	private User user = null;
+	
+	/**
+	 * @jdo.field persistence-modifier="persistent" mapped-by="delivery"
+	 */
+	private DeliveryLocal deliveryLocal = null;
 
 	/**
 	 * @jdo.field persistence-modifier="persistent"
@@ -138,7 +151,7 @@ implements Serializable, StoreCallback
 	 * @jdo.field persistence-modifier="none"
 	 */
 	private transient ServerDeliveryProcessorID serverDeliveryProcessorID = null;
-
+	
 	/**
 	 * @return Returns the serverDeliveryProcessorID. Might be <tt>null</tt> if client
 	 *		doesn't choose one.
@@ -276,7 +289,7 @@ implements Serializable, StoreCallback
 	 * @jdo.field persistence-modifier="persistent"
 	 */
 	private boolean forceRollback = false;
-
+	
 	/**
 	 * @param forceRollback The forceRollback to set.
 	 */
@@ -319,12 +332,6 @@ implements Serializable, StoreCallback
 	 * @jdo.field persistence-modifier="persistent"
 	 */
 	private byte rollbackStatus = ROLLBACK_STATUS_NOT_DONE;
-
-	public Delivery(String organisationID, long deliveryID, DeliveryID precursorID)
-	{
-		this(organisationID, deliveryID);
-		this.precursorID = precursorID;
-	}
 
 	public Delivery(String organisationID, long deliveryID)
 	{
@@ -857,8 +864,7 @@ implements Serializable, StoreCallback
 	{
 		if (deliveryNoteIDs == null) {
 			Set dnids = new HashSet();
-			for (Iterator it = deliveryNotes.iterator(); it.hasNext(); ) {
-				DeliveryNote deliveryNote = (DeliveryNote) it.next();
+			for (DeliveryNote deliveryNote : deliveryNotes) {
 				dnids.add((DeliveryNoteID) JDOHelper.getObjectId(deliveryNote));
 			}
 			deliveryNoteIDs = dnids;
@@ -978,8 +984,7 @@ implements Serializable, StoreCallback
 		else
 			articleIDs.clear();
 
-		for (Iterator it = articles.iterator(); it.hasNext(); ) {
-			Article article = (Article) it.next();
+		for (Article article : articles) {
 			articleIDs.add((ArticleID) JDOHelper.getObjectId(article));
 		}
 		this.articles = articles;
@@ -1252,44 +1257,53 @@ implements Serializable, StoreCallback
 	}
 
 	/**
-	 * @return Returns the precursor.
+	 * @return Returns the precursorSet.
 	 */
-	public Delivery getPrecursor()
+	public Set<Delivery> getPrecursorSet()
 	{
-		return precursor;
+		return precursorSet == null ? Collections.EMPTY_SET : precursorSet;
 	}
 	/**
-	 * @param precursor The precursor to set.
+	 * @param precursor The precursor to add.
 	 */
-	public void setPrecursor(Delivery precursor)
+	public void setPrecursorSet(Set<Delivery> precursorSet)
 	{
-		this.precursor = precursor;
-		this.precursorID = (DeliveryID) JDOHelper.getObjectId(precursor);
+		this.precursorSet = precursorSet;
+		this.precursorIDSet = NLJDOHelper.getObjectIDSet(precursorSet);
 	}
 	/**
-	 * @param precursorID The precursorID to set.
+	 * @param precursorIDSet The precursorIDSet to ad.
 	 */
-	public void setPrecursorID(DeliveryID precursorID)
+	public void setPrecursorIDSet(Set<DeliveryID> precursorIDSet)
 	{
-		this.precursorID = precursorID;
-		this.precursor = null;
+		this.precursorIDSet = precursorIDSet;
+		this.precursorSet = null;
 	}
 	/**
-	 * @return Returns the followUp.
+	 * @return Returns the precursorIDSet.
 	 */
-	public Delivery getFollowUp()
+	public Set<DeliveryID> getPrecursorIDSet()
 	{
-		return followUp;
-	}
-	/**
-	 * @return Returns the precursorID.
-	 */
-	public DeliveryID getPrecursorID()
-	{
-		if (precursor != null)
-			return (DeliveryID) JDOHelper.getObjectId(precursor);
+		if (precursorSet == null)
+			precursorIDSet = NLJDOHelper.getObjectIDSet(getPrecursorSet());
 
-		return precursorID;
+		return precursorIDSet;
+	}
+	
+	/**
+	 * Returns the associated {@link DeliveryLocal}.
+	 * @return The associated {@link DeliveryLocal}.
+	 */
+	public DeliveryLocal getDeliveryLocal() {
+		return deliveryLocal;
+	}
+	
+	/**
+	 * Sets the associated {@link DeliveryLocal}.
+	 * @param deliveryLocal The {@link DeliveryLocal} to associate with this instance.
+	 */
+	public void setDeliveryLocal(DeliveryLocal deliveryLocal) {
+		this.deliveryLocal = deliveryLocal;
 	}
 
 	/**
@@ -1315,7 +1329,7 @@ implements Serializable, StoreCallback
 		n.failed = failed;
 //		n.deliveryNoteIDs = getDeliveryNoteIDs();
 //		n.followUp = followUp;
-		n.precursorID = getPrecursorID();
+		n.precursorIDSet = getPrecursorIDSet();
 		n.modeOfDeliveryFlavourID = getModeOfDeliveryFlavourID();
 		n.partnerID = getPartnerID();
 		n.articleIDs = articleIDs;
@@ -1367,13 +1381,12 @@ implements Serializable, StoreCallback
 //				if (articleLocals == null)
 //					articleLocals = new HashSet();
 				if (articles == null)
-					articles = new HashSet();
+					articles = new HashSet<Article>();
 
 //				articleLocals.clear();
 				articles.clear();
 
-				for (Iterator it = articleIDs.iterator(); it.hasNext(); ) {
-					ArticleID articleID = (ArticleID) it.next();
+				for (ArticleID articleID : articleIDs) {
 					Article article = (Article) pm.getObjectById(articleID);
 					ArticleLocal articleLocal = article.getArticleLocal();
 
@@ -1406,7 +1419,7 @@ implements Serializable, StoreCallback
 		if (JDOHelper.isNew(this)) {
 			HashSet dnIDs = new HashSet();
 			if (deliveryNotes == null)
-				deliveryNotes = new HashSet();
+				deliveryNotes = new HashSet<DeliveryNote>();
 	
 			deliveryNotes.clear();
 //			for (Iterator it = articleLocals.iterator(); it.hasNext(); ) {
@@ -1418,8 +1431,7 @@ implements Serializable, StoreCallback
 //					dnIDs.add(deliveryNoteID);
 //				}
 //			}
-			for (Iterator it = articles.iterator(); it.hasNext(); ) {
-				Article article = (Article) it.next();
+			for (Article article : articles) {
 				DeliveryNote deliveryNote = article.getDeliveryNote();
 				if (deliveryNote == null)
 					throw new IllegalStateException("Article \"" + article.getPrimaryKey() + "\" does not have a DeliveryNote assigned!");
@@ -1432,9 +1444,13 @@ implements Serializable, StoreCallback
 			}
 		}
 
-		if (precursorID != null && precursor == null) {
-			precursor = (Delivery) pm.getObjectById(precursorID);
-			precursor.followUp = this;
+//		if (precursorIDSet != null && precursor == null) {
+//			precursor = (Delivery) pm.getObjectById(precursorIDSet);
+//			precursor.followUp = this;
+//		}
+		
+		if (precursorIDSet != null && precursorSet == null) {
+			precursorSet = NLJDOHelper.getObjectSet(pm, precursorIDSet, Delivery.class);
 		}
 	}
 	

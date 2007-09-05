@@ -132,6 +132,9 @@ implements SessionBean
 //				deliveryData = (DeliveryData) pm.attachCopy(deliveryData, false);
 //			else
 
+			// DeliveryLocal registers itself with the Delivery
+			new DeliveryLocal(deliveryData.getDelivery());
+			
 			deliveryData.getDelivery().initUser(User.getUser(pm, getPrincipal()));
 			deliveryData = (DeliveryData) pm.makePersistent(deliveryData);
 

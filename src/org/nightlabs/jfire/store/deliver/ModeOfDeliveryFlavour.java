@@ -436,7 +436,10 @@ implements Serializable
 			}
 		}
 
-		return res;
+		if (res == null)
+			return new HashMap();
+		else
+			return res;
 	}
 
 	protected static Map getAvailableModeOfDeliveryFlavoursMapForOneCustomerGroup(PersistenceManager pm, String organisationID, String customerGroupID)

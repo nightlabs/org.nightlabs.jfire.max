@@ -115,6 +115,9 @@ implements SessionBean
 //				paymentData = (PaymentData) pm.attachCopy(paymentData, false);
 //			else
 
+			// PaymentLocal registers itself with Payment
+			new PaymentLocal(paymentData.getPayment());
+			
 			paymentData.getPayment().initUser(User.getUser(pm, getPrincipal()));
 			pm.makePersistent(paymentData);
 

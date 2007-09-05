@@ -7,6 +7,7 @@ import org.nightlabs.jdo.query.JDOQuery;
 import org.nightlabs.jfire.accounting.Account;
 import org.nightlabs.jfire.accounting.Currency;
 import org.nightlabs.jfire.accounting.id.CurrencyID;
+import org.nightlabs.jfire.transfer.id.AnchorID;
 
 /**
  * @author Daniel.Mazurek [at] NightLabs [dot] de
@@ -48,6 +49,16 @@ extends JDOQuery<Account>
 	 */
 	private String anchorTypeID = null;
 	
+	/**
+	 * the AnchorID of the owner
+	 */
+	private AnchorID ownerID = null;
+	
+	/**
+	 * the name (or part of the name) of the owner
+	 */
+	private String ownerName = null;
+	
 	@Override
 	protected Query prepareQuery() 
 	{
@@ -79,6 +90,21 @@ extends JDOQuery<Account>
 			filter.append("\n && ( ");
 			addFullTextSearch(filter, vars, "name");
 			filter.append(")");
+		}
+		
+		if (ownerID != null) {
+				// FIXME: JPOX Bug JDOHelper.getObjectId(this.*) does not seem to work (java.lang.IndexOutOfBoundsException: Index: 3, Size: 3)
+//			filter.append("\n && JDOHelper.getObjectId(this.owner) == :ownerID");
+			// WORKAROUND:
+			filter.append("\n && (" +
+					"this.owner.organisationID == \""+ownerID.organisationID+"\" && " +
+					"this.owner.anchorTypeID == \""+ownerID.anchorTypeID+"\" && " +
+					"this.owner.anchorID == \""+ownerID.anchorID+"\"" +
+							")");
+		}
+		
+		if (ownerName != null) {
+			filter.append("\n && (this.owner.person.displayName.toLowerCase().indexOf(\""+ownerName.toLowerCase()+"\") >= 0)");			
 		}
 		
 		if (logger.isDebugEnabled()) {
@@ -220,6 +246,38 @@ extends JDOQuery<Account>
 	 */
 	public void setAnchorTypeID(String anchorTypeID) {
 		this.anchorTypeID = anchorTypeID;
+	}
+
+	/**
+	 * returns the ownerID
+	 * @return the ownerID
+	 */
+	public AnchorID getOwnerID() {
+		return ownerID;
+	}
+
+	/**
+	 * sets the ownerID
+	 * @param ownerID the ownerID to set
+	 */
+	public void setOwnerID(AnchorID ownerID) {
+		this.ownerID = ownerID;
+	}
+
+	/**
+	 * returns the ownerName
+	 * @return the ownerName
+	 */
+	public String getOwnerName() {
+		return ownerName;
+	}
+
+	/**
+	 * sets the ownerName
+	 * @param ownerName the ownerName to set
+	 */
+	public void setOwnerName(String ownerName) {
+		this.ownerName = ownerName;
 	}	
-		
+	
 }

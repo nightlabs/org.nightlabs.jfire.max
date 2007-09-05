@@ -5,6 +5,7 @@ import javax.jdo.Query;
 import org.apache.log4j.Logger;
 import org.nightlabs.jdo.query.JDOQuery;
 import org.nightlabs.jfire.store.Repository;
+import org.nightlabs.jfire.transfer.id.AnchorID;
 
 /**
  * @author Marco Schulze - Marco at NightLabs dot de
@@ -30,6 +31,16 @@ extends JDOQuery<Repository>
 	 */
 	private String anchorTypeID = null;
 
+	/**
+	 * the {@link AnchorID} of the owner
+	 */
+	private AnchorID ownerID = null;
+	
+	/**
+	 * the name (or part of it) of the owner 
+	 */
+	private String ownerName = null;
+	
 	@Override
 	protected Query prepareQuery() 
 	{
@@ -52,6 +63,21 @@ extends JDOQuery<Repository>
 			filter.append(")");
 		}
 
+		if (ownerID != null) {
+			// FIXME: JPOX Bug JDOHelper.getObjectId(this.*) does not seem to work (java.lang.IndexOutOfBoundsException: Index: 3, Size: 3)
+//		filter.append("\n && JDOHelper.getObjectId(this.owner) == :ownerID");
+		// WORKAROUND:
+		filter.append("\n && (" +
+				"this.owner.organisationID == \""+ownerID.organisationID+"\" && " +
+				"this.owner.anchorTypeID == \""+ownerID.anchorTypeID+"\" && " +
+				"this.owner.anchorID == \""+ownerID.anchorID+"\"" +
+						")");
+		}
+		
+		if (ownerName != null) {
+			filter.append("\n && (this.owner.person.displayName.toLowerCase().indexOf(\""+ownerName.toLowerCase()+"\") >= 0)");			
+		}		
+		
 		if (logger.isDebugEnabled()) {
 			logger.debug("Vars:");
 			logger.debug(vars.toString());
@@ -143,6 +169,38 @@ extends JDOQuery<Repository>
 	 */
 	public void setAnchorTypeID(String anchorTypeID) {
 		this.anchorTypeID = anchorTypeID;
+	}
+
+	/**
+	 * returns the {@link AnchorID} of the owner of the repository
+	 * @return the ownerID
+	 */
+	public AnchorID getOwnerID() {
+		return ownerID;
+	}
+
+	/**
+	 * sets the {@link AnchorID} of the owner of the repository
+	 * @param ownerID the ownerID to set
+	 */
+	public void setOwnerID(AnchorID ownerID) {
+		this.ownerID = ownerID;
+	}
+
+	/**
+	 * returns the name (or part of it) of the owner of repository
+	 * @return the ownerName
+	 */
+	public String getOwnerName() {
+		return ownerName;
+	}
+
+	/**
+	 * sets the name (or part of it) of the owner of repository
+	 * @param ownerName the ownerName to set
+	 */
+	public void setOwnerName(String ownerName) {
+		this.ownerName = ownerName;
 	}	
 		
 }

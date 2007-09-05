@@ -16,8 +16,8 @@ extends JDOQuery<T>
 	private Date timestampFromIncl = null;
 	private Date timestampToIncl = null;
 
-	private long rangeFromIncl = 0;
-	private long rangeToExcl = Long.MAX_VALUE;
+//	private long rangeFromIncl = 0;
+//	private long rangeToExcl = Long.MAX_VALUE;
 
 	private AnchorID fromAnchorID = null;
 	private AnchorID toAnchorID = null;
@@ -89,7 +89,7 @@ extends JDOQuery<T>
 
 		appendToFilter(q, filter);
 		q.setFilter(filter.toString());
-		q.setRange(rangeFromIncl, rangeToExcl);
+//		q.setRange(rangeFromIncl, rangeToExcl);
 		q.setOrdering("this.timestamp DESCENDING, organisationID ASCENDING, transferTypeID ASCENDING, transferID DESCENDING");
 		setQueryResult(q);
 
@@ -100,22 +100,22 @@ extends JDOQuery<T>
 
 	protected abstract void setQueryResult(Query q);
 
-	public long getRangeFromIncl()
-	{
-		return rangeFromIncl;
-	}
-	public void setRangeFromIncl(long rangeFromIncl)
-	{
-		this.rangeFromIncl = rangeFromIncl;
-	}
-	public long getRangeToExcl()
-	{
-		return rangeToExcl;
-	}
-	public void setRangeToExcl(long rangeToExcl)
-	{
-		this.rangeToExcl = rangeToExcl;
-	}
+//	public long getRangeFromIncl()
+//	{
+//		return rangeFromIncl;
+//	}
+//	public void setRangeFromIncl(long rangeFromIncl)
+//	{
+//		this.rangeFromIncl = rangeFromIncl;
+//	}
+//	public long getRangeToExcl()
+//	{
+//		return rangeToExcl;
+//	}
+//	public void setRangeToExcl(long rangeToExcl)
+//	{
+//		this.rangeToExcl = rangeToExcl;
+//	}
 	public Date getTimestampFromIncl()
 	{
 		return timestampFromIncl;

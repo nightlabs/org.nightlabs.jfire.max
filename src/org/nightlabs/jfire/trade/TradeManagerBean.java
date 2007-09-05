@@ -83,6 +83,7 @@ import org.nightlabs.jfire.trade.id.OfferLocalID;
 import org.nightlabs.jfire.trade.id.OrderID;
 import org.nightlabs.jfire.trade.id.SegmentTypeID;
 import org.nightlabs.jfire.trade.jbpm.ProcessDefinitionAssignment;
+import org.nightlabs.jfire.trade.query.AbstractArticleContainerQuickSearchQuery;
 import org.nightlabs.jfire.trade.query.ArticleContainerQuery;
 import org.nightlabs.jfire.transfer.id.AnchorID;
 import org.nightlabs.version.MalformedVersionException;
@@ -1510,9 +1511,9 @@ implements SessionBean
 			pm.close();
 		}		
 	}
-		
+
 	/**
-	 * @param articleContainerQueries Instances of {@link ArticleContainerQuery} 
+	 * @param queries Instances of {@link JDOQuery} 
 	 * 		that shall be chained
 	 *		in order to retrieve the result. The result of one query is passed to the
 	 *		next one using the {@link JDOQuery#setCandidates(Collection)}.
@@ -1521,15 +1522,15 @@ implements SessionBean
 	 * @ejb.permission role-name="_Guest_"
 	 * @ejb.transaction type="Supports"
 	 */
-	public Set<ArticleContainerID> getArticleContainerIDs(Collection<ArticleContainerQuery> articleContainerQueries)
+	public Set<ArticleContainerID> getArticleContainerIDs(Collection<JDOQuery<ArticleContainer>> queries)
 	{
 		PersistenceManager pm = getPersistenceManager();
 		try {
 			pm.getFetchPlan().setMaxFetchDepth(1);
 			pm.getFetchPlan().setGroup(FetchPlan.DEFAULT);
 
-			Collection<ArticleContainer> articleContainers = null;
-			for (ArticleContainerQuery query : articleContainerQueries) {
+			Collection<AbstractArticleContainerQuickSearchQuery> articleContainers = null;
+			for (JDOQuery query : queries) {
 				query.setPersistenceManager(pm);
 				query.setCandidates(articleContainers);
 				articleContainers = (Collection) query.getResult();
@@ -1539,32 +1540,92 @@ implements SessionBean
 		} finally {
 			pm.close();
 		}
-	}	
-
-	/**
-	 * @ejb.interface-method
-	 * @ejb.permission role-name="_Guest_"
-	 * @ejb.transaction type="Supports"
-	 */	
-	public Set<InvoiceID> getInvoiceIDs(Collection<JDOQuery> queries) 
-	{
-		PersistenceManager pm = getPersistenceManager();
-		try {
-			pm.getFetchPlan().setMaxFetchDepth(1);
-			pm.getFetchPlan().setGroup(FetchPlan.DEFAULT);
-
-			Collection<Invoice> invoices = null;
-			for (JDOQuery query : queries) {
-				query.setPersistenceManager(pm);
-				query.setCandidates(invoices);
-				invoices = (Collection) query.getResult();
-			}
-
-			return NLJDOHelper.getObjectIDSet(invoices);
-		} finally {
-			pm.close();
-		}		
 	}
+				
+//	/**
+//	 * @param articleContainerQueries Instances of {@link ArticleContainerQuery} 
+//	 * 		that shall be chained
+//	 *		in order to retrieve the result. The result of one query is passed to the
+//	 *		next one using the {@link JDOQuery#setCandidates(Collection)}.
+//	 *
+//	 * @ejb.interface-method
+//	 * @ejb.permission role-name="_Guest_"
+//	 * @ejb.transaction type="Supports"
+//	 */
+//	public Set<ArticleContainerID> getArticleContainerIDsForQueries(Collection<ArticleContainerQuery> articleContainerQueries)
+//	{
+//		PersistenceManager pm = getPersistenceManager();
+//		try {
+//			pm.getFetchPlan().setMaxFetchDepth(1);
+//			pm.getFetchPlan().setGroup(FetchPlan.DEFAULT);
+//
+//			Collection<ArticleContainer> articleContainers = null;
+//			for (ArticleContainerQuery query : articleContainerQueries) {
+//				query.setPersistenceManager(pm);
+//				query.setCandidates(articleContainers);
+//				articleContainers = (Collection) query.getResult();
+//			}
+//
+//			return NLJDOHelper.getObjectIDSet(articleContainers);
+//		} finally {
+//			pm.close();
+//		}
+//	}	
+
+//	/**
+//	 * @param articleContainerQueries Instances of {@link AbstractArticleContainerQuickSearchQuery} 
+//	 * 		that shall be chained
+//	 *		in order to retrieve the result. The result of one query is passed to the
+//	 *		next one using the {@link JDOQuery#setCandidates(Collection)}.
+//	 *
+//	 * @ejb.interface-method
+//	 * @ejb.permission role-name="_Guest_"
+//	 * @ejb.transaction type="Supports"
+//	 */
+//	public Set<ArticleContainerID> getArticleContainerIDsForQuickSearchQueries(Collection<AbstractArticleContainerQuickSearchQuery> articleContainerQuickSearchQueries)
+//	{
+//		PersistenceManager pm = getPersistenceManager();
+//		try {
+//			pm.getFetchPlan().setMaxFetchDepth(1);
+//			pm.getFetchPlan().setGroup(FetchPlan.DEFAULT);
+//
+//			Collection<AbstractArticleContainerQuickSearchQuery> articleContainers = null;
+//			for (AbstractArticleContainerQuickSearchQuery query : articleContainerQuickSearchQueries) {
+//				query.setPersistenceManager(pm);
+//				query.setCandidates(articleContainers);
+//				articleContainers = (Collection) query.getResult();
+//			}
+//
+//			return NLJDOHelper.getObjectIDSet(articleContainers);
+//		} finally {
+//			pm.close();
+//		}
+//	}
+	
+//	/**
+//	 * @ejb.interface-method
+//	 * @ejb.permission role-name="_Guest_"
+//	 * @ejb.transaction type="Supports"
+//	 */	
+//	public Set<InvoiceID> getInvoiceIDs(Collection<JDOQuery> queries) 
+//	{
+//		PersistenceManager pm = getPersistenceManager();
+//		try {
+//			pm.getFetchPlan().setMaxFetchDepth(1);
+//			pm.getFetchPlan().setGroup(FetchPlan.DEFAULT);
+//
+//			Collection<Invoice> invoices = null;
+//			for (JDOQuery query : queries) {
+//				query.setPersistenceManager(pm);
+//				query.setCandidates(invoices);
+//				invoices = (Collection) query.getResult();
+//			}
+//
+//			return NLJDOHelper.getObjectIDSet(invoices);
+//		} finally {
+//			pm.close();
+//		}		
+//	}
 	
 	/**
 	 * @ejb.interface-method
@@ -1616,30 +1677,30 @@ implements SessionBean
 		}		
 	}	
 	
-	/**
-	 * @ejb.interface-method
-	 * @ejb.permission role-name="_Guest_"
-	 * @ejb.transaction type="Supports"
-	 */	
-	public Set<DeliveryNoteID> getDeliveryNoteIDs(Collection<JDOQuery> queries) 
-	{
-		PersistenceManager pm = getPersistenceManager();
-		try {
-			pm.getFetchPlan().setMaxFetchDepth(1);
-			pm.getFetchPlan().setGroup(FetchPlan.DEFAULT);
-
-			Collection<DeliveryNote> deliveryNotes = null;
-			for (JDOQuery query : queries) {
-				query.setPersistenceManager(pm);
-				query.setCandidates(deliveryNotes);
-				deliveryNotes = (Collection) query.getResult();
-			}
-
-			return NLJDOHelper.getObjectIDSet(deliveryNotes);
-		} finally {
-			pm.close();
-		}		
-	}
+//	/**
+//	 * @ejb.interface-method
+//	 * @ejb.permission role-name="_Guest_"
+//	 * @ejb.transaction type="Supports"
+//	 */	
+//	public Set<DeliveryNoteID> getDeliveryNoteIDs(Collection<JDOQuery> queries) 
+//	{
+//		PersistenceManager pm = getPersistenceManager();
+//		try {
+//			pm.getFetchPlan().setMaxFetchDepth(1);
+//			pm.getFetchPlan().setGroup(FetchPlan.DEFAULT);
+//
+//			Collection<DeliveryNote> deliveryNotes = null;
+//			for (JDOQuery query : queries) {
+//				query.setPersistenceManager(pm);
+//				query.setCandidates(deliveryNotes);
+//				deliveryNotes = (Collection) query.getResult();
+//			}
+//
+//			return NLJDOHelper.getObjectIDSet(deliveryNotes);
+//		} finally {
+//			pm.close();
+//		}		
+//	}
 	
 	/**
 	 * @ejb.interface-method

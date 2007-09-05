@@ -396,6 +396,31 @@ implements SessionBean
 	}
 	
 	/**
+	 * @ejb.interface-method
+	 * @ejb.permission role-name="_Guest_"
+	 * @ejb.transaction type="Supports"
+	 */	
+	public Set<DeliveryNoteID> getDeliveryNoteIDs(Collection<JDOQuery> queries) 
+	{
+		PersistenceManager pm = getPersistenceManager();
+		try {
+			pm.getFetchPlan().setMaxFetchDepth(1);
+			pm.getFetchPlan().setGroup(FetchPlan.DEFAULT);
+
+			Collection<DeliveryNote> deliveryNotes = null;
+			for (JDOQuery query : queries) {
+				query.setPersistenceManager(pm);
+				query.setCandidates(deliveryNotes);
+				deliveryNotes = (Collection) query.getResult();
+			}
+
+			return NLJDOHelper.getObjectIDSet(deliveryNotes);
+		} finally {
+			pm.close();
+		}		
+	}	
+	
+	/**
 	 * Searches with the given searchFilter for {@link ProductType}s.
 	 *  
 	 * @ejb.interface-method

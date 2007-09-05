@@ -2280,6 +2280,31 @@ public abstract class AccountingManagerBean
 	}
 
 	/**
+	 * @ejb.interface-method
+	 * @ejb.permission role-name="_Guest_"
+	 * @ejb.transaction type="Supports"
+	 */	
+	public Set<InvoiceID> getInvoiceIDsByQueries(Collection<JDOQuery> queries) 
+	{
+		PersistenceManager pm = getPersistenceManager();
+		try {
+			pm.getFetchPlan().setMaxFetchDepth(1);
+			pm.getFetchPlan().setGroup(FetchPlan.DEFAULT);
+
+			Collection<Invoice> invoices = null;
+			for (JDOQuery query : queries) {
+				query.setPersistenceManager(pm);
+				query.setCandidates(invoices);
+				invoices = (Collection) query.getResult();
+			}
+
+			return NLJDOHelper.getObjectIDSet(invoices);
+		} finally {
+			pm.close();
+		}		
+	}	
+	
+	/**
 	 * This method queries all <code>Invoice</code>s which exist between the given vendor and customer and
 	 * are not yet finalized. They are ordered by invoiceID descending (means newest first).
 	 *

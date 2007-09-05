@@ -1,14 +1,11 @@
 package org.nightlabs.jfire.trade.query;
 
 import java.util.Date;
-import java.util.Set;
 
 import javax.jdo.Query;
 
 import org.apache.log4j.Logger;
 import org.nightlabs.jdo.query.JDOQuery;
-import org.nightlabs.jfire.accounting.Currency;
-import org.nightlabs.jfire.jbpm.graph.def.Statable;
 import org.nightlabs.jfire.security.id.UserID;
 import org.nightlabs.jfire.trade.ArticleContainer;
 import org.nightlabs.jfire.transfer.id.AnchorID;
@@ -79,18 +76,8 @@ extends JDOQuery<ArticleContainer>
 					"this.vendor.anchorID == \""+vendorID.anchorID+"\"" +
 							")");
 		}
+	  // own to method to allow override for Offer where it is different
 		checkCustomer(filter);
-//		if (customerID != null) 
-//		{
-//			// FIXME: JPOX Bug JDOHelper.getObjectId(this.*) does not seem to work (java.lang.IndexOutOfBoundsException: Index: 3, Size: 3)
-////			filter.append("\n && JDOHelper.getObjectId(this.customer) == :customerID");
-//			// WORKAROUND:
-//			filter.append("\n && (" +
-//					"this.customer.organisationID == \""+customerID.organisationID+"\" && " +
-//					"this.customer.anchorTypeID == \""+customerID.anchorTypeID+"\" && " +
-//					"this.customer.anchorID == \""+customerID.anchorID+"\"" +
-//							")");
-//		}
 		
 //		if (currency != null)
 //			filter.append("\n && this.price.currency == :currency");
@@ -108,6 +95,7 @@ extends JDOQuery<ArticleContainer>
 		return q;
 	}
 
+	// own to method to allow override for Offer where it is different
 	protected void checkCustomer(StringBuffer filter) {
 		if (getCustomerID() != null) 
 		{
@@ -200,6 +188,5 @@ extends JDOQuery<ArticleContainer>
 //	}
 //	public void setPriceAmountMax(long priceAmountMax) {
 //		this.priceAmountMax = priceAmountMax;
-//	}
-	
+//	}	
 }

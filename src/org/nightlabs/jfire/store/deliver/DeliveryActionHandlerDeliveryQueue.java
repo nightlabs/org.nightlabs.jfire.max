@@ -1,5 +1,7 @@
 package org.nightlabs.jfire.store.deliver;
 
+import java.io.Serializable;
+
 import javax.jdo.JDOObjectNotFoundException;
 import javax.jdo.PersistenceManager;
 
@@ -21,8 +23,9 @@ import org.nightlabs.jfire.trade.Article;
  *
  * @jdo.inheritance strategy="superclass-table"
  */
-public class DeliveryActionHandlerDeliveryQueue extends DeliveryActionHandler {
+public class DeliveryActionHandlerDeliveryQueue extends DeliveryActionHandler implements Serializable {
 	
+	private static final long serialVersionUID = 1L;
 	private static final Logger logger = Logger.getLogger(DeliveryActionHandlerDeliveryQueue.class);
 	
 	public static DeliveryActionHandler getDeliveryActionHandlerDeliveryQueue(PersistenceManager pm) {

@@ -1284,7 +1284,7 @@ implements Serializable, StoreCallback
 	 */
 	public Set<DeliveryID> getPrecursorIDSet()
 	{
-		if (precursorSet == null)
+		if (precursorIDSet == null)
 			precursorIDSet = NLJDOHelper.getObjectIDSet(getPrecursorSet());
 
 		return precursorIDSet;

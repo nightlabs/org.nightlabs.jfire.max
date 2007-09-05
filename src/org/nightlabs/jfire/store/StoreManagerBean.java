@@ -31,6 +31,7 @@ import java.io.Serializable;
 import java.rmi.RemoteException;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
@@ -45,8 +46,10 @@ import javax.ejb.EJBException;
 import javax.ejb.SessionBean;
 import javax.ejb.SessionContext;
 import javax.jdo.FetchPlan;
+import javax.jdo.JDOHelper;
 import javax.jdo.JDOObjectNotFoundException;
 import javax.jdo.PersistenceManager;
+import javax.jdo.Query;
 
 import org.apache.commons.lang.exception.ExceptionUtils;
 import org.apache.log4j.Logger;
@@ -1692,7 +1695,22 @@ implements SessionBean
 		}
 	}
 	
-	
+	/**
+	 * Returns the {@link DeliveryQueueID}s of all {@link DeliveryQueue}s available.
+	 * @return The {@link DeliveryQueueID}s of all {@link DeliveryQueue}s available.
+	 * 
+	 * @param includeDefunct Sets whether defunct delivery queues should be included in the returned collection.
+	 * @ejb.interface-method
+	 * @ejb.permission role-name="_Guest_"
+	 */
+	public Collection<DeliveryQueueID> getAvailableDeliveryQueueIDs(boolean includeDefunct) {
+		PersistenceManager pm = getPersistenceManager();
+		try {
+			return NLJDOHelper.getDetachedQueryResultAsList(pm, DeliveryQueue.getDeliveryQueueIDs(pm, includeDefunct));
+		} finally {
+			pm.close();
+		}
+	}
 	
 	/**
 	 * Stores the given {@link DeliveryQueue}.
@@ -1725,7 +1743,7 @@ implements SessionBean
 			pm.close();
 		}
 	}
-	
+
 	/**
 	 * Returns all {@link DeliveryQueue}s available without the ones that have been marked as deleted.
 	 * @return All {@link DeliveryQueue}s available without the ones that have been marked as deleted.
@@ -1740,8 +1758,6 @@ implements SessionBean
 		return getAvailableDeliveryQueues(fetchGroups, fetchDepth, false);
 	}
 	
-	
-	
 	private List<DeliveryQueue> storeDeliveryQueues(Collection<DeliveryQueue> deliveryQueues, PersistenceManager pm) {
 		List<DeliveryQueue> pqs = new LinkedList<DeliveryQueue>();
 		for (DeliveryQueue clientPQ : deliveryQueues) {
@@ -1752,7 +1768,6 @@ implements SessionBean
 
 		return pqs;
 	}
-
 
 	/**
 	 * @ejb.interface-method

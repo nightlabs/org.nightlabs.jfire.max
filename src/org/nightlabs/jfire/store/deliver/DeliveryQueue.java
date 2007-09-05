@@ -4,12 +4,15 @@ import java.io.Serializable;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 
+import javax.jdo.FetchPlan;
 import javax.jdo.JDOHelper;
 import javax.jdo.PersistenceManager;
 import javax.jdo.Query;
 import javax.jdo.listener.AttachCallback;
+import javax.jdo.listener.DetachCallback;
 
 import org.apache.log4j.Logger;
 import org.nightlabs.jfire.idgenerator.IDGenerator;
@@ -38,10 +41,15 @@ import org.nightlabs.jfire.store.deliver.id.DeliveryQueueID;
  * 		query="SELECT WHERE !defunct || defunct == :includeDefunct"
  * 
  * @jdo.query
+ * 		name="getDeliveryQueueIDs"
+ * 		query="SELECT JDOHelper.getObjectId(this) WHERE !defunct || defunct == :includeDefunct
+ * 					 import javax.jdo.JDOHelper"
+ * 
+ * @jdo.query
  * 		name="getDeliveryQueueForDelivery"
  * 		query="SELECT WHERE pendingDeliverySet.contains(:delivery)"
  */
-public class DeliveryQueue implements Serializable, AttachCallback {
+public class DeliveryQueue implements Serializable, AttachCallback, DetachCallback {
 	
 	private static final Logger logger = Logger.getLogger(DeliveryQueue.class);
 	
@@ -49,6 +57,9 @@ public class DeliveryQueue implements Serializable, AttachCallback {
 	public static final String FETCH_GROUP_NAME = "DeliveryQueue.name";
 	public static final String FETCH_GROUP_DELIVERY_SET = "DeliveryQueue.deliverySet";
 	public static final String FETCH_GROUP_PENDING_DELIVERY_SET = "DeliveryQueue.pendingDeliverySet";
+	
+	/** virtual fetch group for the field hasPendingDeliveries that is set in the detach callback */
+	public static final String FETCH_GROUP_HAS_PENDING_DELIVERIES = "DeliveryQueue.hasPendingDeliveries";
 	
 	private static final long serialVersionUID = 1L;	
 
@@ -108,8 +119,14 @@ public class DeliveryQueue implements Serializable, AttachCallback {
 	 */
 	private boolean defunct = false;
 	
+	/**
+	 * This field is set during via detach callback.
+	 * @jdo.field persistence-modifier="none"
+	 */
+	private Boolean hasPendingDeliveries;
+	
 	/** @deprecated Only for JDO! */
-	protected DeliveryQueue() {		
+	protected DeliveryQueue() {
 	}
 	
 	public DeliveryQueue(String organisationID) {
@@ -166,7 +183,7 @@ public class DeliveryQueue implements Serializable, AttachCallback {
 	
 	/**
 	 * This marks the given delivery as processed. Internally, this means that the delivery is removed from the list of
-	 * outstanding deliveries.
+	 * pending deliveries.
 	 * 
 	 * @param delivery The delivery that is to be marked as processed.
 	 */
@@ -179,10 +196,16 @@ public class DeliveryQueue implements Serializable, AttachCallback {
 	}
 	
 	public boolean hasPendingDeliveries() {
-		return pendingDeliverySet.size() > 0;
+		if (hasPendingDeliveries == null)
+			hasPendingDeliveries = new Boolean(pendingDeliverySet.size() > 0);
+		
+		return hasPendingDeliveries.booleanValue();
 	}
 	
-	public void markDeleted() {
+	public void markDefunct() {
+		if (hasPendingDeliveries())
+			throw new IllegalArgumentException("Delivery queue has pending deliveries and thus cannot be marked defunct.");
+		
 		this.defunct = true;
 	}
 	
@@ -218,14 +241,23 @@ public class DeliveryQueue implements Serializable, AttachCallback {
 		return true;
 	}
 	
-	public static Collection<DeliveryQueue> getDeliveryQueues(PersistenceManager pm, boolean includeDefuncted) {
+	public static List<DeliveryQueue> getDeliveryQueues(PersistenceManager pm, boolean includeDefunct) {
 		Query q = pm.newNamedQuery(DeliveryQueue.class, "getDeliveryQueues");
-		return (Collection<DeliveryQueue>) q.execute(includeDefuncted);
+		return (List<DeliveryQueue>) q.execute(includeDefunct);
+	}
+	
+	public static Collection<DeliveryQueueID> getDeliveryQueueIDs(PersistenceManager pm, boolean includeDefunct) {
+		Query query = pm.newNamedQuery(DeliveryQueue.class, "getDeliveryQueueIDs");
+		return (Collection<DeliveryQueueID>) query.execute(includeDefunct);
 	}
 	
 	public static DeliveryQueue getDeliveryQueueForDelivery(Delivery delivery, PersistenceManager pm) {
 		Query q = pm.newNamedQuery(DeliveryQueue.class, "getDeliveryQueueForDelivery");
-		return (DeliveryQueue) q.execute(delivery);
+		Collection<DeliveryQueue> col = (Collection<DeliveryQueue>) q.execute(delivery);
+		if (col.isEmpty())
+			return null;
+		
+		return col.iterator().next();
 	}
 
 	public void jdoPreAttach() {
@@ -234,7 +266,8 @@ public class DeliveryQueue implements Serializable, AttachCallback {
 	public void jdoPostAttach(Object attached) {
 		if (true) return;
 		
-		logger.debug("DeliveryQueue#jdoPostAttach() - start");
+		// TODO That doesn't work currently.
+		
 		DeliveryQueue detached = (DeliveryQueue) attached;
 		PersistenceManager pm = JDOHelper.getPersistenceManager(this);
 		
@@ -247,14 +280,20 @@ public class DeliveryQueue implements Serializable, AttachCallback {
 				throw new IllegalArgumentException("You are not supposed to change the deliveries in a delivery queue.");
 			}
 		}
+	}
+
+	@SuppressWarnings("unchecked")
+	public void jdoPostDetach(Object o) {
+		DeliveryQueue attached = (DeliveryQueue) o;
+		DeliveryQueue detached = this;
+
+		PersistenceManager pm = JDOHelper.getPersistenceManager(attached);
+		Set fetchGroups = pm.getFetchPlan().getGroups();
 		
-//		try {
-//			checkDirtyStates(pendingDeliverySet);
-//			checkDirtyStates(deliverySet);
-//		} catch(JDODetachedFieldAccessException e) {
-//			logger.debug("JDODetachedFieldAccessException thrown.");
-//			// do nothing
-//		}
-		logger.debug("DeliveryQueue#jdoPostAttach() - end");
+		if (attached.hasPendingDeliveries != null || fetchGroups.contains(FETCH_GROUP_HAS_PENDING_DELIVERIES) || fetchGroups.contains(FetchPlan.ALL))
+			detached.hasPendingDeliveries = attached.hasPendingDeliveries();
+	}
+
+	public void jdoPreDetach() {
 	}
 }

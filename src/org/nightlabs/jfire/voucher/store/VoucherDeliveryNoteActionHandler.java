@@ -62,8 +62,13 @@ extends DeliveryNoteActionHandler
 
 		if (logger.isDebugEnabled())
 			logger.debug("onDeliverBegin: entered for " + JDOHelper.getObjectId(deliveryData) + " and " + JDOHelper.getObjectId(deliveryNote));
-
+		
 		Delivery delivery = deliveryData.getDelivery();
+		
+		// If the delivery is postponed, we do not create voucher keys.
+		if (delivery.isPostponed())
+			return;
+		
 		PersistenceManager pm = getPersistenceManager();
 
 //		if (Delivery.DELIVERY_DIRECTION_OUTGOING.equals(delivery.getDeliveryDirection())) {
@@ -95,8 +100,12 @@ extends DeliveryNoteActionHandler
 
 		if (logger.isDebugEnabled())
 			logger.debug("onDeliverEnd: entered for " + JDOHelper.getObjectId(deliveryData) + " and " + JDOHelper.getObjectId(deliveryNote));
-
+		
 		Delivery delivery = deliveryData.getDelivery();
+		
+		// If the delivery is postponed, we do not create voucher keys.
+		if (delivery.isPostponed())
+			return;
 
 		for (Article article : delivery.getArticles()) {
 			Product product = article.getProduct();

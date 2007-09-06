@@ -111,13 +111,15 @@ public class Account extends Anchor
 	 * anchorTypeID for accounts of trading partners when they acting as vendor
 	 */
 	public static final String ANCHOR_TYPE_ID_PARTNER_VENDOR = "Account.Partner.Vendor";
+	
 	/**
 	 * anchorTypeID for accounts of trading partners when they acting as customer
 	 */
 	public static final String ANCHOR_TYPE_ID_PARTNER_CUSTOMER = "Account.Partner.Customer";
 
 	/**
-	 * anchorTypeID for accounts of trading partners when they overpay an i TODO document this!
+	 * anchorTypeID for accounts of trading partners when they overpay multiple invoices and
+	 * it cannot be determined whether the partner is a customer or a vendor.
 	 */
 	public static final String ANCHOR_TYPE_ID_PARTNER_NEUTRAL = "Account.Partner.Neutral";
 
@@ -416,7 +418,7 @@ public class Account extends Anchor
 
 	/**
 	 * This is <code>null</code> in most cases. It only references another account (which is automatically
-	 * created), if this Account is a revenue(-in-)account (i.e. getting money for products sold by the local
+	 * created), if this Account is a revenue account (i.e. getting money for products sold by the local
 	 * organisation) and if money continues further to an cost account.
 	 *
 	 * @see #ANCHOR_TYPE_ID_LOCAL_REVENUE_IN

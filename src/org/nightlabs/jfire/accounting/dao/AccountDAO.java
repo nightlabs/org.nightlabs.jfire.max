@@ -11,6 +11,7 @@ import org.nightlabs.jfire.accounting.AccountSearchFilter;
 import org.nightlabs.jfire.accounting.AccountingManager;
 import org.nightlabs.jfire.accounting.AccountingManagerUtil;
 import org.nightlabs.jfire.base.jdo.BaseJDOObjectDAO;
+import org.nightlabs.jfire.base.jdo.cache.Cache;
 import org.nightlabs.jfire.security.SecurityReflector;
 import org.nightlabs.jfire.transfer.id.AnchorID;
 import org.nightlabs.progress.ProgressMonitor;
@@ -88,5 +89,23 @@ extends BaseJDOObjectDAO<AnchorID, Account>
 			int maxFetchDepth, ProgressMonitor monitor) 
 	{
 		return getJDOObject(null, accountID, fetchGroups, maxFetchDepth, monitor);
+	}
+	
+	public Account storeAccount(Account account, boolean get, String[] fetchGroups, 
+			int maxFetchDepth, ProgressMonitor monitor) 
+	{
+		monitor.beginTask("Save Account", 1);		
+		try {
+			AccountingManager am = AccountingManagerUtil.getHome(SecurityReflector.getInitialContextProperties()).create();
+			account = am.storeAccount(account, get, fetchGroups, maxFetchDepth);
+			if (account != null)
+				Cache.sharedInstance().put(null, account, fetchGroups, maxFetchDepth);
+			return account;
+		} catch (Exception x) {
+			throw new RuntimeException(x);
+		} finally {
+			monitor.worked(1);			
+			monitor.done();
+		}
 	}
 }

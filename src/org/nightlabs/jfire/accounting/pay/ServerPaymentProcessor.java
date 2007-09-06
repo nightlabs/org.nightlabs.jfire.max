@@ -45,7 +45,6 @@ import org.nightlabs.jfire.accounting.Currency;
 import org.nightlabs.jfire.accounting.pay.id.ModeOfPaymentFlavourID;
 import org.nightlabs.jfire.accounting.pay.id.ModeOfPaymentID;
 import org.nightlabs.jfire.security.User;
-import org.nightlabs.jfire.store.deliver.ServerDeliveryProcessor.DeliverParams;
 import org.nightlabs.jfire.trade.LegalEntity;
 import org.nightlabs.jfire.transfer.Anchor;
 import org.nightlabs.jfire.transfer.id.AnchorID;
@@ -414,8 +413,23 @@ implements Serializable, DetachCallback
 		return modeOfPaymentFlavours.values();
 	}
 
-	protected Account getAccountOutside(PayParams payParams,
-			String accountIDPrefix)
+	protected Account getAccountOutside(PayParams payParams, String accountIDPrefix)
+	{
+		return getAccountOutside(payParams, accountIDPrefix, false);
+	}
+
+	/**
+	 * Get an account for a payment process. This is a convenience method making
+	 * implementation of an <code>ServerPaymentProcessor</code> easier.
+	 *
+	 * @param payParams the current payment situation
+	 * @param accountIDPrefix a prefix for the account id.
+	 * @param individualAccount If <code>true</code>, the business partner's ID will be
+	 *		part of the account-id and thus one account per business partner will be used. If <code>false</code>,
+	 *		the payment processor will use the same account for all business partners.
+	 * @return the account to be used.
+	 */
+	protected Account getAccountOutside(PayParams payParams, String accountIDPrefix, boolean individualAccount)
 	{
 		PersistenceManager pm = getPersistenceManager();
 
@@ -424,7 +438,9 @@ implements Serializable, DetachCallback
 		LegalEntity partner = payment.getPartner();
 		Currency currency = payment.getCurrency();
 
-		String accountID = accountIDPrefix + '.' + currency.getCurrencyID() + '-' + partner.getOrganisationID() + '.' + partner.getAnchorTypeID() + '.' + partner.getAnchorID();
+		String accountID = accountIDPrefix + '.' + currency.getCurrencyID();
+		if (individualAccount)
+			accountID = accountID + '-' + partner.getOrganisationID() + '.' + partner.getAnchorTypeID() + '.' + partner.getAnchorID();
 
 		Account account;
 		try {

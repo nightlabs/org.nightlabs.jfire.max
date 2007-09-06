@@ -10,12 +10,13 @@ import java.util.List;
 
 import org.apache.log4j.Logger;
 import org.eclipse.datatools.connectivity.oda.IParameterMetaData;
+import org.eclipse.datatools.connectivity.oda.IResultSetMetaData;
 import org.eclipse.datatools.connectivity.oda.OdaException;
 import org.nightlabs.jfire.scripting.ScriptParameter;
 import org.nightlabs.jfire.scripting.ScriptParameterSet;
 
 /**
- * A generic class for metadata for oda DataSets.
+ * A generic class for metadata for ODA DataSets.
  * <p>
  * Note that as defined by ODA the position-parameters used
  * for most of the methods are 1-based.
@@ -42,7 +43,9 @@ public class ParameterMetaData implements NamedParameterMetaData, Serializable {
 		private String dataTypeName;		
 		private int precision;
 		private int scale;
-		private int nullable = IParameterMetaData.parameterNullable;
+		private int nullable = IResultSetMetaData.columnNullable; // 
+		// WORKAROUND: Wrong definition in ODA, should be IParameterMetaData.parameterNullable;
+		// see https://bugs.eclipse.org/bugs/show_bug.cgi?id=202407
 		
 		private String realDataTypeName;
 		
@@ -167,10 +170,10 @@ public class ParameterMetaData implements NamedParameterMetaData, Serializable {
 	
 	/**
 	 * Additional method that returns a name for a given parameter.
-	 * Note that this is not part of the ODA API and therefor not neccessary
+	 * Note that this is not part of the ODA API and therefore not necessary
 	 * to exist. 
 	 * 
-	 * @param pPosition The parameter postion the name should be returned.
+	 * @param pPosition The parameter position the name should be returned.
 	 * @return The name of the referenced parameter if one is set, <code>null</code> otherwise.
 	 */
 	public String getParameterName(int pPosition) {

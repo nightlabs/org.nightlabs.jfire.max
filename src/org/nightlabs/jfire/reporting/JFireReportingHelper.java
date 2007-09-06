@@ -289,10 +289,10 @@ public class JFireReportingHelper {
 	private static final Pattern patLineBreak = Pattern.compile("\\r?\\n");
 	
 	/**
-	 * Returns the given Sting with all occurences of the Pattern \r?\n with &lt;br/&gt;.
+	 * Returns the given Sting with all occurrences of the Pattern \r?\n with &lt;br/&gt;.
 	 * 
 	 * @param str The String to replace the linebreaks in. 
-	 * @return The given Sting with all occurences of the Pattern \r?\n with &lt;br/&gt;.
+	 * @return The given Sting with all occurrences of the Pattern \r?\n with &lt;br/&gt;.
 	 */
 	public static String setBRLineBreaks(String str) {
 		if (str == null)

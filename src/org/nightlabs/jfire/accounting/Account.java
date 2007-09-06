@@ -402,6 +402,9 @@ public class Account extends Anchor
 	/**
 	 * If this Account is the split out account from which money is taken and transferred to a cost center account,
 	 * this field will reference the original revenue account (where the money is coming in).
+	 * <p>
+	 * This means that if this Account is the revenueOutAccount of an account, this member will point back to that Account.
+	 * </p>
 	 *
 	 * @see #ANCHOR_TYPE_ID_LOCAL_REVENUE_IN
 	 * @see #ANCHOR_TYPE_ID_LOCAL_REVENUE_OUT
@@ -413,7 +416,7 @@ public class Account extends Anchor
 
 	/**
 	 * This is <code>null</code> in most cases. It only references another account (which is automatically
-	 * created), if this Account is a revenue account (i.e. getting money for products sold by the local
+	 * created), if this Account is a revenue(-in-)account (i.e. getting money for products sold by the local
 	 * organisation) and if money continues further to an cost account.
 	 *
 	 * @see #ANCHOR_TYPE_ID_LOCAL_REVENUE_IN

@@ -781,6 +781,12 @@ implements Serializable, DeleteCallback, DetachCallback, StoreCallback
 	{
 		return articleID;
 	}
+	/**
+	 * @return Returns the articleID converted to a String using {@link ObjectIDUtil#longObjectIDFieldToString(long)}.
+	 */
+	public String getArticleIDAsString() {
+		return ObjectIDUtil.longObjectIDFieldToString(articleID);
+	}
 	public static String getPrimaryKey(String organisationID, long articleID)
 	{
 		return organisationID + '/' + ObjectIDUtil.longObjectIDFieldToString(articleID);

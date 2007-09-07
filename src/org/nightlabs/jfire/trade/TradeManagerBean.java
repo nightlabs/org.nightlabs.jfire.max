@@ -208,8 +208,6 @@ implements SessionBean
 	 * @param segmentTypeIDs May be <tt>null</tt>. If it is not <tt>null</tt>, a {@link Segment} will be created for each defined {@link SegmentType}. For each <tt>null</tt> entry within the array, a <tt>Segment</tt> with the {@link SegmentType#DEFAULT_SEGMENT_TYPE_ID} will be created.
 	 * @param fetchGroups What fields should be detached.
 	 *
-	 * @throws ModuleException
-	 *
 	 * @ejb.interface-method
 	 * @ejb.permission role-name="TradeManager-write"
 	 * @ejb.transaction type="Required"
@@ -277,7 +275,6 @@ implements SessionBean
 	 * @ejb.transaction type="Required"
 	 */
 	public Collection<Segment> createCrossTradeSegments(OrderID orderID, Collection<SegmentTypeID> segmentTypeIDs)
-		throws ModuleException
 	{
 		PersistenceManager pm = getPersistenceManager();
 		try {
@@ -310,7 +307,6 @@ implements SessionBean
 	 * @ejb.transaction type="Required"
 	 */
 	public Order createCrossTradeOrder(String orderIDPrefix, String currencyID, CustomerGroupID customerGroupID, Collection<SegmentTypeID> segmentTypeIDs)
-		throws ModuleException
 	{
 		if (!getPrincipal().userIsOrganisation())
 			throw new IllegalStateException("This method cannot be called by a user who is not an organisation!");
@@ -598,7 +594,6 @@ implements SessionBean
 	 * @ejb.transaction type = "Required"
 	 **/
 	public List getNonFinalizedOffers(OrderID orderID, String[] fetchGroups, int maxFetchDepth)
-	throws ModuleException
 	{
 		PersistenceManager pm = getPersistenceManager();
 		try {
@@ -821,7 +816,6 @@ implements SessionBean
 	 */
 	public OrganisationLegalEntity getOrganisationLegalEntity(
 			String organisationID, boolean throwExceptionIfNotExistent, String[] fetchGroups, int maxFetchDepth)
-	throws ModuleException
 	{
 		PersistenceManager pm = getPersistenceManager();
 		try {
@@ -890,7 +884,6 @@ implements SessionBean
 	 * @ejb.transaction type = "Required"
 	 */ 
 	public LegalEntity storePersonAsLegalEntity(Person person, boolean get, String[] fetchGroups, int maxFetchDepth)
-	throws ModuleException
 	{
 		
 		PersistenceManager pm = getPersistenceManager();
@@ -914,17 +907,19 @@ implements SessionBean
 	 * Stores the given LegalEntity.
 	 * 
 	 * @param legalEntity The LegalEntity to be stored
-	 * @param get Weather the stored instance or null should be returned.
+	 * @param get Whether the stored instance or null should be returned.
 	 * @param fetchGroups The fetchGroups the returned LegalEntity should be detached with
 	 * @return The stored LegalEntity or null
-	 * @throws ModuleException
+	 * 
+	 * @ejb.interface-method
+	 * @ejb.permission role-name="_Guest_"
+	 * @ejb.transaction type="Required"
 	 */
 	public LegalEntity storeLegalEntity(LegalEntity legalEntity, boolean get, String[] fetchGroups, int maxFetchDepth)
-	throws ModuleException
 	{
 		PersistenceManager pm = getPersistenceManager();
 		try {
-			return (LegalEntity)NLJDOHelper.storeJDO(pm, legalEntity, get, fetchGroups, maxFetchDepth);
+			return (LegalEntity) NLJDOHelper.storeJDO(pm, legalEntity, get, fetchGroups, maxFetchDepth);
 		} finally {
 			pm.close();
 		}
@@ -936,7 +931,6 @@ implements SessionBean
 	 * @ejb.transaction type = "Required"
 	 */ 
 	public Order getOrder(OrderID orderID, String[] fetchGroups, int maxFetchDepth)
-	throws ModuleException
 	{
 		PersistenceManager pm = getPersistenceManager();
 		try {
@@ -956,7 +950,6 @@ implements SessionBean
 	 * @ejb.transaction type = "Required"
 	 */ 
 	public LegalEntity getLegalEntity(AnchorID anchorID, String[] fetchGroups, int maxFetchDepth)
-	throws ModuleException
 	{
 		PersistenceManager pm = getPersistenceManager();
 		try {
@@ -976,7 +969,6 @@ implements SessionBean
 	 * @ejb.transaction type = "Required"
 	 */ 
 	public Collection getLegalEntities(Object[] leAnchorIDs, String[] fetchGroups, int maxFetchDepth)
-	throws ModuleException
 	{
 		PersistenceManager pm = getPersistenceManager();
 		try {
@@ -1008,7 +1000,6 @@ implements SessionBean
 	 * @ejb.transaction type = "Required"
 	 */ 
 	public Collection<LegalEntity> getLegalEntities(Set<AnchorID> anchorIDs, String[] fetchGroups, int maxFetchDepth)
-	throws ModuleException
 	{
 		PersistenceManager pm = getPersistenceManager();
 		try {
@@ -1074,7 +1065,6 @@ implements SessionBean
 	 * @ejb.transaction type = "Required"
 	 */ 
 	public Article getArticle(ArticleID articleID, String[] fetchGroups, int maxFetchDepth)
-	throws ModuleException
 	{
 		PersistenceManager pm = getPersistenceManager();
 		try {
@@ -1098,7 +1088,6 @@ implements SessionBean
 	 * @ejb.transaction type = "Required"
 	 */ 
 	public Collection<Article> getArticles(Collection<ArticleID> articleIDs, String[] fetchGroups, int maxFetchDepth)
-	throws ModuleException
 	{
 		PersistenceManager pm = getPersistenceManager();
 		try {
@@ -1144,7 +1133,6 @@ implements SessionBean
 	 **/
 	public Segment createSegment(
 			OrderID orderID, SegmentTypeID segmentTypeID, String[] fetchGroups, int maxFetchDepth)
-	throws ModuleException
 	{
 		PersistenceManager pm = getPersistenceManager();
 		try {
@@ -1352,7 +1340,6 @@ implements SessionBean
 	 * @ejb.permission role-name="_Guest_"
 	 */
 	public Order assignCustomer(OrderID orderID, AnchorID customerID, boolean get, String[] fetchGroups, int maxFetchDepth)
-	throws ModuleException
 	{
 		PersistenceManager pm = getPersistenceManager();
 		try {

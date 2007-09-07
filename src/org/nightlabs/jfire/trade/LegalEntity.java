@@ -89,7 +89,7 @@ public class LegalEntity extends Anchor
 
 	public static final String ANCHOR_TYPE_ID_PARTNER = "Partner";
 
-	public static final String PROPERY_SCOPE = StructLocal.DEFAULT_SCOPE;
+	public static final String PROPERTY_SET_SCOPE = StructLocal.DEFAULT_SCOPE;
 	
 	/**
 	 * @param pm The <tt>PersistenceManager</tt> to use.
@@ -121,7 +121,7 @@ public class LegalEntity extends Anchor
 
 		// It's better to have a Person for EVERY LegalEntity
 		Person person = new Person(IDGenerator.getOrganisationID(), IDGenerator.nextID(PropertySet.class));
-		IStruct struct = StructLocal.getStructLocal(Person.class, PROPERY_SCOPE, pm);
+		IStruct struct = StructLocal.getStructLocal(Person.class, PROPERTY_SET_SCOPE, pm);
 		struct.explodePropertySet(person);
 		try {
 			((TextDataField)person.getDataField(PersonStruct.PERSONALDATA_NAME)).setText("Anonymous");

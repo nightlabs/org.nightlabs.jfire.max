@@ -57,7 +57,7 @@ import org.nightlabs.jfire.transfer.Transfer;
  * @jdo.fetch-group name="Account.currency" fields="currency"
  * @jdo.fetch-group name="Account.name" fields="name"
  * @jdo.fetch-group name="Account.summaryAccounts" fields="summaryAccounts"
- * @jdo.fetch-group name="Account.this" fetch-groups="default, Anchor.this" fields="owner, currency, name, summaryAccounts, revenueInAccount, revenueOutAccount, summedAccounts"
+ * @jdo.fetch-group name="Account.this" fetch-groups="default, Anchor.this" fields="owner, currency, name, summaryAccounts, revenueInAccount, revenueOutAccount"
  */
 public class Account extends Anchor
 {

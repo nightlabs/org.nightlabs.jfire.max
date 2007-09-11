@@ -118,6 +118,8 @@ extends DataCreator
 		setNames(pt.getName(), names);
 		pt.setPackagePriceConfig(new StablePriceConfig(IDGenerator.getOrganisationID(), IDGenerator.nextID(PriceConfig.class)));
 		pt.getFieldMetaData("innerPriceConfig").setValueInherited(false);
+		pt.getFieldMetaData("localAccountantDelegate").setValueInherited(false); // TODO this should be a field of ProductTypeLocal - not ProductType!
+		pt.getFieldMetaData("localStorekeeperDelegate").setValueInherited(false); // TODO this should be a field of ProductTypeLocal - not ProductType!
 		pt.setInnerPriceConfig(innerPriceConfig);
 		store.addProductType(user, pt); // , SimpleProductTypeActionHandler.getDefaultHome(pm, pt));
 

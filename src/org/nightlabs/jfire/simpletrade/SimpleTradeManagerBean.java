@@ -582,7 +582,6 @@ implements SessionBean
 				productType = (SimpleProductType) Store.getStore(pm).addProductType(
 						User.getUser(pm, getPrincipal()),
 						productType);
-//						SimpleProductTypeActionHandler.getDefaultHome(pm, productType));
 
 				// make sure the prices are correct
 				priceCalculationNeeded = true;

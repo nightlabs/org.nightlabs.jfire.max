@@ -89,7 +89,8 @@ implements SessionBean
 	private static final String REGION_CSV_HEADER = "CountryID;RegionID;LanguageID;RegionName\n";
 	private static final String CITY_CSV_HEADER = "CountryID;CityID;RegionID;LanguageID;CityName\n";
 	private static final String LOCATION_CSV_HEADER = "CountryID;LocationID;CityID;DistrictID;LanguageID;LocationName\n";
-
+	private static final String DISTRICT_CSV_HEADER = "CountryID;CityID;DistrictID;LanguageID;DistrictName;Latitute;Longitude\n";
+	
 	/**
 	 * @see org.nightlabs.jfire.base.BaseSessionBeanImpl#setSessionContext(javax.ejb.SessionContext)
 	 */
@@ -581,83 +582,66 @@ implements SessionBean
 		}//finally
 	}
 
-// Marc: REMOVED BECAUSE SEEMS TO DO NOTHING BUT WRITING A HEADER
-//private static final String DISTRICT_CSV_HEADER = "CountryID;CityID;DistrictID;LanguageID;DistrictName;Latitute;Longitude\n";
-//	/**
-//	 * @ejb.interface-method
-//	 * @ejb.transaction type="Required"
-//	 * @ejb.permission role-name="_Guest_"
-//	 */
-//	public void storeGeographyTemplateDistrictData(District storedDistrict)
-//	throws IOException
-//	{
-//		PersistenceManager pm = getPersistenceManager();
-//		try {
-//			pm.getFetchPlan().setMaxFetchDepth(1);
-//			pm.getFetchPlan().setGroup(FetchPlan.ALL);
-//
-//			Geography geography = Geography.sharedInstance();
-//
-//			String rootOrganisationID;
-//			
-//			try {
-//				InitialContext initialContext = new InitialContext();
-//				try {
-//					rootOrganisationID = Organisation.getRootOrganisationID(initialContext);
-//				}//try 
-//				finally {
-//					initialContext.close();
-//				}//finally
-//			}//try 
-//			catch (NamingException x) {
-//				throw new RuntimeException(x); // it's definitely an unexpected exception if we can't access the local JNDI.
-//			}//catch
-//
-//			DistrictID districtID = DistrictID.create(storedDistrict.getCountryID(), rootOrganisationID, storedDistrict.getDistrictID());
-//			CountryID countryID = CountryID.create(storedDistrict.getCountryID());
-//
-//			ByteArrayOutputStream out = new ByteArrayOutputStream();
-//			Writer w = new OutputStreamWriter(new DeflaterOutputStream(out), IOUtil.CHARSET_UTF_8);
-//			try {
-//				w.write(DISTRICT_CSV_HEADER);
-////				for (Region r : geography.getRegions(countryID, true)) {
-////				for (District d : geography.getDistrictsByZipMap(RegionID.create(r)){
-////				if (DistrictID.create(d.getCountryID(), rootOrganisationID, d.getDistrictID()).equals(districtID)) {
-////				c = city;
-////				city = null; cityID = null;
-////				}//if
-//
-////				String csvLines = GeographyImplResourceCSV.city2csvLines(c);
-//
-////				if (logger.isDebugEnabled())
-////				logger.debug(csvLines);
-//
-////				w.write(csvLines);
-////				}//for
-////				}//for
-//
-//				if (storedDistrict != null) {
-//					String csvLines = GeographyImplResourceCSV.district2csvLines(storedDistrict);
-//
-//					if (logger.isDebugEnabled())
-//						logger.debug(csvLines);
-//
+	/**
+	 * @ejb.interface-method
+	 * @ejb.transaction type="Required"
+	 * @ejb.permission role-name="_Guest_"
+	 */
+	public void storeGeographyTemplateDistrictData(District storedDistrict)
+	throws IOException
+	{
+		PersistenceManager pm = getPersistenceManager();
+		try {
+			pm.getFetchPlan().setMaxFetchDepth(1);
+			pm.getFetchPlan().setGroup(FetchPlan.ALL);
+
+			// initialize:
+			Geography.sharedInstance();
+
+			String rootOrganisationID;
+			
+			try {
+				InitialContext initialContext = new InitialContext();
+				try {
+					rootOrganisationID = Organisation.getRootOrganisationID(initialContext);
+				}//try 
+				finally {
+					initialContext.close();
+				}//finally
+			}//try 
+			catch (NamingException x) {
+				throw new RuntimeException(x); // it's definitely an unexpected exception if we can't access the local JNDI.
+			}//catch
+
+			CountryID countryID = CountryID.create(storedDistrict.getCountryID());
+
+			ByteArrayOutputStream out = new ByteArrayOutputStream();
+			Writer w = new OutputStreamWriter(new DeflaterOutputStream(out), IOUtil.CHARSET_UTF_8);
+			try {
+				w.write(DISTRICT_CSV_HEADER);
+				// TODO: write all old data!
+				if (storedDistrict != null) {
+					String csvLines = GeographyImplResourceCSV.district2csvLines(storedDistrict);
+
+					if (logger.isDebugEnabled())
+						logger.debug(csvLines);
+
 //					csvLines.trim();
-//					w.write(csvLines);
-//				}//if
-//			}//try 
-//			finally {
-//				w.close();
-//			}//finally
-//
-//			CSV.setCSVData(pm, rootOrganisationID, CSV.CSV_TYPE_DISTRICT, countryID.countryID, out.toByteArray());
-//			
-//			clearCache();
-//		}//try 
-//		finally {
-//			pm.close();
-//		}//finally
-//	}
+					w.write(csvLines);
+				}//if
+			}//try 
+			finally {
+				w.close();
+			}//finally
+
+			CSV.setCSVData(pm, rootOrganisationID, CSV.CSV_TYPE_DISTRICT, countryID.countryID, out.toByteArray());
+			
+			clearCache();
+		}//try 
+		finally {
+			pm.close();
+		}//finally
+	}
 
 	/**
 	 * @ejb.interface-method
@@ -673,8 +657,8 @@ implements SessionBean
 		}
 	}
 
-//Marc: REMOVED BECAUSE SEEMS TO DO NOTHING BUT WRITING A HEADER
-//private static final String ZIP_CSV_HEADER = "CountryID;CityID;DistrictID;Zip\n";
+	// TODO: needs implementation!
+//	private static final String ZIP_CSV_HEADER = "CountryID;CityID;DistrictID;Zip\n";
 //	/**
 //	 * @ejb.interface-method
 //	 * @ejb.transaction type="Required"
@@ -688,7 +672,8 @@ implements SessionBean
 //			pm.getFetchPlan().setMaxFetchDepth(1);
 //			pm.getFetchPlan().setGroup(FetchPlan.ALL);
 //
-//			Geography geography = Geography.sharedInstance();
+//			// initialize
+//			Geography.sharedInstance();
 //
 //			String rootOrganisationID;
 //			

@@ -735,7 +735,7 @@ public abstract class Geography
 		return citiesByCityName;
 	}
 
-	public Collection<Country> findCountriesByCountryNameSorted(String countryNamePart, Locale locale, int findMode)
+	public List<Country> findCountriesByCountryNameSorted(String countryNamePart, Locale locale, int findMode)
 	{
 		if ("".equals(countryNamePart))
 			return getCountriesSorted(locale);

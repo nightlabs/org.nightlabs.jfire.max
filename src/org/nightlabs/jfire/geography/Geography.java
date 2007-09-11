@@ -54,7 +54,9 @@ import org.nightlabs.jfire.organisation.Organisation;
 import org.nightlabs.jfire.security.SecurityReflector;
 
 /**
+ * Geography data access class.
  * @author Marco Schulze - marco at nightlabs dot de
+ * @author Marc Klinger - marc[at]nightlabs[dot]de
  */
 public abstract class Geography
 {
@@ -87,7 +89,7 @@ public abstract class Geography
 					if (className == null)
 						break createLocalVMSharedInstance;
 
-					Class clazz;
+					Class<?> clazz;
 					try {
 						clazz = Class.forName(className);
 					} catch (ClassNotFoundException e) {
@@ -298,8 +300,6 @@ public abstract class Geography
 		return res;
 	}
 
-	protected static final Collection EMPTY_COLLECTION = Collections.unmodifiableCollection(new LinkedList());
-
 	/**
 	 * @param countryID
 	 * @param throwExceptionIfNotFound
@@ -310,7 +310,7 @@ public abstract class Geography
 	{
 		Country country = getCountry(countryID, throwExceptionIfNotFound);
 		if (country == null)
-			return EMPTY_COLLECTION;
+			return Collections.emptyList();
 
 		return Collections.unmodifiableCollection(country.getRegions());
 	}
@@ -362,7 +362,7 @@ public abstract class Geography
 	{
 		City city = getCity(cityID, throwExceptionIfNotFound);
 		if (city == null)
-			return EMPTY_COLLECTION;
+			return Collections.emptyList();
 
 		return Collections.unmodifiableCollection(city.getLocations());
 	}
@@ -404,7 +404,7 @@ public abstract class Geography
 
 		Region region = getRegion(regionID, throwExceptionIfNotFound);
 		if (region == null)
-			return EMPTY_COLLECTION;
+			return Collections.emptyList();
 
 		return Collections.unmodifiableCollection(region.getCities());
 	}
@@ -473,7 +473,7 @@ public abstract class Geography
 		};
 	}
 
-	public List getCitiesSorted(final RegionID regionID, Locale locale)
+	public List<City> getCitiesSorted(final RegionID regionID, Locale locale)
 	{
 		if (citiesSortedByLanguageIDByRegionID == null)
 			citiesSortedByLanguageIDByRegionID = new HashMap<RegionID, Map<String, List<City>>>();
@@ -505,22 +505,23 @@ public abstract class Geography
 	 *		value: List countries (instances of {@link Country}
 	 * }
 	 */
-	protected transient Map<String, FulltextMap> countriesByCountryNameByLanguageID = null;
-	protected FulltextMap getCountriesByCountryNameMap(String languageID)
+	protected transient Map<String, FulltextMap<String, List<Country>>> countriesByCountryNameByLanguageID = null;
+	
+	protected FulltextMap<String, List<Country>> getCountriesByCountryNameMap(String languageID)
 	{
 		logger.debug("getCountriesByCountryNameMap(languageID=\""+languageID+"\") entered.");
 
 		if (countriesByCountryNameByLanguageID == null)
-			countriesByCountryNameByLanguageID = new HashMap<String, FulltextMap>();
+			countriesByCountryNameByLanguageID = new HashMap<String, FulltextMap<String, List<Country>>>();
 
-		FulltextMap countriesByCountryName = countriesByCountryNameByLanguageID.get(languageID);
+		FulltextMap<String, List<Country>> countriesByCountryName = countriesByCountryNameByLanguageID.get(languageID);
 		if (countriesByCountryName == null) {
-			countriesByCountryName = new FulltextMap(FULLTEXT_MAP_FEATURES);
+			countriesByCountryName = new FulltextMap<String, List<Country>>(FULLTEXT_MAP_FEATURES);
 			countriesByCountryNameByLanguageID.put(languageID, countriesByCountryName);
-			for (Iterator it = getCountries().iterator(); it.hasNext(); ) {
+			for (Iterator<Country> it = getCountries().iterator(); it.hasNext(); ) {
 				Country country = (Country) it.next();
 				String countryName = country.getName().getText(languageID);
-				List<Country> countryList = (List) countriesByCountryName.get(countryName);
+				List<Country> countryList = countriesByCountryName.get(countryName);
 				if (countryList == null) {
 					countryList = new LinkedList<Country>();
 					countriesByCountryName.put(countryName, countryList);
@@ -543,36 +544,36 @@ public abstract class Geography
 	 *		}<br/>
 	 * }
 	 */
-	protected transient Map locationsByLocationNameByLanguageIDByCityID = null;
+	protected transient Map<CityID, Map<String, FulltextMap<String, List<Location>>>> locationsByLocationNameByLanguageIDByCityID = null;
 
-	protected FulltextMap getLocationsByLocationNameMap(CityID cityID, String languageID)
+	protected FulltextMap<String, List<Location>> getLocationsByLocationNameMap(CityID cityID, String languageID)
 	{
 		logger.debug("getLocationsByLocationNameMap(cityID=\""+cityID+"\", languageID=\""+languageID+"\") entered.");
 
 		needLocations(cityID.countryID);
 
 		if (locationsByLocationNameByLanguageIDByCityID == null)
-			locationsByLocationNameByLanguageIDByCityID = new HashMap();
+			locationsByLocationNameByLanguageIDByCityID = new HashMap<CityID, Map<String, FulltextMap<String, List<Location>>>>();
 
-		Map locationsByLocationNameByLanguageID = (Map) locationsByLocationNameByLanguageIDByCityID.get(cityID);
+		Map<String, FulltextMap<String, List<Location>>> locationsByLocationNameByLanguageID = locationsByLocationNameByLanguageIDByCityID.get(cityID);
 		if (locationsByLocationNameByLanguageID == null) {
-			locationsByLocationNameByLanguageID = new HashMap();
+			locationsByLocationNameByLanguageID = new HashMap<String, FulltextMap<String,List<Location>>>();
 			locationsByLocationNameByLanguageIDByCityID.put(cityID, locationsByLocationNameByLanguageID);
 		}
 
-		FulltextMap locationsByLocationName = (FulltextMap) locationsByLocationNameByLanguageID.get(languageID);
+		FulltextMap<String, List<Location>> locationsByLocationName = locationsByLocationNameByLanguageID.get(languageID);
 		if (locationsByLocationName == null) {
-			locationsByLocationName = new FulltextMap(FULLTEXT_MAP_FEATURES);
+			locationsByLocationName = new FulltextMap<String, List<Location>>(FULLTEXT_MAP_FEATURES);
 			locationsByLocationNameByLanguageID.put(languageID, locationsByLocationName);
 
 			City city = getCity(cityID, false);
 			if (city != null) {
-				for (Iterator it = city.getLocations().iterator(); it.hasNext(); ) {
+				for (Iterator<Location> it = city.getLocations().iterator(); it.hasNext(); ) {
 					Location location = (Location) it.next();
 					String locationName = location.getName().getText(languageID);
-					List locationList = (List) locationsByLocationName.get(locationName);
+					List<Location> locationList = locationsByLocationName.get(locationName);
 					if (locationList == null) {
-						locationList = new LinkedList();
+						locationList = new LinkedList<Location>();
 						locationsByLocationName.put(locationName, locationList);
 					}
 					locationList.add(location);
@@ -594,36 +595,36 @@ public abstract class Geography
 	 *		}<br/>
 	 * }
 	 */
-	protected transient Map regionsByRegionNameByLanguageIDByCountryID = null;
+	protected transient Map<CountryID, Map<String, FulltextMap<String, List<Region>>>> regionsByRegionNameByLanguageIDByCountryID = null;
 
-	protected FulltextMap getRegionsByRegionNameMap(CountryID countryID, String languageID)
+	protected FulltextMap<String, List<Region>> getRegionsByRegionNameMap(CountryID countryID, String languageID)
 	{
 		logger.debug("getRegionsByRegionNameMap(countryID=\""+countryID+"\", languageID=\""+languageID+"\") entered.");
 
 		needRegions(countryID.countryID);
 
 		if (regionsByRegionNameByLanguageIDByCountryID == null)
-			regionsByRegionNameByLanguageIDByCountryID = new HashMap();
+			regionsByRegionNameByLanguageIDByCountryID = new HashMap<CountryID, Map<String, FulltextMap<String, List<Region>>>>();
 
-		Map regionsByRegionNameByLanguageID = (Map) regionsByRegionNameByLanguageIDByCountryID.get(countryID);
+		Map<String, FulltextMap<String, List<Region>>> regionsByRegionNameByLanguageID = regionsByRegionNameByLanguageIDByCountryID.get(countryID);
 		if (regionsByRegionNameByLanguageID == null) {
-			regionsByRegionNameByLanguageID = new HashMap();
+			regionsByRegionNameByLanguageID = new HashMap<String, FulltextMap<String, List<Region>>>();
 			regionsByRegionNameByLanguageIDByCountryID.put(countryID, regionsByRegionNameByLanguageID);
 		}
 
-		FulltextMap regionsByRegionName = (FulltextMap) regionsByRegionNameByLanguageID.get(languageID);
+		FulltextMap<String, List<Region>> regionsByRegionName = regionsByRegionNameByLanguageID.get(languageID);
 		if (regionsByRegionName == null) {
-			regionsByRegionName = new FulltextMap(FULLTEXT_MAP_FEATURES);
+			regionsByRegionName = new FulltextMap<String, List<Region>>(FULLTEXT_MAP_FEATURES);
 			regionsByRegionNameByLanguageID.put(languageID, regionsByRegionName);
 
 			Country country = getCountry(countryID, false);
 			if (country != null) {
-				for (Iterator it = country.getRegions().iterator(); it.hasNext(); ) {
+				for (Iterator<Region> it = country.getRegions().iterator(); it.hasNext(); ) {
 					Region region = (Region) it.next();
 					String regionName = region.getName().getText(languageID);
-					List regionList = (List) regionsByRegionName.get(regionName);
+					List<Region> regionList = regionsByRegionName.get(regionName);
 					if (regionList == null) {
-						regionList = new LinkedList();
+						regionList = new LinkedList<Region>();
 						regionsByRegionName.put(regionName, regionList);
 					}
 					regionList.add(region);
@@ -642,34 +643,34 @@ public abstract class Geography
 	 *		value: List districts (instances of {@link District})
 	 * }
 	 */
-	protected Map districtsByZipByRegionID = null;
+	protected Map<RegionID, FulltextMap<String, List<District>>> districtsByZipByRegionID = null;
 
-	protected FulltextMap getDistrictsByZipMap(RegionID regionID)
+	protected FulltextMap<String, List<District>> getDistrictsByZipMap(RegionID regionID)
 	{
 		logger.debug("getDistrictsByZipMap(regionID=\""+regionID+"\") entered.");
 
 		needZips(regionID.countryID);
 
 		if (districtsByZipByRegionID == null)
-			districtsByZipByRegionID = new HashMap();
+			districtsByZipByRegionID = new HashMap<RegionID, FulltextMap<String,List<District>>>();
 
-		FulltextMap districtsByZip = (FulltextMap) districtsByZipByRegionID.get(regionID);
+		FulltextMap<String, List<District>> districtsByZip = districtsByZipByRegionID.get(regionID);
 		if (districtsByZip == null) {
-			districtsByZip = new FulltextMap(FULLTEXT_MAP_FEATURES);
+			districtsByZip = new FulltextMap<String, List<District>>(FULLTEXT_MAP_FEATURES);
 			districtsByZipByRegionID.put(regionID, districtsByZip);
 
 			Region region = getRegion(regionID, false);
 			if (region != null) {
-				for (Iterator itC = region.getCities().iterator(); itC.hasNext(); ) {
-					City city = (City) itC.next();
-					for (Iterator itD = city.getDistricts().iterator(); itD.hasNext(); ) {
-						District district = (District) itD.next();
-						for (Iterator itZ = district.getZips().iterator(); itZ.hasNext(); ) {
-							String zip = (String) itZ.next();
+				for (Iterator<City> itC = region.getCities().iterator(); itC.hasNext(); ) {
+					City city = itC.next();
+					for (Iterator<District> itD = city.getDistricts().iterator(); itD.hasNext(); ) {
+						District district = itD.next();
+						for (Iterator<String> itZ = district.getZips().iterator(); itZ.hasNext(); ) {
+							String zip = itZ.next();
 
-							List districtList = (List) districtsByZip.get(zip);
+							List<District> districtList = districtsByZip.get(zip);
 							if (districtList == null) {
-								districtList = new LinkedList();
+								districtList = new LinkedList<District>();
 								districtsByZip.put(zip, districtList);
 							}
 							districtList.add(district);
@@ -693,36 +694,36 @@ public abstract class Geography
 	 *		}<br/>
 	 * }
 	 */
-	protected Map citiesByCityNameByLanguageIDByRegionID = null;
+	protected Map<RegionID, Map<String, FulltextMap<String, List<City>>>> citiesByCityNameByLanguageIDByRegionID = null;
 
-	protected FulltextMap getCitiesByCityNameMap(RegionID regionID, String languageID)
+	protected FulltextMap<String, List<City>> getCitiesByCityNameMap(RegionID regionID, String languageID)
 	{
 		logger.debug("getCitiesByCityNameMap(regionID=\""+regionID+"\", languageID=\""+languageID+"\") entered.");
 
 		needCities(regionID.countryID);
 
 		if (citiesByCityNameByLanguageIDByRegionID == null)
-			citiesByCityNameByLanguageIDByRegionID = new HashMap();
+			citiesByCityNameByLanguageIDByRegionID = new HashMap<RegionID, Map<String,FulltextMap<String,List<City>>>>();
 
-		Map citiesByCityNameByLanguageID = (Map) citiesByCityNameByLanguageIDByRegionID.get(regionID);
+		Map<String, FulltextMap<String, List<City>>> citiesByCityNameByLanguageID = citiesByCityNameByLanguageIDByRegionID.get(regionID);
 		if (citiesByCityNameByLanguageID == null) {
-			citiesByCityNameByLanguageID = new HashMap();
+			citiesByCityNameByLanguageID = new HashMap<String, FulltextMap<String,List<City>>>();
 			citiesByCityNameByLanguageIDByRegionID.put(regionID, citiesByCityNameByLanguageID);
 		}
 
-		FulltextMap citiesByCityName = (FulltextMap) citiesByCityNameByLanguageID.get(languageID);
+		FulltextMap<String, List<City>> citiesByCityName = citiesByCityNameByLanguageID.get(languageID);
 		if (citiesByCityName == null) {
-			citiesByCityName = new FulltextMap(FULLTEXT_MAP_FEATURES);
+			citiesByCityName = new FulltextMap<String, List<City>>(FULLTEXT_MAP_FEATURES);
 			citiesByCityNameByLanguageID.put(languageID, citiesByCityName);
 
 			Region region = getRegion(regionID, false);
 			if (region != null) {
-				for (Iterator it = region.getCities().iterator(); it.hasNext(); ) {
-					City city = (City) it.next();
+				for (Iterator<City> it = region.getCities().iterator(); it.hasNext(); ) {
+					City city = it.next();
 					String cityName = city.getName().getText(languageID);
-					List cityList = (List) citiesByCityName.get(cityName);
+					List<City> cityList = citiesByCityName.get(cityName);
 					if (cityList == null) {
-						cityList = new LinkedList();
+						cityList = new LinkedList<City>();
 						citiesByCityName.put(cityName, cityList);
 					}
 					cityList.add(city);
@@ -734,12 +735,12 @@ public abstract class Geography
 		return citiesByCityName;
 	}
 
-	public List<Country> findCountriesByCountryNameSorted(String countryNamePart, Locale locale, int findMode)
+	public Collection<Country> findCountriesByCountryNameSorted(String countryNamePart, Locale locale, int findMode)
 	{
 		if ("".equals(countryNamePart))
 			return getCountriesSorted(locale);
 
-		List countriesSorted = (List) findCountriesByCountryName(countryNamePart, locale.getLanguage(), findMode);
+		List<Country> countriesSorted = new ArrayList<Country>(findCountriesByCountryName(countryNamePart, locale.getLanguage(), findMode));
 		Collections.sort(countriesSorted, getCountryComparator(locale));
 		return countriesSorted;
 	}
@@ -749,15 +750,15 @@ public abstract class Geography
 		return findCountriesByCountryName(countryNamePart, locale.getLanguage(), findMode);
 	}
 
-	protected Collection findCountriesByCountryName(String countryNamePart, String languageID, int findMode)
+	protected Collection<Country> findCountriesByCountryName(String countryNamePart, String languageID, int findMode)
 	{
 		if ("".equals(countryNamePart))
 			return getCountries();
 
-		Collection res = new ArrayList();
-		FulltextMap countriesByCountryName = getCountriesByCountryNameMap(languageID);
-		for (Iterator it = countriesByCountryName.find(countryNamePart, findMode).iterator(); it.hasNext(); ) {
-			List countries = (List) it.next();
+		Collection<Country> res = new ArrayList<Country>();
+		FulltextMap<String, List<Country>> countriesByCountryName = getCountriesByCountryNameMap(languageID);
+		for (Iterator<List<Country>> it = countriesByCountryName.find(countryNamePart, findMode).iterator(); it.hasNext(); ) {
+			List<Country> countries = it.next();
 			res.addAll(countries);
 		}
 		return res;
@@ -773,11 +774,10 @@ public abstract class Geography
 		if ("".equals(regionNamePart))
 			return getRegions(countryID, false);
 
-		Collection res = new ArrayList();
-		FulltextMap regionNames2regions = getRegionsByRegionNameMap(countryID, languageID);
-		for (Iterator it = regionNames2regions.find(regionNamePart, findMode).iterator(); it.hasNext(); ) {
-			List regions = (List) it.next();
-			res.addAll(regions);
+		Collection<Region> res = new ArrayList<Region>();
+		FulltextMap<String, List<Region>> regionNames2regions = getRegionsByRegionNameMap(countryID, languageID);
+		for (Iterator<List<Region>> it = regionNames2regions.find(regionNamePart, findMode).iterator(); it.hasNext(); ) {
+			res.addAll(it.next());
 		}
 		return res;
 	}
@@ -787,7 +787,7 @@ public abstract class Geography
 		if ("".equals(regionNamePart))
 			return getRegionsSorted(countryID, locale);
 
-		List regionsSorted = (List) findRegionsByRegionName(countryID, regionNamePart, locale.getLanguage(), findMode);
+		ArrayList<Region> regionsSorted = new ArrayList<Region>(findRegionsByRegionName(countryID, regionNamePart, locale.getLanguage(), findMode));
 		Collections.sort(regionsSorted, getRegionComparator(locale));
 		return regionsSorted;
 	}
@@ -799,11 +799,11 @@ public abstract class Geography
 
 		// key: String cityPK
 		// value: City city
-		Map cities = new HashMap();
-		FulltextMap zips2districts = getDistrictsByZipMap(regionID);
-		for (Iterator itL = zips2districts.find(zipPart, findMode).iterator(); itL.hasNext(); ) {
-			List districts = (List) itL.next();
-			for (Iterator itD = districts.iterator(); itD.hasNext(); ) {
+		Map<String, City> cities = new HashMap<String, City>();
+		FulltextMap<String, List<District>> zips2districts = getDistrictsByZipMap(regionID);
+		for (Iterator<List<District>> itL = zips2districts.find(zipPart, findMode).iterator(); itL.hasNext(); ) {
+			List<District> districts = itL.next();
+			for (Iterator<District> itD = districts.iterator(); itD.hasNext(); ) {
 				District district = (District) itD.next();
 				cities.put(district.getCity().getPrimaryKey(), district.getCity());
 			}
@@ -816,7 +816,7 @@ public abstract class Geography
 		if ("".equals(zipPart))
 			return getCitiesSorted(regionID, locale);
 
-		List citiesSorted = new ArrayList(findCitiesByZip(regionID, zipPart, findMode));
+		ArrayList<City> citiesSorted = new ArrayList<City>(findCitiesByZip(regionID, zipPart, findMode));
 		Collections.sort(citiesSorted, getCityComparator(locale));
 		return citiesSorted;
 	}
@@ -826,56 +826,55 @@ public abstract class Geography
 		return findCitiesByCityName(regionID, cityNamePart, locale.getLanguage(), findMode);
 	}
 
-	protected Collection findCitiesByCityName(RegionID regionID, String cityNamePart, String languageID, int findMode)
+	protected Collection<City> findCitiesByCityName(RegionID regionID, String cityNamePart, String languageID, int findMode)
 	{
 		if ("".equals(cityNamePart))
 			return getCities(regionID, false);
 
-		Collection res = new ArrayList();
-		FulltextMap cityNames2cities = getCitiesByCityNameMap(regionID, languageID); // (FulltextMap) cityNames2citiesByLanguageID.get(languageID);
-		for (Iterator it = cityNames2cities.find(cityNamePart, findMode).iterator(); it.hasNext(); ) {
-			List cities = (List) it.next();
+		Collection<City> res = new ArrayList<City>();
+		FulltextMap<String, List<City>> cityNames2cities = getCitiesByCityNameMap(regionID, languageID); // (FulltextMap) cityNames2citiesByLanguageID.get(languageID);
+		for (Iterator<List<City>> it = cityNames2cities.find(cityNamePart, findMode).iterator(); it.hasNext(); ) {
+			List<City> cities = it.next();
 			res.addAll(cities);
 		}
 		return res;
 	}
 
-	public List findCitiesByCityNameSorted(RegionID regionID, String cityNamePart, Locale locale, int findMode)
+	public List<City> findCitiesByCityNameSorted(RegionID regionID, String cityNamePart, Locale locale, int findMode)
 	{
 		if ("".equals(cityNamePart))
 			return getCitiesSorted(regionID, locale);
 
-		List citiesSorted = (List) findCitiesByCityName(regionID, cityNamePart, locale.getLanguage(), findMode);
+		List<City> citiesSorted = new ArrayList<City>(findCitiesByCityName(regionID, cityNamePart, locale.getLanguage(), findMode));
 		Collections.sort(citiesSorted, getCityComparator(locale));
 		return citiesSorted;
 	}
 
 
-	public Collection findLocationsByLocationName(CityID cityID, String locationNamePart, Locale locale, int findMode)
+	public Collection<Location> findLocationsByLocationName(CityID cityID, String locationNamePart, Locale locale, int findMode)
 	{
 		return findLocationsByLocationName(cityID, locationNamePart, locale.getLanguage(), findMode);
 	}
 
-	protected Collection findLocationsByLocationName(CityID cityID, String locationNamePart, String languageID, int findMode)
+	protected Collection<Location> findLocationsByLocationName(CityID cityID, String locationNamePart, String languageID, int findMode)
 	{
 		if ("".equals(locationNamePart))
 			return getLocations(cityID, false);
 
-		Collection res = new ArrayList();
-		FulltextMap locationNames2locations = getLocationsByLocationNameMap(cityID, languageID); // (FulltextMap) locationNames2locationsByLanguageID.get(languageID);
-		for (Iterator it = locationNames2locations.find(locationNamePart, findMode).iterator(); it.hasNext(); ) {
-			List locations = (List) it.next();
-			res.addAll(locations);
+		Collection<Location> res = new ArrayList<Location>();
+		FulltextMap<String, List<Location>> locationNames2locations = getLocationsByLocationNameMap(cityID, languageID); // (FulltextMap) locationNames2locationsByLanguageID.get(languageID);
+		for (Iterator<List<Location>> it = locationNames2locations.find(locationNamePart, findMode).iterator(); it.hasNext(); ) {
+			res.addAll(it.next());
 		}
 		return res;
 	}
 
-	public List findLocationsByLocationNameSorted(CityID cityID, String locationNamePart, Locale locale, int findMode)
+	public List<Location> findLocationsByLocationNameSorted(CityID cityID, String locationNamePart, Locale locale, int findMode)
 	{
 		if ("".equals(locationNamePart))
 			return getLocationsSorted(cityID, locale);
 
-		List locationsSorted = (List) findLocationsByLocationName(cityID, locationNamePart, locale.getLanguage(), findMode);
+		List<Location> locationsSorted = new ArrayList<Location>(findLocationsByLocationName(cityID, locationNamePart, locale.getLanguage(), findMode));
 		Collections.sort(locationsSorted, getLocationComparator(locale));
 		return locationsSorted;
 	}
@@ -910,7 +909,7 @@ public abstract class Geography
 	 * Contains instances of {@link String} representing the <tt>countryID</tt> of all countries
 	 * for which the regions have already been loaded.
 	 */
-	protected Set loadedRegionsCountryIDSet = new HashSet();
+	protected Set<String> loadedRegionsCountryIDSet = new HashSet<String>();
 
 	protected abstract void loadRegions(String countryID);
 
@@ -936,7 +935,7 @@ public abstract class Geography
 	 * Contains instances of {@link String} representing the <tt>countryID</tt> of all countries
 	 * for which the locations have already been loaded.
 	 */
-	protected Set loadedLocationsCountryIDSet = new HashSet();
+	protected Set<String> loadedLocationsCountryIDSet = new HashSet<String>();
 
 	protected abstract void loadLocations(String countryID);
 
@@ -963,7 +962,7 @@ public abstract class Geography
 	 * Contains instances of {@link String} representing the <tt>countryID</tt> of all countries
 	 * for which the cities have already been loaded.
 	 */
-	protected Set loadedCitiesCountryIDSet = new HashSet();
+	protected Set<String> loadedCitiesCountryIDSet = new HashSet<String>();
 
 	protected abstract void loadCities(String countryID);
 
@@ -990,7 +989,7 @@ public abstract class Geography
 	 * Contains instances of {@link String} representing the <tt>countryID</tt> of all countries
 	 * for which the districts have already been loaded.
 	 */
-	protected Set loadedDistrictsCountryIDSet = new HashSet();
+	protected Set<String> loadedDistrictsCountryIDSet = new HashSet<String>();
 
 	protected abstract void loadDistricts(String countryID);
 
@@ -1017,7 +1016,7 @@ public abstract class Geography
 	 * Contains instances of {@link String} representing the <tt>countryID</tt> of all countries
 	 * for which the zips have already been loaded.
 	 */
-	protected Set loadedZipsCountryIDSet = new HashSet();
+	protected Set<String> loadedZipsCountryIDSet = new HashSet<String>();
 
 	protected abstract void loadZips(String countryID);
 

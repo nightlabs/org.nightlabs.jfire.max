@@ -6,7 +6,6 @@ import java.util.Set;
 
 import javax.jdo.FetchPlan;
 import javax.jdo.JDOHelper;
-import javax.jdo.JDOObjectNotFoundException;
 import javax.jdo.PersistenceManager;
 
 import org.apache.log4j.Logger;
@@ -50,8 +49,8 @@ extends NotificationReceiver
 	@Override
 	public void onReceiveNotificationBundle(NotificationBundle notificationBundle) throws Exception {
 		try {
-			Set csvIDs = new HashSet();
-			for (Iterator it = notificationBundle.getDirtyObjectIDs().iterator(); it.hasNext();) {
+			Set<CSVID> csvIDs = new HashSet<CSVID>();
+			for (Iterator<DirtyObjectID> it = notificationBundle.getDirtyObjectIDs().iterator(); it.hasNext();) {
 				DirtyObjectID dirtyObjectID = (DirtyObjectID) it.next();
 				if (JDOLifecycleState.DELETED.equals(dirtyObjectID.getLifecycleState()))
 					throw new IllegalStateException("Why the hell is the lifecycleState == DELETED?!?!?");
@@ -65,9 +64,9 @@ extends NotificationReceiver
 
 			GeographyTemplateDataManager gm = GeographyTemplateDataManagerUtil.getHome(
 					Lookup.getInitialContextProperties(pm, getOrganisationID())).create();
-			Set csvSet = gm.getCSVs(csvIDs, FETCH_GROUPS_CSV, NLJDOHelper.MAX_FETCH_DEPTH_NO_LIMIT);
-			for (Iterator it = csvSet.iterator(); it.hasNext();) {
-				CSV csv = (CSV) it.next();
+			Set<CSV> csvSet = gm.getCSVs(csvIDs, FETCH_GROUPS_CSV, NLJDOHelper.MAX_FETCH_DEPTH_NO_LIMIT);
+			for (Iterator<CSV> it = csvSet.iterator(); it.hasNext();) {
+				CSV csv = it.next();
 				// JDO optimizes write access and therefore does not persist the CSV instance if it already
 				// exists, because it has not been modified (this is tracked by the JDO object). Hence,
 				// we need to somehow make it dirty.

@@ -32,7 +32,7 @@ import java.util.HashSet;
 import java.util.Set;
 
 import org.nightlabs.jfire.geography.id.DistrictID;
-import org.nightlabs.util.Utils;
+import org.nightlabs.util.Util;
 
 /**
  * @author Marco Schulze - marco at nightlabs dot de
@@ -49,6 +49,11 @@ import org.nightlabs.util.Utils;
  */
 public class District implements Serializable // , StoreCallback
 {
+	/**
+	 * The serial version of this class.
+	 */
+	private static final long serialVersionUID = 1L;
+
 	/////// begin primary key ///////
 	/**
 	 * 2-char-iso-code
@@ -106,7 +111,7 @@ public class District implements Serializable // , StoreCallback
 	 *
 	 * @jdo.join
 	 */
-	protected Set zips = new HashSet();
+	protected Set<String> zips = new HashSet<String>();
 
 	/**
 	 * @jdo.field persistence-modifier="persistent"
@@ -210,7 +215,7 @@ public class District implements Serializable // , StoreCallback
 	/**
 	 * @return Returns the zips (instances of <tt>java.lang.String</tt>).
 	 */
-	public Collection getZips()
+	public Collection<String> getZips()
 	{
 		if (geography != null)
 			geography.needZips(countryID);
@@ -267,16 +272,16 @@ public class District implements Serializable // , StoreCallback
 		if (!(obj instanceof District)) return false;
 		District o = (District) obj;
 		return
-				Utils.equals(this.countryID, o.countryID) &&
-				Utils.equals(this.organisationID, o.organisationID) &&
-				Utils.equals(this.districtID, o.districtID);
+				Util.equals(this.countryID, o.countryID) &&
+				Util.equals(this.organisationID, o.organisationID) &&
+				Util.equals(this.districtID, o.districtID);
 	}
 	@Override
 	public int hashCode()
 	{
 		return
-				Utils.hashCode(countryID) ^
-				Utils.hashCode(organisationID) ^
-				Utils.hashCode(districtID);
+				Util.hashCode(countryID) ^
+				Util.hashCode(organisationID) ^
+				Util.hashCode(districtID);
 	}
 }

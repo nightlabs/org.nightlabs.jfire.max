@@ -12,7 +12,7 @@ import javax.jdo.PersistenceManager;
 import org.nightlabs.io.DataBuffer;
 import org.nightlabs.jfire.base.Lookup;
 import org.nightlabs.jfire.security.SecurityReflector;
-import org.nightlabs.util.Utils;
+import org.nightlabs.util.IOUtil;
 
 /**
  * @author Marco Schulze - Marco at NightLabs dot de
@@ -56,7 +56,7 @@ extends GeographyImplResourceCSV
 				DataBuffer db = new DataBuffer(10240);
 				OutputStream out = new DeflaterOutputStream(db.createOutputStream());
 				try {
-					Utils.transferStreamData(in, out);
+					IOUtil.transferStreamData(in, out);
 				} finally {
 					out.close();
 				}

@@ -42,7 +42,7 @@ extends NotificationFilter
 	{
 		if (logger.isDebugEnabled()) {
 			logger.debug("filter: dirtyObjectIDs:");
-			for (Iterator it = dirtyObjectIDs.iterator(); it.hasNext();) {
+			for (Iterator<DirtyObjectID> it = dirtyObjectIDs.iterator(); it.hasNext();) {
 				DirtyObjectID dirtyObjectID = (DirtyObjectID) it.next();
 				logger.debug("  " + dirtyObjectID);
 			}

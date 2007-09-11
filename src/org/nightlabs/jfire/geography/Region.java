@@ -36,7 +36,7 @@ import javax.jdo.JDOHelper;
 import javax.jdo.PersistenceManager;
 
 import org.nightlabs.jfire.geography.id.RegionID;
-import org.nightlabs.util.Utils;
+import org.nightlabs.util.Util;
 
 /**
  * @author Marco Schulze - marco at nightlabs dot de
@@ -60,6 +60,11 @@ import org.nightlabs.util.Utils;
  */
 public class Region implements Serializable
 {
+	/**
+	 * The serial version of this class. 
+	 */
+	private static final long serialVersionUID = 1L;
+	
 	public static final String FETCH_GROUP_COUNTRY = "Region.country";
 	public static final String FETCH_GROUP_NAME = "Region.name";
 	public static final String FETCH_GROUP_CITIES = "Region.cities";
@@ -122,7 +127,7 @@ public class Region implements Serializable
 	 *
 	 * @!jdo.map-vendor-extension vendor-name="jpox" key="key-field" value="primaryKey"
 	 */
-	protected Map<String, City> cities = new HashMap();	
+	protected Map<String, City> cities = new HashMap<String, City>();	
 	/////// end normal fields ///////
 	
 	
@@ -289,16 +294,16 @@ public class Region implements Serializable
 		if (!(obj instanceof Region)) return false;
 		Region o = (Region) obj;
 		return
-				Utils.equals(this.countryID, o.countryID) &&
-				Utils.equals(this.organisationID, o.organisationID) &&
-				Utils.equals(this.regionID, o.regionID);
+				Util.equals(this.countryID, o.countryID) &&
+				Util.equals(this.organisationID, o.organisationID) &&
+				Util.equals(this.regionID, o.regionID);
 	}
 	@Override
 	public int hashCode()
 	{
 		return
-				Utils.hashCode(countryID) ^
-				Utils.hashCode(organisationID) ^
-				Utils.hashCode(regionID);
+				Util.hashCode(countryID) ^
+				Util.hashCode(organisationID) ^
+				Util.hashCode(regionID);
 	}
 }

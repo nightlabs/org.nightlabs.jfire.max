@@ -48,6 +48,11 @@ import org.nightlabs.i18n.I18nText;
  */
 public class RegionName extends I18nText
 {
+	/**
+	 * The serial version of this class. 
+	 */
+	private static final long serialVersionUID = 1L;
+	
 	/////// begin primary key ///////
 	/**
 	 * @jdo.field primary-key="true"
@@ -87,7 +92,7 @@ public class RegionName extends I18nText
 	 *
 	 * @jdo.join
 	 */
-	protected Map names = new HashMap();
+	protected Map<String, String> names = new HashMap<String, String>();
 
 	protected RegionName()
 	{
@@ -136,7 +141,7 @@ public class RegionName extends I18nText
 	/**
 	 * @see org.nightlabs.i18n.I18nText#getI18nMap()
 	 */
-	protected Map getI18nMap()
+	protected Map<String, String> getI18nMap()
 	{
 		return names;
 	}

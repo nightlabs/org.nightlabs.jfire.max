@@ -11,7 +11,7 @@ import javax.jdo.PersistenceManager;
 
 import org.apache.log4j.Logger;
 import org.nightlabs.jfire.geography.id.CSVID;
-import org.nightlabs.util.Utils;
+import org.nightlabs.util.IOUtil;
 
 /**
  * @author Marco Schulze - marco at nightlabs dot de
@@ -176,7 +176,7 @@ implements Serializable
 			return;
 
 		try {
-			BufferedReader r = new BufferedReader(new InputStreamReader(new InflaterInputStream(new ByteArrayInputStream(getData())), Utils.CHARSET_UTF_8));
+			BufferedReader r = new BufferedReader(new InputStreamReader(new InflaterInputStream(new ByteArrayInputStream(getData())), IOUtil.CHARSET_UTF_8));
 			try {
 				String line;
 				while (true) {

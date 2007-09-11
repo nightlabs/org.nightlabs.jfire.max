@@ -31,7 +31,7 @@ import java.io.Serializable;
 import javax.jdo.JDOHelper;
 
 import org.nightlabs.jfire.geography.id.LocationID;
-import org.nightlabs.util.Utils;
+import org.nightlabs.util.Util;
 
 /**
  * @author Marco Schulze - marco at nightlabs dot de
@@ -52,6 +52,11 @@ import org.nightlabs.util.Utils;
  */
 public class Location implements Serializable
 {
+	/**
+	 * The serial version of this class. 
+	 */
+	private static final long serialVersionUID = 1L;
+	
 	public static final String FETCH_GROUP_NAME = "Location.name";
 	public static final String FETCH_GROUP_CITY = "Location.city";
 	public static final String FETCH_GROUP_LOCATION_THIS = "Location.this";
@@ -234,16 +239,16 @@ public class Location implements Serializable
 		if (!(obj instanceof Location)) return false;
 		Location  o = (Location) obj;
 		return
-				Utils.equals(this.countryID, o.countryID) &&
-				Utils.equals(this.organisationID, o.organisationID) &&
-				Utils.equals(this.locationID, o.locationID);
+				Util.equals(this.countryID, o.countryID) &&
+				Util.equals(this.organisationID, o.organisationID) &&
+				Util.equals(this.locationID, o.locationID);
 	}
 	@Override
 	public int hashCode()
 	{
 		return
-				Utils.hashCode(countryID) ^
-				Utils.hashCode(organisationID) ^
-				Utils.hashCode(locationID);
+				Util.hashCode(countryID) ^
+				Util.hashCode(organisationID) ^
+				Util.hashCode(locationID);
 	}
 }

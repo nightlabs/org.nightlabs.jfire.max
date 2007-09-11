@@ -162,10 +162,10 @@ implements SessionBean
 				pm.getFetchPlan().setGroups(fetchGroups);
 
 			ArrayList<Country> res = new ArrayList<Country>();
-			for (Iterator it = pm.getExtent(Country.class).iterator(); it.hasNext(); ) {
+			for (Iterator<?> it = pm.getExtent(Country.class).iterator(); it.hasNext(); ) {
 				Country country = (Country) it.next();
 
-				res.add((Country) pm.detachCopy(country));
+				res.add(pm.detachCopy(country));
 			}
 
 			return res;

@@ -36,7 +36,7 @@ import java.util.Map;
 import javax.jdo.JDOHelper;
 import javax.jdo.PersistenceManager;
 
-import org.nightlabs.util.Utils;
+import org.nightlabs.util.Util;
 
 /**
  * @author Marco Schulze - marco at nightlabs dot de
@@ -194,12 +194,12 @@ public class Country implements Serializable
 		if (this == obj) return true;
 		if (!(obj instanceof Country)) return false;
 		Country o = (Country) obj;
-		return Utils.equals(this.countryID, o.countryID);
+		return Util.equals(this.countryID, o.countryID);
 	}
 
 	@Override
 	public int hashCode()
 	{
-		return Utils.hashCode(countryID);
+		return Util.hashCode(countryID);
 	}
 }

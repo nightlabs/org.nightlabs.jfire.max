@@ -30,11 +30,11 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.io.OutputStreamWriter;
 import java.net.URL;
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashMap;
 import java.util.Iterator;
-import java.util.LinkedList;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
@@ -55,18 +55,15 @@ public class CreateCountryCSVFromLocale
 	{
 	}
 
-	/**
-	 * @param args
-	 */
 	public static void main(String[] args)
 	{
 		try {
 			GeographyImplResourceCSV.register();
 
-			Map countries = new HashMap();
+			Map<String, Country> countries = new HashMap<String, Country>();
 
 			// make sure, we have additional countries unknown to Locale
-			for (Iterator it = Geography.sharedInstance().getCountries().iterator(); it.hasNext(); ) {
+			for (Iterator<Country> it = Geography.sharedInstance().getCountries().iterator(); it.hasNext(); ) {
 				Country country = (Country) it.next();
 				countries.put(country.getCountryID(), country);
 			}
@@ -127,39 +124,33 @@ public class CreateCountryCSVFromLocale
 				}
 
 				logger.info("Sorting " + countries.size() + " countries by countryID...");
-				List countryList = new LinkedList(countries.values());
-				Collections.sort(countryList, new Comparator() {
-					public int compare(Object obj0, Object obj1)
+				List<Country> countryList = new ArrayList<Country>(countries.values());
+				Collections.sort(countryList, new Comparator<Country>() {
+					public int compare(Country c0, Country c1)
 					{
-						Country c0 = (Country) obj0;
-						Country c1 = (Country) obj1;
 						return c0.getCountryID().compareTo(c1.getCountryID());
 					}
 				});
 				
-				Comparator nameEntryComparator = new Comparator() {
-					public int compare(Object obj0, Object obj1) {
-						Map.Entry me0 = (Map.Entry)obj0;
-						Map.Entry me1 = (Map.Entry)obj1;
-
-						String languageID0 = (String)me0.getKey();
-						String languageID1 = (String)me1.getKey();
-
+				Comparator<Map.Entry<String, String>> nameEntryComparator = new Comparator<Map.Entry<String,String>>() {
+					public int compare(Map.Entry<String, String> me0, Map.Entry<String, String> me1) {
+						String languageID0 = me0.getKey();
+						String languageID1 = me1.getKey();
 						return languageID0.compareTo(languageID1);
 					};
 				};
 
 				logger.info("Writing CSV data...");
-				for (Iterator itCountry = countryList.iterator(); itCountry.hasNext(); ) {
+				for (Iterator<Country> itCountry = countryList.iterator(); itCountry.hasNext(); ) {
 					Country country = (Country) itCountry.next();
-					List names = new LinkedList(country.getName().getTexts());
+					List<Map.Entry<String, String>> names = new ArrayList<Map.Entry<String,String>>(country.getName().getTexts());
 					// sort by languageID
 					Collections.sort(names, nameEntryComparator);
 
-					for (Iterator itName = names.iterator(); itName.hasNext(); ) {
-						Map.Entry me = (Map.Entry) itName.next();
-						String languageID = (String)me.getKey();
-						String name = (String)me.getValue();
+					for (Iterator<Map.Entry<String, String>> itName = names.iterator(); itName.hasNext(); ) {
+						Map.Entry<String, String> me = itName.next();
+						String languageID = me.getKey();
+						String name = me.getValue();
 						writer.write(country.getCountryID() + ';' + languageID + ';' + name + '\n');
 					}
 				}

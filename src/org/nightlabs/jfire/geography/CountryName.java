@@ -49,6 +49,11 @@ import org.nightlabs.i18n.I18nText;
 public class CountryName extends I18nText
 {
 	/**
+	 * The serial version of this class.
+	 */
+	private static final long serialVersionUID = 1L;
+
+	/**
 	 * @jdo.field primary-key="true"
 	 * @jdo.column length="100"
 	 */
@@ -73,7 +78,7 @@ public class CountryName extends I18nText
 	 *
 	 * @jdo.join
 	 */
-	protected Map names = new HashMap();
+	protected Map<String, String> names = new HashMap<String, String>();
 	
 	protected CountryName()
 	{
@@ -88,7 +93,7 @@ public class CountryName extends I18nText
 	/**
 	 * @see org.nightlabs.i18n.I18nText#getI18nMap()
 	 */
-	protected Map getI18nMap()
+	protected Map<String, String> getI18nMap()
 	{
 		return names;
 	}

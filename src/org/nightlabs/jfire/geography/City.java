@@ -36,10 +36,11 @@ import java.util.Map;
 import javax.jdo.JDOHelper;
 
 import org.nightlabs.jfire.geography.id.CityID;
-import org.nightlabs.util.Utils;
+import org.nightlabs.util.Util;
 
 /**
  * @author Marco Schulze - marco at nightlabs dot de
+ * @author Marc Klinger - marc[at]nightlabs[dot]de
  *
  * @jdo.persistence-capable
  *		identity-type = "application"
@@ -60,6 +61,11 @@ import org.nightlabs.util.Utils;
  */
 public class City implements Serializable
 {
+	/**
+	 * The serial version of this class. 
+	 */
+	private static final long serialVersionUID = 1L;
+	
 	public static final String FETCH_GROUP_NAME = "City.name";
 	public static final String FETCH_GROUP_LOCATIONS = "City.locations";
 	public static final String FETCH_GROUP_REGION = "City.region";
@@ -125,7 +131,7 @@ public class City implements Serializable
 	 *
 	 * @!jdo.map-vendor-extension vendor-name="jpox" key="key-field" value="primaryKey"
 	 */
-	private Map locations;
+	private Map<String, Location> locations = new HashMap<String, Location>();
 
 	/**
 	 * key: String districtPK<br/>
@@ -143,7 +149,7 @@ public class City implements Serializable
 	 *
 	 * @!jdo.map-vendor-extension vendor-name="jpox" key="key-field" value="primaryKey"
 	 */
-	private Map districts = new HashMap();
+	private Map<String, District> districts = new HashMap<String, District>();
 	/////// end normal fields ///////
 
 
@@ -172,8 +178,6 @@ public class City implements Serializable
 		this.region = region;
 		this.primaryKey = getPrimaryKey(countryID, organisationID, cityID);
 		this.name = new CityName(this);
-
-		locations = new HashMap();
 	}
 
 	/////// end constructors ///////
@@ -229,7 +233,7 @@ public class City implements Serializable
 		return name;
 	}
 
-	public Collection getLocations()
+	public Collection<Location> getLocations()
 	{
 		if (geography != null)
 			geography.needLocations(countryID);
@@ -237,7 +241,7 @@ public class City implements Serializable
 		return Collections.unmodifiableCollection(locations.values());
 	}
 
-	public Collection getDistricts()
+	public Collection<District> getDistricts()
 	{
 		if (geography != null)
 			geography.needDistricts(countryID);
@@ -288,16 +292,16 @@ public class City implements Serializable
 		if (!(obj instanceof City)) return false;
 		City o = (City) obj;
 		return
-				Utils.equals(this.countryID, o.countryID) &&
-				Utils.equals(this.organisationID, o.organisationID) &&
-				Utils.equals(this.cityID, o.cityID);
+				Util.equals(this.countryID, o.countryID) &&
+				Util.equals(this.organisationID, o.organisationID) &&
+				Util.equals(this.cityID, o.cityID);
 	}
 	@Override
 	public int hashCode()
 	{
 		return
-				Utils.hashCode(countryID) ^
-				Utils.hashCode(organisationID) ^
-				Utils.hashCode(cityID);
+				Util.hashCode(countryID) ^
+				Util.hashCode(organisationID) ^
+				Util.hashCode(cityID);
 	}
 }

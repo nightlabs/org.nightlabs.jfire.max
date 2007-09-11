@@ -6,8 +6,8 @@ import javax.jdo.PersistenceManager;
 import javax.jdo.Query;
 
 import org.nightlabs.jdo.query.JDOQuery;
-import org.nightlabs.jfire.store.ProductTransfer;
 import org.nightlabs.jfire.transfer.Anchor;
+import org.nightlabs.jfire.transfer.Transfer;
 import org.nightlabs.jfire.transfer.id.AnchorID;
 
 public abstract class AbstractTransferQuery<T>
@@ -38,12 +38,13 @@ extends JDOQuery<T>
 	private transient Anchor otherAnchor = null;
 	// TODO JPOX WORKAROUND end
 
+	protected abstract Class<? extends Transfer> getCandidateClass();
 
 	@Override
 	protected Query prepareQuery()
 	{
 		PersistenceManager pm = getPersistenceManager();
-		Query q = pm.newQuery(ProductTransfer.class);
+		Query q = pm.newQuery(getCandidateClass());
 		StringBuffer filter = new StringBuffer();
 
 		filter.append("true");

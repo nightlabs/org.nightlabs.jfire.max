@@ -40,11 +40,13 @@ import javax.jdo.FetchPlan;
 import javax.jdo.JDOHelper;
 import javax.jdo.PersistenceManager;
 import javax.jdo.Query;
+import javax.jdo.listener.StoreCallback;
 
 import org.apache.log4j.Logger;
 import org.nightlabs.annotation.Implement;
 import org.nightlabs.i18n.I18nText;
 import org.nightlabs.inheritance.FieldInheriter;
+import org.nightlabs.inheritance.FieldMetaData;
 import org.nightlabs.inheritance.Inheritable;
 import org.nightlabs.inheritance.InheritanceCallbacks;
 import org.nightlabs.inheritance.InheritanceManager;
@@ -179,6 +181,7 @@ public abstract class ProductType
 implements
 		Inheritable,
 		InheritanceCallbacks,
+		StoreCallback,
 		Serializable
 {
 	private static final Logger logger = Logger.getLogger(ProductType.class);
@@ -595,8 +598,9 @@ implements
 		nestedProductTypes = new HashMap<String, NestedProductType>();
 		
 		this.name = new ProductTypeName(this);
-		getFieldMetaData("name").setValueInherited(false);
-//	initFieldMetaData();
+		FieldMetaData fmd = getFieldMetaData("name");
+		if (fmd != null)
+			fmd.setValueInherited(false);
 	}
 
 	/**
@@ -1688,6 +1692,10 @@ implements
 	protected ProductTypeLocal createProductTypeLocal(User user, Repository defaultHomeRepository)
 	{
 		return new ProductTypeLocal(user, this, defaultHomeRepository); // self-registering
+	}
+
+	public void jdoPreStore()
+	{
 	}
 
 	@Override

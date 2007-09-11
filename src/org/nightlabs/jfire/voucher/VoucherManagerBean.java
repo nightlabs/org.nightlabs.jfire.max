@@ -775,22 +775,25 @@ implements SessionBean
 	public PreviewParameterValuesResult getPreviewParameterValues(
 			ProductTypeID voucherTypeID) throws ModuleException {
 		try {
-			PersistenceManager pm = getPersistenceManager();
 			try {
-				sessionContext.setRollbackOnly();
+				PersistenceManager pm = getPersistenceManager();
+				try {
+					User user = User.getUser(pm, getPrincipal());
+					PreviewParameterSet previewParameterSet = new PreviewParameterSet(
+							voucherTypeID);
 
-				User user = User.getUser(pm, getPrincipal());
-				PreviewParameterSet previewParameterSet = new PreviewParameterSet(
-						voucherTypeID);
+					PreviewParameterSetExtension previewParameterSetExtension = ensureFinishedConfiguration(
+							pm, user, previewParameterSet);
 
-				PreviewParameterSetExtension previewParameterSetExtension = ensureFinishedConfiguration(
-						pm, user, previewParameterSet);
-
-				pm.getExtent(VoucherType.class);
-				VoucherType voucherType = (VoucherType) pm.getObjectById(voucherTypeID);
-				return new PreviewParameterValuesResult(voucherType);
+					pm.getExtent(VoucherType.class);
+					VoucherType voucherType = (VoucherType) pm.getObjectById(voucherTypeID);
+					return new PreviewParameterValuesResult(voucherType);
+				} finally {
+					pm.close();
+				}
 			} finally {
-				pm.close();
+				// This must be done at the end (*NOT* before), because it will immediately close the DB connection managed by the container.
+				sessionContext.setRollbackOnly();
 			}
 		} catch (RuntimeException x) {
 			throw x;

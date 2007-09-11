@@ -2215,7 +2215,7 @@ public abstract class AccountingManagerBean
 	 * @ejb.permission role-name="_Guest_"
 	 * @ejb.transaction type="Supports"
 	 */
-	public Set<InvoiceID> getInvoiceIDs(Collection<InvoiceQuery> invoiceQueries)
+	public Set<InvoiceID> getInvoiceIDs(Collection<JDOQuery> invoiceQueries)
 	{
 		PersistenceManager pm = getPersistenceManager();
 		try {
@@ -2223,7 +2223,7 @@ public abstract class AccountingManagerBean
 			pm.getFetchPlan().setGroup(FetchPlan.DEFAULT);
 
 			Set<Invoice> invoices = null;
-			for (InvoiceQuery query : invoiceQueries) {
+			for (JDOQuery query : invoiceQueries) {
 				query.setPersistenceManager(pm);
 				query.setCandidates(invoices);
 				invoices = new HashSet<Invoice>(query.getResult());

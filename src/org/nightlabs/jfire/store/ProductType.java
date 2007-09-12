@@ -71,7 +71,6 @@ import org.nightlabs.jfire.store.id.ProductTypeGroupID;
 import org.nightlabs.jfire.store.id.ProductTypeID;
 import org.nightlabs.jfire.trade.LegalEntity;
 import org.nightlabs.util.Util;
-import org.nightlabs.util.Utils;
 
 /**
  * <p>
@@ -1083,6 +1082,7 @@ implements
 		if (deliveryConfiguration == null);
 		if (innerPriceConfig == null);
 		if (localAccountantDelegate == null);
+//		logger.info("preInherit: productType \"" + this.getPrimaryKey() + "\" (" + ( this == mother ? "mother" : (this == child ? "child" : "unknown") ) + "):" + localAccountantDelegate);
 		if (localStorekeeperDelegate == null);
 		nestedProductTypes.size();
 		if (packagePriceConfig == null);
@@ -1093,7 +1093,7 @@ implements
 	@Implement
 	public void postInherit(Inheritable mother, Inheritable child) {
 		if (child == this) {
-			if (!Utils.equals(tmpInherit_innerPriceConfigID, JDOHelper.getObjectId(innerPriceConfig)) ||
+			if (!Util.equals(tmpInherit_innerPriceConfigID, JDOHelper.getObjectId(innerPriceConfig)) ||
 					!compareNestedProductTypes(nestedProductTypes.values(), tmpInherit_nestedProductTypes)) {
 				// there are changes => recalculate prices!
 				PersistenceManager pm = getPersistenceManager();
@@ -1120,6 +1120,8 @@ implements
 				}
 			}
 		}
+
+		logger.debug("postInherit: productType \"" + this.getPrimaryKey() + "\" instance=" + System.identityHashCode(this) + " (" + ( this == mother ? "mother" : (this == child ? "child" : "unknown") ) + "): " + localAccountantDelegate);
 	}
 
 	/**
@@ -1483,8 +1485,8 @@ implements
 			throw new CannotMakeProductTypeSaleableException(CANNOT_MAKE_SALEABLE_REASON_ALREADY_CLOSED, "Cannot make ProductType \"" + getPrimaryKey() + "\" saleable, because it is already closed!");
 
 		if (localAccountantDelegate == null)
-			throw new CannotMakeProductTypeSaleableException(CANNOT_MAKE_SALEABLE_REASON_NO_ACCOUNTANT_DELEGATE, "Cannot make ProductType \"" + getPrimaryKey() + "\" saleable, because it has no LocalAccountantDelegate assigned!");
-		
+			throw new CannotMakeProductTypeSaleableException(CANNOT_MAKE_SALEABLE_REASON_NO_ACCOUNTANT_DELEGATE, "Cannot make ProductType \"" + getPrimaryKey() + "\" saleable, because it has no LocalAccountantDelegate assigned! instance=" + System.identityHashCode(this));
+
 		if (getPriceConfigInPackage(this.getPrimaryKey()) == null)
 			throw new CannotMakeProductTypeSaleableException(CANNOT_MAKE_SALEABLE_REASON_NO_PRICECONFIG, "Cannot make ProductType \"" + getPrimaryKey() + "\" saleable, because it has no PriceConfig assigned!");
 	}

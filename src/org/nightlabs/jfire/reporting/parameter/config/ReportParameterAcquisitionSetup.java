@@ -138,6 +138,13 @@ implements Serializable
 //		this.defaultSetup = defaultSetup;
 	}
 
+	public ReportParameterAcquisitionUseCase getDefaultUseCase() {
+		return defaultUseCase;
+	}
+	public void setDefaultUseCase(
+			ReportParameterAcquisitionUseCase defaultUseCase) {
+		this.defaultUseCase = defaultUseCase;
+	}
 
 	/**
 	 * @return the organisationID

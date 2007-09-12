@@ -426,7 +426,11 @@ public class ReportingInitialiser {
 			
 			if (useCase != null && overwriteOnInit) {
 				// use-case should be overwritten
-				useCase = resetUseCaseAndAcquisitionSetup(setup, useCase);
+//				useCase = resetUseCaseAndAcquisitionSetup(setup, useCase);
+				if (setup != null) {
+					setup.removeUseCase(useCase);
+					useCase = null;
+				}
 			}
 
 			if (setup == null) {
@@ -578,20 +582,20 @@ public class ReportingInitialiser {
 				}
 			}
 
-			// TODO JPOX WORKAROUND : To directly put the new acquisitionSetup causes a duplicate key exception
-			Object o = setup.getValueAcquisitionSetups().get(useCase);
-			if (o != null) {
-				setup.getValueAcquisitionSetups().remove(useCase);
-//				pm.deletePersistent(o);
-			}
-
-			pm.flush();
+//			// TODO JPOX WORKAROUND : To directly put the new acquisitionSetup causes a duplicate key exception
+//			Object o = setup.getValueAcquisitionSetups().get(useCase);
+//			if (o != null) {
+//				setup.getValueAcquisitionSetups().remove(useCase);
+////				pm.deletePersistent(o);
+//			}
+//
+//			pm.flush();
 
 //			acquisitionSetup = pm.makePersistent(acquisitionSetup);
 			// TODO end JPOX workaround
 
 			// make the usecase setup persistent
-			setup.getValueAcquisitionSetups().put(useCase, acquisitionSetup);
+			setup.addValueAcquisitionSetup(acquisitionSetup);
 
 
 			// TODO JPOX WORKAROUND : this was not needed with JPOX 1.1 - but now we seem to need it
@@ -656,23 +660,28 @@ public class ReportingInitialiser {
 		graphicalInfoProvider.setY(y);
 	}
 	
-	private ReportParameterAcquisitionUseCase resetUseCaseAndAcquisitionSetup(ReportParameterAcquisitionSetup setup, ReportParameterAcquisitionUseCase useCase) {
-		if (setup.getDefaultSetup() != null && setup.getDefaultSetup().getUseCase() != null && setup.getDefaultSetup().getUseCase().equals(useCase))
-			setup.setDefaultSetup(null);
-		for (Map.Entry<ReportParameterAcquisitionUseCase, ValueAcquisitionSetup> entry : setup.getValueAcquisitionSetups().entrySet()) {
-			if (entry.getKey().getReportParameterAcquisitionUseCaseID().equals(useCase.getReportParameterAcquisitionUseCaseID())) {
-				for (ValueConsumerBinding binding : entry.getValue().getValueConsumerBindings()) {
-					pm.deletePersistent(binding);
-				}
-				entry.getValue().getValueConsumerBindings().clear();
-				entry.getValue().getParameterConfigs().clear();
-				entry.getValue().getValueProviderConfigs().clear();
-				return entry.getKey();
-			}
-		}
-		pm.flush();
-		return useCase;
-	}
+//	private ReportParameterAcquisitionUseCase resetUseCaseAndAcquisitionSetup(ReportParameterAcquisitionSetup setup, ReportParameterAcquisitionUseCase useCase) {
+////		if (setup.getDefaultSetup() != null && setup.getDefaultSetup().getUseCase() != null && setup.getDefaultSetup().getUseCase().equals(useCase))
+////			setup.setDefaultSetup(null);
+//
+//		// TODO JPOX WORKAROUND Deleting the setup via pm.deletePersistent(setup) fails => workaround
+//		setup.setDefaultSetup(null);
+////		setup.getValueAcquisitionSetups().clear();
+//		for (Map.Entry<ReportParameterAcquisitionUseCase, ValueAcquisitionSetup> entry : setup.getValueAcquisitionSetups().entrySet()) {
+//			if (entry.getKey().getReportParameterAcquisitionUseCaseID().equals(useCase.getReportParameterAcquisitionUseCaseID())) {
+//				for (ValueConsumerBinding binding : entry.getValue().getValueConsumerBindings()) {
+//					pm.deletePersistent(binding);
+//				}
+//				pm.flush();
+//				entry.getValue().getValueConsumerBindings().clear();
+//				entry.getValue().getParameterConfigs().clear();
+//				entry.getValue().getValueProviderConfigs().clear();
+//				return entry.getKey();
+//			}
+//		}
+//		pm.flush();
+//		return useCase;
+//	}
 	
 	/**
 	 * Create the {@link ReportLayoutLocalisationData} objects for the given layout. It will search in a subfolder 'resource'

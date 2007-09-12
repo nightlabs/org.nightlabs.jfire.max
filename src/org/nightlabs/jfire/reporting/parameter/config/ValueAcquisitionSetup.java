@@ -7,6 +7,7 @@ import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
@@ -15,8 +16,10 @@ import java.util.SortedMap;
 import java.util.TreeMap;
 import java.util.Map.Entry;
 
+import org.apache.log4j.Logger;
 import org.nightlabs.jfire.reporting.parameter.ValueProvider;
 import org.nightlabs.jfire.reporting.parameter.ValueProviderInputParameter;
+import org.nightlabs.util.Util;
 
 /**
  * @author Alexander Bieber <!-- alex [AT] nightlabs [DOT] de -->
@@ -37,7 +40,9 @@ import org.nightlabs.jfire.reporting.parameter.ValueProviderInputParameter;
  * @jdo.fetch-group name="ValueAcquisitionSetup.valueConsumerBindings" fetch-groups="default" fields="valueConsumerBindings"
  * @jdo.fetch-group name="ValueAcquisitionSetup.this" fetch-groups="default" fields="parameterConfigs, valueProviderConfigs, valueConsumerBindings"
  */
-public class ValueAcquisitionSetup implements Serializable {
+public class ValueAcquisitionSetup
+implements Serializable
+{
 	
 	private static final long serialVersionUID = 1L;
 	
@@ -45,18 +50,18 @@ public class ValueAcquisitionSetup implements Serializable {
 	public static final String FETCH_GROUP_VALUE_PROVIDER_CONFIGS = "ValueAcquisitionSetup.valueProviderConfigs";
 	public static final String FETCH_GROUP_VALUE_CONSUMER_BINDINGS = "ValueAcquisitionSetup.valueConsumerBindings";
 	public static final String FETCH_GROUP_THIS_VALUE_ACQUISITION_SETUP = "ValueAcquisitionSetup.this";
-	
+
 	/**
 	 * @jdo.field primary-key="true"
 	 * @jdo.column length="100"
 	 */
 	private String organisationID;
-	
+
 	/**
 	 * @jdo.field primary-key="true"
 	 */
 	private long valueAcquisitionSetupID;
-	
+
 	/**
 	 * @jdo.field
 	 *		persistence-modifier="persistent"
@@ -66,7 +71,7 @@ public class ValueAcquisitionSetup implements Serializable {
 	 *		dependent-element="true"
 	 */
 	private List<AcquisitionParameterConfig> parameterConfigs;
-	
+
 	/**
 	 * @jdo.field
 	 *		persistence-modifier="persistent"
@@ -76,7 +81,7 @@ public class ValueAcquisitionSetup implements Serializable {
 	 *		dependent-element="true"
 	 */
 	private Set<ValueProviderConfig> valueProviderConfigs;
-	
+
 	/**
 	 * @jdo.field
 	 *		persistence-modifier="persistent"
@@ -86,13 +91,12 @@ public class ValueAcquisitionSetup implements Serializable {
 	 *		dependent-element="true"
 	 */
 	private Set<ValueConsumerBinding> valueConsumerBindings;
-	
-	
+
 	/**
 	 * @jdo.field persistence-modifier="persistent"
 	 */
 	private ReportParameterAcquisitionSetup parameterAcquisitionSetup;
-	
+
 	/**
 	 * @jdo.field persistence-modifier="persistent" dependent="true"
 	 */
@@ -104,14 +108,14 @@ public class ValueAcquisitionSetup implements Serializable {
 	 * @jdo.field persistence-modifier="none"
 	 **/
 	private transient Map<String, Map<String, ValueConsumerBinding>> consumer2Binding = null;
-	
+
 	/**
 	 * Used internally to provide bindings.
 	 * 
 	 * @jdo.field persistence-modifier="none"
 	 **/
 	private transient Map<String, ValueConsumerBinding> provider2Binding = null;
-	
+
 	/**
 	 * @deprecated Only for JDO
 	 */
@@ -150,13 +154,13 @@ public class ValueAcquisitionSetup implements Serializable {
 		return parameterConfigs;
 	}
 
-	/**
-	 * @param parameterConfigs the parameterConfigs to set
-	 */
-	public void setParameterConfigs(
-			List<AcquisitionParameterConfig> parameterConfigs) {
-		this.parameterConfigs = parameterConfigs;
-	}
+//	/**
+//	 * @param parameterConfigs the parameterConfigs to set
+//	 */
+//	public void setParameterConfigs(
+//			List<AcquisitionParameterConfig> parameterConfigs) {
+//		this.parameterConfigs = parameterConfigs;
+//	}
 
 	/**
 	 * @return the valueProviderConfigs
@@ -165,13 +169,13 @@ public class ValueAcquisitionSetup implements Serializable {
 		return valueProviderConfigs;
 	}
 
-	/**
-	 * @param valueProviderConfigs the valueProviderConfigs to set
-	 */
-	public void setValueProviderConfigs(
-			Set<ValueProviderConfig> valueProviderConfigs) {
-		this.valueProviderConfigs = valueProviderConfigs;
-	}
+//	/**
+//	 * @param valueProviderConfigs the valueProviderConfigs to set
+//	 */
+//	public void setValueProviderConfigs(
+//			Set<ValueProviderConfig> valueProviderConfigs) {
+//		this.valueProviderConfigs = valueProviderConfigs;
+//	}
 
 	/**
 	 * @return the valueConsumerBindings
@@ -180,13 +184,13 @@ public class ValueAcquisitionSetup implements Serializable {
 		return valueConsumerBindings;
 	}
 
-	/**
-	 * @param valueConsumerBindings the valueConsumerBindings to set
-	 */
-	public void setValueConsumerBindings(
-			Set<ValueConsumerBinding> valueConsumerBindings) {
-		this.valueConsumerBindings = valueConsumerBindings;
-	}
+//	/**
+//	 * @param valueConsumerBindings the valueConsumerBindings to set
+//	 */
+//	public void setValueConsumerBindings(
+//			Set<ValueConsumerBinding> valueConsumerBindings) {
+//		this.valueConsumerBindings = valueConsumerBindings;
+//	}
 
 	/**
 	 * @return the organisationID
@@ -209,6 +213,14 @@ public class ValueAcquisitionSetup implements Serializable {
 		return parameterAcquisitionSetup;
 	}
 
+	/**
+	 * Obtain a sorted copy of the <code>ValueProviderConfig</code>s. It is sorted by
+	 * page-index (index of page) and page-order (index within page). Modifying the <code>Map</code> does
+	 * not modify this instance of <code>ValueAcquisitionSetup</code> - modifying the contents
+	 * of the map does, however. You should never modify it, though!
+	 *
+	 * @return a sorted map of all {@link ValueProviderConfig}s.
+	 */
 	public SortedMap<Integer, SortedMap<Integer, ValueProviderConfig>> getSortedValueProviderConfigs() {
 		SortedMap<Integer, SortedMap<Integer, ValueProviderConfig>> result = new TreeMap<Integer, SortedMap<Integer,ValueProviderConfig>>();
 		for (ValueProviderConfig config : getValueProviderConfigs()) {
@@ -221,7 +233,7 @@ public class ValueAcquisitionSetup implements Serializable {
 		}
 		return result;
 	}
-	
+
 	public SortedMap<Integer, List<ValueProviderConfig>> createAcquisitionSequence(ValueProviderProvider provider) 
 	{
 		List<AcquisitionParameterConfig> parameterConfigs = getParameterConfigs();
@@ -340,5 +352,42 @@ public class ValueAcquisitionSetup implements Serializable {
 	public void clearBindingIndexes() {
 		provider2Binding = null;
 		consumer2Binding = null;
+	}
+
+	protected void removeOrphanedBindings(AcquisitionParameterConfig acquisitionParameterConfig)
+	{
+		// TODO make this more efficient
+		int count = 0;
+		for (Iterator it = valueConsumerBindings.iterator(); it.hasNext(); ) {
+			ValueConsumerBinding binding = (ValueConsumerBinding) it.next();
+			if (Util.equals(binding.getProvider(), acquisitionParameterConfig) ||
+				Util.equals(binding.getConsumer(), acquisitionParameterConfig))
+			{
+				it.remove();
+				++count;
+			}
+		}
+		Logger.getLogger(ValueAcquisitionSetup.class).info("removeOrphanedBindings: Deleted " + count + " orphaned bindings.");
+//		PersistenceManager pm = JDOHelper.getPersistenceManager(this);
+//		if (pm != null)
+//			pm.flush();
+	}
+	protected void removeOrphanedBindings(ValueProviderConfig valueProviderConfig)
+	{
+		// TODO make this more efficient
+		int count = 0;
+		for (Iterator it = valueConsumerBindings.iterator(); it.hasNext(); ) {
+			ValueConsumerBinding binding = (ValueConsumerBinding) it.next();
+			if (Util.equals(binding.getProvider(), valueProviderConfig) ||
+				Util.equals(binding.getConsumer(), valueProviderConfig))
+			{
+				it.remove();
+				++count;
+			}
+		}
+		Logger.getLogger(ValueAcquisitionSetup.class).info("removeOrphanedBindings: Deleted " + count + " orphaned bindings.");
+//		PersistenceManager pm = JDOHelper.getPersistenceManager(this);
+//		if (pm != null)
+//			pm.flush();
 	}
 }

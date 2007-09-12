@@ -2,7 +2,7 @@ package org.nightlabs.jfire.reporting.parameter.config;
 
 /**
  * Interface used in a {@link ValueAcquisitionSetup} to bind
- * a {@link ValueProviderConfig} either to an {@link AcquisitionParameterConfig}s or to a {@link ValueProviderConfig}.
+ * a {@link ValueProviderConfig} either to an {@link AcquisitionParameterConfig} or to a {@link ValueProviderConfig}.
  * 
  * @see ValueConsumerBinding
  * 

@@ -2,6 +2,8 @@ package org.nightlabs.jfire.reporting.parameter.config;
 
 import java.io.Serializable;
 
+import javax.jdo.listener.DeleteCallback;
+
 import org.nightlabs.jdo.ObjectIDUtil;
 import org.nightlabs.jfire.reporting.parameter.ValueProvider;
 import org.nightlabs.jfire.reporting.parameter.id.ValueProviderID;
@@ -25,7 +27,7 @@ import org.nightlabs.jfire.reporting.parameter.id.ValueProviderID;
  *
  */
 public class ValueProviderConfig 
-implements ValueConsumer, Serializable, IGraphicalInfoProvider 
+implements ValueConsumer, Serializable, IGraphicalInfoProvider, DeleteCallback
 {
 
 	private static final long serialVersionUID = 1L;
@@ -305,5 +307,75 @@ implements ValueConsumer, Serializable, IGraphicalInfoProvider
 	public void setShowMessageInHeader(boolean showMessageInHeader) {
 		this.showMessageInHeader = showMessageInHeader;
 	}
-		
+
+	/** {@inheritDoc}
+	 */
+	@Override
+	public int hashCode() {
+		final int prime = 31;
+		int result = 1;
+		result = prime * result
+				+ ((organisationID == null) ? 0 : organisationID.hashCode());
+		result = prime
+				* result
+				+ (int) (valueAcquisitionSetupID ^ (valueAcquisitionSetupID >>> 32));
+		result = prime
+				* result
+				+ ((valueProviderCategoryID == null) ? 0
+						: valueProviderCategoryID.hashCode());
+		result = prime
+				* result
+				+ (int) (valueProviderConfigID ^ (valueProviderConfigID >>> 32));
+		result = prime * result
+				+ ((valueProviderID == null) ? 0 : valueProviderID.hashCode());
+		result = prime
+				* result
+				+ ((valueProviderOrganisationID == null) ? 0
+						: valueProviderOrganisationID.hashCode());
+		return result;
+	}
+
+	/** {@inheritDoc}
+	 */
+	@Override
+	public boolean equals(Object obj) {
+		if (this == obj)
+			return true;
+		if (obj == null)
+			return false;
+		if (getClass() != obj.getClass())
+			return false;
+		final ValueProviderConfig other = (ValueProviderConfig) obj;
+		if (organisationID == null) {
+			if (other.organisationID != null)
+				return false;
+		} else if (!organisationID.equals(other.organisationID))
+			return false;
+		if (valueAcquisitionSetupID != other.valueAcquisitionSetupID)
+			return false;
+		if (valueProviderCategoryID == null) {
+			if (other.valueProviderCategoryID != null)
+				return false;
+		} else if (!valueProviderCategoryID
+				.equals(other.valueProviderCategoryID))
+			return false;
+		if (valueProviderConfigID != other.valueProviderConfigID)
+			return false;
+		if (valueProviderID == null) {
+			if (other.valueProviderID != null)
+				return false;
+		} else if (!valueProviderID.equals(other.valueProviderID))
+			return false;
+		if (valueProviderOrganisationID == null) {
+			if (other.valueProviderOrganisationID != null)
+				return false;
+		} else if (!valueProviderOrganisationID
+				.equals(other.valueProviderOrganisationID))
+			return false;
+		return true;
+	}
+
+	public void jdoPreDelete() {
+		setup.removeOrphanedBindings(this);
+	}
 }

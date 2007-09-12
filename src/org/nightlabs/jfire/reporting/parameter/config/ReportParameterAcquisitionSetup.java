@@ -4,9 +4,11 @@
 package org.nightlabs.jfire.reporting.parameter.config;
 
 import java.io.Serializable;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 
+import javax.jdo.JDOHelper;
 import javax.jdo.PersistenceManager;
 import javax.jdo.Query;
 
@@ -24,7 +26,7 @@ import org.nightlabs.jfire.reporting.layout.id.ReportRegistryItemID;
  *
  * @jdo.create-objectid-class field-order="organisationID, reportParameterAcquisitionSetupID"
  * 
- * @jdo.fetch-group name="ReportParameterAcquisitionSetup.defaultSetup" fetch-groups="default" fields="defaultSetup"
+ * @jdo.fetch-group name="ReportParameterAcquisitionSetup.defaultUseCase" fetch-groups="default" fields="defaultUseCase"
  * @jdo.fetch-group name="ReportParameterAcquisitionSetup.reportLayout" fetch-groups="default" fields="reportLayout"
  * @jdo.fetch-group name="ReportParameterAcquisitionSetup.valueAcquisitionSetups" fetch-groups="default" fields="valueAcquisitionSetups"
  * @jdo.fetch-group name="ReportParameterAcquisitionSetup.this" fetch-groups="default" fields="defaultSetup, reportLayout, valueAcquisitionSetups"
@@ -40,11 +42,13 @@ import org.nightlabs.jfire.reporting.layout.id.ReportRegistryItemID;
  *			import java.lang.String"
  * 
  */
-public class ReportParameterAcquisitionSetup implements Serializable {
+public class ReportParameterAcquisitionSetup
+implements Serializable
+{
 
 	private static final long serialVersionUID = 1L;
 	
-	public static final String FETCH_GROUP_DEFAULT_SETUP = "ReportParameterAcquisitionSetup.defaultSetup";
+	public static final String FETCH_GROUP_DEFAULT_USE_CASE = "ReportParameterAcquisitionSetup.defaultUseCase";
 	public static final String FETCH_GROUP_REPORT_LAYOUT = "ReportParameterAcquisitionSetup.reportLayout";
 	public static final String FETCH_GROUP_VALUE_ACQUISITION_SETUPS = "ReportParameterAcquisitionSetup.valueAcquisitionSetups";
 	public static final String FETCH_GROUP_THIS_REPORT_PARAMETER_ACQUISITION_SETUP = "ReportParameterAcquisitionSetup.this";
@@ -60,12 +64,13 @@ public class ReportParameterAcquisitionSetup implements Serializable {
 	 * @jdo.field primary-key="true"
 	 */
 	private long reportParameterAcquisitionSetupID;	
-	
+
 	/**
 	 * @jdo.field persistence-modifier="persistent"
 	 */
-	private ValueAcquisitionSetup defaultSetup;
-	
+	private ReportParameterAcquisitionUseCase defaultUseCase;
+//	private ValueAcquisitionSetup defaultSetup;
+
 	/**
 	 * @jdo.field persistence-modifier="persistent"
 	 */
@@ -78,7 +83,6 @@ public class ReportParameterAcquisitionSetup implements Serializable {
 	 *		key-type="org.nightlabs.jfire.reporting.parameter.config.ReportParameterAcquisitionUseCase"
 	 *		value-type="org.nightlabs.jfire.reporting.parameter.config.ValueAcquisitionSetup"
 	 *		mapped-by="parameterAcquisitionSetup"
-	 *		dependent-key="true"
 	 *		dependent-value="true"
 	 *
 	 * @jdo.key
@@ -119,15 +123,19 @@ public class ReportParameterAcquisitionSetup implements Serializable {
 	 * @return the defaultSetup
 	 */
 	public ValueAcquisitionSetup getDefaultSetup() {
-		return defaultSetup;
-	}
+		if (defaultUseCase == null)
+			return null;
 
+		return valueAcquisitionSetups.get(defaultUseCase);
+//		return defaultSetup;
+	}
 
 	/**
 	 * @param defaultSetup the defaultSetup to set
 	 */
 	public void setDefaultSetup(ValueAcquisitionSetup defaultSetup) {
-		this.defaultSetup = defaultSetup;
+		this.defaultUseCase = defaultSetup != null ? defaultSetup.getUseCase() : null;
+//		this.defaultSetup = defaultSetup;
 	}
 
 
@@ -151,7 +159,37 @@ public class ReportParameterAcquisitionSetup implements Serializable {
 	 * @return the valueAcquisitionSetups
 	 */
 	public Map<ReportParameterAcquisitionUseCase, ValueAcquisitionSetup> getValueAcquisitionSetups() {
-		return valueAcquisitionSetups;	
+		return Collections.unmodifiableMap(valueAcquisitionSetups);
+	}
+
+	public void addValueAcquisitionSetup(ValueAcquisitionSetup valueAcquisitionSetup)
+	{
+		valueAcquisitionSetups.put(valueAcquisitionSetup.getUseCase(), valueAcquisitionSetup);
+	}
+
+	/**
+	 * Remove the use case and its ValueAcquisitionSetup.
+	 * @param useCase
+	 */
+	public void removeUseCase(ReportParameterAcquisitionUseCase useCase)
+	{
+		assert useCase != null;
+
+		PersistenceManager pm = JDOHelper.getPersistenceManager(this);
+
+		if (useCase.equals(defaultUseCase)) {
+			// TODO we should set the next available use-case as default
+			defaultUseCase = null;
+			if (pm != null)
+				pm.flush();
+		}
+		valueAcquisitionSetups.remove(useCase);
+//		ValueAcquisitionSetup setup = valueAcquisitionSetups.remove(useCase);
+//		if (pm != null) {
+//			pm.deletePersistent(setup);
+//			pm.deletePersistent(useCase);
+//			pm.flush();
+//		}
 	}
 
 	/**

@@ -5,6 +5,8 @@ package org.nightlabs.jfire.reporting.parameter.config;
 
 import java.io.Serializable;
 
+import org.nightlabs.util.Util;
+
 /**
  * @author Alexander Bieber <!-- alex [AT] nightlabs [DOT] de -->
  *
@@ -146,5 +148,40 @@ public class ReportParameterAcquisitionUseCase implements Serializable {
 	public void setName(ReportParameterAcquisitionUseCaseName name) {
 		this.name = name;
 	}
-	
+
+
+	/** {@inheritDoc}
+	 */
+	@Override
+	public int hashCode() {
+		final int prime = 31;
+		int result = 1;
+		result = prime * result
+				+ ((organisationID == null) ? 0 : organisationID.hashCode());
+		result = prime
+				* result
+				+ (int) (reportParameterAcquisitionSetupID ^ (reportParameterAcquisitionSetupID >>> 32));
+		result = prime
+				* result
+				+ ((reportParameterAcquisitionUseCaseID == null) ? 0
+						: reportParameterAcquisitionUseCaseID.hashCode());
+		return result;
+	}
+
+	/** {@inheritDoc}
+	 */
+	@Override
+	public boolean equals(Object obj) {
+		if (this == obj)
+			return true;
+		if (obj == null)
+			return false;
+		if (getClass() != obj.getClass())
+			return false;
+		final ReportParameterAcquisitionUseCase other = (ReportParameterAcquisitionUseCase) obj;
+		return
+				Util.equals(organisationID, other.organisationID) &&
+				Util.equals(reportParameterAcquisitionSetupID, other.reportParameterAcquisitionSetupID) &&
+				Util.equals(reportParameterAcquisitionUseCaseID, other.reportParameterAcquisitionUseCaseID);
+	}
 }

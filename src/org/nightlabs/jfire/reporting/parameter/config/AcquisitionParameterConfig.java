@@ -5,6 +5,8 @@ package org.nightlabs.jfire.reporting.parameter.config;
 
 import java.io.Serializable;
 
+import javax.jdo.listener.DeleteCallback;
+
 import org.nightlabs.jfire.reporting.parameter.ValueProvider;
 
 /**
@@ -32,9 +34,8 @@ import org.nightlabs.jfire.reporting.parameter.ValueProvider;
  * 
  */
 public class AcquisitionParameterConfig 
-implements ValueConsumer, Serializable, IGraphicalInfoProvider 
+implements ValueConsumer, Serializable, IGraphicalInfoProvider, DeleteCallback 
 {
-	
 	private static final long serialVersionUID = 1L;
 
 	/**
@@ -177,5 +178,51 @@ implements ValueConsumer, Serializable, IGraphicalInfoProvider
 	 */		
 	public void setY(int y) {
 		this.y = y;
-	}	
+	}
+
+	public void jdoPreDelete() {
+		setup.removeOrphanedBindings(this);
+	}
+
+	/** {@inheritDoc}
+	 */
+	@Override
+	public int hashCode() {
+		final int prime = 31;
+		int result = 1;
+		result = prime * result
+				+ ((organisationID == null) ? 0 : organisationID.hashCode());
+		result = prime * result
+				+ ((parameterID == null) ? 0 : parameterID.hashCode());
+		result = prime
+				* result
+				+ (int) (valueAcquisitionSetupID ^ (valueAcquisitionSetupID >>> 32));
+		return result;
+	}
+
+	/** {@inheritDoc}
+	 */
+	@Override
+	public boolean equals(Object obj) {
+		if (this == obj)
+			return true;
+		if (obj == null)
+			return false;
+		if (getClass() != obj.getClass())
+			return false;
+		final AcquisitionParameterConfig other = (AcquisitionParameterConfig) obj;
+		if (organisationID == null) {
+			if (other.organisationID != null)
+				return false;
+		} else if (!organisationID.equals(other.organisationID))
+			return false;
+		if (parameterID == null) {
+			if (other.parameterID != null)
+				return false;
+		} else if (!parameterID.equals(other.parameterID))
+			return false;
+		if (valueAcquisitionSetupID != other.valueAcquisitionSetupID)
+			return false;
+		return true;
+	}
 }

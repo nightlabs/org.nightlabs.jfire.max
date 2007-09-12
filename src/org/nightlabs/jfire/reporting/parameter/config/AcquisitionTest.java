@@ -38,9 +38,9 @@ public class AcquisitionTest {
 		AcquisitionParameterConfig pc2 = new AcquisitionParameterConfig(setup);
 		pc2.setParameterID("param2");
 		pc2.setParameterType(Integer.class.getName());
-		parameterConfigs.add(pc1);
-		parameterConfigs.add(pc2);
-		setup.setParameterConfigs(parameterConfigs);
+		setup.getParameterConfigs().add(pc1);
+		setup.getParameterConfigs().add(pc2);
+		
 		
 		Set<ValueProviderConfig> providerConfigs = new HashSet<ValueProviderConfig>();
 		ValueProviderConfig vpc1 = new ValueProviderConfig(setup, IDGenerator.nextID(ValueProviderConfig.class));
@@ -55,12 +55,12 @@ public class AcquisitionTest {
 		vpc5.setValueProviderID("vp5");
 		ValueProviderConfig vpc6 = new ValueProviderConfig(setup, IDGenerator.nextID(ValueProviderConfig.class));
 		vpc6.setValueProviderID("vp6");
-		providerConfigs.add(vpc1);
-		providerConfigs.add(vpc2);
-		providerConfigs.add(vpc3);
-		providerConfigs.add(vpc4);
-		providerConfigs.add(vpc5);
-		setup.setValueProviderConfigs(providerConfigs);
+		setup.getValueProviderConfigs().add(vpc1);
+		setup.getValueProviderConfigs().add(vpc2);
+		setup.getValueProviderConfigs().add(vpc3);
+		setup.getValueProviderConfigs().add(vpc4);
+		setup.getValueProviderConfigs().add(vpc5);
+		
 		
 		Set<ValueConsumerBinding> bindings = new HashSet<ValueConsumerBinding>();
 		ValueConsumerBinding b1 = new ValueConsumerBinding(organsiationID, 0, setup);
@@ -92,15 +92,13 @@ public class AcquisitionTest {
 		b6.setConsumer(vpc5);
 		b6.setParameterID("param1");
 		b6.setProvider(vpc6);
-		bindings.add(b1);
-		bindings.add(b2);
-		bindings.add(b3);
-		bindings.add(b4);
-		bindings.add(b5);
-		bindings.add(b6);
-		setup.setValueConsumerBindings(bindings);
-		
-		
+		setup.getValueConsumerBindings().add(b1);
+		setup.getValueConsumerBindings().add(b2);
+		setup.getValueConsumerBindings().add(b3);
+		setup.getValueConsumerBindings().add(b4);
+		setup.getValueConsumerBindings().add(b5);
+		setup.getValueConsumerBindings().add(b6);
+
 //		setup.getValueProviderConfigs()
 		return setup;
 	}

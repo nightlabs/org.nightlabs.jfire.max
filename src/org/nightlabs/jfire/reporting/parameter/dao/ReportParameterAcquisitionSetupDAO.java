@@ -38,7 +38,7 @@ extends BaseJDOObjectDAO<ReportParameterAcquisitionSetupID, ReportParameterAcqui
 
 	public static final String[] DEFAULT_FETCH_GROUPS = new String[] {
 		FetchPlan.DEFAULT,
-		ReportParameterAcquisitionSetup.FETCH_GROUP_DEFAULT_SETUP,
+		ReportParameterAcquisitionSetup.FETCH_GROUP_DEFAULT_USE_CASE,
 		ReportParameterAcquisitionSetup.FETCH_GROUP_VALUE_ACQUISITION_SETUPS,
 		ValueAcquisitionSetup.FETCH_GROUP_THIS_VALUE_ACQUISITION_SETUP,
 		ValueConsumerBinding.FETCH_GROUP_CONSUMER,

@@ -271,7 +271,7 @@ extends Initialiser
 		accessories.getFieldMetaData("localAccountantDelegate").setValueInherited(false);
 		accessories.applyInheritance();
 
-		logger.info("Chezfrancois Created all SimpleProductTypes, publishing now!");
+		logger.info("Chezfrancois Created all SimpleProductTypes; publishing, confirming and making available now!");
 		dataCreator.makeAllLeavesSaleable();
 		
 		

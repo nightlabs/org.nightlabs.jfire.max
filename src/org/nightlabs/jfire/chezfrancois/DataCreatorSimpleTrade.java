@@ -118,13 +118,13 @@ extends DataCreator
 		setNames(pt.getName(), names);
 		pt.setPackagePriceConfig(new StablePriceConfig(IDGenerator.getOrganisationID(), IDGenerator.nextID(PriceConfig.class)));
 		pt.getFieldMetaData("innerPriceConfig").setValueInherited(false);
-		pt.getFieldMetaData("localAccountantDelegate").setValueInherited(false); // TODO this should be a field of ProductTypeLocal - not ProductType!
-		pt.getFieldMetaData("localStorekeeperDelegate").setValueInherited(false); // TODO this should be a field of ProductTypeLocal - not ProductType!
+//		pt.getFieldMetaData("localAccountantDelegate").setValueInherited(false); // TODO this should be a field of ProductTypeLocal - not ProductType!
+//		pt.getFieldMetaData("localStorekeeperDelegate").setValueInherited(false); // TODO this should be a field of ProductTypeLocal - not ProductType!
 		pt.setInnerPriceConfig(innerPriceConfig);
-		store.addProductType(user, pt); // , SimpleProductTypeActionHandler.getDefaultHome(pm, pt));
+		pt = (SimpleProductType) store.addProductType(user, pt);
 
 		store.setProductTypeStatus_published(user, pt);
-		store.setProductTypeStatus_confirmed(user, pt);
+//		store.setProductTypeStatus_confirmed(user, pt);
 //		store.setProductTypeStatus_saleable(user, pt, true);		
 		
 //		createdLeafs.add((ProductTypeID) JDOHelper.getObjectId(pt));
@@ -133,8 +133,11 @@ extends DataCreator
 		return pt;
 	}
 	
-	public void makeAllLeavesSaleable() throws CannotMakeProductTypeSaleableException {
+	public void makeAllLeavesSaleable()
+	throws CannotMakeProductTypeSaleableException, CannotConfirmProductTypeException
+	{
 		for (ProductType pt : createdLeafs) {
+			store.setProductTypeStatus_confirmed(user, pt);
 			store.setProductTypeStatus_saleable(user, pt, true);
 		}
 	}

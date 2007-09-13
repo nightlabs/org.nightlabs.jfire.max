@@ -114,7 +114,25 @@ public abstract class MoneyFlowMapping implements Serializable {
 	 * @jdo.field persistence-modifier="persistent" null-value="exception"
 	 */
 	private Account account;
-	
+
+	/**
+	 * @jdo.field persistence-modifier="persistent" null-value="exception"
+	 */
+	private Account revenueAccount;
+	/**
+	 * @jdo.field persistence-modifier="persistent" null-value="exception"
+	 */
+	private Account expenseAccount;
+
+	/**
+	 * @jdo.field persistence-modifier="persistent"
+	 */
+	private Account reverseRevenueAccount;
+	/**
+	 * @jdo.field persistence-modifier="persistent"
+	 */
+	private Account reverseExpenseAccount;
+
 	/**
 	 * @jdo.field persistence-modifier="persistent"
 	 */

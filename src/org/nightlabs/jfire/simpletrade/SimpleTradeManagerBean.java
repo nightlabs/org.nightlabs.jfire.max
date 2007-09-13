@@ -49,6 +49,7 @@ import javax.jdo.JDOHelper;
 import javax.jdo.JDOObjectNotFoundException;
 import javax.jdo.PersistenceManager;
 import javax.jdo.Query;
+import javax.jdo.annotations.Property;
 
 import org.apache.log4j.Logger;
 import org.nightlabs.ModuleException;
@@ -58,6 +59,7 @@ import org.nightlabs.jdo.query.JDOQuery;
 import org.nightlabs.jfire.accounting.Price;
 import org.nightlabs.jfire.accounting.Tariff;
 import org.nightlabs.jfire.accounting.TariffMapper;
+import org.nightlabs.jfire.accounting.gridpriceconfig.AssignInnerPriceConfigCommand;
 import org.nightlabs.jfire.accounting.gridpriceconfig.FormulaPriceConfig;
 import org.nightlabs.jfire.accounting.gridpriceconfig.GridPriceConfig;
 import org.nightlabs.jfire.accounting.gridpriceconfig.GridPriceConfigUtil;
@@ -1188,7 +1190,7 @@ implements SessionBean
 	 * @ejb.transaction type="Required"
 	 * @ejb.permission role-name="_Guest_"
 	 */
-	public Collection<GridPriceConfig> storePriceConfigs(Collection<GridPriceConfig> priceConfigs, boolean get, ProductTypeID productTypeID, PriceConfigID innerPriceConfigID)
+	public Collection<GridPriceConfig> storePriceConfigs(Collection<GridPriceConfig> priceConfigs, boolean get, AssignInnerPriceConfigCommand assignInnerPriceConfigCommand)
 	throws PriceCalculationException
 	{
 		PersistenceManager pm = getPersistenceManager();
@@ -1203,7 +1205,7 @@ implements SessionBean
 				}
 			};
 
-			return GridPriceConfigUtil.storePriceConfigs(pm, priceConfigs, pcf, get, productTypeID, innerPriceConfigID);
+			return GridPriceConfigUtil.storePriceConfigs(pm, priceConfigs, pcf, get, assignInnerPriceConfigCommand);
 		} finally {
 			pm.close();
 		}

@@ -248,12 +248,12 @@ public class DataCreator
 		return customerGroupAnonymous;
 	}
 
-	public Account createLocalAccount(String anchorID, String name)
+	public Account createLocalRevenueAccount(String anchorID, String name)
 	{
 		Currency euro = getCurrencyEUR();
 
 		Account account = new Account(
-				organisationID, Account.ANCHOR_TYPE_ID_LOCAL_REVENUE_IN, anchorID, organisationLegalEntity, euro, false);
+				organisationID, Account.ANCHOR_TYPE_ID_LOCAL_REVENUE, anchorID, organisationLegalEntity, euro, false);
 		account.getName().setText(languageID, name);
 
 		pm.makePersistent(account);

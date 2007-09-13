@@ -120,10 +120,10 @@ extends Initialiser
 		dataCreator.getRootDynamicProductType().setInnerPriceConfig(priceConfig);
 		
 		// create Accounts
-		Account accountSoftwareDevelopmentVatNet = dataCreator.createLocalAccount("software-development-vat-net.eur", "Software Development Net (EUR)");
-		Account accountSoftwareDevelopmentVatVal = dataCreator.createLocalAccount("software-development-vat-val.eur", "Software Development VAT (EUR)");
-		Account accountServiceVatNet = dataCreator.createLocalAccount("service-vat-net.eur", "Service Net (EUR)");
-		Account accountServiceVatVal = dataCreator.createLocalAccount("service-vat-val.eur", "Service VAT (EUR)");
+		Account accountSoftwareDevelopmentVatNet = dataCreator.createLocalRevenueAccount("software-development-vat-net.eur", "Software Development Net (EUR)");
+		Account accountSoftwareDevelopmentVatVal = dataCreator.createLocalRevenueAccount("software-development-vat-val.eur", "Software Development VAT (EUR)");
+		Account accountServiceVatNet = dataCreator.createLocalRevenueAccount("service-vat-net.eur", "Service Net (EUR)");
+		Account accountServiceVatVal = dataCreator.createLocalRevenueAccount("service-vat-val.eur", "Service VAT (EUR)");
 		
 		DynamicProductType softwareDevelopment = dataCreator.createCategory(null, softwareDevelopmentID.productTypeID, null, "Software Development", "Software-Entwicklung");
 		DynamicProductType swDevJFire = dataCreator.createLeaf(softwareDevelopment, "softwareDevelopment.jfire", null, "JFire");

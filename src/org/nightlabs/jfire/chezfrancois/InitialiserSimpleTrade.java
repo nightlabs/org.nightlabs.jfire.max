@@ -218,19 +218,19 @@ extends Initialiser
 		dataCreator.calculatePrices();
 
 		// create Accounts: Red Wine (bottle), White Wine (bottle), Red Wine (box), White Wine (box)
-		Account accountBottleRedVatNet = dataCreator.createLocalAccount("bottle-red-vat-net.eur", "Bottle Red Net (EUR)");
-		Account accountBottleRedVatVal = dataCreator.createLocalAccount("bottle-red-vat-val.eur", "Bottle Red VAT (EUR)");
-		Account accountBottleWhiteVatNet = dataCreator.createLocalAccount("bottle-white-vat-net.eur", "Bottle White Net (EUR)");
-		Account accountBottleWhiteVatVal = dataCreator.createLocalAccount("bottle-white-vat-val.eur", "Bottle White VAT (EUR)");
+		Account accountBottleRedVatNet = dataCreator.createLocalRevenueAccount("bottle-red-vat-net.eur", "Bottle Red Net (EUR)");
+		Account accountBottleRedVatVal = dataCreator.createLocalRevenueAccount("bottle-red-vat-val.eur", "Bottle Red VAT (EUR)");
+		Account accountBottleWhiteVatNet = dataCreator.createLocalRevenueAccount("bottle-white-vat-net.eur", "Bottle White Net (EUR)");
+		Account accountBottleWhiteVatVal = dataCreator.createLocalRevenueAccount("bottle-white-vat-val.eur", "Bottle White VAT (EUR)");
 
-		Account accountBoxRedVatNet = dataCreator.createLocalAccount("box-red-vat-net.eur", "Box Red Net (EUR)");
-		Account accountBoxRedVatVal = dataCreator.createLocalAccount("box-red-vat-val.eur", "Box Red VAT (EUR)");
-		Account accountBoxWhiteVatNet = dataCreator.createLocalAccount("box-white-vat-net.eur", "Box White Net (EUR)");
-		Account accountBoxWhiteVatVal = dataCreator.createLocalAccount("box-white-vat-val.eur", "Box White VAT (EUR)");
+		Account accountBoxRedVatNet = dataCreator.createLocalRevenueAccount("box-red-vat-net.eur", "Box Red Net (EUR)");
+		Account accountBoxRedVatVal = dataCreator.createLocalRevenueAccount("box-red-vat-val.eur", "Box Red VAT (EUR)");
+		Account accountBoxWhiteVatNet = dataCreator.createLocalRevenueAccount("box-white-vat-net.eur", "Box White Net (EUR)");
+		Account accountBoxWhiteVatVal = dataCreator.createLocalRevenueAccount("box-white-vat-val.eur", "Box White VAT (EUR)");
 
 		// create Accounts: Accessories
-		Account accessoriesVatNet = dataCreator.createLocalAccount("accessories-vat-net.eur", "Accessories Net (EUR)");
-		Account accessoriesVatVal = dataCreator.createLocalAccount("accessories-vat-val.eur", "Accessories VAT (EUR)");
+		Account accessoriesVatNet = dataCreator.createLocalRevenueAccount("accessories-vat-net.eur", "Accessories Net (EUR)");
+		Account accessoriesVatVal = dataCreator.createLocalRevenueAccount("accessories-vat-val.eur", "Accessories VAT (EUR)");
 
 		// configure moneyflow
 		PFMappingAccountantDelegate wineAccountantDelegate = new PFMappingAccountantDelegate(organisationID, "wineAccountantDelegate");

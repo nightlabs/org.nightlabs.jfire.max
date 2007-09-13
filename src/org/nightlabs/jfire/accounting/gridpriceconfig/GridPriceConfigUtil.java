@@ -50,8 +50,8 @@ import org.nightlabs.jfire.accounting.priceconfig.PriceConfigUtil;
 import org.nightlabs.jfire.accounting.priceconfig.id.PriceConfigID;
 import org.nightlabs.jfire.organisation.LocalOrganisation;
 import org.nightlabs.jfire.store.ProductType;
-import org.nightlabs.jfire.store.id.ProductTypeID;
 import org.nightlabs.jfire.trade.CustomerGroup;
+import org.nightlabs.util.Util;
 
 /**
  * @!ejb.bean name="jfire/ejb/JFireTrade/GridPriceConfigManager"	
@@ -191,14 +191,14 @@ public class GridPriceConfigUtil
 	}
 
 	/**
-	 * @param productTypeID If not <code>null</code>, this ProductType can get an <code>innerPriceConfig</code> assigned (specified by <code>innerPriceConfigID</code>).
-	 * @param innerPriceConfigID If not <code>null</code> (and <code>productTypeID</code> not <code>null</code>, too), this priceConfig will be assigned to the specified {@link ProductType}.
+	 *
+	 * @param assignInnerPriceConfigCommand If not <code>null</code>, the specified ProductType will get an <code>innerPriceConfig</code> assigned and the inheritance-meta-data adjusted.
 	 */
 	public static <T extends GridPriceConfig> Collection<T> storePriceConfigs(
 			PersistenceManager pm, Collection<T> _priceConfigs,
 			PriceCalculatorFactory priceCalculatorFactory,
 			boolean get,
-			ProductTypeID productTypeID, PriceConfigID innerPriceConfigID)
+			AssignInnerPriceConfigCommand assignInnerPriceConfigCommand)
 	throws PriceCalculationException
 	{
 		if (logger.isDebugEnabled()) {
@@ -235,13 +235,20 @@ public class GridPriceConfigUtil
 			priceConfigs.add(priceConfig);
 		}
 
-		if (productTypeID != null && innerPriceConfigID != null) {
-			ProductType pt = (ProductType) pm.getObjectById(productTypeID);
-			IInnerPriceConfig pc = (IInnerPriceConfig) pm.getObjectById(innerPriceConfigID);
-			if (!pc.equals(pt.getInnerPriceConfig())) {
-				pt.setInnerPriceConfig(pc);
-				pt.applyInheritance();
+		if (assignInnerPriceConfigCommand != null) {
+			ProductType pt = (ProductType) pm.getObjectById(assignInnerPriceConfigCommand.getProductTypeID());
+			IInnerPriceConfig pc = assignInnerPriceConfigCommand.getInnerPriceConfigID() == null ? null : (IInnerPriceConfig) pm.getObjectById(assignInnerPriceConfigCommand.getInnerPriceConfigID());
+			boolean applyInheritance = false;
+			if (pt.getFieldMetaData("innerPriceConfig").isValueInherited() != assignInnerPriceConfigCommand.isInnerPriceConfigInherited()) {
+				pt.getFieldMetaData("innerPriceConfig").setValueInherited(assignInnerPriceConfigCommand.isInnerPriceConfigInherited());
+				applyInheritance = true;
 			}
+			if (!Util.equals(pc, pt.getInnerPriceConfig())) {
+				pt.setInnerPriceConfig(pc);
+				applyInheritance = true;
+			}
+			if (applyInheritance)
+				pt.applyInheritance();
 		}
 
 		for (GridPriceConfig priceConfig : _priceConfigs) {
@@ -265,20 +272,16 @@ public class GridPriceConfigUtil
 			}
 			processedProductTypes.add(productType);
 
-			if (productType.getPackageNature() == ProductType.PACKAGE_NATURE_OUTER && productType.getPackagePriceConfig() != null) {
+			if (
+					productType.getPackageNature() == ProductType.PACKAGE_NATURE_OUTER &&
+					productType.getPackagePriceConfig() != null &&
+					productType.getInnerPriceConfig() != null)
+			{
 				++recalculatedCounter;
 
-				((IResultPriceConfig)productType.getPackagePriceConfig()).adoptParameters(
-						productType.getInnerPriceConfig());
+				((IResultPriceConfig)productType.getPackagePriceConfig()).adoptParameters(productType.getInnerPriceConfig());
 
-//				PriceCalculator priceCalculator;
-//				try {
-//					priceCalculator = (PriceCalculator) priceCalculatorConstructor.newInstance(new Object[] { productType });
-//				} catch (Exception e) {
-//					throw new RuntimeException("priceCalculatorClass " + priceCalculatorClass.getName() + " could not be instantiated!", e);
-//				}
 				PriceCalculator priceCalculator = priceCalculatorFactory.createPriceCalculator(productType);
-//				PriceCalculator priceCalculator = new PriceCalculator(productType);
 				priceCalculator.preparePriceCalculation();
 				priceCalculator.calculatePrices();
 
@@ -287,7 +290,7 @@ public class GridPriceConfigUtil
 			}
 			else {
 				if (logger.isDebugEnabled())
-					logger.debug("storePriceConfig: Will NOT recalculate prices for ProductType " + productType.getPrimaryKey() + " (" + productType.getName().getText() + ") because it is not PACKAGE_NATURE_OUTER!");
+					logger.debug("storePriceConfig: Will NOT recalculate prices for ProductType " + productType.getPrimaryKey() + " (" + productType.getName().getText() + ") because it is not PACKAGE_NATURE_OUTER or has not both (inner + outer) price-configs assigned!");
 			}
 		}
 

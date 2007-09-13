@@ -11,7 +11,6 @@ import org.nightlabs.ModuleException;
 import org.nightlabs.jfire.accounting.Account;
 import org.nightlabs.jfire.accounting.PriceFragmentType;
 import org.nightlabs.jfire.accounting.Tariff;
-import org.nightlabs.jfire.accounting.book.LocalAccountantDelegate;
 import org.nightlabs.jfire.accounting.book.mappingbased.PFMappingAccountantDelegate;
 import org.nightlabs.jfire.accounting.gridpriceconfig.FormulaCell;
 import org.nightlabs.jfire.accounting.gridpriceconfig.PriceCoordinate;
@@ -120,10 +119,15 @@ extends Initialiser
 		dataCreator.getRootDynamicProductType().setInnerPriceConfig(priceConfig);
 		
 		// create Accounts
-		Account accountSoftwareDevelopmentVatNet = dataCreator.createLocalRevenueAccount("software-development-vat-net.eur", "Software Development Net (EUR)");
-		Account accountSoftwareDevelopmentVatVal = dataCreator.createLocalRevenueAccount("software-development-vat-val.eur", "Software Development VAT (EUR)");
-		Account accountServiceVatNet = dataCreator.createLocalRevenueAccount("service-vat-net.eur", "Service Net (EUR)");
-		Account accountServiceVatVal = dataCreator.createLocalRevenueAccount("service-vat-val.eur", "Service VAT (EUR)");
+		Account accountSoftwareDevelopmentVatNet_revenue = dataCreator.createLocalRevenueAccount("software-development-vat-net.eur", "Software Development Net Revenue (EUR)");
+		Account accountSoftwareDevelopmentVatVal_revenue = dataCreator.createLocalRevenueAccount("software-development-vat-val.eur", "Software Development VAT Revenue (EUR)");
+		Account accountServiceVatNet_revenue = dataCreator.createLocalRevenueAccount("service-vat-net.eur", "Service Net Revenue (EUR)");
+		Account accountServiceVatVal_revenue = dataCreator.createLocalRevenueAccount("service-vat-val.eur", "Service VAT Revenue (EUR)");
+
+		Account accountSoftwareDevelopmentVatNet_expense = dataCreator.createLocalExpenseAccount("software-development-vat-net.eur", "Software Development Net Expense (EUR)");
+		Account accountSoftwareDevelopmentVatVal_expense = dataCreator.createLocalExpenseAccount("software-development-vat-val.eur", "Software Development VAT Expense (EUR)");
+		Account accountServiceVatNet_expense = dataCreator.createLocalExpenseAccount("service-vat-net.eur", "Service Net Expense (EUR)");
+		Account accountServiceVatVal_expense = dataCreator.createLocalExpenseAccount("service-vat-val.eur", "Service VAT Expense (EUR)");
 		
 		DynamicProductType softwareDevelopment = dataCreator.createCategory(null, softwareDevelopmentID.productTypeID, null, "Software Development", "Software-Entwicklung");
 		DynamicProductType swDevJFire = dataCreator.createLeaf(softwareDevelopment, "softwareDevelopment.jfire", null, "JFire");
@@ -145,24 +149,30 @@ extends Initialiser
 		PFMappingAccountantDelegate swDelegate = new PFMappingAccountantDelegate(organisationID, "softwareAccountantDelegate");
 
 		swDelegate.addMoneyFlowMapping(
-				dataCreator.createPFMoneyFlowMapping(softwareDevelopment, dataCreator.getPriceFragmentTypeTotal(), accountSoftwareDevelopmentVatNet));
+				dataCreator.createPFMoneyFlowMapping(softwareDevelopment, dataCreator.getPriceFragmentTypeTotal(),
+						accountSoftwareDevelopmentVatNet_revenue, accountSoftwareDevelopmentVatNet_expense));
 		swDelegate.addMoneyFlowMapping(
-				dataCreator.createPFMoneyFlowMapping(softwareDevelopment, dataCreator.getPriceFragmentTypeVatVal(), accountSoftwareDevelopmentVatVal));
+				dataCreator.createPFMoneyFlowMapping(softwareDevelopment, dataCreator.getPriceFragmentTypeVatVal(),
+						accountSoftwareDevelopmentVatVal_revenue, accountSoftwareDevelopmentVatVal_expense));
 
 		PFMappingAccountantDelegate serviceDelegate = new PFMappingAccountantDelegate(organisationID, "serviceAccountantDelegate");
 
 		serviceDelegate.addMoneyFlowMapping(
-				dataCreator.createPFMoneyFlowMapping(service, dataCreator.getPriceFragmentTypeTotal(), accountServiceVatNet));
+				dataCreator.createPFMoneyFlowMapping(service, dataCreator.getPriceFragmentTypeTotal(),
+						accountServiceVatNet_revenue, accountServiceVatNet_expense));
 		serviceDelegate.addMoneyFlowMapping(
-				dataCreator.createPFMoneyFlowMapping(service, dataCreator.getPriceFragmentTypeVatVal(), accountServiceVatVal));
+				dataCreator.createPFMoneyFlowMapping(service, dataCreator.getPriceFragmentTypeVatVal(),
+						accountServiceVatVal_revenue, accountServiceVatVal_expense));
 
-		
+
 		PFMappingAccountantDelegate miscDelegate = new PFMappingAccountantDelegate(organisationID, "miscAccountantDelegate");
 
 		miscDelegate.addMoneyFlowMapping(
-				dataCreator.createPFMoneyFlowMapping(misc, dataCreator.getPriceFragmentTypeTotal(), accountServiceVatNet));
+				dataCreator.createPFMoneyFlowMapping(misc, dataCreator.getPriceFragmentTypeTotal(),
+						accountServiceVatNet_revenue, accountServiceVatNet_expense));
 		miscDelegate.addMoneyFlowMapping(
-				dataCreator.createPFMoneyFlowMapping(misc, dataCreator.getPriceFragmentTypeVatVal(), accountServiceVatVal));
+				dataCreator.createPFMoneyFlowMapping(misc, dataCreator.getPriceFragmentTypeVatVal(),
+						accountServiceVatVal_revenue, accountServiceVatVal_expense));
 
 		dataCreator.getRootDynamicProductType().applyInheritance();
 		

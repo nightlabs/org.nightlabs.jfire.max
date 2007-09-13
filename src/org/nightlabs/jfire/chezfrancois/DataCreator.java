@@ -42,6 +42,7 @@ import org.nightlabs.jfire.accounting.Accounting;
 import org.nightlabs.jfire.accounting.Currency;
 import org.nightlabs.jfire.accounting.PriceFragmentType;
 import org.nightlabs.jfire.accounting.Tariff;
+import org.nightlabs.jfire.accounting.book.mappingbased.MoneyFlowMapping;
 import org.nightlabs.jfire.accounting.book.mappingbased.PFMoneyFlowMapping;
 import org.nightlabs.jfire.accounting.id.CurrencyID;
 import org.nightlabs.jfire.accounting.id.PriceFragmentTypeID;
@@ -256,18 +257,30 @@ public class DataCreator
 				organisationID, Account.ANCHOR_TYPE_ID_LOCAL_REVENUE, anchorID, organisationLegalEntity, euro, false);
 		account.getName().setText(languageID, name);
 
-		pm.makePersistent(account);
+		account = pm.makePersistent(account);
+
+		return account;
+	}
+	public Account createLocalExpenseAccount(String anchorID, String name)
+	{
+		Currency euro = getCurrencyEUR();
+
+		Account account = new Account(
+				organisationID, Account.ANCHOR_TYPE_ID_LOCAL_EXPENSE, anchorID, organisationLegalEntity, euro, false);
+		account.getName().setText(languageID, name);
+
+		account = pm.makePersistent(account);
 
 		return account;
 	}
 
 	public PFMoneyFlowMapping createPFMoneyFlowMapping(
-			ProductType productType, PriceFragmentType priceFragmentType, Account account)
+			ProductType productType, PriceFragmentType priceFragmentType, Account revenueAccount, Account expenseAccount)
 	{
 		Currency euro = getCurrencyEUR();
 		PFMoneyFlowMapping mapping = new PFMoneyFlowMapping(
-				organisationID,
-				accounting.createMoneyFlowMappingID(),
+				IDGenerator.getOrganisationID(),
+				IDGenerator.nextID(MoneyFlowMapping.class),
 				productType,
 				PFMoneyFlowMapping.PACKAGE_TYPE_PACKAGE,
 				priceFragmentType,
@@ -275,7 +288,8 @@ public class DataCreator
 		);
 		mapping.setOwner(getOrganisationLegalEntity());
 		mapping.setSourceOrganisationID(organisationID);
-		mapping.setAccount(account);
+		mapping.setRevenueAccount(revenueAccount);
+		mapping.setExpenseAccount(expenseAccount);
 
 		return mapping;
 	}

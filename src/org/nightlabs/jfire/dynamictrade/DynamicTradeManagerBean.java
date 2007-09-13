@@ -22,6 +22,7 @@ import org.nightlabs.i18n.I18nText;
 import org.nightlabs.jdo.NLJDOHelper;
 import org.nightlabs.jfire.accounting.Price;
 import org.nightlabs.jfire.accounting.Tariff;
+import org.nightlabs.jfire.accounting.gridpriceconfig.AssignInnerPriceConfigCommand;
 import org.nightlabs.jfire.accounting.gridpriceconfig.PriceCalculationException;
 import org.nightlabs.jfire.accounting.id.TariffID;
 import org.nightlabs.jfire.accounting.priceconfig.FetchGroupsPriceConfig;
@@ -56,6 +57,7 @@ import org.nightlabs.jfire.trade.Trader;
 import org.nightlabs.jfire.trade.id.ArticleID;
 import org.nightlabs.jfire.trade.id.OfferID;
 import org.nightlabs.jfire.trade.id.SegmentID;
+import org.nightlabs.util.Util;
 
 /**
  * @ejb.bean name="jfire/ejb/JFireDynamicTrade/DynamicTradeManager"	
@@ -324,7 +326,7 @@ implements SessionBean
 	 * @ejb.permission role-name="_Guest_"
 	 */
 	@SuppressWarnings("unchecked")
-	public Collection<DynamicTradePriceConfig> storeDynamicTradePriceConfigs(Collection<DynamicTradePriceConfig> priceConfigs, boolean get, ProductTypeID productTypeID, PriceConfigID innerPriceConfigID)
+	public Collection<DynamicTradePriceConfig> storeDynamicTradePriceConfigs(Collection<DynamicTradePriceConfig> priceConfigs, boolean get, AssignInnerPriceConfigCommand assignInnerPriceConfigCommand)
 	throws PriceCalculationException
 	{
 		PersistenceManager pm = getPersistenceManager();
@@ -342,13 +344,20 @@ implements SessionBean
 
 			priceConfigs = pm.makePersistentAll(priceConfigs);
 
-			if (productTypeID != null && innerPriceConfigID != null) {
-				ProductType pt = (ProductType) pm.getObjectById(productTypeID);
-				IInnerPriceConfig pc = (IInnerPriceConfig) pm.getObjectById(innerPriceConfigID);
-				if (!pc.equals(pt.getInnerPriceConfig())) {
-					pt.setInnerPriceConfig(pc);
-					pt.applyInheritance();
+			if (assignInnerPriceConfigCommand != null) {
+				ProductType pt = (ProductType) pm.getObjectById(assignInnerPriceConfigCommand.getProductTypeID());
+				IInnerPriceConfig pc = assignInnerPriceConfigCommand.getInnerPriceConfigID() == null ? null : (IInnerPriceConfig) pm.getObjectById(assignInnerPriceConfigCommand.getInnerPriceConfigID());
+				boolean applyInheritance = false;
+				if (pt.getFieldMetaData("innerPriceConfig").isValueInherited() != assignInnerPriceConfigCommand.isInnerPriceConfigInherited()) {
+					pt.getFieldMetaData("innerPriceConfig").setValueInherited(assignInnerPriceConfigCommand.isInnerPriceConfigInherited());
+					applyInheritance = true;
 				}
+				if (!Util.equals(pc, pt.getInnerPriceConfig())) {
+					pt.setInnerPriceConfig(pc);
+					applyInheritance = true;
+				}
+				if (applyInheritance)
+					pt.applyInheritance();
 			}
 
 			if (get)

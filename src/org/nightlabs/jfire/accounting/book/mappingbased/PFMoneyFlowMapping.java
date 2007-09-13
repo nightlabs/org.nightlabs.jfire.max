@@ -50,20 +50,20 @@ import org.nightlabs.jfire.trade.LegalEntity;
  * @jdo.inheritance strategy="new-table"
  * @jdo.fetch-group name="MoneyFlowMapping.allDimensions" fetch-groups="default" fields="owner, priceFragmentType, sourceOrganisationID"
  */
-public class PFMoneyFlowMapping extends MoneyFlowMapping {
+public class PFMoneyFlowMapping extends MoneyFlowMapping
+{
+	private static final long serialVersionUID = 1L;
 
 	/**
-	 * 
+	 * @deprecated Only for JDO!
 	 */
-	protected PFMoneyFlowMapping() {
-		super();
-	}
+	protected PFMoneyFlowMapping() { }
 	
-	public PFMoneyFlowMapping(String organisationID, int moneyFlowMappingID) {
+	public PFMoneyFlowMapping(String organisationID, long moneyFlowMappingID) {
 		super(organisationID, moneyFlowMappingID);
 	}
 
-	public PFMoneyFlowMapping(String organisationID, int moneyFlowMappingID, ProductType productType, String packageType, PriceFragmentType priceFragmentType, Currency currency) {
+	public PFMoneyFlowMapping(String organisationID, long moneyFlowMappingID, ProductType productType, String packageType, PriceFragmentType priceFragmentType, Currency currency) {
 		this(organisationID, moneyFlowMappingID);
 		setPackageType(packageType);
 		setProductType(productType);

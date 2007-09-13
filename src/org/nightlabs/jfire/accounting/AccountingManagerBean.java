@@ -103,7 +103,6 @@ import org.nightlabs.jfire.accounting.query.InvoiceQuery;
 import org.nightlabs.jfire.accounting.query.MoneyTransferIDQuery;
 import org.nightlabs.jfire.accounting.query.MoneyTransferQuery;
 import org.nightlabs.jfire.base.BaseSessionBeanImpl;
-import org.nightlabs.jfire.idgenerator.IDGenerator;
 import org.nightlabs.jfire.idgenerator.IDNamespaceDefault;
 import org.nightlabs.jfire.jbpm.JbpmLookup;
 import org.nightlabs.jfire.jbpm.graph.def.ProcessDefinition;
@@ -1989,25 +1988,25 @@ public abstract class AccountingManagerBean
 		}
 	}
 
-	/**
-	 * TODO remove this and use {@link IDGenerator}
-	 *
-	 * @throws ModuleException
-	 *
-	 * @ejb.interface-method
-	 * @ejb.transaction type = "Required"
-	 * @ejb.permission role-name="_Guest_"
-	 */
-	public int createMoneyFlowMappingID()
-		throws ModuleException
-	{
-		PersistenceManager pm = getPersistenceManager();
-		try {
-			return Accounting.getAccounting(pm).createMoneyFlowMappingID();
-		} finally {
-			pm.close();
-		}
-	}
+//	/**
+//	 * TODO remove this and use {@link IDGenerator}
+//	 *
+//	 * @throws ModuleException
+//	 *
+//	 * @ejb.interface-method
+//	 * @ejb.transaction type = "Required"
+//	 * @ejb.permission role-name="_Guest_"
+//	 */
+//	public int createMoneyFlowMappingID()
+//		throws ModuleException
+//	{
+//		PersistenceManager pm = getPersistenceManager();
+//		try {
+//			return Accounting.getAccounting(pm).createMoneyFlowMappingID();
+//		} finally {
+//			pm.close();
+//		}
+//	}
 
 //	/**
 //	 * Returns a Configurator for MoneyFlowMappings initially handling

@@ -52,7 +52,6 @@ import org.nightlabs.i18n.I18nText;
 import org.nightlabs.jfire.accounting.book.BookMoneyTransfer;
 import org.nightlabs.jfire.accounting.book.LocalAccountant;
 import org.nightlabs.jfire.accounting.book.PartnerAccountant;
-import org.nightlabs.jfire.accounting.book.mappingbased.MoneyFlowMapping;
 import org.nightlabs.jfire.accounting.id.InvoiceID;
 import org.nightlabs.jfire.accounting.jbpm.ActionHandlerBookInvoice;
 import org.nightlabs.jfire.accounting.jbpm.ActionHandlerBookInvoiceImplicitely;
@@ -82,9 +81,6 @@ import org.nightlabs.jfire.jbpm.graph.def.id.ProcessDefinitionID;
 import org.nightlabs.jfire.organisation.LocalOrganisation;
 import org.nightlabs.jfire.security.User;
 import org.nightlabs.jfire.store.ProductTypeActionHandler;
-import org.nightlabs.jfire.store.deliver.DeliveryActionHandler;
-import org.nightlabs.jfire.store.deliver.DeliveryException;
-import org.nightlabs.jfire.store.deliver.DeliveryResult;
 import org.nightlabs.jfire.trade.Article;
 import org.nightlabs.jfire.trade.ArticleContainer;
 import org.nightlabs.jfire.trade.LegalEntity;
@@ -115,7 +111,7 @@ import org.nightlabs.jfire.transfer.id.AnchorID;
  * @jdo.inheritance strategy="new-table"
  */
 public class Accounting
-	implements StoreCallback, MoneyFlowMapping.Registry
+implements StoreCallback
 {
 	/**
 	 * LOG4J logger used by this class
@@ -223,25 +219,25 @@ public class Accounting
 		return accountingPriceConfig;
 	}
 
-	/**
-	 * @jdo.field persistence-modifier="persistent"
-	 */	
-	private int nextMoneyFlowMappingID = 0;
-	private static int _nextMoneyFlowMappingID = -1;
-	private static Object _nextMoneyFlowMappingIDMutex = new Object();
-
-	// TODO replace this by usage of IDGenerator!
-	public int createMoneyFlowMappingID() {
-		synchronized(_nextMoneyFlowMappingIDMutex) {
-			if (_nextMoneyFlowMappingID < 0)
-				_nextMoneyFlowMappingID = nextMoneyFlowMappingID;
-
-			int res = _nextMoneyFlowMappingID;
-			_nextMoneyFlowMappingID = res + 1;
-			nextMoneyFlowMappingID = _nextMoneyFlowMappingID;
-			return res;
-		}
-	}
+//	/**
+//	 * @jdo.field persistence-modifier="persistent"
+//	 */	
+//	private int nextMoneyFlowMappingID = 0;
+//	private static int _nextMoneyFlowMappingID = -1;
+//	private static Object _nextMoneyFlowMappingIDMutex = new Object();
+//
+//	// TODO replace this by usage of IDGenerator!
+//	public int createMoneyFlowMappingID() {
+//		synchronized(_nextMoneyFlowMappingIDMutex) {
+//			if (_nextMoneyFlowMappingID < 0)
+//				_nextMoneyFlowMappingID = nextMoneyFlowMappingID;
+//
+//			int res = _nextMoneyFlowMappingID;
+//			_nextMoneyFlowMappingID = res + 1;
+//			nextMoneyFlowMappingID = _nextMoneyFlowMappingID;
+//			return res;
+//		}
+//	}
 
 	/**
 	 * Creates a new Invoice with the given articles.
@@ -1145,8 +1141,8 @@ public class Accounting
 
 	public void jdoPreStore()
 	{
-		if (_nextMoneyFlowMappingID >= 0 && nextMoneyFlowMappingID != _nextMoneyFlowMappingID)
-			nextMoneyFlowMappingID = _nextMoneyFlowMappingID;
+//		if (_nextMoneyFlowMappingID >= 0 && nextMoneyFlowMappingID != _nextMoneyFlowMappingID)
+//			nextMoneyFlowMappingID = _nextMoneyFlowMappingID;
 	}
 
 	private static void setStateDefinitionProperties(

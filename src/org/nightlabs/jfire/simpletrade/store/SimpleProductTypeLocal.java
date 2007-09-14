@@ -1,5 +1,6 @@
 package org.nightlabs.jfire.simpletrade.store;
 
+import org.nightlabs.inheritance.FieldMetaData;
 import org.nightlabs.jfire.security.User;
 import org.nightlabs.jfire.store.ProductType;
 import org.nightlabs.jfire.store.ProductTypeLocal;
@@ -76,6 +77,17 @@ extends ProductTypeLocal
 	public void setMaxProductCount(long maxProductCount)
 	{
 		this.maxProductCount = maxProductCount;
+	}
+
+	@Override
+	public FieldMetaData getFieldMetaData(String fieldName, boolean createMissingMetaData)
+	{
+		if ("maxProductCount".equals(fieldName))
+			return null;
+		if ("createdProductCount".equals(fieldName))
+			return null;
+
+		return super.getFieldMetaData(fieldName, createMissingMetaData);
 	}
 
 }

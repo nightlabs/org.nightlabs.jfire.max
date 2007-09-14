@@ -63,9 +63,7 @@ extends DataCreator
 			pt.setInnerPriceConfig(parent.getInnerPriceConfig());
 		}
 
-		pt.getFieldMetaData("localAccountantDelegate").setValueInherited(false);
-		
-		store.addProductType(user, pt); // , DynamicProductTypeActionHandler.getDefaultHome(pm, pt));
+		pt = (DynamicProductType) store.addProductType(user, pt); // , DynamicProductTypeActionHandler.getDefaultHome(pm, pt));
 		store.setProductTypeStatus_published(user, pt);
 
 		return pt;
@@ -91,7 +89,7 @@ extends DataCreator
 		else {
 			pt.setInnerPriceConfig(category.getInnerPriceConfig());
 		}
-		store.addProductType(user, pt); // , DynamicProductTypeActionHandler.getDefaultHome(pm, pt));
+		pt = (DynamicProductType) store.addProductType(user, pt); // , DynamicProductTypeActionHandler.getDefaultHome(pm, pt));
 		store.setProductTypeStatus_published(user, pt);
 		store.setProductTypeStatus_confirmed(user, pt);
 

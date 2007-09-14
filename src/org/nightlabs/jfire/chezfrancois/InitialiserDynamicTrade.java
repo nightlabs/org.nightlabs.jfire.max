@@ -175,15 +175,17 @@ extends Initialiser
 						accountServiceVatVal_revenue, accountServiceVatVal_expense));
 
 		dataCreator.getRootDynamicProductType().applyInheritance();
-		
-		softwareDevelopment.setLocalAccountantDelegate(swDelegate);
+
+		softwareDevelopment.getProductTypeLocal().getFieldMetaData("localAccountantDelegate").setValueInherited(false);
+		softwareDevelopment.getProductTypeLocal().setLocalAccountantDelegate(swDelegate);
 		softwareDevelopment.applyInheritance();
-		service.setLocalAccountantDelegate(serviceDelegate);
+		service.getProductTypeLocal().getFieldMetaData("localAccountantDelegate").setValueInherited(false);
+		service.getProductTypeLocal().setLocalAccountantDelegate(serviceDelegate);
 		service.applyInheritance();
-		misc.getFieldMetaData("localAccountantDelegate").setValueInherited(false);
-		misc.setLocalAccountantDelegate(miscDelegate);
+		misc.getProductTypeLocal().getFieldMetaData("localAccountantDelegate").setValueInherited(false);
+		misc.getProductTypeLocal().setLocalAccountantDelegate(miscDelegate);
 		misc.applyInheritance();
-		
+
 		dataCreator.makeAllLeavesSaleable();
 	}
 }

@@ -61,14 +61,15 @@ public class DataCreatorVoucher
 			pt.setPackagePriceConfig(parent.getPackagePriceConfig());
 		}
 
+		pt = (VoucherType) store.addProductType(user, pt);
+
 		if (localAccountantDelegate != null) {
-			pt.getFieldMetaData("localAccountantDelegate").setValueInherited(false);
-			pt.setLocalAccountantDelegate(localAccountantDelegate);
+			pt.getProductTypeLocal().getFieldMetaData("localAccountantDelegate").setValueInherited(false);
+			pt.getProductTypeLocal().setLocalAccountantDelegate(localAccountantDelegate);
 		}
 		else
-			pt.setLocalAccountantDelegate(parent.getLocalAccountantDelegate());
+			pt.getProductTypeLocal().setLocalAccountantDelegate(parent.getProductTypeLocal().getLocalAccountantDelegate());
 
-		store.addProductType(user, pt); // , VoucherTypeActionHandler.getDefaultHome(pm, pt));
 		store.setProductTypeStatus_published(user, pt);
 
 		return pt;
@@ -93,14 +94,15 @@ public class DataCreatorVoucher
 		else
 			pt.setPackagePriceConfig(category.getPackagePriceConfig());
 
+		pt = (VoucherType) store.addProductType(user, pt);
+
 		if (localAccountantDelegate != null) {
-			pt.getFieldMetaData("localAccountantDelegate").setValueInherited(false);
-			pt.setLocalAccountantDelegate(localAccountantDelegate);
+			pt.getProductTypeLocal().getFieldMetaData("localAccountantDelegate").setValueInherited(false);
+			pt.getProductTypeLocal().setLocalAccountantDelegate(localAccountantDelegate);
 		}
 		else
-			pt.setLocalAccountantDelegate(category.getLocalAccountantDelegate());
+			pt.getProductTypeLocal().setLocalAccountantDelegate(category.getProductTypeLocal().getLocalAccountantDelegate());
 
-		store.addProductType(user, pt); // , VoucherTypeActionHandler.getDefaultHome(pm, pt));
 
 		store.setProductTypeStatus_published(user, pt);
 		store.setProductTypeStatus_confirmed(user, pt);

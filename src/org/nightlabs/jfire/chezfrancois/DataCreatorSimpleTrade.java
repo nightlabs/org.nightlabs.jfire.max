@@ -100,7 +100,7 @@ extends DataCreator
 				ProductType.INHERITANCE_NATURE_BRANCH, ProductType.PACKAGE_NATURE_OUTER);
 		setNames(pt.getName(), names);
 
-		store.addProductType(user, pt); // , SimpleProductTypeActionHandler.getDefaultHome(pm, pt));
+		pt = (SimpleProductType) store.addProductType(user, pt);
 		store.setProductTypeStatus_published(user, pt);
 
 		return pt;

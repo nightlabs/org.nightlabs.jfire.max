@@ -248,7 +248,8 @@ extends Initialiser
 
 		// configure moneyflow
 		PFMappingAccountantDelegate wineAccountantDelegate = new PFMappingAccountantDelegate(organisationID, "wineAccountantDelegate");
-		wine.setLocalAccountantDelegate(wineAccountantDelegate);
+		wine.getProductTypeLocal().getFieldMetaData("localAccountantDelegate").setValueInherited(false);
+		wine.getProductTypeLocal().setLocalAccountantDelegate(wineAccountantDelegate);
 
 		wineAccountantDelegate.addMoneyFlowMapping(
 				dataCreator.createPFMoneyFlowMapping(bottleRed, dataCreator.getPriceFragmentTypeTotal(),
@@ -279,7 +280,8 @@ extends Initialiser
 						accountBoxWhiteVatVal_revenue, accountBoxWhiteVatVal_expense));
 
 		PFMappingAccountantDelegate accessoriesAccountantDelegate = new PFMappingAccountantDelegate(organisationID, "accessoriesAccountantDelegate");
-		accessories.setLocalAccountantDelegate(accessoriesAccountantDelegate);
+		accessories.getProductTypeLocal().getFieldMetaData("localAccountantDelegate").setValueInherited(false);
+		accessories.getProductTypeLocal().setLocalAccountantDelegate(accessoriesAccountantDelegate);
 
 		accessoriesAccountantDelegate.addMoneyFlowMapping(
 				dataCreator.createPFMoneyFlowMapping(accessories, dataCreator.getPriceFragmentTypeVatNet(),
@@ -290,9 +292,7 @@ extends Initialiser
 
 
 		// apply inheritance (e.g. because of LocalAccountantDelegates)
-		wine.getFieldMetaData("localAccountantDelegate").setValueInherited(false);
 		wine.applyInheritance();
-		accessories.getFieldMetaData("localAccountantDelegate").setValueInherited(false);
 		accessories.applyInheritance();
 
 		logger.info("Chezfrancois Created all SimpleProductTypes; publishing, confirming and making available now!");

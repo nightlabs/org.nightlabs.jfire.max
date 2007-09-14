@@ -867,6 +867,7 @@ public abstract class AccountingManagerBean
 	}
 
 	/**
+	 * TODO is this method still used? What about inheritance? It should be possible to control the inheritance-meta-data via this method, too.
 	 * Assign the LocalAccountantDelegate defined by the given localAccountantDelegateID
 	 * to the ProductType defined by the given productTypeID.
 	 * 
@@ -888,7 +889,7 @@ public abstract class AccountingManagerBean
 		try {
 			ProductType productType = (ProductType) pm.getObjectById(productTypeID);
 			LocalAccountantDelegate localAccountantDelegate = (LocalAccountantDelegate) pm.getObjectById(localAccountantDelegateID);
-			productType.setLocalAccountantDelegate(localAccountantDelegate);
+			productType.getProductTypeLocal().setLocalAccountantDelegate(localAccountantDelegate);
 		} finally {
 			pm.close();
 		}
@@ -1109,9 +1110,11 @@ public abstract class AccountingManagerBean
 		PersistenceManager pm = getPersistenceManager();
 		try {
 			ProductType productType = (ProductType)pm.getObjectById(productTypeID);
-			LocalAccountantDelegate delegate = productType.getLocalAccountantDelegate();
-			if (delegate == null)
+			LocalAccountantDelegate delegate = productType.getProductTypeLocal().getLocalAccountantDelegate();
+			if (delegate == null) {
+				// TODO maybe we should have a DefaultLocalAccountantDelegate, similar to the Store logic, where there is a DefaultLocalStorekeeperDelegate.
 				throw new IllegalArgumentException("The ProductType with id "+productTypeID+" does not have a LocalAccountantDelegate assigned to it.");
+			}
 			return getResolvedMoneyFlowMappings(pm, (LocalAccountantDelegateID) JDOHelper.getObjectId(delegate), productTypeID, mappingFetchGroups, maxFetchDepth);
 		} finally {
 			pm.close();

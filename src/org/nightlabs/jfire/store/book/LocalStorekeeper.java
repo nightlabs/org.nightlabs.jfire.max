@@ -38,6 +38,8 @@ import javax.jdo.PersistenceManager;
 import org.nightlabs.jfire.security.User;
 import org.nightlabs.jfire.store.DeliveryNote;
 import org.nightlabs.jfire.store.ProductTransfer;
+import org.nightlabs.jfire.store.ProductType;
+import org.nightlabs.jfire.store.ProductTypeActionHandler;
 import org.nightlabs.jfire.trade.Article;
 import org.nightlabs.jfire.trade.LegalEntity;
 import org.nightlabs.jfire.trade.OrganisationLegalEntity;
@@ -91,11 +93,12 @@ public class LocalStorekeeper extends Storekeeper
 		Map delegates = new HashMap();
 		for (Iterator iter = deliveryNote.getArticles().iterator(); iter.hasNext();) {
 			Article article = (Article) iter.next();
-			LocalStorekeeperDelegate delegate = article.getProductType().getLocalStorekeeperDelegate();
+			ProductType productType = article.getProductType();
+			LocalStorekeeperDelegate delegate = productType.getProductTypeLocal().getLocalStorekeeperDelegate();
 			if (delegate == null) {
 				delegate = DefaultLocalStorekeeperDelegate.getDefaultLocalStorekeeperDelegate(getPersistenceManager());
 //				throw new IllegalStateException("Could not find LocalStorekeeperDelegate for Article "+JDOHelper.getObjectId(article)+" of productType "+JDOHelper.getObjectId(article.getProductType())+".");
-				article.getProductType().setLocalStorekeeperDelegate(delegate);
+				productType.getProductTypeLocal().setLocalStorekeeperDelegate(delegate);
 			}
 			delegates.put(article, delegate);
 		}

@@ -35,18 +35,18 @@ import org.nightlabs.inheritance.NotWritableException;
  * 
  * @jdo.persistence-capable
  *		identity-type="application"
- *		objectid-class="org.nightlabs.jfire.store.id.ProductTypeFieldMetaDataID"
+ *		objectid-class="org.nightlabs.jfire.store.id.ProductTypeLocalFieldMetaDataID"
  *		detachable="true"
- *		table="JFireTrade_ProductTypeFieldMetaData"
+ *		table="JFireTrade_ProductTypeLocalFieldMetaData"
  *
  * @jdo.inheritance strategy="new-table"
  * @jdo.inheritance-discriminator strategy="class-name"
  *
  * @jdo.create-objectid-class field-order="organisationID, productTypeID, fieldName"
  *
- * @jdo.fetch-group name="ProductType.fieldMetaDataMap" fields="productType" fetch-groups="default"
+ * @jdo.fetch-group name="ProductTypeLocal.fieldMetaDataMap" fields="productTypeLocal"
  */
-public class ProductTypeFieldMetaData
+public class ProductTypeLocalFieldMetaData
 implements org.nightlabs.inheritance.FieldMetaData, Serializable
 {
 	private static final long serialVersionUID = 1L;
@@ -72,14 +72,14 @@ implements org.nightlabs.inheritance.FieldMetaData, Serializable
 	/**
 	 * @jdo.field persistence-modifier="persistent"
 	 */
-	private ProductType productType;
+	private ProductTypeLocal productTypeLocal;
 
 	/**
 	 * Whether or not the field may be changed by children.
 	 * 
 	 * @jdo.field persistence-modifier="persistent"
 	 */
-	private byte writableByChildren = ProductTypeFieldMetaData.WRITABLEBYCHILDREN_YES;
+	private byte writableByChildren = ProductTypeLocalFieldMetaData.WRITABLEBYCHILDREN_YES;
 
 	/**
 	 * writable is set to false if the mother has writableByChildren
@@ -97,10 +97,10 @@ implements org.nightlabs.inheritance.FieldMetaData, Serializable
 	 */
 	private boolean valueInherited = true;
 
-	protected ProductTypeFieldMetaData() { }
-	public ProductTypeFieldMetaData(ProductType productType, String fieldName)
+	protected ProductTypeLocalFieldMetaData() { }
+	public ProductTypeLocalFieldMetaData(ProductTypeLocal productTypeLocal, String fieldName)
 	{
-		setProductType(productType);
+		setProductTypeLocal(productTypeLocal);
 		setFieldName(fieldName);
 	}
 
@@ -138,24 +138,24 @@ implements org.nightlabs.inheritance.FieldMetaData, Serializable
 	/**
 	 * @return Returns the product.
 	 */
-	public ProductType getProductType()
+	public ProductTypeLocal getProductTypeLocal()
 	{
-		return productType;
+		return productTypeLocal;
 	}
 	/**
 	 * @param product The product to set.
 	 */
-	protected void setProductType(ProductType productType)
+	protected void setProductTypeLocal(ProductTypeLocal productTypeLocal)
 	{
-		if (productType == null)
+		if (productTypeLocal == null)
 			throw new NullPointerException("productType must not be null!");
-		if (productType.getOrganisationID() == null)
+		if (productTypeLocal.getOrganisationID() == null)
 			throw new NullPointerException("productType.organisationID must not be null!");
-		if (productType.getProductTypeID() == null)
+		if (productTypeLocal.getProductTypeID() == null)
 			throw new NullPointerException("productType.productTypeID must not be null!");
-		this.organisationID = productType.getOrganisationID();
-		this.productTypeID = productType.getProductTypeID();
-		this.productType = productType;
+		this.organisationID = productTypeLocal.getOrganisationID();
+		this.productTypeID = productTypeLocal.getProductTypeID();
+		this.productTypeLocal = productTypeLocal;
 	}
 
 	/**

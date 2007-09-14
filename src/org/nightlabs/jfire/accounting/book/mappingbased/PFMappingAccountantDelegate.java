@@ -505,38 +505,34 @@ public class PFMappingAccountantDelegate
 			Map<ResolvedMapKey, ResolvedMapEntry> resolvedMappings,
 			int delegationLevel)
 	{
-		ResolvedMapEntry entry = addProductTypeMappings(productTypeProvider
-				.getProductType(), productTypeProvider.getPackageType(),
+		ResolvedMapEntry entry = addProductTypeMappings(
+				productTypeProvider.getProductType(),
+				productTypeProvider.getPackageType(),
 				delegationLevel);
+
 		if (entry != null) {
 			entry.setDelegationLevel(delegationLevel);
-			ResolvedMapKey entryKey = new ResolvedMapKey((ProductTypeID) JDOHelper
-					.getObjectId(entry.getProductType()), packageType);
+			ResolvedMapKey entryKey = new ResolvedMapKey((ProductTypeID) JDOHelper.getObjectId(entry.getProductType()), packageType);
 			resolvedMappings.put(entryKey, entry);
-			for (Iterator iter = productTypeProvider.getNestedProviders().iterator(); iter
-					.hasNext();) {
-				ResolveProductTypeProvider nested = (ResolveProductTypeProvider) iter
-						.next();
+			for (Iterator iter = productTypeProvider.getNestedProviders().iterator(); iter.hasNext(); ) {
+				ResolveProductTypeProvider nested = (ResolveProductTypeProvider) iter.next();
 				resolveProductTypeMappings(nested, nested.getPackageType(),
 						resolvedMappings, delegationLevel);
 			}
 		}
 		else {
-			LocalAccountantDelegate _delegate = productTypeProvider.getProductType()
-					.getLocalAccountantDelegate();
-			if (_delegate != null
-					&& !(_delegate instanceof PFMappingAccountantDelegate))
+			LocalAccountantDelegate _delegate = productTypeProvider.getProductType().getProductTypeLocal().getLocalAccountantDelegate();
+			if (_delegate != null && !(_delegate instanceof PFMappingAccountantDelegate))
 				return; // not compatible
+
 			PFMappingAccountantDelegate delegate = (PFMappingAccountantDelegate) _delegate;
 			if (delegate == null)
-				// No delegate assigned to the productType
-				return;
+				return; // No delegate assigned to the productType
 
 			if (JDOHelper.getObjectId(delegate).equals(JDOHelper.getObjectId(this)))
-				// We are the delegate assigned to the productType
-				return;
-			delegate.resolveProductTypeMappings(productTypeProvider, packageType,
-					resolvedMappings, delegationLevel + 1);
+				return; // We are the delegate assigned to the productType
+
+			delegate.resolveProductTypeMappings(productTypeProvider, packageType, resolvedMappings, delegationLevel + 1);
 		}
 	}
 
@@ -707,7 +703,7 @@ public class PFMappingAccountantDelegate
 			int delegationLevel, BookMoneyTransfer container,
 			Set<Anchor> involvedAnchors)
 	{
-		LocalAccountantDelegate delegate = productType.getLocalAccountantDelegate();
+		LocalAccountantDelegate delegate = productType.getProductTypeLocal().getLocalAccountantDelegate();
 		if (delegate instanceof PFMappingAccountantDelegate) {
 			// Have to delegate the booking of this product-type to its own delegate
 			((PFMappingAccountantDelegate) delegate).bookProductTypeParts(mandator,

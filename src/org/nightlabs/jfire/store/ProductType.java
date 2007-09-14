@@ -50,6 +50,7 @@ import org.nightlabs.inheritance.FieldMetaData;
 import org.nightlabs.inheritance.Inheritable;
 import org.nightlabs.inheritance.InheritanceCallbacks;
 import org.nightlabs.inheritance.InheritanceManager;
+import org.nightlabs.inheritance.StaticFieldMetaData;
 import org.nightlabs.jdo.ObjectIDUtil;
 import org.nightlabs.jdo.inheritance.JDOInheritableFieldInheriter;
 import org.nightlabs.jdo.inheritance.JDOInheritanceManager;
@@ -65,7 +66,6 @@ import org.nightlabs.jfire.accounting.priceconfig.id.PriceConfigID;
 import org.nightlabs.jfire.organisation.LocalOrganisation;
 import org.nightlabs.jfire.organisation.Organisation;
 import org.nightlabs.jfire.security.User;
-import org.nightlabs.jfire.store.book.LocalStorekeeperDelegate;
 import org.nightlabs.jfire.store.deliver.DeliveryConfiguration;
 import org.nightlabs.jfire.store.id.ProductTypeGroupID;
 import org.nightlabs.jfire.store.id.ProductTypeID;
@@ -130,10 +130,9 @@ import org.nightlabs.util.Util;
  * @jdo.fetch-group name="ProductType.deliveryConfiguration" fields="deliveryConfiguration"
  * @jdo.fetch-group name="ProductType.productTypeGroups" fields="productTypeGroups"
  * @jdo.fetch-group name="ProductType.managedProductTypeGroup" fields="managedProductTypeGroup"
- * @jdo.fetch-group name="ProductType.localAccountantDelegate" fields="localAccountantDelegate"
- * @jdo.fetch-group name="ProductType.localStorekeeperDelegate" fields="localStorekeeperDelegate"
- * @jdo.fetch-group name="ProductType.this" fetch-groups="default" fields="deliveryConfiguration, extendedProductType, fieldMetaDataMap, innerPriceConfig, localAccountantDelegate, localStorekeeperDelegate, managedProductTypeGroup, name, nestedProductTypes, owner, packagePriceConfig, productTypeGroups, productTypeLocal"
+ * @jdo.fetch-group name="ProductType.productTypeLocal" fields="productTypeLocal"
  * @jdo.fetch-group name="ProductType.name" fields="name" 
+ * @jdo.fetch-group name="ProductType.this" fetch-groups="default" fields="deliveryConfiguration, extendedProductType, fieldMetaDataMap, innerPriceConfig, localAccountantDelegate, localStorekeeperDelegate, managedProductTypeGroup, name, nestedProductTypes, owner, packagePriceConfig, productTypeGroups, productTypeLocal"
  *
  * @jdo.fetch-group name="FetchGroupsTrade.articleInOrderEditor" fetch-groups="default" fields="name"
  * @jdo.fetch-group name="FetchGroupsTrade.articleInOfferEditor" fetch-groups="default" fields="name"
@@ -205,15 +204,16 @@ implements
 	public static final String FETCH_GROUP_DELIVERY_CONFIGURATION = "ProductType.deliveryConfiguration";
 	public static final String FETCH_GROUP_PRODUCT_TYPE_GROUPS = "ProductType.productTypeGroups";
 	public static final String FETCH_GROUP_MANAGED_PRODUCT_TYPE_GROUP = "ProductType.managedProductTypeGroup";
-	public static final String FETCH_GROUP_LOCAL_ACCOUNTANT_DELEGATE = "ProductType.localAccountantDelegate";
-	public static final String FETCH_GROUP_LOCAL_STOREKEEPER_DELEGATE = "ProductType.localStorekeeperDelegate";
+//	public static final String FETCH_GROUP_LOCAL_ACCOUNTANT_DELEGATE = "ProductType.localAccountantDelegate";
+//	public static final String FETCH_GROUP_LOCAL_STOREKEEPER_DELEGATE = "ProductType.localStorekeeperDelegate";
+	public static final String FETCH_GROUP_PRODUCT_TYPE_LOCAL = "ProductType.productTypeLocal";
 	public static final String FETCH_GROUP_THIS_PRODUCT_TYPE = "ProductType.this";
 	
 	public static final String CANNOT_MAKE_SALEABLE_REASON_NOT_PUBLISHED = "ProductType.cannotMakeSaleable.notPublished";
 	public static final String CANNOT_MAKE_SALEABLE_REASON_NOT_CONFIRMED = "ProductType.cannotMakeSaleable.notConfirmed";
 	public static final String CANNOT_MAKE_SALEABLE_REASON_ALREADY_CLOSED = "ProductType.cannotMakeSaleable.alreadyClosed";
 	public static final String CANNOT_MAKE_SALEABLE_REASON_NO_PRICECONFIG = "ProductType.cannotMakeSaleable.noPriceConfig";
-	public static final String CANNOT_MAKE_SALEABLE_REASON_NO_ACCOUNTANT_DELEGATE = "ProductType.cannotMakeSaleable.noAccountantDelegate";
+//	public static final String CANNOT_MAKE_SALEABLE_REASON_NO_ACCOUNTANT_DELEGATE = "ProductType.cannotMakeSaleable.noAccountantDelegate";
 
 	public static final String CANNOT_CONFIRM_REASON_IMMUTABLE = "ProductType.cannotConfirm.immutable";
 	
@@ -288,15 +288,16 @@ implements
 	 */
 	private PriceConfig packagePriceConfig = null;
 
-	/**
-	 * @jdo.field persistence-modifier="persistent"
-	 */
-	private LocalAccountantDelegate localAccountantDelegate = null;
-
-	/**
-	 * @jdo.field persistence-modifier="persistent"
-	 */
-	private LocalStorekeeperDelegate localStorekeeperDelegate = null;
+// These fields are in ProductTypeLocal now.
+//	/**
+//	 * @jdo.field persistence-modifier="persistent"
+//	 */
+//	private LocalAccountantDelegate localAccountantDelegate = null;
+//
+//	/**
+//	 * @jdo.field persistence-modifier="persistent"
+//	 */
+//	private LocalStorekeeperDelegate localStorekeeperDelegate = null;
 
 	/**
 	 * key: String productTypeGroupPK (see {@link ProductTypeGroup#getPrimaryKey()})<br/>
@@ -862,38 +863,39 @@ implements
 		this.packagePriceConfig = (PriceConfig)priceConfig;
 	}
 
-	/**
-	 * The LocalAccountantDelegate is in charge of booking money to different
-	 * account for the productType it is assigned to and its packaged types
-	 * when an invoice is booked. 
-	 */
-	public LocalAccountantDelegate getLocalAccountantDelegate() {
-		return localAccountantDelegate;
-	}
-
-	/**
-	 * Set the LocalAccountantDelegate.
-	 */
-	public void setLocalAccountantDelegate(LocalAccountantDelegate localAccountantDelegate) {
-		this.localAccountantDelegate = localAccountantDelegate;
-	}
-
-	/**
-	 * @return Returns the localStorekeeperDelegate.
-	 */
-	public LocalStorekeeperDelegate getLocalStorekeeperDelegate()
-	{
-		return localStorekeeperDelegate;
-	}
-
-	/**
-	 * @param localStorekeeperDelegate The localStorekeeperDelegate to set.
-	 */
-	public void setLocalStorekeeperDelegate(
-			LocalStorekeeperDelegate localStorekeeperDelegate)
-	{
-		this.localStorekeeperDelegate = localStorekeeperDelegate;
-	}
+// these methods are in ProductTypeLocal, now
+//	/**
+//	 * The LocalAccountantDelegate is in charge of booking money to different
+//	 * account for the productType it is assigned to and its packaged types
+//	 * when an invoice is booked. 
+//	 */
+//	public LocalAccountantDelegate getLocalAccountantDelegate() {
+//		return localAccountantDelegate;
+//	}
+//
+//	/**
+//	 * Set the LocalAccountantDelegate.
+//	 */
+//	public void setLocalAccountantDelegate(LocalAccountantDelegate localAccountantDelegate) {
+//		this.localAccountantDelegate = localAccountantDelegate;
+//	}
+//
+//	/**
+//	 * @return Returns the localStorekeeperDelegate.
+//	 */
+//	public LocalStorekeeperDelegate getLocalStorekeeperDelegate()
+//	{
+//		return localStorekeeperDelegate;
+//	}
+//
+//	/**
+//	 * @param localStorekeeperDelegate The localStorekeeperDelegate to set.
+//	 */
+//	public void setLocalStorekeeperDelegate(
+//			LocalStorekeeperDelegate localStorekeeperDelegate)
+//	{
+//		this.localStorekeeperDelegate = localStorekeeperDelegate;
+//	}
 
 	// *********************************
 	// /// *** begin inheritance *** ///
@@ -937,7 +939,6 @@ implements
 	 *   <li>packageNature</li>
 	 *   <li>productAvailable</li>
 	 *   <li>productTypeGroups</li>
-	 *   <li>productTypeLocal (must never be inherited!)</li>
 	 *   <li>published</li>
 	 *   <li>saleable</li>
 	 *   <li>selfForVirtualSelfPackaging (transient and a must-not-inherit, too)</li>
@@ -964,6 +965,16 @@ implements
 		if (fieldName.startsWith("tmpInherit"))
 			return null;
 
+// TODO the below checks for localAccountantDelegate and localStorekeeperDelegate should be removed after a few months transition time.
+		if ("localAccountantDelegate".equals(fieldName))
+			throw new IllegalArgumentException("The field 'localAccountantDelegate' has been moved to ProductTypeLocal!");
+		if ("localStorekeeperDelegate".equals(fieldName))
+			throw new IllegalArgumentException("The field 'localStorekeeperDelegate' has been moved to ProductTypeLocal!");
+// END to do
+
+		if ("productTypeLocal".equals(fieldName))
+			return new StaticFieldMetaData("productTypeLocal");
+
 		synchronized (nonInheritableFields) {
 			if (nonInheritableFields.isEmpty()) {
 				// PK fields
@@ -981,7 +992,7 @@ implements
 				nonInheritableFields.add("packageNature");
 				nonInheritableFields.add("productAvailable");
 				nonInheritableFields.add("productTypeGroups");
-				nonInheritableFields.add("productTypeLocal");
+//				nonInheritableFields.add("productTypeLocal");
 				nonInheritableFields.add("published");
 				nonInheritableFields.add("saleable");
 				nonInheritableFields.add("selfForVirtualSelfPackaging");
@@ -1007,14 +1018,15 @@ implements
 
 	public FieldInheriter getFieldInheriter(String fieldName)
 	{
-		if ("nestedProductTypes".equals(fieldName)) {		
-//			return new MapFieldInheriter();
+		if ("productTypeLocal".equals(fieldName))
+			return new JDOInheritableFieldInheriter();
+
+		if ("nestedProductTypes".equals(fieldName))		
 			return new NestedProductTypeMapInheriter();
-		}
 
 		if ("name".equals(fieldName))
 			return new JDOInheritableFieldInheriter();
-		
+
 		return new JDOSimpleFieldInheriter();
 	}
 
@@ -1079,11 +1091,11 @@ implements
 		// hmmm... JDOInheritanceManager doesn't work reliably => we need this! :-( Marco.
 		
 		// access all non-simple fields in order to ensure, they're loaded by JDO
+		if (productTypeLocal == null);
 		if (deliveryConfiguration == null);
 		if (innerPriceConfig == null);
-		if (localAccountantDelegate == null);
-//		logger.info("preInherit: productType \"" + this.getPrimaryKey() + "\" (" + ( this == mother ? "mother" : (this == child ? "child" : "unknown") ) + "):" + localAccountantDelegate);
-		if (localStorekeeperDelegate == null);
+//		if (localAccountantDelegate == null);
+//		if (localStorekeeperDelegate == null);
 		nestedProductTypes.size();
 		if (packagePriceConfig == null);
 		if (owner == null);
@@ -1121,7 +1133,7 @@ implements
 			}
 		}
 
-		logger.debug("postInherit: productType \"" + this.getPrimaryKey() + "\" instance=" + System.identityHashCode(this) + " (" + ( this == mother ? "mother" : (this == child ? "child" : "unknown") ) + "): " + localAccountantDelegate);
+//		logger.debug("postInherit: productType \"" + this.getPrimaryKey() + "\" instance=" + System.identityHashCode(this) + " (" + ( this == mother ? "mother" : (this == child ? "child" : "unknown") ) + "): " + localAccountantDelegate);
 	}
 
 	/**
@@ -1484,8 +1496,8 @@ implements
 		if (closed)
 			throw new CannotMakeProductTypeSaleableException(CANNOT_MAKE_SALEABLE_REASON_ALREADY_CLOSED, "Cannot make ProductType \"" + getPrimaryKey() + "\" saleable, because it is already closed!");
 
-		if (localAccountantDelegate == null)
-			throw new CannotMakeProductTypeSaleableException(CANNOT_MAKE_SALEABLE_REASON_NO_ACCOUNTANT_DELEGATE, "Cannot make ProductType \"" + getPrimaryKey() + "\" saleable, because it has no LocalAccountantDelegate assigned! instance=" + System.identityHashCode(this));
+//		if (localAccountantDelegate == null)
+//			throw new CannotMakeProductTypeSaleableException(CANNOT_MAKE_SALEABLE_REASON_NO_ACCOUNTANT_DELEGATE, "Cannot make ProductType \"" + getPrimaryKey() + "\" saleable, because it has no LocalAccountantDelegate assigned! instance=" + System.identityHashCode(this));
 
 		if (getPriceConfigInPackage(this.getPrimaryKey()) == null)
 			throw new CannotMakeProductTypeSaleableException(CANNOT_MAKE_SALEABLE_REASON_NO_PRICECONFIG, "Cannot make ProductType \"" + getPrimaryKey() + "\" saleable, because it has no PriceConfig assigned!");

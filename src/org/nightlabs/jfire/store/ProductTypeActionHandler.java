@@ -984,5 +984,4 @@ public abstract class ProductTypeActionHandler
 				Util.equals(this.organisationID, other.organisationID) &&
 				Util.equals(this.productTypeActionHandlerID, other.productTypeActionHandlerID);
 	}
-
 }

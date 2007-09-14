@@ -97,8 +97,8 @@ public class LocalAccountant extends Accountant {
 		Map delegates = new HashMap();
 		for (Iterator iter = invoice.getArticles().iterator(); iter.hasNext();) {
 			Article article = (Article) iter.next();
-			LocalAccountantDelegate delegate = article.getProductType().getLocalAccountantDelegate();
-			if (delegate == null)
+			LocalAccountantDelegate delegate = article.getProductType().getProductTypeLocal().getLocalAccountantDelegate();
+			if (delegate == null) // TODO maybe we should have a default one like there is a DefaultLocalStorekeeperDelegate, too.
 				throw new IllegalStateException("Could not find LocalAccountantDelegate for Article "+JDOHelper.getObjectId(article)+" of productType "+JDOHelper.getObjectId(article.getProductType())+".");
 
 			delegates.put(article, delegate);

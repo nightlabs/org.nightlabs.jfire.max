@@ -74,6 +74,8 @@ import org.nightlabs.jfire.transfer.Transfer;
  */
 public class DefaultLocalStorekeeperDelegate extends LocalStorekeeperDelegate
 {
+	private static final long serialVersionUID = 1L;
+
 	private static LocalStorekeeperDelegateID localStorekeeperDelegateID = null;
 
 	public static DefaultLocalStorekeeperDelegate getDefaultLocalStorekeeperDelegate(PersistenceManager pm)

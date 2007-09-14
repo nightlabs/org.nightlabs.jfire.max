@@ -1,10 +1,10 @@
 package org.nightlabs.jfire.voucher.store;
 
+import org.nightlabs.inheritance.FieldMetaData;
 import org.nightlabs.jfire.security.User;
 import org.nightlabs.jfire.store.ProductType;
 import org.nightlabs.jfire.store.ProductTypeLocal;
 import org.nightlabs.jfire.store.Repository;
-import org.nightlabs.jfire.transfer.Anchor;
 
 /**
  * @author Marco Schulze - Marco at NightLabs dot de
@@ -77,5 +77,16 @@ extends ProductTypeLocal
 	public void setMaxVoucherCount(long maxProductCount)
 	{
 		this.maxVoucherCount = maxProductCount;
+	}
+
+	@Override
+	public FieldMetaData getFieldMetaData(String fieldName, boolean createMissingMetaData)
+	{
+		if ("maxVoucherCount".equals(fieldName))
+			return null;
+		if ("createdVoucherCount".equals(fieldName))
+			return null;
+
+		return super.getFieldMetaData(fieldName, createMissingMetaData);
 	}
 }

@@ -448,8 +448,7 @@ implements SessionBean
 				pm.getFetchPlan().setGroups(fetchGroups);
 
 			try {
-				VoucherLocalAccountantDelegate delegate = (VoucherLocalAccountantDelegate) voucherType
-						.getLocalAccountantDelegate();
+				VoucherLocalAccountantDelegate delegate = (VoucherLocalAccountantDelegate) voucherType.getProductTypeLocal().getLocalAccountantDelegate();
 				if (delegate != null) {
 					OrganisationLegalEntity organisationLegalEntity = null;
 

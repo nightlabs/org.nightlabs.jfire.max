@@ -35,6 +35,8 @@ import javax.jdo.JDOHelper;
 import javax.jdo.PersistenceManager;
 
 import org.apache.log4j.Logger;
+import org.nightlabs.jdo.FetchPlanBackup;
+import org.nightlabs.jdo.NLJDOHelper;
 import org.nightlabs.jfire.scripting.id.ScriptRegistryItemID;
 
 /**
@@ -323,33 +325,40 @@ public abstract class ScriptExecutor
 
 		Object result = doExecute();
 
-		// TODO: must be done in the bean (ScriptRegistry) to avoid detaching in the server
-		// detach script result if necessary
-		if (script.isNeedsDetach()) {
-			PersistenceManager pm = getPersistenceManager();
-			pm.getFetchPlan().setGroups(script.getFetchGroups());
-			pm.getFetchPlan().setMaxFetchDepth(script.getMaxFetchDepth());
-			result = pm.detachCopy(result);
-		}
-		
-		// check result type against declared type in script
-		if (result == null)
-			return null;
-
-		Class resultClass = result.getClass();
-		ClassLoader oldContextCL = Thread.currentThread().getContextClassLoader();
-		Thread.currentThread().setContextClassLoader(resultClass.getClassLoader());
+		// We always backup and restore the fetch-plan, because it might be manipulated in the script (even if Script.isNeedsDetach() returns false).
+		PersistenceManager pm = getPersistenceManager();
+		FetchPlanBackup fetchPlanBackup = pm == null ? null : NLJDOHelper.backupFetchPlan(pm.getFetchPlan());
 		try {
+			// TODO: must be done in the bean (ScriptRegistry) to avoid detaching in the server
+			// detach script result if necessary
+			if (script.isNeedsDetach() && pm != null) {
+				pm.getFetchPlan().setGroups(script.getFetchGroups());
+				pm.getFetchPlan().setMaxFetchDepth(script.getMaxFetchDepth());
+				result = pm.detachCopy(result);
+			}
+		
+			// check result type against declared type in script
+			if (result == null)
+				return null;
+
+			Class resultClass = result.getClass();
+			ClassLoader oldContextCL = Thread.currentThread().getContextClassLoader();
+			Thread.currentThread().setContextClassLoader(resultClass.getClassLoader());
 			try {
-				if (!script.getResultClass().isAssignableFrom(resultClass))
-					throw new ResultClassMismatchException(
-							(ScriptRegistryItemID) JDOHelper.getObjectId(script), script.getResultClass(), resultClass);
-			} catch (ClassNotFoundException cnf) {
-				Logger.getLogger(ScriptExecutor.class).error("Class not found: " + script.getResultClassName(), cnf);
-				throw new ScriptException(cnf);
+				try {
+					if (!script.getResultClass().isAssignableFrom(resultClass))
+						throw new ResultClassMismatchException(
+								(ScriptRegistryItemID) JDOHelper.getObjectId(script), script.getResultClass(), resultClass);
+				} catch (ClassNotFoundException cnf) {
+					Logger.getLogger(ScriptExecutor.class).error("Class not found: " + script.getResultClassName(), cnf);
+					throw new ScriptException(cnf);
+				}
+			} finally {
+				Thread.currentThread().setContextClassLoader(oldContextCL);
 			}
 		} finally {
-			Thread.currentThread().setContextClassLoader(oldContextCL);
+			if (fetchPlanBackup != null && pm != null)
+				NLJDOHelper.restoreFetchPlan(pm.getFetchPlan(), fetchPlanBackup);
 		}
 
 		return result;

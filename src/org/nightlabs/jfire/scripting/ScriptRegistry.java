@@ -92,7 +92,7 @@ implements Serializable
 			return (ScriptRegistry) it.next();
 
 		ScriptRegistry reg = new ScriptRegistry(SINGLETON_ID.scriptRegistryID);
-		pm.makePersistent(reg);
+		reg = pm.makePersistent(reg);
 
 		try {
 			reg.registerScriptExecutorClass(

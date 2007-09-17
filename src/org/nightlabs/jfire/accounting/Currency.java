@@ -41,7 +41,6 @@ import org.nightlabs.util.Util;
  *
  * @jdo.create-objectid-class
  *
- *
  * @jdo.inheritance strategy = "new-table"
  */
 public class Currency
@@ -50,7 +49,7 @@ implements Serializable, org.nightlabs.l10n.Currency
 	private static final long serialVersionUID = 1L;
 
 	/**
-	 * This is the ISO or whatever standard for the currency. Usually a two or three-letter-abbreviation.
+	 * This is the ISO 4217 identifier for the currency. Usually a two or three-letter-abbreviation.
 	 *
 	 * @jdo.field primary-key="true"
 	 * @jdo.column length="100"

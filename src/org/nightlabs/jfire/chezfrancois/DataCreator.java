@@ -360,7 +360,7 @@ public class DataCreator
 		((DateDataField)person.getDataField(PersonStruct.PERSONALDATA_DATEOFBIRTH)).setDate(dateOfBirth);
 
 		SelectionStructField salutationSelectionStructField = (SelectionStructField) personStruct.getStructField(
-				PersonStruct.PERSONALDATA, PersonStruct.PERSONALDATA_SALUTATION);		
+				PersonStruct.PERSONALDATA, PersonStruct.PERSONALDATA_SALUTATION);
 		StructFieldValue sfv = salutationSelectionStructField.getStructFieldValue(PersonStruct.PERSONALDATA_SALUTATION_MR);
 		((SelectionDataField)person.getDataField(PersonStruct.PERSONALDATA_SALUTATION)).setSelection(sfv);
 

@@ -299,25 +299,25 @@ extends Initialiser
 		dataCreator.makeAllLeavesSaleable();
 		
 		
-		UserGroup userGroup = new UserGroup(organisationID, UserGroup.USERID_PREFIX_TYPE_USERGROUP + "SalesAgents");
+		UserGroup userGroup = new UserGroup(organisationID, User.USERID_PREFIX_TYPE_USERGROUP + "SalesAgents");
 		userGroup.setName("Sales Agents");
 		userGroup.setDescription("This group is blablabla.");
 		new UserLocal(userGroup);
 		userGroup = (UserGroup) pm.makePersistent(userGroup);
 
-		userGroup = new UserGroup(organisationID, UserGroup.USERID_PREFIX_TYPE_USERGROUP + "SalesManagers");
+		userGroup = new UserGroup(organisationID, User.USERID_PREFIX_TYPE_USERGROUP + "SalesManagers");
 		userGroup.setName("Sales Managers");
 		userGroup.setDescription("This group is blablabla.");
 		new UserLocal(userGroup);
 		userGroup = (UserGroup) pm.makePersistent(userGroup);
 
-		userGroup = new UserGroup(organisationID, UserGroup.USERID_PREFIX_TYPE_USERGROUP + "Statistics");
+		userGroup = new UserGroup(organisationID, User.USERID_PREFIX_TYPE_USERGROUP + "Statistics");
 		userGroup.setName("Statistics");
 		userGroup.setDescription("This group consists out of the statistics guys.");
 		new UserLocal(userGroup);
 		userGroup = (UserGroup) pm.makePersistent(userGroup);
 
-		userGroup = new UserGroup(organisationID, UserGroup.USERID_PREFIX_TYPE_USERGROUP + "TheOthers");
+		userGroup = new UserGroup(organisationID, User.USERID_PREFIX_TYPE_USERGROUP + "TheOthers");
 		userGroup.setName("The Others");
 		userGroup.setDescription("This group is trallali trallala.");
 		new UserLocal(userGroup);
@@ -355,7 +355,7 @@ extends Initialiser
 				01, 2008, "Comment for Marco Schulze");
 		User user02 = dataCreator.createUser("marco", "test", person);				
 
-		userGroup = new UserGroup(organisationID, UserGroup.USERID_PREFIX_TYPE_USERGROUP + "Administrators");
+		userGroup = new UserGroup(organisationID, User.USERID_PREFIX_TYPE_USERGROUP + "Administrators");
 		userGroup.setName("Administrators");
 		userGroup.setDescription("This group has all access rights within its organisation.");
 		new UserLocal(userGroup);

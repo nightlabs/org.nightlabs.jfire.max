@@ -28,7 +28,7 @@ package org.nightlabs.jfire.accounting;
 
 import java.io.Serializable;
 
-import org.nightlabs.util.Utils;
+import org.nightlabs.util.Util;
 
 /**
  * @author Marco Schulze - marco at nightlabs dot de
@@ -58,7 +58,7 @@ implements Serializable, org.nightlabs.l10n.Currency
 	private String currencyID;
 
 	/**
-	 * @jdo.field persistence-modifier="persistent"
+	 * @jdo.field persistence-modifier="persistent" null-value="exception"
 	 */
 	private String currencySymbol;
 
@@ -71,7 +71,13 @@ implements Serializable, org.nightlabs.l10n.Currency
 
 	public Currency(String currencyID, String currencySymbol, int decimalDigitCount) {
 		if (currencyID == null)
-			throw new NullPointerException("currencyID must not be null!");
+			throw new IllegalArgumentException("currencyID must not be null!");
+
+		if (currencySymbol == null)
+			throw new IllegalArgumentException("currencySymbol must not be null!");
+
+		if (decimalDigitCount < 0)
+			throw new IllegalArgumentException("decimalDigitCount must be >= 0! It is: " + decimalDigitCount);
 
 		this.currencyID = currencyID;
 		this.currencySymbol = currencySymbol;
@@ -115,13 +121,13 @@ implements Serializable, org.nightlabs.l10n.Currency
 		if (obj == this) return true;
 		if (!(obj instanceof Currency)) return false;
 		Currency o = (Currency) obj;
-		return Utils.equals(o.currencyID, this.currencyID);
+		return Util.equals(o.currencyID, this.currencyID);
 	}
 
 	@Override
 	public int hashCode()
 	{
-		return Utils.hashCode(currencyID);
+		return Util.hashCode(currencyID);
 	}
 	
 	/**

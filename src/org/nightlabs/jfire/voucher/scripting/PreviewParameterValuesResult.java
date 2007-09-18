@@ -21,7 +21,7 @@ implements Serializable
 {
 	private static final String[] FETCH_GROUPS_CURRENCY = new String[] {
 		FetchPlan.DEFAULT,
-		FetchPlan.ALL // TODO clean up fetch groups!!!
+//		FetchPlan.ALL // TODO clean up fetch groups!!!
 	};
 	
 	public PreviewParameterValuesResult(VoucherType voucherType) 

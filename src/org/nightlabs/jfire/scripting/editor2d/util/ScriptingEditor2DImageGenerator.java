@@ -48,7 +48,8 @@ extends ImageGenerator
 			// Category Renderer
 			RenderModeDescriptor barcodeDesc = new RenderModeDescriptor(
 					RenderConstants.DEFAULT_MODE, "Default");
-			Renderer r = renderModeMan.addRenderModeDescriptor(barcodeDesc, BarcodeDrawComponent.class);
+			Renderer r = renderModeMan.addRenderModeDescriptor(barcodeDesc, 
+					BarcodeDrawComponent.class.getName());
 			r.addRenderContext(new J2DBarcodeDefaultRenderer());
 		}
 		return renderModeMan;		

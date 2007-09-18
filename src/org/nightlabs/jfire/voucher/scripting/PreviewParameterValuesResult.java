@@ -7,6 +7,7 @@ import javax.jdo.FetchPlan;
 import javax.jdo.JDOHelper;
 import javax.jdo.PersistenceManager;
 
+import org.nightlabs.jdo.FetchPlanBackup;
 import org.nightlabs.jdo.NLJDOHelper;
 import org.nightlabs.jfire.accounting.Currency;
 import org.nightlabs.jfire.voucher.accounting.VoucherPriceConfig;
@@ -21,7 +22,6 @@ implements Serializable
 {
 	private static final String[] FETCH_GROUPS_CURRENCY = new String[] {
 		FetchPlan.DEFAULT,
-//		FetchPlan.ALL // TODO clean up fetch groups!!!
 	};
 	
 	public PreviewParameterValuesResult(VoucherType voucherType) 
@@ -30,21 +30,18 @@ implements Serializable
 		if (pm == null)
 			throw new IllegalArgumentException("voucherType is currently not persistent!");
 
-		int oldMaxFetchDepth = pm.getFetchPlan().getMaxFetchDepth();
-		Collection oldFetchGroups = pm.getFetchPlan().getGroups();
+		FetchPlanBackup fetchPlanBackup = pm == null ? null : NLJDOHelper.backupFetchPlan(pm.getFetchPlan());
 		try {
 			pm.getFetchPlan().setMaxFetchDepth(NLJDOHelper.MAX_FETCH_DEPTH_NO_LIMIT);
-//			VoucherPriceConfig voucherPriceConfig = (VoucherPriceConfig) voucherType.getInnerPriceConfig();
-			VoucherPriceConfig voucherPriceConfig = (VoucherPriceConfig) voucherType.getPackagePriceConfig();
-			
-			pm.getFetchPlan().setGroups(FETCH_GROUPS_CURRENCY);
+			pm.getFetchPlan().setGroups(FETCH_GROUPS_CURRENCY);			
+			VoucherPriceConfig voucherPriceConfig = (VoucherPriceConfig) voucherType.getPackagePriceConfig();			
 			if (voucherPriceConfig != null && voucherPriceConfig.getCurrencies() != null)
 				this.currencies = pm.detachCopyAll(voucherPriceConfig.getCurrencies());
 			else
 				this.currencies = null;
 		} finally {
-			pm.getFetchPlan().setMaxFetchDepth(oldMaxFetchDepth);
-			pm.getFetchPlan().setGroups(oldFetchGroups);
+			if (fetchPlanBackup != null && pm != null)
+				NLJDOHelper.restoreFetchPlan(pm.getFetchPlan(), fetchPlanBackup);
 		}
 	}
 	

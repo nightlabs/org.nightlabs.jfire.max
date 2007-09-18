@@ -21,6 +21,7 @@ public class ManualMoneyTransfer extends MoneyTransfer
 {
 	private static final long serialVersionUID = 1L;
 
+	public static final String FETCH_GROUP_REASON = "ManualMoneyTransfer.reason";
 	/**
 	 * @jdo.field
 	 *		persistence-modifier="persistent"

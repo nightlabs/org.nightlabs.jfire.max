@@ -20,14 +20,11 @@ implements IJDOObjectDAO<VoucherType>
 {
 	private static VoucherTypeDAO sharedInstance = null;
 
-	public static VoucherTypeDAO sharedInstance()
+	public static synchronized VoucherTypeDAO sharedInstance()
 	{
-		if (sharedInstance == null) {
-			synchronized (VoucherTypeDAO.class) {
-				if (sharedInstance == null)
-					sharedInstance = new VoucherTypeDAO();
-			}
-		}
+		if (sharedInstance == null)
+			sharedInstance = new VoucherTypeDAO();
+
 		return sharedInstance;
 	}
 

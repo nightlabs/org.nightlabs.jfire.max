@@ -382,9 +382,8 @@ implements SessionBean
 	 * @ejb.permission role-name="_Guest_"
 	 */
 	@SuppressWarnings("unchecked")
-	public List<VoucherType> getVoucherTypes(
-			Collection<ProductTypeID> voucherTypeIDs, String[] fetchGroups,
-			int maxFetchDepth) {
+	public List<VoucherType> getVoucherTypes(Collection<ProductTypeID> voucherTypeIDs, String[] fetchGroups, int maxFetchDepth)
+	{
 		PersistenceManager pm = getPersistenceManager();
 		try {
 			return NLJDOHelper.getDetachedObjectList(pm, voucherTypeIDs,
@@ -400,7 +399,8 @@ implements SessionBean
 	 * @ejb.permission role-name="_Guest_"
 	 */
 	@SuppressWarnings("unchecked")
-	public Set<PriceConfigID> getVoucherPriceConfigIDs() {
+	public Set<PriceConfigID> getVoucherPriceConfigIDs()
+	{
 		PersistenceManager pm = getPersistenceManager();
 		try {
 			Query q = pm.newQuery(VoucherPriceConfig.class);
@@ -417,9 +417,8 @@ implements SessionBean
 	 * @ejb.permission role-name="_Guest_"
 	 */
 	@SuppressWarnings("unchecked")
-	public List<VoucherPriceConfig> getVoucherPriceConfigs(
-			Collection<PriceConfigID> voucherPriceConfigIDs, String[] fetchGroups,
-			int maxFetchDepth) {
+	public List<VoucherPriceConfig> getVoucherPriceConfigs(Collection<PriceConfigID> voucherPriceConfigIDs, String[] fetchGroups, int maxFetchDepth)
+	{
 		PersistenceManager pm = getPersistenceManager();
 		try {
 			return NLJDOHelper.getDetachedObjectList(pm, voucherPriceConfigIDs,
@@ -434,8 +433,8 @@ implements SessionBean
 	 * @ejb.permission role-name="_Guest_"
 	 * @ejb.transaction type="Required"
 	 */
-	public VoucherType storeVoucherType(VoucherType voucherType, boolean get,
-			String[] fetchGroups, int maxFetchDepth) {
+	public VoucherType storeVoucherType(VoucherType voucherType, boolean get, String[] fetchGroups, int maxFetchDepth)
+	{
 		if (voucherType == null)
 			throw new IllegalArgumentException("voucherType must not be null!");
 

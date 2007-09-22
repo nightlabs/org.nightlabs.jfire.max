@@ -1,7 +1,5 @@
 package org.nightlabs.jfire.voucher.notification;
 
-import javax.jdo.JDOHelper;
-
 import org.nightlabs.jdo.ObjectID;
 import org.nightlabs.jfire.jdo.notification.TreeNodeParentResolver;
 import org.nightlabs.jfire.voucher.store.VoucherType;
@@ -14,6 +12,7 @@ implements TreeNodeParentResolver
 	public ObjectID getParentObjectID(Object jdoObject)
 	{
 		VoucherType vt = (VoucherType)jdoObject;
-		return (ObjectID) JDOHelper.getObjectId(vt.getExtendedProductType());
+		return vt.getExtendedProductTypeID();
+//		return (ObjectID) JDOHelper.getObjectId(vt.getExtendedProductType());
 	}
 }

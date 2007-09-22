@@ -40,6 +40,7 @@ import javax.jdo.FetchPlan;
 import javax.jdo.JDOHelper;
 import javax.jdo.PersistenceManager;
 import javax.jdo.Query;
+import javax.jdo.listener.DetachCallback;
 import javax.jdo.listener.StoreCallback;
 
 import org.apache.log4j.Logger;
@@ -63,6 +64,7 @@ import org.nightlabs.jfire.accounting.priceconfig.IPriceConfig;
 import org.nightlabs.jfire.accounting.priceconfig.PriceConfig;
 import org.nightlabs.jfire.accounting.priceconfig.PriceConfigUtil;
 import org.nightlabs.jfire.accounting.priceconfig.id.PriceConfigID;
+import org.nightlabs.jfire.idgenerator.IDGenerator;
 import org.nightlabs.jfire.organisation.LocalOrganisation;
 import org.nightlabs.jfire.organisation.Organisation;
 import org.nightlabs.jfire.security.User;
@@ -180,7 +182,8 @@ implements
 		Inheritable,
 		InheritanceCallbacks,
 		StoreCallback,
-		Serializable
+		Serializable,
+		DetachCallback
 {
 	private static final Logger logger = Logger.getLogger(ProductType.class);
 
@@ -190,6 +193,10 @@ implements
 	 */
 	public static final String FETCH_GROUP_NAME = "ProductType.name";
 
+	/**
+	 * This is a virtual fetch-group which is processed in the <code>DetachCallback</code> method <code>jdoPostDetach</code>.
+	 */
+	public static final String FETCH_GROUP_EXTENDED_PRODUCT_TYPE_ID = "ProductType.extendedProductTypeID";
 	public static final String FETCH_GROUP_EXTENDED_PRODUCT_TYPE = "ProductType.extendedProductType";
 	public static final String FETCH_GROUP_EXTENDED_PRODUCT_TYPE_2 = "ProductType.extendedProductType[2]";
 	public static final String FETCH_GROUP_EXTENDED_PRODUCT_TYPE_NO_LIMIT = "ProductType.extendedProductType[-1]";
@@ -250,6 +257,11 @@ implements
 			parentProductTypeID.organisationID, parentProductTypeID.productTypeID);
 	}
 
+	public static String createProductTypeID()
+	{
+		return ObjectIDUtil.longObjectIDFieldToString(IDGenerator.nextID(ProductType.class));
+	}
+
 	/**
 	 * @jdo.field primary-key="true"
 	 * @jdo.column length="100"
@@ -277,6 +289,16 @@ implements
 	 * @jdo.field persistence-modifier="persistent"
 	 */
 	private ProductType extendedProductType;
+
+	/**
+	 * @jdo.field persistence-modifier="none"
+	 */
+	private ProductTypeID extendedProductTypeID = null;
+
+	/**
+	 * @jdo.field persistence-modifier="none"
+	 */
+	private boolean extendedProductTypeID_detached = false;
 
 	/**
 	 * @jdo.field persistence-modifier="persistent"
@@ -687,6 +709,15 @@ implements
 		return extendedProductType;
 	}
 
+	public ProductTypeID getExtendedProductTypeID()
+	{
+		if (!extendedProductTypeID_detached) {
+			extendedProductTypeID = extendedProductType == null ? null : extendedProductType.getObjectId();
+			extendedProductTypeID_detached = true;
+		}
+		return extendedProductTypeID;
+	}
+
 	/**
 	 * @param extendedProductType The extendedProductType to set. This method should not be called
 	 *		from outside. Currently it is not yet possible to change the structure of the inheritance
@@ -709,6 +740,8 @@ implements
 		}
 
 		this.extendedProductType = extendedProductType;
+		this.extendedProductTypeID_detached = false;
+		this.extendedProductTypeID = null;
 	}
 
 	/**
@@ -996,6 +1029,8 @@ implements
 				nonInheritableFields.add("published");
 				nonInheritableFields.add("saleable");
 				nonInheritableFields.add("selfForVirtualSelfPackaging");
+				nonInheritableFields.add("extendedProductTypeID");
+				nonInheritableFields.add("extendedProductTypeID_detached");
 //				nonInheritableFields.add("packagePriceConfig");
 			}
 
@@ -1579,7 +1614,7 @@ implements
 		productTypeGroups.remove(ProductType.getPrimaryKey(organisationID, productTypeID));
 	}
 
-	public Collection getProductTypeGroups()
+	public Collection<ProductTypeGroup> getProductTypeGroups()
 	{
 		return productTypeGroups.values();
 	}
@@ -1710,6 +1745,24 @@ implements
 
 	public void jdoPreStore()
 	{
+	}
+
+	public void jdoPreDetach()
+	{
+		
+	}
+
+	@SuppressWarnings("unchecked")
+	public void jdoPostDetach(Object o)
+	{
+		ProductType attached = (ProductType) o;
+		ProductType detached = this;
+		PersistenceManager pm = attached.getPersistenceManager();
+		Set fetchGroups = pm.getFetchPlan().getGroups();
+		if (fetchGroups.contains(FETCH_GROUP_EXTENDED_PRODUCT_TYPE_ID)) {
+			detached.extendedProductTypeID = attached.getExtendedProductTypeID();
+			detached.extendedProductTypeID_detached = true;
+		}
 	}
 
 	@Override

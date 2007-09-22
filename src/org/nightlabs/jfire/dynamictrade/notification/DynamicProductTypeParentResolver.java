@@ -1,7 +1,5 @@
 package org.nightlabs.jfire.dynamictrade.notification;
 
-import javax.jdo.JDOHelper;
-
 import org.nightlabs.jdo.ObjectID;
 import org.nightlabs.jfire.dynamictrade.store.DynamicProductType;
 import org.nightlabs.jfire.jdo.notification.TreeNodeParentResolver;
@@ -13,7 +11,7 @@ implements TreeNodeParentResolver
 
 	public ObjectID getParentObjectID(Object jdoObject)
 	{
-		DynamicProductType vt = (DynamicProductType)jdoObject;
-		return (ObjectID) JDOHelper.getObjectId(vt.getExtendedProductType());
+		DynamicProductType dpt = (DynamicProductType)jdoObject;
+		return dpt.getExtendedProductTypeID();
 	}
 }

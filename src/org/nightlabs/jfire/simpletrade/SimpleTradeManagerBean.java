@@ -589,7 +589,7 @@ implements SessionBean
 				priceCalculationNeeded = true;
 			}
 
-			// TODO JPOX WORKAROUND: In cross-organisation trade, we get JDODetachedFieldAccessExceptions, even though the object should be persistent - trying a workaround
+			// TODO JPOX WORKAROUND: In cross-organisation trade and some other situations, we get JDODetachedFieldAccessExceptions, even though the object should be persistent - trying a workaround
 			{
 				ProductTypeID productTypeID = (ProductTypeID) JDOHelper.getObjectId(productType);
 				pm.flush();

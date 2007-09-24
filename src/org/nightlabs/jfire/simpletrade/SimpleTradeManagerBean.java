@@ -548,7 +548,7 @@ implements SessionBean
 	throws ModuleException
 	{
 		if (productType == null)
-			throw new NullPointerException("productType");
+			throw new IllegalArgumentException("productType must not be null!");
 
 		PersistenceManager pm = getPersistenceManager();
 		try {

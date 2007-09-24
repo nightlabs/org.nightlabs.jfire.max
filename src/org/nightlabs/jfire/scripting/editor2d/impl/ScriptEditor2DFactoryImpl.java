@@ -49,7 +49,6 @@ public class ScriptEditor2DFactoryImpl
 extends Editor2DFactoryImpl 
 implements ScriptEditor2DFactory 
 {
-
 	public BarcodeDrawComponent createBarcode() {		
 		return new BarcodeDrawComponentImpl();
 	}
@@ -63,9 +62,10 @@ implements ScriptEditor2DFactory
 				printHumanReadable, parent, scriptID);
 	}
 
-	public ScriptRootDrawComponent createScriptRootDrawComponent() {
+	public ScriptRootDrawComponent createScriptRootDrawComponent(boolean validate) {
 		ScriptRootDrawComponent scriptRoot = new ScriptRootDrawComponentImpl(); 
-		validateRoot(scriptRoot);
+		if (validate)
+			validateRoot(scriptRoot);
 		return scriptRoot;
 	}
 
@@ -107,8 +107,8 @@ implements ScriptEditor2DFactory
 	}
 
 	@Override
-	public RootDrawComponent createRootDrawComponent() {
-		return createScriptRootDrawComponent();
+	public RootDrawComponent createRootDrawComponent(boolean validate) {
+		return createScriptRootDrawComponent(validate);
 	}	
 	
 }

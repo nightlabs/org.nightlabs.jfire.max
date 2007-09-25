@@ -458,7 +458,7 @@ implements SessionBean
 			return;
 		}
 		task = new Task(
-				taskID.organisationID, taskID.taskTypeID, taskID.taskTypeID,
+				taskID,
 				User.getUser(pm, getOrganisationID(), User.USERID_SYSTEM),
 				ReportManagerHome.JNDI_NAME,
 				"cleanupRenderedReportLayoutFolders"

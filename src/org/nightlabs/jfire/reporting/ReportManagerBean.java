@@ -32,6 +32,7 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 
 import javax.ejb.CreateException;
@@ -72,6 +73,7 @@ import org.nightlabs.jfire.reporting.layout.render.RenderReportRequest;
 import org.nightlabs.jfire.reporting.layout.render.RenderedReportLayout;
 import org.nightlabs.jfire.reporting.layout.render.ReportLayoutRendererHTML;
 import org.nightlabs.jfire.reporting.layout.render.ReportLayoutRendererPDF;
+import org.nightlabs.jfire.reporting.layout.render.ReportLayoutRendererUtil;
 import org.nightlabs.jfire.reporting.oda.JFireReportingOdaException;
 import org.nightlabs.jfire.reporting.oda.jdojs.JDOJSResultSet;
 import org.nightlabs.jfire.reporting.oda.jdojs.JDOJSResultSetMetaData;
@@ -88,7 +90,11 @@ import org.nightlabs.jfire.scripting.ScriptException;
 import org.nightlabs.jfire.scripting.ScriptRegistry;
 import org.nightlabs.jfire.scripting.ScriptingIntialiserException;
 import org.nightlabs.jfire.scripting.id.ScriptRegistryItemID;
+import org.nightlabs.jfire.security.User;
 import org.nightlabs.jfire.servermanager.JFireServerManager;
+import org.nightlabs.jfire.timer.Task;
+import org.nightlabs.jfire.timer.id.TaskID;
+import org.nightlabs.timepattern.TimePatternFormatException;
 import org.nightlabs.version.MalformedVersionException;
 
 /**
@@ -424,14 +430,72 @@ implements SessionBean
 			
 			logger.info("Intializing JFireReporting basic scripts");
 			ScriptingInitialiser.initialise(pm, jfireServerManager, getOrganisationID());
-			
+
+			// intialise the cleanup of the render folder
+			initialiseCleanupRenderedReportLayoutFoldersTask(pm);
+
 		} finally {
 			pm.close();
 			jfireServerManager.close();
 		}
 		
-		
 	}
+	
+	protected void initialiseCleanupRenderedReportLayoutFoldersTask(PersistenceManager pm) {
+		TaskID taskID = TaskID.create(
+				getOrganisationID(), 
+				Task.TASK_TYPE_ID_SYSTEM,
+				ReportLayoutRendererUtil.class.getSimpleName()+"#cleanupRenderedReportLayoutFolders"
+		);
+		Task task = null;
+		try {
+			task = (Task) pm.getObjectById(taskID);
+		} catch (JDOObjectNotFoundException e) {
+			task = null;
+		}
+		if (task != null) {
+			logger.info("Task already initialised");
+			return;
+		}
+		task = new Task(
+				taskID.organisationID, taskID.taskTypeID, taskID.taskTypeID,
+				User.getUser(pm, getOrganisationID(), User.USERID_SYSTEM),
+				ReportManagerHome.JNDI_NAME,
+				"cleanupRenderedReportLayoutFolders"
+			);
+		task.getName().setText(Locale.ENGLISH.getLanguage(), "Cleanup rendered report layout folders");
+		task.getDescription().setText(Locale.ENGLISH.getLanguage(), "This task deletes old folder used for rendering reports");
+		try {
+			task.getTimePatternSet().createTimePattern(
+				"*", // year
+				"*", // month
+				"*", // day
+				"*", // dayOfWeek
+				"*", //  hour
+				"15"); // minute
+		} catch (TimePatternFormatException e) {
+			throw new RuntimeException(e);
+		} 
+
+		task.setEnabled(true);
+		pm.makePersistent(task);		
+	}
+	
+	/**
+	 * @ejb.interface-method
+	 * @ejb.permission role-name="_System_"
+	 * @ejb.transaction type="Required"
+	 */
+	public void cleanupRenderedReportLayoutFolders(TaskID taskID)
+	throws Exception
+	{
+		PersistenceManager pm = getPersistenceManager();
+		try {
+			ReportLayoutRendererUtil.cleanupRenderedReportLayoutFolders();
+		} finally {
+			pm.close();
+		}
+	}	
 	
 	/**
 	 * @throws ModuleException 

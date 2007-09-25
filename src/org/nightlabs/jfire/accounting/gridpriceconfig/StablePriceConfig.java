@@ -82,19 +82,20 @@ implements IPackagePriceConfig, IResultPriceConfig
 	/**
 	 * @see #getPriceCells(String, String)
 	 */
-	public Collection getPriceCells(CustomerGroup customerGroup, Currency currency)
+	public Collection<PriceCell> getPriceCells(CustomerGroup customerGroup, Currency currency)
 	{
 		return getPriceCells(customerGroup.getPrimaryKey(), currency.getCurrencyID());
 	}
 	/**
 	 * @return a <tt>Collection</tt> of {@link PriceCell}.
 	 */
-	public Collection getPriceCells(String customerGroupPK, String currencyID)
+	@SuppressWarnings("unchecked")
+	public Collection<PriceCell> getPriceCells(String customerGroupPK, String currencyID)
 	{
 		PersistenceManager pm = getPersistenceManager();
 		//Query query = pm.newNamedQuery(StablePriceConfig.class, "getPriceCellsForCustomerGroupAndCurrency");
 		Query query = pm.newNamedQuery(PriceCell.class, "getPriceCellsForCustomerGroupAndCurrency");
-		return (Collection) query.execute(this, customerGroupPK, currencyID);
+		return (Collection<PriceCell>) query.execute(this, customerGroupPK, currencyID);
 	}
 
 	/**
@@ -138,7 +139,7 @@ implements IPackagePriceConfig, IResultPriceConfig
 	}
 
 	@Implement
-	public Collection getPriceCells()
+	public Collection<PriceCell> getPriceCells()
 	{
 		return priceCells.values();
 	}

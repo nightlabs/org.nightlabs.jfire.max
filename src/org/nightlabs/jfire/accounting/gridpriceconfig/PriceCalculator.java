@@ -57,7 +57,7 @@ import org.nightlabs.jfire.store.id.ProductTypeID;
 import org.nightlabs.jfire.trade.CustomerGroup;
 import org.nightlabs.jfire.trade.CustomerGroupMapper;
 import org.nightlabs.jfire.trade.id.CustomerGroupID;
-import org.nightlabs.util.Utils;
+import org.nightlabs.util.Util;
 
 /**
  * @author Marco Schulze - marco at nightlabs dot de
@@ -76,7 +76,7 @@ public class PriceCalculator
 	 * key: String innerProductTypePK
 	 * value: NestedProductType
 	 */
-	protected Map virtualPackagedProductTypes = new HashMap();
+	protected Map<String, NestedProductType> virtualPackagedProductTypes = new HashMap<String, NestedProductType>();
 
 	private CustomerGroupMapper customerGroupMapper;
 
@@ -152,7 +152,7 @@ public class PriceCalculator
 	 *
 	 * @!jdo.field persistence-modifier="none"
 	 */
-	protected Map resolvableProductTypes = null;
+	protected Map<String, List<String>> resolvableProductTypes = null;
 
 	public void preparePriceCalculation()
 	{
@@ -176,12 +176,10 @@ public class PriceCalculator
 //	}
 	
 	protected IResultPriceConfig createResultPriceConfig()
-//	throws ModuleException
 	{
 		return new StablePriceConfig(
 				IDGenerator.getOrganisationID(),
 				IDGenerator.nextID(PriceConfig.class));
-//				PriceConfig.createPriceConfigID());
 	}
 
 	/**
@@ -194,13 +192,11 @@ public class PriceCalculator
 	 * @throws ModuleException
 	 */
 	public void preparePriceCalculation_createPackagedResultPriceConfigs()
-//	throws ModuleException
 	{
-//	 Create an instance of StablePriceConfig for each FormulaPriceConfig
+		// Create an instance of StablePriceConfig for each FormulaPriceConfig
 		// (if not yet existing) to store the results of the FormulaPriceConfig.
-		for (Iterator it = virtualPackagedProductTypes.values().iterator(); it.hasNext(); ) {
-			NestedProductType packagedProductType = (NestedProductType)it.next();
-			ProductType innerProductType = packagedProductType.getInnerProductType();
+		for (NestedProductType nestedProductType : virtualPackagedProductTypes.values()) {
+			ProductType innerProductType = nestedProductType.getInnerProductType();
 			IPriceConfig priceConfig;
 
 			if (innerProductType.isPackageOuter() && innerProductType != packageProductType)
@@ -208,41 +204,39 @@ public class PriceCalculator
 			else {
 				priceConfig = innerProductType.getInnerPriceConfig();
 
-//			if (priceConfig instanceof FormulaPriceConfig) { // should now always be the case
-				IFormulaPriceConfig fpc = (IFormulaPriceConfig)priceConfig;
-
-				fpc.adoptParameters(packagePriceConfig, true);
-				
-				IResultPriceConfig resultPriceConfig = (IResultPriceConfig) fpc.getPackagingResultPriceConfig(
-						innerProductType.getPrimaryKey(), packageProductType.getPrimaryKey(), false);
-
-				if (resultPriceConfig != null) {
-					resultPriceConfig.resetPriceFragmentCalculationStati();
-				}
+				if (priceConfig == null)
+					logger.info("preparePriceCalculation_createPackagedResultPriceConfigs: innerProductType \"" + innerProductType.getPrimaryKey() + "\" (nested within \"" + packageProductType.getPrimaryKey() + "\") does not have an inner price-config assigned!");
 				else {
-					resultPriceConfig = createResultPriceConfig();
-//							this.getOrganisationID(),
-//							this.getProductID()
-//							+ '-'
-//							+ innerProductInfo.getOrganisationID()
-//							+ '-'
-//							+ innerProductInfo.getProductID());
+					IFormulaPriceConfig fpc = (IFormulaPriceConfig)priceConfig;
 
-					fpc.setPackagingResultPriceConfig(
-							innerProductType.getPrimaryKey(), packageProductType.getPrimaryKey(),
-							resultPriceConfig);
+					fpc.adoptParameters(packagePriceConfig, true);
+
+					IResultPriceConfig resultPriceConfig = (IResultPriceConfig) fpc.getPackagingResultPriceConfig(
+							innerProductType.getPrimaryKey(), packageProductType.getPrimaryKey(), false);
+
+					if (resultPriceConfig != null) {
+						resultPriceConfig.resetPriceFragmentCalculationStati();
+					}
+					else {
+						resultPriceConfig = createResultPriceConfig();
+
+						fpc.setPackagingResultPriceConfig(
+								innerProductType.getPrimaryKey(), packageProductType.getPrimaryKey(),
+								resultPriceConfig);
+					}
+
+					resultPriceConfig.adoptParameters(packagePriceConfig);
 				}
-
-				resultPriceConfig.adoptParameters(packagePriceConfig);
 			}
 
-			// We need to merge the PriceFragmentTypes of all packaged PriceConfigs into
-			// the package PriceConfig. To speed it all up, we do it here instead of a second
-			// iteration.
-			for (Iterator itpft = priceConfig.getPriceFragmentTypes().iterator(); itpft.hasNext(); ) {
-				PriceFragmentType pft = (PriceFragmentType) itpft.next();
-				if (!packagePriceConfig.containsPriceFragmentType(pft))
-					packagePriceConfig.addPriceFragmentType(pft);
+			if (priceConfig != null) {
+				// We need to merge the PriceFragmentTypes of all packaged PriceConfigs into
+				// the package PriceConfig. To speed it all up, we do it here instead of a second
+				// iteration.
+				for (PriceFragmentType pft : priceConfig.getPriceFragmentTypes()) {
+					if (!packagePriceConfig.containsPriceFragmentType(pft))
+						packagePriceConfig.addPriceFragmentType(pft);
+				}
 			}
 		}
 	}
@@ -259,15 +253,14 @@ public class PriceCalculator
 
 		// Populate the Map resolvableProductTypes to allow referencing of anchestors
 		// of packaged products in the formulas.
-		this.resolvableProductTypes = new HashMap();
+		this.resolvableProductTypes = new HashMap<String, List<String>>();
 
 		// I use a LinkedList, because it is often iterated and I don't think I
 		// don't need to access it differently.
 //		virtualPackagedProductTypes = new LinkedList(packageProductType.getPackagedProductTypes());
 		virtualPackagedProductTypes.clear();
-		for (Iterator it = packageProductType.getNestedProductTypes(true).iterator(); it.hasNext(); ) {
-			NestedProductType ppt = (NestedProductType) it.next();
-			virtualPackagedProductTypes.put(ppt.getInnerProductTypePrimaryKey(), ppt);
+		for (NestedProductType npt : packageProductType.getNestedProductTypes(true)) {
+			virtualPackagedProductTypes.put(npt.getInnerProductTypePrimaryKey(), npt);
 		}
 
 //		// register packageProductType because of virtual self-packaging - already done
@@ -276,23 +269,21 @@ public class PriceCalculator
 //					packageProductType.getPrimaryKey(),
 //					new NestedProductType(packageProductType, packageProductType));
 
-		for (Iterator it = virtualPackagedProductTypes.values().iterator(); it.hasNext(); ) {
-			NestedProductType packagedProductType = (NestedProductType)it.next();
-
+		for (NestedProductType packagedProductType : virtualPackagedProductTypes.values()) {
 			_resolvableProductTypes_registerWithAnchestors(packagedProductType.getInnerProductType());
 		} // for (Iterator it = getPackagedProductInfos().iterator(); it.hasNext(); ) {
 	}
 	
 	protected void _resolvableProductTypes_registerWithAnchestors(ProductType packagedProductType)
 	{
-		// We map the productPK to itself, so we have it easier when resolving
-		// (*all* searchable productPKs registered here).
+		// We map the productTypePK to itself, so we have it easier when resolving
+		// (*all* searchable productTypePKs registered here).
 		ProductType extendedProductType = packagedProductType;
 
 		while (extendedProductType != null) {
-			List targetList = (List) resolvableProductTypes.get(extendedProductType.getPrimaryKey());
+			List<String> targetList = resolvableProductTypes.get(extendedProductType.getPrimaryKey());
 			if (targetList == null) {
-				targetList = new LinkedList();
+				targetList = new LinkedList<String>();
 				resolvableProductTypes.put(extendedProductType.getPrimaryKey(), targetList);
 			}
 
@@ -327,9 +318,8 @@ public class PriceCalculator
 		// TODO do we really want to always recalculate all cells if sth. changed?
 		// To keep track over dependencies is too complicated...
 		packagePriceConfig.resetPriceFragmentCalculationStati();
-		for (Iterator it = virtualPackagedProductTypes.values().iterator(); it.hasNext(); ) {
-			NestedProductType packagedProductType = (NestedProductType)it.next();
-			ProductType innerProductType = packagedProductType.getInnerProductType();
+		for (NestedProductType nestedProductType : virtualPackagedProductTypes.values()) {
+			ProductType innerProductType = nestedProductType.getInnerProductType();
 			IPriceConfig priceConfig = innerProductType.getPriceConfigInPackage(
 					packageProductType.getPrimaryKey());
 
@@ -407,16 +397,12 @@ public class PriceCalculator
 //		}
 
 		// Now, all preparation is done and we can start calculation:
-		for (Iterator itPriceCells = packagePriceConfig.getPriceCells().iterator(); itPriceCells.hasNext(); ) {
-			PriceCell outerPriceCell = (PriceCell)itPriceCells.next();
+		for (PriceCell outerPriceCell : packagePriceConfig.getPriceCells()) {
 			PriceCoordinate priceCoordinate = outerPriceCell.getPriceCoordinate();
-			for (Iterator itPriceFragmentTypes = packagePriceConfig.getPriceFragmentTypes().iterator(); itPriceFragmentTypes.hasNext(); ) {
-				PriceFragmentType priceFragmentType = (PriceFragmentType)itPriceFragmentTypes.next();
-
+			for (PriceFragmentType priceFragmentType : packagePriceConfig.getPriceFragmentTypes()) {
 				long outerPriceCellAmount = 0;
 
-				for (Iterator itPackagedPTs = virtualPackagedProductTypes.values().iterator(); itPackagedPTs.hasNext(); ) {
-					NestedProductType nestedProductType = (NestedProductType)itPackagedPTs.next();
+				for (NestedProductType nestedProductType : virtualPackagedProductTypes.values()) {
 //					ProductType innerProductType = nestedProductType.getInnerProductType();
 
 //					if (innerProductType.isPackageInner() || innerProductType == packageProductType) {
@@ -449,20 +435,19 @@ public class PriceCalculator
 		TariffID orgTariffID = TariffID.create(localPriceCoordinate.getTariffPK());
 		TariffID newTariffID = getTariffMapper().getTariffIDForProductType(orgTariffID, nestedProductType.getInnerProductTypeOrganisationID(), true);
 
-		IPriceCoordinate res = Utils.cloneSerializable(localPriceCoordinate);
+		IPriceCoordinate res = Util.cloneSerializable(localPriceCoordinate);
 		res.setTariffPK(Tariff.getPrimaryKey(newTariffID.organisationID, newTariffID.tariffID));
 		res.setCustomerGroupPK(CustomerGroup.getPrimaryKey(newCustomerGroupID.organisationID, newCustomerGroupID.customerGroupID));
 		return res;
 	}
 
 	/**
-	 * @return Returns a PriceCell which calculated or <tt>null</tt>.
+	 * @return Returns a PriceCell which is calculated or <tt>null</tt>.
 	 */
 	public PriceCell calculatePriceCell(
 			NestedProductType packagedProductType, PriceFragmentType priceFragmentType,
 			IPriceCoordinate localPriceCoordinate)
 	throws PriceCalculationException
-//		throws ModuleException
 	{
 		ProductType innerProductType = packagedProductType.getInnerProductType();
 
@@ -474,24 +459,28 @@ public class PriceCalculator
 		else {
 			innerPriceConfig = innerProductType.getInnerPriceConfig();
 
-//		if (innerPriceConfig instanceof FormulaPriceConfig) {
-			IFormulaPriceConfig innerFPC = (IFormulaPriceConfig)innerPriceConfig;
-			IResultPriceConfig stablePriceConfig = (IResultPriceConfig) innerFPC.getPackagingResultPriceConfig(
-					innerProductType.getPrimaryKey(), packageProductType.getPrimaryKey(), true);
-//			StablePriceConfig stablePriceConfig = (StablePriceConfig) tempResultPriceConfigs.get(innerProductInfo.getPrimaryKey());
-			PriceCell innerPriceCell = stablePriceConfig.createPriceCell(localPriceCoordinate);
+			if (innerPriceConfig != null) {
+				IFormulaPriceConfig innerFPC = (IFormulaPriceConfig)innerPriceConfig;
+				IResultPriceConfig stablePriceConfig = (IResultPriceConfig) innerFPC.getPackagingResultPriceConfig(
+						innerProductType.getPrimaryKey(), packageProductType.getPrimaryKey(), true);
 
-			FormulaCell innerFormulaCell = innerFPC.getFormulaCell(localPriceCoordinate, false);
-			if (innerFormulaCell != null && innerFormulaCell.getFormula(priceFragmentType) == null)
-				innerFormulaCell = null;
+				PriceCell innerPriceCell = stablePriceConfig.createPriceCell(localPriceCoordinate);
 
-			if (innerFormulaCell == null)
-				innerFormulaCell = innerFPC.getFallbackFormulaCell(false);
+				FormulaCell innerFormulaCell = innerFPC.getFormulaCell(localPriceCoordinate, false);
+				if (innerFormulaCell != null && innerFormulaCell.getFormula(priceFragmentType) == null)
+					innerFormulaCell = null;
 
-			calculatePriceCell(
-					innerFormulaCell, innerPriceCell, packagedProductType, priceFragmentType);
-			return innerPriceCell;
+				if (innerFormulaCell == null)
+					innerFormulaCell = innerFPC.getFallbackFormulaCell(false);
+
+				calculatePriceCell(
+						innerFormulaCell, innerPriceCell, packagedProductType, priceFragmentType);
+				return innerPriceCell;
+			}
 		}
+
+		if (innerPriceConfig == null)
+			return null;
 
 		if (innerPriceConfig instanceof IResultPriceConfig) {
 			IResultPriceConfig innerTPC = (IResultPriceConfig)innerPriceConfig;
@@ -546,8 +535,7 @@ public class PriceCalculator
 			return null;
 
 		StringBuffer sb = new StringBuffer();
-		for (Iterator it = packages.iterator(); it.hasNext();) {
-			Package pakkage = (Package) it.next();
+		for (Package pakkage : packages) {
 			if (sb.length() != 0)
 				sb.append(", ");
 
@@ -588,8 +576,8 @@ public class PriceCalculator
 			return null;
 
 		StringBuffer sb = new StringBuffer();
-		for (Iterator it = classes.iterator(); it.hasNext();) {
-			Class clazz = (Class) it.next();
+		for (Iterator<Class<?>> it = classes.iterator(); it.hasNext();) {
+			Class<?> clazz = it.next();
 			if (sb.length() != 0)
 				sb.append(", ");
 

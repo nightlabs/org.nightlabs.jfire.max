@@ -40,7 +40,7 @@ public interface IResultPriceConfig extends IPackagePriceConfig
 	void adoptParameters(IPriceConfig priceConfig);
 	PriceCell createPriceCell(IPriceCoordinate priceCoordinate);
 	PriceCell getPriceCell(IPriceCoordinate priceCoordinate, boolean throwExceptionIfNotExistent);
-	Collection getPriceCells();
+	Collection<PriceCell> getPriceCells();
 
 //	Collection getCustomerGroups();
 //	void addCustomerGroup(CustomerGroup customerGroup);

@@ -790,7 +790,7 @@ implements
 	 *
 	 * @return Returns either the same as {@link #getNestedProductTypes()} or adds <code>this</code> to the result.
 	 */
-	public Collection getNestedProductTypes(boolean includeSelfForVirtualSelfPackaging)
+	public Collection<NestedProductType> getNestedProductTypes(boolean includeSelfForVirtualSelfPackaging)
 	{
 		if (!includeSelfForVirtualSelfPackaging || isPackageInner() || getInnerPriceConfig() == null)
 			return getNestedProductTypes();

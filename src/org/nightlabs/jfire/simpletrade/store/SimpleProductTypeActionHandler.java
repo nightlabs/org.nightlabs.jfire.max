@@ -63,21 +63,6 @@ public class SimpleProductTypeActionHandler
 	public Collection<? extends Product> findProducts(User user,
 			ProductType productType, NestedProductType nestedProductType, ProductLocator productLocator)
 	{
-//		Tobias: WTF?!?!
-//		System.out.println("**********************************************************************");
-//		System.out.println("**********************************************************************");
-//		System.out.println("**********************************************************************");
-//		System.out.println("**********************************************************************");
-//		System.out.println("**********************************************************************");
-//		System.out.println("**********************************************************************");
-//		System.out.println("**********************************************************************");
-//		System.out.println("**********************************************************************");
-//		System.out.println("**********************************************************************");
-//		System.out.println("######################################################################");
-//		System.out.println("######################################################################");
-//		System.out.println("######################################################################");
-//		System.out.println("######################################################################");
-//		System.out.println("######################################################################");
 		SimpleProductType spt = (SimpleProductType) productType;
 		SimpleProductTypeLocal sptl = (SimpleProductTypeLocal) productType.getProductTypeLocal();
 		int qty = nestedProductType == null ? 1 : nestedProductType.getQuantity();

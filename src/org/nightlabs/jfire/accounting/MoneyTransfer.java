@@ -40,12 +40,16 @@ import org.nightlabs.jfire.transfer.Transfer;
  *		table="JFireTrade_MoneyTransfer"
  *
  * @jdo.inheritance strategy="new-table"
+ * 
+ * @jdo.fetch-group name="MoneyTransfer.currency" fields="currency"
  */
 public class MoneyTransfer extends Transfer
 {
 	private static final long serialVersionUID = 1L;
 
 	public static final String TRANSFERTYPEID = "MoneyTransfer";
+	
+	public static final String FETCH_GROUP_CURRENCY = "MoneyTransfer.currency";
 
 	/**
 	 * @jdo.field persistence-modifier="persistent"

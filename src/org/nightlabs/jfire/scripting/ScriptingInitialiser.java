@@ -137,7 +137,7 @@ public class ScriptingInitialiser
 	}
 	
 	/**
-	 * @param scriptSubDir This is the relative directory under the deploy base directory (e.g. "IpanemaTicketing.ear/script/Ticket")
+	 * @param scriptSubDir This is the relative directory under the deploy base directory (e.g. "CrossTicketTrade.ear/script/Ticket")
 	 * @param baseCategory All directories/files within the scriptSubDir will be created as sub-categories/scripts of this category.
 	 * @param jfsm
 	 * @param pm

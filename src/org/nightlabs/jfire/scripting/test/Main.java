@@ -95,7 +95,7 @@ public class Main {
 	{
 		ScriptRegistryItemID scriptID = getScriptRegistryItemID(TEST);
 		String scriptIDString = scriptID.toString();
-		String objectIDString = "jdo/org.nightlabs.jfire.scripting.id.ScriptRegistryItemID?organisationID=devil.nightlabs.org&scriptRegistryItemType=IpanemaTicketing-Type-Ticket&scriptRegistryItemID=Test";
+		String objectIDString = "jdo/org.nightlabs.jfire.scripting.id.ScriptRegistryItemID?organisationID=devil.nightlabs.org&scriptRegistryItemType=CrossTicketTrade-Type-Ticket&scriptRegistryItemID=Test";
 		Object objectID = ObjectIDUtil.createObjectID(objectIDString);
 		boolean idEquals = objectID.equals(scriptID);
 		boolean stringEquals = scriptIDString.equals(objectIDString);
@@ -163,7 +163,7 @@ public class Main {
 	private static ScriptRegistryItemID getScriptRegistryItemID(String scriptIDName) 
 	{
 		String organisationID = "devil.nightlabs.org";
-		String scriptType = "IpanemaTicketing-Type-Ticket";
+		String scriptType = "CrossTicketTrade-Type-Ticket";
 		return ScriptRegistryItemID.create(organisationID, scriptType, scriptIDName);
 	}
 		

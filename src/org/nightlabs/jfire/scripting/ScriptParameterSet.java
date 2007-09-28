@@ -30,20 +30,16 @@ import java.io.Serializable;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.SortedSet;
 import java.util.TreeSet;
 
-import javax.jdo.JDOHelper;
 import javax.jdo.PersistenceManager;
 import javax.jdo.Query;
-import javax.jdo.listener.StoreCallback;
 
 import org.nightlabs.jdo.ObjectIDUtil;
-import org.nightlabs.util.CollectionUtil;
 
 /**
  * A ScriptParameterSet can only be manipulated by the owner organisation. Hence, it contains
@@ -120,12 +116,12 @@ import org.nightlabs.util.CollectionUtil;
 	 *		dependent-element="true"
 	 */
 	private List<ScriptParameter> orderedParameters;
-	
+
 	/**
-	 * @jdo.field persistence-modifier="persistent"
+	 * @jdo.field persistence-modifier="persistent" mapped-by="scriptParameterSet" dependent="true"
 	 */
 	private ScriptParameterSetName name;
-	
+
 	/**
 	 * @jdo.field persistence-modifier="persistent"
 	 */

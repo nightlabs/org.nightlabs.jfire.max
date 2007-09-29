@@ -18,7 +18,7 @@
 	<classpathentry sourcepath="/WORKSPACE/JFireTrade" path="WORKSPACE/JFireTrade/dist/JFireTrade.jar" kind="var"/>
 	<classpathentry sourcepath="/JDO2" path="JDO2" kind="var"/>
 	<classpathentry sourcepath="WORKSPACE/JFireBase/src" path="WORKSPACE/JFireBase/dist/JFireBase.jar" kind="var"/>
-	<classpathentry sourcepath="/WORKSPACE/org.nightlabs.base/src" path="WORKSPACE/NightLabsBase/dist/NightLabsBase.jar" kind="var"/>
+	<classpathentry sourcepath="/WORKSPACE/org.nightlabs.base.ui/src" path="WORKSPACE/NightLabsBase/dist/NightLabsBase.jar" kind="var"/>
 	<classpathentry sourcepath="/WORKSPACE/JFireServerManager/src" path="WORKSPACE/JFireServerManager/dist/JFireServerManager.jar" kind="var"/>
 	<classpathentry sourcepath="WORKSPACE/JFireBaseBean/src" path="WORKSPACE/JFireBaseBean/dist/JFireBaseBean.jar" kind="var"/>
 	<classpathentry path="LOG4J" kind="var"/>

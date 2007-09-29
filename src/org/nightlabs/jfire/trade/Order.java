@@ -311,7 +311,7 @@ implements Serializable, ArticleContainer, SegmentContainer, DetachCallback
 ////			at org.eclipse.ui.internal.Workbench.runUI(Workbench.java:1931)
 ////			at org.eclipse.ui.internal.Workbench.createAndRunWorkbench(Workbench.java:419)
 ////			at org.eclipse.ui.PlatformUI.createAndRunWorkbench(PlatformUI.java:149)
-////			at org.nightlabs.base.app.AbstractApplicationThread.run(AbstractApplicationThread.java:121)
+////			at org.nightlabs.base.ui.app.AbstractApplicationThread.run(AbstractApplicationThread.java:121)
 //
 //			Collection offers;
 //			try {

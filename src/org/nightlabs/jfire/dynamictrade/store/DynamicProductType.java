@@ -72,13 +72,13 @@ extends ProductType
 
 	public DynamicProductType(
 			String organisationID, String productTypeID,
-			ProductType extendedProductType, LegalEntity owner,
+			ProductType extendedProductType,
 			byte inheritanceNature,
 			byte packageNature)
 	{
 		super(
 				organisationID, productTypeID,
-				extendedProductType, owner,
+				extendedProductType,
 				inheritanceNature,
 				packageNature);
 	}

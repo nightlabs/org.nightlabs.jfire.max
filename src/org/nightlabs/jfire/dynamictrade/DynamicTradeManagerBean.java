@@ -149,11 +149,11 @@ implements SessionBean
 			DynamicProductType root = new DynamicProductType(
 					rootID.organisationID, rootID.productTypeID,
 					null,
-					store.getMandator(),
 					ProductType.INHERITANCE_NATURE_BRANCH,
 					ProductType.PACKAGE_NATURE_OUTER);
+			root.setOwner(store.getMandator());
 			root.getName().setText(Locale.ENGLISH.getLanguage(), LocalOrganisation.getLocalOrganisation(pm).getOrganisation().getPerson().getDisplayName());
-			root = (DynamicProductType) store.addProductType(user, root); // , DynamicProductTypeActionHandler.getDefaultHome(pm, root));
+			root = (DynamicProductType) store.addProductType(user, root);
 			root.setPackagePriceConfig(PackagePriceConfig.getPackagePriceConfig(pm));
 			root.setDeliveryConfiguration(deliveryConfiguration);
 			store.setProductTypeStatus_published(user, root);

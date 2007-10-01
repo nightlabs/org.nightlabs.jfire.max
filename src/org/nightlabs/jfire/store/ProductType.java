@@ -281,7 +281,7 @@ implements
 	private String primaryKey;
 
 	/**
-	 * @jdo.field persistence-modifier="persistent"
+	 * @jdo.field persistence-modifier="persistent" null-value="exception"
 	 */
 	private LegalEntity owner;
 
@@ -566,7 +566,7 @@ implements
 	 * @param extendedProductType The "parent" <code>ProductType</code> in the
 	 *		data-inheritance-tree. If this is <code>null</code> it will be considered being
 	 *		a root node.
-	 * @param owner The owner of this ProductType because an Organisation might
+	 * @!param owner The owner of this ProductType because an Organisation might
 	 *		sell <code>ProductType</code>s for another <code>LegalEntity</code> which has
 	 *		no own Organisation in the system. This can be <code>null</code>, if
 	 *		<code>extendedProductType</code> is defined. In this case, it will be set to
@@ -576,7 +576,7 @@ implements
 	public ProductType(
 			String organisationID, String productTypeID,
 			ProductType extendedProductType,
-			LegalEntity owner,
+//			LegalEntity owner,
 			byte inheritanceNature,
 			byte packageNature)
 	{
@@ -600,17 +600,19 @@ implements
 //		setNature(nature);
 		setExtendedProductType(extendedProductType);
 
-		if (owner == null) {
-			if (extendedProductType == null)
-				throw new IllegalStateException("owner and extendedProductType are both null! At least one of them must be defined!");
+//		if (owner == null) {
+//			if (extendedProductType == null)
+//				throw new IllegalStateException("owner and extendedProductType are both null! At least one of them must be defined!");
+//
+//			this.owner = extendedProductType.getOwner();
+//		}
+//		else
+//			this.owner = owner;
 
+		if (extendedProductType != null) {
+			this.deliveryConfiguration = extendedProductType.getDeliveryConfiguration();
 			this.owner = extendedProductType.getOwner();
 		}
-		else
-			this.owner = owner;
-
-		if (extendedProductType != null)
-			this.deliveryConfiguration = extendedProductType.getDeliveryConfiguration();
 
 		this.inheritanceNature = inheritanceNature;
 		this.packageNature = packageNature;

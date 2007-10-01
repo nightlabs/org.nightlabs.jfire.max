@@ -233,8 +233,9 @@ implements SessionBean
 			User user = User.getUser(pm, getPrincipal());
 			SimpleProductType rootSimpleProductType = new SimpleProductType(
 					organisationID, SimpleProductType.class.getName(),
-					null, store.getMandator(),
+					null,
 					ProductType.INHERITANCE_NATURE_BRANCH, ProductType.PACKAGE_NATURE_OUTER);
+			rootSimpleProductType.setOwner(store.getMandator());
 			rootSimpleProductType.getName().setText(Locale.ENGLISH.getLanguage(), LocalOrganisation.getLocalOrganisation(pm).getOrganisation().getPerson().getDisplayName());
 			rootSimpleProductType.setDeliveryConfiguration(deliveryConfiguration);
 			store.addProductType(user, rootSimpleProductType); // , SimpleProductTypeActionHandler.getDefaultHome(pm, rootSimpleProductType));

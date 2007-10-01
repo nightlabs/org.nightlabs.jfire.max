@@ -125,10 +125,10 @@ public class SimpleProductType extends ProductType
 	 * @see ProductType#ProductType(String, String, ProductType, LegalEntity, String)
 	 */
 	public SimpleProductType(String organisationID, String productTypeID,
-			ProductType extendedProductType, LegalEntity owner,
+			ProductType extendedProductType,
 			byte inheritanceNature, byte packageNature)
 	{
-		super(organisationID, productTypeID, extendedProductType, owner, inheritanceNature, packageNature);
+		super(organisationID, productTypeID, extendedProductType, inheritanceNature, packageNature);
 		this.structLocalScope = StructLocal.DEFAULT_SCOPE;
 		this.propertySet = new PropertySet(organisationID, IDGenerator.nextID(PropertySet.class), SimpleProductType.class.getName(), structLocalScope);
 //		this.name = new SimpleProductTypeName(this);

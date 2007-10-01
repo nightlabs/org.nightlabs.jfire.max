@@ -76,10 +76,10 @@ extends ProductType
 	protected VoucherType() { }
 
 	public VoucherType(String organisationID, String productTypeID,
-			ProductType extendedProductType, LegalEntity owner,
+			ProductType extendedProductType,
 			byte inheritanceNature, byte packageNature)
 	{
-		super(organisationID, productTypeID, extendedProductType, owner,
+		super(organisationID, productTypeID, extendedProductType,
 				inheritanceNature, packageNature);
 
 //		this.name = new VoucherTypeName(this);

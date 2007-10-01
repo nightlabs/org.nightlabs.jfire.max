@@ -206,9 +206,10 @@ implements SessionBean
 																				// accessing a field)
 			} catch (JDOObjectNotFoundException x) {
 				VoucherType rootVoucherType = new VoucherType(getOrganisationID(),
-						VoucherType.class.getName(), null, trader.getMandator(),
+						VoucherType.class.getName(), null,
 						ProductType.INHERITANCE_NATURE_BRANCH,
 						ProductType.PACKAGE_NATURE_OUTER);
+				rootVoucherType.setOwner(trader.getMandator());
 				rootVoucherType.getName().setText(Locale.ENGLISH.getLanguage(), LocalOrganisation.getLocalOrganisation(pm).getOrganisation().getPerson().getDisplayName());
 				rootVoucherType.setDeliveryConfiguration(deliveryConfiguration);
 				store.addProductType(user, rootVoucherType); // , VoucherTypeActionHandler.getDefaultHome(pm, rootVoucherType));

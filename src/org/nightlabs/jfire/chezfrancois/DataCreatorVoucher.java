@@ -49,7 +49,7 @@ public class DataCreatorVoucher
 		}
 
 		VoucherType pt = new VoucherType(
-				organisationID, productTypeID, parent, null, 
+				organisationID, productTypeID, parent, 
 				ProductType.INHERITANCE_NATURE_BRANCH, ProductType.PACKAGE_NATURE_OUTER);
 		setNames(pt.getName(), names);
 
@@ -85,7 +85,7 @@ public class DataCreatorVoucher
 			category = rootVoucherType;
 
 		VoucherType pt = new VoucherType(
-				organisationID, productTypeID, category, null, ProductType.INHERITANCE_NATURE_LEAF, ProductType.PACKAGE_NATURE_OUTER);
+				organisationID, productTypeID, category, ProductType.INHERITANCE_NATURE_LEAF, ProductType.PACKAGE_NATURE_OUTER);
 		setNames(pt.getName(), names);
 		if (packagePriceConfig != null) {
 			pt.getFieldMetaData("packagePriceConfig").setValueInherited(false);

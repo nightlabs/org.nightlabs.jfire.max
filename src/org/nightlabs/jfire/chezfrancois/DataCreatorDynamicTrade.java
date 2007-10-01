@@ -51,7 +51,7 @@ extends DataCreator
 		}
 
 		DynamicProductType pt = new DynamicProductType(
-				organisationID, productTypeID, parent, null, 
+				organisationID, productTypeID, parent,
 				ProductType.INHERITANCE_NATURE_BRANCH, ProductType.PACKAGE_NATURE_OUTER);
 		setNames(pt.getName(), names);
 
@@ -79,7 +79,7 @@ extends DataCreator
 			category = rootDynamicProductType;
 
 		DynamicProductType pt = new DynamicProductType(
-				organisationID, productTypeID, category, null, ProductType.INHERITANCE_NATURE_LEAF, ProductType.PACKAGE_NATURE_OUTER);
+				organisationID, productTypeID, category, ProductType.INHERITANCE_NATURE_LEAF, ProductType.PACKAGE_NATURE_OUTER);
 		setNames(pt.getName(), names);
 		pt.setPackagePriceConfig(new PackagePriceConfig(IDGenerator.getOrganisationID(), IDGenerator.nextID(PriceConfig.class)));
 		if (innerPriceConfig != null) {

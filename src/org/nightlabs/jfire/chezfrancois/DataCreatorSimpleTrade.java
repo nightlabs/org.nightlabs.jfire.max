@@ -96,7 +96,7 @@ extends DataCreator
 		}
 
 		SimpleProductType pt = new SimpleProductType(
-				organisationID, productTypeID, parent, null, 
+				organisationID, productTypeID, parent, 
 				ProductType.INHERITANCE_NATURE_BRANCH, ProductType.PACKAGE_NATURE_OUTER);
 		setNames(pt.getName(), names);
 
@@ -114,7 +114,7 @@ extends DataCreator
 			category = rootSimpleProductType;
 
 		SimpleProductType pt = new SimpleProductType(
-				organisationID, productTypeID, category, null, ProductType.INHERITANCE_NATURE_LEAF, ProductType.PACKAGE_NATURE_OUTER);
+				organisationID, productTypeID, category, ProductType.INHERITANCE_NATURE_LEAF, ProductType.PACKAGE_NATURE_OUTER);
 		setNames(pt.getName(), names);
 		pt.setPackagePriceConfig(new StablePriceConfig(IDGenerator.getOrganisationID(), IDGenerator.nextID(PriceConfig.class)));
 		pt.getFieldMetaData("innerPriceConfig").setValueInherited(false);

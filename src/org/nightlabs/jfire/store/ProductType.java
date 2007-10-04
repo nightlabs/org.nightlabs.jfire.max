@@ -245,15 +245,16 @@ implements
 	 * @param parentProductTypeID The <code>ProductType</code> of which to find all children or <code>null</code> to find all top-level-<code>ProductType</code>s.
 	 * @return Returns instances of <code>ProductType</code>.
 	 */
-	public static Collection getChildProductTypes(PersistenceManager pm, ProductTypeID parentProductTypeID)
+	@SuppressWarnings("unchecked")
+	public static Collection<ProductType> getChildProductTypes(PersistenceManager pm, ProductTypeID parentProductTypeID)
 	{
 		if (parentProductTypeID == null) {
 			Query q = pm.newNamedQuery(ProductType.class, "getChildProductTypes_topLevel");
-			return (Collection)q.execute();
+			return (Collection<ProductType>)q.execute();
 		}
 
 		Query q = pm.newNamedQuery(ProductType.class, "getChildProductTypes_hasParent");
-		return (Collection) q.execute(
+		return (Collection<ProductType>) q.execute(
 			parentProductTypeID.organisationID, parentProductTypeID.productTypeID);
 	}
 

@@ -181,7 +181,17 @@ public abstract class GridPriceConfig extends PriceConfig
 	{
 		return (Tariff) tariffs.remove(Tariff.getPrimaryKey(organisationID, tariffID));
 	}
-	
+
+	public void removeTariff(Tariff tariff)
+	{
+		tariffs.remove(Tariff.getPrimaryKey(tariff.getOrganisationID(), tariff.getTariffID()));
+	}
+
+	public void clearTariffs()
+	{
+		tariffs.clear();
+	}
+
 	/**
 	 * Calls {@link #adoptParameters(GridPriceConfig, boolean)} with <tt>onlyAdd=false</tt>.
 	 */

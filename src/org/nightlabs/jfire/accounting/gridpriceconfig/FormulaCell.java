@@ -54,6 +54,8 @@ import org.nightlabs.jfire.accounting.priceconfig.PriceConfig;
  */
 public class FormulaCell implements Serializable
 {
+	private static final long serialVersionUID = 1L;
+
 	public static final String FETCH_GROUP_PRICE_CONFIG = "FormulaCell.priceConfig";
 	public static final String FETCH_GROUP_PRICE_COORDINATE = "FormulaCell.priceCoordinate";
 	public static final String FETCH_GROUP_PRICE_FRAGMENT_FORMULAS = "FormulaCell.priceFragmentFormulas";
@@ -75,7 +77,7 @@ public class FormulaCell implements Serializable
 	 *
 	 * @jdo.join
 	 */
-	private Map priceFragmentFormulas = new HashMap();
+	private Map<String, String> priceFragmentFormulas;
 
 	/**
 	 * @jdo.field primary-key="true"
@@ -124,9 +126,11 @@ public class FormulaCell implements Serializable
 	 */
 	private PriceCoordinate priceCoordinate;
 
-	protected FormulaCell()
-	{
-	}
+	/**
+	 * @deprecated Only for JDO!
+	 */
+	protected FormulaCell() { }
+
 	/**
 	 * This constructor is used for the <tt>FormulaConfig.fallbackFormulaCell</tt>,
 	 * which doesn't have a <tt>PriceCoordinate</tt>.
@@ -140,6 +144,7 @@ public class FormulaCell implements Serializable
 		this.priceConfigID = priceConfig.getPriceConfigID();
 		this.formulaID = priceConfig.createPriceID();
 		this.priceCoordinate = null;
+		this.priceFragmentFormulas = new HashMap<String, String>();
 	}
 	public FormulaCell(PriceCoordinate priceCoordinate)
 	{
@@ -148,6 +153,7 @@ public class FormulaCell implements Serializable
 		this.priceConfigID = priceConfig.getPriceConfigID();
 		this.formulaID = priceConfig.createPriceID();
 		this.priceCoordinate = priceCoordinate;
+		this.priceFragmentFormulas = new HashMap<String, String>();
 	}
 	/**
 	 * @return Returns the organisationID.
@@ -187,6 +193,10 @@ public class FormulaCell implements Serializable
 	public boolean isEmpty()
 	{
 		return priceFragmentFormulas.isEmpty();
+	}
+	public void clear()
+	{
+		priceFragmentFormulas.clear();
 	}
 	public String getFormula(PriceFragmentType priceFragmentType)
 	{

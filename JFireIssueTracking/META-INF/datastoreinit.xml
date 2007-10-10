@@ -1,18 +1,3 @@
 <!DOCTYPE datastore-initialisation
 		PUBLIC "-//NightLabs GmbH//DTD Datastore Initialisation 1.2//EN"
 		"http://www.nightlabs.de/dtd/datastoreinit_1_2.dtd">
-<datastore-initialisation>
-	<init bean="jfire/ejb/JFireGeography/GeographyManager" method="initialise"/>
-	<init bean="jfire/ejb/JFireGeography/GeographyTemplateDataManager" method="initialise">
-		<depends
-			module="JFireGeography.ear"
-			archive="JFireGeography.jar"
-			bean="jfire/ejb/JFireGeography/GeographyManager"
-			method="initialise"
-		/>
-	</init>
-	<init
-		bean="jfire/ejb/JFireGeography/GeographyTemplateDataManager"
-		method="initialiseJDOLifecycleListeners"
-		priority="980" />
-</datastore-initialisation>

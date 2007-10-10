@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<classpath>
+	<classpathentry kind="src" path="src"/>
+	<classpathentry kind="src" path="ejbsrc"/>
+	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER"/>
+	<classpathentry kind="var" path="JDK_TOOLS"/>
+	<classpathentry kind="var" path="JBOSS/bin/run.jar"/>
+	<classpathentry kind="var" path="JBOSS/bin/shutdown.jar"/>
+	<classpathentry kind="var" path="JBOSS/client/jboss-j2ee.jar"/>
+	<classpathentry kind="var" path="JBOSS/lib/concurrent.jar"/>
+	<classpathentry kind="var" path="JBOSS/lib/jboss-system.jar"/>
+	<classpathentry kind="var" path="JBOSS/server/default/lib/bcel.jar"/>
+	<classpathentry kind="var" path="JBOSS/server/default/lib/jboss.jar"/>
+	<classpathentry kind="var" path="JBOSS/server/default/lib/jboss-transaction.jar"/>
+	<classpathentry kind="var" path="JBOSS/server/default/lib/jnpserver.jar"/>
+	<classpathentry kind="var" path="JBOSS/server/default/lib/jpl-pattern.jar"/>
+	<classpathentry kind="var" path="JBOSS/server/default/lib/jpl-util.jar"/>
+	<classpathentry kind="var" path="LOG4J"/>
+	<classpathentry kind="var" path="JDO2" sourcepath="/JDO2_SRC"/>
+	<classpathentry kind="var" path="JPOX" sourcepath="JPOX_SRC"/>
+	<classpathentry kind="var" path="WORKSPACE/NightLabsBase/dist/NightLabsBase.jar" sourcepath="WORKSPACE/NightLabsBase/src"/>
+	<classpathentry kind="var" path="WORKSPACE/NightLabsJDO/dist/NightLabsJDO.jar" sourcepath="WORKSPACE/NightLabsJDO/src"/>
+	<classpathentry kind="var" path="WORKSPACE/JFireBase/dist/JFireBase.jar" sourcepath="WORKSPACE/JFireBase/src"/>
+	<classpathentry kind="var" path="WORKSPACE/JFireBaseBean/dist/JFireBaseBean.jar" sourcepath="/WORKSPACE/JFireBaseBean/src"/>
+	<classpathentry kind="var" path="WORKSPACE/JFireServerManager/dist/JFireServerManager.jar"/>
+	<classpathentry kind="var" path="RHINO" sourcepath="/RHINO_SRC"/>
+	<classpathentry kind="var" path="JPOXENHANCER"/>
+	<classpathentry kind="var" path="APACHE_COMMONS/commons-lang.jar"/>
+	<classpathentry kind="var" path="WORKSPACE/JFireJbpm/dist/JFireJbpm.jar" sourcepath="/WORKSPACE/JFireJbpm/src"/>
+	<classpathentry kind="var" path="WORKSPACE/JFireJbpm/lib/jbpm/jbpm-3.1.4.jar"/>
+	<classpathentry kind="var" path="WORKSPACE/JFireBaseClientLib/dist/JFireBaseClientLib.jar"/>
+	<classpathentry kind="var" path="WORKSPACE/JFireBaseDAO/dist/JFireBaseDAO.jar"/>
+	<classpathentry kind="output" path="bin"/>
+</classpath>

@@ -1,0 +1,15 @@
+<security-domain>java:/jaas/jfire</security-domain> 
+<container-configurations>
+	<container-configuration>
+		<!-- Use the standardjboss.xml container-name so we only have
+			to specify the elements we want to override -->
+		<container-name>Standard Stateful SessionBean</container-name>
+		<role-mapping-manager>java:/jaas/session-roles</role-mapping-manager>
+	</container-configuration>
+	<container-configuration>
+		<!-- Use the standardjboss.xml container-name so we only have
+			to specify the elements we want to override -->
+		<container-name>Standard Stateless SessionBean</container-name>
+		<role-mapping-manager>java:/jaas/session-roles</role-mapping-manager>
+	</container-configuration>
+</container-configurations>

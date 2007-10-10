@@ -44,7 +44,7 @@ import org.nightlabs.util.Utils;
  *		identity-type="application"
  *		objectid-class="org.nightlabs.jfire.issue.id.IssueID"
  *		detachable="true"
- *		table="JFireIssueTracker_Issue"
+ *		table="JFireIssueTracking_Issue"
  *
  * @jdo.inheritance strategy="new-table"
  *

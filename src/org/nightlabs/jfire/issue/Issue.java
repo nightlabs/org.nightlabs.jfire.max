@@ -33,6 +33,7 @@ import java.util.Date;
 import javax.jdo.JDOHelper;
 import javax.jdo.PersistenceManager;
 
+import org.apache.log4j.Logger;
 import org.nightlabs.jdo.ObjectIDUtil;
 import org.nightlabs.jfire.security.User;
 import org.nightlabs.util.Utils;
@@ -57,6 +58,10 @@ import org.nightlabs.util.Utils;
 public class Issue
 implements Serializable
 {
+	
+	private static final long serialVersionUID = 1L;
+	private static final Logger logger = Logger.getLogger(Issue.class);
+	
 	/**
 	 * @jdo.field primary-key="true"
 	 * @jdo.column length="100"
@@ -71,6 +76,7 @@ implements Serializable
 
 	/**
 	 * @jdo.field primary-key="true"
+	 * @jdo.column length="100"
 	 */
 	private long issueTypeID;
 
@@ -94,6 +100,35 @@ implements Serializable
 
 	public String getOrganisationID() {
 		return organisationID;
+	}
+
+	
+	public String getIssueID() {
+		return issueID;
+	}
+
+	public void setIssueID(String issueID) {
+		this.issueID = issueID;
+	}
+
+	public long getIssueTypeID() {
+		return issueTypeID;
+	}
+
+	public void setIssueTypeID(long issueTypeID) {
+		this.issueTypeID = issueTypeID;
+	}
+
+	public Date getTimestamp() {
+		return timestamp;
+	}
+
+	public void setTimestamp(Date timestamp) {
+		this.timestamp = timestamp;
+	}
+
+	public void setOrganisationID(String organisationID) {
+		this.organisationID = organisationID;
 	}
 
 	public static String getPrimaryKey(String organisationID, String deliveryNoteIDPrefix, long deliveryNoteID)

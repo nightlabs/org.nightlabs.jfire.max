@@ -26,6 +26,7 @@ public class IssueManagerBean
 extends BaseSessionBeanImpl
 implements SessionBean{
 
+	private static final long serialVersionUID = 1L;
 	/**
 	 * LOG4J logger used by this class
 	 */
@@ -71,6 +72,11 @@ implements SessionBean{
 		logger.debug(this.getClass().getName() + ".ejbPassivate()");
 	}
 
+	/**
+	 * @ejb.interface-method
+	 * @ejb.transaction type="Required"
+	 * @ejb.permission role-name="_Guest_"
+	 */
 	public Issue storeIssue(Issue issue, boolean get, String[] fetchGroups, int maxFetchDepth){
 		PersistenceManager pm = getPersistenceManager();
 		try {

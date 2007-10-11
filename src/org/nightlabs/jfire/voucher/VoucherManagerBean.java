@@ -57,6 +57,7 @@ import org.nightlabs.jfire.scripting.ScriptRegistry;
 import org.nightlabs.jfire.scripting.ScriptRegistryItem;
 import org.nightlabs.jfire.scripting.id.ScriptRegistryItemID;
 import org.nightlabs.jfire.security.User;
+import org.nightlabs.jfire.servermanager.JFireServerManager;
 import org.nightlabs.jfire.store.CannotConfirmProductTypeException;
 import org.nightlabs.jfire.store.DeliveryNote;
 import org.nightlabs.jfire.store.NestedProductType;
@@ -155,9 +156,10 @@ implements SessionBean
 	 */
 	public void initialise() throws Exception {
 		PersistenceManager pm = getPersistenceManager();
+		JFireServerManager jsm = getJFireServerManager();
 		try {
 			// init scripts
-			new ScriptingInitialiser(getJFireServerManager(), pm,
+			new ScriptingInitialiser(jsm, pm,
 					Organisation.DEVIL_ORGANISATION_ID).initialise(); // this is a
 																														// throw-away-instance
  
@@ -256,6 +258,7 @@ implements SessionBean
 			logger.info("Initialization of JFireVoucher done!");
 		} finally {
 			pm.close();
+			jsm.close();
 		}
 	}
 

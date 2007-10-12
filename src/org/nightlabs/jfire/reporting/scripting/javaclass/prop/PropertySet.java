@@ -19,8 +19,8 @@ import org.apache.log4j.Logger;
 import org.eclipse.birt.report.model.css.Property;
 import org.eclipse.datatools.connectivity.oda.IResultSetMetaData;
 import org.nightlabs.jdo.NLJDOHelper;
-import org.nightlabs.jfire.prop.AbstractDataField;
-import org.nightlabs.jfire.prop.AbstractStructField;
+import org.nightlabs.jfire.prop.DataField;
+import org.nightlabs.jfire.prop.StructField;
 import org.nightlabs.jfire.prop.IStruct;
 import org.nightlabs.jfire.prop.StructBlock;
 import org.nightlabs.jfire.prop.StructLocal;
@@ -95,13 +95,13 @@ extends AbstractJFSScriptExecutorDelegate
 			}
 			for (Iterator iter = sortedBlocks.values().iterator(); iter.hasNext();) {			
 				StructBlock structBlock = (StructBlock) iter.next();
-				SortedMap<String, AbstractStructField> sortedFields = new TreeMap<String, AbstractStructField>();				
+				SortedMap<String, StructField> sortedFields = new TreeMap<String, StructField>();				
 				for (Iterator iterator = structBlock.getStructFields().iterator(); iterator.hasNext();) {
-					AbstractStructField structField = (AbstractStructField) iterator.next();
+					StructField structField = (StructField) iterator.next();
 					sortedFields.put(structField.getPrimaryKey(), structField);
 				}
 				for (Iterator iterator = sortedFields.values().iterator(); iterator.hasNext();) {
-					AbstractStructField structField = (AbstractStructField) iterator.next();
+					StructField structField = (StructField) iterator.next();
 					if (structField instanceof NumberStructField) {
 						NumberStructField numberStructField = (NumberStructField) structField;
 						if (numberStructField.isInteger())
@@ -159,14 +159,14 @@ extends AbstractJFSScriptExecutorDelegate
 		}		
 		for (Iterator iter = sortedBlocks.values().iterator(); iter.hasNext();) {			
 			StructBlock structBlock = (StructBlock) iter.next();
-			SortedMap<String, AbstractStructField> sortedFields = new TreeMap<String, AbstractStructField>();
+			SortedMap<String, StructField> sortedFields = new TreeMap<String, StructField>();
 			for (Iterator iterator = structBlock.getStructFields().iterator(); iterator.hasNext();) {
-				AbstractStructField structField = (AbstractStructField) iterator.next();
+				StructField structField = (StructField) iterator.next();
 				sortedFields.put(structField.getPrimaryKey(), structField);
 			}
 			for (Iterator iterator = sortedFields.values().iterator(); iterator.hasNext();) {
-				AbstractStructField structField = (AbstractStructField) iterator.next();
-				AbstractDataField field;
+				StructField structField = (StructField) iterator.next();
+				DataField field;
 				try {
 					field = property.getDataField((StructFieldID)JDOHelper.getObjectId(structField));
 				} catch (Exception e) {

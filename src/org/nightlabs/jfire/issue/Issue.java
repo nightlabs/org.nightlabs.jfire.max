@@ -50,9 +50,16 @@ import org.nightlabs.util.Utils;
  * @jdo.inheritance strategy="new-table"
  *
  * @jdo.create-objectid-class
- *		field-order="organisationID, issueID, issueTypeID"
+ *		field-order="organisationID, issueID"
+ * 
+ * @jdo.query
+ *		name="getIssuesByType"
+ *		query="SELECT
+ *			WHERE this.issueType == paramIssueType                    
+ *			PARAMETERS String paramIssueType
+ *			import java.lang.String"
  *
- * jdo.fetch-group name="Issue.createUser" fields="createUser"
+ * @jdo.fetch-group name="Issue.this" fetch-groups="default" fields="description"
  *
  **/
 public class Issue
@@ -75,16 +82,26 @@ implements Serializable
 	private String issueID;
 
 	/**
-	 * @jdo.field primary-key="true"
+	 * @jdo.field persistence-modifier="persistent"
 	 * @jdo.column length="100"
 	 */
 	private long issueTypeID;
 
-
+	/**
+	 * @jdo.field persistence-modifier="persistent"
+	 * @jdo.column length="100"
+	 */
+	private String description;
+	
+	/**
+	 * @jdo.field persistence-modifier="persistent" load-fetch-group="all"
+	 */
+	private User user; 
+	
 	/**
 	 * @jdo.field persistence-modifier="persistent"
 	 */
-	private Date timestamp;
+	private Date createTimestamp;
 
 	/**
 	 * @deprecated Constructor exists only for JDO! 
@@ -98,35 +115,86 @@ implements Serializable
 
 	}
 
+	/**
+	 * @return Returns the organisationID.
+	 */
 	public String getOrganisationID() {
 		return organisationID;
 	}
 
-	
+	/**
+	 * @return Returns the issueID.
+	 */
 	public String getIssueID() {
 		return issueID;
 	}
 
+	/**
+	 * @param issueID The issueID to set.
+	 */
 	public void setIssueID(String issueID) {
 		this.issueID = issueID;
 	}
 
+	/**
+	 * @return Returns the issueTypeID.
+	 */
 	public long getIssueTypeID() {
 		return issueTypeID;
 	}
 
+	/**
+	 * @param issueTypeID The issueTypeID to set.
+	 */
 	public void setIssueTypeID(long issueTypeID) {
 		this.issueTypeID = issueTypeID;
 	}
 
-	public Date getTimestamp() {
-		return timestamp;
+	/**
+	 * @return Returns the create timestamp.
+	 */
+	public Date getCreateTimestamp() {
+		return createTimestamp;
+	}
+	
+	/**
+	 * @param timestamp The timestamp to set.
+	 */
+	public void setCreateTimestamp(Date timestamp) {
+		this.createTimestamp = timestamp;
+	}
+	
+	/**
+	 * @return Returns the description.
+	 */
+	public String getDescription() {
+		return description;
 	}
 
-	public void setTimestamp(Date timestamp) {
-		this.timestamp = timestamp;
+	/**
+	 * @param description The description to set.
+	 */
+	public void setDescription(String description) {
+		this.description = description;
 	}
 
+	/**
+	 * @return Returns the user.
+	 */
+	public User getUser() {
+		return user;
+	}
+
+	/**
+	 * @param user The user to set.
+	 */
+	public void setUser(User user) {
+		this.user = user;
+	}
+
+	/**
+	 * @param organisationID The organisationID to set.
+	 */
 	public void setOrganisationID(String organisationID) {
 		this.organisationID = organisationID;
 	}

@@ -29,12 +29,12 @@ package org.nightlabs.jfire.issue;
 import java.io.Serializable;
 import java.util.Collection;
 import java.util.Date;
+import java.util.Set;
 
 import javax.jdo.JDOHelper;
 import javax.jdo.PersistenceManager;
 
 import org.apache.log4j.Logger;
-import org.nightlabs.jdo.ObjectIDUtil;
 import org.nightlabs.jfire.security.User;
 import org.nightlabs.util.Utils;
 
@@ -51,7 +51,8 @@ import org.nightlabs.util.Utils;
  *
  * @jdo.create-objectid-class
  *		field-order="organisationID, issueID"
- * 
+ *		include-body="id/IssueID.body.inc"
+ *
  * @jdo.query
  *		name="getIssuesByType"
  *		query="SELECT
@@ -87,6 +88,17 @@ implements Serializable
 	 */
 	private long issueTypeID;
 
+	/**
+	 * value: {@link String}
+	 *
+	 * @jdo.field
+	 *		persistence-modifier="persistent"
+	 *		collection-type="collection"
+	 *		element-type="java.lang.String"
+	 *		dependent-element="true"
+	 */
+	private Set<String> documents;	
+	
 	/**
 	 * @jdo.field persistence-modifier="persistent"
 	 * @jdo.column length="100"
@@ -199,16 +211,6 @@ implements Serializable
 		this.organisationID = organisationID;
 	}
 
-	public static String getPrimaryKey(String organisationID, String deliveryNoteIDPrefix, long deliveryNoteID)
-	{
-		return organisationID + '/' + deliveryNoteIDPrefix + '/' + ObjectIDUtil.longObjectIDFieldToString(deliveryNoteID);
-	}
-
-	public String getPrimaryKey()
-	{
-		return ""/*primaryKey*/;
-	}
-
 	protected PersistenceManager getPersistenceManager()
 	{
 		PersistenceManager pm = JDOHelper.getPersistenceManager(this);
@@ -247,5 +249,19 @@ implements Serializable
 	{
 		return
 		Utils.hashCode(this.organisationID); //^
+	}
+	
+	/**
+	 * @jdo.field persistence-modifier="persistent"
+	 */
+	private String primaryKey;
+	
+	public static String getPrimaryKey(String organisationID, String issueID)
+	{
+		return organisationID + '/' + issueID;
+	}
+	public String getPrimaryKey()
+	{
+		return primaryKey;
 	}
 }

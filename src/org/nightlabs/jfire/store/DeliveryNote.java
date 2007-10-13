@@ -63,7 +63,7 @@ import org.nightlabs.jfire.transfer.Anchor;
 import org.nightlabs.jfire.transfer.Transfer;
 import org.nightlabs.jfire.transfer.id.AnchorID;
 import org.nightlabs.util.CollectionUtil;
-import org.nightlabs.util.Utils;
+import org.nightlabs.util.Util;
 
 /**
  * @author Alexander Bieber <!-- alex at nightlabs dot de -->
@@ -642,8 +642,8 @@ implements Serializable, ArticleContainer, Statable, DetachCallback
 		DeliveryNote o = (DeliveryNote) obj;
 
 		return
-				Utils.equals(this.organisationID, o.organisationID) && 
-				Utils.equals(this.deliveryNoteIDPrefix, o.deliveryNoteIDPrefix) &&
+				Util.equals(this.organisationID, o.organisationID) && 
+				Util.equals(this.deliveryNoteIDPrefix, o.deliveryNoteIDPrefix) &&
 				this.deliveryNoteID == o.deliveryNoteID;
 	}
 
@@ -651,9 +651,9 @@ implements Serializable, ArticleContainer, Statable, DetachCallback
 	public int hashCode()
 	{
 		return
-				Utils.hashCode(this.organisationID) ^ 
-				Utils.hashCode(this.deliveryNoteIDPrefix) ^
-				Utils.hashCode(this.deliveryNoteID);
+				Util.hashCode(this.organisationID) ^ 
+				Util.hashCode(this.deliveryNoteIDPrefix) ^
+				Util.hashCode(this.deliveryNoteID);
 	}
 
 

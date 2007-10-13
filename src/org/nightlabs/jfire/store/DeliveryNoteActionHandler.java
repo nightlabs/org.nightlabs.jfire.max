@@ -10,7 +10,7 @@ import org.nightlabs.jfire.store.deliver.Delivery;
 import org.nightlabs.jfire.store.deliver.DeliveryData;
 import org.nightlabs.jfire.store.deliver.DeliveryException;
 import org.nightlabs.jfire.store.deliver.ServerDeliveryProcessor;
-import org.nightlabs.util.Utils;
+import org.nightlabs.util.Util;
 
 
 /**
@@ -150,13 +150,13 @@ public class DeliveryNoteActionHandler implements Serializable
 		DeliveryNoteActionHandler o = (DeliveryNoteActionHandler) obj;
 
 		return
-				Utils.equals(this.organisationID, o.organisationID) &&
-				Utils.equals(this.deliveryNoteActionHandlerID, o.deliveryNoteActionHandlerID);
+				Util.equals(this.organisationID, o.organisationID) &&
+				Util.equals(this.deliveryNoteActionHandlerID, o.deliveryNoteActionHandlerID);
 	}
 
 	@Override
 	public int hashCode()
 	{
-		return Utils.hashCode(organisationID) ^ Utils.hashCode(deliveryNoteActionHandlerID);
+		return Util.hashCode(organisationID) ^ Util.hashCode(deliveryNoteActionHandlerID);
 	}
 }

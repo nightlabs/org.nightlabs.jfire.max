@@ -282,7 +282,8 @@ implements
 	private String primaryKey;
 
 	/**
-	 * @jdo.field persistence-modifier="persistent" null-value="exception"
+	 * @jdo.field persistence-modifier="persistent"
+	 * // TODO JPOX WORKAROUND should be null-value="exception", but causes problems in replication 
 	 */
 	private LegalEntity owner;
 

@@ -29,7 +29,6 @@ package org.nightlabs.jfire.trade;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.Map;
 
 import org.nightlabs.jfire.store.ProductType;
@@ -61,34 +60,34 @@ public class ArticleSegmentGroup
 		return articleSegmentGroups;
 	}
 
-	public synchronized ArticleCarrier addArticle(Article article)
+	public ArticleCarrier addArticle(Article article, boolean filterExisting) // better not synchronized to avoid deadlocks
 	{
 		ArticleProductTypeClassGroup aptg = createArticleProductTypeClassGroup(article.getProductType().getClass());
-		return aptg.addArticle(article);
+		return aptg.addArticle(article, filterExisting);
 	}
 
-	public synchronized void removeArticle(Article article)
+	public void removeArticle(Article article)
 	{
 		ArticleProductTypeClassGroup aptg = getArticleProductTypeClassGroup(article.getProductType(), false);
 		if (aptg != null)
 			aptg.removeArticle(article);
 	}
 
-	public synchronized void addArticles(Collection articles)
-	{
-		for (Iterator it = articles.iterator(); it.hasNext(); ) {
-			Article article = (Article)it.next();
-			addArticle(article);
-		}
-	}
-
-	public synchronized void removeArticles(Collection articles)
-	{
-		for (Iterator it = articles.iterator(); it.hasNext(); ) {
-			Article article = (Article)it.next();
-			removeArticle(article);
-		}
-	}
+//	public synchronized void addArticles(Collection<? extends Article> articles, boolean filterExisting)
+//	{
+//		for (Iterator<? extends Article> it = articles.iterator(); it.hasNext(); ) {
+//			Article article = (Article)it.next();
+//			addArticle(article, filterExisting);
+//		}
+//	}
+//
+//	public synchronized void removeArticles(Collection<? extends Article> articles)
+//	{
+//		for (Iterator<? extends Article> it = articles.iterator(); it.hasNext(); ) {
+//			Article article = (Article)it.next();
+//			removeArticle(article);
+//		}
+//	}
 
 	/**
 	 * @return Returns the segment.
@@ -127,7 +126,7 @@ public class ArticleSegmentGroup
 	 * Called internally and must return a new instance of <code>ArticleProductTypeClassGroup</code>. You
 	 * can override this method, if you want to subclass <code>ArticleProductTypeClassGroup</code>.
 	 */
-	protected ArticleProductTypeClassGroup _createArticleProductTypeClassGroup(Class productTypeClass)
+	protected ArticleProductTypeClassGroup _createArticleProductTypeClassGroup(Class<? extends ProductType> productTypeClass)
 	{
 		return new ArticleProductTypeClassGroup(this, productTypeClass);
 	}
@@ -136,7 +135,7 @@ public class ArticleSegmentGroup
 	 * @param productType
 	 * @return a newly created group or an old one if already existent before
 	 */
-	public synchronized ArticleProductTypeClassGroup createArticleProductTypeClassGroup(Class productTypeClass)
+	public synchronized ArticleProductTypeClassGroup createArticleProductTypeClassGroup(Class<? extends ProductType> productTypeClass)
 	{
 		String productTypeClassName = productTypeClass.getName();
 

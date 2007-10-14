@@ -45,7 +45,7 @@ public class ArticleProductTypeClassGroup
 {
 	private ArticleSegmentGroup articleSegmentGroup;
 //	private String productTypeClassName;
-	private Class productTypeClass;
+	private Class<? extends ProductType> productTypeClass;
 
 	/**
 	 * key: String articlePK<br/>
@@ -60,7 +60,7 @@ public class ArticleProductTypeClassGroup
 //	 */
 //	private Set articles = null;
 
-	public ArticleProductTypeClassGroup(ArticleSegmentGroup articleSegmentGroup, Class productTypeClass)
+	public ArticleProductTypeClassGroup(ArticleSegmentGroup articleSegmentGroup, Class<? extends ProductType> productTypeClass)
 	{
 		this.articleSegmentGroup = articleSegmentGroup;
 		if (!ProductType.class.isAssignableFrom(productTypeClass))
@@ -85,7 +85,7 @@ public class ArticleProductTypeClassGroup
 	/**
 	 * @return Returns the productTypeClass.
 	 */
-	public Class getProductTypeClass()
+	public Class<? extends ProductType> getProductTypeClass()
 	{
 		return productTypeClass;
 	}
@@ -95,21 +95,33 @@ public class ArticleProductTypeClassGroup
 		getArticleSegmentGroup().getArticleSegmentGroups()._removeArticle(article);
 //		articles = null;
 	}
-	public void removeArticles(Collection articles)
+	public void removeArticles(Collection<? extends Article> articles)
 	{
-		for (Iterator it = articles.iterator(); it.hasNext(); )
+		for (Iterator<? extends Article> it = articles.iterator(); it.hasNext(); )
 			removeArticle((Article) it.next());
 	}
 	/**
 	 * Adds a single <tt>Article</tt>.
 	 *
 	 * @param article The instance to add.
+	 * @param filterExisting Whether or not to return <code>null</code> if the passed article already exists.
 	 * @return Returns the <code>ArticleCarrier</code> which is created by this method
-	 *		to wrap the given <code>Article</code>.
+	 *		to wrap the given <code>Article</code>. If the article already exists, this method replaces the article
+	 *		referenced by the existing ArticleCarrier. If <code>filterExisting</code> is <code>false</code>, it then returns the existing
+	 *		<code>ArticleCarrier</code>, if <code>filterExisting</code> is <code>true</code>, it returns <code>null</code>.
 	 */
-	public ArticleCarrier addArticle(Article article)
+	public synchronized ArticleCarrier addArticle(Article article, boolean filterExisting)
 	{
-		ArticleCarrier articleCarrier = new ArticleCarrier(this, article);
+		ArticleCarrier articleCarrier = articleCarriers.get(article.getPrimaryKey());
+		if (articleCarrier != null) {
+			articleCarrier.setArticle(article);
+			if (filterExisting)
+				return null;
+
+			return articleCarrier;
+		}
+
+		articleCarrier = new ArticleCarrier(this, article);
 		articleCarriers.put(article.getPrimaryKey(), articleCarrier);
 		getArticleSegmentGroup().getArticleSegmentGroups()._addArticleCarrier(articleCarrier);
 //		articles = null;
@@ -119,16 +131,22 @@ public class ArticleProductTypeClassGroup
 	 * Adds a <tt>Collection</tt> of {@link Article}. <tt>null</tt> entries will silently
 	 * be ignored.
 	 * @param articles The instances to add.
+	 * @param filterExisting Whether or not to include previously existing ArticleCarriers (or only newly created ones).
 	 * @return Returns a <code>Collection</code> of {@link ArticleCarrier} - the ones that
-	 *		have been created by this method in order to wrap the given {@link Article}s.
+	 *		have been created by this method in order to wrap the given {@link Article}s. If <code>filterExisting</code>
+	 *		is <code>true</code>, the result will not contain <code>ArticleCarrier</code>s whose {@link Article}s already existed
+	 *		before. 
 	 */
-	public Collection<ArticleCarrier> addArticles(Collection articles)
+	public Collection<ArticleCarrier> addArticles(Collection<? extends Article> articles, boolean filterExisting)
 	{
 		Set<ArticleCarrier> articleCarriers = new HashSet<ArticleCarrier>(articles.size());
-		for (Iterator it = articles.iterator(); it.hasNext(); ) {
+		for (Iterator<? extends Article> it = articles.iterator(); it.hasNext(); ) {
 			Article article = (Article) it.next();
-			if (article != null)
-				articleCarriers.add(addArticle(article));
+			if (article != null) {
+				ArticleCarrier articleCarrier = addArticle(article, filterExisting);
+				if (articleCarrier != null)
+					articleCarriers.add(articleCarrier);
+			}
 		}
 		return articleCarriers;
 	}
@@ -138,7 +156,7 @@ public class ArticleProductTypeClassGroup
 	public Collection<Article> getArticles()
 	{
 		Set<Article> s = new HashSet<Article>(articleCarriers.size());
-		for (Iterator it = articleCarriers.values().iterator(); it.hasNext();) {
+		for (Iterator<ArticleCarrier> it = articleCarriers.values().iterator(); it.hasNext();) {
 			ArticleCarrier articleCarrier = (ArticleCarrier) it.next();
 			s.add(articleCarrier.getArticle());
 		}

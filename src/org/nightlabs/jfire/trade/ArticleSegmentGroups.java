@@ -105,7 +105,7 @@ public class ArticleSegmentGroups
 
 	protected void initWithSegmentContainer(SegmentContainer segmentContainer)
 	{
-		for (Iterator it = segmentContainer.getSegments().iterator(); it.hasNext(); ) {
+		for (Iterator<Segment> it = segmentContainer.getSegments().iterator(); it.hasNext(); ) {
 			Segment segment = (Segment) it.next();
 
 			String segmentPK = segment.getPrimaryKey();
@@ -119,16 +119,18 @@ public class ArticleSegmentGroups
 		}
 	}
 
-	public Collection<ArticleCarrier> addArticles(Collection<Article> articles)
+	public Collection<ArticleCarrier> addArticles(Collection<Article> articles, boolean filterExisting)
 	{
 		ArrayList<ArticleCarrier> res = new ArrayList<ArticleCarrier>(articles.size());
 		for (Article article : articles) {
-			res.add(addArticle(article));
+			ArticleCarrier articleCarrier = addArticle(article, filterExisting); // if the article already exists, it won't be added => check for null result
+			if (articleCarrier != null)
+				res.add(articleCarrier);
 		}
 		return res;
 	}
 
-	protected ArticleCarrier addArticle(Article article)
+	protected ArticleCarrier addArticle(Article article, boolean filterExisting)
 	{
 		String segmentPK = article.getSegment().getPrimaryKey();
 		ArticleSegmentGroup asg;
@@ -144,7 +146,7 @@ public class ArticleSegmentGroups
 		if (article.getSegment() != asg.getSegment())
 			article.setSegment(asg.getSegment());
 
-		return asg.addArticle(article);
+		return asg.addArticle(article, filterExisting);
 	}
 
 	public void removeArticles(Collection<Article> articles)
@@ -172,9 +174,9 @@ public class ArticleSegmentGroups
 
 	protected void initWithArticleContainer(ArticleContainer articleContainer)
 	{
-		for (Iterator it = articleContainer.getArticles().iterator(); it.hasNext(); ) {
+		for (Iterator<Article> it = articleContainer.getArticles().iterator(); it.hasNext(); ) {
 			Article article = (Article) it.next();
-			addArticle(article);
+			addArticle(article, true); // filterExisting doesn't matter here - we don't handle the result
 		}
 	}
 
@@ -200,7 +202,7 @@ public class ArticleSegmentGroups
 //		if (articles == null) {
 			Set<Article> s = new HashSet<Article>();
 
-			for (Iterator it = articleCarriers.values().iterator(); it.hasNext();) {
+			for (Iterator<ArticleCarrier> it = articleCarriers.values().iterator(); it.hasNext();) {
 				ArticleCarrier articleCarrier = (ArticleCarrier) it.next();
 				s.add(articleCarrier.getArticle());
 			}

@@ -37,6 +37,6 @@ public interface SegmentContainer
 	/**
 	 * @return A <tt>Collection</tt> of {@link Segment}
 	 */
-	Collection getSegments();
+	Collection<Segment> getSegments();
 
 }

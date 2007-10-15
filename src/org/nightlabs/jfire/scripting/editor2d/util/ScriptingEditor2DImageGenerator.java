@@ -41,7 +41,7 @@ public class ScriptingEditor2DImageGenerator
 extends ImageGenerator 
 {
 	private static RenderModeManager renderModeMan = null;
-	public static RenderModeManager getSandRenderModeManager() 
+	public static RenderModeManager getScripting2DRenderModeManager() 
 	{
 		if (renderModeMan == null) {
 			renderModeMan = new RenderModeManager();

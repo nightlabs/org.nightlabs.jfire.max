@@ -51,6 +51,7 @@ import org.nightlabs.util.Utils;
  *
  * @jdo.create-objectid-class
  *		field-order="organisationID, issueID"
+ *		include-imports="id/IssueID.imports.inc"
  *		include-body="id/IssueID.body.inc"
  *
  * @jdo.query

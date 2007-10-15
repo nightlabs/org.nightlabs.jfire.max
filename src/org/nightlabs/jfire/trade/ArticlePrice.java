@@ -28,7 +28,6 @@ package org.nightlabs.jfire.trade;
 
 import java.util.Collection;
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.Map;
 
 import javax.jdo.JDOHelper;
@@ -68,6 +67,8 @@ import org.nightlabs.jfire.store.ProductType;
  */
 public class ArticlePrice extends org.nightlabs.jfire.accounting.Price
 {
+	private static final long serialVersionUID = 1L;
+
 	public static final String FETCH_GROUP_PACKAGE_ARTICLE_PRICE = "ArticlePrice.packageArticlePrice";
 	public static final String FETCH_GROUP_NESTED_ARTICLE_PRICES = "ArticlePrice.nestedArticlePrices";
 	public static final String FETCH_GROUP_NESTED_ARTICLE_PRICES_NO_LIMIT = "ArticlePrice.nestedArticlePrices[-1]";
@@ -95,7 +96,7 @@ public class ArticlePrice extends org.nightlabs.jfire.accounting.Price
 	 *
 	 * @!jdo.map-vendor-extension vendor-name="jpox" key="key-field" value="nestKey"
 	 */
-	protected Map nestedArticlePrices;
+	protected Map<String, ArticlePrice> nestedArticlePrices;
 
 	/**
 	 * This is to map entries in nestedArticlePrices.
@@ -169,6 +170,9 @@ public class ArticlePrice extends org.nightlabs.jfire.accounting.Price
 	 */
 	private boolean virtualInner;
 
+	/**
+	 * @deprecated Only for JDO!
+	 */
 	protected ArticlePrice() { }
 
 	/**
@@ -273,7 +277,7 @@ public class ArticlePrice extends org.nightlabs.jfire.accounting.Price
 		
 		this.virtualInner = virtualInner;
 		
-		this.nestedArticlePrices = new HashMap();
+		this.nestedArticlePrices = new HashMap<String, ArticlePrice>();
 		assign(origPrice, refund);
 
 		if (packageArticlePrice != null)
@@ -332,8 +336,7 @@ public class ArticlePrice extends org.nightlabs.jfire.accounting.Price
 		if (!getCurrency().getCurrencyID().equals(origPrice.getCurrency().getCurrencyID()))
 			throw new IllegalArgumentException("Currencies do not match!");
 
-		for (Iterator it = origPrice.getFragments().iterator(); it.hasNext(); ) {
-			PriceFragment origpf = (PriceFragment)it.next();
+		for (PriceFragment origpf : origPrice.getFragments()) {
 			PriceFragment pf = new PriceFragment(this, origpf);
 			// TODO Does the following "put" really delete an old object?
 			// Right now, it's not so important, because we currently use assign only for
@@ -352,9 +355,7 @@ public class ArticlePrice extends org.nightlabs.jfire.accounting.Price
 			PersistenceManager pm = JDOHelper.getPersistenceManager(origArticlePrice);
 			AccountingPriceConfig accountingPriceConfig = Accounting.getAccounting(pm).getAccountingPriceConfig();
 
-			for (Iterator it = origArticlePrice.getNestedArticlePrices().iterator(); it.hasNext(); ) {
-				ArticlePrice origNestedArticlePrice = (ArticlePrice) it.next();
-
+			for (ArticlePrice origNestedArticlePrice : origArticlePrice.getNestedArticlePrices()) {
 				new ArticlePrice(
 						origArticlePrice.article,
 						origNestedArticlePrice,
@@ -380,8 +381,7 @@ public class ArticlePrice extends org.nightlabs.jfire.accounting.Price
 	protected void negate()
 	{
 		this._setAmount(-this.getAmount());
-		for (Iterator it = this.getFragments().iterator(); it.hasNext(); ) {
-			PriceFragment pf = (PriceFragment)it.next();
+		for (PriceFragment pf : this.getFragments()) {
 			pf.setAmount(-pf.getAmount());
 		}
 	}
@@ -423,7 +423,7 @@ public class ArticlePrice extends org.nightlabs.jfire.accounting.Price
 		return articlePrice;
 	}
 
-	public Collection getNestedArticlePrices() {
+	public Collection<ArticlePrice> getNestedArticlePrices() {
 		return nestedArticlePrices.values();
 	}
 

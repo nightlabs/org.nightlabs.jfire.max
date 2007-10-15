@@ -152,7 +152,7 @@ public class PFMappingAccountantDelegate
 	/**
 	 * @return Returns the moneyFlowMappings.
 	 */
-	public Set getMoneyFlowMappings()
+	public Set<MoneyFlowMapping> getMoneyFlowMappings()
 	{
 		return moneyFlowMappings;
 	}
@@ -324,9 +324,7 @@ public class PFMappingAccountantDelegate
 		{
 			if (nested == null) {
 				nested = new LinkedList<ResolveProductTypeProvider>();
-				for (Iterator iter = productType.getNestedProductTypes().iterator(); iter
-						.hasNext();) {
-					NestedProductType nestedType = (NestedProductType) iter.next();
+				for (NestedProductType nestedType : productType.getNestedProductTypes()) {
 					nested.add(new ProductTypeProvider(PFMappingAccountantDelegate
 							.getPackageType(nestedType), nestedType.getInnerProductType()));
 				}
@@ -369,9 +367,7 @@ public class PFMappingAccountantDelegate
 		{
 			if (nested == null) {
 				nested = new LinkedList<ResolveProductTypeProvider>();
-				for (Iterator iter = articlePrice.getNestedArticlePrices().iterator(); iter
-						.hasNext();) {
-					ArticlePrice nestedPrice = (ArticlePrice) iter.next();
+				for (ArticlePrice nestedPrice : articlePrice.getNestedArticlePrices()) {
 					nested.add(new ArticlePriceTypeProvider(PFMappingAccountantDelegate
 							.getPackageType(nestedPrice), nestedPrice));
 				}
@@ -397,8 +393,7 @@ public class PFMappingAccountantDelegate
 		// HashMap<ResolvedMapKey, ResolvedMapEntry>();
 		// FIXME: Not typed because of BCEL bug
 		Map result = new HashMap();
-		for (Iterator iter = invoice.getArticles().iterator(); iter.hasNext();) {
-			Article article = (Article) iter.next();
+		for (Article article : invoice.getArticles()) {
 			ArticlePriceTypeProvider provider = new ArticlePriceTypeProvider(
 					getPackageType(article.getPrice()), article.getPrice());
 			resolveProductTypeMappings(provider, provider.getPackageType(), result, 0);
@@ -514,8 +509,7 @@ public class PFMappingAccountantDelegate
 			entry.setDelegationLevel(delegationLevel);
 			ResolvedMapKey entryKey = new ResolvedMapKey((ProductTypeID) JDOHelper.getObjectId(entry.getProductType()), packageType);
 			resolvedMappings.put(entryKey, entry);
-			for (Iterator iter = productTypeProvider.getNestedProviders().iterator(); iter.hasNext(); ) {
-				ResolveProductTypeProvider nested = (ResolveProductTypeProvider) iter.next();
+			for (ResolveProductTypeProvider nested : productTypeProvider.getNestedProviders()) {
 				resolveProductTypeMappings(nested, nested.getPackageType(),
 						resolvedMappings, delegationLevel);
 			}
@@ -577,9 +571,7 @@ public class PFMappingAccountantDelegate
 			// and add all matching mappings to
 			while (!productTypeHierarchy.isEmpty()) {
 				ProductType pType = (ProductType) productTypeHierarchy.removeLast();
-				for (Iterator iterator = delegate.getMoneyFlowMappings().iterator(); iterator
-						.hasNext();) {
-					MoneyFlowMapping mapping = (MoneyFlowMapping) iterator.next();
+				for (MoneyFlowMapping mapping : delegate.getMoneyFlowMappings()) {
 					if (mapping.matches(pType, packageType)) {
 						if (entry == null) {
 							entry = new ResolvedMapEntry();
@@ -865,9 +857,7 @@ public class PFMappingAccountantDelegate
 		} // for (Iterator iter = articlePrice.getFragments().iterator();
 			// iter.hasNext();) {
 		// recurse
-		for (Iterator iterator = articlePrice.getNestedArticlePrices().iterator(); iterator
-				.hasNext();) {
-			ArticlePrice nestedArticlePrice = (ArticlePrice) iterator.next();
+		for (ArticlePrice nestedArticlePrice : articlePrice.getNestedArticlePrices()) {
 			articlePriceStack.addFirst(nestedArticlePrice);
 			bookProductTypeParts(mandator, user, resolvedMappings, articlePriceStack,
 					bookInvoiceTransfers, delegationLevel, container, involvedAnchors);
@@ -1005,12 +995,11 @@ public class PFMappingAccountantDelegate
 	 * will be true if no mapping was defined for this ProductType (or parents)
 	 * within this LocalAccountantDelegate (or parents).
 	 */
-	protected boolean haveToDelegateBooking(Map resolvedMappings,
+	protected boolean haveToDelegateBooking(Map<ResolvedMapKey, ResolvedMapEntry> resolvedMappings,
 			ProductType productType, String packageType, int delegationLevel)
 	{
-		ResolvedMapKey key = new ResolvedMapKey((ProductTypeID) JDOHelper
-				.getObjectId(productType), packageType);
-		ResolvedMapEntry entry = (ResolvedMapEntry) resolvedMappings.get(key);
+		ResolvedMapKey key = new ResolvedMapKey((ProductTypeID)JDOHelper.getObjectId(productType), packageType);
+		ResolvedMapEntry entry = resolvedMappings.get(key);
 		if (entry == null)
 			return false;
 		else
@@ -1021,12 +1010,11 @@ public class PFMappingAccountantDelegate
 	 * Returns the delegationLevel in the ResolvedMapEntry found for the given
 	 * productType and packageType.
 	 */
-	protected int getDelegationLevel(Map resolvedMappings,
+	protected int getDelegationLevel(Map<ResolvedMapKey, ResolvedMapEntry> resolvedMappings,
 			ProductType productType, String packageType)
 	{
-		ResolvedMapKey key = new ResolvedMapKey((ProductTypeID) JDOHelper
-				.getObjectId(productType), packageType);
-		ResolvedMapEntry entry = (ResolvedMapEntry) resolvedMappings.get(key);
+		ResolvedMapKey key = new ResolvedMapKey((ProductTypeID)JDOHelper.getObjectId(productType), packageType);
+		ResolvedMapEntry entry = resolvedMappings.get(key);
 		if (entry == null)
 			return 0;
 		else
@@ -1256,7 +1244,7 @@ public class PFMappingAccountantDelegate
 	 * @param bookArticle
 	 *          TODO
 	 */
-	protected List getDimensionValues(String moneyFlowDimensionID,
+	protected List<String> getDimensionValues(String moneyFlowDimensionID,
 			Article bookArticle, ProductType productType)
 	{
 		MoneyFlowDimension dimension = MoneyFlowDimension.getMoneyFlowDimension(

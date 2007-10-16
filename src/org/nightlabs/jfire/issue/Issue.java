@@ -90,15 +90,15 @@ implements Serializable
 	 */
 	private long issueTypeID;
 
-	/** Documents for the issue
-    *
-    * @jdo.field
-    *    persistence-modifier="persistent"
-    *    collection-type="collection"
-    *    element-type="ObjectID" 
-    *    mapped-by="supplier"
-    **/
-	private Collection attachedDocuments = new HashSet();
+//	/** Documents for the issue
+//    *
+//    * @jdo.field
+//    *    persistence-modifier="persistent"
+//    *    collection-type="collection"
+//    *    element-type="ObjectID" 
+//    *    mapped-by="supplier"
+//    **/
+//	private Collection attachedDocuments = new HashSet();
 	
 	/**
 	 * @jdo.field persistence-modifier="persistent" dependent="true" mapped-by="issue"

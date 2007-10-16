@@ -46,13 +46,29 @@ public class IssueDAO extends BaseJDOObjectDAO<IssueID, Issue>{
 		}
 	}
 
-	public Issue storeIssue(Issue issue, boolean get, String[] fetchGroups, int maxFetchDepth, ProgressMonitor monitor){
+	public Issue createIssueWithoutAttachedDocument(Issue issue, boolean get, String[] fetchGroups, int maxFetchDepth, ProgressMonitor monitor){
 		if(issue == null)
 			throw new NullPointerException("Issue to save must not be null");
 		monitor.beginTask("Storing issue: "+ issue.getIssueID(), 3);
 		try {
 			IssueManager im = IssueManagerUtil.getHome(SecurityReflector.getInitialContextProperties()).create();
-			Issue result = im.storeIssue(issue, get, fetchGroups, maxFetchDepth);
+			Issue result = im.createIssueWithoutAttachedDocument(issue, get, fetchGroups, maxFetchDepth);
+			monitor.worked(1);
+			monitor.done();
+			return result;
+		} catch (Exception e) {
+			monitor.done();
+			throw new RuntimeException("Error while storing Issue!\n" ,e);
+		}
+	}
+	
+	public Issue createIssueWithAttachedDocument(Issue issue, boolean get, String[] fetchGroups, int maxFetchDepth, ProgressMonitor monitor){
+		if(issue == null)
+			throw new NullPointerException("Issue to save must not be null");
+		monitor.beginTask("Storing issue: "+ issue.getIssueID(), 3);
+		try {
+			IssueManager im = IssueManagerUtil.getHome(SecurityReflector.getInitialContextProperties()).create();
+			Issue result = im.createIssueWithAttachedDocument(issue, get, fetchGroups, maxFetchDepth);
 			monitor.worked(1);
 			monitor.done();
 			return result;

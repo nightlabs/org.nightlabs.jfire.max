@@ -17,6 +17,7 @@ import org.apache.log4j.Logger;
 import org.nightlabs.jdo.NLJDOHelper;
 import org.nightlabs.jfire.base.BaseSessionBeanImpl;
 import org.nightlabs.jfire.issue.id.IssueID;
+import org.nightlabs.jfire.security.UserGroup;
 
 /**
  * @author Chairat Kongarayawetchakun - chairatk[AT]nightlabs[DOT]de
@@ -79,11 +80,41 @@ implements SessionBean{
 	}
 
 	/**
+	 * Creates a new issue. This method is only usable, if the user (principal)
+	 * is an organisation, because this organisation will automatically be set
+	 * as the user for the new Issue.
+	 *
+	 * @param userID Either <code>null</code> (then the default will be used) or an ID of a {@link UserGroup} which is allowed to the User.
+	 *
 	 * @ejb.interface-method
 	 * @ejb.transaction type="Required"
 	 * @ejb.permission role-name="_Guest_"
 	 */
-	public Issue storeIssue(Issue issue, boolean get, String[] fetchGroups, int maxFetchDepth){
+	public Issue createIssueWithoutAttachedDocument(Issue issue, boolean get, String[] fetchGroups, int maxFetchDepth){
+		PersistenceManager pm = getPersistenceManager();
+		try {
+			if (!issue.getOrganisationID().equals(getOrganisationID()))
+				throw new IllegalArgumentException("Given Issue was created for a different organisation, can not store to this datastore!");
+
+			Issue result = NLJDOHelper.storeJDO(pm, issue, get, fetchGroups, maxFetchDepth);
+			return result;
+		} finally {
+			pm.close();
+		}
+	}
+	
+	/**
+	 * Creates a new issue. This method is only usable, if the user (principal)
+	 * is an organisation, because this organisation will automatically be set
+	 * as the user for the new Issue.
+	 *
+	 * @param userID Either <code>null</code> (then the default will be used) or an ID of a {@link UserGroup} which is allowed to the User.
+	 *
+	 * @ejb.interface-method
+	 * @ejb.transaction type="Required"
+	 * @ejb.permission role-name="_Guest_"
+	 */
+	public Issue createIssueWithAttachedDocument(Issue issue, boolean get, String[] fetchGroups, int maxFetchDepth){
 		PersistenceManager pm = getPersistenceManager();
 		try {
 			if (!issue.getOrganisationID().equals(getOrganisationID()))

@@ -29,7 +29,7 @@ package org.nightlabs.jfire.issue;
 import java.io.Serializable;
 import java.util.Collection;
 import java.util.Date;
-import java.util.Set;
+import java.util.HashSet;
 
 import javax.jdo.JDOHelper;
 import javax.jdo.PersistenceManager;
@@ -55,10 +55,10 @@ import org.nightlabs.util.Utils;
  *		include-body="id/IssueID.body.inc"
  *
  * @jdo.query
- *		name="getIssuesByType"
+ *		name="getIssuesByIssueTypeID"
  *		query="SELECT
- *			WHERE this.issueType == paramIssueType                    
- *			PARAMETERS String paramIssueType
+ *			WHERE this.issueTypeID == paramIssueTypeID                    
+ *			PARAMETERS String paramIssueTypeID
  *			import java.lang.String"
  *
  * @jdo.fetch-group name="Issue.this" fetch-groups="default" fields="description"
@@ -71,6 +71,7 @@ implements Serializable
 	private static final long serialVersionUID = 1L;
 	private static final Logger logger = Logger.getLogger(Issue.class);
 	
+	public static final String FETCH_GROUP_THIS = "Issue.this";
 	/**
 	 * @jdo.field primary-key="true"
 	 * @jdo.column length="100"
@@ -89,22 +90,20 @@ implements Serializable
 	 */
 	private long issueTypeID;
 
-	/**
-	 * value: {@link String}
-	 *
-	 * @jdo.field
-	 *		persistence-modifier="persistent"
-	 *		collection-type="collection"
-	 *		element-type="java.lang.String"
-	 *		dependent-element="true"
-	 */
-	private Set<String> documents;	
+	/** Documents for the issue
+    *
+    * @jdo.field
+    *    persistence-modifier="persistent"
+    *    collection-type="collection"
+    *    element-type="ObjectID" 
+    *    mapped-by="supplier"
+    **/
+	private Collection attachedDocuments = new HashSet();
 	
 	/**
-	 * @jdo.field persistence-modifier="persistent"
-	 * @jdo.column length="100"
+	 * @jdo.field persistence-modifier="persistent" dependent="true" mapped-by="issue"
 	 */
-	private String description;
+	private IssueDescription description;
 	
 	/**
 	 * @jdo.field persistence-modifier="persistent" load-fetch-group="all"
@@ -153,7 +152,9 @@ implements Serializable
 	{
 		if (creator == null)
 			throw new NullPointerException("creator");
-
+		this.user = creator;
+		this.createTimestamp = new Date();
+//		this.documents = new <String>();
 	}
 
 	/**
@@ -208,14 +209,14 @@ implements Serializable
 	/**
 	 * @return Returns the description.
 	 */
-	public String getDescription() {
+	public IssueDescription getDescription() {
 		return description;
 	}
 
 	/**
 	 * @param description The description to set.
 	 */
-	public void setDescription(String description) {
+	public void setDescription(IssueDescription description) {
 		this.description = description;
 	}
 

@@ -128,4 +128,32 @@ implements SessionBean{
 			pm.close();
 		}
 	}
+	
+//	/**
+//	 * @throws IOException While loading an icon from a local resource, this might happen and we don't care in the initialise method.
+//	 *
+//	 * @ejb.interface-method
+//	 * @ejb.transaction type = "Required"
+//	 * @ejb.permission role-name="_System_"
+//	 */
+//	public void initialise() throws IOException
+//	{
+//		PersistenceManager pm = getPersistenceManager();
+//		try {
+//			pm.getExtent(ModeOfDelivery.class);
+//			try {
+//				pm.getObjectById(ModeOfDeliveryConst.MODE_OF_DELIVERY_ID_MANUAL);
+//
+//				// it already exists, hence initialization is already done
+//				return;
+//			} catch (JDOObjectNotFoundException x) {
+//				// not yet initialized
+//			}
+//
+//
+//			pm.makePersistent(new EditLockTypeDeliveryNote(EditLockTypeDeliveryNote.EDIT_LOCK_TYPE_ID));
+//		} finally {
+//			pm.close();
+//		}
+//	}
 }

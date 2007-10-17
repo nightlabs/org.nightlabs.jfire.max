@@ -149,7 +149,7 @@ extends AbstractJFSScriptExecutorDelegate
 		pm.getFetchPlan().setMaxFetchDepth(oldFetchDepth);
 		logger.debug("Property detached");
 		// have to detach, as explode might modify the person 
-		struct.explodePropertySet(property);
+		property.inflate(struct);
 		List<Object> elements = new LinkedList<Object>();
 		Locale locale = JFireReportingHelper.getLocale();
 		SortedMap<String, StructBlock> sortedBlocks = new TreeMap<String, StructBlock>();

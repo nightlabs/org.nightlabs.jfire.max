@@ -2,126 +2,76 @@ package org.nightlabs.jfire.issue;
 
 import java.io.Serializable;
 
+import org.nightlabs.util.Util;
+
 /**
  * @author Chairat Kongarayawetchakun - chairatk at nightlabs dot de
  *
- * jdo.persistence-capable
- *		identity-type="application"
- *		objectid-class="org.nightlabs.jfire.issue.id.IssueStatusID"
- *		detachable="true"
+ * @jdo.persistence-capable
+ *		identity-type = "application"
+ *		objectid-class = "org.nightlabs.jfire.issue.id.IssueStatusID"
+ *		detachable = "true"
  *		table="JFireIssueTracking_IssueStatus"
  *
- * jdo.inheritance strategy="new-table"
+ * @jdo.create-objectid-class
  *
- * jdo.create-objectid-class field-order="organisationID, productTypeID, statusID"
+ * @jdo.inheritance strategy = "new-table"
  */
 public class IssueStatus 
 implements Serializable{
-//	/**
-//	 * @jdo.field primary-key="true"
-//	 * @jdo.column length="100"
-//	 */
-//	private String organisationID;
-//
-//	/**
-//	 * @jdo.field primary-key="true"
-//	 * @jdo.column length="100"
-//	 */
-//	private String issueID;
-//
-//	/**
-//	 * @jdo.field primary-key="true"
-//	 */
-//	private int statusID;
-//
-//	/**
-//	 * @jdo.field persistence-modifier="persistent"
-//	 */
-//	private Date timestamp;
-//
-//	/**
-//	 * @jdo.field persistence-modifier="persistent"
-//	 */
-//	private boolean resolved;
-//
-//	/**
-//	 * @jdo.field persistence-modifier="persistent"
-//	 */
-//	private boolean added;
-//
-//	/**
-//	 * @jdo.field persistence-modifier="persistent"
-//	 */
-//	private boolean updated;
-//
-//	/**
-//	 * @jdo.field persistence-modifier="persistent"
-//	 */
-//	private boolean closed;
-//
-//	protected IssueStatus()
-//	{
-//	}
-//
-//	public IssueStatus(/*ProductTypeStatusTracker productTypeStatusTracker, int statusID,*/ User user)
-//	{
-////		this.productTypeStatusTracker = productTypeStatusTracker;
-////		this.organisationID = productTypeStatusTracker.getOrganisationID();
-////		this.productTypeID = productTypeStatusTracker.getProductTypeID();
-////		this.statusID = statusID;
-////		this.productType = productTypeStatusTracker.getProductType();
-////		this.user = user;
-////		this.timestamp = new Date();
-////
-////		this.published = productType.isPublished();
-////		this.confirmed = productType.isConfirmed();
-////		this.saleable = productType.isSaleable();
-////		this.closed = productType.isClosed();
-//	}
-//	public String getOrganisationID()
-//	{
-//		return organisationID;
-//	}
-//	public String getProductTypeID()
-//	{
-//		return productTypeID;
-//	}
-//	public int getStatusID()
-//	{
-//		return statusID;
-//	}
-//	public ProductTypeStatusTracker getProductTypeStatusTracker()
-//	{
-//		return productTypeStatusTracker;
-//	}
-//	public ProductType getProductType()
-//	{
-//		return productType;
-//	}
-//
-//	public User getUser()
-//	{
-//		return user;
-//	}
-//	public Date getTimestamp()
-//	{
-//		return timestamp;
-//	}
-//
-//	public boolean isPublished()
-//	{
-//		return published;
-//	}
-//	public boolean isConfirmed()
-//	{
-//		return confirmed;
-//	}
-//	public boolean isSaleable()
-//	{
-//		return saleable;
-//	}
-//	public boolean isClosed()
-//	{
-//		return closed;
-//	}
+	
+	private static final long serialVersionUID = 1L;
+	/**
+	 * @jdo.field primary-key="true"
+	 * @jdo.column length="100"
+	 */
+	private String issueStatusID;
+
+	/**
+	 * @jdo.field persistence-modifier="persistent" null-value="exception"
+	 */
+	private String text;
+
+	protected IssueStatus()
+	{
+	}
+
+	public IssueStatus(String issueStatusID, String text){
+		if (issueStatusID == null)
+			throw new IllegalArgumentException("issueStatusID must not be null!");
+
+		if (text == null)
+			throw new IllegalArgumentException("text must not be null!");
+
+		this.issueStatusID = issueStatusID;
+		this.text = text;
+	}
+	
+	/**
+	 * @return Returns the issueStatusID.
+	 */
+	public String getIssueStatusID()
+	{
+		return issueStatusID;
+	}
+
+	public String getText()
+	{
+		return text;
+	}
+
+	@Override
+	public boolean equals(Object obj)
+	{
+		if (obj == this) return true;
+		if (!(obj instanceof IssueStatus)) return false;
+		IssueStatus o = (IssueStatus) obj;
+		return Util.equals(o.issueStatusID, this.issueStatusID);
+	}
+
+	@Override
+	public int hashCode()
+	{
+		return Util.hashCode(issueStatusID);
+	}
 }

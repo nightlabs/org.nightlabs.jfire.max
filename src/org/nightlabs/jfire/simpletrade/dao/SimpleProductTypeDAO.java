@@ -131,9 +131,7 @@ implements IJDOObjectDAO<SimpleProductType>
 				propertySet = null;
 			}
 			if (propertySet != null) {
-				IStruct struct = propertySet.getStructure();
-				if (struct != null)			
-					struct.implodePropertySet(propertySet);
+				propertySet.deflate();
 			}
 			SimpleTradeManager simpleTradeManager = SimpleTradeManagerUtil.getHome(initialContextProperties).create();
 			result = simpleTradeManager.storeProductType(productType, get, fetchGroups, maxFetchDepth);

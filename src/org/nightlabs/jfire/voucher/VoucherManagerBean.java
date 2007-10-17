@@ -953,7 +953,7 @@ implements SessionBean
 						Person.class, pm);
 				Person person = new Person(getOrganisationID(), IDGenerator
 						.nextID(PropertySet.class));
-				personStruct.explodePropertySet(person);
+				person.inflate(personStruct);
 				((TextDataField) person.getDataField(PersonStruct.PERSONALDATA_COMPANY))
 						.setText("NightLabs GmbH");
 				((TextDataField) person.getDataField(PersonStruct.PERSONALDATA_NAME))
@@ -961,7 +961,7 @@ implements SessionBean
 				((TextDataField) person
 						.getDataField(PersonStruct.PERSONALDATA_FIRSTNAME))
 						.setText("Marco");
-				personStruct.implodePropertySet(person);
+				person.deflate();
 
 				LegalEntity customer = new LegalEntity(getOrganisationID(),
 						LegalEntity.ANCHOR_TYPE_ID_PARTNER, ObjectIDUtil.makeValidIDString(

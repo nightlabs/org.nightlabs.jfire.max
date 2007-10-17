@@ -111,7 +111,7 @@ implements IJDOObjectDAO<LegalEntity>
 		for (LegalEntity le : legalEntities) {
 			try {
 				if (le.getPerson() != null)
-					struct.explodePropertySet(le.getPerson());
+					le.getPerson().inflate(struct);
 			} catch (JDODetachedFieldAccessException e) {
 				// le.person was not detached -> no explosion, break
 				break;

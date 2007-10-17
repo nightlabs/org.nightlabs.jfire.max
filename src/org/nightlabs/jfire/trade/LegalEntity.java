@@ -122,7 +122,7 @@ public class LegalEntity extends Anchor
 		// It's better to have a Person for EVERY LegalEntity
 		Person person = new Person(IDGenerator.getOrganisationID(), IDGenerator.nextID(PropertySet.class));
 		IStruct struct = StructLocal.getStructLocal(Person.class, PROPERTY_SET_SCOPE, pm);
-		struct.explodePropertySet(person);
+		person.inflate(struct);
 		try {
 			((TextDataField)person.getDataField(PersonStruct.PERSONALDATA_NAME)).setText("Anonymous");
 			person.setDisplayName("Anonymous");
@@ -130,7 +130,7 @@ public class LegalEntity extends Anchor
 		} catch (Exception e) { // this should not happen, if there's not a programming error
 			throw new RuntimeException(e);
 		}
-		struct.implodePropertySet(person);
+		person.deflate();
 
 		LegalEntity anonymousCustomer = new LegalEntity(organisationID, ANCHOR_TYPE_ID_PARTNER, ANCHOR_ID_ANONYMOUS);
 		anonymousCustomer.setPerson(person);

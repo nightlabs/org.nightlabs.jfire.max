@@ -15,6 +15,7 @@ import javax.jdo.Query;
 
 import org.apache.log4j.Logger;
 import org.nightlabs.jdo.NLJDOHelper;
+import org.nightlabs.jdo.ObjectID;
 import org.nightlabs.jfire.base.BaseSessionBeanImpl;
 import org.nightlabs.jfire.issue.id.IssueID;
 import org.nightlabs.jfire.security.UserGroup;
@@ -114,7 +115,7 @@ implements SessionBean{
 	 * @ejb.transaction type="Required"
 	 * @ejb.permission role-name="_Guest_"
 	 */
-	public Issue createIssueWithAttachedDocument(Issue issue, boolean get, String[] fetchGroups, int maxFetchDepth){
+	public Issue createIssueWithAttachedDocument(Issue issue, ObjectID objectID, boolean get, String[] fetchGroups, int maxFetchDepth){
 		PersistenceManager pm = getPersistenceManager();
 		try {
 			if (!issue.getOrganisationID().equals(getOrganisationID()))

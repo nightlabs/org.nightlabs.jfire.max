@@ -3,6 +3,7 @@ package org.nightlabs.jfire.issue.dao;
 import java.util.Collection;
 import java.util.Set;
 
+import org.nightlabs.jdo.ObjectID;
 import org.nightlabs.jfire.base.jdo.BaseJDOObjectDAO;
 import org.nightlabs.jfire.issue.Issue;
 import org.nightlabs.jfire.issue.IssueManager;
@@ -62,13 +63,13 @@ public class IssueDAO extends BaseJDOObjectDAO<IssueID, Issue>{
 		}
 	}
 	
-	public Issue createIssueWithAttachedDocument(Issue issue, boolean get, String[] fetchGroups, int maxFetchDepth, ProgressMonitor monitor){
+	public Issue createIssueWithAttachedDocument(Issue issue, ObjectID objectID, boolean get, String[] fetchGroups, int maxFetchDepth, ProgressMonitor monitor){
 		if(issue == null)
 			throw new NullPointerException("Issue to save must not be null");
 		monitor.beginTask("Storing issue: "+ issue.getIssueID(), 3);
 		try {
 			IssueManager im = IssueManagerUtil.getHome(SecurityReflector.getInitialContextProperties()).create();
-			Issue result = im.createIssueWithAttachedDocument(issue, get, fetchGroups, maxFetchDepth);
+			Issue result = im.createIssueWithAttachedDocument(issue, objectID, get, fetchGroups, maxFetchDepth);
 			monitor.worked(1);
 			monitor.done();
 			return result;

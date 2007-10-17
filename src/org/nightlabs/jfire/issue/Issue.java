@@ -114,6 +114,12 @@ implements Serializable
 	 * @jdo.field persistence-modifier="persistent"
 	 */
 	private Date createTimestamp;
+	
+	/**
+	 * @jdo.field persistence-modifier="persistent"
+	 */
+	private Date updateTimestamp;
+	
 
 	/**
 	 * @see #isResolved()
@@ -204,6 +210,20 @@ implements Serializable
 	 */
 	public void setCreateTimestamp(Date timestamp) {
 		this.createTimestamp = timestamp;
+	}
+	
+	/**
+	 * @return Returns the update timestamp.
+	 */
+	public Date getUpdateTimestamp() {
+		return updateTimestamp;
+	}
+	
+	/**
+	 * @param timestamp The timestamp to set.
+	 */
+	public void setUpdateTimestamp(Date timestamp) {
+		this.updateTimestamp = timestamp;
 	}
 	
 	/**

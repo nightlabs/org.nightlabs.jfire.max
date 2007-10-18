@@ -21,6 +21,7 @@ import org.nightlabs.jdo.NLJDOHelper;
 import org.nightlabs.jdo.ObjectID;
 import org.nightlabs.jfire.base.BaseSessionBeanImpl;
 import org.nightlabs.jfire.issue.id.IssueID;
+import org.nightlabs.jfire.issue.id.IssuePriorityID;
 import org.nightlabs.jfire.issue.id.IssueSeverityTypeID;
 import org.nightlabs.jfire.issue.id.IssueStatusID;
 import org.nightlabs.jfire.security.UserGroup;
@@ -209,10 +210,6 @@ implements SessionBean{
 			issueStatus.getIssueStatusText().setText(Locale.ENGLISH.getLanguage(), "Resolved");
 			pm.makePersistent(issueStatus);
 			
-			issueStatus = new IssueStatus("FB");
-			issueStatus.getIssueStatusText().setText(Locale.ENGLISH.getLanguage(), "Feedback");
-			pm.makePersistent(issueStatus);
-			
 			issueStatus = new IssueStatus("C");
 			issueStatus.getIssueStatusText().setText(Locale.ENGLISH.getLanguage(), "Close");
 			pm.makePersistent(issueStatus);
@@ -261,9 +258,16 @@ implements SessionBean{
 			issueSeverityType.getIssueSeverityTypeText().setText(Locale.ENGLISH.getLanguage(), "Tweak");
 			pm.makePersistent(issueSeverityType);
 			
-			
 			////////////////////////////////////////////////////////
-			// Create the statuses
+			// Create the priorities
+			// check, whether the datastore is already initialized
+			pm.getExtent(IssuePriority.class);
+			try {
+				pm.getObjectById(IssuePriorityID.create("0"), true);
+				return; // already initialized
+			} catch (JDOObjectNotFoundException x) {
+				// datastore not yet initialized
+			}
 			IssuePriority issuePriority;
 
 			issuePriority = new IssuePriority("0");

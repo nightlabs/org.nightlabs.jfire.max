@@ -33,7 +33,7 @@ import javax.jdo.JDOHelper;
 import org.nightlabs.jdo.ObjectIDUtil;
 import org.nightlabs.jfire.accounting.id.TariffID;
 import org.nightlabs.jfire.idgenerator.IDGenerator;
-import org.nightlabs.util.Utils;
+import org.nightlabs.util.Util;
 
 /**
  * TODO Shall I really put this class into JFireTrade? Or is it Ticketing specific?
@@ -214,12 +214,12 @@ implements Serializable
 		if (obj == this) return true;
 		if (!(obj instanceof Tariff)) return false;
 		Tariff o = (Tariff) obj;
-		return Utils.equals(o.organisationID, this.organisationID) && Utils.equals(o.tariffID, this.tariffID);
+		return Util.equals(o.organisationID, this.organisationID) && Util.equals(o.tariffID, this.tariffID);
 	}
 
 	@Override
 	public int hashCode()
 	{
-		return Utils.hashCode(organisationID) + Utils.hashCode(tariffID);
+		return Util.hashCode(organisationID) + Util.hashCode(tariffID);
 	}
 }

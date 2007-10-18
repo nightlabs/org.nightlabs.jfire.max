@@ -16,25 +16,25 @@
 	<classpathentry kind="var" path="JBOSS/server/default/lib/jpl-pattern.jar"/>
 	<classpathentry kind="var" path="JBOSS/server/default/lib/jpl-util.jar"/>
 	<classpathentry kind="var" path="LOG4J"/>
-	<classpathentry kind="var" path="WORKSPACE/NightLabsBase/dist/NightLabsBase.jar" sourcepath="/WORKSPACE/NightLabsBase"/>
-	<classpathentry kind="var" path="WORKSPACE/JFireBaseBean/dist/JFireBaseBean.jar" sourcepath="/WORKSPACE/JFireBaseBean"/>
+	<classpathentry combineaccessrules="false" kind="src" path="/NightLabsBase"/>
+	<classpathentry combineaccessrules="false" kind="src" path="/JFireBaseBean"/>
 	<classpathentry kind="var" path="JDO2" sourcepath="JPOX_SRC"/>
 	<classpathentry kind="var" path="JPOX" sourcepath="JPOX_SRC"/>
 	<classpathentry kind="var" path="JPOXENHANCER" sourcepath="/JPOXENHANCER_SRC"/>
-	<classpathentry kind="var" path="WORKSPACE/JFireServerManager/dist/JFireServerManager.jar"/>
-	<classpathentry kind="var" path="WORKSPACE/JFireBase/dist/JFireBase.jar" sourcepath="/WORKSPACE/JFireBase"/>
+	<classpathentry combineaccessrules="false" kind="src" path="/JFireServerManager"/>
+	<classpathentry combineaccessrules="false" kind="src" path="/JFireBase"/>
 	<classpathentry kind="lib" path="dist/birt/lib/js.jar"/>
 	<classpathentry kind="lib" path="dist/birt/lib/engineapi.jar" sourcepath="dist/birt/lib/birt-source-2_2_0.zip"/>
 	<classpathentry kind="lib" path="dist/birt/lib/coreapi.jar" sourcepath="dist/birt/lib/birt-source-2_2_0.zip"/>
 	<classpathentry kind="lib" path="dist/birt/lib/oda.jar" sourcepath="/org.eclipse.datatools.connectivity.oda"/>
-	<classpathentry kind="var" path="WORKSPACE/JFireScripting/dist/JFireScripting.jar" sourcepath="/WORKSPACE/JFireScripting"/>
+	<classpathentry combineaccessrules="false" kind="src" path="/JFireScripting"/>
 	<classpathentry kind="lib" path="dist/birt/lib/modelapi.jar"/>
-	<classpathentry kind="var" path="WORKSPACE/NightLabsJDO/dist/NightLabsJDO.jar" sourcepath="WORKSPACE/NightLabsJDO/src"/>
+	<classpathentry combineaccessrules="false" kind="src" path="/NightLabsJDO"/>
 	<classpathentry kind="var" path="XERCES"/>
 	<classpathentry kind="lib" path="dist/birt/lib/dataadapterapi.jar"/>
 	<classpathentry kind="var" path="WORKSPACE/NightLabsXStream/dist/lib/xpp3-1.1.3.4.jar"/>
 	<classpathentry kind="var" path="WORKSPACE/NightLabsXStream/dist/lib/xstream-1.2.jar"/>
-	<classpathentry kind="var" path="WORKSPACE/JFireBaseClientLib/dist/JFireBaseClientLib.jar" sourcepath="/WORKSPACE/JFireBaseClientLib/src"/>
+	<classpathentry combineaccessrules="false" kind="src" path="/JFireBaseClientLib"/>
 	<classpathentry kind="lib" path="dist/birt/lib/com.ibm.icu_3.6.1.v20070417.jar"/>
 	<classpathentry kind="var" path="APACHE_COMMONS/commons-lang.jar"/>
 	<classpathentry kind="output" path="bin"/>

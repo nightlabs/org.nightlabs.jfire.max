@@ -30,12 +30,12 @@ extends I18nText{
 	 * @jdo.field primary-key="true"
 	 * @jdo.column length="100"
 	 */
-	private String issueID;
+	private String issueSeverityTypeID;
 	
 	/**
 	 * @jdo.field persistence-modifier="persistent"
 	 */
-	private Issue issue;
+	private IssueSeverityType issueSeverityType;
 
 	/**
 	 * key: String languageID<br/>
@@ -60,10 +60,10 @@ extends I18nText{
 	{
 	}
 
-	public IssueSeverityTypeText(Issue issue)
+	public IssueSeverityTypeText(IssueSeverityType issueSeverityType)
 	{
-		this.issue = issue;
-		issueID = issue.getIssueID();
+		this.issueSeverityType = issueSeverityType;
+		issueSeverityTypeID = issueSeverityType.getIssueSeverityTypeID();
 	}
 
 	/**
@@ -79,6 +79,6 @@ extends I18nText{
 	 */
 	protected String getFallBackValue(String languageID)
 	{
-		return issue == null ? languageID : issueID;
+		return issueSeverityTypeID == null ? languageID : issueSeverityTypeID;
 	}
 }

@@ -40,6 +40,7 @@ implements Serializable{
 			throw new IllegalArgumentException("issuePriorityID must not be null!");
 
 		this.issuePriorityID = issuePriorityID;
+		this.text = new IssuePriorityText(this);
 	}
 	
 	public void setIssuePriorityID(String issuePriorityID) {

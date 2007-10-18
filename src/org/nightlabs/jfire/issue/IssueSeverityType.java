@@ -40,6 +40,7 @@ implements Serializable{
 			throw new IllegalArgumentException("issueSeverityTypeID must not be null!");
 
 		this.issueSeverityTypeID = issueSeverityTypeID;
+		this.text = new IssueSeverityTypeText(this);
 	}
 	
 	public void setIssueSeverityTypeID(String issueSeverityTypeID) {

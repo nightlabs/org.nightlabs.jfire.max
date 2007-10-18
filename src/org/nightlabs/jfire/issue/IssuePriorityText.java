@@ -4,6 +4,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 import org.nightlabs.i18n.I18nText;
+import org.nightlabs.jfire.issue.id.IssuePriorityID;
 
 /**
  * @author Chairat Kongarayawetchakun - chairat at nightlabs dot de
@@ -30,12 +31,12 @@ extends I18nText{
 	 * @jdo.field primary-key="true"
 	 * @jdo.column length="100"
 	 */
-	private String issueID;
+	private String issuePriorityID;
 	
 	/**
 	 * @jdo.field persistence-modifier="persistent"
 	 */
-	private Issue issue;
+	private IssuePriority issuePriority;
 
 	/**
 	 * key: String languageID<br/>
@@ -60,10 +61,10 @@ extends I18nText{
 	{
 	}
 
-	public IssuePriorityText(Issue issue)
+	public IssuePriorityText(IssuePriority issuePriority)
 	{
-		this.issue = issue;
-		issueID = issue.getIssueID();
+		this.issuePriority = issuePriority;
+		issuePriorityID = issuePriority.getIssuePriorityID();
 	}
 
 	/**
@@ -79,6 +80,6 @@ extends I18nText{
 	 */
 	protected String getFallBackValue(String languageID)
 	{
-		return issue == null ? languageID : issueID;
+		return issuePriorityID == null ? languageID : issuePriorityID;
 	}
 }

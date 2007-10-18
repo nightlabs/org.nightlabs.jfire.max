@@ -26,17 +26,18 @@ extends I18nText{
 	 * The serial version of this class.
 	 */
 	private static final long serialVersionUID = 1L;
+	
 	/**
 	 * @jdo.field primary-key="true"
-	 * @jdo.column length="100"
+	 * @jdo.field persistence-modifier="persistent"
 	 */
-	private String issueID;
+	private String issueStatusID;
 	
 	/**
 	 * @jdo.field persistence-modifier="persistent"
 	 */
-	private Issue issue;
-
+	private IssueStatus issueStatus;
+	
 	/**
 	 * key: String languageID<br/>
 	 * value: String description
@@ -60,10 +61,10 @@ extends I18nText{
 	{
 	}
 
-	public IssueStatusText(Issue issue)
+	public IssueStatusText(IssueStatus issueStatus)
 	{
-		this.issue = issue;
-		issueID = issue.getIssueID();
+		this.issueStatus = issueStatus;
+		issueStatusID = issueStatus.getIssueStatusID();
 	}
 
 	/**
@@ -79,6 +80,6 @@ extends I18nText{
 	 */
 	protected String getFallBackValue(String languageID)
 	{
-		return issue == null ? languageID : issueID;
+		return issueStatusID == null ? languageID : issueStatusID;
 	}
 }

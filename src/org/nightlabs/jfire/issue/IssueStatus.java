@@ -32,6 +32,11 @@ implements Serializable{
 	 */
 	private IssueStatusText text;
 
+	/**
+	 * @jdo.field persistence-modifier="persistent"
+	 */
+	private Issue issue;
+	
 	protected IssueStatus()
 	{
 	}
@@ -40,7 +45,9 @@ implements Serializable{
 		if (issueStatusID == null)
 			throw new IllegalArgumentException("issueStatusID must not be null!");
 
+		this.issue = issue;
 		this.issueStatusID = issueStatusID;
+		this.text = new IssueStatusText(this);
 	}
 	
 	public void setIssueStatusID(String issueStatusID) {

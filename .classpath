@@ -18,17 +18,17 @@
 	<classpathentry kind="var" path="LOG4J"/>
 	<classpathentry kind="var" path="JDO2" sourcepath="/JDO2_SRC"/>
 	<classpathentry kind="var" path="JPOX" sourcepath="JPOX_SRC"/>
-	<classpathentry kind="var" path="WORKSPACE/NightLabsBase/dist/NightLabsBase.jar" sourcepath="WORKSPACE/NightLabsBase/src"/>
-	<classpathentry kind="var" path="WORKSPACE/NightLabsJDO/dist/NightLabsJDO.jar" sourcepath="WORKSPACE/NightLabsJDO/src"/>
-	<classpathentry kind="var" path="WORKSPACE/JFireBase/dist/JFireBase.jar" sourcepath="WORKSPACE/JFireBase/src"/>
-	<classpathentry kind="var" path="WORKSPACE/JFireBaseBean/dist/JFireBaseBean.jar" sourcepath="/WORKSPACE/JFireBaseBean/src"/>
-	<classpathentry kind="var" path="WORKSPACE/JFireServerManager/dist/JFireServerManager.jar"/>
+	<classpathentry combineaccessrules="false" kind="src" path="/NightLabsBase"/>
+	<classpathentry combineaccessrules="false" kind="src" path="/NightLabsJDO"/>
+	<classpathentry combineaccessrules="false" kind="src" path="/JFireBase"/>
+	<classpathentry combineaccessrules="false" kind="src" path="/JFireBaseBean"/>
+	<classpathentry combineaccessrules="false" kind="src" path="/JFireServerManager"/>
 	<classpathentry kind="var" path="RHINO" sourcepath="/RHINO_SRC"/>
 	<classpathentry kind="var" path="JPOXENHANCER"/>
 	<classpathentry kind="var" path="APACHE_COMMONS/commons-lang.jar"/>
-	<classpathentry kind="var" path="WORKSPACE/JFireJbpm/dist/JFireJbpm.jar" sourcepath="/WORKSPACE/JFireJbpm/src"/>
+	<classpathentry combineaccessrules="false" kind="src" path="/JFireJbpm"/>
 	<classpathentry kind="var" path="WORKSPACE/JFireJbpm/lib/jbpm/jbpm-3.1.4.jar"/>
-	<classpathentry kind="var" path="WORKSPACE/JFireBaseClientLib/dist/JFireBaseClientLib.jar"/>
-	<classpathentry kind="var" path="WORKSPACE/JFireBaseDAO/dist/JFireBaseDAO.jar"/>
+	<classpathentry combineaccessrules="false" kind="src" path="/JFireBaseClientLib"/>
+	<classpathentry combineaccessrules="false" kind="src" path="/JFireBaseDAO"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>

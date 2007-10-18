@@ -16,16 +16,16 @@
 	<classpathentry kind="var" path="JBOSS/server/default/lib/jpl-pattern.jar"/>
 	<classpathentry kind="var" path="JBOSS/server/default/lib/jpl-util.jar"/>
 	<classpathentry kind="var" path="JDO2" sourcepath="JPOX_SRC"/>
-	<classpathentry kind="var" path="WORKSPACE/NightLabsBase/dist/NightLabsBase.jar" sourcepath="WORKSPACE/NightLabsBase/src"/>
-	<classpathentry kind="var" path="WORKSPACE/NightLabsJDO/dist/NightLabsJDO.jar" sourcepath="WORKSPACE/NightLabsJDO/src"/>
-	<classpathentry kind="var" path="WORKSPACE/JFireBase/dist/JFireBase.jar" sourcepath="WORKSPACE/JFireBase/src"/>
+	<classpathentry combineaccessrules="false" kind="src" path="/NightLabsBase"/>
+	<classpathentry combineaccessrules="false" kind="src" path="/NightLabsJDO"/>
+	<classpathentry combineaccessrules="false" kind="src" path="/JFireBase"/>
 	<classpathentry kind="var" path="LOG4J"/>
-	<classpathentry kind="var" path="WORKSPACE/JFireBaseBean/dist/JFireBaseBean.jar" sourcepath="WORKSPACE/JFireBaseBean/src"/>
-	<classpathentry kind="var" path="WORKSPACE/JFireServerManager/dist/JFireServerManager.jar" sourcepath="/WORKSPACE/JFireServerManager/src"/>
+	<classpathentry combineaccessrules="false" kind="src" path="/JFireBaseBean"/>
+	<classpathentry combineaccessrules="false" kind="src" path="/JFireServerManager"/>
 	<classpathentry kind="var" path="JPOX" sourcepath="JPOX_SRC"/>
 	<classpathentry kind="var" path="JPOXENHANCER" sourcepath="/JPOXENHANCER_SRC"/>
 	<classpathentry kind="var" path="JBOSS/server/default/lib/hibernate3.jar"/>
 	<classpathentry kind="lib" path="lib/jbpm/jbpm-3.1.4.jar"/>
-	<classpathentry kind="var" path="WORKSPACE/JFireBaseClientLib/dist/JFireBaseClientLib.jar" sourcepath="/WORKSPACE/JFireBaseClientLib/src"/>
+	<classpathentry combineaccessrules="false" kind="src" path="/JFireBaseClientLib"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>

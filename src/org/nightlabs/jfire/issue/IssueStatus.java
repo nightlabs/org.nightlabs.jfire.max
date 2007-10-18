@@ -30,29 +30,21 @@ implements Serializable{
 	/**
 	 * @jdo.field persistence-modifier="persistent" null-value="exception"
 	 */
-	private String text;
+	private IssueStatusText text;
 
 	protected IssueStatus()
 	{
 	}
 
-	public IssueStatus(String issueStatusID, String text){
+	public IssueStatus(String issueStatusID){
 		if (issueStatusID == null)
 			throw new IllegalArgumentException("issueStatusID must not be null!");
 
-		if (text == null)
-			throw new IllegalArgumentException("text must not be null!");
-
 		this.issueStatusID = issueStatusID;
-		this.text = text;
 	}
 	
 	public void setIssueStatusID(String issueStatusID) {
 		this.issueStatusID = issueStatusID;
-	}
-	
-	public void setText(String text) {
-		this.text = text;
 	}
 	
 	/**
@@ -63,7 +55,7 @@ implements Serializable{
 		return issueStatusID;
 	}
 
-	public String getText()
+	public IssueStatusText getIssueStatusText()
 	{
 		return text;
 	}

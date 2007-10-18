@@ -5,7 +5,7 @@ import java.io.Serializable;
 import org.nightlabs.util.Util;
 
 /**
- * @author Chairat Kongarayawetchakun - chairatk at nightlabs dot de
+ * @author Chairat Kongarayawetchakun - chairat at nightlabs dot de
  *
  * @jdo.persistence-capable
  *		identity-type = "application"
@@ -29,29 +29,21 @@ implements Serializable{
 	/**
 	 * @jdo.field persistence-modifier="persistent" null-value="exception"
 	 */
-	private String text;
+	private IssueSeverityTypeText text;
 
 	protected IssueSeverityType()
 	{
 	}
 
-	public IssueSeverityType(String issueSeverityTypeID, String text){
+	public IssueSeverityType(String issueSeverityTypeID){
 		if (issueSeverityTypeID == null)
 			throw new IllegalArgumentException("issueSeverityTypeID must not be null!");
 
-		if (text == null)
-			throw new IllegalArgumentException("text must not be null!");
-
 		this.issueSeverityTypeID = issueSeverityTypeID;
-		this.text = text;
 	}
 	
 	public void setIssueSeverityTypeID(String issueSeverityTypeID) {
 		this.issueSeverityTypeID = issueSeverityTypeID;
-	}
-	
-	public void setText(String text) {
-		this.text = text;
 	}
 	
 	/**
@@ -62,7 +54,7 @@ implements Serializable{
 		return issueSeverityTypeID;
 	}
 
-	public String getText()
+	public IssueSeverityTypeText getIssueSeverityTypeText()
 	{
 		return text;
 	}

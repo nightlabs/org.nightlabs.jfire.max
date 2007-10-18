@@ -5,6 +5,7 @@ import java.rmi.RemoteException;
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Locale;
 import java.util.Set;
 
 import javax.ejb.CreateException;
@@ -188,25 +189,32 @@ implements SessionBean{
 			// Create the statuses
 			IssueStatus issueStatus;
 
-			issueStatus = new IssueStatus("N", "New");
+			issueStatus = new IssueStatus("N");
+			issueStatus.getIssueStatusText().setText(Locale.ENGLISH.getLanguage(), "New");
 			pm.makePersistent(issueStatus);
 
-			issueStatus = new IssueStatus("F", "Feedback");
+			issueStatus = new IssueStatus("FB");
+			issueStatus.getIssueStatusText().setText(Locale.ENGLISH.getLanguage(), "Feedback");
 			pm.makePersistent(issueStatus);
 			
-			issueStatus = new IssueStatus("A", "Acknowledged");
+			issueStatus = new IssueStatus("AKL");
+			issueStatus.getIssueStatusText().setText(Locale.ENGLISH.getLanguage(), "Acknowledged");
 			pm.makePersistent(issueStatus);
 			
-			issueStatus = new IssueStatus("C", "Confirmed");
+			issueStatus = new IssueStatus("CF");
+			issueStatus.getIssueStatusText().setText(Locale.ENGLISH.getLanguage(), "Confirmed");
 			pm.makePersistent(issueStatus);
 			
-			issueStatus = new IssueStatus("R", "Resolved");
+			issueStatus = new IssueStatus("RS");
+			issueStatus.getIssueStatusText().setText(Locale.ENGLISH.getLanguage(), "Resolved");
 			pm.makePersistent(issueStatus);
 			
-			issueStatus = new IssueStatus("R", "Feedback");
+			issueStatus = new IssueStatus("FB");
+			issueStatus.getIssueStatusText().setText(Locale.ENGLISH.getLanguage(), "Feedback");
 			pm.makePersistent(issueStatus);
 			
-			issueStatus = new IssueStatus("CL", "Close");
+			issueStatus = new IssueStatus("C");
+			issueStatus.getIssueStatusText().setText(Locale.ENGLISH.getLanguage(), "Close");
 			pm.makePersistent(issueStatus);
 
 			// check, whether the datastore is already initialized
@@ -221,29 +229,66 @@ implements SessionBean{
 			// Create the statuses
 			IssueSeverityType issueSeverityType;
 
-			issueSeverityType = new IssueSeverityType("MN", "Minor");
+			issueSeverityType = new IssueSeverityType("MN");
+			issueSeverityType.getIssueSeverityTypeText().setText(Locale.ENGLISH.getLanguage(), "Minor");
 			pm.makePersistent(issueSeverityType);
 
-			issueSeverityType = new IssueSeverityType("MJ", "Major");
+			issueSeverityType = new IssueSeverityType("MJ");
+			issueSeverityType.getIssueSeverityTypeText().setText(Locale.ENGLISH.getLanguage(), "Major");
 			pm.makePersistent(issueSeverityType);
 			
-			issueSeverityType = new IssueSeverityType("C", "Crash");
+			issueSeverityType = new IssueSeverityType("C");
+			issueSeverityType.getIssueSeverityTypeText().setText(Locale.ENGLISH.getLanguage(), "Crash");
 			pm.makePersistent(issueSeverityType);
 			
-			issueSeverityType = new IssueSeverityType("B", "Block");
+			issueSeverityType = new IssueSeverityType("B");
+			issueSeverityType.getIssueSeverityTypeText().setText(Locale.ENGLISH.getLanguage(), "Block");
 			pm.makePersistent(issueSeverityType);
 			
-			issueSeverityType = new IssueSeverityType("FT", "Feature");
+			issueSeverityType = new IssueSeverityType("FT");
+			issueSeverityType.getIssueSeverityTypeText().setText(Locale.ENGLISH.getLanguage(), "Feature");
 			pm.makePersistent(issueSeverityType);
 			
-			issueSeverityType = new IssueSeverityType("TV", "Trivial");
+			issueSeverityType = new IssueSeverityType("TV");
+			issueSeverityType.getIssueSeverityTypeText().setText(Locale.ENGLISH.getLanguage(), "Trivial");
 			pm.makePersistent(issueSeverityType);
 			
-			issueSeverityType = new IssueSeverityType("T", "Text");
+			issueSeverityType = new IssueSeverityType("T");
+			issueSeverityType.getIssueSeverityTypeText().setText(Locale.ENGLISH.getLanguage(), "Text");
 			pm.makePersistent(issueSeverityType);
 			
-			issueSeverityType = new IssueSeverityType("TW", "Tweak");
+			issueSeverityType = new IssueSeverityType("TW");
+			issueSeverityType.getIssueSeverityTypeText().setText(Locale.ENGLISH.getLanguage(), "Tweak");
 			pm.makePersistent(issueSeverityType);
+			
+			
+			////////////////////////////////////////////////////////
+			// Create the statuses
+			IssuePriority issuePriority;
+
+			issuePriority = new IssuePriority("0");
+			issuePriority.getIssuePriorityText().setText(Locale.ENGLISH.getLanguage(), "None");
+			pm.makePersistent(issuePriority);
+
+			issuePriority = new IssuePriority("1");
+			issuePriority.getIssuePriorityText().setText(Locale.ENGLISH.getLanguage(), "Low");
+			pm.makePersistent(issuePriority);
+			
+			issuePriority = new IssuePriority("2");
+			issuePriority.getIssuePriorityText().setText(Locale.ENGLISH.getLanguage(), "Normal");
+			pm.makePersistent(issuePriority);
+			
+			issuePriority = new IssuePriority("3");
+			issuePriority.getIssuePriorityText().setText(Locale.ENGLISH.getLanguage(), "High");
+			pm.makePersistent(issuePriority);
+			
+			issuePriority = new IssuePriority("4");
+			issuePriority.getIssuePriorityText().setText(Locale.ENGLISH.getLanguage(), "Urgent");
+			pm.makePersistent(issuePriority);
+			
+			issuePriority = new IssuePriority("5");
+			issuePriority.getIssuePriorityText().setText(Locale.ENGLISH.getLanguage(), "Immediate");
+			pm.makePersistent(issuePriority);
 			
 //			// create PriceFragmentTypes for Swiss and German VAT
 //			PriceFragmentType priceFragmentType = new PriceFragmentType(getRootOrganisationID(), "vat-de-19-net");

@@ -176,7 +176,7 @@ public abstract class ScriptRegistryItem
 	/**
 	 * Returns the String representation of the primary key of the item
 	 * represented by the given parameters. It is the "/" separated 
-	 * concatination of the given parameters.
+	 * concatenation of the given parameters.
 	 * 
 	 * @param organisationID The organisationID.
 	 * @param scriptRegistryItemType The scriptRegistryItemType.

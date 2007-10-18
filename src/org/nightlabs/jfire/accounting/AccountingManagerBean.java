@@ -1080,7 +1080,7 @@ public abstract class AccountingManagerBean
 		ProductType productType = (ProductType) pm.getObjectById(productTypeID);
 		LocalAccountantDelegate delegate = (LocalAccountantDelegate) pm.getObjectById(localAccountantDelegateID);
 		if (!(delegate instanceof PFMappingAccountantDelegate))
-			throw new IllegalArgumentException("MoneyFlowMappings can only be resolved for ");
+			throw new IllegalArgumentException("MoneyFlowMappings can only be resolved for instances of " + PFMappingAccountantDelegate.class.getName() + " but object with ID \"" + localAccountantDelegateID + "\" is an instance of " + delegate.getClass().getName());
 		Map<ResolvedMapKey, ResolvedMapEntry> resolvedMappings = ((PFMappingAccountantDelegate) delegate).resolveProductTypeMappings(productType);
 		Map<ResolvedMapKey, ResolvedMapEntry> result = new HashMap<ResolvedMapKey, ResolvedMapEntry>();
 		for (Entry<ResolvedMapKey, ResolvedMapEntry> entry : resolvedMappings.entrySet()) {

@@ -29,12 +29,12 @@ package org.nightlabs.jfire.issue;
 import java.io.Serializable;
 import java.util.Collection;
 import java.util.Date;
-import java.util.HashSet;
 
 import javax.jdo.JDOHelper;
 import javax.jdo.PersistenceManager;
 
 import org.apache.log4j.Logger;
+import org.nightlabs.jdo.ObjectID;
 import org.nightlabs.jfire.security.User;
 import org.nightlabs.util.Utils;
 
@@ -122,39 +122,11 @@ implements Serializable
 	
 
 	/**
-	 * @see #isResolved()
-	 *
-	 * @jdo.field persistence-modifier="persistent"
-	 */
-	private boolean resolved = false;
-
-	/**
-	 * @see #isAdded()
-	 *
-	 * @jdo.field persistence-modifier="persistent"
-	 */
-	private boolean added = false;
-
-	/**
-	 * @see #isUpdated()
-	 *
-	 * @jdo.field persistence-modifier="persistent"
-	 */
-	private boolean updated = false;
-
-	/**
-	 * @see #isClosed()
-	 *
-	 * @jdo.field persistence-modifier="persistent"
-	 */
-	private boolean closed = false;
-	
-	/**
 	 * @deprecated Constructor exists only for JDO! 
 	 */
 	protected Issue() { }
 
-	public Issue(User creator)
+	public Issue(User creator, ObjectID objectID)
 	{
 		if (creator == null)
 			throw new NullPointerException("creator");
@@ -261,44 +233,6 @@ implements Serializable
 		this.organisationID = organisationID;
 	}
 
-	/**
-	 * @return boolean
-	 */
-	public boolean isResolved()
-	{
-		return resolved;
-	}
-
-	/**
-	 * @param resolved
-	 */
-	protected void setResolved(boolean resolved)
-	{
-		getPersistenceManager();
-
-		this.resolved = resolved;
-	}
-	
-	/**
-	 * An Issue can be closed. This is irreversile.
-	 *
-	 * @return Returns whether this Issue is closed.
-	 */
-	public boolean isClosed()
-	{
-		return closed;
-	}
-
-	protected void setClosed(boolean closed)
-	{
-		getPersistenceManager();
-
-		if (this.closed && !closed)
-			throw new IllegalArgumentException("The closed flag of a Issue is immutable after once set to true"); 
-
-		this.closed = closed;
-	}
-	
 	protected PersistenceManager getPersistenceManager()
 	{
 		PersistenceManager pm = JDOHelper.getPersistenceManager(this);

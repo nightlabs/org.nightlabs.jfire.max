@@ -6,7 +6,7 @@ import java.util.Map;
 import org.nightlabs.i18n.I18nText;
 
 /**
- * @author Chairat Kongarayawetchakun - chairatk at nightlabs dot de
+ * @author Chairat Kongarayawetchakun - chairat at nightlabs dot de
  *
  * @jdo.persistence-capable
  *		identity-type="application"
@@ -16,22 +16,26 @@ import org.nightlabs.i18n.I18nText;
  *
  * @jdo.inheritance strategy="new-table"
  *
- * @jdo.create-objectid-class field-order="organisationID, issueID"
- *
+ * @jdo.create-objectid-class
+ * 
+ * @jdo.fetch-group name="IssueDescription.description" fields="issue, descriptions"
  */ 
-public class IssueDescription extends I18nText 
-{
+public class IssueDescription 
+extends I18nText{
 	/**
-	 * @jdo.field primary-key="true"
-	 * @jdo.column length="100"
+	 * The serial version of this class.
 	 */
-	private String organisationID;
-
+	private static final long serialVersionUID = 1L;
 	/**
 	 * @jdo.field primary-key="true"
 	 * @jdo.column length="100"
 	 */
 	private String issueID;
+	
+	/**
+	 * @jdo.field persistence-modifier="persistent"
+	 */
+	private Issue issue;
 
 	/**
 	 * key: String languageID<br/>
@@ -42,18 +46,12 @@ public class IssueDescription extends I18nText
 	 *		collection-type="map"
 	 *		key-type="java.lang.String"
 	 *		value-type="java.lang.String"
-	 *		default-fetch-group="true"
 	 *		table="JFireIssueTracking_IssueDescription_descriptions"
 	 *		null-value="exception"
 	 *
 	 * @jdo.join
 	 */
-	private Map descriptions = new HashMap();
-
-	/**
-	 * @jdo.field persistence-modifier="persistent"
-	 */
-	private Issue issue;
+	protected Map<String, String> descriptions = new HashMap<String, String>();
 
 	/**
 	 * @deprecated Only for JDO!
@@ -64,15 +62,14 @@ public class IssueDescription extends I18nText
 
 	public IssueDescription(Issue issue)
 	{
-		this.organisationID = issue.getOrganisationID();
-		this.issueID = issue.getIssueID();
 		this.issue = issue;
+		issueID = issue.getIssueID();
 	}
 
 	/**
 	 * @see org.nightlabs.i18n.I18nText#getI18nMap()
 	 */
-	protected Map getI18nMap()
+	protected Map<String, String> getI18nMap()
 	{
 		return descriptions;
 	}
@@ -82,20 +79,6 @@ public class IssueDescription extends I18nText
 	 */
 	protected String getFallBackValue(String languageID)
 	{
-		return Issue.getPrimaryKey(organisationID, issueID);
-	}
-
-	public String getOrganisationID()
-	{
-		return organisationID;
-	}
-	public String getIssueID()
-	{
-		return issueID;
-	}
-
-	public Issue getIssue()
-	{
-		return issue;
+		return issue == null ? languageID : issueID;
 	}
 }

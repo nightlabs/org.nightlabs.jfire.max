@@ -47,6 +47,14 @@ implements Serializable{
 		this.text = text;
 	}
 	
+	public void setIssueStatusID(String issueStatusID) {
+		this.issueStatusID = issueStatusID;
+	}
+	
+	public void setText(String text) {
+		this.text = text;
+	}
+	
 	/**
 	 * @return Returns the issueStatusID.
 	 */

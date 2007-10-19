@@ -129,6 +129,7 @@ import org.nightlabs.util.Util;
  * @jdo.fetch-group name="ProductType.nestedProductTypes" fields="nestedProductTypes"
  * @jdo.fetch-group name="ProductType.packagePriceConfig" fields="packagePriceConfig"
  * @jdo.fetch-group name="ProductType.owner" fields="owner"
+ * @jdo.fetch-group name="ProductType.vendor" fields="vendor"
  * @jdo.fetch-group name="ProductType.deliveryConfiguration" fields="deliveryConfiguration"
  * @jdo.fetch-group name="ProductType.productTypeGroups" fields="productTypeGroups"
  * @jdo.fetch-group name="ProductType.managedProductTypeGroup" fields="managedProductTypeGroup"
@@ -208,6 +209,7 @@ implements
 	public static final String FETCH_GROUP_NESTED_PRODUCT_TYPES = "ProductType.nestedProductTypes";
 	public static final String FETCH_GROUP_PACKAGE_PRICE_CONFIG = "ProductType.packagePriceConfig";
 	public static final String FETCH_GROUP_OWNER = "ProductType.owner";
+	public static final String FETCH_GROUP_VENDOR = "ProductType.vendor";
 	public static final String FETCH_GROUP_DELIVERY_CONFIGURATION = "ProductType.deliveryConfiguration";
 	public static final String FETCH_GROUP_PRODUCT_TYPE_GROUPS = "ProductType.productTypeGroups";
 	public static final String FETCH_GROUP_MANAGED_PRODUCT_TYPE_GROUP = "ProductType.managedProductTypeGroup";
@@ -286,6 +288,12 @@ implements
 	 * // TODO JPOX WORKAROUND should be null-value="exception", but causes problems in replication 
 	 */
 	private LegalEntity owner;
+
+	/**
+	 * @jdo.field persistence-modifier="persistent"
+	 * // TODO JPOX WORKAROUND should be null-value="exception", but causes problems in replication 
+	 */
+	private LegalEntity vendor;
 
 	/**
 	 * @jdo.field persistence-modifier="persistent"
@@ -614,6 +622,7 @@ implements
 		if (extendedProductType != null) {
 			this.deliveryConfiguration = extendedProductType.getDeliveryConfiguration();
 			this.owner = extendedProductType.getOwner();
+			this.vendor = extendedProductType.getVendor();
 		}
 
 		this.inheritanceNature = inheritanceNature;
@@ -687,7 +696,8 @@ implements
 	 * The real owner can therefore be assigned as property of this
 	 * <code>ProductType</code>. 
 	 *
-	 * @return Returns the owner. If not managed for someone else, this is the {@link LocalOrganisation#getOrganisation() local organisation}
+	 * @return the owner. If not managed for someone else, this is the {@link LocalOrganisation#getOrganisation() local organisation}
+	 * @see #getVendor()
 	 */
 	public LegalEntity getOwner()
 	{
@@ -700,6 +710,50 @@ implements
 	public void setOwner(LegalEntity owner)
 	{
 		this.owner = owner;
+	}
+
+	/**
+	 * Get the vendor of this <code>ProductType</code>.
+	 * <p>
+	 * If an organisation sells products for someone else, there are two possibilities: Either it first buys them
+	 * from the other legal entity and then sells it wrapped in its own reseller-ProductType or it directly sells
+	 * it without buying it first. In the latter case the owner (see {@link #getOwner()}) would still be the other
+	 * legal entity, but the vendor is the local organisation. In this case the local organisation acts as a trustee
+	 * and represents the real vendor. This might be desired to reduce the load on the JFire system or if the
+	 * act of buying the products from the other legal-entity should not be managed within JFire for other reasons.
+	 * </p>
+	 * <p>
+	 * In other words:
+	 * <ul>
+	 * <li>
+	 * If the <code>vendor</code> is not the local organisation (usually the <code>vendor</code> will be
+	 * the same as the <code>owner</code> in this case), the local organisation must first
+	 * buy the products (i.e. create a purchase-<code>Offer</code> and go through the complete purchase-workflow), before
+	 * it can sell them wrapped within an own reseller-product (in the reseller-product-type, the local organisation
+	 * will be the vendor).
+	 * </li>
+	 * <li>
+	 * If the <code>vendor</code> is the local organisation, the local organisation does directly sell the
+	 * products to customers. It is impossible in this case, to create a purchase-<code>Offer</code> with the local
+	 * organisation being the customer for the products.
+	 * </li>
+	 * </ul>
+	 * </p>
+	 *
+	 * @return the vendor.
+	 * @see #getOwner()
+	 */
+	public LegalEntity getVendor()
+	{
+		return vendor;
+	}
+	/**
+	 * @param vendor The vendor to set.
+	 * @see #getVendor()
+	 */
+	public void setVendor(LegalEntity vendor)
+	{
+		this.vendor = vendor;
 	}
 
 	/**
@@ -1138,6 +1192,7 @@ implements
 		nestedProductTypes.size();
 		if (packagePriceConfig == null);
 		if (owner == null);
+		if (vendor == null);
 		name.getI18nMap();
 	}
 

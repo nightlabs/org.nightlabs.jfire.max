@@ -334,6 +334,12 @@ implements StoreCallback
 	public ProductType addProductType(User user, ProductType productType)
 	{
 		PersistenceManager pm = getPersistenceManager();
+		if (productType.getOwner() == null) {
+			productType.setOwner(getMandator());
+		}
+		if (productType.getVendor() == null) {
+			productType.setVendor(getMandator());
+		}
 		productType = pm.makePersistent(productType);
 
 		// JPOX WORKAROUND there seems to be a JPOX bug causing the object not to be cleanly replaced by the attached one

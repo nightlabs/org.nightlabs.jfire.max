@@ -451,26 +451,28 @@ implements SessionBean
 				pm.getFetchPlan().setGroups(fetchGroups);
 
 			try {
-				VoucherLocalAccountantDelegate delegate = (VoucherLocalAccountantDelegate) voucherType.getProductTypeLocal().getLocalAccountantDelegate();
-				if (delegate != null) {
-					OrganisationLegalEntity organisationLegalEntity = null;
+				if (voucherType.getProductTypeLocal() != null) {
+					VoucherLocalAccountantDelegate delegate = (VoucherLocalAccountantDelegate) voucherType.getProductTypeLocal().getLocalAccountantDelegate();
+					if (delegate != null) {
+						OrganisationLegalEntity organisationLegalEntity = null;
 
-					for (Account account : delegate.getAccounts().values()) {
-						try {
-							if (account.getOwner() == null) {
-								if (organisationLegalEntity == null)
-									organisationLegalEntity = OrganisationLegalEntity
-											.getOrganisationLegalEntity(pm, getOrganisationID(),
-													OrganisationLegalEntity.ANCHOR_TYPE_ID_ORGANISATION,
-													true);
+						for (Account account : delegate.getAccounts().values()) {
+							try {
+								if (account.getOwner() == null) {
+									if (organisationLegalEntity == null)
+										organisationLegalEntity = OrganisationLegalEntity
+										.getOrganisationLegalEntity(pm, getOrganisationID(),
+												OrganisationLegalEntity.ANCHOR_TYPE_ID_ORGANISATION,
+												true);
 
-								account.setOwner(organisationLegalEntity);
+									account.setOwner(organisationLegalEntity);
+								}
+							} catch (JDODetachedFieldAccessException x) {
+								// ignore
 							}
-						} catch (JDODetachedFieldAccessException x) {
-							// ignore
 						}
 					}
-				}
+				} // if (voucherType.getProductTypeLocal() != null)
 			} catch (JDODetachedFieldAccessException x) {
 				// ignore
 			}
@@ -480,9 +482,7 @@ implements SessionBean
 			if (NLJDOHelper.exists(pm, voucherType)) {
 				voucherType = (VoucherType) pm.makePersistent(voucherType);
 			} else {
-				voucherType = (VoucherType) Store.getStore(pm).addProductType(User.getUser(pm, getPrincipal()),
-						voucherType);
-//						VoucherTypeActionHandler.getDefaultHome(pm, voucherType));
+				voucherType = (VoucherType) Store.getStore(pm).addProductType(User.getUser(pm, getPrincipal()), voucherType);
 			}
 
 			// take care about the inheritance
@@ -491,7 +491,15 @@ implements SessionBean
 			if (!get)
 				return null;
 
-			return (VoucherType) pm.detachCopy(voucherType);
+			{ // TODO JPOX WORKAROUND
+				pm.flush();
+				ProductTypeID vtid = (ProductTypeID) JDOHelper.getObjectId(voucherType);
+				pm.evictAll();
+				voucherType = (VoucherType) pm.getObjectById(vtid);
+			}
+
+			VoucherType detachedVoucherType = (VoucherType) pm.detachCopy(voucherType);
+			return detachedVoucherType;
 		} finally {
 			pm.close();
 		}

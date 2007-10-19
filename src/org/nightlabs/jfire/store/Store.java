@@ -334,12 +334,6 @@ implements StoreCallback
 	public ProductType addProductType(User user, ProductType productType)
 	{
 		PersistenceManager pm = getPersistenceManager();
-		if (productType.getOwner() == null) {
-			productType.setOwner(getMandator());
-		}
-		if (productType.getVendor() == null) {
-			productType.setVendor(getMandator());
-		}
 		productType = pm.makePersistent(productType);
 
 		// JPOX WORKAROUND there seems to be a JPOX bug causing the object not to be cleanly replaced by the attached one
@@ -407,10 +401,154 @@ implements StoreCallback
 			pm.makePersistent(productTypeStatusTracker);
 		}
 
+		if (productType.getOwner() == null)
+			productType.setOwner(getMandator());
+
+		if (productType.getVendor() == null)
+			productType.setVendor(getMandator());
+
 		ProductTypeActionHandler productTypeActionHandler = ProductTypeActionHandler.getProductTypeActionHandler(getPersistenceManager(), productType.getClass());
 		Repository defaultHomeRepository = productTypeActionHandler.getDefaultHomeRepository(productType);
 
 		productType.createProductTypeLocal(user, defaultHomeRepository);
+		// TODO JPOX WORKAROUND - begin
+		try {
+			pm.flush();
+		} catch (Exception x) {
+			logger.warn("JPOX bug: creating ProductTypeLocal caused an exception!", x);
+		}
+
+//	19:30:18,983 WARN  [SQL] Insert of object "org.nightlabs.jfire.voucher.store.VoucherTypeLocal@8a80d8" using statement "INSERT INTO `JFIRETRADE_PRODUCTTYPELOCAL` (`PRODUCT_TYPE_ORGANISATION_ID_OID`,`PRODUCT_TYPE_PRODUCT_TYPE_ID_OID`,`LOCAL_ACCOUNTANT_DELEGATE_LOCAL_ACCOUNTANT_DELEGATE_ID_OID`,`LOCAL_ACCOUNTANT_DELEGATE_ORGANISATION_ID_OID`,`LOCAL_STOREKEEPER_DELEGATE_LOCAL_STOREKEEPER_DELEGATE_ID_OID`,`LOCAL_STOREKEEPER_DELEGATE_ORGANISATION_ID_OID`,`HOME_ANCHOR_ID_OID`,`HOME_ANCHOR_TYPE_ID_OID`,`HOME_ORGANISATION_ID_OID`,`ORGANISATION_ID`,`PRODUCT_TYPE_ID`) VALUES (?,?,?,?,?,?,?,?,?,?,?)" failed : Duplicate entry 'chezfrancois.jfire.org-ostern_a7n' for key 1
+//	19:30:18,987 ERROR [LogInterceptor] RuntimeException in method: public abstract org.nightlabs.jfire.voucher.store.VoucherType org.nightlabs.jfire.voucher.VoucherManager.storeVoucherType(org.nightlabs.jfire.voucher.store.VoucherType,boolean,java.lang.String[],int) throws java.rmi.RemoteException:
+//	javax.jdo.JDODataStoreException: Insert of object "org.nightlabs.jfire.voucher.store.VoucherTypeLocal@8a80d8" using statement "INSERT INTO `JFIRETRADE_PRODUCTTYPELOCAL` (`PRODUCT_TYPE_ORGANISATION_ID_OID`,`PRODUCT_TYPE_PRODUCT_TYPE_ID_OID`,`LOCAL_ACCOUNTANT_DELEGATE_LOCAL_ACCOUNTANT_DELEGATE_ID_OID`,`LOCAL_ACCOUNTANT_DELEGATE_ORGANISATION_ID_OID`,`LOCAL_STOREKEEPER_DELEGATE_LOCAL_STOREKEEPER_DELEGATE_ID_OID`,`LOCAL_STOREKEEPER_DELEGATE_ORGANISATION_ID_OID`,`HOME_ANCHOR_ID_OID`,`HOME_ANCHOR_TYPE_ID_OID`,`HOME_ORGANISATION_ID_OID`,`ORGANISATION_ID`,`PRODUCT_TYPE_ID`) VALUES (?,?,?,?,?,?,?,?,?,?,?)" failed : Duplicate entry 'chezfrancois.jfire.org-ostern_a7n' for key 1
+//	        at org.jpox.jdo.JPOXJDOHelper.getJDOExceptionForJPOXException(JPOXJDOHelper.java:283)
+//	        at org.jpox.AbstractPersistenceManager.jdoMakePersistent(AbstractPersistenceManager.java:594)
+//	        at org.jpox.AbstractPersistenceManager.makePersistent(AbstractPersistenceManager.java:614)
+//	        at org.nightlabs.jfire.store.Store.addProductType(Store.java:430)
+//	        at org.nightlabs.jfire.voucher.VoucherManagerBean.storeVoucherType(VoucherManagerBean.java:485)
+//	        at sun.reflect.NativeMethodAccessorImpl.invoke0(Native Method)
+//	        at sun.reflect.NativeMethodAccessorImpl.invoke(NativeMethodAccessorImpl.java:39)
+//	        at sun.reflect.DelegatingMethodAccessorImpl.invoke(DelegatingMethodAccessorImpl.java:25)
+//	        at java.lang.reflect.Method.invoke(Method.java:585)
+//	        at org.jboss.invocation.Invocation.performCall(Invocation.java:359)
+//	        at org.jboss.ejb.StatelessSessionContainer$ContainerInterceptor.invoke(StatelessSessionContainer.java:237)
+//	        at org.jboss.resource.connectionmanager.CachedConnectionInterceptor.invoke(CachedConnectionInterceptor.java:158)
+//	        at org.jboss.ejb.plugins.StatelessSessionInstanceInterceptor.invoke(StatelessSessionInstanceInterceptor.java:169)
+//	        at org.jboss.ejb.plugins.CallValidationInterceptor.invoke(CallValidationInterceptor.java:63)
+//	        at org.jboss.ejb.plugins.AbstractTxInterceptor.invokeNext(AbstractTxInterceptor.java:121)
+//	        at org.jboss.ejb.plugins.TxInterceptorCMT.runWithTransactions(TxInterceptorCMT.java:350)
+//	        at org.jboss.ejb.plugins.TxInterceptorCMT.invoke(TxInterceptorCMT.java:181)
+//	        at org.jboss.ejb.plugins.SecurityInterceptor.invoke(SecurityInterceptor.java:168)
+//	        at org.jboss.ejb.plugins.LogInterceptor.invoke(LogInterceptor.java:205)
+//	        at org.jboss.ejb.plugins.ProxyFactoryFinderInterceptor.invoke(ProxyFactoryFinderInterceptor.java:138)
+//	        at org.jboss.ejb.SessionContainer.internalInvoke(SessionContainer.java:648)
+//	        at org.jboss.ejb.Container.invoke(Container.java:960)
+//	        at sun.reflect.GeneratedMethodAccessor115.invoke(Unknown Source)
+//	        at sun.reflect.DelegatingMethodAccessorImpl.invoke(DelegatingMethodAccessorImpl.java:25)
+//	        at java.lang.reflect.Method.invoke(Method.java:585)
+//	        at org.jboss.mx.interceptor.ReflectedDispatcher.invoke(ReflectedDispatcher.java:155)
+//	        at org.jboss.mx.server.Invocation.dispatch(Invocation.java:94)
+//	        at org.jboss.mx.server.Invocation.invoke(Invocation.java:86)
+//	        at org.jboss.mx.server.AbstractMBeanInvoker.invoke(AbstractMBeanInvoker.java:264)
+//	        at org.jboss.mx.server.MBeanServerImpl.invoke(MBeanServerImpl.java:659)
+//	        at org.jboss.invocation.unified.server.UnifiedInvoker.invoke(UnifiedInvoker.java:231)
+//	        at sun.reflect.GeneratedMethodAccessor132.invoke(Unknown Source)
+//	        at sun.reflect.DelegatingMethodAccessorImpl.invoke(DelegatingMethodAccessorImpl.java:25)
+//	        at java.lang.reflect.Method.invoke(Method.java:585)
+//	        at org.jboss.mx.interceptor.ReflectedDispatcher.invoke(ReflectedDispatcher.java:155)
+//	        at org.jboss.mx.server.Invocation.dispatch(Invocation.java:94)
+//	        at org.jboss.mx.server.Invocation.invoke(Invocation.java:86)
+//	        at org.jboss.mx.server.AbstractMBeanInvoker.invoke(AbstractMBeanInvoker.java:264)
+//	        at org.jboss.mx.server.MBeanServerImpl.invoke(MBeanServerImpl.java:659)
+//	        at javax.management.MBeanServerInvocationHandler.invoke(MBeanServerInvocationHandler.java:201)
+//	        at $Proxy16.invoke(Unknown Source)
+//	        at org.jboss.remoting.ServerInvoker.invoke(ServerInvoker.java:734)
+//	        at org.jboss.remoting.transport.socket.ServerThread.processInvocation(ServerThread.java:560)
+//	        at org.jboss.remoting.transport.socket.ServerThread.dorun(ServerThread.java:383)
+//	        at org.jboss.remoting.transport.socket.ServerThread.run(ServerThread.java:165)
+//	NestedThrowablesStackTrace:
+//	com.mysql.jdbc.exceptions.MySQLIntegrityConstraintViolationException: Duplicate entry 'chezfrancois.jfire.org-ostern_a7n' for key 1
+//	        at com.mysql.jdbc.SQLError.createSQLException(SQLError.java:931)
+//	        at com.mysql.jdbc.MysqlIO.checkErrorPacket(MysqlIO.java:2870)
+//	        at com.mysql.jdbc.MysqlIO.sendCommand(MysqlIO.java:1573)
+//	        at com.mysql.jdbc.ServerPreparedStatement.serverExecute(ServerPreparedStatement.java:1160)
+//	        at com.mysql.jdbc.ServerPreparedStatement.executeInternal(ServerPreparedStatement.java:685)
+//	        at com.mysql.jdbc.PreparedStatement.executeUpdate(PreparedStatement.java:1400)
+//	        at com.mysql.jdbc.PreparedStatement.executeUpdate(PreparedStatement.java:1314)
+//	        at com.mysql.jdbc.PreparedStatement.executeUpdate(PreparedStatement.java:1299)
+//	        at org.apache.commons.dbcp.DelegatingPreparedStatement.executeUpdate(DelegatingPreparedStatement.java:101)
+//	        at org.apache.commons.dbcp.DelegatingPreparedStatement.executeUpdate(DelegatingPreparedStatement.java:101)
+//	        at org.jpox.store.rdbms.SQLController.executeStatementUpdate(SQLController.java:368)
+//	        at org.jpox.store.rdbms.request.InsertRequest.execute(InsertRequest.java:363)
+//	        at org.jpox.store.rdbms.table.ClassTable.insert(ClassTable.java:2653)
+//	        at org.jpox.store.rdbms.table.ClassTable.insert(ClassTable.java:2649)
+//	        at org.jpox.store.MappedStoreManager.insertObject(MappedStoreManager.java:177)
+//	        at org.jpox.state.JDOStateManagerImpl.internalMakePersistent(JDOStateManagerImpl.java:2943)
+//	        at org.jpox.state.JDOStateManagerImpl.flush(JDOStateManagerImpl.java:4227)
+//	        at org.jpox.state.JDOStateManagerImpl.insertionCompleted(JDOStateManagerImpl.java:3147)
+//	        at org.jpox.state.JDOStateManagerImpl.changeActivityState(JDOStateManagerImpl.java:3045)
+//	        at org.jpox.store.rdbms.request.InsertRequest.execute(InsertRequest.java:373)
+//	        at org.jpox.store.rdbms.table.ClassTable.insert(ClassTable.java:2653)
+//	        at org.jpox.store.MappedStoreManager.insertObject(MappedStoreManager.java:177)
+//	        at org.jpox.state.JDOStateManagerImpl.internalMakePersistent(JDOStateManagerImpl.java:2943)
+//	        at org.jpox.state.JDOStateManagerImpl.makePersistent(JDOStateManagerImpl.java:2923)
+//	        at org.jpox.ObjectManagerImpl.persistObjectInternal(ObjectManagerImpl.java:1088)
+//	        at org.jpox.ObjectManagerImpl.persistObject(ObjectManagerImpl.java:987)
+//	        at org.jpox.AbstractPersistenceManager.jdoMakePersistent(AbstractPersistenceManager.java:589)
+//	        at org.jpox.AbstractPersistenceManager.makePersistent(AbstractPersistenceManager.java:614)
+//	        at org.nightlabs.jfire.store.Store.addProductType(Store.java:430)
+//	        at org.nightlabs.jfire.voucher.VoucherManagerBean.storeVoucherType(VoucherManagerBean.java:485)
+//	        at sun.reflect.NativeMethodAccessorImpl.invoke0(Native Method)
+//	        at sun.reflect.NativeMethodAccessorImpl.invoke(NativeMethodAccessorImpl.java:39)
+//	        at sun.reflect.DelegatingMethodAccessorImpl.invoke(DelegatingMethodAccessorImpl.java:25)
+//	        at java.lang.reflect.Method.invoke(Method.java:585)
+//	        at org.jboss.invocation.Invocation.performCall(Invocation.java:359)
+//	        at org.jboss.ejb.StatelessSessionContainer$ContainerInterceptor.invoke(StatelessSessionContainer.java:237)
+//	        at org.jboss.resource.connectionmanager.CachedConnectionInterceptor.invoke(CachedConnectionInterceptor.java:158)
+//	        at org.jboss.ejb.plugins.StatelessSessionInstanceInterceptor.invoke(StatelessSessionInstanceInterceptor.java:169)
+//	        at org.jboss.ejb.plugins.CallValidationInterceptor.invoke(CallValidationInterceptor.java:63)
+//	        at org.jboss.ejb.plugins.AbstractTxInterceptor.invokeNext(AbstractTxInterceptor.java:121)
+//	        at org.jboss.ejb.plugins.TxInterceptorCMT.runWithTransactions(TxInterceptorCMT.java:350)
+//	        at org.jboss.ejb.plugins.TxInterceptorCMT.invoke(TxInterceptorCMT.java:181)
+//	        at org.jboss.ejb.plugins.SecurityInterceptor.invoke(SecurityInterceptor.java:168)
+//	        at org.jboss.ejb.plugins.LogInterceptor.invoke(LogInterceptor.java:205)
+//	        at org.jboss.ejb.plugins.ProxyFactoryFinderInterceptor.invoke(ProxyFactoryFinderInterceptor.java:138)
+//	        at org.jboss.ejb.SessionContainer.internalInvoke(SessionContainer.java:648)
+//	        at org.jboss.ejb.Container.invoke(Container.java:960)
+//	        at sun.reflect.GeneratedMethodAccessor115.invoke(Unknown Source)
+//	        at sun.reflect.DelegatingMethodAccessorImpl.invoke(DelegatingMethodAccessorImpl.java:25)
+//	        at java.lang.reflect.Method.invoke(Method.java:585)
+//	        at org.jboss.mx.interceptor.ReflectedDispatcher.invoke(ReflectedDispatcher.java:155)
+//	        at org.jboss.mx.server.Invocation.dispatch(Invocation.java:94)
+//	        at org.jboss.mx.server.Invocation.invoke(Invocation.java:86)
+//	        at org.jboss.mx.server.AbstractMBeanInvoker.invoke(AbstractMBeanInvoker.java:264)
+//	        at org.jboss.mx.server.MBeanServerImpl.invoke(MBeanServerImpl.java:659)
+//	        at org.jboss.invocation.unified.server.UnifiedInvoker.invoke(UnifiedInvoker.java:231)
+//	        at sun.reflect.GeneratedMethodAccessor132.invoke(Unknown Source)
+//	        at sun.reflect.DelegatingMethodAccessorImpl.invoke(DelegatingMethodAccessorImpl.java:25)
+//	        at java.lang.reflect.Method.invoke(Method.java:585)
+//	        at org.jboss.mx.interceptor.ReflectedDispatcher.invoke(ReflectedDispatcher.java:155)
+//	        at org.jboss.mx.server.Invocation.dispatch(Invocation.java:94)
+//	        at org.jboss.mx.server.Invocation.invoke(Invocation.java:86)
+//	        at org.jboss.mx.server.AbstractMBeanInvoker.invoke(AbstractMBeanInvoker.java:264)
+//	        at org.jboss.mx.server.MBeanServerImpl.invoke(MBeanServerImpl.java:659)
+//	        at javax.management.MBeanServerInvocationHandler.invoke(MBeanServerInvocationHandler.java:201)
+//	        at $Proxy16.invoke(Unknown Source)
+//	        at org.jboss.remoting.ServerInvoker.invoke(ServerInvoker.java:734)
+//	        at org.jboss.remoting.transport.socket.ServerThread.processInvocation(ServerThread.java:560)
+//	        at org.jboss.remoting.transport.socket.ServerThread.dorun(ServerThread.java:383)
+//	        at org.jboss.remoting.transport.socket.ServerThread.run(ServerThread.java:165)
+
+
+		{
+			ProductTypeID productTypeID = (ProductTypeID) JDOHelper.getObjectId(productType);
+			pm.evictAll();
+			productType = (ProductType) pm.getObjectById(productTypeID);
+			if (productType.getProductTypeLocal() == null)
+				throw new IllegalStateException("JPOX Workaround failed: There's no ProductTypeLocal!");
+		}
+		// TODO JPOX WORKAROUND - end
+		
 		return productType;
 	}
 

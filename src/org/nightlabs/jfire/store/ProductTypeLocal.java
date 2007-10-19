@@ -137,7 +137,7 @@ implements Serializable, Inheritable, InheritanceCallbacks
 		this.productTypeID = productType.getProductTypeID();
 		fieldMetaDataMap = new HashMap<String, ProductTypeLocalFieldMetaData>();
 		this.setHome(home);
-		productType.setProductTypeLocal(this);
+		productType.setProductTypeLocal(this); // TODO JPOX WORKAROUND: This causes problems, hence we set it in the Store.addProductType(...) method:
 	}
 
 	public String getOrganisationID()

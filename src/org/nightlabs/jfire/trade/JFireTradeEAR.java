@@ -30,7 +30,6 @@ import org.nightlabs.jfire.editlock.EditLockType;
 import org.nightlabs.jfire.editlock.id.EditLockTypeID;
 import org.nightlabs.jfire.organisation.Organisation;
 import org.nightlabs.jfire.store.ProductType;
-import org.nightlabs.jfire.store.deliver.id.ModeOfDeliveryFlavourID;
 
 /**
  * @author Alexander Bieber <alex[AT]nightlabs[DOT]de>

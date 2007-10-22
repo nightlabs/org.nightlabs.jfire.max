@@ -1315,9 +1315,10 @@ implements SessionBean
 
 			pm.makePersistent(new EditLockTypeOrder(EditLockTypeOrder.EDIT_LOCK_TYPE_ID));
 			pm.makePersistent(new EditLockTypeOffer(EditLockTypeOffer.EDIT_LOCK_TYPE_ID));
+
 			EditLockType productTypeEditLock = new EditLockType(JFireTradeEAR.EDIT_LOCK_TYPE_ID_PRODUCT_TYPE);
-			
-			pm.makePersistent(productTypeEditLock);
+			productTypeEditLock = pm.makePersistent(productTypeEditLock);
+			// TODO do sth. with productTypeEditLock or remove this variable (btw. after pm.makePersistent(...) it is crutial to continue work with the result of this method!)
 		} finally {
 			pm.close();
 		}

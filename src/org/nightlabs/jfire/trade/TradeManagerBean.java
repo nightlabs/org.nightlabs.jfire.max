@@ -53,6 +53,7 @@ import org.nightlabs.jdo.NLJDOHelper;
 import org.nightlabs.jdo.moduleregistry.ModuleMetaData;
 import org.nightlabs.jdo.query.JDOQuery;
 import org.nightlabs.jfire.accounting.Currency;
+import org.nightlabs.jfire.accounting.TariffOrderConfigModule;
 import org.nightlabs.jfire.accounting.id.CurrencyID;
 import org.nightlabs.jfire.base.BaseSessionBeanImpl;
 import org.nightlabs.jfire.config.ConfigSetup;
@@ -1288,6 +1289,7 @@ implements SessionBean
 					UserConfigSetup.CONFIG_SETUP_TYPE_USER
 				);
 			configSetup.getConfigModuleClasses().add(LegalEntityViewConfigModule.class.getName());
+			configSetup.getConfigModuleClasses().add(TariffOrderConfigModule.class.getName());
 
 			Trader trader = Trader.getTrader(pm);
 

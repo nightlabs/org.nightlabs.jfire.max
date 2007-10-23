@@ -28,6 +28,7 @@ package org.nightlabs.jfire.accounting;
 
 import java.io.Serializable;
 
+import javax.jdo.JDODetachedFieldAccessException;
 import javax.jdo.JDOHelper;
 
 import org.nightlabs.jdo.ObjectIDUtil;
@@ -104,6 +105,9 @@ implements Serializable
 	 * @jdo.field persistence-modifier="persistent" dependent="true" mapped-by="tariff"
 	 */
 	private TariffName name;
+	
+	/** @jdo.field persistence-modifier="persistent" */
+	private int tariffIndex;
 
 	public Tariff() { }
 
@@ -113,6 +117,7 @@ implements Serializable
 		this.tariffID = tariffID;
 		this.primaryKey = getPrimaryKey(organisationID, tariffID);
 		this.name = new TariffName(this);
+		this.tariffIndex = Integer.MAX_VALUE;
 	}
 
 	public static String getPrimaryKey(String organisationID, String tariffID)
@@ -207,6 +212,14 @@ implements Serializable
 //		tariff.name.localize(languageID, this.name);
 //		return tariff;
 //	}
+	
+	public int getTariffIndex() {
+		return tariffIndex;
+	}
+	
+	public void setTariffIndex(int tariffIndex) {
+		this.tariffIndex = tariffIndex;
+	}
 
 	@Override
 	public boolean equals(Object obj)
@@ -221,5 +234,14 @@ implements Serializable
 	public int hashCode()
 	{
 		return Util.hashCode(organisationID) + Util.hashCode(tariffID);
+	}
+	
+	@Override
+	public String toString() {
+		try {
+			return getName().getText();
+		} catch (JDODetachedFieldAccessException e) {
+			return super.toString();
+		}
 	}
 }

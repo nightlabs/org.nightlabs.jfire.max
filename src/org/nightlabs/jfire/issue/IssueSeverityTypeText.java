@@ -18,7 +18,7 @@ import org.nightlabs.i18n.I18nText;
  *
  * @jdo.create-objectid-class
  * 
- * @jdo.fetch-group name="IssueSeverityTypeText.text" fields="issue, texts"
+ * @jdo.fetch-group name="IssueSeverityTypeText.this" fields="issueSeverityType, texts"
  */ 
 public class IssueSeverityTypeText 
 extends I18nText{
@@ -46,6 +46,7 @@ extends I18nText{
 	 *		collection-type="map"
 	 *		key-type="java.lang.String"
 	 *		value-type="java.lang.String"
+	 *		default-fetch-group="true"
 	 *		table="JFireIssueTracking_IssueSeverityTypeText_texts"
 	 *		null-value="exception"
 	 *

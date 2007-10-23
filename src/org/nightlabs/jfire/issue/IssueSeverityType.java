@@ -16,10 +16,14 @@ import org.nightlabs.util.Util;
  * @jdo.create-objectid-class
  *
  * @jdo.inheritance strategy = "new-table"
+ * 
+ * @jdo.fetch-group name="IssueSeverityType.this" fields="text"
  */
 public class IssueSeverityType
 implements Serializable{
 	private static final long serialVersionUID = 1L;
+	
+	public static final String FETCH_GROUP_THIS = "IssueSeverityType.this";
 	/**
 	 * @jdo.field primary-key="true"
 	 * @jdo.column length="100"
@@ -27,7 +31,7 @@ implements Serializable{
 	private String issueSeverityTypeID;
 
 	/**
-	 * @jdo.field persistence-modifier="persistent" null-value="exception"
+	 * @jdo.field persistence-modifier="persistent" dependent="true" mapped-by="issueSeverityType"
 	 */
 	private IssueSeverityTypeText text;
 

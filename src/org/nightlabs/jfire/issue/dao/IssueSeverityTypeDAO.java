@@ -52,7 +52,7 @@ public class IssueSeverityTypeDAO
 		}
 	}
 
-	private static final String[] FETCH_GROUPS = { FetchPlan.DEFAULT };
+	private static final String[] FETCH_GROUPS = { IssueSeverityType.FETCH_GROUP_THIS, FetchPlan.DEFAULT };
 
 	public List<IssueSeverityType> getIssueSeverityTypes(ProgressMonitor monitor)
 	{

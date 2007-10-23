@@ -17,6 +17,7 @@ import javax.jdo.PersistenceManager;
 import javax.jdo.Query;
 
 import org.apache.log4j.Logger;
+import org.nightlabs.ModuleException;
 import org.nightlabs.jdo.NLJDOHelper;
 import org.nightlabs.jdo.ObjectID;
 import org.nightlabs.jfire.base.BaseSessionBeanImpl;
@@ -27,12 +28,11 @@ import org.nightlabs.jfire.issue.id.IssueStatusID;
 import org.nightlabs.jfire.security.UserGroup;
 
 /**
- * @author Chairat Kongarayawetchakun - chairatk[AT]nightlabs[DOT]de
+ * @author Chairat Kongarayawetchakun - chairat[AT]nightlabs[DOT]de
  * 
  * @ejb.bean name="jfire/ejb/JFireIssueTracking/IssueManager"	
  *           jndi-name="jfire/ejb/JFireIssueTracking/IssueManager"
  *           type="Stateless" 
- *           transaction-type="Container"
  *
  * @ejb.util generate = "physical"
  */
@@ -166,6 +166,46 @@ implements SessionBean{
 			pm.close();
 		}
 	}
+	
+	/**
+	 * @ejb.interface-method
+	 * @ejb.transaction type="Supports"
+	 * @ejb.permission role-name="_Guest_"
+	 */
+	public Set<IssueSeverityTypeID> getIssueSeverityTypeIDs()
+	{
+		PersistenceManager pm = getPersistenceManager();
+		try {
+			Query q = pm.newQuery(IssueSeverityType.class);
+			q.setResult("JDOHelper.getObjectId(this)");
+			return new HashSet<IssueSeverityTypeID>((Collection<? extends IssueSeverityTypeID>) q.execute());
+		} finally {
+			pm.close();
+		}
+	}
+	
+	/**
+	 * @throws ModuleException
+	 *
+	 * @ejb.interface-method
+	 * @ejb.transaction type = "Required"
+	 * @ejb.permission role-name="_Guest_"
+	 */
+	public Collection getIssueSeverityTypes(String[] fetchGroups, int maxFetchDepth)
+	throws ModuleException
+	{
+		PersistenceManager pm = getPersistenceManager();
+		try {
+			pm.getFetchPlan().setMaxFetchDepth(maxFetchDepth);
+			if (fetchGroups != null)
+				pm.getFetchPlan().setGroups(fetchGroups);
+
+			Query q = pm.newQuery(IssueSeverityType.class);
+			return pm.detachCopyAll((Collection)q.execute());
+		} finally {
+			pm.close();
+		}
+	}
 
 	/**
 	 * @throws IOException While loading an icon from a local resource, this might happen and we don't care in the initialise method.
@@ -294,40 +334,6 @@ implements SessionBean{
 			issuePriority.getIssuePriorityText().setText(Locale.ENGLISH.getLanguage(), "Immediate");
 			pm.makePersistent(issuePriority);
 			
-//			// create PriceFragmentTypes for Swiss and German VAT
-//			PriceFragmentType priceFragmentType = new PriceFragmentType(getRootOrganisationID(), "vat-de-19-net");
-//			priceFragmentType.getName().setText(Locale.ENGLISH.getLanguage(), "VAT Germa6ny 19% Net");
-//			priceFragmentType.getName().setText(Locale.GERMAN.getLanguage(), "MwSt. Deutschland 19% Netto");
-//			priceFragmentType.setContainerPriceFragmentType(PriceFragmentType.getTotalPriceFragmentType(pm));
-//			pm.makePersistent(priceFragmentType);
-//
-//			priceFragmentType = new PriceFragmentType(getRootOrganisationID(), "vat-de-19-val");
-//			priceFragmentType.getName().setText(Locale.ENGLISH.getLanguage(), "VAT Germany 19% Value");
-//			priceFragmentType.getName().setText(Locale.GERMAN.getLanguage(), "MwSt. Deutschland 19% Wert");
-//			priceFragmentType.setContainerPriceFragmentType(PriceFragmentType.getTotalPriceFragmentType(pm));
-//			pm.makePersistent(priceFragmentType);
-//
-//			priceFragmentType = new PriceFragmentType(getRootOrganisationID(), "vat-de-7-net");
-//			priceFragmentType.getName().setText(Locale.ENGLISH.getLanguage(), "VAT Germany 7% Net");
-//			priceFragmentType.setContainerPriceFragmentType(PriceFragmentType.getTotalPriceFragmentType(pm));
-//			pm.makePersistent(priceFragmentType);
-//
-//			priceFragmentType = new PriceFragmentType(getRootOrganisationID(), "vat-de-7-val");
-//			priceFragmentType.getName().setText(Locale.ENGLISH.getLanguage(), "VAT Germany 7% Value");
-//			priceFragmentType.setContainerPriceFragmentType(PriceFragmentType.getTotalPriceFragmentType(pm));
-//			pm.makePersistent(priceFragmentType);
-//
-//			priceFragmentType = new PriceFragmentType(getRootOrganisationID(), "vat-ch-7_6-net");
-//			priceFragmentType.getName().setText(Locale.ENGLISH.getLanguage(), "VAT Switzerland 7.6% Net");
-//			priceFragmentType.setContainerPriceFragmentType(PriceFragmentType.getTotalPriceFragmentType(pm));
-//			pm.makePersistent(priceFragmentType);
-//
-//			priceFragmentType = new PriceFragmentType(getRootOrganisationID(), "vat-ch-7_6-val");
-//			priceFragmentType.getName().setText(Locale.ENGLISH.getLanguage(), "VAT Switzerland 7.6% Value");
-//			priceFragmentType.setContainerPriceFragmentType(PriceFragmentType.getTotalPriceFragmentType(pm));
-//			pm.makePersistent(priceFragmentType);
-//
-//			Accounting accounting = Accounting.getAccounting(pm);
 //			Trader trader = Trader.getTrader(pm);
 //
 //

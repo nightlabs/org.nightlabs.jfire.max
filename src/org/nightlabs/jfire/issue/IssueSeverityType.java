@@ -55,6 +55,9 @@ implements Serializable{
 		return issueSeverityTypeID;
 	}
 
+	/**
+	 * @return Returns the issueSeverityTypeText.
+	 */
 	public IssueSeverityTypeText getIssueSeverityTypeText()
 	{
 		return text;

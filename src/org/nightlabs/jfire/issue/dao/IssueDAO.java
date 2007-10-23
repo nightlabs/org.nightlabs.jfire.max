@@ -1,8 +1,10 @@
 package org.nightlabs.jfire.issue.dao;
 
 import java.util.Collection;
+import java.util.List;
 import java.util.Set;
 
+import org.nightlabs.jdo.NLJDOHelper;
 import org.nightlabs.jdo.ObjectID;
 import org.nightlabs.jfire.base.jdo.BaseJDOObjectDAO;
 import org.nightlabs.jfire.issue.Issue;
@@ -11,6 +13,7 @@ import org.nightlabs.jfire.issue.IssueManagerUtil;
 import org.nightlabs.jfire.issue.id.IssueID;
 import org.nightlabs.jfire.security.SecurityReflector;
 import org.nightlabs.progress.ProgressMonitor;
+import org.nightlabs.progress.SubProgressMonitor;
 
 public class IssueDAO extends BaseJDOObjectDAO<IssueID, Issue>{
 
@@ -28,7 +31,7 @@ public class IssueDAO extends BaseJDOObjectDAO<IssueID, Issue>{
 	}
 
 	@Override
-	protected Collection<Issue> retrieveJDOObjects(Set<IssueID> issueIDs,
+	protected synchronized Collection<Issue> retrieveJDOObjects(Set<IssueID> issueIDs,
 			String[] fetchGroups, int maxFetchDepth, ProgressMonitor monitor)
 			throws Exception {
 
@@ -47,7 +50,7 @@ public class IssueDAO extends BaseJDOObjectDAO<IssueID, Issue>{
 		}
 	}
 
-	public Issue createIssueWithoutAttachedDocument(Issue issue, boolean get, String[] fetchGroups, int maxFetchDepth, ProgressMonitor monitor){
+	public synchronized Issue createIssueWithoutAttachedDocument(Issue issue, boolean get, String[] fetchGroups, int maxFetchDepth, ProgressMonitor monitor){
 		if(issue == null)
 			throw new NullPointerException("Issue to save must not be null");
 		monitor.beginTask("Storing issue: "+ issue.getIssueID(), 3);
@@ -63,7 +66,7 @@ public class IssueDAO extends BaseJDOObjectDAO<IssueID, Issue>{
 		}
 	}
 	
-	public Issue createIssueWithAttachedDocument(Issue issue, ObjectID objectID, boolean get, String[] fetchGroups, int maxFetchDepth, ProgressMonitor monitor){
+	public synchronized Issue createIssueWithAttachedDocument(Issue issue, ObjectID objectID, boolean get, String[] fetchGroups, int maxFetchDepth, ProgressMonitor monitor){
 		if(issue == null)
 			throw new NullPointerException("Issue to save must not be null");
 		monitor.beginTask("Storing issue: "+ issue.getIssueID(), 3);
@@ -77,5 +80,40 @@ public class IssueDAO extends BaseJDOObjectDAO<IssueID, Issue>{
 			monitor.done();
 			throw new RuntimeException("Error while storing Issue!\n" ,e);
 		}
+	}
+	
+	/**
+	 * Get a single user.
+	 * @param userID The ID of the user to get
+	 * @param fetchGroups Wich fetch groups to use
+	 * @param maxFetchDepth Fetch depth or {@link NLJDOHelper#MAX_FETCH_DEPTH_NO_LIMIT} 
+	 * @param monitor The progress monitor for this action. For every downloaded
+	 * 					object, <code>monitor.worked(1)</code> will be called.
+	 * @return The requested user object
+	 */
+	public synchronized Issue getIssue(IssueID issueID, String[] fetchGroups, int maxFetchDepth, ProgressMonitor monitor)
+	{
+		monitor.beginTask("Loading user "+issueID.issueID, 1);
+		Issue issue = getJDOObject(null, issueID, fetchGroups, maxFetchDepth, new SubProgressMonitor(monitor, 1));
+		monitor.done();
+		return issue;
+	}
+	
+	public synchronized List<Issue> getIssues(Set<IssueID> issueIDs, String[] fetchgroups, int maxFetchDepth, ProgressMonitor monitor) 
+	{
+		return getJDOObjects(null, issueIDs, fetchgroups, maxFetchDepth, monitor);
+	}
+
+	/**
+	 * Get all users.
+	 * @param fetchGroups Wich fetch groups to use
+	 * @param maxFetchDepth Fetch depth or {@link NLJDOHelper#MAX_FETCH_DEPTH_NO_LIMIT} 
+	 * @param monitor The progress monitor for this action. For every downloaded
+	 * 					object, <code>monitor.worked(1)</code> will be called.
+	 * @return The users.
+	 */
+	public synchronized Collection<Issue> getIssues(String[] fetchgroups, int maxFetchDepth, ProgressMonitor monitor) 
+	{
+		return null;//getIssuesByType(null, fetchgroups, maxFetchDepth, monitor);
 	}
 }

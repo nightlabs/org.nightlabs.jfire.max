@@ -158,6 +158,7 @@ public class DataCreator
 				tariffNormalPrice = (Tariff) pm.getObjectById(tariffID);
 			} catch (JDOObjectNotFoundException x) {
 				tariffNormalPrice = (Tariff) pm.makePersistent(new Tariff(tariffID.organisationID, tariffID.tariffID));
+				tariffNormalPrice.setTariffIndex(0);
 				tariffNormalPrice.getName().setText(Locale.ENGLISH.getLanguage(), "Normal Price");
 				tariffNormalPrice.getName().setText(Locale.GERMAN.getLanguage(), "Normaler Preis");
 				tariffNormalPrice.getName().setText(Locale.FRENCH.getLanguage(), "Prix normal");
@@ -173,8 +174,9 @@ public class DataCreator
 			TariffID tariffID = TariffID.create(organisationID, "_gold_card_");
 			try {
 				tariffGoldCard = (Tariff) pm.getObjectById(tariffID);
-			} catch (JDOObjectNotFoundException x) {
+			} catch (JDOObjectNotFoundException x) {				
 				tariffGoldCard = (Tariff) pm.makePersistent(new Tariff(tariffID.organisationID, tariffID.tariffID));
+				tariffGoldCard.setTariffIndex(1);
 				tariffGoldCard.getName().setText(Locale.ENGLISH.getLanguage(), "Gold Card");
 				tariffGoldCard.getName().setText(Locale.GERMAN.getLanguage(), "Goldene Kundenkarte");
 				tariffGoldCard.getName().setText(Locale.FRENCH.getLanguage(), "Carte d'or");

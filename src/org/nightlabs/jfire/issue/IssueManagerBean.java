@@ -229,6 +229,29 @@ implements SessionBean{
 			pm.close();
 		}
 	}
+	
+	/**
+	 * @throws ModuleException
+	 *
+	 * @ejb.interface-method
+	 * @ejb.transaction type = "Required"
+	 * @ejb.permission role-name="_Guest_"
+	 */
+	public Collection getIssuePriorities(String[] fetchGroups, int maxFetchDepth)
+	throws ModuleException
+	{
+		PersistenceManager pm = getPersistenceManager();
+		try {
+			pm.getFetchPlan().setMaxFetchDepth(maxFetchDepth);
+			if (fetchGroups != null)
+				pm.getFetchPlan().setGroups(fetchGroups);
+
+			Query q = pm.newQuery(IssuePriority.class);
+			return pm.detachCopyAll((Collection)q.execute());
+		} finally {
+			pm.close();
+		}
+	}
 
 	/**
 	 * @throws IOException While loading an icon from a local resource, this might happen and we don't care in the initialise method.

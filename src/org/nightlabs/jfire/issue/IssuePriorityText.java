@@ -46,6 +46,7 @@ extends I18nText{
 	 *		persistence-modifier="persistent"
 	 *		collection-type="map"
 	 *		key-type="java.lang.String"
+	 *		default-fetch-group="true"
 	 *		value-type="java.lang.String"
 	 *		table="JFireIssueTracking_IssuePriorityText_texts"
 	 *		null-value="exception"

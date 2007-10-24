@@ -16,6 +16,8 @@ import org.nightlabs.util.Util;
  * @jdo.create-objectid-class
  *
  * @jdo.inheritance strategy = "new-table"
+ * 
+ * @jdo.fetch-group name="IssuePriority.this" fields="text"
  */
 public class IssuePriority
 implements Serializable{
@@ -25,9 +27,11 @@ implements Serializable{
 	 * @jdo.column length="100"
 	 */
 	private String issuePriorityID;
+	
+	public static final String FETCH_GROUP_THIS = "IssuePriority.this";
 
 	/**
-	 * @jdo.field persistence-modifier="persistent" null-value="exception"
+	 * @jdo.field persistence-modifier="persistent" dependent="true" mapped-by="issuePriority"
 	 */
 	private IssuePriorityText text;
 

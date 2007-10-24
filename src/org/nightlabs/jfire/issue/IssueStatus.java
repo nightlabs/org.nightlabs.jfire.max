@@ -5,7 +5,7 @@ import java.io.Serializable;
 import org.nightlabs.util.Util;
 
 /**
- * @author Chairat Kongarayawetchakun - chairatk at nightlabs dot de
+ * @author Chairat Kongarayawetchakun - chairat at nightlabs dot de
  *
  * @jdo.persistence-capable
  *		identity-type = "application"
@@ -16,11 +16,15 @@ import org.nightlabs.util.Util;
  * @jdo.create-objectid-class
  *
  * @jdo.inheritance strategy = "new-table"
+ * 
+ * @jdo.fetch-group name="IssueStatus.this" fields="text"
  */
 public class IssueStatus 
 implements Serializable{
 	
 	private static final long serialVersionUID = 1L;
+	
+	public static final String FETCH_GROUP_THIS = "IssueStatus.this";
 	/**
 	 * @jdo.field primary-key="true"
 	 * @jdo.column length="100"
@@ -28,7 +32,7 @@ implements Serializable{
 	private String issueStatusID;
 
 	/**
-	 * @jdo.field persistence-modifier="persistent" null-value="exception"
+	 * @jdo.field persistence-modifier="persistent" dependent="true" mapped-by="issueStatus"
 	 */
 	private IssueStatusText text;
 

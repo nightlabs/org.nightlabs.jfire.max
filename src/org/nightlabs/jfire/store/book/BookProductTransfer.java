@@ -57,6 +57,7 @@ public class BookProductTransfer extends DeliveryNoteProductTransfer
 	/**
 	 * @deprecated Only for JDO!
 	 */
+	@Deprecated
 	protected BookProductTransfer() { }
 
 	private static Collection getProducts(DeliveryNote deliveryNote, boolean reversing)

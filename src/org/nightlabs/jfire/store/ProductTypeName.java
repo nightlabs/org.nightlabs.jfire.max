@@ -70,6 +70,7 @@ implements Inheritable
 	/**
 	 * @deprecated Only for JDO!
 	 */
+	@Deprecated
 	protected ProductTypeName() { }
 
 	public ProductTypeName(ProductType product)
@@ -83,6 +84,7 @@ implements Inheritable
 	/**
 	 * @see org.nightlabs.i18n.I18nText#getI18nMap()
 	 */
+	@Override
 	protected Map getI18nMap()
 	{
 		return names;
@@ -91,6 +93,7 @@ implements Inheritable
 	/**
 	 * @see org.nightlabs.i18n.I18nText#getFallBackValue(java.lang.String)
 	 */
+	@Override
 	protected String getFallBackValue(String languageID)
 	{
 		return ProductType.getPrimaryKey(organisationID, productTypeID);

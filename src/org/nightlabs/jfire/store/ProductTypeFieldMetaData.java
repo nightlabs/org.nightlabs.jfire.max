@@ -28,6 +28,7 @@ package org.nightlabs.jfire.store;
 
 import java.io.Serializable;
 
+import org.nightlabs.inheritance.FieldMetaData;
 import org.nightlabs.inheritance.NotWritableException;
 
 /**
@@ -79,7 +80,7 @@ implements org.nightlabs.inheritance.FieldMetaData, Serializable
 	 * 
 	 * @jdo.field persistence-modifier="persistent"
 	 */
-	private byte writableByChildren = ProductTypeFieldMetaData.WRITABLEBYCHILDREN_YES;
+	private byte writableByChildren = FieldMetaData.WRITABLEBYCHILDREN_YES;
 
 	/**
 	 * writable is set to false if the mother has writableByChildren

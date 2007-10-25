@@ -139,6 +139,6 @@ implements Serializable, org.nightlabs.l10n.Currency
 	 * @return
 	 */
 	public double toDouble(long amount) {		
-		return (double)amount / Math.pow(10, getDecimalDigitCount());		
+		return amount / Math.pow(10, getDecimalDigitCount());		
 	}
 }

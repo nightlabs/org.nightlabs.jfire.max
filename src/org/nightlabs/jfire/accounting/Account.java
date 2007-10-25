@@ -222,6 +222,7 @@ public class Account extends Anchor
 	/**
 	 * @see org.nightlabs.jfire.transfer.Anchor#internalRollbackTransfer(org.nightlabs.jfire.transfer.Transfer, org.nightlabs.jfire.security.User, java.util.Map)
 	 */
+	@Override
 	protected void internalRollbackTransfer(Transfer transfer, User user, Set<Anchor> involvedAnchors)
 	{
 		MoneyTransfer moneyTransfer = (MoneyTransfer) transfer;
@@ -265,6 +266,7 @@ public class Account extends Anchor
 	 * 
 	 * @see org.nightlabs.jfire.transfer.Anchor#internalBookTransfer(Transfer, User, Map)
 	 */
+	@Override
 	protected void internalBookTransfer(Transfer transfer, User user, Set<Anchor> involvedAnchors)
 	{
 		MoneyTransfer moneyTransfer = (MoneyTransfer) transfer;
@@ -325,7 +327,7 @@ public class Account extends Anchor
 						(isDebit) ? this : summaryAccount,
 						moneyTransfer.getAmount()
 				);
-				summaryMoneyTransfer = (SummaryMoneyTransfer) pm.makePersistent(summaryMoneyTransfer);
+				summaryMoneyTransfer = pm.makePersistent(summaryMoneyTransfer);
 	//			JDOHelper.getPersistenceManager(this).makePersistent(summaryMoneyTransfer); // done in constructor
 				summaryMoneyTransfer.bookTransfer(user, involvedAnchors);
 	//			SummaryAccount.bookTransfer(user, summaryMoneyTransfer, involvedAnchors);
@@ -385,11 +387,13 @@ public class Account extends Anchor
 		this.owner = owner;
 	}
 
+	@Override
 	public void checkIntegrity(Collection<Transfer> containers)
 	{
 		// here we might check later, whether allowed credit limits have been exceeded
 	}
 
+	@Override
 	public void resetIntegrity(Collection<Transfer> containers)
 	{
 	}

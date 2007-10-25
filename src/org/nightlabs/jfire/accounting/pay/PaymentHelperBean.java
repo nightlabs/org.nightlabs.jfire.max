@@ -70,6 +70,7 @@ implements SessionBean
 	/**
 	 * @see org.nightlabs.jfire.base.BaseSessionBeanImpl#setSessionContext(javax.ejb.SessionContext)
 	 */
+	@Override
 	public void setSessionContext(SessionContext sessionContext)
 			throws EJBException, RemoteException
 	{
@@ -123,7 +124,7 @@ implements SessionBean
 
 			if (paymentData.getPayment().getPartner() == null) {
 				String mandatorPK = Accounting.getAccounting(pm).getMandator().getPrimaryKey();
-				Invoice invoice = (Invoice) paymentData.getPayment().getInvoices().iterator().next();
+				Invoice invoice = paymentData.getPayment().getInvoices().iterator().next();
 
 				LegalEntity partner = invoice.getCustomer();
 				if (mandatorPK.equals(partner.getPrimaryKey()))
@@ -183,14 +184,14 @@ implements SessionBean
 					user, paymentData);
 
 			if (!JDOHelper.isPersistent(payBeginServerResult))
-				payBeginServerResult = (PaymentResult) pm.makePersistent(payBeginServerResult);
+				payBeginServerResult = pm.makePersistent(payBeginServerResult);
 			paymentData.getPayment().setPayBeginServerResult(payBeginServerResult);
 
 			pm.getFetchPlan().setMaxFetchDepth(maxFetchDepth);
 			if (fetchGroups != null)
 				pm.getFetchPlan().setGroups(fetchGroups);
 
-			PaymentResult payBeginServerResult_detached = (PaymentResult) pm.detachCopy(payBeginServerResult);
+			PaymentResult payBeginServerResult_detached = pm.detachCopy(payBeginServerResult);
 //			payBeginServerResult_detached.setError(payBeginServerResult.getError());
 
 			return payBeginServerResult_detached;
@@ -249,7 +250,7 @@ implements SessionBean
 			if (fetchGroups != null)
 				pm.getFetchPlan().setGroups(fetchGroups);
 
-			PaymentResult payDoWorkServerResult_detached = (PaymentResult) pm.detachCopy(payDoWorkServerResult);
+			PaymentResult payDoWorkServerResult_detached = pm.detachCopy(payDoWorkServerResult);
 //			payDoWorkServerResult_detached.setError(payDoWorkServerResult.getError());
 			return payDoWorkServerResult_detached;
 		} finally {
@@ -293,7 +294,7 @@ implements SessionBean
 			if (fetchGroups != null)
 				pm.getFetchPlan().setGroups(fetchGroups);
 
-			PaymentResult payEndServerResult_detached = (PaymentResult) pm.detachCopy(payEndServerResult);
+			PaymentResult payEndServerResult_detached = pm.detachCopy(payEndServerResult);
 //			payBeginServerResult_detached.setError(payBeginServerResult.getError());
 
 // booking should be done already by jBPM and ActionHandlerBookInvoice[Implicitely]
@@ -427,7 +428,7 @@ implements SessionBean
 			Payment payment = (Payment) pm.getObjectById(paymentID);
 
 			if (JDOHelper.isDetached(payBeginServerResult))
-				payBeginServerResult = (PaymentResult) pm.makePersistent(payBeginServerResult);
+				payBeginServerResult = pm.makePersistent(payBeginServerResult);
 			else
 				pm.makePersistent(payBeginServerResult);
 
@@ -450,7 +451,7 @@ implements SessionBean
 			if (fetchGroups != null)
 				pm.getFetchPlan().setGroups(fetchGroups);
 
-			return (PaymentResult) pm.detachCopy(payBeginServerResult);
+			return pm.detachCopy(payBeginServerResult);
 		} finally {
 			pm.close();
 		}
@@ -472,7 +473,7 @@ implements SessionBean
 			Payment payment = (Payment) pm.getObjectById(paymentID);
 
 			if (JDOHelper.isDetached(payDoWorkServerResult))
-				payDoWorkServerResult = (PaymentResult) pm.makePersistent(payDoWorkServerResult);
+				payDoWorkServerResult = pm.makePersistent(payDoWorkServerResult);
 			else
 				pm.makePersistent(payDoWorkServerResult);
 
@@ -491,7 +492,7 @@ implements SessionBean
 			if (fetchGroups != null)
 				pm.getFetchPlan().setGroups(fetchGroups);
 
-			return (PaymentResult) pm.detachCopy(payDoWorkServerResult);
+			return pm.detachCopy(payDoWorkServerResult);
 		} finally {
 			pm.close();
 		}
@@ -513,7 +514,7 @@ implements SessionBean
 			Payment payment = (Payment) pm.getObjectById(paymentID);
 
 			if (JDOHelper.isDetached(payEndServerResult))
-				payEndServerResult = (PaymentResult) pm.makePersistent(payEndServerResult);
+				payEndServerResult = pm.makePersistent(payEndServerResult);
 			else
 				pm.makePersistent(payEndServerResult);
 
@@ -532,7 +533,7 @@ implements SessionBean
 			if (fetchGroups != null)
 				pm.getFetchPlan().setGroups(fetchGroups);
 
-			return (PaymentResult) pm.detachCopy(payEndServerResult);
+			return pm.detachCopy(payEndServerResult);
 		} finally {
 			pm.close();
 		}

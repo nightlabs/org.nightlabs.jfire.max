@@ -45,6 +45,7 @@ public class DeliveryNoteActionHandler implements Serializable
 	/**
 	 * @deprecated Only for JDO!
 	 */
+	@Deprecated
 	protected DeliveryNoteActionHandler() { }
 
 	public DeliveryNoteActionHandler(String organisationID, String deliveryNoteActionHandlerID)

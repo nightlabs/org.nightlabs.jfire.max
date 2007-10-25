@@ -149,11 +149,13 @@ implements StoreCallback
 	/**
 	 * @see org.nightlabs.i18n.I18nText#getI18nMap()
 	 */
+	@Override
 	protected Map getI18nMap()
 	{
 		return names;
 	}
 
+	@Override
 	protected String getFallBackValue(String languageID)
 	{
 		return Tariff.getPrimaryKey(organisationID, tariffID);

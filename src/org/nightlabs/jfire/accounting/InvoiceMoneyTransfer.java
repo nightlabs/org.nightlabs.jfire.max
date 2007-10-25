@@ -26,7 +26,6 @@
 
 package org.nightlabs.jfire.accounting;
 
-import java.util.Map;
 import java.util.Set;
 
 import org.nightlabs.jfire.security.User;
@@ -64,6 +63,7 @@ extends MoneyTransfer
 	/**
 	 * @deprecated Only for JDO! 
 	 */
+	@Deprecated
 	protected InvoiceMoneyTransfer() { }
 
 	private static Currency getCurrency(Invoice invoice)

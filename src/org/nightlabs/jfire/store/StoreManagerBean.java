@@ -31,7 +31,6 @@ import java.io.Serializable;
 import java.rmi.RemoteException;
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
@@ -46,11 +45,8 @@ import javax.ejb.EJBException;
 import javax.ejb.SessionBean;
 import javax.ejb.SessionContext;
 import javax.jdo.FetchPlan;
-import javax.jdo.JDOHelper;
 import javax.jdo.JDOObjectNotFoundException;
 import javax.jdo.PersistenceManager;
-import javax.jdo.Query;
-
 import org.apache.commons.lang.exception.ExceptionUtils;
 import org.apache.log4j.Logger;
 import org.jbpm.JbpmContext;
@@ -155,11 +151,13 @@ implements SessionBean
 	{
 	}
 
+	@Override
 	public void setSessionContext(SessionContext sessionContext)
 	throws EJBException, RemoteException
 	{
 		super.setSessionContext(sessionContext);
 	}
+	@Override
 	public void unsetSessionContext()
 	{
 		super.unsetSessionContext();
@@ -411,7 +409,7 @@ implements SessionBean
 			for (JDOQuery query : queries) {
 				query.setPersistenceManager(pm);
 				query.setCandidates(deliveryNotes);
-				deliveryNotes = (Collection) query.getResult();
+				deliveryNotes = query.getResult();
 			}
 
 			return NLJDOHelper.getObjectIDSet(deliveryNotes);
@@ -565,7 +563,7 @@ implements SessionBean
 			if (!get)
 				return null;
 			else
-				return (ProductTypeStatus) pm.detachCopy(store.getProductTypeStatusTracker(productTypeID, true).getCurrentStatus());
+				return pm.detachCopy(store.getProductTypeStatusTracker(productTypeID, true).getCurrentStatus());
 		} finally {
 			pm.close();
 		}
@@ -596,7 +594,7 @@ implements SessionBean
 			if (!get)
 				return null;
 			else
-				return (ProductTypeStatus) pm.detachCopy(store.getProductTypeStatusTracker(productTypeID, true).getCurrentStatus());
+				return pm.detachCopy(store.getProductTypeStatusTracker(productTypeID, true).getCurrentStatus());
 		} finally {
 			pm.close();
 		}
@@ -627,7 +625,7 @@ implements SessionBean
 			if (!get)
 				return null;
 			else
-				return (ProductTypeStatus) pm.detachCopy(store.getProductTypeStatusTracker(productTypeID, true).getCurrentStatus());
+				return pm.detachCopy(store.getProductTypeStatusTracker(productTypeID, true).getCurrentStatus());
 		} finally {
 			pm.close();
 		}
@@ -656,7 +654,7 @@ implements SessionBean
 			if (!get)
 				return null;
 			else
-				return (ProductTypeStatus) pm.detachCopy(store.getProductTypeStatusTracker(productTypeID, true).getCurrentStatus());
+				return pm.detachCopy(store.getProductTypeStatusTracker(productTypeID, true).getCurrentStatus());
 		} finally {
 			pm.close();
 		}
@@ -693,7 +691,7 @@ implements SessionBean
 				ModeOfDeliveryFlavour modf = (ModeOfDeliveryFlavour) it.next();
 
 				res_detached.addModeOfDeliveryFlavour(
-						(ModeOfDeliveryFlavour) pm.detachCopy(modf));
+						pm.detachCopy(modf));
 			}
 
 			for (Iterator it = res.getModeOfDeliveryFlavourProductTypeGroups().iterator(); it.hasNext(); ) {

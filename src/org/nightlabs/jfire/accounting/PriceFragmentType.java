@@ -33,6 +33,7 @@ import javax.jdo.PersistenceManager;
 
 import org.nightlabs.jfire.accounting.id.PriceFragmentTypeID;
 import org.nightlabs.jfire.organisation.Organisation;
+import org.nightlabs.util.Util;
 import org.nightlabs.util.Utils;
 
 /**
@@ -151,6 +152,7 @@ public class PriceFragmentType
 	 * @see Price#setAmount(String, long)
 	 * @deprecated Use {@link #PRICE_FRAGMENT_TYPE_ID_TOTAL}
 	 */
+	@Deprecated
 	public static final String TOTAL_PRICEFRAGMENTTYPEID = PRICE_FRAGMENT_TYPE_ID_TOTAL.priceFragmentTypeID;
 
 	/**
@@ -213,11 +215,11 @@ public class PriceFragmentType
 		if (this == obj) return true;
 		if (!(obj instanceof PriceFragmentType)) return false;
 		PriceFragmentType o = (PriceFragmentType) obj;
-		return Utils.equals(this.organisationID, o.organisationID) && Utils.equals(this.priceFragmentTypeID, o.priceFragmentTypeID);
+		return Util.equals(this.organisationID, o.organisationID) && Util.equals(this.priceFragmentTypeID, o.priceFragmentTypeID);
 	}
 	@Override
 	public int hashCode()
 	{
-		return Utils.hashCode(organisationID) + Utils.hashCode(priceFragmentTypeID);
+		return Util.hashCode(organisationID) + Util.hashCode(priceFragmentTypeID);
 	}
 }

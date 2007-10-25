@@ -39,7 +39,6 @@ import org.nightlabs.jfire.security.User;
 import org.nightlabs.jfire.store.DeliveryNote;
 import org.nightlabs.jfire.store.ProductTransfer;
 import org.nightlabs.jfire.store.ProductType;
-import org.nightlabs.jfire.store.ProductTypeActionHandler;
 import org.nightlabs.jfire.trade.Article;
 import org.nightlabs.jfire.trade.LegalEntity;
 import org.nightlabs.jfire.trade.OrganisationLegalEntity;
@@ -61,6 +60,7 @@ public class LocalStorekeeper extends Storekeeper
 	/**
 	 * @deprecated Only for JDO!
 	 */
+	@Deprecated
 	protected LocalStorekeeper() { }
 
 	public LocalStorekeeper(OrganisationLegalEntity mandator, String storekeeperID)
@@ -79,6 +79,7 @@ public class LocalStorekeeper extends Storekeeper
 		return mandator;
 	}
 
+	@Override
 	public void bookTransfer(User user, LegalEntity mandator,
 			ProductTransfer transfer, Set<Anchor> involvedAnchors)
 	{
@@ -124,6 +125,7 @@ public class LocalStorekeeper extends Storekeeper
 		}
 	}
 
+	@Override
 	protected PersistenceManager getPersistenceManager() {
 		PersistenceManager pm = JDOHelper.getPersistenceManager(this);
 		if (pm == null)

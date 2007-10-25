@@ -1,7 +1,5 @@
 package org.nightlabs.jfire.store.search;
 
-import java.util.Set;
-
 import javax.jdo.Query;
 
 import org.apache.log4j.Logger;

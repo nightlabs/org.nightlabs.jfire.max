@@ -32,6 +32,7 @@ extends BaseJDOObjectDAO<ProductTypeID, ProductType>
 		return sharedInstance;
 	};
 
+	@Override
 	@Implement
 	protected Collection<ProductType> retrieveJDOObjects(
 			Set<ProductTypeID> objectIDs, String[] fetchGroups, int maxFetchDepth,

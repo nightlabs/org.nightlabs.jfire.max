@@ -83,6 +83,7 @@ implements Serializable, TransferData
 	/**
 	 * @deprecated Only for JDO!
 	 */
+	@Deprecated
 	protected PaymentData()
 	{
 	}

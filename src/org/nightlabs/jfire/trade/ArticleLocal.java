@@ -116,6 +116,7 @@ implements Serializable, DetachCallback
 	/**
 	 * @deprecated Only for JDO!
 	 */
+	@Deprecated
 	protected ArticleLocal() { }
 
 	protected ArticleLocal(Article article)

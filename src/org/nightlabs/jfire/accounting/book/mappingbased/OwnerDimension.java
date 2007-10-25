@@ -56,6 +56,7 @@ public class OwnerDimension extends MoneyFlowDimension {
 	/**
 	 * @see org.nightlabs.jfire.accounting.book.mappingbased.MoneyFlowDimension#getMoneyFlowDimensionID()
 	 */
+	@Override
 	public String getMoneyFlowDimensionID() {
 		return MONEY_FLOW_DIMENSION_ID;
 	}
@@ -63,6 +64,7 @@ public class OwnerDimension extends MoneyFlowDimension {
 	/**
 	 * @see org.nightlabs.jfire.accounting.book.mappingbased.MoneyFlowDimension#getValues(org.nightlabs.jfire.store.ProductType, Article)
 	 */
+	@Override
 	public String[] getValues(ProductType productType, Article bookArticle) {
 		if (!(JDOHelper.isPersistent(productType) && !JDOHelper.isDetached(productType)))
 			throw new IllegalStateException("OwnerDimension can only return values for attached ProductTypes.");

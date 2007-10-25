@@ -70,6 +70,7 @@ extends I18nText
 	/**
 	 * @deprecated Only for JDO!
 	 */
+	@Deprecated
 	protected LocalAccountantDelegateName() {
 	}
 	
@@ -99,6 +100,7 @@ extends I18nText
 	/**
 	 * @see org.nightlabs.i18n.I18nText#getI18nMap()
 	 */
+	@Override
 	protected Map getI18nMap() {
 		return names;
 	}
@@ -106,6 +108,7 @@ extends I18nText
 	/**
 	 * @see org.nightlabs.i18n.I18nText#getFallBackValue(java.lang.String)
 	 */
+	@Override
 	protected String getFallBackValue(String languageID) {
 		return localAccountantDelegateID;
 	}

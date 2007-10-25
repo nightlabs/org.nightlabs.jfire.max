@@ -272,6 +272,7 @@ implements Serializable, DetachCallback
 	 * @deprecated This constructor exists only for JDO and should never be used
 	 *             explicitely!
 	 */
+	@Deprecated
 	protected ServerPaymentProcessor()
 	{
 	}
@@ -540,7 +541,7 @@ public PayMoneyTransfer payBegin(PayParams payParams)
 				to,
 				payParams.paymentData.getPayment()
 			);
-		payMoneyTransfer = (PayMoneyTransfer) getPersistenceManager().makePersistent(payMoneyTransfer);
+		payMoneyTransfer = getPersistenceManager().makePersistent(payMoneyTransfer);
 
 		return payMoneyTransfer;
 	}

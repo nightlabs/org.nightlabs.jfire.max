@@ -30,6 +30,7 @@ import java.io.Serializable;
 
 import org.nightlabs.jfire.accounting.pay.ServerPaymentProcessor.PayParams;
 import org.nightlabs.jfire.idgenerator.IDGenerator;
+import org.nightlabs.util.Util;
 import org.nightlabs.util.Utils;
 
 /**
@@ -63,6 +64,7 @@ implements Serializable
 	/**
 	 * @deprecated Only for JDO!
 	 */
+	@Deprecated
 	protected PaymentResult()
 	{
 	}
@@ -346,7 +348,7 @@ implements Serializable
 	public void setError(Throwable error)
 	{
 		this.error = error;
-		this.errorStackTrace = error == null ? null : Utils.getStackTraceAsString(error);
+		this.errorStackTrace = error == null ? null : Util.getStackTraceAsString(error);
 	}
 	/**
 	 * @return Returns the text.

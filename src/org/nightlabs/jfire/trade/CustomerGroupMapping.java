@@ -14,6 +14,7 @@ import org.nightlabs.jfire.accounting.gridpriceconfig.GridPriceConfig;
 import org.nightlabs.jfire.store.ProductType;
 import org.nightlabs.jfire.trade.id.CustomerGroupID;
 import org.nightlabs.jfire.trade.id.CustomerGroupMappingID;
+import org.nightlabs.util.Util;
 import org.nightlabs.util.Utils;
 
 /**
@@ -114,7 +115,7 @@ implements Serializable
 		CustomerGroup localCustomerGroup = (CustomerGroup) pm.getObjectById(localCustomerGroupID);
 
 		customerGroupMapping = new CustomerGroupMapping(partnerCustomerGroup, localCustomerGroup);
-		return (CustomerGroupMapping) pm.makePersistent(customerGroupMapping);
+		return pm.makePersistent(customerGroupMapping);
 	}
 
 	/**
@@ -174,6 +175,7 @@ implements Serializable
 	/**
 	 * @deprecated Only for JDO!
 	 */
+	@Deprecated
 	protected CustomerGroupMapping() { }
 
 	public CustomerGroupMapping(CustomerGroup partnerCustomerGroup, CustomerGroup localCustomerGroup)
@@ -266,18 +268,18 @@ implements Serializable
 		if (!(obj instanceof CustomerGroupMapping)) return false;
 		CustomerGroupMapping o = (CustomerGroupMapping) obj;
 		return
-				Utils.equals(o.partnerCustomerGroupOrganisationID, this.partnerCustomerGroupOrganisationID) &&
-				Utils.equals(o.partnerCustomerGroupCustomerGroupID, this.partnerCustomerGroupCustomerGroupID) &&
-				Utils.equals(o.localCustomerGroupOrganisationID, this.localCustomerGroupOrganisationID) &&
-				Utils.equals(o.localCustomerGroupCustomerGroupID, this.localCustomerGroupCustomerGroupID);
+				Util.equals(o.partnerCustomerGroupOrganisationID, this.partnerCustomerGroupOrganisationID) &&
+				Util.equals(o.partnerCustomerGroupCustomerGroupID, this.partnerCustomerGroupCustomerGroupID) &&
+				Util.equals(o.localCustomerGroupOrganisationID, this.localCustomerGroupOrganisationID) &&
+				Util.equals(o.localCustomerGroupCustomerGroupID, this.localCustomerGroupCustomerGroupID);
 	}
 	@Override
 	public int hashCode()
 	{
 		return
-				Utils.hashCode(partnerCustomerGroupOrganisationID) +
-				Utils.hashCode(partnerCustomerGroupCustomerGroupID) +
-				Utils.hashCode(localCustomerGroupOrganisationID) +
-				Utils.hashCode(localCustomerGroupCustomerGroupID);
+				Util.hashCode(partnerCustomerGroupOrganisationID) +
+				Util.hashCode(partnerCustomerGroupCustomerGroupID) +
+				Util.hashCode(localCustomerGroupOrganisationID) +
+				Util.hashCode(localCustomerGroupCustomerGroupID);
 	}
 }

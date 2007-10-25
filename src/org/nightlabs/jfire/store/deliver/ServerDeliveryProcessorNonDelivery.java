@@ -69,6 +69,7 @@ public class ServerDeliveryProcessorNonDelivery extends ServerDeliveryProcessor
 	/**
 	 * @deprecated Only for JDO!
 	 */
+	@Deprecated
 	protected ServerDeliveryProcessorNonDelivery()
 	{
 	}
@@ -86,6 +87,7 @@ public class ServerDeliveryProcessorNonDelivery extends ServerDeliveryProcessor
 	/**
 	 * @see org.nightlabs.jfire.store.deliver.ServerDeliveryProcessor#getAnchorOutside(org.nightlabs.jfire.store.deliver.ServerDeliveryProcessor.DeliverParams)
 	 */
+	@Override
 	public Anchor getAnchorOutside(DeliverParams deliverParams)
 	{
 		return getRepositoryOutside(deliverParams, "anchorOutside.nonDelivery");
@@ -94,6 +96,7 @@ public class ServerDeliveryProcessorNonDelivery extends ServerDeliveryProcessor
 	/**
 	 * @see org.nightlabs.jfire.store.deliver.ServerDeliveryProcessor#externalDeliverBegin(org.nightlabs.jfire.store.deliver.ServerDeliveryProcessor.DeliverParams)
 	 */
+	@Override
 	protected DeliveryResult externalDeliverBegin(DeliverParams deliverParams) throws DeliveryException
 	{
 		return new DeliveryResult(
@@ -105,6 +108,7 @@ public class ServerDeliveryProcessorNonDelivery extends ServerDeliveryProcessor
 	/**
 	 * @see org.nightlabs.jfire.store.deliver.ServerDeliveryProcessor#externalDeliverDoWork(org.nightlabs.jfire.store.deliver.ServerDeliveryProcessor.DeliverParams)
 	 */
+	@Override
 	protected DeliveryResult externalDeliverDoWork(DeliverParams deliverParams)
 			throws DeliveryException
 	{
@@ -117,6 +121,7 @@ public class ServerDeliveryProcessorNonDelivery extends ServerDeliveryProcessor
 	/**
 	 * @see org.nightlabs.jfire.store.deliver.ServerDeliveryProcessor#externalDeliverCommit(org.nightlabs.jfire.store.deliver.ServerDeliveryProcessor.DeliverParams)
 	 */
+	@Override
 	protected DeliveryResult externalDeliverCommit(DeliverParams deliverParams) throws DeliveryException
 	{
 		return new DeliveryResult(
@@ -128,6 +133,7 @@ public class ServerDeliveryProcessorNonDelivery extends ServerDeliveryProcessor
 	/**
 	 * @see org.nightlabs.jfire.store.deliver.ServerDeliveryProcessor#externalDeliverRollback(org.nightlabs.jfire.store.deliver.ServerDeliveryProcessor.DeliverParams)
 	 */
+	@Override
 	protected DeliveryResult externalDeliverRollback(DeliverParams deliverParams) throws DeliveryException
 	{
 		return null;

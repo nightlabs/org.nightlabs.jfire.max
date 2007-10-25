@@ -59,6 +59,7 @@ public class LocalAccountant extends Accountant {
 	/**
 	 * @deprecated Do not use! Only for JDO!
 	 */
+	@Deprecated
 	protected LocalAccountant() {
 	}
 
@@ -85,6 +86,7 @@ public class LocalAccountant extends Accountant {
 	 * 
 	 * @see org.nightlabs.jfire.accounting.book.Accountant#bookTransfer(User, LegalEntity, MoneyTransfer, Map)
 	 */
+	@Override
 	public void bookTransfer(User user, LegalEntity mandator, MoneyTransfer transfer, Set<Anchor> involvedAnchors) {
 		// An Accountant gets all bookings and has to decide himself what to do.
 		if (! (transfer instanceof BookMoneyTransfer))

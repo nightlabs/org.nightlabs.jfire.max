@@ -71,6 +71,7 @@ public class LegalEntityViewConfigModule extends ConfigModule {
 		return personStructFields;
 	}
 
+	@Override
 	public void init() {
 		personStructFields = new ArrayList<String>();
 		personStructFields.add(PersonStruct.PERSONALDATA_COMPANY.toString());

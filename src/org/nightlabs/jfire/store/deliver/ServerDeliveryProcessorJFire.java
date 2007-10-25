@@ -35,7 +35,7 @@ extends ServerDeliveryProcessor
 					ServerDeliveryProcessorID.create(Organisation.DEVIL_ORGANISATION_ID, ServerDeliveryProcessorJFire.class.getName()));
 		} catch (JDOObjectNotFoundException e) {
 			serverDeliveryProcessorJFire = new ServerDeliveryProcessorJFire(Organisation.DEVIL_ORGANISATION_ID, ServerDeliveryProcessorJFire.class.getName());
-			serverDeliveryProcessorJFire = (ServerDeliveryProcessorJFire) pm.makePersistent(serverDeliveryProcessorJFire);
+			serverDeliveryProcessorJFire = pm.makePersistent(serverDeliveryProcessorJFire);
 		}
 
 		return serverDeliveryProcessorJFire;
@@ -44,6 +44,7 @@ extends ServerDeliveryProcessor
 	/**
 	 * @deprecated Only for JDO!
 	 */
+	@Deprecated
 	protected ServerDeliveryProcessorJFire()
 	{
 	}
@@ -53,6 +54,7 @@ extends ServerDeliveryProcessor
 		super(organisationID, serverDeliveryProcessorID);
 	}
 
+	@Override
 	@Implement
 	protected DeliveryResult externalDeliverBegin(DeliverParams deliverParams)
 			throws DeliveryException
@@ -60,6 +62,7 @@ extends ServerDeliveryProcessor
 		return null;
 	}
 
+	@Override
 	@Implement
 	protected DeliveryResult externalDeliverCommit(DeliverParams deliverParams)
 			throws DeliveryException
@@ -68,6 +71,7 @@ extends ServerDeliveryProcessor
 		return null;
 	}
 
+	@Override
 	@Implement
 	protected DeliveryResult externalDeliverDoWork(DeliverParams deliverParams)
 			throws DeliveryException
@@ -76,6 +80,7 @@ extends ServerDeliveryProcessor
 		return null;
 	}
 
+	@Override
 	@Implement
 	protected DeliveryResult externalDeliverRollback(DeliverParams deliverParams)
 			throws DeliveryException
@@ -84,6 +89,7 @@ extends ServerDeliveryProcessor
 		return null;
 	}
 
+	@Override
 	@Implement
 	public Anchor getAnchorOutside(DeliverParams deliverParams)
 	{

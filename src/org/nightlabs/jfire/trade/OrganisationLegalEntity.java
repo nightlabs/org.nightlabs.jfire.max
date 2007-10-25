@@ -180,7 +180,7 @@ implements StoreCallback
 				
 				organisationLegalEntity = new OrganisationLegalEntity(organisation, anchorTypeID);
 				try {
-					organisationLegalEntity = (OrganisationLegalEntity) pm.makePersistent(organisationLegalEntity);
+					organisationLegalEntity = pm.makePersistent(organisationLegalEntity);
 				} catch (JDODataStoreException workaround) {
 					System.out.println();
 					System.out.println("******************************************");

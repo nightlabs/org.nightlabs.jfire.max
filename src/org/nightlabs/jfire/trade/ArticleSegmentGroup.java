@@ -115,7 +115,7 @@ public class ArticleSegmentGroup
 
 	public ArticleProductTypeClassGroup getArticleProductTypeClassGroup(String productTypeClassName, boolean throwExceptionIfNotFound)
 	{
-		ArticleProductTypeClassGroup aptg = (ArticleProductTypeClassGroup)articleProductTypeClassGroups.get(productTypeClassName);
+		ArticleProductTypeClassGroup aptg = articleProductTypeClassGroups.get(productTypeClassName);
 		if (throwExceptionIfNotFound && aptg == null)
 			throw new IllegalArgumentException("There is no ArticleProductTypeClassGroup registered for the productTypeClass " + productTypeClassName);
 
@@ -139,7 +139,7 @@ public class ArticleSegmentGroup
 	{
 		String productTypeClassName = productTypeClass.getName();
 
-		ArticleProductTypeClassGroup aptg = (ArticleProductTypeClassGroup)articleProductTypeClassGroups.get(productTypeClassName);
+		ArticleProductTypeClassGroup aptg = articleProductTypeClassGroups.get(productTypeClassName);
 		if (aptg == null) {
 			aptg = _createArticleProductTypeClassGroup(productTypeClass);
 			articleProductTypeClassGroups.put(productTypeClassName, aptg);

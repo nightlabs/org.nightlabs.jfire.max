@@ -147,6 +147,7 @@ public abstract class MoneyFlowMapping implements Serializable {
 	/**
 	 * @deprecated Only for JDO!
 	 */
+	@Deprecated
 	protected MoneyFlowMapping() { }
 
 	protected MoneyFlowMapping(String organisationID, long moneyFlowMappingID) {

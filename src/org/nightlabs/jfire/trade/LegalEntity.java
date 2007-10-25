@@ -136,7 +136,7 @@ public class LegalEntity extends Anchor
 		anonymousCustomer.setPerson(person);
 		anonymousCustomer.setAnonymous(true);
 		anonymousCustomer.setDefaultCustomerGroup(anonymousCustomerGroup);
-		anonymousCustomer = (LegalEntity) pm.makePersistent(anonymousCustomer);
+		anonymousCustomer = pm.makePersistent(anonymousCustomer);
 		return anonymousCustomer;
 	}
 
@@ -245,6 +245,7 @@ public class LegalEntity extends Anchor
 	 * value: {@link Balance}
 	 */
 	private static ThreadLocal balancesTL = new ThreadLocal() {
+		@Override
 		protected Object initialValue()
 		{
 			return new HashMap();
@@ -257,15 +258,17 @@ public class LegalEntity extends Anchor
 	 * value: {@link ProductReference} productReference
 	 */
 	private static ThreadLocal productReferencesTL = new ThreadLocal() {
+		@Override
 		protected Object initialValue()
 		{
 			return new HashMap();
 		}
 	};
 
+	@Override
 	public void checkIntegrity(Collection<Transfer> containers)
 	{
-		Transfer firstContainer = (Transfer) containers.iterator().next();
+		Transfer firstContainer = containers.iterator().next();
 
 		if (firstContainer instanceof MoneyTransfer) {
 			Map balances = (Map) balancesTL.get();
@@ -287,9 +290,10 @@ public class LegalEntity extends Anchor
 			throw new IllegalArgumentException("I know only MoneyTransfer and ProductTransfer! Your container of type " + containers.getClass() + " cannot be processed!");
 	}
 
+	@Override
 	public void resetIntegrity(Collection<Transfer> containers)
 	{
-		Transfer firstContainer = (Transfer) containers.iterator().next();
+		Transfer firstContainer = containers.iterator().next();
 
 		if (firstContainer instanceof MoneyTransfer) {
 			Map balances = (Map) balancesTL.get();
@@ -398,6 +402,7 @@ public class LegalEntity extends Anchor
 		}
 	}
 
+	@Override
 	protected void internalBookTransfer(Transfer transfer, User user, Set<Anchor> involvedAnchors)
 	{
 		PersistenceManager pm = JDOHelper.getPersistenceManager(this);
@@ -414,6 +419,7 @@ public class LegalEntity extends Anchor
 			throw new IllegalArgumentException("unsupported Transfer type: "+transfer.getClass().getName());
 	}
 
+	@Override
 	protected void internalRollbackTransfer(Transfer transfer, User user,
 			Set<Anchor> involvedAnchors)
 	{

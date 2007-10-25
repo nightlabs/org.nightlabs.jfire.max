@@ -57,6 +57,7 @@ public class BookMoneyTransfer extends InvoiceMoneyTransfer
 	/**
 	 * @deprecated Only of JDO!
 	 */
+	@Deprecated
 	protected BookMoneyTransfer() { }
 
 	private static long getAmountAbsoluteValue(Invoice invoice)

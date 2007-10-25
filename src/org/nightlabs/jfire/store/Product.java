@@ -98,6 +98,7 @@ implements Serializable
 	 * this class, please make your default constructor protected and
 	 * use only the second constructor!
 	 */
+	@Deprecated
 	protected Product()
 	{
 	}
@@ -442,6 +443,7 @@ implements Serializable
 		return pm;
 	}
 
+	@Override
 	public String toString()
 	{
 		return this.getClass().getName() + '{' + getPrimaryKey() + '}';

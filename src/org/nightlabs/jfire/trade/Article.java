@@ -602,6 +602,7 @@ implements Serializable, DeleteCallback, DetachCallback, StoreCallback
 	/**
 	 * @deprecated Only for JDO!
 	 */
+	@Deprecated
 	protected Article() { }
 
 	/**
@@ -1244,6 +1245,7 @@ implements Serializable, DeleteCallback, DetachCallback, StoreCallback
 		}
 	}
 
+	@Override
 	public String toString()
 	{
 		return this.getClass().getName() + '{' + getPrimaryKey() + '}';

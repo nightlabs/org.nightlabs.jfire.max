@@ -101,6 +101,7 @@ implements Serializable
 	/**
 	 * @deprecated Only for JDO!
 	 */
+	@Deprecated
 	protected ModeOfDelivery() { }
 
 	public ModeOfDelivery(ModeOfDeliveryID modeOfDeliveryID)

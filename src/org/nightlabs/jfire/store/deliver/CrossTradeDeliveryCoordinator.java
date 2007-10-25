@@ -56,7 +56,6 @@ import org.nightlabs.jfire.store.deliver.id.CrossTradeDeliveryCoordinatorID;
 import org.nightlabs.jfire.store.deliver.id.DeliveryID;
 import org.nightlabs.jfire.store.deliver.id.ModeOfDeliveryFlavourID;
 import org.nightlabs.jfire.store.deliver.id.ServerDeliveryProcessorID;
-import org.nightlabs.jfire.store.id.DeliveryNoteID;
 import org.nightlabs.jfire.trade.Article;
 import org.nightlabs.jfire.trade.LegalEntity;
 import org.nightlabs.jfire.trade.OrganisationLegalEntity;
@@ -99,7 +98,7 @@ public class CrossTradeDeliveryCoordinator implements Serializable
 			ServerDeliveryProcessor serverDeliveryProcessor = ServerDeliveryProcessorJFire.getServerDeliveryProcessorJFire(pm);
 			ctdc.setServerDeliveryProcessor(serverDeliveryProcessor);
 
-			ctdc = (CrossTradeDeliveryCoordinator) pm.makePersistent(ctdc);
+			ctdc = pm.makePersistent(ctdc);
 			return ctdc;
 		}
 	}
@@ -121,6 +120,7 @@ public class CrossTradeDeliveryCoordinator implements Serializable
 	/**
 	 * @deprecated Only for JDO!
 	 */
+	@Deprecated
 	protected CrossTradeDeliveryCoordinator()
 	{
 	}
@@ -189,6 +189,7 @@ public class CrossTradeDeliveryCoordinator implements Serializable
 
 	protected static class PerformDeliveryInvocation extends Invocation
 	{
+		@Override
 		@Implement
 		public Serializable invoke()
 		throws Exception

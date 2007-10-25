@@ -59,6 +59,7 @@ public class PartnerStorekeeper extends Storekeeper
 	/**
 	 * @deprecated Only for JDO!
 	 */
+	@Deprecated
 	protected PartnerStorekeeper() { }
 
 	public PartnerStorekeeper(String organisationID, String storekeeperID)
@@ -66,6 +67,7 @@ public class PartnerStorekeeper extends Storekeeper
 		super(organisationID, storekeeperID);
 	}
 
+	@Override
 	public void bookTransfer(User user, LegalEntity mandator,
 			ProductTransfer transfer, Set<Anchor> involvedAnchors)
 	{
@@ -159,7 +161,7 @@ public class PartnerStorekeeper extends Storekeeper
 			// perPartner-Repository to the mandator.
 			ProductTransfer productTransfer = new ProductTransfer(
 					transfer, user, partnerInsideRepository, mandator, transfer.getProducts());
-			productTransfer = (ProductTransfer) pm.makePersistent(productTransfer);
+			productTransfer = pm.makePersistent(productTransfer);
 			productTransfer.bookTransfer(user, involvedAnchors);
 		}
 		else if (transfer.getAnchorType(mandator) == Transfer.ANCHORTYPE_TO) {
@@ -167,7 +169,7 @@ public class PartnerStorekeeper extends Storekeeper
 			// to the inside perPartner-Repository.
 			ProductTransfer productTransfer = new ProductTransfer(
 					transfer, user, mandator, partnerInsideRepository, transfer.getProducts());
-			productTransfer = (ProductTransfer) pm.makePersistent(productTransfer);
+			productTransfer = pm.makePersistent(productTransfer);
 			productTransfer.bookTransfer(user, involvedAnchors);
 		}
 		else

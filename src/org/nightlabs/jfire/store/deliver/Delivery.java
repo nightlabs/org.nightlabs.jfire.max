@@ -351,6 +351,7 @@ implements Serializable, StoreCallback
 	/**
 	 * @deprecated Only for JDO!
 	 */
+	@Deprecated
 	protected Delivery() { }
 
 	/**
@@ -865,7 +866,7 @@ implements Serializable, StoreCallback
 		if (deliveryNoteIDs == null) {
 			Set dnids = new HashSet();
 			for (DeliveryNote deliveryNote : deliveryNotes) {
-				dnids.add((DeliveryNoteID) JDOHelper.getObjectId(deliveryNote));
+				dnids.add(JDOHelper.getObjectId(deliveryNote));
 			}
 			deliveryNoteIDs = dnids;
 		}
@@ -914,7 +915,7 @@ implements Serializable, StoreCallback
 		if (articleIDs == null) {
 			HashSet s = new HashSet();
 			for (Article article : getArticles()) {
-				s.add((ArticleID) JDOHelper.getObjectId(article));
+				s.add(JDOHelper.getObjectId(article));
 			}
 			articleIDs = s;
 		}

@@ -103,7 +103,7 @@ implements IFormulaPriceConfig
 	}
 	public IPriceConfig getPackagingResultPriceConfig(String innerProductTypePK, String packageProductTypePK, boolean throwExceptionIfNotExistent)
 	{
-		IPriceConfig res = (IPriceConfig) packagingResultPriceConfigs.get(innerProductTypePK+'-'+packageProductTypePK);
+		IPriceConfig res = packagingResultPriceConfigs.get(innerProductTypePK+'-'+packageProductTypePK);
 		if (throwExceptionIfNotExistent && res == null)
 			throw new IllegalArgumentException("There is no PriceConfig registered as the result of the combination of the innerProductType \""+innerProductTypePK+"\" packaged in the packageProductType \""+packageProductTypePK+"\"!");
 		return res;
@@ -146,6 +146,7 @@ implements IFormulaPriceConfig
 	/**
 	 * @deprecated Only for JDO!
 	 */
+	@Deprecated
 	protected FormulaPriceConfig()
 	{
 	}
@@ -177,6 +178,7 @@ implements IFormulaPriceConfig
 	/**
 	 * @see org.nightlabs.jfire.accounting.priceconfig.PriceConfig#requiresProductTypePackageInternal()
 	 */
+	@Override
 	public boolean requiresProductTypePackageInternal()
 	{
 		return true;
@@ -184,6 +186,7 @@ implements IFormulaPriceConfig
 	/**
 	 * @see org.nightlabs.jfire.accounting.priceconfig.PriceConfig#createArticlePrice(Article)
 	 */
+	@Override
 	public ArticlePrice createArticlePrice(Article article)
 	{
 		throw new UnsupportedOperationException("This implementation of PriceConfig cannot deliver a price for an Article! It is only intended to be used internally within a package and not to be sold directly!");
@@ -227,7 +230,7 @@ implements IFormulaPriceConfig
 	}
 	public ProductType getProductType(String organisationID, String productTypeID, boolean throwExceptionIfNotExsistent)
 	{
-		ProductType product = (ProductType)productTypes.get(ProductType.getPrimaryKey(organisationID, productTypeID));
+		ProductType product = productTypes.get(ProductType.getPrimaryKey(organisationID, productTypeID));
 		if (product == null && throwExceptionIfNotExsistent)
 			throw new IllegalArgumentException("No ProductType registered with organisationID=\""+organisationID+"\" productTypeID=\""+productTypeID+"\"!");
 		return product;
@@ -268,7 +271,7 @@ implements IFormulaPriceConfig
 	}
 	public FormulaCell getFormulaCell(IPriceCoordinate priceCoordinate, boolean throwExceptionIfNotExistent)
 	{
-		FormulaCell formulaCell = (FormulaCell) formulaCells.get(priceCoordinate);
+		FormulaCell formulaCell = formulaCells.get(priceCoordinate);
 
 		// If the JDO implementation uses a shortcut (a direct JDOQL instead of loading the whole Map and then
 		// searching for the key), the cell might exist and not be found. Hence, we load the whole Map and try it again.

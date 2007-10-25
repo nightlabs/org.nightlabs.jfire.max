@@ -57,6 +57,7 @@ public class PaymentDataDebitNoteGermany extends PaymentData
 	/**
 	 * @deprecated Only for JDO!
 	 */
+	@Deprecated
 	protected PaymentDataDebitNoteGermany() { }
 
 	/**

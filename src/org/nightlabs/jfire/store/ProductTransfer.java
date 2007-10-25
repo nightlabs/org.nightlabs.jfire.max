@@ -124,6 +124,7 @@ implements Serializable, DetachCallback
 	/**
 	 * @deprecated Only for JDO!
 	 */
+	@Deprecated
 	protected ProductTransfer() { }
 
 	public ProductTransfer(

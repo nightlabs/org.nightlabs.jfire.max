@@ -173,6 +173,7 @@ public class ArticlePrice extends org.nightlabs.jfire.accounting.Price
 	/**
 	 * @deprecated Only for JDO!
 	 */
+	@Deprecated
 	protected ArticlePrice() { }
 
 	/**
@@ -437,7 +438,7 @@ public class ArticlePrice extends org.nightlabs.jfire.accounting.Price
 	 */
 	public ArticlePrice getNestedArticlePrice(Product product, boolean throwException) 
 	{
-		ArticlePrice packagedPrice = (ArticlePrice)nestedArticlePrices.get(product.getPrimaryKey());
+		ArticlePrice packagedPrice = nestedArticlePrices.get(product.getPrimaryKey());
 		if ((packagedPrice == null) && (throwException))
 			throw new ArticlePriceNotFoundException("Could not find a packaged ArticlePrice for product "+product.getPrimaryKey());
 		return packagedPrice;
@@ -453,7 +454,7 @@ public class ArticlePrice extends org.nightlabs.jfire.accounting.Price
 	 */
 	public ArticlePrice getNestedArticlePrice(ProductType productType, boolean throwException) 
 	{
-		ArticlePrice packagedPrice = (ArticlePrice)nestedArticlePrices.get(productType.getPrimaryKey());
+		ArticlePrice packagedPrice = nestedArticlePrices.get(productType.getPrimaryKey());
 		if ((packagedPrice == null) && (throwException))
 			throw new ArticlePriceNotFoundException("Could not find a packaged ArticlePrice for productType "+productType.getPrimaryKey());
 		return packagedPrice;

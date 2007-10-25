@@ -8,6 +8,7 @@ package org.nightlabs.jfire.accounting.jbpm;
  * @author Marco Schulze - Marco at NightLabs dot de
  * @deprecated We can't do this asynchronously :-(
  */
+@Deprecated
 public class BookInvoiceInvocation
 //extends Invocation
 {

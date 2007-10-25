@@ -120,6 +120,7 @@ public class ManualMoneyTransferReason extends I18nText
 	/**
 	 * @deprecated Only for JDO!
 	 */
+	@Deprecated
 	protected ManualMoneyTransferReason() { }
 
 	public ManualMoneyTransferReason(ManualMoneyTransfer manualMoneyTransfer)
@@ -149,12 +150,14 @@ public class ManualMoneyTransferReason extends I18nText
 		return manualMoneyTransfer;
 	}
 
+	@Override
 	@Implement
 	protected Map<String, String> getI18nMap()
 	{
 		return texts;
 	}
 
+	@Override
 	@Implement
 	protected String getFallBackValue(String languageID)
 	{

@@ -29,8 +29,6 @@ package org.nightlabs.jfire.accounting.pay;
 import java.util.HashMap;
 import java.util.Map;
 
-import javax.jdo.PersistenceManager;
-
 import org.nightlabs.i18n.I18nText;
 
 /**
@@ -70,6 +68,7 @@ public class ServerPaymentProcessorName extends I18nText
 	/**
 	 * @deprecated Only for JDO!
 	 */
+	@Deprecated
 	protected ServerPaymentProcessorName()
 	{
 	}
@@ -105,6 +104,7 @@ public class ServerPaymentProcessorName extends I18nText
 	/**
 	 * @see org.nightlabs.i18n.I18nText#getI18nMap()
 	 */
+	@Override
 	protected Map getI18nMap()
 	{
 		return names;
@@ -113,6 +113,7 @@ public class ServerPaymentProcessorName extends I18nText
 	/**
 	 * @see org.nightlabs.i18n.I18nText#getFallBackValue(java.lang.String)
 	 */
+	@Override
 	protected String getFallBackValue(String languageID)
 	{
 		return ServerPaymentProcessor.getPrimaryKey(organisationID, serverPaymentProcessorID);

@@ -1,8 +1,6 @@
 package org.nightlabs.jfire.accounting.query;
 
 import java.util.Date;
-import java.util.Set;
-
 import javax.jdo.Query;
 
 import org.nightlabs.jdo.query.JDOQuery;

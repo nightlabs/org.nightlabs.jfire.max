@@ -241,6 +241,7 @@ implements Serializable, DeleteCallback
 	/**
 	 * @deprecated Only for JDO!
 	 */
+	@Deprecated
 	protected ProductReference() {}
 
 	public ProductReference(Anchor anchor, Product product)

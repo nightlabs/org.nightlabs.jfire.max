@@ -86,6 +86,7 @@ public class SegmentTypeName extends I18nText
 	/**
 	 * @deprecated Only for JDO!
 	 */
+	@Deprecated
 	protected SegmentTypeName()
 	{
 	}
@@ -100,6 +101,7 @@ public class SegmentTypeName extends I18nText
 	/**
 	 * @see org.nightlabs.i18n.I18nText#getI18nMap()
 	 */
+	@Override
 	protected Map getI18nMap()
 	{
 		return names;
@@ -108,6 +110,7 @@ public class SegmentTypeName extends I18nText
 	/**
 	 * @see org.nightlabs.i18n.I18nText#getFallBackValue(java.lang.String)
 	 */
+	@Override
 	protected String getFallBackValue(String languageID)
 	{
 		return SegmentType.getPrimaryKey(organisationID, segmentTypeID);

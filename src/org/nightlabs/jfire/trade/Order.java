@@ -49,6 +49,7 @@ import org.nightlabs.jfire.security.User;
 import org.nightlabs.jfire.security.id.UserID;
 import org.nightlabs.jfire.trade.id.OrderID;
 import org.nightlabs.jfire.transfer.id.AnchorID;
+import org.nightlabs.util.Util;
 import org.nightlabs.util.Utils;
 
 
@@ -532,6 +533,7 @@ implements Serializable, ArticleContainer, SegmentContainer, DetachCallback
 	/**
 	 * @deprecated Only for JDO!
 	 */
+	@Deprecated
 	protected Order() {}
 
 	public Order(
@@ -844,8 +846,8 @@ implements Serializable, ArticleContainer, SegmentContainer, DetachCallback
 		Order o = (Order) obj;
 
 		return
-				Utils.equals(this.organisationID, o.organisationID) && 
-				Utils.equals(this.orderIDPrefix, o.orderIDPrefix) &&
+				Util.equals(this.organisationID, o.organisationID) && 
+				Util.equals(this.orderIDPrefix, o.orderIDPrefix) &&
 				this.orderID == o.orderID;
 	}
 
@@ -853,8 +855,8 @@ implements Serializable, ArticleContainer, SegmentContainer, DetachCallback
 	public int hashCode()
 	{
 		return
-				Utils.hashCode(this.organisationID) ^ 
-				Utils.hashCode(this.orderIDPrefix) ^
-				Utils.hashCode(this.orderID);
+				Util.hashCode(this.organisationID) ^ 
+				Util.hashCode(this.orderIDPrefix) ^
+				Util.hashCode(this.orderID);
 	}
 }

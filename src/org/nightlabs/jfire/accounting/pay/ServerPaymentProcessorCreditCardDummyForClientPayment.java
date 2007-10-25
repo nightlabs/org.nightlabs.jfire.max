@@ -67,6 +67,7 @@ public class ServerPaymentProcessorCreditCardDummyForClientPayment extends Serve
 	/**
 	 * @deprecated Only for JDO!
 	 */
+	@Deprecated
 	protected ServerPaymentProcessorCreditCardDummyForClientPayment()
 	{
 	}
@@ -84,6 +85,7 @@ public class ServerPaymentProcessorCreditCardDummyForClientPayment extends Serve
 	/**
 	 * @see org.nightlabs.jfire.accounting.pay.ServerPaymentProcessor#getAnchorOutside(org.nightlabs.jfire.accounting.pay.ServerPaymentProcessor.PayParams)
 	 */
+	@Override
 	public Anchor getAnchorOutside(PayParams payParams)
 	{
 		Account treasury = getAccountOutside(payParams, "clientSidedCreditCardPayment");
@@ -93,6 +95,7 @@ public class ServerPaymentProcessorCreditCardDummyForClientPayment extends Serve
 	/**
 	 * @see org.nightlabs.jfire.accounting.pay.ServerPaymentProcessor#externalPayBegin(org.nightlabs.jfire.accounting.pay.ServerPaymentProcessor.PayParams)
 	 */
+	@Override
 	protected PaymentResult externalPayBegin(PayParams payParams) throws PaymentException
 	{
 //		return new PaymentResult(
@@ -105,6 +108,7 @@ public class ServerPaymentProcessorCreditCardDummyForClientPayment extends Serve
 	/**
 	 * @see org.nightlabs.jfire.accounting.pay.ServerPaymentProcessor#externalPayDoWork(org.nightlabs.jfire.accounting.pay.ServerPaymentProcessor.PayParams)
 	 */
+	@Override
 	protected PaymentResult externalPayDoWork(PayParams payParams)
 			throws PaymentException
 	{
@@ -114,6 +118,7 @@ public class ServerPaymentProcessorCreditCardDummyForClientPayment extends Serve
 	/**
 	 * @see org.nightlabs.jfire.accounting.pay.ServerPaymentProcessor#externalPayCommit(org.nightlabs.jfire.accounting.pay.ServerPaymentProcessor.PayParams)
 	 */
+	@Override
 	protected PaymentResult externalPayCommit(PayParams payParams) throws PaymentException
 	{
 		return null;
@@ -122,6 +127,7 @@ public class ServerPaymentProcessorCreditCardDummyForClientPayment extends Serve
 	/**
 	 * @see org.nightlabs.jfire.accounting.pay.ServerPaymentProcessor#externalPayRollback(org.nightlabs.jfire.accounting.pay.ServerPaymentProcessor.PayParams)
 	 */
+	@Override
 	protected PaymentResult externalPayRollback(PayParams payParams) throws PaymentException
 	{
 		return null;

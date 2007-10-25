@@ -24,6 +24,7 @@ extends EditLockType
 	/**
 	 * @deprecated Only for JDO!
 	 */
+	@Deprecated
 	protected EditLockTypeInvoice() { }
 
 	public EditLockTypeInvoice(EditLockTypeID editLockTypeID)

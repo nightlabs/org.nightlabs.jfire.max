@@ -158,6 +158,7 @@ implements Serializable, StatableLocal
 	/**
 	 * @deprecated Only for JDO!
 	 */
+	@Deprecated
 	protected OfferLocal() { }
 
 	public OfferLocal(Offer offer)
@@ -362,9 +363,9 @@ implements Serializable, StatableLocal
 		if (currentState == null)
 			throw new IllegalArgumentException("state must not be null!");
 
-		this.state = (State)currentState;
+		this.state = currentState;
 		try { // TODO remove this workaround as soon as JPOX is fixed
-			this.states.add((State)currentState);
+			this.states.add(currentState);
 		} catch (Exception x) { // JPOX WORKAROUND (we get a Duplicate key exception)
 			if (!x.getMessage().contains("Duplicate entry"))
 				throw new RuntimeException(x);

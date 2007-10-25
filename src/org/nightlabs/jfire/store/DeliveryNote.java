@@ -178,6 +178,7 @@ implements Serializable, ArticleContainer, Statable, DetachCallback
 	/**
 	 * @deprecated Constructor exists only for JDO! 
 	 */
+	@Deprecated
 	protected DeliveryNote() { }
 
 	public DeliveryNote(User creator, OrganisationLegalEntity vendor,
@@ -670,8 +671,8 @@ implements Serializable, ArticleContainer, Statable, DetachCallback
 		if (!currentState.getStateDefinition().isPublicState())
 			throw new IllegalArgumentException("state.stateDefinition.publicState is false!");
 
-		this.state = (State)currentState;
-		this.states.add((State)currentState);
+		this.state = currentState;
+		this.states.add(currentState);
 	}
 
 	public State getState()

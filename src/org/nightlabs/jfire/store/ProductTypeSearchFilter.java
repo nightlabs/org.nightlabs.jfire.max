@@ -26,9 +26,6 @@
 
 package org.nightlabs.jfire.store;
 
-import javax.jdo.JDOHelper;
-import javax.jdo.PersistenceManager;
-
 import org.nightlabs.jdo.search.SearchFilter;
 
 /**
@@ -47,6 +44,7 @@ public abstract class ProductTypeSearchFilter extends SearchFilter {
 	/**
 	 * @see org.nightlabs.jdo.search.SearchFilter#getExtentClass()
 	 */
+	@Override
 	protected Class getExtentClass() {
 		Class productTypeClass = getProductTypeClass();
 		if (!ProductType.class.isAssignableFrom(productTypeClass))

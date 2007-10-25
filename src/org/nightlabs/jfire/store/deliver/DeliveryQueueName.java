@@ -53,6 +53,7 @@ public class DeliveryQueueName extends I18nText {
 	private Map<String, String> names;
 	
 	/** @deprecated Only for JDO! */
+	@Deprecated
 	protected DeliveryQueueName() {}
 	
 	public DeliveryQueueName(DeliveryQueue deliveryQueue) {

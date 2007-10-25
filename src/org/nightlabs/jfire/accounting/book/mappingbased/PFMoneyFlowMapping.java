@@ -57,6 +57,7 @@ public class PFMoneyFlowMapping extends MoneyFlowMapping
 	/**
 	 * @deprecated Only for JDO!
 	 */
+	@Deprecated
 	protected PFMoneyFlowMapping() { }
 	
 	public PFMoneyFlowMapping(String organisationID, long moneyFlowMappingID) {
@@ -116,6 +117,7 @@ public class PFMoneyFlowMapping extends MoneyFlowMapping
 		this.sourceOrganisationID = sourceOrganisationID;
 	}
 
+	@Override
 	public String getMappingConditionKey(ProductType productType) {
 		return priceFragmentType.getPrimaryKey(); 
 	}
@@ -143,6 +145,7 @@ public class PFMoneyFlowMapping extends MoneyFlowMapping
 		return MoneyFlowMapping.getMappingKey(productTypePK, packageType, currencyID)+"/"+ownerPK+"/"+sourceOrganisationID+"/"+priceFragmentTypePK;
 	}
 
+	@Override
 	public long getArticlePriceDimensionAmount(Map dimensionValues, ArticlePrice articlePrice) {
 		return articlePrice.getPriceFragment(
 				(String)dimensionValues.get(PriceFragmentDimension.MONEY_FLOW_DIMENSION_ID), 
@@ -150,6 +153,7 @@ public class PFMoneyFlowMapping extends MoneyFlowMapping
 			).getAmount(); // .getAmountAbsoluteValue();
 	}
 
+	@Override
 	public void validateMapping() {
 	}	
 	
@@ -157,6 +161,7 @@ public class PFMoneyFlowMapping extends MoneyFlowMapping
 	 * {@inheritDoc}
 	 * @see org.nightlabs.jfire.accounting.book.mappingbased.MoneyFlowMapping#addMappingsToMap(org.nightlabs.jfire.store.ProductType, java.util.Map)
 	 */
+	@Override
 	@Implement
 	public void addMappingsToMap(ProductType productType, Map<String, MoneyFlowMapping> resolvedMappings) {
 		// TODO: Add here instance multiple times for wildcards
@@ -167,6 +172,7 @@ public class PFMoneyFlowMapping extends MoneyFlowMapping
 			);
 	}
 	
+	@Override
 	public boolean matches(ProductType productType, String packageType) {
 		if (getProductTypePK().equals(productType.getPrimaryKey()) && 
 				getPackageType().equals(packageType))

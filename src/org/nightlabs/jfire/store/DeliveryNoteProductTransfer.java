@@ -62,6 +62,7 @@ public class DeliveryNoteProductTransfer extends ProductTransfer
 	/**
 	 * @deprecated Only for JDO!
 	 */
+	@Deprecated
 	protected DeliveryNoteProductTransfer() { }
 
 	public DeliveryNoteProductTransfer(

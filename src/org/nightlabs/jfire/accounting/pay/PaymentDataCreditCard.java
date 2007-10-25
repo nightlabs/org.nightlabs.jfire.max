@@ -76,6 +76,7 @@ extends PaymentData
 	/**
 	 * @deprecated Only of JDO!
 	 */
+	@Deprecated
 	protected PaymentDataCreditCard()
 	{
 	}
@@ -172,6 +173,7 @@ extends PaymentData
 	/**
 	 * @see org.nightlabs.jfire.accounting.pay.PaymentData#init()
 	 */
+	@Override
 	public void init()
 	{
 		if (nameOnCard == null)

@@ -71,7 +71,7 @@ public class ArticleSegmentGroups
 	 */
 	protected ArticleCarrier getArticleCarrier(ArticleID articleID, boolean throwExceptionIfNotFound)
 	{
-		ArticleCarrier res = (ArticleCarrier) articleCarriers.get(articleID);
+		ArticleCarrier res = articleCarriers.get(articleID);
 
 		if (throwExceptionIfNotFound && res == null)
 			throw new IllegalArgumentException("Could not find an ArticleCarrier for " + articleID);
@@ -106,7 +106,7 @@ public class ArticleSegmentGroups
 	protected void initWithSegmentContainer(SegmentContainer segmentContainer)
 	{
 		for (Iterator<Segment> it = segmentContainer.getSegments().iterator(); it.hasNext(); ) {
-			Segment segment = (Segment) it.next();
+			Segment segment = it.next();
 
 			String segmentPK = segment.getPrimaryKey();
 			synchronized (articleSegmentGroups) {
@@ -158,7 +158,7 @@ public class ArticleSegmentGroups
 	protected void removeArticle(Article article)
 	{
 		String segmentPK = article.getSegment().getPrimaryKey();
-		ArticleSegmentGroup asg = (ArticleSegmentGroup) articleSegmentGroups.get(segmentPK);
+		ArticleSegmentGroup asg = articleSegmentGroups.get(segmentPK);
 		if (asg != null)
 			asg.removeArticle(article);
 	}
@@ -175,7 +175,7 @@ public class ArticleSegmentGroups
 	protected void initWithArticleContainer(ArticleContainer articleContainer)
 	{
 		for (Iterator<Article> it = articleContainer.getArticles().iterator(); it.hasNext(); ) {
-			Article article = (Article) it.next();
+			Article article = it.next();
 			addArticle(article, true); // filterExisting doesn't matter here - we don't handle the result
 		}
 	}
@@ -203,7 +203,7 @@ public class ArticleSegmentGroups
 			Set<Article> s = new HashSet<Article>();
 
 			for (Iterator<ArticleCarrier> it = articleCarriers.values().iterator(); it.hasNext();) {
-				ArticleCarrier articleCarrier = (ArticleCarrier) it.next();
+				ArticleCarrier articleCarrier = it.next();
 				s.add(articleCarrier.getArticle());
 			}
 			return Collections.unmodifiableSet(s);

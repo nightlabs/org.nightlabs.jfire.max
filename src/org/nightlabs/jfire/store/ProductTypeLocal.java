@@ -124,6 +124,7 @@ implements Serializable, Inheritable, InheritanceCallbacks
 	/**
 	 * @deprecated Only for JDO!
 	 */
+	@Deprecated
 	protected ProductTypeLocal() { }
 
 	// TODO we should pass the user here and store it somehow

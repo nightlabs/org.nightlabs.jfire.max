@@ -29,6 +29,7 @@ public class TariffDAO
 		return sharedInstance;
 	}
 
+	@Override
 	@Implement
 	protected Collection<Tariff> retrieveJDOObjects(
 			Set<TariffID> tariffIDs, String[] fetchGroups, int maxFetchDepth,

@@ -151,6 +151,7 @@ implements
 	/**
 	 * @deprecated Only for JDO! 
 	 */
+	@Deprecated
 	protected ReceptionNote() { }
 
 	public ReceptionNote(String organisationID, String receptionNoteIDPrefix, long receptionNoteID, User createUser, DeliveryNote deliveryNote)
@@ -318,12 +319,12 @@ implements
 		Collection fetchGroups = pm.getFetchPlan().getGroups();
 
 		if (fetchGroups.contains(FETCH_GROUP_THIS_RECEPTION_NOTE) || fetchGroups.contains(FETCH_GROUP_VENDOR)) {
-			detached.vendor = (LegalEntity) pm.detachCopy(attached.getVendor());
+			detached.vendor = pm.detachCopy(attached.getVendor());
 			detached.vendor_detached = true;
 		}
 
 		if (fetchGroups.contains(FETCH_GROUP_THIS_RECEPTION_NOTE) || fetchGroups.contains(FETCH_GROUP_CUSTOMER)) {
-			detached.customer = (LegalEntity) pm.detachCopy(attached.getCustomer());
+			detached.customer = pm.detachCopy(attached.getCustomer());
 			detached.customer_detached = true;
 		}
 
@@ -381,8 +382,8 @@ implements
 		if (!currentState.getStateDefinition().isPublicState())
 			throw new IllegalArgumentException("state.stateDefinition.publicState is false!");
 
-		this.state = (State)currentState;
-		this.states.add((State)currentState);
+		this.state = currentState;
+		this.states.add(currentState);
 	}
 
 	public State getState()

@@ -133,7 +133,7 @@ public class Repository extends Anchor
 
 		if (repository == null) { // create persist it
 			repository = new Repository(organisationID, anchorTypeID, anchorID, owner, outside);
-			repository = (Repository) pm.makePersistent(repository);
+			repository = pm.makePersistent(repository);
 		}
 		else { // check, whether owner and outside is correct
 			if (!repository.getOwner().equals(owner))
@@ -149,6 +149,7 @@ public class Repository extends Anchor
 	/**
 	 * @deprecated Only for JDO!
 	 */
+	@Deprecated
 	protected Repository()
 	{
 	}
@@ -175,6 +176,7 @@ public class Repository extends Anchor
 //			throw new IllegalArgumentException("organisationID != owner.organisationID!!! organisationID=\"" + organisationID + "\" owner.organisationID=\"" + owner.getOrganisationID() + "\"");
 	}
 
+	@Override
 	protected void internalBookTransfer(Transfer transfer, User user,
 			Set<Anchor> involvedAnchors)
 	{
@@ -209,6 +211,7 @@ public class Repository extends Anchor
 		}
 	}
 
+	@Override
 	protected void internalRollbackTransfer(Transfer transfer, User user,
 			Set<Anchor> involvedAnchors)
 	{
@@ -250,9 +253,11 @@ public class Repository extends Anchor
 //			incProductLocalQuantity((Product) it.next(), val);
 //	}
 
+	@Override
 	public void checkIntegrity(Collection<Transfer> containers)
 	{
 	}
+	@Override
 	public void resetIntegrity(Collection<Transfer> containers)
 	{
 	}

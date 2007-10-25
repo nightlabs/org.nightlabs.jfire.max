@@ -47,6 +47,7 @@ public abstract class Discount {
 	/**
 	 * @deprecated Only for JDO!
 	 */
+	@Deprecated
 	protected Discount() {
 	}
 

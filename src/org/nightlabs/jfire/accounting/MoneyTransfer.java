@@ -66,6 +66,7 @@ public class MoneyTransfer extends Transfer
 	/**
 	 * @deprecated Only for JDO! This constructor must never be used directly.
 	 */
+	@Deprecated
 	protected MoneyTransfer() {
 	}
 

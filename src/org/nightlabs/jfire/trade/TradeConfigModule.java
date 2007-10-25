@@ -54,6 +54,7 @@ public class TradeConfigModule
 
 	public TradeConfigModule() { }
 
+	@Override
 	@Implement
 	public void init() {
 		idPrefixCfs = new HashMap<String, IDPrefixCf>();
@@ -115,7 +116,7 @@ public class TradeConfigModule
 				!DeliveryNote.class.getName().equals(articleContainerClassName))
 			throw new IllegalArgumentException("articleContainerClassName invalid!");
 
-		IDPrefixCf res = (IDPrefixCf) idPrefixCfs.get(articleContainerClassName);
+		IDPrefixCf res = idPrefixCfs.get(articleContainerClassName);
 		if (res == null && throwExceptionIfNotFound)
 			throw new IllegalStateException("No IDPrefixCf registered for articleContainerClassName=\"" + articleContainerClassName + "\"");
 

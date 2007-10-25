@@ -150,7 +150,7 @@ public class Trader
 		trader.defaultCustomerGroupForKnownCustomer.getName().setText(
 				Locale.ENGLISH.getLanguage(), "Default");
 
-		trader = (Trader) pm.makePersistent(trader);
+		trader = pm.makePersistent(trader);
 
 		logger.info("getTrader: ...new Trader instance created and persisted!");
 		return trader;
@@ -463,7 +463,7 @@ public class Trader
 				user, order,
 				offerIDPrefix, IDGenerator.nextID(Offer.class, offerIDPrefix));
 		new OfferLocal(offer); // self-registering
-		offer = (Offer) getPersistenceManager().makePersistent(offer);
+		offer = getPersistenceManager().makePersistent(offer);
 
 		ProcessDefinitionAssignment processDefinitionAssignment = (ProcessDefinitionAssignment) getPersistenceManager().getObjectById(
 				ProcessDefinitionAssignmentID.create(Offer.class, TradeSide.vendor));
@@ -665,7 +665,7 @@ public class Trader
 
 			new OfferLocal(offer); // OfferLocal registers itself in Offer
 
-			offer = (Offer) getPersistenceManager().makePersistent(offer);
+			offer = getPersistenceManager().makePersistent(offer);
 			validateOffer(offer);
 
 			ProcessDefinitionAssignment processDefinitionAssignment = (ProcessDefinitionAssignment) getPersistenceManager().getObjectById(
@@ -874,6 +874,7 @@ public class Trader
 	{
 		private static final long serialVersionUID = 1L;
 
+		@Override
 		public void handle(AsyncInvokeEnvelope envelope) throws Exception
 		{
 			PersistenceManager pm = getPersistenceManager();
@@ -903,6 +904,7 @@ public class Trader
 	{
 		private static final long serialVersionUID = 1L;
 
+		@Override
 		public void handle(AsyncInvokeEnvelope envelope, Throwable error)
 				throws Exception
 		{
@@ -948,6 +950,7 @@ public class Trader
 			this.articleIDs = NLJDOHelper.getObjectIDSet(articles);
 		}
 
+		@Override
 		public Serializable invoke() throws Exception
 		{
 //			// WORKAROUND it doesn't work immediately - the transactions collide
@@ -1008,6 +1011,7 @@ public class Trader
 	{
 		private static final long serialVersionUID = 1L;
 
+		@Override
 		public void handle(AsyncInvokeEnvelope envelope) throws Exception
 		{
 			PersistenceManager pm = getPersistenceManager();
@@ -1030,6 +1034,7 @@ public class Trader
 	{
 		private static final long serialVersionUID = 1L;
 
+		@Override
 		public void handle(AsyncInvokeEnvelope envelope, Throwable error)
 				throws Exception
 		{
@@ -1068,6 +1073,7 @@ public class Trader
 			this.articleIDs = NLJDOHelper.getObjectIDSet(articles);
 		}
 
+		@Override
 		public Serializable invoke() throws Exception
 		{
 //			// WORKAROUND it doesn't work immediately - the transactions collide
@@ -1359,7 +1365,7 @@ public class Trader
 			ArticlePrice articlePrice = packagePriceConfig.createArticlePrice(article);
 			for (int tryCounter = 0; tryCounter < 10; ++tryCounter) {
 				try {
-					articlePrice = (ArticlePrice) pm.makePersistent(articlePrice);
+					articlePrice = pm.makePersistent(articlePrice);
 					break;
 				} catch (Exception x) {
 					logger.warn("Persisting articlePrice instance failed! Trying it again. tryCounter=" + tryCounter, x);

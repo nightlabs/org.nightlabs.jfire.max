@@ -194,6 +194,7 @@ public abstract class ProductTypeActionHandler
 	/**
 	 * @deprecated Only for JDO!
 	 */
+	@Deprecated
 	protected ProductTypeActionHandler() { }
 
 	/**
@@ -453,7 +454,7 @@ public abstract class ProductTypeActionHandler
 				// transfer from nested to this
 				if (!thisProductHome.getPrimaryKey().equals(nestedProductHome.getPrimaryKey())) {
 					ProductTransfer productTransfer = new ProductTransfer(null, user, nestedProductHome, thisProductHome, nestedProducts);
-					productTransfer = (ProductTransfer) pm.makePersistent(productTransfer);
+					productTransfer = pm.makePersistent(productTransfer);
 					productTransfer.bookTransfer(user, involvedAnchors);
 					productTransfers.add(productTransfer);
 				}
@@ -504,7 +505,7 @@ public abstract class ProductTypeActionHandler
 						null, // TODO we should find out and pass the CustomerGroupID
 //						segmentTypeIDs);
 						segmentTypeIDsWithTheCurrentInstanceOnly);
-				partnerOrder = (Order) pm.makePersistent(order);
+				partnerOrder = pm.makePersistent(order);
 				orderRequirement.addPartnerOrder(partnerOrder);
 				partnerOrderID = (OrderID) JDOHelper.getObjectId(partnerOrder);
 				partnerSegmentID = Segment.getSegmentIDs(pm, partnerOrder, segmentType).iterator().next();
@@ -530,7 +531,7 @@ public abstract class ProductTypeActionHandler
 				{
 					Offer offer = tradeManager.createCrossTradeOffer(partnerOrderID, null); // we don't pass the offerIDPrefix - or should we?
 					new OfferLocal(offer);
-					partnerOffer = (Offer) pm.makePersistent(offer);
+					partnerOffer = pm.makePersistent(offer);
 					offerRequirement.addPartnerOffer(partnerOffer);
 				}
 
@@ -686,7 +687,7 @@ public abstract class ProductTypeActionHandler
 				// transfer from this to nested
 				if (!thisProductHome.getPrimaryKey().equals(nestedProductHome.getPrimaryKey())) {
 					ProductTransfer productTransfer = new ProductTransfer(null, user, thisProductHome, nestedProductHome, nestedProducts);
-					productTransfer = (ProductTransfer) pm.makePersistent(productTransfer);
+					productTransfer = pm.makePersistent(productTransfer);
 					productTransfer.bookTransfer(user, involvedAnchors);
 					productTransfers.add(productTransfer);
 				}

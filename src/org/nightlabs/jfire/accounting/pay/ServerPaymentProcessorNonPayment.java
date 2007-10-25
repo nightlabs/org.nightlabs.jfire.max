@@ -70,6 +70,7 @@ extends ServerPaymentProcessor
 	/**
 	 * @deprecated Only for JDO! 
 	 */
+	@Deprecated
 	protected ServerPaymentProcessorNonPayment()
 	{
 	}
@@ -87,6 +88,7 @@ extends ServerPaymentProcessor
 	/**
 	 * @see org.nightlabs.jfire.accounting.pay.ServerPaymentProcessor#getAnchorOutside(org.nightlabs.jfire.accounting.pay.ServerPaymentProcessor.PayParams)
 	 */
+	@Override
 	public Anchor getAnchorOutside(PayParams payParams)
 	{
 		Account treasury = getAccountOutside(payParams, "nonPayment");
@@ -96,6 +98,7 @@ extends ServerPaymentProcessor
 	/**
 	 * @see org.nightlabs.jfire.accounting.pay.ServerPaymentProcessor#externalPayBegin(org.nightlabs.jfire.accounting.pay.ServerPaymentProcessor.PayParams)
 	 */
+	@Override
 	protected PaymentResult externalPayBegin(PayParams payParams) throws PaymentException
 	{
 		return new PaymentResult(
@@ -107,6 +110,7 @@ extends ServerPaymentProcessor
 	/**
 	 * @see org.nightlabs.jfire.accounting.pay.ServerPaymentProcessor#externalPayDoWork(org.nightlabs.jfire.accounting.pay.ServerPaymentProcessor.PayParams)
 	 */
+	@Override
 	protected PaymentResult externalPayDoWork(PayParams payParams)
 			throws PaymentException
 	{
@@ -119,6 +123,7 @@ extends ServerPaymentProcessor
 	/**
 	 * @see org.nightlabs.jfire.accounting.pay.ServerPaymentProcessor#externalPayCommit(org.nightlabs.jfire.accounting.pay.ServerPaymentProcessor.PayParams)
 	 */
+	@Override
 	protected PaymentResult externalPayCommit(PayParams payParams) throws PaymentException
 	{
 		return new PaymentResult(
@@ -130,6 +135,7 @@ extends ServerPaymentProcessor
 	/**
 	 * @see org.nightlabs.jfire.accounting.pay.ServerPaymentProcessor#externalPayRollback(org.nightlabs.jfire.accounting.pay.ServerPaymentProcessor.PayParams)
 	 */
+	@Override
 	protected PaymentResult externalPayRollback(PayParams payParams) throws PaymentException
 	{
 		return null;

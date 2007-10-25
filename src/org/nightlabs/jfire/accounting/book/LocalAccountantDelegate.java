@@ -92,6 +92,7 @@ public abstract class LocalAccountantDelegate implements Serializable {
 	/**
 	 * @deprecated Only for JDO 
 	 */
+	@Deprecated
 	public LocalAccountantDelegate() {}
 	
 	

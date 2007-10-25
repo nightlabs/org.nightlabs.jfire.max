@@ -148,6 +148,7 @@ implements Serializable, StatableLocal
 	/**
 	 * @deprecated Only for JDO!
 	 */
+	@Deprecated
 	protected InvoiceLocal() { }
 
 	public InvoiceLocal(Invoice invoice)
@@ -278,8 +279,8 @@ implements Serializable, StatableLocal
 		if (currentState == null)
 			throw new IllegalArgumentException("state must not be null!");
 
-		this.state = (State)currentState;
-		this.states.add((State)currentState);
+		this.state = currentState;
+		this.states.add(currentState);
 	}
 
 	public State getState()

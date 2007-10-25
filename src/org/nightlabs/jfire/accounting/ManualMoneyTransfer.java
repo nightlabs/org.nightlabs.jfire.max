@@ -33,6 +33,7 @@ public class ManualMoneyTransfer extends MoneyTransfer
 	/**
 	 * @deprecated Only for JDO!
 	 */
+	@Deprecated
 	protected ManualMoneyTransfer() { }
 
 	/**

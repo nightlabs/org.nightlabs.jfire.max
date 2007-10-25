@@ -98,7 +98,7 @@ public class ArticleProductTypeClassGroup
 	public void removeArticles(Collection<? extends Article> articles)
 	{
 		for (Iterator<? extends Article> it = articles.iterator(); it.hasNext(); )
-			removeArticle((Article) it.next());
+			removeArticle(it.next());
 	}
 	/**
 	 * Adds a single <tt>Article</tt>.
@@ -141,7 +141,7 @@ public class ArticleProductTypeClassGroup
 	{
 		Set<ArticleCarrier> articleCarriers = new HashSet<ArticleCarrier>(articles.size());
 		for (Iterator<? extends Article> it = articles.iterator(); it.hasNext(); ) {
-			Article article = (Article) it.next();
+			Article article = it.next();
 			if (article != null) {
 				ArticleCarrier articleCarrier = addArticle(article, filterExisting);
 				if (articleCarrier != null)
@@ -157,7 +157,7 @@ public class ArticleProductTypeClassGroup
 	{
 		Set<Article> s = new HashSet<Article>(articleCarriers.size());
 		for (Iterator<ArticleCarrier> it = articleCarriers.values().iterator(); it.hasNext();) {
-			ArticleCarrier articleCarrier = (ArticleCarrier) it.next();
+			ArticleCarrier articleCarrier = it.next();
 			s.add(articleCarrier.getArticle());
 		}
 		return Collections.unmodifiableCollection(s);

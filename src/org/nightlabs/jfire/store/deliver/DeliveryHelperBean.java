@@ -81,6 +81,7 @@ implements SessionBean
 	/**
 	 * @see org.nightlabs.jfire.base.BaseSessionBeanImpl#setSessionContext(javax.ejb.SessionContext)
 	 */
+	@Override
 	public void setSessionContext(SessionContext sessionContext)
 			throws EJBException, RemoteException
 	{
@@ -136,11 +137,11 @@ implements SessionBean
 			new DeliveryLocal(deliveryData.getDelivery());
 			
 			deliveryData.getDelivery().initUser(User.getUser(pm, getPrincipal()));
-			deliveryData = (DeliveryData) pm.makePersistent(deliveryData);
+			deliveryData = pm.makePersistent(deliveryData);
 
 			if (deliveryData.getDelivery().getPartner() == null) {
 				String mandatorPK = Store.getStore(pm).getMandator().getPrimaryKey();
-				DeliveryNote deliveryNote = (DeliveryNote) deliveryData.getDelivery().getDeliveryNotes().iterator().next();
+				DeliveryNote deliveryNote = deliveryData.getDelivery().getDeliveryNotes().iterator().next();
 
 				LegalEntity partner = deliveryNote.getCustomer();
 				if (mandatorPK.equals(partner.getPrimaryKey()))
@@ -188,7 +189,7 @@ implements SessionBean
 			if (fetchGroups != null)
 				pm.getFetchPlan().setGroups(fetchGroups);
 
-			DeliveryResult deliverBeginServerResult_detached = (DeliveryResult) pm.detachCopy(deliverBeginServerResult);
+			DeliveryResult deliverBeginServerResult_detached = pm.detachCopy(deliverBeginServerResult);
 //			deliverBeginServerResult_detached.setError(deliverBeginServerResult.getError());
 
 			return deliverBeginServerResult_detached;
@@ -246,7 +247,7 @@ implements SessionBean
 			if (fetchGroups != null)
 				pm.getFetchPlan().setGroups(fetchGroups);
 
-			DeliveryResult deliverDoWorkServerResult_detached = (DeliveryResult) pm.detachCopy(deliverDoWorkServerResult);
+			DeliveryResult deliverDoWorkServerResult_detached = pm.detachCopy(deliverDoWorkServerResult);
 //			deliverDoWorkServerResult_detached.setError(deliverDoWorkServerResult.getError());
 			return deliverDoWorkServerResult_detached;
 		} finally {
@@ -289,7 +290,7 @@ implements SessionBean
 
 			// get DeliveryNoteIDs for booking
 			Collection deliveryNoteIDs = deliveryData.getDelivery().getDeliveryNoteIDs();
-			DeliveryResult deliverEndServerResult_detached = (DeliveryResult) pm.detachCopy(deliverEndServerResult);
+			DeliveryResult deliverEndServerResult_detached = pm.detachCopy(deliverEndServerResult);
 //			deliverBeginServerResult_detached.setError(deliverBeginServerResult.getError());
 
 			try {
@@ -454,6 +455,7 @@ implements SessionBean
 			logger.info("Created ConsolidateProductReferencesInvocation for " + deliveryNoteIDs.size() + " deliveryNotes with "+delayMSec+" msec delay.");
 		}
 
+		@Override
 		public Serializable invoke() throws Exception
 		{
 			long wait = createDT + delayMSec - System.currentTimeMillis();
@@ -573,7 +575,7 @@ implements SessionBean
 //			DeliveryData deliveryData = (DeliveryData) pm.getObjectById(DeliveryDataID.create(deliveryID));
 //			Delivery delivery = deliveryData.getDelivery();
 
-			deliverBeginServerResult = (DeliveryResult) pm.makePersistent(deliverBeginServerResult);
+			deliverBeginServerResult = pm.makePersistent(deliverBeginServerResult);
 
 			delivery.setDeliverBeginServerResult(deliverBeginServerResult);
 
@@ -590,7 +592,7 @@ implements SessionBean
 			if (fetchGroups != null)
 				pm.getFetchPlan().setGroups(fetchGroups);
 
-			return (DeliveryResult) pm.detachCopy(deliverBeginServerResult);
+			return pm.detachCopy(deliverBeginServerResult);
 		} finally {
 			pm.close();
 		}
@@ -612,7 +614,7 @@ implements SessionBean
 			Delivery delivery = (Delivery) pm.getObjectById(deliveryID);
 
 			if (JDOHelper.isDetached(deliverDoWorkServerResult))
-				deliverDoWorkServerResult = (DeliveryResult) pm.makePersistent(deliverDoWorkServerResult);
+				deliverDoWorkServerResult = pm.makePersistent(deliverDoWorkServerResult);
 			else
 				pm.makePersistent(deliverDoWorkServerResult);
 
@@ -631,7 +633,7 @@ implements SessionBean
 			if (fetchGroups != null)
 				pm.getFetchPlan().setGroups(fetchGroups);
 
-			return (DeliveryResult) pm.detachCopy(deliverDoWorkServerResult);
+			return pm.detachCopy(deliverDoWorkServerResult);
 		} finally {
 			pm.close();
 		}
@@ -653,7 +655,7 @@ implements SessionBean
 			Delivery delivery = (Delivery) pm.getObjectById(deliveryID);
 
 			if (JDOHelper.isDetached(deliverEndServerResult))
-				deliverEndServerResult = (DeliveryResult) pm.makePersistent(deliverEndServerResult);
+				deliverEndServerResult = pm.makePersistent(deliverEndServerResult);
 			else
 				pm.makePersistent(deliverEndServerResult);
 
@@ -672,7 +674,7 @@ implements SessionBean
 			if (fetchGroups != null)
 				pm.getFetchPlan().setGroups(fetchGroups);
 
-			return (DeliveryResult) pm.detachCopy(deliverEndServerResult);
+			return pm.detachCopy(deliverEndServerResult);
 		} finally {
 			pm.close();
 		}

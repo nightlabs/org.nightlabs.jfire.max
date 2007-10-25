@@ -1,14 +1,12 @@
 package org.nightlabs.jfire.transfer;
 
 import java.rmi.RemoteException;
-import java.util.LinkedList;
 import java.util.List;
 
 import javax.ejb.CreateException;
 import javax.naming.NamingException;
 import javax.security.auth.login.LoginException;
 
-import org.nightlabs.io.LimitedInputStream;
 import org.nightlabs.jdo.ObjectID;
 import org.nightlabs.jfire.accounting.AccountingManager;
 import org.nightlabs.jfire.accounting.AccountingManagerUtil;

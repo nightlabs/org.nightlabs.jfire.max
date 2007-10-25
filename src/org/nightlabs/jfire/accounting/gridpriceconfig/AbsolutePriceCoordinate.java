@@ -110,6 +110,7 @@ public class AbsolutePriceCoordinate extends PriceCoordinate implements IAbsolut
 	/**
 	 * @deprecated Use {@link #AbsolutePriceCoordinate(Object[])} instead!
 	 */
+	@Deprecated
 	public AbsolutePriceCoordinate(
 			String customerGroupPK, String tariffPK, String currencyID,
 			String productTypePK, String priceFragmentTypePK)

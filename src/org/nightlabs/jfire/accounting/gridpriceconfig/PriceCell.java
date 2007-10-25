@@ -31,7 +31,6 @@ import java.util.HashMap;
 import java.util.Map;
 
 import org.nightlabs.jfire.accounting.Price;
-import org.nightlabs.jfire.accounting.id.PriceFragmentTypeID;
 import org.nightlabs.jfire.accounting.priceconfig.IPriceConfig;
 import org.nightlabs.jfire.accounting.priceconfig.PriceConfig;
 
@@ -104,6 +103,7 @@ public class PriceCell implements Serializable
 	/**
 	 * @deprecated Only for JDO!
 	 */
+	@Deprecated
 	protected PriceCell()
 	{
 	}

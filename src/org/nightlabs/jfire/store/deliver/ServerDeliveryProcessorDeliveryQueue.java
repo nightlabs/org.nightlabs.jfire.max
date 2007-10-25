@@ -50,7 +50,7 @@ extends ServerDeliveryProcessor
 			serverDeliveryProcessorDeliveryQueue = new ServerDeliveryProcessorDeliveryQueue(Organisation.DEVIL_ORGANISATION_ID,	ServerDeliveryProcessorDeliveryQueue.class.getName());
 			serverDeliveryProcessorDeliveryQueue.getName().setText(Locale.ENGLISH.getLanguage(), "Server Delivery Processor for delivering to a delivery queue");
 
-			serverDeliveryProcessorDeliveryQueue = (ServerDeliveryProcessorDeliveryQueue) pm.makePersistent(serverDeliveryProcessorDeliveryQueue);
+			serverDeliveryProcessorDeliveryQueue = pm.makePersistent(serverDeliveryProcessorDeliveryQueue);
 		}
 
 		return serverDeliveryProcessorDeliveryQueue;
@@ -59,6 +59,7 @@ extends ServerDeliveryProcessor
 	/**
 	 * @deprecated Only for JDO!
 	 */
+	@Deprecated
 	protected ServerDeliveryProcessorDeliveryQueue() {
 	}
 
@@ -70,11 +71,13 @@ extends ServerDeliveryProcessor
 		super(organisationID, serverDeliveryProcessorID);
 	}
 
+	@Override
 	@Implement
 	public Anchor getAnchorOutside(DeliverParams deliverParams) {
 		return getRepositoryOutside(deliverParams, "anchorOutside.deliveryQueue");
 	}
 
+	@Override
 	@Implement
 	protected DeliveryResult externalDeliverBegin(DeliverParams deliverParams) throws DeliveryException {
 		// Attach DeliveryActionHandlerDeliveryQueue
@@ -85,6 +88,7 @@ extends ServerDeliveryProcessor
 		return new DeliveryResult(DeliveryResult.CODE_POSTPONED, null, null);
 	}
 
+	@Override
 	@Implement
 	protected DeliveryResult externalDeliverDoWork(DeliverParams deliverParams) throws DeliveryException {
 		DeliveryQueue targetDeliveryQueue = getTargetDeliveryQueue(deliverParams);
@@ -93,12 +97,14 @@ extends ServerDeliveryProcessor
 		return null;
 	}
 
+	@Override
 	@Implement
 	protected DeliveryResult externalDeliverCommit(DeliverParams deliverParams) throws DeliveryException {
 		// Nothing to do					
 		return null; // should automatically be correct ;-)
 	}
 
+	@Override
 	@Implement
 	protected DeliveryResult externalDeliverRollback(DeliverParams deliverParams) throws DeliveryException {
 		DeliveryQueue targetDeliveryQueue = getTargetDeliveryQueue(deliverParams);

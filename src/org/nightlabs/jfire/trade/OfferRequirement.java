@@ -68,7 +68,7 @@ public class OfferRequirement
 		if (res != null)
 			return res;
 
-		return (OfferRequirement) pm.makePersistent(new OfferRequirement(offer));
+		return pm.makePersistent(new OfferRequirement(offer));
 	}
 
 	/**
@@ -145,7 +145,7 @@ public class OfferRequirement
 	
 	public void addPartnerOffer(Offer offer) {
 		OrganisationLegalEntity vendor = offer.getOrder().getVendor();
-		Offer other = (Offer) vendor2offer.get(vendor);
+		Offer other = vendor2offer.get(vendor);
 		if (offer.equals(other))
 			return; // already registered - ignore
 
@@ -160,7 +160,7 @@ public class OfferRequirement
 	 * @param vendor
 	 */
 	public Offer getPartnerOffer(LegalEntity vendor) {
-		return (Offer)vendor2offer.get(vendor);
+		return vendor2offer.get(vendor);
 	}
 
 	public Collection<Offer> getPartnerOffers()

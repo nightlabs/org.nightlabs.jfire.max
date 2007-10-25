@@ -291,6 +291,7 @@ implements Serializable
 	/**
 	 * @deprecated Constructor only for JDO!
 	 */
+	@Deprecated
 	protected DeliveryConfiguration() { }
 
 	public DeliveryConfiguration(String organisationID, String deliveryConfigurationID)

@@ -149,6 +149,7 @@ public class PayMoneyTransfer extends MoneyTransfer
 	/**
 	 * @deprecated Only for JDO!
 	 */
+	@Deprecated
 	protected PayMoneyTransfer() { }
 
 	/**

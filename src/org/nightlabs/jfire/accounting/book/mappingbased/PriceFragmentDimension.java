@@ -61,6 +61,7 @@ public class PriceFragmentDimension extends MoneyFlowDimension {
 	/**
 	 * @see org.nightlabs.jfire.accounting.book.mappingbased.MoneyFlowDimension#getMoneyFlowDimensionID()
 	 */
+	@Override
 	public String getMoneyFlowDimensionID() {
 		return MONEY_FLOW_DIMENSION_ID;
 	}
@@ -68,6 +69,7 @@ public class PriceFragmentDimension extends MoneyFlowDimension {
 	/**
 	 * @see org.nightlabs.jfire.accounting.book.mappingbased.MoneyFlowDimension#getValues()
 	 */
+	@Override
 	public String[] getValues(ProductType productType, Article bookArticle) {
 		ProductType rootType = bookArticle.getProductType();
 		IPriceConfig priceConfig = productType.getPriceConfigInPackage(rootType.getPrimaryKey());

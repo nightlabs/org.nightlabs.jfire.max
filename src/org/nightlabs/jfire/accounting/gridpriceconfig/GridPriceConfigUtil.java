@@ -231,7 +231,7 @@ public class GridPriceConfigUtil
 			if (!localOrganisationID.equals(priceConfig.getOrganisationID()))
 				throw new IllegalArgumentException("Cannot store a partner's price config: " + priceConfig.getPrimaryKey());
 
-			priceConfig = (T) pm.makePersistent(priceConfig);
+			priceConfig = pm.makePersistent(priceConfig);
 			priceConfigs.add(priceConfig);
 		}
 

@@ -337,7 +337,7 @@ public class CellReflector
 
 		// Find all productPKs that inherit the searched one (or are it) and are packaged
 		// in the current package.
-		List foundProductTypePKs = (List) priceCalculator.resolvableProductTypes.get(productTypePK);
+		List foundProductTypePKs = priceCalculator.resolvableProductTypes.get(productTypePK);
 		if (foundProductTypePKs == null)
 			return priceCells;
 
@@ -349,7 +349,7 @@ public class CellReflector
 
 		for (Iterator it = foundProductTypePKs.iterator(); it.hasNext(); ) {
 			String foundProductTypePK = (String) it.next();
-			NestedProductType packagedProductType = (NestedProductType) priceCalculator.virtualPackagedProductTypes.get(foundProductTypePK);
+			NestedProductType packagedProductType = priceCalculator.virtualPackagedProductTypes.get(foundProductTypePK);
 
 			PriceCell priceCell = null;
 			// filter the cell itself out if everything is identical

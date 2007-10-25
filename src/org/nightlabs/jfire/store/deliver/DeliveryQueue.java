@@ -126,6 +126,7 @@ public class DeliveryQueue implements Serializable, AttachCallback, DetachCallba
 	private Boolean hasPendingDeliveries;
 	
 	/** @deprecated Only for JDO! */
+	@Deprecated
 	protected DeliveryQueue() {
 	}
 	

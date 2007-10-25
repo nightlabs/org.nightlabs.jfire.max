@@ -64,6 +64,7 @@ public class ServerPaymentProcessorDebitNoteGermany extends ServerPaymentProcess
 	/**
 	 * @deprecated Only for JDO!
 	 */
+	@Deprecated
 	protected ServerPaymentProcessorDebitNoteGermany()
 	{
 	}
@@ -81,6 +82,7 @@ public class ServerPaymentProcessorDebitNoteGermany extends ServerPaymentProcess
 	/**
 	 * @see org.nightlabs.jfire.accounting.pay.ServerPaymentProcessor#getAnchorOutside(org.nightlabs.jfire.accounting.pay.ServerPaymentProcessor.PayParams)
 	 */
+	@Override
 	public Anchor getAnchorOutside(PayParams payParams)
 	{
 		return getAccountOutside(payParams, "debitNote");
@@ -89,6 +91,7 @@ public class ServerPaymentProcessorDebitNoteGermany extends ServerPaymentProcess
 	/**
 	 * @see org.nightlabs.jfire.accounting.pay.ServerPaymentProcessor#externalPayBegin(org.nightlabs.jfire.accounting.pay.ServerPaymentProcessor.PayParams)
 	 */
+	@Override
 	protected PaymentResult externalPayBegin(PayParams payParams)
 			throws PaymentException
 	{
@@ -107,6 +110,7 @@ public class ServerPaymentProcessorDebitNoteGermany extends ServerPaymentProcess
 	/**
 	 * @see org.nightlabs.jfire.accounting.pay.ServerPaymentProcessor#externalPayDoWork(org.nightlabs.jfire.accounting.pay.ServerPaymentProcessor.PayParams)
 	 */
+	@Override
 	protected PaymentResult externalPayDoWork(PayParams payParams)
 			throws PaymentException
 	{
@@ -125,6 +129,7 @@ public class ServerPaymentProcessorDebitNoteGermany extends ServerPaymentProcess
 	/**
 	 * @see org.nightlabs.jfire.accounting.pay.ServerPaymentProcessor#externalPayCommit(org.nightlabs.jfire.accounting.pay.ServerPaymentProcessor.PayParams)
 	 */
+	@Override
 	protected PaymentResult externalPayCommit(PayParams payParams)
 			throws PaymentException
 	{
@@ -143,6 +148,7 @@ public class ServerPaymentProcessorDebitNoteGermany extends ServerPaymentProcess
 	/**
 	 * @see org.nightlabs.jfire.accounting.pay.ServerPaymentProcessor#externalPayRollback(PayParams)
 	 */
+	@Override
 	protected PaymentResult externalPayRollback(PayParams payParams)
 			throws PaymentException
 	{

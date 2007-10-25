@@ -89,6 +89,7 @@ public class ModeOfPaymentName extends I18nText
 	/**
 	 * @deprecated Only for JDO! 
 	 */
+	@Deprecated
 	protected ModeOfPaymentName() { }
 	
 	public ModeOfPaymentName(ModeOfPayment modeOfPayment)
@@ -106,6 +107,7 @@ public class ModeOfPaymentName extends I18nText
 	/**
 	 * @see org.nightlabs.i18n.I18nText#getI18nMap()
 	 */
+	@Override
 	protected Map getI18nMap()
 	{
 		return names;
@@ -114,6 +116,7 @@ public class ModeOfPaymentName extends I18nText
 	/**
 	 * @see org.nightlabs.i18n.I18nText#getFallBackValue(java.lang.String)
 	 */
+	@Override
 	protected String getFallBackValue(String languageID)
 	{
 		return ModeOfPayment.getPrimaryKey(organisationID, modeOfPaymentID);

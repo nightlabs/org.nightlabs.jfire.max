@@ -76,6 +76,7 @@ public class RepositoryName extends I18nText
 	/**
 	 * @deprecated Only for JDO!
 	 */
+	@Deprecated
 	protected RepositoryName() { }
 
 	public RepositoryName(Repository repository) {
@@ -103,11 +104,13 @@ public class RepositoryName extends I18nText
 	 */
 	protected Map<String, String> names;
 
+	@Override
 	@Implement
 	protected Map<String, String> getI18nMap() {
 		return names;
 	}
 
+	@Override
 	@Implement
 	protected String getFallBackValue(String languageID) {
 		return anchorID;

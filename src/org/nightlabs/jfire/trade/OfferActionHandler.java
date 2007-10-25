@@ -4,6 +4,7 @@ import javax.jdo.JDOHelper;
 import javax.jdo.PersistenceManager;
 
 import org.nightlabs.jfire.security.User;
+import org.nightlabs.util.Util;
 import org.nightlabs.util.Utils;
 
 /**
@@ -36,6 +37,7 @@ public class OfferActionHandler
 	/**
 	 * @deprecated Only for JDO!
 	 */
+	@Deprecated
 	protected OfferActionHandler() { }
 
 	public OfferActionHandler(String organisationID, String offerActionHandlerID)
@@ -65,14 +67,14 @@ public class OfferActionHandler
 		OfferActionHandler o = (OfferActionHandler) obj;
 
 		return
-				Utils.equals(this.organisationID, o.organisationID) &&
-				Utils.equals(this.offerActionHandlerID, o.offerActionHandlerID);
+				Util.equals(this.organisationID, o.organisationID) &&
+				Util.equals(this.offerActionHandlerID, o.offerActionHandlerID);
 	}
 
 	@Override
 	public int hashCode()
 	{
-		return Utils.hashCode(organisationID) ^ Utils.hashCode(offerActionHandlerID);
+		return Util.hashCode(organisationID) ^ Util.hashCode(offerActionHandlerID);
 	}
 
 	public void onFinalizeOffer(User user, Offer offer)

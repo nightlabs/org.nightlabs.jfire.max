@@ -14,6 +14,7 @@ import org.nightlabs.jfire.accounting.gridpriceconfig.GridPriceConfig;
 import org.nightlabs.jfire.accounting.id.TariffID;
 import org.nightlabs.jfire.accounting.id.TariffMappingID;
 import org.nightlabs.jfire.store.ProductType;
+import org.nightlabs.util.Util;
 import org.nightlabs.util.Utils;
 
 /**
@@ -113,7 +114,7 @@ implements Serializable
 		Tariff localTariff = (Tariff) pm.getObjectById(localTariffID);
 
 		tariffMapping = new TariffMapping(partnerTariff, localTariff);
-		return (TariffMapping) pm.makePersistent(tariffMapping);
+		return pm.makePersistent(tariffMapping);
 	}
 
 	/**
@@ -192,6 +193,7 @@ implements Serializable
 	/**
 	 * @deprecated Only for JDO!
 	 */
+	@Deprecated
 	protected TariffMapping() { }
 
 	public TariffMapping(Tariff partnerTariff, Tariff localTariff)
@@ -271,18 +273,18 @@ implements Serializable
 		if (!(obj instanceof TariffMapping)) return false;
 		TariffMapping o = (TariffMapping) obj;
 		return
-				Utils.equals(o.partnerTariffOrganisationID, this.partnerTariffOrganisationID) &&
-				Utils.equals(o.partnerTariffTariffID, this.partnerTariffTariffID) &&
-				Utils.equals(o.localTariffOrganisationID, this.localTariffOrganisationID) &&
-				Utils.equals(o.localTariffTariffID, this.localTariffTariffID);
+				Util.equals(o.partnerTariffOrganisationID, this.partnerTariffOrganisationID) &&
+				Util.equals(o.partnerTariffTariffID, this.partnerTariffTariffID) &&
+				Util.equals(o.localTariffOrganisationID, this.localTariffOrganisationID) &&
+				Util.equals(o.localTariffTariffID, this.localTariffTariffID);
 	}
 	@Override
 	public int hashCode()
 	{
 		return
-				Utils.hashCode(partnerTariffOrganisationID) +
-				Utils.hashCode(partnerTariffTariffID) +
-				Utils.hashCode(localTariffOrganisationID) +
-				Utils.hashCode(localTariffTariffID);
+				Util.hashCode(partnerTariffOrganisationID) +
+				Util.hashCode(partnerTariffTariffID) +
+				Util.hashCode(localTariffOrganisationID) +
+				Util.hashCode(localTariffTariffID);
 	}
 }

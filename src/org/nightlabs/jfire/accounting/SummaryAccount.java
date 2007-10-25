@@ -29,7 +29,6 @@ package org.nightlabs.jfire.accounting;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashSet;
-import java.util.Map;
 import java.util.Set;
 
 import org.nightlabs.jfire.security.User;
@@ -121,6 +120,7 @@ public class SummaryAccount extends Account
 		summedAccounts = new HashSet<Account>();
 	}
 
+	@Override
 	protected void rollbackAccountMoneyTransfer(User user, MoneyTransfer moneyTransfer, Set<Anchor> involvedAnchors)
 	{
 		if (moneyTransfer instanceof SummaryMoneyTransfer) {
@@ -135,6 +135,7 @@ public class SummaryAccount extends Account
 	/**
 	 * @see org.nightlabs.jfire.accounting.Account#bookAccountMoneyTransfer(org.nightlabs.jfire.security.User, org.nightlabs.jfire.accounting.MoneyTransfer, java.util.Map)
 	 */
+	@Override
 	protected void bookAccountMoneyTransfer(User user,
 			MoneyTransfer moneyTransfer, Set<Anchor> involvedAnchors)
 	{

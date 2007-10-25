@@ -109,6 +109,7 @@ public abstract class GridPriceConfig extends PriceConfig
 	/**
 	 * @deprecated Only for JDO!
 	 */
+	@Deprecated
 	protected GridPriceConfig() { }
 
 	/**
@@ -120,6 +121,7 @@ public abstract class GridPriceConfig extends PriceConfig
 		super(organisationID, priceConfigID);
 	}
 
+	@Override
 	@Implement
 	public boolean isDependentOnOffer()
 	{
@@ -139,7 +141,7 @@ public abstract class GridPriceConfig extends PriceConfig
 	}
 	public CustomerGroup getCustomerGroup(String organisationID, String customerGroupID, boolean throwExceptionIfNotExistent)
 	{
-		CustomerGroup customerGroup = (CustomerGroup) customerGroups.get(CustomerGroup.getPrimaryKey(organisationID, customerGroupID));
+		CustomerGroup customerGroup = customerGroups.get(CustomerGroup.getPrimaryKey(organisationID, customerGroupID));
 		if (customerGroup == null && throwExceptionIfNotExistent)
 			throw new IllegalArgumentException("No CustomerGroup registered with organisationID=\""+organisationID+"\" customerGroupID=\""+customerGroupID+"\"!");
 		return customerGroup;
@@ -150,7 +152,7 @@ public abstract class GridPriceConfig extends PriceConfig
 	}
 	public CustomerGroup removeCustomerGroup(String organisationID, String customerGroupID)
 	{
-		return (CustomerGroup) customerGroups.remove(
+		return customerGroups.remove(
 				CustomerGroup.getPrimaryKey(organisationID, customerGroupID));
 	}
 
@@ -167,7 +169,7 @@ public abstract class GridPriceConfig extends PriceConfig
 	}
 	public Tariff getTariff(String organisationID, String tariffID, boolean throwExceptionIfNotExistent)
 	{
-		Tariff tariff = (Tariff) tariffs.get(Tariff.getPrimaryKey(organisationID, tariffID));
+		Tariff tariff = tariffs.get(Tariff.getPrimaryKey(organisationID, tariffID));
 		if (tariff == null && throwExceptionIfNotExistent)
 			throw new IllegalArgumentException("There is no Tariff registered with organisationID=\""+organisationID+"\" tariffID=\""+tariffID+"\"!");
 
@@ -179,7 +181,7 @@ public abstract class GridPriceConfig extends PriceConfig
 	}
 	public Tariff removeTariff(String organisationID, String tariffID)
 	{
-		return (Tariff) tariffs.remove(Tariff.getPrimaryKey(organisationID, tariffID));
+		return tariffs.remove(Tariff.getPrimaryKey(organisationID, tariffID));
 	}
 
 	public void removeTariff(Tariff tariff)

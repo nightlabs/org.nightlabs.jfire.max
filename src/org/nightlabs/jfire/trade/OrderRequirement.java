@@ -90,7 +90,7 @@ public class OrderRequirement
 			res.getOrder();
 			return res;
 		} catch (JDOObjectNotFoundException x) {
-			return (OrderRequirement) pm.makePersistent(new OrderRequirement(order));
+			return pm.makePersistent(new OrderRequirement(order));
 		}
 	}
 

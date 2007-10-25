@@ -142,6 +142,7 @@ public class Price
 	/**
 	 * @deprecated Only for JDO!
 	 */
+	@Deprecated
 	protected Price() { }
 
 	/**
@@ -311,7 +312,7 @@ public class Price
 	public PriceFragment getPriceFragment(
 			String priceFragmentTypePK, boolean throwExceptionIfNotExistent, boolean includeVirtual)
 	{
-		PriceFragment fragment = (PriceFragment) fragments.get(priceFragmentTypePK);		
+		PriceFragment fragment = fragments.get(priceFragmentTypePK);		
 		if (fragment == null && includeVirtual) {
 			fragment = virtualFragments.get(priceFragmentTypePK);
 		}
@@ -367,7 +368,7 @@ public class Price
 		if (priceFragmentType == null)
 			throw new NullPointerException("priceFragmentType");
 
-		PriceFragment fragment = (PriceFragment) fragments.get(priceFragmentType.getPrimaryKey());
+		PriceFragment fragment = fragments.get(priceFragmentType.getPrimaryKey());
 		if (fragment == null) {
 			fragment = new PriceFragment(this, priceFragmentType);
 			fragments.put(priceFragmentType.getPrimaryKey(), fragment);

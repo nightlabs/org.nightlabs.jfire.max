@@ -74,6 +74,7 @@ implements Serializable
 	/**
 	 * @deprecated Only for JDO!
 	 */
+	@Deprecated
 	protected Storekeeper() { }
 
 	public Storekeeper(String organisationID, String storekeeperID)

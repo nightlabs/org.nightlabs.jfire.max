@@ -52,6 +52,7 @@ public class AccountSearchFilter extends SearchFilter {
 		super(SearchFilter.CONJUNCTION_DEFAULT);
 	}
 
+	@Override
 	protected Class getExtentClass() {
 		return Account.class;
 	}

@@ -116,6 +116,7 @@ implements Serializable
 	/**
 	 * @deprecated This constructor exists only for JDO.
 	 */
+	@Deprecated
 	protected NestedProductType()
 	{
 	}

@@ -24,6 +24,7 @@ extends EditLockType
 	/**
 	 * @deprecated Only for JDO!
 	 */
+	@Deprecated
 	protected EditLockTypeDeliveryNote() { }
 
 	public EditLockTypeDeliveryNote(EditLockTypeID editLockTypeID)

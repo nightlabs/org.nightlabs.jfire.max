@@ -54,6 +54,7 @@ public class PaymentDataBankTransferGermany extends PaymentData
 	/**
 	 * @deprecated Only for JDO!
 	 */
+	@Deprecated
 	protected PaymentDataBankTransferGermany() { }
 
 	/**

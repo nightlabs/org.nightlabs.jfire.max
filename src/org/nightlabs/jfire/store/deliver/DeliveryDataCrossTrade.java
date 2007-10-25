@@ -37,6 +37,7 @@ extends DeliveryData
 	/**
 	 * @deprecated Only for JDO!
 	 */
+	@Deprecated
 	protected DeliveryDataCrossTrade() { }
 
 	public DeliveryDataCrossTrade(Delivery delivery, Delivery clientDelivery, Delivery serverDelivery)

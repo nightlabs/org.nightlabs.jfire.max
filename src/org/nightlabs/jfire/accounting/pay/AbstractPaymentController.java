@@ -87,12 +87,12 @@ public abstract class AbstractPaymentController extends AbstractTransferControll
 			Iterator<PaymentResult> itR = payDoWorkServerResults.iterator();
 			for (Iterator<?> itD = getTransferDatas().iterator(); itD.hasNext();) {
 				PaymentData paymentData = (PaymentData) itD.next();
-				PaymentResult payDoWorkServerResult = (PaymentResult) itR.next();
+				PaymentResult payDoWorkServerResult = itR.next();
 				paymentData.getPayment().setPayDoWorkServerResult(payDoWorkServerResult);
 			}
 		} catch (PaymentException x) {
 			for (Iterator<PaymentData> itD = getTransferDatas().iterator(); itD.hasNext();)
-				((PaymentData) itD.next()).getPayment().setPayDoWorkServerResult(x.getPaymentResult());
+				(itD.next()).getPayment().setPayDoWorkServerResult(x.getPaymentResult());
 		} catch (Throwable t) {
 			PaymentResult payDoWorkServerResult = new PaymentResult(SecurityReflector.getUserDescriptor().getOrganisationID(), t);
 			for (PaymentData paymentData : getTransferDatas())

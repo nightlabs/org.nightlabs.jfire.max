@@ -63,6 +63,7 @@ import org.nightlabs.jfire.editlock.EditLockType;
 import org.nightlabs.jfire.idgenerator.IDNamespaceDefault;
 import org.nightlabs.jfire.jbpm.JbpmLookup;
 import org.nightlabs.jfire.jbpm.graph.def.ProcessDefinition;
+import org.nightlabs.jfire.jbpm.graph.def.Statable;
 import org.nightlabs.jfire.jbpm.graph.def.State;
 import org.nightlabs.jfire.jbpm.graph.def.id.ProcessDefinitionID;
 import org.nightlabs.jfire.person.Person;
@@ -128,6 +129,7 @@ implements SessionBean
 	/**
 	 * @see org.nightlabs.jfire.base.BaseSessionBeanImpl#setSessionContext(javax.ejb.SessionContext)
 	 */
+	@Override
 	public void setSessionContext(SessionContext ctx)
 		throws EJBException, RemoteException
 	{
@@ -238,7 +240,7 @@ implements SessionBean
 			if (fetchGroups != null)
 				pm.getFetchPlan().setGroups(fetchGroups);
 
-			return (Order)pm.detachCopy(order);
+			return pm.detachCopy(order);
 		} finally {
 			pm.close();
 		}
@@ -343,7 +345,7 @@ implements SessionBean
 				Trader.getTrader(pm).createSegments(order, segmentTypes);
 			}
 
-			return (Order)pm.detachCopy(order);
+			return pm.detachCopy(order);
 		} finally {
 			pm.close();
 		}
@@ -376,12 +378,12 @@ implements SessionBean
 			pm.getFetchPlan().setMaxFetchDepth(NLJDOHelper.MAX_FETCH_DEPTH_NO_LIMIT);
 			pm.getFetchPlan().setGroups(new String[] {
 				FetchPlan.DEFAULT, Offer.FETCH_GROUP_CREATE_USER, Offer.FETCH_GROUP_ORDER,
-				Offer.FETCH_GROUP_CURRENCY, Offer.FETCH_GROUP_STATE, Offer.FETCH_GROUP_STATES,
+				Offer.FETCH_GROUP_CURRENCY, Statable.FETCH_GROUP_STATE, Statable.FETCH_GROUP_STATES,
 				State.FETCH_GROUP_STATABLE, State.FETCH_GROUP_STATE_DEFINITION, State.FETCH_GROUP_USER
 			});
 			pm.getFetchPlan().setDetachmentOptions(FetchPlan.DETACH_LOAD_FIELDS);
 
-			return (Offer) pm.detachCopy(offer);
+			return pm.detachCopy(offer);
 		} finally {
 			pm.close();
 		}
@@ -447,7 +449,7 @@ implements SessionBean
 			if (fetchGroups != null)
 				pm.getFetchPlan().setGroups(fetchGroups);
 
-			return (Offer) pm.detachCopy(offer);
+			return pm.detachCopy(offer);
 		} finally {
 			pm.close();
 		}
@@ -542,7 +544,7 @@ implements SessionBean
 			Trader.getTrader(pm).rejectOffer(User.getUser(pm, getPrincipal()), offer);
 
 			if (get)
-				return (Offer) pm.detachCopy(offer);
+				return pm.detachCopy(offer);
 			else
 				return null;
 		} finally {
@@ -730,7 +732,7 @@ implements SessionBean
 			if (fetchGroups != null)
 				pm.getFetchPlan().setGroups(fetchGroups);
 
-			return (Offer)pm.detachCopy(offer);
+			return pm.detachCopy(offer);
 		} finally {
 			pm.close();
 		}
@@ -796,7 +798,7 @@ implements SessionBean
 				pm.getFetchPlan().setGroups(fetchGroups);
 
 			LegalEntity le = LegalEntity.getAnonymousCustomer(pm);
-			return (LegalEntity) pm.detachCopy(le);
+			return pm.detachCopy(le);
 		} finally {
 			pm.close();
 		}
@@ -822,7 +824,7 @@ implements SessionBean
 			OrganisationLegalEntity ole = OrganisationLegalEntity.getOrganisationLegalEntity(
 					pm, organisationID, OrganisationLegalEntity.ANCHOR_TYPE_ID_ORGANISATION, throwExceptionIfNotExistent);
 
-			return (OrganisationLegalEntity) pm.detachCopy(ole);
+			return pm.detachCopy(ole);
 		} finally {
 			pm.close();
 		}
@@ -888,10 +890,10 @@ implements SessionBean
 			if (fetchGroups != null)
 				pm.getFetchPlan().setGroups(fetchGroups);
 			Trader trader = Trader.getTrader(pm);
-			Person aPerson = (Person)pm.makePersistent(person);
+			Person aPerson = pm.makePersistent(person);
 			LegalEntity legalEntity = trader.setPersonToLegalEntity(aPerson, true);
 			if (get)
-				return (LegalEntity)pm.detachCopy(legalEntity);
+				return pm.detachCopy(legalEntity);
 			else
 				return null;
 		} finally {
@@ -915,7 +917,7 @@ implements SessionBean
 	{
 		PersistenceManager pm = getPersistenceManager();
 		try {
-			return (LegalEntity) NLJDOHelper.storeJDO(pm, legalEntity, get, fetchGroups, maxFetchDepth);
+			return NLJDOHelper.storeJDO(pm, legalEntity, get, fetchGroups, maxFetchDepth);
 		} finally {
 			pm.close();
 		}
@@ -1148,7 +1150,7 @@ implements SessionBean
 			if (fetchGroups != null)
 				pm.getFetchPlan().setGroups(fetchGroups);
 
-			return (Segment) pm.detachCopy(segment);
+			return pm.detachCopy(segment);
 		} finally {
 			pm.close();
 		}
@@ -1366,7 +1368,7 @@ implements SessionBean
 			if (!get)
 				return null;
 
-			return (Order) pm.detachCopy(order);
+			return pm.detachCopy(order);
 		} finally {
 			pm.close();
 		}
@@ -1423,7 +1425,7 @@ implements SessionBean
 			if (!get)
 				return null;
 
-			return (CustomerGroupMapping) pm.detachCopy(tm);
+			return pm.detachCopy(tm);
 		} finally {
 			pm.close();
 		}
@@ -1478,7 +1480,7 @@ implements SessionBean
 	{
 		PersistenceManager pm = getPersistenceManager();
 		try {
-			return (CustomerGroup) NLJDOHelper.storeJDO(pm, customerGroup, get, fetchGroups, maxFetchDepth);
+			return NLJDOHelper.storeJDO(pm, customerGroup, get, fetchGroups, maxFetchDepth);
 		} finally {
 			pm.close();
 		}
@@ -1520,7 +1522,7 @@ implements SessionBean
 			for (JDOQuery query : queries) {
 				query.setPersistenceManager(pm);
 				query.setCandidates(articleContainers);
-				articleContainers = (Collection) query.getResult();
+				articleContainers = query.getResult();
 			}
 
 			return NLJDOHelper.getObjectIDSet(articleContainers);
@@ -1630,7 +1632,7 @@ implements SessionBean
 			for (JDOQuery query : queries) {
 				query.setPersistenceManager(pm);
 				query.setCandidates(offers);
-				offers = (Collection) query.getResult();
+				offers = query.getResult();
 			}
 
 			return NLJDOHelper.getObjectIDSet(offers);
@@ -1655,7 +1657,7 @@ implements SessionBean
 			for (JDOQuery query : queries) {
 				query.setPersistenceManager(pm);
 				query.setCandidates(orders);
-				orders = (Collection) query.getResult();
+				orders = query.getResult();
 			}
 
 			return NLJDOHelper.getObjectIDSet(orders);
@@ -1705,7 +1707,7 @@ implements SessionBean
 			for (JDOQuery query : queries) {
 				query.setPersistenceManager(pm);
 				query.setCandidates(receptionNotes);
-				receptionNotes = (Collection) query.getResult();
+				receptionNotes = query.getResult();
 			}
 
 			return NLJDOHelper.getObjectIDSet(receptionNotes);

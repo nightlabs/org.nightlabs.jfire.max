@@ -96,6 +96,7 @@ implements Serializable
 	/**
 	 * @deprecated Only for JDO!
 	 */
+	@Deprecated
 	protected ProductReferenceGroup() { }
 
 	public String getOrganisationID()

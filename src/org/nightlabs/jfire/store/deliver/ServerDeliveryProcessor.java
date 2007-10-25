@@ -234,6 +234,7 @@ implements Serializable, DetachCallback
 	/**
 	 * @deprecated Only of JDO!
 	 */
+	@Deprecated
 	protected ServerDeliveryProcessor()
 	{
 	}
@@ -524,7 +525,7 @@ implements Serializable, DetachCallback
 				to,
 				deliverParams.deliveryData.getDelivery()
 			);
-		deliverProductTransfer = (DeliverProductTransfer) getPersistenceManager().makePersistent(deliverProductTransfer);
+		deliverProductTransfer = getPersistenceManager().makePersistent(deliverProductTransfer);
 
 		return deliverProductTransfer;
 	}

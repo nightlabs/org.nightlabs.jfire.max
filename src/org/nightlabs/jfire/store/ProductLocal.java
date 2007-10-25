@@ -217,6 +217,7 @@ implements Serializable
 	/**
 	 * @deprecated Only for JDO!
 	 */
+	@Deprecated
 	protected ProductLocal() { }
 
 	public ProductLocal(User user, Product _product, Repository initialRepository)

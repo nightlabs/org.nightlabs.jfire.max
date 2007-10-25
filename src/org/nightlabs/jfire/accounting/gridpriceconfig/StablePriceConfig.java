@@ -120,6 +120,7 @@ implements IPackagePriceConfig, IResultPriceConfig
 	/**
 	 * @deprecated Only for JDO!
 	 */
+	@Deprecated
 	protected StablePriceConfig() { }
 
 	/**
@@ -132,6 +133,7 @@ implements IPackagePriceConfig, IResultPriceConfig
 		priceCells = new HashMap<IPriceCoordinate, PriceCell>();
 	}
 
+	@Override
 	@Implement
 	public boolean requiresProductTypePackageInternal()
 	{
@@ -181,7 +183,7 @@ implements IPackagePriceConfig, IResultPriceConfig
 	@Implement
 	public PriceCell getPriceCell(IPriceCoordinate priceCoordinate, boolean throwExceptionIfNotExistent)
 	{
-		PriceCell priceCell = (PriceCell) priceCells.get(priceCoordinate);
+		PriceCell priceCell = priceCells.get(priceCoordinate);
 
 		// If the JDO implementation uses a shortcut (a direct JDOQL instead of loading the whole Map and then
 		// search for the key), the cell might exist and not be found. Hence, we load the whole Map and try it again.
@@ -393,6 +395,7 @@ implements IPackagePriceConfig, IResultPriceConfig
 		} // iterate CustomerGroup
 	}
 
+	@Override
 	public ArticlePrice createArticlePrice(Article article)
 	{
 		CustomerGroup customerGroup = getCustomerGroup(article);

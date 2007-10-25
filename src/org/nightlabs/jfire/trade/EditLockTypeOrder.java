@@ -31,6 +31,7 @@ extends EditLockType
 	/**
 	 * @deprecated Only for JDO!
 	 */
+	@Deprecated
 	protected EditLockTypeOrder() { }
 
 	public EditLockTypeOrder(EditLockTypeID editLockTypeID)

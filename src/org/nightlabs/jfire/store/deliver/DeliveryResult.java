@@ -29,8 +29,7 @@ package org.nightlabs.jfire.store.deliver;
 import java.io.Serializable;
 
 import org.nightlabs.jfire.idgenerator.IDGenerator;
-import org.nightlabs.math.Base62Coder;
-import org.nightlabs.util.Utils;
+import org.nightlabs.util.Util;
 
 /**
  * @author Marco Schulze - marco at nightlabs dot de
@@ -63,6 +62,7 @@ implements Serializable
 	/**
 	 * @deprecated Only for JDO!
 	 */
+	@Deprecated
 	protected DeliveryResult()
 	{
 	}
@@ -345,7 +345,7 @@ implements Serializable
 	public void setError(Throwable error)
 	{
 		this.error = error;
-		this.errorStackTrace = error == null ? null : Utils.getStackTraceAsString(error);
+		this.errorStackTrace = error == null ? null : Util.getStackTraceAsString(error);
 	}
 	/**
 	 * @return Returns the text.

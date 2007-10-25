@@ -69,6 +69,7 @@ public abstract class Accountant implements Serializable
 	/**
 	 * @deprecated Do not use! Only for JDO!
 	 */
+	@Deprecated
 	protected Accountant() { }
 
 	public Accountant(String organisationID, String accountantID)

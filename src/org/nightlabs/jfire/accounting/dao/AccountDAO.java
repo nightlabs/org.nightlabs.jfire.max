@@ -32,6 +32,7 @@ extends BaseJDOObjectDAO<AnchorID, Account>
 		return sharedInstance;
 	}
 
+	@Override
 	@SuppressWarnings("unchecked")
 	@Implement
 	protected Collection<Account> retrieveJDOObjects(Set<AnchorID> objectIDs, String[] fetchGroups,

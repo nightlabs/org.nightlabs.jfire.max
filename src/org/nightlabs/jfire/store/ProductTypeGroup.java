@@ -103,6 +103,7 @@ implements Serializable, DetachCallback
 	/**
 	 * @deprecated
 	 */
+	@Deprecated
 	protected ProductTypeGroup()
 	{
 	}

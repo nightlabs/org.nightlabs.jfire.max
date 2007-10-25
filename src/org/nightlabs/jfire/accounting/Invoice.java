@@ -60,6 +60,7 @@ import org.nightlabs.jfire.trade.id.ArticleID;
 import org.nightlabs.jfire.transfer.Transfer;
 import org.nightlabs.jfire.transfer.id.AnchorID;
 import org.nightlabs.util.CollectionUtil;
+import org.nightlabs.util.Util;
 import org.nightlabs.util.Utils;
 
 /**
@@ -196,6 +197,7 @@ implements Serializable, ArticleContainer, Statable, DetachCallback
 	/**
 	 * @deprecated Only for JDO!
 	 */
+	@Deprecated
 	protected Invoice() {}
 
 	public Invoice(
@@ -721,8 +723,8 @@ implements Serializable, ArticleContainer, Statable, DetachCallback
 		Invoice o = (Invoice) obj;
 
 		return
-				Utils.equals(this.organisationID, o.organisationID) && 
-				Utils.equals(this.invoiceIDPrefix, o.invoiceIDPrefix) &&
+				Util.equals(this.organisationID, o.organisationID) && 
+				Util.equals(this.invoiceIDPrefix, o.invoiceIDPrefix) &&
 				this.invoiceID == o.invoiceID;
 	}
 
@@ -730,9 +732,9 @@ implements Serializable, ArticleContainer, Statable, DetachCallback
 	public int hashCode()
 	{
 		return
-				Utils.hashCode(this.organisationID) ^ 
-				Utils.hashCode(this.invoiceIDPrefix) ^
-				Utils.hashCode(this.invoiceID);
+				Util.hashCode(this.organisationID) ^ 
+				Util.hashCode(this.invoiceIDPrefix) ^
+				Util.hashCode(this.invoiceID);
 	}
 
 	/**
@@ -748,8 +750,8 @@ implements Serializable, ArticleContainer, Statable, DetachCallback
 		if (!currentState.getStateDefinition().isPublicState())
 			throw new IllegalArgumentException("state.stateDefinition.publicState is false!");
 
-		this.state = (State) currentState;
-		this.states.add((State) currentState);
+		this.state = currentState;
+		this.states.add(currentState);
 	}
 
 	public State getState()

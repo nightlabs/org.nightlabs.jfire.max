@@ -52,7 +52,6 @@ import org.nightlabs.jfire.security.User;
 import org.nightlabs.jfire.trade.LegalEntity;
 import org.nightlabs.jfire.transfer.Transfer;
 import org.nightlabs.jfire.transfer.id.AnchorID;
-import org.nightlabs.math.Base36Coder;
 
 /**
  * @author Marco Schulze - marco at nightlabs dot de
@@ -378,6 +377,7 @@ implements Serializable, StoreCallback
 	/**
 	 * @deprecated Only for JDO!
 	 */
+	@Deprecated
 	protected Payment() { }
 
 	/**

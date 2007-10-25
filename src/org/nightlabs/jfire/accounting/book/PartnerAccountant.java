@@ -68,6 +68,7 @@ public class PartnerAccountant extends Accountant
 	/**
 	 * @deprecated Constructor only existing for JDO!
 	 */
+	@Deprecated
 	protected PartnerAccountant() {
 	}
 
@@ -82,6 +83,7 @@ public class PartnerAccountant extends Accountant
 	/**
 	 * @see org.nightlabs.jfire.accounting.book.Accountant#bookTransfer(User, LegalEntity, MoneyTransfer, Map)
 	 */
+	@Override
 	public void bookTransfer(User user, LegalEntity mandator, MoneyTransfer transfer, Set<Anchor> involvedAnchors) {
 		if (transfer instanceof BookMoneyTransfer)
 			handleBookMoneyTransfer(mandator, (BookMoneyTransfer)transfer, user, involvedAnchors);
@@ -139,7 +141,7 @@ public class PartnerAccountant extends Accountant
 			createTransferFrom,
 			createTransferTo
 		);
-		moneyTransfer = (MoneyTransfer) getPersistenceManager().makePersistent(moneyTransfer);
+		moneyTransfer = getPersistenceManager().makePersistent(moneyTransfer);
 
 //		createTransferFrom.bookTransfer(user, moneyTransfer, involvedAnchors);
 //		createTransferTo.bookTransfer(user, moneyTransfer, involvedAnchors);
@@ -234,7 +236,7 @@ public class PartnerAccountant extends Accountant
 				to,
 				invoice,
 				amountToPay);
-		moneyTransfer = (InvoiceMoneyTransfer) pm.makePersistent(moneyTransfer);
+		moneyTransfer = pm.makePersistent(moneyTransfer);
 
 //		invoice.bookPayInvoiceMoneyTransfer(moneyTransfer, false);
 //		from.bookTransfer(user, moneyTransfer, involvedAnchors);
@@ -698,7 +700,7 @@ public class PartnerAccountant extends Accountant
 					from,
 					to,
 					amountToTransfer);
-			moneyTransfer = (MoneyTransfer) pm.makePersistent(moneyTransfer);
+			moneyTransfer = pm.makePersistent(moneyTransfer);
 			moneyTransfer.bookTransfer(user, involvedAnchors);
 		}
 	}

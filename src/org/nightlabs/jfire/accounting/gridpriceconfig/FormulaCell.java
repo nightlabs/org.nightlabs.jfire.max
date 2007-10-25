@@ -129,6 +129,7 @@ public class FormulaCell implements Serializable
 	/**
 	 * @deprecated Only for JDO!
 	 */
+	@Deprecated
 	protected FormulaCell() { }
 
 	/**
@@ -207,7 +208,7 @@ public class FormulaCell implements Serializable
 	 */
 	public String getFormula(String priceFragmentTypeOrganisationID, String priceFragmentTypeID)
 	{
-		return (String) priceFragmentFormulas.get(
+		return priceFragmentFormulas.get(
 				PriceFragmentType.getPrimaryKey(priceFragmentTypeOrganisationID, priceFragmentTypeID));
 	}
 	public void setFormula(PriceFragmentType priceFragmentType, String formula)

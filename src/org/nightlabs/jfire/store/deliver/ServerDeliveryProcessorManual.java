@@ -61,7 +61,7 @@ public class ServerDeliveryProcessorManual extends ServerDeliveryProcessor
 					ServerDeliveryProcessorID.create(Organisation.DEVIL_ORGANISATION_ID, ServerDeliveryProcessorManual.class.getName()));
 		} catch (JDOObjectNotFoundException e) {
 			serverDeliveryProcessorManual = new ServerDeliveryProcessorManual(Organisation.DEVIL_ORGANISATION_ID, ServerDeliveryProcessorManual.class.getName());
-			serverDeliveryProcessorManual = (ServerDeliveryProcessorManual) pm.makePersistent(serverDeliveryProcessorManual);
+			serverDeliveryProcessorManual = pm.makePersistent(serverDeliveryProcessorManual);
 		}
 
 		return serverDeliveryProcessorManual;
@@ -70,6 +70,7 @@ public class ServerDeliveryProcessorManual extends ServerDeliveryProcessor
 	/**
 	 * @deprecated Only for JDO!
 	 */
+	@Deprecated
 	protected ServerDeliveryProcessorManual()
 	{
 	}
@@ -87,6 +88,7 @@ public class ServerDeliveryProcessorManual extends ServerDeliveryProcessor
 	/**
 	 * @see org.nightlabs.jfire.store.deliver.ServerDeliveryProcessor#getAnchorOutside(org.nightlabs.jfire.store.deliver.ServerDeliveryProcessor.DeliverParams)
 	 */
+	@Override
 	public Anchor getAnchorOutside(DeliverParams deliverParams)
 	{
 		return getRepositoryOutside(deliverParams, "anchorOutside.manual");
@@ -95,6 +97,7 @@ public class ServerDeliveryProcessorManual extends ServerDeliveryProcessor
 	/**
 	 * @see org.nightlabs.jfire.store.deliver.ServerDeliveryProcessor#externalDeliverBegin(org.nightlabs.jfire.store.deliver.ServerDeliveryProcessor.DeliverParams)
 	 */
+	@Override
 	protected DeliveryResult externalDeliverBegin(DeliverParams deliverParams) throws DeliveryException
 	{
 		return null;
@@ -103,6 +106,7 @@ public class ServerDeliveryProcessorManual extends ServerDeliveryProcessor
 	/**
 	 * @see org.nightlabs.jfire.store.deliver.ServerDeliveryProcessor#externalDeliverDoWork(org.nightlabs.jfire.store.deliver.ServerDeliveryProcessor.DeliverParams)
 	 */
+	@Override
 	protected DeliveryResult externalDeliverDoWork(DeliverParams deliverParams)
 			throws DeliveryException
 	{
@@ -112,6 +116,7 @@ public class ServerDeliveryProcessorManual extends ServerDeliveryProcessor
 	/**
 	 * @see org.nightlabs.jfire.store.deliver.ServerDeliveryProcessor#externalDeliverCommit(org.nightlabs.jfire.store.deliver.ServerDeliveryProcessor.DeliverParams)
 	 */
+	@Override
 	protected DeliveryResult externalDeliverCommit(DeliverParams deliverParams) throws DeliveryException
 	{
 		return null;
@@ -120,6 +125,7 @@ public class ServerDeliveryProcessorManual extends ServerDeliveryProcessor
 	/**
 	 * @see org.nightlabs.jfire.store.deliver.ServerDeliveryProcessor#externalDeliverRollback(org.nightlabs.jfire.store.deliver.ServerDeliveryProcessor.DeliverParams)
 	 */
+	@Override
 	protected DeliveryResult externalDeliverRollback(DeliverParams deliverParams) throws DeliveryException
 	{
 		return null;

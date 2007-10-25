@@ -75,11 +75,13 @@ implements SessionBean
 	{
 	}
 
+	@Override
 	public void setSessionContext(SessionContext sessionContext)
 	throws EJBException, RemoteException
 	{
 		super.setSessionContext(sessionContext);
 	}
+	@Override
 	public void unsetSessionContext()
 	{
 		super.unsetSessionContext();

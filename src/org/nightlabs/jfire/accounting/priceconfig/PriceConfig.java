@@ -42,6 +42,7 @@ import org.nightlabs.jfire.accounting.PriceFragmentType;
 import org.nightlabs.jfire.idgenerator.IDGenerator;
 import org.nightlabs.jfire.trade.Article;
 import org.nightlabs.jfire.trade.ArticlePrice;
+import org.nightlabs.util.Util;
 import org.nightlabs.util.Utils;
 
 /**
@@ -108,6 +109,7 @@ public abstract class PriceConfig implements Serializable, StoreCallback, IPrice
 	/**
 	 * @deprecated Only for JDO!
 	 */
+	@Deprecated
 	protected PriceConfig() { }
 
 	public PriceConfig(String organisationID, long priceConfigID)
@@ -421,7 +423,7 @@ public abstract class PriceConfig implements Serializable, StoreCallback, IPrice
 	@Override
 	public int hashCode()
 	{
-		return Utils.hashCode(this.organisationID) + Utils.hashCode(this.priceConfigID);
+		return Util.hashCode(this.organisationID) + Util.hashCode(this.priceConfigID);
 	}
 
 	@Override
@@ -432,7 +434,7 @@ public abstract class PriceConfig implements Serializable, StoreCallback, IPrice
 
 		IPriceConfig other = (IPriceConfig) obj;
 
-		return Utils.equals(this.organisationID, other.getOrganisationID()) && Utils.equals(this.priceConfigID, other.getPriceConfigID());
+		return Util.equals(this.organisationID, other.getOrganisationID()) && Util.equals(this.priceConfigID, other.getPriceConfigID());
 	}
 
 //	/**

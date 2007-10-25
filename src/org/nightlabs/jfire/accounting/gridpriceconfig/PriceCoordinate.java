@@ -184,6 +184,7 @@ public class PriceCoordinate implements Serializable, StoreCallback, IPriceCoord
 	/**
 	 * @deprecated Only used for downward compatibility! Use {@link #PriceCoordinate(Object[])} instead!
 	 */
+	@Deprecated
 	public PriceCoordinate(String customerGroupPK, String tariffPK, String currencyID)
 	{
 		this.customerGroupPK = customerGroupPK;
@@ -347,6 +348,7 @@ public class PriceCoordinate implements Serializable, StoreCallback, IPriceCoord
 	 *
 	 * @see java.lang.Object#equals(java.lang.Object)
 	 */
+	@Override
 	public boolean equals(Object obj)
 	{
 		if (obj == this)
@@ -371,6 +373,7 @@ public class PriceCoordinate implements Serializable, StoreCallback, IPriceCoord
 	/**
 	 * @see java.lang.Object#toString()
 	 */
+	@Override
 	public String toString()
 	{
 		if (thisString == null) {
@@ -400,6 +403,7 @@ public class PriceCoordinate implements Serializable, StoreCallback, IPriceCoord
 	 *
 	 * @see java.lang.Object#hashCode()
 	 */
+	@Override
 	public int hashCode()
 	{
 		if (thisHashCode == 0)

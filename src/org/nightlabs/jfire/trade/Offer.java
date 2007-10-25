@@ -54,6 +54,7 @@ import org.nightlabs.jfire.security.User;
 import org.nightlabs.jfire.store.ProductType;
 import org.nightlabs.jfire.trade.jbpm.ActionHandlerFinalizeOffer;
 import org.nightlabs.jfire.transfer.id.AnchorID;
+import org.nightlabs.util.Util;
 import org.nightlabs.util.Utils;
 
 /**
@@ -336,6 +337,7 @@ implements
 	/**
 	 * @deprecated This constructor exists only for JDO!
 	 */
+	@Deprecated
 	protected Offer() { }
 
 	public Offer(User user, Order order, String offerIDPrefix, long offerID)
@@ -784,12 +786,12 @@ implements
 		Collection fetchGroups = pm.getFetchPlan().getGroups();
 
 		if (fetchGroups.contains(FETCH_GROUP_THIS_OFFER) || fetchGroups.contains(FETCH_GROUP_VENDOR)) {
-			detached.vendor = (LegalEntity) pm.detachCopy(attached.getVendor());
+			detached.vendor = pm.detachCopy(attached.getVendor());
 			detached.vendor_detached = true;
 		}
 
 		if (fetchGroups.contains(FETCH_GROUP_THIS_OFFER) || fetchGroups.contains(FETCH_GROUP_CUSTOMER)) {
-			detached.customer = (LegalEntity) pm.detachCopy(attached.getCustomer());
+			detached.customer = pm.detachCopy(attached.getCustomer());
 			detached.customer_detached = true;
 		}
 
@@ -826,15 +828,15 @@ implements
 
 		Offer o = (Offer)obj;
 		return
-				Utils.equals(this.organisationID, o.organisationID) &&
-				Utils.equals(this.offerIDPrefix, o.offerIDPrefix) &&
+				Util.equals(this.organisationID, o.organisationID) &&
+				Util.equals(this.offerIDPrefix, o.offerIDPrefix) &&
 				this.offerID == o.offerID;
 	}
 
 	@Override
 	public int hashCode()
 	{
-		return Utils.hashCode(organisationID) ^ Utils.hashCode(offerIDPrefix) ^ Utils.hashCode(offerID);
+		return Util.hashCode(organisationID) ^ Util.hashCode(offerIDPrefix) ^ Util.hashCode(offerID);
 	}
 
 	/**
@@ -850,8 +852,8 @@ implements
 		if (!currentState.getStateDefinition().isPublicState())
 			throw new IllegalArgumentException("state.stateDefinition.publicState is false!");
 
-		this.state = (State)currentState;
-		this.states.add((State)currentState);
+		this.state = currentState;
+		this.states.add(currentState);
 	}
 
 	public State getState()

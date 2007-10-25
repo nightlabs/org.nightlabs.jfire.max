@@ -99,7 +99,7 @@ public class DefaultLocalStorekeeperDelegate extends LocalStorekeeperDelegate
 			DefaultLocalStorekeeperDelegate delegate = new DefaultLocalStorekeeperDelegate(
 					organisationID,
 					DefaultLocalStorekeeperDelegate.class.getName());
-			delegate = (DefaultLocalStorekeeperDelegate) pm.makePersistent(delegate);
+			delegate = pm.makePersistent(delegate);
 			localStorekeeperDelegateID = (LocalStorekeeperDelegateID) JDOHelper.getObjectId(delegate);
 			return delegate;
 		}
@@ -108,6 +108,7 @@ public class DefaultLocalStorekeeperDelegate extends LocalStorekeeperDelegate
 	/**
 	 * @deprecated Only for JDO!
 	 */
+	@Deprecated
 	protected DefaultLocalStorekeeperDelegate() { }
 
 	public DefaultLocalStorekeeperDelegate(String organisationID,
@@ -124,6 +125,7 @@ public class DefaultLocalStorekeeperDelegate extends LocalStorekeeperDelegate
 	 * }
 	 */
 	private static ThreadLocal productsByProductTypeTL = new ThreadLocal() {
+		@Override
 		protected Object initialValue()
 		{
 			return new HashMap();
@@ -158,6 +160,7 @@ public class DefaultLocalStorekeeperDelegate extends LocalStorekeeperDelegate
 //		}
 //	};
 
+	@Override
 	public void preBookArticles(OrganisationLegalEntity mandator, User user, DeliveryNote deliveryNote, BookProductTransfer bookTransfer, Set<Anchor> involvedAnchors)
 	{
 		Map productsByProductTypeClass = (Map) productsByProductTypeTL.get();
@@ -201,6 +204,7 @@ public class DefaultLocalStorekeeperDelegate extends LocalStorekeeperDelegate
 	 *
 	 * @see org.nightlabs.jfire.store.book.LocalStorekeeperDelegate#bookArticle(org.nightlabs.jfire.trade.OrganisationLegalEntity, org.nightlabs.jfire.security.User, org.nightlabs.jfire.store.DeliveryNote, org.nightlabs.jfire.trade.Article, org.nightlabs.jfire.store.book.BookProductTransfer, java.util.Map)
 	 */
+	@Override
 	public void bookArticle(OrganisationLegalEntity mandator, User user,
 			DeliveryNote deliveryNote, Article article,
 			BookProductTransfer bookTransfer, Set<Anchor> involvedAnchors)
@@ -272,7 +276,7 @@ public class DefaultLocalStorekeeperDelegate extends LocalStorekeeperDelegate
 			else
 				throw new IllegalStateException("mandator is neither 'from' nor 'to' of bookTransfer!");
 
-			productTransfer = (ProductTransfer) getPersistenceManager().makePersistent(productTransfer);
+			productTransfer = getPersistenceManager().makePersistent(productTransfer);
 			productTransfer.bookTransfer(user, involvedAnchors);
 		}
 

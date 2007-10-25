@@ -50,6 +50,7 @@ import org.nightlabs.jfire.store.ProductType;
 import org.nightlabs.jfire.store.deliver.id.ModeOfDeliveryFlavourID;
 import org.nightlabs.jfire.store.id.ProductTypeID;
 import org.nightlabs.jfire.trade.id.CustomerGroupID;
+import org.nightlabs.util.Util;
 import org.nightlabs.util.Utils;
 
 /**
@@ -531,6 +532,7 @@ implements Serializable
 	/**
 	 * @deprecated Only for JDO!
 	 */
+	@Deprecated
 	protected ModeOfDeliveryFlavour()
 	{
 	}
@@ -630,7 +632,7 @@ implements Serializable
 			DataBuffer db = new DataBuffer(512);
 //			db.maxSizeForRAM = Integer.MAX_VALUE;
 			OutputStream out = db.createOutputStream();
-			Utils.transferStreamData(in, out);
+			Util.transferStreamData(in, out);
 			out.close();
 
 			this.icon16x16Data = db.createByteArray();

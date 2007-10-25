@@ -102,6 +102,7 @@ public class SegmentType implements Serializable
 	/**
 	 * @deprecated Only for JDO!
 	 */
+	@Deprecated
 	protected SegmentType() { }
 
 	public static SegmentType getDefaultSegmentType(PersistenceManager pm)

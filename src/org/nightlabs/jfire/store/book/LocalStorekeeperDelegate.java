@@ -27,7 +27,6 @@
 package org.nightlabs.jfire.store.book;
 
 import java.io.Serializable;
-import java.util.Map;
 import java.util.Set;
 
 import javax.jdo.JDOHelper;
@@ -71,6 +70,7 @@ implements Serializable
 	/**
 	 * @deprecated Only for JDO!
 	 */
+	@Deprecated
 	protected LocalStorekeeperDelegate() { }
 
 	public LocalStorekeeperDelegate(String organisationID, String localStorekeeperDelegateID)

@@ -69,6 +69,7 @@ public class AccountingPriceConfig extends PriceConfig
 	/**
 	 * @see org.nightlabs.jfire.accounting.priceconfig.PriceConfig#isDependentOnOffer()
 	 */
+	@Override
 	public boolean isDependentOnOffer()
 	{
 		return false;
@@ -77,6 +78,7 @@ public class AccountingPriceConfig extends PriceConfig
 	/**
 	 * @see org.nightlabs.jfire.accounting.priceconfig.PriceConfig#requiresProductTypePackageInternal()
 	 */
+	@Override
 	public boolean requiresProductTypePackageInternal()
 	{
 		return false;
@@ -85,6 +87,7 @@ public class AccountingPriceConfig extends PriceConfig
 	/**
 	 * @see org.nightlabs.jfire.accounting.priceconfig.PriceConfig#createArticlePrice(Article)
 	 */
+	@Override
 	public ArticlePrice createArticlePrice(Article article)
 	{
 		throw new UnsupportedOperationException("This pseudo PriceConfig is not intended to be used in this context!");

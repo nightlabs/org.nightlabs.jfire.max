@@ -40,6 +40,7 @@ public class InvoiceActionHandler
 	/**
 	 * @deprecated Only for JDO!
 	 */
+	@Deprecated
 	protected InvoiceActionHandler() { }
 
 	public InvoiceActionHandler(String organisationID, String invoiceActionHandlerID)

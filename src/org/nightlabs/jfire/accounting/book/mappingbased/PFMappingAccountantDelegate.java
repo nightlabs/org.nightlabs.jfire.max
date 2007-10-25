@@ -104,6 +104,7 @@ public class PFMappingAccountantDelegate
 	/**
 	 * @deprecated Only for JDO
 	 */
+	@Deprecated
 	public PFMappingAccountantDelegate()
 	{
 		super();
@@ -183,6 +184,7 @@ public class PFMappingAccountantDelegate
 		/**
 		 * @see java.lang.Object#equals(java.lang.Object)
 		 */
+		@Override
 		public boolean equals(Object obj)
 		{
 			return obj.toString().equals(toString());
@@ -191,6 +193,7 @@ public class PFMappingAccountantDelegate
 		/**
 		 * @see java.lang.Object#hashCode()
 		 */
+		@Override
 		public int hashCode()
 		{
 			return toString().hashCode();
@@ -199,6 +202,7 @@ public class PFMappingAccountantDelegate
 		/**
 		 * @see java.lang.Object#toString()
 		 */
+		@Override
 		public String toString()
 		{
 			return packageType + "/" + productTypeID.toString();
@@ -570,7 +574,7 @@ public class PFMappingAccountantDelegate
 			// go through the productType hierarchy
 			// and add all matching mappings to
 			while (!productTypeHierarchy.isEmpty()) {
-				ProductType pType = (ProductType) productTypeHierarchy.removeLast();
+				ProductType pType = productTypeHierarchy.removeLast();
 				for (MoneyFlowMapping mapping : delegate.getMoneyFlowMappings()) {
 					if (mapping.matches(pType, packageType)) {
 						if (entry == null) {
@@ -605,6 +609,7 @@ public class PFMappingAccountantDelegate
 	 *      org.nightlabs.jfire.security.User,
 	 *      org.nightlabs.jfire.accounting.Invoice, BookMoneyTransfer, Map)
 	 */
+	@Override
 	public void preBookArticles(OrganisationLegalEntity mandator, User user,
 			Invoice invoice, BookMoneyTransfer bookTransfer,
 			Set<Anchor> involvedAnchors)
@@ -619,6 +624,7 @@ public class PFMappingAccountantDelegate
 	 *      org.nightlabs.jfire.security.User,
 	 *      org.nightlabs.jfire.accounting.Invoice, BookMoneyTransfer, Map)
 	 */
+	@Override
 	public void postBookArticles(OrganisationLegalEntity mandator, User user,
 			Invoice invoice, BookMoneyTransfer bookTransfer,
 			Set<Anchor> involvedAnchors)
@@ -634,6 +640,7 @@ public class PFMappingAccountantDelegate
 	 *      org.nightlabs.jfire.trade.ArticlePrice,
 	 *      org.nightlabs.jfire.accounting.book.BookMoneyTransfer, Map)
 	 */
+	@Override
 	public void bookArticle(OrganisationLegalEntity mandator, User user,
 			Invoice invoice, Article article, BookMoneyTransfer container,
 			Set<Anchor> involvedAnchors)
@@ -751,7 +758,7 @@ public class PFMappingAccountantDelegate
 			int delegationLevel, BookMoneyTransfer container,
 			Set<Anchor> involvedAnchors)
 	{
-		ArticlePrice articlePrice = (ArticlePrice) articlePriceStack.peek();
+		ArticlePrice articlePrice = articlePriceStack.peek();
 		ProductType productType = articlePrice.getProductType();
 		// boolean topLevel = articlePrice.getPackageArticlePrice() == null;
 		String packageType = getPackageType(articlePrice);
@@ -979,10 +986,10 @@ public class PFMappingAccountantDelegate
 			Map<String, String> dimensionValues, String currencyID)
 	{
 		ResolvedMapKey key = new ResolvedMapKey(productTypeID, packageType);
-		ResolvedMapEntry entry = (ResolvedMapEntry) resolvedMappings.get(key);
+		ResolvedMapEntry entry = resolvedMappings.get(key);
 		if (entry == null)
 			return null;
-		MoneyFlowMapping mapping = (MoneyFlowMapping) entry.getResolvedMappings()
+		MoneyFlowMapping mapping = entry.getResolvedMappings()
 				.get(
 						getMoneyFlowMappingKey(productTypeID, packageType, dimensionValues,
 								currencyID));
@@ -1185,8 +1192,8 @@ public class PFMappingAccountantDelegate
 			List<String> dimensionIDs, int idx, Article bookArticle,
 			ProductType productType)
 	{
-		String moneyFlowDimensionID = (String) dimensionIDs.get(idx);
-		String[] dimValues = (String[]) CollectionUtil.collection2TypedArray(
+		String moneyFlowDimensionID = dimensionIDs.get(idx);
+		String[] dimValues = CollectionUtil.collection2TypedArray(
 				getDimensionValues(moneyFlowDimensionID, bookArticle, productType),
 				String.class);
 		for (int i = 0; i < dimValues.length; i++) {
@@ -1289,7 +1296,7 @@ public class PFMappingAccountantDelegate
 					InvoiceMoneyTransfer moneyTransfer = new InvoiceMoneyTransfer(
 							InvoiceMoneyTransfer.BOOK_TYPE_BOOK, container, aFrom, aTo,
 							container.getInvoice(), Math.abs(balance));
-					moneyTransfer = (InvoiceMoneyTransfer) pm
+					moneyTransfer = pm
 							.makePersistent(moneyTransfer);
 					moneyTransfer.bookTransfer(user, involvedAnchors);
 				}
@@ -1319,7 +1326,7 @@ public class PFMappingAccountantDelegate
 						productTypeID.productTypeID), packageType, currencyID);
 		for (String dimensionID : getMoneyFlowDimensionIDs()) {
 			mappingKey = mappingKey + "/"
-					+ ((String) dimensionValues.get(dimensionID));
+					+ (dimensionValues.get(dimensionID));
 		}
 		return mappingKey;
 	}
@@ -1421,7 +1428,7 @@ public class PFMappingAccountantDelegate
 			BookMoneyTransfer bookMoneyTransfer)
 	{
 		// Get the PriceFragmentTypes that are defined for the given container
-		ArticlePrice price = (ArticlePrice) articlePriceStack.getFirst();
+		ArticlePrice price = articlePriceStack.getFirst();
 		Set<PriceFragmentType> containedFragmentTypes = new HashSet<PriceFragmentType>();
 		for (Iterator iter = price.getFragments().iterator(); iter.hasNext();) {
 			PriceFragment fragment = (PriceFragment) iter.next();
@@ -1688,7 +1695,7 @@ public class PFMappingAccountantDelegate
 				Anchor to;
 
 				long amount = resolvedMapping.getArticlePriceDimensionAmount(
-						dimensionValues, (ArticlePrice) articlePriceStack.getFirst());
+						dimensionValues, articlePriceStack.getFirst());
 
 				
 				Invoice invoice = bookMoneyTransfer.getInvoice();

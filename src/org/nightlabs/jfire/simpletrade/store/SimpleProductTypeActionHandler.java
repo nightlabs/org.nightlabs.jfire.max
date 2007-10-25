@@ -13,6 +13,7 @@ import javax.jdo.Query;
 
 import org.nightlabs.annotation.Implement;
 import org.nightlabs.jdo.NLJDOHelper;
+import org.nightlabs.jfire.accounting.Price;
 import org.nightlabs.jfire.accounting.TariffMapping;
 import org.nightlabs.jfire.accounting.id.TariffID;
 import org.nightlabs.jfire.security.User;
@@ -48,6 +49,7 @@ public class SimpleProductTypeActionHandler
 	/**
 	 * @deprecated Only for JDO!
 	 */
+	@Deprecated
 	protected SimpleProductTypeActionHandler() { }
 
 	/**
@@ -59,6 +61,7 @@ public class SimpleProductTypeActionHandler
 		super(organisationID, productTypeActionHandlerID, productTypeClass);
 	}
 
+	@Override
 	@Implement
 	public Collection<? extends Product> findProducts(User user,
 			ProductType productType, NestedProductType nestedProductType, ProductLocator productLocator)
@@ -86,7 +89,7 @@ public class SimpleProductTypeActionHandler
 				if (productType.getOrganisationID().equals(store.getOrganisationID())) {
 					long createdProductCount = sptl.getCreatedProductCount();
 					if (sptl.getMaxProductCount() < 0 || createdProductCount + 1 <= sptl.getMaxProductCount()) {
-						product = new SimpleProduct(spt, SimpleProduct.createProductID());
+						product = new SimpleProduct(spt, Product.createProductID());
 						sptl.setCreatedProductCount(createdProductCount + 1);
 
 						product = (SimpleProduct) store.addProduct(user, product);
@@ -101,6 +104,7 @@ public class SimpleProductTypeActionHandler
 	}
 
 
+	@Override
 	@SuppressWarnings("unchecked")
 	@Implement
 	public Collection<? extends Article> createCrossTradeArticles(
@@ -126,9 +130,9 @@ public class SimpleProductTypeActionHandler
 				qty, tariffMapping.getPartnerTariffID(), true, true,
 				new String[] {
 					FetchPlan.DEFAULT, Article.FETCH_GROUP_OFFER, Article.FETCH_GROUP_ORDER, Article.FETCH_GROUP_PRICE,
-					Article.FETCH_GROUP_PRODUCT, Article.FETCH_GROUP_PRODUCT_TYPE, Article.FETCH_GROUP_SEGMENT, ArticlePrice.FETCH_GROUP_CURRENCY,
+					Article.FETCH_GROUP_PRODUCT, Article.FETCH_GROUP_PRODUCT_TYPE, Article.FETCH_GROUP_SEGMENT, Price.FETCH_GROUP_CURRENCY,
 					Product.FETCH_GROUP_PRODUCT_TYPE,
-					ArticlePrice.FETCH_GROUP_FRAGMENTS, ArticlePrice.FETCH_GROUP_PACKAGE_ARTICLE_PRICE
+					Price.FETCH_GROUP_FRAGMENTS, ArticlePrice.FETCH_GROUP_PACKAGE_ARTICLE_PRICE
 				}, NLJDOHelper.MAX_FETCH_DEPTH_NO_LIMIT);
 	}
 

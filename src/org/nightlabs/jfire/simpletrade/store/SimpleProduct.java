@@ -49,6 +49,7 @@ public class SimpleProduct extends Product
 	/**
 	 * @deprecated Only for JDO!
 	 */
+	@Deprecated
 	protected SimpleProduct() { }
 
 	/**
@@ -65,6 +66,7 @@ public class SimpleProduct extends Product
 	 *
 	 * @see org.nightlabs.jfire.store.Product#getProductLocator(User, NestedProductType)
 	 */
+	@Override
 	public ProductLocator getProductLocator(User user, NestedProductType nestedProductType)
 	{
 		return null;

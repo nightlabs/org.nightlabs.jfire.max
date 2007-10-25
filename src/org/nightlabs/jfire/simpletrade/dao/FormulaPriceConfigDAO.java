@@ -29,6 +29,7 @@ extends BaseJDOObjectDAO<PriceConfigID, FormulaPriceConfig>
 		return sharedInstance;
 	}
 
+	@Override
 	@SuppressWarnings("unchecked")
 	@Implement
 	protected Collection<FormulaPriceConfig> retrieveJDOObjects(

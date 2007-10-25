@@ -43,6 +43,7 @@ extends ProductTypeLocal
 	/**
 	 * @deprecated Only for JDO!
 	 */
+	@Deprecated
 	protected SimpleProductTypeLocal() { }
 
 	public SimpleProductTypeLocal(User user, ProductType productType, Repository home)

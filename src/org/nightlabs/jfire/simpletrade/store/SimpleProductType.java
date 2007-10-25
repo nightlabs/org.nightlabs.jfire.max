@@ -119,6 +119,7 @@ public class SimpleProductType extends ProductType
 	/**
 	 * @deprecated Constructor only for JDO!
 	 */
+	@Deprecated
 	protected SimpleProductType() { }
 
 	/**
@@ -141,6 +142,7 @@ public class SimpleProductType extends ProductType
 		return new SimpleProductTypeLocal(user, this, defaultHomeRepository);
 	}
 
+	@Override
 	@Implement
 	protected void calculatePrices()
 	{

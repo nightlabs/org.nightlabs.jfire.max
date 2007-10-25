@@ -49,6 +49,7 @@ extends NotificationReceiver
 	/**
 	 * @deprecated Only for JDO!
 	 */
+	@Deprecated
 	protected SimpleProductTypeNotificationReceiver() { }
 
 	public SimpleProductTypeNotificationReceiver(String organisationID, String subscriberType, String subscriberID, String subscriptionID)
@@ -61,6 +62,7 @@ extends NotificationReceiver
 		super(notificationFilter);
 	}
 
+	@Override
 	@SuppressWarnings("unchecked")
 	@Implement
 	public void onReceiveNotificationBundle(NotificationBundle notificationBundle)
@@ -110,7 +112,7 @@ extends NotificationReceiver
 
 					try {
 						if (NLJDOHelper.exists(pm, simpleProductType))
-							simpleProductType = (SimpleProductType) pm.makePersistent(simpleProductType);
+							simpleProductType = pm.makePersistent(simpleProductType);
 						else {
 							ProductTypeActionHandler productTypeActionHandler = ProductTypeActionHandler.getProductTypeActionHandler(pm, simpleProductType.getClass());
 

@@ -29,6 +29,7 @@ public class SimpleProductTypeNotificationFilter
 	/**
 	 * @deprecated Only for JDO!
 	 */
+	@Deprecated
 	protected SimpleProductTypeNotificationFilter() { }
 
 	public SimpleProductTypeNotificationFilter(String organisationID,
@@ -41,6 +42,7 @@ public class SimpleProductTypeNotificationFilter
 		getLifecycleStates().add(JDOLifecycleState.DELETED);
 	}
 
+	@Override
 	@Implement
 	public Collection<DirtyObjectID> filter(List<DirtyObjectID> dirtyObjectIDs)
 	{

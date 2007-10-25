@@ -107,6 +107,7 @@ import org.nightlabs.jfire.trade.Article;
 import org.nightlabs.jfire.trade.ArticleCreator;
 import org.nightlabs.jfire.trade.CustomerGroup;
 import org.nightlabs.jfire.trade.CustomerGroupMapper;
+import org.nightlabs.jfire.trade.LegalEntity;
 import org.nightlabs.jfire.trade.Offer;
 import org.nightlabs.jfire.trade.Order;
 import org.nightlabs.jfire.trade.OrganisationLegalEntity;
@@ -138,6 +139,7 @@ implements SessionBean
 	/**
 	 * @see org.nightlabs.jfire.base.BaseSessionBeanImpl#setSessionContext(javax.ejb.SessionContext)
 	 */
+	@Override
 	public void setSessionContext(SessionContext sessionContext)
 	throws EJBException, RemoteException
 	{
@@ -146,6 +148,7 @@ implements SessionBean
 	/**
 	 * @see org.nightlabs.jfire.base.BaseSessionBeanImpl#unsetSessionContext()
 	 */
+	@Override
 	public void unsetSessionContext() {
 		super.unsetSessionContext();
 	}
@@ -198,7 +201,7 @@ implements SessionBean
 
 			SimpleProductTypeActionHandler simpleProductTypeActionHandler = new SimpleProductTypeActionHandler(
 					Organisation.DEVIL_ORGANISATION_ID, SimpleProductTypeActionHandler.class.getName(), SimpleProductType.class);
-			simpleProductTypeActionHandler = (SimpleProductTypeActionHandler) pm.makePersistent(simpleProductTypeActionHandler);
+			simpleProductTypeActionHandler = pm.makePersistent(simpleProductTypeActionHandler);
 
 			Store store = Store.getStore(pm);
 //			Accounting accounting = Accounting.getAccounting(pm);
@@ -579,7 +582,7 @@ implements SessionBean
 					priceCalculationNeeded = !ProductType.compareNestedProductTypes(original.getNestedProductTypes(), newNestedProductTypes);
 				}
 
-				productType = (SimpleProductType) pm.makePersistent(productType);
+				productType = pm.makePersistent(productType);
 			}
 			else {
 				productType = (SimpleProductType) Store.getStore(pm).addProductType(
@@ -689,7 +692,7 @@ implements SessionBean
 			if (!get)
 				return null;
 
-			return (SimpleProductType) pm.detachCopy(productType);
+			return pm.detachCopy(productType);
 		} finally {
 			pm.close();
 		}
@@ -1012,8 +1015,8 @@ implements SessionBean
 					FetchGroupsPriceConfig.FETCH_GROUP_EDIT,
 					DeliveryConfiguration.FETCH_GROUP_THIS_DELIVERY_CONFIGURATION,
 					OrganisationLegalEntity.FETCH_GROUP_ORGANISATION,
-					OrganisationLegalEntity.FETCH_GROUP_PERSON,
-					Person.FETCH_GROUP_FULL_DATA // TODO we should somehow filter this so only public data is exported
+					LegalEntity.FETCH_GROUP_PERSON,
+					PropertySet.FETCH_GROUP_FULL_DATA // TODO we should somehow filter this so only public data is exported
 					});
 			pm.getFetchPlan().setMaxFetchDepth(NLJDOHelper.MAX_FETCH_DEPTH_NO_LIMIT);
 			pm.getFetchPlan().setDetachmentOptions(FetchPlan.DETACH_LOAD_FIELDS);
@@ -1034,7 +1037,7 @@ implements SessionBean
 				simpleProductType.getDeliveryConfiguration();
 
 				// and detach
-				simpleProductType = (SimpleProductType) pm.detachCopy(simpleProductType);
+				simpleProductType = pm.detachCopy(simpleProductType);
 
 				// TODO load CustomerGroups of the other customer-organisation
 				// and remove all prices from the package price config that are for
@@ -1081,7 +1084,7 @@ implements SessionBean
 						emitterOrganisationID, SubscriptionUtil.SUBSCRIBER_TYPE_ORGANISATION, getOrganisationID(),
 						SimpleProductTypeNotificationFilter.class.getName());
 				SimpleProductTypeNotificationReceiver notificationReceiver = new SimpleProductTypeNotificationReceiver(notificationFilter);
-				notificationReceiver = (SimpleProductTypeNotificationReceiver) pm.makePersistent(notificationReceiver);
+				notificationReceiver = pm.makePersistent(notificationReceiver);
 				persistentNotificationEJB.storeNotificationFilter(notificationFilter, false, null, 1);
 
 //				ArrayList<ProductTypeID> productTypeIDs = new ArrayList<ProductTypeID>(1);
@@ -1170,12 +1173,12 @@ implements SessionBean
 					pm.getFetchPlan().setGroups(tariffFetchGroups);
 
 				Tariff tariff = (Tariff) pm.getObjectById(tariffID); // TariffID.create(tariffOrganisationID, tariffID));
-				tariff = (Tariff) pm.detachCopy(tariff);
+				tariff = pm.detachCopy(tariff);
 
 				if (priceFetchGroups != null)
 					pm.getFetchPlan().setGroups(priceFetchGroups);
 
-				Price price = (Price) pm.detachCopy(priceCell.getPrice());
+				Price price = pm.detachCopy(priceCell.getPrice());
 
 				res.add(new TariffPricePair(tariff, price));
 			}
@@ -1268,7 +1271,7 @@ implements SessionBean
 			Collection<ProductType> productTypes = searchFilter.executeQuery(pm);
 			Collection<ProductTypeID> ids = new ArrayList<ProductTypeID>(productTypes.size());
 			for (ProductType	productType : productTypes)
-				ids.add((ProductTypeID)productType.getObjectId());
+				ids.add(productType.getObjectId());
 			return ids;
 		} finally {
 			pm.close();

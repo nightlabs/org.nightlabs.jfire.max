@@ -6,13 +6,10 @@ import java.util.Properties;
 import java.util.Set;
 
 import javax.jdo.JDODetachedFieldAccessException;
-import javax.jdo.JDOHelper;
-
 import org.nightlabs.annotation.Implement;
 import org.nightlabs.jdo.NLJDOHelper;
 import org.nightlabs.jfire.base.jdo.BaseJDOObjectDAO;
 import org.nightlabs.jfire.base.jdo.IJDOObjectDAO;
-import org.nightlabs.jfire.prop.IStruct;
 import org.nightlabs.jfire.prop.PropertySet;
 import org.nightlabs.jfire.security.SecurityReflector;
 import org.nightlabs.jfire.simpletrade.SimpleTradeManager;
@@ -20,6 +17,7 @@ import org.nightlabs.jfire.simpletrade.SimpleTradeManagerUtil;
 import org.nightlabs.jfire.simpletrade.store.SimpleProductType;
 import org.nightlabs.jfire.store.id.ProductTypeID;
 import org.nightlabs.progress.ProgressMonitor;
+import org.nightlabs.util.Util;
 import org.nightlabs.util.Utils;
 
 public class SimpleProductTypeDAO
@@ -39,6 +37,7 @@ implements IJDOObjectDAO<SimpleProductType>
 		return sharedInstance;
 	}
 
+	@Override
 	@SuppressWarnings("unchecked")
 	@Implement
 	protected Collection<SimpleProductType> retrieveJDOObjects(
@@ -118,7 +117,7 @@ implements IJDOObjectDAO<SimpleProductType>
 			throw new NullPointerException("SimpleProductType to save must not be null");
 		if (!(jdoObject instanceof SimpleProductType))
 			throw new IllegalArgumentException("ProductType to save must be of type " + SimpleProductType.class.getSimpleName() + ", passed was " + jdoObject.getClass().getSimpleName());
-		SimpleProductType productType = (SimpleProductType) Utils.cloneSerializable(jdoObject);
+		SimpleProductType productType = Util.cloneSerializable(jdoObject);
 		SimpleProductType result = null;		
 		monitor.beginTask("Saving SimpleProductType PropertySet", 3);
 		Properties initialContextProperties = SecurityReflector.getInitialContextProperties();		

@@ -37,7 +37,6 @@ import org.nightlabs.editor2d.DrawComponentContainer;
 import org.nightlabs.editor2d.impl.DrawComponentImpl;
 import org.nightlabs.editor2d.render.BaseRenderer;
 import org.nightlabs.editor2d.render.Renderer;
-import org.nightlabs.editor2d.render.j2d.J2DRenderContext;
 import org.nightlabs.i18n.unit.IUnit;
 import org.nightlabs.i18n.unit.MMUnit;
 import org.nightlabs.i18n.unit.resolution.DPIResolutionUnit;
@@ -292,7 +291,7 @@ implements BarcodeDrawComponent
 		}
 		
 		int resolution = getModelResolution();
-		double factor = ((double)resolution) / 300d;		
+		double factor = (resolution) / 300d;		
 		double scaledWidth = width * factor;
 		if (logger.isDebugEnabled()) {
 			logger.debug("width = " + width);

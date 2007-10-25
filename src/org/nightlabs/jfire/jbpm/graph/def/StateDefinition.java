@@ -11,6 +11,7 @@ import org.nightlabs.jfire.idgenerator.IDGenerator;
 import org.nightlabs.jfire.jbpm.graph.def.id.ProcessDefinitionID;
 import org.nightlabs.jfire.security.User;
 import org.nightlabs.jfire.trade.state.id.StateDefinitionID;
+import org.nightlabs.util.Util;
 import org.nightlabs.util.Utils;
 
 /**
@@ -140,6 +141,7 @@ implements Serializable
 	/**
 	 * @deprecated Only for JDO!
 	 */
+	@Deprecated
 	protected StateDefinition()
 	{
 	}
@@ -278,7 +280,7 @@ implements Serializable
 
 		PersistenceManager pm = JDOHelper.getPersistenceManager(this);
 		if (pm != null)
-			state = (State) pm.makePersistent(state);
+			state = pm.makePersistent(state);
 
 		statable.getStatableLocal().setState(state);
 		if (this.isPublicState())
@@ -299,19 +301,19 @@ implements Serializable
 		StateDefinition stateDefinition = (StateDefinition) obj;
 
 		return
-			Utils.equals(stateDefinition.processDefinitionID, this.processDefinitionID) && 
-			Utils.equals(stateDefinition.processDefinitionOrganisationID, this.processDefinitionOrganisationID) &&
-			Utils.equals(stateDefinition.stateDefinitionOrganisationID, this.stateDefinitionOrganisationID) &&
-			Utils.equals(stateDefinition.stateDefinitionID, this.stateDefinitionID);
+			Util.equals(stateDefinition.processDefinitionID, this.processDefinitionID) && 
+			Util.equals(stateDefinition.processDefinitionOrganisationID, this.processDefinitionOrganisationID) &&
+			Util.equals(stateDefinition.stateDefinitionOrganisationID, this.stateDefinitionOrganisationID) &&
+			Util.equals(stateDefinition.stateDefinitionID, this.stateDefinitionID);
 	}
 		
 	@Override
 	public int hashCode()
 	{
 		return
-				Utils.hashCode(this.processDefinitionID) ^ 
-				Utils.hashCode(this.processDefinitionOrganisationID) ^
-				Utils.hashCode(this.stateDefinitionOrganisationID) ^
-				Utils.hashCode(this.stateDefinitionID);
+				Util.hashCode(this.processDefinitionID) ^ 
+				Util.hashCode(this.processDefinitionOrganisationID) ^
+				Util.hashCode(this.stateDefinitionOrganisationID) ^
+				Util.hashCode(this.stateDefinitionID);
 	}
 }

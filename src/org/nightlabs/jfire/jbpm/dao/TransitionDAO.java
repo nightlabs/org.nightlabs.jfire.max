@@ -29,6 +29,7 @@ public class TransitionDAO
 
 	protected TransitionDAO() { }
 
+	@Override
 	@Implement
 	protected Collection<Transition> retrieveJDOObjects(
 			Set<TransitionID> transitionIDs, String[] fetchGroups, int maxFetchDepth,

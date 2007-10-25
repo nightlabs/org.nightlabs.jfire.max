@@ -103,6 +103,7 @@ public class LogEntry implements Serializable {
 	/**
 	 * @deprecated This constructor is here because JDO requires it. Its not intended for any other purpose!
 	 */
+	@Deprecated
 	protected LogEntry() { }
 	
 	/**

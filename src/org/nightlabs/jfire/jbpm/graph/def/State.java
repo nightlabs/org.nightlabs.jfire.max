@@ -123,6 +123,7 @@ implements Serializable
 	/**
 	 * @deprecated Only for JDO!
 	 */
+	@Deprecated
 	protected State() { }
 
 	/**

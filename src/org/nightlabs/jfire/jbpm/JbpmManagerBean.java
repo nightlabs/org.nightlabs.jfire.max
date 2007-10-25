@@ -63,6 +63,7 @@ implements SessionBean
 {
 	private static final Logger logger = Logger.getLogger(JbpmManagerBean.class);
 
+	@Override
 	public void setSessionContext(SessionContext sessionContext)
 			throws EJBException, RemoteException
 	{

@@ -124,7 +124,7 @@ implements Serializable
 				processDefinition = (ProcessDefinition) pm.getObjectById(processDefinitionID);
 				processDefinition.createProcessDefinitionVersion(jbpmProcessDefinition, jbpmProcessDefinitionURL);
 			} catch (JDOObjectNotFoundException x) {
-				processDefinition = (ProcessDefinition) pm.makePersistent(
+				processDefinition = pm.makePersistent(
 						new ProcessDefinition(processDefinitionID, jbpmProcessDefinition, jbpmProcessDefinitionURL));
 			}
 
@@ -135,7 +135,7 @@ implements Serializable
 //						node instanceof EndState ||
 //						node instanceof org.jbpm.graph.node.State)
 //				{
-					StateDefinition stateDefinition = (StateDefinition) pm.makePersistent(
+					StateDefinition stateDefinition = pm.makePersistent(
 							new StateDefinition(processDefinition, node.getName()));
 
 					// create Transitions
@@ -187,6 +187,7 @@ implements Serializable
 	/**
 	 * @deprecated Only for JDO!
 	 */
+	@Deprecated
 	protected ProcessDefinition()
 	{
 	}

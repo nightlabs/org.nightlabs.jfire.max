@@ -7,6 +7,7 @@ import java.net.URL;
 
 import org.jbpm.JbpmContext;
 import org.nightlabs.io.DataBuffer;
+import org.nightlabs.util.Util;
 import org.nightlabs.util.Utils;
 
 /**
@@ -77,6 +78,7 @@ public class ProcessDefinitionVersion
 	/**
 	 * @deprecated Only for JDO!
 	 */
+	@Deprecated
 	protected ProcessDefinitionVersion()
 	{
 	}
@@ -101,14 +103,14 @@ public class ProcessDefinitionVersion
 
 		in = new URL(jbpmProcessDefinitionURL, "processdefinition.xml").openStream();
 		try {
-			this.processDefinitionXml = Utils.readTextFile(in);
+			this.processDefinitionXml = Util.readTextFile(in);
 		} finally {
 			in.close();
 		}
 
 		in = new URL(jbpmProcessDefinitionURL, "gpd.xml").openStream();
 		try {
-			this.gpdXml = Utils.readTextFile(in);
+			this.gpdXml = Util.readTextFile(in);
 		} finally {
 			in.close();
 		}

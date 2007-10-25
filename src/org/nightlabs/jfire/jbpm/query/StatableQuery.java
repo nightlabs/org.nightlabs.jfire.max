@@ -1,8 +1,6 @@
 package org.nightlabs.jfire.jbpm.query;
 
 import java.util.Date;
-import java.util.Set;
-
 import javax.jdo.Query;
 
 import org.apache.log4j.Logger;

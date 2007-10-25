@@ -61,6 +61,7 @@ public class WebCustomer
 	/**
 	 * @deprecated only for JDO
 	 */
+	@Deprecated
 	protected WebCustomer() {}
 
 	/**

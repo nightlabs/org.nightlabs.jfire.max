@@ -33,6 +33,7 @@ import org.nightlabs.jfire.person.Person;
 import org.nightlabs.jfire.person.PersonStruct;
 import org.nightlabs.jfire.prop.DataBlock;
 import org.nightlabs.jfire.prop.DataBlockGroup;
+import org.nightlabs.jfire.prop.PropertySet;
 import org.nightlabs.jfire.prop.datafield.RegexDataField;
 import org.nightlabs.jfire.prop.exception.DataBlockGroupNotFoundException;
 import org.nightlabs.jfire.security.UserLocal;
@@ -67,11 +68,13 @@ implements SessionBean
 	 */
 	private static final Logger logger = Logger.getLogger(WebShopBean.class);
 
+	@Override
 	public void setSessionContext(SessionContext sessionContext)
 	throws EJBException, RemoteException
 	{
 		super.setSessionContext(sessionContext);
 	}
+	@Override
 	public void unsetSessionContext() {
 		super.unsetSessionContext();
 	}
@@ -136,7 +139,7 @@ implements SessionBean
 			if (fetchGroups != null)
 				pm.getFetchPlan().setGroups(fetchGroups);
 			WebCustomer webCustomer = (WebCustomer)pm.getObjectById(webCustomerID);
-			return (WebCustomer) pm.detachCopy(webCustomer);
+			return pm.detachCopy(webCustomer);
 		} finally {
 			pm.close();
 		}	
@@ -155,7 +158,7 @@ implements SessionBean
 				pm.getFetchPlan().setGroups(fetchGroups);
 			WebCustomer webCustomer = (WebCustomer)pm.getObjectById(webCustomerID);
 //			AnchorID anchorID = (AnchorID) (webCustomer.getLegalEntity() != null ? JDOHelper.getObjectId(webCustomer.getLegalEntity()) : null);
-			return (WebCustomer) pm.detachCopy(webCustomer);
+			return pm.detachCopy(webCustomer);
 		} finally {
 			pm.close();
 		}	
@@ -208,7 +211,7 @@ implements SessionBean
 			}
 			WebCustomer webCustomer = new WebCustomer(getOrganisationID(), webCustomerID.webCustomerID);
 			webCustomer.setPassword(UserLocal.encryptPassword(password));
-			person = (Person) pm.makePersistent(person);
+			person = pm.makePersistent(person);
 			LegalEntity legalEntity = Trader.getTrader(pm).setPersonToLegalEntity(person, true);
 			// try {
 			// TradeManagerLocal tm = TradeManagerUtil.getLocalHome().create(); //
@@ -220,10 +223,10 @@ implements SessionBean
 			// throw new RuntimeException(x);
 			// }
 			webCustomer.setLegalEntity(legalEntity);
-			webCustomer = (WebCustomer) pm.makePersistent(webCustomer);
+			webCustomer = pm.makePersistent(webCustomer);
 			if(!get)
 				return null;
-			return (WebCustomer) pm.detachCopy(webCustomer);
+			return pm.detachCopy(webCustomer);
 		} finally {
 			pm.close();
 		}
@@ -498,7 +501,7 @@ implements SessionBean
 	{
 		PersistenceManager pm = getPersistenceManager();
 		try {
-			return (WebCustomer) NLJDOHelper.storeJDO(pm, webCustomer, get, fetchGroups, maxFetchDepth);
+			return NLJDOHelper.storeJDO(pm, webCustomer, get, fetchGroups, maxFetchDepth);
 		} finally {
 			pm.close();
 		}
@@ -519,7 +522,7 @@ implements SessionBean
 				webCustomerID, 
 				new String[] {
 						FetchPlan.DEFAULT, WebCustomer.FETCH_GROUP_LEGAL_ENTITY,
-						LegalEntity.FETCH_GROUP_PERSON, Person.FETCH_GROUP_FULL_DATA
+						LegalEntity.FETCH_GROUP_PERSON, PropertySet.FETCH_GROUP_FULL_DATA
 				}, 
 				NLJDOHelper.MAX_FETCH_DEPTH_NO_LIMIT
 		);

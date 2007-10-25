@@ -43,6 +43,7 @@ extends ProductTypeLocal
 	/**
 	 * @deprecated Only for JDO!
 	 */
+	@Deprecated
 	protected VoucherTypeLocal() { }
 
 	public VoucherTypeLocal(User user, ProductType productType, Repository home)

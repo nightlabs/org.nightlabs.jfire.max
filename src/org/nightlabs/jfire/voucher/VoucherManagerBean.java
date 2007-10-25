@@ -181,7 +181,7 @@ implements SessionBean
 			// version is {major}.{minor}.{release}-{patchlevel}-{suffix}
 			moduleMetaData = new ModuleMetaData("JFireVoucher", "0.9.1-0-beta", // TODO use constant for "JFireVoucher" like in other EARs
 					"0.9.1-0-beta");
-			moduleMetaData = (ModuleMetaData) pm.makePersistent(moduleMetaData);
+			moduleMetaData = pm.makePersistent(moduleMetaData);
 
 			User user = User.getUser(pm, getPrincipal());
 
@@ -303,7 +303,7 @@ implements SessionBean
 			modeOfDelivery = new ModeOfDelivery(JFireVoucherEAR.MODE_OF_DELIVERY_ID_VOUCHER_PRINT);
 			modeOfDelivery.getName().setText(Locale.ENGLISH.getLanguage(), "Print Voucher");
 			modeOfDelivery.getName().setText(Locale.GERMAN.getLanguage(), "Gutschein-Druck");
-			modeOfDelivery = (ModeOfDelivery) pm.makePersistent(modeOfDelivery);
+			modeOfDelivery = pm.makePersistent(modeOfDelivery);
 		}
 		return modeOfDelivery;
 	}
@@ -480,7 +480,7 @@ implements SessionBean
 			// we don't need any price calculation as we have fixed prices only
 
 			if (NLJDOHelper.exists(pm, voucherType)) {
-				voucherType = (VoucherType) pm.makePersistent(voucherType);
+				voucherType = pm.makePersistent(voucherType);
 			} else {
 				voucherType = (VoucherType) Store.getStore(pm).addProductType(User.getUser(pm, getPrincipal()), voucherType);
 			}
@@ -498,7 +498,7 @@ implements SessionBean
 				voucherType = (VoucherType) pm.getObjectById(vtid);
 			}
 
-			VoucherType detachedVoucherType = (VoucherType) pm.detachCopy(voucherType);
+			VoucherType detachedVoucherType = pm.detachCopy(voucherType);
 			return detachedVoucherType;
 		} finally {
 			pm.close();
@@ -1027,7 +1027,7 @@ implements SessionBean
 								.getServerDeliveryProcessorManual(pm));
 				delivery.setServerDeliveryProcessorID(serverDeliveryProcessorID);
 				DeliveryData deliveryData = new DeliveryData(delivery);
-				deliveryData = (DeliveryData) pm.makePersistent(deliveryData);
+				deliveryData = pm.makePersistent(deliveryData);
 				delivery.setDeliverBeginClientResult(new DeliveryResult(
 						DeliveryResult.CODE_APPROVED_NO_EXTERNAL,
 						null, null));
@@ -1085,7 +1085,7 @@ implements SessionBean
 				if (voucherType.getVoucherLayout() == null)
 					throw new IllegalStateException("voucherType.getVoucherLayout() == null! voucherType: " + voucherType.getPrimaryKey());
 				
-				res.getProductID2LayoutMap().put(productID, (VoucherLayout) pm.detachCopy(voucherType.getVoucherLayout()));
+				res.getProductID2LayoutMap().put(productID, pm.detachCopy(voucherType.getVoucherLayout()));
 			}
 			return res;
 		} finally {

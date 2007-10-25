@@ -48,6 +48,7 @@ extends Product
 	 *
 	 * @see org.nightlabs.jfire.store.Product#getProductLocator(User, NestedProductType)
 	 */
+	@Override
 	@Implement
 	public ProductLocator getProductLocator(User user, NestedProductType nestedProductType)
 	{

@@ -48,7 +48,7 @@ extends ServerDeliveryProcessor
 			serverDeliveryProcessor.getName().setText(
 					Locale.ENGLISH.getLanguage(), 
 					"Server Delivery Processor for delivering vouchers to print on the client");
-			serverDeliveryProcessor = (ServerDeliveryProcessorClientSideVoucherPrint) pm.makePersistent(serverDeliveryProcessor);
+			serverDeliveryProcessor = pm.makePersistent(serverDeliveryProcessor);
 		}
 
 		return serverDeliveryProcessor;

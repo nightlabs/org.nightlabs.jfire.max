@@ -31,7 +31,7 @@ public class VoucherStore
 		if (voucherStore == null) {
 			voucherStore = new VoucherStore();
 			voucherStore.organisationID = LocalOrganisation.getLocalOrganisation(pm).getOrganisationID();
-			voucherStore = (VoucherStore) pm.makePersistent(voucherStore);
+			voucherStore = pm.makePersistent(voucherStore);
 		}
 
 		return voucherStore;

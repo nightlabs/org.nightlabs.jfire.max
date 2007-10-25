@@ -60,6 +60,7 @@ extends LocalAccountantDelegate
 	/**
 	 * @deprecated Only for JDO!
 	 */
+	@Deprecated
 	protected VoucherLocalAccountantDelegate() { }
 
 	public VoucherLocalAccountantDelegate(String organisationID, String localAccountantDelegateID)
@@ -75,6 +76,7 @@ extends LocalAccountantDelegate
 	 * {@inheritDoc}
 	 * @see org.nightlabs.jfire.accounting.book.LocalAccountantDelegate#bookArticle(org.nightlabs.jfire.trade.OrganisationLegalEntity, org.nightlabs.jfire.security.User, org.nightlabs.jfire.accounting.Invoice, org.nightlabs.jfire.trade.Article, org.nightlabs.jfire.accounting.book.BookMoneyTransfer, java.util.Map)
 	 */
+	@Override
 	@Implement
 	public void bookArticle(OrganisationLegalEntity mandator, User user,
 			Invoice invoice, Article article, BookMoneyTransfer container,
@@ -137,7 +139,7 @@ extends LocalAccountantDelegate
 				container.getInvoice(),
 				amount,
 				articlePrice.getArticle());
-		moneyTransfer = (VoucherMoneyTransfer) pm.makePersistent(moneyTransfer);
+		moneyTransfer = pm.makePersistent(moneyTransfer);
 		moneyTransfer.bookTransfer(user, involvedAnchors);
 	}
 }

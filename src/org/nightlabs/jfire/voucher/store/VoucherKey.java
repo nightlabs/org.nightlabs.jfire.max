@@ -21,6 +21,7 @@ import org.nightlabs.jfire.trade.Article;
 import org.nightlabs.jfire.voucher.accounting.VoucherRedemption;
 import org.nightlabs.jfire.voucher.store.id.VoucherKeyID;
 import org.nightlabs.math.Base62Coder;
+import org.nightlabs.util.Util;
 import org.nightlabs.util.Utils;
 
 /**
@@ -215,6 +216,7 @@ implements Serializable
 	/**
 	 * @deprecated Only for JDO!
 	 */
+	@Deprecated
 	protected VoucherKey() { }
 
 	public VoucherKey(int voucherOrganisationID, long voucherNumber, Article article, User createUser)
@@ -507,6 +509,6 @@ implements Serializable
 	@Override
 	public int hashCode()
 	{
-		return voucherOrganisationID + Utils.hashCode(voucherNumber);
+		return voucherOrganisationID + Util.hashCode(voucherNumber);
 	}
 }

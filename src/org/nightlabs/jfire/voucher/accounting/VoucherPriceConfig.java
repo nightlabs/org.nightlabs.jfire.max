@@ -54,6 +54,7 @@ implements IPackagePriceConfig
 	/**
 	 * @deprecated Only for JDO!
 	 */
+	@Deprecated
 	protected VoucherPriceConfig() { }
 
 	public VoucherPriceConfig(String organisationID, long priceConfigID)
@@ -62,18 +63,21 @@ implements IPackagePriceConfig
 		prices = new HashMap<Currency, Long>();
 	}
 
+	@Override
 	@Implement
 	public boolean isDependentOnOffer()
 	{
 		return false;
 	}
 
+	@Override
 	@Implement
 	public boolean requiresProductTypePackageInternal()
 	{
 		return false;
 	}
 
+	@Override
 	@Implement
 	public ArticlePrice createArticlePrice(Article article)
 	{

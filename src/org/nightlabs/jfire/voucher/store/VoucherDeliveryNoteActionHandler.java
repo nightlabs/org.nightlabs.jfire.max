@@ -34,6 +34,7 @@ extends DeliveryNoteActionHandler
 	/**
 	 * @deprecated Only for JDO!
 	 */
+	@Deprecated
 	protected VoucherDeliveryNoteActionHandler() { }
 
 	public VoucherDeliveryNoteActionHandler(String organisationID, String deliveryNoteActionHandlerID)
@@ -86,7 +87,7 @@ extends DeliveryNoteActionHandler
 
 					VoucherKey voucherKey = new VoucherKey(
 							getVoucherStore().getVoucherOrganisationID(), IDGenerator.nextID(VoucherKey.class), article, user);
-					voucherKey = (VoucherKey) pm.makePersistent(voucherKey);
+					voucherKey = pm.makePersistent(voucherKey);
 					voucher.setVoucherKey(voucherKey); // if we would allow the trade of vouchers between organisations, this should probably be in the VoucherLocal
 				}
 			}

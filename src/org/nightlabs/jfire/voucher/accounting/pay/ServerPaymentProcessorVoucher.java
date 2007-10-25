@@ -42,7 +42,7 @@ public class ServerPaymentProcessorVoucher
 					ServerPaymentProcessorID.create(Organisation.DEVIL_ORGANISATION_ID, ServerPaymentProcessorVoucher.class.getName()));
 		} catch (JDOObjectNotFoundException e) {
 			serverPaymentProcessorVoucher = new ServerPaymentProcessorVoucher(Organisation.DEVIL_ORGANISATION_ID, ServerPaymentProcessorVoucher.class.getName());
-			serverPaymentProcessorVoucher = (ServerPaymentProcessorVoucher) pm.makePersistent(serverPaymentProcessorVoucher);
+			serverPaymentProcessorVoucher = pm.makePersistent(serverPaymentProcessorVoucher);
 		}
 
 		return serverPaymentProcessorVoucher;
@@ -51,6 +51,7 @@ public class ServerPaymentProcessorVoucher
 	/**
 	 * @deprecated Only for JDO!
 	 */
+	@Deprecated
 	protected ServerPaymentProcessorVoucher() { }
 
 	public ServerPaymentProcessorVoucher(String organisationID, String serverPaymentProcessorID)
@@ -58,6 +59,7 @@ public class ServerPaymentProcessorVoucher
 		super(organisationID, serverPaymentProcessorID);
 	}
 
+	@Override
 	@Implement
 	protected PaymentResult externalPayBegin(PayParams payParams)
 			throws PaymentException
@@ -65,6 +67,7 @@ public class ServerPaymentProcessorVoucher
 		return null;
 	}
 
+	@Override
 	@Implement
 	protected PaymentResult externalPayCommit(PayParams payParams)
 			throws PaymentException
@@ -80,6 +83,7 @@ public class ServerPaymentProcessorVoucher
 		return null;
 	}
 
+	@Override
 	@Implement
 	protected PaymentResult externalPayDoWork(PayParams payParams)
 			throws PaymentException
@@ -87,6 +91,7 @@ public class ServerPaymentProcessorVoucher
 		return null;
 	}
 
+	@Override
 	@Implement
 	protected PaymentResult externalPayRollback(PayParams payParams)
 			throws PaymentException
@@ -94,6 +99,7 @@ public class ServerPaymentProcessorVoucher
 		return null;
 	}
 
+	@Override
 	@Implement
 	public Anchor getAnchorOutside(PayParams payParams)
 	{

@@ -42,6 +42,7 @@ extends InvoiceMoneyTransfer
 	/**
 	 * @deprecated Only for JDO!
 	 */
+	@Deprecated
 	protected VoucherMoneyTransfer() { }
 
 	public VoucherMoneyTransfer(String bookType,

@@ -85,6 +85,7 @@ public class VoucherTypeActionHandler
 	/**
 	 * @deprecated Only for JDO!
 	 */
+	@Deprecated
 	protected VoucherTypeActionHandler() { }
 
 	public VoucherTypeActionHandler(String organisationID,
@@ -93,6 +94,7 @@ public class VoucherTypeActionHandler
 		super(organisationID, productTypeActionHandlerID, productTypeClass);
 	}
 
+	@Override
 	@SuppressWarnings("unchecked")
 	@Implement
 	public Collection<? extends Product> findProducts(User user,
@@ -126,7 +128,7 @@ public class VoucherTypeActionHandler
 				if (productType.getOrganisationID().equals(store.getOrganisationID())) {
 					long createdProductCount = vtl.getCreatedVoucherCount();
 					if (vtl.getMaxVoucherCount() < 0 || createdProductCount + 1 <= vtl.getMaxVoucherCount()) {
-						product = new Voucher(vt, Voucher.createProductID());
+						product = new Voucher(vt, Product.createProductID());
 						vtl.setCreatedVoucherCount(createdProductCount + 1);
 
 						store.addProduct(user, product); // , (Repository)vt.getProductTypeLocal().getHome());
@@ -154,6 +156,7 @@ public class VoucherTypeActionHandler
 		deliveryNote.getDeliveryNoteLocal().addDeliveryNoteActionHandler(deliveryNoteActionHandler);
 	}
 
+	@Override
 	@Implement
 	public Collection<? extends Article> createCrossTradeArticles(
 			User user, Product localPackageProduct, Article localArticle,

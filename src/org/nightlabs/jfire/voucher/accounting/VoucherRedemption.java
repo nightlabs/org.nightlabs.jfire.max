@@ -4,6 +4,7 @@ import java.io.Serializable;
 
 import org.nightlabs.jfire.accounting.pay.Payment;
 import org.nightlabs.jfire.voucher.store.VoucherKey;
+import org.nightlabs.util.Util;
 import org.nightlabs.util.Utils;
 
 /**
@@ -64,6 +65,7 @@ implements Serializable
 	/**
 	 * @deprecated Only for JDO!
 	 */
+	@Deprecated
 	protected VoucherRedemption() { }
 
 	public VoucherRedemption(String organisationID, long voucherRedemptionID, VoucherKey voucherKey, Payment payment)
@@ -110,11 +112,11 @@ implements Serializable
 		if (obj == this) return true;
 		if (!(obj instanceof VoucherRedemption)) return false;
 		VoucherRedemption o = (VoucherRedemption) obj;
-		return Utils.equals(o.organisationID, this.organisationID) && Utils.equals(o.voucherRedemptionID, this.voucherRedemptionID);
+		return Util.equals(o.organisationID, this.organisationID) && Util.equals(o.voucherRedemptionID, this.voucherRedemptionID);
 	}
 	@Override
 	public int hashCode()
 	{
-		return Utils.hashCode(organisationID) + Utils.hashCode(voucherRedemptionID);
+		return Util.hashCode(organisationID) + Util.hashCode(voucherRedemptionID);
 	}
 }

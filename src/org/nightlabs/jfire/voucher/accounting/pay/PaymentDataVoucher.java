@@ -22,6 +22,7 @@ extends PaymentData
 	/**
 	 * @deprecated Only for JDO!
 	 */
+	@Deprecated
 	protected PaymentDataVoucher() { }
 
 	public PaymentDataVoucher(Payment payment)

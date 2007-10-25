@@ -12,7 +12,6 @@ import org.nightlabs.jfire.store.ProductType;
 import org.nightlabs.jfire.store.ProductTypeLocal;
 import org.nightlabs.jfire.store.Repository;
 import org.nightlabs.jfire.store.id.ProductTypeID;
-import org.nightlabs.jfire.trade.LegalEntity;
 import org.nightlabs.jfire.voucher.scripting.VoucherLayout;
 
 /**
@@ -73,6 +72,7 @@ extends ProductType
 	/**
 	 * @deprecated Only for JDO!
 	 */
+	@Deprecated
 	protected VoucherType() { }
 
 	public VoucherType(String organisationID, String productTypeID,
@@ -97,6 +97,7 @@ extends ProductType
 		return new VoucherTypeLocal(user, this, home);
 	}
 
+	@Override
 	@Implement
 	protected void calculatePrices()
 	{

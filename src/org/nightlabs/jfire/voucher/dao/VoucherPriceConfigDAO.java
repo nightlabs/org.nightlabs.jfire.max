@@ -31,6 +31,7 @@ extends BaseJDOObjectDAO<PriceConfigID, VoucherPriceConfig>
 
 	private VoucherManager voucherManager;
 
+	@Override
 	@SuppressWarnings("unchecked")
 	@Implement
 	protected Collection<VoucherPriceConfig> retrieveJDOObjects(

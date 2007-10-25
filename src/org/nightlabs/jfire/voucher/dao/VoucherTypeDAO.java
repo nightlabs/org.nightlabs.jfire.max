@@ -28,6 +28,7 @@ implements IJDOObjectDAO<VoucherType>
 		return sharedInstance;
 	}
 
+	@Override
 	@SuppressWarnings("unchecked")
 	@Implement
 	protected Collection<VoucherType> retrieveJDOObjects(

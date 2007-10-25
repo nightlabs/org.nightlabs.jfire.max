@@ -29,6 +29,7 @@ extends BaseJDOObjectDAO<LocalAccountantDelegateID, VoucherLocalAccountantDelega
 		return sharedInstance;
 	}
 
+	@Override
 	@SuppressWarnings("unchecked")
 	@Implement
 	protected Collection<VoucherLocalAccountantDelegate> retrieveJDOObjects(

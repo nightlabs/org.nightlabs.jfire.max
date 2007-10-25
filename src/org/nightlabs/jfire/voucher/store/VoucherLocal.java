@@ -27,6 +27,7 @@ import org.nightlabs.jfire.trade.Article;
  *
  * @deprecated I think this is not needed anymore as we store the restValue in the VoucherKey. It should not be instantiated by {@link Voucher#createProductLocal(User, Repository)} anymore. We can probably delete this class soon. Marco.
  */
+@Deprecated
 public class VoucherLocal
 extends ProductLocal
 implements DetachCallback
@@ -39,6 +40,7 @@ implements DetachCallback
 	/**
 	 * @deprecated Only for JDO!
 	 */
+	@Deprecated
 	protected VoucherLocal() { }
 
 	/**

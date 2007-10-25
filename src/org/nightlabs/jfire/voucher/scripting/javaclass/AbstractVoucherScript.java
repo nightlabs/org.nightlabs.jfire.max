@@ -39,7 +39,7 @@ extends AbstractScriptExecutorJavaClassDelegate
 //		return (Voucher) getPersistenceManager().getObjectById(getVoucherID());	
 //	}
 	public Voucher getVoucher() {
-		return (Voucher) getVoucherKey().getVoucher();	
+		return getVoucherKey().getVoucher();	
 	}
 	
 	public VoucherType getVoucherType() {

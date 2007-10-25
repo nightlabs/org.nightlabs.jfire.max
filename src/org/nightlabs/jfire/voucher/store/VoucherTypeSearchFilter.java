@@ -48,11 +48,13 @@ extends ProductTypeSearchFilter
 		super(conjunction);
 	}
 
+	@Override
 	@Implement
 	protected Class getProductTypeClass() {
 		return VoucherType.class;
 	}
 
+	@Override
 	@Implement
 	protected void prepareQuery(Set<Class> imports, StringBuffer vars,
 			StringBuffer filter, StringBuffer params, Map<String, Object> paramMap,

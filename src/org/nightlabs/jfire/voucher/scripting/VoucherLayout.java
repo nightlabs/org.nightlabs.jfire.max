@@ -66,6 +66,7 @@ implements Serializable, ILayout
 	/**
 	 * @deprecated Only for JDO!
 	 */
+	@Deprecated
 	protected VoucherLayout() { }
 
 	public VoucherLayout(String organisationID, long voucherLayoutID)

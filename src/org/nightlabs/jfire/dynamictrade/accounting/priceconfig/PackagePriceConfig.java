@@ -40,7 +40,7 @@ implements IPackagePriceConfig
 			return (PackagePriceConfig) it.next();
 
 		PackagePriceConfig packagePriceConfig = new PackagePriceConfig(IDGenerator.getOrganisationID(), IDGenerator.nextID(PriceConfig.class));
-		return (PackagePriceConfig) pm.makePersistent(packagePriceConfig);
+		return pm.makePersistent(packagePriceConfig);
 	}
 
 	public PackagePriceConfig(String organisationID, long priceConfigID)
@@ -48,6 +48,7 @@ implements IPackagePriceConfig
 		super(organisationID, priceConfigID);
 	}
 
+	@Override
 	@Implement
 	public ArticlePrice createArticlePrice(Article article)
 	{
@@ -65,12 +66,14 @@ implements IPackagePriceConfig
 		return articlePrice;
 	}
 
+	@Override
 	@Implement
 	public boolean isDependentOnOffer()
 	{
 		return false;
 	}
 
+	@Override
 	@Implement
 	public boolean requiresProductTypePackageInternal()
 	{

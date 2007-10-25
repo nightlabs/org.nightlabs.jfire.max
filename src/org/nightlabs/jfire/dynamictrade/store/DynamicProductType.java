@@ -6,10 +6,8 @@ import javax.jdo.PersistenceManager;
 import javax.jdo.Query;
 
 import org.nightlabs.annotation.Implement;
-import org.nightlabs.inheritance.Inheritable;
 import org.nightlabs.jfire.store.ProductType;
 import org.nightlabs.jfire.store.id.ProductTypeID;
-import org.nightlabs.jfire.trade.LegalEntity;
 
 /**
  * @author Marco Schulze - marco at nightlabs dot de
@@ -68,6 +66,7 @@ extends ProductType
 	/**
 	 * @deprecated Only for JDO!
 	 */
+	@Deprecated
 	protected DynamicProductType() { }
 
 	public DynamicProductType(
@@ -83,6 +82,7 @@ extends ProductType
 				packageNature);
 	}
 
+	@Override
 	@Implement
 	protected void calculatePrices()
 	{

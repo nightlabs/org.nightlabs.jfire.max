@@ -5,6 +5,7 @@ import java.io.Serializable;
 import javax.jdo.listener.StoreCallback;
 
 import org.nightlabs.jdo.ObjectIDUtil;
+import org.nightlabs.util.Util;
 import org.nightlabs.util.Utils;
 
 /**
@@ -60,6 +61,7 @@ implements Serializable, StoreCallback
 	/**
 	 * @deprecated Only for JDO!
 	 */
+	@Deprecated
 	protected Unit() { }
 
 	public Unit(String organisationID, long unitID)
@@ -100,12 +102,12 @@ implements Serializable, StoreCallback
 		if (obj == this) return true;
 		if (!(obj instanceof Unit)) return false;
 		Unit o = (Unit)obj;
-		return Utils.equals(o.organisationID, this.organisationID) && Utils.equals(o.unitID, this.unitID);
+		return Util.equals(o.organisationID, this.organisationID) && Util.equals(o.unitID, this.unitID);
 	}
 
 	@Override
 	public int hashCode()
 	{
-		return Utils.hashCode(organisationID) + Utils.hashCode(unitID);
+		return Util.hashCode(organisationID) + Util.hashCode(unitID);
 	}
 }

@@ -29,6 +29,7 @@ extends BaseJDOObjectDAO<PriceConfigID, DynamicTradePriceConfig>
 		return sharedInstance;
 	}
 
+	@Override
 	@SuppressWarnings("unchecked")
 	@Implement
 	protected Collection<DynamicTradePriceConfig> retrieveJDOObjects(

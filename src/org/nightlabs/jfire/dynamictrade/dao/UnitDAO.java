@@ -29,6 +29,7 @@ extends BaseJDOObjectDAO<UnitID, Unit>
 		return sharedInstance;
 	}
 
+	@Override
 	@SuppressWarnings("unchecked")
 	@Implement
 	protected Collection<Unit> retrieveJDOObjects(Set<UnitID> unitIDs, String[] fetchGroups, int maxFetchDepth, ProgressMonitor monitor)

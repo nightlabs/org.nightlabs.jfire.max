@@ -64,6 +64,7 @@ extends Product
 	/**
 	 * @deprecated Only for JDO!
 	 */
+	@Deprecated
 	protected DynamicProduct() { }
 
 	public DynamicProduct(ProductType productType, long productID)
@@ -73,6 +74,7 @@ extends Product
 		this.quantity = 1;
 	}
 
+	@Override
 	@Implement
 	public ProductLocator getProductLocator(User user,
 			NestedProductType nestedProductType)

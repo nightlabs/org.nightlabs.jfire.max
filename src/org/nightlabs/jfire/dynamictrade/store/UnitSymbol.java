@@ -94,6 +94,7 @@ extends I18nText
 	/**
 	 * @deprecated Only for JDO!
 	 */
+	@Deprecated
 	protected UnitSymbol()
 	{
 	}
@@ -105,12 +106,14 @@ extends I18nText
 		this.unitID = unit.getUnitID();
 	}
 
+	@Override
 	@Implement
 	protected Map<String, String> getI18nMap()
 	{
 		return names;
 	}
 
+	@Override
 	@Implement
 	protected String getFallBackValue(String languageID)
 	{

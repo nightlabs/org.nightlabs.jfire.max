@@ -13,7 +13,6 @@ import javax.ejb.EJBException;
 import javax.ejb.SessionBean;
 import javax.ejb.SessionContext;
 import javax.jdo.FetchPlan;
-import javax.jdo.JDOHelper;
 import javax.jdo.JDOObjectNotFoundException;
 import javax.jdo.PersistenceManager;
 import javax.jdo.Query;
@@ -72,11 +71,13 @@ public abstract class DynamicTradeManagerBean
 extends BaseSessionBeanImpl
 implements SessionBean
 {
+	@Override
 	public void setSessionContext(SessionContext sessionContext)
 	throws EJBException, RemoteException
 	{
 		super.setSessionContext(sessionContext);
 	}
+	@Override
 	public void unsetSessionContext() {
 		super.unsetSessionContext();
 	}
@@ -126,7 +127,7 @@ implements SessionBean
 			// create the ProductTypeActionHandler for DynamicProductTypes
 			DynamicProductTypeActionHandler dynamicProductTypeActionHandler = new DynamicProductTypeActionHandler(
 					Organisation.DEVIL_ORGANISATION_ID, DynamicProductTypeActionHandler.class.getName(), DynamicProductType.class);
-			dynamicProductTypeActionHandler = (DynamicProductTypeActionHandler) pm.makePersistent(dynamicProductTypeActionHandler);
+			dynamicProductTypeActionHandler = pm.makePersistent(dynamicProductTypeActionHandler);
 
 			// create a default DeliveryConfiguration with one ModeOfDelivery
 			DeliveryConfiguration deliveryConfiguration = new DeliveryConfiguration(organisationID, "JFireDynamicTrade.default");
@@ -141,7 +142,7 @@ implements SessionBean
 			modeOfDelivery = (ModeOfDelivery) pm.getObjectById(ModeOfDeliveryConst.MODE_OF_DELIVERY_ID_DELIVER_TO_DELIVERY_QUEUE);
 			deliveryConfiguration.addModeOfDelivery(modeOfDelivery);
 			
-			deliveryConfiguration = (DeliveryConfiguration) pm.makePersistent(deliveryConfiguration);
+			deliveryConfiguration = pm.makePersistent(deliveryConfiguration);
 
 
 			// create the root-ProductType
@@ -302,7 +303,7 @@ implements SessionBean
 			// we don't need any price calculation as we have dynamic prices only - no cached values
 
 			if (NLJDOHelper.exists(pm, dynamicProductType)) {
-				dynamicProductType = (DynamicProductType) pm.makePersistent(dynamicProductType);
+				dynamicProductType = pm.makePersistent(dynamicProductType);
 			} else {
 				dynamicProductType = (DynamicProductType) Store.getStore(pm).addProductType(User.getUser(pm, getPrincipal()),
 						dynamicProductType);
@@ -315,7 +316,7 @@ implements SessionBean
 			if (!get)
 				return null;
 
-			return (DynamicProductType) pm.detachCopy(dynamicProductType);
+			return pm.detachCopy(dynamicProductType);
 		} finally {
 			pm.close();
 		}
@@ -597,7 +598,7 @@ implements SessionBean
 				ArticlePrice price = article.getProductType().getPackagePriceConfig().createArticlePrice(article);
 				while (++tryCounter < 20) { // TODO remove this workaround!
 					try {
-						price = (ArticlePrice) pm.makePersistent(price);
+						price = pm.makePersistent(price);
 						pm.flush();
 						break;
 					} catch (Exception x) {
@@ -615,7 +616,7 @@ implements SessionBean
 			if (fetchGroups != null)
 				pm.getFetchPlan().setGroups(fetchGroups);
 
-			return (Article) pm.detachCopy(article);
+			return pm.detachCopy(article);
 		} finally {
 			pm.close();
 		}

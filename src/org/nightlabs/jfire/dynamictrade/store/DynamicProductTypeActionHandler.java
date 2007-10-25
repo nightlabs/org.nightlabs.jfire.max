@@ -69,6 +69,7 @@ public class DynamicProductTypeActionHandler
 	/**
 	 * @deprecated Only for JDO!
 	 */
+	@Deprecated
 	protected DynamicProductTypeActionHandler() { }
 
 	/**
@@ -80,6 +81,7 @@ public class DynamicProductTypeActionHandler
 		super(organisationID, productTypeActionHandlerID, productTypeClass);
 	}
 
+	@Override
 	@SuppressWarnings("unchecked")
 	@Implement
 	public Collection<? extends Product> findProducts(User user,
@@ -91,7 +93,7 @@ public class DynamicProductTypeActionHandler
 		ArrayList res = new ArrayList();
 		int qty = nestedProductType == null ? 1 : nestedProductType.getQuantity();
 		for (int i = 0; i < qty; ++i) {
-			DynamicProduct product = new DynamicProduct(spt, DynamicProduct.createProductID());
+			DynamicProduct product = new DynamicProduct(spt, Product.createProductID());
 			product = (DynamicProduct) store.addProduct(user, product); // , (Repository)spt.getProductTypeLocal().getHome());
 			res.add(product);
 		}
@@ -136,6 +138,7 @@ public class DynamicProductTypeActionHandler
 	}
 
 
+	@Override
 	@Implement
 	public Collection<? extends Article> createCrossTradeArticles(
 			User user, Product localPackageProduct, Article localArticle,

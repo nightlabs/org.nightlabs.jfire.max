@@ -53,6 +53,7 @@ extends FormulaPriceConfig
 	/**
 	 * @deprecated Only for JDO!
 	 */
+	@Deprecated
 	protected DynamicTradePriceConfig() { }
 
 	public DynamicTradePriceConfig(String organisationID, long priceConfigID)

@@ -31,6 +31,7 @@ import java.util.Map;
 
 import org.nightlabs.annotation.Implement;
 import org.nightlabs.i18n.I18nText;
+import org.nightlabs.jfire.store.Product;
 
 /**
  * @author Marco Schulze - marco at nightlabs dot de
@@ -94,6 +95,7 @@ extends I18nText
 	/**
 	 * @deprecated Only for JDO!
 	 */
+	@Deprecated
 	protected DynamicProductName()
 	{
 	}
@@ -105,16 +107,18 @@ extends I18nText
 		this.productID = dynamicProduct.getProductID();
 	}
 
+	@Override
 	@Implement
 	protected Map<String, String> getI18nMap()
 	{
 		return names;
 	}
 
+	@Override
 	@Implement
 	protected String getFallBackValue(String languageID)
 	{
-		return DynamicProduct.getPrimaryKey(organisationID, productID);
+		return Product.getPrimaryKey(organisationID, productID);
 	}
 
 	/**

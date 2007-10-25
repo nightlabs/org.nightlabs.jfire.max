@@ -31,6 +31,7 @@ implements IJDOObjectDAO<DynamicProductType>
 		return sharedInstance;
 	}
 
+	@Override
 	@SuppressWarnings("unchecked")
 	@Implement
 	protected Collection<DynamicProductType> retrieveJDOObjects(

@@ -3,6 +3,8 @@
  */
 package org.nightlabs.jfire.simpletrade.store.prop;
 
+import java.util.Locale;
+
 import javax.jdo.JDOObjectNotFoundException;
 import javax.jdo.PersistenceManager;
 
@@ -26,16 +28,20 @@ public class SimpleProductTypeStruct {
 
 	public static IStruct getSimpleProductTypeStruct(String organisationID, PersistenceManager pm) {
 		Struct productTypeStruct = null;
-		StructLocal personStructLocal = null;
+		StructLocal productTypeStructLocal = null;
 		try {
 			productTypeStruct = Struct.getStruct(organisationID, SimpleProductType.class, pm);
 		} catch (JDOObjectNotFoundException e) {
 			// person struct not persisted yet.
 			productTypeStruct = new Struct(organisationID, SimpleProductType.class.getName());
 			createStandardStructure(productTypeStruct);
+			productTypeStruct.getName().setText(Locale.ENGLISH.getLanguage(), "Simple products");
+			productTypeStruct.getName().setText(Locale.GERMAN.getLanguage(), "Einfache Produkte");
 			productTypeStruct = (Struct) pm.makePersistent(productTypeStruct);
-			personStructLocal = new StructLocal(productTypeStruct, StructLocal.DEFAULT_SCOPE);
-			pm.makePersistent(personStructLocal);
+			productTypeStructLocal = new StructLocal(productTypeStruct, StructLocal.DEFAULT_SCOPE);
+			productTypeStructLocal.getName().setText(Locale.ENGLISH.getLanguage(), "Default simple product structure");
+			productTypeStructLocal.getName().setText(Locale.GERMAN.getLanguage(), "Standard Struktur für einfache Produkte");
+			pm.makePersistent(productTypeStructLocal);
 		}
 		return productTypeStruct;
 	}

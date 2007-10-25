@@ -71,6 +71,7 @@ implements SessionBean
 	/**
 	 * @see com.nightlabs.jfire.base.BaseSessionBeanImpl#setSessionContext(javax.ejb.SessionContext)
 	 */
+	@Override
 	public void setSessionContext(SessionContext sessionContext)
 	throws EJBException, RemoteException
 	{
@@ -79,6 +80,7 @@ implements SessionBean
 	/**
 	 * @see com.nightlabs.jfire.base.BaseSessionBeanImpl#unsetSessionContext()
 	 */
+	@Override
 	public void unsetSessionContext() {
 		super.unsetSessionContext();
 	}
@@ -153,7 +155,7 @@ implements SessionBean
 				pm.getFetchPlan().setGroups(fetchGroups);
 
 			ScriptRegistryItem reportRegistryItem = (ScriptRegistryItem)pm.getObjectById(scriptRegistryItemID);			
-			ScriptRegistryItem result = (ScriptRegistryItem) pm.detachCopy(reportRegistryItem);
+			ScriptRegistryItem result = pm.detachCopy(reportRegistryItem);
 			return result;
 		} finally {
 			pm.close();
@@ -182,7 +184,7 @@ implements SessionBean
 			List<ScriptRegistryItem> result = new ArrayList<ScriptRegistryItem>();
 			for (ScriptRegistryItemID itemID : scriptRegistryItemIDs) {
 				ScriptRegistryItem item = (ScriptRegistryItem)pm.getObjectById(itemID);
-				result.add((ScriptRegistryItem)pm.detachCopy(item));
+				result.add(pm.detachCopy(item));
 			}
 
 			return result;
@@ -211,7 +213,7 @@ implements SessionBean
 				pm.getFetchPlan().setGroups(fetchGroups);
 
 			Collection topLevelItems = ScriptRegistryItem.getTopScriptRegistryItemsByOrganisationID(pm, organisationID);
-			Collection result = (Collection) pm.detachCopyAll(topLevelItems);
+			Collection result = pm.detachCopyAll(topLevelItems);
 			return result;
 		} finally {
 			pm.close();
@@ -288,7 +290,7 @@ implements SessionBean
 		PersistenceManager pm;
 		pm = getPersistenceManager();
 		try {
-			return (ScriptRegistryItem)NLJDOHelper.storeJDO(pm, reportRegistryItem, get, fetchGroups, maxFetchDepth);
+			return NLJDOHelper.storeJDO(pm, reportRegistryItem, get, fetchGroups, maxFetchDepth);
 		} finally {
 			pm.close();
 		}
@@ -344,7 +346,7 @@ implements SessionBean
 			if (fetchGroups != null)
 				pm.getFetchPlan().setGroups(fetchGroups);
 			ScriptParameterSet parameterSet = (ScriptParameterSet)pm.getObjectById(scriptParameterSetID);
-			return (ScriptParameterSet)pm.detachCopy(parameterSet);
+			return pm.detachCopy(parameterSet);
 		} finally {
 			pm.close();
 		}
@@ -378,7 +380,7 @@ implements SessionBean
 				if (item.getParameterSet() != null)
 					parameterSets.add(item.getParameterSet());				
 			}
-			return (Collection<ScriptParameterSet>)pm.detachCopyAll(parameterSets);
+			return pm.detachCopyAll(parameterSets);
 		} finally {
 			pm.close();
 		}
@@ -404,7 +406,7 @@ implements SessionBean
 			if (fetchGroups != null)
 				pm.getFetchPlan().setGroups(fetchGroups);
 			pm.makePersistent(set);
-			return (ScriptParameterSet)pm.detachCopy(set);
+			return pm.detachCopy(set);
 		} finally {
 			pm.close();
 		}
@@ -426,7 +428,7 @@ implements SessionBean
 		PersistenceManager pm;
 		pm = getPersistenceManager();
 		try {
-			return (ScriptParameterSet)NLJDOHelper.storeJDO(pm, scriptParameterSet, get, fetchGroups, maxFetchDepth);
+			return NLJDOHelper.storeJDO(pm, scriptParameterSet, get, fetchGroups, maxFetchDepth);
 		} finally {
 			pm.close();
 		}
@@ -477,7 +479,7 @@ implements SessionBean
 			pm.getFetchPlan().setGroups(fetchGroups);
 			pm.getFetchPlan().setMaxFetchDepth(maxFetchDepth);
 			ScriptRegistry scriptRegistry = (ScriptRegistry) pm.getObjectById(ScriptRegistry.SINGLETON_ID);
-			scriptRegistry = (ScriptRegistry) pm.detachCopy(scriptRegistry);
+			scriptRegistry = pm.detachCopy(scriptRegistry);
 			return scriptRegistry;
 		} finally {
 			pm.close();
@@ -499,7 +501,7 @@ implements SessionBean
 			pm.getFetchPlan().setGroup(ScriptRegistry.FETCH_GROUP_THIS_SCRIPT_REGISTRY);
 			pm.getFetchPlan().setMaxFetchDepth(NLJDOHelper.MAX_FETCH_DEPTH_NO_LIMIT);
 			ScriptRegistry scriptRegistry = (ScriptRegistry) pm.getObjectById(ScriptRegistry.SINGLETON_ID);
-			scriptRegistry = (ScriptRegistry) pm.detachCopy(scriptRegistry);
+			scriptRegistry = pm.detachCopy(scriptRegistry);
 			return scriptRegistry;
 		} finally {
 			pm.close();

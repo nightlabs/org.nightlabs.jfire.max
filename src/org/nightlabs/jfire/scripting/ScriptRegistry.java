@@ -45,6 +45,7 @@ import org.nightlabs.jfire.organisation.LocalOrganisation;
 import org.nightlabs.jfire.organisation.Organisation;
 import org.nightlabs.jfire.scripting.id.ScriptRegistryID;
 import org.nightlabs.jfire.scripting.id.ScriptRegistryItemID;
+import org.nightlabs.util.Util;
 import org.nightlabs.util.Utils;
 
 /**
@@ -150,6 +151,7 @@ implements Serializable
 	/**
 	 * @deprecated for JDO only 
 	 */
+	@Deprecated
 	protected ScriptRegistry() { }
 
 	/**
@@ -231,7 +233,7 @@ implements Serializable
 	public Class getScriptExecutorClass(String language, boolean throwExceptionIfNotFound)
 		throws ClassNotFoundException, IllegalArgumentException
 	{
-		String className = (String) language2ScriptExecutorClassName.get(language);
+		String className = language2ScriptExecutorClassName.get(language);
 		if (className == null) {
 			if (throwExceptionIfNotFound)
 				throw new IllegalArgumentException("The language \"" + language + "\" is unknown: No ScriptExecutor class bound!");
@@ -336,7 +338,7 @@ implements Serializable
 
 	public String getLanguageByFileName(String fileName, boolean throwExceptionIfNotFound)
 	{
-		String res = getLanguageByFileExtension(Utils.getFileExtension(fileName), false);
+		String res = getLanguageByFileExtension(Util.getFileExtension(fileName), false);
 		if (throwExceptionIfNotFound && res == null)
 			throw new IllegalArgumentException("There is no language registered for the fileExtension of the file: " + fileName);
 
@@ -345,7 +347,7 @@ implements Serializable
 
 	public String getLanguageByFileExtension(String fileExtension, boolean throwExceptionIfNotFound)
 	{
-		String res = (String) fileExtension2Language.get(fileExtension);
+		String res = fileExtension2Language.get(fileExtension);
 		if (throwExceptionIfNotFound && res == null)
 			throw new IllegalArgumentException("There is no language registered for the given fileExtension: " + fileExtension);
 

@@ -130,6 +130,7 @@ import org.nightlabs.jdo.ObjectIDUtil;
 	/**
 	 * @deprecated Only for JDO!
 	 */
+	@Deprecated
 	protected ScriptParameterSet() { }
 
 	public ScriptParameterSet(String organisationID, long scriptParameterSetID)
@@ -178,7 +179,7 @@ import org.nightlabs.jdo.ObjectIDUtil;
 	 */
 	public ScriptParameter createParameter(String scriptParameterID)
 	{
-		ScriptParameter res = (ScriptParameter) parameters.get(scriptParameterID);
+		ScriptParameter res = parameters.get(scriptParameterID);
 		if (res != null)
 			return res;
 
@@ -197,7 +198,7 @@ import org.nightlabs.jdo.ObjectIDUtil;
 	 */
 	public ScriptParameter getParameter(String scriptParameterID, boolean throwExceptionIfNotFound)
 	{
-		ScriptParameter res = (ScriptParameter) parameters.get(scriptParameterID);
+		ScriptParameter res = parameters.get(scriptParameterID);
 		if (res == null && throwExceptionIfNotFound)
 			throw new IllegalArgumentException("No parameter registered with scriptParameterID=\"" + scriptParameterID + "\"!");
 

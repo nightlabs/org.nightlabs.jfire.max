@@ -33,10 +33,8 @@ import javax.jdo.JDOObjectNotFoundException;
 import javax.jdo.PersistenceManager;
 
 import org.apache.log4j.Logger;
-import org.nightlabs.jdo.ObjectID;
 import org.nightlabs.jfire.scripting.Script;
 import org.nightlabs.jfire.scripting.condition.id.PossibleValueProviderID;
-import org.nightlabs.jfire.scripting.id.ScriptRegistryItemID;
 
 /**
  * @author Daniel.Mazurek [at] NightLabs [dot] de
@@ -83,7 +81,7 @@ implements Serializable
 			provider.getLabelProviderClassName(); // JPOX WORKAROUND
 			return provider;
 		} catch (JDOObjectNotFoundException x) {
-			DefaultPossibleValueProvider provider = (DefaultPossibleValueProvider) pm.makePersistent(new DefaultPossibleValueProvider(script));
+			DefaultPossibleValueProvider provider = pm.makePersistent(new DefaultPossibleValueProvider(script));
 			return provider;
 		}
 	}
@@ -91,6 +89,7 @@ implements Serializable
 	/**
 	 * @deprecated for JDO only 
 	 */
+	@Deprecated
 	protected PossibleValueProvider() {
 	}
 

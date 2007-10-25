@@ -45,6 +45,7 @@ import org.apache.log4j.Logger;
 import org.nightlabs.jfire.base.BaseSessionBeanImpl;
 import org.nightlabs.jfire.scripting.Script;
 import org.nightlabs.jfire.scripting.ScriptRegistry;
+import org.nightlabs.jfire.scripting.ScriptRegistryItem;
 import org.nightlabs.jfire.scripting.condition.id.ConditionContextProviderID;
 import org.nightlabs.jfire.scripting.condition.id.PossibleValueProviderID;
 import org.nightlabs.jfire.scripting.id.ScriptRegistryItemID;
@@ -85,6 +86,7 @@ implements SessionBean
 	/**
 	 * @see com.nightlabs.jfire.base.BaseSessionBeanImpl#setSessionContext(javax.ejb.SessionContext)
 	 */
+	@Override
 	public void setSessionContext(SessionContext sessionContext)
 	throws EJBException, RemoteException
 	{
@@ -93,6 +95,7 @@ implements SessionBean
 	/**
 	 * @see com.nightlabs.jfire.base.BaseSessionBeanImpl#unsetSessionContext()
 	 */
+	@Override
 	public void unsetSessionContext() {
 		super.unsetSessionContext();
 	}
@@ -136,8 +139,8 @@ implements SessionBean
 			logger.info("No possible values found for ScriptRegistryItemID "+scriptRegistryItemID+", use DefaultPossibleValueProvider!");				
 		}
 		
-		pm.getFetchPlan().setGroups(new String[] {FetchPlan.DEFAULT, Script.FETCH_GROUP_NAME});
-		script = (Script) pm.detachCopy(script);
+		pm.getFetchPlan().setGroups(new String[] {FetchPlan.DEFAULT, ScriptRegistryItem.FETCH_GROUP_NAME});
+		script = pm.detachCopy(script);
 		ScriptConditioner sc = new ScriptConditioner(scriptRegistryItemID, script, 
 				variableName, compareOperators, possibleValues, valueLabelProviderClassName);		
 //		sc.setPossibleValuesAreObjectIDs(script.isNeedsDetach());

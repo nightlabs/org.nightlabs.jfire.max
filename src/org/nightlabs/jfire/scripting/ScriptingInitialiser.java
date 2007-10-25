@@ -51,6 +51,7 @@ import org.nightlabs.jfire.idgenerator.IDGenerator;
 import org.nightlabs.jfire.organisation.Organisation;
 import org.nightlabs.jfire.scripting.id.ScriptRegistryItemID;
 import org.nightlabs.jfire.servermanager.JFireServerManager;
+import org.nightlabs.util.Util;
 import org.nightlabs.util.Utils;
 import org.nightlabs.xml.DOMParser;
 import org.nightlabs.xml.NLDOMUtil;
@@ -380,7 +381,7 @@ public class ScriptingInitialiser
 
 				Node scriptNode = getScriptDescriptor(scriptFile, catDocument);				
 				
-				String scriptID = Utils.getFileNameWithoutExtension(scriptFile.getName());				
+				String scriptID = Util.getFileNameWithoutExtension(scriptFile.getName());				
 				String scriptItemType = scriptRegistryItemType;
 				String scriptResultClass = "java.lang.Object";
 //				String[] fetchGroups = new String[] {FetchPlan.DEFAULT};
@@ -434,7 +435,7 @@ public class ScriptingInitialiser
 				
 				try {			
 					logger.debug("create Script = "+scriptRegistryItemType + "/" + scriptID);				
-					String scriptContent = Utils.readTextFile(scriptFile);
+					String scriptContent = Util.readTextFile(scriptFile);
 					logger.debug("scriptContent = " + scriptContent);
 					Script script;
 					try {
@@ -514,7 +515,7 @@ public class ScriptingInitialiser
 	{	
 		public boolean accept(File dir, String name) 
 		{				
-			String fileExtension = Utils.getFileExtension(name);
+			String fileExtension = Util.getFileExtension(name);
 			for (Iterator<String> it = getFileExtensions().iterator(); it.hasNext(); ) {
 				String registeredFileExt = it.next();
 				if (registeredFileExt.equals(fileExtension))

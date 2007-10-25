@@ -37,6 +37,7 @@ import javax.jdo.Query;
 import javax.jdo.listener.StoreCallback;
 
 import org.apache.log4j.Logger;
+import org.nightlabs.util.Util;
 import org.nightlabs.util.Utils;
 
 /**
@@ -154,6 +155,7 @@ public abstract class ScriptRegistryItem
 	/**
 	 * @deprecated Only for JDO! 
 	 */
+	@Deprecated
 	protected ScriptRegistryItem() { }
 
 	/**
@@ -282,7 +284,7 @@ public abstract class ScriptRegistryItem
 	 */
 	public void setParameterSet(ScriptParameterSet parameterSet)
 	{
-		this.parameterSet = (ScriptParameterSet) parameterSet;
+		this.parameterSet = parameterSet;
 	}
 
 	/**
@@ -301,9 +303,9 @@ public abstract class ScriptRegistryItem
 		ScriptRegistryItem other = (ScriptRegistryItem) obj;
 
 		return
-				Utils.equals(this.organisationID,           other.organisationID) &&
-				Utils.equals(this.scriptRegistryItemType,   other.scriptRegistryItemType) &&
-				Utils.equals(this.scriptRegistryItemID,     other.scriptRegistryItemID);
+				Util.equals(this.organisationID,           other.organisationID) &&
+				Util.equals(this.scriptRegistryItemType,   other.scriptRegistryItemType) &&
+				Util.equals(this.scriptRegistryItemID,     other.scriptRegistryItemID);
 	}
 
 	/**
@@ -314,9 +316,9 @@ public abstract class ScriptRegistryItem
 	public int hashCode()
 	{
 		return
-				Utils.hashCode(organisationID) ^
-				Utils.hashCode(scriptRegistryItemType) ^
-				Utils.hashCode(scriptRegistryItemID);
+				Util.hashCode(organisationID) ^
+				Util.hashCode(scriptRegistryItemType) ^
+				Util.hashCode(scriptRegistryItemID);
 	}
 
 	/**

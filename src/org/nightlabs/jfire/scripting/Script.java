@@ -114,6 +114,7 @@ public class Script
 	/**
 	 * @deprecated Only for JDO! 
 	 */
+	@Deprecated
 	protected Script() { }
 
 	public Script(ScriptCategory parent, String organisationID, String scriptRegistryItemType, String scriptRegistryItemID)

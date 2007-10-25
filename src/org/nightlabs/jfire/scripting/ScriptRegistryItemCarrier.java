@@ -35,6 +35,7 @@ import java.util.Set;
 
 import org.nightlabs.ModuleException;
 import org.nightlabs.jfire.scripting.id.ScriptRegistryItemID;
+import org.nightlabs.util.Util;
 import org.nightlabs.util.Utils;
 
 /**
@@ -128,7 +129,7 @@ public class ScriptRegistryItemCarrier implements Serializable {
 	
 	@Override
 	public int hashCode() {
-		return registryItemID != null ? Utils.hashCode(registryItemID.toString()) : 0;
+		return registryItemID != null ? Util.hashCode(registryItemID.toString()) : 0;
 	}
 	
 	@Override
@@ -138,7 +139,7 @@ public class ScriptRegistryItemCarrier implements Serializable {
 		if (!(obj instanceof ScriptRegistryItemCarrier))
 			return false;
 		ScriptRegistryItemCarrier other = (ScriptRegistryItemCarrier) obj;
-		return Utils.equals(this.registryItemID, other.registryItemID);
+		return Util.equals(this.registryItemID, other.registryItemID);
 	}
 
 	public Collection<ScriptRegistryItemID> getChildScriptRegistryItemIDs()

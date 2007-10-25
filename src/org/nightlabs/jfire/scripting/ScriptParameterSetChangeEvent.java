@@ -65,6 +65,7 @@ public class ScriptParameterSetChangeEvent extends JDOObjectChangeEvent {
 	/**
 	 * @deprecated
 	 */
+	@Deprecated
 	public ScriptParameterSetChangeEvent() {
 		super();
 	}

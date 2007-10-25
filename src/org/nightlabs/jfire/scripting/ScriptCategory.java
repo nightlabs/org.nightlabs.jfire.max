@@ -74,6 +74,7 @@ public class ScriptCategory
 	/**
 	 * @deprecated Only for JDO!
 	 */
+	@Deprecated
 	protected ScriptCategory() { }
 
 	/**

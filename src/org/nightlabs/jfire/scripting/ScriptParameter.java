@@ -84,6 +84,7 @@ public class ScriptParameter
 	/**
 	 * @deprecated Only for JDO!
 	 */
+	@Deprecated
 	protected ScriptParameter() {}
 
 	public ScriptParameter(ScriptParameterSet scriptParameterSet, String scriptParameterID)

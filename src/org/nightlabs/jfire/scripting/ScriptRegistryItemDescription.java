@@ -95,6 +95,7 @@ extends I18nText
 	/**
 	 * @deprecated Only for JDO!
 	 */
+	@Deprecated
 	protected ScriptRegistryItemDescription()
 	{
 	}
@@ -111,6 +112,7 @@ extends I18nText
 	/**
 	 * @see org.nightlabs.i18n.I18nText#getI18nMap()
 	 */
+	@Override
 	protected Map getI18nMap()
 	{
 		return texts;
@@ -119,6 +121,7 @@ extends I18nText
 	/**
 	 * @see org.nightlabs.i18n.I18nText#getFallBackValue(java.lang.String)
 	 */
+	@Override
 	protected String getFallBackValue(String languageID)
 	{
 		return ScriptRegistryItem.getPrimaryKey(organisationID, scriptRegistryItemType, scriptRegistryItemID);

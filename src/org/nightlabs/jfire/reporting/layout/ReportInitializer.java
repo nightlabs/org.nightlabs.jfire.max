@@ -25,6 +25,7 @@ import org.nightlabs.jfire.organisation.Organisation;
 import org.nightlabs.jfire.reporting.layout.id.ReportRegistryItemID;
 import org.nightlabs.jfire.scripting.ScriptRegistry;
 import org.nightlabs.jfire.servermanager.JFireServerManager;
+import org.nightlabs.util.Util;
 import org.nightlabs.util.Utils;
 import org.nightlabs.xml.DOMParser;
 import org.nightlabs.xml.NLDOMUtil;
@@ -90,7 +91,7 @@ public class ReportInitializer {
 			category = (ReportCategory) pm.getObjectById(ReportRegistryItemID.create(organisationID, reportRegistryItemType, reportRegistryItemID));			
 		} catch (JDOObjectNotFoundException e) {
 			category = new ReportCategory(parent, organisationID, reportRegistryItemType, reportRegistryItemID, internal);
-			category = (ReportCategory)pm.makePersistent(category);
+			category = pm.makePersistent(category);
 		}
 		return category;
 	}
@@ -259,7 +260,7 @@ public class ReportInitializer {
 
 				Node reportNode = getReportDescriptor(reportFile, catDocument);				
 				
-				String reportID = Utils.getFileNameWithoutExtension(reportFile.getName());
+				String reportID = Util.getFileNameWithoutExtension(reportFile.getName());
 				boolean overwriteOnInit = true;
 				
 				if (reportNode != null) {
@@ -287,7 +288,7 @@ public class ReportInitializer {
 						);
 					} catch (JDOObjectNotFoundException e) {
 						layout = new ReportLayout(category, organisationID, itemType, reportID);
-						layout = (ReportLayout)pm.makePersistent(layout);
+						layout = pm.makePersistent(layout);
 						hadToBeCreated = true;
 					}
 					if (overwriteOnInit || hadToBeCreated) {
@@ -326,7 +327,7 @@ public class ReportInitializer {
 	{	
 		public boolean accept(File dir, String name) 
 		{				
-			String fileExtension = Utils.getFileExtension(name);
+			String fileExtension = Util.getFileExtension(name);
 			return "rptdesign".equals(fileExtension);
 		}	
 	};

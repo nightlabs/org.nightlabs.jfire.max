@@ -88,7 +88,7 @@ public class ResultSetMetaData implements IResultSetMetaData, Serializable {
 	 * column index.
 	 */
 	private Column getColumn(int index) {
-		Column col = (Column)columns.get(new Integer(index));
+		Column col = columns.get(new Integer(index));
 		if (col == null)
 			throw new IllegalArgumentException("No column for index "+index+" registered.");
 		return col;
@@ -99,7 +99,7 @@ public class ResultSetMetaData implements IResultSetMetaData, Serializable {
 	 * @return
 	 */
 	public int getColumnIndex(String columnName) {
-		Integer idx = (Integer)colIdxByNames.get(columnName);
+		Integer idx = colIdxByNames.get(columnName);
 		if (idx == null)
 			throw new IllegalArgumentException("No column with name "+columnName+" is registered.");
 		return idx.intValue();
@@ -142,7 +142,7 @@ public class ResultSetMetaData implements IResultSetMetaData, Serializable {
 	 * Nullable will be {@link java.sql.ResultSetMetaData#columnNullable}.
 	 */
 	public void addColumn(String colName, int dataType) {
-		setColumn(columns.size()+1, colName, dataType, ResultSetMetaData.columnNullable);
+		setColumn(columns.size()+1, colName, dataType, IResultSetMetaData.columnNullable);
 	}
 	
 	/* (non-Javadoc)

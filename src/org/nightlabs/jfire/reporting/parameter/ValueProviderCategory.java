@@ -110,6 +110,7 @@ public class ValueProviderCategory implements Serializable, DetachCallback {
 	/**
 	 * @deprecated Only for JDO
 	 */
+	@Deprecated
 	protected ValueProviderCategory() {
 	}
 

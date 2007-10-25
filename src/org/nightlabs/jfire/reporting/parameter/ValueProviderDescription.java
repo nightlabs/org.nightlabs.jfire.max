@@ -83,6 +83,7 @@ public class ValueProviderDescription extends I18nText implements Serializable {
 	/**
 	 * @deprecated Only for JDO!
 	 */
+	@Deprecated
 	protected ValueProviderDescription() {
 	}
 
@@ -114,6 +115,7 @@ public class ValueProviderDescription extends I18nText implements Serializable {
 	/**
 	 * @see com.nightlabs.i18n.I18nText#getI18nMap()
 	 */
+	@Override
 	protected Map<String, String> getI18nMap() {
 		return names;
 	}
@@ -121,6 +123,7 @@ public class ValueProviderDescription extends I18nText implements Serializable {
 	/**
 	 * @see com.nightlabs.i18n.I18nText#getFallBackValue(java.lang.String)
 	 */
+	@Override
 	protected String getFallBackValue(String languageID) {
 		return organisationID + "/" + valueProviderID;
 	}

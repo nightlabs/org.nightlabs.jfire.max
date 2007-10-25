@@ -43,6 +43,7 @@ public class Birt {
 	/**
 	 * @deprecated do not instantiate this class 
 	 */
+	@Deprecated
 	protected Birt() {}
 
 	public static OutputFormat parseOutputFormat(String s) {

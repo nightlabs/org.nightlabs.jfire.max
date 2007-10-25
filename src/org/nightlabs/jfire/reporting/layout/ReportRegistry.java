@@ -89,6 +89,7 @@ public class ReportRegistry {
 	/**
 	 * @deprecated Only for JDO
 	 */
+	@Deprecated
 	protected ReportRegistry() {
 		super();
 	}
@@ -149,7 +150,7 @@ public class ReportRegistry {
 	public Class getReportRendererClass(OutputFormat format, boolean throwExceptionIfNotFound)
 	throws ClassNotFoundException, IllegalArgumentException
 	{
-		String className = (String) format2ReportRendererClassName.get(format.toString());
+		String className = format2ReportRendererClassName.get(format.toString());
 		if (className == null) {
 			if (throwExceptionIfNotFound)
 				throw new IllegalArgumentException("The format \"" + format + "\" is unknown: No ReportLayoutRenderer class bound!");
@@ -202,7 +203,7 @@ public class ReportRegistry {
 		}
 		else {
 			registry = new ReportRegistry(SINGLETON_REGISTRY_ID);
-			registry = (ReportRegistry)pm.makePersistent(registry);
+			registry = pm.makePersistent(registry);
 		}
 		return registry;
 	}

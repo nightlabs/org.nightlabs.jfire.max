@@ -120,6 +120,7 @@ implements SessionBean
 	/**
 	 * @see com.nightlabs.jfire.base.BaseSessionBeanImpl#setSessionContext(javax.ejb.SessionContext)
 	 */
+	@Override
 	public void setSessionContext(SessionContext sessionContext)
 	throws EJBException, RemoteException
 	{
@@ -128,6 +129,7 @@ implements SessionBean
 	/**
 	 * @see com.nightlabs.jfire.base.BaseSessionBeanImpl#unsetSessionContext()
 	 */
+	@Override
 	public void unsetSessionContext() {
 		super.unsetSessionContext();
 	}
@@ -670,7 +672,7 @@ implements SessionBean
 			pm.getFetchPlan().setMaxFetchDepth(maxFetchDepth);
 			if (fetchGroups != null)
 				pm.getFetchPlan().setGroups(fetchGroups);
-			ReportRegistryItem result = (ReportRegistryItem) pm.detachCopy(reportRegistryItem);
+			ReportRegistryItem result = pm.detachCopy(reportRegistryItem);
 			return result;
 		} finally {
 			pm.close();
@@ -704,7 +706,7 @@ implements SessionBean
 			List<ReportRegistryItem> result = new ArrayList<ReportRegistryItem>();
 			for (ReportRegistryItemID itemID : reportRegistryItemIDs) {
 				ReportRegistryItem item = (ReportRegistryItem)pm.getObjectById(itemID);
-				result.add((ReportRegistryItem)pm.detachCopy(item));
+				result.add(pm.detachCopy(item));
 			}
 
 			return result;
@@ -764,7 +766,7 @@ implements SessionBean
 			pm.getFetchPlan().setMaxFetchDepth(maxFetchDepth);
 			if (fetchGroups != null)
 				pm.getFetchPlan().setGroups(fetchGroups);
-			Collection result = (Collection) pm.detachCopyAll(topLevelItems);
+			Collection result = pm.detachCopyAll(topLevelItems);
 			return result;
 		} finally {
 			pm.close();
@@ -829,7 +831,7 @@ implements SessionBean
 		PersistenceManager pm;
 		pm = getPersistenceManager();
 		try {
-			return (ReportRegistryItem)NLJDOHelper.storeJDO(pm, reportRegistryItem, get, fetchGroups, maxFetchDepth);
+			return NLJDOHelper.storeJDO(pm, reportRegistryItem, get, fetchGroups, maxFetchDepth);
 		} finally {
 			pm.close();
 		}
@@ -993,7 +995,7 @@ implements SessionBean
 			if (get) {
 				Collection<ReportLayoutLocalisationData> result = new ArrayList<ReportLayoutLocalisationData>(bundle.size());
 				for (ReportLayoutLocalisationData data : bundle) {
-					result.add((ReportLayoutLocalisationData) NLJDOHelper.storeJDO(pm, data, get, fetchGroups, maxFetchDepth));
+					result.add(NLJDOHelper.storeJDO(pm, data, get, fetchGroups, maxFetchDepth));
 				}
 				return result;
 			}

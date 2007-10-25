@@ -74,6 +74,7 @@ implements SessionBean
 	/**
 	 * @see com.nightlabs.jfire.base.BaseSessionBeanImpl#setSessionContext(javax.ejb.SessionContext)
 	 */
+	@Override
 	public void setSessionContext(SessionContext sessionContext)
 	throws EJBException, RemoteException
 	{
@@ -82,6 +83,7 @@ implements SessionBean
 	/**
 	 * @see com.nightlabs.jfire.base.BaseSessionBeanImpl#unsetSessionContext()
 	 */
+	@Override
 	public void unsetSessionContext() {
 		super.unsetSessionContext();
 	}
@@ -332,7 +334,7 @@ implements SessionBean
 		if (setup == null)
 			throw new IllegalArgumentException("ReportParameterAcquisitionSetup must not be null!");
 
-		return (ReportParameterAcquisitionSetup) NLJDOHelper.storeJDO(getPersistenceManager(), 
+		return NLJDOHelper.storeJDO(getPersistenceManager(), 
 				setup, get, fetchGroups, maxFetchDepth);
 	}
 }

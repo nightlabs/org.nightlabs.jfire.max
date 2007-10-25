@@ -81,6 +81,7 @@ public class ReportRegistryItemDescription extends I18nText {
 	/**
 	 * @deprecated Only for JDO!
 	 */
+	@Deprecated
 	protected ReportRegistryItemDescription() {
 	}
 
@@ -114,6 +115,7 @@ public class ReportRegistryItemDescription extends I18nText {
 	/**
 	 * @see com.nightlabs.i18n.I18nText#getI18nMap()
 	 */
+	@Override
 	protected Map<String, String> getI18nMap() {
 		return texts;
 	}
@@ -121,6 +123,7 @@ public class ReportRegistryItemDescription extends I18nText {
 	/**
 	 * @see com.nightlabs.i18n.I18nText#getFallBackValue(java.lang.String)
 	 */
+	@Override
 	protected String getFallBackValue(String languageID) {
 		return reportRegistryItem.getReportRegistryItemType();
 	}

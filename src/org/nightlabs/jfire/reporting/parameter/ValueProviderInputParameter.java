@@ -61,6 +61,7 @@ public class ValueProviderInputParameter implements Serializable {
 	/**
 	 * @deprecated Only for JDO
 	 */
+	@Deprecated
 	protected ValueProviderInputParameter() {}
 	
 	public ValueProviderInputParameter(ValueProvider valueProvider, String parameterID, String parameterType) {

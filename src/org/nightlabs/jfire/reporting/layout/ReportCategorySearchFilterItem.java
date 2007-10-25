@@ -58,6 +58,7 @@ public class ReportCategorySearchFilterItem extends SearchFilterItem {
 	/* (non-Javadoc)
 	 * @see com.nightlabs.jdo.search.SearchFilterItem#getSearchField()
 	 */
+	@Override
 	public Object getSearchField() {
 		// TODO Auto-generated method stub
 		return null;
@@ -66,6 +67,7 @@ public class ReportCategorySearchFilterItem extends SearchFilterItem {
 	/* (non-Javadoc)
 	 * @see com.nightlabs.jdo.search.SearchFilterItem#isConstraint()
 	 */
+	@Override
 	public boolean isConstraint() {
 		return (nameFilter != null) || (internalFilter != INTERNAL_FILTER_BOTH);
 	}
@@ -73,6 +75,7 @@ public class ReportCategorySearchFilterItem extends SearchFilterItem {
 	/* (non-Javadoc)
 	 * @see com.nightlabs.jdo.search.SearchFilterItem#getItemTargetClass()
 	 */
+	@Override
 	public Class getItemTargetClass() {
 		return null;
 	}
@@ -80,6 +83,7 @@ public class ReportCategorySearchFilterItem extends SearchFilterItem {
 	/* (non-Javadoc)
 	 * @see com.nightlabs.jdo.search.SearchFilterItem#appendSubQuery(int, int, java.util.Set, java.lang.StringBuffer, java.lang.StringBuffer, java.lang.StringBuffer, java.util.Map)
 	 */
+	@Override
 	public void appendSubQuery(int itemIndex, int itemSubIndex, Set imports,
 			StringBuffer vars, StringBuffer filter, StringBuffer params,
 			Map paramMap) {

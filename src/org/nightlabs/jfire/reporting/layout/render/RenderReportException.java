@@ -5,7 +5,6 @@ package org.nightlabs.jfire.reporting.layout.render;
 
 import java.io.Serializable;
 
-import org.nightlabs.util.Utils;
 import org.nightlabs.util.reflect.ReflectUtil;
 
 /**

@@ -21,6 +21,7 @@ import org.nightlabs.jfire.reporting.layout.ReportLayout;
 import org.nightlabs.jfire.reporting.layout.ReportLayoutLocalisationData;
 import org.nightlabs.jfire.reporting.layout.id.ReportLayoutLocalisationDataID;
 import org.nightlabs.jfire.reporting.layout.render.ReportLayoutRendererUtil;
+import org.nightlabs.util.Util;
 import org.nightlabs.util.Utils;
 
 /**
@@ -54,6 +55,7 @@ public class ServerResourceLocator extends DefaultResourceLocator implements IRe
 	 * {@inheritDoc}
 	 * @see org.eclipse.birt.report.model.api.IResourceLocator#findResource(org.eclipse.birt.report.model.api.ModuleHandle, java.lang.String, int)
 	 */
+	@Override
 	public URL findResource(ModuleHandle handle, String fileName, int type) {
 		String locale = ReportLayoutLocalisationData.extractLocale(fileName);
 		if (locale != null) {
@@ -82,7 +84,7 @@ public class ServerResourceLocator extends DefaultResourceLocator implements IRe
 					try {
 						FileOutputStream out = new FileOutputStream(outputFile);
 						try {
-							Utils.transferStreamData(in, out);
+							Util.transferStreamData(in, out);
 						} finally {
 							out.close();
 						}

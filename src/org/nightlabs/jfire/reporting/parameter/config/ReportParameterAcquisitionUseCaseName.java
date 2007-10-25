@@ -82,6 +82,7 @@ public class ReportParameterAcquisitionUseCaseName extends I18nText implements S
 	/**
 	 * @deprecated Only for JDO!
 	 */
+	@Deprecated
 	protected ReportParameterAcquisitionUseCaseName() {
 	}
 
@@ -113,6 +114,7 @@ public class ReportParameterAcquisitionUseCaseName extends I18nText implements S
 	/**
 	 * @see com.nightlabs.i18n.I18nText#getI18nMap()
 	 */
+	@Override
 	protected Map<String, String> getI18nMap() {
 		return names;
 	}
@@ -120,6 +122,7 @@ public class ReportParameterAcquisitionUseCaseName extends I18nText implements S
 	/**
 	 * @see com.nightlabs.i18n.I18nText#getFallBackValue(java.lang.String)
 	 */
+	@Override
 	protected String getFallBackValue(String languageID) {
 		return organisationID + "/" + String.valueOf(reportParameterAcquisitionSetupID) + "/" + String.valueOf(reportParameterAcquisitionUseCaseID);
 	}

@@ -101,7 +101,7 @@ implements IJDOQLQueryMetaData
 			}
 			int i = 1;
 			for (Iterator iter = row.iterator(); iter.hasNext();) {
-				Object col = (Object) iter.next();
+				Object col = iter.next();
 				String colName = "No colname";
 				try {
 					if (metaData != null && metaData.getColumnCount() >= i)

@@ -42,7 +42,7 @@ public class ReportParameterUtil {
 		} catch (JDOObjectNotFoundException e) {
 			logger.debug("Creating ValueProviderCategory "+categoryID);
 			category = new ValueProviderCategory(parent, categoryID.organisationID, categoryID.valueProviderCategoryID, true);
-			category = (ValueProviderCategory) pm.makePersistent(category);
+			category = pm.makePersistent(category);
 			for (NameEntry entry : names) {
 				category.getName().setText(entry.language, entry.name);
 			}
@@ -66,7 +66,7 @@ public class ReportParameterUtil {
 		} catch (JDOObjectNotFoundException e) {
 			logger.debug("Creating ValueProvider "+valueProviderID);
 			valueProvider = new ValueProvider(category, valueProviderID.valueProviderID, outputType);
-			valueProvider = (ValueProvider) pm.makePersistent(valueProvider);
+			valueProvider = pm.makePersistent(valueProvider);
 			for (NameEntry entry : names) {
 				valueProvider.getName().setText(entry.language, entry.name);
 			}

@@ -47,6 +47,7 @@ public class ReportCategorySearchFilter extends SearchFilter {
 	/* (non-Javadoc)
 	 * @see com.nightlabs.jdo.search.SearchFilter#getExtentClass()
 	 */
+	@Override
 	protected Class getExtentClass() {
 		return null;
 	}

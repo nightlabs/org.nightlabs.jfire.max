@@ -38,6 +38,7 @@ import java.util.zip.InflaterInputStream;
 
 import org.apache.log4j.Logger;
 import org.nightlabs.io.DataBuffer;
+import org.nightlabs.util.Util;
 import org.nightlabs.util.Utils;
 
 /**
@@ -78,6 +79,7 @@ public class ReportLayout extends ReportRegistryItem {
 	/**
 	 * @deprecated Only for JDO
 	 */
+	@Deprecated
 	protected ReportLayout() {
 		super();
 	}
@@ -161,7 +163,7 @@ public class ReportLayout extends ReportRegistryItem {
 			DataBuffer db = new DataBuffer((long) (length * 0.6));
 			OutputStream out = new DeflaterOutputStream(db.createOutputStream());
 			try {
-				Utils.transferStreamData(in, out);
+				Util.transferStreamData(in, out);
 			} finally {
 				out.close();
 			}

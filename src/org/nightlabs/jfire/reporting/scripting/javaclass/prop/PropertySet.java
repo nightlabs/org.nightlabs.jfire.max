@@ -144,7 +144,7 @@ extends AbstractJFSScriptExecutorDelegate
 		logger.debug("Have property");
 		
 		IStruct struct = StructLocal.getStructLocal(property.getStructLocalLinkClass(), property.getStructLocalScope(), pm);
-		property = (org.nightlabs.jfire.prop.PropertySet) pm.detachCopy(property);
+		property = pm.detachCopy(property);
 		pm.getFetchPlan().setGroups(oldGroups);
 		pm.getFetchPlan().setMaxFetchDepth(oldFetchDepth);
 		logger.debug("Property detached");
@@ -207,6 +207,7 @@ extends AbstractJFSScriptExecutorDelegate
 	/* (non-Javadoc)
 	 * @see org.nightlabs.jfire.scripting.ScriptExecutorJavaClassDelegate#getScriptExecutorJavaClass()
 	 */
+	@Override
 	public ScriptExecutorJavaClass getScriptExecutorJavaClass() {
 		return scriptExecutorJavaClass;
 	}
@@ -214,6 +215,7 @@ extends AbstractJFSScriptExecutorDelegate
 	/* (non-Javadoc)
 	 * @see org.nightlabs.jfire.scripting.ScriptExecutorJavaClassDelegate#setScriptExecutorJavaClass(org.nightlabs.jfire.scripting.ScriptExecutorJavaClass)
 	 */
+	@Override
 	public void setScriptExecutorJavaClass(ScriptExecutorJavaClass scriptExecutorJavaClass) {
 		this.scriptExecutorJavaClass = scriptExecutorJavaClass;
 	}

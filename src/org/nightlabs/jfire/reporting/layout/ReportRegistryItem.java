@@ -35,6 +35,7 @@ import javax.jdo.Query;
 import javax.jdo.listener.DetachCallback;
 
 import org.nightlabs.jfire.reporting.layout.id.ReportRegistryItemID;
+import org.nightlabs.util.Util;
 import org.nightlabs.util.Utils;
 
 /**
@@ -362,9 +363,9 @@ public abstract class ReportRegistryItem implements Serializable, DetachCallback
 	@Override
 	public int hashCode() {
 		return 
-			Utils.hashCode(organisationID) ^
-			Utils.hashCode(reportRegistryItemType) ^
-			Utils.hashCode(reportRegistryItemID);
+			Util.hashCode(organisationID) ^
+			Util.hashCode(reportRegistryItemType) ^
+			Util.hashCode(reportRegistryItemID);
 	}
 
 	/**
@@ -381,9 +382,9 @@ public abstract class ReportRegistryItem implements Serializable, DetachCallback
 			return false;
 		ReportRegistryItem other = (ReportRegistryItem) obj;
 		return
-			Utils.equals(this.organisationID, other.organisationID) &&
-			Utils.equals(this.reportRegistryItemType, other.reportRegistryItemType) &&
-			Utils.equals(this.reportRegistryItemID, other.reportRegistryItemID);
+			Util.equals(this.organisationID, other.organisationID) &&
+			Util.equals(this.reportRegistryItemType, other.reportRegistryItemType) &&
+			Util.equals(this.reportRegistryItemID, other.reportRegistryItemID);
 	}
 
 	/**

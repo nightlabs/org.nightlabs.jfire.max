@@ -40,6 +40,7 @@ import org.eclipse.birt.report.engine.api.EngineConfig;
 import org.eclipse.birt.report.engine.api.HTMLCompleteImageHandler;
 import org.eclipse.birt.report.engine.api.HTMLEmitterConfig;
 import org.eclipse.birt.report.engine.api.HTMLRenderOption;
+import org.eclipse.birt.report.engine.api.IRenderOption;
 import org.eclipse.birt.report.engine.api.ReportEngine;
 import org.nightlabs.jfire.reporting.layout.ReportLayout;
 import org.nightlabs.jfire.reporting.layout.render.RenderManager;
@@ -120,7 +121,7 @@ public class ReportingManagerFactory implements Serializable {
 				HTMLCompleteImageHandler imageHandler = new HTMLCompleteImageHandler( );
 				hc.setImageHandler( imageHandler );
 //				Associate the configuration with the HTML output format.
-				config.setEmitterConfiguration( HTMLRenderOption.OUTPUT_FORMAT_HTML, hc );			
+				config.setEmitterConfiguration( IRenderOption.OUTPUT_FORMAT_HTML, hc );			
 				config.setLogConfig(new File(JFireReportingEAR.getEARDir(), "log").getAbsolutePath(), Level.ALL);
 				reportEngine = new ReportEngine(config);
 				reportEngine.getConfig().setResourceLocator(new ServerResourceLocator());
@@ -183,7 +184,7 @@ public class ReportingManagerFactory implements Serializable {
 		HTMLCompleteImageHandler imageHandler = new HTMLCompleteImageHandler( );
 		hc.setImageHandler( imageHandler );
 //		Associate the configuration with the HTML output format.
-		config.setEmitterConfiguration( HTMLRenderOption.OUTPUT_FORMAT_HTML, hc );			
+		config.setEmitterConfiguration( IRenderOption.OUTPUT_FORMAT_HTML, hc );			
 		ReportEngine reportEngine = new ReportEngine(config);
 		reportEngine.getConfig().setResourceLocator(new ServerResourceLocator());
 		System.out.println(Util.getTimeDiffString(time));

@@ -154,14 +154,14 @@ public class DataType {
 	}
 	
 	public static Class[] dataTypeToClasses(int dataType) {		
-		Class[] types = (Class[])types2Classes.get(new Integer(dataType));
+		Class[] types = types2Classes.get(new Integer(dataType));
 		if (types == null)
 			return new Class[] {String.class};
 		return types;
 	}
 	
 	public static int classToDataType(Class dataType) {
-		Integer type = (Integer)classes2Types.get(dataType);
+		Integer type = classes2Types.get(dataType);
 		if (type != null)
 			return type.intValue();
 //		return UNKNOWN;
@@ -169,7 +169,7 @@ public class DataType {
 	}
 	
 	public static String getTypeName(int dataType) {
-		String name = (String)types2Names.get(new Integer(dataType));
+		String name = types2Names.get(new Integer(dataType));
 		if (name != null)
 			return name;
 		return N_UNKNOWN;

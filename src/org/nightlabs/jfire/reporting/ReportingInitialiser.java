@@ -43,6 +43,7 @@ import org.nightlabs.jfire.reporting.parameter.config.id.ReportParameterAcquisit
 import org.nightlabs.jfire.reporting.parameter.id.ValueProviderID;
 import org.nightlabs.jfire.scripting.ScriptRegistry;
 import org.nightlabs.jfire.servermanager.JFireServerManager;
+import org.nightlabs.util.Util;
 import org.nightlabs.util.Utils;
 import org.nightlabs.xml.DOMParser;
 import org.nightlabs.xml.NLDOMUtil;
@@ -388,7 +389,7 @@ public class ReportingInitialiser {
 	{	
 		public boolean accept(File dir, String name) 
 		{				
-			String fileExtension = Utils.getFileExtension(name);
+			String fileExtension = Util.getFileExtension(name);
 			return "rptdesign".equals(fileExtension);
 		}	
 	};

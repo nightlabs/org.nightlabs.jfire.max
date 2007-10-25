@@ -23,6 +23,7 @@ import javax.jdo.listener.StoreCallback;
 
 import org.nightlabs.io.DataBuffer;
 import org.nightlabs.jfire.reporting.layout.id.ReportRegistryItemID;
+import org.nightlabs.util.Util;
 import org.nightlabs.util.Utils;
 
 /**
@@ -96,6 +97,7 @@ public class ReportLayoutLocalisationData implements StoreCallback, Serializable
 	/**
 	 * @deprecated Only for JDO
 	 */
+	@Deprecated
 	protected ReportLayoutLocalisationData() {
 	}
 
@@ -171,7 +173,7 @@ public class ReportLayoutLocalisationData implements StoreCallback, Serializable
 			try {
 				FileInputStream in = new FileInputStream(f);
 				try {
-					Utils.transferStreamData(in, out);
+					Util.transferStreamData(in, out);
 				} finally {
 					in.close();
 				}

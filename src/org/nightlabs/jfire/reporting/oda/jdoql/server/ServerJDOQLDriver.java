@@ -38,6 +38,7 @@ public class ServerJDOQLDriver extends AbstractJDOQLDriver {
 	/* (non-Javadoc)
 	 * @see org.nightlabs.jfire.reporting.oda.jdoql.AbstractJDOQLDriver#createProxyFactory()
 	 */
+	@Override
 	protected IJDOQueryProxyFactory createProxyFactory() {
 		return new ServerJDOQLProxyFactory();
 	}

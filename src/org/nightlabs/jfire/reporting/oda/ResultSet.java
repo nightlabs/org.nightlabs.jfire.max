@@ -434,7 +434,7 @@ public abstract class ResultSet implements IResultSet, Serializable {
 		IResultSetMetaData metaData = null;
 		int dataType = 0;
 		try {
-			metaData = (IResultSetMetaData) getMetaData();
+			metaData = getMetaData();
 			dataType = metaData.getColumnType(index);
 		} catch (OdaException e) {
 			throw new IllegalStateException("Exception in checkCol while getting metaData: "+e.getClass().getName()+", message: "+e.getMessage());

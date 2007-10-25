@@ -28,20 +28,11 @@ package org.nightlabs.jfire.reporting.config;
 
 import java.util.Collection;
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.Map;
 
-import javax.jdo.JDOHelper;
-import javax.jdo.PersistenceManager;
-
 import org.apache.log4j.Logger;
-import org.nightlabs.ModuleException;
-import org.nightlabs.jfire.config.Config;
 import org.nightlabs.jfire.config.ConfigModule;
-import org.nightlabs.jfire.reporting.layout.ReportLayout;
-import org.nightlabs.jfire.reporting.layout.ReportRegistryItem;
 import org.nightlabs.jfire.reporting.layout.id.ReportRegistryItemID;
-import org.nightlabs.jfire.security.User;
 
 /**
  * @author Alexander Bieber <alex[AT]nightlabs[DOT]de>

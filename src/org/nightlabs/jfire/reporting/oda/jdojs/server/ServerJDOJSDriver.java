@@ -38,6 +38,7 @@ public class ServerJDOJSDriver extends AbstractJDOJSDriver {
 	/* (non-Javadoc)
 	 * @see org.nightlabs.jfire.reporting.oda.jdojs.AbstractJDOJSDriver#createProxyFactory()
 	 */
+	@Override
 	protected IJDOJSProxyFactory createProxyFactory() {
 		return new ServerJDOJSProxyFactory();
 	}

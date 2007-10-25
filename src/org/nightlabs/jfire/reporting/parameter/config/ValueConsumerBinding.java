@@ -71,6 +71,7 @@ public class ValueConsumerBinding implements Serializable {
 	/**
 	 * @deprecated Only for JDO
 	 */
+	@Deprecated
 	protected ValueConsumerBinding() {}
 
 	/**

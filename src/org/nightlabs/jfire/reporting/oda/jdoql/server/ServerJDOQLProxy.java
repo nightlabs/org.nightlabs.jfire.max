@@ -62,6 +62,7 @@ public class ServerJDOQLProxy extends AbstractJDOQLProxy {
 //		this.organisationID = organisationID;
 //	}
 
+	@Override
 	public void prepare(String queryText) throws OdaException {
 		super.prepare(queryText);
 	}
@@ -122,7 +123,7 @@ public class ServerJDOQLProxy extends AbstractJDOQLProxy {
 //				collection = pm.detachCopyAll(collection);
 				Collection tmpCollection = new LinkedList();
 				for (Iterator iter = collection.iterator(); iter.hasNext();) {
-					Object element = (Object) iter.next();
+					Object element = iter.next();
 					if (element != null && (element instanceof PersistenceCapable))
 						tmpCollection.add(pm.detachCopy(element));
 					else {

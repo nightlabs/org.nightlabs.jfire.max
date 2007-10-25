@@ -155,7 +155,7 @@ extends DataCreator
 		// I got an SQL error because this line was commented out! Marco.
 		// Why not explode attached, when intending to set all properties ;-)
 		if (JDOHelper.isPersistent(props))
-			props = (PropertySet) pm.detachCopy(props);
+			props = pm.detachCopy(props);
 		
 		props.inflate(struct);
 		I18nTextDataField shortDesc;

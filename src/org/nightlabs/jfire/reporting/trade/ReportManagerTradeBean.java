@@ -76,6 +76,7 @@ implements SessionBean
 	/**
 	 * @see com.nightlabs.jfire.base.BaseSessionBeanImpl#setSessionContext(javax.ejb.SessionContext)
 	 */
+	@Override
 	public void setSessionContext(SessionContext sessionContext)
 	throws EJBException, RemoteException
 	{
@@ -84,6 +85,7 @@ implements SessionBean
 	/**
 	 * @see com.nightlabs.jfire.base.BaseSessionBeanImpl#unsetSessionContext()
 	 */
+	@Override
 	public void unsetSessionContext() {
 		super.unsetSessionContext();
 	}
@@ -178,7 +180,7 @@ implements SessionBean
 				initialiser = (ReportLayoutCfModInitialiserArticleContainerLayouts) pm.getObjectById(initialiserID);
 			} catch (JDOObjectNotFoundException e) {
 				initialiser = new ReportLayoutCfModInitialiserArticleContainerLayouts(getOrganisationID());
-				initialiser = (ReportLayoutCfModInitialiserArticleContainerLayouts) pm.makePersistent(initialiser);
+				initialiser = pm.makePersistent(initialiser);
 			}
 		} finally {
 			pm.close();

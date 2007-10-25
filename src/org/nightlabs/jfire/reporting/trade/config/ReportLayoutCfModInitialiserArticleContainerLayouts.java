@@ -74,7 +74,7 @@ public class ReportLayoutCfModInitialiserArticleContainerLayouts extends ConfigM
 	private static void setUserReportLayoutAvailEntry(PersistenceManager pm, ReportLayoutConfigModule cfMod, String reportRegistryItemType) {
 		logger.debug("Setting ReportLayoutAvailEntry for type "+reportRegistryItemType);
 		ReportLayoutAvailEntry entry = cfMod.getAvailEntry(reportRegistryItemType);
-		Collection items = ReportLayout.getReportRegistryItemByType(pm, cfMod.getOrganisationID(), reportRegistryItemType);
+		Collection items = ReportRegistryItem.getReportRegistryItemByType(pm, cfMod.getOrganisationID(), reportRegistryItemType);
 		logger.debug("Search for ReportLayouts produced "+items.size()+" items");
 		for (Iterator iter = items.iterator(); iter.hasNext();) {
 			ReportRegistryItem item = (ReportRegistryItem) iter.next();

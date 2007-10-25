@@ -300,25 +300,25 @@ extends Initialiser
 		
 		
 		UserGroup userGroup = new UserGroup(organisationID, User.USERID_PREFIX_TYPE_USERGROUP + "SalesAgents");
-//		userGroup.setName("Sales Agents"); // TODO do we really want to omit this?
+		userGroup.setName("Sales Agents");
 		userGroup.setDescription("This group is blablabla.");
 		new UserLocal(userGroup);
 		userGroup = (UserGroup) pm.makePersistent(userGroup);
 
 		userGroup = new UserGroup(organisationID, User.USERID_PREFIX_TYPE_USERGROUP + "SalesManagers");
-//		userGroup.setName("Sales Managers");
+		userGroup.setName("Sales Managers");
 		userGroup.setDescription("This group is blablabla.");
 		new UserLocal(userGroup);
 		userGroup = (UserGroup) pm.makePersistent(userGroup);
 
 		userGroup = new UserGroup(organisationID, User.USERID_PREFIX_TYPE_USERGROUP + "Statistics");
-//		userGroup.setName("Statistics");
+		userGroup.setName("Statistics");
 		userGroup.setDescription("This group consists out of the statistics guys.");
 		new UserLocal(userGroup);
 		userGroup = (UserGroup) pm.makePersistent(userGroup);
 
 		userGroup = new UserGroup(organisationID, User.USERID_PREFIX_TYPE_USERGROUP + "TheOthers");
-//		userGroup.setName("The Others");
+		userGroup.setName("The Others");
 		userGroup.setDescription("This group is trallali trallala.");
 		new UserLocal(userGroup);
 		userGroup = (UserGroup) pm.makePersistent(userGroup);
@@ -356,7 +356,7 @@ extends Initialiser
 		User user02 = dataCreator.createUser("marco", "test", person);				
 
 		userGroup = new UserGroup(organisationID, User.USERID_PREFIX_TYPE_USERGROUP + "Administrators");
-//		userGroup.setName("Administrators"); // TODO do we really want to omit this?
+		userGroup.setName("Administrators");
 		userGroup.setDescription("This group has all access rights within its organisation.");
 		new UserLocal(userGroup);
 		userGroup = (UserGroup) pm.makePersistent(userGroup);

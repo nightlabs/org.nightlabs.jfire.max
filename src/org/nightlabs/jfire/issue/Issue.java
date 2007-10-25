@@ -101,6 +101,22 @@ implements Serializable
 //	private Collection attachedDocuments = new HashSet();
 	
 	/**
+	 * @jdo.field persistence-modifier="persistent"
+	 */
+	private IssuePriority priority;
+	
+	/**
+	 * @jdo.field persistence-modifier="persistent"
+	 */
+	private IssueSeverityType severityType;
+	
+	/**
+	 * @jdo.field persistence-modifier="persistent"
+	 */
+	private IssueStatus issueStatus;
+	
+	
+	/**
 	 * @jdo.field persistence-modifier="persistent" dependent="true" mapped-by="issue"
 	 */
 	private IssueDescription description;
@@ -108,7 +124,7 @@ implements Serializable
 	/**
 	 * @jdo.field persistence-modifier="persistent" load-fetch-group="all"
 	 */
-	private User user; 
+	private User creator; 
 	
 	/**
 	 * @jdo.field persistence-modifier="persistent"
@@ -126,11 +142,11 @@ implements Serializable
 	 */
 	protected Issue() { }
 
-	public Issue(User creator, ObjectID objectID)
+	public Issue(IssuePriority priority, IssueSeverityType severityType, IssueStatus issueStatus, User creator, ObjectID objectID)
 	{
 		if (creator == null)
 			throw new NullPointerException("creator");
-		this.user = creator;
+		this.creator = creator;
 		this.createTimestamp = new Date();
 //		this.documents = new <String>();
 	}
@@ -216,14 +232,14 @@ implements Serializable
 	 * @return Returns the user.
 	 */
 	public User getUser() {
-		return user;
+		return creator;
 	}
 
 	/**
 	 * @param user The user to set.
 	 */
 	public void setUser(User user) {
-		this.user = user;
+		this.creator = user;
 	}
 
 	/**

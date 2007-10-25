@@ -121,6 +121,7 @@ public class District implements Serializable // , StoreCallback
 	/**
 	 * @deprecated Only for JDO!
 	 */
+	@Deprecated
 	protected District() { }
 
 	public District(String organisationID, String districtID, City city)

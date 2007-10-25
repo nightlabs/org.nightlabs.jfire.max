@@ -109,6 +109,7 @@ public class CityName extends I18nText
 	/**
 	 * @see org.nightlabs.i18n.I18nText#getI18nMap()
 	 */
+	@Override
 	protected Map<String, String> getI18nMap()
 	{
 		return names;
@@ -122,6 +123,7 @@ public class CityName extends I18nText
 	/**
 	 * @see org.nightlabs.i18n.I18nText#getFallBackValue(java.lang.String)
 	 */
+	@Override
 	protected String getFallBackValue(String languageID)
 	{
 		return City.getPrimaryKey(countryID, organisationID, cityID);

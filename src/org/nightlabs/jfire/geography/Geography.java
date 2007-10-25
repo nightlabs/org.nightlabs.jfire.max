@@ -268,7 +268,7 @@ public abstract class Geography
 	{
 		needCountries();
 
-		Country res = (Country) countries.get(countryID.countryID);
+		Country res = countries.get(countryID.countryID);
 
 		if (res == null && throwExceptionIfNotFound)
 			throw new IllegalArgumentException("No Country registered with countryID=\""+countryID+"\"!!!");
@@ -280,7 +280,7 @@ public abstract class Geography
 	{
 		needRegions(regionID.countryID);
 
-		Region res = (Region) regions.get(Region.getPrimaryKey(regionID));
+		Region res = regions.get(Region.getPrimaryKey(regionID));
 
 		if (res == null && throwExceptionIfNotFound)
 			throw new IllegalArgumentException("No Region registered with regionID=\""+regionID+"\"!!!");
@@ -292,7 +292,7 @@ public abstract class Geography
 	{
 		needCities(cityID.countryID);
 
-		City res = (City) cities.get(City.getPrimaryKey(cityID));
+		City res = cities.get(City.getPrimaryKey(cityID));
 
 		if (res == null && throwExceptionIfNotFound)
 			throw new IllegalArgumentException("No City registered with cityID=\""+cityID+"\"!!!");
@@ -344,7 +344,7 @@ public abstract class Geography
 	{
 		needLocations(locationID.countryID);
 
-		Location res = (Location) locations.get(Location.getPrimaryKey(locationID));
+		Location res = locations.get(Location.getPrimaryKey(locationID));
 
 		if (res == null && throwExceptionIfNotFound)
 			throw new IllegalArgumentException("No Location registered with locationID=\""+locationID+"\"!!!");
@@ -519,7 +519,7 @@ public abstract class Geography
 			countriesByCountryName = new FulltextMap<String, List<Country>>(FULLTEXT_MAP_FEATURES);
 			countriesByCountryNameByLanguageID.put(languageID, countriesByCountryName);
 			for (Iterator<Country> it = getCountries().iterator(); it.hasNext(); ) {
-				Country country = (Country) it.next();
+				Country country = it.next();
 				String countryName = country.getName().getText(languageID);
 				List<Country> countryList = countriesByCountryName.get(countryName);
 				if (countryList == null) {
@@ -569,7 +569,7 @@ public abstract class Geography
 			City city = getCity(cityID, false);
 			if (city != null) {
 				for (Iterator<Location> it = city.getLocations().iterator(); it.hasNext(); ) {
-					Location location = (Location) it.next();
+					Location location = it.next();
 					String locationName = location.getName().getText(languageID);
 					List<Location> locationList = locationsByLocationName.get(locationName);
 					if (locationList == null) {
@@ -620,7 +620,7 @@ public abstract class Geography
 			Country country = getCountry(countryID, false);
 			if (country != null) {
 				for (Iterator<Region> it = country.getRegions().iterator(); it.hasNext(); ) {
-					Region region = (Region) it.next();
+					Region region = it.next();
 					String regionName = region.getName().getText(languageID);
 					List<Region> regionList = regionsByRegionName.get(regionName);
 					if (regionList == null) {
@@ -804,7 +804,7 @@ public abstract class Geography
 		for (Iterator<List<District>> itL = zips2districts.find(zipPart, findMode).iterator(); itL.hasNext(); ) {
 			List<District> districts = itL.next();
 			for (Iterator<District> itD = districts.iterator(); itD.hasNext(); ) {
-				District district = (District) itD.next();
+				District district = itD.next();
 				cities.put(district.getCity().getPrimaryKey(), district.getCity());
 			}
 		}

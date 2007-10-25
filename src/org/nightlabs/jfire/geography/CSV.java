@@ -90,7 +90,7 @@ implements Serializable
 
 			csv = new CSV(organisationID, csvType, countryID);
 			csv.setData(data);
-			csv = (CSV) pm.makePersistent(csv);
+			csv = pm.makePersistent(csv);
 		}
 
 		// TODO remove this DEBUG stuff
@@ -136,6 +136,7 @@ implements Serializable
 	/**
 	 * @deprecated Only for JDO!
 	 */
+	@Deprecated
 	protected CSV()
 	{
 	}

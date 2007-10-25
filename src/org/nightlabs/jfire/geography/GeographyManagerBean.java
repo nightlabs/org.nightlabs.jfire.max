@@ -71,6 +71,7 @@ implements SessionBean
 	/**
 	 * @see org.nightlabs.jfire.base.BaseSessionBeanImpl#setSessionContext(javax.ejb.SessionContext)
 	 */
+	@Override
 	public void setSessionContext(SessionContext sessionContext)
 	throws EJBException, RemoteException
 	{
@@ -80,6 +81,7 @@ implements SessionBean
 	/**
 	 * @see org.nightlabs.jfire.base.BaseSessionBeanImpl#unsetSessionContext()
 	 */
+	@Override
 	public void unsetSessionContext() {
 		super.unsetSessionContext();
 	}
@@ -189,7 +191,7 @@ implements SessionBean
 
 			pm.getExtent(Country.class);
 			Country country = (Country) pm.getObjectById(countryID);
-			return (Country) pm.detachCopy(country);
+			return pm.detachCopy(country);
 		} finally {
 			pm.close();
 		}
@@ -210,7 +212,7 @@ implements SessionBean
 
 			pm.getExtent(Region.class);
 			Region region = (Region) pm.getObjectById(regionID);
-			return (Region) pm.detachCopy(region);
+			return pm.detachCopy(region);
 		} finally {
 			pm.close();
 		}
@@ -231,7 +233,7 @@ implements SessionBean
 
 			pm.getExtent(City.class);
 			City city = (City) pm.getObjectById(cityID);
-			return (City) pm.detachCopy(city);
+			return pm.detachCopy(city);
 		} finally {
 			pm.close();
 		}
@@ -252,7 +254,7 @@ implements SessionBean
 
 			pm.getExtent(Location.class);
 			Location location = (Location) pm.getObjectById(locationID);
-			return (Location) pm.detachCopy(location);
+			return pm.detachCopy(location);
 		} finally {
 			pm.close();
 		}
@@ -267,7 +269,7 @@ implements SessionBean
 	{
 		PersistenceManager pm = getPersistenceManager();
 		try {
-			return (Country) NLJDOHelper.storeJDO(pm, country, get, fetchGroups, maxFetchDepth);
+			return NLJDOHelper.storeJDO(pm, country, get, fetchGroups, maxFetchDepth);
 		} finally {
 			pm.close();
 		}
@@ -281,7 +283,7 @@ implements SessionBean
 	{
 		PersistenceManager pm = getPersistenceManager();
 		try {
-			return (Region) NLJDOHelper.storeJDO(pm, region, get, fetchGroups, maxFetchDepth);
+			return NLJDOHelper.storeJDO(pm, region, get, fetchGroups, maxFetchDepth);
 		} finally {
 			pm.close();
 		}
@@ -295,7 +297,7 @@ implements SessionBean
 	{
 		PersistenceManager pm = getPersistenceManager();
 		try {
-			return (City) NLJDOHelper.storeJDO(pm, city, get, fetchGroups, maxFetchDepth);
+			return NLJDOHelper.storeJDO(pm, city, get, fetchGroups, maxFetchDepth);
 		} finally {
 			pm.close();
 		}
@@ -348,8 +350,8 @@ implements SessionBean
 				pm.getFetchPlan().setGroups(fetchGroups);
 
 			pm.getExtent(CSV.class);
-			Object obj = (Object) pm.getObjectById((CSVID)objectID, true);
-			return (CSV) pm.detachCopy(obj);
+			Object obj = pm.getObjectById(objectID, true);
+			return pm.detachCopy(obj);
 		} finally {
 			pm.close();
 		}

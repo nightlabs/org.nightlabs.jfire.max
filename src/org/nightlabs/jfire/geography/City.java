@@ -157,6 +157,7 @@ public class City implements Serializable
 	/**
 	 * @deprecated Only for JDO!
 	 */
+	@Deprecated
 	protected City() { }
 
 	public City(String organisationID, String cityID, Region region)

@@ -26,6 +26,7 @@ extends NotificationFilter
 	/**
 	 * @deprecated Only for JDO!
 	 */
+	@Deprecated
 	protected GeographyTemplateDataNotificationFilter() { }
 
 	public GeographyTemplateDataNotificationFilter(String organisationID,
@@ -38,12 +39,13 @@ extends NotificationFilter
 //		getLifecycleStates().add(JDOLifecycleState.DELETED); // probably, there will never be this case - CSV instances cannot be deleted
 	}
 
+	@Override
 	public Collection<DirtyObjectID> filter(List<DirtyObjectID> dirtyObjectIDs)
 	{
 		if (logger.isDebugEnabled()) {
 			logger.debug("filter: dirtyObjectIDs:");
 			for (Iterator<DirtyObjectID> it = dirtyObjectIDs.iterator(); it.hasNext();) {
-				DirtyObjectID dirtyObjectID = (DirtyObjectID) it.next();
+				DirtyObjectID dirtyObjectID = it.next();
 				logger.debug("  " + dirtyObjectID);
 			}
 		}

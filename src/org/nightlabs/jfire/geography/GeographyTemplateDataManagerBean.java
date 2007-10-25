@@ -94,6 +94,7 @@ implements SessionBean
 	/**
 	 * @see org.nightlabs.jfire.base.BaseSessionBeanImpl#setSessionContext(javax.ejb.SessionContext)
 	 */
+	@Override
 	public void setSessionContext(SessionContext sessionContext)
 	throws EJBException, RemoteException
 	{
@@ -103,6 +104,7 @@ implements SessionBean
 	/**
 	 * @see org.nightlabs.jfire.base.BaseSessionBeanImpl#unsetSessionContext()
 	 */
+	@Override
 	public void unsetSessionContext() {
 		super.unsetSessionContext();
 	}
@@ -260,6 +262,7 @@ implements SessionBean
 		 */
 		private static final long serialVersionUID = 1L;
 
+		@Override
 		@Implement
 		public Serializable invoke()
 		throws Exception

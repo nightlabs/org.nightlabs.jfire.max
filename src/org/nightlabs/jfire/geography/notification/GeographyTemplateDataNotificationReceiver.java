@@ -40,6 +40,7 @@ extends NotificationReceiver
 	/**
 	 * @deprecated Only for JDO!
 	 */
+	@Deprecated
 	protected GeographyTemplateDataNotificationReceiver() { }
 
 	public GeographyTemplateDataNotificationReceiver(NotificationFilter notificationFilter) {
@@ -51,7 +52,7 @@ extends NotificationReceiver
 		try {
 			Set<CSVID> csvIDs = new HashSet<CSVID>();
 			for (Iterator<DirtyObjectID> it = notificationBundle.getDirtyObjectIDs().iterator(); it.hasNext();) {
-				DirtyObjectID dirtyObjectID = (DirtyObjectID) it.next();
+				DirtyObjectID dirtyObjectID = it.next();
 				if (JDOLifecycleState.DELETED.equals(dirtyObjectID.getLifecycleState()))
 					throw new IllegalStateException("Why the hell is the lifecycleState == DELETED?!?!?");
 

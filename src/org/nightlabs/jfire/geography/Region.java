@@ -136,6 +136,7 @@ public class Region implements Serializable
 	/**
 	 * @deprecated Only for JDO!
 	 */
+	@Deprecated
 	protected Region() { }
 	
 	public Region(String organisationID, String regionID, Country country)
@@ -243,7 +244,7 @@ public class Region implements Serializable
 			if (pm == null)			
 				throw new IllegalStateException("city does not have a primary key and this instance of Region is not persistent! Cannot assign a primary key!");
 			
-			res = (City) pm.makePersistent(city);
+			res = pm.makePersistent(city);
 		}
 		else
 			res = city;

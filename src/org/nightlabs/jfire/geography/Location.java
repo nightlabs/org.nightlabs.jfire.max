@@ -109,6 +109,7 @@ public class Location implements Serializable
 	/**
 	 * @deprecated Only for JDO!
 	 */
+	@Deprecated
 	protected Location()
 	{
 	}

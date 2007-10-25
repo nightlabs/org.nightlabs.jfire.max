@@ -64,7 +64,7 @@ public class CreateCountryCSVFromLocale
 
 			// make sure, we have additional countries unknown to Locale
 			for (Iterator<Country> it = Geography.sharedInstance().getCountries().iterator(); it.hasNext(); ) {
-				Country country = (Country) it.next();
+				Country country = it.next();
 				countries.put(country.getCountryID(), country);
 			}
 
@@ -97,7 +97,7 @@ public class CreateCountryCSVFromLocale
 					if ("".equals(countryID))
 						continue;
 
-					Country country = (Country) countries.get(countryID);
+					Country country = countries.get(countryID);
 //					if (country != null)
 //						continue; // ignore all countries that are already loaded from the CSV or have already been processed
 
@@ -142,7 +142,7 @@ public class CreateCountryCSVFromLocale
 
 				logger.info("Writing CSV data...");
 				for (Iterator<Country> itCountry = countryList.iterator(); itCountry.hasNext(); ) {
-					Country country = (Country) itCountry.next();
+					Country country = itCountry.next();
 					List<Map.Entry<String, String>> names = new ArrayList<Map.Entry<String,String>>(country.getName().getTexts());
 					// sort by languageID
 					Collections.sort(names, nameEntryComparator);

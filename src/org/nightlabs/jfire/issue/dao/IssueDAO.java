@@ -1,8 +1,12 @@
 package org.nightlabs.jfire.issue.dao;
 
+import java.rmi.RemoteException;
 import java.util.Collection;
 import java.util.List;
 import java.util.Set;
+
+import javax.ejb.CreateException;
+import javax.naming.NamingException;
 
 import org.nightlabs.jdo.NLJDOHelper;
 import org.nightlabs.jdo.ObjectID;
@@ -114,6 +118,21 @@ public class IssueDAO extends BaseJDOObjectDAO<IssueID, Issue>{
 	 */
 	public synchronized Collection<Issue> getIssues(String[] fetchgroups, int maxFetchDepth, ProgressMonitor monitor) 
 	{
+		try {
+			IssueManager im = IssueManagerUtil.getHome(SecurityReflector.getInitialContextProperties()).create();
+			Set<IssueID> is = im.getIssueIDs();
+			return getIssues(is, fetchgroups, maxFetchDepth, monitor);
+		} catch (RemoteException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (CreateException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (NamingException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		
 		return null;//getIssuesByType(null, fetchgroups, maxFetchDepth, monitor);
 	}
 }

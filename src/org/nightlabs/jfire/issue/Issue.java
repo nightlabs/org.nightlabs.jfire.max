@@ -148,6 +148,8 @@ implements Serializable
 			throw new NullPointerException("creator");
 		this.creator = creator;
 		this.createTimestamp = new Date();
+		
+		this.issueID = objectID!=null?objectID.toString()+"&"+createTimestamp.toString():createTimestamp.toString();
 //		this.documents = new <String>();
 	}
 

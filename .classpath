@@ -28,4 +28,5 @@
 	<classpathentry sourcepath="/JPOX_SRC" path="JPOX" kind="var"/>
 	<classpathentry sourcepath="/JPOXENHANCER_SRC" path="JPOXENHANCER" kind="var"/>
 	<classpathentry path="bin" kind="output"/>
+  <classpathentry kind="var" path="ASM"/>
 </classpath>

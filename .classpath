@@ -38,4 +38,5 @@
 	<classpathentry kind="lib" path="dist/birt/lib/com.ibm.icu_3.6.1.v20070417.jar"/>
 	<classpathentry kind="var" path="APACHE_COMMONS/commons-lang.jar"/>
 	<classpathentry kind="output" path="bin"/>
+  <classpathentry kind="var" path="ASM"/>
 </classpath>

@@ -21,4 +21,5 @@
 	<classpathentry kind="var" path="BCEL"/>
 	<classpathentry kind="var" path="JBOSS/server/default/lib/mail.jar"/>
 	<classpathentry kind="output" path="bin"/>
+  <classpathentry kind="var" path="ASM"/>
 </classpath>

@@ -593,13 +593,14 @@
     	<fileset dir="." includes="${project.path.includes}" />
     </path>
     <taskdef name="jpoxenhancer" classname="org.jpox.enhancer.tools.EnhancerTask">
-      <classpath refid="jpoxenhancer.classpath"/>
+      <classpath refid="jpoxenhancer.classpath"/>    	
     </taskdef>
     <jpoxenhancer classpathref="jpoxenhancer.classpath"
         dir="${project.dir}/${bin.dir}"
         failonerror="true"
         fork="false"
-        verbose="true">
+        verbose="true"
+    		enhancerName="asm">
     </jpoxenhancer>
   </target>	
 	

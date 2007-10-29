@@ -30,4 +30,5 @@
 	<classpathentry kind="src" path="/JFireTrade"/>
 	<classpathentry kind="var" path="WORKSPACE/JFireJbpm/lib/jbpm/jbpm-3.1.4.jar"/>
 	<classpathentry kind="output" path="bin"/>
+  <classpathentry kind="var" path="ASM"/>
 </classpath>

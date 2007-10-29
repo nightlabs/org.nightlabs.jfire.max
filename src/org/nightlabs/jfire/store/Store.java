@@ -680,7 +680,7 @@ implements StoreCallback
 	 * @param nestedProductType Can be <code>null</code>, if <code>productType</code> is defined (usually, when it is the top-level-producttype).
 	 * @return Returns <tt>Collection</tt> of suitable <tt>Product</tt>s or <tt>null</tt> if nothing is available.
 	 */
-	public Collection findProducts(User user, ProductType productType, NestedProductType nestedProductType, ProductLocator productLocator)
+	public Collection<? extends Product> findProducts(User user, ProductType productType, NestedProductType nestedProductType, ProductLocator productLocator)
 	{
 		if (nestedProductType == null && productType == null)
 			throw new IllegalArgumentException("productType and nestedProductType are both null! One of them must be defined!");

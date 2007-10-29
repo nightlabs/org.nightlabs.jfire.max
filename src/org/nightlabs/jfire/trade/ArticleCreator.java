@@ -28,7 +28,6 @@ package org.nightlabs.jfire.trade;
 
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.Iterator;
 import java.util.List;
 
 import org.nightlabs.jfire.accounting.Tariff;
@@ -77,11 +76,10 @@ public class ArticleCreator
 	 *		{@link ArticlePrice} assigned and they must NOT yet be allocated. This is done by the {@link Trader}
 	 *		afterwards (if at all).
 	 */
-	public List createProductArticles(Trader trader, User user, Offer offer, Segment segment, Collection products)
+	public List<? extends Article> createProductArticles(Trader trader, User user, Offer offer, Segment segment, Collection<? extends Product> products)
 	{
-		List res = new ArrayList(products.size());
-		for (Iterator iter = products.iterator(); iter.hasNext();) {
-			Product product = (Product) iter.next();
+		List<Article> res = new ArrayList<Article>(products.size());
+		for (Product product : products) {
 			res.add(new Article(user, offer, segment, Article.createArticleID(), product, tariff));
 		}
 		return res;
@@ -101,11 +99,10 @@ public class ArticleCreator
 	 * @param productTypes The {@link ProductType}s for which to create <code>Article</code>s.
 	 * @return Returns new instances of {@link Article} (or descendants) which might later be linked to concrete <code>Product</code>s.
 	 */
-	public List createProductTypeArticles(Trader trader, User user, Offer offer, Segment segment, Collection productTypes)
+	public List<? extends Article> createProductTypeArticles(Trader trader, User user, Offer offer, Segment segment, Collection<? extends ProductType> productTypes)
 	{
-		List res = new ArrayList(productTypes.size());
-		for (Iterator iter = productTypes.iterator(); iter.hasNext();) {
-			ProductType productType = (ProductType) iter.next();
+		List<Article> res = new ArrayList<Article>(productTypes.size());
+		for (ProductType productType : productTypes) {
 			res.add(new Article(user, offer, segment, Article.createArticleID(), productType, tariff));
 		}
 		return res;

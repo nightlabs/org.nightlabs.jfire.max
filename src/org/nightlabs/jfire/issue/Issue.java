@@ -113,7 +113,7 @@ implements Serializable
 	/**
 	 * @jdo.field persistence-modifier="persistent"
 	 */
-	private IssueStatus issueStatus;
+	private IssueStatus status;
 	
 	
 	/**
@@ -147,7 +147,7 @@ implements Serializable
 	 */
 	protected Issue() { }
 
-	public Issue(IssuePriority priority, IssueSeverityType severityType, IssueStatus issueStatus, User creator, ObjectID objectID)
+	public Issue(IssuePriority priority, IssueSeverityType severityType, IssueStatus status, User creator, ObjectID objectID)
 	{
 		if (creator == null)
 			throw new NullPointerException("creator");
@@ -156,6 +156,11 @@ implements Serializable
 		
 		this.issueID = objectID!=null?objectID.toString()+"&"+createTimestamp.toString():createTimestamp.toString();
 //		this.documents = new <String>();
+		
+		this.priority = priority;
+		this.severityType = severityType;
+		this.status = status;
+		
 		subject = new IssueSubject(this);
 		description = new IssueDescription(this);
 	}
@@ -263,6 +268,31 @@ implements Serializable
 	 */
 	public void setUser(User user) {
 		this.creator = user;
+	}
+
+	
+	public IssuePriority getPriority() {
+		return priority;
+	}
+
+	public void setPriority(IssuePriority priority) {
+		this.priority = priority;
+	}
+
+	public IssueSeverityType getSeverityType() {
+		return severityType;
+	}
+
+	public void setSeverityType(IssueSeverityType severityType) {
+		this.severityType = severityType;
+	}
+
+	public IssueStatus getStatus() {
+		return status;
+	}
+
+	public void setStatus(IssueStatus status) {
+		this.status = status;
 	}
 
 	/**

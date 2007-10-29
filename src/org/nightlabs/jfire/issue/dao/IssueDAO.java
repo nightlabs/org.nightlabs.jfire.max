@@ -122,17 +122,8 @@ public class IssueDAO extends BaseJDOObjectDAO<IssueID, Issue>{
 			IssueManager im = IssueManagerUtil.getHome(SecurityReflector.getInitialContextProperties()).create();
 			Set<IssueID> is = im.getIssueIDs();
 			return getIssues(is, fetchgroups, maxFetchDepth, monitor);
-		} catch (RemoteException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		} catch (CreateException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		} catch (NamingException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+		} catch (Exception e) {
+			throw new RuntimeException(e);
 		}
-		
-		return null;//getIssuesByType(null, fetchgroups, maxFetchDepth, monitor);
 	}
 }

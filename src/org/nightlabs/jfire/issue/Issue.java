@@ -119,6 +119,11 @@ implements Serializable
 	/**
 	 * @jdo.field persistence-modifier="persistent" dependent="true" mapped-by="issue"
 	 */
+	private IssueSubject subject;
+	
+	/**
+	 * @jdo.field persistence-modifier="persistent" dependent="true" mapped-by="issue"
+	 */
 	private IssueDescription description;
 	
 	/**
@@ -151,6 +156,8 @@ implements Serializable
 		
 		this.issueID = objectID!=null?objectID.toString()+"&"+createTimestamp.toString():createTimestamp.toString();
 //		this.documents = new <String>();
+		subject = new IssueSubject(this);
+		description = new IssueDescription(this);
 	}
 
 	/**
@@ -228,6 +235,20 @@ implements Serializable
 	 */
 	public void setDescription(IssueDescription description) {
 		this.description = description;
+	}
+	
+	/**
+	 * @return Returns the subject.
+	 */
+	public IssueSubject getSubject() {
+		return subject;
+	}
+
+	/**
+	 * @param subject The subject to set.
+	 */
+	public void setSubject(IssueSubject subject) {
+		this.subject = subject;
 	}
 
 	/**

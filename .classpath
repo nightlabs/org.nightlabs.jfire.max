@@ -25,4 +25,5 @@
 	<classpathentry kind="var" path="JPOXENHANCER"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/JFireServerManager"/>
 	<classpathentry kind="output" path="bin"/>
+  <classpathentry kind="var" path="ASM"/>
 </classpath>

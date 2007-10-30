@@ -18,7 +18,7 @@ import org.nightlabs.i18n.I18nText;
  *
  * @jdo.create-objectid-class
  * 
- * @jdo.fetch-group name="IssueStatusText.text" fields="issueStatus, texts"
+ * @jdo.fetch-group name="IssueStatusText.text" fetch-groups="default" fields="issueStatus, texts"
  */ 
 public class IssueStatusText 
 extends I18nText{

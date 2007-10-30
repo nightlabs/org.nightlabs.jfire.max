@@ -61,7 +61,12 @@ import org.nightlabs.util.Utils;
  *			PARAMETERS String paramIssueTypeID
  *			import java.lang.String"
  *
- * @jdo.fetch-group name="Issue.this" fetch-groups="default" fields="description"
+ * @jdo.fetch-group name="Issue.description" fields="description"
+ * @jdo.fetch-group name="Issue.subject" fields="subject"
+ * @jdo.fetch-group name="Issue.priority" fields="priority"
+ * @jdo.fetch-group name="Issue.severityType" fields="severityType"
+ * @jdo.fetch-group name="Issue.status" fields="status"
+ * @jdo.fetch-group name="Issue.this" fetch-groups="default" fields="priority, severityType, status, creator, description"
  *
  **/
 public class Issue
@@ -72,6 +77,11 @@ implements Serializable
 	private static final Logger logger = Logger.getLogger(Issue.class);
 	
 	public static final String FETCH_GROUP_THIS = "Issue.this";
+	public static final String FETCH_GROUP_DESCRIPTION = "Issue.description";
+	public static final String FETCH_GROUP_SUBJECT = "Issue.subject";
+	public static final String FETCH_GROUP_SEVERITYTYPE = "Issue.severityType";
+	public static final String FETCH_GROUP_STATUS = "Issue.status";
+	public static final String FETCH_GROUP_PRIORITY = "Issue.priority";
 	/**
 	 * @jdo.field primary-key="true"
 	 * @jdo.column length="100"
@@ -117,12 +127,12 @@ implements Serializable
 	
 	
 	/**
-	 * @jdo.field persistence-modifier="persistent" dependent="true" mapped-by="issue"
+	 * @jdo.field persistence-modifier="persistent"
 	 */
 	private IssueSubject subject;
 	
 	/**
-	 * @jdo.field persistence-modifier="persistent" dependent="true" mapped-by="issue"
+	 * @jdo.field persistence-modifier="persistent"
 	 */
 	private IssueDescription description;
 	
@@ -310,15 +320,15 @@ implements Serializable
 		return pm;
 	}
 
-	public void jdoPreDetach()
-	{
-	}
-	public void jdoPostDetach(Object _attached)
-	{
-		Issue attached = (Issue)_attached;
-		Issue detached = this;
-		Collection fetchGroups = attached.getPersistenceManager().getFetchPlan().getGroups();
-	}
+//	public void jdoPreDetach()
+//	{
+//	}
+//	public void jdoPostDetach(Object _attached)
+//	{
+//		Issue attached = (Issue)_attached;
+//		Issue detached = this;
+//		Collection fetchGroups = attached.getPersistenceManager().getFetchPlan().getGroups();
+//	}
 
 	@Override
 	public boolean equals(Object obj)

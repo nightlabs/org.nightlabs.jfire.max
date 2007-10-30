@@ -17,14 +17,14 @@ import org.nightlabs.util.Util;
  *
  * @jdo.inheritance strategy = "new-table"
  * 
- * @jdo.fetch-group name="IssueStatus.this" fields="text"
+ * @jdo.fetch-group name="IssueStatus.text" fetch-groups="default" fields="texts"
  */
 public class IssueStatus 
 implements Serializable{
 	
 	private static final long serialVersionUID = 1L;
 	
-	public static final String FETCH_GROUP_THIS = "IssueStatus.this";
+	public static final String FETCH_GROUP_THIS = "IssueStatus.text";
 	/**
 	 * @jdo.field primary-key="true"
 	 * @jdo.column length="100"
@@ -34,7 +34,7 @@ implements Serializable{
 	/**
 	 * @jdo.field persistence-modifier="persistent" dependent="true" mapped-by="issueStatus"
 	 */
-	private IssueStatusText text;
+	private IssueStatusText texts;
 
 	/**
 	 * @jdo.field persistence-modifier="persistent"
@@ -51,7 +51,7 @@ implements Serializable{
 
 		this.issue = issue;
 		this.issueStatusID = issueStatusID;
-		this.text = new IssueStatusText(this);
+		this.texts = new IssueStatusText(this);
 	}
 	
 	public void setIssueStatusID(String issueStatusID) {
@@ -68,7 +68,7 @@ implements Serializable{
 
 	public IssueStatusText getIssueStatusText()
 	{
-		return text;
+		return texts;
 	}
 
 	@Override

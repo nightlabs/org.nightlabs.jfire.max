@@ -19,7 +19,7 @@ import org.nightlabs.jfire.issue.id.IssuePriorityID;
  *
  * @jdo.create-objectid-class
  * 
- * @jdo.fetch-group name="IssuePriorityText.text" fields="issue, texts"
+ * @jdo.fetch-group name="IssuePriorityText.text" fetch-groups="default" fields="issue, texts"
  */ 
 public class IssuePriorityText 
 extends I18nText{

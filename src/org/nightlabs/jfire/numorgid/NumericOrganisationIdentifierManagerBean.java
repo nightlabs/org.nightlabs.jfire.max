@@ -33,6 +33,9 @@ extends BaseSessionBeanImpl
 implements SessionBean
 {
 	/**
+	 * Returns a numeric organisation ID for the current organisation if called for the root organisation.<br />
+	 * This method should only be called by organisation users.
+	 * 
 	 * @ejb.interface-method
 	 * @ejb.permission role-name="_Guest_"
 	 * @ejb.transaction type="Required"
@@ -84,6 +87,8 @@ implements SessionBean
 	}
 	
 	/**
+	 * Initialises an organisation datastore to be used with numeric organisation IDs. 
+	 * 
 	 * @ejb.interface-method
 	 * @ejb.permission role-name="_System_"
 	 * @ejb.transaction type = "Required"
@@ -103,22 +108,8 @@ implements SessionBean
 			} catch (Exception x) {
 				throw new RuntimeException("Acquiring the rootOrganisationID failed.");
 			}
-
-			if (! localOrganisationID.equals(rootOrganisationID))
-				return; // We only want to assign a numeric organisation ID for the root organisation
 			
-			try {
-				NumericOrganisationIdentifierID numericOrganisationIdentifierID = NumericOrganisationIdentifierID.create(rootOrganisationID);
-				pm.getObjectById(numericOrganisationIdentifierID);
-				
-				// if the id already exists, we simply return since the init has already happened once.
-				return;
-			} catch (JDOObjectNotFoundException x) {
-				// otherwise we create it
-				NumericOrganisationIdentifier numericOrganisationIdentifier = new NumericOrganisationIdentifier(rootOrganisationID, NumericOrganisationIdentifier.ROOT_ORGANISATION_NUMERIC_ORGANISATION_ID);
-				numericOrganisationIdentifier = pm.makePersistent(numericOrganisationIdentifier);
-			}
-			
+			// Set conservative settings for the ID generator to not waste numeric organisation IDs due to the caching strategy
 			IDNamespace idNamespace;
 			try {
 				idNamespace = (IDNamespace) pm.getObjectById(IDNamespaceID.create(rootOrganisationID, NumericOrganisationIdentifier.class.getName()));
@@ -129,6 +120,20 @@ implements SessionBean
 				idNamespace.setNextID(1);
 				
 				idNamespace = pm.makePersistent(idNamespace);
+			}
+
+			if (! localOrganisationID.equals(rootOrganisationID))
+				return; // We only want to assign a numeric organisation ID for the root organisation
+			
+			try {
+				NumericOrganisationIdentifierID numericOrganisationIdentifierID = NumericOrganisationIdentifierID.create(rootOrganisationID);
+				pm.getObjectById(numericOrganisationIdentifierID);				
+				// if the id already exists, we simply return since the init has already happened once.
+				return;
+			} catch (JDOObjectNotFoundException x) {
+				// otherwise we create it
+				NumericOrganisationIdentifier numericOrganisationIdentifier = new NumericOrganisationIdentifier(rootOrganisationID, NumericOrganisationIdentifier.ROOT_ORGANISATION_NUMERIC_ORGANISATION_ID);
+				numericOrganisationIdentifier = pm.makePersistent(numericOrganisationIdentifier);
 			}
 		} finally {
 			pm.close();

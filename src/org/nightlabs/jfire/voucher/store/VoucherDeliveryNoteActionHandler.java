@@ -7,6 +7,7 @@ import javax.jdo.PersistenceManager;
 
 import org.apache.log4j.Logger;
 import org.nightlabs.jfire.idgenerator.IDGenerator;
+import org.nightlabs.jfire.numorgid.NumericOrganisationIdentifier;
 import org.nightlabs.jfire.security.User;
 import org.nightlabs.jfire.store.DeliveryNote;
 import org.nightlabs.jfire.store.DeliveryNoteActionHandler;
@@ -85,8 +86,9 @@ extends DeliveryNoteActionHandler
 					if (!voucherKeys.isEmpty())
 						throw new IllegalStateException("There should be no valid VoucherKey for this Voucher, but there is/are "+voucherKeys.size()+"!!! VoucherPK=" + voucher.getPrimaryKey());
 
-					VoucherKey voucherKey = new VoucherKey(
-							getVoucherStore().getVoucherOrganisationID(), IDGenerator.nextID(VoucherKey.class), article, user);
+//					VoucherKey voucherKey = new VoucherKey(
+//							getVoucherStore().getVoucherOrganisationID(), IDGenerator.nextID(VoucherKey.class), article, user);
+					VoucherKey voucherKey = new VoucherKey(NumericOrganisationIdentifier.getNumericOrganisationID(pm), IDGenerator.nextID(VoucherKey.class), article, user);
 					voucherKey = pm.makePersistent(voucherKey);
 					voucher.setVoucherKey(voucherKey); // if we would allow the trade of vouchers between organisations, this should probably be in the VoucherLocal
 				}

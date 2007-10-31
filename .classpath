@@ -23,12 +23,13 @@
 	<classpathentry combineaccessrules="false" kind="src" path="/JFireJbpm"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/JFireScripting"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/JFireBaseClientLib"/>
-	<classpathentry sourcepath="JPOX_SRC" kind="var" path="JDO2"/>
-	<classpathentry sourcepath="JPOX_SRC" kind="var" path="JPOX"/>
+	<classpathentry kind="var" path="JDO2" sourcepath="JPOX_SRC"/>
+	<classpathentry kind="var" path="JPOX" sourcepath="JPOX_SRC"/>
 	<classpathentry kind="var" path="LOG4J"/>
 	<classpathentry kind="var" path="JPOXENHANCER"/>
 	<classpathentry kind="src" path="/JFireTrade"/>
 	<classpathentry kind="var" path="WORKSPACE/JFireJbpm/lib/jbpm/jbpm-3.1.4.jar"/>
+	<classpathentry kind="var" path="ASM"/>
+	<classpathentry combineaccessrules="false" kind="src" path="/JFireNumericOrganisationID"/>
 	<classpathentry kind="output" path="bin"/>
-  <classpathentry kind="var" path="ASM"/>
 </classpath>

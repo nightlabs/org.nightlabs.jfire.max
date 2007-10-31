@@ -23,7 +23,7 @@ public class IssueSeverityType
 implements Serializable{
 	private static final long serialVersionUID = 1L;
 	
-	public static final String FETCH_GROUP_THIS = "IssueSeverityType.this";
+	public static final String FETCH_GROUP_THIS = "IssueSeverityType.text";
 	/**
 	 * @jdo.field primary-key="true"
 	 * @jdo.column length="100"

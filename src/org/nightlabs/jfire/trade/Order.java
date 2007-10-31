@@ -38,6 +38,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import javax.jdo.JDODetachedFieldAccessException;
 import javax.jdo.JDOHelper;
 import javax.jdo.PersistenceManager;
 import javax.jdo.Query;
@@ -525,10 +526,16 @@ implements Serializable, ArticleContainer, SegmentContainer, DetachCallback
 	 * @jdo.field persistence-modifier="none"
 	 */
 	private AnchorID customerID = null;
+	
 	/**
 	 * @jdo.field persistence-modifier="none"
 	 */
 	private boolean customerID_detached = false;
+	
+	/**
+	 * @jdo.field persistence-modifier="persistent"
+	 */
+	private int articleCount = 0;
 
 	/**
 	 * @deprecated Only for JDO!
@@ -858,5 +865,13 @@ implements Serializable, ArticleContainer, SegmentContainer, DetachCallback
 				Util.hashCode(this.organisationID) ^ 
 				Util.hashCode(this.orderIDPrefix) ^
 				Util.hashCode(this.orderID);
+	}
+	
+	/*
+	 * (non-Javadoc)
+	 * @see org.nightlabs.jfire.trade.ArticleContainer#getArticleCount()
+	 */
+	public int getArticleCount() {
+		return articleCount;
 	}
 }

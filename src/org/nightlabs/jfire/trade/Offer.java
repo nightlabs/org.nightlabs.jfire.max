@@ -35,6 +35,7 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
 
+import javax.jdo.JDODetachedFieldAccessException;
 import javax.jdo.JDOHelper;
 import javax.jdo.PersistenceManager;
 import javax.jdo.Query;
@@ -55,7 +56,6 @@ import org.nightlabs.jfire.store.ProductType;
 import org.nightlabs.jfire.trade.jbpm.ActionHandlerFinalizeOffer;
 import org.nightlabs.jfire.transfer.id.AnchorID;
 import org.nightlabs.util.Util;
-import org.nightlabs.util.Utils;
 
 /**
  * @author Niklas Schiffler <nick@nightlabs.de>
@@ -333,6 +333,11 @@ implements
 	 * @jdo.join
 	 */
 	private List<State> states;
+	
+	/**
+	 * @jdo.field persistence-modifier="persistent"
+	 */
+	private int articleCount = 0;
 
 	/**
 	 * @deprecated This constructor exists only for JDO!
@@ -452,6 +457,8 @@ implements
 			this.articles.add(article);
 			this.order.addArticle(article);
 		}
+		
+		this.articleCount = articles.size();
 	}
 
 	public void addArticle(Article article)
@@ -471,6 +478,8 @@ implements
 			attachable = false;
 		else
 			this.order.addArticle(article);
+		
+		this.articleCount = articles.size();
 	}
 
 	public void removeArticle(Article article)
@@ -494,6 +503,7 @@ implements
 			}
 			// end workaround
 		}
+		this.articleCount = articles.size();
 	}
 
 	/**
@@ -804,6 +814,7 @@ implements
 			detached.customerID = attached.getCustomerID();
 			detached.customerID_detached = true;
 		}
+		
 		detached.attachable = true;
 	}
 
@@ -876,5 +887,13 @@ implements
 
 	public Price getPrice() {
 		return price;
+	}
+	
+	/*
+	 * (non-Javadoc)
+	 * @see org.nightlabs.jfire.trade.ArticleContainer#getArticleCount()
+	 */
+	public int getArticleCount() {
+		return articleCount;
 	}
 }

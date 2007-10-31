@@ -8,6 +8,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
+import javax.jdo.JDODetachedFieldAccessException;
 import javax.jdo.JDOHelper;
 import javax.jdo.PersistenceManager;
 import javax.jdo.listener.AttachCallback;
@@ -147,6 +148,11 @@ implements
 	 * @jdo.field persistence-modifier="persistent" mapped-by="receptionNote"
 	 */
 	private ReceptionNoteLocal receptionNoteLocal;
+	
+	/**
+	 * @jdo.field persistence-modifier="persistent"
+	 */
+	private int articleCount = 0;
 
 	/**
 	 * @deprecated Only for JDO! 
@@ -407,5 +413,13 @@ implements
 	public StatableLocal getStatableLocal()
 	{
 		return receptionNoteLocal;
+	}
+	
+	/*
+	 * (non-Javadoc)
+	 * @see org.nightlabs.jfire.trade.ArticleContainer#getArticleCount()
+	 */
+	public int getArticleCount() {
+		return articleCount;
 	}
 }

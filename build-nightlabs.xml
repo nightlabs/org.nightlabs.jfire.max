@@ -1,8 +1,9 @@
 <!--
   Generic j2ee and webapp (jboss/tomcat/jpox/xdoclet) ant build file 
-  Version: 2007-04-07.00
+  Version: 2007-10-29.00
   Author: marc [at] nightlabs [dot] de
   Author: marco [at] nightlabs [dot] de
+  Author: tobias [at] nightlabs [dot] de
 
   Do NOT modify this file!!! It must be the same in all j2ee-modules and libraries!
   

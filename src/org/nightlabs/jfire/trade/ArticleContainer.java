@@ -102,4 +102,10 @@ public interface ArticleContainer
 	 * @return Returns the <code>User</code> who is responsible for creation of this <code>ArticleContainer</code>.
 	 */
 	User getCreateUser();
+	
+	/**
+	 * Returns the number of the articles in this article container.	 * 
+	 * @return the number of the articles in this article container. 
+	 */
+	int getArticleCount();
 }

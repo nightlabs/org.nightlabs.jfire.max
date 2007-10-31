@@ -37,6 +37,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import javax.jdo.JDODetachedFieldAccessException;
 import javax.jdo.JDOHelper;
 import javax.jdo.PersistenceManager;
 import javax.jdo.Query;
@@ -327,6 +328,11 @@ implements Serializable, ArticleContainer, Statable, DetachCallback
 	 *		mapped-by="invoice"
 	 */
 	private Set<Article> articles;
+	
+	/**
+	 * @jdo.field persistence-modifier="persistent"
+	 */
+	private int articleCount = 0;
 
 	/**
 	 * @return the same as {@link #getStatableLocal()}
@@ -419,6 +425,8 @@ implements Serializable, ArticleContainer, Statable, DetachCallback
 
 		this.valid = false;	
 		article.setInvoice(this);		
+		
+		this.articleCount = articles.size();
 	}
 
 	public void removeArticle(Article article)
@@ -432,6 +440,8 @@ implements Serializable, ArticleContainer, Statable, DetachCallback
 			this.valid = false;
 			article.setInvoice(null);
 		}
+		
+		this.articleCount = articles.size();
 	}
 
 	/**
@@ -770,5 +780,13 @@ implements Serializable, ArticleContainer, Statable, DetachCallback
 			_states = CollectionUtil.castList(Collections.unmodifiableList(states));
 
 		return _states;
+	}
+	
+	/*
+	 * (non-Javadoc)
+	 * @see org.nightlabs.jfire.trade.ArticleContainer#getArticleCount()
+	 */
+	public int getArticleCount() {
+		return articleCount;
 	}
 }

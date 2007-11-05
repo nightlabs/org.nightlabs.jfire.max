@@ -1,8 +1,9 @@
 <!--
   Generic j2ee and webapp (jboss/tomcat/jpox/xdoclet) ant build file 
-  Version: 2007-04-07.00
+  Version: 2007-10-29.00
   Author: marc [at] nightlabs [dot] de
   Author: marco [at] nightlabs [dot] de
+  Author: tobias [at] nightlabs [dot] de
 
   Do NOT modify this file!!! It must be the same in all j2ee-modules and libraries!
   
@@ -593,13 +594,14 @@
     	<fileset dir="." includes="${project.path.includes}" />
     </path>
     <taskdef name="jpoxenhancer" classname="org.jpox.enhancer.tools.EnhancerTask">
-      <classpath refid="jpoxenhancer.classpath"/>
+      <classpath refid="jpoxenhancer.classpath"/>    	
     </taskdef>
     <jpoxenhancer classpathref="jpoxenhancer.classpath"
         dir="${project.dir}/${bin.dir}"
         failonerror="true"
         fork="false"
-        verbose="true">
+        verbose="true"
+    		enhancerName="asm">
     </jpoxenhancer>
   </target>	
 	

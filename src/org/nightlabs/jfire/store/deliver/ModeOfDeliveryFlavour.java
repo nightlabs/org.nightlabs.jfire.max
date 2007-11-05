@@ -50,8 +50,8 @@ import org.nightlabs.jfire.store.ProductType;
 import org.nightlabs.jfire.store.deliver.id.ModeOfDeliveryFlavourID;
 import org.nightlabs.jfire.store.id.ProductTypeID;
 import org.nightlabs.jfire.trade.id.CustomerGroupID;
+import org.nightlabs.util.IOUtil;
 import org.nightlabs.util.Util;
-import org.nightlabs.util.Utils;
 
 /**
  * A <tt>ModeOfDeliveryFlavour</tt> is a subkind of <tt>ModeOfDelivery</tt>. An example
@@ -139,6 +139,8 @@ import org.nightlabs.util.Utils;
 public class ModeOfDeliveryFlavour
 implements Serializable
 {
+	private static final long serialVersionUID = 1L;
+
 	public static final String FETCH_GROUP_NAME = "ModeOfDeliveryFlavour.name";
 	public static final String FETCH_GROUP_MODE_OF_DELIVERY = "ModeOfDeliveryFlavour.modeOfDelivery";
 	public static final String FETCH_GROUP_ICON_16X16_DATA = "ModeOfDeliveryFlavour.icon16x16Data";
@@ -147,15 +149,17 @@ implements Serializable
 	public static class ModeOfDeliveryFlavourProductTypeGroupCarrier
 	implements Serializable
 	{
+		private static final long serialVersionUID = 1L;
+
 		/**
 		 * @param customerGroupIDs Instances of {@link org.nightlabs.jfire.trade.id.CustomerGroupID}
 		 */
-		public ModeOfDeliveryFlavourProductTypeGroupCarrier(Collection customerGroupIDs)
+		public ModeOfDeliveryFlavourProductTypeGroupCarrier(Collection<CustomerGroupID> customerGroupIDs)
 		{
 			this.customerGroupIDs = customerGroupIDs;
 		}
 
-		private Collection customerGroupIDs;
+		private Collection<CustomerGroupID> customerGroupIDs;
 
 		/**
 		 * key: {@link org.nightlabs.jfire.store.deliver.id.ModeOfDeliveryFlavourID} modeOfDeliveryFlavourID<br/>
@@ -292,8 +296,8 @@ implements Serializable
 	 */
 	public static ModeOfDeliveryFlavourProductTypeGroupCarrier
 			getModeOfDeliveryFlavourProductTypeGroupCarrier(
-					PersistenceManager pm, Collection productTypeIDs,
-					Collection customerGroupIDs, byte mergeMode)
+					PersistenceManager pm, Collection<ProductTypeID> productTypeIDs,
+					Collection<CustomerGroupID> customerGroupIDs, byte mergeMode)
 	{
 		ModeOfDeliveryFlavourProductTypeGroupCarrier res = new ModeOfDeliveryFlavourProductTypeGroupCarrier(customerGroupIDs);
 
@@ -401,8 +405,7 @@ implements Serializable
 	 *		key: String modeOfDeliveryFlavourPK<br/>
 	 *		value: ModeOfDeliveryFlavour modf
 	 */
-	protected static Map getAvailableModeOfDeliveryFlavoursMapForAllCustomerGroups(
-			PersistenceManager pm, Collection customerGroupIDs, byte mergeMode)
+	protected static Map getAvailableModeOfDeliveryFlavoursMapForAllCustomerGroups(PersistenceManager pm, Collection<CustomerGroupID> customerGroupIDs, byte mergeMode)
 	{
 		if (mergeMode != MERGE_MODE_ADDITIVE && mergeMode != MERGE_MODE_SUBTRACTIVE)
 			throw new IllegalArgumentException("mergeMode invalid! Must be MERGE_MODE_ADDITIVE or MERGE_MODE_SUBTRACTIVE!");
@@ -632,12 +635,28 @@ implements Serializable
 			DataBuffer db = new DataBuffer(512);
 //			db.maxSizeForRAM = Integer.MAX_VALUE;
 			OutputStream out = db.createOutputStream();
-			Util.transferStreamData(in, out);
+			IOUtil.transferStreamData(in, out);
 			out.close();
 
 			this.icon16x16Data = db.createByteArray();
 		} finally {
 			in.close();
 		}
+	}
+
+	@Override
+	public int hashCode()
+	{
+		return Util.hashCode(organisationID) + Util.hashCode(modeOfDeliveryFlavourID);
+	}
+	@Override
+	public boolean equals(Object obj)
+	{
+		if (obj == this) return true;
+		if (!(obj instanceof ModeOfDeliveryFlavour)) return false;
+		ModeOfDeliveryFlavour o = (ModeOfDeliveryFlavour) obj;
+		return
+				Util.equals(this.organisationID, o.organisationID) &&
+				Util.equals(this.modeOfDeliveryFlavourID, o.modeOfDeliveryFlavourID);
 	}
 }

@@ -29,6 +29,7 @@ package org.nightlabs.jfire.accounting.pay;
 import java.io.Serializable;
 import java.util.Collection;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Map;
 import java.util.Set;
@@ -48,6 +49,7 @@ import org.nightlabs.jfire.security.User;
 import org.nightlabs.jfire.trade.LegalEntity;
 import org.nightlabs.jfire.transfer.Anchor;
 import org.nightlabs.jfire.transfer.id.AnchorID;
+import org.nightlabs.util.Util;
 
 /**
  * @author Marco Schulze - marco at nightlabs dot de
@@ -139,7 +141,7 @@ implements Serializable, DetachCallback
 	 * @return Returns a <tt>Collection</tt> with instances of type
 	 *         {@link ServerPaymentProcessor}.
 	 */
-	public static Collection getServerPaymentProcessorsForOneModeOfPaymentFlavour(
+	public static Collection<ServerPaymentProcessor> getServerPaymentProcessorsForOneModeOfPaymentFlavour(
 			PersistenceManager pm, ModeOfPaymentFlavour modeOfPaymentFlavour)
 	{
 		if (pm == null)
@@ -147,16 +149,17 @@ implements Serializable, DetachCallback
 		if (modeOfPaymentFlavour == null)
 			throw new IllegalArgumentException("modeOfPaymentFlavour must not be null!");
 
-		return getServerPaymentProcessorsForOneModeOfPaymentFlavour(pm,
-				modeOfPaymentFlavour.getOrganisationID(), modeOfPaymentFlavour
-						.getModeOfPaymentFlavourID());
+		return getServerPaymentProcessorsForOneModeOfPaymentFlavour(
+				pm,
+				modeOfPaymentFlavour.getOrganisationID(),
+				modeOfPaymentFlavour.getModeOfPaymentFlavourID());
 	}
 
 	/**
 	 * @return Returns a <tt>Collection</tt> with instances of type
 	 *         {@link ServerPaymentProcessor}.
 	 */
-	public static Collection getServerPaymentProcessorsForOneModeOfPaymentFlavour(
+	public static Collection<ServerPaymentProcessor> getServerPaymentProcessorsForOneModeOfPaymentFlavour(
 			PersistenceManager pm, ModeOfPaymentFlavourID modeOfPaymentFlavourID)
 	{
 		if (pm == null)
@@ -164,7 +167,8 @@ implements Serializable, DetachCallback
 		if (modeOfPaymentFlavourID == null)
 			throw new IllegalArgumentException("modeOfPaymentFlavourID must not be null!");
 
-		return getServerPaymentProcessorsForOneModeOfPaymentFlavour(pm,
+		return getServerPaymentProcessorsForOneModeOfPaymentFlavour(
+				pm,
 				modeOfPaymentFlavourID.organisationID,
 				modeOfPaymentFlavourID.modeOfPaymentFlavourID);
 	}
@@ -173,35 +177,31 @@ implements Serializable, DetachCallback
 	 * @return Returns a <tt>Collection</tt> with instances of type
 	 *         {@link ServerPaymentProcessor}.
 	 */
-	public static Collection getServerPaymentProcessorsForOneModeOfPaymentFlavour(
+	public static Collection<ServerPaymentProcessor> getServerPaymentProcessorsForOneModeOfPaymentFlavour(
 			PersistenceManager pm, String organisationID,
 			String modeOfPaymentFlavourID)
 	{
-		Map m = new HashMap();
+		Set<ServerPaymentProcessor> res = new HashSet<ServerPaymentProcessor>();
 
 		Query query;
-		
+
 //		query = pm.newNamedQuery(ServerPaymentProcessor.class,
 //				"getServerPaymentProcessorsForOneModeOfPaymentFlavour");
 //		return (Collection) query.execute(organisationID, modeOfPaymentFlavourID);
 
-		query = pm.newNamedQuery(ServerPaymentProcessor.class,
-				"getServerPaymentProcessorsForOneModeOfPaymentFlavour_WORKAROUND2");
-		for (Iterator it = ((Collection) query.execute(organisationID,
-				modeOfPaymentFlavourID)).iterator(); it.hasNext();) {
+		query = pm.newNamedQuery(ServerPaymentProcessor.class, "getServerPaymentProcessorsForOneModeOfPaymentFlavour_WORKAROUND2");
+		for (Iterator<?> it = ((Collection<?>) query.execute(organisationID, modeOfPaymentFlavourID)).iterator(); it.hasNext();) {
 			ServerPaymentProcessor p = (ServerPaymentProcessor) it.next();
-			m.put(p.getPrimaryKey(), p);
+			res.add(p);
 		}
 
-		query = pm.newNamedQuery(ServerPaymentProcessor.class,
-				"getServerPaymentProcessorsForOneModeOfPaymentFlavour_WORKAROUND1");
-		for (Iterator it = ((Collection) query.execute(organisationID,
-				modeOfPaymentFlavourID)).iterator(); it.hasNext();) {
+		query = pm.newNamedQuery(ServerPaymentProcessor.class, "getServerPaymentProcessorsForOneModeOfPaymentFlavour_WORKAROUND1");
+		for (Iterator<?> it = ((Collection<?>) query.execute(organisationID, modeOfPaymentFlavourID)).iterator(); it.hasNext();) {
 			ServerPaymentProcessor p = (ServerPaymentProcessor) it.next();
-			m.put(p.getPrimaryKey(), p);
+			res.add(p);
 		}
 
-		return m.values();
+		return res;
 	}
 
 	/**
@@ -240,7 +240,7 @@ implements Serializable, DetachCallback
 	 *
 	 * @jdo.join
 	 */
-	private Map modeOfPayments = new HashMap();
+	private Map<String, ModeOfPayment> modeOfPayments;
 
 	/**
 	 * Unlike {@link #modeOfPayments}, this <tt>Map</tt> allows
@@ -261,7 +261,7 @@ implements Serializable, DetachCallback
 	 *
 	 * @jdo.join
 	 */
-	private Map modeOfPaymentFlavours = new HashMap();
+	private Map<String, ModeOfPaymentFlavour> modeOfPaymentFlavours;
 
 	/**
 	 * @jdo.field persistence-modifier="persistent" dependent="true" mapped-by="serverPaymentProcessor"
@@ -273,8 +273,23 @@ implements Serializable, DetachCallback
 	 *             explicitely!
 	 */
 	@Deprecated
-	protected ServerPaymentProcessor()
+	protected ServerPaymentProcessor() { }
+
+	public ServerPaymentProcessor(String organisationID, String serverPaymentProcessorID)
 	{
+		this.organisationID = organisationID;
+		this.serverPaymentProcessorID = serverPaymentProcessorID;
+		this.primaryKey = getPrimaryKey(organisationID, serverPaymentProcessorID);
+
+		this.name = new ServerPaymentProcessorName(this);
+		this.modeOfPayments = new HashMap<String, ModeOfPayment>();
+		this.modeOfPaymentFlavours = new HashMap<String, ModeOfPaymentFlavour>();
+	}
+
+	public static String getPrimaryKey(String organisationID,
+			String serverPaymentProcessorID)
+	{
+		return organisationID + '/' + serverPaymentProcessorID;
 	}
 
 	protected PersistenceManager getPersistenceManager()
@@ -286,21 +301,6 @@ implements Serializable, DetachCallback
 							+ this.getPrimaryKey()
 							+ ") is currently not persistent! Cannot obtain a PersistenceManager!");
 		return pm;
-	}
-
-	public ServerPaymentProcessor(String organisationID,
-			String serverPaymentProcessorID)
-	{
-		this.organisationID = organisationID;
-		this.serverPaymentProcessorID = serverPaymentProcessorID;
-		this.primaryKey = getPrimaryKey(organisationID, serverPaymentProcessorID);
-		this.name = new ServerPaymentProcessorName(this);
-	}
-
-	public static String getPrimaryKey(String organisationID,
-			String serverPaymentProcessorID)
-	{
-		return organisationID + '/' + serverPaymentProcessorID;
 	}
 
 	/**
@@ -382,7 +382,7 @@ implements Serializable, DetachCallback
 	/**
 	 * @return Returns the modeOfPayments.
 	 */
-	public Collection getModeOfPayments()
+	public Collection<ModeOfPayment> getModeOfPayments()
 	{
 		return modeOfPayments.values();
 	}
@@ -409,7 +409,7 @@ implements Serializable, DetachCallback
 	/**
 	 * @return Returns the modeOfPaymentFlavours.
 	 */
-	public Collection getModeOfPaymentFlavours()
+	public Collection<ModeOfPaymentFlavour> getModeOfPaymentFlavours()
 	{
 		return modeOfPaymentFlavours.values();
 	}
@@ -719,7 +719,7 @@ public PayMoneyTransfer payBegin(PayParams payParams)
 	 *
 	 * @see #getExcludedClientPaymentProcessorFactoryIDs()
 	 */
-	public Set getIncludedClientPaymentProcessorFactoryIDs()
+	public Set<String> getIncludedClientPaymentProcessorFactoryIDs()
 	{
 		return null;
 	}
@@ -742,7 +742,7 @@ public PayMoneyTransfer payBegin(PayParams payParams)
 	 *
 	 * @see #getIncludedClientPaymentProcessorFactoryIDs()
 	 */
-	public Set getExcludedClientPaymentProcessorFactoryIDs()
+	public Set<String> getExcludedClientPaymentProcessorFactoryIDs()
 	{
 		return null;
 	}
@@ -797,5 +797,21 @@ public PayMoneyTransfer payBegin(PayParams payParams)
 		ServerPaymentProcessor attached = (ServerPaymentProcessor) o;
 
 		detached.requirementCheckKey = attached.requirementCheckKey;
+	}
+
+	@Override
+	public boolean equals(Object obj)
+	{
+		if (obj == this) return true;
+		if (!(obj instanceof ServerPaymentProcessor)) return false;
+		ServerPaymentProcessor o = (ServerPaymentProcessor) obj;
+		return
+				Util.equals(this.organisationID, o.organisationID) &&
+				Util.equals(this.serverPaymentProcessorID, o.serverPaymentProcessorID);
+	}
+	@Override
+	public int hashCode()
+	{
+		return Util.hashCode(organisationID) + Util.hashCode(serverPaymentProcessorID);
 	}
 }

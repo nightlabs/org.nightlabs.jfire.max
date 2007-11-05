@@ -43,7 +43,6 @@ import org.nightlabs.io.DataBuffer;
 import org.nightlabs.jfire.trade.CustomerGroup;
 import org.nightlabs.jfire.trade.id.CustomerGroupID;
 import org.nightlabs.util.Util;
-import org.nightlabs.util.Utils;
 
 /**
  * A <tt>ModeOfPaymentFlavour</tt> is a subkind of <tt>ModeOfPayment</tt>. An example
@@ -135,6 +134,8 @@ import org.nightlabs.util.Utils;
 public class ModeOfPaymentFlavour
 implements Serializable
 {
+	private static final long serialVersionUID = 1L;
+
 	public static final String FETCH_GROUP_NAME = "ModeOfPaymentFlavour.name";
 	public static final String FETCH_GROUP_MODE_OF_PAYMENT = "ModeOfPaymentFlavour.modeOfPayment";
 	public static final String FETCH_GROUP_ICON_16X16_DATA = "ModeOfPaymentFlavour.icon16x16Data";
@@ -418,5 +419,21 @@ implements Serializable
 		} finally {
 			in.close();
 		}
+	}
+
+	@Override
+	public int hashCode()
+	{
+		return Util.hashCode(organisationID) + Util.hashCode(modeOfPaymentFlavourID);
+	}
+	@Override
+	public boolean equals(Object obj)
+	{
+		if (obj == this) return true;
+		if (!(obj instanceof ModeOfPaymentFlavour)) return false;
+		ModeOfPaymentFlavour o = (ModeOfPaymentFlavour) obj;
+		return
+				Util.equals(this.organisationID, o.organisationID) &&
+				Util.equals(this.modeOfPaymentFlavourID, o.modeOfPaymentFlavourID);
 	}
 }

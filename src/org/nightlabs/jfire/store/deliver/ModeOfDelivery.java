@@ -33,6 +33,7 @@ import java.util.Map;
 
 import org.nightlabs.jfire.store.deliver.id.ModeOfDeliveryFlavourID;
 import org.nightlabs.jfire.store.deliver.id.ModeOfDeliveryID;
+import org.nightlabs.util.Util;
 
 /**
  * @author Marco Schulze - marco at nightlabs dot de
@@ -54,6 +55,8 @@ import org.nightlabs.jfire.store.deliver.id.ModeOfDeliveryID;
 public class ModeOfDelivery
 implements Serializable
 {
+	private static final long serialVersionUID = 1L;
+
 	public static final String FETCH_GROUP_NAME = "ModeOfDelivery.name";
 	public static final String FETCH_GROUP_FLAVOURS = "ModeOfDelivery.flavours";
 	public static final String FETCH_GROUP_THIS_MODE_OF_DELIVERY = "ModeOfDelivery.this";
@@ -186,5 +189,21 @@ implements Serializable
 			flavours.put(modeOfDeliveryFlavourPK, res);
 		}
 		return res;
+	}
+
+	@Override
+	public int hashCode()
+	{
+		return Util.hashCode(organisationID) + Util.hashCode(modeOfDeliveryID);
+	}
+	@Override
+	public boolean equals(Object obj)
+	{
+		if (obj == this) return true;
+		if (!(obj instanceof ModeOfDelivery)) return false;
+		ModeOfDelivery o = (ModeOfDelivery) obj;
+		return
+				Util.equals(this.organisationID, o.organisationID) &&
+				Util.equals(this.modeOfDeliveryID, o.modeOfDeliveryID);
 	}
 }

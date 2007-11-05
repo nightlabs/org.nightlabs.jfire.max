@@ -1440,7 +1440,7 @@ public abstract class AccountingManagerBean
 	 * @ejb.permission role-name="_Guest_"
 	 */
 	public Invoice removeArticlesFromInvoice(
-			InvoiceID invoiceID, Collection articleIDs,
+			InvoiceID invoiceID, Collection<ArticleID> articleIDs,
 			boolean validate, boolean get, String[] fetchGroups, int maxFetchDepth)
 		throws ModuleException
 	{
@@ -1449,11 +1449,11 @@ public abstract class AccountingManagerBean
 			pm.getExtent(Invoice.class);
 			pm.getExtent(Article.class);
 			Invoice invoice = (Invoice) pm.getObjectById(invoiceID);
-			Collection<Object> articles = new ArrayList<Object>(articleIDs.size());
-			for (Iterator it = articleIDs.iterator(); it.hasNext(); ) {
-				ArticleID articleID = (ArticleID) it.next();
-				articles.add(pm.getObjectById(articleID));
-			}
+			Collection<Article> articles = NLJDOHelper.getObjectList(pm, articleIDs, Article.class);
+//			Collection<Article> articles = new ArrayList<Article>(articleIDs.size());
+//			for (ArticleID articleID : articleIDs) {
+//				 articles.add((Article) pm.getObjectById(articleID));
+//			}
 
 			Accounting accounting = Accounting.getAccounting(pm);
 			accounting.removeArticlesFromInvoice(User.getUser(pm, getPrincipal()), invoice, articles);

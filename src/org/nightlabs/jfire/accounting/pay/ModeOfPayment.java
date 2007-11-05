@@ -33,6 +33,7 @@ import java.util.Map;
 
 import org.nightlabs.jfire.accounting.pay.id.ModeOfPaymentFlavourID;
 import org.nightlabs.jfire.accounting.pay.id.ModeOfPaymentID;
+import org.nightlabs.util.Util;
 
 /**
  * @author Marco Schulze - marco at nightlabs dot de
@@ -54,6 +55,8 @@ import org.nightlabs.jfire.accounting.pay.id.ModeOfPaymentID;
 public class ModeOfPayment
 implements Serializable
 {
+	private static final long serialVersionUID = 1L;
+
 	public static final String FETCH_GROUP_NAME = "ModeOfPayment.name";
 	public static final String FETCH_GROUP_FLAVOURS = "ModeOfPayment.flavours";
 	public static final String FETCH_GROUP_THIS_MODE_OF_PAYMENT = "ModeOfPayment.this";
@@ -187,5 +190,21 @@ implements Serializable
 			flavours.put(modeOfPaymentFlavourPK, res);
 		}
 		return res;
+	}
+
+	@Override
+	public int hashCode()
+	{
+		return Util.hashCode(organisationID) + Util.hashCode(modeOfPaymentID);
+	}
+	@Override
+	public boolean equals(Object obj)
+	{
+		if (obj == this) return true;
+		if (!(obj instanceof ModeOfPayment)) return false;
+		ModeOfPayment o = (ModeOfPayment) obj;
+		return
+				Util.equals(this.organisationID, o.organisationID) &&
+				Util.equals(this.modeOfPaymentID, o.modeOfPaymentID);
 	}
 }

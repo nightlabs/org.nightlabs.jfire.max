@@ -30,7 +30,6 @@ import java.io.Serializable;
 import java.rmi.RemoteException;
 import java.util.Collection;
 import java.util.HashSet;
-import java.util.Iterator;
 import java.util.Map;
 import java.util.Set;
 
@@ -49,6 +48,8 @@ import org.nightlabs.jfire.base.BaseSessionBeanImpl;
 import org.nightlabs.jfire.idgenerator.IDGenerator;
 import org.nightlabs.jfire.security.User;
 import org.nightlabs.jfire.store.DeliveryNote;
+import org.nightlabs.jfire.store.Product;
+import org.nightlabs.jfire.store.ProductType;
 import org.nightlabs.jfire.store.ProductTypeActionHandler;
 import org.nightlabs.jfire.store.Store;
 import org.nightlabs.jfire.store.deliver.id.DeliveryDataID;
@@ -289,7 +290,7 @@ implements SessionBean
 				pm.getFetchPlan().setGroups(fetchGroups);
 
 			// get DeliveryNoteIDs for booking
-			Collection deliveryNoteIDs = deliveryData.getDelivery().getDeliveryNoteIDs();
+			Collection<DeliveryNoteID> deliveryNoteIDs = deliveryData.getDelivery().getDeliveryNoteIDs();
 			DeliveryResult deliverEndServerResult_detached = pm.detachCopy(deliverEndServerResult);
 //			deliverBeginServerResult_detached.setError(deliverBeginServerResult.getError());
 
@@ -435,10 +436,10 @@ implements SessionBean
 		private static final Logger logger = Logger.getLogger(ConsolidateProductReferencesInvocation.class);
 
 		private long createDT = System.currentTimeMillis();
-		private Collection deliveryNoteIDs;
+		private Collection<DeliveryNoteID> deliveryNoteIDs;
 		private long delayMSec;
 
-		public ConsolidateProductReferencesInvocation(Collection deliveryNoteIDs, long delayMSec)
+		public ConsolidateProductReferencesInvocation(Collection<DeliveryNoteID> deliveryNoteIDs, long delayMSec)
 		{
 			if (deliveryNoteIDs == null)
 				throw new IllegalArgumentException("deliveryNoteIDs must not be null!");
@@ -469,19 +470,15 @@ implements SessionBean
 				Store store = null;
 
 				pm.getExtent(DeliveryNote.class);
-				Set deliveryNotes = new HashSet();
-				for (Iterator it = deliveryNoteIDs.iterator(); it.hasNext(); ) {
-					DeliveryNoteID deliveryNoteID = (DeliveryNoteID) it.next();
+				Set<DeliveryNote> deliveryNotes = new HashSet<DeliveryNote>();
+				for (DeliveryNoteID deliveryNoteID : deliveryNoteIDs) {
 					DeliveryNote deliveryNote = (DeliveryNote) pm.getObjectById(deliveryNoteID);
 					deliveryNotes.add(deliveryNote);
 				}
 
-				Collection products = new HashSet();
-				for (Iterator itD = deliveryNotes.iterator(); itD.hasNext(); ) {
-					DeliveryNote deliveryNote = (DeliveryNote) itD.next();
-
-					for (Iterator itA = deliveryNote.getArticles().iterator(); itA.hasNext(); ) {
-						Article article = (Article) itA.next();
+				Collection<Product> products = new HashSet<Product>();
+				for (DeliveryNote deliveryNote : deliveryNotes) {
+					for (Article article : deliveryNote.getArticles()) {
 						products.add(article.getProduct());
 					}
 				}
@@ -580,8 +577,8 @@ implements SessionBean
 			delivery.setDeliverBeginServerResult(deliverBeginServerResult);
 
 			// trigger the ProductTypeActionHandler s
-			Map<Class, Set<Article>> productTypeClass2articleSet = Article.getProductTypeClass2articleSetMap(delivery.getArticles());
-			for (Map.Entry<Class, Set<Article>> me : productTypeClass2articleSet.entrySet()) {
+			Map<Class<? extends ProductType>, Set<Article>> productTypeClass2articleSet = Article.getProductTypeClass2articleSetMap(delivery.getArticles());
+			for (Map.Entry<Class<? extends ProductType>, Set<Article>> me : productTypeClass2articleSet.entrySet()) {
 				ProductTypeActionHandler.getProductTypeActionHandler(pm, me.getKey()).onDeliverBegin_storeDeliverBeginServerResult(getPrincipal(), delivery, me.getValue());
 			}
 
@@ -621,8 +618,8 @@ implements SessionBean
 			delivery.setDeliverDoWorkServerResult(deliverDoWorkServerResult);
 
 			// trigger the ProductTypeActionHandler s
-			Map<Class, Set<Article>> productTypeClass2articleSet = Article.getProductTypeClass2articleSetMap(delivery.getArticles());
-			for (Map.Entry<Class, Set<Article>> me : productTypeClass2articleSet.entrySet()) {
+			Map<Class<? extends ProductType>, Set<Article>> productTypeClass2articleSet = Article.getProductTypeClass2articleSetMap(delivery.getArticles());
+			for (Map.Entry<Class<? extends ProductType>, Set<Article>> me : productTypeClass2articleSet.entrySet()) {
 				ProductTypeActionHandler.getProductTypeActionHandler(pm, me.getKey()).onDeliverDoWork_storeDeliverDoWorkServerResult(getPrincipal(), delivery, me.getValue());
 			}
 
@@ -662,8 +659,8 @@ implements SessionBean
 			delivery.setDeliverEndServerResult(deliverEndServerResult);
 
 			// trigger the ProductTypeActionHandler s
-			Map<Class, Set<Article>> productTypeClass2articleSet = Article.getProductTypeClass2articleSetMap(delivery.getArticles());
-			for (Map.Entry<Class, Set<Article>> me : productTypeClass2articleSet.entrySet()) {
+			Map<Class<? extends ProductType>, Set<Article>> productTypeClass2articleSet = Article.getProductTypeClass2articleSetMap(delivery.getArticles());
+			for (Map.Entry<Class<? extends ProductType>, Set<Article>> me : productTypeClass2articleSet.entrySet()) {
 				ProductTypeActionHandler.getProductTypeActionHandler(pm, me.getKey()).onDeliverEnd_storeDeliverEndServerResult(getPrincipal(), delivery, me.getValue());
 			}
 
@@ -692,7 +689,8 @@ implements SessionBean
 		PersistenceManager pm = getPersistenceManager();
 		try {
 			pm.getExtent(Delivery.class);
-			Delivery delivery = (Delivery) pm.getObjectById(deliveryID);
+			// check whether the Delivery exists
+			pm.getObjectById(deliveryID);
 
 			User user = User.getUser(pm, getPrincipal());
 			pm.getExtent(DeliveryData.class);

@@ -80,13 +80,16 @@ import org.nightlabs.jfire.transfer.id.TransferID;
  */
 public class PayMoneyTransfer extends MoneyTransfer
 {
-	public static Collection getChildren(
+	private static final long serialVersionUID = 1L;
+
+	public static Collection<MoneyTransfer> getChildren(
 			PersistenceManager pm, TransferID transferID)
 	{
 		return getChildren(pm, transferID.organisationID, transferID.transferTypeID, transferID.transferID);
 	}
 
-	public static Collection getChildren(
+	@SuppressWarnings("unchecked")
+	public static Collection<MoneyTransfer> getChildren(
 			PersistenceManager pm, String organisationID, String transferTypeID, long transferID)
 	{
 		Query query = pm.newQuery(MoneyTransfer.class);
@@ -96,14 +99,14 @@ public class PayMoneyTransfer extends MoneyTransfer
 				"this.container.organisationID == paramOrganisationID && " +
 				"this.container.transferTypeID == paramTransferTypeID && " +
 				"this.container.transferID == paramTransferID");
-		return (Collection)query.execute(organisationID, transferTypeID, new Long(transferID));
+		return (Collection<MoneyTransfer>)query.execute(organisationID, transferTypeID, new Long(transferID));
 	}
 
 	/**
 	 * This method searches via JDO all <tt>MoneyTransfer</tt>s which have
 	 * {@link Transfer#getContainer()}<tt> == this</tt>.
 	 */
-	public Collection getChildren()
+	public Collection<MoneyTransfer> getChildren()
 	{
 		PersistenceManager pm = JDOHelper.getPersistenceManager(this);
 		if (pm == null)

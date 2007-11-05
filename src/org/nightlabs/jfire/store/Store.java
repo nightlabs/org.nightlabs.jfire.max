@@ -1301,10 +1301,9 @@ implements StoreCallback
 //			setProductLocalAnchorRecursively((Product)it.next(), anchor);
 	}
 
-	protected void deliverBegin_checkArticles(Collection articles)
+	protected void deliverBegin_checkArticles(Collection<? extends Article> articles)
 	{
-		for (Iterator iter = articles.iterator(); iter.hasNext();) {
-			Article article = (Article) iter.next();
+		for (Article article : articles) {
 			if (article.isReversed())
 				throw new IllegalArgumentException("Article " + article.getPrimaryKey() + " is reversed and therefore cannot be delivered!");
 

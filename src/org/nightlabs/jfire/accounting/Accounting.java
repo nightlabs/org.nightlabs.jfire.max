@@ -380,11 +380,10 @@ implements StoreCallback
 		}
 	}
 
-	public void removeArticlesFromInvoice(User user, Invoice invoice, Collection articles)
+	public void removeArticlesFromInvoice(User user, Invoice invoice, Collection<? extends Article> articles)
 	throws InvoiceEditException
 	{
-		for (Iterator it = articles.iterator(); it.hasNext(); ) {
-			Article article = (Article) it.next();
+		for (Article article : articles) {
 			invoice.removeArticle(article);
 		}
 	}
@@ -401,9 +400,8 @@ implements StoreCallback
 	public Invoice createInvoice(User user, ArticleContainer articleContainer, String invoiceIDPrefix) 
 	throws InvoiceEditException 
 	{
-		ArrayList articles = new ArrayList();
-		for (Iterator it = articleContainer.getArticles().iterator(); it.hasNext(); ) {
-			Article article = (Article) it.next();
+		ArrayList<Article> articles = new ArrayList<Article>();
+		for (Article article : articleContainer.getArticles()) {
 			if (article.getInvoice() == null)
 				articles.add(article);
 		}
@@ -507,7 +505,7 @@ implements StoreCallback
 		bookMoneyTransfer = (BookMoneyTransfer) pm.makePersistent(bookMoneyTransfer);
 
 		Set<Anchor> involvedAnchors = new HashSet<Anchor>();
-		ArrayList containers = new ArrayList(1);
+		ArrayList<Transfer> containers = new ArrayList<Transfer>(1);
 		containers.add(bookMoneyTransfer);
 		boolean failed = true;
 		try {
@@ -745,8 +743,8 @@ implements StoreCallback
 
 		PersistenceManager pm = getPersistenceManager();
 
-		Set involvedAnchors = new HashSet();
-		ArrayList containers = new ArrayList(1);
+		Set<Anchor> involvedAnchors = new HashSet<Anchor>();
+		ArrayList<Transfer> containers = new ArrayList<Transfer>(1);
 		containers.add(payMoneyTransfer);
 		boolean failed = true;
 		try {
@@ -913,8 +911,8 @@ implements StoreCallback
 			if (payMoneyTransfer == null)
 				throw new NullPointerException("serverPaymentProcessor.payBegin(...) returned null but Payment is NOT postponed! You are only allowed (and you should) return null, if you postpone a Payment! serverPaymentProcessorPK=\""+serverPaymentProcessor.getPrimaryKey()+"\"");
 
-			Set involvedAnchors = new HashSet();
-			ArrayList containers = new ArrayList(1);
+			Set<Anchor> involvedAnchors = new HashSet<Anchor>();
+			ArrayList<Transfer> containers = new ArrayList<Transfer>(1);
 			containers.add(payMoneyTransfer);
 			boolean failed = true;
 			try {

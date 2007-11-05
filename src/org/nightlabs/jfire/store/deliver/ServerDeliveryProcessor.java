@@ -29,6 +29,7 @@ package org.nightlabs.jfire.store.deliver;
 import java.io.Serializable;
 import java.util.Collection;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Map;
 import java.util.Set;
@@ -46,6 +47,7 @@ import org.nightlabs.jfire.store.deliver.id.ModeOfDeliveryFlavourID;
 import org.nightlabs.jfire.store.deliver.id.ModeOfDeliveryID;
 import org.nightlabs.jfire.trade.LegalEntity;
 import org.nightlabs.jfire.transfer.Anchor;
+import org.nightlabs.util.Util;
 
 /**
  * @author Marco Schulze - marco at nightlabs dot de
@@ -119,22 +121,24 @@ implements Serializable, DetachCallback
 	 * @return Returns a <tt>Collection</tt> with instances of type
 	 *         {@link ServerDeliveryProcessor}.
 	 */
-	public static Collection getServerDeliveryProcessorsForOneModeOfDeliveryFlavour(
+	public static Collection<ServerDeliveryProcessor> getServerDeliveryProcessorsForOneModeOfDeliveryFlavour(
 			PersistenceManager pm, ModeOfDeliveryFlavour modeOfDeliveryFlavour)
 	{
-		return getServerDeliveryProcessorsForOneModeOfDeliveryFlavour(pm,
-				modeOfDeliveryFlavour.getOrganisationID(), modeOfDeliveryFlavour
-						.getModeOfDeliveryFlavourID());
+		return getServerDeliveryProcessorsForOneModeOfDeliveryFlavour(
+				pm,
+				modeOfDeliveryFlavour.getOrganisationID(),
+				modeOfDeliveryFlavour.getModeOfDeliveryFlavourID());
 	}
 
 	/**
 	 * @return Returns a <tt>Collection</tt> with instances of type
 	 *         {@link ServerDeliveryProcessor}.
 	 */
-	public static Collection getServerDeliveryProcessorsForOneModeOfDeliveryFlavour(
+	public static Collection<ServerDeliveryProcessor> getServerDeliveryProcessorsForOneModeOfDeliveryFlavour(
 			PersistenceManager pm, ModeOfDeliveryFlavourID modeOfDeliveryFlavourID)
 	{
-		return getServerDeliveryProcessorsForOneModeOfDeliveryFlavour(pm,
+		return getServerDeliveryProcessorsForOneModeOfDeliveryFlavour(
+				pm,
 				modeOfDeliveryFlavourID.organisationID,
 				modeOfDeliveryFlavourID.modeOfDeliveryFlavourID);
 	}
@@ -143,29 +147,25 @@ implements Serializable, DetachCallback
 	 * @return Returns a <tt>Collection</tt> with instances of type
 	 *         {@link ServerDeliveryProcessor}.
 	 */
-	public static Collection getServerDeliveryProcessorsForOneModeOfDeliveryFlavour(
+	public static Collection<ServerDeliveryProcessor> getServerDeliveryProcessorsForOneModeOfDeliveryFlavour(
 			PersistenceManager pm, String organisationID,
 			String modeOfDeliveryFlavourID)
 	{
-		Map m = new HashMap();
+		Set<ServerDeliveryProcessor> res = new HashSet<ServerDeliveryProcessor>();
 
-		Query query = pm.newNamedQuery(ServerDeliveryProcessor.class,
-				"getServerDeliveryProcessorsForOneModeOfDeliveryFlavour_WORKAROUND1");
-		for (Iterator it = ((Collection) query.execute(organisationID,
-				modeOfDeliveryFlavourID)).iterator(); it.hasNext();) {
+		Query query = pm.newNamedQuery(ServerDeliveryProcessor.class, "getServerDeliveryProcessorsForOneModeOfDeliveryFlavour_WORKAROUND1");
+		for (Iterator<?> it = ((Collection<?>) query.execute(organisationID, modeOfDeliveryFlavourID)).iterator(); it.hasNext();) {
 			ServerDeliveryProcessor p = (ServerDeliveryProcessor) it.next();
-			m.put(p.getPrimaryKey(), p);
+			res.add(p);
 		}
 
-		query = pm.newNamedQuery(ServerDeliveryProcessor.class,
-				"getServerDeliveryProcessorsForOneModeOfDeliveryFlavour_WORKAROUND2");
-		for (Iterator it = ((Collection) query.execute(organisationID,
-				modeOfDeliveryFlavourID)).iterator(); it.hasNext();) {
+		query = pm.newNamedQuery(ServerDeliveryProcessor.class, "getServerDeliveryProcessorsForOneModeOfDeliveryFlavour_WORKAROUND2");
+		for (Iterator<?> it = ((Collection<?>) query.execute(organisationID, modeOfDeliveryFlavourID)).iterator(); it.hasNext();) {
 			ServerDeliveryProcessor p = (ServerDeliveryProcessor) it.next();
-			m.put(p.getPrimaryKey(), p);
+			res.add(p);
 		}
 
-		return m.values();
+		return res;
 	}
 
 	/**
@@ -203,7 +203,7 @@ implements Serializable, DetachCallback
 	 * 
 	 * @jdo.join
 	 */
-	private Map modeOfDeliveries = new HashMap();
+	private Map<String, ModeOfDelivery> modeOfDeliveries;
 
 	/**
 	 * Unlike {@link #modeOfDeliverys}, this <tt>Map</tt> allows
@@ -224,7 +224,7 @@ implements Serializable, DetachCallback
 	 * 
 	 * @jdo.join
 	 */
-	private Map modeOfDeliveryFlavours = new HashMap();
+	private Map<String, ModeOfDeliveryFlavour> modeOfDeliveryFlavours;
 
 	/**
 	 * @jdo.field persistence-modifier="persistent" dependent="true" mapped-by="serverDeliveryProcessor"
@@ -244,7 +244,10 @@ implements Serializable, DetachCallback
 		this.organisationID = organisationID;
 		this.serverDeliveryProcessorID = serverDeliveryProcessorID;
 		this.primaryKey = getPrimaryKey(organisationID, serverDeliveryProcessorID);
+
 		this.name = new ServerDeliveryProcessorName(this);
+		this.modeOfDeliveries = new HashMap<String, ModeOfDelivery>();
+		this.modeOfDeliveryFlavours = new HashMap<String, ModeOfDeliveryFlavour>();
 	}
 
 	/**
@@ -294,19 +297,17 @@ implements Serializable, DetachCallback
 	/**
 	 * @return Returns the modeOfDeliveries.
 	 */
-	public Collection getModeOfDeliveries()
+	public Collection<ModeOfDelivery> getModeOfDeliveries()
 	{
 		return modeOfDeliveries.values();
 	}
 
 	public void addModeOfDeliveryFlavour(ModeOfDeliveryFlavour modeOfDeliveryFlavour)
 	{
-		modeOfDeliveryFlavours.put(modeOfDeliveryFlavour.getPrimaryKey(),
-				modeOfDeliveryFlavour);
+		modeOfDeliveryFlavours.put(modeOfDeliveryFlavour.getPrimaryKey(), modeOfDeliveryFlavour);
 	}
 
-	public void removeModeOfDeliveryFlavour(
-			ModeOfDeliveryFlavourID modeOfDeliveryFlavourID)
+	public void removeModeOfDeliveryFlavour(ModeOfDeliveryFlavourID modeOfDeliveryFlavourID)
 	{
 		modeOfDeliveryFlavours.remove(ModeOfDeliveryFlavour.getPrimaryKey(
 				modeOfDeliveryFlavourID.organisationID,
@@ -321,11 +322,11 @@ implements Serializable, DetachCallback
 	/**
 	 * @return Returns the modeOfDeliveryFlavours.
 	 */
-	public Collection getModeOfDeliveryFlavours()
+	public Collection<ModeOfDeliveryFlavour> getModeOfDeliveryFlavours()
 	{
 		return modeOfDeliveryFlavours.values();
 	}
-	
+
 	/**
 	 * @return Returns the name.
 	 */
@@ -350,7 +351,7 @@ implements Serializable, DetachCallback
 	 *
 	 * @see #getExcludedClientDeliveryProcessorFactoryIDs()
 	 */
-	public Set getIncludedClientDeliveryProcessorFactoryIDs()
+	public Set<String> getIncludedClientDeliveryProcessorFactoryIDs()
 	{
 		return null;
 	}
@@ -373,7 +374,7 @@ implements Serializable, DetachCallback
 	 *
 	 * @see #getIncludedClientDeliveryProcessorFactoryIDs()
 	 */
-	public Set getExcludedClientDeliveryProcessorFactoryIDs()
+	public Set<String> getExcludedClientDeliveryProcessorFactoryIDs()
 	{
 		return null;
 	}
@@ -735,5 +736,22 @@ implements Serializable, DetachCallback
 		ServerDeliveryProcessor attached = (ServerDeliveryProcessor) o;
 
 		detached.requirementCheckKey = attached.requirementCheckKey;
+	}
+
+	@Override
+	public boolean equals(Object obj)
+	{
+		if (obj == this) return true;
+		if (!(obj instanceof ServerDeliveryProcessor)) return false;
+		ServerDeliveryProcessor o = (ServerDeliveryProcessor) obj;
+		return 
+				Util.equals(this.organisationID, o.organisationID) &&
+				Util.equals(this.serverDeliveryProcessorID, o.serverDeliveryProcessorID);
+	}
+
+	@Override
+	public int hashCode()
+	{
+		return Util.hashCode(organisationID) + Util.hashCode(serverDeliveryProcessorID);
 	}
 }

@@ -181,29 +181,29 @@ implements Serializable, DeleteCallback, DetachCallback, StoreCallback
 		return (Article) q.execute(offer, product);
 	}
 
-	public static Map<Class, Set<Article>> getProductTypeClass2articleSetMapFromArticleContainers(Collection<? extends ArticleContainer> articleContainers)
+	public static Map<Class<? extends ProductType>, Set<Article>> getProductTypeClass2articleSetMapFromArticleContainers(Collection<? extends ArticleContainer> articleContainers)
 	{
-		Map<Class, Set<Article>> result = new HashMap<Class, Set<Article>>();
+		Map<Class<? extends ProductType>, Set<Article>> result = new HashMap<Class<? extends ProductType>, Set<Article>>();
 		for (ArticleContainer articleContainer : articleContainers) {
 			populateProductTypeClass2articleSetMap(result, articleContainer.getArticles());
 		}
 		return result;
 	}
 
-	public static Map<Class, Set<Article>> getProductTypeClass2articleSetMap(Collection<? extends Article> articles)
+	public static Map<Class<? extends ProductType>, Set<Article>> getProductTypeClass2articleSetMap(Collection<? extends Article> articles)
 	{
-		Map<Class, Set<Article>> result = new HashMap<Class, Set<Article>>();
+		Map<Class<? extends ProductType>, Set<Article>> result = new HashMap<Class<? extends ProductType>, Set<Article>>();
 		populateProductTypeClass2articleSetMap(result, articles);
 		return result;
 	}
 
-	public static void populateProductTypeClass2articleSetMap(Map<Class, Set<Article>> productTypeClass2articleSetMap, Collection<? extends Article> articles)
+	public static void populateProductTypeClass2articleSetMap(Map<Class<? extends ProductType>, Set<Article>> productTypeClass2articleSetMap, Collection<? extends Article> articles)
 	{
 		if (productTypeClass2articleSetMap == null)
 			throw new IllegalArgumentException("productTypeClass2articleSetMap is null!");
 
 		for (Article article : articles) {
-			Class clazz = article.getProductType().getClass();
+			Class<? extends ProductType> clazz = article.getProductType().getClass();
 			Set<Article> articleSet = productTypeClass2articleSetMap.get(clazz);
 			if (articleSet == null) {
 				articleSet = new HashSet<Article>();
@@ -1175,7 +1175,7 @@ implements Serializable, DeleteCallback, DetachCallback, StoreCallback
 	{
 		Article attached = (Article)_attached;
 		Article detached = this;
-		Collection fetchGroups = attached.getPersistenceManager().getFetchPlan().getGroups();
+		Set<?> fetchGroups = attached.getPersistenceManager().getFetchPlan().getGroups();
 
 		boolean fetchGroupsArticleInEditor =
 			fetchGroups.contains(FetchGroupsTrade.FETCH_GROUP_ARTICLE_IN_ORDER_EDITOR) ||

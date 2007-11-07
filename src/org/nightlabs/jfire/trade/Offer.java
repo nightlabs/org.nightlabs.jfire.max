@@ -795,26 +795,30 @@ implements
 		PersistenceManager pm = attached.getPersistenceManager();
 		Collection<?> fetchGroups = pm.getFetchPlan().getGroups();
 
-		if (fetchGroups.contains(FetchPlan.ALL) || fetchGroups.contains(FETCH_GROUP_THIS_OFFER) || fetchGroups.contains(FETCH_GROUP_VENDOR)) {
+		// We don't need to check for FetchPlan.ALL, because the fields Offer.order and Order.customer/Order.vendor
+		// are detached as well, if FetchPlan.ALL is passed. So we don't need to separately handle this case.
+		// The only problem might arise from a limited max-fetch-depth, but this is IMHO so rare that it doesn't justify the
+		// additional overhead here and performance loss. We can add it later, if really needed.
+		if (fetchGroups.contains(FETCH_GROUP_THIS_OFFER) || fetchGroups.contains(FETCH_GROUP_VENDOR)) {
 			detached.vendor = pm.detachCopy(attached.getVendor());
 			detached.vendor_detached = true;
 		}
 
-		if (fetchGroups.contains(FetchPlan.ALL) || fetchGroups.contains(FETCH_GROUP_THIS_OFFER) || fetchGroups.contains(FETCH_GROUP_CUSTOMER)) {
+		if (fetchGroups.contains(FETCH_GROUP_THIS_OFFER) || fetchGroups.contains(FETCH_GROUP_CUSTOMER)) {
 			detached.customer = pm.detachCopy(attached.getCustomer());
 			detached.customer_detached = true;
 		}
 
-		if (fetchGroups.contains(FetchPlan.ALL) || fetchGroups.contains(FETCH_GROUP_THIS_OFFER) || fetchGroups.contains(FETCH_GROUP_VENDOR_ID)) {
+		if (fetchGroups.contains(FETCH_GROUP_THIS_OFFER) || fetchGroups.contains(FETCH_GROUP_VENDOR_ID)) {
 			detached.vendorID = attached.getVendorID();
 			detached.vendorID_detached = true;
 		}
 
-		if (fetchGroups.contains(FetchPlan.ALL) || fetchGroups.contains(FETCH_GROUP_THIS_OFFER) || fetchGroups.contains(FETCH_GROUP_CUSTOMER_ID)) {
+		if (fetchGroups.contains(FETCH_GROUP_THIS_OFFER) || fetchGroups.contains(FETCH_GROUP_CUSTOMER_ID)) {
 			detached.customerID = attached.getCustomerID();
 			detached.customerID_detached = true;
 		}
-		
+
 		detached.attachable = true;
 	}
 

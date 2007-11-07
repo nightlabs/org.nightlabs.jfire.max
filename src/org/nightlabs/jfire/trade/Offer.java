@@ -35,7 +35,7 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
 
-import javax.jdo.JDODetachedFieldAccessException;
+import javax.jdo.FetchPlan;
 import javax.jdo.JDOHelper;
 import javax.jdo.PersistenceManager;
 import javax.jdo.Query;
@@ -793,24 +793,24 @@ implements
 		Offer attached = (Offer)_attached;
 		Offer detached = this;
 		PersistenceManager pm = attached.getPersistenceManager();
-		Collection fetchGroups = pm.getFetchPlan().getGroups();
+		Collection<?> fetchGroups = pm.getFetchPlan().getGroups();
 
-		if (fetchGroups.contains(FETCH_GROUP_THIS_OFFER) || fetchGroups.contains(FETCH_GROUP_VENDOR)) {
+		if (fetchGroups.contains(FetchPlan.ALL) || fetchGroups.contains(FETCH_GROUP_THIS_OFFER) || fetchGroups.contains(FETCH_GROUP_VENDOR)) {
 			detached.vendor = pm.detachCopy(attached.getVendor());
 			detached.vendor_detached = true;
 		}
 
-		if (fetchGroups.contains(FETCH_GROUP_THIS_OFFER) || fetchGroups.contains(FETCH_GROUP_CUSTOMER)) {
+		if (fetchGroups.contains(FetchPlan.ALL) || fetchGroups.contains(FETCH_GROUP_THIS_OFFER) || fetchGroups.contains(FETCH_GROUP_CUSTOMER)) {
 			detached.customer = pm.detachCopy(attached.getCustomer());
 			detached.customer_detached = true;
 		}
 
-		if (fetchGroups.contains(FETCH_GROUP_THIS_OFFER) || fetchGroups.contains(FETCH_GROUP_VENDOR_ID)) {
+		if (fetchGroups.contains(FetchPlan.ALL) || fetchGroups.contains(FETCH_GROUP_THIS_OFFER) || fetchGroups.contains(FETCH_GROUP_VENDOR_ID)) {
 			detached.vendorID = attached.getVendorID();
 			detached.vendorID_detached = true;
 		}
 
-		if (fetchGroups.contains(FETCH_GROUP_THIS_OFFER) || fetchGroups.contains(FETCH_GROUP_CUSTOMER_ID)) {
+		if (fetchGroups.contains(FetchPlan.ALL) || fetchGroups.contains(FETCH_GROUP_THIS_OFFER) || fetchGroups.contains(FETCH_GROUP_CUSTOMER_ID)) {
 			detached.customerID = attached.getCustomerID();
 			detached.customerID_detached = true;
 		}

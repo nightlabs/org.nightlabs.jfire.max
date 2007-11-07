@@ -17,7 +17,7 @@ import org.nightlabs.i18n.I18nText;
  * @jdo.inheritance strategy="new-table"
  *
  * @jdo.create-objectid-class
- * 
+ * 		field-order="organisationID, issueID"
  * @jdo.fetch-group name="Issue.subject" fields="issue, subjects"
  */ 
 public class IssueSubject 
@@ -26,6 +26,13 @@ extends I18nText{
 	 * The serial version of this class.
 	 */
 	private static final long serialVersionUID = 1L;
+	
+	/**
+	 * @jdo.field primary-key="true"
+	 * @jdo.column length="100"
+	 */
+	private String organisationID;
+	
 	/**
 	 * @jdo.field primary-key="true"
 	 * @jdo.column length="100"
@@ -62,10 +69,26 @@ extends I18nText{
 
 	public IssueSubject(Issue issue)
 	{
+		this.organisationID = issue.getOrganisationID();
 		this.issue = issue;
 		issueID = issue.getIssueID();
 	}
 
+	/**
+	 * @return Returns the organisationID.
+	 */
+	public String getOrganisationID() {
+		return organisationID;
+	}
+	
+	
+	/**
+	 * @param organisationID The organisationID to set.
+	 */
+	public void setOrganisationID(String organisationID) {
+		this.organisationID = organisationID;
+	}
+	
 	/**
 	 * @see org.nightlabs.i18n.I18nText#getI18nMap()
 	 */

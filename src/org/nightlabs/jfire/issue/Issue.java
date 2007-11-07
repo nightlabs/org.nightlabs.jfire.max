@@ -35,6 +35,7 @@ import javax.jdo.PersistenceManager;
 
 import org.apache.log4j.Logger;
 import org.nightlabs.jdo.ObjectID;
+import org.nightlabs.jfire.idgenerator.IDGenerator;
 import org.nightlabs.jfire.security.User;
 import org.nightlabs.util.Utils;
 
@@ -157,13 +158,14 @@ implements Serializable
 	 */
 	protected Issue() { }
 
-	public Issue(IssuePriority priority, IssueSeverityType severityType, IssueStatus status, User creator, ObjectID objectID)
+	public Issue(String organisationID, IssuePriority priority, IssueSeverityType severityType, IssueStatus status, User creator, ObjectID objectID)
 	{
 		if (creator == null)
 			throw new NullPointerException("creator");
 		this.creator = creator;
 		this.createTimestamp = new Date();
 		
+		this.organisationID = organisationID;
 		this.issueID = objectID!=null?objectID.toString()+"&"+createTimestamp.toString():createTimestamp.toString();
 //		this.documents = new <String>();
 		

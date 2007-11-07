@@ -69,6 +69,8 @@ implements Serializable{
 	{
 		if (issue == null)
 			throw new NullPointerException("issue");
+		this.organisationID = issue.getOrganisationID();
+		this.issueID = issue.getIssueID();
 	}
 	
 	/**

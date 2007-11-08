@@ -27,15 +27,16 @@
 package org.nightlabs.jfire.issue;
 
 import java.io.Serializable;
-import java.util.Collection;
 import java.util.Date;
+import java.util.Set;
 
 import javax.jdo.JDOHelper;
 import javax.jdo.PersistenceManager;
+import javax.jdo.listener.DetachCallback;
 
 import org.apache.log4j.Logger;
 import org.nightlabs.jdo.ObjectID;
-import org.nightlabs.jfire.idgenerator.IDGenerator;
+import org.nightlabs.jfire.jbpm.graph.def.StateDefinition;
 import org.nightlabs.jfire.security.User;
 import org.nightlabs.util.Utils;
 
@@ -71,12 +72,14 @@ import org.nightlabs.util.Utils;
  *
  **/
 public class Issue
-implements Serializable
+implements 	
+		Serializable,
+		DetachCallback
 {
-	
+
 	private static final long serialVersionUID = 1L;
 	private static final Logger logger = Logger.getLogger(Issue.class);
-	
+
 	public static final String FETCH_GROUP_THIS = "Issue.this";
 	public static final String FETCH_GROUP_DESCRIPTION = "Issue.description";
 	public static final String FETCH_GROUP_SUBJECT = "Issue.subject";
@@ -102,77 +105,90 @@ implements Serializable
 	private long issueTypeID;
 
 //	/** Documents for the issue
-//    *
-//    * @jdo.field
-//    *    persistence-modifier="persistent"
-//    *    collection-type="collection"
-//    *    element-type="ObjectID" 
-//    *    mapped-by="supplier"
-//    **/
+//	*
+//	* @jdo.field
+//	*    persistence-modifier="persistent"
+//	*    collection-type="collection"
+//	*    element-type="ObjectID" 
+//	*    mapped-by="supplier"
+//	**/
 //	private Collection attachedDocuments = new HashSet();
-	
+
+	/**
+	 * Instances of {@link String}.
+	 *
+	 * @jdo.field
+	 *		persistence-modifier="persistent"
+	 *		collection-type="collection"
+	 *		element-type="String"
+	 *		dependent-value="true"
+	 *		mapped-by="issue"
+	 */
+	private Set<String> referencedObjectIDs;
+
+	private Set<Object> referencedObjects;
 	/**
 	 * @jdo.field persistence-modifier="persistent"
 	 */
 	private IssuePriority priority;
-	
+
 	/**
 	 * @jdo.field persistence-modifier="persistent"
 	 */
 	private IssueSeverityType severityType;
-	
+
 	/**
 	 * @jdo.field persistence-modifier="persistent"
 	 */
-	private IssueStatus status;
-	
-	
+	private StateDefinition status;
+
+
 	/**
 	 * @jdo.field persistence-modifier="persistent"
 	 */
 	private IssueSubject subject;
-	
+
 	/**
 	 * @jdo.field persistence-modifier="persistent"
 	 */
 	private IssueDescription description;
-	
+
 	/**
 	 * @jdo.field persistence-modifier="persistent" load-fetch-group="all"
 	 */
 	private User creator; 
-	
+
 	/**
 	 * @jdo.field persistence-modifier="persistent"
 	 */
 	private Date createTimestamp;
-	
+
 	/**
 	 * @jdo.field persistence-modifier="persistent"
 	 */
 	private Date updateTimestamp;
-	
+
 
 	/**
 	 * @deprecated Constructor exists only for JDO! 
 	 */
 	protected Issue() { }
 
-	public Issue(String organisationID, IssuePriority priority, IssueSeverityType severityType, IssueStatus status, User creator, ObjectID objectID)
+	public Issue(String organisationID, IssuePriority priority, IssueSeverityType severityType, StateDefinition status, User creator, ObjectID objectID)
 	{
 		if (creator == null)
 			throw new NullPointerException("creator");
 		this.creator = creator;
 		this.createTimestamp = new Date();
-		
+
 		this.organisationID = organisationID;
 		this.issueID = objectID!=null?objectID.toString()+"&"+createTimestamp.toString():createTimestamp.toString();
 //		this.documents = new <String>();
-		
+
 		this.priority = priority;
 		this.severityType = severityType;
 		this.status = status;
-		
+
 		subject = new IssueSubject(this);
 		description = new IssueDescription(this);
 	}
@@ -218,28 +234,28 @@ implements Serializable
 	public Date getCreateTimestamp() {
 		return createTimestamp;
 	}
-	
+
 	/**
 	 * @param timestamp The timestamp to set.
 	 */
 	public void setCreateTimestamp(Date timestamp) {
 		this.createTimestamp = timestamp;
 	}
-	
+
 	/**
 	 * @return Returns the update timestamp.
 	 */
 	public Date getUpdateTimestamp() {
 		return updateTimestamp;
 	}
-	
+
 	/**
 	 * @param timestamp The timestamp to set.
 	 */
 	public void setUpdateTimestamp(Date timestamp) {
 		this.updateTimestamp = timestamp;
 	}
-	
+
 	/**
 	 * @return Returns the description.
 	 */
@@ -253,7 +269,7 @@ implements Serializable
 	public void setDescription(IssueDescription description) {
 		this.description = description;
 	}
-	
+
 	/**
 	 * @return Returns the subject.
 	 */
@@ -282,7 +298,7 @@ implements Serializable
 		this.creator = user;
 	}
 
-	
+
 	public IssuePriority getPriority() {
 		return priority;
 	}
@@ -299,11 +315,11 @@ implements Serializable
 		this.severityType = severityType;
 	}
 
-	public IssueStatus getStatus() {
+	public StateDefinition getStatus() {
 		return status;
 	}
 
-	public void setStatus(IssueStatus status) {
+	public void setStatus(StateDefinition status) {
 		this.status = status;
 	}
 
@@ -327,9 +343,9 @@ implements Serializable
 //	}
 //	public void jdoPostDetach(Object _attached)
 //	{
-//		Issue attached = (Issue)_attached;
-//		Issue detached = this;
-//		Collection fetchGroups = attached.getPersistenceManager().getFetchPlan().getGroups();
+//	Issue attached = (Issue)_attached;
+//	Issue detached = this;
+//	Collection fetchGroups = attached.getPersistenceManager().getFetchPlan().getGroups();
 //	}
 
 	@Override
@@ -353,12 +369,12 @@ implements Serializable
 		return
 		Utils.hashCode(this.organisationID); //^
 	}
-	
+
 	/**
 	 * @jdo.field persistence-modifier="persistent"
 	 */
 	private String primaryKey;
-	
+
 	public static String getPrimaryKey(String organisationID, String issueID)
 	{
 		return organisationID + '/' + issueID;
@@ -366,5 +382,38 @@ implements Serializable
 	public String getPrimaryKey()
 	{
 		return primaryKey;
+	}
+
+	public void jdoPreDetach() {
+		// TODO Auto-generated method stub
+		
+	}
+	
+	public void jdoPostDetach(Object _attached) {
+//		Offer attached = (Offer)_attached;
+//		Offer detached = this;
+//		PersistenceManager pm = attached.getPersistenceManager();
+//		Collection fetchGroups = pm.getFetchPlan().getGroups();
+//
+//		if (fetchGroups.contains(FETCH_GROUP_THIS_OFFER) || fetchGroups.contains(FETCH_GROUP_VENDOR)) {
+//			detached.vendor = (LegalEntity) pm.detachCopy(attached.getVendor());
+//			detached.vendor_detached = true;
+//		}
+//
+//		if (fetchGroups.contains(FETCH_GROUP_THIS_OFFER) || fetchGroups.contains(FETCH_GROUP_CUSTOMER)) {
+//			detached.customer = (LegalEntity) pm.detachCopy(attached.getCustomer());
+//			detached.customer_detached = true;
+//		}
+//
+//		if (fetchGroups.contains(FETCH_GROUP_THIS_OFFER) || fetchGroups.contains(FETCH_GROUP_VENDOR_ID)) {
+//			detached.vendorID = attached.getVendorID();
+//			detached.vendorID_detached = true;
+//		}
+//
+//		if (fetchGroups.contains(FETCH_GROUP_THIS_OFFER) || fetchGroups.contains(FETCH_GROUP_CUSTOMER_ID)) {
+//			detached.customerID = attached.getCustomerID();
+//			detached.customerID_detached = true;
+//		}
+//		detached.attachable = true;
 	}
 }

@@ -106,7 +106,6 @@ import org.nightlabs.jfire.base.BaseSessionBeanImpl;
 import org.nightlabs.jfire.idgenerator.IDNamespaceDefault;
 import org.nightlabs.jfire.jbpm.JbpmLookup;
 import org.nightlabs.jfire.jbpm.graph.def.ProcessDefinition;
-import org.nightlabs.jfire.organisation.Organisation;
 import org.nightlabs.jfire.security.User;
 import org.nightlabs.jfire.store.DeliveryNote;
 import org.nightlabs.jfire.store.NestedProductType;
@@ -253,37 +252,35 @@ public abstract class AccountingManagerBean
 			currency = new Currency("CHF", "CHF", 2);
 			pm.makePersistent(currency);
 
-			// FIXME: Changed PriceFragmentType creation. 
-			// It now uses DEVIL_ORG_ID instead of root-organisation-id.
 			// create PriceFragmentTypes for Swiss and German VAT
-			PriceFragmentType priceFragmentType = new PriceFragmentType(Organisation.DEVIL_ORGANISATION_ID, "vat-de-19-net");
+			PriceFragmentType priceFragmentType = new PriceFragmentType(PriceFragmentTypeHelper.getDE().VAT_DE_19_NET);
 			priceFragmentType.getName().setText(Locale.ENGLISH.getLanguage(), "VAT Germany 19% Net");
 			priceFragmentType.getName().setText(Locale.GERMAN.getLanguage(), "MwSt. Deutschland 19% Netto");
 			priceFragmentType.setContainerPriceFragmentType(PriceFragmentType.getTotalPriceFragmentType(pm));
 			pm.makePersistent(priceFragmentType);
 
-			priceFragmentType = new PriceFragmentType(Organisation.DEVIL_ORGANISATION_ID, "vat-de-19-val");
+			priceFragmentType = new PriceFragmentType(PriceFragmentTypeHelper.getDE().VAT_DE_19_VAL);
 			priceFragmentType.getName().setText(Locale.ENGLISH.getLanguage(), "VAT Germany 19% Value");
 			priceFragmentType.getName().setText(Locale.GERMAN.getLanguage(), "MwSt. Deutschland 19% Wert");
 			priceFragmentType.setContainerPriceFragmentType(PriceFragmentType.getTotalPriceFragmentType(pm));
 			pm.makePersistent(priceFragmentType);
 
-			priceFragmentType = new PriceFragmentType(Organisation.DEVIL_ORGANISATION_ID, "vat-de-7-net");
+			priceFragmentType = new PriceFragmentType(PriceFragmentTypeHelper.getDE().VAT_DE_7_NET);
 			priceFragmentType.getName().setText(Locale.ENGLISH.getLanguage(), "VAT Germany 7% Net");
 			priceFragmentType.setContainerPriceFragmentType(PriceFragmentType.getTotalPriceFragmentType(pm));
 			pm.makePersistent(priceFragmentType);
 
-			priceFragmentType = new PriceFragmentType(Organisation.DEVIL_ORGANISATION_ID, "vat-de-7-val");
+			priceFragmentType = new PriceFragmentType(PriceFragmentTypeHelper.getDE().VAT_DE_7_VAL);
 			priceFragmentType.getName().setText(Locale.ENGLISH.getLanguage(), "VAT Germany 7% Value");
 			priceFragmentType.setContainerPriceFragmentType(PriceFragmentType.getTotalPriceFragmentType(pm));
 			pm.makePersistent(priceFragmentType);
 
-			priceFragmentType = new PriceFragmentType(Organisation.DEVIL_ORGANISATION_ID, "vat-ch-7_6-net");
+			priceFragmentType = new PriceFragmentType(PriceFragmentTypeHelper.getCH().VAT_CH_7_6_NET);
 			priceFragmentType.getName().setText(Locale.ENGLISH.getLanguage(), "VAT Switzerland 7.6% Net");
 			priceFragmentType.setContainerPriceFragmentType(PriceFragmentType.getTotalPriceFragmentType(pm));
 			pm.makePersistent(priceFragmentType);
 
-			priceFragmentType = new PriceFragmentType(Organisation.DEVIL_ORGANISATION_ID, "vat-ch-7_6-val");
+			priceFragmentType = new PriceFragmentType(PriceFragmentTypeHelper.getCH().VAT_CH_7_6_VAL);
 			priceFragmentType.getName().setText(Locale.ENGLISH.getLanguage(), "VAT Switzerland 7.6% Value");
 			priceFragmentType.setContainerPriceFragmentType(PriceFragmentType.getTotalPriceFragmentType(pm));
 			pm.makePersistent(priceFragmentType);

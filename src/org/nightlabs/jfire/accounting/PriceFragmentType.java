@@ -86,6 +86,11 @@ public class PriceFragmentType
 
 	protected PriceFragmentType() { }
 
+	public PriceFragmentType(PriceFragmentTypeID priceFragmentTypeID)
+	{
+		this(priceFragmentTypeID.organisationID, priceFragmentTypeID.priceFragmentTypeID);
+	}
+
 	public PriceFragmentType(String organisationID, String priceFragmentTypeID)
 	{
 		this.organisationID = organisationID;

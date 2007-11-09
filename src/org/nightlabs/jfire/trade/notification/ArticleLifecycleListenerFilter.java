@@ -40,7 +40,7 @@ extends JDOLifecycleListenerFilter
 	private static final Class[] candidateClasses = { Article.class };
 
 	@Implement
-	public Class[] getCandidateClasses()
+	public Class<?>[] getCandidateClasses()
 	{
 		return candidateClasses;
 	}

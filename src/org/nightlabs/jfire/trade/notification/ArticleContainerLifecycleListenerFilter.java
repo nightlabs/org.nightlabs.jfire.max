@@ -119,7 +119,7 @@ extends JDOLifecycleListenerFilter
 	private static final Class[] candidateClasses = { Order.class, Offer.class, Invoice.class, DeliveryNote.class };
 
 	@Implement
-	public Class[] getCandidateClasses()
+	public Class<?>[] getCandidateClasses()
 	{
 		return candidateClasses;
 	}

@@ -51,7 +51,6 @@ import org.nightlabs.jfire.accounting.gridpriceconfig.StablePriceConfig;
 import org.nightlabs.jfire.accounting.priceconfig.IInnerPriceConfig;
 import org.nightlabs.jfire.accounting.priceconfig.PriceConfig;
 import org.nightlabs.jfire.idgenerator.IDGenerator;
-import org.nightlabs.jfire.organisation.Organisation;
 import org.nightlabs.jfire.prop.IStruct;
 import org.nightlabs.jfire.prop.PropertySet;
 import org.nightlabs.jfire.prop.StructLocal;
@@ -248,88 +247,50 @@ extends DataCreator
 		}
 	}
 
-	public IInnerPriceConfig createInnerPercentagePriceConfig(String name, int percentage, ProductType packageProductType)
-	{
-		FormulaPriceConfig formulaPriceConfig = new FormulaPriceConfig(IDGenerator.getOrganisationID(), IDGenerator.nextID(PriceConfig.class));
-//		PriceFragmentType vatNet = (PriceFragmentType) pm.getObjectById(PriceFragmentTypeID.create(rootOrganisationID, "vat-de-19-net"));
-//		PriceFragmentType vatVal = (PriceFragmentType) pm.getObjectById(PriceFragmentTypeID.create(rootOrganisationID, "vat-de-19-val"));
-		PriceFragmentType vatNet = getPriceFragmentTypeVatNet();
-		PriceFragmentType vatVal = getPriceFragmentTypeVatVal();
-		formulaPriceConfig.addProductType(packageProductType);
-		formulaPriceConfig.addPriceFragmentType(vatVal);
-		formulaPriceConfig.addPriceFragmentType(vatNet);
-		formulaPriceConfig.getName().setText(languageID, name);
-		FormulaCell fallbackFormulaCell = formulaPriceConfig.createFallbackFormulaCell();
-		fallbackFormulaCell.setFormula(
-				PriceFragmentType.PRICE_FRAGMENT_TYPE_ID_TOTAL.organisationID,
-				PriceFragmentType.PRICE_FRAGMENT_TYPE_ID_TOTAL.priceFragmentTypeID,
-				"cell.resolvePriceCellsAmount(\n" +
-				"	new Array(\n" +
-				"		ProductTypeID.create(\"" + packageProductType.getOrganisationID() + "\", \"" + packageProductType.getProductTypeID() + "\")\n" +
-				"	)\n" +
-				") * 0.1;");
-//				"	new AbsolutePriceCoordinate(\n" +
-//				"		null,\n" +
-//				"		null,\n" +
-//				"		null,\n" +
-//				"		\""+packageProductType.getPrimaryKey()+"\",\n" +
-//				"		null\n" +
+//	public IInnerPriceConfig createInnerPercentagePriceConfig(String name, int percentage, ProductType packageProductType)
+//	{
+//		FormulaPriceConfig formulaPriceConfig = new FormulaPriceConfig(IDGenerator.getOrganisationID(), IDGenerator.nextID(PriceConfig.class));
+////		PriceFragmentType vatNet = (PriceFragmentType) pm.getObjectById(PriceFragmentTypeID.create(rootOrganisationID, "vat-de-19-net"));
+////		PriceFragmentType vatVal = (PriceFragmentType) pm.getObjectById(PriceFragmentTypeID.create(rootOrganisationID, "vat-de-19-val"));
+//		PriceFragmentType vatNet = getPriceFragmentTypeVatNet();
+//		PriceFragmentType vatVal = getPriceFragmentTypeVatVal();
+//		formulaPriceConfig.addProductType(packageProductType);
+//		formulaPriceConfig.addPriceFragmentType(vatVal);
+//		formulaPriceConfig.addPriceFragmentType(vatNet);
+//		formulaPriceConfig.getName().setText(languageID, name);
+//		FormulaCell fallbackFormulaCell = formulaPriceConfig.createFallbackFormulaCell();
+//		fallbackFormulaCell.setFormula(
+//				PriceFragmentType.PRICE_FRAGMENT_TYPE_ID_TOTAL.organisationID,
+//				PriceFragmentType.PRICE_FRAGMENT_TYPE_ID_TOTAL.priceFragmentTypeID,
+//				"cell.resolvePriceCellsAmount(\n" +
+//				"	new Array(\n" +
+//				"		ProductTypeID.create(\"" + packageProductType.getOrganisationID() + "\", \"" + packageProductType.getProductTypeID() + "\")\n" +
 //				"	)\n" +
 //				") * 0.1;");
-
-		fallbackFormulaCell.setFormula(vatNet,
-				"cell.resolvePriceCellsAmount(\n" +
-				"	new Array(\n" +
-				"		PriceFragmentTypeID.create(\"" + PriceFragmentType.PRICE_FRAGMENT_TYPE_ID_TOTAL.organisationID + "\", \"" + PriceFragmentType.PRICE_FRAGMENT_TYPE_ID_TOTAL.priceFragmentTypeID + "\")\n" +
-				"	)\n" +
-				") / 1.19;");
+//
+//		fallbackFormulaCell.setFormula(vatNet,
 //				"cell.resolvePriceCellsAmount(\n" +
-//				"	new AbsolutePriceCoordinate(\n" +
-//				"		null,\n" +
-//				"		null,\n" +
-//				"		null,\n" +
-//				"		null,\n" +
-//				"		\""+Organisation.DEVIL_ORGANISATION_ID+"/_Total_\"\n" +
-//				"	)\n"+
+//				"	new Array(\n" +
+//				"		PriceFragmentTypeID.create(\"" + PriceFragmentType.PRICE_FRAGMENT_TYPE_ID_TOTAL.organisationID + "\", \"" + PriceFragmentType.PRICE_FRAGMENT_TYPE_ID_TOTAL.priceFragmentTypeID + "\")\n" +
+//				"	)\n" +
 //				") / 1.19;");
-		fallbackFormulaCell.setFormula(vatVal,
-				"cell.resolvePriceCellsAmount(\n" +
-				"	new Array(\n" +
-				"		PriceFragmentTypeID.create(\"" + PriceFragmentType.PRICE_FRAGMENT_TYPE_ID_TOTAL.organisationID + "\", \"" + PriceFragmentType.PRICE_FRAGMENT_TYPE_ID_TOTAL.priceFragmentTypeID + "\")\n" +
-				"	)\n" +
-				")\n" +
-				"\n" +
-				"-\n" +
-				"\n" +
-				"cell.resolvePriceCellsAmount(\n" +
-				"	new Array(\n" +
-				"		PriceFragmentTypeID.create(\"" + Organisation.DEVIL_ORGANISATION_ID + "\", \"vat-de-19-net\")\n" +
-				"	)\n" +
-				");");
+//		fallbackFormulaCell.setFormula(vatVal,
 //				"cell.resolvePriceCellsAmount(\n" +
-//				"	new AbsolutePriceCoordinate(\n" +
-//				"		null,\n" +
-//				"		null,\n" +
-//				"		null,\n" +
-//				"		null,\n" +
-//				"		\""+Organisation.DEVIL_ORGANISATION_ID+"/_Total_\"\n" +
-//				"	)\n"+
+//				"	new Array(\n" +
+//				"		PriceFragmentTypeID.create(\"" + PriceFragmentType.PRICE_FRAGMENT_TYPE_ID_TOTAL.organisationID + "\", \"" + PriceFragmentType.PRICE_FRAGMENT_TYPE_ID_TOTAL.priceFragmentTypeID + "\")\n" +
+//				"	)\n" +
 //				")\n" +
 //				"\n" +
 //				"-\n" +
 //				"\n" +
 //				"cell.resolvePriceCellsAmount(\n" +
-//				"	new AbsolutePriceCoordinate(\n" +
-//				"		null,\n" +
-//				"		null,\n" +
-//				"		null,\n" +
-//				"		null,\n" +
-//				"		\""+rootOrganisationID+"/vat-de-19-net\"\n" +
-//				"	)\n"+
+//				"	new Array(\n" +
+//				"		PriceFragmentTypeID.create(\"" + vatNet.getOrganisationID() + "\", \"" + vatNet.getPriceFragmentTypeID() + "\")\n" +
+//				"	)\n" +
 //				");");
-
-		return formulaPriceConfig;
-	}
+//
+//		return formulaPriceConfig;
+//	}
 
 	public IInnerPriceConfig createFixPriceConfig(Tariff[] tariffs, long[] prices, String ... names)
 	{
@@ -376,15 +337,7 @@ extends DataCreator
 				"		CustomerGroupID.create(\"" + organisationID + "\", \"" + CustomerGroup.CUSTOMER_GROUP_ID_DEFAULT + "\")\n" +
 				"	)\n" +
 				");");
-//				"cell.resolvePriceCellsAmount(\n" +
-//				"	new AbsolutePriceCoordinate(\n" +
-//				"		\""+organisationID+"/"+CustomerGroup.CUSTOMER_GROUP_ID_DEFAULT+"\",\n" +
-//				"		null,\n" +
-//				"		null,\n" +
-//				"		null,\n" +
-//				"		null\n" +
-//				"	)\n" +
-//				");");
+
 		fallbackFormulaCell.setFormula(vatNet,
 				"cell.resolvePriceCellsAmount(\n" +
 				"	new Array(\n" +
@@ -402,42 +355,9 @@ extends DataCreator
 				"\n" +
 				"cell.resolvePriceCellsAmount(\n" +
 				"	new Array(\n" +
-				"		PriceFragmentTypeID.create(\"" + Organisation.DEVIL_ORGANISATION_ID + "\", \"vat-de-19-net\")\n" +
+				"		PriceFragmentTypeID.create(\"" + vatNet.getOrganisationID() + "\", \"" + vatNet.getPriceFragmentTypeID() + "\")\n" +
 				"	)\n" +
 				");");
-//		fallbackFormulaCell.setFormula(vatNet, "cell.resolvePriceCellsAmount(\n" +
-//				"	new AbsolutePriceCoordinate(\n" +
-//				"		null,\n" +
-//				"		null,\n" +
-//				"		null,\n" +
-//				"		null,\n" +
-//				"		\""+Organisation.DEVIL_ORGANISATION_ID+"/_Total_\"\n" +
-//				"	)\n" +
-//				") / 1.19;");
-//		fallbackFormulaCell.setFormula(vatVal, "cell.resolvePriceCellsAmount(\n" +
-//				"	new AbsolutePriceCoordinate(\n" +
-//				"		null,\n" +
-//				"		null,\n" +
-//				"		null,\n" +
-//				"		null,\n" +
-//				"		\""+Organisation.DEVIL_ORGANISATION_ID+"/_Total_\"\n" +
-//				"	)\n" +
-//				")\n" +
-//
-////					"/ 1.19 * 0.19");
-//
-//				"\n" +
-//				"-\n" +
-//				"\n" +
-//				"cell.resolvePriceCellsAmount(\n" +
-//				"	new AbsolutePriceCoordinate(\n" +
-//				"		null,\n" +
-//				"		null,\n" +
-//				"		null,\n" +
-//				"		null,\n" +
-//				"		\""+rootOrganisationID+"/vat-de-19-net\"\n" +
-//				"	)\n" +
-//				");");
 
 		for (int i = 0; i < formulas.length; i++) {
 			String formula = formulas[i];

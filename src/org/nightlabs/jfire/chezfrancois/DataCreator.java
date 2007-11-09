@@ -41,11 +41,11 @@ import org.nightlabs.jfire.accounting.Account;
 import org.nightlabs.jfire.accounting.Accounting;
 import org.nightlabs.jfire.accounting.Currency;
 import org.nightlabs.jfire.accounting.PriceFragmentType;
+import org.nightlabs.jfire.accounting.PriceFragmentTypeHelper;
 import org.nightlabs.jfire.accounting.Tariff;
 import org.nightlabs.jfire.accounting.book.mappingbased.MoneyFlowMapping;
 import org.nightlabs.jfire.accounting.book.mappingbased.PFMoneyFlowMapping;
 import org.nightlabs.jfire.accounting.id.CurrencyID;
-import org.nightlabs.jfire.accounting.id.PriceFragmentTypeID;
 import org.nightlabs.jfire.accounting.id.TariffID;
 import org.nightlabs.jfire.idgenerator.IDGenerator;
 import org.nightlabs.jfire.organisation.Organisation;
@@ -211,7 +211,7 @@ public class DataCreator
 	private PriceFragmentType priceFragmentTypeVatNet = null;
 	public PriceFragmentType getPriceFragmentTypeVatNet() {
 		if (priceFragmentTypeVatNet == null)
-			priceFragmentTypeVatNet = (PriceFragmentType) pm.getObjectById(PriceFragmentTypeID.create(Organisation.DEVIL_ORGANISATION_ID, "vat-de-19-net"));
+			priceFragmentTypeVatNet = (PriceFragmentType) pm.getObjectById(PriceFragmentTypeHelper.getDE().VAT_DE_19_NET);
 
 		return priceFragmentTypeVatNet;			
 	}
@@ -219,7 +219,7 @@ public class DataCreator
 	private PriceFragmentType priceFragmentTypeVatVal = null;
 	public PriceFragmentType getPriceFragmentTypeVatVal() {
 		if (priceFragmentTypeVatVal == null)
-			priceFragmentTypeVatVal = (PriceFragmentType) pm.getObjectById(PriceFragmentTypeID.create(Organisation.DEVIL_ORGANISATION_ID, "vat-de-19-val"));
+			priceFragmentTypeVatVal = (PriceFragmentType) pm.getObjectById(PriceFragmentTypeHelper.getDE().VAT_DE_19_VAL);
 
 		return priceFragmentTypeVatVal;
 	}

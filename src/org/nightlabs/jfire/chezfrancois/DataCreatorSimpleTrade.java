@@ -51,6 +51,7 @@ import org.nightlabs.jfire.accounting.gridpriceconfig.StablePriceConfig;
 import org.nightlabs.jfire.accounting.priceconfig.IInnerPriceConfig;
 import org.nightlabs.jfire.accounting.priceconfig.PriceConfig;
 import org.nightlabs.jfire.idgenerator.IDGenerator;
+import org.nightlabs.jfire.organisation.Organisation;
 import org.nightlabs.jfire.prop.IStruct;
 import org.nightlabs.jfire.prop.PropertySet;
 import org.nightlabs.jfire.prop.StructLocal;
@@ -302,7 +303,7 @@ extends DataCreator
 				"\n" +
 				"cell.resolvePriceCellsAmount(\n" +
 				"	new Array(\n" +
-				"		PriceFragmentTypeID.create(\"" + rootOrganisationID + "\", \"vat-de-19-net\")\n" +
+				"		PriceFragmentTypeID.create(\"" + Organisation.DEVIL_ORGANISATION_ID + "\", \"vat-de-19-net\")\n" +
 				"	)\n" +
 				");");
 //				"cell.resolvePriceCellsAmount(\n" +
@@ -401,7 +402,7 @@ extends DataCreator
 				"\n" +
 				"cell.resolvePriceCellsAmount(\n" +
 				"	new Array(\n" +
-				"		PriceFragmentTypeID.create(\"" + rootOrganisationID + "\", \"vat-de-19-net\")\n" +
+				"		PriceFragmentTypeID.create(\"" + Organisation.DEVIL_ORGANISATION_ID + "\", \"vat-de-19-net\")\n" +
 				"	)\n" +
 				");");
 //		fallbackFormulaCell.setFormula(vatNet, "cell.resolvePriceCellsAmount(\n" +

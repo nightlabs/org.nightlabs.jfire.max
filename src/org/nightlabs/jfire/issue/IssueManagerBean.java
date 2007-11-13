@@ -276,27 +276,27 @@ implements SessionBean{
 			// Create the statuses
 			IssueStatus issueStatus;
 
-			issueStatus = new IssueStatus("N");
+			issueStatus = new IssueStatus(IssueStatus.ISSUE_STATUS_NEW);
 			issueStatus.getIssueStatusText().setText(Locale.ENGLISH.getLanguage(), "New");
 			pm.makePersistent(issueStatus);
 
-			issueStatus = new IssueStatus("FB");
+			issueStatus = new IssueStatus(IssueStatus.ISSUE_STATUS_FEEDBACK);
 			issueStatus.getIssueStatusText().setText(Locale.ENGLISH.getLanguage(), "Feedback");
 			pm.makePersistent(issueStatus);
 			
-			issueStatus = new IssueStatus("AKL");
+			issueStatus = new IssueStatus(IssueStatus.ISSUE_STATUS_ACKNOWLEDGED);
 			issueStatus.getIssueStatusText().setText(Locale.ENGLISH.getLanguage(), "Acknowledged");
 			pm.makePersistent(issueStatus);
 			
-			issueStatus = new IssueStatus("CF");
+			issueStatus = new IssueStatus(IssueStatus.ISSUE_STATUS_CONFIRMED);
 			issueStatus.getIssueStatusText().setText(Locale.ENGLISH.getLanguage(), "Confirmed");
 			pm.makePersistent(issueStatus);
 			
-			issueStatus = new IssueStatus("RS");
+			issueStatus = new IssueStatus(IssueStatus.ISSUE_STATUS_RESOLVED);
 			issueStatus.getIssueStatusText().setText(Locale.ENGLISH.getLanguage(), "Resolved");
 			pm.makePersistent(issueStatus);
 			
-			issueStatus = new IssueStatus("C");
+			issueStatus = new IssueStatus(IssueStatus.ISSUE_STATUS_CLOSE);
 			issueStatus.getIssueStatusText().setText(Locale.ENGLISH.getLanguage(), "Close");
 			pm.makePersistent(issueStatus);
 
@@ -312,35 +312,35 @@ implements SessionBean{
 			// Create the statuses
 			IssueSeverityType issueSeverityType;
 
-			issueSeverityType = new IssueSeverityType("MN");
+			issueSeverityType = new IssueSeverityType(IssueSeverityType.ISSUE_SEVERITY_TYPE_MINOR);
 			issueSeverityType.getIssueSeverityTypeText().setText(Locale.ENGLISH.getLanguage(), "Minor");
 			pm.makePersistent(issueSeverityType);
 
-			issueSeverityType = new IssueSeverityType("MJ");
+			issueSeverityType = new IssueSeverityType(IssueSeverityType.ISSUE_SEVERITY_TYPE_MAJOR);
 			issueSeverityType.getIssueSeverityTypeText().setText(Locale.ENGLISH.getLanguage(), "Major");
 			pm.makePersistent(issueSeverityType);
 			
-			issueSeverityType = new IssueSeverityType("C");
+			issueSeverityType = new IssueSeverityType(IssueSeverityType.ISSUE_SEVERITY_TYPE_CRASH);
 			issueSeverityType.getIssueSeverityTypeText().setText(Locale.ENGLISH.getLanguage(), "Crash");
 			pm.makePersistent(issueSeverityType);
 			
-			issueSeverityType = new IssueSeverityType("B");
+			issueSeverityType = new IssueSeverityType(IssueSeverityType.ISSUE_SEVERITY_TYPE_BLOCK);
 			issueSeverityType.getIssueSeverityTypeText().setText(Locale.ENGLISH.getLanguage(), "Block");
 			pm.makePersistent(issueSeverityType);
 			
-			issueSeverityType = new IssueSeverityType("FT");
+			issueSeverityType = new IssueSeverityType(IssueSeverityType.ISSUE_SEVERITY_TYPE_FEATURE);
 			issueSeverityType.getIssueSeverityTypeText().setText(Locale.ENGLISH.getLanguage(), "Feature");
 			pm.makePersistent(issueSeverityType);
 			
-			issueSeverityType = new IssueSeverityType("TV");
+			issueSeverityType = new IssueSeverityType(IssueSeverityType.ISSUE_SEVERITY_TYPE_TRIVIAL);
 			issueSeverityType.getIssueSeverityTypeText().setText(Locale.ENGLISH.getLanguage(), "Trivial");
 			pm.makePersistent(issueSeverityType);
 			
-			issueSeverityType = new IssueSeverityType("T");
+			issueSeverityType = new IssueSeverityType(IssueSeverityType.ISSUE_SEVERITY_TYPE_TEXT);
 			issueSeverityType.getIssueSeverityTypeText().setText(Locale.ENGLISH.getLanguage(), "Text");
 			pm.makePersistent(issueSeverityType);
 			
-			issueSeverityType = new IssueSeverityType("TW");
+			issueSeverityType = new IssueSeverityType(IssueSeverityType.ISSUE_SEVERITY_TYPE_TWEAK);
 			issueSeverityType.getIssueSeverityTypeText().setText(Locale.ENGLISH.getLanguage(), "Tweak");
 			pm.makePersistent(issueSeverityType);
 			
@@ -356,176 +356,29 @@ implements SessionBean{
 			}
 			IssuePriority issuePriority;
 
-			issuePriority = new IssuePriority("0");
+			issuePriority = new IssuePriority(IssuePriority.ISSUE_PRIORITY_NONE);
 			issuePriority.getIssuePriorityText().setText(Locale.ENGLISH.getLanguage(), "None");
 			pm.makePersistent(issuePriority);
 
-			issuePriority = new IssuePriority("1");
+			issuePriority = new IssuePriority(IssuePriority.ISSUE_PRIORITY_LOW);
 			issuePriority.getIssuePriorityText().setText(Locale.ENGLISH.getLanguage(), "Low");
 			pm.makePersistent(issuePriority);
 			
-			issuePriority = new IssuePriority("2");
+			issuePriority = new IssuePriority(IssuePriority.ISSUE_PRIORITY_NORMAL);
 			issuePriority.getIssuePriorityText().setText(Locale.ENGLISH.getLanguage(), "Normal");
 			pm.makePersistent(issuePriority);
 			
-			issuePriority = new IssuePriority("3");
+			issuePriority = new IssuePriority(IssuePriority.ISSUE_PRIORITY_HIGH);
 			issuePriority.getIssuePriorityText().setText(Locale.ENGLISH.getLanguage(), "High");
 			pm.makePersistent(issuePriority);
 			
-			issuePriority = new IssuePriority("4");
+			issuePriority = new IssuePriority(IssuePriority.ISSUE_PRIORITY_URGENT);
 			issuePriority.getIssuePriorityText().setText(Locale.ENGLISH.getLanguage(), "Urgent");
 			pm.makePersistent(issuePriority);
 			
-			issuePriority = new IssuePriority("5");
+			issuePriority = new IssuePriority(IssuePriority.ISSUE_PRIORITY_IMMEDIATE);
 			issuePriority.getIssuePriorityText().setText(Locale.ENGLISH.getLanguage(), "Immediate");
 			pm.makePersistent(issuePriority);
-			
-//			Trader trader = Trader.getTrader(pm);
-//
-//
-//
-//
-//			LegalEntity anonymousCustomer = LegalEntity.getAnonymousCustomer(pm);
-//			CustomerGroup anonymousCustomerGroup = anonymousCustomer.getDefaultCustomerGroup();
-//
-//			//		 create some ModeOfPayments
-//			// Cash
-//			ModeOfPayment modeOfPayment = new ModeOfPayment(ModeOfPaymentConst.MODE_OF_PAYMENT_ID_CASH);
-//			modeOfPayment.getName().setText(Locale.ENGLISH.getLanguage(), "Cash");
-//			modeOfPayment.getName().setText(Locale.GERMAN.getLanguage(), "Bargeld");
-//			modeOfPayment.getName().setText(Locale.FRENCH.getLanguage(), "Argent Liquide");
-//			ModeOfPaymentFlavour modeOfPaymentFlavour = modeOfPayment.createFlavour(ModeOfPaymentConst.MODE_OF_PAYMENT_FLAVOUR_ID_CASH);
-//			modeOfPaymentFlavour.getName().setText(Locale.ENGLISH.getLanguage(), "Cash");
-//			modeOfPaymentFlavour.getName().setText(Locale.GERMAN.getLanguage(), "Bargeld");
-//			modeOfPaymentFlavour.getName().setText(Locale.FRENCH.getLanguage(), "Argent Liquide");
-//			modeOfPaymentFlavour.loadIconFromResource();
-//			pm.makePersistent(modeOfPayment);
-//			trader.getDefaultCustomerGroupForKnownCustomer().addModeOfPayment(modeOfPayment);
-//			anonymousCustomerGroup.addModeOfPayment(modeOfPayment);
-//
-//			// we need this later for payment processor registration
-//			ModeOfPayment modeOfPaymentCash = modeOfPayment;
-//
-//			// No payment - this is a dummy MOP which means, the payment is postponed without
-//			//   specifying a certain real MOP
-//			modeOfPayment = new ModeOfPayment(ModeOfPaymentConst.MODE_OF_PAYMENT_ID_NON_PAYMENT);
-//			modeOfPayment.getName().setText(Locale.ENGLISH.getLanguage(), "Non-Payment");
-//			modeOfPayment.getName().setText(Locale.GERMAN.getLanguage(), "Nichtzahlung");
-//			modeOfPaymentFlavour = modeOfPayment.createFlavour(ModeOfPaymentConst.MODE_OF_PAYMENT_FLAVOUR_ID_NON_PAYMENT);
-//			modeOfPaymentFlavour.getName().setText(Locale.ENGLISH.getLanguage(), "Non-Payment");
-//			modeOfPaymentFlavour.getName().setText(Locale.GERMAN.getLanguage(), "Nichtzahlung");
-//			modeOfPaymentFlavour.loadIconFromResource();
-//			pm.makePersistent(modeOfPayment);
-//			trader.getDefaultCustomerGroupForKnownCustomer().addModeOfPayment(modeOfPayment);
-//
-//			// we need this later for payment processor registration
-//			ModeOfPayment modeOfPaymentNonPayment = modeOfPayment;
-//
-//
-//			// Credit Card - VISA, Master, AmEx, Diners
-//			modeOfPayment = new ModeOfPayment(ModeOfPaymentConst.MODE_OF_PAYMENT_ID_CREDIT_CARD);
-//			modeOfPayment.getName().setText(Locale.ENGLISH.getLanguage(), "Credit Card");
-//			modeOfPayment.getName().setText(Locale.GERMAN.getLanguage(), "Kreditkarte");
-//			modeOfPayment.getName().setText(Locale.FRENCH.getLanguage(), "Carte de Crédit");
-//			modeOfPaymentFlavour = modeOfPayment.createFlavour(ModeOfPaymentConst.MODE_OF_PAYMENT_FLAVOUR_ID_VISA);
-//			modeOfPaymentFlavour.getName().setText(Locale.ENGLISH.getLanguage(), "VISA");
-//			modeOfPaymentFlavour.loadIconFromResource();
-//			modeOfPaymentFlavour = modeOfPayment.createFlavour(ModeOfPaymentConst.MODE_OF_PAYMENT_FLAVOUR_ID_MASTER_CARD);
-//			modeOfPaymentFlavour.getName().setText(Locale.ENGLISH.getLanguage(), "MasterCard");
-//			modeOfPaymentFlavour.loadIconFromResource();
-//			modeOfPaymentFlavour = modeOfPayment.createFlavour(ModeOfPaymentConst.MODE_OF_PAYMENT_FLAVOUR_ID_AMERICAN_EXPRESS);
-//			modeOfPaymentFlavour.getName().setText(Locale.ENGLISH.getLanguage(), "American Express");
-//			modeOfPaymentFlavour.loadIconFromResource();
-//			modeOfPaymentFlavour = modeOfPayment.createFlavour(ModeOfPaymentConst.MODE_OF_PAYMENT_FLAVOUR_ID_DINERS_CLUB);
-//			modeOfPaymentFlavour.getName().setText(Locale.ENGLISH.getLanguage(), "Diners Club");
-//			modeOfPaymentFlavour.loadIconFromResource();
-//			pm.makePersistent(modeOfPayment);
-//			trader.getDefaultCustomerGroupForKnownCustomer().addModeOfPayment(modeOfPayment);
-//			anonymousCustomerGroup.addModeOfPayment(modeOfPayment);
-//
-//			// we need this later for payment processor registration
-//			ModeOfPayment modeOfPaymentCreditCard = modeOfPayment;
-//
-//			// Bank Transfer
-//			modeOfPayment = new ModeOfPayment(ModeOfPaymentConst.MODE_OF_PAYMENT_ID_BANK_TRANSFER);
-//			modeOfPayment.getName().setText(Locale.ENGLISH.getLanguage(), "Bank Transfer");
-//			modeOfPayment.getName().setText(Locale.GERMAN.getLanguage(), "Überweisung");
-//			modeOfPayment.getName().setText(Locale.FRENCH.getLanguage(), "Virement");
-//			modeOfPaymentFlavour = modeOfPayment.createFlavour(ModeOfPaymentConst.MODE_OF_PAYMENT_FLAVOUR_ID_BANK_TRANSFER);
-//			modeOfPaymentFlavour.getName().setText(Locale.ENGLISH.getLanguage(), "Bank Transfer");
-//			modeOfPaymentFlavour.getName().setText(Locale.GERMAN.getLanguage(), "Überweisung");
-//			modeOfPaymentFlavour.getName().setText(Locale.FRENCH.getLanguage(), "Virement");
-//			modeOfPaymentFlavour.loadIconFromResource();
-//			pm.makePersistent(modeOfPayment);
-//			trader.getDefaultCustomerGroupForKnownCustomer().addModeOfPayment(modeOfPayment);
-//
-//			// we need this later for payment processor registration
-//			ModeOfPayment modeOfPaymentBankTransfer = modeOfPayment;
-//
-//			// Debit Note
-//			modeOfPayment = new ModeOfPayment(ModeOfPaymentConst.MODE_OF_PAYMENT_ID_DEBIT_NOTE);
-//			modeOfPayment.getName().setText(Locale.ENGLISH.getLanguage(), "Debit Note");
-//			modeOfPayment.getName().setText(Locale.GERMAN.getLanguage(), "Lastschrift");
-//			modeOfPayment.getName().setText(Locale.FRENCH.getLanguage(), "Note de Débit");
-//			modeOfPaymentFlavour = modeOfPayment.createFlavour(ModeOfPaymentConst.MODE_OF_PAYMENT_FLAVOUR_ID_DEBIT_NOTE);
-//			modeOfPaymentFlavour.getName().setText(Locale.ENGLISH.getLanguage(), "Debit Note");
-//			modeOfPaymentFlavour.getName().setText(Locale.GERMAN.getLanguage(), "Lastschrift");
-//			modeOfPaymentFlavour.getName().setText(Locale.FRENCH.getLanguage(), "Note de Débit");
-//			modeOfPaymentFlavour.loadIconFromResource();
-//			pm.makePersistent(modeOfPayment);
-//			trader.getDefaultCustomerGroupForKnownCustomer().addModeOfPayment(modeOfPayment);
-//
-//			// we need this later for payment processor registration
-//			ModeOfPayment modeOfPaymentDebitNote = modeOfPayment;
-//
-//
-//			// create some ServerPaymentProcessors
-//			ServerPaymentProcessorCash serverPaymentProcessorCash = ServerPaymentProcessorCash.getServerPaymentProcessorCash(pm);
-//			serverPaymentProcessorCash.getName().setText(Locale.ENGLISH.getLanguage(), "Cash Payment");
-//			serverPaymentProcessorCash.getName().setText(Locale.GERMAN.getLanguage(), "Barzahlung");
-//			serverPaymentProcessorCash.getName().setText(Locale.FRENCH.getLanguage(), "Paiement Argent Liquide");
-//			serverPaymentProcessorCash.addModeOfPayment(modeOfPaymentCash);
-//
-//			ServerPaymentProcessorNonPayment serverPaymentProcessorNonPayment =
-//				ServerPaymentProcessorNonPayment.getServerPaymentProcessorNonPayment(pm);
-//			serverPaymentProcessorNonPayment.getName().setText(Locale.ENGLISH.getLanguage(), "Non-Payment (payment will be postponed)");
-//			serverPaymentProcessorNonPayment.getName().setText(Locale.GERMAN.getLanguage(), "Nichtzahlung (Zahlung wird verschoben)");
-//			serverPaymentProcessorNonPayment.addModeOfPayment(modeOfPaymentNonPayment);
-//
-//			ServerPaymentProcessorCreditCardDummyForClientPayment serverPaymentProcessorCreditCardDummyForClientPayment =
-//				ServerPaymentProcessorCreditCardDummyForClientPayment.getServerPaymentProcessorCreditCardDummyForClientPayment(pm);
-//			serverPaymentProcessorCreditCardDummyForClientPayment.getName().setText(Locale.ENGLISH.getLanguage(), "Dummy for client-sided Credit Card Payment");
-//			serverPaymentProcessorCreditCardDummyForClientPayment.getName().setText(Locale.GERMAN.getLanguage(), "Pseudo-Modul für client-seitige Kreditkarten-Zahlungen");
-//			serverPaymentProcessorCreditCardDummyForClientPayment.addModeOfPayment(modeOfPaymentCreditCard);
-//
-//			ServerPaymentProcessorBankTransferGermany serverPaymentProcessorBankTransferGermany = ServerPaymentProcessorBankTransferGermany.getServerPaymentProcessorBankTransferGermany(pm);
-//			serverPaymentProcessorBankTransferGermany.getName().setText(Locale.ENGLISH.getLanguage(), "Bank transfer within Germany");
-//			serverPaymentProcessorBankTransferGermany.getName().setText(Locale.GERMAN.getLanguage(), "Überweisung innerhalb Deutschlands");
-//			serverPaymentProcessorBankTransferGermany.addModeOfPayment(modeOfPaymentBankTransfer);
-//
-//			ServerPaymentProcessorDebitNoteGermany serverPaymentProcessorDebitNoteGermany = ServerPaymentProcessorDebitNoteGermany.getServerPaymentProcessorDebitNoteGermany(pm);
-//			serverPaymentProcessorDebitNoteGermany.getName().setText(Locale.ENGLISH.getLanguage(), "Debit Note within Germany");
-//			serverPaymentProcessorDebitNoteGermany.getName().setText(Locale.GERMAN.getLanguage(), "Lastschrift innerhalb Deutschlands");
-//			serverPaymentProcessorDebitNoteGermany.addModeOfPayment(modeOfPaymentDebitNote);
-//
-//
-//			// persist process definitions
-//			ProcessDefinition processDefinitionInvoiceCustomer;
-//			processDefinitionInvoiceCustomer = accounting.storeProcessDefinitionInvoice(TradeSide.customer, ProcessDefinitionAssignment.class.getResource("invoice/customer/"));
-//			pm.makePersistent(new ProcessDefinitionAssignment(Invoice.class, TradeSide.customer, processDefinitionInvoiceCustomer));
-//
-//			ProcessDefinition processDefinitionInvoiceVendor;
-//			processDefinitionInvoiceVendor = accounting.storeProcessDefinitionInvoice(TradeSide.vendor, ProcessDefinitionAssignment.class.getResource("invoice/vendor/"));
-//			pm.makePersistent(new ProcessDefinitionAssignment(Invoice.class, TradeSide.vendor, processDefinitionInvoiceVendor));
-//
-//
-//			// deactive IDGenerator's cache for invoice
-//			IDNamespaceDefault idNamespaceDefault = IDNamespaceDefault.createIDNamespaceDefault(pm, getOrganisationID(), Invoice.class);
-//			idNamespaceDefault.setCacheSizeServer(0);
-//			idNamespaceDefault.setCacheSizeClient(0);
-//
-//
-//			pm.makePersistent(new EditLockTypeInvoice(EditLockTypeInvoice.EDIT_LOCK_TYPE_ID));
 		} finally {
 			pm.close();
 		}

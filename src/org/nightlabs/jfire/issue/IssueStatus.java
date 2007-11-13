@@ -25,6 +25,14 @@ implements Serializable{
 	private static final long serialVersionUID = 1L;
 	
 	public static final String FETCH_GROUP_THIS = "IssueStatus.text";
+	
+	public static final String ISSUE_STATUS_RESOLVED = "resolved";
+	public static final String ISSUE_STATUS_NEW = "new";
+	public static final String ISSUE_STATUS_FEEDBACK = "feedback";
+	public static final String ISSUE_STATUS_ACKNOWLEDGED = "acknowledged";
+	public static final String ISSUE_STATUS_CONFIRMED = "confirmed";
+	public static final String ISSUE_STATUS_CLOSE = "close";
+	
 	/**
 	 * @jdo.field primary-key="true"
 	 * @jdo.column length="100"

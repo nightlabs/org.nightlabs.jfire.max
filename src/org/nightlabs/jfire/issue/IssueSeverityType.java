@@ -24,6 +24,16 @@ implements Serializable{
 	private static final long serialVersionUID = 1L;
 	
 	public static final String FETCH_GROUP_THIS = "IssueSeverityType.text";
+	
+	public static final String ISSUE_SEVERITY_TYPE_MINOR = "Minor";
+	public static final String ISSUE_SEVERITY_TYPE_MAJOR = "Major";
+	public static final String ISSUE_SEVERITY_TYPE_CRASH = "Crash";
+	public static final String ISSUE_SEVERITY_TYPE_BLOCK = "Block";
+	public static final String ISSUE_SEVERITY_TYPE_FEATURE = "Feature";
+	public static final String ISSUE_SEVERITY_TYPE_TRIVIAL = "Trivial";
+	public static final String ISSUE_SEVERITY_TYPE_TEXT = "Text";
+	public static final String ISSUE_SEVERITY_TYPE_TWEAK = "Tweak";
+	
 	/**
 	 * @jdo.field primary-key="true"
 	 * @jdo.column length="100"

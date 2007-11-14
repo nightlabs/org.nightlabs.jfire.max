@@ -68,7 +68,7 @@ import org.nightlabs.util.Utils;
  * @jdo.fetch-group name="Issue.priority" fields="priority"
  * @jdo.fetch-group name="Issue.severityType" fields="severityType"
  * @jdo.fetch-group name="Issue.status" fields="status"
- * @jdo.fetch-group name="Issue.this" fetch-groups="default" fields="priority, severityType, status, creator, description"
+ * @jdo.fetch-group name="Issue.this" fetch-groups="default" fields="priority, severityType, stateDefinition, reporter, assigntoUser, description"
  *
  **/
 public class Issue
@@ -126,7 +126,8 @@ implements
 	 */
 	private Set<String> referencedObjectIDs;
 
-	private Set<Object> referencedObjects;
+//	private Set<Object> referencedObjects;
+	
 	/**
 	 * @jdo.field persistence-modifier="persistent"
 	 */
@@ -140,7 +141,7 @@ implements
 	/**
 	 * @jdo.field persistence-modifier="persistent"
 	 */
-	private StateDefinition status;
+	private StateDefinition stateDefinition;
 
 
 	/**
@@ -156,7 +157,12 @@ implements
 	/**
 	 * @jdo.field persistence-modifier="persistent" load-fetch-group="all"
 	 */
-	private User creator; 
+	private User reporter; 
+	
+	/**
+	 * @jdo.field persistence-modifier="persistent" load-fetch-group="all"
+	 */
+	private User assigntoUser; 
 
 	/**
 	 * @jdo.field persistence-modifier="persistent"
@@ -174,23 +180,27 @@ implements
 	 */
 	protected Issue() { }
 
-	public Issue(String organisationID, IssuePriority priority, IssueSeverityType severityType, StateDefinition status, User creator, ObjectID objectID)
+	public Issue(String organisationID, IssuePriority priority, IssueSeverityType severityType, StateDefinition stateDefinition, User reporter, User assigntoUser, ObjectID objectID)
 	{
-		if (creator == null)
-			throw new NullPointerException("creator");
-		this.creator = creator;
-		this.createTimestamp = new Date();
+		if (reporter == null)
+			throw new NullPointerException("reporter");
 
 		this.organisationID = organisationID;
+		this.createTimestamp = new Date();
+		
 		this.issueID = objectID!=null?objectID.toString()+"&"+createTimestamp.toString():createTimestamp.toString();
 //		this.documents = new <String>();
 
 		this.priority = priority;
 		this.severityType = severityType;
-		this.status = status;
+		this.stateDefinition = stateDefinition;
 
 		subject = new IssueSubject(this);
 		description = new IssueDescription(this);
+		
+		this.reporter = reporter;
+		this.assigntoUser = assigntoUser;
+	
 	}
 
 	/**
@@ -285,19 +295,32 @@ implements
 	}
 
 	/**
-	 * @return Returns the user.
+	 * @return Returns the reporter.
 	 */
-	public User getUser() {
-		return creator;
+	public User getReporter() {
+		return reporter;
 	}
 
 	/**
-	 * @param user The user to set.
+	 * @param reporter The user to set.
 	 */
-	public void setUser(User user) {
-		this.creator = user;
+	public void setReporter(User reporter) {
+		this.reporter = reporter;
 	}
 
+	/**
+	 * @return Returns the assigntoUser.
+	 */
+	public User getAssigntoUser() {
+		return assigntoUser;
+	}
+
+	/**
+	 * @param assigntoUser The user to set.
+	 */
+	public void setAssigntoUser(User assigntoUser) {
+		this.assigntoUser = assigntoUser;
+	}
 
 	public IssuePriority getPriority() {
 		return priority;
@@ -315,12 +338,12 @@ implements
 		this.severityType = severityType;
 	}
 
-	public StateDefinition getStatus() {
-		return status;
+	public StateDefinition getStateDefinition() {
+		return stateDefinition;
 	}
 
-	public void setStatus(StateDefinition status) {
-		this.status = status;
+	public void setStateDefinition(StateDefinition stateDefinition) {
+		this.stateDefinition = stateDefinition;
 	}
 
 	/**

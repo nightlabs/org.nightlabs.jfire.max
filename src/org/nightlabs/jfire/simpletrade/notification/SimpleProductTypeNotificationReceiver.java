@@ -28,8 +28,8 @@ import org.nightlabs.jfire.security.User;
 import org.nightlabs.jfire.simpletrade.SimpleTradeManager;
 import org.nightlabs.jfire.simpletrade.SimpleTradeManagerUtil;
 import org.nightlabs.jfire.simpletrade.store.SimpleProductType;
-import org.nightlabs.jfire.store.ProductTypeActionHandler;
 import org.nightlabs.jfire.store.Store;
+import org.nightlabs.jfire.store.id.ProductTypeID;
 
 /**
  * @author Marco Schulze - Marco at NightLabs dot de
@@ -85,7 +85,8 @@ extends NotificationReceiver
 		replicateSimpleProductTypes(notificationBundle.getOrganisationID(), productTypeIDs_load, productTypeIDs_delete);
 	}
 
-	public void replicateSimpleProductTypes(String emitterOrganisationID, Set productTypeIDs_load, Set productTypeIDs_delete)
+	@SuppressWarnings("unchecked")
+	public void replicateSimpleProductTypes(String emitterOrganisationID, Set<ProductTypeID> productTypeIDs_load, Set<ProductTypeID> productTypeIDs_delete)
 	throws NamingException, RemoteException, CreateException
 	{
 		if (productTypeIDs_load.isEmpty())
@@ -93,9 +94,9 @@ extends NotificationReceiver
 
 		PersistenceManager pm = getPersistenceManager();
 
-		Hashtable initialContextProperties = Lookup.getInitialContextProperties(pm, emitterOrganisationID);
+		Hashtable<?,?> initialContextProperties = Lookup.getInitialContextProperties(pm, emitterOrganisationID);
 		SimpleTradeManager simpleTradeManager = SimpleTradeManagerUtil.getHome(initialContextProperties).create();
-		Collection productTypes = simpleTradeManager.getSimpleProductTypesForReseller(productTypeIDs_load);
+		Collection<SimpleProductType> productTypes = simpleTradeManager.getSimpleProductTypesForReseller(productTypeIDs_load);
 
 		Set<PriceConfigID> priceConfigIDs = new HashSet<PriceConfigID>();
 
@@ -104,8 +105,8 @@ extends NotificationReceiver
 
 		int previousProductTypesSize = productTypes.size();
 		while (!productTypes.isEmpty()) {
-			for (Iterator itPT = productTypes.iterator(); itPT.hasNext(); ) {
-				SimpleProductType simpleProductType = (SimpleProductType) itPT.next();
+			for (Iterator<SimpleProductType> itPT = productTypes.iterator(); itPT.hasNext(); ) {
+				SimpleProductType simpleProductType = itPT.next();
 				if (simpleProductType.getExtendedProductType() == null || NLJDOHelper.exists(pm, simpleProductType.getExtendedProductType())) {
 					if (simpleProductType.getPackagePriceConfig() != null)
 						priceConfigIDs.add((PriceConfigID) JDOHelper.getObjectId(simpleProductType.getPackagePriceConfig()));
@@ -114,13 +115,9 @@ extends NotificationReceiver
 						if (NLJDOHelper.exists(pm, simpleProductType))
 							simpleProductType = pm.makePersistent(simpleProductType);
 						else {
-							ProductTypeActionHandler productTypeActionHandler = ProductTypeActionHandler.getProductTypeActionHandler(pm, simpleProductType.getClass());
-
 							simpleProductType = (SimpleProductType) store.addProductType(
 									user,
 									simpleProductType);
-//									SimpleProductTypeActionHandler.getDefaultHome(pm, simpleProductType));
-//						simpleProductType = (SimpleProductType) pm.makePersistent(simpleProductType);
 						}
 					} catch (Exception x) {
 						logger.error("Adding SimpleProductType \"" + simpleProductType.getPrimaryKey() + "\" to Store failed!", x);
@@ -142,8 +139,8 @@ extends NotificationReceiver
 
 		if (!productTypes.isEmpty()) {
 			logger.error("Could not persist the following SimpleProductTypes because of missing extendedProductType:");
-			for (Iterator it = productTypes.iterator(); it.hasNext(); ) {
-				SimpleProductType simpleProductType = (SimpleProductType) it.next();
+			for (Iterator<SimpleProductType> it = productTypes.iterator(); it.hasNext(); ) {
+				SimpleProductType simpleProductType = it.next();
 				String name;
 				try {
 					name = simpleProductType.getName().getText();

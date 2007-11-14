@@ -1227,6 +1227,7 @@ implements SessionBean
 	 * @ejb.transaction type="Required"
 	 * @ejb.permission role-name="_Guest_"
 	 */
+	@SuppressWarnings("unchecked")
 	public Collection<OrganisationID> getCandidateOrganisationIDsForCrossTrade()
 	{
 		PersistenceManager pm = getPersistenceManager();
@@ -1240,8 +1241,7 @@ implements SessionBean
 					continue;
 
 				try {
-					pm.getObjectById(
-							ProductTypeID.create(organisationID.organisationID, SimpleProductType.class.getName()));
+					pm.getObjectById(ProductTypeID.create(organisationID.organisationID, SimpleProductType.class.getName()));
 				} catch (JDOObjectNotFoundException x) {
 					res.add(organisationID);
 				}

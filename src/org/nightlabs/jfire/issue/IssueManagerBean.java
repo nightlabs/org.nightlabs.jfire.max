@@ -21,11 +21,11 @@ import org.nightlabs.ModuleException;
 import org.nightlabs.jdo.NLJDOHelper;
 import org.nightlabs.jdo.ObjectID;
 import org.nightlabs.jfire.base.BaseSessionBeanImpl;
+import org.nightlabs.jfire.issue.history.IssueHistory;
 import org.nightlabs.jfire.issue.id.IssueID;
 import org.nightlabs.jfire.issue.id.IssuePriorityID;
 import org.nightlabs.jfire.issue.id.IssueSeverityTypeID;
 import org.nightlabs.jfire.issue.id.IssueStatusID;
-import org.nightlabs.jfire.security.UserGroup;
 
 /**
  * @author Chairat Kongarayawetchakun - chairat[AT]nightlabs[DOT]de
@@ -87,11 +87,31 @@ implements SessionBean{
 	}
 
 	/**
+	 * Creates a new issue history. This method is only usable, if the user (principal)
+	 * is an organisation, because this organisation will automatically be set
+	 * as the user for the new Issue History.
+	 *
+	 * @ejb.interface-method
+	 * @ejb.transaction type="Required"
+	 * @ejb.permission role-name="_Guest_"
+	 */
+	public IssueHistory createIssueHistory(IssueHistory issueHistory, boolean get, String[] fetchGroups, int maxFetchDepth){
+		PersistenceManager pm = getPersistenceManager();
+		try {
+			if (!issueHistory.getOrganisationID().equals(getOrganisationID()))
+				throw new IllegalArgumentException("Given Issue was created for a different organisation, can not store to this datastore!");
+
+			IssueHistory result = NLJDOHelper.storeJDO(pm, issueHistory, get, fetchGroups, maxFetchDepth);
+			return result;
+		} finally {
+			pm.close();
+		}
+	}
+	
+	/**
 	 * Creates a new issue. This method is only usable, if the user (principal)
 	 * is an organisation, because this organisation will automatically be set
 	 * as the user for the new Issue.
-	 *
-	 * @param userID Either <code>null</code> (then the default will be used) or an ID of a {@link UserGroup} which is allowed to the User.
 	 *
 	 * @ejb.interface-method
 	 * @ejb.transaction type="Required"
@@ -114,8 +134,6 @@ implements SessionBean{
 	 * Creates a new issue. This method is only usable, if the user (principal)
 	 * is an organisation, because this organisation will automatically be set
 	 * as the user for the new Issue.
-	 *
-	 * @param userID Either <code>null</code> (then the default will be used) or an ID of a {@link UserGroup} which is allowed to the User.
 	 *
 	 * @ejb.interface-method
 	 * @ejb.transaction type="Required"

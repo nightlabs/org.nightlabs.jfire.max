@@ -56,7 +56,10 @@ implements Serializable{
 	 */
 	private String issueHistoryID;
 
-	private I18nDataFieldText text;
+	/**
+	 * @jdo.field persistence-modifier="persistent"
+	 */
+	private Issue issue;
 	
 	/**
 	 * @jdo.field persistence-modifier="persistent"
@@ -69,6 +72,9 @@ implements Serializable{
 	{
 		if (issue == null)
 			throw new NullPointerException("issue");
+		
+		this.issue = issue;
+		
 		this.organisationID = issue.getOrganisationID();
 		this.issueID = issue.getIssueID();
 	}
@@ -100,5 +106,9 @@ implements Serializable{
 	
 	public void setIssueHistoryID(String issueHistoryID) {
 		this.issueHistoryID = issueHistoryID;
+	}
+	
+	public Issue getIssue(){
+		return issue;
 	}
 }

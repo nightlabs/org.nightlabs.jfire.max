@@ -14,6 +14,7 @@ import org.nightlabs.jfire.base.jdo.BaseJDOObjectDAO;
 import org.nightlabs.jfire.issue.Issue;
 import org.nightlabs.jfire.issue.IssueManager;
 import org.nightlabs.jfire.issue.IssueManagerUtil;
+import org.nightlabs.jfire.issue.history.IssueHistory;
 import org.nightlabs.jfire.issue.id.IssueID;
 import org.nightlabs.jfire.security.SecurityReflector;
 import org.nightlabs.progress.ProgressMonitor;
@@ -54,7 +55,23 @@ public class IssueDAO extends BaseJDOObjectDAO<IssueID, Issue>{
 		}
 	}
 
-	public synchronized Issue createIssueWithoutAttachedDocument(Issue issue, boolean get, String[] fetchGroups, int maxFetchDepth, ProgressMonitor monitor){
+	public synchronized IssueHistory createIssueHistory(IssueHistory issueHistory, boolean get, String[] fetchGroups, int maxFetchDepth, ProgressMonitor monitor){
+		if(issueHistory == null)
+			throw new NullPointerException("IssueHistory to create must not be null");
+		monitor.beginTask("Creating issue history: "+ issueHistory.getIssueID(), 3);
+		try {
+			IssueManager im = IssueManagerUtil.getHome(SecurityReflector.getInitialContextProperties()).create();
+			IssueHistory result = im.createIssueHistory(issueHistory, get, fetchGroups, maxFetchDepth);
+			monitor.worked(1);
+			monitor.done();
+			return result;
+		} catch (Exception e) {
+			monitor.done();
+			throw new RuntimeException("Error while storing Issue!\n" ,e);
+		}
+	}
+	
+	public synchronized Issue storeIssueWithoutAttachedDocument(Issue issue, boolean get, String[] fetchGroups, int maxFetchDepth, ProgressMonitor monitor){
 		if(issue == null)
 			throw new NullPointerException("Issue to save must not be null");
 		monitor.beginTask("Storing issue: "+ issue.getIssueID(), 3);
@@ -70,7 +87,7 @@ public class IssueDAO extends BaseJDOObjectDAO<IssueID, Issue>{
 		}
 	}
 	
-	public synchronized Issue createIssueWithAttachedDocument(Issue issue, ObjectID objectID, boolean get, String[] fetchGroups, int maxFetchDepth, ProgressMonitor monitor){
+	public synchronized Issue storeIssueWithAttachedDocument(Issue issue, ObjectID objectID, boolean get, String[] fetchGroups, int maxFetchDepth, ProgressMonitor monitor){
 		if(issue == null)
 			throw new NullPointerException("Issue to save must not be null");
 		monitor.beginTask("Storing issue: "+ issue.getIssueID(), 3);

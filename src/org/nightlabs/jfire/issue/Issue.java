@@ -26,18 +26,28 @@
 
 package org.nightlabs.jfire.issue;
 
+import java.io.ByteArrayInputStream;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
 import java.io.Serializable;
 import java.util.Date;
 import java.util.Set;
+import java.util.zip.DeflaterOutputStream;
+import java.util.zip.InflaterInputStream;
 
 import javax.jdo.JDOHelper;
 import javax.jdo.PersistenceManager;
 import javax.jdo.listener.DetachCallback;
 
 import org.apache.log4j.Logger;
+import org.nightlabs.io.DataBuffer;
 import org.nightlabs.jdo.ObjectID;
 import org.nightlabs.jfire.jbpm.graph.def.StateDefinition;
 import org.nightlabs.jfire.security.User;
+import org.nightlabs.util.Util;
 import org.nightlabs.util.Utils;
 
 /**
@@ -63,12 +73,13 @@ import org.nightlabs.util.Utils;
  *			PARAMETERS String paramIssueTypeID
  *			import java.lang.String"
  *
- * @jdo.fetch-group name="Issue.description" fields="description"
- * @jdo.fetch-group name="Issue.subject" fields="subject"
- * @jdo.fetch-group name="Issue.priority" fields="priority"
- * @jdo.fetch-group name="Issue.severityType" fields="severityType"
- * @jdo.fetch-group name="Issue.status" fields="status"
- * @jdo.fetch-group name="Issue.this" fetch-groups="default" fields="priority, severityType, stateDefinition, reporter, assigntoUser, description"
+ * @jdo.fetch-group name="Issue.fileAttachment" fetch-groups="default" fields="fileAttachment"
+ * @jdo.fetch-group name="Issue.description" fetch-groups="default" fields="description"
+ * @jdo.fetch-group name="Issue.subject" fetch-groups="default" fields="subject" 
+ * @jdo.fetch-group name="Issue.priority" fetch-groups="default" fields="priority"
+ * @jdo.fetch-group name="Issue.severityType" fetch-groups="default" fields="severityType"
+ * @jdo.fetch-group name="Issue.status" fetch-groups="default" fields="stateDefinition"
+ * @jdo.fetch-group name="Issue.this" fetch-groups="default" fields="fileAttachment, description, subject, priority, severityType, stateDefinition, reporter, assigntoUser"
  *
  **/
 public class Issue
@@ -174,7 +185,93 @@ implements
 	 */
 	private Date updateTimestamp;
 
+	/**
+	 * @jdo.field persistence-modifier="persistent" collection-type="array" serialized-element="true"
+	 */
+	private byte[] fileAttachment;
+	
+	/**
+	 * @jdo.field persistence-modifier="persistent"
+	 */
+	private Date fileTimestamp;
+	
+	/**
+	 * @jdo.field persistence-modifier="persistent"
+	 */
+	private String fileName;
 
+	public void loadStream(InputStream in, long length, Date timeStamp, String name)
+	throws IOException
+	{
+		logger.debug("Loading stream as ReportLayout");
+		boolean error = true;
+		try {
+			DataBuffer db = new DataBuffer((long) (length * 0.6));
+			OutputStream out = new DeflaterOutputStream(db.createOutputStream());
+			try {
+				Util.transferStreamData(in, out);
+			} finally {
+				out.close();
+			}
+			fileAttachment = db.createByteArray();
+
+			fileTimestamp = timeStamp;
+			fileName = name;
+
+			error = false;
+		} finally {
+			if (error) { // make sure that in case of an error all the file members are null.
+				fileName = null;
+				fileTimestamp = null;
+				fileAttachment = null;
+			}
+		}
+	}
+	
+	/**
+	 * Creates a new {@link InputStream} for the report design
+	 * that is wrapped by an {@link InflaterInputStream}.
+	 * This means you can read the report design unzipped from the returend stream.
+	 */
+	public InputStream createReportDesignInputStream() {
+		return new InflaterInputStream(new ByteArrayInputStream(fileAttachment));
+	}
+	
+	public String getFileName() {
+		return fileName;
+	}
+	
+	public Date getFileTimestamp() {
+		return fileTimestamp;
+	}
+	
+	public void loadStream(InputStream in, String name) 
+	throws IOException 
+	{
+		loadStream(in, 10 * 1024, new Date(), name);
+	}
+	
+	public void loadFile(File f)
+	throws IOException
+	{
+		logger.debug("Loading file "+f+" as ReportLayout");
+		FileInputStream in = new FileInputStream(f);
+		try {
+			loadStream(in, f.length(), new Date(f.lastModified()), f.getName());
+		} finally {
+			in.close();
+		}
+	}
+	
+	/**
+	 * Creates a new {@link InputStream} for the file attachment
+	 * that is wrapped by an {@link InflaterInputStream}.
+	 * This means you can read the file attachment unzipped from the returend stream.
+	 */
+	public InputStream createFileAttachmentInputStream() {
+		return new InflaterInputStream(new ByteArrayInputStream(fileAttachment));
+	}
+	
 	/**
 	 * @deprecated Constructor exists only for JDO! 
 	 */
@@ -201,6 +298,12 @@ implements
 		this.reporter = reporter;
 		this.assigntoUser = assigntoUser;
 	
+	}
+	
+	public Issue(String organisationID, IssuePriority priority, IssueSeverityType severityType, StateDefinition stateDefinition, User reporter, User assigntoUser, ObjectID objectID, byte[] fileAttachment)
+	{
+		this(organisationID, priority, severityType, stateDefinition, reporter, assigntoUser, objectID);
+		this.fileAttachment = fileAttachment;
 	}
 
 	/**

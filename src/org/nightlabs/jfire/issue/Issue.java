@@ -33,7 +33,9 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.io.Serializable;
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
 import java.util.Set;
 import java.util.zip.DeflaterOutputStream;
 import java.util.zip.InflaterInputStream;
@@ -139,6 +141,17 @@ implements
 //	private Set<Object> referencedObjects;
 	
 	/**
+	 * Instances of {@link IssueFileAttachment}.
+	 *
+	 * @jdo.field
+	 *		persistence-modifier="persistent"
+	 *		collection-type="collection"
+	 *		element-type="IssueFileAttachment"
+	 *		dependent-value="true"
+	 *		mapped-by="issue"
+	 */
+	private List<IssueFileAttachment> fileList;
+	/**
 	 * @jdo.field persistence-modifier="persistent"
 	 */
 	private IssuePriority priority;
@@ -184,84 +197,6 @@ implements
 	private Date updateTimestamp;
 
 	/**
-	 * @jdo.field persistence-modifier="persistent" collection-type="array" serialized-element="true"
-	 */
-	private byte[] fileAttachment;
-	
-	/**
-	 * @jdo.field persistence-modifier="persistent"
-	 */
-	private Date fileTimestamp;
-	
-	/**
-	 * @jdo.field persistence-modifier="persistent"
-	 */
-	private String fileName;
-
-	public void loadStream(InputStream in, long length, Date timeStamp, String name)
-	throws IOException
-	{
-		logger.debug("Loading stream as Issue File Attachment");
-		boolean error = true;
-		try {
-			DataBuffer db = new DataBuffer((long) (length * 0.6));
-			OutputStream out = new DeflaterOutputStream(db.createOutputStream());
-			try {
-				Util.transferStreamData(in, out);
-			} finally {
-				out.close();
-			}
-			fileAttachment = db.createByteArray();
-
-			fileTimestamp = timeStamp;
-			fileName = name;
-
-			error = false;
-		} finally {
-			if (error) { // make sure that in case of an error all the file members are null.
-				fileName = null;
-				fileTimestamp = null;
-				fileAttachment = null;
-			}
-		}
-	}
-	
-	public String getFileName() {
-		return fileName;
-	}
-	
-	public Date getFileTimestamp() {
-		return fileTimestamp;
-	}
-	
-	public void loadStream(InputStream in, String name) 
-	throws IOException 
-	{
-		loadStream(in, 10 * 1024, new Date(), name);
-	}
-	
-	public void loadFile(File f)
-	throws IOException
-	{
-		logger.debug("Loading file "+f+" as Issue File Attachment");
-		FileInputStream in = new FileInputStream(f);
-		try {
-			loadStream(in, f.length(), new Date(f.lastModified()), f.getName());
-		} finally {
-			in.close();
-		}
-	}
-	
-	/**
-	 * Creates a new {@link InputStream} for the file attachment
-	 * that is wrapped by an {@link InflaterInputStream}.
-	 * This means you can read the file attachment unzipped from the returend stream.
-	 */
-	public InputStream createFileAttachmentInputStream() {
-		return new InflaterInputStream(new ByteArrayInputStream(fileAttachment));
-	}
-	
-	/**
 	 * @deprecated Constructor exists only for JDO! 
 	 */
 	protected Issue() { }
@@ -273,6 +208,8 @@ implements
 
 		subject = new IssueSubject(this);
 		description = new IssueDescription(this);
+		
+		fileList = new ArrayList<IssueFileAttachment>();
 	}
 	
 	public Issue(String organisationID, IssueType issueType)
@@ -431,6 +368,10 @@ implements
 		this.organisationID = organisationID;
 	}
 
+	public List<IssueFileAttachment> getFileList() {
+		return fileList;
+	}
+	
 	protected PersistenceManager getPersistenceManager()
 	{
 		PersistenceManager pm = JDOHelper.getPersistenceManager(this);

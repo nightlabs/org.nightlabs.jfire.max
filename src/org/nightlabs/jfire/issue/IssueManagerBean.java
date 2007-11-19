@@ -321,17 +321,14 @@ implements SessionBean{
 			
 			// check, whether the datastore is already initialized
 			
-			logger.debug(this.getClass().getName() + " Begining of createing the Issue Properties..................");
 			pm.getExtent(IssueType.class);
 			try {
 				pm.getObjectById(IssueTypeID.create(getOrganisationID(), "Default"), true);
 				return; // already initialized
 			} catch (JDOObjectNotFoundException x) {
 				// datastore not yet initialized
-				logger.debug(this.getClass().getName() + "Error..................");
 			}
 			
-			logger.debug(this.getClass().getName() + " Yeahhhhhh!..................");
 			
 			IssueType issueType = new IssueType(getOrganisationID(), "Default");
 			issueType.getName().setText(Locale.ENGLISH.getLanguage(), "Default");

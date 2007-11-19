@@ -25,7 +25,8 @@ import org.nightlabs.util.Util;
  * 
  * @jdo.fetch-group name="IssueType.name" fetch-groups="default" fields="name"
  */
-public class IssueType implements Serializable{
+public class IssueType
+implements Serializable{
 	private static final long serialVersionUID = 1L;
 	/**
 	 * @jdo.field primary-key="true"

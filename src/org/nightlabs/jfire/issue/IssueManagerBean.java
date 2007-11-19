@@ -25,7 +25,7 @@ import org.nightlabs.jfire.issue.history.IssueHistory;
 import org.nightlabs.jfire.issue.id.IssueID;
 import org.nightlabs.jfire.issue.id.IssuePriorityID;
 import org.nightlabs.jfire.issue.id.IssueSeverityTypeID;
-import org.nightlabs.jfire.issue.id.IssueStatusID;
+import org.nightlabs.jfire.issue.id.IssueTypeID;
 
 /**
  * @author Chairat Kongarayawetchakun - chairat[AT]nightlabs[DOT]de
@@ -282,46 +282,65 @@ implements SessionBean{
 	{
 		PersistenceManager pm = getPersistenceManager();
 		try {
+//			// check, whether the datastore is already initialized
+//			pm.getExtent(IssueStatus.class);
+//			try {
+//				pm.getObjectById(IssueStatusID.create("N"), true);
+//				return; // already initialized
+//			} catch (JDOObjectNotFoundException x) {
+//				// datastore not yet initialized
+//			}
+//
+//			// Create the statuses
+//			IssueStatus issueStatus;
+//
+//			issueStatus = new IssueStatus(IssueStatus.ISSUE_STATUS_NEW);
+//			issueStatus.getIssueStatusText().setText(Locale.ENGLISH.getLanguage(), "New");
+//			pm.makePersistent(issueStatus);
+//
+//			issueStatus = new IssueStatus(IssueStatus.ISSUE_STATUS_FEEDBACK);
+//			issueStatus.getIssueStatusText().setText(Locale.ENGLISH.getLanguage(), "Feedback");
+//			pm.makePersistent(issueStatus);
+//			
+//			issueStatus = new IssueStatus(IssueStatus.ISSUE_STATUS_ACKNOWLEDGED);
+//			issueStatus.getIssueStatusText().setText(Locale.ENGLISH.getLanguage(), "Acknowledged");
+//			pm.makePersistent(issueStatus);
+//			
+//			issueStatus = new IssueStatus(IssueStatus.ISSUE_STATUS_CONFIRMED);
+//			issueStatus.getIssueStatusText().setText(Locale.ENGLISH.getLanguage(), "Confirmed");
+//			pm.makePersistent(issueStatus);
+//			
+//			issueStatus = new IssueStatus(IssueStatus.ISSUE_STATUS_RESOLVED);
+//			issueStatus.getIssueStatusText().setText(Locale.ENGLISH.getLanguage(), "Resolved");
+//			pm.makePersistent(issueStatus);
+//			
+//			issueStatus = new IssueStatus(IssueStatus.ISSUE_STATUS_CLOSE);
+//			issueStatus.getIssueStatusText().setText(Locale.ENGLISH.getLanguage(), "Close");
+//			pm.makePersistent(issueStatus);
+
+			
 			// check, whether the datastore is already initialized
-			pm.getExtent(IssueStatus.class);
+			
+			logger.debug(this.getClass().getName() + " Begining of createing the Issue Properties..................");
+			pm.getExtent(IssueType.class);
 			try {
-				pm.getObjectById(IssueStatusID.create("N"), true);
+				pm.getObjectById(IssueTypeID.create(getOrganisationID(), "Default"), true);
 				return; // already initialized
 			} catch (JDOObjectNotFoundException x) {
 				// datastore not yet initialized
+				logger.debug(this.getClass().getName() + "Error..................");
 			}
-
-			// Create the statuses
-			IssueStatus issueStatus;
-
-			issueStatus = new IssueStatus(IssueStatus.ISSUE_STATUS_NEW);
-			issueStatus.getIssueStatusText().setText(Locale.ENGLISH.getLanguage(), "New");
-			pm.makePersistent(issueStatus);
-
-			issueStatus = new IssueStatus(IssueStatus.ISSUE_STATUS_FEEDBACK);
-			issueStatus.getIssueStatusText().setText(Locale.ENGLISH.getLanguage(), "Feedback");
-			pm.makePersistent(issueStatus);
 			
-			issueStatus = new IssueStatus(IssueStatus.ISSUE_STATUS_ACKNOWLEDGED);
-			issueStatus.getIssueStatusText().setText(Locale.ENGLISH.getLanguage(), "Acknowledged");
-			pm.makePersistent(issueStatus);
+			logger.debug(this.getClass().getName() + " Yeahhhhhh!..................");
 			
-			issueStatus = new IssueStatus(IssueStatus.ISSUE_STATUS_CONFIRMED);
-			issueStatus.getIssueStatusText().setText(Locale.ENGLISH.getLanguage(), "Confirmed");
-			pm.makePersistent(issueStatus);
+			IssueType issueType = new IssueType(getOrganisationID(), "Default");
+			issueType.getName().setText(Locale.ENGLISH.getLanguage(), "Default");
+			pm.makePersistent(issueType);
 			
-			issueStatus = new IssueStatus(IssueStatus.ISSUE_STATUS_RESOLVED);
-			issueStatus.getIssueStatusText().setText(Locale.ENGLISH.getLanguage(), "Resolved");
-			pm.makePersistent(issueStatus);
-			
-			issueStatus = new IssueStatus(IssueStatus.ISSUE_STATUS_CLOSE);
-			issueStatus.getIssueStatusText().setText(Locale.ENGLISH.getLanguage(), "Close");
-			pm.makePersistent(issueStatus);
-
 			// check, whether the datastore is already initialized
 			pm.getExtent(IssueSeverityType.class);
 			try {
-				pm.getObjectById(IssueSeverityTypeID.create("N"), true);
+				pm.getObjectById(IssueSeverityTypeID.create(IssueSeverityType.ISSUE_SEVERITY_TYPE_BLOCK, "Default", getOrganisationID()), true);
 				return; // already initialized
 			} catch (JDOObjectNotFoundException x) {
 				// datastore not yet initialized
@@ -330,35 +349,35 @@ implements SessionBean{
 			// Create the statuses
 			IssueSeverityType issueSeverityType;
 
-			issueSeverityType = new IssueSeverityType(IssueSeverityType.ISSUE_SEVERITY_TYPE_MINOR);
+			issueSeverityType = new IssueSeverityType(issueType, IssueSeverityType.ISSUE_SEVERITY_TYPE_MINOR);
 			issueSeverityType.getIssueSeverityTypeText().setText(Locale.ENGLISH.getLanguage(), "Minor");
 			pm.makePersistent(issueSeverityType);
 
-			issueSeverityType = new IssueSeverityType(IssueSeverityType.ISSUE_SEVERITY_TYPE_MAJOR);
+			issueSeverityType = new IssueSeverityType(issueType, IssueSeverityType.ISSUE_SEVERITY_TYPE_MAJOR);
 			issueSeverityType.getIssueSeverityTypeText().setText(Locale.ENGLISH.getLanguage(), "Major");
 			pm.makePersistent(issueSeverityType);
 			
-			issueSeverityType = new IssueSeverityType(IssueSeverityType.ISSUE_SEVERITY_TYPE_CRASH);
+			issueSeverityType = new IssueSeverityType(issueType, IssueSeverityType.ISSUE_SEVERITY_TYPE_CRASH);
 			issueSeverityType.getIssueSeverityTypeText().setText(Locale.ENGLISH.getLanguage(), "Crash");
 			pm.makePersistent(issueSeverityType);
 			
-			issueSeverityType = new IssueSeverityType(IssueSeverityType.ISSUE_SEVERITY_TYPE_BLOCK);
+			issueSeverityType = new IssueSeverityType(issueType, IssueSeverityType.ISSUE_SEVERITY_TYPE_BLOCK);
 			issueSeverityType.getIssueSeverityTypeText().setText(Locale.ENGLISH.getLanguage(), "Block");
 			pm.makePersistent(issueSeverityType);
 			
-			issueSeverityType = new IssueSeverityType(IssueSeverityType.ISSUE_SEVERITY_TYPE_FEATURE);
+			issueSeverityType = new IssueSeverityType(issueType, IssueSeverityType.ISSUE_SEVERITY_TYPE_FEATURE);
 			issueSeverityType.getIssueSeverityTypeText().setText(Locale.ENGLISH.getLanguage(), "Feature");
 			pm.makePersistent(issueSeverityType);
 			
-			issueSeverityType = new IssueSeverityType(IssueSeverityType.ISSUE_SEVERITY_TYPE_TRIVIAL);
+			issueSeverityType = new IssueSeverityType(issueType, IssueSeverityType.ISSUE_SEVERITY_TYPE_TRIVIAL);
 			issueSeverityType.getIssueSeverityTypeText().setText(Locale.ENGLISH.getLanguage(), "Trivial");
 			pm.makePersistent(issueSeverityType);
 			
-			issueSeverityType = new IssueSeverityType(IssueSeverityType.ISSUE_SEVERITY_TYPE_TEXT);
+			issueSeverityType = new IssueSeverityType(issueType, IssueSeverityType.ISSUE_SEVERITY_TYPE_TEXT);
 			issueSeverityType.getIssueSeverityTypeText().setText(Locale.ENGLISH.getLanguage(), "Text");
 			pm.makePersistent(issueSeverityType);
 			
-			issueSeverityType = new IssueSeverityType(IssueSeverityType.ISSUE_SEVERITY_TYPE_TWEAK);
+			issueSeverityType = new IssueSeverityType(issueType, IssueSeverityType.ISSUE_SEVERITY_TYPE_TWEAK);
 			issueSeverityType.getIssueSeverityTypeText().setText(Locale.ENGLISH.getLanguage(), "Tweak");
 			pm.makePersistent(issueSeverityType);
 			
@@ -367,34 +386,34 @@ implements SessionBean{
 			// check, whether the datastore is already initialized
 			pm.getExtent(IssuePriority.class);
 			try {
-				pm.getObjectById(IssuePriorityID.create("0"), true);
+				pm.getObjectById(IssuePriorityID.create(IssuePriority.ISSUE_PRIORITY_NORMAL, issueType.getIssueTypeID(), getOrganisationID()), true);
 				return; // already initialized
 			} catch (JDOObjectNotFoundException x) {
 				// datastore not yet initialized
 			}
 			IssuePriority issuePriority;
 
-			issuePriority = new IssuePriority(IssuePriority.ISSUE_PRIORITY_NONE);
+			issuePriority = new IssuePriority(issueType, IssuePriority.ISSUE_PRIORITY_NONE);
 			issuePriority.getIssuePriorityText().setText(Locale.ENGLISH.getLanguage(), "None");
 			pm.makePersistent(issuePriority);
 
-			issuePriority = new IssuePriority(IssuePriority.ISSUE_PRIORITY_LOW);
+			issuePriority = new IssuePriority(issueType, IssuePriority.ISSUE_PRIORITY_LOW);
 			issuePriority.getIssuePriorityText().setText(Locale.ENGLISH.getLanguage(), "Low");
 			pm.makePersistent(issuePriority);
 			
-			issuePriority = new IssuePriority(IssuePriority.ISSUE_PRIORITY_NORMAL);
+			issuePriority = new IssuePriority(issueType, IssuePriority.ISSUE_PRIORITY_NORMAL);
 			issuePriority.getIssuePriorityText().setText(Locale.ENGLISH.getLanguage(), "Normal");
 			pm.makePersistent(issuePriority);
 			
-			issuePriority = new IssuePriority(IssuePriority.ISSUE_PRIORITY_HIGH);
+			issuePriority = new IssuePriority(issueType, IssuePriority.ISSUE_PRIORITY_HIGH);
 			issuePriority.getIssuePriorityText().setText(Locale.ENGLISH.getLanguage(), "High");
 			pm.makePersistent(issuePriority);
 			
-			issuePriority = new IssuePriority(IssuePriority.ISSUE_PRIORITY_URGENT);
+			issuePriority = new IssuePriority(issueType, IssuePriority.ISSUE_PRIORITY_URGENT);
 			issuePriority.getIssuePriorityText().setText(Locale.ENGLISH.getLanguage(), "Urgent");
 			pm.makePersistent(issuePriority);
 			
-			issuePriority = new IssuePriority(IssuePriority.ISSUE_PRIORITY_IMMEDIATE);
+			issuePriority = new IssuePriority(issueType, IssuePriority.ISSUE_PRIORITY_IMMEDIATE);
 			issuePriority.getIssuePriorityText().setText(Locale.ENGLISH.getLanguage(), "Immediate");
 			pm.makePersistent(issuePriority);
 		} finally {

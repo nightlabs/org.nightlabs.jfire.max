@@ -5,7 +5,6 @@ import java.util.Date;
 
 import org.apache.log4j.Logger;
 import org.nightlabs.jfire.issue.Issue;
-import org.nightlabs.jfire.prop.i18n.I18nDataFieldText;
 
 /**
  * @author Chairat Kongarayawetchakun <!-- chairat at nightlabs dot de -->
@@ -48,13 +47,13 @@ implements Serializable{
 	 * @jdo.field primary-key="true"
 	 * @jdo.column length="100"
 	 */
-	private String issueID;
+	private long issueID;
 	
 	/**
 	 * @jdo.field primary-key="true"
 	 * @jdo.column length="100"
 	 */
-	private String issueHistoryID;
+	private long issueHistoryID;
 
 	/**
 	 * @jdo.field persistence-modifier="persistent"
@@ -89,22 +88,22 @@ implements Serializable{
 	/**
 	 * @return Returns the issueID.
 	 */
-	public String getIssueID() {
+	public long getIssueID() {
 		return issueID;
 	}
 
 	/**
 	 * @param issueID The issueID to set.
 	 */
-	public void setIssueID(String issueID) {
+	public void setIssueID(long issueID) {
 		this.issueID = issueID;
 	}
 	
-	public String getIssueHistoryID() {
+	public long getIssueHistoryID() {
 		return issueHistoryID;
 	}
 	
-	public void setIssueHistoryID(String issueHistoryID) {
+	public void setIssueHistoryID(long issueHistoryID) {
 		this.issueHistoryID = issueHistoryID;
 	}
 	

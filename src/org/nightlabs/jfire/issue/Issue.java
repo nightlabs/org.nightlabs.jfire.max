@@ -44,7 +44,6 @@ import javax.jdo.listener.DetachCallback;
 
 import org.apache.log4j.Logger;
 import org.nightlabs.io.DataBuffer;
-import org.nightlabs.jdo.ObjectID;
 import org.nightlabs.jfire.jbpm.graph.def.StateDefinition;
 import org.nightlabs.jfire.security.User;
 import org.nightlabs.util.Util;
@@ -97,6 +96,7 @@ implements
 	public static final String FETCH_GROUP_SEVERITYTYPE = "Issue.severityType";
 	public static final String FETCH_GROUP_STATUS = "Issue.status";
 	public static final String FETCH_GROUP_PRIORITY = "Issue.priority";
+	
 	/**
 	 * @jdo.field primary-key="true"
 	 * @jdo.column length="100"
@@ -105,15 +105,14 @@ implements
 
 	/**
 	 * @jdo.field primary-key="true"
-	 * @jdo.column length="100"
 	 */
-	private String issueID;
+	private long issueID;
 
 	/**
 	 * @jdo.field persistence-modifier="persistent"
 	 * @jdo.column length="100"
 	 */
-	private long issueTypeID;
+	private IssueType issueType;
 
 //	/** Documents for the issue
 //	*
@@ -153,7 +152,6 @@ implements
 	 * @jdo.field persistence-modifier="persistent"
 	 */
 	private StateDefinition stateDefinition;
-
 
 	/**
 	 * @jdo.field persistence-modifier="persistent"
@@ -203,7 +201,7 @@ implements
 	public void loadStream(InputStream in, long length, Date timeStamp, String name)
 	throws IOException
 	{
-		logger.debug("Loading stream as ReportLayout");
+		logger.debug("Loading stream as Issue File Attachment");
 		boolean error = true;
 		try {
 			DataBuffer db = new DataBuffer((long) (length * 0.6));
@@ -228,15 +226,6 @@ implements
 		}
 	}
 	
-	/**
-	 * Creates a new {@link InputStream} for the report design
-	 * that is wrapped by an {@link InflaterInputStream}.
-	 * This means you can read the report design unzipped from the returend stream.
-	 */
-	public InputStream createReportDesignInputStream() {
-		return new InflaterInputStream(new ByteArrayInputStream(fileAttachment));
-	}
-	
 	public String getFileName() {
 		return fileName;
 	}
@@ -254,7 +243,7 @@ implements
 	public void loadFile(File f)
 	throws IOException
 	{
-		logger.debug("Loading file "+f+" as ReportLayout");
+		logger.debug("Loading file "+f+" as Issue File Attachment");
 		FileInputStream in = new FileInputStream(f);
 		try {
 			loadStream(in, f.length(), new Date(f.lastModified()), f.getName());
@@ -277,33 +266,19 @@ implements
 	 */
 	protected Issue() { }
 
-	public Issue(String organisationID, IssuePriority priority, IssueSeverityType severityType, StateDefinition stateDefinition, User reporter, User assigntoUser, ObjectID objectID)
+	public Issue(String organisationID)
 	{
-		if (reporter == null)
-			throw new NullPointerException("reporter");
-
 		this.organisationID = organisationID;
 		this.createTimestamp = new Date();
-		
-		this.issueID = objectID!=null?objectID.toString()+"&"+createTimestamp.toString():createTimestamp.toString();
-//		this.documents = new <String>();
-
-		this.priority = priority;
-		this.severityType = severityType;
-		this.stateDefinition = stateDefinition;
 
 		subject = new IssueSubject(this);
 		description = new IssueDescription(this);
-		
-		this.reporter = reporter;
-		this.assigntoUser = assigntoUser;
-	
 	}
 	
-	public Issue(String organisationID, IssuePriority priority, IssueSeverityType severityType, StateDefinition stateDefinition, User reporter, User assigntoUser, ObjectID objectID, byte[] fileAttachment)
+	public Issue(String organisationID, IssueType issueType)
 	{
-		this(organisationID, priority, severityType, stateDefinition, reporter, assigntoUser, objectID);
-		this.fileAttachment = fileAttachment;
+		this(organisationID);
+		this.issueType = issueType;
 	}
 
 	/**
@@ -316,29 +291,29 @@ implements
 	/**
 	 * @return Returns the issueID.
 	 */
-	public String getIssueID() {
+	public long getIssueID() {
 		return issueID;
 	}
 
 	/**
 	 * @param issueID The issueID to set.
 	 */
-	public void setIssueID(String issueID) {
+	public void setIssueID(long issueID) {
 		this.issueID = issueID;
 	}
 
 	/**
-	 * @return Returns the issueTypeID.
+	 * @return Returns the issueType.
 	 */
-	public long getIssueTypeID() {
-		return issueTypeID;
+	public IssueType getIssueType() {
+		return issueType;
 	}
 
 	/**
 	 * @param issueTypeID The issueTypeID to set.
 	 */
-	public void setIssueTypeID(long issueTypeID) {
-		this.issueTypeID = issueTypeID;
+	public void setIssueType(IssueType issueType) {
+		this.issueType = issueType;
 	}
 
 	/**
@@ -464,16 +439,6 @@ implements
 		return pm;
 	}
 
-//	public void jdoPreDetach()
-//	{
-//	}
-//	public void jdoPostDetach(Object _attached)
-//	{
-//	Issue attached = (Issue)_attached;
-//	Issue detached = this;
-//	Collection fetchGroups = attached.getPersistenceManager().getFetchPlan().getGroups();
-//	}
-
 	@Override
 	public boolean equals(Object obj)
 	{
@@ -501,9 +466,9 @@ implements
 	 */
 	private String primaryKey;
 
-	public static String getPrimaryKey(String organisationID, String issueID)
+	public static String getPrimaryKey(String organisationID, long issueID)
 	{
-		return organisationID + '/' + issueID;
+		return organisationID + '/' + Long.toString(issueID);
 	}
 	public String getPrimaryKey()
 	{

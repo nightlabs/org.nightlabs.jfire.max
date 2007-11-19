@@ -26,6 +26,17 @@ implements Serializable{
 	 * @jdo.field primary-key="true"
 	 * @jdo.column length="100"
 	 */
+	private String organisationID;
+	
+	/**
+	 * @jdo.field primary-key="true"
+	 */
+	private String issueTypeID;
+	
+	/**
+	 * @jdo.field primary-key="true"
+	 * @jdo.column length="100"
+	 */
 	private String issuePriorityID;
 	
 	public static final String ISSUE_PRIORITY_NONE = "0";
@@ -37,23 +48,42 @@ implements Serializable{
 	
 	public static final String FETCH_GROUP_THIS = "IssuePriority.text";
 
+	
 	/**
 	 * @jdo.field persistence-modifier="persistent" dependent="true" mapped-by="issuePriority"
 	 */
 	private IssuePriorityText texts;
+	
+	/**
+	 * @jdo.field persistence-modifier="persistent"
+	 */
+	private IssueType issueType;
 
+	/**
+	 * @deprecated Only for JDO!!!!
+	 */
 	protected IssuePriority()
 	{
 	}
 
-	public IssuePriority(String issuePriorityID){
+	public IssuePriority(IssueType issueType, String issuePriorityID){
 		if (issuePriorityID == null)
 			throw new IllegalArgumentException("issuePriorityID must not be null!");
 
+		this.organisationID = issueType.getOrganisationID();
+		this.issueTypeID = issueType.getIssueTypeID();
 		this.issuePriorityID = issuePriorityID;
 		this.texts = new IssuePriorityText(this);
 	}
 	
+	public String getOrganisationID() {
+		return organisationID;
+	}
+
+	public void setOrganisationID(String organisationID) {
+		this.organisationID = organisationID;
+	}
+
 	public void setIssuePriorityID(String issuePriorityID) {
 		this.issuePriorityID = issuePriorityID;
 	}
@@ -71,6 +101,10 @@ implements Serializable{
 		return texts;
 	}
 
+	public IssueType getIssueType() {
+		return issueType;
+	}
+	
 	@Override
 	public boolean equals(Object obj)
 	{

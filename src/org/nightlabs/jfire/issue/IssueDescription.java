@@ -39,7 +39,7 @@ extends I18nText{
 	 * @jdo.field primary-key="true"
 	 * @jdo.column length="100"
 	 */
-	private String issueID;
+	private long issueID;
 	
 	/**
 	 * @jdo.field persistence-modifier="persistent"
@@ -104,6 +104,6 @@ extends I18nText{
 	 */
 	protected String getFallBackValue(String languageID)
 	{
-		return issue == null ? languageID : issueID;
+		return issue == null ? languageID : Long.toString(issueID);
 	}
 }

@@ -31,7 +31,7 @@ public class IssueHistoryText extends I18nText{
 	 * @jdo.field primary-key="true"
 	 * @jdo.column length="100"
 	 */
-	private String issueHistoryID;
+	private long issueHistoryID;
 	
 	/**
 	 * @jdo.field persistence-modifier="persistent"
@@ -93,7 +93,7 @@ public class IssueHistoryText extends I18nText{
 	 */
 	protected String getFallBackValue(String languageID)
 	{
-		return Issue.getPrimaryKey(organisationID, issueHistoryTextID);
+		return Issue.getPrimaryKey(organisationID, issue.getIssueID());
 	}
 
 	public String getOrganisationID()

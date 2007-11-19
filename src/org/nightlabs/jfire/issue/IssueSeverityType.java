@@ -38,23 +38,50 @@ implements Serializable{
 	 * @jdo.field primary-key="true"
 	 * @jdo.column length="100"
 	 */
+	private String organisationID;
+	
+	/**
+	 * @jdo.field primary-key="true"
+	 */
+	private String issueTypeID;
+	
+	/**
+	 * @jdo.field primary-key="true"
+	 * @jdo.column length="100"
+	 */
 	private String issueSeverityTypeID;
 
 	/**
 	 * @jdo.field persistence-modifier="persistent" dependent="true" mapped-by="issueSeverityType"
 	 */
 	private IssueSeverityTypeText texts;
+	
+	/**
+	 * @jdo.field persistence-modifier="persistent"
+	 */
+	private IssueType issueType;
 
 	protected IssueSeverityType()
 	{
 	}
 
-	public IssueSeverityType(String issueSeverityTypeID){
+	public IssueSeverityType(IssueType issueType, String issueSeverityTypeID){
+		if (issueType == null)
+			throw new IllegalArgumentException("issueType must not be null!");
 		if (issueSeverityTypeID == null)
 			throw new IllegalArgumentException("issueSeverityTypeID must not be null!");
-
+		this.organisationID = issueType.getOrganisationID();
+		this.issueTypeID = issueType.getIssueTypeID();
 		this.issueSeverityTypeID = issueSeverityTypeID;
 		this.texts = new IssueSeverityTypeText(this);
+	}
+	
+	public String getOrganisationID() {
+		return organisationID;
+	}
+
+	public void setOrganisationID(String organisationID) {
+		this.organisationID = organisationID;
 	}
 	
 	public void setIssueSeverityTypeID(String issueSeverityTypeID) {
@@ -75,6 +102,10 @@ implements Serializable{
 	public IssueSeverityTypeText getIssueSeverityTypeText()
 	{
 		return texts;
+	}
+	
+	public IssueType getIssueType() {
+		return issueType;
 	}
 
 	@Override

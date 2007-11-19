@@ -8,7 +8,7 @@
 			throw new IllegalArgumentException("issuePK does not contain exactly 2 parts: " + issuePK);
 
 		n.organisationID = sa[0];
-		n.issueID = sa[1];
+		n.issueID = Long.parseLong(sa[1]);
 		return n;
 	}
 

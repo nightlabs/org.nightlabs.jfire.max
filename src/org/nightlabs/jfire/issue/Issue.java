@@ -74,13 +74,13 @@ import org.nightlabs.util.Utils;
  *			PARAMETERS String paramIssueTypeID
  *			import java.lang.String"
  *
- * @jdo.fetch-group name="Issue.fileAttachment" fetch-groups="default" fields="fileAttachment"
+ * @jdo.fetch-group name="Issue.fileList" fetch-groups="default" fields="fileList"
  * @jdo.fetch-group name="Issue.description" fetch-groups="default" fields="description"
  * @jdo.fetch-group name="Issue.subject" fetch-groups="default" fields="subject" 
  * @jdo.fetch-group name="Issue.priority" fetch-groups="default" fields="priority"
  * @jdo.fetch-group name="Issue.severityType" fetch-groups="default" fields="severityType"
  * @jdo.fetch-group name="Issue.status" fetch-groups="default" fields="stateDefinition"
- * @jdo.fetch-group name="Issue.this" fetch-groups="default" fields="fileAttachment, description, subject, priority, severityType, stateDefinition, reporter, assigntoUser"
+ * @jdo.fetch-group name="Issue.this" fetch-groups="default" fields="fileList, description, subject, priority, severityType, stateDefinition, reporter, assigntoUser"
  *
  **/
 public class Issue

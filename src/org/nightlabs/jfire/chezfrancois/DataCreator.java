@@ -206,8 +206,6 @@ public class DataCreator
 		return priceFragmentTypeTotal;
 	}
 
-	// FIXME: Changed creation/referencing of PriceFragmentTypes to use devil organisation id. 
-	
 	private PriceFragmentType priceFragmentTypeVatNet = null;
 	public PriceFragmentType getPriceFragmentTypeVatNet() {
 		if (priceFragmentTypeVatNet == null)

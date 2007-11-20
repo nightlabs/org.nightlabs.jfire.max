@@ -13,8 +13,7 @@ public class PriceFragmentTypeHelper
 		try {
 			InitialContext initialContext = new InitialContext();
 			try {
-				Organisation.getRootOrganisationID(initialContext);
-				return Organisation.DEVIL_ORGANISATION_ID; // TODO FIXME fix this workaround. we temporarily use the devil-organisation-id because of the references in the reports. 
+				return Organisation.getRootOrganisationID(initialContext);
 			} finally {
 				initialContext.close();
 			}

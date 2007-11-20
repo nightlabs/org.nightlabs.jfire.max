@@ -24,10 +24,20 @@ import org.nightlabs.util.Util;
  * @jdo.inheritance strategy = "new-table"
  * 
  * @jdo.fetch-group name="IssueType.name" fetch-groups="default" fields="name"
+ * @jdo.fetch-group name="IssueType.priorities" fetch-groups="default" fields="priorities"
+ * @jdo.fetch-group name="IssueType.severityTypes" fetch-groups="default" fields="severityTypes"
+ * @jdo.fetch-group name="IssueType.stateDefinition" fetch-groups="default" fields="stateDefinition"
+ * @jdo.fetch-group name="IssueType.this" fetch-groups="default" fields="name, priorities, severityTypes, stateDefinition"
  */
 public class IssueType
 implements Serializable{
 	private static final long serialVersionUID = 1L;
+	
+	public static final String FETCH_GROUP_THIS = "IssueSeverityType.this";
+	public static final String FETCH_GROUP_NAME = "IssueSeverityType.name";
+	public static final String FETCH_GROUP_PRIORITIES = "IssueSeverityType.priorities";
+	public static final String FETCH_GROUP_SEVERITY_TYPES = "IssueSeverityType.severityTypes";
+	
 	/**
 	 * @jdo.field primary-key="true"
 	 * @jdo.column length="100"

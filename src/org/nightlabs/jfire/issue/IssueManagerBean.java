@@ -271,6 +271,53 @@ implements SessionBean{
 		}
 	}
 
+	
+	/**
+	 * @throws ModuleException
+	 *
+	 * @ejb.interface-method
+	 * @ejb.transaction type = "Required"
+	 * @ejb.permission role-name="_Guest_"
+	 */
+	public Collection getIssueTypes(String[] fetchGroups, int maxFetchDepth)
+	throws ModuleException
+	{
+		PersistenceManager pm = getPersistenceManager();
+		try {
+			pm.getFetchPlan().setMaxFetchDepth(maxFetchDepth);
+			if (fetchGroups != null)
+				pm.getFetchPlan().setGroups(fetchGroups);
+
+			Query q = pm.newQuery(IssueType.class);
+			return pm.detachCopyAll((Collection)q.execute());
+		} finally {
+			pm.close();
+		}
+	}
+	
+	/**
+	 * @throws ModuleException
+	 *
+	 * @ejb.interface-method
+	 * @ejb.transaction type = "Required"
+	 * @ejb.permission role-name="_Guest_"
+	 */
+	public Collection getIssueSeverityTypesByIssueTypeID(IssueTypeID issueTypeID, String[] fetchGroups, int maxFetchDepth)
+	throws ModuleException
+	{
+		PersistenceManager pm = getPersistenceManager();
+		try {
+			pm.getFetchPlan().setMaxFetchDepth(maxFetchDepth);
+			if (fetchGroups != null)
+				pm.getFetchPlan().setGroups(fetchGroups);
+
+			Query q = pm.newQuery(IssueType.class);
+			return pm.detachCopyAll((Collection)q.execute());
+		} finally {
+			pm.close();
+		}
+	}
+	
 	/**
 	 * @throws IOException While loading an icon from a local resource, this might happen and we don't care in the initialise method.
 	 *
@@ -333,6 +380,14 @@ implements SessionBean{
 			IssueType issueType = new IssueType(getOrganisationID(), "Default");
 			issueType.getName().setText(Locale.ENGLISH.getLanguage(), "Default");
 			pm.makePersistent(issueType);
+			
+			IssueType issueType2 = new IssueType(getOrganisationID(), "Customer");
+			issueType2.getName().setText(Locale.ENGLISH.getLanguage(), "Customer");
+			pm.makePersistent(issueType2);
+			
+			IssueType issueType3 = new IssueType(getOrganisationID(), "Officer");
+			issueType3.getName().setText(Locale.ENGLISH.getLanguage(), "Officer");
+			pm.makePersistent(issueType3);
 			
 			// check, whether the datastore is already initialized
 			pm.getExtent(IssueSeverityType.class);

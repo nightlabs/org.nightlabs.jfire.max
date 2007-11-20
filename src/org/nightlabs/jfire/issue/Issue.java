@@ -52,7 +52,7 @@ import org.nightlabs.util.Util;
 import org.nightlabs.util.Utils;
 
 /**
- * @author Chairat Kongarayawetchakun <!-- chairatk at nightlabs dot de -->
+ * @author Chairat Kongarayawetchakun <!-- chairat at nightlabs dot de -->
  *
  * @jdo.persistence-capable
  *		identity-type="application"

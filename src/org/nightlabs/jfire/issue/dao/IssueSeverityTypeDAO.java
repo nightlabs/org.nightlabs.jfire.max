@@ -13,6 +13,7 @@ import org.nightlabs.jfire.issue.IssueManager;
 import org.nightlabs.jfire.issue.IssueManagerUtil;
 import org.nightlabs.jfire.issue.IssueSeverityType;
 import org.nightlabs.jfire.issue.id.IssueSeverityTypeID;
+import org.nightlabs.jfire.issue.id.IssueTypeID;
 import org.nightlabs.jfire.security.SecurityReflector;
 import org.nightlabs.progress.ProgressMonitor;
 
@@ -54,7 +55,7 @@ public class IssueSeverityTypeDAO
 
 	private static final String[] FETCH_GROUPS = { IssueSeverityType.FETCH_GROUP_THIS, FetchPlan.DEFAULT };
 
-	public List<IssueSeverityType> getIssueSeverityTypes(ProgressMonitor monitor)
+	public List<IssueSeverityType> getIssueSeverityTypes(IssueTypeID issueTypeID, ProgressMonitor monitor)
 	{
 		try {
 			return new ArrayList<IssueSeverityType>(retrieveJDOObjects(null, FETCH_GROUPS, NLJDOHelper.MAX_FETCH_DEPTH_NO_LIMIT, monitor));

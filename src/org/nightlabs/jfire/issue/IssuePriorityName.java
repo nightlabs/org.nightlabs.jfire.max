@@ -11,17 +11,17 @@ import org.nightlabs.jfire.issue.id.IssuePriorityID;
  *
  * @jdo.persistence-capable
  *		identity-type="application"
- *		objectid-class="org.nightlabs.jfire.issue.id.IssuePriorityTextID"
+ *		objectid-class="org.nightlabs.jfire.issue.id.IssuePriorityNameID"
  *		detachable="true"
- *		table="JFireIssueTracking_IssuePriorityText"
+ *		table="JFireIssueTracking_IssuePriorityName"
  *
  * @jdo.inheritance strategy="new-table"
  *
  * @jdo.create-objectid-class
  * 
- * @jdo.fetch-group name="IssuePriorityText.text" fetch-groups="default" fields="issue, texts"
+ * @jdo.fetch-group name="IssuePriorityName.name" fetch-groups="default" fields="issue, names"
  */ 
-public class IssuePriorityText 
+public class IssuePriorityName 
 extends I18nText{
 	/**
 	 * The serial version of this class.
@@ -48,21 +48,21 @@ extends I18nText{
 	 *		key-type="java.lang.String"
 	 *		default-fetch-group="true"
 	 *		value-type="java.lang.String"
-	 *		table="JFireIssueTracking_IssuePriorityText_texts"
+	 *		table="JFireIssueTracking_IssuePriorityName_names"
 	 *		null-value="exception"
 	 *
 	 * @jdo.join
 	 */
-	protected Map<String, String> texts = new HashMap<String, String>();
+	protected Map<String, String> names = new HashMap<String, String>();
 
 	/**
 	 * @deprecated Only for JDO!
 	 */
-	protected IssuePriorityText()
+	protected IssuePriorityName()
 	{
 	}
 
-	public IssuePriorityText(IssuePriority issuePriority)
+	public IssuePriorityName(IssuePriority issuePriority)
 	{
 		this.issuePriority = issuePriority;
 		issuePriorityID = issuePriority.getIssuePriorityID();
@@ -73,7 +73,7 @@ extends I18nText{
 	 */
 	protected Map<String, String> getI18nMap()
 	{
-		return texts;
+		return names;
 	}
 
 	/**

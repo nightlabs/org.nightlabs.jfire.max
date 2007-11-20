@@ -10,17 +10,18 @@ import org.nightlabs.i18n.I18nText;
  *
  * @jdo.persistence-capable
  *		identity-type="application"
- *		objectid-class="org.nightlabs.jfire.issue.id.IssueSeverityTypeTextID"
+ *		objectid-class="org.nightlabs.jfire.issue.id.IssueSeverityTypeNameID"
  *		detachable="true"
- *		table="JFireIssueTracking_IssueSeverityTypeText"
+ *		table="JFireIssueTracking_IssueSeverityTypeName"
  *
  * @jdo.inheritance strategy="new-table"
  *
  * @jdo.create-objectid-class
  * 
- * @jdo.fetch-group name="IssueSeverityTypeText.this" fetch-groups="default" fields="issueSeverityType, texts"
+ * @jdo.fetch-group name="IssueSeverityTypeName.this" fetch-groups="default" fields="issueSeverityType, names"
+ * @jdo.fetch-group name="IssueSeverityType.name" fetch-groups="default" fields="issueSeverityType, name"
  */ 
-public class IssueSeverityTypeText 
+public class IssueSeverityTypeName 
 extends I18nText{
 	/**
 	 * The serial version of this class.
@@ -47,21 +48,21 @@ extends I18nText{
 	 *		key-type="java.lang.String"
 	 *		value-type="java.lang.String"
 	 *		default-fetch-group="true"
-	 *		table="JFireIssueTracking_IssueSeverityTypeText_texts"
+	 *		table="JFireIssueTracking_IssueSeverityTypeName_names"
 	 *		null-value="exception"
 	 *
 	 * @jdo.join
 	 */
-	protected Map<String, String> texts = new HashMap<String, String>();
+	protected Map<String, String> names = new HashMap<String, String>();
 
 	/**
 	 * @deprecated Only for JDO!
 	 */
-	protected IssueSeverityTypeText()
+	protected IssueSeverityTypeName()
 	{
 	}
 
-	public IssueSeverityTypeText(IssueSeverityType issueSeverityType)
+	public IssueSeverityTypeName(IssueSeverityType issueSeverityType)
 	{
 		this.issueSeverityType = issueSeverityType;
 		issueSeverityTypeID = issueSeverityType.getIssueSeverityTypeID();
@@ -72,7 +73,7 @@ extends I18nText{
 	 */
 	protected Map<String, String> getI18nMap()
 	{
-		return texts;
+		return names;
 	}
 
 	/**

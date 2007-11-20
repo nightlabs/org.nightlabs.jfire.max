@@ -17,7 +17,7 @@ import org.nightlabs.util.Util;
  *
  * @jdo.inheritance strategy = "new-table"
  * 
- * @jdo.fetch-group name="IssuePriority.text" fetch-groups="default" fields="texts"
+ * @jdo.fetch-group name="IssuePriority.name" fetch-groups="default" fields="name"
  */
 public class IssuePriority
 implements Serializable{
@@ -52,7 +52,7 @@ implements Serializable{
 	/**
 	 * @jdo.field persistence-modifier="persistent" dependent="true" mapped-by="issuePriority"
 	 */
-	private IssuePriorityText texts;
+	private IssuePriorityName name;
 	
 	/**
 	 * @jdo.field persistence-modifier="persistent"
@@ -73,7 +73,7 @@ implements Serializable{
 		this.organisationID = issueType.getOrganisationID();
 		this.issueTypeID = issueType.getIssueTypeID();
 		this.issuePriorityID = issuePriorityID;
-		this.texts = new IssuePriorityText(this);
+		this.name = new IssuePriorityName(this);
 	}
 	
 	public String getOrganisationID() {
@@ -96,9 +96,9 @@ implements Serializable{
 		return issuePriorityID;
 	}
 
-	public IssuePriorityText getIssuePriorityText()
+	public IssuePriorityName getIssuePriorityText()
 	{
-		return texts;
+		return name;
 	}
 
 	public IssueType getIssueType() {

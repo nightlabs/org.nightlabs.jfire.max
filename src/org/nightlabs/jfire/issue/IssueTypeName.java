@@ -21,7 +21,7 @@ import org.nightlabs.i18n.I18nText;
  *
  * @jdo.create-objectid-class
  * 
- * @jdo.fetch-group name="IssueTypeName.name" fetch-groups="default" fields="issueType, names"
+ * @jdo.fetch-group name="IssueType.name" fetch-groups="default" fields="issueType, names"
  */ 
 public class IssueTypeName 
 extends I18nText{

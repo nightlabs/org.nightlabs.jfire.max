@@ -17,6 +17,8 @@ import java.util.Map;
 import javax.jdo.JDOHelper;
 import javax.jdo.JDOObjectNotFoundException;
 import javax.jdo.PersistenceManager;
+import javax.naming.InitialContext;
+import javax.naming.NamingException;
 import javax.xml.transform.TransformerException;
 
 import org.apache.log4j.Logger;
@@ -43,8 +45,7 @@ import org.nightlabs.jfire.reporting.parameter.config.id.ReportParameterAcquisit
 import org.nightlabs.jfire.reporting.parameter.id.ValueProviderID;
 import org.nightlabs.jfire.scripting.ScriptRegistry;
 import org.nightlabs.jfire.servermanager.JFireServerManager;
-import org.nightlabs.util.Util;
-import org.nightlabs.util.Utils;
+import org.nightlabs.util.IOUtil;
 import org.nightlabs.xml.DOMParser;
 import org.nightlabs.xml.NLDOMUtil;
 import org.w3c.dom.Document;
@@ -275,7 +276,15 @@ public class ReportingInitialiser {
 			name.setText(Locale.ENGLISH.getLanguage(), def);
 	}
 	
-	private void createReportCategories(File dir, ReportCategory parent) 
+	/**
+	 * Recurses from the given directory and report categories 
+	 * based on the &lt;report-category&gt; element found in the content.xml files there.
+	 * 
+	 * @param dir The directory to start recursion
+	 * @param parent The {@link ReportCategory}
+	 * @throws ReportingInitialiserException
+	 */
+	protected void createReportCategories(File dir, ReportCategory parent) 
 	throws ReportingInitialiserException
 	{
 		try {
@@ -314,53 +323,10 @@ public class ReportingInitialiser {
 			File[] reports = dir.listFiles(scriptFileNameFilter);
 			for (int j=0; j<reports.length; j++) {
 				File reportFile = reports[j];
-
-				Node reportNode = getReportDescriptor(reportFile, catDocument);				
-				
-				String reportID = Utils.getFileNameWithoutExtension(reportFile.getName());
-				boolean overwriteOnInit = true;
-				
-				if (reportNode != null) {
-					Node idNode = reportNode.getAttributes().getNamedItem("id");
-					if (idNode != null && !"".equals(idNode.getTextContent()))
-						reportID = idNode.getTextContent();
-//					Node typeNode = reportNode.getAttributes().getNamedItem("type");
-//					if (typeNode != null && !"".equals(typeNode.getTextContent()))
-//						itemType = typeNode.getTextContent();
-					Node overwriteNode = reportNode.getAttributes().getNamedItem("overwriteOnInit");
-					if (overwriteNode != null && !"".equals(overwriteNode.getTextContent()))
-						overwriteOnInit = Boolean.parseBoolean(overwriteNode.getTextContent());
-				}
-				
-				try {			
-					logger.debug("create ReportLayout = " + reportID);				
-					ReportLayout layout;
-					boolean hadToBeCreated = false;
-					try {
-						pm.getExtent(ReportLayout.class);
-						layout = (ReportLayout) pm.getObjectById(ReportRegistryItemID.create(
-								organisationID,
-								itemType,
-								reportID)
-						);
-					} catch (JDOObjectNotFoundException e) {
-						layout = new ReportLayout(category, organisationID, itemType, reportID);
-						layout = (ReportLayout)pm.makePersistent(layout);
-						hadToBeCreated = true;
-					}
-					
-					boolean doInit = overwriteOnInit || hadToBeCreated; 
-					if (doInit) {
-						layout.loadFile(reportFile);
-						createElementName(reportNode, "name", layout.getName(), reportID);
-						createElementName(reportNode, "description", layout.getDescription(), null);
-						createReportLocalisationBundle(reportFile, reportID, reportNode, layout);
-					}
-					// This has its own overwriteOnInit
-					createReportParameterAcquisitionSetup(reportFile, reportNode, layout);
-					
+				try {
+					createReportLayout(reportFile, category, catDocument, itemType);
 				} catch (Exception e) {
-					logger.warn("could NOT create ReportLayout "+reportID+"!", e);
+					logger.warn("could NOT create ReportLayout for file " + reportFile + "!", e);
 				}
 			}
 
@@ -372,13 +338,124 @@ public class ReportingInitialiser {
 			}
 		} catch (IOException e) {
 			throw new ReportingInitialiserException(e);
-		} catch (TransformerException e) {
-			throw new ReportingInitialiserException(e);
 		} catch (SAXException e) {
 			throw new ReportingInitialiserException(e);
 		}
 	}
 
+	/**
+	 * Creates a {@link ReportLayout} from the given file.
+	 *  
+	 * @param reportFile The file to create a new ReportFile from.
+	 * @param category The category to add the report
+	 * @param catDocument The document where meta-data of the report can be found
+	 * @param reportRegistryItemType The reportRegistryItemType to use as fallback.
+	 * @throws Exception
+	 */
+	protected void createReportLayout(
+			File reportFile, ReportCategory category, Document catDocument, 
+			String reportRegistryItemType) 
+	throws Exception
+	{
+		Node reportNode = getReportDescriptor(reportFile, catDocument);				
+		
+		String reportID = IOUtil.getFileNameWithoutExtension(reportFile.getName());
+		boolean overwriteOnInit = true;
+		
+		if (reportNode != null) {
+			Node idNode = reportNode.getAttributes().getNamedItem("id");
+			if (idNode != null && !"".equals(idNode.getTextContent()))
+				reportID = idNode.getTextContent();
+//			Node typeNode = reportNode.getAttributes().getNamedItem("type");
+//			if (typeNode != null && !"".equals(typeNode.getTextContent()))
+//				itemType = typeNode.getTextContent();
+			Node overwriteNode = reportNode.getAttributes().getNamedItem("overwriteOnInit");
+			if (overwriteNode != null && !"".equals(overwriteNode.getTextContent()))
+				overwriteOnInit = Boolean.parseBoolean(overwriteNode.getTextContent());
+		}
+		
+		logger.debug("create ReportLayout = " + reportID);				
+		ReportLayout layout;
+		boolean hadToBeCreated = false;
+		try {
+			pm.getExtent(ReportLayout.class);
+			layout = (ReportLayout) pm.getObjectById(ReportRegistryItemID.create(
+					organisationID,
+					reportRegistryItemType,
+					reportID)
+			);
+		} catch (JDOObjectNotFoundException e) {
+			layout = new ReportLayout(category, organisationID, reportRegistryItemType, reportID);
+			layout = (ReportLayout)pm.makePersistent(layout);
+			hadToBeCreated = true;
+		}
+
+		boolean doInit = overwriteOnInit || hadToBeCreated; 
+		if (doInit) {
+			File layoutFile = createReportFileFromTemplate(reportFile);
+			layout.loadFile(layoutFile);
+			layoutFile.delete();
+			createElementName(reportNode, "name", layout.getName(), reportID);
+			createElementName(reportNode, "description", layout.getDescription(), null);
+			createReportLocalisationBundle(reportFile, reportID, reportNode, layout);
+		}
+		// This has its own overwriteOnInit
+		createReportParameterAcquisitionSetup(reportFile, reportNode, layout);
+	}
+	
+	/**
+	 * Creates a new report design file from the given one by replacing
+	 * variables in the given File.
+	 * <p>
+	 * By now the variables replaced are:
+	 * <ul>
+	 * <li>${rootOrganisationID}</li>
+	 * <li>${rootOrganisationIDConverted}</li>
+	 * <li>${devilOrganisationID}</li>
+	 * <li>${devilOrganisationIDConverted}</li>
+	 * </ul>
+	 * </p> 
+	 * @param reportFile The template file to replace the variables in 
+	 * @return The newly created file with all variables replaced.
+	 * @throws Exception If something fails.
+	 */
+	protected File createReportFileFromTemplate(File reportFile) 
+	throws Exception
+	{
+		File tmpFile = File.createTempFile(IOUtil.getFileNameWithoutExtension(reportFile.getName()), ".rptdesign", IOUtil.getTempDir());
+		Map<String, String> variables = new HashMap<String, String>();
+		try {
+			InitialContext ctx = new InitialContext();
+			String rootOrganisationID = Organisation.getRootOrganisationID(ctx);
+			try {
+				variables.put("rootOrganisationID", rootOrganisationID);
+				variables.put("rootOrganisationIDConverted", convertToReportColumnString(rootOrganisationID));
+				variables.put("devilOrganisationID", Organisation.DEVIL_ORGANISATION_ID);
+				variables.put("devilOrganisationIDConverted", convertToReportColumnString(Organisation.DEVIL_ORGANISATION_ID));
+			} finally {
+				ctx.close();
+			}
+		} catch (NamingException e) {
+			throw new RuntimeException(e);
+		}
+		IOUtil.replaceTemplateVariables(tmpFile, reportFile, IOUtil.CHARSET_NAME_UTF_8, variables);
+		tmpFile.deleteOnExit();
+		return tmpFile;
+	}
+	
+	/**
+	 * Returns the given string converted so that it can be used
+	 * as name of dataset column in a report.
+	 *  
+	 * @param str The String to convert.
+	 * @return The given str with all "." replaced with "_" and "_" with "__" 
+	 */
+	public static String convertToReportColumnString(String str) {
+		String key = str.replaceAll("_", "__");
+		key = key.replaceAll("\\.", "_");
+		return key;
+	}	
+	
 	protected FileFilter dirFileFilter = new FileFilter() {	
 		public boolean accept(File pathname) {
 			return pathname.isDirectory() && !(pathname.toString().endsWith("resource"));
@@ -389,7 +466,7 @@ public class ReportingInitialiser {
 	{	
 		public boolean accept(File dir, String name) 
 		{				
-			String fileExtension = Util.getFileExtension(name);
+			String fileExtension = IOUtil.getFileExtension(name);
 			return "rptdesign".equals(fileExtension);
 		}	
 	};

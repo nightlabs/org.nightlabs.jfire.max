@@ -19,7 +19,8 @@ import org.nightlabs.i18n.I18nText;
  * @jdo.create-objectid-class
  * 		field-order="organisationID, issueID"
  * 
- * @jdo.fetch-group name="Issue.name" fields="issue, name"
+ * @jdo.fetch-group name="Issue.subject" fetch-groups="default" fields="issue, names"
+ * @jdo.fetch-group name="IssueSubject.this fetch-groups="default" fields="issue, names"
  */ 
 public class IssueSubject 
 extends I18nText{
@@ -46,19 +47,19 @@ extends I18nText{
 
 	/**
 	 * key: String languageID<br/>
-	 * value: String subject
+	 * value: String names
 	 * 
 	 * @jdo.field
 	 *		persistence-modifier="persistent"
 	 *		collection-type="map"
 	 *		key-type="java.lang.String"
 	 *		value-type="java.lang.String"
-	 *		table="JFireIssueTracking_IssueSubject_name"
+	 *		table="JFireIssueTracking_IssueSubject_names"
 	 *		null-value="exception"
 	 *
 	 * @jdo.join
 	 */
-	protected Map<String, String> name = new HashMap<String, String>();
+	protected Map<String, String> names = new HashMap<String, String>();
 
 	/**
 	 * @deprecated Only for JDO!
@@ -94,7 +95,7 @@ extends I18nText{
 	 */
 	protected Map<String, String> getI18nMap()
 	{
-		return name;
+		return names;
 	}
 
 	/**

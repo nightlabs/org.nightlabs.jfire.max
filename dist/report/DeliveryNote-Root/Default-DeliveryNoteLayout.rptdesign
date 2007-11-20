@@ -325,37 +325,37 @@ JFireReportingHelper.getJDOObject(row["productJDOID"]);</expression>
                     </structure>
                     <structure>
                         <property name="position">26</property>
-                        <property name="name">devil_NightLabs_org/__Total__</property>
+                        <property name="name">${devilOrganisationIDConverted}/__Total__</property>
                         <property name="dataType">float</property>
                     </structure>
                     <structure>
                         <property name="position">27</property>
-                        <property name="name">jfire_nightlabs_org/vat-ch-7__6-net</property>
+                        <property name="name">${rootOrganisationIDConverted}/vat-ch-7__6-net</property>
                         <property name="dataType">float</property>
                     </structure>
                     <structure>
                         <property name="position">28</property>
-                        <property name="name">jfire_nightlabs_org/vat-ch-7__6-val</property>
+                        <property name="name">${rootOrganisationIDConverted}/vat-ch-7__6-val</property>
                         <property name="dataType">float</property>
                     </structure>
                     <structure>
                         <property name="position">29</property>
-                        <property name="name">jfire_nightlabs_org/vat-de-19-net</property>
+                        <property name="name">${rootOrganisationIDConverted}/vat-de-19-net</property>
                         <property name="dataType">float</property>
                     </structure>
                     <structure>
                         <property name="position">30</property>
-                        <property name="name">jfire_nightlabs_org/vat-de-19-val</property>
+                        <property name="name">${rootOrganisationIDConverted}/vat-de-19-val</property>
                         <property name="dataType">float</property>
                     </structure>
                     <structure>
                         <property name="position">31</property>
-                        <property name="name">jfire_nightlabs_org/vat-de-7-net</property>
+                        <property name="name">${rootOrganisationIDConverted}/vat-de-7-net</property>
                         <property name="dataType">float</property>
                     </structure>
                     <structure>
                         <property name="position">32</property>
-                        <property name="name">jfire_nightlabs_org/vat-de-7-val</property>
+                        <property name="name">${rootOrganisationIDConverted}/vat-de-7-val</property>
                         <property name="dataType">float</property>
                     </structure>
                     <structure>
@@ -946,48 +946,48 @@ JFireReportingHelper.createDataSetParam(params["articleContainerID"])</expressio
                     <property name="dataType">string</property>
                 </structure>
                 <structure>
-                    <property name="name">devil_NightLabs_org/__Total__</property>
-                    <expression name="expression">dataSetRow["devil_NightLabs_org/__Total__"]</expression>
+                    <property name="name">${devilOrganisationIDConverted}/__Total__</property>
+                    <expression name="expression">dataSetRow["${devilOrganisationIDConverted}/__Total__"]</expression>
                     <property name="dataType">float</property>
                 </structure>
                 <structure>
-                    <property name="name">jfire_nightlabs_org/vat-ch-7__6-net</property>
-                    <expression name="expression">dataSetRow["jfire_nightlabs_org/vat-ch-7__6-net"]</expression>
+                    <property name="name">${rootOrganisationIDConverted}/vat-ch-7__6-net</property>
+                    <expression name="expression">dataSetRow["${rootOrganisationIDConverted}/vat-ch-7__6-net"]</expression>
                     <property name="dataType">float</property>
                 </structure>
                 <structure>
-                    <property name="name">jfire_nightlabs_org/vat-ch-7__6-val</property>
-                    <expression name="expression">dataSetRow["jfire_nightlabs_org/vat-ch-7__6-val"]</expression>
+                    <property name="name">${rootOrganisationIDConverted}/vat-ch-7__6-val</property>
+                    <expression name="expression">dataSetRow["${rootOrganisationIDConverted}/vat-ch-7__6-val"]</expression>
                     <property name="dataType">float</property>
                 </structure>
                 <structure>
-                    <property name="name">jfire_nightlabs_org/vat-de-19-net</property>
-                    <expression name="expression">dataSetRow["jfire_nightlabs_org/vat-de-19-net"]</expression>
+                    <property name="name">${rootOrganisationIDConverted}/vat-de-19-net</property>
+                    <expression name="expression">dataSetRow["${rootOrganisationIDConverted}/vat-de-19-net"]</expression>
                     <property name="dataType">float</property>
                 </structure>
                 <structure>
-                    <property name="name">jfire_nightlabs_org/vat-de-19-val</property>
-                    <expression name="expression">dataSetRow["jfire_nightlabs_org/vat-de-19-val"]</expression>
+                    <property name="name">${rootOrganisationIDConverted}/vat-de-19-val</property>
+                    <expression name="expression">dataSetRow["${rootOrganisationIDConverted}/vat-de-19-val"]</expression>
                     <property name="dataType">float</property>
                 </structure>
                 <structure>
-                    <property name="name">jfire_nightlabs_org/vat-de-7-net</property>
-                    <expression name="expression">dataSetRow["jfire_nightlabs_org/vat-de-7-net"]</expression>
+                    <property name="name">${rootOrganisationIDConverted}/vat-de-7-net</property>
+                    <expression name="expression">dataSetRow["${rootOrganisationIDConverted}/vat-de-7-net"]</expression>
                     <property name="dataType">float</property>
                 </structure>
                 <structure>
-                    <property name="name">jfire_nightlabs_org/vat-de-7-val</property>
-                    <expression name="expression">dataSetRow["jfire_nightlabs_org/vat-de-7-val"]</expression>
+                    <property name="name">${rootOrganisationIDConverted}/vat-de-7-val</property>
+                    <expression name="expression">dataSetRow["${rootOrganisationIDConverted}/vat-de-7-val"]</expression>
                     <property name="dataType">float</property>
                 </structure>
                 <structure>
                     <property name="name">SumVAT</property>
-                    <expression name="expression">Total.sum(dataSetRow["jfire_nightlabs_org/vat-de-19-val"])</expression>
+                    <expression name="expression">Total.sum(dataSetRow["${rootOrganisationIDConverted}/vat-de-19-val"])</expression>
                     <property name="dataType">float</property>
                 </structure>
                 <structure>
                     <property name="name">SumTotal</property>
-                    <expression name="expression">Total.sum(dataSetRow["devil_NightLabs_org/__Total__"])</expression>
+                    <expression name="expression">Total.sum(dataSetRow["${devilOrganisationIDConverted}/__Total__"])</expression>
                     <property name="dataType">float</property>
                 </structure>
                 <structure>
@@ -1132,7 +1132,7 @@ ObjectIDUtil.longObjectIDFieldToString(row["articleID"])</expression>
                                 <property name="pattern">###0.00</property>
                             </structure>
                             <property name="textAlign">right</property>
-                            <property name="resultSetColumn">devil_NightLabs_org/__Total__</property>
+                            <property name="resultSetColumn">${devilOrganisationIDConverted}/__Total__</property>
                         </data>
                     </cell>
                     <cell id="178">
@@ -1155,7 +1155,7 @@ ObjectIDUtil.longObjectIDFieldToString(row["articleID"])</expression>
                                 <property name="pattern">Fixed</property>
                             </structure>
                             <property name="textAlign">right</property>
-                            <property name="resultSetColumn">devil_NightLabs_org/__Total__</property>
+                            <property name="resultSetColumn">${devilOrganisationIDConverted}/__Total__</property>
                         </data>
                     </cell>
                     <cell id="161">
@@ -1235,7 +1235,7 @@ ObjectIDUtil.longObjectIDFieldToString(row["articleID"])</expression>
                                 <property name="pattern">###0.00</property>
                             </structure>
                             <property name="textAlign">right</property>
-                            <property name="resultSetColumn">devil_NightLabs_org/__Total__</property>
+                            <property name="resultSetColumn">${devilOrganisationIDConverted}/__Total__</property>
                         </data>
                     </cell>
                     <cell id="200">

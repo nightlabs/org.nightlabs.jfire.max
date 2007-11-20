@@ -385,10 +385,6 @@ implements SessionBean{
 			issueType2.getName().setText(Locale.ENGLISH.getLanguage(), "Customer");
 			pm.makePersistent(issueType2);
 			
-			IssueType issueType3 = new IssueType(getOrganisationID(), "Officer");
-			issueType3.getName().setText(Locale.ENGLISH.getLanguage(), "Officer");
-			pm.makePersistent(issueType3);
-			
 			// check, whether the datastore is already initialized
 			pm.getExtent(IssueSeverityType.class);
 			try {

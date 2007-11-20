@@ -18,12 +18,13 @@ import org.nightlabs.util.Util;
  * @jdo.inheritance strategy = "new-table"
  * 
  * @jdo.fetch-group name="IssueSeverityType.name" fetch-groups="default" fields="name"
+ * @jdo.fetch-group name="IssueSeverityType.this" fetch-groups="default" fields="issueType, name"
  */
 public class IssueSeverityType
 implements Serializable{
 	private static final long serialVersionUID = 1L;
 	
-	public static final String FETCH_GROUP_THIS = "IssueSeverityType.text";
+	public static final String FETCH_GROUP_THIS = "IssueSeverityType.this";
 	
 	public static final String ISSUE_SEVERITY_TYPE_MINOR = "Minor";
 	public static final String ISSUE_SEVERITY_TYPE_MAJOR = "Major";
@@ -74,6 +75,7 @@ implements Serializable{
 		this.issueTypeID = issueType.getIssueTypeID();
 		this.issueSeverityTypeID = issueSeverityTypeID;
 		this.name = new IssueSeverityTypeName(this);
+		this.issueType = issueType;
 	}
 	
 	public String getOrganisationID() {

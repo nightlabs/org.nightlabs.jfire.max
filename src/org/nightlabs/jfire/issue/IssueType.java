@@ -33,10 +33,10 @@ public class IssueType
 implements Serializable{
 	private static final long serialVersionUID = 1L;
 	
-	public static final String FETCH_GROUP_THIS = "IssueSeverityType.this";
-	public static final String FETCH_GROUP_NAME = "IssueSeverityType.name";
-	public static final String FETCH_GROUP_PRIORITIES = "IssueSeverityType.priorities";
-	public static final String FETCH_GROUP_SEVERITY_TYPES = "IssueSeverityType.severityTypes";
+	public static final String FETCH_GROUP_THIS = "IssueType.this";
+	public static final String FETCH_GROUP_NAME = "IssueType.name";
+	public static final String FETCH_GROUP_PRIORITIES = "IssueType.priorities";
+	public static final String FETCH_GROUP_SEVERITY_TYPES = "IssueType.severityTypes";
 	
 	/**
 	 * @jdo.field primary-key="true"

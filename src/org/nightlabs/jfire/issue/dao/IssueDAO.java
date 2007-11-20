@@ -104,17 +104,17 @@ public class IssueDAO extends BaseJDOObjectDAO<IssueID, Issue>{
 	}
 	
 	/**
-	 * Get a single user.
-	 * @param userID The ID of the user to get
+	 * Get a single issue.
+	 * @param issueID The ID of the issue to get
 	 * @param fetchGroups Wich fetch groups to use
 	 * @param maxFetchDepth Fetch depth or {@link NLJDOHelper#MAX_FETCH_DEPTH_NO_LIMIT} 
 	 * @param monitor The progress monitor for this action. For every downloaded
 	 * 					object, <code>monitor.worked(1)</code> will be called.
-	 * @return The requested user object
+	 * @return The requested issue object
 	 */
 	public synchronized Issue getIssue(IssueID issueID, String[] fetchGroups, int maxFetchDepth, ProgressMonitor monitor)
 	{
-		monitor.beginTask("Loading user "+issueID.issueID, 1);
+		monitor.beginTask("Loading issue "+issueID.issueID, 1);
 		Issue issue = getJDOObject(null, issueID, fetchGroups, maxFetchDepth, new SubProgressMonitor(monitor, 1));
 		monitor.done();
 		return issue;
@@ -126,12 +126,12 @@ public class IssueDAO extends BaseJDOObjectDAO<IssueID, Issue>{
 	}
 
 	/**
-	 * Get all users.
+	 * Get all issues.
 	 * @param fetchGroups Wich fetch groups to use
 	 * @param maxFetchDepth Fetch depth or {@link NLJDOHelper#MAX_FETCH_DEPTH_NO_LIMIT} 
 	 * @param monitor The progress monitor for this action. For every downloaded
 	 * 					object, <code>monitor.worked(1)</code> will be called.
-	 * @return The users.
+	 * @return The issues.
 	 */
 	public synchronized Collection<Issue> getIssues(String[] fetchgroups, int maxFetchDepth, ProgressMonitor monitor) 
 	{

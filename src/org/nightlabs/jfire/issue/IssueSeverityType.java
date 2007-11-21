@@ -25,6 +25,7 @@ implements Serializable{
 	private static final long serialVersionUID = 1L;
 	
 	public static final String FETCH_GROUP_THIS = "IssueSeverityType.this";
+	public static final String FETCH_GROUP_NAME = "IssueSeverityType.name";
 	
 	public static final String ISSUE_SEVERITY_TYPE_MINOR = "Minor";
 	public static final String ISSUE_SEVERITY_TYPE_MAJOR = "Major";

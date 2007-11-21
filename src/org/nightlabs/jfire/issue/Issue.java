@@ -80,7 +80,8 @@ import org.nightlabs.util.Utils;
  * @jdo.fetch-group name="Issue.priority" fetch-groups="default" fields="priority"
  * @jdo.fetch-group name="Issue.severityType" fetch-groups="default" fields="severityType"
  * @jdo.fetch-group name="Issue.status" fetch-groups="default" fields="stateDefinition"
- * @jdo.fetch-group name="Issue.this" fetch-groups="default" fields="fileList, description, subject, priority, severityType, stateDefinition, reporter, assigntoUser"
+ * @jdo.fetch-group name="Issue.issueType" fetch-groups="default" fields="issueType"
+ * @jdo.fetch-group name="Issue.this" fetch-groups="default" fields="fileList, issueType, description, subject, priority, severityType, stateDefinition, reporter, assigntoUser"
  *
  **/
 public class Issue
@@ -98,6 +99,7 @@ implements
 	public static final String FETCH_GROUP_SEVERITYTYPE = "Issue.severityType";
 	public static final String FETCH_GROUP_STATUS = "Issue.status";
 	public static final String FETCH_GROUP_PRIORITY = "Issue.priority";
+	public static final String fETCH_GROUP_ISSUETYPE = "Issue.issueType";
 	
 	/**
 	 * @jdo.field primary-key="true"

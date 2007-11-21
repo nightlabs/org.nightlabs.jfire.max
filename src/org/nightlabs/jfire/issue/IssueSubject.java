@@ -20,10 +20,14 @@ import org.nightlabs.i18n.I18nText;
  * 		field-order="organisationID, issueID"
  * 
  * @jdo.fetch-group name="Issue.subject" fetch-groups="default" fields="issue, names"
- * @jdo.fetch-group name="IssueSubject.this fetch-groups="default" fields="issue, names"
+ * @jdo.fetch-group name="IssueSubject.this" fetch-groups="default" fields="issue, names"
+ * @jdo.fetch-group name="IssueSubject.name" fetch-groups="default" fields="names"
  */ 
 public class IssueSubject 
 extends I18nText{
+	
+	public static final String FETCH_GROUP_THIS = "IssueSubject.this";
+	
 	/**
 	 * The serial version of this class.
 	 */

@@ -140,7 +140,7 @@ implements Serializable{
 	public boolean equals(Object obj)
 	{
 		if (obj == this) return true;
-		if (!(obj instanceof IssuePriority)) return false;
+		if (!(obj instanceof IssueType)) return false;
 		IssueType o = (IssueType) obj;
 		return Util.equals(o.issueTypeID, this.issueTypeID);
 	}

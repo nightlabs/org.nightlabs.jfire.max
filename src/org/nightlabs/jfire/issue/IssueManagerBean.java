@@ -368,22 +368,12 @@ implements SessionBean{
 			
 			// check, whether the datastore is already initialized
 			
-			pm.getExtent(IssueType.class);
-			try {
-				pm.getObjectById(IssueTypeID.create(getOrganisationID(), "Default"), true);
-				return; // already initialized
-			} catch (JDOObjectNotFoundException x) {
-				// datastore not yet initialized
-			}
-			
-			
 			IssueType issueType = new IssueType(getOrganisationID(), "Default");
 			issueType.getName().setText(Locale.ENGLISH.getLanguage(), "Default");
-			pm.makePersistent(issueType);
 			
 			IssueType issueType2 = new IssueType(getOrganisationID(), "Customer");
 			issueType2.getName().setText(Locale.ENGLISH.getLanguage(), "Customer");
-			pm.makePersistent(issueType2);
+			
 			
 			// check, whether the datastore is already initialized
 			pm.getExtent(IssueSeverityType.class);
@@ -464,6 +454,10 @@ implements SessionBean{
 			issuePriority = new IssuePriority(issueType, IssuePriority.ISSUE_PRIORITY_IMMEDIATE);
 			issuePriority.getIssuePriorityText().setText(Locale.ENGLISH.getLanguage(), "Immediate");
 			pm.makePersistent(issuePriority);
+			
+			pm.getExtent(IssueType.class);
+			pm.makePersistent(issueType);
+			pm.makePersistent(issueType2);
 		} finally {
 			pm.close();
 		}

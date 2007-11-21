@@ -107,6 +107,6 @@ extends I18nText{
 	 */
 	protected String getFallBackValue(String languageID)
 	{
-		return issue == null ? languageID : Long.toString(issueID);
+		return issue == null ? languageID : "";
 	}
 }

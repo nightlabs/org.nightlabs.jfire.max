@@ -46,6 +46,7 @@ import javax.jdo.listener.DetachCallback;
 
 import org.apache.log4j.Logger;
 import org.nightlabs.io.DataBuffer;
+import org.nightlabs.jfire.idgenerator.IDGenerator;
 import org.nightlabs.jfire.jbpm.graph.def.StateDefinition;
 import org.nightlabs.jfire.security.User;
 import org.nightlabs.util.Util;
@@ -203,20 +204,21 @@ implements
 	 */
 	protected Issue() { }
 
-	public Issue(String organisationID)
+	public Issue(String organisationID, long issueID)
 	{
 		this.organisationID = organisationID;
 		this.createTimestamp = new Date();
-
+		this.issueID = issueID;
+		
 		subject = new IssueSubject(this);
 		description = new IssueDescription(this);
 		
 		fileList = new ArrayList<IssueFileAttachment>();
 	}
 	
-	public Issue(String organisationID, IssueType issueType)
+	public Issue(String organisationID, long issueID, IssueType issueType)
 	{
-		this(organisationID);
+		this(organisationID, issueID);
 		this.issueType = issueType;
 	}
 

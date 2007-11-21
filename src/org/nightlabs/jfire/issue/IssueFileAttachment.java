@@ -35,7 +35,7 @@ implements Serializable{
 	private static final long serialVersionUID = 1L;
 	private static final Logger logger = Logger.getLogger(IssueFileAttachment.class);
 
-	public static final String FETCH_GROUP_THIS = "Issue.this";
+	public static final String FETCH_GROUP_THIS = "IssueFileAttachment.this";
 	
 	/**
 	 * @jdo.field primary-key="true"

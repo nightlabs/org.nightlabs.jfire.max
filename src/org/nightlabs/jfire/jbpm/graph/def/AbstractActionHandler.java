@@ -20,12 +20,29 @@ implements ActionHandler
 	 */
 	public static final String VARIABLE_NAME_STATABLE_ID = "statableID";
 
+	// TODO JPOX WORKAROUND: We should get only one real PersistenceManager within one transaction
+	// so that every of the "virtual" PersistenceManagers sees the same data. Currently this is not
+	// the case (they use separate data), so we bind the PersistenceManager here to a ThreadLocal.
+	private static ThreadLocal<PersistenceManager> persistenceManagerThreadLocal = new ThreadLocal<PersistenceManager>();
+
 	private PersistenceManager persistenceManager = null;
 
 	protected PersistenceManager getPersistenceManager()
 	{
+		// TODO JPOX WORKAROUND: begin
+		if (persistenceManager == null) {
+			persistenceManager = persistenceManagerThreadLocal.get();
+			if (persistenceManager != null && persistenceManager.isClosed())
+				persistenceManager = null;
+		}
+		// TODO JPOX WORKAROUND: end
+
 		if (persistenceManager == null)
 			persistenceManager = new Lookup(IDGenerator.getOrganisationID()).getPersistenceManager();
+
+		// TODO JPOX WORKAROUND: begin
+		persistenceManagerThreadLocal.set(persistenceManager);
+		// TODO JPOX WORKAROUND: end
 
 		return persistenceManager;
 	}

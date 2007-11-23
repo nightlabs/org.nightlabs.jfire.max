@@ -26,30 +26,21 @@
 
 package org.nightlabs.jfire.issue;
 
-import java.io.ByteArrayInputStream;
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.OutputStream;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
-import java.util.zip.DeflaterOutputStream;
-import java.util.zip.InflaterInputStream;
 
 import javax.jdo.JDOHelper;
 import javax.jdo.PersistenceManager;
 import javax.jdo.listener.DetachCallback;
 
 import org.apache.log4j.Logger;
-import org.nightlabs.io.DataBuffer;
-import org.nightlabs.jfire.idgenerator.IDGenerator;
+import org.nightlabs.jdo.ObjectID;
 import org.nightlabs.jfire.jbpm.graph.def.StateDefinition;
 import org.nightlabs.jfire.security.User;
-import org.nightlabs.util.Util;
 import org.nightlabs.util.Utils;
 
 /**
@@ -130,7 +121,7 @@ implements
 //	private Collection attachedDocuments = new HashSet();
 
 	/**
-	 * Instances of {@link String}.
+	 * Instances of String that are representations of {@link ObjectID}s.
 	 *
 	 * @jdo.field
 	 *		persistence-modifier="persistent"
@@ -140,8 +131,6 @@ implements
 	 *		mapped-by="issue"
 	 */
 	private Set<String> referencedObjectIDs;
-
-//	private Set<Object> referencedObjects;
 	
 	/**
 	 * Instances of {@link IssueFileAttachment}.
@@ -214,6 +203,7 @@ implements
 		description = new IssueDescription(this);
 		
 		fileList = new ArrayList<IssueFileAttachment>();
+		referencedObjectIDs = new HashSet<String>();
 	}
 	
 	public Issue(String organisationID, long issueID, IssueType issueType)
@@ -374,6 +364,10 @@ implements
 
 	public List<IssueFileAttachment> getFileList() {
 		return fileList;
+	}
+	
+	public Set<String> getReferencedObjectIDs() {
+		return referencedObjectIDs;
 	}
 	
 	protected PersistenceManager getPersistenceManager()

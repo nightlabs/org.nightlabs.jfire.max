@@ -13,12 +13,12 @@ import org.nightlabs.util.Util;
  *		detachable = "true"
  *		table="JFireIssueTracking_IssuePriority"
  *
- * @jdo.create-objectid-class
+ * @jdo.create-objectid-class field-order="organisationID, issuePriorityID"
  *
  * @jdo.inheritance strategy = "new-table"
  * 
  * @jdo.fetch-group name="IssuePriority.name" fetch-groups="default" fields="name"
- * @jdo.fetch-group name="IssuePriority.this" fetch-groups="default" fields="issueType, name"
+ * @jdo.fetch-group name="IssuePriority.this" fetch-groups="default" fields="name"
  */
 public class IssuePriority
 implements Serializable{
@@ -32,11 +32,6 @@ implements Serializable{
 	 * @jdo.column length="100"
 	 */
 	private String organisationID;
-	
-	/**
-	 * @jdo.field primary-key="true"
-	 */
-	private String issueTypeID;
 	
 	/**
 	 * @jdo.field primary-key="true"
@@ -57,26 +52,19 @@ implements Serializable{
 	private IssuePriorityName name;
 	
 	/**
-	 * @jdo.field persistence-modifier="persistent"
-	 */
-	private IssueType issueType;
-
-	/**
 	 * @deprecated Only for JDO!!!!
 	 */
 	protected IssuePriority()
 	{
 	}
 
-	public IssuePriority(IssueType issueType, String issuePriorityID){
+	public IssuePriority(String organisationID, String issuePriorityID){
 		if (issuePriorityID == null)
 			throw new IllegalArgumentException("issuePriorityID must not be null!");
 
-		this.organisationID = issueType.getOrganisationID();
-		this.issueTypeID = issueType.getIssueTypeID();
+		this.organisationID = organisationID;
 		this.issuePriorityID = issuePriorityID;
 		this.name = new IssuePriorityName(this);
-		this.issueType = issueType;
 	}
 	
 	public String getOrganisationID() {
@@ -104,10 +92,6 @@ implements Serializable{
 		return name;
 	}
 
-	public IssueType getIssueType() {
-		return issueType;
-	}
-	
 	@Override
 	public boolean equals(Object obj)
 	{

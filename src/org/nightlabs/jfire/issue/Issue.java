@@ -69,11 +69,11 @@ import org.nightlabs.util.Utils;
  * @jdo.fetch-group name="Issue.fileList" fetch-groups="default" fields="fileList"
  * @jdo.fetch-group name="Issue.description" fetch-groups="default" fields="description"
  * @jdo.fetch-group name="Issue.subject" fetch-groups="default" fields="subject" 
- * @jdo.fetch-group name="Issue.priority" fetch-groups="default" fields="priority"
- * @jdo.fetch-group name="Issue.severityType" fetch-groups="default" fields="severityType"
+ * @jdo.fetch-group name="Issue.issuePriority" fetch-groups="default" fields="issuePriority"
+ * @jdo.fetch-group name="Issue.issueSeverityType" fetch-groups="default" fields="issueSeverityType"
  * @jdo.fetch-group name="Issue.status" fetch-groups="default" fields="stateDefinition"
  * @jdo.fetch-group name="Issue.issueType" fetch-groups="default" fields="issueType"
- * @jdo.fetch-group name="Issue.this" fetch-groups="default" fields="fileList, issueType, description, subject, priority, severityType, stateDefinition, reporter, assigntoUser"
+ * @jdo.fetch-group name="Issue.this" fetch-groups="default" fields="fileList, issueType, description, subject, issuePriority, issueSeverityType, stateDefinition, reporter, assigntoUser"
  *
  **/
 public class Issue
@@ -88,9 +88,9 @@ implements
 	public static final String FETCH_GROUP_THIS = "Issue.this";
 	public static final String FETCH_GROUP_DESCRIPTION = "Issue.description";
 	public static final String FETCH_GROUP_SUBJECT = "Issue.subject";
-	public static final String FETCH_GROUP_SEVERITYTYPE = "Issue.severityType";
+	public static final String FETCH_GROUP_SEVERITYTYPE = "Issue.issueSeverityType";
 	public static final String FETCH_GROUP_STATUS = "Issue.status";
-	public static final String FETCH_GROUP_PRIORITY = "Issue.priority";
+	public static final String FETCH_GROUP_PRIORITY = "Issue.issuePriority";
 	public static final String fETCH_GROUP_ISSUETYPE = "Issue.issueType";
 	
 	/**
@@ -128,7 +128,9 @@ implements
 	 *		collection-type="collection"
 	 *		element-type="String"
 	 *		dependent-value="true"
-	 *		mapped-by="issue"
+	 *		table="JFireIssueTracking_Issue_referencedObjectIDs"
+	 *
+	 * @jdo.join
 	 */
 	private Set<String> referencedObjectIDs;
 	
@@ -146,12 +148,12 @@ implements
 	/**
 	 * @jdo.field persistence-modifier="persistent"
 	 */
-	private IssuePriority priority;
+	private IssuePriority issuePriority;
 
 	/**
 	 * @jdo.field persistence-modifier="persistent"
 	 */
-	private IssueSeverityType severityType;
+	private IssueSeverityType issueSeverityType;
 
 	/**
 	 * @jdo.field persistence-modifier="persistent"
@@ -331,20 +333,20 @@ implements
 		this.assigntoUser = assigntoUser;
 	}
 
-	public IssuePriority getPriority() {
-		return priority;
+	public IssuePriority getIssuePriority() {
+		return issuePriority;
 	}
 
-	public void setPriority(IssuePriority priority) {
-		this.priority = priority;
+	public void setIssuePriority(IssuePriority issuePriority) {
+		this.issuePriority = issuePriority;
 	}
 
-	public IssueSeverityType getSeverityType() {
-		return severityType;
+	public IssueSeverityType getIssueSeverityType() {
+		return issueSeverityType;
 	}
 
-	public void setSeverityType(IssueSeverityType severityType) {
-		this.severityType = severityType;
+	public void setIssueSeverityType(IssueSeverityType issueSeverityType) {
+		this.issueSeverityType = issueSeverityType;
 	}
 
 	public StateDefinition getStateDefinition() {

@@ -24,10 +24,10 @@ import org.nightlabs.util.Util;
  * @jdo.inheritance strategy = "new-table"
  * 
  * @jdo.fetch-group name="IssueType.name" fetch-groups="default" fields="name"
- * @jdo.fetch-group name="IssueType.priorities" fetch-groups="default" fields="priorities"
- * @jdo.fetch-group name="IssueType.severityTypes" fetch-groups="default" fields="severityTypes"
+ * @jdo.fetch-group name="IssueType.issuePriorities" fetch-groups="default" fields="issuePriorities"
+ * @jdo.fetch-group name="IssueType.issueSeverityTypes" fetch-groups="default" fields="issueSeverityTypes"
  * @jdo.fetch-group name="IssueType.stateDefinition" fetch-groups="default" fields="stateDefinition"
- * @jdo.fetch-group name="IssueType.this" fetch-groups="default" fields="name, priorities, severityTypes, stateDefinition"
+ * @jdo.fetch-group name="IssueType.this" fetch-groups="default" fields="name, issuePriorities, issueSeverityTypes, stateDefinition"
  */
 public class IssueType
 implements Serializable{
@@ -35,8 +35,8 @@ implements Serializable{
 	
 	public static final String FETCH_GROUP_THIS = "IssueType.this";
 	public static final String FETCH_GROUP_NAME = "IssueType.name";
-	public static final String FETCH_GROUP_PRIORITIES = "IssueType.priorities";
-	public static final String FETCH_GROUP_SEVERITY_TYPES = "IssueType.severityTypes";
+	public static final String FETCH_GROUP_PRIORITIES = "IssueType.issuePriorities";
+	public static final String FETCH_GROUP_SEVERITY_TYPES = "IssueType.issueSeverityTypes";
 	
 	/**
 	 * @jdo.field primary-key="true"
@@ -62,10 +62,11 @@ implements Serializable{
 	 *		persistence-modifier="persistent"
 	 *		collection-type="collection"
 	 *		element-type="IssueSeverityType"
-	 *		dependent-value="true"
-	 *		mapped-by="issueType"
+	 *		table="JFireIssueTracking_IssueType_severityTypes"
+	 *
+	 * @jdo.join
 	 */
-	private Set<IssueSeverityType> severityTypes;
+	private Set<IssueSeverityType> issueSeverityTypes;
 	
 	/**
 	 * Instances of {@link IssuePriority}.
@@ -74,10 +75,11 @@ implements Serializable{
 	 *		persistence-modifier="persistent"
 	 *		collection-type="collection"
 	 *		element-type="IssuePriority"
-	 *		dependent-value="true"
-	 *		mapped-by="issueType"
+	 *		table="JFireIssueTracking_IssueType_priorities"
+	 *
+	 * @jdo.join
 	 */
-	private Set<IssuePriority> priorities;
+	private Set<IssuePriority> issuePriorities;
 	
 	/**
 	 * Instances of {@link StateDefinition}.
@@ -97,8 +99,8 @@ implements Serializable{
 		this.organisationID = organisationID;
 		this.issueTypeID = issueTypeID;
 		
-		this.severityTypes = new HashSet<IssueSeverityType>();
-		this.priorities = new HashSet<IssuePriority>();
+		this.issueSeverityTypes = new HashSet<IssueSeverityType>();
+		this.issuePriorities = new HashSet<IssuePriority>();
 		this.stateDefinition = null;
 		
 		name = new IssueTypeName(this);
@@ -120,12 +122,12 @@ implements Serializable{
 		this.name = name;
 	}
 
-	public Set<IssueSeverityType> getSeverityTypes() {
-		return severityTypes;
+	public Set<IssueSeverityType> getIssueSeverityTypes() {
+		return issueSeverityTypes;
 	}
 
-	public Set<IssuePriority> getPriorities() {
-		return priorities;
+	public Set<IssuePriority> getIssuePriorities() {
+		return issuePriorities;
 	}
 
 	public StateDefinition getStateDefinition() {

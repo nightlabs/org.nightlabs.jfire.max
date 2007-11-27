@@ -9,11 +9,8 @@ import javax.jdo.FetchPlan;
 
 import org.nightlabs.jdo.NLJDOHelper;
 import org.nightlabs.jfire.base.jdo.BaseJDOObjectDAO;
-import org.nightlabs.jfire.issue.IssueManager;
-import org.nightlabs.jfire.issue.IssueManagerUtil;
 import org.nightlabs.jfire.issue.IssueStatus;
 import org.nightlabs.jfire.issue.id.IssueStatusID;
-import org.nightlabs.jfire.security.SecurityReflector;
 import org.nightlabs.progress.ProgressMonitor;
 
 public class IssueStatusDAO
@@ -32,7 +29,7 @@ public class IssueStatusDAO
 		}
 		return sharedInstance;
 	}
-	
+//	
 	@SuppressWarnings("unchecked") //$NON-NLS-1$
 	@Override
 	protected Collection<IssueStatus> retrieveJDOObjects(Set<IssueStatusID> objectIDs,
@@ -41,9 +38,9 @@ public class IssueStatusDAO
 	{
 		monitor.beginTask("Fetching IssueStatus...", 1); //$NON-NLS-1$
 		try {
-			IssueManager im = IssueManagerUtil.getHome(SecurityReflector.getInitialContextProperties()).create();
+//			IssueManager im = IssueManagerUtil.getHome(SecurityReflector.getInitialContextProperties()).create();
 			monitor.worked(1);
-			return im.getIssueStatus(fetchGroups, maxFetchDepth);	
+			return null;//im.getIssueStatus(fetchGroups, maxFetchDepth);	
 		} catch (Exception e) {
 			monitor.setCanceled(true);
 			throw e;

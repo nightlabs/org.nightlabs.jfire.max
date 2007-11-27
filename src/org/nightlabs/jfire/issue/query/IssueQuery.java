@@ -25,29 +25,53 @@ extends JDOQuery<Issue> {
 	private UserID reporterID;
 	private UserID assigneeID;
 	private Date createTimestamp;
+	private Date updateTimestamp;
 	
 	@Override
 	protected Query prepareQuery() {
 		Query q = getPersistenceManager().newQuery(Issue.class);
 		StringBuffer filter = new StringBuffer();
 		if (issueTypeID != null) {
-			filter.append("JDOHelper.getObjectId(this.issueType) == :issueTypeID && ");
+//			filter.append("JDOHelper.getObjectId(this.issueType) == :issueTypeID && ");
+			filter.append("( this.issueType.organisationID == \"" + issueTypeID.organisationID + "\" && ");
+			filter.append("  this.issueType.issueTypeID == \"" + issueTypeID.issueTypeID + "\" ) && ");
 		}
 		if (issueSeverityTypeID != null) {
-			filter.append("JDOHelper.getObjectId(this.issueSeverityType) == :issueSeverityTypeID && ");
+			filter.append("( this.issueSeverityType.organisationID == \"" + issueSeverityTypeID.organisationID + "\" && ");
+			filter.append("  this.issueSeverityType.issueSeverityTypeID == \"" + issueSeverityTypeID.issueSeverityTypeID + "\" ) && ");
 		}
 		if (issuePriorityID != null) {
-			filter.append("JDOHelper.getObjectId(this.issuePriority) == :issuePriorityID && ");
+			// FIXME: JPOX Bug JDOHelper.getObjectId(this.*) does not seem to work (java.lang.IndexOutOfBoundsException: Index: 3, Size: 3)
+//			filter.append("JDOHelper.getObjectId(this.issuePriority) == :issuePriorityID && ");
+			// WORKAROUND:
+			filter.append("( this.issuePriority.organisationID == \"" + issuePriorityID.organisationID + "\" && ");
+			filter.append("  this.issuePriority.issuePriorityID == \"" + issuePriorityID.issuePriorityID + "\" ) && ");
 		}
 		
 		if (reporterID != null) {
-			filter.append("JDOHelper.getObjectId(this.reporter) == :reporterID && ");
+//			filter.append("JDOHelper.getObjectId(this.reporter) == :reporterID && ");
+			filter.append("( this.reporter.organisationID == \"" + reporterID.organisationID + "\" && ");
+			filter.append("  this.reporter.userID == \"" + reporterID.userID + "\" ) && ");
 		}
 		
 		if (assigneeID != null) {
-			filter.append("JDOHelper.getObjectId(this.assignee) == :assigneeID && ");
+//			filter.append("JDOHelper.getObjectId(this.assignee) == :assigneeID && ");
+			filter.append("( this.assignee.organisationID == \"" + assigneeID.organisationID + "\" && ");
+			filter.append("  this.assignee.userID == \"" + assigneeID.userID + "\" ) && ");
+		}
+		
+		if (createTimestamp != null) {
+//			filter.append("JDOHelper.getObjectId(this.createTimestamp) == :createTimestamp && ");
+			filter.append("( this.createTimestamp >= \"" + createTimestamp + "\" && ");
+		}
+		
+		if (updateTimestamp != null) {
+//			filter.append("JDOHelper.getObjectId(this.updateTimestamp) == :updateTimestamp && ");
+			filter.append("( this.updateTimestamp >= \"" + updateTimestamp + "\" && ");
 		}
 		filter.append("(1 == 1)");
+		logger.info(filter.toString());
+		q.setFilter(filter.toString());
 		return q;
 	}
 
@@ -99,6 +123,11 @@ extends JDOQuery<Issue> {
 		this.createTimestamp = createTimestamp;
 	}
 	
-	
+	public Date getUpdateTimestamp() {
+		return updateTimestamp;
+	}
 
+	public void setUpdateTimestamp(Date updateTimestamp) {
+		this.updateTimestamp = updateTimestamp;
+	}
 }

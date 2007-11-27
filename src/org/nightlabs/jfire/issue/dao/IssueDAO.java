@@ -1,20 +1,15 @@
 package org.nightlabs.jfire.issue.dao;
 
-import java.rmi.RemoteException;
 import java.util.Collection;
 import java.util.List;
 import java.util.Set;
 
-import javax.ejb.CreateException;
-import javax.naming.NamingException;
-
 import org.nightlabs.jdo.NLJDOHelper;
-import org.nightlabs.jdo.ObjectID;
+import org.nightlabs.jdo.query.JDOQuery;
 import org.nightlabs.jfire.base.jdo.BaseJDOObjectDAO;
 import org.nightlabs.jfire.issue.Issue;
 import org.nightlabs.jfire.issue.IssueManager;
 import org.nightlabs.jfire.issue.IssueManagerUtil;
-import org.nightlabs.jfire.issue.history.IssueHistory;
 import org.nightlabs.jfire.issue.id.IssueID;
 import org.nightlabs.jfire.security.SecurityReflector;
 import org.nightlabs.progress.ProgressMonitor;
@@ -55,21 +50,21 @@ public class IssueDAO extends BaseJDOObjectDAO<IssueID, Issue>{
 		}
 	}
 
-	public synchronized IssueHistory createIssueHistory(IssueHistory issueHistory, boolean get, String[] fetchGroups, int maxFetchDepth, ProgressMonitor monitor){
-		if(issueHistory == null)
-			throw new NullPointerException("IssueHistory to create must not be null");
-		monitor.beginTask("Creating issue history: "+ issueHistory.getIssueID(), 3);
-		try {
-			IssueManager im = IssueManagerUtil.getHome(SecurityReflector.getInitialContextProperties()).create();
-			IssueHistory result = im.createIssueHistory(issueHistory, get, fetchGroups, maxFetchDepth);
-			monitor.worked(1);
-			monitor.done();
-			return result;
-		} catch (Exception e) {
-			monitor.done();
-			throw new RuntimeException("Error while storing Issue!\n" ,e);
-		}
-	}
+//	public synchronized IssueHistory createIssueHistory(IssueHistory issueHistory, boolean get, String[] fetchGroups, int maxFetchDepth, ProgressMonitor monitor){
+//		if(issueHistory == null)
+//			throw new NullPointerException("IssueHistory to create must not be null");
+//		monitor.beginTask("Creating issue history: "+ issueHistory.getIssueID(), 3);
+//		try {
+//			IssueManager im = IssueManagerUtil.getHome(SecurityReflector.getInitialContextProperties()).create();
+////			IssueHistory result = im.createIssueHistory(issueHistory, get, fetchGroups, maxFetchDepth);
+////			monitor.worked(1);
+////			monitor.done();
+//			return null;//result;
+//		} catch (Exception e) {
+//			monitor.done();
+//			throw new RuntimeException("Error while storing Issue!\n" ,e);
+//		}
+//	}
 	
 	public synchronized Issue storeIssue(Issue issue, boolean get, String[] fetchGroups, int maxFetchDepth, ProgressMonitor monitor){
 		if(issue == null)
@@ -125,6 +120,19 @@ public class IssueDAO extends BaseJDOObjectDAO<IssueID, Issue>{
 			return getIssues(is, fetchgroups, maxFetchDepth, monitor);
 		} catch (Exception e) {
 			throw new RuntimeException(e);
+		}
+	}
+	
+	@SuppressWarnings("unchecked")
+	public List<Issue> getIssuesForQueries(Collection<JDOQuery> queries, String[] fetchGroups,
+			int maxFetchDepth, ProgressMonitor monitor)
+	{
+		try {
+			IssueManager im = IssueManagerUtil.getHome(SecurityReflector.getInitialContextProperties()).create();
+			Set<IssueID> issueIDs = im.getIssueIDs(queries);
+			return getJDOObjects(null, issueIDs, fetchGroups, maxFetchDepth, monitor);			
+		} catch (Exception x) {
+			throw new RuntimeException(x);
 		}
 	}
 }

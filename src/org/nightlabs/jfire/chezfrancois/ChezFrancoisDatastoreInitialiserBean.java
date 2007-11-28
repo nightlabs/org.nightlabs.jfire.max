@@ -136,7 +136,7 @@ implements SessionBean
 	/**
 	 * @ejb.interface-method
 	 * @ejb.permission role-name="_System_"
-	 * @ejb.transaction type="RequiresNew"
+	 * @ejb.transaction type="Required"
 	 */
 	public void createModuleMetaData()
 	throws MalformedVersionException 

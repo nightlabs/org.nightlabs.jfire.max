@@ -3,10 +3,12 @@
 		"http://www.nightlabs.de/dtd/datastoreinit_1_2.dtd">
 <datastore-initialisation>
 	<init bean="jfire/ejb/JFireNumericOrganisationID/NumericOrganisationIdentifierManager" method="initialise">
+<!-- I think this dependency makes no sense at all! Why is it here? I'll comment it out and see what are the consequences. Marco. 2007-11-25
 		<depends
 			module="JFireVoucher.ear"
 			archive="JFireVoucher.jar"
 			bean="jfire/ejb/JFireVoucher/VoucherManager"
-			method="initialise" />		
+			method="initialise" />
+-->
 	</init>
 </datastore-initialisation>

@@ -56,18 +56,18 @@ extends JDOQuery<Issue> {
 		
 		if (assigneeID != null) {
 //			filter.append("JDOHelper.getObjectId(this.assignee) == :assigneeID && ");
-			filter.append("( this.assignee.organisationID == \"" + assigneeID.organisationID + "\" && ");
-			filter.append("  this.assignee.userID == \"" + assigneeID.userID + "\" ) && ");
+			filter.append("( this.assign.organisationID == \"" + assigneeID.organisationID + "\" && ");
+			filter.append("  this.assign.userID == \"" + assigneeID.userID + "\" ) && ");
 		}
-		
+	
 		if (createTimestamp != null) {
 //			filter.append("JDOHelper.getObjectId(this.createTimestamp) == :createTimestamp && ");
-			filter.append("( this.createTimestamp >= \"" + createTimestamp + "\" && ");
+			filter.append("( this.createTimestamp >= :createTimestamp ) &&");
 		}
 		
 		if (updateTimestamp != null) {
 //			filter.append("JDOHelper.getObjectId(this.updateTimestamp) == :updateTimestamp && ");
-			filter.append("( this.updateTimestamp >= \"" + updateTimestamp + "\" && ");
+			filter.append("( this.updateTimestamp >= :updateTimestamp ) &&");
 		}
 		filter.append("(1 == 1)");
 		logger.info(filter.toString());

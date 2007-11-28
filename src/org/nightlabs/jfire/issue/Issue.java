@@ -73,7 +73,7 @@ import org.nightlabs.util.Utils;
  * @jdo.fetch-group name="Issue.issueSeverityType" fetch-groups="default" fields="issueSeverityType"
  * @jdo.fetch-group name="Issue.status" fetch-groups="default" fields="stateDefinition"
  * @jdo.fetch-group name="Issue.issueType" fetch-groups="default" fields="issueType"
- * @jdo.fetch-group name="Issue.this" fetch-groups="default" fields="fileList, issueType, description, subject, issuePriority, issueSeverityType, stateDefinition, reporter, assigntoUser"
+ * @jdo.fetch-group name="Issue.this" fetch-groups="default" fields="fileList, issueType, description, subject, issuePriority, issueSeverityType, stateDefinition, reporter, assignee"
  *
  **/
 public class Issue
@@ -178,7 +178,7 @@ implements
 	/**
 	 * @jdo.field persistence-modifier="persistent" load-fetch-group="all"
 	 */
-	private User assigntoUser; 
+	private User assignee; 
 
 	/**
 	 * @jdo.field persistence-modifier="persistent"
@@ -320,17 +320,17 @@ implements
 	}
 
 	/**
-	 * @return Returns the assigntoUser.
+	 * @return Returns the assignee.
 	 */
-	public User getAssigntoUser() {
-		return assigntoUser;
+	public User getAssignee() {
+		return assignee;
 	}
 
 	/**
-	 * @param assigntoUser The user to set.
+	 * @param assignee The user to set.
 	 */
-	public void setAssigntoUser(User assigntoUser) {
-		this.assigntoUser = assigntoUser;
+	public void setAssignee(User assignee) {
+		this.assignee = assignee;
 	}
 
 	public IssuePriority getIssuePriority() {

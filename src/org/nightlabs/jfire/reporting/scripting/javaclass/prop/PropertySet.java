@@ -20,14 +20,14 @@ import org.eclipse.birt.report.model.css.Property;
 import org.eclipse.datatools.connectivity.oda.IResultSetMetaData;
 import org.nightlabs.jdo.NLJDOHelper;
 import org.nightlabs.jfire.prop.DataField;
-import org.nightlabs.jfire.prop.StructField;
 import org.nightlabs.jfire.prop.IStruct;
 import org.nightlabs.jfire.prop.StructBlock;
+import org.nightlabs.jfire.prop.StructField;
 import org.nightlabs.jfire.prop.StructLocal;
 import org.nightlabs.jfire.prop.datafield.DateDataField;
 import org.nightlabs.jfire.prop.datafield.II18nTextDataField;
 import org.nightlabs.jfire.prop.datafield.NumberDataField;
-import org.nightlabs.jfire.prop.id.PropertyID;
+import org.nightlabs.jfire.prop.id.PropertySetID;
 import org.nightlabs.jfire.prop.id.StructFieldID;
 import org.nightlabs.jfire.prop.structfield.DateStructField;
 import org.nightlabs.jfire.prop.structfield.NumberStructField;
@@ -130,8 +130,8 @@ extends AbstractJFSScriptExecutorDelegate
 	 */
 	public Object doExecute() throws ScriptException {		
 		JFSResultSet resultSet = new JFSResultSet((JFSResultSetMetaData)getResultSetMetaData());
-		PropertyID propertyID = (PropertyID) getParameterValue("propertyID");
-		if (propertyID == null)
+		PropertySetID propertySetID = (PropertySetID) getParameterValue("propertyID"); // TODO this must be "propertySetID" instead!!!
+		if (propertySetID == null)
 			throw new IllegalArgumentException("Parameter propertyID is not set.");
 		
 		PersistenceManager pm = getScriptExecutorJavaClass().getPersistenceManager();
@@ -140,16 +140,16 @@ extends AbstractJFSScriptExecutorDelegate
 		pm.getFetchPlan().setGroups(new String[] {FetchPlan.DEFAULT, org.nightlabs.jfire.prop.PropertySet.FETCH_GROUP_FULL_DATA});
 		pm.getFetchPlan().setMaxFetchDepth(NLJDOHelper.MAX_FETCH_DEPTH_NO_LIMIT);
 		
-		org.nightlabs.jfire.prop.PropertySet property = (org.nightlabs.jfire.prop.PropertySet) pm.getObjectById(propertyID);
-		logger.debug("Have property");
+		org.nightlabs.jfire.prop.PropertySet propertySet = (org.nightlabs.jfire.prop.PropertySet) pm.getObjectById(propertySetID);
+		logger.debug("Have propertySet");
 		
-		IStruct struct = StructLocal.getStructLocal(property.getStructLocalLinkClass(), property.getStructLocalScope(), pm);
-		property = pm.detachCopy(property);
+		IStruct struct = StructLocal.getStructLocal(propertySet.getStructLocalLinkClass(), propertySet.getStructLocalScope(), pm);
+		propertySet = pm.detachCopy(propertySet);
 		pm.getFetchPlan().setGroups(oldGroups);
 		pm.getFetchPlan().setMaxFetchDepth(oldFetchDepth);
 		logger.debug("Property detached");
 		// have to detach, as explode might modify the person 
-		property.inflate(struct);
+		propertySet.inflate(struct);
 		List<Object> elements = new LinkedList<Object>();
 		Locale locale = JFireReportingHelper.getLocale();
 		SortedMap<String, StructBlock> sortedBlocks = new TreeMap<String, StructBlock>();
@@ -168,7 +168,7 @@ extends AbstractJFSScriptExecutorDelegate
 				StructField structField = (StructField) iterator.next();
 				DataField field;
 				try {
-					field = property.getDataField((StructFieldID)JDOHelper.getObjectId(structField));
+					field = propertySet.getDataField((StructFieldID)JDOHelper.getObjectId(structField));
 				} catch (Exception e) {
 					throw new ScriptException(e);
 				}

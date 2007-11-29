@@ -41,6 +41,7 @@ import org.apache.log4j.Logger;
 import org.nightlabs.ModuleException;
 import org.nightlabs.jdo.moduleregistry.ModuleMetaData;
 import org.nightlabs.jfire.base.BaseSessionBeanImpl;
+import org.nightlabs.jfire.organisation.Organisation;
 import org.nightlabs.jfire.security.User;
 import org.nightlabs.jfire.timer.Task;
 import org.nightlabs.jfire.timer.id.TaskID;
@@ -121,7 +122,7 @@ implements SessionBean
 	public void initialise()
 	throws Exception 
 	{
-		if (getOrganisationID().equals(getRootOrganisationID()))
+		if (hasRootOrganisation() && getOrganisationID().equals(getRootOrganisationID()))
 			return;
 
 		ChezFrancoisDatastoreInitialiserLocal initialiser = ChezFrancoisDatastoreInitialiserUtil.getLocalHome().create();

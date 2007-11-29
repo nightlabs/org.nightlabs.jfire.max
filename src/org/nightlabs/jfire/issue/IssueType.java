@@ -4,8 +4,8 @@
 package org.nightlabs.jfire.issue;
 
 import java.io.Serializable;
-import java.util.HashSet;
-import java.util.Set;
+import java.util.ArrayList;
+import java.util.List;
 
 import org.nightlabs.jfire.jbpm.graph.def.StateDefinition;
 import org.nightlabs.util.Util;
@@ -66,7 +66,7 @@ implements Serializable{
 	 *
 	 * @jdo.join
 	 */
-	private Set<IssueSeverityType> issueSeverityTypes;
+	private List<IssueSeverityType> issueSeverityTypes;
 	
 	/**
 	 * Instances of {@link IssuePriority}.
@@ -79,7 +79,7 @@ implements Serializable{
 	 *
 	 * @jdo.join
 	 */
-	private Set<IssuePriority> issuePriorities;
+	private List<IssuePriority> issuePriorities;
 	
 	/**
 	 * Instances of {@link StateDefinition}.
@@ -99,8 +99,8 @@ implements Serializable{
 		this.organisationID = organisationID;
 		this.issueTypeID = issueTypeID;
 		
-		this.issueSeverityTypes = new HashSet<IssueSeverityType>();
-		this.issuePriorities = new HashSet<IssuePriority>();
+		this.issueSeverityTypes = new ArrayList<IssueSeverityType>();
+		this.issuePriorities = new ArrayList<IssuePriority>();
 		this.stateDefinition = null;
 		
 		name = new IssueTypeName(this);
@@ -122,11 +122,11 @@ implements Serializable{
 		this.name = name;
 	}
 
-	public Set<IssueSeverityType> getIssueSeverityTypes() {
+	public List<IssueSeverityType> getIssueSeverityTypes() {
 		return issueSeverityTypes;
 	}
 
-	public Set<IssuePriority> getIssuePriorities() {
+	public List<IssuePriority> getIssuePriorities() {
 		return issuePriorities;
 	}
 

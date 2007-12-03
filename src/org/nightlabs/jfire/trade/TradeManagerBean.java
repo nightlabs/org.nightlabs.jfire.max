@@ -236,6 +236,15 @@ implements SessionBean
 			if (segmentTypeIDs != null)
 				createSegments(pm, trader, order, segmentTypeIDs);
 
+			// TODO JPOX WORKAROUND BEGIN
+			// JDOHelper.getObjectId(order.getSegments().iterator().next()) returns null => trying to evict cache and reload a clean object
+			{
+				OrderID orderID = (OrderID) JDOHelper.getObjectId(order);
+				pm.evictAll();
+				order = (Order) pm.getObjectById(orderID);
+			}
+			// TODO JPOX WORKAROUND END
+
 			pm.getFetchPlan().setMaxFetchDepth(maxFetchDepth);
 			if (fetchGroups != null)
 				pm.getFetchPlan().setGroups(fetchGroups);

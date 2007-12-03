@@ -504,7 +504,7 @@ public class Trader
 		// LocalOrganisation localOrganisation =
 		// LocalOrganisation.getLocalOrganisation(pm);
 
-		if (mandator.getPrimaryKey().equals(vendor.getPrimaryKey())) {
+		if (getMandator().getPrimaryKey().equals(vendor.getPrimaryKey())) {
 			// local: the vendor is owning the datastore
 			User user = SecurityReflector.getUserDescriptor().getUser(pm);
 
@@ -526,7 +526,7 @@ public class Trader
 					orderIDPrefix, IDGenerator.nextID(Order.class, orderIDPrefix),
 					currency, user);
 
-			getPersistenceManager().makePersistent(order);
+			order = getPersistenceManager().makePersistent(order);
 			return order;
 		}
 //		if (!getOrganisationID().equals(vendor.getOrganisation())) {

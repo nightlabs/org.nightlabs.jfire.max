@@ -24,24 +24,23 @@
  *                                                                             *
  ******************************************************************************/
 
-package org.nightlabs.jfire.reporting.oda.jdojs.server;
+package org.nightlabs.jfire.reporting.oda.server.jdojs;
 
-import java.util.Map;
-
-import org.nightlabs.jfire.reporting.oda.jdojs.IJDOJSProxy;
+import org.nightlabs.jfire.reporting.oda.jdojs.AbstractJDOJSDriver;
 import org.nightlabs.jfire.reporting.oda.jdojs.IJDOJSProxyFactory;
 
 /**
  * @author Alexander Bieber <alex[AT]nightlabs[DOT]de>
  *
  */
-public class ServerJDOJSProxyFactory implements IJDOJSProxyFactory {
-
+public class ServerJDOJSDriver extends AbstractJDOJSDriver {
+	
 	/* (non-Javadoc)
-	 * @see org.nightlabs.jfire.reporting.oda.jdojs.IJDOJSProxyFactory#createJDOJavaScriptProxy(java.util.Map)
+	 * @see org.nightlabs.jfire.reporting.oda.jdojs.AbstractJDOJSDriver#createProxyFactory()
 	 */
-	public IJDOJSProxy createJDOJavaScriptProxy(Map proxyProperties) {
-		return new ServerJDOJSProxy(); // JDOJSConnection.checkConnectonProperties(proxyProperties));
+	@Override
+	protected IJDOJSProxyFactory createProxyFactory() {
+		return new ServerJDOJSProxyFactory();
 	}
-
+	
 }

@@ -9,7 +9,7 @@
 	<parameter-set>
 		<name language="de">ParameterSet: PropertySet</name>
 		<name language="en">ParameterSet: PropertySet</name>
-		<parameter name="propertyID" type="org.nightlabs.jfire.prop.id.PropertyID"/>			
+		<parameter name="propertySetID" type="org.nightlabs.jfire.prop.id.PropertySetID"/>			
 	</parameter-set>
 		
 	<script 

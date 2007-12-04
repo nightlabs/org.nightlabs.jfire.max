@@ -1,7 +1,7 @@
 /**
  * 
  */
-package org.nightlabs.jfire.reporting.oda.jfs.server;
+package org.nightlabs.jfire.reporting.oda.server.jfs;
 
 import org.nightlabs.jfire.reporting.oda.jfs.AbstractJFSDriver;
 import org.nightlabs.jfire.reporting.oda.jfs.IJFSQueryProxyFactory;

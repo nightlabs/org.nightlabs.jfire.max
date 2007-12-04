@@ -21,7 +21,7 @@
          point="org.eclipse.datatools.connectivity.oda.dataSource">
       <dataSource
             defaultDisplayName="JFire JDOQL Driver"
-            driverClass="org.nightlabs.jfire.reporting.oda.jdoql.server.ServerJDOQLDriver"
+            driverClass="org.nightlabs.jfire.reporting.oda.server.jdoql.ServerJDOQLDriver"
             id="org.nightlabs.jfire.reporting.oda.jdoql.JDOQLDriver"
             odaVersion="3.0"
             setThreadContextClassLoader="false">
@@ -68,7 +68,7 @@
          point="org.eclipse.datatools.connectivity.oda.dataSource">
       <dataSource
             defaultDisplayName="JFire JDO JavaScript Driver"
-            driverClass="org.nightlabs.jfire.reporting.oda.jdojs.server.ServerJDOJSDriver"
+            driverClass="org.nightlabs.jfire.reporting.oda.server.jdojs.ServerJDOJSDriver"
             id="org.nightlabs.jfire.reporting.oda.jdojs.JDOJSDriver"
             odaVersion="3.0"
             setThreadContextClassLoader="false">
@@ -123,7 +123,7 @@
          point="org.eclipse.datatools.connectivity.oda.dataSource">
       <dataSource
             defaultDisplayName="JFire Server Side Script Driver"
-            driverClass="org.nightlabs.jfire.reporting.oda.jfs.server.ServerJFSDriver"
+            driverClass="org.nightlabs.jfire.reporting.oda.server.jfs.ServerJFSDriver"
             id="org.nightlabs.jfire.reporting.oda.jfs.JFSDriver"
             odaVersion="3.0"
             setThreadContextClassLoader="false">

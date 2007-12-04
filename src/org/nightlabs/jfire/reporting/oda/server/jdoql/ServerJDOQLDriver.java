@@ -24,7 +24,7 @@
  *                                                                             *
  ******************************************************************************/
 
-package org.nightlabs.jfire.reporting.oda.jdoql.server;
+package org.nightlabs.jfire.reporting.oda.server.jdoql;
 
 import org.nightlabs.jfire.reporting.oda.jdoql.AbstractJDOQLDriver;
 import org.nightlabs.jfire.reporting.oda.jdoql.IJDOQueryProxyFactory;

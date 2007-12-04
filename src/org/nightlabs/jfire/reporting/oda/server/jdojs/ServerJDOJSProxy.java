@@ -24,7 +24,7 @@
  *                                                                             *
  ******************************************************************************/
 
-package org.nightlabs.jfire.reporting.oda.jdojs.server;
+package org.nightlabs.jfire.reporting.oda.server.jdojs;
 
 import java.util.Iterator;
 import java.util.Map;

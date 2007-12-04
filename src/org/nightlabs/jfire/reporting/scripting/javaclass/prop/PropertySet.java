@@ -65,6 +65,8 @@ extends AbstractJFSScriptExecutorDelegate
 	 * Logger used by this class.
 	 */
 	private static final Logger logger = Logger.getLogger(PropertySet.class);
+
+	public static final String PARAMETER_NAME_PROPERTY_SET_ID = "propertySetID";
 	
 	public static final String PROPERTY_NAME_LINK_CLASS = "linkClass";
 	public static final String PROPERTY_NAME_SCOPE = "scope";
@@ -130,9 +132,9 @@ extends AbstractJFSScriptExecutorDelegate
 	 */
 	public Object doExecute() throws ScriptException {		
 		JFSResultSet resultSet = new JFSResultSet((JFSResultSetMetaData)getResultSetMetaData());
-		PropertySetID propertySetID = (PropertySetID) getParameterValue("propertyID"); // TODO this must be "propertySetID" instead!!!
+		PropertySetID propertySetID = (PropertySetID) getParameterValue(PARAMETER_NAME_PROPERTY_SET_ID);
 		if (propertySetID == null)
-			throw new IllegalArgumentException("Parameter propertyID is not set.");
+			throw new IllegalArgumentException("Parameter " + PARAMETER_NAME_PROPERTY_SET_ID + " is not set.");
 		
 		PersistenceManager pm = getScriptExecutorJavaClass().getPersistenceManager();
 		Set oldGroups = pm.getFetchPlan().getGroups();

@@ -1,7 +1,7 @@
 /**
  * 
  */
-package org.nightlabs.jfire.reporting.oda.jfs.server;
+package org.nightlabs.jfire.reporting.oda.server.jfs;
 
 import java.util.Map;
 

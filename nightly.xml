@@ -5,7 +5,7 @@
 
   <project name="org.nightlabs.jfire.reporting.oda.client">
 	<plugin/>
-    <ant path="org.nightlabs.jfire.reporting" file="build-nightlabs.xml" target="deploy"/>
+    <ant path="org.nightlabs.jfire.reporting.oda.client" file="build-nightlabs.xml" target="deploy"/>
     <requires/>
     <provides/>
     <publishes description="..." location="org.nightlabs.jfire.reporting.oda.client/dist/org.nightlabs.jfire.reporting.oda.client_0.9.1.jar"/>

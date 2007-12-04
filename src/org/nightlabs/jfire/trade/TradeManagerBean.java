@@ -1373,6 +1373,7 @@ implements SessionBean
 			}
 
 			order.setCustomer(newCustomer);
+			order.setCustomerGroup(newCustomer.getDefaultCustomerGroup());
 
 			if (!get)
 				return null;

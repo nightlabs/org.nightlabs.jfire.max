@@ -108,6 +108,7 @@ implements IJDOObjectDAO<LegalEntity>
 		Collection<LegalEntity> legalEntities = tradeManager.getLegalEntities(objectIDs, fetchGroups, maxFetchDepth);
 		
 		IStruct struct = StructLocalDAO.sharedInstance().getStructLocal(Person.class, StructLocal.DEFAULT_SCOPE, new NullProgressMonitor());
+//		IStruct struct = StructDAO.sharedInstance().getStruct(Person.class, StructLocal.DEFAULT_SCOPE, new NullProgressMonitor());
 		// TODO: Really need this ?!? Better not to explode here I think, Alex.
 		for (LegalEntity le : legalEntities) {
 			try {

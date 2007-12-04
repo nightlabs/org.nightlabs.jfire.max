@@ -1,0 +1,17 @@
+Manifest-Version: 1.0
+Bundle-ManifestVersion: 2
+Bundle-Name: Reporting Plug-in
+Bundle-SymbolicName: org.nightlabs.jfire.reporting.oda.client;singleton:=true
+Bundle-Version: 0.9.1
+Bundle-ClassPath: org.nightlabs.jfire.reporting.jar
+Bundle-Activator: org.nightlabs.jfire.reporting.ReportingPlugin
+Bundle-Vendor: NightLabs.org
+Require-Bundle: org.eclipse.ui,
+ org.eclipse.core.runtime,
+ org.eclipse.datatools.connectivity.oda,
+ org.nightlabs.jfire.base.j2ee,
+ org.nightlabs.jfire.base.ui
+Eclipse-LazyStart: true
+Export-Package: org.nightlabs.jfire.reporting.oda.client.jdojs,
+ org.nightlabs.jfire.reporting.oda.client.jdoql,
+ org.nightlabs.jfire.reporting.oda.client.jfs

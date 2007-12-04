@@ -381,7 +381,7 @@ JFireReportingHelper.getJDOObject(row["productJDOID"]);</expression>
             <text-property name="displayName">CustomerPropretySet</text-property>
             <list-property name="parameters">
                 <structure>
-                    <property name="name">propertyID</property>
+                    <property name="name">propertySetID</property>
                     <property name="nativeDataType">0</property>
                     <property name="position">1</property>
                     <property name="isOptional">false</property>
@@ -557,7 +557,7 @@ JFireReportingHelper.getJDOObject(row["productJDOID"]);</expression>
             <property name="dataSet">CustomerPropretySet</property>
             <list-property name="paramBindings">
                 <structure>
-                    <property name="paramName">propertyID</property>
+                    <property name="paramName">propertySetID</property>
                     <expression name="expression">importClass(Packages.org.nightlabs.jfire.reporting.JFireReportingHelper);
 importClass(Packages.javax.jdo.JDOHelper);
 articleContainer = JFireReportingHelper.getJDOObject(params["articleContainerID"]);

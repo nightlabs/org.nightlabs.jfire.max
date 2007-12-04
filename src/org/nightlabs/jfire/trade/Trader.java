@@ -646,7 +646,13 @@ public class Trader
 
 	public Offer createOffer(User user, Order order, String offerIDPrefix) throws ModuleException
 	{
-		if (mandator.getPrimaryKey().equals(order.getVendor().getPrimaryKey())) {
+		if (order.getVendor() == null)
+			throw new IllegalStateException("order.getVendor() returned null!");
+
+		if (getMandator().getPrimaryKey() == null)
+			throw new IllegalStateException("getMandator().getPrimaryKey() returned null!");
+		
+		if (getMandator().getPrimaryKey().equals(order.getVendor().getPrimaryKey())) {
 			if (offerIDPrefix == null) {
 				TradeConfigModule tradeConfigModule;
 				try {

@@ -110,7 +110,7 @@ public abstract class Anchor
 		this.organisationID = organisationID;
 		this.anchorTypeID = anchorTypeID;
 		this.anchorID = anchorID;
-		this.primaryKey = getPrimaryKey(organisationID, anchorTypeID, anchorID);
+//		this.primaryKey = getPrimaryKey(organisationID, anchorTypeID, anchorID);
 	}
 
 	public static String getPrimaryKey(String organisationID, String anchorTypeID, String anchorID)
@@ -132,14 +132,15 @@ public abstract class Anchor
 		return AnchorID.create(parts[0], parts[1], anchorID);
 	}
 	
-	/**
-	 * @jdo.field persistence-modifier="persistent"
-	 */
-	protected String primaryKey;
+//	/**
+//	 * @jdo.field persistence-modifier="persistent"
+//	 */
+//	protected String primaryKey;
 	
 	public String getPrimaryKey()
 	{
-		return primaryKey;
+//		return primaryKey;
+		return getPrimaryKey(organisationID, anchorTypeID, anchorID);
 	}
 
 	/**

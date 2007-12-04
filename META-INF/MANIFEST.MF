@@ -4,7 +4,7 @@ Bundle-Name: Reporting Plug-in
 Bundle-SymbolicName: org.nightlabs.jfire.reporting.oda.client;singleton:=true
 Bundle-Version: 0.9.1
 Bundle-ClassPath: org.nightlabs.jfire.reporting.jar
-Bundle-Activator: org.nightlabs.jfire.reporting.ReportingPlugin
+Bundle-Activator: org.nightlabs.jfire.reporting.oda.client.ReportingOdaClientPlugin
 Bundle-Vendor: NightLabs.org
 Require-Bundle: org.eclipse.ui,
  org.eclipse.core.runtime,

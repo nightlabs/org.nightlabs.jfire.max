@@ -32,7 +32,7 @@ import org.eclipse.datatools.connectivity.oda.IParameterMetaData;
 import org.eclipse.datatools.connectivity.oda.IResultSet;
 import org.eclipse.datatools.connectivity.oda.IResultSetMetaData;
 import org.eclipse.datatools.connectivity.oda.OdaException;
-import org.nightlabs.jfire.reporting.ReportingPlugin;
+import org.nightlabs.jfire.reporting.oda.client.ReportingOdaClientPlugin;
 import org.nightlabs.jfire.reporting.oda.jfs.AbstractJFSQueryProxy;
 import org.nightlabs.jfire.scripting.id.ScriptRegistryItemID;
 
@@ -72,7 +72,7 @@ public class ClientJFSQueryProxy extends AbstractJFSQueryProxy {
 			return lastParameterMetaData;
 		lastParamMetaDataItemID = itemID;
 		try {
-			lastParameterMetaData = ReportingPlugin.getReportManager().getJFSParameterMetaData(itemID);
+			lastParameterMetaData = ReportingOdaClientPlugin.getReportManager().getJFSParameterMetaData(itemID);
 		} catch (Exception e) {
 			OdaException ex = new OdaException("Could not get ParameterMetaData: "+e.getMessage()); //$NON-NLS-1$
 			ex.initCause(e);
@@ -94,7 +94,7 @@ public class ClientJFSQueryProxy extends AbstractJFSQueryProxy {
 	 */
 	public IResultSet executeQuery() throws OdaException {
 		try {
-			return ReportingPlugin.getReportManager().getJFSResultSet(
+			return ReportingOdaClientPlugin.getReportManager().getJFSResultSet(
 					getJFSQueryPropertySet(), getNamedParameters()
 				);
 		} catch (Exception e) {
@@ -119,7 +119,7 @@ public class ClientJFSQueryProxy extends AbstractJFSQueryProxy {
 			return lastMetaData;
 		lastMetaDataItemID = itemID;
 		try {
-			lastMetaData = ReportingPlugin.getReportManager().getJFSResultSetMetaData(getJFSQueryPropertySet());
+			lastMetaData = ReportingOdaClientPlugin.getReportManager().getJFSResultSetMetaData(getJFSQueryPropertySet());
 		} catch (Exception e) {
 			OdaException ex = new OdaException("Could not get ResultSetMetaData: "+e.getMessage()); //$NON-NLS-1$
 			ex.initCause(e);

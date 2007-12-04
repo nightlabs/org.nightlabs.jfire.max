@@ -1,24 +1,26 @@
-package org.nightlabs.jfire.reporting;
+package org.nightlabs.jfire.reporting.oda.client;
 
 import org.eclipse.ui.plugin.AbstractUIPlugin;
 import org.nightlabs.jfire.base.ui.login.Login;
+import org.nightlabs.jfire.reporting.ReportManager;
+import org.nightlabs.jfire.reporting.ReportManagerUtil;
 import org.osgi.framework.BundleContext;
 
 /**
  * The activator class controls the plug-in life cycle
  */
-public class ReportingPlugin extends AbstractUIPlugin {
+public class ReportingOdaClientPlugin extends AbstractUIPlugin {
 
 	// The plug-in ID
 	public static final String PLUGIN_ID = "org.nightlabs.jfire.reporting";
 
 	// The shared instance
-	private static ReportingPlugin plugin;
+	private static ReportingOdaClientPlugin plugin;
 	
 	/**
 	 * The constructor
 	 */
-	public ReportingPlugin() {
+	public ReportingOdaClientPlugin() {
 	}
 
 	/*
@@ -44,7 +46,7 @@ public class ReportingPlugin extends AbstractUIPlugin {
 	 *
 	 * @return the shared instance
 	 */
-	public static ReportingPlugin getDefault() {
+	public static ReportingOdaClientPlugin getDefault() {
 		return plugin;
 	}
 

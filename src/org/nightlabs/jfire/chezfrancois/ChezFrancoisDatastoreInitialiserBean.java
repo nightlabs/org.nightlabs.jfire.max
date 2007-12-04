@@ -154,7 +154,7 @@ implements SessionBean
 
 			// version is {major}.{minor}.{release}-{patchlevel}-{suffix}
 			moduleMetaData = new ModuleMetaData(
-					"JFireChezFrancois", "0.9.1-0-beta", "0.9.1-0-beta");
+					"JFireChezFrancois", "0.9.2-0-beta", "0.9.2-0-beta");
 			pm.makePersistent(moduleMetaData);
 
 

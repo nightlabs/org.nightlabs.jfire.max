@@ -31,7 +31,6 @@ import java.util.Map;
 import org.nightlabs.jfire.reporting.oda.Connection;
 import org.nightlabs.jfire.reporting.oda.jdoql.IJDOQueryProxy;
 import org.nightlabs.jfire.reporting.oda.jdoql.IJDOQueryProxyFactory;
-import org.nightlabs.jfire.reporting.oda.jdoql.JDOQLConnection;
 
 /**
  * @author Alexander Bieber <alex[AT]nightlabs[DOT]de>

@@ -5,7 +5,6 @@ import java.io.Serializable;
 import org.nightlabs.jfire.accounting.pay.Payment;
 import org.nightlabs.jfire.voucher.store.VoucherKey;
 import org.nightlabs.util.Util;
-import org.nightlabs.util.Utils;
 
 /**
  * @author Marco Schulze - Marco at NightLabs dot de

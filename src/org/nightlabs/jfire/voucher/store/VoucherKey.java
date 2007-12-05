@@ -22,7 +22,6 @@ import org.nightlabs.jfire.voucher.accounting.VoucherRedemption;
 import org.nightlabs.jfire.voucher.store.id.VoucherKeyID;
 import org.nightlabs.math.Base62Coder;
 import org.nightlabs.util.Util;
-import org.nightlabs.util.Utils;
 
 /**
  * As a {@link Voucher} is a {@link Product} and thus can be refunded and resold to another customer (as

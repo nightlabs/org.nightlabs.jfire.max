@@ -8,7 +8,6 @@ import java.net.URL;
 import org.jbpm.JbpmContext;
 import org.nightlabs.io.DataBuffer;
 import org.nightlabs.util.Util;
-import org.nightlabs.util.Utils;
 
 /**
  * @author Marco Schulze - marco at nightlabs dot de

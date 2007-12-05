@@ -6,6 +6,7 @@ import java.util.Properties;
 import java.util.Set;
 
 import javax.jdo.JDODetachedFieldAccessException;
+
 import org.nightlabs.annotation.Implement;
 import org.nightlabs.jdo.NLJDOHelper;
 import org.nightlabs.jfire.base.jdo.BaseJDOObjectDAO;
@@ -18,7 +19,6 @@ import org.nightlabs.jfire.simpletrade.store.SimpleProductType;
 import org.nightlabs.jfire.store.id.ProductTypeID;
 import org.nightlabs.progress.ProgressMonitor;
 import org.nightlabs.util.Util;
-import org.nightlabs.util.Utils;
 
 public class SimpleProductTypeDAO
 extends BaseJDOObjectDAO<ProductTypeID, SimpleProductType>

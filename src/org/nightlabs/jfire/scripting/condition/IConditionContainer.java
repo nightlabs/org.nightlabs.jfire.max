@@ -26,6 +26,7 @@
 package org.nightlabs.jfire.scripting.condition;
 
 import java.util.List;
+import java.util.concurrent.locks.Condition;
 
 /**
  * This Interface describes a container for holding {@link Condition}s

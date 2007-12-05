@@ -38,7 +38,6 @@ import javax.jdo.listener.StoreCallback;
 
 import org.apache.log4j.Logger;
 import org.nightlabs.util.Util;
-import org.nightlabs.util.Utils;
 
 /**
  * Base class for objects in the JFire scripting tree and provides the 

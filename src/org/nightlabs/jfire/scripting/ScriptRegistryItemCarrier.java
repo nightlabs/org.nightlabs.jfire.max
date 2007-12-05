@@ -36,7 +36,6 @@ import java.util.Set;
 import org.nightlabs.ModuleException;
 import org.nightlabs.jfire.scripting.id.ScriptRegistryItemID;
 import org.nightlabs.util.Util;
-import org.nightlabs.util.Utils;
 
 /**
  * @author Alexander Bieber <alex[AT]nightlabs[DOT]de>

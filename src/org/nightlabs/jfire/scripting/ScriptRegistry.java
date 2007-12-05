@@ -46,7 +46,6 @@ import org.nightlabs.jfire.organisation.Organisation;
 import org.nightlabs.jfire.scripting.id.ScriptRegistryID;
 import org.nightlabs.jfire.scripting.id.ScriptRegistryItemID;
 import org.nightlabs.util.Util;
-import org.nightlabs.util.Utils;
 
 /**
  * <p>

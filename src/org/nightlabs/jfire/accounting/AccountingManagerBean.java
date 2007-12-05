@@ -2365,7 +2365,7 @@ public abstract class AccountingManagerBean
 	
 	/**
 	 * @param customerGroupIDs A <tt>Collection</tt> of {@link CustomerGroupID}. If <tt>null</tt>, all {@link ModeOfPaymentFlavour}s will be returned.
-	 * @param mergeMode one of {@link ModeOfPaymentFlavour#MERGE_MODE_SUBTRACTIVE} or {@link ModeOfPaymentFlavour#MERGE_MODE_ADDITIVE}
+	 * @param mergeMode one of {@link ModeOfPaymentFlavour#MERGE_MODE_INTERSECTION} or {@link ModeOfPaymentFlavour#MERGE_MODE_UNION}
 	 * @param fetchGroups Either <tt>null</tt> or all desired fetch groups.
 	 *
 	 * @ejb.interface-method

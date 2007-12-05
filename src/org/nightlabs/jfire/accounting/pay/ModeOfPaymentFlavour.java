@@ -141,19 +141,19 @@ implements Serializable
 	public static final String FETCH_GROUP_ICON_16X16_DATA = "ModeOfPaymentFlavour.icon16x16Data";
 	public static final String FETCH_GROUP_THIS_MODE_OF_PAYMENT_FLAVOUR = "ModeOfPaymentFlavour.this";
 
-	public static final byte MERGE_MODE_ADDITIVE = 1;
-	public static final byte MERGE_MODE_SUBTRACTIVE = 2;
+	public static final byte MERGE_MODE_UNION = 1;
+	public static final byte MERGE_MODE_INTERSECTION = 2;
 	
 	/**
 	 * @param customerGroupIDs A <tt>Collection</tt> of {@link CustomerGroupID}. Can be <tt>null</tt> in order to return all <tt>ModeOfPaymentFlavour</tt>s.
 	 * @param mergeMode Whether the intersection or the combination of all <tt>CustomerGroup</tt> configurations shall be used.
 	 *
 	 * @return Returns those <tt>ModeOfPaymentFlavour</tt>s that are available for all given
-	 *		<tt>CustomerGroup</tt>s. If <tt>mergeMode</tt> is {@link #MERGE_MODE_ADDITIVE},
+	 *		<tt>CustomerGroup</tt>s. If <tt>mergeMode</tt> is {@link #MERGE_MODE_UNION},
 	 *		they are combined like SQL UNION would do (means, if at least one
 	 *		<tt>CustomerGroup</tt>
 	 *		contains a certain <tt>ModeOfPaymentFlavour</tt>, it will be in the result).
-	 *		If <tt>mergeMode</tt> is {@link #MERGE_MODE_SUBTRACTIVE}, only those
+	 *		If <tt>mergeMode</tt> is {@link #MERGE_MODE_INTERSECTION}, only those
 	 *		<tt>ModeOfPaymentFlavour</tt>s are returned that are available to all
 	 *		<tt>CustomerGroup</tt>s.
 	 */
@@ -164,8 +164,8 @@ implements Serializable
 			return (Collection)pm.newQuery(ModeOfPaymentFlavour.class).execute();
 
 
-		if (mergeMode != MERGE_MODE_ADDITIVE && mergeMode != MERGE_MODE_SUBTRACTIVE)
-			throw new IllegalArgumentException("mergeMode invalid! Must be MERGE_MODE_ADDITIVE or MERGE_MODE_SUBTRACTIVE!");
+		if (mergeMode != MERGE_MODE_UNION && mergeMode != MERGE_MODE_INTERSECTION)
+			throw new IllegalArgumentException("mergeMode invalid! Must be MERGE_MODE_UNION or MERGE_MODE_INTERSECTION!");
 
 		Map res = null;
 		for (Iterator itCustomerGroups = customerGroupIDs.iterator(); itCustomerGroups.hasNext(); ) {
@@ -177,15 +177,15 @@ implements Serializable
 				res = m;
 			}
 			else {
-				if (mergeMode == MERGE_MODE_SUBTRACTIVE) {
+				if (mergeMode == MERGE_MODE_INTERSECTION) {
 					// remove all missing
 					for (Iterator it = res.keySet().iterator(); it.hasNext(); ) {
 						String mopfPK = (String) it.next();
 						if (!m.containsKey(mopfPK))
 							it.remove();
 					}
-				} // if (mergeMode == MERGE_MODE_SUBTRACTIVE) {
-				else { // if (mergeMode == MERGE_MODE_ADDITIVE) {
+				} // if (mergeMode == MERGE_MODE_INTERSECTION) {
+				else { // if (mergeMode == MERGE_MODE_UNION) {
 					// add all additional
 					for (Iterator it = res.entrySet().iterator(); it.hasNext(); ) {
 						Map.Entry me = (Map.Entry)it.next();
@@ -193,7 +193,7 @@ implements Serializable
 						ModeOfPaymentFlavour mopf = (ModeOfPaymentFlavour) me.getValue();
 						res.put(mopfPK, mopf);
 					}
-				} // if (mergeMode == MERGE_MODE_ADDITIVE) {
+				} // if (mergeMode == MERGE_MODE_UNION) {
 			}
 		}
 

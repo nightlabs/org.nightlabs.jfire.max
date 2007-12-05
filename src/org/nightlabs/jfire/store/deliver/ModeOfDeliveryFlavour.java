@@ -394,11 +394,11 @@ implements Serializable
 	 * @param mergeMode Whether the intersection or the combination of all <tt>CustomerGroup</tt> configurations shall be used.
 	 *
 	 * @return Returns those <tt>ModeOfDeliveryFlavour</tt>s that are available for all given
-	 *		<tt>CustomerGroup</tt>s. If <tt>mergeMode</tt> is {@link #MERGE_MODE_ADDITIVE},
+	 *		<tt>CustomerGroup</tt>s. If <tt>mergeMode</tt> is {@link #MERGE_MODE_UNION},
 	 *		they are combined like SQL UNION would do (means, if at least one
 	 *		<tt>CustomerGroup</tt>
 	 *		contains a certain <tt>ModeOfDeliveryFlavour</tt>, it will be in the result).
-	 *		If <tt>mergeMode</tt> is {@link #MERGE_MODE_SUBTRACTIVE}, only those
+	 *		If <tt>mergeMode</tt> is {@link #MERGE_MODE_INTERSECTION}, only those
 	 *		<tt>ModeOfDeliveryFlavour</tt>s are returned that are available to all
 	 *		<tt>CustomerGroup</tt>s.
 	 *		<p>
@@ -408,7 +408,7 @@ implements Serializable
 	protected static Map getAvailableModeOfDeliveryFlavoursMapForAllCustomerGroups(PersistenceManager pm, Collection<CustomerGroupID> customerGroupIDs, byte mergeMode)
 	{
 		if (mergeMode != MERGE_MODE_ADDITIVE && mergeMode != MERGE_MODE_SUBTRACTIVE)
-			throw new IllegalArgumentException("mergeMode invalid! Must be MERGE_MODE_ADDITIVE or MERGE_MODE_SUBTRACTIVE!");
+			throw new IllegalArgumentException("mergeMode invalid! Must be MERGE_MODE_UNION or MERGE_MODE_INTERSECTION!");
 
 		Map res = null;
 		for (Iterator itCustomerGroups = customerGroupIDs.iterator(); itCustomerGroups.hasNext(); ) {
@@ -427,8 +427,8 @@ implements Serializable
 						if (!m.containsKey(modfPK))
 							it.remove();
 					}
-				} // if (mergeMode == MERGE_MODE_SUBTRACTIVE) {
-				else { // if (mergeMode == MERGE_MODE_ADDITIVE) {
+				} // if (mergeMode == MERGE_MODE_INTERSECTION) {
+				else { // if (mergeMode == MERGE_MODE_UNION) {
 					// add all additional
 					for (Iterator it = res.entrySet().iterator(); it.hasNext(); ) {
 						Map.Entry me = (Map.Entry)it.next();
@@ -436,7 +436,7 @@ implements Serializable
 						ModeOfDeliveryFlavour modf = (ModeOfDeliveryFlavour) me.getValue();
 						res.put(modfPK, modf);
 					}
-				} // if (mergeMode == MERGE_MODE_ADDITIVE) {
+				} // if (mergeMode == MERGE_MODE_UNION) {
 			}
 		}
 

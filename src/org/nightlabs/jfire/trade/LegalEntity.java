@@ -74,6 +74,8 @@ import org.nightlabs.jfire.transfer.id.AnchorID;
  * @jdo.fetch-group name="LegalEntity.accountant" fields="accountant"
  * @jdo.fetch-group name="LegalEntity.storekeeper" fields="storekeeper"
  * @jdo.fetch-group name="LegalEntity.person" fields="person"
+ * @jdo.fetch-group name="LegalEntity.customerGroups" fields="customerGroups"
+ * @jdo.fetch-group name="LegalEntity.defaultCustomerGroup" fields="defaultCustomerGroup"
  * @jdo.fetch-group name="LegalEntity.this" fetch-groups="default" fields="person, accountant"
  */
 public class LegalEntity extends Anchor
@@ -86,10 +88,13 @@ public class LegalEntity extends Anchor
 	public static final String FETCH_GROUP_STOREKEEPER = "LegalEntity.storekeeper";
 	public static final String FETCH_GROUP_PERSON = "LegalEntity.person";
 	public static final String FETCH_GROUP_THIS_LEGAL_ENTITY = "LegalEntity.this";
+	public static final String FETCH_GROUP_CUSTOMER_GROUPS = "LegalEntity.customerGroups";
+	public static final String FETCH_GROUP_DEFAULT_CUSTOMER_GROUP = "LegalEntity.defaultCustomerGroup";
 
 	public static final String ANCHOR_TYPE_ID_PARTNER = "Partner";
 
 	public static final String PROPERTY_SET_SCOPE = StructLocal.DEFAULT_SCOPE;
+
 	
 	/**
 	 * @param pm The <tt>PersistenceManager</tt> to use.

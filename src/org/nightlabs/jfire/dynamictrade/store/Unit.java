@@ -6,7 +6,6 @@ import javax.jdo.listener.StoreCallback;
 
 import org.nightlabs.jdo.ObjectIDUtil;
 import org.nightlabs.util.Util;
-import org.nightlabs.util.Utils;
 
 /**
  * @author Marco Schulze - Marco at NightLabs dot de

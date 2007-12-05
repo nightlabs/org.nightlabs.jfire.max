@@ -28,7 +28,6 @@ package org.nightlabs.jfire.reporting.oda.jdoql;
 
 import org.eclipse.datatools.connectivity.oda.IQuery;
 import org.eclipse.datatools.connectivity.oda.OdaException;
-
 import org.nightlabs.jfire.reporting.oda.Connection;
 
 /**

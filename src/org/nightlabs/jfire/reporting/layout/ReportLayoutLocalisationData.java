@@ -24,7 +24,6 @@ import javax.jdo.listener.StoreCallback;
 import org.nightlabs.io.DataBuffer;
 import org.nightlabs.jfire.reporting.layout.id.ReportRegistryItemID;
 import org.nightlabs.util.Util;
-import org.nightlabs.util.Utils;
 
 /**
  * Holds the contents of a properties file that is used in report localisation.

@@ -39,7 +39,6 @@ import org.eclipse.birt.core.framework.IPlatformContext;
 import org.eclipse.birt.report.engine.api.EngineConfig;
 import org.eclipse.birt.report.engine.api.HTMLCompleteImageHandler;
 import org.eclipse.birt.report.engine.api.HTMLEmitterConfig;
-import org.eclipse.birt.report.engine.api.HTMLRenderOption;
 import org.eclipse.birt.report.engine.api.IRenderOption;
 import org.eclipse.birt.report.engine.api.ReportEngine;
 import org.nightlabs.jfire.reporting.layout.ReportLayout;

@@ -26,7 +26,6 @@ import org.nightlabs.jfire.reporting.layout.id.ReportRegistryItemID;
 import org.nightlabs.jfire.scripting.ScriptRegistry;
 import org.nightlabs.jfire.servermanager.JFireServerManager;
 import org.nightlabs.util.Util;
-import org.nightlabs.util.Utils;
 import org.nightlabs.xml.DOMParser;
 import org.nightlabs.xml.NLDOMUtil;
 import org.w3c.dom.Document;

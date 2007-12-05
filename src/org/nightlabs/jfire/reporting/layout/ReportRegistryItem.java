@@ -36,7 +36,6 @@ import javax.jdo.listener.DetachCallback;
 
 import org.nightlabs.jfire.reporting.layout.id.ReportRegistryItemID;
 import org.nightlabs.util.Util;
-import org.nightlabs.util.Utils;
 
 /**
  * Common type for report registry item (ReportCategory, ReportLayout).

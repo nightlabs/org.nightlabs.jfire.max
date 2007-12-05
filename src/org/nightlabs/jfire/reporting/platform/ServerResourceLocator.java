@@ -22,7 +22,6 @@ import org.nightlabs.jfire.reporting.layout.ReportLayoutLocalisationData;
 import org.nightlabs.jfire.reporting.layout.id.ReportLayoutLocalisationDataID;
 import org.nightlabs.jfire.reporting.layout.render.ReportLayoutRendererUtil;
 import org.nightlabs.util.Util;
-import org.nightlabs.util.Utils;
 
 /**
  * @author Alexander Bieber <!-- alex [AT] nightlabs [DOT] de -->

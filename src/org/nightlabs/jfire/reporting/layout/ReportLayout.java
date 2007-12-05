@@ -39,7 +39,6 @@ import java.util.zip.InflaterInputStream;
 import org.apache.log4j.Logger;
 import org.nightlabs.io.DataBuffer;
 import org.nightlabs.util.Util;
-import org.nightlabs.util.Utils;
 
 /**
  * A ReportLayout holds the BIRT report definition.

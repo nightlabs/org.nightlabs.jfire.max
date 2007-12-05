@@ -30,7 +30,6 @@ import java.util.Collection;
 
 import org.eclipse.datatools.connectivity.oda.IResultSet;
 import org.eclipse.datatools.connectivity.oda.OdaException;
-
 import org.nightlabs.jfire.reporting.oda.ResultSet;
 
 

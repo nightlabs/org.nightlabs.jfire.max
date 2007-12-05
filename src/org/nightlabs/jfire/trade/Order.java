@@ -38,7 +38,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import javax.jdo.JDODetachedFieldAccessException;
 import javax.jdo.JDOHelper;
 import javax.jdo.PersistenceManager;
 import javax.jdo.Query;
@@ -51,7 +50,6 @@ import org.nightlabs.jfire.security.id.UserID;
 import org.nightlabs.jfire.trade.id.OrderID;
 import org.nightlabs.jfire.transfer.id.AnchorID;
 import org.nightlabs.util.Util;
-import org.nightlabs.util.Utils;
 
 
 /**

@@ -15,7 +15,6 @@ import org.nightlabs.jfire.store.ProductType;
 import org.nightlabs.jfire.trade.id.CustomerGroupID;
 import org.nightlabs.jfire.trade.id.CustomerGroupMappingID;
 import org.nightlabs.util.Util;
-import org.nightlabs.util.Utils;
 
 /**
  * <p>

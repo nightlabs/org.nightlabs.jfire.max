@@ -35,7 +35,6 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
 
-import javax.jdo.FetchPlan;
 import javax.jdo.JDOHelper;
 import javax.jdo.PersistenceManager;
 import javax.jdo.Query;

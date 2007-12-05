@@ -43,7 +43,6 @@ import org.nightlabs.jfire.idgenerator.IDGenerator;
 import org.nightlabs.jfire.trade.Article;
 import org.nightlabs.jfire.trade.ArticlePrice;
 import org.nightlabs.util.Util;
-import org.nightlabs.util.Utils;
 
 /**
  * A <tt>PriceConfig</tt> is a complete set of prices which can be assigned to a product by setting

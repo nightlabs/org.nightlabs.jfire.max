@@ -31,7 +31,6 @@ import java.io.Serializable;
 import org.nightlabs.jfire.accounting.pay.ServerPaymentProcessor.PayParams;
 import org.nightlabs.jfire.idgenerator.IDGenerator;
 import org.nightlabs.util.Util;
-import org.nightlabs.util.Utils;
 
 /**
  * @author Marco Schulze - marco at nightlabs dot de

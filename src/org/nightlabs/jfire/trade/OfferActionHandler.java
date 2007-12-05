@@ -5,7 +5,6 @@ import javax.jdo.PersistenceManager;
 
 import org.nightlabs.jfire.security.User;
 import org.nightlabs.util.Util;
-import org.nightlabs.util.Utils;
 
 /**
  * @author Marco Schulze - marco at nightlabs dot de

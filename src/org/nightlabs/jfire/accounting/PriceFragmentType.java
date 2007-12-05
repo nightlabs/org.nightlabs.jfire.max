@@ -34,7 +34,6 @@ import javax.jdo.PersistenceManager;
 import org.nightlabs.jfire.accounting.id.PriceFragmentTypeID;
 import org.nightlabs.jfire.organisation.Organisation;
 import org.nightlabs.util.Util;
-import org.nightlabs.util.Utils;
 
 /**
  * A PriceFragmentType defines a part out of which a <tt>Price</tt> may consist.

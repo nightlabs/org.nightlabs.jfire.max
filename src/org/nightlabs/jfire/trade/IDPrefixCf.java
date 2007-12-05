@@ -2,7 +2,6 @@ package org.nightlabs.jfire.trade;
 
 import java.io.Serializable;
 import java.util.Calendar;
-import java.util.GregorianCalendar;
 
 import javax.jdo.JDOHelper;
 

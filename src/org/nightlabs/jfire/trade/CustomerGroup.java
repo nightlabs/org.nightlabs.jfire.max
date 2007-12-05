@@ -36,7 +36,6 @@ import org.nightlabs.jfire.accounting.pay.ModeOfPaymentFlavour;
 import org.nightlabs.jfire.store.deliver.ModeOfDelivery;
 import org.nightlabs.jfire.store.deliver.ModeOfDeliveryFlavour;
 import org.nightlabs.util.Util;
-import org.nightlabs.util.Utils;
 
 
 /**

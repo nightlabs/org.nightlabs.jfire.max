@@ -15,7 +15,6 @@ import org.nightlabs.jfire.accounting.id.TariffID;
 import org.nightlabs.jfire.accounting.id.TariffMappingID;
 import org.nightlabs.jfire.store.ProductType;
 import org.nightlabs.util.Util;
-import org.nightlabs.util.Utils;
 
 /**
  * <p>

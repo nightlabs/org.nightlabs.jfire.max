@@ -214,7 +214,7 @@ implements SessionBean
 
 			// version is {major}.{minor}.{release}-{patchlevel}-{suffix}
 			moduleMetaData = new ModuleMetaData(
-					JFireGeographyEAR.MODULE_NAME, "0.9.2-0-beta", "0.9.2-0-beta");
+					JFireGeographyEAR.MODULE_NAME, "0.9.3-0-beta", "0.9.3-0-beta");
 			pm.makePersistent(moduleMetaData);
 
 

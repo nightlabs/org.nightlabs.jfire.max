@@ -193,7 +193,7 @@ implements SessionBean
 
 			// version is {major}.{minor}.{release}-{patchlevel}-{suffix}
 			moduleMetaData = new ModuleMetaData(
-					"JFireSimpleTrade", "0.9.2-0-beta", "0.9.2-0-beta");
+					"JFireSimpleTrade", "0.9.3-0-beta", "0.9.3-0-beta");
 			pm.makePersistent(moduleMetaData);
 			
 			SimpleProductTypeStruct.getSimpleProductTypeStruct(organisationID, pm);

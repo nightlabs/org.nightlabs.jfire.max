@@ -3,7 +3,6 @@
 	<classpathentry kind="src" path="src"/>
 	<classpathentry kind="src" path="ejbsrc"/>
 	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER"/>
-	<classpathentry kind="var" path="JDK_TOOLS"/>
 	<classpathentry kind="var" path="JBOSS/bin/run.jar"/>
 	<classpathentry kind="var" path="JBOSS/bin/shutdown.jar"/>
 	<classpathentry kind="var" path="JBOSS/client/jboss-j2ee.jar"/>
@@ -19,8 +18,8 @@
 	<classpathentry combineaccessrules="false" kind="src" path="/NightLabsJDO"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/JFireBase"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/JFireBaseBean"/>
-	<classpathentry sourcepath="JPOX_SRC" kind="var" path="JDO2"/>
-	<classpathentry sourcepath="JPOX_SRC" kind="var" path="JPOX"/>
+	<classpathentry kind="var" path="JDO2" sourcepath="JPOX_SRC"/>
+	<classpathentry kind="var" path="JPOX" sourcepath="JPOX_SRC"/>
 	<classpathentry kind="var" path="LOG4J"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/JFireServerManager"/>
 	<classpathentry kind="var" path="JPOXENHANCER"/>
@@ -28,6 +27,6 @@
 	<classpathentry kind="var" path="WORKSPACE/JFireJbpm/lib/jbpm/jbpm-3.1.4.jar"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/JFireJbpm"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/JFireBaseClientLib"/>
+	<classpathentry kind="var" path="ASM"/>
 	<classpathentry kind="output" path="bin"/>
-  <classpathentry kind="var" path="ASM"/>
 </classpath>

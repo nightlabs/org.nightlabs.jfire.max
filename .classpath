@@ -3,7 +3,6 @@
 	<classpathentry kind="src" path="src"/>
 	<classpathentry kind="src" path="ejbsrc"/>
 	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER"/>
-	<classpathentry kind="var" path="JDK_TOOLS"/>
 	<classpathentry kind="var" path="JBOSS/bin/run.jar"/>
 	<classpathentry kind="var" path="JBOSS/bin/shutdown.jar"/>
 	<classpathentry kind="var" path="JBOSS/client/jboss-j2ee.jar"/>
@@ -27,6 +26,6 @@
 	<classpathentry kind="var" path="JBOSS/server/default/lib/hibernate3.jar"/>
 	<classpathentry kind="lib" path="lib/jbpm/jbpm-3.1.4.jar"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/JFireBaseClientLib"/>
+	<classpathentry kind="var" path="ASM"/>
 	<classpathentry kind="output" path="bin"/>
-  <classpathentry kind="var" path="ASM"/>
 </classpath>

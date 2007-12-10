@@ -39,13 +39,6 @@ implements Serializable{
 	 */
 	private String issuePriorityID;
 	
-	public static final String ISSUE_PRIORITY_NONE = "0";
-	public static final String ISSUE_PRIORITY_LOW = "1";
-	public static final String ISSUE_PRIORITY_NORMAL = "2";
-	public static final String ISSUE_PRIORITY_HIGH = "3";
-	public static final String ISSUE_PRIORITY_URGENT = "4";
-	public static final String ISSUE_PRIORITY_IMMEDIATE = "5";
-	
 	/**
 	 * @jdo.field persistence-modifier="persistent" dependent="true" mapped-by="issuePriority"
 	 */

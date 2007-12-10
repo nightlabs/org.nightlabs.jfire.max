@@ -335,6 +335,21 @@ implements SessionBean{
 			pm.close();
 		}
 	}
+	
+	/**
+	 * @ejb.interface-method
+	 * @ejb.permission role-name="_Guest_"
+	 * @ejb.transaction type="Required"
+	 */	
+	public IssueType storeIssueType(IssueType issueType, boolean get, String[] fetchGroups, int maxFetchDepth){
+		PersistenceManager pm = getPersistenceManager();
+		try{
+			return NLJDOHelper.storeJDO(pm, issueType, get, fetchGroups, maxFetchDepth);
+		}//try
+		finally{
+			pm.close();
+		}//finally
+	}
 
 	/**
 	 * @throws IOException While loading an icon from a local resource, this might happen and we don't care in the initialise method.
@@ -454,42 +469,42 @@ implements SessionBean{
 			// check, whether the datastore is already initialized
 			pm.getExtent(IssuePriority.class);
 			try {
-				pm.getObjectById(IssuePriorityID.create(getOrganisationID(), IssuePriority.ISSUE_PRIORITY_NORMAL), true);
+				pm.getObjectById(IssuePriorityID.create(getOrganisationID(), "None"), true);
 				return; // already initialized
 			} catch (JDOObjectNotFoundException x) {
 				// datastore not yet initialized
 			}
 			IssuePriority issuePriority;
 
-			issuePriority = new IssuePriority(getOrganisationID(), IssuePriority.ISSUE_PRIORITY_NONE);
+			issuePriority = new IssuePriority(getOrganisationID(), "None");
 			issuePriority.getIssuePriorityText().setText(Locale.ENGLISH.getLanguage(), "None");
 			issuePriority = pm.makePersistent(issuePriority);
 			issueType.getIssuePriorities().add(issuePriority);
 			issueType2.getIssuePriorities().add(issuePriority);
 
-			issuePriority = new IssuePriority(getOrganisationID(), IssuePriority.ISSUE_PRIORITY_LOW);
+			issuePriority = new IssuePriority(getOrganisationID(), "Low");
 			issuePriority.getIssuePriorityText().setText(Locale.ENGLISH.getLanguage(), "Low");
 			issuePriority = pm.makePersistent(issuePriority);
 			issueType.getIssuePriorities().add(issuePriority);
 			issueType2.getIssuePriorities().add(issuePriority);
 			
-			issuePriority = new IssuePriority(getOrganisationID(), IssuePriority.ISSUE_PRIORITY_NORMAL);
+			issuePriority = new IssuePriority(getOrganisationID(), "Normal");
 			issuePriority.getIssuePriorityText().setText(Locale.ENGLISH.getLanguage(), "Normal");
 			issuePriority = pm.makePersistent(issuePriority);
 			issueType.getIssuePriorities().add(issuePriority);
 			issueType2.getIssuePriorities().add(issuePriority);
 			
-			issuePriority = new IssuePriority(getOrganisationID(), IssuePriority.ISSUE_PRIORITY_HIGH);
+			issuePriority = new IssuePriority(getOrganisationID(), "High");
 			issuePriority.getIssuePriorityText().setText(Locale.ENGLISH.getLanguage(), "High");
 			issuePriority = pm.makePersistent(issuePriority);
 			issueType.getIssuePriorities().add(issuePriority);
 			
-			issuePriority = new IssuePriority(getOrganisationID(), IssuePriority.ISSUE_PRIORITY_URGENT);
+			issuePriority = new IssuePriority(getOrganisationID(), "Urgent");
 			issuePriority.getIssuePriorityText().setText(Locale.ENGLISH.getLanguage(), "Urgent");
 			issuePriority = pm.makePersistent(issuePriority);
 			issueType.getIssuePriorities().add(issuePriority);
 			
-			issuePriority = new IssuePriority(getOrganisationID(), IssuePriority.ISSUE_PRIORITY_IMMEDIATE);
+			issuePriority = new IssuePriority(getOrganisationID(), "Immediate");
 			issuePriority.getIssuePriorityText().setText(Locale.ENGLISH.getLanguage(), "Immediate");
 			issuePriority = pm.makePersistent(issuePriority);
 			issueType.getIssuePriorities().add(issuePriority);

@@ -93,4 +93,22 @@ public class IssueTypeDAO extends BaseJDOObjectDAO<IssueTypeID, IssueType>
 			throw new RuntimeException(e);
 		}
 	}
+	
+	/**
+	 * Store an issue type.
+	 * @param fetchGroups Wich fetch groups to use
+	 * @param maxFetchDepth Fetch depth or {@link NLJDOHelper#MAX_FETCH_DEPTH_NO_LIMIT} 
+	 * @param monitor The progress monitor for this action. For every downloaded
+	 * 					object, <code>monitor.worked(1)</code> will be called.
+	 * @return The issue type.
+	 */
+	public synchronized IssueType storeIssueTypes(IssueType issueType, String[] fetchgroups, int maxFetchDepth, ProgressMonitor monitor) 
+	{
+		try {
+			IssueManager im = IssueManagerUtil.getHome(SecurityReflector.getInitialContextProperties()).create();
+			return im.storeIssueType(issueType, true, fetchgroups, maxFetchDepth);
+		} catch (Exception e) {
+			throw new RuntimeException(e);
+		}
+	}
 }

@@ -4,7 +4,6 @@
 	<classpathentry kind="src" path="ejbsrc"/>
 	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/JFireServerManager"/>
-	<classpathentry kind="var" path="JDK_TOOLS"/>
 	<classpathentry kind="var" path="JBOSS/bin/run.jar"/>
 	<classpathentry kind="var" path="JBOSS/bin/shutdown.jar"/>
 	<classpathentry kind="var" path="JBOSS/client/jboss-j2ee.jar"/>
@@ -12,12 +11,12 @@
 	<classpathentry kind="var" path="JBOSS/lib/jboss-system.jar"/>
 	<classpathentry kind="var" path="JBOSS/lib/jboss-jmx.jar"/>
 	<classpathentry kind="var" path="JBOSS/server/default/lib/bcel.jar"/>
-	<classpathentry sourcepath="/JBOSS_SRC" kind="var" path="JBOSS/server/default/lib/jboss.jar"/>
+	<classpathentry kind="var" path="JBOSS/server/default/lib/jboss.jar" sourcepath="/JBOSS_SRC"/>
 	<classpathentry kind="var" path="JBOSS/server/default/lib/jboss-transaction.jar"/>
 	<classpathentry kind="var" path="JBOSS/server/default/lib/jnpserver.jar"/>
 	<classpathentry kind="var" path="JBOSS/server/default/lib/jpl-pattern.jar"/>
 	<classpathentry kind="var" path="JBOSS/server/default/lib/jpl-util.jar"/>
-	<classpathentry sourcepath="JBOSS_SRC/security/src/main" kind="var" path="JBOSS/server/default/lib/jbosssx.jar"/>
+	<classpathentry kind="var" path="JBOSS/server/default/lib/jbosssx.jar" sourcepath="JBOSS_SRC/security/src/main"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/JFireBase"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/JFireBaseBean"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/NightLabsBase"/>
@@ -25,13 +24,13 @@
 	<classpathentry combineaccessrules="false" kind="src" path="/NightLabsJDO"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/JFireTrade"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/JFireSimpleTrade"/>
-	<classpathentry sourcepath="JPOX_SRC" kind="var" path="JDO2"/>
+	<classpathentry kind="var" path="JDO2" sourcepath="JPOX_SRC"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/JFireJbpm"/>
 	<classpathentry kind="var" path="WORKSPACE/JFireJbpm/lib/jbpm/jbpm-3.1.4.jar"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/JFireDynamicTrade"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/JFireVoucher"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/JFireReporting"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/JFireReportingTrade"/>
+	<classpathentry kind="var" path="ASM"/>
 	<classpathentry kind="output" path="bin"/>
-  <classpathentry kind="var" path="ASM"/>
 </classpath>

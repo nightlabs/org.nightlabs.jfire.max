@@ -3,7 +3,6 @@
 	<classpathentry kind="src" path="src"/>
 	<classpathentry kind="src" path="ejbsrc"/>
 	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER"/>
-	<classpathentry kind="var" path="JDK_TOOLS"/>
 	<classpathentry kind="var" path="JBOSS/bin/run.jar"/>
 	<classpathentry kind="var" path="JBOSS/bin/shutdown.jar"/>
 	<classpathentry kind="var" path="JBOSS/client/jboss-j2ee.jar"/>

@@ -64,14 +64,6 @@ implements Serializable{
 		return organisationID;
 	}
 
-	public void setOrganisationID(String organisationID) {
-		this.organisationID = organisationID;
-	}
-
-	public void setIssuePriorityID(String issuePriorityID) {
-		this.issuePriorityID = issuePriorityID;
-	}
-	
 	/**
 	 * @return Returns the issuePriorityID
 	 */

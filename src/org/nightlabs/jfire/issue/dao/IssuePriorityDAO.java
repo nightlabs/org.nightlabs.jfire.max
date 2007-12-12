@@ -9,6 +9,7 @@ import javax.jdo.FetchPlan;
 
 import org.nightlabs.jdo.NLJDOHelper;
 import org.nightlabs.jfire.base.jdo.BaseJDOObjectDAO;
+import org.nightlabs.jfire.issue.Issue;
 import org.nightlabs.jfire.issue.IssueManager;
 import org.nightlabs.jfire.issue.IssueManagerUtil;
 import org.nightlabs.jfire.issue.IssuePriority;
@@ -17,7 +18,7 @@ import org.nightlabs.jfire.security.SecurityReflector;
 import org.nightlabs.progress.ProgressMonitor;
 
 public class IssuePriorityDAO
-		extends BaseJDOObjectDAO<IssuePriorityID, IssuePriority>
+extends BaseJDOObjectDAO<IssuePriorityID, IssuePriority>
 {
 	private IssuePriorityDAO() {}
 
@@ -32,13 +33,12 @@ public class IssuePriorityDAO
 		}
 		return sharedInstance;
 	}
-	
+
 	@SuppressWarnings("unchecked") //$NON-NLS-1$
 	@Override
 	protected Collection<IssuePriority> retrieveJDOObjects(Set<IssuePriorityID> objectIDs,
 			String[] fetchGroups, int maxFetchDepth, ProgressMonitor monitor)
-			throws Exception
-	{
+			throws Exception {
 		monitor.beginTask("Fetching IssuePriority...", 1); //$NON-NLS-1$
 		try {
 			IssueManager im = IssueManagerUtil.getHome(SecurityReflector.getInitialContextProperties()).create();
@@ -54,8 +54,7 @@ public class IssuePriorityDAO
 
 	private static final String[] FETCH_GROUPS = { IssuePriority.FETCH_GROUP_THIS, FetchPlan.DEFAULT };
 
-	public List<IssuePriority> getIssuePriorities(ProgressMonitor monitor)
-	{
+	public List<IssuePriority> getIssuePriorities(ProgressMonitor monitor) {
 		try {
 			return new ArrayList<IssuePriority>(retrieveJDOObjects(null, FETCH_GROUPS, NLJDOHelper.MAX_FETCH_DEPTH_NO_LIMIT, monitor));
 		} catch (Exception e) {
@@ -63,4 +62,19 @@ public class IssuePriorityDAO
 		} 
 	}
 
+	public IssuePriority storeIssuePriority(IssuePriority issuePriority, boolean get, String[] fetchGroups, int maxFetchDepth, ProgressMonitor monitor) {
+		if(issuePriority == null)
+			throw new NullPointerException("Issue to save must not be null");
+		monitor.beginTask("Storing issuePriority: "+ issuePriority.getIssuePriorityID(), 3);
+		try {
+			IssueManager im = IssueManagerUtil.getHome(SecurityReflector.getInitialContextProperties()).create();
+			IssuePriority result = im.storeIssuePriority(issuePriority, get, fetchGroups, maxFetchDepth);
+			monitor.worked(1);
+			monitor.done();
+			return result;
+		} catch (Exception e) {
+			monitor.done();
+			throw new RuntimeException("Error while storing IssuePriority!\n" ,e);
+		}
+	}
 }

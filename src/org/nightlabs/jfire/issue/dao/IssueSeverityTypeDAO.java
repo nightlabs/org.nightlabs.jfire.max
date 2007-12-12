@@ -56,7 +56,7 @@ public class IssueSeverityTypeDAO
 
 	private static final String[] FETCH_GROUPS = { IssueSeverityType.FETCH_GROUP_THIS, FetchPlan.DEFAULT };
 
-	public List<IssueSeverityType> getIssueSeverityTypes(IssueTypeID issueTypeID, ProgressMonitor monitor)
+	public List<IssueSeverityType> getIssueSeverityTypes(ProgressMonitor monitor)
 	{
 		try {
 			return new ArrayList<IssueSeverityType>(retrieveJDOObjects(null, FETCH_GROUPS, NLJDOHelper.MAX_FETCH_DEPTH_NO_LIMIT, monitor));

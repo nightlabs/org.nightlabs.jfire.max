@@ -9,7 +9,6 @@ import javax.jdo.FetchPlan;
 
 import org.nightlabs.jdo.NLJDOHelper;
 import org.nightlabs.jfire.base.jdo.BaseJDOObjectDAO;
-import org.nightlabs.jfire.issue.Issue;
 import org.nightlabs.jfire.issue.IssueManager;
 import org.nightlabs.jfire.issue.IssueManagerUtil;
 import org.nightlabs.jfire.issue.IssuePriority;

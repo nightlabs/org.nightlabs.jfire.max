@@ -191,6 +191,11 @@ implements
 	private Date updateTimestamp;
 
 	/**
+	 * @jdo.field persistence-modifier="persistent" mapped-by="issue"	 
+	 */
+	private IssueLocal issueLocal;
+	
+	/**
 	 * @deprecated Constructor exists only for JDO! 
 	 */
 	protected Issue() { }
@@ -226,13 +231,6 @@ implements
 	 */
 	public long getIssueID() {
 		return issueID;
-	}
-
-	/**
-	 * @param issueID The issueID to set.
-	 */
-	public void setIssueID(long issueID) {
-		this.issueID = issueID;
 	}
 
 	/**

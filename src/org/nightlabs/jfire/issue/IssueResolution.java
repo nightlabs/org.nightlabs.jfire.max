@@ -9,7 +9,7 @@ import org.nightlabs.util.Util;
  *
  * @jdo.persistence-capable
  *		identity-type = "application"
- *		objectid-class = "org.nightlabs.jfire.issue.id.IssueResolutinoID"
+ *		objectid-class = "org.nightlabs.jfire.issue.id.IssueResolutionID"
  *		detachable = "true"
  *		table="JFireIssueTracking_IssueResolution"
  *

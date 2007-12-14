@@ -24,6 +24,7 @@ import org.nightlabs.jdo.query.JDOQuery;
 import org.nightlabs.jfire.base.BaseSessionBeanImpl;
 import org.nightlabs.jfire.issue.id.IssueID;
 import org.nightlabs.jfire.issue.id.IssuePriorityID;
+import org.nightlabs.jfire.issue.id.IssueResolutionID;
 import org.nightlabs.jfire.issue.id.IssueSeverityTypeID;
 import org.nightlabs.jfire.issue.id.IssueTypeID;
 
@@ -538,6 +539,24 @@ implements SessionBean{
 			issuePriority.getIssuePriorityText().setText(Locale.ENGLISH.getLanguage(), "Immediate");
 			issuePriority = pm.makePersistent(issuePriority);
 			issueType.getIssuePriorities().add(issuePriority);
+			
+////////////////////////////////////////////////////////
+			// Create the priorities
+			// check, whether the datastore is already initialized
+			pm.getExtent(IssueResolution.class);
+			try {
+				pm.getObjectById(IssueResolutionID.create(getOrganisationID(), "Fix"), true);
+				return; // already initialized
+			} catch (JDOObjectNotFoundException x) {
+				// datastore not yet initialized
+			}
+			IssueResolution issueResolution;
+
+			issueResolution = new IssueResolution(getOrganisationID(), "Fix");
+			issueResolution.getName().setText(Locale.ENGLISH.getLanguage(), "Fix");
+			issueResolution = pm.makePersistent(issueResolution);
+			issueType.getIssueResolutions().add(issueResolution);
+			issueType2.getIssueResolutions().add(issueResolution);
 			//------------------------------------------------
 		} finally {
 			pm.close();

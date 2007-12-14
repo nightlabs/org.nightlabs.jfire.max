@@ -35,11 +35,12 @@ import java.util.Set;
 
 import javax.jdo.JDOHelper;
 import javax.jdo.PersistenceManager;
-import javax.jdo.listener.DetachCallback;
 
 import org.apache.log4j.Logger;
 import org.nightlabs.jdo.ObjectID;
-import org.nightlabs.jfire.jbpm.graph.def.StateDefinition;
+import org.nightlabs.jfire.jbpm.graph.def.Statable;
+import org.nightlabs.jfire.jbpm.graph.def.StatableLocal;
+import org.nightlabs.jfire.jbpm.graph.def.State;
 import org.nightlabs.jfire.security.User;
 import org.nightlabs.util.Utils;
 
@@ -56,8 +57,6 @@ import org.nightlabs.util.Utils;
  *
  * @jdo.create-objectid-class
  *		field-order="organisationID, issueID"
- *		include-imports="id/IssueID.imports.inc"
- *		include-body="id/IssueID.body.inc"
  *
  * @jdo.query
  *		name="getIssuesByIssueTypeID"
@@ -71,15 +70,16 @@ import org.nightlabs.util.Utils;
  * @jdo.fetch-group name="Issue.subject" fetch-groups="default" fields="subject" 
  * @jdo.fetch-group name="Issue.issuePriority" fetch-groups="default" fields="issuePriority"
  * @jdo.fetch-group name="Issue.issueSeverityType" fetch-groups="default" fields="issueSeverityType"
+ * @jdo.fetch-group name="Issue.issueResolution" fetch-groups="default" fields="issueResolution"
  * @jdo.fetch-group name="Issue.status" fetch-groups="default" fields="stateDefinition"
  * @jdo.fetch-group name="Issue.issueType" fetch-groups="default" fields="issueType"
- * @jdo.fetch-group name="Issue.this" fetch-groups="default" fields="fileList, issueType, description, subject, issuePriority, issueSeverityType, stateDefinition, reporter, assignee"
+ * @jdo.fetch-group name="Issue.this" fetch-groups="default" fields="fileList, issueType, description, subject, issuePriority, issueSeverityType, issueResolution, stateDefinition, reporter, assignee"
  *
  **/
 public class Issue
 implements 	
 		Serializable,
-		DetachCallback
+		Statable
 {
 
 	private static final long serialVersionUID = 1L;
@@ -88,9 +88,10 @@ implements
 	public static final String FETCH_GROUP_THIS = "Issue.this";
 	public static final String FETCH_GROUP_DESCRIPTION = "Issue.description";
 	public static final String FETCH_GROUP_SUBJECT = "Issue.subject";
-	public static final String FETCH_GROUP_SEVERITYTYPE = "Issue.issueSeverityType";
-	public static final String FETCH_GROUP_STATUS = "Issue.status";
-	public static final String FETCH_GROUP_PRIORITY = "Issue.issuePriority";
+	public static final String FETCH_GROUP_ISSUE_SEVERITYTYPE = "Issue.issueSeverityType";
+	public static final String FETCH_GROUP_STATE = "Issue.state";
+	public static final String FETCH_GROUP_ISSUE_PRIORITY = "Issue.issuePriority";
+	public static final String FETCH_GROUP_ISSUE_RESOLUTION = "Issue.issueResolution";
 	public static final String fETCH_GROUP_ISSUETYPE = "Issue.issueType";
 	
 	/**
@@ -158,11 +159,6 @@ implements
 	/**
 	 * @jdo.field persistence-modifier="persistent"
 	 */
-	private StateDefinition stateDefinition;
-
-	/**
-	 * @jdo.field persistence-modifier="persistent"
-	 */
 	private IssueSubject subject;
 
 	/**
@@ -191,9 +187,34 @@ implements
 	private Date updateTimestamp;
 
 	/**
+	 * @jdo.field persistence-modifier="persistent"
+	 */
+	private IssueResolution issueResolution;
+	
+	/**
 	 * @jdo.field persistence-modifier="persistent" mapped-by="issue"	 
 	 */
 	private IssueLocal issueLocal;
+	
+	/**
+	 * @jdo.field persistence-modifier="persistent"
+	 */
+	private State state;
+	
+	/**
+	 * This is the history of <b>public</b> {@link State}s with the newest last and the oldest first.
+	 *
+	 * @jdo.field
+	 *		persistence-modifier="persistent"
+	 *		collection-type="collection"
+	 *		element-type="State"
+	 *		table="JFireIssueTracking_Issue_states"
+	 *		null-value="exception"
+	 *
+	 * @jdo.join
+	 */
+	private List<State> states;
+	
 	
 	/**
 	 * @deprecated Constructor exists only for JDO! 
@@ -347,14 +368,6 @@ implements
 		this.issueSeverityType = issueSeverityType;
 	}
 
-	public StateDefinition getStateDefinition() {
-		return stateDefinition;
-	}
-
-	public void setStateDefinition(StateDefinition stateDefinition) {
-		this.stateDefinition = stateDefinition;
-	}
-
 	/**
 	 * @param organisationID The organisationID to set.
 	 */
@@ -368,6 +381,42 @@ implements
 	
 	public Set<String> getReferencedObjectIDs() {
 		return referencedObjectIDs;
+	}
+
+	public IssueResolution getIssueResolution() {
+		return issueResolution;
+	}
+	
+	public void setIssueResolution(IssueResolution issueResolution) {
+		this.issueResolution = issueResolution;
+	}
+
+	/**
+	 * {@inheritDoc}}
+	 */
+	public StatableLocal getStatableLocal() {
+		return issueLocal;
+	}
+	
+	/**
+	 * {@inheritDoc}}
+	 */
+	public State getState() {
+		return state;
+	}
+	
+	/**
+	 * {@inheritDoc}}
+	 */
+	public List<State> getStates() {		
+		return states;
+	}
+	
+	/**
+	 * {@inheritDoc}}
+	 */
+	public void setState(State state) {
+		this.state = state;
 	}
 	
 	protected PersistenceManager getPersistenceManager()
@@ -413,37 +462,5 @@ implements
 	{
 		return primaryKey;
 	}
-
-	public void jdoPreDetach() {
-		// TODO Auto-generated method stub
-		
-	}
 	
-	public void jdoPostDetach(Object _attached) {
-//		Offer attached = (Offer)_attached;
-//		Offer detached = this;
-//		PersistenceManager pm = attached.getPersistenceManager();
-//		Collection fetchGroups = pm.getFetchPlan().getGroups();
-//
-//		if (fetchGroups.contains(FETCH_GROUP_THIS_OFFER) || fetchGroups.contains(FETCH_GROUP_VENDOR)) {
-//			detached.vendor = (LegalEntity) pm.detachCopy(attached.getVendor());
-//			detached.vendor_detached = true;
-//		}
-//
-//		if (fetchGroups.contains(FETCH_GROUP_THIS_OFFER) || fetchGroups.contains(FETCH_GROUP_CUSTOMER)) {
-//			detached.customer = (LegalEntity) pm.detachCopy(attached.getCustomer());
-//			detached.customer_detached = true;
-//		}
-//
-//		if (fetchGroups.contains(FETCH_GROUP_THIS_OFFER) || fetchGroups.contains(FETCH_GROUP_VENDOR_ID)) {
-//			detached.vendorID = attached.getVendorID();
-//			detached.vendorID_detached = true;
-//		}
-//
-//		if (fetchGroups.contains(FETCH_GROUP_THIS_OFFER) || fetchGroups.contains(FETCH_GROUP_CUSTOMER_ID)) {
-//			detached.customerID = attached.getCustomerID();
-//			detached.customerID_detached = true;
-//		}
-//		detached.attachable = true;
-	}
 }

@@ -1,1 +1,0 @@
-// import org.nightlabs.jdo.ObjectID;

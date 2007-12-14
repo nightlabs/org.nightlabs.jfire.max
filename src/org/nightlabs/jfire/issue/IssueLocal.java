@@ -50,7 +50,7 @@ implements Serializable, StatableLocal{
 	private State state;
 	
 	/**
-	 * This is the history of <b>public</b> {@link State}s with the newest last and the oldest first.
+	 * This is the history of <b>ALL</b> {@link State}s with the newest last and the oldest first.
 	 *
 	 * @jdo.field
 	 *		persistence-modifier="persistent"

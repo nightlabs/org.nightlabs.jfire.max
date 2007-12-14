@@ -4,24 +4,23 @@ import java.util.HashMap;
 import java.util.Map;
 
 import org.nightlabs.i18n.I18nText;
-import org.nightlabs.jfire.issue.id.IssuePriorityID;
 
 /**
  * @author Chairat Kongarayawetchakun - chairat at nightlabs dot de
  *
  * @jdo.persistence-capable
  *		identity-type="application"
- *		objectid-class="org.nightlabs.jfire.issue.id.IssuePriorityNameID"
+ *		objectid-class="org.nightlabs.jfire.issue.id.IssueResolutionNameID"
  *		detachable="true"
- *		table="JFireIssueTracking_IssuePriorityName"
+ *		table="JFireIssueTracking_IssueResolutionName"
  *
  * @jdo.inheritance strategy="new-table"
  *
  * @jdo.create-objectid-class
  * 
- * @jdo.fetch-group name="IssuePriorityName.name" fetch-groups="default" fields="issuePriority, names"
+ * @jdo.fetch-group name="IssueResolutionName.name" fetch-groups="default" fields="issueResolution, names"
  */ 
-public class IssuePriorityName 
+public class IssueResolutionName 
 extends I18nText{
 	/**
 	 * The serial version of this class.
@@ -38,12 +37,12 @@ extends I18nText{
 	 * @jdo.field primary-key="true"
 	 * @jdo.column length="100"
 	 */
-	private String issuePriorityID;
+	private String issueResolutionID;
 	
 	/**
 	 * @jdo.field persistence-modifier="persistent"
 	 */
-	private IssuePriority issuePriority;
+	private IssueResolution issueResolution;
 
 	/**
 	 * key: String languageID<br/>
@@ -55,7 +54,7 @@ extends I18nText{
 	 *		key-type="java.lang.String"
 	 *		default-fetch-group="true"
 	 *		value-type="java.lang.String"
-	 *		table="JFireIssueTracking_IssuePriorityName_names"
+	 *		table="JFireIssueTracking_IssueResolutionName_names"
 	 *		null-value="exception"
 	 *
 	 * @jdo.join
@@ -65,15 +64,15 @@ extends I18nText{
 	/**
 	 * @deprecated Only for JDO!
 	 */
-	protected IssuePriorityName()
+	protected IssueResolutionName()
 	{
 	}
 
-	public IssuePriorityName(IssuePriority issuePriority)
+	public IssueResolutionName(IssueResolution issueResolution)
 	{
-		this.issuePriority = issuePriority;
-		this.organisationID = issuePriority.getOrganisationID();
-		issuePriorityID = issuePriority.getIssuePriorityID();
+		this.issueResolution = issueResolution;
+		organisationID = issueResolution.getOrganisationID();
+		issueResolutionID = issueResolution.getIssueResolutionID();
 	}
 
 	/**
@@ -83,24 +82,24 @@ extends I18nText{
 	{
 		return names;
 	}
-	
+
 	public String getOrganisationID() {
 		return organisationID;
 	}
 	
-	public IssuePriority getIssuePriority() {
-		return issuePriority;
+	public IssueResolution getIssueResolution() {
+		return issueResolution;
 	}
 	
-	public String getIssuePriorityID() {
-		return issuePriorityID;
+	public String getIssueResolutionID() {
+		return issueResolutionID;
 	}
-
+	
 	/**
 	 * @see org.nightlabs.i18n.I18nText#getFallBackValue(java.lang.String)
 	 */
 	protected String getFallBackValue(String languageID)
 	{
-		return issuePriorityID == null ? languageID : issuePriorityID;
+		return issueResolutionID == null ? languageID : issueResolutionID;
 	}
 }

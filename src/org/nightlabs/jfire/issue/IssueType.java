@@ -3,15 +3,28 @@
  */
 package org.nightlabs.jfire.issue;
 
+import java.io.IOException;
 import java.io.Serializable;
+import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.nightlabs.jfire.jbpm.graph.def.StateDefinition;
+import javax.jdo.JDOHelper;
+import javax.jdo.PersistenceManager;
+
+import org.nightlabs.jfire.jbpm.graph.def.ProcessDefinition;
 import org.nightlabs.util.Util;
 
 /**
+ * {@link IssueType} defines the valid set of {@link IssuePriority}s and {@link IssueSeverityType}s 
+ * and {@link IssueResolution}s for an {@link Issue} of a given type.
+ * <p>
+ * Additionally an {@link IssueType} holds the ProcessDefinition for the workflow of the state transitions
+ * of an Issue.
+ * </p>
+ * 
  * @author Chairat Kongarayawetchakun - chairat at nightlabs dot de
+ * @author Alexander Bieber <!-- alex [AT] nightlabs [DOT] de -->
  *
  * @jdo.persistence-capable
  *		identity-type = "application"
@@ -26,8 +39,9 @@ import org.nightlabs.util.Util;
  * @jdo.fetch-group name="IssueType.name" fetch-groups="default" fields="name"
  * @jdo.fetch-group name="IssueType.issuePriorities" fetch-groups="default" fields="issuePriorities"
  * @jdo.fetch-group name="IssueType.issueSeverityTypes" fetch-groups="default" fields="issueSeverityTypes"
- * @jdo.fetch-group name="IssueType.stateDefinition" fetch-groups="default" fields="stateDefinition"
- * @jdo.fetch-group name="IssueType.this" fetch-groups="default" fields="name, issuePriorities, issueSeverityTypes, stateDefinition"
+ * @jdo.fetch-group name="IssueType.issueResolutions" fetch-groups="default" fields="issueResolutions"
+ * @jdo.fetch-group name="IssueType.processDefinition" fetch-groups="default" fields="processDefinition"
+ * @jdo.fetch-group name="IssueType.this" fetch-groups="default" fields="name, issuePriorities, issueSeverityTypes, issueResolutions, processDefinition"
  */
 public class IssueType
 implements Serializable{
@@ -35,8 +49,9 @@ implements Serializable{
 	
 	public static final String FETCH_GROUP_THIS = "IssueType.this";
 	public static final String FETCH_GROUP_NAME = "IssueType.name";
-	public static final String FETCH_GROUP_PRIORITIES = "IssueType.issuePriorities";
-	public static final String FETCH_GROUP_SEVERITY_TYPES = "IssueType.issueSeverityTypes";
+	public static final String FETCH_GROUP_ISSUE_PRIORITIES = "IssueType.issuePriorities";
+	public static final String FETCH_GROUP_ISSUE_SEVERITY_TYPES = "IssueType.issueSeverityTypes";
+	public static final String FETCH_GROUP_ISSUE_RESOLUTIONS = "IssueType.issueResolutions";
 	
 	/**
 	 * @jdo.field primary-key="true"
@@ -62,7 +77,7 @@ implements Serializable{
 	 *		persistence-modifier="persistent"
 	 *		collection-type="collection"
 	 *		element-type="IssueSeverityType"
-	 *		table="JFireIssueTracking_IssueType_severityTypes"
+	 *		table="JFireIssueTracking_IssueType_issueSeverityTypes"
 	 *
 	 * @jdo.join
 	 */
@@ -75,19 +90,32 @@ implements Serializable{
 	 *		persistence-modifier="persistent"
 	 *		collection-type="collection"
 	 *		element-type="IssuePriority"
-	 *		table="JFireIssueTracking_IssueType_priorities"
+	 *		table="JFireIssueTracking_IssueType_issuePriorities"
 	 *
 	 * @jdo.join
 	 */
 	private List<IssuePriority> issuePriorities;
 	
 	/**
-	 * Instances of {@link StateDefinition}.
+	 * Instances of {@link IssuePriority}.
+	 *
+	 * @jdo.field
+	 *		persistence-modifier="persistent"
+	 *		collection-type="collection"
+	 *		element-type="IssueResolution"
+	 *		table="JFireIssueTracking_IssueType_issueResolutions"
+	 *
+	 * @jdo.join
+	 */
+	private List<IssueResolution> issueResolutions;
+	
+	/**
+	 * Instances of {@link ProcessDefinition}.
 	 *
 	 * @jdo.field
 	 *		persistence-modifier="persistent"
 	 */
-	private StateDefinition stateDefinition;
+	private ProcessDefinition processDefinition;
 	
 	/**
 	 * @deprecated Only for JDO!!!! 
@@ -101,42 +129,90 @@ implements Serializable{
 		
 		this.issueSeverityTypes = new ArrayList<IssueSeverityType>();
 		this.issuePriorities = new ArrayList<IssuePriority>();
-		this.stateDefinition = null;
+		this.issueResolutions = new ArrayList<IssueResolution>();
+		this.processDefinition = null;
 		
 		name = new IssueTypeName(this);
 	}
 
+	/**
+	 * @return The organisationID of this {@link IssueType}.
+	 */
 	public String getOrganisationID() {
 		return organisationID;
 	}
 
+	/**
+	 * @return The issueTypeID of this {@link IssueType}.
+	 */
 	public String getIssueTypeID() {
 		return issueTypeID;
 	}
-
+	
+	/**
+	 * @return The name of this {@link IssueType}.
+	 */
 	public IssueTypeName getName() {
 		return name;
 	}
 
-	public void setName(IssueTypeName name) {
-		this.name = name;
-	}
-
+	/**
+	 * @return The list of valid {@link IssueSeverityType}s a user can choose from
+	 * when editing an {@link Issue} of this {@link IssueType}.
+	 */
 	public List<IssueSeverityType> getIssueSeverityTypes() {
 		return issueSeverityTypes;
 	}
-
+	/**
+	 * @return The list of valid {@link IssuePriority}s a user can choose from
+	 * when editing an {@link Issue} of this {@link IssueType}.
+	 */
 	public List<IssuePriority> getIssuePriorities() {
 		return issuePriorities;
 	}
-
-	public StateDefinition getStateDefinition() {
-		return stateDefinition;
+	
+	/**
+	 * @return The list of valid {@link IssueResolution}s a user can choose from
+	 * when editing an {@link Issue} of this {@link IssueType}.
+	 */
+	public List<IssueResolution> getIssueResolutions() {
+		return issueResolutions;
+	}
+	
+	/**
+	 * 
+	 * @return The {@link ProcessDefinition} assigned to this IssueType.
+	 */
+	public ProcessDefinition getProcessDefinition() {
+		return processDefinition;
 	}
 
-	public void setStateDefinition(StateDefinition stateDefinition) {
-		this.stateDefinition = stateDefinition;
+	/**
+	 * Read a {@link ProcessDefinition} from the given URL and store it as new Version
+	 * of the {@link ProcessDefinition} of this IssueType.
+	 * <p>
+	 * New Issues created with this IssueType will have and Process instance according 
+	 * to the newly read definition.
+	 * </p>
+	 * @param jbpmProcessDefinitionURL An URL pointing to a folder containing the definitions 'processdefinition.xml' file.
+	 * @throws IOException If reading the URL fails.
+	 */
+	public void readProcessDefinition(URL jbpmProcessDefinitionURL) throws IOException {
+		org.jbpm.graph.def.ProcessDefinition jbpmProcessDefinition = ProcessDefinition.readProcessDefinition(jbpmProcessDefinitionURL);
+		this.processDefinition = ProcessDefinition.storeProcessDefinition(getPersistenceManager(), null, jbpmProcessDefinition, jbpmProcessDefinitionURL);
 	}
+	
+	/**
+	 * Internal method.
+	 * @return The PersistenceManager associated with this object. 
+	 */
+	protected PersistenceManager getPersistenceManager() {
+		PersistenceManager issueTypePM = JDOHelper.getPersistenceManager(this);
+		if (issueTypePM == null)
+			throw new IllegalStateException("This instance of " + this.getClass().getSimpleName() + "is not persistent, can not get a PersistenceManager!");
+
+		return issueTypePM;
+	}	
 	
 	@Override
 	public boolean equals(Object obj)

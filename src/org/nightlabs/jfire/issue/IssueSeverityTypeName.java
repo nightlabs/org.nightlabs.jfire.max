@@ -31,6 +31,12 @@ extends I18nText{
 	 * @jdo.field primary-key="true"
 	 * @jdo.column length="100"
 	 */
+	private String organisationID;
+	
+	/**
+	 * @jdo.field primary-key="true"
+	 * @jdo.column length="100"
+	 */
 	private String issueSeverityTypeID;
 	
 	/**
@@ -65,6 +71,7 @@ extends I18nText{
 	public IssueSeverityTypeName(IssueSeverityType issueSeverityType)
 	{
 		this.issueSeverityType = issueSeverityType;
+		organisationID = issueSeverityType.getOrganisationID();
 		issueSeverityTypeID = issueSeverityType.getIssueSeverityTypeID();
 	}
 
@@ -76,6 +83,18 @@ extends I18nText{
 		return names;
 	}
 
+	public String getOrganisationID() {
+		return organisationID;
+	}
+	
+	public IssueSeverityType getIssueSeverityType() {
+		return issueSeverityType;
+	}
+	
+	public String getIssueSeverityTypeID() {
+		return issueSeverityTypeID;
+	}
+	
 	/**
 	 * @see org.nightlabs.i18n.I18nText#getFallBackValue(java.lang.String)
 	 */

@@ -13,20 +13,25 @@ import javax.ejb.EJBException;
 import javax.ejb.SessionBean;
 import javax.ejb.SessionContext;
 import javax.jdo.FetchPlan;
+import javax.jdo.JDOHelper;
 import javax.jdo.JDOObjectNotFoundException;
 import javax.jdo.PersistenceManager;
 import javax.jdo.Query;
 
 import org.apache.log4j.Logger;
+import org.jbpm.JbpmContext;
+import org.jbpm.graph.exe.ProcessInstance;
 import org.nightlabs.ModuleException;
 import org.nightlabs.jdo.NLJDOHelper;
 import org.nightlabs.jdo.query.JDOQuery;
 import org.nightlabs.jfire.base.BaseSessionBeanImpl;
 import org.nightlabs.jfire.issue.id.IssueID;
+import org.nightlabs.jfire.issue.id.IssueLocalID;
 import org.nightlabs.jfire.issue.id.IssuePriorityID;
 import org.nightlabs.jfire.issue.id.IssueResolutionID;
 import org.nightlabs.jfire.issue.id.IssueSeverityTypeID;
 import org.nightlabs.jfire.issue.id.IssueTypeID;
+import org.nightlabs.jfire.jbpm.JbpmLookup;
 
 /**
  * @author Chairat Kongarayawetchakun - chairat[AT]nightlabs[DOT]de
@@ -110,22 +115,36 @@ implements SessionBean{
 //	}
 	
 	/**
-	 * Creates a new issue. This method is only usable, if the user (principal)
-	 * is an organisation, because this organisation will automatically be set
-	 * as the user for the new Issue.
-	 *
 	 * @ejb.interface-method
 	 * @ejb.transaction type="Required"
 	 * @ejb.permission role-name="_Guest_"
 	 */
-	public Issue createIssue(Issue issue, boolean get, String[] fetchGroups, int maxFetchDepth){
+	public Issue storeIssue(Issue issue, boolean get, String[] fetchGroups, int maxFetchDepth){
 		PersistenceManager pm = getPersistenceManager();
 		try {
-			if (!issue.getOrganisationID().equals(getOrganisationID()))
-				throw new IllegalArgumentException("Given Issue was created for a different organisation, can not store to this datastore!");
+			boolean isNewIssue = !JDOHelper.isDetached(issue);
+			
+			pm.getFetchPlan().setMaxFetchDepth(maxFetchDepth);
+			if (fetchGroups != null)
+				pm.getFetchPlan().setGroups(fetchGroups);
 
-			Issue result = NLJDOHelper.storeJDO(pm, issue, get, fetchGroups, maxFetchDepth);
-			return result;
+			Issue pIssue = pm.makePersistent(issue);
+
+			if (isNewIssue) {
+				pm.flush();
+				// create the ProcessInstance for new Issues
+				// TODO: WORKAROUND: Calling createProcessInstanceForIssue on pIssue.getIssueType() says that this IssueType is not persistent ?!?
+				IssueType type = (IssueType) pm.getObjectById(JDOHelper.getObjectId(pIssue.getIssueType()));
+				if (type == null) {
+					throw new IllegalStateException("Could not create ProcessInstance for new Issue as its type is null");
+				}
+				type.createProcessInstanceForIssue(pIssue);
+			}
+			
+			if (!get)
+				return null;
+
+			return pm.detachCopy(pIssue);
 		} finally {
 			pm.close();
 		}
@@ -419,6 +438,29 @@ implements SessionBean{
 			pm.close();
 		}//finally
 	}
+	
+	/**
+	 * @ejb.interface-method
+	 * @ejb.transaction type = "Required"
+	 * @ejb.permission role-name="_Guest_"
+	 */
+	public void signalIssue(IssueID invoiceID, String jbpmTransitionName)
+	{
+		PersistenceManager pm = getPersistenceManager();
+		try {
+			IssueLocal issueLocal = (IssueLocal) pm.getObjectById(IssueLocalID.create(invoiceID));
+			JbpmContext jbpmContext = JbpmLookup.getJbpmConfiguration().createJbpmContext();
+			try {
+				ProcessInstance processInstance = jbpmContext.getProcessInstanceForUpdate(issueLocal.getJbpmProcessInstanceId());
+				processInstance.signal(jbpmTransitionName);
+			} finally {
+				jbpmContext.close();
+			}
+		} finally {
+			pm.close();
+		}
+	}
+	
 	
 	/**
 	 * @throws IOException While loading an icon from a local resource, this might happen and we don't care in the initialise method.

@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<root-container name="devil.NightLabs.org:IssueType" width="1349" height="691">
+<root-container name="devil.NightLabs.org:IssueType" width="1347" height="691">
   <node name="devil.NightLabs.org:new" x="48" y="-72" width="253" height="36">
     <edge>
       <label x="5" y="-10"/>
@@ -17,10 +17,25 @@
     <edge>
       <label x="16" y="-15"/>
     </edge>
+    <edge>
+      <label x="-37" y="-26"/>
+      <bendpoint w1="78" h1="50" w2="-240" h2="-46"/>
+    </edge>
+    <edge>
+      <label x="-71" y="-23"/>
+      <bendpoint w1="152" h1="54" w2="-166" h2="-42"/>
+    </edge>
+    <edge>
+      <label x="-25" y="-19"/>
+      <bendpoint w1="158" h1="35" w2="-160" h2="-61"/>
+    </edge>
   </node>
   <node name="devil.NightLabs.org:assigned" x="48" y="312" width="253" height="36">
     <edge>
       <label x="9" y="-1"/>
+    </edge>
+    <edge>
+      <label x="5" y="-10"/>
     </edge>
     <edge>
       <label x="5" y="-10"/>
@@ -52,26 +67,26 @@
   </node>
   <node name="devil.NightLabs.org:acknowledgedImplicitely" x="348" y="120" width="289" height="36">
     <edge>
-      <label x="5" y="-10"/>
-    </edge>
-    <edge>
-      <label x="28" y="-20"/>
-      <bendpoint w1="-66" h1="50" w2="-66" h2="-46"/>
-      <bendpoint w1="-81" h1="65" w2="-81" h2="-31"/>
-      <bendpoint w1="-94" h1="76" w2="-94" h2="-20"/>
+      <label x="29" y="-19"/>
     </edge>
     <edge>
       <label x="5" y="-10"/>
+      <bendpoint w1="-66" h1="47" w2="-66" h2="-49"/>
+      <bendpoint w1="-81" h1="76" w2="-81" h2="-20"/>
     </edge>
     <edge>
       <label x="5" y="-10"/>
-      <bendpoint w1="73" h1="50" w2="73" h2="-46"/>
+      <bendpoint w1="-8" h1="50" w2="-8" h2="-46"/>
+      <bendpoint w1="-13" h1="71" w2="-13" h2="-25"/>
+    </edge>
+    <edge>
+      <label x="5" y="-10"/>
+      <bendpoint w1="60" h1="47" w2="60" h2="-49"/>
     </edge>
   </node>
   <node name="devil.NightLabs.org:confirmedImplicitely" x="348" y="216" width="289" height="36">
     <edge>
-      <label x="-41" y="26"/>
-      <bendpoint w1="-131" h1="18" w2="187" h2="-78"/>
+      <label x="5" y="-10"/>
     </edge>
     <edge>
       <label x="5" y="-10"/>

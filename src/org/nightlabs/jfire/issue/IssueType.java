@@ -233,7 +233,7 @@ implements Serializable{
 	protected PersistenceManager getPersistenceManager() {
 		PersistenceManager issueTypePM = JDOHelper.getPersistenceManager(this);
 		if (issueTypePM == null)
-			throw new IllegalStateException("This instance of " + this.getClass().getSimpleName() + "is not persistent, can not get a PersistenceManager!");
+			throw new IllegalStateException("This instance of " + this.getClass().getSimpleName() + " is not persistent, can not get a PersistenceManager!");
 
 		return issueTypePM;
 	}	

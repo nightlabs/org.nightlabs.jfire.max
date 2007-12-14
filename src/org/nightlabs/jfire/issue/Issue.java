@@ -38,7 +38,6 @@ import javax.jdo.PersistenceManager;
 import javax.jdo.listener.AttachCallback;
 
 import org.apache.log4j.Logger;
-import org.jbpm.graph.exe.ProcessInstance;
 import org.nightlabs.jdo.ObjectID;
 import org.nightlabs.jfire.jbpm.graph.def.Statable;
 import org.nightlabs.jfire.jbpm.graph.def.StatableLocal;
@@ -48,6 +47,7 @@ import org.nightlabs.util.Util;
 
 /**
  * @author Chairat Kongarayawetchakun <!-- chairat at nightlabs dot de -->
+ * @author Alexander Bieber <!-- alex [AT] nightlabs [DOT] de -->
  *
  * @jdo.persistence-capable
  *		identity-type="application"
@@ -75,6 +75,8 @@ import org.nightlabs.util.Util;
  * @jdo.fetch-group name="Issue.issueResolution" fetch-groups="default" fields="issueResolution"
  * @jdo.fetch-group name="Issue.state" fetch-groups="default" fields="state"
  * @jdo.fetch-group name="Issue.states" fetch-groups="default" fields="states"
+ * @jdo.fetch-group name="Statable.state" fetch-groups="default" fields="state"
+ * @jdo.fetch-group name="Statable.states" fetch-groups="default" fields="states"
  * @jdo.fetch-group name="Issue.issueLocal" fetch-groups="default" fields="issueLocal"
  * @jdo.fetch-group name="Issue.issueType" fetch-groups="default" fields="issueType"
  * @jdo.fetch-group name="Issue.this" fetch-groups="default" fields="fileList, issueType, description, subject, issuePriority, issueSeverityType, issueResolution, state, states, issueLocal, reporter, assignee"
@@ -82,9 +84,7 @@ import org.nightlabs.util.Util;
  **/
 public class Issue
 implements 	
-		Serializable,
-		AttachCallback,
-		Statable
+		Serializable, AttachCallback, Statable
 {
 
 	private static final long serialVersionUID = 1L;
@@ -427,24 +427,24 @@ implements
 	public void setState(State state) {
 		this.state = state;
 	}
-	
-	/**
-	 * The post attach callback will ask the
-	 * {@link IssueType} of this issue to create a {@link ProcessInstance}
-	 * for this {@link Issue} if it hasn't been created yet.
-	 */
-	public void jdoPostAttach(Object attached) {
+
+	protected void ensureIssueHasProcessInstance() {
 		if (this.getStatableLocal().getJbpmProcessInstanceId() < 0) {
 			if (this.getIssueType() == null)
 				throw new IllegalStateException("Could not create ProcessInstance for Issue as its IssueType is null.");
 			getIssueType().createProcessInstanceForIssue(this);
 		}
 	}
+	
+	/**
+	 * See {@link #jdoPreStore()}.
+	 */
+	public void jdoPostAttach(Object attached) {
+		ensureIssueHasProcessInstance();
+	}
 
 	public void jdoPreAttach() {
 	}
-	
-	
 	
 	protected PersistenceManager getPersistenceManager()
 	{

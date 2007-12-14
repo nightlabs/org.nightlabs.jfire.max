@@ -72,7 +72,7 @@ public class IssueDAO extends BaseJDOObjectDAO<IssueID, Issue>{
 		monitor.beginTask("Storing issue: "+ issue.getIssueID(), 3);
 		try {
 			IssueManager im = IssueManagerUtil.getHome(SecurityReflector.getInitialContextProperties()).create();
-			Issue result = im.createIssue(issue, get, fetchGroups, maxFetchDepth);
+			Issue result = im.storeIssue(issue, get, fetchGroups, maxFetchDepth);
 			monitor.worked(1);
 			monitor.done();
 			return result;

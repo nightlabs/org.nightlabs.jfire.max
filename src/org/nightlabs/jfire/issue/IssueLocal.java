@@ -23,7 +23,13 @@ import org.nightlabs.util.Util;
  *
  * @jdo.implements name="org.nightlabs.jfire.jbpm.graph.def.StatableLocal"
  * 
- * @jdo.create-objectid-class field-order="organisationID, issueID"
+ * @jdo.create-objectid-class 
+ * 		field-order="organisationID, issueID"
+ * 		include-body="id/IssueLocalID.body.inc"
+ * 
+ * @jdo.fetch-group name="StatableLocal.state" fetch-groups="default" fields="state"
+ * @jdo.fetch-group name="StatableLocal.states" fetch-groups="default" fields="states"
+ * @jdo.fetch-group name="IssueLocal.this" fetch-groups="default" fields="state, states, issue"
  *
  * @jdo.inheritance strategy="new-table"
  **/
@@ -32,6 +38,8 @@ implements Serializable, StatableLocal{
 	
 	private static final long serialVersionUID = 1L;
 	private static final Logger logger = Logger.getLogger(IssueLocal.class);
+
+	public static final String FETCH_GROUP_THIS = "IssueLocal.this";
 	
 	/**
 	 * @jdo.field primary-key="true"

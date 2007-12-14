@@ -38,11 +38,11 @@ extends BaseJDOObjectDAO<IssueResolutionID, IssueResolution>
 	protected Collection<IssueResolution> retrieveJDOObjects(Set<IssueResolutionID> objectIDs,
 			String[] fetchGroups, int maxFetchDepth, ProgressMonitor monitor)
 			throws Exception {
-		monitor.beginTask("Fetching IssuePriority...", 1); //$NON-NLS-1$
+		monitor.beginTask("Fetching IssueResolution...", 1); //$NON-NLS-1$
 		try {
 			IssueManager im = IssueManagerUtil.getHome(SecurityReflector.getInitialContextProperties()).create();
 			monitor.worked(1);
-			return im.getIssuePriorities(fetchGroups, maxFetchDepth);	
+			return im.getIssueResolutions(fetchGroups, maxFetchDepth);	
 		} catch (Exception e) {
 			monitor.setCanceled(true);
 			throw e;
@@ -66,12 +66,11 @@ extends BaseJDOObjectDAO<IssueResolutionID, IssueResolution>
 			throw new NullPointerException("Issue Resolution to save must not be null");
 		monitor.beginTask("Storing issuePriority: "+ issueResolution.getIssueResolutionID(), 3);
 		try {
-//			IssueManager im = IssueManagerUtil.getHome(SecurityReflector.getInitialContextProperties()).create();
-//			IssueResolution result = im.storeIssueResolution(issueResolution, get, fetchGroups, maxFetchDepth);
-//			monitor.worked(1);
-//			monitor.done();
-//			return result;
-			return null;
+			IssueManager im = IssueManagerUtil.getHome(SecurityReflector.getInitialContextProperties()).create();
+			IssueResolution result = im.storeIssueResolution(issueResolution, get, fetchGroups, maxFetchDepth);
+			monitor.worked(1);
+			monitor.done();
+			return result;
 		} catch (Exception e) {
 			monitor.done();
 			throw new RuntimeException("Error while storing IssuePriority!\n" ,e);

@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<root-container name="status" width="1349" height="701">
+<root-container name="devil.NightLabs.org:IssueType" width="1349" height="691">
   <node name="devil.NightLabs.org:new" x="48" y="-72" width="253" height="36">
     <edge>
       <label x="5" y="-10"/>
@@ -26,7 +26,6 @@
       <label x="5" y="-10"/>
     </edge>
   </node>
-  <node name="devil.NightLabs.org:rejected" x="-312" y="264" width="202" height="36"/>
   <node name="devil.NightLabs.org:confirmed" x="48" y="216" width="253" height="36">
     <edge>
       <label x="5" y="-10"/>
@@ -120,4 +119,5 @@
       <label x="5" y="-10"/>
     </edge>
   </node>
+  <node name="devil.NightLabs.org:rejected" x="-312" y="264" width="202" height="36"/>
 </root-container>

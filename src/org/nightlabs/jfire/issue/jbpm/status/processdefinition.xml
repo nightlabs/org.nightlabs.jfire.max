@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<process-definition  xmlns=""  name="status">
+<process-definition  xmlns=""  name="devil.NightLabs.org:IssueType">
 
 
 	<start-state name="devil.NightLabs.org:new">

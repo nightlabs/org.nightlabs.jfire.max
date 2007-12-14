@@ -12,7 +12,13 @@ import java.util.List;
 import javax.jdo.JDOHelper;
 import javax.jdo.PersistenceManager;
 
+import org.jbpm.JbpmContext;
+import org.jbpm.graph.exe.ProcessInstance;
+import org.nightlabs.jfire.jbpm.JbpmLookup;
+import org.nightlabs.jfire.jbpm.graph.def.AbstractActionHandler;
+import org.nightlabs.jfire.jbpm.graph.def.ActionHandlerNodeEnter;
 import org.nightlabs.jfire.jbpm.graph.def.ProcessDefinition;
+import org.nightlabs.jfire.security.SecurityReflector;
 import org.nightlabs.util.Util;
 
 /**
@@ -199,7 +205,25 @@ implements Serializable{
 	 */
 	public void readProcessDefinition(URL jbpmProcessDefinitionURL) throws IOException {
 		org.jbpm.graph.def.ProcessDefinition jbpmProcessDefinition = ProcessDefinition.readProcessDefinition(jbpmProcessDefinitionURL);
+		ActionHandlerNodeEnter.register(jbpmProcessDefinition);
+		// TODO: This will fail if called more than once, need to add version ?
+		jbpmProcessDefinition.setName(getOrganisationID() + ":IssueType-" + getIssueTypeID());
 		this.processDefinition = ProcessDefinition.storeProcessDefinition(getPersistenceManager(), null, jbpmProcessDefinition, jbpmProcessDefinitionURL);
+	}
+	
+	public ProcessInstance createProcessInstanceForIssue(Issue issue) {
+		JbpmContext jbpmContext = JbpmLookup.getJbpmConfiguration().createJbpmContext();
+		try {
+			ProcessInstance processInstance = jbpmContext.newProcessInstanceForUpdate(getProcessDefinition().getJbpmProcessDefinitionName());
+			issue.getStatableLocal().setJbpmProcessInstanceId(processInstance.getId());
+			processInstance.getContextInstance().setVariable(AbstractActionHandler.VARIABLE_NAME_STATABLE_ID, JDOHelper.getObjectId(issue).toString());
+			ActionHandlerNodeEnter.createStartState(
+					getPersistenceManager(), SecurityReflector.getUserDescriptor().getUser(getPersistenceManager()), issue, processInstance.getProcessDefinition());
+			return processInstance;
+		} finally {
+			jbpmContext.close();
+		}
+		
 	}
 	
 	/**
@@ -220,12 +244,16 @@ implements Serializable{
 		if (obj == this) return true;
 		if (!(obj instanceof IssueType)) return false;
 		IssueType o = (IssueType) obj;
-		return Util.equals(o.issueTypeID, this.issueTypeID);
+		return
+			Util.equals(this.organisationID, o.organisationID) && 
+			Util.equals(this.issueTypeID, o.issueTypeID);
 	}
 
 	@Override
 	public int hashCode()
 	{
-		return Util.hashCode(issueTypeID);
+		return 
+			Util.hashCode(organisationID) ^
+			Util.hashCode(issueTypeID);
 	}
 }

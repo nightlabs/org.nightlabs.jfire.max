@@ -10,7 +10,7 @@ import org.apache.log4j.Logger;
 import org.nightlabs.jfire.jbpm.graph.def.Statable;
 import org.nightlabs.jfire.jbpm.graph.def.StatableLocal;
 import org.nightlabs.jfire.jbpm.graph.def.State;
-import org.nightlabs.util.Utils;
+import org.nightlabs.util.Util;
 
 /**
  * @author Chairat Kongarayawetchakun <!-- chairat at nightlabs dot de -->
@@ -63,6 +63,12 @@ implements Serializable, StatableLocal{
 	 */
 	private List<State> states;
 	
+
+	/**
+	 * @jdo.field persistence-modifier="persistent"
+	 */
+	private long jbpmProcessInstanceId = -1;
+	
 	/**
 	 * @jdo.field persistence-modifier="persistent"
 	 */
@@ -73,10 +79,11 @@ implements Serializable, StatableLocal{
 	 */
 	protected IssueLocal() { }
 
-	public IssueLocal(String organisationID, long issueID)
+	public IssueLocal(Issue issue)
 	{
-		this.organisationID = organisationID;
-		this.issueID = issueID;
+		this.issue = issue;
+		this.organisationID = issue.getOrganisationID();
+		this.issueID = issue.getIssueID();
 	}
 	
 	/**
@@ -94,28 +101,21 @@ implements Serializable, StatableLocal{
 	}
 
 	public long getJbpmProcessInstanceId() {
-		// TODO Auto-generated method stub
-		return 0;
+		return jbpmProcessInstanceId;
 	}
 
 	public Statable getStatable() {
-		// TODO Auto-generated method stub
-		return null;
+		return issue;
 	}
 
 	public List<State> getStates() {
 		return states;
 	}
-
-	/**
-	 * @jdo.field persistence-modifier="persistent"
-	 */
-	private long jbpmProcessInstanceId = -1;
 	
 	public void setJbpmProcessInstanceId(long jbpmProcessInstanceId) {
 		this.jbpmProcessInstanceId = jbpmProcessInstanceId;
 	}
-
+	
 	public void setState(State state) {
 		this.state = state;
 	}
@@ -143,15 +143,18 @@ implements Serializable, StatableLocal{
 
 		IssueLocal o = (IssueLocal) obj;
 
-		return
-		Utils.equals(this.organisationID, o.organisationID); //&& 
+		return 
+			Util.equals(this.organisationID, o.organisationID) &&
+			Util.equals(this.issueID, o.issueID);
 	}
 
 	@Override
 	public int hashCode()
 	{
-		return
-		Utils.hashCode(this.organisationID); //^
+		return 
+			Util.hashCode(this.organisationID) ^
+			Util.hashCode(this.issueID);
+		
 	}
 
 	/**

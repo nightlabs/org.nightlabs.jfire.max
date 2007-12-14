@@ -35,14 +35,16 @@ import java.util.Set;
 
 import javax.jdo.JDOHelper;
 import javax.jdo.PersistenceManager;
+import javax.jdo.listener.AttachCallback;
 
 import org.apache.log4j.Logger;
+import org.jbpm.graph.exe.ProcessInstance;
 import org.nightlabs.jdo.ObjectID;
 import org.nightlabs.jfire.jbpm.graph.def.Statable;
 import org.nightlabs.jfire.jbpm.graph.def.StatableLocal;
 import org.nightlabs.jfire.jbpm.graph.def.State;
 import org.nightlabs.jfire.security.User;
-import org.nightlabs.util.Utils;
+import org.nightlabs.util.Util;
 
 /**
  * @author Chairat Kongarayawetchakun <!-- chairat at nightlabs dot de -->
@@ -71,14 +73,17 @@ import org.nightlabs.util.Utils;
  * @jdo.fetch-group name="Issue.issuePriority" fetch-groups="default" fields="issuePriority"
  * @jdo.fetch-group name="Issue.issueSeverityType" fetch-groups="default" fields="issueSeverityType"
  * @jdo.fetch-group name="Issue.issueResolution" fetch-groups="default" fields="issueResolution"
- * @jdo.fetch-group name="Issue.status" fetch-groups="default" fields="stateDefinition"
+ * @jdo.fetch-group name="Issue.state" fetch-groups="default" fields="state"
+ * @jdo.fetch-group name="Issue.states" fetch-groups="default" fields="states"
+ * @jdo.fetch-group name="Issue.issueLocal" fetch-groups="default" fields="issueLocal"
  * @jdo.fetch-group name="Issue.issueType" fetch-groups="default" fields="issueType"
- * @jdo.fetch-group name="Issue.this" fetch-groups="default" fields="fileList, issueType, description, subject, issuePriority, issueSeverityType, issueResolution, stateDefinition, reporter, assignee"
+ * @jdo.fetch-group name="Issue.this" fetch-groups="default" fields="fileList, issueType, description, subject, issuePriority, issueSeverityType, issueResolution, state, states, issueLocal, reporter, assignee"
  *
  **/
 public class Issue
 implements 	
 		Serializable,
+		AttachCallback,
 		Statable
 {
 
@@ -88,11 +93,13 @@ implements
 	public static final String FETCH_GROUP_THIS = "Issue.this";
 	public static final String FETCH_GROUP_DESCRIPTION = "Issue.description";
 	public static final String FETCH_GROUP_SUBJECT = "Issue.subject";
-	public static final String FETCH_GROUP_ISSUE_SEVERITYTYPE = "Issue.issueSeverityType";
+	public static final String FETCH_GROUP_ISSUE_SEVERITY_TYPE = "Issue.issueSeverityType";
 	public static final String FETCH_GROUP_STATE = "Issue.state";
+	public static final String FETCH_GROUP_STATES = "Issue.states";
 	public static final String FETCH_GROUP_ISSUE_PRIORITY = "Issue.issuePriority";
 	public static final String FETCH_GROUP_ISSUE_RESOLUTION = "Issue.issueResolution";
-	public static final String fETCH_GROUP_ISSUETYPE = "Issue.issueType";
+	public static final String fETCH_GROUP_ISSUE_TYPE = "Issue.issueType";
+	public static final String FETCH_GROUP_ISSUE_LOCAL = "Issue.IssueLocal";
 	
 	/**
 	 * @jdo.field primary-key="true"
@@ -232,6 +239,8 @@ implements
 		
 		fileList = new ArrayList<IssueFileAttachment>();
 		referencedObjectIDs = new HashSet<String>();
+		
+		this.issueLocal = new IssueLocal(this);
 	}
 	
 	public Issue(String organisationID, long issueID, IssueType issueType)
@@ -419,6 +428,24 @@ implements
 		this.state = state;
 	}
 	
+	/**
+	 * The post attach callback will ask the
+	 * {@link IssueType} of this issue to create a {@link ProcessInstance}
+	 * for this {@link Issue} if it hasn't been created yet.
+	 */
+	public void jdoPostAttach(Object attached) {
+		if (this.getStatableLocal().getJbpmProcessInstanceId() < 0) {
+			if (this.getIssueType() == null)
+				throw new IllegalStateException("Could not create ProcessInstance for Issue as its IssueType is null.");
+			getIssueType().createProcessInstanceForIssue(this);
+		}
+	}
+
+	public void jdoPreAttach() {
+	}
+	
+	
+	
 	protected PersistenceManager getPersistenceManager()
 	{
 		PersistenceManager pm = JDOHelper.getPersistenceManager(this);
@@ -439,14 +466,16 @@ implements
 		Issue o = (Issue) obj;
 
 		return
-		Utils.equals(this.organisationID, o.organisationID); //&& 
+			Util.equals(this.organisationID, o.organisationID) &&
+			Util.equals(this.issueID, o.issueID);
 	}
 
 	@Override
 	public int hashCode()
 	{
 		return
-		Utils.hashCode(this.organisationID); //^
+			Util.hashCode(this.organisationID) ^
+			Util.hashCode(this.issueID);
 	}
 
 	/**
@@ -462,5 +491,4 @@ implements
 	{
 		return primaryKey;
 	}
-	
 }

@@ -578,7 +578,6 @@ implements SessionBean{
 			issuePriority = pm.makePersistent(issuePriority);
 			issueType.getIssuePriorities().add(issuePriority);
 			
-////////////////////////////////////////////////////////
 			// Create the priorities
 			// check, whether the datastore is already initialized
 			pm.getExtent(IssueResolution.class);
@@ -595,6 +594,12 @@ implements SessionBean{
 			issueResolution = pm.makePersistent(issueResolution);
 			issueType.getIssueResolutions().add(issueResolution);
 			issueType2.getIssueResolutions().add(issueResolution);
+			
+			
+			// create the process definitions.
+			issueType.readProcessDefinition(IssueType.class.getResource("jbpm/status/"));
+			issueType2.readProcessDefinition(IssueType.class.getResource("jbpm/status/"));
+			
 			//------------------------------------------------
 		} finally {
 			pm.close();

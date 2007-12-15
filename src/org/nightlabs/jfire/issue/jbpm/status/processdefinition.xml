@@ -20,7 +20,7 @@
 	<state name="devil.NightLabs.org:assigned">
 		<transition to="devil.NightLabs.org:rejected" name="reject"></transition>
 		<transition to="devil.NightLabs.org:resolved" name="resolve"></transition>
-		<transition to="devil.NightLabs.org:resolvedImplicitely" name="close"></transition>
+		<transition to="devil.NightLabs.org:resolvedImplicitely" name="close"></transition>		
 	</state>
 
 	<state name="devil.NightLabs.org:confirmed">

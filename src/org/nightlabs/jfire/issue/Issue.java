@@ -28,6 +28,7 @@ package org.nightlabs.jfire.issue;
 
 import java.io.Serializable;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Date;
 import java.util.HashSet;
 import java.util.List;
@@ -43,6 +44,7 @@ import org.nightlabs.jfire.jbpm.graph.def.Statable;
 import org.nightlabs.jfire.jbpm.graph.def.StatableLocal;
 import org.nightlabs.jfire.jbpm.graph.def.State;
 import org.nightlabs.jfire.security.User;
+import org.nightlabs.util.CollectionUtil;
 import org.nightlabs.util.Util;
 
 /**
@@ -415,10 +417,16 @@ implements
 	}
 	
 	/**
-	 * {@inheritDoc}}
+	 * @jdo.field persistence-modifier="none"
 	 */
-	public List<State> getStates() {		
-		return states;
+	private transient List<State> _states = null;
+
+	public List<State> getStates()
+	{
+		if (_states == null)
+			_states = CollectionUtil.castList(Collections.unmodifiableList(states));
+
+		return _states;
 	}
 	
 	/**
@@ -426,6 +434,7 @@ implements
 	 */
 	public void setState(State state) {
 		this.state = state;
+		this.states.add(state);
 	}
 
 	protected void ensureIssueHasProcessInstance() {

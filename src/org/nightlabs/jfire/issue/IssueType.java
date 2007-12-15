@@ -14,6 +14,7 @@ import javax.jdo.PersistenceManager;
 
 import org.jbpm.JbpmContext;
 import org.jbpm.graph.exe.ProcessInstance;
+import org.nightlabs.jfire.issue.jbpm.JbpmConstants;
 import org.nightlabs.jfire.jbpm.JbpmLookup;
 import org.nightlabs.jfire.jbpm.graph.def.AbstractActionHandler;
 import org.nightlabs.jfire.jbpm.graph.def.ActionHandlerNodeEnter;
@@ -209,6 +210,7 @@ implements Serializable{
 		// TODO: This will fail if called more than once, need to add version ?
 		jbpmProcessDefinition.setName(getOrganisationID() + ":IssueType-" + getIssueTypeID());
 		this.processDefinition = ProcessDefinition.storeProcessDefinition(getPersistenceManager(), null, jbpmProcessDefinition, jbpmProcessDefinitionURL);
+		JbpmConstants.initStandardProcessDefinition(this.processDefinition);
 	}
 	
 	public ProcessInstance createProcessInstanceForIssue(Issue issue) {

@@ -1,6 +1,7 @@
 package org.nightlabs.jfire.issue;
 
 import java.io.Serializable;
+import java.util.Collections;
 import java.util.List;
 
 import javax.jdo.JDOHelper;
@@ -10,6 +11,7 @@ import org.apache.log4j.Logger;
 import org.nightlabs.jfire.jbpm.graph.def.Statable;
 import org.nightlabs.jfire.jbpm.graph.def.StatableLocal;
 import org.nightlabs.jfire.jbpm.graph.def.State;
+import org.nightlabs.util.CollectionUtil;
 import org.nightlabs.util.Util;
 
 /**
@@ -116,8 +118,17 @@ implements Serializable, StatableLocal{
 		return issue;
 	}
 
-	public List<State> getStates() {
-		return states;
+	/**
+	 * @jdo.field persistence-modifier="none"
+	 */
+	private transient List<State> _states = null;
+
+	public List<State> getStates()
+	{
+		if (_states == null)
+			_states = CollectionUtil.castList(Collections.unmodifiableList(states));
+
+		return _states;
 	}
 	
 	public void setJbpmProcessInstanceId(long jbpmProcessInstanceId) {
@@ -126,6 +137,7 @@ implements Serializable, StatableLocal{
 	
 	public void setState(State state) {
 		this.state = state;
+		this.states.add(state);
 	}
 
 	public State getState() {

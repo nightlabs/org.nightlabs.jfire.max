@@ -1022,6 +1022,9 @@ implements SessionBean
 
 			List<SimpleProductType> res = new ArrayList<SimpleProductType>(productTypeIDs.size());
 			for (ProductTypeID productTypeID : productTypeIDs) {
+				if (!getOrganisationID().equals(productTypeID.organisationID))
+					throw new IllegalArgumentException("Cannot get foreign SimpleProductTypes! Argument is invalid: " + productTypeID);
+
 				SimpleProductType simpleProductType = (SimpleProductType) pm.getObjectById(productTypeID);
 
 				// we need to strip off the nested product types (they're out of business ;-)

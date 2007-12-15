@@ -899,7 +899,7 @@ implements SessionBean
 			if (previewParameterSetExtension.voucherType.getPackagePriceConfig() == null) {
 				calculatePrices = true;
 				VoucherPriceConfig packagePriceConfig = new VoucherPriceConfig(
-						IDGenerator.getOrganisationID(), IDGenerator.nextID(PriceConfig.class)); // TODO do we really need to consume IDs here - hmmm... shouldn't be such a big problem
+						IDGenerator.getOrganisationID(), PriceConfig.createPriceConfigID()); // TODO do we really need to consume IDs here - hmmm... shouldn't be such a big problem
 				pm.makePersistent(packagePriceConfig);
 				previewParameterSetExtension.voucherType
 						.setPackagePriceConfig(packagePriceConfig);

@@ -64,6 +64,8 @@ import org.nightlabs.jfire.accounting.priceconfig.PriceConfig;
  */
 public class PriceCell implements Serializable
 {
+	private static final long serialVersionUID = 1L;
+
 	public static final String FETCH_GROUP_PRICE = "PriceCell.price";
 	public static final String FETCH_GROUP_PRICE_CONFIG = "PriceCell.priceConfig";
 	public static final String FETCH_GROUP_PRICE_COORDINATE = "PriceCell.priceCoordinate";
@@ -77,8 +79,9 @@ public class PriceCell implements Serializable
 
 	/**
 	 * @jdo.field primary-key="true"
+	 * @jdo.column length="100"
 	 */
-	private long priceConfigID;
+	private String priceConfigID;
 
 	/**
 	 * @jdo.field primary-key="true"
@@ -148,7 +151,7 @@ public class PriceCell implements Serializable
 	/**
 	 * @return Returns the priceConfigID.
 	 */
-	public long getPriceConfigID()
+	public String getPriceConfigID()
 	{
 		return priceConfigID;
 	}

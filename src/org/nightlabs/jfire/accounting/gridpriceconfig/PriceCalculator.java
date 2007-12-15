@@ -179,7 +179,7 @@ public class PriceCalculator
 	{
 		return new StablePriceConfig(
 				IDGenerator.getOrganisationID(),
-				IDGenerator.nextID(PriceConfig.class));
+				PriceConfig.createPriceConfigID());
 	}
 
 	/**

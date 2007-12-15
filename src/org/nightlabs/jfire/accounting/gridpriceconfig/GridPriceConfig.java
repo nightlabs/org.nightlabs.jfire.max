@@ -116,7 +116,7 @@ public abstract class GridPriceConfig extends PriceConfig
 	 * @param organisationID
 	 * @param priceConfigID
 	 */
-	public GridPriceConfig(String organisationID, long priceConfigID)
+	public GridPriceConfig(String organisationID, String priceConfigID)
 	{
 		super(organisationID, priceConfigID);
 	}

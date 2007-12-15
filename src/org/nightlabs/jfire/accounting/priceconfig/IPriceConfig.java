@@ -50,7 +50,7 @@ public interface IPriceConfig
 	/**
 	 * @return Returns the priceConfigID.
 	 */
-	long getPriceConfigID();
+	String getPriceConfigID();
 
 	String getPrimaryKey();
 
@@ -169,12 +169,12 @@ public interface IPriceConfig
 	ArticlePrice createNestedArticlePrice(
 			IPackagePriceConfig topLevelPriceConfig,
 			Article article,
-			LinkedList priceConfigStack,
+			LinkedList<IPriceConfig> priceConfigStack,
 			ArticlePrice topLevelArticlePrice,
 			ArticlePrice nextLevelArticlePrice,
-			LinkedList articlePriceStack,
+			LinkedList<ArticlePrice> articlePriceStack,
 			NestedProductType nestedProductType,
-			LinkedList nestedProductTypeStack);
+			LinkedList<NestedProductType> nestedProductTypeStack);
 
 	/**
 	 * Like
@@ -190,12 +190,12 @@ public interface IPriceConfig
 	ArticlePrice createNestedArticlePrice(
 			IPackagePriceConfig topLevelPriceConfig,
 			Article article,
-			LinkedList priceConfigStack,
+			LinkedList<IPriceConfig> priceConfigStack,
 			ArticlePrice topLevelArticlePrice,
 			ArticlePrice nextLevelArticlePrice,
-			LinkedList articlePriceStack,
+			LinkedList<ArticlePrice> articlePriceStack,
 			NestedProductType nestedProductType,
-			LinkedList nestedProductTypeStack,
+			LinkedList<NestedProductType> nestedProductTypeStack,
 			Product nestedProduct,
-			LinkedList productStack);
+			LinkedList<Product> productStack);
 }

@@ -154,7 +154,7 @@ implements IFormulaPriceConfig
 	 * @param organisationID
 	 * @param priceConfigID
 	 */
-	public FormulaPriceConfig(String organisationID, long priceConfigID)
+	public FormulaPriceConfig(String organisationID, String priceConfigID)
 	{
 		super(organisationID, priceConfigID);
 	}
@@ -413,13 +413,13 @@ implements IFormulaPriceConfig
 //	}
 	
 	/**
-	 * @see org.nightlabs.jfire.accounting.priceconfig.IPriceConfig#createNestedArticlePrice(IPackagePriceConfig, org.nightlabs.jfire.trade.Article, java.util.LinkedList, org.nightlabs.jfire.trade.ArticlePrice, org.nightlabs.jfire.trade.ArticlePrice, java.util.LinkedList, org.nightlabs.jfire.store.NestedProductType, java.util.LinkedList)
+	 * @see org.nightlabs.jfire.accounting.priceconfig.IPriceConfig#createNestedArticlePrice(IPackagePriceConfig, org.nightlabs.jfire.trade.Article, LinkedList, org.nightlabs.jfire.trade.ArticlePrice, org.nightlabs.jfire.trade.ArticlePrice, LinkedList, org.nightlabs.jfire.store.NestedProductType, LinkedList)
 	 */
 	public ArticlePrice createNestedArticlePrice(
 			IPackagePriceConfig packagePriceConfig, Article article,
-			LinkedList priceConfigStack, ArticlePrice topLevelArticlePrice,
-			ArticlePrice nextLevelArticlePrice, LinkedList articlePriceStack,
-			NestedProductType nestedProductType, LinkedList nestedProductTypeStack)
+			LinkedList<IPriceConfig> priceConfigStack, ArticlePrice topLevelArticlePrice,
+			ArticlePrice nextLevelArticlePrice, LinkedList<ArticlePrice> articlePriceStack,
+			NestedProductType nestedProductType, LinkedList<NestedProductType> nestedProductTypeStack)
 	{
 		ProductType packageProductType = nestedProductType.getPackageProductType();
 		ProductType innerProductType = nestedProductType.getInnerProductType();
@@ -435,14 +435,14 @@ implements IFormulaPriceConfig
 	}
 
 	/**
-	 * @see org.nightlabs.jfire.accounting.priceconfig.IPriceConfig#createNestedArticlePrice(IPackagePriceConfig, org.nightlabs.jfire.trade.Article, java.util.LinkedList, org.nightlabs.jfire.trade.ArticlePrice, org.nightlabs.jfire.trade.ArticlePrice, java.util.LinkedList, NestedProductType, LinkedList, org.nightlabs.jfire.store.Product, java.util.LinkedList)
+	 * @see org.nightlabs.jfire.accounting.priceconfig.IPriceConfig#createNestedArticlePrice(IPackagePriceConfig, org.nightlabs.jfire.trade.Article, LinkedList, org.nightlabs.jfire.trade.ArticlePrice, org.nightlabs.jfire.trade.ArticlePrice, LinkedList, NestedProductType, LinkedList, org.nightlabs.jfire.store.Product, LinkedList)
 	 */
 	public ArticlePrice createNestedArticlePrice(
 			IPackagePriceConfig packagePriceConfig, Article article,
-			LinkedList priceConfigStack, ArticlePrice topLevelArticlePrice,
-			ArticlePrice nextLevelArticlePrice, LinkedList articlePriceStack,
-			NestedProductType nestedProductType, LinkedList nestedProductTypeStack,
-			Product nestedProduct, LinkedList productStack)
+			LinkedList<IPriceConfig> priceConfigStack, ArticlePrice topLevelArticlePrice,
+			ArticlePrice nextLevelArticlePrice, LinkedList<ArticlePrice> articlePriceStack,
+			NestedProductType nestedProductType, LinkedList<NestedProductType> nestedProductTypeStack,
+			Product nestedProduct, LinkedList<Product> productStack)
 	{
 		ProductType packageProductType = nestedProductType.getPackageProductType();
 		ProductType innerProductType = nestedProductType.getInnerProductType();

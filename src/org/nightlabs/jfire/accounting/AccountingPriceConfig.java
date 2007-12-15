@@ -29,6 +29,7 @@ package org.nightlabs.jfire.accounting;
 import java.util.LinkedList;
 
 import org.nightlabs.jfire.accounting.priceconfig.IPackagePriceConfig;
+import org.nightlabs.jfire.accounting.priceconfig.IPriceConfig;
 import org.nightlabs.jfire.accounting.priceconfig.PriceConfig;
 import org.nightlabs.jfire.store.NestedProductType;
 import org.nightlabs.jfire.store.Product;
@@ -52,16 +53,18 @@ import org.nightlabs.jfire.trade.ArticlePrice;
  */
 public class AccountingPriceConfig extends PriceConfig
 {
+	private static final long serialVersionUID = 1L;
 
-	protected AccountingPriceConfig()
-	{
-	}
+	/**
+	 * @deprecated Only for JDO!
+	 */
+	protected AccountingPriceConfig() { }
 
 	/**
 	 * @param organisationID
 	 * @param priceConfigID
 	 */
-	public AccountingPriceConfig(String organisationID, long priceConfigID)
+	public AccountingPriceConfig(String organisationID, String priceConfigID)
 	{
 		super(organisationID, priceConfigID);
 	}
@@ -94,17 +97,17 @@ public class AccountingPriceConfig extends PriceConfig
 	}
 
 	/**
-	 * @see org.nightlabs.jfire.accounting.priceconfig.IPriceConfig#createNestedArticlePrice(IPackagePriceConfig, org.nightlabs.jfire.trade.Article, java.util.LinkedList, org.nightlabs.jfire.trade.ArticlePrice, org.nightlabs.jfire.trade.ArticlePrice, java.util.LinkedList, org.nightlabs.jfire.store.NestedProductType, java.util.LinkedList)
+	 * @see org.nightlabs.jfire.accounting.priceconfig.IPriceConfig#createNestedArticlePrice(IPackagePriceConfig, org.nightlabs.jfire.trade.Article, LinkedList, org.nightlabs.jfire.trade.ArticlePrice, org.nightlabs.jfire.trade.ArticlePrice, LinkedList, org.nightlabs.jfire.store.NestedProductType, LinkedList)
 	 */
-	public ArticlePrice createNestedArticlePrice(IPackagePriceConfig packagePriceConfig, Article article, LinkedList priceConfigStack, ArticlePrice topLevelArticlePrice, ArticlePrice nextLevelArticlePrice, LinkedList articlePriceStack, NestedProductType nestedProductType, LinkedList nestedProductTypeStack)
+	public ArticlePrice createNestedArticlePrice(IPackagePriceConfig packagePriceConfig, Article article, LinkedList<IPriceConfig> priceConfigStack, ArticlePrice topLevelArticlePrice, ArticlePrice nextLevelArticlePrice, LinkedList<ArticlePrice> articlePriceStack, NestedProductType nestedProductType, LinkedList<NestedProductType> nestedProductTypeStack)
 	{
 		throw new UnsupportedOperationException("This pseudo PriceConfig is not intended to be used in this context!");
 	}
 
 	/**
-	 * @see org.nightlabs.jfire.accounting.priceconfig.IPriceConfig#createNestedArticlePrice(IPackagePriceConfig, org.nightlabs.jfire.trade.Article, java.util.LinkedList, org.nightlabs.jfire.trade.ArticlePrice, org.nightlabs.jfire.trade.ArticlePrice, java.util.LinkedList, NestedProductType, LinkedList, org.nightlabs.jfire.store.Product, java.util.LinkedList)
+	 * @see org.nightlabs.jfire.accounting.priceconfig.IPriceConfig#createNestedArticlePrice(IPackagePriceConfig, org.nightlabs.jfire.trade.Article, LinkedList, org.nightlabs.jfire.trade.ArticlePrice, org.nightlabs.jfire.trade.ArticlePrice, LinkedList, NestedProductType, LinkedList, org.nightlabs.jfire.store.Product, LinkedList)
 	 */
-	public ArticlePrice createNestedArticlePrice(IPackagePriceConfig packagePriceConfig, Article article, LinkedList priceConfigStack, ArticlePrice topLevelArticlePrice, ArticlePrice nextLevelArticlePrice, LinkedList articlePriceStack, NestedProductType nestedProductType, LinkedList nestedProductTypeStack, Product nestedProduct, LinkedList productStack)
+	public ArticlePrice createNestedArticlePrice(IPackagePriceConfig packagePriceConfig, Article article, LinkedList<IPriceConfig> priceConfigStack, ArticlePrice topLevelArticlePrice, ArticlePrice nextLevelArticlePrice, LinkedList<ArticlePrice> articlePriceStack, NestedProductType nestedProductType, LinkedList<NestedProductType> nestedProductTypeStack, Product nestedProduct, LinkedList<Product> productStack)
 	{
 		throw new UnsupportedOperationException("This pseudo PriceConfig is not intended to be used in this context!");
 	}

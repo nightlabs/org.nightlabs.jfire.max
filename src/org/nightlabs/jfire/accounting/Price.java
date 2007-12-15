@@ -80,8 +80,9 @@ public class Price
 
 	/**
 	 * @jdo.field primary-key="true"
+	 * @jdo.column length="100"
 	 */
-	private long priceConfigID = -1;
+	private String priceConfigID;
 
 	/**
 	 * @jdo.field primary-key="true"
@@ -152,8 +153,23 @@ public class Price
 	 * @param tariffPrice
 	 * @param currency
 	 */
-	public Price(String organisationID, long priceConfigID, long priceID, Currency currency)
+	public Price(String organisationID, String priceConfigID, long priceID, Currency currency)
 	{
+		if (priceID < 0) {
+			if (!"".equals(organisationID))
+				throw new IllegalArgumentException("organisationID must be empty if priceID < 0! organisationID: " + organisationID);
+
+			if (!"".equals(priceConfigID))
+				throw new IllegalArgumentException("priceConfigID must be empty if priceID < 0! priceConfigID: " + priceConfigID);
+		}
+		else {
+			if (!ObjectIDUtil.isValidIDString(organisationID))
+				throw new IllegalArgumentException("organisationID must a valid ID, if priceID >= 0! organisationID: " + organisationID);
+
+			if (!ObjectIDUtil.isValidIDString(priceConfigID))
+				throw new IllegalArgumentException("priceConfigID must a valid ID, if priceID >= 0! priceConfigID: " + priceConfigID);
+		}
+
 		this.organisationID = organisationID;
 		this.priceConfigID = priceConfigID;
 		this.priceID = priceID;
@@ -163,9 +179,9 @@ public class Price
 		this.fragments = new HashMap<String, PriceFragment>();
 	}
 	
-	public static String getPrimaryKey(String organisationID, long priceConfigID, long priceID)
+	public static String getPrimaryKey(String organisationID, String priceConfigID, long priceID)
 	{
-		return organisationID + '/' + ObjectIDUtil.longObjectIDFieldToString(priceConfigID) + '/' + ObjectIDUtil.longObjectIDFieldToString(priceID);
+		return organisationID + '/' + priceConfigID + '/' + ObjectIDUtil.longObjectIDFieldToString(priceID);
 	}
 
 	public String getPrimaryKey()
@@ -183,7 +199,7 @@ public class Price
 	/**
 	 * @return Returns the priceConfigID.
 	 */
-	public long getPriceConfigID()
+	public String getPriceConfigID()
 	{
 		return priceConfigID;
 	}

@@ -88,10 +88,15 @@ public abstract class PriceConfig implements Serializable, StoreCallback, IPrice
 	 */
 	private String organisationID = null;
 
+//	/**
+//	 * @jdo.field primary-key="true"
+//	 */
+//	private long priceConfigID = -1;
 	/**
 	 * @jdo.field primary-key="true"
+	 * @jdo.column length="100"
 	 */
-	private long priceConfigID = -1;
+	private String priceConfigID = null;
 
 	/**
 	 * @jdo.field persistence-modifier="persistent"
@@ -111,12 +116,15 @@ public abstract class PriceConfig implements Serializable, StoreCallback, IPrice
 	@Deprecated
 	protected PriceConfig() { }
 
-	public PriceConfig(String organisationID, long priceConfigID)
+	public PriceConfig(String organisationID, String priceConfigID)
 	{
-		if (organisationID == null)
-			throw new NullPointerException("organisationID must not be null!");
-		if (priceConfigID < 0)
-			throw new IllegalArgumentException("priceConfigID < 0!");
+//		if (organisationID == null)
+//			throw new IllegalArgumentException("organisationID must not be null!");
+//		if (priceConfigID < 0)
+//			throw new IllegalArgumentException("priceConfigID < 0!");
+
+		ObjectIDUtil.assertValidIDString(organisationID, "organisationID");
+		ObjectIDUtil.assertValidIDString(priceConfigID, "priceConfigID");
 
 		this.organisationID = organisationID;
 		this.priceConfigID = priceConfigID;
@@ -134,18 +142,21 @@ public abstract class PriceConfig implements Serializable, StoreCallback, IPrice
 	/**
 	 * @return Returns the priceConfigID.
 	 */
-	public long getPriceConfigID()
+	public String getPriceConfigID()
 	{
 		return priceConfigID;
 	}
-	public static String getPrimaryKey(String organisationID, long priceConfigID)
+	public static String getPrimaryKey(String organisationID, String priceConfigID)
 	{
 		if (organisationID == null)
-			throw new NullPointerException("organisationID must not be null!");
-		if (priceConfigID < 0)
-			throw new IllegalArgumentException("priceConfigID < 0!");
+			throw new IllegalArgumentException("organisationID must not be null!");
+//		if (priceConfigID < 0)
+//			throw new IllegalArgumentException("priceConfigID < 0!");
+		if (priceConfigID == null)
+			throw new IllegalArgumentException("priceConfigID must not be null!");
 
-		return organisationID + '/' + ObjectIDUtil.longObjectIDFieldToString(priceConfigID);
+//		return organisationID + '/' + ObjectIDUtil.longObjectIDFieldToString(priceConfigID);
+		return organisationID  + '/' + priceConfigID;
 	}
 
 	public String getPrimaryKey()
@@ -380,7 +391,12 @@ public abstract class PriceConfig implements Serializable, StoreCallback, IPrice
 //		return res;
 //	}
 
-	public static long createPriceID(String priceConfigOrganisationID, long priceConfigID)
+	public static String createPriceConfigID()
+	{
+		return ObjectIDUtil.longObjectIDFieldToString(IDGenerator.nextID(PriceConfig.class));
+	}
+
+	public static long createPriceID(String priceConfigOrganisationID, String priceConfigID)
 	{
 		if (IDGenerator.getOrganisationID().equals(priceConfigOrganisationID))
 			return IDGenerator.nextID(Price.class, getPrimaryKey(priceConfigOrganisationID, priceConfigID));

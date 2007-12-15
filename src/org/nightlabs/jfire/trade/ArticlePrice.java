@@ -205,7 +205,7 @@ public class ArticlePrice extends org.nightlabs.jfire.accounting.Price
 	public ArticlePrice(
 			Article article,
 			org.nightlabs.jfire.accounting.Price origPrice,
-			String organisationID, long priceConfigID,
+			String organisationID, String priceConfigID,
 			long priceID,
 			ArticlePrice packageArticlePrice,
 			NestedProductType nestedProductType,
@@ -239,7 +239,7 @@ public class ArticlePrice extends org.nightlabs.jfire.accounting.Price
 	public ArticlePrice(
 			Article article,
 			org.nightlabs.jfire.accounting.Price origPrice,
-			String organisationID, long priceConfigID,
+			String organisationID, String priceConfigID,
 			long priceID,
 			ArticlePrice packageArticlePrice,
 			ProductType packageProductType,
@@ -318,7 +318,7 @@ public class ArticlePrice extends org.nightlabs.jfire.accounting.Price
 	public ArticlePrice(
 			Article article,
 			org.nightlabs.jfire.accounting.Price origPrice,
-			String organisationID, long priceConfigID,
+			String organisationID, String priceConfigID,
 			long priceID, boolean refund)
 	{
 		this(article, origPrice, organisationID, priceConfigID, priceID,

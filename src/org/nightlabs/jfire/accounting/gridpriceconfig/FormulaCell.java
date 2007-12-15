@@ -31,6 +31,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 import org.nightlabs.jfire.accounting.PriceFragmentType;
+import org.nightlabs.jfire.accounting.id.PriceFragmentTypeID;
 import org.nightlabs.jfire.accounting.priceconfig.PriceConfig;
 
 /**
@@ -87,9 +88,9 @@ public class FormulaCell implements Serializable
 
 	/**
 	 * @jdo.field primary-key="true"
-	 * @!jdo.column length="100"
+	 * @jdo.column length="100"
 	 */
-	private long priceConfigID;
+	private String priceConfigID;
 
 	/**
 	 * @jdo.field primary-key="true"
@@ -166,7 +167,7 @@ public class FormulaCell implements Serializable
 	/**
 	 * @return Returns the priceConfigID.
 	 */
-	public long getPriceConfigID()
+	public String getPriceConfigID()
 	{
 		return priceConfigID;
 	}
@@ -210,6 +211,13 @@ public class FormulaCell implements Serializable
 	{
 		return priceFragmentFormulas.get(
 				PriceFragmentType.getPrimaryKey(priceFragmentTypeOrganisationID, priceFragmentTypeID));
+	}
+	public void setFormula(PriceFragmentTypeID priceFragmentTypeID, String formula)
+	{
+		setFormula(
+				priceFragmentTypeID.organisationID,
+				priceFragmentTypeID.priceFragmentTypeID,
+				formula);
 	}
 	public void setFormula(PriceFragmentType priceFragmentType, String formula)
 	{

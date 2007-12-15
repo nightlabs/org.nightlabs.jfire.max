@@ -75,8 +75,9 @@ public class PriceFragment
 
 	/**
 	 * @jdo.field primary-key="true"
+	 * @jdo.column length="100"
 	 */
-	private long priceConfigID;
+	private String priceConfigID;
 
 	/**
 	 * @jdo.field primary-key="true"
@@ -165,7 +166,7 @@ public class PriceFragment
 	/**
 	 * @return Returns the priceConfigID.
 	 */
-	public long getPriceConfigID()
+	public String getPriceConfigID()
 	{
 		return priceConfigID;
 	}

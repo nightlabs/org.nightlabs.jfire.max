@@ -40,6 +40,7 @@ import org.nightlabs.annotation.Implement;
 import org.nightlabs.jfire.accounting.Currency;
 import org.nightlabs.jfire.accounting.Tariff;
 import org.nightlabs.jfire.accounting.priceconfig.IPackagePriceConfig;
+import org.nightlabs.jfire.accounting.priceconfig.IPriceConfig;
 import org.nightlabs.jfire.accounting.priceconfig.PriceConfigUtil;
 import org.nightlabs.jfire.store.NestedProductType;
 import org.nightlabs.jfire.store.Product;
@@ -127,7 +128,7 @@ implements IPackagePriceConfig, IResultPriceConfig
 	 * @param organisationID
 	 * @param priceConfigID
 	 */
-	public StablePriceConfig(String organisationID, long priceConfigID)
+	public StablePriceConfig(String organisationID, String priceConfigID)
 	{
 		super(organisationID, priceConfigID);
 		priceCells = new HashMap<IPriceCoordinate, PriceCell>();
@@ -413,9 +414,9 @@ implements IPackagePriceConfig, IResultPriceConfig
 
 	public ArticlePrice createNestedArticlePrice(
 			IPackagePriceConfig packagePriceConfig, Article article,
-			LinkedList priceConfigStack, ArticlePrice topLevelArticlePrice,
-			ArticlePrice nextLevelArticlePrice, LinkedList articlePriceStack,
-			NestedProductType nestedProductType, LinkedList nestedProductTypeStack)
+			LinkedList<IPriceConfig> priceConfigStack, ArticlePrice topLevelArticlePrice,
+			ArticlePrice nextLevelArticlePrice, LinkedList<ArticlePrice> articlePriceStack,
+			NestedProductType nestedProductType, LinkedList<NestedProductType> nestedProductTypeStack)
 	{
 //	 TODO implement
 		throw new UnsupportedOperationException("NYI");
@@ -423,9 +424,9 @@ implements IPackagePriceConfig, IResultPriceConfig
 
 	public ArticlePrice createNestedArticlePrice(
 			IPackagePriceConfig packagePriceConfig, Article article,
-			LinkedList priceConfigStack, ArticlePrice topLevelArticlePrice,
-			ArticlePrice nextLevelArticlePrice, LinkedList articlePriceStack,
-			NestedProductType nestedProductType, LinkedList nestedProductTypeStack, Product nestedProduct, LinkedList productStack)
+			LinkedList<IPriceConfig> priceConfigStack, ArticlePrice topLevelArticlePrice,
+			ArticlePrice nextLevelArticlePrice, LinkedList<ArticlePrice> articlePriceStack,
+			NestedProductType nestedProductType, LinkedList<NestedProductType> nestedProductTypeStack, Product nestedProduct, LinkedList<Product> productStack)
 	{
 		CustomerGroup customerGroup = getCustomerGroup(article);
 		Tariff tariff = getTariff(article);

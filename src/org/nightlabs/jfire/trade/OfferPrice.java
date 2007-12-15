@@ -26,8 +26,6 @@
 
 package org.nightlabs.jfire.trade;
 
-import java.util.Iterator;
-
 /**
  * @author Marco Schulze - marco at nightlabs dot de
  * @author Alexander Bieber <alex[AT]nightlabs[DOT]de>
@@ -42,12 +40,17 @@ import java.util.Iterator;
  */
 public class OfferPrice extends org.nightlabs.jfire.accounting.Price
 {
+	private static final long serialVersionUID = 1L;
+
 	/**
 	 * @jdo.field persistence-modifier="persistent"
 	 */
 	private Offer offer;
 
-	public OfferPrice() { }
+	/**
+	 * @deprecated Only for JDO!
+	 */
+	protected OfferPrice() { }
 
 	/**
 	 * @param organisationID
@@ -57,7 +60,7 @@ public class OfferPrice extends org.nightlabs.jfire.accounting.Price
 	 * @deprecated test
 	 */
 	@Deprecated
-	public OfferPrice(Offer offer, String organisationID, long priceConfigID, long priceID)
+	public OfferPrice(Offer offer, String organisationID, String priceConfigID, long priceID)
 	{
 		super(organisationID, priceConfigID, priceID, offer.getCurrency());
 		this.offer = offer;
@@ -70,10 +73,9 @@ public class OfferPrice extends org.nightlabs.jfire.accounting.Price
 		setAmount(0);
 		clearFragments();
 
-		for (Iterator it = offer.getArticles().iterator(); it.hasNext(); ) {
-			Article offerItem = (Article)it.next();
-			ArticlePrice offerItemPrice = offerItem.getPrice();
-			sumPrice(offerItemPrice);
+		for (Article article : offer.getArticles()) {
+			ArticlePrice articlePrice = article.getPrice();
+			sumPrice(articlePrice);
 		}
 	}
 

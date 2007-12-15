@@ -50,6 +50,8 @@ import org.nightlabs.i18n.I18nText;
  */
 public class PriceConfigName extends I18nText
 {
+	private static final long serialVersionUID = 1L;
+
 	/**
 	 * @jdo.field primary-key="true"
 	 * @jdo.column length="100"
@@ -58,8 +60,9 @@ public class PriceConfigName extends I18nText
 
 	/**
 	 * @jdo.field primary-key="true"
+	 * @jdo.column length="100"
 	 */
-	private long priceConfigID = -1;
+	private String priceConfigID;
 
 	/**
 	 * @jdo.field persistence-modifier="persistent"
@@ -80,31 +83,28 @@ public class PriceConfigName extends I18nText
 	 *
 	 * @jdo.join
 	 */
-	protected Map names = new HashMap();
+	protected Map<String, String> names;
 
-	protected PriceConfigName()
-	{
-	}
+	/**
+	 * @deprecated Only for JDO!
+	 */
+	protected PriceConfigName() { }
 
 	public PriceConfigName(PriceConfig priceConfig)
 	{
 		this.organisationID = priceConfig.getOrganisationID();
 		this.priceConfigID = priceConfig.getPriceConfigID();
 		this.priceConfig = priceConfig;
+
+		names = new HashMap<String, String>();
 	}
 
-	/**
-	 * @see org.nightlabs.i18n.I18nText#getI18nMap()
-	 */
 	@Override
-	protected Map getI18nMap()
+	protected Map<String, String> getI18nMap()
 	{
 		return names;
 	}
 
-	/**
-	 * @see org.nightlabs.i18n.I18nText#getFallBackValue(java.lang.String)
-	 */
 	@Override
 	protected String getFallBackValue(String languageID)
 	{
@@ -121,7 +121,7 @@ public class PriceConfigName extends I18nText
 	/**
 	 * @return Returns the priceConfigID.
 	 */
-	public long getPriceConfigID()
+	public String getPriceConfigID()
 	{
 		return priceConfigID;
 	}

@@ -116,7 +116,7 @@ extends DataCreator
 		SimpleProductType pt = new SimpleProductType(
 				organisationID, productTypeID, category, ProductType.INHERITANCE_NATURE_LEAF, ProductType.PACKAGE_NATURE_OUTER);
 		setNames(pt.getName(), names);
-		pt.setPackagePriceConfig(new StablePriceConfig(IDGenerator.getOrganisationID(), IDGenerator.nextID(PriceConfig.class)));
+		pt.setPackagePriceConfig(new StablePriceConfig(IDGenerator.getOrganisationID(), PriceConfig.createPriceConfigID()));
 		pt.getFieldMetaData("innerPriceConfig").setValueInherited(false);
 //		pt.getFieldMetaData("localAccountantDelegate").setValueInherited(false); // TODO this should be a field of ProductTypeLocal - not ProductType!
 //		pt.getFieldMetaData("localStorekeeperDelegate").setValueInherited(false); // TODO this should be a field of ProductTypeLocal - not ProductType!
@@ -311,8 +311,8 @@ extends DataCreator
 		PriceFragmentType vatNet = getPriceFragmentTypeVatNet();
 		PriceFragmentType vatVal = getPriceFragmentTypeVatVal();
 
-		StablePriceConfig stablePriceConfig = new StablePriceConfig(IDGenerator.getOrganisationID(), IDGenerator.nextID(PriceConfig.class));
-		FormulaPriceConfig formulaPriceConfig = new FormulaPriceConfig(IDGenerator.getOrganisationID(), IDGenerator.nextID(PriceConfig.class));
+		StablePriceConfig stablePriceConfig = new StablePriceConfig(IDGenerator.getOrganisationID(), PriceConfig.createPriceConfigID());
+		FormulaPriceConfig formulaPriceConfig = new FormulaPriceConfig(IDGenerator.getOrganisationID(), PriceConfig.createPriceConfigID());
 		setNames(formulaPriceConfig.getName(), names);
 		
 		CustomerGroup customerGroupDefault = trader.getDefaultCustomerGroupForKnownCustomer();

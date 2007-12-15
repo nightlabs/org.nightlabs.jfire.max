@@ -81,7 +81,7 @@ extends DataCreator
 		DynamicProductType pt = new DynamicProductType(
 				organisationID, productTypeID, category, ProductType.INHERITANCE_NATURE_LEAF, ProductType.PACKAGE_NATURE_OUTER);
 		setNames(pt.getName(), names);
-		pt.setPackagePriceConfig(new PackagePriceConfig(IDGenerator.getOrganisationID(), IDGenerator.nextID(PriceConfig.class)));
+		pt.setPackagePriceConfig(new PackagePriceConfig(IDGenerator.getOrganisationID(), PriceConfig.createPriceConfigID()));
 		if (innerPriceConfig != null) {
 			pt.getFieldMetaData("innerPriceConfig").setValueInherited(false);
 			pt.setInnerPriceConfig(innerPriceConfig);

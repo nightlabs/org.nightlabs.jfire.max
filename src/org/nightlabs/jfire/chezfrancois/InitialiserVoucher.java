@@ -10,7 +10,6 @@ import org.nightlabs.ModuleException;
 import org.nightlabs.jfire.accounting.Account;
 import org.nightlabs.jfire.accounting.priceconfig.PriceConfig;
 import org.nightlabs.jfire.base.JFirePrincipal;
-import org.nightlabs.jfire.idgenerator.IDGenerator;
 import org.nightlabs.jfire.security.User;
 import org.nightlabs.jfire.store.CannotConfirmProductTypeException;
 import org.nightlabs.jfire.store.CannotMakeProductTypeSaleableException;
@@ -46,17 +45,17 @@ extends Initialiser
 
 		DataCreatorVoucher dataCreator = new DataCreatorVoucher(pm, User.getUser(pm, getPrincipal()));
 
-		VoucherPriceConfig priceConfig10 = new VoucherPriceConfig(organisationID, IDGenerator.nextID(PriceConfig.class));
+		VoucherPriceConfig priceConfig10 = new VoucherPriceConfig(organisationID, PriceConfig.createPriceConfigID());
 		priceConfig10.getName().setText(Locale.ENGLISH.getLanguage(), "Voucher 10");
 		priceConfig10.addCurrency(dataCreator.getCurrencyEUR());
 		priceConfig10.setPrice(dataCreator.getCurrencyEUR(), new Long(1000));
 
-		VoucherPriceConfig priceConfig20 = new VoucherPriceConfig(organisationID, IDGenerator.nextID(PriceConfig.class));
+		VoucherPriceConfig priceConfig20 = new VoucherPriceConfig(organisationID, PriceConfig.createPriceConfigID());
 		priceConfig20.getName().setText(Locale.ENGLISH.getLanguage(), "Voucher 20");
 		priceConfig20.addCurrency(dataCreator.getCurrencyEUR());
 		priceConfig20.setPrice(dataCreator.getCurrencyEUR(), new Long(2000));
 
-		VoucherPriceConfig priceConfig50 = new VoucherPriceConfig(organisationID, IDGenerator.nextID(PriceConfig.class));
+		VoucherPriceConfig priceConfig50 = new VoucherPriceConfig(organisationID, PriceConfig.createPriceConfigID());
 		priceConfig50.getName().setText(Locale.ENGLISH.getLanguage(), "Voucher 50");
 		priceConfig50.addCurrency(dataCreator.getCurrencyEUR());
 		priceConfig50.setPrice(dataCreator.getCurrencyEUR(), new Long(5000));

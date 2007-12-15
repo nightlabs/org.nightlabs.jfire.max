@@ -60,7 +60,7 @@ extends Initialiser
 		Tariff tariffNormalPrice = dataCreator.getTariffNormalPrice();
 		Tariff tariffGoldCard = dataCreator.getTariffGoldCard();
 
-		DynamicTradePriceConfig priceConfig = new DynamicTradePriceConfig(IDGenerator.getOrganisationID(), IDGenerator.nextID(PriceConfig.class));
+		DynamicTradePriceConfig priceConfig = new DynamicTradePriceConfig(IDGenerator.getOrganisationID(), PriceConfig.createPriceConfigID());
 		PriceFragmentType vatNet = dataCreator.getPriceFragmentTypeVatNet();
 		PriceFragmentType vatVal = dataCreator.getPriceFragmentTypeVatVal();
 		priceConfig.addPriceFragmentType(vatVal);

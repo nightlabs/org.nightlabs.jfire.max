@@ -9,6 +9,7 @@ import org.nightlabs.annotation.Implement;
 import org.nightlabs.jfire.accounting.Price;
 import org.nightlabs.jfire.accounting.PriceFragment;
 import org.nightlabs.jfire.accounting.priceconfig.IPackagePriceConfig;
+import org.nightlabs.jfire.accounting.priceconfig.IPriceConfig;
 import org.nightlabs.jfire.accounting.priceconfig.PriceConfig;
 import org.nightlabs.jfire.dynamictrade.store.DynamicProduct;
 import org.nightlabs.jfire.idgenerator.IDGenerator;
@@ -35,15 +36,15 @@ implements IPackagePriceConfig
 
 	public static PackagePriceConfig getPackagePriceConfig(PersistenceManager pm)
 	{
-		Iterator it = pm.getExtent(PackagePriceConfig.class, false).iterator();
+		Iterator<?> it = pm.getExtent(PackagePriceConfig.class, false).iterator();
 		if (it.hasNext())
 			return (PackagePriceConfig) it.next();
 
-		PackagePriceConfig packagePriceConfig = new PackagePriceConfig(IDGenerator.getOrganisationID(), IDGenerator.nextID(PriceConfig.class));
+		PackagePriceConfig packagePriceConfig = new PackagePriceConfig(IDGenerator.getOrganisationID(), PriceConfig.createPriceConfigID());
 		return pm.makePersistent(packagePriceConfig);
 	}
 
-	public PackagePriceConfig(String organisationID, long priceConfigID)
+	public PackagePriceConfig(String organisationID, String priceConfigID)
 	{
 		super(organisationID, priceConfigID);
 	}
@@ -59,8 +60,7 @@ implements IPackagePriceConfig
 				article, singlePrice,
 				singlePrice.getOrganisationID(), singlePrice.getPriceConfigID(), priceID,
 				false);
-		for (Iterator it = articlePrice.getFragments().iterator(); it.hasNext(); ) {
-			PriceFragment pf = (PriceFragment) it.next();
+		for (PriceFragment pf : articlePrice.getFragments()) {
 			articlePrice.setAmount(pf.getPriceFragmentType(), (long) (pf.getAmount() * dynamicProduct.getQuantity()));
 		}
 		return articlePrice;
@@ -83,9 +83,9 @@ implements IPackagePriceConfig
 	@Implement
 	public ArticlePrice createNestedArticlePrice(
 			IPackagePriceConfig topLevelPriceConfig, Article article,
-			LinkedList priceConfigStack, ArticlePrice topLevelArticlePrice,
-			ArticlePrice nextLevelArticlePrice, LinkedList articlePriceStack,
-			NestedProductType nestedProductType, LinkedList nestedProductTypeStack)
+			LinkedList<IPriceConfig> priceConfigStack, ArticlePrice topLevelArticlePrice,
+			ArticlePrice nextLevelArticlePrice, LinkedList<ArticlePrice> articlePriceStack,
+			NestedProductType nestedProductType, LinkedList<NestedProductType> nestedProductTypeStack)
 	{
 		throw new UnsupportedOperationException("There should be nothing nested?!");
 	}
@@ -93,10 +93,10 @@ implements IPackagePriceConfig
 	@Implement
 	public ArticlePrice createNestedArticlePrice(
 			IPackagePriceConfig topLevelPriceConfig, Article article,
-			LinkedList priceConfigStack, ArticlePrice topLevelArticlePrice,
-			ArticlePrice nextLevelArticlePrice, LinkedList articlePriceStack,
-			NestedProductType nestedProductType, LinkedList nestedProductTypeStack,
-			Product nestedProduct, LinkedList productStack)
+			LinkedList<IPriceConfig> priceConfigStack, ArticlePrice topLevelArticlePrice,
+			ArticlePrice nextLevelArticlePrice, LinkedList<ArticlePrice> articlePriceStack,
+			NestedProductType nestedProductType, LinkedList<NestedProductType> nestedProductTypeStack,
+			Product nestedProduct, LinkedList<Product> productStack)
 	{
 //		if (nestedProduct.getProductType().equals(article.getProductType()))
 //			return;

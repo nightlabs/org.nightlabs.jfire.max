@@ -56,7 +56,7 @@ extends FormulaPriceConfig
 	@Deprecated
 	protected DynamicTradePriceConfig() { }
 
-	public DynamicTradePriceConfig(String organisationID, long priceConfigID)
+	public DynamicTradePriceConfig(String organisationID, String priceConfigID)
 	{
 		super(organisationID, priceConfigID);
 		this.inputPriceFragmentTypes = new HashSet<PriceFragmentType>();

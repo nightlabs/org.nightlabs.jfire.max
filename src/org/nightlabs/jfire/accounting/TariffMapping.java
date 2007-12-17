@@ -18,9 +18,10 @@ import org.nightlabs.util.Util;
 
 /**
  * <p>
- * The <code>TariffMapping</code>s define how a foreign (partner) {@link Tariff} is mapped to a local one. This
- * is a bidirectionally unique mapping. Hence, for every local {@link Tariff} and every {@link #partnerTariffOrganisationID}
- * there is exactly one partner-{@link Tariff}. And for every partner-{@link Tariff}, there's exactly one local <code>Tariff</code>.
+ * The <code>TariffMapping</code>s define how a local {@link Tariff} is mapped to a foreign (partner) one. This
+ * is a unidirectionally unique mapping from local to partner for any given partner-organisationID.
+ * Hence, for every local {@link Tariff} and every {@link #partnerTariffOrganisationID}
+ * there is exactly one partner-{@link Tariff}. But for every partner-{@link Tariff}, there can be multiple local <code>Tariff</code>s.
  * </p>
  * <p>
  * The <code>TariffMapping</code>s are used with the {@link GridPriceConfig}, because local {@link ProductType}s are always sold with local
@@ -37,17 +38,10 @@ import org.nightlabs.util.Util;
  *
  * @jdo.inheritance strategy="new-table"
  *
- * @jdo.create-objectid-class field-order="partnerTariffOrganisationID, partnerTariffTariffID, localTariffOrganisationID, localTariffTariffID"
+ * @jdo.create-objectid-class field-order="localTariffOrganisationID, localTariffTariffID, partnerTariffOrganisationID, partnerTariffTariffID"
  *
- * @jdo.fetch-group name="TariffMapping.partnerTariff" fields="partnerTariff"
  * @jdo.fetch-group name="TariffMapping.localTariff" fields="localTariff"
- *
- * @jdo.query
- *		name="getTariffMappingForPartnerTariff"
- *		query="SELECT UNIQUE
- *				WHERE
- *					this.partnerTariffOrganisationID == :partnerTariffOrganisationID &&
- *					this.partnerTariffTariffID == :partnerTariffTariffID"
+ * @jdo.fetch-group name="TariffMapping.partnerTariff" fields="partnerTariff"
  *
  * @jdo.query
  *		name="getTariffMappingForLocalTariffAndPartner"
@@ -81,12 +75,13 @@ implements Serializable
 	 * @param localTariffID Reference to the local {@link Tariff}.
 	 * @return The {@link TariffMapping} for the given tariffs.
 	 */
-	public static TariffMapping createTariffMapping(PersistenceManager pm, TariffID partnerTariffID, TariffID localTariffID)
+	public static TariffMapping create(PersistenceManager pm, TariffID localTariffID, TariffID partnerTariffID)
 	{
 		pm.getExtent(TariffMapping.class);
 		TariffMappingID tariffMappingID = TariffMappingID.create(
-				partnerTariffID.organisationID, partnerTariffID.tariffID,
-				localTariffID.organisationID, localTariffID.tariffID);
+				localTariffID.organisationID, localTariffID.tariffID,
+				partnerTariffID.organisationID, partnerTariffID.tariffID
+		);
 		TariffMapping tariffMapping;
 		try {
 			tariffMapping = (TariffMapping) pm.getObjectById(tariffMappingID);
@@ -97,59 +92,29 @@ implements Serializable
 			// not yet existing => we'll create it
 		}
 
-		// ensure that the partner-Tariff is not yet mapped
-		TariffMapping tm = getTariffMappingForPartnerTariff(pm, partnerTariffID);
-		if (tm != null)
-			throw new IllegalStateException("The partner-Tariff is already mapped to another local Tariff! " + JDOHelper.getObjectId(tm));
-
 		// ensure that the local Tariff is not yet mapped for this partner-organisation
-		tm = getTariffMappingForLocalTariffAndPartner(pm, localTariffID, partnerTariffID.organisationID);
+		TariffMapping tm = getTariffMappingForLocalTariffAndPartner(pm, localTariffID, partnerTariffID.organisationID);
 		if (tm != null)
 			throw new IllegalStateException("For the partner-organisation " + partnerTariffID.organisationID + " the local Tariff is already mapped to another partner-Tariff! " + JDOHelper.getObjectId(tm));
 
 		// if we come here, there are no collisions => create the new TariffMapping
 		pm.getExtent(Tariff.class);
-		Tariff partnerTariff = (Tariff) pm.getObjectById(partnerTariffID);
 		Tariff localTariff = (Tariff) pm.getObjectById(localTariffID);
+		Tariff partnerTariff = (Tariff) pm.getObjectById(partnerTariffID);
 
-		tariffMapping = new TariffMapping(partnerTariff, localTariff);
+		tariffMapping = new TariffMapping(localTariff, partnerTariff);
 		return pm.makePersistent(tariffMapping);
-	}
-
-	/**
-	 * @param pm Accessor to the datastore.
-	 * @param partnerTariffID The ID of the partner-{@link Tariff} for which to search a {@link TariffMapping}.
-	 * @return <code>null</code>, if there is no {@link TariffMapping} for the given <code>partnerTariffID</code> or the appropriate instance.
-	 */
-	public static TariffMapping getTariffMappingForPartnerTariff(PersistenceManager pm, TariffID partnerTariffID)
-	{
-		Map<String, Object> params = new HashMap<String, Object>();
-		params.put("partnerTariffOrganisationID", partnerTariffID.organisationID);
-		params.put("partnerTariffTariffID", partnerTariffID.tariffID);
-		Query q = pm.newNamedQuery(TariffMapping.class, "getTariffMappingForPartnerTariff");
-		return (TariffMapping) q.executeWithMap(params);
 	}
 
 	public static TariffMapping getTariffMappingForLocalTariffAndPartner(PersistenceManager pm, TariffID localTariffID, String partnerTariffOrganisationID)
 	{
 		Map<String, Object> params = new HashMap<String, Object>();
-		params.put("partnerTariffOrganisationID", partnerTariffOrganisationID);
 		params.put("localTariffOrganisationID", localTariffID.organisationID);
 		params.put("localTariffTariffID", localTariffID.tariffID);
+		params.put("partnerTariffOrganisationID", partnerTariffOrganisationID);
 		Query q = pm.newNamedQuery(TariffMapping.class, "getTariffMappingForLocalTariffAndPartner");
 		return (TariffMapping) q.executeWithMap(params);
 	}
-
-	/**
-	 * @jdo.field primary-key="true"
-	 * @jdo.column length="100"
-	 */
-	private String partnerTariffOrganisationID;
-	/**
-	 * @jdo.field primary-key="true"
-	 * @jdo.column length="100"
-	 */
-	private String partnerTariffTariffID;
 
 	/**
 	 * @jdo.field primary-key="true"
@@ -163,31 +128,42 @@ implements Serializable
 	private String localTariffTariffID;
 
 	/**
-	 * @jdo.field persistence-modifier="persistent" null-value="exception"
+	 * @jdo.field primary-key="true"
+	 * @jdo.column length="100"
 	 */
-	private Tariff partnerTariff;
+	private String partnerTariffOrganisationID;
+	/**
+	 * @jdo.field primary-key="true"
+	 * @jdo.column length="100"
+	 */
+	private String partnerTariffTariffID;
+
 	/**
 	 * @jdo.field persistence-modifier="persistent" null-value="exception"
 	 */
 	private Tariff localTariff;
-
 	/**
-	 * @jdo.field persistence-modifier="none"
+	 * @jdo.field persistence-modifier="persistent" null-value="exception"
 	 */
-	private transient TariffID partnerTariffID = null;
+	private Tariff partnerTariff;
+
 	/**
 	 * @jdo.field persistence-modifier="none"
 	 */
 	private transient TariffID localTariffID = null;
+	/**
+	 * @jdo.field persistence-modifier="none"
+	 */
+	private transient TariffID partnerTariffID = null;
 
 	/**
 	 * @jdo.field persistence-modifier="none"
 	 */
-	private transient String partnerTariffPK = null;
+	private transient String localTariffPK = null;
 	/**
 	 * @jdo.field persistence-modifier="none"
 	 */
-	private transient String localTariffPK = null;
+	private transient String partnerTariffPK = null;
 
 	/**
 	 * @deprecated Only for JDO!
@@ -195,29 +171,16 @@ implements Serializable
 	@Deprecated
 	protected TariffMapping() { }
 
-	public TariffMapping(Tariff partnerTariff, Tariff localTariff)
+	public TariffMapping(Tariff localTariff, Tariff partnerTariff)
 	{
-		this.partnerTariff = partnerTariff;
 		this.localTariff = localTariff;
+		this.partnerTariff = partnerTariff;
+		
+		this.localTariffOrganisationID = localTariff.getOrganisationID();
+		this.localTariffTariffID = localTariff.getTariffID();
 
 		this.partnerTariffOrganisationID = partnerTariff.getOrganisationID();
 		this.partnerTariffTariffID = partnerTariff.getTariffID();
-
-		this.localTariffOrganisationID = localTariff.getOrganisationID();
-		this.localTariffTariffID = localTariff.getTariffID();
-	}
-
-	public String getPartnerTariffOrganisationID()
-	{
-		return partnerTariffOrganisationID;
-	}
-	public String getPartnerTariffTariffID()
-	{
-		return partnerTariffTariffID;
-	}
-	public Tariff getPartnerTariff()
-	{
-		return partnerTariff;
 	}
 
 	public String getLocalTariffOrganisationID()
@@ -231,6 +194,19 @@ implements Serializable
 	public Tariff getLocalTariff()
 	{
 		return localTariff;
+	}
+
+	public String getPartnerTariffOrganisationID()
+	{
+		return partnerTariffOrganisationID;
+	}
+	public String getPartnerTariffTariffID()
+	{
+		return partnerTariffTariffID;
+	}
+	public Tariff getPartnerTariff()
+	{
+		return partnerTariff;
 	}
 
 	public TariffID getPartnerTariffID()
@@ -272,18 +248,18 @@ implements Serializable
 		if (!(obj instanceof TariffMapping)) return false;
 		TariffMapping o = (TariffMapping) obj;
 		return
-				Util.equals(o.partnerTariffOrganisationID, this.partnerTariffOrganisationID) &&
-				Util.equals(o.partnerTariffTariffID, this.partnerTariffTariffID) &&
 				Util.equals(o.localTariffOrganisationID, this.localTariffOrganisationID) &&
-				Util.equals(o.localTariffTariffID, this.localTariffTariffID);
+				Util.equals(o.localTariffTariffID, this.localTariffTariffID) &&
+				Util.equals(o.partnerTariffOrganisationID, this.partnerTariffOrganisationID) &&
+				Util.equals(o.partnerTariffTariffID, this.partnerTariffTariffID);
 	}
 	@Override
 	public int hashCode()
 	{
 		return
-				Util.hashCode(partnerTariffOrganisationID) +
-				Util.hashCode(partnerTariffTariffID) +
 				Util.hashCode(localTariffOrganisationID) +
-				Util.hashCode(localTariffTariffID);
+				Util.hashCode(localTariffTariffID) +
+				Util.hashCode(partnerTariffOrganisationID) +
+				Util.hashCode(partnerTariffTariffID);
 	}
 }

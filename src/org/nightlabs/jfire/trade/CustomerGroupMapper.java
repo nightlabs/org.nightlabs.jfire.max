@@ -12,7 +12,10 @@ public class CustomerGroupMapper
 {
 	private Collection<CustomerGroupMapping> customerGroupMappings;
 
-	private Map<CustomerGroupID, CustomerGroupMapping> partnerCustomerGroupID2customerGroupMapping = null;
+//	private Map<CustomerGroupID, CustomerGroupMapping> partnerCustomerGroupID2customerGroupMapping = null;
+	/**
+	 * localCustomerGroupID => partnerOrganisationID => CustomerGroupMapping
+	 */
 	private Map<CustomerGroupID, Map<String, CustomerGroupMapping>> localCustomerGroupID2partnerOrganisationID2customerGroupMapping = null;
 
 	/**
@@ -32,18 +35,18 @@ public class CustomerGroupMapper
 		this.customerGroupMappings = customerGroupMappings;
 	}
 
-	protected Map<CustomerGroupID, CustomerGroupMapping> getPartnerCustomerGroupID2customerGroupMapping()
-	{
-		if (partnerCustomerGroupID2customerGroupMapping == null) {
-			Map<CustomerGroupID, CustomerGroupMapping> partnerCustomerGroupID2customerGroupMapping = new HashMap<CustomerGroupID, CustomerGroupMapping>();
-
-			for (CustomerGroupMapping customerGroupMapping : customerGroupMappings)
-				partnerCustomerGroupID2customerGroupMapping.put(customerGroupMapping.getPartnerCustomerGroupID(), customerGroupMapping);
-
-			this.partnerCustomerGroupID2customerGroupMapping = partnerCustomerGroupID2customerGroupMapping;
-		}
-		return partnerCustomerGroupID2customerGroupMapping;
-	}
+//	protected Map<CustomerGroupID, CustomerGroupMapping> getPartnerCustomerGroupID2customerGroupMapping()
+//	{
+//		if (partnerCustomerGroupID2customerGroupMapping == null) {
+//			Map<CustomerGroupID, CustomerGroupMapping> partnerCustomerGroupID2customerGroupMapping = new HashMap<CustomerGroupID, CustomerGroupMapping>();
+//
+//			for (CustomerGroupMapping customerGroupMapping : customerGroupMappings)
+//				partnerCustomerGroupID2customerGroupMapping.put(customerGroupMapping.getPartnerCustomerGroupID(), customerGroupMapping);
+//
+//			this.partnerCustomerGroupID2customerGroupMapping = partnerCustomerGroupID2customerGroupMapping;
+//		}
+//		return partnerCustomerGroupID2customerGroupMapping;
+//	}
 
 	protected Map<CustomerGroupID, Map<String, CustomerGroupMapping>> getLocalCustomerGroupID2partnerOrganisationID2customerGroupMapping()
 	{
@@ -65,33 +68,39 @@ public class CustomerGroupMapper
 		return localCustomerGroupID2partnerOrganisationID2customerGroupMapping;
 	}
 
-	public CustomerGroupID getCustomerGroupIDForProductType(CustomerGroupID sourceCustomerGroupID, String productTypeOrganisationID, boolean throwExceptionIfNotFound)
+	/**
+	 * @param localCustomerGroupID references a customer-group of the local organisation which is reselling a product-type.
+	 * @param partnerOrganisationID references the partner-organisation whose product-type is resold.
+	 * @param throwExceptionIfNotFound controls whether to return <code>null</code> or to throw an exception of no mapping can be found.
+	 * @return the id of the customer-group in the partner-organisation.
+	 */
+	public CustomerGroupID getPartnerCustomerGroupID(CustomerGroupID localCustomerGroupID, String partnerOrganisationID, boolean throwExceptionIfNotFound)
 	{
-		if (productTypeOrganisationID.equals(sourceCustomerGroupID.organisationID))
-			return sourceCustomerGroupID;
+		if (partnerOrganisationID.equals(localCustomerGroupID.organisationID))
+			return localCustomerGroupID;
 
 		CustomerGroupID res = null;
 
-		Map<String, CustomerGroupMapping> partnerOrganisationID2customerGroupMapping = getLocalCustomerGroupID2partnerOrganisationID2customerGroupMapping().get(sourceCustomerGroupID);
+		Map<String, CustomerGroupMapping> partnerOrganisationID2customerGroupMapping = getLocalCustomerGroupID2partnerOrganisationID2customerGroupMapping().get(localCustomerGroupID);
 		if (partnerOrganisationID2customerGroupMapping != null) {
-			CustomerGroupMapping tm = partnerOrganisationID2customerGroupMapping.get(productTypeOrganisationID);
+			CustomerGroupMapping tm = partnerOrganisationID2customerGroupMapping.get(partnerOrganisationID);
 			if (tm != null)
 				res = tm.getPartnerCustomerGroupID();
 		}
 
-		if (res == null) {
-			CustomerGroupMapping tm = getPartnerCustomerGroupID2customerGroupMapping().get(sourceCustomerGroupID);
-			if (tm != null) {
-				res = tm.getLocalCustomerGroupID();
-
-				if (!productTypeOrganisationID.equals(res.organisationID)) { // should never happen that we map from one partner-org to another partner-org, but...
-					return getCustomerGroupIDForProductType(res, productTypeOrganisationID, throwExceptionIfNotFound);
-				}
-			}
-		}
+//		if (res == null) {
+//			CustomerGroupMapping tm = getPartnerCustomerGroupID2customerGroupMapping().get(sourceCustomerGroupID);
+//			if (tm != null) {
+//				res = tm.getLocalCustomerGroupID();
+//
+//				if (!productTypeOrganisationID.equals(res.organisationID)) { // should never happen that we map from one partner-org to another partner-org, but...
+//					return getCustomerGroupIDForProductType(res, productTypeOrganisationID, throwExceptionIfNotFound);
+//				}
+//			}
+//		}
 
 		if (throwExceptionIfNotFound && res == null)
-			throw new IllegalArgumentException("No mapping found to map from sourceCustomerGroupID.organisationID=\"" + sourceCustomerGroupID.organisationID + "\" to productTypeOrganisationID=\"" + productTypeOrganisationID + "\"!");
+			throw new IllegalArgumentException("No mapping found to map from sourceCustomerGroupID.organisationID=\"" + localCustomerGroupID.organisationID + "\" to productTypeOrganisationID=\"" + partnerOrganisationID + "\"!");
 
 		return res;
 	}

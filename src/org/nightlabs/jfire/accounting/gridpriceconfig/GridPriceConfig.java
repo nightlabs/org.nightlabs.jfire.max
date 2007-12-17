@@ -139,6 +139,10 @@ public abstract class GridPriceConfig extends PriceConfig
 	{
 		return null == customerGroups.put(customerGroup.getPrimaryKey(), customerGroup);
 	}
+	public CustomerGroup getCustomerGroup(CustomerGroupID customerGroupID, boolean throwExceptionIfNotExistent)
+	{
+		return getCustomerGroup(customerGroupID.organisationID, customerGroupID.customerGroupID, throwExceptionIfNotExistent);
+	}
 	public CustomerGroup getCustomerGroup(String organisationID, String customerGroupID, boolean throwExceptionIfNotExistent)
 	{
 		CustomerGroup customerGroup = customerGroups.get(CustomerGroup.getPrimaryKey(organisationID, customerGroupID));
@@ -166,6 +170,10 @@ public abstract class GridPriceConfig extends PriceConfig
 	public boolean addTariff(Tariff tariff)
 	{
 		return null == tariffs.put(tariff.getPrimaryKey(), tariff);
+	}
+	public Tariff getTariff(TariffID tariffID, boolean throwExceptionIfNotExistent)
+	{
+		return getTariff(tariffID.organisationID, tariffID.tariffID, throwExceptionIfNotExistent);
 	}
 	public Tariff getTariff(String organisationID, String tariffID, boolean throwExceptionIfNotExistent)
 	{

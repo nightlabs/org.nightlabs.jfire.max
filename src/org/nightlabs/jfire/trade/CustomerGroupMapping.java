@@ -18,9 +18,10 @@ import org.nightlabs.util.Util;
 
 /**
  * <p>
- * The <code>CustomerGroupMapping</code>s define how a foreign (partner) {@link CustomerGroup} is mapped to a local one. This
- * is a bidirectionally unique mapping. Hence, for every local {@link CustomerGroup} and every {@link #partnerCustomerGroupOrganisationID}
- * there is exactly one partner-{@link CustomerGroup}. And for every partner-{@link CustomerGroup}, there's exactly one local <code>CustomerGroup</code>.
+ * The <code>CustomerGroupMapping</code>s define how a local {@link CustomerGroup} is mapped to a foreign (partner) one. This
+ * is a unidirectionally unique mapping from local to partner for any given partner-organisationID. Hence, for every local
+ * {@link CustomerGroup} and every {@link #partnerCustomerGroupOrganisationID}
+ * there is exactly one partner-{@link CustomerGroup}. But for every partner-{@link CustomerGroup}, there might be multiple local <code>CustomerGroup</code>s.
  * </p>
  * <p>
  * The <code>CustomerGroupMapping</code>s are used with the {@link GridPriceConfig}, because local {@link ProductType}s are always sold with local
@@ -38,17 +39,10 @@ import org.nightlabs.util.Util;
  * @jdo.inheritance strategy="new-table"
  *
  * @jdo.create-objectid-class
- *		field-order="partnerCustomerGroupOrganisationID, partnerCustomerGroupCustomerGroupID, localCustomerGroupOrganisationID, localCustomerGroupCustomerGroupID"
+ *		field-order="localCustomerGroupOrganisationID, localCustomerGroupCustomerGroupID, partnerCustomerGroupOrganisationID, partnerCustomerGroupCustomerGroupID"
  *
  * @jdo.fetch-group name="CustomerGroupMapping.partnerCustomerGroup" fields="partnerCustomerGroup"
  * @jdo.fetch-group name="CustomerGroupMapping.localCustomerGroup" fields="localCustomerGroup"
- *
- * @jdo.query
- *		name="getCustomerGroupMappingForPartnerCustomerGroup"
- *		query="SELECT UNIQUE
- *				WHERE
- *					this.partnerCustomerGroupOrganisationID == :partnerCustomerGroupOrganisationID &&
- *					this.partnerCustomerGroupCustomerGroupID == :partnerCustomerGroupCustomerGroupID"
  *
  * @jdo.query
  *		name="getCustomerGroupMappingForLocalCustomerGroupAndPartner"
@@ -78,16 +72,17 @@ implements Serializable
 	 * any action. Otherwise it will be created, if it would not infringe on the rule of bidirectional uniqueness.
 	 *
 	 * @param pm The door to the datastore.
-	 * @param partnerCustomerGroupID Reference to the partner's {@link CustomerGroup}.
 	 * @param localCustomerGroupID Reference to the local {@link CustomerGroup}.
+	 * @param partnerCustomerGroupID Reference to the partner's {@link CustomerGroup}.
 	 * @return The {@link CustomerGroupMapping} for the given customerGroups.
 	 */
-	public static CustomerGroupMapping createCustomerGroupMapping(PersistenceManager pm, CustomerGroupID partnerCustomerGroupID, CustomerGroupID localCustomerGroupID)
+	public static CustomerGroupMapping create(PersistenceManager pm, CustomerGroupID localCustomerGroupID, CustomerGroupID partnerCustomerGroupID)
 	{
 		pm.getExtent(CustomerGroupMapping.class);
 		CustomerGroupMappingID customerGroupMappingID = CustomerGroupMappingID.create(
-				partnerCustomerGroupID.organisationID, partnerCustomerGroupID.customerGroupID,
-				localCustomerGroupID.organisationID, localCustomerGroupID.customerGroupID);
+				localCustomerGroupID.organisationID, localCustomerGroupID.customerGroupID,
+				partnerCustomerGroupID.organisationID, partnerCustomerGroupID.customerGroupID
+		);
 		CustomerGroupMapping customerGroupMapping;
 		try {
 			customerGroupMapping = (CustomerGroupMapping) pm.getObjectById(customerGroupMappingID);
@@ -98,37 +93,18 @@ implements Serializable
 			// not yet existing => we'll create it
 		}
 
-		// ensure that the partner-CustomerGroup is not yet mapped
-		CustomerGroupMapping tm = getCustomerGroupMappingForPartnerCustomerGroup(pm, partnerCustomerGroupID);
-		if (tm != null)
-			throw new IllegalStateException("The partner-CustomerGroup is already mapped to another local CustomerGroup! " + JDOHelper.getObjectId(tm));
-
 		// ensure that the local CustomerGroup is not yet mapped for this partner-organisation
-		tm = getCustomerGroupMappingForLocalCustomerGroupAndPartner(pm, localCustomerGroupID, partnerCustomerGroupID.organisationID);
-		if (tm != null)
-			throw new IllegalStateException("For the partner-organisation " + partnerCustomerGroupID.organisationID + " the local CustomerGroup is already mapped to another partner-CustomerGroup! " + JDOHelper.getObjectId(tm));
+		CustomerGroupMapping cgm = getCustomerGroupMappingForLocalCustomerGroupAndPartner(pm, localCustomerGroupID, partnerCustomerGroupID.organisationID);
+		if (cgm != null)
+			throw new IllegalStateException("For the partner-organisation " + partnerCustomerGroupID.organisationID + " the local CustomerGroup is already mapped to another partner-CustomerGroup! " + JDOHelper.getObjectId(cgm));
 
 		// if we come here, there are no collisions => create the new CustomerGroupMapping
 		pm.getExtent(CustomerGroup.class);
 		CustomerGroup partnerCustomerGroup = (CustomerGroup) pm.getObjectById(partnerCustomerGroupID);
 		CustomerGroup localCustomerGroup = (CustomerGroup) pm.getObjectById(localCustomerGroupID);
 
-		customerGroupMapping = new CustomerGroupMapping(partnerCustomerGroup, localCustomerGroup);
+		customerGroupMapping = new CustomerGroupMapping(localCustomerGroup, partnerCustomerGroup);
 		return pm.makePersistent(customerGroupMapping);
-	}
-
-	/**
-	 * @param pm Accessor to the datastore.
-	 * @param partnerCustomerGroupID The ID of the partner-{@link CustomerGroup} for which to search a {@link CustomerGroupMapping}.
-	 * @return <code>null</code>, if there is no {@link CustomerGroupMapping} for the given <code>partnerCustomerGroupID</code> or the appropriate instance.
-	 */
-	public static CustomerGroupMapping getCustomerGroupMappingForPartnerCustomerGroup(PersistenceManager pm, CustomerGroupID partnerCustomerGroupID)
-	{
-		Map<String, Object> params = new HashMap<String, Object>();
-		params.put("partnerCustomerGroupOrganisationID", partnerCustomerGroupID.organisationID);
-		params.put("partnerCustomerGroupCustomerGroupID", partnerCustomerGroupID.customerGroupID);
-		Query q = pm.newNamedQuery(CustomerGroupMapping.class, "getCustomerGroupMappingForPartnerCustomerGroup");
-		return (CustomerGroupMapping) q.executeWithMap(params);
 	}
 
 	public static CustomerGroupMapping getCustomerGroupMappingForLocalCustomerGroupAndPartner(PersistenceManager pm, CustomerGroupID localCustomerGroupID, String partnerCustomerGroupOrganisationID)
@@ -177,16 +153,25 @@ implements Serializable
 	@Deprecated
 	protected CustomerGroupMapping() { }
 
-	public CustomerGroupMapping(CustomerGroup partnerCustomerGroup, CustomerGroup localCustomerGroup)
+	public CustomerGroupMapping(CustomerGroup localCustomerGroup, CustomerGroup partnerCustomerGroup)
 	{
-		this.partnerCustomerGroup = partnerCustomerGroup;
 		this.localCustomerGroup = localCustomerGroup;
+		this.partnerCustomerGroup = partnerCustomerGroup;
+		
+		this.localCustomerGroupOrganisationID = localCustomerGroup.getOrganisationID();
+		this.localCustomerGroupCustomerGroupID = localCustomerGroup.getCustomerGroupID();
 
 		this.partnerCustomerGroupOrganisationID = partnerCustomerGroup.getOrganisationID();
 		this.partnerCustomerGroupCustomerGroupID = partnerCustomerGroup.getCustomerGroupID();
+	}
 
-		this.localCustomerGroupOrganisationID = localCustomerGroup.getOrganisationID();
-		this.localCustomerGroupCustomerGroupID = localCustomerGroup.getCustomerGroupID();
+	public String getLocalCustomerGroupOrganisationID()
+	{
+		return localCustomerGroupOrganisationID;
+	}
+	public String getLocalCustomerGroupCustomerGroupID()
+	{
+		return localCustomerGroupCustomerGroupID;
 	}
 
 	public String getPartnerCustomerGroupOrganisationID()
@@ -197,27 +182,16 @@ implements Serializable
 	{
 		return partnerCustomerGroupCustomerGroupID;
 	}
-	public String getLocalCustomerGroupOrganisationID()
+
+	public CustomerGroup getLocalCustomerGroup()
 	{
-		return localCustomerGroupOrganisationID;
-	}
-	public String getLocalCustomerGroupCustomerGroupID()
-	{
-		return localCustomerGroupCustomerGroupID;
+		return localCustomerGroup;
 	}
 	public CustomerGroup getPartnerCustomerGroup()
 	{
 		return partnerCustomerGroup;
 	}
-	public CustomerGroup getLocalCustomerGroup()
-	{
-		return localCustomerGroup;
-	}
 
-	/**
-	 * @jdo.field persistence-modifier="none"
-	 */
-	private transient CustomerGroupID partnerCustomerGroupID;
 	/**
 	 * @jdo.field persistence-modifier="none"
 	 */
@@ -225,12 +199,23 @@ implements Serializable
 	/**
 	 * @jdo.field persistence-modifier="none"
 	 */
-	private transient String partnerCustomerGroupPK;
+	private transient CustomerGroupID partnerCustomerGroupID;
 	/**
 	 * @jdo.field persistence-modifier="none"
 	 */
 	private transient String localCustomerGroupPK;
+	/**
+	 * @jdo.field persistence-modifier="none"
+	 */
+	private transient String partnerCustomerGroupPK;
 
+	public CustomerGroupID getLocalCustomerGroupID()
+	{
+		if (localCustomerGroupID == null)
+			localCustomerGroupID = CustomerGroupID.create(localCustomerGroupOrganisationID, localCustomerGroupCustomerGroupID);
+		
+		return localCustomerGroupID;
+	}
 	public CustomerGroupID getPartnerCustomerGroupID()
 	{
 		if (partnerCustomerGroupID == null)
@@ -238,12 +223,12 @@ implements Serializable
 
 		return partnerCustomerGroupID;
 	}
-	public CustomerGroupID getLocalCustomerGroupID()
+	public String getLocalCustomerGroupPK()
 	{
-		if (localCustomerGroupID == null)
-			localCustomerGroupID = CustomerGroupID.create(localCustomerGroupOrganisationID, localCustomerGroupCustomerGroupID);
-
-		return localCustomerGroupID;
+		if (localCustomerGroupPK == null)
+			localCustomerGroupPK = CustomerGroup.getPrimaryKey(localCustomerGroupOrganisationID, localCustomerGroupCustomerGroupID);
+		
+		return localCustomerGroupPK;
 	}
 	public String getPartnerCustomerGroupPK()
 	{
@@ -251,13 +236,6 @@ implements Serializable
 			partnerCustomerGroupPK = CustomerGroup.getPrimaryKey(partnerCustomerGroupOrganisationID, partnerCustomerGroupCustomerGroupID);
 
 		return partnerCustomerGroupPK;
-	}
-	public String getLocalCustomerGroupPK()
-	{
-		if (localCustomerGroupPK == null)
-			localCustomerGroupPK = CustomerGroup.getPrimaryKey(localCustomerGroupOrganisationID, localCustomerGroupCustomerGroupID);
-
-		return localCustomerGroupPK;
 	}
 
 	@Override
@@ -267,18 +245,18 @@ implements Serializable
 		if (!(obj instanceof CustomerGroupMapping)) return false;
 		CustomerGroupMapping o = (CustomerGroupMapping) obj;
 		return
-				Util.equals(o.partnerCustomerGroupOrganisationID, this.partnerCustomerGroupOrganisationID) &&
-				Util.equals(o.partnerCustomerGroupCustomerGroupID, this.partnerCustomerGroupCustomerGroupID) &&
 				Util.equals(o.localCustomerGroupOrganisationID, this.localCustomerGroupOrganisationID) &&
-				Util.equals(o.localCustomerGroupCustomerGroupID, this.localCustomerGroupCustomerGroupID);
+				Util.equals(o.localCustomerGroupCustomerGroupID, this.localCustomerGroupCustomerGroupID) &&
+				Util.equals(o.partnerCustomerGroupOrganisationID, this.partnerCustomerGroupOrganisationID) &&
+				Util.equals(o.partnerCustomerGroupCustomerGroupID, this.partnerCustomerGroupCustomerGroupID);
 	}
 	@Override
 	public int hashCode()
 	{
 		return
-				Util.hashCode(partnerCustomerGroupOrganisationID) +
-				Util.hashCode(partnerCustomerGroupCustomerGroupID) +
 				Util.hashCode(localCustomerGroupOrganisationID) +
-				Util.hashCode(localCustomerGroupCustomerGroupID);
+				Util.hashCode(localCustomerGroupCustomerGroupID) +
+				Util.hashCode(partnerCustomerGroupOrganisationID) +
+				Util.hashCode(partnerCustomerGroupCustomerGroupID);
 	}
 }

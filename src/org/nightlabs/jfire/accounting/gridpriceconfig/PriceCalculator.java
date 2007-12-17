@@ -430,10 +430,10 @@ public class PriceCalculator
 			return localPriceCoordinate;
 
 		CustomerGroupID orgCustomerGroupID = CustomerGroupID.create(localPriceCoordinate.getCustomerGroupPK());
-		CustomerGroupID newCustomerGroupID = getCustomerGroupMapper().getCustomerGroupIDForProductType(orgCustomerGroupID, nestedProductType.getInnerProductTypeOrganisationID(), true);
+		CustomerGroupID newCustomerGroupID = getCustomerGroupMapper().getPartnerCustomerGroupID(orgCustomerGroupID, nestedProductType.getInnerProductTypeOrganisationID(), true);
 
 		TariffID orgTariffID = TariffID.create(localPriceCoordinate.getTariffPK());
-		TariffID newTariffID = getTariffMapper().getTariffIDForProductType(orgTariffID, nestedProductType.getInnerProductTypeOrganisationID(), true);
+		TariffID newTariffID = getTariffMapper().getPartnerTariffID(orgTariffID, nestedProductType.getInnerProductTypeOrganisationID(), true);
 
 		IPriceCoordinate res = Util.cloneSerializable(localPriceCoordinate);
 		res.setTariffPK(Tariff.getPrimaryKey(newTariffID.organisationID, newTariffID.tariffID));

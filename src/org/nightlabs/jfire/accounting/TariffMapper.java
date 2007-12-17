@@ -12,10 +12,7 @@ public class TariffMapper
 {
 	private Collection<TariffMapping> tariffMappings;
 
-//	private Map<String, TariffMapping> partnerTariffPK2tariffMapping = null;
-//	private Map<String, Map<String, TariffMapping>> localTariffPK2partnerOrganisationID2tariffMapping = null;
-
-	private Map<TariffID, TariffMapping> partnerTariffID2tariffMapping = null;
+//	private Map<TariffID, TariffMapping> partnerTariffID2tariffMapping = null;
 	private Map<TariffID, Map<String, TariffMapping>> localTariffID2partnerOrganisationID2tariffMapping = null;
 
 	/**
@@ -35,51 +32,18 @@ public class TariffMapper
 		this.tariffMappings = tariffMappings;
 	}
 
-//	protected Map<String, TariffMapping> getPartnerTariffPK2tariffMapping()
+//	protected Map<TariffID, TariffMapping> getPartnerTariffID2tariffMapping()
 //	{
-//		if (partnerTariffPK2tariffMapping == null) {
-//			Map<String, TariffMapping> partnerTariffPK2tariffMapping = new HashMap<String, TariffMapping>();
+//		if (partnerTariffID2tariffMapping == null) {
+//			Map<TariffID, TariffMapping> partnerTariffID2tariffMapping = new HashMap<TariffID, TariffMapping>();
 //
 //			for (TariffMapping tariffMapping : tariffMappings)
-//				partnerTariffPK2tariffMapping.put(tariffMapping.getPartnerTariffPK(), tariffMapping);
+//				partnerTariffID2tariffMapping.put(tariffMapping.getPartnerTariffID(), tariffMapping);
 //
-//			this.partnerTariffPK2tariffMapping = partnerTariffPK2tariffMapping;
+//			this.partnerTariffID2tariffMapping = partnerTariffID2tariffMapping;
 //		}
-//		return partnerTariffPK2tariffMapping;
+//		return partnerTariffID2tariffMapping;
 //	}
-//
-//	protected Map<String, Map<String, TariffMapping>> getLocalTariffPK2partnerOrganisationID2tariffMapping()
-//	{
-//		if (localTariffPK2partnerOrganisationID2tariffMapping == null) {
-//			Map<String, Map<String, TariffMapping>> localTariffPK2partnerOrganisationID2tariffMapping = new HashMap<String, Map<String, TariffMapping>>();
-//
-//			for (TariffMapping tariffMapping : tariffMappings) {
-//				Map<String, TariffMapping> partnerOrganisationID2tariffMapping = localTariffPK2partnerOrganisationID2tariffMapping.get(tariffMapping.getLocalTariffPK());
-//				if (partnerOrganisationID2tariffMapping == null) {
-//					partnerOrganisationID2tariffMapping = new HashMap<String, TariffMapping>();
-//					localTariffPK2partnerOrganisationID2tariffMapping.put(tariffMapping.getLocalTariffPK(), partnerOrganisationID2tariffMapping);
-//				}
-//				partnerOrganisationID2tariffMapping.put(tariffMapping.getPartnerTariffOrganisationID(), tariffMapping);
-//			}
-//
-//			this.localTariffPK2partnerOrganisationID2tariffMapping = localTariffPK2partnerOrganisationID2tariffMapping;
-//		}
-//
-//		return localTariffPK2partnerOrganisationID2tariffMapping;
-//	}
-
-	protected Map<TariffID, TariffMapping> getPartnerTariffID2tariffMapping()
-	{
-		if (partnerTariffID2tariffMapping == null) {
-			Map<TariffID, TariffMapping> partnerTariffID2tariffMapping = new HashMap<TariffID, TariffMapping>();
-
-			for (TariffMapping tariffMapping : tariffMappings)
-				partnerTariffID2tariffMapping.put(tariffMapping.getPartnerTariffID(), tariffMapping);
-
-			this.partnerTariffID2tariffMapping = partnerTariffID2tariffMapping;
-		}
-		return partnerTariffID2tariffMapping;
-	}
 
 	protected Map<TariffID, Map<String, TariffMapping>> getLocalTariffID2partnerOrganisationID2tariffMapping()
 	{
@@ -101,66 +65,42 @@ public class TariffMapper
 		return localTariffID2partnerOrganisationID2tariffMapping;
 	}
 
-	public TariffID getTariffIDForProductType(TariffID sourceTariffID, String productTypeOrganisationID, boolean throwExceptionIfNotFound)
+	/**
+	 * @param localTariffID references a tariff of the local organisation which is reselling a product-type.
+	 * @param partnerOrganisationID references the partner-organisation whose product-type is resold.
+	 * @param throwExceptionIfNotFound controls whether to return <code>null</code> or to throw an exception of no mapping can be found.
+	 * @return the id of the tariff in the partner-organisation.
+	 */
+	public TariffID getPartnerTariffID(TariffID localTariffID, String partnerOrganisationID, boolean throwExceptionIfNotFound)
 	{
-		if (productTypeOrganisationID.equals(sourceTariffID.organisationID))
-			return sourceTariffID;
+		if (partnerOrganisationID.equals(localTariffID.organisationID))
+			return localTariffID;
 
 		TariffID res = null;
 
-		Map<String, TariffMapping> partnerOrganisationID2tariffMapping = getLocalTariffID2partnerOrganisationID2tariffMapping().get(sourceTariffID);
+		Map<String, TariffMapping> partnerOrganisationID2tariffMapping = getLocalTariffID2partnerOrganisationID2tariffMapping().get(localTariffID);
 		if (partnerOrganisationID2tariffMapping != null) {
-			TariffMapping tm = partnerOrganisationID2tariffMapping.get(productTypeOrganisationID);
+			TariffMapping tm = partnerOrganisationID2tariffMapping.get(partnerOrganisationID);
 			if (tm != null)
 				res = tm.getPartnerTariffID();
 		}
 
-		if (res == null) {
-			TariffMapping tm = getPartnerTariffID2tariffMapping().get(sourceTariffID);
-			if (tm != null) {
-				res = tm.getLocalTariffID();
-
-				if (!productTypeOrganisationID.equals(res.organisationID)) { // should never happen that we map from one partner-org to another partner-org
-					return getTariffIDForProductType(res, productTypeOrganisationID, throwExceptionIfNotFound);
-//					throw new IllegalArgumentException("None of these organisations seem to be my local one! Cannot map from sourceTariffID.organisationID=\"" + sourceTariffID.organisationID + "\" to productTypeOrganisationID=\"" + productTypeOrganisationID + "\"!");
-				}
-			}
-		}
-
-		if (throwExceptionIfNotFound && res == null)
-			throw new IllegalArgumentException("No mapping found to map from sourceTariffID.organisationID=\"" + sourceTariffID.organisationID + "\" to productTypeOrganisationID=\"" + productTypeOrganisationID + "\"!");
-
-		return res;
-	}
-
-//	public String getTariffPKForProductType(String sourceTariffPK, String productTypeOrganisationID, boolean throwExceptionIfNotFound)
-//	{
-//		if (productTypeOrganisationID.equals(sourceTariffID.organisationID))
-//			return sourceTariffID;
-//
-//		TariffID res = null;
-//
-//		Map<String, TariffMapping> partnerOrganisationID2tariffMapping = getLocalTariffID2partnerOrganisationID2tariffMapping().get(sourceTariffID);
-//		if (partnerOrganisationID2tariffMapping != null) {
-//			TariffMapping tm = partnerOrganisationID2tariffMapping.get(productTypeOrganisationID);
-//			if (tm != null)
-//				res = tm.getPartnerTariffID();
-//		}
-//
 //		if (res == null) {
 //			TariffMapping tm = getPartnerTariffID2tariffMapping().get(sourceTariffID);
 //			if (tm != null) {
 //				res = tm.getLocalTariffID();
 //
 //				if (!productTypeOrganisationID.equals(res.organisationID)) { // should never happen that we map from one partner-org to another partner-org
-//					throw new IllegalArgumentException("None of these organisations seem to be my local one! Cannot map from sourceTariffID.organisationID=\"" + sourceTariffID.organisationID + "\" to productTypeOrganisationID=\"" + productTypeOrganisationID + "\"!");
+//					return getTariffIDForProductType(res, productTypeOrganisationID, throwExceptionIfNotFound);
+////					throw new IllegalArgumentException("None of these organisations seem to be my local one! Cannot map from sourceTariffID.organisationID=\"" + sourceTariffID.organisationID + "\" to productTypeOrganisationID=\"" + productTypeOrganisationID + "\"!");
 //				}
 //			}
 //		}
-//
-//		if (throwExceptionIfNotFound && res == null)
-//			throw new IllegalArgumentException("No mapping found to map from sourceTariffID.organisationID=\"" + sourceTariffID.organisationID + "\" to productTypeOrganisationID=\"" + productTypeOrganisationID + "\"!");
-//
-//		return res;
-//	}
+
+		if (throwExceptionIfNotFound && res == null)
+			throw new IllegalArgumentException("No mapping found to map from sourceTariffID.organisationID=\"" + localTariffID.organisationID + "\" to productTypeOrganisationID=\"" + partnerOrganisationID + "\"!");
+
+		return res;
+	}
+
 }

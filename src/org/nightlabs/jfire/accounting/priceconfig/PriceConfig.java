@@ -39,6 +39,7 @@ import org.nightlabs.jdo.ObjectIDUtil;
 import org.nightlabs.jfire.accounting.Currency;
 import org.nightlabs.jfire.accounting.Price;
 import org.nightlabs.jfire.accounting.PriceFragmentType;
+import org.nightlabs.jfire.accounting.id.CurrencyID;
 import org.nightlabs.jfire.idgenerator.IDGenerator;
 import org.nightlabs.jfire.trade.Article;
 import org.nightlabs.jfire.trade.ArticlePrice;
@@ -201,7 +202,10 @@ public abstract class PriceConfig implements Serializable, StoreCallback, IPrice
 	{
 		return null == currencies.put(currency.getCurrencyID(), currency);
 	}
-
+	public Currency getCurrency(CurrencyID currencyID, boolean throwExceptionIfNotRegistered)
+	{
+		return getCurrency(currencyID.currencyID, throwExceptionIfNotRegistered);
+	}
 	/**
 	 * @return Returns the desired Currency if registered or <tt>null</tt> if the
 	 * given currencyID is not known.

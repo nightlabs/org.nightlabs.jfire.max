@@ -18,17 +18,15 @@ public class TariffDAO
 {
 	private static TariffDAO sharedInstance = null;
 
-	public static TariffDAO sharedInstance()
+	public synchronized static TariffDAO sharedInstance()
 	{
-		if (sharedInstance == null) {
-			synchronized (TariffDAO.class) {
-				if (sharedInstance == null)
-					sharedInstance = new TariffDAO();
-			}
-		}
+		if (sharedInstance == null)
+			sharedInstance = new TariffDAO();
+
 		return sharedInstance;
 	}
 
+	@SuppressWarnings("unchecked")
 	@Override
 	@Implement
 	protected Collection<Tariff> retrieveJDOObjects(
@@ -59,6 +57,7 @@ public class TariffDAO
 	 * @param monitor
 	 * @return
 	 */
+	@SuppressWarnings("unchecked")
 	public synchronized List<Tariff> getTariffs(String organisationID, boolean inverse, String[] fetchGroups, int maxFetchDepth, ProgressMonitor monitor)
 	{
 		try {

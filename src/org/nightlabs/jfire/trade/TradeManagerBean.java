@@ -1419,11 +1419,13 @@ implements SessionBean
 	}
 
 	/**
+ 	 * TODO remove the "_new" suffix after a while (when the clients are updated for sure)
+	 *
 	 * @ejb.interface-method
 	 * @ejb.transaction type="Required"
 	 * @ejb.permission role-name="_Guest_"
 	 */
-	public CustomerGroupMapping createCustomerGroupMapping(CustomerGroupID partnerCustomerGroupID, CustomerGroupID localCustomerGroupID, boolean get, String[] fetchGroups, int maxFetchDepth)
+	public CustomerGroupMapping createCustomerGroupMapping_new(CustomerGroupID localCustomerGroupID, CustomerGroupID partnerCustomerGroupID, boolean get, String[] fetchGroups, int maxFetchDepth)
 	{
 		PersistenceManager pm = getPersistenceManager();
 		try {
@@ -1431,7 +1433,7 @@ implements SessionBean
 			if (fetchGroups != null)
 				pm.getFetchPlan().setGroups(fetchGroups);
 
-			CustomerGroupMapping tm = CustomerGroupMapping.createCustomerGroupMapping(pm, partnerCustomerGroupID, localCustomerGroupID);
+			CustomerGroupMapping tm = CustomerGroupMapping.create(pm, localCustomerGroupID, partnerCustomerGroupID);
 			if (!get)
 				return null;
 

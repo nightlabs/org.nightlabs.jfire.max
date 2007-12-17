@@ -471,11 +471,13 @@ public abstract class AccountingManagerBean
 	}
 
 	/**
+	 * TODO remove the "_new" suffix after a while (when the clients are updated for sure)
+	 *
 	 * @ejb.interface-method
 	 * @ejb.transaction type="Required"
 	 * @ejb.permission role-name="_Guest_"
 	 */
-	public TariffMapping createTariffMapping(TariffID partnerTariffID, TariffID localTariffID, boolean get, String[] fetchGroups, int maxFetchDepth)
+	public TariffMapping createTariffMapping_new(TariffID localTariffID, TariffID partnerTariffID, boolean get, String[] fetchGroups, int maxFetchDepth)
 	{
 		PersistenceManager pm = getPersistenceManager();
 		try {
@@ -483,7 +485,7 @@ public abstract class AccountingManagerBean
 			if (fetchGroups != null)
 				pm.getFetchPlan().setGroups(fetchGroups);
 
-			TariffMapping tm = TariffMapping.createTariffMapping(pm, partnerTariffID, localTariffID);
+			TariffMapping tm = TariffMapping.create(pm, localTariffID, partnerTariffID);
 			if (!get)
 				return null;
 

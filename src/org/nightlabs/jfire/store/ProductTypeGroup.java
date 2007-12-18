@@ -47,6 +47,7 @@ import org.nightlabs.jfire.store.id.ProductTypeGroupID;
  *		table="JFireTrade_ProductTypeGroup"
  *
  * @jdo.inheritance strategy="new-table"
+ * @jdo.inheritance-discriminator strategy="class-name"
  *
  * @jdo.create-objectid-class field-order="organisationID, productTypeGroupID"
  *
@@ -56,6 +57,8 @@ import org.nightlabs.jfire.store.id.ProductTypeGroupID;
 public class ProductTypeGroup
 implements Serializable, DetachCallback
 {
+	private static final long serialVersionUID = 1L;
+
 	public static final String FETCH_GROUP_NAME = "ProductTypeGroup.name";
 	public static final String FETCH_GROUP_MANAGED_BY_PRODUCT_TYPE = "ProductTypeGroup.managedByProductType";
 
@@ -98,7 +101,7 @@ implements Serializable, DetachCallback
 	 *
 	 * @jdo.field persistence-modifier="none"
 	 */
-	private Collection productTypes = null;
+	private Collection<ProductType> productTypes = null;
 
 	/**
 	 * @deprecated
@@ -133,10 +136,11 @@ implements Serializable, DetachCallback
 		return primaryKey;
 	}
 
-	public static Collection getProductTypes(PersistenceManager pm, ProductTypeGroupID productTypeGroupID)
+	@SuppressWarnings("unchecked")
+	public static Collection<ProductType> getProductTypes(PersistenceManager pm, ProductTypeGroupID productTypeGroupID)
 	{
 		Query q = pm.newNamedQuery(ProductType.class, "getProductTypesOfProductTypeGroup");
-		return (Collection) q.execute(productTypeGroupID.organisationID, productTypeGroupID.productTypeGroupID);
+		return (Collection<ProductType>) q.execute(productTypeGroupID.organisationID, productTypeGroupID.productTypeGroupID);
 	}
 
 	protected PersistenceManager getPersistenceManager()
@@ -155,14 +159,14 @@ implements Serializable, DetachCallback
 	 *		the object is currently attached to the datastore,
 	 *	</li>
 	 *	<li>
-	 *		{@link #setIncludeProductTypes(boolean)} has been called with value <code>true</code>, before
+	 *		the fetch-group {@value #FETCH_GROUP_PRODUCT_TYPES} was used when
 	 *		this object has been detached.
 	 *	</li>
 	 * </ul>
 	 *
 	 * @return Returns instances of {@link ProductType}.
 	 */
-	public Collection getProductTypes()
+	public Collection<ProductType> getProductTypes()
 	{
 		if (productTypes != null)
 			return productTypes;
@@ -222,7 +226,7 @@ implements Serializable, DetachCallback
 		ProductTypeGroup attached = (ProductTypeGroup)_attached;
 		ProductTypeGroup detached = this;
 		PersistenceManager pm = attached.getPersistenceManager();
-		Collection fetchGroups = pm.getFetchPlan().getGroups();
+		Collection<?> fetchGroups = pm.getFetchPlan().getGroups();
 		if (fetchGroups.contains(FETCH_GROUP_PRODUCT_TYPES) || fetchGroups.contains(FetchPlan.ALL))
 			detached.productTypes = pm.detachCopyAll(
 					getProductTypes(pm, (ProductTypeGroupID) JDOHelper.getObjectId(attached)));

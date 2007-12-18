@@ -46,7 +46,9 @@ import org.nightlabs.i18n.I18nText;
  *
  * @jdo.fetch-group name="ProductTypeGroup.name" fields="productTypeGroup, names"
  */
-public class ProductTypeGroupName extends I18nText {
+public class ProductTypeGroupName extends I18nText
+{
+	private static final long serialVersionUID = 1L;
 
 	/**
 	 * @jdo.field primary-key="true"
@@ -58,13 +60,12 @@ public class ProductTypeGroupName extends I18nText {
 	 * @jdo.column length="100"
 	 */
 	private String productTypeGroupID;
-	
+
 	/**
 	 * @jdo.field persistence-modifier="persistent"
 	 */
 	private ProductTypeGroup productTypeGroup;
-	
-	
+
 	/**
 	 * @deprecated Only for JDO!
 	 */
@@ -76,7 +77,7 @@ public class ProductTypeGroupName extends I18nText {
 		this.organisationID = productTypeGroup.getOrganisationID();
 		this.productTypeGroupID = productTypeGroup.getProductTypeGroupID();
 		this.productTypeGroup = productTypeGroup;
-		this.names = new HashMap();
+		this.names = new HashMap<String, String>();
 	}
 
 	/**
@@ -94,19 +95,13 @@ public class ProductTypeGroupName extends I18nText {
 	 *
 	 * @jdo.join
 	 */
-	protected Map names;
+	protected Map<String, String> names;
 	
-	/**
-	 * @see org.nightlabs.i18n.I18nText#getI18nMap()
-	 */
 	@Override
-	protected Map getI18nMap() {
+	protected Map<String, String> getI18nMap() {
 		return names;
 	}
 
-	/**
-	 * @see org.nightlabs.i18n.I18nText#getFallBackValue(java.lang.String)
-	 */
 	@Override
 	protected String getFallBackValue(String languageID) {
 		return productTypeGroupID;

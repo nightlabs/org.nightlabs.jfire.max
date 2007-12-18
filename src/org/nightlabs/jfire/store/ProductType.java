@@ -225,6 +225,7 @@ implements
 //	public static final String CANNOT_MAKE_SALEABLE_REASON_NO_ACCOUNTANT_DELEGATE = "ProductType.cannotMakeSaleable.noAccountantDelegate";
 
 	public static final String CANNOT_CONFIRM_REASON_IMMUTABLE = "ProductType.cannotConfirm.immutable";
+	public static final String CANNOT_CONFIRM_REASON_INHERITANCE_BRANCH = "ProductType.cannotConfirm.inheritanceBranch"; // only leafs can be confirmed
 	
 	public static final String CANNOT_PUBLISH_REASON_IMMUTABLE = "ProductType.cannotPublish.immutable";
 	public static final String CANNOT_PUBLISH_REASON_PARENT_NOT_PUBLISHED = "ProductType.cannotPublish.parentNotPublished";
@@ -1520,11 +1521,15 @@ implements
 	{
 		getPersistenceManager();
 
+		if (this.confirmed == confirmed)
+			return;
+
 		if (confirmed == false && this.confirmed == true)
 			throw new CannotConfirmProductTypeException(CANNOT_CONFIRM_REASON_IMMUTABLE, "The confirmed flag of a ProductType is immutable after once set to true");
 
-		checkCanConfirm();
-		
+		if (confirmed)
+			checkCanConfirm();
+
 		this.confirmed = confirmed;
 	}
 	
@@ -1537,7 +1542,8 @@ implements
 	 * @throws CannotConfirmProductTypeException If the ProductType cannot be confirmed.
 	 */
 	protected void checkCanConfirm() throws CannotConfirmProductTypeException {
-		// Nothing to do
+		if (!isInheritanceLeaf())
+			throw new CannotConfirmProductTypeException(CANNOT_CONFIRM_REASON_INHERITANCE_BRANCH, "The confirmed flag of a ProductType can only be set for leafs in the inheritance tree");
 	}
 
 	/**
@@ -1551,8 +1557,9 @@ implements
 	}
 
 	/**
-	 * Sets if this ProductType can be sold. This only takes effect when 
-	 * published is true. This is used as a filter flag.
+	 * Sets if this ProductType can be sold. If a product-type is saleable but not published,
+	 * it cannot be sold by resellers, though - only within the local organisation.
+	 * This is used as a filter flag.
 	 * 
 	 * @param saleable Wheather this ProductType is saleable
 	 * @throws CannotMakeProductTypeSaleableException If the ProductType cannot be made saleable.
@@ -1560,6 +1567,9 @@ implements
 	protected void setSaleable(boolean saleable) throws CannotMakeProductTypeSaleableException
 	{
 		getPersistenceManager();
+
+		if (this.saleable == saleable)
+			return;
 		
 		if (saleable)
 			checkCanMakeSaleable();

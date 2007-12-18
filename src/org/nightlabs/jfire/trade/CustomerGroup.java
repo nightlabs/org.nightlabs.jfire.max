@@ -59,8 +59,11 @@ import org.nightlabs.util.Util;
  */
 public class CustomerGroup implements Serializable
 {
+	private static final long serialVersionUID = 1L;
+
 	public static final String CUSTOMER_GROUP_ID_ANONYMOUS = "CustomerGroup-anonymous";
 	public static final String CUSTOMER_GROUP_ID_DEFAULT = "CustomerGroup-default";
+	public static final String CUSTOMER_GROUP_ID_RESELLER = "CustomerGroup-reseller";
 
 	public static final String FETCH_GROUP_NAME = "CustomerGroup.name";
 

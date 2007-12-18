@@ -788,11 +788,11 @@ public class Trader
 	 *		passes it to {@link AsyncInvoke#exec(Invocation, org.nightlabs.jfire.asyncinvoke.SuccessCallback, ErrorCallback, UndeliverableCallback, boolean)}.
 	 * @return Instances of {@link Article}.
 	 */
-	public Collection createArticles(User user, Offer offer, Segment segment,
-			Collection products, ArticleCreator articleCreator, boolean allocate,
+	public Collection<? extends Article> createArticles(User user, Offer offer, Segment segment,
+			Collection<? extends Product> products, ArticleCreator articleCreator, boolean allocate,
 			boolean allocateSynchronously, boolean enableXA) throws ModuleException
 	{
-		Collection articles = articleCreator.createProductArticles(this, user, offer,
+		Collection<? extends Article> articles = articleCreator.createProductArticles(this, user, offer,
 				segment, products);
 
 		createArticleLocals(user, articles);
@@ -826,8 +826,7 @@ public class Trader
 		}
 		else {
 			// create the Articles' prices
-			for (Iterator iter = articles.iterator(); iter.hasNext();) {
-				Article article = (Article) iter.next();
+			for (Article article : articles) {
 				IPackagePriceConfig packagePriceConfig = article.getProductType()
 						.getPackagePriceConfig();
 				article.setPrice(packagePriceConfig.createArticlePrice(article));
@@ -850,7 +849,7 @@ public class Trader
 	 * @param enableXA This applies only if <code>synchronously==false</code> and it is passed to
 	 *		{@link AsyncInvoke#exec(Invocation, org.nightlabs.jfire.asyncinvoke.SuccessCallback, ErrorCallback, UndeliverableCallback, boolean)}
 	 */
-	public void allocateArticles(User user, Collection articles,
+	public void allocateArticles(User user, Collection<? extends Article> articles,
 			boolean synchronously, boolean enableXA) throws ModuleException
 	{
 		try {
@@ -1301,7 +1300,7 @@ public class Trader
 	 * @throws ModuleException
 	 *           If another error occurs.
 	 */
-	protected void allocateArticlesBegin(User user, Collection articles)
+	protected void allocateArticlesBegin(User user, Collection<? extends Article> articles)
 			throws ModuleException
 	{
 		// If all articles are currently allocated or the allocation is pending, we
@@ -1413,7 +1412,7 @@ public class Trader
 	 *          must not return <code>null</code>).
 	 * @throws ModuleException
 	 */
-	protected void allocateArticlesEnd(User user, Collection articles)
+	protected void allocateArticlesEnd(User user, Collection<? extends Article> articles)
 			throws ModuleException
 	{
 		TotalArticleStatus tas = getTotalArticleStatus(articles);

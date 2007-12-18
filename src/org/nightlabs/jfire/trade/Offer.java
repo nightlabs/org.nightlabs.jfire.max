@@ -125,10 +125,11 @@ implements
 	/**
 	 * @return a <tt>Collection</tt> of <tt>Offer</tt>
 	 */
-	public static Collection getNonFinalizedOffers(PersistenceManager pm, Order order)
+	@SuppressWarnings("unchecked")
+	public static Collection<Offer> getNonFinalizedOffers(PersistenceManager pm, Order order)
 	{
 		Query query = pm.newNamedQuery(Offer.class, "getNonFinalizedOffersForOrder");
-		return (Collection) query.execute(order);
+		return (Collection<Offer>) query.execute(order);
 	}
 
 	/**

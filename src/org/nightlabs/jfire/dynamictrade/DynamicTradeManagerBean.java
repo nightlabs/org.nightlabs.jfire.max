@@ -518,7 +518,7 @@ implements SessionBean
 					user, offer, segment,
 					products,
 					new ArticleCreator(tariff),
-					allocate, allocateSynchronously, true);
+					allocate, allocateSynchronously);
 
 			if (articles.size() != 1)
 				throw new IllegalStateException("trader.createArticles(...) created " + articles.size() + " instead of exactly 1 article!");

@@ -889,7 +889,7 @@ implements SessionBean
 					user, offer, segment,
 					products,
 					new ArticleCreator(tariff),
-					allocate, allocateSynchronously, true);
+					allocate, allocateSynchronously);
 //			Collection articles = new ArrayList();
 //			for (Iterator it = products.iterator(); it.hasNext(); ) {
 //				SimpleProduct product = (SimpleProduct) it.next();

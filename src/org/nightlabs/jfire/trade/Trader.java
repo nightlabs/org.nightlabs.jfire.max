@@ -783,14 +783,11 @@ public class Trader
 	 *          organisations). That's why you can set this <code>false</code>
 	 *          in order to call this method asynchronously. This param is
 	 *          ignored, if <code>allocate == false</code>.
-	 * @param enableXA This applies only if <code>allocateSynchronously==false</code>.
-	 *		It is passed to {@link #allocateArticles(User, Collection, boolean, boolean)}, which itself
-	 *		passes it to {@link AsyncInvoke#exec(Invocation, org.nightlabs.jfire.asyncinvoke.SuccessCallback, ErrorCallback, UndeliverableCallback, boolean)}.
 	 * @return Instances of {@link Article}.
 	 */
 	public Collection<? extends Article> createArticles(User user, Offer offer, Segment segment,
 			Collection<? extends Product> products, ArticleCreator articleCreator, boolean allocate,
-			boolean allocateSynchronously, boolean enableXA) throws ModuleException
+			boolean allocateSynchronously) throws ModuleException
 	{
 		Collection<? extends Article> articles = articleCreator.createProductArticles(this, user, offer,
 				segment, products);
@@ -822,7 +819,7 @@ public class Trader
 		if (allocate) {
 			// allocateArticle (re)creates the price already => no need to create the
 			// price.
-			allocateArticles(user, articles, allocateSynchronously, enableXA);
+			allocateArticles(user, articles, allocateSynchronously);
 		}
 		else {
 			// create the Articles' prices
@@ -846,11 +843,9 @@ public class Trader
 	 * @param synchronously
 	 *          Whether the second phase of allocation shall be done
 	 *          synchronously. Otherwise it will be done via {@link AsyncInvoke}.
-	 * @param enableXA This applies only if <code>synchronously==false</code> and it is passed to
-	 *		{@link AsyncInvoke#exec(Invocation, org.nightlabs.jfire.asyncinvoke.SuccessCallback, ErrorCallback, UndeliverableCallback, boolean)}
 	 */
 	public void allocateArticles(User user, Collection<? extends Article> articles,
-			boolean synchronously, boolean enableXA) throws ModuleException
+			boolean synchronously) throws ModuleException
 	{
 		try {
 			allocateArticlesBegin(user, articles); // allocateArticleBegin

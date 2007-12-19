@@ -48,7 +48,7 @@ import org.nightlabs.util.Util;
  *
  * @jdo.fetch-group name="Location.name" fields="name"
  * @jdo.fetch-group name="Location.city" fields="city"
- * @jdo.fetch-group name="Location.this" fields="city, district, geographySystem, name"
+ * @jdo.fetch-group name="Location.this" fields="city, district, name"
  */
 public class Location implements Serializable
 {
@@ -59,7 +59,7 @@ public class Location implements Serializable
 	
 	public static final String FETCH_GROUP_NAME = "Location.name";
 	public static final String FETCH_GROUP_CITY = "Location.city";
-	public static final String FETCH_GROUP_LOCATION_THIS = "Location.this";
+	public static final String FETCH_GROUP_THIS_LOCATION = "Location.this";
 
 	/**
 	 * 2-char-iso-code

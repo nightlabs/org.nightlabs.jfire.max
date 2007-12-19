@@ -554,7 +554,7 @@ implements SessionBean
 				null);
 
 		Collection articles = trader.createArticles(user, offer, segment, products,
-				new ArticleCreator(null), true, false, true);
+				new ArticleCreator(null), true, false);
 
 		return articles;
 	}

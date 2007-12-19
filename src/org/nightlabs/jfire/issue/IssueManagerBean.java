@@ -444,11 +444,11 @@ implements SessionBean{
 	 * @ejb.transaction type = "Required"
 	 * @ejb.permission role-name="_Guest_"
 	 */
-	public void signalIssue(IssueID invoiceID, String jbpmTransitionName)
+	public void signalIssue(IssueID issueID, String jbpmTransitionName)
 	{
 		PersistenceManager pm = getPersistenceManager();
 		try {
-			IssueLocal issueLocal = (IssueLocal) pm.getObjectById(IssueLocalID.create(invoiceID));
+			IssueLocal issueLocal = (IssueLocal) pm.getObjectById(IssueLocalID.create(issueID));
 			JbpmContext jbpmContext = JbpmLookup.getJbpmConfiguration().createJbpmContext();
 			try {
 				ProcessInstance processInstance = jbpmContext.getProcessInstanceForUpdate(issueLocal.getJbpmProcessInstanceId());

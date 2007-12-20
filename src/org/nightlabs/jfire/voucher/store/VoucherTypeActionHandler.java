@@ -160,7 +160,7 @@ public class VoucherTypeActionHandler
 	@Implement
 	public Collection<? extends Article> createCrossTradeArticles(
 			User user, Product localPackageProduct, Article localArticle,
-			String partnerOrganisationID, Hashtable partnerInitialContextProperties,
+			String partnerOrganisationID, Hashtable<?, ?> partnerInitialContextProperties,
 			Offer partnerOffer, OfferID partnerOfferID, SegmentID partnerSegmentID, ProductType nestedProductType, Collection<NestedProductType> nestedProductTypes) throws Exception
 	{
 		throw new UnsupportedOperationException("Vouchers cannot be traded accross organisations!");

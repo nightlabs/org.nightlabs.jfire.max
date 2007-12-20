@@ -31,6 +31,7 @@ import org.nightlabs.jfire.trade.ArticlePrice;
 import org.nightlabs.jfire.trade.Offer;
 import org.nightlabs.jfire.trade.id.OfferID;
 import org.nightlabs.jfire.trade.id.SegmentID;
+import org.nightlabs.util.CollectionUtil;
 
 /**
  * @author Marco Schulze - marco at nightlabs dot de
@@ -56,7 +57,7 @@ public class SimpleProductTypeActionHandler
 	 * @see ProductTypeActionHandler#ProductTypeActionHandler(String, String, Class)
 	 */
 	public SimpleProductTypeActionHandler(String organisationID,
-			String productTypeActionHandlerID, Class productTypeClass)
+			String productTypeActionHandlerID, Class<? extends SimpleProductType> productTypeClass)
 	{
 		super(organisationID, productTypeActionHandlerID, productTypeClass);
 	}
@@ -75,7 +76,7 @@ public class SimpleProductTypeActionHandler
 		// search for an available product
 		Query q = pm.newQuery(SimpleProduct.class);
 		q.setFilter("this.productType == :productType && this.productLocal.available");
-		Collection<? extends SimpleProduct> availableProducts = (Collection<? extends SimpleProduct>) q.execute(productType);
+		Collection<? extends SimpleProduct> availableProducts = CollectionUtil.castCollection((Collection<?>)q.execute(productType));
 		List<SimpleProduct> res = new ArrayList<SimpleProduct>();
 		Iterator<? extends SimpleProduct> iteratorAvailableProducts = availableProducts.iterator();
 		for (int i = 0; i < qty; ++i) {
@@ -109,7 +110,7 @@ public class SimpleProductTypeActionHandler
 	@Implement
 	public Collection<? extends Article> createCrossTradeArticles(
 			User user, Product localPackageProduct, Article localArticle,
-			String partnerOrganisationID, Hashtable partnerInitialContextProperties,
+			String partnerOrganisationID, Hashtable<?, ?> partnerInitialContextProperties,
 			Offer partnerOffer, OfferID partnerOfferID, SegmentID partnerSegmentID,
 			ProductType nestedProductType, Collection<NestedProductType> nestedProductTypes) throws Exception
 	{

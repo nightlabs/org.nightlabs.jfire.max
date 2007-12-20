@@ -108,7 +108,7 @@ public class SimpleProductTypeActionHandler
 	@Override
 	@SuppressWarnings("unchecked")
 	@Implement
-	public Collection<? extends Article> createCrossTradeArticles(
+	protected Collection<? extends Article> createCrossTradeArticles(
 			User user, Product localPackageProduct, Article localArticle,
 			String partnerOrganisationID, Hashtable<?, ?> partnerInitialContextProperties,
 			Offer partnerOffer, OfferID partnerOfferID, SegmentID partnerSegmentID,

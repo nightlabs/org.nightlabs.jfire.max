@@ -5,9 +5,15 @@ import java.util.Map;
 
 import javax.jdo.PersistenceManager;
 
+/**
+ * This is a simple cache managing a <code>Map&lt;Class&lt;? extends ProductType&gt;, ProductTypeActionHandler&gt;</code>
+ * in order to prevent unnecessary lookups. It can only be used within one transaction!
+ *
+ * @author marco
+ */
 public class ProductTypeActionHandlerCache
 {
-	private Map<Class, ProductTypeActionHandler> class2ProductTypeActionHandler = new HashMap<Class, ProductTypeActionHandler>();
+	private Map<Class<? extends ProductType>, ProductTypeActionHandler> class2ProductTypeActionHandler = new HashMap<Class<? extends ProductType>, ProductTypeActionHandler>();
 
 	private PersistenceManager pm;
 
@@ -29,7 +35,7 @@ public class ProductTypeActionHandlerCache
 		return getProductTypeActionHandler(productType.getClass());
 	}
 
-	public ProductTypeActionHandler getProductTypeActionHandler(Class productTypeClass)
+	public ProductTypeActionHandler getProductTypeActionHandler(Class<? extends ProductType> productTypeClass)
 	{
 		ProductTypeActionHandler ptah = class2ProductTypeActionHandler.get(productTypeClass);
 		if (ptah == null) {

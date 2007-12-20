@@ -1190,7 +1190,7 @@ public class Trader
 			// clear product's article and update all stati
 			ProductLocal productLocal = product.getProductLocal();
 			productLocal.setAllocated(false);
-			productLocal.setArticle(null);
+			productLocal.setSaleArticle(null);
 			article.setAllocated(false);
 			article.setReleasePending(false);
 
@@ -1337,14 +1337,14 @@ public class Trader
 
 			ProductLocal productLocal = product.getProductLocal();
 
-			if (productLocal.getArticle() != null)
+			if (productLocal.getSaleArticle() != null)
 				throw new NotAvailableException(
 						"The article '"
 								+ article.getPrimaryKey()
 								+ "' with product '"
 								+ product.getPrimaryKey()
 								+ "' cannot be allocated, because the product is already allocated in article '"
-								+ productLocal.getArticle().getPrimaryKey() + "'!");
+								+ productLocal.getSaleArticle().getPrimaryKey() + "'!");
 
 			if (!article.getOrganisationID().equals(product.getOrganisationID()))
 				throw new IllegalStateException("The article '"
@@ -1352,7 +1352,7 @@ public class Trader
 						+ "' has a different organisationID than the product '"
 						+ product.getPrimaryKey() + "'!");
 
-			productLocal.setArticle(article);
+			productLocal.setSaleArticle(article);
 			productLocal.setAllocationPending(true);
 			article.setAllocationPending(true);
 			IPackagePriceConfig packagePriceConfig = product.getProductType()

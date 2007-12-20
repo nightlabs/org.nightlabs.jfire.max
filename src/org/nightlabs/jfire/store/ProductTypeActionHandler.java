@@ -67,6 +67,7 @@ import org.nightlabs.jfire.trade.TradeManager;
 import org.nightlabs.jfire.trade.TradeManagerUtil;
 import org.nightlabs.jfire.trade.TradeSide;
 import org.nightlabs.jfire.trade.Trader;
+import org.nightlabs.jfire.trade.id.ArticleID;
 import org.nightlabs.jfire.trade.id.OfferID;
 import org.nightlabs.jfire.trade.id.OrderID;
 import org.nightlabs.jfire.trade.id.SegmentID;
@@ -262,7 +263,7 @@ public abstract class ProductTypeActionHandler
 	 * </p>
 	 * <p>
 	 * Dependent on your implementation, this method can create new instances of Products (e.g. if your products are not physical, an
-	 * on-the-fly creation might make sense) or simply search the storage area for existing ones.
+	 * on-the-fly creation might make sense) or simply search the store for existing ones.
 	 * </p>
 	 *
 	 * @param user The <code>User</code> who is responsible for this action.
@@ -277,14 +278,15 @@ public abstract class ProductTypeActionHandler
 
 
 	/**
-	 * This method is called on the client-side (i.e. the reseller-side) and needs to create {@link Article}s
+	 * This method is called on the client-side (i.e. the reseller-side) by {@link #importCrossTradeNestedProducts(User, ProductTypeActionHandlerCache, Product, String, Collection)}.
+	 * It needs to create {@link Article}s
 	 * (or specific decendents of the class {@link Article}) on the vendor-side. It must not persist them on
 	 * the client-side or do anything else except for creating them on the vendor-side and returning them.
 	 *
 	 * @param user The user who is creating the package-article and thus responsible for creating the nested (remote) <code>Product</code>s.
 	 * @param localPackageProduct The {@link Product} into which the nested products are put after having been obtained from the vendor.
 	 * @param localArticle The local {@link Article} which is a convenience (could be read from {@link Product#getProductLocal()} and
-	 *		{@link ProductLocal#getArticle()}).
+	 *		{@link ProductLocal#getSaleArticle()}).
 	 * @param partnerOrganisationID The ID of the vendor-organisation.
 	 * @param partnerInitialContextProperties This parameter is passed for convenience and performance reasons. This <code>Hashtable</code> contains
 	 *		initial-context-properties for communication with the vendor-organisation and can be passed to xdoclet-generated Util-classes - for
@@ -301,19 +303,33 @@ public abstract class ProductTypeActionHandler
 	 *		attached locally - this is done by the framework.
 	 * @throws Exception As this method communicates with a remote server and calls implementation-specific methods, it can throw a wide variety of exceptions.
 	 */
-	public abstract Collection<? extends Article> createCrossTradeArticles(
+	protected abstract Collection<? extends Article> createCrossTradeArticles(
 			User user, Product localPackageProduct, Article localArticle,
 			String partnerOrganisationID, Hashtable<?, ?> partnerInitialContextProperties,
 			Offer partnerOffer, OfferID partnerOfferID, SegmentID partnerSegmentID,
 			ProductType nestedProductType, Collection<NestedProductType> nestedProductTypes) throws Exception;
 
-	public Collection<? extends Article> importCrossTradeNestedProducts(
+	/**
+	 * This method is called on the client-side (i.e. the reseller-side) by {@link #assembleProduct(User, ProductTypeActionHandlerCache, Product)}
+	 * once for each supplier (i.e. partner-organisation which sells us the required nested products).
+	 *
+	 * @param user the current user responsible for this action.
+	 * @param productTypeActionHandlerCache cache for accessing {@link ProductTypeActionHandler}s faster.
+	 * @param packageProduct the <code>Product</code> which is currently assembled.
+	 * @param partnerOrganisationID refencing the organisation from which the nested products are purchased.
+	 * @param partnerNestedProductTypes all those {@link NestedProductType}s which reference {@link ProductType}s for the products to be purchased from the organisation referenced by <code>partnerOrganisationID</code>.
+	 * @return the purchase-{@link Article}s which are buying the required nested {@link Product}s for the given <code>partnerNestedProductTypes</code>
+	 * @throws ModuleException if sth. goes wrong - e.g. a {@link NotAvailableException} if the nested products cannot be bought (the supplier cannot supply us). 
+	 */
+	protected Collection<? extends Article> importCrossTradeNestedProducts(
 			User user, ProductTypeActionHandlerCache productTypeActionHandlerCache, Product packageProduct,
-			String partnerOrganisationID, Collection<NestedProductType> partnerNestedProductTypes)
+			String partnerOrganisationID, Collection<NestedProductType> partnerNestedProductTypes
+	)
+	throws ModuleException
 	{
 		try {
 			PersistenceManager pm = getPersistenceManager();
-			Article localArticle = packageProduct.getProductLocal().getArticle();
+			Article localArticle = packageProduct.getProductLocal().getSaleArticle();
 			Order localOrder = localArticle.getOrder();
 			Offer localOffer = localArticle.getOffer();
 			SegmentType segmentType = localArticle.getSegment().getSegmentType();
@@ -434,10 +450,21 @@ public abstract class ProductTypeActionHandler
 					if (articleProductTypeLocal == null)
 						throw new IllegalStateException("article.getProductType().getProductTypeLocal() == null for imported Article (" + article.getPrimaryKey() + "). ProductType: " + articleProductType.getPrimaryKey());
 
-//					Product product = store.addProduct(user, article.getProduct(), articleProductTypeLocal.getHome());
-					Product product = store.addProduct(user, article.getProduct());
+					Product product = article.getProduct();
+					if (product.getProductLocal() == null) // if it has already been bought at an earlier time, it already has a productLocal and doesn't need to be added to the store.
+						product = store.addProduct(user, product);
+
 					product.getProductLocal().setAssembled(true); // since we receive it from another organisation, we always assume that it's assembled.
 //					product.getProductLocal().setArticle(article); // pointing back to the article which delivers it to us - NO! we do not point back, because the same product[Local] can be in multiple Articles (when being reversed - and maybe even resold and again reversed and so on) - it's cleaner to find the Article by a query - see the static method in class Article!
+					// hmmm... I think it's better to have it point back. Maybe the contract should be this:
+					// * if the product is local (not from a business partner):
+					//   - productLocal.article is assigned, if allocated is true; it is null, if allocated is false
+					//   - productLocal.article points to the article in which the product is sold by the local organisation to a customer
+					//
+					// * if the product is imported from a business partner:
+					//   - productLocal.article points to the article in which the product is bought.
+					//   - when the product is sent back to the supplier, productLocal.article is nulled
+					product.getProductLocal().setPurchaseArticle(article);
 				}
 			}
 
@@ -463,7 +490,7 @@ public abstract class ProductTypeActionHandler
 	 *
 	 * @param user The user who is responsible.
 	 * @param product The product to be assembled.
-	 * @throws ModuleException
+	 * @throws ModuleException if sth. goes wrong - e.g. a {@link NotAvailableException} if the nested products cannot be bought (the supplier cannot supply us).
 	 */
 	public void assembleProduct(User user, ProductTypeActionHandlerCache productTypeActionHandlerCache, Product product)
 	throws ModuleException
@@ -612,6 +639,17 @@ public abstract class ProductTypeActionHandler
 		productLocal.setAssembled(true);
 	}
 
+	public void releaseCrossTradeArticles(
+			User user, Product localPackageProduct,
+			String partnerOrganisationID, Hashtable<?, ?> partnerInitialContextProperties,
+			Set<Article> partnerArticles
+	) throws Exception
+	{
+		PersistenceManager pm = getPersistenceManager();
+		TradeManager tm = TradeManagerUtil.getHome(Lookup.getInitialContextProperties(pm, partnerOrganisationID)).create();
+		Set<ArticleID> articleIDs = NLJDOHelper.getObjectIDSet(partnerArticles);
+		tm.releaseArticles(articleIDs, true, false, null, 1);
+	}
 
 	/**
 	 * @param user The responsible user
@@ -637,6 +675,8 @@ public abstract class ProductTypeActionHandler
 		// value: Set<Product> products
 		Map<Anchor, Set<Product>> nestedProductsByHome = new HashMap<Anchor, Set<Product>>();
 
+		Map<String, List<Product>> organisationID2partnerNestedProducts = null; // lazy creation
+
 		for (ProductLocal nestedProductLocal : product.getProductLocal().getNestedProductLocals()) {
 			Product nestedProduct = nestedProductLocal.getProduct();
 
@@ -653,14 +693,18 @@ public abstract class ProductTypeActionHandler
 				// If it has been delivered here but already delivered back, we do the same for the reversing articles.
 				// TODO check for this status!
 
-				
+				if (organisationID2partnerNestedProducts == null)
+					organisationID2partnerNestedProducts = new HashMap<String, List<Product>>();
+
+				List<Product> nestedProducts = organisationID2partnerNestedProducts.get(nestedProduct.getOrganisationID());
+				if (nestedProducts == null) {
+					nestedProducts = new ArrayList<Product>();
+					organisationID2partnerNestedProducts.put(nestedProduct.getOrganisationID(), nestedProducts);
+				}
+				nestedProducts.add(nestedProduct);
 
 				// And of course, we need to transfer the products from the package-product's home to the nested product's homes
-
-				
-
-				// TODO allow remote products - delegate to Trader!
-				throw new UnsupportedOperationException("NYI");
+				// TODO take care of the transfers - hmm... isn't this already done by the code below (nestedProductsByHome)???
 			}
 
 			// We need to transfer the nested product back to its home repositories and update productLocal.quantity
@@ -674,7 +718,31 @@ public abstract class ProductTypeActionHandler
 				nestedProductsByHome.put(nestedProductHome, nestedProducts);
 			}
 			nestedProducts.add(nestedProduct);
-		}
+		} // for (ProductLocal nestedProductLocal : product.getProductLocal().getNestedProductLocals()) {
+
+		if (organisationID2partnerNestedProducts != null) {
+			for (Map.Entry<String, List<Product>> me : organisationID2partnerNestedProducts.entrySet()) {
+				String partnerOrganisationID = me.getKey();
+				List<Product> nestedProducts = me.getValue();
+				Set<Article> partnerArticles = new HashSet<Article>(nestedProducts.size());
+
+				for (Product nestedProduct : nestedProducts) {
+					ProductLocal nestedProductLocal = nestedProduct.getProductLocal();
+					Article purchaseArticle = nestedProductLocal.getPurchaseArticle();
+					if (purchaseArticle != null)
+						partnerArticles.add(purchaseArticle);
+
+					nestedProductLocal.setPurchaseArticle(null);
+				}
+
+				try {
+					if (!partnerArticles.isEmpty())
+						releaseCrossTradeArticles(user, product, partnerOrganisationID, Lookup.getInitialContextProperties(pm, partnerOrganisationID), partnerArticles);
+				} catch (Exception e) {
+					throw new RuntimeException(e);
+				}
+			} // for (Map.Entry<String, List<Product>> me : organisationID2partnerNestedProducts.entrySet()) {
+		} // if (organisationID2partnerNestedProducts != null) {
 
 		// create the ProductTransfers for the grouped nested products
 		Set<Anchor> involvedAnchors = new HashSet<Anchor>();

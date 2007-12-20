@@ -55,13 +55,13 @@ import org.nightlabs.jfire.transfer.Anchor;
  *
  * @jdo.create-objectid-class field-order="organisationID, productID"
  *
- * @jdo.fetch-group name="ProductLocal.article" fields="article"
+ * @jdo.fetch-group name="ProductLocal.saleArticle" fields="saleArticle"
  */
 public class ProductLocal
 implements Serializable
 {
 	// TODO create fetch-groups for all object-fields
-	public static final String FETCH_GROUP_ARTICLE = "ProductLocal.article";
+	public static final String FETCH_GROUP_ARTICLE = "ProductLocal.saleArticle";
 
 //	/**
 //	 * This method creates a new instance of <code>ProductLocal</code> if it is necessesary. If there exists
@@ -118,16 +118,22 @@ implements Serializable
 	private Product product;
 
 	/**
-	 * A <tt>Product</tt> can only be allocated in one article. But all Articles hold
+	 * A <tt>Product</tt> can only be allocated in one saleArticle. But all Articles hold
 	 * a reference of the <tt>Product</tt> even after they have been released (to allow
 	 * re-allocation).
 	 * <p>
-	 * When <code>article</code> is set, {@link #allocationPending} is set to <code>true</code>.
+	 * When <code>saleArticle</code> is set, {@link #allocationPending} is set to <code>true</code>.
 	 * </p>
 	 *
 	 * @jdo.field persistence-modifier="persistent"
 	 */
-	private Article article = null;
+	private Article saleArticle = null;
+
+	/**
+	 * This field references the article by which a product has been purchased. It therefore references
+	 * the same article as {@link #saleArticle} does in the {@link ProductLocal} on the vendor-side.
+	 */
+	private Article purchaseArticle = null;
 
 	/**
 	 * @see #isAvailable()
@@ -154,7 +160,7 @@ implements Serializable
 	 * A <tt>Product</tt> is allocated when all packaged products are either already in
 	 * the local store or allocated in backhand orders and therefore themselves
 	 * ready for being sold in the package of this <tt>Product</tt>. In short: a Product is
-	 * always allocated, if the {@link Article} referenced by {@link #article} is allocated.
+	 * always allocated, if the {@link Article} referenced by {@link #saleArticle} is allocated.
 	 * <p>
 	 * Note, that assembling a Product can be done asynchronously. Therefore a Product
 	 * can have the state {@link #allocationPending}.
@@ -453,22 +459,44 @@ implements Serializable
 //	}
 
 	/**
-	 * @return Returns the article.
+	 * Get the currently assigned <code>Article</code>. This is always a "normal" saleArticle - never a reversing one.
+	 * <p>
+	 * </p>
+	 *
+	 * @return Returns the saleArticle or <code>null</code>.
+	 * @see #setSaleArticle(Article)
 	 */
-	public Article getArticle()
+	public Article getSaleArticle()
 	{
-		return article;
+		return saleArticle;
 	}
 	/**
-	 * This method simply sets the field {@link #article}. It does not do any complex
+	 * This method simply sets the field {@link #saleArticle}. It does not do any complex
 	 * logic (like iterating nested products or contacting other organisations).
 	 *
-	 * @param article The article to set.
+	 * @param saleArticle The saleArticle to set. This is always a "normal" saleArticle - never a reversing saleArticle.
+	 * @see #getSaleArticle()
 	 */
-	public void setArticle(Article article)
+	public void setSaleArticle(Article saleArticle)
 	{
-		this.article = article;
+		if (saleArticle != null && saleArticle.isReversing())
+			throw new IllegalArgumentException("saleArticle must not be reversing!");
+
+		this.saleArticle = saleArticle;
 	}
+
+	public Article getPurchaseArticle()
+	{
+		return purchaseArticle;
+	}
+	public void setPurchaseArticle(Article purchaseArticle)
+	{
+		if (purchaseArticle != null && purchaseArticle.isReversing())
+			throw new IllegalArgumentException("purchaseArticle must not be reversing!");
+
+		this.purchaseArticle = purchaseArticle;
+	}
+
 	public boolean isAssembled()
 	{
 		return assembled;

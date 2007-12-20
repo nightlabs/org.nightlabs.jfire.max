@@ -188,7 +188,7 @@ implements Serializable
 	 * <code>ProductType</code> knows the <code>ProductType</code>s it is packaging
 	 * (which is usually the case - not the other way around).
 	 * You can obtain the {@link Article} in which this <code>Product</code> is wrapped
-	 * by {@link #getProductLocal()} and {@link ProductLocal#getArticle()}, in case you're interested.
+	 * by {@link #getProductLocal()} and {@link ProductLocal#getSaleArticle()}, in case you're interested.
 	 *
 	 * @param user The <code>User</code> who is responsible for this action.
 	 * @param nestedProductType The <code>NestedProductType</code> for which to create a <code>ProductLocator</code>.

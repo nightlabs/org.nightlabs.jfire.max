@@ -114,7 +114,7 @@ public class ServerPaymentProcessorVoucher
 		if (VoucherKey.VALIDITY_VALID != voucherKey.getValidity())
 			throw new IllegalStateException("Voucher not valid! VoucherKey=" + paymentData.getVoucherKey()); // TODO this should be another exception - or we check for it already in the ClientDeliveryProcessor.
 
-		Article article = voucherKey.getVoucher().getProductLocal().getArticle();
+		Article article = voucherKey.getVoucher().getProductLocal().getSaleArticle();
 		if (article == null)
 			throw new IllegalStateException("No Article! VoucherKey=" + paymentData.getVoucherKey()); // TODO this should be another exception - or we check for it already in the ClientDeliveryProcessor.
 

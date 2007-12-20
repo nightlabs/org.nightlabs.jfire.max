@@ -71,7 +71,7 @@ implements DetachCallback
 		if (nominalValue_detached)
 			return nominalValue;
 
-		Article article = getArticle();
+		Article article = getSaleArticle();
 		if (article == null)
 			return null;
 

@@ -16,8 +16,8 @@ extends AbstractVoucherScript
 	public Object doExecute() throws ScriptException 
 	{
 		Voucher voucher = getVoucher();
-		long amount = voucher.getProductLocal().getArticle().getPrice().getAmount();
-		Currency currency = voucher.getProductLocal().getArticle().getPrice().getCurrency();
+		long amount = voucher.getProductLocal().getSaleArticle().getPrice().getAmount();
+		Currency currency = voucher.getProductLocal().getSaleArticle().getPrice().getCurrency();
 		return NumberFormatter.formatCurrency(amount, currency);
 	}
 

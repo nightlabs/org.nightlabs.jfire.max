@@ -28,7 +28,6 @@ package org.nightlabs.jfire.transfer;
 
 import java.io.Serializable;
 import java.util.Collection;
-import java.util.Iterator;
 import java.util.Map;
 import java.util.Set;
 
@@ -262,18 +261,16 @@ public abstract class Anchor
 //		transfers.put(transfer.getPrimaryKey(), transfer);
 //	}
 
-	public static void checkIntegrity(Collection<Transfer> containers, Set<Anchor> involvedAnchors)
+	public static void checkIntegrity(Collection<? extends Transfer> containers, Set<? extends Anchor> involvedAnchors)
 	{
-		for (Iterator it = involvedAnchors.iterator(); it.hasNext(); ) {
-			Anchor anchor = (Anchor) it.next();
+		for (Anchor anchor : involvedAnchors) {
 			anchor.checkIntegrity(containers);
 		}
 	}
 
-	public static void resetIntegrity(Collection<Transfer> containers, Set<Anchor> involvedAnchors)
+	public static void resetIntegrity(Collection<? extends Transfer> containers, Set<? extends Anchor> involvedAnchors)
 	{
-		for (Iterator it = involvedAnchors.iterator(); it.hasNext(); ) {
-			Anchor anchor = (Anchor) it.next();
+		for (Anchor anchor : involvedAnchors) {
 			anchor.resetIntegrity(containers);
 		}
 	}
@@ -292,7 +289,7 @@ public abstract class Anchor
 	 *		They contain all the other transfers (them pointing to this
 	 *		one with {@link Transfer#getContainer()}.
 	 */
-	public abstract void checkIntegrity(Collection<Transfer> containers);
+	public abstract void checkIntegrity(Collection<? extends Transfer> containers);
 
 	/**
 	 * This method is called on all involved anchors after {@link #checkIntegrity(Collection)} failed on one
@@ -302,7 +299,7 @@ public abstract class Anchor
 	 *
 	 * @param containers
 	 */
-	public abstract void resetIntegrity(Collection<Transfer> containers);
+	public abstract void resetIntegrity(Collection<? extends Transfer> containers);
 
 	protected PersistenceManager getPersistenceManager()
 	{

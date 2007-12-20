@@ -271,7 +271,7 @@ public class LegalEntity extends Anchor
 	};
 
 	@Override
-	public void checkIntegrity(Collection<Transfer> containers)
+	public void checkIntegrity(Collection<? extends Transfer> containers)
 	{
 		Transfer firstContainer = containers.iterator().next();
 
@@ -296,7 +296,7 @@ public class LegalEntity extends Anchor
 	}
 
 	@Override
-	public void resetIntegrity(Collection<Transfer> containers)
+	public void resetIntegrity(Collection<? extends Transfer> containers)
 	{
 		Transfer firstContainer = containers.iterator().next();
 

@@ -254,11 +254,11 @@ public class Repository extends Anchor
 //	}
 
 	@Override
-	public void checkIntegrity(Collection<Transfer> containers)
+	public void checkIntegrity(Collection<? extends Transfer> containers)
 	{
 	}
 	@Override
-	public void resetIntegrity(Collection<Transfer> containers)
+	public void resetIntegrity(Collection<? extends Transfer> containers)
 	{
 	}
 

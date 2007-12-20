@@ -388,13 +388,13 @@ public class Account extends Anchor
 	}
 
 	@Override
-	public void checkIntegrity(Collection<Transfer> containers)
+	public void checkIntegrity(Collection<? extends Transfer> containers)
 	{
 		// here we might check later, whether allowed credit limits have been exceeded
 	}
 
 	@Override
-	public void resetIntegrity(Collection<Transfer> containers)
+	public void resetIntegrity(Collection<? extends Transfer> containers)
 	{
 	}
 

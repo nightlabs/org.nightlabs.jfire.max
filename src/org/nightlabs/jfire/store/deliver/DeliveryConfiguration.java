@@ -28,6 +28,7 @@ package org.nightlabs.jfire.store.deliver;
 
 import java.io.Serializable;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
@@ -105,7 +106,7 @@ implements Serializable
 	 *
 	 * @jdo.join
 	 */
-	private Map modeOfDeliveries;
+	private Map<String, ModeOfDelivery> modeOfDeliveries;
 
 	/**
 	 * key: String primaryKey<br/>
@@ -121,7 +122,7 @@ implements Serializable
 	 *
 	 * @jdo.join
 	 */
-	private Map modeOfDeliveryFlavours;
+	private Map<String, ModeOfDeliveryFlavour> modeOfDeliveryFlavours;
 
 
 	/**
@@ -221,7 +222,7 @@ implements Serializable
 	 *
 	 * @jdo.join
 	 */
-	private Map includedServerDeliveryProcessors;
+	private Map<String, ServerDeliveryProcessor> includedServerDeliveryProcessors;
 
 	/**
 	 * This <tt>Map</tt> allows to specify a certain subset of server-sided processors
@@ -242,7 +243,7 @@ implements Serializable
 	 *
 	 * @jdo.join
 	 */
-	private Map excludedServerDeliveryProcessors;
+	private Map<String, ServerDeliveryProcessor> excludedServerDeliveryProcessors;
 
 	/**
 	 * This <tt>Set</tt> allows to specify a certain subset of client-sided processors
@@ -259,7 +260,7 @@ implements Serializable
 	 *
 	 * @jdo.join
 	 */
-	private Set includedClientDeliveryProcessorFactoryIDs;
+	private Set<String> includedClientDeliveryProcessorFactoryIDs;
 
 	/**
 	 * This <tt>Set</tt> allows to specify a certain subset of client-sided processors
@@ -276,7 +277,7 @@ implements Serializable
 	 *
 	 * @jdo.join
 	 */
-	private Set excludedClientDeliveryProcessorFactoryIDs;
+	private Set<String> excludedClientDeliveryProcessorFactoryIDs;
 
 	/**
 	 * @jdo.field persistence-modifier="persistent" dependent="true" mapped-by="deliveryConfiguration"
@@ -301,12 +302,12 @@ implements Serializable
 
 		name = new DeliveryConfigurationName(this);
 
-		modeOfDeliveries = new HashMap();
-		modeOfDeliveryFlavours = new HashMap();
-		includedServerDeliveryProcessors = new HashMap();
-		excludedServerDeliveryProcessors = new HashMap();
-		includedClientDeliveryProcessorFactoryIDs = new HashSet();
-		excludedClientDeliveryProcessorFactoryIDs = new HashSet();
+		modeOfDeliveries = new HashMap<String, ModeOfDelivery>();
+		modeOfDeliveryFlavours = new HashMap<String, ModeOfDeliveryFlavour>();
+		includedServerDeliveryProcessors = new HashMap<String, ServerDeliveryProcessor>();
+		excludedServerDeliveryProcessors = new HashMap<String, ServerDeliveryProcessor>();
+		includedClientDeliveryProcessorFactoryIDs = new HashSet<String>();
+		excludedClientDeliveryProcessorFactoryIDs = new HashSet<String>();
 	}
 
 	/**
@@ -333,8 +334,7 @@ implements Serializable
 	}
 	public void addModeOfDelivery(ModeOfDelivery modeOfDelivery)
 	{
-		modeOfDeliveries.put(
-				modeOfDelivery.getPrimaryKey(), modeOfDelivery);
+		modeOfDeliveries.put(modeOfDelivery.getPrimaryKey(), modeOfDelivery);
 	}
 
 	public void removeModeOfDelivery(ModeOfDelivery modeOfDelivery)
@@ -353,15 +353,14 @@ implements Serializable
 	/**
 	 * @return Returns the modeOfDeliveries.
 	 */
-	public Collection getModeOfDeliveries()
+	public Collection<ModeOfDelivery> getModeOfDeliveries()
 	{
-		return modeOfDeliveries.values();
+		return Collections.unmodifiableCollection(modeOfDeliveries.values());
 	}
 
 	public void addModeOfDeliveryFlavour(ModeOfDeliveryFlavour modeOfDeliveryFlavour)
 	{
-		modeOfDeliveryFlavours.put(
-				modeOfDeliveryFlavour.getPrimaryKey(), modeOfDeliveryFlavour);
+		modeOfDeliveryFlavours.put(modeOfDeliveryFlavour.getPrimaryKey(), modeOfDeliveryFlavour);
 	}
 
 	public void removeModeOfDeliveryFlavour(ModeOfDeliveryFlavour modeOfDeliveryFlavour)
@@ -380,9 +379,9 @@ implements Serializable
 	/**
 	 * @return Returns the modeOfDeliveryFlavours.
 	 */
-	public Collection getModeOfDeliveryFlavours()
+	public Collection<ModeOfDeliveryFlavour> getModeOfDeliveryFlavours()
 	{
-		return modeOfDeliveryFlavours.values();
+		return Collections.unmodifiableCollection(modeOfDeliveryFlavours.values());
 	}
 
 	/**

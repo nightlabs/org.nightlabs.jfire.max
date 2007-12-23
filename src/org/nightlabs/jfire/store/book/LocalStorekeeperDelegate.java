@@ -32,6 +32,7 @@ import java.util.Set;
 import javax.jdo.JDOHelper;
 import javax.jdo.PersistenceManager;
 
+import org.nightlabs.jdo.ObjectIDUtil;
 import org.nightlabs.jfire.security.User;
 import org.nightlabs.jfire.store.DeliveryNote;
 import org.nightlabs.jfire.store.Store;
@@ -49,6 +50,7 @@ import org.nightlabs.jfire.transfer.Anchor;
  *		table="JFireTrade_LocalStorekeeperDelegate"
  *
  * @jdo.inheritance strategy="new-table"
+ * @jdo.inheritance-discriminator strategy="class-name"
  *
  * @jdo.create-objectid-class
  *		field-order="organisationID, localStorekeeperDelegateID"
@@ -75,6 +77,8 @@ implements Serializable
 
 	public LocalStorekeeperDelegate(String organisationID, String localStorekeeperDelegateID)
 	{
+		ObjectIDUtil.assertValidIDString(organisationID, "organisationID");
+		ObjectIDUtil.assertValidIDString(localStorekeeperDelegateID, "localStorekeeperDelegateID");
 		this.organisationID = organisationID;
 		this.localStorekeeperDelegateID = localStorekeeperDelegateID;
 	}

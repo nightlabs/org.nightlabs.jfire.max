@@ -653,7 +653,7 @@ public abstract class ProductTypeActionHandler
 
 	/**
 	 * @param user The responsible user
-	 * @param onRelease Whether this method is called during the release method. Hence, a Product
+	 * @param onRelease Whether this method is called during the release method. Hence, a ProductTypeActionHandler for a certain implememtation of Product
 	 *		might decide not to disassemble, if this is <code>true</code>.
 	 */
 	public void disassembleProduct(User user, ProductTypeActionHandlerCache productTypeActionHandlerCache, Product product, boolean onRelease)

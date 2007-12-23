@@ -32,11 +32,11 @@ import java.util.LinkedList;
 import java.util.Map;
 import java.util.Set;
 
-import javax.jdo.JDOHelper;
 import javax.jdo.JDOObjectNotFoundException;
 import javax.jdo.PersistenceManager;
 
 import org.nightlabs.jfire.organisation.LocalOrganisation;
+import org.nightlabs.jfire.security.SecurityReflector;
 import org.nightlabs.jfire.security.User;
 import org.nightlabs.jfire.store.DeliveryNote;
 import org.nightlabs.jfire.store.ProductTransfer;
@@ -68,40 +68,39 @@ import org.nightlabs.jfire.transfer.Transfer;
  *		identity-type="application"
  *		persistence-capable-superclass="LocalStorekeeperDelegate"
  *		detachable="true"
- *		table="JFireTrade_DefaultLocalStorekeeperDelegate"
  *
- * @jdo.inheritance strategy="new-table"
+ * @jdo.inheritance strategy="superclass-table"
  */
 public class DefaultLocalStorekeeperDelegate extends LocalStorekeeperDelegate
 {
 	private static final long serialVersionUID = 1L;
 
-	private static LocalStorekeeperDelegateID localStorekeeperDelegateID = null;
-
 	public static DefaultLocalStorekeeperDelegate getDefaultLocalStorekeeperDelegate(PersistenceManager pm)
 	{
-		String organisationID = null;
+		String organisationID = LocalOrganisation.getLocalOrganisation(pm).getOrganisationID();
+
+		// TODO remove this debug stuff
+		{
+			String securityReflectorOrganisationID = SecurityReflector.getUserDescriptor().getOrganisationID();
+			if (!securityReflectorOrganisationID.equals(organisationID))
+				throw new IllegalStateException("SecurityReflector returned organisationID " + securityReflectorOrganisationID + " but LocalOrganisation.organisationID=" + organisationID);
+		}
+		// TODO end debug
+
+		LocalStorekeeperDelegateID localStorekeeperDelegateID = LocalStorekeeperDelegateID.create(
+					organisationID,
+					DefaultLocalStorekeeperDelegate.class.getName()
+		);
+
 		pm.getExtent(DefaultLocalStorekeeperDelegate.class);
 		try {
-			if (localStorekeeperDelegateID == null) {
-				if (organisationID == null)
-					organisationID = LocalOrganisation.getLocalOrganisation(pm).getOrganisationID();
-
-				localStorekeeperDelegateID = LocalStorekeeperDelegateID.create(
-						organisationID,
-						DefaultLocalStorekeeperDelegate.class.getName());
-			}
 			return (DefaultLocalStorekeeperDelegate) pm.getObjectById(localStorekeeperDelegateID);
 		} catch (JDOObjectNotFoundException x) {
-			if (organisationID == null)
-				organisationID = LocalOrganisation.getLocalOrganisation(pm).getOrganisationID();
-
 			DefaultLocalStorekeeperDelegate delegate = new DefaultLocalStorekeeperDelegate(
-					organisationID,
-					DefaultLocalStorekeeperDelegate.class.getName());
-			delegate = pm.makePersistent(delegate);
-			localStorekeeperDelegateID = (LocalStorekeeperDelegateID) JDOHelper.getObjectId(delegate);
-			return delegate;
+					localStorekeeperDelegateID.organisationID,
+					localStorekeeperDelegateID.localStorekeeperDelegateID
+			);
+			return pm.makePersistent(delegate);
 		}
 	}
 
@@ -111,8 +110,7 @@ public class DefaultLocalStorekeeperDelegate extends LocalStorekeeperDelegate
 	@Deprecated
 	protected DefaultLocalStorekeeperDelegate() { }
 
-	public DefaultLocalStorekeeperDelegate(String organisationID,
-			String localStorekeeperDelegateID)
+	public DefaultLocalStorekeeperDelegate(String organisationID, String localStorekeeperDelegateID)
 	{
 		super(organisationID, localStorekeeperDelegateID);
 	}

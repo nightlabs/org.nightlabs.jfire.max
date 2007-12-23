@@ -58,6 +58,8 @@ import org.nightlabs.jfire.transfer.Anchor;
  *		detachable="true"
  *		table="JFireTrade_LocalAccountantDelegate"
  *
+ * @jdo.inheritance-discriminator strategy="class-name"
+ *
  * @jdo.create-objectid-class
  *		field-order="organisationID, localAccountantDelegateID"
  *

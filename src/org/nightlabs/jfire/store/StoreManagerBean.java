@@ -68,6 +68,7 @@ import org.nightlabs.jfire.jbpm.JbpmLookup;
 import org.nightlabs.jfire.jbpm.graph.def.ProcessDefinition;
 import org.nightlabs.jfire.organisation.Organisation;
 import org.nightlabs.jfire.security.User;
+import org.nightlabs.jfire.store.book.DefaultLocalStorekeeperDelegate;
 import org.nightlabs.jfire.store.deliver.CheckRequirementsEnvironment;
 import org.nightlabs.jfire.store.deliver.CrossTradeDeliveryCoordinator;
 import org.nightlabs.jfire.store.deliver.Delivery;
@@ -199,6 +200,7 @@ implements SessionBean
 				// not yet initialized
 			}
 
+			DefaultLocalStorekeeperDelegate.getDefaultLocalStorekeeperDelegate(pm);
 
 //			// create the essential DeliveryNoteStateDefinitions
 //			JbpmConstantsDeliveryNote deliveryNoteStateDefinitionUtil;

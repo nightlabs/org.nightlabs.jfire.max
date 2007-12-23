@@ -28,11 +28,9 @@ package org.nightlabs.jfire.store.deliver;
 import java.io.Serializable;
 import java.rmi.RemoteException;
 import java.util.HashSet;
-import java.util.Iterator;
 import java.util.Set;
 
 import javax.ejb.CreateException;
-import javax.jdo.FetchPlan;
 import javax.jdo.JDOHelper;
 import javax.jdo.JDOObjectNotFoundException;
 import javax.jdo.PersistenceManager;
@@ -40,9 +38,7 @@ import javax.naming.NamingException;
 
 import org.apache.log4j.Logger;
 import org.nightlabs.ModuleException;
-import org.nightlabs.annotation.Implement;
 import org.nightlabs.jdo.NLJDOHelper;
-import org.nightlabs.jfire.asyncinvoke.Invocation;
 import org.nightlabs.jfire.base.Lookup;
 import org.nightlabs.jfire.idgenerator.IDGenerator;
 import org.nightlabs.jfire.organisation.Organisation;
@@ -174,31 +170,31 @@ public class CrossTradeDeliveryCoordinator implements Serializable
 		return pm;
 	}
 
-	public static final String[] FETCH_GROUPS_DELIVERY_NOTE = new String[] {
-			FetchPlan.DEFAULT,
-			DeliveryNote.FETCH_GROUP_ARTICLES,
-			DeliveryNote.FETCH_GROUP_CREATE_USER,
-			DeliveryNote.FETCH_GROUP_CUSTOMER,
-			DeliveryNote.FETCH_GROUP_FINALIZE_USER,
-			DeliveryNote.FETCH_GROUP_VENDOR,
-//			Article.FETCH_GROUP_ORDER, // should already be set - no need to detach
-//			Article.FETCH_GROUP_OFFER, // should already be set - no need to detach
-			Article.FETCH_GROUP_INVOICE,
-			Article.FETCH_GROUP_DELIVERY_NOTE,
-	};
+//	public static final String[] FETCH_GROUPS_DELIVERY_NOTE = new String[] {
+//			FetchPlan.DEFAULT,
+//			DeliveryNote.FETCH_GROUP_ARTICLES,
+//			DeliveryNote.FETCH_GROUP_CREATE_USER,
+//			DeliveryNote.FETCH_GROUP_CUSTOMER,
+//			DeliveryNote.FETCH_GROUP_FINALIZE_USER,
+//			DeliveryNote.FETCH_GROUP_VENDOR,
+////			Article.FETCH_GROUP_ORDER, // should already be set - no need to detach
+////			Article.FETCH_GROUP_OFFER, // should already be set - no need to detach
+//			Article.FETCH_GROUP_INVOICE,
+//			Article.FETCH_GROUP_DELIVERY_NOTE,
+//	};
 
-	protected static class PerformDeliveryInvocation extends Invocation
-	{
-		@Override
-		@Implement
-		public Serializable invoke()
-		throws Exception
-		{
-			
-
-			return null;
-		}
-	}
+//	protected static class PerformDeliveryInvocation extends Invocation
+//	{
+//		@Override
+//		@Implement
+//		public Serializable invoke()
+//		throws Exception
+//		{
+//			
+//
+//			return null;
+//		}
+//	}
 
 	/**
 	 * Perform a delivery between two organisations.
@@ -283,35 +279,38 @@ public class CrossTradeDeliveryCoordinator implements Serializable
 			StoreManager localStoreManager = createStoreManager(null);
 			StoreManager remoteStoreManager = createStoreManager(partner.getOrganisationID());
 
-			Set articlesMissingDeliveryNote = new HashSet(articles.size());
-			for (Iterator itA = articles.iterator(); itA.hasNext(); ) {
-				Article article = (Article) itA.next();
+			Set<Article> articlesMissingDeliveryNote = new HashSet<Article>(articles.size());
+			for (Article article : articles) {
 				if (article.getDeliveryNote() == null)
 					articlesMissingDeliveryNote.add(article);
 			}
 
 			// before we deliver, we have to create a DeliveryNote
-			{
-				// TODO why does this work? Shouldn't the transaction on the remote side be pending as
-				// long as this one here is? We use XA - hence, it seems that XA doesn't work. Is this
-				// due to our CascadedAuthentication stuff?
-				// Once the XA works fine, we need to create (and use here) a 2nd method which is tagged
-				// @ejb.transaction type="RequiresNew"
-				DeliveryNote deliveryNote;
-				deliveryNote = remoteStoreManager.createDeliveryNote(
-						NLJDOHelper.getObjectIDList(articlesMissingDeliveryNote),
-						null, // deliveryNoteIDPrefix => use default
-						true,
-						FETCH_GROUPS_DELIVERY_NOTE, NLJDOHelper.MAX_FETCH_DEPTH_NO_LIMIT);
+			if (!articlesMissingDeliveryNote.isEmpty()) {
+//				// TODO why does this work? Shouldn't the transaction on the remote side be pending as
+//				// long as this one here is? We use XA - hence, it seems that XA doesn't work. Is this
+//				// due to our CascadedAuthentication stuff?
+//				// Once the XA works fine, we need to create (and use here) a 2nd method which is tagged
+//				// @ejb.transaction type="RequiresNew"
+//				DeliveryNote deliveryNote;
+//				deliveryNote = remoteStoreManager.createDeliveryNote(
+//						NLJDOHelper.getObjectIDList(articlesMissingDeliveryNote),
+//						null, // deliveryNoteIDPrefix => use default
+//						true,
+//						FETCH_GROUPS_DELIVERY_NOTE, NLJDOHelper.MAX_FETCH_DEPTH_NO_LIMIT);
+//
+//				// Locally, the transactions work fine and cause a problem:
+//				// Because we cannot deliver locally without the DeliveryNote
+//				// and the current transaction is not yet finished when the
+//				// delivery is performed in *separate* transactions, we delegate this
+//				// to a sub-transaction as well.
+//				StoreManagerHelperLocal storeManagerHelperLocal = StoreManagerHelperUtil.getLocalHome().create();
+//				storeManagerHelperLocal.storeDeliveryNoteFromVendorOrganisation(deliveryNote);
+////				storeManagerHelperLocal.testDeliveryNote((DeliveryNoteID) JDOHelper.getObjectId(deliveryNote));
 
-				// Locally, the transactions work fine and cause a problem:
-				// Because we cannot deliver locally without the DeliveryNote
-				// and the current transaction is not yet finished when the
-				// delivery is performed in *separate* transactions, we delegate this
-				// to a sub-transaction as well.
 				StoreManagerHelperLocal storeManagerHelperLocal = StoreManagerHelperUtil.getLocalHome().create();
-				storeManagerHelperLocal.storeDeliveryNoteFromVendorOrganisation(deliveryNote);
-//				storeManagerHelperLocal.testDeliveryNote((DeliveryNoteID) JDOHelper.getObjectId(deliveryNote));
+				Set<ArticleID> articleIDs = NLJDOHelper.getObjectIDSet(articlesMissingDeliveryNote);
+				storeManagerHelperLocal.createAndReplicateVendorDeliveryNote(articleIDs);
 			}
 
 			// from and to are now defined and we have to create a Delivery

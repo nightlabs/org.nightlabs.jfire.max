@@ -27,19 +27,25 @@
 package org.nightlabs.jfire.store;
 
 import java.rmi.RemoteException;
+import java.util.Set;
 
 import javax.ejb.CreateException;
 import javax.ejb.EJBException;
 import javax.ejb.SessionBean;
 import javax.ejb.SessionContext;
+import javax.jdo.FetchPlan;
 import javax.jdo.JDOHelper;
 import javax.jdo.PersistenceManager;
 
 import org.nightlabs.ModuleException;
+import org.nightlabs.jdo.NLJDOHelper;
 import org.nightlabs.jfire.base.BaseSessionBeanImpl;
+import org.nightlabs.jfire.base.Lookup;
 import org.nightlabs.jfire.security.User;
+import org.nightlabs.jfire.store.id.DeliveryNoteID;
 import org.nightlabs.jfire.trade.Article;
 import org.nightlabs.jfire.trade.TradeSide;
+import org.nightlabs.jfire.trade.id.ArticleID;
 import org.nightlabs.jfire.trade.jbpm.ProcessDefinitionAssignment;
 import org.nightlabs.jfire.trade.jbpm.id.ProcessDefinitionAssignmentID;
 
@@ -87,16 +93,51 @@ implements SessionBean
 		super.unsetSessionContext();
 	}
 
+	private static final String[] FETCH_GROUPS_DELIVERY_NOTE = new String[] {
+		FetchPlan.DEFAULT,
+		DeliveryNote.FETCH_GROUP_ARTICLES,
+		DeliveryNote.FETCH_GROUP_CREATE_USER,
+		DeliveryNote.FETCH_GROUP_CUSTOMER,
+		DeliveryNote.FETCH_GROUP_FINALIZE_USER,
+		DeliveryNote.FETCH_GROUP_VENDOR,
+//		Article.FETCH_GROUP_ORDER, // should already be set - no need to detach
+//		Article.FETCH_GROUP_OFFER, // should already be set - no need to detach
+		Article.FETCH_GROUP_INVOICE,
+		Article.FETCH_GROUP_DELIVERY_NOTE,
+	};
+
 	/**
 	 * @ejb.interface-method view-type="local"
 	 * @ejb.transaction type="RequiresNew"
 	 * @ejb.permission role-name="_Guest_"
 	 */
-	public void storeDeliveryNoteFromVendorOrganisation(DeliveryNote deliveryNote)
-	throws ModuleException
+	public DeliveryNoteID createAndReplicateVendorDeliveryNote(Set<ArticleID> articleIDs)
+	throws Exception
 	{
 		PersistenceManager pm = getPersistenceManager();
 		try {
+			if (articleIDs.isEmpty())
+				throw new IllegalArgumentException("articleIDs is empty!");
+
+			String partnerOrganisationID = null;
+			for (ArticleID articleID : articleIDs) {
+				if (partnerOrganisationID == null)
+					partnerOrganisationID = articleID.organisationID;
+				else if (!partnerOrganisationID.equals(articleID.organisationID))
+					throw new IllegalArgumentException("OrganisationID mismatch! All articles need to be from the same organisation! " + partnerOrganisationID + " != " + articleID.organisationID);
+			}
+
+			StoreManager remoteStoreManager = StoreManagerUtil.getHome(
+					Lookup.getInitialContextProperties(getPersistenceManager(), partnerOrganisationID)
+			).create();
+
+			DeliveryNote deliveryNote;
+			deliveryNote = remoteStoreManager.createDeliveryNote(
+					articleIDs,
+					null, // deliveryNoteIDPrefix => use default
+					true,
+					FETCH_GROUPS_DELIVERY_NOTE, NLJDOHelper.MAX_FETCH_DEPTH_NO_LIMIT);
+
 			for (Article article : deliveryNote.getArticles()) { // TODO JPOX WORKAROUND: JPOX doesn't store the data again, because it does some optimization and doesn't recognize that the datastore is different.
 				article.setDeliveryNote(deliveryNote);
 				// TODO JPOX WORKAROUND: JDOHelper.makeDirty(...) doesn't work with detached objects :-( At least it didn't a while ago. Please tell me when this is fixed. Marco :-)
@@ -112,6 +153,10 @@ implements SessionBean
 			ProcessDefinitionAssignment processDefinitionAssignment = (ProcessDefinitionAssignment) getPersistenceManager().getObjectById(
 					ProcessDefinitionAssignmentID.create(DeliveryNote.class, TradeSide.customer));
 			processDefinitionAssignment.createProcessInstance(null, user, deliveryNote);
+
+			DeliveryNoteID deliveryNoteID = (DeliveryNoteID) JDOHelper.getObjectId(deliveryNote);
+			assert deliveryNoteID != null : "deliveryNoteID != null";
+			return deliveryNoteID;
 		} finally {
 			pm.close();
 		}

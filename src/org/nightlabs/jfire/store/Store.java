@@ -55,6 +55,7 @@ import org.nightlabs.jfire.jbpm.graph.def.State;
 import org.nightlabs.jfire.jbpm.graph.def.Transition;
 import org.nightlabs.jfire.jbpm.graph.def.id.ProcessDefinitionID;
 import org.nightlabs.jfire.organisation.LocalOrganisation;
+import org.nightlabs.jfire.security.SecurityReflector;
 import org.nightlabs.jfire.security.User;
 import org.nightlabs.jfire.store.book.BookProductTransfer;
 import org.nightlabs.jfire.store.book.LocalStorekeeper;
@@ -125,9 +126,18 @@ implements StoreCallback
 	 */
 	public static Store getStore(PersistenceManager pm)
 	{
-		Iterator it = pm.getExtent(Store.class).iterator();
-		if (it.hasNext())
-			return (Store)it.next();
+		Iterator<?> it = pm.getExtent(Store.class).iterator();
+		if (it.hasNext()) {
+			Store store = (Store)it.next();
+
+			// TODO remove this debug stuff
+			String securityReflectorOrganisationID = SecurityReflector.getUserDescriptor().getOrganisationID();
+			if (!securityReflectorOrganisationID.equals(store.getOrganisationID()))
+				throw new IllegalStateException("SecurityReflector returned organisationID " + securityReflectorOrganisationID + " but Store.organisationID=" + store.getOrganisationID());
+			// TODO end debug
+
+			return store;
+		}
 
 		Store store = new Store();
 

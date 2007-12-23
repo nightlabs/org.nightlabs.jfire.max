@@ -128,9 +128,16 @@ public class Trader
 	 */
 	public static Trader getTrader(PersistenceManager pm)
 	{
-		Iterator it = pm.getExtent(Trader.class).iterator();
-		if (it.hasNext())
-			return (Trader) it.next();
+		Iterator<?> it = pm.getExtent(Trader.class).iterator();
+		if (it.hasNext()) {
+			Trader trader = (Trader) it.next();
+			// TODO remove this debug stuff
+			String securityReflectorOrganisationID = SecurityReflector.getUserDescriptor().getOrganisationID();
+			if (!securityReflectorOrganisationID.equals(trader.getOrganisationID()))
+				throw new IllegalStateException("SecurityReflector returned organisationID " + securityReflectorOrganisationID + " but Trader.organisationID=" + trader.getOrganisationID());
+			// TODO end debug
+			return trader;
+		}
 
 		logger.info("getTrader: The Trader instance does not yet exist! Creating it...");
 

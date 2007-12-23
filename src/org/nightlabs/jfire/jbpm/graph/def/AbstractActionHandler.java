@@ -1,5 +1,8 @@
 package org.nightlabs.jfire.jbpm.graph.def;
 
+import java.util.HashMap;
+import java.util.Map;
+
 import javax.jdo.PersistenceManager;
 
 import org.jbpm.graph.def.ActionHandler;
@@ -9,6 +12,7 @@ import org.nightlabs.jdo.ObjectID;
 import org.nightlabs.jdo.ObjectIDUtil;
 import org.nightlabs.jfire.base.Lookup;
 import org.nightlabs.jfire.idgenerator.IDGenerator;
+import org.nightlabs.jfire.security.SecurityReflector;
 
 public abstract class AbstractActionHandler
 implements ActionHandler
@@ -20,29 +24,44 @@ implements ActionHandler
 	 */
 	public static final String VARIABLE_NAME_STATABLE_ID = "statableID";
 
-	// TODO JPOX WORKAROUND: We should get only one real PersistenceManager within one transaction
-	// so that every of the "virtual" PersistenceManagers sees the same data. Currently this is not
-	// the case (they use separate data), so we bind the PersistenceManager here to a ThreadLocal.
-	private static ThreadLocal<PersistenceManager> persistenceManagerThreadLocal = new ThreadLocal<PersistenceManager>();
+//	// TODO JPOX WORKAROUND: We should get only one real PersistenceManager within one transaction
+//	// so that every of the "virtual" PersistenceManagers sees the same data. Currently this is not
+//	// the case (they use separate data), so we bind the PersistenceManager here to a ThreadLocal.
+//	private static ThreadLocal<PersistenceManager> persistenceManagerThreadLocal = new ThreadLocal<PersistenceManager>();
+	private static ThreadLocal<Map<String, PersistenceManager>> persistenceManagerThreadLocal = new ThreadLocal<Map<String,PersistenceManager>>() {
+		@Override
+		protected Map<String, PersistenceManager> initialValue()
+		{
+			return new HashMap<String, PersistenceManager>();
+		}
+	};
 
 	private PersistenceManager persistenceManager = null;
 
 	protected PersistenceManager getPersistenceManager()
 	{
 		// TODO JPOX WORKAROUND: begin
+		String currentOrganisationID = null;
 		if (persistenceManager == null) {
-			persistenceManager = persistenceManagerThreadLocal.get();
+			currentOrganisationID = SecurityReflector.getUserDescriptor().getOrganisationID();
+			persistenceManager = persistenceManagerThreadLocal.get().get(currentOrganisationID);
+
 			if (persistenceManager != null && persistenceManager.isClosed())
 				persistenceManager = null;
 		}
 		// TODO JPOX WORKAROUND: end
 
-		if (persistenceManager == null)
+		if (persistenceManager == null) {
 			persistenceManager = new Lookup(IDGenerator.getOrganisationID()).getPersistenceManager();
 
 		// TODO JPOX WORKAROUND: begin
-		persistenceManagerThreadLocal.set(persistenceManager);
+//		persistenceManagerThreadLocal.set(persistenceManager);
+			if (currentOrganisationID == null)
+				currentOrganisationID = SecurityReflector.getUserDescriptor().getOrganisationID();
+
+			persistenceManagerThreadLocal.get().put(currentOrganisationID, persistenceManager);
 		// TODO JPOX WORKAROUND: end
+		}
 
 		return persistenceManager;
 	}

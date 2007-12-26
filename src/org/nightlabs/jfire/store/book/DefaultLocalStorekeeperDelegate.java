@@ -27,18 +27,20 @@
 package org.nightlabs.jfire.store.book;
 
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.LinkedList;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
 import javax.jdo.JDOObjectNotFoundException;
 import javax.jdo.PersistenceManager;
 
+import org.nightlabs.jfire.idgenerator.IDGenerator;
 import org.nightlabs.jfire.organisation.LocalOrganisation;
 import org.nightlabs.jfire.security.SecurityReflector;
 import org.nightlabs.jfire.security.User;
 import org.nightlabs.jfire.store.DeliveryNote;
+import org.nightlabs.jfire.store.Product;
 import org.nightlabs.jfire.store.ProductTransfer;
 import org.nightlabs.jfire.store.ProductType;
 import org.nightlabs.jfire.store.book.id.LocalStorekeeperDelegateID;
@@ -117,16 +119,19 @@ public class DefaultLocalStorekeeperDelegate extends LocalStorekeeperDelegate
 
 	/**
 	 * Manages {@link Map}s with the following structure:<br/>
-	 * Map articleGroups {<br/>
-	 *		key: ProductType productType<br/>
-	 *		value: LinkedList&lt;Product&gt; products
+	 * Map organisationID2articleGroups {<br/>
+	 *		key: String organisationID<br/>
+	 *		value: Map articleGroups {<br/>
+	 *				key: ProductType productType<br/>
+	 *				value: LinkedList&lt;Product&gt; products
+	 * }
 	 * }
 	 */
-	private static ThreadLocal productsByProductTypeTL = new ThreadLocal() {
+	private static ThreadLocal<Map<String,Map<ProductType,List<Product>>>> organisationID2productType2productsTL = new ThreadLocal<Map<String,Map<ProductType,List<Product>>>>() {
 		@Override
-		protected Object initialValue()
+		protected Map<String,Map<ProductType,List<Product>>> initialValue()
 		{
-			return new HashMap();
+			return new HashMap<String, Map<ProductType,List<Product>>>();
 		}
 	};
 
@@ -161,8 +166,10 @@ public class DefaultLocalStorekeeperDelegate extends LocalStorekeeperDelegate
 	@Override
 	public void preBookArticles(OrganisationLegalEntity mandator, User user, DeliveryNote deliveryNote, BookProductTransfer bookTransfer, Set<Anchor> involvedAnchors)
 	{
-		Map productsByProductTypeClass = (Map) productsByProductTypeTL.get();
-		productsByProductTypeClass.clear();
+		Map<String,Map<ProductType,List<Product>>> organisationID2productType2products = organisationID2productType2productsTL.get();
+		Map<ProductType,List<Product>> productType2products = organisationID2productType2products.get(IDGenerator.getOrganisationID());
+		if (productType2products != null)
+			productType2products.clear();
 
 //		if (bookTransfer.getAnchorType(mandator) == Transfer.ANCHORTYPE_TO) {
 //			Map productsByProductTypeClass = (Map) productsByProductTypeClassTL.get();
@@ -207,12 +214,19 @@ public class DefaultLocalStorekeeperDelegate extends LocalStorekeeperDelegate
 			DeliveryNote deliveryNote, Article article,
 			BookProductTransfer bookTransfer, Set<Anchor> involvedAnchors)
 	{
-		Map productsByProductType = (Map) productsByProductTypeTL.get();
+		Map<String,Map<ProductType,List<Product>>> organisationID2productType2products = organisationID2productType2productsTL.get();
+		String currentOrganisationID = IDGenerator.getOrganisationID();
+		Map<ProductType,List<Product>> productType2products = organisationID2productType2products.get(currentOrganisationID);
+		if (productType2products == null) {
+			productType2products = new HashMap<ProductType, List<Product>>();
+			organisationID2productType2products.put(currentOrganisationID, productType2products);
+		}
+
 		ProductType productType = article.getProductType();
-		LinkedList products = (LinkedList) productsByProductType.get(productType);
+		List<Product> products = productType2products.get(productType);
 		if (products == null) {
-			products = new LinkedList();
-			productsByProductType.put(productType, products);
+			products = new LinkedList<Product>();
+			productType2products.put(productType, products);
 		}
 		products.add(article.getProduct());
 
@@ -256,27 +270,29 @@ public class DefaultLocalStorekeeperDelegate extends LocalStorekeeperDelegate
 	@Override
 	public void postBookArticles(OrganisationLegalEntity mandator, User user, DeliveryNote deliveryNote, BookProductTransfer bookTransfer, Set<Anchor> involvedAnchors)
 	{
-		Map productsByProductType = (Map) productsByProductTypeTL.get();
-		for (Iterator it = productsByProductType.entrySet().iterator(); it.hasNext(); ) {
-			Map.Entry me = (Map.Entry) it.next();
-			ProductType productType = (ProductType) me.getKey();
-			LinkedList products = (LinkedList) me.getValue();
+		Map<String,Map<ProductType,List<Product>>> organisationID2productType2products = organisationID2productType2productsTL.get();
+		Map<ProductType,List<Product>> productType2products = organisationID2productType2products.get(IDGenerator.getOrganisationID());
+		if (productType2products != null) {
+			for (Map.Entry<ProductType,List<Product>> me : productType2products.entrySet()) {
+				ProductType productType = me.getKey();
+				List<Product> products = me.getValue();
 
-			// get the home of the producttype
-			Anchor home = productType.getProductTypeLocal().getHome();
+				// get the home of the producttype
+				Anchor home = productType.getProductTypeLocal().getHome();
 
-			// transfer products
-			ProductTransfer productTransfer;
-			if (bookTransfer.getAnchorType(mandator) == Transfer.ANCHORTYPE_TO)
-				productTransfer = new ProductTransfer(bookTransfer, user, mandator, home, products);
-			else if (bookTransfer.getAnchorType(mandator) == Transfer.ANCHORTYPE_FROM)
-				productTransfer = new ProductTransfer(bookTransfer, user, home, mandator, products);
-			else
-				throw new IllegalStateException("mandator is neither 'from' nor 'to' of bookTransfer!");
+				// transfer products
+				ProductTransfer productTransfer;
+				if (bookTransfer.getAnchorType(mandator) == Transfer.ANCHORTYPE_TO)
+					productTransfer = new ProductTransfer(bookTransfer, user, mandator, home, products);
+				else if (bookTransfer.getAnchorType(mandator) == Transfer.ANCHORTYPE_FROM)
+					productTransfer = new ProductTransfer(bookTransfer, user, home, mandator, products);
+				else
+					throw new IllegalStateException("mandator is neither 'from' nor 'to' of bookTransfer!");
 
-			productTransfer = getPersistenceManager().makePersistent(productTransfer);
-			productTransfer.bookTransfer(user, involvedAnchors);
-		}
+				productTransfer = getPersistenceManager().makePersistent(productTransfer);
+				productTransfer.bookTransfer(user, involvedAnchors);
+			}
+		} // if (productType2products != null) {
 
 //		if (bookTransfer.getAnchorType(mandator) == Transfer.ANCHORTYPE_TO) {
 //			PersistenceManager pm = getPersistenceManager();

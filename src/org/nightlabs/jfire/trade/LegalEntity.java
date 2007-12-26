@@ -30,7 +30,6 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
-import java.util.Iterator;
 import java.util.Locale;
 import java.util.Map;
 import java.util.Set;
@@ -41,6 +40,7 @@ import javax.jdo.PersistenceManager;
 
 import org.nightlabs.jfire.accounting.MoneyTransfer;
 import org.nightlabs.jfire.accounting.book.Accountant;
+import org.nightlabs.jfire.accounting.id.CurrencyID;
 import org.nightlabs.jfire.idgenerator.IDGenerator;
 import org.nightlabs.jfire.organisation.LocalOrganisation;
 import org.nightlabs.jfire.person.Person;
@@ -54,6 +54,7 @@ import org.nightlabs.jfire.store.Product;
 import org.nightlabs.jfire.store.ProductReference;
 import org.nightlabs.jfire.store.ProductTransfer;
 import org.nightlabs.jfire.store.book.Storekeeper;
+import org.nightlabs.jfire.store.id.ProductID;
 import org.nightlabs.jfire.trade.id.CustomerGroupID;
 import org.nightlabs.jfire.transfer.Anchor;
 import org.nightlabs.jfire.transfer.Transfer;
@@ -245,30 +246,74 @@ public class LegalEntity extends Anchor
 //	private transient Object balancesMutex = new Object();
 
 	/**
-	 * Manages {@link Map}s:
-	 * key: String currencyID
-	 * value: {@link Balance}
+	 * Manages the balance of a legal entity in the scope of an organisation.
 	 */
-	private static ThreadLocal balancesTL = new ThreadLocal() {
+	private static ThreadLocal<Map<String, Map<AnchorID, Map<CurrencyID,Balance>>>> balancesMapTL = new ThreadLocal<Map<String,Map<AnchorID,Map<CurrencyID,Balance>>>>() {
 		@Override
-		protected Object initialValue()
+		protected Map<String, Map<AnchorID, Map<CurrencyID,Balance>>> initialValue()
 		{
-			return new HashMap();
+			return new HashMap<String, Map<AnchorID, Map<CurrencyID,Balance>>>();
 		}
 	};
+
+	private Map<CurrencyID,Balance> getBalanceMap()
+	{
+		Map<String, Map<AnchorID, Map<CurrencyID,Balance>>> organisationID2anchorID2balanceMap = balancesMapTL.get();
+		String currentOrganisationID = IDGenerator.getOrganisationID();
+		Map<AnchorID, Map<CurrencyID,Balance>> anchorID2balanceMap = organisationID2anchorID2balanceMap.get(currentOrganisationID);
+		if (anchorID2balanceMap == null) {
+			anchorID2balanceMap = new HashMap<AnchorID, Map<CurrencyID,Balance>>();
+			organisationID2anchorID2balanceMap.put(currentOrganisationID, anchorID2balanceMap);
+		}
+
+		AnchorID anchorID = (AnchorID) JDOHelper.getObjectId(this);
+		if (anchorID == null)
+			throw new IllegalStateException("JDOHelper.getObjectId(this) returned null!");
+
+		Map<CurrencyID,Balance> balanceMap = anchorID2balanceMap.get(anchorID);
+		if (balanceMap == null) {
+			balanceMap = new HashMap<CurrencyID, Balance>();
+			anchorID2balanceMap.put(anchorID, balanceMap);
+		}
+
+		return balanceMap;
+	}
 
 	/**
 	 * Manages {@link Map}s:
 	 * key: String productPK (see {@link Product#getPrimaryKey()})
 	 * value: {@link ProductReference} productReference
 	 */
-	private static ThreadLocal productReferencesTL = new ThreadLocal() {
+	private static ThreadLocal<Map<String, Map<AnchorID, Map<ProductID, ProductReference>>>> productReferencesMapTL = new ThreadLocal<Map<String,Map<AnchorID,Map<ProductID,ProductReference>>>>() {
 		@Override
-		protected Object initialValue()
+		protected Map<String, Map<AnchorID, Map<ProductID, ProductReference>>> initialValue()
 		{
-			return new HashMap();
+			return new HashMap<String, Map<AnchorID,Map<ProductID,ProductReference>>>();
 		}
 	};
+
+	private Map<ProductID, ProductReference> getProductReferenceMap()
+	{
+		Map<String, Map<AnchorID, Map<ProductID, ProductReference>>> organisationID2anchorID2productReferenceMap = productReferencesMapTL.get();
+		String currentOrganisationID = IDGenerator.getOrganisationID();
+		Map<AnchorID, Map<ProductID, ProductReference>> anchorID2productReferenceMap = organisationID2anchorID2productReferenceMap.get(currentOrganisationID);
+		if (anchorID2productReferenceMap == null) {
+			anchorID2productReferenceMap = new HashMap<AnchorID, Map<ProductID,ProductReference>>();
+			organisationID2anchorID2productReferenceMap.put(currentOrganisationID, anchorID2productReferenceMap);
+		}
+		
+		AnchorID anchorID = (AnchorID) JDOHelper.getObjectId(this);
+		if (anchorID == null)
+			throw new IllegalStateException("JDOHelper.getObjectId(this) returned null!");
+
+		Map<ProductID, ProductReference> productReferenceMap = anchorID2productReferenceMap.get(anchorID);
+		if (productReferenceMap == null) {
+			productReferenceMap = new HashMap<ProductID, ProductReference>();
+			anchorID2productReferenceMap.put(anchorID, productReferenceMap);
+		}
+
+		return productReferenceMap;
+	}
 
 	@Override
 	public void checkIntegrity(Collection<? extends Transfer> containers)
@@ -276,17 +321,15 @@ public class LegalEntity extends Anchor
 		Transfer firstContainer = containers.iterator().next();
 
 		if (firstContainer instanceof MoneyTransfer) {
-			Map balances = (Map) balancesTL.get();
-			for (Iterator it = balances.values().iterator(); it.hasNext(); ) {
-				Balance balance = (Balance) it.next();
+			Map<CurrencyID,Balance> balanceMap = getBalanceMap();
+			for (Balance balance : balanceMap.values()) {
 				if (balance.amount != 0)
 					throw new IllegalStateException("Balance for LegalEntity \""+getPrimaryKey()+"\" must be 0, but is "+balance.amount+" for currency \""+balance.currencyID+"\"!");
 			}
 		}
 		else if (firstContainer instanceof ProductTransfer) {
-			Map productReferences = (Map) productReferencesTL.get();
-			for (Iterator it = productReferences.values().iterator(); it.hasNext(); ) {
-				ProductReference productReference = (ProductReference) it.next();
+			Map<ProductID, ProductReference> productReferenceMap = getProductReferenceMap();
+			for (ProductReference productReference : productReferenceMap.values()) {
 				if (productReference.getQuantity() != 0)
 					throw new IllegalStateException("LegalEntity \""+getPrimaryKey()+"\" has the ProductReference \""+productReference.getPrimaryKey()+"\" with quantity = " + productReference.getQuantity() + "! The quantity MUST be 0 at the end of a transaction!");
 			}
@@ -301,12 +344,12 @@ public class LegalEntity extends Anchor
 		Transfer firstContainer = containers.iterator().next();
 
 		if (firstContainer instanceof MoneyTransfer) {
-			Map balances = (Map) balancesTL.get();
-			balances.clear();
+			Map<CurrencyID,Balance> balanceMap = getBalanceMap();
+			balanceMap.clear();
 		}
 		else if (firstContainer instanceof ProductTransfer) {
-			Map productReferences = (Map) productReferencesTL.get();
-			productReferences.clear();
+			Map<ProductID, ProductReference> productReferenceMap = getProductReferenceMap();
+			productReferenceMap.clear();
 		}
 		else
 			throw new IllegalArgumentException("I know only MoneyTransfer and ProductTransfer! Your container of type " + containers.getClass() + " cannot be processed!");
@@ -317,12 +360,12 @@ public class LegalEntity extends Anchor
 		if (accountant == null)
 			throw new NullPointerException("There is no accountant existing in this LegalEntity (\""+this.getPrimaryKey()+"\")!");
 
-		Map balances = (Map) balancesTL.get();
-		String currencyID = transfer.getCurrency().getCurrencyID();
-		Balance balance = (Balance) balances.get(currencyID);
+		Map<CurrencyID,Balance> balanceMap = getBalanceMap();
+		CurrencyID currencyID = (CurrencyID) JDOHelper.getObjectId(transfer.getCurrency());
+		Balance balance = balanceMap.get(currencyID);
 		if (balance == null) {
-			balance = new Balance(currencyID);
-			balances.put(currencyID, balance);
+			balance = new Balance(currencyID.currencyID);
+			balanceMap.put(currencyID, balance);
 		}
 		if (transfer.getAnchorType(this) == Transfer.ANCHORTYPE_FROM)
 			balance.amount -= transfer.getAmount();
@@ -338,28 +381,29 @@ public class LegalEntity extends Anchor
 		if (accountant == null)
 			throw new NullPointerException("There is no accountant existing in this LegalEntity (\""+this.getPrimaryKey()+"\")!");
 
-		Map balances = (Map) balancesTL.get();
-//		synchronized (balancesMutex) {
-			String currencyID = transfer.getCurrency().getCurrencyID();
-			Balance balance = (Balance) balances.get(currencyID);
-			if (balance == null) {
-				balance = new Balance(currencyID);
-				balances.put(currencyID, balance);
-			}
-			if (transfer.getAnchorType(this) == Transfer.ANCHORTYPE_FROM)
-				balance.amount += transfer.getAmount();
-			else
-				balance.amount -= transfer.getAmount();
-//		}
+		Map<CurrencyID,Balance> balanceMap = getBalanceMap();
+		CurrencyID currencyID = (CurrencyID) JDOHelper.getObjectId(transfer.getCurrency());
+		Balance balance = balanceMap.get(currencyID);
+		if (balance == null) {
+			balance = new Balance(currencyID.currencyID);
+			balanceMap.put(currencyID, balance);
+		}
+		if (transfer.getAnchorType(this) == Transfer.ANCHORTYPE_FROM)
+			balance.amount += transfer.getAmount();
+		else
+			balance.amount -= transfer.getAmount();
 	}
 
-	protected ProductReference createProductReference(Map productReferences, Product product)
+	protected ProductReference createProductReference(Map<ProductID, ProductReference> productReferenceMap, Product product)
 	{
-		String productPK = product.getPrimaryKey();
-		ProductReference productReference = (ProductReference) productReferences.get(productPK);
+		ProductID productID = (ProductID) JDOHelper.getObjectId(product);
+		if (productID == null)
+			throw new IllegalArgumentException("JDOHelper.getObjectId(product) returned null!");
+
+		ProductReference productReference = (ProductReference) productReferenceMap.get(productID);
 		if (productReference == null) {
 			productReference = new ProductReference(this, product);
-			productReferences.put(productPK, productReference);
+			productReferenceMap.put(productID, productReference);
 		}
 		return productReference;
 	}
@@ -369,18 +413,17 @@ public class LegalEntity extends Anchor
 		if (storekeeper == null)
 			throw new NullPointerException("There is no storekeeper existing in this LegalEntity (\""+this.getPrimaryKey()+"\")!");
 
-		Map productReferences = (Map) productReferencesTL.get();
+		Map<ProductID, ProductReference> productReferenceMap = getProductReferenceMap();
 
 		boolean thisIsFrom = transfer.getAnchorType(this) == Transfer.ANCHORTYPE_FROM;
 		boolean thisIsTo = transfer.getAnchorType(this) == Transfer.ANCHORTYPE_TO;
 
 		// after we delegated to the storekeeper, we handle the product transfer and update ProductReference.quantity
-		for (Iterator it = transfer.getProducts().iterator(); it.hasNext(); ) {
-			Product product = (Product) it.next();
+		for (Product product : transfer.getProducts()) {
 			if (thisIsFrom)
-				createProductReference(productReferences, product).decQuantity();
+				createProductReference(productReferenceMap, product).decQuantity();
 			else if (thisIsTo)
-				createProductReference(productReferences, product).incQuantity();
+				createProductReference(productReferenceMap, product).incQuantity();
 			else
 				throw new IllegalStateException("This Repository (" + getPrimaryKey() + ") is neither to nor from!");
 		}
@@ -391,17 +434,16 @@ public class LegalEntity extends Anchor
 	protected void rollbackProductTransfer(ProductTransfer transfer, User user,
 			Set<Anchor> involvedAnchors)
 	{
-		Map productReferences = (Map) productReferencesTL.get();
+		Map<ProductID, ProductReference> productReferenceMap = getProductReferenceMap();
 
 		boolean thisIsFrom = transfer.getAnchorType(this) == Transfer.ANCHORTYPE_FROM;
 		boolean thisIsTo = transfer.getAnchorType(this) == Transfer.ANCHORTYPE_TO;
 
-		for (Iterator it = transfer.getProducts().iterator(); it.hasNext(); ) {
-			Product product = (Product) it.next();
+		for (Product product : transfer.getProducts()) {
 			if (thisIsFrom)
-				createProductReference(productReferences, product).incQuantity();
+				createProductReference(productReferenceMap, product).incQuantity();
 			else if (thisIsTo)
-				createProductReference(productReferences, product).decQuantity();
+				createProductReference(productReferenceMap, product).decQuantity();
 			else
 				throw new IllegalStateException("This Repository (" + getPrimaryKey() + ") is neither to nor from!");
 		}
@@ -425,8 +467,7 @@ public class LegalEntity extends Anchor
 	}
 
 	@Override
-	protected void internalRollbackTransfer(Transfer transfer, User user,
-			Set<Anchor> involvedAnchors)
+	protected void internalRollbackTransfer(Transfer transfer, User user, Set<Anchor> involvedAnchors)
 	{
 //		PersistenceManager pm = JDOHelper.getPersistenceManager(this);
 //		if (pm == null)
@@ -526,7 +567,7 @@ public class LegalEntity extends Anchor
 	 * @return Returns the {@link CustomerGroup}s as which this <tt>LegalEntity</tt>
 	 *		is allowed to buy sth.
 	 */
-	public Collection getCustomerGroups()
+	public Collection<CustomerGroup> getCustomerGroups()
 	{
 		if (unmodifiableCustomerGroups == null)
 			unmodifiableCustomerGroups = Collections.unmodifiableSet(customerGroups);

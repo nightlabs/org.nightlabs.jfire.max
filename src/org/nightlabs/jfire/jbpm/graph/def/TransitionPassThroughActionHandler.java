@@ -17,6 +17,8 @@ import org.jbpm.graph.exe.ExecutionContext;
  * as well as action for the node itself in order to function correctly.
  * </p>
  * @author Alexander Bieber <!-- alex [AT] nightlabs [DOT] de -->
+ * 
+ * TODO Why doesn't this use the {@link ActionHandlerNodeEnter#getLastNodeEnterTransitionName()}? Marco.
  */
 public class TransitionPassThroughActionHandler implements ActionHandler {
 

@@ -1,5 +1,8 @@
 package org.nightlabs.jfire.jbpm.graph.def;
 
+import java.util.HashMap;
+import java.util.Map;
+
 import javax.jdo.JDOHelper;
 import javax.jdo.PersistenceManager;
 
@@ -11,6 +14,7 @@ import org.jbpm.graph.exe.ExecutionContext;
 import org.jbpm.instantiation.Delegation;
 import org.nightlabs.annotation.Implement;
 import org.nightlabs.jdo.ObjectIDUtil;
+import org.nightlabs.jfire.idgenerator.IDGenerator;
 import org.nightlabs.jfire.security.SecurityReflector;
 import org.nightlabs.jfire.security.User;
 
@@ -36,13 +40,25 @@ extends AbstractActionHandler
 		public String transitionName;
 	}
 
-	private static ThreadLocal<LastNodeEnterTransitionCarrier> lastNodeEnterTransitionCarrier = new ThreadLocal<LastNodeEnterTransitionCarrier>() {
+	private static ThreadLocal<Map<String,LastNodeEnterTransitionCarrier>> organisationID2lastNodeEnterTransitionCarrier = new ThreadLocal<Map<String,LastNodeEnterTransitionCarrier>>() {
 		@Override
-		protected LastNodeEnterTransitionCarrier initialValue()
+		protected Map<String,LastNodeEnterTransitionCarrier> initialValue()
 		{
-			return new LastNodeEnterTransitionCarrier();
+			return new HashMap<String, LastNodeEnterTransitionCarrier>();
 		}
 	};
+
+	private static LastNodeEnterTransitionCarrier getLastNodeEnterTransitionCarrier()
+	{
+		Map<String,LastNodeEnterTransitionCarrier> m = organisationID2lastNodeEnterTransitionCarrier.get();
+		String currentOrganisationID = IDGenerator.getOrganisationID();
+		LastNodeEnterTransitionCarrier lastNodeEnterTransitionCarrier = m.get(currentOrganisationID);
+		if (lastNodeEnterTransitionCarrier == null) {
+			lastNodeEnterTransitionCarrier = new LastNodeEnterTransitionCarrier();
+			m.put(currentOrganisationID, lastNodeEnterTransitionCarrier);
+		}
+		return lastNodeEnterTransitionCarrier;
+	}
 
 	/**
 	 * This method allows to find out which transition was used for the last node-enter event. It is managed
@@ -54,12 +70,12 @@ extends AbstractActionHandler
 	 */
 	public static String getLastNodeEnterTransitionName()
 	{
-		return lastNodeEnterTransitionCarrier.get().transitionName;
+		return getLastNodeEnterTransitionCarrier().transitionName;
 	}
 
 	protected static void setLastNodeEnterTransitionName(String transitionName)
 	{
-		lastNodeEnterTransitionCarrier.get().transitionName = transitionName;
+		getLastNodeEnterTransitionCarrier().transitionName = transitionName;
 	}
 
 //	/**

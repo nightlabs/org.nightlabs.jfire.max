@@ -10,7 +10,6 @@ import org.nightlabs.jfire.accounting.priceconfig.IPriceConfig;
 import org.nightlabs.jfire.security.User;
 import org.nightlabs.jfire.store.ProductType;
 import org.nightlabs.jfire.store.ProductTypeLocal;
-import org.nightlabs.jfire.store.Repository;
 import org.nightlabs.jfire.store.id.ProductTypeID;
 import org.nightlabs.jfire.voucher.scripting.VoucherLayout;
 
@@ -92,9 +91,9 @@ extends ProductType
 //	}
 
 	@Override
-	protected ProductTypeLocal createProductTypeLocal(User user, Repository home)
+	protected ProductTypeLocal createProductTypeLocal(User user)
 	{
-		return new VoucherTypeLocal(user, this, home);
+		return new VoucherTypeLocal(user, this);
 	}
 
 	@Override

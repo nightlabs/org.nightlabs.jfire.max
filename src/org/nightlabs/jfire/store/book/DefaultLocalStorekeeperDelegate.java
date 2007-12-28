@@ -43,6 +43,8 @@ import org.nightlabs.jfire.store.DeliveryNote;
 import org.nightlabs.jfire.store.Product;
 import org.nightlabs.jfire.store.ProductTransfer;
 import org.nightlabs.jfire.store.ProductType;
+import org.nightlabs.jfire.store.Repository;
+import org.nightlabs.jfire.store.Store;
 import org.nightlabs.jfire.store.book.id.LocalStorekeeperDelegateID;
 import org.nightlabs.jfire.trade.Article;
 import org.nightlabs.jfire.trade.OrganisationLegalEntity;
@@ -117,21 +119,11 @@ public class DefaultLocalStorekeeperDelegate extends LocalStorekeeperDelegate
 		super(organisationID, localStorekeeperDelegateID);
 	}
 
-	/**
-	 * Manages {@link Map}s with the following structure:<br/>
-	 * Map organisationID2articleGroups {<br/>
-	 *		key: String organisationID<br/>
-	 *		value: Map articleGroups {<br/>
-	 *				key: ProductType productType<br/>
-	 *				value: LinkedList&lt;Product&gt; products
-	 * }
-	 * }
-	 */
-	private static ThreadLocal<Map<String,Map<ProductType,List<Product>>>> organisationID2productType2productsTL = new ThreadLocal<Map<String,Map<ProductType,List<Product>>>>() {
+	private static ThreadLocal<Map<String,Map<Repository,List<Product>>>> organisationID2repository2productsTL = new ThreadLocal<Map<String,Map<Repository,List<Product>>>>() {
 		@Override
-		protected Map<String,Map<ProductType,List<Product>>> initialValue()
+		protected Map<String,Map<Repository,List<Product>>> initialValue()
 		{
-			return new HashMap<String, Map<ProductType,List<Product>>>();
+			return new HashMap<String, Map<Repository,List<Product>>>();
 		}
 	};
 
@@ -166,41 +158,11 @@ public class DefaultLocalStorekeeperDelegate extends LocalStorekeeperDelegate
 	@Override
 	public void preBookArticles(OrganisationLegalEntity mandator, User user, DeliveryNote deliveryNote, BookProductTransfer bookTransfer, Set<Anchor> involvedAnchors)
 	{
-		Map<String,Map<ProductType,List<Product>>> organisationID2productType2products = organisationID2productType2productsTL.get();
-		Map<ProductType,List<Product>> productType2products = organisationID2productType2products.get(IDGenerator.getOrganisationID());
-		if (productType2products != null)
-			productType2products.clear();
-
-//		if (bookTransfer.getAnchorType(mandator) == Transfer.ANCHORTYPE_TO) {
-//			Map productsByProductTypeClass = (Map) productsByProductTypeClassTL.get();
-//			productsByProductTypeClass.clear();
-//		}
-//		else if (bookTransfer.getAnchorType(mandator) == Transfer.ANCHORTYPE_FROM) {
-//			Map productsBySourceRepository = (Map) productsBySourceRepositoryTL.get();
-//			productsBySourceRepository.clear();
-//		}
-//		else
-//			throw new IllegalStateException("mandator is neither 'from' nor 'to' of bookTransfer!");
+		Map<String,Map<Repository,List<Product>>> organisationID2repository2products = organisationID2repository2productsTL.get();
+		Map<Repository,List<Product>> repository2products = organisationID2repository2products.get(IDGenerator.getOrganisationID());
+		if (repository2products != null)
+			repository2products.clear();
 	}
-
-//	/**
-//	 * There are two different cases:
-//	 * <p>
-//	 * In the first case, the mandator receives {@link Article}s - either 'normal' articles as a customer or
-//	 * reversing articles as a vendor - and the delegate needs to send them to the repositories.
-//	 * Hence, this method groups all {@link Article}s by {@link org.nightlabs.jfire.store.ProductType}.
-//	 * As this implementation of <code>LocalStorekeeperDelegate</code> manages one
-//	 * {@link org.nightlabs.jfire.store.Repository} per <code>ProductType</code>,
-//	 * the method {@link #postBookArticles(OrganisationLegalEntity, User, DeliveryNote, BookProductTransfer, Map)} then
-//	 * creates one {@link org.nightlabs.jfire.store.ProductTransfer} per <code>ProductType</code>.
-//	 * </p>
-//	 * <p>
-//	 * In the second case, the mandator has to send {@link Article}s. This will cause a grouping
-//	 * by source-repository.
-//	 * </p>
-//	 *
-//	 * @see org.nightlabs.jfire.store.book.LocalStorekeeperDelegate#bookArticle(org.nightlabs.jfire.trade.OrganisationLegalEntity, org.nightlabs.jfire.security.User, org.nightlabs.jfire.store.DeliveryNote, org.nightlabs.jfire.trade.Article, org.nightlabs.jfire.store.book.BookProductTransfer, java.util.Map)
-//	 */
 
 	/**
 	 * This method does not yet book the <code>article</code>, but only groups all products by their
@@ -214,19 +176,19 @@ public class DefaultLocalStorekeeperDelegate extends LocalStorekeeperDelegate
 			DeliveryNote deliveryNote, Article article,
 			BookProductTransfer bookTransfer, Set<Anchor> involvedAnchors)
 	{
-		Map<String,Map<ProductType,List<Product>>> organisationID2productType2products = organisationID2productType2productsTL.get();
-		String currentOrganisationID = IDGenerator.getOrganisationID();
-		Map<ProductType,List<Product>> productType2products = organisationID2productType2products.get(currentOrganisationID);
-		if (productType2products == null) {
-			productType2products = new HashMap<ProductType, List<Product>>();
-			organisationID2productType2products.put(currentOrganisationID, productType2products);
+		Repository repository = getRepositoryForBooking(article.getProduct());
+		
+		Map<String,Map<Repository,List<Product>>> organisationID2repository2products = organisationID2repository2productsTL.get();
+		Map<Repository,List<Product>> repository2products = organisationID2repository2products.get(IDGenerator.getOrganisationID());
+		if (repository2products == null) {
+			repository2products = new HashMap<Repository, List<Product>>();
+			organisationID2repository2products.put(IDGenerator.getOrganisationID(), repository2products);
 		}
 
-		ProductType productType = article.getProductType();
-		List<Product> products = productType2products.get(productType);
+		List<Product> products = repository2products.get(repository);
 		if (products == null) {
 			products = new LinkedList<Product>();
-			productType2products.put(productType, products);
+			repository2products.put(repository, products);
 		}
 		products.add(article.getProduct());
 
@@ -264,28 +226,28 @@ public class DefaultLocalStorekeeperDelegate extends LocalStorekeeperDelegate
 	 * for the groups of <code>Product</code>s that have been created by
 	 * {@link #bookArticle(OrganisationLegalEntity, User, DeliveryNote, Article, BookProductTransfer, Map)}
 	 * before.
+	 * <p>
+	 * The products are transferred 
+	 * </p>
 	 *
 	 * @see org.nightlabs.jfire.store.book.LocalStorekeeperDelegate#postBookArticles(org.nightlabs.jfire.trade.OrganisationLegalEntity, org.nightlabs.jfire.security.User, org.nightlabs.jfire.store.DeliveryNote, org.nightlabs.jfire.store.book.BookProductTransfer, java.util.Map)
 	 */
 	@Override
 	public void postBookArticles(OrganisationLegalEntity mandator, User user, DeliveryNote deliveryNote, BookProductTransfer bookTransfer, Set<Anchor> involvedAnchors)
 	{
-		Map<String,Map<ProductType,List<Product>>> organisationID2productType2products = organisationID2productType2productsTL.get();
-		Map<ProductType,List<Product>> productType2products = organisationID2productType2products.get(IDGenerator.getOrganisationID());
-		if (productType2products != null) {
-			for (Map.Entry<ProductType,List<Product>> me : productType2products.entrySet()) {
-				ProductType productType = me.getKey();
+		Map<String,Map<Repository,List<Product>>> organisationID2repository2products = organisationID2repository2productsTL.get();
+		Map<Repository,List<Product>> repository2products = organisationID2repository2products.get(IDGenerator.getOrganisationID());
+		if (repository2products != null) {
+			for (Map.Entry<Repository,List<Product>> me : repository2products.entrySet()) {
+				Repository repository = me.getKey();
 				List<Product> products = me.getValue();
-
-				// get the home of the producttype
-				Anchor home = productType.getProductTypeLocal().getHome();
 
 				// transfer products
 				ProductTransfer productTransfer;
 				if (bookTransfer.getAnchorType(mandator) == Transfer.ANCHORTYPE_TO)
-					productTransfer = new ProductTransfer(bookTransfer, user, mandator, home, products);
+					productTransfer = new ProductTransfer(bookTransfer, user, mandator, repository, products);
 				else if (bookTransfer.getAnchorType(mandator) == Transfer.ANCHORTYPE_FROM)
-					productTransfer = new ProductTransfer(bookTransfer, user, home, mandator, products);
+					productTransfer = new ProductTransfer(bookTransfer, user, repository, mandator, products);
 				else
 					throw new IllegalStateException("mandator is neither 'from' nor 'to' of bookTransfer!");
 
@@ -327,5 +289,63 @@ public class DefaultLocalStorekeeperDelegate extends LocalStorekeeperDelegate
 //		}
 //		else
 //			throw new IllegalStateException("mandator is neither 'from' nor 'to' of bookTransfer!");
+	}
+
+	@Override
+	public Repository getInitialRepositoryForLocalProduct(Product product)
+	{
+		if (!getStore().getOrganisationID().equals(product.getOrganisationID()))
+			throw new IllegalStateException("The product is a foreign product! This should never happen, since Store should call getPartnerStorekeeper().getInitialForeignRepository(...)!");
+
+		return getHomeRepository(product);
+	}
+
+	protected String getAnchorIDForLocalHomeRepository(ProductType productType)
+	{
+		return productType.getClass().getName() + ".home";  
+	}
+
+	protected String getAnchorIDForForeignHomeRepository(ProductType productType)
+	{
+		return productType.getClass().getName() + ".home#" + productType.getOrganisationID();  
+	}
+
+	/**
+	 * Get the "home" repository of a product. This is the repository where instances of the product are usually kept
+	 * while they are in the local organisation.
+	 */
+	@Override
+	public Repository getHomeRepository(Product product)
+	{
+		ProductType productType = product.getProductType();
+		PersistenceManager pm = getPersistenceManager();
+		Store store = Store.getStore(pm);
+
+		return Repository.createRepository(
+				pm,
+				store.getOrganisationID(),
+				Repository.ANCHOR_TYPE_ID_HOME,
+				(
+						store.getOrganisationID().equals(productType.getOrganisationID()) ?
+								getAnchorIDForLocalHomeRepository(productType) : getAnchorIDForForeignHomeRepository(productType)
+				),
+				store.getMandator(), false);
+	}
+
+	/**
+	 * This method is called internally by {@link #bookArticle(OrganisationLegalEntity, User, DeliveryNote, Article, BookProductTransfer, Set)}
+	 * in order to find out from/to which repository a transfer needs to be created
+	 * (with the mandator - the local {@link OrganisationLegalEntity} - on the other end of the transfer).
+	 *
+	 * @param product the product for which to find out 
+	 * @return
+	 */
+	protected Repository getRepositoryForBooking(Product product)
+	{
+		return getHomeRepository(product);
+//		if (getStore().getOrganisationID().equals(product.getOrganisationID()))
+//			return getInitialRepositoryForLocalProduct(product);
+//		else
+//			return getStore().getPartnerStorekeeper().getInitialRepositoryForForeignProduct(product);
 	}
 }

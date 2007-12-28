@@ -92,10 +92,10 @@ implements Serializable, Inheritable, InheritanceCallbacks
 	 */
 	private ProductType productType;
 
-	/**
-	 * @jdo.field persistence-modifier="persistent"
-	 */
-	private Repository home;
+//	/**
+//	 * @jdo.field persistence-modifier="persistent"
+//	 */
+//	private Repository home;
 
 	/**
 	 * @jdo.field persistence-modifier="persistent"
@@ -128,7 +128,7 @@ implements Serializable, Inheritable, InheritanceCallbacks
 	protected ProductTypeLocal() { }
 
 	// TODO we should pass the user here and store it somehow
-	public ProductTypeLocal(User user, ProductType productType, Repository home)
+	public ProductTypeLocal(User user, ProductType productType)
 	{
 		if (productType == null)
 			throw new IllegalArgumentException("productType must not be null!");
@@ -137,7 +137,6 @@ implements Serializable, Inheritable, InheritanceCallbacks
 		this.organisationID = productType.getOrganisationID();
 		this.productTypeID = productType.getProductTypeID();
 		fieldMetaDataMap = new HashMap<String, ProductTypeLocalFieldMetaData>();
-		this.setHome(home);
 		productType.setProductTypeLocal(this); // TODO JPOX WORKAROUND: This causes problems, hence we set it in the Store.addProductType(...) method:
 	}
 
@@ -155,20 +154,20 @@ implements Serializable, Inheritable, InheritanceCallbacks
 		return productType;
 	}
 
-	/**
-	 * @see Repository#ANCHOR_TYPE_ID_HOME
-	 */
-	public Repository getHome()
-	{
-		return home;
-	}
-	public void setHome(Repository home)
-	{
-		if (home == null)
-			throw new IllegalArgumentException("home must not be null!");
-
-		this.home = home;
-	}
+//	/**
+//	 * @see Repository#ANCHOR_TYPE_ID_HOME
+//	 */
+//	public Repository getHome()
+//	{
+//		return home;
+//	}
+//	public void setHome(Repository home)
+//	{
+//		if (home == null)
+//			throw new IllegalArgumentException("home must not be null!");
+//
+//		this.home = home;
+//	}
 
 	/**
 	 * The LocalAccountantDelegate is in charge of booking money to different
@@ -250,7 +249,7 @@ implements Serializable, Inheritable, InheritanceCallbacks
 	public void preInherit(Inheritable mother, Inheritable child)
 	{
 		// ensure that these fields are loaded
-		if (home == null);
+//		if (home == null);
 		if (localAccountantDelegate == null);
 		if (localStorekeeperDelegate == null);
 	}

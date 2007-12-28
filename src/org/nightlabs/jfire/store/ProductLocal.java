@@ -337,18 +337,6 @@ implements Serializable
 //	 */
 //	protected List statusHistory = new ArrayList();
 
-	/**
-	 * @jdo.field persistence-modifier="persistent"
-	 */
-	private int nextStatusID = 0;
-
-	protected synchronized int createStatusID()
-	{
-		int res = nextStatusID;
-		nextStatusID = res + 1;
-		return res;
-	}
-
 	public Collection<ProductLocal> getNestedProductLocals()
 	{
 		return Collections.unmodifiableCollection(nestedProductLocals);

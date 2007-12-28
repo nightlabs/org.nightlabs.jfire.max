@@ -35,6 +35,8 @@ import javax.jdo.PersistenceManager;
 import org.nightlabs.jdo.ObjectIDUtil;
 import org.nightlabs.jfire.security.User;
 import org.nightlabs.jfire.store.DeliveryNote;
+import org.nightlabs.jfire.store.Product;
+import org.nightlabs.jfire.store.Repository;
 import org.nightlabs.jfire.store.Store;
 import org.nightlabs.jfire.trade.Article;
 import org.nightlabs.jfire.trade.OrganisationLegalEntity;
@@ -144,4 +146,21 @@ implements Serializable
 	{
 		return Store.getStore(getPersistenceManager());
 	}
+
+	/**
+	 * Get the <code>Repository</code> for a newly created <code>Product</code> of the local {@link OrganisationLegalEntity}.
+	 * This can be understood as storage area of the product's factory (i.e. the end
+	 * of the production assembly line.
+	 * <p>
+	 * Do <b>not</b> call this method directly! Always use {@link LocalStorekeeper#getInitialRepositoryForLocalProduct(Product)} which will
+	 * delegate to the appropriate delegate.
+	 * </p>
+	 *
+	 * @param product the newly created product.
+	 *
+	 * @return the initial repository - never <code>null</code>.
+	 */
+	public abstract Repository getInitialRepositoryForLocalProduct(Product product);
+
+	public abstract Repository getHomeRepository(Product product);
 }

@@ -5,10 +5,7 @@ import javax.jdo.PersistenceManager;
 
 import org.nightlabs.annotation.Implement;
 import org.nightlabs.jfire.organisation.Organisation;
-import org.nightlabs.jfire.store.Repository;
-import org.nightlabs.jfire.store.book.PartnerStorekeeper;
 import org.nightlabs.jfire.store.deliver.id.ServerDeliveryProcessorID;
-import org.nightlabs.jfire.trade.LegalEntity;
 import org.nightlabs.jfire.transfer.Anchor;
 
 /**
@@ -93,11 +90,12 @@ extends ServerDeliveryProcessor
 	@Implement
 	public Anchor getAnchorOutside(DeliverParams deliverParams)
 	{
-		PersistenceManager pm = getPersistenceManager();
-		String organisationID = deliverParams.store.getOrganisationID();
-		LegalEntity partner = deliverParams.deliveryData.getDelivery().getPartner();
-		Repository outsideRepository = PartnerStorekeeper.createPartnerOutsideRepository(pm, organisationID, partner);
-		return outsideRepository;
+		return getRepositoryOutside(deliverParams, null);
+//		PersistenceManager pm = getPersistenceManager();
+//		String organisationID = deliverParams.store.getOrganisationID();
+//		LegalEntity partner = deliverParams.deliveryData.getDelivery().getPartner();
+//		Repository outsideRepository = PartnerStorekeeper.createPartnerOutsideRepository(pm, organisationID, partner);
+//		return outsideRepository;
 	}
 
 }

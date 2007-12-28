@@ -1807,9 +1807,9 @@ implements
 		return this.getClass().getName() + '{' + getPrimaryKey() + '}';
 	}
 
-	protected ProductTypeLocal createProductTypeLocal(User user, Repository defaultHomeRepository)
+	protected ProductTypeLocal createProductTypeLocal(User user)
 	{
-		return new ProductTypeLocal(user, this, defaultHomeRepository); // self-registering
+		return new ProductTypeLocal(user, this); // self-registering
 	}
 
 	public void jdoPreStore()

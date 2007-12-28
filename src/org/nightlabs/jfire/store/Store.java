@@ -417,10 +417,10 @@ implements StoreCallback
 		if (productType.getVendor() == null)
 			productType.setVendor(getMandator());
 
-		ProductTypeActionHandler productTypeActionHandler = ProductTypeActionHandler.getProductTypeActionHandler(getPersistenceManager(), productType.getClass());
-		Repository defaultHomeRepository = productTypeActionHandler.getDefaultHomeRepository(productType);
+//		ProductTypeActionHandler productTypeActionHandler = ProductTypeActionHandler.getProductTypeActionHandler(getPersistenceManager(), productType.getClass());
+//		Repository defaultHomeRepository = productTypeActionHandler.getDefaultHomeRepository(productType);
 
-		productType.createProductTypeLocal(user, defaultHomeRepository);
+		productType.createProductTypeLocal(user);
 		// TODO JPOX WORKAROUND - begin
 		try {
 			pm.flush();
@@ -562,6 +562,16 @@ implements StoreCallback
 		return productType;
 	}
 
+	protected Repository getInitialRepositoryForLocalProduct(Product product)
+	{
+		return getLocalStorekeeper().getInitialRepositoryForLocalProduct(product);
+	}
+
+	protected Repository getInitialRepositoryForForeignProduct(Product product)
+	{
+		return getPartnerStorekeeper().getInitialRepositoryForForeignProduct(product);
+	}
+
 	/**
 	 * @param user Which user is adding this product.
 	 * @param product The <tt>Product</tt> that shall be added.
@@ -576,7 +586,14 @@ implements StoreCallback
 		if (product.getProductLocal() != null)
 			throw new IllegalArgumentException("This Product has already a ProductLocal assigned! Obviously you either called Store.addProduct(...) twice or you detached a ProductLocal from a remote organisation! Both is illegal!");
 
-		Repository initialRepository = ProductTypeActionHandler.getProductTypeActionHandler(pm, product.getProductType().getClass()).getInitialRepository(product);
+//		Repository initialRepository = ProductTypeActionHandler.getProductTypeActionHandler(pm, product.getProductType().getClass()).getInitialRepository(product);
+
+		Repository initialRepository;
+		if (this.getOrganisationID().equals(product.getOrganisationID()))
+			initialRepository = getInitialRepositoryForLocalProduct(product);
+		else
+			initialRepository = getInitialRepositoryForForeignProduct(product);
+
 		product.createProductLocal(user, initialRepository);
 		return product;
 	}
@@ -1256,23 +1273,38 @@ implements StoreCallback
 	 *
 	 * @param products
 	 */
-	public void consolidateProductReferences(Collection products)
+	public void consolidateProductReferences(Collection<Product> products)
 	{
 		PersistenceManager pm = getPersistenceManager();
 
-		for (Iterator itP = products.iterator(); itP.hasNext(); ) {
-			Product product = (Product) itP.next();
+		for (Product product : products) {
+			if (logger.isDebugEnabled())
+				logger.debug("consolidateProductReferences: product.class=" + product.getClass().getName() + " product.primaryKey=" + product.getPrimaryKey());
 
-			Collection productReferencesSource = ProductReference.getProductReferences(pm, product, -1);
-			Collection productReferencesDest = ProductReference.getProductReferences(pm, product, 1);
+			Collection<? extends ProductReference> productReferencesSource = ProductReference.getProductReferences(pm, product, -1);
+			Collection<? extends ProductReference> productReferencesDest = ProductReference.getProductReferences(pm, product, 1);
+
+			if (logger.isDebugEnabled()) {
+				logger.debug("consolidateProductReferences: productReferencesSource.size()=" + productReferencesSource.size() + " productReferencesDest.size()=" + productReferencesDest.size());
+
+				for (ProductReference productReference : productReferencesSource) {
+					logger.debug("consolidateProductReferences: productReferencesSource: anchor.primaryKey=" + productReference.getAnchor().getPrimaryKey());
+				}
+				for (ProductReference productReference : productReferencesDest) {
+					logger.debug("consolidateProductReferences: productReferencesDest: anchor.primaryKey=" + productReference.getAnchor().getPrimaryKey());
+				}
+			}
 
 			int size = productReferencesSource.size();
 			if (size != productReferencesDest.size())
-				throw new IllegalStateException("Product \"" + product.getPrimaryKey() + "\" has " + productReferencesSource.size() + " ProductHoles with quantity = -1, but " + productReferencesDest.size() + " ProductHoles with quantity = +1! The number of both should be the same!");
+				throw new IllegalStateException("Product \"" + product.getPrimaryKey() + "\" has " + productReferencesSource.size() + " ProductReferences with quantity = -1, but " + productReferencesDest.size() + " ProductReferences with quantity = +1! The number of both should be the same!");
 
 			// If we have multiple "chains" of product-transfers, we cannot consolidate.
-			if (size != 1)
+			if (size != 1) {
+				logger.warn("consolidateProductReferences: productReferencesSource.size()!=1 => multiple chains of transfers => cannot consolidate");
+
 				continue;
+			}
 
 			ProductReference productReferenceSource = (ProductReference) productReferencesSource.iterator().next();
 			ProductReference productReferenceDest = (ProductReference) productReferencesDest.iterator().next();
@@ -1288,28 +1320,31 @@ implements StoreCallback
 				if (!currentRepository.isOutside() && !repositorySource.getPrimaryKey().equals(currentRepository.getPrimaryKey()))
 					throw new IllegalStateException("Product \"" + product.getPrimaryKey() + "\" is currently in a different inside repository (\"" + currentRepository.getPrimaryKey() + "\") than the transfer chain starts (\"" + repositorySource.getPrimaryKey() + "\")!");
 
-				setProductLocalAnchorRecursively(product, repositoryDest);
+//				setProductLocalAnchorRecursively(product, repositoryDest);
+				product.getProductLocal().setAnchor(repositoryDest);
+				// we do not track nested product's repositories because 1st they might be dissolved anyway (i.e. consumed) and
+				// 2nd, we shouldn't do this here
 			}
 		}
 	}
 
-	/**
-	 * This method sets the Anchor for all (including the nested) Products.
-	 *
-	 * @param productLocal
-	 * @param anchor
-	 */
-	protected void setProductLocalAnchorRecursively(Product product, Anchor anchor)
-	{
-		ProductLocal productLocal = product.getProductLocal();
-		productLocal.setAnchor(anchor);
-		// TODO I should somehow ensure, that the nested products really can be delivered - or does it work this way, because
-		// we call it only when ProductLocal.quantity >= 0???!
-
-// The nested products are handled during assembling/disassembling
-//		for (Iterator it = productLocal.getNestedProducts().iterator(); it.hasNext(); )
-//			setProductLocalAnchorRecursively((Product)it.next(), anchor);
-	}
+//	/**
+//	 * This method sets the Anchor for all (including the nested) Products.
+//	 *
+//	 * @param productLocal
+//	 * @param anchor
+//	 */
+//	protected void setProductLocalAnchorRecursively(Product product, Anchor anchor)
+//	{
+//		ProductLocal productLocal = product.getProductLocal();
+//		productLocal.setAnchor(anchor);
+//		// TODO I should somehow ensure, that the nested products really can be delivered - or does it work this way, because
+//		// we call it only when ProductLocal.quantity >= 0???!
+//
+//// The nested products are handled during assembling/disassembling
+////		for (Iterator it = productLocal.getNestedProducts().iterator(); it.hasNext(); )
+////			setProductLocalAnchorRecursively((Product)it.next(), anchor);
+//	}
 
 	protected void deliverBegin_checkArticles(Collection<? extends Article> articles)
 	{

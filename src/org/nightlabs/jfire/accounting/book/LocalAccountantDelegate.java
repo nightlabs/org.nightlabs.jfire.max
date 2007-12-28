@@ -265,6 +265,5 @@ public abstract class LocalAccountantDelegate implements Serializable {
 		Query q = pm.newNamedQuery(LocalAccountantDelegate.class, QUERY_GET_CHILD_DELEGATES);
 		return (Collection)q.execute(organisationID, localAccountantDelegateID);
 	}
-	
-	
+
 }

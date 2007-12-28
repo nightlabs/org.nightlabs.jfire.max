@@ -97,6 +97,8 @@ import org.nightlabs.jfire.transfer.id.AnchorID;
 public class ProductReference
 implements Serializable, DeleteCallback
 {
+	private static final long serialVersionUID = 1L;
+
 	/**
 	 * This method finds out, how many <code>ProductReference</code>s use the given <code>productReferenceGroup</code>.
 	 *
@@ -144,24 +146,27 @@ implements Serializable, DeleteCallback
 		return null;
 	}
 
-	public static Collection getProductReferences(PersistenceManager pm, Anchor anchor)
+	@SuppressWarnings("unchecked")
+	public static Collection<? extends ProductReference> getProductReferences(PersistenceManager pm, Anchor anchor)
 	{
 		Query q = pm.newNamedQuery(ProductReference.class, "getProductReferencesForAnchor");
-		return (Collection) q.execute(anchor);
+		return (Collection<? extends ProductReference>) q.execute(anchor);
 	}
 
-	public static Collection getProductReferences(PersistenceManager pm, Product product)
+	@SuppressWarnings("unchecked")
+	public static Collection<? extends ProductReference> getProductReferences(PersistenceManager pm, Product product)
 	{
 		Query q = pm.newNamedQuery(ProductReference.class, "getProductReferencesForProduct");
-		return (Collection) q.execute(product);
+		return (Collection<? extends ProductReference>) q.execute(product);
 	}
 
-	public static Collection getProductReferences(
+	@SuppressWarnings("unchecked")
+	public static Collection<? extends ProductReference> getProductReferences(
 			PersistenceManager pm,
 			Product product, int quantity)
 	{
 		Query q = pm.newNamedQuery(ProductReference.class, "getProductReferencesForProductAndQuantity");
-		return (Collection) q.execute(product, new Integer(quantity));
+		return (Collection<? extends ProductReference>) q.execute(product, new Integer(quantity));
 	}
 
 	/**

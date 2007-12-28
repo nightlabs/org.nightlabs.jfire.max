@@ -28,14 +28,20 @@ package org.nightlabs.jfire.store.book;
 
 import java.util.Set;
 
+import javax.jdo.JDOHelper;
 import javax.jdo.PersistenceManager;
 
 import org.apache.log4j.Logger;
 import org.nightlabs.jfire.idgenerator.IDGenerator;
 import org.nightlabs.jfire.security.User;
+import org.nightlabs.jfire.store.Product;
 import org.nightlabs.jfire.store.ProductTransfer;
 import org.nightlabs.jfire.store.Repository;
+import org.nightlabs.jfire.store.Store;
 import org.nightlabs.jfire.store.deliver.DeliverProductTransfer;
+import org.nightlabs.jfire.store.deliver.ServerDeliveryProcessor;
+import org.nightlabs.jfire.store.deliver.ServerDeliveryProcessorJFire;
+import org.nightlabs.jfire.store.deliver.ServerDeliveryProcessor.DeliverParams;
 import org.nightlabs.jfire.trade.LegalEntity;
 import org.nightlabs.jfire.trade.OrganisationLegalEntity;
 import org.nightlabs.jfire.transfer.Anchor;
@@ -119,8 +125,12 @@ public class PartnerStorekeeper extends Storekeeper
 	 * @param repositoryOwner This will be the owner of the new repository. Should be the partner!
 	 * @return
 	 */
-	public static Repository createPartnerOutsideRepository(
-			PersistenceManager pm, String organisationID, LegalEntity repositoryOwner)
+	public static Repository createPartnerOutsideRepository(PersistenceManager pm, String organisationID, LegalEntity repositoryOwner)
+	{
+		return createPartnerOutsideRepository(pm, organisationID, repositoryOwner, null);
+	}
+
+	public static Repository createPartnerOutsideRepository(PersistenceManager pm, String organisationID, LegalEntity repositoryOwner, String anchorIDPrefix)
 	{
 		// TODO remove this! begin DEBUG check
 		Logger.getLogger(PartnerStorekeeper.class).info("createPartnerOutsideRepository: organisationID=" + organisationID + " repositoryOwner=" + repositoryOwner.getPrimaryKey() + " IDGenerator.getOrganisationID()=" + IDGenerator.getOrganisationID());
@@ -135,6 +145,9 @@ public class PartnerStorekeeper extends Storekeeper
 		// TODO remove this! end DEBUG check
 
 		String anchorID = repositoryOwner.getOrganisationID() + '#' + repositoryOwner.getAnchorTypeID() + '#' + repositoryOwner.getAnchorID();
+		if (anchorIDPrefix != null && !"".equals(anchorIDPrefix))
+			anchorID = anchorIDPrefix + '#' + anchorID;
+
 		return Repository.createRepository(pm, organisationID, Repository.ANCHOR_TYPE_ID_OUTSIDE, anchorID, repositoryOwner, true);
 
 //		try {
@@ -147,6 +160,38 @@ public class PartnerStorekeeper extends Storekeeper
 //			pm.makePersistent(repository);
 //			return repository;
 //		}
+	}
+
+	/**
+	 * This method is called by {@link Store#addProduct(User, Product)}, if the product is a foreign product
+	 * in order to get the repository in which the new product will be initially located. It must be
+	 * an outside repository, because the product will later be delivered (it is not yet here).
+	 * <p>
+	 * The default implementation of this method in {@link PartnerStorekeeper} calls
+	 * {@link #createPartnerOutsideRepository(PersistenceManager, String, LegalEntity)}s
+	 * which is used by the delivery processor {@link ServerDeliveryProcessorJFire} as well (it's the default repository as returned by
+	 * {@link ServerDeliveryProcessor#getRepositoryOutside(DeliverParams deliverParams)}).
+	 * </p>
+	 *
+	 * @param product the product for which to find the initial repository. Usually, only the product's organisationID is interesting, 
+	 *		but there might be different repositories used for different products. The delivery might in this case be performed
+	 *		using another outside-repository. This is fine, because the chains might be interrupted in outside-repositories since
+	 *		we don't know what's happening outside (it can leave through outside-A and come back later to outside-B).
+	 * @return the repository in which to initially locate the given foreign product.
+	 */
+	public Repository getInitialRepositoryForForeignProduct(Product product)
+	{
+		String partnerOrganisationID = product.getOrganisationID();
+		PersistenceManager pm = getPersistenceManager();
+		Store store = Store.getStore(pm);
+
+		if (partnerOrganisationID.equals(store.getOrganisationID()))
+			throw new IllegalStateException("This method should never be called for a local product! " + JDOHelper.getObjectId(product));
+
+		LegalEntity repositoryOwner = OrganisationLegalEntity.getOrganisationLegalEntity(
+				pm, partnerOrganisationID, OrganisationLegalEntity.ANCHOR_TYPE_ID_ORGANISATION, true);
+
+		return createPartnerOutsideRepository(pm, store.getOrganisationID(), repositoryOwner);
 	}
 
 	protected void handleBookOrDeliveryProductTransfer(User user, LegalEntity mandator,

@@ -37,8 +37,10 @@ import javax.jdo.PersistenceManager;
 
 import org.nightlabs.jfire.security.User;
 import org.nightlabs.jfire.store.DeliveryNote;
+import org.nightlabs.jfire.store.Product;
 import org.nightlabs.jfire.store.ProductTransfer;
 import org.nightlabs.jfire.store.ProductType;
+import org.nightlabs.jfire.store.Repository;
 import org.nightlabs.jfire.trade.Article;
 import org.nightlabs.jfire.trade.LegalEntity;
 import org.nightlabs.jfire.trade.OrganisationLegalEntity;
@@ -95,12 +97,7 @@ public class LocalStorekeeper extends Storekeeper
 		for (Iterator iter = deliveryNote.getArticles().iterator(); iter.hasNext();) {
 			Article article = (Article) iter.next();
 			ProductType productType = article.getProductType();
-			LocalStorekeeperDelegate delegate = productType.getProductTypeLocal().getLocalStorekeeperDelegate();
-			if (delegate == null) {
-				delegate = DefaultLocalStorekeeperDelegate.getDefaultLocalStorekeeperDelegate(getPersistenceManager());
-//				throw new IllegalStateException("Could not find LocalStorekeeperDelegate for Article "+JDOHelper.getObjectId(article)+" of productType "+JDOHelper.getObjectId(article.getProductType())+".");
-				productType.getProductTypeLocal().setLocalStorekeeperDelegate(delegate);
-			}
+			LocalStorekeeperDelegate delegate = getDelegate(productType);
 			delegates.put(article, delegate);
 		}
 		Set distinctDelegates = new HashSet(delegates.values());
@@ -133,4 +130,38 @@ public class LocalStorekeeper extends Storekeeper
 		return pm;
 	}
 
+	protected LocalStorekeeperDelegate getDelegate(Product product)
+	{
+		return getDelegate(product.getProductType());
+	}
+
+	protected LocalStorekeeperDelegate getDelegate(ProductType productType)
+	{
+		// TODO we should throw an exception here and not auto-assign!
+		LocalStorekeeperDelegate delegate = productType.getProductTypeLocal().getLocalStorekeeperDelegate();
+		if (delegate == null) {
+			delegate = DefaultLocalStorekeeperDelegate.getDefaultLocalStorekeeperDelegate(getPersistenceManager());
+//			throw new IllegalStateException("Could not find LocalStorekeeperDelegate for article "+JDOHelper.getObjectId(article)+" of productType "+JDOHelper.getObjectId(article.getProductType())+".");
+			productType.getProductTypeLocal().setLocalStorekeeperDelegate(delegate);
+		}
+		return delegate;
+	}
+
+	/**
+	 * Get the <code>Repository</code> for a newly created <code>Product</code>.
+	 * This can be understood as storage area of the product's factory (i.e. the end
+	 * of the production assembly line.
+	 * @param product the newly created product.
+	 *
+	 * @return the initial repository - never <code>null</code>.
+	 */
+	public Repository getInitialRepositoryForLocalProduct(Product product)
+	{
+		return getDelegate(product).getInitialRepositoryForLocalProduct(product);
+	}
+
+	public Repository getHomeRepository(Product product)
+	{
+		return getDelegate(product).getHomeRepository(product);
+	}
 }

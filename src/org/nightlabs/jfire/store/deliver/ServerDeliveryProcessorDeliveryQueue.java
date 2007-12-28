@@ -74,6 +74,7 @@ extends ServerDeliveryProcessor
 	@Override
 	@Implement
 	public Anchor getAnchorOutside(DeliverParams deliverParams) {
+		// I think this doesn't matter since the delivery will be postponed anyway and thus no transfer done.
 		return getRepositoryOutside(deliverParams, "anchorOutside.deliveryQueue");
 	}
 

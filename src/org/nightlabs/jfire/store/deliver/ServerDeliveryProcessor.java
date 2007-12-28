@@ -412,15 +412,19 @@ implements Serializable, DetachCallback
 		return pm;
 	}
 
-	protected Repository getRepositoryOutside(DeliverParams deliverParams,
-			String repositoryIDPrefix)
+	/**
+	 * @param deliverParams the context of the delivery.
+	 * @param repositoryIDPrefix either <code>null</code> or a prefix in order to manage different modes of deliveries via different outside-repositories.
+	 * @return the outside repository
+	 */
+	protected Repository getRepositoryOutside(DeliverParams deliverParams, String repositoryIDPrefix)
 	{
 		PersistenceManager pm = getPersistenceManager();
 
 		String organisationID = deliverParams.store.getOrganisationID();
 		Delivery delivery = deliverParams.deliveryData.getDelivery();
 		LegalEntity partner = delivery.getPartner();
-		return PartnerStorekeeper.createPartnerOutsideRepository(pm, organisationID, partner);
+		return PartnerStorekeeper.createPartnerOutsideRepository(pm, organisationID, partner, repositoryIDPrefix);
 
 //		String repositoryID = repositoryIDPrefix + '-' + partner.getOrganisationID() + '.' + partner.getAnchorTypeID() + '.' + partner.getAnchorID();
 //

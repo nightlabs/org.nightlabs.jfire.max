@@ -48,13 +48,11 @@ import org.nightlabs.jfire.base.JFirePrincipal;
 import org.nightlabs.jfire.base.Lookup;
 import org.nightlabs.jfire.organisation.Organisation;
 import org.nightlabs.jfire.security.User;
-import org.nightlabs.jfire.store.book.PartnerStorekeeper;
 import org.nightlabs.jfire.store.deliver.Delivery;
 import org.nightlabs.jfire.store.deliver.DeliveryData;
 import org.nightlabs.jfire.store.deliver.DeliveryHelperBean;
 import org.nightlabs.jfire.store.deliver.id.DeliveryDataID;
 import org.nightlabs.jfire.trade.Article;
-import org.nightlabs.jfire.trade.LegalEntity;
 import org.nightlabs.jfire.trade.Offer;
 import org.nightlabs.jfire.trade.OfferLocal;
 import org.nightlabs.jfire.trade.OfferRequirement;
@@ -553,7 +551,8 @@ public abstract class ProductTypeActionHandler
 					// To reduce transfers, we group them by source-repository (dest is the same for all nested products)
 					// dest: product.productType.productTypeLocal.home
 					// source: nestedProduct.productType.productTypeLocal.home
-					Anchor nestedProductHome = nestedProduct.getProductType().getProductTypeLocal().getHome();
+//					Anchor nestedProductHome = nestedProduct.getProductType().getProductTypeLocal().getLocalStorekeeperDelegate().getSourceRepositoryForAssembly(nestedProduct);
+					Anchor nestedProductHome = store.getLocalStorekeeper().getHomeRepository(nestedProduct);
 					Set<Product> nestedProductSet = nestedProductsByHome.get(nestedProductHome);
 					if (nestedProductSet == null) {
 						nestedProductSet = new HashSet<Product>();
@@ -595,7 +594,8 @@ public abstract class ProductTypeActionHandler
 					productLocal.addNestedProductLocal(nestedProductLocal);
 					nestedProductLocal.decQuantity();
 
-					Anchor nestedProductHome = nestedProduct.getProductType().getProductTypeLocal().getHome();
+//					Anchor nestedProductHome = nestedProduct.getProductType().getProductTypeLocal().getHome();
+					Anchor nestedProductHome = store.getLocalStorekeeper().getHomeRepository(nestedProduct);
 					Set<Product> nestedProductSet = nestedProductsByHome.get(nestedProductHome);
 					if (nestedProductSet == null) {
 						nestedProductSet = new HashSet<Product>();
@@ -614,7 +614,8 @@ public abstract class ProductTypeActionHandler
 		LinkedList<ProductTransfer> productTransfers = new LinkedList<ProductTransfer>();
 		boolean failed = true;
 		try {
-			Anchor thisProductHome = productType.getProductTypeLocal().getHome();
+//			Anchor thisProductHome = productType.getProductTypeLocal().getHome();
+			Anchor thisProductHome = store.getLocalStorekeeper().getHomeRepository(product);
 			for (Map.Entry<Anchor, Set<Product>> me : nestedProductsByHome.entrySet()) {
 				Anchor nestedProductHome = me.getKey();
 				Set<Product> nestedProducts = me.getValue();
@@ -665,6 +666,7 @@ public abstract class ProductTypeActionHandler
 		PersistenceManager pm = getPersistenceManager();
 
 		Trader trader = Trader.getTrader(getPersistenceManager());
+		Store store = Store.getStore(pm);
 
 		if (!product.getOrganisationID().equals(trader.getOrganisationID())) {
 			// remote product => cannot be disassembled, but must be returned instead
@@ -711,7 +713,8 @@ public abstract class ProductTypeActionHandler
 			// To reduce transfers, we group them by dest-repository (source is the same for all nested products)
 			// source: product.productType.productTypeLocal.home
 			// dest nestedProduct.productType.productTypeLocal.home
-			Anchor nestedProductHome = nestedProduct.getProductType().getProductTypeLocal().getHome();
+//			Anchor nestedProductHome = nestedProduct.getProductType().getProductTypeLocal().getHome();
+			Anchor nestedProductHome = store.getLocalStorekeeper().getHomeRepository(nestedProduct);
 			Set<Product> nestedProducts = nestedProductsByHome.get(nestedProductHome);
 			if (nestedProducts == null) {
 				nestedProducts = new HashSet<Product>();
@@ -749,8 +752,9 @@ public abstract class ProductTypeActionHandler
 		LinkedList<ProductTransfer> productTransfers = new LinkedList<ProductTransfer>();
 		boolean failed = true;
 		try {
-	
-			Anchor thisProductHome = product.getProductType().getProductTypeLocal().getHome();
+
+//			Anchor thisProductHome = product.getProductType().getProductTypeLocal().getHome();
+			Anchor thisProductHome = store.getLocalStorekeeper().getHomeRepository(product);
 			for (Map.Entry<Anchor, Set<Product>> me : nestedProductsByHome.entrySet()) {
 				Anchor nestedProductHome = me.getKey();
 				Set<Product> nestedProducts = me.getValue();
@@ -894,83 +898,83 @@ public abstract class ProductTypeActionHandler
 	{
 	}
 
-	/**
-	 * Create/return an existing repository which is used to put a newly created product into it.
-	 *
-	 * @param product The new product before it is added to the store (it has no {@link ProductLocal} assigned yet).
-	 * @return the repository
-	 */
-	public Repository getInitialRepository(Product product)
-	{
-		PersistenceManager pm = getPersistenceManager();
-		Store store = Store.getStore(pm);
-
-		if (store.getOrganisationID().equals(product.getOrganisationID()))
-			return getInitialLocalRepository(product);
-		else
-			return getInitialForeignRepository(product);
-	}
-
-	protected String getAnchorIDForLocalHomeRepository(ProductType productType)
-	{
-		return productType.getClass().getName() + ".home";  
-	}
-
-	protected String getAnchorIDForForeignHomeRepository(ProductType productType)
-	{
-		return productType.getClass().getName() + ".home#" + productType.getOrganisationID();  
-	}
-
-	protected Repository getInitialLocalRepository(Product product)
-	{
-		return getDefaultHomeRepository(product.getProductType());
-	}
-
-	/**
-	 * This method is called by {@link Store#addProductType(User, ProductType)} in order to assign the default
-	 * value for {@link ProductTypeLocal#getHome()}.
-	 * <p>
-	 * Furthermore, it is called by {@link #getInitialLocalRepository(Product)} since the initial repository
-	 * for local products is the same as the home (while it is different for foreign products, which first need to
-	 * be delivered from their initial repository to their home).
-	 * </p>
-	 *
-	 * @param productType The <code>ProductType</code> for which to determine the default home.
-	 * @return the home repository
-	 */
-	public Repository getDefaultHomeRepository(ProductType productType)
-	{
-		PersistenceManager pm = getPersistenceManager();
-		Store store = Store.getStore(pm);
-
-		return Repository.createRepository(
-				pm,
-				store.getOrganisationID(),
-				Repository.ANCHOR_TYPE_ID_HOME,
-				store.getOrganisationID().equals(productType.getOrganisationID()) ?
-						getAnchorIDForLocalHomeRepository(productType) : getAnchorIDForForeignHomeRepository(productType),
-				store.getMandator(), false);
-	}
-
-	protected Repository getInitialForeignRepository(Product product)
-	{
-		PersistenceManager pm = getPersistenceManager();
-		Store store = Store.getStore(pm);
-
-		LegalEntity repositoryOwner = OrganisationLegalEntity.getOrganisationLegalEntity(
-				pm, product.getOrganisationID(), OrganisationLegalEntity.ANCHOR_TYPE_ID_ORGANISATION, true);
-
-		return PartnerStorekeeper.createPartnerOutsideRepository(pm, store.getOrganisationID(), repositoryOwner);
+//	/**
+//	 * Create/return an existing repository which is used to put a newly created product into it.
+//	 *
+//	 * @param product The new product before it is added to the store (it has no {@link ProductLocal} assigned yet).
+//	 * @return the repository
+//	 */
+//	public Repository getInitialRepository(Product product)
+//	{
+//		PersistenceManager pm = getPersistenceManager();
 //		Store store = Store.getStore(pm);
 //
-//		// local (i.e. produced here)
+//		if (store.getOrganisationID().equals(product.getOrganisationID()))
+//			return getInitialLocalRepository(product);
+//		else
+//			return getInitialForeignRepository(product);
+//	}
+
+//	protected String getAnchorIDForLocalHomeRepository(ProductType productType)
+//	{
+//		return productType.getClass().getName() + ".home";  
+//	}
+//
+//	protected String getAnchorIDForForeignHomeRepository(ProductType productType)
+//	{
+//		return productType.getClass().getName() + ".home#" + productType.getOrganisationID();  
+//	}
+
+//	protected Repository getInitialLocalRepository(Product product)
+//	{
+//		return getDefaultHomeRepository(product.getProductType());
+//	}
+
+//	/**
+//	 * This method is called by {@link Store#addProductType(User, ProductType)} in order to assign the default
+//	 * value for {@link ProductTypeLocal#getHome()}.
+//	 * <p>
+//	 * Furthermore, it is called by {@link #getInitialLocalRepository(Product)} since the initial repository
+//	 * for local products is the same as the home (while it is different for foreign products, which first need to
+//	 * be delivered from their initial repository to their home).
+//	 * </p>
+//	 *
+//	 * @param productType The <code>ProductType</code> for which to determine the default home.
+//	 * @return the home repository
+//	 */
+//	public Repository getDefaultHomeRepository(ProductType productType)
+//	{
+//		PersistenceManager pm = getPersistenceManager();
+//		Store store = Store.getStore(pm);
+//
 //		return Repository.createRepository(
 //				pm,
 //				store.getOrganisationID(),
-//				Repository.ANCHOR_TYPE_,
-//				ANCHOR_ID_REPOSITORY_HOME_LOCAL,
-//				store.getMandator(), true);		
-	}
+//				Repository.ANCHOR_TYPE_ID_HOME,
+//				store.getOrganisationID().equals(productType.getOrganisationID()) ?
+//						getAnchorIDForLocalHomeRepository(productType) : getAnchorIDForForeignHomeRepository(productType),
+//				store.getMandator(), false);
+//	}
+
+//	protected Repository getInitialForeignRepository(Product product)
+//	{
+//		PersistenceManager pm = getPersistenceManager();
+//		Store store = Store.getStore(pm);
+//
+//		LegalEntity repositoryOwner = OrganisationLegalEntity.getOrganisationLegalEntity(
+//				pm, product.getOrganisationID(), OrganisationLegalEntity.ANCHOR_TYPE_ID_ORGANISATION, true);
+//
+//		return PartnerStorekeeper.createPartnerOutsideRepository(pm, store.getOrganisationID(), repositoryOwner);
+////		Store store = Store.getStore(pm);
+////
+////		// local (i.e. produced here)
+////		return Repository.createRepository(
+////				pm,
+////				store.getOrganisationID(),
+////				Repository.ANCHOR_TYPE_,
+////				ANCHOR_ID_REPOSITORY_HOME_LOCAL,
+////				store.getMandator(), true);		
+//	}
 
 
 

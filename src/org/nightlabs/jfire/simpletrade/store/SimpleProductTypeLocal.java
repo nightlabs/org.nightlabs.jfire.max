@@ -4,7 +4,6 @@ import org.nightlabs.inheritance.FieldMetaData;
 import org.nightlabs.jfire.security.User;
 import org.nightlabs.jfire.store.ProductType;
 import org.nightlabs.jfire.store.ProductTypeLocal;
-import org.nightlabs.jfire.store.Repository;
 
 /**
  * @author Marco Schulze - Marco at NightLabs dot de
@@ -46,9 +45,9 @@ extends ProductTypeLocal
 	@Deprecated
 	protected SimpleProductTypeLocal() { }
 
-	public SimpleProductTypeLocal(User user, ProductType productType, Repository home)
+	public SimpleProductTypeLocal(User user, ProductType productType)
 	{
-		super(user, productType, home);
+		super(user, productType);
 	}
 
 	/**

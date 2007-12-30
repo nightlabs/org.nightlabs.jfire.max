@@ -34,6 +34,7 @@ import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 
+import javax.jdo.JDODetachedFieldAccessException;
 import javax.jdo.JDOHelper;
 import javax.jdo.JDOObjectNotFoundException;
 import javax.jdo.PersistenceManager;
@@ -100,6 +101,12 @@ import org.nightlabs.util.Util;
  * @jdo.fetch-group name="Article.deliveryNote" fields="deliveryNote"
  * @jdo.fetch-group name="Article.receptionNote" fields="receptionNote"
  * @!jdo.fetch-group name="Article.delivery" fields="delivery"
+ *
+ * @jdo.fetch-group name="Order.articles" fields="order"
+ * @jdo.fetch-group name="Offer.articles" fields="offer"
+ * @jdo.fetch-group name="Invoice.articles" fields="invoice"
+ * @jdo.fetch-group name="DeliveryNote.articles" fields="deliveryNote"
+ * @jdo.fetch-group name="ReceptionNote.articles" fields="receptionNote"
  *
  * @jdo.fetch-group name="FetchGroupsTrade.articleInOrderEditor" fields="articleLocal, segment, productType, product, tariff, price"
  * @jdo.fetch-group name="FetchGroupsTrade.articleInOfferEditor" fields="articleLocal, segment, productType, product, tariff, price"
@@ -1372,5 +1379,78 @@ implements Serializable, DeleteCallback, DetachCallback, StoreCallback
 	public int hashCode()
 	{
 		return Util.hashCode(organisationID) ^ Util.hashCode(articleID);
+	}
+
+	/**
+	 * This is a temporary method until this problem is solved: http://www.jpox.org/servlet/forum/viewthread?thread=4718
+	 */
+	public void makeAllDirty()
+	{
+		if (!JDOHelper.isDetached(this))
+			throw new IllegalStateException("This method may only be called while this object is detached!");
+
+		try {
+			DeliveryNote d = deliveryNote;
+			deliveryNote = null;
+			deliveryNote = d;
+		} catch (JDODetachedFieldAccessException x) {
+			// ignore
+		}
+
+		try {
+			Invoice i = invoice;
+			invoice = null;
+			invoice = i;
+		} catch (JDODetachedFieldAccessException x) {
+			// ignore
+		}
+
+		try {
+			Offer o = offer;
+			offer = null;
+			offer = o;
+		} catch (JDODetachedFieldAccessException x) {
+			// ignore
+		}
+
+		try {
+			Article a = reversedArticle;
+			reversedArticle = null;
+			reversedArticle = a;
+		} catch (JDODetachedFieldAccessException x) {
+			// ignore
+		}
+
+		try {
+			Article a = reversingArticle;
+			reversingArticle = null;
+			reversingArticle = a;
+		} catch (JDODetachedFieldAccessException x) {
+			// ignore
+		}
+
+		try {
+			boolean r = reversed;
+			reversed = !r;
+			reversed = r;
+		} catch (JDODetachedFieldAccessException x) {
+			// ignore
+		}
+
+		try {
+			boolean r = reversing;
+			reversing = !r;
+			reversing = r;
+		} catch (JDODetachedFieldAccessException x) {
+			// ignore
+		}
+
+		try {
+			ArticlePrice p = price;
+			price = null;
+			price = p;
+		} catch (JDODetachedFieldAccessException x) {
+			// ignore
+		}
 	}
 }

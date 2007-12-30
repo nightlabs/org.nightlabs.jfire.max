@@ -80,6 +80,7 @@ import org.nightlabs.jfire.trade.id.OfferID;
 import org.nightlabs.jfire.trade.id.OfferLocalID;
 import org.nightlabs.jfire.trade.id.OrderID;
 import org.nightlabs.jfire.trade.id.SegmentTypeID;
+import org.nightlabs.jfire.trade.jbpm.JbpmConstantsOffer;
 import org.nightlabs.jfire.trade.jbpm.ProcessDefinitionAssignment;
 import org.nightlabs.jfire.trade.query.AbstractArticleContainerQuickSearchQuery;
 import org.nightlabs.jfire.transfer.id.AnchorID;
@@ -340,9 +341,9 @@ implements SessionBean
 			pm.getFetchPlan().setGroups(new String[] {
 				FetchPlan.DEFAULT, Order.FETCH_GROUP_CHANGE_USER, Order.FETCH_GROUP_CREATE_USER,
 				Order.FETCH_GROUP_CURRENCY, Order.FETCH_GROUP_CUSTOMER, Order.FETCH_GROUP_CUSTOMER_GROUP,
-				Order.FETCH_GROUP_SEGMENTS, Order.FETCH_GROUP_VENDOR
+				Order.FETCH_GROUP_SEGMENTS, Order.FETCH_GROUP_VENDOR, Segment.FETCH_GROUP_ORDER, Segment.FETCH_GROUP_SEGMENT_TYPE
 			});
-			pm.getFetchPlan().setDetachmentOptions(FetchPlan.DETACH_LOAD_FIELDS);
+//			pm.getFetchPlan().setDetachmentOptions(FetchPlan.DETACH_LOAD_FIELDS);
 
 			Order order = trader.createOrder(trader.getMandator(), customer, orderIDPrefix, currency);
 
@@ -390,7 +391,53 @@ implements SessionBean
 				Offer.FETCH_GROUP_CURRENCY, Statable.FETCH_GROUP_STATE, Statable.FETCH_GROUP_STATES,
 				State.FETCH_GROUP_STATABLE, State.FETCH_GROUP_STATE_DEFINITION, State.FETCH_GROUP_USER
 			});
-			pm.getFetchPlan().setDetachmentOptions(FetchPlan.DETACH_LOAD_FIELDS);
+//			pm.getFetchPlan().setDetachmentOptions(FetchPlan.DETACH_LOAD_FIELDS); // TODO shouldn't we omit this line? our default is to have UNload as well and it's imho cleaner to unload
+
+			return pm.detachCopy(offer);
+		} finally {
+			pm.close();
+		}
+	}
+
+	/**
+	 * @ejb.interface-method
+	 * @ejb.permission role-name="_Guest_"
+	 * @ejb.transaction type="Required"
+	 */
+	public Offer createCrossTradeReverseOffer(Collection<ArticleID> reversedArticleIDs, String offerIDPrefix) // , boolean acceptForCrossTrade)
+	throws ModuleException
+	{
+		if (!getPrincipal().userIsOrganisation())
+			throw new IllegalStateException("This method cannot be called by a user who is not an organisation!");
+
+		PersistenceManager pm = getPersistenceManager();
+		try {
+			User user = User.getUser(pm, getPrincipal());
+			Trader trader = Trader.getTrader(pm);
+			pm.getExtent(Order.class);
+			Set<Article> reversedArticles = NLJDOHelper.getObjectSet(pm, reversedArticleIDs, Article.class);
+			Offer offer = trader.createReverseOffer(user, reversedArticles, offerIDPrefix);
+
+//			if (acceptForCrossTrade) {
+//				JbpmContext jbpmContext = JbpmLookup.getJbpmConfiguration().createJbpmContext();
+//				try {
+//					ProcessInstance processInstance = jbpmContext.getProcessInstanceForUpdate(offer.getOfferLocal().getJbpmProcessInstanceId());
+//					processInstance.signal(JbpmConstantsOffer.Vendor.TRANSITION_NAME_ACCEPT_FOR_CROSS_TRADE);
+//				} finally {
+//					jbpmContext.close();
+//				}
+//			}
+
+			pm.getFetchPlan().setMaxFetchDepth(NLJDOHelper.MAX_FETCH_DEPTH_NO_LIMIT);
+			pm.getFetchPlan().setGroups(new String[] {
+					FetchPlan.DEFAULT, Offer.FETCH_GROUP_CREATE_USER, Offer.FETCH_GROUP_ORDER,
+					Offer.FETCH_GROUP_CURRENCY, Statable.FETCH_GROUP_STATE, Statable.FETCH_GROUP_STATES, Offer.FETCH_GROUP_PRICE,
+					Offer.FETCH_GROUP_CREATE_USER,
+					State.FETCH_GROUP_STATABLE, State.FETCH_GROUP_STATE_DEFINITION, State.FETCH_GROUP_USER,
+					Offer.FETCH_GROUP_ARTICLES, Article.FETCH_GROUP_PRICE, Article.FETCH_GROUP_PRODUCT, Article.FETCH_GROUP_PRODUCT_TYPE,
+					Article.FETCH_GROUP_REVERSED_ARTICLE, Article.FETCH_GROUP_REVERSING_ARTICLE,
+					Article.FETCH_GROUP_ORDER
+			});
 
 			return pm.detachCopy(offer);
 		} finally {
@@ -707,30 +754,14 @@ implements SessionBean
 	 * @ejb.transaction type = "Required"
 	 **/
 	public Offer createReverseOffer(
-			Collection reversedArticleIDs, String offerIDPrefix,
+			Collection<ArticleID> reversedArticleIDs, String offerIDPrefix,
 			boolean get, String[] fetchGroups, int maxFetchDepth)
 	throws ModuleException
 	{
 		PersistenceManager pm = getPersistenceManager();
 		try {
-			Order order = null;
 			Set<Article> reversedArticles = NLJDOHelper.getObjectSet(pm, reversedArticleIDs, Article.class);
-//			List reversedArticles = new ArrayList(reversedArticleIDs.size());
-//			for (Iterator it = reversedArticleIDs.iterator(); it.hasNext(); ) {
-//				ArticleID articleID = (ArticleID) it.next();
-//				Article article = (Article) pm.getObjectById(articleID);
-//				if (order == null)
-//					order = article.getOrder();
-//				else if (!order.getPrimaryKey().equals(article.getOrder().getPrimaryKey()))
-//					throw new IllegalArgumentException("Not all Articles are in the same Order!");
-//
-//				reversedArticles.add(article);
-//			}
-//			if (order == null)
-//				throw new IllegalArgumentException("Collection reversedArticleIDs must not be empty!");
-
 			User user = User.getUser(pm, getPrincipal());
-
 			Trader trader = Trader.getTrader(pm);
 			Offer offer = trader.createReverseOffer(user, reversedArticles, offerIDPrefix);
 

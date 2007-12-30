@@ -47,11 +47,12 @@ import org.nightlabs.jfire.accounting.Invoice;
 import org.nightlabs.jfire.base.JFirePrincipal;
 import org.nightlabs.jfire.base.Lookup;
 import org.nightlabs.jfire.organisation.Organisation;
+import org.nightlabs.jfire.security.SecurityReflector;
 import org.nightlabs.jfire.security.User;
 import org.nightlabs.jfire.store.deliver.Delivery;
 import org.nightlabs.jfire.store.deliver.DeliveryData;
-import org.nightlabs.jfire.store.deliver.DeliveryHelperBean;
 import org.nightlabs.jfire.store.deliver.id.DeliveryDataID;
+import org.nightlabs.jfire.store.id.ProductID;
 import org.nightlabs.jfire.trade.Article;
 import org.nightlabs.jfire.trade.Offer;
 import org.nightlabs.jfire.trade.OfferLocal;
@@ -65,7 +66,6 @@ import org.nightlabs.jfire.trade.TradeManager;
 import org.nightlabs.jfire.trade.TradeManagerUtil;
 import org.nightlabs.jfire.trade.TradeSide;
 import org.nightlabs.jfire.trade.Trader;
-import org.nightlabs.jfire.trade.id.ArticleID;
 import org.nightlabs.jfire.trade.id.OfferID;
 import org.nightlabs.jfire.trade.id.OrderID;
 import org.nightlabs.jfire.trade.id.SegmentID;
@@ -73,6 +73,7 @@ import org.nightlabs.jfire.trade.id.SegmentTypeID;
 import org.nightlabs.jfire.trade.jbpm.ProcessDefinitionAssignment;
 import org.nightlabs.jfire.trade.jbpm.id.ProcessDefinitionAssignmentID;
 import org.nightlabs.jfire.transfer.Anchor;
+import org.nightlabs.jfire.transfer.id.AnchorID;
 import org.nightlabs.util.Util;
 
 /**
@@ -640,16 +641,102 @@ public abstract class ProductTypeActionHandler
 		productLocal.setAssembled(true);
 	}
 
-	public void releaseCrossTradeArticles(
-			User user, Product localPackageProduct,
-			String partnerOrganisationID, Hashtable<?, ?> partnerInitialContextProperties,
-			Set<Article> partnerArticles
-	) throws Exception
+//	public void releaseCrossTradeArticles(
+//			User user, Product localPackageProduct,
+//			String partnerOrganisationID, Hashtable<?, ?> partnerInitialContextProperties,
+//			Set<Article> partnerArticles
+//	) throws Exception
+//	{
+//		PersistenceManager pm = getPersistenceManager();
+//		TradeManager tm = TradeManagerUtil.getHome(Lookup.getInitialContextProperties(pm, partnerOrganisationID)).create();
+//		Set<ArticleID> articleIDs = NLJDOHelper.getObjectIDSet(partnerArticles);
+//		tm.releaseArticles(articleIDs, true, false, null, 1);
+//	}
+
+	/**
+	 * This method delegates to {@link StoreManagerHelperBean#findAndReleaseCrossTradeArticlesForProductIDs(Map)} in order to execute
+	 * this in a separate transaction.
+	 */
+	protected void findAndReleaseCrossTradeArticlesForProductIDs(Map<String, ? extends Collection<ProductID>> organisationID2productIDs)
 	{
+		try {
+			StoreManagerHelperLocal smh = StoreManagerHelperUtil.getLocalHome().create();
+			smh.findAndReleaseCrossTradeArticlesForProductIDs(organisationID2productIDs);
+		} catch (Exception e) {
+			throw new RuntimeException(e);
+		}
+	}
+
+	/**
+	 * This method delegates to {@link StoreManagerHelperBean#createReversingCrossTradeArticlesForProductIDs(Map)} in order to execute
+	 * this in a separate transaction.
+	 */
+	protected void createReversingCrossTradeArticlesForProductIDs(Map<String, ? extends Collection<ProductID>> organisationID2productIDs)
+	{
+		try {
+			StoreManagerHelperLocal smh = StoreManagerHelperUtil.getLocalHome().create();
+			smh.createReversingCrossTradeArticlesForProductIDs(organisationID2productIDs);
+		} catch (Exception e) {
+			throw new RuntimeException(e);
+		}
+	}
+
+	/**
+	 * This method delegates to {@link StoreManagerHelperBean#deliverReversingCrossTradeArticlesForProductIDs(Map)} in order to execute
+	 * this in a separate transaction.
+	 */
+	protected void deliverReversingCrossTradeArticlesForProductIDs(Map<String, ? extends Collection<ProductID>> organisationID2productIDs)
+	{
+		try {
+			StoreManagerHelperLocal smh = StoreManagerHelperUtil.getLocalHome().create();
+			smh.deliverReversingCrossTradeArticlesForProductIDs(organisationID2productIDs);
+		} catch (Exception e) {
+			throw new RuntimeException(e);
+		}
+	}
+
+	protected void createProductTransfersAndDisassemble(ProductID packageProductID, Map<AnchorID, ? extends Collection<ProductID>> nestedProductIDsByHome)
+	{
+//		try {
+//			StoreManagerHelperLocal smh = StoreManagerHelperUtil.getLocalHome().create();
+//			smh.createProductTransfersAndDisassemble(packageProductID, nestedProductIDsByHome);
+//		} catch (Exception e) {
+//			throw new RuntimeException(e);
+//		}
 		PersistenceManager pm = getPersistenceManager();
-		TradeManager tm = TradeManagerUtil.getHome(Lookup.getInitialContextProperties(pm, partnerOrganisationID)).create();
-		Set<ArticleID> articleIDs = NLJDOHelper.getObjectIDSet(partnerArticles);
-		tm.releaseArticles(articleIDs, true, false, null, 1);
+		Store store = Store.getStore(pm);
+		User user = SecurityReflector.getUserDescriptor().getUser(pm);
+		Product packageProduct = (Product) pm.getObjectById(packageProductID);
+		Set<Anchor> involvedAnchors = new HashSet<Anchor>();
+		LinkedList<ProductTransfer> productTransfers = new LinkedList<ProductTransfer>();
+		boolean failed = true;
+		try {
+
+//			Anchor thisProductHome = packageProduct.getProductType().getProductTypeLocal().getHome();
+			Anchor thisProductHome = store.getLocalStorekeeper().getHomeRepository(packageProduct);
+			for (Map.Entry<AnchorID, ? extends Collection<ProductID>> me : nestedProductIDsByHome.entrySet()) {
+				Anchor nestedProductHome = (Anchor) pm.getObjectById(me.getKey());
+				Set<Product> nestedProducts = NLJDOHelper.getObjectSet(pm, me.getValue(), Product.class);
+				// transfer from this to nested
+				if (!thisProductHome.getPrimaryKey().equals(nestedProductHome.getPrimaryKey())) {
+					ProductTransfer productTransfer = new ProductTransfer(null, user, thisProductHome, nestedProductHome, nestedProducts);
+					productTransfer = pm.makePersistent(productTransfer);
+					productTransfer.bookTransfer(user, involvedAnchors);
+					productTransfers.add(productTransfer);
+				}
+			}
+
+			// and finally check the integrity of the involved anchors after all the transfers
+			Anchor.checkIntegrity(productTransfers, involvedAnchors);
+
+			failed = false;
+		} finally {
+			if (failed)
+				Anchor.resetIntegrity(productTransfers, involvedAnchors);
+		}
+
+		packageProduct.getProductLocal().removeAllNestedProductLocals();
+		packageProduct.getProductLocal().setAssembled(false);
 	}
 
 	/**
@@ -675,9 +762,10 @@ public abstract class ProductTypeActionHandler
 
 		// key: Anchor home
 		// value: Set<Product> products
-		Map<Anchor, Set<Product>> nestedProductsByHome = new HashMap<Anchor, Set<Product>>();
+		Map<AnchorID, Set<ProductID>> nestedProductIDsByHome = new HashMap<AnchorID, Set<ProductID>>();
 
-		Map<String, List<Product>> organisationID2partnerNestedProducts = null; // lazy creation
+		Map<String, List<ProductID>> organisationID2partnerNestedProductIDs_releaseOnly = null; // lazy creation
+		Map<String, List<ProductID>> organisationID2partnerNestedProductIDs_reverseAndRelease = null; // lazy creation
 
 		for (ProductLocal nestedProductLocal : product.getProductLocal().getNestedProductLocals()) {
 			Product nestedProduct = nestedProductLocal.getProduct();
@@ -693,91 +781,72 @@ public abstract class ProductTypeActionHandler
 
 				// If it has not yet been delivered here, we simply search for the backend-articles and release them.
 				// If it has been delivered here but already delivered back, we do the same for the reversing articles.
-				// TODO check for this status!
+				// If it is still here, we have to deliver it back before releasing.
 
-				if (organisationID2partnerNestedProducts == null)
-					organisationID2partnerNestedProducts = new HashMap<String, List<Product>>();
+				// So, check where it currently is. It must be a repository, because a LegalEntity is no allowed persistent state.
+				if (!(nestedProduct.getProductLocal().getAnchor() instanceof Repository))
+					throw new IllegalStateException("The product \"" + nestedProduct.getPrimaryKey() + "\" is currently not in a Repository, but it's current anchor is an instance of " + (nestedProduct.getProductLocal().getAnchor() == null ? null : nestedProduct.getProductLocal().getAnchor().getClass().getName()) + " with the primary key \"" + (nestedProduct.getProductLocal().getAnchor() == null ? null : nestedProduct.getProductLocal().getAnchor().getPrimaryKey()) + "\"!");
 
-				List<Product> nestedProducts = organisationID2partnerNestedProducts.get(nestedProduct.getOrganisationID());
-				if (nestedProducts == null) {
-					nestedProducts = new ArrayList<Product>();
-					organisationID2partnerNestedProducts.put(nestedProduct.getOrganisationID(), nestedProducts);
+				Repository repository = (Repository) nestedProduct.getProductLocal().getAnchor();
+				if (repository.isOutside()) {
+					// It is not here, so it must be at the supplier, because we cannot sell it directly somewhere else and
+					// when it is nested, the transfers of the package do not transfer the nested products (hence the nested
+					// product stays at the repository where it has been packed into its package-product).
+					// Still, we check whether it is where we expect it to be - just for the sake of a consistent database.
+					if (!(repository.getOwner() instanceof OrganisationLegalEntity))
+						throw new IllegalStateException("The product \"" + nestedProduct.getPrimaryKey() + "\" is currently outside, but the owner of its repository \"" + repository.getPrimaryKey() + "\" is not an OrganisationLegalEntity! Instead, the owner is an instance of " + (repository.getOwner() == null ? null : repository.getOwner().getClass()) + " with the primary key \"" + (repository.getOwner() == null ? null : repository.getOwner().getPrimaryKey()) + "\"");
+
+					if (!nestedProduct.getOrganisationID().equals(repository.getOwner().getOrganisationID()))
+							throw new IllegalStateException("The product \"" + nestedProduct.getPrimaryKey() + "\" is currently outside, but the owner of its repository \"" + repository.getPrimaryKey() + "\" is not the correct OrganisationLegalEntity! The organisationIDs do not match! The owner is \"" + (repository.getOwner() == null ? null : repository.getOwner().getPrimaryKey()) + "\" but its organisationID should be \"" + nestedProduct.getOrganisationID() + "\"!");
+
+					// the checks were successful, so we do not need to deliver it back => simply release
+					if (organisationID2partnerNestedProductIDs_releaseOnly == null)
+						organisationID2partnerNestedProductIDs_releaseOnly = new HashMap<String, List<ProductID>>();
+
+					List<ProductID> nestedProductIDs = organisationID2partnerNestedProductIDs_releaseOnly.get(nestedProduct.getOrganisationID());
+					if (nestedProductIDs == null) {
+						nestedProductIDs = new ArrayList<ProductID>();
+						organisationID2partnerNestedProductIDs_releaseOnly.put(nestedProduct.getOrganisationID(), nestedProductIDs);
+					}
+					nestedProductIDs.add((ProductID) JDOHelper.getObjectId(nestedProduct));
 				}
-				nestedProducts.add(nestedProduct);
+				else {
+					// it is here => reverse and deliver back
+					if (organisationID2partnerNestedProductIDs_reverseAndRelease == null)
+						organisationID2partnerNestedProductIDs_reverseAndRelease = new HashMap<String, List<ProductID>>();
 
-				// And of course, we need to transfer the products from the package-product's home to the nested product's homes
-				// TODO take care of the transfers - hmm... isn't this already done by the code below (nestedProductsByHome)???
-			}
+					List<ProductID> nestedProductIDs = organisationID2partnerNestedProductIDs_reverseAndRelease.get(nestedProduct.getOrganisationID());
+					if (nestedProductIDs == null) {
+						nestedProductIDs = new ArrayList<ProductID>();
+						organisationID2partnerNestedProductIDs_reverseAndRelease.put(nestedProduct.getOrganisationID(), nestedProductIDs);
+					}
+					nestedProductIDs.add((ProductID) JDOHelper.getObjectId(nestedProduct));
+				}
+			} // remote nested product
 
-			// We need to transfer the nested product back to its home repositories and update productLocal.quantity
+			// We need to transfer the nested products back to their home repositories and update productLocal.quantity
 			// To reduce transfers, we group them by dest-repository (source is the same for all nested products)
-			// source: product.productType.productTypeLocal.home
-			// dest nestedProduct.productType.productTypeLocal.home
 //			Anchor nestedProductHome = nestedProduct.getProductType().getProductTypeLocal().getHome();
-			Anchor nestedProductHome = store.getLocalStorekeeper().getHomeRepository(nestedProduct);
-			Set<Product> nestedProducts = nestedProductsByHome.get(nestedProductHome);
-			if (nestedProducts == null) {
-				nestedProducts = new HashSet<Product>();
-				nestedProductsByHome.put(nestedProductHome, nestedProducts);
+			AnchorID nestedProductHomeID = (AnchorID) JDOHelper.getObjectId(store.getLocalStorekeeper().getHomeRepository(nestedProduct));
+			Set<ProductID> nestedProductIDs = nestedProductIDsByHome.get(nestedProductHomeID);
+			if (nestedProductIDs == null) {
+				nestedProductIDs = new HashSet<ProductID>();
+				nestedProductIDsByHome.put(nestedProductHomeID, nestedProductIDs);
 			}
-			nestedProducts.add(nestedProduct);
+			nestedProductIDs.add((ProductID) JDOHelper.getObjectId(nestedProduct));
 		} // for (ProductLocal nestedProductLocal : product.getProductLocal().getNestedProductLocals()) {
 
-		if (organisationID2partnerNestedProducts != null) {
-			for (Map.Entry<String, List<Product>> me : organisationID2partnerNestedProducts.entrySet()) {
-				String partnerOrganisationID = me.getKey();
-				List<Product> nestedProducts = me.getValue();
-				Set<Article> partnerArticles = new HashSet<Article>(nestedProducts.size());
+		if (organisationID2partnerNestedProductIDs_releaseOnly != null)
+			findAndReleaseCrossTradeArticlesForProductIDs(organisationID2partnerNestedProductIDs_releaseOnly);
 
-				for (Product nestedProduct : nestedProducts) {
-					ProductLocal nestedProductLocal = nestedProduct.getProductLocal();
-					Article purchaseArticle = nestedProductLocal.getPurchaseArticle();
-					if (purchaseArticle != null)
-						partnerArticles.add(purchaseArticle);
-
-					nestedProductLocal.setPurchaseArticle(null);
-				}
-
-				try {
-					if (!partnerArticles.isEmpty())
-						releaseCrossTradeArticles(user, product, partnerOrganisationID, Lookup.getInitialContextProperties(pm, partnerOrganisationID), partnerArticles);
-				} catch (Exception e) {
-					throw new RuntimeException(e);
-				}
-			} // for (Map.Entry<String, List<Product>> me : organisationID2partnerNestedProducts.entrySet()) {
-		} // if (organisationID2partnerNestedProducts != null) {
-
-		// create the ProductTransfers for the grouped nested products
-		Set<Anchor> involvedAnchors = new HashSet<Anchor>();
-		LinkedList<ProductTransfer> productTransfers = new LinkedList<ProductTransfer>();
-		boolean failed = true;
-		try {
-
-//			Anchor thisProductHome = product.getProductType().getProductTypeLocal().getHome();
-			Anchor thisProductHome = store.getLocalStorekeeper().getHomeRepository(product);
-			for (Map.Entry<Anchor, Set<Product>> me : nestedProductsByHome.entrySet()) {
-				Anchor nestedProductHome = me.getKey();
-				Set<Product> nestedProducts = me.getValue();
-				// transfer from this to nested
-				if (!thisProductHome.getPrimaryKey().equals(nestedProductHome.getPrimaryKey())) {
-					ProductTransfer productTransfer = new ProductTransfer(null, user, thisProductHome, nestedProductHome, nestedProducts);
-					productTransfer = pm.makePersistent(productTransfer);
-					productTransfer.bookTransfer(user, involvedAnchors);
-					productTransfers.add(productTransfer);
-				}
-			}
-
-			// and finally check the integrity of the involved anchors after all the transfers
-			Anchor.checkIntegrity(productTransfers, involvedAnchors);
-
-			failed = false;
-		} finally {
-			if (failed)
-				Anchor.resetIntegrity(productTransfers, involvedAnchors);
+		if (organisationID2partnerNestedProductIDs_reverseAndRelease != null) {
+			createReversingCrossTradeArticlesForProductIDs(organisationID2partnerNestedProductIDs_reverseAndRelease);
+			deliverReversingCrossTradeArticlesForProductIDs(organisationID2partnerNestedProductIDs_reverseAndRelease);
+			findAndReleaseCrossTradeArticlesForProductIDs(organisationID2partnerNestedProductIDs_reverseAndRelease);
 		}
 
-		productLocal.removeAllNestedProductLocals();
-		productLocal.setAssembled(false);
+		// create the ProductTransfers for the grouped nested products
+		createProductTransfersAndDisassemble((ProductID) JDOHelper.getObjectId(product), nestedProductIDsByHome);
 	}
 
 	/**
@@ -866,7 +935,7 @@ public abstract class ProductTypeActionHandler
 	}
 
 	/**
-	 * This method is called by {@link DeliveryHelperBean#deliverBegin_storeDeliverBeginServerResult(org.nightlabs.jfire.store.deliver.id.DeliveryID, org.nightlabs.jfire.store.deliver.DeliveryResult, boolean, String[], int)}
+	 * This method is called by {@link org.nightlabs.jfire.store.deliver.DeliveryHelperBean#deliverBegin_storeDeliverBeginServerResult(org.nightlabs.jfire.store.deliver.id.DeliveryID, org.nightlabs.jfire.store.deliver.DeliveryResult, boolean, String[], int)}
 	 * at the end of its action. You should not cause any exception here as this will cause the <code>DeliveryResult</code> not to be written and
 	 * this situation is not handled.
 	 *
@@ -878,7 +947,7 @@ public abstract class ProductTypeActionHandler
 	{
 	}
 	/**
-	 * This method is called by {@link DeliveryHelperBean#deliverDoWork_storeDeliverDoWorkServerResult(org.nightlabs.jfire.store.deliver.id.DeliveryID, org.nightlabs.jfire.store.deliver.DeliveryResult, boolean, String[], int)} at the end of its action.
+	 * This method is called by {@link org.nightlabs.jfire.store.deliver.DeliveryHelperBean#deliverDoWork_storeDeliverDoWorkServerResult(org.nightlabs.jfire.store.deliver.id.DeliveryID, org.nightlabs.jfire.store.deliver.DeliveryResult, boolean, String[], int)} at the end of its action.
 	 *
 	 * @param principal The user who initiated this action. If you need a {@link User} instance, call {@link User#getUser(PersistenceManager, org.nightlabs.jfire.base.JFireBasePrincipal)}.
 	 * @param delivery The currently performed delivery. If you need the {@link DeliveryData}, you can use {@link PersistenceManager#getObjectById(Object)} with {@link DeliveryDataID#create(org.nightlabs.jfire.store.deliver.id.DeliveryID)}

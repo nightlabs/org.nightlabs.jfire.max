@@ -35,6 +35,7 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
 
+import javax.jdo.JDODetachedFieldAccessException;
 import javax.jdo.JDOHelper;
 import javax.jdo.PersistenceManager;
 import javax.jdo.Query;
@@ -899,5 +900,48 @@ implements
 	 */
 	public int getArticleCount() {
 		return articleCount;
+	}
+
+	/**
+	 * This is a temporary method until this problem is solved: http://www.jpox.org/servlet/forum/viewthread?thread=4718
+	 */
+	public void makeAllDirty()
+	{
+		if (!JDOHelper.isDetached(this))
+			throw new IllegalStateException("This method may only be called while this object is detached!");
+
+		try {
+			State s = state;
+			state = null;
+			state = s;
+		} catch (JDODetachedFieldAccessException x) {
+			// ignore
+		}
+
+		try {
+			Price p = price;
+			price = null;
+			price = p;
+		} catch (JDODetachedFieldAccessException x) {
+			// ignore
+		}
+
+		try {
+			List<State> ss = states;
+			states = null;
+			states = ss;
+		} catch (JDODetachedFieldAccessException x) {
+			// ignore
+		}
+
+		try {
+			Set<Article> aa = articles;
+			articles = null;
+			articles = aa;
+			for (Article article : aa)
+				article.makeAllDirty();
+		} catch (JDODetachedFieldAccessException x) {
+			// ignore
+		}
 	}
 }

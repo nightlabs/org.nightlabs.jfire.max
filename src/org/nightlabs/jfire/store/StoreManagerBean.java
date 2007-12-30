@@ -1489,7 +1489,7 @@ implements SessionBean
 							LegalEntity partner = OrganisationLegalEntity.getOrganisationLegalEntity(pm, nestedProductLocal.getOrganisationID(), OrganisationLegalEntity.ANCHOR_TYPE_ID_ORGANISATION, true);
 
 							Boolean directionIncoming = Boolean.TRUE;
-							if (article.isReversing())
+							if (article.isReversing()) // TODO this should imho never happen - maybe throw an exception?
 								directionIncoming = Boolean.FALSE;
 
 							Set<Article> articleSet = direction2articleSet.get(directionIncoming);
@@ -1528,6 +1528,7 @@ implements SessionBean
 
 						for (Map.Entry<Boolean, Set<Article>> me3 : me2.getValue().entrySet()) {
 //							Boolean directionIncoming = me3.getKey();
+							
 							Set<Article> backhandArticles = me3.getValue();
 
 							// Because of transactional problems, crossTradeDeliveryCoordinator.performCrossTradeDelivery(...) will spawn an additional AsyncInvoke

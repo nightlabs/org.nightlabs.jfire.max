@@ -27,6 +27,12 @@
 package org.nightlabs.jfire.store;
 
 import java.rmi.RemoteException;
+import java.util.Collection;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 import javax.ejb.CreateException;
@@ -37,17 +43,23 @@ import javax.jdo.FetchPlan;
 import javax.jdo.JDOHelper;
 import javax.jdo.PersistenceManager;
 
-import org.nightlabs.ModuleException;
 import org.nightlabs.jdo.NLJDOHelper;
 import org.nightlabs.jfire.base.BaseSessionBeanImpl;
 import org.nightlabs.jfire.base.Lookup;
 import org.nightlabs.jfire.security.User;
+import org.nightlabs.jfire.store.deliver.CrossTradeDeliveryCoordinator;
 import org.nightlabs.jfire.store.id.DeliveryNoteID;
+import org.nightlabs.jfire.store.id.ProductID;
 import org.nightlabs.jfire.trade.Article;
+import org.nightlabs.jfire.trade.Offer;
+import org.nightlabs.jfire.trade.TradeManager;
+import org.nightlabs.jfire.trade.TradeManagerUtil;
 import org.nightlabs.jfire.trade.TradeSide;
 import org.nightlabs.jfire.trade.id.ArticleID;
 import org.nightlabs.jfire.trade.jbpm.ProcessDefinitionAssignment;
 import org.nightlabs.jfire.trade.jbpm.id.ProcessDefinitionAssignmentID;
+import org.nightlabs.jfire.transfer.Anchor;
+import org.nightlabs.jfire.transfer.id.AnchorID;
 
 /**
  * @ejb.bean name="jfire/ejb/JFireTrade/StoreManagerHelper"	
@@ -162,23 +174,167 @@ implements SessionBean
 		}
 	}
 
+	/**
+	 * @ejb.interface-method view-type="local"
+	 * @ejb.transaction type="RequiresNew"
+	 * @ejb.permission role-name="_Guest_"
+	 */
+	public void findAndReleaseCrossTradeArticlesForProductIDs(Map<String, ? extends Collection<ProductID>> organisationID2productIDs)
+	throws Exception
+	{
+		PersistenceManager pm = getPersistenceManager();
+		try {
+
+			for (Map.Entry<String, ? extends Collection<ProductID>> me : organisationID2productIDs.entrySet()) {
+				String partnerOrganisationID = me.getKey();
+				List<Product> products = NLJDOHelper.getObjectList(pm, me.getValue(), Product.class);
+				Set<Article> partnerArticles = new HashSet<Article>(products.size());
+
+				for (Product product : products) {
+					ProductLocal nestedProductLocal = product.getProductLocal();
+					Article purchaseArticle = nestedProductLocal.getPurchaseArticle();
+					if (purchaseArticle != null) {
+						if (purchaseArticle.getReversingArticle() != null)
+							partnerArticles.add(purchaseArticle.getReversingArticle());
+						else
+							partnerArticles.add(purchaseArticle);
+					}
+
+					nestedProductLocal.setPurchaseArticle(null);
+				}
+
+				if (!partnerArticles.isEmpty()) {
+					TradeManager tm = TradeManagerUtil.getHome(Lookup.getInitialContextProperties(pm, partnerOrganisationID)).create();
+					Set<ArticleID> articleIDs = NLJDOHelper.getObjectIDSet(partnerArticles);
+					tm.releaseArticles(articleIDs, true, false, null, 1);
+				}
+			} // for (Map.Entry<String, List<Product>> me : organisationID2partnerNestedProducts.entrySet()) {
+
+		} finally {
+			pm.close();
+		}
+	}
+
+	/**
+	 * @ejb.interface-method view-type="local"
+	 * @ejb.transaction type="RequiresNew"
+	 * @ejb.permission role-name="_Guest_"
+	 */
+	public void createReversingCrossTradeArticlesForProductIDs(Map<String, ? extends Collection<ProductID>> organisationID2productIDs)
+	throws Exception
+	{
+		PersistenceManager pm = getPersistenceManager();
+		try {
+			for (Map.Entry<String, ? extends Collection<ProductID>> me : organisationID2productIDs.entrySet()) {
+				String partnerOrganisationID = me.getKey();
+				List<Product> products = NLJDOHelper.getObjectList(pm, me.getValue(), Product.class);
+				Set<ArticleID> reversedArticleIDs = new HashSet<ArticleID>(products.size());
+
+				for (Product product : products) {
+					ProductLocal nestedProductLocal = product.getProductLocal();
+					Article purchaseArticle = nestedProductLocal.getPurchaseArticle();
+					if (purchaseArticle.getReversingArticle() == null)
+						reversedArticleIDs.add((ArticleID) JDOHelper.getObjectId(purchaseArticle));	
+				}
+
+				if (!reversedArticleIDs.isEmpty()) {
+					TradeManager tradeManager = TradeManagerUtil.getHome(Lookup.getInitialContextProperties(pm, partnerOrganisationID)).create();
+					Offer offer = tradeManager.createCrossTradeReverseOffer(reversedArticleIDs, null);
+					offer.makeAllDirty();
+					offer = pm.makePersistent(offer);
+					// TODO we should add it to the OfferRequirements, if it is delivered back during the release of a "front-end-article"
+				}
+			}
+		} finally {
+			pm.close();
+		}
+	}
+
+	/**
+	 * @ejb.interface-method view-type="local"
+	 * @ejb.transaction type="RequiresNew"
+	 * @ejb.permission role-name="_Guest_"
+	 */
+	public void deliverReversingCrossTradeArticlesForProductIDs(Map<String, ? extends Collection<ProductID>> organisationID2productIDs)
+	throws Exception
+	{
+		PersistenceManager pm = getPersistenceManager();
+		try {
+			for (Map.Entry<String, ? extends Collection<ProductID>> me1 : organisationID2productIDs.entrySet()) {
+//				String partnerOrganisationID = me1.getKey();
+				List<Product> products = NLJDOHelper.getObjectList(pm, me1.getValue(), Product.class);
+				Map<CrossTradeDeliveryCoordinator, Set<Article>> crossTradeDeliveryCoordinator2reversingArticles = new HashMap<CrossTradeDeliveryCoordinator, Set<Article>>();
+
+				for (Product product : products) {
+					ProductLocal nestedProductLocal = product.getProductLocal();
+					Article purchaseArticle = nestedProductLocal.getPurchaseArticle();
+					if (purchaseArticle.getReversingArticle() == null)
+						throw new IllegalStateException("purchaseArticle.getReversingArticle() == null for product \"" + product.getPrimaryKey() + "\"!");
+
+					CrossTradeDeliveryCoordinator crossTradeDeliveryCoordinator = product.getProductType().getDeliveryConfiguration().getCrossTradeDeliveryCoordinator();
+					Set<Article> reversingBackendArticles = crossTradeDeliveryCoordinator2reversingArticles.get(crossTradeDeliveryCoordinator);
+					if (reversingBackendArticles == null) {
+						reversingBackendArticles = new HashSet<Article>();
+						crossTradeDeliveryCoordinator2reversingArticles.put(crossTradeDeliveryCoordinator, reversingBackendArticles);
+					}
+					reversingBackendArticles.add(purchaseArticle.getReversingArticle());
+				}
+
+				for (Map.Entry<CrossTradeDeliveryCoordinator, Set<Article>> me2 : crossTradeDeliveryCoordinator2reversingArticles.entrySet())
+					me2.getKey().performCrossTradeDelivery(me2.getValue());
+
+			} // for (Map.Entry<String, ? extends Collection<ProductID>> me1 : organisationID2productIDs.entrySet()) {
+		} finally {
+			pm.close();
+		}
+	}
+
 //	/**
 //	 * @ejb.interface-method view-type="local"
 //	 * @ejb.transaction type="RequiresNew"
 //	 * @ejb.permission role-name="_Guest_"
 //	 */
-//	public void testDeliveryNote(DeliveryNoteID deliveryNoteID)
-//	throws ModuleException
+//	public void createProductTransfersAndDisassemble(ProductID packageProductID, Map<AnchorID, ? extends Collection<ProductID>> nestedProductIDsByHome)
+//	throws Exception
 //	{
 //		PersistenceManager pm = getPersistenceManager();
 //		try {
+//			Store store = Store.getStore(pm);
+//			User user = User.getUser(pm, getPrincipal());
+//			Product packageProduct = (Product) pm.getObjectById(packageProductID);
+//			Set<Anchor> involvedAnchors = new HashSet<Anchor>();
+//			LinkedList<ProductTransfer> productTransfers = new LinkedList<ProductTransfer>();
+//			boolean failed = true;
 //			try {
-//				pm.getObjectById(deliveryNoteID);
-//			} catch (JDOObjectNotFoundException e) {
-//				Logger.getLogger(StoreManagerHelperBean.class).error("DeliveryNote does not exist in organisation "+ getOrganisationID() +": " + deliveryNoteID);
+//
+////				Anchor thisProductHome = packageProduct.getProductType().getProductTypeLocal().getHome();
+//				Anchor thisProductHome = store.getLocalStorekeeper().getHomeRepository(packageProduct);
+//				for (Map.Entry<AnchorID, ? extends Collection<ProductID>> me : nestedProductIDsByHome.entrySet()) {
+//					Anchor nestedProductHome = (Anchor) pm.getObjectById(me.getKey());
+//					Set<Product> nestedProducts = NLJDOHelper.getObjectSet(pm, me.getValue(), Product.class);
+//					// transfer from this to nested
+//					if (!thisProductHome.getPrimaryKey().equals(nestedProductHome.getPrimaryKey())) {
+//						ProductTransfer productTransfer = new ProductTransfer(null, user, thisProductHome, nestedProductHome, nestedProducts);
+//						productTransfer = pm.makePersistent(productTransfer);
+//						productTransfer.bookTransfer(user, involvedAnchors);
+//						productTransfers.add(productTransfer);
+//					}
+//				}
+//
+//				// and finally check the integrity of the involved anchors after all the transfers
+//				Anchor.checkIntegrity(productTransfers, involvedAnchors);
+//
+//				failed = false;
+//			} finally {
+//				if (failed)
+//					Anchor.resetIntegrity(productTransfers, involvedAnchors);
 //			}
+//
+//			packageProduct.getProductLocal().removeAllNestedProductLocals();
+//			packageProduct.getProductLocal().setAssembled(false);
 //		} finally {
 //			pm.close();
 //		}
 //	}
+
 }

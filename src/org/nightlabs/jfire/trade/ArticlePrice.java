@@ -63,7 +63,10 @@ import org.nightlabs.jfire.store.ProductType;
  * @jdo.fetch-group name="ArticlePrice.productType" fields="productType"
  * @jdo.fetch-group name="ArticlePrice.packageProductType" fields="packageProductType"
  * @jdo.fetch-group name="ArticlePrice.product" fields="product"
+ * @jdo.fetch-group name="ArticlePrice.article" fields="article"
  * @jdo.fetch-group name="ArticlePrice.this" fetch-groups="default" fields="origPrice, nestedArticlePrices, packageArticlePrice, productType, packageProductType, product"
+ *
+ * @jdo.fetch-group name="Article.price" fields="article"
  */
 public class ArticlePrice extends org.nightlabs.jfire.accounting.Price
 {
@@ -73,6 +76,7 @@ public class ArticlePrice extends org.nightlabs.jfire.accounting.Price
 	public static final String FETCH_GROUP_NESTED_ARTICLE_PRICES = "ArticlePrice.nestedArticlePrices";
 	public static final String FETCH_GROUP_NESTED_ARTICLE_PRICES_NO_LIMIT = "ArticlePrice.nestedArticlePrices[-1]";
 	public static final String FETCH_GROUP_ORIG_PRICE = "ArticlePrice.origPrice";
+	public static final String FETCH_GROUP_ARTICLE = "ArticlePrice.article";
 	public static final String FETCH_GROUP_THIS_ARTICLE_PRICE = "ArticlePrice.this";
 
 	/**

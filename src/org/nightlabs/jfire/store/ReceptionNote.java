@@ -49,6 +49,8 @@ import org.nightlabs.util.Util;
  *
  * @jdo.fetch-group name="Statable.state" fields="state"
  * @jdo.fetch-group name="Statable.states" fields="states"
+ *
+ * @jdo.fetch-group name="ReceptionNote.articles" fields="articles"
  * @jdo.fetch-group name="ReceptionNote.this" fetch-groups="default" fields="receptionNoteLocal, articles, createDT, createUser, state, states";
  */
 public class ReceptionNote

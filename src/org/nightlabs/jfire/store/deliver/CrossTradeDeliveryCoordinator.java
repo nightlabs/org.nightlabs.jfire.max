@@ -45,6 +45,7 @@ import org.nightlabs.jfire.organisation.Organisation;
 import org.nightlabs.jfire.store.DeliveryNote;
 import org.nightlabs.jfire.store.Store;
 import org.nightlabs.jfire.store.StoreManager;
+import org.nightlabs.jfire.store.StoreManagerHelperBean;
 import org.nightlabs.jfire.store.StoreManagerHelperLocal;
 import org.nightlabs.jfire.store.StoreManagerHelperUtil;
 import org.nightlabs.jfire.store.StoreManagerUtil;
@@ -200,7 +201,7 @@ public class CrossTradeDeliveryCoordinator implements Serializable
 	 * Perform a delivery between two organisations.
 	 * <p>
 	 * Since our current delivery API works with separate transactions, the newly created DeliveryNote
-	 * is not yet seen in the delivery-methods. Hence, this method will delegate to {@link StoreManagerHelperLocal#storeDeliveryNote(DeliveryNote)}
+	 * is not yet seen in the delivery-methods. Hence, this method will delegate to {@link StoreManagerHelperBean#createAndReplicateVendorDeliveryNote(Set)}
 	 * which is executed in a new, separate transaction.
 	 * In the long run, we should implement a special "fast-track-delivery" which will be used between organisations and work within one
 	 * transaction.

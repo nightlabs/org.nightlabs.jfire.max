@@ -836,6 +836,9 @@ public abstract class ProductTypeActionHandler
 			nestedProductIDs.add((ProductID) JDOHelper.getObjectId(nestedProduct));
 		} // for (ProductLocal nestedProductLocal : product.getProductLocal().getNestedProductLocals()) {
 
+		pm.flush();
+		pm.evictAll();
+
 		if (organisationID2partnerNestedProductIDs_releaseOnly != null)
 			findAndReleaseCrossTradeArticlesForProductIDs(organisationID2partnerNestedProductIDs_releaseOnly);
 

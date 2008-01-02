@@ -30,7 +30,6 @@ import java.rmi.RemoteException;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
-import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -51,15 +50,16 @@ import org.nightlabs.jfire.store.deliver.CrossTradeDeliveryCoordinator;
 import org.nightlabs.jfire.store.id.DeliveryNoteID;
 import org.nightlabs.jfire.store.id.ProductID;
 import org.nightlabs.jfire.trade.Article;
+import org.nightlabs.jfire.trade.ArticleLocal;
 import org.nightlabs.jfire.trade.Offer;
+import org.nightlabs.jfire.trade.OfferLocal;
 import org.nightlabs.jfire.trade.TradeManager;
 import org.nightlabs.jfire.trade.TradeManagerUtil;
 import org.nightlabs.jfire.trade.TradeSide;
 import org.nightlabs.jfire.trade.id.ArticleID;
+import org.nightlabs.jfire.trade.id.OfferID;
 import org.nightlabs.jfire.trade.jbpm.ProcessDefinitionAssignment;
 import org.nightlabs.jfire.trade.jbpm.id.ProcessDefinitionAssignmentID;
-import org.nightlabs.jfire.transfer.Anchor;
-import org.nightlabs.jfire.transfer.id.AnchorID;
 
 /**
  * @ejb.bean name="jfire/ejb/JFireTrade/StoreManagerHelper"	
@@ -225,6 +225,8 @@ implements SessionBean
 	{
 		PersistenceManager pm = getPersistenceManager();
 		try {
+			User user = User.getUser(pm, getPrincipal());
+
 			for (Map.Entry<String, ? extends Collection<ProductID>> me : organisationID2productIDs.entrySet()) {
 				String partnerOrganisationID = me.getKey();
 				List<Product> products = NLJDOHelper.getObjectList(pm, me.getValue(), Product.class);
@@ -238,10 +240,28 @@ implements SessionBean
 				}
 
 				if (!reversedArticleIDs.isEmpty()) {
+					pm.flush(); // TODO JPOX WORKAROUND - maybe it helps agains the update-problem (see 2nd workaround below)
+
 					TradeManager tradeManager = TradeManagerUtil.getHome(Lookup.getInitialContextProperties(pm, partnerOrganisationID)).create();
 					Offer offer = tradeManager.createCrossTradeReverseOffer(reversedArticleIDs, null);
 					offer.makeAllDirty();
 					offer = pm.makePersistent(offer);
+
+					// TODO JPOX WORKAROUND BEGIN
+					OfferID offerID = (OfferID) JDOHelper.getObjectId(offer);
+					pm.flush();
+					pm.evictAll();
+					offer = (Offer) pm.getObjectById(offerID);
+					for (Article article : offer.getArticles()) {
+						article.checkReversing();
+					}
+					// TODO JPOX WORKAROUND END
+
+					// create the local objects
+					new OfferLocal(offer); // self-registering
+					for (Article article : offer.getArticles()) {
+						article.createArticleLocal(user); // self-registering
+					}
 					// TODO we should add it to the OfferRequirements, if it is delivered back during the release of a "front-end-article"
 				}
 			}

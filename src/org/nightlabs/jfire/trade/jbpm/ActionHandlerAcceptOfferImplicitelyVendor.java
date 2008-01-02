@@ -10,7 +10,6 @@ import org.jbpm.instantiation.Delegation;
 import org.nightlabs.annotation.Implement;
 import org.nightlabs.jfire.jbpm.graph.def.AbstractActionHandler;
 import org.nightlabs.jfire.trade.Offer;
-import org.nightlabs.jfire.trade.OrganisationLegalEntity;
 
 public class ActionHandlerAcceptOfferImplicitelyVendor
 extends AbstractActionHandler
@@ -51,8 +50,9 @@ extends AbstractActionHandler
 //		}
 
 		// send the offer to the customer, if the customer is an organisation
-		if (offer.getOrder().getCustomer() instanceof OrganisationLegalEntity) {
-			throw new UnsupportedOperationException("NYI"); // TODO implement!
-		}
+//		if (offer.getOrder().getCustomer() instanceof OrganisationLegalEntity) {
+//			throw new UnsupportedOperationException("NYI"); // TODO implement!
+//		}
+		// I think that's not necessary - at least not for our implicit on-the-fly-cross-organisation-delivery, since ProductTypeActionHandler.disassemble() (and what else???) already do this.
 	}
 }

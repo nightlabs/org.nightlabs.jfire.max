@@ -27,6 +27,7 @@
 package org.nightlabs.jfire.trade;
 
 import java.io.Serializable;
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Date;
@@ -927,19 +928,23 @@ implements
 		}
 
 		try {
-			List<State> ss = states;
-			states = null;
-			states = ss;
+			ArrayList<State> ss = new ArrayList<State>(this.states);
+			this.states.clear();
+			for (State state : ss) {
+				this.states.add(state);
+				// TODO delegate "makeAllDirty"
+			}
 		} catch (JDODetachedFieldAccessException x) {
 			// ignore
 		}
 
 		try {
-			Set<Article> aa = articles;
-			articles = null;
-			articles = aa;
-			for (Article article : aa)
+			ArrayList<Article> aa = new ArrayList<Article>(this.articles);
+			this.articles.clear();
+			for (Article article : aa) {
+				this.articles.add(article);
 				article.makeAllDirty();
+			}
 		} catch (JDODetachedFieldAccessException x) {
 			// ignore
 		}

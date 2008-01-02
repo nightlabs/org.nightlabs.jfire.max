@@ -1453,4 +1453,16 @@ implements Serializable, DeleteCallback, DetachCallback, StoreCallback
 			// ignore
 		}
 	}
+
+	/**
+	 * This is a temporary method until this problem is solved: http://www.jpox.org/servlet/forum/viewthread?thread=4718
+	 */
+	public void checkReversing()
+	{
+		Article reversedArticle = this.getReversedArticle();
+		if (reversedArticle != null) {
+			if (reversedArticle.getReversingArticle() == null)
+				reversedArticle.setReversingArticle(this);
+		}
+	}
 }

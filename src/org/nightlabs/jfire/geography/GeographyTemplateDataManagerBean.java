@@ -65,6 +65,7 @@ import org.nightlabs.jfire.jdo.notification.persistent.PersistentNotificationEJB
 import org.nightlabs.jfire.jdo.notification.persistent.SubscriptionUtil;
 import org.nightlabs.jfire.jdo.notification.persistent.id.NotificationReceiverID;
 import org.nightlabs.jfire.organisation.Organisation;
+import org.nightlabs.jfire.security.SecurityException;
 import org.nightlabs.util.IOUtil;
 import org.nightlabs.version.MalformedVersionException;
 
@@ -285,13 +286,32 @@ implements SessionBean
 	}
 
 	/**
+	 * It is only allowed to write template data, if we're the root-organisation or if there is no root-organisation.
+	 * @throws SecurityException if writing is not allowed.
+	 */
+	private void assertWritingAllowed() throws SecurityException
+	{
+		if (!hasRootOrganisation()) // if there is no root-organisation, writing is allowed
+			return;
+
+		String rootOrganisationID = getRootOrganisationID();
+
+		if (getOrganisationID().equals(rootOrganisationID)) // if we are the root-organisation, writing is ok
+			return;
+
+		throw new SecurityException("Writing geography template data is exclusively allowed to the root-organisation (" + rootOrganisationID + ") when using JFire in network mode (with a root-organisation present). Your organisation (" + getOrganisationID() + ") cannot modify the network-wide geography data!");
+	}
+
+	/**
 	 * @ejb.interface-method
 	 * @ejb.transaction type="Required"
 	 * @ejb.permission role-name="_Guest_"
 	 */
 	public void storeGeographyTemplateCountryData(Country storedCountry)
-	throws IOException
+	throws IOException, SecurityException
 	{
+		assertWritingAllowed();
+
 		PersistenceManager pm = getPersistenceManager();
 		try {
 			pm.getFetchPlan().setMaxFetchDepth(1);
@@ -363,8 +383,10 @@ implements SessionBean
 	 * @ejb.permission role-name="_Guest_"
 	 */
 	public void storeGeographyTemplateRegionData(Region storedRegion)
-	throws IOException
+	throws IOException, SecurityException
 	{
+		assertWritingAllowed();
+
 		PersistenceManager pm = getPersistenceManager();
 		try {
 			pm.getFetchPlan().setMaxFetchDepth(1);
@@ -437,8 +459,10 @@ implements SessionBean
 	 * @ejb.permission role-name="_Guest_"
 	 */
 	public void storeGeographyTemplateCityData(City storedCity)
-	throws IOException
+	throws IOException, SecurityException
 	{
+		assertWritingAllowed();
+
 		PersistenceManager pm = getPersistenceManager();
 		try {
 			pm.getFetchPlan().setMaxFetchDepth(1);
@@ -513,8 +537,10 @@ implements SessionBean
 	 * @ejb.permission role-name="_Guest_"
 	 */
 	public void storeGeographyTemplateLocationData(Location storedLocation)
-	throws IOException
+	throws IOException, SecurityException
 	{
+		assertWritingAllowed();
+
 		PersistenceManager pm = getPersistenceManager();
 		try {
 			pm.getFetchPlan().setMaxFetchDepth(1);
@@ -591,8 +617,10 @@ implements SessionBean
 	 * @ejb.permission role-name="_Guest_"
 	 */
 	public void storeGeographyTemplateDistrictData(District storedDistrict)
-	throws IOException
+	throws IOException, SecurityException
 	{
+		assertWritingAllowed();
+
 		PersistenceManager pm = getPersistenceManager();
 		try {
 			pm.getFetchPlan().setMaxFetchDepth(1);

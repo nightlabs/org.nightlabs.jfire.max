@@ -28,7 +28,6 @@ package org.nightlabs.jfire.store.book;
 
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.Iterator;
 import java.util.List;
 
 import javax.jdo.JDOHelper;
@@ -37,6 +36,7 @@ import javax.jdo.PersistenceManager;
 import org.nightlabs.jfire.security.User;
 import org.nightlabs.jfire.store.DeliveryNote;
 import org.nightlabs.jfire.store.DeliveryNoteProductTransfer;
+import org.nightlabs.jfire.store.Product;
 import org.nightlabs.jfire.trade.Article;
 import org.nightlabs.jfire.trade.LegalEntity;
 import org.nightlabs.jfire.transfer.Anchor;
@@ -54,25 +54,25 @@ import org.nightlabs.jfire.transfer.Anchor;
  */
 public class BookProductTransfer extends DeliveryNoteProductTransfer
 {
+	private static final long serialVersionUID = 1L;
+
 	/**
 	 * @deprecated Only for JDO!
 	 */
 	@Deprecated
 	protected BookProductTransfer() { }
 
-	private static Collection getProducts(DeliveryNote deliveryNote, boolean reversing)
+	private static Collection<Product> getProducts(DeliveryNote deliveryNote, boolean reversing)
 	{
 		if (deliveryNote == null)
 			throw new IllegalArgumentException("deliveryNote must not be null!");
 
-		Collection articles = deliveryNote.getArticles();
-		Collection products = null;
-		for (Iterator it = articles.iterator(); it.hasNext(); ) {
-			Article article = (Article) it.next();
-
+		Collection<? extends Article> articles = deliveryNote.getArticles();
+		Collection<Product> products = null;
+		for (Article article : articles) {
 			if (article.isReversing() == reversing) {
 				if (products == null)
-					products = new ArrayList(articles.size());
+					products = new ArrayList<Product>(articles.size());
 
 				products.add(article.getProduct());
 			}
@@ -87,17 +87,16 @@ public class BookProductTransfer extends DeliveryNoteProductTransfer
 	 * @param deliveryNote
 	 * @return
 	 */
-	public static List createBookProductTransfers(
-			User initiator, DeliveryNote deliveryNote)
+	public static List<BookProductTransfer> createBookProductTransfers(User initiator, DeliveryNote deliveryNote)
 	{
 		if (deliveryNote.getDeliveryNoteLocal().isBooked())
 			throw new IllegalArgumentException("deliveryNote is already booked!");
 
 		PersistenceManager pm = JDOHelper.getPersistenceManager(deliveryNote);
 
-		List res = new ArrayList(2);
-		Collection productsNormal = getProducts(deliveryNote, false);
-		Collection productsReversing = getProducts(deliveryNote, true);
+		List<BookProductTransfer> res = new ArrayList<BookProductTransfer>(2);
+		Collection<Product> productsNormal = getProducts(deliveryNote, false);
+		Collection<Product>  productsReversing = getProducts(deliveryNote, true);
 
 		if (productsNormal != null)
 			res.add(pm.makePersistent(new BookProductTransfer(
@@ -116,7 +115,7 @@ public class BookProductTransfer extends DeliveryNoteProductTransfer
 
 	protected BookProductTransfer(
 			User initiator,
-			Anchor from, Anchor to, DeliveryNote deliveryNote, Collection products)
+			Anchor from, Anchor to, DeliveryNote deliveryNote, Collection<Product> products)
 	{
 		super(BOOK_TYPE_BOOK, initiator, from, to, deliveryNote, products);
 

@@ -360,18 +360,20 @@ implements Serializable
 
 	public void addNestedProductLocal(ProductLocal productLocal)
 	{
-		if (productLocal.packageProductLocal != null)
+		if (productLocal.getPackageProductLocal() != null)
 			throw new IllegalArgumentException("The ProductLocal \""+productLocal.getPrimaryKey()+"\" is already nested within \""+productLocal.packageProductLocal.getPrimaryKey()+"\"!");
 
+		productLocal.decQuantity();
 		productLocal.setPackageProductLocal(this);
 		nestedProductLocals.add(productLocal);
 	}
 
 	public void removeAllNestedProductLocals()
 	{
-		for (Iterator it = nestedProductLocals.iterator(); it.hasNext(); ) {
+		for (Iterator<ProductLocal> it = nestedProductLocals.iterator(); it.hasNext(); ) {
 			ProductLocal productLocal = (ProductLocal) it.next();
 			productLocal.setPackageProductLocal(null);
+			productLocal.incQuantity();
 			it.remove();
 		}
 	}

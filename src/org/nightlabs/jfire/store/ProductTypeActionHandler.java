@@ -545,7 +545,7 @@ public abstract class ProductTypeActionHandler
 					productTypeActionHandlerCache.getProductTypeActionHandler(nestedProduct).assembleProduct(user, productTypeActionHandlerCache, nestedProduct);
 //					nestedProduct.assemble(user);
 					productLocal.addNestedProductLocal(nestedProductLocal);
-					nestedProductLocal.decQuantity();
+//					nestedProductLocal.decQuantity();
 
 					// We need to transfer the nested product from wherever it is to the same repository as the
 					// package-product and then update productLocal.quantity
@@ -593,7 +593,7 @@ public abstract class ProductTypeActionHandler
 					ProductLocal nestedProductLocal = nestedProduct.getProductLocal();
 
 					productLocal.addNestedProductLocal(nestedProductLocal);
-					nestedProductLocal.decQuantity();
+//					nestedProductLocal.decQuantity();
 
 //					Anchor nestedProductHome = nestedProduct.getProductType().getProductTypeLocal().getHome();
 					Anchor nestedProductHome = store.getLocalStorekeeper().getHomeRepository(nestedProduct);
@@ -772,7 +772,7 @@ public abstract class ProductTypeActionHandler
 
 			if (product.getOrganisationID().equals(nestedProduct.getOrganisationID())) {
 				// local nested product => disassemble
-				nestedProductLocal.incQuantity();
+//				nestedProductLocal.incQuantity(); // needs to be always done - for both remote and local products => is done implicitely now in ProductLocal.removeAllNestedProductLocals()
 				productTypeActionHandlerCache.getProductTypeActionHandler(nestedProduct).disassembleProduct(user, productTypeActionHandlerCache, nestedProduct, onRelease);
 //				nestedProduct.disassemble(user, onRelease);
 			}

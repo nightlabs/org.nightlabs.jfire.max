@@ -46,6 +46,8 @@ import org.nightlabs.jfire.transfer.Transfer;
  */
 public class DeliveryNoteProductTransfer extends ProductTransfer
 {
+	private static final long serialVersionUID = 1L;
+
 	public static final String BOOK_TYPE_BOOK = "book";
 	public static final String BOOK_TYPE_DELIVER = "deliver";
 

@@ -34,6 +34,7 @@ import java.util.Set;
 import javax.jdo.JDOHelper;
 import javax.jdo.PersistenceManager;
 
+import org.apache.log4j.Logger;
 import org.nightlabs.jdo.ObjectIDUtil;
 import org.nightlabs.jfire.idgenerator.IDGenerator;
 import org.nightlabs.jfire.security.User;
@@ -60,6 +61,9 @@ import org.nightlabs.jfire.security.User;
 public abstract class Transfer
 implements Serializable
 {
+	/** @jdo.field persistence-modifier="none" */
+	private final Logger logger = Logger.getLogger(Transfer.class);
+
 	public static final String FETCH_GROUP_CONTAINER = "Transfer.container";
 	public static final String FETCH_GROUP_FROM = "Transfer.from";
 	public static final String FETCH_GROUP_TO = "Transfer.to";
@@ -150,6 +154,13 @@ implements Serializable
 			throw new NullPointerException("to must not be null! Even nirvana must be known as Anchor!");
 		this.to = to;
 		this.timestamp = new Date();
+
+		if (logger.isDebugEnabled()) {
+			if (logger.isTraceEnabled())
+				logger.trace(this.getClass().getName() + ".<init>: pk=\"" + getPrimaryKey() + "\" from.pk=\"" + (from == null ? null : from.getPrimaryKey()) + "\"" + " to.pk=\"" + (to == null ? null : to.getPrimaryKey()) + "\"", new Exception("STACKTRACE"));
+			else
+				logger.debug(this.getClass().getName() + ".<init>: pk=\"" + getPrimaryKey() + "\" from.pk=\"" + (from == null ? null : from.getPrimaryKey()) + "\"" + " to.pk=\"" + (to == null ? null : to.getPrimaryKey()) + "\"");
+		}
 	}
 
 	public static String getPrimaryKey(String organisationID, String transferTypeID, long transferID)
@@ -300,6 +311,10 @@ implements Serializable
 	 */
 	public void bookTransfer(User user, Set<Anchor> involvedAnchors)
 	{
+		if (logger.isInfoEnabled()) {
+			logger.info("bookTransfer: pk=\"" + getPrimaryKey() + "\" from.pk=\"" + (from == null ? null : from.getPrimaryKey()) + "\"" + " to.pk=\"" + (to == null ? null : to.getPrimaryKey()) + "\"");
+		}
+
 		getPersistenceManager(); // ensure we're attached
 
 		from.bookTransfer(user, this, involvedAnchors);
@@ -308,6 +323,10 @@ implements Serializable
 
 	public void rollbackTransfer(User user, Set<Anchor> involvedAnchors)
 	{
+		if (logger.isInfoEnabled()) {
+			logger.info("rollbackTransfer: pk=\"" + getPrimaryKey() + "\" from.pk=\"" + (from == null ? null : from.getPrimaryKey()) + "\"" + " to.pk=\"" + (to == null ? null : to.getPrimaryKey()) + "\"");
+		}
+
 		getPersistenceManager(); // ensure we're attached
 
 		from.rollbackTransfer(user, this, involvedAnchors);

@@ -36,6 +36,7 @@ import javax.jdo.PersistenceManager;
 import javax.jdo.Query;
 import javax.jdo.listener.DeleteCallback;
 
+import org.apache.log4j.Logger;
 import org.nightlabs.jdo.ObjectIDUtil;
 import org.nightlabs.jfire.store.id.ProductID;
 import org.nightlabs.jfire.store.id.ProductReferenceGroupID;
@@ -98,6 +99,9 @@ public class ProductReference
 implements Serializable, DeleteCallback
 {
 	private static final long serialVersionUID = 1L;
+
+	/** @jdo.field persistence-modifier="none" */
+	private final Logger logger = Logger.getLogger(ProductReference.class);
 
 	/**
 	 * This method finds out, how many <code>ProductReference</code>s use the given <code>productReferenceGroup</code>.
@@ -182,7 +186,7 @@ implements Serializable, DeleteCallback
 			return (ProductReference) pm.getObjectById(ProductReferenceID.create(anchor, product));
 		} catch (JDOObjectNotFoundException x) {
 			ProductReference productReference = new ProductReference(anchor, product);
-			pm.makePersistent(productReference);
+			productReference = pm.makePersistent(productReference);
 			return productReference;
 		}
 	}
@@ -289,6 +293,12 @@ implements Serializable, DeleteCallback
 			}
 		}
 
+		if (logger.isDebugEnabled()) {
+			if (logger.isTraceEnabled())
+				logger.trace(this.getClass().getName() + ".<init>: pk=\"" + getPrimaryKey() + "\"", new Exception("STACKTRACE"));
+			else
+				logger.debug(this.getClass().getName() + ".<init>: pk=\"" + getPrimaryKey() + "\"");
+		}
 	}
 
 	public String getAnchorOrganisationID()
@@ -383,6 +393,14 @@ implements Serializable, DeleteCallback
 			throw new IllegalStateException("ProductReference \"" + getPrimaryKey() + "\" has illegal quantity!");
 
 		productReferenceGroup.setQuantity(quantity);
+
+		if (logger.isDebugEnabled()) {
+			if (logger.isTraceEnabled())
+				logger.trace(this.getClass().getName() + ".incQuantity: pk=\"" + getPrimaryKey() + "\" newQuantity=" + quantity, new Exception("STACKTRACE"));
+			else
+				logger.debug(this.getClass().getName() + ".incQuantity: pk=\"" + getPrimaryKey() + "\" newQuantity=" + quantity);
+		}
+
 		return quantity;
 	}
 
@@ -413,6 +431,14 @@ implements Serializable, DeleteCallback
 			throw new IllegalStateException("ProductReference \"" + getPrimaryKey() + "\" has illegal quantity!");
 
 		productReferenceGroup.setQuantity(quantity);
+
+		if (logger.isDebugEnabled()) {
+			if (logger.isTraceEnabled())
+				logger.trace(this.getClass().getName() + ".decQuantity: pk=\"" + getPrimaryKey() + "\" newQuantity=" + quantity, new Exception("STACKTRACE"));
+			else
+				logger.debug(this.getClass().getName() + ".decQuantity: pk=\"" + getPrimaryKey() + "\" newQuantity=" + quantity);
+		}
+
 		return quantity;
 	}
 
@@ -425,6 +451,13 @@ implements Serializable, DeleteCallback
 			if (getProductReferenceCount(pm, tmpPRG) == 0)
 				pm.deletePersistent(tmpPRG);
 //			if (prs.size() == 1 && JDOHelper.getObjectId(this).equals(JDOHelper.getObjectId(prs.iterator().next())))
+		}
+
+		if (logger.isDebugEnabled()) {
+			if (logger.isTraceEnabled())
+				logger.trace(this.getClass().getName() + ".jdoPreDelete: pk=\"" + getPrimaryKey() + "\" quantity=" + quantity, new Exception("STACKTRACE"));
+			else
+				logger.debug(this.getClass().getName() + ".jdoPreDelete: pk=\"" + getPrimaryKey() + "\" quantity=" + quantity);
 		}
 	}
 }

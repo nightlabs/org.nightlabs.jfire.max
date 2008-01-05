@@ -1148,16 +1148,14 @@ implements StoreCallback
 		if (deliveryNote.getVendor().getStorekeeper() == null)
 			deliveryNote.getVendor().setStorekeeper(getPartnerStorekeeper());
 
-		// The booking works only with ProductHoles - the ProductLocal is not touched (Product is never touched anyway by deliveries or bookings) 
-		Set involvedAnchors = new HashSet();
-		List bookProductTransfers = BookProductTransfer.createBookProductTransfers(initiator, deliveryNote);
+		// The booking works only with ProductReferences - the ProductLocal is not touched (Product is never touched anyway by deliveries or bookings) 
+		Set<Anchor> involvedAnchors = new HashSet<Anchor>();
+		List<BookProductTransfer> bookProductTransfers = BookProductTransfer.createBookProductTransfers(initiator, deliveryNote);
 		boolean failed = true;
 		try {
-			for (Iterator it = bookProductTransfers.iterator(); it.hasNext(); ) {
-				BookProductTransfer bookProductTransfer = (BookProductTransfer) it.next();
+			for (BookProductTransfer bookProductTransfer : bookProductTransfers)
 				bookProductTransfer.bookTransfer(initiator, involvedAnchors);
-			}
-	
+
 			checkIntegrity(bookProductTransfers, involvedAnchors);
 
 			failed = false;
@@ -1183,25 +1181,21 @@ implements StoreCallback
 	 * @param containers Instances of {@link Transfer}
 	 * @param involvedAnchors
 	 */
-	protected void checkIntegrity(Collection containers, Set<Anchor> involvedAnchors)
+	protected void checkIntegrity(Collection<? extends ProductTransfer> containers, Set<Anchor> involvedAnchors)
 	{
 		PersistenceManager pm = getPersistenceManager();
 
 		// We collect the products from all container-transfers.
-		Set products = new HashSet();
-		for (Iterator it = containers.iterator(); it.hasNext(); ) {
-			ProductTransfer container = (ProductTransfer) it.next();
+		Set<Product> products = new HashSet<Product>();
+		for (ProductTransfer container : containers)
 			products.addAll(container.getProducts());
-		}
 
 		// These two Maps should store for each Product where it's coming from and
 		// where it's going to because of the given containers.
-		Map fromProductReferenceByProductMap = new HashMap();
-		Map toProductReferenceByProductMap = new HashMap();
+		Map<Product, ProductReference> fromProductReferenceByProductMap = new HashMap<Product, ProductReference>();
+		Map<Product, ProductReference> toProductReferenceByProductMap = new HashMap<Product, ProductReference>();
 
-		for (Iterator itA = involvedAnchors.iterator(); itA.hasNext(); ) {
-			Anchor anchor = (Anchor) itA.next();
-
+		for (Anchor anchor : involvedAnchors) {
 			// Give every involved Anchor the possibility to check itself.
 			anchor.checkIntegrity(containers);
 
@@ -1212,8 +1206,7 @@ implements StoreCallback
 
 			// If the current Anchor is the final destination or the very source of the transfer of
 			// any product, put it into one of the product2xxxMaps 
-			for (Iterator itP = products.iterator(); itP.hasNext(); ) {
-				Product product = (Product) itP.next();
+			for (Product product : products) {
 				ProductReference productReference = ProductReference.getProductReference(pm, anchor, product, false); // not every involved anchor has a reference to every product, because the transfers take different routes. hence the result may be null
 				if (productReference == null)
 					continue;
@@ -1246,7 +1239,7 @@ implements StoreCallback
 		}
 
 		// If we came here, all is fine. Note, that products.size() and the size of the two maps might
-		// differ. This can happen, because we checked only those ProductHoles that are part of this transaction
+		// differ. This can happen, because we checked only those ProductReferences that are part of this transaction
 		// and there might be a "neighbour" chain that caused the beginning/end of this chain to be 0.
 
 // Marco: productLocal.quantity is updated in Repository now already!
@@ -1312,7 +1305,14 @@ implements StoreCallback
 			Repository repositoryDest = (Repository) productReferenceDest.getAnchor();
 			ProductLocal productLocal = product.getProductLocal();
 
-			if (productLocal.getQuantity() >= 0) {
+			if (productLocal.getQuantity() < 0) {
+				if (logger.isDebugEnabled())
+					logger.debug("consolidateProductReferences: productLocal.quantity=" + productLocal.getQuantity() + " => cannot delete ProductReferences!");
+			}
+			else {
+				if (logger.isDebugEnabled())
+					logger.debug("consolidateProductReferences: deleting ProductReferences.");
+
 				pm.deletePersistentAll(ProductReference.getProductReferences(pm, product));
 
 				// put the product to the final destination
@@ -1465,8 +1465,8 @@ implements StoreCallback
 			if (deliverProductTransfer == null)
 				throw new NullPointerException("serverDeliveryProcessor.deliverBegin(...) returned null but Delivery is NOT postponed! You are only allowed (and you should) return null, if you postpone a Delivery! serverDeliveryProcessorPK=\""+serverDeliveryProcessor.getPrimaryKey()+"\" localOrganisation="+getOrganisationID());
 
-			Set involvedAnchors = new HashSet();
-			ArrayList containers = new ArrayList(1);
+			Set<Anchor> involvedAnchors = new HashSet<Anchor>();
+			ArrayList<DeliverProductTransfer> containers = new ArrayList<DeliverProductTransfer>(1);
 			containers.add(deliverProductTransfer);
 			boolean failed = true;
 			try {

@@ -4,7 +4,7 @@ import org.nightlabs.annotation.Implement;
 import org.nightlabs.jfire.accounting.Price;
 import org.nightlabs.jfire.dynamictrade.accounting.priceconfig.DynamicTradePriceConfig;
 import org.nightlabs.jfire.security.User;
-import org.nightlabs.jfire.store.NestedProductType;
+import org.nightlabs.jfire.store.NestedProductTypeLocal;
 import org.nightlabs.jfire.store.Product;
 import org.nightlabs.jfire.store.ProductLocator;
 import org.nightlabs.jfire.store.ProductType;
@@ -77,7 +77,7 @@ extends Product
 	@Override
 	@Implement
 	public ProductLocator getProductLocator(User user,
-			NestedProductType nestedProductType)
+			NestedProductTypeLocal nestedProductTypeLocal)
 	{
 		throw new UnsupportedOperationException("Not necessary! Why is this method called?");
 	}

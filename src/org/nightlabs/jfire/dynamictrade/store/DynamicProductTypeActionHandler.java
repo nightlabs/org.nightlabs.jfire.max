@@ -8,7 +8,7 @@ import javax.jdo.PersistenceManager;
 
 import org.nightlabs.annotation.Implement;
 import org.nightlabs.jfire.security.User;
-import org.nightlabs.jfire.store.NestedProductType;
+import org.nightlabs.jfire.store.NestedProductTypeLocal;
 import org.nightlabs.jfire.store.Product;
 import org.nightlabs.jfire.store.ProductLocator;
 import org.nightlabs.jfire.store.ProductType;
@@ -85,13 +85,13 @@ public class DynamicProductTypeActionHandler
 	@SuppressWarnings("unchecked")
 	@Implement
 	public Collection<? extends Product> findProducts(User user,
-			ProductType productType, NestedProductType nestedProductType, ProductLocator productLocator)
+			ProductType productType, NestedProductTypeLocal nestedProductTypeLocal, ProductLocator productLocator)
 	{
 		DynamicProductType spt = (DynamicProductType) productType;
 		PersistenceManager pm = getPersistenceManager();
 		Store store = Store.getStore(pm);
 		ArrayList res = new ArrayList();
-		int qty = nestedProductType == null ? 1 : nestedProductType.getQuantity();
+		int qty = nestedProductTypeLocal == null ? 1 : nestedProductTypeLocal.getQuantity();
 		for (int i = 0; i < qty; ++i) {
 			DynamicProduct product = new DynamicProduct(spt, Product.createProductID());
 			product = (DynamicProduct) store.addProduct(user, product); // , (Repository)spt.getProductTypeLocal().getHome());
@@ -100,7 +100,7 @@ public class DynamicProductTypeActionHandler
 		return res;
 //		DynamicProductType spt = (DynamicProductType) productType;
 //		DynamicProductTypeLocal sptl = (DynamicProductTypeLocal) productType.getProductTypeLocal();
-//		int qty = nestedProductType == null ? 1 : nestedProductType.getQuantity();
+//		int qty = nestedProductTypeLocal == null ? 1 : nestedProductTypeLocal.getQuantity();
 //		PersistenceManager pm = getPersistenceManager();
 //
 //		Store store = Store.getStore(pm);
@@ -144,7 +144,7 @@ public class DynamicProductTypeActionHandler
 			User user, Product localPackageProduct, Article localArticle,
 			String partnerOrganisationID, Hashtable<?, ?> partnerInitialContextProperties,
 			Offer partnerOffer, OfferID partnerOfferID, SegmentID partnerSegmentID,
-			ProductType nestedProductType, Collection<NestedProductType> nestedProductTypes) throws Exception
+			ProductType nestedProductType, Collection<NestedProductTypeLocal> nestedProductTypeLocals) throws Exception
 	{
 		throw new UnsupportedOperationException("DynamicProductTypes do not support cross-trade!");
 	}

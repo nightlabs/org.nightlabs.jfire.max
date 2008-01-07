@@ -13,7 +13,7 @@ import org.nightlabs.jfire.accounting.priceconfig.IPriceConfig;
 import org.nightlabs.jfire.accounting.priceconfig.PriceConfig;
 import org.nightlabs.jfire.dynamictrade.store.DynamicProduct;
 import org.nightlabs.jfire.idgenerator.IDGenerator;
-import org.nightlabs.jfire.store.NestedProductType;
+import org.nightlabs.jfire.store.NestedProductTypeLocal;
 import org.nightlabs.jfire.store.Product;
 import org.nightlabs.jfire.trade.Article;
 import org.nightlabs.jfire.trade.ArticlePrice;
@@ -85,7 +85,7 @@ implements IPackagePriceConfig
 			IPackagePriceConfig topLevelPriceConfig, Article article,
 			LinkedList<IPriceConfig> priceConfigStack, ArticlePrice topLevelArticlePrice,
 			ArticlePrice nextLevelArticlePrice, LinkedList<ArticlePrice> articlePriceStack,
-			NestedProductType nestedProductType, LinkedList<NestedProductType> nestedProductTypeStack)
+			NestedProductTypeLocal nestedProductTypeLocal, LinkedList<NestedProductTypeLocal> nestedProductTypeStack)
 	{
 		throw new UnsupportedOperationException("There should be nothing nested?!");
 	}
@@ -95,7 +95,7 @@ implements IPackagePriceConfig
 			IPackagePriceConfig topLevelPriceConfig, Article article,
 			LinkedList<IPriceConfig> priceConfigStack, ArticlePrice topLevelArticlePrice,
 			ArticlePrice nextLevelArticlePrice, LinkedList<ArticlePrice> articlePriceStack,
-			NestedProductType nestedProductType, LinkedList<NestedProductType> nestedProductTypeStack,
+			NestedProductTypeLocal nestedProductTypeLocal, LinkedList<NestedProductTypeLocal> nestedProductTypeStack,
 			Product nestedProduct, LinkedList<Product> productStack)
 	{
 //		if (nestedProduct.getProductType().equals(article.getProductType()))

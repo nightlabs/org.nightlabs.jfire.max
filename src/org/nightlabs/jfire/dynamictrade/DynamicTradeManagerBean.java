@@ -504,7 +504,7 @@ implements SessionBean
 			}
 
 			// find / create Products
-			Collection products = store.findProducts(user, productType, null, null); // we create exactly one => no NestedProductType needed
+			Collection products = store.findProducts(user, productType, null, null); // we create exactly one => no NestedProductTypeLocal needed
 			if (products.size() != 1)
 				throw new IllegalStateException("store.findProducts(...) created " + products.size() + " instead of exactly 1 product!");
 

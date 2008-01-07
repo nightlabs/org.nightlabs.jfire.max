@@ -2,7 +2,7 @@ package org.nightlabs.jfire.voucher.store;
 
 import org.nightlabs.annotation.Implement;
 import org.nightlabs.jfire.security.User;
-import org.nightlabs.jfire.store.NestedProductType;
+import org.nightlabs.jfire.store.NestedProductTypeLocal;
 import org.nightlabs.jfire.store.Product;
 import org.nightlabs.jfire.store.ProductLocal;
 import org.nightlabs.jfire.store.ProductLocator;
@@ -46,11 +46,11 @@ extends Product
 	 * {@link ProductLocator}s (they don't support nesting either - a Voucher is only valid within
 	 * one organisation).
 	 *
-	 * @see org.nightlabs.jfire.store.Product#getProductLocator(User, NestedProductType)
+	 * @see org.nightlabs.jfire.store.Product#getProductLocator(User, NestedProductTypeLocal)
 	 */
 	@Override
 	@Implement
-	public ProductLocator getProductLocator(User user, NestedProductType nestedProductType)
+	public ProductLocator getProductLocator(User user, NestedProductTypeLocal nestedProductTypeLocal)
 	{
 		return null;
 	}

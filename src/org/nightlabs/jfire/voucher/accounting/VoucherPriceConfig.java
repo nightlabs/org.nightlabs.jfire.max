@@ -13,7 +13,7 @@ import org.nightlabs.jfire.accounting.priceconfig.IPackagePriceConfig;
 import org.nightlabs.jfire.accounting.priceconfig.IPriceConfig;
 import org.nightlabs.jfire.accounting.priceconfig.PriceConfig;
 import org.nightlabs.jfire.accounting.priceconfig.PriceConfigUtil;
-import org.nightlabs.jfire.store.NestedProductType;
+import org.nightlabs.jfire.store.NestedProductTypeLocal;
 import org.nightlabs.jfire.store.Product;
 import org.nightlabs.jfire.trade.Article;
 import org.nightlabs.jfire.trade.ArticlePrice;
@@ -99,7 +99,7 @@ implements IPackagePriceConfig
 			IPackagePriceConfig topLevelPriceConfig, Article article,
 			LinkedList<IPriceConfig> priceConfigStack, ArticlePrice topLevelArticlePrice,
 			ArticlePrice nextLevelArticlePrice, LinkedList<ArticlePrice> articlePriceStack,
-			NestedProductType nestedProductType, LinkedList<NestedProductType> nestedProductTypeStack)
+			NestedProductTypeLocal nestedProductTypeLocal, LinkedList<NestedProductTypeLocal> nestedProductTypeStack)
 	{
 		Long amount = prices.get(article.getCurrency());
 
@@ -113,7 +113,7 @@ implements IPackagePriceConfig
 		return PriceConfigUtil.createNestedArticlePrice(
 				topLevelPriceConfig, this, article, priceConfigStack,
 				topLevelArticlePrice, nextLevelArticlePrice, articlePriceStack,
-				nestedProductType, nestedProductTypeStack, origPrice);
+				nestedProductTypeLocal, nestedProductTypeStack, origPrice);
 	}
 
 	@Implement
@@ -121,7 +121,7 @@ implements IPackagePriceConfig
 			IPackagePriceConfig topLevelPriceConfig, Article article,
 			LinkedList<IPriceConfig> priceConfigStack, ArticlePrice topLevelArticlePrice,
 			ArticlePrice nextLevelArticlePrice, LinkedList<ArticlePrice> articlePriceStack,
-			NestedProductType nestedProductType, LinkedList<NestedProductType> nestedProductTypeStack,
+			NestedProductTypeLocal nestedProductTypeLocal, LinkedList<NestedProductTypeLocal> nestedProductTypeStack,
 			Product nestedProduct, LinkedList<Product> productStack)
 	{
 		Long amount = prices.get(article.getCurrency());
@@ -136,7 +136,7 @@ implements IPackagePriceConfig
 		return PriceConfigUtil.createNestedArticlePrice(
 				topLevelPriceConfig, this, article, priceConfigStack,
 				topLevelArticlePrice, nextLevelArticlePrice, articlePriceStack,
-				nestedProductType, nestedProductTypeStack, nestedProduct,
+				nestedProductTypeLocal, nestedProductTypeStack, nestedProduct,
 				productStack, origPrice);
 	}
 

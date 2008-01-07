@@ -60,7 +60,8 @@ import org.nightlabs.jfire.security.User;
 import org.nightlabs.jfire.servermanager.JFireServerManager;
 import org.nightlabs.jfire.store.CannotConfirmProductTypeException;
 import org.nightlabs.jfire.store.DeliveryNote;
-import org.nightlabs.jfire.store.NestedProductType;
+import org.nightlabs.jfire.store.NestedProductTypeLocal;
+import org.nightlabs.jfire.store.Product;
 import org.nightlabs.jfire.store.ProductType;
 import org.nightlabs.jfire.store.Store;
 import org.nightlabs.jfire.store.deliver.Delivery;
@@ -511,7 +512,7 @@ implements SessionBean
 	 *           in case there are not enough <tt>Voucher</tt>s available and
 	 *           the <tt>Product</tt>s cannot be created (because of a limit).
 	 */
-	protected Collection<Article> createArticles(PersistenceManager pm,
+	protected Collection<? extends Article> createArticles(PersistenceManager pm,
 			SegmentID segmentID, OfferID offerID, ProductTypeID productTypeID,
 			int quantity) throws ModuleException {
 		Trader trader = Trader.getTrader(pm);
@@ -533,7 +534,7 @@ implements SessionBean
 		// find an Offer within the Order which is not finalized - or create one
 		Offer offer;
 		if (offerID == null) {
-			Collection offers = Offer.getNonFinalizedOffers(pm, order);
+			Collection<Offer> offers = Offer.getNonFinalizedOffers(pm, order);
 			if (!offers.isEmpty()) {
 				offer = (Offer) offers.iterator().next();
 			} else {
@@ -546,14 +547,18 @@ implements SessionBean
 		}
 
 		// find / create Products
-		NestedProductType pseudoNestedPT = null;
+		NestedProductTypeLocal pseudoNestedPT = null;
 		if (quantity != 1)
-			pseudoNestedPT = new NestedProductType(null, voucherType, quantity);
+			pseudoNestedPT = new NestedProductTypeLocal(null, voucherType.getProductTypeLocal(), quantity);
 
-		Collection products = store.findProducts(user, voucherType, pseudoNestedPT,
-				null);
+		Collection<? extends Product> products = store.findProducts(
+				user,
+				voucherType,
+				pseudoNestedPT,
+				null
+		);
 
-		Collection articles = trader.createArticles(user, offer, segment, products,
+		Collection<? extends Article> articles = trader.createArticles(user, offer, segment, products,
 				new ArticleCreator(null), true, false);
 
 		return articles;
@@ -569,13 +574,15 @@ implements SessionBean
 	 * @ejb.permission role-name="_Guest_"
 	 * @ejb.transaction type="Required"
 	 */
-	public Collection<Article> createArticles(SegmentID segmentID,
+	public Collection<? extends Article> createArticles(SegmentID segmentID,
 			OfferID offerID, ProductTypeID productTypeID, int quantity,
 			String[] fetchGroups, int maxFetchDepth) throws ModuleException {
 		PersistenceManager pm = getPersistenceManager();
 		try {
-			Collection<Article> articles = createArticles(pm, segmentID, offerID,
-					productTypeID, quantity);
+			Collection<? extends Article> articles = createArticles(
+					pm, segmentID, offerID,
+					productTypeID, quantity
+			);
 
 			pm.getFetchPlan().setMaxFetchDepth(maxFetchDepth);
 			if (fetchGroups != null)
@@ -987,7 +994,7 @@ implements SessionBean
 				SegmentType segmentType = SegmentType.getDefaultSegmentType(pm);
 				Segment segment = trader.createSegment(order, segmentType);
 				SegmentID segmentID = (SegmentID) JDOHelper.getObjectId(segment);
-				Collection<Article> articles = createArticles(pm, segmentID, null,
+				Collection<? extends Article> articles = createArticles(pm, segmentID, null,
 						previewParameterSet.getVoucherTypeID(), 1);
 
 				Article article = articles.iterator().next();

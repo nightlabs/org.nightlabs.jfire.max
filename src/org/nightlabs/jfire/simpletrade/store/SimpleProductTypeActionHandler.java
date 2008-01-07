@@ -19,7 +19,7 @@ import org.nightlabs.jfire.accounting.id.TariffID;
 import org.nightlabs.jfire.security.User;
 import org.nightlabs.jfire.simpletrade.SimpleTradeManager;
 import org.nightlabs.jfire.simpletrade.SimpleTradeManagerUtil;
-import org.nightlabs.jfire.store.NestedProductType;
+import org.nightlabs.jfire.store.NestedProductTypeLocal;
 import org.nightlabs.jfire.store.Product;
 import org.nightlabs.jfire.store.ProductLocator;
 import org.nightlabs.jfire.store.ProductType;
@@ -65,11 +65,11 @@ public class SimpleProductTypeActionHandler
 	@Override
 	@Implement
 	public Collection<? extends Product> findProducts(User user,
-			ProductType productType, NestedProductType nestedProductType, ProductLocator productLocator)
+			ProductType productType, NestedProductTypeLocal nestedProductTypeLocal, ProductLocator productLocator)
 	{
 		SimpleProductType spt = (SimpleProductType) productType;
 		SimpleProductTypeLocal sptl = (SimpleProductTypeLocal) productType.getProductTypeLocal();
-		int qty = nestedProductType == null ? 1 : nestedProductType.getQuantity();
+		int qty = nestedProductTypeLocal == null ? 1 : nestedProductTypeLocal.getQuantity();
 		PersistenceManager pm = getPersistenceManager();
 
 		Store store = Store.getStore(pm);
@@ -112,11 +112,11 @@ public class SimpleProductTypeActionHandler
 			User user, Product localPackageProduct, Article localArticle,
 			String partnerOrganisationID, Hashtable<?, ?> partnerInitialContextProperties,
 			Offer partnerOffer, OfferID partnerOfferID, SegmentID partnerSegmentID,
-			ProductType nestedProductType, Collection<NestedProductType> nestedProductTypes) throws Exception
+			ProductType nestedProductType, Collection<NestedProductTypeLocal> nestedProductTypeLocals) throws Exception
 	{
 		SimpleTradeManager stm = SimpleTradeManagerUtil.getHome(partnerInitialContextProperties).create();
 		int qty = 0;
-		for (NestedProductType npt : nestedProductTypes) {
+		for (NestedProductTypeLocal npt : nestedProductTypeLocals) {
 			qty += npt.getQuantity();
 		}
 

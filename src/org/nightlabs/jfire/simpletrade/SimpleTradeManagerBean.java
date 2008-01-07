@@ -94,8 +94,10 @@ import org.nightlabs.jfire.simpletrade.store.SimpleProductTypeActionHandler;
 import org.nightlabs.jfire.simpletrade.store.SimpleProductTypeSearchFilter;
 import org.nightlabs.jfire.simpletrade.store.prop.SimpleProductTypeStruct;
 import org.nightlabs.jfire.store.CannotPublishProductTypeException;
-import org.nightlabs.jfire.store.NestedProductType;
+import org.nightlabs.jfire.store.NestedProductTypeLocal;
+import org.nightlabs.jfire.store.Product;
 import org.nightlabs.jfire.store.ProductType;
+import org.nightlabs.jfire.store.ProductTypeLocal;
 import org.nightlabs.jfire.store.Store;
 import org.nightlabs.jfire.store.deliver.CrossTradeDeliveryCoordinator;
 import org.nightlabs.jfire.store.deliver.DeliveryConfiguration;
@@ -112,6 +114,7 @@ import org.nightlabs.jfire.trade.Order;
 import org.nightlabs.jfire.trade.OrganisationLegalEntity;
 import org.nightlabs.jfire.trade.Segment;
 import org.nightlabs.jfire.trade.Trader;
+import org.nightlabs.jfire.trade.id.ArticleID;
 import org.nightlabs.jfire.trade.id.CustomerGroupID;
 import org.nightlabs.jfire.trade.id.OfferID;
 import org.nightlabs.jfire.trade.id.SegmentID;
@@ -431,7 +434,7 @@ implements SessionBean
 //				wheel.setInnerPriceConfig(formulaPriceConfig);
 //
 //				// package 4 wheels inside the bmw320i
-//				NestedProductType wheelInsideBMW = bmw320i.createNestedProductType(wheel);
+//				NestedProductTypeLocal wheelInsideBMW = bmw320i.createNestedProductType(wheel);
 //				wheelInsideBMW.setQuantity(4);
 //
 //				// calculate prices
@@ -565,9 +568,9 @@ implements SessionBean
 			if (NLJDOHelper.exists(pm, productType)) {
 				// if the nestedProductTypes changed, we need to recalculate prices
 				// test first, whether they were detached
-				Map<String, NestedProductType> newNestedProductTypes = new HashMap<String, NestedProductType>();
+				Map<String, NestedProductTypeLocal> newNestedProductTypes = new HashMap<String, NestedProductTypeLocal>();
 				try {
-					for (NestedProductType npt : productType.getNestedProductTypes()) {
+					for (NestedProductTypeLocal npt : productType.getProductTypeLocal().getNestedProductTypeLocals()) {
 						newNestedProductTypes.put(npt.getInnerProductTypePrimaryKey(), npt);
 						npt.getQuantity();
 					}
@@ -578,7 +581,7 @@ implements SessionBean
 				if (newNestedProductTypes != null) {
 					SimpleProductType original = (SimpleProductType) pm.getObjectById(JDOHelper.getObjectId(productType));
 
-					priceCalculationNeeded = !ProductType.compareNestedProductTypes(original.getNestedProductTypes(), newNestedProductTypes);
+					priceCalculationNeeded = !ProductTypeLocal.compareNestedProductTypeLocals(original.getProductTypeLocal().getNestedProductTypeLocals(), newNestedProductTypes);
 				}
 
 				productType = pm.makePersistent(productType);
@@ -833,7 +836,7 @@ implements SessionBean
 	 * @ejb.permission role-name="_Guest_"
 	 * @ejb.transaction type = "Required"
 	 */
-	public Collection createArticles(
+	public Collection<? extends Article> createArticles(
 			SegmentID segmentID,
 			OfferID offerID,
 			ProductTypeID productTypeID,
@@ -879,13 +882,13 @@ implements SessionBean
 			}
 
 			// find / create Products
-			NestedProductType pseudoNestedPT = null;
+			NestedProductTypeLocal pseudoNestedPT = null;
 			if (quantity != 1)
-				pseudoNestedPT = new NestedProductType(null, productType, quantity);
+				pseudoNestedPT = new NestedProductTypeLocal(null, productType.getProductTypeLocal(), quantity);
 
-			Collection products = store.findProducts(user, productType, pseudoNestedPT, null);
+			Collection<? extends Product> products = store.findProducts(user, productType, pseudoNestedPT, null);
 
-			Collection articles = trader.createArticles(
+			Collection<? extends Article> articles = trader.createArticles(
 					user, offer, segment,
 					products,
 					new ArticleCreator(tariff),
@@ -959,13 +962,13 @@ implements SessionBean
 //			        at org.jpox.resource.PersistenceManagerImpl.detachCopyAll(PersistenceManagerImpl.java:1000)
 //			        at org.nightlabs.jfire.simpletrade.SimpleTradeManagerBean.createArticles(SimpleTradeManagerBean.java:745)
 
-			List articleIDs = NLJDOHelper.getObjectIDList(articles);
+			List<ArticleID> articleIDs = NLJDOHelper.getObjectIDList(articles);
 			for (int tryCounter = 0; tryCounter < 10; ++tryCounter) {
 				pm.flush();
 				pm.evictAll();
 				articles = NLJDOHelper.getObjectList(pm, articleIDs, Article.class);
 				try {
-					Collection detachedArticles = null;
+					Collection<? extends Article> detachedArticles = null;
 					detachedArticles = pm.detachCopyAll(articles);
 					return detachedArticles;
 				} catch (Exception x) {
@@ -992,7 +995,8 @@ implements SessionBean
 			Query q = pm.newQuery(SimpleProductType.class);
 			q.setResult("JDOHelper.getObjectId(this)");
 			q.setFilter("this.published");
-			return new HashSet<ProductTypeID>((Collection<? extends ProductTypeID>) q.execute());
+			Collection<ProductTypeID> res = CollectionUtil.castCollection((Collection<?>)q.execute());
+			return new HashSet<ProductTypeID>(res);
 		} finally {
 			pm.close();
 		}

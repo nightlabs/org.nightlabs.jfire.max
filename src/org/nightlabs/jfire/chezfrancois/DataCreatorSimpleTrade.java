@@ -106,7 +106,7 @@ extends DataCreator
 		return pt;
 	}
 
-	private List<SimpleProductType> createdLeafs = new ArrayList<SimpleProductType>(); 
+	private List<ProductTypeID> createdLeafIDs = new ArrayList<ProductTypeID>(); 
 
 	public SimpleProductType createLeaf(SimpleProductType category, String productTypeID, IInnerPriceConfig innerPriceConfig, String ... names) throws CannotPublishProductTypeException, CannotConfirmProductTypeException
 	{
@@ -127,8 +127,7 @@ extends DataCreator
 //		store.setProductTypeStatus_confirmed(user, pt);
 //		store.setProductTypeStatus_saleable(user, pt, true);		
 		
-//		createdLeafs.add((ProductTypeID) JDOHelper.getObjectId(pt));
-		createdLeafs.add(pt);
+		createdLeafIDs.add((ProductTypeID) JDOHelper.getObjectId(pt));
 
 		return pt;
 	}
@@ -136,7 +135,8 @@ extends DataCreator
 	public void makeAllLeavesSaleable()
 	throws CannotMakeProductTypeSaleableException, CannotConfirmProductTypeException
 	{
-		for (ProductType pt : createdLeafs) {
+		for (ProductTypeID ptID : createdLeafIDs) {
+			ProductType pt = (ProductType) pm.getObjectById(ptID);
 			store.setProductTypeStatus_confirmed(user, pt);
 			store.setProductTypeStatus_saleable(user, pt, true);
 		}
@@ -235,9 +235,8 @@ extends DataCreator
 	public void calculatePrices()
 	throws ModuleException
 	{
-//		for (ProductTypeID ptID : createdLeafs) {
-//			SimpleProductType pt = (SimpleProductType) pm.getObjectById(ptID);
-		for (SimpleProductType pt : createdLeafs){
+		for (ProductTypeID ptID : createdLeafIDs) {
+			SimpleProductType pt = (SimpleProductType) pm.getObjectById(ptID);
 			if (pt.getInnerPriceConfig() != null && pt.getPackagePriceConfig() != null)
 				((StablePriceConfig)pt.getPackagePriceConfig()).adoptParameters(pt.getInnerPriceConfig());
 

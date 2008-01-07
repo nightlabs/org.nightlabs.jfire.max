@@ -186,15 +186,15 @@ extends Initialiser
 		dataCreator.createWineProperties(pm, boxMerlotAustralia2001, "Box (6): Merlot 2001 (Australia) from Australia", "Karton Merlot aus Australien", 
 				"Box (6): Merlot 2001 (Australia) from Australia", "Karton Merlot aus Australien", "merlot_box_small.jpg", contentTypeJpeg, "merlot_box_large.jpg", contentTypeJpeg);
 
-		boxMerlotAustralia2001.createNestedProductType(bottleMerlotAustralia2001).setQuantity(6);
-		boxMerlotAustralia2004.createNestedProductType(bottleMerlotAustralia2004).setQuantity(6);
-		boxMerlotFrance2001.createNestedProductType(bottleMerlotFrance2001).setQuantity(6);
-		boxMerlotCalifornia2003.createNestedProductType(bottleMerlotCalifornia2003).setQuantity(6);
+		boxMerlotAustralia2001.getProductTypeLocal().createNestedProductTypeLocal(bottleMerlotAustralia2001.getProductTypeLocal()).setQuantity(6);
+		boxMerlotAustralia2004.getProductTypeLocal().createNestedProductTypeLocal(bottleMerlotAustralia2004.getProductTypeLocal()).setQuantity(6);
+		boxMerlotFrance2001.getProductTypeLocal().createNestedProductTypeLocal(bottleMerlotFrance2001.getProductTypeLocal()).setQuantity(6);
+		boxMerlotCalifornia2003.getProductTypeLocal().createNestedProductTypeLocal(bottleMerlotCalifornia2003.getProductTypeLocal()).setQuantity(6);
 
-		boxMerlotAustralia2001.getFieldMetaData("nestedProductTypes").setValueInherited(false);
-		boxMerlotAustralia2004.getFieldMetaData("nestedProductTypes").setValueInherited(false);
-		boxMerlotFrance2001.getFieldMetaData("nestedProductTypes").setValueInherited(false);
-		boxMerlotCalifornia2003.getFieldMetaData("nestedProductTypes").setValueInherited(false);
+		boxMerlotAustralia2001.getProductTypeLocal().getFieldMetaData("nestedProductTypeLocals").setValueInherited(false);
+		boxMerlotAustralia2004.getProductTypeLocal().getFieldMetaData("nestedProductTypeLocals").setValueInherited(false);
+		boxMerlotFrance2001.getProductTypeLocal().getFieldMetaData("nestedProductTypeLocals").setValueInherited(false);
+		boxMerlotCalifornia2003.getProductTypeLocal().getFieldMetaData("nestedProductTypeLocals").setValueInherited(false);
 
 		// create ProductTypes: accessories
 		IInnerPriceConfig priceConfigChocolate = dataCreator.createFixPriceConfig(

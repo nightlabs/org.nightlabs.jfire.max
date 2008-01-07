@@ -265,6 +265,9 @@ implements StoreCallback
 	public void setProductTypeStatus_published(User user, ProductType productType) 
 	throws CannotPublishProductTypeException
 	{
+		if (productType == null)
+			throw new IllegalArgumentException("productType must not be null!");
+
 		if (productType.isPublished())
 			return;
 
@@ -275,6 +278,9 @@ implements StoreCallback
 	public void setProductTypeStatus_confirmed(User user, ProductType productType) 
 	throws CannotConfirmProductTypeException
 	{
+		if (productType == null)
+			throw new IllegalArgumentException("productType must not be null!");
+
 		if (productType.isConfirmed())
 			return;
 
@@ -703,23 +709,23 @@ implements StoreCallback
 //	}
 
 	/**
-	 * @param productType Can be <code>null</code>, if <code>nestedProductType</code> is defined.
-	 * @param nestedProductType Can be <code>null</code>, if <code>productType</code> is defined (usually, when it is the top-level-producttype).
+	 * @param productType Can be <code>null</code>, if <code>nestedProductTypeLocal</code> is defined.
+	 * @param nestedProductTypeLocal Can be <code>null</code>, if <code>productType</code> is defined (usually, when it is the top-level-producttype).
 	 * @return Returns <tt>Collection</tt> of suitable <tt>Product</tt>s or <tt>null</tt> if nothing is available.
 	 */
-	public Collection<? extends Product> findProducts(User user, ProductType productType, NestedProductType nestedProductType, ProductLocator productLocator)
+	public Collection<? extends Product> findProducts(User user, ProductType productType, NestedProductTypeLocal nestedProductTypeLocal, ProductLocator productLocator)
 	{
-		if (nestedProductType == null && productType == null)
-			throw new IllegalArgumentException("productType and nestedProductType are both null! One of them must be defined!");
+		if (nestedProductTypeLocal == null && productType == null)
+			throw new IllegalArgumentException("productType and nestedProductTypeLocal are both null! One of them must be defined!");
 
-		if (nestedProductType != null)
-			productType = nestedProductType.getInnerProductType();
+		if (nestedProductTypeLocal != null)
+			productType = nestedProductTypeLocal.getInnerProductTypeLocal().getProductType();
 
 		ProductTypeActionHandler ptah = ProductTypeActionHandler.getProductTypeActionHandler(
 				getPersistenceManager(), productType.getClass());
 
 		return ptah.findProducts(
-				user, productType, nestedProductType, productLocator);
+				user, productType, nestedProductTypeLocal, productLocator);
 	}
 
 	/**

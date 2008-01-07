@@ -1465,7 +1465,7 @@ implements SessionBean
 								productTypeClass2organisationID2articleSet = new HashMap<CrossTradeDeliveryCoordinator, Map<String,Map<Boolean,Set<Article>>>>();
 
 							ProductType nestedProductType = nestedProductLocal.getProduct().getProductType();
-//							Class nestedProductTypeClass = nestedProductType.getClass();
+//							Class nestedProductTypeClass = nestedProductTypeLocal.getClass();
 
 							if (nestedProductType.getDeliveryConfiguration() == null)
 								throw new IllegalStateException("productType.deliveryConfiguration is null!!! productType \"" + nestedProductType.getPrimaryKey() + "\" localArticle \"" + article.getPrimaryKey() + "\" + nestedProductLocal \"" + nestedProductLocal.getPrimaryKey() + "\"");
@@ -1945,9 +1945,9 @@ implements SessionBean
 //			if (NLJDOHelper.exists(pm, productType)) {
 //				// if the nestedProductTypes changed, we need to recalculate prices
 //				// test first, whether they were detached
-//				Map<String, NestedProductType> newNestedProductTypes = new HashMap<String, NestedProductType>();
+//				Map<String, NestedProductTypeLocal> newNestedProductTypes = new HashMap<String, NestedProductTypeLocal>();
 //				try {
-//					for (NestedProductType npt : productType.getNestedProductTypes()) {
+//					for (NestedProductTypeLocal npt : productType.getNestedProductTypes()) {
 //						newNestedProductTypes.put(npt.getInnerProductTypePrimaryKey(), npt);
 //						npt.getQuantity();
 //					}

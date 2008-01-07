@@ -41,27 +41,29 @@ import org.nightlabs.jfire.store.id.ProductTypeID;
  *		identity-type="application"
  *		objectid-class="org.nightlabs.jfire.store.id.NestedProductTypeID"
  *		detachable="true"
- *		table="JFireTrade_NestedProductType"
+ *		table="JFireTrade_NestedProductTypeLocal"
  *
  * @jdo.inheritance strategy="new-table"
  *
  * @jdo.create-objectid-class field-order="packageProductTypeOrganisationID, packageProductTypeProductTypeID, innerProductTypeOrganisationID, innerProductTypeProductTypeID"
  *
- * @jdo.fetch-group name="NestedProductType.packageProductType" fields="packageProductType"
- * @jdo.fetch-group name="NestedProductType.innerProductType" fields="innerProductType"
- * @jdo.fetch-group name="NestedProductType.this" fetch-groups="default" fields="packageProductType, innerProductType"
+ * @jdo.fetch-group name="NestedProductTypeLocal.packageProductTypeLocal" fields="packageProductTypeLocal"
+ * @jdo.fetch-group name="NestedProductTypeLocal.innerProductTypeLocal" fields="innerProductTypeLocal"
+ * @jdo.fetch-group name="NestedProductTypeLocal.this" fetch-groups="default" fields="packageProductTypeLocal, innerProductTypeLocal"
  *
  * @!jdo.fetch-group name="FetchGroupsTrade.articleInOrderEditor" fetch-groups="default"
  * @!jdo.fetch-group name="FetchGroupsTrade.articleInOfferEditor" fetch-groups="default"
  * @!jdo.fetch-group name="FetchGroupsTrade.articleInInvoiceEditor" fetch-groups="default"
  * @!jdo.fetch-group name="FetchGroupsTrade.articleInDeliveryNoteEditor" fetch-groups="default"
  */
-public class NestedProductType
+public class NestedProductTypeLocal
 implements Serializable
 {
-	public static final String FETCH_GROUP_PACKAGE_PRODUCT_TYPE = "NestedProductType.packageProductType";
-	public static final String FETCH_GROUP_INNER_PRODUCT_TYPE = "NestedProductType.innerProductType";
-	public static final String FETCH_GROUP_THIS_PACKAGED_PRODUCT_TYPE = "NestedProductType.this";
+	private static final long serialVersionUID = 1L;
+
+	public static final String FETCH_GROUP_PACKAGE_PRODUCT_TYPE = "NestedProductTypeLocal.packageProductTypeLocal";
+	public static final String FETCH_GROUP_INNER_PRODUCT_TYPE = "NestedProductTypeLocal.innerProductTypeLocal";
+	public static final String FETCH_GROUP_THIS_PACKAGED_PRODUCT_TYPE = "NestedProductTypeLocal.this";
 
 	/**
 	 * @jdo.field primary-key="true"
@@ -92,12 +94,12 @@ implements Serializable
 	/**
 	 * @jdo.field persistence-modifier="persistent"
 	 */
-	private ProductType packageProductType;
+	private ProductTypeLocal packageProductTypeLocal;
 
 	/**
 	 * @jdo.field persistence-modifier="persistent"
 	 */
-	private ProductType innerProductType;
+	private ProductTypeLocal innerProductTypeLocal;
 
 	/**
 	 * @jdo.field persistence-modifier="persistent"
@@ -117,39 +119,39 @@ implements Serializable
 	 * @deprecated This constructor exists only for JDO.
 	 */
 	@Deprecated
-	protected NestedProductType()
+	protected NestedProductTypeLocal()
 	{
 	}
 
 	/**
-	 * @param packageProductType Might be <tt>null</tt> for virtual toplevel-pointer.
-	 * @param innerProductType
+	 * @param packageProductTypeLocal Might be <tt>null</tt> for virtual toplevel-pointer.
+	 * @param innerProductTypeLocal
 	 * @param quantity
 	 */
-	public NestedProductType(ProductType packageProductType, ProductType innerProductType, int quantity)
+	public NestedProductTypeLocal(ProductTypeLocal packageProductTypeLocal, ProductTypeLocal innerProductTypeLocal, int quantity)
 	{
-		this(packageProductType, innerProductType);
+		this(packageProductTypeLocal, innerProductTypeLocal);
 		this.quantity = quantity;
 	}
-	public NestedProductType(ProductType packageProductType, ProductType innerProductType)
+	public NestedProductTypeLocal(ProductTypeLocal packageProductTypeLocal, ProductTypeLocal innerProductTypeLocal)
 	{
-		this.packageProductType = packageProductType;
-		this.innerProductType = innerProductType;
-		if (packageProductType != null) {
-			this.packageProductTypeOrganisationID = packageProductType.getOrganisationID();
-			this.packageProductTypeProductTypeID = packageProductType.getProductTypeID();
+		this.packageProductTypeLocal = packageProductTypeLocal;
+		this.innerProductTypeLocal = innerProductTypeLocal;
+		if (packageProductTypeLocal != null) {
+			this.packageProductTypeOrganisationID = packageProductTypeLocal.getOrganisationID();
+			this.packageProductTypeProductTypeID = packageProductTypeLocal.getProductTypeID();
 		}
-		this.innerProductTypeOrganisationID = innerProductType.getOrganisationID();
-		this.innerProductTypeProductTypeID = innerProductType.getProductTypeID();
-		this.innerProductTypePrimaryKey = innerProductType.getPrimaryKey();
+		this.innerProductTypeOrganisationID = innerProductTypeLocal.getOrganisationID();
+		this.innerProductTypeProductTypeID = innerProductTypeLocal.getProductTypeID();
+		this.innerProductTypePrimaryKey = ProductType.getPrimaryKey(this.innerProductTypeOrganisationID, this.innerProductTypeProductTypeID);
 	}
 
 	/**
-	 * @return Returns the innerProductType.
+	 * @return Returns the innerProductTypeLocal.
 	 */
-	public ProductType getInnerProductType()
+	public ProductTypeLocal getInnerProductTypeLocal()
 	{
-		return innerProductType;
+		return innerProductTypeLocal;
 	}
 	/**
 	 * @return Returns the innerProductTypeOrganisationID.
@@ -166,11 +168,11 @@ implements Serializable
 		return innerProductTypeProductTypeID;
 	}
 	/**
-	 * @return Returns the packageProductType.
+	 * @return Returns the packageProductTypeLocal.
 	 */
-	public ProductType getPackageProductType()
+	public ProductTypeLocal getPackageProductTypeLocal()
 	{
-		return packageProductType;
+		return packageProductTypeLocal;
 	}
 	/**
 	 * @return Returns the packageProductTypeOrganisationID.

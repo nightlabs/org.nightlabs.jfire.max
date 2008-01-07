@@ -253,11 +253,11 @@ public abstract class ProductTypeActionHandler
 	 * {@link ProductLocator}.
 	 * <p>
 	 * Do NOT call this method directly!
-	 * Use {@link Store#findProducts(User, NestedProductType, ProductLocator)} instead! This is
+	 * Use {@link Store#findProducts(User, NestedProductTypeLocal, ProductLocator)} instead! This is
 	 * necessary for interception.
 	 * </p>
 	 * <p>
-	 * You should return the same number of <code>Product</code>s as defined in <code>nestedProductType.quantity</code>! Otherwise,
+	 * You should return the same number of <code>Product</code>s as defined in <code>nestedProductTypeLocal.quantity</code>! Otherwise,
 	 * it is handled as if you return <code>null</code>.
 	 * </p>
 	 * <p>
@@ -266,14 +266,14 @@ public abstract class ProductTypeActionHandler
 	 * </p>
 	 *
 	 * @param user The <code>User</code> who is responsible for this action.
-	 * @param productType If <code>nestedProductType</code> is defined, it is the same as {@link NestedProductType#getInnerProductType()}. This is passed, because
-	 *		<code>nestedProductType</code> might be <code>null</code> for top-level products.
-	 * @param nestedProductType This will be <code>null</code> if the top-level product (i.e. the container a package) shall be found/created.
+	 * @param productType If <code>nestedProductTypeLocal</code> is defined, it is the same as {@link NestedProductTypeLocal#getInnerProductTypeLocal()}. This is passed, because
+	 *		<code>nestedProductTypeLocal</code> might be <code>null</code> for top-level products.
+	 * @param nestedProductTypeLocal This will be <code>null</code> if the top-level product (i.e. the container a package) shall be found/created.
 	 * @param productLocator A specialized Object defining for YOUR implementation which <code>Product</code> to find.
 	 * @return Return either <code>null</code> if no suitable <code>Product</code>s can be allocated or a <code>Collection</code> of <code>Product</code>.
 	 */
 	public abstract Collection<? extends Product> findProducts(
-			User user, ProductType productType, NestedProductType nestedProductType, ProductLocator productLocator);
+			User user, ProductType productType, NestedProductTypeLocal nestedProductTypeLocal, ProductLocator productLocator);
 
 
 	/**
@@ -295,9 +295,9 @@ public abstract class ProductTypeActionHandler
 	 *		{@link JDOHelper#getObjectId(Object)} applied to <code>partnerOffer</code>.
 	 * @param partnerSegmentID For every {@link SegmentType} of the local {@link Order}, a Segment is created in the vendor's {@link Order}. This is the ID
 	 *		of the {@link Segment} in the partner's Order that has been created for the <code>SegmentType</code> returned by <code>localArticle.getSegment().getSegmentType()</code>.
-	 * @param nestedProductType The {@link NestedProductType}s passed as parameter <code>nestedProductTypes</code> are grouped by {@link ProductType} as returned
-	 *		by {@link NestedProductType#getInnerProductType()}. This instance is then passed to this method here.
-	 * @param nestedProductTypes The {@link NestedProductType}s for whose inner-{@link ProductType}s the {@link Article}s shall be created.
+	 * @param nestedProductTypeLocal The {@link NestedProductTypeLocal}s passed as parameter <code>nestedProductTypes</code> are grouped by {@link ProductType} as returned
+	 *		by {@link NestedProductTypeLocal#getInnerProductTypeLocal()}. This instance is then passed to this method here.
+	 * @param nestedProductTypeLocals The {@link NestedProductTypeLocal}s for whose inner-{@link ProductType}s the {@link Article}s shall be created.
 	 * @return the {@link Article}s which have been created by the vendor and detached from the vendor's organisation's datastore. They must not yet be
 	 *		attached locally - this is done by the framework.
 	 * @throws Exception As this method communicates with a remote server and calls implementation-specific methods, it can throw a wide variety of exceptions.
@@ -306,7 +306,7 @@ public abstract class ProductTypeActionHandler
 			User user, Product localPackageProduct, Article localArticle,
 			String partnerOrganisationID, Hashtable<?, ?> partnerInitialContextProperties,
 			Offer partnerOffer, OfferID partnerOfferID, SegmentID partnerSegmentID,
-			ProductType nestedProductType, Collection<NestedProductType> nestedProductTypes) throws Exception;
+			ProductType nestedProductType, Collection<NestedProductTypeLocal> nestedProductTypeLocals) throws Exception;
 
 	/**
 	 * This method is called on the client-side (i.e. the reseller-side) by {@link #assembleProduct(User, ProductTypeActionHandlerCache, Product)}
@@ -316,13 +316,13 @@ public abstract class ProductTypeActionHandler
 	 * @param productTypeActionHandlerCache cache for accessing {@link ProductTypeActionHandler}s faster.
 	 * @param packageProduct the <code>Product</code> which is currently assembled.
 	 * @param partnerOrganisationID refencing the organisation from which the nested products are purchased.
-	 * @param partnerNestedProductTypes all those {@link NestedProductType}s which reference {@link ProductType}s for the products to be purchased from the organisation referenced by <code>partnerOrganisationID</code>.
+	 * @param partnerNestedProductTypes all those {@link NestedProductTypeLocal}s which reference {@link ProductType}s for the products to be purchased from the organisation referenced by <code>partnerOrganisationID</code>.
 	 * @return the purchase-{@link Article}s which are buying the required nested {@link Product}s for the given <code>partnerNestedProductTypes</code>
 	 * @throws ModuleException if sth. goes wrong - e.g. a {@link NotAvailableException} if the nested products cannot be bought (the supplier cannot supply us). 
 	 */
 	protected Collection<? extends Article> importCrossTradeNestedProducts(
 			User user, ProductTypeActionHandlerCache productTypeActionHandlerCache, Product packageProduct,
-			String partnerOrganisationID, Collection<NestedProductType> partnerNestedProductTypes
+			String partnerOrganisationID, Collection<NestedProductTypeLocal> partnerNestedProductTypes
 	)
 	throws ModuleException
 	{
@@ -396,7 +396,7 @@ public abstract class ProductTypeActionHandler
 //			ProductLocator[] productLocators = new ProductLocator[partnerNestedProductTypes.size()];
 //
 //			int idx = 0;
-//			for (NestedProductType partnerNestedProductType : partnerNestedProductTypes) {
+//			for (NestedProductTypeLocal partnerNestedProductType : partnerNestedProductTypes) {
 //				ProductLocator productLocator = packageProduct.getProductLocator(user, partnerNestedProductType);
 //				productTypeIDs[idx] = (ProductTypeID) JDOHelper.getObjectId(partnerNestedProductType.getInnerProductType());
 //				quantities[idx] = partnerNestedProductType.getQuantity();
@@ -406,22 +406,22 @@ public abstract class ProductTypeActionHandler
 //
 //			Map<Integer, Collection<? extends Article>> articleMap = tradeManager.createCrossTradeArticles(partnerOfferID, productTypeIDs, quantities, productLocators);
 
-			Map<ProductType, Collection<NestedProductType>> productType2NestedProductTypes = new HashMap<ProductType, Collection<NestedProductType>>();
-			for (NestedProductType partnerNestedProductType : partnerNestedProductTypes) {
-				Collection<NestedProductType> nestedProductTypes = productType2NestedProductTypes.get(partnerNestedProductType.getInnerProductType());
-				if (nestedProductTypes == null) {
-					nestedProductTypes = new ArrayList<NestedProductType>();
-					productType2NestedProductTypes.put(partnerNestedProductType.getInnerProductType(), nestedProductTypes);
+			Map<ProductType, Collection<NestedProductTypeLocal>> productType2NestedProductTypes = new HashMap<ProductType, Collection<NestedProductTypeLocal>>();
+			for (NestedProductTypeLocal partnerNestedProductType : partnerNestedProductTypes) {
+				Collection<NestedProductTypeLocal> nestedProductTypeLocals = productType2NestedProductTypes.get(partnerNestedProductType.getInnerProductTypeLocal());
+				if (nestedProductTypeLocals == null) {
+					nestedProductTypeLocals = new ArrayList<NestedProductTypeLocal>();
+					productType2NestedProductTypes.put(partnerNestedProductType.getInnerProductTypeLocal().getProductType(), nestedProductTypeLocals);
 				}
-				nestedProductTypes.add(partnerNestedProductType);
+				nestedProductTypeLocals.add(partnerNestedProductType);
 			}
 
 			Collection<Article> resultArticles = null;
 			Store store = Store.getStore(pm);
 
-			for (Map.Entry<ProductType, Collection<NestedProductType>> me : productType2NestedProductTypes.entrySet()) {
+			for (Map.Entry<ProductType, Collection<NestedProductTypeLocal>> me : productType2NestedProductTypes.entrySet()) {
 				ProductType productType = (ProductType) me.getKey();
-				Collection<NestedProductType> nestedProductTypes = me.getValue();
+				Collection<NestedProductTypeLocal> nestedProductTypeLocals = me.getValue();
 //				ProductTypeActionHandler productTypeActionHandler = ProductTypeActionHandler.getProductTypeActionHandler(pm, productType.getClass());
 
 				ProductTypeActionHandler productTypeActionHandler = productTypeActionHandlerCache.getProductTypeActionHandler(productType);
@@ -429,7 +429,7 @@ public abstract class ProductTypeActionHandler
 						user, packageProduct, localArticle,
 						partnerOrganisationID, initialContextProperties,
 						partnerOffer, partnerOfferID, partnerSegmentID,
-						productType, nestedProductTypes);
+						productType, nestedProductTypeLocals);
 
 				articles = pm.makePersistentAll(articles);
 
@@ -514,8 +514,8 @@ public abstract class ProductTypeActionHandler
 
 		// All nestedProductTypes that come from a partner-organisation are collected and grouped in this map in order
 		// to import them more efficiently
-//		Map<String, List<NestedProductType>> organisationID2partnerNestedProductType = new HashMap<String, List<NestedProductType>>();
-		Map<String, List<NestedProductType>> organisationID2partnerNestedProductTypes = null; // lazy creation
+//		Map<String, List<NestedProductTypeLocal>> organisationID2partnerNestedProductType = new HashMap<String, List<NestedProductTypeLocal>>();
+		Map<String, List<NestedProductTypeLocal>> organisationID2partnerNestedProductTypes = null; // lazy creation
 // The above generic notation causes the class Product to be destroyed during enhancement with BCEL + JPOX-Enhancer. This results
 // in the following exception when afterwards enhancing JFireSimpleTrade (which extends the class Product):
 //		[jpoxenhancer] Exception in thread "main" java.lang.ClassFormatError: LVTT entry for 'me' in class file org/nightlabs/jfire/store/Product does not match any LVT entry
@@ -530,14 +530,14 @@ public abstract class ProductTypeActionHandler
 
 		// local product => create/find nested products
 		ProductType productType = product.getProductType();
-		for (NestedProductType nestedProductType : productType.getNestedProductTypes()) {
-			if (product.getOrganisationID().equals(nestedProductType.getInnerProductTypeOrganisationID())) {
-				ProductLocator productLocator = product.getProductLocator(user, nestedProductType);
+		for (NestedProductTypeLocal nestedProductTypeLocal : productType.getProductTypeLocal().getNestedProductTypeLocals()) {
+			if (product.getOrganisationID().equals(nestedProductTypeLocal.getInnerProductTypeOrganisationID())) {
+				ProductLocator productLocator = product.getProductLocator(user, nestedProductTypeLocal);
 
 				// nested productType is our own, so we can just package it without buying it from someone else.
-				Collection<? extends Product> nestedProducts = store.findProducts(user, null, nestedProductType, productLocator);
-				if (nestedProducts == null || nestedProducts.size() != nestedProductType.getQuantity())
-					throw new NotAvailableException("The product '"+product.getPrimaryKey()+"' cannot be assembled, because the nested ProductType '"+nestedProductType.getInnerProductTypePrimaryKey()+"' could not find available products!");
+				Collection<? extends Product> nestedProducts = store.findProducts(user, null, nestedProductTypeLocal, productLocator);
+				if (nestedProducts == null || nestedProducts.size() != nestedProductTypeLocal.getQuantity())
+					throw new NotAvailableException("The product '"+product.getPrimaryKey()+"' cannot be assembled, because the nested ProductType '"+nestedProductTypeLocal.getInnerProductTypePrimaryKey()+"' could not find available products!");
 
 				for (Product nestedProduct : nestedProducts) {
 					ProductLocal nestedProductLocal = nestedProduct.getProductLocal();
@@ -564,26 +564,26 @@ public abstract class ProductTypeActionHandler
 			}
 			else {
 				if (organisationID2partnerNestedProductTypes == null)
-					organisationID2partnerNestedProductTypes = new HashMap<String, List<NestedProductType>>();
+					organisationID2partnerNestedProductTypes = new HashMap<String, List<NestedProductTypeLocal>>();
 				
 				// nested productType is coming from a remote organisation and must be acquired from there
 				// this means: an Offer must be created (or a previously created one used) and an Article be added
 				// we group them in order to make it more efficient
-				List<NestedProductType> partnerNestedProductTypes = organisationID2partnerNestedProductTypes.get(nestedProductType.getInnerProductTypeOrganisationID());
+				List<NestedProductTypeLocal> partnerNestedProductTypes = organisationID2partnerNestedProductTypes.get(nestedProductTypeLocal.getInnerProductTypeOrganisationID());
 				if (partnerNestedProductTypes == null) {
-					partnerNestedProductTypes = new ArrayList<NestedProductType>();
-					organisationID2partnerNestedProductTypes.put(nestedProductType.getInnerProductTypeOrganisationID(), partnerNestedProductTypes);
+					partnerNestedProductTypes = new ArrayList<NestedProductTypeLocal>();
+					organisationID2partnerNestedProductTypes.put(nestedProductTypeLocal.getInnerProductTypeOrganisationID(), partnerNestedProductTypes);
 				}
-				partnerNestedProductTypes.add(nestedProductType);
+				partnerNestedProductTypes.add(nestedProductTypeLocal);
 			}
 		} // for (Iterator itNPT = productType.getNestedProductTypes().iterator(); itNPT.hasNext(); ) {
 
-//		for (Iterator<Map.Entry<String, List<NestedProductType>>> itPNPT = organisationID2partnerNestedProductType.entrySet().iterator(); itPNPT.hasNext(); ) {
+//		for (Iterator<Map.Entry<String, List<NestedProductTypeLocal>>> itPNPT = organisationID2partnerNestedProductType.entrySet().iterator(); itPNPT.hasNext(); ) {
 		if (organisationID2partnerNestedProductTypes != null) {
-			for (Map.Entry<String, List<NestedProductType>> me : organisationID2partnerNestedProductTypes.entrySet()) {
+			for (Map.Entry<String, List<NestedProductTypeLocal>> me : organisationID2partnerNestedProductTypes.entrySet()) {
 				String organisationID = me.getKey();
-				List<NestedProductType> nestedProductTypes = me.getValue();
-				Collection<? extends Article> articlesWithNestedProducts = importCrossTradeNestedProducts(user, productTypeActionHandlerCache, product, organisationID, nestedProductTypes);
+				List<NestedProductTypeLocal> nestedProductTypeLocals = me.getValue();
+				Collection<? extends Article> articlesWithNestedProducts = importCrossTradeNestedProducts(user, productTypeActionHandlerCache, product, organisationID, nestedProductTypeLocals);
 //				(user, this, organisationID, nestedProductTypes);
 
 				// dest: product.productType.productTypeLocal.home

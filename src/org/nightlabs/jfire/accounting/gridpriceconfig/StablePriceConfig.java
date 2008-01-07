@@ -42,7 +42,7 @@ import org.nightlabs.jfire.accounting.Tariff;
 import org.nightlabs.jfire.accounting.priceconfig.IPackagePriceConfig;
 import org.nightlabs.jfire.accounting.priceconfig.IPriceConfig;
 import org.nightlabs.jfire.accounting.priceconfig.PriceConfigUtil;
-import org.nightlabs.jfire.store.NestedProductType;
+import org.nightlabs.jfire.store.NestedProductTypeLocal;
 import org.nightlabs.jfire.store.Product;
 import org.nightlabs.jfire.trade.Article;
 import org.nightlabs.jfire.trade.ArticlePrice;
@@ -416,7 +416,7 @@ implements IPackagePriceConfig, IResultPriceConfig
 			IPackagePriceConfig packagePriceConfig, Article article,
 			LinkedList<IPriceConfig> priceConfigStack, ArticlePrice topLevelArticlePrice,
 			ArticlePrice nextLevelArticlePrice, LinkedList<ArticlePrice> articlePriceStack,
-			NestedProductType nestedProductType, LinkedList<NestedProductType> nestedProductTypeStack)
+			NestedProductTypeLocal nestedProductTypeLocal, LinkedList<NestedProductTypeLocal> nestedProductTypeStack)
 	{
 //	 TODO implement
 		throw new UnsupportedOperationException("NYI");
@@ -426,7 +426,7 @@ implements IPackagePriceConfig, IResultPriceConfig
 			IPackagePriceConfig packagePriceConfig, Article article,
 			LinkedList<IPriceConfig> priceConfigStack, ArticlePrice topLevelArticlePrice,
 			ArticlePrice nextLevelArticlePrice, LinkedList<ArticlePrice> articlePriceStack,
-			NestedProductType nestedProductType, LinkedList<NestedProductType> nestedProductTypeStack, Product nestedProduct, LinkedList<Product> productStack)
+			NestedProductTypeLocal nestedProductTypeLocal, LinkedList<NestedProductTypeLocal> nestedProductTypeStack, Product nestedProduct, LinkedList<Product> productStack)
 	{
 		CustomerGroup customerGroup = getCustomerGroup(article);
 		Tariff tariff = getTariff(article);
@@ -440,7 +440,7 @@ implements IPackagePriceConfig, IResultPriceConfig
 				article, priceConfigStack,
 				topLevelArticlePrice, nextLevelArticlePrice,
 				articlePriceStack,
-				nestedProductType,
+				nestedProductTypeLocal,
 				nestedProductTypeStack,
 				nestedProduct,
 				productStack,

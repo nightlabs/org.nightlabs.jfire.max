@@ -51,6 +51,7 @@ import org.nightlabs.jfire.security.User;
  * @jdo.create-objectid-class field-order="organisationID, transferTypeID, transferID"
  *
  * @jdo.inheritance strategy="new-table"
+ * @jdo.inheritance-discriminator strategy="class-name"
  *
  * @jdo.fetch-group name="Transfer.container" fields="container"
  * @jdo.fetch-group name="Transfer.from" fields="from"

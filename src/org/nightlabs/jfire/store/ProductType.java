@@ -28,7 +28,6 @@ package org.nightlabs.jfire.store;
 
 import java.io.Serializable;
 import java.util.Collection;
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
@@ -36,7 +35,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import javax.jdo.FetchPlan;
 import javax.jdo.JDOHelper;
 import javax.jdo.PersistenceManager;
 import javax.jdo.Query;
@@ -57,13 +55,10 @@ import org.nightlabs.jdo.inheritance.JDOInheritableFieldInheriter;
 import org.nightlabs.jdo.inheritance.JDOInheritanceManager;
 import org.nightlabs.jdo.inheritance.JDOSimpleFieldInheriter;
 import org.nightlabs.jfire.accounting.book.LocalAccountantDelegate;
-import org.nightlabs.jfire.accounting.priceconfig.AffectedProductType;
 import org.nightlabs.jfire.accounting.priceconfig.IInnerPriceConfig;
 import org.nightlabs.jfire.accounting.priceconfig.IPackagePriceConfig;
 import org.nightlabs.jfire.accounting.priceconfig.IPriceConfig;
 import org.nightlabs.jfire.accounting.priceconfig.PriceConfig;
-import org.nightlabs.jfire.accounting.priceconfig.PriceConfigUtil;
-import org.nightlabs.jfire.accounting.priceconfig.id.PriceConfigID;
 import org.nightlabs.jfire.idgenerator.IDGenerator;
 import org.nightlabs.jfire.organisation.LocalOrganisation;
 import org.nightlabs.jfire.organisation.Organisation;
@@ -116,6 +111,7 @@ import org.nightlabs.util.Util;
  *		table="JFireTrade_ProductType"
  *
  * @jdo.inheritance strategy="new-table"
+ * @jdo.inheritance-discriminator strategy="class-name"
  *
  * @jdo.create-objectid-class
  *		field-order="organisationID, productTypeID"
@@ -126,7 +122,6 @@ import org.nightlabs.util.Util;
  * @jdo.fetch-group name="ProductType.extendedProductType[-1]" fields="extendedProductType[-1]"
  * @jdo.fetch-group name="ProductType.fieldMetaDataMap" fields="fieldMetaDataMap"
  * @jdo.fetch-group name="ProductType.innerPriceConfig" fields="innerPriceConfig"
- * @jdo.fetch-group name="ProductType.nestedProductTypes" fields="nestedProductTypes"
  * @jdo.fetch-group name="ProductType.packagePriceConfig" fields="packagePriceConfig"
  * @jdo.fetch-group name="ProductType.owner" fields="owner"
  * @jdo.fetch-group name="ProductType.vendor" fields="vendor"
@@ -135,14 +130,14 @@ import org.nightlabs.util.Util;
  * @jdo.fetch-group name="ProductType.managedProductTypeGroup" fields="managedProductTypeGroup"
  * @jdo.fetch-group name="ProductType.productTypeLocal" fields="productTypeLocal"
  * @jdo.fetch-group name="ProductType.name" fields="name" 
- * @jdo.fetch-group name="ProductType.this" fetch-groups="default" fields="deliveryConfiguration, extendedProductType, fieldMetaDataMap, innerPriceConfig, managedProductTypeGroup, name, nestedProductTypes, owner, packagePriceConfig, productTypeGroups, productTypeLocal"
+ * @jdo.fetch-group name="ProductType.this" fetch-groups="default" fields="deliveryConfiguration, extendedProductType, fieldMetaDataMap, innerPriceConfig, managedProductTypeGroup, name, owner, packagePriceConfig, productTypeGroups, productTypeLocal"
  *
  * @jdo.fetch-group name="FetchGroupsTrade.articleInOrderEditor" fetch-groups="default" fields="name"
  * @jdo.fetch-group name="FetchGroupsTrade.articleInOfferEditor" fetch-groups="default" fields="name"
  * @jdo.fetch-group name="FetchGroupsTrade.articleInInvoiceEditor" fetch-groups="default" fields="name"
  * @jdo.fetch-group name="FetchGroupsTrade.articleInDeliveryNoteEditor" fetch-groups="default" fields="name"
  *
- * @jdo.fetch-group name="FetchGroupsCrossTrade.ProductTypeForReseller" fetch-groups="default" fields="deliveryConfiguration, extendedProductType, fieldMetaDataMap, innerPriceConfig, localAccountantDelegate, localStorekeeperDelegate, managedProductTypeGroup, name, nestedProductTypes, owner, packagePriceConfig, productTypeGroups"
+ * @!jdo.fetch-group name="FetchGroupsCrossTrade.ProductTypeForReseller" fetch-groups="default" fields="deliveryConfiguration, extendedProductType, fieldMetaDataMap, innerPriceConfig, localAccountantDelegate, localStorekeeperDelegate, managedProductTypeGroup, name, owner, packagePriceConfig, productTypeGroups"
  *
  * @jdo.query name="getProductTypesOfProductTypeGroup" query="
  *		SELECT
@@ -174,9 +169,9 @@ import org.nightlabs.util.Util;
  *		name="getProductTypesNestingThis"
  *		query="SELECT
  *			WHERE
- *				this.nestedProductTypes.containsValue(nestedProductType) &&
- *				nestedProductType.innerProductType == :productType
- *				VARIABLES org.nightlabs.jfire.store.NestedProductType nestedProductType"
+ *				this.productTypeLocal.nestedProductTypeLocals.containsValue(nestedProductTypeLocal) &&
+ *				nestedProductTypeLocal.innerProductTypeLocal.productType == :productType
+ *				VARIABLES org.nightlabs.jfire.store.NestedProductTypeLocal nestedProductTypeLocal"
  **/
 public abstract class ProductType
 implements
@@ -206,7 +201,6 @@ implements
 	 */
 	public static final String FETCH_GROUP_FIELD_METADATA_MAP = "ProductType.fieldMetaDataMap";
 	public static final String FETCH_GROUP_INNER_PRICE_CONFIG = "ProductType.innerPriceConfig";
-	public static final String FETCH_GROUP_NESTED_PRODUCT_TYPES = "ProductType.nestedProductTypes";
 	public static final String FETCH_GROUP_PACKAGE_PRICE_CONFIG = "ProductType.packagePriceConfig";
 	public static final String FETCH_GROUP_OWNER = "ProductType.owner";
 	public static final String FETCH_GROUP_VENDOR = "ProductType.vendor";
@@ -408,22 +402,6 @@ implements
 //	 */
 //	protected Map properties = new HashMap();
 
-	/**
-	 * key: String primaryKey(organisationID + '/' + productTypeID)<br/>
-	 * value: {@link NestedProductType} nestedProductType
-	 *
-	 * @jdo.field
-	 *		persistence-modifier="persistent"
-	 *		collection-type="map"
-	 *		key-type="java.lang.String"
-	 *		value-type="NestedProductType"
-	 *		mapped-by="packageProductType"
-	 *		dependent-value="true"
-	 *
-	 * @jdo.key mapped-by="innerProductTypePrimaryKey"
-	 */
-	private Map<String, NestedProductType> nestedProductTypes;
-
 //	/**
 //	 * @see #isPackage()
 //	 *
@@ -498,7 +476,7 @@ implements
 	/**
 	 * If the <code>ProductType</code> has this <code>packageNature</code>, it is an inner part
 	 * of a package. This means, it is NOT able to package itself virtually - but it
-	 * is able to nest other <code>ProductType</code>s (see {@link #getNestedProductTypes()})!
+	 * is able to nest other <code>ProductType</code>s (see {@link #getNestedProductTypeLocals()})!
 	 * <p>
 	 * The price is dependent on its siblings within the package. Hence, the price
 	 * of an inner <code>ProductType</code> varies from package to package.
@@ -515,7 +493,7 @@ implements
 
 	/**
 	 * If the <code>ProductType</code> has this <code>packageNature</code>, it can not only
-	 * contain other <code>ProductType</code>s (see {@link #getNestedProductTypes()}),
+	 * contain other <code>ProductType</code>s (see {@link #getNestedProductTypeLocals()}),
 	 * but even virtually package itself. Additionally, it
 	 * can still be packaged within another <code>ProductType</code>, but
 	 * it is not able to make its price dependent on its siblings within
@@ -631,7 +609,6 @@ implements
 
 		productTypeGroups = new HashMap<String, ProductTypeGroup>();
 		fieldMetaDataMap = new HashMap<String, ProductTypeFieldMetaData>();
-		nestedProductTypes = new HashMap<String, NestedProductType>();
 		
 		this.name = new ProductTypeName(this);
 		FieldMetaData fmd = getFieldMetaData("name");
@@ -672,9 +649,9 @@ implements
 	public static String getPrimaryKey(String organisationID, String productTypeID)
 	{
 		if (organisationID == null)
-			throw new NullPointerException("organisationID must not be null!");
+			throw new IllegalArgumentException("organisationID must not be null!");
 		if (productTypeID == null)
-			throw new NullPointerException("productTypeID must not be null!");
+			throw new IllegalArgumentException("productTypeID must not be null!");
 		return organisationID + '/' + productTypeID;
 	}
 	
@@ -802,122 +779,6 @@ implements
 		this.extendedProductTypeID_detached = false;
 		this.extendedProductTypeID = null;
 	}
-
-	/**
-	 * A <code>ProductType</code> can contain others (e.g. a car would contain 4 wheels,
-	 * the engine and much more). This method allows to package another <code>ProductType</code>
-	 * within this one.
-	 *
-	 * @param productType The <code>ProductType</code> which will be packaged within this one. 
-	 * @return Returns the {@link NestedProductType} which functions as glue-with-metadata between
-	 *		the package and its content. You can change the quantity (and later other properties)
-	 *		manipulating the <code>NestedProductType</code>.
-	 */
-	public NestedProductType createNestedProductType(ProductType productType)
-	{
-		// it MUST be possible to continue nesting indefinitely
-//		if (this.isPackageInner())
-//			throw new IllegalStateException("This ProductType ("+getPrimaryKey()+") is marked as package-inner and can therefore not contain nested product types!");
-
-		NestedProductType packagedProductType = (NestedProductType)nestedProductTypes.get(productType.getPrimaryKey());
-		if (packagedProductType == null) {
-			packagedProductType = new NestedProductType(this, productType);
-			nestedProductTypes.put(productType.getPrimaryKey(), packagedProductType);
-		}
-		return packagedProductType;
-	}
-
-	/**
-	 * @return Returns a <code>Collection</code> of {@link NestedProductType}. These are all
-	 *		other <code>ProductType</code>s that have been added to this package. It does <b>not</b>
-	 *		contain itself, even if this <code>ProductType</code> does virtual-self-packaging.
-	 *
-	 * @see #getNestedProductTypes(boolean)
-	 */
-	public Collection<NestedProductType> getNestedProductTypes()
-	{
-		return Collections.unmodifiableCollection(nestedProductTypes.values());
-	}
-
-	/**
-	 * This method can be used instead of {@link #getNestedProductTypes()} and provides
-	 * the possibility to take the virtual-self-packaging into account.
-	 *
-	 * @param includeSelfForVirtualSelfPackaging Whether or not to add <code>this</code>
-	 *		to the result, if this ProductType virtually packages itself (i.e. has an {@link #getInnerPriceConfig() inner}
-	 *		<b>and</b> a {@link #getPackagePriceConfig() package price config} assigned).
-	 *
-	 * @return Returns either the same as {@link #getNestedProductTypes()} or adds <code>this</code> to the result.
-	 */
-	public Collection<NestedProductType> getNestedProductTypes(boolean includeSelfForVirtualSelfPackaging)
-	{
-		if (!includeSelfForVirtualSelfPackaging || isPackageInner() || getInnerPriceConfig() == null)
-			return getNestedProductTypes();
-		else {
-			HashSet<NestedProductType> res = new HashSet<NestedProductType>(nestedProductTypes.values());
-			res.add(getSelfForVirtualSelfPackaging());
-			return Collections.unmodifiableCollection(res);
-		}
-	}
-
-	/**
-	 * @jdo.field persistence-modifier="none"
-	 */
-	protected transient NestedProductType selfForVirtualSelfPackaging = null;
-
-	/**
-	 * This method is used internally (e.g. by {@link #getNestedProductTypes(boolean)}).
-	 *
-	 * @return Returns a transient, temporary instance of {@link NestedProductType} linking <code>this</code>
-	 *		to itself.
-	 */
-	protected NestedProductType getSelfForVirtualSelfPackaging()
-	{
-		if (selfForVirtualSelfPackaging == null)
-			selfForVirtualSelfPackaging = new NestedProductType(this, this);
-		return selfForVirtualSelfPackaging;
-	}
-
-	/**
-	 * @param productTypePK The composite primary key returned by {@link #getPrimaryKey()}.
-	 * @return Returns a packaged productType or <code>null</code> if none with the given ID exists.
-	 */
-	public NestedProductType getNestedProductType(String productTypePK, boolean throwExceptionIfNotExistent)
-	{
-		if (this.primaryKey.equals(productTypePK))
-			return getSelfForVirtualSelfPackaging();
-
-		NestedProductType res = (NestedProductType)nestedProductTypes.get(productTypePK);
-		if (res == null && throwExceptionIfNotExistent)
-			throw new IllegalArgumentException("No NestedProductType existing with productTypePK=\""+productTypePK+"\"!");
-		return res;
-	}
-	/**
-	 * @param organisationID The organisation part of the primary key as returned by {@link #getOrganisationID()}.
-	 * @param productTypeID The local id part of the primary key as returned by {@link #getProductTypeID()}.
-	 * @return Returns a packaged product or <code>null</code> if none with the given ID exists.
-	 */
-	public NestedProductType getNestedProductType(String organisationID, String productTypeID, boolean throwExceptionIfNotExistent)
-	{
-		if (this.organisationID.equals(organisationID) && this.productTypeID.equals(productTypeID))
-			return getSelfForVirtualSelfPackaging();
-
-		NestedProductType res = (NestedProductType)nestedProductTypes.get(getPrimaryKey(organisationID, productTypeID));
-		if (res == null && throwExceptionIfNotExistent)
-			throw new IllegalArgumentException("No NestedProductType existing with organisationID=\""+organisationID+"\", productTypeID=\""+productTypeID+"\"!");
-		return res;
-	}
-	/**
-	 * Removes a packaged product from this package.
-	 *
-	 * @param organisationID The organisation part of the primary key as returned by {@link #getOrganisationID()}.
-	 * @param productTypeID The local id part of the primary key as returned by {@link #getProductTypeID()}.
-	 */
-	public void removeNestedProductType(String organisationID, String productTypeID)
-	{
-		nestedProductTypes.remove(getPrimaryKey(organisationID, productTypeID));
-	}
-
 
 	/**
 	 * @return Returns the innerPriceConfig.
@@ -1064,6 +925,13 @@ implements
 			throw new IllegalArgumentException("The field 'localStorekeeperDelegate' has been moved to ProductTypeLocal!");
 // END to do
 
+// TODO the below checks for nestedProductTypes should be removed after a few months transition time.
+		if ("nestedProductTypes".equals(fieldName))
+			throw new IllegalArgumentException("The field 'nestedProductTypes' has been moved to ProductTypeLocal and renamed to 'nestedProductTypeLocals'!");
+		if ("nestedProductTypeLocals".equals(fieldName))
+			throw new IllegalArgumentException("The field 'nestedProductTypeLocals' is in class ProductTypeLocal!");
+// END to do
+
 		if ("productTypeLocal".equals(fieldName))
 			return new StaticFieldMetaData("productTypeLocal");
 
@@ -1087,7 +955,6 @@ implements
 //				nonInheritableFields.add("productTypeLocal");
 				nonInheritableFields.add("published");
 				nonInheritableFields.add("saleable");
-				nonInheritableFields.add("selfForVirtualSelfPackaging");
 				nonInheritableFields.add("extendedProductTypeID");
 				nonInheritableFields.add("extendedProductTypeID_detached");
 //				nonInheritableFields.add("packagePriceConfig");
@@ -1099,10 +966,7 @@ implements
 
 		ProductTypeFieldMetaData fmd = fieldMetaDataMap.get(fieldName);
 		if (fmd == null && createMissingMetaData) {
-			if ("nestedProductTypes".equals(fieldName))
-				fmd = new ProductTypeMapFieldMetaData(this, fieldName);
-			else
-				fmd = new ProductTypeFieldMetaData(this, fieldName);
+			fmd = new ProductTypeFieldMetaData(this, fieldName);
 
 			fieldMetaDataMap.put(fieldName, fmd);
 		} // if (fmd == null) {
@@ -1115,72 +979,14 @@ implements
 		if ("productTypeLocal".equals(fieldName))
 			return new JDOInheritableFieldInheriter();
 
-		if ("nestedProductTypes".equals(fieldName))		
-			return new NestedProductTypeMapInheriter();
-
 		if ("name".equals(fieldName))
 			return new JDOInheritableFieldInheriter();
 
 		return new JDOSimpleFieldInheriter();
 	}
 
-	/**
-	 * @return <code>true</code> if they are equal, <code>false</code> if they are different
-	 */
-	public static boolean compareNestedProductTypes(
-			Collection<NestedProductType> nestedProductTypes1,
-			Map<String, NestedProductType> nestedProductTypes2)
-	{
-		if (nestedProductTypes1.size() != nestedProductTypes2.size())
-			return false;
-
-		for (NestedProductType orgNPT : nestedProductTypes1) {
-			NestedProductType newNPT = nestedProductTypes2.get(orgNPT.getInnerProductTypePrimaryKey());
-			if (newNPT == null)
-				return false;
-
-			if (newNPT.getQuantity() != orgNPT.getQuantity())
-				return false;
-		}
-
-		return true;
-	}
-
-	/**
-	 * @jdo.field persistence-modifier="none"
-	 */
-	private transient PriceConfigID tmpInherit_innerPriceConfigID = null;
-	/**
-	 * @jdo.field persistence-modifier="none"
-	 */
-	private transient Map<String, NestedProductType> tmpInherit_nestedProductTypes = null;
-
 	public void preInherit(Inheritable mother, Inheritable child)
 	{
-		if (child == this) {
-			// check whether the nestedPoductTypes change - in this case we will recalculate prices after inheritance in postInherit(...) 
-			// we copy the current nestedProductTypes to tmpInherit_nestedProductTypes - then we compare them afterwards
-			PersistenceManager pm = getPersistenceManager();
-			int orgMaxFetchDepth = pm.getFetchPlan().getMaxFetchDepth();
-			Set orgFetchGroups = new HashSet(pm.getFetchPlan().getGroups());
-			pm.getFetchPlan().setGroup(FetchPlan.DEFAULT);
-			pm.getFetchPlan().setMaxFetchDepth(1);
-			try {
-				tmpInherit_nestedProductTypes = new HashMap<String, NestedProductType>(nestedProductTypes.size());
-				for (Iterator it = nestedProductTypes.entrySet().iterator(); it.hasNext(); ) {
-					Map.Entry me = (Map.Entry) it.next();
-					NestedProductType npt = (NestedProductType) pm.detachCopy(me.getValue());
-					tmpInherit_nestedProductTypes.put((String) me.getKey(), npt);
-				}
-			} finally {
-				pm.getFetchPlan().setGroups(orgFetchGroups);
-				pm.getFetchPlan().setMaxFetchDepth(orgMaxFetchDepth);
-			}
-
-			// additionally, we need to check, whether the innerPriceConfig is replaced, which would cause recalculation, too
-			tmpInherit_innerPriceConfigID = (PriceConfigID) JDOHelper.getObjectId(innerPriceConfig);
-		}
-
 		// Tobias: This is not necessary anymore when the JDOInheritanceManager is used
 		// hmmm... JDOInheritanceManager doesn't work reliably => we need this! :-( Marco.
 		
@@ -1190,7 +996,6 @@ implements
 		if (innerPriceConfig == null);
 //		if (localAccountantDelegate == null);
 //		if (localStorekeeperDelegate == null);
-		nestedProductTypes.size();
 		if (packagePriceConfig == null);
 		if (owner == null);
 		if (vendor == null);
@@ -1199,36 +1004,7 @@ implements
 
 	@Implement
 	public void postInherit(Inheritable mother, Inheritable child) {
-		if (child == this) {
-			if (!Util.equals(tmpInherit_innerPriceConfigID, JDOHelper.getObjectId(innerPriceConfig)) ||
-					!compareNestedProductTypes(nestedProductTypes.values(), tmpInherit_nestedProductTypes)) {
-				// there are changes => recalculate prices!
-				PersistenceManager pm = getPersistenceManager();
-
-				HashSet processedProductTypeIDs = new HashSet();
-				ProductTypeID productTypeID = (ProductTypeID) JDOHelper.getObjectId(this);
-				for (AffectedProductType apt : PriceConfigUtil.getAffectedProductTypes(pm, this)) {
-					if (!processedProductTypeIDs.add(apt.getProductTypeID()))
-						continue;
-					
-					ProductType pt;
-					if (apt.getProductTypeID().equals(productTypeID))
-						pt = this;
-					else
-						pt = (ProductType) pm.getObjectById(apt.getProductTypeID());
-
-					if (pt.isResponsibleForPriceCalculation()) {
-						logger.info("postInherit: price-calculation starting for: " + JDOHelper.getObjectId(pt));
-
-						pt.calculatePrices();
-
-						logger.info("postInherit: price-calculation complete for: " + JDOHelper.getObjectId(pt));
-					}
-				}
-			}
-		}
-
-//		logger.debug("postInherit: productType \"" + this.getPrimaryKey() + "\" instance=" + System.identityHashCode(this) + " (" + ( this == mother ? "mother" : (this == child ? "child" : "unknown") ) + "): " + localAccountantDelegate);
+		// nothing to do
 	}
 
 	/**
@@ -1246,7 +1022,7 @@ implements
 	/**
 	 * This method is called, when this ProductType should recalculate its prices and {@link #isResponsibleForPriceCalculation()}
 	 * returned <code>true</code>. This happens for example during inheritance application, if the packaging
-	 * (i.e. {@link #nestedProductTypes}) changed or an inner price config changed.
+	 * (i.e. {@link #nestedProductTypeLocals}) changed or an inner price config changed.
 	 * <p>
 	 * This method is never be called when the object is detached. It assumes that it is currently persistent and thus
 	 * has a {@link PersistenceManager} assigned (which can be obtained via {@link #getPersistenceManager()}).
@@ -1333,7 +1109,7 @@ implements
 //	 * is <code>true</code>, too. If the <code>Product</code>s of the package are created manually, the
 //	 * result of this method does not matter.
 //	 *
-//	 * @see #findProducts(User, NestedProductType, ProductLocator)
+//	 * @see #findProducts(User, NestedProductTypeLocal, ProductLocator)
 //	 * @!see #provideAvailableProduct()
 //	 */
 //	public abstract boolean isProductProvider();

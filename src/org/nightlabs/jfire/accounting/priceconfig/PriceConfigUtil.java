@@ -41,7 +41,7 @@ import javax.jdo.Query;
 
 import org.nightlabs.jfire.accounting.Price;
 import org.nightlabs.jfire.accounting.priceconfig.id.PriceConfigID;
-import org.nightlabs.jfire.store.NestedProductType;
+import org.nightlabs.jfire.store.NestedProductTypeLocal;
 import org.nightlabs.jfire.store.Product;
 import org.nightlabs.jfire.store.ProductLocal;
 import org.nightlabs.jfire.store.ProductType;
@@ -89,7 +89,7 @@ public class PriceConfigUtil
 	 * packaging level
 	 * and nests an instance of <tt>ArticlePrice</tt> per packagedProductType / packagedProduct.
 	 * To retrieve this nested <tt>ArticlePrice</tt>, the method
-	 * {@link IPriceConfig#createNestedArticlePrice(IPackagePriceConfig, Article, LinkedList, ArticlePrice, ArticlePrice, LinkedList, NestedProductType, LinkedList, Product, LinkedList)
+	 * {@link IPriceConfig#createNestedArticlePrice(IPackagePriceConfig, Article, LinkedList, ArticlePrice, ArticlePrice, LinkedList, NestedProductTypeLocal, LinkedList, Product, LinkedList)
 	 * is called, if the nested product is coming from the local organisation. If the product
 	 * is coming from a foreign organisation, the ArticlePrice is copied from the corresponding
 	 * ArticlePrice (from the Article which was used to buy this Product).
@@ -112,8 +112,8 @@ public class PriceConfigUtil
 			for (Iterator it = product.getProductLocal().getNestedProductLocals(true).iterator(); it.hasNext(); ) {
 				ProductLocal nestedProductLocal = (ProductLocal) it.next();
 				Product nestedProduct = nestedProductLocal.getProduct();
-				NestedProductType nestedProductType = productType.getNestedProductType(nestedProduct.getProductType().getPrimaryKey(), true);
-				ProductType innerProductType = nestedProductType.getInnerProductType();
+				NestedProductTypeLocal nestedProductTypeLocal = productType.getProductTypeLocal().getNestedProductTypeLocal(nestedProduct.getProductType().getPrimaryKey(), true);
+				ProductType innerProductType = nestedProductTypeLocal.getInnerProductTypeLocal().getProductType();
 
 //				Article nestedArticle = nestedProductLocal.getArticle();
 //				if (nestedArticle != null) {
@@ -130,7 +130,7 @@ public class PriceConfigUtil
 //							packagePriceConfig.getPriceConfigID(),
 //							packagePriceConfig.createPriceID(),
 //							packageArticlePrice,
-//							nestedProductType,
+//							nestedProductTypeLocal,
 //							nestedProduct.getProductType(),
 //							nestedProduct,
 //							false, // virtualInner is impossible if it's a foreign product
@@ -145,7 +145,7 @@ public class PriceConfigUtil
 //							packageArticlePrice,
 //							packageArticlePrice,
 //							articlePriceStack,
-//							nestedProductType,
+//							nestedProductTypeLocal,
 //							nestedProductTypeStack,
 //							nestedProduct,
 //							productStack
@@ -161,7 +161,7 @@ public class PriceConfigUtil
 						packageArticlePrice,
 						packageArticlePrice,
 						articlePriceStack,
-						nestedProductType,
+						nestedProductTypeLocal,
 						nestedProductTypeStack,
 						nestedProduct,
 						productStack
@@ -169,9 +169,8 @@ public class PriceConfigUtil
 			}
 		}
 		else {
-			for (Iterator it = productType.getNestedProductTypes(true).iterator(); it.hasNext(); ) {
-				NestedProductType nestedProductType = (NestedProductType) it.next();
-				ProductType innerProductType = nestedProductType.getInnerProductType();
+			for (NestedProductTypeLocal nestedProductTypeLocal : productType.getProductTypeLocal().getNestedProductTypeLocals(true)) {
+				ProductType innerProductType = nestedProductTypeLocal.getInnerProductTypeLocal().getProductType();
 
 				innerProductType.getPriceConfigInPackage(productType.getPrimaryKey()).createNestedArticlePrice(
 						packagePriceConfig,
@@ -180,7 +179,7 @@ public class PriceConfigUtil
 						packageArticlePrice,
 						packageArticlePrice,
 						articlePriceStack,
-						nestedProductType,
+						nestedProductTypeLocal,
 						nestedProductTypeStack
 						);
 			}
@@ -189,7 +188,7 @@ public class PriceConfigUtil
 
 	/**
 	 * Helper method used by
-	 * {@link IPriceConfig#createNestedArticlePrice(IPackagePriceConfig, Article, LinkedList, ArticlePrice, ArticlePrice, LinkedList, NestedProductType, LinkedList, Product, LinkedList).
+	 * {@link IPriceConfig#createNestedArticlePrice(IPackagePriceConfig, Article, LinkedList, ArticlePrice, ArticlePrice, LinkedList, NestedProductTypeLocal, LinkedList, Product, LinkedList).
 	 * <p>
 	 * This method keeps track about adding and removing items to/from the stacks. Hence,
 	 * you can simply call this method without touching the parameters in your
@@ -209,7 +208,7 @@ public class PriceConfigUtil
 			LinkedList priceConfigStack,
 			ArticlePrice topLevelArticlePrice, ArticlePrice nextLevelArticlePrice,
 			LinkedList articlePriceStack,
-			NestedProductType nestedProductType,
+			NestedProductTypeLocal nestedProductTypeLocal,
 			LinkedList nestedProductTypeStack,
 			Product nestedProduct,
 			LinkedList productStack,
@@ -224,13 +223,13 @@ public class PriceConfigUtil
 				topLevelPriceConfig.getPriceConfigID(),
 				topLevelPriceConfig.createPriceID(),
 				nextLevelArticlePrice,
-				nestedProductType,
+				nestedProductTypeLocal,
 				nestedProduct.getProductType(),
 				nestedProduct,
 				inner,
 				false);
 
-		ProductType productType = nestedProductType.getInnerProductType();
+		ProductType productType = nestedProductTypeLocal.getInnerProductTypeLocal().getProductType();
 
 		if (productType.isPackageOuter()) {
 
@@ -245,15 +244,15 @@ public class PriceConfigUtil
 
 				priceConfigStack.addFirst(priceConfig);
 				articlePriceStack.addFirst(articlePrice);
-				nestedProductTypeStack.addFirst(nestedProductType);
+				nestedProductTypeStack.addFirst(nestedProductTypeLocal);
 				productStack.addFirst(nestedProduct);
 				try {
 	
 					for (Iterator it = nestedProduct.getProductLocal().getNestedProductLocals(true).iterator(); it.hasNext(); ) {
 						ProductLocal innerProductLocal = (ProductLocal) it.next();
-						NestedProductType innerNestedProductType = productType.getNestedProductType(
+						NestedProductTypeLocal innerNestedProductType = productType.getProductTypeLocal().getNestedProductTypeLocal(
 								nestedProduct.getProductType().getPrimaryKey(), true);
-						ProductType innerProductType = innerNestedProductType.getInnerProductType();
+						ProductType innerProductType = innerNestedProductType.getInnerProductTypeLocal().getProductType();
 
 						innerProductType.getPriceConfigInPackage(productType.getPrimaryKey()).createNestedArticlePrice(
 								topLevelPriceConfig,
@@ -290,11 +289,11 @@ public class PriceConfigUtil
 			LinkedList priceConfigStack,
 			ArticlePrice topLevelArticlePrice, ArticlePrice nextLevelArticlePrice,
 			LinkedList articlePriceStack,
-			NestedProductType nestedProductType,
+			NestedProductTypeLocal nestedProductTypeLocal,
 			LinkedList nestedProductTypeStack,
 			Price origPrice)
 	{
-		boolean inner = nestedProductType.getInnerProductType().getPrimaryKey().equals(nextLevelArticlePrice.getProductType().getPrimaryKey());
+		boolean inner = nestedProductTypeLocal.getInnerProductTypeLocal().getPrimaryKey().equals(nextLevelArticlePrice.getProductType().getPrimaryKey());
 
 		ArticlePrice articlePrice = new ArticlePrice(
 				article,
@@ -303,13 +302,13 @@ public class PriceConfigUtil
 				topLevelPriceConfig.getPriceConfigID(),
 				topLevelPriceConfig.createPriceID(),
 				nextLevelArticlePrice,
-				nestedProductType,
-				nestedProductType.getInnerProductType(),
+				nestedProductTypeLocal,
+				nestedProductTypeLocal.getInnerProductTypeLocal().getProductType(),
 				(Product)null,
 				inner,
 				false);
 
-		ProductType productType = nestedProductType.getInnerProductType();
+		ProductType productType = nestedProductTypeLocal.getInnerProductTypeLocal().getProductType();
 
 		if (productType.isPackageOuter()) {
 			
@@ -318,18 +317,17 @@ public class PriceConfigUtil
 			if (nestedProductTypeStack.isEmpty())
 				nextLevelProductType = article.getProductType();
 			else
-				nextLevelProductType = ((NestedProductType)nestedProductTypeStack.peek()).getInnerProductType();
+				nextLevelProductType = ((NestedProductTypeLocal)nestedProductTypeStack.peek()).getInnerProductTypeLocal().getProductType();
 
 			if (!productType.getPrimaryKey().equals(nextLevelProductType.getPrimaryKey())) {
 
 				priceConfigStack.addFirst(priceConfig);
 				articlePriceStack.addFirst(articlePrice);
-				nestedProductTypeStack.addFirst(nestedProductType);
+				nestedProductTypeStack.addFirst(nestedProductTypeLocal);
 				try {
 	
-					for (Iterator it = productType.getNestedProductTypes(true).iterator(); it.hasNext(); ) {
-						NestedProductType innerNestedProductType = (NestedProductType)it.next();
-						ProductType innerProductType = innerNestedProductType.getInnerProductType();
+					for (NestedProductTypeLocal innerNestedProductType : productType.getProductTypeLocal().getNestedProductTypeLocals(true)) {
+						ProductType innerProductType = innerNestedProductType.getInnerProductTypeLocal().getProductType();
 	
 						innerProductType.getPriceConfigInPackage(productType.getPrimaryKey()).createNestedArticlePrice(
 								topLevelPriceConfig,
@@ -387,8 +385,8 @@ public class PriceConfigUtil
 //			List<AffectedProductType> affectedProductTypes, ProductType productType)
 //	{
 //		ProductTypeID productTypeID = (ProductTypeID) JDOHelper.getObjectId(productType);
-//		for (NestedProductType nestedProductType : productType.getExtendedProductType().getNestedProductTypes()) {
-//			ProductType innerPT = nestedProductType.getInnerProductType();
+//		for (NestedProductTypeLocal nestedProductTypeLocal : productType.getExtendedProductType().getNestedProductTypes()) {
+//			ProductType innerPT = nestedProductTypeLocal.getInnerProductType();
 //			ProductTypeID innerPTID = (ProductTypeID) JDOHelper.getObjectId(innerPT);
 //
 //			// we don't add the productType passed as parameter again
@@ -436,8 +434,8 @@ public class PriceConfigUtil
 		q1.setFilter("this.innerPriceConfig == :priceConfig || this.packagePriceConfig == :priceConfig");
 
 //		Query q2 = pm.newQuery(ProductType.class);
-//		q2.declareVariables(NestedProductType.class.getName() + " nestedProductType");
-//		q2.setFilter("this.nestedProductTypes.containsValue(nestedProductType) && nestedProductType.innerProductType == :productType");
+//		q2.declareVariables(NestedProductTypeLocal.class.getName() + " nestedProductTypeLocal");
+//		q2.setFilter("this.nestedProductTypes.containsValue(nestedProductTypeLocal) && nestedProductTypeLocal.innerProductType == :productType");
 
 		for (ProductType pt : (Collection<ProductType>)q1.execute(priceConfig)) {
 			ProductTypeID productTypeID = (ProductTypeID) JDOHelper.getObjectId(pt);

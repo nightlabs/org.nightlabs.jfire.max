@@ -37,7 +37,7 @@ import org.nightlabs.jfire.accounting.PriceFragmentType;
 import org.nightlabs.jfire.accounting.Tariff;
 import org.nightlabs.jfire.accounting.priceconfig.IPackagePriceConfig;
 import org.nightlabs.jfire.accounting.priceconfig.IPriceConfig;
-import org.nightlabs.jfire.store.NestedProductType;
+import org.nightlabs.jfire.store.NestedProductTypeLocal;
 import org.nightlabs.jfire.store.Product;
 import org.nightlabs.jfire.store.ProductType;
 import org.nightlabs.jfire.trade.Article;
@@ -413,16 +413,16 @@ implements IFormulaPriceConfig
 //	}
 	
 	/**
-	 * @see org.nightlabs.jfire.accounting.priceconfig.IPriceConfig#createNestedArticlePrice(IPackagePriceConfig, org.nightlabs.jfire.trade.Article, LinkedList, org.nightlabs.jfire.trade.ArticlePrice, org.nightlabs.jfire.trade.ArticlePrice, LinkedList, org.nightlabs.jfire.store.NestedProductType, LinkedList)
+	 * @see org.nightlabs.jfire.accounting.priceconfig.IPriceConfig#createNestedArticlePrice(IPackagePriceConfig, org.nightlabs.jfire.trade.Article, LinkedList, org.nightlabs.jfire.trade.ArticlePrice, org.nightlabs.jfire.trade.ArticlePrice, LinkedList, org.nightlabs.jfire.store.NestedProductTypeLocal, LinkedList)
 	 */
 	public ArticlePrice createNestedArticlePrice(
 			IPackagePriceConfig packagePriceConfig, Article article,
 			LinkedList<IPriceConfig> priceConfigStack, ArticlePrice topLevelArticlePrice,
 			ArticlePrice nextLevelArticlePrice, LinkedList<ArticlePrice> articlePriceStack,
-			NestedProductType nestedProductType, LinkedList<NestedProductType> nestedProductTypeStack)
+			NestedProductTypeLocal nestedProductTypeLocal, LinkedList<NestedProductTypeLocal> nestedProductTypeStack)
 	{
-		ProductType packageProductType = nestedProductType.getPackageProductType();
-		ProductType innerProductType = nestedProductType.getInnerProductType();
+		ProductType packageProductType = nestedProductTypeLocal.getPackageProductTypeLocal().getProductType();
+		ProductType innerProductType = nestedProductTypeLocal.getInnerProductTypeLocal().getProductType();
 		StablePriceConfig packagingResultPriceConfig = (StablePriceConfig) getPackagingResultPriceConfig(
 				innerProductType.getPrimaryKey(),
 				packageProductType.getPrimaryKey(), true);
@@ -431,21 +431,21 @@ implements IFormulaPriceConfig
 				packagePriceConfig, article,
 				priceConfigStack, topLevelArticlePrice,
 				nextLevelArticlePrice, articlePriceStack,
-				nestedProductType, nestedProductTypeStack);
+				nestedProductTypeLocal, nestedProductTypeStack);
 	}
 
 	/**
-	 * @see org.nightlabs.jfire.accounting.priceconfig.IPriceConfig#createNestedArticlePrice(IPackagePriceConfig, org.nightlabs.jfire.trade.Article, LinkedList, org.nightlabs.jfire.trade.ArticlePrice, org.nightlabs.jfire.trade.ArticlePrice, LinkedList, NestedProductType, LinkedList, org.nightlabs.jfire.store.Product, LinkedList)
+	 * @see org.nightlabs.jfire.accounting.priceconfig.IPriceConfig#createNestedArticlePrice(IPackagePriceConfig, org.nightlabs.jfire.trade.Article, LinkedList, org.nightlabs.jfire.trade.ArticlePrice, org.nightlabs.jfire.trade.ArticlePrice, LinkedList, NestedProductTypeLocal, LinkedList, org.nightlabs.jfire.store.Product, LinkedList)
 	 */
 	public ArticlePrice createNestedArticlePrice(
 			IPackagePriceConfig packagePriceConfig, Article article,
 			LinkedList<IPriceConfig> priceConfigStack, ArticlePrice topLevelArticlePrice,
 			ArticlePrice nextLevelArticlePrice, LinkedList<ArticlePrice> articlePriceStack,
-			NestedProductType nestedProductType, LinkedList<NestedProductType> nestedProductTypeStack,
+			NestedProductTypeLocal nestedProductTypeLocal, LinkedList<NestedProductTypeLocal> nestedProductTypeStack,
 			Product nestedProduct, LinkedList<Product> productStack)
 	{
-		ProductType packageProductType = nestedProductType.getPackageProductType();
-		ProductType innerProductType = nestedProductType.getInnerProductType();
+		ProductType packageProductType = nestedProductTypeLocal.getPackageProductTypeLocal().getProductType();
+		ProductType innerProductType = nestedProductTypeLocal.getInnerProductTypeLocal().getProductType();
 		IPriceConfig packagingResultPriceConfig = getPackagingResultPriceConfig(
 				innerProductType.getPrimaryKey(),
 				packageProductType.getPrimaryKey(), true);
@@ -454,7 +454,7 @@ implements IFormulaPriceConfig
 				packagePriceConfig, article,
 				priceConfigStack, topLevelArticlePrice,
 				nextLevelArticlePrice, articlePriceStack,
-				nestedProductType, nestedProductTypeStack,
+				nestedProductTypeLocal, nestedProductTypeStack,
 				nestedProduct, productStack);
 
 //		PersistenceManager pm = getPersistenceManager();
@@ -463,8 +463,8 @@ implements IFormulaPriceConfig
 //		Tariff tariff = article.getTariff();
 //		Currency currency = article.getCurrency();
 //		
-//		ProductType packageProductType = nestedProductType.getPackageProductType();
-//		ProductType innerProductType = nestedProductType.getInnerProductType();
+//		ProductType packageProductType = nestedProductTypeLocal.getPackageProductType();
+//		ProductType innerProductType = nestedProductTypeLocal.getInnerProductType();
 //		StablePriceConfig packagingResultPriceConfig = (StablePriceConfig) getPackagingResultPriceConfig(
 //				innerProductType.getPrimaryKey(),
 //				packageProductType.getPrimaryKey(), true);
@@ -477,7 +477,7 @@ implements IFormulaPriceConfig
 //				article, priceConfigStack,
 //				topLevelArticlePrice, nextLevelArticlePrice,
 //				articlePriceStack,
-//				nestedProductType,
+//				nestedProductTypeLocal,
 //				nestedProductTypeStack,
 //				nestedProduct,
 //				productStack,

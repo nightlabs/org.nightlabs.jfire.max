@@ -50,7 +50,7 @@ import org.nightlabs.jfire.accounting.book.BookMoneyTransfer;
 import org.nightlabs.jfire.accounting.book.LocalAccountantDelegate;
 import org.nightlabs.jfire.accounting.id.PriceFragmentTypeID;
 import org.nightlabs.jfire.security.User;
-import org.nightlabs.jfire.store.NestedProductType;
+import org.nightlabs.jfire.store.NestedProductTypeLocal;
 import org.nightlabs.jfire.store.ProductType;
 import org.nightlabs.jfire.store.id.ProductTypeID;
 import org.nightlabs.jfire.trade.Article;
@@ -328,9 +328,9 @@ public class PFMappingAccountantDelegate
 		{
 			if (nested == null) {
 				nested = new LinkedList<ResolveProductTypeProvider>();
-				for (NestedProductType nestedType : productType.getNestedProductTypes()) {
+				for (NestedProductTypeLocal nestedType : productType.getProductTypeLocal().getNestedProductTypeLocals()) {
 					nested.add(new ProductTypeProvider(PFMappingAccountantDelegate
-							.getPackageType(nestedType), nestedType.getInnerProductType()));
+							.getPackageType(nestedType), nestedType.getInnerProductTypeLocal().getProductType()));
 				}
 			}
 			return nested;
@@ -1062,19 +1062,19 @@ public class PFMappingAccountantDelegate
 	}
 
 	/**
-	 * Returns the package type of the given NestedProductType. It will be
+	 * Returns the package type of the given NestedProductTypeLocal. It will be
 	 * {@link MoneyFlowMapping#PACKAGE_TYPE_INNER} if the ProductType is virtually
 	 * self packaged in the given the package-nature of the nested inner
 	 * ProductType is {@link ProductType#PACKAGE_NATURE_INNER}. Will return
 	 * {@link MoneyFlowMapping#PACKAGE_TYPE_PACKAGE} otherwise.
 	 */
-	public static String getPackageType(NestedProductType nestedProductType)
+	public static String getPackageType(NestedProductTypeLocal nestedProductTypeLocal)
 	{
-		String innerPPK = nestedProductType.getInnerProductTypePrimaryKey();
-		String packagePPK = nestedProductType.getPackageProductType()
+		String innerPPK = nestedProductTypeLocal.getInnerProductTypePrimaryKey();
+		String packagePPK = nestedProductTypeLocal.getPackageProductTypeLocal()
 				.getPrimaryKey();
-		return (packagePPK.equals(innerPPK) || nestedProductType
-				.getInnerProductType().isPackageInner()) ? MoneyFlowMapping.PACKAGE_TYPE_INNER
+		return (packagePPK.equals(innerPPK) || nestedProductTypeLocal
+				.getInnerProductTypeLocal().getProductType().isPackageInner()) ? MoneyFlowMapping.PACKAGE_TYPE_INNER
 				: MoneyFlowMapping.PACKAGE_TYPE_PACKAGE;
 	}
 

@@ -35,15 +35,15 @@ import java.util.Map;
  *
  * @jdo.persistence-capable 
  *		identity-type="application"
- *		persistence-capable-superclass="ProductTypeFieldMetaData"
+ *		persistence-capable-superclass="ProductTypeLocalFieldMetaData"
  *		detachable="true"
  *
  * @jdo.inheritance strategy="superclass-table"
  *
- * @jdo.fetch-group name="ProductType.fieldMetaDataMap" fields="mapEntryMetaDataMap" fetch-groups="default"
+ * @jdo.fetch-group name="ProductTypeLocal.fieldMetaDataMap" fields="mapEntryMetaDataMap" fetch-groups="default"
  */
-public class ProductTypeMapFieldMetaData
-	extends ProductTypeFieldMetaData
+public class ProductTypeLocalMapFieldMetaData
+	extends ProductTypeLocalFieldMetaData
 	implements org.nightlabs.inheritance.MapFieldMetaData, Serializable
 {
 	private static final long serialVersionUID = 1L;
@@ -53,33 +53,33 @@ public class ProductTypeMapFieldMetaData
 	 *		persistence-modifier="persistent"
 	 *		collection-type="map"
 	 *		key-type="java.lang.String"
-	 *		value-type="ProductTypeMapEntryMetaData"
+	 *		value-type="ProductTypeLocalMapEntryMetaData"
 	 *		dependent-value="true"
 	 *		mapped-by="mapFieldMetaData"
 	 *
 	 * @jdo.key mapped-by="key"
 	 */
-	protected Map<String, ProductTypeMapEntryMetaData> mapEntryMetaDataMap;
+	protected Map<String, ProductTypeLocalMapEntryMetaData> mapEntryMetaDataMap;
 
-	protected ProductTypeMapFieldMetaData() { }
+	protected ProductTypeLocalMapFieldMetaData() { }
 
-	public ProductTypeMapFieldMetaData(ProductType productType, String fieldName)
+	public ProductTypeLocalMapFieldMetaData(ProductTypeLocal productTypeLocal, String fieldName)
 	{
-		super(productType, fieldName);
-		mapEntryMetaDataMap = new HashMap<String, ProductTypeMapEntryMetaData>();
+		super(productTypeLocal, fieldName);
+		mapEntryMetaDataMap = new HashMap<String, ProductTypeLocalMapEntryMetaData>();
 	}
 
 	@Override
 	public org.nightlabs.inheritance.MapEntryMetaData getMapEntryMetaData(Object key)
 	{
 		if (!(key instanceof String))
-			throw new IllegalArgumentException("This implementation of ProductTypeMapFieldMetaData supports only String keys!");
+			throw new IllegalArgumentException("This implementation of ProductTypeLocalMapFieldMetaData supports only String keys!");
 
 		String skey = (String)key;
-		
-		ProductTypeMapEntryMetaData memd = (ProductTypeMapEntryMetaData)mapEntryMetaDataMap.get(skey);
+
+		ProductTypeLocalMapEntryMetaData memd = mapEntryMetaDataMap.get(skey);
 		if (memd == null) {
-			memd = new ProductTypeMapEntryMetaData(this, skey);
+			memd = new ProductTypeLocalMapEntryMetaData(this, skey);
 			mapEntryMetaDataMap.put(skey, memd);
 		}
 		return memd;

@@ -1758,7 +1758,7 @@ public class Trader
 		return processDefinition;
 	}
 
-//	public Collection<? extends Article> onProductAssemble_importNestedProduct(User user, Product packageProduct, String partnerOrganisationID, Collection<NestedProductType> partnerNestedProductTypes)
+//	public Collection<? extends Article> onProductAssemble_importNestedProduct(User user, Product packageProduct, String partnerOrganisationID, Collection<NestedProductTypeLocal> partnerNestedProductTypes)
 //	{
 //		try {
 //			PersistenceManager pm = getPersistenceManager();
@@ -1830,7 +1830,7 @@ public class Trader
 ////			ProductLocator[] productLocators = new ProductLocator[partnerNestedProductTypes.size()];
 ////
 ////			int idx = 0;
-////			for (NestedProductType partnerNestedProductType : partnerNestedProductTypes) {
+////			for (NestedProductTypeLocal partnerNestedProductType : partnerNestedProductTypes) {
 ////				ProductLocator productLocator = packageProduct.getProductLocator(user, partnerNestedProductType);
 ////				productTypeIDs[idx] = (ProductTypeID) JDOHelper.getObjectId(partnerNestedProductType.getInnerProductType());
 ////				quantities[idx] = partnerNestedProductType.getQuantity();
@@ -1841,7 +1841,7 @@ public class Trader
 ////			Map<Integer, Collection<? extends Article>> articleMap = tradeManager.createCrossTradeArticles(partnerOfferID, productTypeIDs, quantities, productLocators);
 //
 //			Map productType2NestedProductTypes = new HashMap();
-//			for (NestedProductType partnerNestedProductType : partnerNestedProductTypes) {
+//			for (NestedProductTypeLocal partnerNestedProductType : partnerNestedProductTypes) {
 //				Collection nestedProductTypes = (Collection) productType2NestedProductTypes.get(partnerNestedProductType.getInnerProductType());
 //				if (nestedProductTypes == null) {
 //					nestedProductTypes = new ArrayList();

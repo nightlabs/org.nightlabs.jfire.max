@@ -36,7 +36,7 @@ import javax.jdo.PersistenceManager;
 import org.nightlabs.jfire.accounting.Accounting;
 import org.nightlabs.jfire.accounting.AccountingPriceConfig;
 import org.nightlabs.jfire.accounting.PriceFragment;
-import org.nightlabs.jfire.store.NestedProductType;
+import org.nightlabs.jfire.store.NestedProductTypeLocal;
 import org.nightlabs.jfire.store.Product;
 import org.nightlabs.jfire.store.ProductType;
 
@@ -129,14 +129,14 @@ public class ArticlePrice extends org.nightlabs.jfire.accounting.Price
 
 //	/**
 //	 * If this <tt>ArticlePrice</tt> is nested, then this points to the
-//	 * <tt>NestedProductType</tt> for which this price has been calculated and assigned.
+//	 * <tt>NestedProductTypeLocal</tt> for which this price has been calculated and assigned.
 //	 * This <tt>ArticlePrice</tt> represents always the TOTAL price, means it might
 //	 * differ from the <tt>origPrice</tt>, if the quantity of <tt>ProductType</tt> within
-//	 * the <tt>nestedProductType</tt> is not 1. 
+//	 * the <tt>nestedProductTypeLocal</tt> is not 1. 
 //	 *
 //	 * @jdo.field persistence-modifier="persistent"
 //	 */
-//	private NestedProductType nestedProductType = null;
+//	private NestedProductTypeLocal nestedProductTypeLocal = null;
 
 	/**
 	 * @see #getPackageProductType()
@@ -200,7 +200,7 @@ public class ArticlePrice extends org.nightlabs.jfire.accounting.Price
 	 *		<tt>priceConfigID</tt>.
 	 * @param packageArticlePrice Either <code>null</code> or the parent ArticlePrice into which this
 	 *		new ArticlePrice will be nested.
-	 * @param nestedProductType Either <code>null</code> or the NestedProductType for which's inner part
+	 * @param nestedProductTypeLocal Either <code>null</code> or the NestedProductTypeLocal for which's inner part
 	 *		this ArticlePrice is created.
 	 * @param productType The ProductType for which this ArticlePrice is created.
 	 * @param product The Product for which this ArticlePrice is created.
@@ -212,7 +212,7 @@ public class ArticlePrice extends org.nightlabs.jfire.accounting.Price
 			String organisationID, String priceConfigID,
 			long priceID,
 			ArticlePrice packageArticlePrice,
-			NestedProductType nestedProductType,
+			NestedProductTypeLocal nestedProductTypeLocal,
 			ProductType productType,
 			Product product,
 			boolean virtualInner,
@@ -225,14 +225,14 @@ public class ArticlePrice extends org.nightlabs.jfire.accounting.Price
 				priceID,
 				packageArticlePrice,
 				(
-						nestedProductType == null ||
-						nestedProductType.getInnerProductTypePrimaryKey().equals(nestedProductType.getPackageProductType().getPrimaryKey()) ?
-								null : nestedProductType.getPackageProductType()
+						nestedProductTypeLocal == null ||
+						nestedProductTypeLocal.getInnerProductTypePrimaryKey().equals(nestedProductTypeLocal.getPackageProductTypeLocal().getPrimaryKey()) ?
+								null : nestedProductTypeLocal.getPackageProductTypeLocal().getProductType()
 				),
 				(
-						nestedProductType == null ||
-						nestedProductType.getInnerProductTypePrimaryKey().equals(nestedProductType.getPackageProductType().getPrimaryKey()) ?
-								0 : nestedProductType.getQuantity()
+						nestedProductTypeLocal == null ||
+						nestedProductTypeLocal.getInnerProductTypePrimaryKey().equals(nestedProductTypeLocal.getPackageProductTypeLocal().getPrimaryKey()) ?
+								0 : nestedProductTypeLocal.getQuantity()
 				),
 				productType,
 				product,
@@ -490,11 +490,11 @@ public class ArticlePrice extends org.nightlabs.jfire.accounting.Price
 		return article;
 	}
 	/**
-	 * Because {@link NestedProductType}s can be removed (and thus deleted) or modified,
+	 * Because {@link NestedProductTypeLocal}s can be removed (and thus deleted) or modified,
 	 * we do not reference them here. Instead, if this <code>ArticlePrice</code> is
-	 * created for a <code>NestedProductType.innerProductType</code>, we store the
+	 * created for a <code>NestedProductTypeLocal.innerProductType</code>, we store the
 	 * <code>packageProductType</code> (i.e. the container) here and copy
-	 * {@link NestedProductType#getQuantity()} in {@link #innerProductTypeQuantity}.
+	 * {@link NestedProductTypeLocal#getQuantity()} in {@link #innerProductTypeQuantity}.
 	 */
 	public ProductType getPackageProductType()
 	{
@@ -502,10 +502,10 @@ public class ArticlePrice extends org.nightlabs.jfire.accounting.Price
 	}
 	/**
 	 * If {@link #packageProductType} is not <code>null</code>, this <code>ArticlePrice</code> has
-	 * been created for the inner product[type] and the result of {@link NestedProductType#getQuantity()}
+	 * been created for the inner product[type] and the result of {@link NestedProductTypeLocal#getQuantity()}
 	 * is copied here.
 	 * If this is not created for a nested product[type], it defaults to 0. If it is created for nested
-	 * products (not types!), it still contains the value copied from {@link NestedProductType#getQuantity()}
+	 * products (not types!), it still contains the value copied from {@link NestedProductTypeLocal#getQuantity()}
 	 * even though there is one instance of ArticlePrice for every Product.
 	 */
 	public int getInnerProductTypeQuantity()
@@ -513,11 +513,11 @@ public class ArticlePrice extends org.nightlabs.jfire.accounting.Price
 		return innerProductTypeQuantity;
 	}
 //	/**
-//	 * @return Returns the nestedProductType.
+//	 * @return Returns the nestedProductTypeLocal.
 //	 */
-//	public NestedProductType getNestedProductType()
+//	public NestedProductTypeLocal getNestedProductType()
 //	{
-//		return nestedProductType;
+//		return nestedProductTypeLocal;
 //	}
 	/**
 	 * @return Returns the origPrice.

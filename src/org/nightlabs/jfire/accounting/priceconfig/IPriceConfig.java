@@ -32,7 +32,7 @@ import java.util.LinkedList;
 import org.nightlabs.jfire.accounting.Currency;
 import org.nightlabs.jfire.accounting.Price;
 import org.nightlabs.jfire.accounting.PriceFragmentType;
-import org.nightlabs.jfire.store.NestedProductType;
+import org.nightlabs.jfire.store.NestedProductTypeLocal;
 import org.nightlabs.jfire.store.Product;
 import org.nightlabs.jfire.trade.Article;
 import org.nightlabs.jfire.trade.ArticlePrice;
@@ -154,14 +154,14 @@ public interface IPriceConfig
 	 *		of the nesting operation. It does NOT contain the <tt>topLevelArticlePrice</tt>!
 	 *		This method must add the newly created <tt>ArticlePrice</tt> at the first position
 	 *		(#0) before diving into
-	 *		<tt>NestedProductType</tt>s. Before returning, this <tt>ArticlePrice</tt> must be
+	 *		<tt>NestedProductTypeLocal</tt>s. Before returning, this <tt>ArticlePrice</tt> must be
 	 *		removed again.
-	 * @param nestedProductType The <tt>NestedProductType</tt> for which to create a nested
+	 * @param nestedProductTypeLocal The <tt>NestedProductTypeLocal</tt> for which to create a nested
 	 *		<tt>ArticlePrice</tt>.
-	 * @param nestedProductTypeStack A <tt>List</tt> containing all <tt>NestedProductType</tt>s
+	 * @param nestedProductTypeStack A <tt>List</tt> containing all <tt>NestedProductTypeLocal</tt>s
 	 *		of the above nesting operation; hence not containing the top-level <tt>ProductType</tt>
 	 *		which can be obtained by <tt>article.getProductType()</tt>. This method must add
-	 *		the current <tt>nestedProductType</tt> as first element (position #0) before iterating
+	 *		the current <tt>nestedProductTypeLocal</tt> as first element (position #0) before iterating
 	 *		deeper and must remove it before leaving this method.
 	 *
 	 * @return Returns a new instance of <tt>ArticlePrice</tt>
@@ -173,18 +173,18 @@ public interface IPriceConfig
 			ArticlePrice topLevelArticlePrice,
 			ArticlePrice nextLevelArticlePrice,
 			LinkedList<ArticlePrice> articlePriceStack,
-			NestedProductType nestedProductType,
-			LinkedList<NestedProductType> nestedProductTypeStack);
+			NestedProductTypeLocal nestedProductTypeLocal,
+			LinkedList<NestedProductTypeLocal> nestedProductTypeStack);
 
 	/**
 	 * Like
-	 * {@link #createNestedArticlePrice(IPackagePriceConfig, Article, LinkedList, ArticlePrice, ArticlePrice, LinkedList, NestedProductType, LinkedList)
+	 * {@link #createNestedArticlePrice(IPackagePriceConfig, Article, LinkedList, ArticlePrice, ArticlePrice, LinkedList, NestedProductTypeLocal, LinkedList)
 	 * this method creates a new instance of <tt>ArticlePrice</tt> for an <tt>Article</tt>.
 	 * The difference however is, that this method is used for actual <tt>Product</tt>s and
 	 * not for <tt>ProductType</tt>s.
 	 * <p>
 	 * You should delegate to
-	 * {@link PriceConfigUtil#createNestedArticlePrice(IPackagePriceConfig, IPriceConfig, Article, LinkedList, ArticlePrice, ArticlePrice, LinkedList, NestedProductType, LinkedList, Product, LinkedList, Price)}!
+	 * {@link PriceConfigUtil#createNestedArticlePrice(IPackagePriceConfig, IPriceConfig, Article, LinkedList, ArticlePrice, ArticlePrice, LinkedList, NestedProductTypeLocal, LinkedList, Product, LinkedList, Price)}!
 	 * </p>
 	 */
 	ArticlePrice createNestedArticlePrice(
@@ -194,8 +194,8 @@ public interface IPriceConfig
 			ArticlePrice topLevelArticlePrice,
 			ArticlePrice nextLevelArticlePrice,
 			LinkedList<ArticlePrice> articlePriceStack,
-			NestedProductType nestedProductType,
-			LinkedList<NestedProductType> nestedProductTypeStack,
+			NestedProductTypeLocal nestedProductTypeLocal,
+			LinkedList<NestedProductTypeLocal> nestedProductTypeStack,
 			Product nestedProduct,
 			LinkedList<Product> productStack);
 }

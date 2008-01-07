@@ -168,10 +168,10 @@ implements Serializable
 		return productType;
 	}
 
-//	public Collection getNestedProducts(NestedProductType nestedProductType)
+//	public Collection getNestedProducts(NestedProductTypeLocal nestedProductTypeLocal)
 //	{
 //		Collection res = new LinkedList();
-//		String innerProductTypePK = nestedProductType.getInnerProductTypePrimaryKey();
+//		String innerProductTypePK = nestedProductTypeLocal.getInnerProductTypePrimaryKey();
 //		for (Iterator it = nestedProducts.values().iterator(); it.hasNext(); ) {
 //			Product nestedProduct = (Product) it.next();
 //			if (innerProductTypePK.equals(nestedProduct.getProductType().getPrimaryKey()))
@@ -183,19 +183,19 @@ implements Serializable
 	/**
 	 * This method is called during the allocation-process.
 	 * It must return a <code>ProductLocator</code> that is suitable for
-	 * {@link ProductType#findProducts(User, ProductType, NestedProductType, ProductLocator)}
-	 * of the <code>nestedProductType</code>s. This method assumes that a wrapping
+	 * {@link ProductType#findProducts(User, ProductType, NestedProductTypeLocal, ProductLocator)}
+	 * of the <code>nestedProductTypeLocal</code>s. This method assumes that a wrapping
 	 * <code>ProductType</code> knows the <code>ProductType</code>s it is packaging
 	 * (which is usually the case - not the other way around).
 	 * You can obtain the {@link Article} in which this <code>Product</code> is wrapped
 	 * by {@link #getProductLocal()} and {@link ProductLocal#getSaleArticle()}, in case you're interested.
 	 *
 	 * @param user The <code>User</code> who is responsible for this action.
-	 * @param nestedProductType The <code>NestedProductType</code> for which to create a <code>ProductLocator</code>.
+	 * @param nestedProductTypeLocal The <code>NestedProductTypeLocal</code> for which to create a <code>ProductLocator</code>.
 	 * @return Return <tt>null</tt> or an object that identifies one or more nested <tt>Product</tt>s
 	 * 		in order to allocate them.
 	 */
-	public abstract ProductLocator getProductLocator(User user, NestedProductType nestedProductType);
+	public abstract ProductLocator getProductLocator(User user, NestedProductTypeLocal nestedProductTypeLocal);
 
 //	/**
 //	 * This method is called by {@link Trader#allocateArticlesEnd(User user, Collection articles)} and
@@ -231,7 +231,7 @@ implements Serializable
 //
 //		// All nestedProductTypes that come from a partner-organisation are collected and grouped in this map in order
 //		// to import them more efficiently
-////		Map<String, List<NestedProductType>> organisationID2partnerNestedProductType = new HashMap<String, List<NestedProductType>>();
+////		Map<String, List<NestedProductTypeLocal>> organisationID2partnerNestedProductType = new HashMap<String, List<NestedProductTypeLocal>>();
 //		Map organisationID2partnerNestedProductType = null; // lazy creation
 //// The above generic notation causes the class Product to be destroyed during enhancement with BCEL + JPOX-Enhancer. This results
 //// in the following exception when afterwards enhancing JFireSimpleTrade (which extends the class Product):
@@ -248,15 +248,15 @@ implements Serializable
 //		// local product => create/find nested products
 //		ProductType productType = this.getProductType();
 //		for (Iterator itNPT = productType.getNestedProductTypes().iterator(); itNPT.hasNext(); ) {
-//			NestedProductType nestedProductType = (NestedProductType) itNPT.next();
+//			NestedProductTypeLocal nestedProductTypeLocal = (NestedProductTypeLocal) itNPT.next();
 //
-//			if (this.organisationID.equals(nestedProductType.getInnerProductTypeOrganisationID())) {
-//				ProductLocator productLocator = this.getProductLocator(user, nestedProductType);
+//			if (this.organisationID.equals(nestedProductTypeLocal.getInnerProductTypeOrganisationID())) {
+//				ProductLocator productLocator = this.getProductLocator(user, nestedProductTypeLocal);
 //
 //				// nested productType is our own, so we can just package it without buying it from someone else.
-//				Collection nestedProducts = store.findProducts(user, null, nestedProductType, productLocator);
-//				if (nestedProducts == null || nestedProducts.size() != nestedProductType.getQuantity())
-//					throw new NotAvailableException("The product '"+getPrimaryKey()+"' cannot be assembled, because the nested ProductType '"+nestedProductType.getInnerProductTypePrimaryKey()+"' could not find available products!");
+//				Collection nestedProducts = store.findProducts(user, null, nestedProductTypeLocal, productLocator);
+//				if (nestedProducts == null || nestedProducts.size() != nestedProductTypeLocal.getQuantity())
+//					throw new NotAvailableException("The product '"+getPrimaryKey()+"' cannot be assembled, because the nested ProductType '"+nestedProductTypeLocal.getInnerProductTypePrimaryKey()+"' could not find available products!");
 //
 //				for (Iterator itNestedProducts = nestedProducts.iterator(); itNestedProducts.hasNext(); ) {
 //					Product nestedProduct = (Product)itNestedProducts.next();
@@ -286,19 +286,19 @@ implements Serializable
 //				// nested productType is coming from a remote organisation and must be acquired from there
 //				// this means: an Offer must be created (or a previously created one used) and an Article be added
 //				// we group them in order to make it more efficient
-//				List partnerNestedProductTypes = (List) organisationID2partnerNestedProductType.get(nestedProductType.getInnerProductTypeOrganisationID());
+//				List partnerNestedProductTypes = (List) organisationID2partnerNestedProductType.get(nestedProductTypeLocal.getInnerProductTypeOrganisationID());
 //				if (partnerNestedProductTypes == null) {
-//					partnerNestedProductTypes = new ArrayList<NestedProductType>();
-//					organisationID2partnerNestedProductType.put(nestedProductType.getInnerProductTypeOrganisationID(), partnerNestedProductTypes);
+//					partnerNestedProductTypes = new ArrayList<NestedProductTypeLocal>();
+//					organisationID2partnerNestedProductType.put(nestedProductTypeLocal.getInnerProductTypeOrganisationID(), partnerNestedProductTypes);
 //				}
-//				partnerNestedProductTypes.add(nestedProductType);
+//				partnerNestedProductTypes.add(nestedProductTypeLocal);
 //			}
 //		} // for (Iterator itNPT = productType.getNestedProductTypes().iterator(); itNPT.hasNext(); ) {
 //
-////		for (Iterator<Map.Entry<String, List<NestedProductType>>> itPNPT = organisationID2partnerNestedProductType.entrySet().iterator(); itPNPT.hasNext(); ) {
+////		for (Iterator<Map.Entry<String, List<NestedProductTypeLocal>>> itPNPT = organisationID2partnerNestedProductType.entrySet().iterator(); itPNPT.hasNext(); ) {
 //		if (organisationID2partnerNestedProductType != null) {
 //			for (Iterator itPNPT = organisationID2partnerNestedProductType.entrySet().iterator(); itPNPT.hasNext(); ) {
-//	//			Map.Entry<String, List<NestedProductType>> me = (Entry<String, List<NestedProductType>>) itPNPT.next();
+//	//			Map.Entry<String, List<NestedProductTypeLocal>> me = (Entry<String, List<NestedProductTypeLocal>>) itPNPT.next();
 //				Map.Entry me = (Map.Entry) itPNPT.next();
 //				String organisationID = (String) me.getKey();
 //				List nestedProductTypes = (List) me.getValue();

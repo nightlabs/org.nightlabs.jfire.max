@@ -108,7 +108,7 @@ import org.nightlabs.jfire.jbpm.JbpmLookup;
 import org.nightlabs.jfire.jbpm.graph.def.ProcessDefinition;
 import org.nightlabs.jfire.security.User;
 import org.nightlabs.jfire.store.DeliveryNote;
-import org.nightlabs.jfire.store.NestedProductType;
+import org.nightlabs.jfire.store.NestedProductTypeLocal;
 import org.nightlabs.jfire.store.ProductType;
 import org.nightlabs.jfire.store.id.DeliveryNoteID;
 import org.nightlabs.jfire.store.id.ProductTypeID;
@@ -2482,7 +2482,7 @@ public abstract class AccountingManagerBean
 			fetchPlan.setDetachmentOptions(FetchPlan.DETACH_LOAD_FIELDS);
 			fetchPlan.setMaxFetchDepth(-1);
 			fetchPlan.setGroups(new String[] {
-					FetchPlan.DEFAULT, 
+					FetchPlan.DEFAULT,
 					FetchGroupsPriceConfig.FETCH_GROUP_EDIT});
 
 			detachmentOptions = fetchPlan.getDetachmentOptions();
@@ -2496,6 +2496,7 @@ public abstract class AccountingManagerBean
 			res.getName().getTexts();
 			res.getFieldMetaData("innerPriceConfig", false);
 			res.getFieldMetaData("packagePriceConfig", false);
+			res.getProductTypeLocal().getProductType();
 
 			// load main price configs
 			res.getPackagePriceConfig();
@@ -2509,9 +2510,10 @@ public abstract class AccountingManagerBean
 			}
 
 			// load all nested ProductType-s
-			for (NestedProductType npt : res.getNestedProductTypes()) {
-				npt.getPackageProductType();
-				ProductType ipt = npt.getInnerProductType();
+			for (NestedProductTypeLocal npt : res.getProductTypeLocal().getNestedProductTypeLocals()) {
+				npt.getPackageProductTypeLocal();
+				ProductType ipt = npt.getInnerProductTypeLocal().getProductType();
+				ipt.getProductTypeLocal().getProductType();
 				ipt.getName().getTexts();
 				ipt.getPackagePriceConfig();
 				ipt.getInnerPriceConfig();
@@ -2532,22 +2534,21 @@ public abstract class AccountingManagerBean
 			// FIXME WORKAROUND for JPOX - begin
 			resolveExtendedProductTypes(pm, res, detachedRes);
 
-			for (NestedProductType attached_npt : res.getNestedProductTypes()) {
-				NestedProductType detached_npt = detachedRes.getNestedProductType(attached_npt.getInnerProductTypePrimaryKey(), true);
+			for (NestedProductTypeLocal attached_npt : res.getProductTypeLocal().getNestedProductTypeLocals()) {
+				NestedProductTypeLocal detached_npt = detachedRes.getProductTypeLocal().getNestedProductTypeLocal(attached_npt.getInnerProductTypePrimaryKey(), true);
 
 				resolveExtendedProductTypes(pm,
-						attached_npt.getInnerProductType(), 
-						detached_npt.getInnerProductType());
+						attached_npt.getInnerProductTypeLocal().getProductType(),
+						detached_npt.getInnerProductTypeLocal().getProductType());
 			}
-
 			// FIXME WORKAROUND for JPOX - end
 
 			if (logger.isDebugEnabled()) {
 				LinkedList<ProductType> productTypes = new LinkedList<ProductType>();
 				productTypes.add(detachedRes);
 
-				for (NestedProductType npt : detachedRes.getNestedProductTypes())
-					productTypes.add(npt.getInnerProductType());
+				for (NestedProductTypeLocal npt : detachedRes.getProductTypeLocal().getNestedProductTypeLocals())
+					productTypes.add(npt.getInnerProductTypeLocal().getProductType());
 
 				for (ProductType productType : productTypes) {
 					logger.debug("getProductTypeForPriceConfigEditing: productType="+productType.getPrimaryKey());

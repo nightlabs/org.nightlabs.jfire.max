@@ -34,7 +34,7 @@ import java.util.List;
 import org.apache.log4j.Logger;
 import org.nightlabs.ModuleException;
 import org.nightlabs.jfire.accounting.PriceFragmentType;
-import org.nightlabs.jfire.store.NestedProductType;
+import org.nightlabs.jfire.store.NestedProductTypeLocal;
 import org.nightlabs.jfire.store.ProductType;
 
 /**
@@ -48,11 +48,11 @@ public class CellReflector
 	private static final Logger logger = Logger.getLogger(CellReflector.class);
 
 	public static class ResolvedPriceCell {
-		public ResolvedPriceCell(NestedProductType nestedProductType, PriceCell priceCell) {
-			this.nestedProductType = nestedProductType;
+		public ResolvedPriceCell(NestedProductTypeLocal nestedProductTypeLocal, PriceCell priceCell) {
+			this.nestedProductTypeLocal = nestedProductTypeLocal;
 			this.priceCell = priceCell;
 		}
-		public NestedProductType nestedProductType;
+		public NestedProductTypeLocal nestedProductTypeLocal;
 		public PriceCell priceCell;
 	}
 
@@ -63,7 +63,7 @@ public class CellReflector
 			PriceCalculator priceCalculator,
 			ProductType packageProductType,
 			IAbsolutePriceCoordinate coordinate, 
-			NestedProductType nestedProductType)
+			NestedProductTypeLocal nestedProductTypeLocal)
 	{
 		if (priceCalculator == null)
 			throw new NullPointerException("priceCalculator");
@@ -74,14 +74,14 @@ public class CellReflector
 		if (coordinate == null)
 			throw new NullPointerException("coordinate");
 
-		if (nestedProductType == null)
-			throw new NullPointerException("nestedProductType");
+		if (nestedProductTypeLocal == null)
+			throw new NullPointerException("nestedProductTypeLocal");
 
 		this.priceCalculator = priceCalculator;
 		this.packageProductType = packageProductType;
 		this.coordinate = coordinate;
-		this.nestedProductType = nestedProductType;
-		this.productType = nestedProductType.getInnerProductType();
+		this.nestedProductTypeLocal = nestedProductTypeLocal;
+		this.productType = nestedProductTypeLocal.getInnerProductTypeLocal().getProductType();
 	}
 
 	/**
@@ -90,13 +90,13 @@ public class CellReflector
 	private IAbsolutePriceCoordinate coordinate;
 	
 	/**
-	 * The NestedProductType in which we are. <tt>nestedProductType.innerProductType</tt>
+	 * The NestedProductTypeLocal in which we are. <tt>nestedProductTypeLocal.innerProductType</tt>
 	 * is the same as {@link #productType}
 	 */
-	private NestedProductType nestedProductType;
+	private NestedProductTypeLocal nestedProductTypeLocal;
 	/**
-	 * The ProductType in which we are. This is the same as <tt>nestedProductType.innerProductType</tt>.
-	 * @see #nestedProductType;
+	 * The ProductType in which we are. This is the same as <tt>nestedProductTypeLocal.innerProductType</tt>.
+	 * @see #nestedProductTypeLocal;
 	 */
 	private ProductType productType;
 
@@ -122,20 +122,20 @@ public class CellReflector
 		return coordinate;
 	}
 	/**
-	 * @return Returns the nestedProductType in which this cell is located.
+	 * @return Returns the nestedProductTypeLocal in which this cell is located.
 	 * @see #getProductType();
 	 * @see #productType
 	 */
-	public NestedProductType getNestedProductType()
+	public NestedProductTypeLocal getNestedProductType()
 	{
-		return nestedProductType;
+		return nestedProductTypeLocal;
 	}
 	/**
 	 * The result of this method is the same as <tt>getNestedProductType().getInnerProductType()</tt>
 	 *
 	 * @return Returns the productType in which this cell is located.
 	 * @see #getNestedProductType()
-	 * @see #nestedProductType
+	 * @see #nestedProductTypeLocal
 	 */
 	public ProductType getProductType()
 	{
@@ -205,8 +205,8 @@ public class CellReflector
 //If we reference a cell within the same ProductType, we take the simple result.
 //We only multiply the amount with the quantity, if the cell is in a different
 //ProductType.
-			if (!this.coordinate.getProductTypePK().equals(resolvedPriceCell.nestedProductType.getInnerProductTypePrimaryKey())) {
-				amount *= resolvedPriceCell.nestedProductType.getQuantity();
+			if (!this.coordinate.getProductTypePK().equals(resolvedPriceCell.nestedProductTypeLocal.getInnerProductTypePrimaryKey())) {
+				amount *= resolvedPriceCell.nestedProductTypeLocal.getQuantity();
 			}
 			sumAmount += amount;
 		}
@@ -349,7 +349,7 @@ public class CellReflector
 
 		for (Iterator it = foundProductTypePKs.iterator(); it.hasNext(); ) {
 			String foundProductTypePK = (String) it.next();
-			NestedProductType packagedProductType = priceCalculator.virtualPackagedProductTypes.get(foundProductTypePK);
+			NestedProductTypeLocal packagedProductType = priceCalculator.virtualPackagedProductTypes.get(foundProductTypePK);
 
 			PriceCell priceCell = null;
 			// filter the cell itself out if everything is identical
@@ -363,7 +363,7 @@ public class CellReflector
 //				IPriceCoordinate realLocalPriceCoordinate = localPriceCoordinate;
 ////				if (!packageProductTypeOrganisationID.equals(innerProductTypeOrganisationID))
 //				if (!innerProductTypeOrganisationID.equals(localPriceCoordinate.getTariffOrganisationID()))
-//					realLocalPriceCoordinate = createMappedLocalPriceCoordinateForDifferentOrganisation(localPriceCoordinate, nestedProductType);
+//					realLocalPriceCoordinate = createMappedLocalPriceCoordinateForDifferentOrganisation(localPriceCoordinate, nestedProductTypeLocal);
 
 //				priceCell = priceCalculator.calculatePriceCell(
 //						packagedProductType, priceFragmentType, realLocalPriceCoordinate);
@@ -378,17 +378,17 @@ public class CellReflector
 		if (logger.isDebugEnabled()) {
 			logger.debug("resolvePriceCells (" + address + "): priceCells.size=" + priceCells.size());
 			for (ResolvedPriceCell cell : priceCells) {
-				logger.debug("resolvePriceCells (" + address + "):    cell: nestedInnerPTPK=" + cell.nestedProductType.getInnerProductTypePrimaryKey() + " coordinate=" + cell.priceCell.getPriceCoordinate() + " priceFragmentTypePK="+priceFragmentTypePK+" amount=" + cell.priceCell.getPrice().getAmount(priceFragmentTypePK));
+				logger.debug("resolvePriceCells (" + address + "):    cell: nestedInnerPTPK=" + cell.nestedProductTypeLocal.getInnerProductTypePrimaryKey() + " coordinate=" + cell.priceCell.getPriceCoordinate() + " priceFragmentTypePK="+priceFragmentTypePK+" amount=" + cell.priceCell.getPrice().getAmount(priceFragmentTypePK));
 			}
 		}
 
 		return priceCells;
 	}
 
-//	protected IPriceCoordinate createMappedLocalPriceCoordinateForDifferentOrganisation(IPriceCoordinate priceCoordinate, NestedProductType nestedProductType)
+//	protected IPriceCoordinate createMappedLocalPriceCoordinateForDifferentOrganisation(IPriceCoordinate priceCoordinate, NestedProductTypeLocal nestedProductTypeLocal)
 //	{
 //		TariffID orgTariffID = TariffID.create(priceCoordinate.getTariffPK());
-//		TariffID newTariffID = priceCalculator.getTariffMapper().getTariffIDForProductType(orgTariffID, nestedProductType.getInnerProductTypeOrganisationID(), true);
+//		TariffID newTariffID = priceCalculator.getTariffMapper().getTariffIDForProductType(orgTariffID, nestedProductTypeLocal.getInnerProductTypeOrganisationID(), true);
 //		IPriceCoordinate res = createLocalPriceCoordinate(priceCoordinate);
 //		res.setTariffPK(Tariff.getPrimaryKey(newTariffID.organisationID, newTariffID.tariffID));
 //		return res;

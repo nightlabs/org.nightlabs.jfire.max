@@ -51,7 +51,7 @@ import org.nightlabs.jfire.accounting.priceconfig.IInnerPriceConfig;
 import org.nightlabs.jfire.accounting.priceconfig.IPriceConfig;
 import org.nightlabs.jfire.accounting.priceconfig.PriceConfig;
 import org.nightlabs.jfire.idgenerator.IDGenerator;
-import org.nightlabs.jfire.store.NestedProductType;
+import org.nightlabs.jfire.store.NestedProductTypeLocal;
 import org.nightlabs.jfire.store.ProductType;
 import org.nightlabs.jfire.store.id.ProductTypeID;
 import org.nightlabs.jfire.trade.CustomerGroup;
@@ -74,9 +74,9 @@ public class PriceCalculator
 
 	/**
 	 * key: String innerProductTypePK
-	 * value: NestedProductType
+	 * value: NestedProductTypeLocal
 	 */
-	protected Map<String, NestedProductType> virtualPackagedProductTypes = new HashMap<String, NestedProductType>();
+	protected Map<String, NestedProductTypeLocal> virtualPackagedProductTypes = new HashMap<String, NestedProductTypeLocal>();
 
 	private CustomerGroupMapper customerGroupMapper;
 
@@ -113,7 +113,10 @@ public class PriceCalculator
 		if (tariffMapper == null)
 			throw new IllegalArgumentException("tariffMapper must not be null!");
 
-		this.packageProductType = packageProductType;
+		// If the JDO cache (1st-leve) has been evicted, the call packageProductType.getProductTypeLocal().getProductType()
+		// will return a different instance. Therefore, we do not use packageProductType directly, but go over the ProductTypeLocal.
+		// This is necessary anyway and therefore always detached.
+		this.packageProductType = packageProductType.getProductTypeLocal().getProductType();
 		this.customerGroupMapper = customerGroupMapper;
 		this.tariffMapper = tariffMapper;
 		if (packageProductType.isPackageInner())
@@ -195,8 +198,8 @@ public class PriceCalculator
 	{
 		// Create an instance of StablePriceConfig for each FormulaPriceConfig
 		// (if not yet existing) to store the results of the FormulaPriceConfig.
-		for (NestedProductType nestedProductType : virtualPackagedProductTypes.values()) {
-			ProductType innerProductType = nestedProductType.getInnerProductType();
+		for (NestedProductTypeLocal nestedProductTypeLocal : virtualPackagedProductTypes.values()) {
+			ProductType innerProductType = nestedProductTypeLocal.getInnerProductTypeLocal().getProductType();
 			IPriceConfig priceConfig;
 
 			if (innerProductType.isPackageOuter() && innerProductType != packageProductType)
@@ -259,7 +262,10 @@ public class PriceCalculator
 		// don't need to access it differently.
 //		virtualPackagedProductTypes = new LinkedList(packageProductType.getPackagedProductTypes());
 		virtualPackagedProductTypes.clear();
-		for (NestedProductType npt : packageProductType.getNestedProductTypes(true)) {
+		for (NestedProductTypeLocal npt : packageProductType.getProductTypeLocal().getNestedProductTypeLocals(true)) {
+			if (npt.getInnerProductTypeLocal().getProductType().equals(packageProductType) && npt.getInnerProductTypeLocal().getProductType() != packageProductType)
+				throw new IllegalStateException("Why the hell are there two instances of this JDO object?!??!");
+
 			virtualPackagedProductTypes.put(npt.getInnerProductTypePrimaryKey(), npt);
 		}
 
@@ -267,10 +273,10 @@ public class PriceCalculator
 //		if (packageProductType.getInnerPriceConfig() != null)
 //			virtualPackagedProductTypes.put(
 //					packageProductType.getPrimaryKey(),
-//					new NestedProductType(packageProductType, packageProductType));
+//					new NestedProductTypeLocal(packageProductType, packageProductType));
 
-		for (NestedProductType packagedProductType : virtualPackagedProductTypes.values()) {
-			_resolvableProductTypes_registerWithAnchestors(packagedProductType.getInnerProductType());
+		for (NestedProductTypeLocal packagedProductType : virtualPackagedProductTypes.values()) {
+			_resolvableProductTypes_registerWithAnchestors(packagedProductType.getInnerProductTypeLocal().getProductType());
 		} // for (Iterator it = getPackagedProductInfos().iterator(); it.hasNext(); ) {
 	}
 	
@@ -318,8 +324,8 @@ public class PriceCalculator
 		// TODO do we really want to always recalculate all cells if sth. changed?
 		// To keep track over dependencies is too complicated...
 		packagePriceConfig.resetPriceFragmentCalculationStati();
-		for (NestedProductType nestedProductType : virtualPackagedProductTypes.values()) {
-			ProductType innerProductType = nestedProductType.getInnerProductType();
+		for (NestedProductTypeLocal nestedProductTypeLocal : virtualPackagedProductTypes.values()) {
+			ProductType innerProductType = nestedProductTypeLocal.getInnerProductTypeLocal().getProductType();
 			IPriceConfig priceConfig = innerProductType.getPriceConfigInPackage(
 					packageProductType.getPrimaryKey());
 
@@ -402,17 +408,17 @@ public class PriceCalculator
 			for (PriceFragmentType priceFragmentType : packagePriceConfig.getPriceFragmentTypes()) {
 				long outerPriceCellAmount = 0;
 
-				for (NestedProductType nestedProductType : virtualPackagedProductTypes.values()) {
-//					ProductType innerProductType = nestedProductType.getInnerProductType();
+				for (NestedProductTypeLocal nestedProductTypeLocal : virtualPackagedProductTypes.values()) {
+//					ProductType innerProductType = nestedProductTypeLocal.getInnerProductType();
 
 //					if (innerProductType.isPackageInner() || innerProductType == packageProductType) {
 //						IPriceConfig innerPriceConfig = innerProductType.getInnerPriceConfig();
 						PriceCell innerPriceCell = calculatePriceCell(
-								nestedProductType, priceFragmentType, priceCoordinate);
+								nestedProductTypeLocal, priceFragmentType, priceCoordinate);
 	
 						if (innerPriceCell != null) { // it might be null, because the packaging is quite free and cells might be missing
 							long amount = innerPriceCell.getPrice().getAmount(priceFragmentType);
-							amount *= nestedProductType.getQuantity();
+							amount *= nestedProductTypeLocal.getQuantity();
 							outerPriceCellAmount += amount;
 						}
 //					}
@@ -424,16 +430,16 @@ public class PriceCalculator
 	}
 
 	public IPriceCoordinate createMappedLocalPriceCoordinate(
-			NestedProductType nestedProductType, PriceFragmentType priceFragmentType, IPriceCoordinate localPriceCoordinate)
+			NestedProductTypeLocal nestedProductTypeLocal, PriceFragmentType priceFragmentType, IPriceCoordinate localPriceCoordinate)
 	{
-		if (nestedProductType.getPackageProductTypeOrganisationID().equals(nestedProductType.getInnerProductTypeOrganisationID())) // TODO or better check the organisationIDs of the price-configs?
+		if (nestedProductTypeLocal.getPackageProductTypeOrganisationID().equals(nestedProductTypeLocal.getInnerProductTypeOrganisationID())) // TODO or better check the organisationIDs of the price-configs?
 			return localPriceCoordinate;
 
 		CustomerGroupID orgCustomerGroupID = CustomerGroupID.create(localPriceCoordinate.getCustomerGroupPK());
-		CustomerGroupID newCustomerGroupID = getCustomerGroupMapper().getPartnerCustomerGroupID(orgCustomerGroupID, nestedProductType.getInnerProductTypeOrganisationID(), true);
+		CustomerGroupID newCustomerGroupID = getCustomerGroupMapper().getPartnerCustomerGroupID(orgCustomerGroupID, nestedProductTypeLocal.getInnerProductTypeOrganisationID(), true);
 
 		TariffID orgTariffID = TariffID.create(localPriceCoordinate.getTariffPK());
-		TariffID newTariffID = getTariffMapper().getPartnerTariffID(orgTariffID, nestedProductType.getInnerProductTypeOrganisationID(), true);
+		TariffID newTariffID = getTariffMapper().getPartnerTariffID(orgTariffID, nestedProductTypeLocal.getInnerProductTypeOrganisationID(), true);
 
 		IPriceCoordinate res = Util.cloneSerializable(localPriceCoordinate);
 		res.setTariffPK(Tariff.getPrimaryKey(newTariffID.organisationID, newTariffID.tariffID));
@@ -445,11 +451,11 @@ public class PriceCalculator
 	 * @return Returns a PriceCell which is calculated or <tt>null</tt>.
 	 */
 	public PriceCell calculatePriceCell(
-			NestedProductType packagedProductType, PriceFragmentType priceFragmentType,
+			NestedProductTypeLocal packagedProductType, PriceFragmentType priceFragmentType,
 			IPriceCoordinate localPriceCoordinate)
 	throws PriceCalculationException
 	{
-		ProductType innerProductType = packagedProductType.getInnerProductType();
+		ProductType innerProductType = packagedProductType.getInnerProductTypeLocal().getProductType();
 
 		localPriceCoordinate = createMappedLocalPriceCoordinate(packagedProductType, priceFragmentType, localPriceCoordinate);
 
@@ -503,11 +509,11 @@ public class PriceCalculator
 	
 	protected CellReflector createCellReflector(
 			IAbsolutePriceCoordinate absolutePriceCoordinate,
-			NestedProductType nestedProductType)
+			NestedProductTypeLocal nestedProductTypeLocal)
 	{
 		return new CellReflector(
 				this, packageProductType,
-				absolutePriceCoordinate, nestedProductType
+				absolutePriceCoordinate, nestedProductTypeLocal
 				);
 	}
 
@@ -621,21 +627,21 @@ public class PriceCalculator
 	 */
 	protected void calculatePriceCell(
 			FormulaCell formulaCell, PriceCell priceCell,
-			NestedProductType nestedProductType, PriceFragmentType priceFragmentType)
+			NestedProductTypeLocal nestedProductTypeLocal, PriceFragmentType priceFragmentType)
 	throws PriceCalculationException
 //		throws ModuleException
 	{
 		// formulaCell can be null!
 		if (priceCell == null)
 			throw new NullPointerException("priceCell");
-		if (nestedProductType == null)
-			throw new NullPointerException("nestedProductType");
+		if (nestedProductTypeLocal == null)
+			throw new NullPointerException("nestedProductTypeLocal");
 		if (priceFragmentType == null)
 			throw new NullPointerException("priceFragmentType");
 		
 		String formula = null;
 
-		ProductType productType = nestedProductType.getInnerProductType();
+		ProductType productType = nestedProductTypeLocal.getInnerProductTypeLocal().getProductType();
 
 		IAbsolutePriceCoordinate absolutePriceCoordinate = createAbsolutePriceCoordinate(
 				priceCell.getPriceCoordinate(),
@@ -692,7 +698,7 @@ public class PriceCalculator
 
 						CellReflector cell = createCellReflector(
 //								this, packageProductType,
-								absolutePriceCoordinate, nestedProductType
+								absolutePriceCoordinate, nestedProductTypeLocal
 								);
 						Object js_cell = Context.javaToJS(cell, scope);
 						ScriptableObject.putProperty(scope, "cell", js_cell);

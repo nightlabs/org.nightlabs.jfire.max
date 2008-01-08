@@ -116,19 +116,8 @@ implements
 
 	/**
 	 * @jdo.field persistence-modifier="persistent"
-	 * @jdo.column length="100"
 	 */
 	private IssueType issueType;
-
-//	/** Documents for the issue
-//	*
-//	* @jdo.field
-//	*    persistence-modifier="persistent"
-//	*    collection-type="collection"
-//	*    element-type="ObjectID" 
-//	*    mapped-by="supplier"
-//	**/
-//	private Collection attachedDocuments = new HashSet();
 
 	/**
 	 * Instances of String that are representations of {@link ObjectID}s.

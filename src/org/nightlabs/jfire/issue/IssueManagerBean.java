@@ -25,6 +25,7 @@ import org.nightlabs.ModuleException;
 import org.nightlabs.jdo.NLJDOHelper;
 import org.nightlabs.jdo.query.JDOQuery;
 import org.nightlabs.jfire.base.BaseSessionBeanImpl;
+import org.nightlabs.jfire.issue.history.IssueHistory;
 import org.nightlabs.jfire.issue.id.IssueID;
 import org.nightlabs.jfire.issue.id.IssueLocalID;
 import org.nightlabs.jfire.issue.id.IssuePriorityID;
@@ -92,34 +93,13 @@ implements SessionBean{
 		logger.debug(this.getClass().getName() + ".ejbPassivate()");
 	}
 
-//	/**
-//	 * Creates a new issue history. This method is only usable, if the user (principal)
-//	 * is an organisation, because this organisation will automatically be set
-//	 * as the user for the new Issue History.
-//	 *
-//	 * @ejb.interface-method
-//	 * @ejb.transaction type="Required"
-//	 * @ejb.permission role-name="_Guest_"
-//	 */
-//	public IssueHistory createIssueHistory(IssueHistory issueHistory, boolean get, String[] fetchGroups, int maxFetchDepth){
-//		PersistenceManager pm = getPersistenceManager();
-//		try {
-//			if (!issueHistory.getOrganisationID().equals(getOrganisationID()))
-//				throw new IllegalArgumentException("Given Issue was created for a different organisation, can not store to this datastore!");
-//
-//			IssueHistory result = NLJDOHelper.storeJDO(pm, issueHistory, get, fetchGroups, maxFetchDepth);
-//			return result;
-//		} finally {
-//			pm.close();
-//		}
-//	}
-	
 	/**
 	 * @ejb.interface-method
 	 * @ejb.transaction type="Required"
 	 * @ejb.permission role-name="_Guest_"
 	 */
-	public Issue storeIssue(Issue issue, boolean get, String[] fetchGroups, int maxFetchDepth){
+	public Issue storeIssue(Issue issue, boolean get, String[] fetchGroups, int maxFetchDepth)
+	{
 		PersistenceManager pm = getPersistenceManager();
 		try {
 			boolean isNewIssue = !JDOHelper.isDetached(issue);
@@ -222,29 +202,6 @@ implements SessionBean{
 			pm.close();
 		}
 	}
-	
-//	/**
-//	 * @throws ModuleException
-//	 *
-//	 * @ejb.interface-method
-//	 * @ejb.transaction type = "Required"
-//	 * @ejb.permission role-name="_Guest_"
-//	 */
-//	public Collection getIssueStatus(String[] fetchGroups, int maxFetchDepth)
-//	throws ModuleException
-//	{
-//		PersistenceManager pm = getPersistenceManager();
-//		try {
-//			pm.getFetchPlan().setMaxFetchDepth(maxFetchDepth);
-//			if (fetchGroups != null)
-//				pm.getFetchPlan().setGroups(fetchGroups);
-//
-//			Query q = pm.newQuery(IssueStatus.class);
-//			return pm.detachCopyAll((Collection)q.execute());
-//		} finally {
-//			pm.close();
-//		}
-//	}
 	
 	/**
 	 * @throws ModuleException
@@ -384,12 +341,13 @@ implements SessionBean{
 	 * @ejb.permission role-name="_Guest_"
 	 * @ejb.transaction type="Required"
 	 */	
-	public IssueType storeIssueType(IssueType issueType, boolean get, String[] fetchGroups, int maxFetchDepth){
+	public IssueType storeIssueType(IssueType issueType, boolean get, String[] fetchGroups, int maxFetchDepth)
+	{
 		PersistenceManager pm = getPersistenceManager();
-		try{
+		try {
 			return NLJDOHelper.storeJDO(pm, issueType, get, fetchGroups, maxFetchDepth);
 		}//try
-		finally{
+		finally {
 			pm.close();
 		}//finally
 	}
@@ -399,12 +357,13 @@ implements SessionBean{
 	 * @ejb.permission role-name="_Guest_"
 	 * @ejb.transaction type="Required"
 	 */	
-	public IssuePriority storeIssuePriority(IssuePriority issuePriority, boolean get, String[] fetchGroups, int maxFetchDepth){
+	public IssuePriority storeIssuePriority(IssuePriority issuePriority, boolean get, String[] fetchGroups, int maxFetchDepth) 
+	{
 		PersistenceManager pm = getPersistenceManager();
-		try{
+		try {
 			return NLJDOHelper.storeJDO(pm, issuePriority, get, fetchGroups, maxFetchDepth);
 		}//try
-		finally{
+		finally {
 			pm.close();
 		}//finally
 	}
@@ -414,7 +373,8 @@ implements SessionBean{
 	 * @ejb.permission role-name="_Guest_"
 	 * @ejb.transaction type="Required"
 	 */	
-	public IssueSeverityType storeIssueSeverityType(IssueSeverityType issueSeverityType, boolean get, String[] fetchGroups, int maxFetchDepth){
+	public IssueSeverityType storeIssueSeverityType(IssueSeverityType issueSeverityType, boolean get, String[] fetchGroups, int maxFetchDepth)
+	{
 		PersistenceManager pm = getPersistenceManager();
 		try{
 			return NLJDOHelper.storeJDO(pm, issueSeverityType, get, fetchGroups, maxFetchDepth);
@@ -429,12 +389,29 @@ implements SessionBean{
 	 * @ejb.permission role-name="_Guest_"
 	 * @ejb.transaction type="Required"
 	 */	
-	public IssueResolution storeIssueResolution(IssueResolution issueResolution, boolean get, String[] fetchGroups, int maxFetchDepth){
+	public IssueResolution storeIssueResolution(IssueResolution issueResolution, boolean get, String[] fetchGroups, int maxFetchDepth) 
+	{
 		PersistenceManager pm = getPersistenceManager();
-		try{
+		try {
 			return NLJDOHelper.storeJDO(pm, issueResolution, get, fetchGroups, maxFetchDepth);
 		}//try
-		finally{
+		finally {
+			pm.close();
+		}//finally
+	}
+	
+	/**
+	 * @ejb.interface-method
+	 * @ejb.permission role-name="_Guest_"
+	 * @ejb.transaction type="Required"
+	 */	
+	public IssueHistory createIssueHistory(IssueHistory issueHistory, boolean get, String[] fetchGroups, int maxFetchDepth) 
+	{
+		PersistenceManager pm = getPersistenceManager();
+		try{
+			return NLJDOHelper.storeJDO(pm, issueHistory, get, fetchGroups, maxFetchDepth);
+		}//try
+		finally {
 			pm.close();
 		}//finally
 	}

@@ -39,11 +39,11 @@ extends ServerDeliveryProcessor
 		try {
 			pm.getExtent(ServerDeliveryProcessorClientSideVoucherPrint.class);
 			serverDeliveryProcessor = (ServerDeliveryProcessorClientSideVoucherPrint) pm.getObjectById(
-					ServerPaymentProcessorID.create(Organisation.DEVIL_ORGANISATION_ID, 
+					ServerPaymentProcessorID.create(Organisation.DEV_ORGANISATION_ID, 
 							ServerDeliveryProcessorClientSideVoucherPrint.class.getName()));
 		} catch (JDOObjectNotFoundException e) {
 			serverDeliveryProcessor = new ServerDeliveryProcessorClientSideVoucherPrint(
-					Organisation.DEVIL_ORGANISATION_ID, 
+					Organisation.DEV_ORGANISATION_ID, 
 					ServerDeliveryProcessorClientSideVoucherPrint.class.getName());
 			serverDeliveryProcessor.getName().setText(
 					Locale.ENGLISH.getLanguage(), 

@@ -25,7 +25,7 @@ public class VoucherScriptingConstants
 	{
 		public static final ScriptRegistryItemID SCRIPT_REGISTRY_ITEM_ID_SCRIPT_VOUCHER_KEY = 
 			ScriptRegistryItemID.create(
-					Organisation.DEVIL_ORGANISATION_ID, 
+					Organisation.DEV_ORGANISATION_ID, 
 					SCRIPT_REGISTRY_ITEM_TYPE_TRADE_VOUCHER, 
 					"VoucherKey");
 	}

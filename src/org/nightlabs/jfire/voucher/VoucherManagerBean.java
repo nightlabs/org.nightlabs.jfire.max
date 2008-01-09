@@ -162,7 +162,7 @@ implements SessionBean
 		try {
 			// init scripts
 			new ScriptingInitialiser(jsm, pm,
-					Organisation.DEVIL_ORGANISATION_ID).initialise(); // this is a
+					Organisation.DEV_ORGANISATION_ID).initialise(); // this is a
 																														// throw-away-instance
  
 			DeliveryConfiguration deliveryConfiguration = checkDeliveryConfiguration(pm);
@@ -195,12 +195,12 @@ implements SessionBean
 
 			// create the ProductTypeActionHandler for VoucherTypes
 			VoucherTypeActionHandler voucherTypeActionHandler = new VoucherTypeActionHandler(
-					Organisation.DEVIL_ORGANISATION_ID, VoucherTypeActionHandler.class
+					Organisation.DEV_ORGANISATION_ID, VoucherTypeActionHandler.class
 							.getName(), VoucherType.class);
 			pm.makePersistent(voucherTypeActionHandler);
 
 			VoucherDeliveryNoteActionHandler voucherDeliveryNoteActionHandler = new VoucherDeliveryNoteActionHandler(
-					Organisation.DEVIL_ORGANISATION_ID,
+					Organisation.DEV_ORGANISATION_ID,
 					VoucherDeliveryNoteActionHandler.class.getName());
 			pm.makePersistent(voucherDeliveryNoteActionHandler);
 			
@@ -1031,7 +1031,7 @@ implements SessionBean
 				articleIDs.add((ArticleID) JDOHelper.getObjectId(article));
 				delivery.setArticleIDs(articleIDs);
 				ModeOfDeliveryFlavourID modeOfDeliveryFlavourID = ModeOfDeliveryFlavourID
-						.create(Organisation.DEVIL_ORGANISATION_ID,
+						.create(Organisation.DEV_ORGANISATION_ID,
 								"mailing.physical.default"); // TODO should be a constant!
 				delivery.setModeOfDeliveryFlavourID(modeOfDeliveryFlavourID);
 				delivery.setClientDeliveryProcessorFactoryID("dummy"); // should not

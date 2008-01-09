@@ -31,7 +31,7 @@ public class ScriptingInitialiser
 	 * @param baseCategory All directories/files within the scriptSubDir will be created as sub-categories/scripts of this category.
 	 * @param jfsm
 	 * @param pm
-	 * @param organisationID If you're writing a JFire Community Project, this is {@link Organisation#DEVIL_ORGANISATION_ID}.
+	 * @param organisationID If you're writing a JFire Community Project, this is {@link Organisation#DEV_ORGANISATION_ID}.
 	 */
 	public ScriptingInitialiser(JFireServerManager jfsm, PersistenceManager pm, String organisationID)
 	{
@@ -78,6 +78,6 @@ public class ScriptingInitialiser
 				"JFireVoucher.ear/script/Voucher",
 				baseCategory,
 				VoucherScriptingConstants.SCRIPT_REGISTRY_ITEM_TYPE_TRADE_VOUCHER,				
-				jfsm, pm, Organisation.DEVIL_ORGANISATION_ID).initialise(); // this is a throw-away-instance
+				jfsm, pm, Organisation.DEV_ORGANISATION_ID).initialise(); // this is a throw-away-instance
 	}
 }

@@ -152,7 +152,7 @@ public class VoucherTypeActionHandler
 		PersistenceManager pm = getPersistenceManager();
 
 		pm.getExtent(VoucherDeliveryNoteActionHandler.class);
-		VoucherDeliveryNoteActionHandler deliveryNoteActionHandler = (VoucherDeliveryNoteActionHandler) pm.getObjectById(DeliveryNoteActionHandlerID.create(Organisation.DEVIL_ORGANISATION_ID, VoucherDeliveryNoteActionHandler.class.getName()));
+		VoucherDeliveryNoteActionHandler deliveryNoteActionHandler = (VoucherDeliveryNoteActionHandler) pm.getObjectById(DeliveryNoteActionHandlerID.create(Organisation.DEV_ORGANISATION_ID, VoucherDeliveryNoteActionHandler.class.getName()));
 		deliveryNote.getDeliveryNoteLocal().addDeliveryNoteActionHandler(deliveryNoteActionHandler);
 	}
 

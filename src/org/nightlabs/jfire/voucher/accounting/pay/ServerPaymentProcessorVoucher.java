@@ -41,9 +41,9 @@ public class ServerPaymentProcessorVoucher
 		try {
 			pm.getExtent(ServerPaymentProcessorVoucher.class);
 			serverPaymentProcessorVoucher = (ServerPaymentProcessorVoucher) pm.getObjectById(
-					ServerPaymentProcessorID.create(Organisation.DEVIL_ORGANISATION_ID, ServerPaymentProcessorVoucher.class.getName()));
+					ServerPaymentProcessorID.create(Organisation.DEV_ORGANISATION_ID, ServerPaymentProcessorVoucher.class.getName()));
 		} catch (JDOObjectNotFoundException e) {
-			serverPaymentProcessorVoucher = new ServerPaymentProcessorVoucher(Organisation.DEVIL_ORGANISATION_ID, ServerPaymentProcessorVoucher.class.getName());
+			serverPaymentProcessorVoucher = new ServerPaymentProcessorVoucher(Organisation.DEV_ORGANISATION_ID, ServerPaymentProcessorVoucher.class.getName());
 			serverPaymentProcessorVoucher = pm.makePersistent(serverPaymentProcessorVoucher);
 		}
 

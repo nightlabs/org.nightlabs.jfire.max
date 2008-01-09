@@ -131,7 +131,7 @@ implements SessionBean
 		JFireServerManager jfireServerManager = getJFireServerManager();
 		try {
 			
-			ScriptingInitialiser.initialize(pm, jfireServerManager, Organisation.DEVIL_ORGANISATION_ID);
+			ScriptingInitialiser.initialize(pm, jfireServerManager, Organisation.DEV_ORGANISATION_ID);
 			
 		} finally {
 			pm.close();
@@ -189,13 +189,13 @@ implements SessionBean
 	}
 	
 	private void initializeReportParameterAcquisition(final PersistenceManager pm) {
-		ValueProviderCategoryID categoryID = ValueProviderCategoryID.create(Organisation.DEVIL_ORGANISATION_ID, ReportingTradeConstants.VALUE_PROVIDER_CATEGORY_ID_TRADE_REPORTS);
+		ValueProviderCategoryID categoryID = ValueProviderCategoryID.create(Organisation.DEV_ORGANISATION_ID, ReportingTradeConstants.VALUE_PROVIDER_CATEGORY_ID_TRADE_REPORTS);
 		ValueProviderCategory rootCategory = ReportParameterUtil.createValueProviderCategory(
 				pm, null, categoryID, 
 				new NameEntry[] {new NameEntry(Locale.ENGLISH.getLanguage(), "Trade reports")}
 			);
 		
-		ValueProviderCategoryID leCategoryID = ValueProviderCategoryID.create(Organisation.DEVIL_ORGANISATION_ID, ReportingTradeConstants.VALUE_PROVIDER_CATEGORY_ID_LEGAL_ENTITY);
+		ValueProviderCategoryID leCategoryID = ValueProviderCategoryID.create(Organisation.DEV_ORGANISATION_ID, ReportingTradeConstants.VALUE_PROVIDER_CATEGORY_ID_LEGAL_ENTITY);
 		ValueProviderCategory leCategory = ReportParameterUtil.createValueProviderCategory(
 				pm, rootCategory, leCategoryID, 
 				new NameEntry[] {new NameEntry(Locale.ENGLISH.getLanguage(), "Legal entity parameters")}
@@ -208,7 +208,7 @@ implements SessionBean
 				);
 		
 		ValueProviderCategoryID docsCategoryID = ValueProviderCategoryID.create(
-				Organisation.DEVIL_ORGANISATION_ID, 
+				Organisation.DEV_ORGANISATION_ID, 
 				ReportingTradeConstants.VALUE_PROVIDER_CATEGORY_ID_TRADE_DOCUMENTS);
 		ReportParameterUtil.createValueProviderCategory(
 				pm, null, docsCategoryID, 
@@ -216,7 +216,7 @@ implements SessionBean
 			);
 		
 		ValueProviderCategoryID invoiceCategoryID = ValueProviderCategoryID.create(
-				Organisation.DEVIL_ORGANISATION_ID, 
+				Organisation.DEV_ORGANISATION_ID, 
 				ReportingTradeConstants.VALUE_PROVIDER_CATEGORY_ID_TRADE_DOCUMENTS_INVOICE);
 		ValueProviderCategory invoiceCategory = ReportParameterUtil.createValueProviderCategory(
 				pm, rootCategory, invoiceCategoryID, 
@@ -263,7 +263,7 @@ implements SessionBean
 		
 		// order category
 		ValueProviderCategoryID orderCategoryID = ValueProviderCategoryID.create(
-				Organisation.DEVIL_ORGANISATION_ID, 
+				Organisation.DEV_ORGANISATION_ID, 
 				ReportingTradeConstants.VALUE_PROVIDER_CATEGORY_ID_TRADE_DOCUMENTS_ORDER);
 		ValueProviderCategory orderCategory = ReportParameterUtil.createValueProviderCategory(
 				pm, rootCategory, orderCategoryID, 
@@ -285,7 +285,7 @@ implements SessionBean
 		
 		// offer category
 		ValueProviderCategoryID offerCategoryID = ValueProviderCategoryID.create(
-				Organisation.DEVIL_ORGANISATION_ID, 
+				Organisation.DEV_ORGANISATION_ID, 
 				ReportingTradeConstants.VALUE_PROVIDER_CATEGORY_ID_TRADE_DOCUMENTS_OFFER);
 		ValueProviderCategory offerCategory = ReportParameterUtil.createValueProviderCategory(
 				pm, rootCategory, offerCategoryID, 
@@ -307,7 +307,7 @@ implements SessionBean
 		
 		// deliveryNote category
 		ValueProviderCategoryID deliveryNoteCategoryID = ValueProviderCategoryID.create(
-				Organisation.DEVIL_ORGANISATION_ID, 
+				Organisation.DEV_ORGANISATION_ID, 
 				ReportingTradeConstants.VALUE_PROVIDER_CATEGORY_ID_TRADE_DOCUMENTS_DELIVERY_NOTE);
 		ValueProviderCategory deliveryNoteCategory = ReportParameterUtil.createValueProviderCategory(
 				pm, rootCategory, deliveryNoteCategoryID, 

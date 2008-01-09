@@ -43,7 +43,7 @@
                 </list-property>
             </structure>
             <property name="dataSource">Data Source</property>
-            <property name="queryText">jdo/org.nightlabs.jfire.scripting.id.ScriptRegistryItemID?organisationID=devil.NightLabs.org&amp;scriptRegistryItemType=JFireReportingTrade-General&amp;scriptRegistryItemID=GeneralSalesStatistic</property>
+            <property name="queryText">jdo/org.nightlabs.jfire.scripting.id.ScriptRegistryItemID?organisationID=dev.jfire.org&amp;scriptRegistryItemType=JFireReportingTrade-General&amp;scriptRegistryItemID=GeneralSalesStatistic</property>
         </oda-data-set>
     </data-sets>
     <page-setup>

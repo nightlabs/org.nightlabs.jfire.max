@@ -35,11 +35,11 @@ SimpleProductType, DynamicProductType and VoucherType
 					<parameter id="0" name="articleContainerID" type="org.nightlabs.jfire.trade.id.ArticleContainerID" x="550" y="20" />
 				</parameters>
 				<value-provider-configs>
-					<provider-config id="1" organisationID="devil.NightLabs.org" categoryID="JFireReportingTrade-ValueProviderCategory-TradeDocuments-Invoice" valueProviderID="ByCustomer" pageIndex="1" pageOrder="0" allowNullOutputValue="false" showMessageInHeader="true" x="275" y="20" >
+					<provider-config id="1" organisationID="dev.jfire.org" categoryID="JFireReportingTrade-ValueProviderCategory-TradeDocuments-Invoice" valueProviderID="ByCustomer" pageIndex="1" pageOrder="0" allowNullOutputValue="false" showMessageInHeader="true" x="275" y="20" >
 						<message language="de">Wählen Sie eine der Rechnungen</message>
 						<message language="en">Select one of the customers invoices</message>
 					</provider-config>
-					<provider-config id="2" organisationID="devil.NightLabs.org" categoryID="JFireReportingTrade-ValueProviderCategory-LegalEntity" valueProviderID="Search" pageIndex="0" pageOrder="0" allowNullOutputValue="false" showMessageInHeader="true" x="0" y="20" >
+					<provider-config id="2" organisationID="dev.jfire.org" categoryID="JFireReportingTrade-ValueProviderCategory-LegalEntity" valueProviderID="Search" pageIndex="0" pageOrder="0" allowNullOutputValue="false" showMessageInHeader="true" x="0" y="20" >
 						<message language="de">Suchen Sie den Rechnungs-Kunden</message>
 						<message language="en">Search the invoice customer</message>
 					</provider-config>

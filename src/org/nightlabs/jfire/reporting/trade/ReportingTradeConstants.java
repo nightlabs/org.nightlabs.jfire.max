@@ -38,7 +38,7 @@ public class ReportingTradeConstants {
 
 	public static final String VALUE_PROVIDER_CATEGORY_ID_LEGAL_ENTITY = "JFireReportingTrade-ValueProviderCategory-LegalEntity";
 	public static final ValueProviderID VALUE_PROVIDER_ID_LEGAL_ENTITY_SEARCH = ValueProviderID.create( 
-			Organisation.DEVIL_ORGANISATION_ID, VALUE_PROVIDER_CATEGORY_ID_LEGAL_ENTITY, "Search");
+			Organisation.DEV_ORGANISATION_ID, VALUE_PROVIDER_CATEGORY_ID_LEGAL_ENTITY, "Search");
 
 	public static final String VALUE_PROVIDER_CATEGORY_ID_TRADE_DOCUMENTS = "JFireReportingTrade-ValueProviderCategory-TradeDocuments";
 	public static final String VALUE_PROVIDER_CATEGORY_ID_TRADE_DOCUMENTS_INVOICE = "JFireReportingTrade-ValueProviderCategory-TradeDocuments-Invoice";
@@ -47,17 +47,17 @@ public class ReportingTradeConstants {
 	public static final String VALUE_PROVIDER_CATEGORY_ID_TRADE_DOCUMENTS_DELIVERY_NOTE = "JFireReportingTrade-ValueProviderCategory-TradeDocuments-DeliveryNote";	
 	
 	public static final ValueProviderID VALUE_PROVIDER_ID_TRADE_DOCUMENTS_INVOICE_BY_CUSTOMER = ValueProviderID.create(
-			Organisation.DEVIL_ORGANISATION_ID, VALUE_PROVIDER_CATEGORY_ID_TRADE_DOCUMENTS_INVOICE, "ByCustomer");
+			Organisation.DEV_ORGANISATION_ID, VALUE_PROVIDER_CATEGORY_ID_TRADE_DOCUMENTS_INVOICE, "ByCustomer");
 	public static final ValueProviderID VALUE_PROVIDER_ID_TRADE_DOCUMENTS_INVOICE_BY_CUSTOMER_AND_PERIOD = ValueProviderID.create(
-			Organisation.DEVIL_ORGANISATION_ID, VALUE_PROVIDER_CATEGORY_ID_TRADE_DOCUMENTS_INVOICE, "ByCustomerAndPeriod");
+			Organisation.DEV_ORGANISATION_ID, VALUE_PROVIDER_CATEGORY_ID_TRADE_DOCUMENTS_INVOICE, "ByCustomerAndPeriod");
 	public static final ValueProviderID VALUE_PROVIDER_ID_TRADE_DOCUMENTS_INVOICE_BY_ARTICLE_TYPE = ValueProviderID.create(
-			Organisation.DEVIL_ORGANISATION_ID, VALUE_PROVIDER_CATEGORY_ID_TRADE_DOCUMENTS_INVOICE, "ByArticleType");
+			Organisation.DEV_ORGANISATION_ID, VALUE_PROVIDER_CATEGORY_ID_TRADE_DOCUMENTS_INVOICE, "ByArticleType");
 
 	public static final ValueProviderID VALUE_PROVIDER_ID_TRADE_DOCUMENTS_ORDER_BY_CUSTOMER = ValueProviderID.create(
-			Organisation.DEVIL_ORGANISATION_ID, VALUE_PROVIDER_CATEGORY_ID_TRADE_DOCUMENTS_ORDER, "ByOrder");
+			Organisation.DEV_ORGANISATION_ID, VALUE_PROVIDER_CATEGORY_ID_TRADE_DOCUMENTS_ORDER, "ByOrder");
 	public static final ValueProviderID VALUE_PROVIDER_ID_TRADE_DOCUMENTS_OFFER_BY_CUSTOMER = ValueProviderID.create(
-			Organisation.DEVIL_ORGANISATION_ID, VALUE_PROVIDER_CATEGORY_ID_TRADE_DOCUMENTS_OFFER, "ByOffer");
+			Organisation.DEV_ORGANISATION_ID, VALUE_PROVIDER_CATEGORY_ID_TRADE_DOCUMENTS_OFFER, "ByOffer");
 	public static final ValueProviderID VALUE_PROVIDER_ID_TRADE_DOCUMENTS_DELIVERY_NOTE_BY_CUSTOMER = ValueProviderID.create(
-			Organisation.DEVIL_ORGANISATION_ID, VALUE_PROVIDER_CATEGORY_ID_TRADE_DOCUMENTS_DELIVERY_NOTE, "ByDeliveryNote");
+			Organisation.DEV_ORGANISATION_ID, VALUE_PROVIDER_CATEGORY_ID_TRADE_DOCUMENTS_DELIVERY_NOTE, "ByDeliveryNote");
 	
 }

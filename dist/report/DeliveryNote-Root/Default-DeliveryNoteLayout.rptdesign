@@ -42,7 +42,7 @@ function isDynamicProduct(product) {
                     <property name="name">invoiceOrganisationID</property>
                     <property name="dataType">string</property>
                     <property name="position">1</property>
-                    <expression name="defaultValue">"devil.NightLabs.org"</expression>
+                    <expression name="defaultValue">"dev.jfire.org"</expression>
                     <property name="isInput">true</property>
                     <property name="isOutput">false</property>
                 </structure>
@@ -368,7 +368,7 @@ JFireReportingHelper.getJDOObject(row["productJDOID"]);</expression>
             <property name="dataSource">JFS-Datasource</property>
             <property name="queryText">&lt;queryPropertySet>&lt;org.nightlabs.jfire.reporting.oda.jfs.JFSQueryPropertySet>
   &lt;scriptRegistryItemID>
-    &lt;organisationID>devil.NightLabs.org&lt;/organisationID>
+    &lt;organisationID>dev.jfire.org&lt;/organisationID>
     &lt;scriptRegistryItemType>JFireReportingTrade-Scripting-ArticleContainerData&lt;/scriptRegistryItemType>
     &lt;scriptRegistryItemID>ArticleList&lt;/scriptRegistryItemID>
   &lt;/scriptRegistryItemID>

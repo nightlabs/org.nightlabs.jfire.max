@@ -446,7 +446,7 @@ function isDynamicProduct(productJDOID) {
             </list-property>
             <property name="queryText">&lt;queryPropertySet>&lt;org.nightlabs.jfire.reporting.oda.jfs.JFSQueryPropertySet>
   &lt;scriptRegistryItemID>
-    &lt;organisationID>devil.NightLabs.org&lt;/organisationID>
+    &lt;organisationID>dev.jfire.org&lt;/organisationID>
     &lt;scriptRegistryItemType>JFireReportingTrade-Scripting-ArticleContainerData&lt;/scriptRegistryItemType>
     &lt;scriptRegistryItemID>ArticleList&lt;/scriptRegistryItemID>
   &lt;/scriptRegistryItemID>

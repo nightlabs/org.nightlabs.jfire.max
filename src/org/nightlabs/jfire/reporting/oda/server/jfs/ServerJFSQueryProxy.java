@@ -144,7 +144,7 @@ public class ServerJFSQueryProxy extends AbstractJFSQueryProxy {
 	 * 	thrown when the script registry item referenced is not a Script (maybe a category).
 	 */
 	private static Script getScript(PersistenceManager pm, ScriptRegistryItemID itemID) {
-		if (!Organisation.DEVIL_ORGANISATION_ID.equals(itemID.organisationID))
+		if (!Organisation.DEV_ORGANISATION_ID.equals(itemID.organisationID))
 			itemID.organisationID = SecurityReflector.getUserDescriptor().getOrganisationID();
 			// TODO: does this make sense ?!?
 		return validateScriptRegistryItem((ScriptRegistryItem) pm.getObjectById(itemID));

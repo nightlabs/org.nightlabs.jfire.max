@@ -103,7 +103,7 @@ public class ReportInitializer {
 	 * @param jfsm The JFireServerManager to use
 	 * @param pm The PersistenceManager to use.
 	 * @param registryItemType is the type (identifier) for the reports in categories, sub-categories get the scriptRegistryItemType from their parent 
-	 * @param organisationID If you're writing a JFire Community Project, this is {@link Organisation#DEVIL_ORGANISATION_ID}.
+	 * @param organisationID If you're writing a JFire Community Project, this is {@link Organisation#DEV_ORGANISATION_ID}.
 	 */
 	public ReportInitializer(
 			String scriptSubDir, ReportCategory baseCategory, String reportRegistryItemType, 

@@ -31,7 +31,7 @@ public class ReportingConstants {
 	 * ValueProvider category for simple types like String, Intgeger etc.
 	 */
 	public static final ValueProviderCategoryID VALUE_PROVIDER_CATEGORY_ID_SIMPLE_TYPES = ValueProviderCategoryID.create(
-			Organisation.DEVIL_ORGANISATION_ID, 
+			Organisation.DEV_ORGANISATION_ID, 
 			"JFireReporting-ValueProviderCategory-SimpleTypes"
 		);
 	
@@ -39,7 +39,7 @@ public class ReportingConstants {
 	 * ValueProvider id for a value provider that queries a {@link String} from the user 
 	 */
 	public static final ValueProviderID VALUE_PROVIDER_ID_STRING = ValueProviderID.create(
-			Organisation.DEVIL_ORGANISATION_ID, 
+			Organisation.DEV_ORGANISATION_ID, 
 			ReportingConstants.VALUE_PROVIDER_CATEGORY_ID_SIMPLE_TYPES.valueProviderCategoryID, 
 			String.class.getName()
 		);
@@ -48,7 +48,7 @@ public class ReportingConstants {
 	 * ValueProvider id for a value provider that queries an {@link Integer} from the user 
 	 */
 	public static final ValueProviderID VALUE_PROVIDER_ID_INTEGER = ValueProviderID.create(
-			Organisation.DEVIL_ORGANISATION_ID, 
+			Organisation.DEV_ORGANISATION_ID, 
 			ReportingConstants.VALUE_PROVIDER_CATEGORY_ID_SIMPLE_TYPES.valueProviderCategoryID, 
 			Integer.class.getName()
 		);
@@ -57,7 +57,7 @@ public class ReportingConstants {
 	 * ValueProvider id for a value provider that queries an {@link BigDecimal} from the user 
 	 */
 	public static final ValueProviderID VALUE_PROVIDER_ID_BIG_DECIMAL = ValueProviderID.create(
-			Organisation.DEVIL_ORGANISATION_ID, 
+			Organisation.DEV_ORGANISATION_ID, 
 			ReportingConstants.VALUE_PROVIDER_CATEGORY_ID_SIMPLE_TYPES.valueProviderCategoryID, 
 			BigDecimal.class.getName()
 		);
@@ -66,7 +66,7 @@ public class ReportingConstants {
 	 * ValueProvider id for a value provider that queries a {@link Double} from the user 
 	 */
 	public static final ValueProviderID VALUE_PROVIDER_ID_DOUBLE = ValueProviderID.create(
-			Organisation.DEVIL_ORGANISATION_ID, 
+			Organisation.DEV_ORGANISATION_ID, 
 			ReportingConstants.VALUE_PROVIDER_CATEGORY_ID_SIMPLE_TYPES.valueProviderCategoryID, 
 			Double.class.getName()
 		);
@@ -75,7 +75,7 @@ public class ReportingConstants {
 	 * ValueProvider id for a value provider that queries a {@link Date} from the user 
 	 */
 	public static final ValueProviderID VALUE_PROVIDER_ID_DATE = ValueProviderID.create(
-			Organisation.DEVIL_ORGANISATION_ID, 
+			Organisation.DEV_ORGANISATION_ID, 
 			ReportingConstants.VALUE_PROVIDER_CATEGORY_ID_SIMPLE_TYPES.valueProviderCategoryID, 
 			Date.class.getName()
 		);
@@ -84,7 +84,7 @@ public class ReportingConstants {
 	 * ValueProvider id for a value provider that queries a {@link TimePeriod} from the user 
 	 */
 	public static final ValueProviderID VALUE_PROVIDER_ID_TIME_PERIOD = ValueProviderID.create(
-			Organisation.DEVIL_ORGANISATION_ID, 
+			Organisation.DEV_ORGANISATION_ID, 
 			ReportingConstants.VALUE_PROVIDER_CATEGORY_ID_SIMPLE_TYPES.valueProviderCategoryID, 
 			TimePeriod.class.getName()
 		);
@@ -94,7 +94,7 @@ public class ReportingConstants {
 	 * ValueProvider category for JFire objects like Users, UserGroups, Organisations etc. 
 	 */
 	public static final ValueProviderCategoryID VALUE_PROVIDER_CATEGORY_ID_JFIRE_OBJECTS = ValueProviderCategoryID.create(
-			Organisation.DEVIL_ORGANISATION_ID, 
+			Organisation.DEV_ORGANISATION_ID, 
 			"JFireReporting-ValueProviderCategory-JFireObjects"
 		);
 	
@@ -102,7 +102,7 @@ public class ReportingConstants {
 	 * ValueProvider id for a value provider that queries a {@link UserID} from the user 
 	 */
 	public static final ValueProviderID VALUE_PROVIDER_ID_USER = ValueProviderID.create(
-			Organisation.DEVIL_ORGANISATION_ID, 
+			Organisation.DEV_ORGANISATION_ID, 
 			ReportingConstants.VALUE_PROVIDER_CATEGORY_ID_JFIRE_OBJECTS.valueProviderCategoryID, 
 			User.class.getName()
 		);
@@ -111,7 +111,7 @@ public class ReportingConstants {
 	 * ValueProvider id for a value provider that queries a {@link UserID} for a {@link UserGroup} from the user 
 	 */
 	public static final ValueProviderID VALUE_PROVIDER_ID_USER_GROUP = ValueProviderID.create(
-			Organisation.DEVIL_ORGANISATION_ID, 
+			Organisation.DEV_ORGANISATION_ID, 
 			ReportingConstants.VALUE_PROVIDER_CATEGORY_ID_JFIRE_OBJECTS.valueProviderCategoryID, 
 			UserGroup.class.getName()
 		);
@@ -120,7 +120,7 @@ public class ReportingConstants {
 	 * ValueProvider id for a value provider that queries a {@link OrganisationID} from the user 
 	 */
 	public static final ValueProviderID VALUE_PROVIDER_ID_ORGANISATION = ValueProviderID.create(
-			Organisation.DEVIL_ORGANISATION_ID, 
+			Organisation.DEV_ORGANISATION_ID, 
 			ReportingConstants.VALUE_PROVIDER_CATEGORY_ID_JFIRE_OBJECTS.valueProviderCategoryID, 
 			Organisation.class.getName()
 		);
@@ -129,7 +129,7 @@ public class ReportingConstants {
 	 * ValueProvider id for a value provider that queries a {@link WorkstationID} from the user 
 	 */
 	public static final ValueProviderID VALUE_PROVIDER_ID_WORKSTATION = ValueProviderID.create(
-			Organisation.DEVIL_ORGANISATION_ID, 
+			Organisation.DEV_ORGANISATION_ID, 
 			ReportingConstants.VALUE_PROVIDER_CATEGORY_ID_JFIRE_OBJECTS.valueProviderCategoryID, 
 			Workstation.class.getName()
 		);

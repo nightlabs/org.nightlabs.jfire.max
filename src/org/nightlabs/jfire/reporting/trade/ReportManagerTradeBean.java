@@ -171,7 +171,7 @@ implements SessionBean
 
 			initializeReportParameterAcquisition(pm);
 
-			// better have the layouts for the local organisation, than for the devil organisation			
+			// better have the layouts for the local organisation, than for the dev organisation			
 			ReportingInitialiser.initialise(pm, jfireServerManager, getOrganisationID()); 
 
 			ConfigModuleInitialiserID initialiserID = ReportLayoutCfModInitialiserArticleContainerLayouts.getConfigModuleInitialiserID(getOrganisationID());

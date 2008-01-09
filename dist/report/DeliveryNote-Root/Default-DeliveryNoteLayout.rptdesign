@@ -325,7 +325,7 @@ JFireReportingHelper.getJDOObject(row["productJDOID"]);</expression>
                     </structure>
                     <structure>
                         <property name="position">26</property>
-                        <property name="name">${devilOrganisationIDConverted}/__Total__</property>
+                        <property name="name">${devOrganisationIDConverted}/__Total__</property>
                         <property name="dataType">float</property>
                     </structure>
                     <structure>
@@ -946,8 +946,8 @@ JFireReportingHelper.createDataSetParam(params["articleContainerID"])</expressio
                     <property name="dataType">string</property>
                 </structure>
                 <structure>
-                    <property name="name">${devilOrganisationIDConverted}/__Total__</property>
-                    <expression name="expression">dataSetRow["${devilOrganisationIDConverted}/__Total__"]</expression>
+                    <property name="name">${devOrganisationIDConverted}/__Total__</property>
+                    <expression name="expression">dataSetRow["${devOrganisationIDConverted}/__Total__"]</expression>
                     <property name="dataType">float</property>
                 </structure>
                 <structure>
@@ -987,7 +987,7 @@ JFireReportingHelper.createDataSetParam(params["articleContainerID"])</expressio
                 </structure>
                 <structure>
                     <property name="name">SumTotal</property>
-                    <expression name="expression">Total.sum(dataSetRow["${devilOrganisationIDConverted}/__Total__"])</expression>
+                    <expression name="expression">Total.sum(dataSetRow["${devOrganisationIDConverted}/__Total__"])</expression>
                     <property name="dataType">float</property>
                 </structure>
                 <structure>
@@ -1132,7 +1132,7 @@ ObjectIDUtil.longObjectIDFieldToString(row["articleID"])</expression>
                                 <property name="pattern">###0.00</property>
                             </structure>
                             <property name="textAlign">right</property>
-                            <property name="resultSetColumn">${devilOrganisationIDConverted}/__Total__</property>
+                            <property name="resultSetColumn">${devOrganisationIDConverted}/__Total__</property>
                         </data>
                     </cell>
                     <cell id="178">
@@ -1155,7 +1155,7 @@ ObjectIDUtil.longObjectIDFieldToString(row["articleID"])</expression>
                                 <property name="pattern">Fixed</property>
                             </structure>
                             <property name="textAlign">right</property>
-                            <property name="resultSetColumn">${devilOrganisationIDConverted}/__Total__</property>
+                            <property name="resultSetColumn">${devOrganisationIDConverted}/__Total__</property>
                         </data>
                     </cell>
                     <cell id="161">
@@ -1235,7 +1235,7 @@ ObjectIDUtil.longObjectIDFieldToString(row["articleID"])</expression>
                                 <property name="pattern">###0.00</property>
                             </structure>
                             <property name="textAlign">right</property>
-                            <property name="resultSetColumn">${devilOrganisationIDConverted}/__Total__</property>
+                            <property name="resultSetColumn">${devOrganisationIDConverted}/__Total__</property>
                         </data>
                     </cell>
                     <cell id="200">

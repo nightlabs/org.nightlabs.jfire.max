@@ -411,8 +411,8 @@ public class ReportingInitialiser {
 	 * <ul>
 	 * <li>${rootOrganisationID}</li>
 	 * <li>${rootOrganisationIDConverted}</li>
-	 * <li>${devilOrganisationID}</li>
-	 * <li>${devilOrganisationIDConverted}</li>
+	 * <li>${devOrganisationID}</li>
+	 * <li>${devOrganisationIDConverted}</li>
 	 * </ul>
 	 * </p> 
 	 * @param reportFile The template file to replace the variables in 
@@ -430,8 +430,8 @@ public class ReportingInitialiser {
 			try {
 				variables.put("rootOrganisationID", rootOrganisationID);
 				variables.put("rootOrganisationIDConverted", convertToReportColumnString(rootOrganisationID));
-				variables.put("devilOrganisationID", Organisation.DEV_ORGANISATION_ID);
-				variables.put("devilOrganisationIDConverted", convertToReportColumnString(Organisation.DEV_ORGANISATION_ID));
+				variables.put("devOrganisationID", Organisation.DEV_ORGANISATION_ID);
+				variables.put("devOrganisationIDConverted", convertToReportColumnString(Organisation.DEV_ORGANISATION_ID));
 			} finally {
 				ctx.close();
 			}

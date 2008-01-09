@@ -202,7 +202,7 @@ implements SessionBean
 			SimpleProductTypeStruct.getSimpleProductTypeStruct(organisationID, pm);
 
 			SimpleProductTypeActionHandler simpleProductTypeActionHandler = new SimpleProductTypeActionHandler(
-					Organisation.DEVIL_ORGANISATION_ID, SimpleProductTypeActionHandler.class.getName(), SimpleProductType.class);
+					Organisation.DEV_ORGANISATION_ID, SimpleProductTypeActionHandler.class.getName(), SimpleProductType.class);
 			simpleProductTypeActionHandler = pm.makePersistent(simpleProductTypeActionHandler);
 
 			Store store = Store.getStore(pm);
@@ -319,7 +319,7 @@ implements SessionBean
 //						"		null,\n" +
 //						"		null,\n" +
 //						"		null,\n" +
-//						"		\""+Organisation.DEVIL_ORGANISATION_ID+"/_Total_\"\n" +
+//						"		\""+Organisation.DEV_ORGANISATION_ID+"/_Total_\"\n" +
 //						"	)\n" +
 //						") / 1.16;");
 //				fallbackFormulaCell.setFormula(vatVal, "cell.resolvePriceCellsAmount(\n" +
@@ -328,7 +328,7 @@ implements SessionBean
 //						"		null,\n" +
 //						"		null,\n" +
 //						"		null,\n" +
-//						"		\""+Organisation.DEVIL_ORGANISATION_ID+"/_Total_\"\n" +
+//						"		\""+Organisation.DEV_ORGANISATION_ID+"/_Total_\"\n" +
 //						"	)\n" +
 //						")\n" +
 //
@@ -385,7 +385,7 @@ implements SessionBean
 //				formulaPriceConfig.getName().setText(langID, "Car Part - Wheel");
 //				fallbackFormulaCell = formulaPriceConfig.createFallbackFormulaCell();
 //				fallbackFormulaCell.setFormula(
-//						Organisation.DEVIL_ORGANISATION_ID,
+//						Organisation.DEV_ORGANISATION_ID,
 //						PriceFragmentType.TOTAL_PRICEFRAGMENTTYPEID,
 //						"cell.resolvePriceCellsAmount(\n" +
 //						"	new AbsolutePriceCoordinate(\n" +
@@ -403,7 +403,7 @@ implements SessionBean
 //						"		null,\n" +
 //						"		null,\n" +
 //						"		null,\n" +
-//						"		\""+Organisation.DEVIL_ORGANISATION_ID+"/_Total_\"\n" +
+//						"		\""+Organisation.DEV_ORGANISATION_ID+"/_Total_\"\n" +
 //						"	)\n"+
 //						") / 1.16;");
 //				fallbackFormulaCell.setFormula(vatVal, "cell.resolvePriceCellsAmount(\n" +
@@ -412,7 +412,7 @@ implements SessionBean
 //						"		null,\n" +
 //						"		null,\n" +
 //						"		null,\n" +
-//						"		\""+Organisation.DEVIL_ORGANISATION_ID+"/_Total_\"\n" +
+//						"		\""+Organisation.DEV_ORGANISATION_ID+"/_Total_\"\n" +
 //						"	)\n"+
 //						")\n" +
 //						
@@ -912,7 +912,7 @@ implements SessionBean
 
 			// TODO remove this JPOX WORKAROUND! getting sometimes:
 //			Caused by: javax.jdo.JDOUserException: Cannot read fields from a deleted object
-//			FailedObject:jdo/org.nightlabs.jfire.accounting.id.PriceFragmentID?organisationID=chezfrancois.jfire.org&priceConfigID=9&priceID=232&priceFragmentTypePK=devil.NightLabs.org%2F_Total_
+//			FailedObject:jdo/org.nightlabs.jfire.accounting.id.PriceFragmentID?organisationID=chezfrancois.jfire.org&priceConfigID=9&priceID=232&priceFragmentTypePK=dev.jfire.org%2F_Total_
 //			        at org.jpox.state.jdo.PersistentNewDeleted.transitionReadField(PersistentNewDeleted.java:105)
 //			        at org.jpox.state.StateManagerImpl.transitionReadField(StateManagerImpl.java:3394)
 //			        at org.jpox.state.StateManagerImpl.isLoaded(StateManagerImpl.java:1982)

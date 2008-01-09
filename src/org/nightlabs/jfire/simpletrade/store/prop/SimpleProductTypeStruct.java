@@ -89,7 +89,7 @@ public class SimpleProductTypeStruct {
 
 	// *************** STANDARD StructBlocks StructField IDs ***************************
 
-	public static final String DEVIL_ORGANISATION_ID = Organisation.DEVIL_ORGANISATION_ID;
+	public static final String DEVIL_ORGANISATION_ID = Organisation.DEV_ORGANISATION_ID;
 
 	public static final StructBlockID DESCRIPTION = StructBlockID.create(DEVIL_ORGANISATION_ID,"SimpleProductType.description");
 	public static final StructFieldID DESCRIPTION_SHORT = StructFieldID.create(DESCRIPTION,"Short");

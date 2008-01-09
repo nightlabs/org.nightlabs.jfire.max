@@ -89,13 +89,13 @@ public class SimpleProductTypeStruct {
 
 	// *************** STANDARD StructBlocks StructField IDs ***************************
 
-	public static final String DEVIL_ORGANISATION_ID = Organisation.DEV_ORGANISATION_ID;
+	public static final String DEV_ORGANISATION_ID = Organisation.DEV_ORGANISATION_ID;
 
-	public static final StructBlockID DESCRIPTION = StructBlockID.create(DEVIL_ORGANISATION_ID,"SimpleProductType.description");
+	public static final StructBlockID DESCRIPTION = StructBlockID.create(DEV_ORGANISATION_ID,"SimpleProductType.description");
 	public static final StructFieldID DESCRIPTION_SHORT = StructFieldID.create(DESCRIPTION,"Short");
 	public static final StructFieldID DESCRIPTION_LONG = StructFieldID.create(DESCRIPTION,"Long");
 
-	public static final StructBlockID IMAGES = StructBlockID.create(DEVIL_ORGANISATION_ID,"SimpleProductType.images");
+	public static final StructBlockID IMAGES = StructBlockID.create(DEV_ORGANISATION_ID,"SimpleProductType.images");
 	public static final StructFieldID IMAGES_SMALL_IMAGE = StructFieldID.create(IMAGES,"SmallImage");
 	public static final StructFieldID IMAGES_LARGE_IMAGE = StructFieldID.create(IMAGES,"LargeImage");
 	

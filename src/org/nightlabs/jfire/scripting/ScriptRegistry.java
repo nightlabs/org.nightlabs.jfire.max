@@ -265,7 +265,7 @@ implements Serializable
 	/**
 	 * Searches a script for the given type and id. If multiple scripts are found with the
 	 * same id, it uses first the one with the local organisation id, second the one of
-	 * the root organisation and third the devil organisation description. If none of them
+	 * the root organisation and third the dev organisation description. If none of them
 	 * matches, because two (or more) other organisations have conflicting ids, an exception is thrown,
 	 * because the result would otherwise be arbitrary and might change from method call to method call.
 	 *
@@ -324,7 +324,7 @@ implements Serializable
 		if (script != null)
 			return script;
 
-		throw new IllegalStateException("Have multiple scripts for scriptRegistryItemType=\"" + scriptRegistryItemType + "\" and scriptRegistryItemID=\"" + scriptRegistryItemID + "\" and they do neither come from the root nor from the devil organisation!");
+		throw new IllegalStateException("Have multiple scripts for scriptRegistryItemType=\"" + scriptRegistryItemType + "\" and scriptRegistryItemID=\"" + scriptRegistryItemID + "\" and they do neither come from the root nor from the dev organisation!");
 	}
 	
 	public Collection<String> getRegisteredLanguages() {

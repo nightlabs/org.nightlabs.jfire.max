@@ -76,11 +76,11 @@ implements Serializable
 		return IDGenerator.nextID(Product.class);
 	}
 
-	/**
-	 * @jdo.field persistence-modifier="persistent"
-	 * @jdo.column length="120"
-	 */
-	private String primaryKey;
+//	/**
+//	 * @jdo.field persistence-modifier="persistent"
+//	 * @jdo.column length="120"
+//	 */
+//	private String primaryKey;
 
 	/**
 	 * @jdo.field persistence-modifier="persistent"
@@ -117,7 +117,7 @@ implements Serializable
 		this.productType = productType;
 		this.organisationID = productType.getOrganisationID();
 		this.productID = productID;
-		this.primaryKey = getPrimaryKey(organisationID, productID);
+//		this.primaryKey = getPrimaryKey(organisationID, productID);
 	}
 
 	protected void setProductLocal(ProductLocal productLocal)
@@ -158,7 +158,8 @@ implements Serializable
 	 */
 	public String getPrimaryKey()
 	{
-		return primaryKey;
+		return getPrimaryKey(organisationID, productID);
+//		return primaryKey;
 	}
 	/**
 	 * @return Returns the productType.

@@ -38,6 +38,7 @@ import javax.jdo.JDOHelper;
 import javax.jdo.PersistenceManager;
 
 import org.nightlabs.jfire.accounting.Account;
+import org.nightlabs.jfire.accounting.AccountType;
 import org.nightlabs.jfire.accounting.Accounting;
 import org.nightlabs.jfire.accounting.Invoice;
 import org.nightlabs.jfire.accounting.InvoiceMoneyTransfer;
@@ -113,7 +114,8 @@ public class PartnerAccountant extends Accountant
 		// create IntraLegalEntityMoneyTransfer from PartnerAccount(AsDebitor) to mandator (or <->)
 		// determine the direction
 		if (mandatorIsCustomer) {
-			Account customerPartnerAccount = accounting.getPartnerAccount(Account.ANCHOR_TYPE_ID_PARTNER_CUSTOMER, mandator, transfer.getInvoice().getCurrency()); 
+			AccountType accountType = (AccountType) getPersistenceManager().getObjectById(AccountType.ACCOUNT_TYPE_ID_PARTNER_CUSTOMER);
+			Account customerPartnerAccount = accounting.getPartnerAccount(accountType, mandator, transfer.getInvoice().getCurrency()); 
 			if (mandatorIsTransferFrom) {
 				createTransferFrom = customerPartnerAccount;
 				createTransferTo = mandator;
@@ -125,7 +127,8 @@ public class PartnerAccountant extends Accountant
 		}
 		else {
 			// if (mandatorIsVendor)
-			Account vendorPartnerAccount = accounting.getPartnerAccount(Account.ANCHOR_TYPE_ID_PARTNER_VENDOR, mandator, transfer.getInvoice().getCurrency());
+			AccountType accountType = (AccountType) getPersistenceManager().getObjectById(AccountType.ACCOUNT_TYPE_ID_PARTNER_VENDOR);
+			Account vendorPartnerAccount = accounting.getPartnerAccount(accountType, mandator, transfer.getInvoice().getCurrency());
 			if (mandatorIsTransferFrom) {
 				createTransferFrom = vendorPartnerAccount;
 				createTransferTo = mandator;
@@ -203,20 +206,26 @@ public class PartnerAccountant extends Accountant
 		if (partnerTransferFrom) {
 			to = partner;
 			// Local Accounting is paying
-			if (partnerIsInvoiceVendor(partner, invoice))				
-				from = accounting.getPartnerAccount(Account.ANCHOR_TYPE_ID_PARTNER_VENDOR, partner, transfer.getCurrency());
+			if (partnerIsInvoiceVendor(partner, invoice)) {
+				AccountType accountType = (AccountType) getPersistenceManager().getObjectById(AccountType.ACCOUNT_TYPE_ID_PARTNER_VENDOR);
+				from = accounting.getPartnerAccount(accountType, partner, transfer.getCurrency());
+			}
 			else {
 //				amountToPay *= -1; // TODO korrekt?
-				from = accounting.getPartnerAccount(Account.ANCHOR_TYPE_ID_PARTNER_CUSTOMER, partner, transfer.getCurrency());
+				AccountType accountType = (AccountType) getPersistenceManager().getObjectById(AccountType.ACCOUNT_TYPE_ID_PARTNER_CUSTOMER);
+				from = accounting.getPartnerAccount(accountType, partner, transfer.getCurrency());
 			}
 		}
 		else {
 			from = partner;
-			if (!partnerIsInvoiceVendor(partner, invoice))
-				to = accounting.getPartnerAccount(Account.ANCHOR_TYPE_ID_PARTNER_CUSTOMER, partner, transfer.getCurrency());
+			if (!partnerIsInvoiceVendor(partner, invoice)) {
+				AccountType accountType = (AccountType) getPersistenceManager().getObjectById(AccountType.ACCOUNT_TYPE_ID_PARTNER_CUSTOMER);
+				to = accounting.getPartnerAccount(accountType, partner, transfer.getCurrency());
+			}
 			else {
 //				amountToPay *= -1; // TODO korrekt?
-				to = accounting.getPartnerAccount(Account.ANCHOR_TYPE_ID_PARTNER_VENDOR, partner, transfer.getCurrency());
+				AccountType accountType = (AccountType) getPersistenceManager().getObjectById(AccountType.ACCOUNT_TYPE_ID_PARTNER_VENDOR);
+				to = accounting.getPartnerAccount(accountType, partner, transfer.getCurrency());
 			}
 		}
 
@@ -687,11 +696,13 @@ public class PartnerAccountant extends Accountant
 			if (capital > 0) {
 				amountToTransfer = capital;
 				from = partner;
-				to = accounting.getPartnerAccount(Account.ANCHOR_TYPE_ID_PARTNER_NEUTRAL, partner, payMoneyTransfer.getCurrency());
+				AccountType accountType = (AccountType) getPersistenceManager().getObjectById(AccountType.ACCOUNT_TYPE_ID_PARTNER_NEUTRAL);
+				to = accounting.getPartnerAccount(accountType, partner, payMoneyTransfer.getCurrency());
 			}
 			else {
 				amountToTransfer = -capital;
-				from = accounting.getPartnerAccount(Account.ANCHOR_TYPE_ID_PARTNER_NEUTRAL, partner, payMoneyTransfer.getCurrency());
+				AccountType accountType = (AccountType) getPersistenceManager().getObjectById(AccountType.ACCOUNT_TYPE_ID_PARTNER_NEUTRAL);
+				from = accounting.getPartnerAccount(accountType, partner, payMoneyTransfer.getCurrency());
 				to = partner;
 			}
 

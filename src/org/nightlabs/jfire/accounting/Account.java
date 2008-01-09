@@ -28,6 +28,7 @@ package org.nightlabs.jfire.accounting;
 
 import java.util.Collection;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Map;
@@ -35,6 +36,7 @@ import java.util.Set;
 
 import javax.jdo.JDOHelper;
 import javax.jdo.PersistenceManager;
+import javax.jdo.Query;
 
 import org.nightlabs.jfire.security.User;
 import org.nightlabs.jfire.trade.LegalEntity;
@@ -57,7 +59,13 @@ import org.nightlabs.jfire.transfer.Transfer;
  * @jdo.fetch-group name="Account.currency" fields="currency"
  * @jdo.fetch-group name="Account.name" fields="name"
  * @jdo.fetch-group name="Account.summaryAccounts" fields="summaryAccounts"
- * @jdo.fetch-group name="Account.this" fetch-groups="default, Anchor.this" fields="owner, currency, name, summaryAccounts"
+ * @jdo.fetch-group name="Account.accountType" fields="accountType"
+ * @jdo.fetch-group name="Account.this" fetch-groups="default, Anchor.this" fields="owner, currency, accountType, name, summaryAccounts"
+ *
+ * @jdo.query
+ *		name="getAccountsForAccountTypeAndOwnerAndCurrency"
+ *		query="SELECT
+ *				WHERE this.accountType == :accountType && this.owner == :owner && this.currency == :currency"
  */
 public class Account extends Anchor
 {
@@ -67,61 +75,78 @@ public class Account extends Anchor
 	public static final String FETCH_GROUP_CURRENCY = "Account.currency";
 	public static final String FETCH_GROUP_NAME = "Account.name";
 	public static final String FETCH_GROUP_SUMMARY_ACCOUNTS = "Account.summaryAccounts";
+	public static final String FETCH_GROUP_ACCOUNT_TYPE = "Account.accountType";
 	public static final String FETCH_GROUP_THIS_ACCOUNT = "Account.this";
-	
+
+	@SuppressWarnings("unchecked")
+	public static Collection<? extends Account> getAccounts(PersistenceManager pm, AccountType accountType, LegalEntity owner, Currency currency)
+	{
+		Query q = pm.newNamedQuery(Account.class, "getAccountsForAccountTypeAndOwnerAndCurrency");
+		Map<String, Object> params = new HashMap<String, Object>(3);
+		params.put("accountType", accountType);
+		params.put("owner", owner);
+		params.put("currency", currency);
+		return (Collection<? extends Account>) q.executeWithMap(params);
+	}
+
+////	/**
+////	 * anchorTypeID for normal accounts of the Local organisation
+////	 *
+////	 * @deprecated This type will be deleted very soon. It must be one of
+////	 *		{@link #ANCHOR_TYPE_ID_LOCAL_REVENUE}, {@link #ANCHOR_TYPE_ID_LOCAL_REVENUE_OUT} or
+////	 *		{@link #ANCHOR_TYPE_ID_LOCAL_EXPENSE} instead!
+////	 */
+////	public static final String ANCHOR_TYPE_ID_LOCAL_NORMAL = "Account.Local.Normal";
+//
 //	/**
-//	 * anchorTypeID for normal accounts of the Local organisation
+//	 * anchorTypeID for revenue accounts of the local organisation.
 //	 *
-//	 * @deprecated This type will be deleted very soon. It must be one of
-//	 *		{@link #ANCHOR_TYPE_ID_LOCAL_REVENUE}, {@link #ANCHOR_TYPE_ID_LOCAL_REVENUE_OUT} or
-//	 *		{@link #ANCHOR_TYPE_ID_LOCAL_EXPENSE} instead!
+//	 * @see #ANCHOR_TYPE_ID_LOCAL_EXPENSE
+//	 * @see #setRevenueInAccount(Account)
+//	 * @see #setRevenueOutAccount(Account)
 //	 */
-//	public static final String ANCHOR_TYPE_ID_LOCAL_NORMAL = "Account.Local.Normal";
-
-	/**
-	 * anchorTypeID for revenue accounts of the local organisation.
-	 *
-	 * @see #ANCHOR_TYPE_ID_LOCAL_EXPENSE
-	 * @see #setRevenueInAccount(Account)
-	 * @see #setRevenueOutAccount(Account)
-	 */
-	public static final String ANCHOR_TYPE_ID_LOCAL_REVENUE = "Account.Local.Revenue";
-//	public static final String ANCHOR_TYPE_ID_LOCAL_REVENUE_IN = "Account.Local.Revenue.In";
-
+//	public static final String ANCHOR_TYPE_ID_LOCAL_REVENUE = "Account.Local.Revenue";
+////	public static final String ANCHOR_TYPE_ID_LOCAL_REVENUE_IN = "Account.Local.Revenue.In";
+//
+////	/**
+////	 * anchorTypeID for revenue accounts of the local organisation, but solely as a split account for money that's
+////	 * forwarded to a cost-account. Revenues will - despite of the name - not be deposited on an account with this type,
+////	 * but rather on the corresponding revenue-in account.
+////	 */
+////	public static final String ANCHOR_TYPE_ID_LOCAL_REVENUE_OUT = "Account.Local.Revenue.Out";
+//
 //	/**
-//	 * anchorTypeID for revenue accounts of the local organisation, but solely as a split account for money that's
-//	 * forwarded to a cost-account. Revenues will - despite of the name - not be deposited on an account with this type,
-//	 * but rather on the corresponding revenue-in account.
+//	 * anchorTypeID for expense accounts of the Local organisation
 //	 */
-//	public static final String ANCHOR_TYPE_ID_LOCAL_REVENUE_OUT = "Account.Local.Revenue.Out";
-
-	/**
-	 * anchorTypeID for expense accounts of the Local organisation
-	 */
-	public static final String ANCHOR_TYPE_ID_LOCAL_EXPENSE = "Account.Local.Expense";
-
-	/**
-	 * anchorTypeID for accounts of trading partners when they acting as vendor
-	 */
-	public static final String ANCHOR_TYPE_ID_PARTNER_VENDOR = "Account.Partner.Vendor";
+//	public static final String ANCHOR_TYPE_ID_LOCAL_EXPENSE = "Account.Local.Expense";
+//
+//	/**
+//	 * anchorTypeID for accounts of trading partners when they acting as vendor
+//	 */
+//	public static final String ANCHOR_TYPE_ID_PARTNER_VENDOR = "Account.Partner.Vendor";
+//	
+//	/**
+//	 * anchorTypeID for accounts of trading partners when they acting as customer
+//	 */
+//	public static final String ANCHOR_TYPE_ID_PARTNER_CUSTOMER = "Account.Partner.Customer";
+//
+//	/**
+//	 * anchorTypeID for accounts of trading partners when they overpay multiple invoices and
+//	 * it cannot be determined whether the partner is a customer or a vendor.
+//	 */
+//	public static final String ANCHOR_TYPE_ID_PARTNER_NEUTRAL = "Account.Partner.Neutral";
+//
+//	/**
+//	 * anchorTypeID for accounts that are used during payment. They represent money that's outside
+//	 * the organisation (means paid to a partner), hence their {@link #isOutside()} property is <code>true</code>.
+//	 */
+//	public static final String ANCHOR_TYPE_ID_OUTSIDE = "Account.Outside";
+////	public static final String ANCHOR_TYPE_ID_PAYMENT = "Account.Payment";
 	
 	/**
-	 * anchorTypeID for accounts of trading partners when they acting as customer
+	 * @jdo.field persistence-modifier="persistent" 
 	 */
-	public static final String ANCHOR_TYPE_ID_PARTNER_CUSTOMER = "Account.Partner.Customer";
-
-	/**
-	 * anchorTypeID for accounts of trading partners when they overpay multiple invoices and
-	 * it cannot be determined whether the partner is a customer or a vendor.
-	 */
-	public static final String ANCHOR_TYPE_ID_PARTNER_NEUTRAL = "Account.Partner.Neutral";
-
-	/**
-	 * anchorTypeID for accounts that are used during payment. They represent money that's outside
-	 * the organisation (means paid to a partner), hence their {@link #isOutside()} property is <code>true</code>.
-	 */
-	public static final String ANCHOR_TYPE_ID_OUTSIDE = "Account.Outside";
-//	public static final String ANCHOR_TYPE_ID_PAYMENT = "Account.Payment";
+	private AccountType accountType;
 
 	/**
 	 * @jdo.field persistence-modifier="persistent"
@@ -138,27 +163,38 @@ public class Account extends Anchor
 //	private Accountant accountant = null;
 //	private boolean statistical;
 
-	/**
-	 * Whether or not this Repository represents sth. outside.
-	 *
-	 * @jdo.field persistence-modifier="persistent"
-	 */
-	private boolean outside;
+//	/**
+//	 * Whether or not this Repository represents sth. outside.
+//	 *
+//	 * @jdo.field persistence-modifier="persistent"
+//	 */
+//	private boolean outside;
 
+	/**
+	 * @deprecated Only for JDO!
+	 */
 	protected Account() { }
 
-	public Account(String organisationID, String anchorTypeID, String anchorID, LegalEntity owner, Currency currency, boolean outside) {
-		super(organisationID, anchorTypeID, anchorID);
+	public static final String ANCHOR_TYPE_ID_ACCOUNT = "Account";
+
+	public Account(String organisationID, String anchorID, AccountType accountType, LegalEntity owner, Currency currency) {
+		super(organisationID, ANCHOR_TYPE_ID_ACCOUNT, anchorID);
+
+		if (accountType == null)
+			throw new IllegalArgumentException("accountType must not be null!");
+
+		if (owner == null)
+			throw new IllegalArgumentException("owner must not be null!");
 
 		if (currency == null)
-			throw new NullPointerException("currency must not be null!");
+			throw new IllegalArgumentException("currency must not be null!");
 
+		this.accountType = accountType;
 		this.currency = currency;
 		this.owner = owner;
 		this.name = new AccountName(this);
 		this.summaryAccounts = new HashSet<SummaryAccount>();
-		this.outside = outside;
-		// TODO: What about an accountType (Erlös/Aufwandt) - isn't this realised now with REVENUE_IN/REVENUE_OUT/COST?
+//		this.outside = outside;
 	}
 //	/**
 //	 * The accountant who is responsible for MoneyTransfers from and to this Account. The Accountant
@@ -170,8 +206,7 @@ public class Account extends Anchor
 //	{
 //		return accountant;
 //	}
-	
-	
+
 	/**
 	 * @jdo.field persistence-modifier="persistent" dependent="true" mapped-by="account"
 	 */
@@ -180,8 +215,12 @@ public class Account extends Anchor
 	public AccountName getName() {
 		return name;
 	}
-	
-	
+
+	public AccountType getAccountType()
+	{
+		return accountType;
+	}
+
 	/**
 	 * The balance in the smallest unit available in the Currency of this Account. This is e.g.
 	 * Cent for EUR.
@@ -524,8 +563,8 @@ public class Account extends Anchor
 //		return revenueOutAccount;
 //	}
 
-	public boolean isOutside()
-	{
-		return outside;
-	}
+//	public boolean isOutside()
+//	{
+//		return outside;
+//	}
 }

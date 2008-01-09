@@ -41,6 +41,7 @@ import javax.jdo.Query;
 import javax.jdo.listener.DetachCallback;
 
 import org.nightlabs.jfire.accounting.Account;
+import org.nightlabs.jfire.accounting.AccountType;
 import org.nightlabs.jfire.accounting.Accounting;
 import org.nightlabs.jfire.accounting.Currency;
 import org.nightlabs.jfire.accounting.pay.id.ModeOfPaymentFlavourID;
@@ -439,26 +440,27 @@ implements Serializable, DetachCallback
 		LegalEntity partner = payment.getPartner();
 		Currency currency = payment.getCurrency();
 
-		String accountID = accountIDPrefix + '.' + currency.getCurrencyID();
+		String accountID = "outside#" + accountIDPrefix + '#' + currency.getCurrencyID();
 		if (individualAccount)
-			accountID = accountID + '-' + partner.getOrganisationID() + '.' + partner.getAnchorTypeID() + '.' + partner.getAnchorID();
+			accountID = accountID + '#' + partner.getOrganisationID() + '#' + partner.getAnchorTypeID() + '#' + partner.getAnchorID();
 
 		Account account;
 		try {
 			pm.getExtent(Account.class);
 			account = (Account) pm.getObjectById(AnchorID.create(organisationID,
-					Account.ANCHOR_TYPE_ID_OUTSIDE,
+					Account.ANCHOR_TYPE_ID_ACCOUNT,
 					accountID));
 		} catch (JDOObjectNotFoundException x) {
 //			OrganisationLegalEntity organisationLegalEntity = OrganisationLegalEntity
 //					.getOrganisationLegalEntity(pm, organisationID, Account.ANCHOR_TYPE_ID_OUTSIDE, true);
+			AccountType accountType = (AccountType) pm.getObjectById(AccountType.ACCOUNT_TYPE_ID_OUTSIDE);
+
 			account = new Account(
 					organisationID,
-					Account.ANCHOR_TYPE_ID_OUTSIDE,
 					accountID,
+					accountType,
 					partner,
-					currency,
-					true);
+					currency);
 			pm.makePersistent(account);
 		}
 		return account;

@@ -33,50 +33,51 @@ import org.nightlabs.i18n.I18nText;
 
 /**
  * @author Alexander Bieber <alex[AT]nightlabs[DOT]de>
- * 
+ * @author marco schulze - marco at nightlabs dot de
+ *
  * @jdo.persistence-capable
  *		identity-type="application"
- *		objectid-class="org.nightlabs.jfire.accounting.id.PriceFragmentTypeNameID"
+ *		objectid-class="org.nightlabs.jfire.accounting.id.AccountTypeNameID"
  *		detachable="true"
- *		table="JFireTrade_PriceFragmentTypeName"
+ *		table="JFireTrade_AccountTypeName"
  *
  * @jdo.inheritance strategy="new-table"
  * 
  * @jdo.create-objectid-class
- *		field-order="organisationID, priceFragmentTypeID"
+ *		field-order="organisationID, accountTypeID"
  *
- * @jdo.fetch-group name="FetchGroupsPriceConfig.edit" fields="priceFragmentType, names"
+ * @jdo.fetch-group name="AccountType.name" fields="accountType, names"
  */
-public class PriceFragmentTypeName extends I18nText
+public class AccountTypeName extends I18nText
 {
 	private static final long serialVersionUID = 1L;
 	/**
 	 * @jdo.field primary-key="true"
 	 * @jdo.column length="100"
 	 */
-	private String organisationID; 
+	private String organisationID;
 	/**
 	 * @jdo.field primary-key="true"
 	 * @jdo.column length="100"
 	 */
-	private String priceFragmentTypeID;
-	
+	private String accountTypeID;
+
 	/**
 	 * @jdo.field persistence-modifier="persistent"
 	 */
-	private PriceFragmentType priceFragmentType;
+	private AccountType accountType;
 
 	/**
 	 * @deprecated Only for JDO!
 	 */
 	@Deprecated
-	protected PriceFragmentTypeName() {
+	protected AccountTypeName() {
 	}
 
-	public PriceFragmentTypeName(PriceFragmentType priceFragmentType) {
-		this.priceFragmentType = priceFragmentType;
-		this.organisationID = priceFragmentType.getOrganisationID();
-		this.priceFragmentTypeID = priceFragmentType.getPriceFragmentTypeID();
+	public AccountTypeName(AccountType accountType) {
+		this.accountType = accountType;
+		this.organisationID = accountType.getOrganisationID();
+		this.accountTypeID = accountType.getAccountTypeID();
 		this.names = new HashMap<String, String>();
 	}
 
@@ -90,7 +91,7 @@ public class PriceFragmentTypeName extends I18nText
 	 *		key-type="java.lang.String"
 	 *		value-type="java.lang.String"
 	 *		default-fetch-group="true"
-	 *		table="JFireTrade_PriceFragmentTypeName_names"
+	 *		table="JFireTrade_AccountTypeName_names"
 	 *		null-value="exception"
 	 *
 	 * @jdo.join
@@ -110,19 +111,19 @@ public class PriceFragmentTypeName extends I18nText
 	 */
 	@Override
 	protected String getFallBackValue(String languageID) {
-		return priceFragmentTypeID;
+		return accountTypeID;
 	}
 
 	public String getOrganisationID() {
 		return organisationID;
 	}
 
-	public String getPriceFragmentTypeID() {
-		return priceFragmentTypeID;
+	public String getAccountTypeID() {
+		return accountTypeID;
 	}
 
-	public PriceFragmentType getPriceFragmentType()
+	public AccountType getAccountType()
 	{
-		return priceFragmentType;
+		return accountType;
 	}
 }

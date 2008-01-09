@@ -54,15 +54,17 @@ public class SummaryAccount extends Account
 {
 	private static final long serialVersionUID = 1L;
 
-	/**
-	 * anchorTypeID for {@link SummaryAccount}s
-	 */
-	public static final String ANCHOR_TYPE_ID_SUMMARY = "Account.Summary";
+//	/**
+//	 * anchorTypeID for {@link SummaryAccount}s
+//	 */
+//	public static final String ANCHOR_TYPE_ID_SUMMARY = "Account.Summary";
 
 	public static final String FETCH_GROUP_SUMMED_ACCOUNTS = "SummaryAccount.summedAccounts";
 	public static final String FETCH_GROUP_THIS_SUMMARY_ACCOUNT = "SummaryAccount.this";
 
-
+	/**
+	 * @deprecated Only for JDO!
+	 */
 	protected SummaryAccount() {
 	}
 
@@ -108,15 +110,14 @@ public class SummaryAccount extends Account
 //		}
 //	}
 
-	/**
-	 * @param organisationID
-	 * @param anchorID
-	 * @param currency
-	 * @param statistical
-	 */
-	public SummaryAccount(String organisationID, String anchorID,
-			LegalEntity owner, Currency currency, boolean outside) {
-		super(organisationID, ANCHOR_TYPE_ID_SUMMARY, anchorID, owner, currency, outside);
+	public SummaryAccount(
+			String organisationID,
+			String anchorID,
+			AccountType accountType,
+			LegalEntity owner,
+			Currency currency)
+	{
+		super(organisationID, anchorID, accountType, owner, currency);
 		summedAccounts = new HashSet<Account>();
 	}
 

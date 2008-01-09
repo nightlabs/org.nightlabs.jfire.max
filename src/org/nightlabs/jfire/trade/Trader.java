@@ -366,7 +366,7 @@ public class Trader
 		if (person == null)
 			throw new IllegalArgumentException("person must not be null!");
 
-		String anchorID = person.getPrimaryKey();
+		String anchorID = person.getPrimaryKey().replace('/', '#');
 		AnchorID oAnchorID = AnchorID.create(getMandator().getOrganisationID(),
 				LegalEntity.ANCHOR_TYPE_ID_PARTNER, anchorID);
 		LegalEntity legalEntity = null;

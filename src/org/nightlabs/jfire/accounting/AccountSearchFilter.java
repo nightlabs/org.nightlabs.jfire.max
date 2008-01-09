@@ -30,6 +30,7 @@ import java.util.Map;
 import java.util.Set;
 
 import org.nightlabs.jdo.search.SearchFilter;
+import org.nightlabs.jfire.accounting.id.AccountTypeID;
 import org.nightlabs.jfire.prop.search.PropSearchFilter;
 import org.nightlabs.jfire.transfer.id.AnchorID;
 
@@ -41,6 +42,7 @@ public class AccountSearchFilter extends SearchFilter {
 	
 	private AnchorID owner;
 	private String anchorTypeID;
+	private AccountTypeID accountTypeID;
 	private String currencyID;
 	private String nameFilter;
 	private PropSearchFilter personFilter;
@@ -67,15 +69,16 @@ public class AccountSearchFilter extends SearchFilter {
 		params.append("java.lang.String ownerAnchorID, ");
 		params.append("java.lang.String accountAnchorTypeID, ");
 		params.append("java.lang.String accountCurrencyID, ");
-		params.append("java.lang.String paramNameFilter");
-	
+		params.append("java.lang.String paramNameFilter, ");
+		params.append(AccountType.class.getName() + " paramAccountType");
+
 //		vars.append("java.lang.String nameFilterVar");
 		
 		if (owner != null) {
 			paramMap.put("ownerOrganisationID", owner.organisationID);
 			paramMap.put("ownerAnchorTypeID", owner.anchorTypeID);
 			paramMap.put("ownerAnchorID", owner.anchorID);
-			
+
 			filter.append("( this.owner.organisationID == ownerOrganisationID && ");
 			filter.append("  this.owner.anchorTypeID == ownerAnchorTypeID && ");
 			filter.append("  this.owner.anchorID == ownerAnchorID )");
@@ -85,8 +88,17 @@ public class AccountSearchFilter extends SearchFilter {
 			paramMap.put("ownerAnchorTypeID", null);
 			paramMap.put("ownerAnchorID", null);
 		}
-		
-		
+
+		if (accountTypeID == null)
+			paramMap.put("paramAccountType", null);
+		else {
+			paramMap.put("paramAccountType", getPersistenceManager().getObjectById(accountTypeID));
+
+			if (filter.length() > 0)
+				filter.append(" && ");
+			filter.append("(this.accountType == paramAccountType)");
+		}
+
 		paramMap.put("accountAnchorTypeID", anchorTypeID);
 		if (anchorTypeID != null) {
 			if (filter.length() > 0)
@@ -132,6 +144,16 @@ public class AccountSearchFilter extends SearchFilter {
 		this.anchorTypeID = anchorTypeID;
 	}
 
+	public AccountTypeID getAccountTypeID()
+	{
+		return accountTypeID;
+	}
+	
+	public void setAccountTypeID(AccountTypeID accountTypeID)
+	{
+		this.accountTypeID = accountTypeID;
+	}
+	
 	/**
 	 * @return Returns the currencyID.
 	 */

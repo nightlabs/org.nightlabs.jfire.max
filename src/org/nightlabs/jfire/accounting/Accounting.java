@@ -49,6 +49,7 @@ import org.jbpm.JbpmContext;
 import org.jbpm.graph.exe.ProcessInstance;
 import org.nightlabs.ModuleException;
 import org.nightlabs.i18n.I18nText;
+import org.nightlabs.jdo.ObjectIDUtil;
 import org.nightlabs.jfire.accounting.book.BookMoneyTransfer;
 import org.nightlabs.jfire.accounting.book.LocalAccountant;
 import org.nightlabs.jfire.accounting.book.PartnerAccountant;
@@ -94,7 +95,6 @@ import org.nightlabs.jfire.trade.jbpm.ProcessDefinitionAssignment;
 import org.nightlabs.jfire.trade.jbpm.id.ProcessDefinitionAssignmentID;
 import org.nightlabs.jfire.transfer.Anchor;
 import org.nightlabs.jfire.transfer.Transfer;
-import org.nightlabs.jfire.transfer.id.AnchorID;
 
 /**
  * @author Marco Schulze - marco at nightlabs dot de
@@ -1092,48 +1092,64 @@ implements StoreCallback
 //		getPersistenceManager().makePersistent(newAccount);
 //		return newAccount;
 //	}
-	
+
 	/**
 	 * Finds (and creates if neccessary) the right Account for the given LegalEntity and Currency.
 	 * 
-	 * @param anchorTypeID See {@link Account} for static anchorTypeID definitions
+	 * @param accountType See {@link Account} for static anchorTypeID definitions
 	 * @param partner The legal entity the account should be searched for. 
 	 * @param currency The currency the account should record.
 	 * @return The found or created acccount. Never null.
 	 */
-	public Account getPartnerAccount(String anchorTypeID, LegalEntity partner, Currency currency) {
+	public Account getPartnerAccount(AccountType accountType, LegalEntity partner, Currency currency) {
 		if (partner == null)
 			throw new IllegalArgumentException("Parameter partner must not be null!");
 		if (currency == null)
 			throw new IllegalArgumentException("Parameter currency must not be null!");
-		
-		String searchAccountID = partner.getAnchorID()+"-"+currency.getCurrencyID(); 
-		AnchorID anchorID = AnchorID.create(this.getOrganisationID(), anchorTypeID, searchAccountID);
-		
-		Account account = null;
-		Object o = null;
-		try {
-			o = getPersistenceManager().getObjectById(anchorID);
-			account = (Account)o;
-		} 
-		catch (ClassCastException ce)  {
-			IllegalStateException ill = new IllegalStateException("Found persistent object with oid "+anchorID+" but is not of type Account but "+o.getClass().getName());
-			ill.initCause(ce);
-			throw ill;
-		}
-		catch (JDOObjectNotFoundException je) {
-			// account not existing, create it 
-			account = new Account(this.getOrganisationID(), anchorTypeID, searchAccountID, partner, currency, false);
-			getPersistenceManager().makePersistent(account);
+
+		Collection<Account> accounts = (Collection<Account>) Account.getAccounts(getPersistenceManager(), accountType, partner, currency);
+		// there should be only one account, but in case a user later adds one, we don't throw an exception
+		Account account = accounts.isEmpty() ? null : accounts.iterator().next();
+		if (account == null) {
+			// TODO how to generate the IDs here? Give the user the possibility to define rules (e.g. number ranges)
+			account = new Account(
+					this.getOrganisationID(),
+					"partner." + ObjectIDUtil.longObjectIDFieldToString(IDGenerator.nextID(Anchor.class, Account.ANCHOR_TYPE_ID_ACCOUNT + "partner")),
+					accountType, partner, currency);
+			account = getPersistenceManager().makePersistent(account);
 			account.setOwner(partner);
 		}
-		
-		if (account == null)
-			throw new IllegalStateException("Account with oid "+anchorID+" could neither be found nor created!");
-		
-		if (!account.getOwner().getPrimaryKey().equals(partner.getPrimaryKey()))
-			throw new IllegalStateException("A account for oid "+anchorID+" could be found, but its owner is not the partner the search was performed for. Owner: "+account.getOwner().getPrimaryKey()+", Partner: "+partner.getPrimaryKey());
-		
+
+//		String searchAccountID = accountType.getOrganisationID() + ':' + accountType.getAccountTypeID() + ':' + partner.getOrganisationID() + ':' + partner.getAnchorID() + ':' + currency.getCurrencyID(); 
+//		AnchorID anchorID = AnchorID.create(this.getOrganisationID(), Account.ANCHOR_TYPE_ID_ACCOUNT, searchAccountID);
+//
+//		Account account = null;
+//		Object o = null;
+//		try {
+//			o = getPersistenceManager().getObjectById(anchorID);
+//			account = (Account)o;
+//		} 
+//		catch (ClassCastException ce)  {
+//			IllegalStateException ill = new IllegalStateException("Found persistent object with oid "+anchorID+" but is not of type Account but "+o.getClass().getName());
+//			ill.initCause(ce);
+//			throw ill;
+//		}
+//		catch (JDOObjectNotFoundException je) {
+//			// account not existing, create it 
+//			account = new Account(this.getOrganisationID(), searchAccountID, partner, currency, accountType);
+//			account = getPersistenceManager().makePersistent(account);
+//			account.setOwner(partner);
+//		}
+//
+//		if (account == null)
+//			throw new IllegalStateException("Account with oid "+anchorID+" could neither be found nor created!");
+//		
+//		if (!account.getOwner().equals(partner))
+//			throw new IllegalStateException("An account for oid "+anchorID+" could be found, but its owner is not the partner the search was performed for. Owner: "+account.getOwner().getPrimaryKey()+", Partner: "+partner.getPrimaryKey());
+//
+//		if (!account.getAccountType().equals(accountType))
+//			throw new IllegalStateException("An account for oid "+anchorID+" could be found, but its accountType is not the accountType the search was performed for. assignedAccountType: "+JDOHelper.getObjectId(account.getAccountType())+", expectedAccountType: "+JDOHelper.getObjectId(accountType));
+
 		return account;
 	}
 

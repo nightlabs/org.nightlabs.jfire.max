@@ -272,11 +272,11 @@ implements
 	 */
 	private String productTypeID;
 
-	/**
-	 * @jdo.field persistence-modifier="persistent"
-	 * @jdo.column length="201"
-	 */
-	private String primaryKey;
+//	/**
+//	 * @jdo.field persistence-modifier="persistent"
+//	 * @jdo.column length="201"
+//	 */
+//	private String primaryKey;
 
 	/**
 	 * @jdo.field persistence-modifier="persistent"
@@ -585,7 +585,7 @@ implements
 
 		this.organisationID = organisationID;
 		this.productTypeID = productTypeID;
-		this.primaryKey = getPrimaryKey(organisationID, productTypeID);
+//		this.primaryKey = getPrimaryKey(organisationID, productTypeID);
 //		setNature(nature);
 		setExtendedProductType(extendedProductType);
 
@@ -654,17 +654,18 @@ implements
 			throw new IllegalArgumentException("productTypeID must not be null!");
 		return organisationID + '/' + productTypeID;
 	}
-	
+
 	public static ProductTypeID primaryKeyToProductTypeID(String primaryKey) {
 		String[] parts = primaryKey.split("/");
 		if (parts.length != 2) 
 			throw new IllegalArgumentException("The given productTypePK "+primaryKey+" is illegal (more than one /)");
 		return ProductTypeID.create(parts[0], parts[1]);
 	}
-	
+
 	public String getPrimaryKey()
 	{
-		return primaryKey;
+		return getPrimaryKey(organisationID, productTypeID);
+//		return primaryKey;
 	}
 
 	/**

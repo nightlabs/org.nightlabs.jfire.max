@@ -5,7 +5,9 @@ import javax.jdo.Query;
 import org.apache.log4j.Logger;
 import org.nightlabs.jdo.query.JDOQuery;
 import org.nightlabs.jfire.accounting.Account;
+import org.nightlabs.jfire.accounting.AccountType;
 import org.nightlabs.jfire.accounting.Currency;
+import org.nightlabs.jfire.accounting.id.AccountTypeID;
 import org.nightlabs.jfire.accounting.id.CurrencyID;
 import org.nightlabs.jfire.transfer.id.AnchorID;
 
@@ -34,7 +36,7 @@ extends JDOQuery<Account>
 	private CurrencyID currencyID = null;
 	
 	@SuppressWarnings("unused") // used as parameter in the JDOQL
-	private Currency currency = null;
+	private transient Currency currency = null;
 	/**
 	 * the name of the account to search for
 	 */
@@ -48,7 +50,12 @@ extends JDOQuery<Account>
 	 * the anchorTypeID to search for
 	 */
 	private String anchorTypeID = null;
-	
+
+	private AccountTypeID accountTypeID = null;
+
+	@SuppressWarnings("unused") // used as parameter in the JDOQL
+	private transient AccountType accountType = null;
+
 	/**
 	 * the AnchorID of the owner
 	 */
@@ -73,7 +80,12 @@ extends JDOQuery<Account>
 			currency = (Currency) getPersistenceManager().getObjectById(currencyID);
 			filter.append("\n && this.currency == :currency");
 		}
-		
+
+		if (accountTypeID != null) {
+			accountType = (AccountType) getPersistenceManager().getObjectById(accountTypeID);
+			filter.append("\n && this.accountType == :accountType");
+		}
+
 		if (minBalance >= 0)
 			filter.append("\n && this.balance >= :minBalance");
 			
@@ -182,6 +194,15 @@ extends JDOQuery<Account>
 	 */
 	public void setCurrencyID(CurrencyID currencyID) {
 		this.currencyID = currencyID;
+	}
+
+	public void setAccountTypeID(AccountTypeID accountTypeID)
+	{
+		this.accountTypeID = accountTypeID;
+	}
+	public AccountTypeID getAccountTypeID()
+	{
+		return accountTypeID;
 	}
 
 	/**

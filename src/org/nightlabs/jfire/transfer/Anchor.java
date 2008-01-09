@@ -34,6 +34,8 @@ import java.util.Set;
 import javax.jdo.JDOHelper;
 import javax.jdo.PersistenceManager;
 
+import org.nightlabs.jdo.ObjectIDUtil;
+import org.nightlabs.jfire.organisation.Organisation;
 import org.nightlabs.jfire.security.User;
 import org.nightlabs.jfire.transfer.id.AnchorID;
 import org.nightlabs.util.Util;
@@ -106,6 +108,10 @@ public abstract class Anchor
 
 	public Anchor(String organisationID, String anchorTypeID, String anchorID)
 	{
+		Organisation.assertValidOrganisationID(organisationID);
+		ObjectIDUtil.assertValidIDString(anchorTypeID, "anchorTypeID");
+		ObjectIDUtil.assertValidIDString(anchorID, "anchorID");
+
 		this.organisationID = organisationID;
 		this.anchorTypeID = anchorTypeID;
 		this.anchorID = anchorID;

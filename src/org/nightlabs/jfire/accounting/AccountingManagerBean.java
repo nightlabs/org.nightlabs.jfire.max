@@ -71,6 +71,7 @@ import org.nightlabs.jfire.accounting.book.mappingbased.PFMappingAccountantDeleg
 import org.nightlabs.jfire.accounting.book.mappingbased.PFMappingAccountantDelegate.ResolvedMapKey;
 import org.nightlabs.jfire.accounting.gridpriceconfig.GridPriceConfig;
 import org.nightlabs.jfire.accounting.gridpriceconfig.GridPriceConfigUtil;
+import org.nightlabs.jfire.accounting.id.AccountTypeID;
 import org.nightlabs.jfire.accounting.id.CurrencyID;
 import org.nightlabs.jfire.accounting.id.InvoiceID;
 import org.nightlabs.jfire.accounting.id.InvoiceLocalID;
@@ -251,6 +252,38 @@ public abstract class AccountingManagerBean
 
 			currency = new Currency("CHF", "CHF", 2);
 			pm.makePersistent(currency);
+
+
+			// create and persist the AccountTypes
+			AccountType accountType;
+			accountType = pm.makePersistent(new AccountType(AccountType.ACCOUNT_TYPE_ID_OUTSIDE, true));
+			accountType.getName().setText(Locale.ENGLISH.getLanguage(), "Outside");
+			accountType.getName().setText(Locale.GERMAN.getLanguage(), "Außerhalb");
+
+			accountType = pm.makePersistent(new AccountType(AccountType.ACCOUNT_TYPE_ID_LOCAL_EXPENSE, false));
+			accountType.getName().setText(Locale.ENGLISH.getLanguage(), "Expense");
+			accountType.getName().setText(Locale.GERMAN.getLanguage(), "Aufwand");
+
+			accountType = pm.makePersistent(new AccountType(AccountType.ACCOUNT_TYPE_ID_LOCAL_REVENUE, false));
+			accountType.getName().setText(Locale.ENGLISH.getLanguage(), "Revenue");
+			accountType.getName().setText(Locale.GERMAN.getLanguage(), "Einnahme");
+
+			accountType = pm.makePersistent(new AccountType(AccountType.ACCOUNT_TYPE_ID_PARTNER_CUSTOMER, false));
+			accountType.getName().setText(Locale.ENGLISH.getLanguage(), "Customer");
+			accountType.getName().setText(Locale.GERMAN.getLanguage(), "Kunde");
+
+			accountType = pm.makePersistent(new AccountType(AccountType.ACCOUNT_TYPE_ID_PARTNER_NEUTRAL, false));
+			accountType.getName().setText(Locale.ENGLISH.getLanguage(), "Business partner");
+			accountType.getName().setText(Locale.GERMAN.getLanguage(), "Geschäftspartner");
+
+			accountType = pm.makePersistent(new AccountType(AccountType.ACCOUNT_TYPE_ID_PARTNER_VENDOR, false));
+			accountType.getName().setText(Locale.ENGLISH.getLanguage(), "Vendor");
+			accountType.getName().setText(Locale.GERMAN.getLanguage(), "Lieferant");
+
+			accountType = pm.makePersistent(new AccountType(AccountType.ACCOUNT_TYPE_ID_SUMMARY, false));
+			accountType.getName().setText(Locale.ENGLISH.getLanguage(), "Summary");
+			accountType.getName().setText(Locale.GERMAN.getLanguage(), "Summenkonto");
+
 
 			// create PriceFragmentTypes for Swiss and German VAT
 			PriceFragmentType priceFragmentType = new PriceFragmentType(PriceFragmentTypeHelper.getDE().VAT_DE_19_NET);
@@ -2763,7 +2796,7 @@ public abstract class AccountingManagerBean
 	 * for cascading multiple queries. It is slower than {@link #getMoneyTransferIDs(MoneyTransferIDQuery)}
 	 * and should therefore only be used, if it's essentially necessary.
 	 *
-	 * @param productTransferQueries A <code>Collection</code> of {@link MoneyTransferQuery}. They will be executed
+	 * @param moneyTransferQueries A <code>Collection</code> of {@link MoneyTransferQuery}. They will be executed
 	 *		in the given order (if it's a <code>List</code>) and the result of the previous query will be passed as candidates
 	 *		to the next query.
 	 *
@@ -2771,12 +2804,12 @@ public abstract class AccountingManagerBean
 	 * @ejb.transaction type="Supports"
 	 * @ejb.permission role-name="_Guest_"
 	 */
-	public List<TransferID> getMoneyTransferIDs(Collection<MoneyTransferQuery> productTransferQueries)
+	public List<TransferID> getMoneyTransferIDs(Collection<MoneyTransferQuery> moneyTransferQueries)
 	{
 		PersistenceManager pm = getPersistenceManager();
 		try {
 			Collection<MoneyTransfer> productTransfers = null;
-			for (MoneyTransferQuery productTransferQuery : productTransferQueries) {
+			for (MoneyTransferQuery productTransferQuery : moneyTransferQueries) {
 				productTransferQuery.setPersistenceManager(pm);
 				productTransferQuery.setCandidates(productTransfers);
 				productTransfers = productTransferQuery.getResult();
@@ -2793,14 +2826,46 @@ public abstract class AccountingManagerBean
 	 * @ejb.transaction type="Supports"
 	 * @ejb.permission role-name="_Guest_"
 	 */
-	public List<MoneyTransfer> getMoneyTransfers(Collection<TransferID> productTransferIDs, String[] fetchGroups, int maxFetchDepth)
+	public List<MoneyTransfer> getMoneyTransfers(Collection<TransferID> moneyTransferIDs, String[] fetchGroups, int maxFetchDepth)
 	{
 		PersistenceManager pm = getPersistenceManager();
 		try {
-			return NLJDOHelper.getDetachedObjectList(pm, productTransferIDs, MoneyTransfer.class, fetchGroups, maxFetchDepth);
+			return NLJDOHelper.getDetachedObjectList(pm, moneyTransferIDs, MoneyTransfer.class, fetchGroups, maxFetchDepth);
 		} finally {
 			pm.close();
 		}
 	}
 
+	/**
+	 * @ejb.interface-method
+	 * @ejb.transaction type="Supports"
+	 * @ejb.permission role-name="_Guest_"
+	 */
+	@SuppressWarnings("unchecked")
+	public Set<AccountTypeID> getAccountTypeIDs()
+	{
+		PersistenceManager pm = getPersistenceManager();
+		try {
+			Query q = pm.newQuery(AccountType.class);
+			q.setResult("JDOHelper.getObjectId(this)");
+			return new HashSet<AccountTypeID>((Collection<? extends AccountTypeID>) q.execute());
+		} finally {
+			pm.close();
+		}
+	}
+
+	/**
+	 * @ejb.interface-method
+	 * @ejb.transaction type="Supports"
+	 * @ejb.permission role-name="_Guest_"
+	 */
+	public List<AccountType> getAccountTypes(Collection<AccountTypeID> accountTypeIDs, String[] fetchGroups, int maxFetchDepth)
+	{
+		PersistenceManager pm = getPersistenceManager();
+		try {
+			return NLJDOHelper.getDetachedObjectList(pm, accountTypeIDs, AccountType.class, fetchGroups, maxFetchDepth);
+		} finally {
+			pm.close();
+		}
+	}
 }

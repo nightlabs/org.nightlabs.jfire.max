@@ -38,6 +38,7 @@ import org.apache.log4j.Logger;
 import org.nightlabs.ModuleException;
 import org.nightlabs.i18n.I18nText;
 import org.nightlabs.jfire.accounting.Account;
+import org.nightlabs.jfire.accounting.AccountType;
 import org.nightlabs.jfire.accounting.Accounting;
 import org.nightlabs.jfire.accounting.Currency;
 import org.nightlabs.jfire.accounting.PriceFragmentType;
@@ -251,24 +252,26 @@ public class DataCreator
 		return customerGroupAnonymous;
 	}
 
-	public Account createLocalRevenueAccount(String anchorID, String name)
+	public Account createLocalRevenueAccount(String anchorIDSuffix, String name)
 	{
 		Currency euro = getCurrencyEUR();
 
+		AccountType accountType = (AccountType) pm.getObjectById(AccountType.ACCOUNT_TYPE_ID_LOCAL_REVENUE);
 		Account account = new Account(
-				organisationID, Account.ANCHOR_TYPE_ID_LOCAL_REVENUE, anchorID, getOrganisationLegalEntity(), euro, false);
+				organisationID, "revenue#" + anchorIDSuffix, accountType, getOrganisationLegalEntity(), euro);
 		account.getName().setText(languageID, name);
 
 		account = pm.makePersistent(account);
 
 		return account;
 	}
-	public Account createLocalExpenseAccount(String anchorID, String name)
+	public Account createLocalExpenseAccount(String anchorIDSuffix, String name)
 	{
 		Currency euro = getCurrencyEUR();
 
+		AccountType accountType = (AccountType) pm.getObjectById(AccountType.ACCOUNT_TYPE_ID_LOCAL_EXPENSE);
 		Account account = new Account(
-				organisationID, Account.ANCHOR_TYPE_ID_LOCAL_EXPENSE, anchorID, getOrganisationLegalEntity(), euro, false);
+				organisationID, "expense#" + anchorIDSuffix, accountType, getOrganisationLegalEntity(), euro);
 		account.getName().setText(languageID, name);
 
 		account = pm.makePersistent(account);

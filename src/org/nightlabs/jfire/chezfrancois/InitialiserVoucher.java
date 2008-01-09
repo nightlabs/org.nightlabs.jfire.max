@@ -8,6 +8,7 @@ import javax.jdo.PersistenceManager;
 import org.apache.log4j.Logger;
 import org.nightlabs.ModuleException;
 import org.nightlabs.jfire.accounting.Account;
+import org.nightlabs.jfire.accounting.AccountType;
 import org.nightlabs.jfire.accounting.priceconfig.PriceConfig;
 import org.nightlabs.jfire.base.JFirePrincipal;
 import org.nightlabs.jfire.security.User;
@@ -15,6 +16,7 @@ import org.nightlabs.jfire.store.CannotConfirmProductTypeException;
 import org.nightlabs.jfire.store.CannotMakeProductTypeSaleableException;
 import org.nightlabs.jfire.store.CannotPublishProductTypeException;
 import org.nightlabs.jfire.store.id.ProductTypeID;
+import org.nightlabs.jfire.voucher.JFireVoucherEAR;
 import org.nightlabs.jfire.voucher.accounting.VoucherLocalAccountantDelegate;
 import org.nightlabs.jfire.voucher.accounting.VoucherPriceConfig;
 import org.nightlabs.jfire.voucher.store.VoucherType;
@@ -60,8 +62,9 @@ extends Initialiser
 		priceConfig50.addCurrency(dataCreator.getCurrencyEUR());
 		priceConfig50.setPrice(dataCreator.getCurrencyEUR(), new Long(5000));
 
-		Account accountNormalEur = new Account(organisationID, VoucherLocalAccountantDelegate.ACCOUNT_ANCHOR_TYPE_ID_VOUCHER, "voucherType.normal.eur", dataCreator.getOrganisationLegalEntity(), dataCreator.getCurrencyEUR(), false);
-		Account accountXmasEur = new Account(organisationID, VoucherLocalAccountantDelegate.ACCOUNT_ANCHOR_TYPE_ID_VOUCHER, "voucherType.xmas.eur", dataCreator.getOrganisationLegalEntity(), dataCreator.getCurrencyEUR(), false);
+		AccountType accountType = (AccountType) pm.getObjectById(JFireVoucherEAR.ACCOUNT_TYPE_ID_VOUCHER);
+		Account accountNormalEur = new Account(organisationID, "voucherType.normal.eur", accountType, dataCreator.getOrganisationLegalEntity(), dataCreator.getCurrencyEUR());
+		Account accountXmasEur = new Account(organisationID, "voucherType.xmas.eur", accountType, dataCreator.getOrganisationLegalEntity(), dataCreator.getCurrencyEUR());
 
 		VoucherLocalAccountantDelegate localAccountantDelegateNormal = new VoucherLocalAccountantDelegate(organisationID, "voucherType.normal");
 		localAccountantDelegateNormal.setAccount(dataCreator.getCurrencyEUR().getCurrencyID(), accountNormalEur);

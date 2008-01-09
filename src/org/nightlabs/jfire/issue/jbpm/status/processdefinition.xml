@@ -1,87 +1,87 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<process-definition  xmlns=""  name="devil.NightLabs.org:IssueType">
+<process-definition  xmlns=""  name="dev.jfire.org:IssueType">
 
 
-	<start-state name="devil.NightLabs.org:new">
-		<transition to="devil.NightLabs.org:rejected" name="reject"></transition>
-		<transition to="devil.NightLabs.org:open" name="open"></transition>
+	<start-state name="dev.jfire.org:new">
+		<transition to="dev.jfire.org:rejected" name="reject"></transition>
+		<transition to="dev.jfire.org:open" name="open"></transition>
 	</start-state>
 
 
-	<state name="devil.NightLabs.org:acknowledged">
-		<transition to="devil.NightLabs.org:confirmed" name="confirm"></transition>
-		<transition to="devil.NightLabs.org:rejected" name="reject"></transition>
-		<transition to="devil.NightLabs.org:confirmedImplicitely" name="assign"></transition>
-		<transition to="devil.NightLabs.org:confirmedImplicitely" name="resolve"></transition>
-		<transition to="devil.NightLabs.org:confirmedImplicitely" name="close"></transition>
+	<state name="dev.jfire.org:acknowledged">
+		<transition to="dev.jfire.org:confirmed" name="confirm"></transition>
+		<transition to="dev.jfire.org:rejected" name="reject"></transition>
+		<transition to="dev.jfire.org:confirmedImplicitely" name="assign"></transition>
+		<transition to="dev.jfire.org:confirmedImplicitely" name="resolve"></transition>
+		<transition to="dev.jfire.org:confirmedImplicitely" name="close"></transition>
 	</state>
 
-	<state name="devil.NightLabs.org:assigned">
-		<transition to="devil.NightLabs.org:rejected" name="reject"></transition>
-		<transition to="devil.NightLabs.org:resolved" name="resolve"></transition>
-		<transition to="devil.NightLabs.org:resolvedImplicitely" name="close"></transition>		
+	<state name="dev.jfire.org:assigned">
+		<transition to="dev.jfire.org:rejected" name="reject"></transition>
+		<transition to="dev.jfire.org:resolved" name="resolve"></transition>
+		<transition to="dev.jfire.org:resolvedImplicitely" name="close"></transition>		
 	</state>
 
-	<state name="devil.NightLabs.org:confirmed">
-		<transition to="devil.NightLabs.org:assigned" name="assign"></transition>
+	<state name="dev.jfire.org:confirmed">
+		<transition to="dev.jfire.org:assigned" name="assign"></transition>
 	</state>
 
-	<state name="devil.NightLabs.org:resolved">
-		<transition to="devil.NightLabs.org:closed" name="close"></transition>
-		<transition to="devil.NightLabs.org:rejected" name="reject"></transition>
-		<transition to="devil.NightLabs.org:reopened" name="reopen"></transition>
+	<state name="dev.jfire.org:resolved">
+		<transition to="dev.jfire.org:closed" name="close"></transition>
+		<transition to="dev.jfire.org:rejected" name="reject"></transition>
+		<transition to="dev.jfire.org:reopened" name="reopen"></transition>
 	</state>
 
-	<state name="devil.NightLabs.org:closed">
-		<transition to="devil.NightLabs.org:rejected" name="reject"></transition>
-		<transition to="devil.NightLabs.org:reopened" name="reopen"></transition>
+	<state name="dev.jfire.org:closed">
+		<transition to="dev.jfire.org:rejected" name="reject"></transition>
+		<transition to="dev.jfire.org:reopened" name="reopen"></transition>
 	</state>
 
-	<node name="devil.NightLabs.org:acknowledgedImplicitely">
+	<node name="dev.jfire.org:acknowledgedImplicitely">
 		<event type="node-enter">
 			<action class="org.nightlabs.jfire.jbpm.graph.def.TransitionPassThroughActionHandler"></action>
 		</event>
 		<action class="org.nightlabs.jfire.jbpm.graph.def.TransitionPassThroughActionHandler"></action>
-		<transition to="devil.NightLabs.org:confirmed" name="confirm"></transition>
-		<transition to="devil.NightLabs.org:confirmedImplicitely" name="assign"></transition>
-		<transition to="devil.NightLabs.org:confirmedImplicitely" name="resolve"></transition>
-		<transition to="devil.NightLabs.org:confirmedImplicitely" name="close"></transition>
+		<transition to="dev.jfire.org:confirmed" name="confirm"></transition>
+		<transition to="dev.jfire.org:confirmedImplicitely" name="assign"></transition>
+		<transition to="dev.jfire.org:confirmedImplicitely" name="resolve"></transition>
+		<transition to="dev.jfire.org:confirmedImplicitely" name="close"></transition>
 	</node>
 
-	<node name="devil.NightLabs.org:confirmedImplicitely">
+	<node name="dev.jfire.org:confirmedImplicitely">
 		<event type="node-enter">
 			<action class="org.nightlabs.jfire.jbpm.graph.def.TransitionPassThroughActionHandler"></action>
 		</event>
 		<action class="org.nightlabs.jfire.jbpm.graph.def.TransitionPassThroughActionHandler"></action>
-		<transition to="devil.NightLabs.org:assigned" name="assign"></transition>
-		<transition to="devil.NightLabs.org:resolved" name="resolve"></transition>
-		<transition to="devil.NightLabs.org:resolvedImplicitely" name="close"></transition>
+		<transition to="dev.jfire.org:assigned" name="assign"></transition>
+		<transition to="dev.jfire.org:resolved" name="resolve"></transition>
+		<transition to="dev.jfire.org:resolvedImplicitely" name="close"></transition>
 	</node>
 
-	<node name="devil.NightLabs.org:resolvedImplicitely">
+	<node name="dev.jfire.org:resolvedImplicitely">
 		<event type="node-enter">
 			<action class="org.nightlabs.jfire.jbpm.graph.def.TransitionPassThroughActionHandler"></action>
 		</event>
 		<action class="org.nightlabs.jfire.jbpm.graph.def.TransitionPassThroughActionHandler"></action>
-		<transition to="devil.NightLabs.org:closed" name="close"></transition>
+		<transition to="dev.jfire.org:closed" name="close"></transition>
 	</node>
 
-	<node name="devil.NightLabs.org:reopened">
-		<transition to="devil.NightLabs.org:open" name="reopen"></transition>
+	<node name="dev.jfire.org:reopened">
+		<transition to="dev.jfire.org:open" name="reopen"></transition>
 	</node>
 
-	<state name="devil.NightLabs.org:open">
-		<transition to="devil.NightLabs.org:acknowledgedImplicitely" name="confirm"></transition>
-		<transition to="devil.NightLabs.org:acknowledgedImplicitely" name="assign"></transition>
-		<transition to="devil.NightLabs.org:acknowledgedImplicitely" name="resolve"></transition>
-		<transition to="devil.NightLabs.org:acknowledgedImplicitely" name="close"></transition>
-		<transition to="devil.NightLabs.org:acknowledged" name="acknowledge"></transition>
-		<transition to="devil.NightLabs.org:rejected" name="reject"></transition>
+	<state name="dev.jfire.org:open">
+		<transition to="dev.jfire.org:acknowledgedImplicitely" name="confirm"></transition>
+		<transition to="dev.jfire.org:acknowledgedImplicitely" name="assign"></transition>
+		<transition to="dev.jfire.org:acknowledgedImplicitely" name="resolve"></transition>
+		<transition to="dev.jfire.org:acknowledgedImplicitely" name="close"></transition>
+		<transition to="dev.jfire.org:acknowledged" name="acknowledge"></transition>
+		<transition to="dev.jfire.org:rejected" name="reject"></transition>
 	</state>
 
 
-	<end-state name="devil.NightLabs.org:rejected"></end-state>
+	<end-state name="dev.jfire.org:rejected"></end-state>
 
 
 </process-definition>

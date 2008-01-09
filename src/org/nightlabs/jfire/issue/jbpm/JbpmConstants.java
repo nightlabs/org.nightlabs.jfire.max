@@ -17,19 +17,19 @@ import org.nightlabs.jfire.organisation.Organisation;
  */
 public class JbpmConstants {
 
-	public static final String NODE_NAME_NEW = Organisation.DEVIL_ORGANISATION_ID + ":new";
-	public static final String NODE_NAME_OPEN = Organisation.DEVIL_ORGANISATION_ID + ":open";
-	public static final String NODE_NAME_ACKNOWLEDGED = Organisation.DEVIL_ORGANISATION_ID + ":acknowledged";
-	public static final String NODE_NAME_ACKNOWLEDGED_IMPLICITELY = Organisation.DEVIL_ORGANISATION_ID + ":acknowledgedImplicitely";
-	public static final String NODE_NAME_CONFIRMED = Organisation.DEVIL_ORGANISATION_ID + ":confirmed";
-	public static final String NODE_NAME_CONFIRMED_IMPLICITELY = Organisation.DEVIL_ORGANISATION_ID + ":confirmedImplicitely";
-	public static final String NODE_NAME_ASSIGNED = Organisation.DEVIL_ORGANISATION_ID + ":assigned";
-	public static final String NODE_NAME_RESOLVED = Organisation.DEVIL_ORGANISATION_ID + ":resolved";
-	public static final String NODE_NAME_RESOLVED_IMPLICITELY = Organisation.DEVIL_ORGANISATION_ID + ":resolvedImplicitely";
-	public static final String NODE_NAME_CLOSED = Organisation.DEVIL_ORGANISATION_ID + ":closed";
-	public static final String NODE_NAME_REOPENED = Organisation.DEVIL_ORGANISATION_ID + ":reopened";
+	public static final String NODE_NAME_NEW = Organisation.DEV_ORGANISATION_ID + ":new";
+	public static final String NODE_NAME_OPEN = Organisation.DEV_ORGANISATION_ID + ":open";
+	public static final String NODE_NAME_ACKNOWLEDGED = Organisation.DEV_ORGANISATION_ID + ":acknowledged";
+	public static final String NODE_NAME_ACKNOWLEDGED_IMPLICITELY = Organisation.DEV_ORGANISATION_ID + ":acknowledgedImplicitely";
+	public static final String NODE_NAME_CONFIRMED = Organisation.DEV_ORGANISATION_ID + ":confirmed";
+	public static final String NODE_NAME_CONFIRMED_IMPLICITELY = Organisation.DEV_ORGANISATION_ID + ":confirmedImplicitely";
+	public static final String NODE_NAME_ASSIGNED = Organisation.DEV_ORGANISATION_ID + ":assigned";
+	public static final String NODE_NAME_RESOLVED = Organisation.DEV_ORGANISATION_ID + ":resolved";
+	public static final String NODE_NAME_RESOLVED_IMPLICITELY = Organisation.DEV_ORGANISATION_ID + ":resolvedImplicitely";
+	public static final String NODE_NAME_CLOSED = Organisation.DEV_ORGANISATION_ID + ":closed";
+	public static final String NODE_NAME_REOPENED = Organisation.DEV_ORGANISATION_ID + ":reopened";
 	
-	public static final String NODE_NAME_REJECTED = Organisation.DEVIL_ORGANISATION_ID + ":rejected";
+	public static final String NODE_NAME_REJECTED = Organisation.DEV_ORGANISATION_ID + ":rejected";
 
 	/**
 	 * Sets the State properties for the standard IssueTracking workflow.

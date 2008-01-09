@@ -29,9 +29,9 @@ extends ServerDeliveryProcessor
 		try {
 			pm.getExtent(ServerDeliveryProcessorJFire.class);
 			serverDeliveryProcessorJFire = (ServerDeliveryProcessorJFire) pm.getObjectById(
-					ServerDeliveryProcessorID.create(Organisation.DEVIL_ORGANISATION_ID, ServerDeliveryProcessorJFire.class.getName()));
+					ServerDeliveryProcessorID.create(Organisation.DEV_ORGANISATION_ID, ServerDeliveryProcessorJFire.class.getName()));
 		} catch (JDOObjectNotFoundException e) {
-			serverDeliveryProcessorJFire = new ServerDeliveryProcessorJFire(Organisation.DEVIL_ORGANISATION_ID, ServerDeliveryProcessorJFire.class.getName());
+			serverDeliveryProcessorJFire = new ServerDeliveryProcessorJFire(Organisation.DEV_ORGANISATION_ID, ServerDeliveryProcessorJFire.class.getName());
 			serverDeliveryProcessorJFire = pm.makePersistent(serverDeliveryProcessorJFire);
 		}
 

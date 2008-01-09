@@ -44,10 +44,10 @@ extends ServerDeliveryProcessor
 		try {
 			pm.getExtent(ServerDeliveryProcessorDeliveryQueue.class);
 			serverDeliveryProcessorDeliveryQueue = (ServerDeliveryProcessorDeliveryQueue) pm.getObjectById(ServerDeliveryProcessorID.create(
-					Organisation.DEVIL_ORGANISATION_ID, ServerDeliveryProcessorDeliveryQueue.class.getName()));
+					Organisation.DEV_ORGANISATION_ID, ServerDeliveryProcessorDeliveryQueue.class.getName()));
 
 		} catch (JDOObjectNotFoundException e) {
-			serverDeliveryProcessorDeliveryQueue = new ServerDeliveryProcessorDeliveryQueue(Organisation.DEVIL_ORGANISATION_ID,	ServerDeliveryProcessorDeliveryQueue.class.getName());
+			serverDeliveryProcessorDeliveryQueue = new ServerDeliveryProcessorDeliveryQueue(Organisation.DEV_ORGANISATION_ID,	ServerDeliveryProcessorDeliveryQueue.class.getName());
 			serverDeliveryProcessorDeliveryQueue.getName().setText(Locale.ENGLISH.getLanguage(), "Server Delivery Processor for delivering to a delivery queue");
 
 			serverDeliveryProcessorDeliveryQueue = pm.makePersistent(serverDeliveryProcessorDeliveryQueue);

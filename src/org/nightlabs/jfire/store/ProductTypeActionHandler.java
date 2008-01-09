@@ -199,7 +199,7 @@ public abstract class ProductTypeActionHandler
 
 	/**
 	 * @param organisationID First part of primary key: The identifier of that organisation which defined this handler.
-	 *		Use {@link Organisation#DEVIL_ORGANISATION_ID} if you contribute directly to a JFire project and your own
+	 *		Use {@link Organisation#DEV_ORGANISATION_ID} if you contribute directly to a JFire project and your own
 	 *		organisation's unique identifier (i.e. your domain), if you write an own project.
 	 * @param productTypeActionHandlerID The ID within the scope of the <code>organisationID</code> 
 	 * @param productTypeClass The class for which this handler shall be responsible. It will apply to all
@@ -1054,7 +1054,7 @@ public abstract class ProductTypeActionHandler
 //	{
 //		PersistenceManager pm = getPersistenceManager();
 //
-//		CrossTradeDeliveryCoordinatorID id = CrossTradeDeliveryCoordinatorID.create(Organisation.DEVIL_ORGANISATION_ID, CrossTradeDeliveryCoordinator.class.getName());
+//		CrossTradeDeliveryCoordinatorID id = CrossTradeDeliveryCoordinatorID.create(Organisation.DEV_ORGANISATION_ID, CrossTradeDeliveryCoordinator.class.getName());
 //		try {
 //			CrossTradeDeliveryCoordinator ctdc = (CrossTradeDeliveryCoordinator) pm.getObjectById(id);
 //			ctdc.getModeOfDeliveryFlavour();

@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<process-diagram name="devil.NightLabs.org:Offer.Vendor" width="1444" height="806">
-  <node name="devil.NightLabs.org:created" x="-24" y="17" width="190" height="40">
+<process-diagram name="dev.jfire.org:Offer.Vendor" width="1444" height="806">
+  <node name="dev.jfire.org:created" x="-24" y="17" width="190" height="40">
     <transition name="finalize">
       <label x="-122" y="-52"/>
       <bendpoint w1="231" h1="75" w2="-1" h2="-114"/>
@@ -9,17 +9,17 @@
     <transition name="abort">
       <label x="-26" y="-15"/>
     </transition>
-    <transition name="devil.NightLabs.org:acceptImplicitely">
+    <transition name="dev.jfire.org:acceptImplicitely">
       <label x="-12" y="5"/>
     </transition>
-    <transition name="devil.NightLabs.org:finalizeForCrossTrade">
+    <transition name="dev.jfire.org:finalizeForCrossTrade">
       <label x="-240" y="-23"/>
     </transition>
   </node>
-  <node name="devil.NightLabs.org:rejected" x="456" y="336" width="217" height="40"/>
-  <node name="devil.NightLabs.org:accepted" x="-28" y="313" width="199" height="40"/>
-  <node name="devil.NightLabs.org:finalized" x="208" y="206" width="190" height="40">
-    <transition name="devil.NightLabs.org:expire">
+  <node name="dev.jfire.org:rejected" x="456" y="336" width="217" height="40"/>
+  <node name="dev.jfire.org:accepted" x="-28" y="313" width="199" height="40"/>
+  <node name="dev.jfire.org:finalized" x="208" y="206" width="190" height="40">
+    <transition name="dev.jfire.org:expire">
       <label x="-15" y="-45"/>
       <bendpoint w1="98" h1="208" w2="-163" h2="6"/>
     </transition>
@@ -31,37 +31,37 @@
       <label x="5" y="-10"/>
       <bendpoint w1="101" h1="129" w2="-160" h2="-1"/>
     </transition>
-    <transition name="devil.NightLabs.org:customerAccepted">
+    <transition name="dev.jfire.org:customerAccepted">
       <label x="-79" y="96"/>
     </transition>
-    <transition name="devil.NightLabs.org:customerRejected">
+    <transition name="dev.jfire.org:customerRejected">
       <label x="-81" y="-24"/>
       <bendpoint w1="262" h1="-1" w2="1" h2="-47"/>
     </transition>
     <transition name="accept">
       <label x="-2" y="-27"/>
     </transition>
-    <transition name="devil.NightLabs.org:send">
+    <transition name="dev.jfire.org:send">
       <label x="-49" y="-15"/>
       <bendpoint w1="-57" h1="-51" w2="272" h2="-53"/>
       <bendpoint w1="-211" h1="-51" w2="118" h2="-53"/>
     </transition>
   </node>
-  <node name="devil.NightLabs.org:expired" x="456" y="408" width="217" height="40"/>
-  <node name="devil.NightLabs.org:aborted" x="453" y="16" width="217" height="40"/>
-  <node name="devil.NightLabs.org:revoked" x="456" y="480" width="217" height="40"/>
-  <node name="devil.NightLabs.org:customerAccepted" x="-41" y="491" width="225" height="40">
+  <node name="dev.jfire.org:expired" x="456" y="408" width="217" height="40"/>
+  <node name="dev.jfire.org:aborted" x="453" y="16" width="217" height="40"/>
+  <node name="dev.jfire.org:revoked" x="456" y="480" width="217" height="40"/>
+  <node name="dev.jfire.org:customerAccepted" x="-41" y="491" width="225" height="40">
     <transition name="accept">
       <label x="5" y="-10"/>
     </transition>
   </node>
-  <node name="devil.NightLabs.org:customerRejected" x="456" y="252" width="217" height="40">
+  <node name="dev.jfire.org:customerRejected" x="456" y="252" width="217" height="40">
     <transition name="reject">
       <label x="5" y="-10"/>
     </transition>
   </node>
-  <node name="devil.NightLabs.org:sent" x="-134" y="208" width="216" height="40">
-    <transition name="devil.NightLabs.org:send">
+  <node name="dev.jfire.org:sent" x="-134" y="208" width="216" height="40">
+    <transition name="dev.jfire.org:send">
       <label x="-53" y="-12"/>
       <bendpoint w1="122" h1="-33" w2="-207" h2="-31"/>
       <bendpoint w1="233" h1="-33" w2="-96" h2="-31"/>
@@ -76,22 +76,22 @@
       <label x="-123" y="-15"/>
     </transition>
   </node>
-  <node name="devil.NightLabs.org:acceptedImplicitely" x="-156" y="105" width="261" height="40">
+  <node name="dev.jfire.org:acceptedImplicitely" x="-156" y="105" width="261" height="40">
     <transition name="sendImplicitely">
       <label x="3" y="-8"/>
     </transition>
   </node>
-  <node name="devil.NightLabs.org:sentForCrossTrade" x="-453" y="273" width="290" height="40">
-    <transition name="devil.NightLabs.org:acceptForCrossTrade">
+  <node name="dev.jfire.org:sentForCrossTrade" x="-453" y="273" width="290" height="40">
+    <transition name="dev.jfire.org:acceptForCrossTrade">
       <label x="2" y="-39"/>
     </transition>
   </node>
-  <node name="devil.NightLabs.org:acceptedForCrossTrade" x="-456" y="392" width="296" height="40">
+  <node name="dev.jfire.org:acceptedForCrossTrade" x="-456" y="392" width="296" height="40">
     <transition name="">
       <label x="5" y="-10"/>
     </transition>
   </node>
-  <node name="devil.NightLabs.org:finalizedForCrossTrade" x="-453" y="120" width="288" height="40">
+  <node name="dev.jfire.org:finalizedForCrossTrade" x="-453" y="120" width="288" height="40">
     <transition name="sendForCrossTrade">
       <label x="-146" y="-7"/>
     </transition>

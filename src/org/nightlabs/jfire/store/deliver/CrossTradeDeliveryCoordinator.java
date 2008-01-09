@@ -79,7 +79,7 @@ public class CrossTradeDeliveryCoordinator implements Serializable
 
 	public static CrossTradeDeliveryCoordinator getDefaultCrossTradeDeliveryCoordinator(PersistenceManager pm)
 	{
-		CrossTradeDeliveryCoordinatorID id = CrossTradeDeliveryCoordinatorID.create(Organisation.DEVIL_ORGANISATION_ID, CrossTradeDeliveryCoordinator.class.getName());
+		CrossTradeDeliveryCoordinatorID id = CrossTradeDeliveryCoordinatorID.create(Organisation.DEV_ORGANISATION_ID, CrossTradeDeliveryCoordinator.class.getName());
 		try {
 			CrossTradeDeliveryCoordinator ctdc = (CrossTradeDeliveryCoordinator) pm.getObjectById(id);
 			ctdc.getModeOfDeliveryFlavour();

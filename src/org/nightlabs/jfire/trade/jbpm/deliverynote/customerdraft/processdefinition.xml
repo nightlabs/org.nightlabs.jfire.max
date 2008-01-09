@@ -1,14 +1,14 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
 <process-definition
-  xmlns=""  name="devil.NightLabs.org:DeliveryNote.Customer">
-   <start-state name="devil.NightLabs.org:sent">
-      <transition name="createReceptionNote" to="devil.NightLabs.org:createdReceptionNote"></transition>
-      <transition name="book" to="devil.NightLabs.org:booked"></transition>
+  xmlns=""  name="dev.jfire.org:DeliveryNote.Customer">
+   <start-state name="dev.jfire.org:sent">
+      <transition name="createReceptionNote" to="dev.jfire.org:createdReceptionNote"></transition>
+      <transition name="book" to="dev.jfire.org:booked"></transition>
    </start-state>
-   <end-state name="devil.NightLabs.org:createdReceptionNote"></end-state>
-   <end-state name="devil.NightLabs.org:delivered"></end-state>
-   <state name="devil.NightLabs.org:booked">
-      <transition name="devil.NightLabs.org:deliver" to="devil.NightLabs.org:delivered"></transition>
+   <end-state name="dev.jfire.org:createdReceptionNote"></end-state>
+   <end-state name="dev.jfire.org:delivered"></end-state>
+   <state name="dev.jfire.org:booked">
+      <transition name="dev.jfire.org:deliver" to="dev.jfire.org:delivered"></transition>
    </state>
 </process-definition>

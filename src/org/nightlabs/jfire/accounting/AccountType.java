@@ -33,36 +33,36 @@ implements Serializable
 	/**
 	 * anchorTypeID for revenue accounts of the local organisation.
 	 */
-	public static final AccountTypeID ACCOUNT_TYPE_ID_LOCAL_REVENUE = AccountTypeID.create(Organisation.DEVIL_ORGANISATION_ID, "Account.Local.Revenue");
+	public static final AccountTypeID ACCOUNT_TYPE_ID_LOCAL_REVENUE = AccountTypeID.create(Organisation.DEV_ORGANISATION_ID, "Account.Local.Revenue");
 
 	/**
 	 * anchorTypeID for expense accounts of the Local organisation
 	 */
-	public static final AccountTypeID ACCOUNT_TYPE_ID_LOCAL_EXPENSE = AccountTypeID.create(Organisation.DEVIL_ORGANISATION_ID, "Account.Local.Expense");
+	public static final AccountTypeID ACCOUNT_TYPE_ID_LOCAL_EXPENSE = AccountTypeID.create(Organisation.DEV_ORGANISATION_ID, "Account.Local.Expense");
 
 	/**
 	 * anchorTypeID for accounts of trading partners when they acting as vendor
 	 */
-	public static final AccountTypeID ACCOUNT_TYPE_ID_PARTNER_VENDOR = AccountTypeID.create(Organisation.DEVIL_ORGANISATION_ID, "Account.Partner.Vendor");
+	public static final AccountTypeID ACCOUNT_TYPE_ID_PARTNER_VENDOR = AccountTypeID.create(Organisation.DEV_ORGANISATION_ID, "Account.Partner.Vendor");
 	
 	/**
 	 * anchorTypeID for accounts of trading partners when they acting as customer
 	 */
-	public static final AccountTypeID ACCOUNT_TYPE_ID_PARTNER_CUSTOMER = AccountTypeID.create(Organisation.DEVIL_ORGANISATION_ID, "Account.Partner.Customer");
+	public static final AccountTypeID ACCOUNT_TYPE_ID_PARTNER_CUSTOMER = AccountTypeID.create(Organisation.DEV_ORGANISATION_ID, "Account.Partner.Customer");
 
 	/**
 	 * anchorTypeID for accounts of trading partners when they overpay multiple invoices and
 	 * it cannot be determined whether the partner is a customer or a vendor.
 	 */
-	public static final AccountTypeID ACCOUNT_TYPE_ID_PARTNER_NEUTRAL = AccountTypeID.create(Organisation.DEVIL_ORGANISATION_ID, "Account.Partner.Neutral");
+	public static final AccountTypeID ACCOUNT_TYPE_ID_PARTNER_NEUTRAL = AccountTypeID.create(Organisation.DEV_ORGANISATION_ID, "Account.Partner.Neutral");
 
 	/**
 	 * anchorTypeID for accounts that are used during payment. They represent money that's outside
 	 * the organisation (means paid to a partner), hence their {@link #isOutside()} property is <code>true</code>.
 	 */
-	public static final AccountTypeID ACCOUNT_TYPE_ID_OUTSIDE = AccountTypeID.create(Organisation.DEVIL_ORGANISATION_ID, "Account.Outside");
+	public static final AccountTypeID ACCOUNT_TYPE_ID_OUTSIDE = AccountTypeID.create(Organisation.DEV_ORGANISATION_ID, "Account.Outside");
 
-	public static final AccountTypeID ACCOUNT_TYPE_ID_SUMMARY = AccountTypeID.create(Organisation.DEVIL_ORGANISATION_ID, "Account.Summary");
+	public static final AccountTypeID ACCOUNT_TYPE_ID_SUMMARY = AccountTypeID.create(Organisation.DEV_ORGANISATION_ID, "Account.Summary");
 
 	/**
 	 * @jdo.field primary-key="true"

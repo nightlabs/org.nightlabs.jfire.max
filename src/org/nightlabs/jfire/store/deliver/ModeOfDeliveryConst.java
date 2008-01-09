@@ -15,7 +15,7 @@ public class ModeOfDeliveryConst
 	 * It specifies the manual delivery outside of the control of the system (directly
 	 * by the personal contact between vendor and customer).
 	 */
-	public static final ModeOfDeliveryID MODE_OF_DELIVERY_ID_MANUAL = ModeOfDeliveryID.create(Organisation.DEVIL_ORGANISATION_ID, "manual");
+	public static final ModeOfDeliveryID MODE_OF_DELIVERY_ID_MANUAL = ModeOfDeliveryID.create(Organisation.DEV_ORGANISATION_ID, "manual");
 
 	/**
 	 * This is the ID of one of the default <tt>ModeOfDelivery</tt>s. However, you
@@ -26,13 +26,13 @@ public class ModeOfDeliveryConst
 	 * It specifies the non-delivery, means the delivery is simply postponed without
 	 * any further action.
 	 */
-	public static final ModeOfDeliveryID MODE_OF_DELIVERY_ID_NON_DELIVERY = ModeOfDeliveryID.create(Organisation.DEVIL_ORGANISATION_ID, "nonDelivery");
+	public static final ModeOfDeliveryID MODE_OF_DELIVERY_ID_NON_DELIVERY = ModeOfDeliveryID.create(Organisation.DEV_ORGANISATION_ID, "nonDelivery");
 	
 	/**
 	 * This is the ID of the ModeOfDelivery of delivering articles to a {@link DeliveryQueue} for
 	 * further processing later.
 	 */
-	public static final ModeOfDeliveryID MODE_OF_DELIVERY_ID_DELIVER_TO_DELIVERY_QUEUE = ModeOfDeliveryID.create(Organisation.DEVIL_ORGANISATION_ID, "deliverToDeliveryQueue");
+	public static final ModeOfDeliveryID MODE_OF_DELIVERY_ID_DELIVER_TO_DELIVERY_QUEUE = ModeOfDeliveryID.create(Organisation.DEV_ORGANISATION_ID, "deliverToDeliveryQueue");
 
 	/**
 	 * This is the ID of one of the default <tt>ModeOfDelivery</tt>s. However, you
@@ -43,7 +43,7 @@ public class ModeOfDeliveryConst
 	 * It specifies the external delivery via a delivery agency like "Deutsche Post",
 	 * "UPS" or similar.
 	 */
-	public static final ModeOfDeliveryID MODE_OF_DELIVERY_ID_MAILING_PHYSICAL = ModeOfDeliveryID.create(Organisation.DEVIL_ORGANISATION_ID, "mailing.physical");
+	public static final ModeOfDeliveryID MODE_OF_DELIVERY_ID_MAILING_PHYSICAL = ModeOfDeliveryID.create(Organisation.DEV_ORGANISATION_ID, "mailing.physical");
 
 	/**
 	 * This is the ID of one of the default <tt>ModeOfDelivery</tt>s. However, you
@@ -57,11 +57,11 @@ public class ModeOfDeliveryConst
 	 * browser. Between organisations, a virtual delivery can be done directly within
 	 * jfire.
 	 */
-	public static final ModeOfDeliveryID MODE_OF_DELIVERY_ID_MAILING_VIRTUAL = ModeOfDeliveryID.create(Organisation.DEVIL_ORGANISATION_ID, "mailing.virtual");
+	public static final ModeOfDeliveryID MODE_OF_DELIVERY_ID_MAILING_VIRTUAL = ModeOfDeliveryID.create(Organisation.DEV_ORGANISATION_ID, "mailing.virtual");
 
-	public static final ModeOfDeliveryID MODE_OF_DELIVERY_ID_JFIRE = ModeOfDeliveryID.create(Organisation.DEVIL_ORGANISATION_ID, "jfire");
+	public static final ModeOfDeliveryID MODE_OF_DELIVERY_ID_JFIRE = ModeOfDeliveryID.create(Organisation.DEV_ORGANISATION_ID, "jfire");
 
-	public static final ModeOfDeliveryFlavourID MODE_OF_DELIVERY_FLAVOUR_ID_JFIRE = ModeOfDeliveryFlavourID.create(Organisation.DEVIL_ORGANISATION_ID, "jfire");
+	public static final ModeOfDeliveryFlavourID MODE_OF_DELIVERY_FLAVOUR_ID_JFIRE = ModeOfDeliveryFlavourID.create(Organisation.DEV_ORGANISATION_ID, "jfire");
 	
 	
 	

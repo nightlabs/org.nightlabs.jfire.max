@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<process-diagram name="devil.NightLabs.org:DeliveryNote.Customer" width="742" height="637">
-  <node name="devil.NightLabs.org:sent" x="4" y="4" width="206" height="40">
+<process-diagram name="dev.jfire.org:DeliveryNote.Customer" width="742" height="637">
+  <node name="dev.jfire.org:sent" x="4" y="4" width="206" height="40">
     <transition name="createReceptionNote">
       <label x="5" y="-10"/>
     </transition>
@@ -9,10 +9,10 @@
       <label x="5" y="-10"/>
     </transition>
   </node>
-  <node name="devil.NightLabs.org:createdReceptionNote" x="347" y="116" width="268" height="40"/>
-  <node name="devil.NightLabs.org:delivered" x="2" y="237" width="211" height="40"/>
-  <node name="devil.NightLabs.org:booked" x="2" y="115" width="210" height="40">
-    <transition name="devil.NightLabs.org:deliver">
+  <node name="dev.jfire.org:createdReceptionNote" x="347" y="116" width="268" height="40"/>
+  <node name="dev.jfire.org:delivered" x="2" y="237" width="211" height="40"/>
+  <node name="dev.jfire.org:booked" x="2" y="115" width="210" height="40">
+    <transition name="dev.jfire.org:deliver">
       <label x="5" y="-10"/>
     </transition>
   </node>

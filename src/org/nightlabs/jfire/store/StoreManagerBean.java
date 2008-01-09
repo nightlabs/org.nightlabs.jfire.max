@@ -245,7 +245,7 @@ implements SessionBean
 			ModeOfDelivery modeOfDelivery = new ModeOfDelivery(ModeOfDeliveryConst.MODE_OF_DELIVERY_ID_MANUAL);
 			modeOfDelivery.getName().setText(Locale.ENGLISH.getLanguage(), "Personal Delivery (manually from hand to hand)");
 			modeOfDelivery.getName().setText(Locale.GERMAN.getLanguage(), "Persönliche Lieferung (manuell von Hand zu Hand)");
-			ModeOfDeliveryFlavour modeOfDeliveryFlavour = modeOfDelivery.createFlavour(Organisation.DEVIL_ORGANISATION_ID, "manual");
+			ModeOfDeliveryFlavour modeOfDeliveryFlavour = modeOfDelivery.createFlavour(Organisation.DEV_ORGANISATION_ID, "manual");
 			modeOfDeliveryFlavour.loadIconFromResource();
 			modeOfDeliveryFlavour.getName().setText(Locale.ENGLISH.getLanguage(), "Personal Delivery (manually from hand to hand)");
 			modeOfDeliveryFlavour.getName().setText(Locale.GERMAN.getLanguage(), "Persönliche Lieferung (manuell von Hand zu Hand)");
@@ -260,7 +260,7 @@ implements SessionBean
 			modeOfDelivery = new ModeOfDelivery(ModeOfDeliveryConst.MODE_OF_DELIVERY_ID_NON_DELIVERY);
 			modeOfDelivery.getName().setText(Locale.ENGLISH.getLanguage(), "Non-Delivery");
 			modeOfDelivery.getName().setText(Locale.GERMAN.getLanguage(), "Nichtversand");
-			modeOfDeliveryFlavour = modeOfDelivery.createFlavour(Organisation.DEVIL_ORGANISATION_ID, "nonDelivery");
+			modeOfDeliveryFlavour = modeOfDelivery.createFlavour(Organisation.DEV_ORGANISATION_ID, "nonDelivery");
 			modeOfDeliveryFlavour.getName().setText(Locale.ENGLISH.getLanguage(), "Non-Delivery");
 			modeOfDeliveryFlavour.getName().setText(Locale.GERMAN.getLanguage(), "Nichtversand");
 			pm.makePersistent(modeOfDelivery);
@@ -271,13 +271,13 @@ implements SessionBean
 			modeOfDelivery = new ModeOfDelivery(ModeOfDeliveryConst.MODE_OF_DELIVERY_ID_MAILING_PHYSICAL);
 			modeOfDelivery.getName().setText(Locale.ENGLISH.getLanguage(), "Mailing Delivery (physical)");
 			modeOfDelivery.getName().setText(Locale.GERMAN.getLanguage(), "Postversand (physisch)");
-			modeOfDeliveryFlavour = modeOfDelivery.createFlavour(Organisation.DEVIL_ORGANISATION_ID, "mailing.physical.default");
+			modeOfDeliveryFlavour = modeOfDelivery.createFlavour(Organisation.DEV_ORGANISATION_ID, "mailing.physical.default");
 			modeOfDeliveryFlavour.getName().setText(Locale.ENGLISH.getLanguage(), "Mailing Delivery by default service");
 			modeOfDeliveryFlavour.getName().setText(Locale.GERMAN.getLanguage(), "Postversand via Standard-Dienstleister");
-			modeOfDeliveryFlavour = modeOfDelivery.createFlavour(Organisation.DEVIL_ORGANISATION_ID, "mailing.physical.DHL");
+			modeOfDeliveryFlavour = modeOfDelivery.createFlavour(Organisation.DEV_ORGANISATION_ID, "mailing.physical.DHL");
 			modeOfDeliveryFlavour.getName().setText(Locale.ENGLISH.getLanguage(), "Mailing Delivery via DHL");
 			modeOfDeliveryFlavour.getName().setText(Locale.GERMAN.getLanguage(), "Postversand via DHL");
-			modeOfDeliveryFlavour = modeOfDelivery.createFlavour(Organisation.DEVIL_ORGANISATION_ID, "mailing.physical.UPS");
+			modeOfDeliveryFlavour = modeOfDelivery.createFlavour(Organisation.DEV_ORGANISATION_ID, "mailing.physical.UPS");
 			modeOfDeliveryFlavour.getName().setText(Locale.ENGLISH.getLanguage(), "Mailing Delivery via UPS");
 			modeOfDeliveryFlavour.getName().setText(Locale.GERMAN.getLanguage(), "Postversand via UPS");
 			pm.makePersistent(modeOfDelivery);
@@ -288,7 +288,7 @@ implements SessionBean
 			modeOfDelivery = new ModeOfDelivery(ModeOfDeliveryConst.MODE_OF_DELIVERY_ID_MAILING_VIRTUAL);
 			modeOfDelivery.getName().setText(Locale.ENGLISH.getLanguage(), "Virtual Delivery (online)");
 			modeOfDelivery.getName().setText(Locale.GERMAN.getLanguage(), "Virtuelle Lieferung (online)");
-			modeOfDeliveryFlavour = modeOfDelivery.createFlavour(Organisation.DEVIL_ORGANISATION_ID, "mailing.virtual.email");
+			modeOfDeliveryFlavour = modeOfDelivery.createFlavour(Organisation.DEV_ORGANISATION_ID, "mailing.virtual.email");
 			modeOfDeliveryFlavour.getName().setText(Locale.ENGLISH.getLanguage(), "Delivery by eMail");
 			modeOfDeliveryFlavour.getName().setText(Locale.GERMAN.getLanguage(), "Zustellung via eMail");
 			pm.makePersistent(modeOfDelivery);
@@ -310,7 +310,7 @@ implements SessionBean
 			modeOfDelivery = new ModeOfDelivery(ModeOfDeliveryConst.MODE_OF_DELIVERY_ID_DELIVER_TO_DELIVERY_QUEUE);
 			modeOfDelivery.getName().setText(Locale.ENGLISH.getLanguage(), "Deliver to Delivery Queue");
 			modeOfDelivery.getName().setText(Locale.GERMAN.getLanguage(), "Lieferung in Lieferwarteschlange");
-			modeOfDeliveryFlavour = modeOfDelivery.createFlavour(Organisation.DEVIL_ORGANISATION_ID, "deliverToDeliveryQueue");
+			modeOfDeliveryFlavour = modeOfDelivery.createFlavour(Organisation.DEV_ORGANISATION_ID, "deliverToDeliveryQueue");
 			modeOfDeliveryFlavour.getName().setText(Locale.ENGLISH.getLanguage(), "Deliver to Delivery Queue");
 			modeOfDeliveryFlavour.getName().setText(Locale.GERMAN.getLanguage(), "Lieferung in Lieferwarteschlange");
 			pm.makePersistent(modeOfDelivery);

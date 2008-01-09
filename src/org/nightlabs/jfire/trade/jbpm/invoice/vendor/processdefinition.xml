@@ -1,45 +1,45 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
 <process-definition
-  xmlns=""  name="devil.NightLabs.org:Invoice.Vendor">
-   <start-state name="devil.NightLabs.org:created">
-      <transition name="abort" to="devil.NightLabs.org:aborted"></transition>
-      <transition name="finalize" to="devil.NightLabs.org:finalized"></transition>
-      <transition name="devil.NightLabs.org:bookImplicitely" to="devil.NightLabs.org:bookedImplicitely"></transition>
+  xmlns=""  name="dev.jfire.org:Invoice.Vendor">
+   <start-state name="dev.jfire.org:created">
+      <transition name="abort" to="dev.jfire.org:aborted"></transition>
+      <transition name="finalize" to="dev.jfire.org:finalized"></transition>
+      <transition name="dev.jfire.org:bookImplicitely" to="dev.jfire.org:bookedImplicitely"></transition>
    </start-state>
-   <state name="devil.NightLabs.org:finalized">
-      <transition name="devil.NightLabs.org:book" to="devil.NightLabs.org:booked"></transition>
+   <state name="dev.jfire.org:finalized">
+      <transition name="dev.jfire.org:book" to="dev.jfire.org:booked"></transition>
    </state>
-   <end-state name="devil.NightLabs.org:aborted"></end-state>
-   <state name="devil.NightLabs.org:doubtful">
-      <transition name="devil.NightLabs.org:pay" to="devil.NightLabs.org:paid"></transition>
-      <transition name="bookUnreceivable" to="devil.NightLabs.org:bookedUnreceivable"></transition>
-      <transition name="trust" to="devil.NightLabs.org:booked"></transition>
+   <end-state name="dev.jfire.org:aborted"></end-state>
+   <state name="dev.jfire.org:doubtful">
+      <transition name="dev.jfire.org:pay" to="dev.jfire.org:paid"></transition>
+      <transition name="bookUnreceivable" to="dev.jfire.org:bookedUnreceivable"></transition>
+      <transition name="trust" to="dev.jfire.org:booked"></transition>
    </state>
-   <end-state name="devil.NightLabs.org:uncollectable"></end-state>
-   <end-state name="devil.NightLabs.org:paid"></end-state>
-   <state name="devil.NightLabs.org:booked">
-      <transition name="devil.NightLabs.org:send" to="devil.NightLabs.org:sent"></transition>
-      <transition name="doubt" to="devil.NightLabs.org:doubtful"></transition>
-      <transition name="devil.NightLabs.org:pay" to="devil.NightLabs.org:paid"></transition>
-      <transition name="sendReminder" to="devil.NightLabs.org:sentReminder"></transition>
+   <end-state name="dev.jfire.org:uncollectable"></end-state>
+   <end-state name="dev.jfire.org:paid"></end-state>
+   <state name="dev.jfire.org:booked">
+      <transition name="dev.jfire.org:send" to="dev.jfire.org:sent"></transition>
+      <transition name="doubt" to="dev.jfire.org:doubtful"></transition>
+      <transition name="dev.jfire.org:pay" to="dev.jfire.org:paid"></transition>
+      <transition name="sendReminder" to="dev.jfire.org:sentReminder"></transition>
    </state>
-   <node name="devil.NightLabs.org:sent">
-      <transition name="" to="devil.NightLabs.org:booked"></transition>
+   <node name="dev.jfire.org:sent">
+      <transition name="" to="dev.jfire.org:booked"></transition>
    </node>
-   <node name="devil.NightLabs.org:bookedUnreceivable">
-      <transition name="endAsUncollectable" to="devil.NightLabs.org:uncollectable"></transition>
+   <node name="dev.jfire.org:bookedUnreceivable">
+      <transition name="endAsUncollectable" to="dev.jfire.org:uncollectable"></transition>
    </node>
-   <state name="devil.NightLabs.org:sentReminder">
-      <transition name="sendPreCollectionLetter" to="devil.NightLabs.org:sentPreCollectionLetter"></transition>
-      <transition name="devil.NightLabs.org:pay" to="devil.NightLabs.org:paid"></transition>
-      <transition name="doubt" to="devil.NightLabs.org:doubtful"></transition>
+   <state name="dev.jfire.org:sentReminder">
+      <transition name="sendPreCollectionLetter" to="dev.jfire.org:sentPreCollectionLetter"></transition>
+      <transition name="dev.jfire.org:pay" to="dev.jfire.org:paid"></transition>
+      <transition name="doubt" to="dev.jfire.org:doubtful"></transition>
    </state>
-   <state name="devil.NightLabs.org:sentPreCollectionLetter">
-      <transition name="doubt" to="devil.NightLabs.org:doubtful"></transition>
-      <transition name="devil.NightLabs.org:pay" to="devil.NightLabs.org:paid"></transition>
+   <state name="dev.jfire.org:sentPreCollectionLetter">
+      <transition name="doubt" to="dev.jfire.org:doubtful"></transition>
+      <transition name="dev.jfire.org:pay" to="dev.jfire.org:paid"></transition>
    </state>
-   <node name="devil.NightLabs.org:bookedImplicitely">
-      <transition name="" to="devil.NightLabs.org:booked"></transition>
+   <node name="dev.jfire.org:bookedImplicitely">
+      <transition name="" to="dev.jfire.org:booked"></transition>
    </node>
 </process-definition>

@@ -52,9 +52,9 @@ public class ServerPaymentProcessorDebitNoteGermany extends ServerPaymentProcess
 		try {
 			pm.getExtent(ServerPaymentProcessorDebitNoteGermany.class);
 			serverPaymentProcessorDebitNote = (ServerPaymentProcessorDebitNoteGermany) pm.getObjectById(
-					ServerPaymentProcessorID.create(Organisation.DEVIL_ORGANISATION_ID, ServerPaymentProcessorDebitNoteGermany.class.getName()));
+					ServerPaymentProcessorID.create(Organisation.DEV_ORGANISATION_ID, ServerPaymentProcessorDebitNoteGermany.class.getName()));
 		} catch (JDOObjectNotFoundException e) {
-			serverPaymentProcessorDebitNote = new ServerPaymentProcessorDebitNoteGermany(Organisation.DEVIL_ORGANISATION_ID, ServerPaymentProcessorDebitNoteGermany.class.getName());
+			serverPaymentProcessorDebitNote = new ServerPaymentProcessorDebitNoteGermany(Organisation.DEV_ORGANISATION_ID, ServerPaymentProcessorDebitNoteGermany.class.getName());
 			pm.makePersistent(serverPaymentProcessorDebitNote);
 		}
 

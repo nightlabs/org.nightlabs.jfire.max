@@ -55,9 +55,9 @@ public class ServerPaymentProcessorCreditCardDummyForClientPayment extends Serve
 		try {
 			pm.getExtent(ServerPaymentProcessorCreditCardDummyForClientPayment.class);
 			serverPaymentProcessorSaferPay = (ServerPaymentProcessorCreditCardDummyForClientPayment) pm.getObjectById(
-					ServerPaymentProcessorID.create(Organisation.DEVIL_ORGANISATION_ID, ServerPaymentProcessorCreditCardDummyForClientPayment.class.getName()));
+					ServerPaymentProcessorID.create(Organisation.DEV_ORGANISATION_ID, ServerPaymentProcessorCreditCardDummyForClientPayment.class.getName()));
 		} catch (JDOObjectNotFoundException e) {
-			serverPaymentProcessorSaferPay = new ServerPaymentProcessorCreditCardDummyForClientPayment(Organisation.DEVIL_ORGANISATION_ID, ServerPaymentProcessorCreditCardDummyForClientPayment.class.getName());
+			serverPaymentProcessorSaferPay = new ServerPaymentProcessorCreditCardDummyForClientPayment(Organisation.DEV_ORGANISATION_ID, ServerPaymentProcessorCreditCardDummyForClientPayment.class.getName());
 			pm.makePersistent(serverPaymentProcessorSaferPay);
 		}
 

@@ -8,10 +8,10 @@ import org.nightlabs.jfire.organisation.Organisation;
 public class JbpmConstantsInvoice
 {
 	public static class Both {
-		public static final String NODE_NAME_SENT   = Organisation.DEVIL_ORGANISATION_ID + ":sent";
-		public static final String NODE_NAME_BOOKED = Organisation.DEVIL_ORGANISATION_ID + ":booked";
+		public static final String NODE_NAME_SENT   = Organisation.DEV_ORGANISATION_ID + ":sent";
+		public static final String NODE_NAME_BOOKED = Organisation.DEV_ORGANISATION_ID + ":booked";
 
-		public static final String NODE_NAME_PAID          = Organisation.DEVIL_ORGANISATION_ID + ":paid";
+		public static final String NODE_NAME_PAID          = Organisation.DEV_ORGANISATION_ID + ":paid";
 
 		/**
 		 * <p>
@@ -25,7 +25,7 @@ public class JbpmConstantsInvoice
 		 * {@link org.nightlabs.jfire.accounting.Accounting#payEnd(org.nightlabs.jfire.security.User, org.nightlabs.jfire.accounting.pay.PaymentData)}.
 		 * </p>
 		 */
-		public static final String TRANSITION_NAME_PAY = Organisation.DEVIL_ORGANISATION_ID + ":pay";
+		public static final String TRANSITION_NAME_PAY = Organisation.DEV_ORGANISATION_ID + ":pay";
 	}
 
 	public static class Vendor {
@@ -40,30 +40,30 @@ public class JbpmConstantsInvoice
 //		 * </p> 
 //		 */
 //		public static final ProcessDefinitionID PROCESS_DEFINITION_ID = ProcessDefinitionID.create(
-//				Organisation.DEVIL_ORGANISATION_ID, "Invoice.Vendor");
+//				Organisation.DEV_ORGANISATION_ID, "Invoice.Vendor");
 
-		public static final String NODE_NAME_CREATED       = Organisation.DEVIL_ORGANISATION_ID + ":created";
-		public static final String NODE_NAME_FINALIZED     = Organisation.DEVIL_ORGANISATION_ID + ":finalized";
-		public static final String NODE_NAME_ABORTED       = Organisation.DEVIL_ORGANISATION_ID + ":aborted";
-		public static final String NODE_NAME_SENT_REMINDER = Organisation.DEVIL_ORGANISATION_ID + ":sentReminder";
-		public static final String NODE_NAME_SENT_PRE_COLLECTION_LETTER = Organisation.DEVIL_ORGANISATION_ID + ":sentPreCollectionLetter";
-		public static final String NODE_NAME_DOUBTFUL      = Organisation.DEVIL_ORGANISATION_ID + ":doubtful";
-		public static final String NODE_NAME_BOOKED_UNRECEIVABLE = Organisation.DEVIL_ORGANISATION_ID + ":bookedUnreceivable";
-		public static final String NODE_NAME_UNCOLLECTABLE = Organisation.DEVIL_ORGANISATION_ID + ":uncollectable";
+		public static final String NODE_NAME_CREATED       = Organisation.DEV_ORGANISATION_ID + ":created";
+		public static final String NODE_NAME_FINALIZED     = Organisation.DEV_ORGANISATION_ID + ":finalized";
+		public static final String NODE_NAME_ABORTED       = Organisation.DEV_ORGANISATION_ID + ":aborted";
+		public static final String NODE_NAME_SENT_REMINDER = Organisation.DEV_ORGANISATION_ID + ":sentReminder";
+		public static final String NODE_NAME_SENT_PRE_COLLECTION_LETTER = Organisation.DEV_ORGANISATION_ID + ":sentPreCollectionLetter";
+		public static final String NODE_NAME_DOUBTFUL      = Organisation.DEV_ORGANISATION_ID + ":doubtful";
+		public static final String NODE_NAME_BOOKED_UNRECEIVABLE = Organisation.DEV_ORGANISATION_ID + ":bookedUnreceivable";
+		public static final String NODE_NAME_UNCOLLECTABLE = Organisation.DEV_ORGANISATION_ID + ":uncollectable";
 
-		public static final String NODE_NAME_BOOKED_IMPLICITELY = Organisation.DEVIL_ORGANISATION_ID + ":bookedImplicitely";
+		public static final String NODE_NAME_BOOKED_IMPLICITELY = Organisation.DEV_ORGANISATION_ID + ":bookedImplicitely";
 
 		/**
 		 * This transition is automatically triggered asynchronously as soon as the user finalized the document.
 		 */
-		public static final String TRANSITION_NAME_BOOK = Organisation.DEVIL_ORGANISATION_ID + ":book";
+		public static final String TRANSITION_NAME_BOOK = Organisation.DEV_ORGANISATION_ID + ":book";
 
 		/**
 		 * This transition is automatically triggered asynchronously as soon as the document has been booked.
 		 */
-		public static final String TRANSITION_NAME_SEND = Organisation.DEVIL_ORGANISATION_ID + ":send";
+		public static final String TRANSITION_NAME_SEND = Organisation.DEV_ORGANISATION_ID + ":send";
 
-		public static final String TRANSITION_NAME_BOOK_IMPLICITELY = Organisation.DEVIL_ORGANISATION_ID + ":bookImplicitely";
+		public static final String TRANSITION_NAME_BOOK_IMPLICITELY = Organisation.DEV_ORGANISATION_ID + ":bookImplicitely";
 	}
 
 	public static class Customer {
@@ -78,7 +78,7 @@ public class JbpmConstantsInvoice
 //		 * </p> 
 //		 */
 //		public static final ProcessDefinitionID PROCESS_DEFINITION_ID = ProcessDefinitionID.create(
-//				Organisation.DEVIL_ORGANISATION_ID, "Invoice.Customer");
+//				Organisation.DEV_ORGANISATION_ID, "Invoice.Customer");
 	}
 
 	private JbpmConstantsInvoice() { }

@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<process-diagram name="devil.NightLabs.org:Invoice.Customer" width="742" height="635">
-  <node name="devil.NightLabs.org:sent" x="3" y="3" width="216" height="40">
+<process-diagram name="dev.jfire.org:Invoice.Customer" width="742" height="635">
+  <node name="dev.jfire.org:sent" x="3" y="3" width="216" height="40">
     <transition name="book">
       <label x="0" y="-10"/>
     </transition>
@@ -9,9 +9,9 @@
       <label x="5" y="-10"/>
     </transition>
   </node>
-  <node name="devil.NightLabs.org:paid" x="1" y="211" width="220" height="40"/>
-  <node name="devil.NightLabs.org:booked" x="2" y="103" width="219" height="40">
-    <transition name="devil.NightLabs.org:pay">
+  <node name="dev.jfire.org:paid" x="1" y="211" width="220" height="40"/>
+  <node name="dev.jfire.org:booked" x="2" y="103" width="219" height="40">
+    <transition name="dev.jfire.org:pay">
       <label x="-1" y="-10"/>
     </transition>
     <transition name="dispute">
@@ -24,7 +24,7 @@
     </transition>
   </node>
   <node name="disputeStarted.afterBook" x="401" y="104" width="179" height="40">
-    <transition name="devil.NightLabs.org:pay">
+    <transition name="dev.jfire.org:pay">
       <label x="34" y="-12"/>
     </transition>
   </node>

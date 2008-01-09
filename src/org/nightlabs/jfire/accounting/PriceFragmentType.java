@@ -137,7 +137,7 @@ public class PriceFragmentType
 	/**
 	 * The {@link PriceFragmentTypeID} of the system-internal {@link PriceFragmentType} 'Total', that is the total price of a ProductType.
 	 */
-	public static final PriceFragmentTypeID PRICE_FRAGMENT_TYPE_ID_TOTAL = PriceFragmentTypeID.create(Organisation.DEVIL_ORGANISATION_ID, "_Total_");
+	public static final PriceFragmentTypeID PRICE_FRAGMENT_TYPE_ID_TOTAL = PriceFragmentTypeID.create(Organisation.DEV_ORGANISATION_ID, "_Total_");
 	/**
 	 * The {@link PriceFragmentTypeID} of the system-internal {@link PriceFragmentType} 'Rest', that is the missing amount of the parts of 'Total' 
 	 * (those parts not defined in a {@link Price}), to form the 'Total' amount.
@@ -145,7 +145,7 @@ public class PriceFragmentType
 	 * Note that the PriceFragment for this type is used as virtual price fragment and is not persisted to the datastore.
 	 * </p>
 	 */
-	public static final PriceFragmentTypeID PRICE_FRAGMENT_TYPE_ID_REST = PriceFragmentTypeID.create(Organisation.DEVIL_ORGANISATION_ID, "_Rest_");
+	public static final PriceFragmentTypeID PRICE_FRAGMENT_TYPE_ID_REST = PriceFragmentTypeID.create(Organisation.DEV_ORGANISATION_ID, "_Rest_");
 
 	/**
 	 * This predefined priceFragmentType exists to allow a unified API for accesses

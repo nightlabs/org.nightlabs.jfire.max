@@ -58,9 +58,9 @@ public class ServerDeliveryProcessorManual extends ServerDeliveryProcessor
 		try {
 			pm.getExtent(ServerDeliveryProcessorManual.class);
 			serverDeliveryProcessorManual = (ServerDeliveryProcessorManual) pm.getObjectById(
-					ServerDeliveryProcessorID.create(Organisation.DEVIL_ORGANISATION_ID, ServerDeliveryProcessorManual.class.getName()));
+					ServerDeliveryProcessorID.create(Organisation.DEV_ORGANISATION_ID, ServerDeliveryProcessorManual.class.getName()));
 		} catch (JDOObjectNotFoundException e) {
-			serverDeliveryProcessorManual = new ServerDeliveryProcessorManual(Organisation.DEVIL_ORGANISATION_ID, ServerDeliveryProcessorManual.class.getName());
+			serverDeliveryProcessorManual = new ServerDeliveryProcessorManual(Organisation.DEV_ORGANISATION_ID, ServerDeliveryProcessorManual.class.getName());
 			serverDeliveryProcessorManual = pm.makePersistent(serverDeliveryProcessorManual);
 		}
 

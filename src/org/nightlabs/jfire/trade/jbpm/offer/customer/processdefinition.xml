@@ -1,19 +1,19 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
 <process-definition
-  xmlns=""  name="devil.NightLabs.org:Offer.Customer">
-   <start-state name="devil.NightLabs.org:sent">
-      <transition name="accept" to="devil.NightLabs.org:customerAccepted"></transition>
-      <transition name="reject" to="devil.NightLabs.org:customerRejected"></transition>
-      <transition name="devil.NightLabs.org:expired" to="devil.NightLabs.org:expired"></transition>
-      <transition name="devil.NightLabs.org:revoked" to="devil.NightLabs.org:revoked"></transition>
-      <transition name="devil.NightLabs.org:acceptedImplicitely" to="devil.NightLabs.org:acceptedImplicitely"></transition>
-      <transition name="devil.NightLabs.org:acceptedForCrossTrade" to="devil.NightLabs.org:acceptedForCrossTrade"></transition>
+  xmlns=""  name="dev.jfire.org:Offer.Customer">
+   <start-state name="dev.jfire.org:sent">
+      <transition name="accept" to="dev.jfire.org:customerAccepted"></transition>
+      <transition name="reject" to="dev.jfire.org:customerRejected"></transition>
+      <transition name="dev.jfire.org:expired" to="dev.jfire.org:expired"></transition>
+      <transition name="dev.jfire.org:revoked" to="dev.jfire.org:revoked"></transition>
+      <transition name="dev.jfire.org:acceptedImplicitely" to="dev.jfire.org:acceptedImplicitely"></transition>
+      <transition name="dev.jfire.org:acceptedForCrossTrade" to="dev.jfire.org:acceptedForCrossTrade"></transition>
    </start-state>
-   <end-state name="devil.NightLabs.org:customerRejected"></end-state>
-   <end-state name="devil.NightLabs.org:customerAccepted"></end-state>
-   <end-state name="devil.NightLabs.org:expired"></end-state>
-   <end-state name="devil.NightLabs.org:revoked"></end-state>
-   <end-state name="devil.NightLabs.org:acceptedImplicitely"></end-state>
-   <end-state name="devil.NightLabs.org:acceptedForCrossTrade"></end-state>
+   <end-state name="dev.jfire.org:customerRejected"></end-state>
+   <end-state name="dev.jfire.org:customerAccepted"></end-state>
+   <end-state name="dev.jfire.org:expired"></end-state>
+   <end-state name="dev.jfire.org:revoked"></end-state>
+   <end-state name="dev.jfire.org:acceptedImplicitely"></end-state>
+   <end-state name="dev.jfire.org:acceptedForCrossTrade"></end-state>
 </process-definition>

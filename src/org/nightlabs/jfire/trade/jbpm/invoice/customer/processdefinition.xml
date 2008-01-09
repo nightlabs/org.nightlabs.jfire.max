@@ -1,20 +1,20 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
 <process-definition
-  xmlns=""  name="devil.NightLabs.org:Invoice.Customer">
-   <start-state name="devil.NightLabs.org:sent">
-      <transition name="book" to="devil.NightLabs.org:booked"></transition>
+  xmlns=""  name="dev.jfire.org:Invoice.Customer">
+   <start-state name="dev.jfire.org:sent">
+      <transition name="book" to="dev.jfire.org:booked"></transition>
       <transition name="dispute" to="disputeStarted.beforeBook"></transition>
    </start-state>
-   <end-state name="devil.NightLabs.org:paid"></end-state>
-   <state name="devil.NightLabs.org:booked">
-      <transition name="devil.NightLabs.org:pay" to="devil.NightLabs.org:paid"></transition>
+   <end-state name="dev.jfire.org:paid"></end-state>
+   <state name="dev.jfire.org:booked">
+      <transition name="dev.jfire.org:pay" to="dev.jfire.org:paid"></transition>
       <transition name="dispute" to="disputeStarted.afterBook"></transition>
    </state>
    <state name="disputeStarted.beforeBook">
-      <transition name="book" to="devil.NightLabs.org:booked"></transition>
+      <transition name="book" to="dev.jfire.org:booked"></transition>
    </state>
    <state name="disputeStarted.afterBook">
-      <transition name="devil.NightLabs.org:pay" to="devil.NightLabs.org:paid"></transition>
+      <transition name="dev.jfire.org:pay" to="dev.jfire.org:paid"></transition>
    </state>
 </process-definition>

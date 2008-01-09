@@ -57,9 +57,9 @@ public class ServerDeliveryProcessorNonDelivery extends ServerDeliveryProcessor
 		try {
 			pm.getExtent(ServerDeliveryProcessorNonDelivery.class);
 			serverDeliveryProcessorNonDelivery = (ServerDeliveryProcessorNonDelivery) pm.getObjectById(
-					ServerPaymentProcessorID.create(Organisation.DEVIL_ORGANISATION_ID, ServerDeliveryProcessorNonDelivery.class.getName()));
+					ServerPaymentProcessorID.create(Organisation.DEV_ORGANISATION_ID, ServerDeliveryProcessorNonDelivery.class.getName()));
 		} catch (JDOObjectNotFoundException e) {
-			serverDeliveryProcessorNonDelivery = new ServerDeliveryProcessorNonDelivery(Organisation.DEVIL_ORGANISATION_ID, ServerDeliveryProcessorNonDelivery.class.getName());
+			serverDeliveryProcessorNonDelivery = new ServerDeliveryProcessorNonDelivery(Organisation.DEV_ORGANISATION_ID, ServerDeliveryProcessorNonDelivery.class.getName());
 			pm.makePersistent(serverDeliveryProcessorNonDelivery);
 		}
 

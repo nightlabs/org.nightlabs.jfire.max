@@ -1,25 +1,25 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
 <process-definition
-  xmlns=""  name="devil.NightLabs.org:DeliveryNote.Vendor">
-   <start-state name="devil.NightLabs.org:created">
-      <transition name="finalize" to="devil.NightLabs.org:finalized"></transition>
-      <transition name="abort" to="devil.NightLabs.org:aborted"></transition>
-      <transition name="devil.NightLabs.org:bookImplicitely" to="devil.NightLabs.org:bookedImplicitely"></transition>
+  xmlns=""  name="dev.jfire.org:DeliveryNote.Vendor">
+   <start-state name="dev.jfire.org:created">
+      <transition name="finalize" to="dev.jfire.org:finalized"></transition>
+      <transition name="abort" to="dev.jfire.org:aborted"></transition>
+      <transition name="dev.jfire.org:bookImplicitely" to="dev.jfire.org:bookedImplicitely"></transition>
    </start-state>
-   <state name="devil.NightLabs.org:finalized">
-      <transition name="devil.NightLabs.org:book" to="devil.NightLabs.org:booked"></transition>
+   <state name="dev.jfire.org:finalized">
+      <transition name="dev.jfire.org:book" to="dev.jfire.org:booked"></transition>
    </state>
-   <state name="devil.NightLabs.org:booked">
-      <transition name="devil.NightLabs.org:send" to="devil.NightLabs.org:sent"></transition>
-      <transition name="devil.NightLabs.org:deliver" to="devil.NightLabs.org:delivered"></transition>
+   <state name="dev.jfire.org:booked">
+      <transition name="dev.jfire.org:send" to="dev.jfire.org:sent"></transition>
+      <transition name="dev.jfire.org:deliver" to="dev.jfire.org:delivered"></transition>
    </state>
-   <end-state name="devil.NightLabs.org:aborted"></end-state>
-   <end-state name="devil.NightLabs.org:delivered"></end-state>
-   <node name="devil.NightLabs.org:sent">
-      <transition name="" to="devil.NightLabs.org:booked"></transition>
+   <end-state name="dev.jfire.org:aborted"></end-state>
+   <end-state name="dev.jfire.org:delivered"></end-state>
+   <node name="dev.jfire.org:sent">
+      <transition name="" to="dev.jfire.org:booked"></transition>
    </node>
-   <node name="devil.NightLabs.org:bookedImplicitely">
-      <transition name="" to="devil.NightLabs.org:booked"></transition>
+   <node name="dev.jfire.org:bookedImplicitely">
+      <transition name="" to="dev.jfire.org:booked"></transition>
    </node>
 </process-definition>

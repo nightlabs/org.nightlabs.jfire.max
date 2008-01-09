@@ -75,7 +75,7 @@ public class SegmentType implements Serializable
 	 * forms of sales with higher logic, this defines the default <tt>SegmentType</tt> that
 	 * is used in most of the cases.
 	 */
-	public static final SegmentTypeID DEFAULT_SEGMENT_TYPE_ID = SegmentTypeID.create(Organisation.DEVIL_ORGANISATION_ID, "default");
+	public static final SegmentTypeID DEFAULT_SEGMENT_TYPE_ID = SegmentTypeID.create(Organisation.DEV_ORGANISATION_ID, "default");
 
 	/**
 	 * @jdo.field primary-key="true"

@@ -31,9 +31,9 @@ public class DeliveryActionHandlerDeliveryQueue extends DeliveryActionHandler im
 	public static DeliveryActionHandler getDeliveryActionHandlerDeliveryQueue(PersistenceManager pm) {
 		DeliveryActionHandlerDeliveryQueue actionHandler = null;
 		try {
-			actionHandler = (DeliveryActionHandlerDeliveryQueue) pm.getObjectById(DeliveryActionHandlerID.create(Organisation.DEVIL_ORGANISATION_ID, DeliveryActionHandlerDeliveryQueue.class.getName()));
+			actionHandler = (DeliveryActionHandlerDeliveryQueue) pm.getObjectById(DeliveryActionHandlerID.create(Organisation.DEV_ORGANISATION_ID, DeliveryActionHandlerDeliveryQueue.class.getName()));
 		} catch (JDOObjectNotFoundException e) {
-			actionHandler = new DeliveryActionHandlerDeliveryQueue(Organisation.DEVIL_ORGANISATION_ID, DeliveryActionHandlerDeliveryQueue.class.getName());
+			actionHandler = new DeliveryActionHandlerDeliveryQueue(Organisation.DEV_ORGANISATION_ID, DeliveryActionHandlerDeliveryQueue.class.getName());
 			pm.makePersistent(actionHandler);
 		}
 		

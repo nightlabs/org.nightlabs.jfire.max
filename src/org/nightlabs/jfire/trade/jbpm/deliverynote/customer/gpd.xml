@@ -1,25 +1,25 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<process-diagram name="devil.NightLabs.org:DeliveryNote.Customer" width="940" height="671">
-  <node name="devil.NightLabs.org:sent" x="4" y="4" width="206" height="40">
+<process-diagram name="dev.jfire.org:DeliveryNote.Customer" width="940" height="671">
+  <node name="dev.jfire.org:sent" x="4" y="4" width="206" height="40">
     <transition name="createReceptionNote">
       <label x="5" y="-10"/>
     </transition>
-    <transition name="devil.NightLabs.org:deliver">
+    <transition name="dev.jfire.org:deliver">
       <label x="5" y="-10"/>
     </transition>
   </node>
-  <node name="devil.NightLabs.org:createdReceptionNote" x="347" y="116" width="268" height="40"/>
-  <node name="devil.NightLabs.org:booked" x="4" y="296" width="205" height="40"/>
-  <node name="devil.NightLabs.org:delivered" x="4" y="152" width="206" height="40">
-    <transition name="devil.NightLabs.org:book">
+  <node name="dev.jfire.org:createdReceptionNote" x="347" y="116" width="268" height="40"/>
+  <node name="dev.jfire.org:booked" x="4" y="296" width="205" height="40"/>
+  <node name="dev.jfire.org:delivered" x="4" y="152" width="206" height="40">
+    <transition name="dev.jfire.org:book">
       <label x="5" y="-10"/>
     </transition>
-    <transition name="devil.NightLabs.org:bookImplicitely">
+    <transition name="dev.jfire.org:bookImplicitely">
       <label x="-36" y="-22"/>
     </transition>
   </node>
-  <node name="devil.NightLabs.org:bookedImplicitely" x="307" y="215" width="254" height="40">
+  <node name="dev.jfire.org:bookedImplicitely" x="307" y="215" width="254" height="40">
     <transition name="">
       <label x="5" y="-10"/>
     </transition>

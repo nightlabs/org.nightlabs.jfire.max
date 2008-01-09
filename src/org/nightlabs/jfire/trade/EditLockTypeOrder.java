@@ -26,7 +26,7 @@ extends EditLockType
 {
 	private static final long serialVersionUID = 1L;
 
-	public static final EditLockTypeID EDIT_LOCK_TYPE_ID = EditLockTypeID.create(Organisation.DEVIL_ORGANISATION_ID, EditLockTypeOrder.class.getName());
+	public static final EditLockTypeID EDIT_LOCK_TYPE_ID = EditLockTypeID.create(Organisation.DEV_ORGANISATION_ID, EditLockTypeOrder.class.getName());
 
 	/**
 	 * @deprecated Only for JDO!

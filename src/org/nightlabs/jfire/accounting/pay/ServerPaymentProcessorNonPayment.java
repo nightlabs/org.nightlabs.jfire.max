@@ -58,9 +58,9 @@ extends ServerPaymentProcessor
 		try {
 			pm.getExtent(ServerPaymentProcessorNonPayment.class);
 			serverPaymentProcessorNonPayment = (ServerPaymentProcessorNonPayment) pm.getObjectById(
-					ServerPaymentProcessorID.create(Organisation.DEVIL_ORGANISATION_ID, ServerPaymentProcessorNonPayment.class.getName()));
+					ServerPaymentProcessorID.create(Organisation.DEV_ORGANISATION_ID, ServerPaymentProcessorNonPayment.class.getName()));
 		} catch (JDOObjectNotFoundException e) {
-			serverPaymentProcessorNonPayment = new ServerPaymentProcessorNonPayment(Organisation.DEVIL_ORGANISATION_ID, ServerPaymentProcessorNonPayment.class.getName());
+			serverPaymentProcessorNonPayment = new ServerPaymentProcessorNonPayment(Organisation.DEV_ORGANISATION_ID, ServerPaymentProcessorNonPayment.class.getName());
 			pm.makePersistent(serverPaymentProcessorNonPayment);
 		}
 

@@ -142,7 +142,7 @@ public class ScriptingInitialiser
 	 * @param jfsm
 	 * @param pm
 	 * @param scriptRegistryItemType is the type (identifier) for the scripts in categories, categories get the scriptRegistryItemType from their parent 
-	 * @param organisationID If you're writing a JFire Community Project, this is {@link Organisation#DEVIL_ORGANISATION_ID}.
+	 * @param organisationID If you're writing a JFire Community Project, this is {@link Organisation#DEV_ORGANISATION_ID}.
 	 */
 	public ScriptingInitialiser(
 			String scriptSubDir, ScriptCategory baseCategory, String scriptRegistryItemType,

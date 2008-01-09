@@ -58,7 +58,7 @@ public class ParserTest
 	
 	private static ScriptRegistryItemID getScriptID() 
 	{
-		String organisationID = "devil.nightlabs.org";
+		String organisationID = "dev.jfire.org";
 		String scriptType = "CrossTicketTrade-Type-Ticket";
 		String scriptIDName = "Test";
 		return ScriptRegistryItemID.create(organisationID, scriptType, scriptIDName);
@@ -67,7 +67,7 @@ public class ParserTest
 	
 	private static Script getScript() 
 	{
-		String organisationID = "devil.nightlabs.org";
+		String organisationID = "dev.jfire.org";
 		String scriptType = "CrossTicketTrade-Type-Ticket";
 		String scriptIDName = "Test";
 		ScriptCategory scriptCategory = new ScriptCategory(organisationID, scriptType, "Ticketing"); 

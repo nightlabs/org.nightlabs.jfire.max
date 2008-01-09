@@ -320,7 +320,7 @@ implements Serializable
 			return script;
 
 
-		script = (Script) scriptsByOrganisationID.get(Organisation.DEVIL_ORGANISATION_ID);
+		script = (Script) scriptsByOrganisationID.get(Organisation.DEV_ORGANISATION_ID);
 		if (script != null)
 			return script;
 

@@ -126,7 +126,7 @@ implements SessionBean
 
 			// create the ProductTypeActionHandler for DynamicProductTypes
 			DynamicProductTypeActionHandler dynamicProductTypeActionHandler = new DynamicProductTypeActionHandler(
-					Organisation.DEVIL_ORGANISATION_ID, DynamicProductTypeActionHandler.class.getName(), DynamicProductType.class);
+					Organisation.DEV_ORGANISATION_ID, DynamicProductTypeActionHandler.class.getName(), DynamicProductType.class);
 			dynamicProductTypeActionHandler = pm.makePersistent(dynamicProductTypeActionHandler);
 
 			// create a default DeliveryConfiguration with one ModeOfDelivery

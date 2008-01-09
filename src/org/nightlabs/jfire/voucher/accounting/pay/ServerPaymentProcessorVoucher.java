@@ -1,9 +1,11 @@
 package org.nightlabs.jfire.voucher.accounting.pay;
 
+import javax.jdo.JDOHelper;
 import javax.jdo.JDOObjectNotFoundException;
 import javax.jdo.PersistenceManager;
 
 import org.nightlabs.annotation.Implement;
+import org.nightlabs.jfire.accounting.Account;
 import org.nightlabs.jfire.accounting.Invoice;
 import org.nightlabs.jfire.accounting.pay.PaymentException;
 import org.nightlabs.jfire.accounting.pay.PaymentResult;
@@ -13,7 +15,7 @@ import org.nightlabs.jfire.idgenerator.IDGenerator;
 import org.nightlabs.jfire.organisation.Organisation;
 import org.nightlabs.jfire.trade.Article;
 import org.nightlabs.jfire.transfer.Anchor;
-import org.nightlabs.jfire.voucher.accounting.VoucherLocalAccountantDelegate;
+import org.nightlabs.jfire.voucher.JFireVoucherEAR;
 import org.nightlabs.jfire.voucher.accounting.VoucherMoneyTransfer;
 import org.nightlabs.jfire.voucher.accounting.VoucherRedemption;
 import org.nightlabs.jfire.voucher.store.VoucherKey;
@@ -135,12 +137,24 @@ public class ServerPaymentProcessorVoucher
 		if (voucherKey.getRestValue().getAmount() < paymentData.getPayment().getAmount())
 			throw new IllegalStateException("Insufficient value ("+voucherKey.getRestValue().getAmount()+") for this payment ("+paymentData.getPayment().getAmount()+")! VoucherKey=" + paymentData.getVoucherKey()); 
 
-		if (VoucherLocalAccountantDelegate.ACCOUNT_ANCHOR_TYPE_ID_VOUCHER.equals(voucherMoneyTransfer.getFrom().getAnchorTypeID()))
-			return voucherMoneyTransfer.getFrom();
+//		if (VoucherLocalAccountantDelegate.ACCOUNT_ANCHOR_TYPE_ID_VOUCHER.equals(voucherMoneyTransfer.getFrom().getAnchorTypeID()))
+//			return voucherMoneyTransfer.getFrom();
+//
+//		if (VoucherLocalAccountantDelegate.ACCOUNT_ANCHOR_TYPE_ID_VOUCHER.equals(voucherMoneyTransfer.getTo().getAnchorTypeID()))
+//			return voucherMoneyTransfer.getTo();
 
-		if (VoucherLocalAccountantDelegate.ACCOUNT_ANCHOR_TYPE_ID_VOUCHER.equals(voucherMoneyTransfer.getTo().getAnchorTypeID()))
-			return voucherMoneyTransfer.getTo();
+		if (voucherMoneyTransfer.getFrom() instanceof Account) {
+			Account fromAccount = (Account) voucherMoneyTransfer.getFrom();
+			if (JFireVoucherEAR.ACCOUNT_TYPE_ID_VOUCHER.equals(JDOHelper.getObjectId(fromAccount.getAccountType())))
+				return voucherMoneyTransfer.getFrom();
+		}
 
-		throw new IllegalStateException("Neither VoucherMoneyTransfer.from nor VoucherMoneyTransfer.to has AccountTypeID==VoucherLocalAccountantDelegate.ACCOUNT_ANCHOR_TYPE_ID_VOUCHER! VoucherKey=" + paymentData.getVoucherKey());
+		if (voucherMoneyTransfer.getTo() instanceof Account) {
+			Account toAccount = (Account) voucherMoneyTransfer.getTo();
+			if (JFireVoucherEAR.ACCOUNT_TYPE_ID_VOUCHER.equals(JDOHelper.getObjectId(toAccount.getAccountType())))
+				return voucherMoneyTransfer.getTo();
+		}
+
+		throw new IllegalStateException("Neither VoucherMoneyTransfer.from nor VoucherMoneyTransfer.to has AccountTypeID==JFireVoucherEAR.ACCOUNT_TYPE_ID_VOUCHER! VoucherKey=" + paymentData.getVoucherKey());
 	}
 }

@@ -1,5 +1,6 @@
 package org.nightlabs.jfire.voucher;
 
+import org.nightlabs.jfire.accounting.id.AccountTypeID;
 import org.nightlabs.jfire.organisation.Organisation;
 import org.nightlabs.jfire.store.deliver.id.ModeOfDeliveryFlavourID;
 import org.nightlabs.jfire.store.deliver.id.ModeOfDeliveryID;
@@ -17,5 +18,6 @@ public class JFireVoucherEAR
 	public static final ModeOfDeliveryFlavourID MODE_OF_DELIVERY_FLAVOUR_ID_VOUCHER_PRINT_VIA_OPERATING_SYSTEM_PRINTER = 
 		ModeOfDeliveryFlavourID.create(Organisation.DEVIL_ORGANISATION_ID, "voucherPrintViaOperatingSystemPrinter");
 	public static final ModeOfDeliveryFlavourID MODE_OF_DELIVERY_FLAVOUR_ID_VOUCHER_PRINT_VIA_TICKET_PRINTER = 
-		ModeOfDeliveryFlavourID.create(Organisation.DEVIL_ORGANISATION_ID, "voucherPrintViaTicketPrinter");	
+		ModeOfDeliveryFlavourID.create(Organisation.DEVIL_ORGANISATION_ID, "voucherPrintViaTicketPrinter");
+	public static final AccountTypeID ACCOUNT_TYPE_ID_VOUCHER = AccountTypeID.create(Organisation.DEVIL_ORGANISATION_ID, "Account.Voucher");
 }

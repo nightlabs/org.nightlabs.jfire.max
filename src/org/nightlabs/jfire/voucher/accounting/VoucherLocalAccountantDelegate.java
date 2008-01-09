@@ -42,7 +42,7 @@ extends LocalAccountantDelegate
 {
 	private static final long serialVersionUID = 1L;
 
-	public static final String ACCOUNT_ANCHOR_TYPE_ID_VOUCHER = "Account.Voucher";
+//	public static final String ACCOUNT_ANCHOR_TYPE_ID_VOUCHER = "Account.Voucher";
 
 	/**
 	 * @jdo.field

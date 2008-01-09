@@ -34,6 +34,7 @@ import org.nightlabs.jdo.NLJDOHelper;
 import org.nightlabs.jdo.ObjectIDUtil;
 import org.nightlabs.jdo.moduleregistry.ModuleMetaData;
 import org.nightlabs.jfire.accounting.Account;
+import org.nightlabs.jfire.accounting.AccountType;
 import org.nightlabs.jfire.accounting.Accounting;
 import org.nightlabs.jfire.accounting.Currency;
 import org.nightlabs.jfire.accounting.book.id.LocalAccountantDelegateID;
@@ -185,6 +186,12 @@ implements SessionBean
 			moduleMetaData = pm.makePersistent(moduleMetaData);
 
 			User user = User.getUser(pm, getPrincipal());
+
+			AccountType accountType;
+			accountType = pm.makePersistent(new AccountType(JFireVoucherEAR.ACCOUNT_TYPE_ID_VOUCHER, false));
+			accountType.getName().setText(Locale.ENGLISH.getLanguage(), "Voucher");
+			accountType.getName().setText(Locale.GERMAN.getLanguage(), "Gutschein");
+
 
 			// create the ProductTypeActionHandler for VoucherTypes
 			VoucherTypeActionHandler voucherTypeActionHandler = new VoucherTypeActionHandler(

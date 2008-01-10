@@ -43,4 +43,11 @@ implements ScriptExecutorJavaClassReportingDelegate
 	public JFSQueryPropertySet getJFSQueryPropertySet() {
 		return queryPropertySet;
 	}
+	
+	public <T> T getObjectParameterValue(String parameterName, Class<T> clazz) {
+		Object obj = getParameterValue(parameterName);
+		if ("".equals(obj))
+			return null;
+		return (T) obj;
+	}
 }

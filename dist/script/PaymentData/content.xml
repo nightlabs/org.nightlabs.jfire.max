@@ -1,0 +1,35 @@
+<!DOCTYPE script-category PUBLIC "-//NightLabs//DTD ScriptingInitializer V 1.0//EN" "http://www.nightlabs.de/dtd/scripting-initializer-content_1_0.dtd">
+<script-category 
+	id="DeliveryData"
+	type="JFireReportingTrade-PaymentData"
+>
+	<name language="de">Zahlungs-Daten</name>
+	<name language="en">Payment-data</name>
+
+	<script 
+		file="PaymentList.javaclass" 
+		id="PaymentList"
+		resultClass="org.eclipse.datatools.connectivity.oda.IResultSet"
+	>
+		<name language="de">Zahlungen: Liste</name>
+		<name language="en">Payments: List</name>
+		<parameter-set>
+			<name language="de">ParameterSet: Zahlungsliste</name>
+			<name language="en">ParameterSet: Paymentlist</name>
+			<parameter name="userIDs" type="java.util.Collection"/>	
+			<parameter name="userGroupIDs" type="java.util.Collection"/>	
+			<parameter name="partnerIDs" type="java.util.Collection"/>	
+			<parameter name="beginTimePeriod" type="org.nightlabs.util.TimePeriod"/>	
+			<parameter name="endTimePeriod" type="org.nightlabs.util.TimePeriod"/>
+		</parameter-set>
+		
+		<description language="de">Dieses Skript listet Zahlungen auf.
+Mittels der Parameter kann nach Benutzer, Partner oder Zeitraum gefiltert werden.		
+		</description>
+		<description language="en">This script lists payments.
+With the parameters the list can be filtered by user, partner and time period.		
+		</description>
+		
+	</script>
+	
+</script-category>

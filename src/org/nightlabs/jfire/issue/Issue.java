@@ -40,6 +40,7 @@ import javax.jdo.listener.AttachCallback;
 
 import org.apache.log4j.Logger;
 import org.nightlabs.jdo.ObjectID;
+import org.nightlabs.jdo.ObjectIDUtil;
 import org.nightlabs.jfire.jbpm.graph.def.Statable;
 import org.nightlabs.jfire.jbpm.graph.def.StatableLocal;
 import org.nightlabs.jfire.jbpm.graph.def.State;
@@ -378,14 +379,62 @@ implements
 	public List<IssueFileAttachment> getFileList() {
 		return fileList;
 	}
-	
+
+	/**
+	 * @deprecated It is not good practice to expose 1-n-relationships in a JDO object. Since this Set here is solely linking simple Strings, it works fine,
+	 * but to be consistent, there should never be the possibility (in a JDO object) to replace the set (in non-JDO-objects there are many reasons to do the same,
+	 * as well). Therefore you should better have add and remove methods here and remove the setter.
+	 * As you see below, I've hidden the internal String management more or less completely and instead work with instances of {@link ObjectID} - which
+	 * is a much nicer API. This couldn't be easily done when exposing the Set<String> referencedObjectIDs directly. 
+	 */
 	public void setReferencedObjectIDs(Set<String> objIds) {
 		this.referencedObjectIDs = objIds;
 	}
-	
+
+	// This method should be named "getReferencedObjectIDStrings()"
 	public Set<String> getReferencedObjectIDs() {
-		return referencedObjectIDs;
+//		return referencedObjectIDs;
+		return Collections.unmodifiableSet(referencedObjectIDs); // we enfore using the add/remove methods here (below)
 	}
+
+	// This method should be named "getReferencedObjectIDs()". Please rename it, after you removed the above method, which currently blocks the name
+	public Set<ObjectID> _getReferencedObjectIDs() {
+		if (_referencedObjectIDs == null) {
+			Set<ObjectID> ro = new HashSet<ObjectID>(referencedObjectIDs.size());
+			for (String objectIDString : referencedObjectIDs) {
+				ObjectID objectID = ObjectIDUtil.createObjectID(objectIDString);
+				ro.add(objectID);
+			}
+			_referencedObjectIDs = ro;
+		}
+		return Collections.unmodifiableSet(_referencedObjectIDs);
+	}
+
+	public void addReferencedObjectID(ObjectID referencedObjectID)
+	{
+		if (referencedObjectID == null)
+			throw new IllegalArgumentException("referencedObjectID must not be null!");
+
+		referencedObjectIDs.add(referencedObjectID.toString());
+		if (_referencedObjectIDs != null) // instead of managing our cache of ObjectID instances, we could alternatively simply null it here, but the current implementation is more efficient.
+			_referencedObjectIDs.add(referencedObjectID);
+	}
+
+	public void removeReferencedObjectID(ObjectID referencedObjectID)
+	{
+		if (referencedObjectID == null)
+			throw new IllegalArgumentException("referencedObjectID must not be null!");
+
+		referencedObjectIDs.remove(referencedObjectID.toString());
+		if (_referencedObjectIDs != null)
+			_referencedObjectIDs.remove(referencedObjectID);
+	}
+
+	/**
+	 * @jdo.field persistence-modifier="none"
+	 */
+	private transient Set<ObjectID> _referencedObjectIDs;
+
 
 	public IssueResolution getIssueResolution() {
 		return issueResolution;

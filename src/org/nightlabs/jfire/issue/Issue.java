@@ -81,7 +81,7 @@ import org.nightlabs.util.Util;
  * @jdo.fetch-group name="Statable.states" fetch-groups="default" fields="states"
  * @jdo.fetch-group name="Issue.issueLocal" fetch-groups="default" fields="issueLocal"
  * @jdo.fetch-group name="Issue.issueType" fetch-groups="default" fields="issueType"
- * @jdo.fetch-group name="Issue.this" fetch-groups="default" fields="fileList, issueType, description, subject, issuePriority, issueSeverityType, issueResolution, state, states, issueLocal, reporter, assignee"
+ * @jdo.fetch-group name="Issue.this" fetch-groups="default" fields="fileList, issueType, referencedObjectIDs, description, subject, issuePriority, issueSeverityType, issueResolution, state, states, issueLocal, reporter, assignee"
  *
  **/
 public class Issue
@@ -377,6 +377,10 @@ implements
 
 	public List<IssueFileAttachment> getFileList() {
 		return fileList;
+	}
+	
+	public void setReferencedObjectIDs(Set<String> objIds) {
+		this.referencedObjectIDs = objIds;
 	}
 	
 	public Set<String> getReferencedObjectIDs() {

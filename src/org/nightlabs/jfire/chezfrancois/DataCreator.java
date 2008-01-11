@@ -229,7 +229,7 @@ public class DataCreator
 	{
 		if (organisationLegalEntity == null)
 			organisationLegalEntity = OrganisationLegalEntity.getOrganisationLegalEntity(
-				pm, organisationID, OrganisationLegalEntity.ANCHOR_TYPE_ID_ORGANISATION, true);
+				pm, organisationID, true);
 
 		return organisationLegalEntity;
 	}
@@ -442,7 +442,7 @@ public class DataCreator
 		Trader trader = Trader.getTrader(pm);
 		return trader.setPersonToLegalEntity(person, true);
 //		LegalEntity legalEntity = new LegalEntity(
-//				person.getOrganisationID(), LegalEntity.ANCHOR_TYPE_ID_PARTNER, ObjectIDUtil.longObjectIDFieldToString(person.getPropertyID()));
+//				person.getOrganisationID(), LegalEntity.ANCHOR_TYPE_ID_LEGAL_ENTITY, ObjectIDUtil.longObjectIDFieldToString(person.getPropertyID()));
 //		legalEntity.setPerson(person);
 //		pm.makePersistent(legalEntity);
 //		return legalEntity;

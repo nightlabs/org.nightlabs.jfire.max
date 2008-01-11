@@ -57,8 +57,8 @@ implements StoreCallback
 
 	public static final String FETCH_GROUP_ORGANISATION = "OrganisationLegalEntity.organisation";
 	public static final String FETCH_GROUP_THIS_ORGANISATION_LEGAL_ENTITY = "OrganisationLegalEntity.this";
-	
-	public static final String ANCHOR_TYPE_ID_ORGANISATION = "Organisation";
+
+//	public static final String ANCHOR_TYPE_ID_ORGANISATION = "Organisation";
 
 	public static String getPrimaryKey(String organisationID, String anchorTypeID)
 	{
@@ -87,9 +87,9 @@ implements StoreCallback
 	protected OrganisationLegalEntity() { }
 
 	// TODO Why do I have to pass the anchorTypeID? Isn't this the same for all OrganisationLegalEntities?! Marco.
-	protected OrganisationLegalEntity(org.nightlabs.jfire.organisation.Organisation organisation, String anchorTypeID)
+	protected OrganisationLegalEntity(org.nightlabs.jfire.organisation.Organisation organisation)
 	{
-		super(organisation.getOrganisationID(), anchorTypeID, OrganisationLegalEntity.class.getName());
+		super(organisation.getOrganisationID(), OrganisationLegalEntity.class.getName());
 //		System.out.println("******************************************");
 //		System.out.println("******************************************");
 //		System.out.println("******************************************");
@@ -153,32 +153,32 @@ implements StoreCallback
 	/**
 	 * @param pm The {@link PersistenceManager} to use.
 	 * @param organisationID The id specifying the <tt>Organisation</tt> for which the <tt>LegalEntity</tt> is desired.
-	 * @param anchorTypeID Use public static finals declared in this class
 	 * @param throwExceptionIfNotExistent If <tt>false</tt>, this method will return null,	 * 
 	 * if the {@link Organisation} specified by <tt>organisationID</tt> does not exist.  
-	 *
 	 * @return the <tt>OrganisationLegalEntity</tt> for the given <tt>organisationID</tt>.
 	 * If the <tt>OrganisationLegalEntity</tt> does not exist, it will be automatically
 	 * created, if the {@link Organisation} exists. If it does not exist, this method
 	 * will either throw an exception or return <tt>null</tt> - dependent on the parameter
 	 * <tt>throwExceptionIfNotExistent</tt>.  
 	 */
-	// TODO Why do I have to pass the anchorTypeID? Isn't this the same for all OrganisationLegalEntities?! Marco.
 	public static OrganisationLegalEntity getOrganisationLegalEntity(
-			PersistenceManager pm, String organisationID, String anchorTypeID, boolean throwExceptionIfNotExistent)
+			PersistenceManager pm,
+			String organisationID,
+			boolean throwExceptionIfNotExistent
+	)
 	{
 		OrganisationLegalEntity organisationLegalEntity = null; 
 		try {
 			pm.getExtent(OrganisationLegalEntity.class);
 			organisationLegalEntity = (OrganisationLegalEntity)pm.getObjectById(
-					AnchorID.create(organisationID, anchorTypeID, OrganisationLegalEntity.class.getName()));
+					AnchorID.create(organisationID, ANCHOR_TYPE_ID_LEGAL_ENTITY, OrganisationLegalEntity.class.getName()));
 		} catch (JDOObjectNotFoundException e) {
 			Organisation organisation = Organisation.getOrganisation(
 					pm, organisationID, throwExceptionIfNotExistent);
 
 			if (organisation != null) {
 				
-				organisationLegalEntity = new OrganisationLegalEntity(organisation, anchorTypeID);
+				organisationLegalEntity = new OrganisationLegalEntity(organisation);
 				try {
 					organisationLegalEntity = pm.makePersistent(organisationLegalEntity);
 				} catch (JDODataStoreException workaround) {

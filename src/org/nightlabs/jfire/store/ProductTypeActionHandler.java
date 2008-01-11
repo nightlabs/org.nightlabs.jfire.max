@@ -337,7 +337,7 @@ public abstract class ProductTypeActionHandler
 			segmentTypeIDsWithTheCurrentInstanceOnly.add((SegmentTypeID) JDOHelper.getObjectId(segmentType));
 
 			// TODO we should remove the anchorTypeID from the following method's parameter list
-			OrganisationLegalEntity partner = OrganisationLegalEntity.getOrganisationLegalEntity(pm, partnerOrganisationID, OrganisationLegalEntity.ANCHOR_TYPE_ID_ORGANISATION, true);
+			OrganisationLegalEntity partner = OrganisationLegalEntity.getOrganisationLegalEntity(pm, partnerOrganisationID, true);
 
 			Hashtable<?, ?> initialContextProperties = Lookup.getInitialContextProperties(pm, partnerOrganisationID);
 			TradeManager tradeManager = TradeManagerUtil.getHome(initialContextProperties).create();

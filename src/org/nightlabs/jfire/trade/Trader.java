@@ -330,8 +330,7 @@ public class Trader
 	{
 		PersistenceManager pm = getPersistenceManager();
 		return OrganisationLegalEntity.getOrganisationLegalEntity(pm,
-				organisationID, OrganisationLegalEntity.ANCHOR_TYPE_ID_ORGANISATION,
-				true);
+				organisationID, true);
 
 		// if (organisationLegalEntity != null)
 		// return organisationLegalEntity;
@@ -368,7 +367,7 @@ public class Trader
 
 		String anchorID = person.getPrimaryKey().replace('/', '#');
 		AnchorID oAnchorID = AnchorID.create(getMandator().getOrganisationID(),
-				LegalEntity.ANCHOR_TYPE_ID_PARTNER, anchorID);
+				LegalEntity.ANCHOR_TYPE_ID_LEGAL_ENTITY, anchorID);
 		LegalEntity legalEntity = null;
 		PersistenceManager pm = getPersistenceManager();
 		boolean found = true;
@@ -376,7 +375,7 @@ public class Trader
 			legalEntity = (LegalEntity) pm.getObjectById(oAnchorID);
 		} catch (JDOObjectNotFoundException e) {
 			legalEntity = new LegalEntity(oAnchorID.organisationID,
-					LegalEntity.ANCHOR_TYPE_ID_PARTNER, oAnchorID.anchorID);
+					oAnchorID.anchorID);
 			legalEntity
 					.setDefaultCustomerGroup(getDefaultCustomerGroupForKnownCustomer());
 			found = false;

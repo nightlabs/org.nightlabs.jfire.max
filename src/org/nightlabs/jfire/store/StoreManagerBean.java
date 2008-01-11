@@ -1474,7 +1474,7 @@ implements SessionBean
 							if (!nestedProductLocalRepository.getRepositoryType().isOutside())
 								throw new IllegalStateException("The nested product is not outside, but has a quanity < 0! localArticle \"" + article.getPrimaryKey() + "\" + nestedProductLocal \"" + nestedProductLocal.getPrimaryKey() + "\"");
 
-							if (!nestedProductLocalRepository.getOwner().equals(OrganisationLegalEntity.getOrganisationLegalEntity(pm, nestedProductLocal.getOrganisationID(), OrganisationLegalEntity.ANCHOR_TYPE_ID_ORGANISATION, true)))
+							if (!nestedProductLocalRepository.getOwner().equals(OrganisationLegalEntity.getOrganisationLegalEntity(pm, nestedProductLocal.getOrganisationID(), true)))
 								throw new IllegalStateException("The nested product is not in an outside Repository belonging to the supplier! Has it already been delivered to another customer? localArticle \"" + article.getPrimaryKey() + "\" + nestedProductLocal \"" + nestedProductLocal.getPrimaryKey() + "\"");
 
 							if (productTypeClass2organisationID2articleSet == null)
@@ -1503,7 +1503,7 @@ implements SessionBean
 								organisationID2articleSet.put(nestedProductLocal.getOrganisationID(), direction2articleSet);
 							}
 
-							LegalEntity partner = OrganisationLegalEntity.getOrganisationLegalEntity(pm, nestedProductLocal.getOrganisationID(), OrganisationLegalEntity.ANCHOR_TYPE_ID_ORGANISATION, true);
+							LegalEntity partner = OrganisationLegalEntity.getOrganisationLegalEntity(pm, nestedProductLocal.getOrganisationID(), true);
 
 							Boolean directionIncoming = Boolean.TRUE;
 							if (article.isReversing()) // TODO this should imho never happen - maybe throw an exception?

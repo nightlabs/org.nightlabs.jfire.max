@@ -135,7 +135,7 @@ implements StoreCallback
 
 		String organisationID = LocalOrganisation.getLocalOrganisation(pm).getOrganisationID();
 		accounting.organisationID = organisationID;
-		accounting.mandator = OrganisationLegalEntity.getOrganisationLegalEntity(pm, organisationID, OrganisationLegalEntity.ANCHOR_TYPE_ID_ORGANISATION, true); // new OrganisationLegalEntity(localOrganisation.getOrganisation());
+		accounting.mandator = OrganisationLegalEntity.getOrganisationLegalEntity(pm, organisationID, true); // new OrganisationLegalEntity(localOrganisation.getOrganisation());
 		accounting.accountingPriceConfig = new AccountingPriceConfig(IDGenerator.getOrganisationID(), PriceConfig.createPriceConfigID());
 		accounting.localAccountant = new LocalAccountant(accounting.mandator, LocalAccountant.class.getName());
 		accounting.mandator.setAccountant(accounting.localAccountant);

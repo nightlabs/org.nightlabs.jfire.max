@@ -862,7 +862,7 @@ implements SessionBean
 				pm.getFetchPlan().setGroups(fetchGroups);
 
 			OrganisationLegalEntity ole = OrganisationLegalEntity.getOrganisationLegalEntity(
-					pm, organisationID, OrganisationLegalEntity.ANCHOR_TYPE_ID_ORGANISATION, throwExceptionIfNotExistent);
+					pm, organisationID, throwExceptionIfNotExistent);
 
 			return pm.detachCopy(ole);
 		} finally {

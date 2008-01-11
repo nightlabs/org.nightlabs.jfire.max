@@ -92,7 +92,7 @@ public class LegalEntity extends Anchor
 	public static final String FETCH_GROUP_CUSTOMER_GROUPS = "LegalEntity.customerGroups";
 	public static final String FETCH_GROUP_DEFAULT_CUSTOMER_GROUP = "LegalEntity.defaultCustomerGroup";
 
-	public static final String ANCHOR_TYPE_ID_PARTNER = "Partner";
+	public static final String ANCHOR_TYPE_ID_LEGAL_ENTITY = "LegalEntity";
 
 	public static final String PROPERTY_SET_SCOPE = StructLocal.DEFAULT_SCOPE;
 
@@ -107,7 +107,7 @@ public class LegalEntity extends Anchor
 		String organisationID = LocalOrganisation.getLocalOrganisation(pm).getOrganisationID();
 		try {
 			pm.getExtent(LegalEntity.class);
-			LegalEntity anonymousCustomer = (LegalEntity) pm.getObjectById(AnchorID.create(organisationID, ANCHOR_TYPE_ID_PARTNER, ANCHOR_ID_ANONYMOUS));
+			LegalEntity anonymousCustomer = (LegalEntity) pm.getObjectById(AnchorID.create(organisationID, ANCHOR_TYPE_ID_LEGAL_ENTITY, ANCHOR_ID_ANONYMOUS));
 			return anonymousCustomer;
 		} catch (JDOObjectNotFoundException x) {
 			// nothing if it's not existent - we'll create it afterwards
@@ -138,7 +138,7 @@ public class LegalEntity extends Anchor
 		}
 		person.deflate();
 
-		LegalEntity anonymousCustomer = new LegalEntity(organisationID, ANCHOR_TYPE_ID_PARTNER, ANCHOR_ID_ANONYMOUS);
+		LegalEntity anonymousCustomer = new LegalEntity(organisationID, ANCHOR_ID_ANONYMOUS);
 		anonymousCustomer.setPerson(person);
 		anonymousCustomer.setAnonymous(true);
 		anonymousCustomer.setDefaultCustomerGroup(anonymousCustomerGroup);
@@ -201,9 +201,9 @@ public class LegalEntity extends Anchor
 	 * @param organisationID
 	 * @param anchorID
 	 */
-	public LegalEntity(String organisationID, String anchorTypeID, String anchorID)
+	public LegalEntity(String organisationID, String anchorID)
 	{
-		super(organisationID, anchorTypeID, anchorID);
+		super(organisationID, ANCHOR_TYPE_ID_LEGAL_ENTITY, anchorID);
 		this.customerGroups = new HashSet<CustomerGroup>();
 	}
 

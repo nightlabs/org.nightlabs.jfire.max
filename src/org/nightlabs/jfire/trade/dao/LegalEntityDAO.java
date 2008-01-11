@@ -69,7 +69,7 @@ implements IJDOObjectDAO<LegalEntity>
 //				try {
 //					anonymousAnchorID = AnchorID.create(
 //							Login.getLogin().getOrganisationID(), 
-//							LegalEntity.ANCHOR_TYPE_ID_PARTNER, 
+//							LegalEntity.ANCHOR_TYPE_ID_LEGAL_ENTITY, 
 //							LegalEntity.ANCHOR_ID_ANONYMOUS
 //					);
 //				} catch (Exception e) {
@@ -87,7 +87,7 @@ implements IJDOObjectDAO<LegalEntity>
 		try {
 			anonymousAnchorID = AnchorID.create(
 					SecurityReflector.getUserDescriptor().getOrganisationID(), 
-					LegalEntity.ANCHOR_TYPE_ID_PARTNER, 
+					LegalEntity.ANCHOR_TYPE_ID_LEGAL_ENTITY, 
 					LegalEntity.ANCHOR_ID_ANONYMOUS
 			);			
 		} catch (Exception e) {
@@ -144,7 +144,7 @@ implements IJDOObjectDAO<LegalEntity>
 	public LegalEntity getAnonymousLegalEntity(String[] fetchGroups, int maxFetchDepth, ProgressMonitor monitor) {
 		anonymousAnchorID = AnchorID.create(
 				SecurityReflector.getUserDescriptor().getOrganisationID(), 
-				LegalEntity.ANCHOR_TYPE_ID_PARTNER, 
+				LegalEntity.ANCHOR_TYPE_ID_LEGAL_ENTITY, 
 				LegalEntity.ANCHOR_ID_ANONYMOUS
 		);
 		return getJDOObject(null, anonymousAnchorID, fetchGroups, maxFetchDepth, monitor);

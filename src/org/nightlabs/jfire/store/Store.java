@@ -145,7 +145,7 @@ implements StoreCallback
 		LocalOrganisation localOrganisation = LocalOrganisation.getLocalOrganisation(pm);
 		String organisationID = localOrganisation.getOrganisation().getOrganisationID();
 		store.organisationID = organisationID;
-		store.mandator = OrganisationLegalEntity.getOrganisationLegalEntity(pm, organisationID, OrganisationLegalEntity.ANCHOR_TYPE_ID_ORGANISATION, true);
+		store.mandator = OrganisationLegalEntity.getOrganisationLegalEntity(pm, organisationID, true);
 		store.localStorekeeper = new LocalStorekeeper(store.mandator, LocalStorekeeper.class.getName());
 		store.mandator.setStorekeeper(store.localStorekeeper);
 		store.partnerStorekeeper = new PartnerStorekeeper(organisationID, PartnerStorekeeper.class.getName());

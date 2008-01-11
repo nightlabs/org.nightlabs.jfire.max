@@ -193,7 +193,7 @@ public class PartnerStorekeeper extends Storekeeper
 			throw new IllegalStateException("This method should never be called for a local product! " + JDOHelper.getObjectId(product));
 
 		LegalEntity repositoryOwner = OrganisationLegalEntity.getOrganisationLegalEntity(
-				pm, partnerOrganisationID, OrganisationLegalEntity.ANCHOR_TYPE_ID_ORGANISATION, true);
+				pm, partnerOrganisationID, true);
 
 		return createPartnerOutsideRepository(pm, store.getOrganisationID(), repositoryOwner);
 	}

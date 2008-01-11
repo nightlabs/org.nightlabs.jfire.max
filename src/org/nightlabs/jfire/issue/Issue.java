@@ -380,25 +380,19 @@ implements
 		return fileList;
 	}
 
-	/**
-	 * @deprecated It is not good practice to expose 1-n-relationships in a JDO object. Since this Set here is solely linking simple Strings, it works fine,
-	 * but to be consistent, there should never be the possibility (in a JDO object) to replace the set (in non-JDO-objects there are many reasons to do the same,
-	 * as well). Therefore you should better have add and remove methods here and remove the setter.
-	 * As you see below, I've hidden the internal String management more or less completely and instead work with instances of {@link ObjectID} - which
-	 * is a much nicer API. This couldn't be easily done when exposing the Set<String> referencedObjectIDs directly. 
-	 */
-	public void setReferencedObjectIDs(Set<String> objIds) {
-		this.referencedObjectIDs = objIds;
-	}
-
-	// This method should be named "getReferencedObjectIDStrings()"
-	public Set<String> getReferencedObjectIDs() {
-//		return referencedObjectIDs;
-		return Collections.unmodifiableSet(referencedObjectIDs); // we enfore using the add/remove methods here (below)
-	}
+//	/**
+//	 * @deprecated It is not good practice to expose 1-n-relationships in a JDO object. Since this Set here is solely linking simple Strings, it works fine,
+//	 * but to be consistent, there should never be the possibility (in a JDO object) to replace the set (in non-JDO-objects there are many reasons to do the same,
+//	 * as well). Therefore you should better have add and remove methods here and remove the setter.
+//	 * As you see below, I've hidden the internal String management more or less completely and instead work with instances of {@link ObjectID} - which
+//	 * is a much nicer API. This couldn't be easily done when exposing the Set<String> referencedObjectIDs directly. 
+//	 */
+//	public void setReferencedObjectIDs(Set<String> objIds) {
+//		this.referencedObjectIDs = objIds;
+//	}
 
 	// This method should be named "getReferencedObjectIDs()". Please rename it, after you removed the above method, which currently blocks the name
-	public Set<ObjectID> _getReferencedObjectIDs() {
+	public Set<ObjectID> getReferencedObjectIDs() {
 		if (_referencedObjectIDs == null) {
 			Set<ObjectID> ro = new HashSet<ObjectID>(referencedObjectIDs.size());
 			for (String objectIDString : referencedObjectIDs) {

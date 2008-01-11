@@ -423,6 +423,11 @@ implements
 		if (_referencedObjectIDs != null)
 			_referencedObjectIDs.remove(referencedObjectID);
 	}
+	
+	public void clearReferencedObjectIDs()
+	{
+		referencedObjectIDs.clear();
+	}
 
 	/**
 	 * @jdo.field persistence-modifier="none"

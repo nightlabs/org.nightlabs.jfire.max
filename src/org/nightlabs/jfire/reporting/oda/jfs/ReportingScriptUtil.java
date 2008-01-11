@@ -21,7 +21,7 @@ public class ReportingScriptUtil {
 	}
 	
 	/**
-	 * Adds a {@link TimePeriod} contition to a JDOQL query in the form of
+	 * Adds a {@link TimePeriod} condition to a JDOQL query in the form of
 	 * <pre>
 	 *   && (variable >= :timePeriodVarNameFrom && variable <= :timePeriodVarNameTo) 
 	 * </pre>
@@ -44,12 +44,14 @@ public class ReportingScriptUtil {
 		if (timePeriod.isFromSet())
 			jdoql.append(variable+" >= :"+timePeriodVarName+"From");
 		if (timePeriod.isToSet()) {
-			if (timePeriod.isToSet())
+			if (timePeriod.isFromSet())
 				jdoql.append(" && ");
 			jdoql.append(variable+" <= :"+timePeriodVarName+"To");
 		}
-		queryParameters.put(timePeriodVarName+"From", timePeriod.getFrom());
-		queryParameters.put(timePeriodVarName+"To", timePeriod.getTo());
+		if (timePeriod.isFromSet())
+			queryParameters.put(timePeriodVarName+"From", timePeriod.getFrom());
+		if (timePeriod.isToSet())
+			queryParameters.put(timePeriodVarName+"To", timePeriod.getTo());
 		jdoql.append(") ");
 	}
 

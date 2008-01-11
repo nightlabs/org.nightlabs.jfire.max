@@ -108,10 +108,7 @@ implements ReportingScriptExecutor
 	public IResultSet getResultSet(Script script, Map<String, Object> parameters, JFSQueryPropertySet queryPropertySet)
 	throws ScriptException
 	{
-		Map<String, Object> convertedParams = new HashMap<String, Object>();
-		for (Entry<String, Object> entry : parameters.entrySet()) {
-			convertedParams.put(entry.getKey(), JFireReportingHelper.getDataSetParamObject(entry.getValue()));
-		}
+		Map<String, Object> convertedParams = convertParameters(parameters);
 		prepare(script, convertedParams);
 		getReportingDelegate(queryPropertySet);
 		Object result = execute();
@@ -120,6 +117,25 @@ implements ReportingScriptExecutor
 		} catch (ClassCastException e) {
 			throw new ScriptException("The delegate of type "+getDelegate().getClass().getName()+" did not return an implementation of "+IResultSet.class.getName()+" upon execution but "+result.getClass().getName(), e);
 		}
+	}
+	
+	/**
+	 * Converts the parameters given (eventually the data-set-parameters binded to a use of a BIRT dataset).
+	 * It will check if it either finds {@link JFSParameterUtil#DUMMY_DEFAULT_PARAMETER_VALUE} or a serialized
+	 * Object parameter.
+	 * 
+	 * @param parameters The parameters to convert. 
+	 * @return The converted parameters.
+	 */
+	protected Map<String, Object> convertParameters(Map<String, Object> parameters) {
+		Map<String, Object> convertedParams = new HashMap<String, Object>();
+		for (Entry<String, Object> entry : parameters.entrySet()) {
+			if (JFSParameterUtil.DUMMY_DEFAULT_PARAMETER_VALUE.equals(entry.getValue()))
+				convertedParams.put(entry.getKey(), null);
+			else
+				convertedParams.put(entry.getKey(), JFireReportingHelper.getDataSetParamObject(entry.getValue()));
+		}
+		return convertedParams;
 	}
 
 	

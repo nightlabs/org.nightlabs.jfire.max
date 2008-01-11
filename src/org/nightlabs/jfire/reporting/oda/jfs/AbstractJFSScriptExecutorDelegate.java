@@ -46,7 +46,7 @@ implements ScriptExecutorJavaClassReportingDelegate
 	
 	public <T> T getObjectParameterValue(String parameterName, Class<T> clazz) {
 		Object obj = getParameterValue(parameterName);
-		if ("".equals(obj))
+		if ("".equals(obj) || JFSParameterUtil.DUMMY_DEFAULT_PARAMETER_VALUE.equals(obj))
 			return null;
 		return (T) obj;
 	}

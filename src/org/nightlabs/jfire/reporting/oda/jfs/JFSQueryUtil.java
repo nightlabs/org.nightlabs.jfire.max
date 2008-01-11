@@ -53,9 +53,9 @@ public class JFSQueryUtil {
 	}
 
 	/**
-	 * Creates the query string of a JFS query witht the given property set.
+	 * Creates the query string of a JFS query with the given property set.
 	 * @param queryPropertySet The property set that should be referenced in the query.
-	 * @return The query string of a JFS query witht the given property set.
+	 * @return The query string of a JFS query with the given property set.
 	 */
 	public static String createQueryStringFromPropertySet(JFSQueryPropertySet queryPropertySet) {
 		XStream xStream = new XStream(new XppDriver());

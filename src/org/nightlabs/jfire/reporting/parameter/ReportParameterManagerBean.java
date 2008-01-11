@@ -55,6 +55,7 @@ import org.nightlabs.jfire.reporting.parameter.config.id.ReportParameterAcquisit
 import org.nightlabs.jfire.reporting.parameter.id.ValueProviderCategoryID;
 import org.nightlabs.jfire.reporting.parameter.id.ValueProviderID;
 import org.nightlabs.jfire.security.id.UserID;
+import org.nightlabs.jfire.workstation.id.WorkstationID;
 import org.nightlabs.util.TimePeriod;
 
 /**
@@ -162,6 +163,19 @@ implements SessionBean
 					new NameEntry[] {new NameEntry(Locale.ENGLISH.getLanguage(), "Let the user select a user.")},
 					new NameEntry[] {new NameEntry(Locale.ENGLISH.getLanguage(), "Select a user")}
 			);
+			
+			ReportParameterUtil.createValueProvider(pm, jfireObjects, ReportingConstants.VALUE_PROVIDER_ID_CURRENT_USER, UserID.class.getName(),
+					new NameEntry[] {new NameEntry(Locale.ENGLISH.getLanguage(), "Current user")},
+					new NameEntry[] {new NameEntry(Locale.ENGLISH.getLanguage(), "Current user pre-selected (change possible).")},
+					new NameEntry[] {new NameEntry(Locale.ENGLISH.getLanguage(), "Current user is selected. You might select an other user.")}
+			);
+			
+			ReportParameterUtil.createValueProvider(pm, jfireObjects, ReportingConstants.VALUE_PROVIDER_ID_USERS, 
+					Collection.class.getName() + "<" + UserID.class.getName() + ">",
+					new NameEntry[] {new NameEntry(Locale.ENGLISH.getLanguage(), "List of users")},
+					new NameEntry[] {new NameEntry(Locale.ENGLISH.getLanguage(), "Let the user select a list of users.")},
+					new NameEntry[] {new NameEntry(Locale.ENGLISH.getLanguage(), "Select a list of users")}
+			);
 
 			ReportParameterUtil.createValueProvider(pm, jfireObjects, ReportingConstants.VALUE_PROVIDER_ID_USER_GROUP, UserID.class.getName(),
 					new NameEntry[] {new NameEntry(Locale.ENGLISH.getLanguage(), "User group")},
@@ -169,16 +183,36 @@ implements SessionBean
 					new NameEntry[] {new NameEntry(Locale.ENGLISH.getLanguage(), "Select a user group")}
 			);
 
+			ReportParameterUtil.createValueProvider(pm, jfireObjects, ReportingConstants.VALUE_PROVIDER_ID_USER_GROUPS, 
+					Collection.class.getName() + "<" + UserID.class.getName() + ">",
+					new NameEntry[] {new NameEntry(Locale.ENGLISH.getLanguage(), "List of user groups")},
+					new NameEntry[] {new NameEntry(Locale.ENGLISH.getLanguage(), "Let the user select a list of user groups.")},
+					new NameEntry[] {new NameEntry(Locale.ENGLISH.getLanguage(), "Select a list of user groups")}
+			);
+			
 			ReportParameterUtil.createValueProvider(pm, jfireObjects, ReportingConstants.VALUE_PROVIDER_ID_ORGANISATION, OrganisationID.class.getName(),
 					new NameEntry[] {new NameEntry(Locale.ENGLISH.getLanguage(), "Organisation")},
 					new NameEntry[] {new NameEntry(Locale.ENGLISH.getLanguage(), "Let the user select an organisation.")},
 					new NameEntry[] {new NameEntry(Locale.ENGLISH.getLanguage(), "Select an organisation")}
 			);
 
-			ReportParameterUtil.createValueProvider(pm, jfireObjects, ReportingConstants.VALUE_PROVIDER_ID_ORGANISATION, OrganisationID.class.getName(),
+			ReportParameterUtil.createValueProvider(pm, jfireObjects, ReportingConstants.VALUE_PROVIDER_ID_WORKSTATION, WorkstationID.class.getName(),
 					new NameEntry[] {new NameEntry(Locale.ENGLISH.getLanguage(), "Workstation")},
 					new NameEntry[] {new NameEntry(Locale.ENGLISH.getLanguage(), "Let the user select a workstation.")},
 					new NameEntry[] {new NameEntry(Locale.ENGLISH.getLanguage(), "Select a workstation")}
+			);
+			
+			ReportParameterUtil.createValueProvider(pm, jfireObjects, ReportingConstants.VALUE_PROVIDER_ID_CURRENT_WORKSTATION, WorkstationID.class.getName(),
+					new NameEntry[] {new NameEntry(Locale.ENGLISH.getLanguage(), "Current workstation")},
+					new NameEntry[] {new NameEntry(Locale.ENGLISH.getLanguage(), "Current workstation pre-selected (change possible).")},
+					new NameEntry[] {new NameEntry(Locale.ENGLISH.getLanguage(), "Current workstation is selected. You might select another one.")}
+			);
+			
+			ReportParameterUtil.createValueProvider(pm, jfireObjects, ReportingConstants.VALUE_PROVIDER_ID_WORKSTATIONS, 
+					Collection.class.getName() + "<" + WorkstationID.class.getName() + ">",
+					new NameEntry[] {new NameEntry(Locale.ENGLISH.getLanguage(), "List of workstations")},
+					new NameEntry[] {new NameEntry(Locale.ENGLISH.getLanguage(), "Let the user select a list of workstations.")},
+					new NameEntry[] {new NameEntry(Locale.ENGLISH.getLanguage(), "Select a list of workstations")}
 			);
 		} finally {
 			pm.close();

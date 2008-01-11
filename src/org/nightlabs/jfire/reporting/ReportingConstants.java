@@ -4,6 +4,7 @@
 package org.nightlabs.jfire.reporting;
 
 import java.math.BigDecimal;
+import java.util.Collection;
 import java.util.Date;
 
 import org.nightlabs.jfire.organisation.Organisation;
@@ -108,6 +109,24 @@ public class ReportingConstants {
 		);
 	
 	/**
+	 * ValueProvider id for a value provider that queries a {@link UserID} from the user but has the current user preselected. 
+	 */
+	public static final ValueProviderID VALUE_PROVIDER_ID_CURRENT_USER = ValueProviderID.create(
+			Organisation.DEV_ORGANISATION_ID, 
+			ReportingConstants.VALUE_PROVIDER_CATEGORY_ID_JFIRE_OBJECTS.valueProviderCategoryID, 
+			User.class.getName() + "#current"
+		);
+	
+	/**
+	 * ValueProvider id for a value provider that queries a {@link Collection} of {@link UserID}s from the user 
+	 */
+	public static final ValueProviderID VALUE_PROVIDER_ID_USERS = ValueProviderID.create(
+			Organisation.DEV_ORGANISATION_ID, 
+			ReportingConstants.VALUE_PROVIDER_CATEGORY_ID_JFIRE_OBJECTS.valueProviderCategoryID, 
+			Collection.class.getName() + "<" + User.class.getName() + ">"
+		);
+	
+	/**
 	 * ValueProvider id for a value provider that queries a {@link UserID} for a {@link UserGroup} from the user 
 	 */
 	public static final ValueProviderID VALUE_PROVIDER_ID_USER_GROUP = ValueProviderID.create(
@@ -116,6 +135,16 @@ public class ReportingConstants {
 			UserGroup.class.getName()
 		);
 	
+	// Current Usergroup not possible, as as the current User can be in multiple user groups.
+	
+	/**
+	 * ValueProvider id for a value provider that queries a {@link Collection} of {@link UserID}s from the user 
+	 */
+	public static final ValueProviderID VALUE_PROVIDER_ID_USER_GROUPS = ValueProviderID.create(
+			Organisation.DEV_ORGANISATION_ID, 
+			ReportingConstants.VALUE_PROVIDER_CATEGORY_ID_JFIRE_OBJECTS.valueProviderCategoryID, 
+			Collection.class.getName() + "<" + UserGroup.class.getName() + ">"
+		);
 	/**
 	 * ValueProvider id for a value provider that queries a {@link OrganisationID} from the user 
 	 */
@@ -132,5 +161,23 @@ public class ReportingConstants {
 			Organisation.DEV_ORGANISATION_ID, 
 			ReportingConstants.VALUE_PROVIDER_CATEGORY_ID_JFIRE_OBJECTS.valueProviderCategoryID, 
 			Workstation.class.getName()
+		);
+	
+	/**
+	 * ValueProvider id for a value provider that queries a {@link WorkstationID} from the user 
+	 */
+	public static final ValueProviderID VALUE_PROVIDER_ID_CURRENT_WORKSTATION = ValueProviderID.create(
+			Organisation.DEV_ORGANISATION_ID, 
+			ReportingConstants.VALUE_PROVIDER_CATEGORY_ID_JFIRE_OBJECTS.valueProviderCategoryID, 
+			Workstation.class.getName() + "#current"
+		);
+	
+	/**
+	 * ValueProvider id for a value provider that queries a {@link Collection} of {@link WorkstationID} from the user 
+	 */
+	public static final ValueProviderID VALUE_PROVIDER_ID_WORKSTATIONS = ValueProviderID.create(
+			Organisation.DEV_ORGANISATION_ID, 
+			ReportingConstants.VALUE_PROVIDER_CATEGORY_ID_JFIRE_OBJECTS.valueProviderCategoryID, 
+			Collection.class.getName() + "<" + Workstation.class.getName() + ">"
 		);
 }

@@ -39,6 +39,8 @@ public class ReportingTradeConstants {
 	public static final String VALUE_PROVIDER_CATEGORY_ID_LEGAL_ENTITY = "JFireReportingTrade-ValueProviderCategory-LegalEntity";
 	public static final ValueProviderID VALUE_PROVIDER_ID_LEGAL_ENTITY_SEARCH = ValueProviderID.create( 
 			Organisation.DEV_ORGANISATION_ID, VALUE_PROVIDER_CATEGORY_ID_LEGAL_ENTITY, "Search");
+	public static final ValueProviderID VALUE_PROVIDER_ID_LEGAL_ENTITY_SEARCH_MULTIPLE = ValueProviderID.create( 
+			Organisation.DEV_ORGANISATION_ID, VALUE_PROVIDER_CATEGORY_ID_LEGAL_ENTITY, "SearchMultiple");
 
 	public static final String VALUE_PROVIDER_CATEGORY_ID_TRADE_DOCUMENTS = "JFireReportingTrade-ValueProviderCategory-TradeDocuments";
 	public static final String VALUE_PROVIDER_CATEGORY_ID_TRADE_DOCUMENTS_INVOICE = "JFireReportingTrade-ValueProviderCategory-TradeDocuments-Invoice";

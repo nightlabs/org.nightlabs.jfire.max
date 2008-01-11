@@ -89,12 +89,12 @@ public class PaymentList extends AbstractJFSScriptExecutorDelegate {
 	 */
 	public Object doExecute() throws ScriptException {
 		Map<String, Object> param = getScriptExecutorJavaClass().getParameterValues();
-		logger.error("**************************************************************");
-		logger.error("**************************************************************");
-		logger.error("**************************************************************");
-		logger.error("**************************************************************");
-		logger.error("**************************************************************");
-		logger.error("parameterValues");
+		logger.info("**************************************************************");
+		logger.info("**************************************************************");
+		logger.info("**************************************************************");
+		logger.info("**************************************************************");
+		logger.info("**************************************************************");
+		logger.info("parameterValues");
 		for (Map.Entry<String, Object> entry : param.entrySet()) {
 			logger.error(" " + entry.getKey() + " = '" + entry.getValue() + "'");
 		}
@@ -139,7 +139,9 @@ public class PaymentList extends AbstractJFSScriptExecutorDelegate {
 			int i = 0;
 			for (Iterator<UserID> iterator = users.iterator(); iterator.hasNext();) {
 				UserID userID = iterator.next();
-				jdoql.append("(JDOHelper.getObjectId(this.user) == :userID" + i + ") ");
+				// TODO: WORKAROUND: JPOX Bug
+//				jdoql.append("(JDOHelper.getObjectId(this.user) == :userID" + i + ") ");
+				jdoql.append("(this.user.organisationID == \"" + userID.organisationID + "\" && this.user.userID == \"" + userID.userID + "\")");
 				jdoParams.put("userID" + i, userID);
 				if (iterator.hasNext())
 					jdoql.append("|| ");
@@ -162,30 +164,30 @@ public class PaymentList extends AbstractJFSScriptExecutorDelegate {
 		}
 		
 		// filter by begin time period
-		if (beginTimePeriod != null) {
-			if (beginTimePeriod.getFrom() != null || beginTimePeriod.getTo() != null) {
-				jdoql.append("&& (");
-				if (beginTimePeriod.getFrom() != null) {
-					jdoql.append("(this.beginDT >= :beginDateFrom)");
-					jdoParams.put("beginDateFrom", beginTimePeriod.getFrom());
-				}
-				if (beginTimePeriod.getTo() != null) {
-					if (beginTimePeriod.getFrom() != null)
-						jdoql.append(" && ");
-					jdoql.append("(this.beginDT <= :beginDateTo)");
-					jdoParams.put("beginDateTo", beginTimePeriod.getTo());
-				}
-				jdoql.append(") "); 
-			}
-		}
-		
-		// filter by begin time period
 		ReportingScriptUtil.addTimePeriodCondition(jdoql, "this.beginDT", "beginDT", beginTimePeriod, jdoParams);
 		// filter by begin time period
 		ReportingScriptUtil.addTimePeriodCondition(jdoql, "this.endDT", "endDT", endTimePeriod, jdoParams);
 		
+		logger.info("**************************************************************");
+		logger.info("**************************************************************");
+		logger.info("**************************************************************");
+		logger.info("**************************************************************");
+		logger.info("**************************************************************");
+		logger.info("jdoql parameters");
+		for (Map.Entry<String, Object> entry : jdoParams.entrySet()) {
+			logger.error(" " + entry.getKey() + " = " + entry.getValue().getClass().getName() + "'" + entry.getValue() + "'");
+		}
+		
+		logger.info("**************************************************************");
+		logger.info("**************************************************************");
+		logger.info("**************************************************************");
+		logger.info("**************************************************************");
+		logger.info("**************************************************************");
+		logger.info("query");
+		logger.info(jdoql.toString());		
+		
 		Query q = pm.newQuery(jdoql.toString());
-		Collection queryResult = (Collection)q.execute(jdoParams);
+		Collection queryResult = (Collection)q.executeWithMap(jdoParams);
 		getResultSetMetaData();
 		TableBuffer buffer = null;
 		try {

@@ -71,11 +71,9 @@ public class DeliveryList extends AbstractJFSScriptExecutorDelegate {
 	 * @see org.nightlabs.jfire.scripting.ScriptExecutorJavaClassDelegate#doExecute()
 	 */
 	public Object doExecute() throws ScriptException {
-		Map<String, Object> param = getScriptExecutorJavaClass().getParameterValues();
-		UserID createUserID = (UserID) param.get("createUserID");
-//		UserID createUserGroupID = (UserID) param.get("createUserGroupID");
-		TimePeriod createTimePeriod = (TimePeriod) param.get("createTimePeriod");
-		TimePeriod deliveryTimePeriod = (TimePeriod) param.get("deliveryTimePeriod");
+		UserID createUserID = getObjectParameterValue("createUserID", UserID.class);
+		TimePeriod createTimePeriod = getObjectParameterValue("createTimePeriod", TimePeriod.class);
+		TimePeriod deliveryTimePeriod = getObjectParameterValue("deliveryTimePeriod", TimePeriod.class);
 		PersistenceManager pm = getScriptExecutorJavaClass().getPersistenceManager();
 		StringBuffer jdoql = new StringBuffer();
 		 jdoql.append("SELECT "+
@@ -107,7 +105,7 @@ public class DeliveryList extends AbstractJFSScriptExecutorDelegate {
 		ReportingScriptUtil.addTimePeriodCondition(jdoql, "this.articleLocal.delivery.beginDT", "deliveryDT", deliveryTimePeriod, jdoParams);
 		
 		Query q = pm.newQuery(jdoql);
-		Collection queryResult = (Collection)q.execute(jdoParams);
+		Collection queryResult = (Collection)q.executeWithMap(jdoParams);
 		getResultSetMetaData();
 		TableBuffer buffer = null;
 		try {

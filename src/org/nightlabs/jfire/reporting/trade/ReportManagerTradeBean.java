@@ -27,6 +27,7 @@
 package org.nightlabs.jfire.reporting.trade;
 
 import java.rmi.RemoteException;
+import java.util.Collection;
 import java.util.Date;
 import java.util.Locale;
 
@@ -201,11 +202,19 @@ implements SessionBean
 				new NameEntry[] {new NameEntry(Locale.ENGLISH.getLanguage(), "Legal entity parameters")}
 			);
 		
-		ReportParameterUtil.createValueProvider(pm, leCategory, ReportingTradeConstants.VALUE_PROVIDER_ID_LEGAL_ENTITY_SEARCH, AnchorID.class.getName(),
+		ReportParameterUtil.createValueProvider(pm, leCategory, ReportingTradeConstants.VALUE_PROVIDER_ID_LEGAL_ENTITY_SEARCH, 
+				AnchorID.class.getName(),
 				new NameEntry[] {new NameEntry(Locale.ENGLISH.getLanguage(), "Customer search")},
 				new NameEntry[] {new NameEntry(Locale.ENGLISH.getLanguage(), "Customer search")},
 				new NameEntry[] {new NameEntry(Locale.ENGLISH.getLanguage(), "Select a customer")}
-				);
+			);
+		
+		ReportParameterUtil.createValueProvider(pm, leCategory, ReportingTradeConstants.VALUE_PROVIDER_ID_LEGAL_ENTITY_SEARCH_MULTIPLE, 
+				Collection.class.getName() + "<" + AnchorID.class.getName() + ">",
+				new NameEntry[] {new NameEntry(Locale.ENGLISH.getLanguage(), "Customer search multiple")},
+				new NameEntry[] {new NameEntry(Locale.ENGLISH.getLanguage(), "Customer search multiple")},
+				new NameEntry[] {new NameEntry(Locale.ENGLISH.getLanguage(), "Select a customer multiple customers")}
+			);
 		
 		ValueProviderCategoryID docsCategoryID = ValueProviderCategoryID.create(
 				Organisation.DEV_ORGANISATION_ID, 

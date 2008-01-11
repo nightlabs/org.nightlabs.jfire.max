@@ -30,6 +30,7 @@ import java.util.Collection;
 import java.util.Iterator;
 import java.util.Set;
 
+import javax.jdo.JDOHelper;
 import javax.jdo.JDOObjectNotFoundException;
 import javax.jdo.PersistenceManager;
 
@@ -52,7 +53,8 @@ import org.nightlabs.jfire.transfer.id.AnchorID;
  *
  * @jdo.fetch-group name="Repository.owner" fields="owner"
  * @jdo.fetch-group name="Repository.name" fields="name"
- * @jdo.fetch-group name="Repository.this" fetch-groups="default, Anchor.this" fields="owner, name"
+ * @jdo.fetch-group name="Repository.repositoryType" fields="repositoryType"
+ * @jdo.fetch-group name="Repository.this" fetch-groups="default, Anchor.this" fields="owner, name, repositoryType"
  */
 public class Repository extends Anchor
 {
@@ -60,48 +62,52 @@ public class Repository extends Anchor
 
 	public static final String FETCH_GROUP_OWNER = "Repository.owner";
 	public static final String FETCH_GROUP_NAME = "Repository.name";
+	public static final String FETCH_GROUP_REPOSITORY_TYPE = "Repository.repositoryType";
 	public static final String FETCH_GROUP_THIS_REPOSITORY = "Repository.this";
 
-	/**
-	 * Local products will be created in a repository with this type. Foreign products, however, are created in
-	 * a repository with {@link #ANCHOR_TYPE_ID_OUTSIDE}. Foreign products are transferred here (i.e. to their home)
-	 * during the booking of their DeliveryNote / ReceptionNote.
-	 * <p>
-	 * Both local and foreign products are transferred from
-	 * this repository to the container product's repository
-	 * when the container product is assembled.
-	 * </p> 
-	 * <p>
-	 * Both local and foreign products are transferred into
-	 * this repository (from the container's repository) when
-	 * the container product is DISassembled.
-	 * </p>
-	 */
-	public static final String ANCHOR_TYPE_ID_HOME = "Repository.Home";
-
 //	/**
-//   * A repository with this type is the source of products - they are created here. Therefore,
-//   * it's used as initial repository for local products and (if a local product nests foreign products)
-//   * foreign products might be transferred here during the assemble process. It should have {@link #isOutside()}<code> == false</code>.
-//   */
-//	public static final String ANCHOR_TYPE_ID_FACTORY = "Repository.Factory";
-
-//	/**
-//	 * A repository with this type is inside the organisation. It should have {@link #outside}<code> == false</code>!
+//	 * Local products will be created in a repository with this type. Foreign products, however, are created in
+//	 * a repository with {@link #ANCHOR_TYPE_ID_OUTSIDE}. Foreign products are transferred here (i.e. to their home)
+//	 * during the booking of their DeliveryNote / ReceptionNote.
+//	 * <p>
+//	 * Both local and foreign products are transferred from
+//	 * this repository to the container product's repository
+//	 * when the container product is assembled.
+//	 * </p> 
+//	 * <p>
+//	 * Both local and foreign products are transferred into
+//	 * this repository (from the container's repository) when
+//	 * the container product is DISassembled.
+//	 * </p>
 //	 */
-//	public static final String ANCHOR_TYPE_ID_BIN = "Repository.Bin";
+//	public static final String ANCHOR_TYPE_ID_HOME = "Repository.Home";
+//
+////	/**
+////   * A repository with this type is the source of products - they are created here. Therefore,
+////   * it's used as initial repository for local products and (if a local product nests foreign products)
+////   * foreign products might be transferred here during the assemble process. It should have {@link #isOutside()}<code> == false</code>.
+////   */
+////	public static final String ANCHOR_TYPE_ID_FACTORY = "Repository.Factory";
+//
+////	/**
+////	 * A repository with this type is inside the organisation. It should have {@link #outside}<code> == false</code>!
+////	 */
+////	public static final String ANCHOR_TYPE_ID_BIN = "Repository.Bin";
+//
+//	/**
+//	 * A repository with this type is used for virtually outside repositories. If a <tt>Product</tt>
+//	 * is there, it means that the product is not here anymore (or not yet) and has already been delivered
+//	 * to a partner (or not yet been delivered from a supplier). It should have {@link #outside} == true!
+//	 */
+//	public static final String ANCHOR_TYPE_ID_OUTSIDE = "Repository.Outside";
 
-	/**
-	 * A repository with this type is used for virtually outside repositories. If a <tt>Product</tt>
-	 * is there, it means that the product is not here anymore (or not yet) and has already been delivered
-	 * to a partner (or not yet been delivered from a supplier). It should have {@link #outside} == true!
-	 */
-	public static final String ANCHOR_TYPE_ID_OUTSIDE = "Repository.Outside";
 //	/**
 //	 * Repositories with this type are used by {@link ServerDeliveryProcessor}s to transfer their
 //	 * goods from and to. They're outside, hence they should have {@link #isOutside()}<code> == true</code>. 
 //	 */
 //	public static final String ANCHOR_TYPE_ID_DELIVERY = "Repository.Delivery";
+
+	public static final String ANCHOR_TYPE_ID_REPOSITORY = "Repository";
 
 	/**
 	 * @jdo.field persistence-modifier="persistent"
@@ -114,33 +120,39 @@ public class Repository extends Anchor
 	private RepositoryName name;
 
 	/**
-	 * Whether or not this Repository represents sth. outside.
-	 *
 	 * @jdo.field persistence-modifier="persistent"
 	 */
-	private boolean outside;
+	private RepositoryType repositoryType;
+
+//	/**
+//	 * Whether or not this Repository represents sth. outside.
+//	 *
+//	 * @jdo.field persistence-modifier="persistent"
+//	 */
+//	private boolean outside;
 
 	public static Repository createRepository(
-			PersistenceManager pm, String organisationID, String anchorTypeID, String anchorID, LegalEntity owner, boolean outside)
+			PersistenceManager pm, String organisationID, String anchorID, RepositoryType repositoryType, LegalEntity owner)
 	{
 		Repository repository;
 		try {
-			repository = (Repository) pm.getObjectById(
-					AnchorID.create(organisationID, anchorTypeID, anchorID));
+			repository = (Repository) pm.getObjectById(AnchorID.create(organisationID, ANCHOR_TYPE_ID_REPOSITORY, anchorID));
 		} catch (JDOObjectNotFoundException x) {
 			repository = null;
 		}
 
 		if (repository == null) { // create persist it
-			repository = new Repository(organisationID, anchorTypeID, anchorID, owner, outside);
+			repository = new Repository(organisationID, anchorID, repositoryType, owner);
 			repository = pm.makePersistent(repository);
 		}
 		else { // check, whether owner and outside is correct
 			if (!repository.getOwner().equals(owner))
 				throw new IllegalArgumentException("The repository \"" + repository.getPrimaryKey() + "\" already exists but does not match the specified owner \"" + owner.getPrimaryKey() + "\" - it already has the owner \"" + repository.getOwner().getPrimaryKey() + "\" assigned!");
 
-			if (repository.isOutside() != outside)
-				throw new IllegalArgumentException("The repository \"" + repository.getPrimaryKey() + "\" already exists but does not match the specified outside flag \"" + outside + "\" - it already has outside \"" + repository.isOutside() + "\" assigned!");
+//			if (repository.isOutside() != outside)
+//				throw new IllegalArgumentException("The repository \"" + repository.getPrimaryKey() + "\" already exists but does not match the specified outside flag \"" + outside + "\" - it already has outside \"" + repository.isOutside() + "\" assigned!");
+			if (!repository.getRepositoryType().equals(repositoryType))
+				throw new IllegalArgumentException("The repository \"" + repository.getPrimaryKey() + "\" already exists but does not match the specified RepositoryType \"" + JDOHelper.getObjectId(repositoryType) + "\" - it already has \"" + JDOHelper.getObjectId(repository.getRepositoryType()) + "\" assigned!");
 		}
 
 		return repository;
@@ -160,20 +172,29 @@ public class Repository extends Anchor
 	 * @param anchorID
 	 */
 	public Repository(
-			String organisationID, String anchorTypeID, String anchorID,
-			LegalEntity owner, boolean outside)
+			String organisationID, String anchorID,
+			RepositoryType repositoryType,
+			LegalEntity owner)
 	{
-		super(organisationID, anchorTypeID, anchorID);
+		super(organisationID, ANCHOR_TYPE_ID_REPOSITORY, anchorID);
+		
+		if (repositoryType == null)
+			throw new IllegalArgumentException("repositoryType must not be null!");
 
 		if (owner == null)
 			throw new IllegalArgumentException("owner must not be null!");
 
+		this.repositoryType = repositoryType;
 		this.owner = owner;
 		this.name = new RepositoryName(this);
-		this.outside = outside;
 
 //		if (!organisationID.equals(owner.getOrganisationID())) // TODO remove this temporary test - it is a legal state, but it should not occur in the current situation at all! it does already occur!
 //			throw new IllegalArgumentException("organisationID != owner.organisationID!!! organisationID=\"" + organisationID + "\" owner.organisationID=\"" + owner.getOrganisationID() + "\"");
+	}
+
+	public RepositoryType getRepositoryType()
+	{
+		return repositoryType;
 	}
 
 	@Override
@@ -199,7 +220,7 @@ public class Repository extends Anchor
 			else
 				throw new IllegalStateException("This Repository (" + getPrimaryKey() + ") is neither to nor from!");
 //			ProductReference.createProductReference(pm, to, product).incQuantity();
-			if (isOutside()) {
+			if (getRepositoryType().isOutside()) {
 				int val = thisIsFrom ? +1 : -1;
 				product.getProductLocal().incQuantity(val); // nested products are handled during assembling/disassembling
 //				incProductLocalQuantity(product, val);
@@ -233,7 +254,7 @@ public class Repository extends Anchor
 			else
 				throw new IllegalStateException("This Repository (" + getPrimaryKey() + ") is neither to nor from!");
 
-			if (isOutside()) {
+			if (getRepositoryType().isOutside()) {
 				int val = thisIsFrom ? -1 : +1;
 				product.getProductLocal().incQuantity(val); // nested products are handled during assembling/disassembling
 //				incProductLocalQuantity(product, val);
@@ -275,8 +296,4 @@ public class Repository extends Anchor
 		return name;
 	}
 
-	public boolean isOutside()
-	{
-		return outside;
-	}
 }

@@ -266,7 +266,7 @@ implements Serializable, DeleteCallback
 
 		if (anchor instanceof Repository) {
 			Repository repository = (Repository)anchor;
-			if (repository.isOutside()) {
+			if (repository.getRepositoryType().isOutside()) {
 				String productReferenceGroupOrganisationID = repository.getOwner().getOrganisationID();
 				String productReferenceGroupID = repository.getOwner().getAnchorTypeID() + '.' + repository.getOwner().getAnchorID();
 

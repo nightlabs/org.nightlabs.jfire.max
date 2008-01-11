@@ -37,6 +37,7 @@ import org.nightlabs.jfire.security.User;
 import org.nightlabs.jfire.store.Product;
 import org.nightlabs.jfire.store.ProductTransfer;
 import org.nightlabs.jfire.store.Repository;
+import org.nightlabs.jfire.store.RepositoryType;
 import org.nightlabs.jfire.store.Store;
 import org.nightlabs.jfire.store.deliver.DeliverProductTransfer;
 import org.nightlabs.jfire.store.deliver.ServerDeliveryProcessor;
@@ -104,8 +105,9 @@ public class PartnerStorekeeper extends Storekeeper
 		}
 		// TODO remove this! end DEBUG check
 
-		String anchorID = repositoryOwner.getOrganisationID() + '#' + repositoryOwner.getAnchorTypeID() + '#' + repositoryOwner.getAnchorID();
-		return Repository.createRepository(pm, organisationID, Repository.ANCHOR_TYPE_ID_HOME, anchorID, repositoryOwner, false);
+		String anchorID = RepositoryType.ANCHOR_TYPE_ID_PREFIX_PARTNER + repositoryOwner.getOrganisationID() + '#' + repositoryOwner.getAnchorTypeID() + '#' + repositoryOwner.getAnchorID();
+		RepositoryType repositoryType = (RepositoryType) pm.getObjectById(RepositoryType.REPOSITORY_TYPE_ID_PARTNER);
+		return Repository.createRepository(pm, organisationID, anchorID, repositoryType, repositoryOwner);
 
 //		try {
 //			return (Repository) pm.getObjectById(AnchorID.create(
@@ -148,7 +150,9 @@ public class PartnerStorekeeper extends Storekeeper
 		if (anchorIDPrefix != null && !"".equals(anchorIDPrefix))
 			anchorID = anchorIDPrefix + '#' + anchorID;
 
-		return Repository.createRepository(pm, organisationID, Repository.ANCHOR_TYPE_ID_OUTSIDE, anchorID, repositoryOwner, true);
+		anchorID = RepositoryType.ANCHOR_TYPE_ID_PREFIX_OUTSIDE + anchorID;
+		RepositoryType repositoryType = (RepositoryType) pm.getObjectById(RepositoryType.REPOSITORY_TYPE_ID_OUTSIDE);
+		return Repository.createRepository(pm, organisationID, anchorID, repositoryType, repositoryOwner);
 
 //		try {
 //			return (Repository) pm.getObjectById(AnchorID.create(

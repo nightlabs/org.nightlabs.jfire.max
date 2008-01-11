@@ -1323,7 +1323,7 @@ implements StoreCallback
 
 				// put the product to the final destination
 				Repository currentRepository = (Repository) productLocal.getAnchor();
-				if (!currentRepository.isOutside() && !repositorySource.getPrimaryKey().equals(currentRepository.getPrimaryKey()))
+				if (!currentRepository.getRepositoryType().isOutside() && !repositorySource.equals(currentRepository))
 					throw new IllegalStateException("Product \"" + product.getPrimaryKey() + "\" is currently in a different inside repository (\"" + currentRepository.getPrimaryKey() + "\") than the transfer chain starts (\"" + repositorySource.getPrimaryKey() + "\")!");
 
 //				setProductLocalAnchorRecursively(product, repositoryDest);

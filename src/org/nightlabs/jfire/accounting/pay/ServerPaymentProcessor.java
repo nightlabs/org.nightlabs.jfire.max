@@ -440,7 +440,7 @@ implements Serializable, DetachCallback
 		LegalEntity partner = payment.getPartner();
 		Currency currency = payment.getCurrency();
 
-		String accountID = "outside#" + accountIDPrefix + '#' + currency.getCurrencyID();
+		String accountID = AccountType.ANCHOR_TYPE_ID_PREFIX_OUTSIDE + accountIDPrefix + '#' + currency.getCurrencyID();
 		if (individualAccount)
 			accountID = accountID + '#' + partner.getOrganisationID() + '#' + partner.getAnchorTypeID() + '#' + partner.getAnchorID();
 

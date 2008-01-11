@@ -47,6 +47,7 @@ import javax.ejb.SessionContext;
 import javax.jdo.FetchPlan;
 import javax.jdo.JDOObjectNotFoundException;
 import javax.jdo.PersistenceManager;
+import javax.jdo.Query;
 
 import org.apache.commons.lang.exception.ExceptionUtils;
 import org.apache.log4j.Logger;
@@ -95,6 +96,7 @@ import org.nightlabs.jfire.store.deliver.id.ModeOfDeliveryFlavourID;
 import org.nightlabs.jfire.store.id.DeliveryNoteID;
 import org.nightlabs.jfire.store.id.DeliveryNoteLocalID;
 import org.nightlabs.jfire.store.id.ProductTypeID;
+import org.nightlabs.jfire.store.id.RepositoryTypeID;
 import org.nightlabs.jfire.store.query.ProductTransferIDQuery;
 import org.nightlabs.jfire.store.query.ProductTransferQuery;
 import org.nightlabs.jfire.store.search.ProductTypeQuery;
@@ -232,13 +234,27 @@ implements SessionBean
 
 			// TODO deploy process definitions!
 
+			// create & persist instances of RepositoryType
+			RepositoryType repositoryType;
+
+			repositoryType = pm.makePersistent(new RepositoryType(RepositoryType.REPOSITORY_TYPE_ID_HOME, false));
+			repositoryType.getName().setText(Locale.ENGLISH.getLanguage(), "Home");
+			repositoryType.getName().setText(Locale.GERMAN.getLanguage(), "Heim");
+
+			repositoryType = pm.makePersistent(new RepositoryType(RepositoryType.REPOSITORY_TYPE_ID_OUTSIDE, true));
+			repositoryType.getName().setText(Locale.ENGLISH.getLanguage(), "Outside");
+			repositoryType.getName().setText(Locale.GERMAN.getLanguage(), "Außerhalb");
+
+			repositoryType = pm.makePersistent(new RepositoryType(RepositoryType.REPOSITORY_TYPE_ID_PARTNER, false));
+			repositoryType.getName().setText(Locale.ENGLISH.getLanguage(), "Business partner");
+			repositoryType.getName().setText(Locale.GERMAN.getLanguage(), "Geschäftspartner");
+
 
 			Store store = Store.getStore(pm);
 			Trader trader = Trader.getTrader(pm);
 
 			LegalEntity anonymousCustomer = LegalEntity.getAnonymousCustomer(pm);
 			CustomerGroup anonymousCustomerGroup = anonymousCustomer.getDefaultCustomerGroup();
-
 
 			//		 create fundamental set of ModeOfDelivery/ModeOfDeliveryFlavour
 			// manual
@@ -1450,13 +1466,14 @@ implements SessionBean
 						if (nestedProductLocal.getQuantity() < 0) {
 							// quantity indicates that the product is not here - is it still at supplier?
 
-							if (!Repository.ANCHOR_TYPE_ID_OUTSIDE.equals(nestedProductLocal.getAnchor().getAnchorTypeID()))
-								throw new IllegalStateException("The nested product is not outside, but has a quanity < 0! localArticle \"" + article.getPrimaryKey() + "\" + nestedProductLocal \"" + nestedProductLocal.getPrimaryKey() + "\"");
-
 							if (!(nestedProductLocal.getAnchor() instanceof Repository))
 								throw new IllegalStateException("The nested product is not in a Repository, but its anchor is of type \"" + (nestedProductLocal.getAnchor() == null ? null : nestedProductLocal.getAnchor().getClass().getName()) + "\"! localArticle \"" + article.getPrimaryKey() + "\" + nestedProductLocal \"" + nestedProductLocal.getPrimaryKey() + "\"");
 
 							Repository nestedProductLocalRepository = (Repository) nestedProductLocal.getAnchor();
+
+							if (!nestedProductLocalRepository.getRepositoryType().isOutside())
+								throw new IllegalStateException("The nested product is not outside, but has a quanity < 0! localArticle \"" + article.getPrimaryKey() + "\" + nestedProductLocal \"" + nestedProductLocal.getPrimaryKey() + "\"");
+
 							if (!nestedProductLocalRepository.getOwner().equals(OrganisationLegalEntity.getOrganisationLegalEntity(pm, nestedProductLocal.getOrganisationID(), OrganisationLegalEntity.ANCHOR_TYPE_ID_ORGANISATION, true)))
 								throw new IllegalStateException("The nested product is not in an outside Repository belonging to the supplier! Has it already been delivered to another customer? localArticle \"" + article.getPrimaryKey() + "\" + nestedProductLocal \"" + nestedProductLocal.getPrimaryKey() + "\"");
 
@@ -1913,6 +1930,39 @@ implements SessionBean
 		PersistenceManager pm = getPersistenceManager();
 		try {
 			return NLJDOHelper.getDetachedObjectList(pm, productTransferIDs, ProductTransfer.class, fetchGroups, maxFetchDepth);
+		} finally {
+			pm.close();
+		}
+	}
+
+	/**
+	 * @ejb.interface-method
+	 * @ejb.transaction type="Supports"
+	 * @ejb.permission role-name="_Guest_"
+	 */
+	@SuppressWarnings("unchecked")
+	public Set<RepositoryTypeID> getRepositoryTypeIDs()
+	{
+		PersistenceManager pm = getPersistenceManager();
+		try {
+			Query q = pm.newQuery(RepositoryType.class);
+			q.setResult("JDOHelper.getObjectId(this)");
+			return new HashSet<RepositoryTypeID>((Collection<? extends RepositoryTypeID>) q.execute());
+		} finally {
+			pm.close();
+		}
+	}
+
+	/**
+	 * @ejb.interface-method
+	 * @ejb.transaction type="Supports"
+	 * @ejb.permission role-name="_Guest_"
+	 */
+	public List<RepositoryType> getRepositoryTypes(Collection<RepositoryTypeID> repositoryTypeIDs, String[] fetchGroups, int maxFetchDepth)
+	{
+		PersistenceManager pm = getPersistenceManager();
+		try {
+			return NLJDOHelper.getDetachedObjectList(pm, repositoryTypeIDs, RepositoryType.class, fetchGroups, maxFetchDepth);
 		} finally {
 			pm.close();
 		}

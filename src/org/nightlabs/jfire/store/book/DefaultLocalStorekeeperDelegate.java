@@ -44,6 +44,7 @@ import org.nightlabs.jfire.store.Product;
 import org.nightlabs.jfire.store.ProductTransfer;
 import org.nightlabs.jfire.store.ProductType;
 import org.nightlabs.jfire.store.Repository;
+import org.nightlabs.jfire.store.RepositoryType;
 import org.nightlabs.jfire.store.Store;
 import org.nightlabs.jfire.store.book.id.LocalStorekeeperDelegateID;
 import org.nightlabs.jfire.trade.Article;
@@ -302,12 +303,12 @@ public class DefaultLocalStorekeeperDelegate extends LocalStorekeeperDelegate
 
 	protected String getAnchorIDForLocalHomeRepository(ProductType productType)
 	{
-		return productType.getClass().getName() + ".home";  
+		return RepositoryType.ANCHOR_TYPE_ID_PREFIX_HOME + productType.getClass().getName();
 	}
 
 	protected String getAnchorIDForForeignHomeRepository(ProductType productType)
 	{
-		return productType.getClass().getName() + ".home#" + productType.getOrganisationID();  
+		return RepositoryType.ANCHOR_TYPE_ID_PREFIX_HOME + productType.getClass().getName() + '#' + productType.getOrganisationID();  
 	}
 
 	/**
@@ -321,15 +322,17 @@ public class DefaultLocalStorekeeperDelegate extends LocalStorekeeperDelegate
 		PersistenceManager pm = getPersistenceManager();
 		Store store = Store.getStore(pm);
 
+		RepositoryType repositoryType = (RepositoryType) pm.getObjectById(RepositoryType.REPOSITORY_TYPE_ID_HOME);
+
 		return Repository.createRepository(
 				pm,
 				store.getOrganisationID(),
-				Repository.ANCHOR_TYPE_ID_HOME,
 				(
 						store.getOrganisationID().equals(productType.getOrganisationID()) ?
 								getAnchorIDForLocalHomeRepository(productType) : getAnchorIDForForeignHomeRepository(productType)
 				),
-				store.getMandator(), false);
+				repositoryType,
+				store.getMandator());
 	}
 
 	/**

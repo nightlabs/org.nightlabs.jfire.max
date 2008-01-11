@@ -5,6 +5,8 @@ import javax.jdo.Query;
 import org.apache.log4j.Logger;
 import org.nightlabs.jdo.query.JDOQuery;
 import org.nightlabs.jfire.store.Repository;
+import org.nightlabs.jfire.store.RepositoryType;
+import org.nightlabs.jfire.store.id.RepositoryTypeID;
 import org.nightlabs.jfire.transfer.id.AnchorID;
 
 /**
@@ -32,6 +34,15 @@ extends JDOQuery<Repository>
 	private String anchorTypeID = null;
 
 	/**
+	 * This is solely used in pepareQuery as parameter because JPOX still has a bug with JDOHelper.getObjectId(...) in JDOQL.
+	 * TODO JPOX WORKAROUND use JDOHelper.getObjectId(...) and remove this field.
+	 */
+	@SuppressWarnings("unused")
+	private transient RepositoryType repositoryType = null;
+
+	private RepositoryTypeID repositoryTypeID = null;
+
+	/**
 	 * the {@link AnchorID} of the owner
 	 */
 	private AnchorID ownerID = null;
@@ -56,6 +67,11 @@ extends JDOQuery<Repository>
 			
 		if (anchorID != null)
 			filter.append("\n && this.anchorID == :anchorID");
+
+		if (repositoryTypeID != null) {
+			repositoryType = (RepositoryType) getPersistenceManager().getObjectById(repositoryTypeID);
+			filter.append("\n && this.repositoryType == :repositoryType");
+		}
 
 		if (name != null) {
 			filter.append("\n && ( ");
@@ -145,6 +161,15 @@ extends JDOQuery<Repository>
 	 */
 	public String getAnchorID() {
 		return anchorID;
+	}
+
+	public RepositoryTypeID getRepositoryTypeID()
+	{
+		return repositoryTypeID;
+	}
+	public void setRepositoryTypeID(RepositoryTypeID repositoryTypeID)
+	{
+		this.repositoryTypeID = repositoryTypeID;
 	}
 
 	/**

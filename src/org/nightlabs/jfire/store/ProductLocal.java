@@ -233,7 +233,7 @@ implements Serializable
 		this.product = _product;
 
 		this.setAnchor(initialRepository);
-		if (initialRepository.isOutside())
+		if (initialRepository.getRepositoryType().isOutside())
 			this.quantity = 0;
 		else
 			this.quantity = 1;

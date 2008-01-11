@@ -5,6 +5,7 @@ import java.io.Serializable;
 import org.nightlabs.jdo.ObjectIDUtil;
 import org.nightlabs.jfire.accounting.id.AccountTypeID;
 import org.nightlabs.jfire.organisation.Organisation;
+import org.nightlabs.util.Util;
 
 /**
  * @author Marco Schulze - marco at nightlabs dot de
@@ -33,36 +34,38 @@ implements Serializable
 	/**
 	 * anchorTypeID for revenue accounts of the local organisation.
 	 */
-	public static final AccountTypeID ACCOUNT_TYPE_ID_LOCAL_REVENUE = AccountTypeID.create(Organisation.DEV_ORGANISATION_ID, "Account.Local.Revenue");
+	public static final AccountTypeID ACCOUNT_TYPE_ID_LOCAL_REVENUE = AccountTypeID.create(Organisation.DEV_ORGANISATION_ID, "Local.Revenue");
 
 	/**
 	 * anchorTypeID for expense accounts of the Local organisation
 	 */
-	public static final AccountTypeID ACCOUNT_TYPE_ID_LOCAL_EXPENSE = AccountTypeID.create(Organisation.DEV_ORGANISATION_ID, "Account.Local.Expense");
+	public static final AccountTypeID ACCOUNT_TYPE_ID_LOCAL_EXPENSE = AccountTypeID.create(Organisation.DEV_ORGANISATION_ID, "Local.Expense");
 
 	/**
 	 * anchorTypeID for accounts of trading partners when they acting as vendor
 	 */
-	public static final AccountTypeID ACCOUNT_TYPE_ID_PARTNER_VENDOR = AccountTypeID.create(Organisation.DEV_ORGANISATION_ID, "Account.Partner.Vendor");
+	public static final AccountTypeID ACCOUNT_TYPE_ID_PARTNER_VENDOR = AccountTypeID.create(Organisation.DEV_ORGANISATION_ID, "Partner.Vendor");
 	
 	/**
 	 * anchorTypeID for accounts of trading partners when they acting as customer
 	 */
-	public static final AccountTypeID ACCOUNT_TYPE_ID_PARTNER_CUSTOMER = AccountTypeID.create(Organisation.DEV_ORGANISATION_ID, "Account.Partner.Customer");
+	public static final AccountTypeID ACCOUNT_TYPE_ID_PARTNER_CUSTOMER = AccountTypeID.create(Organisation.DEV_ORGANISATION_ID, "Partner.Customer");
 
 	/**
 	 * anchorTypeID for accounts of trading partners when they overpay multiple invoices and
 	 * it cannot be determined whether the partner is a customer or a vendor.
 	 */
-	public static final AccountTypeID ACCOUNT_TYPE_ID_PARTNER_NEUTRAL = AccountTypeID.create(Organisation.DEV_ORGANISATION_ID, "Account.Partner.Neutral");
+	public static final AccountTypeID ACCOUNT_TYPE_ID_PARTNER_NEUTRAL = AccountTypeID.create(Organisation.DEV_ORGANISATION_ID, "Partner.Neutral");
 
 	/**
 	 * anchorTypeID for accounts that are used during payment. They represent money that's outside
 	 * the organisation (means paid to a partner), hence their {@link #isOutside()} property is <code>true</code>.
 	 */
-	public static final AccountTypeID ACCOUNT_TYPE_ID_OUTSIDE = AccountTypeID.create(Organisation.DEV_ORGANISATION_ID, "Account.Outside");
+	public static final AccountTypeID ACCOUNT_TYPE_ID_OUTSIDE = AccountTypeID.create(Organisation.DEV_ORGANISATION_ID, "Outside");
 
-	public static final AccountTypeID ACCOUNT_TYPE_ID_SUMMARY = AccountTypeID.create(Organisation.DEV_ORGANISATION_ID, "Account.Summary");
+	public static final AccountTypeID ACCOUNT_TYPE_ID_SUMMARY = AccountTypeID.create(Organisation.DEV_ORGANISATION_ID, "Summary");
+
+	public static final String ANCHOR_TYPE_ID_PREFIX_OUTSIDE = "outside#";
 
 	/**
 	 * @jdo.field primary-key="true"
@@ -127,4 +130,28 @@ implements Serializable
 	{
 		return outside;
 	}
+
+	@Override
+	public int hashCode()
+	{
+		final int prime = 31;
+		int result = 1;
+		result = prime * result
+				+ ((organisationID == null) ? 0 : organisationID.hashCode());
+		result = prime * result
+				+ ((accountTypeID == null) ? 0 : accountTypeID.hashCode());
+		return result;
+	}
+
+	@Override
+	public boolean equals(Object obj)
+	{
+		if (this == obj)
+			return true;
+		if (!(obj instanceof AccountType))
+			return false;
+		final AccountType other = (AccountType) obj;
+		return Util.equals(this.organisationID, other.organisationID) && Util.equals(this.accountTypeID, other.accountTypeID);
+	}
+
 }

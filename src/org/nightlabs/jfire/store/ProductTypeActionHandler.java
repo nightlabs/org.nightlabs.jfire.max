@@ -788,7 +788,7 @@ public abstract class ProductTypeActionHandler
 					throw new IllegalStateException("The product \"" + nestedProduct.getPrimaryKey() + "\" is currently not in a Repository, but it's current anchor is an instance of " + (nestedProduct.getProductLocal().getAnchor() == null ? null : nestedProduct.getProductLocal().getAnchor().getClass().getName()) + " with the primary key \"" + (nestedProduct.getProductLocal().getAnchor() == null ? null : nestedProduct.getProductLocal().getAnchor().getPrimaryKey()) + "\"!");
 
 				Repository repository = (Repository) nestedProduct.getProductLocal().getAnchor();
-				if (repository.isOutside()) {
+				if (repository.getRepositoryType().isOutside()) {
 					// It is not here, so it must be at the supplier, because we cannot sell it directly somewhere else and
 					// when it is nested, the transfers of the package do not transfer the nested products (hence the nested
 					// product stays at the repository where it has been packed into its package-product).

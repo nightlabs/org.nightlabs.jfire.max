@@ -470,7 +470,6 @@ implements SessionBean
 									if (organisationLegalEntity == null)
 										organisationLegalEntity = OrganisationLegalEntity
 										.getOrganisationLegalEntity(pm, getOrganisationID(),
-												OrganisationLegalEntity.ANCHOR_TYPE_ID_ORGANISATION,
 												true);
 
 									account.setOwner(organisationLegalEntity);
@@ -986,7 +985,7 @@ implements SessionBean
 				person.deflate();
 
 				LegalEntity customer = new LegalEntity(getOrganisationID(),
-						LegalEntity.ANCHOR_TYPE_ID_PARTNER, ObjectIDUtil.makeValidIDString(
+						ObjectIDUtil.makeValidIDString(
 								null, true));
 				customer.setPerson(person);
 				customer.setDefaultCustomerGroup(trader

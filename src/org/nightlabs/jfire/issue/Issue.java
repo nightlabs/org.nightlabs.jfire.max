@@ -82,8 +82,8 @@ import org.nightlabs.util.Util;
  * @jdo.fetch-group name="Statable.states" fetch-groups="default" fields="states"
  * @jdo.fetch-group name="Issue.issueLocal" fetch-groups="default" fields="issueLocal"
  * @jdo.fetch-group name="Issue.issueType" fetch-groups="default" fields="issueType"
- * @jdo.fetch-group name="Issue.this" fetch-groups="default" fields="fileList, issueType, referencedObjectIDs, description, subject, issuePriority, issueSeverityType, issueResolution, state, states, issueLocal, reporter, assignee"
- *
+ * @jdo.fetch-group name="Issue.comments" fetch-groups="default" fields="comments"
+ * @jdo.fetch-group name="Issue.this" fetch-groups="default" fields="fileList, issueType, referencedObjectIDs, description, subject, issuePriority, issueSeverityType, issueResolution, state, states, comments, issueLocal, reporter, assignee" *
  **/
 public class Issue
 implements 	
@@ -102,7 +102,8 @@ implements
 	public static final String FETCH_GROUP_ISSUE_PRIORITY = "Issue.issuePriority";
 	public static final String FETCH_GROUP_ISSUE_RESOLUTION = "Issue.issueResolution";
 	public static final String fETCH_GROUP_ISSUE_TYPE = "Issue.issueType";
-	public static final String FETCH_GROUP_ISSUE_LOCAL = "Issue.IssueLocal";
+	public static final String FETCH_GROUP_ISSUE_LOCAL = "Issue.issueLocal";
+	public static final String fETCH_GROUP_ISSUE_COMMENT = "Issue.comments";
 	
 	/**
 	 * @jdo.field primary-key="true"
@@ -145,6 +146,19 @@ implements
 	 *		mapped-by="issue"
 	 */
 	private List<IssueFileAttachment> fileList;
+	
+	/**
+	 * Instances of {@link IssueComment}.
+	 *
+	 * @jdo.field
+	 *		persistence-modifier="persistent"
+	 *		collection-type="collection"
+	 *		element-type="IssueComment"
+	 *		dependent-value="true"
+	 *		mapped-by="issue"
+	 */
+	private List<IssueComment> comments;
+	
 	/**
 	 * @jdo.field persistence-modifier="persistent"
 	 */
@@ -230,6 +244,7 @@ implements
 		description = new IssueDescription(this);
 		
 		fileList = new ArrayList<IssueFileAttachment>();
+		comments = new ArrayList<IssueComment>();
 		referencedObjectIDs = new HashSet<String>();
 		
 		this.issueLocal = new IssueLocal(this);
@@ -380,6 +395,10 @@ implements
 		return fileList;
 	}
 
+	public List<IssueComment> getComments() {
+		return comments;
+	}
+	
 //	/**
 //	 * @deprecated It is not good practice to expose 1-n-relationships in a JDO object. Since this Set here is solely linking simple Strings, it works fine,
 //	 * but to be consistent, there should never be the possibility (in a JDO object) to replace the set (in non-JDO-objects there are many reasons to do the same,

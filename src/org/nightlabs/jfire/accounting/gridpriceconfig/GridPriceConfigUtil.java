@@ -26,6 +26,7 @@
 
 package org.nightlabs.jfire.accounting.gridpriceconfig;
 
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.List;
@@ -251,12 +252,15 @@ public class GridPriceConfigUtil
 				pt.applyInheritance();
 		}
 
-		for (GridPriceConfig priceConfig : _priceConfigs) {
+		for (GridPriceConfig priceConfig : _priceConfigs) { // _priceConfigs is empty, if there is null assigned as inner price config => affectedProductTypes = null !!!
 			if (affectedProductTypes == null)
 				affectedProductTypes = PriceConfigUtil.getAffectedProductTypes(pm, priceConfig);
 			else
 				affectedProductTypes.addAll(PriceConfigUtil.getAffectedProductTypes(pm, priceConfig));
 		}
+
+		if (affectedProductTypes == null)
+			affectedProductTypes = new ArrayList<AffectedProductType>();
 
 		// and recalculate the prices for all affected ProductTypes
 		long startDT = System.currentTimeMillis();

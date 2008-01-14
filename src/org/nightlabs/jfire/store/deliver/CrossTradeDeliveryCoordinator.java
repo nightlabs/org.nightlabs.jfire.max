@@ -42,7 +42,6 @@ import org.nightlabs.jdo.NLJDOHelper;
 import org.nightlabs.jfire.base.Lookup;
 import org.nightlabs.jfire.idgenerator.IDGenerator;
 import org.nightlabs.jfire.organisation.Organisation;
-import org.nightlabs.jfire.store.DeliveryNote;
 import org.nightlabs.jfire.store.Store;
 import org.nightlabs.jfire.store.StoreManager;
 import org.nightlabs.jfire.store.StoreManagerHelperBean;

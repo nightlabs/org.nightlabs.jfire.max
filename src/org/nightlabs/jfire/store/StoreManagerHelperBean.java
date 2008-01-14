@@ -50,7 +50,6 @@ import org.nightlabs.jfire.store.deliver.CrossTradeDeliveryCoordinator;
 import org.nightlabs.jfire.store.id.DeliveryNoteID;
 import org.nightlabs.jfire.store.id.ProductID;
 import org.nightlabs.jfire.trade.Article;
-import org.nightlabs.jfire.trade.ArticleLocal;
 import org.nightlabs.jfire.trade.Offer;
 import org.nightlabs.jfire.trade.OfferLocal;
 import org.nightlabs.jfire.trade.TradeManager;

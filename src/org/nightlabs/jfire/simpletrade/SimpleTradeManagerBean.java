@@ -804,7 +804,7 @@ implements SessionBean
 	{
 		PersistenceManager pm = getPersistenceManager();
 		try {
-			Query q = pm.newQuery(FormulaPriceConfig.class);
+			Query q = pm.newQuery(pm.getExtent(FormulaPriceConfig.class, false));
 			q.setResult("JDOHelper.getObjectId(this)");
 			return new HashSet<PriceConfigID>((Collection<? extends PriceConfigID>) q.execute());
 		} finally {

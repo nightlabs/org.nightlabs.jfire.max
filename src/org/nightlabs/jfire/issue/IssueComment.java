@@ -5,6 +5,7 @@ import java.util.Date;
 
 import javax.jdo.listener.AttachCallback;
 
+import org.nightlabs.jfire.security.User;
 import org.nightlabs.util.Util;
 
 /**
@@ -21,7 +22,8 @@ import org.nightlabs.util.Util;
  * @jdo.create-objectid-class
  * 		field-order="organisationID, issueID, commentID"
  * 
- * @jdo.fetch-group name="IssueComment.this" fields="issue"
+ * @jdo.fetch-group name="IssueComment.user" fetch-groups="default" fields="user"
+ * @jdo.fetch-group name="IssueComment.this" fields="issue, text, createTimestamp, user"
  * 
  */ 
 public class IssueComment
@@ -63,6 +65,10 @@ implements Serializable, AttachCallback
 	 */
 	private Issue issue;
 	
+	/**
+	 * @jdo.field persistence-modifier="persistent" load-fetch-group="all"
+	 */
+	private User user;
 	
 	/**
 	 * @deprecated Only for JDO!!!!
@@ -71,7 +77,7 @@ implements Serializable, AttachCallback
 	{
 	}
 	
-	public IssueComment(String organisationID, long issueID, String commentID, String text){
+	public IssueComment(String organisationID, long issueID, String commentID, String text, User user){
 		if (commentID == null)
 			throw new IllegalArgumentException("commentID must not be null!");
 
@@ -79,6 +85,7 @@ implements Serializable, AttachCallback
 		this.issueID = issueID;
 		this.commentID = commentID;
 		this.text = text;
+		this.user = user;
 		
 		createTimestamp = new Date();
 	}
@@ -95,7 +102,18 @@ implements Serializable, AttachCallback
 	public String getCommentID() {
 		return commentID;
 	}
+	
+	public String getText() {
+		return text;
+	}
 
+	public Date getCreateTimestamp() {
+		return createTimestamp;
+	}
+
+	public User getUser() {
+		return user;
+	}
 	
 	@Override
 	public void jdoPostAttach(Object arg0) {

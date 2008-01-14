@@ -1,0 +1,79 @@
+/**
+ * 
+ */
+package org.nightlabs.jfire.issue.dao;
+
+import java.util.Collection;
+import java.util.Set;
+
+import org.nightlabs.jfire.base.jdo.BaseJDOObjectDAO;
+import org.nightlabs.jfire.issue.IssueComment;
+import org.nightlabs.jfire.issue.IssueManager;
+import org.nightlabs.jfire.issue.IssueManagerUtil;
+import org.nightlabs.jfire.issue.IssueType;
+import org.nightlabs.jfire.issue.id.IssueCommentID;
+import org.nightlabs.jfire.security.SecurityReflector;
+import org.nightlabs.progress.ProgressMonitor;
+
+/**
+ * @author chairatk
+ *
+ */
+public class IssueCommentDAO extends BaseJDOObjectDAO<IssueCommentID, IssueComment> {
+
+	private static IssueCommentDAO sharedInstance = null;
+
+	public static IssueCommentDAO sharedInstance()
+	{
+		if (sharedInstance == null) {
+			synchronized (IssueCommentDAO.class) {
+				if (sharedInstance == null)
+					sharedInstance = new IssueCommentDAO();
+			}
+		}
+		return sharedInstance;
+	}
+
+	@Override
+	protected Collection<IssueComment> retrieveJDOObjects(Set<IssueCommentID> commentIDs, 
+			String[] fetchGroups, int maxFetchDepth, ProgressMonitor monitor) throws Exception {
+		monitor.beginTask("Loading IssueComments", 1);
+		try {
+			IssueManager im = IssueManagerUtil.getHome(SecurityReflector.getInitialContextProperties()).create();
+			return im.getIssueComments(fetchGroups, maxFetchDepth);
+
+		} catch (Exception e) {
+			monitor.setCanceled(true);
+			throw e;
+
+		} finally {
+			monitor.worked(1);
+			monitor.done();
+		}
+	}
+	
+//	public synchronized List<IssueType> getIssueTypes(Set<IssueTypeID> issueTypeIDs, String[] fetchgroups, int maxFetchDepth, ProgressMonitor monitor) 
+//	{
+//		return getJDOObjects(null, issueTypeIDs, fetchgroups, maxFetchDepth, monitor);
+//	}
+
+	public synchronized Collection<IssueType> getIssueTypes(String[] fetchgroups, int maxFetchDepth, ProgressMonitor monitor) 
+	{
+		try {
+			IssueManager im = IssueManagerUtil.getHome(SecurityReflector.getInitialContextProperties()).create();
+			return im.getIssueTypes(fetchgroups, maxFetchDepth);
+		} catch (Exception e) {
+			throw new RuntimeException(e);
+		}
+	}
+	
+	public synchronized IssueComment storeIssueComment(IssueComment issueComment, String[] fetchgroups, int maxFetchDepth, ProgressMonitor monitor) 
+	{
+		try {
+			IssueManager im = IssueManagerUtil.getHome(SecurityReflector.getInitialContextProperties()).create();
+			return im.storeIssueComment(issueComment, true, fetchgroups, maxFetchDepth);
+		} catch (Exception e) {
+			throw new RuntimeException(e);
+		}
+	}
+}

@@ -980,6 +980,26 @@ public class Trader
 	}
 
 	/**
+	 * If a reversing offer is cancelled (or its workflow is otherwise ended non-successfully), the reversing articles
+	 * need to be unregistered from the reversed articles in order for the reversed articles to be reversable in a new
+	 * offer.
+	 *
+	 * @param user the responsible user.
+	 * @param reversingArticles the reversing articles that need to be unregistered.
+	 */
+	public void unregisterReversingArticles(User user, Set<Article> reversingArticles)
+	{
+		for (Article reversingArticle : reversingArticles) {
+			if (!reversingArticle.isReversing())
+				throw new IllegalArgumentException("The article \"" + reversingArticle.getPrimaryKey() + "\" is not reversing!");
+
+			Article reversedArticle = reversingArticle.getReversedArticle();
+			reversedArticle.setReversingArticle(null);
+			reversingArticle.setReversingAborted();
+		}
+	}
+
+	/**
 	 * @param user
 	 * @param articles
 	 *          Instances of {@link Article}.
@@ -1116,56 +1136,79 @@ public class Trader
 							+ getToStringList(articles)
 							+ "\" cannot be released, because they are currently in state allocationPending!");
 
-		Map productTypeActionHandler2Articles = new HashMap();
-		for (Iterator iter = articles.iterator(); iter.hasNext();) {
-			Article article = (Article) iter.next();
-			if (article.isReversing()) {
-				// reversing article
+		Map<ProductTypeActionHandler, List<Article>> productTypeActionHandler2Articles = new HashMap<ProductTypeActionHandler, List<Article>>();
 
-				// If the reversing article is in a non-accepted Offer, it must not be released!
-				if (!article.getOffer().getOfferLocal().isAccepted())
-					throw new IllegalStateException("The Offer " + article.getOffer().getPrimaryKey() + " of reversing Article " + article.getPrimaryKey() + " has NOT been accepted!");
+		JbpmContext jbpmContext = JbpmLookup.getJbpmConfiguration().createJbpmContext();
+		try {
+			Map<Offer, ProcessInstance> offer2ProcessInstance = new HashMap<Offer, ProcessInstance>();
+
+			for (Article article : articles) {
+				if (article.isReversing()) {
+					// reversing article
+
+					// If the reversing article is in a non-accepted Offer, it must not be released!
+					if (!article.getOffer().getOfferLocal().isAccepted())
+						throw new IllegalStateException("The Offer " + article.getOffer().getPrimaryKey() + " of reversing Article " + article.getPrimaryKey() + " has NOT been accepted!");
 
 
-				// If the reversed article is in a DeliveryNote, both - reversed and reversing - articles must be in a DeliveryNote.
-				// The DeliveryNotes must be booked!
+					// If the reversed article is in a DeliveryNote, both - reversed and reversing - articles must be in a DeliveryNote.
+					// The DeliveryNotes must be booked!
 
-				Article reversedArticle = article.getReversedArticle();
-				if (reversedArticle.getDeliveryNote() != null) {
-					if (article.getDeliveryNote() ==  null)
-						throw new IllegalStateException("The reversing Article " + article.getPrimaryKey() + " is NOT in a DeliveryNote, but its corresponding reversed Article is! In this case, the reversing Article MUST be in a DeliveryNote, too!");
+					Article reversedArticle = article.getReversedArticle();
+					if (reversedArticle.getDeliveryNote() != null) {
+						if (article.getDeliveryNote() ==  null)
+							throw new IllegalStateException("The reversing Article " + article.getPrimaryKey() + " is NOT in a DeliveryNote, but its corresponding reversed Article is! In this case, the reversing Article MUST be in a DeliveryNote, too!");
 
-					if (!reversedArticle.getDeliveryNote().getDeliveryNoteLocal().isBooked())
-						throw new IllegalStateException("The reversed Article " + reversedArticle.getPrimaryKey() + " is in a DeliveryNote, but it is NOT booked! The DeliveryNote must be booked!");
+						if (!reversedArticle.getDeliveryNote().getDeliveryNoteLocal().isBooked())
+							throw new IllegalStateException("The reversed Article " + reversedArticle.getPrimaryKey() + " is in a DeliveryNote, but it is NOT booked! The DeliveryNote must be booked!");
 
-					if (!article.getDeliveryNote().getDeliveryNoteLocal().isBooked())
-						throw new IllegalStateException("The reversing Article " + article.getPrimaryKey() + " is in a DeliveryNote, but it is NOT booked! The DeliveryNote must be booked!");
+						if (!article.getDeliveryNote().getDeliveryNoteLocal().isBooked())
+							throw new IllegalStateException("The reversing Article " + article.getPrimaryKey() + " is in a DeliveryNote, but it is NOT booked! The DeliveryNote must be booked!");
+					}
+
+				}
+				else {
+					// normal article (non-reversing)
+
+					// check, whether the article is finalized 
+					if (article.getOffer().isFinalized()) {
+						// it is finalized, so we only allow to release, if the offer's workflow has ended in a non-successful way (abort, reject, revoke etc.)
+						ProcessInstance processInstance = offer2ProcessInstance.get(article.getOffer());
+						if (processInstance == null) {
+							processInstance = jbpmContext.getProcessInstance(article.getOffer().getOfferLocal().getJbpmProcessInstanceId());
+							offer2ProcessInstance.put(article.getOffer(), processInstance);
+						}
+
+//						if (!(processInstance.getRootToken().getNode() instanceof EndState)) // currently finishing
+						State state = article.getOffer().getOfferLocal().getState();
+						if (!state.getStateDefinition().isEndState())
+							throw new IllegalStateException("Article \"" + article.getPrimaryKey() + "\" cannot be released, because its Offer is finalized and the Offer's workflow has not ended yet!");
+
+						if (JbpmConstantsOffer.Vendor.NODE_NAME_ACCEPTED.equals(state.getStateDefinition().getJbpmNodeName()))
+							throw new IllegalStateException("Article \"" + article.getPrimaryKey() + "\" cannot be released, because its Offer is finalized and the Offer's workflow has ended successfully!");
+					}
 				}
 
-			}
-			else {
-				// normal article (non-reversing)
-				if (article.getOffer().isFinalized())
-					throw new IllegalStateException("Article \"" + article.getPrimaryKey()
-							+ "\" cannot be released, because its Offer is finalized!");
+				Product product = article.getProduct();
+				article.setReleasePending(true);
+				product.getProductLocal().setReleasePending(true);
+
+				ProductTypeActionHandler productTypeActionHandler = ProductTypeActionHandler.getProductTypeActionHandler(
+						getPersistenceManager(), article.getProductType().getClass());
+				List<Article> al = productTypeActionHandler2Articles.get(productTypeActionHandler);
+				if (al == null) {
+					al = new LinkedList<Article>();
+					productTypeActionHandler2Articles.put(productTypeActionHandler, al);
+				}
+				al.add(article);
 			}
 
-			Product product = article.getProduct();
-			article.setReleasePending(true);
-			product.getProductLocal().setReleasePending(true);
-
-			ProductTypeActionHandler productTypeActionHandler = ProductTypeActionHandler.getProductTypeActionHandler(
-					getPersistenceManager(), article.getProductType().getClass());
-			List al = (List) productTypeActionHandler2Articles.get(productTypeActionHandler);
-			if (al == null) {
-				al = new LinkedList();
-				productTypeActionHandler2Articles.put(productTypeActionHandler, al);
-			}
-			al.add(article);
+		} finally {
+			jbpmContext.close();
 		}
-		for (Iterator it = productTypeActionHandler2Articles.entrySet().iterator(); it.hasNext();) {
-			Map.Entry me = (Map.Entry) it.next();
-			((ProductTypeActionHandler) me.getKey()).onReleaseArticlesBegin(user, this, (List) me.getValue());
+
+		for (Map.Entry<ProductTypeActionHandler, List<Article>> me : productTypeActionHandler2Articles.entrySet()) {
+			me.getKey().onReleaseArticlesBegin(user, this, me.getValue());
 		}
 	}
 
@@ -1184,8 +1227,7 @@ public class Trader
 		ProductTypeActionHandlerCache productTypeActionHandlerCache = new ProductTypeActionHandlerCache(getPersistenceManager());
 
 		Map<ProductTypeActionHandler, List<Article>> productTypeActionHandler2Articles = new HashMap<ProductTypeActionHandler, List<Article>>();
-		for (Iterator iter = articles.iterator(); iter.hasNext();) {
-			Article article = (Article) iter.next();
+		for (Article article : articles) {
 			Product product = article.getProduct();
 
 			ProductTypeActionHandler productTypeActionHandler = productTypeActionHandlerCache.getProductTypeActionHandler(product);

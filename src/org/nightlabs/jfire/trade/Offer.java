@@ -79,10 +79,8 @@ import org.nightlabs.util.Util;
  *		add-interfaces="org.nightlabs.jfire.trade.id.ArticleContainerID"
  *		include-body="id/OfferID.body.inc"
  *
- * @jdo.query name="getNonFinalizedOffersForOrder" query="SELECT
- *			WHERE this.order == paramOrder && this.finalizeDT == null
- *			PARAMETERS Order paramOrder
- *			import org.nightlabs.jfire.trade.Order
+ * @jdo.query name="getNonFinalizedNonEndedOffersForOrder" query="SELECT
+ *			WHERE this.order == :order && this.finalizeDT == null && this.offerLocal.processEnded == false
  *			ORDER BY offerID DESCENDING"
  *
  * @jdo.fetch-group name="Offer.offerLocal" fields="offerLocal"
@@ -128,9 +126,9 @@ implements
 	 * @return a <tt>Collection</tt> of <tt>Offer</tt>
 	 */
 	@SuppressWarnings("unchecked")
-	public static Collection<Offer> getNonFinalizedOffers(PersistenceManager pm, Order order)
+	public static Collection<Offer> getNonFinalizedNonEndedOffers(PersistenceManager pm, Order order)
 	{
-		Query query = pm.newNamedQuery(Offer.class, "getNonFinalizedOffersForOrder");
+		Query query = pm.newNamedQuery(Offer.class, "getNonFinalizedNonEndedOffersForOrder");
 		return (Collection<Offer>) query.execute(order);
 	}
 

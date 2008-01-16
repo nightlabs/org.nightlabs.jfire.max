@@ -482,6 +482,13 @@ implements Serializable, DeleteCallback, DetachCallback, StoreCallback
 	private boolean reversing = false;
 
 	/**
+	 * This flag is set <code>true</code>, if the reversing offer is somehow cancelled (rejected, expired, revoked, aborted etc.).
+	 *
+	 * @jdo.field persistence-modifier="persistent"
+	 */
+	private boolean isReversingAborted = false;
+
+	/**
 	 * If this <tt>Article</tt> reverses (i.e. refunds) a previously sold Article, this member points
 	 * to the original Article.
 	 *
@@ -1153,6 +1160,20 @@ implements Serializable, DeleteCallback, DetachCallback, StoreCallback
 	public boolean isReversing()
 	{
 		return reversing;
+	}
+	public boolean isReversingAborted()
+	{
+		return isReversingAborted;
+	}
+	protected void setReversingAborted()
+	{
+		this.isReversingAborted = true;
+
+		// This article will never be updated because the reversed article is not pointing to this "defunct" reversing article anymore.
+		// Therefore it probably looks better, if we mark it as not allocated. The UI should somehow show this status.
+		this._setAllocated(false);
+		this.setReleasePending(false);
+		this.setAllocationPending(false);
 	}
 
 	public void jdoPreDelete()

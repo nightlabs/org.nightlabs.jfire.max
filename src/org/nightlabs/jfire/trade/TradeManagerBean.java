@@ -647,7 +647,7 @@ implements SessionBean
 	 * @ejb.permission role-name="TradeManager-read"
 	 * @ejb.transaction type = "Required"
 	 **/
-	public List getNonFinalizedOffers(OrderID orderID, String[] fetchGroups, int maxFetchDepth)
+	public List<Offer> getNonFinalizedNonEndedOffers(OrderID orderID, String[] fetchGroups, int maxFetchDepth)
 	{
 		PersistenceManager pm = getPersistenceManager();
 		try {
@@ -658,7 +658,7 @@ implements SessionBean
 			if (fetchGroups != null)
 				pm.getFetchPlan().setGroups(fetchGroups);
 
-			return (List) pm.detachCopyAll(Offer.getNonFinalizedOffers(pm, order));
+			return (List<Offer>) pm.detachCopyAll(Offer.getNonFinalizedNonEndedOffers(pm, order));
 		} finally {
 			pm.close();
 		}
@@ -682,7 +682,7 @@ implements SessionBean
 	 * @ejb.permission role-name="TradeManager-write"
 	 * @ejb.transaction type = "Required"
 	 **/
-	public Collection reverseArticles(OfferID offerID, Collection reversedArticleIDs, boolean get, String[] fetchGroups, int maxFetchDepth)
+	public Collection<Article> reverseArticles(OfferID offerID, Collection<ArticleID> reversedArticleIDs, boolean get, String[] fetchGroups, int maxFetchDepth)
 	throws ModuleException
 	{
 		PersistenceManager pm = getPersistenceManager();
@@ -692,9 +692,8 @@ implements SessionBean
 
 			pm.getExtent(Article.class);
 			Order order = null;
-			List reversedArticles = new ArrayList(reversedArticleIDs.size());
-			for (Iterator it = reversedArticleIDs.iterator(); it.hasNext(); ) {
-				ArticleID articleID = (ArticleID) it.next();
+			List<Article> reversedArticles = new ArrayList<Article>(reversedArticleIDs.size());
+			for (ArticleID articleID : reversedArticleIDs) {
 				Article article = (Article) pm.getObjectById(articleID);
 				if (order == null)
 					order = article.getOrder();
@@ -715,7 +714,9 @@ implements SessionBean
 //				if (reversingArticles != null)
 //					reversingArticles.add(reversingArticle);
 //			}
-			Collection reversingArticles = Trader.getTrader(pm).reverseArticles(user, offer, reversedArticles);
+			Collection<Article> reversingArticles = Trader.getTrader(pm).reverseArticles(user, offer, reversedArticles);
+
+			offer.validate();
 
 			if (!get)
 				return null;
@@ -764,6 +765,8 @@ implements SessionBean
 			User user = User.getUser(pm, getPrincipal());
 			Trader trader = Trader.getTrader(pm);
 			Offer offer = trader.createReverseOffer(user, reversedArticles, offerIDPrefix);
+
+			offer.validate();
 
 			if (!get)
 				return null;

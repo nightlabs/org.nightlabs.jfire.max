@@ -54,6 +54,22 @@ implements
 	private ReceptionNote receptionNote;
 
 	/**
+	 * @jdo.field persistence-modifier="persistent"
+	 */
+	private boolean processEnded = false;
+
+	@Override
+	public boolean isProcessEnded()
+	{
+		return processEnded;
+	}
+	@Override
+	public void setProcessEnded()
+	{
+		processEnded = true;
+	}
+
+	/**
 	 * @deprecated Only for JDO!
 	 */
 	@Deprecated

@@ -540,7 +540,7 @@ implements SessionBean
 		// find an Offer within the Order which is not finalized - or create one
 		Offer offer;
 		if (offerID == null) {
-			Collection<Offer> offers = Offer.getNonFinalizedOffers(pm, order);
+			Collection<Offer> offers = Offer.getNonFinalizedNonEndedOffers(pm, order);
 			if (!offers.isEmpty()) {
 				offer = (Offer) offers.iterator().next();
 			} else {

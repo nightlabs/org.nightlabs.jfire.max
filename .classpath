@@ -30,5 +30,6 @@
 	<classpathentry kind="var" path="WORKSPACE/JFireBaseClientLib/dist/JFireBaseClientLib.jar"/>
 	<classpathentry kind="var" path="WORKSPACE/JFireBaseDAO/dist/JFireBaseDAO.jar"/>
 	<classpathentry kind="var" path="ASM"/>
+	<classpathentry kind="lib" path="/home/chairatk/java/workspace/workspace1/NightLabsXStream/dist/lib/xstream-1.2.jar"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>

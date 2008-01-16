@@ -33,6 +33,7 @@ import org.nightlabs.jfire.issue.id.IssueResolutionID;
 import org.nightlabs.jfire.issue.id.IssueSeverityTypeID;
 import org.nightlabs.jfire.issue.id.IssueTypeID;
 import org.nightlabs.jfire.jbpm.JbpmLookup;
+import org.nightlabs.jfire.jbpm.graph.def.State;
 
 /**
  * @author Chairat Kongarayawetchakun - chairat[AT]nightlabs[DOT]de
@@ -433,6 +434,40 @@ implements SessionBean{
 		PersistenceManager pm = getPersistenceManager();
 		try {
 			return NLJDOHelper.storeJDO(pm, issueComment, get, fetchGroups, maxFetchDepth);
+		}//try
+		finally {
+			pm.close();
+		}//finally
+	}
+	
+	/**
+	 * @ejb.interface-method
+	 * @ejb.permission role-name="_Guest_"
+	 * @ejb.transaction type="Required"
+	 */	
+	public void deleteIssue(IssueID issueID)
+	{
+		PersistenceManager pm = getPersistenceManager();
+		try {
+			pm.getFetchPlan().setGroup(FetchPlan.DEFAULT);
+			pm.getExtent(Issue.class, true);
+			Issue issue = (Issue) pm.getObjectById(issueID);
+
+			//FIXME: We can not remove states righnow. Don't know why??????
+			
+			pm.getExtent(State.class, true);
+			for (State state : issue.getStates()) {
+				pm.flush();
+				pm.deletePersistent(state);			
+			}
+
+			pm.flush();
+			pm.getExtent(IssueLocal.class, true);
+			pm.deletePersistent(issue.getStatableLocal());
+			
+			pm.flush();
+			pm.getExtent(Issue.class, true);
+			pm.deletePersistent(issue);
 		}//try
 		finally {
 			pm.close();

@@ -55,7 +55,7 @@ implements Serializable, StatableLocal{
 	private long issueID;
 	
 	/**
-	 * @jdo.field persistence-modifier="persistent"
+	 * @jdo.field persistence-modifier="persistent" dependent="true"
 	 */
 	private State state;
 	
@@ -66,6 +66,7 @@ implements Serializable, StatableLocal{
 	 *		persistence-modifier="persistent"
 	 *		collection-type="collection"
 	 *		element-type="State"
+	 *		dependent-value="true"
 	 *		table="JFireIssueTracking_IssueLocal_states"
 	 *		null-value="exception"
 	 *

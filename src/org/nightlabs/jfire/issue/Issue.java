@@ -170,12 +170,12 @@ implements
 	private IssueSeverityType issueSeverityType;
 
 	/**
-	 * @jdo.field persistence-modifier="persistent"
+	 * @jdo.field persistence-modifier="persistent" dependent="true"
 	 */
 	private IssueSubject subject;
 
 	/**
-	 * @jdo.field persistence-modifier="persistent"
+	 * @jdo.field persistence-modifier="persistent" dependent="true"
 	 */
 	private IssueDescription description;
 
@@ -205,12 +205,12 @@ implements
 	private IssueResolution issueResolution;
 	
 	/**
-	 * @jdo.field persistence-modifier="persistent" mapped-by="issue"	 
+	 * @jdo.field persistence-modifier="persistent" mapped-by="issue" dependent="true"
 	 */
 	private IssueLocal issueLocal;
 	
 	/**
-	 * @jdo.field persistence-modifier="persistent"
+	 * @jdo.field persistence-modifier="persistent" dependent="true"
 	 */
 	private State state;
 	
@@ -221,6 +221,7 @@ implements
 	 *		persistence-modifier="persistent"
 	 *		collection-type="collection"
 	 *		element-type="State"
+	 *		dependent-value="true"
 	 *		table="JFireIssueTracking_Issue_states"
 	 *		null-value="exception"
 	 *

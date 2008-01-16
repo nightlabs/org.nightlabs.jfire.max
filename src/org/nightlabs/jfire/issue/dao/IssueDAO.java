@@ -82,6 +82,19 @@ public class IssueDAO extends BaseJDOObjectDAO<IssueID, Issue>{
 		}
 	}
 	
+	public synchronized void deleteIssue(IssueID issueID, ProgressMonitor monitor) {
+		monitor.beginTask("Deleting issue: "+ issueID, 3);
+		try {
+			IssueManager im = IssueManagerUtil.getHome(SecurityReflector.getInitialContextProperties()).create();
+			im.deleteIssue(issueID);
+			monitor.worked(1);
+			monitor.done();
+		} catch (Exception e) {
+			monitor.done();
+			throw new RuntimeException("Error while deleting Issue!\n" ,e);
+		}
+	}
+	
 	/**
 	 * Get a single issue.
 	 * @param issueID The ID of the issue to get

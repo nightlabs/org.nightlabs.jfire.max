@@ -11,6 +11,7 @@ import org.jbpm.graph.def.Action;
 import org.jbpm.graph.def.Event;
 import org.jbpm.graph.def.GraphElement;
 import org.jbpm.graph.exe.ExecutionContext;
+import org.jbpm.graph.node.EndState;
 import org.jbpm.instantiation.Delegation;
 import org.nightlabs.annotation.Implement;
 import org.nightlabs.jdo.ObjectIDUtil;
@@ -127,7 +128,7 @@ extends AbstractActionHandler
 
 		if (executionContext.getTransition() == null) {
 			// TODO JBPM WORKAROUND - this seems to be a jBPM bug - hence we don't throw an exception but only log it.
-			logger.warn("graphElement \"" + graphElement.getName() + "\": executionContext.getTransition() == null", new IllegalArgumentException("graphElement \"" + graphElement.getName() + "\": executionContext.getTransition() == null"));
+			logger.warn("graphElement \"" + graphElement.getName() + "\": executionContext.getTransition() == null (executionContext.getTransitionSource() = " + executionContext.getTransitionSource() + ")", new IllegalArgumentException("graphElement \"" + graphElement.getName() + "\": executionContext.getTransition() == null (executionContext.getTransitionSource() = " + executionContext.getTransitionSource() + ")"));
 			setLastNodeEnterTransitionName(null);
 		}
 		else
@@ -135,6 +136,10 @@ extends AbstractActionHandler
 
 		if (logger.isDebugEnabled())
 			logger.debug("doExecute: graphElement.class=" + (graphElement == null ? null : graphElement.getClass().getName()) + " graphElement=" + graphElement);
+
+		if (graphElement instanceof EndState) {
+			getStatable().getStatableLocal().setProcessEnded();
+		}
 
 //		if (!(graphElement instanceof org.jbpm.graph.node.State || graphElement instanceof org.jbpm.graph.node.EndState)) {
 		if (!(graphElement instanceof org.jbpm.graph.def.Node)) {

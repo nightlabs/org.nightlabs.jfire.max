@@ -7,6 +7,7 @@ import javax.jdo.JDOHelper;
 import javax.jdo.PersistenceManager;
 import javax.jdo.Query;
 
+import org.jbpm.graph.node.EndState;
 import org.nightlabs.jfire.idgenerator.IDGenerator;
 import org.nightlabs.jfire.jbpm.graph.def.id.ProcessDefinitionID;
 import org.nightlabs.jfire.security.User;
@@ -138,6 +139,11 @@ implements Serializable
 	private boolean publicState = false;
 
 	/**
+	 * @jdo.field persistence-modifier="persistent"
+	 */
+	private boolean endState = false;
+
+	/**
 	 * @deprecated Only for JDO!
 	 */
 	@Deprecated
@@ -148,7 +154,7 @@ implements Serializable
 	public StateDefinition(
 			ProcessDefinition processDefinition,
 //			String processDefinitionOrganisationID, String processDefinitionID,
-			String jbpmNodeName)
+			org.jbpm.graph.def.Node jbpmNode)
 //			String stateDefinitionOrganisationID, String stateDefinitionID)
 	{
 		this.processDefinition = processDefinition;
@@ -156,7 +162,8 @@ implements Serializable
 		this.processDefinitionID = processDefinition.getProcessDefinitionID();
 //		this.processDefinitionOrganisationID = processDefinitionOrganisationID;
 //		this.processDefinitionID = processDefinitionID;
-		this.jbpmNodeName = jbpmNodeName;
+		this.jbpmNodeName = jbpmNode.getName();
+		this.endState = jbpmNode instanceof EndState;
 
 		if (jbpmNodeName.indexOf(':') < 0) {
 			this.stateDefinitionOrganisationID = IDGenerator.getOrganisationID(); // TODO is it safe to allow local names (without organisationID)? do we really never share process definitions across organisations?
@@ -218,6 +225,11 @@ implements Serializable
 	public void setPublicState(boolean publicState)
 	{
 		this.publicState = publicState;
+	}
+
+	public boolean isEndState()
+	{
+		return endState;
 	}
 
 //	/**

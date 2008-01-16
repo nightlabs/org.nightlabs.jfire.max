@@ -55,4 +55,24 @@ public interface StatableLocal
 	 * Virtual fetch-group used by implementations that should include the list of states. 
 	 */
 	static final String FETCH_GROUP_STATES = "StatableLocal.states";
+
+	/**
+	 * Indicate whether a process has reached an end state or is still running.
+	 * <p>
+	 * This method returns <code>true</code> for new object instances; until {@link #setProcessEnded()} is called.
+	 * </p>
+	 *
+	 * @return <code>true</code> if the process has reached and end state, <code>false</code> if it is still alive.
+	 * @see #setProcessEnded()
+	 */
+	boolean isProcessEnded();
+
+	/**
+	 * Called by {@link ActionHandlerNodeEnter} when it reached an end-state. After this method has been called,
+	 * {@link #isProcessEnded()} must return <code>true</code>.
+	 * <p>
+	 * You must never call this method directly.
+	 * </p>
+	 */
+	void setProcessEnded();
 }

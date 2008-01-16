@@ -135,8 +135,7 @@ implements Serializable
 //						node instanceof EndState ||
 //						node instanceof org.jbpm.graph.node.State)
 //				{
-					StateDefinition stateDefinition = pm.makePersistent(
-							new StateDefinition(processDefinition, node.getName()));
+					StateDefinition stateDefinition = pm.makePersistent(new StateDefinition(processDefinition, node));
 
 					// create Transitions
 					// TODO should we create JDO Transition objects for all jbpm Transitions? right now we can't because we create only StateDefinitions for States (not for other Nodes)

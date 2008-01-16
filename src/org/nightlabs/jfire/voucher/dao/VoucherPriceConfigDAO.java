@@ -78,4 +78,11 @@ extends BaseJDOObjectDAO<PriceConfigID, VoucherPriceConfig>
 
 		return getJDOObjects(null, priceConfigIDs, fetchGroups, maxFetchDepth, monitor);
 	}
+	
+	public VoucherPriceConfig getVoucherPriceConfig(
+			PriceConfigID priceConfigID, String[] fetchGroups, int maxFetchDepth,
+			ProgressMonitor monitor)
+	{
+		return getJDOObject(null, priceConfigID, fetchGroups, maxFetchDepth, monitor);
+	}
 }

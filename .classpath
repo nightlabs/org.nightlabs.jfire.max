@@ -25,12 +25,12 @@
 	<classpathentry kind="var" path="RHINO" sourcepath="/RHINO_SRC"/>
 	<classpathentry kind="var" path="JPOXENHANCER"/>
 	<classpathentry kind="var" path="APACHE_COMMONS/commons-lang.jar"/>
-	<classpathentry kind="var" path="WORKSPACE/JFireJbpm/dist/JFireJbpm.jar" sourcepath="/WORKSPACE/JFireJbpm/src"/>
 	<classpathentry kind="var" path="WORKSPACE/JFireJbpm/lib/jbpm/jbpm-3.1.4.jar"/>
 	<classpathentry kind="var" path="WORKSPACE/JFireBaseClientLib/dist/JFireBaseClientLib.jar"/>
 	<classpathentry kind="var" path="WORKSPACE/JFireBaseDAO/dist/JFireBaseDAO.jar"/>
 	<classpathentry kind="var" path="ASM"/>
 	<classpathentry kind="var" path="WORKSPACE/NightLabsXStream/dist/lib/xpp3-1.1.3.4.jar"/>
 	<classpathentry kind="var" path="WORKSPACE/NightLabsXStream/dist/lib/xstream-1.2.jar"/>
+	<classpathentry combineaccessrules="false" kind="src" path="/JFireJbpm"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>

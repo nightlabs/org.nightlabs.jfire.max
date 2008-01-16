@@ -84,7 +84,12 @@ implements Serializable, StatableLocal{
 	 * @jdo.field persistence-modifier="persistent"
 	 */
 	private Issue issue;
-	
+
+	/**
+	 * @jdo.field persistence-modifier="persistent"
+	 */
+	private boolean processEnded = false;
+
 	/**
 	 * @deprecated Constructor exists only for JDO! 
 	 */
@@ -176,6 +181,17 @@ implements Serializable, StatableLocal{
 			Util.hashCode(this.organisationID) ^
 			Util.hashCode(this.issueID);
 		
+	}
+
+	@Override
+	public boolean isProcessEnded()
+	{
+		return processEnded;
+	}
+	@Override
+	public void setProcessEnded()
+	{
+		processEnded = true;
 	}
 
 	/**

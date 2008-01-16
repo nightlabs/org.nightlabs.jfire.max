@@ -1,6 +1,7 @@
 package org.nightlabs.jfire.issue.query;
 
 import java.util.Date;
+import java.util.regex.Pattern;
 
 import javax.jdo.Query;
 
@@ -19,6 +20,7 @@ extends JDOQuery<Issue> {
 
 	private static final Logger logger = Logger.getLogger(IssueQuery.class);
 	
+	private String issueSubject;
 	private IssueTypeID issueTypeID;
 	private IssueSeverityTypeID issueSeverityTypeID;
 	private IssuePriorityID issuePriorityID;
@@ -31,6 +33,14 @@ extends JDOQuery<Issue> {
 	protected Query prepareQuery() {
 		Query q = getPersistenceManager().newQuery(Issue.class);
 		StringBuffer filter = new StringBuffer();
+		
+		if (issueSubject != null) {
+//			issueSubject = ".*" + Pattern.quote(issueSubject.toLowerCase()) + ".*";
+			issueSubject = ".*" + issueSubject.toLowerCase() + ".*";
+			filter.append("( this.subject.names.containsValue(varSubject) && varSubject.toLowerCase().matches(\"" + issueSubject + "\") ) &&");
+			q.declareVariables(String.class.getName() + " varSubject");
+		}
+		
 		if (issueTypeID != null) {
 //			filter.append("JDOHelper.getObjectId(this.issueType) == :issueTypeID && ");
 			filter.append("( this.issueType.organisationID == \"" + issueTypeID.organisationID + "\" && ");
@@ -75,6 +85,14 @@ extends JDOQuery<Issue> {
 		return q;
 	}
 
+	public String getIssueSubject() {
+		return issueSubject;
+	}
+	
+	public void setIssueSubject(String issueSubject) {
+		this.issueSubject = issueSubject;
+	}
+	
 	public IssueTypeID getIssueTypeID() {
 		return issueTypeID;
 	}

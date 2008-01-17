@@ -16,6 +16,7 @@ import org.nightlabs.jfire.issue.config.StoredIssueQuery;
 import org.nightlabs.jfire.issue.id.StoredIssueQueryID;
 import org.nightlabs.jfire.security.SecurityReflector;
 import org.nightlabs.progress.ProgressMonitor;
+import org.nightlabs.progress.SubProgressMonitor;
 
 public class StoredIssueQueryDAO
 extends BaseJDOObjectDAO<StoredIssueQueryID, StoredIssueQuery>
@@ -62,6 +63,14 @@ extends BaseJDOObjectDAO<StoredIssueQueryID, StoredIssueQuery>
 		} 
 	}
 
+	public synchronized StoredIssueQuery getStoredIssueQuery(StoredIssueQueryID storedIssueQueryID, String[] fetchGroups, int maxFetchDepth, ProgressMonitor monitor)
+	{
+		monitor.beginTask("Loading storedIssueQuery " + storedIssueQueryID.storedIssueQueryID, 1);
+		StoredIssueQuery issuePriority = getJDOObject(null, storedIssueQueryID, fetchGroups, maxFetchDepth, new SubProgressMonitor(monitor, 1));
+		monitor.done();
+		return issuePriority;
+	}
+	
 	public StoredIssueQuery storeStoredIssueQuery(StoredIssueQuery storedIssueQuery, boolean get, String[] fetchGroups, int maxFetchDepth, ProgressMonitor monitor) {
 		if(storedIssueQuery == null)
 			throw new NullPointerException("StoredIssueQuery to save must not be null");

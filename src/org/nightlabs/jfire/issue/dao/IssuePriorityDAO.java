@@ -15,6 +15,7 @@ import org.nightlabs.jfire.issue.IssuePriority;
 import org.nightlabs.jfire.issue.id.IssuePriorityID;
 import org.nightlabs.jfire.security.SecurityReflector;
 import org.nightlabs.progress.ProgressMonitor;
+import org.nightlabs.progress.SubProgressMonitor;
 
 public class IssuePriorityDAO
 extends BaseJDOObjectDAO<IssuePriorityID, IssuePriority>
@@ -37,7 +38,8 @@ extends BaseJDOObjectDAO<IssuePriorityID, IssuePriority>
 	@Override
 	protected Collection<IssuePriority> retrieveJDOObjects(Set<IssuePriorityID> objectIDs,
 			String[] fetchGroups, int maxFetchDepth, ProgressMonitor monitor)
-			throws Exception {
+			throws Exception 
+	{
 		monitor.beginTask("Fetching IssuePriority...", 1); //$NON-NLS-1$
 		try {
 			IssueManager im = IssueManagerUtil.getHome(SecurityReflector.getInitialContextProperties()).create();
@@ -53,7 +55,16 @@ extends BaseJDOObjectDAO<IssuePriorityID, IssuePriority>
 
 	private static final String[] FETCH_GROUPS = { IssuePriority.FETCH_GROUP_THIS, FetchPlan.DEFAULT };
 
-	public List<IssuePriority> getIssuePriorities(ProgressMonitor monitor) {
+	public synchronized IssuePriority getIssuePriority(IssuePriorityID issuePriorityID, String[] fetchGroups, int maxFetchDepth, ProgressMonitor monitor)
+	{
+		monitor.beginTask("Loading issuePriority "+issuePriorityID.issuePriorityID, 1);
+		IssuePriority issuePriority = getJDOObject(null, issuePriorityID, fetchGroups, maxFetchDepth, new SubProgressMonitor(monitor, 1));
+		monitor.done();
+		return issuePriority;
+	}
+	
+	public List<IssuePriority> getIssuePriorities(ProgressMonitor monitor) 
+	{
 		try {
 			return new ArrayList<IssuePriority>(retrieveJDOObjects(null, FETCH_GROUPS, NLJDOHelper.MAX_FETCH_DEPTH_NO_LIMIT, monitor));
 		} catch (Exception e) {
@@ -61,8 +72,9 @@ extends BaseJDOObjectDAO<IssuePriorityID, IssuePriority>
 		} 
 	}
 
-	public IssuePriority storeIssuePriority(IssuePriority issuePriority, boolean get, String[] fetchGroups, int maxFetchDepth, ProgressMonitor monitor) {
-		if(issuePriority == null)
+	public IssuePriority storeIssuePriority(IssuePriority issuePriority, boolean get, String[] fetchGroups, int maxFetchDepth, ProgressMonitor monitor)
+	{
+		if (issuePriority == null)
 			throw new NullPointerException("Issue to save must not be null");
 		monitor.beginTask("Storing issuePriority: "+ issuePriority.getIssuePriorityID(), 3);
 		try {

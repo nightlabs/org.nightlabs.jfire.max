@@ -8,6 +8,7 @@ import org.apache.log4j.Logger;
 import org.nightlabs.jdo.query.JDOQuery;
 import org.nightlabs.jfire.issue.Issue;
 import org.nightlabs.jfire.issue.id.IssuePriorityID;
+import org.nightlabs.jfire.issue.id.IssueResolutionID;
 import org.nightlabs.jfire.issue.id.IssueSeverityTypeID;
 import org.nightlabs.jfire.issue.id.IssueTypeID;
 import org.nightlabs.jfire.security.id.UserID;
@@ -23,6 +24,7 @@ extends JDOQuery<Issue> {
 	private IssueTypeID issueTypeID;
 	private IssueSeverityTypeID issueSeverityTypeID;
 	private IssuePriorityID issuePriorityID;
+	private IssueResolutionID issueResolutionID;
 	private UserID reporterID;
 	private UserID assigneeID;
 	private Date createTimestamp;
@@ -45,16 +47,26 @@ extends JDOQuery<Issue> {
 			filter.append("( this.issueType.organisationID == \"" + issueTypeID.organisationID + "\" && ");
 			filter.append("  this.issueType.issueTypeID == \"" + issueTypeID.issueTypeID + "\" ) && ");
 		}
+		
 		if (issueSeverityTypeID != null) {
 			filter.append("( this.issueSeverityType.organisationID == \"" + issueSeverityTypeID.organisationID + "\" && ");
 			filter.append("  this.issueSeverityType.issueSeverityTypeID == \"" + issueSeverityTypeID.issueSeverityTypeID + "\" ) && ");
 		}
+		
 		if (issuePriorityID != null) {
 			// FIXME: JPOX Bug JDOHelper.getObjectId(this.*) does not seem to work (java.lang.IndexOutOfBoundsException: Index: 3, Size: 3)
 //			filter.append("JDOHelper.getObjectId(this.issuePriority) == :issuePriorityID && ");
 			// WORKAROUND:
 			filter.append("( this.issuePriority.organisationID == \"" + issuePriorityID.organisationID + "\" && ");
 			filter.append("  this.issuePriority.issuePriorityID == \"" + issuePriorityID.issuePriorityID + "\" ) && ");
+		}
+		
+		if (issueResolutionID != null) {
+			// FIXME: JPOX Bug JDOHelper.getObjectId(this.*) does not seem to work (java.lang.IndexOutOfBoundsException: Index: 3, Size: 3)
+//			filter.append("JDOHelper.getObjectId(this.issueResolution) == :issueResolutionID && ");
+			// WORKAROUND:
+			filter.append("( this.issueResolution.organisationID == \"" + issueResolutionID.organisationID + "\" && ");
+			filter.append("  this.issueResolution.issueResolutionID == \"" + issueResolutionID.issueResolutionID + "\" ) && ");
 		}
 		
 		if (reporterID != null) {
@@ -116,6 +128,14 @@ extends JDOQuery<Issue> {
 		this.issuePriorityID = issuePriorityID;
 	}
 
+	public IssueResolutionID getIssueResolutionID() {
+		return issueResolutionID;
+	}
+	
+	public void setIssueResolutionID(IssueResolutionID issueResolutionID) {
+		this.issueResolutionID = issueResolutionID;
+	}
+	
 	public UserID getReporterID() {
 		return reporterID;
 	}

@@ -15,6 +15,7 @@ import org.nightlabs.jfire.issue.IssueResolution;
 import org.nightlabs.jfire.issue.id.IssueResolutionID;
 import org.nightlabs.jfire.security.SecurityReflector;
 import org.nightlabs.progress.ProgressMonitor;
+import org.nightlabs.progress.SubProgressMonitor;
 
 public class IssueResolutionDAO
 extends BaseJDOObjectDAO<IssueResolutionID, IssueResolution>
@@ -53,6 +54,14 @@ extends BaseJDOObjectDAO<IssueResolutionID, IssueResolution>
 
 	private static final String[] FETCH_GROUPS = { IssueResolution.FETCH_GROUP_THIS, FetchPlan.DEFAULT };
 
+	public synchronized IssueResolution getIssueResolution(IssueResolutionID issueResolutionID, String[] fetchGroups, int maxFetchDepth, ProgressMonitor monitor)
+	{
+		monitor.beginTask("Loading issueResolution "+issueResolutionID.issueResolutionID, 1);
+		IssueResolution issueResolution = getJDOObject(null, issueResolutionID, fetchGroups, maxFetchDepth, new SubProgressMonitor(monitor, 1));
+		monitor.done();
+		return issueResolution;
+	}
+	
 	public List<IssueResolution> getIssueResolutions(ProgressMonitor monitor) {
 		try {
 			return new ArrayList<IssueResolution>(retrieveJDOObjects(null, FETCH_GROUPS, NLJDOHelper.MAX_FETCH_DEPTH_NO_LIMIT, monitor));

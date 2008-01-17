@@ -11,12 +11,11 @@ import org.nightlabs.jdo.NLJDOHelper;
 import org.nightlabs.jfire.base.jdo.BaseJDOObjectDAO;
 import org.nightlabs.jfire.issue.IssueManager;
 import org.nightlabs.jfire.issue.IssueManagerUtil;
-import org.nightlabs.jfire.issue.IssuePriority;
 import org.nightlabs.jfire.issue.IssueSeverityType;
 import org.nightlabs.jfire.issue.id.IssueSeverityTypeID;
-import org.nightlabs.jfire.issue.id.IssueTypeID;
 import org.nightlabs.jfire.security.SecurityReflector;
 import org.nightlabs.progress.ProgressMonitor;
+import org.nightlabs.progress.SubProgressMonitor;
 
 public class IssueSeverityTypeDAO
 		extends BaseJDOObjectDAO<IssueSeverityTypeID, IssueSeverityType>
@@ -25,7 +24,8 @@ public class IssueSeverityTypeDAO
 
 	private static IssueSeverityTypeDAO sharedInstance = null;
 
-	public static IssueSeverityTypeDAO sharedInstance() {
+	public static IssueSeverityTypeDAO sharedInstance() 
+	{
 		if (sharedInstance == null) {
 			synchronized (IssueSeverityTypeDAO.class) {
 				if (sharedInstance == null)
@@ -56,6 +56,14 @@ public class IssueSeverityTypeDAO
 
 	private static final String[] FETCH_GROUPS = { IssueSeverityType.FETCH_GROUP_THIS, FetchPlan.DEFAULT };
 
+	public synchronized IssueSeverityType getIssueSeverityType(IssueSeverityTypeID issueSeverityTypeID, String[] fetchGroups, int maxFetchDepth, ProgressMonitor monitor)
+	{
+		monitor.beginTask("Loading issueSeverityType "+issueSeverityTypeID.issueSeverityTypeID, 1);
+		IssueSeverityType issueSeverityType = getJDOObject(null, issueSeverityTypeID, fetchGroups, maxFetchDepth, new SubProgressMonitor(monitor, 1));
+		monitor.done();
+		return issueSeverityType;
+	}
+	
 	public List<IssueSeverityType> getIssueSeverityTypes(ProgressMonitor monitor)
 	{
 		try {
@@ -65,7 +73,8 @@ public class IssueSeverityTypeDAO
 		} 
 	}
 
-	public IssueSeverityType storeIssueSeverityType(IssueSeverityType issueSeverityType, boolean get, String[] fetchGroups, int maxFetchDepth, ProgressMonitor monitor) {
+	public IssueSeverityType storeIssueSeverityType(IssueSeverityType issueSeverityType, boolean get, String[] fetchGroups, int maxFetchDepth, ProgressMonitor monitor)
+	{
 		if(issueSeverityType == null)
 			throw new NullPointerException("Issue to save must not be null");
 		monitor.beginTask("Storing issueSeverityType: "+ issueSeverityType.getIssueSeverityTypeID(), 3);

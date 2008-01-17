@@ -29,7 +29,12 @@ package org.nightlabs.jfire.accounting.pay;
 import java.io.Serializable;
 import java.util.Collection;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Map;
+import java.util.Set;
+
+import javax.jdo.PersistenceManager;
+import javax.jdo.Query;
 
 import org.nightlabs.jfire.accounting.pay.id.ModeOfPaymentFlavourID;
 import org.nightlabs.jfire.accounting.pay.id.ModeOfPaymentID;
@@ -51,6 +56,11 @@ import org.nightlabs.util.Util;
  * @jdo.fetch-group name="ModeOfPayment.name" fields="name"
  * @jdo.fetch-group name="ModeOfPayment.flavours" fields="flavours"
  * @jdo.fetch-group name="ModeOfPayment.this" fetch-groups="default" fields="flavours, name"
+ * 
+ * @jdo.query
+ *		name="getAllModeOfPaymentIDs"
+ *		query="SELECT JDOHelper.getObjectId(this)"
+ * 
  */
 public class ModeOfPayment
 implements Serializable
@@ -99,7 +109,7 @@ implements Serializable
 	 *
 	 * @!jdo.map-vendor-extension vendor-name="jpox" key="key-field" value="primaryKey"
 	 */
-	private Map flavours = new HashMap();
+	private Map<String, ModeOfPaymentFlavour> flavours = new HashMap<String, ModeOfPaymentFlavour>();
 
 	/**
 	 * @deprecated Only for JDO!
@@ -152,7 +162,7 @@ implements Serializable
 	/**
 	 * @return Returns the flavours.
 	 */
-	public Collection getFlavours()
+	public Collection<ModeOfPaymentFlavour> getFlavours()
 	{
 		return flavours.values();
 	}
@@ -190,6 +200,12 @@ implements Serializable
 			flavours.put(modeOfPaymentFlavourPK, res);
 		}
 		return res;
+	}
+	
+	@SuppressWarnings("unchecked")
+	public static Set<ModeOfPaymentID> getAllModeOfPaymentIDs(PersistenceManager pm) {
+		Query query = pm.newNamedQuery(ModeOfPayment.class, "getAllModeOfPaymentIDs");
+		return new HashSet<ModeOfPaymentID>((Collection<? extends ModeOfPaymentID>) query.execute());
 	}
 
 	@Override

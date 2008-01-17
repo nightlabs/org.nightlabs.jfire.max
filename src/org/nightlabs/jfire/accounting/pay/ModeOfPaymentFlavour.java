@@ -33,15 +33,19 @@ import java.io.OutputStream;
 import java.io.Serializable;
 import java.util.Collection;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Map;
+import java.util.Set;
 
 import javax.jdo.PersistenceManager;
 import javax.jdo.Query;
 
 import org.nightlabs.io.DataBuffer;
+import org.nightlabs.jfire.accounting.pay.id.ModeOfPaymentFlavourID;
 import org.nightlabs.jfire.trade.CustomerGroup;
 import org.nightlabs.jfire.trade.id.CustomerGroupID;
+import org.nightlabs.util.IOUtil;
 import org.nightlabs.util.Util;
 
 /**
@@ -130,6 +134,10 @@ import org.nightlabs.util.Util;
  *			import org.nightlabs.jfire.trade.CustomerGroup;
  *			import org.nightlabs.jfire.accounting.pay.ModeOfPayment"
  *
+ * @jdo.query
+ *		name="getAllModeOfPaymentFlavourIDs"
+ *		query="SELECT JDOHelper.getObjectId(this)"
+ *
  */
 public class ModeOfPaymentFlavour
 implements Serializable
@@ -157,21 +165,22 @@ implements Serializable
 	 *		<tt>ModeOfPaymentFlavour</tt>s are returned that are available to all
 	 *		<tt>CustomerGroup</tt>s.
 	 */
-	public static Collection getAvailableModeOfPaymentFlavoursForAllCustomerGroups(
-			PersistenceManager pm, Collection customerGroupIDs, byte mergeMode)
+	@SuppressWarnings("unchecked")
+	public static Collection<ModeOfPaymentFlavour> getAvailableModeOfPaymentFlavoursForAllCustomerGroups(
+			PersistenceManager pm, Collection<CustomerGroupID> customerGroupIDs, byte mergeMode)
 	{
 		if (customerGroupIDs == null)
-			return (Collection)pm.newQuery(ModeOfPaymentFlavour.class).execute();
+			return (Collection<ModeOfPaymentFlavour>) pm.newQuery(ModeOfPaymentFlavour.class).execute();
 
 
 		if (mergeMode != MERGE_MODE_UNION && mergeMode != MERGE_MODE_INTERSECTION)
 			throw new IllegalArgumentException("mergeMode invalid! Must be MERGE_MODE_UNION or MERGE_MODE_INTERSECTION!");
 
-		Map res = null;
-		for (Iterator itCustomerGroups = customerGroupIDs.iterator(); itCustomerGroups.hasNext(); ) {
-			CustomerGroupID customerGroupID = (CustomerGroupID) itCustomerGroups.next();
+		Map<String, ModeOfPaymentFlavour> res = null;
+		for (Iterator<CustomerGroupID> itCustomerGroups = customerGroupIDs.iterator(); itCustomerGroups.hasNext(); ) {
+			CustomerGroupID customerGroupID = itCustomerGroups.next();
 
-			Map m = getAvailableModeOfPaymentFlavoursMapForOneCustomerGroup(pm, customerGroupID.organisationID, customerGroupID.customerGroupID);
+			Map<String, ModeOfPaymentFlavour> m = getAvailableModeOfPaymentFlavoursMapForOneCustomerGroup(pm, customerGroupID.organisationID, customerGroupID.customerGroupID);
 
 			if (res == null) {
 				res = m;
@@ -179,18 +188,18 @@ implements Serializable
 			else {
 				if (mergeMode == MERGE_MODE_INTERSECTION) {
 					// remove all missing
-					for (Iterator it = res.keySet().iterator(); it.hasNext(); ) {
-						String mopfPK = (String) it.next();
+					for (Iterator<String> it = res.keySet().iterator(); it.hasNext(); ) {
+						String mopfPK = it.next();
 						if (!m.containsKey(mopfPK))
 							it.remove();
 					}
 				} // if (mergeMode == MERGE_MODE_INTERSECTION) {
 				else { // if (mergeMode == MERGE_MODE_UNION) {
 					// add all additional
-					for (Iterator it = res.entrySet().iterator(); it.hasNext(); ) {
-						Map.Entry me = (Map.Entry)it.next();
-						String mopfPK = (String) me.getKey();
-						ModeOfPaymentFlavour mopf = (ModeOfPaymentFlavour) me.getValue();
+					for (Iterator<Map.Entry<String, ModeOfPaymentFlavour>> it = res.entrySet().iterator(); it.hasNext(); ) {
+						Map.Entry<String, ModeOfPaymentFlavour> me = it.next();
+						String mopfPK = me.getKey();
+						ModeOfPaymentFlavour mopf = me.getValue();
 						res.put(mopfPK, mopf);
 					}
 				} // if (mergeMode == MERGE_MODE_UNION) {
@@ -203,7 +212,7 @@ implements Serializable
 	/**
 	 * @see #getAvailableModeOfPaymentFlavoursForOneCustomerGroup(PersistenceManager, String, String)
 	 */
-	public static Collection getAvailableModeOfPaymentFlavoursForOneCustomerGroup(PersistenceManager pm, CustomerGroupID customerGroupID)
+	public static Collection<ModeOfPaymentFlavour> getAvailableModeOfPaymentFlavoursForOneCustomerGroup(PersistenceManager pm, CustomerGroupID customerGroupID)
 	{
 //		pm.getExtent(CustomerGroup.class);
 //		CustomerGroup customerGroup = (CustomerGroup) pm.getObjectById(customerGroupID);
@@ -240,13 +249,14 @@ implements Serializable
 	 *
 	 * @see #getAvailableModeOfPaymentFlavoursForOneCustomerGroup(PersistenceManager, CustomerGroupID)
 	 */
-	public static Collection getAvailableModeOfPaymentFlavoursForOneCustomerGroup(PersistenceManager pm, String organisationID, String customerGroupID)
+	public static Collection<ModeOfPaymentFlavour> getAvailableModeOfPaymentFlavoursForOneCustomerGroup(PersistenceManager pm, String organisationID, String customerGroupID)
 	{
 		return getAvailableModeOfPaymentFlavoursMapForOneCustomerGroup(
 				pm, organisationID, customerGroupID).values();
 	}
 
-	protected static Map getAvailableModeOfPaymentFlavoursMapForOneCustomerGroup(PersistenceManager pm, String organisationID, String customerGroupID)
+	@SuppressWarnings("unchecked")
+	protected static Map<String, ModeOfPaymentFlavour> getAvailableModeOfPaymentFlavoursMapForOneCustomerGroup(PersistenceManager pm, String organisationID, String customerGroupID)
 	{
 		// return getAvailableModeOfPaymentFlavoursForOneCustomerGroup(pm, CustomerGroupID.create(organisationID, customerGroupID));
 
@@ -254,20 +264,26 @@ implements Serializable
 //		return (Collection)query.execute(organisationID, customerGroupID);
 
 		// WORKAROUND The normal query returns an empty result, probably because of issues with ORs. 
-		Map m = new HashMap();
+		Map<String, ModeOfPaymentFlavour> m = new HashMap<String, ModeOfPaymentFlavour>();
 		Query query = pm.newNamedQuery(ModeOfPaymentFlavour.class, "getAvailableModeOfPaymentFlavoursForOneCustomerGroup_WORKAROUND1");
-		for (Iterator it = ((Collection)query.execute(organisationID, customerGroupID)).iterator(); it.hasNext(); ) {
-			ModeOfPaymentFlavour modeOfPaymentFlavour = (ModeOfPaymentFlavour) it.next();
+		for (Iterator<ModeOfPaymentFlavour> it = ((Collection)query.execute(organisationID, customerGroupID)).iterator(); it.hasNext(); ) {
+			ModeOfPaymentFlavour modeOfPaymentFlavour = it.next();
 			m.put(modeOfPaymentFlavour.getPrimaryKey(), modeOfPaymentFlavour);
 		}
 
 		query = pm.newNamedQuery(ModeOfPaymentFlavour.class, "getAvailableModeOfPaymentFlavoursForOneCustomerGroup_WORKAROUND2");
-		for (Iterator it = ((Collection)query.execute(organisationID, customerGroupID)).iterator(); it.hasNext(); ) {
-			ModeOfPaymentFlavour modeOfPaymentFlavour = (ModeOfPaymentFlavour) it.next();
+		for (Iterator<ModeOfPaymentFlavour> it = ((Collection)query.execute(organisationID, customerGroupID)).iterator(); it.hasNext(); ) {
+			ModeOfPaymentFlavour modeOfPaymentFlavour = it.next();
 			m.put(modeOfPaymentFlavour.getPrimaryKey(), modeOfPaymentFlavour);
 		}
 
 		return m;
+	}
+	
+	@SuppressWarnings("unchecked")
+	public static Set<ModeOfPaymentFlavourID> getAllModeOfPaymentFlavourIDs(PersistenceManager pm) {
+		Query query = pm.newNamedQuery(ModeOfPaymentFlavour.class, "getAllModeOfPaymentFlavourIDs");
+		return new HashSet<ModeOfPaymentFlavourID>((Collection<? extends ModeOfPaymentFlavourID>) query.execute());
 	}
 
 	/**
@@ -403,7 +419,7 @@ implements Serializable
 	 * @param fileName A filename relative to <code>resourceLoaderClass</code>. Note, that subdirectories are possible, but ".." not.
 	 * @throws IOException If loading the resource failed. This might be a {@link FileNotFoundException}.
 	 */
-	public void loadIconFromResource(Class resourceLoaderClass, String fileName) throws IOException
+	public void loadIconFromResource(Class<?> resourceLoaderClass, String fileName) throws IOException
 	{
 		InputStream in = resourceLoaderClass.getResourceAsStream(fileName);
 		if (in == null)
@@ -412,7 +428,7 @@ implements Serializable
 			DataBuffer db = new DataBuffer(512);
 //			db.maxSizeForRAM = Integer.MAX_VALUE;
 			OutputStream out = db.createOutputStream();
-			Util.transferStreamData(in, out);
+			IOUtil.transferStreamData(in, out);
 			out.close();
 
 			this.icon16x16Data = db.createByteArray();

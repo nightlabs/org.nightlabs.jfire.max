@@ -94,6 +94,7 @@ import org.nightlabs.jfire.accounting.pay.ServerPaymentProcessorCreditCardDummyF
 import org.nightlabs.jfire.accounting.pay.ServerPaymentProcessorDebitNoteGermany;
 import org.nightlabs.jfire.accounting.pay.ServerPaymentProcessorNonPayment;
 import org.nightlabs.jfire.accounting.pay.id.ModeOfPaymentFlavourID;
+import org.nightlabs.jfire.accounting.pay.id.ModeOfPaymentID;
 import org.nightlabs.jfire.accounting.pay.id.PaymentDataID;
 import org.nightlabs.jfire.accounting.pay.id.PaymentID;
 import org.nightlabs.jfire.accounting.priceconfig.AffectedProductType;
@@ -2420,6 +2421,70 @@ public abstract class AccountingManagerBean
 					pm, customerGroupIDs, mergeMode);
 
 			return pm.detachCopyAll(c);
+		} finally {
+			pm.close();
+		}
+	}
+	
+	/**
+	 *
+	 * @ejb.interface-method
+	 * @ejb.permission role-name="_Guest_"
+	 * @ejb.transaction type="Supports"
+	 */
+	public Set<ModeOfPaymentID> getAllModeOfPaymentIDs() {
+		PersistenceManager pm = getPersistenceManager();
+		try {
+			return ModeOfPayment.getAllModeOfPaymentIDs(pm);
+		} finally {
+			pm.close();
+		}
+	}
+	
+	/**
+	 * @param fetchGroups Either <tt>null</tt> or all desired fetch groups.
+	 *
+	 * @ejb.interface-method
+	 * @ejb.permission role-name="_Guest_"
+	 * @ejb.transaction type="Supports"
+	 */
+	public Collection<ModeOfPaymentFlavour> getModeOfPayments(Set<ModeOfPaymentID> modeOfPaymentIDs, String[] fetchGroups, int maxFetchDepth)
+	{
+		PersistenceManager pm = getPersistenceManager();
+		try {
+			return NLJDOHelper.getDetachedObjectList(pm, modeOfPaymentIDs, ModeOfPayment.class, fetchGroups, maxFetchDepth);
+		} finally {
+			pm.close();
+		}
+	}
+	
+	/**
+	 *
+	 * @ejb.interface-method
+	 * @ejb.permission role-name="_Guest_"
+	 * @ejb.transaction type="Supports"
+	 */
+	public Set<ModeOfPaymentFlavourID> getAllModeOfPaymentFlavourIDs() {
+		PersistenceManager pm = getPersistenceManager();
+		try {
+			return ModeOfPaymentFlavour.getAllModeOfPaymentFlavourIDs(pm);
+		} finally {
+			pm.close();
+		}
+	}
+	
+	/**
+	 * @param fetchGroups Either <tt>null</tt> or all desired fetch groups.
+	 *
+	 * @ejb.interface-method
+	 * @ejb.permission role-name="_Guest_"
+	 * @ejb.transaction type="Supports"
+	 */
+	public Collection<ModeOfPaymentFlavour> getModeOfPaymentFlavours(Set<ModeOfPaymentFlavourID> modeOfPaymentFlavourIDs, String[] fetchGroups, int maxFetchDepth)
+	{
+		PersistenceManager pm = getPersistenceManager();
+		try {
+			return NLJDOHelper.getDetachedObjectList(pm, modeOfPaymentFlavourIDs, ModeOfPaymentFlavour.class, fetchGroups, maxFetchDepth);
 		} finally {
 			pm.close();
 		}

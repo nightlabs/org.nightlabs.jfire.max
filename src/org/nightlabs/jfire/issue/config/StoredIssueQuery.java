@@ -4,10 +4,12 @@ import java.io.ByteArrayInputStream;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.io.Serializable;
+import java.util.Collection;
 import java.util.zip.DeflaterOutputStream;
 import java.util.zip.InflaterInputStream;
 
 import org.nightlabs.io.DataBuffer;
+import org.nightlabs.jdo.query.JDOQuery;
 import org.nightlabs.jfire.issue.query.IssueQuery;
 
 import com.thoughtworks.xstream.XStream;
@@ -62,46 +64,36 @@ implements Serializable
 	 */
 	protected StoredIssueQuery() { }
 
-	public StoredIssueQuery(String organisationID, long storedIssueQueryID, String name, IssueQuery issueQuery) 
+	public StoredIssueQuery(String organisationID, long storedIssueQueryID) 
 	{
 		this.organisationID = organisationID;
 		this.storedIssueQueryID = storedIssueQueryID;
-		this.name = name;
-		
-		setIssueQuery(issueQuery);
 	}
 	
-	public void setIssueQuery(IssueQuery issueQuery) {
-		DataBuffer db = null;
-		OutputStream out = null;
+	public void setIssueQueries(Collection<JDOQuery> jdoQuery) {
 		try {
-			db = new DataBuffer();
-			out = new DeflaterOutputStream(db.createOutputStream());
-			XStream xStream = new XStream(new XppDriver());
-			xStream.toXML(issueQuery, out);
+			DataBuffer db = new DataBuffer();
+			OutputStream out = new DeflaterOutputStream(db.createOutputStream());
+			try {
+				XStream xStream = new XStream(new XppDriver());
+				xStream.toXML(jdoQuery, out);
+			} finally {
+				out.close();
+			}
 			serializedIssueQuery = db.createByteArray();
 		}
 		catch (Exception e) {
 			throw new RuntimeException(e);
 		}
-		finally {
-			try {
-				if (out != null)
-					out.close();
-			} catch (Exception e) {
-				throw new RuntimeException(e);
-			}
-			
-		}
 	}
 	
-	public IssueQuery getIssueQuery() {
+	public Collection<JDOQuery> getIssueQueries() {
 		InputStream in = null;
 		try {
 			DataBuffer db = new DataBuffer(new InflaterInputStream(new ByteArrayInputStream(serializedIssueQuery)));
 			in = db.createInputStream();
 			XStream xStream = new XStream(new XppDriver());
-			IssueQuery q = (IssueQuery) xStream.fromXML(in);
+			Collection<JDOQuery> q = (Collection<JDOQuery>) xStream.fromXML(in);
 			return q;
 		} 
 		catch (Exception e) {
@@ -118,5 +110,9 @@ implements Serializable
 	
 	public String getName() {
 		return name;
+	}
+
+	public void setName(String name) {
+		this.name = name;
 	}
 }

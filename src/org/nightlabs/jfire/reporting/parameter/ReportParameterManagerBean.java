@@ -170,6 +170,12 @@ implements SessionBean
 					new NameEntry[] {new NameEntry(Locale.ENGLISH.getLanguage(), "Current user is selected. You might select an other user.")}
 			);
 			
+			ReportParameterUtil.createValueProvider(pm, jfireObjects, ReportingConstants.VALUE_PROVIDER_ID_CURRENT_USER_MULTIPLE, UserID.class.getName(),
+					new NameEntry[] {new NameEntry(Locale.ENGLISH.getLanguage(), "Current user (with multiple selection)")},
+					new NameEntry[] {new NameEntry(Locale.ENGLISH.getLanguage(), "Current user pre-selected (change possible).")},
+					new NameEntry[] {new NameEntry(Locale.ENGLISH.getLanguage(), "Current user is selected. You might select an a list of other users.")}
+			);
+			
 			ReportParameterUtil.createValueProvider(pm, jfireObjects, ReportingConstants.VALUE_PROVIDER_ID_USERS, 
 					Collection.class.getName() + "<" + UserID.class.getName() + ">",
 					new NameEntry[] {new NameEntry(Locale.ENGLISH.getLanguage(), "List of users")},

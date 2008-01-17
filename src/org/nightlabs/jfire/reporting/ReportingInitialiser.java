@@ -432,6 +432,8 @@ public class ReportingInitialiser {
 				variables.put("rootOrganisationIDConverted", convertToReportColumnString(rootOrganisationID));
 				variables.put("devOrganisationID", Organisation.DEV_ORGANISATION_ID);
 				variables.put("devOrganisationIDConverted", convertToReportColumnString(Organisation.DEV_ORGANISATION_ID));
+				variables.put("localOrganisationID", organisationID);
+				variables.put("localOrganisationIDConverted", convertToReportColumnString(organisationID));
 			} finally {
 				ctx.close();
 			}
@@ -581,7 +583,7 @@ public class ReportingInitialiser {
 					}
 					config.setValueProvider(provider);
 					config.setPageIndex(pageIndex);					
-					config.setPageOrder(pageOrder);
+					config.setPageRow(pageOrder);
 					
 					boolean allowOutputNull = false;
 					String allowNullValue = NLDOMUtil.getAttributeValue(providerNode, "allowNullOutputValue");

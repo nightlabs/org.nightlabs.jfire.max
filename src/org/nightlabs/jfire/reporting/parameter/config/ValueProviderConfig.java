@@ -75,7 +75,11 @@ implements ValueConsumer, Serializable, IGraphicalInfoProvider, DeleteCallback
 	/**
 	 * @jdo.field persistence-modifier="persistent"
 	 */
-	private int pageOrder;
+	private int pageRow;
+	/**
+	 * @jdo.field persistence-modifier="persistent"
+	 */
+	private int pageColumn;
 	
 	/**
 	 * @jdo.field persistence-modifier="persistent"
@@ -168,22 +172,39 @@ implements ValueConsumer, Serializable, IGraphicalInfoProvider, DeleteCallback
 	}
 
 	/**
-	 * The pageOrder is defines the order
+	 * The pageRow is defines the vertical order
 	 * of valueProviders within one page.
 	 * 
-	 * @return the pageOrder
+	 * @return the pageRow
 	 */
-	public int getPageOrder() {
-		return pageOrder;
+	public int getPageRow() {
+		return pageRow;
 	}
 
 	/**
-	 * @param pageOrder the pageOrder to set
+	 * @param pageRow the pageRow to set
 	 */
-	public void setPageOrder(int pageOrder) {
-		this.pageOrder = pageOrder;
+	public void setPageRow(int pageOrder) {
+		this.pageRow = pageOrder;
 	}
 
+	/**
+	 * The pageColumn defines the order
+	 * of valueProviders within one row.
+	 * 
+	 * @return the pageColumn
+	 */
+	public int getPageColumn() {
+		return pageColumn;
+	}
+
+	/**
+	 * @param pageRow the pageColumn to set
+	 */
+	public void setPageColumn(int pageColumn) {
+		this.pageColumn = pageColumn;
+	}
+	
 	/**
 	 * @return the setup
 	 */

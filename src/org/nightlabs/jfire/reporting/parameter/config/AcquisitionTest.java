@@ -163,7 +163,7 @@ public class AcquisitionTest {
 			int i = 0;
 			for (ValueProviderConfig config : entry.getValue()) {
 				config.setPageIndex(inverseLevel);
-				config.setPageOrder(i++);
+				config.setPageRow(i++);
 			}
 			result.put(new Integer(inverseLevel--), entry.getValue());
 		}
@@ -229,7 +229,7 @@ public class AcquisitionTest {
 		for (Entry<Integer, List<ValueProviderConfig>> entry : result.entrySet()) {
 			System.out.println("*** Page "+entry.getKey()+" ***");
 			for (ValueProviderConfig config : entry.getValue()) {
-				System.out.println("    -> part "+config.getPageOrder()+": "+config.getValueProviderID());
+				System.out.println("    -> part "+config.getPageRow()+": "+config.getValueProviderID());
 			}
 		}
 		

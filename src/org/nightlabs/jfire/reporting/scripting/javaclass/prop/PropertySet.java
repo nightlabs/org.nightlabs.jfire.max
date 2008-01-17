@@ -89,39 +89,44 @@ extends AbstractJFSScriptExecutorDelegate
 			if (scope == null || "".equals(scope)) {
 				throw new IllegalArgumentException("Query property scope was not set.");
 			}
+			metaData.addColumn("DisplayName", DataType.STRING);
 			IStruct struct = StructLocal.getStructLocal(linkClass, scope, pm);
 			SortedMap<String, StructBlock> sortedBlocks = new TreeMap<String, StructBlock>();
-			for (Iterator iter = struct.getStructBlocks().iterator(); iter.hasNext();) {			
-				StructBlock structBlock = (StructBlock) iter.next();
+			for (Iterator<StructBlock> iter = struct.getStructBlocks().iterator(); iter.hasNext();) {			
+				StructBlock structBlock = iter.next();
 				sortedBlocks.put(structBlock.getPrimaryKey(), structBlock);
 			}
-			for (Iterator iter = sortedBlocks.values().iterator(); iter.hasNext();) {			
-				StructBlock structBlock = (StructBlock) iter.next();
+			for (Iterator<StructBlock> iter = sortedBlocks.values().iterator(); iter.hasNext();) {			
+				StructBlock structBlock = iter.next();
 				SortedMap<String, StructField> sortedFields = new TreeMap<String, StructField>();				
-				for (Iterator iterator = structBlock.getStructFields().iterator(); iterator.hasNext();) {
-					StructField structField = (StructField) iterator.next();
+				for (Iterator<StructField> iterator = structBlock.getStructFields().iterator(); iterator.hasNext();) {
+					StructField structField = iterator.next();
 					sortedFields.put(structField.getPrimaryKey(), structField);
 				}
-				for (Iterator iterator = sortedFields.values().iterator(); iterator.hasNext();) {
-					StructField structField = (StructField) iterator.next();
+				for (Iterator<StructField> iterator = sortedFields.values().iterator(); iterator.hasNext();) {
+					StructField structField = iterator.next();
 					if (structField instanceof NumberStructField) {
 						NumberStructField numberStructField = (NumberStructField) structField;
 						if (numberStructField.isInteger())
-							metaData.addColumn(structField.getStructBlockID(), DataType.INTEGER);
+							metaData.addColumn(getColumnName(structField), DataType.INTEGER);
 						else
-							metaData.addColumn(structField.getStructBlockID(), DataType.DOUBLE);
+							metaData.addColumn(getColumnName(structField), DataType.DOUBLE);
 					}
 					else if (structField instanceof DateStructField) {
-						metaData.addColumn(structField.getStructFieldID(), DataType.DATE);
+						metaData.addColumn(getColumnName(structField), DataType.DATE);
 					}
 					else if (II18nTextDataField.class.isAssignableFrom(structField.getDataFieldClass()))
-						metaData.addColumn(structField.getStructFieldID(), DataType.STRING);
+						metaData.addColumn(getColumnName(structField), DataType.STRING);
 				}			
 			}
 		}
 		return metaData;
 	}
 
+	
+	protected String getColumnName(StructField structField) {
+		return structField.getStructBlockID() + "_" + structField.getStructFieldID();
+	}
 
 	protected String getOrganisation() {
 		return SecurityReflector.getUserDescriptor().getOrganisationID();
@@ -155,19 +160,20 @@ extends AbstractJFSScriptExecutorDelegate
 		List<Object> elements = new LinkedList<Object>();
 		Locale locale = JFireReportingHelper.getLocale();
 		SortedMap<String, StructBlock> sortedBlocks = new TreeMap<String, StructBlock>();
-		for (Iterator iter = struct.getStructBlocks().iterator(); iter.hasNext();) {			
-			StructBlock structBlock = (StructBlock) iter.next();
+		elements.add(propertySet.getDisplayName());
+		for (Iterator<StructBlock> iter = struct.getStructBlocks().iterator(); iter.hasNext();) {			
+			StructBlock structBlock = iter.next();
 			sortedBlocks.put(structBlock.getPrimaryKey(), structBlock);
 		}		
-		for (Iterator iter = sortedBlocks.values().iterator(); iter.hasNext();) {			
-			StructBlock structBlock = (StructBlock) iter.next();
+		for (Iterator<StructBlock> iter = sortedBlocks.values().iterator(); iter.hasNext();) {			
+			StructBlock structBlock = iter.next();
 			SortedMap<String, StructField> sortedFields = new TreeMap<String, StructField>();
-			for (Iterator iterator = structBlock.getStructFields().iterator(); iterator.hasNext();) {
-				StructField structField = (StructField) iterator.next();
+			for (Iterator<StructField> iterator = structBlock.getStructFields().iterator(); iterator.hasNext();) {
+				StructField structField = iterator.next();
 				sortedFields.put(structField.getPrimaryKey(), structField);
 			}
-			for (Iterator iterator = sortedFields.values().iterator(); iterator.hasNext();) {
-				StructField structField = (StructField) iterator.next();
+			for (Iterator<StructField> iterator = sortedFields.values().iterator(); iterator.hasNext();) {
+				StructField structField = iterator.next();
 				DataField field;
 				try {
 					field = propertySet.getDataField((StructFieldID)JDOHelper.getObjectId(structField));

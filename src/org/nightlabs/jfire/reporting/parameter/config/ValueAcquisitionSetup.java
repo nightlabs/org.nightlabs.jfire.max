@@ -5,6 +5,8 @@ package org.nightlabs.jfire.reporting.parameter.config;
 
 import java.io.Serializable;
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
@@ -13,7 +15,9 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.SortedMap;
+import java.util.SortedSet;
 import java.util.TreeMap;
+import java.util.TreeSet;
 import java.util.Map.Entry;
 
 import org.apache.log4j.Logger;
@@ -216,23 +220,34 @@ implements Serializable
 
 	/**
 	 * Obtain a sorted copy of the <code>ValueProviderConfig</code>s. It is sorted by
-	 * page-index (index of page) and page-order (index within page). Modifying the <code>Map</code> does
-	 * not modify this instance of <code>ValueAcquisitionSetup</code> - modifying the contents
-	 * of the map does, however. You should never modify it, though!
+	 * page-index (index of page) and page-row (vertical index within page) and page-column (horizontal index within one row). 
+	 * Modifying the returned <code>Map</code> is not possible as an unmodifiable Map is returned - 
+	 * modifying the contents of the map (instances of <code>ValueAcquisitionSetup</code> ), 
+	 * however, is possible, but you should never modify them!
 	 *
 	 * @return a sorted map of all {@link ValueProviderConfig}s.
 	 */
-	public SortedMap<Integer, SortedMap<Integer, ValueProviderConfig>> getSortedValueProviderConfigs() {
-		SortedMap<Integer, SortedMap<Integer, ValueProviderConfig>> result = new TreeMap<Integer, SortedMap<Integer,ValueProviderConfig>>();
+	public SortedMap<Integer, SortedMap<Integer, SortedSet<ValueProviderConfig>>> getSortedValueProviderConfigs() {
+		SortedMap<Integer, SortedMap<Integer, SortedSet<ValueProviderConfig>>> result = new TreeMap<Integer, SortedMap<Integer, SortedSet<ValueProviderConfig>>>();
 		for (ValueProviderConfig config : getValueProviderConfigs()) {
-			SortedMap<Integer, ValueProviderConfig> configs = result.get(config.getPageIndex());
-			if (configs == null) {
-				configs = new TreeMap<Integer, ValueProviderConfig>();
-				result.put(config.getPageIndex(), configs);
+			SortedMap<Integer, SortedSet<ValueProviderConfig>> configRows = result.get(config.getPageIndex());
+			if (configRows == null) {
+				configRows = new TreeMap<Integer, SortedSet<ValueProviderConfig>>();
+				result.put(config.getPageIndex(), configRows);
 			}
-			configs.put(config.getPageOrder(), config);
+			SortedSet<ValueProviderConfig> configRow = configRows.get(config.getPageRow());
+			if (configRow == null) {
+				configRow = new TreeSet<ValueProviderConfig>(new Comparator<ValueProviderConfig>() {
+					@Override
+					public int compare(ValueProviderConfig config1, ValueProviderConfig config2) {
+						return Integer.valueOf(config1.getPageColumn()).compareTo(config2.getPageColumn());
+					}
+				});
+				configRows.put(config.getPageRow(), configRow);
+			}
+			configRow.add(config);
 		}
-		return result;
+		return Collections.unmodifiableSortedMap(result);
 	}
 
 	public SortedMap<Integer, List<ValueProviderConfig>> createAcquisitionSequence(ValueProviderProvider provider) 
@@ -261,7 +276,8 @@ implements Serializable
 			int i = 0;
 			for (ValueProviderConfig config : entry.getValue()) {
 				config.setPageIndex(inverseLevel);
-				config.setPageOrder(i++);
+				config.setPageRow(i++);
+				config.setPageColumn(0);
 			}
 			result.put(new Integer(inverseLevel--), entry.getValue());
 		}
@@ -309,17 +325,15 @@ implements Serializable
 		configs.add(providerConfig);
 	}
 	
-	@SuppressWarnings("unchecked")
 	public Map<String, ValueConsumerBinding> getValueConsumerBindings(ValueConsumer consumer) {
-		// TODO: Rewrite with generics when bcel bug fixed
 		if (consumer2Binding == null) {
 			consumer2Binding = new HashMap<String, Map<String, ValueConsumerBinding>>();			
 			for (ValueConsumerBinding binding : valueConsumerBindings) {
 				if (binding != null && binding.getConsumer() != null) {
 					String bindingKey = binding.getConsumer().getConsumerKey();
-					Map bindings = consumer2Binding.get(bindingKey);
+					Map<String, ValueConsumerBinding> bindings = consumer2Binding.get(bindingKey);
 					if (bindings == null) {
-						bindings = new HashMap();
+						bindings = new HashMap<String, ValueConsumerBinding>();
 						consumer2Binding.put(bindingKey, bindings);
 					}
 					bindings.put(binding.getParameterID(), binding);					
@@ -330,7 +344,7 @@ implements Serializable
 	}
 	
 	public ValueConsumerBinding getValueConsumerBinding(ValueConsumer consumer, String parameterID) {
-		Map bindings = getValueConsumerBindings(consumer);
+		Map<String, ValueConsumerBinding> bindings = getValueConsumerBindings(consumer);
 		if (bindings != null)
 			return (ValueConsumerBinding) bindings.get(parameterID);
 		return null;
@@ -359,8 +373,8 @@ implements Serializable
 	{
 		// TODO make this more efficient
 		int count = 0;
-		for (Iterator it = valueConsumerBindings.iterator(); it.hasNext(); ) {
-			ValueConsumerBinding binding = (ValueConsumerBinding) it.next();
+		for (Iterator<ValueConsumerBinding> it = valueConsumerBindings.iterator(); it.hasNext(); ) {
+			ValueConsumerBinding binding = it.next();
 			if (Util.equals(binding.getProvider(), acquisitionParameterConfig) ||
 				Util.equals(binding.getConsumer(), acquisitionParameterConfig))
 			{
@@ -377,8 +391,8 @@ implements Serializable
 	{
 		// TODO make this more efficient
 		int count = 0;
-		for (Iterator it = valueConsumerBindings.iterator(); it.hasNext(); ) {
-			ValueConsumerBinding binding = (ValueConsumerBinding) it.next();
+		for (Iterator<ValueConsumerBinding> it = valueConsumerBindings.iterator(); it.hasNext(); ) {
+			ValueConsumerBinding binding = it.next();
 			if (Util.equals(binding.getProvider(), valueProviderConfig) ||
 				Util.equals(binding.getConsumer(), valueProviderConfig))
 			{

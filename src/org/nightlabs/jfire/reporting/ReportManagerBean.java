@@ -60,6 +60,7 @@ import org.nightlabs.jdo.moduleregistry.ModuleMetaData;
 import org.nightlabs.jfire.base.BaseSessionBeanImpl;
 import org.nightlabs.jfire.config.ConfigSetup;
 import org.nightlabs.jfire.config.UserConfigSetup;
+import org.nightlabs.jfire.organisation.Organisation;
 import org.nightlabs.jfire.reporting.config.ReportLayoutConfigModule;
 import org.nightlabs.jfire.reporting.layout.ReportCategory;
 import org.nightlabs.jfire.reporting.layout.ReportLayout;
@@ -431,7 +432,7 @@ implements SessionBean
 			}
 			
 			logger.info("Intializing JFireReporting basic scripts");
-			ScriptingInitialiser.initialise(pm, jfireServerManager, getOrganisationID());
+			ScriptingInitialiser.initialise(pm, jfireServerManager, Organisation.DEV_ORGANISATION_ID);
 
 			// intialise the cleanup of the render folder
 			initialiseCleanupRenderedReportLayoutFoldersTask(pm);

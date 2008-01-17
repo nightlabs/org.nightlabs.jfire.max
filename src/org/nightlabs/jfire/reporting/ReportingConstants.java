@@ -118,6 +118,15 @@ public class ReportingConstants {
 		);
 	
 	/**
+	 * ValueProvider id for a value provider that queries a list of {@link UserID}s from the user but has the current user preselected. 
+	 */
+	public static final ValueProviderID VALUE_PROVIDER_ID_CURRENT_USER_MULTIPLE = ValueProviderID.create(
+			Organisation.DEV_ORGANISATION_ID, 
+			ReportingConstants.VALUE_PROVIDER_CATEGORY_ID_JFIRE_OBJECTS.valueProviderCategoryID, 
+			Collection.class.getName() + "<" + User.class.getName() + ">" + "#current"
+		);
+	
+	/**
 	 * ValueProvider id for a value provider that queries a {@link Collection} of {@link UserID}s from the user 
 	 */
 	public static final ValueProviderID VALUE_PROVIDER_ID_USERS = ValueProviderID.create(

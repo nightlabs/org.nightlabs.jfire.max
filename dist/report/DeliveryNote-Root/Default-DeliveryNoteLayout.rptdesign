@@ -1,22 +1,24 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<!-- Written by Eclipse BIRT 2.0 -->
-<report xmlns="http://www.eclipse.org/birt/2005/design" version="3.2.2" id="1">
+<report xmlns="http://www.eclipse.org/birt/2005/design" version="3.2.14" id="1">
     <property name="createdBy">Eclipse BIRT Designer Version 1.0.1 Build &lt;20051201-1157></property>
     <property name="units">in</property>
     <property name="includeResource">reportMessages</property>
-    <method name="initialize"><![CDATA[importClass(Packages.org.nightlabs.jfire.reporting.JFireReportingHelper);
-// This imports all product and ProductType classes it knows
-// it might fail if one of the modules is not deployed
-/*
-importClass(Packages.org.nightlabs.jfire.dynamictrade.store.DynamicProduct);
-importClass(Packages.org.nightlabs.jfire.dynamictrade.store.DynamicProductType);
-importClass(Packages.org.nightlabs.jfire.simpletrade.store.SimpleProduct);
-importClass(Packages.org.nightlabs.jfire.simpletrade.store.SimpleProductType);
-importClass(Packages.org.nightlabs.jfire.voucher.store.Voucher);
-importClass(Packages.org.nightlabs.jfire.voucher.store.VoucherType);
-*/
+    <method name="initialize"><![CDATA[// Import the JFireReportingHelper
+importClass(Packages.org.nightlabs.jfire.reporting.JFireReportingHelper);
+// Import the JDOHelper
+importClass(Packages.javax.jdo.JDOHelper);
+// Resolve the articleContainer for this report
+// getJDOObject takes a string
+articleContainer = JFireReportingHelper.getJDOObject(params["articleContainerID"]);
+// Remember the articleContainer
+JFireReportingHelper.getVars().put("articleContainer", articleContainer);
 
-function isDynamicProduct(product) {
+/**
+ * This function checks whether the given instance of
+ * the given productTypeID is of type DynamicProduct
+ */
+function isDynamicProduct(productJDOID) {
+  product = JFireReportingHelper.getJDOObject(productJDOID);
   return product.getClass().getName() == "org.nightlabs.jfire.dynamictrade.store.DynamicProduct";
 }]]></method>
     <parameters>
@@ -37,32 +39,6 @@ function isDynamicProduct(product) {
     </data-sources>
     <data-sets>
         <oda-data-set extensionID="org.nightlabs.jfire.reporting.oda.jdojs.JDOJSDataSet" name="CustomerOld" id="6">
-            <list-property name="parameters">
-                <structure>
-                    <property name="name">invoiceOrganisationID</property>
-                    <property name="dataType">string</property>
-                    <property name="position">1</property>
-                    <expression name="defaultValue">"dev.jfire.org"</expression>
-                    <property name="isInput">true</property>
-                    <property name="isOutput">false</property>
-                </structure>
-                <structure>
-                    <property name="name">invoiceInvoiceID</property>
-                    <property name="dataType">decimal</property>
-                    <property name="position">2</property>
-                    <expression name="defaultValue">1</expression>
-                    <property name="isInput">true</property>
-                    <property name="isOutput">false</property>
-                </structure>
-                <structure>
-                    <property name="name">languageID</property>
-                    <property name="dataType">string</property>
-                    <property name="position">3</property>
-                    <expression name="defaultValue">"de"</expression>
-                    <property name="isInput">true</property>
-                    <property name="isOutput">false</property>
-                </structure>
-            </list-property>
             <structure name="cachedMetaData">
                 <list-property name="resultSet">
                     <structure>
@@ -98,6 +74,32 @@ function isDynamicProduct(product) {
                 </list-property>
             </structure>
             <property name="dataSource">Data Source</property>
+            <list-property name="parameters">
+                <structure>
+                    <property name="name">invoiceOrganisationID</property>
+                    <property name="dataType">string</property>
+                    <property name="position">1</property>
+                    <expression name="defaultValue">"${devOrganisationID}"</expression>
+                    <property name="isInput">true</property>
+                    <property name="isOutput">false</property>
+                </structure>
+                <structure>
+                    <property name="name">invoiceInvoiceID</property>
+                    <property name="dataType">decimal</property>
+                    <property name="position">2</property>
+                    <expression name="defaultValue">1</expression>
+                    <property name="isInput">true</property>
+                    <property name="isOutput">false</property>
+                </structure>
+                <structure>
+                    <property name="name">languageID</property>
+                    <property name="dataType">string</property>
+                    <property name="position">3</property>
+                    <expression name="defaultValue">"de"</expression>
+                    <property name="isInput">true</property>
+                    <property name="isOutput">false</property>
+                </structure>
+            </list-property>
             <property name="queryText">metaData.addColumn("Company", DataType.STRING);
 metaData.addColumn("Name", DataType.STRING);
 metaData.addColumn("FirstName", DataType.STRING);
@@ -174,28 +176,10 @@ try {
 	resultSet.addColumn(postCode);
 } catch (e) {
 	resultSet.addColumn("");
-}
-</property>
+}</property>
         </oda-data-set>
         <oda-data-set extensionID="org.nightlabs.jfire.reporting.oda.jfs.JFSDataSet" name="InvoiceArticles" id="137">
             <text-property name="displayName">Articles</text-property>
-            <list-property name="parameters">
-                <structure>
-                    <property name="name">articleContainerID</property>
-                    <property name="nativeDataType">0</property>
-                    <property name="position">1</property>
-                    <property name="isOptional">false</property>
-                    <property name="allowNull">false</property>
-                    <property name="isInput">true</property>
-                </structure>
-            </list-property>
-            <list-property name="computedColumns">
-                <structure>
-                    <property name="name">product</property>
-                    <expression name="expression">// resolves the actual JDO object = the articles product
-JFireReportingHelper.getJDOObject(row["productJDOID"]);</expression>
-                </structure>
-            </list-property>
             <structure name="cachedMetaData">
                 <list-property name="resultSet">
                     <structure>
@@ -236,7 +220,7 @@ JFireReportingHelper.getJDOObject(row["productJDOID"]);</expression>
                     <structure>
                         <property name="position">8</property>
                         <property name="name">createDT</property>
-                        <property name="dataType">date-time</property>
+                        <property name="dataType">date</property>
                     </structure>
                     <structure>
                         <property name="position">9</property>
@@ -325,50 +309,284 @@ JFireReportingHelper.getJDOObject(row["productJDOID"]);</expression>
                     </structure>
                     <structure>
                         <property name="position">26</property>
-                        <property name="name">${devOrganisationIDConverted}/__Total__</property>
-                        <property name="dataType">float</property>
-                    </structure>
-                    <structure>
-                        <property name="position">27</property>
                         <property name="name">${rootOrganisationIDConverted}/vat-ch-7__6-net</property>
                         <property name="dataType">float</property>
                     </structure>
                     <structure>
-                        <property name="position">28</property>
+                        <property name="position">27</property>
                         <property name="name">${rootOrganisationIDConverted}/vat-ch-7__6-val</property>
                         <property name="dataType">float</property>
                     </structure>
                     <structure>
-                        <property name="position">29</property>
+                        <property name="position">28</property>
                         <property name="name">${rootOrganisationIDConverted}/vat-de-19-net</property>
                         <property name="dataType">float</property>
                     </structure>
                     <structure>
-                        <property name="position">30</property>
+                        <property name="position">29</property>
                         <property name="name">${rootOrganisationIDConverted}/vat-de-19-val</property>
                         <property name="dataType">float</property>
                     </structure>
                     <structure>
-                        <property name="position">31</property>
+                        <property name="position">30</property>
                         <property name="name">${rootOrganisationIDConverted}/vat-de-7-net</property>
                         <property name="dataType">float</property>
                     </structure>
                     <structure>
-                        <property name="position">32</property>
+                        <property name="position">31</property>
                         <property name="name">${rootOrganisationIDConverted}/vat-de-7-val</property>
                         <property name="dataType">float</property>
                     </structure>
                     <structure>
-                        <property name="position">33</property>
-                        <property name="name">product</property>
-                        <property name="dataType">any</property>
+                        <property name="position">32</property>
+                        <property name="name">${devOrganisationIDConverted}/__Total__</property>
+                        <property name="dataType">float</property>
                     </structure>
                 </list-property>
             </structure>
             <property name="dataSource">JFS-Datasource</property>
+            <list-property name="parameters">
+                <structure>
+                    <property name="name">articleContainerID</property>
+                    <property name="nativeName">articleContainerID</property>
+                    <property name="dataType">string</property>
+                    <property name="nativeDataType">1</property>
+                    <property name="position">1</property>
+                    <expression name="defaultValue">'__DUMMY_DEFAULT_PARAMETER_VALUE__'</expression>
+                    <property name="isOptional">false</property>
+                    <property name="allowNull">true</property>
+                    <property name="isInput">true</property>
+                </structure>
+            </list-property>
+            <list-property name="resultSet">
+                <structure>
+                    <property name="position">1</property>
+                    <property name="name">articleJDOID</property>
+                    <property name="nativeName">articleJDOID</property>
+                    <property name="dataType">string</property>
+                    <property name="nativeDataType">1</property>
+                </structure>
+                <structure>
+                    <property name="position">2</property>
+                    <property name="name">articleID</property>
+                    <property name="nativeName">articleID</property>
+                    <property name="dataType">decimal</property>
+                    <property name="nativeDataType">6</property>
+                </structure>
+                <structure>
+                    <property name="position">3</property>
+                    <property name="name">allocated</property>
+                    <property name="nativeName">allocated</property>
+                    <property name="dataType">integer</property>
+                    <property name="nativeDataType">4</property>
+                </structure>
+                <structure>
+                    <property name="position">4</property>
+                    <property name="name">allocationPending</property>
+                    <property name="nativeName">allocationPending</property>
+                    <property name="dataType">integer</property>
+                    <property name="nativeDataType">4</property>
+                </structure>
+                <structure>
+                    <property name="position">5</property>
+                    <property name="name">delivered</property>
+                    <property name="nativeName">delivered</property>
+                    <property name="dataType">integer</property>
+                    <property name="nativeDataType">4</property>
+                </structure>
+                <structure>
+                    <property name="position">6</property>
+                    <property name="name">deliveryJDOID</property>
+                    <property name="nativeName">deliveryJDOID</property>
+                    <property name="dataType">string</property>
+                    <property name="nativeDataType">1</property>
+                </structure>
+                <structure>
+                    <property name="position">7</property>
+                    <property name="name">deliveryNoteJDOID</property>
+                    <property name="nativeName">deliveryNoteJDOID</property>
+                    <property name="dataType">string</property>
+                    <property name="nativeDataType">1</property>
+                </structure>
+                <structure>
+                    <property name="position">8</property>
+                    <property name="name">createDT</property>
+                    <property name="nativeName">createDT</property>
+                    <property name="dataType">date</property>
+                    <property name="nativeDataType">5</property>
+                </structure>
+                <structure>
+                    <property name="position">9</property>
+                    <property name="name">createUserID</property>
+                    <property name="nativeName">createUserID</property>
+                    <property name="dataType">string</property>
+                    <property name="nativeDataType">1</property>
+                </structure>
+                <structure>
+                    <property name="position">10</property>
+                    <property name="name">createUserJDOID</property>
+                    <property name="nativeName">createUserJDOID</property>
+                    <property name="dataType">string</property>
+                    <property name="nativeDataType">1</property>
+                </structure>
+                <structure>
+                    <property name="position">11</property>
+                    <property name="name">currencyID</property>
+                    <property name="nativeName">currencyID</property>
+                    <property name="dataType">string</property>
+                    <property name="nativeDataType">1</property>
+                </structure>
+                <structure>
+                    <property name="position">12</property>
+                    <property name="name">currencyJDOID</property>
+                    <property name="nativeName">currencyJDOID</property>
+                    <property name="dataType">string</property>
+                    <property name="nativeDataType">1</property>
+                </structure>
+                <structure>
+                    <property name="position">13</property>
+                    <property name="name">invoiceJDOID</property>
+                    <property name="nativeName">invoiceJDOID</property>
+                    <property name="dataType">string</property>
+                    <property name="nativeDataType">1</property>
+                </structure>
+                <structure>
+                    <property name="position">14</property>
+                    <property name="name">offerJDOID</property>
+                    <property name="nativeName">offerJDOID</property>
+                    <property name="dataType">string</property>
+                    <property name="nativeDataType">1</property>
+                </structure>
+                <structure>
+                    <property name="position">15</property>
+                    <property name="name">orderJDOID</property>
+                    <property name="nativeName">orderJDOID</property>
+                    <property name="dataType">string</property>
+                    <property name="nativeDataType">1</property>
+                </structure>
+                <structure>
+                    <property name="position">16</property>
+                    <property name="name">productJDOID</property>
+                    <property name="nativeName">productJDOID</property>
+                    <property name="dataType">string</property>
+                    <property name="nativeDataType">1</property>
+                </structure>
+                <structure>
+                    <property name="position">17</property>
+                    <property name="name">productTypeJDOID</property>
+                    <property name="nativeName">productTypeJDOID</property>
+                    <property name="dataType">string</property>
+                    <property name="nativeDataType">1</property>
+                </structure>
+                <structure>
+                    <property name="position">18</property>
+                    <property name="name">productTypeName</property>
+                    <property name="nativeName">productTypeName</property>
+                    <property name="dataType">string</property>
+                    <property name="nativeDataType">1</property>
+                </structure>
+                <structure>
+                    <property name="position">19</property>
+                    <property name="name">receptionNoteJDOID</property>
+                    <property name="nativeName">receptionNoteJDOID</property>
+                    <property name="dataType">string</property>
+                    <property name="nativeDataType">1</property>
+                </structure>
+                <structure>
+                    <property name="position">20</property>
+                    <property name="name">reversed</property>
+                    <property name="nativeName">reversed</property>
+                    <property name="dataType">integer</property>
+                    <property name="nativeDataType">4</property>
+                </structure>
+                <structure>
+                    <property name="position">21</property>
+                    <property name="name">reversingArticleJDOID</property>
+                    <property name="nativeName">reversingArticleJDOID</property>
+                    <property name="dataType">string</property>
+                    <property name="nativeDataType">1</property>
+                </structure>
+                <structure>
+                    <property name="position">22</property>
+                    <property name="name">reversing</property>
+                    <property name="nativeName">reversing</property>
+                    <property name="dataType">integer</property>
+                    <property name="nativeDataType">4</property>
+                </structure>
+                <structure>
+                    <property name="position">23</property>
+                    <property name="name">reversedArticleJDOID</property>
+                    <property name="nativeName">reversedArticleJDOID</property>
+                    <property name="dataType">string</property>
+                    <property name="nativeDataType">1</property>
+                </structure>
+                <structure>
+                    <property name="position">24</property>
+                    <property name="name">tariffJDOID</property>
+                    <property name="nativeName">tariffJDOID</property>
+                    <property name="dataType">string</property>
+                    <property name="nativeDataType">1</property>
+                </structure>
+                <structure>
+                    <property name="position">25</property>
+                    <property name="name">tariffName</property>
+                    <property name="nativeName">tariffName</property>
+                    <property name="dataType">string</property>
+                    <property name="nativeDataType">1</property>
+                </structure>
+                <structure>
+                    <property name="position">26</property>
+                    <property name="name">${rootOrganisationIDConverted}/vat-ch-7__6-net</property>
+                    <property name="nativeName">${rootOrganisationIDConverted}/vat-ch-7__6-net</property>
+                    <property name="dataType">float</property>
+                    <property name="nativeDataType">3</property>
+                </structure>
+                <structure>
+                    <property name="position">27</property>
+                    <property name="name">${rootOrganisationIDConverted}/vat-ch-7__6-val</property>
+                    <property name="nativeName">${rootOrganisationIDConverted}/vat-ch-7__6-val</property>
+                    <property name="dataType">float</property>
+                    <property name="nativeDataType">3</property>
+                </structure>
+                <structure>
+                    <property name="position">28</property>
+                    <property name="name">${rootOrganisationIDConverted}/vat-de-19-net</property>
+                    <property name="nativeName">${rootOrganisationIDConverted}/vat-de-19-net</property>
+                    <property name="dataType">float</property>
+                    <property name="nativeDataType">3</property>
+                </structure>
+                <structure>
+                    <property name="position">29</property>
+                    <property name="name">${rootOrganisationIDConverted}/vat-de-19-val</property>
+                    <property name="nativeName">${rootOrganisationIDConverted}/vat-de-19-val</property>
+                    <property name="dataType">float</property>
+                    <property name="nativeDataType">3</property>
+                </structure>
+                <structure>
+                    <property name="position">30</property>
+                    <property name="name">${rootOrganisationIDConverted}/vat-de-7-net</property>
+                    <property name="nativeName">${rootOrganisationIDConverted}/vat-de-7-net</property>
+                    <property name="dataType">float</property>
+                    <property name="nativeDataType">3</property>
+                </structure>
+                <structure>
+                    <property name="position">31</property>
+                    <property name="name">${rootOrganisationIDConverted}/vat-de-7-val</property>
+                    <property name="nativeName">${rootOrganisationIDConverted}/vat-de-7-val</property>
+                    <property name="dataType">float</property>
+                    <property name="nativeDataType">3</property>
+                </structure>
+                <structure>
+                    <property name="position">32</property>
+                    <property name="name">${devOrganisationIDConverted}/__Total__</property>
+                    <property name="nativeName">${devOrganisationIDConverted}/__Total__</property>
+                    <property name="dataType">float</property>
+                    <property name="nativeDataType">3</property>
+                </structure>
+            </list-property>
             <property name="queryText">&lt;queryPropertySet>&lt;org.nightlabs.jfire.reporting.oda.jfs.JFSQueryPropertySet>
   &lt;scriptRegistryItemID>
-    &lt;organisationID>dev.jfire.org&lt;/organisationID>
+    &lt;organisationID>${devOrganisationID}&lt;/organisationID>
     &lt;scriptRegistryItemType>JFireReportingTrade-Scripting-ArticleContainerData&lt;/scriptRegistryItemType>
     &lt;scriptRegistryItemID>ArticleList&lt;/scriptRegistryItemID>
   &lt;/scriptRegistryItemID>
@@ -376,153 +594,354 @@ JFireReportingHelper.getJDOObject(row["productJDOID"]);</expression>
     &lt;no-comparator/>
   &lt;/properties>
 &lt;/org.nightlabs.jfire.reporting.oda.jfs.JFSQueryPropertySet>&lt;/queryPropertySet></property>
+            <xml-property name="designerValues"><![CDATA[<?xml version="1.0" encoding="UTF-8"?>
+<model:DesignValues xmlns:design="http://www.eclipse.org/datatools/connectivity/oda/design" xmlns:model="http://www.eclipse.org/birt/report/model/adapter/odaModel">
+  <Version>1.0</Version>
+  <design:DataSetParameters>
+    <design:parameterDefinitions>
+      <design:inOutMode>In</design:inOutMode>
+      <design:attributes>
+        <design:name>articleContainerID</design:name>
+        <design:position>1</design:position>
+        <design:nativeDataTypeCode>1</design:nativeDataTypeCode>
+        <design:precision>0</design:precision>
+        <design:scale>0</design:scale>
+        <design:nullability>Nullable</design:nullability>
+      </design:attributes>
+      <design:inputAttributes>
+        <design:elementAttributes>
+          <design:defaultScalarValue>__DUMMY_DEFAULT_PARAMETER_VALUE__</design:defaultScalarValue>
+        </design:elementAttributes>
+      </design:inputAttributes>
+    </design:parameterDefinitions>
+  </design:DataSetParameters>
+</model:DesignValues>]]></xml-property>
         </oda-data-set>
         <oda-data-set extensionID="org.nightlabs.jfire.reporting.oda.jfs.JFSDataSet" name="CustomerPropretySet" id="171">
             <text-property name="displayName">CustomerPropretySet</text-property>
-            <list-property name="parameters">
-                <structure>
-                    <property name="name">propertySetID</property>
-                    <property name="nativeDataType">0</property>
-                    <property name="position">1</property>
-                    <property name="isOptional">false</property>
-                    <property name="allowNull">false</property>
-                    <property name="isInput">true</property>
-                </structure>
-            </list-property>
-            <list-property name="resultSetHints">
-                <structure>
-                    <property name="position">8</property>
-                    <property name="name">CreditCard_8</property>
-                </structure>
-            </list-property>
             <structure name="cachedMetaData">
                 <list-property name="resultSet">
                     <structure>
                         <property name="position">1</property>
-                        <property name="name">AccountHolder</property>
+                        <property name="name">DisplayName</property>
                         <property name="dataType">string</property>
                     </structure>
                     <structure>
                         <property name="position">2</property>
-                        <property name="name">BankData</property>
-                        <property name="dataType">integer</property>
-                    </structure>
-                    <structure>
-                        <property name="position">3</property>
-                        <property name="name">BankCode</property>
+                        <property name="name">BankData_AccountHolder</property>
                         <property name="dataType">string</property>
                     </structure>
                     <structure>
+                        <property name="position">3</property>
+                        <property name="name">BankData_AccountNumber</property>
+                        <property name="dataType">integer</property>
+                    </structure>
+                    <structure>
                         <property name="position">4</property>
-                        <property name="name">BankName</property>
+                        <property name="name">BankData_BankCode</property>
                         <property name="dataType">string</property>
                     </structure>
                     <structure>
                         <property name="position">5</property>
-                        <property name="name">Comment</property>
+                        <property name="name">BankData_BankName</property>
                         <property name="dataType">string</property>
                     </structure>
                     <structure>
                         <property name="position">6</property>
-                        <property name="name">CreditCardHolder</property>
+                        <property name="name">Comment_Comment</property>
                         <property name="dataType">string</property>
                     </structure>
                     <structure>
                         <property name="position">7</property>
-                        <property name="name">CreditCard</property>
-                        <property name="dataType">integer</property>
+                        <property name="name">CreditCard_CreditCardHolder</property>
+                        <property name="dataType">string</property>
                     </structure>
                     <structure>
                         <property name="position">8</property>
-                        <property name="name">CreditCard_8</property>
+                        <property name="name">CreditCard_ExpiryMonth</property>
                         <property name="dataType">integer</property>
                     </structure>
                     <structure>
                         <property name="position">9</property>
-                        <property name="name">Number</property>
-                        <property name="dataType">string</property>
+                        <property name="name">CreditCard_ExpiryYear</property>
+                        <property name="dataType">integer</property>
                     </structure>
                     <structure>
                         <property name="position">10</property>
-                        <property name="name">EMail</property>
+                        <property name="name">CreditCard_Number</property>
                         <property name="dataType">string</property>
                     </structure>
                     <structure>
                         <property name="position">11</property>
-                        <property name="name">Homepage</property>
+                        <property name="name">Internet_EMail</property>
                         <property name="dataType">string</property>
                     </structure>
                     <structure>
                         <property name="position">12</property>
-                        <property name="name">Company</property>
+                        <property name="name">Internet_Homepage</property>
                         <property name="dataType">string</property>
                     </structure>
                     <structure>
                         <property name="position">13</property>
-                        <property name="name">DateOfBirth</property>
-                        <property name="dataType">date-time</property>
-                    </structure>
-                    <structure>
-                        <property name="position">14</property>
-                        <property name="name">FirstName</property>
+                        <property name="name">PersonalData_Company</property>
                         <property name="dataType">string</property>
                     </structure>
                     <structure>
+                        <property name="position">14</property>
+                        <property name="name">PersonalData_DateOfBirth</property>
+                        <property name="dataType">date</property>
+                    </structure>
+                    <structure>
                         <property name="position">15</property>
-                        <property name="name">Name</property>
+                        <property name="name">PersonalData_FirstName</property>
                         <property name="dataType">string</property>
                     </structure>
                     <structure>
                         <property name="position">16</property>
-                        <property name="name">Salutation</property>
+                        <property name="name">PersonalData_Name</property>
                         <property name="dataType">string</property>
                     </structure>
                     <structure>
                         <property name="position">17</property>
-                        <property name="name">Title</property>
+                        <property name="name">PersonalData_Salutation</property>
                         <property name="dataType">string</property>
                     </structure>
                     <structure>
                         <property name="position">18</property>
-                        <property name="name">Fax</property>
+                        <property name="name">PersonalData_Title</property>
                         <property name="dataType">string</property>
                     </structure>
                     <structure>
                         <property name="position">19</property>
-                        <property name="name">PrimaryPhone</property>
+                        <property name="name">Phone_Fax</property>
                         <property name="dataType">string</property>
                     </structure>
                     <structure>
                         <property name="position">20</property>
-                        <property name="name">Address</property>
+                        <property name="name">Phone_PrimaryPhone</property>
                         <property name="dataType">string</property>
                     </structure>
                     <structure>
                         <property name="position">21</property>
-                        <property name="name">City</property>
+                        <property name="name">PostAddress_Address</property>
                         <property name="dataType">string</property>
                     </structure>
                     <structure>
                         <property name="position">22</property>
-                        <property name="name">Country</property>
+                        <property name="name">PostAddress_City</property>
                         <property name="dataType">string</property>
                     </structure>
                     <structure>
                         <property name="position">23</property>
-                        <property name="name">PostCode</property>
+                        <property name="name">PostAddress_Country</property>
                         <property name="dataType">string</property>
                     </structure>
                     <structure>
                         <property name="position">24</property>
-                        <property name="name">Region</property>
+                        <property name="name">PostAddress_PostCode</property>
+                        <property name="dataType">string</property>
+                    </structure>
+                    <structure>
+                        <property name="position">25</property>
+                        <property name="name">PostAddress_Region</property>
                         <property name="dataType">string</property>
                     </structure>
                 </list-property>
             </structure>
             <property name="dataSource">JFS-Datasource</property>
+            <list-property name="parameters">
+                <structure>
+                    <property name="name">propertySetID</property>
+                    <property name="nativeName">propertySetID</property>
+                    <property name="dataType">string</property>
+                    <property name="nativeDataType">1</property>
+                    <property name="position">1</property>
+                    <expression name="defaultValue">'__DUMMY_DEFAULT_PARAMETER_VALUE__'</expression>
+                    <property name="isOptional">false</property>
+                    <property name="allowNull">true</property>
+                    <property name="isInput">true</property>
+                </structure>
+            </list-property>
+            <list-property name="resultSet">
+                <structure>
+                    <property name="position">1</property>
+                    <property name="name">DisplayName</property>
+                    <property name="nativeName">DisplayName</property>
+                    <property name="dataType">string</property>
+                    <property name="nativeDataType">1</property>
+                </structure>
+                <structure>
+                    <property name="position">2</property>
+                    <property name="name">BankData_AccountHolder</property>
+                    <property name="nativeName">BankData_AccountHolder</property>
+                    <property name="dataType">string</property>
+                    <property name="nativeDataType">1</property>
+                </structure>
+                <structure>
+                    <property name="position">3</property>
+                    <property name="name">BankData_AccountNumber</property>
+                    <property name="nativeName">BankData_AccountNumber</property>
+                    <property name="dataType">integer</property>
+                    <property name="nativeDataType">2</property>
+                </structure>
+                <structure>
+                    <property name="position">4</property>
+                    <property name="name">BankData_BankCode</property>
+                    <property name="nativeName">BankData_BankCode</property>
+                    <property name="dataType">string</property>
+                    <property name="nativeDataType">1</property>
+                </structure>
+                <structure>
+                    <property name="position">5</property>
+                    <property name="name">BankData_BankName</property>
+                    <property name="nativeName">BankData_BankName</property>
+                    <property name="dataType">string</property>
+                    <property name="nativeDataType">1</property>
+                </structure>
+                <structure>
+                    <property name="position">6</property>
+                    <property name="name">Comment_Comment</property>
+                    <property name="nativeName">Comment_Comment</property>
+                    <property name="dataType">string</property>
+                    <property name="nativeDataType">1</property>
+                </structure>
+                <structure>
+                    <property name="position">7</property>
+                    <property name="name">CreditCard_CreditCardHolder</property>
+                    <property name="nativeName">CreditCard_CreditCardHolder</property>
+                    <property name="dataType">string</property>
+                    <property name="nativeDataType">1</property>
+                </structure>
+                <structure>
+                    <property name="position">8</property>
+                    <property name="name">CreditCard_ExpiryMonth</property>
+                    <property name="nativeName">CreditCard_ExpiryMonth</property>
+                    <property name="dataType">integer</property>
+                    <property name="nativeDataType">2</property>
+                </structure>
+                <structure>
+                    <property name="position">9</property>
+                    <property name="name">CreditCard_ExpiryYear</property>
+                    <property name="nativeName">CreditCard_ExpiryYear</property>
+                    <property name="dataType">integer</property>
+                    <property name="nativeDataType">2</property>
+                </structure>
+                <structure>
+                    <property name="position">10</property>
+                    <property name="name">CreditCard_Number</property>
+                    <property name="nativeName">CreditCard_Number</property>
+                    <property name="dataType">string</property>
+                    <property name="nativeDataType">1</property>
+                </structure>
+                <structure>
+                    <property name="position">11</property>
+                    <property name="name">Internet_EMail</property>
+                    <property name="nativeName">Internet_EMail</property>
+                    <property name="dataType">string</property>
+                    <property name="nativeDataType">1</property>
+                </structure>
+                <structure>
+                    <property name="position">12</property>
+                    <property name="name">Internet_Homepage</property>
+                    <property name="nativeName">Internet_Homepage</property>
+                    <property name="dataType">string</property>
+                    <property name="nativeDataType">1</property>
+                </structure>
+                <structure>
+                    <property name="position">13</property>
+                    <property name="name">PersonalData_Company</property>
+                    <property name="nativeName">PersonalData_Company</property>
+                    <property name="dataType">string</property>
+                    <property name="nativeDataType">1</property>
+                </structure>
+                <structure>
+                    <property name="position">14</property>
+                    <property name="name">PersonalData_DateOfBirth</property>
+                    <property name="nativeName">PersonalData_DateOfBirth</property>
+                    <property name="dataType">date</property>
+                    <property name="nativeDataType">5</property>
+                </structure>
+                <structure>
+                    <property name="position">15</property>
+                    <property name="name">PersonalData_FirstName</property>
+                    <property name="nativeName">PersonalData_FirstName</property>
+                    <property name="dataType">string</property>
+                    <property name="nativeDataType">1</property>
+                </structure>
+                <structure>
+                    <property name="position">16</property>
+                    <property name="name">PersonalData_Name</property>
+                    <property name="nativeName">PersonalData_Name</property>
+                    <property name="dataType">string</property>
+                    <property name="nativeDataType">1</property>
+                </structure>
+                <structure>
+                    <property name="position">17</property>
+                    <property name="name">PersonalData_Salutation</property>
+                    <property name="nativeName">PersonalData_Salutation</property>
+                    <property name="dataType">string</property>
+                    <property name="nativeDataType">1</property>
+                </structure>
+                <structure>
+                    <property name="position">18</property>
+                    <property name="name">PersonalData_Title</property>
+                    <property name="nativeName">PersonalData_Title</property>
+                    <property name="dataType">string</property>
+                    <property name="nativeDataType">1</property>
+                </structure>
+                <structure>
+                    <property name="position">19</property>
+                    <property name="name">Phone_Fax</property>
+                    <property name="nativeName">Phone_Fax</property>
+                    <property name="dataType">string</property>
+                    <property name="nativeDataType">1</property>
+                </structure>
+                <structure>
+                    <property name="position">20</property>
+                    <property name="name">Phone_PrimaryPhone</property>
+                    <property name="nativeName">Phone_PrimaryPhone</property>
+                    <property name="dataType">string</property>
+                    <property name="nativeDataType">1</property>
+                </structure>
+                <structure>
+                    <property name="position">21</property>
+                    <property name="name">PostAddress_Address</property>
+                    <property name="nativeName">PostAddress_Address</property>
+                    <property name="dataType">string</property>
+                    <property name="nativeDataType">1</property>
+                </structure>
+                <structure>
+                    <property name="position">22</property>
+                    <property name="name">PostAddress_City</property>
+                    <property name="nativeName">PostAddress_City</property>
+                    <property name="dataType">string</property>
+                    <property name="nativeDataType">1</property>
+                </structure>
+                <structure>
+                    <property name="position">23</property>
+                    <property name="name">PostAddress_Country</property>
+                    <property name="nativeName">PostAddress_Country</property>
+                    <property name="dataType">string</property>
+                    <property name="nativeDataType">1</property>
+                </structure>
+                <structure>
+                    <property name="position">24</property>
+                    <property name="name">PostAddress_PostCode</property>
+                    <property name="nativeName">PostAddress_PostCode</property>
+                    <property name="dataType">string</property>
+                    <property name="nativeDataType">1</property>
+                </structure>
+                <structure>
+                    <property name="position">25</property>
+                    <property name="name">PostAddress_Region</property>
+                    <property name="nativeName">PostAddress_Region</property>
+                    <property name="dataType">string</property>
+                    <property name="nativeDataType">1</property>
+                </structure>
+            </list-property>
             <property name="queryText">&lt;queryPropertySet>&lt;org.nightlabs.jfire.reporting.oda.jfs.JFSQueryPropertySet>
   &lt;scriptRegistryItemID>
-    &lt;organisationID>chezfrancois.jfire.org&lt;/organisationID>
+    &lt;organisationID>${devOrganisationID}&lt;/organisationID>
     &lt;scriptRegistryItemType>JFireReporting-Scripting-PropertySet&lt;/scriptRegistryItemType>
     &lt;scriptRegistryItemID>PropertySet&lt;/scriptRegistryItemID>
   &lt;/scriptRegistryItemID>
@@ -538,6 +957,28 @@ JFireReportingHelper.getJDOObject(row["productJDOID"]);</expression>
     &lt;/entry>
   &lt;/properties>
 &lt;/org.nightlabs.jfire.reporting.oda.jfs.JFSQueryPropertySet>&lt;/queryPropertySet></property>
+            <xml-property name="designerValues"><![CDATA[<?xml version="1.0" encoding="UTF-8"?>
+<model:DesignValues xmlns:design="http://www.eclipse.org/datatools/connectivity/oda/design" xmlns:model="http://www.eclipse.org/birt/report/model/adapter/odaModel">
+  <Version>1.0</Version>
+  <design:DataSetParameters>
+    <design:parameterDefinitions>
+      <design:inOutMode>In</design:inOutMode>
+      <design:attributes>
+        <design:name>propertySetID</design:name>
+        <design:position>1</design:position>
+        <design:nativeDataTypeCode>1</design:nativeDataTypeCode>
+        <design:precision>0</design:precision>
+        <design:scale>0</design:scale>
+        <design:nullability>Nullable</design:nullability>
+      </design:attributes>
+      <design:inputAttributes>
+        <design:elementAttributes>
+          <design:defaultScalarValue>__DUMMY_DEFAULT_PARAMETER_VALUE__</design:defaultScalarValue>
+        </design:elementAttributes>
+      </design:inputAttributes>
+    </design:parameterDefinitions>
+  </design:DataSetParameters>
+</model:DesignValues>]]></xml-property>
         </oda-data-set>
     </data-sets>
     <page-setup>
@@ -567,123 +1008,33 @@ JFireReportingHelper.createDataSetParam(JDOHelper.getObjectId(customer.getPerson
             </list-property>
             <list-property name="boundDataColumns">
                 <structure>
-                    <property name="name">AccountHolder</property>
-                    <expression name="expression">dataSetRow["AccountHolder"]</expression>
-                    <property name="dataType">string</property>
-                </structure>
-                <structure>
-                    <property name="name">BankData</property>
-                    <expression name="expression">dataSetRow["BankData"]</expression>
-                    <property name="dataType">integer</property>
-                </structure>
-                <structure>
-                    <property name="name">BankCode</property>
-                    <expression name="expression">dataSetRow["BankCode"]</expression>
-                    <property name="dataType">string</property>
-                </structure>
-                <structure>
-                    <property name="name">BankName</property>
-                    <expression name="expression">dataSetRow["BankName"]</expression>
-                    <property name="dataType">string</property>
-                </structure>
-                <structure>
-                    <property name="name">Comment</property>
-                    <expression name="expression">dataSetRow["Comment"]</expression>
-                    <property name="dataType">string</property>
-                </structure>
-                <structure>
-                    <property name="name">CreditCardHolder</property>
-                    <expression name="expression">dataSetRow["CreditCardHolder"]</expression>
-                    <property name="dataType">string</property>
-                </structure>
-                <structure>
-                    <property name="name">CreditCard</property>
-                    <expression name="expression">dataSetRow["CreditCard"]</expression>
-                    <property name="dataType">integer</property>
-                </structure>
-                <structure>
-                    <property name="name">CreditCard_8</property>
-                    <expression name="expression">dataSetRow["CreditCard_8"]</expression>
-                    <property name="dataType">integer</property>
-                </structure>
-                <structure>
-                    <property name="name">Number</property>
-                    <expression name="expression">dataSetRow["Number"]</expression>
-                    <property name="dataType">string</property>
-                </structure>
-                <structure>
-                    <property name="name">EMail</property>
-                    <expression name="expression">dataSetRow["EMail"]</expression>
-                    <property name="dataType">string</property>
-                </structure>
-                <structure>
-                    <property name="name">Homepage</property>
-                    <expression name="expression">dataSetRow["Homepage"]</expression>
-                    <property name="dataType">string</property>
-                </structure>
-                <structure>
-                    <property name="name">Company</property>
-                    <expression name="expression">dataSetRow["Company"]</expression>
-                    <property name="dataType">string</property>
-                </structure>
-                <structure>
-                    <property name="name">DateOfBirth</property>
-                    <expression name="expression">dataSetRow["DateOfBirth"]</expression>
+                    <property name="name">Name</property>
+                    <expression name="expression">dataSetRow["PersonalData_Name"]</expression>
                     <property name="dataType">string</property>
                 </structure>
                 <structure>
                     <property name="name">FirstName</property>
-                    <expression name="expression">dataSetRow["FirstName"]</expression>
-                    <property name="dataType">string</property>
-                </structure>
-                <structure>
-                    <property name="name">Name</property>
-                    <expression name="expression">dataSetRow["Name"]</expression>
-                    <property name="dataType">string</property>
-                </structure>
-                <structure>
-                    <property name="name">Salutation</property>
-                    <expression name="expression">dataSetRow["Salutation"]</expression>
-                    <property name="dataType">string</property>
-                </structure>
-                <structure>
-                    <property name="name">Title</property>
-                    <expression name="expression">dataSetRow["Title"]</expression>
-                    <property name="dataType">string</property>
-                </structure>
-                <structure>
-                    <property name="name">Fax</property>
-                    <expression name="expression">dataSetRow["Fax"]</expression>
-                    <property name="dataType">string</property>
-                </structure>
-                <structure>
-                    <property name="name">PrimaryPhone</property>
-                    <expression name="expression">dataSetRow["PrimaryPhone"]</expression>
-                    <property name="dataType">string</property>
-                </structure>
-                <structure>
-                    <property name="name">Address</property>
-                    <expression name="expression">dataSetRow["Address"]</expression>
-                    <property name="dataType">string</property>
-                </structure>
-                <structure>
-                    <property name="name">City</property>
-                    <expression name="expression">dataSetRow["City"]</expression>
-                    <property name="dataType">string</property>
-                </structure>
-                <structure>
-                    <property name="name">Country</property>
-                    <expression name="expression">dataSetRow["Country"]</expression>
+                    <expression name="expression">dataSetRow["PersonalData_FirstName"]</expression>
                     <property name="dataType">string</property>
                 </structure>
                 <structure>
                     <property name="name">PostCode</property>
-                    <expression name="expression">dataSetRow["PostCode"]</expression>
+                    <expression name="expression">dataSetRow["PostAddress_PostCode"]</expression>
                     <property name="dataType">string</property>
                 </structure>
                 <structure>
-                    <property name="name">Region</property>
-                    <expression name="expression">dataSetRow["Region"]</expression>
+                    <property name="name">City</property>
+                    <expression name="expression">dataSetRow["PostAddress_City"]</expression>
+                    <property name="dataType">string</property>
+                </structure>
+                <structure>
+                    <property name="name">Country</property>
+                    <expression name="expression">dataSetRow["PostAddress_Country"]</expression>
+                    <property name="dataType">string</property>
+                </structure>
+                <structure>
+                    <property name="name">Company</property>
+                    <expression name="expression">dataSetRow["PersonalData_Company"]</expression>
                     <property name="dataType">string</property>
                 </structure>
             </list-property>
@@ -762,6 +1113,7 @@ if (!"".equals(row["City"]))
                                 <cell id="98">
                                     <property name="textAlign">right</property>
                                     <image id="213">
+                                        <property name="source">embed</property>
                                         <property name="imageName">JFire-Logo.jpg</property>
                                     </image>
                                     <text-data id="127">
@@ -769,15 +1121,7 @@ if (!"".equals(row["City"]))
                                         <property name="fontSize">larger</property>
                                         <property name="paddingTop">10pt</property>
                                         <property name="paddingRight">8pt</property>
-                                        <expression name="valueExpr">"Delivery note "+params["articleContainerID"].organisationID</expression>
-                                        <property name="contentType">html</property>
-                                    </text-data>
-                                    <text-data id="170">
-                                        <property name="fontFamily">"Arial"</property>
-                                        <property name="fontSize">larger</property>
-                                        <property name="paddingRight">8pt</property>
-                                        <expression name="valueExpr">importClass(Packages.org.nightlabs.jdo.ObjectIDUtil)
-"Delivery note # "+params["articleContainerID"].deliveryNoteIDPrefix+"/"+ObjectIDUtil.longObjectIDFieldToString(params["articleContainerID"].deliveryNoteID)</expression>
+                                        <expression name="valueExpr">JFireReportingHelper.getVar("articleContainer").getOrganisationID()</expression>
                                         <property name="contentType">html</property>
                                     </text-data>
                                 </cell>
@@ -793,6 +1137,26 @@ if (!"".equals(row["City"]))
                 </row>
             </footer>
         </table>
+        <text-data id="217">
+            <property name="fontFamily">"Arial"</property>
+            <property name="fontWeight">bold</property>
+            <property name="paddingTop">1pt</property>
+            <property name="paddingLeft">10pt</property>
+            <property name="paddingBottom">20pt</property>
+            <expression name="valueExpr">articleContainerType = "";
+articleContainer = JFireReportingHelper.getVar("articleContainer");
+if (articleContainer.getClass().getSimpleName() == "Invoice") {
+  articleContainerType = "Invoice"; // TODO: Localize this
+} else if (articleContainer.getClass().getSimpleName() == "Offer") {
+  articleContainerType = "Offer"; // TODO: Localize this
+} else if (articleContainer.getClass().getSimpleName() == "Order") {
+  articleContainerType = "Order"; // TODO: Localize this
+} else if (articleContainer.getClass().getSimpleName() == "DeliveryNote") {
+  articleContainerType = "DeliveryNote"; // TODO: Localize this
+} 
+articleContainerType + " " + articleContainer.getArticleContainerIDPrefix() + " / " + articleContainer.getArticleContainerIDAsString()</expression>
+            <property name="contentType">html</property>
+        </text-data>
         <table id="62">
             <property name="borderBottomColor">#C0C0C0</property>
             <property name="borderBottomStyle">solid</property>
@@ -827,8 +1191,8 @@ JFireReportingHelper.createDataSetParam(params["articleContainerID"])</expressio
                 </structure>
                 <structure>
                     <property name="name">articleID</property>
-                    <expression name="expression">dataSetRow["articleID"]</expression>
-                    <property name="dataType">decimal</property>
+                    <expression name="expression">JFireReportingHelper.getJDOObject(dataSetRow["articleJDOID"]).getArticleIDAsString()</expression>
+                    <property name="dataType">string</property>
                 </structure>
                 <structure>
                     <property name="name">allocated</property>
@@ -990,10 +1354,6 @@ JFireReportingHelper.createDataSetParam(params["articleContainerID"])</expressio
                     <expression name="expression">Total.sum(dataSetRow["${devOrganisationIDConverted}/__Total__"])</expression>
                     <property name="dataType">float</property>
                 </structure>
-                <structure>
-                    <property name="name">product</property>
-                    <expression name="expression">dataSetRow["product"]</expression>
-                </structure>
             </list-property>
             <column id="81">
                 <property name="width">0.458in</property>
@@ -1001,21 +1361,8 @@ JFireReportingHelper.createDataSetParam(params["articleContainerID"])</expressio
             <column id="82">
                 <property name="width">2.677in</property>
             </column>
-            <column id="145">
-                <property name="width">1.239in</property>
-            </column>
-            <column id="191">
-                <property name="width">1in</property>
-            </column>
             <column id="182">
                 <property name="width">0.395in</property>
-            </column>
-            <column id="83">
-                <property name="width">1in</property>
-            </column>
-            <column id="165">
-                <property name="width">0.385in</property>
-                <property name="textAlign">right</property>
             </column>
             <header>
                 <row id="63">
@@ -1035,42 +1382,12 @@ JFireReportingHelper.createDataSetParam(params["articleContainerID"])</expressio
                             <text-property name="text" key="articleDescription">Article name</text-property>
                         </label>
                     </cell>
-                    <cell id="140">
-                        <label id="146">
-                            <property name="fontFamily">"Arial"</property>
-                            <property name="fontWeight">bold</property>
-                            <text-property name="text" key="tariff">Tariff</text-property>
-                        </label>
-                    </cell>
-                    <cell id="185">
-                        <label id="192">
-                            <property name="fontFamily">"Arial"</property>
-                            <property name="fontWeight">bold</property>
-                            <property name="textAlign">right</property>
-                            <text-property name="text" key="singlePrice">Single Price</text-property>
-                        </label>
-                    </cell>
                     <cell id="176">
                         <label id="183">
                             <property name="fontFamily">"Arial"</property>
                             <property name="fontWeight">bold</property>
                             <property name="textAlign">right</property>
                             <text-property name="text" key="quantity">Qty</text-property>
-                        </label>
-                    </cell>
-                    <cell id="68">
-                        <label id="69">
-                            <property name="fontFamily">"Arial"</property>
-                            <property name="fontWeight">bold</property>
-                            <property name="textAlign">right</property>
-                            <text-property name="text" key="totalPrice">Amount</text-property>
-                        </label>
-                    </cell>
-                    <cell id="159">
-                        <label id="166">
-                            <property name="fontFamily">"Arial"</property>
-                            <property name="fontWeight">bold</property>
-                            <text-property name="text" key="currency"></text-property>
                         </label>
                     </cell>
                 </row>
@@ -1080,11 +1397,7 @@ JFireReportingHelper.createDataSetParam(params["articleContainerID"])</expressio
                         <property name="paddingLeft">5pt</property>
                     </cell>
                     <cell id="130"/>
-                    <cell id="141"/>
-                    <cell id="186"/>
                     <cell id="177"/>
-                    <cell id="131"/>
-                    <cell id="160"/>
                 </row>
             </header>
             <detail>
@@ -1092,19 +1405,17 @@ JFireReportingHelper.createDataSetParam(params["articleContainerID"])</expressio
                     <list-property name="visibility">
                         <structure>
                             <property name="format">all</property>
-                            <expression name="valueExpr">//row["product"].getClass().getName() == "org.nightlabs.jfire.dynamictrade.store.DynamicProduct"
-isDynamicProduct(row["product"])</expression>
+                            <expression name="valueExpr">isDynamicProduct(row["productJDOID"])</expression>
                         </structure>
                     </list-property>
                     <cell id="71">
                         <property name="paddingTop">3pt</property>
                         <property name="paddingLeft">5pt</property>
                         <property name="paddingBottom">10pt</property>
-                        <text-data id="214">
-                            <expression name="valueExpr">importClass(Packages.org.nightlabs.jdo.ObjectIDUtil);
-ObjectIDUtil.longObjectIDFieldToString(row["articleID"])</expression>
-                            <property name="contentType">html</property>
-                        </text-data>
+                        <data id="138">
+                            <property name="fontFamily">"Arial"</property>
+                            <property name="resultSetColumn">articleID</property>
+                        </data>
                     </cell>
                     <cell id="73">
                         <property name="paddingTop">3pt</property>
@@ -1112,27 +1423,6 @@ ObjectIDUtil.longObjectIDFieldToString(row["articleID"])</expression>
                         <data id="139">
                             <property name="fontFamily">"Arial"</property>
                             <property name="resultSetColumn">productTypeName</property>
-                        </data>
-                    </cell>
-                    <cell id="142">
-                        <property name="paddingTop">3pt</property>
-                        <property name="paddingBottom">10pt</property>
-                        <data id="147">
-                            <property name="fontFamily">"Arial"</property>
-                            <property name="resultSetColumn">tariffName</property>
-                        </data>
-                    </cell>
-                    <cell id="187">
-                        <property name="paddingTop">3pt</property>
-                        <property name="paddingBottom">10pt</property>
-                        <data id="208">
-                            <property name="fontFamily">"Arial"</property>
-                            <structure name="numberFormat">
-                                <property name="category">Currency</property>
-                                <property name="pattern">###0.00</property>
-                            </structure>
-                            <property name="textAlign">right</property>
-                            <property name="resultSetColumn">${devOrganisationIDConverted}/__Total__</property>
                         </data>
                     </cell>
                     <cell id="178">
@@ -1145,72 +1435,31 @@ ObjectIDUtil.longObjectIDFieldToString(row["articleID"])</expression>
                             <property name="contentType">html</property>
                         </text-data>
                     </cell>
-                    <cell id="75">
-                        <property name="paddingTop">3pt</property>
-                        <property name="paddingBottom">10pt</property>
-                        <data id="148">
-                            <property name="fontFamily">"Arial"</property>
-                            <structure name="numberFormat">
-                                <property name="category">Fixed</property>
-                                <property name="pattern">Fixed</property>
-                            </structure>
-                            <property name="textAlign">right</property>
-                            <property name="resultSetColumn">${devOrganisationIDConverted}/__Total__</property>
-                        </data>
-                    </cell>
-                    <cell id="161">
-                        <property name="paddingTop">3pt</property>
-                        <property name="paddingBottom">10pt</property>
-                        <data id="167">
-                            <property name="fontFamily">"Arial"</property>
-                            <property name="resultSetColumn">currencyID</property>
-                        </data>
-                    </cell>
                 </row>
                 <row id="193">
                     <list-property name="visibility">
                         <structure>
                             <property name="format">all</property>
-                            <expression name="valueExpr">!isDynamicProduct(row["product"])</expression>
+                            <expression name="valueExpr">!isDynamicProduct(row["productJDOID"])</expression>
                         </structure>
                     </list-property>
                     <cell id="194">
                         <property name="paddingTop">3pt</property>
                         <property name="paddingLeft">5pt</property>
                         <property name="paddingBottom">10pt</property>
-                        <text-data id="215">
-                            <expression name="valueExpr">importClass(Packages.org.nightlabs.jdo.ObjectIDUtil);
-ObjectIDUtil.longObjectIDFieldToString(row["articleID"])</expression>
-                            <property name="contentType">html</property>
-                        </text-data>
+                        <data id="201">
+                            <property name="fontFamily">"Arial"</property>
+                            <property name="resultSetColumn">articleID</property>
+                        </data>
                     </cell>
                     <cell id="195">
                         <property name="paddingTop">3pt</property>
                         <property name="paddingBottom">10pt</property>
                         <text-data id="202">
                             <property name="fontFamily">"Arial"</property>
-                            <expression name="valueExpr">if (isDynamicProduct(row["product"])) 
-  JFireReportingHelper.setBRLineBreaks(row["product"].getName().getText());</expression>
-                            <property name="contentType">html</property>
-                        </text-data>
-                    </cell>
-                    <cell id="196">
-                        <property name="paddingTop">3pt</property>
-                        <property name="paddingBottom">10pt</property>
-                        <data id="203">
-                            <property name="fontFamily">"Arial"</property>
-                            <property name="resultSetColumn">tariffName</property>
-                        </data>
-                    </cell>
-                    <cell id="197">
-                        <property name="paddingTop">3pt</property>
-                        <property name="paddingBottom">10pt</property>
-                        <text-data id="204">
-                            <property name="fontFamily">"Arial"</property>
-                            <property name="textAlign">right</property>
-                            <expression name="valueExpr">if (isDynamicProduct(row["product"])) {
-  price = row["product"].getSinglePrice();
-  price.getAmountAsDouble().toFixed(price.getCurrency().getDecimalDigitCount())
+                            <expression name="valueExpr">if (isDynamicProduct(row["productJDOID"]))  {
+  product = JFireReportingHelper.getJDOObject(row["productJDOID"]);
+  JFireReportingHelper.setBRLineBreaks(product.getName().getText());
 }</expression>
                             <property name="contentType">html</property>
                         </text-data>
@@ -1221,30 +1470,12 @@ ObjectIDUtil.longObjectIDFieldToString(row["articleID"])</expression>
                         <text-data id="207">
                             <property name="fontFamily">"Arial"</property>
                             <property name="textAlign">right</property>
-                            <expression name="valueExpr">if (isDynamicProduct(row["product"])) row["product"].getQuantity()</expression>
+                            <expression name="valueExpr">if (isDynamicProduct(row["productJDOID"])) {
+  product = JFireReportingHelper.getJDOObject(row["productJDOID"]);
+  product.getQuantity()
+}</expression>
                             <property name="contentType">html</property>
                         </text-data>
-                    </cell>
-                    <cell id="199">
-                        <property name="paddingTop">3pt</property>
-                        <property name="paddingBottom">10pt</property>
-                        <data id="205">
-                            <property name="fontFamily">"Arial"</property>
-                            <structure name="numberFormat">
-                                <property name="category">Currency</property>
-                                <property name="pattern">###0.00</property>
-                            </structure>
-                            <property name="textAlign">right</property>
-                            <property name="resultSetColumn">${devOrganisationIDConverted}/__Total__</property>
-                        </data>
-                    </cell>
-                    <cell id="200">
-                        <property name="paddingTop">3pt</property>
-                        <property name="paddingBottom">10pt</property>
-                        <data id="206">
-                            <property name="fontFamily">"Arial"</property>
-                            <property name="resultSetColumn">currencyID</property>
-                        </data>
                     </cell>
                 </row>
             </detail>
@@ -1252,108 +1483,7 @@ ObjectIDUtil.longObjectIDFieldToString(row["articleID"])</expression>
                 <row id="132">
                     <cell id="133"/>
                     <cell id="134"/>
-                    <cell id="143"/>
-                    <cell id="188"/>
                     <cell id="179"/>
-                    <cell id="135"/>
-                    <cell id="162"/>
-                </row>
-                <row id="152">
-                    <cell id="153">
-                        <property name="colSpan">3</property>
-                        <property name="rowSpan">1</property>
-                        <property name="borderTopColor">#C0C0C0</property>
-                        <property name="borderTopStyle">solid</property>
-                        <property name="borderTopWidth">thin</property>
-                        <label id="157">
-                            <property name="fontFamily">"Arial"</property>
-                            <property name="fontWeight">bold</property>
-                            <text-property name="text" key="sumTotal">SumTotal</text-property>
-                        </label>
-                    </cell>
-                    <cell id="189">
-                        <property name="borderTopColor">#C0C0C0</property>
-                        <property name="borderTopStyle">solid</property>
-                        <property name="borderTopWidth">thin</property>
-                    </cell>
-                    <cell id="180">
-                        <property name="borderTopColor">#C0C0C0</property>
-                        <property name="borderTopStyle">solid</property>
-                        <property name="borderTopWidth">thin</property>
-                    </cell>
-                    <cell id="156">
-                        <property name="borderTopColor">#C0C0C0</property>
-                        <property name="borderTopStyle">solid</property>
-                        <property name="borderTopWidth">thin</property>
-                        <data id="158">
-                            <property name="fontFamily">"Arial"</property>
-                            <property name="fontWeight">bold</property>
-                            <structure name="numberFormat">
-                                <property name="category">Currency</property>
-                                <property name="pattern">###0.00</property>
-                            </structure>
-                            <property name="textAlign">right</property>
-                            <property name="resultSetColumn">SumTotal</property>
-                        </data>
-                    </cell>
-                    <cell id="163">
-                        <property name="borderTopColor">#C0C0C0</property>
-                        <property name="borderTopStyle">solid</property>
-                        <property name="borderTopWidth">thin</property>
-                        <data id="168">
-                            <property name="fontFamily">"Arial"</property>
-                            <property name="fontWeight">bold</property>
-                            <property name="resultSetColumn">currencyID</property>
-                        </data>
-                    </cell>
-                </row>
-                <row id="77">
-                    <cell id="78">
-                        <property name="colSpan">3</property>
-                        <property name="rowSpan">1</property>
-                        <property name="borderTopColor">#C0C0C0</property>
-                        <property name="borderTopStyle">solid</property>
-                        <property name="borderTopWidth">thin</property>
-                        <label id="150">
-                            <property name="fontFamily">"Arial"</property>
-                            <property name="fontStyle">italic</property>
-                            <text-property name="text" key="includedVAT">IncludedTax</text-property>
-                        </label>
-                    </cell>
-                    <cell id="190">
-                        <property name="borderTopColor">#C0C0C0</property>
-                        <property name="borderTopStyle">solid</property>
-                        <property name="borderTopWidth">thin</property>
-                    </cell>
-                    <cell id="181">
-                        <property name="borderTopColor">#C0C0C0</property>
-                        <property name="borderTopStyle">solid</property>
-                        <property name="borderTopWidth">thin</property>
-                    </cell>
-                    <cell id="80">
-                        <property name="borderTopColor">#C0C0C0</property>
-                        <property name="borderTopStyle">solid</property>
-                        <property name="borderTopWidth">thin</property>
-                        <data id="151">
-                            <property name="fontFamily">"Arial"</property>
-                            <property name="fontStyle">italic</property>
-                            <structure name="numberFormat">
-                                <property name="category">Currency</property>
-                                <property name="pattern">###0.00</property>
-                            </structure>
-                            <property name="textAlign">right</property>
-                            <property name="resultSetColumn">SumVAT</property>
-                        </data>
-                    </cell>
-                    <cell id="164">
-                        <property name="borderTopColor">#C0C0C0</property>
-                        <property name="borderTopStyle">solid</property>
-                        <property name="borderTopWidth">thin</property>
-                        <data id="169">
-                            <property name="fontFamily">"Arial"</property>
-                            <property name="resultSetColumn">currencyID</property>
-                        </data>
-                    </cell>
                 </row>
             </footer>
         </table>

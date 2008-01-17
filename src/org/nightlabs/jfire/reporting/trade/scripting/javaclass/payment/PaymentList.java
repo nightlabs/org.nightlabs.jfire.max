@@ -194,10 +194,9 @@ public class PaymentList extends AbstractJFSScriptExecutorDelegate {
 			buffer = JFSResultUtil.createTableBuffer(metaData);
 		} catch (Exception e) {
 			throw new ScriptException(e);
-		}
-		List<Object> row = new ArrayList<Object>(12); 
+		}		 
 		for (Iterator<Payment> iter = queryResult.iterator(); iter.hasNext();) {			
-			row.clear();
+			List<Object> row = new ArrayList<Object>(17);
 			Payment payment = iter.next();
 			row.add(payment.getOrganisationID());
 			row.add(payment.getPaymentID());

@@ -62,4 +62,35 @@ public class ReportingTradeConstants {
 	public static final ValueProviderID VALUE_PROVIDER_ID_TRADE_DOCUMENTS_DELIVERY_NOTE_BY_CUSTOMER = ValueProviderID.create(
 			Organisation.DEV_ORGANISATION_ID, VALUE_PROVIDER_CATEGORY_ID_TRADE_DOCUMENTS_DELIVERY_NOTE, "ByDeliveryNote");
 	
+	
+	public static final String VALUE_PROVIDER_CATEGORY_ID_ACCOUNTING = "JFireReportingTrade-ValueProviderCategory-Accounting";
+	public static final ValueProviderID VALUE_PROVIDER_ID_ACCOUNTING_CURRENCY = ValueProviderID.create( 
+			Organisation.DEV_ORGANISATION_ID, VALUE_PROVIDER_CATEGORY_ID_ACCOUNTING, "Currency");
+	public static final ValueProviderID VALUE_PROVIDER_ID_ACCOUNTING_CURRENCIES = ValueProviderID.create( 
+			Organisation.DEV_ORGANISATION_ID, VALUE_PROVIDER_CATEGORY_ID_ACCOUNTING, "Currencies");
+	public static final ValueProviderID VALUE_PROVIDER_ID_ACCOUNTING_TARIFF = ValueProviderID.create( 
+			Organisation.DEV_ORGANISATION_ID, VALUE_PROVIDER_CATEGORY_ID_ACCOUNTING, "Tariff");
+	public static final ValueProviderID VALUE_PROVIDER_ID_ACCOUNTING_TARIFFS = ValueProviderID.create( 
+			Organisation.DEV_ORGANISATION_ID, VALUE_PROVIDER_CATEGORY_ID_ACCOUNTING, "Tariffs");
+	public static final ValueProviderID VALUE_PROVIDER_ID_ACCOUNTING_MODE_OF_PAYMENT = ValueProviderID.create( 
+			Organisation.DEV_ORGANISATION_ID, VALUE_PROVIDER_CATEGORY_ID_ACCOUNTING, "ModeOfPayment");
+	public static final ValueProviderID VALUE_PROVIDER_ID_ACCOUNTING_MODE_OF_PAYMENTS = ValueProviderID.create( 
+			Organisation.DEV_ORGANISATION_ID, VALUE_PROVIDER_CATEGORY_ID_ACCOUNTING, "ModeOfPayments");	
+	public static final ValueProviderID VALUE_PROVIDER_ID_ACCOUNTING_MODE_OF_PAYMENT_FLAVOUR = ValueProviderID.create( 
+			Organisation.DEV_ORGANISATION_ID, VALUE_PROVIDER_CATEGORY_ID_ACCOUNTING, "ModeOfPaymentFlavour");
+	public static final ValueProviderID VALUE_PROVIDER_ID_ACCOUNTING_MODE_OF_PAYMENT_FLAVOURS = ValueProviderID.create( 
+			Organisation.DEV_ORGANISATION_ID, VALUE_PROVIDER_CATEGORY_ID_ACCOUNTING, "ModeOfPaymentFlavours");	
+	public static final ValueProviderID VALUE_PROVIDER_ID_ACCOUNTING_MODE_OF_PAYMENT_FLAVOURS_BY_MODE_OF_PAYMENT = ValueProviderID.create( 
+			Organisation.DEV_ORGANISATION_ID, VALUE_PROVIDER_CATEGORY_ID_ACCOUNTING, "ModeOfPaymentFlavoursByModeOfPayment");	
+	public static final ValueProviderID VALUE_PROVIDER_ID_ACCOUNTING_MODE_OF_DELIVERY= ValueProviderID.create( 
+			Organisation.DEV_ORGANISATION_ID, VALUE_PROVIDER_CATEGORY_ID_ACCOUNTING, "ModeOfDelivery");
+	public static final ValueProviderID VALUE_PROVIDER_ID_ACCOUNTING_MODE_OF_DELIVERIES = ValueProviderID.create( 
+			Organisation.DEV_ORGANISATION_ID, VALUE_PROVIDER_CATEGORY_ID_ACCOUNTING, "ModeOfDeliveries");	
+	public static final ValueProviderID VALUE_PROVIDER_ID_ACCOUNTING_MODE_OF_DELIVERY_FLAVOUR = ValueProviderID.create( 
+			Organisation.DEV_ORGANISATION_ID, VALUE_PROVIDER_CATEGORY_ID_ACCOUNTING, "ModeOfDeliveryFlavour");
+	public static final ValueProviderID VALUE_PROVIDER_ID_ACCOUNTING_MODE_OF_DELIVERY_FLAVOURS = ValueProviderID.create( 
+			Organisation.DEV_ORGANISATION_ID, VALUE_PROVIDER_CATEGORY_ID_ACCOUNTING, "ModeOfDeliveryFlavours");	
+	public static final ValueProviderID VALUE_PROVIDER_ID_ACCOUNTING_MODE_OF_DELIVERY_FLAVOURS_BY_MODE_OF_DELIVERY = ValueProviderID.create( 
+			Organisation.DEV_ORGANISATION_ID, VALUE_PROVIDER_CATEGORY_ID_ACCOUNTING, "ModeOfDeliveryFlavoursByModeOfDelivery");	
+	
 }

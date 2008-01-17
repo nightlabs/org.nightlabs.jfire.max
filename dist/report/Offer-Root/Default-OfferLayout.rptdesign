@@ -446,7 +446,7 @@ function isDynamicProduct(productJDOID) {
             </list-property>
             <property name="queryText">&lt;queryPropertySet>&lt;org.nightlabs.jfire.reporting.oda.jfs.JFSQueryPropertySet>
   &lt;scriptRegistryItemID>
-    &lt;organisationID>dev.jfire.org&lt;/organisationID>
+    &lt;organisationID>${devOrganisationID}&lt;/organisationID>
     &lt;scriptRegistryItemType>JFireReportingTrade-Scripting-ArticleContainerData&lt;/scriptRegistryItemType>
     &lt;scriptRegistryItemID>ArticleList&lt;/scriptRegistryItemID>
   &lt;/scriptRegistryItemID>
@@ -483,122 +483,127 @@ function isDynamicProduct(productJDOID) {
                 <list-property name="resultSet">
                     <structure>
                         <property name="position">1</property>
-                        <property name="name">AccountHolder</property>
+                        <property name="name">DisplayName</property>
                         <property name="dataType">string</property>
                     </structure>
                     <structure>
                         <property name="position">2</property>
-                        <property name="name">BankData</property>
-                        <property name="dataType">integer</property>
-                    </structure>
-                    <structure>
-                        <property name="position">3</property>
-                        <property name="name">BankCode</property>
+                        <property name="name">BankData_AccountHolder</property>
                         <property name="dataType">string</property>
                     </structure>
                     <structure>
+                        <property name="position">3</property>
+                        <property name="name">BankData_AccountNumber</property>
+                        <property name="dataType">integer</property>
+                    </structure>
+                    <structure>
                         <property name="position">4</property>
-                        <property name="name">BankName</property>
+                        <property name="name">BankData_BankCode</property>
                         <property name="dataType">string</property>
                     </structure>
                     <structure>
                         <property name="position">5</property>
-                        <property name="name">Comment</property>
+                        <property name="name">BankData_BankName</property>
                         <property name="dataType">string</property>
                     </structure>
                     <structure>
                         <property name="position">6</property>
-                        <property name="name">CreditCardHolder</property>
+                        <property name="name">Comment_Comment</property>
                         <property name="dataType">string</property>
                     </structure>
                     <structure>
                         <property name="position">7</property>
-                        <property name="name">CreditCard</property>
-                        <property name="dataType">integer</property>
+                        <property name="name">CreditCard_CreditCardHolder</property>
+                        <property name="dataType">string</property>
                     </structure>
                     <structure>
                         <property name="position">8</property>
-                        <property name="name">CreditCard_8</property>
+                        <property name="name">CreditCard_ExpiryMonth</property>
                         <property name="dataType">integer</property>
                     </structure>
                     <structure>
                         <property name="position">9</property>
-                        <property name="name">Number</property>
-                        <property name="dataType">string</property>
+                        <property name="name">CreditCard_ExpiryYear</property>
+                        <property name="dataType">integer</property>
                     </structure>
                     <structure>
                         <property name="position">10</property>
-                        <property name="name">EMail</property>
+                        <property name="name">CreditCard_Number</property>
                         <property name="dataType">string</property>
                     </structure>
                     <structure>
                         <property name="position">11</property>
-                        <property name="name">Homepage</property>
+                        <property name="name">Internet_EMail</property>
                         <property name="dataType">string</property>
                     </structure>
                     <structure>
                         <property name="position">12</property>
-                        <property name="name">Company</property>
+                        <property name="name">Internet_Homepage</property>
                         <property name="dataType">string</property>
                     </structure>
                     <structure>
                         <property name="position">13</property>
-                        <property name="name">DateOfBirth</property>
-                        <property name="dataType">date</property>
-                    </structure>
-                    <structure>
-                        <property name="position">14</property>
-                        <property name="name">FirstName</property>
+                        <property name="name">PersonalData_Company</property>
                         <property name="dataType">string</property>
                     </structure>
                     <structure>
+                        <property name="position">14</property>
+                        <property name="name">PersonalData_DateOfBirth</property>
+                        <property name="dataType">date</property>
+                    </structure>
+                    <structure>
                         <property name="position">15</property>
-                        <property name="name">Name</property>
+                        <property name="name">PersonalData_FirstName</property>
                         <property name="dataType">string</property>
                     </structure>
                     <structure>
                         <property name="position">16</property>
-                        <property name="name">Salutation</property>
+                        <property name="name">PersonalData_Name</property>
                         <property name="dataType">string</property>
                     </structure>
                     <structure>
                         <property name="position">17</property>
-                        <property name="name">Title</property>
+                        <property name="name">PersonalData_Salutation</property>
                         <property name="dataType">string</property>
                     </structure>
                     <structure>
                         <property name="position">18</property>
-                        <property name="name">Fax</property>
+                        <property name="name">PersonalData_Title</property>
                         <property name="dataType">string</property>
                     </structure>
                     <structure>
                         <property name="position">19</property>
-                        <property name="name">PrimaryPhone</property>
+                        <property name="name">Phone_Fax</property>
                         <property name="dataType">string</property>
                     </structure>
                     <structure>
                         <property name="position">20</property>
-                        <property name="name">Address</property>
+                        <property name="name">Phone_PrimaryPhone</property>
                         <property name="dataType">string</property>
                     </structure>
                     <structure>
                         <property name="position">21</property>
-                        <property name="name">City</property>
+                        <property name="name">PostAddress_Address</property>
                         <property name="dataType">string</property>
                     </structure>
                     <structure>
                         <property name="position">22</property>
-                        <property name="name">Country</property>
+                        <property name="name">PostAddress_City</property>
                         <property name="dataType">string</property>
                     </structure>
                     <structure>
                         <property name="position">23</property>
-                        <property name="name">PostCode</property>
+                        <property name="name">PostAddress_Country</property>
                         <property name="dataType">string</property>
                     </structure>
                     <structure>
                         <property name="position">24</property>
-                        <property name="name">Region</property>
+                        <property name="name">PostAddress_PostCode</property>
+                        <property name="dataType">string</property>
+                    </structure>
+                    <structure>
+                        <property name="position">25</property>
+                        <property name="name">PostAddress_Region</property>
                         <property name="dataType">string</property>
                     </structure>
                 </list-property>
@@ -611,7 +616,7 @@ function isDynamicProduct(productJDOID) {
                     <property name="dataType">string</property>
                     <property name="nativeDataType">1</property>
                     <property name="position">1</property>
-                    <expression name="defaultValue">'""'</expression>
+                    <expression name="defaultValue">'__DUMMY_DEFAULT_PARAMETER_VALUE__'</expression>
                     <property name="isOptional">false</property>
                     <property name="allowNull">true</property>
                     <property name="isInput">true</property>
@@ -620,176 +625,183 @@ function isDynamicProduct(productJDOID) {
             <list-property name="resultSet">
                 <structure>
                     <property name="position">1</property>
-                    <property name="name">AccountHolder</property>
-                    <property name="nativeName">AccountHolder</property>
+                    <property name="name">DisplayName</property>
+                    <property name="nativeName">DisplayName</property>
                     <property name="dataType">string</property>
                     <property name="nativeDataType">1</property>
                 </structure>
                 <structure>
                     <property name="position">2</property>
-                    <property name="name">BankData</property>
-                    <property name="nativeName">BankData</property>
-                    <property name="dataType">integer</property>
-                    <property name="nativeDataType">2</property>
-                </structure>
-                <structure>
-                    <property name="position">3</property>
-                    <property name="name">BankCode</property>
-                    <property name="nativeName">BankCode</property>
+                    <property name="name">BankData_AccountHolder</property>
+                    <property name="nativeName">BankData_AccountHolder</property>
                     <property name="dataType">string</property>
                     <property name="nativeDataType">1</property>
                 </structure>
                 <structure>
+                    <property name="position">3</property>
+                    <property name="name">BankData_AccountNumber</property>
+                    <property name="nativeName">BankData_AccountNumber</property>
+                    <property name="dataType">integer</property>
+                    <property name="nativeDataType">2</property>
+                </structure>
+                <structure>
                     <property name="position">4</property>
-                    <property name="name">BankName</property>
-                    <property name="nativeName">BankName</property>
+                    <property name="name">BankData_BankCode</property>
+                    <property name="nativeName">BankData_BankCode</property>
                     <property name="dataType">string</property>
                     <property name="nativeDataType">1</property>
                 </structure>
                 <structure>
                     <property name="position">5</property>
-                    <property name="name">Comment</property>
-                    <property name="nativeName">Comment</property>
+                    <property name="name">BankData_BankName</property>
+                    <property name="nativeName">BankData_BankName</property>
                     <property name="dataType">string</property>
                     <property name="nativeDataType">1</property>
                 </structure>
                 <structure>
                     <property name="position">6</property>
-                    <property name="name">CreditCardHolder</property>
-                    <property name="nativeName">CreditCardHolder</property>
+                    <property name="name">Comment_Comment</property>
+                    <property name="nativeName">Comment_Comment</property>
                     <property name="dataType">string</property>
                     <property name="nativeDataType">1</property>
                 </structure>
                 <structure>
                     <property name="position">7</property>
-                    <property name="name">CreditCard</property>
-                    <property name="nativeName">CreditCard</property>
-                    <property name="dataType">integer</property>
-                    <property name="nativeDataType">2</property>
+                    <property name="name">CreditCard_CreditCardHolder</property>
+                    <property name="nativeName">CreditCard_CreditCardHolder</property>
+                    <property name="dataType">string</property>
+                    <property name="nativeDataType">1</property>
                 </structure>
                 <structure>
                     <property name="position">8</property>
-                    <property name="name">CreditCard_8</property>
-                    <property name="nativeName">CreditCard</property>
+                    <property name="name">CreditCard_ExpiryMonth</property>
+                    <property name="nativeName">CreditCard_ExpiryMonth</property>
                     <property name="dataType">integer</property>
                     <property name="nativeDataType">2</property>
                 </structure>
                 <structure>
                     <property name="position">9</property>
-                    <property name="name">Number</property>
-                    <property name="nativeName">Number</property>
-                    <property name="dataType">string</property>
-                    <property name="nativeDataType">1</property>
+                    <property name="name">CreditCard_ExpiryYear</property>
+                    <property name="nativeName">CreditCard_ExpiryYear</property>
+                    <property name="dataType">integer</property>
+                    <property name="nativeDataType">2</property>
                 </structure>
                 <structure>
                     <property name="position">10</property>
-                    <property name="name">EMail</property>
-                    <property name="nativeName">EMail</property>
+                    <property name="name">CreditCard_Number</property>
+                    <property name="nativeName">CreditCard_Number</property>
                     <property name="dataType">string</property>
                     <property name="nativeDataType">1</property>
                 </structure>
                 <structure>
                     <property name="position">11</property>
-                    <property name="name">Homepage</property>
-                    <property name="nativeName">Homepage</property>
+                    <property name="name">Internet_EMail</property>
+                    <property name="nativeName">Internet_EMail</property>
                     <property name="dataType">string</property>
                     <property name="nativeDataType">1</property>
                 </structure>
                 <structure>
                     <property name="position">12</property>
-                    <property name="name">Company</property>
-                    <property name="nativeName">Company</property>
+                    <property name="name">Internet_Homepage</property>
+                    <property name="nativeName">Internet_Homepage</property>
                     <property name="dataType">string</property>
                     <property name="nativeDataType">1</property>
                 </structure>
                 <structure>
                     <property name="position">13</property>
-                    <property name="name">DateOfBirth</property>
-                    <property name="nativeName">DateOfBirth</property>
-                    <property name="dataType">date</property>
-                    <property name="nativeDataType">5</property>
-                </structure>
-                <structure>
-                    <property name="position">14</property>
-                    <property name="name">FirstName</property>
-                    <property name="nativeName">FirstName</property>
+                    <property name="name">PersonalData_Company</property>
+                    <property name="nativeName">PersonalData_Company</property>
                     <property name="dataType">string</property>
                     <property name="nativeDataType">1</property>
                 </structure>
                 <structure>
+                    <property name="position">14</property>
+                    <property name="name">PersonalData_DateOfBirth</property>
+                    <property name="nativeName">PersonalData_DateOfBirth</property>
+                    <property name="dataType">date</property>
+                    <property name="nativeDataType">5</property>
+                </structure>
+                <structure>
                     <property name="position">15</property>
-                    <property name="name">Name</property>
-                    <property name="nativeName">Name</property>
+                    <property name="name">PersonalData_FirstName</property>
+                    <property name="nativeName">PersonalData_FirstName</property>
                     <property name="dataType">string</property>
                     <property name="nativeDataType">1</property>
                 </structure>
                 <structure>
                     <property name="position">16</property>
-                    <property name="name">Salutation</property>
-                    <property name="nativeName">Salutation</property>
+                    <property name="name">PersonalData_Name</property>
+                    <property name="nativeName">PersonalData_Name</property>
                     <property name="dataType">string</property>
                     <property name="nativeDataType">1</property>
                 </structure>
                 <structure>
                     <property name="position">17</property>
-                    <property name="name">Title</property>
-                    <property name="nativeName">Title</property>
+                    <property name="name">PersonalData_Salutation</property>
+                    <property name="nativeName">PersonalData_Salutation</property>
                     <property name="dataType">string</property>
                     <property name="nativeDataType">1</property>
                 </structure>
                 <structure>
                     <property name="position">18</property>
-                    <property name="name">Fax</property>
-                    <property name="nativeName">Fax</property>
+                    <property name="name">PersonalData_Title</property>
+                    <property name="nativeName">PersonalData_Title</property>
                     <property name="dataType">string</property>
                     <property name="nativeDataType">1</property>
                 </structure>
                 <structure>
                     <property name="position">19</property>
-                    <property name="name">PrimaryPhone</property>
-                    <property name="nativeName">PrimaryPhone</property>
+                    <property name="name">Phone_Fax</property>
+                    <property name="nativeName">Phone_Fax</property>
                     <property name="dataType">string</property>
                     <property name="nativeDataType">1</property>
                 </structure>
                 <structure>
                     <property name="position">20</property>
-                    <property name="name">Address</property>
-                    <property name="nativeName">Address</property>
+                    <property name="name">Phone_PrimaryPhone</property>
+                    <property name="nativeName">Phone_PrimaryPhone</property>
                     <property name="dataType">string</property>
                     <property name="nativeDataType">1</property>
                 </structure>
                 <structure>
                     <property name="position">21</property>
-                    <property name="name">City</property>
-                    <property name="nativeName">City</property>
+                    <property name="name">PostAddress_Address</property>
+                    <property name="nativeName">PostAddress_Address</property>
                     <property name="dataType">string</property>
                     <property name="nativeDataType">1</property>
                 </structure>
                 <structure>
                     <property name="position">22</property>
-                    <property name="name">Country</property>
-                    <property name="nativeName">Country</property>
+                    <property name="name">PostAddress_City</property>
+                    <property name="nativeName">PostAddress_City</property>
                     <property name="dataType">string</property>
                     <property name="nativeDataType">1</property>
                 </structure>
                 <structure>
                     <property name="position">23</property>
-                    <property name="name">PostCode</property>
-                    <property name="nativeName">PostCode</property>
+                    <property name="name">PostAddress_Country</property>
+                    <property name="nativeName">PostAddress_Country</property>
                     <property name="dataType">string</property>
                     <property name="nativeDataType">1</property>
                 </structure>
                 <structure>
                     <property name="position">24</property>
-                    <property name="name">Region</property>
-                    <property name="nativeName">Region</property>
+                    <property name="name">PostAddress_PostCode</property>
+                    <property name="nativeName">PostAddress_PostCode</property>
+                    <property name="dataType">string</property>
+                    <property name="nativeDataType">1</property>
+                </structure>
+                <structure>
+                    <property name="position">25</property>
+                    <property name="name">PostAddress_Region</property>
+                    <property name="nativeName">PostAddress_Region</property>
                     <property name="dataType">string</property>
                     <property name="nativeDataType">1</property>
                 </structure>
             </list-property>
             <property name="queryText">&lt;queryPropertySet>&lt;org.nightlabs.jfire.reporting.oda.jfs.JFSQueryPropertySet>
   &lt;scriptRegistryItemID>
-    &lt;organisationID>chezfrancois.jfire.org&lt;/organisationID>
+    &lt;organisationID>${devOrganisationID}&lt;/organisationID>
     &lt;scriptRegistryItemType>JFireReporting-Scripting-PropertySet&lt;/scriptRegistryItemType>
     &lt;scriptRegistryItemID>PropertySet&lt;/scriptRegistryItemID>
   &lt;/scriptRegistryItemID>
@@ -821,7 +833,7 @@ function isDynamicProduct(productJDOID) {
       </design:attributes>
       <design:inputAttributes>
         <design:elementAttributes>
-          <design:defaultScalarValue>&quot;&quot;</design:defaultScalarValue>
+          <design:defaultScalarValue>__DUMMY_DEFAULT_PARAMETER_VALUE__</design:defaultScalarValue>
         </design:elementAttributes>
       </design:inputAttributes>
     </design:parameterDefinitions>
@@ -856,123 +868,33 @@ JFireReportingHelper.createDataSetParam(JDOHelper.getObjectId(customer.getPerson
             </list-property>
             <list-property name="boundDataColumns">
                 <structure>
-                    <property name="name">AccountHolder</property>
-                    <expression name="expression">dataSetRow["AccountHolder"]</expression>
-                    <property name="dataType">string</property>
-                </structure>
-                <structure>
-                    <property name="name">BankData</property>
-                    <expression name="expression">dataSetRow["BankData"]</expression>
-                    <property name="dataType">integer</property>
-                </structure>
-                <structure>
-                    <property name="name">BankCode</property>
-                    <expression name="expression">dataSetRow["BankCode"]</expression>
-                    <property name="dataType">string</property>
-                </structure>
-                <structure>
-                    <property name="name">BankName</property>
-                    <expression name="expression">dataSetRow["BankName"]</expression>
-                    <property name="dataType">string</property>
-                </structure>
-                <structure>
-                    <property name="name">Comment</property>
-                    <expression name="expression">dataSetRow["Comment"]</expression>
-                    <property name="dataType">string</property>
-                </structure>
-                <structure>
-                    <property name="name">CreditCardHolder</property>
-                    <expression name="expression">dataSetRow["CreditCardHolder"]</expression>
-                    <property name="dataType">string</property>
-                </structure>
-                <structure>
-                    <property name="name">CreditCard</property>
-                    <expression name="expression">dataSetRow["CreditCard"]</expression>
-                    <property name="dataType">integer</property>
-                </structure>
-                <structure>
-                    <property name="name">CreditCard_8</property>
-                    <expression name="expression">dataSetRow["CreditCard_8"]</expression>
-                    <property name="dataType">integer</property>
-                </structure>
-                <structure>
-                    <property name="name">Number</property>
-                    <expression name="expression">dataSetRow["Number"]</expression>
-                    <property name="dataType">string</property>
-                </structure>
-                <structure>
-                    <property name="name">EMail</property>
-                    <expression name="expression">dataSetRow["EMail"]</expression>
-                    <property name="dataType">string</property>
-                </structure>
-                <structure>
-                    <property name="name">Homepage</property>
-                    <expression name="expression">dataSetRow["Homepage"]</expression>
-                    <property name="dataType">string</property>
-                </structure>
-                <structure>
-                    <property name="name">Company</property>
-                    <expression name="expression">dataSetRow["Company"]</expression>
-                    <property name="dataType">string</property>
-                </structure>
-                <structure>
-                    <property name="name">DateOfBirth</property>
-                    <expression name="expression">dataSetRow["DateOfBirth"]</expression>
+                    <property name="name">Name</property>
+                    <expression name="expression">dataSetRow["PersonalData_Name"]</expression>
                     <property name="dataType">string</property>
                 </structure>
                 <structure>
                     <property name="name">FirstName</property>
-                    <expression name="expression">dataSetRow["FirstName"]</expression>
-                    <property name="dataType">string</property>
-                </structure>
-                <structure>
-                    <property name="name">Name</property>
-                    <expression name="expression">dataSetRow["Name"]</expression>
-                    <property name="dataType">string</property>
-                </structure>
-                <structure>
-                    <property name="name">Salutation</property>
-                    <expression name="expression">dataSetRow["Salutation"]</expression>
-                    <property name="dataType">string</property>
-                </structure>
-                <structure>
-                    <property name="name">Title</property>
-                    <expression name="expression">dataSetRow["Title"]</expression>
-                    <property name="dataType">string</property>
-                </structure>
-                <structure>
-                    <property name="name">Fax</property>
-                    <expression name="expression">dataSetRow["Fax"]</expression>
-                    <property name="dataType">string</property>
-                </structure>
-                <structure>
-                    <property name="name">PrimaryPhone</property>
-                    <expression name="expression">dataSetRow["PrimaryPhone"]</expression>
-                    <property name="dataType">string</property>
-                </structure>
-                <structure>
-                    <property name="name">Address</property>
-                    <expression name="expression">dataSetRow["Address"]</expression>
-                    <property name="dataType">string</property>
-                </structure>
-                <structure>
-                    <property name="name">City</property>
-                    <expression name="expression">dataSetRow["City"]</expression>
-                    <property name="dataType">string</property>
-                </structure>
-                <structure>
-                    <property name="name">Country</property>
-                    <expression name="expression">dataSetRow["Country"]</expression>
+                    <expression name="expression">dataSetRow["PersonalData_FirstName"]</expression>
                     <property name="dataType">string</property>
                 </structure>
                 <structure>
                     <property name="name">PostCode</property>
-                    <expression name="expression">dataSetRow["PostCode"]</expression>
+                    <expression name="expression">dataSetRow["PostAddress_PostCode"]</expression>
                     <property name="dataType">string</property>
                 </structure>
                 <structure>
-                    <property name="name">Region</property>
-                    <expression name="expression">dataSetRow["Region"]</expression>
+                    <property name="name">City</property>
+                    <expression name="expression">dataSetRow["PostAddress_City"]</expression>
+                    <property name="dataType">string</property>
+                </structure>
+                <structure>
+                    <property name="name">Country</property>
+                    <expression name="expression">dataSetRow["PostAddress_Country"]</expression>
+                    <property name="dataType">string</property>
+                </structure>
+                <structure>
+                    <property name="name">Company</property>
+                    <expression name="expression">dataSetRow["PersonalData_Company"]</expression>
                     <property name="dataType">string</property>
                 </structure>
             </list-property>

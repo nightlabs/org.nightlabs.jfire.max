@@ -39,6 +39,10 @@ import javax.jdo.JDOObjectNotFoundException;
 import javax.jdo.PersistenceManager;
 
 import org.apache.log4j.Logger;
+import org.nightlabs.jfire.accounting.id.CurrencyID;
+import org.nightlabs.jfire.accounting.id.TariffID;
+import org.nightlabs.jfire.accounting.pay.id.ModeOfPaymentFlavourID;
+import org.nightlabs.jfire.accounting.pay.id.ModeOfPaymentID;
 import org.nightlabs.jfire.base.BaseSessionBeanImpl;
 import org.nightlabs.jfire.config.id.ConfigModuleInitialiserID;
 import org.nightlabs.jfire.organisation.Organisation;
@@ -52,6 +56,8 @@ import org.nightlabs.jfire.reporting.parameter.id.ValueProviderCategoryID;
 import org.nightlabs.jfire.reporting.trade.config.ReportLayoutCfModInitialiserArticleContainerLayouts;
 import org.nightlabs.jfire.scripting.ScriptingIntialiserException;
 import org.nightlabs.jfire.servermanager.JFireServerManager;
+import org.nightlabs.jfire.store.deliver.id.ModeOfDeliveryFlavourID;
+import org.nightlabs.jfire.store.deliver.id.ModeOfDeliveryID;
 import org.nightlabs.jfire.store.id.ProductTypeID;
 import org.nightlabs.jfire.trade.id.ArticleContainerID;
 import org.nightlabs.jfire.transfer.id.AnchorID;
@@ -219,8 +225,8 @@ implements SessionBean
 		ValueProviderCategoryID docsCategoryID = ValueProviderCategoryID.create(
 				Organisation.DEV_ORGANISATION_ID, 
 				ReportingTradeConstants.VALUE_PROVIDER_CATEGORY_ID_TRADE_DOCUMENTS);
-		ReportParameterUtil.createValueProviderCategory(
-				pm, null, docsCategoryID, 
+		ValueProviderCategory docsCategory = ReportParameterUtil.createValueProviderCategory(
+				pm, rootCategory, docsCategoryID, 
 				new NameEntry[] {new NameEntry(Locale.ENGLISH.getLanguage(), "Trade documents parameters")}
 			);
 		
@@ -228,7 +234,7 @@ implements SessionBean
 				Organisation.DEV_ORGANISATION_ID, 
 				ReportingTradeConstants.VALUE_PROVIDER_CATEGORY_ID_TRADE_DOCUMENTS_INVOICE);
 		ValueProviderCategory invoiceCategory = ReportParameterUtil.createValueProviderCategory(
-				pm, rootCategory, invoiceCategoryID, 
+				pm, docsCategory, invoiceCategoryID, 
 				new NameEntry[] {new NameEntry(Locale.ENGLISH.getLanguage(), "Invoice parameters")}
 			);
 		
@@ -275,7 +281,7 @@ implements SessionBean
 				Organisation.DEV_ORGANISATION_ID, 
 				ReportingTradeConstants.VALUE_PROVIDER_CATEGORY_ID_TRADE_DOCUMENTS_ORDER);
 		ValueProviderCategory orderCategory = ReportParameterUtil.createValueProviderCategory(
-				pm, rootCategory, orderCategoryID, 
+				pm, docsCategory, orderCategoryID, 
 				new NameEntry[] {new NameEntry(Locale.ENGLISH.getLanguage(), "Order parameters")}
 			);	
 		
@@ -297,7 +303,7 @@ implements SessionBean
 				Organisation.DEV_ORGANISATION_ID, 
 				ReportingTradeConstants.VALUE_PROVIDER_CATEGORY_ID_TRADE_DOCUMENTS_OFFER);
 		ValueProviderCategory offerCategory = ReportParameterUtil.createValueProviderCategory(
-				pm, rootCategory, offerCategoryID, 
+				pm, docsCategory, offerCategoryID, 
 				new NameEntry[] {new NameEntry(Locale.ENGLISH.getLanguage(), "Offer parameters")}
 			);	
 		
@@ -319,7 +325,7 @@ implements SessionBean
 				Organisation.DEV_ORGANISATION_ID, 
 				ReportingTradeConstants.VALUE_PROVIDER_CATEGORY_ID_TRADE_DOCUMENTS_DELIVERY_NOTE);
 		ValueProviderCategory deliveryNoteCategory = ReportParameterUtil.createValueProviderCategory(
-				pm, rootCategory, deliveryNoteCategoryID, 
+				pm, docsCategory, deliveryNoteCategoryID, 
 				new NameEntry[] {new NameEntry(Locale.ENGLISH.getLanguage(), "DeliveryNote parameters")}
 			);	
 		
@@ -336,5 +342,103 @@ implements SessionBean
 		pm.flush();
 		deliveryNoteByCustomer.addInputParameter(new ValueProviderInputParameter(deliveryNoteByCustomer, "customer", AnchorID.class.getName()));
 		
+		
+		ValueProviderCategoryID accountingCategoryID = ValueProviderCategoryID.create(
+				Organisation.DEV_ORGANISATION_ID, 
+				ReportingTradeConstants.VALUE_PROVIDER_CATEGORY_ID_ACCOUNTING);
+		ValueProviderCategory accountingCategory = ReportParameterUtil.createValueProviderCategory(
+				pm, rootCategory, accountingCategoryID, 
+				new NameEntry[] {new NameEntry(Locale.ENGLISH.getLanguage(), "Accounting parameters")}
+			);
+		
+		ReportParameterUtil.createValueProvider(pm, accountingCategory, ReportingTradeConstants.VALUE_PROVIDER_ID_ACCOUNTING_CURRENCY, 
+				CurrencyID.class.getName(),
+				new NameEntry[] {new NameEntry(Locale.ENGLISH.getLanguage(), "Currency")},
+				new NameEntry[] {new NameEntry(Locale.ENGLISH.getLanguage(), "Select a currency")},
+				new NameEntry[] {new NameEntry(Locale.ENGLISH.getLanguage(), "Select a currency")}
+			);
+		ReportParameterUtil.createValueProvider(pm, accountingCategory, ReportingTradeConstants.VALUE_PROVIDER_ID_ACCOUNTING_CURRENCIES, 
+				Collection.class.getName() + "<" + CurrencyID.class.getName() + ">",
+				new NameEntry[] {new NameEntry(Locale.ENGLISH.getLanguage(), "List of currencies")},
+				new NameEntry[] {new NameEntry(Locale.ENGLISH.getLanguage(), "Select a list of currencies")},
+				new NameEntry[] {new NameEntry(Locale.ENGLISH.getLanguage(), "Select a list of currencies")}
+			);
+		
+		ReportParameterUtil.createValueProvider(pm, accountingCategory, ReportingTradeConstants.VALUE_PROVIDER_ID_ACCOUNTING_TARIFF, 
+				TariffID.class.getName(),
+				new NameEntry[] {new NameEntry(Locale.ENGLISH.getLanguage(), "Tariff")},
+				new NameEntry[] {new NameEntry(Locale.ENGLISH.getLanguage(), "Select a tariff")},
+				new NameEntry[] {new NameEntry(Locale.ENGLISH.getLanguage(), "Select a fariff")}
+			);
+		ReportParameterUtil.createValueProvider(pm, accountingCategory, ReportingTradeConstants.VALUE_PROVIDER_ID_ACCOUNTING_TARIFFS, 
+				Collection.class.getName() + "<" + TariffID.class.getName() + ">",
+				new NameEntry[] {new NameEntry(Locale.ENGLISH.getLanguage(), "List of tariffs")},
+				new NameEntry[] {new NameEntry(Locale.ENGLISH.getLanguage(), "Select a list of tariffs")},
+				new NameEntry[] {new NameEntry(Locale.ENGLISH.getLanguage(), "Select a list of tariffs")}
+			);
+		
+		ReportParameterUtil.createValueProvider(pm, accountingCategory, ReportingTradeConstants.VALUE_PROVIDER_ID_ACCOUNTING_MODE_OF_PAYMENT, 
+				ModeOfPaymentID.class.getName(),
+				new NameEntry[] {new NameEntry(Locale.ENGLISH.getLanguage(), "Mode of payment")},
+				new NameEntry[] {new NameEntry(Locale.ENGLISH.getLanguage(), "Select a mode of payment")},
+				new NameEntry[] {new NameEntry(Locale.ENGLISH.getLanguage(), "Select a mode of payment")}
+			);
+		ReportParameterUtil.createValueProvider(pm, accountingCategory, ReportingTradeConstants.VALUE_PROVIDER_ID_ACCOUNTING_MODE_OF_PAYMENTS, 
+				Collection.class.getName() + "<" + ModeOfPaymentID.class.getName() + ">",
+				new NameEntry[] {new NameEntry(Locale.ENGLISH.getLanguage(), "List of modes of payment")},
+				new NameEntry[] {new NameEntry(Locale.ENGLISH.getLanguage(), "Select a list of modes of payment")},
+				new NameEntry[] {new NameEntry(Locale.ENGLISH.getLanguage(), "Select a list of modes of payment")}
+			);
+		
+		ReportParameterUtil.createValueProvider(pm, accountingCategory, ReportingTradeConstants.VALUE_PROVIDER_ID_ACCOUNTING_MODE_OF_PAYMENT_FLAVOUR, 
+				ModeOfPaymentFlavourID.class.getName(),
+				new NameEntry[] {new NameEntry(Locale.ENGLISH.getLanguage(), "Mode of payment flavour")},
+				new NameEntry[] {new NameEntry(Locale.ENGLISH.getLanguage(), "Select a mode of payment flavour")},
+				new NameEntry[] {new NameEntry(Locale.ENGLISH.getLanguage(), "Select a mode of payment flavour")}
+			);
+		ReportParameterUtil.createValueProvider(pm, accountingCategory, ReportingTradeConstants.VALUE_PROVIDER_ID_ACCOUNTING_MODE_OF_PAYMENT_FLAVOURS, 
+				Collection.class.getName() + "<" + ModeOfPaymentFlavourID.class.getName() + ">",
+				new NameEntry[] {new NameEntry(Locale.ENGLISH.getLanguage(), "List of mode of payment flavours")},
+				new NameEntry[] {new NameEntry(Locale.ENGLISH.getLanguage(), "Select a list of mode of payment flavours")},
+				new NameEntry[] {new NameEntry(Locale.ENGLISH.getLanguage(), "Select a list of mode of payment flavours")}
+			);
+		ReportParameterUtil.createValueProvider(pm, accountingCategory, ReportingTradeConstants.VALUE_PROVIDER_ID_ACCOUNTING_MODE_OF_PAYMENT_FLAVOURS_BY_MODE_OF_PAYMENT, 
+				Collection.class.getName() + "<" + ModeOfPaymentFlavourID.class.getName() + ">",
+				new NameEntry[] {new NameEntry(Locale.ENGLISH.getLanguage(), "List of mode of payment flavours by their mode of payment")},
+				new NameEntry[] {new NameEntry(Locale.ENGLISH.getLanguage(), "Select a list of mode of payment flavours by their mode of payment")},
+				new NameEntry[] {new NameEntry(Locale.ENGLISH.getLanguage(), "Select a list of mode of payment flavours by their mode of payment")}
+			);
+
+		ReportParameterUtil.createValueProvider(pm, accountingCategory, ReportingTradeConstants.VALUE_PROVIDER_ID_ACCOUNTING_MODE_OF_DELIVERY, 
+				ModeOfDeliveryID.class.getName(),
+				new NameEntry[] {new NameEntry(Locale.ENGLISH.getLanguage(), "Mode of delivery")},
+				new NameEntry[] {new NameEntry(Locale.ENGLISH.getLanguage(), "Select a mode of delivery")},
+				new NameEntry[] {new NameEntry(Locale.ENGLISH.getLanguage(), "Select a mode of delivery")}
+			);
+		ReportParameterUtil.createValueProvider(pm, accountingCategory, ReportingTradeConstants.VALUE_PROVIDER_ID_ACCOUNTING_MODE_OF_DELIVERIES, 
+				Collection.class.getName() + "<" + ModeOfDeliveryID.class.getName() + ">",
+				new NameEntry[] {new NameEntry(Locale.ENGLISH.getLanguage(), "List of modes of delivery")},
+				new NameEntry[] {new NameEntry(Locale.ENGLISH.getLanguage(), "Select a list of modes of delivery")},
+				new NameEntry[] {new NameEntry(Locale.ENGLISH.getLanguage(), "Select a list of modes of delivery")}
+			);
+		ReportParameterUtil.createValueProvider(pm, accountingCategory, ReportingTradeConstants.VALUE_PROVIDER_ID_ACCOUNTING_MODE_OF_DELIVERY_FLAVOUR, 
+				ModeOfDeliveryFlavourID.class.getName(),
+				new NameEntry[] {new NameEntry(Locale.ENGLISH.getLanguage(), "Mode of delivery flavour")},
+				new NameEntry[] {new NameEntry(Locale.ENGLISH.getLanguage(), "Select a mode of delivery flavour")},
+				new NameEntry[] {new NameEntry(Locale.ENGLISH.getLanguage(), "Select a mode of delivery flavour")}
+			);
+		ReportParameterUtil.createValueProvider(pm, accountingCategory, ReportingTradeConstants.VALUE_PROVIDER_ID_ACCOUNTING_MODE_OF_DELIVERY_FLAVOURS, 
+				Collection.class.getName() + "<" + ModeOfDeliveryFlavourID.class.getName() + ">",
+				new NameEntry[] {new NameEntry(Locale.ENGLISH.getLanguage(), "List of mode of delivery  flavours")},
+				new NameEntry[] {new NameEntry(Locale.ENGLISH.getLanguage(), "Select a list of mode of delivery flavours")},
+				new NameEntry[] {new NameEntry(Locale.ENGLISH.getLanguage(), "Select a list of mode of delivery flavours")}
+			);
+		ReportParameterUtil.createValueProvider(pm, accountingCategory, ReportingTradeConstants.VALUE_PROVIDER_ID_ACCOUNTING_MODE_OF_DELIVERY_FLAVOURS_BY_MODE_OF_DELIVERY, 
+				Collection.class.getName() + "<" + ModeOfDeliveryFlavourID.class.getName() + ">",
+				new NameEntry[] {new NameEntry(Locale.ENGLISH.getLanguage(), "List of mode of delivery flavours by their mode of delivery")},
+				new NameEntry[] {new NameEntry(Locale.ENGLISH.getLanguage(), "Select a list of mode of delivery flavours by their mode of delivery")},
+				new NameEntry[] {new NameEntry(Locale.ENGLISH.getLanguage(), "Select a list of mode of delivery flavours by their mode of delivery")}
+			);
+
 	}
 }

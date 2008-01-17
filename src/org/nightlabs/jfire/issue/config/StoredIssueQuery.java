@@ -75,7 +75,7 @@ implements Serializable
 		DataBuffer db = null;
 		OutputStream out = null;
 		try {
-			db = new DataBuffer(new InflaterInputStream(new ByteArrayInputStream(serializedIssueQuery)));
+			db = new DataBuffer();
 			out = new DeflaterOutputStream(db.createOutputStream());
 			XStream xStream = new XStream(new XppDriver());
 			xStream.toXML(issueQuery, out);
@@ -86,7 +86,8 @@ implements Serializable
 		}
 		finally {
 			try {
-				out.close();
+				if (out != null)
+					out.close();
 			} catch (Exception e) {
 				throw new RuntimeException(e);
 			}

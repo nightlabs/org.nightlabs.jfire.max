@@ -1,7 +1,6 @@
 package org.nightlabs.jfire.issue.query;
 
 import java.util.Date;
-import java.util.regex.Pattern;
 
 import javax.jdo.Query;
 

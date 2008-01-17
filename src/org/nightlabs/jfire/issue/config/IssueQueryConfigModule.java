@@ -1,6 +1,7 @@
 package org.nightlabs.jfire.issue.config;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 import org.nightlabs.jfire.config.ConfigModule;
@@ -30,8 +31,8 @@ extends ConfigModule
 	 * @jdo.field
 	 *		persistence-modifier="persistent"
 	 *		collection-type="collection"
-	 *		element-type="java.lang.String"
-	 *		table="JFireIssueTracking_StoredIssueQuery_storedIssueQueryList"
+	 *		element-type="org.nightlabs.jfire.issue.config.StoredIssueQuery"
+	 *		table="JFireIssueTracking_IssueQueryConfigModule_storedIssueQueryList"
 	 *		null-value="exception"
 	 *
 	 * @jdo.join
@@ -39,11 +40,19 @@ extends ConfigModule
 	private List<StoredIssueQuery> storedIssueQueryList;
 	
 	public List<StoredIssueQuery> getStoredIssueQueryList() {
-		return storedIssueQueryList;
+		return Collections.unmodifiableList(storedIssueQueryList);
 	}
 
 	@Override
 	public void init() {
 		storedIssueQueryList = new ArrayList<StoredIssueQuery>();
+	}
+	
+	public void addStoredIssueQuery(StoredIssueQuery storedIssueQuery) {
+		storedIssueQueryList.add(storedIssueQuery);
+	}
+	
+	public boolean removeStoredIssueQuery(StoredIssueQuery storedIssueQuery) {
+		return storedIssueQueryList.remove(storedIssueQuery);
 	}
 }

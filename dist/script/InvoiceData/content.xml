@@ -1,0 +1,25 @@
+<!DOCTYPE script-category PUBLIC "-//NightLabs//DTD ScriptingInitializer V 1.0//EN" "http://www.nightlabs.de/dtd/scripting-initializer-content_1_0.dtd">
+<script-category 
+	id="OrderData"
+	type="JFireReportingTrade-InvoiceData"
+>
+	<name language="de">Rechnungsdaten</name>
+	<name language="en">Invoice data</name>
+
+	<parameter-set>
+		<name language="de">ParameterSet: Rechnungen</name>
+		<name language="en">ParameterSet: Invoices</name>
+		<parameter name="invoiceIDs" type="java.util.Collection"/>			
+	</parameter-set>
+		
+	<script 
+		file="OrderDataArticles.javaclass" 
+		id="OrderDataArticles"
+		resultClass="org.nightlabs.jfire.reporting.oda.jfs.ResultSet"
+	>
+	<!-- id is optional and defaults to the value of file -->
+		<name language="de">Rechnungsdaten</name>
+		<name language="en">Invoicedata</name>
+	</script>
+	
+</script-category>

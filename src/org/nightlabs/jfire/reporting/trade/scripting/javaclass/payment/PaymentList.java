@@ -20,7 +20,9 @@ import org.apache.log4j.Logger;
 import org.eclipse.datatools.connectivity.oda.IResultSetMetaData;
 import org.nightlabs.db.Record;
 import org.nightlabs.db.TableBuffer;
+import org.nightlabs.jfire.accounting.pay.PayMoneyTransfer;
 import org.nightlabs.jfire.accounting.pay.Payment;
+import org.nightlabs.jfire.accounting.pay.id.ModeOfPaymentFlavourID;
 import org.nightlabs.jfire.reporting.JFireReportingHelper;
 import org.nightlabs.jfire.reporting.oda.DataType;
 import org.nightlabs.jfire.reporting.oda.SQLResultSet;
@@ -67,12 +69,12 @@ public class PaymentList extends AbstractJFSScriptExecutorDelegate {
 			metaData.addColumn("paymentID", DataType.BIGDECIMAL);
 			metaData.addColumn("paymentDirection", DataType.STRING);
 			metaData.addColumn("reasonForPayment", DataType.STRING);
-			metaData.addColumn("modeOfPaymentFlavourID", DataType.STRING);
-			metaData.addColumn("currencyID", DataType.STRING);
-			metaData.addColumn("partnerID", DataType.STRING);
-			metaData.addColumn("partnerAccountID", DataType.STRING);
+			metaData.addColumn("modeOfPaymentFlavourJDOID", DataType.STRING);
+			metaData.addColumn("currencyJDOID", DataType.STRING);
+			metaData.addColumn("partnerJDOID", DataType.STRING);
+			metaData.addColumn("partnerAccountJDOID", DataType.STRING);
 			metaData.addColumn("amount", DataType.BIGDECIMAL);
-			metaData.addColumn("userID", DataType.STRING);
+			metaData.addColumn("userJDOID", DataType.STRING);
 			metaData.addColumn("beginDT", DataType.DATE);
 			metaData.addColumn("endDT", DataType.DATE);
 			metaData.addColumn("postponed", DataType.BOOLEAN);
@@ -89,18 +91,19 @@ public class PaymentList extends AbstractJFSScriptExecutorDelegate {
 	 */
 	public Object doExecute() throws ScriptException {
 		Map<String, Object> param = getScriptExecutorJavaClass().getParameterValues();
-		logger.info("**************************************************************");
-		logger.info("**************************************************************");
-		logger.info("**************************************************************");
-		logger.info("**************************************************************");
-		logger.info("**************************************************************");
-		logger.info("parameterValues");
-		for (Map.Entry<String, Object> entry : param.entrySet()) {
-			logger.error(" " + entry.getKey() + " = '" + entry.getValue() + "'");
-		}
+//		logger.debug("**************************************************************");
+//		logger.debug("**************************************************************");
+//		logger.debug("**************************************************************");
+//		logger.debug("**************************************************************");
+//		logger.debug("**************************************************************");
+//		logger.debug("parameterValues");
+//		for (Map.Entry<String, Object> entry : param.entrySet()) {
+//			logger.error(" " + entry.getKey() + " = '" + entry.getValue() + "'");
+//		}
 		Collection<UserID> users = (Collection<UserID>) getObjectParameterValue("userIDs", Collection.class);
 		Collection<UserID> userGroups = (Collection<UserID>) getObjectParameterValue("userGroupIDs", Collection.class);
 		Collection<AnchorID> partnerIDs = (Collection<AnchorID>) getObjectParameterValue("partnerIDs", Collection.class);;
+		Collection<ModeOfPaymentFlavourID> modeOfPaymentFlavourIDs = (Collection<ModeOfPaymentFlavourID>) getObjectParameterValue("modeOfPaymentFlavourIDs", Collection.class);;
 		TimePeriod beginTimePeriod = getObjectParameterValue("beginTimePeriod", TimePeriod.class);
 		TimePeriod endTimePeriod = getObjectParameterValue("endTimePeriod", TimePeriod.class);
 		
@@ -126,10 +129,9 @@ public class PaymentList extends AbstractJFSScriptExecutorDelegate {
 		
 		StringBuffer jdoql = new StringBuffer();
 		 jdoql.append("SELECT "+
-		 "  this "+
-//		 "  JDOHelper.getObjectId(this.user) " +
+		 "  this.payment "+
 		"FROM " +
-		"  "+Payment.class.getName()+" " +
+		"  "+PayMoneyTransfer.class.getName()+" " +
 		"WHERE (1 == 1) ");
 		Map<String, Object> jdoParams = new HashMap<String, Object>();
 		
@@ -141,7 +143,7 @@ public class PaymentList extends AbstractJFSScriptExecutorDelegate {
 				UserID userID = iterator.next();
 				// TODO: WORKAROUND: JPOX Bug
 //				jdoql.append("(JDOHelper.getObjectId(this.user) == :userID" + i + ") ");
-				jdoql.append("(this.user.organisationID == \"" + userID.organisationID + "\" && this.user.userID == \"" + userID.userID + "\")");
+				jdoql.append("(this.payment.user.organisationID == \"" + userID.organisationID + "\" && this.user.userID == \"" + userID.userID + "\")");
 				jdoParams.put("userID" + i, userID);
 				if (iterator.hasNext())
 					jdoql.append("|| ");
@@ -155,7 +157,7 @@ public class PaymentList extends AbstractJFSScriptExecutorDelegate {
 			int i = 0;
 			for (Iterator<AnchorID> iterator = partnerIDs.iterator(); iterator.hasNext();) {
 				AnchorID partnerID = iterator.next();
-				jdoql.append("(JDOHelper.getObjectId(this.partner) == :partnerID" + i + ") ");
+				jdoql.append("(JDOHelper.getObjectId(this.payment.partner) == :partnerID" + i + ") ");
 				jdoParams.put("partnerID", partnerID);
 				if (iterator.hasNext())
 					jdoql.append("|| ");
@@ -163,28 +165,45 @@ public class PaymentList extends AbstractJFSScriptExecutorDelegate {
 			jdoql.append(") "); 
 		}
 		
-		// filter by begin time period
-		ReportingScriptUtil.addTimePeriodCondition(jdoql, "this.beginDT", "beginDT", beginTimePeriod, jdoParams);
-		// filter by begin time period
-		ReportingScriptUtil.addTimePeriodCondition(jdoql, "this.endDT", "endDT", endTimePeriod, jdoParams);
-		
-		logger.info("**************************************************************");
-		logger.info("**************************************************************");
-		logger.info("**************************************************************");
-		logger.info("**************************************************************");
-		logger.info("**************************************************************");
-		logger.info("jdoql parameters");
-		for (Map.Entry<String, Object> entry : jdoParams.entrySet()) {
-			logger.error(" " + entry.getKey() + " = " + entry.getValue().getClass().getName() + "'" + entry.getValue() + "'");
+		// filter by modeOfPayment
+		if (modeOfPaymentFlavourIDs != null && modeOfPaymentFlavourIDs.size() > 0) {
+			jdoql.append("&& ( ");
+			int i = 0;
+			for (Iterator<ModeOfPaymentFlavourID> iterator = modeOfPaymentFlavourIDs.iterator(); iterator.hasNext();) {
+				ModeOfPaymentFlavourID modeOfPaymentFlavourID = iterator.next();
+				// TODO: WORKAROUND: JPOX Bug
+//				jdoql.append("(JDOHelper.getObjectId(this.payment.modeOfPaymentFlavour) == :modeOfPaymentFlavourID" + i + ") ");
+//				jdoParams.put(":modeOfPaymentFlavourID" + i, modeOfPaymentFlavourID);
+				jdoql.append("(this.payment.modeOfPaymentFlavour == :== :modeOfPaymentFlavour" + i + ") ");
+				jdoParams.put(":modeOfPaymentFlavour" + i, pm.getObjectById(modeOfPaymentFlavourID));
+				if (iterator.hasNext())
+					jdoql.append("|| ");
+			}
+			jdoql.append(") ");
 		}
 		
-		logger.info("**************************************************************");
-		logger.info("**************************************************************");
-		logger.info("**************************************************************");
-		logger.info("**************************************************************");
-		logger.info("**************************************************************");
-		logger.info("query");
-		logger.info(jdoql.toString());		
+		// filter by begin time period
+		ReportingScriptUtil.addTimePeriodCondition(jdoql, "this.payment.beginDT", "beginDT", beginTimePeriod, jdoParams);
+		// filter by begin time period
+		ReportingScriptUtil.addTimePeriodCondition(jdoql, "this.payment.endDT", "endDT", endTimePeriod, jdoParams);
+		
+//		logger.debug("**************************************************************");
+//		logger.debug("**************************************************************");
+//		logger.debug("**************************************************************");
+//		logger.debug("**************************************************************");
+//		logger.debug("**************************************************************");
+//		logger.debug("jdoql parameters");
+//		for (Map.Entry<String, Object> entry : jdoParams.entrySet()) {
+//			logger.error(" " + entry.getKey() + " = " + entry.getValue().getClass().getName() + "'" + entry.getValue() + "'");
+//		}
+//		
+		logger.debug("**************************************************************");
+		logger.debug("**************************************************************");
+		logger.debug("**************************************************************");
+		logger.debug("**************************************************************");
+		logger.debug("**************************************************************");
+		logger.debug("query");
+		logger.debug(jdoql.toString());		
 		
 		Query q = pm.newQuery(jdoql.toString());
 		Collection queryResult = (Collection)q.executeWithMap(jdoParams);

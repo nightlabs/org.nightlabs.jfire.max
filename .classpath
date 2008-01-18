@@ -1,32 +1,33 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <classpath>
-	<classpathentry path="src" kind="src"/>
-	<classpathentry path="org.eclipse.jdt.launching.JRE_CONTAINER" kind="con"/>
-	<classpathentry path="JBOSS/bin/run.jar" kind="var"/>
-	<classpathentry path="JBOSS/bin/shutdown.jar" kind="var"/>
-	<classpathentry path="JBOSS/client/jboss-j2ee.jar" kind="var"/>
-	<classpathentry path="JBOSS/lib/concurrent.jar" kind="var"/>
-	<classpathentry path="JBOSS/lib/jboss-system.jar" kind="var"/>
-	<classpathentry path="JBOSS/server/default/lib/bcel.jar" kind="var"/>
-	<classpathentry path="JBOSS/server/default/lib/jboss.jar" kind="var"/>
-	<classpathentry path="JBOSS/server/default/lib/jboss-transaction.jar" kind="var"/>
-	<classpathentry path="JBOSS/server/default/lib/jnpserver.jar" kind="var"/>
-	<classpathentry path="JBOSS/server/default/lib/jpl-pattern.jar" kind="var"/>
-	<classpathentry path="JBOSS/server/default/lib/jpl-util.jar" kind="var"/>
+	<classpathentry kind="src" path="src"/>
+	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER"/>
+	<classpathentry kind="var" path="JBOSS/bin/run.jar"/>
+	<classpathentry kind="var" path="JBOSS/bin/shutdown.jar"/>
+	<classpathentry kind="var" path="JBOSS/client/jboss-j2ee.jar"/>
+	<classpathentry kind="var" path="JBOSS/lib/concurrent.jar"/>
+	<classpathentry kind="var" path="JBOSS/lib/jboss-system.jar"/>
+	<classpathentry kind="var" path="JBOSS/server/default/lib/bcel.jar"/>
+	<classpathentry kind="var" path="JBOSS/server/default/lib/jboss.jar"/>
+	<classpathentry kind="var" path="JBOSS/server/default/lib/jboss-transaction.jar"/>
+	<classpathentry kind="var" path="JBOSS/server/default/lib/jnpserver.jar"/>
+	<classpathentry kind="var" path="JBOSS/server/default/lib/jpl-pattern.jar"/>
+	<classpathentry kind="var" path="JBOSS/server/default/lib/jpl-util.jar"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/JFireScripting"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/JFireSimpleTrade"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/JFireTrade"/>
-	<classpathentry sourcepath="/JDO2" path="JDO2" kind="var"/>
+	<classpathentry kind="var" path="JDO2" sourcepath="/JDO2"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/JFireBase"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/NightLabsBase"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/JFireServerManager"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/JFireBaseBean"/>
-	<classpathentry path="LOG4J" kind="var"/>
-	<classpathentry path="/JFireReporting/dist/birt/lib/oda.jar" kind="lib"/>
+	<classpathentry kind="var" path="LOG4J"/>
+	<classpathentry kind="lib" path="/JFireReporting/dist/birt/lib/oda.jar"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/JFireReporting"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/NightLabsJDO"/>
-	<classpathentry sourcepath="/JPOX_SRC" path="JPOX" kind="var"/>
-	<classpathentry sourcepath="/JPOXENHANCER_SRC" path="JPOXENHANCER" kind="var"/>
-	<classpathentry path="bin" kind="output"/>
-  <classpathentry kind="var" path="ASM"/>
+	<classpathentry kind="var" path="JPOX" sourcepath="/JPOX_SRC"/>
+	<classpathentry kind="var" path="JPOXENHANCER" sourcepath="/JPOXENHANCER_SRC"/>
+	<classpathentry kind="var" path="ASM"/>
+	<classpathentry combineaccessrules="false" kind="src" path="/JFireJbpm"/>
+	<classpathentry kind="output" path="bin"/>
 </classpath>

@@ -48,16 +48,9 @@ import org.nightlabs.jfire.transfer.id.TransferID;
  * {@link org.nightlabs.jfire.trade.LegalEntity} representing the partner to whom
  * or from whom money is transferred.
  * <p>
- * In spite of other {@link org.nightlabs.jfire.accounting.MoneyTransfer}s
- * that are used for bookings and are assigned to one invoice only
- * the invoice-member (inherited from MoneyTransfer) of PayMoneyTransfer will be null.
- * A <tt>PayMoneyTransfer</tt> 
- * can be assigned to a multiple of {@link org.nightlabs.jfire.accounting.Invoice}
- * s.
+ * A <tt>PayMoneyTransfer</tt> can be assigned to multiple {@link org.nightlabs.jfire.accounting.Invoice}s
+ * by its connecitons to a {@link Payment}.
  * <p>
- * Additionally, every <tt>MoneyTransfer</tt> can occur without being linked to any
- * <tt>Invoice</tt> (e.g. if the partner decides later to do a withdrawal of some
- * "old" money kept after reimbourse).
  *
  * @author Alexander Bieber <alex[AT]nightlabs[DOT]de>
  *

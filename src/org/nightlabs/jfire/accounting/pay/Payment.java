@@ -54,8 +54,16 @@ import org.nightlabs.jfire.transfer.Transfer;
 import org.nightlabs.jfire.transfer.id.AnchorID;
 
 /**
+ * {@link Payment}s are created when invoices or parts of invoices are paid. Therefore
+ * a {@link Payment} is linked to one or more invoices ({@link Payment#getInvoices()}).
+ * <p>
+ * Additionally, every <tt>MoneyTransfer</tt> can occur without being linked to any
+ * <tt>Invoice</tt> (e.g. if the partner decides later to do a withdrawal of some
+ * "old" money kept after reimbourse).
+ * </p>
  * @author Marco Schulze - marco at nightlabs dot de
- *
+ * @author Alexander Bieber <!-- alex [AT] nightlabs [DOT] de -->
+ * 
  * @jdo.persistence-capable
  *		identity-type="application"
  *		objectid-class="org.nightlabs.jfire.accounting.pay.id.PaymentID"

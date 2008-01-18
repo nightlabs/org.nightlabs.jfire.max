@@ -77,8 +77,8 @@ extends JDOQuery<Issue> {
 		
 		if (assigneeID != null) {
 //			filter.append("JDOHelper.getObjectId(this.assignee) == :assigneeID && ");
-			filter.append("( this.assign.organisationID == \"" + assigneeID.organisationID + "\" && ");
-			filter.append("  this.assign.userID == \"" + assigneeID.userID + "\" ) && ");
+			filter.append("( this.assignee.organisationID == \"" + assigneeID.organisationID + "\" && ");
+			filter.append("  this.assignee.userID == \"" + assigneeID.userID + "\" ) && ");
 		}
 	
 		if (createTimestamp != null) {

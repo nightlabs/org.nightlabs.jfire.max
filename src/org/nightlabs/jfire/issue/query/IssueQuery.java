@@ -7,6 +7,7 @@ import javax.jdo.Query;
 import org.apache.log4j.Logger;
 import org.nightlabs.jdo.query.JDOQuery;
 import org.nightlabs.jfire.issue.Issue;
+import org.nightlabs.jfire.issue.IssueComment;
 import org.nightlabs.jfire.issue.id.IssuePriorityID;
 import org.nightlabs.jfire.issue.id.IssueResolutionID;
 import org.nightlabs.jfire.issue.id.IssueSeverityTypeID;
@@ -21,6 +22,8 @@ extends JDOQuery<Issue> {
 	private static final Logger logger = Logger.getLogger(IssueQuery.class);
 	
 	private String issueSubject;
+	private String issueComment;
+	private String issueSubjectNComment;
 	private IssueTypeID issueTypeID;
 	private IssueSeverityTypeID issueSeverityTypeID;
 	private IssuePriorityID issuePriorityID;
@@ -40,6 +43,13 @@ extends JDOQuery<Issue> {
 			issueSubject = ".*" + issueSubject.toLowerCase() + ".*";
 			filter.append("( this.subject.names.containsValue(varSubject) && varSubject.toLowerCase().matches(\"" + issueSubject + "\") ) &&");
 			q.declareVariables(String.class.getName() + " varSubject");
+		}
+		
+		if (issueComment != null) {
+//			issueSubject = ".*" + Pattern.quote(issueSubject.toLowerCase()) + ".*";
+			issueComment = ".*" + issueComment.toLowerCase() + ".*";
+			filter.append("( this.comments.contains(varComment) && varComment.text.toLowerCase().matches(\"" + issueComment + "\") ) &&");
+			q.declareVariables(IssueComment.class.getName() + " varComment");
 		}
 		
 		if (issueTypeID != null) {
@@ -102,6 +112,14 @@ extends JDOQuery<Issue> {
 	
 	public void setIssueSubject(String issueSubject) {
 		this.issueSubject = issueSubject;
+	}
+	
+	public String getIssueComment() {
+		return issueComment;
+	}
+	
+	public void setIssueComment(String issueComment) {
+		this.issueComment = issueComment;
 	}
 	
 	public IssueTypeID getIssueTypeID() {

@@ -4,6 +4,8 @@
     <property name="units">in</property>
     <property name="includeResource">reportMessages</property>
     <html-property name="description">WizardTemplateChoicePage.message.BlankReport</html-property>
+    <method name="initialize"><![CDATA[importClass(Packages.org.nightlabs.jfire.reporting.JFireReportingHelper);
+importClass(Packages.org.nightlabs.jfire.accounting.pay.Payment);]]></method>
     <text-property name="displayName">WizardTemplateChoicePage.title.BlankReport</text-property>
     <property name="iconFile">/templates/blank_report.gif</property>
     <parameters>
@@ -61,7 +63,7 @@
             <list-property name="computedColumns">
                 <structure>
                     <property name="name">PaymentAccount</property>
-                    <expression name="expression">if (row["paymentDirection"].equals("incoming")) {
+                    <expression name="expression">if (row["paymentDirection"].equals(Payment.PAYMENT_DIRECTION_INCOMING)) {
   row["amount"]
 } else {
   - row["amount"]
@@ -2133,7 +2135,7 @@ currency.toDouble(dataSetRow["PaymentAccount"])</expression>
                         <property name="paddingTop">1pt</property>
                         <text-data id="401">
                             <property name="fontFamily">"Arial Narrow"</property>
-                            <expression name="valueExpr">if (row["paymentDirection"].equals("incoming"))
+                            <expression name="valueExpr">if (row["paymentDirection"].equals(Payment.PAYMENT_DIRECTION_INCOMING))
   reportContext.getMessage("paymentDirection.incoming", reportContext.getLocale())
 else
   reportContext.getMessage("paymentDirection.outgoing", reportContext.getLocale())</expression>
@@ -2296,11 +2298,14 @@ description = dataSetRow["invoiceIDPrefix"] + "/" + dataSetRow["invoiceIDAsStrin
 currency = JFireReportingHelper.getJDOObject(dataSetRow["currencyJDOID"]);
 
 if (dataSetRow["outstanding"] != 0) {
-  oustandingStr = reportContext.getMessage("invoice.status.outstanding", reportContext.getLocale());
+  outstandingStr = reportContext.getMessage("invoice.status.outstanding", reportContext.getLocale());
+  formatParams = new Array();
+  formatParams[0] = currency.toDouble(dataSetRow["amountToPay"]);
+  formatParams[1] = currency.getCurrencySymbol();
   description = 
     description + 
     " " + 
-    Packages.java.lang.String.format(outStandingStr, currency.toDouble(dataSetRow["amountToPay"]), currency.getDescription);
+    Packages.java.lang.String.format(outstandingStr, formatParams);
 } else {
   paidStr = reportContext.getMessage("invoice.status.paid", reportContext.getLocale());
   description = 
@@ -2318,6 +2323,14 @@ description</expression>
                                     <cell id="384">
                                         <data id="459">
                                             <property name="fontFamily">"Arial Narrow"</property>
+                                            <list-property name="highlightRules">
+                                                <structure>
+                                                    <property name="operator">ne</property>
+                                                    <property name="color">#FF0000</property>
+                                                    <expression name="testExpr">row["outstanding"]</expression>
+                                                    <expression name="value1">0</expression>
+                                                </structure>
+                                            </list-property>
                                             <property name="resultSetColumn">InvoiceDescription</property>
                                         </data>
                                     </cell>

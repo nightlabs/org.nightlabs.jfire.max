@@ -59,6 +59,7 @@ import org.nightlabs.jfire.asyncinvoke.AsyncInvoke;
 import org.nightlabs.jfire.asyncinvoke.AsyncInvokeEnvelope;
 import org.nightlabs.jfire.asyncinvoke.ErrorCallback;
 import org.nightlabs.jfire.asyncinvoke.Invocation;
+import org.nightlabs.jfire.asyncinvoke.InvocationError;
 import org.nightlabs.jfire.asyncinvoke.UndeliverableCallback;
 import org.nightlabs.jfire.base.Lookup;
 import org.nightlabs.jfire.config.Config;
@@ -911,11 +912,13 @@ public class Trader
 		private static final long serialVersionUID = 1L;
 
 		@Override
-		public void handle(AsyncInvokeEnvelope envelope, Throwable error)
+		public void handle(AsyncInvokeEnvelope envelope)
 				throws Exception
 		{
 			PersistenceManager pm = getPersistenceManager();
 			try {
+				InvocationError invocationError = envelope.getAsyncInvokeProblem(pm).getLastError();
+
 				pm.getExtent(Article.class);
 				Collection articleIDs = ((AllocateArticlesEndInvocation) envelope
 						.getInvocation()).getArticleIDs();
@@ -928,8 +931,12 @@ public class Trader
 						logger.error("AllocateArticlesEndErrorCallback: Article does not exist in datastore: " + articleID);
 					}
 
-					if (article != null)
-						article.setAllocationException(error);
+					if (article != null) {
+						if (invocationError.getError() != null)
+							article.setAllocationException(invocationError.getError());
+						else
+							article.setAllocationException(invocationError.getErrorRootCauseClassName(), invocationError.getErrorMessage(), invocationError.getErrorStackTrace());
+					}
 				}
 			} finally {
 				pm.close();
@@ -1061,18 +1068,24 @@ public class Trader
 		private static final long serialVersionUID = 1L;
 
 		@Override
-		public void handle(AsyncInvokeEnvelope envelope, Throwable error)
+		public void handle(AsyncInvokeEnvelope envelope)
 				throws Exception
 		{
 			PersistenceManager pm = getPersistenceManager();
 			try {
+				InvocationError invocationError = envelope.getAsyncInvokeProblem(pm).getLastError();
+
 				pm.getExtent(Article.class);
 				Collection articleIDs = ((ReleaseArticlesEndInvocation) envelope
 						.getInvocation()).getArticleIDs();
 				for (Iterator iter = articleIDs.iterator(); iter.hasNext();) {
 					ArticleID articleID = (ArticleID) iter.next();
 					Article article = (Article) pm.getObjectById(articleID);
-					article.setReleaseException(error);
+
+					if (invocationError.getError() != null)
+						article.setReleaseException(invocationError.getError());
+					else
+						article.setReleaseException(invocationError.getErrorRootCauseClassName(), invocationError.getErrorMessage(), invocationError.getErrorStackTrace());
 				}
 			} finally {
 				pm.close();

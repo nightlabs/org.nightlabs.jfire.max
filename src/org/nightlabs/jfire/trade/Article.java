@@ -574,9 +574,9 @@ implements Serializable, DeleteCallback, DetachCallback, StoreCallback
 	 * specifying where the root exception happened.
 	 *
 	 * @jdo.field persistence-modifier="persistent"
-	 * @jdo.column length="255"
+	 * @jdo.column jdbc-type="LONGVARCHAR"
 	 */
-	private String allocationExceptionLocation = null;
+	private String allocationExceptionStackTrace = null;
 
 	/**
 	 * @jdo.field persistence-modifier="persistent"
@@ -604,9 +604,9 @@ implements Serializable, DeleteCallback, DetachCallback, StoreCallback
 	 * specifying where the root exception happened.
 	 *
 	 * @jdo.field persistence-modifier="persistent"
-	 * @jdo.column length="255"
+	 * @jdo.column jdbc-type="LONGVARCHAR"
 	 */
-	private String releaseExceptionLocation = null;
+	private String releaseExceptionStackTrace = null;
 
 	/**
 	 * @jdo.field persistence-modifier="persistent"
@@ -1279,25 +1279,38 @@ implements Serializable, DeleteCallback, DetachCallback, StoreCallback
 		return this.getClass().getName() + '{' + getPrimaryKey() + '}';
 	}
 
+	public void setAllocationException(String allocationExceptionClass, String allocationExceptionMessage, String allocationExceptionStackTrace)
+	{
+		this.allocationExceptionClass = allocationExceptionClass;
+		this.allocationExceptionMessage = allocationExceptionMessage;
+		this.allocationExceptionStackTrace = allocationExceptionStackTrace;
+	}
+
 	public void setAllocationException(Throwable t)
 	{
 		if (t == null) {
 			this.allocationExceptionClass = null;
 			this.allocationExceptionMessage = null;
-			this.allocationExceptionLocation = null;
+			this.allocationExceptionStackTrace = null;
 			return;
 		}
 
 		Throwable root = ExceptionUtils.getRootCause(t);
 		if (root == null)
 			root = t;
-		StackTraceElement ste = root.getStackTrace()[0];
-//		while (root.getCause() != null)
-//			root = root.getCause();
+//		StackTraceElement ste = root.getStackTrace()[0];
 
 		this.allocationExceptionClass = root.getClass().getName();
 		this.allocationExceptionMessage = root.getLocalizedMessage();
-		this.allocationExceptionLocation = ste.toString();
+//		this.allocationExceptionStackTrace = ste.toString();
+		this.allocationExceptionStackTrace = Util.getStackTraceAsString(root);
+	}
+
+	public void setReleaseException(String releaseExceptionClass, String releaseExceptionMessage, String releaseExceptionStackTrace)
+	{
+		this.releaseExceptionClass = releaseExceptionClass;
+		this.releaseExceptionMessage = releaseExceptionMessage;
+		this.releaseExceptionStackTrace = releaseExceptionStackTrace;
 	}
 
 	public void setReleaseException(Throwable t)
@@ -1305,7 +1318,7 @@ implements Serializable, DeleteCallback, DetachCallback, StoreCallback
 		if (t == null) {
 			this.releaseExceptionClass = null;
 			this.releaseExceptionMessage = null;
-			this.releaseExceptionLocation = null;
+			this.releaseExceptionStackTrace = null;
 			return;
 		}
 
@@ -1316,7 +1329,7 @@ implements Serializable, DeleteCallback, DetachCallback, StoreCallback
 
 		this.releaseExceptionClass = root.getClass().getName();
 		this.releaseExceptionMessage = root.getLocalizedMessage();
-		this.releaseExceptionLocation = ste.toString();
+		this.releaseExceptionStackTrace = ste.toString();
 	}
 
 	public String getAllocationExceptionClass()
@@ -1327,9 +1340,9 @@ implements Serializable, DeleteCallback, DetachCallback, StoreCallback
 	{
 		return allocationExceptionMessage;
 	}
-	public String getAllocationExceptionLocation()
+	public String getAllocationExceptionStackTrace()
 	{
-		return allocationExceptionLocation;
+		return allocationExceptionStackTrace;
 	}
 	public boolean isAllocationAbandoned()
 	{
@@ -1348,9 +1361,9 @@ implements Serializable, DeleteCallback, DetachCallback, StoreCallback
 	{
 		return releaseExceptionMessage;
 	}
-	public String getReleaseExceptionLocation()
+	public String getReleaseExceptionStackTrace()
 	{
-		return releaseExceptionLocation;
+		return releaseExceptionStackTrace;
 	}
 	public boolean isReleaseAbandoned()
 	{

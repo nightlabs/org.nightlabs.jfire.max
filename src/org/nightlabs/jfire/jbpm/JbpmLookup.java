@@ -4,6 +4,7 @@ import javax.naming.InitialContext;
 import javax.naming.NameAlreadyBoundException;
 import javax.naming.NamingException;
 
+import org.apache.log4j.Logger;
 import org.jbpm.JbpmConfiguration;
 import org.nightlabs.jfire.jbpm.internal.JbpmConfigurationCarrier;
 import org.nightlabs.jfire.security.SecurityReflector;
@@ -36,6 +37,7 @@ public class JbpmLookup
 
 	protected static void bindJbpmConfiguration(String organisationID, JbpmConfiguration jbpmConfiguration)
 	{
+		Logger.getLogger(JbpmLookup.class).info("bindJbpmConfiguration: organisationID="+organisationID);
 		String jndiName = getJbpmConfigurationJndiName(organisationID);
 		try {
 			InitialContext initialContext = new InitialContext();

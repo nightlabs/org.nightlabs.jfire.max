@@ -1,10 +1,12 @@
 package org.nightlabs.jfire.issue.query;
 
 import java.util.Date;
+import java.util.Set;
 
 import javax.jdo.Query;
 
 import org.apache.log4j.Logger;
+import org.nightlabs.jdo.ObjectID;
 import org.nightlabs.jdo.query.JDOQuery;
 import org.nightlabs.jfire.issue.Issue;
 import org.nightlabs.jfire.issue.IssueComment;
@@ -32,6 +34,7 @@ extends JDOQuery<Issue> {
 	private UserID assigneeID;
 	private Date createTimestamp;
 	private Date updateTimestamp;
+	private Set<ObjectID> objectIDs;
 	
 	@Override
 	protected Query prepareQuery() {
@@ -52,6 +55,14 @@ extends JDOQuery<Issue> {
 			q.declareVariables(IssueComment.class.getName() + " varComment");
 		}
 		
+		if (issueSubjectNComment != null) {
+			issueSubjectNComment = ".*" + issueSubjectNComment.toLowerCase() + ".*";
+			filter.append("( this.comments.contains(varComment) && varComment.text.toLowerCase().matches(\"" + issueSubjectNComment + "\") ) &&");
+			filter.append("( this.subject.names.containsValue(varSubject) && varSubject.toLowerCase().matches(\"" + issueSubject + "\") ) &&");
+			q.declareVariables(IssueComment.class.getName() + " varComment");
+			q.declareVariables(String.class.getName() + " varSubject");
+		}
+
 		if (issueTypeID != null) {
 //			filter.append("JDOHelper.getObjectId(this.issueType) == :issueTypeID && ");
 			filter.append("( this.issueType.organisationID == \"" + issueTypeID.organisationID + "\" && ");
@@ -100,6 +111,13 @@ extends JDOQuery<Issue> {
 //			filter.append("JDOHelper.getObjectId(this.updateTimestamp) == :updateTimestamp && ");
 			filter.append("( this.updateTimestamp >= :updateTimestamp ) &&");
 		}
+		
+		if (objectIDs != null) {
+//			filter.append("JDOHelper.getObjectId(this.updateTimestamp) == :updateTimestamp && ");
+			
+			filter.append("( this.updateTimestamp >= :updateTimestamp ) &&");
+		}
+		
 		filter.append("(1 == 1)");
 		logger.info(filter.toString());
 		q.setFilter(filter.toString());
@@ -112,6 +130,14 @@ extends JDOQuery<Issue> {
 	
 	public void setIssueSubject(String issueSubject) {
 		this.issueSubject = issueSubject;
+	}
+	
+	public void setIssueSubjectNComment(String issueSubjectNComment) {
+		this.issueSubjectNComment = issueSubjectNComment;
+	}
+	
+	public String getIssueSubjectNComment() {
+		return issueSubjectNComment;
 	}
 	
 	public String getIssueComment() {
@@ -184,5 +210,13 @@ extends JDOQuery<Issue> {
 
 	public void setUpdateTimestamp(Date updateTimestamp) {
 		this.updateTimestamp = updateTimestamp;
+	}
+	
+	public void setObjectIDs(Set<ObjectID> objectIDs) {
+		this.objectIDs = objectIDs;
+	}
+	
+	public Set<ObjectID> getObjectIDs() {
+		return objectIDs;
 	}
 }

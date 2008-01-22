@@ -535,21 +535,35 @@ implements SessionBean{
 	 * @ejb.transaction type = "Required"
 	 * @ejb.permission role-name="_Guest_"
 	 */
-	public void signalIssue(IssueID issueID, String jbpmTransitionName)
+	public Issue signalIssue(IssueID issueID, String jbpmTransitionName, boolean get, String[] fetchGroups, int maxFetchDepth)
 	{
 		PersistenceManager pm = getPersistenceManager();
 		try {
 			IssueLocal issueLocal = (IssueLocal) pm.getObjectById(IssueLocalID.create(issueID));
 			JbpmContext jbpmContext = JbpmLookup.getJbpmConfiguration().createJbpmContext();
+			
 			try {
 				ProcessInstance processInstance = jbpmContext.getProcessInstanceForUpdate(issueLocal.getJbpmProcessInstanceId());
 				processInstance.signal(jbpmTransitionName);
 			} finally {
 				jbpmContext.close();
 			}
+			
+			pm.flush();
+			
+			if (get) {
+				pm.getExtent(Issue.class);
+				pm.getFetchPlan().setGroups(fetchGroups);
+				pm.getFetchPlan().setMaxFetchDepth(maxFetchDepth);
+				Issue issue = (Issue) pm.getObjectById(issueID);
+				return pm.detachCopy(issue);
+			}
+			
 		} finally {
 			pm.close();
 		}
+		
+		return null;
 	}
 	
 	

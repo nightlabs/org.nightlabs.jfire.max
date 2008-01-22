@@ -18,6 +18,8 @@ public class ReportingTradeConstants {
 	public static final String REPORT_REGISTRY_ITEM_TYPE_OFFER = "JFireReportingTrade-Reporting-Offer";
 	public static final String REPORT_REGISTRY_ITEM_TYPE_INVOICE = "JFireReportingTrade-Reporting-Invoice";
 	public static final String REPORT_REGISTRY_ITEM_TYPE_DELIVERY_NOTE = "JFireReportingTrade-Reporting-DeliveryNote";
+	
+	public static final String REPORT_REGISTRY_ITEM_TYPE_FINANCIAL_ANALYSIS_PAYMENT = "JFireReportingTrade-FinancialAnalysis-Payment";
 
 	/**
 	 * Used as fallback value for script types where none was specified in the content.xml (of the root element).

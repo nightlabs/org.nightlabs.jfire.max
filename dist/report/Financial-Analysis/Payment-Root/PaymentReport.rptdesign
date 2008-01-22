@@ -5,7 +5,11 @@
     <property name="includeResource">reportMessages</property>
     <html-property name="description">WizardTemplateChoicePage.message.BlankReport</html-property>
     <method name="initialize"><![CDATA[importClass(Packages.org.nightlabs.jfire.reporting.JFireReportingHelper);
-importClass(Packages.org.nightlabs.jfire.accounting.pay.Payment);]]></method>
+importClass(Packages.org.nightlabs.jfire.accounting.pay.Payment);
+
+function isParamSet(param) {
+  return !("".equals(param) || ""+param == "null" || null == param);
+}]]></method>
     <text-property name="displayName">WizardTemplateChoicePage.title.BlankReport</text-property>
     <property name="iconFile">/templates/blank_report.gif</property>
     <parameters>
@@ -28,6 +32,15 @@ importClass(Packages.org.nightlabs.jfire.accounting.pay.Payment);]]></method>
             </structure>
         </scalar-parameter>
         <scalar-parameter name="partnerIDs" id="327">
+            <property name="valueType">static</property>
+            <property name="dataType">string</property>
+            <property name="isRequired">false</property>
+            <property name="controlType">text-box</property>
+            <structure name="format">
+                <property name="category">Unformatted</property>
+            </structure>
+        </scalar-parameter>
+        <scalar-parameter name="modeOfPaymentFlavourIDs" id="468">
             <property name="valueType">static</property>
             <property name="dataType">string</property>
             <property name="isRequired">false</property>
@@ -1785,7 +1798,86 @@ importClass(Packages.org.nightlabs.jfire.accounting.pay.Payment);]]></method>
             <column id="356"/>
             <column id="357"/>
             <row id="361">
-                <cell id="362"/>
+                <cell id="362">
+                    <text id="471">
+                        <property name="fontFamily">"Arial"</property>
+                        <property name="fontWeight">bold</property>
+                        <property name="contentType">auto</property>
+                        <text-property name="content"><![CDATA[Parameters:]]></text-property>
+                    </text>
+                    <grid id="472">
+                        <property name="width">100%</property>
+                        <column id="473"/>
+                        <column id="474"/>
+                        <row id="475">
+                            <cell id="476">
+                                <property name="paddingTop">1pt</property>
+                                <property name="paddingLeft">5pt</property>
+                                <property name="paddingBottom">1pt</property>
+                                <text-data id="485">
+                                    <property name="paddingTop">5pt</property>
+                                    <property name="paddingBottom">5pt</property>
+                                    <expression name="valueExpr">text = "Selected time period: ";
+if (JFireReportingHelper.getParameter("beginTimePeriod") == null) {
+  text + "None";
+} else {
+  timePeriod = JFireReportingHelper.getParameter("beginTimePeriod");
+  text = text + "&lt;br>From: ";
+  if (timePeriod.getFrom() == null) {  
+    text = text + "None";
+  } else {
+    text = text + (new Date(timePeriod.getFrom().getTime())).toLocaleString();
+  }
+  text = text + "&lt;br>To: "
+  if (timePeriod.getTo() == null) {  
+    text = text + "None";
+  } else {
+    text = text + (new Date(timePeriod.getTo().getTime())).toLocaleString();
+  }
+}</expression>
+                                    <property name="contentType">html</property>
+                                </text-data>
+                                <text-data id="484">
+                                    <property name="fontFamily">"Arial Narrow"</property>
+                                    <expression name="valueExpr">text = "Selected users and groups: ";
+userSelected = JFireReportingHelper.getParameter("userIDs") != null || JFireReportingHelper.getParameter("userGroupIDs") != null;
+if (!userSelected) {
+  text + "None"
+} else {
+  table = "&lt;table>"
+  if (JFireReportingHelper.getParameter("userIDs") != null) {
+    userIDs = JFireReportingHelper.getParameter("userIDs");
+    it = userIDs.iterator(); 
+    while (it.hasNext()) {
+      userID = it.next();
+      table = table + "\n" + "&lt;tr>&lt;td>" + "User: " + userID.userID + "&lt;/td>&lt;/tr>";
+    }
+  }  
+  if (JFireReportingHelper.getParameter("userGroupIDs") != null) {
+    userGroupIDs = JFireReportingHelper.getParameter("userGroupIDs");
+    it = userGroupIDs.iterator(); 
+    while (it.hasNext()) {
+      userGroupID = it.next();
+      table = table + "\n" + "&lt;tr>&lt;td>" + "Usergroup: " + userGroupID.userID + "&lt;/td>&lt;/tr>";
+    }
+  }
+  text + table + "&lt;/table>"
+}</expression>
+                                    <property name="contentType">html</property>
+                                </text-data>
+                            </cell>
+                            <cell id="477"/>
+                        </row>
+                        <row id="478">
+                            <cell id="479"/>
+                            <cell id="480"/>
+                        </row>
+                        <row id="481">
+                            <cell id="482"/>
+                            <cell id="483"/>
+                        </row>
+                    </grid>
+                </cell>
                 <cell id="363">
                     <property name="textAlign">right</property>
                     <image id="213">
@@ -1810,6 +1902,38 @@ JFire Payment List
         <table id="219">
             <property name="width">100%</property>
             <property name="dataSet">Payments</property>
+            <list-property name="paramBindings">
+                <structure>
+                    <property name="paramName">userIDs</property>
+                    <expression name="expression">if (JFireReportingHelper.getParameter("userIDs") != null)
+    JFireReportingHelper.createDataSetParam(JFireReportingHelper.getParameter("userIDs"))</expression>
+                </structure>
+                <structure>
+                    <property name="paramName">userGroupIDs</property>
+                    <expression name="expression">if (JFireReportingHelper.getParameter("userGroupIDs") != null)
+    JFireReportingHelper.createDataSetParam(JFireReportingHelper.getParameter("userGroupIDs"))</expression>
+                </structure>
+                <structure>
+                    <property name="paramName">partnerIDs</property>
+                    <expression name="expression">if (JFireReportingHelper.getParameter("partnerIDs") != null)
+    JFireReportingHelper.createDataSetParam(JFireReportingHelper.getParameter("partnerIDs"))</expression>
+                </structure>
+                <structure>
+                    <property name="paramName">beginTimePeriod</property>
+                    <expression name="expression">if (JFireReportingHelper.getParameter("beginTimePeriod") != null)
+    JFireReportingHelper.createDataSetParam(JFireReportingHelper.getParameter("beginTimePeriod"))</expression>
+                </structure>
+                <structure>
+                    <property name="paramName">endTimePeriod</property>
+                    <expression name="expression">if (JFireReportingHelper.getParameter("endTimePeriod") != null)
+    JFireReportingHelper.createDataSetParam(JFireReportingHelper.getParameter("endTimePeriod"))</expression>
+                </structure>
+                <structure>
+                    <property name="paramName">modeOfPaymentIDs</property>
+                    <expression name="expression">if (JFireReportingHelper.getParameter("modeOfPaymentFlavourIDs") != null)
+    JFireReportingHelper.createDataSetParam(JFireReportingHelper.getParameter("modeOfPaymentFlavourIDs"))</expression>
+                </structure>
+            </list-property>
             <list-property name="boundDataColumns">
                 <structure>
                     <property name="name">organisationID</property>
@@ -1938,6 +2062,12 @@ currency.toDouble(dataSetRow["PaymentAccount"])</expression>
                         <value>CurrencyGroup</value>
                     </simple-property-list>
                     <property name="aggregateFunction">sum</property>
+                </structure>
+            </list-property>
+            <list-property name="sort">
+                <structure>
+                    <expression name="key">row["paymentID"]</expression>
+                    <property name="direction">asc</property>
                 </structure>
             </list-property>
             <column id="318">

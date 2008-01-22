@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE reporting_initialiser PUBLIC "-//NightLabs//Reporting Initialiser DTD V 0.1//EN" "http://www.nightlabs.de/dtd/reporting-initialiser-content_0_1.dtd">
+<report-category id="Financial-Analysis">
+	<name language="de">Financial analysis</name>
+	<name language="en">Finanzanalyse</name>
+</report-category>

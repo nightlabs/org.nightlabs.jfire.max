@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE reporting_initialiser PUBLIC "-//NightLabs//Reporting Initialiser DTD V 0.1//EN" "http://www.nightlabs.de/dtd/reporting-initialiser-content_0_1.dtd">
+<report-category 
+	id="Payment-Root"
+	type="JFireReportingTrade-FinancialAnalysis-Payment"
+>
+	<name language="de">Analyse von Zahlungen</name>
+	<name language="en">Payments analysis</name>
+	
+	<report
+		file="PaymentReport.rptdesign" 
+		id="PaymentReport"
+		overwriteOnInit="false"
+	>
+		<name language="de">Kassenbericht (Zahlungsbericht)</name>
+		<name language="en">Cash report (payment report)</name>
+		<description language="de">Ein Bericht, der Zahlungen auflistet.</description>
+		<description language="en">A report that lists payments</description>
+	</report>	
+
+</report-category>

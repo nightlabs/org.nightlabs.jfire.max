@@ -236,8 +236,8 @@ function isParamSet(param) {
                     <property name="isInput">true</property>
                 </structure>
                 <structure>
-                    <property name="name">modeOfPaymentIDs</property>
-                    <property name="nativeName">modeOfPaymentIDs</property>
+                    <property name="name">modeOfPaymentFlavourIDs</property>
+                    <property name="nativeName">modeOfPaymentFlavourIDs</property>
                     <property name="dataType">string</property>
                     <property name="nativeDataType">1</property>
                     <property name="position">3</property>
@@ -417,7 +417,7 @@ function isParamSet(param) {
     <design:parameterDefinitions>
       <design:inOutMode>In</design:inOutMode>
       <design:attributes>
-        <design:name>modeOfPaymentIDs</design:name>
+        <design:name>modeOfPaymentFlavourIDs</design:name>
         <design:position>3</design:position>
         <design:nativeDataTypeCode>1</design:nativeDataTypeCode>
         <design:precision>0</design:precision>
@@ -1815,34 +1815,35 @@ function isParamSet(param) {
                                 <property name="paddingLeft">5pt</property>
                                 <property name="paddingBottom">1pt</property>
                                 <text-data id="485">
+                                    <property name="fontFamily">"Arial Narrow"</property>
                                     <property name="paddingTop">5pt</property>
                                     <property name="paddingBottom">5pt</property>
-                                    <expression name="valueExpr">text = "Selected time period: ";
+                                    <expression name="valueExpr">text = reportContext.getMessage("parameterListing.selectedBeginTime", reportContext.getLocale());
 if (JFireReportingHelper.getParameter("beginTimePeriod") == null) {
-  text + "None";
+  text + reportContext.getMessage("parameterListing.selectedBeginTime.none", reportContext.getLocale());
 } else {
   timePeriod = JFireReportingHelper.getParameter("beginTimePeriod");
-  text = text + "&lt;br>From: ";
+  text = text + "&lt;br>&amp;nbsp;" + reportContext.getMessage("parameterListing.selectedBeginTime.from", reportContext.getLocale());
   if (timePeriod.getFrom() == null) {  
-    text = text + "None";
+    text = text + reportContext.getMessage("parameterListing.selectedBeginTime.none", reportContext.getLocale());
   } else {
     text = text + (new Date(timePeriod.getFrom().getTime())).toLocaleString();
   }
-  text = text + "&lt;br>To: "
+  text = text + "&lt;br>&amp;nbsp;" + reportContext.getMessage("parameterListing.selectedBeginTime.to", reportContext.getLocale());
   if (timePeriod.getTo() == null) {  
-    text = text + "None";
+    text = text + reportContext.getMessage("parameterListing.selectedBeginTime.none", reportContext.getLocale())
   } else {
-    text = text + (new Date(timePeriod.getTo().getTime())).toLocaleString();
+    text = text + (new Date(timePeriod.getTo().getTime())).toLocaleString()
   }
 }</expression>
                                     <property name="contentType">html</property>
                                 </text-data>
                                 <text-data id="484">
                                     <property name="fontFamily">"Arial Narrow"</property>
-                                    <expression name="valueExpr">text = "Selected users and groups: ";
+                                    <expression name="valueExpr">text = reportContext.getMessage("parameterListing.selectedUsers", reportContext.getLocale());
 userSelected = JFireReportingHelper.getParameter("userIDs") != null || JFireReportingHelper.getParameter("userGroupIDs") != null;
 if (!userSelected) {
-  text + "None"
+  text + reportContext.getMessage("parameterListing.selectedUsers.none", reportContext.getLocale())
 } else {
   table = "&lt;table>"
   if (JFireReportingHelper.getParameter("userIDs") != null) {
@@ -1850,7 +1851,7 @@ if (!userSelected) {
     it = userIDs.iterator(); 
     while (it.hasNext()) {
       userID = it.next();
-      table = table + "\n" + "&lt;tr>&lt;td>" + "User: " + userID.userID + "&lt;/td>&lt;/tr>";
+      table = table + "\n" + "&lt;tr>&lt;td>" + reportContext.getMessage("parameterListing.selectedUsers.user", reportContext.getLocale()) + userID.userID + "&lt;/td>&lt;/tr>";
     }
   }  
   if (JFireReportingHelper.getParameter("userGroupIDs") != null) {
@@ -1858,7 +1859,7 @@ if (!userSelected) {
     it = userGroupIDs.iterator(); 
     while (it.hasNext()) {
       userGroupID = it.next();
-      table = table + "\n" + "&lt;tr>&lt;td>" + "Usergroup: " + userGroupID.userID + "&lt;/td>&lt;/tr>";
+      table = table + "\n" + "&lt;tr>&lt;td>" + reportContext.getMessage("parameterListing.selectedUsers.group", reportContext.getLocale()) + userGroupID.userID + "&lt;/td>&lt;/tr>";
     }
   }
   text + table + "&lt;/table>"
@@ -1866,7 +1867,46 @@ if (!userSelected) {
                                     <property name="contentType">html</property>
                                 </text-data>
                             </cell>
-                            <cell id="477"/>
+                            <cell id="477">
+                                <property name="paddingTop">1pt</property>
+                                <property name="paddingLeft">5pt</property>
+                                <text-data id="486">
+                                    <property name="fontFamily">"Arial Narrow"</property>
+                                    <property name="paddingTop">5pt</property>
+                                    <property name="paddingBottom">5pt</property>
+                                    <expression name="valueExpr">text = reportContext.getMessage("parameterListing.selectedMOPF", reportContext.getLocale());
+if (JFireReportingHelper.getParameter("modeOfPaymentFlavourIDs") == null) {
+  text = text + reportContext.getMessage("parameterListing.selectedMOPF.none", reportContext.getLocale())
+} else {
+  it = JFireReportingHelper.getParameter("modeOfPaymentFlavourIDs").iterator();
+  text = text + "&lt;table>";
+  while (it.hasNext()) {
+    mopfID = it.next();
+    mopf = JFireReportingHelper.getJDOObject(mopfID.toString());
+    text = text + "&lt;tr>&lt;td>" + mopf.getName().getText() + "&lt;/td>&lt;/tr>";
+  }
+  text = text + "&lt;/table>"
+}</expression>
+                                    <property name="contentType">html</property>
+                                </text-data>
+                                <text-data id="487">
+                                    <property name="fontFamily">"Arial Narrow"</property>
+                                    <expression name="valueExpr">text = reportContext.getMessage("parameterListing.selectedPartner", reportContext.getLocale());
+if (JFireReportingHelper.getParameter("partnerIDs") == null) {
+  text = text + reportContext.getMessage("parameterListing.selectedPartner.none", reportContext.getLocale())
+} else {
+  it = JFireReportingHelper.getParameter("partnerIDs").iterator();
+  text = text + "&lt;table>";
+  while (it.hasNext()) {
+    partnerID = it.next();
+    partner = JFireReportingHelper.getJDOObject(partnerID.toString());
+    text = text + "&lt;tr>&lt;td>" + partner.getPerson().getDisplayName() + "&lt;/td>&lt;/tr>";
+  }
+  text = text + "&lt;/table>"
+}</expression>
+                                    <property name="contentType">html</property>
+                                </text-data>
+                            </cell>
                         </row>
                         <row id="478">
                             <cell id="479"/>
@@ -1929,7 +1969,7 @@ JFire Payment List
     JFireReportingHelper.createDataSetParam(JFireReportingHelper.getParameter("endTimePeriod"))</expression>
                 </structure>
                 <structure>
-                    <property name="paramName">modeOfPaymentIDs</property>
+                    <property name="paramName">modeOfPaymentFlavourIDs</property>
                     <expression name="expression">if (JFireReportingHelper.getParameter("modeOfPaymentFlavourIDs") != null)
     JFireReportingHelper.createDataSetParam(JFireReportingHelper.getParameter("modeOfPaymentFlavourIDs"))</expression>
                 </structure>

@@ -148,8 +148,11 @@ public class PaymentList extends AbstractJFSScriptExecutorDelegate {
 			int i = 0;
 			for (Iterator<AnchorID> iterator = partnerIDs.iterator(); iterator.hasNext();) {
 				AnchorID partnerID = iterator.next();
-				jdoql.append("(JDOHelper.getObjectId(this.payment.partner) == :partnerID" + i + ") ");
-				jdoParams.put("partnerID", partnerID);
+				// TODO: WORKAROUND: JPOX Bug
+//				jdoql.append("(JDOHelper.getObjectId(this.payment.partner) == :partnerID" + i + ") ");
+//				jdoParams.put("partnerID"+i, partnerID);
+				jdoql.append("(this.payment.partner == :partner" + i + ") ");
+				jdoParams.put("partner"+i, pm.getObjectById(partnerID));
 				if (iterator.hasNext())
 					jdoql.append("|| ");
 			}
@@ -165,8 +168,8 @@ public class PaymentList extends AbstractJFSScriptExecutorDelegate {
 				// TODO: WORKAROUND: JPOX Bug
 //				jdoql.append("(JDOHelper.getObjectId(this.payment.modeOfPaymentFlavour) == :modeOfPaymentFlavourID" + i + ") ");
 //				jdoParams.put(":modeOfPaymentFlavourID" + i, modeOfPaymentFlavourID);
-				jdoql.append("(this.payment.modeOfPaymentFlavour == :== :modeOfPaymentFlavour" + i + ") ");
-				jdoParams.put(":modeOfPaymentFlavour" + i, pm.getObjectById(modeOfPaymentFlavourID));
+				jdoql.append("(this.payment.modeOfPaymentFlavour == :modeOfPaymentFlavour" + i + ") ");
+				jdoParams.put("modeOfPaymentFlavour" + i, pm.getObjectById(modeOfPaymentFlavourID));
 				if (iterator.hasNext())
 					jdoql.append("|| ");
 			}

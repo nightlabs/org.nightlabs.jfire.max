@@ -1,13 +1,32 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<root-container name="dev.jfire.org:IssueType" width="1347" height="691">
+<root-container name="dev.jfire.org:IssueType" width="1262" height="709">
   <node name="dev.jfire.org:new" x="48" y="-72" width="253" height="36">
     <edge>
       <label x="5" y="-10"/>
-      <bendpoint w1="-253" h1="80" w2="132" h2="-256"/>
     </edge>
     <edge>
       <label x="5" y="-10"/>
+    </edge>
+    <edge>
+      <label x="5" y="-10"/>
+      <bendpoint w1="259" h1="-27" w2="-245" h2="-48"/>
+    </edge>
+    <edge>
+      <label x="5" y="-10"/>
+      <bendpoint w1="256" h1="-11" w2="-248" h2="-32"/>
+    </edge>
+    <edge>
+      <label x="5" y="-10"/>
+      <bendpoint w1="256" h1="1" w2="-248" h2="-20"/>
+    </edge>
+    <edge>
+      <label x="5" y="-10"/>
+      <bendpoint w1="240" h1="22" w2="-264" h2="1"/>
+    </edge>
+    <edge>
+      <label x="5" y="-10"/>
+      <bendpoint w1="223" h1="37" w2="-281" h2="16"/>
     </edge>
   </node>
   <node name="dev.jfire.org:acknowledged" x="48" y="120" width="253" height="36">
@@ -134,5 +153,26 @@
       <label x="5" y="-10"/>
     </edge>
   </node>
-  <node name="dev.jfire.org:rejected" x="-312" y="264" width="202" height="36"/>
+  <node name="dev.jfire.org:rejected" x="-228" y="247" width="202" height="36"/>
+  <node name="dev.jfire.org:openedImplicitely" x="684" y="-51" width="223" height="36">
+    <edge>
+      <label x="5" y="-10"/>
+    </edge>
+    <edge>
+      <label x="5" y="-10"/>
+      <bendpoint w1="-83" h1="50" w2="220" h2="-121"/>
+    </edge>
+    <edge>
+      <label x="5" y="-10"/>
+      <bendpoint w1="-79" h1="65" w2="224" h2="-106"/>
+    </edge>
+    <edge>
+      <label x="5" y="-10"/>
+      <bendpoint w1="-73" h1="80" w2="230" h2="-91"/>
+    </edge>
+    <edge>
+      <label x="5" y="-10"/>
+      <bendpoint w1="-57" h1="95" w2="246" h2="-76"/>
+    </edge>
+  </node>
 </root-container>

@@ -553,23 +553,33 @@ public class ReportingInitialiser {
 					String providerOrganisationID = NLDOMUtil.getNonEmptyAttributeValue(providerNode, "organisationID");
 					String providerCategoryID = NLDOMUtil.getNonEmptyAttributeValue(providerNode, "categoryID");
 					String valueProviderID = NLDOMUtil.getNonEmptyAttributeValue(providerNode, "valueProviderID");
-					String pageIndexStr = NLDOMUtil.getNonEmptyAttributeValue(providerNode, "pageIndex");
-					if (pageIndexStr == null)
-						pageIndexStr = "0";
-					String pageOrderStr = NLDOMUtil.getNonEmptyAttributeValue(providerNode, "pageOrder");
-					if (pageOrderStr == null)
-						pageOrderStr = "0";
+					
 					int pageIndex = 0;
 					try {
+						String pageIndexStr = NLDOMUtil.getNonEmptyAttributeValue(providerNode, "pageIndex");
+						if (pageIndexStr == null)
+							pageIndexStr = "0";
 						pageIndex = Integer.parseInt(pageIndexStr);
 					} catch (Exception e) {
 						pageIndex = 0;
 					}
-					int pageOrder = 0;
+					int pageRow = 0;
 					try {
-						pageIndex = Integer.parseInt(pageIndexStr);
+						String pageRowStr = NLDOMUtil.getNonEmptyAttributeValue(providerNode, "pageRow");
+						if (pageRowStr == null)
+							pageRowStr = "0";
+						pageRow = Integer.parseInt(pageRowStr);
 					} catch (Exception e) {
-						pageIndex = 0;
+						pageRow = 0;
+					}
+					int pageColumn = 0;
+					try {
+						String pageColumnStr = NLDOMUtil.getNonEmptyAttributeValue(providerNode, "pageColumn");
+						if (pageColumnStr == null)
+							pageColumnStr = "0";
+						pageColumn = Integer.parseInt(pageColumnStr);
+					} catch (Exception e) {
+						pageColumn = 0;
 					}
 
 					ValueProviderConfig config = new ValueProviderConfig(acquisitionSetup, IDGenerator.nextID(ValueProviderConfig.class));
@@ -583,7 +593,8 @@ public class ReportingInitialiser {
 					}
 					config.setValueProvider(provider);
 					config.setPageIndex(pageIndex);					
-					config.setPageRow(pageOrder);
+					config.setPageRow(pageRow);
+					config.setPageColumn(pageColumn);
 					
 					boolean allowOutputNull = false;
 					String allowNullValue = NLDOMUtil.getAttributeValue(providerNode, "allowNullOutputValue");
@@ -789,6 +800,8 @@ public class ReportingInitialiser {
 			return;
 		for (File resFile : resourceFiles) {
 			String locale = ReportLayoutLocalisationData.extractLocale(resFile.getName());
+			if (locale == null)
+				locale = "";
 			ReportLayoutLocalisationDataID localisationDataID = ReportLayoutLocalisationDataID.create(
 					layout.getOrganisationID(), layout.getReportRegistryItemType(), layout.getReportRegistryItemID(), locale  
 			);

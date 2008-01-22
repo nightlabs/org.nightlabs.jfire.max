@@ -21,7 +21,7 @@ import org.nightlabs.jfire.reporting.layout.ReportLayout;
 import org.nightlabs.jfire.reporting.layout.ReportLayoutLocalisationData;
 import org.nightlabs.jfire.reporting.layout.id.ReportLayoutLocalisationDataID;
 import org.nightlabs.jfire.reporting.layout.render.ReportLayoutRendererUtil;
-import org.nightlabs.util.Util;
+import org.nightlabs.util.IOUtil;
 
 /**
  * @author Alexander Bieber <!-- alex [AT] nightlabs [DOT] de -->
@@ -57,44 +57,45 @@ public class ServerResourceLocator extends DefaultResourceLocator implements IRe
 	@Override
 	public URL findResource(ModuleHandle handle, String fileName, int type) {
 		String locale = ReportLayoutLocalisationData.extractLocale(fileName);
-		if (locale != null) {
-			ReportLayout layout = getCurrentReportLayout();
-			if (layout != null) {
-				ReportLayoutLocalisationDataID localisationID = ReportLayoutLocalisationDataID.create(
-						layout.getOrganisationID(),
-						layout.getReportRegistryItemType(),
-						layout.getReportRegistryItemID(),
-						locale
-					);
-				PersistenceManager pm = JDOHelper.getPersistenceManager(layout);
-				if (pm == null)
-					throw new IllegalStateException("Could not obtain PersistenceManager for ReportLayout "+JDOHelper.getObjectId(layout));
-				ReportLayoutLocalisationData localisationData = null;
+		if (locale == null)
+			locale = "";
+
+		ReportLayout layout = getCurrentReportLayout();
+		if (layout != null) {
+			ReportLayoutLocalisationDataID localisationID = ReportLayoutLocalisationDataID.create(
+					layout.getOrganisationID(),
+					layout.getReportRegistryItemType(),
+					layout.getReportRegistryItemID(),
+					locale
+			);
+			PersistenceManager pm = JDOHelper.getPersistenceManager(layout);
+			if (pm == null)
+				throw new IllegalStateException("Could not obtain PersistenceManager for ReportLayout "+JDOHelper.getObjectId(layout));
+			ReportLayoutLocalisationData localisationData = null;
+			try {
+				localisationData = (ReportLayoutLocalisationData) pm.getObjectById(localisationID);
+				localisationData.getLocale(); // WORKAROUND: Need to access
+			} catch (JDOObjectNotFoundException e) {
+				return null;
+			}
+			File layoutRoot = ReportLayoutRendererUtil.getRenderedLayoutOutputFolder();
+			File outputFile = new File(layoutRoot, fileName);
+			InputStream in = localisationData.createLocalisationDataInputStream();
+			try {
 				try {
-					localisationData = (ReportLayoutLocalisationData) pm.getObjectById(localisationID);
-					localisationData.getLocale(); // WORKAROUND: Need to access
-				} catch (JDOObjectNotFoundException e) {
-					return null;
-				}
-				File layoutRoot = ReportLayoutRendererUtil.getRenderedLayoutOutputFolder();
-				File outputFile = new File(layoutRoot, fileName);
-				InputStream in = localisationData.createLocalisationDataInputStream();
-				try {
+					FileOutputStream out = new FileOutputStream(outputFile);
 					try {
-						FileOutputStream out = new FileOutputStream(outputFile);
-						try {
-							Util.transferStreamData(in, out);
-						} finally {
-							out.close();
-						}
+						IOUtil.transferStreamData(in, out);
 					} finally {
-						in.close();
+						out.close();
 					}
-					return outputFile.toURL();
-				} catch (IOException e) {
-					logger.error(e);
-					return null;
+				} finally {
+					in.close();
 				}
+				return outputFile.toURL();
+			} catch (IOException e) {
+				logger.error(e);
+				return null;
 			}
 		}
 		return super.findResource(handle, fileName, type);

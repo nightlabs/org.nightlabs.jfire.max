@@ -40,6 +40,7 @@ import org.eclipse.datatools.connectivity.oda.IQuery;
 import org.nightlabs.jdo.ObjectID;
 import org.nightlabs.jdo.ObjectIDUtil;
 import org.nightlabs.jfire.reporting.layout.render.RenderManager;
+import org.nightlabs.jfire.reporting.oda.jfs.JFSParameterUtil;
 
 import com.thoughtworks.xstream.XStream;
 import com.thoughtworks.xstream.io.xml.XppDriver;
@@ -177,10 +178,10 @@ public class JFireReportingHelper {
 	}
 	
 	/**
-	 * Get the map of all named varialbes associated to the current thread
+	 * Get the map of all named variables associated to the current thread
 	 * (execution of the current report). 
 	 * 
-	 * @return The map of all named varialbes associated to the current thread
+	 * @return The map of all named variables associated to the current thread
 	 * (execution of the current report).
 	 */
 	public static Map<String, Object> getVars() {
@@ -199,7 +200,11 @@ public class JFireReportingHelper {
 	
 	/**
 	 * Get the parameter with the given name for the currently running report.
-	 * 
+	 * <p>
+	 * Report developers are advised to access the parameters via this method
+	 * and not the BIRT via params[name], because accessing java methods of
+	 * that value will fail.
+	 * </p> 
 	 * @return The parameter with the given name for the currently running report.
 	 * @see #getParameters()
 	 */
@@ -248,6 +253,8 @@ public class JFireReportingHelper {
 	 * @return A String serialization of the given object.
 	 */
 	public static String createDataSetParam(Object obj) {
+		if (obj == null)
+			return JFSParameterUtil.DUMMY_DEFAULT_PARAMETER_VALUE;
 		XStream xStream = new XStream(new XppDriver());
 		StringWriter writer = new StringWriter();
 		writer.append(dataSetparameterOpenTag);

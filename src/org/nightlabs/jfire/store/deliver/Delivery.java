@@ -37,6 +37,7 @@ import javax.jdo.JDOHelper;
 import javax.jdo.PersistenceManager;
 import javax.jdo.listener.StoreCallback;
 
+import org.apache.log4j.Logger;
 import org.nightlabs.jdo.NLJDOHelper;
 import org.nightlabs.jdo.ObjectIDUtil;
 import org.nightlabs.jfire.idgenerator.IDGenerator;
@@ -1388,7 +1389,26 @@ implements Serializable, StoreCallback
 				articles.clear();
 
 				for (ArticleID articleID : articleIDs) {
-					Article article = (Article) pm.getObjectById(articleID);
+					Article article = null;
+
+					int tryCounter = 0;
+					while (article == null) {
+						try {
+							++tryCounter;
+							article = (Article) pm.getObjectById(articleID);
+						} catch (Exception x) {
+							// TODO JPOX WORKAROUND sometimes it doesn't find articles even though they definitely exist
+							// => ignore and try again
+							Logger.getLogger(Delivery.class).warn("Loading article failed!", x);
+							pm.getExtent(Article.class); // shouldn't be necessary since it was loaded already before, but shouldn't hurt either
+							if (tryCounter > 10) {
+								if (x instanceof RuntimeException)
+									throw (RuntimeException)x;
+								throw new RuntimeException(x);
+							}
+						}
+					}
+
 					ArticleLocal articleLocal = article.getArticleLocal();
 
 					if (articleLocal.isDelivered() && !getPrimaryKey().equals(articleLocal.getDelivery().getPrimaryKey()))

@@ -62,8 +62,7 @@ import org.nightlabs.jfire.security.User;
 public abstract class Transfer
 implements Serializable
 {
-	/** @jdo.field persistence-modifier="none" */
-	private final Logger logger = Logger.getLogger(Transfer.class);
+	private static final Logger logger = Logger.getLogger(Transfer.class);
 
 	public static final String FETCH_GROUP_CONTAINER = "Transfer.container";
 	public static final String FETCH_GROUP_FROM = "Transfer.from";

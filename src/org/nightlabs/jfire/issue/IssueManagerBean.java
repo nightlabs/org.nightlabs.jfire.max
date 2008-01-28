@@ -25,6 +25,7 @@ import org.nightlabs.ModuleException;
 import org.nightlabs.jdo.NLJDOHelper;
 import org.nightlabs.jdo.query.JDOQuery;
 import org.nightlabs.jfire.base.BaseSessionBeanImpl;
+import org.nightlabs.jfire.editlock.EditLockType;
 import org.nightlabs.jfire.issue.config.StoredIssueQuery;
 import org.nightlabs.jfire.issue.history.IssueHistory;
 import org.nightlabs.jfire.issue.id.IssueID;
@@ -746,7 +747,9 @@ implements SessionBean{
 			// create the process definitions.
 			issueType.readProcessDefinition(IssueType.class.getResource("jbpm/status/"));
 			issueType2.readProcessDefinition(IssueType.class.getResource("jbpm/status/"));
-			
+	
+			EditLockType issueEditLock = new EditLockType(EditLockTypeIssue.EDIT_LOCK_TYPE_ID);
+			issueEditLock = pm.makePersistent(issueEditLock);
 			//------------------------------------------------
 		} finally {
 			pm.close();

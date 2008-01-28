@@ -31,6 +31,8 @@ import org.nightlabs.util.Util;
  * 
  * @jdo.fetch-group name="StatableLocal.state" fetch-groups="default" fields="state"
  * @jdo.fetch-group name="StatableLocal.states" fetch-groups="default" fields="states"
+ * @jdo.fetch-group name="IssueLocal.state" fetch-groups="default" fields="state"
+ * @jdo.fetch-group name="IssueLocal.states" fetch-groups="default" fields="states"
  * @jdo.fetch-group name="IssueLocal.this" fetch-groups="default" fields="state, states, issue"
  *
  * @jdo.inheritance strategy="new-table"

@@ -83,7 +83,8 @@ import org.nightlabs.util.Util;
  * @jdo.fetch-group name="Issue.issueLocal" fetch-groups="default" fields="issueLocal"
  * @jdo.fetch-group name="Issue.issueType" fetch-groups="default" fields="issueType"
  * @jdo.fetch-group name="Issue.comments" fetch-groups="default" fields="comments"
- * @jdo.fetch-group name="Issue.this" fetch-groups="default" fields="fileList, issueType, referencedObjectIDs, description, subject, issuePriority, issueSeverityType, issueResolution, state, states, comments, issueLocal, reporter, assignee" *
+ * @jdo.fetch-group name="Issue.this" fetch-groups="default" fields="fileList, issueType, referencedObjectIDs, description, subject, issuePriority, issueSeverityType, issueResolution, state, states, comments, issueLocal, reporter, assignee" 
+ *
  **/
 public class Issue
 implements 	

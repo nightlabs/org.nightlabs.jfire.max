@@ -86,4 +86,19 @@ extends BaseJDOObjectDAO<StoredIssueQueryID, StoredIssueQuery>
 			throw new RuntimeException("Error while storing StoredIssueQuery!\n" ,e);
 		}
 	}
+	
+	public void deleteStoredIssueQuery(StoredIssueQueryID id, ProgressMonitor monitor) {
+		if(id == null)
+			throw new NullPointerException("StoredIssueQueryID to delete must not be null");
+		monitor.beginTask("Deleting storedIssueQuery: "+ id, 3);
+		try {
+			IssueManager im = IssueManagerUtil.getHome(SecurityReflector.getInitialContextProperties()).create();
+			im.deleteStoredIssueQuery(id);
+			monitor.worked(1);
+			monitor.done();
+		} catch (Exception e) {
+			monitor.done();
+			throw new RuntimeException("Error while deleting StoredIssueQuery!\n" ,e);
+		}
+	}
 }

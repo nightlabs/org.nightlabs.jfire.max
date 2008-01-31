@@ -37,6 +37,8 @@ public class RenderReportRequest implements Serializable {
 	}
 
 	/**
+	 * Creates a new {@link RenderReportRequest} with the given parameters and the default locale (of the current java runtime).
+	 * 
 	 * @param reportRegistryItemID the id of the report which shall be rendered - must NOT be <code>null</code>.
 	 * @param parameters the parameters - can be <code>null</code> (<code>null</code> will be converted to an empty <code>Map</code>)
 	 * @param outputFormat the desired output-format - must NOT be <code>null</code>.
@@ -50,6 +52,28 @@ public class RenderReportRequest implements Serializable {
 		this.setReportRegistryItemID(reportRegistryItemID);
 		this.setParameters(parameters);
 		this.setOutputFormat(outputFormat);
+		this.locale = Locale.getDefault();
+	}
+	
+	/**
+	 * Creates a new {@link RenderReportRequest} with the given parameters.
+	 * 
+	 * @param reportRegistryItemID the id of the report which shall be rendered - must NOT be <code>null</code>.
+	 * @param parameters the parameters - can be <code>null</code> (<code>null</code> will be converted to an empty <code>Map</code>)
+	 * @param outputFormat the desired output-format - must NOT be <code>null</code>.
+	 * @param locale the Locale for the report should be rendered with.
+	 */
+	public RenderReportRequest(
+			ReportRegistryItemID reportRegistryItemID,
+			Map<String, Object> parameters,
+			OutputFormat outputFormat,
+			Locale locale
+		)
+	{
+		this.setReportRegistryItemID(reportRegistryItemID);
+		this.setParameters(parameters);
+		this.setOutputFormat(outputFormat);
+		this.locale = locale;
 	}
 	
 	/**

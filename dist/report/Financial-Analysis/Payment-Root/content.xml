@@ -12,8 +12,8 @@
 		id="PaymentReport"
 		overwriteOnInit="false"
 	>
-		<name language="de">Kassenbericht (Zahlungsbericht)</name>
-		<name language="en">Cash report (payment report)</name>
+		<name language="de">Zahlungsbericht</name>
+		<name language="en">Payment report</name>
 		<description language="de">Ein Bericht, der Zahlungen auflistet.</description>
 		<description language="en">A report that lists payments</description>
 		

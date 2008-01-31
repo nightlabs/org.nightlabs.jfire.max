@@ -5,14 +5,12 @@ package org.nightlabs.jfire.reporting.layout.render;
 
 import java.io.File;
 import java.util.Date;
-import java.util.HashMap;
 
 import javax.jdo.PersistenceManager;
 
-import org.eclipse.birt.report.engine.api.EngineConstants;
 import org.eclipse.birt.report.engine.api.EngineException;
-import org.eclipse.birt.report.engine.api.HTMLRenderContext;
 import org.eclipse.birt.report.engine.api.HTMLRenderOption;
+import org.eclipse.birt.report.engine.api.HTMLServerImageHandler;
 import org.eclipse.birt.report.engine.api.IRunAndRenderTask;
 import org.nightlabs.jfire.reporting.Birt;
 import org.nightlabs.jfire.reporting.Birt.OutputFormat;
@@ -57,16 +55,10 @@ public class ReportLayoutRendererHTML implements ReportLayoutRenderer {
 		HTMLRenderOption options = new HTMLRenderOption( );
 		options.setOutputFormat(renderRequest.getOutputFormat().toString());
 		
-		HTMLRenderContext renderContext = new HTMLRenderContext( );
-		renderContext.setImageDirectory(layoutRoot.getAbsolutePath().toString()+File.separator+"images");
-		renderContext.setBaseImageURL("images"); //$NON-NLS-1$
-
-		HashMap appContext = new HashMap( );
-		appContext.put(EngineConstants.APPCONTEXT_HTML_RENDER_CONTEXT, renderContext);
-		task.setAppContext(appContext);
-		
-		options.setOutputFileName(layoutRoot.getAbsolutePath().toString()+File.separator+fileName+".html");
-//		options.setOutputStream(outputStream);
+		options.setOutputFileName(layoutRoot.getAbsolutePath().toString() + File.separator + fileName+".html"); //$NON-NLS-1$
+		options.setImageHandler(new HTMLServerImageHandler());
+		options.setImageDirectory(layoutRoot.getAbsolutePath().toString() + File.separator + "images"); //$NON-NLS-1$
+		options.setBaseImageURL("images"); //$NON-NLS-1$
 		task.setRenderOption(options);
 		
 		task.setParameterValues(renderRequest.getParameters());

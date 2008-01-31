@@ -521,6 +521,25 @@ implements SessionBean{
 	 * @ejb.permission role-name="_Guest_"
 	 * @ejb.transaction type="Required"
 	 */	
+	public void deleteStoredIssueQuery(StoredIssueQueryID storedIssueQueryID)
+	{
+		PersistenceManager pm = getPersistenceManager();
+		try {
+			pm.getFetchPlan().setGroup(FetchPlan.DEFAULT);
+			pm.getExtent(StoredIssueQuery.class, true);
+			StoredIssueQuery storedIssueQuery = (StoredIssueQuery) pm.getObjectById(storedIssueQueryID);
+			pm.deletePersistent(storedIssueQuery);
+		}//try
+		finally {
+			pm.close();
+		}//finally
+	}
+	
+	/**
+	 * @ejb.interface-method
+	 * @ejb.permission role-name="_Guest_"
+	 * @ejb.transaction type="Required"
+	 */	
 	public IssueHistory createIssueHistory(IssueHistory issueHistory, boolean get, String[] fetchGroups, int maxFetchDepth) 
 	{
 		PersistenceManager pm = getPersistenceManager();

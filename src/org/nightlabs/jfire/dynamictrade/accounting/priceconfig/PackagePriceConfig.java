@@ -61,7 +61,7 @@ implements IPackagePriceConfig
 				singlePrice.getOrganisationID(), singlePrice.getPriceConfigID(), priceID,
 				false);
 		for (PriceFragment pf : articlePrice.getFragments()) {
-			articlePrice.setAmount(pf.getPriceFragmentType(), (long) (pf.getAmount() * dynamicProduct.getQuantity()));
+			articlePrice.setAmount(pf.getPriceFragmentType(), (long) (pf.getAmount() * dynamicProduct.getQuantityAsDouble()));
 		}
 		return articlePrice;
 	}

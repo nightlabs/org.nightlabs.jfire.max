@@ -4,10 +4,12 @@ import org.nightlabs.annotation.Implement;
 import org.nightlabs.jfire.accounting.Price;
 import org.nightlabs.jfire.dynamictrade.accounting.priceconfig.DynamicTradePriceConfig;
 import org.nightlabs.jfire.security.User;
+import org.nightlabs.jfire.store.BundleProduct;
 import org.nightlabs.jfire.store.NestedProductTypeLocal;
 import org.nightlabs.jfire.store.Product;
 import org.nightlabs.jfire.store.ProductLocator;
 import org.nightlabs.jfire.store.ProductType;
+import org.nightlabs.jfire.store.Unit;
 import org.nightlabs.jfire.trade.Article;
 import org.nightlabs.jfire.trade.ArticlePrice;
 
@@ -34,6 +36,7 @@ import org.nightlabs.jfire.trade.ArticlePrice;
  */
 public class DynamicProduct
 extends Product
+implements BundleProduct
 {
 	private static final long serialVersionUID = 1L;
 
@@ -49,7 +52,7 @@ extends Product
 	/**
 	 * @jdo.field persistence-modifier="persistent"
 	 */
-	private double quantity;
+	private long quantity;
 
 	/**
 	 * @jdo.field persistence-modifier="persistent"
@@ -86,7 +89,7 @@ extends Product
 	 * The single price is the price calculated by the {@link DynamicTradePriceConfig}. Therefore it does not take the quantity
 	 * into account. The quantity is incorporated into the {@link ArticlePrice} of the corresponding {@link Article}.
 	 *
-	 * @return the price for one single <code>Product</code> - i.e. without the quantity ({@link #getQuantity()}) taken into account.
+	 * @return the price for one single <code>Product</code> - i.e. without the quantity ({@link #getQuantityAsDouble()}) taken into account.
 	 */
 	public Price getSinglePrice()
 	{
@@ -102,19 +105,33 @@ extends Product
 		return name;
 	}
 
-	public double getQuantity()
+	/**
+	 * Get the quantity as floating point number. This is a convenience method equal to
+	 * calling {@link #getUnit()} and {@link Unit#toDouble(long)}.
+	 *
+	 * @return the quantity in double form - i.e. with shifted decimal digits.
+	 */
+//	@Override
+	public double getQuantityAsDouble()
+	{
+		return unit.toDouble(quantity);
+	}
+	@Override
+	public long getQuantity()
 	{
 		return quantity;
 	}
-	public void setQuantity(double quantity)
+	@Override
+	public void setQuantity(long quantity)
 	{
 		this.quantity = quantity;
 	}
-
+	@Override
 	public Unit getUnit()
 	{
 		return unit;
 	}
+	@Override
 	public void setUnit(Unit unit)
 	{
 		this.unit = unit;

@@ -34,19 +34,18 @@ import org.nightlabs.jfire.dynamictrade.accounting.priceconfig.PackagePriceConfi
 import org.nightlabs.jfire.dynamictrade.store.DynamicProduct;
 import org.nightlabs.jfire.dynamictrade.store.DynamicProductType;
 import org.nightlabs.jfire.dynamictrade.store.DynamicProductTypeActionHandler;
-import org.nightlabs.jfire.dynamictrade.store.Unit;
-import org.nightlabs.jfire.dynamictrade.store.id.UnitID;
-import org.nightlabs.jfire.idgenerator.IDGenerator;
 import org.nightlabs.jfire.organisation.LocalOrganisation;
 import org.nightlabs.jfire.organisation.Organisation;
 import org.nightlabs.jfire.security.User;
 import org.nightlabs.jfire.store.CannotPublishProductTypeException;
 import org.nightlabs.jfire.store.ProductType;
 import org.nightlabs.jfire.store.Store;
+import org.nightlabs.jfire.store.Unit;
 import org.nightlabs.jfire.store.deliver.DeliveryConfiguration;
 import org.nightlabs.jfire.store.deliver.ModeOfDelivery;
 import org.nightlabs.jfire.store.deliver.ModeOfDeliveryConst;
 import org.nightlabs.jfire.store.id.ProductTypeID;
+import org.nightlabs.jfire.store.id.UnitID;
 import org.nightlabs.jfire.trade.Article;
 import org.nightlabs.jfire.trade.ArticleCreator;
 import org.nightlabs.jfire.trade.ArticlePrice;
@@ -159,27 +158,6 @@ implements SessionBean
 			root.setPackagePriceConfig(PackagePriceConfig.getPackagePriceConfig(pm));
 			root.setDeliveryConfiguration(deliveryConfiguration);
 			store.setProductTypeStatus_published(user, root);
-
-			Unit unit = new Unit(organisationID, IDGenerator.nextID(Unit.class));
-			unit.getSymbol().setText(Locale.ENGLISH.getLanguage(), "h");
-			unit.getName().setText(Locale.ENGLISH.getLanguage(), "hour");
-			unit.getName().setText(Locale.GERMAN.getLanguage(), "Stunde");
-			pm.makePersistent(unit);
-
-			unit = new Unit(organisationID, IDGenerator.nextID(Unit.class));
-			unit.getSymbol().setText(Locale.ENGLISH.getLanguage(), "pcs.");
-			unit.getName().setText(Locale.ENGLISH.getLanguage(), "pieces");
-			unit.getSymbol().setText(Locale.GERMAN.getLanguage(), "Stk.");
-			unit.getName().setText(Locale.GERMAN.getLanguage(), "Stück");
-			pm.makePersistent(unit);
-
-			unit = new Unit(organisationID, IDGenerator.nextID(Unit.class));
-			unit.getSymbol().setText(Locale.ENGLISH.getLanguage(), "()");
-			unit.getName().setText(Locale.ENGLISH.getLanguage(), "(spot-rate)");
-			unit.getSymbol().setText(Locale.GERMAN.getLanguage(), "()");
-			unit.getName().setText(Locale.GERMAN.getLanguage(), "(pauschal)");
-			pm.makePersistent(unit);
-
 		} finally {
 			pm.close();
 		}
@@ -404,40 +382,6 @@ implements SessionBean
 		}
 	}
 
-
-	/**
-	 * @ejb.interface-method
-	 * @ejb.permission role-name="_Guest_"
-	 * @ejb.transaction type="Supports"
-	 */
-	public Set<UnitID> getUnitIDs()
-	{
-		PersistenceManager pm = getPersistenceManager();
-		try {
-			Query q = pm.newQuery(Unit.class);
-			q.setResult("JDOHelper.getObjectId(this)");
-			return new HashSet<UnitID>((Collection<? extends UnitID>) q.execute());
-		} finally {
-			pm.close();
-		}
-	}
-
-	/**
-	 * @ejb.interface-method
-	 * @ejb.permission role-name="_Guest_"
-	 * @ejb.transaction type="Supports"
-	 */
-	@SuppressWarnings("unchecked")
-	public List<Unit> getUnits(Collection<UnitID> unitIDs, String[] fetchGroups, int maxFetchDepth)
-	{
-		PersistenceManager pm = getPersistenceManager();
-		try {
-			return NLJDOHelper.getDetachedObjectList(pm, unitIDs, Unit.class, fetchGroups, maxFetchDepth);
-		} finally {
-			pm.close();
-		}
-	}
-
 	/**
 	 * @ejb.interface-method
 	 * @ejb.permission role-name="_Guest_"
@@ -447,7 +391,7 @@ implements SessionBean
 			SegmentID segmentID,
 			OfferID offerID,
 			ProductTypeID productTypeID,
-			double quantity,
+			long quantity,
 			UnitID unitID,
 			TariffID tariffID,
 			I18nText productName,
@@ -547,7 +491,7 @@ implements SessionBean
 	 */
 	public Article modifyArticle(
 			ArticleID articleID,
-			Double quantity,
+			Long quantity,
 			UnitID unitID,
 			TariffID tariffID,
 			I18nText productName,
@@ -567,7 +511,7 @@ implements SessionBean
 			boolean recalculatePrice = false;
 
 			if (quantity != null) {
-				product.setQuantity(quantity.doubleValue());
+				product.setQuantity(quantity.longValue());
 				recalculatePrice = true;
 			}
 

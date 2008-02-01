@@ -97,6 +97,7 @@ import org.nightlabs.jfire.store.id.DeliveryNoteID;
 import org.nightlabs.jfire.store.id.DeliveryNoteLocalID;
 import org.nightlabs.jfire.store.id.ProductTypeID;
 import org.nightlabs.jfire.store.id.RepositoryTypeID;
+import org.nightlabs.jfire.store.id.UnitID;
 import org.nightlabs.jfire.store.query.ProductTransferIDQuery;
 import org.nightlabs.jfire.store.query.ProductTransferQuery;
 import org.nightlabs.jfire.store.search.ProductTypeQuery;
@@ -372,6 +373,60 @@ implements SessionBean
 			idNamespaceDefault.setCacheSizeClient(0);
 
 			pm.makePersistent(new EditLockTypeDeliveryNote(EditLockTypeDeliveryNote.EDIT_LOCK_TYPE_ID));
+
+
+			Unit unit = new Unit(Organisation.DEV_ORGANISATION_ID, IDGenerator.nextID(Unit.class), 2);
+			unit.getSymbol().setText(Locale.ENGLISH.getLanguage(), "h");
+			unit.getName().setText(Locale.ENGLISH.getLanguage(), "hour");
+			unit.getName().setText(Locale.GERMAN.getLanguage(), "Stunde");
+			pm.makePersistent(unit);
+
+			unit = new Unit(Organisation.DEV_ORGANISATION_ID, IDGenerator.nextID(Unit.class), 3);
+			unit.getSymbol().setText(Locale.ENGLISH.getLanguage(), "pcs.");
+			unit.getName().setText(Locale.ENGLISH.getLanguage(), "pieces");
+			unit.getSymbol().setText(Locale.GERMAN.getLanguage(), "Stk.");
+			unit.getName().setText(Locale.GERMAN.getLanguage(), "Stück");
+			pm.makePersistent(unit);
+
+			unit = new Unit(Organisation.DEV_ORGANISATION_ID, IDGenerator.nextID(Unit.class), 0);
+			unit.getSymbol().setText(Locale.ENGLISH.getLanguage(), "()");
+			unit.getName().setText(Locale.ENGLISH.getLanguage(), "(spot-rate)");
+			unit.getSymbol().setText(Locale.GERMAN.getLanguage(), "()");
+			unit.getName().setText(Locale.GERMAN.getLanguage(), "(pauschal)");
+			pm.makePersistent(unit);
+		} finally {
+			pm.close();
+		}
+	}
+
+	/**
+	 * @ejb.interface-method
+	 * @ejb.permission role-name="_Guest_"
+	 * @ejb.transaction type="Supports"
+	 */
+	public Set<UnitID> getUnitIDs()
+	{
+		PersistenceManager pm = getPersistenceManager();
+		try {
+			Query q = pm.newQuery(Unit.class);
+			q.setResult("JDOHelper.getObjectId(this)");
+			return new HashSet<UnitID>((Collection<? extends UnitID>) q.execute());
+		} finally {
+			pm.close();
+		}
+	}
+
+	/**
+	 * @ejb.interface-method
+	 * @ejb.permission role-name="_Guest_"
+	 * @ejb.transaction type="Supports"
+	 */
+	@SuppressWarnings("unchecked")
+	public List<Unit> getUnits(Collection<UnitID> unitIDs, String[] fetchGroups, int maxFetchDepth)
+	{
+		PersistenceManager pm = getPersistenceManager();
+		try {
+			return NLJDOHelper.getDetachedObjectList(pm, unitIDs, Unit.class, fetchGroups, maxFetchDepth);
 		} finally {
 			pm.close();
 		}

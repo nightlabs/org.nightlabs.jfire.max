@@ -128,7 +128,7 @@ implements Serializable, org.nightlabs.l10n.Currency
 	{
 		return Util.hashCode(currencyID);
 	}
-	
+
 	/**
 	 * Returns the given amount in the double value of this currency.
 	 * <p>
@@ -136,9 +136,22 @@ implements Serializable, org.nightlabs.l10n.Currency
 	 * <p>
 	 *  
 	 * @param amount The amount to convert
-	 * @return
+	 * @return the approximate value as double - there might be rounding differences.
 	 */
 	public double toDouble(long amount) {		
-		return amount / Math.pow(10, getDecimalDigitCount());		
+		return amount / Math.pow(10, getDecimalDigitCount());
+	}
+
+	/**
+	 * Convert the given amount to the long value of this currency.
+	 * <p>
+	 *   amount * 10^(decimalDigitCount)
+	 * <p>
+	 *  
+	 * @param amount The amount to convert
+	 * @return the approximate value as long - there might be rounding differences.
+	 */
+	public long toLong(double amount) {		
+		return (long)(amount * Math.pow(10, getDecimalDigitCount()));
 	}
 }

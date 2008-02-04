@@ -107,7 +107,8 @@ import org.nightlabs.version.MalformedVersionException;
  *					 type="Stateless" 
  *					 transaction-type="Container"
  *
- * @ejb.util generate = "physical"
+ * @ejb.util generate="physical"
+ * @ejb.transaction type="Required"
  */
 public abstract class ReportManagerBean
 extends BaseSessionBeanImpl
@@ -359,7 +360,7 @@ implements SessionBean
 	 *
 	 * @ejb.interface-method
 	 * @ejb.permission role-name="_System_"
-	 * @ejb.transaction type = "Required"
+	 * @ejb.transaction type="Required"
 	 */
 	public void initialise() throws InstantiationException, IllegalAccessException, MalformedVersionException, ScriptingIntialiserException 
 	{
@@ -506,7 +507,7 @@ implements SessionBean
 	 *
 	 * @ejb.interface-method
 	 * @ejb.permission role-name="_Guest_"
-	 * @ejb.transaction type = "Never"
+	 * @ejb.transaction type="Never"
 	 */
 	public IResultSet fetchJDOQLResultSet(
 			String queryText, 
@@ -534,7 +535,7 @@ implements SessionBean
 	 *
 	 * @ejb.interface-method
 	 * @ejb.permission role-name="_Guest_"
-	 * @ejb.transaction type = "Required"
+	 * @ejb.transaction type="Required"
 	 */
 	public JDOQLResultSetMetaData getQueryMetaData(String organisationID, String queryText) 
 	{
@@ -548,7 +549,7 @@ implements SessionBean
 	 *
 	 * @ejb.interface-method
 	 * @ejb.permission role-name="_Guest_"
-	 * @ejb.transaction type = "Required"
+	 * @ejb.transaction type="Required"
 	 */
 	public JDOJSResultSetMetaData prepareJDOJSQuery(String prepareScript)
 	{
@@ -561,7 +562,7 @@ implements SessionBean
 	 *
 	 * @ejb.interface-method
 	 * @ejb.permission role-name="_Guest_"
-	 * @ejb.transaction type = "Never"
+	 * @ejb.transaction type="Never"
 	 */
 	public JDOJSResultSet fetchJDOJSResultSet(
 			JDOJSResultSetMetaData metaData, 
@@ -588,7 +589,7 @@ implements SessionBean
 	 *
 	 * @ejb.interface-method
 	 * @ejb.permission role-name="_Guest_"
-	 * @ejb.transaction type = "Never"
+	 * @ejb.transaction type="Never"
 	 */
 	public IResultSetMetaData getJFSResultSetMetaData(JFSQueryPropertySet queryPropertySet) throws ScriptException, InstantiationException
 	{
@@ -606,7 +607,7 @@ implements SessionBean
 	 *
 	 * @ejb.interface-method
 	 * @ejb.permission role-name="_Guest_"
-	 * @ejb.transaction type = "Never"
+	 * @ejb.transaction type="Never"
 	 */
 	public IResultSet getJFSResultSet(
 			JFSQueryPropertySet queryPropertySet,
@@ -631,7 +632,7 @@ implements SessionBean
 	 * @throws JFireReportingOdaException 
 	 * @ejb.interface-method
 	 * @ejb.permission role-name="_Guest_"
-	 * @ejb.transaction type = "Never"
+	 * @ejb.transaction type="Never"
 	 */
 	public IParameterMetaData getJFSParameterMetaData(
 			ScriptRegistryItemID scriptRegistryItemID
@@ -659,7 +660,7 @@ implements SessionBean
 	 * 
 	 * @ejb.interface-method
 	 * @ejb.permission role-name="_Guest_"
-	 * @ejb.transaction type = "Required"
+	 * @ejb.transaction type="Required"
 	 */
 	public ReportRegistryItem getReportRegistryItem (
 			ReportRegistryItemID reportRegistryItemID,
@@ -690,7 +691,7 @@ implements SessionBean
 	 * 
 	 * @ejb.interface-method
 	 * @ejb.permission role-name="_Guest_"
-	 * @ejb.transaction type = "Required"
+	 * @ejb.transaction type="Required"
 	 */
 	public List<ReportRegistryItem> getReportRegistryItems (
 			List<ReportRegistryItemID> reportRegistryItemIDs,
@@ -724,7 +725,7 @@ implements SessionBean
 	 * 
 	 * @ejb.interface-method
 	 * @ejb.permission role-name="_Guest_"
-	 * @ejb.transaction type = "Required"
+	 * @ejb.transaction type="Required"
 	 */
 	public Collection<ReportRegistryItemID> getReportRegistryItemIDsForParent(ReportRegistryItemID reportRegistryItemID)
 	{
@@ -753,7 +754,7 @@ implements SessionBean
 	 * 
 	 * @ejb.interface-method
 	 * @ejb.permission role-name="_Guest_"
-	 * @ejb.transaction type = "Required"
+	 * @ejb.transaction type="Required"
 	 */
 	public Collection getTopLevelReportRegistryItems (
 			String organisationID,
@@ -780,7 +781,7 @@ implements SessionBean
 	 *
 	 * @ejb.interface-method
 	 * @ejb.permission role-name="_Guest_"
-	 * @ejb.transaction type = "Required"
+	 * @ejb.transaction type="Required"
 	 */
 	public Collection<ReportRegistryItemID> getTopLevelReportRegistryItemIDs ()
 	{
@@ -943,7 +944,7 @@ implements SessionBean
 	 * 
 	 * @ejb.interface-method
 	 * @ejb.permission role-name="_Guest_"
-	 * @ejb.transaction type = "Required"
+	 * @ejb.transaction type="Required"
 	 */
 	@SuppressWarnings("unchecked")
 	public Collection<ReportLayoutLocalisationData> getReportLayoutLocalisationBundle(
@@ -979,7 +980,7 @@ implements SessionBean
 	 *
 	 * @ejb.interface-method
 	 * @ejb.permission role-name="_Guest_"
-	 * @ejb.transaction type = "Required"
+	 * @ejb.transaction type="Required"
 	 */
 	@SuppressWarnings("unchecked")
 	public Collection<ReportLayoutLocalisationData> storeReportLayoutLocalisationBundle(

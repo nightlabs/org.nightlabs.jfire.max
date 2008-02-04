@@ -66,7 +66,8 @@ import org.nightlabs.jfire.trade.LegalEntity;
  *           type="Stateless" 
  *           transaction-type="Container"
  *
- * @ejb.util generate = "physical"
+ * @ejb.util generate="physical"
+ * @ejb.transaction type="Required"
  */
 public abstract class DeliveryHelperBean
 extends BaseSessionBeanImpl
@@ -114,7 +115,7 @@ implements SessionBean
 	 * @throws ModuleException 
 	 *
 	 * @ejb.interface-method view-type="local"
-	 * @ejb.transaction type = "RequiresNew"
+	 * @ejb.transaction type="RequiresNew"
 	 * @ejb.permission role-name="_Guest_"
 	 */
 	public DeliveryDataID deliverBegin_storeDeliveryData(DeliveryData deliveryData)
@@ -163,7 +164,7 @@ implements SessionBean
 	
 	/**
 	 * @ejb.interface-method
-	 * @ejb.transaction type = "RequiresNew"
+	 * @ejb.transaction type="RequiresNew"
 	 * @ejb.permission role-name="_Guest_"
 	 */
 	public DeliveryResult deliverBegin_internal(
@@ -201,7 +202,7 @@ implements SessionBean
 
 	/**
 	 * @ejb.interface-method view-type="local"
-	 * @ejb.transaction type = "RequiresNew"
+	 * @ejb.transaction type="RequiresNew"
 	 * @ejb.permission role-name="_Guest_"
 	 */
 	public void deliverDoWork_storeDeliverDoWorkClientResult(DeliveryID deliveryID, DeliveryResult deliverDoWorkClientResult, boolean forceRollback)
@@ -221,7 +222,7 @@ implements SessionBean
 
 	/**
 	 * @ejb.interface-method view-type="local"
-	 * @ejb.transaction type = "RequiresNew"
+	 * @ejb.transaction type="RequiresNew"
 	 * @ejb.permission role-name="_Guest_"
 	 */
 	public DeliveryResult deliverDoWork_internal(DeliveryID deliveryID, String[] fetchGroups, int maxFetchDepth)
@@ -258,7 +259,7 @@ implements SessionBean
 
 	/**
 	 * @ejb.interface-method view-type="local"
-	 * @ejb.transaction type = "RequiresNew"
+	 * @ejb.transaction type="RequiresNew"
 	 * @ejb.permission role-name="_Guest_"
 	 */
 	public DeliveryResult deliverEnd_internal(DeliveryID deliveryID, String[] fetchGroups, int maxFetchDepth)
@@ -498,7 +499,7 @@ implements SessionBean
 
 //	/**
 //	 * @ejb.interface-method view-type="local"
-//	 * @ejb.transaction type = "RequiresNew"
+//	 * @ejb.transaction type="RequiresNew"
 //	 * @ejb.permission role-name="_Guest_"
 //	 */
 //	public DeliveryResult deliverEnd_internal(DeliveryID deliveryID, String[] fetchGroups, int maxFetchDepth)
@@ -536,7 +537,7 @@ implements SessionBean
 
 	/**
 	 * @ejb.interface-method view-type="local"
-	 * @ejb.transaction type = "RequiresNew"
+	 * @ejb.transaction type="RequiresNew"
 	 * @ejb.permission role-name="_Guest_"
 	 */
 	public void deliverEnd_storeDeliverEndClientResult(
@@ -557,7 +558,7 @@ implements SessionBean
 
 	/**
 	 * @ejb.interface-method view-type="local"
-	 * @ejb.transaction type = "RequiresNew"
+	 * @ejb.transaction type="RequiresNew"
 	 * @ejb.permission role-name="_Guest_"
 	 */
 	public DeliveryResult deliverBegin_storeDeliverBeginServerResult(
@@ -597,7 +598,7 @@ implements SessionBean
 	
 	/**
 	 * @ejb.interface-method view-type="local"
-	 * @ejb.transaction type = "RequiresNew"
+	 * @ejb.transaction type="RequiresNew"
 	 * @ejb.permission role-name="_Guest_"
 	 */
 	public DeliveryResult deliverDoWork_storeDeliverDoWorkServerResult(
@@ -638,7 +639,7 @@ implements SessionBean
 
 	/**
 	 * @ejb.interface-method view-type="local"
-	 * @ejb.transaction type = "RequiresNew"
+	 * @ejb.transaction type="RequiresNew"
 	 * @ejb.permission role-name="_Guest_"
 	 */
 	public DeliveryResult deliverEnd_storeDeliverEndServerResult(
@@ -680,7 +681,7 @@ implements SessionBean
 
 	/**
 	 * @ejb.interface-method view-type="local"
-	 * @ejb.transaction type = "RequiresNew"
+	 * @ejb.transaction type="RequiresNew"
 	 * @ejb.permission role-name="_Guest_"
 	 */
 	public void deliverRollback(DeliveryID deliveryID)

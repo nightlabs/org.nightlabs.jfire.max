@@ -94,6 +94,7 @@ import org.nightlabs.version.MalformedVersionException;
  *					 transaction-type="Container"
  *
  * @ejb.util generate="physical"
+ * @ejb.transaction type="Required"
  */
 public abstract class TradeManagerBean 
 extends BaseSessionBeanImpl
@@ -448,7 +449,7 @@ implements SessionBean
 //	/**
 //	 * @ejb.interface-method
 //	 * @ejb.permission role-name="_Guest_"
-//	 * @ejb.transaction type = "Required"
+//	 * @ejb.transaction type="Required"
 //	 **/
 //	public Map<Integer, Collection<? extends Article>> createCrossTradeArticles(
 //			OfferID offerID, ProductTypeID[] productTypeIDs, int[] quantities, ProductLocator[] productLocators)
@@ -489,7 +490,7 @@ implements SessionBean
 	 *
 	 * @ejb.interface-method
 	 * @ejb.permission role-name="TradeManager-write"
-	 * @ejb.transaction type = "Required"
+	 * @ejb.transaction type="Required"
 	 **/
 	public Offer createOffer(OrderID orderID, String offerIDPrefix, String[] fetchGroups, int maxFetchDepth)
 	throws ModuleException
@@ -517,7 +518,7 @@ implements SessionBean
 //	 *
 //	 * @ejb.interface-method
 //	 * @ejb.permission role-name="TradeManager-write"
-//	 * @ejb.transaction type = "Required"
+//	 * @ejb.transaction type="Required"
 //	 **/
 //	public Offer finalizeOffer(OfferID offerID, boolean get, String[] fetchGroups, int maxFetchDepth)
 //	throws ModuleException
@@ -549,7 +550,7 @@ implements SessionBean
 //	 *
 //	 * @ejb.interface-method
 //	 * @ejb.permission role-name="TradeManager-write"
-//	 * @ejb.transaction type = "Required"
+//	 * @ejb.transaction type="Required"
 //	 **/
 //	public Offer acceptOffer(OfferID offerID, boolean get, String[] fetchGroups, int maxFetchDepth)
 //	throws ModuleException
@@ -581,7 +582,7 @@ implements SessionBean
 	 *
 	 * @ejb.interface-method
 	 * @ejb.permission role-name="TradeManager-write"
-	 * @ejb.transaction type = "Required"
+	 * @ejb.transaction type="Required"
 	 **/
 	public Offer rejectOffer(OfferID offerID, boolean get, String[] fetchGroups, int maxFetchDepth)
 	throws ModuleException
@@ -613,7 +614,7 @@ implements SessionBean
 //	 *
 //	 * @ejb.interface-method
 //	 * @ejb.permission role-name="TradeManager-write"
-//	 * @ejb.transaction type = "Required"
+//	 * @ejb.transaction type="Required"
 //	 **/
 //	public Offer confirmOffer(OfferID offerID, boolean get, String[] fetchGroups, int maxFetchDepth)
 //	throws ModuleException
@@ -645,7 +646,7 @@ implements SessionBean
 	 *
 	 * @ejb.interface-method
 	 * @ejb.permission role-name="TradeManager-read"
-	 * @ejb.transaction type = "Required"
+	 * @ejb.transaction type="Required"
 	 **/
 	public List<Offer> getNonFinalizedNonEndedOffers(OrderID orderID, String[] fetchGroups, int maxFetchDepth)
 	{
@@ -680,7 +681,7 @@ implements SessionBean
 	 *
 	 * @ejb.interface-method
 	 * @ejb.permission role-name="TradeManager-write"
-	 * @ejb.transaction type = "Required"
+	 * @ejb.transaction type="Required"
 	 **/
 	public Collection<Article> reverseArticles(OfferID offerID, Collection<ArticleID> reversedArticleIDs, boolean get, String[] fetchGroups, int maxFetchDepth)
 	throws ModuleException
@@ -752,7 +753,7 @@ implements SessionBean
 	 *
 	 * @ejb.interface-method
 	 * @ejb.permission role-name="TradeManager-write"
-	 * @ejb.transaction type = "Required"
+	 * @ejb.transaction type="Required"
 	 **/
 	public Offer createReverseOffer(
 			Collection<ArticleID> reversedArticleIDs, String offerIDPrefix,
@@ -794,7 +795,7 @@ implements SessionBean
 //	 *
 //	 * @ejb.interface-method
 //	 * @ejb.permission role-name="TradeManager-write"
-//	 * @ejb.transaction type = "Required"
+//	 * @ejb.transaction type="Required"
 //	 **/
 //	public Article reverseArticle(
 //			OfferID offerID, ArticleID reversedArticleID, boolean get, String[] fetchGroups, int maxFetchDepth)
@@ -829,7 +830,7 @@ implements SessionBean
 	 *
 	 * @ejb.interface-method
 	 * @ejb.permission role-name="_Guest_"
-	 * @ejb.transaction type = "Required"
+	 * @ejb.transaction type="Required"
 	 */
 	public LegalEntity getAnonymousCustomer(String[] fetchGroups, int maxFetchDepth)
 	throws ModuleException
@@ -853,7 +854,7 @@ implements SessionBean
 	 *
 	 * @ejb.interface-method
 	 * @ejb.permission role-name="_Guest_"
-	 * @ejb.transaction type = "Required"
+	 * @ejb.transaction type="Required"
 	 */
 	public OrganisationLegalEntity getOrganisationLegalEntity(
 			String organisationID, boolean throwExceptionIfNotExistent, String[] fetchGroups, int maxFetchDepth)
@@ -885,7 +886,7 @@ implements SessionBean
 	 *
 	 * @ejb.interface-method
 	 * @ejb.permission role-name="_Guest_"
-	 * @ejb.transaction type="Supports"
+	 * @ejb.transaction type="Supports" @!This usually means that no transaction is opened which is significantly faster and recommended for all read-only EJB methods! Marco.
 	 */
 	public List<OrderID> getOrderIDs(AnchorID vendorID, AnchorID customerID, long rangeBeginIdx, long rangeEndIdx)
 	{
@@ -900,7 +901,7 @@ implements SessionBean
 	/**
 	 * @ejb.interface-method
 	 * @ejb.permission role-name="_Guest_"
-	 * @ejb.transaction type="Supports"
+	 * @ejb.transaction type="Supports" @!This usually means that no transaction is opened which is significantly faster and recommended for all read-only EJB methods! Marco.
 	 */
 	public List<Order> getOrders(Set<OrderID> orderIDs, String[] fetchGroups, int maxFetchDepth)
 	{
@@ -922,7 +923,7 @@ implements SessionBean
 	 * 
 	 * @ejb.interface-method
 	 * @ejb.permission role-name="_Guest_"
-	 * @ejb.transaction type = "Required"
+	 * @ejb.transaction type="Required"
 	 */ 
 	public LegalEntity storePersonAsLegalEntity(Person person, boolean get, String[] fetchGroups, int maxFetchDepth)
 	{
@@ -969,7 +970,7 @@ implements SessionBean
 	/**
 	 * @ejb.interface-method
 	 * @ejb.permission role-name="_Guest_"
-	 * @ejb.transaction type = "Required"
+	 * @ejb.transaction type="Required"
 	 */ 
 	public Order getOrder(OrderID orderID, String[] fetchGroups, int maxFetchDepth)
 	{
@@ -988,7 +989,7 @@ implements SessionBean
 	/**
 	 * @ejb.interface-method
 	 * @ejb.permission role-name="_Guest_"
-	 * @ejb.transaction type = "Required"
+	 * @ejb.transaction type="Required"
 	 */ 
 	public LegalEntity getLegalEntity(AnchorID anchorID, String[] fetchGroups, int maxFetchDepth)
 	{
@@ -1007,7 +1008,7 @@ implements SessionBean
 	/**
 	 * @ejb.interface-method
 	 * @ejb.permission role-name="_Guest_"
-	 * @ejb.transaction type = "Required"
+	 * @ejb.transaction type="Required"
 	 */ 
 	public Collection getLegalEntities(Object[] leAnchorIDs, String[] fetchGroups, int maxFetchDepth)
 	{
@@ -1038,7 +1039,7 @@ implements SessionBean
 	/**
 	 * @ejb.interface-method
 	 * @ejb.permission role-name="_Guest_"
-	 * @ejb.transaction type = "Required"
+	 * @ejb.transaction type="Required"
 	 */ 
 	public Collection<LegalEntity> getLegalEntities(Set<AnchorID> anchorIDs, String[] fetchGroups, int maxFetchDepth)
 	{
@@ -1067,7 +1068,7 @@ implements SessionBean
 	/**
 	 * @ejb.interface-method
 	 * @ejb.permission role-name="_Guest_"
-	 * @ejb.transaction type="Supports"
+	 * @ejb.transaction type="Supports" @!This usually means that no transaction is opened which is significantly faster and recommended for all read-only EJB methods! Marco.
 	 */ 
 	public Offer getOffer(OfferID offerID, String[] fetchGroups, int maxFetchDepth)
 	{
@@ -1087,7 +1088,7 @@ implements SessionBean
 	/**
 	 * @ejb.interface-method
 	 * @ejb.permission role-name="_Guest_"
-	 * @ejb.transaction type="Supports"
+	 * @ejb.transaction type="Supports" @!This usually means that no transaction is opened which is significantly faster and recommended for all read-only EJB methods! Marco.
 	 */ 
 	@SuppressWarnings("unchecked")
 	public List<Offer> getOffers(Set<OfferID> offerIDs, String[] fetchGroups, int maxFetchDepth)
@@ -1103,7 +1104,7 @@ implements SessionBean
 	/**
 	 * @ejb.interface-method
 	 * @ejb.permission role-name="_Guest_"
-	 * @ejb.transaction type = "Required"
+	 * @ejb.transaction type="Required"
 	 */ 
 	public Article getArticle(ArticleID articleID, String[] fetchGroups, int maxFetchDepth)
 	{
@@ -1126,7 +1127,7 @@ implements SessionBean
 	 *
 	 * @ejb.interface-method
 	 * @ejb.permission role-name="_Guest_"
-	 * @ejb.transaction type = "Required"
+	 * @ejb.transaction type="Required"
 	 */ 
 	public Collection<Article> getArticles(Collection<ArticleID> articleIDs, String[] fetchGroups, int maxFetchDepth)
 	{
@@ -1170,7 +1171,7 @@ implements SessionBean
 	 *
 	 * @ejb.interface-method
 	 * @ejb.permission role-name="_Guest_"
-	 * @ejb.transaction type = "Required"
+	 * @ejb.transaction type="Required"
 	 **/
 	public Segment createSegment(
 			OrderID orderID, SegmentTypeID segmentTypeID, String[] fetchGroups, int maxFetchDepth)
@@ -1203,7 +1204,7 @@ implements SessionBean
 	 * @throws ModuleException
 	 *
 	 * @ejb.interface-method
-	 * @ejb.transaction type = "Required"
+	 * @ejb.transaction type="Required"
 	 * @ejb.permission role-name="_Guest_"
 	 */
 	public void deleteArticles(Collection articleIDs, boolean validate)
@@ -1242,7 +1243,7 @@ implements SessionBean
 	 * @throws ModuleException
 	 *
 	 * @ejb.interface-method
-	 * @ejb.transaction type = "Required"
+	 * @ejb.transaction type="Required"
 	 * @ejb.permission role-name="_Guest_"
 	 */
 	public Collection releaseArticles(Collection articleIDs, boolean synchronously, boolean get, String[] fetchGroups, int maxFetchDepth)
@@ -1270,7 +1271,7 @@ implements SessionBean
 
 	/**
 	 * @ejb.interface-method
-	 * @ejb.transaction type = "Required"
+	 * @ejb.transaction type="Required"
 	 * @ejb.permission role-name="_Guest_"
 	 */
 	public void signalOffer(OfferID offerID, String jbpmTransitionName)
@@ -1308,7 +1309,7 @@ implements SessionBean
 	 * @throws ModuleException
 	 *
 	 * @ejb.interface-method
-	 * @ejb.transaction type = "Required"
+	 * @ejb.transaction type="Required"
 	 * @ejb.permission role-name="_System_"
 	 */
 	public void initialise()
@@ -1421,7 +1422,7 @@ implements SessionBean
 
 	/**
 	 * @ejb.interface-method
-	 * @ejb.transaction type="Supports"
+	 * @ejb.transaction type="Supports" @!This usually means that no transaction is opened which is significantly faster and recommended for all read-only EJB methods! Marco.
 	 * @ejb.permission role-name="_Guest_"
 	 */
 	public Set<CustomerGroupMappingID> getCustomerGroupMappingIDs()
@@ -1438,7 +1439,7 @@ implements SessionBean
 
 	/**
 	 * @ejb.interface-method
-	 * @ejb.transaction type="Supports"
+	 * @ejb.transaction type="Supports" @!This usually means that no transaction is opened which is significantly faster and recommended for all read-only EJB methods! Marco.
 	 * @ejb.permission role-name="_Guest_"
 	 */
 	@SuppressWarnings("unchecked")
@@ -1483,7 +1484,7 @@ implements SessionBean
 	 *		is NOT the one passed as parameter <code>organisationID</code>.
 	 *
 	 * @ejb.interface-method
-	 * @ejb.transaction type="Supports"
+	 * @ejb.transaction type="Supports" @!This usually means that no transaction is opened which is significantly faster and recommended for all read-only EJB methods! Marco.
 	 * @ejb.permission role-name="_Guest_"
 	 */
 	public Set<CustomerGroupID> getCustomerGroupIDs(String organisationID, boolean inverse)
@@ -1503,7 +1504,7 @@ implements SessionBean
 
 	/**
 	 * @ejb.interface-method
-	 * @ejb.transaction type="Supports"
+	 * @ejb.transaction type="Supports" @!This usually means that no transaction is opened which is significantly faster and recommended for all read-only EJB methods! Marco.
 	 * @ejb.permission role-name="_Guest_"
 	 */
 	@SuppressWarnings("unchecked")
@@ -1555,7 +1556,7 @@ implements SessionBean
 	 *
 	 * @ejb.interface-method
 	 * @ejb.permission role-name="_Guest_"
-	 * @ejb.transaction type="Supports"
+	 * @ejb.transaction type="Supports" @!This usually means that no transaction is opened which is significantly faster and recommended for all read-only EJB methods! Marco.
 	 */
 	public Set<ArticleContainerID> getArticleContainerIDs(Collection<JDOQuery<ArticleContainer>> queries)
 	{
@@ -1585,7 +1586,7 @@ implements SessionBean
 //	 *
 //	 * @ejb.interface-method
 //	 * @ejb.permission role-name="_Guest_"
-//	 * @ejb.transaction type="Supports"
+//	 * @ejb.transaction type="Supports" @!This usually means that no transaction is opened which is significantly faster and recommended for all read-only EJB methods! Marco.
 //	 */
 //	public Set<ArticleContainerID> getArticleContainerIDsForQueries(Collection<ArticleContainerQuery> articleContainerQueries)
 //	{
@@ -1615,7 +1616,7 @@ implements SessionBean
 //	 *
 //	 * @ejb.interface-method
 //	 * @ejb.permission role-name="_Guest_"
-//	 * @ejb.transaction type="Supports"
+//	 * @ejb.transaction type="Supports" @!This usually means that no transaction is opened which is significantly faster and recommended for all read-only EJB methods! Marco.
 //	 */
 //	public Set<ArticleContainerID> getArticleContainerIDsForQuickSearchQueries(Collection<AbstractArticleContainerQuickSearchQuery> articleContainerQuickSearchQueries)
 //	{
@@ -1640,7 +1641,7 @@ implements SessionBean
 //	/**
 //	 * @ejb.interface-method
 //	 * @ejb.permission role-name="_Guest_"
-//	 * @ejb.transaction type="Supports"
+//	 * @ejb.transaction type="Supports" @!This usually means that no transaction is opened which is significantly faster and recommended for all read-only EJB methods! Marco.
 //	 */	
 //	public Set<InvoiceID> getInvoiceIDs(Collection<JDOQuery> queries) 
 //	{
@@ -1665,7 +1666,7 @@ implements SessionBean
 	/**
 	 * @ejb.interface-method
 	 * @ejb.permission role-name="_Guest_"
-	 * @ejb.transaction type="Supports"
+	 * @ejb.transaction type="Supports" @!This usually means that no transaction is opened which is significantly faster and recommended for all read-only EJB methods! Marco.
 	 */	
 	public Set<OfferID> getOfferIDs(Collection<JDOQuery> queries) 
 	{
@@ -1690,7 +1691,7 @@ implements SessionBean
 	/**
 	 * @ejb.interface-method
 	 * @ejb.permission role-name="_Guest_"
-	 * @ejb.transaction type="Supports"
+	 * @ejb.transaction type="Supports" @!This usually means that no transaction is opened which is significantly faster and recommended for all read-only EJB methods! Marco.
 	 */	
 	public Set<OrderID> getOrderIDs(Collection<JDOQuery> queries) 
 	{
@@ -1715,7 +1716,7 @@ implements SessionBean
 //	/**
 //	 * @ejb.interface-method
 //	 * @ejb.permission role-name="_Guest_"
-//	 * @ejb.transaction type="Supports"
+//	 * @ejb.transaction type="Supports" @!This usually means that no transaction is opened which is significantly faster and recommended for all read-only EJB methods! Marco.
 //	 */	
 //	public Set<DeliveryNoteID> getDeliveryNoteIDs(Collection<JDOQuery> queries) 
 //	{
@@ -1740,7 +1741,7 @@ implements SessionBean
 	/**
 	 * @ejb.interface-method
 	 * @ejb.permission role-name="_Guest_"
-	 * @ejb.transaction type="Supports"
+	 * @ejb.transaction type="Supports" @!This usually means that no transaction is opened which is significantly faster and recommended for all read-only EJB methods! Marco.
 	 */	
 	public Set<ReceptionNoteID> getReceptionNoteIDs(Collection<JDOQuery> queries) 
 	{
@@ -1765,7 +1766,7 @@ implements SessionBean
 	/**
 	 * @ejb.interface-method
 	 * @ejb.permission role-name="_Guest_"
-	 * @ejb.transaction type="Supports"
+	 * @ejb.transaction type="Supports" @!This usually means that no transaction is opened which is significantly faster and recommended for all read-only EJB methods! Marco.
 	 */ 
 	@SuppressWarnings("unchecked")
 	public List<ReceptionNote> getReceptionNotes(Set<ReceptionNoteID> receptionNoteIDs, String[] fetchGroups, int maxFetchDepth)

@@ -140,7 +140,8 @@ import org.nightlabs.jfire.transfer.id.TransferID;
  *           type="Stateless" 
  *           transaction-type="Container"
  *
- * @ejb.util generate = "physical"
+ * @ejb.util generate="physical"
+ * @ejb.transaction type="Required"
  */
 public abstract class AccountingManagerBean
 	extends BaseSessionBeanImpl
@@ -473,7 +474,7 @@ public abstract class AccountingManagerBean
 
 	/**
 	 * @ejb.interface-method
-	 * @ejb.transaction type="Supports"
+	 * @ejb.transaction type="Supports" @!This usually means that no transaction is opened which is significantly faster and recommended for all read-only EJB methods! Marco.
 	 * @ejb.permission role-name="_Guest_"
 	 */
 	public Set<TariffMappingID> getTariffMappingIDs()
@@ -490,7 +491,7 @@ public abstract class AccountingManagerBean
 
 	/**
 	 * @ejb.interface-method
-	 * @ejb.transaction type="Supports"
+	 * @ejb.transaction type="Supports" @!This usually means that no transaction is opened which is significantly faster and recommended for all read-only EJB methods! Marco.
 	 * @ejb.permission role-name="_Guest_"
 	 */
 	@SuppressWarnings("unchecked")
@@ -535,7 +536,7 @@ public abstract class AccountingManagerBean
 	 *		is NOT the one passed as parameter <code>organisationID</code>.
 	 *
 	 * @ejb.interface-method
-	 * @ejb.transaction type="Supports"
+	 * @ejb.transaction type="Supports" @!This usually means that no transaction is opened which is significantly faster and recommended for all read-only EJB methods! Marco.
 	 * @ejb.permission role-name="_Guest_"
 	 */
 	public Set<TariffID> getTariffIDs(String organisationID, boolean inverse)
@@ -555,7 +556,7 @@ public abstract class AccountingManagerBean
 
 	/**
 	 * @ejb.interface-method
-	 * @ejb.transaction type="Supports"
+	 * @ejb.transaction type="Supports" @!This usually means that no transaction is opened which is significantly faster and recommended for all read-only EJB methods! Marco.
 	 * @ejb.permission role-name="_Guest_"
 	 */
 	@SuppressWarnings("unchecked")
@@ -571,7 +572,7 @@ public abstract class AccountingManagerBean
 
 //	/**
 //	 * @ejb.interface-method
-//	 * @ejb.transaction type="Supports"
+//	 * @ejb.transaction type="Supports" @!This usually means that no transaction is opened which is significantly faster and recommended for all read-only EJB methods! Marco.
 //	 * @ejb.permission role-name="_Guest_"
 //	 */
 //	public Collection<Tariff> getTariffs(String[] fetchGroups, int maxFetchDepth)
@@ -636,7 +637,7 @@ public abstract class AccountingManagerBean
 //	 * @throws ModuleException
 //	 *
 //	 * @ejb.interface-method
-//	 * @ejb.transaction type = "Required"
+//	 * @ejb.transaction type="Required"
 //	 * @ejb.permission role-name="_Guest_"
 //	 */
 //	public CustomerGroup storeCustomerGroup(CustomerGroup customerGroup, boolean get, String[] fetchGroups, int maxFetchDepth)
@@ -653,7 +654,7 @@ public abstract class AccountingManagerBean
 	 * @throws ModuleException
 	 *
 	 * @ejb.interface-method
-	 * @ejb.transaction type = "Required"
+	 * @ejb.transaction type="Required"
 	 * @ejb.permission role-name="_Guest_"
 	 */
 	public Collection getCurrencies(String[] fetchGroups, int maxFetchDepth)
@@ -676,7 +677,7 @@ public abstract class AccountingManagerBean
 	 * @throws ModuleException
 	 *
 	 * @ejb.interface-method
-	 * @ejb.transaction type = "Required"
+	 * @ejb.transaction type="Required"
 	 * @ejb.permission role-name="_Guest_"
 	 */
 	public Account getAccount(AnchorID accountID, String[] fetchGroups, int maxFetchDepth) 
@@ -689,7 +690,7 @@ public abstract class AccountingManagerBean
 	 * @throws ModuleException
 	 *
 	 * @ejb.interface-method
-	 * @ejb.transaction type = "Required"
+	 * @ejb.transaction type="Required"
 	 * @ejb.permission role-name="_Guest_"
 	 */
 	public Account getAccount(String accountPK, String[] fetchGroups, int maxFetchDepth) 
@@ -717,7 +718,7 @@ public abstract class AccountingManagerBean
 	}
 	/**
 	 * @ejb.interface-method
-	 * @ejb.transaction type="Supports"
+	 * @ejb.transaction type="Supports" @!This usually means that no transaction is opened which is significantly faster and recommended for all read-only EJB methods! Marco.
 	 * @ejb.permission role-name="_Guest_"
 	 */
 	public Collection getAccounts(AccountSearchFilter searchFilter,  String[] fetchGroups, int maxFetchDepth)
@@ -742,7 +743,7 @@ public abstract class AccountingManagerBean
 
 	/**
 	 * @ejb.interface-method
-	 * @ejb.transaction type="Supports"
+	 * @ejb.transaction type="Supports" @!This usually means that no transaction is opened which is significantly faster and recommended for all read-only EJB methods! Marco.
 	 * @ejb.permission role-name="_Guest_"
 	 */
 	@SuppressWarnings("unchecked")
@@ -758,7 +759,7 @@ public abstract class AccountingManagerBean
 
 	/**
 	 * @ejb.interface-method
-	 * @ejb.transaction type="Supports"
+	 * @ejb.transaction type="Supports" @!This usually means that no transaction is opened which is significantly faster and recommended for all read-only EJB methods! Marco.
 	 * @ejb.permission role-name="_Guest_"
 	 */
 	@SuppressWarnings("unchecked")
@@ -776,7 +777,7 @@ public abstract class AccountingManagerBean
 //	 * @throws ModuleException
 //	 *
 //	 * @ejb.interface-method
-//	 * @ejb.transaction type = "Required"
+//	 * @ejb.transaction type="Required"
 //	 * @ejb.permission role-name="_Guest_"
 //	 */
 //	public Account createMandatorAccount(String anchorID, String currencyID, boolean createSummaryAccount, boolean get, String[] fetchGroups, int maxFetchDepth)
@@ -809,7 +810,7 @@ public abstract class AccountingManagerBean
 	 * @throws ModuleException
 	 *
 	 * @ejb.interface-method
-	 * @ejb.transaction type = "Required"
+	 * @ejb.transaction type="Required"
 	 * @ejb.permission role-name="_Guest_"
 	 */
 	public Account storeAccount(Account account, boolean get, String[] fetchGroups, int maxFetchDepth)
@@ -910,7 +911,7 @@ public abstract class AccountingManagerBean
 	 * @param localAccountantDelegateID The LocalAccountantDelegateID of the LocalAccountantDelegate to assign.
 	 * 
 	 * @ejb.interface-method
-	 * @ejb.transaction type = "Required"
+	 * @ejb.transaction type="Required"
 	 * @ejb.permission role-name="_Guest_"
 	 */
 	public void assignLocalAccountantDelegateToProductType(
@@ -937,7 +938,7 @@ public abstract class AccountingManagerBean
 	 * @param delegateClass The class/type of delegates that should be returned.
 	 * 
 	 * @ejb.interface-method
-	 * @ejb.transaction type = "Required"
+	 * @ejb.transaction type="Required"
 	 * @ejb.permission role-name="_Guest_"
 	 */
 	public Collection<Object> getTopLevelAccountantDelegates(Class delegateClass) 
@@ -964,7 +965,7 @@ public abstract class AccountingManagerBean
 	 * @param delegateID The LocalAccountantDelegateID children should be searched for.
 	 * 
 	 * @ejb.interface-method
-	 * @ejb.transaction type = "Required"
+	 * @ejb.transaction type="Required"
 	 * @ejb.permission role-name="_Guest_"
 	 */
 	public Collection<Object> getChildAccountantDelegates(LocalAccountantDelegateID delegateID) 
@@ -997,7 +998,7 @@ public abstract class AccountingManagerBean
 	 * @throws ModuleException
 	 * 
 	 * @ejb.interface-method
-	 * @ejb.transaction type = "Required"
+	 * @ejb.transaction type="Required"
 	 * @ejb.permission role-name="_Guest_"
 	 */
 	public Collection<LocalAccountantDelegate> getLocalAccountantDelegates(Collection delegateIDs, String[] fetchGroups, int maxFetchDepth)
@@ -1035,7 +1036,7 @@ public abstract class AccountingManagerBean
 	 * @throws ModuleException
 	 * 
 	 * @ejb.interface-method
-	 * @ejb.transaction type = "Required"
+	 * @ejb.transaction type="Required"
 	 * @ejb.permission role-name="_Guest_"
 	 */
 	public LocalAccountantDelegate getLocalAccountantDelegate(LocalAccountantDelegateID delegateID, String[] fetchGroups, int maxFetchDepth)
@@ -1064,7 +1065,7 @@ public abstract class AccountingManagerBean
 	 * @throws ModuleException
 	 * 
 	 * @ejb.interface-method
-	 * @ejb.transaction type = "Required"
+	 * @ejb.transaction type="Required"
 	 * @ejb.permission role-name="_Guest_"
 	 */
 	public LocalAccountantDelegate storeLocalAccountantDelegate(
@@ -1085,7 +1086,7 @@ public abstract class AccountingManagerBean
 	/**
 	 * @ejb.interface-method
 	 * @ejb.permission role-name="_Guest_"
-	 * @ejb.transaction type = "Required"
+	 * @ejb.transaction type="Required"
 	 */ 
 	public MoneyFlowMapping storeMoneyFlowMapping(MoneyFlowMapping mapping, boolean get, String[] fetchGroups, int maxFetchDepth)
 	throws ModuleException
@@ -1136,7 +1137,7 @@ public abstract class AccountingManagerBean
 	
 	/**
 	 * @ejb.interface-method
-	 * @ejb.transaction type = "Required"
+	 * @ejb.transaction type="Required"
 	 * @ejb.permission role-name="_Guest_"
 	 */
 	public Map<ResolvedMapKey, ResolvedMapEntry> getResolvedMoneyFlowMappings(ProductTypeID productTypeID, String[] mappingFetchGroups, int maxFetchDepth)
@@ -1158,7 +1159,7 @@ public abstract class AccountingManagerBean
 	
 	/**
 	 * @ejb.interface-method
-	 * @ejb.transaction type = "Required"
+	 * @ejb.transaction type="Required"
 	 * @ejb.permission role-name="_Guest_"
 	 */
 	public Map<ResolvedMapKey, ResolvedMapEntry> getResolvedMoneyFlowMappings(ProductTypeID productTypeID, LocalAccountantDelegateID delegateID, String[] mappingFetchGroups, int maxFetchDepth)
@@ -1180,7 +1181,7 @@ public abstract class AccountingManagerBean
 //	 * @deprecated use {@link #getPriceFragmentTypes(Collection, String[], int)} 
 //	 * 
 //	 * @ejb.interface-method
-//	 * @ejb.transaction type = "Required"
+//	 * @ejb.transaction type="Required"
 //	 * @ejb.permission role-name="_Guest_"
 //	 */
 //	public Collection getPriceFragmentTypes(String[] fetchGroups, int maxFetchDepth)
@@ -1203,7 +1204,7 @@ public abstract class AccountingManagerBean
 	 * @throws ModuleException
 	 * 
 	 * @ejb.interface-method
-	 * @ejb.transaction type = "Required"
+	 * @ejb.transaction type="Required"
 	 * @ejb.permission role-name="_Guest_"
 	 */
 	public Collection<PriceFragmentType> getPriceFragmentTypes(Collection priceFragmentTypeIDs, String[] fetchGroups, int maxFetchDepth)
@@ -1238,7 +1239,7 @@ public abstract class AccountingManagerBean
 	 * @throws ModuleException
 	 *
 	 * @ejb.interface-method
-	 * @ejb.transaction type = "Required"
+	 * @ejb.transaction type="Required"
 	 * @ejb.permission role-name="_Guest_"
 	 */
 	public Collection<Object> getPriceFragmentTypeIDs()
@@ -1263,7 +1264,7 @@ public abstract class AccountingManagerBean
 	 * @throws ModuleException
 	 *
 	 * @ejb.interface-method
-	 * @ejb.transaction type = "Required"
+	 * @ejb.transaction type="Required"
 	 * @ejb.permission role-name="_Guest_"
 	 */
 	public PriceFragmentType getPriceFragmentType(PriceFragmentTypeID priceFragmentTypeID, String[] fetchGroups, int maxFetchDepth)
@@ -1295,7 +1296,7 @@ public abstract class AccountingManagerBean
 	 * @throws ModuleException
 	 *
 	 * @ejb.interface-method
-	 * @ejb.transaction type = "Required"
+	 * @ejb.transaction type="Required"
 	 * @ejb.permission role-name="_Guest_"
 	 */
 	public Invoice createInvoice(
@@ -1354,7 +1355,7 @@ public abstract class AccountingManagerBean
 	 * @throws ModuleException
 	 *
 	 * @ejb.interface-method
-	 * @ejb.transaction type = "Required"
+	 * @ejb.transaction type="Required"
 	 * @ejb.permission role-name="_Guest_"
 	 */
 	public Invoice createInvoice(
@@ -1429,7 +1430,7 @@ public abstract class AccountingManagerBean
 	 * @throws ModuleException
 	 *
 	 * @ejb.interface-method
-	 * @ejb.transaction type = "Required"
+	 * @ejb.transaction type="Required"
 	 * @ejb.permission role-name="_Guest_"
 	 */
 	public Invoice addArticlesToInvoice(
@@ -1471,7 +1472,7 @@ public abstract class AccountingManagerBean
 	 * @throws ModuleException
 	 *
 	 * @ejb.interface-method
-	 * @ejb.transaction type = "Required"
+	 * @ejb.transaction type="Required"
 	 * @ejb.permission role-name="_Guest_"
 	 */
 	public Invoice removeArticlesFromInvoice(
@@ -1513,7 +1514,7 @@ public abstract class AccountingManagerBean
 //	 * @throws ModuleException
 //	 *
 //	 * @ejb.interface-method
-//	 * @ejb.transaction type = "Required"
+//	 * @ejb.transaction type="Required"
 //	 * @ejb.permission role-name="_Guest_"
 //	 */
 //	public void finalizeInvoice(InvoiceID invoiceID)
@@ -1532,7 +1533,7 @@ public abstract class AccountingManagerBean
 //	 * @throws ModuleException
 //	 *
 //	 * @ejb.interface-method
-//	 * @ejb.transaction type = "Required"
+//	 * @ejb.transaction type="Required"
 //	 * @ejb.permission role-name="_Guest_"
 //	 */
 //	public void finalizeInvoices(Collection invoiceIDs)
@@ -1554,7 +1555,7 @@ public abstract class AccountingManagerBean
 //	 * @throws ModuleException
 //	 *
 //	 * @ejb.interface-method
-//	 * @ejb.transaction type = "Required"
+//	 * @ejb.transaction type="Required"
 //	 * @ejb.permission role-name="_Guest_"
 //	 */
 //	public void bookInvoice(InvoiceID invoiceID, boolean finalizeIfNecessary, boolean silentlyIgnoreBookedInvoice)
@@ -1573,7 +1574,7 @@ public abstract class AccountingManagerBean
 //	 * @throws ModuleException
 //	 *
 //	 * @ejb.interface-method
-//	 * @ejb.transaction type = "Required"
+//	 * @ejb.transaction type="Required"
 //	 * @ejb.permission role-name="_Guest_"
 //	 */
 //	public void bookInvoices(Collection invoiceIDs, boolean finalizeIfNecessary, boolean silentlyIgnoreBookedInvoice)
@@ -1625,7 +1626,7 @@ public abstract class AccountingManagerBean
 	 *		<tt>paymentDataList</tt>.
 	 *
 	 * @ejb.interface-method
-	 * @ejb.transaction type = "Supports"
+	 * @ejb.transaction type="Supports" @!This usually means that no transaction is opened which is significantly faster and recommended for all read-only EJB methods! Marco.
 	 * @ejb.permission role-name="_Guest_"
 	 */
 	public List<PaymentResult> payBegin(List paymentDataList)
@@ -1677,7 +1678,7 @@ public abstract class AccountingManagerBean
 	 * @see Accounting#payBegin(User, PaymentData)
 	 *
 	 * @ejb.interface-method
-	 * @ejb.transaction type="Supports"
+	 * @ejb.transaction type="Supports" @!This usually means that no transaction is opened which is significantly faster and recommended for all read-only EJB methods! Marco.
 	 * @ejb.permission role-name="_Guest_"
 	 */
 	public PaymentResult payBegin(PaymentData paymentData)
@@ -1771,7 +1772,7 @@ public abstract class AccountingManagerBean
 	 *		<tt>paymentIDs</tt>.
 	 *
 	 * @ejb.interface-method
-	 * @ejb.transaction type = "Supports"
+	 * @ejb.transaction type="Supports" @!This usually means that no transaction is opened which is significantly faster and recommended for all read-only EJB methods! Marco.
 	 * @ejb.permission role-name="_Guest_"
 	 */
 	public List<PaymentResult> payDoWork(List paymentIDs, List payDoWorkClientResults, boolean forceRollback)
@@ -1823,7 +1824,7 @@ public abstract class AccountingManagerBean
 	 * @see Accounting#payEnd(User, PaymentData)
 	 *
 	 * @ejb.interface-method
-	 * @ejb.transaction type = "Supports"
+	 * @ejb.transaction type="Supports" @!This usually means that no transaction is opened which is significantly faster and recommended for all read-only EJB methods! Marco.
 	 * @ejb.permission role-name="_Guest_"
 	 */
 	public PaymentResult payDoWork(
@@ -1837,7 +1838,7 @@ public abstract class AccountingManagerBean
 
 	/**
 	 * @ejb.interface-method view-type="local"
-	 * @ejb.transaction type = "RequiresNew"
+	 * @ejb.transaction type="RequiresNew"
 	 * @ejb.permission role-name="_Guest_"
 	 */
 	public PaymentResult _payDoWork(
@@ -1904,7 +1905,7 @@ public abstract class AccountingManagerBean
 	 *		<tt>paymentIDs</tt>.
 	 *
 	 * @ejb.interface-method
-	 * @ejb.transaction type = "Supports"
+	 * @ejb.transaction type="Supports" @!This usually means that no transaction is opened which is significantly faster and recommended for all read-only EJB methods! Marco.
 	 * @ejb.permission role-name="_Guest_"
 	 */
 	public List<PaymentResult> payEnd(List paymentIDs, List payEndClientResults, boolean forceRollback)
@@ -1955,7 +1956,7 @@ public abstract class AccountingManagerBean
 	 * @see Accounting#payEnd(User, PaymentData)
 	 *
 	 * @ejb.interface-method
-	 * @ejb.transaction type = "Supports"
+	 * @ejb.transaction type="Supports" @!This usually means that no transaction is opened which is significantly faster and recommended for all read-only EJB methods! Marco.
 	 * @ejb.permission role-name="_Guest_"
 	 */
 	public PaymentResult payEnd(
@@ -1969,7 +1970,7 @@ public abstract class AccountingManagerBean
 
 	/**
 	 * @ejb.interface-method view-type="local"
-	 * @ejb.transaction type = "RequiresNew"
+	 * @ejb.transaction type="RequiresNew"
 	 * @ejb.permission role-name="_Guest_"
 	 */
 	public PaymentResult _payEnd(
@@ -2032,7 +2033,7 @@ public abstract class AccountingManagerBean
 //	 * @throws ModuleException
 //	 *
 //	 * @ejb.interface-method
-//	 * @ejb.transaction type = "Required"
+//	 * @ejb.transaction type="Required"
 //	 * @ejb.permission role-name="_Guest_"
 //	 */
 //	public int createMoneyFlowMappingID()
@@ -2054,7 +2055,7 @@ public abstract class AccountingManagerBean
 //	 * @throws ModuleException
 //	 *
 //	 * @ejb.interface-method
-//	 * @ejb.transaction type = "Required"
+//	 * @ejb.transaction type="Required"
 //	 * @ejb.permission role-name="_Guest_"
 //	 */
 //	public PFMoneyFlowMappingConfigurator getPFMoneyFlowMappingConfigurator(
@@ -2142,7 +2143,7 @@ public abstract class AccountingManagerBean
 //	 * @throws ModuleException
 //	 *
 //	 * @ejb.interface-method
-//	 * @ejb.transaction type = "Required"
+//	 * @ejb.transaction type="Required"
 //	 * @ejb.permission role-name="_Guest_"
 //	 */
 //	public Map getPFMoneyFlowMappingConfigurators (
@@ -2185,7 +2186,7 @@ public abstract class AccountingManagerBean
 //	 * @throws ModuleException
 //	 *
 //	 * @ejb.interface-method
-//	 * @ejb.transaction type = "Required"
+//	 * @ejb.transaction type="Required"
 //	 * @ejb.permission role-name="_Guest_"
 //	 */
 //	public void storeMoneyFlowMappingConfiguration(PFMoneyFlowMappingConfigurator configurator)
@@ -2206,7 +2207,7 @@ public abstract class AccountingManagerBean
 //	 * @throws ModuleException
 //	 *
 //	 * @ejb.interface-method
-//	 * @ejb.transaction type = "Required"
+//	 * @ejb.transaction type="Required"
 //	 * @ejb.permission role-name="_Guest_"
 //	 */
 //	public void storeMoneyFlowMappingConfiguration(Collection configurators)
@@ -2226,7 +2227,7 @@ public abstract class AccountingManagerBean
 	/**
 	 * @ejb.interface-method
 	 * @ejb.permission role-name="_Guest_"
-	 * @ejb.transaction type="Supports"
+	 * @ejb.transaction type="Supports" @!This usually means that no transaction is opened which is significantly faster and recommended for all read-only EJB methods! Marco.
 	 */ 
 	public Invoice getInvoice(InvoiceID invoiceID, String[] fetchGroups, int maxFetchDepth)
 	throws ModuleException
@@ -2250,7 +2251,7 @@ public abstract class AccountingManagerBean
 	 *
 	 * @ejb.interface-method
 	 * @ejb.permission role-name="_Guest_"
-	 * @ejb.transaction type="Supports"
+	 * @ejb.transaction type="Supports" @!This usually means that no transaction is opened which is significantly faster and recommended for all read-only EJB methods! Marco.
 	 */
 	public Set<InvoiceID> getInvoiceIDs(Collection<JDOQuery> invoiceQueries)
 	{
@@ -2275,7 +2276,7 @@ public abstract class AccountingManagerBean
 	/**
 	 * @ejb.interface-method
 	 * @ejb.permission role-name="_Guest_"
-	 * @ejb.transaction type="Supports"
+	 * @ejb.transaction type="Supports" @!This usually means that no transaction is opened which is significantly faster and recommended for all read-only EJB methods! Marco.
 	 */
 	@SuppressWarnings("unchecked")
 	public List<Invoice> getInvoices(Set<InvoiceID> invoiceIDs, String[] fetchGroups, int maxFetchDepth)
@@ -2300,7 +2301,7 @@ public abstract class AccountingManagerBean
 	 *
 	 * @ejb.interface-method
 	 * @ejb.permission role-name="_Guest_"
-	 * @ejb.transaction type = "Required"
+	 * @ejb.transaction type="Required"
 	 */
 	public List<InvoiceID> getInvoiceIDs(AnchorID vendorID, AnchorID customerID, long rangeBeginIdx, long rangeEndIdx)
 	{
@@ -2319,7 +2320,7 @@ public abstract class AccountingManagerBean
 	/**
 	 * @ejb.interface-method
 	 * @ejb.permission role-name="_Guest_"
-	 * @ejb.transaction type="Supports"
+	 * @ejb.transaction type="Supports" @!This usually means that no transaction is opened which is significantly faster and recommended for all read-only EJB methods! Marco.
 	 */	
 	public Set<InvoiceID> getInvoiceIDsByQueries(Collection<JDOQuery> queries) 
 	{
@@ -2347,7 +2348,7 @@ public abstract class AccountingManagerBean
 	 *
  	 * @ejb.interface-method
 	 * @ejb.permission role-name="_Guest_"
-	 * @ejb.transaction type = "Required"
+	 * @ejb.transaction type="Required"
 	 */
 	public List getNonFinalizedInvoices(AnchorID vendorID, AnchorID customerID, String[] fetchGroups, int maxFetchDepth)
 	{
@@ -2369,7 +2370,7 @@ public abstract class AccountingManagerBean
 //	 *
 //	 * @ejb.interface-method
 //	 * @ejb.permission role-name="_Guest_"
-//	 * @ejb.transaction type = "Supports"
+//	 * @ejb.transaction type="Supports" @!This usually means that no transaction is opened which is significantly faster and recommended for all read-only EJB methods! Marco.
 //	 */
 //	public Collection getAvailableModeOfPaymentFlavoursForOneCustomer(AnchorID legalEntityID, String[] fetchGroups, int maxFetchDepth)
 //	throws ModuleException
@@ -2406,7 +2407,7 @@ public abstract class AccountingManagerBean
 	 *
 	 * @ejb.interface-method
 	 * @ejb.permission role-name="_Guest_"
-	 * @ejb.transaction type = "Supports"
+	 * @ejb.transaction type="Supports" @!This usually means that no transaction is opened which is significantly faster and recommended for all read-only EJB methods! Marco.
 	 */
 	public Collection getAvailableModeOfPaymentFlavoursForAllCustomerGroups(
 			Collection customerGroupIDs, byte mergeMode, String[] fetchGroups, int maxFetchDepth)
@@ -2430,7 +2431,7 @@ public abstract class AccountingManagerBean
 	 *
 	 * @ejb.interface-method
 	 * @ejb.permission role-name="_Guest_"
-	 * @ejb.transaction type="Supports"
+	 * @ejb.transaction type="Supports" @!This usually means that no transaction is opened which is significantly faster and recommended for all read-only EJB methods! Marco.
 	 */
 	public Set<ModeOfPaymentID> getAllModeOfPaymentIDs() {
 		PersistenceManager pm = getPersistenceManager();
@@ -2446,7 +2447,7 @@ public abstract class AccountingManagerBean
 	 *
 	 * @ejb.interface-method
 	 * @ejb.permission role-name="_Guest_"
-	 * @ejb.transaction type="Supports"
+	 * @ejb.transaction type="Supports" @!This usually means that no transaction is opened which is significantly faster and recommended for all read-only EJB methods! Marco.
 	 */
 	public Collection<ModeOfPaymentFlavour> getModeOfPayments(Set<ModeOfPaymentID> modeOfPaymentIDs, String[] fetchGroups, int maxFetchDepth)
 	{
@@ -2462,7 +2463,7 @@ public abstract class AccountingManagerBean
 	 *
 	 * @ejb.interface-method
 	 * @ejb.permission role-name="_Guest_"
-	 * @ejb.transaction type="Supports"
+	 * @ejb.transaction type="Supports" @!This usually means that no transaction is opened which is significantly faster and recommended for all read-only EJB methods! Marco.
 	 */
 	public Set<ModeOfPaymentFlavourID> getAllModeOfPaymentFlavourIDs() {
 		PersistenceManager pm = getPersistenceManager();
@@ -2478,7 +2479,7 @@ public abstract class AccountingManagerBean
 	 *
 	 * @ejb.interface-method
 	 * @ejb.permission role-name="_Guest_"
-	 * @ejb.transaction type="Supports"
+	 * @ejb.transaction type="Supports" @!This usually means that no transaction is opened which is significantly faster and recommended for all read-only EJB methods! Marco.
 	 */
 	public Collection<ModeOfPaymentFlavour> getModeOfPaymentFlavours(Set<ModeOfPaymentFlavourID> modeOfPaymentFlavourIDs, String[] fetchGroups, int maxFetchDepth)
 	{
@@ -2495,7 +2496,7 @@ public abstract class AccountingManagerBean
 	 *
 	 * @ejb.interface-method
 	 * @ejb.permission role-name="_Guest_"
-	 * @ejb.transaction type="Supports"
+	 * @ejb.transaction type="Supports" @!This usually means that no transaction is opened which is significantly faster and recommended for all read-only EJB methods! Marco.
 	 */
 	public Collection<ServerPaymentProcessor> getServerPaymentProcessorsForOneModeOfPaymentFlavour(
 			ModeOfPaymentFlavourID modeOfPaymentFlavourID,
@@ -2534,7 +2535,7 @@ public abstract class AccountingManagerBean
 	/**
 	 * @ejb.interface-method
 	 * @ejb.permission role-name="_Guest_"
-	 * @ejb.transaction type = "Supports"
+	 * @ejb.transaction type="Supports" @!This usually means that no transaction is opened which is significantly faster and recommended for all read-only EJB methods! Marco.
 	 */
 	public Collection getAvailableModeOfPaymentFlavoursForOneCustomerGroup(CustomerGroupID customerGroupID, String[] fetchGroups, int maxFetchDepth)
 	{
@@ -2557,7 +2558,7 @@ public abstract class AccountingManagerBean
 	 * @param productTypeID The object ID of the desired ProductType.
 	 *
 	 * @ejb.interface-method
-	 * @ejb.transaction type="Supports"
+	 * @ejb.transaction type="Supports" @!This usually means that no transaction is opened which is significantly faster and recommended for all read-only EJB methods! Marco.
 	 * @ejb.permission role-name="_Guest_"
 	 */
 	public ProductType getProductTypeForPriceConfigEditing(
@@ -2690,7 +2691,7 @@ public abstract class AccountingManagerBean
 
 	/**
 	 * @ejb.interface-method
-	 * @ejb.transaction type = "Required"
+	 * @ejb.transaction type="Required"
 	 * @ejb.permission role-name="_Guest_"
 	 */
 	public void signalInvoice(InvoiceID invoiceID, String jbpmTransitionName)
@@ -2715,7 +2716,7 @@ public abstract class AccountingManagerBean
 	 *		price config would result in which products to have their prices recalculated.
 	 *
 	 * @ejb.interface-method
-	 * @ejb.transaction type="Supports"
+	 * @ejb.transaction type="Supports" @!This usually means that no transaction is opened which is significantly faster and recommended for all read-only EJB methods! Marco.
 	 * @ejb.permission role-name="_Guest_"
 	 */
 	public Map<PriceConfigID, List<AffectedProductType>> getAffectedProductTypes(Set<PriceConfigID> priceConfigIDs, ProductTypeID productTypeID, PriceConfigID innerPriceConfigID)
@@ -2732,7 +2733,7 @@ public abstract class AccountingManagerBean
 	/**
 	 * @ejb.interface-method
 	 * @ejb.permission role-name="_Guest_"
-	 * @ejb.transaction type="Supports"
+	 * @ejb.transaction type="Supports" @!This usually means that no transaction is opened which is significantly faster and recommended for all read-only EJB methods! Marco.
 	 */	
 	public Set<AnchorID> getAccountIDs(Collection<JDOQuery> queries) 
 	{
@@ -2765,7 +2766,7 @@ public abstract class AccountingManagerBean
 //	 * @throws ModuleException
 //	 * 
 //	 * @ejb.interface-method
-//	 * @ejb.transaction type = "Required"
+//	 * @ejb.transaction type="Required"
 //	 * @ejb.permission role-name="_Guest_"
 //	 */
 //	public ProductType assignLocalAccountantDelegate(ProductTypeID productTypeID,
@@ -2842,7 +2843,7 @@ public abstract class AccountingManagerBean
 	 * @param productTransferIDQuery The query to execute.
 	 *
 	 * @ejb.interface-method
-	 * @ejb.transaction type="Supports"
+	 * @ejb.transaction type="Supports" @!This usually means that no transaction is opened which is significantly faster and recommended for all read-only EJB methods! Marco.
 	 * @ejb.permission role-name="_Guest_"
 	 */
 	public List<TransferID> getMoneyTransferIDs(MoneyTransferIDQuery productTransferIDQuery)
@@ -2866,7 +2867,7 @@ public abstract class AccountingManagerBean
 	 *		to the next query.
 	 *
 	 * @ejb.interface-method
-	 * @ejb.transaction type="Supports"
+	 * @ejb.transaction type="Supports" @!This usually means that no transaction is opened which is significantly faster and recommended for all read-only EJB methods! Marco.
 	 * @ejb.permission role-name="_Guest_"
 	 */
 	public List<TransferID> getMoneyTransferIDs(Collection<MoneyTransferQuery> moneyTransferQueries)
@@ -2888,7 +2889,7 @@ public abstract class AccountingManagerBean
 
 	/**
 	 * @ejb.interface-method
-	 * @ejb.transaction type="Supports"
+	 * @ejb.transaction type="Supports" @!This usually means that no transaction is opened which is significantly faster and recommended for all read-only EJB methods! Marco.
 	 * @ejb.permission role-name="_Guest_"
 	 */
 	public List<MoneyTransfer> getMoneyTransfers(Collection<TransferID> moneyTransferIDs, String[] fetchGroups, int maxFetchDepth)
@@ -2903,7 +2904,7 @@ public abstract class AccountingManagerBean
 
 	/**
 	 * @ejb.interface-method
-	 * @ejb.transaction type="Supports"
+	 * @ejb.transaction type="Supports" @!This usually means that no transaction is opened which is significantly faster and recommended for all read-only EJB methods! Marco.
 	 * @ejb.permission role-name="_Guest_"
 	 */
 	@SuppressWarnings("unchecked")
@@ -2921,7 +2922,7 @@ public abstract class AccountingManagerBean
 
 	/**
 	 * @ejb.interface-method
-	 * @ejb.transaction type="Supports"
+	 * @ejb.transaction type="Supports" @!This usually means that no transaction is opened which is significantly faster and recommended for all read-only EJB methods! Marco.
 	 * @ejb.permission role-name="_Guest_"
 	 */
 	public List<AccountType> getAccountTypes(Collection<AccountTypeID> accountTypeIDs, String[] fetchGroups, int maxFetchDepth)

@@ -54,7 +54,8 @@ import org.nightlabs.jfire.trade.LegalEntity;
  *           type="Stateless" 
  *           transaction-type="Container"
  *
- * @ejb.util generate = "physical"
+ * @ejb.util generate="physical"
+ * @ejb.transaction type="Required"
  */
 public abstract class PaymentHelperBean
 extends BaseSessionBeanImpl
@@ -102,7 +103,7 @@ implements SessionBean
 	 * @throws ModuleException 
 	 *
 	 * @ejb.interface-method view-type="local"
-	 * @ejb.transaction type = "RequiresNew"
+	 * @ejb.transaction type="RequiresNew"
 	 * @ejb.permission role-name="_Guest_"
 	 */
 	public PaymentDataID payBegin_storePaymentData(PaymentData paymentData)
@@ -142,7 +143,7 @@ implements SessionBean
 
 	/**
 	 * @ejb.interface-method
-	 * @ejb.transaction type = "RequiresNew"
+	 * @ejb.transaction type="RequiresNew"
 	 * @ejb.permission role-name="_Guest_"
 	 */
 	public PaymentResult payBegin_internal(
@@ -203,7 +204,7 @@ implements SessionBean
 
 	/**
 	 * @ejb.interface-method view-type="local"
-	 * @ejb.transaction type = "RequiresNew"
+	 * @ejb.transaction type="RequiresNew"
 	 * @ejb.permission role-name="_Guest_"
 	 */
 	public void payDoWork_storePayDoWorkClientResult(PaymentID paymentID, PaymentResult payDoWorkClientResult, boolean forceRollback)
@@ -223,7 +224,7 @@ implements SessionBean
 	
 	/**
 	 * @ejb.interface-method view-type="local"
-	 * @ejb.transaction type = "RequiresNew"
+	 * @ejb.transaction type="RequiresNew"
 	 * @ejb.permission role-name="_Guest_"
 	 */
 	public PaymentResult payDoWork_internal(PaymentID paymentID, String[] fetchGroups, int maxFetchDepth)
@@ -261,7 +262,7 @@ implements SessionBean
 
 	/**
 	 * @ejb.interface-method view-type="local"
-	 * @ejb.transaction type = "RequiresNew"
+	 * @ejb.transaction type="RequiresNew"
 	 * @ejb.permission role-name="_Guest_"
 	 */
 	public PaymentResult payEnd_internal(PaymentID paymentID, String[] fetchGroups, int maxFetchDepth)
@@ -394,7 +395,7 @@ implements SessionBean
 
 	/**
 	 * @ejb.interface-method view-type="local"
-	 * @ejb.transaction type = "RequiresNew"
+	 * @ejb.transaction type="RequiresNew"
 	 * @ejb.permission role-name="_Guest_"
 	 */
 	public void payEnd_storePayEndClientResult(PaymentID paymentID, PaymentResult payEndClientResult, boolean forceRollback)
@@ -414,7 +415,7 @@ implements SessionBean
 
 	/**
 	 * @ejb.interface-method view-type="local"
-	 * @ejb.transaction type = "RequiresNew"
+	 * @ejb.transaction type="RequiresNew"
 	 * @ejb.permission role-name="_Guest_"
 	 */
 	public PaymentResult payBegin_storePayBeginServerResult(
@@ -459,7 +460,7 @@ implements SessionBean
 	
 	/**
 	 * @ejb.interface-method view-type="local"
-	 * @ejb.transaction type = "RequiresNew"
+	 * @ejb.transaction type="RequiresNew"
 	 * @ejb.permission role-name="_Guest_"
 	 */
 	public PaymentResult payDoWork_storePayDoWorkServerResult(
@@ -500,7 +501,7 @@ implements SessionBean
 
 	/**
 	 * @ejb.interface-method view-type="local"
-	 * @ejb.transaction type = "RequiresNew"
+	 * @ejb.transaction type="RequiresNew"
 	 * @ejb.permission role-name="_Guest_"
 	 */
 	public PaymentResult payEnd_storePayEndServerResult(
@@ -542,7 +543,7 @@ implements SessionBean
 
 	/**
 	 * @ejb.interface-method view-type="local"
-	 * @ejb.transaction type = "RequiresNew"
+	 * @ejb.transaction type="RequiresNew"
 	 * @ejb.permission role-name="_Guest_"
 	 */
 	public void payRollback(PaymentID paymentID)

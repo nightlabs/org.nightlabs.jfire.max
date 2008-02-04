@@ -67,6 +67,7 @@ import org.nightlabs.jfire.trade.jbpm.id.ProcessDefinitionAssignmentID;
  *					 transaction-type="Container"
  *
  * @ejb.util generate="physical"
+ * @ejb.transaction type="Required"
  */
 public abstract class StoreManagerHelperBean 
 extends BaseSessionBeanImpl

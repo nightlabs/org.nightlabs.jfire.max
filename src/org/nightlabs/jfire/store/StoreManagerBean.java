@@ -128,6 +128,7 @@ import org.nightlabs.jfire.transfer.id.TransferID;
  *					 transaction-type="Container"
  *
  * @ejb.util generate="physical"
+ * @ejb.transaction type="Required"
  */
 public abstract class StoreManagerBean 
 extends BaseSessionBeanImpl
@@ -186,7 +187,7 @@ implements SessionBean
 	 * @throws IOException While loading an icon from a local resource, this might happen and we don't care in the initialise method.
 	 *
 	 * @ejb.interface-method
-	 * @ejb.transaction type = "Required"
+	 * @ejb.transaction type="Required"
 	 * @ejb.permission role-name="_System_"
 	 */
 	public void initialise() throws IOException
@@ -402,7 +403,7 @@ implements SessionBean
 	/**
 	 * @ejb.interface-method
 	 * @ejb.permission role-name="_Guest_"
-	 * @ejb.transaction type="Supports"
+	 * @ejb.transaction type="Supports" @!This usually means that no transaction is opened which is significantly faster and recommended for all read-only EJB methods! Marco.
 	 */
 	public Set<UnitID> getUnitIDs()
 	{
@@ -419,7 +420,7 @@ implements SessionBean
 	/**
 	 * @ejb.interface-method
 	 * @ejb.permission role-name="_Guest_"
-	 * @ejb.transaction type="Supports"
+	 * @ejb.transaction type="Supports" @!This usually means that no transaction is opened which is significantly faster and recommended for all read-only EJB methods! Marco.
 	 */
 	@SuppressWarnings("unchecked")
 	public List<Unit> getUnits(Collection<UnitID> unitIDs, String[] fetchGroups, int maxFetchDepth)
@@ -435,7 +436,7 @@ implements SessionBean
 	/**
 	 * @ejb.interface-method
 	 * @ejb.permission role-name="_Guest_"
-	 * @ejb.transaction type="Supports"
+	 * @ejb.transaction type="Supports" @!This usually means that no transaction is opened which is significantly faster and recommended for all read-only EJB methods! Marco.
 	 */ 
 	@SuppressWarnings("unchecked")
 	public List<DeliveryNote> getDeliveryNotes(Set<DeliveryNoteID> deliveryNoteIDs, String[] fetchGroups, int maxFetchDepth)
@@ -451,7 +452,7 @@ implements SessionBean
 	/**
 	 * @ejb.interface-method
 	 * @ejb.permission role-name="_Guest_"
-	 * @ejb.transaction type="Supports"
+	 * @ejb.transaction type="Supports" @!This usually means that no transaction is opened which is significantly faster and recommended for all read-only EJB methods! Marco.
 	 */ 
 	public DeliveryNote getDeliveryNote(DeliveryNoteID deliveryID, String[] fetchGroups, int maxFetchDepth)
 	{
@@ -470,7 +471,7 @@ implements SessionBean
 	/**
 	 * @ejb.interface-method
 	 * @ejb.permission role-name="_Guest_"
-	 * @ejb.transaction type="Supports"
+	 * @ejb.transaction type="Supports" @!This usually means that no transaction is opened which is significantly faster and recommended for all read-only EJB methods! Marco.
 	 */	
 	public Set<DeliveryNoteID> getDeliveryNoteIDs(Collection<JDOQuery> queries) 
 	{
@@ -497,7 +498,7 @@ implements SessionBean
 	 *  
 	 * @ejb.interface-method
 	 * @ejb.permission role-name="_Guest_"
-	 * @ejb.transaction type="Supports"
+	 * @ejb.transaction type="Supports" @!This usually means that no transaction is opened which is significantly faster and recommended for all read-only EJB methods! Marco.
 	 * 
 	 * FIXME: move to SimpleTradeManager and others, check permissions there and return only the ids!
 	 */ 
@@ -524,7 +525,7 @@ implements SessionBean
 	 * 
 	 * @ejb.interface-method
 	 * @ejb.permission role-name="_Guest_"
-	 * @ejb.transaction type = "Required"
+	 * @ejb.transaction type="Required"
 	 */ 
 	public Collection searchProductTypeGroups(ProductTypeGroupSearchFilter searchFilter, String[] fetchGroups, int maxFetchDepth)
 	{
@@ -551,7 +552,7 @@ implements SessionBean
 	 * 
 	 * @ejb.interface-method
 	 * @ejb.permission role-name="_Guest_"
-	 * @ejb.transaction type = "Required"
+	 * @ejb.transaction type="Required"
 	 */ 
 	public ProductTypeGroupSearchResult searchProductTypeGroups(ProductTypeGroupSearchFilter searchFilter, boolean saleable)
 	{
@@ -581,7 +582,7 @@ implements SessionBean
 	/**
 	 * @ejb.interface-method
 	 * @ejb.permission role-name="_Guest_"
-	 * @ejb.transaction type="Supports"
+	 * @ejb.transaction type="Supports" @!This usually means that no transaction is opened which is significantly faster and recommended for all read-only EJB methods! Marco.
 	 */ 
 	public ProductType getProductType(ProductTypeID productTypeID, String[] fetchGroups, int maxFetchDepth)
 	{
@@ -600,7 +601,7 @@ implements SessionBean
 	/**
 	 * @ejb.interface-method
 	 * @ejb.permission role-name="_Guest_"
-	 * @ejb.transaction type="Supports"
+	 * @ejb.transaction type="Supports" @!This usually means that no transaction is opened which is significantly faster and recommended for all read-only EJB methods! Marco.
 	 */ 
 	public List<ProductType> getProductTypes(Set<ProductTypeID> productTypeIDs, String[] fetchGroups, int maxFetchDepth)
 	{
@@ -616,7 +617,7 @@ implements SessionBean
 	 * @throws CannotPublishProductTypeException 
 	 * @ejb.interface-method
 	 * @ejb.permission role-name="_Guest_"
-	 * @ejb.transaction type = "Required"
+	 * @ejb.transaction type="Required"
 	 */ 
 	public ProductTypeStatus setProductTypeStatus_published(ProductTypeID productTypeID, boolean get, String[] fetchGroups, int maxFetchDepth) 
 	throws CannotPublishProductTypeException
@@ -647,7 +648,7 @@ implements SessionBean
 	 * @throws CannotConfirmProductTypeException 
 	 * @ejb.interface-method
 	 * @ejb.permission role-name="_Guest_"
-	 * @ejb.transaction type = "Required"
+	 * @ejb.transaction type="Required"
 	 */ 
 	public ProductTypeStatus setProductTypeStatus_confirmed(ProductTypeID productTypeID, boolean get, String[] fetchGroups, int maxFetchDepth) 
 	throws CannotConfirmProductTypeException
@@ -678,7 +679,7 @@ implements SessionBean
 	 * @throws CannotMakeProductTypeSaleableException 
 	 * @ejb.interface-method
 	 * @ejb.permission role-name="_Guest_"
-	 * @ejb.transaction type = "Required"
+	 * @ejb.transaction type="Required"
 	 */ 
 	public ProductTypeStatus setProductTypeStatus_saleable(ProductTypeID productTypeID, boolean saleable, boolean get, String[] fetchGroups, int maxFetchDepth) 
 	throws CannotMakeProductTypeSaleableException
@@ -708,7 +709,7 @@ implements SessionBean
 	/**
 	 * @ejb.interface-method
 	 * @ejb.permission role-name="_Guest_"
-	 * @ejb.transaction type = "Required"
+	 * @ejb.transaction type="Required"
 	 */ 
 	public ProductTypeStatus setProductTypeStatus_closed(ProductTypeID productTypeID, boolean get, String[] fetchGroups, int maxFetchDepth)
 	{
@@ -741,7 +742,7 @@ implements SessionBean
 	 *
 	 * @ejb.interface-method
 	 * @ejb.permission role-name="_Guest_"
-	 * @ejb.transaction type = "Required"
+	 * @ejb.transaction type="Required"
 	 */
 	public ModeOfDeliveryFlavourProductTypeGroupCarrier
 			getModeOfDeliveryFlavourProductTypeGroupCarrier(
@@ -784,7 +785,7 @@ implements SessionBean
 	 *
 	 * @ejb.interface-method
 	 * @ejb.permission role-name="_Guest_"
-	 * @ejb.transaction type="Supports"
+	 * @ejb.transaction type="Supports" @!This usually means that no transaction is opened which is significantly faster and recommended for all read-only EJB methods! Marco.
 	 */
 	public Collection<ServerDeliveryProcessor> getServerDeliveryProcessorsForOneModeOfDeliveryFlavour(
 			ModeOfDeliveryFlavourID modeOfDeliveryFlavourID,
@@ -834,7 +835,7 @@ implements SessionBean
 	 * @throws ModuleException
 	 *
 	 * @ejb.interface-method
-	 * @ejb.transaction type = "Required"
+	 * @ejb.transaction type="Required"
 	 * @ejb.permission role-name="_Guest_"
 	 */
 	public DeliveryNote createDeliveryNote(
@@ -894,7 +895,7 @@ implements SessionBean
 	 * @throws ModuleException
 	 *
 	 * @ejb.interface-method
-	 * @ejb.transaction type = "Required"
+	 * @ejb.transaction type="Required"
 	 * @ejb.permission role-name="_Guest_"
 	 */
 	public DeliveryNote createDeliveryNote(
@@ -965,7 +966,7 @@ implements SessionBean
 	 * @throws DeliveryNoteEditException 
 	 *
 	 * @ejb.interface-method
-	 * @ejb.transaction type = "Required"
+	 * @ejb.transaction type="Required"
 	 * @ejb.permission role-name="_Guest_"
 	 */
 	public DeliveryNote addArticlesToDeliveryNote(
@@ -1007,7 +1008,7 @@ implements SessionBean
 	 * @throws DeliveryNoteEditException
 	 * 
 	 * @ejb.interface-method
-	 * @ejb.transaction type = "Required"
+	 * @ejb.transaction type="Required"
 	 * @ejb.permission role-name="_Guest_"
 	 */
 	public DeliveryNote removeArticlesFromDeliveryNote(
@@ -1052,7 +1053,7 @@ implements SessionBean
 	 *		<tt>deliveryDataList</tt>.
 	 *
 	 * @ejb.interface-method
-	 * @ejb.transaction type = "Supports"
+	 * @ejb.transaction type="Supports" @!This usually means that no transaction is opened which is significantly faster and recommended for all read-only EJB methods! Marco.
 	 * @ejb.permission role-name="_Guest_"
 	 */
 	public List deliverBegin(List deliveryDataList)
@@ -1103,7 +1104,7 @@ implements SessionBean
 	 * @see Store#deliverBegin(User, DeliveryData)
 	 *
 	 * @ejb.interface-method
-	 * @ejb.transaction type="Supports"
+	 * @ejb.transaction type="Supports" @!This usually means that no transaction is opened which is significantly faster and recommended for all read-only EJB methods! Marco.
 	 * @ejb.permission role-name="_Guest_"
 	 */
 	public DeliveryResult deliverBegin(DeliveryData deliveryData)
@@ -1210,7 +1211,7 @@ implements SessionBean
 	 *		<tt>deliveryIDs</tt>.
 	 *
 	 * @ejb.interface-method
-	 * @ejb.transaction type = "Supports"
+	 * @ejb.transaction type="Supports" @!This usually means that no transaction is opened which is significantly faster and recommended for all read-only EJB methods! Marco.
 	 * @ejb.permission role-name="_Guest_"
 	 */
 	public List deliverEnd(List deliveryIDs, List deliverEndClientResults, boolean forceRollback)
@@ -1267,7 +1268,7 @@ implements SessionBean
 	 *		<tt>deliveryIDs</tt>.
 	 *
 	 * @ejb.interface-method
-	 * @ejb.transaction type = "Supports"
+	 * @ejb.transaction type="Supports" @!This usually means that no transaction is opened which is significantly faster and recommended for all read-only EJB methods! Marco.
 	 * @ejb.permission role-name="_Guest_"
 	 */
 	public List deliverDoWork(List deliveryIDs, List deliverDoWorkClientResults, boolean forceRollback)
@@ -1319,7 +1320,7 @@ implements SessionBean
 	 * @see Accounting#deliverEnd(User, DeliveryData)
 	 *
 	 * @ejb.interface-method
-	 * @ejb.transaction type = "Supports"
+	 * @ejb.transaction type="Supports" @!This usually means that no transaction is opened which is significantly faster and recommended for all read-only EJB methods! Marco.
 	 * @ejb.permission role-name="_Guest_"
 	 */
 	public DeliveryResult deliverDoWork(
@@ -1333,7 +1334,7 @@ implements SessionBean
 
 	/**
 	 * @ejb.interface-method view-type="local"
-	 * @ejb.transaction type = "RequiresNew"
+	 * @ejb.transaction type="RequiresNew"
 	 * @ejb.permission role-name="_Guest_"
 	 */
 	public DeliveryResult _deliverDoWork(
@@ -1394,7 +1395,7 @@ implements SessionBean
 	 * @see Accounting#deliverEnd(User, DeliveryData)
 	 *
 	 * @ejb.interface-method
-	 * @ejb.transaction type="Supports"
+	 * @ejb.transaction type="Supports" @!This usually means that no transaction is opened which is significantly faster and recommended for all read-only EJB methods! Marco.
 	 * @ejb.permission role-name="_Guest_"
 	 */
 	public DeliveryResult deliverEnd(
@@ -1628,7 +1629,7 @@ implements SessionBean
 	 *
 	 * @ejb.interface-method
 	 * @ejb.permission role-name="_Guest_"
-	 * @ejb.transaction type = "Required"
+	 * @ejb.transaction type="Required"
 	 */
 	public List<DeliveryNoteID> getDeliveryNoteIDs(AnchorID vendorID, AnchorID customerID, long rangeBeginIdx, long rangeEndIdx)
 	throws ModuleException
@@ -1669,7 +1670,7 @@ implements SessionBean
 
 	/**
 	 * @ejb.interface-method
-	 * @ejb.transaction type = "Required"
+	 * @ejb.transaction type="Required"
 	 * @ejb.permission role-name="_Guest_"
 	 */
 	public void signalDeliveryNote(DeliveryNoteID deliveryNoteID, String jbpmTransitionName)
@@ -1693,7 +1694,7 @@ implements SessionBean
 	 *
 	 * @ejb.interface-method
 	 * @ejb.permission role-name="_Guest_"
-	 * @ejb.transaction type="Supports"
+	 * @ejb.transaction type="Supports" @!This usually means that no transaction is opened which is significantly faster and recommended for all read-only EJB methods! Marco.
 	 */
 	public Set<ProductTypeID> getProductTypeIDs(Collection<ProductTypeQuery<? extends ProductType>> productTypeQueries)
 	{
@@ -1871,7 +1872,7 @@ implements SessionBean
 	/**
 	 * @ejb.interface-method
 	 * @ejb.permission role-name="_Guest_"
-	 * @ejb.transaction type="Supports"
+	 * @ejb.transaction type="Supports" @!This usually means that no transaction is opened which is significantly faster and recommended for all read-only EJB methods! Marco.
 	 */	
 	public Set<AnchorID> getRepositoryIDs(Collection<JDOQuery> queries) 
 	{
@@ -1895,7 +1896,7 @@ implements SessionBean
 
 	/**
 	 * @ejb.interface-method
-	 * @ejb.transaction type="Supports"
+	 * @ejb.transaction type="Supports" @!This usually means that no transaction is opened which is significantly faster and recommended for all read-only EJB methods! Marco.
 	 * @ejb.permission role-name="_Guest_"
 	 */
 	@SuppressWarnings("unchecked")
@@ -1931,7 +1932,7 @@ implements SessionBean
 	 * @param productTransferIDQuery The query to execute.
 	 *
 	 * @ejb.interface-method
-	 * @ejb.transaction type="Supports"
+	 * @ejb.transaction type="Supports" @!This usually means that no transaction is opened which is significantly faster and recommended for all read-only EJB methods! Marco.
 	 * @ejb.permission role-name="_Guest_"
 	 */
 	public List<TransferID> getProductTransferIDs(ProductTransferIDQuery productTransferIDQuery)
@@ -1955,7 +1956,7 @@ implements SessionBean
 	 *		to the next query.
 	 *
 	 * @ejb.interface-method
-	 * @ejb.transaction type="Supports"
+	 * @ejb.transaction type="Supports" @!This usually means that no transaction is opened which is significantly faster and recommended for all read-only EJB methods! Marco.
 	 * @ejb.permission role-name="_Guest_"
 	 */
 	public List<TransferID> getProductTransferIDs(Collection<ProductTransferQuery> productTransferQueries)
@@ -1977,7 +1978,7 @@ implements SessionBean
 
 	/**
 	 * @ejb.interface-method
-	 * @ejb.transaction type="Supports"
+	 * @ejb.transaction type="Supports" @!This usually means that no transaction is opened which is significantly faster and recommended for all read-only EJB methods! Marco.
 	 * @ejb.permission role-name="_Guest_"
 	 */
 	public List<ProductTransfer> getProductTransfers(Collection<TransferID> productTransferIDs, String[] fetchGroups, int maxFetchDepth)
@@ -1992,7 +1993,7 @@ implements SessionBean
 
 	/**
 	 * @ejb.interface-method
-	 * @ejb.transaction type="Supports"
+	 * @ejb.transaction type="Supports" @!This usually means that no transaction is opened which is significantly faster and recommended for all read-only EJB methods! Marco.
 	 * @ejb.permission role-name="_Guest_"
 	 */
 	@SuppressWarnings("unchecked")
@@ -2010,7 +2011,7 @@ implements SessionBean
 
 	/**
 	 * @ejb.interface-method
-	 * @ejb.transaction type="Supports"
+	 * @ejb.transaction type="Supports" @!This usually means that no transaction is opened which is significantly faster and recommended for all read-only EJB methods! Marco.
 	 * @ejb.permission role-name="_Guest_"
 	 */
 	public List<RepositoryType> getRepositoryTypes(Collection<RepositoryTypeID> repositoryTypeIDs, String[] fetchGroups, int maxFetchDepth)
@@ -2030,7 +2031,7 @@ implements SessionBean
 //	 *
 //	 * @ejb.interface-method
 //	 * @ejb.permission role-name="_Guest_"
-//	 * @ejb.transaction type = "Required"
+//	 * @ejb.transaction type="Required"
 //	 */	
 //	public ProductType storeProductType(ProductType productType, boolean get, String[] fetchGroups, int maxFetchDepth)
 //	throws ModuleException

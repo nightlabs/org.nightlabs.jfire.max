@@ -10,7 +10,7 @@ import org.nightlabs.i18n.I18nText;
  * 
  * @jdo.persistence-capable
  *		identity-type="application"
- *		objectid-class="org.nightlabs.jfire.ticketing.store.deliver.id.DeliveryQueueNameID"
+ *		objectid-class="org.nightlabs.jfire.store.deliver.id.DeliveryQueueNameID"
  *		detachable="true"
  *		table="JFireTrade_DeliveryQueueName"
  *

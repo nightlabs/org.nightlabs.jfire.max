@@ -74,7 +74,8 @@ import org.nightlabs.version.MalformedVersionException;
  *           type="Stateless" 
  *           transaction-type="Container"
  *
- * @ejb.util generate = "physical" 
+ * @ejb.util generate="physical"
+ * @ejb.transaction type="Required" 
  */
 public abstract class GeographyTemplateDataManagerBean
 extends BaseSessionBeanImpl

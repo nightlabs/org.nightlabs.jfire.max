@@ -57,7 +57,8 @@ import org.nightlabs.jfire.scripting.id.ScriptRegistryItemID;
  *					 type="Stateless" 
  *					 transaction-type="Container"
  *
- * @ejb.util generate = "physical"
+ * @ejb.util generate="physical"
+ * @ejb.transaction type="Required"
  */
 public abstract class ScriptManagerBean
 extends BaseSessionBeanImpl
@@ -140,7 +141,7 @@ implements SessionBean
 	 *
 	 * @ejb.interface-method
 	 * @ejb.permission role-name="_Guest_"
-	 * @ejb.transaction type = "Required"
+	 * @ejb.transaction type="Required"
 	 */
 	public ScriptRegistryItem getScriptRegistryItem (
 			ScriptRegistryItemID scriptRegistryItemID,
@@ -167,7 +168,7 @@ implements SessionBean
 	 *
 	 * @ejb.interface-method
 	 * @ejb.permission role-name="_Guest_"
-	 * @ejb.transaction type = "Required"
+	 * @ejb.transaction type="Required"
 	 */
 	public List<ScriptRegistryItem> getScriptRegistryItems (
 			List<ScriptRegistryItemID> scriptRegistryItemIDs,
@@ -198,7 +199,7 @@ implements SessionBean
 	 *
 	 * @ejb.interface-method
 	 * @ejb.permission role-name="_Guest_"
-	 * @ejb.transaction type = "Required"
+	 * @ejb.transaction type="Required"
 	 */
 	public Collection getTopLevelScriptRegistryItems (
 			String organisationID,
@@ -227,7 +228,7 @@ implements SessionBean
 	 *
 	 * @ejb.interface-method
 	 * @ejb.permission role-name="_Guest_"
-	 * @ejb.transaction type = "Required"
+	 * @ejb.transaction type="Required"
 	 */
 	public Collection<ScriptRegistryItemCarrier> getTopLevelScriptRegistryItemCarriers (String organisationID)
 	{
@@ -253,7 +254,7 @@ implements SessionBean
 //	 *
 //	 * @ejb.interface-method
 //	 * @ejb.permission role-name="_Guest_"
-//	 * @ejb.transaction type = "Required"
+//	 * @ejb.transaction type="Required"
 //	 */
 //	public Collection<ScriptRegistryItemCarrier> getTopLevelScriptRegistryItemCarriers (Set<ScriptRegistryItemID> topLevelIDs)
 //	throws ModuleException
@@ -301,7 +302,7 @@ implements SessionBean
 	 *
 	 * @ejb.interface-method
 	 * @ejb.permission role-name="_Guest_"
-	 * @ejb.transaction type = "Required"
+	 * @ejb.transaction type="Required"
 	 */
 	public Collection<ScriptParameterSet> getScriptParameterSets(
 			String organisationID, 
@@ -332,7 +333,7 @@ implements SessionBean
 	 *
 	 * @ejb.interface-method
 	 * @ejb.permission role-name="_Guest_"
-	 * @ejb.transaction type = "Required"
+	 * @ejb.transaction type="Required"
 	 */
 	public ScriptParameterSet getScriptParameterSet(
 			ScriptParameterSetID scriptParameterSetID, 
@@ -360,7 +361,7 @@ implements SessionBean
 	 *
 	 * @ejb.interface-method
 	 * @ejb.permission role-name="_Guest_"
-	 * @ejb.transaction type = "Required"
+	 * @ejb.transaction type="Required"
 	 */
 	@SuppressWarnings("unchecked")
 	public Collection<ScriptParameterSet> getScriptParameterSets(
@@ -443,7 +444,7 @@ implements SessionBean
 	 *
 	 * @ejb.interface-method
 	 * @ejb.permission role-name="_Guest_"
-	 * @ejb.transaction type = "Required"
+	 * @ejb.transaction type="Required"
 	 */
 	public Collection<ScriptRegistryItemCarrier> getTopLevelScriptRegistryItemCarriers (
 			String organisationID, String scriptRegistryItemType)
@@ -469,7 +470,7 @@ implements SessionBean
 	 * 
 	 * @ejb.interface-method
 	 * @ejb.permission role-name="_Guest_"
-	 * @ejb.transaction type = "Required"
+	 * @ejb.transaction type="Required"
 	 */	
 	public ScriptRegistry getScriptRegistry(String[] fetchGroups, int maxFetchDepth)
 	{
@@ -491,7 +492,7 @@ implements SessionBean
 	 * 
 	 * @ejb.interface-method
 	 * @ejb.permission role-name="_Guest_"
-	 * @ejb.transaction type = "Required"
+	 * @ejb.transaction type="Required"
 	 */	
 	public ScriptRegistry getScriptRegistry()
 	{

@@ -128,6 +128,7 @@ import org.nightlabs.util.CollectionUtil;
  *					 transaction-type="Container"
  *
  * @ejb.util generate="physical"
+ * @ejb.transaction type="Required"
  */
 public abstract class SimpleTradeManagerBean
 extends BaseSessionBeanImpl
@@ -455,7 +456,7 @@ implements SessionBean
 //	 *
 //	 * @ejb.interface-method
 //	 * @ejb.permission role-name="SimpleTradeManager-user"
-//	 * @ejb.transaction type = "Required"
+//	 * @ejb.transaction type="Required"
 //	 */
 //	public Collection<SimpleProductType> test(Map<String, SimpleProductType> m)
 //		throws ModuleException
@@ -468,7 +469,7 @@ implements SessionBean
 //	 *
 //	 * @ejb.interface-method
 //	 * @ejb.permission role-name="SimpleTradeManager-user"
-//	 * @ejb.transaction type = "Required"
+//	 * @ejb.transaction type="Required"
 //	 */
 //	public Collection getChildProductTypes(ProductTypeID parentProductTypeID, String[] fetchGroups, int maxFetchDepth)
 //		throws ModuleException
@@ -490,7 +491,7 @@ implements SessionBean
 	
 	/**
 	 * @ejb.interface-method
-	 * @ejb.transaction type="Supports"
+	 * @ejb.transaction type="Supports" @!This usually means that no transaction is opened which is significantly faster and recommended for all read-only EJB methods! Marco.
 	 * @ejb.permission role-name="_Guest_"
 	 */
 	@SuppressWarnings("unchecked")
@@ -507,7 +508,7 @@ implements SessionBean
 
 	/**
 	 * @ejb.interface-method
-	 * @ejb.transaction type="Supports"
+	 * @ejb.transaction type="Supports" @!This usually means that no transaction is opened which is significantly faster and recommended for all read-only EJB methods! Marco.
 	 * @ejb.permission role-name="_Guest_"
 	 */
 	@SuppressWarnings("unchecked")
@@ -527,7 +528,7 @@ implements SessionBean
 	
 	/**
 	 * @ejb.interface-method
-	 * @ejb.transaction type="Supports"
+	 * @ejb.transaction type="Supports" @!This usually means that no transaction is opened which is significantly faster and recommended for all read-only EJB methods! Marco.
 	 * @ejb.permission role-name="_Guest_"
 	 */
 	@SuppressWarnings("unchecked")
@@ -548,7 +549,7 @@ implements SessionBean
 	 *
 	 * @ejb.interface-method
 	 * @ejb.permission role-name="SimpleTradeManager.Admin"
-	 * @ejb.transaction type = "Required"
+	 * @ejb.transaction type="Required"
 	 */
 	public SimpleProductType storeProductType(SimpleProductType productType, boolean get, String[] fetchGroups, int maxFetchDepth)
 	throws ModuleException
@@ -706,7 +707,7 @@ implements SessionBean
 	 *
 	 * @ejb.interface-method
 	 * @ejb.permission role-name="SimpleTradeManager.Admin"
-	 * @ejb.transaction type = "Required"
+	 * @ejb.transaction type="Required"
 	 */
 	public Map<ProductTypeID, PropertySet> getSimpleProductTypesPropertySets(
 			Set<ProductTypeID> simpleProductTypeIDs,
@@ -737,7 +738,7 @@ implements SessionBean
 //	 *
 //	 * @ejb.interface-method
 //	 * @ejb.permission role-name="SimpleTradeManager.Admin"
-//	 * @ejb.transaction type = "Required"
+//	 * @ejb.transaction type="Required"
 //	 */
 //	public SimpleProductType updateProductType(SimpleProductType productType, boolean get, String[] fetchGroups, int maxFetchDepth)
 //		throws ModuleException
@@ -798,7 +799,7 @@ implements SessionBean
 	/**
 	 * @ejb.interface-method
 	 * @ejb.permission role-name="_Guest_"
-	 * @ejb.transaction type = "Required"
+	 * @ejb.transaction type="Required"
 	 */
 	public Set<PriceConfigID> getFormulaPriceConfigIDs()
 	{
@@ -815,7 +816,7 @@ implements SessionBean
 	/**
 	 * @ejb.interface-method
 	 * @ejb.permission role-name="_Guest_"
-	 * @ejb.transaction type = "Required"
+	 * @ejb.transaction type="Required"
 	 */
 	@SuppressWarnings("unchecked")
 	public List<FormulaPriceConfig> getFormulaPriceConfigs(Collection<PriceConfigID> formulaPriceConfigIDs, String[] fetchGroups, int maxFetchDepth)
@@ -834,7 +835,7 @@ implements SessionBean
 	 *
 	 * @ejb.interface-method
 	 * @ejb.permission role-name="_Guest_"
-	 * @ejb.transaction type = "Required"
+	 * @ejb.transaction type="Required"
 	 */
 	public Collection<? extends Article> createArticles(
 			SegmentID segmentID,
@@ -985,7 +986,7 @@ implements SessionBean
 
 	/**
 	 * @ejb.interface-method
-	 * @ejb.transaction type="Supports"
+	 * @ejb.transaction type="Supports" @!This usually means that no transaction is opened which is significantly faster and recommended for all read-only EJB methods! Marco.
 	 * @ejb.permission role-name="_Guest_"
 	 */
 	public Set<ProductTypeID> getPublishedSimpleProductTypeIDs()
@@ -1005,7 +1006,7 @@ implements SessionBean
 
 	/**
 	 * @ejb.interface-method
-	 * @ejb.transaction type="Supports"
+	 * @ejb.transaction type="Supports" @!This usually means that no transaction is opened which is significantly faster and recommended for all read-only EJB methods! Marco.
 	 * @ejb.permission role-name="_Guest_"
 	 */
 	public List<SimpleProductType> getSimpleProductTypesForReseller(Collection<ProductTypeID> productTypeIDs)
@@ -1144,7 +1145,7 @@ implements SessionBean
 	 * @return a <tt>Collection</tt> of {@link TariffPricePair}
 	 *
 	 * @ejb.interface-method
-	 * @ejb.transaction type="Supports"
+	 * @ejb.transaction type="Supports" @!This usually means that no transaction is opened which is significantly faster and recommended for all read-only EJB methods! Marco.
 	 * @ejb.permission role-name="_Guest_"
 	 */
 	public Collection<TariffPricePair> getTariffPricePairs(
@@ -1265,7 +1266,7 @@ implements SessionBean
 	 *  
 	 * @ejb.interface-method
 	 * @ejb.permission role-name="_Guest_"
-	 * @ejb.transaction type="Supports"
+	 * @ejb.transaction type="Supports" @!This usually means that no transaction is opened which is significantly faster and recommended for all read-only EJB methods! Marco.
 	 * 
 	 * FIXME: Use {@link JDOQuery} instead of search filter and get only ids from the datastore
 	 */ 

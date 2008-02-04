@@ -50,6 +50,7 @@ import org.nightlabs.jfire.webshop.id.WebCustomerID;
  *           transaction-type="Container"
  * 
  * @ejb.util generate="physical"
+ * @ejb.transaction type="Required"
  */
 public abstract class WebShopBean
 extends BaseSessionBeanImpl
@@ -114,7 +115,7 @@ implements SessionBean
 	/**
 	 * @ejb.interface-method
 	 * @ejb.permission role-name="_Guest_"
-	 * @ejb.transaction type="Supports"
+	 * @ejb.transaction type="Supports" @!This usually means that no transaction is opened which is significantly faster and recommended for all read-only EJB methods! Marco.
 	 */	
 	public List<WebCustomer> getWebCustomers(Set<WebCustomerID> webCustomerIDs, String[] fetchGroups, int maxFetchDepth)
 	{
@@ -129,7 +130,7 @@ implements SessionBean
 	/**
 	 * @ejb.interface-method
 	 * @ejb.permission role-name="_Guest_"
-	 * @ejb.transaction type="Supports"
+	 * @ejb.transaction type="Supports" @!This usually means that no transaction is opened which is significantly faster and recommended for all read-only EJB methods! Marco.
 	 */	
 	public WebCustomer getWebCustomer(WebCustomerID webCustomerID, String[] fetchGroups, int maxFetchDepth) 
 	{
@@ -147,7 +148,7 @@ implements SessionBean
 	/**
 	 * @ejb.interface-method
 	 * @ejb.permission role-name="_Guest_"
-	 * @ejb.transaction type="Supports"
+	 * @ejb.transaction type="Supports" @!This usually means that no transaction is opened which is significantly faster and recommended for all read-only EJB methods! Marco.
 	 */	
 	public WebCustomer getPerson(WebCustomerID webCustomerID, String[] fetchGroups, int maxFetchDepth) 
 	{
@@ -166,7 +167,7 @@ implements SessionBean
 	/**
 	 * @ejb.interface-method
 	 * @ejb.permission role-name="_Guest_"
-	 * @ejb.transaction type="Supports"
+	 * @ejb.transaction type="Supports" @!This usually means that no transaction is opened which is significantly faster and recommended for all read-only EJB methods! Marco.
 	 */	
 	public AnchorID getWebCustomerLegalEntityID(WebCustomerID webCustomerID) 
 	{
@@ -234,7 +235,7 @@ implements SessionBean
 	/**
 	 * @ejb.interface-method
 	 * @ejb.permission role-name="_Guest_"
-	 * @ejb.transaction type="Supports"
+	 * @ejb.transaction type="Supports" @!This usually means that no transaction is opened which is significantly faster and recommended for all read-only EJB methods! Marco.
 	 */			
 	public boolean isWebCustomerIDExisting(WebCustomerID webCustomerID, PersistenceManager pm) 
 	{
@@ -315,7 +316,7 @@ implements SessionBean
 //	/**
 //	 * @ejb.interface-method
 //	 * @ejb.permission role-name="_Guest_"
-//	 * @ejb.transaction type="Supports"
+//	 * @ejb.transaction type="Supports" @!This usually means that no transaction is opened which is significantly faster and recommended for all read-only EJB methods! Marco.
 //	 * @deprecated
 //	 */
 //	public boolean checkPassword(WebCustomerID webCustomerID, String password) 
@@ -350,7 +351,7 @@ implements SessionBean
 //	 * The second password that can be set if a customer triggers the lostPassword procedure
 //	 * @ejb.interface-method
 //	 * @ejb.permission role-name="_Guest_"
-//	 * @ejb.transaction type="Supports"
+//	 * @ejb.transaction type="Supports" @!This usually means that no transaction is opened which is significantly faster and recommended for all read-only EJB methods! Marco.
 //	 * @deprecated
 //	 */
 //	public boolean checkSecondPassword(WebCustomerID webCustomerID, String password) 
@@ -383,7 +384,7 @@ implements SessionBean
 	/**
 	 * @ejb.interface-method
 	 * @ejb.permission role-name="_Guest_"
-	 * @ejb.transaction type="Supports"
+	 * @ejb.transaction type="Supports" @!This usually means that no transaction is opened which is significantly faster and recommended for all read-only EJB methods! Marco.
 	 */
 	public boolean checkEmailConfirmation(WebCustomerID webCustomerID, String checkString) 
 	{
@@ -407,7 +408,7 @@ implements SessionBean
 	/**
 	 * @ejb.interface-method
 	 * @ejb.permission role-name="_Guest_"
-	 * @ejb.transaction type="Supports"
+	 * @ejb.transaction type="Supports" @!This usually means that no transaction is opened which is significantly faster and recommended for all read-only EJB methods! Marco.
 	 */
 	public boolean hasEmailConfirmationExpired(WebCustomerID webCustomerID) throws JDOObjectNotFoundException 
 	{
@@ -429,7 +430,7 @@ implements SessionBean
 //	 * The second password that can be set if a customer triggers the lostPassword procedure
 //	 * @ejb.interface-method
 //	 * @ejb.permission role-name="_Guest_"
-//	 * @ejb.transaction type="Supports"
+//	 * @ejb.transaction type="Supports" @!This usually means that no transaction is opened which is significantly faster and recommended for all read-only EJB methods! Marco.
 //	 * @deprecated
 //	 */
 //	public boolean hasSecondPasswordDateExpired(WebCustomerID webCustomerID)  
@@ -460,7 +461,7 @@ implements SessionBean
 	/**
 	 * @ejb.interface-method
 	 * @ejb.permission role-name="_Guest_"
-	 * @ejb.transaction type="Supports"
+	 * @ejb.transaction type="Supports" @!This usually means that no transaction is opened which is significantly faster and recommended for all read-only EJB methods! Marco.
 	 */			
 	public boolean isWebCustomerIDExisting(WebCustomerID webCustomerID) 
 	{
@@ -478,7 +479,7 @@ implements SessionBean
 	/**
 	 * @ejb.interface-method
 	 * @ejb.permission role-name="_Guest_"
-	 * @ejb.transaction type="Supports"
+	 * @ejb.transaction type="Supports" @!This usually means that no transaction is opened which is significantly faster and recommended for all read-only EJB methods! Marco.
 	 */			
 	public boolean isEmailExisting(String email) 
 	{

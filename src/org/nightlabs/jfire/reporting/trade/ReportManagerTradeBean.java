@@ -72,7 +72,8 @@ import org.nightlabs.jfire.transfer.id.AnchorID;
  *					 type="Stateless" 
  *					 transaction-type="Container"
  *
- * @ejb.util generate = "physical"
+ * @ejb.util generate="physical"
+ * @ejb.transaction type="Required"
  */
 public abstract class ReportManagerTradeBean
 extends BaseSessionBeanImpl

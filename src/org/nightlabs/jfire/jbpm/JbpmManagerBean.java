@@ -52,7 +52,8 @@ import org.nightlabs.util.IOUtil;
  *           type="Stateless"
  *           transaction-type="Container"
  *
- * @ejb.util generate = "physical"
+ * @ejb.util generate="physical"
+ * @ejb.transaction type="Required"
  * 
  * @author Marco Schulze
  * @author Marc Klinger - marc[at]nightlabs[dot]de
@@ -314,7 +315,7 @@ implements SessionBean
 
 	/**
 	 * @ejb.interface-method
-	 * @ejb.transaction type="Supports"
+	 * @ejb.transaction type="Supports" @!This usually means that no transaction is opened which is significantly faster and recommended for all read-only EJB methods! Marco.
 	 * @ejb.permission role-name="_Guest_"
 	 */
 	@SuppressWarnings("unchecked")
@@ -330,7 +331,7 @@ implements SessionBean
 
 	/**
 	 * @ejb.interface-method
-	 * @ejb.transaction type="Supports"
+	 * @ejb.transaction type="Supports" @!This usually means that no transaction is opened which is significantly faster and recommended for all read-only EJB methods! Marco.
 	 * @ejb.permission role-name="_Guest_"
 	 */
 	public Set<StateID> getStateIDs(ObjectID statableID)
@@ -347,7 +348,7 @@ implements SessionBean
 	 * @param userExecutable If <code>null</code>, it is ignored. If not <code>null</code>, the query filters only transitions where userExecutable has this value.
 	 *
 	 * @ejb.interface-method
-	 * @ejb.transaction type="Supports"
+	 * @ejb.transaction type="Supports" @!This usually means that no transaction is opened which is significantly faster and recommended for all read-only EJB methods! Marco.
 	 * @ejb.permission role-name="_Guest_"
 	 */
 	public Set<TransitionID> getTransitionIDs(StateID stateID, Boolean userExecutable)
@@ -379,7 +380,7 @@ implements SessionBean
 	 * @param userExecutable If <code>null</code>, it is ignored. If not <code>null</code>, the query filters only transitions where userExecutable has this value.
 	 *
 	 * @ejb.interface-method
-	 * @ejb.transaction type="Supports"
+	 * @ejb.transaction type="Supports" @!This usually means that no transaction is opened which is significantly faster and recommended for all read-only EJB methods! Marco.
 	 * @ejb.permission role-name="_Guest_"
 	 */
 	public Set<TransitionID> getTransitionIDs(StateDefinitionID stateDefinitionID, Boolean userExecutable)
@@ -408,7 +409,7 @@ implements SessionBean
 
 	/**
 	 * @ejb.interface-method
-	 * @ejb.transaction type="Supports"
+	 * @ejb.transaction type="Supports" @!This usually means that no transaction is opened which is significantly faster and recommended for all read-only EJB methods! Marco.
 	 * @ejb.permission role-name="_Guest_"
 	 */
 	@SuppressWarnings("unchecked")
@@ -496,7 +497,7 @@ implements SessionBean
 	 *
 	 * @ejb.interface-method
 	 * @ejb.permission role-name="_Guest_"
-	 * @ejb.transaction type="Supports"
+	 * @ejb.transaction type="Supports" @!This usually means that no transaction is opened which is significantly faster and recommended for all read-only EJB methods! Marco.
 	 */
 	public Set<Statable> getStatables(Collection<StatableQuery> statableQueries)
 	{

@@ -14,7 +14,6 @@ import javax.ejb.SessionBean;
 import javax.ejb.SessionContext;
 import javax.jdo.FetchPlan;
 import javax.jdo.JDOHelper;
-import javax.jdo.JDOObjectNotFoundException;
 import javax.jdo.PersistenceManager;
 import javax.jdo.Query;
 
@@ -23,6 +22,7 @@ import org.jbpm.JbpmContext;
 import org.jbpm.graph.exe.ProcessInstance;
 import org.nightlabs.ModuleException;
 import org.nightlabs.jdo.NLJDOHelper;
+import org.nightlabs.jdo.moduleregistry.ModuleMetaData;
 import org.nightlabs.jdo.query.JDOQuery;
 import org.nightlabs.jfire.base.BaseSessionBeanImpl;
 import org.nightlabs.jfire.editlock.EditLockType;
@@ -30,8 +30,6 @@ import org.nightlabs.jfire.issue.config.StoredIssueQuery;
 import org.nightlabs.jfire.issue.history.IssueHistory;
 import org.nightlabs.jfire.issue.id.IssueID;
 import org.nightlabs.jfire.issue.id.IssueLocalID;
-import org.nightlabs.jfire.issue.id.IssuePriorityID;
-import org.nightlabs.jfire.issue.id.IssueResolutionID;
 import org.nightlabs.jfire.issue.id.IssueSeverityTypeID;
 import org.nightlabs.jfire.issue.id.IssueTypeID;
 import org.nightlabs.jfire.issue.id.StoredIssueQueryID;
@@ -45,7 +43,8 @@ import org.nightlabs.jfire.jbpm.graph.def.State;
  *           jndi-name="jfire/ejb/JFireIssueTracking/IssueManager"
  *           type="Stateless" 
  *
- * @ejb.util generate = "physical"
+ * @ejb.util generate="physical"
+ * @ejb.transaction type="Required"
  */
 public class IssueManagerBean 
 extends BaseSessionBeanImpl
@@ -136,7 +135,7 @@ implements SessionBean{
 	
 	/**
 	 * @ejb.interface-method
-	 * @ejb.transaction type="Supports"
+	 * @ejb.transaction type="Supports" @!This usually means that no transaction is opened which is significantly faster and recommended for all read-only EJB methods! Marco.
 	 * @ejb.permission role-name="_Guest_"
 	 */
 	public Set<IssueID> getIssueIDs()
@@ -153,7 +152,7 @@ implements SessionBean{
 	
 	/**
 	 * @ejb.interface-method
-	 * @ejb.transaction type="Supports"
+	 * @ejb.transaction type="Supports" @!This usually means that no transaction is opened which is significantly faster and recommended for all read-only EJB methods! Marco.
 	 * @ejb.permission role-name="_Guest_"
 	 */
 	@SuppressWarnings("unchecked")
@@ -169,7 +168,7 @@ implements SessionBean{
 	
 	/**
 	 * @ejb.interface-method
-	 * @ejb.transaction type="Supports"
+	 * @ejb.transaction type="Supports" @!This usually means that no transaction is opened which is significantly faster and recommended for all read-only EJB methods! Marco.
 	 * @ejb.permission role-name="_Guest_"
 	 */
 	public Set<IssueSeverityTypeID> getIssueSeverityTypeIDs()
@@ -188,7 +187,7 @@ implements SessionBean{
 	 * @throws ModuleException
 	 *
 	 * @ejb.interface-method
-	 * @ejb.transaction type = "Required"
+	 * @ejb.transaction type="Required"
 	 * @ejb.permission role-name="_Guest_"
 	 */
 	public Collection getIssueSeverityTypes(String[] fetchGroups, int maxFetchDepth)
@@ -211,7 +210,7 @@ implements SessionBean{
 	 * @throws ModuleException
 	 *
 	 * @ejb.interface-method
-	 * @ejb.transaction type = "Required"
+	 * @ejb.transaction type="Required"
 	 * @ejb.permission role-name="_Guest_"
 	 */
 	public Collection getIssuePriorities(String[] fetchGroups, int maxFetchDepth)
@@ -234,7 +233,7 @@ implements SessionBean{
 	 * @throws ModuleException
 	 *
 	 * @ejb.interface-method
-	 * @ejb.transaction type = "Required"
+	 * @ejb.transaction type="Required"
 	 * @ejb.permission role-name="_Guest_"
 	 */
 	public Collection getIssueResolutions(String[] fetchGroups, int maxFetchDepth)
@@ -255,7 +254,7 @@ implements SessionBean{
 
 	/**
 	 * @ejb.interface-method
-	 * @ejb.transaction type="Supports"
+	 * @ejb.transaction type="Supports" @!This usually means that no transaction is opened which is significantly faster and recommended for all read-only EJB methods! Marco.
 	 * @ejb.permission role-name="_Guest_"
 	 */
 	@SuppressWarnings("unchecked")
@@ -273,7 +272,7 @@ implements SessionBean{
 	 * @throws ModuleException
 	 *
 	 * @ejb.interface-method
-	 * @ejb.transaction type = "Required"
+	 * @ejb.transaction type="Required"
 	 * @ejb.permission role-name="_Guest_"
 	 */
 	public Collection getIssueTypes(String[] fetchGroups, int maxFetchDepth)
@@ -296,7 +295,7 @@ implements SessionBean{
 	 * @throws ModuleException
 	 *
 	 * @ejb.interface-method
-	 * @ejb.transaction type = "Required"
+	 * @ejb.transaction type="Required"
 	 * @ejb.permission role-name="_Guest_"
 	 */
 	public Collection getIssueSeverity(String[] fetchGroups, int maxFetchDepth)
@@ -319,7 +318,7 @@ implements SessionBean{
 	 * @throws ModuleException
 	 *
 	 * @ejb.interface-method
-	 * @ejb.transaction type = "Required"
+	 * @ejb.transaction type="Required"
 	 * @ejb.permission role-name="_Guest_"
 	 */
 	public Collection getIssueComments(String[] fetchGroups, int maxFetchDepth)
@@ -342,7 +341,7 @@ implements SessionBean{
 	 * @throws ModuleException
 	 *
 	 * @ejb.interface-method
-	 * @ejb.transaction type = "Required"
+	 * @ejb.transaction type="Required"
 	 * @ejb.permission role-name="_Guest_"
 	 */
 	public Collection getStoredIssueQuery(String[] fetchGroups, int maxFetchDepth)
@@ -364,7 +363,7 @@ implements SessionBean{
 	/**
 	 * @ejb.interface-method
 	 * @ejb.permission role-name="_Guest_"
-	 * @ejb.transaction type="Supports"
+	 * @ejb.transaction type="Supports" @!This usually means that no transaction is opened which is significantly faster and recommended for all read-only EJB methods! Marco.
 	 */	
 	public Set<IssueID> getIssueIDs(Collection<JDOQuery> queries) 
 	{
@@ -553,7 +552,7 @@ implements SessionBean{
 	
 	/**
 	 * @ejb.interface-method
-	 * @ejb.transaction type = "Required"
+	 * @ejb.transaction type="Required"
 	 * @ejb.permission role-name="_Guest_"
 	 */
 	public Issue signalIssue(IssueID issueID, String jbpmTransitionName, boolean get, String[] fetchGroups, int maxFetchDepth)
@@ -591,13 +590,25 @@ implements SessionBean{
 	 * @throws IOException While loading an icon from a local resource, this might happen and we don't care in the initialise method.
 	 *
 	 * @ejb.interface-method
-	 * @ejb.transaction type = "Required"
+	 * @ejb.transaction type="Required"
 	 * @ejb.permission role-name="_System_"
 	 */
-	public void initialise() throws IOException
+	public void initialise() throws Exception
 	{
 		PersistenceManager pm = getPersistenceManager();
 		try {
+			// The complete method is executed in *one* transaction. So if one thing fails, all fail.
+			// => We check once at the beginning, if this module has already been initialised.
+			ModuleMetaData moduleMetaData = ModuleMetaData.getModuleMetaData(pm, JFireIssueTrackingEAR.MODULE_NAME);
+			if (moduleMetaData != null)
+				return;
+
+			logger.info("Initialization of " + JFireIssueTrackingEAR.MODULE_NAME + " started...");
+
+			pm.makePersistent(new ModuleMetaData(
+					JFireIssueTrackingEAR.MODULE_NAME, "0.9.3.0.beta", "0.9.3.0.beta")
+			);
+
 //			// check, whether the datastore is already initialized
 //			pm.getExtent(IssueStatus.class);
 //			try {
@@ -634,28 +645,14 @@ implements SessionBean{
 //			issueStatus.getIssueStatusText().setText(Locale.ENGLISH.getLanguage(), "Close");
 //			pm.makePersistent(issueStatus);
 
-			
-			// check, whether the datastore is already initialized
-			
-			pm.getExtent(IssueType.class);			
-			
 			IssueType issueType = new IssueType(getOrganisationID(), "Default");
 			issueType.getName().setText(Locale.ENGLISH.getLanguage(), "Default");
 			issueType = pm.makePersistent(issueType);
-			
+
 			IssueType issueType2 = new IssueType(getOrganisationID(), "Customer");
 			issueType2.getName().setText(Locale.ENGLISH.getLanguage(), "Customer");
 			issueType2 = pm.makePersistent(issueType2);
-			
-			// check, whether the datastore is already initialized
-			pm.getExtent(IssueSeverityType.class);
-			try {
-				pm.getObjectById(IssueSeverityTypeID.create(getOrganisationID(), IssueSeverityType.ISSUE_SEVERITY_TYPE_BLOCK), true);
-				return; // already initialized
-			} catch (JDOObjectNotFoundException x) {
-				// datastore not yet initialized
-			}
-			
+
 			// Create the statuses
 			IssueSeverityType issueSeverityType;
 
@@ -703,13 +700,6 @@ implements SessionBean{
 			////////////////////////////////////////////////////////
 			// Create the priorities
 			// check, whether the datastore is already initialized
-			pm.getExtent(IssuePriority.class);
-			try {
-				pm.getObjectById(IssuePriorityID.create(getOrganisationID(), "None"), true);
-				return; // already initialized
-			} catch (JDOObjectNotFoundException x) {
-				// datastore not yet initialized
-			}
 			IssuePriority issuePriority;
 
 			issuePriority = new IssuePriority(getOrganisationID(), "None");
@@ -745,15 +735,7 @@ implements SessionBean{
 			issuePriority = pm.makePersistent(issuePriority);
 			issueType.getIssuePriorities().add(issuePriority);
 			
-			// Create the priorities
-			// check, whether the datastore is already initialized
-			pm.getExtent(IssueResolution.class);
-			try {
-				pm.getObjectById(IssueResolutionID.create(getOrganisationID(), "Fix"), true);
-				return; // already initialized
-			} catch (JDOObjectNotFoundException x) {
-				// datastore not yet initialized
-			}
+			// Create the resolutions
 			IssueResolution issueResolution;
 
 			issueResolution = new IssueResolution(getOrganisationID(), "Fix");

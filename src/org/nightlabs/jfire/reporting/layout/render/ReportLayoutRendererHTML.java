@@ -5,10 +5,13 @@ package org.nightlabs.jfire.reporting.layout.render;
 
 import java.io.File;
 import java.util.Date;
+import java.util.HashMap;
 
 import javax.jdo.PersistenceManager;
 
+import org.eclipse.birt.report.engine.api.EngineConstants;
 import org.eclipse.birt.report.engine.api.EngineException;
+import org.eclipse.birt.report.engine.api.HTMLRenderContext;
 import org.eclipse.birt.report.engine.api.HTMLRenderOption;
 import org.eclipse.birt.report.engine.api.HTMLServerImageHandler;
 import org.eclipse.birt.report.engine.api.IRunAndRenderTask;
@@ -56,10 +59,19 @@ public class ReportLayoutRendererHTML implements ReportLayoutRenderer {
 		options.setOutputFormat(renderRequest.getOutputFormat().toString());
 		
 		options.setOutputFileName(layoutRoot.getAbsolutePath().toString() + File.separator + fileName+".html"); //$NON-NLS-1$
-		options.setImageHandler(new HTMLServerImageHandler());
+		HTMLServerImageHandler handler = new HTMLServerImageHandler();
+		options.setImageHandler(handler);
 		options.setImageDirectory(layoutRoot.getAbsolutePath().toString() + File.separator + "images"); //$NON-NLS-1$
 		options.setBaseImageURL("images"); //$NON-NLS-1$
 		task.setRenderOption(options);
+		
+		HTMLRenderContext renderContext = new HTMLRenderContext( );
+		renderContext.setImageDirectory(layoutRoot.getAbsolutePath().toString()+File.separator+"images");
+		renderContext.setBaseImageURL("images"); //$NON-NLS-1$
+
+		HashMap appContext = new HashMap( );
+		appContext.put(EngineConstants.APPCONTEXT_HTML_RENDER_CONTEXT, renderContext);
+		task.setAppContext(appContext);
 		
 		task.setParameterValues(renderRequest.getParameters());
 		

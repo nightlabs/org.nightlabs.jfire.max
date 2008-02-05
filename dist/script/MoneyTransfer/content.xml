@@ -1,0 +1,25 @@
+<!DOCTYPE script-category PUBLIC "-//NightLabs//DTD ScriptingInitializer V 1.0//EN" "http://www.nightlabs.de/dtd/scripting-initializer-content_1_0.dtd">
+<script-category 
+	id="MoneyTransfer"
+	type="JFireReportingTrade-MoneyTransfer"
+>
+	<name language="de">Geldtransfers</name>
+	<name language="en">Money transfers</name>
+
+	<script 
+		file="MoneyTransferList.javaclass" 
+		id="MoneyTransferList"
+		resultClass="org.eclipse.datatools.connectivity.oda.IResultSet"
+	>
+		<name language="de">Geldtransfers: Liste</name>
+		<name language="en">Money transfers: List</name>
+		<parameter-set>
+			<name language="de">ParameterSet: Geldtransferliste</name>
+			<name language="en">ParameterSet: Moeny transfer list</name>
+			<parameter name="timePeriod" type="org.nightlabs.util.TimePeriod"/>	
+			<parameter name="accountIDs" type="java.util.Collection"/>	
+			<parameter name="initiatorIDs" type="java.util.Collection"/>	
+		</parameter-set>
+	</script>
+	
+</script-category>

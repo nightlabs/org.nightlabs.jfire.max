@@ -95,4 +95,17 @@ public class ReportingTradeConstants {
 	public static final ValueProviderID VALUE_PROVIDER_ID_ACCOUNTING_MODE_OF_DELIVERY_FLAVOURS_BY_MODE_OF_DELIVERY = ValueProviderID.create( 
 			Organisation.DEV_ORGANISATION_ID, VALUE_PROVIDER_CATEGORY_ID_ACCOUNTING, "ModeOfDeliveryFlavoursByModeOfDelivery");	
 	
+	public static final ValueProviderID VALUE_PROVIDER_ID_ACCOUNTING_ACCOUNT_ID = ValueProviderID.create( 
+			Organisation.DEV_ORGANISATION_ID, VALUE_PROVIDER_CATEGORY_ID_ACCOUNTING, "AccountID");	
+	public static final ValueProviderID VALUE_PROVIDER_ID_ACCOUNTING_ACCOUNT_IDS = ValueProviderID.create( 
+			Organisation.DEV_ORGANISATION_ID, VALUE_PROVIDER_CATEGORY_ID_ACCOUNTING, "AccountIDs");
+	
+	
+	public static final String VALUE_PROVIDER_CATEGORY_ID_STORE = "JFireReportingTrade-ValueProviderCategory-Store";
+	
+	public static final ValueProviderID VALUE_PROVIDER_ID_STORE_REPOSITORY_ID = ValueProviderID.create( 
+			Organisation.DEV_ORGANISATION_ID, VALUE_PROVIDER_CATEGORY_ID_STORE, "RepositoryID");	
+	public static final ValueProviderID VALUE_PROVIDER_ID_STORE_REPOSITORY_IDS = ValueProviderID.create( 
+			Organisation.DEV_ORGANISATION_ID, VALUE_PROVIDER_CATEGORY_ID_STORE, "RepositoryIDs");	
+	
 }

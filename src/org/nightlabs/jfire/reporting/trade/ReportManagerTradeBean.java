@@ -440,6 +440,43 @@ implements SessionBean
 				new NameEntry[] {new NameEntry(Locale.ENGLISH.getLanguage(), "Select a list of mode of delivery flavours by their mode of delivery")},
 				new NameEntry[] {new NameEntry(Locale.ENGLISH.getLanguage(), "Select a list of mode of delivery flavours by their mode of delivery")}
 			);
+		
+		
+		ReportParameterUtil.createValueProvider(pm, accountingCategory, ReportingTradeConstants.VALUE_PROVIDER_ID_ACCOUNTING_ACCOUNT_ID, 
+				AnchorID.class.getName(),
+				new NameEntry[] {new NameEntry(Locale.ENGLISH.getLanguage(), "Account")},
+				new NameEntry[] {new NameEntry(Locale.ENGLISH.getLanguage(), "Select an account")},
+				new NameEntry[] {new NameEntry(Locale.ENGLISH.getLanguage(), "Select an account")}
+			);
+		
+		ReportParameterUtil.createValueProvider(pm, accountingCategory, ReportingTradeConstants.VALUE_PROVIDER_ID_ACCOUNTING_ACCOUNT_IDS, 
+				Collection.class.getName() + "<" + AnchorID.class.getName() + ">",
+				new NameEntry[] {new NameEntry(Locale.ENGLISH.getLanguage(), "List of accounts")},
+				new NameEntry[] {new NameEntry(Locale.ENGLISH.getLanguage(), "Select a list of accounts")},
+				new NameEntry[] {new NameEntry(Locale.ENGLISH.getLanguage(), "Select a list of accounts")}
+			);
+				
+
+		ValueProviderCategoryID storeCategoryID = ValueProviderCategoryID.create(
+				Organisation.DEV_ORGANISATION_ID, 
+				ReportingTradeConstants.VALUE_PROVIDER_CATEGORY_ID_STORE);
+		ValueProviderCategory storeCategory = ReportParameterUtil.createValueProviderCategory(
+				pm, rootCategory, storeCategoryID, 
+				new NameEntry[] {new NameEntry(Locale.ENGLISH.getLanguage(), "Store parameters")}
+			);
+		ReportParameterUtil.createValueProvider(pm, storeCategory, ReportingTradeConstants.VALUE_PROVIDER_ID_STORE_REPOSITORY_ID, 
+				AnchorID.class.getName(),
+				new NameEntry[] {new NameEntry(Locale.ENGLISH.getLanguage(), "Repository")},
+				new NameEntry[] {new NameEntry(Locale.ENGLISH.getLanguage(), "Select an repository")},
+				new NameEntry[] {new NameEntry(Locale.ENGLISH.getLanguage(), "Select an repository")}
+			);
+		
+		ReportParameterUtil.createValueProvider(pm, storeCategory, ReportingTradeConstants.VALUE_PROVIDER_ID_STORE_REPOSITORY_IDS, 
+				Collection.class.getName() + "<" + AnchorID.class.getName() + ">",
+				new NameEntry[] {new NameEntry(Locale.ENGLISH.getLanguage(), "List of repositories")},
+				new NameEntry[] {new NameEntry(Locale.ENGLISH.getLanguage(), "Select a list of repositories")},
+				new NameEntry[] {new NameEntry(Locale.ENGLISH.getLanguage(), "Select a list of repositories")}
+			);		
 
 	}
 }

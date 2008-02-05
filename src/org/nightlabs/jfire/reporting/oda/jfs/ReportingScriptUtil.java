@@ -6,6 +6,8 @@ package org.nightlabs.jfire.reporting.oda.jfs;
 import java.util.Date;
 import java.util.Map;
 
+import javax.jdo.JDOHelper;
+
 import org.nightlabs.util.TimePeriod;
 
 /**
@@ -53,6 +55,21 @@ public class ReportingScriptUtil {
 		if (timePeriod.isToSet())
 			queryParameters.put(timePeriodVarName+"To", timePeriod.getTo());
 		jdoql.append(") ");
+	}
+	
+	/**
+	 * Returns the String representation of the given PersistenceCapable object.
+	 * Checks for <code>null</code> also. 
+	 * @param pc The Object to get the id for.
+	 * @return The String representation of the given PersistenceCapable object.
+	 */
+	public static String getObjectJDOID(Object pc) {
+		if (pc == null)
+			return null;
+		Object pcID = JDOHelper.getObjectId(pc);
+		if (pcID == null)
+			return null;
+		return pcID.toString();
 	}
 
 }

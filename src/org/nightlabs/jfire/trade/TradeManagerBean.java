@@ -80,7 +80,6 @@ import org.nightlabs.jfire.trade.id.OfferID;
 import org.nightlabs.jfire.trade.id.OfferLocalID;
 import org.nightlabs.jfire.trade.id.OrderID;
 import org.nightlabs.jfire.trade.id.SegmentTypeID;
-import org.nightlabs.jfire.trade.jbpm.JbpmConstantsOffer;
 import org.nightlabs.jfire.trade.jbpm.ProcessDefinitionAssignment;
 import org.nightlabs.jfire.trade.query.AbstractArticleContainerQuickSearchQuery;
 import org.nightlabs.jfire.transfer.id.AnchorID;

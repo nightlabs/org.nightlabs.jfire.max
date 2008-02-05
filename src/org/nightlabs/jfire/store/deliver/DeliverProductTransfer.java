@@ -30,6 +30,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.Iterator;
+import java.util.Locale;
 import java.util.Set;
 
 import javax.jdo.JDOHelper;
@@ -212,5 +213,13 @@ public class DeliverProductTransfer extends ProductTransfer
 	{
 		bookAtDeliveryNotes(user, involvedAnchors, true);
 		super.rollbackTransfer(user, involvedAnchors);
+	}
+	
+	@Override
+	public String getDescription(Locale locale) {	
+		return String.format(
+				"Delivery %s",
+				getDelivery().getPrimaryKey()
+			);
 	}
 }

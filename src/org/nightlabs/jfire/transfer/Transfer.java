@@ -28,6 +28,7 @@ package org.nightlabs.jfire.transfer;
 
 import java.io.Serializable;
 import java.util.Date;
+import java.util.Locale;
 import java.util.Map;
 import java.util.Set;
 
@@ -196,7 +197,7 @@ implements Serializable
 	}
 
 	/**
-	 * One Transfer can be part of an enclosing Tranfer. E.g. if a product needs to be shipped, it may first
+	 * One Transfer can be part of an enclosing Transfer. E.g. if a product needs to be shipped, it may first
 	 * need to be checked out of a certain storage hall, brought to a test center (to assure the product is in
 	 * good order) and finally leaves the source and reaches the customer. Thus, in this example, we have the
 	 * enclosing transfer: Organisation A transfers object to Organisation B. This transfer contains two transfers:
@@ -341,4 +342,14 @@ implements Serializable
 
 		return pm;
 	}
+	
+	/**
+	 * This should return a human readable description of the transfer.
+	 * <p>
+	 * Note that this method should only be called on attached instances of Transfer.
+	 * </p>
+	 * @param locale The locale for the description. 
+	 * @return A human readable description of the transfer.
+	 */
+	public abstract String getDescription(Locale locale);
 }

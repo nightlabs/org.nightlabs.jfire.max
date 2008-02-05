@@ -31,6 +31,7 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
+import java.util.Locale;
 import java.util.Map;
 import java.util.Set;
 
@@ -328,6 +329,11 @@ public class Account extends Anchor
 		if (! (moneyTransfer instanceof SummaryMoneyTransfer) ) {
 			boolean isDebit = Transfer.ANCHORTYPE_FROM == moneyTransfer.getAnchorType(this);
 //			boolean isDebit = moneyTransfer.getFrom().getPrimaryKey().equals(this.getPrimaryKey());
+			if (isTransferFrom(moneyTransfer)) {
+				moneyTransfer.setFromBalanceBeforeTransfer(getBalance());
+			} else if (isTransferTo(moneyTransfer)) {
+				moneyTransfer.setToBalanceBeforeTransfer(getBalance());
+			}
 			adjustBalance(isDebit, moneyTransfer.getAmount());
 //			addTransfer(moneyTransfer);
 
@@ -435,6 +441,11 @@ public class Account extends Anchor
 	@Override
 	public void resetIntegrity(Collection<? extends Transfer> containers)
 	{
+	}
+	
+	@Override
+	public String getDescription(Locale locale) {
+		return getName().getText(locale.getLanguage());
 	}
 
 //	/**

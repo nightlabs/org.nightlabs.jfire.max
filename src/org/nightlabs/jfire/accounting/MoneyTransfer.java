@@ -26,6 +26,8 @@
 
 package org.nightlabs.jfire.accounting;
 
+import java.util.Locale;
+
 import org.nightlabs.jfire.security.User;
 import org.nightlabs.jfire.transfer.Anchor;
 import org.nightlabs.jfire.transfer.Transfer;
@@ -61,6 +63,16 @@ public class MoneyTransfer extends Transfer
 	 */
 	private long amount;
 
+	/**
+	 * @jdo.field persistence-modifier="persistent"
+	 */
+	private long fromBalanceBeforeTransfer;
+	/**
+	 * @jdo.field persistence-modifier="persistent"
+	 */
+	private long toBalanceBeforeTransfer;
+	
+	
 //	private boolean statistical = false; // necessary?!
 
 	/**
@@ -106,6 +118,9 @@ public class MoneyTransfer extends Transfer
 			if (!currency.getCurrencyID().equals(toCurrencyID))
 				throw new IllegalArgumentException("currency mismatch! To-account \""+to.getPrimaryKey()+"\" has currency \""+toCurrencyID+"\", but given currency is \""+currency.getCurrencyID()+"\"!");
 		}
+		
+		fromBalanceBeforeTransfer = Long.MIN_VALUE;
+		toBalanceBeforeTransfer = Long.MIN_VALUE;
 	}
 
 //	protected static Collection getSingleInvoiceCollection(Invoice invoice)
@@ -194,4 +209,70 @@ public class MoneyTransfer extends Transfer
 		return amount;
 	}
 	
+	/**
+	 * Get the balance of the from-anchor before the transfer was booked. 
+	 * @return The balance of the from-anchor before the transfer was booked.
+	 */
+	public long getFromBalanceBeforeTransfer() {
+		return fromBalanceBeforeTransfer;
+	}
+	
+	/**
+	 * Get the balance of the to-anchor before the transfer was booked. 
+	 * @return The balance of the to-anchor before the transfer was booked.
+	 */
+	public long getToBalanceBeforeTransfer() {
+		return toBalanceBeforeTransfer;
+	}
+
+	/**
+	 * Remember the balance of the from-anchor before the transfer was booked.
+	 * This method is called by Account and LegalEntity. The value can only be
+	 * set once, attempts to change it will result in an {@link IllegalStateException}.
+	 * 
+	 * @param fromBalanceBeforeTransfer The balance to set.
+	 */
+	public void setFromBalanceBeforeTransfer(long fromBalanceBeforeTransfer) {
+		if (this.fromBalanceBeforeTransfer == fromBalanceBeforeTransfer)
+			return;
+
+		if (this.fromBalanceBeforeTransfer != Long.MIN_VALUE)
+			throw new IllegalStateException("fromBalanceBeforeTransfer is immutable and has already been initialised!");
+
+		this.fromBalanceBeforeTransfer = fromBalanceBeforeTransfer;
+	}
+	
+	/**
+	 * Remember the balance of the from-anchor before the transfer was booked.
+	 * This method is called by Account and LegalEntity. The value can only be
+	 * set once, attempts to change it will result in an {@link IllegalStateException}.
+	 * 
+	 * @param toBalanceBeforeTransfer The balance to set.
+	 */
+	public void setToBalanceBeforeTransfer(long toBalanceBeforeTransfer) {
+		if (this.toBalanceBeforeTransfer == toBalanceBeforeTransfer)
+			return;
+
+		if (this.toBalanceBeforeTransfer != Long.MIN_VALUE)
+			throw new IllegalStateException("toBalanceBeforeTransfer is immutable and has already been initialised!");
+
+		this.toBalanceBeforeTransfer = toBalanceBeforeTransfer;
+	}
+	
+	/**
+	 * {@inheritDoc}
+	 * <p>
+	 * This implementation checks if the MoneyTransfer has a container. If so the description
+	 * of the container is returned, otherwise 
+	 * </p>
+	 */
+	@Override
+	public String getDescription(Locale locale) {
+		if (getContainer() != null)
+			return getContainer().getDescription(locale);
+		return String.format(
+				"MoneyTransfer from %s to %s",
+				getFrom().getDescription(locale), getTo().getDescription(locale)
+			);		
+	}
 }

@@ -1,5 +1,7 @@
 package org.nightlabs.jfire.accounting;
 
+import java.util.Locale;
+
 import org.nightlabs.jfire.security.User;
 import org.nightlabs.jfire.transfer.Anchor;
 
@@ -51,5 +53,13 @@ public class ManualMoneyTransfer extends MoneyTransfer
 
 	public ManualMoneyTransferReason getReason() {
 		return reason;
+	}
+	
+	@Override
+	public String getDescription(Locale locale) {
+		return String.format(
+				"Manual moneytransfer"
+			);
+		
 	}
 }

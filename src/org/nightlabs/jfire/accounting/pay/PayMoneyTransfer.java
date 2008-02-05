@@ -27,11 +27,14 @@
 package org.nightlabs.jfire.accounting.pay;
 
 import java.util.Collection;
+import java.util.Iterator;
+import java.util.Locale;
 
 import javax.jdo.JDOHelper;
 import javax.jdo.PersistenceManager;
 import javax.jdo.Query;
 
+import org.nightlabs.jfire.accounting.Invoice;
 import org.nightlabs.jfire.accounting.MoneyTransfer;
 import org.nightlabs.jfire.accounting.pay.id.PaymentID;
 import org.nightlabs.jfire.security.User;
@@ -173,5 +176,20 @@ public class PayMoneyTransfer extends MoneyTransfer
 	public Payment getPayment()
 	{
 		return payment;
+	}
+	
+	@Override
+	public String getDescription(Locale locale) {
+		String invoiceStr = "";
+		for (Iterator<Invoice> it = getPayment().getInvoices().iterator(); it.hasNext();) {
+			Invoice invoice = it.next();
+			invoiceStr = invoiceStr + invoice.getPrimaryKey();
+			if (it.hasNext())
+				invoiceStr = invoiceStr + ", ";
+		}		
+		return String.format(
+				"Payment for invoices: %s",
+				invoiceStr
+			);
 	}
 }

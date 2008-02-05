@@ -26,6 +26,8 @@
 
 package org.nightlabs.jfire.accounting.book;
 
+import java.util.Locale;
+
 import org.apache.log4j.Logger;
 import org.nightlabs.jfire.accounting.Invoice;
 import org.nightlabs.jfire.accounting.InvoiceMoneyTransfer;
@@ -90,6 +92,14 @@ public class BookMoneyTransfer extends InvoiceMoneyTransfer
 
 		if (logger.isDebugEnabled())
 			logger.debug("constructor: from=" + from.getPrimaryKey() + " to=" + to.getPrimaryKey());
+	}
+	
+	@Override
+	public String getDescription(Locale locale) {
+		return String.format(
+				"Booking of invoice %s", 
+				getInvoice().getPrimaryKey()
+			);		
 	}
 
 }

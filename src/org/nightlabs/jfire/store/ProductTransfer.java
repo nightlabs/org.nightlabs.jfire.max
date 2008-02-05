@@ -31,6 +31,7 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Locale;
 import java.util.Map;
 import java.util.Set;
 
@@ -224,4 +225,22 @@ implements Serializable, DetachCallback
 		if (attached.productType2productCountMap != null || fetchGroups.contains(FETCH_GROUP_PRODUCT_TYPE_ID_2_PRODUCT_COUNT_MAP) || fetchGroups.contains(FetchPlan.ALL))
 			detached.productType2productCountMap = attached.getProductType2productCountMap();
 	}
+	
+	/**
+	 * {@inheritDoc}
+	 * <p>
+	 * This implementation checks if the ProductTransfer has a container. If so the description
+	 * of the container is returned, otherwise 
+	 * </p>
+	 */
+	@Override
+	public String getDescription(Locale locale) {
+		if (getContainer() != null)
+			return getContainer().getDescription(locale);
+		return String.format(
+				"ProductTransfer from %s to %s",
+				getFrom().getDescription(locale), getTo().getDescription(locale)
+			);		
+	}
+	
 }

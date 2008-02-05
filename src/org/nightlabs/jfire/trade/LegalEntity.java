@@ -367,6 +367,13 @@ public class LegalEntity extends Anchor
 			balance = new Balance(currencyID.currencyID);
 			balanceMap.put(currencyID, balance);
 		}
+
+		if (isTransferFrom(transfer)) {
+			transfer.setFromBalanceBeforeTransfer(balance.amount);
+		} else if (isTransferTo(transfer)) {
+			transfer.setToBalanceBeforeTransfer(balance.amount);
+		}
+
 		if (transfer.getAnchorType(this) == Transfer.ANCHORTYPE_FROM)
 			balance.amount -= transfer.getAmount();
 		else
@@ -587,5 +594,10 @@ public class LegalEntity extends Anchor
 	public boolean containsCustomerGroup(CustomerGroup customerGroup)
 	{
 		return customerGroups.contains(customerGroup);
+	}
+	
+	@Override
+	public String getDescription(Locale locale) {
+		return getPerson().getDisplayName();
 	}
 }

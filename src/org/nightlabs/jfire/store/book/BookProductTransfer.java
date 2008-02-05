@@ -29,6 +29,7 @@ package org.nightlabs.jfire.store.book;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
+import java.util.Locale;
 
 import javax.jdo.JDOHelper;
 import javax.jdo.PersistenceManager;
@@ -125,4 +126,13 @@ public class BookProductTransfer extends DeliveryNoteProductTransfer
 		if (!(to instanceof LegalEntity))
 			throw new IllegalArgumentException("to must be an instance of LegalEntity, but is of type " + from.getClass().getName());
 	}
+	
+	@Override
+	public String getDescription(Locale locale) {
+		return String.format(
+				"Booking of delivery note %s", 
+				getDeliveryNote().getPrimaryKey()
+			);		
+	}
+
 }

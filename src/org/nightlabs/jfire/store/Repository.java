@@ -28,6 +28,7 @@ package org.nightlabs.jfire.store;
 
 import java.util.Collection;
 import java.util.Iterator;
+import java.util.Locale;
 import java.util.Set;
 
 import javax.jdo.JDOHelper;
@@ -294,6 +295,11 @@ public class Repository extends Anchor
 	public RepositoryName getName()
 	{
 		return name;
+	}
+
+	@Override
+	public String getDescription(Locale locale) {
+		return getName().getText(locale.getLanguage());
 	}
 
 }

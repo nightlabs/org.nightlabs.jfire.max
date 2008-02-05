@@ -28,6 +28,7 @@ package org.nightlabs.jfire.transfer;
 
 import java.io.Serializable;
 import java.util.Collection;
+import java.util.Locale;
 import java.util.Map;
 import java.util.Set;
 
@@ -315,16 +316,32 @@ public abstract class Anchor
 
 		return pm;
 	}
-
-	public static void main(String[] args)
-	{
-		int val = Integer.MAX_VALUE - 10;
-		for (int i = 0; i < 10; ++i) {
-			val = val + 3;
-			System.out.println(val);
-		}
+	
+	/**
+	 * Checks whether this anchor is the from-anchor of the given transfer.
+	 * @param transfer The transfer to check.
+	 * @return Whether this anchor is the from-anchor of the given transfer.
+	 */
+	protected boolean isTransferFrom(Transfer transfer) {
+		return (transfer.getFrom() != null && transfer.getFrom().equals(this));
 	}
-
+	
+	/**
+	 * Checks whether this anchor is the to-anchor of the given transfer.
+	 * @param transfer The transfer to check.
+	 * @return Whether this anchor is the to-anchor of the given transfer.
+	 */
+	protected boolean isTransferTo(Transfer transfer) {
+		return (transfer.getTo() != null && transfer.getTo().equals(this));
+	}
+	
+	/**
+	 * Should return a description of this Anchor.
+	 * @param locale The locale for the description.
+	 * @return A description of this Anchor.
+	 */
+	public abstract String getDescription(Locale locale); 
+	
 	@Override
 	public boolean equals(Object obj)
 	{

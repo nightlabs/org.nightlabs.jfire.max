@@ -1420,7 +1420,7 @@ JFireReportingHelper.createDataSetParam(params["articleContainerID"])</expressio
                             <property name="textAlign">right</property>
                             <expression name="valueExpr">if (isDynamicProduct(row["productJDOID"])) {
   product = JFireReportingHelper.getJDOObject(row["productJDOID"]);
-  product.getQuantity()
+  product.getUnit().toDouble(product.getQuantity()) + " " + product.getUnit().getSymbol().getText()
 }</expression>
                             <property name="contentType">html</property>
                         </text-data>

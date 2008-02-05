@@ -553,7 +553,7 @@ implements Serializable
 
 	protected void updateAvailable()
 	{
-		available = !allocated && !allocationPending && !nested;
+		available = !allocated && !allocationPending && !nested && quantity > 0;
 	}
 
 	/**

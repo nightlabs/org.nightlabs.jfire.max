@@ -15,7 +15,8 @@ import org.nightlabs.jfire.accounting.gridpriceconfig.FormulaPriceConfig;
  *		persistence-capable-superclass="org.nightlabs.jfire.accounting.gridpriceconfig.FormulaPriceConfig"
  *		detachable="true"
  *
- * @jdo.inheritance strategy="superclass-table"
+ * @!jdo.inheritance strategy="superclass-table" @!TODO JPOX WORKAROUND: Using superclass-table here causes weird errors - see: http://www.jpox.org/servlet/forum/viewthread?thread=4874
+ * @jdo.inheritance strategy="new-table"
  *
  * @jdo.fetch-group name="DynamicTradePriceConfig.inputPriceFragmentTypes" fields="inputPriceFragmentTypes"
  *

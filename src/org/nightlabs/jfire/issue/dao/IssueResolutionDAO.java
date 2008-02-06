@@ -43,7 +43,7 @@ extends BaseJDOObjectDAO<IssueResolutionID, IssueResolution>
 		try {
 			IssueManager im = IssueManagerUtil.getHome(SecurityReflector.getInitialContextProperties()).create();
 			monitor.worked(1);
-			return im.getIssueResolutions(fetchGroups, maxFetchDepth);	
+			return im.getIssueResolutions(objectIDs, fetchGroups, maxFetchDepth);	
 		} catch (Exception e) {
 			monitor.setCanceled(true);
 			throw e;

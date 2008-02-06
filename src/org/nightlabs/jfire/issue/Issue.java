@@ -41,9 +41,12 @@ import javax.jdo.listener.AttachCallback;
 import org.apache.log4j.Logger;
 import org.nightlabs.jdo.ObjectID;
 import org.nightlabs.jdo.ObjectIDUtil;
+import org.nightlabs.jfire.idgenerator.IDGenerator;
 import org.nightlabs.jfire.jbpm.graph.def.Statable;
 import org.nightlabs.jfire.jbpm.graph.def.StatableLocal;
 import org.nightlabs.jfire.jbpm.graph.def.State;
+import org.nightlabs.jfire.prop.PropertySet;
+import org.nightlabs.jfire.prop.StructLocal;
 import org.nightlabs.jfire.security.User;
 import org.nightlabs.util.CollectionUtil;
 import org.nightlabs.util.Util;
@@ -85,6 +88,7 @@ import org.nightlabs.util.Util;
  * @jdo.fetch-group name="Issue.comments" fetch-groups="default" fields="comments"
  * @jdo.fetch-group name="Issue.this" fetch-groups="default" fields="fileList, issueType, referencedObjectIDs, description, subject, issuePriority, issueSeverityType, issueResolution, state, states, comments, issueLocal, reporter, assignee" 
  *
+ * @jdo.fetch-group name="Issue.propertySet" fetch-groups="default" fields="propertySet"
  **/
 public class Issue
 implements 	
@@ -106,6 +110,7 @@ implements
 	public static final String FETCH_GROUP_ISSUE_LOCAL = "Issue.issueLocal";
 	public static final String fETCH_GROUP_ISSUE_COMMENT = "Issue.comments";
 	
+	public static final String FETCH_GROUP_PROPERTY_SET = "Issue.propertySet";
 	/**
 	 * @jdo.field primary-key="true"
 	 * @jdo.column length="100"
@@ -230,6 +235,34 @@ implements
 	 */
 	private List<State> states;
 	
+	/**
+	 * @jdo.field persistence-modifier="persistent"
+	 */
+	private PropertySet propertySet;
+	
+	/**
+	 * Returns the property set of this {@link Issue}.
+	 * 
+	 * @return The property set of this {@link Issue}.
+	 */
+	public PropertySet getPropertySet() {
+		return propertySet;
+	}
+	
+	/**
+	 * The scope of the StructLocal by which the propertySet is build from.
+	 * 
+	 * @jdo.field persistence-modifier="persistent" null-value="exception" indexed="true"
+	 */
+	private String structLocalScope;
+	
+	/**
+	 * Returns the scope of the StructLocal by which the propertySet is build from.
+	 * @return The scope of the StructLocal by which the propertySet is build from.
+	 */
+	public String getStructLocalScope() {
+		return structLocalScope;
+	}
 	
 	/**
 	 * @deprecated Constructor exists only for JDO! 
@@ -250,6 +283,8 @@ implements
 		referencedObjectIDs = new HashSet<String>();
 		
 		this.issueLocal = new IssueLocal(this);
+		this.structLocalScope = StructLocal.DEFAULT_SCOPE;
+		this.propertySet = new PropertySet(organisationID, IDGenerator.nextID(PropertySet.class), Issue.class.getName(), structLocalScope);
 	}
 	
 	public Issue(String organisationID, long issueID, IssueType issueType)

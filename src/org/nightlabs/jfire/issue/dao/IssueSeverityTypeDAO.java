@@ -45,7 +45,7 @@ public class IssueSeverityTypeDAO
 		try {
 			IssueManager im = IssueManagerUtil.getHome(SecurityReflector.getInitialContextProperties()).create();
 			monitor.worked(1);
-			return im.getIssueSeverityTypes(fetchGroups, maxFetchDepth);	
+			return im.getIssueSeverityTypes(objectIDs, fetchGroups, maxFetchDepth);	
 		} catch (Exception e) {
 			monitor.setCanceled(true);
 			throw e;

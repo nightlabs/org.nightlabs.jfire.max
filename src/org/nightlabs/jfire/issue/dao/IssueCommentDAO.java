@@ -40,7 +40,7 @@ public class IssueCommentDAO extends BaseJDOObjectDAO<IssueCommentID, IssueComme
 		monitor.beginTask("Loading IssueComments", 1);
 		try {
 			IssueManager im = IssueManagerUtil.getHome(SecurityReflector.getInitialContextProperties()).create();
-			return im.getIssueComments(fetchGroups, maxFetchDepth);
+			return im.getIssueComments(commentIDs, fetchGroups, maxFetchDepth);
 
 		} catch (Exception e) {
 			monitor.setCanceled(true);

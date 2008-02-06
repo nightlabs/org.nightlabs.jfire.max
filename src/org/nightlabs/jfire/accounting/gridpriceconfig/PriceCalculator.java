@@ -34,6 +34,9 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import javax.jdo.JDOHelper;
+import javax.jdo.PersistenceManager;
+
 import org.apache.log4j.Logger;
 import org.mozilla.javascript.Context;
 import org.mozilla.javascript.ImporterTopLevel;
@@ -92,6 +95,8 @@ public class PriceCalculator
 		return tariffMapper;
 	}
 
+	PersistenceManager pm; // TODO JPOX WORKAROUND only needed for some workarounds! Will be removed again, soon.
+
 	/**
 	 * @param packageProductType The <tt>ProductType</tt> which encloses all the other <tt>ProductType</tt>s and
 	 * which has an {@link IResultPriceConfig} assigned as {@link ProductType#packagePriceConfig} or <code>null</code>
@@ -134,6 +139,8 @@ public class PriceCalculator
 				throw new IllegalArgumentException("packageProductType does neither have a packagePriceConfig nor an innerPriceConfig! " + packageProductType.getPrimaryKey());
 			this.packagePriceConfig.adoptParameters(innerPC);
 		}
+
+		this.pm = JDOHelper.getPersistenceManager(packageProductType);
 	}
 
 	/**
@@ -222,6 +229,11 @@ public class PriceCalculator
 					}
 					else {
 						resultPriceConfig = createResultPriceConfig();
+
+						// force the new price config to be written to the DB - otherwise we run into a foreign key violation
+						// see http://www.jpox.org/servlet/forum/viewthread?thread=4871&offset=0#27443 error (2)
+						if (pm != null)
+							resultPriceConfig = pm.makePersistent(resultPriceConfig);
 
 						fpc.setPackagingResultPriceConfig(
 								innerProductType.getPrimaryKey(), packageProductType.getPrimaryKey(),

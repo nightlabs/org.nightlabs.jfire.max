@@ -185,7 +185,7 @@ public class CellReflector
 		if (logger.isDebugEnabled())
 			logger.debug("resolvePriceCellsAmount (" + address + "): enter");
 
-		Collection resolvedPriceCells = resolvePriceCells(address);
+		Collection<ResolvedPriceCell> resolvedPriceCells = resolvePriceCells(address);
 //				_customerGroupPK,
 //				_tariffPK,
 //				_currencyID,
@@ -199,8 +199,7 @@ public class CellReflector
 			return 0;
 
 		long sumAmount = 0;
-		for (Iterator it = resolvedPriceCells.iterator(); it.hasNext(); ) {
-			ResolvedPriceCell resolvedPriceCell = (ResolvedPriceCell)it.next();
+		for (ResolvedPriceCell resolvedPriceCell : resolvedPriceCells) {
 			long amount = resolvedPriceCell.priceCell.getPrice().getAmount(priceFragmentTypePK);
 //If we reference a cell within the same ProductType, we take the simple result.
 //We only multiply the amount with the quantity, if the cell is in a different

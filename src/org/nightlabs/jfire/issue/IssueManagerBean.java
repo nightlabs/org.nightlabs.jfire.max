@@ -3,6 +3,7 @@ package org.nightlabs.jfire.issue;
 import java.io.IOException;
 import java.rmi.RemoteException;
 import java.util.Collection;
+import java.util.Date;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Locale;
@@ -114,6 +115,10 @@ implements SessionBean{
 			if (fetchGroups != null)
 				pm.getFetchPlan().setGroups(fetchGroups);
 
+			if (issue.getCreateTimestamp() != null) {
+				issue.setUpdateTimestamp(new Date());
+			}
+			
 			Issue pIssue = pm.makePersistent(issue);
 
 			if (isNewIssue) {

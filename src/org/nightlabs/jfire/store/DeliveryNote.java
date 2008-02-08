@@ -75,6 +75,8 @@ import org.nightlabs.util.Util;
  *		detachable="true"
  *		table="JFireTrade_DeliveryNote"
  *
+ * @jdo.version strategy="version-number"
+ *
  * @jdo.implements name="org.nightlabs.jfire.trade.ArticleContainer"
  * @jdo.implements name="org.nightlabs.jfire.jbpm.graph.def.Statable"
  *
@@ -117,10 +119,12 @@ import org.nightlabs.util.Util;
  * @jdo.fetch-group name="DeliveryNote.vendor" fields="vendor"
  * @jdo.fetch-group name="DeliveryNote.this" fetch-groups="default" fields="deliveryNoteLocal, articles, createUser, customer, finalizeUser, vendor, state, states"
  *
+ * @jdo.fetch-group name="FetchGroupsTrade.articleContainerInEditor" fields="deliveryNoteLocal, articles, createUser, customer, finalizeUser, vendor, state, states"
+ *
  * @jdo.fetch-group name="Statable.state" fields="state"
  * @jdo.fetch-group name="Statable.states" fields="states"
  *
- **/
+ */
 public class DeliveryNote
 implements Serializable, ArticleContainer, Statable, DetachCallback
 {

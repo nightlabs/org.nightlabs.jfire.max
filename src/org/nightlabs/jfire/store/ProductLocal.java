@@ -50,6 +50,8 @@ import org.nightlabs.jfire.transfer.Anchor;
  *		detachable="true"
  *		table="JFireTrade_ProductLocal"
  *
+ * @jdo.version strategy="version-number"
+ *
  * @jdo.inheritance strategy="new-table"
  * @jdo.inheritance-discriminator strategy="class-name"
  *
@@ -60,6 +62,8 @@ import org.nightlabs.jfire.transfer.Anchor;
 public class ProductLocal
 implements Serializable
 {
+	private static final long serialVersionUID = 1L;
+
 	// TODO create fetch-groups for all object-fields
 	public static final String FETCH_GROUP_ARTICLE = "ProductLocal.saleArticle";
 

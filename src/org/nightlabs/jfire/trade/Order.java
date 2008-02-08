@@ -63,6 +63,8 @@ import org.nightlabs.util.Util;
  *		detachable="true"
  *		table="JFireTrade_Order"
  *
+ * @jdo.version strategy="version-number"
+ *
  * @jdo.implements name="org.nightlabs.jfire.trade.ArticleContainer"
  *
  * @jdo.inheritance strategy="new-table"
@@ -132,6 +134,8 @@ import org.nightlabs.util.Util;
  * @jdo.fetch-group name="Order.createUser" fields="createUser"
  * @jdo.fetch-group name="Order.changeUser" fields="changeUser"
  * @jdo.fetch-group name="Order.this" fetch-groups="default" fields="vendor, currency, customer, customerGroup, articles, segments, offers, createUser, changeUser"
+ *
+ * @jdo.fetch-group name="FetchGroupsTrade.articleContainerInEditor" fields="vendor, currency, customer, customerGroup, segments, offers, createUser, changeUser"
  */
 public class Order
 implements Serializable, ArticleContainer, SegmentContainer, DetachCallback

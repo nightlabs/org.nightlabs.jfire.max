@@ -49,6 +49,8 @@ import org.nightlabs.util.CollectionUtil;
  *		detachable="true"
  *		table="JFireTrade_InvoiceLocal"
  *
+ * @jdo.version strategy="version-number"
+ *
  * @jdo.implements name="org.nightlabs.jfire.jbpm.graph.def.StatableLocal"
  *
  * @jdo.inheritance strategy="new-table"
@@ -61,6 +63,8 @@ import org.nightlabs.util.CollectionUtil;
  * @jdo.fetch-group name="InvoiceLocal.invoice" fields="invoice"
  * @jdo.fetch-group name="InvoiceLocal.bookUser" fields="bookUser"
  * @jdo.fetch-group name="InvoiceLocal.this" fields="invoice, bookUser, state, states"
+ *
+ * @jdo.fetch-group name="FetchGroupsTrade.articleContainerInEditor" fetch-groups="InvoiceLocal.this"
  *
  * @jdo.fetch-group name="StatableLocal.state" fields="state"
  * @jdo.fetch-group name="StatableLocal.states" fields="states"

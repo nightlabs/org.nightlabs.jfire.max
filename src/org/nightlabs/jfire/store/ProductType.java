@@ -110,6 +110,8 @@ import org.nightlabs.util.Util;
  *		detachable="true"
  *		table="JFireTrade_ProductType"
  *
+ * @jdo.version strategy="version-number"
+ *
  * @jdo.inheritance strategy="new-table"
  * @jdo.inheritance-discriminator strategy="class-name"
  *

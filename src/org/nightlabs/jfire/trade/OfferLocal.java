@@ -49,6 +49,8 @@ import org.nightlabs.jfire.security.User;
  *		detachable="true"
  *		table="JFireTrade_OfferLocal"
  *
+ * @jdo.version strategy="version-number"
+ *
  * @jdo.implements name="org.nightlabs.jfire.jbpm.graph.def.StatableLocal"
  *
  * @jdo.inheritance strategy="new-table"
@@ -62,6 +64,8 @@ import org.nightlabs.jfire.security.User;
  * @jdo.fetch-group name="OfferLocal.acceptUser" fields="acceptUser"
  * @jdo.fetch-group name="OfferLocal.rejectUser" fields="rejectUser"
  * @jdo.fetch-group name="OfferLocal.this" fields="offer, acceptUser, rejectUser, state, states"
+ *
+ * @jdo.fetch-group name="FetchGroupsTrade.articleContainerInEditor" fetch-groups="OfferLocal.this"
  *
  * @jdo.fetch-group name="StatableLocal.state" fields="state"
  * @jdo.fetch-group name="StatableLocal.states" fields="states"

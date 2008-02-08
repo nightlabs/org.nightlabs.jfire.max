@@ -45,6 +45,8 @@ import org.nightlabs.jfire.trade.Article;
  *		detachable="true"
  *		table="JFireTrade_Product"
  *
+ * @jdo.version strategy="version-number"
+ *
  * @jdo.inheritance strategy="new-table"
  * @!jdo.inheritance-discriminator strategy="class-name"
  * @!jdo.inheritance strategy="subclass-table"

@@ -72,6 +72,8 @@ import org.nightlabs.util.Util;
  *		detachable="true"
  *		table="JFireTrade_Invoice"
  *
+ * @jdo.version strategy="version-number"
+ *
  * @jdo.implements name="org.nightlabs.jfire.trade.ArticleContainer"
  * @jdo.implements name="org.nightlabs.jfire.jbpm.graph.def.Statable"
  *
@@ -117,10 +119,12 @@ import org.nightlabs.util.Util;
  * @jdo.fetch-group name="Invoice.vendor" fields="vendor"
  * @jdo.fetch-group name="Invoice.this" fetch-groups="default" fields="invoiceLocal, articles, createUser, currency, customer, discount, finalizeUser, price, vendor, state, states"
  *
+ * @jdo.fetch-group name="FetchGroupsTrade.articleContainerInEditor" fields="invoiceLocal, createUser, currency, customer, discount, finalizeUser, price, vendor, state, states"
+ *
  * @jdo.fetch-group name="Statable.state" fields="state"
  * @jdo.fetch-group name="Statable.states" fields="states"
  *
- **/
+ */
 public class Invoice
 implements Serializable, ArticleContainer, Statable, DetachCallback
 {

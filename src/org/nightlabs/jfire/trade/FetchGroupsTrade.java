@@ -31,9 +31,15 @@ package org.nightlabs.jfire.trade;
  */
 public class FetchGroupsTrade
 {
+	// The following fetch-groups are used to retrieve the ArticleContainer with its Articles when an editor is opened
+	// or when articles have been added/changed. They are not used for the ArticleContainer, when it is changed.
 	public static final String FETCH_GROUP_ARTICLE_IN_ORDER_EDITOR = "FetchGroupsTrade.articleInOrderEditor";
 	public static final String FETCH_GROUP_ARTICLE_IN_OFFER_EDITOR = "FetchGroupsTrade.articleInOfferEditor";
 	public static final String FETCH_GROUP_ARTICLE_IN_INVOICE_EDITOR = "FetchGroupsTrade.articleInInvoiceEditor";
 	public static final String FETCH_GROUP_ARTICLE_IN_DELIVERY_NOTE_EDITOR = "FetchGroupsTrade.articleInDeliveryNoteEditor";
 	public static final String FETCH_GROUP_ARTICLE_IN_RECEPTION_NOTE_EDITOR = "FetchGroupsTrade.articleInReceptionNoteEditor";
+
+	// The following fetch-groups are used to retrieve the ArticleContainer when it has been changed - in this case it will
+	// not detach the articles, since they are managed separately (to improve speed).
+	public static final String FETCH_GROUP_ARTICLE_CONTAINER_IN_EDITOR = "FetchGroupsTrade.articleContainerInEditor";
 }

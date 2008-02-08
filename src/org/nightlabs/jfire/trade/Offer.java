@@ -69,6 +69,8 @@ import org.nightlabs.util.Util;
  *		detachable="true"
  *		table="JFireTrade_Offer"
  *
+ * @jdo.version strategy="version-number"
+ *
  * @jdo.implements name="org.nightlabs.jfire.trade.ArticleContainer"
  * @jdo.implements name="org.nightlabs.jfire.jbpm.graph.def.Statable"
  *
@@ -95,6 +97,7 @@ import org.nightlabs.util.Util;
  * @jdo.fetch-group name="Statable.states" fields="states"
  *
  * @!jdo.fetch-group name="FetchGroupsTrade.articleEdit" fetch-groups="default" fields="articles"
+ * @jdo.fetch-group name="FetchGroupsTrade.articleContainerInEditor" fields="offerLocal, createUser, currency, finalizeUser, order, price, state, states"
  */
 public class Offer
 implements

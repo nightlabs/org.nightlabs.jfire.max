@@ -45,6 +45,8 @@ import org.nightlabs.jfire.store.deliver.id.DeliveryID;
  *		detachable="true"
  *		table="JFireTrade_ArticleLocal"
  *
+ * @jdo.version strategy="version-number"
+ *
  * @jdo.inheritance strategy="new-table"
  *
  * @jdo.create-objectid-class field-order="organisationID, articleID"

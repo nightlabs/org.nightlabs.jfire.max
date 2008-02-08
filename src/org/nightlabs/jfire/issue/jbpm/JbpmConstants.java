@@ -28,9 +28,17 @@ public class JbpmConstants {
 	public static final String NODE_NAME_RESOLVED_IMPLICITELY = Organisation.DEV_ORGANISATION_ID + ":resolvedImplicitely";
 	public static final String NODE_NAME_CLOSED = Organisation.DEV_ORGANISATION_ID + ":closed";
 	public static final String NODE_NAME_REOPENED = Organisation.DEV_ORGANISATION_ID + ":reopened";
-	
 	public static final String NODE_NAME_REJECTED = Organisation.DEV_ORGANISATION_ID + ":rejected";
 
+	public static final String TRANSITION_NAME_NEW = "new";
+	public static final String TRANSITION_NAME_OPEN = "open";
+	public static final String TRANSITION_NAME_ACKNOWLEDGE = "acknowledge";
+	public static final String TRANSITION_NAME_CONFIRM = "confirm";
+	public static final String TRANSITION_NAME_ASSIGN = "assign";
+	public static final String TRANSITION_NAME_RESOLVE = "resolve";
+	public static final String TRANSITION_NAME_CLOSE = "close";
+	public static final String TRANSITION_NAME_REOPEN = "reopen";
+	public static final String TRANSITION_NAME_REJECT = "reject";
 	/**
 	 * Sets the State properties for the standard IssueTracking workflow.
 	 * @param processDefinition The {@link ProcessDefinition} to use.

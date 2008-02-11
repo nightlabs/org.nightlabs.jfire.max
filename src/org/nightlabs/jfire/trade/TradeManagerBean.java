@@ -53,8 +53,10 @@ import org.nightlabs.jdo.NLJDOHelper;
 import org.nightlabs.jdo.moduleregistry.ModuleMetaData;
 import org.nightlabs.jdo.query.JDOQuery;
 import org.nightlabs.jfire.accounting.Currency;
+import org.nightlabs.jfire.accounting.Tariff;
 import org.nightlabs.jfire.accounting.TariffOrderConfigModule;
 import org.nightlabs.jfire.accounting.id.CurrencyID;
+import org.nightlabs.jfire.accounting.id.TariffID;
 import org.nightlabs.jfire.base.BaseSessionBeanImpl;
 import org.nightlabs.jfire.config.ConfigSetup;
 import org.nightlabs.jfire.config.UserConfigSetup;
@@ -1776,5 +1778,41 @@ implements SessionBean
 		} finally {
 			pm.close();
 		}
-	}	
+	}
+
+	/**
+	 * Assign a tariff to the specified articles.
+	 *
+	 * @param articleIDs the object-ids of the articles to be changed.
+	 * @param tariffID the object-id of the tariff to be assigned.
+	 * @param get <code>false</code> if no result is desired (this method will return <code>null</code>) or <code>true</code> to get the specified articles
+	 * @param fetchGroups the fetch-groups in case the affected articles shall be detached and returned. This is ignored, if <code>get</code> is <code>false</code>.
+	 * @param maxFetchDepth the maximum fetch-depth - ignored, if <code>get</code> is <code>false</code>.
+	 * @return either <code>null</code>, if <code>get</code> is <code>false</code> or the articles identified by <code>articleIDs</code>.
+	 *
+	 * @ejb.interface-method
+	 * @ejb.permission role-name="_Guest_"
+	 * @ejb.transaction type="Required"
+	 */
+	public Collection<Article> assignTariff(Set<ArticleID> articleIDs, TariffID tariffID, boolean get, String[] fetchGroups, int maxFetchDepth)
+	{
+		PersistenceManager pm = getPersistenceManager();
+		try {
+			Tariff tariff = (Tariff) pm.getObjectById(tariffID);
+			Set<Article> articles = NLJDOHelper.getObjectSet(pm, articleIDs, Article.class);
+
+			Trader.getTrader(pm).assignTariff(User.getUser(pm, getPrincipal()), articles, tariff);
+
+			if (!get)
+				return null;
+
+			pm.getFetchPlan().setMaxFetchDepth(maxFetchDepth);
+			if (fetchGroups != null)
+				pm.getFetchPlan().setGroups(fetchGroups);
+
+			return pm.detachCopyAll(articles);
+		} finally {
+			pm.close();
+		}
+	}
 }

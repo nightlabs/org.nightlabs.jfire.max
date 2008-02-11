@@ -142,6 +142,7 @@ implements Serializable, DeleteCallback, DetachCallback, StoreCallback
 	public static final String FETCH_GROUP_INVOICE = "Article.invoice";
 	public static final String FETCH_GROUP_DELIVERY_NOTE = "Article.deliveryNote";
 	public static final String FETCH_GROUP_RECEPTION_NOTE = "Article.receptionNote";
+	public static final String FETCH_GROUP_TARIFF = "Article.tariff";
 //	public static final String FETCH_GROUP_DELIVERY = "Article.delivery";
 
 	// the following fetch-groups are virtual and processed in the detach callback

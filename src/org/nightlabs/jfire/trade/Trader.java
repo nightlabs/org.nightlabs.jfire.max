@@ -54,6 +54,7 @@ import org.nightlabs.ModuleException;
 import org.nightlabs.jdo.NLJDOHelper;
 import org.nightlabs.jfire.accounting.Accounting;
 import org.nightlabs.jfire.accounting.Currency;
+import org.nightlabs.jfire.accounting.Tariff;
 import org.nightlabs.jfire.accounting.priceconfig.IPackagePriceConfig;
 import org.nightlabs.jfire.asyncinvoke.AsyncInvoke;
 import org.nightlabs.jfire.asyncinvoke.AsyncInvokeEnvelope;
@@ -1810,6 +1811,53 @@ public class Trader
 		}
 
 		return processDefinition;
+	}
+
+	public void assignTariff(User user, Set<? extends Article> articles, Tariff tariff)
+	{
+		Map<Offer, Set<Article>> offers = new HashMap<Offer, Set<Article>>();
+		for (Article article : articles) {
+			if (article.getOffer().isFinalized())
+				throw new IllegalArgumentException("Article's offer is finalized! article=" + article.getPrimaryKey() + " offer=" + article.getOffer().getPrimaryKey());
+
+			if (article.isAllocationPending())
+				throw new IllegalArgumentException("Article is currently in state 'allocationPending'! Wait until allocation finished. article=" + article.getPrimaryKey());
+
+			if (article.isAllocationAbandoned())
+				throw new IllegalArgumentException("Article is currently in state 'allocationAbandoned'! Check whether there was an error and fix it! article=" + article.getPrimaryKey());
+
+			if (article.isReleasePending())
+				throw new IllegalArgumentException("Article is currently in state 'releasePending'! Wait until release finished. article=" + article.getPrimaryKey());
+
+			if (article.isReleaseAbandoned())
+				throw new IllegalArgumentException("Article is currently in state 'releaseAbandoned'! Check whether there was an error and fix it! article=" + article.getPrimaryKey());
+
+			if (tariff.equals(article.getTariff()))
+				continue; // already the same tariff assigned => nothing to do
+
+			// the involved offers need to be validated later
+			Set<Article> offerArticles = offers.get(article.getOffer());
+			if (offerArticles == null) {
+				offerArticles = new HashSet<Article>();
+				offers.put(article.getOffer(), offerArticles);
+			}
+			offerArticles.add(article);
+
+			// assign tariff
+			article.setTariff(tariff);
+
+			// recalculate price
+			IPackagePriceConfig packagePriceConfig = article.getProductType().getPackagePriceConfig();
+			article.setPrice(packagePriceConfig.createArticlePrice(article));
+			packagePriceConfig.fillArticlePrice(article);
+		}
+
+		for (Map.Entry<Offer, Set<Article>> me : offers.entrySet()) {
+			Offer offer = me.getKey();
+			validateOffer(offer);
+			for (OfferActionHandler offerActionHandler : offer.getOfferLocal().getOfferActionHandlers())
+				offerActionHandler.onArticlesTariffChanged(user, offer, me.getValue());
+		}
 	}
 
 //	public Collection<? extends Article> onProductAssemble_importNestedProduct(User user, Product packageProduct, String partnerOrganisationID, Collection<NestedProductTypeLocal> partnerNestedProductTypes)

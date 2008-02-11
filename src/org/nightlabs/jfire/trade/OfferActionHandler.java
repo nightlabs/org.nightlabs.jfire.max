@@ -1,5 +1,7 @@
 package org.nightlabs.jfire.trade;
 
+import java.util.Set;
+
 import javax.jdo.JDOHelper;
 import javax.jdo.PersistenceManager;
 
@@ -82,6 +84,11 @@ public class OfferActionHandler
 
 	public void onAcceptOffer(User user, Offer offer)
 	{
+	}
+
+	public void onArticlesTariffChanged(User user, Offer offer, Set<Article> articles)
+	{
+		
 	}
 
 	protected PersistenceManager getPersistenceManager()

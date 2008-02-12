@@ -80,7 +80,7 @@ public class InvoiceData extends AbstractJFSScriptExecutorDelegate {
 	 * @see org.nightlabs.jfire.scripting.ScriptExecutorJavaClassDelegate#doExecute()
 	 */
 	public Object doExecute() throws ScriptException {
-		Collection<InvoiceID> invoiceIDs = (Collection<InvoiceID>) getObjectParameterValue("invoiceIDs", Collection.class);
+		Collection<InvoiceID> invoiceIDs = getObjectParameterValue("invoiceIDs", Collection.class);
 		PersistenceManager pm = getScriptExecutorJavaClass().getPersistenceManager();
 		
 		getResultSetMetaData();

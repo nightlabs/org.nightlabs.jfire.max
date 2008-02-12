@@ -91,10 +91,10 @@ public class PaymentList extends AbstractJFSScriptExecutorDelegate {
 	 */
 	public Object doExecute() throws ScriptException {
 		Map<String, Object> param = getScriptExecutorJavaClass().getParameterValues();
-		Collection<UserID> users = (Collection<UserID>) getObjectParameterValue("userIDs", Collection.class);
-		Collection<UserID> userGroups = (Collection<UserID>) getObjectParameterValue("userGroupIDs", Collection.class);
-		Collection<AnchorID> partnerIDs = (Collection<AnchorID>) getObjectParameterValue("partnerIDs", Collection.class);;
-		Collection<ModeOfPaymentFlavourID> modeOfPaymentFlavourIDs = (Collection<ModeOfPaymentFlavourID>) getObjectParameterValue("modeOfPaymentFlavourIDs", Collection.class);;
+		Collection<UserID> users = getObjectParameterValue("userIDs", Collection.class);
+		Collection<UserID> userGroups = getObjectParameterValue("userGroupIDs", Collection.class);
+		Collection<AnchorID> partnerIDs = getObjectParameterValue("partnerIDs", Collection.class);;
+		Collection<ModeOfPaymentFlavourID> modeOfPaymentFlavourIDs = getObjectParameterValue("modeOfPaymentFlavourIDs", Collection.class);;
 		TimePeriod beginTimePeriod = getObjectParameterValue("beginTimePeriod", TimePeriod.class);
 		TimePeriod endTimePeriod = getObjectParameterValue("endTimePeriod", TimePeriod.class);
 		

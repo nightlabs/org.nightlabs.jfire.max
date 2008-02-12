@@ -85,10 +85,10 @@ public class MoneyTransferList extends AbstractJFSScriptExecutorDelegate {
 	 */
 	public Object doExecute() throws ScriptException {		
 		TimePeriod timePeriod = getObjectParameterValue("timePeriod", TimePeriod.class);
-		Collection<AnchorID> accountIDs = (Collection<AnchorID>) getObjectParameterValue("accountIDs", Collection.class);
+		Collection<AnchorID> accountIDs = getObjectParameterValue("accountIDs", Collection.class);
 		if (accountIDs == null || accountIDs.size() < 1)
 			throw new IllegalArgumentException("The parameter 'accountIDs' has to be set and contain at least one entry.");
-		Collection<UserID> initiatorIDs = (Collection<UserID>) getObjectParameterValue("initiatorIDs", Collection.class);		
+		Collection<UserID> initiatorIDs = getObjectParameterValue("initiatorIDs", Collection.class);		
 		
 		PersistenceManager pm = getScriptExecutorJavaClass().getPersistenceManager();
 

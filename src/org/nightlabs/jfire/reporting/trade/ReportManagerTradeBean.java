@@ -79,6 +79,10 @@ public abstract class ReportManagerTradeBean
 extends BaseSessionBeanImpl
 implements SessionBean
 {
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = 1L;
 	public static final Logger logger = Logger.getLogger(ReportManagerTradeBean.class);
 
 	/**

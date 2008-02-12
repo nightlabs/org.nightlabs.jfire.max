@@ -5,7 +5,6 @@ import java.util.Locale;
 import javax.jdo.JDOObjectNotFoundException;
 import javax.jdo.PersistenceManager;
 
-import org.apache.log4j.Logger;
 import org.nightlabs.ModuleException;
 import org.nightlabs.jfire.accounting.Account;
 import org.nightlabs.jfire.accounting.AccountType;
@@ -24,8 +23,6 @@ import org.nightlabs.jfire.voucher.store.VoucherType;
 public class InitialiserVoucher
 extends Initialiser
 {
-	private static final Logger logger = Logger.getLogger(InitialiserVoucher.class);
-
 	public InitialiserVoucher(PersistenceManager pm, JFirePrincipal principal)
 	{
 		super(pm, principal);

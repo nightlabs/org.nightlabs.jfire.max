@@ -6,7 +6,6 @@ import javax.jdo.JDOHelper;
 import javax.jdo.JDOObjectNotFoundException;
 import javax.jdo.PersistenceManager;
 
-import org.apache.log4j.Logger;
 import org.nightlabs.ModuleException;
 import org.nightlabs.jfire.accounting.Account;
 import org.nightlabs.jfire.accounting.PriceFragmentType;
@@ -31,8 +30,6 @@ import org.nightlabs.jfire.trade.id.CustomerGroupID;
 public class InitialiserDynamicTrade
 extends Initialiser
 {
-	private static final Logger logger = Logger.getLogger(InitialiserDynamicTrade.class);
-
 	public InitialiserDynamicTrade(PersistenceManager pm, JFirePrincipal principal)
 	{
 		super(pm, principal);
@@ -130,17 +127,28 @@ extends Initialiser
 		Account accountServiceVatVal_expense = dataCreator.createLocalExpenseAccount("service-vat-val.eur", "Service VAT Expense (EUR)");
 		
 		DynamicProductType softwareDevelopment = dataCreator.createCategory(null, softwareDevelopmentID.productTypeID, null, "Software Development", "Software-Entwicklung");
+		
+		// FIXME
+		@SuppressWarnings("unused")
 		DynamicProductType swDevJFire = dataCreator.createLeaf(softwareDevelopment, "softwareDevelopment.jfire", null, "JFire");
+		@SuppressWarnings("unused")
 		DynamicProductType swDevProjectA = dataCreator.createLeaf(softwareDevelopment, "softwareDevelopment.projectA", null, "Project A", "Projekt A");
+		@SuppressWarnings("unused")
 		DynamicProductType swDevProjectB = dataCreator.createLeaf(softwareDevelopment, "softwareDevelopment.projectB", null, "Project B", "Projekt B");
+		@SuppressWarnings("unused")
 		DynamicProductType swDevProjectC = dataCreator.createLeaf(softwareDevelopment, "softwareDevelopment.projectC", null, "Project C", "Projekt C");
 
 		
 		DynamicProductType service = dataCreator.createCategory(null, serviceID.productTypeID, null, "Service", "Dienstleistung");
+		
+		
+		// FIXME
+		@SuppressWarnings("unused")
 		DynamicProductType serviceJFire = dataCreator.createLeaf(service, "service.jfire", null, "JFire");
+		@SuppressWarnings("unused")
 		DynamicProductType serviceNetwork = dataCreator.createLeaf(service, "service.network", null, "Network", "Netzwerk");
+		@SuppressWarnings("unused")
 		DynamicProductType serviceWebserver = dataCreator.createLeaf(service, "service.webserver", null, "Webserver");
-
 		
 		DynamicProductType misc = dataCreator.createLeaf(null, miscID.productTypeID, null, "Miscellaneous", "Verschiedenes");
 		

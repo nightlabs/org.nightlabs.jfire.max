@@ -34,7 +34,6 @@ import javax.jdo.PersistenceManager;
 import javax.naming.InitialContext;
 import javax.naming.NamingException;
 
-import org.apache.log4j.Logger;
 import org.nightlabs.ModuleException;
 import org.nightlabs.i18n.I18nText;
 import org.nightlabs.jfire.accounting.Account;
@@ -85,8 +84,6 @@ import org.nightlabs.jfire.trade.id.CustomerGroupID;
 
 public class DataCreator
 {
-	private static Logger logger = Logger.getLogger(DataCreator.class);
-
 	public static final String languageID = Locale.ENGLISH.getLanguage();
 	public static final String[] languages = new String[] {
 			Locale.ENGLISH.getLanguage(),

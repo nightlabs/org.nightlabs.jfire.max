@@ -40,6 +40,7 @@ extends JDOQuery<Issue> {
 	protected Query prepareQuery() {
 		Query q = getPersistenceManager().newQuery(Issue.class);
 		StringBuffer filter = new StringBuffer();
+		StringBuffer stringNames = new StringBuffer();
 		
 		if (issueSubject != null) {
 			issueSubject = ".*" + issueSubject.toLowerCase() + ".*";
@@ -113,16 +114,17 @@ extends JDOQuery<Issue> {
 		if (objectIDs != null) {
 			for (int i = 0; i < objectIDs.size(); i++) {
 				ObjectID objectID = objectIDs.iterator().next();
-//				issueComment = ".*" + issueComment.toLowerCase() + ".*";
 				String objectIDString = objectID.toString();
 				filter.append("( this.referencedObjectIDs.contains(varObjectID"+i+") && varObjectID"+i+".matches(\"" + objectIDString + "\") )");
-				q.declareVariables(String.class.getName() + " varObjectID" + i);
+				stringNames.append(String.class.getName() + " varObjectID" + i);
 				
 				if (i != objectIDs.size() - 1) {
-					 filter.append("||");
+					stringNames.append(";");
+					filter.append("||");
 				}
-				
 			}
+			
+			q.declareVariables(stringNames.toString());
 			
 			filter.append("&& ");
 		}

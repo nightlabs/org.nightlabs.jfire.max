@@ -40,16 +40,9 @@ import org.nightlabs.jfire.store.id.ProductTypeGroupID;
 import org.nightlabs.jfire.store.id.ProductTypeID;
 
 public class ProductTypeGroupSearchResult implements Serializable {
-	
-	/**
-	 * 
-	 */
 	private static final long serialVersionUID = 1L;
 
 	public static class Entry implements Serializable {
-		/**
-		 * 
-		 */
 		private static final long serialVersionUID = 1L;
 		private ProductTypeGroupID productTypeGroup;
 		private List productTypes = new LinkedList();

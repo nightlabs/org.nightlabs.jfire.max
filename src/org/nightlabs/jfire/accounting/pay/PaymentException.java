@@ -33,9 +33,6 @@ import org.nightlabs.ModuleException;
  */
 public class PaymentException extends ModuleException
 {
-	/**
-	 * 
-	 */
 	private static final long serialVersionUID = 1L;
 	private PaymentResult paymentResult;
 

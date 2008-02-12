@@ -74,10 +74,6 @@ extends BaseSessionBeanImpl
 implements SessionBean 
 {	
 	////////////////////// EJB "constuctor" ////////////////////////////
-	
-	/**
-	 * 
-	 */
 	private static final long serialVersionUID = 1L;
 
 	/**

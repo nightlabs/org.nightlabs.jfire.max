@@ -59,9 +59,6 @@ import org.nightlabs.jfire.transfer.Anchor;
  */
 public class LocalStorekeeper extends Storekeeper
 {
-	/**
-	 * 
-	 */
 	private static final long serialVersionUID = 1L;
 
 	/**

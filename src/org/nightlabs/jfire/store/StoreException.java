@@ -34,9 +34,6 @@ import org.nightlabs.ModuleException;
  */
 public class StoreException extends ModuleException
 {
-	/**
-	 * 
-	 */
 	private static final long serialVersionUID = 1L;
 
 	public StoreException() 

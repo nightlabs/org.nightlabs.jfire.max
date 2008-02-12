@@ -49,9 +49,6 @@ import org.nightlabs.jfire.transfer.Anchor;
  */
 public class ServerPaymentProcessorCreditCardDummyForClientPayment extends ServerPaymentProcessor
 {
-	/**
-	 * 
-	 */
 	private static final long serialVersionUID = 1L;
 
 	public static ServerPaymentProcessorCreditCardDummyForClientPayment getServerPaymentProcessorCreditCardDummyForClientPayment(PersistenceManager pm)

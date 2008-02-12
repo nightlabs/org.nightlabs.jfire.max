@@ -46,9 +46,6 @@ import org.nightlabs.jfire.transfer.Anchor;
  */
 public class ServerPaymentProcessorDebitNoteGermany extends ServerPaymentProcessor
 {
-	/**
-	 * 
-	 */
 	private static final long serialVersionUID = 1L;
 
 	public static ServerPaymentProcessorDebitNoteGermany getServerPaymentProcessorDebitNoteGermany(PersistenceManager pm)

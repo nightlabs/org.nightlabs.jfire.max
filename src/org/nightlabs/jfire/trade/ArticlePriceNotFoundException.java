@@ -33,10 +33,6 @@ import org.nightlabs.jfire.accounting.AccountingConfigException;
  *
  */
 public class ArticlePriceNotFoundException extends AccountingConfigException {
-
-	/**
-	 * 
-	 */
 	private static final long serialVersionUID = 1L;
 
 	/**

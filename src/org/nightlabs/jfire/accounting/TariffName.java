@@ -63,9 +63,6 @@ import org.nightlabs.i18n.I18nText;
 public class TariffName extends I18nText
 implements StoreCallback
 {
-	/**
-	 * 
-	 */
 	private static final long serialVersionUID = 1L;
 
 	/**

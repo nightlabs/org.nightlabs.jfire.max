@@ -55,9 +55,6 @@ import org.nightlabs.jfire.transfer.Anchor;
  */
 public abstract class Accountant implements Serializable
 {
-	/**
-	 * 
-	 */
 	private static final long serialVersionUID = 1L;
 	/**
 	 * @jdo.field primary-key="true"

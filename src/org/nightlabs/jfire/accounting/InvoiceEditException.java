@@ -43,10 +43,6 @@ import org.nightlabs.jfire.trade.id.ArticleID;
  */
 public class InvoiceEditException extends ArticleContainerException
 {
-	
-	/**
-	 * 
-	 */
 	private static final long serialVersionUID = 1L;
 	public static int REASON_NESTED_EXCEPTION = 0;
 	public static int REASON_ARTICLE_ALREADY_IN_INVOICE = 1;

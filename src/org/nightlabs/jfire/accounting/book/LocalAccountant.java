@@ -55,10 +55,6 @@ import org.nightlabs.jfire.transfer.Anchor;
  * @jdo.inheritance strategy = "new-table"
  */
 public class LocalAccountant extends Accountant {
-	
-	/**
-	 * 
-	 */
 	private static final long serialVersionUID = 1L;
 
 

@@ -57,9 +57,6 @@ import org.nightlabs.jfire.trade.id.OrderRequirementID;
 public class OrderRequirement
 	implements Serializable
 {
-	/**
-	 * 
-	 */
 	private static final long serialVersionUID = 1L;
 	/**
 	 * @jdo.field primary-key="true"

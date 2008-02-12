@@ -33,10 +33,6 @@ import org.nightlabs.jdo.search.SearchFilter;
  * @author Alexander Bieber <alex[AT]nightlabs[DOT]de>
  */
 public abstract class ProductTypeGroupSearchFilter extends SearchFilter {
-
-	/**
-	 * 
-	 */
 	private static final long serialVersionUID = 1L;
 
 	public ProductTypeGroupSearchFilter(int conjunction) {

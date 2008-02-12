@@ -31,10 +31,6 @@ package org.nightlabs.jfire.accounting;
  *
  */
 public class AccountingConfigException extends RuntimeException {
-
-	/**
-	 * 
-	 */
 	private static final long serialVersionUID = 1L;
 
 	/**

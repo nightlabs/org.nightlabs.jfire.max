@@ -34,10 +34,6 @@ import org.nightlabs.jfire.prop.search.PropSearchFilter;
  *
  */
 public class LegalEntitySearchFilter extends PropSearchFilter {
-
-	/**
-	 * 
-	 */
 	private static final long serialVersionUID = 1L;
 
 	/**

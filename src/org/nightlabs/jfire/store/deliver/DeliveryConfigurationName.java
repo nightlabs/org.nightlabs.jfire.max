@@ -48,9 +48,6 @@ import org.nightlabs.i18n.I18nText;
  */
 public class DeliveryConfigurationName extends I18nText
 {
-	/**
-	 * 
-	 */
 	private static final long serialVersionUID = 1L;
 
 	/**

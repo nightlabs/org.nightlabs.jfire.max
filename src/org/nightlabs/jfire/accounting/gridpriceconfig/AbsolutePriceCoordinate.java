@@ -40,9 +40,6 @@ import org.nightlabs.jfire.trade.CustomerGroup;
  */
 public class AbsolutePriceCoordinate extends PriceCoordinate implements IAbsolutePriceCoordinate
 {
-	/**
-	 * 
-	 */
 	private static final long serialVersionUID = 1L;
 	private String productTypePK;
 	private String priceFragmentTypePK;

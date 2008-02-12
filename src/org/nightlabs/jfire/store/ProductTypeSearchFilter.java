@@ -33,10 +33,6 @@ import org.nightlabs.jdo.search.SearchFilter;
  *
  */
 public abstract class ProductTypeSearchFilter extends SearchFilter {
-
-	/**
-	 * 
-	 */
 	private static final long serialVersionUID = 1L;
 
 	/**

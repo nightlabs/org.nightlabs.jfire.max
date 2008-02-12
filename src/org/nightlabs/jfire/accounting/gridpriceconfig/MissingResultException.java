@@ -31,10 +31,6 @@ package org.nightlabs.jfire.accounting.gridpriceconfig;
  */
 public class MissingResultException extends InvalidResultException
 {
-
-	/**
-	 * 
-	 */
 	private static final long serialVersionUID = 1L;
 
 	/**

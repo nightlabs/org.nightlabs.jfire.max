@@ -24,9 +24,6 @@ import org.nightlabs.jfire.store.DeliveryNote;
 public class TradeConfigModule
 		extends ConfigModule
 {
-	/**
-	 * 
-	 */
 	private static final long serialVersionUID = 1L;
 
 	/**

@@ -50,9 +50,6 @@ import org.nightlabs.i18n.I18nText;
  */
 public class ServerPaymentProcessorName extends I18nText
 {
-	/**
-	 * 
-	 */
 	private static final long serialVersionUID = 1L;
 	public static final String FETCH_GROUP_NAMES = "ServerPaymentProcessorName.names";
 	public static final String FETCH_GROUP_SERVER_PAYMENT_PROCESSOR = "ServerPaymentProcessorName.serverPaymentProcessor";

@@ -42,9 +42,6 @@ import java.util.Calendar;
 public class PaymentDataCreditCard
 extends PaymentData
 {
-	/**
-	 * 
-	 */
 	private static final long serialVersionUID = 1L;
 	/**
 	 * @jdo.field persistence-modifier="persistent"

@@ -63,9 +63,6 @@ import org.nightlabs.jfire.security.User;
 public abstract class Transfer
 implements Serializable
 {
-	/**
-	 * 
-	 */
 	private static final long serialVersionUID = 1L;
 
 	private static final Logger logger = Logger.getLogger(Transfer.class);

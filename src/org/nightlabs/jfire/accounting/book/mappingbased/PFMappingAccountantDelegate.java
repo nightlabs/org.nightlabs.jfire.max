@@ -89,10 +89,6 @@ public class PFMappingAccountantDelegate
 	 * 
 	 */
 	private Set<MoneyFlowMapping> moneyFlowMappings;
-
-	/**
-	 * 
-	 */
 	private static final long serialVersionUID = 1L;
 
 	/**
@@ -166,9 +162,6 @@ public class PFMappingAccountantDelegate
 	public static class ResolvedMapKey
 			implements Serializable
 	{
-		/**
-		 * 
-		 */
 		private static final long serialVersionUID = 1L;
 
 		private ProductTypeID productTypeID;
@@ -216,9 +209,6 @@ public class PFMappingAccountantDelegate
 	public static class ResolvedMapEntry
 			implements Serializable
 	{
-		/**
-		 * 
-		 */
 		private static final long serialVersionUID = 1L;
 
 		private ProductType productType;

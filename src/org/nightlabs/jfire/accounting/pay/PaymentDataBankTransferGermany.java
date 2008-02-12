@@ -41,9 +41,6 @@ import java.util.Date;
  */
 public class PaymentDataBankTransferGermany extends PaymentData
 {
-	/**
-	 * 
-	 */
 	private static final long serialVersionUID = 1L;
 
 	/**

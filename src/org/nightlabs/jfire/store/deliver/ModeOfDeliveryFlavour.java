@@ -251,9 +251,6 @@ implements Serializable
 	public static class ModeOfDeliveryFlavourProductTypeGroup
 	implements Serializable
 	{
-		/**
-		 * 
-		 */
 		private static final long serialVersionUID = 1L;
 		private Set productTypeIDs = new HashSet();
 		private Set modeOfDeliveryFlavourIDs = new HashSet();

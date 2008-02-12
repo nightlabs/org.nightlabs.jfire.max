@@ -34,10 +34,6 @@ package org.nightlabs.jfire.transfer;
  */
 public class AnchorMismatchException extends RuntimeException
 {
-
-	/**
-	 * 
-	 */
 	private static final long serialVersionUID = 1L;
 
 	public AnchorMismatchException() { }

@@ -50,9 +50,6 @@ import org.nightlabs.i18n.I18nText;
  */
 public class CustomerGroupName extends I18nText
 {
-	/**
-	 * 
-	 */
 	private static final long serialVersionUID = 1L;
 
 	/**

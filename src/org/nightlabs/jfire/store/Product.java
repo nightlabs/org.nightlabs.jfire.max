@@ -59,9 +59,6 @@ import org.nightlabs.jfire.trade.Article;
 public abstract class Product
 implements Serializable
 {
-	/**
-	 * 
-	 */
 	private static final long serialVersionUID = 1L;
 	public static final String FETCH_GROUP_PRODUCT_LOCAL = "Product.productLocal";
 	public static final String FETCH_GROUP_PRODUCT_TYPE = "Product.productType";

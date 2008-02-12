@@ -128,9 +128,6 @@ import org.nightlabs.util.Util;
 public class Invoice
 implements Serializable, ArticleContainer, Statable, DetachCallback
 {
-	/**
-	 * 
-	 */
 	private static final long serialVersionUID = 1L;
 	public static final String FETCH_GROUP_INVOICE_LOCAL = "Invoice.invoiceLocal";
 	public static final String FETCH_GROUP_ARTICLES = "Invoice.articles";

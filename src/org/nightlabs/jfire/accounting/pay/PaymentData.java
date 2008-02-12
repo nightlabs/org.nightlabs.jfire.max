@@ -59,9 +59,6 @@ import org.nightlabs.jfire.transfer.TransferData;
 public class PaymentData
 implements Serializable, TransferData
 {
-	/**
-	 * 
-	 */
 	private static final long serialVersionUID = 1L;
 
 	/**

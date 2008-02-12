@@ -33,10 +33,6 @@ import org.nightlabs.ModuleException;
  *
  */
 public class OrderNotFoundException extends ModuleException {
-
-	/**
-	 * 
-	 */
 	private static final long serialVersionUID = 1L;
 
 	/**

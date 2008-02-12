@@ -108,9 +108,6 @@ import org.nightlabs.util.Util;
 public abstract class ServerDeliveryProcessor
 implements Serializable, DetachCallback
 {
-	/**
-	 * 
-	 */
 	private static final long serialVersionUID = 1L;
 
 	public static final String FETCH_GROUP_NAME = "ServerDeliveryProcessor.name";

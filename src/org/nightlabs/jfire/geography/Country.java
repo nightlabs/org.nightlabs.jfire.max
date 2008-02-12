@@ -134,7 +134,7 @@ public class Country implements Serializable
 	public String getCountryID()
 	{
 		return countryID;
-	}	
+	}
 	/**
 	 * @param countryID The countryID to set.
 	 */
@@ -156,7 +156,7 @@ public class Country implements Serializable
 		Region res;
 		if (region.getPrimaryKey() == null) {
 			PersistenceManager pm = JDOHelper.getPersistenceManager(this);
-			if (pm == null)			
+			if (pm == null)
 				throw new IllegalStateException("region does not have a primary key and this instance of Country is not persistent! Cannot assign a primary key!");
 
 			res = pm.makePersistent(region);

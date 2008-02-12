@@ -61,7 +61,7 @@ import org.nightlabs.util.Util;
 public class Region implements Serializable
 {
 	/**
-	 * The serial version of this class. 
+	 * The serial version of this class.
 	 */
 	private static final long serialVersionUID = 1L;
 	
@@ -127,7 +127,7 @@ public class Region implements Serializable
 	 *
 	 * @!jdo.map-vendor-extension vendor-name="jpox" key="key-field" value="primaryKey"
 	 */
-	protected Map<String, City> cities = new HashMap<String, City>();	
+	protected Map<String, City> cities = new HashMap<String, City>();
 	/////// end normal fields ///////
 	
 	
@@ -241,7 +241,7 @@ public class Region implements Serializable
 		City res;
 		if (city.getPrimaryKey() == null) {
 			PersistenceManager pm = JDOHelper.getPersistenceManager(this);
-			if (pm == null)			
+			if (pm == null)
 				throw new IllegalStateException("city does not have a primary key and this instance of Region is not persistent! Cannot assign a primary key!");
 			
 			res = pm.makePersistent(city);

@@ -53,7 +53,7 @@ import org.nightlabs.util.Util;
 public class Location implements Serializable
 {
 	/**
-	 * The serial version of this class. 
+	 * The serial version of this class.
 	 */
 	private static final long serialVersionUID = 1L;
 	

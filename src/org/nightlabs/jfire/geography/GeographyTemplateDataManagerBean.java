@@ -69,13 +69,13 @@ import org.nightlabs.util.IOUtil;
 import org.nightlabs.version.MalformedVersionException;
 
 /**
- * @ejb.bean name="jfire/ejb/JFireGeography/GeographyTemplateDataManager"	
+ * @ejb.bean name="jfire/ejb/JFireGeography/GeographyTemplateDataManager"
  *           jndi-name="jfire/ejb/JFireGeography/GeographyTemplateDataManager"
- *           type="Stateless" 
+ *           type="Stateless"
  *           transaction-type="Container"
  *
  * @ejb.util generate="physical"
- * @ejb.transaction type="Required" 
+ * @ejb.transaction type="Required"
  */
 public abstract class GeographyTemplateDataManagerBean
 extends BaseSessionBeanImpl
@@ -115,7 +115,7 @@ implements SessionBean
 		super.unsetSessionContext();
 	}
 	/**
-	 * @ejb.create-method  
+	 * @ejb.create-method
 	 * @ejb.permission role-name="_Guest_"
 	 */
 	public void ejbCreate()
@@ -331,11 +331,11 @@ implements SessionBean
 				InitialContext initialContext = new InitialContext();
 				try {
 					rootOrganisationID = Organisation.getRootOrganisationID(initialContext);
-				}//try 
+				}//try
 				finally {
 					initialContext.close();
 				}//finally
-			}//try 
+			}//try
 			catch (NamingException x) {
 				throw new RuntimeException(x); // it's definitely an unexpected exception if we can't access the local JNDI.
 			}//catch
@@ -369,7 +369,7 @@ implements SessionBean
 					csvLines.trim();
 					w.write(csvLines);
 				}//if
-			}//try 
+			}//try
 			finally {
 				w.close();
 			}//finally
@@ -377,7 +377,7 @@ implements SessionBean
 			CSV.setCSVData(pm, rootOrganisationID, CSV.CSV_TYPE_COUNTRY, countryID.countryID, out.toByteArray());
 			
 			clearCache();
-		}//try 
+		}//try
 		finally {
 			pm.close();
 		}//finally
@@ -406,11 +406,11 @@ implements SessionBean
 				InitialContext initialContext = new InitialContext();
 				try {
 					rootOrganisationID = Organisation.getRootOrganisationID(initialContext);
-				}//try 
+				}//try
 				finally {
 					initialContext.close();
 				}//finally
-			}//try 
+			}//try
 			catch (NamingException x) {
 				throw new RuntimeException(x); // it's definitely an unexpected exception if we can't access the local JNDI.
 			}//catch
@@ -445,7 +445,7 @@ implements SessionBean
 					csvLines.trim();
 					w.write(csvLines);
 				}//if
-			}//try 
+			}//try
 			finally {
 				w.close();
 			}//finally
@@ -453,7 +453,7 @@ implements SessionBean
 			CSV.setCSVData(pm, rootOrganisationID, CSV.CSV_TYPE_REGION, countryID.countryID, out.toByteArray());
 			
 			clearCache();
-		}//try 
+		}//try
 		finally {
 			pm.close();
 		}//finally
@@ -482,11 +482,11 @@ implements SessionBean
 				InitialContext initialContext = new InitialContext();
 				try {
 					rootOrganisationID = Organisation.getRootOrganisationID(initialContext);
-				}//try 
+				}//try
 				finally {
 					initialContext.close();
 				}//finally
-			}//try 
+			}//try
 			catch (NamingException x) {
 				throw new RuntimeException(x); // it's definitely an unexpected exception if we can't access the local JNDI.
 			}//catch
@@ -523,7 +523,7 @@ implements SessionBean
 					csvLines.trim();
 					w.write(csvLines);
 				}//if
-			}//try 
+			}//try
 			finally {
 				w.close();
 			}//finally
@@ -531,7 +531,7 @@ implements SessionBean
 			CSV.setCSVData(pm, rootOrganisationID, CSV.CSV_TYPE_CITY, countryID.countryID, out.toByteArray());
 			
 			clearCache();
-		}//try 
+		}//try
 		finally {
 			pm.close();
 		}//finally
@@ -560,11 +560,11 @@ implements SessionBean
 				InitialContext initialContext = new InitialContext();
 				try {
 					rootOrganisationID = Organisation.getRootOrganisationID(initialContext);
-				}//try 
+				}//try
 				finally {
 					initialContext.close();
 				}//finally
-			}//try 
+			}//try
 			catch (NamingException x) {
 				throw new RuntimeException(x); // it's definitely an unexpected exception if we can't access the local JNDI.
 			}//catch
@@ -603,7 +603,7 @@ implements SessionBean
 					csvLines.trim();
 					w.write(csvLines);
 				}//if
-			}//try 
+			}//try
 			finally {
 				w.close();
 			}//finally
@@ -611,7 +611,7 @@ implements SessionBean
 			CSV.setCSVData(pm, rootOrganisationID, CSV.CSV_TYPE_LOCATION, countryID.countryID, out.toByteArray());
 
 			clearCache();
-		}//try 
+		}//try
 		finally {
 			pm.close();
 		}//finally
@@ -641,11 +641,11 @@ implements SessionBean
 				InitialContext initialContext = new InitialContext();
 				try {
 					rootOrganisationID = Organisation.getRootOrganisationID(initialContext);
-				}//try 
+				}//try
 				finally {
 					initialContext.close();
 				}//finally
-			}//try 
+			}//try
 			catch (NamingException x) {
 				throw new RuntimeException(x); // it's definitely an unexpected exception if we can't access the local JNDI.
 			}//catch
@@ -666,7 +666,7 @@ implements SessionBean
 //					csvLines.trim();
 					w.write(csvLines);
 				}//if
-			}//try 
+			}//try
 			finally {
 				w.close();
 			}//finally
@@ -674,7 +674,7 @@ implements SessionBean
 			CSV.setCSVData(pm, rootOrganisationID, CSV.CSV_TYPE_DISTRICT, countryID.countryID, out.toByteArray());
 			
 			clearCache();
-		}//try 
+		}//try
 		finally {
 			pm.close();
 		}//finally
@@ -713,16 +713,16 @@ implements SessionBean
 //			Geography.sharedInstance();
 //
 //			String rootOrganisationID;
-//			
+//
 //			try {
 //				InitialContext initialContext = new InitialContext();
 //				try {
 //					rootOrganisationID = Organisation.getRootOrganisationID(initialContext);
-//				}//try 
+//				}//try
 //				finally {
 //					initialContext.close();
 //				}//finally
-//			}//try 
+//			}//try
 //			catch (NamingException x) {
 //				throw new RuntimeException(x); // it's definitely an unexpected exception if we can't access the local JNDI.
 //			}//catch
@@ -759,13 +759,13 @@ implements SessionBean
 ////				csvLines.trim();
 ////				w.write(csvLines);
 ////				}//if
-//			}//try 
+//			}//try
 //			finally {
 //				w.close();
 //			}//finally
 //
 ////			CSV.setCSVData(pm, rootOrganisationID, CSV.CSV_TYPE_DISTRICT, countryID.countryID, out.toByteArray());
-//			
+//
 ////			GeographyTemplateDataNotificationFilter notificationFilter = new GeographyTemplateDataNotificationFilter(
 ////					rootOrganisationID, SubscriptionUtil.SUBSCRIBER_TYPE_ORGANISATION, getOrganisationID(),
 ////					GeographyTemplateDataNotificationFilter.class.getName(), Zip.class.getName());
@@ -780,9 +780,9 @@ implements SessionBean
 ////				// TODO Auto-generated catch block
 ////				e.printStackTrace();
 ////			}
-//			
+//
 //			clearCache();
-//		}//try 
+//		}//try
 //		finally {
 //			pm.close();
 //		}//finally

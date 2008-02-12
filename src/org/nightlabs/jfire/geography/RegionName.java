@@ -34,7 +34,7 @@ import org.nightlabs.i18n.I18nText;
 /**
  * @author Marco Schulze - marco at nightlabs dot de
  *
- * @jdo.persistence-capable 
+ * @jdo.persistence-capable
  *		identity-type="application"
  *		objectid-class="org.nightlabs.jfire.geography.id.RegionNameID"
  *		detachable="true"
@@ -49,7 +49,7 @@ import org.nightlabs.i18n.I18nText;
 public class RegionName extends I18nText
 {
 	/**
-	 * The serial version of this class. 
+	 * The serial version of this class.
 	 */
 	private static final long serialVersionUID = 1L;
 	

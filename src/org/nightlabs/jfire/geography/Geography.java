@@ -26,7 +26,6 @@
 
 package org.nightlabs.jfire.geography;
 
-import java.io.IOException;
 import java.text.Collator;
 import java.util.ArrayList;
 import java.util.Collection;

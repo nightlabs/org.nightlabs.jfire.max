@@ -62,7 +62,7 @@ import org.nightlabs.util.Util;
 public class City implements Serializable
 {
 	/**
-	 * The serial version of this class. 
+	 * The serial version of this class.
 	 */
 	private static final long serialVersionUID = 1L;
 	
@@ -270,7 +270,7 @@ public class City implements Serializable
 
 	public District addDistrict(District district)
 	{
-		if (!this.getPrimaryKey().equals(district.getCity().getPrimaryKey())) 
+		if (!this.getPrimaryKey().equals(district.getCity().getPrimaryKey()))
 			throw new IllegalArgumentException("district has wrong city (!= this)!!!");
 
 		districts.put(district.getPrimaryKey(), district);
@@ -279,7 +279,7 @@ public class City implements Serializable
 
 	public Location addLocation(Location location)
 	{
-		if (!this.getPrimaryKey().equals(location.getCity().getPrimaryKey())) 
+		if (!this.getPrimaryKey().equals(location.getCity().getPrimaryKey()))
 			throw new IllegalArgumentException("location has wrong city (!= this)!!!");
 
 		locations.put(location.getPrimaryKey(), location);

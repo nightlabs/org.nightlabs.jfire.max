@@ -34,7 +34,7 @@ import org.nightlabs.i18n.I18nText;
 /**
  * @author Marco Schulze - marco at nightlabs dot de
  *
- * @jdo.persistence-capable 
+ * @jdo.persistence-capable
  *		identity-type="application"
  *		objectid-class="org.nightlabs.jfire.geography.id.CountryNameID"
  *		detachable="true"

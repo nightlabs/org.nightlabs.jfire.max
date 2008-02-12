@@ -11,7 +11,6 @@ import java.util.StringTokenizer;
 import org.apache.log4j.Logger;
 import org.nightlabs.annotation.Implement;
 import org.nightlabs.jdo.ObjectIDUtil;
-import org.nightlabs.jfire.security.SecurityReflector;
 import org.nightlabs.util.CollectionUtil;
 
 public class GeographyImplResourceCSV
@@ -69,7 +68,7 @@ extends Geography
 		if (lastWasSep)
 			res.add("");
 
-		return (String[]) CollectionUtil.collection2TypedArray(res, String.class);
+		return CollectionUtil.collection2TypedArray(res, String.class);
 	}
 
 	/**
@@ -236,6 +235,7 @@ extends Geography
 		return in;
 	}
 
+	@Override
 	@Implement
 	protected void loadCountries()
 	{
@@ -314,6 +314,7 @@ extends Geography
 		return in;
 	}
 
+	@Override
 	@Implement
 	protected void loadRegions(String countryID)
 	{
@@ -419,6 +420,7 @@ extends Geography
 		return in;
 	}
 
+	@Override
 	@Implement
 	protected void loadCities(String countryID)
 	{
@@ -522,6 +524,7 @@ extends Geography
 		return in;
 	}
 
+	@Override
 	@Implement
 	protected void loadDistricts(String countryID)
 	{
@@ -585,7 +588,7 @@ extends Geography
 						}
 
 						String cityPK = City.getPrimaryKey(countryID, csvOrganisationID, cityID);
-						City city = (City) cities.get(cityPK);
+						City city = cities.get(cityPK);
 						if (city == null) {
 							logger.warn("District-CSV for countryID \""+countryID+"\", line "+row+": City with PK \""+cityPK+"\" does not exist! Row ignored.");
 							continue;
@@ -648,6 +651,7 @@ extends Geography
 		return in;
 	}
 
+	@Override
 	@Implement
 	protected void loadZips(String countryID)
 	{
@@ -712,7 +716,7 @@ extends Geography
 						}
 
 						String districtPK = District.getPrimaryKey(countryID, csvOrganisationID, districtID);
-						District district = (District) districts.get(districtPK);
+						District district = districts.get(districtPK);
 						if (district == null) {
 							logger.warn("Zip-CSV for countryID \""+countryID+"\", line "+row+": District with PK \""+districtPK+"\" does not exist! Row ignored.");
 							continue;
@@ -720,7 +724,7 @@ extends Geography
 
 						if (!district.getCity().getCityID().equals(cityID)) {
 							String languageID = Locale.getDefault().getLanguage();
-							City csvCity = (City) cities.get(City.getPrimaryKey(countryID, csvOrganisationID, cityID));
+							City csvCity = cities.get(City.getPrimaryKey(countryID, csvOrganisationID, cityID));
 							String csvCityName = csvCity == null ? "{unknown city}" : csvCity.getName().getText(languageID);
 
 							logger.warn("Zip-CSV for countryID \""+countryID+"\", line "+row+": District with PK \""+districtPK+"\" (named \""+district.getName()+"\") has cityID \""+district.getCity().getCityID()+"\" (named \""+district.getCity().getName().getText(languageID)+"\") but csv row declares cityID \""+cityID+"\" (named \"" + csvCityName + "\")! Will add zip \""+zip+"\" to district \""+districtPK+"\" anyway.");
@@ -753,6 +757,7 @@ extends Geography
 		return in;
 	}
 
+	@Override
 	@Implement
 	protected void loadLocations(String countryID)
 	{
@@ -828,8 +833,7 @@ extends Geography
 								logger.warn("Location-CSV for countryID \""+countryID+"\", line "+row+": District with PK \""+districtPK+"\" does not exist! Will NOT assign a district to location \""+locationPK+"\"!");
 						}
 
-						Location location = (Location) locations.get(
-								Location.getPrimaryKey(countryID, csvOrganisationID, locationID));
+						Location location = locations.get(Location.getPrimaryKey(countryID, csvOrganisationID, locationID));
 						if (location == null) {
 							location = new Location(this, csvOrganisationID, locationID, city);
 							city.addLocation(location);

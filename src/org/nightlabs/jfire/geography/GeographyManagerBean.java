@@ -51,13 +51,13 @@ import org.nightlabs.jfire.geography.id.RegionID;
 import org.nightlabs.jfire.organisation.Organisation;
 
 /**
- * @ejb.bean name="jfire/ejb/JFireGeography/GeographyManager"	
+ * @ejb.bean name="jfire/ejb/JFireGeography/GeographyManager"
  *           jndi-name="jfire/ejb/JFireGeography/GeographyManager"
- *           type="Stateless" 
+ *           type="Stateless"
  *           transaction-type="Container"
  *
  * @ejb.util generate="physical"
- * @ejb.transaction type="Required" 
+ * @ejb.transaction type="Required"
  */
 public abstract class GeographyManagerBean
 extends BaseSessionBeanImpl
@@ -87,7 +87,7 @@ implements SessionBean
 		super.unsetSessionContext();
 	}
 	/**
-	 * @ejb.create-method  
+	 * @ejb.create-method
 	 * @ejb.permission role-name="_Guest_"
 	 */
 	public void ejbCreate()
@@ -337,7 +337,7 @@ implements SessionBean
 		finally {
 			pm.close();
 		}
-	} 
+	}
 
 	/**
 	 * @ejb.interface-method
@@ -397,7 +397,7 @@ implements SessionBean
 ////							tokenizer.nextToken();
 ////							String countryName = tokenizer.sval;
 ////							System.out.println(" countryID = \""+countryID+"\" countryName=\""+countryName+"\"");
-////	
+////
 ////							if (tokenizer.lineno() != 1) {
 ////								Country country;
 ////								try {
@@ -407,11 +407,11 @@ implements SessionBean
 ////									country = new Country(Organisation.ROOT_ORGANISATIONID, countryID);
 ////								}
 ////								country.getName().setText(languageID, countryName);
-////	
+////
 ////								if (!JDOHelper.isPersistent(country))
 ////									pm.makePersistent(country);
 ////							}
-////	
+////
 ////							while (tokenizer.ttype != StreamTokenizer.TT_EOL)
 ////								tokenizer.nextToken();
 ////							tokenizer.nextToken();
@@ -441,7 +441,7 @@ implements SessionBean
 ////							tokenizer.nextToken();
 ////							String regionName = tokenizer.sval;
 ////							System.out.println(" countryID=\""+countryID+"\" regionID=\""+regionID+"\" regionName=\""+regionName+"\"");
-////	
+////
 ////							if (tokenizer.lineno() != 1) {
 ////								Country country;
 ////								try {
@@ -450,7 +450,7 @@ implements SessionBean
 ////								} catch (JDOObjectNotFoundException x) {
 ////									throw new RuntimeException("CSV \""+file+"\", line "+tokenizer.lineno()+": country with ID \""+countryID+"\" does not exist!");
 ////								}
-////	
+////
 ////								Region region;
 ////								try {
 ////									region = (Region) pm.getObjectById(
@@ -461,11 +461,11 @@ implements SessionBean
 ////									region = new Region(Organisation.ROOT_ORGANISATIONID, regionID, country);
 ////								}
 ////								region.getName().setText(languageID, regionName);
-////	
+////
 ////								if (!JDOHelper.isPersistent(region))
 ////									pm.makePersistent(region);
 ////							}
-////	
+////
 ////							while (tokenizer.ttype != StreamTokenizer.TT_EOL)
 ////								tokenizer.nextToken();
 ////							tokenizer.nextToken();
@@ -549,7 +549,7 @@ implements SessionBean
 
 //geoMan._storeDistrictRecord(
 //file, tokenizer.lineno(), mode == 1,
-//cityIDStr, languageID, 
+//cityIDStr, languageID,
 //countryID, regionID, cityName,
 //districtName, cityID, latitude, longitude,
 //zips);
@@ -731,7 +731,7 @@ implements SessionBean
 //*/
 //public void _storeDistrictRecord(
 //String file, int lineno, boolean searchCityByName,
-//String cityIDStr, String languageID, 
+//String cityIDStr, String languageID,
 //String countryID, String regionID, String cityName,
 //String districtName, long cityID, double latitude, double longitude,
 //Set zips)
@@ -758,7 +758,7 @@ implements SessionBean
 //query.declareParameters("String languageID, String cityName");
 //query.setFilter("this.name.names.containsEntry(languageID, cityName)");
 //Collection c = (Collection)query.execute(languageID, cityName);
-//if (!c.isEmpty()) 
+//if (!c.isEmpty())
 //city = (City)c.iterator().next();
 //else {
 //query.setFilter("this.name.names.containsValue(cityName)");

@@ -17,9 +17,6 @@ import org.nightlabs.jfire.security.SecurityReflector;
 public abstract class AbstractActionHandler
 implements ActionHandler
 {
-	/**
-	 * 
-	 */
 	private static final long serialVersionUID = 1L;
 
 	/**

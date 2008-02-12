@@ -32,10 +32,6 @@ import org.jbpm.svc.ServiceFactory;
  * @author Jasper Siepkes <siepkes[AT]serviceplanet[DOT]nl>
  */
 public class JFireLoggingServiceFactory implements ServiceFactory {
-
-	/**
-	 * 
-	 */
 	private static final long serialVersionUID = 1L;
 
 	public Service openService() {

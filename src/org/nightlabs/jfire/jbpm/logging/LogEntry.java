@@ -45,10 +45,6 @@ import org.nightlabs.jfire.security.User;
  * @jdo.create-objectid-class field-order = "organisationID, logEntryID"
  */
 public class LogEntry implements Serializable {
-
-	/**
-	 * 
-	 */
 	private static final long serialVersionUID = 1L;
 
 	////////BEGIN OF PRIMARY KEY(S) ////////////

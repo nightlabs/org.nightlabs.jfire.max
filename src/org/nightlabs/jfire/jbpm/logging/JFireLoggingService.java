@@ -44,10 +44,6 @@ import org.nightlabs.jfire.security.SecurityReflector;
  * @author Jasper Siepkes <siepkes[AT]serviceplanet[DOT]nl>
  */
 public class JFireLoggingService implements LoggingService {
-	
-	/**
-	 * 
-	 */
 	private static final long serialVersionUID = 1L;
 
 	private static final Logger logger = Logger.getLogger(JFireLoggingService.class);

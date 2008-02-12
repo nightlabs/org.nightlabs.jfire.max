@@ -12,6 +12,11 @@ import org.nightlabs.jfire.store.search.ProductTypeQuery;
 public class DynamicProductTypeQuery 
 extends ProductTypeQuery 
 {
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = 1L;
+
 	public DynamicProductTypeQuery() {
 	}
 

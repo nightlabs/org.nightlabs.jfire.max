@@ -71,9 +71,6 @@ public abstract class DynamicTradeManagerBean
 extends BaseSessionBeanImpl
 implements SessionBean
 {
-	/**
-	 * 
-	 */
 	private static final long serialVersionUID = 1L;
 
 	@Override

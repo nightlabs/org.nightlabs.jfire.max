@@ -31,7 +31,6 @@ import java.rmi.RemoteException;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashSet;
-import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Set;
@@ -1208,16 +1207,15 @@ implements SessionBean
 	 * @ejb.transaction type="Required"
 	 * @ejb.permission role-name="_Guest_"
 	 */
-	public void deleteArticles(Collection articleIDs, boolean validate)
+	public void deleteArticles(Collection<ArticleID> articleIDs, boolean validate)
 		throws ModuleException
 	{
 		PersistenceManager pm = getPersistenceManager();
 		try {
 			pm.getExtent(Article.class);
-			Collection articles = new ArrayList(articleIDs.size());
-			Set offers = validate ? new HashSet() : null;
-			for (Iterator it = articleIDs.iterator(); it.hasNext(); ) {
-				ArticleID articleID = (ArticleID) it.next();
+			Collection<Article> articles = new ArrayList<Article>(articleIDs.size());
+			Set<Offer> offers = validate ? new HashSet<Offer>() : null;
+			for (ArticleID articleID : articleIDs) {
 				Article article = (Article) pm.getObjectById(articleID);
 				articles.add(article);
 
@@ -1229,10 +1227,8 @@ implements SessionBean
 			trader.deleteArticles(User.getUser(pm, getPrincipal()), articles);
 
 			if (validate) {
-				for (Iterator it = offers.iterator(); it.hasNext(); ) {
-					Offer offer = (Offer) it.next();
+				for (Offer offer : offers)
 					trader.validateOffer(offer);
-				}
 			}
 
 		} finally {
@@ -1247,12 +1243,12 @@ implements SessionBean
 	 * @ejb.transaction type="Required"
 	 * @ejb.permission role-name="_Guest_"
 	 */
-	public Collection releaseArticles(Collection articleIDs, boolean synchronously, boolean get, String[] fetchGroups, int maxFetchDepth)
+	public Collection<Article> releaseArticles(Collection<ArticleID> articleIDs, boolean synchronously, boolean get, String[] fetchGroups, int maxFetchDepth)
 	throws ModuleException
 	{
 		PersistenceManager pm = getPersistenceManager();
 		try {
-			Collection articles = NLJDOHelper.getObjectList(pm, articleIDs, Article.class);
+			Collection<Article> articles = NLJDOHelper.getObjectList(pm, articleIDs, Article.class);
 
 			Trader trader = Trader.getTrader(pm);
 			trader.releaseArticles(User.getUser(pm, getPrincipal()), articles, synchronously, true);
@@ -1426,6 +1422,7 @@ implements SessionBean
 	 * @ejb.transaction type="Supports" @!This usually means that no transaction is opened which is significantly faster and recommended for all read-only EJB methods! Marco.
 	 * @ejb.permission role-name="_Guest_"
 	 */
+	@SuppressWarnings("unchecked")
 	public Set<CustomerGroupMappingID> getCustomerGroupMappingIDs()
 	{
 		PersistenceManager pm = getPersistenceManager();
@@ -1488,6 +1485,7 @@ implements SessionBean
 	 * @ejb.transaction type="Supports" @!This usually means that no transaction is opened which is significantly faster and recommended for all read-only EJB methods! Marco.
 	 * @ejb.permission role-name="_Guest_"
 	 */
+	@SuppressWarnings("unchecked")
 	public Set<CustomerGroupID> getCustomerGroupIDs(String organisationID, boolean inverse)
 	{
 		PersistenceManager pm = getPersistenceManager();

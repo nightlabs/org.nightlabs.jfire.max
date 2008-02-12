@@ -247,7 +247,7 @@ implements
 	 * @return Returns instances of <code>ProductType</code>.
 	 */
 	@SuppressWarnings("unchecked")
-	public static Collection<ProductType> getChildProductTypes(PersistenceManager pm, ProductTypeID parentProductTypeID)
+	public static Collection<? extends ProductType> getChildProductTypes(PersistenceManager pm, ProductTypeID parentProductTypeID)
 	{
 		if (parentProductTypeID == null) {
 			Query q = pm.newNamedQuery(ProductType.class, "getChildProductTypes_topLevel");

@@ -46,6 +46,11 @@ import org.nightlabs.jfire.security.User;
  */
 public class LogEntry implements Serializable {
 
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = 1L;
+
 	////////BEGIN OF PRIMARY KEY(S) ////////////
 	/**
 	 * @jdo.field primary-key="true"

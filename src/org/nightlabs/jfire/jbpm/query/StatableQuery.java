@@ -19,6 +19,10 @@ import org.nightlabs.jfire.trade.state.id.StateDefinitionID;
 public class StatableQuery 
 extends JDOQuery<Statable> 
 {	
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = 1L;
 	private static final Logger logger = Logger.getLogger(StatableQuery.class);
 	
 //	public abstract Class getStatableClass();

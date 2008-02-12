@@ -18,6 +18,11 @@ public abstract class AbstractActionHandler
 implements ActionHandler
 {
 	/**
+	 * 
+	 */
+	private static final long serialVersionUID = 1L;
+
+	/**
 	 * This variable name references the toString()-representation of the {@link ObjectID} which
 	 * references the instance of {@link Statable} for which the {@link ProcessInstance} has been
 	 * created.

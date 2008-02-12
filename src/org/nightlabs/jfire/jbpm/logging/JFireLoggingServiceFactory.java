@@ -33,6 +33,11 @@ import org.jbpm.svc.ServiceFactory;
  */
 public class JFireLoggingServiceFactory implements ServiceFactory {
 
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = 1L;
+
 	public Service openService() {
 		return new JFireLoggingService();
 	}

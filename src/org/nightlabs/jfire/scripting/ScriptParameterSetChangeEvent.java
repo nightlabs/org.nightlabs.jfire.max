@@ -44,10 +44,6 @@ import org.nightlabs.jfire.jdo.controller.JDOObjectController;
  *
  */
 public class ScriptParameterSetChangeEvent extends JDOObjectChangeEvent {
-
-	/**
-	 * 
-	 */
 	private static final long serialVersionUID = 1L;
 	public static final String EVENT_TYPE_SET_ADDED = "setAdded";
 	public static final String EVENT_TYPE_PARAMETER_ADDED = "parameterAdded";

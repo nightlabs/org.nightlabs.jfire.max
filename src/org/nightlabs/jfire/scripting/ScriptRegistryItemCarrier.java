@@ -42,10 +42,6 @@ import org.nightlabs.util.Util;
  *
  */
 public class ScriptRegistryItemCarrier implements Serializable {
-
-	/**
-	 * 
-	 */
 	private static final long serialVersionUID = 1L;
 
 	/**

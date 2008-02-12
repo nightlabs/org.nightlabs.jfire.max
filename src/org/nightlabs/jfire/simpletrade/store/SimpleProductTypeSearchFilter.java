@@ -37,10 +37,6 @@ import org.nightlabs.jfire.store.ProductTypeSearchFilter;
  *
  */
 public class SimpleProductTypeSearchFilter extends ProductTypeSearchFilter {
-
-	/**
-	 * 
-	 */
 	private static final long serialVersionUID = 1L;
 
 	/**

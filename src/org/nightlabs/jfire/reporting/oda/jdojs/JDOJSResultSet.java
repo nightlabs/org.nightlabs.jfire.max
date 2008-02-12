@@ -33,10 +33,6 @@ import org.nightlabs.jfire.reporting.oda.ResultSet;
  *
  */
 public class JDOJSResultSet extends ResultSet {
-
-	/**
-	 * 
-	 */
 	private static final long serialVersionUID = 1L;
 	
 	public JDOJSResultSet(JDOJSResultSetMetaData metaData) {

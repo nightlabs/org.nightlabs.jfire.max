@@ -47,10 +47,6 @@ import org.nightlabs.i18n.I18nText;
  * @jdo.fetch-group name="ReportRegistryItem.name" fields="reportRegistryItem, names"
  */
 public class ReportRegistryItemName extends I18nText {
-	
-	/**
-	 * 
-	 */
 	private static final long serialVersionUID = 1L;
 	
 	

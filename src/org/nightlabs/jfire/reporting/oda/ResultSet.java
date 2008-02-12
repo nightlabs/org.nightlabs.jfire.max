@@ -52,10 +52,6 @@ import org.eclipse.datatools.connectivity.oda.OdaException;
  *
  */
 public abstract class ResultSet implements IResultSet, Serializable {
-
-	/**
-	 * 
-	 */
 	private static final long serialVersionUID = 1L;
 	private Collection<Object> collection;
 	private transient Iterator iterator;

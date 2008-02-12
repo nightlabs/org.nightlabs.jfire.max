@@ -66,10 +66,6 @@ public class ReportingManagerFactory implements Serializable {
 	 * The Log4J Logger used for this class.
 	 */
 	private static final Logger logger = Logger.getLogger(ReportingManagerFactory.class);
-	
-	/**
-	 * 
-	 */
 	private static final long serialVersionUID = 1L;
 
 	public static final String JNDI_PREFIX = "java:/jfire/reportingManagerFactory/";

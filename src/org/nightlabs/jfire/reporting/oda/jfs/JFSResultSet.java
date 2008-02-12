@@ -11,10 +11,6 @@ import org.nightlabs.jfire.reporting.oda.ResultSetMetaData;
  *
  */
 public class JFSResultSet extends ResultSet {
-
-	/**
-	 * 
-	 */
 	private static final long serialVersionUID = 1L;
 
 	/**

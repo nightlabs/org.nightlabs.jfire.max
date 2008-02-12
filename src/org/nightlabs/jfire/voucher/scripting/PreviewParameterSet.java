@@ -12,6 +12,10 @@ import org.nightlabs.jfire.store.id.ProductTypeID;
 public class PreviewParameterSet 
 implements Serializable 
 {
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = 1L;
 	public PreviewParameterSet(ProductTypeID voucherTypeID) {
 		this(voucherTypeID, null);
 	}

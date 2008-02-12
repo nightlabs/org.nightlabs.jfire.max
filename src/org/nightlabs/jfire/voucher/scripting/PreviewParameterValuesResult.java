@@ -20,6 +20,10 @@ import org.nightlabs.jfire.voucher.store.VoucherType;
 public class PreviewParameterValuesResult 
 implements Serializable 
 {
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = 1L;
 	private static final String[] FETCH_GROUPS_CURRENCY = new String[] {
 		FetchPlan.DEFAULT,
 	};

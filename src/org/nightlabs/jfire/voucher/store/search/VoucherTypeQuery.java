@@ -13,6 +13,11 @@ public class VoucherTypeQuery
 extends ProductTypeQuery 
 {
 
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = 1L;
+
 	public VoucherTypeQuery() {
 	}
 

@@ -33,6 +33,11 @@ import org.nightlabs.jfire.voucher.store.VoucherType;
 public class ServerDeliveryProcessorClientSideVoucherPrint 
 extends ServerDeliveryProcessor 
 {
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = 1L;
+
 	public static ServerDeliveryProcessorClientSideVoucherPrint getServerDeliveryProcessorClientSideVoucherPrint(PersistenceManager pm)
 	{
 		ServerDeliveryProcessorClientSideVoucherPrint serverDeliveryProcessor;

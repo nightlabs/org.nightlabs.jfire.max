@@ -123,6 +123,10 @@ public abstract class VoucherManagerBean
 extends BaseSessionBeanImpl 
 implements SessionBean 
 {
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = 1L;
 	private static final Logger logger = Logger.getLogger(VoucherManagerBean.class);
 
 	@Override
@@ -543,7 +547,7 @@ implements SessionBean
 		if (offerID == null) {
 			Collection<Offer> offers = Offer.getNonFinalizedNonEndedOffers(pm, order);
 			if (!offers.isEmpty()) {
-				offer = (Offer) offers.iterator().next();
+				offer = offers.iterator().next();
 			} else {
 				offer = trader.createOffer(user, order, String.valueOf(Calendar
 						.getInstance().get(Calendar.YEAR)));

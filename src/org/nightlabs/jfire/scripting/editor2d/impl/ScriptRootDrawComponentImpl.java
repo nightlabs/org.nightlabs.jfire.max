@@ -50,6 +50,10 @@ public class ScriptRootDrawComponentImpl
 extends RootDrawComponentImpl 
 implements ScriptRootDrawComponent
 {
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = 1L;
 	private static final Logger logger = Logger.getLogger(ScriptRootDrawComponentImpl.class);
 	
 	public void assignScriptResults(Map<ScriptRegistryItemID, Object> scriptValues) 

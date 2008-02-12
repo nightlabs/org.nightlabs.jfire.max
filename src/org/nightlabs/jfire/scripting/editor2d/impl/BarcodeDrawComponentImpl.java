@@ -54,6 +54,10 @@ public class BarcodeDrawComponentImpl
 extends DrawComponentImpl 
 implements BarcodeDrawComponent 
 {
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = 1L;
 	public static final Logger logger = Logger.getLogger(BarcodeDrawComponentImpl.class);
 	
 	public BarcodeDrawComponentImpl() {

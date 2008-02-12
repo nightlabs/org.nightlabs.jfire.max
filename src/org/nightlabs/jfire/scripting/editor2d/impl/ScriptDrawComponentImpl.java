@@ -38,6 +38,10 @@ public abstract class ScriptDrawComponentImpl
 extends DrawComponentImpl 
 implements ScriptDrawComponent
 {
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = 1L;
 	private transient ScriptRegistryItemID scriptRegistryItemID = null;
 	private String scriptRegistryItemIDKeyStr = null;
 

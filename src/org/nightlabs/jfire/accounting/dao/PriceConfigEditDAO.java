@@ -21,6 +21,8 @@ public class PriceConfigEditDAO
 extends BaseJDOObjectDAO<ProductTypeID, ProductType>
 {
 	private static PriceConfigEditDAO sharedInstance;
+	
+	public static final String PRICE_CONFIG_EDITING_SCOPE = "getProductTypeForPriceConfigEditing";
 
 	public static PriceConfigEditDAO sharedInstance() {
 		if (sharedInstance == null) {
@@ -51,7 +53,7 @@ extends BaseJDOObjectDAO<ProductTypeID, ProductType>
 
 	public ProductType getProductTypeForPriceConfigEditing(ProductTypeID productTypeID, ProgressMonitor monitor)
 	{
-		return getJDOObject("getProductTypeForPriceConfigEditing", productTypeID, null, NLJDOHelper.MAX_FETCH_DEPTH_NO_LIMIT, monitor);
+		return getJDOObject(PRICE_CONFIG_EDITING_SCOPE, productTypeID, null, NLJDOHelper.MAX_FETCH_DEPTH_NO_LIMIT, monitor);
 	}
 
 	// public void storePriceConfigForProductType(ProductType productType,

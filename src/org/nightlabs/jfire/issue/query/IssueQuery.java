@@ -111,13 +111,20 @@ extends JDOQuery<Issue> {
 		}
 		
 		if (objectIDs != null) {
-			for (ObjectID objectID : objectIDs) {
-				
+			for (int i = 0; i < objectIDs.size(); i++) {
+				ObjectID objectID = objectIDs.iterator().next();
 //				issueComment = ".*" + issueComment.toLowerCase() + ".*";
 				String objectIDString = objectID.toString();
-				filter.append("( this.referencedObjectIDs.contains(varObjectID) && varObjectID.matches(\"" + objectIDString + "\") ) &&");
-				q.declareVariables(String.class.getName() + " varObjectID");
+				filter.append("( this.referencedObjectIDs.contains(varObjectID"+i+") && varObjectID"+i+".matches(\"" + objectIDString + "\") )");
+				q.declareVariables(String.class.getName() + " varObjectID" + i);
+				
+				if (i != objectIDs.size() - 1) {
+					 filter.append("||");
+				}
+				
 			}
+			
+			filter.append("&& ");
 		}
 		
 		filter.append("(1 == 1)");

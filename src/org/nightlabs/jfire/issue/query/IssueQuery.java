@@ -42,14 +42,12 @@ extends JDOQuery<Issue> {
 		StringBuffer filter = new StringBuffer();
 		
 		if (issueSubject != null) {
-//			issueSubject = ".*" + Pattern.quote(issueSubject.toLowerCase()) + ".*";
 			issueSubject = ".*" + issueSubject.toLowerCase() + ".*";
 			filter.append("( this.subject.names.containsValue(varSubject) && varSubject.toLowerCase().matches(\"" + issueSubject + "\") ) &&");
 			q.declareVariables(String.class.getName() + " varSubject");
 		}
 		
 		if (issueComment != null) {
-//			issueSubject = ".*" + Pattern.quote(issueSubject.toLowerCase()) + ".*";
 			issueComment = ".*" + issueComment.toLowerCase() + ".*";
 			filter.append("( this.comments.contains(varComment) && varComment.text.toLowerCase().matches(\"" + issueComment + "\") ) &&");
 			q.declareVariables(IssueComment.class.getName() + " varComment");
@@ -113,9 +111,13 @@ extends JDOQuery<Issue> {
 		}
 		
 		if (objectIDs != null) {
-//			filter.append("JDOHelper.getObjectId(this.updateTimestamp) == :updateTimestamp && ");
-			
-			filter.append("( this.updateTimestamp >= :updateTimestamp ) &&");
+			for (ObjectID objectID : objectIDs) {
+				
+//				issueComment = ".*" + issueComment.toLowerCase() + ".*";
+				String objectIDString = objectID.toString();
+				filter.append("( this.referencedObjectIDs.contains(varObjectID) && varObjectID.matches(\"" + objectIDString + "\") ) &&");
+				q.declareVariables(String.class.getName() + " varObjectID");
+			}
 		}
 		
 		filter.append("(1 == 1)");

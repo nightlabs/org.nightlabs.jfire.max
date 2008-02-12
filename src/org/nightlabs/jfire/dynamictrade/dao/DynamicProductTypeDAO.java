@@ -32,7 +32,6 @@ implements IJDOObjectDAO<DynamicProductType>
 	}
 
 	@Override
-	@SuppressWarnings("unchecked")
 	@Implement
 	protected Collection<DynamicProductType> retrieveJDOObjects(
 			Set<ProductTypeID> dynamicProductTypeIDs, String[] fetchGroups, int maxFetchDepth,
@@ -53,7 +52,6 @@ implements IJDOObjectDAO<DynamicProductType>
 
 	private DynamicTradeManager dynamicTradeManager;
 
-	@SuppressWarnings("unchecked")
 	public synchronized List<DynamicProductType> getChildDynamicProductTypes(ProductTypeID parentDynamicProductTypeID,
 			String[] fetchGroups, int maxFetchDepth,
 			ProgressMonitor monitor)
@@ -71,7 +69,6 @@ implements IJDOObjectDAO<DynamicProductType>
 		}
 	}
 
-	@SuppressWarnings("unchecked")
 	public List<DynamicProductType> getDynamicProductTypes(Byte inheritanceNature, Boolean saleable, String[] fetchGroups, int maxFetchDepth,
 			ProgressMonitor monitor)
 	{

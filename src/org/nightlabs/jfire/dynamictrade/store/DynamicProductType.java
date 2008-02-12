@@ -12,7 +12,7 @@ import org.nightlabs.jfire.store.id.ProductTypeID;
 /**
  * @author Marco Schulze - marco at nightlabs dot de
  * 
- * @jdo.persistence-capable 
+ * @jdo.persistence-capable
  *		identity-type="application"
  *		persistence-capable-superclass="org.nightlabs.jfire.store.ProductType"
  *		detachable="true"
@@ -51,15 +51,15 @@ extends ProductType
 	 * @param parentProductTypeID The <tt>ProductType</tt> of which to find all children or <tt>null</tt> to find all top-level-<tt>DynamicProductType</tt>s.
 	 * @return Returns instances of <tt>DynamicProductType</tt>.
 	 */
-	public static Collection getChildProductTypes(PersistenceManager pm, ProductTypeID parentProductTypeID)
+	public static Collection<DynamicProductType> getChildProductTypes(PersistenceManager pm, ProductTypeID parentProductTypeID)
 	{
 		if (parentProductTypeID == null) {
 			Query q = pm.newNamedQuery(DynamicProductType.class, "getChildProductTypes_topLevel");
-			return (Collection)q.execute();
+			return (Collection<DynamicProductType>)q.execute();
 		}
 
 		Query q = pm.newNamedQuery(DynamicProductType.class, "getChildProductTypes_hasParent");
-		return (Collection) q.execute(
+		return (Collection<DynamicProductType>) q.execute(
 			parentProductTypeID.organisationID, parentProductTypeID.productTypeID);
 	}
 

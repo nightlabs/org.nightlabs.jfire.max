@@ -38,6 +38,7 @@ import org.nightlabs.jfire.organisation.LocalOrganisation;
 import org.nightlabs.jfire.organisation.Organisation;
 import org.nightlabs.jfire.security.User;
 import org.nightlabs.jfire.store.CannotPublishProductTypeException;
+import org.nightlabs.jfire.store.Product;
 import org.nightlabs.jfire.store.ProductType;
 import org.nightlabs.jfire.store.Store;
 import org.nightlabs.jfire.store.Unit;
@@ -59,9 +60,9 @@ import org.nightlabs.jfire.trade.id.SegmentID;
 import org.nightlabs.util.Util;
 
 /**
- * @ejb.bean name="jfire/ejb/JFireDynamicTrade/DynamicTradeManager"	
+ * @ejb.bean name="jfire/ejb/JFireDynamicTrade/DynamicTradeManager"
  *					 jndi-name="jfire/ejb/JFireDynamicTrade/DynamicTradeManager"
- *					 type="Stateless" 
+ *					 type="Stateless"
  *					 transaction-type="Container"
  *
  * @ejb.util generate="physical"
@@ -86,7 +87,7 @@ implements SessionBean
 	
 	/**
 	 * @ejb.create-method
-	 * @ejb.permission role-name="_Guest_"	
+	 * @ejb.permission role-name="_Guest_"
 	 */
 	public void ejbCreate() throws CreateException
 	{
@@ -103,7 +104,7 @@ implements SessionBean
 	 * It creates the root DynamicProductType for the organisation itself.
 	 * DynamicProductTypes of other organisations cannot be imported or
 	 * traded as reseller.
-	 * @throws CannotPublishProductTypeException 
+	 * @throws CannotPublishProductTypeException
 	 *
 	 * @ejb.interface-method
 	 * @ejb.permission role-name="_System_"
@@ -171,7 +172,6 @@ implements SessionBean
 	 * @ejb.transaction type="Supports" @!This usually means that no transaction is opened which is significantly faster and recommended for all read-only EJB methods! Marco.
 	 * @ejb.permission role-name="_Guest_"
 	 */
-	@SuppressWarnings("unchecked")
 	public Set<ProductTypeID> getChildDynamicProductTypeIDs(
 			ProductTypeID parentDynamicProductTypeID) {
 		PersistenceManager pm = getPersistenceManager();
@@ -224,7 +224,6 @@ implements SessionBean
 	 * @ejb.transaction type="Supports" @!This usually means that no transaction is opened which is significantly faster and recommended for all read-only EJB methods! Marco.
 	 * @ejb.permission role-name="_Guest_"
 	 */
-	@SuppressWarnings("unchecked")
 	public List<DynamicProductType> getDynamicProductTypes(
 			Collection<ProductTypeID> dynamicProductTypeIDs, String[] fetchGroups,
 			int maxFetchDepth) {
@@ -308,7 +307,6 @@ implements SessionBean
 	 * @ejb.transaction type="Required"
 	 * @ejb.permission role-name="_Guest_"
 	 */
-	@SuppressWarnings("unchecked")
 	public Collection<DynamicTradePriceConfig> storeDynamicTradePriceConfigs(Collection<DynamicTradePriceConfig> priceConfigs, boolean get, AssignInnerPriceConfigCommand assignInnerPriceConfigCommand)
 	throws PriceCalculationException
 	{
@@ -317,7 +315,7 @@ implements SessionBean
 			if (get) {
 				pm.getFetchPlan().setMaxFetchDepth(NLJDOHelper.MAX_FETCH_DEPTH_NO_LIMIT);
 				pm.getFetchPlan().setGroups(new String[] {
-						FetchPlan.DEFAULT, 
+						FetchPlan.DEFAULT,
 						FetchGroupsPriceConfig.FETCH_GROUP_EDIT});
 			}
 
@@ -374,7 +372,6 @@ implements SessionBean
 	 * @ejb.permission role-name="_Guest_"
 	 * @ejb.transaction type="Supports" @!This usually means that no transaction is opened which is significantly faster and recommended for all read-only EJB methods! Marco.
 	 */
-	@SuppressWarnings("unchecked")
 	public List<DynamicTradePriceConfig> getDynamicTradePriceConfigs(Collection<PriceConfigID> dynamicTradePriceConfigIDs, String[] fetchGroups, int maxFetchDepth)
 	{
 		PersistenceManager pm = getPersistenceManager();
@@ -437,9 +434,9 @@ implements SessionBean
 			// find an Offer within the Order which is not finalized - or create one
 			Offer offer;
 			if (offerID == null) {
-				Collection offers = Offer.getNonFinalizedNonEndedOffers(pm, order);
+				Collection<Offer> offers = Offer.getNonFinalizedNonEndedOffers(pm, order);
 				if (!offers.isEmpty()) {
-					offer = (Offer) offers.iterator().next();
+					offer = offers.iterator().next();
 				}
 				else {
 					offer = trader.createOffer(user, order, null); // TODO offerIDPrefix ???
@@ -451,7 +448,7 @@ implements SessionBean
 			}
 
 			// find / create Products
-			Collection products = store.findProducts(user, productType, null, null); // we create exactly one => no NestedProductTypeLocal needed
+			Collection<? extends Product> products = store.findProducts(user, productType, null, null); // we create exactly one => no NestedProductTypeLocal needed
 			if (products.size() != 1)
 				throw new IllegalStateException("store.findProducts(...) created " + products.size() + " instead of exactly 1 product!");
 
@@ -461,7 +458,7 @@ implements SessionBean
 			product.setQuantity(quantity);
 			product.setUnit(unit);
 
-			Collection articles = trader.createArticles(
+			Collection<? extends Article> articles = trader.createArticles(
 					user, offer, segment,
 					products,
 					new ArticleCreator(tariff),
@@ -475,7 +472,7 @@ implements SessionBean
 			if (fetchGroups != null)
 				pm.getFetchPlan().setGroups(fetchGroups);
 
-			return (Article) pm.detachCopy(articles.iterator().next());
+			return pm.detachCopy(articles.iterator().next());
 		} finally {
 			pm.close();
 		}

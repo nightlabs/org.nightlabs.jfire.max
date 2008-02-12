@@ -2,7 +2,6 @@ package org.nightlabs.jfire.dynamictrade.store;
 
 import org.nightlabs.annotation.Implement;
 import org.nightlabs.jfire.accounting.Price;
-import org.nightlabs.jfire.dynamictrade.accounting.priceconfig.DynamicTradePriceConfig;
 import org.nightlabs.jfire.security.User;
 import org.nightlabs.jfire.store.BundleProduct;
 import org.nightlabs.jfire.store.NestedProductTypeLocal;
@@ -10,13 +9,11 @@ import org.nightlabs.jfire.store.Product;
 import org.nightlabs.jfire.store.ProductLocator;
 import org.nightlabs.jfire.store.ProductType;
 import org.nightlabs.jfire.store.Unit;
-import org.nightlabs.jfire.trade.Article;
-import org.nightlabs.jfire.trade.ArticlePrice;
 
 /**
  * @author Marco Schulze - marco at nightlabs dot de
  * 
- * @jdo.persistence-capable 
+ * @jdo.persistence-capable
  *		identity-type="application"
  *		persistence-capable-superclass="org.nightlabs.jfire.store.Product"
  *		detachable="true"

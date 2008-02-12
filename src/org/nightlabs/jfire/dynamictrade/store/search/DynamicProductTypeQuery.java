@@ -9,8 +9,8 @@ import org.nightlabs.jfire.store.search.ProductTypeQuery;
  * @author Daniel.Mazurek [at] NightLabs [dot] de
  *
  */
-public class DynamicProductTypeQuery 
-extends ProductTypeQuery 
+public class DynamicProductTypeQuery
+extends ProductTypeQuery<DynamicProductType>
 {
 	/**
 	 * 
@@ -21,7 +21,7 @@ extends ProductTypeQuery
 	}
 
 	@Override
-	protected Query prepareQuery() 
+	protected Query prepareQuery()
 	{
 		super.prepareQuery();
 		// FIXME: Query also subclasses when JPOX problem is solved

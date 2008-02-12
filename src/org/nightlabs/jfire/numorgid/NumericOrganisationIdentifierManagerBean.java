@@ -33,6 +33,11 @@ extends BaseSessionBeanImpl
 implements SessionBean
 {
 	/**
+	 * 
+	 */
+	private static final long serialVersionUID = 1L;
+
+	/**
 	 * Returns a numeric organisation ID for the current organisation if called for the root organisation.<br />
 	 * This method should only be called by organisation users.
 	 * 
@@ -143,6 +148,7 @@ implements SessionBean
 	/**
 	 * @see org.nightlabs.jfire.base.BaseSessionBeanImpl#setSessionContext(javax.ejb.SessionContext)
 	 */
+	@Override
 	public void setSessionContext(SessionContext sessionContext)
 	throws EJBException, RemoteException
 	{
@@ -151,6 +157,7 @@ implements SessionBean
 	/**
 	 * @see org.nightlabs.jfire.base.BaseSessionBeanImpl#unsetSessionContext()
 	 */
+	@Override
 	public void unsetSessionContext() {
 		super.unsetSessionContext();
 	}

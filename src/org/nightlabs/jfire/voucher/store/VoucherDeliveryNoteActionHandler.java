@@ -30,9 +30,6 @@ import org.nightlabs.jfire.trade.Article;
 public class VoucherDeliveryNoteActionHandler
 extends DeliveryNoteActionHandler
 {
-	/**
-	 * 
-	 */
 	private static final long serialVersionUID = 1L;
 	private static final Logger logger = Logger.getLogger(VoucherDeliveryNoteActionHandler.class);
 

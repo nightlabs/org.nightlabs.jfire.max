@@ -37,6 +37,10 @@ import org.nightlabs.jfire.accounting.Tariff;
 public class TariffPricePair
 implements Serializable
 {
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = 1L;
 	private Tariff tariff;
 	private Price price;
 

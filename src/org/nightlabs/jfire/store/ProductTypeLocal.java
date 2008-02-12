@@ -404,7 +404,7 @@ implements Serializable, Inheritable, InheritanceCallbacks
 //		if (this.isPackageInner())
 //			throw new IllegalStateException("This ProductType ("+getPrimaryKey()+") is marked as package-inner and can therefore not contain nested product types!");
 
-		NestedProductTypeLocal packagedProductType = (NestedProductTypeLocal)nestedProductTypeLocals.get(productTypeLocal.getPrimaryKey());
+		NestedProductTypeLocal packagedProductType = nestedProductTypeLocals.get(productTypeLocal.getPrimaryKey());
 		if (packagedProductType == null) {
 			packagedProductType = new NestedProductTypeLocal(this, productTypeLocal);
 			nestedProductTypeLocals.put(productTypeLocal.getPrimaryKey(), packagedProductType);
@@ -477,7 +477,7 @@ implements Serializable, Inheritable, InheritanceCallbacks
 		if (this.getPrimaryKey().equals(productTypePK))
 			return getSelfForVirtualSelfPackaging();
 
-		NestedProductTypeLocal res = (NestedProductTypeLocal)nestedProductTypeLocals.get(productTypePK);
+		NestedProductTypeLocal res = nestedProductTypeLocals.get(productTypePK);
 		if (res == null && throwExceptionIfNotExistent)
 			throw new IllegalArgumentException("No NestedProductTypeLocal existing with productTypePK=\""+productTypePK+"\"!");
 		return res;
@@ -492,7 +492,7 @@ implements Serializable, Inheritable, InheritanceCallbacks
 		if (this.organisationID.equals(organisationID) && this.productTypeID.equals(productTypeID))
 			return getSelfForVirtualSelfPackaging();
 
-		NestedProductTypeLocal res = (NestedProductTypeLocal)nestedProductTypeLocals.get(ProductType.getPrimaryKey(organisationID, productTypeID));
+		NestedProductTypeLocal res = nestedProductTypeLocals.get(ProductType.getPrimaryKey(organisationID, productTypeID));
 		if (res == null && throwExceptionIfNotExistent)
 			throw new IllegalArgumentException("No NestedProductTypeLocal existing with organisationID=\""+organisationID+"\", productTypeID=\""+productTypeID+"\"!");
 		return res;

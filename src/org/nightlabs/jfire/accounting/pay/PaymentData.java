@@ -60,6 +60,11 @@ public class PaymentData
 implements Serializable, TransferData
 {
 	/**
+	 * 
+	 */
+	private static final long serialVersionUID = 1L;
+
+	/**
 	 * @jdo.field primary-key="true"
 	 * @jdo.column length="100"
 	 */

@@ -33,6 +33,11 @@ public class MissingResultException extends InvalidResultException
 {
 
 	/**
+	 * 
+	 */
+	private static final long serialVersionUID = 1L;
+
+	/**
 	 * @param absolutePriceCoordinate
 	 */
 	public MissingResultException(IAbsolutePriceCoordinate absolutePriceCoordinate)

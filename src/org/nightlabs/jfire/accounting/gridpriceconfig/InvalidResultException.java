@@ -33,6 +33,11 @@ public class InvalidResultException extends PriceCalculationException
 {
 
 	/**
+	 * 
+	 */
+	private static final long serialVersionUID = 1L;
+
+	/**
 	 * @param absolutePriceCoordinate
 	 */
 	public InvalidResultException(IAbsolutePriceCoordinate absolutePriceCoordinate)

@@ -61,6 +61,11 @@ import org.nightlabs.jfire.store.deliver.id.DeliveryID;
 public class ArticleLocal
 implements Serializable, DetachCallback
 {
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = 1L;
+
 	// the following fetch-groups are virtual and processed in the detach callback
 	public static final String FETCH_GROUP_DELIVERY_ID = "Article.deliveryID";
 

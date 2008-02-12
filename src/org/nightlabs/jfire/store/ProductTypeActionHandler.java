@@ -368,7 +368,7 @@ public abstract class ProductTypeActionHandler
 					segments = pm.makePersistentAll(segments);
 					segmentIDs = NLJDOHelper.getObjectIDSet(segments);
 				}
-				partnerSegmentID = (SegmentID) segmentIDs.iterator().next();
+				partnerSegmentID = segmentIDs.iterator().next();
 //				Set partnerSegmentTypeIDs = Segment.getSegmentTypeIDs(pm, partnerOrder);
 //				if (!segmentTypeIDs.equals(partnerSegmentTypeIDs))
 //					tradeManager.createCrossTradeSegments(partnerOrderID, segmentTypeIDs);
@@ -420,7 +420,7 @@ public abstract class ProductTypeActionHandler
 			Store store = Store.getStore(pm);
 
 			for (Map.Entry<ProductType, Collection<NestedProductTypeLocal>> me : productType2NestedProductTypes.entrySet()) {
-				ProductType productType = (ProductType) me.getKey();
+				ProductType productType = me.getKey();
 				Collection<NestedProductTypeLocal> nestedProductTypeLocals = me.getValue();
 //				ProductTypeActionHandler productTypeActionHandler = ProductTypeActionHandler.getProductTypeActionHandler(pm, productType.getClass());
 

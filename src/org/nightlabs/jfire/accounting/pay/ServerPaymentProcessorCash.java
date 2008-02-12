@@ -53,6 +53,11 @@ public class ServerPaymentProcessorCash
 extends ServerPaymentProcessor
 // implements StoreCallback
 {
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = 1L;
+
 	public static ServerPaymentProcessorCash getServerPaymentProcessorCash(PersistenceManager pm)
 	{
 		ServerPaymentProcessorCash serverPaymentProcessorCash;

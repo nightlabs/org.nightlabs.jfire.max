@@ -10,6 +10,11 @@ import org.nightlabs.jfire.transfer.query.AbstractTransferQuery;
 public abstract class AbstractMoneyTransferQuery<T>
 extends AbstractTransferQuery<T>
 {
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = 1L;
+
 	@Override
 	protected Class<? extends Transfer> getCandidateClass()
 	{

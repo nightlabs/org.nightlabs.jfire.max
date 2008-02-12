@@ -34,6 +34,11 @@ import org.nightlabs.jdo.search.SearchFilter;
  */
 public abstract class ProductTypeGroupSearchFilter extends SearchFilter {
 
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = 1L;
+
 	public ProductTypeGroupSearchFilter(int conjunction) {
 		super(conjunction);
 	}

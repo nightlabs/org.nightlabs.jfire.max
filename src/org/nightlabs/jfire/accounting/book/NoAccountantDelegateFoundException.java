@@ -37,6 +37,11 @@ public class NoAccountantDelegateFoundException extends Exception {
 	/**
 	 * 
 	 */
+	private static final long serialVersionUID = 1L;
+
+	/**
+	 * 
+	 */
 	public NoAccountantDelegateFoundException() {
 		super();
 	}

@@ -57,6 +57,12 @@ import org.nightlabs.jfire.transfer.Anchor;
 public class LocalAccountant extends Accountant {
 	
 	/**
+	 * 
+	 */
+	private static final long serialVersionUID = 1L;
+
+
+	/**
 	 * @deprecated Do not use! Only for JDO!
 	 */
 	@Deprecated

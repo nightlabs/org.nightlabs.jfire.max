@@ -32,6 +32,11 @@ package org.nightlabs.jfire.store;
 public class NotAvailableException extends StoreException
 {
 
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = 1L;
+
 	public NotAvailableException()
 	{
 		super();

@@ -77,7 +77,7 @@ public class ProductTypeMapFieldMetaData
 
 		String skey = (String)key;
 		
-		ProductTypeMapEntryMetaData memd = (ProductTypeMapEntryMetaData)mapEntryMetaDataMap.get(skey);
+		ProductTypeMapEntryMetaData memd = mapEntryMetaDataMap.get(skey);
 		if (memd == null) {
 			memd = new ProductTypeMapEntryMetaData(this, skey);
 			mapEntryMetaDataMap.put(skey, memd);

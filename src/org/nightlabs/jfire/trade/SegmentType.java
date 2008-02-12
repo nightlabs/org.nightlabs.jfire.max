@@ -67,6 +67,10 @@ import org.nightlabs.jfire.trade.id.SegmentTypeID;
  */
 public class SegmentType implements Serializable
 {
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = 1L;
 	public static final String FETCH_GROUP_THIS_SEGMENT_TYPE = "SegmentType.this";
 	public static final String FETCH_GROUP_NAME = "SegmentType.name";
 

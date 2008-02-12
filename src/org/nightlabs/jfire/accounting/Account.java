@@ -174,6 +174,7 @@ public class Account extends Anchor
 	/**
 	 * @deprecated Only for JDO!
 	 */
+	@Deprecated
 	protected Account() { }
 
 	public static final String ANCHOR_TYPE_ID_ACCOUNT = "Account";

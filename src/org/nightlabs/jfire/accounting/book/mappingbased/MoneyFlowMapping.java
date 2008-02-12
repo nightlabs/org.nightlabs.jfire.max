@@ -68,6 +68,10 @@ import org.nightlabs.util.Util;
  */
 public abstract class MoneyFlowMapping implements Serializable {
 
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = 1L;
 	public static final String PACKAGE_TYPE_PACKAGE = "package-outer";
 	public static final String PACKAGE_TYPE_INNER = "package-inner";
 

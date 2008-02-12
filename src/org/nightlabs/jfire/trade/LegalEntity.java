@@ -407,7 +407,7 @@ public class LegalEntity extends Anchor
 		if (productID == null)
 			throw new IllegalArgumentException("JDOHelper.getObjectId(product) returned null!");
 
-		ProductReference productReference = (ProductReference) productReferenceMap.get(productID);
+		ProductReference productReference = productReferenceMap.get(productID);
 		if (productReference == null) {
 			productReference = new ProductReference(this, product);
 			productReferenceMap.put(productID, productReference);

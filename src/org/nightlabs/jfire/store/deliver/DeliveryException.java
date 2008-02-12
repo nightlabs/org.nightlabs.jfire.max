@@ -33,6 +33,10 @@ import org.nightlabs.ModuleException;
  */
 public class DeliveryException extends ModuleException
 {
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = 1L;
 	private DeliveryResult deliveryResult;
 
 	public DeliveryException()

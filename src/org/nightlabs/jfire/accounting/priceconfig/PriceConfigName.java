@@ -88,6 +88,7 @@ public class PriceConfigName extends I18nText
 	/**
 	 * @deprecated Only for JDO!
 	 */
+	@Deprecated
 	protected PriceConfigName() { }
 
 	public PriceConfigName(PriceConfig priceConfig)

@@ -12,6 +12,11 @@ import org.nightlabs.jfire.store.ReceptionNote;
 public class ReceptionNoteQuickSearchQuery 
 extends AbstractArticleContainerQuickSearchQuery 
 {
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = 1L;
+
 	@Override
 	public Class getArticleContainerClass() {
 		return ReceptionNote.class;

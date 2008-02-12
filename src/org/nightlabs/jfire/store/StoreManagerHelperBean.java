@@ -76,6 +76,11 @@ implements SessionBean
 	////////////////////// EJB "constuctor" ////////////////////////////
 	
 	/**
+	 * 
+	 */
+	private static final long serialVersionUID = 1L;
+
+	/**
 	 * @ejb.create-method	
 	 * @ejb.permission role-name="_Guest_"
 	 */

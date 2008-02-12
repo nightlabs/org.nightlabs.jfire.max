@@ -375,7 +375,7 @@ implements Serializable
 	public void removeAllNestedProductLocals()
 	{
 		for (Iterator<ProductLocal> it = nestedProductLocals.iterator(); it.hasNext(); ) {
-			ProductLocal productLocal = (ProductLocal) it.next();
+			ProductLocal productLocal = it.next();
 			productLocal.setPackageProductLocal(null);
 			productLocal.incQuantity();
 			it.remove();

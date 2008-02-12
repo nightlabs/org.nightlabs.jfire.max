@@ -12,6 +12,11 @@ import org.nightlabs.jfire.trade.Order;
 public class OrderQuickSearchQuery 
 extends AbstractArticleContainerQuickSearchQuery 
 {
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = 1L;
+
 	@Override
 	public Class getArticleContainerClass() {
 		return Order.class;

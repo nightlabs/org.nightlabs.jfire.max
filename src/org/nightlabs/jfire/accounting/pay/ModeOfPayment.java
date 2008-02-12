@@ -173,7 +173,7 @@ implements Serializable
 	}
 	public ModeOfPaymentFlavour getFlavour(String modeOfPaymentFlavourPK, boolean throwExceptionIfNotExistent)
 	{
-		ModeOfPaymentFlavour res = (ModeOfPaymentFlavour) flavours.get(modeOfPaymentFlavourPK);
+		ModeOfPaymentFlavour res = flavours.get(modeOfPaymentFlavourPK);
 		if (throwExceptionIfNotExistent && res == null)
 			throw new IllegalArgumentException("No ModeOfPaymentFlavour with modeOfPaymentFlavourPK=\"" + modeOfPaymentFlavourPK + "\" in the ModeOfPayment \"" + getPrimaryKey() + "\" existing!");
 		return res;
@@ -194,7 +194,7 @@ implements Serializable
 	public ModeOfPaymentFlavour createFlavour(String organisationID, String modeOfPaymentFlavourID)
 	{
 		String modeOfPaymentFlavourPK = ModeOfPaymentFlavour.getPrimaryKey(organisationID, modeOfPaymentFlavourID);
-		ModeOfPaymentFlavour res = (ModeOfPaymentFlavour) flavours.get(modeOfPaymentFlavourPK);
+		ModeOfPaymentFlavour res = flavours.get(modeOfPaymentFlavourPK);
 		if (res == null) {
 			res = new ModeOfPaymentFlavour(organisationID, modeOfPaymentFlavourID, this);
 			flavours.put(modeOfPaymentFlavourPK, res);

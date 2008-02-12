@@ -50,6 +50,7 @@ public class OfferPrice extends org.nightlabs.jfire.accounting.Price
 	/**
 	 * @deprecated Only for JDO!
 	 */
+	@Deprecated
 	protected OfferPrice() { }
 
 	/**

@@ -17,6 +17,10 @@ import org.nightlabs.jfire.transfer.id.AnchorID;
 public class ArticleContainerQuery 
 extends JDOQuery<ArticleContainer>
 {
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = 1L;
 	private static final Logger logger = Logger.getLogger(ArticleContainerQuery.class);
 	
 	public ArticleContainerQuery(Class articleContainerClass) 

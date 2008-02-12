@@ -25,6 +25,11 @@ public class TradeConfigModule
 		extends ConfigModule
 {
 	/**
+	 * 
+	 */
+	private static final long serialVersionUID = 1L;
+
+	/**
 	 * Which currency is used by the user group / user.
 	 * TODO Maybe we should store the Currency per Organisation, because usually all accounting activities are
 	 * performed in ONE currency?!

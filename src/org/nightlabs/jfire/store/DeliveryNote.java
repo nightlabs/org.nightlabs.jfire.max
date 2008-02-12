@@ -128,6 +128,10 @@ import org.nightlabs.util.Util;
 public class DeliveryNote
 implements Serializable, ArticleContainer, Statable, DetachCallback
 {
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = 1L;
 	public static final String FETCH_GROUP_DELIVERY_NOTE_LOCAL = "DeliveryNote.deliveryNoteLocal";
 	public static final String FETCH_GROUP_ARTICLES = "DeliveryNote.articles";
 	public static final String FETCH_GROUP_CREATE_USER = "DeliveryNote.createUser";

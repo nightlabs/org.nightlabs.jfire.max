@@ -94,6 +94,7 @@ implements Serializable
 	/**
 	 * @deprecated Only for JDO!
 	 */
+	@Deprecated
 	protected AccountType() { }
 
 	public AccountType(AccountTypeID accountTypeID, boolean outside)

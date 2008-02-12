@@ -40,6 +40,10 @@ import org.nightlabs.jfire.transfer.id.AnchorID;
  */
 public class AccountSearchFilter extends SearchFilter {
 	
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = 1L;
 	private AnchorID owner;
 	private String anchorTypeID;
 	private AccountTypeID accountTypeID;

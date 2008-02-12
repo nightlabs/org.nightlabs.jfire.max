@@ -124,6 +124,7 @@ implements Serializable
 	/**
 	 * @deprecated Only for JDO!
 	 */
+	@Deprecated
 	protected RepositoryType() { }
 
 	public RepositoryType(RepositoryTypeID repositoryTypeID, boolean outside)

@@ -37,6 +37,11 @@ public class OrderNotFoundException extends ModuleException {
 	/**
 	 * 
 	 */
+	private static final long serialVersionUID = 1L;
+
+	/**
+	 * 
+	 */
 	public OrderNotFoundException() {
 		super();
 	}

@@ -12,6 +12,11 @@ import org.nightlabs.jfire.accounting.Invoice;
 public class InvoiceQuickSearchQuery 
 extends AbstractArticleContainerQuickSearchQuery 
 {
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = 1L;
+
 	@Override
 	public Class getArticleContainerClass() {
 		return Invoice.class;

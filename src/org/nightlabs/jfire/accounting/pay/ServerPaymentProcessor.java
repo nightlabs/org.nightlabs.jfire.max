@@ -130,6 +130,11 @@ import org.nightlabs.util.Util;
 public abstract class ServerPaymentProcessor
 implements Serializable, DetachCallback
 {
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = 1L;
+
 	public static final String FETCH_GROUP_NAME = "ServerPaymentProcessor.name";
 
 	public static final String FETCH_GROUP_MODE_OF_PAYMENTS = "ServerPaymentProcessor.modeOfPayments";

@@ -37,6 +37,11 @@ public class ArticlePriceNotFoundException extends AccountingConfigException {
 	/**
 	 * 
 	 */
+	private static final long serialVersionUID = 1L;
+
+	/**
+	 * 
+	 */
 	public ArticlePriceNotFoundException() {
 		super();
 	}

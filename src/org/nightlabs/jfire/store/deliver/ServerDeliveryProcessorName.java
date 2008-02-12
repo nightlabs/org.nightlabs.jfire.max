@@ -50,6 +50,10 @@ import org.nightlabs.i18n.I18nText;
  */
 public class ServerDeliveryProcessorName extends I18nText
 {
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = 1L;
 	public static final String FETCH_GROUP_NAMES = "ServerDeliveryProcessorName.names";
 	public static final String FETCH_GROUP_SERVER_DELIVERY_PROCESSOR = "ServerDeliveryProcessorName.serverDeliveryProcessor";
 	public static final String FETCH_GROUP_THIS_SERVER_DELIVERY_PROCESSOR_NAME = "ServerDeliveryProcessorName.this";

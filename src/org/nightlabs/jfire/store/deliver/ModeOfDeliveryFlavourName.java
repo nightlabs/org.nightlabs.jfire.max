@@ -49,6 +49,10 @@ import org.nightlabs.i18n.I18nText;
  */
 public class ModeOfDeliveryFlavourName extends I18nText
 {
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = 1L;
 	public static final String FETCH_GROUP_NAMES = "ModeOfDeliveryFlavourName.names";
 	public static final String FETCH_GROUP_THIS_MODE_OF_PAYMENT_FLAVOUR_NAME = "ModeOfDeliveryFlavourName.this";
 

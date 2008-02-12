@@ -51,6 +51,10 @@ public class LocalAccountantDelegateName
 extends I18nText 
 {	
 	/**
+	 * 
+	 */
+	private static final long serialVersionUID = 1L;
+	/**
 	 * @jdo.field primary-key="true"
 	 * @jdo.column length="100"
 	 */

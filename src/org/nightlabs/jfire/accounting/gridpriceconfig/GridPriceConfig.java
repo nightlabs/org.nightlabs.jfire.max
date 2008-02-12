@@ -71,6 +71,10 @@ import org.nightlabs.jfire.trade.id.CustomerGroupID;
  */
 public abstract class GridPriceConfig extends PriceConfig
 {
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = 1L;
 	public static final String FETCH_GROUP_CUSTOMER_GROUPS = "GridPriceConfig.customerGroups";
 	public static final String FETCH_GROUP_TARIFFS = "GridPriceConfig.tariffs";
 

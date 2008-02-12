@@ -12,6 +12,11 @@ import org.nightlabs.jfire.store.DeliveryNote;
 public class DeliveryNoteQuickSearchQuery 
 extends AbstractArticleContainerQuickSearchQuery 
 {	
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = 1L;
+
 	@Override
 	public Class getArticleContainerClass() {
 		return DeliveryNote.class;

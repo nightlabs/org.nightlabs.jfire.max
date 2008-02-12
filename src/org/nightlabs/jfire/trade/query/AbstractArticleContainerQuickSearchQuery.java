@@ -19,6 +19,10 @@ import org.nightlabs.jfire.trade.ArticleContainer;
 public abstract class AbstractArticleContainerQuickSearchQuery 
 extends JDOQuery<ArticleContainer> 
 { 
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = 1L;
 	private static final Logger logger = Logger.getLogger(AbstractArticleContainerQuickSearchQuery.class);
 	
 	@Override

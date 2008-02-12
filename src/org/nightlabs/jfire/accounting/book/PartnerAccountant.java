@@ -67,6 +67,11 @@ import org.nightlabs.jfire.transfer.Transfer;
 public class PartnerAccountant extends Accountant
 {
 	/**
+	 * 
+	 */
+	private static final long serialVersionUID = 1L;
+
+	/**
 	 * @deprecated Constructor only existing for JDO!
 	 */
 	@Deprecated

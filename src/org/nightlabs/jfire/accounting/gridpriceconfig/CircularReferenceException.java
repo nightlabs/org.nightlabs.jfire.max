@@ -34,6 +34,10 @@ public class CircularReferenceException extends PriceCalculationException
 {
 	
 	/**
+	 * 
+	 */
+	private static final long serialVersionUID = 1L;
+	/**
 	 * @param absolutePriceCoordinate
 	 */
 	public CircularReferenceException(

@@ -13,6 +13,10 @@ import org.nightlabs.jfire.transfer.id.AnchorID;
 public abstract class AbstractTransferQuery<T>
 extends JDOQuery<T>
 {
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = 1L;
 	private Date timestampFromIncl = null;
 	private Date timestampToIncl = null;
 

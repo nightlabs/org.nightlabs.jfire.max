@@ -66,7 +66,12 @@ import org.nightlabs.util.Util;
 public abstract class Anchor
 	implements Serializable
 {
-//	public static final String FETCH_GROUP_TRANSFERS = "Anchor.transfers";
+/**
+	 * 
+	 */
+	private static final long serialVersionUID = 1L;
+
+	//	public static final String FETCH_GROUP_TRANSFERS = "Anchor.transfers";
 	public static final String FETCH_GROUP_THIS_ANCHOR = "Anchor.this";
 
 	/**

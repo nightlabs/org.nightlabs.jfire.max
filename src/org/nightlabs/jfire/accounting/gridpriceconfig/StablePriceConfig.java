@@ -235,6 +235,11 @@ implements IPackagePriceConfig, IResultPriceConfig
 
 	protected static class SingleObjectList extends ArrayList
 	{
+		/**
+		 * 
+		 */
+		private static final long serialVersionUID = 1L;
+
 		public SingleObjectList(Object obj)
 		{
 			super(1);

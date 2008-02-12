@@ -40,6 +40,11 @@ package org.nightlabs.jfire.accounting.pay;
 public class PaymentDataDebitNoteGermany extends PaymentData
 {
 	/**
+	 * 
+	 */
+	private static final long serialVersionUID = 1L;
+
+	/**
 	 * @jdo.field persistence-modifier="persistent"
 	 */
 	private String accountHolderName;

@@ -41,6 +41,11 @@ package org.nightlabs.jfire.accounting;
 public class SummaryMoneyTransfer extends MoneyTransfer
 {
 
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = 1L;
+
 	protected SummaryMoneyTransfer() { }
 
 	/**

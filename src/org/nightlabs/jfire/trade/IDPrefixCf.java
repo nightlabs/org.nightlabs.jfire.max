@@ -24,6 +24,10 @@ public class IDPrefixCf
 implements Serializable
 {
 	/**
+	 * 
+	 */
+	private static final long serialVersionUID = 1L;
+	/**
 	 * Use the current year automatically without asking the user.
 	 */
 	public static final String STRATEGY_YEAR_AUTO = "YearAuto";

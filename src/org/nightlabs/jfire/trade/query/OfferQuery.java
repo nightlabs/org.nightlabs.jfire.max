@@ -15,6 +15,11 @@ public class OfferQuery
 extends ArticleContainerQuery
 {
 
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = 1L;
+
 	public OfferQuery() {
 		super(Offer.class);
 	}

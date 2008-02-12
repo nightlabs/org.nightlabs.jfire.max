@@ -65,6 +65,7 @@ public class SummaryAccount extends Account
 	/**
 	 * @deprecated Only for JDO!
 	 */
+	@Deprecated
 	protected SummaryAccount() {
 	}
 

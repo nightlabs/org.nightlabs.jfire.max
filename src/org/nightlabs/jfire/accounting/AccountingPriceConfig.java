@@ -58,6 +58,7 @@ public class AccountingPriceConfig extends PriceConfig
 	/**
 	 * @deprecated Only for JDO!
 	 */
+	@Deprecated
 	protected AccountingPriceConfig() { }
 
 	/**

@@ -75,6 +75,10 @@ import org.nightlabs.util.Util;
  */
 public abstract class PriceConfig implements Serializable, StoreCallback, IPriceConfig
 {
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = 1L;
 	public static final String FETCH_GROUP_CURRENCIES = "PriceConfig.currencies";
 	public static final String FETCH_GROUP_NAME = "PriceConfig.name";
 	public static final String FETCH_GROUP_PRICE_FRAGMENT_TYPES = "PriceConfig.priceFragmentTypes";

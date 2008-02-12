@@ -42,6 +42,11 @@ import java.util.Date;
 public class PaymentDataBankTransferGermany extends PaymentData
 {
 	/**
+	 * 
+	 */
+	private static final long serialVersionUID = 1L;
+
+	/**
 	 * @jdo.field persistence-modifier="persistent"
 	 */
 	private Date moneyInDT = null;

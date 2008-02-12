@@ -34,6 +34,11 @@ import org.nightlabs.ModuleException;
  */
 public class TradeException extends ModuleException
 {
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = 1L;
+
 	public TradeException() 
 	{
 		super();

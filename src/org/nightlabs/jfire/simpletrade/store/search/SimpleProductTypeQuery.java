@@ -13,6 +13,10 @@ import org.nightlabs.jfire.store.search.ProductTypeQuery;
 public class SimpleProductTypeQuery 
 extends ProductTypeQuery 
 {
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = 1L;
 	private static final Logger logger = Logger.getLogger(SimpleProductTypeQuery.class);
 	
 	public SimpleProductTypeQuery() {

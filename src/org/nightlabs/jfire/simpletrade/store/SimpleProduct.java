@@ -47,6 +47,11 @@ public class SimpleProduct extends Product
 {
 
 	/**
+	 * 
+	 */
+	private static final long serialVersionUID = 1L;
+
+	/**
 	 * @deprecated Only for JDO!
 	 */
 	@Deprecated

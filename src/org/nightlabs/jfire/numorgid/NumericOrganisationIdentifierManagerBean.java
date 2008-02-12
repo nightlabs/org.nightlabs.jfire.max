@@ -32,9 +32,6 @@ public abstract class NumericOrganisationIdentifierManagerBean
 extends BaseSessionBeanImpl
 implements SessionBean
 {
-	/**
-	 * 
-	 */
 	private static final long serialVersionUID = 1L;
 
 	/**

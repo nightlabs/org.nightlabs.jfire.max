@@ -60,6 +60,10 @@ import org.nightlabs.jfire.scripting.id.ScriptRegistryItemID;
 public class DefaultPossibleValueProvider 
 extends PossibleValueProvider 
 {
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = 1L;
 	private static final Logger logger = Logger.getLogger(DefaultPossibleValueProvider.class);
 
 	public DefaultPossibleValueProvider(Script script) // ScriptRegistryItemID scriptID)

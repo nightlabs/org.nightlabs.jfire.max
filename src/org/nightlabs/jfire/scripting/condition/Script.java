@@ -40,6 +40,10 @@ import org.nightlabs.jfire.scripting.id.ScriptRegistryItemID;
 public class Script 
 implements IScript
 {
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = 1L;
 	public Script(String language, String text, Map<String, ScriptRegistryItemID> variableName2ScriptID) 
 	{
 		if (language == null)

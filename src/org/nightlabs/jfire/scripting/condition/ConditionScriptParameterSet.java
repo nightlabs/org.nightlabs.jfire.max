@@ -40,6 +40,10 @@ import org.nightlabs.jfire.scripting.ScriptParameter;
 public class ConditionScriptParameterSet 
 implements IScriptParameterSet 
 {
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = 1L;
 	private Map<String, ScriptParameter> parameters = new HashMap<String, ScriptParameter>();
 	public Set<String> getParameterIDs() {
 		return parameters.keySet();

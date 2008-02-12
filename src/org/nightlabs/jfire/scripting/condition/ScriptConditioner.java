@@ -39,6 +39,10 @@ import org.nightlabs.jfire.scripting.id.ScriptRegistryItemID;
 public class ScriptConditioner 
 implements Serializable
 {
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = 1L;
 	private static final Logger logger = Logger.getLogger(ScriptConditioner.class);
 	
 	public ScriptConditioner(

@@ -55,6 +55,11 @@ import org.nightlabs.jfire.scripting.condition.id.PossibleValueProviderID;
 public abstract class PossibleValueProvider
 implements Serializable
 {
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = 1L;
+
 	private static final Logger logger = Logger.getLogger(PossibleValueProvider.class);
 
 	public static final String FETCH_GROUP_THIS_POSSIBLE_VALUE_PROVIDER = "PossibleValueProvider.this";

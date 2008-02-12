@@ -33,6 +33,11 @@ public class LabelProvider
 implements ILabelProvider
 {
 
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = 1L;
+
 	public String getText(Object object) 
 	{
 		// TODO: check first with reflection if the object contains a field which is

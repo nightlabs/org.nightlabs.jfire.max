@@ -103,6 +103,10 @@ import org.nightlabs.util.Util;
 public abstract class ReportRegistryItem implements Serializable, DetachCallback
 {
 	
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = 1L;
 	public static final String QUERY_GET_REPORT_REGISTRY_ITEM_BY_TYPE = "getReportRegistryItemByType";
 	public static final String QUERY_TOP_LEVEL_GET_REPORT_REGISTRY_ITEM_BY_TYPE = "getTopLevelReportRegistryItemByType";
 	public static final String QUERY_TOP_LEVEL_GET_REPORT_REGISTRY_ITEMS_BY_ORGANISATION = "getTopLevelReportRegistryItemsByOrganisation";

@@ -74,6 +74,11 @@ extends BaseSessionBeanImpl
 implements SessionBean
 {
 	/**
+	 * 
+	 */
+	private static final long serialVersionUID = 1L;
+
+	/**
 	 * @see com.nightlabs.jfire.base.BaseSessionBeanImpl#setSessionContext(javax.ejb.SessionContext)
 	 */
 	@Override

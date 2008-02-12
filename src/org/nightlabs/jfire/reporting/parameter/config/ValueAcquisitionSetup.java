@@ -346,7 +346,7 @@ implements Serializable
 	public ValueConsumerBinding getValueConsumerBinding(ValueConsumer consumer, String parameterID) {
 		Map<String, ValueConsumerBinding> bindings = getValueConsumerBindings(consumer);
 		if (bindings != null)
-			return (ValueConsumerBinding) bindings.get(parameterID);
+			return bindings.get(parameterID);
 		return null;
 	}
 	

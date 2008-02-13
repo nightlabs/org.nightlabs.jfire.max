@@ -58,7 +58,7 @@ public class ArticleCreator
 	}
 
 	/**
-	 * This method must create a new <code>Article</code> for a concrete <code>Product<code>. 
+	 * This method must create a new <code>Article</code> for a concrete <code>Product<code>.
 	 * Override it, if you want to use extended <code>Article</code>s instead of the
 	 * default ones (e.g. if you have more
 	 * situation-dependent properties than just the <code>Tariff</code>).

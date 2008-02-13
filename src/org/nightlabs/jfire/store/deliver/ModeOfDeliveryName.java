@@ -88,7 +88,7 @@ public class ModeOfDeliveryName extends I18nText
 	private ModeOfDelivery modeOfDelivery;
 
 	/**
-	 * @deprecated Only for JDO! 
+	 * @deprecated Only for JDO!
 	 */
 	@Deprecated
 	protected ModeOfDeliveryName() { }

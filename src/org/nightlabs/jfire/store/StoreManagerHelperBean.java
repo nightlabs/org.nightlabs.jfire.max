@@ -61,26 +61,26 @@ import org.nightlabs.jfire.trade.jbpm.ProcessDefinitionAssignment;
 import org.nightlabs.jfire.trade.jbpm.id.ProcessDefinitionAssignmentID;
 
 /**
- * @ejb.bean name="jfire/ejb/JFireTrade/StoreManagerHelper"	
+ * @ejb.bean name="jfire/ejb/JFireTrade/StoreManagerHelper"
  *					 jndi-name="jfire/ejb/JFireTrade/StoreManagerHelper"
- *					 type="Stateless" 
+ *					 type="Stateless"
  *					 transaction-type="Container"
  *
  * @ejb.util generate="physical"
  * @ejb.transaction type="Required"
  */
-public abstract class StoreManagerHelperBean 
+public abstract class StoreManagerHelperBean
 extends BaseSessionBeanImpl
-implements SessionBean 
-{	
+implements SessionBean
+{
 	////////////////////// EJB "constuctor" ////////////////////////////
 	private static final long serialVersionUID = 1L;
 
 	/**
-	 * @ejb.create-method	
+	 * @ejb.create-method
 	 * @ejb.permission role-name="_Guest_"
 	 */
-	public void ejbCreate() 
+	public void ejbCreate()
 	throws CreateException
 	{
 	}
@@ -237,7 +237,7 @@ implements SessionBean
 					ProductLocal nestedProductLocal = product.getProductLocal();
 					Article purchaseArticle = nestedProductLocal.getPurchaseArticle();
 					if (purchaseArticle.getReversingArticle() == null)
-						reversedArticleIDs.add((ArticleID) JDOHelper.getObjectId(purchaseArticle));	
+						reversedArticleIDs.add((ArticleID) JDOHelper.getObjectId(purchaseArticle));
 				}
 
 				if (!reversedArticleIDs.isEmpty()) {

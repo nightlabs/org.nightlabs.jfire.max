@@ -70,7 +70,7 @@ extends ServerPaymentProcessor
 	}
 
 	/**
-	 * @deprecated Only for JDO! 
+	 * @deprecated Only for JDO!
 	 */
 	@Deprecated
 	protected ServerPaymentProcessorNonPayment()

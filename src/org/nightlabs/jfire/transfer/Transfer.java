@@ -29,7 +29,6 @@ package org.nightlabs.jfire.transfer;
 import java.io.Serializable;
 import java.util.Date;
 import java.util.Locale;
-import java.util.Map;
 import java.util.Set;
 
 import javax.jdo.JDOHelper;
@@ -106,7 +105,7 @@ implements Serializable
 	 *
 	 * @jdo.field persistence-modifier="persistent"
 	 */
-	private boolean bookedFrom = false; 
+	private boolean bookedFrom = false;
 
 	/**
 	 * @jdo.field persistence-modifier="persistent"
@@ -350,7 +349,7 @@ implements Serializable
 	 * <p>
 	 * Note that this method should only be called on attached instances of Transfer.
 	 * </p>
-	 * @param locale The locale for the description. 
+	 * @param locale The locale for the description.
 	 * @return A human readable description of the transfer.
 	 */
 	public abstract String getDescription(Locale locale);

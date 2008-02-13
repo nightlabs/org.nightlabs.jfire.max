@@ -3,8 +3,6 @@ package org.nightlabs.jfire.store.deliver;
 import javax.jdo.JDOHelper;
 import javax.jdo.PersistenceManager;
 
-import org.nightlabs.jfire.store.Store;
-
 /**
  * @author Tobias Langner <!-- tobias[dot]langner[at]nightlabs[dot]de -->
  *

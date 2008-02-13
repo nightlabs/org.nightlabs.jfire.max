@@ -91,7 +91,7 @@ public class LocalStorekeeper extends Storekeeper
 		if (! (transfer instanceof BookProductTransfer))
 			return;
 
-		BookProductTransfer bookTransfer = (BookProductTransfer)transfer;		
+		BookProductTransfer bookTransfer = (BookProductTransfer)transfer;
 		DeliveryNote deliveryNote = bookTransfer.getDeliveryNote();
 
 		// find the delegates

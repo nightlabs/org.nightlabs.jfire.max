@@ -46,7 +46,7 @@ public enum Stage {
 	}
 	
 	/**
-	 * Returns a boolean indicating whether this stage takes place later than the given stage. 
+	 * Returns a boolean indicating whether this stage takes place later than the given stage.
 	 * @param stage The Stage in question.
 	 * @return A boolean indicating whether this stage takes place later than the given stage.
 	 */
@@ -55,7 +55,7 @@ public enum Stage {
 	}
 	
 	/**
-	 * Returns a boolean indicating whether this stage takes place earlier than the given stage. 
+	 * Returns a boolean indicating whether this stage takes place earlier than the given stage.
 	 * @param stage The Stage in question.
 	 * @return A boolean indicating whether this stage takes place earlier than the given stage.
 	 */

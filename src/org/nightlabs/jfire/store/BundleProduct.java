@@ -15,7 +15,7 @@ package org.nightlabs.jfire.store;
 public interface BundleProduct
 {
 //	/**
-//	 * Get the approximate quantity as a double. This is the same as first calling {@link #getUnit()} and then {@link Unit#toDouble(long)} 
+//	 * Get the approximate quantity as a double. This is the same as first calling {@link #getUnit()} and then {@link Unit#toDouble(long)}
 //	 *
 //	 * @return the quantity as double.
 //	 */

@@ -64,7 +64,7 @@ extends BaseJDOObjectDAO<AnchorID, Account>
 			return getJDOObjects(null, accountIDs, fetchGroups, maxFetchDepth, monitor);
 		} catch (Exception x) {
 			throw new RuntimeException(x);
-		} 
+		}
 	}
 
 	@SuppressWarnings("unchecked")
@@ -74,10 +74,10 @@ extends BaseJDOObjectDAO<AnchorID, Account>
 		try {
 			AccountingManager am = AccountingManagerUtil.getHome(SecurityReflector.getInitialContextProperties()).create();
 			Set<AnchorID> accountIDs = am.getAccountIDs(queries);
-			return getJDOObjects(null, accountIDs, fetchGroups, maxFetchDepth, monitor);			
+			return getJDOObjects(null, accountIDs, fetchGroups, maxFetchDepth, monitor);
 		} catch (Exception x) {
 			throw new RuntimeException(x);
-		} 
+		}
 	}
 
 	public List<Account> getAccounts(Collection<AnchorID> accountIDs, String[] fetchGroups,
@@ -86,16 +86,16 @@ extends BaseJDOObjectDAO<AnchorID, Account>
 		return getJDOObjects(null, accountIDs, fetchGroups, maxFetchDepth, monitor);
 	}
 	
-	public Account getAccount(AnchorID accountID, String[] fetchGroups, 
-			int maxFetchDepth, ProgressMonitor monitor) 
+	public Account getAccount(AnchorID accountID, String[] fetchGroups,
+			int maxFetchDepth, ProgressMonitor monitor)
 	{
 		return getJDOObject(null, accountID, fetchGroups, maxFetchDepth, monitor);
 	}
 	
-	public Account storeAccount(Account account, boolean get, String[] fetchGroups, 
-			int maxFetchDepth, ProgressMonitor monitor) 
+	public Account storeAccount(Account account, boolean get, String[] fetchGroups,
+			int maxFetchDepth, ProgressMonitor monitor)
 	{
-		monitor.beginTask("Save Account", 1);		
+		monitor.beginTask("Save Account", 1);
 		try {
 			AccountingManager am = AccountingManagerUtil.getHome(SecurityReflector.getInitialContextProperties()).create();
 			account = am.storeAccount(account, get, fetchGroups, maxFetchDepth);
@@ -105,7 +105,7 @@ extends BaseJDOObjectDAO<AnchorID, Account>
 		} catch (Exception x) {
 			throw new RuntimeException(x);
 		} finally {
-			monitor.worked(1);			
+			monitor.worked(1);
 			monitor.done();
 		}
 	}

@@ -48,14 +48,14 @@ implements Serializable
 	 * returns a List of {@link ProcessDefinition} defined for the given {@link Statable} class
 	 * 
 	 * @param pm the {@link PersistenceManager} to use
-	 * @param statableClass the name of the {@link Statable} class as String 
+	 * @param statableClass the name of the {@link Statable} class as String
 	 * @return a List of {@link ProcessDefinition} defined for the given statable class
 	 */
 	public static List<ProcessDefinition> getProcessDefinitions(PersistenceManager pm, String statableClass)
 	{
 		Query q = pm.newNamedQuery(ProcessDefinitionAssignment.class, "getProcessDefinitionsForStatableClass");
 		return (List<ProcessDefinition>) q.execute(statableClass);
-	}	
+	}
 	
 	/**
 	 * The fully qualified class name of a class implementing {@link Statable}. Usually, this

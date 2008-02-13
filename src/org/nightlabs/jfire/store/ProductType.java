@@ -54,14 +54,11 @@ import org.nightlabs.jdo.ObjectIDUtil;
 import org.nightlabs.jdo.inheritance.JDOInheritableFieldInheriter;
 import org.nightlabs.jdo.inheritance.JDOInheritanceManager;
 import org.nightlabs.jdo.inheritance.JDOSimpleFieldInheriter;
-import org.nightlabs.jfire.accounting.book.LocalAccountantDelegate;
 import org.nightlabs.jfire.accounting.priceconfig.IInnerPriceConfig;
 import org.nightlabs.jfire.accounting.priceconfig.IPackagePriceConfig;
 import org.nightlabs.jfire.accounting.priceconfig.IPriceConfig;
 import org.nightlabs.jfire.accounting.priceconfig.PriceConfig;
 import org.nightlabs.jfire.idgenerator.IDGenerator;
-import org.nightlabs.jfire.organisation.LocalOrganisation;
-import org.nightlabs.jfire.organisation.Organisation;
 import org.nightlabs.jfire.security.User;
 import org.nightlabs.jfire.store.deliver.DeliveryConfiguration;
 import org.nightlabs.jfire.store.id.ProductTypeGroupID;
@@ -81,7 +78,7 @@ import org.nightlabs.util.Util;
  * <code>ProductType</code>s are organized in a data-inheritance-tree, where each child can inherit
  * properties from the parent (or override some of them). Usually, there is one root-<code>ProductType</code>
  * ({@link #getExtendedProductType()}<code> == null</code>) for each implementation of <code>ProductType</code>
- * and each {@link Organisation} (the local one and every business partner). 
+ * and each {@link Organisation} (the local one and every business partner).
  * </p>
  * <p>
  * It's important to
@@ -97,7 +94,7 @@ import org.nightlabs.util.Util;
  * 200 red balls with a diameter of 90 cm, then you would probably have two instances of
  * <code>BallType</code> and 300 instances of <code>Ball</code> in your datastore.
  * <code>BallType</code> would extend <code>ProductType</code> and <code>Ball</code> would
- * be an implementation of {@link Product}. 
+ * be an implementation of {@link Product}.
  * </p>
  *
  * @author Niklas Schiffler <nick@nightlabs.de>
@@ -131,7 +128,7 @@ import org.nightlabs.util.Util;
  * @jdo.fetch-group name="ProductType.productTypeGroups" fields="productTypeGroups"
  * @jdo.fetch-group name="ProductType.managedProductTypeGroup" fields="managedProductTypeGroup"
  * @jdo.fetch-group name="ProductType.productTypeLocal" fields="productTypeLocal"
- * @jdo.fetch-group name="ProductType.name" fields="name" 
+ * @jdo.fetch-group name="ProductType.name" fields="name"
  * @jdo.fetch-group name="ProductType.this" fetch-groups="default" fields="deliveryConfiguration, extendedProductType, fieldMetaDataMap, innerPriceConfig, managedProductTypeGroup, name, owner, packagePriceConfig, productTypeGroups, productTypeLocal"
  *
  * @jdo.fetch-group name="FetchGroupsTrade.articleInOrderEditor" fetch-groups="default" fields="name"
@@ -189,7 +186,7 @@ implements
 
 	/**
 	 * This fetch-group (named "ProductType.name") must be used in all descendents of this class
-	 * to ensure that the method {@link #getName()} can be used. 
+	 * to ensure that the method {@link #getName()} can be used.
 	 */
 	public static final String FETCH_GROUP_NAME = "ProductType.name";
 
@@ -283,13 +280,13 @@ implements
 
 	/**
 	 * @jdo.field persistence-modifier="persistent"
-	 * // TODO JPOX WORKAROUND should be null-value="exception", but causes problems in replication 
+	 * // TODO JPOX WORKAROUND should be null-value="exception", but causes problems in replication
 	 */
 	private LegalEntity owner;
 
 	/**
 	 * @jdo.field persistence-modifier="persistent"
-	 * // TODO JPOX WORKAROUND should be null-value="exception", but causes problems in replication 
+	 * // TODO JPOX WORKAROUND should be null-value="exception", but causes problems in replication
 	 */
 	private LegalEntity vendor;
 
@@ -372,7 +369,7 @@ implements
 //	/**
 //	 * key: String languageID<br/>
 //	 * value: String productName
-//	 * 
+//	 *
 //	 * @jdo.field
 //	 *		persistence-modifier="persistent"
 //	 *		collection-type="map"
@@ -390,7 +387,7 @@ implements
 //	/**
 //	 * key: String propertyName<br/>
 //	 * value: String propertyValue
-//	 * 
+//	 *
 //	 * @jdo.field
 //	 *		persistence-modifier="persistent"
 //	 *		collection-type="map"
@@ -550,7 +547,7 @@ implements
 	/**
 	 * @deprecated Only for JDO!
 	 */
-	protected ProductType() {} 
+	protected ProductType() {}
 
 	/**
 	 * @param organisationID This must not be null. This reflects the owner organisation which is issuing this <code>ProductType</code>.
@@ -660,7 +657,7 @@ implements
 
 	public static ProductTypeID primaryKeyToProductTypeID(String primaryKey) {
 		String[] parts = primaryKey.split("/");
-		if (parts.length != 2) 
+		if (parts.length != 2)
 			throw new IllegalArgumentException("The given productTypePK "+primaryKey+" is illegal (more than one /)");
 		return ProductTypeID.create(parts[0], parts[1]);
 	}
@@ -676,7 +673,7 @@ implements
 	 * organisation connected to the network. Hence, this organisation would create
 	 * and manage the <code>ProductType</code>, but still is not the owner.
 	 * The real owner can therefore be assigned as property of this
-	 * <code>ProductType</code>. 
+	 * <code>ProductType</code>.
 	 *
 	 * @return the owner. If not managed for someone else, this is the {@link LocalOrganisation#getOrganisation() local organisation}
 	 * @see #getVendor()
@@ -824,7 +821,7 @@ implements
 //	/**
 //	 * The LocalAccountantDelegate is in charge of booking money to different
 //	 * account for the productType it is assigned to and its packaged types
-//	 * when an invoice is booked. 
+//	 * when an invoice is booked.
 //	 */
 //	public LocalAccountantDelegate getLocalAccountantDelegate() {
 //		return localAccountantDelegate;
@@ -1154,7 +1151,7 @@ implements
 //	 * If there is no <code>Product</code> available anymore, the <code>ProductType</code>
 //	 * will be listed as not available (or even filtered out) in sale lists.
 //	 * <p>
-//	 * This method is only called while this <code>ProductType</code> is persistent. 
+//	 * This method is only called while this <code>ProductType</code> is persistent.
 //	 */
 //	protected abstract boolean _checkProductAvailability();
 //
@@ -1242,7 +1239,7 @@ implements
 	 * is known to the whole wide world, noone can erase knowledge
 	 * anymore :-)
 	 *
-	 * @return Whether this ProductType is published 
+	 * @return Whether this ProductType is published
 	 */
 	public boolean isPublished() {
 		return published;
@@ -1250,7 +1247,7 @@ implements
 
 	/**
 	 * Sets whether this ProductType is published.  This flag is immutable after once set to true.
-	 *  
+	 * 
 	 * @param published Weather the ProductType should be published.
 	 * @throws CannotPublishProductTypeException If the ProductType cannot be published.
 	 */
@@ -1264,7 +1261,7 @@ implements
 	}
 	
 	/**
-	 * Checks if the ProductType can be confirmed. 
+	 * Checks if the ProductType can be confirmed.
 	 * This implementation checks whether the parent ProductType (the productType this extends) is published.
 	 * <p>
 	 * This method might be overridden, however the super implementation should be invoked then.
@@ -1366,7 +1363,7 @@ implements
 	 *   <li>is not closed</li>
 	 *   <li>has a {@link LocalAccountantDelegate} assigned</li>
 	 *   <li>has a correct {@link IPriceConfig} assigned</li>
-	 * </ul> 
+	 * </ul>
 	 * </p>
 	 * <p>
 	 * This method might be overridden, however the super implementation should be invoked then.
@@ -1406,7 +1403,7 @@ implements
 			throw new IllegalStateException("Cannot close ProductType \"" + getPrimaryKey() + "\", because it is still saleable!");
 
 		if (this.closed && !closed)
-			throw new IllegalArgumentException("The closed flag of a ProductType is immutable after once set to true"); 
+			throw new IllegalArgumentException("The closed flag of a ProductType is immutable after once set to true");
 
 		this.closed = closed;
 	}
@@ -1499,9 +1496,9 @@ implements
 	 */
 	private ProductTypeName name;
 	/**
-	 * return the multilanguage capable name of the productType 
+	 * return the multilanguage capable name of the productType
 	 * 
-	 * @return the {@link I18nText} which stores the name of the productType 
+	 * @return the {@link I18nText} which stores the name of the productType
 	 * in a  {@link ProductTypeName}
 	 */
 	public I18nText getName() {

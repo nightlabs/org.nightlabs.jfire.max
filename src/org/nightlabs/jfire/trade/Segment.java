@@ -35,9 +35,7 @@ import javax.jdo.PersistenceManager;
 import javax.jdo.Query;
 
 import org.nightlabs.jdo.ObjectIDUtil;
-import org.nightlabs.jfire.accounting.Invoice;
 import org.nightlabs.jfire.idgenerator.IDGenerator;
-import org.nightlabs.jfire.store.DeliveryNote;
 import org.nightlabs.jfire.trade.id.SegmentID;
 import org.nightlabs.jfire.trade.id.SegmentTypeID;
 import org.nightlabs.util.Util;

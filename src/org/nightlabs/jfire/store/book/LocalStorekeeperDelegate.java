@@ -103,15 +103,15 @@ implements Serializable
 	 * @param user The user that initiated the booking.
 	 * @param deliveryNote The deliveryNote that is currently booked.
 	 * @param article The Article to book.
-	 * @param container The Container transfer, that is the transfer from the customer to the vendor of the deliveryNote 
+	 * @param container The Container transfer, that is the transfer from the customer to the vendor of the deliveryNote
 	 * @param involvedAnchors A List of involved Anchors, so they can be checked after the booking
 	 */
 	public abstract void bookArticle(
-			OrganisationLegalEntity mandator, 
+			OrganisationLegalEntity mandator,
 			User user,
 			DeliveryNote deliveryNote,
-			Article article, 
-			BookProductTransfer container, 
+			Article article,
+			BookProductTransfer container,
 			Set<Anchor> involvedAnchors
 		);
 

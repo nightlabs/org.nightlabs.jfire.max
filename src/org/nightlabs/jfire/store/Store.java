@@ -91,7 +91,6 @@ import org.nightlabs.jfire.trade.id.ArticleID;
 import org.nightlabs.jfire.trade.jbpm.ProcessDefinitionAssignment;
 import org.nightlabs.jfire.trade.jbpm.id.ProcessDefinitionAssignmentID;
 import org.nightlabs.jfire.transfer.Anchor;
-import org.nightlabs.jfire.transfer.Transfer;
 
 /**
  * The Store is responsible for managing all ProductTypes and Products
@@ -172,7 +171,7 @@ implements StoreCallback
 	
 	/**
 	 * @jdo.field persistence-modifier="persistent"
-	 */ 
+	 */
 	private OrganisationLegalEntity mandator;
 
 	protected Store() { }
@@ -197,7 +196,7 @@ implements StoreCallback
 //	/**
 //	 * key: String productPrimaryKey {organisationID + / + productID}<br/>
 //	 * value: ProductStatusTracker productStatusTracker
-//	 * 
+//	 *
 //	 * @jdo.field
 //	 *		persistence-modifier="persistent"
 //	 *		collection-type="map"
@@ -206,7 +205,7 @@ implements StoreCallback
 //	 *		dependent="true"
 //	 *
 //	 * @jdo.join
-//	 * 
+//	 *
 //	 * @jdo.map-vendor-extension vendor-name="jpox" key="key-length" value="max 201"
 //	 */
 //	protected Map productTypeStatusTrackers = new HashMap();
@@ -214,7 +213,7 @@ implements StoreCallback
 //	/**
 //	 * key: String productPrimaryKey {organisationID + / + productID}<br/>
 //	 * value: ProductType product
-//	 * 
+//	 *
 //	 * @jdo.field
 //	 *		persistence-modifier="persistent"
 //	 *		collection-type="map"
@@ -223,7 +222,7 @@ implements StoreCallback
 //	 *		dependent="true"
 //	 *
 //	 * @jdo.join
-//	 * 
+//	 *
 //	 * @jdo.map-vendor-extension vendor-name="jpox" key="key-length" value="max 201"
 //	 */
 //	protected Map products = new HashMap();
@@ -262,7 +261,7 @@ implements StoreCallback
 //	 */
 //	protected Map productTransferTrackers = new HashMap();
 
-	public void setProductTypeStatus_published(User user, ProductType productType) 
+	public void setProductTypeStatus_published(User user, ProductType productType)
 	throws CannotPublishProductTypeException
 	{
 		if (productType == null)
@@ -275,7 +274,7 @@ implements StoreCallback
 		getProductTypeStatusTracker(productType, true).newCurrentStatus(user);
 	}
 
-	public void setProductTypeStatus_confirmed(User user, ProductType productType) 
+	public void setProductTypeStatus_confirmed(User user, ProductType productType)
 	throws CannotConfirmProductTypeException
 	{
 		if (productType == null)
@@ -288,7 +287,7 @@ implements StoreCallback
 		getProductTypeStatusTracker(productType, true).newCurrentStatus(user);
 	}
 
-	public void setProductTypeStatus_saleable(User user, ProductType productType, boolean saleable) 
+	public void setProductTypeStatus_saleable(User user, ProductType productType, boolean saleable)
 	throws CannotMakeProductTypeSaleableException
 	{
 		if (productType.isSaleable() == saleable)
@@ -788,7 +787,7 @@ implements StoreCallback
 	 * @param user The user which is responsible for creation of this invoice.
 	 * @param articles The {@link Article}s that shall be added to the invoice. Must not be empty (because the customer is looked up from the articles).
 	 * @param deliveryNoteIDPrefix Which prefix shall be used (i.e. what namespace for the newly generated deliveryNoteID). If this is <code>null</code>, the
-	 *		user's default value will be used. 
+	 *		user's default value will be used.
 	 */
 	public DeliveryNote createDeliveryNote(
 			User user, Collection articles, String deliveryNoteIDPrefix)
@@ -824,19 +823,19 @@ implements StoreCallback
 			
 			if (!articleOffer.getOfferLocal().isAccepted()) {
 				throw new DeliveryNoteEditException(
-					DeliveryNoteEditException.REASON_OFFER_NOT_ACCEPTED, 
+					DeliveryNoteEditException.REASON_OFFER_NOT_ACCEPTED,
 					"At least one involved offer is not accepted!",
 					(ArticleID) JDOHelper.getObjectId(article)
 				);
 			}
 
-			if (!vendorPK.equals(articleOrder.getVendor().getPrimaryKey()) 
-						|| 
-					!customerPK.equals(articleOrder.getCustomer().getPrimaryKey()) 
+			if (!vendorPK.equals(articleOrder.getVendor().getPrimaryKey())
+						||
+					!customerPK.equals(articleOrder.getCustomer().getPrimaryKey())
 					)
 			{
 				throw new DeliveryNoteEditException(
-					DeliveryNoteEditException.REASON_ANCHORS_DONT_MATCH,				
+					DeliveryNoteEditException.REASON_ANCHORS_DONT_MATCH,
 					"Vendor and customer are not equal for all involved orders, can not create DeliveryNote!!"
 				);
 			}
@@ -846,8 +845,8 @@ implements StoreCallback
 				DeliveryNote deliveryNote = article.getDeliveryNote();
 				throw new DeliveryNoteEditException(
 					DeliveryNoteEditException.REASON_ARTICLE_ALREADY_IN_DELIVERY_NOTE,
-					"Article already in a delivery note. Article "+article.getPrimaryKey()+", DeliveryNote "+deliveryNote.getPrimaryKey(), 
-					(ArticleID) JDOHelper.getObjectId(article), 
+					"Article already in a delivery note. Article "+article.getPrimaryKey()+", DeliveryNote "+deliveryNote.getPrimaryKey(),
+					(ArticleID) JDOHelper.getObjectId(article),
 					(DeliveryNoteID) JDOHelper.getObjectId(deliveryNote)
 				);
 			}
@@ -907,8 +906,8 @@ implements StoreCallback
 	 * @return a new DeliveryNote
 	 * @throws DeliveryNoteEditException
 	 */
-	public DeliveryNote createDeliveryNote(User user, ArticleContainer articleContainer, String deliveryNoteIDPrefix) 
-	throws DeliveryNoteEditException 
+	public DeliveryNote createDeliveryNote(User user, ArticleContainer articleContainer, String deliveryNoteIDPrefix)
+	throws DeliveryNoteEditException
 	{
 		ArrayList articles = new ArrayList();
 		for (Iterator it = articleContainer.getArticles().iterator(); it.hasNext(); ) {
@@ -985,7 +984,7 @@ implements StoreCallback
 
 	/**
 	 * @param deliveryNotes Can be null. Should be a <tt>Collection</tt> of {@link DeliveryNote}
-	 * @param stage This method is called twice during 
+	 * @param stage This method is called twice during
 	 * @return Either <tt>null</tt>, in case no DeliveryNote was passed or the partner
 	 *		(if at least one DeliveryNote has been passed in <tt>deliveryNotes</tt>).
 	 */
@@ -1050,7 +1049,7 @@ implements StoreCallback
 //			} catch (DeliveryException x) {
 //				resList.add(x.getDeliveryResult());
 //			} catch (Throwable t) {
-//				
+//
 //			}
 //		}
 //		return resList;
@@ -1067,7 +1066,7 @@ implements StoreCallback
 	}
 
 	/**
-	 * Finalizes a deliveryNote and sends it to the involved 
+	 * Finalizes a deliveryNote and sends it to the involved
 	 * organisation if neccessary.
 	 * 
 	 * @param finalizer
@@ -1142,7 +1141,7 @@ implements StoreCallback
 //			this,
 //			initiator,
 //			from,
-//			to,			
+//			to,
 //			deliveryNote
 //		);
 //		HashSet<Anchor> involvedAnchors = new HashMap();
@@ -1154,7 +1153,7 @@ implements StoreCallback
 		if (deliveryNote.getVendor().getStorekeeper() == null)
 			deliveryNote.getVendor().setStorekeeper(getPartnerStorekeeper());
 
-		// The booking works only with ProductReferences - the ProductLocal is not touched (Product is never touched anyway by deliveries or bookings) 
+		// The booking works only with ProductReferences - the ProductLocal is not touched (Product is never touched anyway by deliveries or bookings)
 		Set<Anchor> involvedAnchors = new HashSet<Anchor>();
 		List<BookProductTransfer> bookProductTransfers = BookProductTransfer.createBookProductTransfers(initiator, deliveryNote);
 		boolean failed = true;
@@ -1211,7 +1210,7 @@ implements StoreCallback
 				continue;
 
 			// If the current Anchor is the final destination or the very source of the transfer of
-			// any product, put it into one of the product2xxxMaps 
+			// any product, put it into one of the product2xxxMaps
 			for (Product product : products) {
 				ProductReference productReference = ProductReference.getProductReference(pm, anchor, product, false); // not every involved anchor has a reference to every product, because the transfers take different routes. hence the result may be null
 				if (productReference == null)
@@ -1249,7 +1248,7 @@ implements StoreCallback
 		// and there might be a "neighbour" chain that caused the beginning/end of this chain to be 0.
 
 // Marco: productLocal.quantity is updated in Repository now already!
-//		// We update productLocal.quantity now. This works always, because a 
+//		// We update productLocal.quantity now. This works always, because a
 //		for (Iterator itP = products.iterator(); itP.hasNext(); ) {
 //			Product product = (Product) itP.next();
 //			ProductLocal productLocal = product.getProductLocal();
@@ -1268,7 +1267,7 @@ implements StoreCallback
 	}
 
 	/**
-	 * If the {@link ProductLocal#get} 
+	 * If the {@link ProductLocal#get}
 	 *
 	 * @param products
 	 */
@@ -1399,7 +1398,7 @@ implements StoreCallback
 			partner.setStorekeeper(getPartnerStorekeeper());
 		
 //		The DeliveryLocal object is normally created in DeliveryHelperBean#deliverBegin_storeDeliveryData(DeliveryData).
-//		But some use cases do not use this API, this is why we create it here if it does not exist yet.  
+//		But some use cases do not use this API, this is why we create it here if it does not exist yet.
 		if (deliveryData.getDelivery().getDeliveryLocal() == null)
 			new DeliveryLocal(deliveryData.getDelivery());
 
@@ -1439,7 +1438,7 @@ implements StoreCallback
 							x));
 		}
 		
-		Set<Delivery> precursorDeliverySet = deliveryData.getDelivery().getPrecursorSet();		
+		Set<Delivery> precursorDeliverySet = deliveryData.getDelivery().getPrecursorSet();
 		for (Delivery precursorDelivery : precursorDeliverySet) {
 			try {
 				for (DeliveryActionHandler deliveryActionHandler : precursorDelivery.getDeliveryLocal().getDeliveryActionHandlers()) {
@@ -1449,7 +1448,7 @@ implements StoreCallback
 				throw x;
 			} catch (Exception e) {
 				throw new DeliveryException(new DeliveryResult(
-						DeliveryResult.CODE_FAILED, "Calling DeliveryActionHandler.onFollowUpDeliverBegin failed! localOrganisation="+getOrganisationID(), e)); 
+						DeliveryResult.CODE_FAILED, "Calling DeliveryActionHandler.onFollowUpDeliverBegin failed! localOrganisation="+getOrganisationID(), e));
 			}
 		}
 
@@ -1588,7 +1587,7 @@ implements StoreCallback
 							x));
 		}
 		
-		Set<Delivery> precursorDeliverySet = deliveryData.getDelivery().getPrecursorSet();		
+		Set<Delivery> precursorDeliverySet = deliveryData.getDelivery().getPrecursorSet();
 		for (Delivery precursorDelivery : precursorDeliverySet) {
 			try {
 				for (DeliveryActionHandler deliveryActionHandler : precursorDelivery.getDeliveryLocal().getDeliveryActionHandlers()) {
@@ -1598,7 +1597,7 @@ implements StoreCallback
 				throw x;
 			} catch (Exception e) {
 				throw new DeliveryException(new DeliveryResult(
-						DeliveryResult.CODE_FAILED, "Calling DeliveryActionHandler.onFollowUpDeliverDoWork failed! localOrganisation="+getOrganisationID(), e)); 
+						DeliveryResult.CODE_FAILED, "Calling DeliveryActionHandler.onFollowUpDeliverDoWork failed! localOrganisation="+getOrganisationID(), e));
 			}
 		}
 
@@ -1682,7 +1681,7 @@ implements StoreCallback
 							x));
 		}
 		
-		Set<Delivery> precursorDeliverySet = deliveryData.getDelivery().getPrecursorSet();		
+		Set<Delivery> precursorDeliverySet = deliveryData.getDelivery().getPrecursorSet();
 		for (Delivery precursorDelivery : precursorDeliverySet) {
 			try {
 				for (DeliveryActionHandler deliveryActionHandler : precursorDelivery.getDeliveryLocal().getDeliveryActionHandlers()) {
@@ -1692,7 +1691,7 @@ implements StoreCallback
 				throw x;
 			} catch (Exception e) {
 				throw new DeliveryException(new DeliveryResult(
-						DeliveryResult.CODE_FAILED, "Calling DeliveryActionHandler.onFollowUpDeliverEnd failed! localOrganisation="+getOrganisationID(), e)); 
+						DeliveryResult.CODE_FAILED, "Calling DeliveryActionHandler.onFollowUpDeliverEnd failed! localOrganisation="+getOrganisationID(), e));
 			}
 		}
 
@@ -1740,7 +1739,7 @@ implements StoreCallback
 	 * <p>
 	 * It is not integrated within deliverxxxEnd
 	 * (e.g. {@link #deliverEnd(User, DeliveryData)}),
-	 * because it needs to be called within a separate transaction. 
+	 * because it needs to be called within a separate transaction.
 	 */
 	public void deliverRollback(
 			User user, DeliveryData deliveryData)

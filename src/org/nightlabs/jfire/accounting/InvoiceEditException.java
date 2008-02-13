@@ -27,7 +27,6 @@
 package org.nightlabs.jfire.accounting;
 
 import org.nightlabs.jfire.accounting.id.InvoiceID;
-import org.nightlabs.jfire.store.DeliveryNote;
 import org.nightlabs.jfire.trade.ArticleContainerException;
 import org.nightlabs.jfire.trade.id.ArticleID;
 
@@ -130,7 +129,7 @@ public class InvoiceEditException extends ArticleContainerException
 		setInvoiceID(invoiceID);
 	}
 	
-	private int reason;	
+	private int reason;
 
 	public int getReason() {
 		return reason;
@@ -144,7 +143,7 @@ public class InvoiceEditException extends ArticleContainerException
 	
 	public void setArticleID(ArticleID offerItemID) {
 		this.articleID = offerItemID;
-	}	
+	}
 	
 	private InvoiceID invoiceID;
 

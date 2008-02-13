@@ -61,7 +61,7 @@ public class DeliveryQueue implements Serializable, AttachCallback, DetachCallba
 	/** virtual fetch group for the field hasPendingDeliveries that is set in the detach callback */
 	public static final String FETCH_GROUP_HAS_PENDING_DELIVERIES = "DeliveryQueue.hasPendingDeliveries";
 	
-	private static final long serialVersionUID = 1L;	
+	private static final long serialVersionUID = 1L;
 
 	/**
 	 * @jdo.field primary-key="true"
@@ -79,7 +79,7 @@ public class DeliveryQueue implements Serializable, AttachCallback, DetachCallba
 	 * 		persistence-modifier="persistent"
 	 * 		mapped-by="deliveryQueue"
 	 */
-	private DeliveryQueueName name; 
+	private DeliveryQueueName name;
 	
 	/**
 	 * The list of the deliveries in this queue no matter their status.
@@ -91,7 +91,7 @@ public class DeliveryQueue implements Serializable, AttachCallback, DetachCallba
 	 * 		element-type="org.nightlabs.jfire.store.deliver.Delivery"
 	 * 		table="JFireTrade_DeliveryQueue_deliverySet"
 	 *		null-value="exception"
-	 *  
+	 * 
 	 * @jdo.join
 	 */
 	private Set<Delivery> deliverySet;
@@ -131,7 +131,7 @@ public class DeliveryQueue implements Serializable, AttachCallback, DetachCallba
 	}
 	
 	public DeliveryQueue(String organisationID) {
-		this.organisationID = organisationID;		
+		this.organisationID = organisationID;
 		this.deliveryQueueID = IDGenerator.nextID(DeliveryQueue.class);
 		this.deliverySet = new HashSet<Delivery>();
 		this.pendingDeliverySet = new HashSet<Delivery>();

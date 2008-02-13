@@ -88,7 +88,7 @@ public class ModeOfDeliveryFlavourName extends I18nText
 	private ModeOfDeliveryFlavour modeOfDeliveryFlavour;
 
 	/**
-	 * @deprecated Only for JDO! 
+	 * @deprecated Only for JDO!
 	 */
 	@Deprecated
 	protected ModeOfDeliveryFlavourName() { }

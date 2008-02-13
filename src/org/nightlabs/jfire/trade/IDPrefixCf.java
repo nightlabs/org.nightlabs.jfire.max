@@ -10,7 +10,7 @@ import org.nightlabs.jdo.ObjectIDUtil;
 /**
  * @author Marco Schulze - marco at nightlabs dot de
  *
- *  @jdo.persistence-capable 
+ *  @jdo.persistence-capable
  *		identity-type="application"
  *		objectid-class="org.nightlabs.jfire.trade.id.IDPrefixCfID"
  *		detachable="true"
@@ -157,7 +157,7 @@ implements Serializable
 
 	public String getDefaultIDPrefix()
 	{
-		if (IDPrefixCf.STRATEGY_YEAR_AUTO.equals(getStrategy()) || IDPrefixCf.STRATEGY_YEAR_ASK.equals(getStrategy()))		
+		if (IDPrefixCf.STRATEGY_YEAR_AUTO.equals(getStrategy()) || IDPrefixCf.STRATEGY_YEAR_ASK.equals(getStrategy()))
 			return Integer.toString(Calendar.getInstance().get(Calendar.YEAR));
 		else if (IDPrefixCf.STRATEGY_DEFAULT_AUTO.equals(getStrategy()) || IDPrefixCf.STRATEGY_DEFAULT_ASK.equals(getStrategy())) {
 			String res = getDefaultValue();

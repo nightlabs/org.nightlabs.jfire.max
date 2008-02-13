@@ -101,7 +101,7 @@ extends ServerDeliveryProcessor
 	@Override
 	@Implement
 	protected DeliveryResult externalDeliverCommit(DeliverParams deliverParams) throws DeliveryException {
-		// Nothing to do					
+		// Nothing to do
 		return null; // should automatically be correct ;-)
 	}
 

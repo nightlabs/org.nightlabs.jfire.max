@@ -132,7 +132,7 @@ public class ArticlePrice extends org.nightlabs.jfire.accounting.Price
 //	 * <tt>NestedProductTypeLocal</tt> for which this price has been calculated and assigned.
 //	 * This <tt>ArticlePrice</tt> represents always the TOTAL price, means it might
 //	 * differ from the <tt>origPrice</tt>, if the quantity of <tt>ProductType</tt> within
-//	 * the <tt>nestedProductTypeLocal</tt> is not 1. 
+//	 * the <tt>nestedProductTypeLocal</tt> is not 1.
 //	 *
 //	 * @jdo.field persistence-modifier="persistent"
 //	 */
@@ -308,7 +308,7 @@ public class ArticlePrice extends org.nightlabs.jfire.accounting.Price
 	 *		and might therefore point to another instance of <tt>ArticlePrice</tt>.
 	 * @param origPrice The original price from which to copy all data. If
 	 *		<tt>origPrice.priceID >= 0</tt>, the origPrice will be stored as reference
-	 *		within the new <tt>ArticlePrice</tt>. 
+	 *		within the new <tt>ArticlePrice</tt>.
 	 *  @param organisationID The organisationID of the <tt>IPriceConfig</tt> which
 	 *		provides the <tt>priceID</tt>. This must be equal to <tt>Accounting.organisationID</tt>,
 	 *		because <tt>Article</tt>s cannot be created in a foreign datastore.
@@ -326,7 +326,7 @@ public class ArticlePrice extends org.nightlabs.jfire.accounting.Price
 			long priceID, boolean refund)
 	{
 		this(article, origPrice, organisationID, priceConfigID, priceID,
-				null, null, article.getProductType(), article.getProduct(), false, refund);		
+				null, null, article.getProductType(), article.getProduct(), false, refund);
 	}
 
 	/**
@@ -422,7 +422,7 @@ public class ArticlePrice extends org.nightlabs.jfire.accounting.Price
 				this,
 				accounting.getOrganisationID(),
 				accountingPriceConfig.getPriceConfigID(),
-				accountingPriceConfig.createPriceID(), 
+				accountingPriceConfig.createPriceID(),
 				true
 			);
 		return articlePrice;
@@ -440,7 +440,7 @@ public class ArticlePrice extends org.nightlabs.jfire.accounting.Price
 	 * @return The packaged ArticlePrice for the given product.
 	 * @throws ArticlePriceNotFoundException
 	 */
-	public ArticlePrice getNestedArticlePrice(Product product, boolean throwException) 
+	public ArticlePrice getNestedArticlePrice(Product product, boolean throwException)
 	{
 		ArticlePrice packagedPrice = nestedArticlePrices.get(product.getPrimaryKey());
 		if ((packagedPrice == null) && (throwException))
@@ -456,7 +456,7 @@ public class ArticlePrice extends org.nightlabs.jfire.accounting.Price
 	 * @return The packaged ArticlePrice for the given productType.
 	 * @throws ArticlePriceNotFoundException
 	 */
-	public ArticlePrice getNestedArticlePrice(ProductType productType, boolean throwException) 
+	public ArticlePrice getNestedArticlePrice(ProductType productType, boolean throwException)
 	{
 		ArticlePrice packagedPrice = nestedArticlePrices.get(productType.getPrimaryKey());
 		if ((packagedPrice == null) && (throwException))
@@ -469,7 +469,7 @@ public class ArticlePrice extends org.nightlabs.jfire.accounting.Price
 //	 * @return The packaged ArticlePrice for the given productType.
 //	 * @throws ArticlePriceNotFoundException
 //	 */
-//	public ArticlePrice getNestedArticlePrice(ProductType productType) 
+//	public ArticlePrice getNestedArticlePrice(ProductType productType)
 //	{
 //		return getNestedArticlePrice(productType, true);
 //	}

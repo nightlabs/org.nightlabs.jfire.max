@@ -11,7 +11,7 @@ import java.util.Date;
  * @author Daniel.Mazurek [at] NightLabs [dot] de
  *
  */
-public interface ILayout 
+public interface ILayout
 {
 	/**
 	 * returns the binary data of the layout file

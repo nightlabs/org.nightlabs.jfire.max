@@ -130,9 +130,9 @@ public class BookProductTransfer extends DeliveryNoteProductTransfer
 	@Override
 	public String getDescription(Locale locale) {
 		return String.format(
-				"Booking of delivery note %s", 
+				"Booking of delivery note %s",
 				getDeliveryNote().getPrimaryKey()
-			);		
+			);
 	}
 
 }

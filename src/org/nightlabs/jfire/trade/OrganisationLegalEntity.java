@@ -153,13 +153,13 @@ implements StoreCallback
 	/**
 	 * @param pm The {@link PersistenceManager} to use.
 	 * @param organisationID The id specifying the <tt>Organisation</tt> for which the <tt>LegalEntity</tt> is desired.
-	 * @param throwExceptionIfNotExistent If <tt>false</tt>, this method will return null,	 * 
-	 * if the {@link Organisation} specified by <tt>organisationID</tt> does not exist.  
+	 * @param throwExceptionIfNotExistent If <tt>false</tt>, this method will return null,	 *
+	 * if the {@link Organisation} specified by <tt>organisationID</tt> does not exist.
 	 * @return the <tt>OrganisationLegalEntity</tt> for the given <tt>organisationID</tt>.
 	 * If the <tt>OrganisationLegalEntity</tt> does not exist, it will be automatically
 	 * created, if the {@link Organisation} exists. If it does not exist, this method
 	 * will either throw an exception or return <tt>null</tt> - dependent on the parameter
-	 * <tt>throwExceptionIfNotExistent</tt>.  
+	 * <tt>throwExceptionIfNotExistent</tt>.
 	 */
 	public static OrganisationLegalEntity getOrganisationLegalEntity(
 			PersistenceManager pm,
@@ -167,7 +167,7 @@ implements StoreCallback
 			boolean throwExceptionIfNotExistent
 	)
 	{
-		OrganisationLegalEntity organisationLegalEntity = null; 
+		OrganisationLegalEntity organisationLegalEntity = null;
 		try {
 			pm.getExtent(OrganisationLegalEntity.class);
 			organisationLegalEntity = (OrganisationLegalEntity)pm.getObjectById(

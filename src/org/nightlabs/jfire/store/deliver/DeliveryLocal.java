@@ -36,7 +36,7 @@ public class DeliveryLocal implements Serializable {
 	/**
 	 * @jdo.field persistence-modifier="persistent"
 	 */
-	private Delivery delivery;	
+	private Delivery delivery;
 
 	/**
 	 * @jdo.field

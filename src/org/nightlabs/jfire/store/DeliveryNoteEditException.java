@@ -121,7 +121,7 @@ public class DeliveryNoteEditException extends ArticleContainerException
 	}
 
 
-	private int reason;	
+	private int reason;
 
 	public int getReason() {
 		return reason;
@@ -135,7 +135,7 @@ public class DeliveryNoteEditException extends ArticleContainerException
 	
 	public void setArticleID(ArticleID offerItemID) {
 		this.articleID = offerItemID;
-	}	
+	}
 	
 	private DeliveryNoteID deliveryNoteID;
 

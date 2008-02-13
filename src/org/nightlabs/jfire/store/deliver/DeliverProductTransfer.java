@@ -50,7 +50,7 @@ import org.nightlabs.jfire.transfer.id.TransferID;
 /**
  * @author Marco Schulze - marco at nightlabs dot de
  *
- * @jdo.persistence-capable 
+ * @jdo.persistence-capable
  *		identity-type="application"
  *		persistence-capable-superclass="org.nightlabs.jfire.store.ProductTransfer"
  *		detachable="true"
@@ -58,7 +58,7 @@ import org.nightlabs.jfire.transfer.id.TransferID;
  *
  * @jdo.inheritance strategy="new-table"
  *
- * @jdo.persistence-capable 
+ * @jdo.persistence-capable
  *		identity-type = "application"
  *		persistence-capable-superclass = "org.nightlabs.jfire.store.ProductTransfer"
  *		detachable = "true"
@@ -70,7 +70,7 @@ import org.nightlabs.jfire.transfer.id.TransferID;
  *		query = "SELECT UNIQUE
  *				WHERE
  *					this.delivery.organisationID == :paramOrganisationID &&
- *					this.delivery.deliveryID == :paramDeliveryID				
+ *					this.delivery.deliveryID == :paramDeliveryID
  *				import java.lang.String; import java.lang.Long"
  */
 public class DeliverProductTransfer extends ProductTransfer
@@ -144,7 +144,7 @@ public class DeliverProductTransfer extends ProductTransfer
 	private Delivery delivery;
 
 	/**
-	 * @deprecated Only of JDO! 
+	 * @deprecated Only of JDO!
 	 */
 	@Deprecated
 	protected DeliverProductTransfer()
@@ -216,7 +216,7 @@ public class DeliverProductTransfer extends ProductTransfer
 	}
 	
 	@Override
-	public String getDescription(Locale locale) {	
+	public String getDescription(Locale locale) {
 		return String.format(
 				"Delivery %s",
 				getDelivery().getPrimaryKey()

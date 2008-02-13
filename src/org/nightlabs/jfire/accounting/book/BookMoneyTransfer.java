@@ -42,7 +42,7 @@ import org.nightlabs.jfire.transfer.Anchor;
  *
  * @author Marco Schulze - marco at nightlabs dot de
  *
- * @jdo.persistence-capable 
+ * @jdo.persistence-capable
  *		identity-type="application"
  *		persistence-capable-superclass="org.nightlabs.jfire.accounting.InvoiceMoneyTransfer"
  *		detachable="true"
@@ -63,7 +63,7 @@ public class BookMoneyTransfer extends InvoiceMoneyTransfer
 	protected BookMoneyTransfer() { }
 
 	private static long getAmountAbsoluteValue(Invoice invoice)
-	{		
+	{
 		if (invoice == null)
 			throw new IllegalArgumentException("invoice must not be null!");
 
@@ -97,9 +97,9 @@ public class BookMoneyTransfer extends InvoiceMoneyTransfer
 	@Override
 	public String getDescription(Locale locale) {
 		return String.format(
-				"Booking of invoice %s", 
+				"Booking of invoice %s",
 				getInvoice().getPrimaryKey()
-			);		
+			);
 	}
 
 }

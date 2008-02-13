@@ -163,7 +163,7 @@ implements Serializable
 
 		/**
 		 * key: {@link org.nightlabs.jfire.store.deliver.id.ModeOfDeliveryFlavourID} modeOfDeliveryFlavourID<br/>
-		 * value: {@link ModeOfDeliveryFlavour} modeOfDeliveryFlavour 
+		 * value: {@link ModeOfDeliveryFlavour} modeOfDeliveryFlavour
 		 */
 		private Map modeOfDeliveryFlavours = new HashMap();
 
@@ -449,7 +449,7 @@ implements Serializable
 
 	protected static Map getAvailableModeOfDeliveryFlavoursMapForOneCustomerGroup(PersistenceManager pm, String organisationID, String customerGroupID)
 	{
-		// WORKAROUND The normal query returns an empty result, probably because of issues with ORs. 
+		// WORKAROUND The normal query returns an empty result, probably because of issues with ORs.
 		Map m = new HashMap();
 		Query query = pm.newNamedQuery(ModeOfDeliveryFlavour.class, "getAvailableModeOfDeliveryFlavoursForOneCustomerGroup_WORKAROUND1");
 		for (Iterator it = ((Collection)query.execute(organisationID, customerGroupID)).iterator(); it.hasNext(); ) {
@@ -478,7 +478,7 @@ implements Serializable
 //
 //	protected static Map getAvailableModeOfDeliveryFlavoursMapForOneProductType(PersistenceManager pm, String organisationID, String productTypeID)
 //	{
-//		// WORKAROUND The normal query returns an empty result, probably because of issues with ORs. 
+//		// WORKAROUND The normal query returns an empty result, probably because of issues with ORs.
 //		Map m = new HashMap();
 //		Query query = pm.newNamedQuery(ModeOfDeliveryFlavour.class, "getAvailableModeOfDeliveryFlavoursForOneProductType_WORKAROUND1");
 //		for (Iterator it = ((Collection)query.execute(organisationID, productTypeID)).iterator(); it.hasNext(); ) {
@@ -527,7 +527,7 @@ implements Serializable
 //	* @jdo.field persistence-modifier="persistent"
 //	*/
 //	private Date icon16x16Timestamp;
-//	
+//
 	/**
 	 * @jdo.field persistence-modifier="persistent" collection-type="array" serialized-element="true"
 	 */

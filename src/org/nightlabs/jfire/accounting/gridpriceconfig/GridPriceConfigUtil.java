@@ -55,9 +55,9 @@ import org.nightlabs.jfire.trade.CustomerGroup;
 import org.nightlabs.util.Util;
 
 /**
- * @!ejb.bean name="jfire/ejb/JFireTrade/GridPriceConfigManager"	
+ * @!ejb.bean name="jfire/ejb/JFireTrade/GridPriceConfigManager"
  *           jndi-name="jfire/ejb/JFireTrade/GridPriceConfigManager"
- *           type="Stateless" 
+ *           type="Stateless"
  *           transaction-type="Container"
  *
  * @!ejb.util generate = "physical"
@@ -108,7 +108,7 @@ public class GridPriceConfigUtil
 //		super.unsetSessionContext();
 //	}
 //	/**
-//	 * @ejb.create-method  
+//	 * @ejb.create-method
 //	 * @ejb.permission role-name="_Guest_"
 //	 */
 //	public void ejbCreate()
@@ -118,14 +118,14 @@ public class GridPriceConfigUtil
 //	}
 //	/**
 //	 * @see javax.ejb.SessionBean#ejbRemove()
-//	 * 
+//	 *
 //	 * @ejb.permission unchecked="true"
 //	 */
 //	public void ejbRemove() throws EJBException, RemoteException
 //	{
 //		logger.debug(this.getClass().getName() + ".ejbRemove()");
 //	}
-//	
+//
 //	/**
 //	 * @see javax.ejb.SessionBean#ejbActivate()
 //	 */
@@ -308,7 +308,7 @@ public class GridPriceConfigUtil
 
 		pm.getFetchPlan().setMaxFetchDepth(NLJDOHelper.MAX_FETCH_DEPTH_NO_LIMIT);
 		pm.getFetchPlan().setGroups(new String[] {
-				FetchPlan.DEFAULT, 
+				FetchPlan.DEFAULT,
 				FetchGroupsPriceConfig.FETCH_GROUP_EDIT});
 
 //		pm.getFetchPlan().setMaxFetchDepth(maxFetchDepth);

@@ -46,12 +46,9 @@ import org.nightlabs.jfire.accounting.Accounting;
 import org.nightlabs.jfire.accounting.Invoice;
 import org.nightlabs.jfire.base.JFirePrincipal;
 import org.nightlabs.jfire.base.Lookup;
-import org.nightlabs.jfire.organisation.Organisation;
 import org.nightlabs.jfire.security.SecurityReflector;
 import org.nightlabs.jfire.security.User;
 import org.nightlabs.jfire.store.deliver.Delivery;
-import org.nightlabs.jfire.store.deliver.DeliveryData;
-import org.nightlabs.jfire.store.deliver.id.DeliveryDataID;
 import org.nightlabs.jfire.store.id.ProductID;
 import org.nightlabs.jfire.trade.Article;
 import org.nightlabs.jfire.trade.Offer;
@@ -130,7 +127,7 @@ public abstract class ProductTypeActionHandler
 	 *
 	 * @param pm The <code>PersistenceManager</code> to be used for accessing the datastore.
 	 * @param productTypeClass The class (must be an inheritent of {@link ProductType}) for which to find a handler.
-	 * @return Returns an instance of {@link ProductTypeActionHandler}. Never returns <code>null</code>. 
+	 * @return Returns an instance of {@link ProductTypeActionHandler}. Never returns <code>null</code>.
 	 * @throws ProductTypeActionHandlerNotFoundException If no handler is registered for the given class or one of its
 	 *		parent classes.
 	 */
@@ -201,7 +198,7 @@ public abstract class ProductTypeActionHandler
 	 * @param organisationID First part of primary key: The identifier of that organisation which defined this handler.
 	 *		Use {@link Organisation#DEV_ORGANISATION_ID} if you contribute directly to a JFire project and your own
 	 *		organisation's unique identifier (i.e. your domain), if you write an own project.
-	 * @param productTypeActionHandlerID The ID within the scope of the <code>organisationID</code> 
+	 * @param productTypeActionHandlerID The ID within the scope of the <code>organisationID</code>
 	 * @param productTypeClass The class for which this handler shall be responsible. It will apply to all
 	 *		inherited classes as well, except if there is another handler registered for the extended type.
 	 */
@@ -318,7 +315,7 @@ public abstract class ProductTypeActionHandler
 	 * @param partnerOrganisationID refencing the organisation from which the nested products are purchased.
 	 * @param partnerNestedProductTypes all those {@link NestedProductTypeLocal}s which reference {@link ProductType}s for the products to be purchased from the organisation referenced by <code>partnerOrganisationID</code>.
 	 * @return the purchase-{@link Article}s which are buying the required nested {@link Product}s for the given <code>partnerNestedProductTypes</code>
-	 * @throws ModuleException if sth. goes wrong - e.g. a {@link NotAvailableException} if the nested products cannot be bought (the supplier cannot supply us). 
+	 * @throws ModuleException if sth. goes wrong - e.g. a {@link NotAvailableException} if the nested products cannot be bought (the supplier cannot supply us).
 	 */
 	protected Collection<? extends Article> importCrossTradeNestedProducts(
 			User user, ProductTypeActionHandlerCache productTypeActionHandlerCache, Product packageProduct,
@@ -914,7 +911,7 @@ public abstract class ProductTypeActionHandler
 	}
 
 	/**
-	 * This method is called by {@link Accounting#addArticlesToInvoice(User, org.nightlabs.jfire.accounting.Invoice, Collection)}. 
+	 * This method is called by {@link Accounting#addArticlesToInvoice(User, org.nightlabs.jfire.accounting.Invoice, Collection)}.
 	 *
 	 * @param user The user who initiated this action.
 	 * @param accounting The Accounting instance.
@@ -922,7 +919,7 @@ public abstract class ProductTypeActionHandler
 	 * @param articles The {@link Article}s that are being added to the invoice.
 	 */
 	public void onAddArticlesToInvoice(User user, Accounting accounting, Invoice invoice, Collection<? extends Article> articles)
-	{		
+	{
 	}
 
 	/**
@@ -989,12 +986,12 @@ public abstract class ProductTypeActionHandler
 
 //	protected String getAnchorIDForLocalHomeRepository(ProductType productType)
 //	{
-//		return productType.getClass().getName() + ".home";  
+//		return productType.getClass().getName() + ".home";
 //	}
 //
 //	protected String getAnchorIDForForeignHomeRepository(ProductType productType)
 //	{
-//		return productType.getClass().getName() + ".home#" + productType.getOrganisationID();  
+//		return productType.getClass().getName() + ".home#" + productType.getOrganisationID();
 //	}
 
 //	protected Repository getInitialLocalRepository(Product product)
@@ -1045,7 +1042,7 @@ public abstract class ProductTypeActionHandler
 ////				store.getOrganisationID(),
 ////				Repository.ANCHOR_TYPE_,
 ////				ANCHOR_ID_REPOSITORY_HOME_LOCAL,
-////				store.getMandator(), true);		
+////				store.getMandator(), true);
 //	}
 
 

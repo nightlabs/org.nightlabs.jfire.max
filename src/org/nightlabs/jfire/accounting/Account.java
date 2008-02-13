@@ -125,7 +125,7 @@ public class Account extends Anchor
 //	 * anchorTypeID for accounts of trading partners when they acting as vendor
 //	 */
 //	public static final String ANCHOR_TYPE_ID_PARTNER_VENDOR = "Account.Partner.Vendor";
-//	
+//
 //	/**
 //	 * anchorTypeID for accounts of trading partners when they acting as customer
 //	 */
@@ -145,7 +145,7 @@ public class Account extends Anchor
 ////	public static final String ANCHOR_TYPE_ID_PAYMENT = "Account.Payment";
 	
 	/**
-	 * @jdo.field persistence-modifier="persistent" 
+	 * @jdo.field persistence-modifier="persistent"
 	 */
 	private AccountType accountType;
 
@@ -291,7 +291,7 @@ public class Account extends Anchor
 //
 //		if (!(transfer instanceof MoneyTransfer))
 //			throw new ClassCastException("Account cannot book another Transfer (\""+transfer.getPrimaryKey()+"\" with type "+transfer.getClass().getName()+") than MoneyTransfer!");
-//		
+//
 //		MoneyTransfer mt = (MoneyTransfer) transfer;
 //
 //		if (!mt.getCurrency().getCurrencyID().equals(this.getCurrency().getCurrencyID()))

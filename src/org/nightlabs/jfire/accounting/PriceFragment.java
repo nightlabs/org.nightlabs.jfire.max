@@ -89,7 +89,7 @@ public class PriceFragment
 //	 * @jdo.column length="100"
 //	 */
 //	private String priceFragmentTypeOrganisationID;
-//	
+//
 //	/**
 //	 * @jdo.field primary-key="true"
 //	 * @jdo.column length="100"

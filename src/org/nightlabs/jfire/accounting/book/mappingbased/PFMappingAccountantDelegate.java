@@ -419,7 +419,7 @@ public class PFMappingAccountantDelegate
 	 *     |
 	 *   Delegate2
 	 *          -&gt; Mapping: PType1 (dimensions) -&gt; Account2
-	 *          -&gt; Mapping: PType2 (dimensions) -&gt; Account3 
+	 *          -&gt; Mapping: PType2 (dimensions) -&gt; Account3
 	 * </pre>
 	 * 
 	 * If now Delegate2 is asked for the mappings of PType2, this will result in
@@ -1450,14 +1450,14 @@ public class PFMappingAccountantDelegate
 	}
 
 	protected Collection<BookInvoiceTransfer> getBookInvoiceTransfersForSingleFragmentType(
-			OrganisationLegalEntity mandator, 
-			PriceFragmentType priceFragmentType, 
+			OrganisationLegalEntity mandator,
+			PriceFragmentType priceFragmentType,
 			LinkedList<ArticlePrice> articlePriceStack,
-			Map<String, String> dimensionValues, 
-			MoneyFlowMapping resolvedMapping, 
+			Map<String, String> dimensionValues,
+			MoneyFlowMapping resolvedMapping,
 			Map<ResolvedMapKey, ResolvedMapEntry> resolvedMappings,
 			boolean forContainer, BookMoneyTransfer bookMoneyTransfer
-		) 
+		)
 	{
 		Collection<BookInvoiceTransfer> result = new ArrayList<BookInvoiceTransfer>();
 		BookInvoiceTransfer transfer = getBookInvoiceTransferForSingleFragmentType(
@@ -1470,7 +1470,7 @@ public class PFMappingAccountantDelegate
 			ArticlePrice articlePrice = articlePriceStack.getFirst();
 
 			long amount = resolvedMapping.getArticlePriceDimensionAmount(
-					dimensionValues, 
+					dimensionValues,
 					articlePrice
 				);
 
@@ -1622,7 +1622,7 @@ public class PFMappingAccountantDelegate
 		// itPriceFragmentTypes.hasNext(); ) {
 		// PriceFragmentType searchPriceFragmentType = (PriceFragmentType)
 		// itPriceFragmentTypes.next();
-		//			
+		//
 		// Iterator iterator = articlePriceStack.iterator();
 		// if (iterator.hasNext()) // if
 		// (searchPriceFragmentType.getPrimaryKey().equals(priceFragmentType.getPrimaryKey()))
@@ -1643,7 +1643,7 @@ public class PFMappingAccountantDelegate
 		// fakeDimValues,
 		// upperArticlePrice.getCurrency()
 		// );
-		//				
+		//
 		// if (packagingUpperMapping != null) {
 		// return
 		// new LocalAccountantDelegate.BookInvoiceTransfer(
@@ -1654,7 +1654,7 @@ public class PFMappingAccountantDelegate
 		// (ArticlePrice)articlePriceStack.getFirst()
 		// )
 		// );
-		//						
+		//
 		// }
 		// }
 		// } // while (iterator.hasNext()) {

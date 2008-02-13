@@ -52,7 +52,7 @@ public abstract class Discount {
 	}
 
 	/**
-	 * // TODO Why does a Discount have a discountID and doesn't use the invoiceID?! 
+	 * // TODO Why does a Discount have a discountID and doesn't use the invoiceID?!
 	 *
 	 * @param invoice
 	 * @param discountID
@@ -76,16 +76,16 @@ public abstract class Discount {
 	
 	/**
 	 * @jdo.field persistence-modifier="persistent"
-	 */ 
+	 */
 	private Invoice invoice;
 	
 	/**
 	 * @jdo.field persistence-modifier="persistent"
-	 */ 
+	 */
 	private boolean booked;
 	
 	/**
-	 * Will be called when the Invoice changes and after finalization. 
+	 * Will be called when the Invoice changes and after finalization.
 	 */
 	public abstract void update();
 	
@@ -111,7 +111,7 @@ public abstract class Discount {
 
 	/**
 	 * Returns the discountID
-	 *  
+	 * 
 	 * @return The discountID
 	 */
 	public long getDiscountID() {
@@ -129,7 +129,7 @@ public abstract class Discount {
 
 	/**
 	 * Returns the organisationID
-	 *  
+	 * 
 	 * @return The organisationID
 	 */
 	public String getOrganisationID() {

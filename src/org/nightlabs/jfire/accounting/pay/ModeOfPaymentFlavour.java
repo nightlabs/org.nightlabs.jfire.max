@@ -43,7 +43,6 @@ import javax.jdo.Query;
 
 import org.nightlabs.io.DataBuffer;
 import org.nightlabs.jfire.accounting.pay.id.ModeOfPaymentFlavourID;
-import org.nightlabs.jfire.trade.CustomerGroup;
 import org.nightlabs.jfire.trade.id.CustomerGroupID;
 import org.nightlabs.util.IOUtil;
 import org.nightlabs.util.Util;
@@ -263,7 +262,7 @@ implements Serializable
 //		Query query = pm.newNamedQuery(ModeOfPaymentFlavour.class, "getAvailableModeOfPaymentFlavoursForOneCustomerGroup");
 //		return (Collection)query.execute(organisationID, customerGroupID);
 
-		// WORKAROUND The normal query returns an empty result, probably because of issues with ORs. 
+		// WORKAROUND The normal query returns an empty result, probably because of issues with ORs.
 		Map<String, ModeOfPaymentFlavour> m = new HashMap<String, ModeOfPaymentFlavour>();
 		Query query = pm.newNamedQuery(ModeOfPaymentFlavour.class, "getAvailableModeOfPaymentFlavoursForOneCustomerGroup_WORKAROUND1");
 		for (Iterator<ModeOfPaymentFlavour> it = ((Collection)query.execute(organisationID, customerGroupID)).iterator(); it.hasNext(); ) {

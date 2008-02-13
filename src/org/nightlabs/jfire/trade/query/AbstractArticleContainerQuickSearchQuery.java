@@ -13,12 +13,12 @@ import org.nightlabs.jfire.trade.ArticleContainer;
 /**
  * {@link JDOQuery} implementation which can be used together with
  * {@link AbstractArticleContainerQuickSearchEntry}s
- *  
+ * 
  * @author Daniel Mazurek - daniel <at> nightlabs <dot> de
  */
-public abstract class AbstractArticleContainerQuickSearchQuery 
-extends JDOQuery<ArticleContainer> 
-{ 
+public abstract class AbstractArticleContainerQuickSearchQuery
+extends JDOQuery<ArticleContainer>
+{
 	/**
 	 * 
 	 */
@@ -26,12 +26,12 @@ extends JDOQuery<ArticleContainer>
 	private static final Logger logger = Logger.getLogger(AbstractArticleContainerQuickSearchQuery.class);
 	
 	@Override
-	protected Query prepareQuery() 
+	protected Query prepareQuery()
 	{
 		Query q = getPersistenceManager().newQuery(getArticleContainerClass());
 		StringBuffer filter = new StringBuffer();
 		
-		filter.append("true");	
+		filter.append("true");
 		
 		// own methods to allow override e.g. for Offer where for customerName it is different
 		checkCustomerName(filter);
@@ -49,21 +49,21 @@ extends JDOQuery<ArticleContainer>
 
 	protected void checkVendorName(StringBuffer filter)
 	{
-		if (getVendorName() != null) 
-			filter.append("\n && (this.vendor.person.displayName.toLowerCase().indexOf(\""+vendorName.toLowerCase()+"\") >= 0)");					
+		if (getVendorName() != null)
+			filter.append("\n && (this.vendor.person.displayName.toLowerCase().indexOf(\""+vendorName.toLowerCase()+"\") >= 0)");
 	}
 	
-	protected void checkCustomerName(StringBuffer filter) 
+	protected void checkCustomerName(StringBuffer filter)
 	{
-		if (getCustomerName() != null) 
-			filter.append("\n && (this.customer.person.displayName.toLowerCase().indexOf(\""+customerName.toLowerCase()+"\") >= 0)");					
-	}	
+		if (getCustomerName() != null)
+			filter.append("\n && (this.customer.person.displayName.toLowerCase().indexOf(\""+customerName.toLowerCase()+"\") >= 0)");
+	}
 	
-	protected void checkArticleContainerID(StringBuffer filter) 
+	protected void checkArticleContainerID(StringBuffer filter)
 	{
 		if (getArticleContainerID() != null && !getArticleContainerID().trim().equals(""))
 //			filter.append("\n && (this."+getArticleContainerIDMemberName()+" == \""+ObjectIDUtil.parseLongObjectIDField(articleContainerID)+"\"");
-			filter.append("\n && (this."+getArticleContainerIDMemberName()+" == "+ObjectIDUtil.parseLongObjectIDField(articleContainerID)+")");			
+			filter.append("\n && (this."+getArticleContainerIDMemberName()+" == "+ObjectIDUtil.parseLongObjectIDField(articleContainerID)+")");
 	}
 	
 	private String customerName;
@@ -137,7 +137,7 @@ extends JDOQuery<ArticleContainer>
 	 * @return the name of the member which defines the value
 	 * which is returned by {@link ArticleContainer#getArticleContainerIDPrefix()}
 	 */
-	public abstract String getArticleContainerIDPrefixMemberName();		
+	public abstract String getArticleContainerIDPrefixMemberName();
 
 //	/**
 //	 * the beginning of the range to include from the result
@@ -150,7 +150,7 @@ extends JDOQuery<ArticleContainer>
 //	public void setRangeFromIncl(long rangeFromIncl) {
 //		this.rangeFromIncl = rangeFromIncl;
 //	}
-//	
+//
 //	/**
 //	 * the end of the range to exclude from the result
 //	 * by default {@link Long#MAX_VALUE}
@@ -161,5 +161,5 @@ extends JDOQuery<ArticleContainer>
 //	}
 //	public void setRangeToExcl(long rangeToExcl) {
 //		this.rangeToExcl = rangeToExcl;
-//	}	
+//	}
 }

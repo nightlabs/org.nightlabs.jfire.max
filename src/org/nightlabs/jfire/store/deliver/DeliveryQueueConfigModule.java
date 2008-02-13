@@ -11,7 +11,7 @@ import org.nightlabs.jfire.config.ConfigModule;
 /**
  * @author Tobias Langner <!-- tobias[dot]langner[at]nightlabs[dot]de -->
  *
- * @jdo.persistence-capable 
+ * @jdo.persistence-capable
  *		identity-type="application"
  *		persistence-capable-superclass="org.nightlabs.jfire.config.ConfigModule"
  *		detachable="true"
@@ -30,7 +30,7 @@ public class DeliveryQueueConfigModule extends ConfigModule {
 	public static final String FETCH_GROUP_VISIBLE_DELIVERY_QUEUES = "DeliveryQueueConfigModule.visibleDeliveryQueues";
 
 	/**
-	 * This set contains all {@link DeliveryQueue}s that are visible for the entity 
+	 * This set contains all {@link DeliveryQueue}s that are visible for the entity
 	 * configured by this config module.
 	 * 
 	 * @jdo.field
@@ -51,7 +51,7 @@ public class DeliveryQueueConfigModule extends ConfigModule {
 	}
 	
 	/**
-	 * Returns a set of the visible {@link DeliveryQueue}s. 
+	 * Returns a set of the visible {@link DeliveryQueue}s.
 	 * @return A set of the visible {@link DeliveryQueue}s.
 	 */
 	public List<DeliveryQueue> getVisibleDeliveryQueues() {

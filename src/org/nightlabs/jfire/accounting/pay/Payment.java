@@ -31,7 +31,6 @@ import java.util.Collection;
 import java.util.Date;
 import java.util.HashSet;
 import java.util.Iterator;
-import java.util.Map;
 import java.util.Set;
 
 import javax.jdo.JDOHelper;
@@ -44,13 +43,11 @@ import org.nightlabs.jfire.accounting.Currency;
 import org.nightlabs.jfire.accounting.Invoice;
 import org.nightlabs.jfire.accounting.id.CurrencyID;
 import org.nightlabs.jfire.accounting.id.InvoiceID;
-import org.nightlabs.jfire.accounting.pay.ServerPaymentProcessor.PayParams;
 import org.nightlabs.jfire.accounting.pay.id.ModeOfPaymentFlavourID;
 import org.nightlabs.jfire.accounting.pay.id.PaymentID;
 import org.nightlabs.jfire.accounting.pay.id.ServerPaymentProcessorID;
 import org.nightlabs.jfire.security.User;
 import org.nightlabs.jfire.trade.LegalEntity;
-import org.nightlabs.jfire.transfer.Transfer;
 import org.nightlabs.jfire.transfer.id.AnchorID;
 
 /**
@@ -251,7 +248,7 @@ implements Serializable, StoreCallback
 	 *   {@link ServerPaymentProcessor#payBegin(PayParams)} or even already before
 	 *   that by the client. In this case, your <tt>ServerPaymentProcessor</tt>
 	 *   doesn't even need to create a <tt>PayMoneyTransfer</tt> because it will NOT
-	 *   be stored anyway.    
+	 *   be stored anyway.
 	 *  </li>
 	 *  <li>
 	 *   The <tt>Payment</tt> can still be postponed during
@@ -715,7 +712,7 @@ implements Serializable, StoreCallback
 	/**
 	 * @return Returns <tt>null</tt> if there was no failure. Otherwise the
 	 *		first <tt>PaymentResult</tt> with {@link PaymentResult#CODE_FAILED} is
-	 *		returned. The order is (1) begin client, (2) begin server, (3) end client, (4) end server). 
+	 *		returned. The order is (1) begin client, (2) begin server, (3) end client, (4) end server).
 	 */
 	public PaymentResult getFailurePaymentResult()
 	{
@@ -768,7 +765,7 @@ implements Serializable, StoreCallback
 	 */
 	private String reasonForPayment = null;
 
-// The following fields are not transferred to the server - only their IDs are.	
+// The following fields are not transferred to the server - only their IDs are.
 	/**
 	 * @jdo.field
 	 *		persistence-modifier="persistent"
@@ -1206,10 +1203,10 @@ implements Serializable, StoreCallback
 		if (paymentDirection == null)
 			throw new IllegalStateException("paymentDirection is not set!");
 
-		if (partnerID != null && partner == null) 
+		if (partnerID != null && partner == null)
 			partner = (LegalEntity) pm.getObjectById(partnerID);
 	
-		if (partnerAccountID != null && partnerAccount == null) 
+		if (partnerAccountID != null && partnerAccount == null)
 			partnerAccount = (Account) pm.getObjectById(partnerAccountID);
 	
 		if (modeOfPaymentFlavourID != null && modeOfPaymentFlavour == null)

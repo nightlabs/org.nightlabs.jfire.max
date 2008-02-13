@@ -364,7 +364,7 @@ implements Serializable
 
 	/**
 	 * @return Returns <tt>true</tt> if <tt>code</tt> is {@link #CODE_FAILED} or
-	 *		{@link #isRolledBack()} returns <tt>true</tt>. 
+	 *		{@link #isRolledBack()} returns <tt>true</tt>.
 	 */
 	public boolean isFailed()
 	{

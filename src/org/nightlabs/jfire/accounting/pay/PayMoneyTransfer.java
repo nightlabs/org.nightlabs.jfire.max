@@ -57,7 +57,7 @@ import org.nightlabs.jfire.transfer.id.TransferID;
  *
  * @author Alexander Bieber <alex[AT]nightlabs[DOT]de>
  *
- * @jdo.persistence-capable 
+ * @jdo.persistence-capable
  *		identity-type="application"
  *		persistence-capable-superclass="org.nightlabs.jfire.accounting.MoneyTransfer"
  *		detachable="true"
@@ -163,7 +163,7 @@ public class PayMoneyTransfer extends MoneyTransfer
 	public PayMoneyTransfer(
 			Transfer container, User initiator, Anchor from, Anchor to,
 			Payment payment)
-	{		
+	{
 		super(container, initiator, from, to, payment.getCurrency(),
 				payment.getAmount());
 		this.payment = payment;
@@ -185,7 +185,7 @@ public class PayMoneyTransfer extends MoneyTransfer
 			invoiceStr = invoiceStr + invoice.getPrimaryKey();
 			if (it.hasNext())
 				invoiceStr = invoiceStr + ", ";
-		}		
+		}
 		return String.format(
 				"Payment for invoices: %s",
 				invoiceStr

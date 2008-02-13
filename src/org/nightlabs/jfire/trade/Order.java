@@ -378,25 +378,25 @@ implements Serializable, ArticleContainer, SegmentContainer, DetachCallback
 	private long orderID;
 	
 	/**
-	 * @jdo.field persistence-modifier="persistent"	 
+	 * @jdo.field persistence-modifier="persistent"
 	 */
 	private Currency currency;
 
 	/**
-	 * @jdo.field persistence-modifier="persistent"	 
+	 * @jdo.field persistence-modifier="persistent"
 	 */
 	private OrganisationLegalEntity vendor;
 
 	/**
-	 * @jdo.field persistence-modifier="persistent"	 
+	 * @jdo.field persistence-modifier="persistent"
 	 */
 	private LegalEntity customer;
 
 	/**
 	 * Because the {@link #customer} may have many available <tt>CustomerGroup</tt>s,
-	 * it is necessary to define which one shall be used for this <tt>Order</tt>.  
+	 * it is necessary to define which one shall be used for this <tt>Order</tt>.
 	 *
-	 * @jdo.field persistence-modifier="persistent"	 
+	 * @jdo.field persistence-modifier="persistent"
 	 */
 	private CustomerGroup customerGroup;
 
@@ -513,7 +513,7 @@ implements Serializable, ArticleContainer, SegmentContainer, DetachCallback
 	/**
 	 * @jdo.field persistence-modifier="persistent"
 	 */
-	private User changeUser;	
+	private User changeUser;
 
 	/**
 	 * @jdo.field persistence-modifier="none"
@@ -855,7 +855,7 @@ implements Serializable, ArticleContainer, SegmentContainer, DetachCallback
 		Order o = (Order) obj;
 
 		return
-				Util.equals(this.organisationID, o.organisationID) && 
+				Util.equals(this.organisationID, o.organisationID) &&
 				Util.equals(this.orderIDPrefix, o.orderIDPrefix) &&
 				this.orderID == o.orderID;
 	}
@@ -864,7 +864,7 @@ implements Serializable, ArticleContainer, SegmentContainer, DetachCallback
 	public int hashCode()
 	{
 		return
-				Util.hashCode(this.organisationID) ^ 
+				Util.hashCode(this.organisationID) ^
 				Util.hashCode(this.orderIDPrefix) ^
 				Util.hashCode(this.orderID);
 	}

@@ -129,7 +129,7 @@ public class PriceFragmentType
 	public static PriceFragmentTypeID primaryKeyToPriceFragmentTypeID(String primaryKey)
 	{
 		String[] parts = primaryKey.split("/");
-		if (parts.length != 2) 
+		if (parts.length != 2)
 			throw new IllegalArgumentException("The given productTypePK "+primaryKey+" is illegal (more than one /)");
 		return PriceFragmentTypeID.create(parts[0], parts[1]);
 	}
@@ -139,7 +139,7 @@ public class PriceFragmentType
 	 */
 	public static final PriceFragmentTypeID PRICE_FRAGMENT_TYPE_ID_TOTAL = PriceFragmentTypeID.create(Organisation.DEV_ORGANISATION_ID, "_Total_");
 	/**
-	 * The {@link PriceFragmentTypeID} of the system-internal {@link PriceFragmentType} 'Rest', that is the missing amount of the parts of 'Total' 
+	 * The {@link PriceFragmentTypeID} of the system-internal {@link PriceFragmentType} 'Rest', that is the missing amount of the parts of 'Total'
 	 * (those parts not defined in a {@link Price}), to form the 'Total' amount.
 	 * <p>
 	 * Note that the PriceFragment for this type is used as virtual price fragment and is not persisted to the datastore.
@@ -170,7 +170,7 @@ public class PriceFragmentType
 	 */
 	public PriceFragmentTypeName getName() {
 		return name;
-	}	
+	}
 	
 	/**
 	 * @jdo.field persistence-modifier="persistent"
@@ -178,7 +178,7 @@ public class PriceFragmentType
 	private PriceFragmentType containerPriceFragmentType;
 
 	/**
-	 * The PriceFragmentType this one is contained in. 
+	 * The PriceFragmentType this one is contained in.
 	 * Currently the setter will only allow null or
 	 * the PriceFragmentType with id {@link #TOTAL_PRICEFRAGMENTTYPEID} or null.
 	 */

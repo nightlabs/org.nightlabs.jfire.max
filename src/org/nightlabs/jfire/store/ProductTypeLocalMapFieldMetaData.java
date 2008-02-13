@@ -33,7 +33,7 @@ import java.util.Map;
 /**
  * @author Marco Schulze - marco at nightlabs dot de
  *
- * @jdo.persistence-capable 
+ * @jdo.persistence-capable
  *		identity-type="application"
  *		persistence-capable-superclass="ProductTypeLocalFieldMetaData"
  *		detachable="true"

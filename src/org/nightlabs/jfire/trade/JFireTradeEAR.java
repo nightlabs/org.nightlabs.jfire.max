@@ -26,10 +26,8 @@
 
 package org.nightlabs.jfire.trade;
 
-import org.nightlabs.jfire.editlock.EditLockType;
 import org.nightlabs.jfire.editlock.id.EditLockTypeID;
 import org.nightlabs.jfire.organisation.Organisation;
-import org.nightlabs.jfire.store.ProductType;
 
 /**
  * @author Alexander Bieber <alex[AT]nightlabs[DOT]de>
@@ -43,5 +41,5 @@ public class JFireTradeEAR {
 	 * {@link EditLockType} for {@link ProductType}s. Used in the TradeAdminPrespective.
 	 */
 	public final static EditLockTypeID EDIT_LOCK_TYPE_ID_PRODUCT_TYPE = EditLockTypeID.create(
-			Organisation.DEV_ORGANISATION_ID, "EditLockTypeProductType"); 
+			Organisation.DEV_ORGANISATION_ID, "EditLockTypeProductType");
 }

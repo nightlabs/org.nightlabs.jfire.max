@@ -26,7 +26,6 @@
 
 package org.nightlabs.jfire.accounting.priceconfig;
 
-import org.nightlabs.jfire.accounting.Price;
 import org.nightlabs.jfire.trade.Article;
 import org.nightlabs.jfire.trade.ArticlePrice;
 

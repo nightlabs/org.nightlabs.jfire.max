@@ -88,17 +88,17 @@ import org.nightlabs.version.MalformedVersionException;
 
 
 /**
- * @ejb.bean name="jfire/ejb/JFireTrade/TradeManager"	
+ * @ejb.bean name="jfire/ejb/JFireTrade/TradeManager"
  *					 jndi-name="jfire/ejb/JFireTrade/TradeManager"
- *					 type="Stateless" 
+ *					 type="Stateless"
  *					 transaction-type="Container"
  *
  * @ejb.util generate="physical"
  * @ejb.transaction type="Required"
  */
-public abstract class TradeManagerBean 
+public abstract class TradeManagerBean
 extends BaseSessionBeanImpl
-implements SessionBean 
+implements SessionBean
 {
 	private static final long serialVersionUID = 1L;
 	/**
@@ -109,10 +109,10 @@ implements SessionBean
 	////////////////////// EJB "constuctor" ////////////////////////////
 
 	/**
-	 * @ejb.create-method	
+	 * @ejb.create-method
 	 * @ejb.permission role-name="_Guest_"
 	 */
-	public void ejbCreate() 
+	public void ejbCreate()
 	throws CreateException
 	{
 		logger.debug(this.getClass().getName() + ".ejbCreate()");
@@ -484,7 +484,7 @@ implements SessionBean
 //	}
 
 	/**
-	 * Creates a new Offer within a given Order. 
+	 * Creates a new Offer within a given Order.
 	 *
 	 * @param orderID The orderID defining the Order in which to create a new Offer.
 	 * @throws ModuleException
@@ -925,7 +925,7 @@ implements SessionBean
 	 * @ejb.interface-method
 	 * @ejb.permission role-name="_Guest_"
 	 * @ejb.transaction type="Required"
-	 */ 
+	 */
 	public LegalEntity storePersonAsLegalEntity(Person person, boolean get, String[] fetchGroups, int maxFetchDepth)
 	{
 		
@@ -972,7 +972,7 @@ implements SessionBean
 	 * @ejb.interface-method
 	 * @ejb.permission role-name="_Guest_"
 	 * @ejb.transaction type="Required"
-	 */ 
+	 */
 	public Order getOrder(OrderID orderID, String[] fetchGroups, int maxFetchDepth)
 	{
 		PersistenceManager pm = getPersistenceManager();
@@ -991,7 +991,7 @@ implements SessionBean
 	 * @ejb.interface-method
 	 * @ejb.permission role-name="_Guest_"
 	 * @ejb.transaction type="Required"
-	 */ 
+	 */
 	public LegalEntity getLegalEntity(AnchorID anchorID, String[] fetchGroups, int maxFetchDepth)
 	{
 		PersistenceManager pm = getPersistenceManager();
@@ -1010,7 +1010,7 @@ implements SessionBean
 	 * @ejb.interface-method
 	 * @ejb.permission role-name="_Guest_"
 	 * @ejb.transaction type="Required"
-	 */ 
+	 */
 	public Collection getLegalEntities(Object[] leAnchorIDs, String[] fetchGroups, int maxFetchDepth)
 	{
 		PersistenceManager pm = getPersistenceManager();
@@ -1041,7 +1041,7 @@ implements SessionBean
 	 * @ejb.interface-method
 	 * @ejb.permission role-name="_Guest_"
 	 * @ejb.transaction type="Required"
-	 */ 
+	 */
 	public Collection<LegalEntity> getLegalEntities(Set<AnchorID> anchorIDs, String[] fetchGroups, int maxFetchDepth)
 	{
 		PersistenceManager pm = getPersistenceManager();
@@ -1070,7 +1070,7 @@ implements SessionBean
 	 * @ejb.interface-method
 	 * @ejb.permission role-name="_Guest_"
 	 * @ejb.transaction type="Supports" @!This usually means that no transaction is opened which is significantly faster and recommended for all read-only EJB methods! Marco.
-	 */ 
+	 */
 	public Offer getOffer(OfferID offerID, String[] fetchGroups, int maxFetchDepth)
 	{
 		PersistenceManager pm = getPersistenceManager();
@@ -1090,7 +1090,7 @@ implements SessionBean
 	 * @ejb.interface-method
 	 * @ejb.permission role-name="_Guest_"
 	 * @ejb.transaction type="Supports" @!This usually means that no transaction is opened which is significantly faster and recommended for all read-only EJB methods! Marco.
-	 */ 
+	 */
 	@SuppressWarnings("unchecked")
 	public List<Offer> getOffers(Set<OfferID> offerIDs, String[] fetchGroups, int maxFetchDepth)
 	{
@@ -1106,7 +1106,7 @@ implements SessionBean
 	 * @ejb.interface-method
 	 * @ejb.permission role-name="_Guest_"
 	 * @ejb.transaction type="Required"
-	 */ 
+	 */
 	public Article getArticle(ArticleID articleID, String[] fetchGroups, int maxFetchDepth)
 	{
 		PersistenceManager pm = getPersistenceManager();
@@ -1129,7 +1129,7 @@ implements SessionBean
 	 * @ejb.interface-method
 	 * @ejb.permission role-name="_Guest_"
 	 * @ejb.transaction type="Required"
-	 */ 
+	 */
 	public Collection<Article> getArticles(Collection<ArticleID> articleIDs, String[] fetchGroups, int maxFetchDepth)
 	{
 		PersistenceManager pm = getPersistenceManager();
@@ -1328,8 +1328,8 @@ implements SessionBean
 			pm.makePersistent(moduleMetaData);
 			
 			ConfigSetup configSetup = ConfigSetup.getConfigSetup(
-					pm, 
-					getOrganisationID(), 
+					pm,
+					getOrganisationID(),
 					UserConfigSetup.CONFIG_SETUP_TYPE_USER
 				);
 			configSetup.getConfigModuleClasses().add(LegalEntityViewConfigModule.class.getName());
@@ -1377,7 +1377,7 @@ implements SessionBean
 	 *
 	 * @param orderID The ID of the {@link Order} that shall be linked to another customer.
 	 * @param customerID The ID of the {@link LegalEntity} which shall be the new customer.
-	 * @throws ModuleException 
+	 * @throws ModuleException
 	 *
 	 * @ejb.interface-method
 	 * @ejb.transaction type="Required"
@@ -1537,19 +1537,19 @@ implements SessionBean
 	 * @ejb.interface-method
 	 * @ejb.transaction type="Required"
 	 * @ejb.permission role-name="_Guest_"
-	 */	
-	public Set<ProcessDefinitionID> getProcessDefinitionIDs(String statableClassName) 
+	 */
+	public Set<ProcessDefinitionID> getProcessDefinitionIDs(String statableClassName)
 	{
 		PersistenceManager pm = getPersistenceManager();
 		try {
 			return NLJDOHelper.getObjectIDSet(ProcessDefinitionAssignment.getProcessDefinitions(pm, statableClassName));
 		} finally {
 			pm.close();
-		}		
+		}
 	}
 
 	/**
-	 * @param queries Instances of {@link JDOQuery} 
+	 * @param queries Instances of {@link JDOQuery}
 	 * 		that shall be chained
 	 *		in order to retrieve the result. The result of one query is passed to the
 	 *		next one using the {@link JDOQuery#setCandidates(Collection)}.
@@ -1579,7 +1579,7 @@ implements SessionBean
 	}
 				
 //	/**
-//	 * @param articleContainerQueries Instances of {@link ArticleContainerQuery} 
+//	 * @param articleContainerQueries Instances of {@link ArticleContainerQuery}
 //	 * 		that shall be chained
 //	 *		in order to retrieve the result. The result of one query is passed to the
 //	 *		next one using the {@link JDOQuery#setCandidates(Collection)}.
@@ -1606,10 +1606,10 @@ implements SessionBean
 //		} finally {
 //			pm.close();
 //		}
-//	}	
+//	}
 
 //	/**
-//	 * @param articleContainerQueries Instances of {@link AbstractArticleContainerQuickSearchQuery} 
+//	 * @param articleContainerQueries Instances of {@link AbstractArticleContainerQuickSearchQuery}
 //	 * 		that shall be chained
 //	 *		in order to retrieve the result. The result of one query is passed to the
 //	 *		next one using the {@link JDOQuery#setCandidates(Collection)}.
@@ -1642,8 +1642,8 @@ implements SessionBean
 //	 * @ejb.interface-method
 //	 * @ejb.permission role-name="_Guest_"
 //	 * @ejb.transaction type="Supports" @!This usually means that no transaction is opened which is significantly faster and recommended for all read-only EJB methods! Marco.
-//	 */	
-//	public Set<InvoiceID> getInvoiceIDs(Collection<JDOQuery> queries) 
+//	 */
+//	public Set<InvoiceID> getInvoiceIDs(Collection<JDOQuery> queries)
 //	{
 //		PersistenceManager pm = getPersistenceManager();
 //		try {
@@ -1660,15 +1660,15 @@ implements SessionBean
 //			return NLJDOHelper.getObjectIDSet(invoices);
 //		} finally {
 //			pm.close();
-//		}		
+//		}
 //	}
 	
 	/**
 	 * @ejb.interface-method
 	 * @ejb.permission role-name="_Guest_"
 	 * @ejb.transaction type="Supports" @!This usually means that no transaction is opened which is significantly faster and recommended for all read-only EJB methods! Marco.
-	 */	
-	public Set<OfferID> getOfferIDs(Collection<JDOQuery> queries) 
+	 */
+	public Set<OfferID> getOfferIDs(Collection<JDOQuery> queries)
 	{
 		PersistenceManager pm = getPersistenceManager();
 		try {
@@ -1685,15 +1685,15 @@ implements SessionBean
 			return NLJDOHelper.getObjectIDSet(offers);
 		} finally {
 			pm.close();
-		}		
-	}	
+		}
+	}
 	
 	/**
 	 * @ejb.interface-method
 	 * @ejb.permission role-name="_Guest_"
 	 * @ejb.transaction type="Supports" @!This usually means that no transaction is opened which is significantly faster and recommended for all read-only EJB methods! Marco.
-	 */	
-	public Set<OrderID> getOrderIDs(Collection<JDOQuery> queries) 
+	 */
+	public Set<OrderID> getOrderIDs(Collection<JDOQuery> queries)
 	{
 		PersistenceManager pm = getPersistenceManager();
 		try {
@@ -1710,15 +1710,15 @@ implements SessionBean
 			return NLJDOHelper.getObjectIDSet(orders);
 		} finally {
 			pm.close();
-		}		
-	}	
+		}
+	}
 	
 //	/**
 //	 * @ejb.interface-method
 //	 * @ejb.permission role-name="_Guest_"
 //	 * @ejb.transaction type="Supports" @!This usually means that no transaction is opened which is significantly faster and recommended for all read-only EJB methods! Marco.
-//	 */	
-//	public Set<DeliveryNoteID> getDeliveryNoteIDs(Collection<JDOQuery> queries) 
+//	 */
+//	public Set<DeliveryNoteID> getDeliveryNoteIDs(Collection<JDOQuery> queries)
 //	{
 //		PersistenceManager pm = getPersistenceManager();
 //		try {
@@ -1735,15 +1735,15 @@ implements SessionBean
 //			return NLJDOHelper.getObjectIDSet(deliveryNotes);
 //		} finally {
 //			pm.close();
-//		}		
+//		}
 //	}
 	
 	/**
 	 * @ejb.interface-method
 	 * @ejb.permission role-name="_Guest_"
 	 * @ejb.transaction type="Supports" @!This usually means that no transaction is opened which is significantly faster and recommended for all read-only EJB methods! Marco.
-	 */	
-	public Set<ReceptionNoteID> getReceptionNoteIDs(Collection<JDOQuery> queries) 
+	 */
+	public Set<ReceptionNoteID> getReceptionNoteIDs(Collection<JDOQuery> queries)
 	{
 		PersistenceManager pm = getPersistenceManager();
 		try {
@@ -1760,14 +1760,14 @@ implements SessionBean
 			return NLJDOHelper.getObjectIDSet(receptionNotes);
 		} finally {
 			pm.close();
-		}		
-	}		
+		}
+	}
 
 	/**
 	 * @ejb.interface-method
 	 * @ejb.permission role-name="_Guest_"
 	 * @ejb.transaction type="Supports" @!This usually means that no transaction is opened which is significantly faster and recommended for all read-only EJB methods! Marco.
-	 */ 
+	 */
 	@SuppressWarnings("unchecked")
 	public List<ReceptionNote> getReceptionNotes(Set<ReceptionNoteID> receptionNoteIDs, String[] fetchGroups, int maxFetchDepth)
 	{

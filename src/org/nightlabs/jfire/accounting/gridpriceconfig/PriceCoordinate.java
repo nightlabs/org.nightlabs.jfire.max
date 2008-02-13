@@ -33,7 +33,6 @@ import java.util.Set;
 import javax.jdo.listener.StoreCallback;
 
 import org.apache.log4j.Logger;
-import org.nightlabs.jdo.ObjectID;
 import org.nightlabs.jdo.ObjectIDUtil;
 import org.nightlabs.jfire.accounting.Currency;
 import org.nightlabs.jfire.accounting.Tariff;
@@ -128,7 +127,7 @@ public class PriceCoordinate implements Serializable, StoreCallback, IPriceCoord
 	 * must have a different type.
 	 * </p>
 	 * <p>
-	 * Additionally, it converts {@link String}s starting with {@link ObjectIDUtil#JDO_PREFIX} + 
+	 * Additionally, it converts {@link String}s starting with {@link ObjectIDUtil#JDO_PREFIX} +
 	 * {@link ObjectIDUtil#JDO_PREFIX_SEPARATOR} to {@link ObjectID}s using the method
 	 * {@link ObjectIDUtil#createObjectID(String)}.
 	 * </p>

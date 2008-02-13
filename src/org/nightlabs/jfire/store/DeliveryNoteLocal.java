@@ -31,10 +31,8 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Date;
 import java.util.List;
-import java.util.Map;
 import java.util.Set;
 
-import org.nightlabs.jfire.jbpm.graph.def.ActionHandlerNodeEnter;
 import org.nightlabs.jfire.jbpm.graph.def.Statable;
 import org.nightlabs.jfire.jbpm.graph.def.StatableLocal;
 import org.nightlabs.jfire.jbpm.graph.def.State;
@@ -101,12 +99,12 @@ implements Serializable, StatableLocal
 	private DeliveryNote deliveryNote;
 
 //	/**
-//	 * @jdo.field persistence-modifier="persistent"	 
+//	 * @jdo.field persistence-modifier="persistent"
 //	 */
 //	private boolean delivered = false;
 
 	/**
-	 * @jdo.field persistence-modifier="persistent"	 
+	 * @jdo.field persistence-modifier="persistent"
 	 */
 	private int deliveredArticleCount = 0;
 

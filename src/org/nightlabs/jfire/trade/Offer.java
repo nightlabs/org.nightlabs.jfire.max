@@ -48,13 +48,11 @@ import org.nightlabs.jfire.accounting.Accounting;
 import org.nightlabs.jfire.accounting.AccountingPriceConfig;
 import org.nightlabs.jfire.accounting.Currency;
 import org.nightlabs.jfire.accounting.Price;
-import org.nightlabs.jfire.jbpm.graph.def.ActionHandlerNodeEnter;
 import org.nightlabs.jfire.jbpm.graph.def.Statable;
 import org.nightlabs.jfire.jbpm.graph.def.StatableLocal;
 import org.nightlabs.jfire.jbpm.graph.def.State;
 import org.nightlabs.jfire.security.User;
 import org.nightlabs.jfire.store.ProductType;
-import org.nightlabs.jfire.trade.jbpm.ActionHandlerFinalizeOffer;
 import org.nightlabs.jfire.transfer.id.AnchorID;
 import org.nightlabs.util.Util;
 
@@ -549,7 +547,7 @@ implements
 	 * 
 	 * @param all If all=false, it does not recalculate the price of an Article,
 	 *	if Article.isPriceDependentFromOffer() returns false.
-	 *	If all=true, all prices of all items are recalculated. 
+	 *	If all=true, all prices of all items are recalculated.
 	 */
 	private void calculateArticlePrices(boolean all)
 	{
@@ -752,7 +750,7 @@ implements
 	{
 		if (valid && !stable) {
 //		 TODO we should log an error here, because this should never happen!
-			return false;		
+			return false;
 		}
 		return valid;
 	}

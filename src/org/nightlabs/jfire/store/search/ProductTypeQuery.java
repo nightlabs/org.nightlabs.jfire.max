@@ -12,14 +12,14 @@ import org.nightlabs.jfire.store.id.ProductTypeGroupID;
 import org.nightlabs.jfire.transfer.id.AnchorID;
 
 /**
- * Searches {@link ProductType}s. Every field that's <code>null</code> is ignored, 
+ * Searches {@link ProductType}s. Every field that's <code>null</code> is ignored,
  * every field containing a value will cause the query to filter all non-matching instances.
  * 
  * @author Daniel.Mazurek [at] NightLabs [dot] de
  *
  */
 public class ProductTypeQuery<P extends ProductType>
-extends JDOQuery<P> 
+extends JDOQuery<P>
 {
 	private static final Logger logger = Logger.getLogger(ProductTypeQuery.class);
 	
@@ -43,20 +43,20 @@ extends JDOQuery<P>
 	private ProductTypeGroupID productTypeGroupID = null;
 	
 	@Override
-	protected Query prepareQuery() 
+	protected Query prepareQuery()
 	{
 		// FIXME: Query also subclasses when JPOX problem is solved
 		Query q = getPersistenceManager().newQuery(getPersistenceManager().getExtent(
 				ProductType.class, false));
 		
 		StringBuffer filter = getFilter();
-		StringBuffer vars = getVars();		
+		StringBuffer vars = getVars();
 		
 		filter.append("\n");
-		filter.append("true");		
+		filter.append("true");
 		
 		if (fullTextSearch != null) {
-			filter.append("\n && ( ");			
+			filter.append("\n && ( ");
 			addFullTextSearch(filter, vars, "name");
 			filter.append("\n )");
 		}
@@ -73,7 +73,7 @@ extends JDOQuery<P>
 		if (available != null)
 			filter.append("\n && this.available == :available");
 		
-		if (innerPriceConfigID != null) 
+		if (innerPriceConfigID != null)
 		{
 			// TODO: JDOHelper.getObjectId(this.*) does not seem to work (java.lang.IndexOutOfBoundsException: Index: 3, Size: 3)
 //			filter.append("\n && JDOHelper.getObjectId(this.innerPriceConfig) == :innerPriceConfigID");
@@ -90,7 +90,7 @@ extends JDOQuery<P>
 		if (maxNestedProductTypeAmount >= 0)
 			filter.append("\n && :maxNestedProductTypeAmount > this.nestedProductTypes.size()");
 		
-		if (ownerID != null) 
+		if (ownerID != null)
 		{
 			// TODO: JDOHelper.getObjectId(this.*) does not seem to work
 //			filter.append("\n && JDOHelper.getObjectId(this.owner) == :ownerID");
@@ -102,7 +102,7 @@ extends JDOQuery<P>
 							")");
 		}
 		
-		if (deliveryConfigurationID != null) 
+		if (deliveryConfigurationID != null)
 		{
 			// TODO: JDOHelper.getObjectId(this.*) does not seem to work
 //		filter.append("\n && JDOHelper.getObjectId(this.deliveryConfiguration) == :deliveryConfigurationID");
@@ -110,10 +110,10 @@ extends JDOQuery<P>
 			filter.append("\n && (" +
 				"this.deliveryConfigurationID.organisationID == \""+deliveryConfigurationID.organisationID+"\" && " +
 				"this.deliveryConfigurationID.deliveryConfigurationID == \""+deliveryConfigurationID.deliveryConfigurationID+"\"" +
-						")");			
+						")");
 		}
 		
-		if (localAccountantDelegateID != null) 
+		if (localAccountantDelegateID != null)
 		{
 			// TODO: JDOHelper.getObjectId(this.*) does not seem to work
 //		filter.append("\n && JDOHelper.getObjectId(this.localAccountantDelegate) == :localAccountantDelegateID");
@@ -121,10 +121,10 @@ extends JDOQuery<P>
 			filter.append("\n && (" +
 				"this.localAccountantDelegate.organisationID == \""+localAccountantDelegateID.organisationID+"\" && " +
 				"this.localAccountantDelegate.localAccountantDelegateID == \""+localAccountantDelegateID.localAccountantDelegateID+"\"" +
-						")");						
+						")");
 		}
 
-		if (productTypeGroupID != null) 
+		if (productTypeGroupID != null)
 		{
 			// TODO: JDOHelper.getObjectId(this.*) does not seem to work
 //		filter.append("\n && JDOHelper.getObjectId(this.managedProductTypeGroup) == :productTypeGroupID");
@@ -143,7 +143,7 @@ extends JDOQuery<P>
 		q.setFilter(filter.toString());
 		q.declareVariables(vars.toString());
 		
-		return q;		
+		return q;
 	}
 
 	protected void addFullTextSearch(StringBuffer filter, StringBuffer vars, String member) {
@@ -165,7 +165,7 @@ extends JDOQuery<P>
 		if (getImports().length() > 0)
 			getImports().append("; ");
 		
-		getImports().append("import "+importClass);		
+		getImports().append("import "+importClass);
 	}
 
 	protected void addVariable(String className, String variableName) {
@@ -184,7 +184,7 @@ extends JDOQuery<P>
 	}
 
 	/**
-	 * Sets the filter to include only ProductTypes whose confirmed flag matches the given value. 
+	 * Sets the filter to include only ProductTypes whose confirmed flag matches the given value.
 	 * @param confirmed the confirmed to set
 	 */
 	public void setConfirmed(Boolean confirmed) {
@@ -213,7 +213,7 @@ extends JDOQuery<P>
 	}
 
 	/**
-	 * Sets the filter to include only ProductTypes whose name 
+	 * Sets the filter to include only ProductTypes whose name
 	 * matches the given fullTextSearch. The match will be performed
 	 * following the rules of {@link String#matches(String)}, i.e.
 	 * you need to pass a regular expression here.
@@ -232,7 +232,7 @@ extends JDOQuery<P>
 	}
 
 	/**
-	 * Sets the filter to include only productTypes whose published flag matches the given value. 
+	 * Sets the filter to include only productTypes whose published flag matches the given value.
 	 * @param published the published to set
 	 */
 	public void setPublished(Boolean published) {

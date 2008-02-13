@@ -43,7 +43,6 @@ import org.mozilla.javascript.ImporterTopLevel;
 import org.mozilla.javascript.Scriptable;
 import org.mozilla.javascript.ScriptableObject;
 import org.mozilla.javascript.Undefined;
-import org.nightlabs.ModuleException;
 import org.nightlabs.jfire.accounting.PriceFragmentType;
 import org.nightlabs.jfire.accounting.Tariff;
 import org.nightlabs.jfire.accounting.TariffMapper;
@@ -172,7 +171,7 @@ public class PriceCalculator
 	}
 
 //	/**
-//	 * This method iterates all inner products (including the virtual one) and 
+//	 * This method iterates all inner products (including the virtual one) and
 //	 */
 //	public void preparePriceCalculation_adoptPackagePriceConfigParams()
 //	{
@@ -633,7 +632,7 @@ public class PriceCalculator
 	 * @param priceCell Must <b>not</b> be <tt>null</tt>.
 	 * @param productInfo The productInfo to which the cell belongs.
 	 * @param priceFragmentType The current PriceFragmentType for which to calculate a price.
-	 * @throws PriceCalculationException 
+	 * @throws PriceCalculationException
 	 *
 	 * @throws ModuleException
 	 */

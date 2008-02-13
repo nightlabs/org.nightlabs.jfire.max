@@ -153,7 +153,7 @@ implements StoreCallback
 
 	/**
 	 * @jdo.field persistence-modifier="persistent"
-	 */ 
+	 */
 	private OrganisationLegalEntity mandator;
 
 	/**
@@ -221,7 +221,7 @@ implements StoreCallback
 
 //	/**
 //	 * @jdo.field persistence-modifier="persistent"
-//	 */	
+//	 */
 //	private int nextMoneyFlowMappingID = 0;
 //	private static int _nextMoneyFlowMappingID = -1;
 //	private static Object _nextMoneyFlowMappingIDMutex = new Object();
@@ -247,7 +247,7 @@ implements StoreCallback
 	 * fails a InvoiceEditException will be thrown.
 	 *
 	 * @param user The user which is responsible for creation of this invoice.
-	 * @param articles The {@link Article}s that shall be added to the invoice. Must not be empty (because the customer is looked up from the articles). 
+	 * @param articles The {@link Article}s that shall be added to the invoice. Must not be empty (because the customer is looked up from the articles).
 	 */
 	public Invoice createInvoice(User user, Collection articles, String invoiceIDPrefix)
 	throws InvoiceEditException
@@ -285,19 +285,19 @@ implements StoreCallback
 			
 			if (!articleOffer.getOfferLocal().isAccepted()) {
 				throw new InvoiceEditException(
-					InvoiceEditException.REASON_OFFER_NOT_ACCEPTED, 
+					InvoiceEditException.REASON_OFFER_NOT_ACCEPTED,
 					"At least one involved offer is not accepted!",
 					(ArticleID) JDOHelper.getObjectId(article)
 				);
 			}
 
-			if (!vendorPK.equals(articleOrder.getVendor().getPrimaryKey()) 
-						|| 
-					!customerPK.equals(articleOrder.getCustomer().getPrimaryKey()) 
+			if (!vendorPK.equals(articleOrder.getVendor().getPrimaryKey())
+						||
+					!customerPK.equals(articleOrder.getCustomer().getPrimaryKey())
 					)
 			{
 				throw new InvoiceEditException(
-					InvoiceEditException.REASON_ANCHORS_DONT_MATCH,				
+					InvoiceEditException.REASON_ANCHORS_DONT_MATCH,
 					"Vendor and customer are not equal for all involved orders, can not create Invoice!!"
 				);
 			}
@@ -306,8 +306,8 @@ implements StoreCallback
 				Invoice invoice = article.getInvoice();
 				throw new InvoiceEditException(
 					InvoiceEditException.REASON_ARTICLE_ALREADY_IN_INVOICE,
-					"Article already in an invoice. Article "+article.getPrimaryKey()+", Invoice "+invoice.getPrimaryKey(), 
-					(ArticleID) JDOHelper.getObjectId(article), 
+					"Article already in an invoice. Article "+article.getPrimaryKey()+", Invoice "+invoice.getPrimaryKey(),
+					(ArticleID) JDOHelper.getObjectId(article),
 					(InvoiceID) JDOHelper.getObjectId(invoice)
 				);
 			}
@@ -397,8 +397,8 @@ implements StoreCallback
 	 * @return a new Invoice
 	 * @throws InvoiceEditException
 	 */
-	public Invoice createInvoice(User user, ArticleContainer articleContainer, String invoiceIDPrefix) 
-	throws InvoiceEditException 
+	public Invoice createInvoice(User user, ArticleContainer articleContainer, String invoiceIDPrefix)
+	throws InvoiceEditException
 	{
 		ArrayList<Article> articles = new ArrayList<Article>();
 		for (Article article : articleContainer.getArticles()) {
@@ -499,7 +499,7 @@ implements StoreCallback
 		BookMoneyTransfer bookMoneyTransfer = new BookMoneyTransfer(
 				user,
 				from,
-				to,			
+				to,
 				invoice
 			);
 		bookMoneyTransfer = (BookMoneyTransfer) pm.makePersistent(bookMoneyTransfer);
@@ -593,7 +593,7 @@ implements StoreCallback
 			throw x;
 		} catch (Exception e) {
 			throw new PaymentException(new PaymentResult(
-					PaymentResult.CODE_FAILED, "Calling PaymentActionHandler.onPayDoWork failed! localOrganisation="+getOrganisationID(), e)); 
+					PaymentResult.CODE_FAILED, "Calling PaymentActionHandler.onPayDoWork failed! localOrganisation="+getOrganisationID(), e));
 		}
 
 		return serverPaymentResult;
@@ -687,7 +687,7 @@ implements StoreCallback
 			throw x;
 		} catch (Exception e) {
 			throw new PaymentException(new PaymentResult(
-					PaymentResult.CODE_FAILED, "Calling PaymentActionHandler.onPayEnd failed! localOrganisation="+getOrganisationID(), e)); 
+					PaymentResult.CODE_FAILED, "Calling PaymentActionHandler.onPayEnd failed! localOrganisation="+getOrganisationID(), e));
 		}
 
 		try {
@@ -723,7 +723,7 @@ implements StoreCallback
 	 * <p>
 	 * It is not integrated within payxxxEnd
 	 * (e.g. {@link #payInvoicesEnd(User, PaymentData, PayMoneyTransfer)}),
-	 * because it needs to be called within a separate transaction. 
+	 * because it needs to be called within a separate transaction.
 	 */
 	public void payRollback(
 			User user, PaymentData paymentData)
@@ -793,7 +793,7 @@ implements StoreCallback
 	 * @return Returns the <tt>PaymentResult</tt>, which is additionally set in
 	 *		<tt>paymentData.getPayment().setPayBeginServerResult(...)</tt>.
 	 *
-	 * @throws PaymentException 
+	 * @throws PaymentException
 	 */
 	public PaymentResult payBegin(
 			User user, PaymentData paymentData)
@@ -844,7 +844,7 @@ implements StoreCallback
 			partner.setAccountant(getPartnerAccountant());
 		
 //	The PaymentLocal object is normally created in PaymentHelperBean#payBegin_storePaymentData(PaymentData).
-//	But some use cases do not use this API, this is why we create it here if it does not exist yet.  
+//	But some use cases do not use this API, this is why we create it here if it does not exist yet.
 		if (paymentData.getPayment().getPaymentLocal() == null)
 			new PaymentLocal(paymentData.getPayment());
 
@@ -891,7 +891,7 @@ implements StoreCallback
 			throw x;
 		} catch (Exception e) {
 			throw new PaymentException(new PaymentResult(
-					PaymentResult.CODE_FAILED, "Calling PaymentActionHandler.onPayBegin failed! localOrganisation="+getOrganisationID(), e)); 
+					PaymentResult.CODE_FAILED, "Calling PaymentActionHandler.onPayBegin failed! localOrganisation="+getOrganisationID(), e));
 		}
 
 		if (paymentData.getPayment().isPostponed()) {
@@ -1042,9 +1042,9 @@ implements StoreCallback
 	}
 
 //	/**
-//	 * Finalizes an invoice and sends it to the involved 
+//	 * Finalizes an invoice and sends it to the involved
 //	 * organisation if neccessary.
-//	 * 
+//	 *
 //	 * @param finalizer
 //	 * @param invoice
 //	 */
@@ -1065,7 +1065,7 @@ implements StoreCallback
 
 //	/**
 //	 * Creates and persists a new Account for the mandator.
-//	 * 
+//	 *
 //	 * @param anchorID
 //	 * @param currency
 //	 * @return
@@ -1075,8 +1075,8 @@ implements StoreCallback
 //		if (createSummaryAccount) {
 //			newAccount = new SummaryAccount(
 //					getMandator().getOrganisationID(),
-//					anchorID, 
-//					getMandator(), 
+//					anchorID,
+//					getMandator(),
 //					currency
 //			);
 //		}
@@ -1097,7 +1097,7 @@ implements StoreCallback
 	 * Finds (and creates if neccessary) the right Account for the given LegalEntity and Currency.
 	 * 
 	 * @param accountType See {@link Account} for static anchorTypeID definitions
-	 * @param partner The legal entity the account should be searched for. 
+	 * @param partner The legal entity the account should be searched for.
 	 * @param currency The currency the account should record.
 	 * @return The found or created acccount. Never null.
 	 */
@@ -1120,7 +1120,7 @@ implements StoreCallback
 			account.setOwner(partner);
 		}
 
-//		String searchAccountID = accountType.getOrganisationID() + ':' + accountType.getAccountTypeID() + ':' + partner.getOrganisationID() + ':' + partner.getAnchorID() + ':' + currency.getCurrencyID(); 
+//		String searchAccountID = accountType.getOrganisationID() + ':' + accountType.getAccountTypeID() + ':' + partner.getOrganisationID() + ':' + partner.getAnchorID() + ':' + currency.getCurrencyID();
 //		AnchorID anchorID = AnchorID.create(this.getOrganisationID(), Account.ANCHOR_TYPE_ID_ACCOUNT, searchAccountID);
 //
 //		Account account = null;
@@ -1128,14 +1128,14 @@ implements StoreCallback
 //		try {
 //			o = getPersistenceManager().getObjectById(anchorID);
 //			account = (Account)o;
-//		} 
+//		}
 //		catch (ClassCastException ce)  {
 //			IllegalStateException ill = new IllegalStateException("Found persistent object with oid "+anchorID+" but is not of type Account but "+o.getClass().getName());
 //			ill.initCause(ce);
 //			throw ill;
 //		}
 //		catch (JDOObjectNotFoundException je) {
-//			// account not existing, create it 
+//			// account not existing, create it
 //			account = new Account(this.getOrganisationID(), searchAccountID, partner, currency, accountType);
 //			account = getPersistenceManager().makePersistent(account);
 //			account.setOwner(partner);
@@ -1143,7 +1143,7 @@ implements StoreCallback
 //
 //		if (account == null)
 //			throw new IllegalStateException("Account with oid "+anchorID+" could neither be found nor created!");
-//		
+//
 //		if (!account.getOwner().equals(partner))
 //			throw new IllegalStateException("An account for oid "+anchorID+" could be found, but its owner is not the partner the search was performed for. Owner: "+account.getOwner().getPrimaryKey()+", Partner: "+partner.getPrimaryKey());
 //

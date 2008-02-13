@@ -74,7 +74,7 @@ public class Repository extends Anchor
 //	 * Both local and foreign products are transferred from
 //	 * this repository to the container product's repository
 //	 * when the container product is assembled.
-//	 * </p> 
+//	 * </p>
 //	 * <p>
 //	 * Both local and foreign products are transferred into
 //	 * this repository (from the container's repository) when
@@ -104,7 +104,7 @@ public class Repository extends Anchor
 
 //	/**
 //	 * Repositories with this type are used by {@link ServerDeliveryProcessor}s to transfer their
-//	 * goods from and to. They're outside, hence they should have {@link #isOutside()}<code> == true</code>. 
+//	 * goods from and to. They're outside, hence they should have {@link #isOutside()}<code> == true</code>.
 //	 */
 //	public static final String ANCHOR_TYPE_ID_DELIVERY = "Repository.Delivery";
 

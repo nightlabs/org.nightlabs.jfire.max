@@ -49,9 +49,9 @@ import org.nightlabs.jfire.trade.LegalEntity;
 /**
  * @author Marco Schulze - marco at nightlabs dot de
  *
- * @ejb.bean name="jfire/ejb/JFireTrade/PaymentHelper"	
+ * @ejb.bean name="jfire/ejb/JFireTrade/PaymentHelper"
  *           jndi-name="jfire/ejb/JFireTrade/PaymentHelper"
- *           type="Stateless" 
+ *           type="Stateless"
  *           transaction-type="Container"
  *
  * @ejb.util generate="physical"
@@ -81,7 +81,7 @@ implements SessionBean
 		super.setSessionContext(sessionContext);
 	}
 	/**
-	 * @ejb.create-method  
+	 * @ejb.create-method
 	 * @ejb.permission role-name="_Guest_"
 	 */
 	public void ejbCreate()
@@ -102,7 +102,7 @@ implements SessionBean
 	/**
 	 * @param paymentData The <tt>PaymentData</tt> to be stored.
 	 * @return Returns the JDO objectID of the newly persisted <tt>paymentData</tt>
-	 * @throws ModuleException 
+	 * @throws ModuleException
 	 *
 	 * @ejb.interface-method view-type="local"
 	 * @ejb.transaction type="RequiresNew"
@@ -164,7 +164,7 @@ implements SessionBean
 //
 //			// look up Invoice s for InvoiceID s
 //			for (Iterator iter = invoiceIDs.iterator(); iter.hasNext();) {
-//				InvoiceID invoiceID = (InvoiceID) iter.next();				
+//				InvoiceID invoiceID = (InvoiceID) iter.next();
 //				Invoice invoice = null;
 //				try {
 //					invoice = (Invoice)pm.getObjectById(invoiceID);

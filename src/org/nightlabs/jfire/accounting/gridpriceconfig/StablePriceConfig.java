@@ -60,7 +60,7 @@ import org.nightlabs.jfire.trade.CustomerGroup;
  * @jdo.inheritance strategy="superclass-table"
  *
  * @!jdo.query name="getPriceCellsForCustomerGroupAndCurrency" query="SELECT
- *		FROM org.nightlabs.jfire.accounting.gridpriceconfig.PriceCell 
+ *		FROM org.nightlabs.jfire.accounting.gridpriceconfig.PriceCell
  *		WHERE
  *			this.priceConfig == paramPriceConfig &&
  *			this.priceCoordinate.customerGroupPK == paramCustomerGroupPK &&
@@ -252,7 +252,7 @@ implements IPackagePriceConfig, IResultPriceConfig
 	 * <b>Important</b>: The current behaviour is that only exactly zero or one parameter
 	 * can be defined, the others must be <tt>null</tt>. This might be changed later.
 	 *
-	 * @param customerGroup <tt>null</tt> or a specific CustomerGroup for which to add the missing cells in the other dimensions. 
+	 * @param customerGroup <tt>null</tt> or a specific CustomerGroup for which to add the missing cells in the other dimensions.
 	 * @param tariff <tt>null</tt> or a specific Tariff for which to add the missing cells in the other dimensions.
 	 * @param currency <tt>null</tt> or a specific Currency for which to add the missing cells in the other dimensions.
 	 */
@@ -352,7 +352,7 @@ implements IPackagePriceConfig, IResultPriceConfig
 	 * If one of the parameters is not <tt>null</tt>, all
 	 * <p>
 	 * <b>Important</b>: The current behaviour is that only exactly zero or one parameter
-	 * can be defined, the others must be <tt>null</tt>. This might be changed later. 
+	 * can be defined, the others must be <tt>null</tt>. This might be changed later.
 	 *
 	 * @param _customerGroup
 	 * @param _saleMode

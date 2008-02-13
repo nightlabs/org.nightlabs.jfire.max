@@ -15,7 +15,7 @@ import org.nightlabs.jfire.transfer.id.AnchorID;
  * @author Daniel.Mazurek [at] NightLabs [dot] de
  *
  */
-public class AccountQuery 
+public class AccountQuery
 extends JDOQuery<Account>
 {
 	private static final long serialVersionUID = 1L;
@@ -67,7 +67,7 @@ extends JDOQuery<Account>
 	private String ownerName = null;
 	
 	@Override
-	protected Query prepareQuery() 
+	protected Query prepareQuery()
 	{
 		Query q = getPersistenceManager().newQuery(Account.class);
 		StringBuffer filter = new StringBuffer();
@@ -90,7 +90,7 @@ extends JDOQuery<Account>
 			filter.append("\n && this.balance >= :minBalance");
 			
 		if (maxBalance >= 0)
-			filter.append("\n && this.balance <= :maxBalance");		
+			filter.append("\n && this.balance <= :maxBalance");
 		
 		if (anchorTypeID != null)
 			filter.append("\n && this.anchorTypeID == :anchorTypeID");
@@ -116,23 +116,23 @@ extends JDOQuery<Account>
 		}
 		
 		if (ownerName != null) {
-			filter.append("\n && (this.owner.person.displayName.toLowerCase().indexOf(\""+ownerName.toLowerCase()+"\") >= 0)");			
+			filter.append("\n && (this.owner.person.displayName.toLowerCase().indexOf(\""+ownerName.toLowerCase()+"\") >= 0)");
 		}
 		
 		if (logger.isDebugEnabled()) {
 			logger.debug("Vars:");
 			logger.debug(vars.toString());
 			logger.debug("Filter:");
-			logger.debug(filter.toString());			
+			logger.debug(filter.toString());
 		}
 		
 		q.setFilter(filter.toString());
-		q.declareVariables(vars.toString());		
+		q.declareVariables(vars.toString());
 		
 		return q;
 	}
 
-	private void addFullTextSearch(StringBuffer filter, StringBuffer vars, String member) 
+	private void addFullTextSearch(StringBuffer filter, StringBuffer vars, String member)
 	{
 		if (vars.length() > 0)
 			vars.append("; ");
@@ -299,6 +299,6 @@ extends JDOQuery<Account>
 	 */
 	public void setOwnerName(String ownerName) {
 		this.ownerName = ownerName;
-	}	
+	}
 	
 }

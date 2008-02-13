@@ -81,7 +81,6 @@ import org.nightlabs.jfire.store.DeliveryNote;
 import org.nightlabs.jfire.store.NotAvailableException;
 import org.nightlabs.jfire.store.Product;
 import org.nightlabs.jfire.store.ProductLocal;
-import org.nightlabs.jfire.store.ProductType;
 import org.nightlabs.jfire.store.ProductTypeActionHandler;
 import org.nightlabs.jfire.store.ProductTypeActionHandlerCache;
 import org.nightlabs.jfire.store.Store;
@@ -336,7 +335,7 @@ public class Trader
 
 		// if (organisationLegalEntity != null)
 		// return organisationLegalEntity;
-		//		
+		//
 		// Organisation org = Organisation.getOrganisation(pm, organisationID,
 		// false);
 		// if (org == null)
@@ -346,7 +345,7 @@ public class Trader
 		// organisationLegalEntity = new OrganisationLegalEntity(org);
 		// organisationLegalEntity.setPerson(org.getPerson());
 		// pm.makePersistent(organisationLegalEntity);
-		//		
+		//
 		// return organisationLegalEntity;
 	}
 
@@ -539,8 +538,8 @@ public class Trader
 		}
 //		if (!getOrganisationID().equals(vendor.getOrganisation())) {
 //			try {
-//				
-//				
+//
+//
 //
 //			} catch (ModuleException x) {
 //				throw x;
@@ -557,7 +556,7 @@ public class Trader
 		// TradeManager tm = TradeManagerUtil.getHome(props).create();
 		// Order order = tm.createOrder(currency.getCurrencyID());
 		// tm.remove();
-		//			
+		//
 		// String pk = order.getPrimaryKey();
 		// orders.put(pk, order);
 		// return order;
@@ -607,7 +606,7 @@ public class Trader
 //	/**
 //	 * This method creates a new Offer for the given vendor or returns a
 //	 * previously created one.
-//	 * 
+//	 *
 //	 * @param vendor
 //	 * @return Returns the offer for the given vendor. Never returns <tt>null</tt>.
 //	 * @throws ModuleException
@@ -636,7 +635,7 @@ public class Trader
 //	/**
 //	 * This method creates a new Order for the given vendor or returns a
 //	 * previously created one.
-//	 * 
+//	 *
 //	 * @param vendor
 //	 * @return Returns the order for the given vendor. Never returns <tt>null</tt>.
 //	 * @throws ModuleException
@@ -1184,7 +1183,7 @@ public class Trader
 				else {
 					// normal article (non-reversing)
 
-					// check, whether the article is finalized 
+					// check, whether the article is finalized
 					if (article.getOffer().isFinalized()) {
 						// it is finalized, so we only allow to release, if the offer's workflow has ended in a non-successful way (abort, reject, revoke etc.)
 						ProcessInstance processInstance = offer2ProcessInstance.get(article.getOffer());

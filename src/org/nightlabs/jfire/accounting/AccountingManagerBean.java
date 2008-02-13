@@ -101,7 +101,6 @@ import org.nightlabs.jfire.accounting.priceconfig.AffectedProductType;
 import org.nightlabs.jfire.accounting.priceconfig.FetchGroupsPriceConfig;
 import org.nightlabs.jfire.accounting.priceconfig.PriceConfigUtil;
 import org.nightlabs.jfire.accounting.priceconfig.id.PriceConfigID;
-import org.nightlabs.jfire.accounting.query.InvoiceQuery;
 import org.nightlabs.jfire.accounting.query.MoneyTransferIDQuery;
 import org.nightlabs.jfire.accounting.query.MoneyTransferQuery;
 import org.nightlabs.jfire.base.BaseSessionBeanImpl;
@@ -135,9 +134,9 @@ import org.nightlabs.jfire.transfer.id.TransferID;
 /**
  * @author Alexander Bieber - alex[AT]nightlabs[DOT]de
  * 
- * @ejb.bean name="jfire/ejb/JFireTrade/AccountingManager"	
+ * @ejb.bean name="jfire/ejb/JFireTrade/AccountingManager"
  *           jndi-name="jfire/ejb/JFireTrade/AccountingManager"
- *           type="Stateless" 
+ *           type="Stateless"
  *           transaction-type="Container"
  *
  * @ejb.util generate="physical"
@@ -160,7 +159,7 @@ public abstract class AccountingManagerBean
 		super.setSessionContext(sessionContext);
 	}
 	/**
-	 * @ejb.create-method  
+	 * @ejb.create-method
 	 * @ejb.permission role-name="_Guest_"
 	 */
 	public void ejbCreate()
@@ -681,7 +680,7 @@ public abstract class AccountingManagerBean
 	 * @ejb.transaction type="Required"
 	 * @ejb.permission role-name="_Guest_"
 	 */
-	public Account getAccount(AnchorID accountID, String[] fetchGroups, int maxFetchDepth) 
+	public Account getAccount(AnchorID accountID, String[] fetchGroups, int maxFetchDepth)
 	throws ModuleException
 	{
 		return getAccount(Account.getPrimaryKey(accountID.organisationID, accountID.anchorTypeID, accountID.anchorID), fetchGroups, maxFetchDepth);
@@ -694,7 +693,7 @@ public abstract class AccountingManagerBean
 	 * @ejb.transaction type="Required"
 	 * @ejb.permission role-name="_Guest_"
 	 */
-	public Account getAccount(String accountPK, String[] fetchGroups, int maxFetchDepth) 
+	public Account getAccount(String accountPK, String[] fetchGroups, int maxFetchDepth)
 	throws ModuleException
 	{
 		Account result = null;
@@ -792,7 +791,7 @@ public abstract class AccountingManagerBean
 //			} catch(JDOObjectNotFoundException e) {
 //				throw new ModuleException("No currency with currencyID "+currencyID+" known.", e);
 //			}
-//			
+//
 //			Account newAccount = Accounting.getAccounting(pm).createMandatorAccount(anchorID, currency, createSummaryAccount);
 //			if (get) {
 //				pm.getFetchPlan().setMaxFetchDepth(maxFetchDepth);
@@ -801,7 +800,7 @@ public abstract class AccountingManagerBean
 //
 //				return (Account)pm.detachCopy(newAccount);
 //			}
-//			return null;			
+//			return null;
 //		} finally {
 //			pm.close();
 //		}
@@ -942,7 +941,7 @@ public abstract class AccountingManagerBean
 	 * @ejb.transaction type="Required"
 	 * @ejb.permission role-name="_Guest_"
 	 */
-	public Collection<Object> getTopLevelAccountantDelegates(Class delegateClass) 
+	public Collection<Object> getTopLevelAccountantDelegates(Class delegateClass)
 	throws ModuleException
 	{
 		PersistenceManager pm = getPersistenceManager();
@@ -969,13 +968,13 @@ public abstract class AccountingManagerBean
 	 * @ejb.transaction type="Required"
 	 * @ejb.permission role-name="_Guest_"
 	 */
-	public Collection<Object> getChildAccountantDelegates(LocalAccountantDelegateID delegateID) 
+	public Collection<Object> getChildAccountantDelegates(LocalAccountantDelegateID delegateID)
 	throws ModuleException
 	{
 		PersistenceManager pm = getPersistenceManager();
 		try {
 			Collection delegates = LocalAccountantDelegate.getChildDelegates(
-					pm, 
+					pm,
 					delegateID.organisationID,
 					delegateID.localAccountantDelegateID
 				);
@@ -993,7 +992,7 @@ public abstract class AccountingManagerBean
 	/**
 	 * Returns detached instances of the LocalAccountantDelegates referenced by
 	 * the given LocalAccountantDelegateIDs in the delegateIDs parameter.
-	 *  
+	 * 
 	 * @param delegateIDs The LocalAccountantDelegateID of the delegates to return.
 	 * @param fetchGroups The fetchGroups to detach the delegates with.
 	 * @throws ModuleException
@@ -1031,7 +1030,7 @@ public abstract class AccountingManagerBean
 	/**
 	 * Returns the detached LocalAccountantDelegates referenced by
 	 * the given LocalAccountantDelegateID.
-	 *  
+	 * 
 	 * @param delegateID The LocalAccountantDelegateID of the delegate to return.
 	 * @param fetchGroups The fetchGroups to detach the delegates with.
 	 * @throws ModuleException
@@ -1070,8 +1069,8 @@ public abstract class AccountingManagerBean
 	 * @ejb.permission role-name="_Guest_"
 	 */
 	public LocalAccountantDelegate storeLocalAccountantDelegate(
-			LocalAccountantDelegate delegate, 
-			boolean get, 
+			LocalAccountantDelegate delegate,
+			boolean get,
 			String[] fetchGroups, int maxFetchDepth
 		)
 	throws ModuleException
@@ -1088,7 +1087,7 @@ public abstract class AccountingManagerBean
 	 * @ejb.interface-method
 	 * @ejb.permission role-name="_Guest_"
 	 * @ejb.transaction type="Required"
-	 */ 
+	 */
 	public MoneyFlowMapping storeMoneyFlowMapping(MoneyFlowMapping mapping, boolean get, String[] fetchGroups, int maxFetchDepth)
 	throws ModuleException
 	{
@@ -1104,11 +1103,11 @@ public abstract class AccountingManagerBean
 	
 	protected Map<ResolvedMapKey, ResolvedMapEntry> getResolvedMoneyFlowMappings(
 			PersistenceManager pm,
-			LocalAccountantDelegateID localAccountantDelegateID, 
-			ProductTypeID productTypeID, 
+			LocalAccountantDelegateID localAccountantDelegateID,
+			ProductTypeID productTypeID,
 			String[] mappingFetchGroups,
 			int maxFetchDepth
-		) 
+		)
 	{
 		if (mappingFetchGroups != null)
 			pm.getFetchPlan().setGroups(mappingFetchGroups);
@@ -1121,7 +1120,7 @@ public abstract class AccountingManagerBean
 		Map<ResolvedMapKey, ResolvedMapEntry> resolvedMappings = ((PFMappingAccountantDelegate) delegate).resolveProductTypeMappings(productType);
 		Map<ResolvedMapKey, ResolvedMapEntry> result = new HashMap<ResolvedMapKey, ResolvedMapEntry>();
 		for (Entry<ResolvedMapKey, ResolvedMapEntry> entry : resolvedMappings.entrySet()) {
-			ResolvedMapEntry persitentMapEntry = entry.getValue();				
+			ResolvedMapEntry persitentMapEntry = entry.getValue();
 			ResolvedMapEntry mapEntry = new ResolvedMapEntry();
 			
 			for (Iterator iterator = persitentMapEntry.getResolvedMappings().entrySet().iterator(); iterator.hasNext();) {
@@ -1130,7 +1129,7 @@ public abstract class AccountingManagerBean
 				MoneyFlowMapping detachedMapping = pm.detachCopy(persistentMapping);
 				mapEntry.getResolvedMappings().put((String)resolvedEntry.getKey(), detachedMapping);
 			}
-			result.put(entry.getKey(), mapEntry);				
+			result.put(entry.getKey(), mapEntry);
 		}
 		return result;
 		
@@ -1179,8 +1178,8 @@ public abstract class AccountingManagerBean
 
 //	/**
 //	 * @throws ModuleException
-//	 * @deprecated use {@link #getPriceFragmentTypes(Collection, String[], int)} 
-//	 * 
+//	 * @deprecated use {@link #getPriceFragmentTypes(Collection, String[], int)}
+//	 *
 //	 * @ejb.interface-method
 //	 * @ejb.transaction type="Required"
 //	 * @ejb.permission role-name="_Guest_"
@@ -1301,7 +1300,7 @@ public abstract class AccountingManagerBean
 	 * @ejb.permission role-name="_Guest_"
 	 */
 	public Invoice createInvoice(
-			Collection<ArticleID> articleIDs, String invoiceIDPrefix, 
+			Collection<ArticleID> articleIDs, String invoiceIDPrefix,
 			boolean get, String[] fetchGroups, int maxFetchDepth)
 		throws ModuleException
 	{
@@ -1529,7 +1528,7 @@ public abstract class AccountingManagerBean
 //			pm.close();
 //		}
 //	}
-//	
+//
 //	/**
 //	 * @throws ModuleException
 //	 *
@@ -1705,7 +1704,7 @@ public abstract class AccountingManagerBean
 		if (paymentData.getPayment().getPartnerID() == null) {
 			// if no partner is defined, at least one invoice must be known!
 			if (paymentData.getPayment().getInvoiceIDs() == null)
-				throw new NullPointerException("paymentData.getPayment().getPartnerID() and paymentData.getPayment().getInvoiceIDs() are both null! One of them must be specified, because I need to know who's paying!"); 
+				throw new NullPointerException("paymentData.getPayment().getPartnerID() and paymentData.getPayment().getInvoiceIDs() are both null! One of them must be specified, because I need to know who's paying!");
 
 			if (paymentData.getPayment().getInvoiceIDs().isEmpty())
 				throw new NullPointerException("paymentData.getPayment().getPartnerID() is null and paymentData.getPayment().getInvoiceIDs() is empty! If no partner is specified explicitely, I need at least one invoice to find out who's paying!");
@@ -2051,8 +2050,8 @@ public abstract class AccountingManagerBean
 //	/**
 //	 * Returns a Configurator for MoneyFlowMappings initially handling
 //	 * all MoneyFlowMappings found according to the given filters. Set
-//	 * a parameter to null to have it ignored in the filter. 
-//	 * 
+//	 * a parameter to null to have it ignored in the filter.
+//	 *
 //	 * @throws ModuleException
 //	 *
 //	 * @ejb.interface-method
@@ -2061,10 +2060,10 @@ public abstract class AccountingManagerBean
 //	 */
 //	public PFMoneyFlowMappingConfigurator getPFMoneyFlowMappingConfigurator(
 //			String accountantDelegateID,
-//			String productTypePK, 
-//			String priceFragmentTypePK, 
-//			String currencyID, 
-//			String packageType, 
+//			String productTypePK,
+//			String priceFragmentTypePK,
+//			String currencyID,
+//			String packageType,
 //			String[] fetchGroups
 //	)
 //	throws ModuleException
@@ -2086,7 +2085,7 @@ public abstract class AccountingManagerBean
 ////				filter.append("this.priceFragmentTypePK == qPriceFragmentTypePK");
 //				filter.append("this.priceFragmentTypePK == '"+priceFragmentTypePK+"'");
 //			}
-//			
+//
 //			if (currencyID != null){
 //				if (filter.length() > 0) {
 //					filter.append(" && ");
@@ -2094,7 +2093,7 @@ public abstract class AccountingManagerBean
 ////				filter.append("this.currencyID == qCurrencyID");
 //				filter.append("this.currencyID == '"+currencyID+"'");
 //			}
-//			
+//
 //			if (packageType != null){
 //				if (filter.length() > 0) {
 //					filter.append(" && ");
@@ -2102,14 +2101,14 @@ public abstract class AccountingManagerBean
 ////				filter.append("this.packageType == qPackageType");
 //				filter.append("this.packageType == '"+packageType+"'");
 //			}
-//			
+//
 //			if (filter.length() > 0)
 //				filter.append(" && ");
 //			if (accountantDelegateID == null)
 //				filter.append("this.accountantDelegateID == null");
 //			else
 //				filter.append("this.accountantDelegateID == \""+accountantDelegateID+"\"");
-//			
+//
 //			if (filter.length() > 0) {
 ////				q.declareParameters(params.toString());
 //				q.setFilter(filter.toString());
@@ -2121,15 +2120,15 @@ public abstract class AccountingManagerBean
 //				LOGGER.error("Error executing PFMoneyFlowMapping query: ", t);
 //				throw new RuntimeException(t);
 //			}
-//			
+//
 //			if (fetchGroups != null)
 //				pm.getFetchPlan().setGroups(Utils.array2ArrayList(fetchGroups));
-//			
+//
 //			Collection detachedMappings = pm.detachCopyAll(mappings);
-//			
+//
 //			PFMoneyFlowMappingConfigurator result = new PFMoneyFlowMappingConfigurator(getOrganisationID(), detachedMappings, null);
 //			result.setAccountantDelegateID(accountantDelegateID);
-//			return result;			
+//			return result;
 //		} finally {
 //			pm.close();
 //		}
@@ -2138,9 +2137,9 @@ public abstract class AccountingManagerBean
 	
 //	/**
 //	 * Returns a Map with key productTypePK and value PFMoneyFlowConfigurator
-//	 * holding all declared global Mappings for each element of the 
+//	 * holding all declared global Mappings for each element of the
 //	 * given list of productTypePKs.
-//	 * 
+//	 *
 //	 * @throws ModuleException
 //	 *
 //	 * @ejb.interface-method
@@ -2148,18 +2147,18 @@ public abstract class AccountingManagerBean
 //	 * @ejb.permission role-name="_Guest_"
 //	 */
 //	public Map getPFMoneyFlowMappingConfigurators (
-//			Collection productTypePKs, 
+//			Collection productTypePKs,
 //			String[] fetchGroups
 //	)
-//	throws ModuleException 
+//	throws ModuleException
 //	{
 //		PersistenceManager pm = getPersistenceManager();
 //		try {
 //			Query q = pm.newQuery(PFMoneyFlowMapping.class);
 //			StringBuffer filter = new StringBuffer();
-//			
-//			Map result = new HashMap(); 
-//			
+//
+//			Map result = new HashMap();
+//
 //			for (Iterator iter = productTypePKs.iterator(); iter.hasNext();) {
 //				String productTypePK = (String) iter.next();
 //				result.put(
@@ -2174,7 +2173,7 @@ public abstract class AccountingManagerBean
 //						)
 //				);
 //			}
-//			return result;			
+//			return result;
 //		} finally {
 //			pm.close();
 //		}
@@ -2203,7 +2202,7 @@ public abstract class AccountingManagerBean
 //
 //	/**
 //	 * Store the MoneyFlowMappings managed by the given Configurators.
-//	 * 
+//	 *
 //	 * @param configurators A Collection of PFMoneyFlowMappingConfigurators to store.
 //	 * @throws ModuleException
 //	 *
@@ -2229,7 +2228,7 @@ public abstract class AccountingManagerBean
 	 * @ejb.interface-method
 	 * @ejb.permission role-name="_Guest_"
 	 * @ejb.transaction type="Supports" @!This usually means that no transaction is opened which is significantly faster and recommended for all read-only EJB methods! Marco.
-	 */ 
+	 */
 	public Invoice getInvoice(InvoiceID invoiceID, String[] fetchGroups, int maxFetchDepth)
 	throws ModuleException
 	{
@@ -2322,8 +2321,8 @@ public abstract class AccountingManagerBean
 	 * @ejb.interface-method
 	 * @ejb.permission role-name="_Guest_"
 	 * @ejb.transaction type="Supports" @!This usually means that no transaction is opened which is significantly faster and recommended for all read-only EJB methods! Marco.
-	 */	
-	public Set<InvoiceID> getInvoiceIDsByQueries(Collection<JDOQuery> queries) 
+	 */
+	public Set<InvoiceID> getInvoiceIDsByQueries(Collection<JDOQuery> queries)
 	{
 		PersistenceManager pm = getPersistenceManager();
 		try {
@@ -2340,8 +2339,8 @@ public abstract class AccountingManagerBean
 			return NLJDOHelper.getObjectIDSet(invoices);
 		} finally {
 			pm.close();
-		}		
-	}	
+		}
+	}
 	
 	/**
 	 * This method queries all <code>Invoice</code>s which exist between the given vendor and customer and
@@ -2735,8 +2734,8 @@ public abstract class AccountingManagerBean
 	 * @ejb.interface-method
 	 * @ejb.permission role-name="_Guest_"
 	 * @ejb.transaction type="Supports" @!This usually means that no transaction is opened which is significantly faster and recommended for all read-only EJB methods! Marco.
-	 */	
-	public Set<AnchorID> getAccountIDs(Collection<JDOQuery> queries) 
+	 */
+	public Set<AnchorID> getAccountIDs(Collection<JDOQuery> queries)
 	{
 		PersistenceManager pm = getPersistenceManager();
 		try {
@@ -2753,26 +2752,26 @@ public abstract class AccountingManagerBean
 			return NLJDOHelper.getObjectIDSet(accounts);
 		} finally {
 			pm.close();
-		}		
+		}
 	}
 		
 //	/**
 //	 * assign a new {@link LocalAccountantDelegate} to a {@link ProductType}
-//	 * 
+//	 *
 //	 * @param productTypeID the id of the productType to assign a new {@link LocalAccountantDelegate} to
 //	 * @param delegateID The ID of the LocalAccountantDelegate to assign
 //	 * @param get Whether or not to return the a newly detached version of the stored productType
 //	 * @param fetchGroups The fetchGroups to detach
-//	 * @param maxFetchDepth the maxium fetchDepth 
+//	 * @param maxFetchDepth the maxium fetchDepth
 //	 * @throws ModuleException
-//	 * 
+//	 *
 //	 * @ejb.interface-method
 //	 * @ejb.transaction type="Required"
 //	 * @ejb.permission role-name="_Guest_"
 //	 */
 //	public ProductType assignLocalAccountantDelegate(ProductTypeID productTypeID,
-//			LocalAccountantDelegateID delegateID, 
-//			boolean get, 
+//			LocalAccountantDelegateID delegateID,
+//			boolean get,
 //			String[] fetchGroups, int maxFetchDepth
 //		)
 //	throws ModuleException
@@ -2784,11 +2783,11 @@ public abstract class AccountingManagerBean
 //			productType.setLocalAccountantDelegate(localAccountantDelegate);
 //			if (!get)
 //				return null;
-//			
+//
 //		 	pm.getFetchPlan().setMaxFetchDepth(maxFetchDepth);
 //	  	if (fetchGroups != null)
 //	  		pm.getFetchPlan().setGroups(fetchGroups);
-//	  	
+//
 //	  	return (ProductType) pm.detachCopy(productType);
 //		} finally {
 //			pm.close();

@@ -31,7 +31,6 @@ import java.util.Comparator;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.Map;
 import java.util.Set;
 
 import javax.jdo.JDOHelper;
@@ -51,7 +50,7 @@ import org.nightlabs.jfire.transfer.Transfer;
 
 /**
  * One instance of PartnerAccountant exists per organisation.
- * It handles Transfers for trade partners that can be other 
+ * It handles Transfers for trade partners that can be other
  * organisations or customers.
  * 
  * @author Alexander Bieber <alex[AT]nightlabs[DOT]de>
@@ -117,7 +116,7 @@ public class PartnerAccountant extends Accountant
 		// determine the direction
 		if (mandatorIsCustomer) {
 			AccountType accountType = (AccountType) getPersistenceManager().getObjectById(AccountType.ACCOUNT_TYPE_ID_PARTNER_CUSTOMER);
-			Account customerPartnerAccount = accounting.getPartnerAccount(accountType, mandator, transfer.getInvoice().getCurrency()); 
+			Account customerPartnerAccount = accounting.getPartnerAccount(accountType, mandator, transfer.getInvoice().getCurrency());
 			if (mandatorIsTransferFrom) {
 				createTransferFrom = customerPartnerAccount;
 				createTransferTo = mandator;
@@ -161,7 +160,7 @@ public class PartnerAccountant extends Accountant
 		public TransferInvoiceEntry(Invoice invoice, long invoiceBalance) {
 			this.invoice = invoice;
 			this.invoiceBalance = invoiceBalance;
-		}		
+		}
 		public Invoice getInvoice() {
 			return invoice;
 		}
@@ -186,7 +185,7 @@ public class PartnerAccountant extends Accountant
 	 *
 	 * @return The amount coming from or going to the partner LegalEntity. This
 	 *		is negative if it leaves the partner (and goes to an account) and positive
-	 *		if it comes from an account and goes to the partner legal entity. 
+	 *		if it comes from an account and goes to the partner legal entity.
 	 */
 	private long handleSingleInvoicePayment(
 			User user, LegalEntity partner, PayMoneyTransfer transfer,
@@ -330,7 +329,7 @@ public class PartnerAccountant extends Accountant
 				else
 					return -1;
 			}
-		};		
+		};
 		Collections.sort(sortedInvoices,comparator);
 		
 		
@@ -359,7 +358,7 @@ public class PartnerAccountant extends Accountant
 		long allInvoicesBalance = 0;
 
 		for (Iterator iter = sortedInvoices.iterator(); iter.hasNext();) {
-			Invoice invoice = (Invoice) iter.next();			
+			Invoice invoice = (Invoice) iter.next();
 			boolean partnerInvoiceCustomer = invoice.getCustomer().getPrimaryKey().equals(partner.getPrimaryKey());
 			boolean partnerInvoiceVendor = !partnerInvoiceCustomer;
 
@@ -381,7 +380,7 @@ public class PartnerAccountant extends Accountant
 		}
 
 //		for (Iterator iter = sortedInvoices.iterator(); iter.hasNext();) {
-//			Invoice invoice = (Invoice) iter.next();			
+//			Invoice invoice = (Invoice) iter.next();
 //			long invoiceBalance = 0;
 //			boolean partnerInvoiceCustomer = invoice.getCustomer().getPrimaryKey().equals(partner.getPrimaryKey());
 //			boolean partnerInvoiceVendor = !partnerInvoiceCustomer;
@@ -392,12 +391,12 @@ public class PartnerAccountant extends Accountant
 //				factor = -1;
 //			invoiceBalance = invoice.getAmountToPay() * factor;
 //			allInvoicesBalance += invoiceBalance;
-//			
+//
 ////			if (partnerInvoiceVendor)
 ////				amountToGetAsVendor += invoice.getAmountToPay();
-////			else 
-////				amountToPayAsCustomer += invoice.getAmountToPay();			
-//			
+////			else
+////				amountToPayAsCustomer += invoice.getAmountToPay();
+//
 //			if (invoiceBalance >= 0) {
 //				invoicesReceiveMoney.add(new TransferInvoiceEntry(invoice, invoiceBalance));
 //			}
@@ -423,9 +422,9 @@ public class PartnerAccountant extends Accountant
 //				partner,
 ////				payMoneyTransfer,
 //				payMoneyTransfer.getCurrency(),
-//				payMoneyTransfer.getAmount()				
+//				payMoneyTransfer.getAmount()
 //			);
-//			
+//
 //			fromAccount.bookTransfer(user, moneyTransfer, involvedAnchors);
 //			partner.bookTransfer(user, moneyTransfer, involvedAnchors);
 //		}
@@ -440,9 +439,9 @@ public class PartnerAccountant extends Accountant
 //				toAccount,
 ////				payMoneyTransfer,
 //				payMoneyTransfer.getCurrency(),
-//				payMoneyTransfer.getAmount()				
+//				payMoneyTransfer.getAmount()
 //			);
-//			
+//
 //			partner.bookTransfer(user, moneyTransfer, involvedAnchors);
 //			toAccount.bookTransfer(user, moneyTransfer, involvedAnchors);
 //		}
@@ -503,7 +502,7 @@ public class PartnerAccountant extends Accountant
 					if (capital > 0)
 						throw new IllegalStateException("capital=="+capital+"! capital must be negative here!");
 
-					// capital is negative - hence --=+ (let the capital grow = away from 0) 
+					// capital is negative - hence --=+ (let the capital grow = away from 0)
 					capital -= handleSingleInvoicePayment(
 							user, partner, payMoneyTransfer, invoice,
 							entry.getInvoiceBalance(), involvedAnchors);
@@ -528,7 +527,7 @@ public class PartnerAccountant extends Accountant
 					}
 					else {
 						capital += handleSingleInvoicePayment(
-								user, partner, payMoneyTransfer, invoice, 
+								user, partner, payMoneyTransfer, invoice,
 								-1 * capital, involvedAnchors);
 						break;
 					}
@@ -578,7 +577,7 @@ public class PartnerAccountant extends Accountant
 					}
 					else {
 						capital -= handleSingleInvoicePayment(
-								user, partner, payMoneyTransfer, invoice, 
+								user, partner, payMoneyTransfer, invoice,
 								capital, involvedAnchors);
 						break;
 					}
@@ -607,7 +606,7 @@ public class PartnerAccountant extends Accountant
 					if (capital > 0)
 						throw new IllegalStateException("capital=="+capital+"! capital must be negative here!");
 
-					// capital is negative - hence --=+ (let the capital grow) 
+					// capital is negative - hence --=+ (let the capital grow)
 					capital += handleSingleInvoicePayment(
 							user, partner, payMoneyTransfer, invoice,
 							-1 * entry.getInvoiceBalance(), involvedAnchors);
@@ -624,7 +623,7 @@ public class PartnerAccountant extends Accountant
 					if (capital > 0)
 						throw new IllegalStateException("capital=="+capital+"! capital must be negative here!");
 
-					// capital is negative - hence --=+ (let the capital grow) 
+					// capital is negative - hence --=+ (let the capital grow)
 					if (capital <= entry.getInvoiceBalance()) {
 						capital -= handleSingleInvoicePayment(
 								user, partner, payMoneyTransfer, invoice,
@@ -632,7 +631,7 @@ public class PartnerAccountant extends Accountant
 					}
 					else {
 						capital -= handleSingleInvoicePayment(
-								user, partner, payMoneyTransfer, invoice, 
+								user, partner, payMoneyTransfer, invoice,
 								-1 * capital, involvedAnchors);
 						break;
 					}
@@ -662,7 +661,7 @@ public class PartnerAccountant extends Accountant
 							-1 * entry.getInvoiceBalance(), involvedAnchors);
 				} // iterate pay-invoices
 
-				// now as many receive-invoices as possible 
+				// now as many receive-invoices as possible
 				for (Iterator iter = invoicesReceiveMoney.iterator(); iter.hasNext();) {
 					TransferInvoiceEntry entry = (TransferInvoiceEntry) iter.next();
 					Invoice invoice = entry.getInvoice();
@@ -680,7 +679,7 @@ public class PartnerAccountant extends Accountant
 					}
 					else {
 						capital += handleSingleInvoicePayment(
-								user, partner, payMoneyTransfer, invoice, 
+								user, partner, payMoneyTransfer, invoice,
 								capital, involvedAnchors);
 						break;
 					}
@@ -721,10 +720,10 @@ public class PartnerAccountant extends Accountant
 //	private PersistenceManager accountantPM = null;
 	
 	/**
-	 * Returns the PersitenceManager of this PartnerAccountant. This 
+	 * Returns the PersitenceManager of this PartnerAccountant. This
 	 * is not cached.
 	 */
-	protected PersistenceManager getPersistenceManager() {		
+	protected PersistenceManager getPersistenceManager() {
 //		if (accountantPM == null) {
 		PersistenceManager accountantPM = JDOHelper.getPersistenceManager(this);
 		if (accountantPM == null)

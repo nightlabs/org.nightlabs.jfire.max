@@ -40,9 +40,6 @@ import org.nightlabs.jfire.store.Repository;
 import org.nightlabs.jfire.store.RepositoryType;
 import org.nightlabs.jfire.store.Store;
 import org.nightlabs.jfire.store.deliver.DeliverProductTransfer;
-import org.nightlabs.jfire.store.deliver.ServerDeliveryProcessor;
-import org.nightlabs.jfire.store.deliver.ServerDeliveryProcessorJFire;
-import org.nightlabs.jfire.store.deliver.ServerDeliveryProcessor.DeliverParams;
 import org.nightlabs.jfire.trade.LegalEntity;
 import org.nightlabs.jfire.trade.OrganisationLegalEntity;
 import org.nightlabs.jfire.transfer.Anchor;
@@ -177,7 +174,7 @@ public class PartnerStorekeeper extends Storekeeper
 	 * {@link ServerDeliveryProcessor#getRepositoryOutside(DeliverParams deliverParams)}).
 	 * </p>
 	 *
-	 * @param product the product for which to find the initial repository. Usually, only the product's organisationID is interesting, 
+	 * @param product the product for which to find the initial repository. Usually, only the product's organisationID is interesting,
 	 *		but there might be different repositories used for different products. The delivery might in this case be performed
 	 *		using another outside-repository. This is fine, because the chains might be interrupted in outside-repositories since
 	 *		we don't know what's happening outside (it can leave through outside-A and come back later to outside-B).

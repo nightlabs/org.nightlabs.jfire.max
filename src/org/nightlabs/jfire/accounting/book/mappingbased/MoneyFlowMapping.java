@@ -109,7 +109,7 @@ public abstract class MoneyFlowMapping implements Serializable {
 	 * 
 	 * @jdo.field persistence-modifier="persistent"
 	 */
-	private String packageType;	
+	private String packageType;
 
 	/**
 	 * @jdo.field persistence-modifier="persistent"
@@ -187,7 +187,7 @@ public abstract class MoneyFlowMapping implements Serializable {
 	}
 
 	/**
-	 * Sets the packageType 
+	 * Sets the packageType
 	 * @param packageType
 	 */
 	public void setPackageType(String packageType) {
@@ -213,7 +213,7 @@ public abstract class MoneyFlowMapping implements Serializable {
 //	 */
 //	public Account getAccount() {
 //		return account;
-//	}	
+//	}
 //
 //	/**
 //	 * @param account The account to set.
@@ -316,11 +316,11 @@ public abstract class MoneyFlowMapping implements Serializable {
 	}
 	
 	protected String simulateMappingKeyPartForProductType(ProductType productType) {
-		return getMappingKey(productType.getPrimaryKey(), packageType, getCurrencyID())+"/";		
+		return getMappingKey(productType.getPrimaryKey(), packageType, getCurrencyID())+"/";
 	}
 	
 	/**
-	 * Should return a 
+	 * Should return a
 	 * @return
 	 */
 	public abstract String getMappingConditionKey(ProductType productType);
@@ -333,10 +333,10 @@ public abstract class MoneyFlowMapping implements Serializable {
 	
 	
 	public static String getMappingKey(
-			String productTypePK, 
-			String packageType, 
+			String productTypePK,
+			String packageType,
 			String currencyID
-		) 
+		)
 	{
 		return productTypePK+"/"+packageType+"/"+currencyID;
 	}

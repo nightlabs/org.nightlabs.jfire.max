@@ -94,7 +94,7 @@ public class LocalAccountant extends Accountant {
 		if (! (transfer instanceof BookMoneyTransfer))
 			return;
 
-		BookMoneyTransfer bookTransfer = (BookMoneyTransfer)transfer;		
+		BookMoneyTransfer bookTransfer = (BookMoneyTransfer)transfer;
 		Invoice invoice = bookTransfer.getInvoice();
 
 		// find the delegates
@@ -137,7 +137,7 @@ public class LocalAccountant extends Accountant {
 	}
 
 	protected OrganisationLegalEntity getMandator() {
-		return mandator;	
+		return mandator;
 	}
 
 }

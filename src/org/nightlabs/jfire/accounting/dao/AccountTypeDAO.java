@@ -61,7 +61,7 @@ extends BaseJDOObjectDAO<AccountTypeID, AccountType>
 			return getJDOObjects(null, accountTypeIDs, fetchGroups, maxFetchDepth, monitor);
 		} catch (Exception x) {
 			throw new RuntimeException(x);
-		} 
+		}
 	}
 
 	public List<AccountType> getAccountTypes(Collection<AccountTypeID> accountTypeIDs, String[] fetchGroups,
@@ -70,8 +70,8 @@ extends BaseJDOObjectDAO<AccountTypeID, AccountType>
 		return getJDOObjects(null, accountTypeIDs, fetchGroups, maxFetchDepth, monitor);
 	}
 	
-	public AccountType getAccountType(AccountTypeID accountTypeID, String[] fetchGroups, 
-			int maxFetchDepth, ProgressMonitor monitor) 
+	public AccountType getAccountType(AccountTypeID accountTypeID, String[] fetchGroups,
+			int maxFetchDepth, ProgressMonitor monitor)
 	{
 		return getJDOObject(null, accountTypeID, fetchGroups, maxFetchDepth, monitor);
 	}

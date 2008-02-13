@@ -18,7 +18,7 @@ public abstract class AbstractDeliveryController extends AbstractTransferControl
 		for (DeliveryData data : transferDatas)
 			deliveryIDs.add(DeliveryID.create(data.getDelivery().getOrganisationID(), data.getDelivery().getDeliveryID()));
 		
-		return deliveryIDs;			
+		return deliveryIDs;
 	}
 
 	@Override

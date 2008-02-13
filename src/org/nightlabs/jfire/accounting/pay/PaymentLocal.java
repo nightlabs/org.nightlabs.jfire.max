@@ -35,7 +35,7 @@ public class PaymentLocal implements Serializable {
 	/**
 	 * @jdo.field persistence-modifier="persistent"
 	 */
-	private Payment payment;	
+	private Payment payment;
 
 	/**
 	 * @jdo.field

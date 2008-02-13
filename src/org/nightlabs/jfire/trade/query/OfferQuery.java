@@ -10,8 +10,8 @@ import org.nightlabs.jfire.trade.Offer;
  * @author Daniel Mazurek - daniel <at> nightlabs <dot> de
  *
  */
-public class OfferQuery 
-//extends ArticleContainerQuery<Set<Offer>> 
+public class OfferQuery
+//extends ArticleContainerQuery<Set<Offer>>
 extends ArticleContainerQuery
 {
 

@@ -46,7 +46,7 @@ import org.nightlabs.jfire.transfer.Transfer;
 /**
  * @author Marco Schulze - marco at nightlabs dot de
  *
- * @jdo.persistence-capable 
+ * @jdo.persistence-capable
  *		identity-type="application"
  *		persistence-capable-superclass="org.nightlabs.jfire.transfer.Transfer"
  *		detachable="true"
@@ -230,7 +230,7 @@ implements Serializable, DetachCallback
 	 * {@inheritDoc}
 	 * <p>
 	 * This implementation checks if the ProductTransfer has a container. If so the description
-	 * of the container is returned, otherwise 
+	 * of the container is returned, otherwise
 	 * </p>
 	 */
 	@Override
@@ -240,7 +240,7 @@ implements Serializable, DetachCallback
 		return String.format(
 				"ProductTransfer from %s to %s",
 				getFrom().getDescription(locale), getTo().getDescription(locale)
-			);		
+			);
 	}
 	
 }

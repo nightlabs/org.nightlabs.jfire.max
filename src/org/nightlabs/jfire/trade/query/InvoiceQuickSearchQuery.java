@@ -9,8 +9,8 @@ import org.nightlabs.jfire.accounting.Invoice;
  * @author Daniel Mazurek - daniel <at> nightlabs <dot> de
  *
  */
-public class InvoiceQuickSearchQuery 
-extends AbstractArticleContainerQuickSearchQuery 
+public class InvoiceQuickSearchQuery
+extends AbstractArticleContainerQuickSearchQuery
 {
 	/**
 	 * 

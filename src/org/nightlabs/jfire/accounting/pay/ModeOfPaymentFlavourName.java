@@ -88,7 +88,7 @@ public class ModeOfPaymentFlavourName extends I18nText
 	private ModeOfPaymentFlavour modeOfPaymentFlavour;
 
 	/**
-	 * @deprecated Only for JDO! 
+	 * @deprecated Only for JDO!
 	 */
 	@Deprecated
 	protected ModeOfPaymentFlavourName() { }

@@ -13,7 +13,7 @@ import org.nightlabs.jfire.store.DeliveryNote;
 /**
  * @author Marco Schulze - marco at nightlabs dot de
  *
- *  @jdo.persistence-capable 
+ *  @jdo.persistence-capable
  *		identity-type="application"
  *		persistence-capable-superclass="org.nightlabs.jfire.config.ConfigModule"
  *		detachable="true"

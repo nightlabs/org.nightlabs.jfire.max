@@ -38,7 +38,7 @@ public class DeliveryQueueDAO extends BaseJDOObjectDAO<DeliveryQueueID, Delivery
 	}
 	
 	public synchronized DeliveryQueue getDeliveryQueue(DeliveryQueueID deliveryQueueId, String[] fetchGroups, int maxFetchDepth, ProgressMonitor monitor) {
-		return getDeliveryQueues(Arrays.asList(new DeliveryQueueID[] { deliveryQueueId }), fetchGroups, maxFetchDepth, monitor).iterator().next();		
+		return getDeliveryQueues(Arrays.asList(new DeliveryQueueID[] { deliveryQueueId }), fetchGroups, maxFetchDepth, monitor).iterator().next();
 	}
 	
 	public synchronized Collection<DeliveryQueue> getDeliveryQueues(Collection<DeliveryQueueID> deliveryQueueIds, String[] fetchGroups, int maxFetchDepth, ProgressMonitor monitor) {

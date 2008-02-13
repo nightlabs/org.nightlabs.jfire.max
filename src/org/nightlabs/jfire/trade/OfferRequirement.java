@@ -156,7 +156,7 @@ public class OfferRequirement
 	}
 	
 	/**
-	 * Returns the Offer for this vendor or null. 
+	 * Returns the Offer for this vendor or null.
 	 * @param vendor
 	 */
 	public Offer getPartnerOffer(LegalEntity vendor) {

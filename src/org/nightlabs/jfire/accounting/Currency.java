@@ -134,11 +134,11 @@ implements Serializable, org.nightlabs.l10n.Currency
 	 * <p>
 	 *   amount / 10^(decimalDigitCount)
 	 * <p>
-	 *  
+	 * 
 	 * @param amount The amount to convert
 	 * @return the approximate value as double - there might be rounding differences.
 	 */
-	public double toDouble(long amount) {		
+	public double toDouble(long amount) {
 		return amount / Math.pow(10, getDecimalDigitCount());
 	}
 
@@ -147,11 +147,11 @@ implements Serializable, org.nightlabs.l10n.Currency
 	 * <p>
 	 *   amount * 10^(decimalDigitCount)
 	 * <p>
-	 *  
+	 * 
 	 * @param amount The amount to convert
 	 * @return the approximate value as long - there might be rounding differences.
 	 */
-	public long toLong(double amount) {		
+	public long toLong(double amount) {
 		return (long)(amount * Math.pow(10, getDecimalDigitCount()));
 	}
 }

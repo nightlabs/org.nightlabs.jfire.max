@@ -43,7 +43,6 @@ import javax.jdo.Query;
 import javax.jdo.listener.DetachCallback;
 
 import org.nightlabs.jdo.ObjectIDUtil;
-import org.nightlabs.jfire.jbpm.graph.def.ActionHandlerNodeEnter;
 import org.nightlabs.jfire.jbpm.graph.def.Statable;
 import org.nightlabs.jfire.jbpm.graph.def.StatableLocal;
 import org.nightlabs.jfire.jbpm.graph.def.State;
@@ -51,7 +50,6 @@ import org.nightlabs.jfire.security.User;
 import org.nightlabs.jfire.store.deliver.DeliverProductTransfer;
 import org.nightlabs.jfire.store.deliver.Delivery;
 import org.nightlabs.jfire.store.id.DeliveryNoteID;
-import org.nightlabs.jfire.store.jbpm.ActionHandlerFinalizeDeliveryNote;
 import org.nightlabs.jfire.trade.Article;
 import org.nightlabs.jfire.trade.ArticleContainer;
 import org.nightlabs.jfire.trade.LegalEntity;
@@ -181,7 +179,7 @@ implements Serializable, ArticleContainer, Statable, DetachCallback
 	}
 
 	/**
-	 * @deprecated Constructor exists only for JDO! 
+	 * @deprecated Constructor exists only for JDO!
 	 */
 	@Deprecated
 	protected DeliveryNote() { }
@@ -244,22 +242,22 @@ implements Serializable, ArticleContainer, Statable, DetachCallback
 	private long deliveryNoteID;
 
 	/**
-	 * @jdo.field persistence-modifier="persistent"	 
+	 * @jdo.field persistence-modifier="persistent"
 	 */
 	private String primaryKey;
 
 	/**
-	 * @jdo.field persistence-modifier="persistent" mapped-by="deliveryNote"	 
+	 * @jdo.field persistence-modifier="persistent" mapped-by="deliveryNote"
 	 */
 	private DeliveryNoteLocal deliveryNoteLocal;
 
 	/**
-	 * @jdo.field persistence-modifier="persistent"	 
+	 * @jdo.field persistence-modifier="persistent"
 	 */
 	private OrganisationLegalEntity vendor;
 
 	/**
-	 * @jdo.field persistence-modifier="persistent"	 
+	 * @jdo.field persistence-modifier="persistent"
 	 */
 	private LegalEntity customer;
 
@@ -343,7 +341,7 @@ implements Serializable, ArticleContainer, Statable, DetachCallback
 	private Set<ReceptionNote> receptionNotes;
 
 	/**
-	 * @jdo.field persistence-modifier="persistent"	 
+	 * @jdo.field persistence-modifier="persistent"
 	 */
 	private Date createDT;
 
@@ -477,8 +475,8 @@ implements Serializable, ArticleContainer, Statable, DetachCallback
 	private Date finalizeDT  = null;
 
 	/**
-	 * Adds an Article, if this DeliveryNote is not yet finalized, 
-	 * the offerItems offer has the same vendor and customer as this DeliveryNote, 
+	 * Adds an Article, if this DeliveryNote is not yet finalized,
+	 * the offerItems offer has the same vendor and customer as this DeliveryNote,
 	 * and the offerItem is not yet part of another invoice.
 	 * <p>
 	 * NEVER use this method directly (within the server)! Call {@link Store#addArticlesToDeliveryNote(DeliveryNote, Collection)}
@@ -493,20 +491,20 @@ implements Serializable, ArticleContainer, Statable, DetachCallback
 		Offer articleOffer = article.getOffer();
 		Order articleOrder = articleOffer.getOrder();
 		ArticleID articleID = (ArticleID) JDOHelper.getObjectId(article);
-		if (isFinalized())			
+		if (isFinalized())
 			throw new DeliveryNoteEditException(
-					DeliveryNoteEditException.REASON_DELIVERY_NOTE_FINALIZED, 
-					"DeliveryNote is finalized, can not change any more!", 
+					DeliveryNoteEditException.REASON_DELIVERY_NOTE_FINALIZED,
+					"DeliveryNote is finalized, can not change any more!",
 					articleID
 				);
 
-		if (!vendor.getPrimaryKey().equals(articleOrder.getVendor().getPrimaryKey()) 
-					|| 
-				!customer.getPrimaryKey().equals(articleOrder.getCustomer().getPrimaryKey()) 
+		if (!vendor.getPrimaryKey().equals(articleOrder.getVendor().getPrimaryKey())
+					||
+				!customer.getPrimaryKey().equals(articleOrder.getCustomer().getPrimaryKey())
 				)
 		{
 			throw new DeliveryNoteEditException(
-				DeliveryNoteEditException.REASON_ANCHORS_DONT_MATCH,				
+				DeliveryNoteEditException.REASON_ANCHORS_DONT_MATCH,
 				"Vendor and customer are not equal for the Article to add and the delivery note, can not add the article!"
 			);
 		}
@@ -515,15 +513,15 @@ implements Serializable, ArticleContainer, Statable, DetachCallback
 		if (deliveryNoteID != null) {
 			throw new DeliveryNoteEditException(
 				DeliveryNoteEditException.REASON_ARTICLE_ALREADY_IN_DELIVERY_NOTE,
-				"Article already in a delivery note. Article "+articleID+", DeliveryNote "+deliveryNoteID, 
-				articleID, 
+				"Article already in a delivery note. Article "+articleID+", DeliveryNote "+deliveryNoteID,
+				articleID,
 				deliveryNoteID
 			);
 		}
 
 		if (!article.getOffer().getOfferLocal().isAccepted()) {
 			throw new DeliveryNoteEditException(
-				DeliveryNoteEditException.REASON_OFFER_NOT_ACCEPTED, 
+				DeliveryNoteEditException.REASON_OFFER_NOT_ACCEPTED,
 				"At least one involved offer is not confirmed!",
 				articleID
 			);
@@ -550,8 +548,8 @@ implements Serializable, ArticleContainer, Statable, DetachCallback
 		articles.add(article);
 		articleCount = articles.size();
 
-		this.valid = false;	
-		article.setDeliveryNote(this);		
+		this.valid = false;
+		article.setDeliveryNote(this);
 	}
 	
 	public void removeArticle(Article article)
@@ -594,15 +592,15 @@ implements Serializable, ArticleContainer, Statable, DetachCallback
 		this.finalizeDT = new Date(System.currentTimeMillis());
 	}
 	/**
-	 * This member is set to true as soon as all desired 
-	 * {@link Article}s were added to this delivery note. A finalized 
+	 * This member is set to true as soon as all desired
+	 * {@link Article}s were added to this delivery note. A finalized
 	 * DeliveryNote can not be altered any more.
 	 */
 	public boolean isFinalized() {
 		return finalizeDT != null;
 	}
 	public User getFinalizeUser() {
-		return finalizeUser;		
+		return finalizeUser;
 	}
 	public Date getFinalizeDT() {
 		return finalizeDT;
@@ -648,7 +646,7 @@ implements Serializable, ArticleContainer, Statable, DetachCallback
 		DeliveryNote o = (DeliveryNote) obj;
 
 		return
-				Util.equals(this.organisationID, o.organisationID) && 
+				Util.equals(this.organisationID, o.organisationID) &&
 				Util.equals(this.deliveryNoteIDPrefix, o.deliveryNoteIDPrefix) &&
 				this.deliveryNoteID == o.deliveryNoteID;
 	}
@@ -657,7 +655,7 @@ implements Serializable, ArticleContainer, Statable, DetachCallback
 	public int hashCode()
 	{
 		return
-				Util.hashCode(this.organisationID) ^ 
+				Util.hashCode(this.organisationID) ^
 				Util.hashCode(this.deliveryNoteIDPrefix) ^
 				Util.hashCode(this.deliveryNoteID);
 	}

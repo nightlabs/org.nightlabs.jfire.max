@@ -54,7 +54,7 @@ public class PriceFragmentTypeName extends I18nText
 	 * @jdo.field primary-key="true"
 	 * @jdo.column length="100"
 	 */
-	private String organisationID; 
+	private String organisationID;
 	/**
 	 * @jdo.field primary-key="true"
 	 * @jdo.column length="100"

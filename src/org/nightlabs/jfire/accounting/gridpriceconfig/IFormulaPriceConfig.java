@@ -69,7 +69,7 @@ public interface IFormulaPriceConfig extends IInnerPriceConfig
 	 * @return Returns a <tt>FormulaCell</tt> that serves as fallback if no specific one
 	 * for a certain coordinate exists or <tt>null</tt> if the fallbackFormulaCell is not
 	 * defined. If <tt>throwExceptionIfNotExistent==true</tt>, this method never returns
-	 * <tt>null</tt>. 
+	 * <tt>null</tt>.
 	 */
 	FormulaCell getFallbackFormulaCell(boolean throwExceptionIfNotExistent);
 

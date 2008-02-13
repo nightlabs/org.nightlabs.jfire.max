@@ -52,7 +52,7 @@ import org.nightlabs.util.Util;
  * <br/><br/>
  * Because the prices are not hardlinked to a product but indirectly assigned via a PriceConfig, it is
  * no problem for multiple products to share the same <tt>PriceConfig</tt>. The property <tt>PriceConfig</tt>
- * of <tt>ProductInfo</tt> is inherited. 
+ * of <tt>ProductInfo</tt> is inherited.
  *
  * @author Marco Schulze - marco at nightlabs dot de
  *
@@ -294,7 +294,7 @@ public abstract class PriceConfig implements Serializable, StoreCallback, IPrice
 				PriceFragmentType.getPrimaryKey(organisationID, priceFragmentTypeID));
 	}
 	/**
-	 * @param priceFragmentTypePK The composite primary key of the PriceFragmentType to remove. 
+	 * @param priceFragmentTypePK The composite primary key of the PriceFragmentType to remove.
 	 * @return Returns the PriceFragmentType that has been removed or <tt>null</tt> if none was registered with the given key.
 	 * 
 	 * @see #removePriceFragmentType(String, String)
@@ -318,7 +318,7 @@ public abstract class PriceConfig implements Serializable, StoreCallback, IPrice
 //	public abstract ArticlePrice getPrice(ProductInfo productInfo, LegalEntity customer, Currency currency);
 
 	/**
-	 * This method sets the ArticlePrice of a product in a certain context in the <code>article</code>. 
+	 * This method sets the ArticlePrice of a product in a certain context in the <code>article</code>.
 	 * The context is defined by <code>article</code>, which knows the product, the customer and all the
 	 * other items in the offer and even the whole order.
 	 * <p>
@@ -461,16 +461,16 @@ public abstract class PriceConfig implements Serializable, StoreCallback, IPrice
 //	 * @jdo.field persistence-modifier="none"
 //	 */
 //	private transient int adjustParametersCounter = 0;
-//	
+//
 //	/**
-//	 * 
+//	 *
 //	 */
 //	public void beginAdjustParameters()
 //	{
-//		
+//
 //	}
 //	public void endAdjustParameters()
 //	{
-//		
+//
 //	}
 }

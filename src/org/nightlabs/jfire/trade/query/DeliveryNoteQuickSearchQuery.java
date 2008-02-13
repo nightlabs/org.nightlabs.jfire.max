@@ -9,9 +9,9 @@ import org.nightlabs.jfire.store.DeliveryNote;
  * @author Daniel Mazurek - daniel <at> nightlabs <dot> de
  *
  */
-public class DeliveryNoteQuickSearchQuery 
-extends AbstractArticleContainerQuickSearchQuery 
-{	
+public class DeliveryNoteQuickSearchQuery
+extends AbstractArticleContainerQuickSearchQuery
+{
 	/**
 	 * 
 	 */

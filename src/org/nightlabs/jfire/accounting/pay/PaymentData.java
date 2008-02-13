@@ -34,7 +34,7 @@ import org.nightlabs.jfire.transfer.TransferData;
  * Subclass in order to hold specific data for your payment process.
  * This additional data can be defined by the client payment processor (gathered by
  * wizard pages or other input forms) and is
- * passed to the {@link org.nightlabs.jfire.accounting.pay.ServerPaymentProcessor}. 
+ * passed to the {@link org.nightlabs.jfire.accounting.pay.ServerPaymentProcessor}.
  * <p>
  * Instances of this class are only stored temporarily and might be removed
  * from the datastore, afer a payment has been completed.
@@ -68,7 +68,7 @@ implements Serializable, TransferData
 	private String organisationID;
 	
 	/**
-	 * @jdo.field primary-key="true" 
+	 * @jdo.field primary-key="true"
 	 */
 	private long paymentID;
 

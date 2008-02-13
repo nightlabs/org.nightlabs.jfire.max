@@ -30,9 +30,9 @@ import org.nightlabs.jdo.inheritance.JDOSimpleFieldInheriter;
  *
  * @author Daniel.Mazurek [at] NightLabs [dot] de
  */
-public class ProductTypeName 
-extends I18nText 
-implements Inheritable 
+public class ProductTypeName
+extends I18nText
+implements Inheritable
 {
 	/**
 	 * 
@@ -93,7 +93,7 @@ implements Inheritable
 	protected Map getI18nMap()
 	{
 		return names;
-	}	
+	}
 	
 	/**
 	 * @see org.nightlabs.i18n.I18nText#getFallBackValue(java.lang.String)

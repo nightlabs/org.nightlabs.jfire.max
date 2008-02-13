@@ -34,7 +34,7 @@ import org.nightlabs.jfire.transfer.TransferData;
  * Subclass in order to hold specific data for your delivery process.
  * This additional data can be defined by the client delivery processor (gathered by
  * wizard pages or other input forms) and is
- * passed to the {@link org.nightlabs.jfire.store.deliver.ServerDeliveryProcessor}. 
+ * passed to the {@link org.nightlabs.jfire.store.deliver.ServerDeliveryProcessor}.
  * <p>
  * Instances of this class are only stored temporarily and might be removed
  * from the datastore, afer a delivery has been completed.

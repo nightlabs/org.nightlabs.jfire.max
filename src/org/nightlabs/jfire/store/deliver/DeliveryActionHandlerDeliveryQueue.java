@@ -11,7 +11,7 @@ import org.nightlabs.jfire.store.deliver.id.DeliveryActionHandlerID;
 import org.nightlabs.jfire.trade.Article;
 
 /**
- * This {@link DeliveryActionHandler} handles deliveries in {@link DeliveryQueue}. When all articles in such a delivery are delivered, 
+ * This {@link DeliveryActionHandler} handles deliveries in {@link DeliveryQueue}. When all articles in such a delivery are delivered,
  * the delivery in the delivery queue is removed since it is now completely processed.
  *
  * @author Tobias Langner <!-- tobias[dot]langner[at]nightlabs[dot]de -->

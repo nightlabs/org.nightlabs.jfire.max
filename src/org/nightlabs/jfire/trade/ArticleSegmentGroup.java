@@ -45,7 +45,7 @@ public class ArticleSegmentGroup
 
 	/**
 	 * key: String productTypeClassName<br/>
-	 * value: {@link ArticleProductTypeClassGroup} articleProductTypeGroup 
+	 * value: {@link ArticleProductTypeClassGroup} articleProductTypeGroup
 	 */
 	private Map<String, ArticleProductTypeClassGroup> articleProductTypeClassGroups = Collections.synchronizedMap(new HashMap<String, ArticleProductTypeClassGroup>());
 

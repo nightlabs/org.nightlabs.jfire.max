@@ -546,7 +546,7 @@ implements Serializable, DetachCallback
 	throws DeliveryException
 	{
 		Delivery delivery = deliverParams.deliveryData.getDelivery();
-		DeliveryResult deliverDoWorkServerResult = externalDeliverDoWork(deliverParams); 
+		DeliveryResult deliverDoWorkServerResult = externalDeliverDoWork(deliverParams);
 
 		if (deliverDoWorkServerResult == null) {
 			if (delivery.isPostponed()) {
@@ -574,7 +574,7 @@ implements Serializable, DetachCallback
 	 * in case another payment/delivery (executed together) fails. If your external
 	 * delivery process supports only two phases (approve & commit/rollback), you
 	 * should simply return <tt>null</tt>.
-	 * <p> 
+	 * <p>
 	 * This method is called after
 	 * {@link #externalDeliverBegin(DeliverParams)} and before
 	 * {@link #externalDeliverCommit(DeliverParams)}/{@link #externalDeliverRollback(DeliverParams)}.
@@ -633,7 +633,7 @@ implements Serializable, DetachCallback
 		Delivery delivery = deliverParams.deliveryData.getDelivery();
 		DeliveryResult deliverEndServerResult;
 		if (delivery.isForceRollback() || delivery.isFailed()) {
-			deliverEndServerResult = externalDeliverRollback(deliverParams); 
+			deliverEndServerResult = externalDeliverRollback(deliverParams);
 
 			if (deliverEndServerResult == null) {
 				deliverEndServerResult = new DeliveryResult(
@@ -643,7 +643,7 @@ implements Serializable, DetachCallback
 			}
 		}
 		else {
-			deliverEndServerResult = externalDeliverCommit(deliverParams); 
+			deliverEndServerResult = externalDeliverCommit(deliverParams);
 
 			if (deliverEndServerResult == null) {
 				if (delivery.isPostponed()) {
@@ -680,7 +680,7 @@ implements Serializable, DetachCallback
 	
 	/**
 	 * In your implementation of this method, you must rollback the delivery in
-	 * the external system. 
+	 * the external system.
 	 *
 	 * @return Return simply <tt>null</tt> if you have no external work to do.
 	 *         Otherwise, you must return a meaningful instance of
@@ -750,7 +750,7 @@ implements Serializable, DetachCallback
 		if (obj == this) return true;
 		if (!(obj instanceof ServerDeliveryProcessor)) return false;
 		ServerDeliveryProcessor o = (ServerDeliveryProcessor) obj;
-		return 
+		return
 				Util.equals(this.organisationID, o.organisationID) &&
 				Util.equals(this.serverDeliveryProcessorID, o.serverDeliveryProcessorID);
 	}

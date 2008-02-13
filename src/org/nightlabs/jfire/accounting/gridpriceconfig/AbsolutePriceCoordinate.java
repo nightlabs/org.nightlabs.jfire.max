@@ -59,7 +59,7 @@ public class AbsolutePriceCoordinate extends PriceCoordinate implements IAbsolut
 //	 * @param currencyID
 //	 * @param productTypePK
 //	 * @param priceFragmentTypeID
-//	 * 
+//	 *
 //	 * @deprecated
 //	 */
 //	public AbsolutePriceCoordinate(

@@ -50,10 +50,10 @@ import org.nightlabs.progress.ProgressMonitor;
 
 /**
  * JDOObjectDAO for LegalEntities.
- *  
+ * 
  * @author Alexander Bieber <!-- alex [AT] nightlabs[DOT] de -->
  */
-public class LegalEntityDAO 
+public class LegalEntityDAO
 extends BaseJDOObjectDAO<AnchorID, LegalEntity>
 implements IJDOObjectDAO<LegalEntity>
 {
@@ -68,8 +68,8 @@ implements IJDOObjectDAO<LegalEntity>
 //			if (loginState == Login.LOGINSTATE_LOGGED_IN) {
 //				try {
 //					anonymousAnchorID = AnchorID.create(
-//							Login.getLogin().getOrganisationID(), 
-//							LegalEntity.ANCHOR_TYPE_ID_LEGAL_ENTITY, 
+//							Login.getLogin().getOrganisationID(),
+//							LegalEntity.ANCHOR_TYPE_ID_LEGAL_ENTITY,
 //							LegalEntity.ANCHOR_ID_ANONYMOUS
 //					);
 //				} catch (Exception e) {
@@ -86,10 +86,10 @@ implements IJDOObjectDAO<LegalEntity>
 		super();
 		try {
 			anonymousAnchorID = AnchorID.create(
-					SecurityReflector.getUserDescriptor().getOrganisationID(), 
-					LegalEntity.ANCHOR_TYPE_ID_LEGAL_ENTITY, 
+					SecurityReflector.getUserDescriptor().getOrganisationID(),
+					LegalEntity.ANCHOR_TYPE_ID_LEGAL_ENTITY,
 					LegalEntity.ANCHOR_ID_ANONYMOUS
-			);			
+			);
 		} catch (Exception e) {
 			throw new RuntimeException(e);
 		}
@@ -143,8 +143,8 @@ implements IJDOObjectDAO<LegalEntity>
 	 */
 	public LegalEntity getAnonymousLegalEntity(String[] fetchGroups, int maxFetchDepth, ProgressMonitor monitor) {
 		anonymousAnchorID = AnchorID.create(
-				SecurityReflector.getUserDescriptor().getOrganisationID(), 
-				LegalEntity.ANCHOR_TYPE_ID_LEGAL_ENTITY, 
+				SecurityReflector.getUserDescriptor().getOrganisationID(),
+				LegalEntity.ANCHOR_TYPE_ID_LEGAL_ENTITY,
 				LegalEntity.ANCHOR_ID_ANONYMOUS
 		);
 		return getJDOObject(null, anonymousAnchorID, fetchGroups, maxFetchDepth, monitor);

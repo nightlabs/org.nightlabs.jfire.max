@@ -44,8 +44,6 @@ import javax.jdo.listener.DetachCallback;
 
 import org.nightlabs.jdo.ObjectIDUtil;
 import org.nightlabs.jfire.accounting.id.InvoiceID;
-import org.nightlabs.jfire.accounting.jbpm.ActionHandlerFinalizeInvoice;
-import org.nightlabs.jfire.jbpm.graph.def.ActionHandlerNodeEnter;
 import org.nightlabs.jfire.jbpm.graph.def.Statable;
 import org.nightlabs.jfire.jbpm.graph.def.StatableLocal;
 import org.nightlabs.jfire.jbpm.graph.def.State;
@@ -250,22 +248,22 @@ implements Serializable, ArticleContainer, Statable, DetachCallback
 	}
 
 	/**
-	 * @jdo.field persistence-modifier="persistent"	 
+	 * @jdo.field persistence-modifier="persistent"
 	 */
 	private String primaryKey;
 
 	/**
-	 * @jdo.field persistence-modifier="persistent" mapped-by="invoice"	 
+	 * @jdo.field persistence-modifier="persistent" mapped-by="invoice"
 	 */
 	private InvoiceLocal invoiceLocal;
 
 	/**
-	 * @jdo.field persistence-modifier="persistent"	 
+	 * @jdo.field persistence-modifier="persistent"
 	 */
 	private OrganisationLegalEntity vendor;
 
 	/**
-	 * @jdo.field persistence-modifier="persistent"	 
+	 * @jdo.field persistence-modifier="persistent"
 	 */
 	private LegalEntity customer;
 
@@ -354,8 +352,8 @@ implements Serializable, ArticleContainer, Statable, DetachCallback
 	}
 
 	/**
-	 * Adds an Article, if this Invoice is not yet finalized, 
-	 * the article's offer has the same vendor and customer as this Invoice, 
+	 * Adds an Article, if this Invoice is not yet finalized,
+	 * the article's offer has the same vendor and customer as this Invoice,
 	 * and the article is not yet part of another invoice.
 	 * <p>
 	 * NEVER use this method directly (within the server)! Call {@link Accounting#addArticlesToInvoice(User, Invoice, Collection)}
@@ -370,20 +368,20 @@ implements Serializable, ArticleContainer, Statable, DetachCallback
 		Offer articleOffer = article.getOffer();
 		Order articleOrder = articleOffer.getOrder();
 		ArticleID articleID = (ArticleID) JDOHelper.getObjectId(article);
-		if (isFinalized())			
+		if (isFinalized())
 			throw new InvoiceEditException(
-					InvoiceEditException.REASON_INVOICE_FINALIZED, 
-					"Invoice is finalized, can not change any more!", 
+					InvoiceEditException.REASON_INVOICE_FINALIZED,
+					"Invoice is finalized, can not change any more!",
 					articleID
 				);
 
-		if (!vendor.getPrimaryKey().equals(articleOrder.getVendor().getPrimaryKey()) 
-					|| 
-				!customer.getPrimaryKey().equals(articleOrder.getCustomer().getPrimaryKey()) 
+		if (!vendor.getPrimaryKey().equals(articleOrder.getVendor().getPrimaryKey())
+					||
+				!customer.getPrimaryKey().equals(articleOrder.getCustomer().getPrimaryKey())
 				)
 		{
 			throw new InvoiceEditException(
-				InvoiceEditException.REASON_ANCHORS_DONT_MATCH,				
+				InvoiceEditException.REASON_ANCHORS_DONT_MATCH,
 				"Vendor and customer are not equal for the Article to add and the invoice, can not add the offerItem!!"
 			);
 		}
@@ -392,8 +390,8 @@ implements Serializable, ArticleContainer, Statable, DetachCallback
 		if (invoiceID != null) {
 			throw new InvoiceEditException(
 				InvoiceEditException.REASON_ARTICLE_ALREADY_IN_INVOICE,
-				"Article already in an invoice. Article "+articleID+", Invoice "+invoiceID, 
-				articleID, 
+				"Article already in an invoice. Article "+articleID+", Invoice "+invoiceID,
+				articleID,
 				invoiceID
 			);
 		}
@@ -426,8 +424,8 @@ implements Serializable, ArticleContainer, Statable, DetachCallback
 
 		articles.add(article);
 
-		this.valid = false;	
-		article.setInvoice(this);		
+		this.valid = false;
+		article.setInvoice(this);
 		
 		this.articleCount = articles.size();
 	}
@@ -448,7 +446,7 @@ implements Serializable, ArticleContainer, Statable, DetachCallback
 	}
 
 	/**
-	 * @jdo.field persistence-modifier="persistent"	 
+	 * @jdo.field persistence-modifier="persistent"
 	 */
 	private Discount discount;
 	
@@ -676,15 +674,15 @@ implements Serializable, ArticleContainer, Statable, DetachCallback
 		this.finalizeDT = new Date(System.currentTimeMillis());
 	}
 	/**
-	 * This member is set to true as soon as all desired 
-	 * {@link Article}s were added to this offer. A finalized 
+	 * This member is set to true as soon as all desired
+	 * {@link Article}s were added to this offer. A finalized
 	 * Invoice can not be altered any more.
 	 */
 	public boolean isFinalized() {
 		return finalizeDT != null;
 	}
 	public User getFinalizeUser() {
-		return finalizeUser;		
+		return finalizeUser;
 	}
 	public Date getFinalizeDT() {
 		return finalizeDT;
@@ -736,7 +734,7 @@ implements Serializable, ArticleContainer, Statable, DetachCallback
 		Invoice o = (Invoice) obj;
 
 		return
-				Util.equals(this.organisationID, o.organisationID) && 
+				Util.equals(this.organisationID, o.organisationID) &&
 				Util.equals(this.invoiceIDPrefix, o.invoiceIDPrefix) &&
 				this.invoiceID == o.invoiceID;
 	}
@@ -745,7 +743,7 @@ implements Serializable, ArticleContainer, Statable, DetachCallback
 	public int hashCode()
 	{
 		return
-				Util.hashCode(this.organisationID) ^ 
+				Util.hashCode(this.organisationID) ^
 				Util.hashCode(this.invoiceIDPrefix) ^
 				Util.hashCode(this.invoiceID);
 	}

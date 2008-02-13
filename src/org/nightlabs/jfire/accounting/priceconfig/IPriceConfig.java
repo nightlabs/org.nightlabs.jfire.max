@@ -30,7 +30,6 @@ import java.util.Collection;
 import java.util.LinkedList;
 
 import org.nightlabs.jfire.accounting.Currency;
-import org.nightlabs.jfire.accounting.Price;
 import org.nightlabs.jfire.accounting.PriceFragmentType;
 import org.nightlabs.jfire.store.NestedProductTypeLocal;
 import org.nightlabs.jfire.store.Product;
@@ -105,7 +104,7 @@ public interface IPriceConfig
 			String priceFragmentTypeID);
 
 	/**
-	 * @param priceFragmentTypePK The composite primary key of the PriceFragmentType to remove. 
+	 * @param priceFragmentTypePK The composite primary key of the PriceFragmentType to remove.
 	 * @return Returns the PriceFragmentType that has been removed or <tt>null</tt> if none was registered with the given key.
 	 * 
 	 * @see #removePriceFragmentType(String, String)

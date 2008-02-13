@@ -132,7 +132,7 @@ public class Price
 	/**
 	 * A Price can contain virtual fragments. Virtual fragments
 	 * are not stored persitently, they are for example calculated/used
-	 * by the book process. 
+	 * by the book process.
 	 * 
 	 * @jdo.field persistence-modifier="none"
 	 */
@@ -253,7 +253,7 @@ public class Price
 	 * This is a convenience method for JSTL
 	 * @return Returns the amount as a double.
 	 */
-	public double getAmountAsDouble() 
+	public double getAmountAsDouble()
 	{
 		return getCurrency().toDouble(amount);
 	}
@@ -295,7 +295,7 @@ public class Price
 	}
 	
 	/**
-	 * Returns the mathematical absolute value of this price's amount. 
+	 * Returns the mathematical absolute value of this price's amount.
 	 */
 	public long getAmountAbsoluteValue() {
 		return Math.abs(amount);
@@ -317,7 +317,7 @@ public class Price
 	
 	/**
 	 * Returns the PriceFragment for the given PriceFragmentType primary key.
-	 * The caller can decide whether the fragment is searched in the persistent fragments only, 
+	 * The caller can decide whether the fragment is searched in the persistent fragments only,
 	 * or whether the search includes the virtual fragments as well.
 	 * 
 	 * @param priceFragmentTypePK The primary key of the PriceFragmentType the PriceFragment should be searched for.
@@ -328,7 +328,7 @@ public class Price
 	public PriceFragment getPriceFragment(
 			String priceFragmentTypePK, boolean throwExceptionIfNotExistent, boolean includeVirtual)
 	{
-		PriceFragment fragment = fragments.get(priceFragmentTypePK);		
+		PriceFragment fragment = fragments.get(priceFragmentTypePK);
 		if (fragment == null && includeVirtual) {
 			fragment = virtualFragments.get(priceFragmentTypePK);
 		}
@@ -355,7 +355,7 @@ public class Price
 	
 	/**
 	 * Returns the PriceFragment for the given PriceFragmentType primary key.
-	 * The caller can decide whether the fragment is searched in the persistent fragments only, 
+	 * The caller can decide whether the fragment is searched in the persistent fragments only,
 	 * or whether the search includes the virtual fragments as well.
 	 * 
 	 * @param priceFragmentTypeOrganisationID The organisationID The primary key of the PriceFragmentType the PriceFragment should be searched for.
@@ -412,7 +412,7 @@ public class Price
 			virtualFragments.put(priceFragmentType.getPrimaryKey(), fragment);
 		}
 		return fragment;
-	}	
+	}
 	
 	/**
 	 * Returns the amount of the PriceFragment for the given PriceFragmentType in this Price.
@@ -479,7 +479,7 @@ public class Price
 	 * Returns the amount of the PriceFragment for the given PriceFragmentType in this Price.
 	 * If the corresponding fragment cannot be found, <code>0</code> is returned.
 	 * <p>
-	 * The caller can decide if the search for fragments is limited to the list of persistent fragments only, 
+	 * The caller can decide if the search for fragments is limited to the list of persistent fragments only,
 	 * or whether the fragment is searched in the list of virtual fragments as well.
 	 * </p>
 	 * @param priceFragmentTypeOrganisationID The organisationID of the primary key of the PriceFragmentType the amount should be returned for.

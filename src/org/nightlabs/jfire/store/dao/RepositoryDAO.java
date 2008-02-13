@@ -60,7 +60,7 @@ extends BaseJDOObjectDAO<AnchorID, Repository>
 		try {
 			StoreManager sm = StoreManagerUtil.getHome(SecurityReflector.getInitialContextProperties()).create();
 			Set<AnchorID> repositoryIDs = sm.getRepositoryIDs(queries);
-			return getJDOObjects(null, repositoryIDs, fetchGroups, maxFetchDepth, monitor);			
+			return getJDOObjects(null, repositoryIDs, fetchGroups, maxFetchDepth, monitor);
 		} catch (Exception x) {
 			throw new RuntimeException(x);
 		}
@@ -72,13 +72,13 @@ extends BaseJDOObjectDAO<AnchorID, Repository>
 		return getJDOObjects(null, repositoryIDs, fetchGroups, maxFetchDepth, monitor);
 	}
 	
-	public Repository getRepository(AnchorID repositoryID, String[] fetchGroups, 
-			int maxFetchDepth, ProgressMonitor monitor) 
+	public Repository getRepository(AnchorID repositoryID, String[] fetchGroups,
+			int maxFetchDepth, ProgressMonitor monitor)
 	{
 		return getJDOObject(null, repositoryID, fetchGroups, maxFetchDepth, monitor);
 	}
 
-	public Repository storeRepository(Repository repository, boolean get, String[] fetchGroups, 
+	public Repository storeRepository(Repository repository, boolean get, String[] fetchGroups,
 			int maxFetchDepth, ProgressMonitor monitor)
 	{
 		StoreManager sm;
@@ -90,6 +90,6 @@ extends BaseJDOObjectDAO<AnchorID, Repository>
 			return repository;
 		} catch (Exception x) {
 			throw new RuntimeException(x);
-		} 
+		}
 	}
 }

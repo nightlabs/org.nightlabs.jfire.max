@@ -45,7 +45,7 @@ implements Serializable
 //	 * anchorTypeID for repositorys of trading partners when they acting as vendor
 //	 */
 //	public static final RepositoryTypeID ACCOUNT_TYPE_ID_PARTNER_VENDOR = RepositoryTypeID.create(Organisation.DEV_ORGANISATION_ID, "Repository.Partner.Vendor");
-//	
+//
 //	/**
 //	 * anchorTypeID for repositorys of trading partners when they acting as customer
 //	 */
@@ -73,7 +73,7 @@ implements Serializable
 	 * Both local and foreign products are transferred from
 	 * this repository to the container product's repository
 	 * when the container product is assembled.
-	 * </p> 
+	 * </p>
 	 * <p>
 	 * Both local and foreign products are transferred into
 	 * this repository (from the container's repository) when

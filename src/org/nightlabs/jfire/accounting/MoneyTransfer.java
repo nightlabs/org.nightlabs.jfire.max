@@ -35,7 +35,7 @@ import org.nightlabs.jfire.transfer.Transfer;
 /**
  * @author Alexander Bieber <alex[AT]nightlabs[DOT]de>
  * 
- * @jdo.persistence-capable 
+ * @jdo.persistence-capable
  *		identity-type="application"
  *		persistence-capable-superclass="org.nightlabs.jfire.transfer.Transfer"
  *		detachable="true"
@@ -130,9 +130,9 @@ public class MoneyTransfer extends Transfer
 //		return res;
 //	}
 
-	/** 
+	/**
 	 * Used to create a MoneyTransfer accosiated to
-	 * the (first) invoice of containerMoneyTransfer. 
+	 * the (first) invoice of containerMoneyTransfer.
 	 * 
 	 * @param transferRegistry
 	 * @param container
@@ -143,7 +143,7 @@ public class MoneyTransfer extends Transfer
 	 * @param currency
 	 * @param amount
 	 */
-	public MoneyTransfer(MoneyTransfer containerMoneyTransfer, Anchor from, Anchor to, 
+	public MoneyTransfer(MoneyTransfer containerMoneyTransfer, Anchor from, Anchor to,
 			long amount)
 	{
 		this(containerMoneyTransfer, containerMoneyTransfer.getInitiator(),
@@ -152,10 +152,10 @@ public class MoneyTransfer extends Transfer
 				amount);
 	}
 
-//	/** 
-//	 * Used to assosiate a MoneyTransfer 
-//	 * to the given invoice. 
-//	 * 
+//	/**
+//	 * Used to assosiate a MoneyTransfer
+//	 * to the given invoice.
+//	 *
 //	 * @param transferRegistry
 //	 * @param container
 //	 * @param from
@@ -166,7 +166,7 @@ public class MoneyTransfer extends Transfer
 //	 * @param amount
 //	 */
 //	public MoneyTransfer(TransferRegistry transferRegistry,
-//			MoneyTransfer containerMoneyTransfer, Anchor from, Anchor to, 
+//			MoneyTransfer containerMoneyTransfer, Anchor from, Anchor to,
 //			long amount)
 //	{
 //		this(transferRegistry, containerMoneyTransfer, containerMoneyTransfer.getInitiator(),
@@ -178,14 +178,14 @@ public class MoneyTransfer extends Transfer
 	/**
 	 * Creates a MoneyTransfer associated to the invoice
 	 * of the given containerMoneyTransfer in its currency and with
-	 * its price. 
+	 * its price.
 	 * 
 	 * @param transferRegistry
 	 * @param containerMoneyTransfer
 	 * @param from
 	 * @param to
 	 */
-	public MoneyTransfer(MoneyTransfer containerMoneyTransfer, Anchor from, Anchor to) 
+	public MoneyTransfer(MoneyTransfer containerMoneyTransfer, Anchor from, Anchor to)
 	{
 		this(containerMoneyTransfer, containerMoneyTransfer.getInitiator(),
 				from, to,
@@ -210,7 +210,7 @@ public class MoneyTransfer extends Transfer
 	}
 	
 	/**
-	 * Get the balance of the from-anchor before the transfer was booked. 
+	 * Get the balance of the from-anchor before the transfer was booked.
 	 * @return The balance of the from-anchor before the transfer was booked.
 	 */
 	public long getFromBalanceBeforeTransfer() {
@@ -218,7 +218,7 @@ public class MoneyTransfer extends Transfer
 	}
 	
 	/**
-	 * Get the balance of the to-anchor before the transfer was booked. 
+	 * Get the balance of the to-anchor before the transfer was booked.
 	 * @return The balance of the to-anchor before the transfer was booked.
 	 */
 	public long getToBalanceBeforeTransfer() {
@@ -263,7 +263,7 @@ public class MoneyTransfer extends Transfer
 	 * {@inheritDoc}
 	 * <p>
 	 * This implementation checks if the MoneyTransfer has a container. If so the description
-	 * of the container is returned, otherwise 
+	 * of the container is returned, otherwise
 	 * </p>
 	 */
 	@Override
@@ -273,6 +273,6 @@ public class MoneyTransfer extends Transfer
 		return String.format(
 				"MoneyTransfer from %s to %s",
 				getFrom().getDescription(locale), getTo().getDescription(locale)
-			);		
+			);
 	}
 }

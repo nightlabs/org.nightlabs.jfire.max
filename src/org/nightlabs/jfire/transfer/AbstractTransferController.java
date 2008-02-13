@@ -10,15 +10,9 @@ import javax.security.auth.login.LoginException;
 import org.nightlabs.jdo.ObjectID;
 import org.nightlabs.jfire.accounting.AccountingManager;
 import org.nightlabs.jfire.accounting.AccountingManagerUtil;
-import org.nightlabs.jfire.accounting.pay.PaymentController;
-import org.nightlabs.jfire.accounting.pay.PaymentResult;
-import org.nightlabs.jfire.accounting.pay.id.PaymentID;
 import org.nightlabs.jfire.security.SecurityReflector;
 import org.nightlabs.jfire.store.StoreManager;
 import org.nightlabs.jfire.store.StoreManagerUtil;
-import org.nightlabs.jfire.store.deliver.DeliveryController;
-import org.nightlabs.jfire.store.deliver.DeliveryResult;
-import org.nightlabs.jfire.store.deliver.id.DeliveryID;
 import org.nightlabs.util.Util;
 
 /**
@@ -111,7 +105,7 @@ public abstract class AbstractTransferController<D extends TransferData, ID exte
 	}
 	
 	/**
-	 * Sets the last stage that has been performed to the given {@link Stage}. This method is supposed to be used together with the method 
+	 * Sets the last stage that has been performed to the given {@link Stage}. This method is supposed to be used together with the method
 	 * {@link #assertLastStage(org.nightlabs.jfire.transfer.Stage)} to ensure that the different stages are executed in
 	 * the correct order.
 	 * @param stage The last performed stage.
@@ -122,7 +116,7 @@ public abstract class AbstractTransferController<D extends TransferData, ID exte
 	
 	/**
 	 * Checks whether the last executed stage (set by {@link #setLastStage(org.nightlabs.jfire.transfer.Stage)}) is the
-	 * given stage. This is supposed to be used to ensure that the different stages are executed in the correct order. 
+	 * given stage. This is supposed to be used to ensure that the different stages are executed in the correct order.
 	 * @param stage The expected last stage.
 	 */
 	private void assertLastStage(Stage stage) {

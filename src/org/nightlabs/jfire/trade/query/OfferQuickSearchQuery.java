@@ -9,8 +9,8 @@ import org.nightlabs.jfire.trade.Offer;
  * @author Daniel Mazurek - daniel <at> nightlabs <dot> de
  *
  */
-public class OfferQuickSearchQuery 
-extends AbstractArticleContainerQuickSearchQuery 
+public class OfferQuickSearchQuery
+extends AbstractArticleContainerQuickSearchQuery
 {
 	/**
 	 * 

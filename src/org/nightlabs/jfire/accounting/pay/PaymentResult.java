@@ -28,7 +28,6 @@ package org.nightlabs.jfire.accounting.pay;
 
 import java.io.Serializable;
 
-import org.nightlabs.jfire.accounting.pay.ServerPaymentProcessor.PayParams;
 import org.nightlabs.jfire.idgenerator.IDGenerator;
 import org.nightlabs.util.Util;
 
@@ -366,7 +365,7 @@ implements Serializable
 
 	/**
 	 * @return Returns <tt>true</tt> if <tt>code</tt> is {@link #CODE_FAILED} or
-	 *		{@link #isRolledBack()} returns <tt>true</tt>. 
+	 *		{@link #isRolledBack()} returns <tt>true</tt>.
 	 */
 	public boolean isFailed()
 	{

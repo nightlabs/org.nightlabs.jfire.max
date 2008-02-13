@@ -61,9 +61,9 @@ import org.nightlabs.jfire.trade.LegalEntity;
 /**
  * @author Marco Schulze - marco at nightlabs dot de
  *
- * @ejb.bean name="jfire/ejb/JFireTrade/DeliveryHelper"	
+ * @ejb.bean name="jfire/ejb/JFireTrade/DeliveryHelper"
  *           jndi-name="jfire/ejb/JFireTrade/DeliveryHelper"
- *           type="Stateless" 
+ *           type="Stateless"
  *           transaction-type="Container"
  *
  * @ejb.util generate="physical"
@@ -92,7 +92,7 @@ implements SessionBean
 		super.setSessionContext(sessionContext);
 	}
 	/**
-	 * @ejb.create-method  
+	 * @ejb.create-method
 	 * @ejb.permission role-name="_Guest_"
 	 */
 	public void ejbCreate()
@@ -113,7 +113,7 @@ implements SessionBean
 	/**
 	 * @param deliveryData The <tt>DeliveryData</tt> to be stored.
 	 * @return Returns the JDO objectID of the newly persisted <tt>deliveryData</tt>
-	 * @throws ModuleException 
+	 * @throws ModuleException
 	 *
 	 * @ejb.interface-method view-type="local"
 	 * @ejb.transaction type="RequiresNew"

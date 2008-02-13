@@ -135,7 +135,7 @@ public class ArticleProductTypeClassGroup
 	 * @return Returns a <code>Collection</code> of {@link ArticleCarrier} - the ones that
 	 *		have been created by this method in order to wrap the given {@link Article}s. If <code>filterExisting</code>
 	 *		is <code>true</code>, the result will not contain <code>ArticleCarrier</code>s whose {@link Article}s already existed
-	 *		before. 
+	 *		before.
 	 */
 	public Collection<ArticleCarrier> addArticles(Collection<? extends Article> articles, boolean filterExisting)
 	{

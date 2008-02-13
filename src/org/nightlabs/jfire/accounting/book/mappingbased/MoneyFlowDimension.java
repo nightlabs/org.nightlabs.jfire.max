@@ -34,7 +34,7 @@ import org.nightlabs.jfire.trade.Article;
 
 /**
  * Abstract Dimension for MoneyFlowMappings.
- *  
+ * 
  * @author Alexander Bieber <alex[AT]nightlabs[DOT]de>
  *
  * @jdo.persistence-capable
@@ -82,12 +82,12 @@ public abstract class MoneyFlowDimension {
 	
 	/**
 	 * Returns the MoneyFlowDimension with the given organisationID and
-	 * moneyFlowDimensionID. 
+	 * moneyFlowDimensionID.
 	 * 
 	 * @param pm The PersistenceManager to use.
 	 * @param organisationID The organisationID of the dimension.
 	 * @param moneyFlowDimensionID The moneyFlowDimensionID of the dimension.
-	 * @return The MoneyFlowDimension with for the given keys.  
+	 * @return The MoneyFlowDimension with for the given keys.
 	 */
 	public static MoneyFlowDimension getMoneyFlowDimension(PersistenceManager pm, String moneyFlowDimensionID) {
 		Query q = pm.newNamedQuery(MoneyFlowDimension.class, FETCH_GROUP_GET_MONEY_FLOW_DIMENSION);

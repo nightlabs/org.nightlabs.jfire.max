@@ -34,7 +34,7 @@ import org.nightlabs.jfire.transfer.Anchor;
 /**
  * @author Marco Schulze - marco at nightlabs dot de
  * 
- * @jdo.persistence-capable 
+ * @jdo.persistence-capable
  *		identity-type="application"
  *		persistence-capable-superclass="org.nightlabs.jfire.accounting.MoneyTransfer"
  *		detachable="true"
@@ -61,13 +61,13 @@ extends MoneyTransfer
 	private String bookType;
 
 	/**
-	 * @deprecated Only for JDO! 
+	 * @deprecated Only for JDO!
 	 */
 	@Deprecated
 	protected InvoiceMoneyTransfer() { }
 
 	private static Currency getCurrency(Invoice invoice)
-	{		
+	{
 		if (invoice == null)
 			throw new IllegalArgumentException("invoice must not be null!");
 

@@ -36,8 +36,8 @@ import org.nightlabs.jfire.trade.ArticlePrice;
 import org.nightlabs.jfire.trade.LegalEntity;
 
 /**
- * Defines a mapping of ProductType, PriceFragmentTypes 
- * and a PackageType (package-product, inner-product) to an Account. 
+ * Defines a mapping of ProductType, PriceFragmentTypes
+ * and a PackageType (package-product, inner-product) to an Account.
  * 
  * @author Alexander Bieber <alex[AT]nightlabs[DOT]de>
  * 
@@ -119,7 +119,7 @@ public class PFMoneyFlowMapping extends MoneyFlowMapping
 
 	@Override
 	public String getMappingConditionKey(ProductType productType) {
-		return priceFragmentType.getPrimaryKey(); 
+		return priceFragmentType.getPrimaryKey();
 	}
 	
 	public LegalEntity getOwner() {
@@ -134,13 +134,13 @@ public class PFMoneyFlowMapping extends MoneyFlowMapping
 	 * @return
 	 */
 	public static String getMappingKey(
-			String productTypePK, 
-			String packageType, 
+			String productTypePK,
+			String packageType,
 			String currencyID,
 			String ownerPK,
 			String sourceOrganisationID,
 			String priceFragmentTypePK
-		) 
+		)
 	{
 		return MoneyFlowMapping.getMappingKey(productTypePK, packageType, currencyID)+"/"+ownerPK+"/"+sourceOrganisationID+"/"+priceFragmentTypePK;
 	}
@@ -148,14 +148,14 @@ public class PFMoneyFlowMapping extends MoneyFlowMapping
 	@Override
 	public long getArticlePriceDimensionAmount(Map dimensionValues, ArticlePrice articlePrice) {
 		return articlePrice.getPriceFragment(
-				(String)dimensionValues.get(PriceFragmentDimension.MONEY_FLOW_DIMENSION_ID), 
+				(String)dimensionValues.get(PriceFragmentDimension.MONEY_FLOW_DIMENSION_ID),
 				true
 			).getAmount(); // .getAmountAbsoluteValue();
 	}
 
 	@Override
 	public void validateMapping() {
-	}	
+	}
 	
 	/**
 	 * {@inheritDoc}
@@ -167,25 +167,25 @@ public class PFMoneyFlowMapping extends MoneyFlowMapping
 		// TODO: Add here instance multiple times for wildcards
 		resolvedMappings.put(
 				simulateMappingKeyPartForProductType(productType)+
-				productType.getOwner().getPrimaryKey() + "/" + productType.getOrganisationID() + "/" + priceFragmentType.getPrimaryKey(), 
+				productType.getOwner().getPrimaryKey() + "/" + productType.getOrganisationID() + "/" + priceFragmentType.getPrimaryKey(),
 				this
 			);
 	}
 	
 	@Override
 	public boolean matches(ProductType productType, String packageType) {
-		if (getProductTypePK().equals(productType.getPrimaryKey()) && 
+		if (getProductTypePK().equals(productType.getPrimaryKey()) &&
 				getPackageType().equals(packageType))
 		{
 			if (getOwner() == null)
-				return (getSourceOrganisationID() == null) 
-					? 
-						true 
-					: 
+				return (getSourceOrganisationID() == null)
+					?
+						true
+					:
 						productType.getOrganisationID().equals(getSourceOrganisationID());
 			else
-				return (getSourceOrganisationID() == null) 
-					? 
+				return (getSourceOrganisationID() == null)
+					?
 						productType.getOwner().getPrimaryKey().equals(getOwner().getPrimaryKey())
 					:
 						productType.getOwner().getPrimaryKey().equals(getOwner().getPrimaryKey()) &&

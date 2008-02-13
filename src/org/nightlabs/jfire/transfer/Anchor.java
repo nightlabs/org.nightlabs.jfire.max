@@ -29,7 +29,6 @@ package org.nightlabs.jfire.transfer;
 import java.io.Serializable;
 import java.util.Collection;
 import java.util.Locale;
-import java.util.Map;
 import java.util.Set;
 
 import javax.jdo.JDOHelper;
@@ -129,7 +128,7 @@ public abstract class Anchor
 	public static AnchorID primaryKeyToAnchorID(String primaryKey)
 	{
 		String[] parts = primaryKey.split("/");
-		if (parts.length < 3) 
+		if (parts.length < 3)
 			throw new IllegalArgumentException("The given anchorPK "+primaryKey+" is illegal (not enough parts)");
 		String anchorID = parts[2];
 		if (parts.length > 3) {
@@ -342,7 +341,7 @@ public abstract class Anchor
 	 * @param locale The locale for the description.
 	 * @return A description of this Anchor.
 	 */
-	public abstract String getDescription(Locale locale); 
+	public abstract String getDescription(Locale locale);
 	
 	@Override
 	public boolean equals(Object obj)

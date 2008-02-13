@@ -84,7 +84,7 @@ import org.nightlabs.util.Util;
 public class ProductTypeLocal
 implements Serializable, Inheritable, InheritanceCallbacks
 {
-	// TODO: add field authority for security checking 
+	// TODO: add field authority for security checking
 	private static final long serialVersionUID = 1L;
 
 	private static final Logger logger = Logger.getLogger(ProductTypeLocal.class);
@@ -94,7 +94,7 @@ implements Serializable, Inheritable, InheritanceCallbacks
 	public static final String FETCH_GROUP_LOCAL_ACCOUNTANT_DELEGATE = "ProductTypeLocal.localAccountantDelegate";
 	public static final String FETCH_GROUP_LOCAL_STOREKEEPER_DELEGATE = "ProductTypeLocal.localStorekeeperDelegate";
 	public static final String FETCH_GROUP_FIELD_METADATA_MAP = "ProductTypeLocal.fieldMetaDataMap";
-	public static final String FETCH_GROUP_NESTED_PRODUCT_TYPE_LOCALS = "ProductTypeLocal.nestedProductTypeLocals";	
+	public static final String FETCH_GROUP_NESTED_PRODUCT_TYPE_LOCALS = "ProductTypeLocal.nestedProductTypeLocals";
 
 	/**
 	 * @jdo.field primary-key="true"
@@ -209,7 +209,7 @@ implements Serializable, Inheritable, InheritanceCallbacks
 	/**
 	 * The LocalAccountantDelegate is in charge of booking money to different
 	 * account for the productType it is assigned to and its packaged types
-	 * when an invoice is booked. 
+	 * when an invoice is booked.
 	 */
 	public LocalAccountantDelegate getLocalAccountantDelegate() {
 		return localAccountantDelegate;
@@ -241,7 +241,7 @@ implements Serializable, Inheritable, InheritanceCallbacks
 
 	public FieldInheriter getFieldInheriter(String fieldName)
 	{
-		if ("nestedProductTypeLocals".equals(fieldName))		
+		if ("nestedProductTypeLocals".equals(fieldName))
 			return new NestedProductTypeLocalMapInheriter();
 
 		return new JDOSimpleFieldInheriter();
@@ -307,7 +307,7 @@ implements Serializable, Inheritable, InheritanceCallbacks
 	public void preInherit(Inheritable mother, Inheritable child)
 	{
 		if (child == this) {
-			// check whether the nestedPoductTypes change - in this case we will recalculate prices after inheritance in postInherit(...) 
+			// check whether the nestedPoductTypes change - in this case we will recalculate prices after inheritance in postInherit(...)
 			// we copy the current nestedProductTypeLocals to tmpInherit_nestedProductTypes - then we compare them afterwards
 			PersistenceManager pm = getPersistenceManager();
 			FetchPlanBackup fetchPlanBackup = NLJDOHelper.backupFetchPlan(pm.getFetchPlan());
@@ -393,7 +393,7 @@ implements Serializable, Inheritable, InheritanceCallbacks
 	 * the engine and much more). This method allows to package another <code>ProductType</code>
 	 * within this one.
 	 *
-	 * @param productType The <code>ProductType</code> which will be packaged within this one. 
+	 * @param productType The <code>ProductType</code> which will be packaged within this one.
 	 * @return Returns the {@link NestedProductTypeLocal} which functions as glue-with-metadata between
 	 *		the package and its content. You can change the quantity (and later other properties)
 	 *		manipulating the <code>NestedProductTypeLocal</code>.

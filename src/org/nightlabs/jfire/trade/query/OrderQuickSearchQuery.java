@@ -9,8 +9,8 @@ import org.nightlabs.jfire.trade.Order;
  * @author Daniel Mazurek - daniel <at> nightlabs <dot> de
  *
  */
-public class OrderQuickSearchQuery 
-extends AbstractArticleContainerQuickSearchQuery 
+public class OrderQuickSearchQuery
+extends AbstractArticleContainerQuickSearchQuery
 {
 	/**
 	 * 

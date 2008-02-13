@@ -18,7 +18,7 @@ import org.nightlabs.jfire.transfer.Anchor;
  * @jdo.inheritance strategy="new-table"
  *
  * @jdo.fetch-group name="ManualMoneyTransfer.reason" fields="reason"
- */	
+ */
 public class ManualMoneyTransfer extends MoneyTransfer
 {
 	private static final long serialVersionUID = 1L;
@@ -43,7 +43,7 @@ public class ManualMoneyTransfer extends MoneyTransfer
 	 */
 	public ManualMoneyTransfer(
 			User initiator, Anchor from, Anchor to, Currency currency, long amount)
-	{		
+	{
 		super(
 				null, // there is no container
 				initiator, from, to, currency, amount);

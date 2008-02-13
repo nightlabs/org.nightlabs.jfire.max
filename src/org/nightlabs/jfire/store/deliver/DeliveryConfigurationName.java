@@ -43,7 +43,7 @@ import org.nightlabs.i18n.I18nText;
  * @jdo.create-objectid-class field-order="organisationID, deliveryConfigurationID"
  *
  * @jdo.inheritance strategy="new-table"
- *  
+ * 
  * @jdo.fetch-group name="DeliveryConfiguration.name" fields="deliveryConfiguration, names"
  */
 public class DeliveryConfigurationName extends I18nText
@@ -85,7 +85,7 @@ public class DeliveryConfigurationName extends I18nText
 	private DeliveryConfiguration deliveryConfiguration;
 
 	/**
-	 * @deprecated Only for JDO! 
+	 * @deprecated Only for JDO!
 	 */
 	@Deprecated
 	protected DeliveryConfigurationName() { }

@@ -48,11 +48,11 @@ public class ProductTypeGroupSearchResult implements Serializable {
 		private List productTypes = new LinkedList();
 		
 		public Entry(ProductTypeGroupID productTypeGroupID) {
-			this.productTypeGroup = productTypeGroupID;			
+			this.productTypeGroup = productTypeGroupID;
 		}
 		
 		public Entry(ProductTypeGroup productTypeGroup) {
-			this.productTypeGroup = (ProductTypeGroupID)JDOHelper.getObjectId(productTypeGroup);			
+			this.productTypeGroup = (ProductTypeGroupID)JDOHelper.getObjectId(productTypeGroup);
 		}
 
 		public void addProductType(ProductType productType) {

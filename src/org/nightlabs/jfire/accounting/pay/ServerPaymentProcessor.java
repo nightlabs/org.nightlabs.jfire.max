@@ -577,7 +577,7 @@ public PayMoneyTransfer payBegin(PayParams payParams)
 	throws PaymentException
 	{
 		Payment payment = payParams.paymentData.getPayment();
-		PaymentResult payDoWorkServerResult = externalPayDoWork(payParams); 
+		PaymentResult payDoWorkServerResult = externalPayDoWork(payParams);
 	
 		if (payDoWorkServerResult == null) {
 			if (payment.isPostponed()) {
@@ -605,7 +605,7 @@ public PayMoneyTransfer payBegin(PayParams payParams)
 	 * in case another payment/delivery (executed together) fails. If your external
 	 * payment process supports only two phases (approve & commit/rollback), you
 	 * should simply return <tt>null</tt>.
-	 * <p> 
+	 * <p>
 	 * This method is called after
 	 * {@link #externalPayBegin(PayParams)} and before
 	 * {@link #externalPayCommit(PayParams)}/{@link #externalPayRollback(PayParams)}.
@@ -640,7 +640,7 @@ public PayMoneyTransfer payBegin(PayParams payParams)
 		Payment payment = payParams.paymentData.getPayment();
 		PaymentResult payEndServerResult;
 		if (payment.isForceRollback() || payment.isFailed()) {
-			payEndServerResult = externalPayRollback(payParams); 
+			payEndServerResult = externalPayRollback(payParams);
 	
 			if (payEndServerResult == null) {
 				payEndServerResult = new PaymentResult(
@@ -650,14 +650,14 @@ public PayMoneyTransfer payBegin(PayParams payParams)
 			}
 		}
 		else {
-			payEndServerResult = externalPayCommit(payParams); 
+			payEndServerResult = externalPayCommit(payParams);
 			
 			if (payEndServerResult == null) {
 				if (payment.isPostponed()) {
 					payEndServerResult = new PaymentResult(
 							PaymentResult.CODE_POSTPONED,
 							(String)null,
-							(Throwable)null);					
+							(Throwable)null);
 				}
 				else {
 					payEndServerResult = new PaymentResult(
@@ -687,7 +687,7 @@ public PayMoneyTransfer payBegin(PayParams payParams)
 	
 	/**
 	 * In your implementation of this method, you must rollback the payment in
-	 * the external system. 
+	 * the external system.
 	 *
 	 * @return Return simply <tt>null</tt> if you have no external work to do.
 	 *         Otherwise, you must return a meaningful instance of

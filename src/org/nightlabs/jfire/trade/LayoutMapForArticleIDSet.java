@@ -11,8 +11,8 @@ import org.nightlabs.jfire.trade.id.ArticleID;
  * @author Daniel.Mazurek [at] NightLabs [dot] de
  *
  */
-public class LayoutMapForArticleIDSet 
-implements Serializable 
+public class LayoutMapForArticleIDSet
+implements Serializable
 {
 	private static final long serialVersionUID = 1L;
 
@@ -22,7 +22,7 @@ implements Serializable
 		this.productID2LayoutMap = new HashMap<ProductID, ILayout>();
 	}
 
-	public LayoutMapForArticleIDSet(Map<ArticleID, ProductID> articleID2TicketIDMap, 
+	public LayoutMapForArticleIDSet(Map<ArticleID, ProductID> articleID2TicketIDMap,
 			Map<ProductID, ILayout> productID2LayoutMap)
 	{
 		if (articleID2TicketIDMap == null)

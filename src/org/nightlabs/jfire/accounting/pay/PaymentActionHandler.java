@@ -3,8 +3,6 @@ package org.nightlabs.jfire.accounting.pay;
 import javax.jdo.JDOHelper;
 import javax.jdo.PersistenceManager;
 
-import org.nightlabs.jfire.accounting.Accounting;
-
 /**
  * @author Tobias Langner <!-- tobias[dot]langner[at]nightlabs[dot]de -->
  *

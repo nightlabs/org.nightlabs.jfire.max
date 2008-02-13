@@ -368,7 +368,7 @@ public class PriceConfigUtil
 	 * @param productType The ProductType whose prices are about to be changed.
 	 * @return Returns a List referencing the affected product types. This list starts with the given
 	 *		<code>productType</code> having the nesting-level (see {@link AffectedProductType#getNestingLevel()}) 0. The
-	 *		direct packages around this productType will follow with nesting-level 1 and so on. 
+	 *		direct packages around this productType will follow with nesting-level 1 and so on.
 	 */
 	public static ArrayList<AffectedProductType> getAffectedProductTypes(PersistenceManager pm, ProductType productType)
 	{
@@ -393,7 +393,7 @@ public class PriceConfigUtil
 //			if (productTypeID.equals(innerPTID))
 //				continue;
 //
-//			// if the sibling is not INNER, its price cannot change 
+//			// if the sibling is not INNER, its price cannot change
 //			if (ProductType.PACKAGE_NATURE_INNER != innerPT.getPackageNature())
 //				continue;
 //

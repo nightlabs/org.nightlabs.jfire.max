@@ -62,7 +62,7 @@ public class CellReflector
 	public CellReflector(
 			PriceCalculator priceCalculator,
 			ProductType packageProductType,
-			IAbsolutePriceCoordinate coordinate, 
+			IAbsolutePriceCoordinate coordinate,
 			NestedProductTypeLocal nestedProductTypeLocal)
 	{
 		if (priceCalculator == null)
@@ -252,7 +252,7 @@ public class CellReflector
 //	 * @param priceFragmentTypePK
 //	 *
 //	 * @return Returns a <tt>Collection</tt> of {@link ResolvedPriceCell}. Never <tt>null</tt>, but the <tt>Collection</tt> may be empty.
-//	 * @throws ModuleException 
+//	 * @throws ModuleException
 //	 */
 //	public Collection resolvePriceCells(
 //			String _customerGroupPK,
@@ -315,7 +315,7 @@ public class CellReflector
 	 * @param searchedCoordinate
 	 *
 	 * @return Returns a <tt>Collection</tt> of {@link ResolvedPriceCell}. Never <tt>null</tt>, but the <tt>Collection</tt> may be empty.
-	 * @throws ModuleException 
+	 * @throws ModuleException
 	 */
 	public Collection<ResolvedPriceCell> resolvePriceCells(
 			IAbsolutePriceCoordinate address)

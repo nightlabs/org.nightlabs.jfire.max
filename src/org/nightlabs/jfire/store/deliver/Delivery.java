@@ -43,7 +43,6 @@ import org.nightlabs.jdo.ObjectIDUtil;
 import org.nightlabs.jfire.idgenerator.IDGenerator;
 import org.nightlabs.jfire.security.User;
 import org.nightlabs.jfire.store.DeliveryNote;
-import org.nightlabs.jfire.store.deliver.ServerDeliveryProcessor.DeliverParams;
 import org.nightlabs.jfire.store.deliver.id.DeliveryID;
 import org.nightlabs.jfire.store.deliver.id.ModeOfDeliveryFlavourID;
 import org.nightlabs.jfire.store.deliver.id.ServerDeliveryProcessorID;
@@ -52,7 +51,6 @@ import org.nightlabs.jfire.trade.Article;
 import org.nightlabs.jfire.trade.ArticleLocal;
 import org.nightlabs.jfire.trade.LegalEntity;
 import org.nightlabs.jfire.trade.id.ArticleID;
-import org.nightlabs.jfire.transfer.Transfer;
 import org.nightlabs.jfire.transfer.id.AnchorID;
 
 /**
@@ -119,7 +117,7 @@ implements Serializable, StoreCallback
 	
 //	Tobias: Since a delivery may have several follow up deliveries, this field is removed. Relations between
 //	postponed deliveries should be managed by using #precursor and #precursorIDSet
-//	
+//
 //	/**
 //	 * This is used for postponed <tt>Delivery</tt>s. If this <tt>Delivery</tt> has been
 //	 * postponed and later followed up by a new one, this field will point to the
@@ -226,7 +224,7 @@ implements Serializable, StoreCallback
 	 *   {@link ServerDeliveryProcessor#deliverBegin(DeliverParams)} or even already before
 	 *   that by the client. In this case, your <tt>ServerDeliveryProcessor</tt>
 	 *   doesn't even need to create a <tt>DeliverMoneyTransfer</tt> because it will NOT
-	 *   be stored anyway.    
+	 *   be stored anyway.
 	 *  </li>
 	 *  <li>
 	 *   The <tt>Delivery</tt> can still be postponed during
@@ -683,7 +681,7 @@ implements Serializable, StoreCallback
 	/**
 	 * @return Returns <tt>null</tt> if there was no failure. Otherwise the
 	 *		first <tt>DeliveryResult</tt> with {@link DeliveryResult#CODE_FAILED} is
-	 *		returned. The order is (1) begin client, (2) begin server, (3) end client, (4) end server). 
+	 *		returned. The order is (1) begin client, (2) begin server, (3) end client, (4) end server).
 	 */
 	public DeliveryResult getFailureDeliveryResult()
 	{
@@ -754,7 +752,7 @@ implements Serializable, StoreCallback
 //	 *		collection-type="collection"
 //	 *		element-type="org.nightlabs.jfire.trade.ArticleLocal"
 //	 *		mapped-by="delivery"
-//	 */	
+//	 */
 //	private Collection<ArticleLocal> articleLocals = null;
 
 	/**
@@ -766,7 +764,7 @@ implements Serializable, StoreCallback
 	 *		null-value="exception"
 	 *
 	 * @jdo.join
-	 */	
+	 */
 	private Set<Article> articles = null;
 
 	/**
@@ -1033,7 +1031,7 @@ implements Serializable, StoreCallback
 //	{
 //		if (products == null)
 //			throw new NullPointerException("products must not be null!");
-//		
+//
 //		if (productIDs == null)
 //			productIDs = new HashSet();
 //		else
@@ -1365,10 +1363,10 @@ implements Serializable, StoreCallback
 		if (deliveryDirection == null)
 			throw new IllegalStateException("deliveryDirection is not set!");
 
-		if (partnerID != null && partner == null) 
+		if (partnerID != null && partner == null)
 			partner = (LegalEntity) pm.getObjectById(partnerID);
 
-//		if (partnerAccountID != null && partnerAccount == null) 
+//		if (partnerAccountID != null && partnerAccount == null)
 //			partnerAccount = (Account) pm.getObjectById(partnerAccountID);
 
 		if (modeOfDeliveryFlavourID != null && modeOfDeliveryFlavour == null)
@@ -1507,5 +1505,5 @@ implements Serializable, StoreCallback
 		} else if (!organisationID.equals(other.organisationID))
 			return false;
 		return true;
-	}	
+	}
 }

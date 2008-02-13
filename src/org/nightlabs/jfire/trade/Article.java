@@ -985,14 +985,14 @@ implements Serializable, DeleteCallback, DetachCallback, StoreCallback
 //		PersistenceManager pm = JDOHelper.getPersistenceManager(this);
 //		if (pm == null)
 //			throw new IllegalStateException("This instance of Article is currently not persistent!");
-//		
+//
 //		Trader trader = Trader.getTrader(pm);
 //		trader.allocateArticle(user, this, autoReleaseDT);
 //
 //		this.autoReleaseDT = autoReleaseDT;
 //		this.allocated = true;
 //	}
-//	
+//
 //	public void release(User user)
 //			throws ModuleException
 //	{
@@ -1114,7 +1114,7 @@ implements Serializable, DeleteCallback, DetachCallback, StoreCallback
 	 * This method should be a one-liner! You should put all your logic into the constructor
 	 * (see {@link #Article(User, Offer, long, Article)}).
 	 * </p>
-	 * @param user The responsible user. 
+	 * @param user The responsible user.
 	 * @param offer The <code>Offer</code> into which the new <code>Article</code> will be created.
 	 * @param articleID A new (not yet used) unique id within the current organisation for the new <code>Article</code>, that will be created.
 	 * @return Returns the new Article that reverses this one.

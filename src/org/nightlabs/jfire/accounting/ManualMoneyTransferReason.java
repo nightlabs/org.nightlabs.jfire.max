@@ -37,7 +37,7 @@ import org.nightlabs.jfire.transfer.Transfer;
  * @author Chairat Kongarayawetchakun - chairatk at nightlabs dot de
  * @author Marco Schulze - Marco at NightLabs dot de
  *
- * @jdo.persistence-capable 
+ * @jdo.persistence-capable
  *		identity-type="application"
  *		objectid-class="org.nightlabs.jfire.accounting.id.ManualMoneyTransferReasonID"
  *		detachable="true"

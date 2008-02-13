@@ -10,7 +10,7 @@ import org.nightlabs.jfire.config.ConfigModule;
 /**
  * @author Tobias Langner <!-- tobias[dot]langner[at]nightlabs[dot]de -->
  *
- * @jdo.persistence-capable 
+ * @jdo.persistence-capable
  *		identity-type="application"
  *		persistence-capable-superclass="org.nightlabs.jfire.config.ConfigModule"
  *		detachable="true"
@@ -54,7 +54,7 @@ public class TariffOrderConfigModule extends ConfigModule {
 					if (index1.equals(index2))
 						return Collator.getInstance().compare(o1.getName().getText(), o2.getName().getText());
 					else
-						return new Integer(o1.getTariffIndex()).compareTo(o2.getTariffIndex());					
+						return new Integer(o1.getTariffIndex()).compareTo(o2.getTariffIndex());
 				}
 			};
 		} else {
@@ -71,7 +71,7 @@ public class TariffOrderConfigModule extends ConfigModule {
 					else
 						return index1.compareTo(index2);
 				}
-			}; 
+			};
 		}
 	}
 	

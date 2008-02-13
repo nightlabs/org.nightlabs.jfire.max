@@ -36,22 +36,22 @@ public class TradeException extends ModuleException
 {
 	private static final long serialVersionUID = 1L;
 
-	public TradeException() 
+	public TradeException()
 	{
 		super();
 	}
 	
-	public TradeException(String message) 
+	public TradeException(String message)
 	{
 		super(message);
 	}
 	
-	public TradeException(String message, Throwable cause) 
+	public TradeException(String message, Throwable cause)
 	{
 		super(message, cause);
 	}
 	
-	public TradeException(Throwable cause) 
+	public TradeException(Throwable cause)
 	{
 		super(cause);
 	}

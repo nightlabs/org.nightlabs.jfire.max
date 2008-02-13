@@ -84,7 +84,7 @@ public class AccountSearchFilter extends SearchFilter {
 			filter.append("  this.owner.anchorID == ownerAnchorID )");
 		}
 		else {
-			paramMap.put("ownerOrganisationID", null); 		
+			paramMap.put("ownerOrganisationID", null);
 			paramMap.put("ownerAnchorTypeID", null);
 			paramMap.put("ownerAnchorID", null);
 		}

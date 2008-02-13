@@ -57,7 +57,6 @@ import org.nightlabs.ModuleException;
 import org.nightlabs.annotation.Implement;
 import org.nightlabs.jdo.NLJDOHelper;
 import org.nightlabs.jdo.query.JDOQuery;
-import org.nightlabs.jfire.accounting.Accounting;
 import org.nightlabs.jfire.accounting.Invoice;
 import org.nightlabs.jfire.accounting.id.InvoiceID;
 import org.nightlabs.jfire.asyncinvoke.AsyncInvoke;
@@ -122,17 +121,17 @@ import org.nightlabs.jfire.transfer.id.TransferID;
 
 /**
  *
- * @ejb.bean name="jfire/ejb/JFireTrade/StoreManager"	
+ * @ejb.bean name="jfire/ejb/JFireTrade/StoreManager"
  *					 jndi-name="jfire/ejb/JFireTrade/StoreManager"
- *					 type="Stateless" 
+ *					 type="Stateless"
  *					 transaction-type="Container"
  *
  * @ejb.util generate="physical"
  * @ejb.transaction type="Required"
  */
-public abstract class StoreManagerBean 
+public abstract class StoreManagerBean
 extends BaseSessionBeanImpl
-implements SessionBean 
+implements SessionBean
 {
 	private static final long serialVersionUID = 1L;
 	/**
@@ -143,10 +142,10 @@ implements SessionBean
 	////////////////////// EJB "constuctor" ////////////////////////////
 	
 	/**
-	 * @ejb.create-method	
+	 * @ejb.create-method
 	 * @ejb.permission role-name="_Guest_"
 	 */
-	public void ejbCreate() 
+	public void ejbCreate()
 	throws CreateException
 	{
 	}
@@ -438,7 +437,7 @@ implements SessionBean
 	 * @ejb.interface-method
 	 * @ejb.permission role-name="_Guest_"
 	 * @ejb.transaction type="Supports" @!This usually means that no transaction is opened which is significantly faster and recommended for all read-only EJB methods! Marco.
-	 */ 
+	 */
 	@SuppressWarnings("unchecked")
 	public List<DeliveryNote> getDeliveryNotes(Set<DeliveryNoteID> deliveryNoteIDs, String[] fetchGroups, int maxFetchDepth)
 	{
@@ -454,7 +453,7 @@ implements SessionBean
 	 * @ejb.interface-method
 	 * @ejb.permission role-name="_Guest_"
 	 * @ejb.transaction type="Supports" @!This usually means that no transaction is opened which is significantly faster and recommended for all read-only EJB methods! Marco.
-	 */ 
+	 */
 	public DeliveryNote getDeliveryNote(DeliveryNoteID deliveryID, String[] fetchGroups, int maxFetchDepth)
 	{
 		PersistenceManager pm = getPersistenceManager();
@@ -473,8 +472,8 @@ implements SessionBean
 	 * @ejb.interface-method
 	 * @ejb.permission role-name="_Guest_"
 	 * @ejb.transaction type="Supports" @!This usually means that no transaction is opened which is significantly faster and recommended for all read-only EJB methods! Marco.
-	 */	
-	public Set<DeliveryNoteID> getDeliveryNoteIDs(Collection<JDOQuery> queries) 
+	 */
+	public Set<DeliveryNoteID> getDeliveryNoteIDs(Collection<JDOQuery> queries)
 	{
 		PersistenceManager pm = getPersistenceManager();
 		try {
@@ -491,18 +490,18 @@ implements SessionBean
 			return NLJDOHelper.getObjectIDSet(deliveryNotes);
 		} finally {
 			pm.close();
-		}		
-	}	
+		}
+	}
 	
 	/**
 	 * Searches with the given searchFilter for {@link ProductType}s.
-	 *  
+	 * 
 	 * @ejb.interface-method
 	 * @ejb.permission role-name="_Guest_"
 	 * @ejb.transaction type="Supports" @!This usually means that no transaction is opened which is significantly faster and recommended for all read-only EJB methods! Marco.
 	 * 
 	 * FIXME: move to SimpleTradeManager and others, check permissions there and return only the ids!
-	 */ 
+	 */
 	public Collection searchProductTypes(ProductTypeSearchFilter searchFilter, String[] fetchGroups, int maxFetchDepth)
 	{
 		PersistenceManager pm = getPersistenceManager();
@@ -522,12 +521,12 @@ implements SessionBean
 	/**
 	 * Searches with the given searchFilter for {@link ProductTypeGroup}s.
 	 * This method will return the detached ProductTypeGroups and no further
-	 * filtering. 
+	 * filtering.
 	 * 
 	 * @ejb.interface-method
 	 * @ejb.permission role-name="_Guest_"
 	 * @ejb.transaction type="Required"
-	 */ 
+	 */
 	public Collection searchProductTypeGroups(ProductTypeGroupSearchFilter searchFilter, String[] fetchGroups, int maxFetchDepth)
 	{
 		PersistenceManager pm = getPersistenceManager();
@@ -549,15 +548,15 @@ implements SessionBean
 	 * This method creates a ProductTypeGroupSearchResult out of the
 	 * result an suppresses all ProductTypes in the groups lists that are
 	 * not published or isSaleable() of the ProductType does not equal to the
-	 * sableable parameter. 
+	 * sableable parameter.
 	 * 
 	 * @ejb.interface-method
 	 * @ejb.permission role-name="_Guest_"
 	 * @ejb.transaction type="Required"
-	 */ 
+	 */
 	public ProductTypeGroupSearchResult searchProductTypeGroups(ProductTypeGroupSearchFilter searchFilter, boolean saleable)
 	{
-		PersistenceManager pm = getPersistenceManager();		
+		PersistenceManager pm = getPersistenceManager();
 		try {
 			ProductTypeGroupSearchResult searchResult = new ProductTypeGroupSearchResult();
 			
@@ -584,7 +583,7 @@ implements SessionBean
 	 * @ejb.interface-method
 	 * @ejb.permission role-name="_Guest_"
 	 * @ejb.transaction type="Supports" @!This usually means that no transaction is opened which is significantly faster and recommended for all read-only EJB methods! Marco.
-	 */ 
+	 */
 	public ProductType getProductType(ProductTypeID productTypeID, String[] fetchGroups, int maxFetchDepth)
 	{
 		PersistenceManager pm = getPersistenceManager();
@@ -603,7 +602,7 @@ implements SessionBean
 	 * @ejb.interface-method
 	 * @ejb.permission role-name="_Guest_"
 	 * @ejb.transaction type="Supports" @!This usually means that no transaction is opened which is significantly faster and recommended for all read-only EJB methods! Marco.
-	 */ 
+	 */
 	public List<ProductType> getProductTypes(Set<ProductTypeID> productTypeIDs, String[] fetchGroups, int maxFetchDepth)
 	{
 		PersistenceManager pm = getPersistenceManager();
@@ -615,12 +614,12 @@ implements SessionBean
 	}
 
 	/**
-	 * @throws CannotPublishProductTypeException 
+	 * @throws CannotPublishProductTypeException
 	 * @ejb.interface-method
 	 * @ejb.permission role-name="_Guest_"
 	 * @ejb.transaction type="Required"
-	 */ 
-	public ProductTypeStatus setProductTypeStatus_published(ProductTypeID productTypeID, boolean get, String[] fetchGroups, int maxFetchDepth) 
+	 */
+	public ProductTypeStatus setProductTypeStatus_published(ProductTypeID productTypeID, boolean get, String[] fetchGroups, int maxFetchDepth)
 	throws CannotPublishProductTypeException
 	{
 		PersistenceManager pm = getPersistenceManager();
@@ -646,12 +645,12 @@ implements SessionBean
 	}
 
 	/**
-	 * @throws CannotConfirmProductTypeException 
+	 * @throws CannotConfirmProductTypeException
 	 * @ejb.interface-method
 	 * @ejb.permission role-name="_Guest_"
 	 * @ejb.transaction type="Required"
-	 */ 
-	public ProductTypeStatus setProductTypeStatus_confirmed(ProductTypeID productTypeID, boolean get, String[] fetchGroups, int maxFetchDepth) 
+	 */
+	public ProductTypeStatus setProductTypeStatus_confirmed(ProductTypeID productTypeID, boolean get, String[] fetchGroups, int maxFetchDepth)
 	throws CannotConfirmProductTypeException
 	{
 		PersistenceManager pm = getPersistenceManager();
@@ -677,12 +676,12 @@ implements SessionBean
 	}
 
 	/**
-	 * @throws CannotMakeProductTypeSaleableException 
+	 * @throws CannotMakeProductTypeSaleableException
 	 * @ejb.interface-method
 	 * @ejb.permission role-name="_Guest_"
 	 * @ejb.transaction type="Required"
-	 */ 
-	public ProductTypeStatus setProductTypeStatus_saleable(ProductTypeID productTypeID, boolean saleable, boolean get, String[] fetchGroups, int maxFetchDepth) 
+	 */
+	public ProductTypeStatus setProductTypeStatus_saleable(ProductTypeID productTypeID, boolean saleable, boolean get, String[] fetchGroups, int maxFetchDepth)
 	throws CannotMakeProductTypeSaleableException
 	{
 		PersistenceManager pm = getPersistenceManager();
@@ -711,7 +710,7 @@ implements SessionBean
 	 * @ejb.interface-method
 	 * @ejb.permission role-name="_Guest_"
 	 * @ejb.transaction type="Required"
-	 */ 
+	 */
 	public ProductTypeStatus setProductTypeStatus_closed(ProductTypeID productTypeID, boolean get, String[] fetchGroups, int maxFetchDepth)
 	{
 		PersistenceManager pm = getPersistenceManager();
@@ -831,7 +830,7 @@ implements SessionBean
 	 * @param get Whether a detached version of the created DeliveryNote should be returned, otherwise null will be returned.
 	 * @param fetchGroups Array ouf fetch-groups the deliveryNote should be detached with.
 	 * @return Detached DeliveryNote or null.
-	 * @throws DeliveryNoteEditException 
+	 * @throws DeliveryNoteEditException
 	 *
 	 * @throws ModuleException
 	 *
@@ -891,7 +890,7 @@ implements SessionBean
 	 * @param get Whether a detached version of the created DeliveryNote should be returned, otherwise null will be returned.
 	 * @param fetchGroups Array ouf fetch-groups the deliveryNote should be detached with.
 	 * @return Detached DeliveryNote or null.
-	 * @throws DeliveryNoteEditException 
+	 * @throws DeliveryNoteEditException
 	 *
 	 * @throws ModuleException
 	 *
@@ -964,7 +963,7 @@ implements SessionBean
 	}
 
 	/**
-	 * @throws DeliveryNoteEditException 
+	 * @throws DeliveryNoteEditException
 	 *
 	 * @ejb.interface-method
 	 * @ejb.transaction type="Required"
@@ -1111,7 +1110,7 @@ implements SessionBean
 	public DeliveryResult deliverBegin(DeliveryData deliveryData)
 	throws ModuleException
 	{
-		return _deliverBegin(deliveryData);		
+		return _deliverBegin(deliveryData);
 	}
 
 	/**
@@ -1137,7 +1136,7 @@ implements SessionBean
 //		if (deliveryData.getDelivery().getPartnerID() == null) {
 //			// if no partner is defined, at least one deliveryNote must be known!
 //			if (deliveryData.getDelivery().getDeliveryNoteIDs() == null)
-//				throw new NullPointerException("deliveryData.getDelivery().getPartnerID() and deliveryData.getDelivery().getDeliveryNoteIDs() are both null! One of them must be specified, because I need to know who's delivering!"); 
+//				throw new NullPointerException("deliveryData.getDelivery().getPartnerID() and deliveryData.getDelivery().getDeliveryNoteIDs() are both null! One of them must be specified, because I need to know who's delivering!");
 //
 //			if (deliveryData.getDelivery().getDeliveryNoteIDs().isEmpty())
 //				throw new NullPointerException("deliveryData.getDelivery().getPartnerID() is null and deliveryData.getDelivery().getDeliveryNoteIDs() is empty! If no partner is specified explicitely, I need at least one invoice to find out who's delivering!");
@@ -1762,7 +1761,7 @@ implements SessionBean
 			
 			deliveryQueues = pm.makePersistentAll(deliveryQueues);
 			
-			if (get)		
+			if (get)
 				return pm.detachCopyAll(deliveryQueues);
 			else
 				return null;
@@ -1874,8 +1873,8 @@ implements SessionBean
 	 * @ejb.interface-method
 	 * @ejb.permission role-name="_Guest_"
 	 * @ejb.transaction type="Supports" @!This usually means that no transaction is opened which is significantly faster and recommended for all read-only EJB methods! Marco.
-	 */	
-	public Set<AnchorID> getRepositoryIDs(Collection<JDOQuery> queries) 
+	 */
+	public Set<AnchorID> getRepositoryIDs(Collection<JDOQuery> queries)
 	{
 		PersistenceManager pm = getPersistenceManager();
 		try {
@@ -2027,13 +2026,13 @@ implements SessionBean
 
 	// TODO: when all jpox bugs are fixed, implement generic storeProductType-Method
 //	/**
-//	 * @return Returns a newly detached instance of <tt>ProductType</tt> 
+//	 * @return Returns a newly detached instance of <tt>ProductType</tt>
 //	 * if <tt>get</tt> is true - otherwise <tt>null</tt>.
 //	 *
 //	 * @ejb.interface-method
 //	 * @ejb.permission role-name="_Guest_"
 //	 * @ejb.transaction type="Required"
-//	 */	
+//	 */
 //	public ProductType storeProductType(ProductType productType, boolean get, String[] fetchGroups, int maxFetchDepth)
 //	throws ModuleException
 //	{
@@ -2047,7 +2046,7 @@ implements SessionBean
 //				pm.getFetchPlan().setGroup(FetchPlan.DEFAULT);
 //			else
 //				pm.getFetchPlan().setGroups(fetchGroups);
-//						
+//
 //			boolean priceCalculationNeeded = false;
 //			if (NLJDOHelper.exists(pm, productType)) {
 //				// if the nestedProductTypes changed, we need to recalculate prices
@@ -2070,11 +2069,11 @@ implements SessionBean
 //				productType = (ProductType) pm.makePersistent(productType);
 //			}
 //			else {
-//				// TODO: ProductTypeActionHandler.getDefaultHome() should be abstract 
-//				// and not static in implementation to make generic implementation possible 				
+//				// TODO: ProductTypeActionHandler.getDefaultHome() should be abstract
+//				// and not static in implementation to make generic implementation possible
 //				productType = (ProductType) Store.getStore(pm).addProductType(
 //						User.getUser(pm, getPrincipal()),
-//						productType,						
+//						productType,
 //						ProductTypeActionHandler.getProductTypeActionHandler(
 //								pm, productType.getClass().getDefaultHome(pm, productType)));
 //
@@ -2126,7 +2125,7 @@ implements SessionBean
 //			return (ProductType) pm.detachCopy(productType);
 //		} finally {
 //			pm.close();
-//		}		
+//		}
 //	}
 	
 }

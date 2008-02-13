@@ -224,7 +224,7 @@ public class ArticleSegmentGroups
 
 	/**
 	 * This method is called by {@link ArticleProductTypeClassGroup#removeArticle(Article)}. This guarantees
-	 * that {@link #getArticles()} returns a correct <code>Set</code>. 
+	 * that {@link #getArticles()} returns a correct <code>Set</code>.
 	 */
 	protected void _removeArticle(Article article)
 	{

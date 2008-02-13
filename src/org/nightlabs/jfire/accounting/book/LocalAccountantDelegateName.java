@@ -47,9 +47,9 @@ import org.nightlabs.i18n.I18nText;
  *
  * @jdo.fetch-group name="LocalAccountantDelegate.name" fields="localAccountantDelegate, names"
  */
-public class LocalAccountantDelegateName 
-extends I18nText 
-{	
+public class LocalAccountantDelegateName
+extends I18nText
+{
 	private static final long serialVersionUID = 1L;
 	/**
 	 * @jdo.field primary-key="true"

@@ -29,7 +29,6 @@ package org.nightlabs.jfire.trade;
 import java.util.Collection;
 import java.util.Date;
 
-import org.nightlabs.jdo.ObjectIDUtil;
 import org.nightlabs.jfire.security.User;
 import org.nightlabs.jfire.transfer.id.AnchorID;
 
@@ -104,8 +103,8 @@ public interface ArticleContainer
 	User getCreateUser();
 	
 	/**
-	 * Returns the number of the articles in this article container.	 * 
-	 * @return the number of the articles in this article container. 
+	 * Returns the number of the articles in this article container.	 *
+	 * @return the number of the articles in this article container.
 	 */
 	int getArticleCount();
 }

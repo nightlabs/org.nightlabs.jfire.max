@@ -32,7 +32,7 @@ public class CurrencyDAO extends BaseJDOObjectDAO<CurrencyID, Currency>
 		return sharedInstance;
 	}
 	
-	@SuppressWarnings("unchecked") 
+	@SuppressWarnings("unchecked")
 	@Override
 	protected Collection<Currency> retrieveJDOObjects(Set<CurrencyID> objectIDs,
 			String[] fetchGroups, int maxFetchDepth, ProgressMonitor monitor)
@@ -42,7 +42,7 @@ public class CurrencyDAO extends BaseJDOObjectDAO<CurrencyID, Currency>
 		try {
 			AccountingManager am = AccountingManagerUtil.getHome(SecurityReflector.getInitialContextProperties()).create();
 			monitor.worked(1);
-			return am.getCurrencies(fetchGroups, maxFetchDepth);	
+			return am.getCurrencies(fetchGroups, maxFetchDepth);
 		} catch (Exception e) {
 			monitor.setCanceled(true);
 			throw e;
@@ -59,7 +59,7 @@ public class CurrencyDAO extends BaseJDOObjectDAO<CurrencyID, Currency>
 			return new ArrayList<Currency>(retrieveJDOObjects(null, FETCH_GROUPS, NLJDOHelper.MAX_FETCH_DEPTH_NO_LIMIT, monitor));
 		} catch (Exception e) {
 			throw new RuntimeException("Error while fetching Currencies: " + e.getMessage(), e); //$NON-NLS-1$
-		} 
+		}
 	}
 
 }

@@ -36,22 +36,22 @@ public class StoreException extends ModuleException
 {
 	private static final long serialVersionUID = 1L;
 
-	public StoreException() 
+	public StoreException()
 	{
 		super();
 	}
 	
-	public StoreException(String message) 
+	public StoreException(String message)
 	{
 		super(message);
 	}
 	
-	public StoreException(String message, Throwable cause) 
+	public StoreException(String message, Throwable cause)
 	{
 		super(message, cause);
 	}
 	
-	public StoreException(Throwable cause) 
+	public StoreException(Throwable cause)
 	{
 		super(cause);
 	}

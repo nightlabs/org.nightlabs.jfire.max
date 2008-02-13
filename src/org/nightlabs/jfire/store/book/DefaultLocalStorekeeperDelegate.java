@@ -228,7 +228,7 @@ public class DefaultLocalStorekeeperDelegate extends LocalStorekeeperDelegate
 	 * {@link #bookArticle(OrganisationLegalEntity, User, DeliveryNote, Article, BookProductTransfer, Map)}
 	 * before.
 	 * <p>
-	 * The products are transferred 
+	 * The products are transferred
 	 * </p>
 	 *
 	 * @see org.nightlabs.jfire.store.book.LocalStorekeeperDelegate#postBookArticles(org.nightlabs.jfire.trade.OrganisationLegalEntity, org.nightlabs.jfire.security.User, org.nightlabs.jfire.store.DeliveryNote, org.nightlabs.jfire.store.book.BookProductTransfer, java.util.Map)
@@ -308,7 +308,7 @@ public class DefaultLocalStorekeeperDelegate extends LocalStorekeeperDelegate
 
 	protected String getAnchorIDForForeignHomeRepository(ProductType productType)
 	{
-		return RepositoryType.ANCHOR_TYPE_ID_PREFIX_HOME + productType.getClass().getName() + '#' + productType.getOrganisationID();  
+		return RepositoryType.ANCHOR_TYPE_ID_PREFIX_HOME + productType.getClass().getName() + '#' + productType.getOrganisationID();
 	}
 
 	/**
@@ -340,7 +340,7 @@ public class DefaultLocalStorekeeperDelegate extends LocalStorekeeperDelegate
 	 * in order to find out from/to which repository a transfer needs to be created
 	 * (with the mandator - the local {@link OrganisationLegalEntity} - on the other end of the transfer).
 	 *
-	 * @param product the product for which to find out 
+	 * @param product the product for which to find out
 	 * @return
 	 */
 	protected Repository getRepositoryForBooking(Product product)

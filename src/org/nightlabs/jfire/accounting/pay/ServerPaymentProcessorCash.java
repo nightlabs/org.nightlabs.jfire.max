@@ -71,7 +71,7 @@ extends ServerPaymentProcessor
 	}
 
 	/**
-	 * @deprecated Only for JDO! 
+	 * @deprecated Only for JDO!
 	 */
 	@Deprecated
 	protected ServerPaymentProcessorCash()
@@ -140,12 +140,12 @@ extends ServerPaymentProcessor
 //	 */
 //	public void jdoPreStore()
 //	{
-//		// If this processor is persisted the first time, we subscribe the 
+//		// If this processor is persisted the first time, we subscribe the
 //		// ModeOfPayment s
 //		if (JDOHelper.isNew(this)) {
 //			PersistenceManager pm = getPersistenceManager();
 //
-//			
+//
 //		} // if (JDOHelper.isNew(this)) {
 //	}
 

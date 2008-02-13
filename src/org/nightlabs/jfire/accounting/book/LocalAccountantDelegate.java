@@ -29,7 +29,6 @@ package org.nightlabs.jfire.accounting.book;
 import java.io.Serializable;
 import java.util.Collection;
 import java.util.LinkedList;
-import java.util.Map;
 import java.util.Set;
 
 import javax.jdo.JDOHelper;
@@ -46,7 +45,7 @@ import org.nightlabs.jfire.transfer.Anchor;
 
 /**
  * LocalAccountantDelegates are used by {@link org.nightlabs.jfire.accounting.book.LocalAccountant}
- * to assist in the booking procedure. A Delegate is registered per ProductType 
+ * to assist in the booking procedure. A Delegate is registered per ProductType
  * and will be asked to {@link #bookArticle(OrganisationLegalEntity, User, Invoice, ArticlePrice, BookMoneyTransfer, Map)}
  * when an invoice is booked.
  * 
@@ -66,7 +65,7 @@ import org.nightlabs.jfire.transfer.Anchor;
  * @jdo.query
  *		name="getChildDelegates"
  *		query="SELECT
- *			WHERE 
+ *			WHERE
  *						this.extendedAccountantDelegate != null &&
  *						this.extendedAccountantDelegate.organisationID == paramOrganisationID &&
  *						this.extendedAccountantDelegate.localAccountantDelegateID == paramLocalAccountantDelegateID
@@ -93,7 +92,7 @@ public abstract class LocalAccountantDelegate implements Serializable {
 	public static final String QUERY_GET_CHILD_DELEGATES = "getChildDelegates";
 	
 	/**
-	 * @deprecated Only for JDO 
+	 * @deprecated Only for JDO
 	 */
 	@Deprecated
 	public LocalAccountantDelegate() {}
@@ -169,7 +168,7 @@ public abstract class LocalAccountantDelegate implements Serializable {
 	 * A LocalAccountantDelegate should decide based on its
 	 * configuration to which accounts the money is to be booked.
 	 * 
-	 * Subclasses may delegate the work here to 
+	 * Subclasses may delegate the work here to
 	 * {@link #bookProductTypeParts(OrganisationLegalEntity, User, Map, LinkedList, int, BookMoneyTransfer, Map)}
 	 * and only provide new dimensions.
 	 * 
@@ -177,15 +176,15 @@ public abstract class LocalAccountantDelegate implements Serializable {
 	 * @param user The user that initiated the booking.
 	 * @param invoice The invoice that is currently booked.
 	 * @param article The Article to book.
-	 * @param container The Container transfer, that is the transfer from the customer to the vendor of the invoice 
+	 * @param container The Container transfer, that is the transfer from the customer to the vendor of the invoice
 	 * @param involvedAnchors A List of involved Anchors, so they can be checked after the booking
 	 */
 	public abstract void bookArticle(
 			OrganisationLegalEntity mandator,
 			User user,
 			Invoice invoice,
-			Article article, 
-			BookMoneyTransfer container, 
+			Article article,
+			BookMoneyTransfer container,
 			Set<Anchor> involvedAnchors
 		);
 	
@@ -214,15 +213,15 @@ public abstract class LocalAccountantDelegate implements Serializable {
 	 * @param user The user that initiated the booking.
 	 * @param articlePriceStack A Stack of ArticlePrices representing the ProductType packaging
 	 * @param delegationLevel The level of delegation calls to this method
-	 * @param container The Container transfer, that is the transfer from the customer to the vendor of the invoice 
+	 * @param container The Container transfer, that is the transfer from the customer to the vendor of the invoice
 	 * @param involvedAnchors A List of involved Anchors, so they can be checked after the booking
 	 */
 	public abstract void bookProductTypeParts(
-			OrganisationLegalEntity mandator,			
+			OrganisationLegalEntity mandator,
 			User user,
 			LinkedList<ArticlePrice> articlePriceStack,
 			int delegationLevel,
-			BookMoneyTransfer container, 
+			BookMoneyTransfer container,
 			Set<Anchor> involvedAnchors
 		);
 	
@@ -258,8 +257,8 @@ public abstract class LocalAccountantDelegate implements Serializable {
 	 * @param localAccountantDelegateID The localAccountantDelegateID of the parent delegate
 	 */
 	public static Collection getChildDelegates(
-			PersistenceManager pm, 
-			String organisationID, 
+			PersistenceManager pm,
+			String organisationID,
 			String localAccountantDelegateID
 		)
 	{

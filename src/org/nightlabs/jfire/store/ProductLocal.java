@@ -40,7 +40,7 @@ import org.nightlabs.jfire.transfer.Anchor;
 
 /**
  * An instance of this class holds data related to the product, but different in each
- * datastore. 
+ * datastore.
  *
  * @author Marco Schulze - marco at nightlabs dot de
  *

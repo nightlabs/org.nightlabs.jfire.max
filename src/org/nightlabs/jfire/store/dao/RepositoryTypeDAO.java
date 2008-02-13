@@ -61,7 +61,7 @@ extends BaseJDOObjectDAO<RepositoryTypeID, RepositoryType>
 			return getJDOObjects(null, repositoryTypeIDs, fetchGroups, maxFetchDepth, monitor);
 		} catch (Exception x) {
 			throw new RuntimeException(x);
-		} 
+		}
 	}
 
 	public List<RepositoryType> getRepositoryTypes(Collection<RepositoryTypeID> repositoryTypeIDs, String[] fetchGroups,
@@ -70,8 +70,8 @@ extends BaseJDOObjectDAO<RepositoryTypeID, RepositoryType>
 		return getJDOObjects(null, repositoryTypeIDs, fetchGroups, maxFetchDepth, monitor);
 	}
 	
-	public RepositoryType getRepositoryType(RepositoryTypeID repositoryTypeID, String[] fetchGroups, 
-			int maxFetchDepth, ProgressMonitor monitor) 
+	public RepositoryType getRepositoryType(RepositoryTypeID repositoryTypeID, String[] fetchGroups,
+			int maxFetchDepth, ProgressMonitor monitor)
 	{
 		return getJDOObject(null, repositoryTypeID, fetchGroups, maxFetchDepth, monitor);
 	}

@@ -10,8 +10,6 @@ import javax.jdo.JDOObjectNotFoundException;
 import javax.jdo.PersistenceManager;
 import javax.jdo.Query;
 
-import org.nightlabs.jfire.accounting.gridpriceconfig.GridPriceConfig;
-import org.nightlabs.jfire.store.ProductType;
 import org.nightlabs.jfire.trade.id.CustomerGroupID;
 import org.nightlabs.jfire.trade.id.CustomerGroupMappingID;
 import org.nightlabs.util.Util;
@@ -25,7 +23,7 @@ import org.nightlabs.util.Util;
  * </p>
  * <p>
  * The <code>CustomerGroupMapping</code>s are used with the {@link GridPriceConfig}, because local {@link ProductType}s are always sold with local
- * <code>CustomerGroup</code>s, but they can package imported partner-{@link ProductType}s which use the partner's <code>CustomerGroup</code>s. 
+ * <code>CustomerGroup</code>s, but they can package imported partner-{@link ProductType}s which use the partner's <code>CustomerGroup</code>s.
  * </p>
  *
  * @author Marco Schulze - Marco at NightLabs dot de

@@ -34,7 +34,6 @@ import javax.jdo.PersistenceManager;
 import org.nightlabs.jdo.ObjectIDUtil;
 import org.nightlabs.jfire.idgenerator.IDGenerator;
 import org.nightlabs.jfire.security.User;
-import org.nightlabs.jfire.trade.Article;
 
 /**
  * @author Marco Schulze - marco at nightlabs dot de
@@ -286,7 +285,7 @@ implements Serializable
 //			else {
 //				if (organisationID2partnerNestedProductType == null)
 //					organisationID2partnerNestedProductType = new HashMap();
-//				
+//
 //				// nested productType is coming from a remote organisation and must be acquired from there
 //				// this means: an Offer must be created (or a previously created one used) and an Article be added
 //				// we group them in order to make it more efficient
@@ -412,7 +411,7 @@ implements Serializable
 //		LinkedList productTransfers = new LinkedList();
 //		boolean failed = true;
 //		try {
-//	
+//
 //			Anchor thisProductHome = getProductType().getProductTypeLocal().getHome();
 //			for (Iterator it = nestedProductsByHome.entrySet().iterator(); it.hasNext(); ) {
 //				Map.Entry me = (Map.Entry) it.next();

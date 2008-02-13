@@ -37,7 +37,7 @@ public class JbpmConstantsInvoice
 //		 * </p>
 //		 * <p>
 //		 * Which process definition will be used, is defined by {@link ProcessDefinitionAssignment} instances.
-//		 * </p> 
+//		 * </p>
 //		 */
 //		public static final ProcessDefinitionID PROCESS_DEFINITION_ID = ProcessDefinitionID.create(
 //				Organisation.DEV_ORGANISATION_ID, "Invoice.Vendor");
@@ -75,7 +75,7 @@ public class JbpmConstantsInvoice
 //		 * </p>
 //		 * <p>
 //		 * Which process definition will be used, is defined by {@link ProcessDefinitionAssignment} instances.
-//		 * </p> 
+//		 * </p>
 //		 */
 //		public static final ProcessDefinitionID PROCESS_DEFINITION_ID = ProcessDefinitionID.create(
 //				Organisation.DEV_ORGANISATION_ID, "Invoice.Customer");

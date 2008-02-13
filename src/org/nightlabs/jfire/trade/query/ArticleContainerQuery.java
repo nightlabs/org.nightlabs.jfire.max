@@ -14,7 +14,7 @@ import org.nightlabs.jfire.transfer.id.AnchorID;
  * @author Daniel.Mazurek [at] NightLabs [dot] de
  *
  */
-public class ArticleContainerQuery 
+public class ArticleContainerQuery
 extends JDOQuery<ArticleContainer>
 {
 	/**
@@ -23,7 +23,7 @@ extends JDOQuery<ArticleContainer>
 	private static final long serialVersionUID = 1L;
 	private static final Logger logger = Logger.getLogger(ArticleContainerQuery.class);
 	
-	public ArticleContainerQuery(Class articleContainerClass) 
+	public ArticleContainerQuery(Class articleContainerClass)
 	{
 		if (articleContainerClass == null)
 			throw new IllegalArgumentException("Param articleContainerClass must not be null");
@@ -40,7 +40,7 @@ extends JDOQuery<ArticleContainer>
 	}
 	
 	@Override
-	protected Query prepareQuery() 
+	protected Query prepareQuery()
 	{
 		Query q = getPersistenceManager().newQuery(getArticleContainerClass());
 		StringBuffer filter = new StringBuffer();
@@ -59,7 +59,7 @@ extends JDOQuery<ArticleContainer>
 		if (createDTMax != null)
 			filter.append("\n && this.createDT <= :createDTMax");
 		
-		if (createUserID != null) 
+		if (createUserID != null)
 		{
 			// FIXME: JPOX Bug JDOHelper.getObjectId(this.*) does not seem to work (java.lang.IndexOutOfBoundsException: Index: 3, Size: 3)
 //		filter.append("\n && JDOHelper.getObjectId(this.createUser) == :createUserID");
@@ -67,9 +67,9 @@ extends JDOQuery<ArticleContainer>
 		filter.append("\n && (" +
 				"this.createUser.organisationID == \""+createUserID.organisationID+"\" && " +
 				"this.createUser.userID == \""+createUserID.userID+"\"" +
-						")");			
+						")");
 		}
-		if (vendorID != null) 
+		if (vendorID != null)
 		{
 			// FIXME: JPOX Bug JDOHelper.getObjectId(this.*) does not seem to work (java.lang.IndexOutOfBoundsException: Index: 3, Size: 3)
 //			filter.append("\n && JDOHelper.getObjectId(this.vendor) == :vendorID");
@@ -85,10 +85,10 @@ extends JDOQuery<ArticleContainer>
 		
 //		if (currency != null)
 //			filter.append("\n && this.price.currency == :currency");
-//			
+//
 //		if (priceAmountMin >= 0)
 //			filter.append("\n && this.price.amount >= :priceAmountMin");
-//		
+//
 //		if (priceAmountMax >= 0)
 //			filter.append("\n && this.price.amount <= :priceAmountMax");
 		
@@ -101,7 +101,7 @@ extends JDOQuery<ArticleContainer>
 
 	// own to method to allow override for Offer where it is different
 	protected void checkCustomer(StringBuffer filter) {
-		if (getCustomerID() != null) 
+		if (getCustomerID() != null)
 		{
 			// FIXME: JPOX Bug JDOHelper.getObjectId(this.*) does not seem to work (java.lang.IndexOutOfBoundsException: Index: 3, Size: 3)
 //			filter.append("\n && JDOHelper.getObjectId(this.customer) == :customerID");
@@ -111,7 +111,7 @@ extends JDOQuery<ArticleContainer>
 					"this.customer.anchorTypeID == \""+customerID.anchorTypeID+"\" && " +
 					"this.customer.anchorID == \""+customerID.anchorID+"\"" +
 							")");
-		}		
+		}
 	}
 	
 	private int articleCountMin = -1;
@@ -177,7 +177,7 @@ extends JDOQuery<ArticleContainer>
 //	public void setCurrency(Currency currency) {
 //		this.currency = currency;
 //	}
-//	
+//
 //	private long priceAmountMin = -1;
 //	public long getPriceAmountMin() {
 //		return priceAmountMin;
@@ -185,12 +185,12 @@ extends JDOQuery<ArticleContainer>
 //	public void setPriceAmountMin(long priceAmountMin) {
 //		this.priceAmountMin = priceAmountMin;
 //	}
-//	
+//
 //	private long priceAmountMax = -1;
 //	public long getPriceAmountMax() {
 //		return priceAmountMax;
 //	}
 //	public void setPriceAmountMax(long priceAmountMax) {
 //		this.priceAmountMax = priceAmountMax;
-//	}	
+//	}
 }

@@ -204,12 +204,12 @@ implements Serializable, DetachCallback
 	}
 
 	/**
-	 * This method is called by {@link ProductType#setManagedProductTypeGroup(ProductTypeGroup)}. 
+	 * This method is called by {@link ProductType#setManagedProductTypeGroup(ProductTypeGroup)}.
 	 */
 	protected void _setManagedByProductType(ProductType managedByProductType)
 	{
 		this.managedByProductType = managedByProductType;
-	} 
+	}
 
 	/**
 	 * @see javax.jdo.listener.DetachCallback#jdoPreDetach()

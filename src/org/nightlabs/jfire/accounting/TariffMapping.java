@@ -10,10 +10,8 @@ import javax.jdo.JDOObjectNotFoundException;
 import javax.jdo.PersistenceManager;
 import javax.jdo.Query;
 
-import org.nightlabs.jfire.accounting.gridpriceconfig.GridPriceConfig;
 import org.nightlabs.jfire.accounting.id.TariffID;
 import org.nightlabs.jfire.accounting.id.TariffMappingID;
-import org.nightlabs.jfire.store.ProductType;
 import org.nightlabs.util.Util;
 
 /**
@@ -25,7 +23,7 @@ import org.nightlabs.util.Util;
  * </p>
  * <p>
  * The <code>TariffMapping</code>s are used with the {@link GridPriceConfig}, because local {@link ProductType}s are always sold with local
- * <code>Tariff</code>s, but they can package imported partner-{@link ProductType}s which use the partner's <code>Tariff</code>s. 
+ * <code>Tariff</code>s, but they can package imported partner-{@link ProductType}s which use the partner's <code>Tariff</code>s.
  * </p>
  *
  * @author Marco Schulze - Marco at NightLabs dot de

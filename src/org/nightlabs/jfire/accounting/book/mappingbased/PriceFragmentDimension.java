@@ -50,7 +50,7 @@ import org.nightlabs.jfire.trade.Article;
  */
 public class PriceFragmentDimension extends MoneyFlowDimension {
 
-	public static final String MONEY_FLOW_DIMENSION_ID = PriceFragmentDimension.class.getName(); 
+	public static final String MONEY_FLOW_DIMENSION_ID = PriceFragmentDimension.class.getName();
 	
 	/**
 	 */
@@ -80,7 +80,7 @@ public class PriceFragmentDimension extends MoneyFlowDimension {
 			PriceFragmentType pft = (PriceFragmentType) iter.next();
 			result[i++] = pft.getPrimaryKey();
 		}
-		return result;		
+		return result;
 	}
 	
 	public PersistenceManager getPersistenceManager() {

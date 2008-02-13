@@ -408,7 +408,7 @@ implements IFormulaPriceConfig
 //	public void adoptParameters(GridPriceConfig other)
 //	{
 //		super.adoptParameters(other);
-//		// TODO This is expensive! Is it really necessary? Can we  
+//		// TODO This is expensive! Is it really necessary? Can we
 //		for (Iterator it = packagingResultPriceConfigs.values().iterator(); it.)
 //	}
 	
@@ -462,7 +462,7 @@ implements IFormulaPriceConfig
 //		CustomerGroup customerGroup = getCustomerGroup(article);
 //		Tariff tariff = article.getTariff();
 //		Currency currency = article.getCurrency();
-//		
+//
 //		ProductType packageProductType = nestedProductTypeLocal.getPackageProductType();
 //		ProductType innerProductType = nestedProductTypeLocal.getInnerProductType();
 //		StablePriceConfig packagingResultPriceConfig = (StablePriceConfig) getPackagingResultPriceConfig(

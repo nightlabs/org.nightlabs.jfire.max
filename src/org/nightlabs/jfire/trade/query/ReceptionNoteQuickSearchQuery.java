@@ -9,8 +9,8 @@ import org.nightlabs.jfire.store.ReceptionNote;
  * @author Daniel Mazurek - daniel <at> nightlabs <dot> de
  *
  */
-public class ReceptionNoteQuickSearchQuery 
-extends AbstractArticleContainerQuickSearchQuery 
+public class ReceptionNoteQuickSearchQuery
+extends AbstractArticleContainerQuickSearchQuery
 {
 	/**
 	 * 

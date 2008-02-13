@@ -36,8 +36,8 @@ import org.nightlabs.jfire.scripting.editor2d.TextScriptDrawComponent;
  * @author Daniel.Mazurek [at] NightLabs [dot] de
  *
  */
-public class ConstrainedScriptEditor2DFactoryImpl 
-extends ScriptEditor2DFactoryImpl 
+public class ConstrainedScriptEditor2DFactoryImpl
+extends ScriptEditor2DFactoryImpl
 {
 	@Override
 	public TextScriptDrawComponent createTextScriptDrawComponent() {
@@ -50,11 +50,11 @@ extends ScriptEditor2DFactoryImpl
 	}
 
 	@Override
-	public TextScriptDrawComponent createTextScriptDrawComponent(String text, 
-			String fontName, int fontSize, int fontStyle, int x, int y, 
-			DrawComponentContainer parent) 
+	public TextScriptDrawComponent createTextScriptDrawComponent(String text,
+			String fontName, int fontSize, int fontStyle, int x, int y,
+			DrawComponentContainer parent)
 	{
-		return new ConstrainedTextScriptDrawComponentImpl(text, fontName, 
+		return new ConstrainedTextScriptDrawComponentImpl(text, fontName,
 				fontSize, fontStyle, x, y, parent);
 	}
 
@@ -64,15 +64,15 @@ extends ScriptEditor2DFactoryImpl
 	}
 
 	@Override
-	public TextDrawComponent createTextDrawComponent(String text, Font font, 
-			int x, int y, DrawComponentContainer parent) 
+	public TextDrawComponent createTextDrawComponent(String text, Font font,
+			int x, int y, DrawComponentContainer parent)
 	{
 		return new ConstrainedTextDrawComponentImpl(text, font, x, y, parent);
 	}
 
 	@Override
-	public TextDrawComponent createTextDrawComponent(String text, String fontName, 
-			int fontSize, int fontStyle, int x, int y, DrawComponentContainer parent) 
+	public TextDrawComponent createTextDrawComponent(String text, String fontName,
+			int fontSize, int fontStyle, int x, int y, DrawComponentContainer parent)
 	{
 		return new ConstrainedTextDrawComponentImpl(text, fontName, fontSize, fontStyle, x, y,
 				parent);

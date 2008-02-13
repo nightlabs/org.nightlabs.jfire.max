@@ -34,8 +34,8 @@ import org.nightlabs.jfire.scripting.id.ScriptRegistryItemID;
  * @author Daniel.Mazurek [at] NightLabs [dot] de
  *
  */
-public abstract class ScriptDrawComponentImpl 
-extends DrawComponentImpl 
+public abstract class ScriptDrawComponentImpl
+extends DrawComponentImpl
 implements ScriptDrawComponent
 {
 	/**
@@ -50,13 +50,13 @@ implements ScriptDrawComponent
 			scriptRegistryItemID = (ScriptRegistryItemID) ObjectIDUtil.createObjectID(scriptRegistryItemIDKeyStr);
 		return scriptRegistryItemID;
 	}
-	public void setScriptRegistryItemID(ScriptRegistryItemID scriptRegistryItemID) 
+	public void setScriptRegistryItemID(ScriptRegistryItemID scriptRegistryItemID)
 	{
-		ScriptRegistryItemID oldID = this.scriptRegistryItemID; 
+		ScriptRegistryItemID oldID = this.scriptRegistryItemID;
 		this.scriptRegistryItemID = scriptRegistryItemID;
-		this.scriptRegistryItemIDKeyStr = scriptRegistryItemID == null ? null : scriptRegistryItemID.toString();		
+		this.scriptRegistryItemIDKeyStr = scriptRegistryItemID == null ? null : scriptRegistryItemID.toString();
 		firePropertyChange(PROP_SCRIPT_REGISTRY_ITEM_ID, oldID, scriptRegistryItemID);
-	}		
+	}
 	
 	private transient Object scriptValue;
 	public Object getScriptValue() {

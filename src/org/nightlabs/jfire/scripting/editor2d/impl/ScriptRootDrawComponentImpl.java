@@ -46,8 +46,8 @@ import org.nightlabs.jfire.scripting.id.ScriptRegistryItemID;
  * @author Daniel.Mazurek [at] NightLabs [dot] de
  *
  */
-public class ScriptRootDrawComponentImpl 
-extends RootDrawComponentImpl 
+public class ScriptRootDrawComponentImpl
+extends RootDrawComponentImpl
 implements ScriptRootDrawComponent
 {
 	/**
@@ -56,11 +56,11 @@ implements ScriptRootDrawComponent
 	private static final long serialVersionUID = 1L;
 	private static final Logger logger = Logger.getLogger(ScriptRootDrawComponentImpl.class);
 	
-	public void assignScriptResults(Map<ScriptRegistryItemID, Object> scriptValues) 
+	public void assignScriptResults(Map<ScriptRegistryItemID, Object> scriptValues)
 	{
 		// TODO: all scriptDrawComponents should already be cached when added
-		Collection scriptDrawComponents = findDrawComponents(ScriptDrawComponent.class, true);				
-		for (Iterator it = scriptDrawComponents.iterator(); it.hasNext(); ) 
+		Collection scriptDrawComponents = findDrawComponents(ScriptDrawComponent.class, true);
+		for (Iterator it = scriptDrawComponents.iterator(); it.hasNext(); )
 		{
 			ScriptDrawComponent sd = (ScriptDrawComponent) it.next();
 			Object value = scriptValues.get(sd.getScriptRegistryItemID());
@@ -83,11 +83,11 @@ implements ScriptRootDrawComponent
 //			if (!(value instanceof String))
 //				throw new IllegalStateException("scriptValues does not contain an entry which is NOT a String instance but " + value + " for " + sd.getScriptRegistryItemID());
 			sd.setScriptValue(value);
-		}		
+		}
 		firePropertyChange(PROP_SCRIPT_VALUES, null, null);
 	}
 	
-	public Set<ScriptRegistryItemID> getScriptRegistryItemIDs() 
+	public Set<ScriptRegistryItemID> getScriptRegistryItemIDs()
 	{
 		// TODO: all scriptDrawComponents should already be cached when added
 		Collection scriptDrawComponents = findDrawComponents(ScriptDrawComponent.class, true);
@@ -100,7 +100,7 @@ implements ScriptRootDrawComponent
 		return scriptIDs;
 	}
 
-	public void assignVisibleScriptResults(Map<Long, Boolean> scriptValues) 
+	public void assignVisibleScriptResults(Map<Long, Boolean> scriptValues)
 	{
 		if (scriptValues == null)
 			throw new IllegalArgumentException("Param scriptValues must NOT be null!");
@@ -118,12 +118,12 @@ implements ScriptRootDrawComponent
 	}
 	
 //	private static final Map<Long, Script> EMPTY_MAP = new HashMap<Long, Script>(0);
-	protected Map<Long, Script> getVisibleScripts(DrawComponentContainer dcc) 
+	protected Map<Long, Script> getVisibleScripts(DrawComponentContainer dcc)
 	{
 		// TODO all DrawComponents with a visibleScript should already be cached
 		// when visibleScript is assigned
 		Map<Long, Script> dcID2VisibleScript = new HashMap<Long, Script>();
-		for (DrawComponent dc : dcc.getDrawComponents()) 
+		for (DrawComponent dc : dcc.getDrawComponents())
 		{
 			if (dc instanceof DrawComponentContainer) {
 				DrawComponentContainer container = (DrawComponentContainer) dc;
@@ -133,9 +133,9 @@ implements ScriptRootDrawComponent
 				Script script = (Script) dc.getProperties().get(ScriptingConstants.PROP_VISIBLE_SCRIPT);
 				if (script != null) {
 					 dcID2VisibleScript.put(dc.getId(), script);
-				}				
+				}
 			}
 		}
 		return dcID2VisibleScript;
-	}		
+	}
 }

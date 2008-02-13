@@ -31,8 +31,8 @@ import org.nightlabs.editor2d.TextDrawComponent;
  * @author Daniel.Mazurek [at] NightLabs [dot] de
  *
  */
-public interface TextScriptDrawComponent 
-extends ScriptDrawComponent, TextDrawComponent 
+public interface TextScriptDrawComponent
+extends ScriptDrawComponent, TextDrawComponent
 {
 
 }

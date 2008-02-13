@@ -35,22 +35,22 @@ import org.nightlabs.editor2d.DrawComponent;
  * @author Daniel.Mazurek [at] NightLabs [dot] de
  *
  */
-public interface BarcodeDrawComponent 
+public interface BarcodeDrawComponent
 extends DrawComponent, ScriptDrawComponent
 {
 	public static final Type TYPE_DEFAULT = Type.TYPE_128;
-	public static final String VALUE_DEFAULT = " ";		
+	public static final String VALUE_DEFAULT = " ";
 	public static final boolean HUMAN_READABLE_DEFAULT = true;
 	public static final double DEFAULT_BAR_WIDTH = 0.21f; // mm
-	public static final Font DEFAULT_FONT = new Font("Arial", Font.PLAIN, 12);	
-	public static final Orientation ORIENTATION_DEFAULT = Orientation.VERTICAL;	
-	public static final WidthScale WIDTH_SCALE_DEFAULT = WidthScale.SCALE_4;	
+	public static final Font DEFAULT_FONT = new Font("Arial", Font.PLAIN, 12);
+	public static final Orientation ORIENTATION_DEFAULT = Orientation.VERTICAL;
+	public static final WidthScale WIDTH_SCALE_DEFAULT = WidthScale.SCALE_4;
 	
 	public static final String PROP_TYPE = "Type";
 	public static final String PROP_VALUE = "Value";
 	public static final String PROP_HUMAN_READABLE = "HumanReadable";
-	public static final String PROP_WIDTH_SCALE = "WidthScale";	
-	public static final String PROP_ORIENTATION = "Orientation";	
+	public static final String PROP_WIDTH_SCALE = "WidthScale";
+	public static final String PROP_ORIENTATION = "Orientation";
 	
   public enum Type {
   	TYPE_128
@@ -64,7 +64,7 @@ extends DrawComponent, ScriptDrawComponent
   public enum WidthScale {
   	SCALE_1,
   	SCALE_2,
-  	SCALE_3, 
+  	SCALE_3,
   	SCALE_4
   }
   

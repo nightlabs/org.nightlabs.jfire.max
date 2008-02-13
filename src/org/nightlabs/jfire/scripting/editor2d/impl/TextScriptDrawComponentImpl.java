@@ -37,9 +37,9 @@ import org.nightlabs.jfire.scripting.id.ScriptRegistryItemID;
  * @author Daniel.Mazurek [at] NightLabs [dot] de
  *
  */
-public class TextScriptDrawComponentImpl 
+public class TextScriptDrawComponentImpl
 extends AbstractTextDrawComponent
-implements TextScriptDrawComponent 
+implements TextScriptDrawComponent
 {
 
 	/**
@@ -68,19 +68,19 @@ implements TextScriptDrawComponent
 			scriptRegistryItemID = (ScriptRegistryItemID) ObjectIDUtil.createObjectID(scriptRegistryItemIDKeyStr);
 		return scriptRegistryItemID;
 	}
-	public void setScriptRegistryItemID(ScriptRegistryItemID scriptRegistryItemID) 
+	public void setScriptRegistryItemID(ScriptRegistryItemID scriptRegistryItemID)
 	{
-		ScriptRegistryItemID oldID = this.scriptRegistryItemID; 
+		ScriptRegistryItemID oldID = this.scriptRegistryItemID;
 		this.scriptRegistryItemID = scriptRegistryItemID;
-		this.scriptRegistryItemIDKeyStr = scriptRegistryItemID == null ? null : scriptRegistryItemID.toString();		
+		this.scriptRegistryItemIDKeyStr = scriptRegistryItemID == null ? null : scriptRegistryItemID.toString();
 		firePropertyChange(PROP_SCRIPT_REGISTRY_ITEM_ID, oldID, scriptRegistryItemID);
-	}	
+	}
 	
-	private transient String text;	
+	private transient String text;
 	@Override
 	public String getInternalText() {
 		return text;
-	}	
+	}
 	@Override
   public void setInternalText(String text) {
 		this.text = text;
@@ -100,6 +100,6 @@ implements TextScriptDrawComponent
 		if (scriptValue instanceof String) {
 			setText(((String)scriptValue));
 		}
-	}		
+	}
 
 }

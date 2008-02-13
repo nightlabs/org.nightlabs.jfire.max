@@ -28,7 +28,6 @@ package org.nightlabs.jfire.scripting.editor2d;
 import java.util.Map;
 import java.util.Set;
 
-import org.nightlabs.editor2d.DrawComponent;
 import org.nightlabs.editor2d.RootDrawComponent;
 import org.nightlabs.jfire.scripting.condition.Script;
 import org.nightlabs.jfire.scripting.id.ScriptRegistryItemID;
@@ -37,18 +36,18 @@ import org.nightlabs.jfire.scripting.id.ScriptRegistryItemID;
  * The interface for the root drawcomponent {@link RootDrawComponent} which
  * contains {@link ScriptDrawComponent}s and which is responsible for assigning the values
  * of the scripts to the corresponding {@link ScriptDrawComponent}s
- *    
+ * 
  * @author Daniel.Mazurek <at> NightLabs <dot> de
  *
  */
-public interface ScriptRootDrawComponent 
-extends RootDrawComponent 
+public interface ScriptRootDrawComponent
+extends RootDrawComponent
 {
 	public static final String PROP_SCRIPT_VALUES = "Script Values";
 	
 	/**
-	 * returns a {@link Set} of all {@link ScriptRegistryItemID}s which are contained in 
-	 * the {@link ScriptRootDrawComponent}  
+	 * returns a {@link Set} of all {@link ScriptRegistryItemID}s which are contained in
+	 * the {@link ScriptRootDrawComponent}
 	 * @return a Set of all ScriptRegistryItemIDs
 	 */
 	public Set<ScriptRegistryItemID> getScriptRegistryItemIDs();
@@ -57,7 +56,7 @@ extends RootDrawComponent
 	 * assigns all the values of the scripts to the contained {@link ScriptDrawComponent}s
 	 * with the corresponding {@link ScriptRegistryItemID}
 	 * 
-	 * @param scriptValues a {@link Map} which contains all the values of the scripts 
+	 * @param scriptValues a {@link Map} which contains all the values of the scripts
 	 * for the corresponding {@link ScriptRegistryItemID}s as key
 	 * key: ScriptRegistryItemID
 	 * value: value of the script
@@ -71,7 +70,7 @@ extends RootDrawComponent
 	 * value: VisibleScript {@link DrawComponent#getProperties().get(ScriptingConstants.PROP_VISIBLE_SCRIPT)}
 	 * 
 	 * @return a {@link Map} with the drawComponent ID as key, and
-	 * the VisibleScript as value 
+	 * the VisibleScript as value
 	 */
 	public Map<Long, Script> getVisibleScripts();
 	
@@ -82,7 +81,7 @@ extends RootDrawComponent
 	 * key: DrawComponentID {@link DrawComponent#getId()}
 	 * value: result of visibleScript {@link DrawComponent#getProperties().get(ScriptingConstants.PROP_VISIBLE_SCRIPT)}
 	 * 
-	 * @param scriptValues a map with the drawComponent ID as key, and the value 
+	 * @param scriptValues a map with the drawComponent ID as key, and the value
 	 * of the visibleScript as value
 	 */
 	public void assignVisibleScriptResults(Map<Long, Boolean> scriptValues);

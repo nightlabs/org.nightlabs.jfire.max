@@ -38,12 +38,12 @@ import org.nightlabs.jfire.scripting.id.ScriptRegistryItemID;
  * @author Daniel.Mazurek [at] NightLabs [dot] de
  *
  */
-public interface ScriptEditor2DFactory 
-extends Editor2DFactory 
+public interface ScriptEditor2DFactory
+extends Editor2DFactory
 {
 	TextScriptDrawComponent createTextScriptDrawComponent();
 	
-	TextScriptDrawComponent createTextScriptDrawComponent(String text, Font font, int x, int y, DrawComponentContainer parent);	
+	TextScriptDrawComponent createTextScriptDrawComponent(String text, Font font, int x, int y, DrawComponentContainer parent);
 	
 	TextScriptDrawComponent createTextScriptDrawComponent(String text, String fontName, int fontSize, int fontStyle, int x, int y, DrawComponentContainer parent);
 	
@@ -51,7 +51,7 @@ extends Editor2DFactory
 	
 	BarcodeDrawComponent createBarcode();
 		
-	BarcodeDrawComponent createBarcode(Type type, String value, int x, int y, WidthScale widthScale, 
-			int height, Orientation orientation, boolean printHumanReadable, 
-			DrawComponentContainer parent, ScriptRegistryItemID scriptID);	
+	BarcodeDrawComponent createBarcode(Type type, String value, int x, int y, WidthScale widthScale,
+			int height, Orientation orientation, boolean printHumanReadable,
+			DrawComponentContainer parent, ScriptRegistryItemID scriptID);
 }

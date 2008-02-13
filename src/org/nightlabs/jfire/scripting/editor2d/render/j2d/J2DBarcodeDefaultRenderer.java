@@ -38,29 +38,29 @@ import org.nightlabs.jfire.scripting.editor2d.BarcodeDrawComponent.Orientation;
  * @author Daniel.Mazurek <at> NightLabs <dot> de
  *
  */
-public class J2DBarcodeDefaultRenderer 
-extends J2DBaseRenderer 
+public class J2DBarcodeDefaultRenderer
+extends J2DBaseRenderer
 {
 	public static final Logger LOGGER = Logger.getLogger(J2DBarcodeDefaultRenderer.class);
 	public J2DBarcodeDefaultRenderer() {
-		super();		
+		super();
 	}
 
 	@Override
-  public void paint(DrawComponent dc, Graphics2D g2d) 
+  public void paint(DrawComponent dc, Graphics2D g2d)
   {
     BarcodeDrawComponent barcode = (BarcodeDrawComponent) dc;
     if (barcode.getOrientation() == Orientation.HORIZONTAL)
     	barcode.getBarcode().draw(g2d, barcode.getX(), barcode.getY());
-    else if (barcode.getOrientation() == Orientation.VERTICAL) 
+    else if (barcode.getOrientation() == Orientation.VERTICAL)
     {
     	AffineTransform oldAT = g2d.getTransform();
     	g2d.rotate(Math.toRadians(90), barcode.getX(), barcode.getY());
     	g2d.translate(0, -barcode.getWidth());
-    	barcode.getBarcode().draw(g2d, barcode.getX(), barcode.getY());    	
+    	barcode.getBarcode().draw(g2d, barcode.getX(), barcode.getY());
     	g2d.setTransform(oldAT);
     }
-  }	
+  }
 	
 }
 

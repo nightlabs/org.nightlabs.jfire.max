@@ -37,21 +37,21 @@ import org.nightlabs.jfire.scripting.editor2d.render.j2d.J2DBarcodeDefaultRender
  * @author Daniel.Mazurek [at] NightLabs [dot] de
  *
  */
-public class ScriptingEditor2DImageGenerator 
-extends ImageGenerator 
+public class ScriptingEditor2DImageGenerator
+extends ImageGenerator
 {
 	private static RenderModeManager renderModeMan = null;
-	public static RenderModeManager getScripting2DRenderModeManager() 
+	public static RenderModeManager getScripting2DRenderModeManager()
 	{
 		if (renderModeMan == null) {
 			renderModeMan = new RenderModeManager();
 			// Category Renderer
 			RenderModeDescriptor barcodeDesc = new RenderModeDescriptor(
 					RenderConstants.DEFAULT_MODE, "Default");
-			Renderer r = renderModeMan.addRenderModeDescriptor(barcodeDesc, 
+			Renderer r = renderModeMan.addRenderModeDescriptor(barcodeDesc,
 					BarcodeDrawComponent.class.getName());
 			r.addRenderContext(new J2DBarcodeDefaultRenderer());
 		}
-		return renderModeMan;		
+		return renderModeMan;
 	}
 }

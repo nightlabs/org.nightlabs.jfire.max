@@ -29,7 +29,7 @@ package org.nightlabs.jfire.scripting.editor2d;
  * @author Daniel.Mazurek [at] NightLabs [dot] de
  *
  */
-public class ScriptingConstants 
+public class ScriptingConstants
 {
 	public static final String PROP_VISIBLE_SCRIPT = "VisibleScript";
 }

@@ -47,12 +47,11 @@ import org.nightlabs.jfire.store.ProductType;
 import org.nightlabs.jfire.store.ProductTypeLocal;
 import org.nightlabs.jfire.store.id.ProductTypeID;
 import org.nightlabs.jfire.trade.CustomerGroupMapper;
-import org.nightlabs.jfire.trade.LegalEntity;
 
 /**
  * @author Marco Schulze - marco at nightlabs dot de
  * 
- * @jdo.persistence-capable 
+ * @jdo.persistence-capable
  *		identity-type="application"
  *		persistence-capable-superclass="org.nightlabs.jfire.store.ProductType"
  *		detachable="true"
@@ -219,7 +218,7 @@ public class SimpleProductType extends ProductType
 //	 * @jdo.field persistence-modifier="persistent"
 //	 */
 //	private long maxProductCount = -1;
-//	
+//
 //	/**
 //	 * Keeps track, how many <tt>Product</tt>s have already been created. If this number
 //	 * reaches <tt>maxProductCount</tt> and <tt>maxProductCount</tt> is a positive number,
@@ -233,7 +232,7 @@ public class SimpleProductType extends ProductType
 //	 * @jdo.field persistence-modifier="persistent" mapped-by="simpleProductType"
 //	 */
 //	private SimpleProductTypeName name;
-//		
+//
 //	/**
 //	 * @return Returns the name.
 //	 */
@@ -263,7 +262,7 @@ public class SimpleProductType extends ProductType
 //			if (createdProductCount >= maxProductCount)
 //				return null;
 //		}
-//		
+//
 //		Store store = Store.getStore(pm);
 //		if (!store.getOrganisationID().equals(this.getOrganisationID()))
 //			throw new IllegalStateException("Cannot create a Product in a foreign datastore! this.organisationID=\""+getOrganisationID()+"\" != store.organisationID=\""+store.getOrganisationID()+"\"");
@@ -289,7 +288,7 @@ public class SimpleProductType extends ProductType
 
 //	/**
 //	 * WORKAROUND Because of a JPOX bug, we have to re-set the member extendedProductType in the EJBean.
-//	 * 
+//	 *
 //	 * @see org.nightlabs.jfire.store.ProductType#setExtendedProductType(org.nightlabs.jfire.store.ProductType)
 //	 */
 //	public void setExtendedProductType(ProductType extendedProductType)

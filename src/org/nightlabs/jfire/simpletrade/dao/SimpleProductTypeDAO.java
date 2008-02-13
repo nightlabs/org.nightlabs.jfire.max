@@ -118,11 +118,11 @@ implements IJDOObjectDAO<SimpleProductType>
 		if (!(jdoObject instanceof SimpleProductType))
 			throw new IllegalArgumentException("ProductType to save must be of type " + SimpleProductType.class.getSimpleName() + ", passed was " + jdoObject.getClass().getSimpleName());
 		SimpleProductType productType = Util.cloneSerializable(jdoObject);
-		SimpleProductType result = null;		
+		SimpleProductType result = null;
 		monitor.beginTask("Saving SimpleProductType PropertySet", 3);
-		Properties initialContextProperties = SecurityReflector.getInitialContextProperties();		
+		Properties initialContextProperties = SecurityReflector.getInitialContextProperties();
 		try {
-			PropertySet propertySet = null; 
+			PropertySet propertySet = null;
 			try {
 				productType.getPropertySet();
 			} catch (JDODetachedFieldAccessException e) {
@@ -141,5 +141,5 @@ implements IJDOObjectDAO<SimpleProductType>
 			throw new RuntimeException("PropertySet Save failed", e);
 		}
 		return result;
-	}	
+	}
 }

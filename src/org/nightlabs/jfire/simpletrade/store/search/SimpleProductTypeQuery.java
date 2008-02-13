@@ -10,8 +10,8 @@ import org.nightlabs.jfire.store.search.ProductTypeQuery;
  * @author Daniel.Mazurek [at] NightLabs [dot] de
  *
  */
-public class SimpleProductTypeQuery 
-extends ProductTypeQuery 
+public class SimpleProductTypeQuery
+extends ProductTypeQuery
 {
 	/**
 	 * 
@@ -23,7 +23,7 @@ extends ProductTypeQuery
 	}
 
 	@Override
-	protected Query prepareQuery() 
+	protected Query prepareQuery()
 	{
 		super.prepareQuery();
 		Query q = getPersistenceManager().newQuery(getPersistenceManager().getExtent(
@@ -37,7 +37,7 @@ extends ProductTypeQuery
 		q.setFilter(getFilter().toString());
 		q.declareVariables(getVars().toString());
 		
-		return q;				
+		return q;
 	}
 
 	

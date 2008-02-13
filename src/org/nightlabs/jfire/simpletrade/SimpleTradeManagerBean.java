@@ -49,13 +49,10 @@ import javax.jdo.JDOHelper;
 import javax.jdo.JDOObjectNotFoundException;
 import javax.jdo.PersistenceManager;
 import javax.jdo.Query;
-import javax.jdo.annotations.Property;
-
 import org.apache.log4j.Logger;
 import org.nightlabs.ModuleException;
 import org.nightlabs.jdo.NLJDOHelper;
 import org.nightlabs.jdo.moduleregistry.ModuleMetaData;
-import org.nightlabs.jdo.query.JDOQuery;
 import org.nightlabs.jfire.accounting.Price;
 import org.nightlabs.jfire.accounting.Tariff;
 import org.nightlabs.jfire.accounting.TariffMapper;
@@ -122,9 +119,9 @@ import org.nightlabs.util.CollectionUtil;
 
 
 /**
- * @ejb.bean name="jfire/ejb/JFireSimpleTrade/SimpleTradeManager"	
+ * @ejb.bean name="jfire/ejb/JFireSimpleTrade/SimpleTradeManager"
  *					 jndi-name="jfire/ejb/JFireSimpleTrade/SimpleTradeManager"
- *					 type="Stateless" 
+ *					 type="Stateless"
  *					 transaction-type="Container"
  *
  * @ejb.util generate="physical"
@@ -159,7 +156,7 @@ implements SessionBean
 	
 	/**
 	 * @ejb.create-method
-	 * @ejb.permission role-name="_Guest_"	
+	 * @ejb.permission role-name="_Guest_"
 	 */
 	public void ejbCreate() throws CreateException
 	{
@@ -177,14 +174,14 @@ implements SessionBean
 	 * Simple products of other organisations must be imported.
 	 * 
 	 * @throws ModuleException
-	 * @throws CannotPublishProductTypeException 
+	 * @throws CannotPublishProductTypeException
 	 *
 	 * @ejb.interface-method
 	 * @ejb.permission role-name="_System_"
 	 * @ejb.transaction type="Required"
 	 */
-	public void initialise() 
-	throws ModuleException, CannotPublishProductTypeException 
+	public void initialise()
+	throws ModuleException, CannotPublishProductTypeException
 	{
 		PersistenceManager pm = this.getPersistenceManager();
 		try {
@@ -274,7 +271,7 @@ implements SessionBean
 //
 //				// create the category "car"
 //				SimpleProductType car = new SimpleProductType(
-//						organisationID, "car", rootSimpleProductType, null, 
+//						organisationID, "car", rootSimpleProductType, null,
 //						ProductType.INHERITANCE_NATURE_BRANCH, ProductType.PACKAGE_NATURE_OUTER);
 //				car.getName().setText(langID, "Car");
 ////				car.setDeliveryConfiguration(deliveryConfiguration);
@@ -291,7 +288,7 @@ implements SessionBean
 //				StablePriceConfig stablePriceConfig = new StablePriceConfig(organisationID, accounting.createPriceConfigID());
 //				FormulaPriceConfig formulaPriceConfig = new FormulaPriceConfig(organisationID, accounting.createPriceConfigID());
 //				formulaPriceConfig.getName().setText(langID, "Car - Middle Class");
-//				
+//
 //				CustomerGroup customerGroupDefault = trader.getDefaultCustomerGroupForKnownCustomer();
 //				CustomerGroup customerGroupAnonymous = LegalEntity.getAnonymousCustomer(pm).getDefaultCustomerGroup();
 //				formulaPriceConfig.addCustomerGroup(customerGroupDefault);
@@ -417,9 +414,9 @@ implements SessionBean
 //						"		\""+Organisation.DEV_ORGANISATION_ID+"/_Total_\"\n" +
 //						"	)\n"+
 //						")\n" +
-//						
+//
 ////						"/ 1.16 * 0.16;");
-//						
+//
 //						"\n" +
 //						"-\n" +
 //						"\n" +
@@ -714,7 +711,7 @@ implements SessionBean
 			Set<ProductTypeID> simpleProductTypeIDs,
 			Set<StructFieldID> structFieldIDs,
 			String[] fetchGroups, int maxFetchDepth
-		) 
+		)
 	{
 		Map<ProductTypeID, PropertySet> result = new HashMap<ProductTypeID, PropertySet>(simpleProductTypeIDs.size());
 		PersistenceManager pm = getPersistenceManager();
@@ -722,8 +719,8 @@ implements SessionBean
 			for (ProductTypeID productTypeID : simpleProductTypeIDs) {
 				SimpleProductType productType = (SimpleProductType) pm.getObjectById(productTypeID);
 				PropertySet detached = PropertySet.detachPropertyWithTrimmedFieldList(
-						pm, 
-						productType.getPropertySet(), structFieldIDs, 
+						pm,
+						productType.getPropertySet(), structFieldIDs,
 						fetchGroups, maxFetchDepth
 					);
 				result.put(productTypeID, detached);
@@ -832,7 +829,7 @@ implements SessionBean
 
 	/**
 	 * @return <tt>Collection</tt> of {@link org.nightlabs.jfire.trade.Article}
-	 * @throws org.nightlabs.jfire.store.NotAvailableException in case there are not enough <tt>Product</tt>s available and the <tt>Product</tt>s cannot be created (because of a limit). 
+	 * @throws org.nightlabs.jfire.store.NotAvailableException in case there are not enough <tt>Product</tt>s available and the <tt>Product</tt>s cannot be created (because of a limit).
 	 *
 	 * @ejb.interface-method
 	 * @ejb.permission role-name="_Guest_"
@@ -1134,7 +1131,7 @@ implements SessionBean
 //	{
 //		PersistenceManager pm = getPersistenceManager();
 //		try {
-//			
+//
 //		} finally {
 //			pm.close();
 //		}
@@ -1259,18 +1256,18 @@ implements SessionBean
 		} finally {
 			pm.close();
 		}
-	} 
+	}
 
 
 	/**
 	 * Searches with the given searchFilter for {@link SimpleProductType}s.
-	 *  
+	 * 
 	 * @ejb.interface-method
 	 * @ejb.permission role-name="_Guest_"
 	 * @ejb.transaction type="Supports" @!This usually means that no transaction is opened which is significantly faster and recommended for all read-only EJB methods! Marco.
 	 * 
 	 * FIXME: Use {@link JDOQuery} instead of search filter and get only ids from the datastore
-	 */ 
+	 */
 	public Collection<ProductTypeID> searchProductTypes(SimpleProductTypeSearchFilter searchFilter)
 	{
 		PersistenceManager pm = getPersistenceManager();

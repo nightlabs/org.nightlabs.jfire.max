@@ -36,7 +36,7 @@ import org.nightlabs.util.CollectionUtil;
 /**
  * @author Marco Schulze - marco at nightlabs dot de
  *
- * @jdo.persistence-capable 
+ * @jdo.persistence-capable
  *		identity-type="application"
  *		persistence-capable-superclass="org.nightlabs.jfire.store.ProductTypeActionHandler"
  *		detachable="true"

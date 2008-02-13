@@ -19,5 +19,5 @@ public interface NamedParameterMetaData extends IParameterMetaData {
 	 * @param pPosition The (1-based) parameter position.
 	 * @return The name of the given parameter.
 	 */
-	public String getParameterName(int pPosition);	
+	public String getParameterName(int pPosition);
 }

@@ -45,13 +45,13 @@ public class RenderedReportLayout implements Serializable {
 
 	/**
 	 * The header holds the descriptive information
-	 * for a {@link RenderedReportLayout} 
+	 * for a {@link RenderedReportLayout}
 	 */
 	public class Header implements Serializable {
 		private static final long serialVersionUID = 2L;
 
-		private ReportRegistryItemID reportRegistryItemID;		
-		private Birt.OutputFormat outputFormat;		
+		private ReportRegistryItemID reportRegistryItemID;
+		private Birt.OutputFormat outputFormat;
 		private Date timestamp;
 		private boolean zipped;
 		private String entryFileName;
@@ -141,7 +141,7 @@ public class RenderedReportLayout implements Serializable {
 		}
 		
 		/**
-		 * Returns the collection of BIRT errors that occurred 
+		 * Returns the collection of BIRT errors that occurred
 		 * during the rendering of the referenced layout.
 		 * 
 		 * @return The collection of BIRT errors that occurred during rendering.

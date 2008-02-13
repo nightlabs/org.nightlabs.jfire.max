@@ -43,7 +43,7 @@ public class ReportParameterAcquisitionUseCase implements Serializable {
 	/**
 	 * @jdo.field primary-key="true"
 	 */
-	private long reportParameterAcquisitionSetupID;	
+	private long reportParameterAcquisitionSetupID;
 	
 	/**
 	 * @jdo.field primary-key="true"
@@ -57,7 +57,7 @@ public class ReportParameterAcquisitionUseCase implements Serializable {
 //	private ReportParameterAcquisitionSetup parameterAcquisitionSetup;
 
 	/**
-	 * @jdo.field 
+	 * @jdo.field
 	 *		persistence-modifier="persistent"
 	 *		mapped-by="useCase"
 	 *		dependent="true"
@@ -65,7 +65,7 @@ public class ReportParameterAcquisitionUseCase implements Serializable {
 	private ReportParameterAcquisitionUseCaseName name;
 
 	/**
-	 * @jdo.field 
+	 * @jdo.field
 	 *		persistence-modifier="persistent"
 	 *		mapped-by="useCase"
 	 *		dependent="true"

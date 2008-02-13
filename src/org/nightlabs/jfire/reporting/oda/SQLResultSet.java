@@ -14,7 +14,6 @@ import java.sql.Types;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.eclipse.birt.report.engine.api.IResultMetaData;
 import org.eclipse.datatools.connectivity.oda.IBlob;
 import org.eclipse.datatools.connectivity.oda.IClob;
 import org.eclipse.datatools.connectivity.oda.IResultSet;
@@ -22,12 +21,12 @@ import org.eclipse.datatools.connectivity.oda.IResultSetMetaData;
 import org.eclipse.datatools.connectivity.oda.OdaException;
 
 /**
- * An implementation of {@link IResultMetaData} that uses 
+ * An implementation of {@link IResultMetaData} that uses
  * a list of sql {@link ResultSet} to provide Data.
  * <p>
  * It imposes only one constraint on the ResultSets used:
  * They need to be {@link Serializable}.
- *   
+ * 
  * @author Alexander Bieber <!-- alex [AT] nightlabs [DOT] de -->
  */
 public class SQLResultSet implements IResultSet, Serializable {
@@ -210,7 +209,7 @@ public class SQLResultSet implements IResultSet, Serializable {
 				metaData = createMetaDataFromTable(resultSet);
 			} catch (SQLException e) {
 				throw new OdaException(e);
-			} 
+			}
 		}
 		return metaData;
 	}
@@ -304,7 +303,7 @@ public class SQLResultSet implements IResultSet, Serializable {
 	}
 
 	/**
-	 * {@inheritDoc} 
+	 * {@inheritDoc}
 	 */
 	public boolean getBoolean(int columnIndex) throws OdaException {
 		try {
@@ -344,16 +343,16 @@ public class SQLResultSet implements IResultSet, Serializable {
 					return next();
 				}
 			}
-//				
+//
 //			if (!haveNext) {
 //				currentResultSetIdx++;
 //				if (currentResultSetIdx > 0 && currentResultSetIdx < resultSets.size()) {
 //					while (currentResultSetIdx < resultSets.size() && !haveNext) {
-//						haveNext = resultSets.get(currentResultSetIdx).next();						
+//						haveNext = resultSets.get(currentResultSetIdx).next();
 //						currentResultSetIdx++;
 //					}
 //					if (haveNext)
-//						this.resultSet = resultSets.get(currentResultSetIdx);					
+//						this.resultSet = resultSets.get(currentResultSetIdx);
 //					return haveNext;
 //				}
 //			}
@@ -402,7 +401,7 @@ public class SQLResultSet implements IResultSet, Serializable {
 	 * This method will make the first resultSet
 	 * in the list the active one and will set
 	 * all contained sets to beforeFirst();
-	 *  
+	 * 
 	 * @throws SQLException
 	 */
 	public void init() throws SQLException {
@@ -425,7 +424,7 @@ public class SQLResultSet implements IResultSet, Serializable {
 	 * @return A new {@link ResultSetMetaData} with columns mapped from the given resultSet.
 	 * @throws SQLException
 	 */
-	public static ResultSetMetaData createMetaDataFromTable(ResultSet resultSet) 
+	public static ResultSetMetaData createMetaDataFromTable(ResultSet resultSet)
 	throws SQLException
 	{
 		ResultSetMetaData metaData = new ResultSetMetaData();

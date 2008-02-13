@@ -23,7 +23,7 @@ import org.eclipse.datatools.connectivity.oda.SortSpec;
 import org.nightlabs.jfire.reporting.JFireReportingHelper;
 
 /**
- * Common implementation of {@link IQuery} that can be (and is) used 
+ * Common implementation of {@link IQuery} that can be (and is) used
  * by all ODA drivers in JFireReporting project.
  * <p>
  * It handles parameters and properties for the query, so the actual
@@ -313,8 +313,8 @@ public abstract class Query implements IQuery {
 	 * 
 	 * @throws OdaException
 	 */
-	private void mapParameterNames() 
-	throws OdaException 
+	private void mapParameterNames()
+	throws OdaException
 	{
 		IParameterMetaData pMetaData = getParameterMetaData();
 		int mParamIDFromMetaData = 0;
@@ -382,10 +382,10 @@ public abstract class Query implements IQuery {
 	}
 	
 	/**
-	 * Uses the {@link JFireReportingHelper} to obtain a 
+	 * Uses the {@link JFireReportingHelper} to obtain a
 	 * {@link PersistenceManager} for the currently rendered BIRT report.
 	 * <p>
-	 * Please not that this method can 
+	 * Please not that this method can
 	 * <b>only be used within a JFire J2EE Server environment</b>
 	 * <p>
 	 * Most likely it will be used by subclasses of Query to provide access

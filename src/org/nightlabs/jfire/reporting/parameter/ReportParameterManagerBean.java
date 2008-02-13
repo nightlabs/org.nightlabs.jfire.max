@@ -61,9 +61,9 @@ import org.nightlabs.util.TimePeriod;
 /**
  * @author Alexander Bieber <alex[AT]nightlabs[DOT]de>
  * 
- * @ejb.bean name="jfire/ejb/JFireReporting/ReportParameterManager"	
+ * @ejb.bean name="jfire/ejb/JFireReporting/ReportParameterManager"
  *					 jndi-name="jfire/ejb/JFireReporting/ReportParameterManager"
- *					 type="Stateless" 
+ *					 type="Stateless"
  *					 transaction-type="Container"
  *
  * @ejb.util generate="physical"
@@ -97,7 +97,7 @@ implements SessionBean
 
 	/**
 	 * @ejb.create-method
-	 * @ejb.permission role-name="_Guest_"	
+	 * @ejb.permission role-name="_Guest_"
 	 */
 	public void ejbCreate() throws CreateException
 	{
@@ -176,14 +176,14 @@ implements SessionBean
 					new NameEntry[] {new NameEntry(Locale.ENGLISH.getLanguage(), "Current user is selected. You might select an other user.")}
 			);
 			
-			ReportParameterUtil.createValueProvider(pm, jfireObjects, ReportingConstants.VALUE_PROVIDER_ID_CURRENT_USER_MULTIPLE, 
+			ReportParameterUtil.createValueProvider(pm, jfireObjects, ReportingConstants.VALUE_PROVIDER_ID_CURRENT_USER_MULTIPLE,
 					Collection.class.getName() + "<" + UserID.class.getName() + ">",
 					new NameEntry[] {new NameEntry(Locale.ENGLISH.getLanguage(), "Current user (with multiple selection)")},
 					new NameEntry[] {new NameEntry(Locale.ENGLISH.getLanguage(), "Current user pre-selected (change possible with multiple selection).")},
 					new NameEntry[] {new NameEntry(Locale.ENGLISH.getLanguage(), "Current user is selected. You might select an a list of other users.")}
 			);
 			
-			ReportParameterUtil.createValueProvider(pm, jfireObjects, ReportingConstants.VALUE_PROVIDER_ID_USERS, 
+			ReportParameterUtil.createValueProvider(pm, jfireObjects, ReportingConstants.VALUE_PROVIDER_ID_USERS,
 					Collection.class.getName() + "<" + UserID.class.getName() + ">",
 					new NameEntry[] {new NameEntry(Locale.ENGLISH.getLanguage(), "List of users")},
 					new NameEntry[] {new NameEntry(Locale.ENGLISH.getLanguage(), "Let the user select a list of users.")},
@@ -196,7 +196,7 @@ implements SessionBean
 					new NameEntry[] {new NameEntry(Locale.ENGLISH.getLanguage(), "Select a user group")}
 			);
 
-			ReportParameterUtil.createValueProvider(pm, jfireObjects, ReportingConstants.VALUE_PROVIDER_ID_USER_GROUPS, 
+			ReportParameterUtil.createValueProvider(pm, jfireObjects, ReportingConstants.VALUE_PROVIDER_ID_USER_GROUPS,
 					Collection.class.getName() + "<" + UserID.class.getName() + ">",
 					new NameEntry[] {new NameEntry(Locale.ENGLISH.getLanguage(), "List of user groups")},
 					new NameEntry[] {new NameEntry(Locale.ENGLISH.getLanguage(), "Let the user select a list of user groups.")},
@@ -221,7 +221,7 @@ implements SessionBean
 					new NameEntry[] {new NameEntry(Locale.ENGLISH.getLanguage(), "Current workstation is selected. You might select another one.")}
 			);
 			
-			ReportParameterUtil.createValueProvider(pm, jfireObjects, ReportingConstants.VALUE_PROVIDER_ID_WORKSTATIONS, 
+			ReportParameterUtil.createValueProvider(pm, jfireObjects, ReportingConstants.VALUE_PROVIDER_ID_WORKSTATIONS,
 					Collection.class.getName() + "<" + WorkstationID.class.getName() + ">",
 					new NameEntry[] {new NameEntry(Locale.ENGLISH.getLanguage(), "List of workstations")},
 					new NameEntry[] {new NameEntry(Locale.ENGLISH.getLanguage(), "Let the user select a list of workstations.")},
@@ -280,8 +280,8 @@ implements SessionBean
 			return result;
 		} finally {
 			pm.close();
-		}		
-	}	
+		}
+	}
 
 	/**
 	 * @throws ModuleException
@@ -381,7 +381,7 @@ implements SessionBean
 		if (setup == null)
 			throw new IllegalArgumentException("ReportParameterAcquisitionSetup must not be null!");
 
-		return NLJDOHelper.storeJDO(getPersistenceManager(), 
+		return NLJDOHelper.storeJDO(getPersistenceManager(),
 				setup, get, fetchGroups, maxFetchDepth);
 	}
 }

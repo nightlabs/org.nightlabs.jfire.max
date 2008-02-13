@@ -41,20 +41,19 @@ import org.eclipse.birt.report.engine.api.HTMLCompleteImageHandler;
 import org.eclipse.birt.report.engine.api.HTMLEmitterConfig;
 import org.eclipse.birt.report.engine.api.IRenderOption;
 import org.eclipse.birt.report.engine.api.ReportEngine;
-import org.nightlabs.jfire.reporting.layout.ReportLayout;
 import org.nightlabs.jfire.reporting.layout.render.RenderManager;
 import org.nightlabs.jfire.reporting.platform.ServerPlatformContext;
 import org.nightlabs.jfire.reporting.platform.ServerResourceLocator;
 import org.nightlabs.util.Util;
 
 /**
- * {@link ReportingManagerFactory} is the entry point for operations with 
+ * {@link ReportingManagerFactory} is the entry point for operations with
  * stored {@link ReportLayout}s. One instance of the factory is bound to JNDI
  * for each organisation (see {@link #ReportingManagerFactory(InitialContext, String)}).
  * <p>
  * Currently the factory allows access to a configured BIRT {@link ReportEngine} that
- * should be used to create new engine tasks. Additionally the factory can serve  
- * {@link RenderManager} that help rendering reports according to user-given parameters. 
+ * should be used to create new engine tasks. Additionally the factory can serve
+ * {@link RenderManager} that help rendering reports according to user-given parameters.
  * 
  * 
  * @author Alexander Bieber <alex[AT]nightlabs[DOT]de>
@@ -78,7 +77,7 @@ public class ReportingManagerFactory implements Serializable {
 	 * 
 	 * @param ctx The initial context to use.
 	 * @param organisationID The organisationID this factory should be used for
-	 * @throws NamingException 
+	 * @throws NamingException
 	 */
 	public ReportingManagerFactory(InitialContext ctx, String organisationID)
 	throws NamingException
@@ -116,7 +115,7 @@ public class ReportingManagerFactory implements Serializable {
 				HTMLCompleteImageHandler imageHandler = new HTMLCompleteImageHandler( );
 				hc.setImageHandler( imageHandler );
 //				Associate the configuration with the HTML output format.
-				config.setEmitterConfiguration( IRenderOption.OUTPUT_FORMAT_HTML, hc );			
+				config.setEmitterConfiguration( IRenderOption.OUTPUT_FORMAT_HTML, hc );
 				config.setLogConfig(new File(JFireReportingEAR.getEARDir(), "log").getAbsolutePath(), Level.ALL);
 				reportEngine = new ReportEngine(config);
 				reportEngine.getConfig().setResourceLocator(new ServerResourceLocator());
@@ -140,7 +139,7 @@ public class ReportingManagerFactory implements Serializable {
 	
 	
 	/**
-	 * Returns the JNDI prefix of the ReportingManagerFactory for the given organisationID. 
+	 * Returns the JNDI prefix of the ReportingManagerFactory for the given organisationID.
 	 */
 	public static String getJNDIName(String organisationID)
 	{
@@ -160,7 +159,7 @@ public class ReportingManagerFactory implements Serializable {
 	throws NamingException
 	{
 		return (ReportingManagerFactory) ctx.lookup(getJNDIName(organisationID));
-	}	 
+	}
 
 	public static void main(String[] args) {
 		EngineConfig config = new EngineConfig( );
@@ -179,7 +178,7 @@ public class ReportingManagerFactory implements Serializable {
 		HTMLCompleteImageHandler imageHandler = new HTMLCompleteImageHandler( );
 		hc.setImageHandler( imageHandler );
 //		Associate the configuration with the HTML output format.
-		config.setEmitterConfiguration( IRenderOption.OUTPUT_FORMAT_HTML, hc );			
+		config.setEmitterConfiguration( IRenderOption.OUTPUT_FORMAT_HTML, hc );
 		ReportEngine reportEngine = new ReportEngine(config);
 		reportEngine.getConfig().setResourceLocator(new ServerResourceLocator());
 		System.out.println(Util.getTimeDiffString(time));

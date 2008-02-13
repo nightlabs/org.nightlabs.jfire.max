@@ -16,7 +16,6 @@ import javax.jdo.JDOHelper;
 import javax.jdo.PersistenceManager;
 
 import org.apache.log4j.Logger;
-import org.eclipse.birt.report.model.css.Property;
 import org.eclipse.datatools.connectivity.oda.IResultSetMetaData;
 import org.nightlabs.jdo.NLJDOHelper;
 import org.nightlabs.jfire.prop.DataField;
@@ -48,7 +47,7 @@ import org.nightlabs.jfire.security.SecurityReflector;
  *   <li><code>propertyID</code>: The {@link PropertyID} of the {@link Property} to access.</li>
  * </ul>
  * <p>
- * At design-time the script does not know for which linkClass and scope the metad-data should be created, 
+ * At design-time the script does not know for which linkClass and scope the metad-data should be created,
  * that's why the script requires two query-properties, that are available before the query is prepared.
  * <ul>
  *   <li><code>linkClass</code>: The linkClass of the structure</li>
@@ -92,13 +91,13 @@ extends AbstractJFSScriptExecutorDelegate
 			metaData.addColumn("DisplayName", DataType.STRING);
 			IStruct struct = StructLocal.getStructLocal(linkClass, scope, pm);
 			SortedMap<String, StructBlock> sortedBlocks = new TreeMap<String, StructBlock>();
-			for (Iterator<StructBlock> iter = struct.getStructBlocks().iterator(); iter.hasNext();) {			
+			for (Iterator<StructBlock> iter = struct.getStructBlocks().iterator(); iter.hasNext();) {
 				StructBlock structBlock = iter.next();
 				sortedBlocks.put(structBlock.getPrimaryKey(), structBlock);
 			}
-			for (Iterator<StructBlock> iter = sortedBlocks.values().iterator(); iter.hasNext();) {			
+			for (Iterator<StructBlock> iter = sortedBlocks.values().iterator(); iter.hasNext();) {
 				StructBlock structBlock = iter.next();
-				SortedMap<String, StructField> sortedFields = new TreeMap<String, StructField>();				
+				SortedMap<String, StructField> sortedFields = new TreeMap<String, StructField>();
 				for (Iterator<StructField> iterator = structBlock.getStructFields().iterator(); iterator.hasNext();) {
 					StructField structField = iterator.next();
 					sortedFields.put(structField.getPrimaryKey(), structField);
@@ -117,7 +116,7 @@ extends AbstractJFSScriptExecutorDelegate
 					}
 					else if (II18nTextDataField.class.isAssignableFrom(structField.getDataFieldClass()))
 						metaData.addColumn(getColumnName(structField), DataType.STRING);
-				}			
+				}
 			}
 		}
 		return metaData;
@@ -135,7 +134,7 @@ extends AbstractJFSScriptExecutorDelegate
 	/* (non-Javadoc)
 	 * @see org.nightlabs.jfire.scripting.ScriptExecutorJavaClassDelegate#doExecute()
 	 */
-	public Object doExecute() throws ScriptException {		
+	public Object doExecute() throws ScriptException {
 		JFSResultSet resultSet = new JFSResultSet((JFSResultSetMetaData)getResultSetMetaData());
 		PropertySetID propertySetID = (PropertySetID) getParameterValue(PARAMETER_NAME_PROPERTY_SET_ID);
 		if (propertySetID == null)
@@ -155,17 +154,17 @@ extends AbstractJFSScriptExecutorDelegate
 		pm.getFetchPlan().setGroups(oldGroups);
 		pm.getFetchPlan().setMaxFetchDepth(oldFetchDepth);
 		logger.debug("Property detached");
-		// have to detach, as explode might modify the person 
+		// have to detach, as explode might modify the person
 		propertySet.inflate(struct);
 		List<Object> elements = new LinkedList<Object>();
 		Locale locale = JFireReportingHelper.getLocale();
 		SortedMap<String, StructBlock> sortedBlocks = new TreeMap<String, StructBlock>();
 		elements.add(propertySet.getDisplayName());
-		for (Iterator<StructBlock> iter = struct.getStructBlocks().iterator(); iter.hasNext();) {			
+		for (Iterator<StructBlock> iter = struct.getStructBlocks().iterator(); iter.hasNext();) {
 			StructBlock structBlock = iter.next();
 			sortedBlocks.put(structBlock.getPrimaryKey(), structBlock);
-		}		
-		for (Iterator<StructBlock> iter = sortedBlocks.values().iterator(); iter.hasNext();) {			
+		}
+		for (Iterator<StructBlock> iter = sortedBlocks.values().iterator(); iter.hasNext();) {
 			StructBlock structBlock = iter.next();
 			SortedMap<String, StructField> sortedFields = new TreeMap<String, StructField>();
 			for (Iterator<StructField> iterator = structBlock.getStructFields().iterator(); iterator.hasNext();) {
@@ -183,7 +182,7 @@ extends AbstractJFSScriptExecutorDelegate
 				if (structField instanceof NumberStructField) {
 					NumberStructField numberStructField = (NumberStructField) structField;
 					if (numberStructField.isInteger())
-						elements.add(((NumberDataField)field).getIntValue());					
+						elements.add(((NumberDataField)field).getIntValue());
 					else
 						elements.add(((NumberDataField)field).getDoubleValue());
 				}
@@ -197,7 +196,7 @@ extends AbstractJFSScriptExecutorDelegate
 						elements.add(((II18nTextDataField) field).getText(locale));
 					}
 				}
-			}			
+			}
 		}
 		resultSet.addRow(elements.toArray());
 		resultSet.init();

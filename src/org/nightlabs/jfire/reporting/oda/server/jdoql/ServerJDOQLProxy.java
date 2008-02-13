@@ -82,7 +82,7 @@ public class ServerJDOQLProxy extends AbstractJDOQLProxy {
 		try {
 			return executeQuery(
 					getPersistenceManager(),
-					getQuery(), getNamedParameters(), 
+					getQuery(), getNamedParameters(),
 					(JDOQLResultSetMetaData)getMetaData(), false, null
 				);
 		} catch (Exception e) {
@@ -93,12 +93,12 @@ public class ServerJDOQLProxy extends AbstractJDOQLProxy {
 	@SuppressWarnings("unchecked")
 	public static IResultSet executeQuery(
 			PersistenceManager pm,
-			String query, 
+			String query,
 			Map parameters,
 			JDOQLResultSetMetaData metaData,
 			boolean doDetach,
 			String[] detachFetchGroups
-		) 
+		)
 	{
 		try {
 			Query q = pm.newQuery(query);

@@ -8,7 +8,7 @@ import org.nightlabs.jfire.reporting.parameter.id.ValueProviderID;
 /**
  * {@link ValueConsumerBinding} define a binding from a {@link ValueProviderConfig}
  * to a {@link ValueConsumer} (that can be an {@link AcquisitionParameterConfig} or {@link ValueProviderConfig}).
- * The output of the bindings {@link ValueProviderConfig} will be the input for its 
+ * The output of the bindings {@link ValueProviderConfig} will be the input for its
  * {@link ValueConsumer} and the given {@link #parameterID}.
  * 
  * @author Alexander Bieber <!-- alex [AT] nightlabs [DOT] de -->
@@ -19,10 +19,10 @@ import org.nightlabs.jfire.reporting.parameter.id.ValueProviderID;
  *		detachable = "true"
  *		table="JFireReporting_ValueConsumerBinding"
  *
- * @jdo.create-objectid-class 
+ * @jdo.create-objectid-class
  * 		field-order="organisationID, valueConsumerBindingID"
  * 		include-imports="id/ValueConsumerBinding.imports.inc"
- *		include-body="id/ValueConsumerBinding.body.inc"	  
+ *		include-body="id/ValueConsumerBinding.body.inc"
  * 
  * @jdo.implements name="org.nightlabs.jfire.reporting.parameter.config.ValueConsumer"
  * 
@@ -57,7 +57,7 @@ public class ValueConsumerBinding implements Serializable {
 	/**
 	 * @jdo.field persistence-modifier="persistent"
 	 */
-	private String parameterID;	
+	private String parameterID;
 	/**
 	 * @jdo.field persistence-modifier="persistent"
 	 */
@@ -84,7 +84,7 @@ public class ValueConsumerBinding implements Serializable {
 		this.organisationID = organisationID;
 		this.valueConsumerBindingID = valueConsumerBindingID;
 		this.setup = setup;
-	}	
+	}
 	
 	/**
 	 * @return the consumer
@@ -146,10 +146,10 @@ public class ValueConsumerBinding implements Serializable {
 		if (getProvider() == null)
 			return null;
 		return ValueProviderID.create(
-				getProvider().getValueProviderOrganisationID(), 
-				getProvider().getValueProviderCategoryID(), 
+				getProvider().getValueProviderOrganisationID(),
+				getProvider().getValueProviderCategoryID(),
 				getProvider().getValueProviderID()
-			);		
+			);
 	}
 	
 }

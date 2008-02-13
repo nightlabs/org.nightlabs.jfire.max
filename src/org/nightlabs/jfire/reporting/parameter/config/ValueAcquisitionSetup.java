@@ -34,10 +34,10 @@ import org.nightlabs.util.Util;
  *		detachable = "true"
  *		table="JFireReporting_ValueAcquisitionSetup"
  *
- * @jdo.create-objectid-class 
+ * @jdo.create-objectid-class
  * 		field-order="organisationID, valueAcquisitionSetupID"
  * 		include-imports="id/ValueAcquisitionSetup.imports.inc"
- *		include-body="id/ValueAcquisitionSetup.body.inc"	 
+ *		include-body="id/ValueAcquisitionSetup.body.inc"
  * 
  * @jdo.fetch-group name="ValueAcquisitionSetup.parameterConfigs" fetch-groups="default" fields="parameterConfigs"
  * @jdo.fetch-group name="ValueAcquisitionSetup.valueProviderConfigs" fetch-groups="default" fields="valueProviderConfigs"
@@ -220,9 +220,9 @@ implements Serializable
 
 	/**
 	 * Obtain a sorted copy of the <code>ValueProviderConfig</code>s. It is sorted by
-	 * page-index (index of page) and page-row (vertical index within page) and page-column (horizontal index within one row). 
-	 * Modifying the returned <code>Map</code> is not possible as an unmodifiable Map is returned - 
-	 * modifying the contents of the map (instances of <code>ValueAcquisitionSetup</code> ), 
+	 * page-index (index of page) and page-row (vertical index within page) and page-column (horizontal index within one row).
+	 * Modifying the returned <code>Map</code> is not possible as an unmodifiable Map is returned -
+	 * modifying the contents of the map (instances of <code>ValueAcquisitionSetup</code> ),
 	 * however, is possible, but you should never modify them!
 	 *
 	 * @return a sorted map of all {@link ValueProviderConfig}s.
@@ -250,7 +250,7 @@ implements Serializable
 		return Collections.unmodifiableSortedMap(result);
 	}
 
-	public SortedMap<Integer, List<ValueProviderConfig>> createAcquisitionSequence(ValueProviderProvider provider) 
+	public SortedMap<Integer, List<ValueProviderConfig>> createAcquisitionSequence(ValueProviderProvider provider)
 	{
 		List<AcquisitionParameterConfig> parameterConfigs = getParameterConfigs();
 		int levelOffset = 0;
@@ -259,7 +259,7 @@ implements Serializable
 			resolveProviderLevel(provider, parameterConfig, levels, levelOffset);
 			int newLevelOffset = levelOffset;
 			for (Integer rLevel : levels.keySet()) {
-				newLevelOffset = Math.max(levelOffset, rLevel);				
+				newLevelOffset = Math.max(levelOffset, rLevel);
 			}
 			levelOffset = newLevelOffset;
 			// only increase levelOffset when new levels were found
@@ -286,10 +286,10 @@ implements Serializable
 	}
 	
 	protected void resolveProviderLevel(
-			ValueProviderProvider provider, 
-			ValueConsumer consumer, 
+			ValueProviderProvider provider,
+			ValueConsumer consumer,
 			Map<Integer, List<ValueProviderConfig>> levels, int level
-		) 
+		)
 	{
 		if (consumer instanceof AcquisitionParameterConfig) {
 			AcquisitionParameterConfig parameterConfig = (AcquisitionParameterConfig) consumer;
@@ -311,14 +311,14 @@ implements Serializable
 				resolveProviderLevel(provider, binding.getProvider(), levels, (level+1));
 			}
 		}
-		else 
+		else
 			throw new IllegalStateException("resolveProviderLevel called with unknown consumer type: "+consumer.getClass().getName());
 	}
 	
 	private void addToLevel(int level, Map<Integer, List<ValueProviderConfig>> levels, ValueProviderConfig providerConfig) {
 		Integer l = new Integer(level);
 		List<ValueProviderConfig> configs = levels.get(l);
-		if (configs == null) { 
+		if (configs == null) {
 			configs = new LinkedList<ValueProviderConfig>();
 			levels.put(l, configs);
 		}
@@ -327,7 +327,7 @@ implements Serializable
 	
 	public Map<String, ValueConsumerBinding> getValueConsumerBindings(ValueConsumer consumer) {
 		if (consumer2Binding == null) {
-			consumer2Binding = new HashMap<String, Map<String, ValueConsumerBinding>>();			
+			consumer2Binding = new HashMap<String, Map<String, ValueConsumerBinding>>();
 			for (ValueConsumerBinding binding : valueConsumerBindings) {
 				if (binding != null && binding.getConsumer() != null) {
 					String bindingKey = binding.getConsumer().getConsumerKey();
@@ -336,7 +336,7 @@ implements Serializable
 						bindings = new HashMap<String, ValueConsumerBinding>();
 						consumer2Binding.put(bindingKey, bindings);
 					}
-					bindings.put(binding.getParameterID(), binding);					
+					bindings.put(binding.getParameterID(), binding);
 				}
 			}
 		}
@@ -353,11 +353,11 @@ implements Serializable
 	public ValueConsumerBinding getValueProviderBinding(ValueProviderConfig provider) {
 		String key = provider.getConsumerKey();
 		if (provider2Binding == null) {
-			provider2Binding = new HashMap<String, ValueConsumerBinding>();			
+			provider2Binding = new HashMap<String, ValueConsumerBinding>();
 			for (ValueConsumerBinding binding : valueConsumerBindings) {
 				if (binding != null && binding.getProvider() != null) {
 					String bindingKey = binding.getProvider().getConsumerKey();
-					provider2Binding.put(bindingKey, binding);					
+					provider2Binding.put(bindingKey, binding);
 				}
 			}
 		}

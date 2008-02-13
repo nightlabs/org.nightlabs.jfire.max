@@ -34,7 +34,7 @@ import org.nightlabs.jfire.reporting.layout.id.ReportRegistryItemID;
  * @jdo.query
  * 		name="getSetupForReportLayout"
  *		query="SELECT UNIQUE
- *			WHERE 
+ *			WHERE
  *				this.reportLayout.organisationID == paramOrganisationID &&
  *				this.reportLayout.reportRegistryItemType == paramRegistryItemType &&
  *				this.reportLayout.reportRegistryItemID == paramRegistryItemID
@@ -63,7 +63,7 @@ implements Serializable
 	/**
 	 * @jdo.field primary-key="true"
 	 */
-	private long reportParameterAcquisitionSetupID;	
+	private long reportParameterAcquisitionSetupID;
 
 	/**
 	 * @jdo.field persistence-modifier="persistent"
@@ -74,7 +74,7 @@ implements Serializable
 	/**
 	 * @jdo.field persistence-modifier="persistent"
 	 */
-	private ReportLayout reportLayout; 
+	private ReportLayout reportLayout;
 
 	/**
 	 * @jdo.field

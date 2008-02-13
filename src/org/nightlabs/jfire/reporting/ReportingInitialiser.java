@@ -22,7 +22,6 @@ import javax.naming.NamingException;
 import javax.xml.transform.TransformerException;
 
 import org.apache.log4j.Logger;
-import org.nightlabs.ModuleException;
 import org.nightlabs.i18n.I18nText;
 import org.nightlabs.jfire.idgenerator.IDGenerator;
 import org.nightlabs.jfire.organisation.Organisation;
@@ -64,21 +63,21 @@ import org.xml.sax.SAXParseException;
  * <p>
  * For each folder the initializer finds a category will be created as child of
  * the upper directorys one. A descriptor file 'content.xml' can be placed in
- * the directory to define in detail what id and names the category and report layous 
+ * the directory to define in detail what id and names the category and report layous
  * should get.
- * </p> 
+ * </p>
  * <p>
  * The {@link ReportInitialiser} will also create a parameter acquisition workflow
- * defined in the content.xml for the report layout. For further details about how to 
- * define the acquisition workflow see the content.xml dtd (http://www.nightlabs.de/dtd/reporting_initialiser_*.dtd) 
+ * defined in the content.xml for the report layout. For further details about how to
+ * define the acquisition workflow see the content.xml dtd (http://www.nightlabs.de/dtd/reporting_initialiser_*.dtd)
  * </p>
  * <p>
  * Additionally resource bundles used for localisation of the reports are created by the
- * initialzer. These files should be placed in a subfolder 'resource' for each category and should be 
+ * initialzer. These files should be placed in a subfolder 'resource' for each category and should be
  * prefixed with the report layout id. (e.g. DefaultInvoiceLayout_en_EN.properties)
- * </p> 
- * <p> 
- * The recommended usage is 
+ * </p>
+ * <p>
+ * The recommended usage is
  * <ul>
  * <li><b>Create the initializer</b>: Use {@link #ReportingInitialiser(String, ReportCategory, String, JFireServerManager, PersistenceManager, String)} to create the initializer and set the
  * base category, root directory and fallback values for ids</li>
@@ -103,9 +102,9 @@ public class ReportingInitialiser {
 	private Map<File, Document> categoryDescriptors = new HashMap<File, Document>();
 
 	/**
-	 * Returns the ReportCategory with the given id-parameters. If neccessary (not found in the datastore) 
+	 * Returns the ReportCategory with the given id-parameters. If neccessary (not found in the datastore)
 	 * it will be newly created.
-	 *  
+	 * 
 	 * @param pm The PersistenceManager to use.
 	 * @param parent The parent category.
 	 * @param organisationID Organisation id-parameter.
@@ -114,7 +113,7 @@ public class ReportingInitialiser {
 	 * @param internal Whether this should be treated as internal categroy.
 	 * @return The ReportCategory with the given id-parameters.
 	 */
-	public static final ReportCategory createCategory(PersistenceManager pm, ReportCategory parent, String organisationID, String reportRegistryItemType, String reportRegistryItemID, boolean internal)  
+	public static final ReportCategory createCategory(PersistenceManager pm, ReportCategory parent, String organisationID, String reportRegistryItemType, String reportRegistryItemID, boolean internal)
 	{
 		if (logger.isDebugEnabled())
 			logger.debug("createCategory: categoryPK=\""+organisationID+'/'+reportRegistryItemType+'/'+reportRegistryItemID+"\" parent=\""+ (parent == null ? null : (parent.getOrganisationID()+'/'+parent.getReportRegistryItemType()+'/'+parent.getReportRegistryItemID())) + "\" internal="+internal);
@@ -147,11 +146,11 @@ public class ReportingInitialiser {
 	 * @param baseCategory The base category from where the category-tree will be build.
 	 * @param jfsm The JFireServerManager to use
 	 * @param pm The PersistenceManager to use.
-	 * @param registryItemType is the type (identifier) for the reports in categories, sub-categories get the scriptRegistryItemType from their parent 
+	 * @param registryItemType is the type (identifier) for the reports in categories, sub-categories get the scriptRegistryItemType from their parent
 	 * @param organisationID If you're writing a JFire Community Project, this is {@link Organisation#DEV_ORGANISATION_ID}.
 	 */
 	public ReportingInitialiser(
-			String scriptSubDir, ReportCategory baseCategory, String reportRegistryItemType, 
+			String scriptSubDir, ReportCategory baseCategory, String reportRegistryItemType,
 			JFireServerManager jfsm, PersistenceManager pm, String organisationID
 		)
 	{
@@ -176,9 +175,9 @@ public class ReportingInitialiser {
 	 * Start the initializing process.
 	 * 
 	 * @throws ModuleException
-	 */	
-	public void initialise() 
-	throws ReportingInitialiserException 
+	 */
+	public void initialise()
+	throws ReportingInitialiserException
 	{
 		String j2eeBaseDir = jfsm.getJFireServerConfigModule().getJ2ee().getJ2eeDeployBaseDirectory();
 		File scriptDir = new File(j2eeBaseDir, scriptSubDir);
@@ -186,7 +185,7 @@ public class ReportingInitialiser {
 		if (!scriptDir.exists())
 			throw new IllegalStateException("Script directory does not exist: " + scriptDir.getAbsolutePath());
 
-		logger.debug("BEGIN initialization of Scripts");	
+		logger.debug("BEGIN initialization of Scripts");
 //		initDefaultParameterSets();
 
 		// initialise meta-data
@@ -201,13 +200,13 @@ public class ReportingInitialiser {
 		createReportCategories(scriptDir, baseCategory);
 	}
 
-	private Document getCategoryDescriptor(File categoryDir) 
-	throws SAXException, IOException 
+	private Document getCategoryDescriptor(File categoryDir)
+	throws SAXException, IOException
 	{
 		Document doc = categoryDescriptors.get(categoryDir);
 		if (doc == null) {
 			final File contentFile = new File(categoryDir, "content.xml");
-			if (contentFile.exists()) { 
+			if (contentFile.exists()) {
 				DOMParser parser = new DOMParser();
 				parser.setErrorHandler(new ErrorHandler(){
 					public void error(SAXParseException exception) throws SAXException {
@@ -241,8 +240,8 @@ public class ReportingInitialiser {
 		return doc;
 	}
 	
-	private Node getReportDescriptor(File scriptFile, Document categoryDocument) 
-	throws TransformerException 
+	private Node getReportDescriptor(File scriptFile, Document categoryDocument)
+	throws TransformerException
 	{
 		Collection<Node> nodes = NLDOMUtil.findNodeList(categoryDocument, "report-category/report");
 		for (Node scriptNode : nodes) {
@@ -253,12 +252,12 @@ public class ReportingInitialiser {
 		return null;
 	}
 	
-	private void createElementName(Node elementNode, String elementName, I18nText name, String def) 
+	private void createElementName(Node elementNode, String elementName, I18nText name, String def)
 	{
 		if (name == null) {
 			logger.warn("createElementName called with null element!", new NullPointerException("name"));
 			return;
-		}		
+		}
 		boolean nameSet = false;
 		if (elementNode != null) {
 			Collection<Node> nodes = NLDOMUtil.findNodeList(elementNode, elementName);
@@ -277,14 +276,14 @@ public class ReportingInitialiser {
 	}
 	
 	/**
-	 * Recurses from the given directory and report categories 
+	 * Recurses from the given directory and report categories
 	 * based on the &lt;report-category&gt; element found in the content.xml files there.
 	 * 
 	 * @param dir The directory to start recursion
 	 * @param parent The {@link ReportCategory}
 	 * @throws ReportingInitialiserException
 	 */
-	protected void createReportCategories(File dir, ReportCategory parent) 
+	protected void createReportCategories(File dir, ReportCategory parent)
 	throws ReportingInitialiserException
 	{
 		try {
@@ -332,7 +331,7 @@ public class ReportingInitialiser {
 
 			
 			// recurse
-			File[] subDirs = dir.listFiles(dirFileFilter);		
+			File[] subDirs = dir.listFiles(dirFileFilter);
 			for (int i=0; i<subDirs.length; i++) {
 				createReportCategories(subDirs[i], category);
 			}
@@ -345,7 +344,7 @@ public class ReportingInitialiser {
 
 	/**
 	 * Creates a {@link ReportLayout} from the given file.
-	 *  
+	 * 
 	 * @param reportFile The file to create a new ReportFile from.
 	 * @param category The category to add the report
 	 * @param catDocument The document where meta-data of the report can be found
@@ -353,11 +352,11 @@ public class ReportingInitialiser {
 	 * @throws Exception
 	 */
 	protected void createReportLayout(
-			File reportFile, ReportCategory category, Document catDocument, 
-			String reportRegistryItemType) 
+			File reportFile, ReportCategory category, Document catDocument,
+			String reportRegistryItemType)
 	throws Exception
 	{
-		Node reportNode = getReportDescriptor(reportFile, catDocument);				
+		Node reportNode = getReportDescriptor(reportFile, catDocument);
 		
 		String reportID = IOUtil.getFileNameWithoutExtension(reportFile.getName());
 		boolean overwriteOnInit = true;
@@ -374,7 +373,7 @@ public class ReportingInitialiser {
 				overwriteOnInit = Boolean.parseBoolean(overwriteNode.getTextContent());
 		}
 		
-		logger.debug("create ReportLayout = " + reportID);				
+		logger.debug("create ReportLayout = " + reportID);
 		ReportLayout layout;
 		boolean hadToBeCreated = false;
 		try {
@@ -390,7 +389,7 @@ public class ReportingInitialiser {
 			hadToBeCreated = true;
 		}
 
-		boolean doInit = overwriteOnInit || hadToBeCreated; 
+		boolean doInit = overwriteOnInit || hadToBeCreated;
 		if (doInit) {
 			File layoutFile = createReportFileFromTemplate(reportFile);
 			layout.loadFile(layoutFile);
@@ -414,12 +413,12 @@ public class ReportingInitialiser {
 	 * <li>${devOrganisationID}</li>
 	 * <li>${devOrganisationIDConverted}</li>
 	 * </ul>
-	 * </p> 
-	 * @param reportFile The template file to replace the variables in 
+	 * </p>
+	 * @param reportFile The template file to replace the variables in
 	 * @return The newly created file with all variables replaced.
 	 * @throws Exception If something fails.
 	 */
-	protected File createReportFileFromTemplate(File reportFile) 
+	protected File createReportFileFromTemplate(File reportFile)
 	throws Exception
 	{
 		File tmpFile = File.createTempFile(IOUtil.getFileNameWithoutExtension(reportFile.getName()), ".rptdesign", IOUtil.getTempDir());
@@ -448,29 +447,29 @@ public class ReportingInitialiser {
 	/**
 	 * Returns the given string converted so that it can be used
 	 * as name of dataset column in a report.
-	 *  
+	 * 
 	 * @param str The String to convert.
-	 * @return The given str with all "." replaced with "_" and "_" with "__" 
+	 * @return The given str with all "." replaced with "_" and "_" with "__"
 	 */
 	public static String convertToReportColumnString(String str) {
 		String key = str.replaceAll("_", "__");
 		key = key.replaceAll("\\.", "_");
 		return key;
-	}	
+	}
 	
-	protected FileFilter dirFileFilter = new FileFilter() {	
+	protected FileFilter dirFileFilter = new FileFilter() {
 		public boolean accept(File pathname) {
 			return pathname.isDirectory() && !(pathname.toString().endsWith("resource"));
-		}	
+		}
 	};
 
 	private FilenameFilter scriptFileNameFilter = new FilenameFilter()
-	{	
-		public boolean accept(File dir, String name) 
-		{				
+	{
+		public boolean accept(File dir, String name)
+		{
 			String fileExtension = IOUtil.getFileExtension(name);
 			return "rptdesign".equals(fileExtension);
-		}	
+		}
 	};
 
 	
@@ -493,7 +492,7 @@ public class ReportingInitialiser {
 				throw new ReportingInitialiserException("ReportParameterAcquisitionUseCase element <use-case> must define an id attribute. See file "+reportFile.toString());
 			String useCaseID = useCaseIDNode.getNodeValue();
 			
-			boolean overwriteOnInit = false;			
+			boolean overwriteOnInit = false;
 			Node overwriteNode = reportNode.getAttributes().getNamedItem("overwriteOnInit");
 			if (overwriteNode != null && !"".equals(overwriteNode.getTextContent()))
 				overwriteOnInit = Boolean.parseBoolean(overwriteNode.getTextContent());
@@ -536,7 +535,7 @@ public class ReportingInitialiser {
 					String id = NLDOMUtil.getNonEmptyAttributeValue(paramNode, "id");
 					String name = NLDOMUtil.getNonEmptyAttributeValue(paramNode, "name");
 					String type = NLDOMUtil.getNonEmptyAttributeValue(paramNode, "type");
-					AcquisitionParameterConfig parameterConfig = new AcquisitionParameterConfig(acquisitionSetup, name, type);					
+					AcquisitionParameterConfig parameterConfig = new AcquisitionParameterConfig(acquisitionSetup, name, type);
 					setGraphicalData(paramNode, parameterConfig);
 					id2BindingObject.put(id, parameterConfig);
 					acquisitionSetup.getParameterConfigs().add(parameterConfig);
@@ -592,7 +591,7 @@ public class ReportingInitialiser {
 						throw new ReportingInitialiserException("Referenced ValueProvider does not exist "+providerID+". See "+reportFile, e);
 					}
 					config.setValueProvider(provider);
-					config.setPageIndex(pageIndex);					
+					config.setPageIndex(pageIndex);
 					config.setPageRow(pageRow);
 					config.setPageColumn(pageColumn);
 					
@@ -623,7 +622,7 @@ public class ReportingInitialiser {
 					setGraphicalData(providerNode, config);
 					
 					id2BindingObject.put(id, config);
-					acquisitionSetup.getValueProviderConfigs().add(config);					
+					acquisitionSetup.getValueProviderConfigs().add(config);
 				} catch (IllegalArgumentException e) {
 					throw new ReportingInitialiserException("Some attribute is missing for the value-provider-configs declaration in the parameter-acquisition in file "+reportFile, e);
 				}
@@ -646,7 +645,7 @@ public class ReportingInitialiser {
 						throw new ReportingInitialiserException("Element value-consumer-binding/binding has to define sub-element consumer. See file "+reportFile);
 					String consumerID = NLDOMUtil.getNonEmptyAttributeValue(consumerNode, "id");
 
-					ValueProviderConfig provider = null; 
+					ValueProviderConfig provider = null;
 					try {
 						provider = (ValueProviderConfig) id2BindingObject.get(providerID);
 						if (provider == null)
@@ -722,7 +721,7 @@ public class ReportingInitialiser {
 			return setup.getDefaultSetup().getUseCase();
 		ReportParameterAcquisitionUseCaseID id = ReportParameterAcquisitionUseCaseID.create(setup.getOrganisationID(), setup.getReportParameterAcquisitionSetupID(), useCaseID);
 		ReportParameterAcquisitionUseCase useCase = null;
-		try {			
+		try {
 			useCase = (ReportParameterAcquisitionUseCase) pm.getObjectById(id);
 			useCase.getReportParameterAcquisitionSetupID();
 		} catch (JDOObjectNotFoundException e) {
@@ -779,7 +778,7 @@ public class ReportingInitialiser {
 	 * for entries named like reportID_{locale}.properties
 	 * 
 	 * @param reportFile The report file currently processed.
-	 * @param reportID The id of the {@link ReportLayout} currently processed. 
+	 * @param reportID The id of the {@link ReportLayout} currently processed.
 	 * @param reportNode The 'report' node of the content.xml document currenty processed
 	 * @param layout The {@link ReportLayout} currently processed.
 	 * @throws ReportingInitialiserException
@@ -803,7 +802,7 @@ public class ReportingInitialiser {
 			if (locale == null)
 				locale = "";
 			ReportLayoutLocalisationDataID localisationDataID = ReportLayoutLocalisationDataID.create(
-					layout.getOrganisationID(), layout.getReportRegistryItemType(), layout.getReportRegistryItemID(), locale  
+					layout.getOrganisationID(), layout.getReportRegistryItemType(), layout.getReportRegistryItemID(), locale
 			);
 			ReportLayoutLocalisationData localisationData = null;
 			try {

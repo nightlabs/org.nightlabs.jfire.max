@@ -7,13 +7,11 @@ import java.io.Serializable;
 
 import javax.jdo.listener.DeleteCallback;
 
-import org.nightlabs.jfire.reporting.parameter.ValueProvider;
-
 /**
  * This is used to represent a BIRT parameter within a {@link ValueAcquisitionSetup}.
  * These objects are always the end of the {@link ValueProvider} chain when
  * quering parameters from the user.
- *  
+ * 
  * @author Alexander Bieber <!-- alex [AT] nightlabs [DOT] de -->
  * 
  * @jdo.persistence-capable
@@ -22,19 +20,19 @@ import org.nightlabs.jfire.reporting.parameter.ValueProvider;
  *		detachable = "true"
  *		table="JFireReporting_AcquisitionParameterConfig"
  *
- * @jdo.create-objectid-class 
+ * @jdo.create-objectid-class
  * 		field-order="organisationID, valueAcquisitionSetupID, parameterID"
  * 		include-imports="id/AcquistionParameterConfig.imports.inc"
  *		include-body="id/AcquistionParameterConfig.body.inc"
  * 
- * @jdo.inheritance strategy = "new-table" 
+ * @jdo.inheritance strategy = "new-table"
  * @jdo.inheritance-discriminator strategy="class-name"
  * 
  * @jdo.implements name="org.nightlabs.jfire.reporting.parameter.config.ValueConsumer"
  * 
  */
-public class AcquisitionParameterConfig 
-implements ValueConsumer, Serializable, IGraphicalInfoProvider, DeleteCallback 
+public class AcquisitionParameterConfig
+implements ValueConsumer, Serializable, IGraphicalInfoProvider, DeleteCallback
 {
 	private static final long serialVersionUID = 1L;
 
@@ -67,12 +65,12 @@ implements ValueConsumer, Serializable, IGraphicalInfoProvider, DeleteCallback
 	
 	/**
 	 * @jdo.field persistence-modifier="persistent"
-	 */	
+	 */
 	private int x;
 
 	/**
 	 * @jdo.field persistence-modifier="persistent"
-	 */	
+	 */
 	private int y;
 	
 	// Maybe need to add x,y for GEF editor
@@ -86,9 +84,9 @@ implements ValueConsumer, Serializable, IGraphicalInfoProvider, DeleteCallback
 	}
 
 	public AcquisitionParameterConfig(
-			ValueAcquisitionSetup setup, 
+			ValueAcquisitionSetup setup,
 			String parameterID, String parameterType
-		) 
+		)
 	{
 		this(setup);
 		this.parameterID = parameterID;
@@ -159,7 +157,7 @@ implements ValueConsumer, Serializable, IGraphicalInfoProvider, DeleteCallback
 	/**
 	 * returns the y coordinate
 	 * @return the y coordinate
-	 */	
+	 */
 	public int getY() {
 		return y;
 	}
@@ -167,7 +165,7 @@ implements ValueConsumer, Serializable, IGraphicalInfoProvider, DeleteCallback
 	/**
 	 * sets the x coordinate
 	 * @param x the x coordinate to set
-	 */	
+	 */
 	public void setX(int x) {
 		this.x = x;
 	}
@@ -175,7 +173,7 @@ implements ValueConsumer, Serializable, IGraphicalInfoProvider, DeleteCallback
 	/**
 	 * sets the y coordinate
 	 * @param y the y coordinate to set
-	 */		
+	 */
 	public void setY(int y) {
 		this.y = y;
 	}

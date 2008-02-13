@@ -66,7 +66,7 @@ public class ReportParameterAcquisitionUseCaseName extends I18nText implements S
 	/**
 	 * @jdo.field primary-key="true"
 	 */
-	private long reportParameterAcquisitionSetupID;	
+	private long reportParameterAcquisitionSetupID;
 	
 	/**
 	 * @jdo.field primary-key="true"

@@ -44,7 +44,7 @@ public interface IJDOQueryProxy extends IQuery {
 	/**
 	 * Set the single-string JDOQL query that should be executed.
 	 * 
-	 * @param query The single-string JDOQL query to be executed 
+	 * @param query The single-string JDOQL query to be executed
 	 */
 	public void setQuery(String query);
 	

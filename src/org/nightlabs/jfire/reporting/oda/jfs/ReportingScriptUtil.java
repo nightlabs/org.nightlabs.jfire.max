@@ -3,7 +3,6 @@
  */
 package org.nightlabs.jfire.reporting.oda.jfs;
 
-import java.util.Date;
 import java.util.Map;
 
 import javax.jdo.JDOHelper;
@@ -17,7 +16,7 @@ import org.nightlabs.util.TimePeriod;
 public class ReportingScriptUtil {
 
 	/**
-	 * Protected as this class is for static use. 
+	 * Protected as this class is for static use.
 	 */
 	protected ReportingScriptUtil() {
 	}
@@ -25,7 +24,7 @@ public class ReportingScriptUtil {
 	/**
 	 * Adds a {@link TimePeriod} condition to a JDOQL query in the form of
 	 * <pre>
-	 *   && (variable >= :timePeriodVarNameFrom && variable <= :timePeriodVarNameTo) 
+	 *   && (variable >= :timePeriodVarNameFrom && variable <= :timePeriodVarNameTo)
 	 * </pre>
 	 * 
 	 * @param jdoql The query to add the condition to.
@@ -36,9 +35,9 @@ public class ReportingScriptUtil {
 	 */
 	public static void addTimePeriodCondition(
 			StringBuffer jdoql,
-			String variable, String timePeriodVarName, 
+			String variable, String timePeriodVarName,
 			TimePeriod timePeriod, Map<String, Object> queryParameters
-		) 
+		)
 	{
 		if (timePeriod == null || !timePeriod.isConfining())
 			return;
@@ -59,7 +58,7 @@ public class ReportingScriptUtil {
 	
 	/**
 	 * Returns the String representation of the given PersistenceCapable object.
-	 * Checks for <code>null</code> also. 
+	 * Checks for <code>null</code> also.
 	 * @param pc The Object to get the id for.
 	 * @return The String representation of the given PersistenceCapable object.
 	 */

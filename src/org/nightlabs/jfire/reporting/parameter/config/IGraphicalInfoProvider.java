@@ -4,7 +4,7 @@ package org.nightlabs.jfire.reporting.parameter.config;
  * @author Daniel.Mazurek [at] NightLabs [dot] de
  *
  */
-public interface IGraphicalInfoProvider 
+public interface IGraphicalInfoProvider
 {
 	public static final String PROP_X = "X";
 	public static final String PROP_Y = "Y";
@@ -24,13 +24,13 @@ public interface IGraphicalInfoProvider
 	/**
 	 * returns the y coordinate
 	 * @return the y coordinate
-	 */	
+	 */
 	int getY();
 	
 	/**
 	 * sets the y coordinate
 	 * @param y the y coordinate to set
-	 */	
+	 */
 	void setY(int y);
 	
 }

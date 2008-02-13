@@ -38,13 +38,13 @@ import org.nightlabs.util.Util;
  *
  * @jdo.create-objectid-class field-order="organisationID, reportRegistryItemType, reportRegistryItemID, locale"
  *
- * @jdo.inheritance strategy = "new-table" 
+ * @jdo.inheritance strategy = "new-table"
  * 
  * @jdo.fetch-group name="ReportLayoutLocalisationData.localisationData" fetch-groups="default" fields="localisationData"
  *
  *  @jdo.query
  *		name="getReportLayoutLocalisationBundle"
- *		query="SELECT 
+ *		query="SELECT
  *			WHERE this.reportLayout == :paramReportLayout"
  *
  */
@@ -159,7 +159,7 @@ public class ReportLayoutLocalisationData implements StoreCallback, Serializable
 	/**
 	 * Loads the contents of the given file into the {@link #localisationData} member.
 	 * 
-	 * @param f The {@link File} to load. 
+	 * @param f The {@link File} to load.
 	 * @throws IOException
 	 */
 	public void loadFile(File f)
@@ -183,7 +183,7 @@ public class ReportLayoutLocalisationData implements StoreCallback, Serializable
 
 			error = false;
 		} finally {
-			if (error) { 
+			if (error) {
 				localisationData = null;
 			}
 		}

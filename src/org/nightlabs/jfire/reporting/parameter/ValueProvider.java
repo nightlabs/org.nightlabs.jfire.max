@@ -10,21 +10,19 @@ import javax.jdo.PersistenceManager;
 import javax.jdo.Query;
 import javax.jdo.listener.DetachCallback;
 
-import org.nightlabs.jfire.reporting.parameter.config.ValueAcquisitionSetup;
-import org.nightlabs.jfire.reporting.parameter.config.ValueProviderConfig;
 import org.nightlabs.jfire.reporting.parameter.id.ValueProviderCategoryID;
 import org.nightlabs.jfire.reporting.parameter.id.ValueProviderID;
 
 /**
- * ValueProviders are used to declare the process of acquiring 
- * report parameters from the user. They are registered on the 
+ * ValueProviders are used to declare the process of acquiring
+ * report parameters from the user. They are registered on the
  * server side referenced in {@link ValueProviderConfig}s and
  * {@link ValueAcquisitionSetup}s.
  * <p>
  * This object is only for declaring the value provider.
  * Objects for concrete user interaction should be registered
  * to the appropriate {@link #valueProviderID} on the
- * client side. 
+ * client side.
  * 
  * @author Alexander Bieber <!-- alex [AT] nightlabs [DOT] de -->
  * 
@@ -36,7 +34,7 @@ import org.nightlabs.jfire.reporting.parameter.id.ValueProviderID;
  *
  * @jdo.create-objectid-class field-order="organisationID, valueProviderCategoryID, valueProviderID"
  * 
- * @jdo.inheritance strategy = "new-table" 
+ * @jdo.inheritance strategy = "new-table"
  * @jdo.inheritance-discriminator strategy="class-name"
  * 
  * @jdo.fetch-group name="ValueProvider.name" fetch-groups="default" fields="name"
@@ -72,16 +70,16 @@ public class ValueProvider implements Serializable, DetachCallback {
 	private String organisationID;
 	
 	/**
-	 * @jdo.field primary-key="true" 
-	 * @jdo.column length="100" 
+	 * @jdo.field primary-key="true"
+	 * @jdo.column length="100"
 	 */
 	private String valueProviderCategoryID;
 	
 	/**
-	 * @jdo.field primary-key="true" 
+	 * @jdo.field primary-key="true"
 	 * @jdo.column length="100"
 	 */
-	private String valueProviderID;	
+	private String valueProviderID;
 	
 	/**
 	 * @jdo.field persistence-modifier="persistent"
@@ -104,21 +102,21 @@ public class ValueProvider implements Serializable, DetachCallback {
 	private List<ValueProviderInputParameter> inputParameters;
 	
 	/**
-	 * @jdo.field 
+	 * @jdo.field
 	 * 		persistence-modifier="persistent"
 	 * 		mapped-by="valueProvider"
 	 */
 	private ValueProviderName name;
 
 	/**
-	 * @jdo.field 
+	 * @jdo.field
 	 * 		persistence-modifier="persistent"
 	 * 		mapped-by="valueProvider"
 	 */
 	private ValueProviderDescription description;
 	
 	/**
-	 * @jdo.field 
+	 * @jdo.field
 	 * 		persistence-modifier="persistent"
 	 * 		mapped-by="valueProvider"
 	 */
@@ -133,7 +131,7 @@ public class ValueProvider implements Serializable, DetachCallback {
 	}
 	
 	public ValueProvider(ValueProviderCategory category, String valueProviderID, String outputType) {
-		this.organisationID = category.getOrganisationID();		
+		this.organisationID = category.getOrganisationID();
 		this.valueProviderCategoryID = category.getValueProviderCategoryID();
 		this.category = category;
 		this.valueProviderID = valueProviderID;
@@ -240,7 +238,7 @@ public class ValueProvider implements Serializable, DetachCallback {
 	
 	public ValueProviderCategoryID getCategoryID() {
 		if (categoryID == null)
-			categoryID = (ValueProviderCategoryID) JDOHelper.getObjectId(category); 
+			categoryID = (ValueProviderCategoryID) JDOHelper.getObjectId(category);
 		return categoryID;
 	}
 	

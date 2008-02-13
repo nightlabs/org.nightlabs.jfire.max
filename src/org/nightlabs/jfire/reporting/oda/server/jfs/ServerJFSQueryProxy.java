@@ -12,7 +12,6 @@ import org.eclipse.datatools.connectivity.oda.IParameterMetaData;
 import org.eclipse.datatools.connectivity.oda.IResultSet;
 import org.eclipse.datatools.connectivity.oda.IResultSetMetaData;
 import org.eclipse.datatools.connectivity.oda.OdaException;
-import org.nightlabs.ModuleException;
 import org.nightlabs.jfire.organisation.Organisation;
 import org.nightlabs.jfire.reporting.oda.JFireReportingOdaException;
 import org.nightlabs.jfire.reporting.oda.ParameterMetaData;
@@ -29,12 +28,12 @@ import org.nightlabs.jfire.scripting.id.ScriptRegistryItemID;
 import org.nightlabs.jfire.security.SecurityReflector;
 
 /**
- * Actual implementation of the JFS ODA Query. 
+ * Actual implementation of the JFS ODA Query.
  * <p>
  * When this driver is queried it will try to lookup
  * a {@link Script} that, when executed by the right {@link ScriptExecutor} (see {@link ReportingScriptExecutor}),
  * will provide ODA result set data.
- *  
+ * 
  * @author Alexander Bieber <alex [AT] nightlabs [DOT] de>
  *
  */
@@ -57,7 +56,7 @@ public class ServerJFSQueryProxy extends AbstractJFSQueryProxy {
 	 * @see org.eclipse.datatools.connectivity.oda.IQuery#close()
 	 */
 	public void close() throws OdaException {
-		logger.debug("close() IQuery."); 
+		logger.debug("close() IQuery.");
 //		closePersistenceManager();
 	}
 
@@ -68,8 +67,8 @@ public class ServerJFSQueryProxy extends AbstractJFSQueryProxy {
 	 * @see org.nightlabs.jfire.reporting.oda.jfs.AbstractJFSQueryProxy#getParameterMetaData()
 	 */
 	@Override
-	public IParameterMetaData getParameterMetaData() 
-	throws OdaException 
+	public IParameterMetaData getParameterMetaData()
+	throws OdaException
 	{
 		if (parameterMetaData == null) {
 			ScriptRegistryItemID itemID = getScriptRegistryItemID();
@@ -110,7 +109,7 @@ public class ServerJFSQueryProxy extends AbstractJFSQueryProxy {
 	 * <p>
 	 * Calls {@link #getJFSResultSetMetaData(ScriptRegistryItemID)} with the
 	 * {@link ScriptRegistryItemID} associated to the calling data set.
-	 *  
+	 * 
 	 * @see org.eclipse.datatools.connectivity.oda.IQuery#getMetaData()
 	 */
 	public IResultSetMetaData getMetaData() throws OdaException {
@@ -130,14 +129,14 @@ public class ServerJFSQueryProxy extends AbstractJFSQueryProxy {
 	
 	/**
 	 * Returns the script associated to the dataset. Scripts are associated
-	 * by referencing them with the String representation of their {@link ScriptRegistryItemID} 
+	 * by referencing them with the String representation of their {@link ScriptRegistryItemID}
 	 * int the query property of the dataset.
 	 * <p>
 	 * Note that this method replaces the organisationID of the itemID passed with the
 	 * organisationID of the executing user.
 	 * <p>
-	 * TODO: Refactor script reference in query text to have an option whether to replace the organisation-id or not 
-	 *  
+	 * TODO: Refactor script reference in query text to have an option whether to replace the organisation-id or not
+	 * 
 	 * @param pm The PersistenceManager to lookup the script with.
 	 * @param itemID The script's id.
 	 * @return An instance of {@link Script}. Note that and {@link IllegalArgumentException} will be
@@ -160,7 +159,7 @@ s	 */
 			throw new IllegalArgumentException("The ScriptRegistryItem is not an instance or subclass of Script, but "+item.getClass().getName());
 		
 		return (Script)item;
-	}	
+	}
 
 	/**
 	 * Lookup and create a new executor for the given script.
@@ -168,11 +167,11 @@ s	 */
 	 * This method checks if the executor implements the {@link ReportingScriptExecutor}
 	 * interface so it can be used to generate ODA result set data, if not an {@link IllegalStateException}
 	 * will be thrown.
-	 *  
+	 * 
 	 * @param pm The PersistenceManager to use.
 	 * @param script The Script to create the executor for.
 	 * @return A {@link ReportingScriptExecutor} for the given script.
-	 * @throws InstantiationException 
+	 * @throws InstantiationException
 	 */
 	private static ReportingScriptExecutor createReportingScriptExecutor(PersistenceManager pm, Script script) throws InstantiationException
 	{
@@ -193,8 +192,8 @@ s	 */
 	 * @param pm The PersistenceManager to lookup the executor.
 	 * @param scriptRegistryItemID The scriptRegistryItemID that will be delegate to (does the real work).
 	 * @return An {@link IResultSetMetaData} created by the Script referenced by the given scriptRegistryItemID.
-	 * @throws InstantiationException 
-	 * @throws ScriptException 
+	 * @throws InstantiationException
+	 * @throws ScriptException
 	 * @throws ModuleException
 	 */
 	public static IResultSetMetaData getJFSResultSetMetaData(PersistenceManager pm, ScriptRegistryItemID scriptRegistryItemID, JFSQueryPropertySet queryPropertySet) throws ScriptException, InstantiationException
@@ -210,12 +209,12 @@ s	 */
 	 * @param scriptRegistryItemID The scriptRegistryItemID that will be delegate to (does the real work).
 	 * @param parameters The parameters for the script to execute.
 	 * @return An {@link IResultSetMetaData} created by the Script referenced by the given scriptRegistryItemID.
-	 * @throws InstantiationException 
-	 * @throws ScriptException 
+	 * @throws InstantiationException
+	 * @throws ScriptException
 	 * 
 	 * @throws ModuleException
 	 */
-	public static IResultSet getJFSResultSet(PersistenceManager pm, ScriptRegistryItemID scriptRegistryItemID, JFSQueryPropertySet queryPropertySet, Map<String, Object> parameters) 
+	public static IResultSet getJFSResultSet(PersistenceManager pm, ScriptRegistryItemID scriptRegistryItemID, JFSQueryPropertySet queryPropertySet, Map<String, Object> parameters)
 	throws ScriptException, InstantiationException
 	{
 		Script script = getScript(pm, scriptRegistryItemID);
@@ -227,11 +226,11 @@ s	 */
 	}
 	
 	/**
-	 * Returns the parameter metadata of the given JFire Script in the form 
+	 * Returns the parameter metadata of the given JFire Script in the form
 	 * of an ODA runtime interface {@link IParameterMetaData}.
-	 *  
+	 * 
 	 * @param itemID The id of the JFire script.
-	 * @throws JFireReportingOdaException 
+	 * @throws JFireReportingOdaException
 	 */
 	public IParameterMetaData getScriptParameterMetaData(ScriptRegistryItemID itemID)
 	throws JFireReportingOdaException
@@ -245,12 +244,12 @@ s	 */
 	}
 
 	/**
-	 * Returns the parameter metadata of the given JFire Script in the form 
+	 * Returns the parameter metadata of the given JFire Script in the form
 	 * of an ODA runtime interface {@link IParameterMetaData}.
 	 *
 	 * @param pm The PersistenceManager to use.
 	 * @param itemID The id of the JFire script.
-	 * @throws JFireReportingOdaException 
+	 * @throws JFireReportingOdaException
 	 * @throws OdaException
 	 */
 	public static IParameterMetaData getScriptParameterMetaData(PersistenceManager pm, ScriptRegistryItemID itemID) throws JFireReportingOdaException

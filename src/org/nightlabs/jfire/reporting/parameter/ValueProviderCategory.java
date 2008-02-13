@@ -26,7 +26,7 @@ import org.nightlabs.jfire.reporting.parameter.id.ValueProviderCategoryID;
  *
  * @jdo.create-objectid-class field-order="organisationID, valueProviderCategoryID"
  * 
- * @jdo.inheritance strategy = "new-table" 
+ * @jdo.inheritance strategy = "new-table"
  * @jdo.inheritance-discriminator strategy="class-name"
  * 
  * @jdo.fetch-group name="ValueProviderCategory.valueProviders" fetch-groups="default" fields="valueProviders"
@@ -95,7 +95,7 @@ public class ValueProviderCategory implements Serializable, DetachCallback {
 	private Set<ValueProviderCategory> childCategories;
 	
 	/**
-	 * @jdo.field 
+	 * @jdo.field
 	 * 		persistence-modifier="persistent"
 	 * 		mapped-by="valueProviderCategory"
 	 */
@@ -118,11 +118,11 @@ public class ValueProviderCategory implements Serializable, DetachCallback {
 			ValueProviderCategory parent,
 			String organisationID, String valueProviderCategoryID,
 			boolean addToParent
-		) 
+		)
 	{
 		this.organisationID = organisationID;
 		this.valueProviderCategoryID = valueProviderCategoryID;
-		this.valueProviders = new HashSet<ValueProvider>();		
+		this.valueProviders = new HashSet<ValueProvider>();
 		this.name = new ValueProviderCategoryName(this);
 		this.parent = parent;
 		if (parent != null && addToParent)
@@ -209,7 +209,7 @@ public class ValueProviderCategory implements Serializable, DetachCallback {
 	
 	public ValueProviderCategoryID getParentID() {
 		if (parentID == null)
-			parentID = (ValueProviderCategoryID) JDOHelper.getObjectId(parent); 
+			parentID = (ValueProviderCategoryID) JDOHelper.getObjectId(parent);
 		return parentID;
 	}
 	

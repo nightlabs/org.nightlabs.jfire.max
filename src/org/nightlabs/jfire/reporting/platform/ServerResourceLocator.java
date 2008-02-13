@@ -49,7 +49,7 @@ public class ServerResourceLocator extends DefaultResourceLocator implements IRe
 	}
 
 	/**
-	 * Tries to find 
+	 * Tries to find
 	 * <p>
 	 * {@inheritDoc}
 	 * @see org.eclipse.birt.report.model.api.IResourceLocator#findResource(org.eclipse.birt.report.model.api.ModuleHandle, java.lang.String, int)

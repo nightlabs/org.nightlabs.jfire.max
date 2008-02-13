@@ -41,7 +41,7 @@ public class Birt {
 	}
 	
 	/**
-	 * @deprecated do not instantiate this class 
+	 * @deprecated do not instantiate this class
 	 */
 	@Deprecated
 	protected Birt() {}

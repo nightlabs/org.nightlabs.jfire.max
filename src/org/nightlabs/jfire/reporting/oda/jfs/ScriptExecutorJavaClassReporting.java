@@ -8,13 +8,11 @@ import java.util.Map.Entry;
 import org.eclipse.datatools.connectivity.oda.IResultSet;
 import org.eclipse.datatools.connectivity.oda.IResultSetMetaData;
 import org.nightlabs.jfire.reporting.JFireReportingHelper;
-import org.nightlabs.jfire.reporting.oda.server.jfs.ServerJFSQueryProxy;
 import org.nightlabs.jfire.scripting.Script;
 import org.nightlabs.jfire.scripting.ScriptException;
 import org.nightlabs.jfire.scripting.ScriptExecutorJavaClass;
 import org.nightlabs.jfire.scripting.ScriptExecutorJavaClassDelegate;
 import org.nightlabs.jfire.scripting.ScriptParameterSet;
-import org.nightlabs.jfire.scripting.ScriptRegistry;
 
 /**
  * When JFireReporting is deployed this class is registered to the {@link ScriptRegistry}
@@ -26,9 +24,9 @@ import org.nightlabs.jfire.scripting.ScriptRegistry;
  * @author Alexander Bieber <alex [AT] nightlabs [DOT] de>
  *
  */
-public class ScriptExecutorJavaClassReporting 
-extends ScriptExecutorJavaClass 
-implements ReportingScriptExecutor 
+public class ScriptExecutorJavaClassReporting
+extends ScriptExecutorJavaClass
+implements ReportingScriptExecutor
 {
 
 	/**
@@ -60,9 +58,9 @@ implements ReportingScriptExecutor
 	/**
 	 * {@inheritDoc}
 	 * <p>
-	 * This implementation will first fake the params for the delegate, meaning it will put 
+	 * This implementation will first fake the params for the delegate, meaning it will put
 	 * itself(this) as value for all required parameters, in order to be able to prepare
-	 * the script. The script meeds to be prepared as {@link #getDelegate()} will 
+	 * the script. The script meeds to be prepared as {@link #getDelegate()} will
 	 * throw an IllegalStateException if not.
 	 * <p>
 	 * After preparation the {@link ScriptExecutorJavaClassReportingDelegate#getResultSetMetaData()}
@@ -124,7 +122,7 @@ implements ReportingScriptExecutor
 	 * It will check if it either finds {@link JFSParameterUtil#DUMMY_DEFAULT_PARAMETER_VALUE} or a serialized
 	 * Object parameter.
 	 * 
-	 * @param parameters The parameters to convert. 
+	 * @param parameters The parameters to convert.
 	 * @return The converted parameters.
 	 */
 	protected Map<String, Object> convertParameters(Map<String, Object> parameters) {

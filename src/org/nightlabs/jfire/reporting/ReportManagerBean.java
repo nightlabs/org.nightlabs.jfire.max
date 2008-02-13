@@ -54,7 +54,6 @@ import org.eclipse.birt.report.engine.api.EngineConfig;
 import org.eclipse.datatools.connectivity.oda.IParameterMetaData;
 import org.eclipse.datatools.connectivity.oda.IResultSet;
 import org.eclipse.datatools.connectivity.oda.IResultSetMetaData;
-import org.nightlabs.ModuleException;
 import org.nightlabs.jdo.NLJDOHelper;
 import org.nightlabs.jdo.moduleregistry.ModuleMetaData;
 import org.nightlabs.jfire.base.BaseSessionBeanImpl;
@@ -102,9 +101,9 @@ import org.nightlabs.version.MalformedVersionException;
  * TODO: Unify method names for ResultSet and ResultSetMetaData getter (also in Dirvers, and Queries)
  * @author Alexander Bieber <alex[AT]nightlabs[DOT]de>
  * 
- * @ejb.bean name="jfire/ejb/JFireReporting/ReportManager"	
+ * @ejb.bean name="jfire/ejb/JFireReporting/ReportManager"
  *					 jndi-name="jfire/ejb/JFireReporting/ReportManager"
- *					 type="Stateless" 
+ *					 type="Stateless"
  *					 transaction-type="Container"
  *
  * @ejb.util generate="physical"
@@ -139,7 +138,7 @@ implements SessionBean
 	
 	/**
 	 * @ejb.create-method
-	 * @ejb.permission role-name="_Guest_"	
+	 * @ejb.permission role-name="_Guest_"
 	 */
 	public void ejbCreate() throws CreateException
 	{
@@ -153,12 +152,12 @@ implements SessionBean
 	
 	
 	@SuppressWarnings("unchecked")
-	private void initRegisterConfigModules(PersistenceManager pm) 
+	private void initRegisterConfigModules(PersistenceManager pm)
 	{
 		// Register all Reporing config-Modules
 		ConfigSetup configSetup = ConfigSetup.getConfigSetup(
-				pm, 
-				getOrganisationID(), 
+				pm,
+				getOrganisationID(),
 				UserConfigSetup.CONFIG_SETUP_TYPE_USER
 			);
 		configSetup.getConfigModuleClasses().add(ReportLayoutConfigModule.class.getName());
@@ -183,7 +182,7 @@ implements SessionBean
 //			logger.info("Persisting default layout for "+catType);
 //			pm.makePersistent(layout);
 //			logger.info("Persisting default layout for "+catType+" ...  DONE");
-//			
+//
 //			Collection configs = Config.getConfigsByType(pm, getOrganisationID(), UserConfigSetup.CONFIG_TYPE_USER_CONFIG);
 //			for (Iterator iter = configs.iterator(); iter.hasNext();) {
 //				Config config = (Config) iter.next();
@@ -196,8 +195,8 @@ implements SessionBean
 //		}
 //	}
 	
-//	private void initRegisterCategoriesAndLayouts(PersistenceManager pm, JFireServerManager jfireServerManager) 
-//	throws ModuleException 
+//	private void initRegisterCategoriesAndLayouts(PersistenceManager pm, JFireServerManager jfireServerManager)
+//	throws ModuleException
 //	{
 //		// TODO: Init report categories and layouts like spcripting
 //		File earDir = new File(
@@ -205,8 +204,8 @@ implements SessionBean
 //				.getJ2ee().getJ2eeDeployBaseDirectory()+
 //				"JFireReporting.ear"
 //			);
-//		
-////		 Register internal report categories if not existent			
+//
+////		 Register internal report categories if not existent
 //		ReportCategory offerCat = ReportCategory.getReportCategory(
 //				pm,
 //				getOrganisationID(),
@@ -231,8 +230,8 @@ implements SessionBean
 //				"Standard Angebots-Vorlage",
 //				"Default offer layout"
 //			);
-//		
-//		
+//
+//
 //		ReportCategory orderCat = ReportCategory.getReportCategory(
 //				pm,
 //				getOrganisationID(),
@@ -250,7 +249,7 @@ implements SessionBean
 //			orderCat.getName().setText(Locale.GERMAN.getLanguage(), "Auftrags-Vorlagen");
 //			pm.makePersistent(orderCat);
 //		}
-//		
+//
 //		initDefaultCatReportLayout(
 //				pm,
 //				orderCat,
@@ -259,8 +258,8 @@ implements SessionBean
 //				"Standard Auftrags-Vorlage",
 //				"Default order layout"
 //			);
-//		
-//		
+//
+//
 //		ReportCategory invoiceCat = ReportCategory.getReportCategory(
 //				pm,
 //				getOrganisationID(),
@@ -278,7 +277,7 @@ implements SessionBean
 //			invoiceCat.getName().setText(Locale.GERMAN.getLanguage(), "Rechnungs-Vorlagen");
 //			pm.makePersistent(invoiceCat);
 //		}
-//		
+//
 //		initDefaultCatReportLayout(
 //				pm,
 //				invoiceCat,
@@ -287,8 +286,8 @@ implements SessionBean
 //				"Standard Rechnungs-Vorlage",
 //				"Default invoice layout"
 //			);
-//		
-//		
+//
+//
 //		ReportCategory deliveryNoteCat = ReportCategory.getReportCategory(
 //				pm,
 //				getOrganisationID(),
@@ -306,7 +305,7 @@ implements SessionBean
 //			deliveryNoteCat.getName().setText(Locale.GERMAN.getLanguage(), "Lieferschein-Vorlagen");
 //			pm.makePersistent(deliveryNoteCat);
 //		}
-//		
+//
 //		initDefaultCatReportLayout(
 //				pm,
 //				deliveryNoteCat,
@@ -315,8 +314,8 @@ implements SessionBean
 //				"Standard Lieferschein-Vorlage",
 //				"Default deliverynote layout"
 //			);
-//		
-//		
+//
+//
 //		ReportCategory generalCat = ReportCategory.getReportCategory(
 //				pm,
 //				getOrganisationID(),
@@ -334,7 +333,7 @@ implements SessionBean
 //			generalCat.getName().setText(Locale.GERMAN.getLanguage(), "Allgemein");
 //			pm.makePersistent(generalCat);
 //		}
-//		
+//
 //		initDefaultCatReportLayout(
 //				pm,
 //				generalCat,
@@ -345,25 +344,25 @@ implements SessionBean
 //			);
 //	}
 	
-	private void initRegisterScripts(PersistenceManager pm, JFireServerManager jfireServerManager) throws InstantiationException, IllegalAccessException 
+	private void initRegisterScripts(PersistenceManager pm, JFireServerManager jfireServerManager) throws InstantiationException, IllegalAccessException
 	{
 		ScriptRegistry.getScriptRegistry(pm).registerScriptExecutorClass(ScriptExecutorJavaClassReporting.class);
 	}
 	
 	/**
 	 * This method is called by the datastore initialization mechanism.
-	 * @throws IllegalAccessException 
-	 * @throws InstantiationException 
-	 * @throws MalformedVersionException 
-	 * @throws ScriptingIntialiserException 
-	 * @throws ModuleException 
+	 * @throws IllegalAccessException
+	 * @throws InstantiationException
+	 * @throws MalformedVersionException
+	 * @throws ScriptingIntialiserException
+	 * @throws ModuleException
 	 * @throws ModuleException
 	 *
 	 * @ejb.interface-method
 	 * @ejb.permission role-name="_System_"
 	 * @ejb.transaction type="Required"
 	 */
-	public void initialise() throws InstantiationException, IllegalAccessException, MalformedVersionException, ScriptingIntialiserException 
+	public void initialise() throws InstantiationException, IllegalAccessException, MalformedVersionException, ScriptingIntialiserException
 	{
 		// TODO: Better check if platform initialized. Propose on birt forum.
 		if (false) {
@@ -371,16 +370,16 @@ implements SessionBean
 			try {
 				try {
  
-					ServerPlatformContext platformContext = new ServerPlatformContext();					
+					ServerPlatformContext platformContext = new ServerPlatformContext();
 					System.setProperty(Platform.PROPERTY_BIRT_HOME, platformContext.getPlatform());
 					EngineConfig config = new EngineConfig();
 					config.setEngineHome(platformContext.getPlatform());
-					config.setLogConfig(platformContext.getPlatform(), java.util.logging.Level.ALL);					
+					config.setLogConfig(platformContext.getPlatform(), java.util.logging.Level.ALL);
 					
 					config.setPlatformContext(platformContext);
 					Platform.startup(config);
 //					Platform.initialize(platformContext);
-				} catch (Throwable t) {			
+				} catch (Throwable t) {
 					logger.log(Level.ERROR, "Initializing BIRT Platform failed!", t);
 				}
 			} finally {
@@ -448,7 +447,7 @@ implements SessionBean
 	
 	protected void initialiseCleanupRenderedReportLayoutFoldersTask(PersistenceManager pm) {
 		TaskID taskID = TaskID.create(
-				getOrganisationID(), 
+				getOrganisationID(),
 				Task.TASK_TYPE_ID_SYSTEM,
 				ReportLayoutRendererUtil.class.getSimpleName()+"#cleanupRenderedReportLayoutFolders"
 		);
@@ -480,10 +479,10 @@ implements SessionBean
 				"15"); // minute
 		} catch (TimePatternFormatException e) {
 			throw new RuntimeException(e);
-		} 
+		}
 
 		task.setEnabled(true);
-		pm.makePersistent(task);		
+		pm.makePersistent(task);
 	}
 	
 	/**
@@ -500,10 +499,10 @@ implements SessionBean
 		} finally {
 			pm.close();
 		}
-	}	
+	}
 	
 	/**
-	 * @throws ModuleException 
+	 * @throws ModuleException
 	 * @throws ModuleException
 	 *
 	 * @ejb.interface-method
@@ -511,17 +510,17 @@ implements SessionBean
 	 * @ejb.transaction type="Never"
 	 */
 	public IResultSet fetchJDOQLResultSet(
-			String queryText, 
+			String queryText,
 			Map parameters,
 			JDOQLResultSetMetaData metaData
-		) 
+		)
 	{
 		PersistenceManager pm = getPersistenceManager();
 		try {
 			return ServerJDOQLProxy.executeQuery(
 					pm,
-					queryText, 
-					parameters, 
+					queryText,
+					parameters,
 					metaData,
 					true,
 					new String[] {FetchPlan.ALL}
@@ -538,7 +537,7 @@ implements SessionBean
 	 * @ejb.permission role-name="_Guest_"
 	 * @ejb.transaction type="Required"
 	 */
-	public JDOQLResultSetMetaData getQueryMetaData(String organisationID, String queryText) 
+	public JDOQLResultSetMetaData getQueryMetaData(String organisationID, String queryText)
 	{
 		return JDOQLMetaDataParser.parseJDOQLMetaData(queryText);
 	}
@@ -566,7 +565,7 @@ implements SessionBean
 	 * @ejb.transaction type="Never"
 	 */
 	public JDOJSResultSet fetchJDOJSResultSet(
-			JDOJSResultSetMetaData metaData, 
+			JDOJSResultSetMetaData metaData,
 			String prepareScript,
 			Map<String, Object> parameters
 		)
@@ -575,7 +574,7 @@ implements SessionBean
 		try {
 			return ServerJDOJSProxy.fetchJDOJSResultSet(
 					pm,
-					metaData, 
+					metaData,
 					prepareScript,
 					parameters
 				);
@@ -585,8 +584,8 @@ implements SessionBean
 	}
 	
 	/**
-	 * @throws InstantiationException 
-	 * @throws ScriptException 
+	 * @throws InstantiationException
+	 * @throws ScriptException
 	 *
 	 * @ejb.interface-method
 	 * @ejb.permission role-name="_Guest_"
@@ -603,8 +602,8 @@ implements SessionBean
 	}
 	
 	/**
-	 * @throws InstantiationException 
-	 * @throws ScriptException 
+	 * @throws InstantiationException
+	 * @throws ScriptException
 	 *
 	 * @ejb.interface-method
 	 * @ejb.permission role-name="_Guest_"
@@ -630,7 +629,7 @@ implements SessionBean
 	
 	/**
 	 *
-	 * @throws JFireReportingOdaException 
+	 * @throws JFireReportingOdaException
 	 * @ejb.interface-method
 	 * @ejb.permission role-name="_Guest_"
 	 * @ejb.transaction type="Never"
@@ -652,7 +651,7 @@ implements SessionBean
 	
 	
 	/**
-	 * Returns the {@link ReportRegistryItem} with the given id. 
+	 * Returns the {@link ReportRegistryItem} with the given id.
 	 * It will be detached with the given fetch-groups and fetch-depth.
 	 * 
 	 * @param reportRegistryItemID The id of the {@link ReportRegistryItem} to fetch.
@@ -735,7 +734,7 @@ implements SessionBean
 		try {
 			ReportRegistryItem item = (ReportRegistryItem) pm.getObjectById(reportRegistryItemID);
 			if (item instanceof ReportCategory) {
-				return new ArrayList<ReportRegistryItemID>(ReportRegistryItem.getReportRegistryItemIDsForParent(pm, (ReportCategory) item));				
+				return new ArrayList<ReportRegistryItemID>(ReportRegistryItem.getReportRegistryItemIDsForParent(pm, (ReportCategory) item));
 			} else {
 				// only ReportCategorys can have children
 				return Collections.emptyList();
@@ -886,7 +885,7 @@ implements SessionBean
 	 * @ejb.permission role-name="_Guest_"
 	 * @ejb.transaction type="Never"
 	 */
-	public RenderedReportLayout renderReportLayout(RenderReportRequest renderReportRequest) 
+	public RenderedReportLayout renderReportLayout(RenderReportRequest renderReportRequest)
 	throws NamingException, RenderReportException
 	{
 		PersistenceManager pm;
@@ -949,7 +948,7 @@ implements SessionBean
 	 */
 	@SuppressWarnings("unchecked")
 	public Collection<ReportLayoutLocalisationData> getReportLayoutLocalisationBundle(
-			ReportRegistryItemID reportLayoutID, 
+			ReportRegistryItemID reportLayoutID,
 			String[] fetchGroups, int maxFetchDepth
 		)
 	{
@@ -1011,5 +1010,5 @@ implements SessionBean
 		} finally {
 			pm.close();
 		}
-	}	
+	}
 }

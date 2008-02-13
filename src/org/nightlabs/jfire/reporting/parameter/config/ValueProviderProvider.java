@@ -17,7 +17,7 @@ public interface ValueProviderProvider {
 	/**
 	 * Returns the {@link ValueProvider} that is referenced by the given valueProviderConfig.
 	 * 
-	 * @param valueProviderConfig The {@link ValueProviderConfig} to search the {@link ValueProvider} for.	 * 
+	 * @param valueProviderConfig The {@link ValueProviderConfig} to search the {@link ValueProvider} for.	 *
 	 * @return The {@link ValueProvider} that is referenced by the given valueProviderConfig.
 	 */
 	ValueProvider getValueProvider(ValueProviderConfig valueProviderConfig);

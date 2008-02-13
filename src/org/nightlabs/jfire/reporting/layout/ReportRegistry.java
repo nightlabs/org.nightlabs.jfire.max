@@ -31,7 +31,6 @@ import java.util.Map;
 
 import javax.jdo.PersistenceManager;
 
-import org.nightlabs.jfire.reporting.Birt;
 import org.nightlabs.jfire.reporting.Birt.OutputFormat;
 import org.nightlabs.jfire.reporting.layout.id.ReportRegistryID;
 import org.nightlabs.jfire.reporting.layout.render.ReportLayoutRenderer;
@@ -66,7 +65,7 @@ public class ReportRegistry {
 	
 	// TODO: Change to use IDGenerator.
 	/**
-	 * @jdo.field persistence-modifier="persistent"  
+	 * @jdo.field persistence-modifier="persistent"
 	 */
 	private long newReportItemID = 0;
 	
@@ -107,15 +106,15 @@ public class ReportRegistry {
 	}
 	
 	/**
-	 * Register the given ReportRender class to a Birt OutputFormat. 
+	 * Register the given ReportRender class to a Birt OutputFormat.
 	 * The ReportLayoutRenderer will be instantiated and asked for the format.
 	 * 
 	 * @param clazz The class to register.
 	 * @throws InstantiationException When instantiating fails.
 	 * @throws IllegalAccessException When instantiating fails.
 	 */
-	public void registerReportRenderer(Class clazz) 
-	throws InstantiationException, IllegalAccessException 
+	public void registerReportRenderer(Class clazz)
+	throws InstantiationException, IllegalAccessException
 	{
 		if (!ReportLayoutRenderer.class.isAssignableFrom(clazz))
 			throw new ClassCastException("Class " + clazz.getName() + " does not implement " + ReportLayoutRenderer.class.getName());
@@ -165,7 +164,7 @@ public class ReportRegistry {
 	 * Creates a new instance of the {@link ReportLayoutRenderer} implementation registered
 	 * to the given format and returns it.
 	 * 
-	 * @param format The format the renderer should be searched for. 
+	 * @param format The format the renderer should be searched for.
 	 * @return A new instance of the registered {@link ReportLayoutRenderer}
 	 * @throws IllegalArgumentException When no registration could be found.
 	 * @throws ClassNotFoundException When the registered class could not be found.
@@ -176,11 +175,11 @@ public class ReportRegistry {
 	throws IllegalArgumentException, ClassNotFoundException, InstantiationException, IllegalAccessException
 	{
 		return (ReportLayoutRenderer) getReportRendererClass(format, true).newInstance();
-	}	
+	}
 
 	/**
 	 * Returns the current newReportCategoryID
-	 * before incrementing it by one. Equivalent to 
+	 * before incrementing it by one. Equivalent to
 	 * <code>newReportCategoryID++</code>
 	 */
 	public long createNewReportItemID() {
@@ -193,13 +192,13 @@ public class ReportRegistry {
 	
 
 	public static final int SINGLETON_REGISTRY_ID = 0;
-	public static final ReportRegistryID SINGLETON_ID = ReportRegistryID.create(SINGLETON_REGISTRY_ID); 
+	public static final ReportRegistryID SINGLETON_ID = ReportRegistryID.create(SINGLETON_REGISTRY_ID);
 	
 	public static ReportRegistry getReportRegistry(PersistenceManager pm) {
 		Iterator it = pm.getExtent(ReportRegistry.class).iterator();
 		ReportRegistry registry;
 		if (it.hasNext()) {
-			registry = (ReportRegistry)it.next(); 
+			registry = (ReportRegistry)it.next();
 		}
 		else {
 			registry = new ReportRegistry(SINGLETON_REGISTRY_ID);

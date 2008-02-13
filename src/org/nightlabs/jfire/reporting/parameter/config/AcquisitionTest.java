@@ -141,7 +141,7 @@ public class AcquisitionTest {
 	
 	public SortedMap<Integer, List<ValueProviderConfig>> createAcquisitionSequence(
 			ValueAcquisitionSetup setup, ValueProviderProvider provider
-		) 
+		)
 	{
 		List<AcquisitionParameterConfig> parameterConfigs = setup.getParameterConfigs();
 		int levelOffset = 0;
@@ -149,7 +149,7 @@ public class AcquisitionTest {
 		for (AcquisitionParameterConfig parameterConfig : parameterConfigs) {
 			resolveProviderLevel(setup, provider, parameterConfig, levels, levelOffset);
 			for (Integer rLevel : levels.keySet()) {
-				levelOffset = Math.max(levelOffset, rLevel);				
+				levelOffset = Math.max(levelOffset, rLevel);
 			}
 			levelOffset ++;
 		}
@@ -172,10 +172,10 @@ public class AcquisitionTest {
 	}
 	
 	public void resolveProviderLevel(
-			ValueAcquisitionSetup setup, ValueProviderProvider provider, 
-			ValueConsumer consumer, 
+			ValueAcquisitionSetup setup, ValueProviderProvider provider,
+			ValueConsumer consumer,
 			Map<Integer, List<ValueProviderConfig>> levels, int level
-		) 
+		)
 	{
 		if (consumer instanceof AcquisitionParameterConfig) {
 			AcquisitionParameterConfig parameterConfig = (AcquisitionParameterConfig) consumer;
@@ -197,14 +197,14 @@ public class AcquisitionTest {
 				resolveProviderLevel(setup, provider, binding.getProvider(), levels, (level+1));
 			}
 		}
-		else 
+		else
 			throw new IllegalStateException("resolveProviderLevel called with unknown consumer type: "+consumer.getClass().getName());
 	}
 	
 	private void addToLevel(int level, Map<Integer, List<ValueProviderConfig>> levels, ValueProviderConfig providerConfig) {
 		Integer l = new Integer(level);
 		List<ValueProviderConfig> configs = levels.get(l);
-		if (configs == null) { 
+		if (configs == null) {
 			configs = new LinkedList<ValueProviderConfig>();
 			levels.put(l, configs);
 		}

@@ -33,7 +33,7 @@ import org.nightlabs.progress.ProgressMonitor;
  *
  */
 public class ReportParameterAcquisitionSetupDAO
-extends BaseJDOObjectDAO<ReportParameterAcquisitionSetupID, ReportParameterAcquisitionSetup> 
+extends BaseJDOObjectDAO<ReportParameterAcquisitionSetupID, ReportParameterAcquisitionSetup>
 {
 
 	public static final String[] DEFAULT_FETCH_GROUPS = new String[] {
@@ -63,7 +63,7 @@ extends BaseJDOObjectDAO<ReportParameterAcquisitionSetupID, ReportParameterAcqui
 			Set<ReportParameterAcquisitionSetupID> objectIDs,
 			String[] fetchGroups, int maxFetchDepth, ProgressMonitor monitor
 		)
-		throws Exception 
+		throws Exception
 	{
 		ReportParameterManager rpm = ReportParameterManagerUtil.getHome(SecurityReflector.getInitialContextProperties()).create();
 		return rpm.getReportParameterAcquisitionSetups(objectIDs, fetchGroups, maxFetchDepth);
@@ -74,11 +74,11 @@ extends BaseJDOObjectDAO<ReportParameterAcquisitionSetupID, ReportParameterAcqui
 			ReportRegistryItemID reportLayoutID,
 			String[] fetchGroups,
 			ProgressMonitor monitor
-		) 
-	throws RemoteException, CreateException, NamingException, ModuleException 
+		)
+	throws RemoteException, CreateException, NamingException, ModuleException
 	{
 		Set<ReportRegistryItemID> itemIDs = new HashSet<ReportRegistryItemID>(1);
-		itemIDs.add(reportLayoutID);		
+		itemIDs.add(reportLayoutID);
 		ReportParameterManager rpm = ReportParameterManagerUtil.getHome(SecurityReflector.getInitialContextProperties()).create();
 		Map<ReportRegistryItemID, ReportParameterAcquisitionSetupID> ids = rpm.getReportParameterAcquisitionSetupIDs(itemIDs);
 		ReportParameterAcquisitionSetupID setupID = ids.get(reportLayoutID);

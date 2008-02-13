@@ -30,7 +30,7 @@ import java.util.Set;
 
 /**
  * Interface for nestable registry items like (ReportCategory).
- *  
+ * 
  * @author Alexander Bieber <alex[AT]nightlabs[DOT]de>
  *
  */

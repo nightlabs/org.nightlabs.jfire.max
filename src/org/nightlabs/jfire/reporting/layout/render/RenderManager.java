@@ -90,7 +90,7 @@ public class RenderManager {
 
 	/**
 	 * Lets BIRT render the given report with the given params in the given format.
-	 * The report will be rendered into the default temporary folder for 
+	 * The report will be rendered into the default temporary folder for
 	 * rendered report layouts. See {@link ReportLayoutRendererUtil#prepareRenderedLayoutOutputFolder()}.
 	 * Also it will set the entry file-name of the report to "renderedReport".
 	 *
@@ -123,7 +123,7 @@ public class RenderManager {
 			String fileName,
 			File layoutRoot,
 			boolean prepareForTransfer
-		) 
+		)
 	throws RenderReportException
 	{
 		ReportLayout reportLayout = null;
@@ -160,7 +160,7 @@ public class RenderManager {
 			IRunAndRenderTask task = reportEngine.createRunAndRenderTask(report);
 			
 			Locale locale = Locale.getDefault();
-			if (renderRequest.getLocale() != null)				
+			if (renderRequest.getLocale() != null)
 				locale = renderRequest.getLocale();
 			else {
 				// TODO: Add the users locale
@@ -171,7 +171,7 @@ public class RenderManager {
 			if (logger.isDebugEnabled())
 				logger.debug("Creating ReportLayoutRenderer");
 			ReportRegistry registry = ReportRegistry.getReportRegistry(pm);
-			ReportLayoutRenderer renderer = null; 
+			ReportLayoutRenderer renderer = null;
 			try {
 				renderer = registry.createReportRenderer(renderRequest.getOutputFormat());
 			} catch (Exception e) {
@@ -224,7 +224,7 @@ public class RenderManager {
 			return result;
 
 		IGetParameterDefinitionTask task = engine.createGetParameterDefinitionTask(report);
-		// TODO: find alternative to deprecated getParameterDefns 
+		// TODO: find alternative to deprecated getParameterDefns
 		Collection params = task.getParameterDefns(false);
 	
 		for (Iterator iterator = values.keySet().iterator(); iterator.hasNext();) {
@@ -252,7 +252,7 @@ public class RenderManager {
 			result.put(name, value);
 		}
 		return result;
-	}	
+	}
 	
 }
 

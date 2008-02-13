@@ -39,9 +39,9 @@ import org.nightlabs.jfire.reporting.oda.ResultSetMetaData;
  * @author Alexander Bieber <alex[AT]nightlabs[DOT]de>
  *
  */
-public class JDOQLResultSetMetaData 
-extends ResultSetMetaData 
-implements IJDOQLQueryMetaData 
+public class JDOQLResultSetMetaData
+extends ResultSetMetaData
+implements IJDOQLQueryMetaData
 {
 	
 	private static final long serialVersionUID = 1L;
@@ -60,7 +60,7 @@ implements IJDOQLQueryMetaData
 	 * @param colNames
 	 * @param collection
 	 */
-	public void setCollectionMetaData(List colNames, Collection collection) {		
+	public void setCollectionMetaData(List colNames, Collection collection) {
 	}
 
 	/**
@@ -79,8 +79,8 @@ implements IJDOQLQueryMetaData
 			try {
 				for (int i = 0; i < metaData.getColumnCount(); i++) {
 					setColumn(
-						i+1, 
-						metaData.getColumnName(i+1), 
+						i+1,
+						metaData.getColumnName(i+1),
 						metaData.getColumnType(i+1),
 						java.sql.ResultSetMetaData.columnNullable
 						
@@ -89,7 +89,7 @@ implements IJDOQLQueryMetaData
 			} catch (OdaException e) {
 				throw new RuntimeException(e);
 			}
-		} 
+		}
 		else {
 			Object o = it.next();
 			List row = null;

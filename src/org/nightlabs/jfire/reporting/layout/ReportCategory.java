@@ -34,7 +34,7 @@ import javax.jdo.Query;
 
 
 /**
- * ReportCategories are used to organise reports on the server. 
+ * ReportCategories are used to organise reports on the server.
  * The JFire sytem itself uses internal categories to organise
  * report-layouts for invoices, orders etc.
  * 
@@ -57,7 +57,7 @@ import javax.jdo.Query;
  *	name="getReportCategory"
  *	query="SELECT UNIQUE
  *		WHERE this.organisationID == paramOrganisationID &&
- *           this.reportRegistryItemType == paramCategoryType            
+ *           this.reportRegistryItemType == paramCategoryType
  *		PARAMETERS String paramOrganisationID, String paramCategoryType
  *		import java.lang.String"
  * 
@@ -73,13 +73,13 @@ public class ReportCategory extends ReportRegistryItem implements NestableReport
 	
 	public static final String QUERY_GET_REPORT_CATEGORY = "getReportCategory";
 	
-	// TODO: Would be great to have recursion depth here and for ReportRegistryItem.parentItem when thinking of caching in client 
+	// TODO: Would be great to have recursion depth here and for ReportRegistryItem.parentItem when thinking of caching in client
 	public static final String FETCH_GROUP_CHILD_ITEMS = "ReportCategory.childItems";
 	public static final String FETCH_GROUP_THIS_REPORT_CATEGORY = "ReportCategory.this";
 	
 	
 	/**
-	 * Serial version UID. Don't forget to change when changing members. 
+	 * Serial version UID. Don't forget to change when changing members.
 	 */
 	private static final long serialVersionUID = 1L;
 	
@@ -98,7 +98,7 @@ public class ReportCategory extends ReportRegistryItem implements NestableReport
 	 *		mapped-by="parentCategory"
 	 *		dependent-element="true"
 	 */
-	private Set<ReportRegistryItem> childItems;	
+	private Set<ReportRegistryItem> childItems;
 
 	/**
 	 * Create a new {@link ReportCategory} wth the given parent and primary key fields.
@@ -107,7 +107,7 @@ public class ReportCategory extends ReportRegistryItem implements NestableReport
 	 * @param organisationID The orgaisatoinID.
 	 * @param reportRegistryItemType The reportRegistryItemType.
 	 * @param reportRegistryItemID The reportRegistryItemID.
-	 * @param internal Whether the new cateory is for internal use of the system. 
+	 * @param internal Whether the new cateory is for internal use of the system.
 	 */
 	public ReportCategory(
 			ReportCategory parentCategory,
@@ -121,7 +121,7 @@ public class ReportCategory extends ReportRegistryItem implements NestableReport
 		if (parentCategory != null)
 			this.internal = parentCategory.isInternal();
 		else
-			this.internal = internal;		
+			this.internal = internal;
 		this.childItems = new HashSet<ReportRegistryItem>();
 	}
 	
@@ -133,10 +133,10 @@ public class ReportCategory extends ReportRegistryItem implements NestableReport
 	
 
 	public static ReportCategory getReportCategory(
-			PersistenceManager pm, 
+			PersistenceManager pm,
 			String organisationID,
 			String categoryType
-		) 
+		)
 	{
 		Query q = pm.newNamedQuery(ReportCategory.class, QUERY_GET_REPORT_CATEGORY);
 		return (ReportCategory)q.execute(organisationID, categoryType);

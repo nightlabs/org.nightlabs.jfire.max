@@ -36,10 +36,8 @@ import javax.jdo.JDOObjectNotFoundException;
 import javax.jdo.PersistenceManager;
 
 import org.apache.log4j.Logger;
-import org.eclipse.datatools.connectivity.oda.IQuery;
 import org.nightlabs.jdo.ObjectID;
 import org.nightlabs.jdo.ObjectIDUtil;
-import org.nightlabs.jfire.reporting.layout.render.RenderManager;
 import org.nightlabs.jfire.reporting.oda.jfs.JFSParameterUtil;
 
 import com.thoughtworks.xstream.XStream;
@@ -53,7 +51,7 @@ import com.thoughtworks.xstream.io.xml.XppDriver;
  * the {@link RenderManager} prior to the rendering of reports.
  * <p>
  * Additionally it serves as a storage for global report values
- * that are also accessible for the ODA drivers. 
+ * that are also accessible for the ODA drivers.
  * 
  * @author Alexander Bieber <!-- alex [AT] nightlabs [DOT] de -->
  *
@@ -66,11 +64,11 @@ public class JFireReportingHelper {
 	private static Logger logger = Logger.getLogger(JFireReportingHelper.class);
 	
 	/**
-	 * Private class that keeps the helper per thread. 
+	 * Private class that keeps the helper per thread.
 	 */
 	private static class Helper {
 		private boolean closePM;
-		private PersistenceManager pm;		
+		private PersistenceManager pm;
 		private Map<String, Object> vars = new HashMap<String, Object>();
 		private Map<String, Object> parameters = new HashMap<String, Object>();
 		private Locale locale;
@@ -125,14 +123,14 @@ public class JFireReportingHelper {
 	
 	
 	/**
-	 * Protected constructor. Class is for static use. 
+	 * Protected constructor. Class is for static use.
 	 */
 	protected JFireReportingHelper() {
 	}
 
 	/**
 	 * Open (re-initialize) the helper associated to the current
-	 * thread (currently rendered report). 
+	 * thread (currently rendered report).
 	 * <p>
 	 * Do not call this method direcly, it is called by the {@link RenderManager}.+
 	 * 
@@ -179,7 +177,7 @@ public class JFireReportingHelper {
 	
 	/**
 	 * Get the map of all named variables associated to the current thread
-	 * (execution of the current report). 
+	 * (execution of the current report).
 	 * 
 	 * @return The map of all named variables associated to the current thread
 	 * (execution of the current report).
@@ -204,7 +202,7 @@ public class JFireReportingHelper {
 	 * Report developers are advised to access the parameters via this method
 	 * and not the BIRT via params[name], because accessing java methods of
 	 * that value will fail.
-	 * </p> 
+	 * </p>
 	 * @return The parameter with the given name for the currently running report.
 	 * @see #getParameters()
 	 */
@@ -224,9 +222,9 @@ public class JFireReportingHelper {
 	 * Returns the JDO object with the given jdo id. Assumes that the given
 	 * {@link String} parameter is the string representation of an {@link ObjectID}
 	 * and tries to get this Object from the datastore.
-	 *  
-	 * @param jdoIDString The {@link String} representation of the {@link ObjectID} of the object to retrieve.	 * 
-	 * @return The persistent object of with the given id or null if this can not be found. 
+	 * 
+	 * @param jdoIDString The {@link String} representation of the {@link ObjectID} of the object to retrieve.	 *
+	 * @return The persistent object of with the given id or null if this can not be found.
 	 */
 	public static Object getJDOObject(String jdoIDString) {
 		ObjectID id = ObjectIDUtil.createObjectID(jdoIDString);
@@ -245,11 +243,11 @@ public class JFireReportingHelper {
 	
 	/**
 	 * Creates a String representation of the given object that
-	 * can be used as parameter for JFS data sets.  
+	 * can be used as parameter for JFS data sets.
 	 * <p>
 	 * Currently, the XStream serializer is used for this purpose.
 	 * </p>
-	 * @param obj The object to serialize and 
+	 * @param obj The object to serialize and
 	 * @return A String serialization of the given object.
 	 */
 	public static String createDataSetParam(Object obj) {
@@ -270,7 +268,7 @@ public class JFireReportingHelper {
 	 * This method then checks whether the parameter was serialized using the
 	 * {@link #createDataSetParam(Object)} method and returns the appropriate
 	 * de-serialized object than. Otherwise it will return the object as
-	 * it is passed (i.e. passing <code>null</code> will return <code>null</code> as well). 
+	 * it is passed (i.e. passing <code>null</code> will return <code>null</code> as well).
 	 * </p>
 	 * @param obj The data set parameter.
 	 * @return The data set parameter either de-serialized to the object it originally was or as passed to this method.
@@ -287,7 +285,7 @@ public class JFireReportingHelper {
 			XStream xStream = new XStream(new XppDriver());
 			return xStream.fromXML(stripped);
 		} else
-			return obj;			
+			return obj;
 	}
 	
 	/**
@@ -298,7 +296,7 @@ public class JFireReportingHelper {
 	/**
 	 * Returns the given Sting with all occurrences of the Pattern \r?\n with &lt;br/&gt;.
 	 * 
-	 * @param str The String to replace the linebreaks in. 
+	 * @param str The String to replace the linebreaks in.
 	 * @return The given Sting with all occurrences of the Pattern \r?\n with &lt;br/&gt;.
 	 */
 	public static String setBRLineBreaks(String str) {
@@ -308,7 +306,7 @@ public class JFireReportingHelper {
 	}
 
 	/**
-	 * Returns the Log4J Logger of {@link JFireReportingHelper}. 
+	 * Returns the Log4J Logger of {@link JFireReportingHelper}.
 	 * @return The Log4J Logger of {@link JFireReportingHelper}.
 	 */
 	public static Logger getLogger() {

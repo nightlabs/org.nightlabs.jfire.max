@@ -66,7 +66,7 @@ public class ReportParameterAcquisitionUseCaseDescription extends I18nText imple
 	/**
 	 * @jdo.field primary-key="true"
 	 */
-	private long reportParameterAcquisitionSetupID;	
+	private long reportParameterAcquisitionSetupID;
 	
 	/**
 	 * @jdo.field primary-key="true"

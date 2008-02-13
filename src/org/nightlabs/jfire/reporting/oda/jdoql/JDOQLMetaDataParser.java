@@ -38,7 +38,7 @@ import java.util.regex.Pattern;
  * @author Alexander Bieber <alex[AT]nightlabs[DOT]de>
  *
  */
-public class JDOQLMetaDataParser {	
+public class JDOQLMetaDataParser {
 	private static final String S_FIELD = "[a-zA-Z0-9_\\-\\.\\(\\)\"]+";
 	private static final String S_PART = "(" + S_FIELD + ")\\s*AS\\s*(" + S_FIELD + ")|(" + S_FIELD + ")";
 //	private static final String S_MULTIPLE = "(^\\s*SELECT\\s+)*"+ S_PART +"+\\s*,*(?:FROM\\s.*)*";
@@ -77,7 +77,7 @@ public class JDOQLMetaDataParser {
 				getResultColumnDataType(candidate, selectStatement),
 				ResultSetMetaData.columnNullable
 			);
-		}		
+		}
 		
 //		metaData.s
 		
@@ -97,7 +97,7 @@ public class JDOQLMetaDataParser {
 	}
 	
 	public static void testSelect() {
-		Matcher m = PATTERN_SELECT.matcher("SELECT this.amount as amount ,this.owner.name.get(\"en\") as name, xx AS xxx, FROMDT blubb FROM Test, blubb WHERE Trallali AS muell bla");		
+		Matcher m = PATTERN_SELECT.matcher("SELECT this.amount as amount ,this.owner.name.get(\"en\") as name, xx AS xxx, FROMDT blubb FROM Test, blubb WHERE Trallali AS muell bla");
 		System.out.println(PATTERN_SELECT.toString());
 		System.out.println("**************************");
 		while (m.find()) {
@@ -112,7 +112,7 @@ public class JDOQLMetaDataParser {
 	}
 
 	public static void testCC() {
-		Matcher m = PATTERN_CANDIDATE.matcher("SELECT this.amount as amount ,this.owner.name.get(\"en\") as name, xx AS xxx, FROMDT blubb FROM org.nightlabs.Test, blubb WHERE Trallali AS muell bla from what ever here as will from selection");		
+		Matcher m = PATTERN_CANDIDATE.matcher("SELECT this.amount as amount ,this.owner.name.get(\"en\") as name, xx AS xxx, FROMDT blubb FROM org.nightlabs.Test, blubb WHERE Trallali AS muell bla from what ever here as will from selection");
 		System.out.println(PATTERN_CANDIDATE.toString());
 		System.out.println("**************************");
 		while (m.find()) {

@@ -7,7 +7,6 @@ import org.eclipse.datatools.connectivity.oda.IParameterMetaData;
 import org.eclipse.datatools.connectivity.oda.OdaException;
 import org.nightlabs.jfire.reporting.JFireReportingHelper;
 import org.nightlabs.jfire.reporting.oda.Query;
-import org.nightlabs.jfire.scripting.Script;
 import org.nightlabs.jfire.scripting.id.ScriptRegistryItemID;
 
 /**
@@ -17,7 +16,7 @@ import org.nightlabs.jfire.scripting.id.ScriptRegistryItemID;
  * The query parameter of the ODA dataset linked to this driver will be assumed
  * to be a string reference of a {@link ScriptRegistryItemID}, referencing
  * as {@link Script} not a category.
- *  
+ * 
  * @author Alexander Bieber <alex [AT] nightlabs [DOT] de>
  *
  */
@@ -64,7 +63,7 @@ public abstract class AbstractJFSQueryProxy extends Query implements IJFSQueryPr
 	}
 
 	/**
-	 * Returns the property set for this query that was created through the 
+	 * Returns the property set for this query that was created through the
 	 * query string.
 	 * 
 	 * @return The property set for this query.

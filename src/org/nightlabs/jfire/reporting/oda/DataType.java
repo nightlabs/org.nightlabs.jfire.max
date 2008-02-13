@@ -42,7 +42,7 @@ import java.util.Map;
 public class DataType {
 	protected DataType() {}
 	
-	public static final int STRING = 1; 
+	public static final int STRING = 1;
 	public static final int INTEGER = 2;
 	public static final int DOUBLE = 3;
 	public static final int BOOLEAN = 4;
@@ -55,7 +55,7 @@ public class DataType {
 	public static final int JAVA_OBJECT = 2000;
 	public static final int UNKNOWN = 0;
 
-	public static final String N_STRING = "String"; 
+	public static final String N_STRING = "String";
 	public static final String N_INTEGER = "Integer";
 	public static final String N_DOUBLE = "Double";
 	public static final String N_BOOLEAN = "Boolean";
@@ -68,7 +68,7 @@ public class DataType {
 	public static final String N_UNKNOWN = "Unknown";
 	
 	
-//	public static final Integer K_STRING = new Integer(STRING);; 
+//	public static final Integer K_STRING = new Integer(STRING);;
 //	public static final Integer K_INTEGER = new Integer(INTEGER);
 //	public static final Integer K_DOUBLE = new Integer(DOUBLE);
 //	public static final Integer K_BOOLEAN = new Integer(BOOLEAN);
@@ -153,7 +153,7 @@ public class DataType {
 		dataTypes2sqlTypes.put(dataType, sqlType);
 	}
 	
-	public static Class[] dataTypeToClasses(int dataType) {		
+	public static Class[] dataTypeToClasses(int dataType) {
 		Class[] types = types2Classes.get(new Integer(dataType));
 		if (types == null)
 			return new Class[] {String.class};

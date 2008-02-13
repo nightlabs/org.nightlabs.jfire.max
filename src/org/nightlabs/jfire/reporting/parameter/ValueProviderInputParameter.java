@@ -14,7 +14,7 @@ import java.io.Serializable;
  *
  * @jdo.create-objectid-class field-order="organisationID, valueProviderCategoryID, valueProviderID, parameterID"
  * 
- * @jdo.inheritance strategy = "new-table" 
+ * @jdo.inheritance strategy = "new-table"
  * @jdo.inheritance-discriminator strategy="class-name"
  * 
  * @jdo.fetch-group name="ValueProviderInputParameter.valueProvider" fetch-groups="default" fields="valueProvider"
@@ -51,7 +51,7 @@ public class ValueProviderInputParameter implements Serializable {
 	/**
 	 * @jdo.field persistence-modifier="persistent"
 	 */
-	private String parameterType;	
+	private String parameterType;
 
 	/**
 	 * @jdo.field persistence-modifier="persistent"

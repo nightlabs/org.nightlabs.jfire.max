@@ -35,7 +35,7 @@ import org.eclipse.datatools.connectivity.oda.OdaException;
 
 /**
  * Common type for all oda resultset metadata in JFireReporting.
- *  
+ * 
  * @author Alexander Bieber <alex[AT]nightlabs[DOT]de>
  *
  */
@@ -84,7 +84,7 @@ public class ResultSetMetaData implements IResultSetMetaData, Serializable {
 	private Map<String, Integer> colIdxByNames = new HashMap<String, Integer>();
 	
 	/**
-	 * Returns the Column for the given 1-based 
+	 * Returns the Column for the given 1-based
 	 * column index.
 	 */
 	private Column getColumn(int index) {
@@ -116,7 +116,7 @@ public class ResultSetMetaData implements IResultSetMetaData, Serializable {
 	
 	/**
 	 * Sets the metaData for the given 1-based column to the given
-	 * name and datatype. 
+	 * name and datatype.
 	 */
 	public void setColumn(int index, String colName, Class dataType, int nullable) {
 		setColumn(index, new Column(colName, DataType.classToDataType(dataType), nullable));
@@ -124,10 +124,10 @@ public class ResultSetMetaData implements IResultSetMetaData, Serializable {
 	
 	/**
 	 * Sets the column meta data for the given index.
-	 *  
+	 * 
 	 */
 	public void setColumn(int index, String colName, int dataType, int nullable) {
-		setColumn(index, new Column(colName, dataType, nullable));		
+		setColumn(index, new Column(colName, dataType, nullable));
 	}
 
 	/**

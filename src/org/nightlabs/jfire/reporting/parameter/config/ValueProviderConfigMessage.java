@@ -31,7 +31,6 @@ import java.util.HashMap;
 import java.util.Map;
 
 import org.nightlabs.i18n.I18nText;
-import org.nightlabs.jfire.reporting.parameter.ValueProvider;
 
 /**
  * Description i18n text for {@link ValueProvider}s.
@@ -71,19 +70,19 @@ public class ValueProviderConfigMessage extends I18nText implements Serializable
 	private long valueAcquisitionSetupID;
 	
 	/**
-	 * @jdo.field primary-key="true" 
+	 * @jdo.field primary-key="true"
 	 * @jdo.column length="100"
 	 */
 	private String valueProviderOrganisationID;
 	
 	/**
-	 * @jdo.field primary-key="true" 
+	 * @jdo.field primary-key="true"
 	 * @jdo.column length="100"
-	 */ 
+	 */
 	private String valueProviderCategoryID;
 	
 	/**
-	 * @jdo.field primary-key="true" 
+	 * @jdo.field primary-key="true"
 	 * @jdo.column length="100"
 	 */
 	private String valueProviderID;

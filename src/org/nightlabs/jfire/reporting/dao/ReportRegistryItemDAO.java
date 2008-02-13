@@ -38,21 +38,19 @@ import org.nightlabs.jdo.NLJDOHelper;
 import org.nightlabs.jfire.base.jdo.BaseJDOObjectDAO;
 import org.nightlabs.jfire.reporting.ReportManager;
 import org.nightlabs.jfire.reporting.ReportManagerUtil;
-import org.nightlabs.jfire.reporting.layout.ReportCategory;
-import org.nightlabs.jfire.reporting.layout.ReportLayout;
 import org.nightlabs.jfire.reporting.layout.ReportRegistryItem;
 import org.nightlabs.jfire.reporting.layout.id.ReportRegistryItemID;
 import org.nightlabs.jfire.security.SecurityReflector;
 import org.nightlabs.progress.ProgressMonitor;
 
 /**
- * DAO object for {@link ReportRegistryItem}s, 
+ * DAO object for {@link ReportRegistryItem}s,
  * i.e. {@link ReportCategory}s and {@link ReportLayout}s.
  * 
  * @author Alexander Bieber <!-- alex [AT] nightlabs [DOT] de -->
  */
-public class ReportRegistryItemDAO 
-extends BaseJDOObjectDAO<ReportRegistryItemID, ReportRegistryItem> 
+public class ReportRegistryItemDAO
+extends BaseJDOObjectDAO<ReportRegistryItemID, ReportRegistryItem>
 {
 
 	/**
@@ -100,7 +98,7 @@ extends BaseJDOObjectDAO<ReportRegistryItemID, ReportRegistryItem>
 			synchronized (ReportRegistryItemDAO.class) {
 				if (sharedInstance == null)
 					sharedInstance = new ReportRegistryItemDAO();
-			}			
+			}
 		}
 		return sharedInstance;
 	}
@@ -108,7 +106,7 @@ extends BaseJDOObjectDAO<ReportRegistryItemID, ReportRegistryItem>
 	/**
 	 * Stores the given {@link ReportRegistryItem} on the JFire server.
 	 * <p>
-	 * If get is true, the newly stored item will be returned. It will 
+	 * If get is true, the newly stored item will be returned. It will
 	 * be a copy, detached with the given fetchGroups.
 	 * </p>
 	 * 
@@ -124,8 +122,8 @@ extends BaseJDOObjectDAO<ReportRegistryItemID, ReportRegistryItem>
 	 * @throws NamingException
 	 */
 	public ReportRegistryItem storeReportRegistryItem(
-			ReportRegistryItem reportRegistryItem, boolean get, String[] fetchGroups, int maxFetchDepth, ProgressMonitor monitor) 
-	throws RemoteException, CreateException, NamingException 
+			ReportRegistryItem reportRegistryItem, boolean get, String[] fetchGroups, int maxFetchDepth, ProgressMonitor monitor)
+	throws RemoteException, CreateException, NamingException
 	{
 		ReportManager rm = ReportManagerUtil.getHome(SecurityReflector.getInitialContextProperties()).create();
 		return rm.storeRegistryItem(reportRegistryItem, get, fetchGroups, maxFetchDepth);

@@ -33,7 +33,7 @@ import java.util.HashSet;
 import org.nightlabs.jfire.reporting.layout.id.ReportRegistryItemID;
 
 /**
- * ConfigModule to store all available and one default 
+ * ConfigModule to store all available and one default
  * ReportLayouts for one reportCategoryType.
  * 
  * @author Alexander Bieber <alex[AT]nightlabs[DOT]de>
@@ -48,8 +48,8 @@ import org.nightlabs.jfire.reporting.layout.id.ReportRegistryItemID;
  * 
  * @jdo.fetch-group name="ReportLayoutAvailEntry.availableReportLayoutKeys" fields="availableReportLayoutKeys"
  */
-public class ReportLayoutAvailEntry 
-implements Serializable 
+public class ReportLayoutAvailEntry
+implements Serializable
 {
 	public static final String FETCH_GROUP_AVAILABLE_REPORT_LAYOUT_KEYS = "ReportLayoutAvailEntry.availableReportLayoutKeys";
 	
@@ -92,7 +92,7 @@ implements Serializable
 	
 	/**
 	 * The default ReportLayoutID for this categoryType
-	 */	
+	 */
 	private String defaultReportLayoutKey;
 	
 	/**
@@ -201,7 +201,7 @@ implements Serializable
 	}
 	
 	/**
-	 * Returns either the ReportRegistryItemID configured as default for 
+	 * Returns either the ReportRegistryItemID configured as default for
 	 * this entry or null if none is set.
 	 */
 	public ReportRegistryItemID getDefaultReportLayoutID() {
@@ -216,7 +216,7 @@ implements Serializable
 	
 	/**
 	 * Converts the stored Collection of strings into a Collection
-	 * of ReportRegistryItemIDs representing the available 
+	 * of ReportRegistryItemIDs representing the available
 	 * ReportLayouts in this entry.
 	 */
 	public Collection<ReportRegistryItemID> getAvailableReportLayoutIDs() {

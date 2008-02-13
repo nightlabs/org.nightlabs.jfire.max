@@ -40,7 +40,7 @@ public class JFSQueryUtil {
 				throw new IllegalArgumentException("Query \""+query+"\" does not define a valid JFSQueryPropertySet.");
 			return (JFSQueryPropertySet) obj;
 		} else if (query.startsWith("jdo/")) {
-			// try to create scriptID from query string -> backward compatibility			
+			// try to create scriptID from query string -> backward compatibility
 			ObjectID idObject = ObjectIDUtil.createObjectID(query);
 			if (!(idObject instanceof ScriptRegistryItemID))
 				throw new IllegalArgumentException("The query string of this JFS DataSet does not define a valid JFSQueryPropertySet. It does refer to a JDO object but not to an ScriptRegistryItem. The query was "+query);

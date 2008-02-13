@@ -51,7 +51,7 @@ import org.nightlabs.util.Util;
  * @jdo.create-objectid-class field-order="organisationID, reportRegistryItemType, reportRegistryItemID"
  *
  *
- * @jdo.inheritance strategy = "new-table" 
+ * @jdo.inheritance strategy = "new-table"
  * @jdo.inheritance-discriminator strategy="class-name"
  * 
  * @jdo.fetch-group name="ReportRegistryItem.parentCategory" fetch-groups="default" fields="parentCategory"
@@ -59,12 +59,12 @@ import org.nightlabs.util.Util;
  * @jdo.fetch-group name="ReportRegistryItem.description" fetch-groups="default" fields="description"
  * @jdo.fetch-group name="ReportRegistryItem.this" fetch-groups="default" fields="parentCategory, name"
  * 
- *  
+ * 
  * @jdo.query
  *		name="getReportRegistryItemByType"
- *		query="SELECT 
+ *		query="SELECT
  *			WHERE this.organisationID == :paramOrganisationID &&
- *            this.reportRegistryItemType == :paramReportRegistryItemType            
+ *            this.reportRegistryItemType == :paramReportRegistryItemType
  *			import java.lang.String"
  * 
  * @jdo.query
@@ -72,7 +72,7 @@ import org.nightlabs.util.Util;
  *		query="SELECT UNIQUE
  *			WHERE this.organisationID == paramOrganisationID &&
  *            this.reportRegistryItemType == paramReportRegistryItemType &&
- *            this.parentCategory == null    
+ *            this.parentCategory == null
  *			PARAMETERS String paramOrganisationID, String reportRegistryItemType
  *			import java.lang.String"
  *
@@ -80,7 +80,7 @@ import org.nightlabs.util.Util;
  *		name="getTopLevelReportRegistryItemsByOrganisation"
  *		query="SELECT
  *			WHERE this.organisationID == paramOrganisationID &&
- *            this.parentCategory == null    
+ *            this.parentCategory == null
  *			PARAMETERS String paramOrganisationID
  *			import java.lang.String"
  *
@@ -92,12 +92,12 @@ import org.nightlabs.util.Util;
  *
  * @jdo.query
  *	name="getReportRegistryItemsForParent"
- *	query="SELECT 
+ *	query="SELECT
  *		WHERE this.parentCategory == :paramParent"
  *
  * @jdo.query
  *	name="getReportRegistryItemIDsForParent"
- *	query="SELECT JDOHelper.getObjectId(this) 
+ *	query="SELECT JDOHelper.getObjectId(this)
  *		WHERE this.parentCategory == :paramParent"
  */
 public abstract class ReportRegistryItem implements Serializable, DetachCallback
@@ -110,7 +110,7 @@ public abstract class ReportRegistryItem implements Serializable, DetachCallback
 
 	public static final String FETCH_GROUP_PARENT_CATEGORY = "ReportRegistryItem.parentCategory";
 	/**
-	 * Virtual. The {@link #parentCategoryID} is set 
+	 * Virtual. The {@link #parentCategoryID} is set
 	 */
 	public static final String FETCH_GROUP_PARENT_CATEGORY_ID = "ReportRegistryItem.parentCategoryID";
 	public static final String FETCH_GROUP_NAME = "ReportRegistryItem.name";
@@ -160,7 +160,7 @@ public abstract class ReportRegistryItem implements Serializable, DetachCallback
 
 
 	/**
-	 * Creates a new ReportRegistryItem with the given 
+	 * Creates a new ReportRegistryItem with the given
 	 * parent and primary key parameters.
 	 * 
 	 * @param parentCategory The parent item of the new item.
@@ -169,11 +169,11 @@ public abstract class ReportRegistryItem implements Serializable, DetachCallback
 	 * @param reportRegistryItemID The itemID of the new item.
 	 */
 	protected ReportRegistryItem(
-			ReportCategory parentCategory, 
-			String organisationID, 
+			ReportCategory parentCategory,
+			String organisationID,
 			String reportRegistryItemType,
 			String reportRegistryItemID
-		) 
+		)
 	{
 		this.parentCategory = parentCategory;
 		this.organisationID = organisationID;
@@ -241,7 +241,7 @@ public abstract class ReportRegistryItem implements Serializable, DetachCallback
 	}
 
 	/**
-	 * Set the parent of this item. 
+	 * Set the parent of this item.
 	 * 
 	 * @param parentCategory The parent to set.
 	 */
@@ -276,7 +276,7 @@ public abstract class ReportRegistryItem implements Serializable, DetachCallback
 	}
 
 	/**
-	 * Returns the top-level {@link ReportRegistryItem}s with the given type. 
+	 * Returns the top-level {@link ReportRegistryItem}s with the given type.
 	 * Top-level means here that the items do not have parent.
 	 * 
 	 * @param pm The {@link PersistenceManager} to use.
@@ -290,7 +290,7 @@ public abstract class ReportRegistryItem implements Serializable, DetachCallback
 	}
 	
 	/**
-	 * Returns all top-level {@link ReportRegistryItem}s of the given organisations. 
+	 * Returns all top-level {@link ReportRegistryItem}s of the given organisations.
 	 * Top-level means here that the items do not have parent.
 	 * 
 	 * @param pm The {@link PersistenceManager} to use.
@@ -306,7 +306,7 @@ public abstract class ReportRegistryItem implements Serializable, DetachCallback
 	}
 	
 	/**
-	 * Returns all top-level {@link ReportRegistryItem}s. 
+	 * Returns all top-level {@link ReportRegistryItem}s.
 	 * Top-level means here that the items do not have parent.
 	 * 
 	 * @param pm The {@link PersistenceManager} to use.
@@ -327,7 +327,7 @@ public abstract class ReportRegistryItem implements Serializable, DetachCallback
 	/**
 	 * Returns all {@link ReportRegistryItem}s that have with the given reportCategory
 	 * as parent.
-	 *  
+	 * 
 	 * @param pm The {@link PersistenceManager} to use.
 	 * @param reportCategory The {@link ReportCategory} children should be searched for.
 	 * @return all {@link ReportRegistryItem}s that have with the given reportCategory
@@ -341,8 +341,8 @@ public abstract class ReportRegistryItem implements Serializable, DetachCallback
 
 	/**
 	 * Returns the {@link PersistenceManager} associated with this item.
-	 * Throws an {@link IllegalStateException} if this instance of 
-	 * {@link ReportRegistryItem} is not attached. (e.g. detached, not yet persistent) 
+	 * Throws an {@link IllegalStateException} if this instance of
+	 * {@link ReportRegistryItem} is not attached. (e.g. detached, not yet persistent)
 	 * 
 	 * @return The {@link PersistenceManager} associated with this item.
 	 */
@@ -361,7 +361,7 @@ public abstract class ReportRegistryItem implements Serializable, DetachCallback
 	 */
 	@Override
 	public int hashCode() {
-		return 
+		return
 			Util.hashCode(organisationID) ^
 			Util.hashCode(reportRegistryItemType) ^
 			Util.hashCode(reportRegistryItemID);
@@ -390,7 +390,7 @@ public abstract class ReportRegistryItem implements Serializable, DetachCallback
 	 * @jdo.field persistence-modifier="none"
 	 */
 	private boolean parentCategoryIDDetached = false;
-	/** 
+	/**
 	 * {@inheritDoc}
 	 * Sets the {@link #parentCategoryID} member if {@link #FETCH_GROUP_PARENT_CATEGORY_ID} is in the fetch-plan.
 	 * 
@@ -401,11 +401,11 @@ public abstract class ReportRegistryItem implements Serializable, DetachCallback
 		ReportRegistryItem detached = this;
 		if (attached.getPersistenceManager().getFetchPlan().getGroups().contains(FETCH_GROUP_PARENT_CATEGORY_ID)) {
 			detached.parentCategoryID = attached.getParentCategoryID();
-			detached.parentCategoryIDDetached = true; 
+			detached.parentCategoryIDDetached = true;
 		}
 	}
 
-	/** 
+	/**
 	 * {@inheritDoc}
 	 * This implementation does nothing.
 	 * 

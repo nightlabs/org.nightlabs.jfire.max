@@ -47,12 +47,12 @@ public class ReportLayoutRendererPDF implements ReportLayoutRenderer {
 			String fileName, File layoutRoot,
 			boolean prepareForTransfer
 		)
-	throws EngineException 
+	throws EngineException
 	{
 		if (renderRequest.getOutputFormat() != Birt.OutputFormat.pdf)
 			throw new IllegalArgumentException(this.getClass().getName()+" was asked to render a report to format "+renderRequest.getOutputFormat()+" altough it is registered to "+getOutputFormat());
 		
-		HTMLRenderOption options = new HTMLRenderOption( );		
+		HTMLRenderOption options = new HTMLRenderOption( );
 		options.setOutputFormat(renderRequest.getOutputFormat().toString());
 		
 		PDFRenderContext renderContext = new PDFRenderContext();

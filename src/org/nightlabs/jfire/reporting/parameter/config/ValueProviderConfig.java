@@ -18,7 +18,7 @@ import org.nightlabs.jfire.reporting.parameter.id.ValueProviderID;
  *		detachable = "true"
  *		table="JFireReporting_ValueProviderConfig"
  *
- * @jdo.create-objectid-class 
+ * @jdo.create-objectid-class
  * 		field-order="organisationID, valueAcquisitionSetupID, valueProviderOrganisationID, valueProviderCategoryID, valueProviderID, valueProviderConfigID"
  * 		include-imports="id/ValueProviderConfig.imports.inc"
  *		include-body="id/ValueProviderConfig.body.inc"
@@ -26,7 +26,7 @@ import org.nightlabs.jfire.reporting.parameter.id.ValueProviderID;
  * @jdo.fetch-group name="ValueProviderConfig.message" fetch-groups="default" fields="message"
  *
  */
-public class ValueProviderConfig 
+public class ValueProviderConfig
 implements ValueConsumer, Serializable, IGraphicalInfoProvider, DeleteCallback
 {
 
@@ -46,19 +46,19 @@ implements ValueConsumer, Serializable, IGraphicalInfoProvider, DeleteCallback
 	private long valueAcquisitionSetupID;
 	
 	/**
-	 * @jdo.field primary-key="true" 
+	 * @jdo.field primary-key="true"
 	 * @jdo.column length="100"
 	 */
 	private String valueProviderOrganisationID;
 	
 	/**
-	 * @jdo.field primary-key="true" 
+	 * @jdo.field primary-key="true"
 	 * @jdo.column length="100"
 	 */
 	private String valueProviderCategoryID;
 	
 	/**
-	 * @jdo.field primary-key="true" 
+	 * @jdo.field primary-key="true"
 	 * @jdo.column length="100"
 	 */
 	private String valueProviderID;
@@ -88,33 +88,33 @@ implements ValueConsumer, Serializable, IGraphicalInfoProvider, DeleteCallback
 	
 	/**
 	 * @jdo.field persistence-modifier="persistent"
-	 */	
+	 */
 	private boolean allowNullOutputValue;
 	
 	/**
 	 * @jdo.field persistence-modifier="persistent"
-	 */	
+	 */
 	private boolean showMessageInHeader;
 
 	/**
 	 * @jdo.field persistence-modifier="persistent"
-	 */	
+	 */
 	private int x;
 
 	/**
 	 * @jdo.field persistence-modifier="persistent"
-	 */	
+	 */
 	private int y;
 	
 	/**
 	 * @jdo.field persistence-modifier="persistent" mapped-by="valueProviderConfig"
-	 */	
+	 */
 	private ValueProviderConfigMessage message;
 	
 	
 	protected ValueProviderConfig() {}
 	
-	public ValueProviderConfig(ValueAcquisitionSetup setup, long valueProviderConfigID)  {		
+	public ValueProviderConfig(ValueAcquisitionSetup setup, long valueProviderConfigID)  {
 		this.organisationID = setup.getOrganisationID();
 		this.valueAcquisitionSetupID = setup.getValueAcquisitionSetupID();
 		this.setup = setup;
@@ -157,7 +157,7 @@ implements ValueConsumer, Serializable, IGraphicalInfoProvider, DeleteCallback
 	/**
 	 * The pageIndex is the number of the page
 	 * the value provider referenced is displayed.
-	 *  
+	 * 
 	 * @return the pageIndex
 	 */
 	public int getPageIndex() {
@@ -242,10 +242,10 @@ implements ValueConsumer, Serializable, IGraphicalInfoProvider, DeleteCallback
 	
 	public ValueProviderID getConfigValueProviderID() {
 		return ValueProviderID.create(
-				getValueProviderOrganisationID(), 
-				getValueProviderCategoryID(), 
+				getValueProviderOrganisationID(),
+				getValueProviderCategoryID(),
 				getValueProviderID()
-			);		
+			);
 	}
 
 	public void setValueProvider(ValueProvider valueProvider) {
@@ -266,7 +266,7 @@ implements ValueConsumer, Serializable, IGraphicalInfoProvider, DeleteCallback
 	/**
 	 * returns the y coordinate
 	 * @return the y coordinate
-	 */	
+	 */
 	public int getY() {
 		return y;
 	}
@@ -274,7 +274,7 @@ implements ValueConsumer, Serializable, IGraphicalInfoProvider, DeleteCallback
 	/**
 	 * sets the x coordinate
 	 * @param x the x coordinate to set
-	 */	
+	 */
 	public void setX(int x) {
 		this.x = x;
 	}
@@ -282,7 +282,7 @@ implements ValueConsumer, Serializable, IGraphicalInfoProvider, DeleteCallback
 	/**
 	 * sets the y coordinate
 	 * @param y the y coordinate to set
-	 */		
+	 */
 	public void setY(int y) {
 		this.y = y;
 	}

@@ -135,7 +135,7 @@ public abstract class ResultSet implements IResultSet, Serializable {
 	/* (non-Javadoc)
 	 * @see org.eclipse.datatools.connectivity.oda.IResultSet#getRow()
 	 */
-	public int getRow() throws OdaException {	
+	public int getRow() throws OdaException {
 		return currPos;
 	}
 
@@ -168,7 +168,7 @@ public abstract class ResultSet implements IResultSet, Serializable {
 	/* (non-Javadoc)
 	 * @see org.eclipse.datatools.connectivity.oda.IResultSet#getString(int)
 	 */
-	public String getString(int index) throws OdaException {				
+	public String getString(int index) throws OdaException {
 		return (String)checkColObject(index, String.class);
 	}
 
@@ -189,14 +189,14 @@ public abstract class ResultSet implements IResultSet, Serializable {
 	/* (non-Javadoc)
 	 * @see org.eclipse.datatools.connectivity.oda.IResultSet#getInt(java.lang.String)
 	 */
-	public int getInt(String columnName) throws OdaException {		
+	public int getInt(String columnName) throws OdaException {
 		return getInt(findColumn(columnName));
 	}
 
 	/* (non-Javadoc)
 	 * @see org.eclipse.datatools.connectivity.oda.IResultSet#getDouble(int)
 	 */
-	public double getDouble(int index) throws OdaException {		
+	public double getDouble(int index) throws OdaException {
 		return ((Number)checkColObject(index, Double.class)).doubleValue();
 	}
 
@@ -210,7 +210,7 @@ public abstract class ResultSet implements IResultSet, Serializable {
 	/* (non-Javadoc)
 	 * @see org.eclipse.datatools.connectivity.oda.IResultSet#getBigDecimal(int)
 	 */
-	public BigDecimal getBigDecimal(int index) throws OdaException {		
+	public BigDecimal getBigDecimal(int index) throws OdaException {
 		//return new BigDecimal(getDouble(index));
 		return new BigDecimal(((Long)checkColObject(index, Long.class)).longValue());
 	}
@@ -252,7 +252,7 @@ public abstract class ResultSet implements IResultSet, Serializable {
 	/* (non-Javadoc)
 	 * @see org.eclipse.datatools.connectivity.oda.IResultSet#getTime(java.lang.String)
 	 */
-	public Time getTime(String columnName) throws OdaException {	
+	public Time getTime(String columnName) throws OdaException {
 		return getTime(findColumn(columnName));
 	}
 
@@ -309,7 +309,7 @@ public abstract class ResultSet implements IResultSet, Serializable {
 	}
 
 	/**
-	 * {@inheritDoc} 
+	 * {@inheritDoc}
 	 */
 	public boolean getBoolean(int index) throws OdaException {
 		return (Boolean) checkColObject(index, Boolean.class);

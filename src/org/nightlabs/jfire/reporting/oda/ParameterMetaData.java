@@ -26,12 +26,12 @@ import org.nightlabs.jfire.scripting.ScriptParameterSet;
  */
 public class ParameterMetaData implements NamedParameterMetaData, Serializable {
 
-	private static final long serialVersionUID = 1L;	
+	private static final long serialVersionUID = 1L;
 
 	private static final Logger logger = Logger.getLogger(ParameterMetaData.class);
 	
 	/**
-	 * Holds information about parameters according to datatools oda. 
+	 * Holds information about parameters according to datatools oda.
 	 */
 	public static class ParameterDescriptor implements Serializable {
 
@@ -40,10 +40,10 @@ public class ParameterMetaData implements NamedParameterMetaData, Serializable {
 		private String parameterName;
 		private int mode;
 		private int dataType;
-		private String dataTypeName;		
+		private String dataTypeName;
 		private int precision;
 		private int scale;
-		private int nullable = IResultSetMetaData.columnNullable; // 
+		private int nullable = IResultSetMetaData.columnNullable; //
 		// WORKAROUND: Wrong definition in ODA, should be IParameterMetaData.parameterNullable;
 		// see https://bugs.eclipse.org/bugs/show_bug.cgi?id=202407
 		
@@ -135,7 +135,7 @@ public class ParameterMetaData implements NamedParameterMetaData, Serializable {
 		}
 		
 		/**
-		 * The realDataTypeName can be used to store the original 
+		 * The realDataTypeName can be used to store the original
 		 * type name (which might have been a class name).
 		 * 
 		 * @return the realDataTypeName
@@ -171,7 +171,7 @@ public class ParameterMetaData implements NamedParameterMetaData, Serializable {
 	/**
 	 * Additional method that returns a name for a given parameter.
 	 * Note that this is not part of the ODA API and therefore not necessary
-	 * to exist. 
+	 * to exist.
 	 * 
 	 * @param pPosition The parameter position the name should be returned.
 	 * @return The name of the referenced parameter if one is set, <code>null</code> otherwise.
@@ -232,14 +232,14 @@ public class ParameterMetaData implements NamedParameterMetaData, Serializable {
 	}
 
 	/**
-	 * Tries to create a ODA {@link ParameterMetaData} from the given 
+	 * Tries to create a ODA {@link ParameterMetaData} from the given
 	 * {@link ScriptParameterSet}. The parameters will be sorted by
 	 * their parameterID (their name) so this method will always return
 	 * the same result for the same parameter set.
 	 * 
 	 * @param parameterSet The parameter set to create meta data for.
 	 * @return A ParameterMetaData representing the parameter of the given script parameter set.
-	 * @throws JFireReportingOdaException 
+	 * @throws JFireReportingOdaException
 	 */
 	public static ParameterMetaData createMetaDataFromParameterSet(ScriptParameterSet parameterSet) throws JFireReportingOdaException
 	{
@@ -255,7 +255,7 @@ public class ParameterMetaData implements NamedParameterMetaData, Serializable {
 				dataType = DataType.classToDataType(parameter.getScriptParameterClass());
 			} catch (ClassNotFoundException e) {
 				throw new JFireReportingOdaException("Could not create ParameterMetaData from ScriptParameterSet as one parameter's class could not be found or mapped to a scalar datatype. "+e.getMessage());
-			}			
+			}
 			descriptor.setDataType(dataType);
 			descriptor.setDataTypeName(DataType.getTypeName(dataType));
 			descriptor.setParameterName(parameter.getScriptParameterID());

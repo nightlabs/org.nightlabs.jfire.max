@@ -83,7 +83,7 @@ public class ReportLayoutConfigModule extends ConfigModule {
 	
 	
 	/**
-	 * The Map of available entries per reportRegistryItemType 
+	 * The Map of available entries per reportRegistryItemType
 	 * @return
 	 */
 	public Map<String, ReportLayoutAvailEntry> getAvailEntries() {
@@ -124,7 +124,7 @@ public class ReportLayoutConfigModule extends ConfigModule {
 		configModule.getAvailEntries().clear();
 		for (ReportLayoutAvailEntry entry : getAvailEntries().values()) {
 			configModule.getAvailEntries().put(
-					entry.getReportRegistryItemType(), 
+					entry.getReportRegistryItemType(),
 					entry.clone(configModule)
 				);
 		}
@@ -154,6 +154,6 @@ public class ReportLayoutConfigModule extends ConfigModule {
 		ReportLayoutAvailEntry availEntry = getAvailEntry(reportRegistryItemType);
 		if (availEntry == null)
 			throw new IllegalStateException("Could not get ReportLayoutAvailEntry even with auto-create");
-		return availEntry.getAvailableReportLayoutIDs();		
+		return availEntry.getAvailableReportLayoutIDs();
 	}
 }

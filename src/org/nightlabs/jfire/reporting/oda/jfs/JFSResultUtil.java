@@ -16,8 +16,8 @@ import org.nightlabs.jfire.reporting.oda.DataType;
  */
 public class JFSResultUtil {
 
-	public static TableBuffer createTableBuffer(JFSResultSetMetaData metaData) 
-	throws OdaException, SQLException 
+	public static TableBuffer createTableBuffer(JFSResultSetMetaData metaData)
+	throws OdaException, SQLException
 	{
 		TableBuffer tableBuffer = new TableBuffer();
 		for (int i = 1; i <= metaData.getColumnCount(); i++) {

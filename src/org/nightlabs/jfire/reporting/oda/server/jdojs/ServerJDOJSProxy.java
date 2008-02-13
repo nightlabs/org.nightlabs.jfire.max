@@ -47,8 +47,8 @@ import org.nightlabs.jfire.reporting.oda.jdojs.JDOJSResultSetMetaData;
 
 /**
  * Server-side JDO JavaScript DataSets. Its method are also called
- * from the client-side(preview) DataSet through the ReportManager-Bean. 
- *  
+ * from the client-side(preview) DataSet through the ReportManager-Bean.
+ * 
  * @author Alexander Bieber <alex[AT]nightlabs[DOT]de>
  *
  */
@@ -89,7 +89,7 @@ public class ServerJDOJSProxy extends AbstractJDOJSProxy {
 		try {
 			return fetchJDOJSResultSet(
 					getPersistenceManager(),
-					(JDOJSResultSetMetaData)getMetaData(), 
+					(JDOJSResultSetMetaData)getMetaData(),
 					getFetchScript(),
 //					getParameterMetaData(),
 					getNamedParameters()
@@ -104,11 +104,11 @@ public class ServerJDOJSProxy extends AbstractJDOJSProxy {
 
 	public static final String IMPORT_PACKAGES_PREPARE = null; // "importPackage(Packages.org.nightlabs.jfire.reporting);";
 	public static final String IMPORT_PACKAGES_FETCH = "importPackage(Packages.javax.jdo);\n";
-	public static final String IMPORT_CLASSES_PREPARE = 
+	public static final String IMPORT_CLASSES_PREPARE =
 		"importClass(Packages."+ResultSetMetaData.class.getName()+");\n"+
 		"importClass(Packages."+DataType.class.getName()+");\n"
 		;
-	public static final String IMPORT_CLASSES_FETCH = 
+	public static final String IMPORT_CLASSES_FETCH =
 		"importClass(Packages."+ResultSetMetaData.class.getName()+");\n"+
 		"importClass(Packages."+ResultSet.class.getName()+");\n"+
 		"importClass(Packages."+DataType.class.getName()+");\n"
@@ -137,9 +137,9 @@ public class ServerJDOJSProxy extends AbstractJDOJSProxy {
 			context.evaluateString(scope, prepareScript, "JDOJS prepare script", 1, null);
 			try {
 				if (metaData.getColumnCount() <= 0)
-					throw new IllegalStateException("JDOJS prepare statement "+prepareScript+" did not add at least one ");			
+					throw new IllegalStateException("JDOJS prepare statement "+prepareScript+" did not add at least one ");
 			} catch (OdaException e) {
-				throw new RuntimeException(e);				
+				throw new RuntimeException(e);
 			}
 			return metaData;
 		} finally {
@@ -155,7 +155,7 @@ public class ServerJDOJSProxy extends AbstractJDOJSProxy {
 	 * Additionally three special variables will be deployed into the script:
 	 * <ul>
 	 *   <li><b>metaData</b>: The result set metadata that was returned by the prepare script.</li>
-	 *   <li><b>resultSet</b>: A freshly create result set object that can be filled by the script and should be returned. 
+	 *   <li><b>resultSet</b>: A freshly create result set object that can be filled by the script and should be returned.
 	 *   	The object is of type {@link JDOJSResultSet}</li>
 	 *   <li><b>persistenceManager</b>: A PersistenceManager the script can use to query its result set</li>
 	 * </ul>
@@ -171,11 +171,11 @@ public class ServerJDOJSProxy extends AbstractJDOJSProxy {
 	 * @return A resultSet that was filled by the fetchScript.
 	 */
 	public static JDOJSResultSet fetchJDOJSResultSet(
-			PersistenceManager pm, 
-			JDOJSResultSetMetaData metaData, 
+			PersistenceManager pm,
+			JDOJSResultSetMetaData metaData,
 			String fetchScript,
 //			IParameterMetaData parameterMetaData,
-			Map<String, Object> parameters			
+			Map<String, Object> parameters
 	)
 	{
 		try {
@@ -220,10 +220,10 @@ public class ServerJDOJSProxy extends AbstractJDOJSProxy {
 					logger.debug("*****************************************");
 				}
 
-				// deactivate part above as parameternames are now mapped by Query itself					
+				// deactivate part above as parameternames are now mapped by Query itself
 				for (Map.Entry<String, Object> paramEntry : parameters.entrySet()) {
 					Object js_param = Context.javaToJS(paramEntry.getValue(), scope);
-					ScriptableObject.putProperty(scope, paramEntry.getKey(), js_param);						
+					ScriptableObject.putProperty(scope, paramEntry.getKey(), js_param);
 				}
 
 				if(logger.isDebugEnabled())

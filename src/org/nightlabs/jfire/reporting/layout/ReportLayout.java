@@ -52,7 +52,7 @@ import org.nightlabs.util.Util;
  *		table="JFireReporting_ReportLayout"
  *
  * WORKAROUND: Workaround for MySQL table lock timeout when initializing datastore on ADD COLUMN when using superclass-table
- * ...and: superclass-table fails with HSQLDB! (MySQL works) 
+ * ...and: superclass-table fails with HSQLDB! (MySQL works)
  * @jdo.inheritance strategy="new-table"
  *
  * @jdo.fetch-group name="ReportLayout.reportDesign" fetch-groups="default" fields="reportDesign"
@@ -71,7 +71,7 @@ public class ReportLayout extends ReportRegistryItem {
 	public static final String FETCH_GROUP_THIS_REPORT_LAYOUT = "ReportLayout.this";
 	
 	/**
-	 * Serial version UID. Don't forget to change after changing members. 
+	 * Serial version UID. Don't forget to change after changing members.
 	 */
 	private static final long serialVersionUID = 1L;
 
@@ -95,7 +95,7 @@ public class ReportLayout extends ReportRegistryItem {
 			ReportCategory parentItem,
 			String reportRegistryItemID,
 			byte[] reportDesign
-		) 
+		)
 	{
 		super(parentItem, parentItem.getOrganisationID(), parentItem.getReportRegistryItemType(), reportRegistryItemID);
 		this.reportDesign = reportDesign;
@@ -116,7 +116,7 @@ public class ReportLayout extends ReportRegistryItem {
 			String organisationID,
 			String reportRegistryItemType,
 			String reportRegistryItemID
-		) 
+		)
 	{
 		super(parentItem, organisationID, reportRegistryItemType, reportRegistryItemID);
 //		this.localisationData = new HashMap<String, ReportLayoutLocalisationData>();
@@ -181,8 +181,8 @@ public class ReportLayout extends ReportRegistryItem {
 		}
 	}
 	
-	public void loadStream(InputStream in, String name) 
-	throws IOException 
+	public void loadStream(InputStream in, String name)
+	throws IOException
 	{
 		loadStream(in, 10 * 1024, new Date(), name);
 	}
@@ -218,7 +218,7 @@ public class ReportLayout extends ReportRegistryItem {
 
 //	/**
 //	 * Returns the map of localisation data (message files).
-//	 * 
+//	 *
 //	 * @return the localisationData
 //	 */
 //	public Map<String, ReportLayoutLocalisationData> getLocalisationData() {

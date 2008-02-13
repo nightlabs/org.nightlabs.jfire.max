@@ -19,7 +19,7 @@ import org.nightlabs.progress.ProgressMonitor;
  * @author Alexander Bieber <!-- alex [AT] nightlabs [DOT] de -->
  *
  */
-public class ValueProviderDAO 
+public class ValueProviderDAO
 extends BaseJDOObjectDAO<ValueProviderID, ValueProvider> {
 
 	/**
@@ -36,8 +36,8 @@ extends BaseJDOObjectDAO<ValueProviderID, ValueProvider> {
 	protected Collection<ValueProvider> retrieveJDOObjects(
 			Set<ValueProviderID> objectIDs, String[] fetchGroups,
 			int maxFetchDepth, ProgressMonitor monitor
-		) 
-	throws Exception 
+		)
+	throws Exception
 	{
 		ReportParameterManager rpm = ReportParameterManagerUtil.getHome(SecurityReflector.getInitialContextProperties()).create();
 		return rpm.getValueProviders(objectIDs, fetchGroups, maxFetchDepth);

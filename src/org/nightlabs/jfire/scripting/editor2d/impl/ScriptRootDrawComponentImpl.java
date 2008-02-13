@@ -59,10 +59,10 @@ implements ScriptRootDrawComponent
 	public void assignScriptResults(Map<ScriptRegistryItemID, Object> scriptValues)
 	{
 		// TODO: all scriptDrawComponents should already be cached when added
-		Collection scriptDrawComponents = findDrawComponents(ScriptDrawComponent.class, true);
-		for (Iterator it = scriptDrawComponents.iterator(); it.hasNext(); )
+		Collection<ScriptDrawComponent> scriptDrawComponents = findDrawComponents(ScriptDrawComponent.class, true);
+		for (Iterator<ScriptDrawComponent> it = scriptDrawComponents.iterator(); it.hasNext(); )
 		{
-			ScriptDrawComponent sd = (ScriptDrawComponent) it.next();
+			ScriptDrawComponent sd = it.next();
 			Object value = scriptValues.get(sd.getScriptRegistryItemID());
 			if (sd.getScriptRegistryItemID() == null) {
 				logger.error("ScriptDrawComponent "+sd+" has null as scriptRegistryItemID!");
@@ -90,11 +90,11 @@ implements ScriptRootDrawComponent
 	public Set<ScriptRegistryItemID> getScriptRegistryItemIDs()
 	{
 		// TODO: all scriptDrawComponents should already be cached when added
-		Collection scriptDrawComponents = findDrawComponents(ScriptDrawComponent.class, true);
+		Collection<ScriptDrawComponent> scriptDrawComponents = findDrawComponents(ScriptDrawComponent.class, true);
 		
 		Set<ScriptRegistryItemID> scriptIDs = new HashSet<ScriptRegistryItemID>();
-		for (Iterator it = scriptDrawComponents.iterator(); it.hasNext(); ) {
-			ScriptDrawComponent sd = (ScriptDrawComponent) it.next();
+		for (Iterator<ScriptDrawComponent> it = scriptDrawComponents.iterator(); it.hasNext(); ) {
+			ScriptDrawComponent sd = it.next();
 			scriptIDs.add(sd.getScriptRegistryItemID());
 		}
 		return scriptIDs;

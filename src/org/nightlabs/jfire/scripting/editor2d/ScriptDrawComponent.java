@@ -25,6 +25,7 @@
  ******************************************************************************/
 package org.nightlabs.jfire.scripting.editor2d;
 
+import org.nightlabs.editor2d.DrawComponent;
 import org.nightlabs.jfire.scripting.id.ScriptRegistryItemID;
 
 /**
@@ -35,7 +36,7 @@ import org.nightlabs.jfire.scripting.id.ScriptRegistryItemID;
  * @author Daniel.Mazurek <at> NightLabs <dot> de
  *
  */
-public interface ScriptDrawComponent
+public interface ScriptDrawComponent extends DrawComponent
 {
 	public static final String PROP_SCRIPT_REGISTRY_ITEM_ID = "ScriptRegistryItemID";
 	

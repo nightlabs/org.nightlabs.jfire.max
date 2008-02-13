@@ -85,10 +85,9 @@ implements ScriptEditor2DFactory
 	{
 		return new TextScriptDrawComponentImpl(text, fontName, fontSize, fontStyle, x, y, parent);
 	}
-
+	
 	@Override
-	public DrawComponent createDrawComponent(Class clazz)
-	{
+	public DrawComponent createDrawComponent(Class<?> clazz) {
 		if (clazz.isAssignableFrom(TextScriptDrawComponent.class))
 			return createTextScriptDrawComponent();
 		if (clazz.isAssignableFrom(BarcodeDrawComponent.class))
@@ -98,9 +97,9 @@ implements ScriptEditor2DFactory
 	}
 
 	@Override
-	public Set<Class> getSupportedDrawComponentClasses()
+	public Set<Class<? extends DrawComponent>> getSupportedDrawComponentClasses()
 	{
-		Set<Class> supportedClasses = super.getSupportedDrawComponentClasses();
+		Set<Class<? extends DrawComponent>> supportedClasses = super.getSupportedDrawComponentClasses();
 		supportedClasses.add(TextScriptDrawComponent.class);
 		supportedClasses.add(BarcodeDrawComponent.class);
 		return super.getSupportedDrawComponentClasses();

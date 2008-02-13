@@ -102,15 +102,15 @@ public class SimpleProductType extends ProductType
 	 * @param parentProductTypeID The <tt>ProductType</tt> of which to find all children or <tt>null</tt> to find all top-level-<tt>SimpleProductType</tt>s.
 	 * @return Returns instances of <tt>SimpleProductType</tt>.
 	 */
-	public static Collection getChildProductTypes(PersistenceManager pm, ProductTypeID parentProductTypeID)
+	public static Collection<SimpleProductType> getChildProductTypes(PersistenceManager pm, ProductTypeID parentProductTypeID)
 	{
 		if (parentProductTypeID == null) {
 			Query q = pm.newNamedQuery(SimpleProductType.class, "getChildProductTypes_topLevel");
-			return (Collection)q.execute();
+			return (Collection<SimpleProductType>)q.execute();
 		}
 
 		Query q = pm.newNamedQuery(SimpleProductType.class, "getChildProductTypes_hasParent");
-		return (Collection) q.execute(
+		return (Collection<SimpleProductType>) q.execute(
 			parentProductTypeID.organisationID, parentProductTypeID.productTypeID);
 	}
 

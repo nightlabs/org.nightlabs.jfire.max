@@ -106,7 +106,6 @@ public class SimpleProductTypeActionHandler
 
 
 	@Override
-	@SuppressWarnings("unchecked")
 	@Implement
 	protected Collection<? extends Article> createCrossTradeArticles(
 			User user, Product localPackageProduct, Article localArticle,

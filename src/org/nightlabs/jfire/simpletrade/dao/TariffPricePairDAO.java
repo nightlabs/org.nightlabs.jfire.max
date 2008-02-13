@@ -32,6 +32,7 @@ import javax.jdo.FetchPlan;
 
 import org.nightlabs.jfire.accounting.Price;
 import org.nightlabs.jfire.accounting.Tariff;
+import org.nightlabs.jfire.accounting.gridpriceconfig.TariffPricePair;
 import org.nightlabs.jfire.accounting.id.CurrencyID;
 import org.nightlabs.jfire.accounting.priceconfig.id.PriceConfigID;
 import org.nightlabs.jfire.base.jdo.cache.Cache;
@@ -61,7 +62,7 @@ public class TariffPricePairDAO
 	protected static class TariffPricePairsCarrier {
 		public TariffPricePairsCarrier(
 				PriceConfigID priceConfigID, CustomerGroupID customerGroupID,
-				CurrencyID currencyID, Collection tariffPricePairs)
+				CurrencyID currencyID, Collection<TariffPricePair> tariffPricePairs)
 		{
 			this.customerGroupID = customerGroupID;
 			this.priceConfigID = priceConfigID;
@@ -72,7 +73,7 @@ public class TariffPricePairDAO
 		public CustomerGroupID customerGroupID;
 		public PriceConfigID priceConfigID;
 		public CurrencyID currencyID;
-		public Collection tariffPricePairs;
+		public Collection<TariffPricePair> tariffPricePairs;
 		public long loadDT = System.currentTimeMillis();
 	}
 
@@ -90,7 +91,7 @@ public class TariffPricePairDAO
 //	 */
 //	private Map tariffPricePairsCarriers = new HashMap();
 
-	public synchronized Collection getTariffPricePairs(
+	public synchronized Collection<TariffPricePair> getTariffPricePairs(
 			PriceConfigID priceConfigID,
 			CustomerGroupID customerGroupID,
 			CurrencyID currencyID,
@@ -104,7 +105,7 @@ public class TariffPricePairDAO
 		if (tppc == null) { // || System.currentTimeMillis() - tppc.loadDT > EXPIRE_MSEC) {
 			try {
 				SimpleTradeManager stm = SimpleTradeManagerUtil.getHome(SecurityReflector.getInitialContextProperties()).create();
-				Collection tariffPricePairs = stm.getTariffPricePairs(priceConfigID,
+				Collection<TariffPricePair> tariffPricePairs = stm.getTariffPricePairs(priceConfigID,
 						customerGroupID,
 						currencyID,
 						FETCH_GROUPS_TARIFF,

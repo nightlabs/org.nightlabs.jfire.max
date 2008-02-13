@@ -492,7 +492,6 @@ implements SessionBean
 	 * @ejb.transaction type="Supports" @!This usually means that no transaction is opened which is significantly faster and recommended for all read-only EJB methods! Marco.
 	 * @ejb.permission role-name="_Guest_"
 	 */
-	@SuppressWarnings("unchecked")
 	public Set<ProductTypeID> getChildSimpleProductTypeIDs(
 			ProductTypeID parentSimpleProductTypeID) {
 		PersistenceManager pm = getPersistenceManager();
@@ -509,7 +508,6 @@ implements SessionBean
 	 * @ejb.transaction type="Supports" @!This usually means that no transaction is opened which is significantly faster and recommended for all read-only EJB methods! Marco.
 	 * @ejb.permission role-name="_Guest_"
 	 */
-	@SuppressWarnings("unchecked")
 	public SimpleProductType getSimpleProductType(
 			ProductTypeID simpleProductTypeID, String[] fetchGroups,
 			int maxFetchDepth) {
@@ -529,7 +527,6 @@ implements SessionBean
 	 * @ejb.transaction type="Supports" @!This usually means that no transaction is opened which is significantly faster and recommended for all read-only EJB methods! Marco.
 	 * @ejb.permission role-name="_Guest_"
 	 */
-	@SuppressWarnings("unchecked")
 	public List<SimpleProductType> getSimpleProductTypes(
 			Collection<ProductTypeID> simpleProductTypeIDs, String[] fetchGroups,
 			int maxFetchDepth) {
@@ -816,7 +813,6 @@ implements SessionBean
 	 * @ejb.permission role-name="_Guest_"
 	 * @ejb.transaction type="Required"
 	 */
-	@SuppressWarnings("unchecked")
 	public List<FormulaPriceConfig> getFormulaPriceConfigs(Collection<PriceConfigID> formulaPriceConfigIDs, String[] fetchGroups, int maxFetchDepth)
 	{
 		PersistenceManager pm = getPersistenceManager();
@@ -867,9 +863,9 @@ implements SessionBean
 			// find an Offer within the Order which is not finalized - or create one
 			Offer offer;
 			if (offerID == null) {
-				Collection offers = Offer.getNonFinalizedNonEndedOffers(pm, order);
+				Collection<Offer> offers = Offer.getNonFinalizedNonEndedOffers(pm, order);
 				if (!offers.isEmpty()) {
-					offer = (Offer) offers.iterator().next();
+					offer = offers.iterator().next();
 				}
 				else {
 					offer = trader.createOffer(user, order, null); // TODO offerIDPrefix ???
@@ -1053,8 +1049,9 @@ implements SessionBean
 				else if (simpleProductType.getPackagePriceConfig() instanceof GridPriceConfig) {
 					Set<CustomerGroupID> unavailableCustomerGroupIDs = new HashSet<CustomerGroupID>();
 					GridPriceConfig gridPriceConfig = (GridPriceConfig) simpleProductType.getPackagePriceConfig();
-					for (CustomerGroup customerGroup : gridPriceConfig.getCustomerGroups()) {
-						
+					
+					//FIXME Check whether this loop is necessary
+					for (@SuppressWarnings("unused") CustomerGroup customerGroup : gridPriceConfig.getCustomerGroups()) {
 					}
 	
 					for (CustomerGroupID customerGroupID : unavailableCustomerGroupIDs)
@@ -1082,7 +1079,7 @@ implements SessionBean
 		try {
 			PersistenceManager pm = getPersistenceManager();
 			try {
-				Hashtable initialContextProperties = getInitialContextProperties(emitterOrganisationID);
+				Hashtable<?, ?> initialContextProperties = getInitialContextProperties(emitterOrganisationID);
 
 				PersistentNotificationEJB persistentNotificationEJB = PersistentNotificationEJBUtil.getHome(initialContextProperties).create();
 				SimpleProductTypeNotificationFilter notificationFilter = new SimpleProductTypeNotificationFilter(
@@ -1098,7 +1095,8 @@ implements SessionBean
 				SimpleTradeManager simpleTradeManager = SimpleTradeManagerUtil.getHome(initialContextProperties).create();
 
 				Set<ProductTypeID> productTypeIDs = simpleTradeManager.getPublishedSimpleProductTypeIDs();
-				Collection<SimpleProductType> productTypes = simpleTradeManager.getSimpleProductTypesForReseller(productTypeIDs);
+				// never used
+				//Collection<SimpleProductType> productTypes = simpleTradeManager.getSimpleProductTypesForReseller(productTypeIDs);
 
 				notificationReceiver.replicateSimpleProductTypes(emitterOrganisationID, productTypeIDs, new HashSet<ProductTypeID>(0));
 
@@ -1157,14 +1155,14 @@ implements SessionBean
 
 			// TODO use setResult and put all this logic into the JDO query!
 			StablePriceConfig priceConfig = (StablePriceConfig) pm.getObjectById(priceConfigID);
-			Collection priceCells = priceConfig.getPriceCells(
+			Collection<PriceCell> priceCells = priceConfig.getPriceCells(
 					CustomerGroup.getPrimaryKey(customerGroupID.organisationID, customerGroupID.customerGroupID),
 					currencyID.currencyID);
 
 			Collection<TariffPricePair> res = new ArrayList<TariffPricePair>();
 
-			for (Iterator it = priceCells.iterator(); it.hasNext(); ) {
-				PriceCell priceCell = (PriceCell) it.next();
+			for (Iterator<PriceCell> it = priceCells.iterator(); it.hasNext(); ) {
+				PriceCell priceCell = it.next();
 				String tariffPK = priceCell.getPriceCoordinate().getTariffPK();
 				TariffID tariffID = TariffID.create(tariffPK);
 //				String[] tariffPKParts = tariffPKSplitPattern.split(tariffPK);
@@ -1232,7 +1230,6 @@ implements SessionBean
 	 * @ejb.transaction type="Required"
 	 * @ejb.permission role-name="_Guest_"
 	 */
-	@SuppressWarnings("unchecked")
 	public Collection<OrganisationID> getCandidateOrganisationIDsForCrossTrade()
 	{
 		PersistenceManager pm = getPersistenceManager();

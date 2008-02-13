@@ -85,7 +85,6 @@ extends NotificationReceiver
 		replicateSimpleProductTypes(notificationBundle.getOrganisationID(), productTypeIDs_load, productTypeIDs_delete);
 	}
 
-	@SuppressWarnings("unchecked")
 	public void replicateSimpleProductTypes(String emitterOrganisationID, Set<ProductTypeID> productTypeIDs_load, Set<ProductTypeID> productTypeIDs_delete)
 	throws NamingException, RemoteException, CreateException
 	{

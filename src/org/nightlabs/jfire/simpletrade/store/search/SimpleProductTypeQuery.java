@@ -11,7 +11,7 @@ import org.nightlabs.jfire.store.search.ProductTypeQuery;
  *
  */
 public class SimpleProductTypeQuery
-extends ProductTypeQuery
+extends ProductTypeQuery<SimpleProductType>
 {
 	/**
 	 * 

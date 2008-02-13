@@ -38,7 +38,6 @@ implements IJDOObjectDAO<SimpleProductType>
 	}
 
 	@Override
-	@SuppressWarnings("unchecked")
 	@Implement
 	protected Collection<SimpleProductType> retrieveJDOObjects(
 			Set<ProductTypeID> simpleProductTypeIDs, String[] fetchGroups, int maxFetchDepth,
@@ -59,7 +58,6 @@ implements IJDOObjectDAO<SimpleProductType>
 
 	private SimpleTradeManager simpleTradeManager;
 
-	@SuppressWarnings("unchecked")
 	public synchronized List<SimpleProductType> getChildSimpleProductTypes(ProductTypeID parentSimpleProductTypeID,
 			String[] fetchGroups, int maxFetchDepth,
 			ProgressMonitor monitor)
@@ -115,8 +113,8 @@ implements IJDOObjectDAO<SimpleProductType>
 	public SimpleProductType storeJDOObject(SimpleProductType jdoObject, boolean get, String[] fetchGroups, int maxFetchDepth, ProgressMonitor monitor) {
 		if(jdoObject == null)
 			throw new NullPointerException("SimpleProductType to save must not be null");
-		if (!(jdoObject instanceof SimpleProductType))
-			throw new IllegalArgumentException("ProductType to save must be of type " + SimpleProductType.class.getSimpleName() + ", passed was " + jdoObject.getClass().getSimpleName());
+//		if (!(jdoObject instanceof SimpleProductType))
+//			throw new IllegalArgumentException("ProductType to save must be of type " + SimpleProductType.class.getSimpleName() + ", passed was " + jdoObject.getClass().getSimpleName());
 		SimpleProductType productType = Util.cloneSerializable(jdoObject);
 		SimpleProductType result = null;
 		monitor.beginTask("Saving SimpleProductType PropertySet", 3);

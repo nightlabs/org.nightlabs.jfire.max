@@ -50,7 +50,7 @@ public class SimpleProductTypeSearchFilter extends ProductTypeSearchFilter {
 	 * @see org.nightlabs.jfire.store.ProductTypeSearchFilter#getProductTypeClass()
 	 */
 	@Override
-	protected Class getProductTypeClass() {
+	protected Class<SimpleProductType> getProductTypeClass() {
 		return SimpleProductType.class;
 	}
 

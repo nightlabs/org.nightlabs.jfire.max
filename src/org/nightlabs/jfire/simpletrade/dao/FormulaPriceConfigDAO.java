@@ -30,7 +30,6 @@ extends BaseJDOObjectDAO<PriceConfigID, FormulaPriceConfig>
 	}
 
 	@Override
-	@SuppressWarnings("unchecked")
 	@Implement
 	protected Collection<FormulaPriceConfig> retrieveJDOObjects(
 			Set<PriceConfigID> formulaPriceConfigIDs, String[] fetchGroups, int maxFetchDepth,
@@ -51,7 +50,6 @@ extends BaseJDOObjectDAO<PriceConfigID, FormulaPriceConfig>
 
 	private SimpleTradeManager simpleTradeManager;
 
-	@SuppressWarnings("unchecked")
 	public List<FormulaPriceConfig> getFormulaPriceConfigs(String[] fetchGroups, int maxFetchDepth,
 			ProgressMonitor monitor)
 	{

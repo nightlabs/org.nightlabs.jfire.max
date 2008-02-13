@@ -61,7 +61,7 @@ public class AccountSearchFilter extends SearchFilter {
 
 	@Override
 	protected void prepareQuery(
-			Set<Class> imports, StringBuffer vars, StringBuffer filter, StringBuffer params,
+			Set<Class<?>> imports, StringBuffer vars, StringBuffer filter, StringBuffer params,
 			Map<String, Object> paramMap, StringBuffer result)
 	{
 		params.append("java.lang.String ownerOrganisationID, ");

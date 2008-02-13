@@ -38,6 +38,6 @@ public class JFireLoggingServiceFactory implements ServiceFactory {
 		return new JFireLoggingService();
 	}
 	
-	public void close() {		
+	public void close() {
 	}
 }

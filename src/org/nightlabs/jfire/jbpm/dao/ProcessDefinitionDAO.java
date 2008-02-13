@@ -15,8 +15,8 @@ import org.nightlabs.progress.ProgressMonitor;
  * @author Daniel.Mazurek [at] NightLabs [dot] de
  *
  */
-public class ProcessDefinitionDAO 
-extends BaseJDOObjectDAO<ProcessDefinitionID, ProcessDefinition> 
+public class ProcessDefinitionDAO
+extends BaseJDOObjectDAO<ProcessDefinitionID, ProcessDefinition>
 {
 	private static ProcessDefinitionDAO sharedInstance;
 	public static ProcessDefinitionDAO sharedInstance() {
@@ -39,8 +39,8 @@ extends BaseJDOObjectDAO<ProcessDefinitionID, ProcessDefinition>
 	@Override
 	protected Collection<ProcessDefinition> retrieveJDOObjects(
 			Set<ProcessDefinitionID> objectIDs, String[] fetchGroups,
-			int maxFetchDepth, ProgressMonitor monitor) 
-	throws Exception 
+			int maxFetchDepth, ProgressMonitor monitor)
+	throws Exception
 	{
 		monitor.beginTask("Loading ProcessDefintions", 2);
 		monitor.worked(1);

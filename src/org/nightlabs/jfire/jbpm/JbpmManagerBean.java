@@ -73,7 +73,7 @@ implements SessionBean
 		super.setSessionContext(sessionContext);
 	}
 	/**
-	 * @ejb.create-method  
+	 * @ejb.create-method
 	 * @ejb.permission role-name="_Guest_"
 	 */
 	public void ejbCreate()
@@ -113,7 +113,7 @@ implements SessionBean
 	 *		CASE-SENSITIVE identifier behind the $INCLUDE directive. The value is the <code>File</code> that will be merged into, instead of the
 	 *		complete comment containing the $INCLUDE. Note, that "$INCLUDE" must be at the beginning of the comment! That means, between
 	 *		the "&lt;!--" and the "$INCLUDE", only whitespaces and linefeeds are allowed!
-	 * @throws IOException 
+	 * @throws IOException
 	 */
 	private static void createHibernateConfigTemplate(
 			File hibernateConfigTemplateOutputFile,
@@ -433,7 +433,7 @@ implements SessionBean
 //			JbpmContext jbpmContext = JbpmLookup.getJbpmConfiguration().createJbpmContext();
 //			try {
 //				state.getStateDefinition().getProcessDefinition().getJbpmProcessDefinitionName();
-//				
+//
 //			} finally {
 //				jbpmContext.close();
 //			}
@@ -446,53 +446,53 @@ implements SessionBean
 	 * @ejb.interface-method
 	 * @ejb.transaction type="Required"
 	 * @ejb.permission role-name="_Guest_"
-	 */		
+	 */
 	@SuppressWarnings("unchecked")
-	public Set<StateDefinitionID> getStateDefinitionIDs(ProcessDefinition processDefinition) 
+	public Set<StateDefinitionID> getStateDefinitionIDs(ProcessDefinition processDefinition)
 	{
 		PersistenceManager pm = getPersistenceManager();
 		try {
 			return NLJDOHelper.getObjectIDSet(StateDefinition.getStateDefinitions(pm, processDefinition));
 		} finally {
 			pm.close();
-		}				
+		}
 	}
 
 	/**
 	 * @ejb.interface-method
 	 * @ejb.transaction type="Required"
 	 * @ejb.permission role-name="_Guest_"
-	 */		
+	 */
 	@SuppressWarnings("unchecked")
-	public Collection<StateDefinition> getStateDefinitions(Set<StateDefinitionID> objectIDs, 
-			String[] fetchGroups, int maxFetchDepth) 
+	public Collection<StateDefinition> getStateDefinitions(Set<StateDefinitionID> objectIDs,
+			String[] fetchGroups, int maxFetchDepth)
 	{
 		PersistenceManager pm = getPersistenceManager();
 		try {
-			return NLJDOHelper.getDetachedObjectList(pm, objectIDs, StateDefinition.class, 
+			return NLJDOHelper.getDetachedObjectList(pm, objectIDs, StateDefinition.class,
 					fetchGroups, maxFetchDepth);
 		} finally {
 			pm.close();
-		}				
+		}
 	}
 	
 	/**
 	 * @ejb.interface-method
 	 * @ejb.transaction type="Required"
 	 * @ejb.permission role-name="_Guest_"
-	 */		
+	 */
 	@SuppressWarnings("unchecked")
-	public Collection<ProcessDefinition> getProcessDefinitions(Set<ProcessDefinitionID> objectIDs, 
-			String[] fetchGroups, int maxFetchDepth) 
+	public Collection<ProcessDefinition> getProcessDefinitions(Set<ProcessDefinitionID> objectIDs,
+			String[] fetchGroups, int maxFetchDepth)
 	{
 		PersistenceManager pm = getPersistenceManager();
 		try {
-			return NLJDOHelper.getDetachedObjectList(pm, objectIDs, ProcessDefinition.class, 
+			return NLJDOHelper.getDetachedObjectList(pm, objectIDs, ProcessDefinition.class,
 					fetchGroups, maxFetchDepth);
 		} finally {
 			pm.close();
-		}				
-	}	
+		}
+	}
 	
 	/**
 	 *
@@ -518,5 +518,5 @@ implements SessionBean
 		} finally {
 			pm.close();
 		}
-	}			
+	}
 }

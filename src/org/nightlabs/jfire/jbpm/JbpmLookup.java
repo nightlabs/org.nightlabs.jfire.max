@@ -54,7 +54,7 @@ public class JbpmLookup
 			}
 		} catch (NamingException x) {
 			throw new RuntimeException("Could not bind JbpmConfiguration \""+jndiName+"\" into JNDI!", x);
-		} 
+		}
 	}
 
 	public static JbpmConfiguration getJbpmConfiguration()

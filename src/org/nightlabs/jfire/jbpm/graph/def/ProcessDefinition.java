@@ -45,7 +45,7 @@ implements Serializable
 	private static final Logger logger = Logger.getLogger(ProcessDefinition.class);
 	private static final long serialVersionUID = 1L;
 
-	public static final String FETCH_GROUP_THIS_PROCESS_DEFINITION = "ProcessDefinition.this"; 
+	public static final String FETCH_GROUP_THIS_PROCESS_DEFINITION = "ProcessDefinition.this";
 	
 	public static ProcessDefinitionID getProcessDefinitionID(org.jbpm.graph.def.ProcessDefinition jbpmProcessDefinition)
 	{
@@ -60,7 +60,7 @@ implements Serializable
 	/**
 	 * @param jbpmProcessDefinitionURL The URL pointing to the processdefinition.xml file's directory
 	 * @return the newly created {@link ProcessDefinition} (or the old one with a new version, if it previously existed.
-	 * @throws IOException 
+	 * @throws IOException
 	 */
 	public static org.jbpm.graph.def.ProcessDefinition readProcessDefinition(URL jbpmProcessDefinitionURL)
 	throws IOException
@@ -101,7 +101,7 @@ implements Serializable
 	 * @param jbpmContext The jbpm context to work in. Can be <code>null</code> which will cause a context to be implicitely created and closed.
 	 * @param jbpmProcessDefinitionURL The URL pointing to the processdefinition.xml file's directory
 	 * @return the newly created {@link ProcessDefinition} (or the old one with a new version, if it previously existed.
-	 * @throws IOException 
+	 * @throws IOException
 	 */
 	public static ProcessDefinition storeProcessDefinition(
 			PersistenceManager pm, JbpmContext jbpmContext, org.jbpm.graph.def.ProcessDefinition jbpmProcessDefinition,
@@ -211,7 +211,7 @@ implements Serializable
 	 * and makes it the current version (retrievable via {@link #getProcessDefinitionVersion()}).
 	 * @param jbpmProcessDefinition
 	 * @return
-	 * @throws IOException 
+	 * @throws IOException
 	 */
 	public ProcessDefinitionVersion createProcessDefinitionVersion(org.jbpm.graph.def.ProcessDefinition jbpmProcessDefinition, URL jbpmProcessDefinitionURL)
 	throws IOException
@@ -233,7 +233,7 @@ implements Serializable
 	/**
 	 * Returns the current (= newest) version of this <code>ProcessDefinition</code>.
 	 *
-	 * @return the current (= newest) version of this <code>ProcessDefinition</code>. 
+	 * @return the current (= newest) version of this <code>ProcessDefinition</code>.
 	 */
 	public ProcessDefinitionVersion getProcessDefinitionVersion()
 	{

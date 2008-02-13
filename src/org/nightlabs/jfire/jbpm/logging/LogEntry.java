@@ -113,15 +113,15 @@ public class LogEntry implements Serializable {
 	 * @param organisationID - The ID of the organisation in which the workflow transition takes place.
 	 * @param date - The Date the start of the workflow transition takes place.
 	 * @param sourceNode - The Workflow node from which the transition originates (Where the token started).
-	 * @param destinationNode - The Workflow node the transition leads to (Where the token is now). 
+	 * @param destinationNode - The Workflow node the transition leads to (Where the token is now).
 	 * @param transitionName - The name of the transition itself.
 	 * @param processInstanceID - The ID of the instance of the workflow.
 	 * @param user - The User who initiated the transition.
 	 */
-	public LogEntry (String organisationID, 
-			Date date, 
-			String sourceNode, 
-			String destinationNode, 
+	public LogEntry (String organisationID,
+			Date date,
+			String sourceNode,
+			String destinationNode,
 			String transitionName,
 			long processInstanceID,
 			User user) {
@@ -203,5 +203,5 @@ public class LogEntry implements Serializable {
 
 	public String getTransitionName() {
 		return transitionName;
-	}	
+	}
 }

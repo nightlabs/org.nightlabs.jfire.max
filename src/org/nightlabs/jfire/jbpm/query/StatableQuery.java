@@ -16,9 +16,9 @@ import org.nightlabs.jfire.trade.state.id.StateDefinitionID;
  * @author Daniel.Mazurek [at] NightLabs [dot] de
  *
  */
-public class StatableQuery 
-extends JDOQuery<Statable> 
-{	
+public class StatableQuery
+extends JDOQuery<Statable>
+{
 	/**
 	 * 
 	 */
@@ -27,7 +27,7 @@ extends JDOQuery<Statable>
 	
 //	public abstract Class getStatableClass();
 	
-	public StatableQuery(Class statableClass) 
+	public StatableQuery(Class statableClass)
 	{
 		if (statableClass == null)
 			throw new IllegalArgumentException("Param statableClass must not be null");
@@ -41,32 +41,32 @@ extends JDOQuery<Statable>
 	/**
 	 * the Implementation class of the {@link Statable} Interface
 	 */
-	private Class statableClass = null;	
+	private Class statableClass = null;
 	public Class getStatableClass() {
 		return statableClass;
 	}
 	
 	@Override
-	protected Query prepareQuery() 
+	protected Query prepareQuery()
 	{
 		Query q = getPersistenceManager().newQuery(getStatableClass());
 		StringBuffer filter = new StringBuffer();
 		
 		filter.append(" true");
 		
-		if (stateDefinitionID != null) 
+		if (stateDefinitionID != null)
 		{
 			if (!onlyInSelectedState) {
 				filter.append("\n && (this.states.contains(stateVar) && ( " +
 						"stateVar.stateDefinition.processDefinitionOrganisationID == \""+stateDefinitionID.processDefinitionOrganisationID+"\" && " +
 						"stateVar.stateDefinition.processDefinitionID == \""+stateDefinitionID.processDefinitionID+"\" && " +
 						"stateVar.stateDefinition.stateDefinitionOrganisationID == \""+stateDefinitionID.stateDefinitionOrganisationID+"\" && " +
-						"stateVar.stateDefinition.stateDefinitionID == \""+stateDefinitionID.stateDefinitionID+"\"" +					
+						"stateVar.stateDefinition.stateDefinitionID == \""+stateDefinitionID.stateDefinitionID+"\"" +
 						"))");
 				
 				q.declareImports("import "+State.class.getName());
 				q.declareVariables(State.class.getName()+" stateVar");
-			} else { 
+			} else {
 				// TODO: JDOHelper.getObjectId(this.*) does not seem to work (java.lang.IndexOutOfBoundsException: Index: 3, Size: 3)
 //				filter.append("\n && JDOHelper.getObjectId(this.stateDefinition) == :stateDefinitionID");
 				// WORKAROUND:
@@ -74,7 +74,7 @@ extends JDOQuery<Statable>
 						"this.state.stateDefinition.processDefinitionOrganisationID == \""+stateDefinitionID.processDefinitionOrganisationID+"\" && " +
 						"this.state.stateDefinition.processDefinitionID == \""+stateDefinitionID.processDefinitionID+"\" && " +
 						"this.state.stateDefinition.stateDefinitionOrganisationID == \""+stateDefinitionID.stateDefinitionOrganisationID+"\" && " +
-						"this.state.stateDefinition.stateDefinitionID == \""+stateDefinitionID.stateDefinitionID+"\"" +					
+						"this.state.stateDefinition.stateDefinitionID == \""+stateDefinitionID.stateDefinitionID+"\"" +
 						")");
 			}
 		}
@@ -83,7 +83,7 @@ extends JDOQuery<Statable>
 			filter.append("\n && this.createDT >= :stateCreateDTMin");
 
 		if (stateCreateDTMax != null)
-			filter.append("\n && this.createDT <= :stateCreateDTMax");		
+			filter.append("\n && this.createDT <= :stateCreateDTMax");
 	
 		logger.debug("filter == "+filter);
 		
@@ -105,8 +105,8 @@ extends JDOQuery<Statable>
 
 	/**
 	 * determines the lower limit of the createDT of the {@link Statable} for the given
-	 * stateDefinitionID 
-	 */	
+	 * stateDefinitionID
+	 */
 	private Date stateCreateDTMin = null;
 	public Date getStateCreateDTMin() {
 		return stateCreateDTMin;
@@ -117,7 +117,7 @@ extends JDOQuery<Statable>
 
 	/**
 	 * determines the upper limit of the createDT of the {@link Statable} for the given
-	 * stateDefinitionID 
+	 * stateDefinitionID
 	 */
 	private Date stateCreateDTMax = null;
 	public Date getStateCreateDTMax() {
@@ -131,9 +131,9 @@ extends JDOQuery<Statable>
 	 * if onlyInSelectedState is true, the query matches only, if the StateDefinitionID of the
 	 * Statable.getState().getStateDefinition() is exact the one in the query
 	 * 
-	 * if onlyInSelectedState is false the query matches, if the {@link Statable} once, 
-	 * has passed the getStateDefinitionID() of the query 
-	 *  
+	 * if onlyInSelectedState is false the query matches, if the {@link Statable} once,
+	 * has passed the getStateDefinitionID() of the query
+	 * 
 	 */
 	private boolean onlyInSelectedState = false;
 	public boolean isOnlyInSelectedState() {

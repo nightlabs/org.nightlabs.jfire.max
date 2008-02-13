@@ -7,7 +7,6 @@ import javax.jdo.PersistenceManager;
 
 import org.jbpm.graph.def.ActionHandler;
 import org.jbpm.graph.exe.ExecutionContext;
-import org.jbpm.graph.exe.ProcessInstance;
 import org.nightlabs.jdo.ObjectID;
 import org.nightlabs.jdo.ObjectIDUtil;
 import org.nightlabs.jfire.base.Lookup;
@@ -115,5 +114,5 @@ implements ActionHandler
 	}
 
 	protected abstract void doExecute(ExecutionContext executionContext)
-	throws Exception; 
+	throws Exception;
 }

@@ -57,12 +57,12 @@ public class JFireLoggingService implements LoggingService {
 		//Get the ID of the current organisation
 		this.OrganisationID = SecurityReflector.getUserDescriptor().getOrganisationID();
 		//Obtain a persistency manager for the current organisation
-		this.pm = new Lookup(OrganisationID).getPersistenceManager();		
+		this.pm = new Lookup(OrganisationID).getPersistenceManager();
 	}
 
 	public void log(ProcessLog processLog) {
 		if(processLog.getParent() != null) {
-			if (processLog.getParent().getChildren() != null) { 
+			if (processLog.getParent().getChildren() != null) {
 				logger.debug("Processing "+processLog.getParent().getChildren().size()+" workflow log(s)");
 				Iterator logIterator = processLog.getParent().getChildren().iterator();
 				
@@ -71,8 +71,8 @@ public class JFireLoggingService implements LoggingService {
 					if (log instanceof TransitionLog) { //We are only interested in workflow transitions.
 					TransitionLog transitionLog = (TransitionLog)log;
 					
-					pm.makePersistent(new LogEntry(OrganisationID, processLog.getDate(), 
-							transitionLog.getSourceNode().getFullyQualifiedName(), 
+					pm.makePersistent(new LogEntry(OrganisationID, processLog.getDate(),
+							transitionLog.getSourceNode().getFullyQualifiedName(),
 							transitionLog.getDestinationNode().getFullyQualifiedName(),
 							transitionLog.getTransition().getName(),
 							processLog.getToken().getProcessInstance().getId(),
@@ -85,7 +85,7 @@ public class JFireLoggingService implements LoggingService {
 	}
 
 	public void close() {
-		//this.pm.close(); 
+		//this.pm.close();
 		logger.debug("Closed");
 	}
 }

@@ -240,7 +240,7 @@ implements Serializable
 //	 * This method calls {@link #_createState(User, Statable)} in order to obtain the new instance. Override that method
 //	 * in order to subclass {@link State}.
 //	 * </p>
-//	 * 
+//	 *
 //	 * @param user The user who is responsible for the action.
 //	 * @param statable The {@link Statable} that is transitioned to the new state.
 //	 * @return Returns the new newly created State instance.
@@ -301,7 +301,7 @@ implements Serializable
 	}
 
 	@Override
-	public boolean equals(Object obj) 
+	public boolean equals(Object obj)
 	{
 		if (obj == null)
 			return false;
@@ -312,7 +312,7 @@ implements Serializable
 		StateDefinition stateDefinition = (StateDefinition) obj;
 
 		return
-			Util.equals(stateDefinition.processDefinitionID, this.processDefinitionID) && 
+			Util.equals(stateDefinition.processDefinitionID, this.processDefinitionID) &&
 			Util.equals(stateDefinition.processDefinitionOrganisationID, this.processDefinitionOrganisationID) &&
 			Util.equals(stateDefinition.stateDefinitionOrganisationID, this.stateDefinitionOrganisationID) &&
 			Util.equals(stateDefinition.stateDefinitionID, this.stateDefinitionID);
@@ -322,7 +322,7 @@ implements Serializable
 	public int hashCode()
 	{
 		return
-				Util.hashCode(this.processDefinitionID) ^ 
+				Util.hashCode(this.processDefinitionID) ^
 				Util.hashCode(this.processDefinitionOrganisationID) ^
 				Util.hashCode(this.stateDefinitionOrganisationID) ^
 				Util.hashCode(this.stateDefinitionID);

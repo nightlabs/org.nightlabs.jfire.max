@@ -16,7 +16,7 @@ import org.nightlabs.progress.ProgressMonitor;
  *
  */
 public class StateDefinitionDAO
-extends BaseJDOObjectDAO<StateDefinitionID, StateDefinition> 
+extends BaseJDOObjectDAO<StateDefinitionID, StateDefinition>
 {
 	private static StateDefinitionDAO sharedInstance;
 	public static StateDefinitionDAO sharedInstance() {
@@ -36,8 +36,8 @@ extends BaseJDOObjectDAO<StateDefinitionID, StateDefinition>
 	@Override
 	protected Collection<StateDefinition> retrieveJDOObjects(
 			Set<StateDefinitionID> objectIDs, String[] fetchGroups,
-			int maxFetchDepth, ProgressMonitor monitor) 
-	throws Exception 
+			int maxFetchDepth, ProgressMonitor monitor)
+	throws Exception
 	{
 		monitor.beginTask("Loading StateDefintions", 2);
 		monitor.worked(1);
@@ -49,7 +49,7 @@ extends BaseJDOObjectDAO<StateDefinitionID, StateDefinition>
 	
 	public Collection<StateDefinition> getStateDefintions(
 			Set<StateDefinitionID> objectIDs, String[] fetchGroups,
-			int maxFetchDepth, ProgressMonitor monitor) 
+			int maxFetchDepth, ProgressMonitor monitor)
 	throws Exception
 	{
 		return retrieveJDOObjects(objectIDs, fetchGroups, maxFetchDepth, monitor);

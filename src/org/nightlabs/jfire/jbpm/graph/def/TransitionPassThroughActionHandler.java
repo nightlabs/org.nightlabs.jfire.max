@@ -4,7 +4,6 @@
 package org.nightlabs.jfire.jbpm.graph.def;
 
 import org.jbpm.graph.def.ActionHandler;
-import org.jbpm.graph.def.Node;
 import org.jbpm.graph.def.Transition;
 import org.jbpm.graph.exe.ExecutionContext;
 
@@ -59,7 +58,7 @@ public class TransitionPassThroughActionHandler implements ActionHandler {
 			if (transition != null) {
 				ctx.leaveNode(transition);
 				return;
-			}				
+			}
 		}
 		ctx.leaveNode();
 	}

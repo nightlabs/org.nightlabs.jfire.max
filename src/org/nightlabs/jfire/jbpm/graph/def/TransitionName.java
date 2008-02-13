@@ -105,7 +105,7 @@ public class TransitionName extends I18nText
 	 *
 	 * @jdo.join
 	 */
-	private Map names = new HashMap();
+	private Map<String, String> names = new HashMap<String, String>();
 
 	/**
 	 * @jdo.field persistence-modifier="persistent"
@@ -135,7 +135,7 @@ public class TransitionName extends I18nText
 	 * @see org.nightlabs.i18n.I18nText#getI18nMap()
 	 */
 	@Override
-	protected Map getI18nMap()
+	protected Map<String, String> getI18nMap()
 	{
 		return names;
 	}

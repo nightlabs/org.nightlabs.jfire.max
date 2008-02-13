@@ -319,7 +319,6 @@ implements SessionBean
 	 * @ejb.transaction type="Supports" @!This usually means that no transaction is opened which is significantly faster and recommended for all read-only EJB methods! Marco.
 	 * @ejb.permission role-name="_Guest_"
 	 */
-	@SuppressWarnings("unchecked")
 	public List<State> getStates(Set<StateID> stateIDs, String[] fetchGroups, int maxFetchDepth)
 	{
 		PersistenceManager pm = getPersistenceManager();
@@ -413,7 +412,6 @@ implements SessionBean
 	 * @ejb.transaction type="Supports" @!This usually means that no transaction is opened which is significantly faster and recommended for all read-only EJB methods! Marco.
 	 * @ejb.permission role-name="_Guest_"
 	 */
-	@SuppressWarnings("unchecked")
 	public List<Transition> getTransitions(Set<TransitionID> transitionIDs, String[] fetchGroups, int maxFetchDepth)
 	{
 		PersistenceManager pm = getPersistenceManager();
@@ -447,7 +445,6 @@ implements SessionBean
 	 * @ejb.transaction type="Required"
 	 * @ejb.permission role-name="_Guest_"
 	 */
-	@SuppressWarnings("unchecked")
 	public Set<StateDefinitionID> getStateDefinitionIDs(ProcessDefinition processDefinition)
 	{
 		PersistenceManager pm = getPersistenceManager();
@@ -463,7 +460,6 @@ implements SessionBean
 	 * @ejb.transaction type="Required"
 	 * @ejb.permission role-name="_Guest_"
 	 */
-	@SuppressWarnings("unchecked")
 	public Collection<StateDefinition> getStateDefinitions(Set<StateDefinitionID> objectIDs,
 			String[] fetchGroups, int maxFetchDepth)
 	{
@@ -481,7 +477,6 @@ implements SessionBean
 	 * @ejb.transaction type="Required"
 	 * @ejb.permission role-name="_Guest_"
 	 */
-	@SuppressWarnings("unchecked")
 	public Collection<ProcessDefinition> getProcessDefinitions(Set<ProcessDefinitionID> objectIDs,
 			String[] fetchGroups, int maxFetchDepth)
 	{

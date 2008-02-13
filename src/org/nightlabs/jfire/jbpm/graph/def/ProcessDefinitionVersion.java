@@ -7,7 +7,7 @@ import java.net.URL;
 
 import org.jbpm.JbpmContext;
 import org.nightlabs.io.DataBuffer;
-import org.nightlabs.util.Util;
+import org.nightlabs.util.IOUtil;
 
 /**
  * @author Marco Schulze - marco at nightlabs dot de
@@ -102,14 +102,14 @@ public class ProcessDefinitionVersion
 
 		in = new URL(jbpmProcessDefinitionURL, "processdefinition.xml").openStream();
 		try {
-			this.processDefinitionXml = Util.readTextFile(in);
+			this.processDefinitionXml = IOUtil.readTextFile(in);
 		} finally {
 			in.close();
 		}
 
 		in = new URL(jbpmProcessDefinitionURL, "gpd.xml").openStream();
 		try {
-			this.gpdXml = Util.readTextFile(in);
+			this.gpdXml = IOUtil.readTextFile(in);
 		} finally {
 			in.close();
 		}

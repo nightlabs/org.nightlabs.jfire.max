@@ -54,19 +54,28 @@ public class StateDefinitionDescription extends I18nText
 	/**
 	 * @jdo.field primary-key="true"
 	 * @jdo.column length="100"
+	 * 
+	 * FIXME Check the use of this field and remove it if not used or indented to be used.
 	 */
+	@SuppressWarnings("unused")
 	private String processDefinitionOrganisationID;
 
 	/**
 	 * @jdo.field primary-key="true"
 	 * @jdo.column length="50"
+	 * 
+	 * FIXME Check the use of this field and remove it if not used or indented to be used.
 	 */
+	@SuppressWarnings("unused")
 	private String processDefinitionID;
 
 	/**
 	 * @jdo.field primary-key="true"
 	 * @jdo.column length="100"
+	 * 
+	 * FIXME Check the use of this field and remove it if not used or indented to be used.
 	 */
+	@SuppressWarnings("unused")
 	private String stateDefinitionOrganisationID;
 
 	/**
@@ -93,7 +102,7 @@ public class StateDefinitionDescription extends I18nText
 	 *
 	 * @jdo.join
 	 */
-	protected Map descriptions = new HashMap();
+	protected Map<String, String> descriptions = new HashMap<String, String>();
 
 	/**
 	 * @jdo.field persistence-modifier="persistent"
@@ -121,7 +130,7 @@ public class StateDefinitionDescription extends I18nText
 	 * @see org.nightlabs.i18n.I18nText#getI18nMap()
 	 */
 	@Override
-	protected Map getI18nMap()
+	protected Map<String, String> getI18nMap()
 	{
 		return descriptions;
 	}

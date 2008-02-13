@@ -64,7 +64,7 @@ public class JFireLoggingService implements LoggingService {
 		if(processLog.getParent() != null) {
 			if (processLog.getParent().getChildren() != null) {
 				logger.debug("Processing "+processLog.getParent().getChildren().size()+" workflow log(s)");
-				Iterator logIterator = processLog.getParent().getChildren().iterator();
+				Iterator<?> logIterator = processLog.getParent().getChildren().iterator();
 				
 				while (logIterator.hasNext()) {
 					Object log = logIterator.next();

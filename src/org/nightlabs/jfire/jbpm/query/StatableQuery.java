@@ -19,15 +19,12 @@ import org.nightlabs.jfire.trade.state.id.StateDefinitionID;
 public class StatableQuery
 extends JDOQuery<Statable>
 {
-	/**
-	 * 
-	 */
 	private static final long serialVersionUID = 1L;
 	private static final Logger logger = Logger.getLogger(StatableQuery.class);
 	
 //	public abstract Class getStatableClass();
 	
-	public StatableQuery(Class statableClass)
+	public StatableQuery(Class<? extends Statable> statableClass)
 	{
 		if (statableClass == null)
 			throw new IllegalArgumentException("Param statableClass must not be null");
@@ -41,8 +38,8 @@ extends JDOQuery<Statable>
 	/**
 	 * the Implementation class of the {@link Statable} Interface
 	 */
-	private Class statableClass = null;
-	public Class getStatableClass() {
+	private Class<? extends Statable> statableClass = null;
+	public Class<? extends Statable> getStatableClass() {
 		return statableClass;
 	}
 	

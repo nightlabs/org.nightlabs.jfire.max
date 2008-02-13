@@ -48,7 +48,6 @@ implements Serializable
 	public static final String FETCH_GROUP_NAME = "StateDefinition.name";
 	public static final String FETCH_GROUP_DESCRIPTION = "StateDefinition.description";
 
-	@SuppressWarnings("unchecked")
 	public static List<StateDefinition> getStateDefinitions(PersistenceManager pm, ProcessDefinition processDefinition)
 	{
 		Query q = pm.newNamedQuery(StateDefinition.class, "getStateDefinitionsForProcessDefinition");

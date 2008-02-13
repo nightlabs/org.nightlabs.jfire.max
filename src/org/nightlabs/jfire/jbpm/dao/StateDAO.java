@@ -31,7 +31,6 @@ extends BaseJDOObjectDAO<StateID, State>
 
 	protected StateDAO() { }
 
-	@SuppressWarnings("unchecked")
 	@Override
 	protected Collection<State> retrieveJDOObjects(Set<StateID> stateIDs,
 			String[] fetchGroups, int maxFetchDepth, ProgressMonitor monitor)

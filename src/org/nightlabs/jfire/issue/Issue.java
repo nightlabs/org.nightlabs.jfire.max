@@ -147,13 +147,13 @@ implements
 	 * @jdo.field
 	 *		persistence-modifier="persistent"
 	 *		collection-type="collection"
-	 *		element-type="IssueLnk"
+	 *		element-type="IssueLink"
 	 *		dependent-value="true"
 	 *		mapped-by="issue"
 	 *
 	 * @jdo.join
 	 */
-	private Set<IssueLink> referencedObjectIDs;
+	private Set<IssueLink> issueLinks;
 	
 	/**
 	 * Instances of {@link IssueFileAttachment}.
@@ -295,7 +295,7 @@ implements
 		fileList = new ArrayList<IssueFileAttachment>();
 		comments = new ArrayList<IssueComment>();
 //		referencedObjectIDs = new HashSet<String>();
-		referencedObjectIDs = new HashSet<IssueLink>();
+		issueLinks = new HashSet<IssueLink>();
 		
 		this.issueLocal = new IssueLocal(this);
 		this.structLocalScope = StructLocal.DEFAULT_SCOPE;
@@ -487,9 +487,9 @@ implements
 	
 	public Set<ObjectID> getReferencedObjectIDs() {
 		if (_referencedObjectIDs == null) {
-			Set<ObjectID> ro = new HashSet<ObjectID>(referencedObjectIDs.size());
-			for (IssueLink objectIDString : referencedObjectIDs) {
-				ObjectID objectID = ObjectIDUtil.createObjectID(objectIDString.getReferencedObjectID());
+			Set<ObjectID> ro = new HashSet<ObjectID>(issueLinks.size());
+			for (IssueLink issueLink : issueLinks) {
+				ObjectID objectID = ObjectIDUtil.createObjectID(issueLink.getReferencedObjectID());
 				ro.add(objectID);
 			}
 			_referencedObjectIDs = ro;
@@ -502,7 +502,7 @@ implements
 		if (referencedObjectID == null)
 			throw new IllegalArgumentException("referencedObjectID must not be null!");
 
-		referencedObjectIDs.add(new IssueLink(this, referencedObjectID.toString(), referencedObjectID.toString(), "NONE"));
+		issueLinks.add(new IssueLink(this, referencedObjectID.toString(), referencedObjectID.toString(), "NONE"));
 		if (_referencedObjectIDs != null) // instead of managing our cache of ObjectID instances, we could alternatively simply null it here, but the current implementation is more efficient.
 			_referencedObjectIDs.add(referencedObjectID);
 	}
@@ -512,14 +512,14 @@ implements
 		if (referencedObjectID == null)
 			throw new IllegalArgumentException("referencedObjectID must not be null!");
 
-		referencedObjectIDs.remove(referencedObjectID.toString());
+		issueLinks.remove(referencedObjectID.toString());
 		if (_referencedObjectIDs != null)
 			_referencedObjectIDs.remove(referencedObjectID);
 	}
 	
 	public void clearReferencedObjectIDs()
 	{
-		referencedObjectIDs.clear();
+		issueLinks.clear();
 	}
 
 	/**

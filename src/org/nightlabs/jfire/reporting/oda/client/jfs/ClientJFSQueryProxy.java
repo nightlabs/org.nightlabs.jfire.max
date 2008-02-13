@@ -56,7 +56,7 @@ public class ClientJFSQueryProxy extends AbstractJFSQueryProxy {
 //		descriptor.setNullable(IParameterMetaData.parameterNullable);
 ////		descriptor.set
 //		metaData.addParameterDescriptor(descriptor);
-//		setParameterMetaData(metaData);	
+//		setParameterMetaData(metaData);
 //		System.out.println("Constructor of "+this.getClass().getName()+" called.");
 	}
 

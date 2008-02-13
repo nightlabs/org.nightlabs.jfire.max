@@ -68,7 +68,7 @@ public class ClientJDOJSProxy extends AbstractJDOJSProxy {
 	 */
 	public IResultSet executeQuery() throws OdaException {
 		JDOJSResultSet resultSet = fetchResultSet(
-				(JDOJSResultSetMetaData)getMetaData(), 
+				(JDOJSResultSetMetaData)getMetaData(),
 				getFetchScript(),
 //				getParameterMetaData(),
 				getNamedParameters()
@@ -97,7 +97,7 @@ public class ClientJDOJSProxy extends AbstractJDOJSProxy {
 	 * of this Query.
 	 */
 	public static JDOJSResultSet fetchResultSet(
-			JDOJSResultSetMetaData metaData, 
+			JDOJSResultSetMetaData metaData,
 			String fetchScript,
 //			IParameterMetaData parameterMetaData,
 			Map<String, Object> parameters
@@ -107,7 +107,7 @@ public class ClientJDOJSProxy extends AbstractJDOJSProxy {
 		try {
 			ReportManager reportManager = ReportManagerUtil.getHome(Login.getLogin().getInitialContextProperties()).create();
 			return reportManager.fetchJDOJSResultSet(
-					metaData, fetchScript, 
+					metaData, fetchScript,
 					parameters
 				);
 		} catch (Throwable t) {

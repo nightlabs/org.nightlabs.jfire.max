@@ -48,9 +48,9 @@ import org.nightlabs.version.MalformedVersionException;
 
 
 /**
- * @ejb.bean name="jfire/ejb/JFireChezFrancois/ChezFrancoisDatastoreInitialiser"	
+ * @ejb.bean name="jfire/ejb/JFireChezFrancois/ChezFrancoisDatastoreInitialiser"
  *					 jndi-name="jfire/ejb/JFireChezFrancois/ChezFrancoisDatastoreInitialiser"
- *					 type="Stateless" 
+ *					 type="Stateless"
  *					 transaction-type="Container"
  *
  * @ejb.util generate="physical"
@@ -79,7 +79,7 @@ implements SessionBean
 
 	/**
 	 * @ejb.create-method
-	 * @ejb.permission role-name="_Guest_"	
+	 * @ejb.permission role-name="_Guest_"
 	 */
 	public void ejbCreate() throws CreateException
 	{
@@ -101,8 +101,8 @@ implements SessionBean
 	 * @ejb.permission role-name="_System_"
 	 * @ejb.transaction type="Supports" @!This usually means that no transaction is opened which is significantly faster and recommended for all read-only EJB methods! Marco.
 	 */
-	public void initialise2() 
-	throws Exception 
+	public void initialise2()
+	throws Exception
 	{
 		initialise();
 	}
@@ -110,8 +110,8 @@ implements SessionBean
 	/**
 	 * This method is called by the datastore initialisation mechanism.
 	 * It populates the datastore with the demo data.
-	 * @throws MalformedVersionException 
-	 * @throws TimePatternFormatException 
+	 * @throws MalformedVersionException
+	 * @throws TimePatternFormatException
 	 * 
 	 * @throws ModuleException
 	 *
@@ -120,7 +120,7 @@ implements SessionBean
 	 * @ejb.transaction type="Supports" @!This usually means that no transaction is opened which is significantly faster and recommended for all read-only EJB methods! Marco.
 	 */
 	public void initialise()
-	throws Exception 
+	throws Exception
 	{
 		if (hasRootOrganisation() && getOrganisationID().equals(getRootOrganisationID()))
 			return;
@@ -140,7 +140,7 @@ implements SessionBean
 	 * @ejb.transaction type="Required"
 	 */
 	public void createModuleMetaData()
-	throws MalformedVersionException 
+	throws MalformedVersionException
 	{
 		logger.info("createModuleMetaData: begin");
 
@@ -178,7 +178,7 @@ implements SessionBean
 	 * @ejb.permission role-name="_System_"
 	 * @ejb.transaction type="RequiresNew"
 	 */
-	public void createDemoTimerTask() throws TimePatternFormatException 
+	public void createDemoTimerTask() throws TimePatternFormatException
 	{
 		logger.info("createDemoTimerTask: begin");
 
@@ -236,7 +236,7 @@ implements SessionBean
 	 * @ejb.transaction type="RequiresNew"
 	 */
 	public void createDemoData_JFireVoucher()
-	throws Exception 
+	throws Exception
 	{
 		try {
 			Class.forName("org.nightlabs.jfire.voucher.store.VoucherType");
@@ -259,7 +259,7 @@ implements SessionBean
 	 * @ejb.transaction type="RequiresNew"
 	 */
 	public void createDemoData_JFireDynamicTrade()
-	throws Exception 
+	throws Exception
 	{
 		try {
 			Class.forName("org.nightlabs.jfire.dynamictrade.store.DynamicProductType");
@@ -282,7 +282,7 @@ implements SessionBean
 	 * @ejb.transaction type="RequiresNew"
 	 */
 	public void createDemoData_JFireSimpleTrade()
-	throws Exception 
+	throws Exception
 	{
 		try {
 			Class.forName("org.nightlabs.jfire.simpletrade.store.SimpleProductType");
@@ -306,7 +306,7 @@ implements SessionBean
 	 * @ejb.permission role-name="_Guest_"
 	 * @ejb.transaction type="Required"
 	 */
-	public void demoTimerTask(TaskID taskID) 
+	public void demoTimerTask(TaskID taskID)
 	{
 		int sleepSec = 30;
 

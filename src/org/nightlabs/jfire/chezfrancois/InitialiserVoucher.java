@@ -29,7 +29,7 @@ extends Initialiser
 	}
 
 	public void createDemoData()
-	throws ModuleException, CannotPublishProductTypeException, CannotConfirmProductTypeException, CannotMakeProductTypeSaleableException 
+	throws ModuleException, CannotPublishProductTypeException, CannotConfirmProductTypeException, CannotMakeProductTypeSaleableException
 	{
 		String organisationID = getOrganisationID();
 

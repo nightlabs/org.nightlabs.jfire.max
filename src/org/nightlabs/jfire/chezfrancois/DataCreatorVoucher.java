@@ -49,7 +49,7 @@ public class DataCreatorVoucher
 		}
 
 		VoucherType pt = new VoucherType(
-				organisationID, productTypeID, parent, 
+				organisationID, productTypeID, parent,
 				ProductType.INHERITANCE_NATURE_BRANCH, ProductType.PACKAGE_NATURE_OUTER);
 		setNames(pt.getName(), names);
 
@@ -106,7 +106,7 @@ public class DataCreatorVoucher
 
 		store.setProductTypeStatus_published(user, pt);
 		store.setProductTypeStatus_confirmed(user, pt);
-//		store.setProductTypeStatus_saleable(user, pt, true);		
+//		store.setProductTypeStatus_saleable(user, pt, true);
 
 		createdLeafs.add(pt);
 

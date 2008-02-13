@@ -172,7 +172,7 @@ public class DataCreator
 			TariffID tariffID = TariffID.create(organisationID, "_gold_card_");
 			try {
 				tariffGoldCard = (Tariff) pm.getObjectById(tariffID);
-			} catch (JDOObjectNotFoundException x) {				
+			} catch (JDOObjectNotFoundException x) {
 				tariffGoldCard = pm.makePersistent(new Tariff(tariffID.organisationID, tariffID.tariffID));
 				tariffGoldCard.setTariffIndex(1);
 				tariffGoldCard.getName().setText(Locale.ENGLISH.getLanguage(), "Gold Card");
@@ -184,7 +184,7 @@ public class DataCreator
 	}
 
 
-	private Currency euro = null;	
+	private Currency euro = null;
 	public Currency getCurrencyEUR()
 	{
 		if (euro == null) {
@@ -209,7 +209,7 @@ public class DataCreator
 		if (priceFragmentTypeVatNet == null)
 			priceFragmentTypeVatNet = (PriceFragmentType) pm.getObjectById(PriceFragmentTypeHelper.getDE().VAT_DE_19_NET);
 
-		return priceFragmentTypeVatNet;			
+		return priceFragmentTypeVatNet;
 	}
 
 	private PriceFragmentType priceFragmentTypeVatVal = null;
@@ -339,18 +339,18 @@ public class DataCreator
 		userLocal.setPasswordPlain(password);
 		user.setPerson(person);
 		user = pm.makePersistent(user);
-		return user;		
+		return user;
 	}
 	
 	public Person createPerson(String company, String name, String firstName, String eMail,
 			Date dateOfBirth, String salutation, String title, String postAdress, String postCode,
-			String postCity, String postRegion, String postCountry, String phoneCountryCode, 
-			String phoneAreaCode, String phoneNumber, String faxCountryCode, 
-			String faxAreaCode, String faxNumber, String bankAccountHolder, int bankAccountNumber, 
-			String bankCode, String bankName, String creditCardHolder, String creditCardNumber, 
+			String postCity, String postRegion, String postCountry, String phoneCountryCode,
+			String phoneAreaCode, String phoneNumber, String faxCountryCode,
+			String faxAreaCode, String faxNumber, String bankAccountHolder, int bankAccountNumber,
+			String bankCode, String bankName, String creditCardHolder, String creditCardNumber,
 			int creditCardExpiryMonth, int creditCardExpiryYear, String comment)
 	throws DataBlockNotFoundException, DataBlockGroupNotFoundException, DataFieldNotFoundException, StructFieldValueNotFoundException, StructFieldNotFoundException, StructBlockNotFoundException
-	{		
+	{
 		IStruct personStruct = getPersonStruct();
 		
 		Person person = new Person(IDGenerator.getOrganisationID(), IDGenerator.nextID(PropertySet.class));
@@ -374,22 +374,22 @@ public class DataCreator
 		((TextDataField)person.getDataField(PersonStruct.POSTADDRESS_COUNTRY)).setText(postCountry);
 		
 		((PhoneNumberDataField)person.getDataField(PersonStruct.PHONE_PRIMARY)).setCountryCode(phoneCountryCode);
-		((PhoneNumberDataField)person.getDataField(PersonStruct.PHONE_PRIMARY)).setAreaCode(phoneAreaCode);		
+		((PhoneNumberDataField)person.getDataField(PersonStruct.PHONE_PRIMARY)).setAreaCode(phoneAreaCode);
 		((PhoneNumberDataField)person.getDataField(PersonStruct.PHONE_PRIMARY)).setLocalNumber(phoneNumber);
 		
 		((PhoneNumberDataField)person.getDataField(PersonStruct.FAX)).setCountryCode(faxCountryCode);
 		((PhoneNumberDataField)person.getDataField(PersonStruct.FAX)).setAreaCode(faxAreaCode);
-		((PhoneNumberDataField)person.getDataField(PersonStruct.FAX)).setLocalNumber(faxNumber);		
+		((PhoneNumberDataField)person.getDataField(PersonStruct.FAX)).setLocalNumber(faxNumber);
 		
 		((TextDataField)person.getDataField(PersonStruct.BANKDATA_ACCOUNTHOLDER)).setText(bankAccountHolder);
-		((NumberDataField)person.getDataField(PersonStruct.BANKDATA_ACCOUNTNUMBER)).setValue(bankAccountNumber);	
+		((NumberDataField)person.getDataField(PersonStruct.BANKDATA_ACCOUNTNUMBER)).setValue(bankAccountNumber);
 		((TextDataField)person.getDataField(PersonStruct.BANKDATA_BANKCODE)).setText(bankCode);
 		((TextDataField)person.getDataField(PersonStruct.BANKDATA_BANKNAME)).setText(bankName);
 		
 		((TextDataField)person.getDataField(PersonStruct.CREDITCARD_CREDITCARDHOLDER)).setText(creditCardHolder);
 		((TextDataField)person.getDataField(PersonStruct.CREDITCARD_NUMBER)).setText(creditCardNumber);
-		((NumberDataField)person.getDataField(PersonStruct.CREDITCARD_EXPIRYMONTH)).setValue(creditCardExpiryMonth);		
-		((NumberDataField)person.getDataField(PersonStruct.CREDITCARD_EXPIRYYEAR)).setValue(creditCardExpiryYear);		
+		((NumberDataField)person.getDataField(PersonStruct.CREDITCARD_EXPIRYMONTH)).setValue(creditCardExpiryMonth);
+		((NumberDataField)person.getDataField(PersonStruct.CREDITCARD_EXPIRYYEAR)).setValue(creditCardExpiryYear);
 		
 		((TextDataField)person.getDataField(PersonStruct.COMMENT_COMMENT)).setText(comment);
 		

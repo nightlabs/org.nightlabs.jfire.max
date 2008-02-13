@@ -96,7 +96,7 @@ extends DataCreator
 		}
 
 		SimpleProductType pt = new SimpleProductType(
-				organisationID, productTypeID, parent, 
+				organisationID, productTypeID, parent,
 				ProductType.INHERITANCE_NATURE_BRANCH, ProductType.PACKAGE_NATURE_OUTER);
 		setNames(pt.getName(), names);
 
@@ -106,7 +106,7 @@ extends DataCreator
 		return pt;
 	}
 
-	private List<ProductTypeID> createdLeafIDs = new ArrayList<ProductTypeID>(); 
+	private List<ProductTypeID> createdLeafIDs = new ArrayList<ProductTypeID>();
 
 	public SimpleProductType createLeaf(SimpleProductType category, String productTypeID, IInnerPriceConfig innerPriceConfig, String ... names) throws CannotPublishProductTypeException, CannotConfirmProductTypeException
 	{
@@ -125,7 +125,7 @@ extends DataCreator
 
 		store.setProductTypeStatus_published(user, pt);
 //		store.setProductTypeStatus_confirmed(user, pt);
-//		store.setProductTypeStatus_saleable(user, pt, true);		
+//		store.setProductTypeStatus_saleable(user, pt, true);
 		
 		createdLeafIDs.add((ProductTypeID) JDOHelper.getObjectId(pt));
 
@@ -150,8 +150,8 @@ extends DataCreator
 		pm.getFetchPlan().setGroups(new String[] {FetchPlan.DEFAULT, PropertySet.FETCH_GROUP_DATA_FIELDS, PropertySet.FETCH_GROUP_FULL_DATA});
 		pm.getFetchPlan().setMaxFetchDepth(NLJDOHelper.MAX_FETCH_DEPTH_NO_LIMIT);
 
-		// PropertySet should always be detached before exploding! 
-		// never explode while being attached! 
+		// PropertySet should always be detached before exploding!
+		// never explode while being attached!
 		// I got an SQL error because this line was commented out! Marco.
 		// Why not explode attached, when intending to set all properties ;-)
 		if (JDOHelper.isPersistent(props))
@@ -163,7 +163,7 @@ extends DataCreator
 			shortDesc = (I18nTextDataField)props.getDataField(SimpleProductTypeStruct.DESCRIPTION_SHORT);
 		} catch (Exception e) {
 			throw new RuntimeException(e);
-		}  
+		}
 		shortDesc.getI18nText().setText(Locale.ENGLISH.getLanguage(), englishShort);
 		shortDesc.getI18nText().setText(Locale.GERMAN.getLanguage(), germanShort);
 		I18nTextDataField longDesc;
@@ -171,7 +171,7 @@ extends DataCreator
 			longDesc = (I18nTextDataField)props.getDataField(SimpleProductTypeStruct.DESCRIPTION_LONG);
 		} catch (Exception e) {
 			throw new RuntimeException(e);
-		}  
+		}
 		longDesc.getI18nText().setText(Locale.ENGLISH.getLanguage(), englishLong);
 		longDesc.getI18nText().setText(Locale.GERMAN.getLanguage(), germanLong);
 		ImageDataField smallImg;
@@ -321,7 +321,7 @@ extends DataCreator
 		formulaPriceConfig.addCurrency(euro);
 		for (int i = 0; i < tariffs.length; i++) {
 			Tariff tariff = tariffs[i];
-			formulaPriceConfig.addTariff(tariff);			
+			formulaPriceConfig.addTariff(tariff);
 		}
 //			formulaPriceConfig.addProductType(rootSimpleProductType);
 		formulaPriceConfig.addPriceFragmentType(totalPriceFragmentType);

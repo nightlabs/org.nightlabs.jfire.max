@@ -72,7 +72,7 @@ extends DataCreator
 	private List<DynamicProductType> createdLeafs = new ArrayList<DynamicProductType>();
 
 	public DynamicProductType createLeaf(DynamicProductType category, String productTypeID,
-			IInnerPriceConfig innerPriceConfig,			
+			IInnerPriceConfig innerPriceConfig,
 			String ... names) throws CannotPublishProductTypeException, CannotConfirmProductTypeException
 	{
 		if (category == null)

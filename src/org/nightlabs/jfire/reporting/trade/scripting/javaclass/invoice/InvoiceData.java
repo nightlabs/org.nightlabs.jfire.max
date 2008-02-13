@@ -10,7 +10,6 @@ import java.util.List;
 import javax.jdo.JDOHelper;
 import javax.jdo.PersistenceManager;
 
-import org.apache.log4j.Logger;
 import org.eclipse.datatools.connectivity.oda.IResultSetMetaData;
 import org.nightlabs.db.Record;
 import org.nightlabs.db.TableBuffer;
@@ -34,11 +33,6 @@ import org.nightlabs.jfire.scripting.ScriptException;
  */
 public class InvoiceData extends AbstractJFSScriptExecutorDelegate {
 
-	private static final Logger logger = Logger.getLogger(InvoiceData.class);
-	
-	/**
-	 * 
-	 */
 	public InvoiceData() {
 		super();
 	}

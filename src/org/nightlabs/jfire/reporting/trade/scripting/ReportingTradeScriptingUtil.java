@@ -33,7 +33,6 @@ public class ReportingTradeScriptingUtil {
 	 * @param pm The {@link PersistenceManager} used to resolve the {@link PriceFragmentType}s.
 	 * @return All {@link PriceFragmentType}s in a sorted list.
 	 */
-	@SuppressWarnings("unchecked")
 	public static List<PriceFragmentType> getSortedPriceFragmentTypes(PersistenceManager pm) {
 		Query q = pm.newQuery(PriceFragmentType.class);
 		List<PriceFragmentType> pfTypes = new ArrayList<PriceFragmentType>((List<PriceFragmentType>) q.execute());

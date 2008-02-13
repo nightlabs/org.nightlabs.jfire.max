@@ -105,7 +105,7 @@ public class DeliveryList extends AbstractJFSScriptExecutorDelegate {
 		ReportingScriptUtil.addTimePeriodCondition(jdoql, "this.articleLocal.delivery.beginDT", "deliveryDT", deliveryTimePeriod, jdoParams);
 		
 		Query q = pm.newQuery(jdoql);
-		Collection queryResult = (Collection)q.executeWithMap(jdoParams);
+		Collection<?> queryResult = (Collection<?>)q.executeWithMap(jdoParams);
 		getResultSetMetaData();
 		TableBuffer buffer = null;
 		try {
@@ -114,7 +114,7 @@ public class DeliveryList extends AbstractJFSScriptExecutorDelegate {
 			throw new ScriptException(e);
 		}
 		List<Object> row = new ArrayList<Object>(12);
-		for (Iterator iter = queryResult.iterator(); iter.hasNext();) {
+		for (Iterator<?> iter = queryResult.iterator(); iter.hasNext();) {
 			row.clear();
 			CollectionUtil.addAllToCollection((Object[]) iter.next(), row);
 			Article article = (Article) row.get(0);

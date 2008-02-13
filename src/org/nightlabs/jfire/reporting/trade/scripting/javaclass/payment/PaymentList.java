@@ -16,7 +16,6 @@ import javax.jdo.JDOObjectNotFoundException;
 import javax.jdo.PersistenceManager;
 import javax.jdo.Query;
 
-import org.apache.log4j.Logger;
 import org.eclipse.datatools.connectivity.oda.IResultSetMetaData;
 import org.nightlabs.db.Record;
 import org.nightlabs.db.TableBuffer;
@@ -48,11 +47,6 @@ import org.nightlabs.util.TimePeriod;
  */
 public class PaymentList extends AbstractJFSScriptExecutorDelegate {
 
-	private static final Logger logger = Logger.getLogger(PaymentList.class);
-	
-	/**
-	 * 
-	 */
 	public PaymentList() {
 		super();
 	}
@@ -90,7 +84,7 @@ public class PaymentList extends AbstractJFSScriptExecutorDelegate {
 	 * @see org.nightlabs.jfire.scripting.ScriptExecutorJavaClassDelegate#doExecute()
 	 */
 	public Object doExecute() throws ScriptException {
-		Map<String, Object> param = getScriptExecutorJavaClass().getParameterValues();
+		// Map<String, Object> param = getScriptExecutorJavaClass().getParameterValues();
 		Collection<UserID> users = getObjectParameterValue("userIDs", Collection.class);
 		Collection<UserID> userGroups = getObjectParameterValue("userGroupIDs", Collection.class);
 		Collection<AnchorID> partnerIDs = getObjectParameterValue("partnerIDs", Collection.class);;
@@ -182,7 +176,7 @@ public class PaymentList extends AbstractJFSScriptExecutorDelegate {
 		ReportingScriptUtil.addTimePeriodCondition(jdoql, "this.payment.endDT", "endDT", endTimePeriod, jdoParams);
 		
 		Query q = pm.newQuery(jdoql.toString());
-		Collection queryResult = (Collection)q.executeWithMap(jdoParams);
+		Collection<Payment> queryResult = (Collection<Payment>)q.executeWithMap(jdoParams);
 		getResultSetMetaData();
 		TableBuffer buffer = null;
 		try {

@@ -63,10 +63,10 @@ public class ScriptExecutorGeneralSalesStatistic extends AbstractJFSScriptExecut
 				"GROUP BY "+
 				"  this.product.productType"
 			);
-		Collection products = (Collection)q.execute();
+		Collection<Object[]> products = (Collection<Object[]>)q.execute();
 		int count = 0;
-		for (Iterator iter = products.iterator(); iter.hasNext();) {
-			Object[] row = (Object[]) iter.next();
+		for (Iterator<Object[]> iter = products.iterator(); iter.hasNext();) {
+			Object[] row = iter.next();
 			Object[] nRow = new Object[3];
 			nRow[0] = ((ProductType)row[0]).getName().getText(Locale.getDefault().getLanguage());
 			nRow[1] = row[1];

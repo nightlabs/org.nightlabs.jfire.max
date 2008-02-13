@@ -14,7 +14,6 @@ import javax.jdo.JDOHelper;
 import javax.jdo.PersistenceManager;
 import javax.jdo.Query;
 
-import org.apache.log4j.Logger;
 import org.eclipse.datatools.connectivity.oda.IResultSetMetaData;
 import org.nightlabs.db.Record;
 import org.nightlabs.db.TableBuffer;
@@ -44,11 +43,6 @@ import org.nightlabs.util.TimePeriod;
  */
 public class MoneyTransferList extends AbstractJFSScriptExecutorDelegate {
 
-	private static final Logger logger = Logger.getLogger(MoneyTransferList.class);
-	
-	/**
-	 * 
-	 */
 	public MoneyTransferList() {
 		super();
 	}
@@ -143,7 +137,7 @@ public class MoneyTransferList extends AbstractJFSScriptExecutorDelegate {
 
 
 			Query q = pm.newQuery(jdoql.toString());
-			Collection queryResult = (Collection)q.executeWithMap(jdoParams);
+			Collection<MoneyTransfer> queryResult = (Collection<MoneyTransfer>)q.executeWithMap(jdoParams);
 
 			for (Iterator<MoneyTransfer> it = queryResult.iterator(); it.hasNext();) {
 				List<Object> row = new ArrayList<Object>(17);

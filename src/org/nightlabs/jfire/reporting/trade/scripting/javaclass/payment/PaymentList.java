@@ -156,7 +156,7 @@ public class PaymentList extends AbstractJFSScriptExecutorDelegate {
 				if (iterator.hasNext())
 					jdoql.append("|| ");
 			}
-			jdoql.append(") "); 
+			jdoql.append(") ");
 		}
 		
 		// filter by modeOfPayment
@@ -189,8 +189,8 @@ public class PaymentList extends AbstractJFSScriptExecutorDelegate {
 			buffer = JFSResultUtil.createTableBuffer(metaData);
 		} catch (Exception e) {
 			throw new ScriptException(e);
-		}		 
-		for (Iterator<Payment> iter = queryResult.iterator(); iter.hasNext();) {			
+		}
+		for (Iterator<Payment> iter = queryResult.iterator(); iter.hasNext();) {
 			List<Object> row = new ArrayList<Object>(17);
 			Payment payment = iter.next();
 			row.add(payment.getOrganisationID());
@@ -199,7 +199,7 @@ public class PaymentList extends AbstractJFSScriptExecutorDelegate {
 			row.add(payment.getReasonForPayment());
 			row.add(payment.getModeOfPaymentFlavourID().toString());
 			row.add(payment.getCurrencyID().toString());
-			row.add(payment.getPartnerID().toString());			
+			row.add(payment.getPartnerID().toString());
 			row.add(payment.getPartnerAccountID() != null ? payment.getPartnerAccountID().toString() : null);
 			row.add(payment.getAmount());
 			row.add(JDOHelper.getObjectId(payment.getUser()).toString());
@@ -210,14 +210,14 @@ public class PaymentList extends AbstractJFSScriptExecutorDelegate {
 			row.add(payment.isFailed());
 			row.add(payment.isForceRollback());
 			row.add(JFireReportingHelper.createDataSetParam(payment.getInvoiceIDs()));
-			try {				
+			try {
 				buffer.addRecord(new Record(row));
 			} catch (Exception e) {
 				throw new ScriptException(e);
 			}
 		}
 		SQLResultSet resultSet = new SQLResultSet(buffer);
-		return resultSet; 
+		return resultSet;
 	}
 
 	/* (non-Javadoc)

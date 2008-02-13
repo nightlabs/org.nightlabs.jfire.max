@@ -27,7 +27,7 @@ import org.nightlabs.jfire.trade.ArticleContainer;
  * Script that returns all {@link Article}s for a given {@link ArticleContainer}.
  * It accepts one parameter:
  * <ul>
- * <li> 
+ * <li>
  * 	<code>articleContainerID</code>: Defines the id of the specific {@link ArticleContainer} that should be loaded.
  * </li>
  * </ul>
@@ -77,7 +77,7 @@ public class ArticleList extends AbstractJFSScriptExecutorDelegate {
 		}
 		SortedMap<Long, Article> sortedArticles = new TreeMap<Long, Article>();
 		for (Article article : articleContainer.getArticles()) {
-			sortedArticles.put(article.getArticleID(), article);			
+			sortedArticles.put(article.getArticleID(), article);
 		}
 		List<Object> row = new ArrayList<Object>();
 		for (Article article : sortedArticles.values()) {
@@ -89,7 +89,7 @@ public class ArticleList extends AbstractJFSScriptExecutorDelegate {
 			} catch (Exception e) {
 				throw new ScriptException(e);
 			}
-		}		
+		}
 		SQLResultSet resultSet = new SQLResultSet(buffer);
 		return resultSet;
 	}

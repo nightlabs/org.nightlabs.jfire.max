@@ -19,15 +19,15 @@ import org.nightlabs.jfire.servermanager.JFireServerManager;
 public class ReportingInitialiser {
 
 	public static void initialise(
-			PersistenceManager pm, 
+			PersistenceManager pm,
 			JFireServerManager jfireServerManager,
 			String organisationID
-		) throws ReportingInitialiserException 
+		) throws ReportingInitialiserException
 	{
 		ReportCategory rootCategory = org.nightlabs.jfire.reporting.ReportingInitialiser.createCategory(
-				pm, null, 
-				organisationID, 
-				ReportingTradeConstants.REPORT_REGISTRY_ITEM_TYPE_ROOT, 
+				pm, null,
+				organisationID,
+				ReportingTradeConstants.REPORT_REGISTRY_ITEM_TYPE_ROOT,
 				ReportingTradeConstants.REPORT_REGISTRY_ITEM_ID_CATEGORY_ROOT, true
 			);
 		rootCategory.getName().setText(Locale.ENGLISH.getLanguage(), "JFire Trade Reports");
@@ -45,7 +45,7 @@ public class ReportingInitialiser {
 						rootCategory,
 						ScriptingTradeConstants.SCRIPT_REGISTRY_ITEM_TYPE_TRADE_SCRIPT,
 						jfireServerManager,
-						pm, 
+						pm,
 						organisationID
 					).initialise();
 			}

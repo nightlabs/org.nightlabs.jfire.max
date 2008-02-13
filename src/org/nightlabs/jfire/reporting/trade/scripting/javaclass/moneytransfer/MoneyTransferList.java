@@ -83,12 +83,12 @@ public class MoneyTransferList extends AbstractJFSScriptExecutorDelegate {
 	/* (non-Javadoc)
 	 * @see org.nightlabs.jfire.scripting.ScriptExecutorJavaClassDelegate#doExecute()
 	 */
-	public Object doExecute() throws ScriptException {		
+	public Object doExecute() throws ScriptException {
 		TimePeriod timePeriod = getObjectParameterValue("timePeriod", TimePeriod.class);
 		Collection<AnchorID> accountIDs = getObjectParameterValue("accountIDs", Collection.class);
 		if (accountIDs == null || accountIDs.size() < 1)
 			throw new IllegalArgumentException("The parameter 'accountIDs' has to be set and contain at least one entry.");
-		Collection<UserID> initiatorIDs = getObjectParameterValue("initiatorIDs", Collection.class);		
+		Collection<UserID> initiatorIDs = getObjectParameterValue("initiatorIDs", Collection.class);
 		
 		PersistenceManager pm = getScriptExecutorJavaClass().getPersistenceManager();
 
@@ -134,18 +134,18 @@ public class MoneyTransferList extends AbstractJFSScriptExecutorDelegate {
 //					jdoParams.put("initiatorID" + i, initiatorID);
 					jdoql.append("(this.inititaotr == :intiator" + i);
 					jdoParams.put("initiator" + i, pm.getObjectById(initiatorID));
-					if (it.hasNext())					
+					if (it.hasNext())
 						jdoql.append("|| ");
 				}
 				jdoql.append(")");
-			}		
+			}
 
 
 
 			Query q = pm.newQuery(jdoql.toString());
 			Collection queryResult = (Collection)q.executeWithMap(jdoParams);
 
-			for (Iterator<MoneyTransfer> it = queryResult.iterator(); it.hasNext();) {			
+			for (Iterator<MoneyTransfer> it = queryResult.iterator(); it.hasNext();) {
 				List<Object> row = new ArrayList<Object>(17);
 				MoneyTransfer moneyTransfer = it.next();
 				row.add(accountID.toString());
@@ -163,7 +163,7 @@ public class MoneyTransferList extends AbstractJFSScriptExecutorDelegate {
 				row.add(ReportingScriptUtil.getObjectJDOID(moneyTransfer.getCurrency()));
 				row.add(moneyTransfer.getAmount());
 				row.add(moneyTransfer.getDescription(JFireReportingHelper.getLocale()));
-				try {				
+				try {
 					buffer.addRecord(new Record(row));
 				} catch (Exception e) {
 					throw new ScriptException(e);
@@ -172,7 +172,7 @@ public class MoneyTransferList extends AbstractJFSScriptExecutorDelegate {
 		}
 		
 		SQLResultSet resultSet = new SQLResultSet(buffer);
-		return resultSet; 
+		return resultSet;
 	}
 
 	/* (non-Javadoc)

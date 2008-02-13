@@ -95,16 +95,16 @@ public class InvoiceData extends AbstractJFSScriptExecutorDelegate {
 		for (InvoiceID invoiceID : invoiceIDs) {
 			Invoice invoice = (Invoice) pm.getObjectById(invoiceID);
 			List<Object> row = new ArrayList<Object>(21);
-			row.add(invoice.getOrganisationID());			
+			row.add(invoice.getOrganisationID());
 			row.add(invoice.getInvoiceIDPrefix());
 			row.add(invoice.getInvoiceID());
 			row.add(invoice.getInvoiceIDAsString());
 			row.add(invoice.getCreateDT());
 			row.add(JDOHelper.getObjectId(invoice.getCreateUser()).toString());
 			row.add(JDOHelper.getObjectId(invoice.getVendor()).toString());
-			row.add(JDOHelper.getObjectId(invoice.getCustomer()).toString());			
+			row.add(JDOHelper.getObjectId(invoice.getCustomer()).toString());
 			row.add(JDOHelper.getObjectId(invoice.getCurrency()).toString());
-			row.add(invoice.getPrice().getAmount());			
+			row.add(invoice.getPrice().getAmount());
 			row.add(JDOHelper.getObjectId(invoice.getInvoiceLocal().getState()).toString());
 			row.add(invoice.getArticleCount());
 			row.add(invoice.isValid());
@@ -116,14 +116,14 @@ public class InvoiceData extends AbstractJFSScriptExecutorDelegate {
 			row.add(invoice.getInvoiceLocal().isBooked());
 			row.add(JDOHelper.getObjectId(invoice.getInvoiceLocal().getBookUser()).toString());
 			row.add(invoice.getInvoiceLocal().getBookDT());
-			try {				
+			try {
 				buffer.addRecord(new Record(row));
 			} catch (Exception e) {
 				throw new ScriptException(e);
 			}
 		}
 		SQLResultSet resultSet = new SQLResultSet(buffer);
-		return resultSet; 
+		return resultSet;
 	}
 
 	/* (non-Javadoc)

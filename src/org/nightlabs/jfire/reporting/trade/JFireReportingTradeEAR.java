@@ -40,10 +40,10 @@ public class JFireReportingTradeEAR {
 
 	protected JFireReportingTradeEAR() {}
 	
-	public static final String MODULE_NAME = "JFireReportingTrade"; 
+	public static final String MODULE_NAME = "JFireReportingTrade";
 	
-	public static File getEARDir() 
-	throws ModuleException 
+	public static File getEARDir()
+	throws ModuleException
 	{
 		JFireServerManager jFireServerManager;
 		try {

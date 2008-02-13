@@ -90,8 +90,8 @@ public class ReportLayoutCfModInitialiserArticleContainerLayouts extends ConfigM
 
 	public static final ConfigModuleInitialiserID getConfigModuleInitialiserID(String organisationID) {
 		return ConfigModuleInitialiserID.create(
-				organisationID, 
-				ReportLayoutConfigModule.class.getName(), 
+				organisationID,
+				ReportLayoutConfigModule.class.getName(),
 				INITIALISER_ID_DEFAULT_ARTICLE_CONTAINER_LAYOUTS
 		);
 	}

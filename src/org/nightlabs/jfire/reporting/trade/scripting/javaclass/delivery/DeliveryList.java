@@ -82,7 +82,7 @@ public class DeliveryList extends AbstractJFSScriptExecutorDelegate {
 		 "  this.createDT, "+
 		 "  JDOHelper.getObjectId(this.productType), "+
 		 "  JDOHelper.getObjectId(this.order.vendor), "+
-		 "  JDOHelper.getObjectId(this.order.customer), "+ 
+		 "  JDOHelper.getObjectId(this.order.customer), "+
 		 "  JDOHelper.getObjectId(this.order), "+
 		 "  JDOHelper.getObjectId(this.offer), "+
 		 "  JDOHelper.getObjectId(this.deliveryNote), "+
@@ -113,13 +113,13 @@ public class DeliveryList extends AbstractJFSScriptExecutorDelegate {
 		} catch (Exception e) {
 			throw new ScriptException(e);
 		}
-		List<Object> row = new ArrayList<Object>(12); 
+		List<Object> row = new ArrayList<Object>(12);
 		for (Iterator iter = queryResult.iterator(); iter.hasNext();) {
 			row.clear();
 			CollectionUtil.addAllToCollection((Object[]) iter.next(), row);
 			Article article = (Article) row.get(0);
 			ReportingTradeScriptingUtil.addPriceFragmentsToResultSet(getPersistenceManager(), article.getPrice(), row);
-			try {				
+			try {
 				buffer.addRecord(new Record(row));
 			} catch (Exception e) {
 				throw new ScriptException(e);

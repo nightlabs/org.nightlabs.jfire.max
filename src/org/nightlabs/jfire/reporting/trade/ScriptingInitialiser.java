@@ -5,7 +5,6 @@ import java.util.Locale;
 
 import javax.jdo.PersistenceManager;
 
-import org.nightlabs.ModuleException;
 import org.nightlabs.jfire.scripting.ScriptCategory;
 import org.nightlabs.jfire.scripting.ScriptingIntialiserException;
 import org.nightlabs.jfire.servermanager.JFireServerManager;
@@ -25,20 +24,20 @@ public class ScriptingInitialiser {
 	 * 
 	 * @param pm The PersistenceManager to use.
 	 * @param jfireServerManager The ServerManager to use.
-	 * @param organisationID The organisationID the stored scirpts will have. 
-	 * @throws ScriptingIntialiserException 
+	 * @param organisationID The organisationID the stored scirpts will have.
+	 * @throws ScriptingIntialiserException
 	 * @throws ModuleException
 	 */
 	public static void initialize(
-			PersistenceManager pm, 
+			PersistenceManager pm,
 			JFireServerManager jfireServerManager,
-			String organisationID			
-		) throws ScriptingIntialiserException 
+			String organisationID
+		) throws ScriptingIntialiserException
 	{
 		ScriptCategory rootCategory = org.nightlabs.jfire.scripting.ScriptingInitialiser.createCategory(
-				pm, null, 
-				organisationID, 
-				ScriptingTradeConstants.SCRIPT_REGISTRY_ITEM_TYPE_ROOT, 
+				pm, null,
+				organisationID,
+				ScriptingTradeConstants.SCRIPT_REGISTRY_ITEM_TYPE_ROOT,
 				ScriptingTradeConstants.SCRIPT_REGISTRY_ITEM_ID_CATEGORY_ROOT);
 		rootCategory.getName().setText(Locale.ENGLISH.getLanguage(), "JFire Trade Scripting");
 		rootCategory.getName().setText(Locale.GERMAN.getLanguage(), "JFire Trade Scripting");
@@ -55,7 +54,7 @@ public class ScriptingInitialiser {
 						rootCategory,
 						ScriptingTradeConstants.SCRIPT_REGISTRY_ITEM_TYPE_TRADE_SCRIPT,
 						jfireServerManager,
-						pm, 
+						pm,
 						organisationID
 					).initialise();
 			}

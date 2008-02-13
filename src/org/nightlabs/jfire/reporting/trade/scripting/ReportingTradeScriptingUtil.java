@@ -12,7 +12,6 @@ import javax.jdo.JDOHelper;
 import javax.jdo.PersistenceManager;
 import javax.jdo.Query;
 
-import org.nightlabs.jfire.accounting.Currency;
 import org.nightlabs.jfire.accounting.Price;
 import org.nightlabs.jfire.accounting.PriceFragment;
 import org.nightlabs.jfire.accounting.PriceFragmentType;
@@ -30,7 +29,7 @@ public class ReportingTradeScriptingUtil {
 	/**
 	 * Returns all {@link PriceFragmentType}s (also those of other organisations)
 	 * in a {@link List} sorted by their primary key.
-	 *  
+	 * 
 	 * @param pm The {@link PersistenceManager} used to resolve the {@link PriceFragmentType}s.
 	 * @return All {@link PriceFragmentType}s in a sorted list.
 	 */
@@ -62,7 +61,7 @@ public class ReportingTradeScriptingUtil {
 	/**
 	 * Adds the values of all {@link PriceFragmentType}s of the given {@link Price} as {@link Double} value to the given list.
 	 * The types will be sorted according to {@link #getSortedPriceFragmentTypes(PersistenceManager)}.
-	 * If there is no {@link PriceFragment} defined for a type in the price the value for that type will be <code>0</code>. 
+	 * If there is no {@link PriceFragment} defined for a type in the price the value for that type will be <code>0</code>.
 	 * The values(price-amounts) are converted to {@link Double}s by {@link Currency#toDouble(long)}.
 	 * 
 	 * @param pm The {@link PersistenceManager} used to resolve the {@link PriceFragmentType}s.
@@ -123,9 +122,9 @@ public class ReportingTradeScriptingUtil {
 		row.add(article.getDeliveryNote() == null ? null : JDOHelper.getObjectId(article.getDeliveryNote()).toString());
 		row.add(article.getCreateDT());
 		row.add(article.getCreateUser().getUserID());
-		row.add(JDOHelper.getObjectId(article.getCreateUser()).toString());		
-		row.add(article.getCurrency().getCurrencyID());		
-		row.add(JDOHelper.getObjectId(article.getCurrency()).toString());		
+		row.add(JDOHelper.getObjectId(article.getCreateUser()).toString());
+		row.add(article.getCurrency().getCurrencyID());
+		row.add(JDOHelper.getObjectId(article.getCurrency()).toString());
 		row.add(article.getInvoice() == null ? null : JDOHelper.getObjectId(article.getInvoice()).toString());
 		row.add(article.getOffer() == null ? null : JDOHelper.getObjectId(article.getOffer()).toString());
 		row.add(article.getOrder() == null ? null : JDOHelper.getObjectId(article.getOrder()).toString());
@@ -143,7 +142,7 @@ public class ReportingTradeScriptingUtil {
 	
 	/**
 	 * Returns an instance of {@link Properties} with the content of the given
-	 * Map where in the keys all "." are replaced with "_" and "_" with "__" 
+	 * Map where in the keys all "." are replaced with "_" and "_" with "__"
 	 * 
 	 * @param mapProps The map to escape.
 	 */

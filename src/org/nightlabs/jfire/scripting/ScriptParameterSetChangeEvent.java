@@ -85,13 +85,13 @@ public class ScriptParameterSetChangeEvent extends JDOObjectChangeEvent {
 	 * @param pm The PersistenceManager to use.
 	 * @param eventType The eventType of the event to add.
 	 * @param changed The id of the item chaned.
-	 * @param relative The id of the item related to the changed one (normally its (new) parent) 
+	 * @param relative The id of the item related to the changed one (normally its (new) parent)
 	 */
 	public static void addChangeEventToController(
 			PersistenceManager pm,
 			String eventType,
-			ScriptParameterSet changed 
-		) 
+			ScriptParameterSet changed
+		)
 	{
 		JDOObjectController controller = JDOObjectController.getObjectController(
 				pm,

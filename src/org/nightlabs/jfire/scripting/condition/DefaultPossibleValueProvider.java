@@ -47,18 +47,18 @@ import org.nightlabs.jfire.scripting.id.ScriptRegistryItemID;
  * takes the resultClass of the script with the given ScriptRegistryItemID
  * and returns all instances of the same class as possible
  * values, from the datastore.
- *  
+ * 
  * @author Daniel.Mazurek [at] NightLabs [dot] de
  *
- * @jdo.persistence-capable 
+ * @jdo.persistence-capable
  *		identity-type="application"
  * 		persistence-capable-superclass="org.nightlabs.jfire.scripting.condition.PossibleValueProvider"
  *		detachable="true"
  *
  * @jdo.inheritance strategy="superclass-table"
  */
-public class DefaultPossibleValueProvider 
-extends PossibleValueProvider 
+public class DefaultPossibleValueProvider
+extends PossibleValueProvider
 {
 	/**
 	 * 
@@ -72,17 +72,17 @@ extends PossibleValueProvider
 	}
 		
 	@Override
-	public List<Object> getPossibleValues(Map<String, Object> parameterValues, int limit) 
+	public List<Object> getPossibleValues(Map<String, Object> parameterValues, int limit)
 	{
 		PersistenceManager pm = JDOHelper.getPersistenceManager(this);
 		ScriptRegistry scriptRegistry = ScriptRegistry.getScriptRegistry(pm);
-		Script script = scriptRegistry.getScript(getScriptRegistryItemType(), 
+		Script script = scriptRegistry.getScript(getScriptRegistryItemType(),
 				getScriptRegistryItemID());
 		List scripts = new ArrayList<Script>(1);
-		scripts.add(script);		
+		scripts.add(script);
 		try {
 			Map<ScriptRegistryItemID, Object> results = scriptRegistry.execute(scripts, parameterValues);
-			if (results != null) 
+			if (results != null)
 			{
 				ScriptRegistryItemID itemID = ScriptRegistryItemID.create(
 						getOrganisationID(), getScriptRegistryItemType(), getScriptRegistryItemID());
@@ -97,13 +97,13 @@ extends PossibleValueProvider
 					}
 					if (logger.isDebugEnabled())
 						logger.debug(possibleValues.size()+" possible values for class "+result.getClass());
-					return possibleValues;					
+					return possibleValues;
 				} else {
 					logger.warn("resultClass of script scriptRegistryItemID "+getScriptRegistryItemID()+" is no instance of PersistenceCapable!");
 				}
 			}
 		} catch (Exception e) {
-			logger.error("getPossibleValues() produced the following error "+e);			
+			logger.error("getPossibleValues() produced the following error "+e);
 		}
 		return Collections.EMPTY_LIST;
 	}

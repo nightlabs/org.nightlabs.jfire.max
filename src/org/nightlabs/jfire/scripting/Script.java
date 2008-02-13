@@ -35,7 +35,7 @@ import javax.jdo.Query;
 /**
  * @author Marco Schulze - marco at nightlabs dot de
  *
- * @jdo.persistence-capable 
+ * @jdo.persistence-capable
  *		identity-type="application"
  *		persistence-capable-superclass="org.nightlabs.jfire.scripting.ScriptRegistryItem"
  *		detachable="true"
@@ -76,7 +76,7 @@ public class Script
 	}
 
 	private static final String QUERY_GET_SCRIPTS_BY_TYPE_AND_RESULT_CLASS = "getScriptsByTypeAndResultClass";
-	public static Collection getScriptsByTypeAndResult(PersistenceManager pm, 
+	public static Collection getScriptsByTypeAndResult(PersistenceManager pm,
 			String scriptRegistryItemType, String resultClassName)
 	{
 		Query q = pm.newNamedQuery(Script.class, QUERY_GET_SCRIPTS_BY_TYPE_AND_RESULT_CLASS);
@@ -112,7 +112,7 @@ public class Script
 	private String text;
 
 	/**
-	 * @deprecated Only for JDO! 
+	 * @deprecated Only for JDO!
 	 */
 	@Deprecated
 	protected Script() { }
@@ -129,7 +129,7 @@ public class Script
 		}
 		// TODO remove this if jdo doesn't accept null arrays
 //		fetchGroups = new String[] {
-//			FetchPlan.DEFAULT	
+//			FetchPlan.DEFAULT
 //		};
 	}
 
@@ -218,7 +218,7 @@ public class Script
 
 	/**
 	 * @jdo.field
-	 *		persistence-modifier="persistent" 
+	 *		persistence-modifier="persistent"
 	 *		collection-type="array"
 	 *		element-type="String"
 	 *		table="JFireScripting_Script_fetchGroups"
@@ -249,7 +249,7 @@ public class Script
 
 	/**
 	 * @jdo.field persistence-modifier="persistent"
-	 */	
+	 */
 	private boolean needsDetach = false;
 	
 	public void setNeedsDetach(boolean needsDetach) {
@@ -263,7 +263,7 @@ public class Script
 //	* @jdo.field persistence-modifier="persistent"
 //	*/
 //	private String scriptExecutorClassName;
-//	
+//
 //	public String getScriptExecutorClassName()
 //	{
 //		return scriptExecutorClassName;

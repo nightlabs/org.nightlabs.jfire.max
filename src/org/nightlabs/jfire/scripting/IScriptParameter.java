@@ -29,7 +29,7 @@ package org.nightlabs.jfire.scripting;
  * @author Daniel.Mazurek [at] NightLabs [dot] de
  *
  */
-public interface IScriptParameter 
+public interface IScriptParameter
 {
 //	public void setScriptParameterClass(Class scriptParameterClass);
 	public String getScriptParameterID();

@@ -31,7 +31,7 @@ import org.nightlabs.jfire.scripting.id.ScriptRegistryItemID;
  * @author Daniel.Mazurek [at] NightLabs [dot] de
  *
  */
-public interface ValueStringConverter 
+public interface ValueStringConverter
 {
 	public Object getValue(String valueString);
 //	public String getValueString(Object value);

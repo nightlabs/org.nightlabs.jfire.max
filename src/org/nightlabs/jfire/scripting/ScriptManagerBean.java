@@ -52,9 +52,9 @@ import org.nightlabs.jfire.scripting.id.ScriptRegistryItemID;
 /**
  * @author Alexander Bieber <alex[AT]nightlabs[DOT]de>
  * 
- * @ejb.bean name="jfire/ejb/JFireScripting/ScriptManager"	
+ * @ejb.bean name="jfire/ejb/JFireScripting/ScriptManager"
  *					 jndi-name="jfire/ejb/JFireScripting/ScriptManager"
- *					 type="Stateless" 
+ *					 type="Stateless"
  *					 transaction-type="Container"
  *
  * @ejb.util generate="physical"
@@ -89,7 +89,7 @@ implements SessionBean
 	
 	/**
 	 * @ejb.create-method
-	 * @ejb.permission role-name="_Guest_"	
+	 * @ejb.permission role-name="_Guest_"
 	 */
 	public void ejbCreate() throws CreateException
 	{
@@ -111,8 +111,8 @@ implements SessionBean
 	 * @ejb.permission role-name="_System_"
 	 * @ejb.transaction type="Required"
 	 */
-	public void initialise() 
-	throws ModuleException 
+	public void initialise()
+	throws ModuleException
 	{
 		PersistenceManager pm;
 		pm = getPersistenceManager();
@@ -156,7 +156,7 @@ implements SessionBean
 			if (fetchGroups != null)
 				pm.getFetchPlan().setGroups(fetchGroups);
 
-			ScriptRegistryItem reportRegistryItem = (ScriptRegistryItem)pm.getObjectById(scriptRegistryItemID);			
+			ScriptRegistryItem reportRegistryItem = (ScriptRegistryItem)pm.getObjectById(scriptRegistryItemID);
 			ScriptRegistryItem result = pm.detachCopy(reportRegistryItem);
 			return result;
 		} finally {
@@ -249,8 +249,8 @@ implements SessionBean
 	}
 	
 //	/**
-//	 * 
-//	 * @param topLevelIDs a Set of {@link ScriptRegistryItemID}s which {@link ScriptRegistryItemCarrier} you want to get for 
+//	 *
+//	 * @param topLevelIDs a Set of {@link ScriptRegistryItemID}s which {@link ScriptRegistryItemCarrier} you want to get for
 //	 * @throws ModuleException
 //	 *
 //	 * @ejb.interface-method
@@ -262,9 +262,9 @@ implements SessionBean
 //	{
 //		PersistenceManager pm;
 //		pm = getPersistenceManager();
-//		try {			
+//		try {
 ////			Collection topLevelItems = ScriptRegistryItem.getTopScriptRegistryItemsByOrganisationID(pm, organisationID);
-//			Collection topLevelItems = pm.getObjectsById(topLevelIDs);			
+//			Collection topLevelItems = pm.getObjectsById(topLevelIDs);
 //			Collection<ScriptRegistryItemCarrier> result = new HashSet<ScriptRegistryItemCarrier>();
 //			for (Iterator iter = topLevelItems.iterator(); iter.hasNext();) {
 //				ScriptRegistryItem item = (ScriptRegistryItem) iter.next();
@@ -306,7 +306,7 @@ implements SessionBean
 	 * @ejb.transaction type="Required"
 	 */
 	public Collection<ScriptParameterSet> getScriptParameterSets(
-			String organisationID, 
+			String organisationID,
 			String[] fetchGroups, int maxFetchDepth
 		)
 	{
@@ -337,7 +337,7 @@ implements SessionBean
 	 * @ejb.transaction type="Required"
 	 */
 	public ScriptParameterSet getScriptParameterSet(
-			ScriptParameterSetID scriptParameterSetID, 
+			ScriptParameterSetID scriptParameterSetID,
 			String[] fetchGroups, int maxFetchDepth
 		)
 	{
@@ -366,13 +366,13 @@ implements SessionBean
 	 */
 	@SuppressWarnings("unchecked")
 	public Collection<ScriptParameterSet> getScriptParameterSets(
-			Collection<ScriptRegistryItemID> scriptParameterSetID, 
+			Collection<ScriptRegistryItemID> scriptParameterSetID,
 			String[] fetchGroups, int maxFetchDepth
 		)
 	{
 		PersistenceManager pm;
 		pm = getPersistenceManager();
-		try {			
+		try {
 			pm.getFetchPlan().setMaxFetchDepth(maxFetchDepth);
 			if (fetchGroups != null)
 				pm.getFetchPlan().setGroups(fetchGroups);
@@ -380,7 +380,7 @@ implements SessionBean
 			for (ScriptRegistryItemID itemID : scriptParameterSetID) {
 				ScriptRegistryItem item = (ScriptRegistryItem) pm.getObjectById(itemID);
 				if (item.getParameterSet() != null)
-					parameterSets.add(item.getParameterSet());				
+					parameterSets.add(item.getParameterSet());
 			}
 			return pm.detachCopyAll(parameterSets);
 		} finally {
@@ -438,7 +438,7 @@ implements SessionBean
 			
 	/**
 	 * 
-	 * @param organisationID The organisationID the carriers should be searched for. 
+	 * @param organisationID The organisationID the carriers should be searched for.
 	 * If null top level carriers for all organisations are returned.
 	 * @param scriptRegistryItemType the scriptRegistryItemType to search for
 	 * @throws ModuleException
@@ -464,7 +464,7 @@ implements SessionBean
 		} finally {
 			pm.close();
 		}
-	}		
+	}
 	
 	/**
 	 * returns the detached {@link ScriptRegistry}
@@ -472,7 +472,7 @@ implements SessionBean
 	 * @ejb.interface-method
 	 * @ejb.permission role-name="_Guest_"
 	 * @ejb.transaction type="Required"
-	 */	
+	 */
 	public ScriptRegistry getScriptRegistry(String[] fetchGroups, int maxFetchDepth)
 	{
 		PersistenceManager pm;
@@ -494,7 +494,7 @@ implements SessionBean
 	 * @ejb.interface-method
 	 * @ejb.permission role-name="_Guest_"
 	 * @ejb.transaction type="Required"
-	 */	
+	 */
 	public ScriptRegistry getScriptRegistry()
 	{
 		PersistenceManager pm;
@@ -508,5 +508,5 @@ implements SessionBean
 		} finally {
 			pm.close();
 		}
-	}	
+	}
 }

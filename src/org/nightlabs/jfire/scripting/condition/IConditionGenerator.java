@@ -35,9 +35,9 @@ import java.util.Collection;
  * @author Daniel.Mazurek [at] NightLabs [dot] de
  *
  */
-public interface IConditionGenerator 
+public interface IConditionGenerator
 {
-	/** 
+	/**
 	 * @param text the scriptText to transform into a ICondition
 	 * @param simpleStringConditions determines if the ICondition contains {@link ISimpleCondition}s or
 	 * {@link ISimpleStringCondition}s
@@ -62,7 +62,7 @@ public interface IConditionGenerator
 	/**
 	 * 
 	 * @return a Collection of {@link ScriptConditioner} which provide the necessary data
-	 * for parsing and creating the scriptTexts 
+	 * for parsing and creating the scriptTexts
 	 */
 	Collection<ScriptConditioner> getScriptConditioner();
 	

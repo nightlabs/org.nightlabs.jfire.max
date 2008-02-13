@@ -37,8 +37,8 @@ import org.nightlabs.jfire.scripting.ScriptParameter;
  * @author Daniel.Mazurek [at] NightLabs [dot] de
  *
  */
-public class ConditionScriptParameterSet 
-implements IScriptParameterSet 
+public class ConditionScriptParameterSet
+implements IScriptParameterSet
 {
 	/**
 	 * 

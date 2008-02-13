@@ -33,7 +33,7 @@ import org.nightlabs.jfire.scripting.id.ScriptRegistryItemID;
  * 
  * The structure of a simple condition always looks like this
  * [variable] [compareOperator] [value]
- *  
+ * 
  * @author Daniel.Mazurek [at] NightLabs [dot] de
  *
  */
@@ -41,13 +41,13 @@ public interface ISimpleCondition
 extends ICondition
 {
 //	/**
-//	 * returns the name of the variable 
+//	 * returns the name of the variable
 //	 * @return the name of the variable
 //	 */
 //	String getVariableName();
-//	
+//
 //	/**
-//	 * sets the variableName 
+//	 * sets the variableName
 //	 * @param variableName the variableName to set
 //	 */
 //	void setVariableName(String variableName);
@@ -57,7 +57,7 @@ extends ICondition
 //	 * @return the value as string
 //	 */
 //	String getValueAsString();
-//	
+//
 //	/**
 //	 * sets the value as String
 //	 * @param s the value to set
@@ -65,13 +65,13 @@ extends ICondition
 //	void setValueAsString(String s);
 
 	/**
-	 * returns the {@link ScriptRegistryItemID} which represents the variable 
+	 * returns the {@link ScriptRegistryItemID} which represents the variable
 	 * @return the ScriptRegistryItemID which represents the variable
 	 */
 	ScriptRegistryItemID getScriptRegistryItemID();
 	
 	/**
-	 * sets the {@link ScriptRegistryItemID} which represents the variable 
+	 * sets the {@link ScriptRegistryItemID} which represents the variable
 	 * @param scriptID the {@link ScriptRegistryItemID} to set
 	 */
 	void setScriptRegistryItemID(ScriptRegistryItemID scriptID);

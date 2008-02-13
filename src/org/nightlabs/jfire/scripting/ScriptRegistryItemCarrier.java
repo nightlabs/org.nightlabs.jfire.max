@@ -60,10 +60,10 @@ public class ScriptRegistryItemCarrier implements Serializable {
 	private ScriptRegistryItemID registryItemID;
 
 	public ScriptRegistryItemCarrier(
-			ScriptRegistryItemCarrier parentCarrier, 
+			ScriptRegistryItemCarrier parentCarrier,
 			ScriptRegistryItem item,
 			boolean recurse
-		) 
+		)
 	{
 		this.parentCarrier = parentCarrier;
 		this.registryItemID = ScriptRegistryItemID.create(item.getOrganisationID(), item.getScriptRegistryItemType(), item.getScriptRegistryItemID());
@@ -76,9 +76,9 @@ public class ScriptRegistryItemCarrier implements Serializable {
 	}
 	
 	public ScriptRegistryItemCarrier(
-			ScriptRegistryItemCarrier parentCarrier, 
+			ScriptRegistryItemCarrier parentCarrier,
 			ScriptRegistryItemID itemID
-		) 
+		)
 	{
 		this.parentCarrier = parentCarrier;
 		this.registryItemID = itemID;
@@ -123,7 +123,7 @@ public class ScriptRegistryItemCarrier implements Serializable {
 			if (carrier.getRegistryItemID().equals(itemID)) {
 				iter.remove();
 				break;
-			}				
+			}
 		}
 	}
 	
@@ -150,5 +150,5 @@ public class ScriptRegistryItemCarrier implements Serializable {
 			childIDs.add(childCarrier.getRegistryItemID());
 		}
 		return childIDs;
-	}	
+	}
 }

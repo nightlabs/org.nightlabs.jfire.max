@@ -83,7 +83,7 @@ implements Serializable
 	 */
 	private int scriptRegistryID;
 
-	public static final ScriptRegistryID SINGLETON_ID = ScriptRegistryID.create(0); 
+	public static final ScriptRegistryID SINGLETON_ID = ScriptRegistryID.create(0);
 
 	public static ScriptRegistry getScriptRegistry(PersistenceManager pm)
 	{
@@ -148,7 +148,7 @@ implements Serializable
 	private String organisationID;
 
 	/**
-	 * @deprecated for JDO only 
+	 * @deprecated for JDO only
 	 */
 	@Deprecated
 	protected ScriptRegistry() { }
@@ -170,8 +170,8 @@ implements Serializable
 	 * class bound to a language.
 	 * @param clazz A class which has a default constructor and extends {@link ScriptExecutor}.
 	 *
-	 * @throws IllegalAccessException 
-	 * @throws InstantiationException 
+	 * @throws IllegalAccessException
+	 * @throws InstantiationException
 	 *
 	 * @see #unbindLanguage(String)
 	 */
@@ -410,10 +410,10 @@ implements Serializable
 			scriptExecutor.prepare(script, parameterValuesIterator.next());
 			res.add(scriptExecutor.execute());
 		}
-		return res;		
+		return res;
 	}
 	
-	public Map<ScriptRegistryItemID, Script> getScripts(Collection<ScriptRegistryItemID> scriptItemsIDs) 
+	public Map<ScriptRegistryItemID, Script> getScripts(Collection<ScriptRegistryItemID> scriptItemsIDs)
 	{
 		if (scriptItemsIDs == null)
 			return null;

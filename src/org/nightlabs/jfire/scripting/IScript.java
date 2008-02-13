@@ -33,7 +33,7 @@ import java.io.Serializable;
  */
 public interface IScript
 extends Serializable
-{	
+{
 	/**
 	 * Accessor to the language of the script. Currently,
 	 * the {@link ScriptExecutorJavaScript} supports {@link ScriptExecutorJavaScript#LANGUAGE_JAVA_SCRIPT}}
@@ -79,7 +79,7 @@ extends Serializable
 	
 	/**
 	 * determines the maxFetchDepth if {@link IScript#isNeedsDetach()} returns true
-	 * @return the maxFetchDepth if {@link IScript#isNeedsDetach()} returns true 
+	 * @return the maxFetchDepth if {@link IScript#isNeedsDetach()} returns true
 	 */
 	public int getMaxFetchDepth();
 	

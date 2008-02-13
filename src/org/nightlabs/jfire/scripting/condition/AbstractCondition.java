@@ -30,8 +30,8 @@ package org.nightlabs.jfire.scripting.condition;
  * @author Daniel.Mazurek [at] NightLabs [dot] de
  *
  */
-public abstract class AbstractCondition 
-implements ICondition 
+public abstract class AbstractCondition
+implements ICondition
 {
 //	// the default language is JavaScript
 //	private String language = ScriptExecutorJavaScript.LANGUAGE_JAVA_SCRIPT;
@@ -42,8 +42,8 @@ implements ICondition
 	private IConditionContainer parent = null;
 	public IConditionContainer getParent() {
 		return parent;
-	}	
+	}
 	public void setParent(IConditionContainer parent) {
 		this.parent = parent;
-	}	
+	}
 }

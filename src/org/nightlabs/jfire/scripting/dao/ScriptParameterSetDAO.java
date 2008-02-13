@@ -24,7 +24,7 @@ import org.nightlabs.progress.ProgressMonitor;
 public class ScriptParameterSetDAO extends BaseJDOObjectDAO<ScriptRegistryItemID, ScriptParameterSet> {
 
 	public static final String[] DEFAULT_FETCH_GROUPS = new String[] {
-		FetchPlan.DEFAULT, 
+		FetchPlan.DEFAULT,
 		ScriptParameterSet.FETCH_GROUP_PARAMETERS,
 		ScriptParameterSet.FETCH_GROUP_NAME
 	};

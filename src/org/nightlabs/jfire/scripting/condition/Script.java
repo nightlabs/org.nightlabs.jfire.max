@@ -37,14 +37,14 @@ import org.nightlabs.jfire.scripting.id.ScriptRegistryItemID;
  * @author Daniel.Mazurek [at] NightLabs [dot] de
  *
  */
-public class Script 
+public class Script
 implements IScript
 {
 	/**
 	 * 
 	 */
 	private static final long serialVersionUID = 1L;
-	public Script(String language, String text, Map<String, ScriptRegistryItemID> variableName2ScriptID) 
+	public Script(String language, String text, Map<String, ScriptRegistryItemID> variableName2ScriptID)
 	{
 		if (language == null)
 			throw new IllegalArgumentException("Param language must not be null");
@@ -89,8 +89,8 @@ implements IScript
 	 */
 	private Map<String, ScriptRegistryItemID> variableName2ScriptID = new HashMap<String, ScriptRegistryItemID>();
 	public Map<String, ScriptRegistryItemID> getVariableName2ScriptID() {
-		return variableName2ScriptID;		
-	}	
+		return variableName2ScriptID;
+	}
 	public void setVariableName2ScriptID(Map<String, ScriptRegistryItemID> variableName2ScriptID) {
 		this.variableName2ScriptID = variableName2ScriptID;
 	}
@@ -103,7 +103,7 @@ implements IScript
 				m.put(me.getValue(), me.getKey());
 
 			scriptID2variableName = m;
-		}		
+		}
 		return scriptID2variableName;
 	}
 
@@ -114,7 +114,7 @@ implements IScript
 	 * {@link Script#getVariableName2ScriptID()}
 	 */
 	private transient Map<String, Object> variableName2Value = null;
-	public Map<String, Object> getVariableName2Value() 
+	public Map<String, Object> getVariableName2Value()
 	{
 		if (variableName2Value == null) {
 			variableName2Value = new HashMap<String, Object>();
@@ -126,12 +126,12 @@ implements IScript
 	}
 	
 	//***************************** Compatibilty Reasons for IScript **************************
-	private IScriptParameterSet parameterSet = new ConditionScriptParameterSet(); 
+	private IScriptParameterSet parameterSet = new ConditionScriptParameterSet();
 	public IScriptParameterSet getParameterSet() {
-		return parameterSet; 
-	}	
+		return parameterSet;
+	}
 	
-	private String[] fetchGroups = null; 
+	private String[] fetchGroups = null;
 	public String[] getFetchGroups() {
 		return fetchGroups;
 	}

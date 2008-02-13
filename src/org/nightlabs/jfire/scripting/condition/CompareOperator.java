@@ -7,7 +7,7 @@ package org.nightlabs.jfire.scripting.condition;
  * @author Daniel.Mazurek [at] NightLabs [dot] de
  *
  */
-public enum CompareOperator 
+public enum CompareOperator
 {
 	EQUAL,
 	NOT_EQUAL,

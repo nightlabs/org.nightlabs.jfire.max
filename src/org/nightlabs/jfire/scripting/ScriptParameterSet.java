@@ -49,7 +49,7 @@ import org.nightlabs.jdo.ObjectIDUtil;
  * @author Marco Schulze - marco at nightlabs dot de
  * @author Alexander Bieber <alex[AT]nightlabs[DOT]de>
  * 
- * @jdo.persistence-capable 
+ * @jdo.persistence-capable
  *		identity-type="application"
  *		objectid-class="org.nightlabs.jfire.scripting.id.ScriptParameterSetID"
  *		detachable="true"
@@ -76,7 +76,7 @@ import org.nightlabs.jdo.ObjectIDUtil;
 	
 	public static final String FETCH_GROUP_PARAMETERS = "ScriptParameterSet.parameters";
 	public static final String FETCH_GROUP_NAME = "ScriptParameterSet.name";
-	public static final String FETCH_THIS_SCRIPT_PARAMETER_SET = "ScriptParameterSet.this";	
+	public static final String FETCH_THIS_SCRIPT_PARAMETER_SET = "ScriptParameterSet.this";
 	
 	public static final String QUERY_GET_PARAMETER_SETS_BY_ORGANISATION = "getParameterSetsByOrganisation";
 
@@ -125,7 +125,7 @@ import org.nightlabs.jdo.ObjectIDUtil;
 	/**
 	 * @jdo.field persistence-modifier="persistent"
 	 */
-	private int nextParameterOrderNumber;	
+	private int nextParameterOrderNumber;
 
 	/**
 	 * @deprecated Only for JDO!
@@ -159,7 +159,7 @@ import org.nightlabs.jdo.ObjectIDUtil;
 	public Collection<ScriptParameter> getParameters()
 	{
 		return Collections.unmodifiableCollection(parameters.values());
-//		Collection<IScriptParameter> params = CollectionUtil.castCollection(parameters.values()); 
+//		Collection<IScriptParameter> params = CollectionUtil.castCollection(parameters.values());
 //		return Collections.unmodifiableCollection(params);
 	}
 	
@@ -228,18 +228,18 @@ import org.nightlabs.jdo.ObjectIDUtil;
 	}
 
 //	/**
-//	 * TODO: Remove this StoreCallback, ScriptParameterSets should be created 
+//	 * TODO: Remove this StoreCallback, ScriptParameterSets should be created
 //	 * with ID from IDGenerator
 //	 */
 //	public void jdoPreStore() {
-//		if (!JDOHelper.isNew(this)) 
+//		if (!JDOHelper.isNew(this))
 //			return;
-//		
+//
 //		PersistenceManager pm = JDOHelper.getPersistenceManager(this);
 //		if (pm == null)
 //			throw new IllegalStateException("Could not get PersistenceManager jdoPreStore()");
-//		
-//		
+//
+//
 //		if (scriptParameterSetID < 0) {
 //			// TODO: add check for organisationID
 //			ScriptRegistry scriptRegistry = ScriptRegistry.getScriptRegistry(pm);
@@ -255,7 +255,7 @@ import org.nightlabs.jdo.ObjectIDUtil;
 //				pm,
 //				ScriptParameterSetChangeEvent.EVENT_TYPE_SET_ADDED,
 //				this
-//			);		
+//			);
 //	}
 
 	/**

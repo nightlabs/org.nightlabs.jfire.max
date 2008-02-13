@@ -34,7 +34,7 @@ import java.util.List;
  * @author Daniel.Mazurek [at] NightLabs [dot] de
  *
  */
-public class ConditionContainer 
+public class ConditionContainer
 extends AbstractCondition
 implements IConditionContainer
 {
@@ -50,7 +50,7 @@ implements IConditionContainer
 	}
 	
 	public void removeCondition(ICondition condition) {
-		conditions.remove(condition);	
+		conditions.remove(condition);
 		condition.setParent(null);
 	}
 
@@ -62,11 +62,11 @@ implements IConditionContainer
 		this.combineOperator = combineOperator;
 	}
 
-//	public String getScriptText() 
+//	public String getScriptText()
 //	{
 //		StringBuffer sb = new StringBuffer();
 //		IConditionGenerator generator = GeneratorRegistry.sharedInstance().getGenerator(getLanguage());
-//		sb.append(generator.getOpenContainerString());								
+//		sb.append(generator.getOpenContainerString());
 //		for (int i=0; i<conditions.size(); i++) {
 //			ICondition con = conditions.get(i);
 //			sb.append(con.getScriptText());

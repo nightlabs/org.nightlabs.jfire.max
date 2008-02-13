@@ -32,12 +32,12 @@ import org.nightlabs.jfire.scripting.id.ScriptRegistryItemID;
  * @author Daniel.Mazurek [at] NightLabs [dot] de
  *
  */
-public class SimpleCondition 
-extends AbstractCondition 
+public class SimpleCondition
+extends AbstractCondition
 implements ISimpleCondition
 {
 	public SimpleCondition(ScriptRegistryItemID scriptID, CompareOperator compareOperator,
-			Object value) 
+			Object value)
 	{
 		if (scriptID == null)
 			throw new IllegalArgumentException("Param scriptID must not be null");
@@ -78,26 +78,26 @@ implements ISimpleCondition
 	}
 		
 //	@Override
-//	public boolean equals(Object obj) 
+//	public boolean equals(Object obj)
 //	{
 //		if (obj == null)
-//			return false;		
+//			return false;
 //		if (obj instanceof SimpleCondition) {
-//			SimpleCondition sc = (SimpleCondition) obj;			
+//			SimpleCondition sc = (SimpleCondition) obj;
 //			if (!sc.getScriptRegistryItemID().equals(scriptRegistryItemID))
 //				return false;
 //			if (sc.getCompareOperator() != compareOperator)
 //				return false;
 //			if (!sc.getValue().equals(value))
 //				return false;
-//			
+//
 //			return true;
-//		}		
+//		}
 //		return false;
 //	}
-//	
+//
 //	@Override
-//	public int hashCode() 
+//	public int hashCode()
 //	{
 //		return scriptRegistryItemID.hashCode() + value.hashCode() + compareOperator.hashCode();
 //	}

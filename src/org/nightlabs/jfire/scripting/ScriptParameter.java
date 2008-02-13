@@ -34,7 +34,7 @@ import org.nightlabs.util.Util;
  * 
  * @author Alexander Bieber <alex[AT]nightlabs[DOT]de>
  * 
- * @jdo.persistence-capable 
+ * @jdo.persistence-capable
  *		identity-type="application"
  *		objectid-class="org.nightlabs.jfire.scripting.id.ScriptParameterID"
  *		detachable="true"
@@ -158,9 +158,9 @@ public class ScriptParameter
 
 	@Override
 	public int hashCode() {
-		return 
-			Util.hashCode(organisationID) ^ 
-			Util.hashCode(scriptParameterSetID) ^ 
+		return
+			Util.hashCode(organisationID) ^
+			Util.hashCode(scriptParameterSetID) ^
 			Util.hashCode(scriptParameterID);
 	}
 	
@@ -174,7 +174,7 @@ public class ScriptParameter
 		
 		ScriptParameter other = (ScriptParameter) obj;
 		
-		return 
+		return
 			Util.equals(this.organisationID, other.organisationID) &&
 			this.scriptParameterSetID == other.scriptParameterSetID &&
 			Util.equals(this.scriptParameterID, other.scriptParameterID);

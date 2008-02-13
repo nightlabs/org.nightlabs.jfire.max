@@ -31,14 +31,14 @@ import java.util.List;
  * @author Daniel.Mazurek [at] NightLabs [dot] de
  *
  */
-public interface ICompareOperatorProvider 
+public interface ICompareOperatorProvider
 {
 	/**
 	 * returns a List of {@link CompareOperator}s which are legal for the given class
 	 * 
-	 * @param scriptResultClass the Class to get the allowed 
+	 * @param scriptResultClass the Class to get the allowed
 	 * {@link CompareOperator}s for
-	 * @return a List of {@link CompareOperator}s which are legal for the given class 
+	 * @return a List of {@link CompareOperator}s which are legal for the given class
 	 */
 	List<CompareOperator> getCompareOperator(Class scriptResultClass);
 }

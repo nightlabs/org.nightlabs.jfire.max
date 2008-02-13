@@ -31,14 +31,14 @@ import java.util.List;
  * @author Daniel.Mazurek [at] NightLabs [dot] de
  *
  */
-public class ConditionUtil 
+public class ConditionUtil
 {
 	/**
-	 * adds all contained {@link ISimpleCondition}s of a condition to the given list 
-	 * @param condition the condition to get all contained {@link ISimpleCondition}s for 
-	 * @param simpleConditions a {@link List} to add all contained {@link ISimpleCondition}s to 
+	 * adds all contained {@link ISimpleCondition}s of a condition to the given list
+	 * @param condition the condition to get all contained {@link ISimpleCondition}s for
+	 * @param simpleConditions a {@link List} to add all contained {@link ISimpleCondition}s to
 	 */
-	public static void getSimpleConditions(ICondition condition, List<ISimpleCondition> simpleConditions) 
+	public static void getSimpleConditions(ICondition condition, List<ISimpleCondition> simpleConditions)
 	{
 		if (condition == null)
 			throw new IllegalArgumentException("Param condition must NOT be null!");
@@ -50,19 +50,19 @@ public class ConditionUtil
 			IConditionContainer container = (IConditionContainer) condition;
 			for (ICondition condition2 : container.getConditions()) {
 				getSimpleConditions(condition2, simpleConditions);
-			}			
-		} 
+			}
+		}
 		else if (condition instanceof ISimpleCondition) {
 			simpleConditions.add((ISimpleCondition)condition);
 		}
 	}
 
 	/**
-	 * adds all contained {@link ISimpleStringCondition}s of a condition to the given list 
-	 * @param condition the condition to get all contained {@link ISimpleStringCondition}s for 
-	 * @param simpleConditions a {@link List} to add all contained {@link ISimpleStringCondition}s to 
-	 */	
-	public static void getSimpleStringConditions(ICondition condition, List<ISimpleStringCondition> simpleConditions) 
+	 * adds all contained {@link ISimpleStringCondition}s of a condition to the given list
+	 * @param condition the condition to get all contained {@link ISimpleStringCondition}s for
+	 * @param simpleConditions a {@link List} to add all contained {@link ISimpleStringCondition}s to
+	 */
+	public static void getSimpleStringConditions(ICondition condition, List<ISimpleStringCondition> simpleConditions)
 	{
 		if (condition == null)
 			throw new IllegalArgumentException("Param condition must NOT be null!");
@@ -74,8 +74,8 @@ public class ConditionUtil
 			IConditionContainer container = (IConditionContainer) condition;
 			for (ICondition condition2 : container.getConditions()) {
 				getSimpleStringConditions(condition2, simpleConditions);
-			}			
-		} 
+			}
+		}
 		else if (condition instanceof ISimpleStringCondition) {
 			simpleConditions.add((ISimpleStringCondition)condition);
 		}

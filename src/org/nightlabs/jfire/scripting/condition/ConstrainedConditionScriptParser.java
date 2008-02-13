@@ -46,7 +46,7 @@ import org.nightlabs.jfire.scripting.id.ScriptRegistryItemID;
  * @author Daniel.Mazurek [at] NightLabs [dot] de
  *
  */
-public class ConstrainedConditionScriptParser 
+public class ConstrainedConditionScriptParser
 {
 	private static final Logger logger = Logger.getLogger(ConstrainedConditionScriptParser.class);
 		
@@ -55,7 +55,7 @@ public class ConstrainedConditionScriptParser
 	
 	/**
 	 * May only be used if {@link ConstrainedConditionScriptParser#getCondition(ConstrainedConditionGenerator, String, boolean)}
-	 * is called with the boolean (simpleStringCondition) true 
+	 * is called with the boolean (simpleStringCondition) true
 	 */
 	public ConstrainedConditionScriptParser() {
 		
@@ -63,10 +63,10 @@ public class ConstrainedConditionScriptParser
 	
 	public ConstrainedConditionScriptParser(Collection<ScriptConditioner> scriptConditioners) {
 		this(scriptConditioners, null);
-	}	
+	}
 	
 	public ConstrainedConditionScriptParser(Collection<ScriptConditioner> scriptConditioners,
-			Map<ScriptRegistryItemID, ValueStringConverter> scriptID2ValueStringConverter) 
+			Map<ScriptRegistryItemID, ValueStringConverter> scriptID2ValueStringConverter)
 	{
 		this.scriptConditioners = scriptConditioners;
 		this.scriptID2ValueStringConverter = scriptID2ValueStringConverter;
@@ -74,7 +74,7 @@ public class ConstrainedConditionScriptParser
 		valueString2Value = new HashMap<String, Object>();
 		
 		for (ScriptConditioner conditioner : scriptConditioners) {
-			variableName2ScriptID.put(conditioner.getVariableName(), 
+			variableName2ScriptID.put(conditioner.getVariableName(),
 					conditioner.getScriptRegistryItemID());
 			for (Object value : conditioner.getPossibleValues()) {
 				if (value instanceof PersistenceCapable) {
@@ -117,8 +117,8 @@ public class ConstrainedConditionScriptParser
 		return specialCharacters;
 	}
 		
-	public ICondition getCondition(ConstrainedConditionGenerator generator, String scriptText, 
-			boolean simpleStringCondition) 
+	public ICondition getCondition(ConstrainedConditionGenerator generator, String scriptText,
+			boolean simpleStringCondition)
 	{
 		if (scriptText == null)
 			throw new IllegalArgumentException("param scriptText must NOT be null!");
@@ -138,31 +138,31 @@ public class ConstrainedConditionScriptParser
 		scriptText = scriptText.replaceAll(importRegEx, "");
 		
 		sb = new StringBuffer();
-		sb.append("JDOHelper.getObjectId\\((.*?)\\)");		
-		sb.append("\\.toString\\(\\)");		
-		String varRegEx = sb.toString();		
+		sb.append("JDOHelper.getObjectId\\((.*?)\\)");
+		sb.append("\\.toString\\(\\)");
+		String varRegEx = sb.toString();
 		scriptText = scriptText.replaceAll(varRegEx, "$1");
 		System.out.println("replacedScriptText = "+scriptText);
 		
 		return parseConditionContainer(scriptText, generator, simpleStringCondition);
-	}	
+	}
 			
 	protected ICondition parseConditionContainer(String text, ConstrainedConditionGenerator generator,
-			boolean simpleStringCondition) 
+			boolean simpleStringCondition)
 	{
-		List<String> subContainer = getContainerSubStrings(text, 
-				generator.getOpenContainerString(), 
+		List<String> subContainer = getContainerSubStrings(text,
+				generator.getOpenContainerString(),
 				generator.getCloseContainerString());
 		if (subContainer.size() == 0) {
 			return getSimpleConditions(text, generator, simpleStringCondition);
 		}
-		if (subContainer.size() == 1) 
+		if (subContainer.size() == 1)
 		{
 			// remove surrounding brackets
 			int firstIndex = text.indexOf(generator.getOpenContainerString());
 			int lastIndex = text.lastIndexOf(generator.getCloseContainerString());
 			text = text.substring(firstIndex+1, lastIndex);
-			return parseConditionContainer(text, generator, simpleStringCondition);			
+			return parseConditionContainer(text, generator, simpleStringCondition);
 		}
 		else {
 			ConditionContainer conditionContainer = new ConditionContainer();
@@ -171,7 +171,7 @@ public class ConstrainedConditionScriptParser
 				ICondition condition = parseConditionContainer(container, generator, simpleStringCondition);
 				conditionContainer.addCondition(condition);
 //				System.out.println("subContainer = "+container);
-			}			
+			}
 			text = text.replace(generator.getOpenContainerString(), "");
 			text = text.replace(generator.getCloseContainerString(), "");
 //			System.out.println("combineText = "+text);
@@ -182,22 +182,22 @@ public class ConstrainedConditionScriptParser
 			if (combinePatternMatcher.find()) {
 				int start = combinePatternMatcher.start();
 				int end = combinePatternMatcher.end();
-				String combineOperator = text.substring(start, end);				
+				String combineOperator = text.substring(start, end);
 				conditionContainer.setCombineOperator(generator.getCombineOperator(combineOperator));
-				return conditionContainer;										
+				return conditionContainer;
 			}
 			else {
 				StringBuffer sb = new StringBuffer();
 				for (String string : generator.getCombineOperators()) {
 					sb.append(string+" , ");
 				}
-				throw new IllegalArgumentException("Param text "+text+" does not contain any of " + 
+				throw new IllegalArgumentException("Param text "+text+" does not contain any of " +
 						" the following combineOperators!");
-			}				
+			}
 		}
-	}	
+	}
 	
-	protected List<String> getContainerSubStrings(String text, String openContainerString, String closeContainerString) 
+	protected List<String> getContainerSubStrings(String text, String openContainerString, String closeContainerString)
 	{
 		List<String> containers = new ArrayList<String>();
 		int firstIndex = -1;
@@ -207,11 +207,11 @@ public class ConstrainedConditionScriptParser
 			char c = text.charAt(i);
 			if (String.valueOf(c).equals(openContainerString)) {
 				if (firstIndex == -1)
-					firstIndex = i;				
-				counter++;						
+					firstIndex = i;
+				counter++;
 			}
 			if (String.valueOf(c).equals(closeContainerString)) {
-				counter--;						
+				counter--;
 			}
 			if (firstIndex != -1 && counter == 0) {
 				lastIndex = i;
@@ -225,7 +225,7 @@ public class ConstrainedConditionScriptParser
 		return containers;
 	}
 	
-//	protected ISimpleCondition parseSimpleCondition(ConstrainedConditionGenerator generator, String scriptText) 
+//	protected ISimpleCondition parseSimpleCondition(ConstrainedConditionGenerator generator, String scriptText)
 //	{
 //		String variableRegEx = getVariableRegEx(generator);
 //		Pattern variablePattern = Pattern.compile(variableRegEx);
@@ -247,40 +247,40 @@ public class ConstrainedConditionScriptParser
 //						value = scriptText.substring(index + compareOperator.length(), endIndex);
 //					else
 //						value = scriptText.substring(index + compareOperator.length());
-//					
+//
 //					logger.debug("value before replace = "+value);
 //					Pattern p = Pattern.compile("\\\"(.*?)\\\"");
-//					Matcher matcher = p.matcher(value); 
+//					Matcher matcher = p.matcher(value);
 //					if (matcher.find()) {
 //						value = value.substring(1, value.length()-1);
-//					}					
+//					}
 //					logger.debug("value after replace = "+value);
-//										
+//
 //				} else {
 //					throw new IllegalArgumentException("Param scriptText "+scriptText+" does " +
 //							"not contain a value");
 //				}
-//				
+//
 //				if (logger.isDebugEnabled()) {
 //					logger.debug("simpleConditionText = "+scriptText);
 //					logger.debug("variable = "+variable);
 //					logger.debug("compareOperator = "+compareOperator);
 //					logger.debug("value = "+value);
 //				}
-//				
+//
 //				ScriptRegistryItemID scriptID = variableName2ScriptID.get(variable);
-//				
+//
 //				Object valueObject = null;
 //				if (scriptID2ValueStringConverter.get(scriptID) != null) {
 //					ValueStringConverter valueStringConverter = scriptID2ValueStringConverter.get(scriptID);
 //					valueObject = valueStringConverter.getValue(value);
 //				}
 //				else {
-//					valueObject = valueString2Value.get(value);					
+//					valueObject = valueString2Value.get(value);
 //				}
-//				
+//
 //				SimpleCondition simpleCondition = new SimpleCondition(scriptID, co, valueObject);
-//				return simpleCondition;				
+//				return simpleCondition;
 //			}
 //			else {
 //				StringBuffer sb = new StringBuffer();
@@ -289,17 +289,17 @@ public class ConstrainedConditionScriptParser
 //				}
 //				throw new IllegalArgumentException("Param scriptText "+scriptText+" does " +
 //						"not contain one of the following compareOperators " +
-//						sb.toString());			  								
+//						sb.toString());
 //			}
 //		}
 //		else
 //			throw new IllegalArgumentException("Param scriptText "+scriptText+" does " +
 //					"not contain a variableIdentifier " +
-//					generator.getVariableString());			  
+//					generator.getVariableString());
 //	}
 
-	protected ICondition parseSimpleCondition(ConstrainedConditionGenerator generator, 
-			String scriptText, boolean simpleStringCondition) 
+	protected ICondition parseSimpleCondition(ConstrainedConditionGenerator generator,
+			String scriptText, boolean simpleStringCondition)
 	{
 		String variableRegEx = getVariableRegEx(generator);
 		Pattern variablePattern = Pattern.compile(variableRegEx);
@@ -324,10 +324,10 @@ public class ConstrainedConditionScriptParser
 					
 					logger.debug("value before replace = "+value);
 					Pattern p = Pattern.compile("\\\"(.*?)\\\"");
-					Matcher matcher = p.matcher(value); 
+					Matcher matcher = p.matcher(value);
 					if (matcher.find()) {
 						value = value.substring(1, value.length()-1);
-					}					
+					}
 					logger.debug("value after replace = "+value);
 										
 				} else {
@@ -348,17 +348,17 @@ public class ConstrainedConditionScriptParser
 					return stringCondition;
 				}
 				else {
-					ScriptRegistryItemID scriptID = variableName2ScriptID.get(variable);				
+					ScriptRegistryItemID scriptID = variableName2ScriptID.get(variable);
 					Object valueObject = null;
 					if (scriptID2ValueStringConverter != null && scriptID2ValueStringConverter.get(scriptID) != null) {
 						ValueStringConverter valueStringConverter = scriptID2ValueStringConverter.get(scriptID);
 						valueObject = valueStringConverter.getValue(value);
 					}
 					else {
-						valueObject = valueString2Value.get(value);					
-					}				
+						valueObject = valueString2Value.get(value);
+					}
 					SimpleCondition simpleCondition = new SimpleCondition(scriptID, co, valueObject);
-					return simpleCondition;									
+					return simpleCondition;
 				}
 			}
 			else {
@@ -368,16 +368,16 @@ public class ConstrainedConditionScriptParser
 				}
 				throw new IllegalArgumentException("Param scriptText "+scriptText+" does " +
 						"not contain one of the following compareOperators " +
-						sb.toString());			  								
+						sb.toString());
 			}
 		}
 		else
 			throw new IllegalArgumentException("Param scriptText "+scriptText+" does " +
 					"not contain a variableIdentifier " +
-					generator.getVariableString());			  
-	}	
+					generator.getVariableString());
+	}
 	
-	protected String getVariableRegEx(ConstrainedConditionGenerator generator) 
+	protected String getVariableRegEx(ConstrainedConditionGenerator generator)
 	{
 		StringBuffer sb = new StringBuffer();
 		sb.append(checkString(generator.getVariableString()));
@@ -391,7 +391,7 @@ public class ConstrainedConditionScriptParser
 		return regEx;
 	}
 		
-	protected String getCompareOperatorRegEx(ConstrainedConditionGenerator generator) 
+	protected String getCompareOperatorRegEx(ConstrainedConditionGenerator generator)
 	{
 		StringBuffer sb = new StringBuffer();
 		// get all compare operator Strings and concat them with |
@@ -401,7 +401,7 @@ public class ConstrainedConditionScriptParser
 				String checkedCompareOperator = checkString(compareOperator);
 				sb.append(checkedCompareOperator);
 				if (i != generator.getCompareOperators().size()-1)
-					sb.append("|");				
+					sb.append("|");
 			}
 		}
 		// replace duplicate | if some compareOperator Strings are null
@@ -413,15 +413,15 @@ public class ConstrainedConditionScriptParser
 		// cut off | at the end if some compareOperator Strings are null
 		while(sb.lastIndexOf("|") == sb.length()-1) {
 			sb = new StringBuffer(sb.subSequence(0, sb.length()-1));
-		}		
+		}
 		return sb.toString();
 	}
 	
 	
-	protected String getCombineOperatorRegEx(ConstrainedConditionGenerator generator) 
+	protected String getCombineOperatorRegEx(ConstrainedConditionGenerator generator)
 	{
 		StringBuffer sb = new StringBuffer();
-		for (int i = 0; i < generator.getCombineOperators().size(); i++) 
+		for (int i = 0; i < generator.getCombineOperators().size(); i++)
 		{
 			String combineOperator = generator.getCombineOperators().get(i);
 			String checkedCombineOperator = checkString(combineOperator);
@@ -430,9 +430,9 @@ public class ConstrainedConditionScriptParser
 				sb.append("|");
 		}
 		return sb.toString();
-	}	
+	}
 	
-	protected String checkString(String s) 
+	protected String checkString(String s)
 	{
 			String originalString = new String(s);
 			// first check for escape
@@ -452,8 +452,8 @@ public class ConstrainedConditionScriptParser
 			return s;
 	}
 		
-	protected ICondition getSimpleConditions(String s, ConstrainedConditionGenerator generator, 
-			boolean simpleStringCondition) 
+	protected ICondition getSimpleConditions(String s, ConstrainedConditionGenerator generator,
+			boolean simpleStringCondition)
 	{
 		Pattern combinePattern = Pattern.compile(getCombineOperatorRegEx(generator));
 		Matcher combinePatternMatcher = combinePattern.matcher(s);
@@ -465,16 +465,16 @@ public class ConstrainedConditionScriptParser
 		boolean found = false;
 		CombineOperator combineOperator = null;
 		// get all strings between compareOperators
-		while (combinePatternMatcher.find()) 
+		while (combinePatternMatcher.find())
 		{
-			String group = combinePatternMatcher.group(); 
+			String group = combinePatternMatcher.group();
 			if (!group.equals("")) {
-				found = true;				
+				found = true;
 				combineOperator = generator.getCombineOperator(group);
 				end = combinePatternMatcher.start();
 				String simpleCondition = sb.substring(start, end);
 				simpleConditions.add(simpleCondition);
-				start = combinePatternMatcher.end();				
+				start = combinePatternMatcher.end();
 			}
 		}
 		
@@ -482,7 +482,7 @@ public class ConstrainedConditionScriptParser
 		if (end != 0) {
 			if (start != sb.length()-1) {
 				String simpleCondition = sb.substring(start, sb.length());
-				simpleConditions.add(simpleCondition);								
+				simpleConditions.add(simpleCondition);
 				if (logger.isDebugEnabled()) {
 					logger.debug("simpleCondition = "+simpleCondition);
 				}
@@ -492,7 +492,7 @@ public class ConstrainedConditionScriptParser
 		// if no compareOperators have been found just add the original string
 		if (!found) {
 			return parseSimpleCondition(generator, s, simpleStringCondition);
-		} 
+		}
 		else {
 			IConditionContainer container = new ConditionContainer();
 			container.setCombineOperator(combineOperator);
@@ -502,5 +502,5 @@ public class ConstrainedConditionScriptParser
 			}
 			return container;
 		}
-	}		
+	}
 }

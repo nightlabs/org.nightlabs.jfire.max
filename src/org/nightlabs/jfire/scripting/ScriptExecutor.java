@@ -117,14 +117,14 @@ public abstract class ScriptExecutor
 //		try {
 //			if (script == null)
 //				throw new IllegalArgumentException("script must not be null!");
-//	
+//
 //			this.script = script;
-//	
+//
 //			if (parameterValues == null)
 //				parameterValues = new HashMap<String, Object>(0);
-//	
+//
 //			this.parameterValues = parameterValues;
-//	
+//
 //			validateParameters();
 //			doPrepare();
 //			prepared = true;
@@ -166,7 +166,7 @@ public abstract class ScriptExecutor
 	}
 	
 	/**
-	 * Called on {@link #prepare(Script, Map)} after the 
+	 * Called on {@link #prepare(Script, Map)} after the
 	 * validation of parameters.
 	 * Default implementation does nothing. Subclasses my
 	 * add functionality.
@@ -259,10 +259,10 @@ public abstract class ScriptExecutor
 	}
 
 //	/**
-//	 * Returns the script set with {@link #prepare(Script, Map)}. 
+//	 * Returns the script set with {@link #prepare(Script, Map)}.
 //	 * If prepare was not called prior to this method
 //	 * an {@link IllegalStateException} will be thrown.
-//	 * 
+//	 *
 //	 * @return The script to execute.
 //	 */
 //	public Script getScript()
@@ -274,7 +274,7 @@ public abstract class ScriptExecutor
 //	}
 
 	/**
-	 * Returns the script set with {@link #prepare(Script, Map)}. 
+	 * Returns the script set with {@link #prepare(Script, Map)}.
 	 * If prepare was not called prior to this method
 	 * an {@link IllegalStateException} will be thrown.
 	 * 

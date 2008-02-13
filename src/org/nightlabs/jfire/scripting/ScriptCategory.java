@@ -38,7 +38,7 @@ import org.apache.log4j.Logger;
  * @author Marco Schulze - marco at nightlabs dot de
  * @author Alexander Bieber <!-- alex [AT] nightlabs [DOT] de -->
  * 
- * @jdo.persistence-capable 
+ * @jdo.persistence-capable
  *		identity-type="application"
  *		persistence-capable-superclass="org.nightlabs.jfire.scripting.ScriptRegistryItem"
  *		detachable="true"
@@ -69,7 +69,7 @@ public class ScriptCategory
 	 *		mapped-by="parent"
 	 *		dependent-element="true"
 	 */
-	private Set children;	
+	private Set children;
 
 	/**
 	 * @deprecated Only for JDO!
@@ -94,7 +94,7 @@ public class ScriptCategory
 	 * @param parent Can be <code>null</code>, if this is the root category.
 	 * @param organisationID The owner-organisation. Must not be <code>null</code>.
 	 * @param scriptRegistryItemType The type of the ScriptCategory. Must not be <code>null</code>.
-	 * @param scriptRegistryItemID The local id in the scope of <code>organisationID</code> and <code>scriptRegistryItemType</code>. Must not be null. 
+	 * @param scriptRegistryItemID The local id in the scope of <code>organisationID</code> and <code>scriptRegistryItemType</code>. Must not be null.
 	 */
 	public ScriptCategory(
 			ScriptCategory parent,
@@ -154,7 +154,7 @@ public class ScriptCategory
 	}
 
 	/**
-	 * Returns and unmodifiableSet with 
+	 * Returns and unmodifiableSet with
 	 * all sub-categories and scripts of this category.
 	 */
 	public Set getChildren()

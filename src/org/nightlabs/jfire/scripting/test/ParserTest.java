@@ -18,12 +18,12 @@ import org.nightlabs.jfire.scripting.condition.SimpleCondition;
 import org.nightlabs.jfire.scripting.id.ScriptRegistryItemID;
 
 
-public class ParserTest 
+public class ParserTest
 {
 
-	public static void main(String[] args) 
+	public static void main(String[] args)
 	{
-		String script = getScriptText();		
+		String script = getScriptText();
 		
 		ConstrainedConditionGenerator generator = new JavaScriptConditionGenerator();
 		generator.setScriptConditioner(getScriptConditioner());
@@ -36,19 +36,19 @@ public class ParserTest
 		System.out.println("scriptText = "+script);
 		System.out.println("conditionText = "+conditionText);
 		boolean equals = script.equals(conditionText);
-		System.out.println("equals = "+equals);		
+		System.out.println("equals = "+equals);
 	}
 
-	private static Collection<ScriptConditioner> getScriptConditioner() 
+	private static Collection<ScriptConditioner> getScriptConditioner()
 	{
 		String scriptIDName = "Test";
 		ScriptRegistryItemID scriptID = getScriptID();
 		Script script = getScript();
-		Collection possibleValues = new ArrayList();		
+		Collection possibleValues = new ArrayList();
 //		possibleValues.add(new Tariff(organisationID, 0));
 		possibleValues.add(script);
-		ScriptConditioner sc = new ScriptConditioner(scriptID, script, scriptIDName, 
-				DefaultCompareOperatorProvider.sharedInstance().getEqualOperators(), 
+		ScriptConditioner sc = new ScriptConditioner(scriptID, script, scriptIDName,
+				DefaultCompareOperatorProvider.sharedInstance().getEqualOperators(),
 				possibleValues, LabelProvider.class.getName());
 		
 		Collection<ScriptConditioner> scs = new ArrayList<ScriptConditioner>();
@@ -56,28 +56,28 @@ public class ParserTest
 		return scs;
 	}
 	
-	private static ScriptRegistryItemID getScriptID() 
+	private static ScriptRegistryItemID getScriptID()
 	{
 		String organisationID = "dev.jfire.org";
 		String scriptType = "CrossTicketTrade-Type-Ticket";
 		String scriptIDName = "Test";
 		return ScriptRegistryItemID.create(organisationID, scriptType, scriptIDName);
-//		System.out.println("scriptID = "+scriptID);		
+//		System.out.println("scriptID = "+scriptID);
 	}
 	
-	private static Script getScript() 
+	private static Script getScript()
 	{
 		String organisationID = "dev.jfire.org";
 		String scriptType = "CrossTicketTrade-Type-Ticket";
 		String scriptIDName = "Test";
-		ScriptCategory scriptCategory = new ScriptCategory(organisationID, scriptType, "Ticketing"); 
+		ScriptCategory scriptCategory = new ScriptCategory(organisationID, scriptType, "Ticketing");
 		Script script = new Script(scriptCategory, organisationID, scriptType, "Test");
 		return script;
 	}
 	
-	private static ICondition getCondition() 
+	private static ICondition getCondition()
 	{
-		SimpleCondition sc = new SimpleCondition(getScriptID(), 
+		SimpleCondition sc = new SimpleCondition(getScriptID(),
 				CompareOperator.EQUAL,
 				getScript());
 
@@ -90,11 +90,11 @@ public class ParserTest
 		return container;
 	}
 	
-	private static String getScriptText() 
+	private static String getScriptText()
 	{
 //	String script = "(($variable==Value)&&($variable2!=Value2)&&($variable3>Value3))||($variable4==Value4)";
 //	String script = "(($variable4==Value4)||(($variable==Value)&&(($variable2!=Value2)||($variable3!=Value3))))";
-//	String script = "($variable4==Value4)||(($variable==Value)&&(($variable2!=Value2)||($variable3!=Value3)))";		
+//	String script = "($variable4==Value4)||(($variable==Value)&&(($variable2!=Value2)||($variable3!=Value3)))";
 //	String script = "$variable4==Value4";
 //	String script = "($variable4==Value4)";
 	
@@ -103,7 +103,7 @@ public class ParserTest
 //		sb.append("importPackage(Packages.org.nightlabs.jdo);");
 //		sb.append("JDOHelper.getObjectId(Test)==ObjectIDUtil.createObjectID(\"jdo/org.b.MyClassID?fieldA=0\");");
 		String scriptIDString = getScriptID().toString();
-		sb.append("JDOHelper.getObjectId(Test).toString()=="+scriptIDString+"");		
+		sb.append("JDOHelper.getObjectId(Test).toString()=="+scriptIDString+"");
 		String script = sb.toString();
 		return script;
 	}

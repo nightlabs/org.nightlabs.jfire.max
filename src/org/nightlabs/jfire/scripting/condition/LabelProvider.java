@@ -29,7 +29,7 @@ package org.nightlabs.jfire.scripting.condition;
  * @author Daniel.Mazurek [at] NightLabs [dot] de
  *
  */
-public class LabelProvider 
+public class LabelProvider
 implements ILabelProvider
 {
 
@@ -38,7 +38,7 @@ implements ILabelProvider
 	 */
 	private static final long serialVersionUID = 1L;
 
-	public String getText(Object object) 
+	public String getText(Object object)
 	{
 		// TODO: check first with reflection if the object contains a field which is
 		// assignable from I18nText and return the value of the Locale.getDefault().getLanguage()

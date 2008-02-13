@@ -37,7 +37,7 @@ import org.nightlabs.jfire.scripting.ScriptExecutorJavaScript;
  * @author Daniel.Mazurek [at] NightLabs [dot] de
  *
  */
-public class JavaScriptConditionGenerator  
+public class JavaScriptConditionGenerator
 extends ConstrainedConditionGenerator
 {
 //	public JavaScriptConditionGenerator(Collection<ScriptConditioner> scriptConditioners) {
@@ -49,24 +49,24 @@ extends ConstrainedConditionGenerator
 	}
 
 	@Override
-	public String getCombineOperator(CombineOperator combineOperator) 
+	public String getCombineOperator(CombineOperator combineOperator)
 	{
-		switch (combineOperator) 
+		switch (combineOperator)
 		{
 			case LOGICAL_AND:
 				return "&&";
 			case LOGICAL_OR:
 				return "||";
 //			case LOGICAL_NOT:
-//				return "!";				
+//				return "!";
 		}
 		return null;
 	}
 
 	@Override
-	public String getCompareOperator(CompareOperator compareOperator) 
+	public String getCompareOperator(CompareOperator compareOperator)
 	{
-		switch (compareOperator) 
+		switch (compareOperator)
 		{
 			case EQUAL:
 				return "==";
@@ -79,7 +79,7 @@ extends ConstrainedConditionGenerator
 			case GREATER_OR_EQUAL_THEN:
 				return ">=";
 			case SMALLER_OR_EQUAL_THEN:
-				return "<=";				
+				return "<=";
 		}
 		return null;
 	}
@@ -107,27 +107,27 @@ extends ConstrainedConditionGenerator
 //			compareOperatorStrings = new ArrayList<String>(compareOperators.length);
 //			for (int i=0; i<compareOperators.length; i++) {
 //				compareOperatorStrings.add(getCompareOperator(compareOperators[i]));
-//			}			
+//			}
 //		}
 //		return compareOperatorStrings;
 //	}
 	
 //	private List<String> combineOperatorStrings = null;
-//	public List<String> getCombineOperators() 
+//	public List<String> getCombineOperators()
 //	{
 //		if (combineOperatorStrings == null) {
 //			CombineOperator[] combineOperators = CombineOperator.values();
 //			combineOperatorStrings = new ArrayList<String>(combineOperators.length);
 //			for (int i=0; i<combineOperators.length; i++) {
 //				combineOperatorStrings.add(getCombineOperator(combineOperators[i]));
-//			}			
+//			}
 //		}
-//		return combineOperatorStrings;		
+//		return combineOperatorStrings;
 //	}
 
 	@Override
-	public CompareOperator getCompareOperator(String compareOperator) 
-	{		
+	public CompareOperator getCompareOperator(String compareOperator)
+	{
 		if (compareOperator.equals("==")) {
 			return CompareOperator.EQUAL;
 		}
@@ -151,7 +151,7 @@ extends ConstrainedConditionGenerator
 	}
 
 	@Override
-	public CombineOperator getCombineOperator(String combineOperator) 
+	public CombineOperator getCombineOperator(String combineOperator)
 	{
 		if (combineOperator.equals("&&")) {
 			return CombineOperator.LOGICAL_AND;
@@ -169,20 +169,20 @@ extends ConstrainedConditionGenerator
 	@Override
 	public String getLanguage() {
 		return ScriptExecutorJavaScript.LANGUAGE_JAVA_SCRIPT;
-	}	
+	}
 	
 	@Override
-	public String getScriptText(ICondition condition) 
+	public String getScriptText(ICondition condition)
 	{
 		StringBuffer sb = new StringBuffer();
 		getScriptText(condition, sb, false);
 		return sb.toString();
 	}
 	
-	protected void getScriptText(ICondition condition, StringBuffer sb, boolean importInserted) 
+	protected void getScriptText(ICondition condition, StringBuffer sb, boolean importInserted)
 	{
-		if (condition instanceof ISimpleCondition) 
-		{	
+		if (condition instanceof ISimpleCondition)
+		{
 			ISimpleCondition simpleCondition = (ISimpleCondition) condition;
 			if (simpleCondition.getValue() instanceof PersistenceCapable) {
 				if (!importInserted) {
@@ -197,7 +197,7 @@ extends ConstrainedConditionGenerator
 			Object value = simpleCondition.getValue();
 			String valueName = "";
 			String variableName = "";
-			if (value instanceof PersistenceCapable) 
+			if (value instanceof PersistenceCapable)
 			{
 				variableName = "JDOHelper.getObjectId("+varName+").toString()";
 				ObjectID objectID = (ObjectID) JDOHelper.getObjectId(value);
@@ -211,7 +211,7 @@ extends ConstrainedConditionGenerator
 			}
 			sb.append(openContainer + variableName + operator + valueName + closeContainer);
 		}
-		else if (condition instanceof IConditionContainer) 
+		else if (condition instanceof IConditionContainer)
 		{
 			IConditionContainer container = (IConditionContainer) condition;
 			sb.append(getOpenContainerString());
@@ -223,8 +223,8 @@ extends ConstrainedConditionGenerator
 						if (((ISimpleCondition)con).getValue() instanceof PersistenceCapable) {
 							sb.insert(0, "importPackage(Packages.javax.jdo);");
 							importInserted = true;
-						}									
-					}					
+						}
+					}
 				}
 				getScriptText(con, sb, importInserted);
 				if (i != conditions.size()-1)

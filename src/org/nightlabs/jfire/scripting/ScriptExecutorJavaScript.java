@@ -29,7 +29,6 @@ package org.nightlabs.jfire.scripting;
 import java.util.Map;
 
 import javax.jdo.JDOHelper;
-import javax.jdo.PersistenceManager;
 import javax.jdo.spi.PersistenceCapable;
 
 import org.mozilla.javascript.Context;
@@ -67,7 +66,7 @@ public class ScriptExecutorJavaScript
 
 			if (getPersistenceManager() != null) {
 				Object js_pm = Context.javaToJS(getPersistenceManager(), scope);
-				ScriptableObject.putProperty(scope, VARIABLE_PERSISTENCE_MANAGER, js_pm);				
+				ScriptableObject.putProperty(scope, VARIABLE_PERSISTENCE_MANAGER, js_pm);
 			}
 
 			for (Map.Entry<String, Object> me : getParameterValues().entrySet()) {

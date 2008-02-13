@@ -60,30 +60,30 @@ import org.nightlabs.jfire.scripting.id.ScriptRegistryItemID;
  *			PARAMETERS String pConditionContextProviderID, String pOrganisationID
  *			import java.lang.String"
  */
-public class ConditionContextProvider 
+public class ConditionContextProvider
 //implements IConditionContextProvider
 implements Serializable
 {
 	private static final long serialVersionUID = 1L;
 	
-	public static ConditionContextProvider getConditionContextProvider(PersistenceManager pm, 
-			String organisationID, String conditionContextProviderID) 
+	public static ConditionContextProvider getConditionContextProvider(PersistenceManager pm,
+			String organisationID, String conditionContextProviderID)
 	{
-		Query q = pm.newNamedQuery(ConditionContextProvider.class, "getConditionProviderByOrganisationIDAndProviderID"); 
-		Collection providers = (Collection) q.execute(conditionContextProviderID, organisationID);		
+		Query q = pm.newNamedQuery(ConditionContextProvider.class, "getConditionProviderByOrganisationIDAndProviderID");
+		Collection providers = (Collection) q.execute(conditionContextProviderID, organisationID);
 		return (ConditionContextProvider) providers.iterator().next();
 	}
 	
 	public static final String FETCH_GROUP_SCRIPT_REGISTRY_ITEM_IDS = "ConditionContextProvider.scriptRegistryItemIDs";
 	public static final String FETCH_GROUP_THIS_CONDITION_CONTEXT_PROVIDER = "ConditionContextProvider.this";
 	
-	/** 
+	/**
 	 * @jdo.field primary-key="true"
 	 * @jdo.column length="100"
 	 */
 	private String organisationID;
 	
-	/** 
+	/**
 	 * @jdo.field primary-key="true"
 	 * @jdo.column length="100"
 	 */
@@ -131,12 +131,12 @@ implements Serializable
 	 *		persistence-modifier="persistent"
 	 *		collection-type="collection"
 	 *		element-type="org.nightlabs.jfire.scripting.id.ScriptRegistryItemID"
-	 */	
+	 */
 	private Set<ScriptRegistryItemID> scriptRegistryItemIDs = new HashSet<ScriptRegistryItemID>();
 
 	/**
-	 * returns a {@link Set} of {@link ScriptRegistryItemID}s for the context 
-	 * @return a {@link Set} of {@link ScriptRegistryItemID}s for the context 
+	 * returns a {@link Set} of {@link ScriptRegistryItemID}s for the context
+	 * @return a {@link Set} of {@link ScriptRegistryItemID}s for the context
 	 */
 	public Set<ScriptRegistryItemID> getScriptRegistryItemIDs() {
 		return scriptRegistryItemIDs;

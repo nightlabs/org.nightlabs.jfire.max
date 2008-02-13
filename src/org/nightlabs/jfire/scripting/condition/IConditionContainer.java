@@ -26,15 +26,14 @@
 package org.nightlabs.jfire.scripting.condition;
 
 import java.util.List;
-import java.util.concurrent.locks.Condition;
 
 /**
  * This Interface describes a container for holding {@link Condition}s
  * 
- * each IConditionContainer has exactly one {@link CombineOperator} which 
+ * each IConditionContainer has exactly one {@link CombineOperator} which
  * expresses how the conditions are combined with each other
  * 
- * e.g. if the CombineOperator is {@link CombineOperator#LOGICAL_AND}   
+ * e.g. if the CombineOperator is {@link CombineOperator#LOGICAL_AND}
  * 
  * Condition1 LOGICAL_AND Condition2 LOGICAL_AND Condition3 LOGICAL_AND ....
  * 
@@ -46,7 +45,7 @@ public interface IConditionContainer
 extends ICondition
 {
 	/**
-	 * adds a {@link ICondition} to the container 
+	 * adds a {@link ICondition} to the container
 	 * @param condition the condition to add
 	 */
 	void addCondition(ICondition condition);

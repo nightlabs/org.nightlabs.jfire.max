@@ -85,13 +85,13 @@ public class Main {
 //		}
 //	}
 	
-	public static void main(String[] args) 
+	public static void main(String[] args)
 	{
 		runJavaScript();
 //		checkObjectIDEquals();
 	}
 
-	private static void checkObjectIDEquals() 
+	private static void checkObjectIDEquals()
 	{
 		ScriptRegistryItemID scriptID = getScriptRegistryItemID(TEST);
 		String scriptIDString = scriptID.toString();
@@ -100,17 +100,17 @@ public class Main {
 		boolean idEquals = objectID.equals(scriptID);
 		boolean stringEquals = scriptIDString.equals(objectIDString);
 		System.out.println("objectID.equals(scriptID) = "+idEquals);
-		System.out.println("scriptIDString.equals(objectIDString) = "+stringEquals);		
+		System.out.println("scriptIDString.equals(objectIDString) = "+stringEquals);
 	}
 	
-	private static void runJavaScript() 
+	private static void runJavaScript()
 	{
 		Context context = Context.enter();
 		try {
 			Scriptable scope = new ImporterTopLevel(context);
 
-			for (Map.Entry<String, Object> me : getParameterValues().entrySet()) 
-			{ 
+			for (Map.Entry<String, Object> me : getParameterValues().entrySet())
+			{
 				Object js_value = Context.javaToJS(me.getValue(), scope);
 				ScriptableObject.putProperty(scope, me.getKey(), js_value);
 			}
@@ -144,12 +144,12 @@ public class Main {
 			System.out.println("result.class=" + (result == null ? null : result.getClass().getName()));
 		} finally {
 			Context.exit();
-		}		
+		}
 	}
 	
 	private static final String TEST = "Test";
 	
-	private static Map<String, Object> getParameterValues() 
+	private static Map<String, Object> getParameterValues()
 	{
 		Map<String, Object> parameter = new HashMap<String, Object>();
 		ScriptRegistryItemID scriptID = getScriptRegistryItemID(TEST);
@@ -160,15 +160,15 @@ public class Main {
 		return parameter;
 	}
 
-	private static ScriptRegistryItemID getScriptRegistryItemID(String scriptIDName) 
+	private static ScriptRegistryItemID getScriptRegistryItemID(String scriptIDName)
 	{
 		String organisationID = "dev.jfire.org";
 		String scriptType = "CrossTicketTrade-Type-Ticket";
 		return ScriptRegistryItemID.create(organisationID, scriptType, scriptIDName);
 	}
 		
-	private static String getScriptText() 
-	{		
+	private static String getScriptText()
+	{
 		StringBuffer sb = new StringBuffer();
 		String objectIDString = getScriptRegistryItemID(TEST).toString();
 		sb.append("importPackage(Packages.javax.jdo);");
@@ -177,21 +177,21 @@ public class Main {
 ////		sb.append("("+TEST+".toString()==\""+objectIDString+"\""+")");
 //		sb.append("("+TEST+".toString()=="+objectIDString+")");
 //		sb.append("&&");
-////		sb.append("("+TEST+".toString()!=\""+objectIDString+"\""+")");		
+////		sb.append("("+TEST+".toString()!=\""+objectIDString+"\""+")");
 //		sb.append("("+TEST+".toString()!="+objectIDString+")");
 //		sb.append(")");
 		
 //		sb.append("("+TEST+".toString()).equals(\""+objectIDString+"\")");
 //		sb.append("("+TEST+".toString()=="+objectIDString+")");
 		sb.append("("+TEST+".toString()==\""+objectIDString+"\""+")");
-//		sb.append(TEST+".equals(ObjectIDUtil.createObjectID(\""+objectIDString+"\"))");		
+//		sb.append(TEST+".equals(ObjectIDUtil.createObjectID(\""+objectIDString+"\"))");
 //		sb.append(TEST+"==(ObjectIDUtil.createObjectID(\""+objectIDString+"\"))");
 //		sb.append(TEST+"==\""+objectIDString+"\"");
 //		sb.append("5 == \"5.0\"");
 //		sb.append("ObjectIDUtil.createObjectID(\""+objectIDString+"\")");
 		
-		String script = sb.toString();	
+		String script = sb.toString();
 		System.out.println("script = "+script);
-		return script;				
-	}	
+		return script;
+	}
 }

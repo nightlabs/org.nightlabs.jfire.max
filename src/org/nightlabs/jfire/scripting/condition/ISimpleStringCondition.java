@@ -25,12 +25,12 @@
  ******************************************************************************/
 package org.nightlabs.jfire.scripting.condition;
 
-/** 
+/**
  * @author Daniel.Mazurek [at] NightLabs [dot] de
  *
  */
-public interface ISimpleStringCondition 
-extends ICondition 
+public interface ISimpleStringCondition
+extends ICondition
 {
 	public String getCompareOperator();
 	public void setCompareOperator(String compareOperator);

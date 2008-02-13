@@ -55,17 +55,17 @@ import org.nightlabs.jfire.scripting.id.ScriptRegistryItemID;
 /**
  * @author Daniel.Mazurek [at] NightLabs [dot] de
  * 
- * @ejb.bean name="jfire/ejb/JFireScripting/condition/ConditionScriptManager"	
+ * @ejb.bean name="jfire/ejb/JFireScripting/condition/ConditionScriptManager"
  *					 jndi-name="jfire/ejb/JFireScripting/condition/ConditionScriptManager"
- *					 type="Stateless" 
+ *					 type="Stateless"
  *					 transaction-type="Container"
  *
  * @ejb.util generate="physical"
  * @ejb.transaction type="Required"
  */
-public abstract class ConditionScriptManagerBean 
-extends BaseSessionBeanImpl 
-implements SessionBean 
+public abstract class ConditionScriptManagerBean
+extends BaseSessionBeanImpl
+implements SessionBean
 {
 	/**
 	 * 
@@ -75,7 +75,7 @@ implements SessionBean
 	
 	/**
 	 * @ejb.create-method
-	 * @ejb.permission role-name="_Guest_"	
+	 * @ejb.permission role-name="_Guest_"
 	 */
 	public void ejbCreate() throws CreateException
 	{
@@ -105,18 +105,18 @@ implements SessionBean
 		super.unsetSessionContext();
 	}
 		
-	protected ScriptConditioner getScriptConditioner(PersistenceManager pm, 
-			ScriptRegistryItemID scriptRegistryItemID, 
+	protected ScriptConditioner getScriptConditioner(PersistenceManager pm,
+			ScriptRegistryItemID scriptRegistryItemID,
 			Map<String, Object> parameterValues, int valueLimit)
-	{		
+	{
 		Script script = ScriptRegistry.getScriptRegistry(pm).getScript(
-				scriptRegistryItemID.scriptRegistryItemType, 
+				scriptRegistryItemID.scriptRegistryItemType,
 				scriptRegistryItemID.scriptRegistryItemID);
 		Class scriptResultClass;
 		List<CompareOperator> compareOperators = DefaultCompareOperatorProvider.sharedInstance().getEqualOperators();
 		try {
 			scriptResultClass = script.getResultClass();
-			compareOperators = DefaultCompareOperatorProvider.sharedInstance().getCompareOperator(scriptResultClass);			
+			compareOperators = DefaultCompareOperatorProvider.sharedInstance().getCompareOperator(scriptResultClass);
 		} catch (ClassNotFoundException e) {
 			logger.error("script resultClass "+script.getResultClassName()+" of script with scriptRegistryItemID "+scriptRegistryItemID+" could not be found", e);
 		}
@@ -126,28 +126,28 @@ implements SessionBean
 //		String variableName = script.getName().getText();
 		
 		Collection possibleValues = Collections.EMPTY_LIST;
-		String valueLabelProviderClassName = LabelProvider.class.getName();			
+		String valueLabelProviderClassName = LabelProvider.class.getName();
 		PossibleValueProviderID valueProviderID = PossibleValueProviderID.create(
-				scriptRegistryItemID.organisationID, 
-				scriptRegistryItemID.scriptRegistryItemType, 
+				scriptRegistryItemID.organisationID,
+				scriptRegistryItemID.scriptRegistryItemType,
 				scriptRegistryItemID.scriptRegistryItemID);
 		try {
 			PossibleValueProvider valueProvider = (PossibleValueProvider) pm.getObjectById(valueProviderID);
-			pm.getFetchPlan().setGroup(PossibleValueProvider.FETCH_GROUP_THIS_POSSIBLE_VALUE_PROVIDER);				
+			pm.getFetchPlan().setGroup(PossibleValueProvider.FETCH_GROUP_THIS_POSSIBLE_VALUE_PROVIDER);
 			possibleValues = valueProvider.getPossibleValues(parameterValues, valueLimit);
 			valueLabelProviderClassName = valueProvider.getLabelProviderClassName();
-		} 
+		}
 		catch (JDOObjectNotFoundException e) {
 			// If no valueprovider is registered use the default
-			PossibleValueProvider provider = PossibleValueProvider.getDefaultPossibleValueProvider(getPersistenceManager(), script); 
+			PossibleValueProvider provider = PossibleValueProvider.getDefaultPossibleValueProvider(getPersistenceManager(), script);
 			possibleValues = provider.getPossibleValues(parameterValues, valueLimit);
-			logger.info("No possible values found for ScriptRegistryItemID "+scriptRegistryItemID+", use DefaultPossibleValueProvider!");				
+			logger.info("No possible values found for ScriptRegistryItemID "+scriptRegistryItemID+", use DefaultPossibleValueProvider!");
 		}
 		
 		pm.getFetchPlan().setGroups(new String[] {FetchPlan.DEFAULT, ScriptRegistryItem.FETCH_GROUP_NAME});
 		script = pm.detachCopy(script);
-		ScriptConditioner sc = new ScriptConditioner(scriptRegistryItemID, script, 
-				variableName, compareOperators, possibleValues, valueLabelProviderClassName);		
+		ScriptConditioner sc = new ScriptConditioner(scriptRegistryItemID, script,
+				variableName, compareOperators, possibleValues, valueLabelProviderClassName);
 //		sc.setPossibleValuesAreObjectIDs(script.isNeedsDetach());
 		
 //		if (logger.isDebugEnabled()) {
@@ -155,8 +155,8 @@ implements SessionBean
 			logger.info("variableName = "+variableName);
 			logger.info("scriptResultClass = "+script.getResultClassName());
 			logger.info("compareOperators.size() = "+compareOperators.size());
-			logger.info("possibleValues.size() = "+possibleValues.size());	
-			logger.info("valueLabelProviderClassName = "+valueLabelProviderClassName);				
+			logger.info("possibleValues.size() = "+possibleValues.size());
+			logger.info("valueLabelProviderClassName = "+valueLabelProviderClassName);
 //		}
 		return sc;
 	}
@@ -166,7 +166,7 @@ implements SessionBean
 	 * @ejb.permission role-name="_Guest_"
 	 * @ejb.transaction type="Supports" @!This usually means that no transaction is opened which is significantly faster and recommended for all read-only EJB methods! Marco.
 	 */
-	public ScriptConditioner getScriptConditioner(ScriptRegistryItemID scriptRegistryItemID, 
+	public ScriptConditioner getScriptConditioner(ScriptRegistryItemID scriptRegistryItemID,
 			Map<String, Object> parameterValues, int valueLimit)
 	{
 		PersistenceManager pm = getPersistenceManager();
@@ -193,16 +193,16 @@ implements SessionBean
 	 * @ejb.interface-method
 	 * @ejb.permission role-name="_Guest_"
 	 * @ejb.transaction type="Supports" @!This usually means that no transaction is opened which is significantly faster and recommended for all read-only EJB methods! Marco.
-	 */	
+	 */
 	public Map<ScriptRegistryItemID, ScriptConditioner> getScriptConditioner(
-			PersistenceManager pm, Map<ScriptRegistryItemID, 
+			PersistenceManager pm, Map<ScriptRegistryItemID,
 			Map<String, Object>> scriptID2Paramters, int valueLimit)
 	{
-		Map<ScriptRegistryItemID, ScriptConditioner> scriptID2ScriptConditioner = 
-			new HashMap<ScriptRegistryItemID, ScriptConditioner>(scriptID2Paramters.size());		
+		Map<ScriptRegistryItemID, ScriptConditioner> scriptID2ScriptConditioner =
+			new HashMap<ScriptRegistryItemID, ScriptConditioner>(scriptID2Paramters.size());
 		for (Map.Entry<ScriptRegistryItemID, Map<String, Object>> entry : scriptID2Paramters.entrySet()) {
 			ScriptConditioner sc = getScriptConditioner(pm, entry.getKey(), entry.getValue(), valueLimit);
-			scriptID2ScriptConditioner.put(entry.getKey(), sc);			
+			scriptID2ScriptConditioner.put(entry.getKey(), sc);
 		}
 		return scriptID2ScriptConditioner;
 	}
@@ -211,7 +211,7 @@ implements SessionBean
 	 * @ejb.interface-method
 	 * @ejb.permission role-name="_Guest_"
 	 * @ejb.transaction type="Supports" @!This usually means that no transaction is opened which is significantly faster and recommended for all read-only EJB methods! Marco.
-	 */	
+	 */
 	public Set<ScriptRegistryItemID> getConditionContextScriptIDs(ConditionContextProviderID providerID)
 	{
 		PersistenceManager pm = getPersistenceManager();
@@ -220,7 +220,7 @@ implements SessionBean
 			return provider.getScriptRegistryItemIDs();
 		} finally {
 			pm.close();
-		}		
+		}
 	}
 	
 }

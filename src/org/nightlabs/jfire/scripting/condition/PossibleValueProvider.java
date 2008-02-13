@@ -50,7 +50,7 @@ import org.nightlabs.jfire.scripting.condition.id.PossibleValueProviderID;
  * 
  * @jdo.create-objectid-class field-order="organisationID, scriptRegistryItemType, scriptRegistryItemID"
  *
- * @jdo.fetch-group name="PossibleValueProvider.this" fetch-groups="default" fields="organisationID, scriptRegistryItemID, scriptRegistryItemType, labelProviderClassName" 
+ * @jdo.fetch-group name="PossibleValueProvider.this" fetch-groups="default" fields="organisationID, scriptRegistryItemID, scriptRegistryItemType, labelProviderClassName"
  */
 public abstract class PossibleValueProvider
 implements Serializable
@@ -92,7 +92,7 @@ implements Serializable
 	}
 		
 	/**
-	 * @deprecated for JDO only 
+	 * @deprecated for JDO only
 	 */
 	@Deprecated
 	protected PossibleValueProvider() {
@@ -156,8 +156,8 @@ implements Serializable
 	
 	/**
 	 * @jdo.field persistence-modifier="persistent"
-	 * @jdo.column length="100"  
-	 */		
+	 * @jdo.column length="100"
+	 */
 	private String labelProviderClassName = LabelProvider.class.getName();
 	
 	public String getLabelProviderClassName() {
@@ -174,20 +174,20 @@ implements Serializable
 //	 * this method returns the default implemenation {@link LabelProvider}
 //	 * which just returns Object.toString().
 //	 * Inheritans can override this method to provide an own {@link ILabelProvider}
-//	 * for the possible Values 
-//	 * 
+//	 * for the possible Values
+//	 *
 //	 * @return a {@link ILabelProvider} for the possibleValues
 //	 */
-//	public ILabelProvider getLabelProvider() 	
+//	public ILabelProvider getLabelProvider()
 //	{
-//		if (labelProvider == null) 
+//		if (labelProvider == null)
 //		{
 //			try {
 //				Class labelProviderClass = Class.forName(labelProviderClassName);
 //				Object lp = labelProviderClass.newInstance();
 //				if (lp instanceof ILabelProvider) {
 //					labelProvider = (ILabelProvider) lp;
-//				}				
+//				}
 //			} catch (Exception e) {
 //				logger.error("There occured an error while trying to create an instance for the class "+
 //						labelProviderClassName, e);
@@ -195,7 +195,7 @@ implements Serializable
 //		}
 //		return labelProvider;
 //	}
-//	
+//
 //	public void setLabelProvider(ILabelProvider labelProvider) {
 //		this.labelProvider = labelProvider;
 //		labelProviderClassName = labelProvider.getClass().getName();

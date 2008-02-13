@@ -30,7 +30,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 /**
- * A Registry which allows the registration of {@link IConditionGenerator} for 
+ * A Registry which allows the registration of {@link IConditionGenerator} for
  * a certain language
  * 
  * This class is a singleton
@@ -38,12 +38,12 @@ import java.util.Map;
  * @author Daniel.Mazurek [at] NightLabs [dot] de
  *
  */
-public class GeneratorRegistry 
+public class GeneratorRegistry
 {
 	private static GeneratorRegistry sharedInstance;
-	public static GeneratorRegistry sharedInstance()  
+	public static GeneratorRegistry sharedInstance()
 	{
-		if (sharedInstance == null) 
+		if (sharedInstance == null)
 		{
 			sharedInstance = new GeneratorRegistry();
 			// register JavaScriptConditionGenerator
@@ -65,7 +65,7 @@ public class GeneratorRegistry
 //	public IConditionGenerator getGenerator(String language) {
 //		return language2Generator.get(language);
 //	}
-	public IConditionGenerator getGenerator(String language, Collection<ScriptConditioner> scriptConditioner) 
+	public IConditionGenerator getGenerator(String language, Collection<ScriptConditioner> scriptConditioner)
 	{
 		IConditionGenerator generator = language2Generator.get(language);
 		generator.setScriptConditioner(scriptConditioner);

@@ -45,10 +45,8 @@ import javax.jdo.PersistenceManager;
 import javax.xml.transform.TransformerException;
 
 import org.apache.log4j.Logger;
-import org.nightlabs.ModuleException;
 import org.nightlabs.i18n.I18nText;
 import org.nightlabs.jfire.idgenerator.IDGenerator;
-import org.nightlabs.jfire.organisation.Organisation;
 import org.nightlabs.jfire.scripting.id.ScriptRegistryItemID;
 import org.nightlabs.jfire.servermanager.JFireServerManager;
 import org.nightlabs.util.Util;
@@ -72,7 +70,7 @@ import org.xml.sax.SAXParseException;
  * the directory to define in detail what id and names and parameter-sets
  * the created categories and scripts should have.
  * 
- * Each file found will cause a {@link Script} to be created. Depending on the 
+ * Each file found will cause a {@link Script} to be created. Depending on the
  * file extension some assumptions will be made:
  * <ul>
  *   <li><b>.js</b>: The script is assumed to be a JavaScript and the file-contents to state the script text.</li>
@@ -82,16 +80,16 @@ import org.xml.sax.SAXParseException;
  * For more detailed information consult the the dtd of the scriping initializer content.xml at
  * <a href="http://www.nightlabs.de/dtd/scripting-initializer-content_1_0.dtd">http://www.nightlabs.de/dtd/scripting-initializer-content_1_0.dtd</a>
  * 
- * The recommended usage is 
+ * The recommended usage is
  * <ul>
- * <li><b>Create the initializer</b>: Use {@link #ScriptingInitializer(String, ScriptCategory, String, JFireServerManager, PersistenceManager, String)} 
+ * <li><b>Create the initializer</b>: Use {@link #ScriptingInitializer(String, ScriptCategory, String, JFireServerManager, PersistenceManager, String)}
  * to create the initializer and set the base category, root directory and fallback values for ids</li>
  * <li><b>Initialize from (sub)directories</b>: Use {@link #initialise()} to start the initialization</li>
  * 
  * @author Alexander Bieber <alex [AT] nightlabs [DOT] de>
  *
  */
-public class ScriptingInitialiser 
+public class ScriptingInitialiser
 {
 	/**
 	 * LOG4J logger used by this class
@@ -117,15 +115,15 @@ public class ScriptingInitialiser
 	 * @param scriptRegistryItemType The category's item type.
 	 * @param scriptRegistryItemID The categroy's ID.
 	 */
-	public static final ScriptCategory createCategory(PersistenceManager pm, ScriptCategory parent, String organisationID, 
-			String scriptRegistryItemType, String scriptRegistryItemID)  
+	public static final ScriptCategory createCategory(PersistenceManager pm, ScriptCategory parent, String organisationID,
+			String scriptRegistryItemType, String scriptRegistryItemID)
 	{
 		// initialise meta-data
 		pm.getExtent(ScriptCategory.class);
 
 		ScriptCategory category;
 		try {
-			category = (ScriptCategory) pm.getObjectById(ScriptRegistryItemID.create(organisationID, scriptRegistryItemType, scriptRegistryItemID));			
+			category = (ScriptCategory) pm.getObjectById(ScriptRegistryItemID.create(organisationID, scriptRegistryItemType, scriptRegistryItemID));
 		} catch (JDOObjectNotFoundException e) {
 			category = new ScriptCategory(parent, organisationID, scriptRegistryItemType, scriptRegistryItemID);
 			if (parent == null)
@@ -141,7 +139,7 @@ public class ScriptingInitialiser
 	 * @param baseCategory All directories/files within the scriptSubDir will be created as sub-categories/scripts of this category.
 	 * @param jfsm
 	 * @param pm
-	 * @param scriptRegistryItemType is the type (identifier) for the scripts in categories, categories get the scriptRegistryItemType from their parent 
+	 * @param scriptRegistryItemType is the type (identifier) for the scripts in categories, categories get the scriptRegistryItemType from their parent
 	 * @param organisationID If you're writing a JFire Community Project, this is {@link Organisation#DEV_ORGANISATION_ID}.
 	 */
 	public ScriptingInitialiser(
@@ -153,7 +151,7 @@ public class ScriptingInitialiser
 		this.jfsm = jfsm;
 		this.pm = pm;
 		this.organisationID = organisationID;
-		this.scriptRegistryItemType = scriptRegistryItemType;		
+		this.scriptRegistryItemType = scriptRegistryItemType;
 	}
 
 	private ScriptRegistry scriptRegistry = null;
@@ -165,7 +163,7 @@ public class ScriptingInitialiser
 		return scriptRegistry;
 	}
 
-	protected Collection<String> getFileExtensions()  
+	protected Collection<String> getFileExtensions()
 	{
 		ScriptRegistry scriptRegistry = ScriptRegistry.getScriptRegistry(pm);
 		return scriptRegistry.getRegisteredFileExtensions();
@@ -177,9 +175,9 @@ public class ScriptingInitialiser
 	 * @ejb.interface-method
 	 * @ejb.transaction type="Required"
 	 * @ejb.permission role-name="_Guest_"
-	 */	
-	public void initialise() 
-	throws ScriptingIntialiserException 
+	 */
+	public void initialise()
+	throws ScriptingIntialiserException
 	{
 		String j2eeBaseDir = jfsm.getJFireServerConfigModule().getJ2ee().getJ2eeDeployBaseDirectory();
 		File scriptDir = new File(j2eeBaseDir, scriptSubDir);
@@ -187,7 +185,7 @@ public class ScriptingInitialiser
 		if (!scriptDir.exists())
 			throw new IllegalStateException("Script directory does not exist: " + scriptDir.getAbsolutePath());
 
-		logger.debug("BEGIN initialization of Scripts");	
+		logger.debug("BEGIN initialization of Scripts");
 
 		// initialise meta-data
 		pm.getExtent(ScriptParameter.class);
@@ -199,13 +197,13 @@ public class ScriptingInitialiser
 		createScriptCategories(scriptDir, baseCategory);
 	}
 
-	private Document getCategoryDescriptor(File categoryDir) 
-	throws SAXException, IOException 
+	private Document getCategoryDescriptor(File categoryDir)
+	throws SAXException, IOException
 	{
 		Document doc = categoryDescriptors.get(categoryDir);
 		if (doc == null) {
 			final File contentFile = new File(categoryDir, "content.xml");
-			if (contentFile.exists()) { 
+			if (contentFile.exists()) {
 				DOMParser parser = new DOMParser();
 				parser.setErrorHandler(new ErrorHandler(){
 					public void error(SAXParseException exception) throws SAXException {
@@ -239,8 +237,8 @@ public class ScriptingInitialiser
 		return doc;
 	}
 	
-	private Node getScriptDescriptor(File scriptFile, Document categoryDocument) 
-	throws TransformerException 
+	private Node getScriptDescriptor(File scriptFile, Document categoryDocument)
+	throws TransformerException
 	{
 		Collection<Node> nodes = NLDOMUtil.findNodeList(categoryDocument, "script-category/script");
 		for (Node scriptNode : nodes) {
@@ -256,8 +254,8 @@ public class ScriptingInitialiser
 			String organisationID,
 			ScriptRegistryItem registryItem,
 			Node parentNode
-		) 
-	throws TransformerException 
+		)
+	throws TransformerException
 	{
 		Node setNode = NLDOMUtil.findSingleNode(parentNode, "parameter-set");
 		ScriptParameterSet parameterSet = registryItem.getParameterSet();
@@ -289,12 +287,12 @@ public class ScriptingInitialiser
 		return parameterSet;
 	}
 	
-	private void createElementName(Node elementNode, I18nText name, String def, String elementName) 
+	private void createElementName(Node elementNode, I18nText name, String def, String elementName)
 	{
 		if (name == null) {
 			logger.warn("createElementName called with null element!", new NullPointerException("name"));
 			return;
-		}		
+		}
 		boolean nameSet = false;
 		if (elementNode != null) {
 			Collection<Node> nodes = NLDOMUtil.findNodeList(elementNode, elementName);
@@ -312,7 +310,7 @@ public class ScriptingInitialiser
 			name.setText(Locale.ENGLISH.getLanguage(), def);
 	}
 	
-	private void createScriptCategories(File dir, ScriptCategory parent) 
+	private void createScriptCategories(File dir, ScriptCategory parent)
 	throws ScriptingIntialiserException
 	{
 		try {
@@ -348,7 +346,7 @@ public class ScriptingInitialiser
 			ScriptCategory category;
 			try {
 				pm.getExtent(ScriptCategory.class);
-				ScriptRegistryItemID registryItemID = ScriptRegistryItemID.create(organisationID, itemType, categoryID); 
+				ScriptRegistryItemID registryItemID = ScriptRegistryItemID.create(organisationID, itemType, categoryID);
 				Object cat = pm.getObjectById(registryItemID);
 				if (!(cat instanceof ScriptCategory))
 					throw new IllegalStateException("Found ScriptRegistryItem for id "+registryItemID+" but it is not an instance of ScriptCategory, it is "+cat.getClass().getName());
@@ -378,9 +376,9 @@ public class ScriptingInitialiser
 			for (int j=0; j<scripts.length; j++) {
 				File scriptFile = scripts[j];
 
-				Node scriptNode = getScriptDescriptor(scriptFile, catDocument);				
+				Node scriptNode = getScriptDescriptor(scriptFile, catDocument);
 				
-				String scriptID = Util.getFileNameWithoutExtension(scriptFile.getName());				
+				String scriptID = Util.getFileNameWithoutExtension(scriptFile.getName());
 				String scriptItemType = scriptRegistryItemType;
 				String scriptResultClass = "java.lang.Object";
 //				String[] fetchGroups = new String[] {FetchPlan.DEFAULT};
@@ -429,11 +427,11 @@ public class ScriptingInitialiser
 					if (needsDetachNode != null && !"".equals(needsDetachNode.getTextContent())) {
 						logger.debug("Have needsDetachNode-attribute in script element: "+idNode.getTextContent());
 						needsDetach = Boolean.parseBoolean(needsDetachNode.getTextContent());
-					}					
+					}
 				}
 				
-				try {			
-					logger.debug("create Script = "+scriptRegistryItemType + "/" + scriptID);				
+				try {
+					logger.debug("create Script = "+scriptRegistryItemType + "/" + scriptID);
 					String scriptContent = Util.readTextFile(scriptFile);
 					logger.debug("scriptContent = " + scriptContent);
 					Script script;
@@ -457,7 +455,7 @@ public class ScriptingInitialiser
 					
 					// script name and parameters
 					if (scriptNode != null) {
-						ScriptParameterSet parameterSet = createParameterSet(pm, organisationID, script, scriptNode);						
+						ScriptParameterSet parameterSet = createParameterSet(pm, organisationID, script, scriptNode);
 						if (parameterSet != null)
 							script.setParameterSet(parameterSet);
 					}
@@ -471,7 +469,7 @@ public class ScriptingInitialiser
 
 			
 			// recurse
-			File[] subDirs = dir.listFiles(dirFileFilter);		
+			File[] subDirs = dir.listFiles(dirFileFilter);
 			for (int i=0; i<subDirs.length; i++) {
 				createScriptCategories(subDirs[i], category);
 			}
@@ -484,13 +482,13 @@ public class ScriptingInitialiser
 		}
 	}
 
-	private String[] parseFetchGroups(String s) 
+	private String[] parseFetchGroups(String s)
 	{
 		StringBuffer sb = new StringBuffer(s);
 		List<String> fetchGroups = new LinkedList<String>();
 		int firstIndex = 0;
-		int index = sb.indexOf(",");		
-		while(index != -1) {			
+		int index = sb.indexOf(",");
+		while(index != -1) {
 			String fetchGroup = sb.substring(firstIndex, index);
 			fetchGroups.add(fetchGroup);
 			firstIndex = index + 1;
@@ -500,20 +498,20 @@ public class ScriptingInitialiser
 			for (String fetchGroup : fetchGroups) {
 				logger.debug("fetchGroup = "+fetchGroup);
 			}
-		}			
+		}
 		return fetchGroups.toArray(new String[fetchGroups.size()]);
 	}
 	
-	protected FileFilter dirFileFilter = new FileFilter() {	
+	protected FileFilter dirFileFilter = new FileFilter() {
 		public boolean accept(File pathname) {
 			return pathname.isDirectory();
-		}	
+		}
 	};
 
 	private FilenameFilter scriptFileNameFilter = new FilenameFilter()
-	{	
-		public boolean accept(File dir, String name) 
-		{				
+	{
+		public boolean accept(File dir, String name)
+		{
 			String fileExtension = Util.getFileExtension(name);
 			for (Iterator<String> it = getFileExtensions().iterator(); it.hasNext(); ) {
 				String registeredFileExt = it.next();
@@ -521,7 +519,7 @@ public class ScriptingInitialiser
 					return true;
 			}
 			return false;
-		}	
+		}
 	};
 	
 }

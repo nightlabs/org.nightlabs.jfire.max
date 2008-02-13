@@ -33,7 +33,7 @@ import org.nightlabs.util.CollectionUtil;
 /**
  * The default Implementation of the {@link ICompareOperatorProvider} interface
  * which can be used in nearly all cases
- *  
+ * 
  * @author Daniel.Mazurek [at] NightLabs [dot] de
  *
  */
@@ -43,17 +43,17 @@ implements ICompareOperatorProvider
 	private static DefaultCompareOperatorProvider sharedInstance = null;
 	public static DefaultCompareOperatorProvider sharedInstance() {
 		if (sharedInstance == null) {
-			sharedInstance = new DefaultCompareOperatorProvider();			
+			sharedInstance = new DefaultCompareOperatorProvider();
 		}
 		return sharedInstance;
 	}
 	
 	protected DefaultCompareOperatorProvider() {}
 	
-	public List<CompareOperator> getCompareOperator(Class scriptResultClass) 
+	public List<CompareOperator> getCompareOperator(Class scriptResultClass)
 	{
 		if (scriptResultClass.equals(String.class)) {
-			return getEqualOperators();			
+			return getEqualOperators();
 		}
 		if (scriptResultClass.equals(Integer.class)) {
 			return getPrimtiveCompareOperators();
@@ -71,7 +71,7 @@ implements ICompareOperatorProvider
 			return getPrimtiveCompareOperators();
 		}
 //		if (Comparable.class.isAssignableFrom(scriptResultClass))
-//			return getAllOperators(); 
+//			return getAllOperators();
 		return getEqualOperators();
 	}
 	
@@ -80,23 +80,23 @@ implements ICompareOperatorProvider
 	}
 	
 	private List<CompareOperator> allOperators;
-	public List<CompareOperator> getAllOperators() 
+	public List<CompareOperator> getAllOperators()
 	{
 		if (allOperators == null) {
 //			allOperators = CollectionUtil.enum2List(Enum.valueOf(CompareOperator.class, "EQUAL"));
-			allOperators = CollectionUtil.enum2List(CompareOperator.EQUAL);			
+			allOperators = CollectionUtil.enum2List(CompareOperator.EQUAL);
 		}
 		return allOperators;
 	}
 	
 	private List<CompareOperator> equalOperators;
-	public List<CompareOperator> getEqualOperators() 
+	public List<CompareOperator> getEqualOperators()
 	{
 		if (equalOperators == null) {
 			equalOperators = new ArrayList<CompareOperator>(2);
 			equalOperators.add(CompareOperator.EQUAL);
-			equalOperators.add(CompareOperator.NOT_EQUAL);			
-		}		
+			equalOperators.add(CompareOperator.NOT_EQUAL);
+		}
 		return equalOperators;
 	}
 	

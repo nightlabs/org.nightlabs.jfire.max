@@ -7,7 +7,7 @@ package org.nightlabs.jfire.scripting.condition;
  * @author Daniel.Mazurek [at] NightLabs [dot] de
  *
  */
-public enum CombineOperator 
+public enum CombineOperator
 {
 	LOGICAL_AND,
 	LOGICAL_OR,

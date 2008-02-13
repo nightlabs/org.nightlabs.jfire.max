@@ -36,7 +36,7 @@ import org.nightlabs.jfire.scripting.id.ScriptRegistryItemID;
  * @author Daniel.Mazurek [at] NightLabs [dot] de
  *
  */
-public class ScriptConditioner 
+public class ScriptConditioner
 implements Serializable
 {
 	/**
@@ -48,10 +48,10 @@ implements Serializable
 	public ScriptConditioner(
 			ScriptRegistryItemID scriptID,
 			org.nightlabs.jfire.scripting.Script script,
-			String variableName, 
-			List<CompareOperator> compareOperators, 
-			Collection<Object> possibleValues,  
-			String valueLabelProviderClassName)			
+			String variableName,
+			List<CompareOperator> compareOperators,
+			Collection<Object> possibleValues,
+			String valueLabelProviderClassName)
 	{
 		if (scriptID == null)
 			throw new IllegalArgumentException("Param scriptID must NOT be null!");
@@ -118,7 +118,7 @@ implements Serializable
 	}
 	
 	private transient ILabelProvider valueLabelProvider;
-	public ILabelProvider getValueLabelProvider() 
+	public ILabelProvider getValueLabelProvider()
 	{
 		if (valueLabelProvider == null && labelProviderClassName != null) {
 			try {
@@ -126,12 +126,12 @@ implements Serializable
 				Object lp = labelProviderClass.newInstance();
 				if (lp instanceof ILabelProvider) {
 					valueLabelProvider = (ILabelProvider) lp;
-				}				
+				}
 			} catch (Exception e) {
 				logger.warn("There occured an error while trying to create an instance for the class "+
 						labelProviderClassName, e);
 				valueLabelProvider = new LabelProvider();
-			}			
+			}
 		}
 		return valueLabelProvider;
 	}

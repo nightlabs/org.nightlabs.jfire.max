@@ -25,7 +25,7 @@ public class ScriptRegistryDAO extends BaseJDOObjectDAO<ScriptRegistryID, Script
 	}
 
 	@Override
-	protected Collection<ScriptRegistry> retrieveJDOObjects(Set<ScriptRegistryID> objectIDs, String[] fetchGroups, int maxFetchDepth, ProgressMonitor monitor) throws Exception 
+	protected Collection<ScriptRegistry> retrieveJDOObjects(Set<ScriptRegistryID> objectIDs, String[] fetchGroups, int maxFetchDepth, ProgressMonitor monitor) throws Exception
 	{
 		ScriptManager scriptManager = ScriptManagerUtil.getHome(SecurityReflector.getInitialContextProperties()).create();
 		List<ScriptRegistry> l = new ArrayList<ScriptRegistry>(1);
@@ -33,10 +33,10 @@ public class ScriptRegistryDAO extends BaseJDOObjectDAO<ScriptRegistryID, Script
 		return l;
 	}
 
-	public ScriptRegistry getScriptRegistry(String[] fetchGroups, int maxFetchDepth, ProgressMonitor monitor) 
+	public ScriptRegistry getScriptRegistry(String[] fetchGroups, int maxFetchDepth, ProgressMonitor monitor)
 	{
 		try {
-			ScriptManager scriptManager = ScriptManagerUtil.getHome(SecurityReflector.getInitialContextProperties()).create();			
+			ScriptManager scriptManager = ScriptManagerUtil.getHome(SecurityReflector.getInitialContextProperties()).create();
 			return scriptManager.getScriptRegistry();
 		} catch (Exception e) {
 			throw new RuntimeException(e);

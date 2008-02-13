@@ -29,7 +29,7 @@ package org.nightlabs.jfire.scripting.condition;
  * @author Daniel.Mazurek [at] NightLabs [dot] de
  *
  */
-public class SimpleStringCondition 
+public class SimpleStringCondition
 extends AbstractCondition
 implements ISimpleStringCondition
 {

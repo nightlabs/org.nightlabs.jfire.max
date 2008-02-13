@@ -55,7 +55,7 @@ public class SimpleProductTypeSearchFilter extends ProductTypeSearchFilter {
 	}
 
 	@Override
-	protected void prepareQuery(Set<Class> imports, StringBuffer vars,
+	protected void prepareQuery(Set<Class<?>> imports, StringBuffer vars,
 			StringBuffer filter, StringBuffer params, Map<String, Object> paramMap,
 			StringBuffer result) {
 		filter.append("this.published && this.saleable && this.organisationID == myOrganisationID");

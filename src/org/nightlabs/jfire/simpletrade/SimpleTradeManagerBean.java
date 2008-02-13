@@ -1273,7 +1273,7 @@ implements SessionBean
 		PersistenceManager pm = getPersistenceManager();
 		try {
 			pm.getFetchPlan().clearGroups();
-			Collection<ProductType> productTypes = searchFilter.executeQuery(pm);
+			Collection<ProductType> productTypes = (Collection<ProductType>) searchFilter.executeQuery(pm);
 			Collection<ProductTypeID> ids = new ArrayList<ProductTypeID>(productTypes.size());
 			for (ProductType	productType : productTypes)
 				ids.add(productType.getObjectId());

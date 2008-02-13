@@ -84,7 +84,6 @@ public class PayMoneyTransfer extends MoneyTransfer
 		return getChildren(pm, transferID.organisationID, transferID.transferTypeID, transferID.transferID);
 	}
 
-	@SuppressWarnings("unchecked")
 	public static Collection<MoneyTransfer> getChildren(
 			PersistenceManager pm, String organisationID, String transferTypeID, long transferID)
 	{

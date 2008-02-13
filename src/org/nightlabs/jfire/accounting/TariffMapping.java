@@ -59,7 +59,6 @@ implements Serializable
 	public static final String FETCH_GROUP_PARTNER_TARIFF = "TariffMapping.partnerTariff";
 	public static final String FETCH_GROUP_LOCAL_TARIFF = "TariffMapping.localTariff";
 
-	@SuppressWarnings("unchecked")
 	public static Collection<TariffMapping> getTariffMappings(PersistenceManager pm)
 	{
 		Query q = pm.newQuery(TariffMapping.class);

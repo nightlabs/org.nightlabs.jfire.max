@@ -246,7 +246,6 @@ implements
 	 * @param parentProductTypeID The <code>ProductType</code> of which to find all children or <code>null</code> to find all top-level-<code>ProductType</code>s.
 	 * @return Returns instances of <code>ProductType</code>.
 	 */
-	@SuppressWarnings("unchecked")
 	public static Collection<? extends ProductType> getChildProductTypes(PersistenceManager pm, ProductTypeID parentProductTypeID)
 	{
 		if (parentProductTypeID == null) {

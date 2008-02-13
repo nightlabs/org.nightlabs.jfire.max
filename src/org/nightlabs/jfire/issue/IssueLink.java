@@ -38,9 +38,8 @@ implements Serializable{
 	
 	/**
 	 * @jdo.field primary-key="true"
-	 * @jdo.column length="100"
 	 */
-	private String issueLinkID;
+	private long issueLinkID;
 	
 	/**
 	 * @jdo.column length="100"
@@ -64,11 +63,9 @@ implements Serializable{
 	{
 	}
 
-	public IssueLink(Issue issue, String issueLinkID, String referencedObjectID, String relation){
+	public IssueLink(Issue issue, long issueLinkID, String referencedObjectID, String relation){
 		if (issue == null)
 			throw new IllegalArgumentException("issue must not be null!");
-		if (issueLinkID == null)
-			throw new IllegalArgumentException("issueLinkID must not be null!");
 
 		this.organisationID = issue.getOrganisationID();
 		this.issueID = issue.getIssueID();
@@ -86,7 +83,7 @@ implements Serializable{
 		return issueID;
 	}
 	
-	public String getIssueLinkID() {
+	public long getIssueLinkID() {
 		return issueLinkID;
 	}
 	

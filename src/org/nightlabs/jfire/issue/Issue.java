@@ -502,7 +502,7 @@ implements
 		if (referencedObjectID == null)
 			throw new IllegalArgumentException("referencedObjectID must not be null!");
 
-		issueLinks.add(new IssueLink(this, referencedObjectID.toString(), referencedObjectID.toString(), "NONE"));
+		issueLinks.add(new IssueLink(this, IDGenerator.nextID(IssueLink.class), referencedObjectID.toString(), "NONE"));
 		if (_referencedObjectIDs != null) // instead of managing our cache of ObjectID instances, we could alternatively simply null it here, but the current implementation is more efficient.
 			_referencedObjectIDs.add(referencedObjectID);
 	}

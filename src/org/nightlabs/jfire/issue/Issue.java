@@ -127,19 +127,33 @@ implements
 	 */
 	private IssueType issueType;
 
+//	/**
+//	 * Instances of String that are representations of {@link ObjectID}s.
+//	 *
+//	 * @jdo.field
+//	 *		persistence-modifier="persistent"
+//	 *		collection-type="collection"
+//	 *		element-type="String"
+//	 *		dependent-value="true"
+//	 *		table="JFireIssueTracking_Issue_referencedObjectIDs"
+//	 *
+//	 * @jdo.join
+//	 */
+//	private Set<String> referencedObjectIDs;
+	
 	/**
-	 * Instances of String that are representations of {@link ObjectID}s.
+	 * Instances of IssueLink that are representations of {@link ObjectID}s.
 	 *
 	 * @jdo.field
 	 *		persistence-modifier="persistent"
 	 *		collection-type="collection"
-	 *		element-type="String"
+	 *		element-type="IssueLnk"
 	 *		dependent-value="true"
-	 *		table="JFireIssueTracking_Issue_referencedObjectIDs"
+	 *		mapped-by="issue"
 	 *
 	 * @jdo.join
 	 */
-	private Set<String> referencedObjectIDs;
+	private Set<IssueLink> referencedObjectIDs;
 	
 	/**
 	 * Instances of {@link IssueFileAttachment}.
@@ -280,7 +294,8 @@ implements
 		
 		fileList = new ArrayList<IssueFileAttachment>();
 		comments = new ArrayList<IssueComment>();
-		referencedObjectIDs = new HashSet<String>();
+//		referencedObjectIDs = new HashSet<String>();
+		referencedObjectIDs = new HashSet<IssueLink>();
 		
 		this.issueLocal = new IssueLocal(this);
 		this.structLocalScope = StructLocal.DEFAULT_SCOPE;
@@ -448,7 +463,7 @@ implements
 //	}
 
 	// This method should be named "getReferencedObjectIDs()". Please rename it, after you removed the above method, which currently blocks the name
-	public Set<ObjectID> getReferencedObjectIDs() {
+	/*public Set<ObjectID> getReferencedObjectIDs() {
 		if (_referencedObjectIDs == null) {
 			Set<ObjectID> ro = new HashSet<ObjectID>(referencedObjectIDs.size());
 			for (String objectIDString : referencedObjectIDs) {
@@ -466,6 +481,28 @@ implements
 			throw new IllegalArgumentException("referencedObjectID must not be null!");
 
 		referencedObjectIDs.add(referencedObjectID.toString());
+		if (_referencedObjectIDs != null) // instead of managing our cache of ObjectID instances, we could alternatively simply null it here, but the current implementation is more efficient.
+			_referencedObjectIDs.add(referencedObjectID);
+	}*/
+	
+	public Set<ObjectID> getReferencedObjectIDs() {
+		if (_referencedObjectIDs == null) {
+			Set<ObjectID> ro = new HashSet<ObjectID>(referencedObjectIDs.size());
+			for (IssueLink objectIDString : referencedObjectIDs) {
+				ObjectID objectID = ObjectIDUtil.createObjectID(objectIDString.getReferencedObjectID());
+				ro.add(objectID);
+			}
+			_referencedObjectIDs = ro;
+		}
+		return Collections.unmodifiableSet(_referencedObjectIDs);
+	}
+
+	public void addReferencedObjectID(ObjectID referencedObjectID)
+	{
+		if (referencedObjectID == null)
+			throw new IllegalArgumentException("referencedObjectID must not be null!");
+
+		referencedObjectIDs.add(new IssueLink(this, referencedObjectID.toString(), referencedObjectID.toString(), "NONE"));
 		if (_referencedObjectIDs != null) // instead of managing our cache of ObjectID instances, we could alternatively simply null it here, but the current implementation is more efficient.
 			_referencedObjectIDs.add(referencedObjectID);
 	}

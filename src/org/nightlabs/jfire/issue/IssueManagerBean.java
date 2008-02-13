@@ -547,17 +547,17 @@ implements SessionBean{
 			
 			pm.getExtent(State.class, true);
 			for (State state : issue.getStates()) {
-				pm.flush();
-				pm.deletePersistent(state);			
+				pm.deletePersistent(state);		
 			}
-
 			pm.flush();
+			
 			pm.getExtent(IssueLocal.class, true);
 			pm.deletePersistent(issue.getStatableLocal());
-			
 			pm.flush();
+
 			pm.getExtent(Issue.class, true);
 			pm.deletePersistent(issue);
+			pm.flush();
 		}//try
 		finally {
 			pm.close();

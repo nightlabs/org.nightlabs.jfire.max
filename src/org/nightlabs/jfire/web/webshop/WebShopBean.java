@@ -81,7 +81,7 @@ implements SessionBean
 	}
 
 	/**
-	 * @ejb.create-method  
+	 * @ejb.create-method
 	 * @ejb.permission role-name="_Guest_"
 	 */
 	public void ejbCreate()
@@ -116,7 +116,7 @@ implements SessionBean
 	 * @ejb.interface-method
 	 * @ejb.permission role-name="_Guest_"
 	 * @ejb.transaction type="Supports" @!This usually means that no transaction is opened which is significantly faster and recommended for all read-only EJB methods! Marco.
-	 */	
+	 */
 	public List<WebCustomer> getWebCustomers(Set<WebCustomerID> webCustomerIDs, String[] fetchGroups, int maxFetchDepth)
 	{
 		PersistenceManager pm = getPersistenceManager();
@@ -131,8 +131,8 @@ implements SessionBean
 	 * @ejb.interface-method
 	 * @ejb.permission role-name="_Guest_"
 	 * @ejb.transaction type="Supports" @!This usually means that no transaction is opened which is significantly faster and recommended for all read-only EJB methods! Marco.
-	 */	
-	public WebCustomer getWebCustomer(WebCustomerID webCustomerID, String[] fetchGroups, int maxFetchDepth) 
+	 */
+	public WebCustomer getWebCustomer(WebCustomerID webCustomerID, String[] fetchGroups, int maxFetchDepth)
 	{
 		PersistenceManager pm = getPersistenceManager();
 		try {
@@ -143,14 +143,14 @@ implements SessionBean
 			return pm.detachCopy(webCustomer);
 		} finally {
 			pm.close();
-		}	
+		}
 	}
 	/**
 	 * @ejb.interface-method
 	 * @ejb.permission role-name="_Guest_"
 	 * @ejb.transaction type="Supports" @!This usually means that no transaction is opened which is significantly faster and recommended for all read-only EJB methods! Marco.
-	 */	
-	public WebCustomer getPerson(WebCustomerID webCustomerID, String[] fetchGroups, int maxFetchDepth) 
+	 */
+	public WebCustomer getPerson(WebCustomerID webCustomerID, String[] fetchGroups, int maxFetchDepth)
 	{
 		PersistenceManager pm = getPersistenceManager();
 		try {
@@ -162,14 +162,14 @@ implements SessionBean
 			return pm.detachCopy(webCustomer);
 		} finally {
 			pm.close();
-		}	
+		}
 	}
 	/**
 	 * @ejb.interface-method
 	 * @ejb.permission role-name="_Guest_"
 	 * @ejb.transaction type="Supports" @!This usually means that no transaction is opened which is significantly faster and recommended for all read-only EJB methods! Marco.
-	 */	
-	public AnchorID getWebCustomerLegalEntityID(WebCustomerID webCustomerID) 
+	 */
+	public AnchorID getWebCustomerLegalEntityID(WebCustomerID webCustomerID)
 	{
 		PersistenceManager pm = getPersistenceManager();
 		try {
@@ -177,7 +177,7 @@ implements SessionBean
 			return (AnchorID) (webCustomer.getLegalEntity() != null ? JDOHelper.getObjectId(webCustomer.getLegalEntity()) : null);
 		} finally {
 			pm.close();
-		}	
+		}
 	}
 
 	/**
@@ -190,7 +190,7 @@ implements SessionBean
 	 * 		newly created customer
 	 * @param fetchGroups The fetch groups to use when <code>get</code> is set to <code>true</code>.
 	 * @param maxFetchDepth The fetch depth to use when <code>get</code> is set to <code>true</code>.
-	 * @return The newly created customer if the <code>get</code> parameter is <code>true</code> - 
+	 * @return The newly created customer if the <code>get</code> parameter is <code>true</code> -
 	 * 		<code>null</code> otherwise.
 	 * @throws DuplicateIDException If a customer with the same id already exists.
 	 * 
@@ -236,8 +236,8 @@ implements SessionBean
 	 * @ejb.interface-method
 	 * @ejb.permission role-name="_Guest_"
 	 * @ejb.transaction type="Supports" @!This usually means that no transaction is opened which is significantly faster and recommended for all read-only EJB methods! Marco.
-	 */			
-	public boolean isWebCustomerIDExisting(WebCustomerID webCustomerID, PersistenceManager pm) 
+	 */
+	public boolean isWebCustomerIDExisting(WebCustomerID webCustomerID, PersistenceManager pm)
 	{
 		//WebCustomerID id = WebCustomerID.create(getOrganisationID(), webCustomerID);
 		try {
@@ -251,7 +251,7 @@ implements SessionBean
 	/**
 	 * Check if a customer can login. This is done by checking
 	 * the first and second password for the customer. If authentication
-	 * with the second password succeeds, the firsat password will be 
+	 * with the second password succeeds, the firsat password will be
 	 * replaced by the second and the second password will be removed.
 	 * @param webCustomerID the customer to log in
 	 * @param password The plain text password to check
@@ -259,7 +259,7 @@ implements SessionBean
 	 * @ejb.permission role-name="_Guest_"
 	 * @ejb.transaction type="Required"
 	 */
-	public boolean tryCustomerLogin(WebCustomerID webCustomerID, String password) 
+	public boolean tryCustomerLogin(WebCustomerID webCustomerID, String password)
 	{
 		logger.debug("Trying authentication for web customer: "+webCustomerID);
 		if(password == null) {
@@ -293,7 +293,7 @@ implements SessionBean
 //						setPassword(pm, webCustomerID, wbc.getSecondPassword());
 //						setSecondPassword(pm, webCustomerID, null);
 						return true;
-					} else { 
+					} else {
 						logger.debug("Customer authentication (2nd pwd) failed: Passwords don't match.");
 						return false;
 					}
@@ -310,7 +310,7 @@ implements SessionBean
 			return false;
 		} finally {
 			pm.close();
-		}	
+		}
 	}
 	
 //	/**
@@ -319,7 +319,7 @@ implements SessionBean
 //	 * @ejb.transaction type="Supports" @!This usually means that no transaction is opened which is significantly faster and recommended for all read-only EJB methods! Marco.
 //	 * @deprecated
 //	 */
-//	public boolean checkPassword(WebCustomerID webCustomerID, String password) 
+//	public boolean checkPassword(WebCustomerID webCustomerID, String password)
 //	{
 //		logger.debug("Trying authentication for web customer: "+webCustomerID);
 //		if(password == null) {
@@ -344,7 +344,7 @@ implements SessionBean
 //			return false;
 //		} finally {
 //			pm.close();
-//		}	
+//		}
 //	}
 	
 //	/**
@@ -354,7 +354,7 @@ implements SessionBean
 //	 * @ejb.transaction type="Supports" @!This usually means that no transaction is opened which is significantly faster and recommended for all read-only EJB methods! Marco.
 //	 * @deprecated
 //	 */
-//	public boolean checkSecondPassword(WebCustomerID webCustomerID, String password) 
+//	public boolean checkSecondPassword(WebCustomerID webCustomerID, String password)
 //	{
 //		logger.debug("Trying authentication (2nd pwd) for web customer: "+webCustomerID);
 //		if(password == null) {
@@ -369,7 +369,7 @@ implements SessionBean
 //				// TODO: login with second password succeeded - replace first password with second
 //				logger.debug("Customer authentication (2nd pwd) successful.");
 //				return true;
-//			} else { 
+//			} else {
 //				logger.debug("Customer authentication (2nd pwd) failed: Passwords don't match.");
 //				return false;
 //			}
@@ -378,7 +378,7 @@ implements SessionBean
 //			return false;
 //		} finally {
 //			pm.close();
-//		}	
+//		}
 //	}
 	
 	/**
@@ -386,7 +386,7 @@ implements SessionBean
 	 * @ejb.permission role-name="_Guest_"
 	 * @ejb.transaction type="Supports" @!This usually means that no transaction is opened which is significantly faster and recommended for all read-only EJB methods! Marco.
 	 */
-	public boolean checkEmailConfirmation(WebCustomerID webCustomerID, String checkString) 
+	public boolean checkEmailConfirmation(WebCustomerID webCustomerID, String checkString)
 	{
 		if(checkString == null ) return false;
 		PersistenceManager pm = getPersistenceManager();
@@ -396,13 +396,13 @@ implements SessionBean
 			if(wbc.getConfirmationString() == null) return false;
 			if(wbc.getConfirmationString().equals(checkString)) return true;
 			else return false;
-		}	
+		}
 		catch (JDOObjectNotFoundException e) {
 			logger.error("Customer not found: "+webCustomerID, e);
 			return false;
 		} finally {
 			pm.close();
-		}	
+		}
 	}
 	
 	/**
@@ -410,7 +410,7 @@ implements SessionBean
 	 * @ejb.permission role-name="_Guest_"
 	 * @ejb.transaction type="Supports" @!This usually means that no transaction is opened which is significantly faster and recommended for all read-only EJB methods! Marco.
 	 */
-	public boolean hasEmailConfirmationExpired(WebCustomerID webCustomerID) throws JDOObjectNotFoundException 
+	public boolean hasEmailConfirmationExpired(WebCustomerID webCustomerID) throws JDOObjectNotFoundException
 	{
 		long expirationTime = 1000 * 60 * 60 * confirmationStringExpirationTimeInHours;
 		PersistenceManager pm = getPersistenceManager();
@@ -423,7 +423,7 @@ implements SessionBean
 			else return false;
 		} finally {
 			pm.close();
-		}	
+		}
 	}
 	
 //	/**
@@ -433,7 +433,7 @@ implements SessionBean
 //	 * @ejb.transaction type="Supports" @!This usually means that no transaction is opened which is significantly faster and recommended for all read-only EJB methods! Marco.
 //	 * @deprecated
 //	 */
-//	public boolean hasSecondPasswordDateExpired(WebCustomerID webCustomerID)  
+//	public boolean hasSecondPasswordDateExpired(WebCustomerID webCustomerID)
 //	{
 //		long expirationTime = 1000 * 60 * 60 * secondPasswordExpirationTimeInHours;
 //		PersistenceManager pm = getPersistenceManager();
@@ -446,7 +446,7 @@ implements SessionBean
 //				setSecondPassword(webCustomerID, null);
 //				return true;
 //			}
-//			else { 
+//			else {
 //				// everythings ok so move the secondpassword to the primary field
 //				setPassword(webCustomerID, wbc.getSecondPassword());
 //				setSecondPassword(webCustomerID, null);
@@ -454,7 +454,7 @@ implements SessionBean
 //			}
 //		} finally {
 //			pm.close();
-//		}	
+//		}
 //
 //	}
 	
@@ -462,8 +462,8 @@ implements SessionBean
 	 * @ejb.interface-method
 	 * @ejb.permission role-name="_Guest_"
 	 * @ejb.transaction type="Supports" @!This usually means that no transaction is opened which is significantly faster and recommended for all read-only EJB methods! Marco.
-	 */			
-	public boolean isWebCustomerIDExisting(WebCustomerID webCustomerID) 
+	 */
+	public boolean isWebCustomerIDExisting(WebCustomerID webCustomerID)
 	{
 		PersistenceManager pm = getPersistenceManager();
 		try {
@@ -473,15 +473,15 @@ implements SessionBean
 			return false;
 		} finally {
 			pm.close();
-		}		
+		}
 	}
 
 	/**
 	 * @ejb.interface-method
 	 * @ejb.permission role-name="_Guest_"
 	 * @ejb.transaction type="Supports" @!This usually means that no transaction is opened which is significantly faster and recommended for all read-only EJB methods! Marco.
-	 */			
-	public boolean isEmailExisting(String email) 
+	 */
+	public boolean isEmailExisting(String email)
 	{
 		PersistenceManager pm = getPersistenceManager();
 		try {
@@ -490,14 +490,14 @@ implements SessionBean
 			return customers.size() > 0;
 		} finally {
 			pm.close();
-		}		
+		}
 	}
 	
 	/**
 	 * @ejb.interface-method
 	 * @ejb.transaction type="Required"
 	 * @ejb.permission role-name="_Guest_"
-	 */	
+	 */
 	public WebCustomer storeWebCustomer(WebCustomer webCustomer, boolean get, String[] fetchGroups, int maxFetchDepth)
 	{
 		PersistenceManager pm = getPersistenceManager();
@@ -509,22 +509,22 @@ implements SessionBean
 	}
 	
 	/**
-	 * This will send E-mails to every address found for that webCustomers 
+	 * This will send E-mails to every address found for that webCustomers
 	 * @param webCustomer
 	 * @param subject of the mail
-	 * @param message Mail content 
-	 * @return atLeastOneMailSent Turns false when no mail was sent 
+	 * @param message Mail content
+	 * @return atLeastOneMailSent Turns false when no mail was sent
 	 * @throws DataBlockGroupNotFoundException
 	 *
 	 */
 	public boolean sendBlockGroupMails(WebCustomerID webCustomerID, String subject, String message)
 	{
 		WebCustomer webCustomer = getWebCustomer(
-				webCustomerID, 
+				webCustomerID,
 				new String[] {
 						FetchPlan.DEFAULT, WebCustomer.FETCH_GROUP_LEGAL_ENTITY,
 						LegalEntity.FETCH_GROUP_PERSON, PropertySet.FETCH_GROUP_FULL_DATA
-				}, 
+				},
 				NLJDOHelper.MAX_FETCH_DEPTH_NO_LIMIT
 		);
 
@@ -557,8 +557,8 @@ implements SessionBean
 
 	/**
 	 * This is no Bean Method!!
-	 * @throws NamingException 
-	 * @throws MessagingException 
+	 * @throws NamingException
+	 * @throws MessagingException
 	 */
 	public void sendMail(String recipientAddress, String subject, String message) throws NamingException, MessagingException
 	{
@@ -575,11 +575,11 @@ implements SessionBean
 	
 	/**
 	 * Creates, sends and if it succeeds stores it with an expiration Date.
-	 * @throws  
+	 * @throws
 	 * @ejb.interface-method
 	 * @ejb.transaction type="Required"
 	 * @ejb.permission role-name="_Guest_"
-	 */	
+	 */
 	public void createPassword(WebCustomerID webCustomerID) throws DataBlockGroupNotFoundException
 	{
 		String newPassword = UserLocal.createHumanPassword(8,10);
@@ -596,7 +596,7 @@ implements SessionBean
 //				setSecondPassword(pm, webCustomerID, UserLocal.encryptPassword(newPassword));
 			} finally {
 				pm.close();
-			}	
+			}
 		}
 	}
 	
@@ -609,7 +609,7 @@ implements SessionBean
 //			webCustomer.setPassword(encryptedPassword);
 ////		} finally {
 ////			pm.close();
-////		}	
+////		}
 //	}
 	
 //	private static void setSecondPassword(PersistenceManager pm, WebCustomerID webCustomerID, String encryptedPassword)
@@ -620,20 +620,20 @@ implements SessionBean
 //			WebCustomer webCustomer = (WebCustomer)pm.getObjectById(webCustomerID);
 //			webCustomer.setSecondPassword(encryptedPassword);
 //			// if the password doesnt get erased we have to set the current Time for a possible expiration
-//			if(encryptedPassword != null) 
+//			if(encryptedPassword != null)
 //				webCustomer.setSecondPasswordDate(new Date());
-//			else 
+//			else
 //				webCustomer.setSecondPasswordDate(null);
 ////		} finally {
 ////			pm.close();
-////		}	
+////		}
 //	}
 	
 	/**
 	 * @ejb.interface-method
 	 * @ejb.transaction type="Required"
 	 * @ejb.permission role-name="_Guest_"
-	 */	
+	 */
 	public void storeAndSendConfirmation(WebCustomerID webCustomerID, String subject, String messageText, String confirmationString) throws Exception
 	{
 //		try {
@@ -643,7 +643,7 @@ implements SessionBean
 //			// very temporarly
 //			String message = "Hello "+ webCustomerID.webCustomerID +
 //			"\n Thank you for registering at the JFire demo shop. Your account is created and must be activated before you can use it."+
-//			"To activate the account click on the following link or copy-paste it in your browser: http://127.0.0.1:8080/jfire-webshop/customer/?customerId="+webCustomerID.webCustomerID +"&action=confirm&cf="+ randomEncrypted;  
+//			"To activate the account click on the following link or copy-paste it in your browser: http://127.0.0.1:8080/jfire-webshop/customer/?customerId="+webCustomerID.webCustomerID +"&action=confirm&cf="+ randomEncrypted;
 
 			if(sendBlockGroupMails(webCustomerID, subject, messageText))
 				// At least 1 mail has been sent succesfully
@@ -666,6 +666,6 @@ implements SessionBean
 			wbc.setConfirmationStringDate(confirmationString == null ? null : new Date());
 		} finally {
 			pm.close();
-		}	
+		}
 	}
 }

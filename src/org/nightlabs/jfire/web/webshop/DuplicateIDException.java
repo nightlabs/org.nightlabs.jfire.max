@@ -6,7 +6,7 @@ package org.nightlabs.jfire.web.webshop;
 /**
  * @author Khaled
  */
-public class DuplicateIDException 
+public class DuplicateIDException
 // FIXME: why Throwable and not Exception ??
 extends Throwable
 {

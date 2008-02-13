@@ -16,13 +16,13 @@ import org.nightlabs.jfire.person.PersonStruct;
 import org.nightlabs.jfire.trade.LegalEntity;
 
 /**
- * The WebCustomer assembles datas like username and password that are only used for the web 
+ * The WebCustomer assembles datas like username and password that are only used for the web
  * and a legalEntity within the core system.
  * 
  * @author Khaled
  *
  * @jdo.persistence-capable
- *		identity-type="application"		
+ *		identity-type="application"
  *		detachable="true"
  *		objectid-class="org.nightlabs.jfire.webshop.id.WebCustomerID"
  *		table="JFireWebShopBase_WebCustomer"
@@ -41,22 +41,22 @@ import org.nightlabs.jfire.trade.LegalEntity;
  * 		WHERE
  * 			this.legalEntity != null &&
  * 			this.legalEntity.person != null &&
- * 			this.legalEntity.person.dataFields.contains(regexField) && 
+ * 			this.legalEntity.person.dataFields.contains(regexField) &&
  * 			(
- * 				regexField.structBlockOrganisationID == :regexFieldStructBlockOrganisationID && 
- * 				regexField.structBlockID == :regexFieldStructBlockID && 
- * 				regexField.structFieldOrganisationID == :regexFieldStructFieldOrganisationID && 
+ * 				regexField.structBlockOrganisationID == :regexFieldStructBlockOrganisationID &&
+ * 				regexField.structBlockID == :regexFieldStructBlockID &&
+ * 				regexField.structFieldOrganisationID == :regexFieldStructFieldOrganisationID &&
  * 				regexField.structFieldID == :regexFieldStructFieldID &&
  * 				regexField.text.toLowerCase() == :regexFieldValue
  * 			)
- * 		VARIABLES org.nightlabs.jfire.prop.datafield.RegexDataField regexField 
+ * 		VARIABLES org.nightlabs.jfire.prop.datafield.RegexDataField regexField
  * "
  */
 public class WebCustomer
 {
 	
 	public static final String FETCH_GROUP_LEGAL_ENTITY = "WebCustomer.legalEntity";
-	public static final String FETCH_GROUP_THIS_WEB_CUSTOMER = "WebCustomer.this"; 
+	public static final String FETCH_GROUP_THIS_WEB_CUSTOMER = "WebCustomer.this";
 	
 	/**
 	 * @deprecated only for JDO
@@ -127,7 +127,7 @@ public class WebCustomer
 	private Date confirmationStringDate ;
 	
 	/**
-	 * @jdo.field persistence-modifier="persistent" 
+	 * @jdo.field persistence-modifier="persistent"
 	 */
 	private LegalEntity legalEntity = null;
 

@@ -11,10 +11,9 @@ import org.nightlabs.jfire.base.Lookup;
 import org.nightlabs.jfire.numorgid.id.NumericOrganisationIdentifierID;
 import org.nightlabs.jfire.organisation.LocalOrganisation;
 import org.nightlabs.jfire.organisation.Organisation;
-import org.nightlabs.math.Base62Coder;
 
 /**
- * @jdo.persistence-capable 
+ * @jdo.persistence-capable
  *		identity-type="application"
  *		detachable="true"
  *		table="JFireNumericOrganisationID_NumericOrganisationIdentifier"
@@ -77,12 +76,12 @@ public class NumericOrganisationIdentifier {
 	}
 	
 	/**
-	 * This method returns the numeric organisation ID for the current organisation. In order to do so, it asks the root organisation for 
+	 * This method returns the numeric organisation ID for the current organisation. In order to do so, it asks the root organisation for
 	 * the numeric organisation ID of the current organisation which returns it if one is already existing or creates a new unique one
 	 * if it doesn't exist yet.<br />
 	 * If the JFire server has been configured in stand-alone mode (i.e. no root-organisation available), the value
 	 * {@link NumericOrganisationIdentifier#MAX_NUMERIC_ORGANISATION_ID} is returned instead as ID.
-	 *  
+	 * 
 	 * @param pm A persistence manager to be used to lookup the {@link NumericOrganisationIdentifier} and the initial context properties for the root
 	 * 		organisation.
 	 * @return The numeric organisation ID for the current organisation.
@@ -101,7 +100,7 @@ public class NumericOrganisationIdentifier {
 				InitialContext initialContext = new InitialContext();
 				try {
 					if (! Organisation.hasRootOrganisation(initialContext))
-						return NumericOrganisationIdentifier.MAX_NUMERIC_ORGANISATION_ID; // For test systems it's good to have a valid value						
+						return NumericOrganisationIdentifier.MAX_NUMERIC_ORGANISATION_ID; // For test systems it's good to have a valid value
 						
 					rootOrganisationID = Organisation.getRootOrganisationID(initialContext);
 				} finally {

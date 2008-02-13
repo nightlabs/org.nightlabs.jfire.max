@@ -89,7 +89,7 @@ implements SessionBean
 	}
 	
 	/**
-	 * Initialises an organisation datastore to be used with numeric organisation IDs. 
+	 * Initialises an organisation datastore to be used with numeric organisation IDs.
 	 * 
 	 * @ejb.interface-method
 	 * @ejb.permission role-name="_System_"
@@ -129,7 +129,7 @@ implements SessionBean
 			
 			try {
 				NumericOrganisationIdentifierID numericOrganisationIdentifierID = NumericOrganisationIdentifierID.create(rootOrganisationID);
-				pm.getObjectById(numericOrganisationIdentifierID);				
+				pm.getObjectById(numericOrganisationIdentifierID);
 				// if the id already exists, we simply return since the init has already happened once.
 				return;
 			} catch (JDOObjectNotFoundException x) {
@@ -161,7 +161,7 @@ implements SessionBean
 	
 	/**
 	 * @ejb.create-method
-	 * @ejb.permission role-name="_Guest_"  
+	 * @ejb.permission role-name="_Guest_"
 	 */
 	public void ejbCreate() throws CreateException { }
 	

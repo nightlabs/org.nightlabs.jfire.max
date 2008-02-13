@@ -20,7 +20,7 @@ import org.nightlabs.jfire.trade.Article;
 /**
  * @author Marco Schulze - Marco at NightLabs dot de
  *
- * @jdo.persistence-capable 
+ * @jdo.persistence-capable
  *		identity-type="application"
  *		persistence-capable-superclass="org.nightlabs.jfire.store.DeliveryNoteActionHandler"
  *		detachable="true"

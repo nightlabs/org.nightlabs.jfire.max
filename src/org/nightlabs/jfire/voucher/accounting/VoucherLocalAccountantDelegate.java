@@ -11,7 +11,6 @@ import javax.jdo.PersistenceManager;
 
 import org.nightlabs.annotation.Implement;
 import org.nightlabs.jfire.accounting.Account;
-import org.nightlabs.jfire.accounting.Currency;
 import org.nightlabs.jfire.accounting.Invoice;
 import org.nightlabs.jfire.accounting.InvoiceMoneyTransfer;
 import org.nightlabs.jfire.accounting.book.BookMoneyTransfer;
@@ -93,7 +92,7 @@ extends LocalAccountantDelegate
 	private transient Map<String, Account> unmodifiableAccounts = null;
 
 	/**
-	 * @return a Map with {@link Currency}'s id as 
+	 * @return a Map with {@link Currency}'s id as
 	 */
 	public Map<String, Account> getAccounts()
 	{

@@ -30,8 +30,8 @@ import org.nightlabs.jfire.voucher.store.VoucherType;
  *
  * @jdo.inheritance strategy="superclass-table"
  */
-public class ServerDeliveryProcessorClientSideVoucherPrint 
-extends ServerDeliveryProcessor 
+public class ServerDeliveryProcessorClientSideVoucherPrint
+extends ServerDeliveryProcessor
 {
 	/**
 	 * 
@@ -44,14 +44,14 @@ extends ServerDeliveryProcessor
 		try {
 			pm.getExtent(ServerDeliveryProcessorClientSideVoucherPrint.class);
 			serverDeliveryProcessor = (ServerDeliveryProcessorClientSideVoucherPrint) pm.getObjectById(
-					ServerPaymentProcessorID.create(Organisation.DEV_ORGANISATION_ID, 
+					ServerPaymentProcessorID.create(Organisation.DEV_ORGANISATION_ID,
 							ServerDeliveryProcessorClientSideVoucherPrint.class.getName()));
 		} catch (JDOObjectNotFoundException e) {
 			serverDeliveryProcessor = new ServerDeliveryProcessorClientSideVoucherPrint(
-					Organisation.DEV_ORGANISATION_ID, 
+					Organisation.DEV_ORGANISATION_ID,
 					ServerDeliveryProcessorClientSideVoucherPrint.class.getName());
 			serverDeliveryProcessor.getName().setText(
-					Locale.ENGLISH.getLanguage(), 
+					Locale.ENGLISH.getLanguage(),
 					"Server Delivery Processor for delivering vouchers to print on the client");
 			serverDeliveryProcessor = pm.makePersistent(serverDeliveryProcessor);
 		}
@@ -61,7 +61,7 @@ extends ServerDeliveryProcessor
 	
 	public ServerDeliveryProcessorClientSideVoucherPrint(String organisationID, String serverDeliveryProcessorID)
 	{
-		super(organisationID, serverDeliveryProcessorID);		
+		super(organisationID, serverDeliveryProcessorID);
 	}
 	
 	@Override

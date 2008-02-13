@@ -17,8 +17,8 @@ import org.nightlabs.jfire.voucher.store.VoucherType;
  * @author Daniel.Mazurek [at] NightLabs [dot] de
  *
  */
-public class PreviewParameterValuesResult 
-implements Serializable 
+public class PreviewParameterValuesResult
+implements Serializable
 {
 	/**
 	 * 
@@ -28,7 +28,7 @@ implements Serializable
 		FetchPlan.DEFAULT,
 	};
 	
-	public PreviewParameterValuesResult(VoucherType voucherType) 
+	public PreviewParameterValuesResult(VoucherType voucherType)
 	{
 		PersistenceManager pm = JDOHelper.getPersistenceManager(voucherType);
 		if (pm == null)
@@ -37,8 +37,8 @@ implements Serializable
 		FetchPlanBackup fetchPlanBackup = pm == null ? null : NLJDOHelper.backupFetchPlan(pm.getFetchPlan());
 		try {
 			pm.getFetchPlan().setMaxFetchDepth(NLJDOHelper.MAX_FETCH_DEPTH_NO_LIMIT);
-			pm.getFetchPlan().setGroups(FETCH_GROUPS_CURRENCY);			
-			VoucherPriceConfig voucherPriceConfig = (VoucherPriceConfig) voucherType.getPackagePriceConfig();			
+			pm.getFetchPlan().setGroups(FETCH_GROUPS_CURRENCY);
+			VoucherPriceConfig voucherPriceConfig = (VoucherPriceConfig) voucherType.getPackagePriceConfig();
 			if (voucherPriceConfig != null && voucherPriceConfig.getCurrencies() != null)
 				this.currencies = pm.detachCopyAll(voucherPriceConfig.getCurrencies());
 			else

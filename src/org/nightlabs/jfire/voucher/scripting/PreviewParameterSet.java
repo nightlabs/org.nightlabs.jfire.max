@@ -9,8 +9,8 @@ import org.nightlabs.jfire.store.id.ProductTypeID;
  * @author Daniel.Mazurek [at] NightLabs [dot] de
  *
  */
-public class PreviewParameterSet 
-implements Serializable 
+public class PreviewParameterSet
+implements Serializable
 {
 	/**
 	 * 
@@ -32,7 +32,7 @@ implements Serializable
 	}
 	public void setCurrencyID(CurrencyID currencyID) {
 		this.currencyID = currencyID;
-	}	
+	}
 	
 	private ProductTypeID voucherTypeID;
 	public ProductTypeID getVoucherTypeID() {

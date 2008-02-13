@@ -16,7 +16,7 @@ import org.nightlabs.jfire.voucher.scripting.VoucherLayout;
 /**
  * @author Marco Schulze - marco at nightlabs dot de
  * 
- * @jdo.persistence-capable 
+ * @jdo.persistence-capable
  *		identity-type="application"
  *		persistence-capable-superclass="org.nightlabs.jfire.store.ProductType"
  *		detachable="true"
@@ -46,7 +46,7 @@ import org.nightlabs.jfire.voucher.scripting.VoucherLayout;
 public class VoucherType
 extends ProductType
 {
-	public static final String FETCH_GROUP_VOUCHER_LAYOUT = "VoucherType.voucherLayout";	
+	public static final String FETCH_GROUP_VOUCHER_LAYOUT = "VoucherType.voucherLayout";
 	
 	private static final long serialVersionUID = 1L;
 
@@ -106,7 +106,7 @@ extends ProductType
 
 	// ******************************
 	// /// *** begin inheritance *** ///
-// Marco: important change: the basic ProductType does NOT filter packagePriceConfig anymore, because there are about the same number of implementations 
+// Marco: important change: the basic ProductType does NOT filter packagePriceConfig anymore, because there are about the same number of implementations
 // needing inheritance as there are which must not have inheritance for this field!
 //	@Override
 //	public FieldMetaData getFieldMetaData(String fieldName, boolean createMissingMetaData)
@@ -159,7 +159,7 @@ extends ProductType
 	/**
 	 * {@inheritDoc}
 	 * <p>
-	 * This implementation always returns the {@link #getPackagePriceConfig()} as 
+	 * This implementation always returns the {@link #getPackagePriceConfig()} as
 	 * vouchers have a special PriceConfig that does not virtual self packaging.
 	 * </p>
 	 * @see org.nightlabs.jfire.store.ProductType#getPriceConfigInPackage(java.lang.String)

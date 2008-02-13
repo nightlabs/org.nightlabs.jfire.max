@@ -9,8 +9,8 @@ import org.nightlabs.jfire.voucher.store.VoucherType;
  * @author Daniel.Mazurek [at] NightLabs [dot] de
  *
  */
-public class VoucherTypeQuery 
-extends ProductTypeQuery 
+public class VoucherTypeQuery
+extends ProductTypeQuery
 {
 
 	/**
@@ -22,7 +22,7 @@ extends ProductTypeQuery
 	}
 
 	@Override
-	protected Query prepareQuery() 
+	protected Query prepareQuery()
 	{
 		super.prepareQuery();
 		// FIXME: Query also subclasses when JPOX problem is solved
@@ -32,7 +32,7 @@ extends ProductTypeQuery
 		q.setFilter(getFilter().toString());
 		q.declareVariables(getVars().toString());
 		
-		return q;		
+		return q;
 	}
 
 	

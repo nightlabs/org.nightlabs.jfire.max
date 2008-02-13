@@ -79,7 +79,7 @@ implements DetachCallback
 	}
 	/**
 	 * @return the value that's still available - i.e. the nominal amount minus the redeemed amount. This will be <code>null</code>,
-	 *		if the Voucher is currently NOT assigned to any customer. 
+	 *		if the Voucher is currently NOT assigned to any customer.
 	 */
 	public Price getRestValue()
 	{
@@ -132,7 +132,7 @@ implements DetachCallback
 //	{
 //		Price origPrice = getArticle().getPrice();
 //		long priceID = PriceConfig.createPriceID(origPrice.getOrganisationID(), origPrice.getPriceConfigID());
-//		restValue = new Price(origPrice.getOrganisationID(), origPrice.getPriceConfigID(), priceID, origPrice.getCurrency()); 
+//		restValue = new Price(origPrice.getOrganisationID(), origPrice.getPriceConfigID(), priceID, origPrice.getCurrency());
 //	}
 //
 //	protected void onDisassemble(User user, boolean onRelease)

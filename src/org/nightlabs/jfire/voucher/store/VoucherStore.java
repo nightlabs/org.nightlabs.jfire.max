@@ -6,7 +6,6 @@ import javax.jdo.JDOHelper;
 import javax.jdo.PersistenceManager;
 
 import org.nightlabs.jfire.organisation.LocalOrganisation;
-import org.nightlabs.math.Base62Coder;
 
 /**
  * @author Marco Schulze - marco at nightlabs dot de

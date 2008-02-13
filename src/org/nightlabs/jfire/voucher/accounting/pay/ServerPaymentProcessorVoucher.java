@@ -135,7 +135,7 @@ public class ServerPaymentProcessorVoucher
 			throw new IllegalStateException("Currency mismatch! VoucherKey's currency ("+voucherKey.getRestValue().getCurrency().getCurrencyID()+") is not the same as payment's currency ("+paymentData.getPayment().getCurrency().getCurrencyID()+")! VoucherKey=" + paymentData.getVoucherKey());
 
 		if (voucherKey.getRestValue().getAmount() < paymentData.getPayment().getAmount())
-			throw new IllegalStateException("Insufficient value ("+voucherKey.getRestValue().getAmount()+") for this payment ("+paymentData.getPayment().getAmount()+")! VoucherKey=" + paymentData.getVoucherKey()); 
+			throw new IllegalStateException("Insufficient value ("+voucherKey.getRestValue().getAmount()+") for this payment ("+paymentData.getPayment().getAmount()+")! VoucherKey=" + paymentData.getVoucherKey());
 
 //		if (VoucherLocalAccountantDelegate.ACCOUNT_ANCHOR_TYPE_ID_VOUCHER.equals(voucherMoneyTransfer.getFrom().getAnchorTypeID()))
 //			return voucherMoneyTransfer.getFrom();

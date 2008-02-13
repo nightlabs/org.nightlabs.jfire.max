@@ -16,7 +16,6 @@ import org.nightlabs.jfire.accounting.PriceFragmentType;
 import org.nightlabs.jfire.accounting.pay.Payment;
 import org.nightlabs.jfire.accounting.priceconfig.PriceConfig;
 import org.nightlabs.jfire.security.User;
-import org.nightlabs.jfire.store.Product;
 import org.nightlabs.jfire.trade.Article;
 import org.nightlabs.jfire.voucher.accounting.VoucherRedemption;
 import org.nightlabs.jfire.voucher.store.id.VoucherKeyID;
@@ -193,7 +192,7 @@ implements Serializable
 			default:
 				throw new IllegalArgumentException("Unknown validity: " + validity);
 		}
-	}	
+	}
 
 	/**
 	 * @see #getValidity()
@@ -312,7 +311,7 @@ implements Serializable
 	 * soon as the restValue reaches 0, the validity is set to {@link #VALIDITY_REDEEMED_COMPLETELY}.
 	 * </li>
 	 * </ul>
-	 * </p> 
+	 * </p>
 	 */
 	public byte getValidity()
 	{
@@ -404,7 +403,7 @@ implements Serializable
 		return nominalValue;
 	}
 	/**
-	 * @return the value that's still available. 
+	 * @return the value that's still available.
 	 */
 	public Price getRestValue()
 	{

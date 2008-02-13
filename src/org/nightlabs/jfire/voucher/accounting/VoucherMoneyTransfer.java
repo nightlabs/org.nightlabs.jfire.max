@@ -12,7 +12,7 @@ import org.nightlabs.jfire.transfer.Anchor;
 /**
  * @author Marco Schulze - Marco at NightLabs dot de
  *
- * @jdo.persistence-capable 
+ * @jdo.persistence-capable
  *		identity-type="application"
  *		persistence-capable-superclass="org.nightlabs.jfire.accounting.InvoiceMoneyTransfer"
  *		detachable="true"

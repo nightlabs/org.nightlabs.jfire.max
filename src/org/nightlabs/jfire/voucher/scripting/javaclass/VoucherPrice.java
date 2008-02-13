@@ -9,11 +9,11 @@ import org.nightlabs.l10n.NumberFormatter;
  * @author Daniel.Mazurek [at] NightLabs [dot] de
  *
  */
-public class VoucherPrice 
-extends AbstractVoucherScript 
+public class VoucherPrice
+extends AbstractVoucherScript
 {
 
-	public Object doExecute() throws ScriptException 
+	public Object doExecute() throws ScriptException
 	{
 		Voucher voucher = getVoucher();
 		long amount = voucher.getProductLocal().getSaleArticle().getPrice().getAmount();

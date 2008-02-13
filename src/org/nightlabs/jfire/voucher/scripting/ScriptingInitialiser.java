@@ -18,7 +18,7 @@ import org.nightlabs.jfire.voucher.store.id.VoucherKeyID;
  * @author Daniel.Mazurek [at] NightLabs [dot] de
  *
  */
-public class ScriptingInitialiser 
+public class ScriptingInitialiser
 {
 	protected Logger LOGGER = Logger.getLogger(ScriptingInitialiser.class);
 
@@ -41,7 +41,7 @@ public class ScriptingInitialiser
 	}
 
 	// init Default ParameterSets
-	public void initialise() throws ScriptingIntialiserException 
+	public void initialise() throws ScriptingIntialiserException
 	{
 		ScriptRegistry scriptRegistry = ScriptRegistry.getScriptRegistry(pm);
 		ScriptCategory baseCategory;
@@ -50,9 +50,9 @@ public class ScriptingInitialiser
 
 		// JFire Trade Root Category
 		rootCategory = org.nightlabs.jfire.scripting.ScriptingInitialiser.createCategory(
-				pm, null, 
-				organisationID,  
-				VoucherScriptingConstants.SCRIPT_REGISTRY_ITEM_TYPE_TRADE_ROOT,				
+				pm, null,
+				organisationID,
+				VoucherScriptingConstants.SCRIPT_REGISTRY_ITEM_TYPE_TRADE_ROOT,
 				VoucherScriptingConstants.SCRIPT_REGISTRY_ITEM_ID_CATEGORY_ROOT);
 		rootCategory.getName().setText(Locale.ENGLISH.getLanguage(), "JFireTrade");
 		rootCategory.getName().setText(Locale.GERMAN.getLanguage(), "JFireTrade");
@@ -60,10 +60,10 @@ public class ScriptingInitialiser
 		// Voucher category
 		baseCategory = org.nightlabs.jfire.scripting.ScriptingInitialiser.createCategory(
 				pm, rootCategory, organisationID,
-				VoucherScriptingConstants.SCRIPT_REGISTRY_ITEM_TYPE_TRADE_VOUCHER,				
+				VoucherScriptingConstants.SCRIPT_REGISTRY_ITEM_TYPE_TRADE_VOUCHER,
 				VoucherScriptingConstants.SCRIPT_REGISTRY_ITEM_ID_CATEGORY_VOUCHER);
-		baseCategory.getName().setText(Locale.ENGLISH.getLanguage(), "Voucher");		
-		baseCategory.getName().setText(Locale.GERMAN.getLanguage(), "Gutschein");		
+		baseCategory.getName().setText(Locale.ENGLISH.getLanguage(), "Voucher");
+		baseCategory.getName().setText(Locale.GERMAN.getLanguage(), "Gutschein");
 
 		// Parameter Sets
 		if (baseCategory.getParameterSet() == null) {
@@ -77,7 +77,7 @@ public class ScriptingInitialiser
 		new org.nightlabs.jfire.scripting.ScriptingInitialiser(
 				"JFireVoucher.ear/script/Voucher",
 				baseCategory,
-				VoucherScriptingConstants.SCRIPT_REGISTRY_ITEM_TYPE_TRADE_VOUCHER,				
+				VoucherScriptingConstants.SCRIPT_REGISTRY_ITEM_TYPE_TRADE_VOUCHER,
 				jfsm, pm, Organisation.DEV_ORGANISATION_ID).initialise(); // this is a throw-away-instance
 	}
 }

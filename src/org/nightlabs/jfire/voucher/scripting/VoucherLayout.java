@@ -26,7 +26,7 @@ import org.nightlabs.jfire.trade.ILayout;
  * @jdo.fetch-group name="VoucherLayout.file" fields="fileName, fileTimestamp, fileData"
  *
  */
-public class VoucherLayout 
+public class VoucherLayout
 implements Serializable, ILayout
 {
 	private static final long serialVersionUID = 1L;

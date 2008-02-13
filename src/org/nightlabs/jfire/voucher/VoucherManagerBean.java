@@ -55,7 +55,6 @@ import org.nightlabs.jfire.prop.Struct;
 import org.nightlabs.jfire.prop.datafield.TextDataField;
 import org.nightlabs.jfire.scripting.Script;
 import org.nightlabs.jfire.scripting.ScriptRegistry;
-import org.nightlabs.jfire.scripting.ScriptRegistryItem;
 import org.nightlabs.jfire.scripting.id.ScriptRegistryItemID;
 import org.nightlabs.jfire.security.User;
 import org.nightlabs.jfire.servermanager.JFireServerManager;
@@ -119,9 +118,9 @@ import org.nightlabs.jfire.voucher.store.id.VoucherKeyID;
  * @ejb.util generate="physical"
  * @ejb.transaction type="Required"
  */
-public abstract class VoucherManagerBean 
-extends BaseSessionBeanImpl 
-implements SessionBean 
+public abstract class VoucherManagerBean
+extends BaseSessionBeanImpl
+implements SessionBean
 {
 	private static final long serialVersionUID = 1L;
 	private static final Logger logger = Logger.getLogger(VoucherManagerBean.class);
@@ -168,7 +167,7 @@ implements SessionBean
 																														// throw-away-instance
  
 			DeliveryConfiguration deliveryConfiguration = checkDeliveryConfiguration(pm);
-			// check each time for ticketPrinter module, to register corresponding 
+			// check each time for ticketPrinter module, to register corresponding
 			// modeOfDeliveryFlavour if necessary
 			checkModeOfDeliveryFlavourTicketPrinter(pm);
 			
@@ -272,7 +271,7 @@ implements SessionBean
 		}
 	}
 
-	protected void checkModeOfDeliveryFlavourTicketPrinter(PersistenceManager pm) 
+	protected void checkModeOfDeliveryFlavourTicketPrinter(PersistenceManager pm)
 	{
 		try {
 			pm.getObjectById(JFireVoucherEAR.MODE_OF_DELIVERY_FLAVOUR_ID_VOUCHER_PRINT_VIA_TICKET_PRINTER);
@@ -288,10 +287,10 @@ implements SessionBean
 			// Tobias: I don't think it is necessary to "pollute" the server log with the exception
 			
 //			logger.info("Class "+ticketPrinterClassName+" could not be resolved, means TicketPrinter Module " +
-//					"is not deployed, will skip registering of ModeOfDeliveryFlavour " + 
+//					"is not deployed, will skip registering of ModeOfDeliveryFlavour " +
 //					JFireVoucherEAR.MODE_OF_DELIVERY_FLAVOUR_ID_VOUCHER_PRINT_VIA_TICKET_PRINTER, e2);
 			logger.info("Class "+ticketPrinterClassName+" could not be resolved, means TicketPrinter Module " +
-					"is not deployed, will skip registering of ModeOfDeliveryFlavour " + 
+					"is not deployed, will skip registering of ModeOfDeliveryFlavour " +
 					JFireVoucherEAR.MODE_OF_DELIVERY_FLAVOUR_ID_VOUCHER_PRINT_VIA_TICKET_PRINTER);
 
 			// the class does not exist => no need for this ModeOfDelivery[Flavour]
@@ -318,14 +317,14 @@ implements SessionBean
 		return modeOfDelivery;
 	}
 
-	protected DeliveryConfiguration checkDeliveryConfiguration(PersistenceManager pm) 
-	{		
+	protected DeliveryConfiguration checkDeliveryConfiguration(PersistenceManager pm)
+	{
 		DeliveryConfiguration deliveryConfiguration = null;
 		try {
 			deliveryConfiguration = (DeliveryConfiguration) pm.getObjectById(DeliveryConfigurationID.create(getOrganisationID(), "JFireVoucher.default"));
 			return deliveryConfiguration;
-		} 
-		catch (JDOObjectNotFoundException jdoonfe) 
+		}
+		catch (JDOObjectNotFoundException jdoonfe)
 		{
 				// create a default DeliveryConfiguration with all default ModeOfDeliverys
 				deliveryConfiguration = new DeliveryConfiguration(
@@ -367,9 +366,9 @@ implements SessionBean
 					logger
 							.warn(
 									"Could not populate default DeliveryConfiguration for JFireVoucher with ModeOfDelivery s!",
-									x);			
-				}			
-		}		
+									x);
+				}
+		}
 		return deliveryConfiguration;
 	}
 	
@@ -854,7 +853,7 @@ implements SessionBean
 	 * @throws ModuleException
 	 * @throws NamingException
 	 * @throws IOException
-	 * @throws CannotConfirmProductTypeException 
+	 * @throws CannotConfirmProductTypeException
 	 */
 	private PreviewParameterSetExtension ensureFinishedConfiguration(
 			PersistenceManager pm, User user, PreviewParameterSet previewParameterSet)
@@ -1106,7 +1105,7 @@ implements SessionBean
 		} finally {
 			pm.close();
 		}
-	}	
+	}
 	
 	/**
 	 * @ejb.interface-method
@@ -1129,7 +1128,7 @@ implements SessionBean
 	}
 
 //	/**
-//	 * This method checks, whether all specified <code>Article</code>s have a VoucherLayout assigned and thus can be printed. 
+//	 * This method checks, whether all specified <code>Article</code>s have a VoucherLayout assigned and thus can be printed.
 //	 *
 //	 * @ejb.interface-method
 //	 * @ejb.transaction type="Required"

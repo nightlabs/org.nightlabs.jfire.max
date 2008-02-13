@@ -11,8 +11,8 @@ import org.nightlabs.jfire.voucher.store.id.VoucherKeyID;
  * @author Daniel.Mazurek [at] NightLabs [dot] de
  *
  */
-public abstract class AbstractVoucherScript 
-extends AbstractScriptExecutorJavaClassDelegate 
+public abstract class AbstractVoucherScript
+extends AbstractScriptExecutorJavaClassDelegate
 {
 
 	public AbstractVoucherScript() {
@@ -25,10 +25,10 @@ extends AbstractScriptExecutorJavaClassDelegate
 
 //	public ProductID getVoucherID() {
 //		return (ProductID) getParameterValue(VoucherScriptingConstants.PARAMETER_ID_VOUCHER_ID);
-//	}	
+//	}
 	
 	public VoucherKeyID getVoucherKeyID() {
-		return (VoucherKeyID) getParameterValue(VoucherScriptingConstants.PARAMETER_ID_VOUCHER_KEY_ID);		
+		return (VoucherKeyID) getParameterValue(VoucherScriptingConstants.PARAMETER_ID_VOUCHER_KEY_ID);
 	}
 	
 	public org.nightlabs.jfire.voucher.store.VoucherKey getVoucherKey() {
@@ -36,10 +36,10 @@ extends AbstractScriptExecutorJavaClassDelegate
 	}
 	
 //	public Voucher getVoucher() {
-//		return (Voucher) getPersistenceManager().getObjectById(getVoucherID());	
+//		return (Voucher) getPersistenceManager().getObjectById(getVoucherID());
 //	}
 	public Voucher getVoucher() {
-		return getVoucherKey().getVoucher();	
+		return getVoucherKey().getVoucher();
 	}
 	
 	public VoucherType getVoucherType() {

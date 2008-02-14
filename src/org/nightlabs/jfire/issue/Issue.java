@@ -86,7 +86,8 @@ import org.nightlabs.util.Util;
  * @jdo.fetch-group name="Issue.issueLocal" fetch-groups="default" fields="issueLocal"
  * @jdo.fetch-group name="Issue.issueType" fetch-groups="default" fields="issueType"
  * @jdo.fetch-group name="Issue.comments" fetch-groups="default" fields="comments"
- * @jdo.fetch-group name="Issue.this" fetch-groups="default" fields="fileList, issueType, referencedObjectIDs, description, subject, issuePriority, issueSeverityType, issueResolution, state, states, comments, issueLocal, reporter, assignee" 
+ * @jdo.fetch-group name="Issue.issueLinks" fetch-groups="default" fields="issueLinks"
+ * @jdo.fetch-group name="Issue.this" fetch-groups="default" fields="fileList, issueType, issueLinks, description, subject, issuePriority, issueSeverityType, issueResolution, state, states, comments, issueLocal, reporter, assignee" 
  *
  * @jdo.fetch-group name="Issue.propertySet" fetch-groups="default" fields="propertySet"
  **/
@@ -109,6 +110,7 @@ implements
 	public static final String fETCH_GROUP_ISSUE_TYPE = "Issue.issueType";
 	public static final String FETCH_GROUP_ISSUE_LOCAL = "Issue.issueLocal";
 	public static final String fETCH_GROUP_ISSUE_COMMENT = "Issue.comments";
+	public static final String FETCH_GROUP_ISSUE_LINKS = "Issue.issueLinks";
 	
 	public static final String FETCH_GROUP_PROPERTY_SET = "Issue.propertySet";
 	/**

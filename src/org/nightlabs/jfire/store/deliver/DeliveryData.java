@@ -90,6 +90,15 @@ implements Serializable, TransferData
 
 	public DeliveryData(Delivery delivery)
 	{
+		if (delivery == null)
+			throw new IllegalArgumentException("delivery must not be null!");
+
+		if (delivery.getOrganisationID() == null)
+			throw new IllegalArgumentException("delivery.getOrganisationID() returned null!");
+
+		if (delivery.getDeliveryID() < 0)
+			throw new IllegalArgumentException("delivery.getDeliveryID() < 0");
+
 		this.delivery = delivery;
 		this.organisationID = delivery.getOrganisationID();
 		this.deliveryID = delivery.getDeliveryID();

@@ -15,9 +15,13 @@ public abstract class AbstractDeliveryController extends AbstractTransferControl
 	
 	private static List<DeliveryID> getDeliveryIDs(List<DeliveryData> transferDatas) {
 		List<DeliveryID> deliveryIDs = new LinkedList<DeliveryID>();
-		for (DeliveryData data : transferDatas)
+		for (DeliveryData data : transferDatas) {
+			if (data == null)
+				throw new IllegalArgumentException("List<DeliveryData> contains a null entry!");
+
 			deliveryIDs.add(DeliveryID.create(data.getDelivery().getOrganisationID(), data.getDelivery().getDeliveryID()));
-		
+		}
+
 		return deliveryIDs;
 	}
 

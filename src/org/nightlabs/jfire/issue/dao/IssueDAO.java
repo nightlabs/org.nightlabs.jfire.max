@@ -114,7 +114,12 @@ public class IssueDAO extends BaseJDOObjectDAO<IssueID, Issue>{
 	
 	public synchronized List<Issue> getIssues(Set<IssueID> issueIDs, String[] fetchgroups, int maxFetchDepth, ProgressMonitor monitor) 
 	{
-		return getJDOObjects(null, issueIDs, fetchgroups, maxFetchDepth, monitor);
+		try {
+			IssueManager im = IssueManagerUtil.getHome(SecurityReflector.getInitialContextProperties()).create();
+			return im.getIssues(issueIDs, fetchgroups, maxFetchDepth);
+		} catch (Exception e) {
+			throw new RuntimeException(e);
+		}
 	}
 
 	/**
@@ -130,7 +135,7 @@ public class IssueDAO extends BaseJDOObjectDAO<IssueID, Issue>{
 		try {
 			IssueManager im = IssueManagerUtil.getHome(SecurityReflector.getInitialContextProperties()).create();
 			Set<IssueID> is = im.getIssueIDs();
-			return getIssues(is, fetchgroups, maxFetchDepth, monitor);
+			return im.getIssues(is, fetchgroups, maxFetchDepth);
 		} catch (Exception e) {
 			throw new RuntimeException(e);
 		}

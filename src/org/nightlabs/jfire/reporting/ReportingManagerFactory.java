@@ -28,7 +28,6 @@ package org.nightlabs.jfire.reporting;
 
 import java.io.File;
 import java.io.Serializable;
-import java.util.logging.Level;
 
 import javax.naming.InitialContext;
 import javax.naming.NameAlreadyBoundException;
@@ -41,6 +40,7 @@ import org.eclipse.birt.report.engine.api.HTMLCompleteImageHandler;
 import org.eclipse.birt.report.engine.api.HTMLEmitterConfig;
 import org.eclipse.birt.report.engine.api.IRenderOption;
 import org.eclipse.birt.report.engine.api.ReportEngine;
+import org.nightlabs.jfire.reporting.layout.ReportLayout;
 import org.nightlabs.jfire.reporting.layout.render.RenderManager;
 import org.nightlabs.jfire.reporting.platform.ServerPlatformContext;
 import org.nightlabs.jfire.reporting.platform.ServerResourceLocator;
@@ -69,7 +69,9 @@ public class ReportingManagerFactory implements Serializable {
 
 	public static final String JNDI_PREFIX = "java:/jfire/reportingManagerFactory/";
 	
+	private String organisationID;
 	private ReportEngine reportEngine;
+	
 	
 	/**
 	 * Creates a new ReportingManagerFactory and binds it into JNDI with
@@ -82,6 +84,7 @@ public class ReportingManagerFactory implements Serializable {
 	public ReportingManagerFactory(InitialContext ctx, String organisationID)
 	throws NamingException
 	{
+		this.organisationID = organisationID;
 		try {
 			ctx.createSubcontext("java:/jfire");
 		} catch (NameAlreadyBoundException e) {
@@ -116,7 +119,10 @@ public class ReportingManagerFactory implements Serializable {
 				hc.setImageHandler( imageHandler );
 //				Associate the configuration with the HTML output format.
 				config.setEmitterConfiguration( IRenderOption.OUTPUT_FORMAT_HTML, hc );
-				config.setLogConfig(new File(JFireReportingEAR.getEARDir(), "log").getAbsolutePath(), Level.ALL);
+				File organisationLogDir = new File(JFireReportingEAR.getEARDir(), "log" + File.separator + organisationID);
+				if (!organisationLogDir.exists()) {
+					organisationLogDir.mkdirs();
+				}
 				reportEngine = new ReportEngine(config);
 				reportEngine.getConfig().setResourceLocator(new ServerResourceLocator());
 //				reportEngine.setLogger();

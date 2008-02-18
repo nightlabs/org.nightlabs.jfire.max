@@ -3,16 +3,23 @@
  */
 package org.nightlabs.jfire.reporting;
 
+import java.io.BufferedReader;
+import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileFilter;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
 import java.io.FilenameFilter;
 import java.io.IOException;
+import java.io.InputStreamReader;
+import java.io.OutputStreamWriter;
+import java.io.Writer;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Locale;
 import java.util.Map;
+import java.util.regex.Pattern;
 
 import javax.jdo.JDOHelper;
 import javax.jdo.JDOObjectNotFoundException;
@@ -22,6 +29,7 @@ import javax.naming.NamingException;
 import javax.xml.transform.TransformerException;
 
 import org.apache.log4j.Logger;
+import org.nightlabs.ModuleException;
 import org.nightlabs.i18n.I18nText;
 import org.nightlabs.jfire.idgenerator.IDGenerator;
 import org.nightlabs.jfire.organisation.Organisation;
@@ -43,6 +51,7 @@ import org.nightlabs.jfire.reporting.parameter.config.ValueProviderConfig;
 import org.nightlabs.jfire.reporting.parameter.config.id.ReportParameterAcquisitionUseCaseID;
 import org.nightlabs.jfire.reporting.parameter.id.ValueProviderID;
 import org.nightlabs.jfire.scripting.ScriptRegistry;
+import org.nightlabs.jfire.security.SecurityReflector;
 import org.nightlabs.jfire.servermanager.JFireServerManager;
 import org.nightlabs.util.IOUtil;
 import org.nightlabs.xml.DOMParser;
@@ -134,7 +143,7 @@ public class ReportingInitialiser {
 			if (logger.isDebugEnabled())
 				logger.debug("createCategory: persisting new category: categoryPK=\""+category.getOrganisationID()+'/'+category.getReportRegistryItemType()+'/'+category.getReportRegistryItemID()+"\"");
 
-			category = (ReportCategory)pm.makePersistent(category);
+			category = pm.makePersistent(category);
 		}
 		return category;
 	}
@@ -385,7 +394,7 @@ public class ReportingInitialiser {
 			);
 		} catch (JDOObjectNotFoundException e) {
 			layout = new ReportLayout(category, organisationID, reportRegistryItemType, reportID);
-			layout = (ReportLayout)pm.makePersistent(layout);
+			layout = pm.makePersistent(layout);
 			hadToBeCreated = true;
 		}
 
@@ -406,13 +415,7 @@ public class ReportingInitialiser {
 	 * Creates a new report design file from the given one by replacing
 	 * variables in the given File.
 	 * <p>
-	 * By now the variables replaced are:
-	 * <ul>
-	 * <li>${rootOrganisationID}</li>
-	 * <li>${rootOrganisationIDConverted}</li>
-	 * <li>${devOrganisationID}</li>
-	 * <li>${devOrganisationIDConverted}</li>
-	 * </ul>
+	 * The variables replaced are defined here: {@link #getTemplateReplaceVariables()}
 	 * </p>
 	 * @param reportFile The template file to replace the variables in
 	 * @return The newly created file with all variables replaced.
@@ -422,13 +425,41 @@ public class ReportingInitialiser {
 	throws Exception
 	{
 		File tmpFile = File.createTempFile(IOUtil.getFileNameWithoutExtension(reportFile.getName()), ".rptdesign", IOUtil.getTempDir());
+		tmpFile.deleteOnExit();
+		importTemplateToLayoutFile(reportFile, tmpFile);
+		return tmpFile;
+	}
+	
+	/**
+	 * Get the variable names and values that are replaced by
+	 * when a layout is imported or exported.
+	 * <p>
+	 * By now the variables replaced are:
+	 * <ul>
+	 * <li>${rootOrganisationID}</li>
+	 * <li>${rootOrganisationIDConverted}</li>
+	 * <li>${devOrganisationID}</li>
+	 * <li>${devOrganisationIDConverted}</li>
+	 * </ul>
+	 * </p>
+	 * @return The variable names and values
+	 * @throws Exception If something fails getting the organisationID or the rootOrganisationID
+	 */
+	public static Map<String, String> getTemplateReplaceVariables() 
+	throws Exception 
+	{
+		String organisationID = SecurityReflector.getUserDescriptor().getOrganisationID();
 		Map<String, String> variables = new HashMap<String, String>();
 		try {
-			InitialContext ctx = new InitialContext();
-			String rootOrganisationID = Organisation.getRootOrganisationID(ctx);
+			InitialContext ctx = new InitialContext(SecurityReflector.getInitialContextProperties());
+			String rootOrganisationID = null;
+			if (Organisation.hasRootOrganisation(ctx))
+				 rootOrganisationID = Organisation.getRootOrganisationID(ctx);			
 			try {
-				variables.put("rootOrganisationID", rootOrganisationID);
-				variables.put("rootOrganisationIDConverted", convertToReportColumnString(rootOrganisationID));
+				if (rootOrganisationID != null) {
+					variables.put("rootOrganisationID", rootOrganisationID);
+					variables.put("rootOrganisationIDConverted", convertToReportColumnString(rootOrganisationID));
+				}
 				variables.put("devOrganisationID", Organisation.DEV_ORGANISATION_ID);
 				variables.put("devOrganisationIDConverted", convertToReportColumnString(Organisation.DEV_ORGANISATION_ID));
 				variables.put("localOrganisationID", organisationID);
@@ -439,9 +470,60 @@ public class ReportingInitialiser {
 		} catch (NamingException e) {
 			throw new RuntimeException(e);
 		}
-		IOUtil.replaceTemplateVariables(tmpFile, reportFile, IOUtil.CHARSET_NAME_UTF_8, variables);
-		tmpFile.deleteOnExit();
-		return tmpFile;
+		return variables;
+	}
+	
+	/**
+	 * Export the given ReportLayout file to a template file (variable values replaced by their names).
+	 * 
+	 * @param reportFile The file to export.
+	 * @param exportFile The file to export to.
+	 * @throws Exception If something fails.
+	 */
+	public static void exportLayoutToTemplateFile(File reportFile, File exportFile)
+	throws Exception
+	{
+		try {
+			Map<String, String> variables = getTemplateReplaceVariables();
+			Map<Pattern, String> replacements = new HashMap<Pattern, String>();
+			for (Map.Entry<String, String> varEntry : variables.entrySet()) {
+				Pattern pat =  Pattern.compile(Pattern.quote(varEntry.getValue()));
+				// TODO: FIXME: Pattern.quote does not seem to work with replaceAll later ?!?
+//				replacements.put(pat, Pattern.quote("${" + varEntry.getKey() + "}"));
+				replacements.put(pat, "\\$\\{" + varEntry.getKey() + "\\}");
+			}
+			Writer writer = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(exportFile), IOUtil.CHARSET_NAME_UTF_8));
+			BufferedReader reader = new BufferedReader(new InputStreamReader(new FileInputStream(reportFile), IOUtil.CHARSET_NAME_UTF_8));
+			try {
+				String line = null;
+				while ((line = reader.readLine()) != null) {
+					String tmpStr = line;
+					for (Map.Entry<Pattern, String> varEntry : replacements.entrySet()) {
+						tmpStr = varEntry.getKey().matcher(tmpStr).replaceAll(varEntry.getValue());
+					}
+					writer.write(tmpStr + "\n");					
+				}
+			} finally {
+				reader.close();
+				writer.close();
+			}
+		} catch (NamingException e) {
+			throw new RuntimeException(e);
+		}
+	}
+	/**
+	 * Import the given template file as ReportLayout file 
+	 * (variable names replaced by their values: see {@link #getTemplateReplaceVariables()}).
+	 * 
+	 * @param templateFile The file to import.
+	 * @param layoutFile The file to create.
+	 * @throws Exception If something fails.
+	 */
+	public static void importTemplateToLayoutFile(File templateFile, File layoutFile)
+	throws Exception
+	{
+		Map<String, String> variables = getTemplateReplaceVariables();		
+		IOUtil.replaceTemplateVariables(layoutFile, templateFile, IOUtil.CHARSET_NAME_UTF_8, variables);
 	}
 	
 	/**
@@ -515,7 +597,7 @@ public class ReportingInitialiser {
 			if (setup == null) {
 				// if setup not created by now, create it
 				setup = new ReportParameterAcquisitionSetup(organisationID, IDGenerator.nextID(ReportParameterAcquisitionSetup.class), layout);
-				setup = (ReportParameterAcquisitionSetup) pm.makePersistent(setup);
+				setup = pm.makePersistent(setup);
 			}
 			
 			// (re-)create the use case
@@ -810,7 +892,7 @@ public class ReportingInitialiser {
 				localisationData.getLocale();
 			} catch (JDOObjectNotFoundException e) {
 				localisationData = new ReportLayoutLocalisationData(layout, locale);
-				localisationData = (ReportLayoutLocalisationData) pm.makePersistent(localisationData);
+				localisationData = pm.makePersistent(localisationData);
 			}
 			try {
 				localisationData.loadFile(resFile);

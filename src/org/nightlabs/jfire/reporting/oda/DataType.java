@@ -160,10 +160,34 @@ public class DataType {
 		return types;
 	}
 	
-	public static int classToDataType(Class dataType) {
-		Integer type = classes2Types.get(dataType);
+	/**
+	 * Tries to lookup the datatype definition integer for the given class
+	 * as statically registered in the index of this class.
+	 * <p>
+	 * This method will also search for all super-classes and implemented
+	 * interfaces of the given class.
+	 * </p>
+	 * @param dataType The class to search the definition integer for.
+	 * @return The datatype definition definition integer or {@link #STRING} if nothing could be found.
+	 */
+	public static int classToDataType(Class<?> dataType) {
+		Integer type = null;
+		Class<?> checkClass = dataType;
+		while (type == null && (checkClass != Object.class)) {
+			type = classes2Types.get(checkClass);
+			if (type == null) {
+				Class<?>[] interfaces = checkClass.getInterfaces();
+				for (Class<?> interfaceClass : interfaces) {
+					type = classes2Types.get(interfaceClass);
+					if (type != null)
+						return type.intValue();
+				}
+			}
+			checkClass = checkClass.getSuperclass();
+		}
 		if (type != null)
 			return type.intValue();
+		
 //		return UNKNOWN;
 		return STRING;
 	}

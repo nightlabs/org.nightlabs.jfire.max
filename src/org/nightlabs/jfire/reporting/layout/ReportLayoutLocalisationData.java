@@ -23,7 +23,7 @@ import javax.jdo.listener.StoreCallback;
 
 import org.nightlabs.io.DataBuffer;
 import org.nightlabs.jfire.reporting.layout.id.ReportRegistryItemID;
-import org.nightlabs.util.Util;
+import org.nightlabs.util.IOUtil;
 
 /**
  * Holds the contents of a properties file that is used in report localisation.
@@ -172,7 +172,7 @@ public class ReportLayoutLocalisationData implements StoreCallback, Serializable
 			try {
 				FileInputStream in = new FileInputStream(f);
 				try {
-					Util.transferStreamData(in, out);
+					IOUtil.transferStreamData(in, out);
 				} finally {
 					in.close();
 				}
@@ -193,6 +193,9 @@ public class ReportLayoutLocalisationData implements StoreCallback, Serializable
 	 * Creates a new {@link InputStream} for the report messages file
 	 * that is wrapped by an {@link InflaterInputStream}.
 	 * This means you can read the messages unzipped from the returend stream.
+	 * <p>
+	 * Note that this will create a new {@link InputStream} and you need to make sure to close it.
+	 * </p>
 	 */
 	public InputStream createLocalisationDataInputStream() {
 		return new InflaterInputStream(new ByteArrayInputStream(localisationData));

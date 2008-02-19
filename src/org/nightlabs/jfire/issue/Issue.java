@@ -152,8 +152,6 @@ implements
 	 *		element-type="IssueLink"
 	 *		dependent-value="true"
 	 *		mapped-by="issue"
-	 *
-	 * @jdo.join
 	 */
 	private Set<IssueLink> issueLinks;
 	

@@ -142,7 +142,7 @@ public class IssueDAO extends BaseJDOObjectDAO<IssueID, Issue>{
 	}
 	
 	@SuppressWarnings("unchecked")
-	public List<Issue> getIssuesForQueries(Collection<JDOQuery> queries, String[] fetchGroups,
+	public List<Issue> getIssuesForQueries(Collection<? extends JDOQuery> queries, String[] fetchGroups,
 			int maxFetchDepth, ProgressMonitor monitor)
 	{
 		try {

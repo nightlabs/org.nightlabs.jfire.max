@@ -414,18 +414,18 @@ implements SessionBean{
 	 * @ejb.permission role-name="_Guest_"
 	 * @ejb.transaction type="Supports" @!This usually means that no transaction is opened which is significantly faster and recommended for all read-only EJB methods! Marco.
 	 */	
-	public Set<IssueID> getIssueIDs(Collection<JDOQuery> queries) 
+	public Set<IssueID> getIssueIDs(Collection<? extends JDOQuery<? extends Issue>> queries)
 	{
 		PersistenceManager pm = getPersistenceManager();
 		try {
 			pm.getFetchPlan().setMaxFetchDepth(1);
 			pm.getFetchPlan().setGroup(FetchPlan.DEFAULT);
 
-			Collection<Issue> issues = null;
-			for (JDOQuery query : queries) {
+			Collection<? extends Issue> issues = null;
+			for (JDOQuery<? extends Issue> query : queries) {
 				query.setPersistenceManager(pm);
 				query.setCandidates(issues);
-				issues = (Collection) query.getResult();
+				issues = query.getResult();
 			}
 
 			return NLJDOHelper.getObjectIDSet(issues);

@@ -172,8 +172,10 @@ public class DataType {
 	 */
 	public static int classToDataType(Class<?> dataType) {
 		Integer type = null;
+		if (dataType == null)
+			throw new IllegalArgumentException("Parameter dataType can not be null classToDataType");
 		Class<?> checkClass = dataType;
-		while (type == null && (checkClass != Object.class)) {
+		while (type == null && (checkClass != null && checkClass != Object.class)) {
 			type = classes2Types.get(checkClass);
 			if (type == null) {
 				Class<?>[] interfaces = checkClass.getInterfaces();

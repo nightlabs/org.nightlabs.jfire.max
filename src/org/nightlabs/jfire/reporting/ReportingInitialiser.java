@@ -442,10 +442,12 @@ public class ReportingInitialiser {
 	 * <li>${devOrganisationIDConverted}</li>
 	 * </ul>
 	 * </p>
+	 * @param useAlsoDummyRootOrganisationID Whether to use the local organisationID as ${rootOrganisationID}
+	 * 		when there the server is in standalone mode. 
 	 * @return The variable names and values
 	 * @throws Exception If something fails getting the organisationID or the rootOrganisationID
 	 */
-	public static Map<String, String> getTemplateReplaceVariables() 
+	protected static Map<String, String> getTemplateReplaceVariables(boolean useAlsoDummyRootOrganisationID) 
 	throws Exception 
 	{
 		String organisationID = SecurityReflector.getUserDescriptor().getOrganisationID();
@@ -453,7 +455,7 @@ public class ReportingInitialiser {
 		try {
 			InitialContext ctx = new InitialContext(SecurityReflector.getInitialContextProperties());
 			String rootOrganisationID = null;
-			if (Organisation.hasRootOrganisation(ctx))
+			if (Organisation.hasRootOrganisation(ctx) || useAlsoDummyRootOrganisationID)
 				 rootOrganisationID = Organisation.getRootOrganisationID(ctx);			
 			try {
 				if (rootOrganisationID != null) {
@@ -484,7 +486,7 @@ public class ReportingInitialiser {
 	throws Exception
 	{
 		try {
-			Map<String, String> variables = getTemplateReplaceVariables();
+			Map<String, String> variables = getTemplateReplaceVariables(false);
 			Map<Pattern, String> replacements = new HashMap<Pattern, String>();
 			for (Map.Entry<String, String> varEntry : variables.entrySet()) {
 				Pattern pat =  Pattern.compile(Pattern.quote(varEntry.getValue()));
@@ -522,7 +524,7 @@ public class ReportingInitialiser {
 	public static void importTemplateToLayoutFile(File templateFile, File layoutFile)
 	throws Exception
 	{
-		Map<String, String> variables = getTemplateReplaceVariables();		
+		Map<String, String> variables = getTemplateReplaceVariables(true);		
 		IOUtil.replaceTemplateVariables(layoutFile, templateFile, IOUtil.CHARSET_NAME_UTF_8, variables);
 	}
 	

@@ -100,7 +100,7 @@ extends BaseJDOObjectDAO<ArticleContainerID, ArticleContainer>
 	
 	public Collection<ArticleContainer> getArticleContainersForQueries(
 //			Collection<JDOQuery<ArticleContainer>> queries,
-			Collection<JDOQuery> queries,
+			Collection<? extends JDOQuery> queries,
 			String[] fetchGroups,
 			int maxFetchDepth, ProgressMonitor monitor)
 	{

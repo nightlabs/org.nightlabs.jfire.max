@@ -60,7 +60,10 @@ extends JDOQuery<Account>
 	 * the AnchorID of the owner
 	 */
 	private AnchorID ownerID = null;
-	
+
+//	@SuppressWarnings("unused") // used as parameter in the JDOQL
+//	private transient Anchor owner;
+
 	/**
 	 * the name (or part of the name) of the owner
 	 */
@@ -98,7 +101,7 @@ extends JDOQuery<Account>
 		if (anchorID != null)
 			filter.append("\n && this.anchorID == :anchorID");
 			
-		if (name != null) {
+		if (name != null && !"".equals(name)) {
 			filter.append("\n && ( ");
 			addFullTextSearch(filter, vars, "name");
 			filter.append(")");
@@ -113,10 +116,12 @@ extends JDOQuery<Account>
 					"this.owner.anchorTypeID == \""+ownerID.anchorTypeID+"\" && " +
 					"this.owner.anchorID == \""+ownerID.anchorID+"\"" +
 							")");
+//			owner = (Anchor) getPersistenceManager().getObjectById(ownerID);
+//			filter.append("\n && this.owner == :owner");
 		}
-		
-		if (ownerName != null) {
-			filter.append("\n && (this.owner.person.displayName.toLowerCase().indexOf(\""+ownerName.toLowerCase()+"\") >= 0)");
+
+		if (ownerName != null && !"".equals(ownerName)) {
+			filter.append("\n && this.owner.person.displayName.toLowerCase().indexOf(\""+ownerName.toLowerCase()+"\") >= 0");
 		}
 		
 		if (logger.isDebugEnabled()) {
@@ -136,12 +141,12 @@ extends JDOQuery<Account>
 	{
 		if (vars.length() > 0)
 			vars.append("; ");
-		
+
 		String varName = member+"Var";
 		vars.append(String.class.getName()+" "+varName);
 		String containsStr = "containsValue("+varName+")";
 		if (nameLanguageID != null)
-			containsStr = "containsEntry(\""+nameLanguageID+"\","+varName+")";
+			containsStr = "containsEntry(:nameLanguageID, "+varName+")";
 		filter.append("\n (\n" +
 				"  this."+member+".names."+containsStr+"\n" +
 				"  && "+varName+".toLowerCase().matches(:name.toLowerCase())" +

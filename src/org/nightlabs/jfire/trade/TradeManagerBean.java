@@ -1558,7 +1558,7 @@ implements SessionBean
 	 * @ejb.permission role-name="_Guest_"
 	 * @ejb.transaction type="Supports" @!This usually means that no transaction is opened which is significantly faster and recommended for all read-only EJB methods! Marco.
 	 */
-	public Set<ArticleContainerID> getArticleContainerIDs(Collection<JDOQuery<ArticleContainer>> queries)
+	public Set<ArticleContainerID> getArticleContainerIDs(Collection<? extends JDOQuery<? extends ArticleContainer>> queries)
 	{
 		PersistenceManager pm = getPersistenceManager();
 		try {
@@ -1668,15 +1668,21 @@ implements SessionBean
 	 * @ejb.permission role-name="_Guest_"
 	 * @ejb.transaction type="Supports" @!This usually means that no transaction is opened which is significantly faster and recommended for all read-only EJB methods! Marco.
 	 */
-	public Set<OfferID> getOfferIDs(Collection<JDOQuery> queries)
+	public Set<OfferID> getOfferIDs(Collection<? extends JDOQuery<? extends Offer>> queries)
 	{
+		if (queries == null)
+			throw new IllegalArgumentException("queries must not be null!");
+
+		if (queries.isEmpty())
+			throw new IllegalArgumentException("queries must not be empty!");
+
 		PersistenceManager pm = getPersistenceManager();
 		try {
 			pm.getFetchPlan().setMaxFetchDepth(1);
 			pm.getFetchPlan().setGroup(FetchPlan.DEFAULT);
 
-			Collection<Offer> offers = null;
-			for (JDOQuery query : queries) {
+			Collection<? extends Offer> offers = null;
+			for (JDOQuery<? extends Offer> query : queries) {
 				query.setPersistenceManager(pm);
 				query.setCandidates(offers);
 				offers = query.getResult();
@@ -1693,15 +1699,15 @@ implements SessionBean
 	 * @ejb.permission role-name="_Guest_"
 	 * @ejb.transaction type="Supports" @!This usually means that no transaction is opened which is significantly faster and recommended for all read-only EJB methods! Marco.
 	 */
-	public Set<OrderID> getOrderIDs(Collection<JDOQuery> queries)
+	public Set<OrderID> getOrderIDs(Collection<? extends JDOQuery<? extends Order>> queries)
 	{
 		PersistenceManager pm = getPersistenceManager();
 		try {
 			pm.getFetchPlan().setMaxFetchDepth(1);
 			pm.getFetchPlan().setGroup(FetchPlan.DEFAULT);
 
-			Collection<Order> orders = null;
-			for (JDOQuery query : queries) {
+			Collection<? extends Order> orders = null;
+			for (JDOQuery<? extends Order> query : queries) {
 				query.setPersistenceManager(pm);
 				query.setCandidates(orders);
 				orders = query.getResult();

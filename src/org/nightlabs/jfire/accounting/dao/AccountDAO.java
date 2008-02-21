@@ -68,7 +68,7 @@ extends BaseJDOObjectDAO<AnchorID, Account>
 	}
 
 	@SuppressWarnings("unchecked")
-	public List<Account> getAccountsForQueries(Collection<JDOQuery> queries, String[] fetchGroups,
+	public List<Account> getAccountsForQueries(Collection<? extends JDOQuery<? extends Account>> queries, String[] fetchGroups,
 			int maxFetchDepth, ProgressMonitor monitor)
 	{
 		try {

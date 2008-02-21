@@ -8,11 +8,12 @@ import org.apache.log4j.Logger;
 import org.nightlabs.jdo.query.JDOQuery;
 import org.nightlabs.jfire.security.id.UserID;
 import org.nightlabs.jfire.trade.ArticleContainer;
+import org.nightlabs.jfire.trade.Offer;
 import org.nightlabs.jfire.transfer.id.AnchorID;
 
 /**
  * @author Daniel.Mazurek [at] NightLabs [dot] de
- *
+ * @author marco schulze - marco at nightlabs dot de
  */
 public class ArticleContainerQuery
 extends JDOQuery<ArticleContainer>
@@ -30,7 +31,10 @@ extends JDOQuery<ArticleContainer>
 		
 		if (!ArticleContainer.class.isAssignableFrom(articleContainerClass))
 			throw new IllegalArgumentException("Param articleContainerClass must implement the interface "+ArticleContainer.class);
-		
+
+		if (Offer.class.isAssignableFrom(articleContainerClass) && !(this instanceof OfferQuery))
+			throw new IllegalStateException("Instantiate an instance of OfferQuery instead!");
+
 		this.articleContainerClass = articleContainerClass;
 	}
 	
@@ -69,18 +73,8 @@ extends JDOQuery<ArticleContainer>
 				"this.createUser.userID == \""+createUserID.userID+"\"" +
 						")");
 		}
-		if (vendorID != null)
-		{
-			// FIXME: JPOX Bug JDOHelper.getObjectId(this.*) does not seem to work (java.lang.IndexOutOfBoundsException: Index: 3, Size: 3)
-//			filter.append("\n && JDOHelper.getObjectId(this.vendor) == :vendorID");
-			// WORKAROUND:
-			filter.append("\n && (" +
-					"this.vendor.organisationID == \""+vendorID.organisationID+"\" && " +
-					"this.vendor.anchorTypeID == \""+vendorID.anchorTypeID+"\" && " +
-					"this.vendor.anchorID == \""+vendorID.anchorID+"\"" +
-							")");
-		}
 	  // own to method to allow override for Offer where it is different
+		checkVendor(filter);
 		checkCustomer(filter);
 		
 //		if (currency != null)
@@ -97,6 +91,20 @@ extends JDOQuery<ArticleContainer>
 		q.setFilter(filter.toString());
 		
 		return q;
+	}
+
+	protected void checkVendor(StringBuffer filter) {
+		if (vendorID != null)
+		{
+			// FIXME: JPOX Bug JDOHelper.getObjectId(this.*) does not seem to work (java.lang.IndexOutOfBoundsException: Index: 3, Size: 3)
+//			filter.append("\n && JDOHelper.getObjectId(this.vendor) == :vendorID");
+			// WORKAROUND:
+			filter.append("\n && (" +
+					"this.vendor.organisationID == \""+vendorID.organisationID+"\" && " +
+					"this.vendor.anchorTypeID == \""+vendorID.anchorTypeID+"\" && " +
+					"this.vendor.anchorID == \""+vendorID.anchorID+"\"" +
+							")");
+		}	
 	}
 
 	// own to method to allow override for Offer where it is different

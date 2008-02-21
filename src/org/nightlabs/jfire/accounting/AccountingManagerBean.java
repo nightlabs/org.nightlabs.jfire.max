@@ -101,6 +101,7 @@ import org.nightlabs.jfire.accounting.priceconfig.AffectedProductType;
 import org.nightlabs.jfire.accounting.priceconfig.FetchGroupsPriceConfig;
 import org.nightlabs.jfire.accounting.priceconfig.PriceConfigUtil;
 import org.nightlabs.jfire.accounting.priceconfig.id.PriceConfigID;
+import org.nightlabs.jfire.accounting.query.InvoiceQuery;
 import org.nightlabs.jfire.accounting.query.MoneyTransferIDQuery;
 import org.nightlabs.jfire.accounting.query.MoneyTransferQuery;
 import org.nightlabs.jfire.base.BaseSessionBeanImpl;
@@ -2253,7 +2254,7 @@ public abstract class AccountingManagerBean
 	 * @ejb.permission role-name="_Guest_"
 	 * @ejb.transaction type="Supports" @!This usually means that no transaction is opened which is significantly faster and recommended for all read-only EJB methods! Marco.
 	 */
-	public Set<InvoiceID> getInvoiceIDs(Collection<JDOQuery> invoiceQueries)
+	public Set<InvoiceID> getInvoiceIDs(Collection<? extends JDOQuery<? extends Invoice>> invoiceQueries)
 	{
 		PersistenceManager pm = getPersistenceManager();
 		try {
@@ -2261,7 +2262,7 @@ public abstract class AccountingManagerBean
 			pm.getFetchPlan().setGroup(FetchPlan.DEFAULT);
 
 			Set<Invoice> invoices = null;
-			for (JDOQuery query : invoiceQueries) {
+			for (JDOQuery<? extends Invoice> query : invoiceQueries) {
 				query.setPersistenceManager(pm);
 				query.setCandidates(invoices);
 				invoices = new HashSet<Invoice>(query.getResult());
@@ -2735,18 +2736,18 @@ public abstract class AccountingManagerBean
 	 * @ejb.permission role-name="_Guest_"
 	 * @ejb.transaction type="Supports" @!This usually means that no transaction is opened which is significantly faster and recommended for all read-only EJB methods! Marco.
 	 */
-	public Set<AnchorID> getAccountIDs(Collection<JDOQuery> queries)
+	public Set<AnchorID> getAccountIDs(Collection<? extends JDOQuery<? extends Account>> queries)
 	{
 		PersistenceManager pm = getPersistenceManager();
 		try {
 			pm.getFetchPlan().setMaxFetchDepth(1);
 			pm.getFetchPlan().setGroup(FetchPlan.DEFAULT);
 
-			Collection<Account> accounts = null;
-			for (JDOQuery query : queries) {
+			Collection<?> accounts = null;
+			for (JDOQuery<?> query : queries) {
 				query.setPersistenceManager(pm);
 				query.setCandidates(accounts);
-				accounts = (Collection) query.getResult();
+				accounts = query.getResult();
 			}
 
 			return NLJDOHelper.getObjectIDSet(accounts);

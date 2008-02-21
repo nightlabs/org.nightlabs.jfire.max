@@ -54,7 +54,7 @@ extends BaseJDOObjectDAO<AnchorID, Repository>
 	}
 
 	@SuppressWarnings("unchecked")
-	public List<Repository> getRepositoriesForQueries(Collection<JDOQuery> queries, String[] fetchGroups,
+	public List<Repository> getRepositoriesForQueries(Collection<? extends JDOQuery<? extends Repository>> queries, String[] fetchGroups,
 			int maxFetchDepth, ProgressMonitor monitor)
 	{
 		try {

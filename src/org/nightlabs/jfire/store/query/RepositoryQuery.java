@@ -73,7 +73,7 @@ extends JDOQuery<Repository>
 			filter.append("\n && this.repositoryType == :repositoryType");
 		}
 
-		if (name != null) {
+		if (name != null && !"".equals(name)) {
 			filter.append("\n && ( ");
 			addFullTextSearch(filter, vars, "name");
 			filter.append(")");
@@ -90,7 +90,7 @@ extends JDOQuery<Repository>
 						")");
 		}
 		
-		if (ownerName != null) {
+		if (ownerName != null && !"".equals(ownerName)) {
 			filter.append("\n && (this.owner.person.displayName.toLowerCase().indexOf(\""+ownerName.toLowerCase()+"\") >= 0)");
 		}
 		

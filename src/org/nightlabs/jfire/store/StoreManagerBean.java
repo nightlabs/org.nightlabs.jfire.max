@@ -1874,18 +1874,18 @@ implements SessionBean
 	 * @ejb.permission role-name="_Guest_"
 	 * @ejb.transaction type="Supports" @!This usually means that no transaction is opened which is significantly faster and recommended for all read-only EJB methods! Marco.
 	 */
-	public Set<AnchorID> getRepositoryIDs(Collection<JDOQuery> queries)
+	public Set<AnchorID> getRepositoryIDs(Collection<? extends JDOQuery<? extends Repository>> queries)
 	{
 		PersistenceManager pm = getPersistenceManager();
 		try {
 			pm.getFetchPlan().setMaxFetchDepth(1);
 			pm.getFetchPlan().setGroup(FetchPlan.DEFAULT);
 
-			Collection<Repository> repositories = null;
-			for (JDOQuery query : queries) {
+			Collection<? extends Repository> repositories = null;
+			for (JDOQuery<? extends Repository> query : queries) {
 				query.setPersistenceManager(pm);
 				query.setCandidates(repositories);
-				repositories = (Collection) query.getResult();
+				repositories = query.getResult();
 			}
 
 			return NLJDOHelper.getObjectIDSet(repositories);

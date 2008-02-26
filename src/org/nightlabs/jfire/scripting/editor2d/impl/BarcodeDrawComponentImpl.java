@@ -33,6 +33,7 @@ import net.sourceforge.barbecue.BarcodeException;
 import net.sourceforge.barbecue.linear.code128.Code128Barcode;
 
 import org.apache.log4j.Logger;
+import org.nightlabs.editor2d.DrawComponent;
 import org.nightlabs.editor2d.DrawComponentContainer;
 import org.nightlabs.editor2d.impl.DrawComponentImpl;
 import org.nightlabs.editor2d.render.BaseRenderer;
@@ -52,9 +53,6 @@ public class BarcodeDrawComponentImpl
 extends DrawComponentImpl
 implements BarcodeDrawComponent
 {
-	/**
-	 * 
-	 */
 	private static final long serialVersionUID = 1L;
 	public static final Logger logger = Logger.getLogger(BarcodeDrawComponentImpl.class);
 	
@@ -428,7 +426,7 @@ implements BarcodeDrawComponent
 	}
 
 	@Override
-	public Class<?> getRenderModeClass() {
+	public Class<? extends DrawComponent> getRenderModeClass() {
 		return BarcodeDrawComponent.class;
 	}
 	

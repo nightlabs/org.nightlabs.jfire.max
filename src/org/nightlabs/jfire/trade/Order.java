@@ -759,13 +759,12 @@ implements Serializable, ArticleContainer, SegmentContainer, DetachCallback
 	/**
 	 * @jdo.field persistence-modifier="none"
 	 */
-	private transient Set _segments = null;
+	private transient Set<Segment> _segments = null;
 
 	/**
 	 * @return Returns the segments.
 	 */
-	@SuppressWarnings("unchecked")
-	public Collection getSegments()
+	public Collection<Segment> getSegments()
 	{
 		if (_segments == null)
 			_segments = Collections.unmodifiableSet(segments);
@@ -776,7 +775,6 @@ implements Serializable, ArticleContainer, SegmentContainer, DetachCallback
 	/**
 	 * This method is called by {@link Trader} to add a newly created <tt>Segment</tt>.
 	 */
-	@SuppressWarnings("unchecked")
 	protected void addSegment(Segment segment)
 	{
 		if (!getPrimaryKey().equals(segment.getOrder().getPrimaryKey()))
@@ -830,7 +828,7 @@ implements Serializable, ArticleContainer, SegmentContainer, DetachCallback
 	{
 		Order attached = (Order)_attached;
 		Order detached = this;
-		Collection fetchGroups = attached.getPersistenceManager().getFetchPlan().getGroups();
+		Collection<String> fetchGroups = attached.getPersistenceManager().getFetchPlan().getGroups();
 
 		if (fetchGroups.contains(FETCH_GROUP_VENDOR_ID)) {
 			detached.vendorID = attached.getVendorID();

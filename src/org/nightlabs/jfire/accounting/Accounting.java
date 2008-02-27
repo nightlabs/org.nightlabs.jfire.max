@@ -141,7 +141,7 @@ implements StoreCallback
 		accounting.mandator.setAccountant(accounting.localAccountant);
 		accounting.partnerAccountant = new PartnerAccountant(organisationID, PartnerAccountant.class.getName());
 
-		accounting = (Accounting) pm.makePersistent(accounting);
+		accounting = pm.makePersistent(accounting);
 		return accounting;
 	}
 
@@ -342,7 +342,7 @@ implements StoreCallback
 				invoiceIDPrefix, IDGenerator.nextID(Invoice.class, invoiceIDPrefix),
 				invoiceCurrency);
 		new InvoiceLocal(invoice); // registers itself in the invoice
-		invoice = (Invoice) getPersistenceManager().makePersistent(invoice);
+		invoice = getPersistenceManager().makePersistent(invoice);
 
 		ProcessDefinitionAssignment processDefinitionAssignment = (ProcessDefinitionAssignment) getPersistenceManager().getObjectById(
 				ProcessDefinitionAssignmentID.create(Invoice.class, TradeSide.vendor));
@@ -502,7 +502,7 @@ implements StoreCallback
 				to,
 				invoice
 			);
-		bookMoneyTransfer = (BookMoneyTransfer) pm.makePersistent(bookMoneyTransfer);
+		bookMoneyTransfer = pm.makePersistent(bookMoneyTransfer);
 
 		Set<Anchor> involvedAnchors = new HashSet<Anchor>();
 		ArrayList<Transfer> containers = new ArrayList<Transfer>(1);

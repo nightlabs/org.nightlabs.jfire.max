@@ -10,7 +10,6 @@ import org.jbpm.graph.exe.ExecutionContext;
 import org.nightlabs.jdo.ObjectID;
 import org.nightlabs.jdo.ObjectIDUtil;
 import org.nightlabs.jfire.base.Lookup;
-import org.nightlabs.jfire.idgenerator.IDGenerator;
 import org.nightlabs.jfire.security.SecurityReflector;
 
 public abstract class AbstractActionHandler
@@ -42,27 +41,27 @@ implements ActionHandler
 	protected PersistenceManager getPersistenceManager()
 	{
 		// TODO JPOX WORKAROUND: begin
+		// If the PMF would return a delegate to the SAME PM in all calls within the same transaction,
+		// it would be sufficient to cache it only in the local object instance (solely for performance reasons).
+		// But since we get multiple PMs which don't see each others data, we must ensure that we always work with the same one.
 		String currentOrganisationID = null;
 		if (persistenceManager == null) {
 			currentOrganisationID = SecurityReflector.getUserDescriptor().getOrganisationID();
 			persistenceManager = persistenceManagerThreadLocal.get().get(currentOrganisationID);
-
-			if (persistenceManager != null && persistenceManager.isClosed())
-				persistenceManager = null;
 		}
-		// TODO JPOX WORKAROUND: end
+
+		if (persistenceManager != null && persistenceManager.isClosed())
+			persistenceManager = null;
 
 		if (persistenceManager == null) {
-			persistenceManager = new Lookup(IDGenerator.getOrganisationID()).getPersistenceManager();
-
-		// TODO JPOX WORKAROUND: begin
-//		persistenceManagerThreadLocal.set(persistenceManager);
 			if (currentOrganisationID == null)
 				currentOrganisationID = SecurityReflector.getUserDescriptor().getOrganisationID();
 
+			persistenceManager = new Lookup(currentOrganisationID).getPersistenceManager();
+
 			persistenceManagerThreadLocal.get().put(currentOrganisationID, persistenceManager);
-		// TODO JPOX WORKAROUND: end
 		}
+		// TODO JPOX WORKAROUND: end
 
 		return persistenceManager;
 	}

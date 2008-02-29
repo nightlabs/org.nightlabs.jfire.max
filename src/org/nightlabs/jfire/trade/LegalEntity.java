@@ -113,17 +113,7 @@ public class LegalEntity extends Anchor
 			// nothing if it's not existent - we'll create it afterwards
 		}
 
-		CustomerGroup anonymousCustomerGroup;
-		try {
-			pm.getExtent(CustomerGroup.class);
-			anonymousCustomerGroup = (CustomerGroup) pm.getObjectById(CustomerGroupID.create(organisationID, CustomerGroup.CUSTOMER_GROUP_ID_ANONYMOUS));
-		} catch (JDOObjectNotFoundException x) {
-			anonymousCustomerGroup = new CustomerGroup(organisationID, CustomerGroup.CUSTOMER_GROUP_ID_ANONYMOUS);
-			anonymousCustomerGroup.getName().setText(Locale.GERMAN.getLanguage(), "Anonym");
-			anonymousCustomerGroup.getName().setText(Locale.FRENCH.getLanguage(), "Anonyme");
-			anonymousCustomerGroup.getName().setText(Locale.ENGLISH.getLanguage(), "Anonymous");
-			pm.makePersistent(anonymousCustomerGroup);
-		}
+		CustomerGroup anonymousCustomerGroup = (CustomerGroup) pm.getObjectById(CustomerGroupID.create(organisationID, CustomerGroup.CUSTOMER_GROUP_ID_ANONYMOUS));
 
 		// It's better to have a Person for EVERY LegalEntity
 		Person person = new Person(IDGenerator.getOrganisationID(), IDGenerator.nextID(PropertySet.class));

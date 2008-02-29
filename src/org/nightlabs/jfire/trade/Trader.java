@@ -81,6 +81,7 @@ import org.nightlabs.jfire.store.DeliveryNote;
 import org.nightlabs.jfire.store.NotAvailableException;
 import org.nightlabs.jfire.store.Product;
 import org.nightlabs.jfire.store.ProductLocal;
+import org.nightlabs.jfire.store.ProductType;
 import org.nightlabs.jfire.store.ProductTypeActionHandler;
 import org.nightlabs.jfire.store.ProductTypeActionHandlerCache;
 import org.nightlabs.jfire.store.Store;
@@ -149,15 +150,26 @@ public class Trader
 		trader.organisationID = trader.accounting.getOrganisationID();
 		trader.mandator = trader.accounting.getMandator();
 
-		trader.defaultCustomerGroupForKnownCustomer = new CustomerGroup(
-				trader.organisationID, CustomerGroup.CUSTOMER_GROUP_ID_DEFAULT);
-		trader.defaultCustomerGroupForKnownCustomer.getName().setText(
-				Locale.GERMAN.getLanguage(), "Standard");
-		trader.defaultCustomerGroupForKnownCustomer.getName().setText(
-				Locale.FRENCH.getLanguage(), "Standard");
-		trader.defaultCustomerGroupForKnownCustomer.getName().setText(
-				Locale.ENGLISH.getLanguage(), "Default");
+		// create customer groups
+		CustomerGroup anonymousCustomerGroup = new CustomerGroup(trader.organisationID, CustomerGroup.CUSTOMER_GROUP_ID_ANONYMOUS);
+		anonymousCustomerGroup.getName().setText(Locale.GERMAN.getLanguage(), "Anonym");
+		anonymousCustomerGroup.getName().setText(Locale.FRENCH.getLanguage(), "Anonyme");
+		anonymousCustomerGroup.getName().setText(Locale.ENGLISH.getLanguage(), "Anonymous");
+		anonymousCustomerGroup = pm.makePersistent(anonymousCustomerGroup);
 
+		CustomerGroup resellerCustomerGroup = new CustomerGroup(trader.organisationID, CustomerGroup.CUSTOMER_GROUP_ID_RESELLER);
+		resellerCustomerGroup.getName().setText(Locale.GERMAN.getLanguage(), "Wiederverkäufer");
+//		resellerCustomerGroup.getName().setText(Locale.FRENCH.getLanguage(), "Reseller");
+		resellerCustomerGroup.getName().setText(Locale.ENGLISH.getLanguage(), "Reseller");
+		resellerCustomerGroup = pm.makePersistent(resellerCustomerGroup);
+
+		CustomerGroup defaultCustomerGroup = new CustomerGroup(trader.organisationID, CustomerGroup.CUSTOMER_GROUP_ID_DEFAULT);
+		defaultCustomerGroup.getName().setText(Locale.GERMAN.getLanguage(), "Standard");
+		defaultCustomerGroup.getName().setText(Locale.FRENCH.getLanguage(), "Standard");
+		defaultCustomerGroup.getName().setText(Locale.ENGLISH.getLanguage(), "Default");
+		defaultCustomerGroup = pm.makePersistent(defaultCustomerGroup);
+
+		trader.defaultCustomerGroupForKnownCustomer = defaultCustomerGroup;
 		trader = pm.makePersistent(trader);
 
 		logger.info("getTrader: ...new Trader instance created and persisted!");

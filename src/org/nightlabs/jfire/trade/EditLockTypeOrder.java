@@ -66,7 +66,7 @@ extends EditLockType
 					Trader trader = Trader.getTrader(pm);
 					User user = SecurityReflector.getUserDescriptor().getUser(pm);
 					if (!order.getArticles().isEmpty()) {
-						trader.releaseArticles(user, order.getArticles(), true, true);
+						trader.releaseArticles(user, order.getArticles(), true, false, true);
 						trader.deleteArticles(user, order.getArticles());
 					}
 				} // if (!containsFinalizedOffer) {

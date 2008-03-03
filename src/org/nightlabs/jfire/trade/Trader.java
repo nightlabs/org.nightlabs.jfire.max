@@ -81,7 +81,6 @@ import org.nightlabs.jfire.store.DeliveryNote;
 import org.nightlabs.jfire.store.NotAvailableException;
 import org.nightlabs.jfire.store.Product;
 import org.nightlabs.jfire.store.ProductLocal;
-import org.nightlabs.jfire.store.ProductType;
 import org.nightlabs.jfire.store.ProductTypeActionHandler;
 import org.nightlabs.jfire.store.ProductTypeActionHandlerCache;
 import org.nightlabs.jfire.store.Store;
@@ -1027,16 +1026,16 @@ public class Trader
 	 *		{@link AsyncInvoke#exec(Invocation, org.nightlabs.jfire.asyncinvoke.SuccessCallback, ErrorCallback, UndeliverableCallback, boolean)}.
 	 */
 	public void releaseArticles(User user, Collection<Article> articles,
-			boolean synchronously, boolean enableXA) throws ModuleException
+			boolean synchronously, boolean deleteAfterRelease, boolean enableXA) throws ModuleException
 	{
 		try {
 			releaseArticlesBegin(user, articles);
 
 			if (synchronously)
-				releaseArticlesEnd(user, articles);
+				releaseArticlesEnd(user, articles, deleteAfterRelease);
 			else
 				AsyncInvoke.exec(
-						new ReleaseArticlesEndInvocation(user, articles),
+						new ReleaseArticlesEndInvocation(user, articles, deleteAfterRelease),
 						null,
 						new ReleaseArticlesEndErrorCallback(),
 						new ReleaseArticlesEndUndeliverableCallback(),
@@ -1113,15 +1112,18 @@ public class Trader
 
 		private Collection articleIDs;
 
+		private boolean deleteAfterRelease;
+		
 		public Collection getArticleIDs()
 		{
 			return articleIDs;
 		}
 
-		public ReleaseArticlesEndInvocation(User user, Collection<Article> articles)
+		public ReleaseArticlesEndInvocation(User user, Collection<Article> articles, boolean deleteAfterRelease)
 		{
 			this.userID = (UserID) JDOHelper.getObjectId(user);
 			this.articleIDs = NLJDOHelper.getObjectIDSet(articles);
+			this.deleteAfterRelease = deleteAfterRelease;
 		}
 
 		@Override
@@ -1132,14 +1134,14 @@ public class Trader
 //				Thread.sleep(3000);
 //			} catch (InterruptedException x) {
 //			}
-
+			
 			PersistenceManager pm = getPersistenceManager();
 			try {
 				pm.getExtent(User.class);
 				User user = (User) pm.getObjectById(userID);
 				Collection<Article> articles = NLJDOHelper.getObjectSet(pm, articleIDs,
 						Article.class);
-				Trader.getTrader(pm).releaseArticlesEnd(user, articles);
+				Trader.getTrader(pm).releaseArticlesEnd(user, articles, deleteAfterRelease);
 			} finally {
 				pm.close();
 			}
@@ -1237,7 +1239,7 @@ public class Trader
 		}
 	}
 
-	protected void releaseArticlesEnd(User user, Collection<Article> articles)
+	protected void releaseArticlesEnd(User user, Collection<Article> articles, boolean deleteAfterRelease)
 			throws ModuleException
 	{
 		TotalArticleStatus tas = getTotalArticleStatus(articles);
@@ -1281,6 +1283,10 @@ public class Trader
 
 		for (Map.Entry<ProductTypeActionHandler, List<Article>> me : productTypeActionHandler2Articles.entrySet()) {
 			me.getKey().onReleaseArticlesEnd(user, this, me.getValue());
+		}
+		
+		if (deleteAfterRelease) {
+			deleteArticles(user, articles);
 		}
 	}
 

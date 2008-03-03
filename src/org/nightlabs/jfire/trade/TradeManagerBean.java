@@ -1214,18 +1214,27 @@ implements SessionBean
 		PersistenceManager pm = getPersistenceManager();
 		try {
 			pm.getExtent(Article.class);
-			Collection<Article> articles = new ArrayList<Article>(articleIDs.size());
+			Collection<Article> nonAllocatedArticles = new HashSet<Article>(articleIDs.size());
 			Set<Offer> offers = validate ? new HashSet<Offer>() : null;
+			Set<Article> allocatedArticles = new HashSet<Article>(articleIDs.size());
 			for (ArticleID articleID : articleIDs) {
 				Article article = (Article) pm.getObjectById(articleID);
-				articles.add(article);
-
 				if (validate)
 					offers.add(article.getOffer());
+				
+				if (article.isAllocated())
+					allocatedArticles.add(article);
+				else
+					nonAllocatedArticles.add(article);
 			}
 
 			Trader trader = Trader.getTrader(pm);
-			trader.deleteArticles(User.getUser(pm, getPrincipal()), articles);
+			
+			if (!allocatedArticles.isEmpty())
+				trader.releaseArticles(User.getUser(pm, getPrincipal()), allocatedArticles, false, true, true);
+			
+			if (!nonAllocatedArticles.isEmpty())
+				trader.deleteArticles(User.getUser(pm, getPrincipal()), nonAllocatedArticles);
 
 			if (validate) {
 				for (Offer offer : offers)
@@ -1252,8 +1261,8 @@ implements SessionBean
 			Collection<Article> articles = NLJDOHelper.getObjectList(pm, articleIDs, Article.class);
 
 			Trader trader = Trader.getTrader(pm);
-			trader.releaseArticles(User.getUser(pm, getPrincipal()), articles, synchronously, true);
-
+			trader.releaseArticles(User.getUser(pm, getPrincipal()), articles, synchronously, false, true);
+			
 			if (!get)
 				return null;
 

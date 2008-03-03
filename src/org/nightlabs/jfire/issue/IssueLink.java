@@ -16,12 +16,12 @@ import java.io.Serializable;
  * @jdo.create-objectid-class
  * 		field-order="organisationID, issueID, issueLinkID"
  * 
- * @jdo.fetch-group name="IssueLink.this" fetch-groups="default" fields="relation"
+ * @jdo.fetch-group name="IssueLink.this" fetch-groups="default" fields="issueLinkType"
  * 
  */ 
 public class IssueLink 
-implements Serializable{
-	
+implements Serializable
+{
 	public static final String FETCH_GROUP_THIS = "IssueLink.this";
 	
 	private static final long serialVersionUID = 1L;
@@ -44,12 +44,12 @@ implements Serializable{
 	/**
 	 * @jdo.column length="100"
 	 */
-	private String referencedObjectID;
+	private String linkObjectID;
 	
 	/**
 	 * @jdo.field persistence-modifier="persistent"
 	 */
-	private String relation;
+	private IssueLinkType issueLinkType;
 	
 	/**
 	 * @jdo.field persistence-modifier="persistent"
@@ -59,11 +59,9 @@ implements Serializable{
 	/**
 	 * @deprecated Only for JDO!!!!
 	 */
-	protected IssueLink()
-	{
-	}
+	protected IssueLink() {}
 
-	public IssueLink(Issue issue, long issueLinkID, String referencedObjectID, String relation){
+	public IssueLink(Issue issue, long issueLinkID, String linkObjectID, IssueLinkType issueLinkType) {
 		if (issue == null)
 			throw new IllegalArgumentException("issue must not be null!");
 
@@ -71,8 +69,8 @@ implements Serializable{
 		this.issueID = issue.getIssueID();
 		this.issueLinkID = issueLinkID;
 		
-		this.referencedObjectID = referencedObjectID;
-		this.relation = relation;
+		this.linkObjectID = linkObjectID;
+		this.issueLinkType = issueLinkType;
 	}
 	
 	public String getOrganisationID() {
@@ -87,12 +85,11 @@ implements Serializable{
 		return issueLinkID;
 	}
 	
-	
-	public String getReferencedObjectID() {
-		return referencedObjectID;
+	public String getLinkObjectID() {
+		return linkObjectID;
 	}
 	
-	public String getRelation() {
-		return relation;
+	public IssueLinkType getIssueLinkType() {
+		return issueLinkType;
 	}
 }

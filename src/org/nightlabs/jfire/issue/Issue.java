@@ -485,39 +485,37 @@ implements
 			_referencedObjectIDs.add(referencedObjectID);
 	}*/
 	
-	public Set<ObjectID> getReferencedObjectIDs() {
-		if (_referencedObjectIDs == null) {
+	public Set<ObjectID> getLinkObjectIDs() {
+		if (_linkObjectIDs == null) {
 			Set<ObjectID> ro = new HashSet<ObjectID>(issueLinks.size());
 			for (IssueLink issueLink : issueLinks) {
-				ObjectID objectID = ObjectIDUtil.createObjectID(issueLink.getReferencedObjectID());
+				ObjectID objectID = ObjectIDUtil.createObjectID(issueLink.getLinkObjectID());
 				ro.add(objectID);
 			}
-			_referencedObjectIDs = ro;
+			_linkObjectIDs = ro;
 		}
-		return Collections.unmodifiableSet(_referencedObjectIDs);
+		return Collections.unmodifiableSet(_linkObjectIDs);
 	}
 
-	public void addReferencedObjectID(ObjectID referencedObjectID)
-	{
-		if (referencedObjectID == null)
-			throw new IllegalArgumentException("referencedObjectID must not be null!");
+	public void addLinkObjectID(ObjectID linkObjectID) {
+		if (linkObjectID == null)
+			throw new IllegalArgumentException("linkObjectID must not be null!");
 
-		issueLinks.add(new IssueLink(this, IDGenerator.nextID(IssueLink.class), referencedObjectID.toString(), "NONE"));
-		if (_referencedObjectIDs != null) // instead of managing our cache of ObjectID instances, we could alternatively simply null it here, but the current implementation is more efficient.
-			_referencedObjectIDs.add(referencedObjectID);
+		issueLinks.add(new IssueLink(this, IDGenerator.nextID(IssueLink.class), linkObjectID.toString(), new IssueLinkType()));
+		if (_linkObjectIDs != null) // instead of managing our cache of ObjectID instances, we could alternatively simply null it here, but the current implementation is more efficient.
+			_linkObjectIDs.add(linkObjectID);
 	}
 
-	public void removeReferencedObjectID(ObjectID referencedObjectID)
-	{
-		if (referencedObjectID == null)
-			throw new IllegalArgumentException("referencedObjectID must not be null!");
+	public void removeLinkObjectID(ObjectID linkObjectID) {
+		if (linkObjectID == null)
+			throw new IllegalArgumentException("linkObjectID must not be null!");
 
-		issueLinks.remove(referencedObjectID.toString());
-		if (_referencedObjectIDs != null)
-			_referencedObjectIDs.remove(referencedObjectID);
+		issueLinks.remove(linkObjectID.toString());
+		if (_linkObjectIDs != null)
+			_linkObjectIDs.remove(linkObjectID);
 	}
 	
-	public void clearReferencedObjectIDs()
+	public void clearLinkObjectIDs()
 	{
 		issueLinks.clear();
 	}
@@ -525,7 +523,7 @@ implements
 	/**
 	 * @jdo.field persistence-modifier="none"
 	 */
-	private transient Set<ObjectID> _referencedObjectIDs;
+	private transient Set<ObjectID> _linkObjectIDs;
 
 
 	public IssueResolution getIssueResolution() {
@@ -634,4 +632,11 @@ implements
 	{
 		return primaryKey;
 	}
+	
+	private void afterCreateIssueLink(IssueLink newIssueLink) {
+
+	}
+	
+	private void beforeDeleteIssueLink(IssueLink issueLinkToBeDeleted) {}
+	private void afterDeleteIssueLink(IssueLink issueLinkDeleted) {}
 }

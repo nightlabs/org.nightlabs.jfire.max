@@ -3,22 +3,16 @@ package org.nightlabs.jfire.dynamictrade.store.search;
 import javax.jdo.Query;
 
 import org.nightlabs.jfire.dynamictrade.store.DynamicProductType;
-import org.nightlabs.jfire.store.search.ProductTypeQuery;
+import org.nightlabs.jfire.store.search.AbstractProductTypeQuery;
 
 /**
  * @author Daniel.Mazurek [at] NightLabs [dot] de
  *
  */
 public class DynamicProductTypeQuery
-extends ProductTypeQuery<DynamicProductType>
+extends AbstractProductTypeQuery<DynamicProductType>
 {
-	/**
-	 * 
-	 */
 	private static final long serialVersionUID = 1L;
-
-	public DynamicProductTypeQuery() {
-	}
 
 	@Override
 	protected Query prepareQuery()
@@ -34,4 +28,9 @@ extends ProductTypeQuery<DynamicProductType>
 		return q;
 	}
 
+	@Override
+	protected Class<DynamicProductType> init()
+	{
+		return DynamicProductType.class;
+	}
 }

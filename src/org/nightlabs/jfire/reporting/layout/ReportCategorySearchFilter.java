@@ -35,21 +35,13 @@ import org.nightlabs.jdo.search.SearchFilter;
  * @author Alexander Bieber <alex[AT]nightlabs[DOT]de>
  *
  */
-public class ReportCategorySearchFilter extends SearchFilter {
-
-	
+public class ReportCategorySearchFilter
+	extends SearchFilter<ReportCategory>
+{
 	private static final long serialVersionUID = 1L;
 
 	protected ReportCategorySearchFilter() {
 		super(SearchFilter.CONJUNCTION_DEFAULT);
-	}
-
-	/* (non-Javadoc)
-	 * @see com.nightlabs.jdo.search.SearchFilter#getExtentClass()
-	 */
-	@Override
-	protected Class getExtentClass() {
-		return null;
 	}
 
 	@Override
@@ -59,6 +51,12 @@ public class ReportCategorySearchFilter extends SearchFilter {
 		)
 	{
 		
+	}
+
+	@Override
+	protected Class<ReportCategory> init()
+	{
+		return ReportCategory.class;
 	}
 
 }

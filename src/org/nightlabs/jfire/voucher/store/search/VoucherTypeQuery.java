@@ -2,7 +2,7 @@ package org.nightlabs.jfire.voucher.store.search;
 
 import javax.jdo.Query;
 
-import org.nightlabs.jfire.store.search.ProductTypeQuery;
+import org.nightlabs.jfire.store.search.AbstractProductTypeQuery;
 import org.nightlabs.jfire.voucher.store.VoucherType;
 
 /**
@@ -10,7 +10,7 @@ import org.nightlabs.jfire.voucher.store.VoucherType;
  *
  */
 public class VoucherTypeQuery
-extends ProductTypeQuery
+extends AbstractProductTypeQuery<VoucherType>
 {
 
 	/**
@@ -33,6 +33,12 @@ extends ProductTypeQuery
 		q.declareVariables(getVars().toString());
 		
 		return q;
+	}
+
+	@Override
+	protected Class<VoucherType> init()
+	{
+		return VoucherType.class;
 	}
 
 	

@@ -37,7 +37,7 @@ import org.nightlabs.jfire.store.ProductTypeSearchFilter;
  * @author Marco Schulze - Marco at NightLabs dot de
  */
 public class VoucherTypeSearchFilter
-extends ProductTypeSearchFilter
+	extends ProductTypeSearchFilter<VoucherType>
 {
 	private static final long serialVersionUID = 1L;
 
@@ -50,16 +50,16 @@ extends ProductTypeSearchFilter
 
 	@Override
 	@Implement
-	protected Class getProductTypeClass() {
-		return VoucherType.class;
-	}
-
-	@Override
-	@Implement
 	protected void prepareQuery(Set<Class<?>> imports, StringBuffer vars,
 			StringBuffer filter, StringBuffer params, Map<String, Object> paramMap,
 			StringBuffer result) {
 		filter.append("this.published && this.saleable");
+	}
+
+	@Override
+	protected Class<VoucherType> init()
+	{
+		return VoucherType.class;
 	}
 
 }

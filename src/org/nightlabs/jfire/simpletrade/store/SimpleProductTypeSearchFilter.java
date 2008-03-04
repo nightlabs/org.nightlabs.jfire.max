@@ -36,7 +36,9 @@ import org.nightlabs.jfire.store.ProductTypeSearchFilter;
  * @author Alexander Bieber <alex[AT]nightlabs[DOT]de>
  *
  */
-public class SimpleProductTypeSearchFilter extends ProductTypeSearchFilter {
+public class SimpleProductTypeSearchFilter
+	extends ProductTypeSearchFilter<SimpleProductType>
+{
 	private static final long serialVersionUID = 1L;
 
 	/**
@@ -46,14 +48,6 @@ public class SimpleProductTypeSearchFilter extends ProductTypeSearchFilter {
 		super(conjunction);
 	}
 
-	/**
-	 * @see org.nightlabs.jfire.store.ProductTypeSearchFilter#getProductTypeClass()
-	 */
-	@Override
-	protected Class<SimpleProductType> getProductTypeClass() {
-		return SimpleProductType.class;
-	}
-
 	@Override
 	protected void prepareQuery(Set<Class<?>> imports, StringBuffer vars,
 			StringBuffer filter, StringBuffer params, Map<String, Object> paramMap,
@@ -61,6 +55,12 @@ public class SimpleProductTypeSearchFilter extends ProductTypeSearchFilter {
 		filter.append("this.published && this.saleable && this.organisationID == myOrganisationID");
 		params.append("java.lang.String myOrganisationID");
 		paramMap.put("myOrganisationID", LocalOrganisation.getLocalOrganisation(getPersistenceManager()).getOrganisationID());
+	}
+
+	@Override
+	protected Class<SimpleProductType> init()
+	{
+		return SimpleProductType.class;
 	}
 
 }

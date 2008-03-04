@@ -1263,14 +1263,15 @@ implements SessionBean
 	 * @ejb.permission role-name="_Guest_"
 	 * @ejb.transaction type="Supports" @!This usually means that no transaction is opened which is significantly faster and recommended for all read-only EJB methods! Marco.
 	 * 
-	 * FIXME: Use {@link JDOQuery} instead of search filter and get only ids from the datastore
+	 * FIXME: Use {@link AbstractJDOQuery} instead of search filter and get only ids from the datastore
 	 */
 	public Collection<ProductTypeID> searchProductTypes(SimpleProductTypeSearchFilter searchFilter)
 	{
 		PersistenceManager pm = getPersistenceManager();
 		try {
 			pm.getFetchPlan().clearGroups();
-			Collection<ProductType> productTypes = (Collection<ProductType>) searchFilter.executeQuery(pm);
+			searchFilter.setPersistenceManager(pm);
+			Collection<SimpleProductType> productTypes = searchFilter.getResult();
 			Collection<ProductTypeID> ids = new ArrayList<ProductTypeID>(productTypes.size());
 			for (ProductType	productType : productTypes)
 				ids.add(productType.getObjectId());

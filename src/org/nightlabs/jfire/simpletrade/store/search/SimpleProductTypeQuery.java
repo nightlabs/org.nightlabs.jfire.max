@@ -4,14 +4,14 @@ import javax.jdo.Query;
 
 import org.apache.log4j.Logger;
 import org.nightlabs.jfire.simpletrade.store.SimpleProductType;
-import org.nightlabs.jfire.store.search.ProductTypeQuery;
+import org.nightlabs.jfire.store.search.AbstractProductTypeQuery;
 
 /**
  * @author Daniel.Mazurek [at] NightLabs [dot] de
  *
  */
 public class SimpleProductTypeQuery
-extends ProductTypeQuery<SimpleProductType>
+extends AbstractProductTypeQuery<SimpleProductType>
 {
 	/**
 	 * 
@@ -40,5 +40,10 @@ extends ProductTypeQuery<SimpleProductType>
 		return q;
 	}
 
-	
+	@Override
+	protected Class<SimpleProductType> init()
+	{
+		return SimpleProductType.class;
+	}
+
 }

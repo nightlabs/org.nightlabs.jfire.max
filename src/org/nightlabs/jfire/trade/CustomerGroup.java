@@ -40,7 +40,7 @@ import org.nightlabs.util.Util;
 
 /**
  * @author Marco Schulze - marco at nightlabs dot de
- * 
+ *
  * @jdo.persistence-capable
  *		identity-type="application"
  *		objectid-class="org.nightlabs.jfire.trade.id.CustomerGroupID"
@@ -56,6 +56,7 @@ import org.nightlabs.util.Util;
  * @jdo.fetch-group name="CustomerGroup.name" fields="name"
  *
  * @jdo.fetch-group name="FetchGroupsPriceConfig.edit" fields="name"
+ * @jdo.fetch-group name="FetchGroupsPriceConfig.this" fields="name, modeOfPayments, modeOfPaymentFlavours, modeOfDeliveries, modeOfDeliveryFlavours"
  */
 public class CustomerGroup implements Serializable
 {
@@ -66,6 +67,7 @@ public class CustomerGroup implements Serializable
 	public static final String CUSTOMER_GROUP_ID_RESELLER = "CustomerGroup-reseller";
 
 	public static final String FETCH_GROUP_NAME = "CustomerGroup.name";
+	public static final String FETCH_GROUP_THIS_CUSTOMER_GROUP = "CustomerGroup.this";
 
 //	public static final String DEFAULT_CUSTOMER_GROUP_ID = "default";
 //

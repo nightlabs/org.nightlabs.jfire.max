@@ -120,7 +120,7 @@ implements SessionBean
 
 	/**
 	 * @see javax.ejb.SessionBean#ejbRemove()
-	 * 
+	 *
 	 * @ejb.permission unchecked="true"
 	 */
 	public void ejbRemove() throws EJBException, RemoteException
@@ -917,18 +917,18 @@ implements SessionBean
 	/**
 	 * Stores the given Person to a LegalEntity. If no LegalEntity with the right
 	 * AnchorID is found a new one will be created and made persistent.
-	 * 
+	 *
 	 * @param person The person to be set to the LegalEntity
 	 * @param get If true the created LegalEntity will be returned else null
 	 * @param fetchGroups The fetchGroups the returned LegalEntity should be detached with
-	 * 
+	 *
 	 * @ejb.interface-method
 	 * @ejb.permission role-name="_Guest_"
 	 * @ejb.transaction type="Required"
 	 */
 	public LegalEntity storePersonAsLegalEntity(Person person, boolean get, String[] fetchGroups, int maxFetchDepth)
 	{
-		
+
 		PersistenceManager pm = getPersistenceManager();
 		try {
 			pm.getFetchPlan().setMaxFetchDepth(maxFetchDepth);
@@ -947,13 +947,38 @@ implements SessionBean
 	}
 
 	/**
+	 * Returns the {@link LegalEntity} for the given {@link Person} or <code>null</code> if none could be found.
+	 * @param person The {@link Person} for which a {@link LegalEntity} is to be returned.
+	 * @return the {@link LegalEntity} for the given {@link Person} or <code>null</code> if none could be found.
+	 *
+	 * @ejb.interface-method
+	 * @ejb.permission role-name="_Guest_"
+	 * @ejb.transaction type="Supports"
+	 */
+	public LegalEntity getLegalEntityForPerson(Person person, String[] fetchGroups, int maxFetchDepth) {
+		if (person == null)
+			throw new IllegalArgumentException("person must not be null!");
+
+		PersistenceManager pm = getPersistenceManager();
+		LegalEntity legalEntity = LegalEntity.getLegalEntity(pm, person);
+
+		if (legalEntity == null)
+			return null;
+
+		pm.getFetchPlan().setGroups(fetchGroups);
+		pm.getFetchPlan().setMaxFetchDepth(maxFetchDepth);
+
+		return pm.detachCopy(legalEntity);
+	}
+
+	/**
 	 * Stores the given LegalEntity.
-	 * 
+	 *
 	 * @param legalEntity The LegalEntity to be stored
 	 * @param get Whether the stored instance or null should be returned.
 	 * @param fetchGroups The fetchGroups the returned LegalEntity should be detached with
 	 * @return The stored LegalEntity or null
-	 * 
+	 *
 	 * @ejb.interface-method
 	 * @ejb.permission role-name="_Guest_"
 	 * @ejb.transaction type="Required"
@@ -967,7 +992,7 @@ implements SessionBean
 			pm.close();
 		}
 	}
-	
+
 	/**
 	 * @ejb.interface-method
 	 * @ejb.permission role-name="_Guest_"
@@ -1019,13 +1044,13 @@ implements SessionBean
 			pm.getFetchPlan().setMaxFetchDepth(maxFetchDepth);
 			if (fetchGroups != null)
 				pm.getFetchPlan().setGroups(fetchGroups);
-			
+
 			for (int i = 0; i < leAnchorIDs.length; i++) {
 				if (!(leAnchorIDs[i] instanceof AnchorID))
 					throw new IllegalArgumentException("leAnchorIDs["+i+" is not of type AnchorID");
 				les.add(pm.getObjectById(leAnchorIDs[i]));
 			}
-			
+
 			long time = System.currentTimeMillis();
 			Collection result = pm.detachCopyAll(les);
 			time = System.currentTimeMillis() - time;
@@ -1036,7 +1061,7 @@ implements SessionBean
 			pm.close();
 		}
 	}
-	
+
 	/**
 	 * @ejb.interface-method
 	 * @ejb.permission role-name="_Guest_"
@@ -1054,7 +1079,7 @@ implements SessionBean
 			for (AnchorID anchorID : anchorIDs) {
 				les.add(pm.getObjectById(anchorID));
 			}
-			
+
 			long time = System.currentTimeMillis();
 			Collection result = pm.detachCopyAll(les);
 			time = System.currentTimeMillis() - time;
@@ -1065,7 +1090,7 @@ implements SessionBean
 			pm.close();
 		}
 	}
-	
+
 	/**
 	 * @ejb.interface-method
 	 * @ejb.permission role-name="_Guest_"
@@ -1221,7 +1246,7 @@ implements SessionBean
 				Article article = (Article) pm.getObjectById(articleID);
 				if (validate)
 					offers.add(article.getOffer());
-				
+
 				if (article.isAllocated())
 					allocatedArticles.add(article);
 				else
@@ -1229,10 +1254,10 @@ implements SessionBean
 			}
 
 			Trader trader = Trader.getTrader(pm);
-			
+
 			if (!allocatedArticles.isEmpty())
 				trader.releaseArticles(User.getUser(pm, getPrincipal()), allocatedArticles, false, true, true);
-			
+
 			if (!nonAllocatedArticles.isEmpty())
 				trader.deleteArticles(User.getUser(pm, getPrincipal()), nonAllocatedArticles);
 
@@ -1262,7 +1287,7 @@ implements SessionBean
 
 			Trader trader = Trader.getTrader(pm);
 			trader.releaseArticles(User.getUser(pm, getPrincipal()), articles, synchronously, false, true);
-			
+
 			if (!get)
 				return null;
 
@@ -1325,7 +1350,7 @@ implements SessionBean
 		PersistenceManager pm = getPersistenceManager();
 		try {
 			ModuleMetaData moduleMetaData = ModuleMetaData.getModuleMetaData(pm, JFireTradeEAR.MODULE_NAME);
-			
+
 			if (moduleMetaData != null)
 				return;
 
@@ -1335,7 +1360,7 @@ implements SessionBean
 			moduleMetaData = new ModuleMetaData(
 					JFireTradeEAR.MODULE_NAME, "0.9.3-0-beta", "0.9.3-0-beta");
 			pm.makePersistent(moduleMetaData);
-			
+
 			ConfigSetup configSetup = ConfigSetup.getConfigSetup(
 					pm,
 					getOrganisationID(),
@@ -1357,7 +1382,7 @@ implements SessionBean
 			ProcessDefinition processDefinitionOfferVendor;
 			processDefinitionOfferVendor = trader.storeProcessDefinitionOffer(TradeSide.vendor, ProcessDefinitionAssignment.class.getResource("offer/vendor/"));
 			pm.makePersistent(new ProcessDefinitionAssignment(Offer.class, TradeSide.vendor, processDefinitionOfferVendor));
-			
+
 
 			// switch off the IDGenerator's caches for Order and Offer
 			IDNamespaceDefault idNamespaceDefault = IDNamespaceDefault.createIDNamespaceDefault(pm, getOrganisationID(), Order.class);
@@ -1541,7 +1566,7 @@ implements SessionBean
 			pm.close();
 		}
 	}
-	
+
 	/**
 	 * @ejb.interface-method
 	 * @ejb.transaction type="Required"
@@ -1586,7 +1611,7 @@ implements SessionBean
 			pm.close();
 		}
 	}
-				
+
 //	/**
 //	 * @param articleContainerQueries Instances of {@link ArticleContainerQuery}
 //	 * 		that shall be chained
@@ -1646,7 +1671,7 @@ implements SessionBean
 //			pm.close();
 //		}
 //	}
-	
+
 //	/**
 //	 * @ejb.interface-method
 //	 * @ejb.permission role-name="_Guest_"
@@ -1671,7 +1696,7 @@ implements SessionBean
 //			pm.close();
 //		}
 //	}
-	
+
 	/**
 	 * @ejb.interface-method
 	 * @ejb.permission role-name="_Guest_"
@@ -1702,7 +1727,7 @@ implements SessionBean
 			pm.close();
 		}
 	}
-	
+
 	/**
 	 * @ejb.interface-method
 	 * @ejb.permission role-name="_Guest_"
@@ -1727,7 +1752,7 @@ implements SessionBean
 			pm.close();
 		}
 	}
-	
+
 //	/**
 //	 * @ejb.interface-method
 //	 * @ejb.permission role-name="_Guest_"
@@ -1752,7 +1777,7 @@ implements SessionBean
 //			pm.close();
 //		}
 //	}
-	
+
 	/**
 	 * @ejb.interface-method
 	 * @ejb.permission role-name="_Guest_"

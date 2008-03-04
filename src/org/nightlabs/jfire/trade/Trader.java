@@ -81,6 +81,7 @@ import org.nightlabs.jfire.store.DeliveryNote;
 import org.nightlabs.jfire.store.NotAvailableException;
 import org.nightlabs.jfire.store.Product;
 import org.nightlabs.jfire.store.ProductLocal;
+import org.nightlabs.jfire.store.ProductType;
 import org.nightlabs.jfire.store.ProductTypeActionHandler;
 import org.nightlabs.jfire.store.ProductTypeActionHandlerCache;
 import org.nightlabs.jfire.store.Store;
@@ -94,15 +95,14 @@ import org.nightlabs.jfire.trade.jbpm.ActionHandlerSendOffer;
 import org.nightlabs.jfire.trade.jbpm.JbpmConstantsOffer;
 import org.nightlabs.jfire.trade.jbpm.ProcessDefinitionAssignment;
 import org.nightlabs.jfire.trade.jbpm.id.ProcessDefinitionAssignmentID;
-import org.nightlabs.jfire.transfer.id.AnchorID;
 
 /**
  * Trader is responsible for purchase and sale. It manages orders, offers and
  * delegates to the Store and to the Accounting.
- * 
+ *
  * @author Marco Schulze - marco at nightlabs dot de
  * @author Alexander Bieber <alex[AT]nightlabs[DOT]de>
- * 
+ *
  * @jdo.persistence-capable
  *		identity-type="application"
  *		objectid-class="org.nightlabs.jfire.trade.id.TraderID"
@@ -110,7 +110,7 @@ import org.nightlabs.jfire.transfer.id.AnchorID;
  *		table="JFireTrade_Trader"
  *
  * @jdo.create-objectid-class
- * 
+ *
  * @jdo.inheritance strategy="new-table"
  */
 public class Trader
@@ -123,7 +123,7 @@ public class Trader
 	/**
 	 * This method returns the singleton instance of Trader. If there is no
 	 * instance of Trader in the datastore, yet, it will be created.
-	 * 
+	 *
 	 * @param pm
 	 * @return
 	 */
@@ -265,12 +265,12 @@ public class Trader
 	/**
 	 * TODO We don't know yet how we handle the CustomerGroups in the product
 	 * chain. This member might be removed soon.
-	 * 
+	 *
 	 * Update: Probably we will add a mapping of customer groups. Hence, this
 	 * member will stay here and always contain a local CustomerGroup (of this
 	 * organisation). There will be a mapping within the priceconfig and a global
 	 * one. The priceconfig- customergroup-mapping will inherit the global one.
-	 * 
+	 *
 	 * @jdo.field persistence-modifier="persistent"
 	 */
 	private CustomerGroup defaultCustomerGroupForKnownCustomer;
@@ -289,7 +289,7 @@ public class Trader
 	/**
 	 * @param defaultCustomerGroupForKnownCustomer
 	 *          The defaultCustomerGroupForKnownCustomer to set.
-	 * 
+	 *
 	 * @see #getDefaultCustomerGroupForKnownCustomer()
 	 */
 	public void setDefaultCustomerGroupForKnownCustomer(
@@ -305,7 +305,7 @@ public class Trader
 	/**
 	 * The mandator is the OrganisationLegalEntity which is represented by this
 	 * Trader, means this Trader manages the datastore on behalf of this entity.
-	 * 
+	 *
 	 * @return Returns the mandator.
 	 */
 	public OrganisationLegalEntity getMandator()
@@ -333,7 +333,7 @@ public class Trader
 	 * Creates a new OrganisationLegalEntity, if it does not yet exist. If it is
 	 * already existing, this method doesn't do anything but only returns the
 	 * previously created instance.
-	 * 
+	 *
 	 * @param organisationID
 	 * @return Returns an OrganisationLegalEntity for the given organisationID
 	 */
@@ -365,43 +365,56 @@ public class Trader
 	 * creates one if not. The given person will be set to the found or created
 	 * LegalEntity. If makePersistent is true the newly created LegalEntity will
 	 * be made persistent.
-	 * 
+	 *
 	 * @param person
 	 *          The person to set to the LegalEntity
-	 * @param makePesistent
-	 *          Weather a newly created LegalEntity should be made persistent
+	 * @param makePersistent
+	 *          Whether a newly created LegalEntity should be made persistent
 	 * @return The legal entity for this person
 	 */
-	public LegalEntity setPersonToLegalEntity(Person person, boolean makePesistent)
+	public LegalEntity setPersonToLegalEntity(Person person, boolean makePersistent)
 	{
 		if (person == null)
 			throw new IllegalArgumentException("person must not be null!");
 
-		String anchorID = person.getPrimaryKey().replace('/', '#');
-		AnchorID oAnchorID = AnchorID.create(getMandator().getOrganisationID(),
-				LegalEntity.ANCHOR_TYPE_ID_LEGAL_ENTITY, anchorID);
-		LegalEntity legalEntity = null;
+//		String anchorID = person.getPrimaryKey().replace('/', '#');
+//		AnchorID oAnchorID = AnchorID.create(getMandator().getOrganisationID(),	LegalEntity.ANCHOR_TYPE_ID_LEGAL_ENTITY, anchorID);
+
+//		LegalEntity legalEntity = null;
+//		PersistenceManager pm = getPersistenceManager();
+//		boolean found = true;
+//		try {
+//			legalEntity = (LegalEntity) pm.getObjectById(oAnchorID);
+//		} catch (JDOObjectNotFoundException e) {
+//			legalEntity = new LegalEntity(oAnchorID.organisationID,
+//					oAnchorID.anchorID);
+//			legalEntity
+//					.setDefaultCustomerGroup(getDefaultCustomerGroupForKnownCustomer());
+//			found = false;
+//		}
 		PersistenceManager pm = getPersistenceManager();
 		boolean found = true;
-		try {
-			legalEntity = (LegalEntity) pm.getObjectById(oAnchorID);
-		} catch (JDOObjectNotFoundException e) {
-			legalEntity = new LegalEntity(oAnchorID.organisationID,
-					oAnchorID.anchorID);
-			legalEntity
-					.setDefaultCustomerGroup(getDefaultCustomerGroupForKnownCustomer());
+
+		LegalEntity legalEntity = LegalEntity.getLegalEntity(pm, person);
+		if (legalEntity == null) {
 			found = false;
+			String anchorID = LegalEntity.nextAnchorID();
+			legalEntity = new LegalEntity(IDGenerator.getOrganisationID(), anchorID);
+			legalEntity.setDefaultCustomerGroup(getDefaultCustomerGroupForKnownCustomer());
 		}
+
 		legalEntity.setPerson(person);
-		if (makePesistent && !found)
-			if (!JDOHelper.isPersistent(legalEntity))
+		if (makePersistent && !found) {
+			if (!JDOHelper.isPersistent(legalEntity)) {
 				pm.makePersistent(legalEntity);
+			}
+		}
 		return legalEntity;
 	}
 
 	public Collection<Segment> createSegments(Order order, Collection<SegmentType> segmentTypes)
 	{
-		List segments = new ArrayList();
+		List<Segment> segments = new ArrayList<Segment>();
 		for (SegmentType segmentType : segmentTypes) {
 			segments.add(createSegment(order, segmentType));
 		}
@@ -412,7 +425,7 @@ public class Trader
 	 * Creates a new <tt>Segment</tt> within the given <tt>Order</tt> for the
 	 * given <tt>SegmentType</tt>. Note, that you can create many
 	 * <tt>Segment</tt>s with the same <tt>SegmentType</tt>.
-	 * 
+	 *
 	 * @param order
 	 *          The <tt>Order</tt> in which to create a <tt>Segment</tt>.
 	 * @param segmentType
@@ -669,7 +682,7 @@ public class Trader
 
 		if (getMandator().getPrimaryKey() == null)
 			throw new IllegalStateException("getMandator().getPrimaryKey() returned null!");
-		
+
 		if (getMandator().getPrimaryKey().equals(order.getVendor().getPrimaryKey())) {
 			if (offerIDPrefix == null) {
 				TradeConfigModule tradeConfigModule;
@@ -722,9 +735,9 @@ public class Trader
 	throws ModuleException
 	{
 		Set<Article> res = new HashSet<Article>(reversedArticles.size());
-		for (Iterator it = reversedArticles.iterator(); it.hasNext();) {
-			Article reversedArticle = (Article) it.next();
-
+//		for (Iterator it = reversedArticles.iterator(); it.hasNext();) {
+//			Article reversedArticle = (Article) it.next();
+		for (Article reversedArticle : reversedArticles) {
 			if (!reversedArticle.getOffer().getOfferLocal().isAccepted())
 				throw new IllegalStateException("Offer " + reversedArticle.getOffer().getPrimaryKey() + " of Article " + reversedArticle.getPrimaryKey() + " has NOT been accepted! Cannot create reversing Article!");
 
@@ -747,10 +760,11 @@ public class Trader
 //		return reversingArticle;
 //	}
 
-	protected void createArticleLocals(User user, Collection articles)
+	protected void createArticleLocals(User user, Collection<? extends Article> articles)
 	{
-		for (Iterator it = articles.iterator(); it.hasNext();) {
-			Article article = (Article) it.next();
+//		for (Iterator it = articles.iterator(); it.hasNext();) {
+//			Article article = (Article) it.next();
+		for (Article article : articles) {
 			article.createArticleLocal(user);
 		}
 	}
@@ -760,12 +774,12 @@ public class Trader
 	 * give the customer an idea about the price). Therefore, no <tt>Product</tt>
 	 * will be allocated and only the <tt>ProductType</tt> referenced as given
 	 * here.
-	 * 
+	 *
 	 * @param productTypes
 	 *          Instances of {@link ProductType}.
 	 */
-	public Collection createArticles(User user, Offer offer, Segment segment,
-			Collection productTypes, ArticleCreator articleCreator)
+	public Collection<Article> createArticles(User user, Offer offer, Segment segment,
+			Collection<ProductType> productTypes, ArticleCreator articleCreator)
 			throws ModuleException
 	{
 		throw new UnsupportedOperationException("NYI");
@@ -778,7 +792,7 @@ public class Trader
 	 * method {@link #allocateArticlesEnd(User, Collection)} is either called
 	 * asynchronously or immediately, depending on
 	 * <code>allocateSynchronously</code>.
-	 * 
+	 *
 	 * @param user
 	 *          The User who is responsible for the action.
 	 * @param offer
@@ -898,10 +912,11 @@ public class Trader
 			PersistenceManager pm = getPersistenceManager();
 			try {
 				pm.getExtent(Article.class);
-				Collection articleIDs = ((AllocateArticlesEndInvocation) envelope
+				Collection<ArticleID> articleIDs = ((AllocateArticlesEndInvocation) envelope
 						.getInvocation()).getArticleIDs();
-				for (Iterator iter = articleIDs.iterator(); iter.hasNext();) {
-					ArticleID articleID = (ArticleID) iter.next();
+//				for (Iterator iter = articleIDs.iterator(); iter.hasNext();) {
+//					ArticleID articleID = (ArticleID) iter.next();
+				for (ArticleID articleID : articleIDs) {
 					Article article = null;
 					try {
 						article = (Article) pm.getObjectById(articleID);
@@ -931,10 +946,11 @@ public class Trader
 				InvocationError invocationError = envelope.getAsyncInvokeProblem(pm).getLastError();
 
 				pm.getExtent(Article.class);
-				Collection articleIDs = ((AllocateArticlesEndInvocation) envelope
+				Collection<ArticleID> articleIDs = ((AllocateArticlesEndInvocation) envelope
 						.getInvocation()).getArticleIDs();
-				for (Iterator iter = articleIDs.iterator(); iter.hasNext();) {
-					ArticleID articleID = (ArticleID) iter.next();
+//				for (Iterator iter = articleIDs.iterator(); iter.hasNext();) {
+//					ArticleID articleID = (ArticleID) iter.next();
+				for (ArticleID articleID : articleIDs) {
 					Article article = null;
 					try {
 						article = (Article) pm.getObjectById(articleID);
@@ -961,14 +977,14 @@ public class Trader
 
 		private UserID userID;
 
-		private Set articleIDs;
+		private Set<ArticleID> articleIDs;
 
-		public Set getArticleIDs()
+		public Set<ArticleID> getArticleIDs()
 		{
 			return articleIDs;
 		}
 
-		public AllocateArticlesEndInvocation(User user, Collection articles)
+		public AllocateArticlesEndInvocation(User user, Collection<? extends Article> articles)
 		{
 			this.userID = (UserID) JDOHelper.getObjectId(user);
 			this.articleIDs = NLJDOHelper.getObjectIDSet(articles);
@@ -987,7 +1003,7 @@ public class Trader
 			try {
 				pm.getExtent(User.class);
 				User user = (User) pm.getObjectById(userID);
-				Collection articles = NLJDOHelper.getObjectSet(pm, articleIDs,
+				Collection<Article>articles = NLJDOHelper.getObjectSet(pm, articleIDs,
 						Article.class);
 				Trader.getTrader(pm).allocateArticlesEnd(user, articles);
 			} finally {
@@ -1061,10 +1077,11 @@ public class Trader
 			PersistenceManager pm = getPersistenceManager();
 			try {
 				pm.getExtent(Article.class);
-				Collection articleIDs = ((ReleaseArticlesEndInvocation) envelope
+				Collection<ArticleID> articleIDs = ((ReleaseArticlesEndInvocation) envelope
 						.getInvocation()).getArticleIDs();
-				for (Iterator iter = articleIDs.iterator(); iter.hasNext();) {
-					ArticleID articleID = (ArticleID) iter.next();
+//				for (Iterator iter = articleIDs.iterator(); iter.hasNext();) {
+//					ArticleID articleID = (ArticleID) iter.next();
+				for (ArticleID articleID : articleIDs) {
 					Article article = (Article) pm.getObjectById(articleID);
 					article.setReleaseAbandoned(true);
 				}
@@ -1087,10 +1104,11 @@ public class Trader
 				InvocationError invocationError = envelope.getAsyncInvokeProblem(pm).getLastError();
 
 				pm.getExtent(Article.class);
-				Collection articleIDs = ((ReleaseArticlesEndInvocation) envelope
+				Collection<ArticleID> articleIDs = ((ReleaseArticlesEndInvocation) envelope
 						.getInvocation()).getArticleIDs();
-				for (Iterator iter = articleIDs.iterator(); iter.hasNext();) {
-					ArticleID articleID = (ArticleID) iter.next();
+//				for (Iterator iter = articleIDs.iterator(); iter.hasNext();) {
+//					ArticleID articleID = (ArticleID) iter.next();
+				for (ArticleID articleID : articleIDs) {
 					Article article = (Article) pm.getObjectById(articleID);
 
 					if (invocationError.getError() != null)
@@ -1110,11 +1128,11 @@ public class Trader
 
 		private UserID userID;
 
-		private Collection articleIDs;
+		private Collection<ArticleID> articleIDs;
 
 		private boolean deleteAfterRelease;
-		
-		public Collection getArticleIDs()
+
+		public Collection<ArticleID> getArticleIDs()
 		{
 			return articleIDs;
 		}
@@ -1134,7 +1152,7 @@ public class Trader
 //				Thread.sleep(3000);
 //			} catch (InterruptedException x) {
 //			}
-			
+
 			PersistenceManager pm = getPersistenceManager();
 			try {
 				pm.getExtent(User.class);
@@ -1284,16 +1302,16 @@ public class Trader
 		for (Map.Entry<ProductTypeActionHandler, List<Article>> me : productTypeActionHandler2Articles.entrySet()) {
 			me.getKey().onReleaseArticlesEnd(user, this, me.getValue());
 		}
-		
+
 		if (deleteAfterRelease) {
 			deleteArticles(user, articles);
 		}
 	}
 
-	protected static String getToStringList(Collection objects)
+	protected static String getToStringList(Collection<?> objects)
 	{
 		StringBuffer sb = new StringBuffer();
-		for (Iterator iter = objects.iterator(); iter.hasNext();) {
+		for (Iterator<?> iter = objects.iterator(); iter.hasNext();) {
 			Object o = iter.next();
 			sb.append(String.valueOf(o));
 			if (iter.hasNext())
@@ -1311,15 +1329,16 @@ public class Trader
 		public boolean releasePending = false;
 	}
 
-	protected static TotalArticleStatus getTotalArticleStatus(Collection articles)
+	protected static TotalArticleStatus getTotalArticleStatus(Collection<? extends Article> articles)
 	{
 		if (articles.isEmpty())
 			throw new IllegalArgumentException("articles is empty!");
 
 		boolean first = true;
 		TotalArticleStatus res = new TotalArticleStatus();
-		for (Iterator iter = articles.iterator(); iter.hasNext();) {
-			Article article = (Article) iter.next();
+//		for (Iterator iter = articles.iterator(); iter.hasNext();) {
+//			Article article = (Article) iter.next();
+		for (Article article : articles) {
 			if (first) {
 				res.allocated = article.isAllocated();
 				res.allocationPending = article.isAllocationPending();
@@ -1362,7 +1381,7 @@ public class Trader
 	 * This method creates a top-level-{@link ArticlePrice} (it will be filled
 	 * with nested details in {@link #allocateArticleEnd(User, Article)}).
 	 * </p>
-	 * 
+	 *
 	 * @param user
 	 *          The user who is responsible for this allocation.
 	 * @param article
@@ -1477,7 +1496,7 @@ public class Trader
 	 * <code>Article</code> and the corresponding <code>ProductLocal</code> to
 	 * status <code>allocationPending</code>, this method assembles the
 	 * ProductLocal recursively.
-	 * 
+	 *
 	 * @param user
 	 *          The user who is responsible for this allocation.
 	 * @param article
@@ -1642,7 +1661,7 @@ public class Trader
 
 	/**
 	 * The {@link Article}s must already be released!
-	 * 
+	 *
 	 * @param user
 	 *          The user who is responsible.
 	 * @param articles

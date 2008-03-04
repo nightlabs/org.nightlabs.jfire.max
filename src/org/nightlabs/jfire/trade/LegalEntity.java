@@ -37,7 +37,9 @@ import java.util.Set;
 import javax.jdo.JDOHelper;
 import javax.jdo.JDOObjectNotFoundException;
 import javax.jdo.PersistenceManager;
+import javax.jdo.Query;
 
+import org.nightlabs.jdo.ObjectIDUtil;
 import org.nightlabs.jfire.accounting.MoneyTransfer;
 import org.nightlabs.jfire.accounting.book.Accountant;
 import org.nightlabs.jfire.accounting.id.CurrencyID;
@@ -49,6 +51,7 @@ import org.nightlabs.jfire.prop.IStruct;
 import org.nightlabs.jfire.prop.PropertySet;
 import org.nightlabs.jfire.prop.StructLocal;
 import org.nightlabs.jfire.prop.datafield.TextDataField;
+import org.nightlabs.jfire.prop.id.PropertySetID;
 import org.nightlabs.jfire.security.User;
 import org.nightlabs.jfire.store.Product;
 import org.nightlabs.jfire.store.ProductReference;
@@ -63,7 +66,7 @@ import org.nightlabs.jfire.transfer.id.AnchorID;
 /**
  * @author Marco Schulze - marco at nightlabs dot de
  * @author Alexander Bieber <alex[AT]nightlabs[DOT]de>
- * 
+ *
  * @jdo.persistence-capable
  *		identity-type="application"
  *		persistence-capable-superclass="org.nightlabs.jfire.transfer.Anchor"
@@ -78,6 +81,8 @@ import org.nightlabs.jfire.transfer.id.AnchorID;
  * @jdo.fetch-group name="LegalEntity.customerGroups" fields="customerGroups"
  * @jdo.fetch-group name="LegalEntity.defaultCustomerGroup" fields="defaultCustomerGroup"
  * @jdo.fetch-group name="LegalEntity.this" fetch-groups="default" fields="person, accountant"
+ *
+ * @jdo.query name="getLegalEntityForPerson" query="SELECT UNIQUE WHERE this.person == :person"
  */
 public class LegalEntity extends Anchor
 {
@@ -96,7 +101,37 @@ public class LegalEntity extends Anchor
 
 	public static final String PROPERTY_SET_SCOPE = StructLocal.DEFAULT_SCOPE;
 
-	
+	public static LegalEntity getLegalEntityForPerson(PersistenceManager pm, PropertySetID personID)
+	{
+		Person person = (Person) pm.getObjectById(personID);
+		return getLegalEntity(pm, person);
+	}
+
+	public static LegalEntity getLegalEntity(PersistenceManager pm, Person person)
+	{
+		Query q = pm.newNamedQuery(LegalEntity.class, "getLegalEntityForPerson");
+		return (LegalEntity) q.execute(person);
+	}
+
+//	/**
+//	 * When creating a new {@link LegalEntity} for a {@link Person}, you should use this method to
+//	 * generate the ID. Note, however, that the LegalEntity doesn't necessarily uses this ID and
+//	 * you must always search via {@link #getLegalEntity(PersistenceManager, Person)} or {@link #getLegalEntityForPerson(PersistenceManager, PropertySetID)}
+//	 * first.
+//	 *
+//	 * @param personID
+//	 * @return
+//	 */
+//	public static AnchorID createDefaultLegalEntityIDForPerson(PropertySetID personID)
+//	{
+//		return AnchorID.create(IDGenerator.getOrganisationID(), ANCHOR_TYPE_ID_LEGAL_ENTITY, personID.organisationID + '#' + ObjectIDUtil.longObjectIDFieldToString(personID.propertySetID));
+//	}
+
+	public static String nextAnchorID()
+	{
+		return ObjectIDUtil.longObjectIDFieldToString(IDGenerator.nextID(Anchor.class, ANCHOR_TYPE_ID_LEGAL_ENTITY));
+	}
+
 	/**
 	 * @param pm The <tt>PersistenceManager</tt> to use.
 	 * @return the <tt>LegalEntity</tt> which represents the anonymous customer. If this
@@ -217,7 +252,7 @@ public class LegalEntity extends Anchor
 		public Balance(String currencyID) {
 			this.currencyID = currencyID;
 		}
-		
+
 		public String currencyID;
 		public long amount = 0;
 	}
@@ -291,7 +326,7 @@ public class LegalEntity extends Anchor
 			anchorID2productReferenceMap = new HashMap<AnchorID, Map<ProductID,ProductReference>>();
 			organisationID2anchorID2productReferenceMap.put(currentOrganisationID, anchorID2productReferenceMap);
 		}
-		
+
 		AnchorID anchorID = (AnchorID) JDOHelper.getObjectId(this);
 		if (anchorID == null)
 			throw new IllegalStateException("JDOHelper.getObjectId(this) returned null!");
@@ -585,7 +620,7 @@ public class LegalEntity extends Anchor
 	{
 		return customerGroups.contains(customerGroup);
 	}
-	
+
 	@Override
 	public String getDescription(Locale locale) {
 		return getPerson().getDisplayName();

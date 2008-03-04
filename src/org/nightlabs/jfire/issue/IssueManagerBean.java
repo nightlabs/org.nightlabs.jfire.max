@@ -24,7 +24,10 @@ import org.jbpm.graph.exe.ProcessInstance;
 import org.nightlabs.ModuleException;
 import org.nightlabs.jdo.NLJDOHelper;
 import org.nightlabs.jdo.moduleregistry.ModuleMetaData;
-import org.nightlabs.jdo.query.JDOQuery;
+import org.nightlabs.jdo.query.AbstractJDOQuery;
+import org.nightlabs.jdo.query.AbstractSearchQuery;
+import org.nightlabs.jdo.query.JDOQueryCollectionDecorator;
+import org.nightlabs.jdo.query.QueryCollection;
 import org.nightlabs.jfire.base.BaseSessionBeanImpl;
 import org.nightlabs.jfire.editlock.EditLockType;
 import org.nightlabs.jfire.issue.config.StoredIssueQuery;
@@ -60,6 +63,7 @@ implements SessionBean{
 	 */
 	private static final Logger logger = Logger.getLogger(IssueManagerBean.class);
 
+	@Override
 	public void setSessionContext(SessionContext sessionContext)
 			throws EJBException, RemoteException
 	{
@@ -413,20 +417,26 @@ implements SessionBean{
 	 * @ejb.interface-method
 	 * @ejb.permission role-name="_Guest_"
 	 * @ejb.transaction type="Supports" @!This usually means that no transaction is opened which is significantly faster and recommended for all read-only EJB methods! Marco.
-	 */	
-	public Set<IssueID> getIssueIDs(Collection<? extends JDOQuery<? extends Issue>> queries)
+	 */
+	public Set<IssueID> getIssueIDs(QueryCollection<Issue, ? extends AbstractJDOQuery<? extends Issue>> queries)
 	{
 		PersistenceManager pm = getPersistenceManager();
 		try {
 			pm.getFetchPlan().setMaxFetchDepth(1);
 			pm.getFetchPlan().setGroup(FetchPlan.DEFAULT);
 
-			Collection<? extends Issue> issues = null;
-			for (JDOQuery<? extends Issue> query : queries) {
-				query.setPersistenceManager(pm);
-				query.setCandidates(issues);
-				issues = query.getResult();
+			JDOQueryCollectionDecorator<Issue, ? extends AbstractSearchQuery<? extends Issue>> decoratedCollection;
+			if (queries instanceof JDOQueryCollectionDecorator)
+			{
+				decoratedCollection = (JDOQueryCollectionDecorator<Issue, ? extends AbstractSearchQuery<? extends Issue>>) queries;
 			}
+			else
+			{
+				decoratedCollection = new JDOQueryCollectionDecorator<Issue, AbstractSearchQuery<? extends Issue>>(queries);
+			}
+			
+			decoratedCollection.setPersistenceManager(pm);
+			Collection<? extends Issue> issues = decoratedCollection.executeQueries();
 
 			return NLJDOHelper.getObjectIDSet(issues);
 		} finally {

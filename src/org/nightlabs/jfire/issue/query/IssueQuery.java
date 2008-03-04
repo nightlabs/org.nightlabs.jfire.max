@@ -7,7 +7,7 @@ import javax.jdo.Query;
 
 import org.apache.log4j.Logger;
 import org.nightlabs.jdo.ObjectID;
-import org.nightlabs.jdo.query.JDOQuery;
+import org.nightlabs.jdo.query.AbstractJDOQuery;
 import org.nightlabs.jfire.issue.Issue;
 import org.nightlabs.jfire.issue.IssueComment;
 import org.nightlabs.jfire.issue.id.IssuePriorityID;
@@ -17,7 +17,7 @@ import org.nightlabs.jfire.issue.id.IssueTypeID;
 import org.nightlabs.jfire.security.id.UserID;
 
 public class IssueQuery 
-extends JDOQuery<Issue> {
+extends AbstractJDOQuery<Issue> {
 	
 	private static final long serialVersionUID = 1L;
 
@@ -229,5 +229,11 @@ extends JDOQuery<Issue> {
 	
 	public Set<ObjectID> getObjectIDs() {
 		return objectIDs;
+	}
+
+	@Override
+	protected Class<Issue> init()
+	{
+		return Issue.class;
 	}
 }

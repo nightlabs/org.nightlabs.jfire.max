@@ -4,12 +4,12 @@ import java.io.ByteArrayInputStream;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.io.Serializable;
-import java.util.Collection;
 import java.util.zip.DeflaterOutputStream;
 import java.util.zip.InflaterInputStream;
 
 import org.nightlabs.io.DataBuffer;
-import org.nightlabs.jdo.query.JDOQuery;
+import org.nightlabs.jdo.query.QueryCollection;
+import org.nightlabs.jfire.issue.Issue;
 import org.nightlabs.jfire.issue.query.IssueQuery;
 
 import com.thoughtworks.xstream.XStream;
@@ -62,6 +62,7 @@ implements Serializable
 	/**
 	 * @deprecated Constructor exists only for JDO! 
 	 */
+	@Deprecated
 	protected StoredIssueQuery() { }
 
 	public StoredIssueQuery(String organisationID, long storedIssueQueryID) 
@@ -70,7 +71,7 @@ implements Serializable
 		this.storedIssueQueryID = storedIssueQueryID;
 	}
 	
-	public void setIssueQueries(Collection<JDOQuery> jdoQuery) {
+	public void setIssueQueries(QueryCollection<Issue, ? extends IssueQuery> jdoQuery) {
 		try {
 			DataBuffer db = new DataBuffer();
 			OutputStream out = new DeflaterOutputStream(db.createOutputStream());
@@ -87,13 +88,15 @@ implements Serializable
 		}
 	}
 	
-	public Collection<JDOQuery> getIssueQueries() {
+	public QueryCollection<Issue, ? extends IssueQuery> getIssueQueries() {
 		InputStream in = null;
 		try {
 			DataBuffer db = new DataBuffer(new InflaterInputStream(new ByteArrayInputStream(serializedIssueQuery)));
 			in = db.createInputStream();
 			XStream xStream = new XStream(new XppDriver());
-			Collection<JDOQuery> q = (Collection<JDOQuery>) xStream.fromXML(in);
+			QueryCollection<Issue, ? extends IssueQuery> q =
+				(QueryCollection<Issue, ? extends IssueQuery>) xStream.fromXML(in);
+			
 			return q;
 		} 
 		catch (Exception e) {

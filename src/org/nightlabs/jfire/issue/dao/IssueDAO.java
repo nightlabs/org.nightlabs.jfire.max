@@ -5,12 +5,13 @@ import java.util.List;
 import java.util.Set;
 
 import org.nightlabs.jdo.NLJDOHelper;
-import org.nightlabs.jdo.query.JDOQuery;
+import org.nightlabs.jdo.query.QueryCollection;
 import org.nightlabs.jfire.base.jdo.BaseJDOObjectDAO;
 import org.nightlabs.jfire.issue.Issue;
 import org.nightlabs.jfire.issue.IssueManager;
 import org.nightlabs.jfire.issue.IssueManagerUtil;
 import org.nightlabs.jfire.issue.id.IssueID;
+import org.nightlabs.jfire.issue.query.IssueQuery;
 import org.nightlabs.jfire.security.SecurityReflector;
 import org.nightlabs.progress.ProgressMonitor;
 import org.nightlabs.progress.SubProgressMonitor;
@@ -142,7 +143,7 @@ public class IssueDAO extends BaseJDOObjectDAO<IssueID, Issue>{
 	}
 	
 	@SuppressWarnings("unchecked")
-	public List<Issue> getIssuesForQueries(Collection<? extends JDOQuery> queries, String[] fetchGroups,
+	public List<Issue> getIssuesForQueries(QueryCollection<Issue, ? extends IssueQuery> queries, String[] fetchGroups,
 			int maxFetchDepth, ProgressMonitor monitor)
 	{
 		try {

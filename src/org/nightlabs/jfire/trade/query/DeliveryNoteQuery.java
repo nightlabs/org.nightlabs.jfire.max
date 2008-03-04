@@ -6,8 +6,8 @@ import org.nightlabs.jfire.store.DeliveryNote;
  * @author Daniel Mazurek - daniel <at> nightlabs <dot> de
  * @author Marius Heinzmann - marius[at]nightlabs[dot]com
  */
-public class DeliveryNoteQuickSearchQuery
-	extends AbstractArticleContainerQuickSearchQuery<DeliveryNote>
+public class DeliveryNoteQuery
+	extends AbstractArticleContainerQuery<DeliveryNote>
 {
 	private static final long serialVersionUID = 1L;
 

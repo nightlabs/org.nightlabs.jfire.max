@@ -6,8 +6,8 @@ import org.nightlabs.jfire.trade.Order;
  * @author Daniel Mazurek - daniel <at> nightlabs <dot> de
  * @author Marius Heinzmann - marius[at]nightlabs[dot]com
  */
-public class OrderQuickSearchQuery
-	extends AbstractArticleContainerQuickSearchQuery<Order>
+public class OrderQuery
+	extends AbstractArticleContainerQuery<Order>
 {
 	private static final long serialVersionUID = 1L;
 

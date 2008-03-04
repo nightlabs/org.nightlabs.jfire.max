@@ -6,8 +6,8 @@ import org.nightlabs.jfire.store.ReceptionNote;
  * @author Daniel Mazurek - daniel <at> nightlabs <dot> de
  *
  */
-public class ReceptionNoteQuickSearchQuery
-	extends AbstractArticleContainerQuickSearchQuery<ReceptionNote>
+public class ReceptionNoteQuery
+	extends AbstractArticleContainerQuery<ReceptionNote>
 {
 	private static final long serialVersionUID = 1L;
 

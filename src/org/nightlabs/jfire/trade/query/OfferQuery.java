@@ -7,8 +7,8 @@ import org.nightlabs.jfire.trade.Offer;
  * @author marco schulze - marco at nightlabs dot de
  * @author Marius Heinzmann - marius[at]nightlabs[dot]com
  */
-public class OfferQuickSearchQuery
-	extends AbstractArticleContainerQuickSearchQuery<Offer>
+public class OfferQuery
+	extends AbstractArticleContainerQuery<Offer>
 {
 	private static final long serialVersionUID = 1L;
 

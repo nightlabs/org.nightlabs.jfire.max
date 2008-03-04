@@ -10,8 +10,8 @@ import org.nightlabs.jfire.accounting.id.CurrencyID;
  * @author Daniel Mazurek - daniel <at> nightlabs <dot> de
  * @author Marius Heinzmann - marius[at]nightlabs[dot]com
  */
-public class InvoiceQuickSearchQuery
-	extends AbstractArticleContainerQuickSearchQuery<Invoice>
+public class InvoiceQuery
+	extends AbstractArticleContainerQuery<Invoice>
 {
 	private static final long serialVersionUID = 1L;
 

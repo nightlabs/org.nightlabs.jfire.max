@@ -18,11 +18,11 @@ import org.nightlabs.jfire.transfer.id.AnchorID;
  * @author Daniel Mazurek - daniel <at> nightlabs <dot> de
  * @author Marius Heinzmann - marius[at]nightlabs[dot]com
  */
-public abstract class AbstractArticleContainerQuickSearchQuery<R extends ArticleContainer>
+public abstract class AbstractArticleContainerQuery<R extends ArticleContainer>
 	extends AbstractJDOQuery<R>
 {
 	private static final long serialVersionUID = 1L;
-	private static final Logger logger = Logger.getLogger(AbstractArticleContainerQuickSearchQuery.class);
+	private static final Logger logger = Logger.getLogger(AbstractArticleContainerQuery.class);
 	
 	@Override
 	protected Query prepareQuery()

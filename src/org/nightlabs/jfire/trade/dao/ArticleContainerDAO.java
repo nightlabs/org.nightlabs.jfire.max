@@ -19,7 +19,7 @@ import org.nightlabs.jfire.trade.TradeManagerUtil;
 import org.nightlabs.jfire.trade.id.ArticleContainerID;
 import org.nightlabs.jfire.trade.id.OfferID;
 import org.nightlabs.jfire.trade.id.OrderID;
-import org.nightlabs.jfire.trade.query.AbstractArticleContainerQuickSearchQuery;
+import org.nightlabs.jfire.trade.query.AbstractArticleContainerQuery;
 import org.nightlabs.progress.ProgressMonitor;
 import org.nightlabs.util.CollectionUtil;
 
@@ -99,7 +99,7 @@ extends BaseJDOObjectDAO<ArticleContainerID, ArticleContainer>
 	
 	public <T extends ArticleContainer> Collection<T> getArticleContainersForQueries(
 //			Collection<JDOQuery<ArticleContainer>> queries,
-			QueryCollection<T, ? extends AbstractArticleContainerQuickSearchQuery<T>> queries,
+			QueryCollection<T, ? extends AbstractArticleContainerQuery<T>> queries,
 			String[] fetchGroups,
 			int maxFetchDepth, ProgressMonitor monitor)
 	{

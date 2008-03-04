@@ -84,7 +84,7 @@ import org.nightlabs.jfire.trade.id.OfferLocalID;
 import org.nightlabs.jfire.trade.id.OrderID;
 import org.nightlabs.jfire.trade.id.SegmentTypeID;
 import org.nightlabs.jfire.trade.jbpm.ProcessDefinitionAssignment;
-import org.nightlabs.jfire.trade.query.AbstractArticleContainerQuickSearchQuery;
+import org.nightlabs.jfire.trade.query.AbstractArticleContainerQuery;
 import org.nightlabs.jfire.transfer.id.AnchorID;
 import org.nightlabs.version.MalformedVersionException;
 
@@ -1594,24 +1594,24 @@ implements SessionBean
 	 * @ejb.transaction type="Supports" @!This usually means that no transaction is opened which is significantly faster and recommended for all read-only EJB methods! Marco.
 	 */
 	@SuppressWarnings("unchecked")
-	public <R extends ArticleContainer> Set<ArticleContainerID> getArticleContainerIDs(QueryCollection<R, ? extends AbstractArticleContainerQuickSearchQuery<? extends R>> queries)
+	public <R extends ArticleContainer> Set<ArticleContainerID> getArticleContainerIDs(QueryCollection<R, ? extends AbstractArticleContainerQuery<? extends R>> queries)
 	{
 		PersistenceManager pm = getPersistenceManager();
 		try {
 			pm.getFetchPlan().setMaxFetchDepth(1);
 			pm.getFetchPlan().setGroup(FetchPlan.DEFAULT);
 
-			JDOQueryCollectionDecorator<R, ? extends AbstractArticleContainerQuickSearchQuery<? extends R>> decoratedCollection;
+			JDOQueryCollectionDecorator<R, ? extends AbstractArticleContainerQuery<? extends R>> decoratedCollection;
 			
 			// DO not add / apply generics to the instanceof check, the sun compiler doesn't like it
 			// and stop compilation with an "Unconvertible types" error!
 			if (queries instanceof JDOQueryCollectionDecorator)
 			{
-				decoratedCollection = (JDOQueryCollectionDecorator<R, ? extends AbstractArticleContainerQuickSearchQuery<? extends R>>) queries;
+				decoratedCollection = (JDOQueryCollectionDecorator<R, ? extends AbstractArticleContainerQuery<? extends R>>) queries;
 			}
 			else
 			{
-				decoratedCollection = new JDOQueryCollectionDecorator<R, AbstractArticleContainerQuickSearchQuery<? extends R>>(queries);
+				decoratedCollection = new JDOQueryCollectionDecorator<R, AbstractArticleContainerQuery<? extends R>>(queries);
 			}
 			
 			decoratedCollection.setPersistenceManager(pm);			
@@ -1654,7 +1654,7 @@ implements SessionBean
 //	}
 
 //	/**
-//	 * @param articleContainerQueries Instances of {@link AbstractArticleContainerQuickSearchQuery}
+//	 * @param articleContainerQueries Instances of {@link AbstractArticleContainerQuery}
 //	 * 		that shall be chained
 //	 *		in order to retrieve the result. The result of one query is passed to the
 //	 *		next one using the {@link JDOQuery#setCandidates(Collection)}.
@@ -1663,15 +1663,15 @@ implements SessionBean
 //	 * @ejb.permission role-name="_Guest_"
 //	 * @ejb.transaction type="Supports" @!This usually means that no transaction is opened which is significantly faster and recommended for all read-only EJB methods! Marco.
 //	 */
-//	public Set<ArticleContainerID> getArticleContainerIDsForQuickSearchQueries(Collection<AbstractArticleContainerQuickSearchQuery> articleContainerQuickSearchQueries)
+//	public Set<ArticleContainerID> getArticleContainerIDsForQuickSearchQueries(Collection<AbstractArticleContainerQuery> articleContainerQuickSearchQueries)
 //	{
 //		PersistenceManager pm = getPersistenceManager();
 //		try {
 //			pm.getFetchPlan().setMaxFetchDepth(1);
 //			pm.getFetchPlan().setGroup(FetchPlan.DEFAULT);
 //
-//			Collection<AbstractArticleContainerQuickSearchQuery> articleContainers = null;
-//			for (AbstractArticleContainerQuickSearchQuery query : articleContainerQuickSearchQueries) {
+//			Collection<AbstractArticleContainerQuery> articleContainers = null;
+//			for (AbstractArticleContainerQuery query : articleContainerQuickSearchQueries) {
 //				query.setPersistenceManager(pm);
 //				query.setCandidates(articleContainers);
 //				articleContainers = (Collection) query.getResult();

@@ -5,7 +5,7 @@ import java.util.Date;
 import javax.jdo.Query;
 
 import org.apache.log4j.Logger;
-import org.nightlabs.jdo.query.JDOQuery;
+import org.nightlabs.jdo.query.AbstractJDOQuery;
 import org.nightlabs.jfire.jbpm.graph.def.Statable;
 import org.nightlabs.jfire.jbpm.graph.def.State;
 import org.nightlabs.jfire.trade.state.id.StateDefinitionID;
@@ -17,7 +17,7 @@ import org.nightlabs.jfire.trade.state.id.StateDefinitionID;
  *
  */
 public class StatableQuery
-extends JDOQuery<Statable>
+	extends AbstractJDOQuery<Statable>
 {
 	private static final long serialVersionUID = 1L;
 	private static final Logger logger = Logger.getLogger(StatableQuery.class);
@@ -138,6 +138,12 @@ extends JDOQuery<Statable>
 	}
 	public void setOnlyInSelectedState(boolean onlyInSelectedState) {
 		this.onlyInSelectedState = onlyInSelectedState;
+	}
+
+	@Override
+	protected Class<Statable> init()
+	{
+		return Statable.class;
 	}
 	
 }

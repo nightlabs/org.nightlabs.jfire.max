@@ -28,6 +28,8 @@ import org.jbpm.JbpmConfiguration;
 import org.nightlabs.jdo.NLJDOHelper;
 import org.nightlabs.jdo.ObjectID;
 import org.nightlabs.jdo.moduleregistry.ModuleMetaData;
+import org.nightlabs.jdo.query.JDOQueryCollectionDecorator;
+import org.nightlabs.jdo.query.QueryCollection;
 import org.nightlabs.jfire.base.BaseSessionBeanImpl;
 import org.nightlabs.jfire.jbpm.graph.def.ProcessDefinition;
 import org.nightlabs.jfire.jbpm.graph.def.Statable;
@@ -495,19 +497,33 @@ implements SessionBean
 	 * @ejb.permission role-name="_Guest_"
 	 * @ejb.transaction type="Supports" @!This usually means that no transaction is opened which is significantly faster and recommended for all read-only EJB methods! Marco.
 	 */
-	public Set<Statable> getStatables(Collection<StatableQuery> statableQueries)
+	@SuppressWarnings("unchecked")
+	public Set<Statable> getStatables(QueryCollection<Statable, ? extends StatableQuery> statableQueries)
 	{
 		PersistenceManager pm = getPersistenceManager();
 		try {
 			pm.getFetchPlan().setMaxFetchDepth(1);
 			pm.getFetchPlan().setGroup(FetchPlan.DEFAULT);
 
-			Set<Statable> statables = null;
-			for (StatableQuery query : statableQueries) {
-				query.setPersistenceManager(pm);
-				query.setCandidates(statables);
-				statables = new HashSet<Statable>(query.getResult());
+			JDOQueryCollectionDecorator<Statable, StatableQuery> decoratedCollection;
+			
+			// DO not apply generics to this instanceof check, otherwise the sun compiler will result in
+			// an error like this:
+//			 [javac] /home/marius/workspaces/crossticket/JFireJbpm/src/org/nightlabs/jfire/jbpm/JbpmManagerBean.java:510: inconvertible types
+//		   [javac] found   : org.nightlabs.jdo.query.QueryCollection<org.nightlabs.jfire.jbpm.graph.def.Statable,capture#82 of ? extends org.nightlabs.jfire.jbpm.query.StatableQuery>
+//		   [javac] required: org.nightlabs.jdo.query.JDOQueryCollectionDecorator<?,?>
+//		   [javac] 			if (statableQueries instanceof JDOQueryCollectionDecorator<?, ?>)
+			if (statableQueries instanceof JDOQueryCollectionDecorator)
+			{
+				decoratedCollection = (JDOQueryCollectionDecorator<Statable, StatableQuery>) statableQueries; 
 			}
+			else
+			{
+				decoratedCollection = new JDOQueryCollectionDecorator<Statable, StatableQuery>(statableQueries);
+			}
+
+			decoratedCollection.setPersistenceManager(pm);
+			Collection<Statable> statables = decoratedCollection.executeQueries();
 
 			return NLJDOHelper.getDetachedQueryResultAsSet(pm, statables);
 		} finally {

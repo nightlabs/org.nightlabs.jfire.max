@@ -50,7 +50,9 @@ import org.jbpm.graph.exe.ProcessInstance;
 import org.nightlabs.ModuleException;
 import org.nightlabs.jdo.NLJDOHelper;
 import org.nightlabs.jdo.moduleregistry.ModuleMetaData;
-import org.nightlabs.jdo.query.JDOQuery;
+import org.nightlabs.jdo.query.AbstractJDOQuery;
+import org.nightlabs.jdo.query.JDOQueryCollectionDecorator;
+import org.nightlabs.jdo.query.QueryCollection;
 import org.nightlabs.jfire.accounting.Currency;
 import org.nightlabs.jfire.accounting.Tariff;
 import org.nightlabs.jfire.accounting.TariffOrderConfigModule;
@@ -1583,28 +1585,37 @@ implements SessionBean
 	}
 
 	/**
-	 * @param queries Instances of {@link JDOQuery}
-	 * 		that shall be chained
+	 * @param queries the QueryCollection containing all queries that shall be chained
 	 *		in order to retrieve the result. The result of one query is passed to the
-	 *		next one using the {@link JDOQuery#setCandidates(Collection)}.
+	 *		next one using the {@link AbstractJDOQuery#setCandidates(Collection)}.
 	 *
 	 * @ejb.interface-method
 	 * @ejb.permission role-name="_Guest_"
 	 * @ejb.transaction type="Supports" @!This usually means that no transaction is opened which is significantly faster and recommended for all read-only EJB methods! Marco.
 	 */
-	public Set<ArticleContainerID> getArticleContainerIDs(Collection<? extends JDOQuery<? extends ArticleContainer>> queries)
+	@SuppressWarnings("unchecked")
+	public <R extends ArticleContainer> Set<ArticleContainerID> getArticleContainerIDs(QueryCollection<R, ? extends AbstractArticleContainerQuickSearchQuery<? extends R>> queries)
 	{
 		PersistenceManager pm = getPersistenceManager();
 		try {
 			pm.getFetchPlan().setMaxFetchDepth(1);
 			pm.getFetchPlan().setGroup(FetchPlan.DEFAULT);
 
-			Collection<AbstractArticleContainerQuickSearchQuery> articleContainers = null;
-			for (JDOQuery query : queries) {
-				query.setPersistenceManager(pm);
-				query.setCandidates(articleContainers);
-				articleContainers = query.getResult();
+			JDOQueryCollectionDecorator<R, ? extends AbstractArticleContainerQuickSearchQuery<? extends R>> decoratedCollection;
+			
+			// DO not add / apply generics to the instanceof check, the sun compiler doesn't like it
+			// and stop compilation with an "Unconvertible types" error!
+			if (queries instanceof JDOQueryCollectionDecorator)
+			{
+				decoratedCollection = (JDOQueryCollectionDecorator<R, ? extends AbstractArticleContainerQuickSearchQuery<? extends R>>) queries;
 			}
+			else
+			{
+				decoratedCollection = new JDOQueryCollectionDecorator<R, AbstractArticleContainerQuickSearchQuery<? extends R>>(queries);
+			}
+			
+			decoratedCollection.setPersistenceManager(pm);			
+			Collection<R> articleContainers = decoratedCollection.executeQueries();
 
 			return NLJDOHelper.getObjectIDSet(articleContainers);
 		} finally {
@@ -1702,7 +1713,8 @@ implements SessionBean
 	 * @ejb.permission role-name="_Guest_"
 	 * @ejb.transaction type="Supports" @!This usually means that no transaction is opened which is significantly faster and recommended for all read-only EJB methods! Marco.
 	 */
-	public Set<OfferID> getOfferIDs(Collection<? extends JDOQuery<? extends Offer>> queries)
+	@SuppressWarnings("unchecked")
+	public Set<OfferID> getOfferIDs(QueryCollection<Offer, ? extends AbstractJDOQuery<? extends Offer>> queries)
 	{
 		if (queries == null)
 			throw new IllegalArgumentException("queries must not be null!");
@@ -1715,12 +1727,19 @@ implements SessionBean
 			pm.getFetchPlan().setMaxFetchDepth(1);
 			pm.getFetchPlan().setGroup(FetchPlan.DEFAULT);
 
-			Collection<? extends Offer> offers = null;
-			for (JDOQuery<? extends Offer> query : queries) {
-				query.setPersistenceManager(pm);
-				query.setCandidates(offers);
-				offers = query.getResult();
+			JDOQueryCollectionDecorator<Offer, AbstractJDOQuery<? extends Offer>> decoratedQueries;
+			
+			if (queries instanceof JDOQueryCollectionDecorator)
+			{
+				decoratedQueries = (JDOQueryCollectionDecorator<Offer, AbstractJDOQuery<? extends Offer>>) queries;
 			}
+			else
+			{
+				decoratedQueries = new JDOQueryCollectionDecorator<Offer, AbstractJDOQuery<? extends Offer>>(queries);
+			}
+			
+			decoratedQueries.setPersistenceManager(pm);
+			Collection<? extends Offer> offers = decoratedQueries.executeQueries();
 
 			return NLJDOHelper.getObjectIDSet(offers);
 		} finally {
@@ -1733,20 +1752,28 @@ implements SessionBean
 	 * @ejb.permission role-name="_Guest_"
 	 * @ejb.transaction type="Supports" @!This usually means that no transaction is opened which is significantly faster and recommended for all read-only EJB methods! Marco.
 	 */
-	public Set<OrderID> getOrderIDs(Collection<? extends JDOQuery<? extends Order>> queries)
+	@SuppressWarnings("unchecked")
+	public Set<OrderID> getOrderIDs(QueryCollection<Order, ? extends AbstractJDOQuery<? extends Order>> queries)
 	{
 		PersistenceManager pm = getPersistenceManager();
 		try {
 			pm.getFetchPlan().setMaxFetchDepth(1);
 			pm.getFetchPlan().setGroup(FetchPlan.DEFAULT);
 
-			Collection<? extends Order> orders = null;
-			for (JDOQuery<? extends Order> query : queries) {
-				query.setPersistenceManager(pm);
-				query.setCandidates(orders);
-				orders = query.getResult();
+			JDOQueryCollectionDecorator<Order, AbstractJDOQuery<? extends Order>> decoratedQueries;
+			
+			if (queries instanceof JDOQueryCollectionDecorator)
+			{
+				decoratedQueries = (JDOQueryCollectionDecorator<Order, AbstractJDOQuery<? extends Order>>) queries;
 			}
-
+			else
+			{
+				decoratedQueries = new JDOQueryCollectionDecorator<Order, AbstractJDOQuery<? extends Order>>(queries);
+			}
+			
+			decoratedQueries.setPersistenceManager(pm);
+			Collection<? extends Order> orders = decoratedQueries.executeQueries();
+			
 			return NLJDOHelper.getObjectIDSet(orders);
 		} finally {
 			pm.close();
@@ -1783,20 +1810,28 @@ implements SessionBean
 	 * @ejb.permission role-name="_Guest_"
 	 * @ejb.transaction type="Supports" @!This usually means that no transaction is opened which is significantly faster and recommended for all read-only EJB methods! Marco.
 	 */
-	public Set<ReceptionNoteID> getReceptionNoteIDs(Collection<JDOQuery> queries)
+	@SuppressWarnings("unchecked")
+	public Set<ReceptionNoteID> getReceptionNoteIDs(QueryCollection<ReceptionNote, ? extends AbstractJDOQuery<? extends ReceptionNote>> queries)
 	{
 		PersistenceManager pm = getPersistenceManager();
 		try {
 			pm.getFetchPlan().setMaxFetchDepth(1);
 			pm.getFetchPlan().setGroup(FetchPlan.DEFAULT);
 
-			Collection<ReceptionNote> receptionNotes = null;
-			for (JDOQuery query : queries) {
-				query.setPersistenceManager(pm);
-				query.setCandidates(receptionNotes);
-				receptionNotes = query.getResult();
+			JDOQueryCollectionDecorator<ReceptionNote, AbstractJDOQuery<? extends ReceptionNote>> decoratedQueries;
+			
+			if (queries instanceof JDOQueryCollectionDecorator)
+			{
+				decoratedQueries = (JDOQueryCollectionDecorator<ReceptionNote, AbstractJDOQuery<? extends ReceptionNote>>) queries;
 			}
-
+			else
+			{
+				decoratedQueries = new JDOQueryCollectionDecorator<ReceptionNote, AbstractJDOQuery<? extends ReceptionNote>>(queries);
+			}
+			
+			decoratedQueries.setPersistenceManager(pm);
+			Collection<ReceptionNote> receptionNotes = decoratedQueries.executeQueries();
+			
 			return NLJDOHelper.getObjectIDSet(receptionNotes);
 		} finally {
 			pm.close();

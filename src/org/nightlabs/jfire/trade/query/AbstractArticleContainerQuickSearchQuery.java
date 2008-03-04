@@ -1,34 +1,33 @@
-/**
- * 
- */
 package org.nightlabs.jfire.trade.query;
+
+import java.util.Date;
 
 import javax.jdo.Query;
 
 import org.apache.log4j.Logger;
 import org.nightlabs.jdo.ObjectIDUtil;
-import org.nightlabs.jdo.query.JDOQuery;
+import org.nightlabs.jdo.query.AbstractJDOQuery;
+import org.nightlabs.jfire.security.id.UserID;
 import org.nightlabs.jfire.trade.ArticleContainer;
+import org.nightlabs.jfire.transfer.id.AnchorID;
 
 /**
- * {@link JDOQuery} implementation which can be used together with
+ * {@link AbstractJDOQuery} implementation which can be used together with
  * {@link AbstractArticleContainerQuickSearchEntry}s
  * 
  * @author Daniel Mazurek - daniel <at> nightlabs <dot> de
+ * @author Marius Heinzmann - marius[at]nightlabs[dot]com
  */
-public abstract class AbstractArticleContainerQuickSearchQuery
-extends JDOQuery<ArticleContainer>
+public abstract class AbstractArticleContainerQuickSearchQuery<R extends ArticleContainer>
+	extends AbstractJDOQuery<R>
 {
-	/**
-	 * 
-	 */
 	private static final long serialVersionUID = 1L;
 	private static final Logger logger = Logger.getLogger(AbstractArticleContainerQuickSearchQuery.class);
 	
 	@Override
 	protected Query prepareQuery()
 	{
-		Query q = getPersistenceManager().newQuery(getArticleContainerClass());
+		Query q = getPersistenceManager().newQuery(getResultType());
 		StringBuffer filter = new StringBuffer();
 		
 		filter.append("true");
@@ -37,7 +36,36 @@ extends JDOQuery<ArticleContainer>
 		checkCustomerName(filter);
 		checkVendorName(filter);
 		checkArticleContainerID(filter);
-				
+		
+		// check creation time and counts
+		if (articleCountMin >= 0)
+			filter.append("\n && :articleCountMin < this.articles.size()");
+		
+		if (articleCountMax >= 0)
+			filter.append("\n && :articleCountMax > this.articles.size()");
+
+		if (createDTMin != null)
+			filter.append("\n && this.createDT >= :createDTMin");
+
+		if (createDTMax != null)
+			filter.append("\n && this.createDT <= :createDTMax");
+		
+		if (createUserID != null)
+		{
+			// FIXME: JPOX Bug JDOHelper.getObjectId(this.*) does not seem to work (java.lang.IndexOutOfBoundsException: Index: 3, Size: 3)
+//		filter.append("\n && JDOHelper.getObjectId(this.createUser) == :createUserID");
+		// WORKAROUND:
+		filter.append("\n && (" +
+				"this.createUser.organisationID == \""+createUserID.organisationID+"\" && " +
+				"this.createUser.userID == \""+createUserID.userID+"\"" +
+						")");
+		}
+	  // own to method to allow override for Offer where it is different
+		checkVendor(filter);
+		checkCustomer(filter);
+		
+		// append filter for the additional fields of the implementing class.
+		checkAdditionalFields(filter);
 		q.setFilter(filter.toString());
 //		q.setRange(rangeFromIncl, rangeToExcl);
 		
@@ -46,6 +74,13 @@ extends JDOQuery<ArticleContainer>
 		
 		return q;
 	}
+
+	/**
+	 * Here you should check the fields of the subclass of ArticleContainer.
+	 * @param filter the already constructed filter consisting of the vendor, customer and article id
+	 * 	check.
+	 */
+	protected abstract void checkAdditionalFields(StringBuffer filter);
 
 	protected void checkVendorName(StringBuffer filter)
 	{
@@ -64,6 +99,43 @@ extends JDOQuery<ArticleContainer>
 		if (getArticleContainerID() != null && !getArticleContainerID().trim().equals(""))
 //			filter.append("\n && (this."+getArticleContainerIDMemberName()+" == \""+ObjectIDUtil.parseLongObjectIDField(articleContainerID)+"\"");
 			filter.append("\n && (this."+getArticleContainerIDMemberName()+" == "+ObjectIDUtil.parseLongObjectIDField(articleContainerID)+")");
+	}
+	
+	/**
+	 * Crops all elements from given vendor anchor. 
+	 * @param filter the filter to write the query into.
+	 */
+	protected void checkVendor(StringBuffer filter) {
+		if (vendorID != null)
+		{
+			// FIXME: JPOX Bug JDOHelper.getObjectId(this.*) does not seem to work (java.lang.IndexOutOfBoundsException: Index: 3, Size: 3)
+//			filter.append("\n && JDOHelper.getObjectId(this.vendor) == :vendorID");
+			// WORKAROUND:
+			filter.append("\n && (" +
+				"this.vendor.organisationID == \""+vendorID.organisationID+"\" && " +
+				"this.vendor.anchorTypeID == \""+vendorID.anchorTypeID+"\" && " +
+				"this.vendor.anchorID == \""+vendorID.anchorID+"\"" +
+			")");
+		}	
+	}
+	
+	// own to method to allow override for Offer where it is different
+	/**
+	 * Crops all elements from given customer anchor. 
+	 * @param filter the filter to write the query into.
+	 */
+	protected void checkCustomer(StringBuffer filter) {
+		if (getCustomerID() != null)
+		{
+			// FIXME: JPOX Bug JDOHelper.getObjectId(this.*) does not seem to work (java.lang.IndexOutOfBoundsException: Index: 3, Size: 3)
+//			filter.append("\n && JDOHelper.getObjectId(this.customer) == :customerID");
+			// WORKAROUND:
+			filter.append("\n && (" +
+				"this.customer.organisationID == \""+customerID.organisationID+"\" && " +
+				"this.customer.anchorTypeID == \""+customerID.anchorTypeID+"\" && " +
+				"this.customer.anchorID == \""+customerID.anchorID+"\"" +
+			")");
+		}
 	}
 	
 	private String customerName;
@@ -117,11 +189,67 @@ extends JDOQuery<ArticleContainer>
 		this.articleContainerID = articleContainerID;
 	}
 	
-	/**
-	 * returns the class of the articleContainer
-	 * @return the class of the articleContainer
-	 */
-	public abstract Class getArticleContainerClass();
+	private int articleCountMin = -1;
+	public int getArticleCountMin() {
+		return articleCountMin;
+	}
+	public void setArticleCountMin(int articleCountMin) {
+		this.articleCountMin = articleCountMin;
+	}
+	
+	private int articleCountMax = -1;
+	public int getArticleCountMax() {
+		return articleCountMax;
+	}
+	public void setArticleCountMax(int articleCountMax) {
+		this.articleCountMax = articleCountMax;
+	}
+	
+	private Date createDTMin = null;
+	public Date getCreateDTMin() {
+		return createDTMin;
+	}
+	public void setCreateDTMin(Date createDTMin) {
+		this.createDTMin = createDTMin;
+	}
+	
+	private Date createDTMax = null;
+	public Date getCreateDTMax() {
+		return createDTMax;
+	}
+	public void setCreateDTMax(Date createDTMax) {
+		this.createDTMax = createDTMax;
+	}
+	
+	private UserID createUserID = null;
+	public UserID getCreateUserID() {
+		return createUserID;
+	}
+	public void setCreateUserID(UserID createUserID) {
+		this.createUserID = createUserID;
+	}
+	
+	private AnchorID vendorID = null;
+	public AnchorID getVendorID() {
+		return vendorID;
+	}
+	public void setVendorID(AnchorID vendorID) {
+		this.vendorID = vendorID;
+	}
+	
+	private AnchorID customerID = null;
+	public AnchorID getCustomerID() {
+		return customerID;
+	}
+	public void setCustomerID(AnchorID customerID) {
+		this.customerID = customerID;
+	}
+	
+//	/**
+//	 * returns the class of the articleContainer
+//	 * @return the class of the articleContainer
+//	 */
+//	public abstract Class<R> getArticleContainerClass();
 	
 	/**
 	 * returns the name of the articleContainerID member

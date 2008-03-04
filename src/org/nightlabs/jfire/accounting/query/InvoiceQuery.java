@@ -4,10 +4,11 @@ import java.util.Date;
 
 import javax.jdo.Query;
 
-import org.nightlabs.jdo.query.JDOQuery;
+import org.nightlabs.jdo.query.AbstractJDOQuery;
 import org.nightlabs.jfire.accounting.Currency;
 import org.nightlabs.jfire.accounting.Invoice;
 import org.nightlabs.jfire.accounting.id.CurrencyID;
+import org.nightlabs.jfire.trade.query.InvoiceQuickSearchQuery;
 import org.nightlabs.jfire.transfer.id.AnchorID;
 
 /**
@@ -15,14 +16,17 @@ import org.nightlabs.jfire.transfer.id.AnchorID;
  * will cause the query to filter all non-matching instances.
  *
  * @author Marco Schulze - marco at nightlabs dot de
+ * @deprecated use {@link InvoiceQuickSearchQuery} instead.
  */
+@Deprecated
 public class InvoiceQuery
-extends JDOQuery<Invoice>
+extends AbstractJDOQuery<Invoice>
 {
 	private static final long serialVersionUID = 1L;
 
 	private AnchorID vendorID = null;
 	private AnchorID customerID = null;
+
 	private CurrencyID currencyID = null;
 	private Currency currency = null;
 
@@ -31,7 +35,7 @@ extends JDOQuery<Invoice>
 	private Long amountPaidMin = null;
 	private Long amountPaidMax = null;
 	private Boolean booked = null;
-
+	
 	private Date bookDTMin = null;
 	private Date bookDTMax = null;
 
@@ -195,6 +199,12 @@ extends JDOQuery<Invoice>
 	public void setVendorID(AnchorID vendorID)
 	{
 		this.vendorID = vendorID;
+	}
+
+	@Override
+	protected Class<Invoice> init()
+	{
+		return null;
 	}
 
 	

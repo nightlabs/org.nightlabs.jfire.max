@@ -32,27 +32,12 @@ import org.nightlabs.jdo.search.SearchFilter;
  * 
  * @author Alexander Bieber <alex[AT]nightlabs[DOT]de>
  */
-public abstract class ProductTypeGroupSearchFilter extends SearchFilter {
-	private static final long serialVersionUID = 1L;
-
-	public ProductTypeGroupSearchFilter(int conjunction) {
+public abstract class ProductTypeGroupSearchFilter<R extends ProductTypeGroup>
+	extends SearchFilter<R>
+{
+	public ProductTypeGroupSearchFilter(int conjunction)
+	{
 		super(conjunction);
 	}
-
-	/**
-	 * @see org.nightlabs.jdo.search.SearchFilter#getExtentClass()
-	 */
-	@Override
-	protected Class getExtentClass() {
-		Class productTypeGroupClass = getProductTypeGroupClass();
-		if (!ProductTypeGroup.class.isAssignableFrom(productTypeGroupClass))
-			throw new IllegalArgumentException("getProductTypeGroupClass must return a subclass of ProductTypeGroup");
-		return productTypeGroupClass;
-	}
 	
-	/**
-	 * Return the extend-class for this filter. Must return an
-	 * subclass of {@link ProductTypeGroup}.
-	 */
-	protected abstract Class getProductTypeGroupClass();
 }

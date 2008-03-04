@@ -1,6 +1,3 @@
-/**
- * 
- */
 package org.nightlabs.jfire.trade.query;
 
 import org.nightlabs.jfire.trade.Offer;
@@ -9,7 +6,10 @@ import org.nightlabs.jfire.trade.Offer;
 /**
  * @author Daniel Mazurek - daniel <at> nightlabs <dot> de
  * @author marco schulze - marco at nightlabs dot de
+ * 
+ * @deprecated use {@link OfferQuickSearchQuery}!
  */
+@Deprecated
 public class OfferQuery
 //extends ArticleContainerQuery<Set<Offer>>
 extends ArticleContainerQuery

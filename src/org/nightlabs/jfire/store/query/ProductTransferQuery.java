@@ -5,6 +5,11 @@ import javax.jdo.Query;
 import org.nightlabs.annotation.Implement;
 import org.nightlabs.jfire.store.ProductTransfer;
 
+/**
+ * 
+ * @author Marco Schulze - marco[at]nightlabs[dot]com
+ * @author Marius Heinzmann - marius[at]nightlabs[dot]com
+ */
 public class ProductTransferQuery
 extends AbstractProductTransferQuery<ProductTransfer>
 {
@@ -15,5 +20,11 @@ extends AbstractProductTransferQuery<ProductTransfer>
 	protected void setQueryResult(Query q)
 	{
 		// nothing to do
+	}
+
+	@Override
+	protected Class<ProductTransfer> init()
+	{
+		return ProductTransfer.class;
 	}
 }

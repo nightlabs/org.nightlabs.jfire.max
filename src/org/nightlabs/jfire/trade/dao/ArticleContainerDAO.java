@@ -1,12 +1,9 @@
-/**
- * 
- */
 package org.nightlabs.jfire.trade.dao;
 
 import java.util.Collection;
 import java.util.Set;
 
-import org.nightlabs.jdo.query.JDOQuery;
+import org.nightlabs.jdo.query.QueryCollection;
 import org.nightlabs.jfire.accounting.AccountingManager;
 import org.nightlabs.jfire.accounting.AccountingManagerUtil;
 import org.nightlabs.jfire.accounting.id.InvoiceID;
@@ -22,7 +19,9 @@ import org.nightlabs.jfire.trade.TradeManagerUtil;
 import org.nightlabs.jfire.trade.id.ArticleContainerID;
 import org.nightlabs.jfire.trade.id.OfferID;
 import org.nightlabs.jfire.trade.id.OrderID;
+import org.nightlabs.jfire.trade.query.AbstractArticleContainerQuickSearchQuery;
 import org.nightlabs.progress.ProgressMonitor;
+import org.nightlabs.util.CollectionUtil;
 
 /**
  * @author Daniel Mazurek - daniel <at> nightlabs <dot> de
@@ -98,16 +97,18 @@ extends BaseJDOObjectDAO<ArticleContainerID, ArticleContainer>
 		return getJDOObjects(null, articleContainerIDs, fetchGroups, maxFetchDepth, monitor);
 	}
 	
-	public Collection<ArticleContainer> getArticleContainersForQueries(
+	public <T extends ArticleContainer> Collection<T> getArticleContainersForQueries(
 //			Collection<JDOQuery<ArticleContainer>> queries,
-			Collection<? extends JDOQuery> queries,
+			QueryCollection<T, ? extends AbstractArticleContainerQuickSearchQuery<T>> queries,
 			String[] fetchGroups,
 			int maxFetchDepth, ProgressMonitor monitor)
 	{
 		try {
 			TradeManager tm = TradeManagerUtil.getHome(SecurityReflector.getInitialContextProperties()).create();
 			Collection<ArticleContainerID> articleContainerIDs = tm.getArticleContainerIDs(queries);
-			return getJDOObjects(null, articleContainerIDs, fetchGroups, maxFetchDepth, monitor);
+			return CollectionUtil.castCollection( 
+				getJDOObjects(null, articleContainerIDs, fetchGroups, maxFetchDepth, monitor)
+				);
 		}
 		catch (Throwable t) {
 			throw new RuntimeException(t);

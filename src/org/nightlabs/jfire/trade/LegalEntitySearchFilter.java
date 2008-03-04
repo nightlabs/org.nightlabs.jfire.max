@@ -33,12 +33,11 @@ import org.nightlabs.jfire.prop.search.PropSearchFilter;
  * @author Alexander Bieber <alex[AT]nightlabs[DOT]de>
  *
  */
-public class LegalEntitySearchFilter extends PropSearchFilter {
+public class LegalEntitySearchFilter
+	extends PropSearchFilter
+{
 	private static final long serialVersionUID = 1L;
 
-	/**
-	 * 
-	 */
 	public LegalEntitySearchFilter() {
 		super();
 	}
@@ -55,8 +54,14 @@ public class LegalEntitySearchFilter extends PropSearchFilter {
 		filter.append(PROPERTY_VARNAME+" == this.person");
 	}
 	
+//	@Override
+//	protected Class getExtentClass() {
+//		return LegalEntity.class;
+//	}
+
 	@Override
-	protected Class getExtentClass() {
+	protected Class<LegalEntity> init()
+	{
 		return LegalEntity.class;
 	}
 }

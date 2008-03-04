@@ -58,7 +58,9 @@ import org.jbpm.graph.exe.ProcessInstance;
 import org.nightlabs.ModuleException;
 import org.nightlabs.i18n.I18nText;
 import org.nightlabs.jdo.NLJDOHelper;
-import org.nightlabs.jdo.query.JDOQuery;
+import org.nightlabs.jdo.query.AbstractJDOQuery;
+import org.nightlabs.jdo.query.JDOQueryCollectionDecorator;
+import org.nightlabs.jdo.query.QueryCollection;
 import org.nightlabs.jfire.accounting.book.LocalAccountantDelegate;
 import org.nightlabs.jfire.accounting.book.id.LocalAccountantDelegateID;
 import org.nightlabs.jfire.accounting.book.mappingbased.MoneyFlowDimension;
@@ -129,6 +131,7 @@ import org.nightlabs.jfire.trade.id.CustomerGroupID;
 import org.nightlabs.jfire.trade.id.OfferID;
 import org.nightlabs.jfire.trade.id.OrderID;
 import org.nightlabs.jfire.trade.jbpm.ProcessDefinitionAssignment;
+import org.nightlabs.jfire.transfer.Anchor;
 import org.nightlabs.jfire.transfer.id.AnchorID;
 import org.nightlabs.jfire.transfer.id.TransferID;
 
@@ -153,6 +156,7 @@ public abstract class AccountingManagerBean
 	 */
 	private static final Logger logger = Logger.getLogger(AccountingManagerBean.class);
 
+	@Override
 	public void setSessionContext(SessionContext sessionContext)
 			throws EJBException, RemoteException
 	{
@@ -684,7 +688,7 @@ public abstract class AccountingManagerBean
 	public Account getAccount(AnchorID accountID, String[] fetchGroups, int maxFetchDepth)
 	throws ModuleException
 	{
-		return getAccount(Account.getPrimaryKey(accountID.organisationID, accountID.anchorTypeID, accountID.anchorID), fetchGroups, maxFetchDepth);
+		return getAccount(Anchor.getPrimaryKey(accountID.organisationID, accountID.anchorTypeID, accountID.anchorID), fetchGroups, maxFetchDepth);
 	}
 
 		/**
@@ -722,7 +726,7 @@ public abstract class AccountingManagerBean
 	 * @ejb.transaction type="Supports" @!This usually means that no transaction is opened which is significantly faster and recommended for all read-only EJB methods! Marco.
 	 * @ejb.permission role-name="_Guest_"
 	 */
-	public Collection getAccounts(AccountSearchFilter searchFilter,  String[] fetchGroups, int maxFetchDepth)
+	public Collection<Account> getAccounts(AccountSearchFilter searchFilter,  String[] fetchGroups, int maxFetchDepth)
 	{
 		PersistenceManager pm = getPersistenceManager();
 		try {
@@ -730,13 +734,14 @@ public abstract class AccountingManagerBean
 			if (fetchGroups != null)
 				pm.getFetchPlan().setGroups(fetchGroups);
 			
-			Collection accounts = searchFilter.executeQuery(pm);
+			searchFilter.setPersistenceManager(pm);
+			Collection<Account> accounts = searchFilter.getResult();
 
 			if (fetchGroups != null)
 				pm.getFetchPlan().setGroups(fetchGroups);
 			
-			Collection result = pm.detachCopyAll(accounts);
-			return result;
+//			Collection result = pm.detachCopyAll(accounts);
+			return NLJDOHelper.getDetachedQueryResultAsSet(pm, accounts);
 		} finally {
 			pm.close();
 		}
@@ -752,7 +757,8 @@ public abstract class AccountingManagerBean
 	{
 		PersistenceManager pm = getPersistenceManager();
 		try {
-			return NLJDOHelper.getObjectIDSet(searchFilter.executeQuery(pm));
+			searchFilter.setPersistenceManager(pm);
+			return NLJDOHelper.getObjectIDSet(searchFilter.getResult());
 		} finally {
 			pm.close();
 		}
@@ -2248,26 +2254,31 @@ public abstract class AccountingManagerBean
 	/**
 	 * @param invoiceQueries Instances of {@link InvoiceQuery} that shall be chained
 	 *		in order to retrieve the result. The result of one query is passed to the
-	 *		next one using the {@link JDOQuery#setCandidates(Collection)}.
+	 *		next one using the {@link AbstractJDOQuery#setCandidates(Collection)}.
 	 *
 	 * @ejb.interface-method
 	 * @ejb.permission role-name="_Guest_"
 	 * @ejb.transaction type="Supports" @!This usually means that no transaction is opened which is significantly faster and recommended for all read-only EJB methods! Marco.
 	 */
-	public Set<InvoiceID> getInvoiceIDs(Collection<? extends JDOQuery<? extends Invoice>> invoiceQueries)
+	@SuppressWarnings("unchecked")
+	public Set<InvoiceID> getInvoiceIDs(QueryCollection<Invoice, ? extends AbstractJDOQuery<? extends Invoice>> invoiceQueries)
 	{
 		PersistenceManager pm = getPersistenceManager();
 		try {
 			pm.getFetchPlan().setMaxFetchDepth(1);
 			pm.getFetchPlan().setGroup(FetchPlan.DEFAULT);
 
-			Set<Invoice> invoices = null;
-			for (JDOQuery<? extends Invoice> query : invoiceQueries) {
-				query.setPersistenceManager(pm);
-				query.setCandidates(invoices);
-				invoices = new HashSet<Invoice>(query.getResult());
+			if (! (invoiceQueries instanceof JDOQueryCollectionDecorator))
+			{
+				invoiceQueries = new JDOQueryCollectionDecorator<Invoice, AbstractJDOQuery<? extends Invoice>>(invoiceQueries);
 			}
+			
+			JDOQueryCollectionDecorator<Invoice, AbstractJDOQuery<? extends Invoice>> queryCollection =
+				(JDOQueryCollectionDecorator<Invoice, AbstractJDOQuery<? extends Invoice>>) invoiceQueries;
 
+			queryCollection.setPersistenceManager(pm);
+			Collection<Invoice> invoices = queryCollection.executeQueries();
+			
 			return NLJDOHelper.getObjectIDSet(invoices);
 		} finally {
 			pm.close();
@@ -2318,30 +2329,30 @@ public abstract class AccountingManagerBean
 		}
 	}
 
-	/**
-	 * @ejb.interface-method
-	 * @ejb.permission role-name="_Guest_"
-	 * @ejb.transaction type="Supports" @!This usually means that no transaction is opened which is significantly faster and recommended for all read-only EJB methods! Marco.
-	 */
-	public Set<InvoiceID> getInvoiceIDsByQueries(Collection<JDOQuery> queries)
-	{
-		PersistenceManager pm = getPersistenceManager();
-		try {
-			pm.getFetchPlan().setMaxFetchDepth(1);
-			pm.getFetchPlan().setGroup(FetchPlan.DEFAULT);
-
-			Collection<Invoice> invoices = null;
-			for (JDOQuery query : queries) {
-				query.setPersistenceManager(pm);
-				query.setCandidates(invoices);
-				invoices = (Collection) query.getResult();
-			}
-
-			return NLJDOHelper.getObjectIDSet(invoices);
-		} finally {
-			pm.close();
-		}
-	}
+//	/**
+//	 * @ejb.interface-method
+//	 * @ejb.permission role-name="_Guest_"
+//	 * @ejb.transaction type="Supports" @!This usually means that no transaction is opened which is significantly faster and recommended for all read-only EJB methods! Marco.
+//	 */
+//	public Set<InvoiceID> getInvoiceIDsByQueries(Collection<AbstractJDOQuery> queries)
+//	{
+//		PersistenceManager pm = getPersistenceManager();
+//		try {
+//			pm.getFetchPlan().setMaxFetchDepth(1);
+//			pm.getFetchPlan().setGroup(FetchPlan.DEFAULT);
+//
+//			Collection<Invoice> invoices = null;
+//			for (AbstractSearchQuery<R> query : queries) {
+//				query.setPersistenceManager(pm);
+//				query.setCandidates(invoices);
+//				invoices = (Collection) query.getResult();
+//			}
+//
+//			return NLJDOHelper.getObjectIDSet(invoices);
+//		} finally {
+//			pm.close();
+//		}
+//	}
 	
 	/**
 	 * This method queries all <code>Invoice</code>s which exist between the given vendor and customer and
@@ -2685,6 +2696,7 @@ public abstract class AccountingManagerBean
 			} catch (Exception e) {
 				e.printStackTrace();
 			}
+			// FIXME: this does not do anything, what is supposed to change by doing this? (marius)
 			detachedPT = extPT;
 		}
 	}
@@ -2736,20 +2748,24 @@ public abstract class AccountingManagerBean
 	 * @ejb.permission role-name="_Guest_"
 	 * @ejb.transaction type="Supports" @!This usually means that no transaction is opened which is significantly faster and recommended for all read-only EJB methods! Marco.
 	 */
-	public Set<AnchorID> getAccountIDs(Collection<? extends JDOQuery<? extends Account>> queries)
+	@SuppressWarnings("unchecked")
+	public Set<AnchorID> getAccountIDs(QueryCollection<Account, ? extends AbstractJDOQuery<? extends Account>> queries)
 	{
 		PersistenceManager pm = getPersistenceManager();
 		try {
 			pm.getFetchPlan().setMaxFetchDepth(1);
 			pm.getFetchPlan().setGroup(FetchPlan.DEFAULT);
 
-			Collection<?> accounts = null;
-			for (JDOQuery<?> query : queries) {
-				query.setPersistenceManager(pm);
-				query.setCandidates(accounts);
-				accounts = query.getResult();
+			if (!(queries instanceof JDOQueryCollectionDecorator))
+			{
+				queries = new JDOQueryCollectionDecorator<Account, AbstractJDOQuery<? extends Account>>(queries);
 			}
-
+			JDOQueryCollectionDecorator<Account, AbstractJDOQuery<? extends Account>> decoratedQueries =
+				(JDOQueryCollectionDecorator<Account, AbstractJDOQuery<? extends Account>>) queries;
+			
+			decoratedQueries.setPersistenceManager(pm);
+			Collection<Account> accounts = decoratedQueries.executeQueries();
+			
 			return NLJDOHelper.getObjectIDSet(accounts);
 		} finally {
 			pm.close();

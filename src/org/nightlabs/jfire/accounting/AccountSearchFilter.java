@@ -29,6 +29,8 @@ package org.nightlabs.jfire.accounting;
 import java.util.Map;
 import java.util.Set;
 
+import javax.jdo.Query;
+
 import org.nightlabs.jdo.search.SearchFilter;
 import org.nightlabs.jfire.accounting.id.AccountTypeID;
 import org.nightlabs.jfire.prop.search.PropSearchFilter;
@@ -38,7 +40,8 @@ import org.nightlabs.jfire.transfer.id.AnchorID;
  * @author Alexander Bieber <alex[AT]nightlabs[DOT]de>
  *
  */
-public class AccountSearchFilter extends SearchFilter {
+public class AccountSearchFilter extends SearchFilter<Account>
+{
 	private static final long serialVersionUID = 1L;
 	private AnchorID owner;
 	private String anchorTypeID;
@@ -54,10 +57,10 @@ public class AccountSearchFilter extends SearchFilter {
 		super(SearchFilter.CONJUNCTION_DEFAULT);
 	}
 
-	@Override
-	protected Class getExtentClass() {
-		return Account.class;
-	}
+//	@Override
+//	protected Class<Account> getExtentClass() {
+//		return Account.class;
+//	}
 
 	@Override
 	protected void prepareQuery(
@@ -209,8 +212,18 @@ public class AccountSearchFilter extends SearchFilter {
 	public void setPersonFilter(PropSearchFilter personFilter) {
 		this.personFilter = personFilter;
 	}
-	
-	
 
+	@Override
+	protected Query prepareQuery()
+	{
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	protected Class<Account> init()
+	{
+		return Account.class;
+	}
 
 }

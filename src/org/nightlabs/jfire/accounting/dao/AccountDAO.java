@@ -5,11 +5,12 @@ import java.util.List;
 import java.util.Set;
 
 import org.nightlabs.annotation.Implement;
-import org.nightlabs.jdo.query.JDOQuery;
+import org.nightlabs.jdo.query.QueryCollection;
 import org.nightlabs.jfire.accounting.Account;
 import org.nightlabs.jfire.accounting.AccountSearchFilter;
 import org.nightlabs.jfire.accounting.AccountingManager;
 import org.nightlabs.jfire.accounting.AccountingManagerUtil;
+import org.nightlabs.jfire.accounting.query.AccountQuery;
 import org.nightlabs.jfire.base.jdo.BaseJDOObjectDAO;
 import org.nightlabs.jfire.base.jdo.cache.Cache;
 import org.nightlabs.jfire.security.SecurityReflector;
@@ -68,8 +69,9 @@ extends BaseJDOObjectDAO<AnchorID, Account>
 	}
 
 	@SuppressWarnings("unchecked")
-	public List<Account> getAccountsForQueries(Collection<? extends JDOQuery<? extends Account>> queries, String[] fetchGroups,
-			int maxFetchDepth, ProgressMonitor monitor)
+	public List<Account> getAccountsForQueries(
+		QueryCollection<? extends Account, ? extends AccountQuery> queries,	String[] fetchGroups,
+		int maxFetchDepth, ProgressMonitor monitor)
 	{
 		try {
 			AccountingManager am = AccountingManagerUtil.getHome(SecurityReflector.getInitialContextProperties()).create();

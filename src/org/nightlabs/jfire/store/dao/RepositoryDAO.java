@@ -5,13 +5,14 @@ import java.util.List;
 import java.util.Set;
 
 import org.nightlabs.annotation.Implement;
-import org.nightlabs.jdo.query.JDOQuery;
+import org.nightlabs.jdo.query.QueryCollection;
 import org.nightlabs.jfire.base.jdo.BaseJDOObjectDAO;
 import org.nightlabs.jfire.base.jdo.cache.Cache;
 import org.nightlabs.jfire.security.SecurityReflector;
 import org.nightlabs.jfire.store.Repository;
 import org.nightlabs.jfire.store.StoreManager;
 import org.nightlabs.jfire.store.StoreManagerUtil;
+import org.nightlabs.jfire.store.query.RepositoryQuery;
 import org.nightlabs.jfire.transfer.id.AnchorID;
 import org.nightlabs.progress.ProgressMonitor;
 
@@ -54,7 +55,7 @@ extends BaseJDOObjectDAO<AnchorID, Repository>
 	}
 
 	@SuppressWarnings("unchecked")
-	public List<Repository> getRepositoriesForQueries(Collection<? extends JDOQuery<? extends Repository>> queries, String[] fetchGroups,
+	public List<Repository> getRepositoriesForQueries(QueryCollection<Repository, ? extends RepositoryQuery> queries, String[] fetchGroups,
 			int maxFetchDepth, ProgressMonitor monitor)
 	{
 		try {

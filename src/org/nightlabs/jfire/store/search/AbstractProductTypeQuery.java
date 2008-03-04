@@ -3,7 +3,7 @@ package org.nightlabs.jfire.store.search;
 import javax.jdo.Query;
 
 import org.apache.log4j.Logger;
-import org.nightlabs.jdo.query.JDOQuery;
+import org.nightlabs.jdo.query.AbstractJDOQuery;
 import org.nightlabs.jfire.accounting.book.id.LocalAccountantDelegateID;
 import org.nightlabs.jfire.accounting.priceconfig.id.PriceConfigID;
 import org.nightlabs.jfire.store.ProductType;
@@ -16,14 +16,14 @@ import org.nightlabs.jfire.transfer.id.AnchorID;
  * every field containing a value will cause the query to filter all non-matching instances.
  * 
  * @author Daniel.Mazurek [at] NightLabs [dot] de
- *
+ * @author Marius Heinzmann - marius[at]nightlabs[dot]com
  */
-public class ProductTypeQuery<P extends ProductType>
-extends JDOQuery<P>
+public abstract class AbstractProductTypeQuery<P extends ProductType>
+	extends AbstractJDOQuery<P>
 {
-	private static final Logger logger = Logger.getLogger(ProductTypeQuery.class);
+	private static final Logger logger = Logger.getLogger(AbstractProductTypeQuery.class);
 	
-	private static final long serialVersionUID = 2L;
+	private static final long serialVersionUID = 3L;
 
 	private String fullTextLanguageID = null;
 	private String fullTextSearch = null;
@@ -414,5 +414,5 @@ extends JDOQuery<P>
 	public void setAvailable(Boolean available) {
 		this.available = available;
 	}
-			
+
 }

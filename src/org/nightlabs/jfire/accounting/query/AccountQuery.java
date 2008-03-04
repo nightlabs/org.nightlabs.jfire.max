@@ -3,7 +3,7 @@ package org.nightlabs.jfire.accounting.query;
 import javax.jdo.Query;
 
 import org.apache.log4j.Logger;
-import org.nightlabs.jdo.query.JDOQuery;
+import org.nightlabs.jdo.query.AbstractJDOQuery;
 import org.nightlabs.jfire.accounting.Account;
 import org.nightlabs.jfire.accounting.AccountType;
 import org.nightlabs.jfire.accounting.Currency;
@@ -13,10 +13,10 @@ import org.nightlabs.jfire.transfer.id.AnchorID;
 
 /**
  * @author Daniel.Mazurek [at] NightLabs [dot] de
- *
+ * @author Marius Heinzmann - marius[at]nightlabs[dot]com
  */
 public class AccountQuery
-extends JDOQuery<Account>
+	extends AbstractJDOQuery<Account>
 {
 	private static final long serialVersionUID = 1L;
 
@@ -304,6 +304,12 @@ extends JDOQuery<Account>
 	 */
 	public void setOwnerName(String ownerName) {
 		this.ownerName = ownerName;
+	}
+
+	@Override
+	protected Class<Account> init()
+	{
+		return Account.class;
 	}
 	
 }

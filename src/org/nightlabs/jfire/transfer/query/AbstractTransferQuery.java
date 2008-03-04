@@ -5,13 +5,13 @@ import java.util.Date;
 import javax.jdo.PersistenceManager;
 import javax.jdo.Query;
 
-import org.nightlabs.jdo.query.JDOQuery;
+import org.nightlabs.jdo.query.AbstractJDOQuery;
 import org.nightlabs.jfire.transfer.Anchor;
 import org.nightlabs.jfire.transfer.Transfer;
 import org.nightlabs.jfire.transfer.id.AnchorID;
 
 public abstract class AbstractTransferQuery<T>
-extends JDOQuery<T>
+extends AbstractJDOQuery<T>
 {
 	private static final long serialVersionUID = 1L;
 	private Date timestampFromIncl = null;

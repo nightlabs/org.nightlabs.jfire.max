@@ -56,7 +56,10 @@ import org.jbpm.graph.exe.ProcessInstance;
 import org.nightlabs.ModuleException;
 import org.nightlabs.annotation.Implement;
 import org.nightlabs.jdo.NLJDOHelper;
-import org.nightlabs.jdo.query.JDOQuery;
+import org.nightlabs.jdo.query.AbstractJDOQuery;
+import org.nightlabs.jdo.query.JDOQueryCollectionDecorator;
+import org.nightlabs.jdo.query.QueryCollection;
+import org.nightlabs.jfire.accounting.Accounting;
 import org.nightlabs.jfire.accounting.Invoice;
 import org.nightlabs.jfire.accounting.id.InvoiceID;
 import org.nightlabs.jfire.asyncinvoke.AsyncInvoke;
@@ -99,7 +102,7 @@ import org.nightlabs.jfire.store.id.RepositoryTypeID;
 import org.nightlabs.jfire.store.id.UnitID;
 import org.nightlabs.jfire.store.query.ProductTransferIDQuery;
 import org.nightlabs.jfire.store.query.ProductTransferQuery;
-import org.nightlabs.jfire.store.search.ProductTypeQuery;
+import org.nightlabs.jfire.store.search.AbstractProductTypeQuery;
 import org.nightlabs.jfire.trade.Article;
 import org.nightlabs.jfire.trade.ArticleContainer;
 import org.nightlabs.jfire.trade.CustomerGroup;
@@ -118,6 +121,7 @@ import org.nightlabs.jfire.trade.id.OrderID;
 import org.nightlabs.jfire.trade.jbpm.ProcessDefinitionAssignment;
 import org.nightlabs.jfire.transfer.id.AnchorID;
 import org.nightlabs.jfire.transfer.id.TransferID;
+import org.nightlabs.util.CollectionUtil;
 
 /**
  *
@@ -473,19 +477,24 @@ implements SessionBean
 	 * @ejb.permission role-name="_Guest_"
 	 * @ejb.transaction type="Supports" @!This usually means that no transaction is opened which is significantly faster and recommended for all read-only EJB methods! Marco.
 	 */
-	public Set<DeliveryNoteID> getDeliveryNoteIDs(Collection<JDOQuery> queries)
+	@SuppressWarnings("unchecked")
+	public Set<DeliveryNoteID> getDeliveryNoteIDs(QueryCollection<DeliveryNote, ? extends AbstractJDOQuery<? extends DeliveryNote>> queries)
 	{
 		PersistenceManager pm = getPersistenceManager();
 		try {
 			pm.getFetchPlan().setMaxFetchDepth(1);
 			pm.getFetchPlan().setGroup(FetchPlan.DEFAULT);
-
-			Collection<DeliveryNote> deliveryNotes = null;
-			for (JDOQuery query : queries) {
-				query.setPersistenceManager(pm);
-				query.setCandidates(deliveryNotes);
-				deliveryNotes = query.getResult();
+			
+			if (! (queries instanceof JDOQueryCollectionDecorator))
+			{
+				queries = new JDOQueryCollectionDecorator<DeliveryNote, AbstractJDOQuery<? extends DeliveryNote>>(queries);
 			}
+
+			JDOQueryCollectionDecorator<DeliveryNote, AbstractJDOQuery<? extends DeliveryNote>> decoratedCollection =
+				(JDOQueryCollectionDecorator<DeliveryNote, AbstractJDOQuery<? extends DeliveryNote>>) queries;
+			
+			decoratedCollection.setPersistenceManager(pm);
+			Collection<DeliveryNote> deliveryNotes = decoratedCollection.executeQueries();
 
 			return NLJDOHelper.getObjectIDSet(deliveryNotes);
 		} finally {
@@ -502,7 +511,7 @@ implements SessionBean
 	 * 
 	 * FIXME: move to SimpleTradeManager and others, check permissions there and return only the ids!
 	 */
-	public Collection searchProductTypes(ProductTypeSearchFilter searchFilter, String[] fetchGroups, int maxFetchDepth)
+	public Collection<ProductType> searchProductTypes(ProductTypeSearchFilter<? extends ProductType> searchFilter, String[] fetchGroups, int maxFetchDepth)
 	{
 		PersistenceManager pm = getPersistenceManager();
 		try {
@@ -510,9 +519,9 @@ implements SessionBean
 			if (fetchGroups != null)
 				pm.getFetchPlan().setGroups(fetchGroups);
 			
-			Collection productTypes = searchFilter.executeQuery(pm);
-			Collection result = pm.detachCopyAll(productTypes);
-			return result;
+			searchFilter.setPersistenceManager(pm);
+			Collection<? extends ProductType> productTypes = searchFilter.getResult();
+			return CollectionUtil.castCollection(NLJDOHelper.getDetachedQueryResultAsSet(pm, productTypes));
 		} finally {
 			pm.close();
 		}
@@ -527,7 +536,7 @@ implements SessionBean
 	 * @ejb.permission role-name="_Guest_"
 	 * @ejb.transaction type="Required"
 	 */
-	public Collection searchProductTypeGroups(ProductTypeGroupSearchFilter searchFilter, String[] fetchGroups, int maxFetchDepth)
+	public Collection<? extends ProductTypeGroup> searchProductTypeGroups(ProductTypeGroupSearchFilter<?> searchFilter, String[] fetchGroups, int maxFetchDepth)
 	{
 		PersistenceManager pm = getPersistenceManager();
 		try {
@@ -535,9 +544,10 @@ implements SessionBean
 			if (fetchGroups != null)
 				pm.getFetchPlan().setGroups(fetchGroups);
 
-			Collection productTypeGroups = searchFilter.executeQuery(pm);
-			Collection result = pm.detachCopyAll(productTypeGroups);
-			return result;
+			searchFilter.setPersistenceManager(pm);
+			Collection<? extends ProductTypeGroup> productTypeGroups = searchFilter.getResult();
+//			Collection result = pm.detachCopyAll(productTypeGroups);
+			return CollectionUtil.castSet(NLJDOHelper.getDetachedQueryResultAsSet(pm, productTypeGroups));
 		} finally {
 			pm.close();
 		}
@@ -548,25 +558,26 @@ implements SessionBean
 	 * This method creates a ProductTypeGroupSearchResult out of the
 	 * result an suppresses all ProductTypes in the groups lists that are
 	 * not published or isSaleable() of the ProductType does not equal to the
-	 * sableable parameter.
+	 * saleable parameter.
 	 * 
 	 * @ejb.interface-method
 	 * @ejb.permission role-name="_Guest_"
 	 * @ejb.transaction type="Required"
 	 */
-	public ProductTypeGroupSearchResult searchProductTypeGroups(ProductTypeGroupSearchFilter searchFilter, boolean saleable)
+	public ProductTypeGroupSearchResult searchProductTypeGroups(ProductTypeGroupSearchFilter<?> searchFilter, boolean saleable)
 	{
 		PersistenceManager pm = getPersistenceManager();
 		try {
 			ProductTypeGroupSearchResult searchResult = new ProductTypeGroupSearchResult();
 			
-			Collection productTypeGroups = searchFilter.executeQuery(pm);
-			for (Iterator iter = productTypeGroups.iterator(); iter.hasNext();) {
-				ProductTypeGroup group = (ProductTypeGroup) iter.next();
+			searchFilter.setPersistenceManager(pm);
+			Collection<? extends ProductTypeGroup> productTypeGroups = searchFilter.getResult();
+			for (Iterator<? extends ProductTypeGroup> iter = productTypeGroups.iterator(); iter.hasNext();) {
+				ProductTypeGroup group = iter.next();
 				searchResult.addEntry(group);
-				for (Iterator iterator = group.getProductTypes().iterator(); iterator
+				for (Iterator<ProductType> iterator = group.getProductTypes().iterator(); iterator
 						.hasNext();) {
-					ProductType type = (ProductType) iterator.next();
+					ProductType type = iterator.next();
 					if (type.isPublished() && (type.isSaleable() == saleable)) {
 						searchResult.addType(group, type);
 					}
@@ -873,7 +884,7 @@ implements SessionBean
 				if (fetchGroups != null)
 					pm.getFetchPlan().setGroups(fetchGroups);
 
-				return (DeliveryNote)pm.detachCopy(deliveryNote);
+				return pm.detachCopy(deliveryNote);
 			}
 			return null;
 		} finally {
@@ -954,7 +965,7 @@ implements SessionBean
 				if (fetchGroups != null)
 					pm.getFetchPlan().setGroups(fetchGroups);
 
-				return (DeliveryNote)pm.detachCopy(deliveryNote);
+				return pm.detachCopy(deliveryNote);
 			}
 			return null;
 		} finally {
@@ -998,7 +1009,7 @@ implements SessionBean
 			if (fetchGroups != null)
 				pm.getFetchPlan().setGroups(fetchGroups);
 
-			return (DeliveryNote)pm.detachCopy(deliveryNote);
+			return pm.detachCopy(deliveryNote);
 		} finally {
 			pm.close();
 		}
@@ -1040,7 +1051,7 @@ implements SessionBean
 			if (fetchGroups != null)
 				pm.getFetchPlan().setGroups(fetchGroups);
 
-			return (DeliveryNote)pm.detachCopy(deliveryNote);
+			return pm.detachCopy(deliveryNote);
 		} finally {
 			pm.close();
 		}
@@ -1490,6 +1501,7 @@ implements SessionBean
 			this.deliveryID = deliveryID;
 		}
 
+		@Override
 		@Implement
 		public Serializable invoke()
 				throws Exception
@@ -1696,7 +1708,8 @@ implements SessionBean
 	 * @ejb.permission role-name="_Guest_"
 	 * @ejb.transaction type="Supports" @!This usually means that no transaction is opened which is significantly faster and recommended for all read-only EJB methods! Marco.
 	 */
-	public Set<ProductTypeID> getProductTypeIDs(Collection<ProductTypeQuery<? extends ProductType>> productTypeQueries)
+	@SuppressWarnings("unchecked")
+	public Set<ProductTypeID> getProductTypeIDs(QueryCollection<ProductType, ? extends AbstractProductTypeQuery<? extends ProductType>> productTypeQueries)
 	{
 		// TODO: Implement Authority checking here
 		PersistenceManager pm = getPersistenceManager();
@@ -1704,12 +1717,16 @@ implements SessionBean
 			pm.getFetchPlan().setMaxFetchDepth(1);
 			pm.getFetchPlan().setGroup(FetchPlan.DEFAULT);
 
-			Set<? extends ProductType> productTypes = null;
-			for (ProductTypeQuery<? extends ProductType> query : productTypeQueries) {
-				query.setPersistenceManager(pm);
-				query.setCandidates(productTypes);
-				productTypes = new HashSet<ProductType>(query.getResult());
+			if (! (productTypeQueries instanceof JDOQueryCollectionDecorator))
+			{
+				productTypeQueries = new JDOQueryCollectionDecorator<ProductType, AbstractProductTypeQuery<? extends ProductType>>(productTypeQueries);
 			}
+			JDOQueryCollectionDecorator<ProductType, AbstractProductTypeQuery<? extends ProductType>> queries =
+				(JDOQueryCollectionDecorator<ProductType, AbstractProductTypeQuery<? extends ProductType>>) productTypeQueries;
+			
+			queries.setPersistenceManager(pm);
+			
+			Collection<ProductType> productTypes = queries.executeQueries();
 
 			return NLJDOHelper.getObjectIDSet(productTypes);
 		} finally {
@@ -1862,7 +1879,7 @@ implements SessionBean
 		List<DeliveryQueue> pqs = new LinkedList<DeliveryQueue>();
 		for (DeliveryQueue clientPQ : deliveryQueues) {
 			logger.debug("TicketingManagerBean.storeDeliveryQueue: Storing deliveryQueue " + clientPQ.getName().getText());
-			clientPQ = (DeliveryQueue) pm.makePersistent(clientPQ);
+			clientPQ = pm.makePersistent(clientPQ);
 			pqs.add(clientPQ);
 		}
 
@@ -1874,19 +1891,23 @@ implements SessionBean
 	 * @ejb.permission role-name="_Guest_"
 	 * @ejb.transaction type="Supports" @!This usually means that no transaction is opened which is significantly faster and recommended for all read-only EJB methods! Marco.
 	 */
-	public Set<AnchorID> getRepositoryIDs(Collection<? extends JDOQuery<? extends Repository>> queries)
+	@SuppressWarnings("unchecked")
+	public Set<AnchorID> getRepositoryIDs(QueryCollection<Repository, ? extends AbstractJDOQuery<? extends Repository>> queries)
 	{
 		PersistenceManager pm = getPersistenceManager();
 		try {
 			pm.getFetchPlan().setMaxFetchDepth(1);
 			pm.getFetchPlan().setGroup(FetchPlan.DEFAULT);
 
-			Collection<? extends Repository> repositories = null;
-			for (JDOQuery<? extends Repository> query : queries) {
-				query.setPersistenceManager(pm);
-				query.setCandidates(repositories);
-				repositories = query.getResult();
+			if (! (queries instanceof JDOQueryCollectionDecorator))
+			{
+				queries = new JDOQueryCollectionDecorator<Repository, AbstractJDOQuery<? extends Repository>>(queries);
 			}
+			JDOQueryCollectionDecorator<Repository, AbstractJDOQuery<? extends Repository>> repoQueries =
+				(JDOQueryCollectionDecorator<Repository, AbstractJDOQuery<? extends Repository>>) queries;
+			
+			repoQueries.setPersistenceManager(pm);
+			Collection<? extends Repository> repositories = repoQueries.executeQueries();
 
 			return NLJDOHelper.getObjectIDSet(repositories);
 		} finally {
@@ -1959,7 +1980,8 @@ implements SessionBean
 	 * @ejb.transaction type="Supports" @!This usually means that no transaction is opened which is significantly faster and recommended for all read-only EJB methods! Marco.
 	 * @ejb.permission role-name="_Guest_"
 	 */
-	public List<TransferID> getProductTransferIDs(Collection<ProductTransferQuery> productTransferQueries)
+	public List<TransferID> getProductTransferIDs(
+		QueryCollection<ProductTransfer, ProductTransferQuery> productTransferQueries)
 	{
 		PersistenceManager pm = getPersistenceManager();
 		try {

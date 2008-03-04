@@ -5,7 +5,7 @@ import java.util.Date;
 import javax.jdo.Query;
 
 import org.apache.log4j.Logger;
-import org.nightlabs.jdo.query.JDOQuery;
+import org.nightlabs.jdo.query.AbstractJDOQuery;
 import org.nightlabs.jfire.security.id.UserID;
 import org.nightlabs.jfire.trade.ArticleContainer;
 import org.nightlabs.jfire.trade.Offer;
@@ -14,13 +14,14 @@ import org.nightlabs.jfire.transfer.id.AnchorID;
 /**
  * @author Daniel.Mazurek [at] NightLabs [dot] de
  * @author marco schulze - marco at nightlabs dot de
+ * @author Marius Heinzmann - marius[at]nightlabs[dot]com
+ * 
+ * @deprecated this should not be used anymore see {@link AbstractArticleContainerQuickSearchQuery}! (marius)
  */
-public class ArticleContainerQuery
-extends JDOQuery<ArticleContainer>
+@Deprecated
+public class ArticleContainerQuery<R extends ArticleContainer>
+	extends AbstractJDOQuery<R>
 {
-	/**
-	 * 
-	 */
 	private static final long serialVersionUID = 1L;
 	private static final Logger logger = Logger.getLogger(ArticleContainerQuery.class);
 	
@@ -34,19 +35,12 @@ extends JDOQuery<ArticleContainer>
 
 		if (Offer.class.isAssignableFrom(articleContainerClass) && !(this instanceof OfferQuery))
 			throw new IllegalStateException("Instantiate an instance of OfferQuery instead!");
-
-		this.articleContainerClass = articleContainerClass;
-	}
-	
-	private Class articleContainerClass = null;
-	public Class getArticleContainerClass() {
-		return articleContainerClass;
 	}
 	
 	@Override
 	protected Query prepareQuery()
 	{
-		Query q = getPersistenceManager().newQuery(getArticleContainerClass());
+		Query q = getPersistenceManager().newQuery(getResultType());
 		StringBuffer filter = new StringBuffer();
 		
 		filter.append(" true");
@@ -176,6 +170,13 @@ extends JDOQuery<ArticleContainer>
 	}
 	public void setCustomerID(AnchorID customerID) {
 		this.customerID = customerID;
+	}
+
+	@Override
+	protected Class<R> init()
+	{
+		// TODO Auto-generated method stub
+		return null;
 	}
 	
 //	private Currency currency = null;

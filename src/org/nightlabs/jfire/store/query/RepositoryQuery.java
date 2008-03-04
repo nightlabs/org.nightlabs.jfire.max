@@ -3,7 +3,7 @@ package org.nightlabs.jfire.store.query;
 import javax.jdo.Query;
 
 import org.apache.log4j.Logger;
-import org.nightlabs.jdo.query.JDOQuery;
+import org.nightlabs.jdo.query.AbstractJDOQuery;
 import org.nightlabs.jfire.store.Repository;
 import org.nightlabs.jfire.store.RepositoryType;
 import org.nightlabs.jfire.store.id.RepositoryTypeID;
@@ -13,7 +13,7 @@ import org.nightlabs.jfire.transfer.id.AnchorID;
  * @author Marco Schulze - Marco at NightLabs dot de
  */
 public class RepositoryQuery
-extends JDOQuery<Repository>
+extends AbstractJDOQuery<Repository>
 {
 	private static final long serialVersionUID = 1L;
 
@@ -226,6 +226,12 @@ extends JDOQuery<Repository>
 	 */
 	public void setOwnerName(String ownerName) {
 		this.ownerName = ownerName;
+	}
+
+	@Override
+	protected Class<Repository> init()
+	{
+		return Repository.class;
 	}
 		
 }

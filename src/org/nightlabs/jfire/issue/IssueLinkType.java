@@ -1,10 +1,8 @@
 package org.nightlabs.jfire.issue;
 
 import java.io.Serializable;
-import java.util.Date;
+import java.util.HashSet;
 import java.util.Set;
-
-import org.nightlabs.jdo.ObjectID;
 
 /**
  * @author Chairat Kongarayawetchakun - chairat at nightlabs dot de
@@ -38,10 +36,10 @@ implements Serializable
 	/**
 	 * @jdo.field primary-key="true"
 	 */
-	private long issueLinkTypeID;	
+	private String issueLinkTypeID;	
 	
 	/**
-	 * String of the referenced object class name.
+	 * String of the referenced object class names.
 	 *
 	 * @jdo.field
 	 *		persistence-modifier="persistent"
@@ -52,16 +50,40 @@ implements Serializable
 	private Set<String> linkableObjectClassNames;
 	
 	/**
+	 * @jdo.field persistence-modifier="persistent" dependent="true" mapped-by="issueLinkType"
+	 */
+	private IssueLinkTypeName issueLinkTypeName;
+	/**
 	 * @deprecated Only for JDO!!!!
 	 */
 	protected IssueLinkType() {}
 
-	public IssueLinkType(String organisationID, long issueLinkTypeID) {
+	public IssueLinkType(String organisationID, String issueLinkTypeID) {
 		this.organisationID = organisationID;
 		this.issueLinkTypeID = issueLinkTypeID;
+		
+		this.linkableObjectClassNames = new HashSet<String>();
+		this.issueLinkTypeName = new IssueLinkTypeName(this);
 	}
 	
 	public Set<String> getLinkableObjectClassNames() {
 		return linkableObjectClassNames;
 	}
+	
+	public String getOrganisationID() {
+		return organisationID;
+	}
+	
+	public String getIssueLinkTypeID() {
+		return issueLinkTypeID;
+	}
+	
+	public IssueLinkTypeName getIssueLinkTypeName() {
+		return issueLinkTypeName;
+	}
+	
+	protected void afterCreateIssueLink(IssueLink newIssueLink) { }
+	
+	protected void beforeDeleteIssueLink(IssueLink issueLinkToBeDeleted) { }
+	protected void afterDeleteIssueLink(IssueLink issueLinkDeleted) { }
 }

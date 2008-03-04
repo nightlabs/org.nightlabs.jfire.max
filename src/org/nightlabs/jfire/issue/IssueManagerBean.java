@@ -798,6 +798,30 @@ implements SessionBean{
 			issueType.readProcessDefinition(IssueType.class.getResource("jbpm/status/"));
 			issueType2.readProcessDefinition(IssueType.class.getResource("jbpm/status/"));
 	
+			// Create the issueLinkTypes
+			IssueLinkType issueLinkType;
+
+			issueLinkType = new IssueLinkType(getOrganisationID(), "Related");
+			issueLinkType.getIssueLinkTypeName().setText(Locale.ENGLISH.getLanguage(), "Related");
+			issueLinkType.getLinkableObjectClassNames().add("java.lang.Object");
+			issueLinkType = pm.makePersistent(issueLinkType);
+
+			issueLinkType = new IssueLinkType(getOrganisationID(), "Parent of");
+			issueLinkType.getIssueLinkTypeName().setText(Locale.ENGLISH.getLanguage(), "Parent of");
+			issueLinkType.getLinkableObjectClassNames().add("org.nightlabs.jfire.issue.Issue");
+			issueLinkType = pm.makePersistent(issueLinkType);
+			
+			issueLinkType = new IssueLinkType(getOrganisationID(), "Child of");
+			issueLinkType.getIssueLinkTypeName().setText(Locale.ENGLISH.getLanguage(), "Child of");
+			issueLinkType.getLinkableObjectClassNames().add("org.nightlabs.jfire.issue.Issue");
+			issueLinkType = pm.makePersistent(issueLinkType);
+			
+			issueLinkType = new IssueLinkType(getOrganisationID(), "Duplicate");
+			issueLinkType.getIssueLinkTypeName().setText(Locale.ENGLISH.getLanguage(), "Duplicate");
+			issueLinkType.getLinkableObjectClassNames().add("org.nightlabs.jfire.issue.Issue");
+			issueLinkType = pm.makePersistent(issueLinkType);
+			////////////////////////////////////////////////////////
+			
 			EditLockType issueEditLock = new EditLockType(EditLockTypeIssue.EDIT_LOCK_TYPE_ID);
 			issueEditLock = pm.makePersistent(issueEditLock);
 			//------------------------------------------------

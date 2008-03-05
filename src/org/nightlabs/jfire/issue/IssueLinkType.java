@@ -18,7 +18,7 @@ import java.util.Set;
  * @jdo.create-objectid-class
  * 		field-order="organisationID, issueLinkTypeID"
  * 
- * @jdo.fetch-group name="IssueLinkType.this" fetch-groups="default" fields="names"
+ * @jdo.fetch-group name="IssueLinkType.this" fetch-groups="default" fields="linkableObjectClassNames, issueLinkTypeName"
  * 
  */ 
 public class IssueLinkType 
@@ -46,7 +46,11 @@ implements Serializable
 	 *		collection-type="collection"
 	 *		element-type="String"
 	 *		dependent-value="true"
+	 *		table="JFireIssueTracking_IssueLinkType_linkableObjectClassNames"
+	 *
+	 * @jdo.join
 	 */
+	
 	private Set<String> linkableObjectClassNames;
 	
 	/**

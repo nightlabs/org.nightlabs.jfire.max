@@ -5,6 +5,7 @@ import java.rmi.RemoteException;
 import java.util.Collection;
 import java.util.Date;
 import java.util.HashSet;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Locale;
 import java.util.Set;
@@ -34,6 +35,7 @@ import org.nightlabs.jfire.issue.config.StoredIssueQuery;
 import org.nightlabs.jfire.issue.history.IssueHistory;
 import org.nightlabs.jfire.issue.id.IssueCommentID;
 import org.nightlabs.jfire.issue.id.IssueID;
+import org.nightlabs.jfire.issue.id.IssueLinkTypeID;
 import org.nightlabs.jfire.issue.id.IssueLocalID;
 import org.nightlabs.jfire.issue.id.IssuePriorityID;
 import org.nightlabs.jfire.issue.id.IssueResolutionID;
@@ -440,6 +442,57 @@ implements SessionBean{
 
 			return NLJDOHelper.getObjectIDSet(issues);
 		} finally {
+			pm.close();
+		}
+	}
+	
+	/**
+	 * @ejb.interface-method
+	 * @ejb.transaction type="Supports"
+	 * @ejb.permission role-name="_Guest_"
+	 */
+	@SuppressWarnings("unchecked")
+	public List<IssueLinkType> getIssueLinkTypes(Collection<IssueLinkTypeID> issueLinkTypeIDs, String[] fetchGroups, int maxFetchDepth)
+	{
+		PersistenceManager pm = getPersistenceManager();
+		try {
+			return NLJDOHelper.getDetachedObjectList(pm, issueLinkTypeIDs, IssueLinkType.class, fetchGroups, maxFetchDepth);
+		} finally {
+			pm.close();
+		}
+	}
+	
+	/**
+	 * @throws ModuleException
+	 * 
+	 * @ejb.interface-method
+	 * @ejb.permission role-name="_Guest_"
+	 */
+	public Collection getIssueLinkTypesByLinkedObjectClass(Class<? extends Object> linkedObjectClass)
+	throws ModuleException
+	{
+		PersistenceManager pm = getPersistenceManager();
+		try
+		{
+			Query query = pm.newQuery(IssueLinkType.class);
+			StringBuffer filter = new StringBuffer();
+			
+			if (linkedObjectClass != null) {
+				filter.append("( this.linkableObjectClassNames.contains(varName) && varName.matches(\"" + linkedObjectClass.getName() + "\") )");
+				query.declareVariables(String.class.getName() + " varName");
+			}
+			
+			logger.info(filter.toString());
+			query.setFilter(filter.toString());
+			Collection c = (Collection)query.execute(linkedObjectClass);
+			Iterator i = c.iterator();
+			Collection ret = new HashSet();
+			while(i.hasNext())
+				ret.add(JDOHelper.getObjectId(i.next()));
+
+			return ret;
+		}
+		finally {
 			pm.close();
 		}
 	}

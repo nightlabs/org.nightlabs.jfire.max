@@ -24,6 +24,10 @@ public class StatableQuery
 	
 //	public abstract Class getStatableClass();
 	
+	public StatableQuery()
+	{
+	}
+	
 	public StatableQuery(Class<? extends Statable> statableClass)
 	{
 		if (statableClass == null)
@@ -41,6 +45,15 @@ public class StatableQuery
 	private Class<? extends Statable> statableClass = null;
 	public Class<? extends Statable> getStatableClass() {
 		return statableClass;
+	}
+	
+	/**
+	 * 
+	 * @param statableClass
+	 */
+	public void setStatableClass(Class<? extends Statable> statableClass)
+	{
+		this.statableClass = statableClass;
 	}
 	
 	@Override

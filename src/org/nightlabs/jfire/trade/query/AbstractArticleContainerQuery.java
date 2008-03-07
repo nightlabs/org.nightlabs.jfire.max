@@ -94,6 +94,14 @@ public abstract class AbstractArticleContainerQuery<R extends ArticleContainer>
 			filter.append("\n && (this.customer.person.displayName.toLowerCase().indexOf(\""+customerName.toLowerCase()+"\") >= 0)");
 	}
 	
+	protected void checkCreatorName(StringBuilder filter)
+	{
+		if (creatorName != null)
+		{
+			filter.append("\n && (this.createUser.person.displayName.toLowerCase().indexOf(\""+creatorName.toLowerCase()+"\") >= 0)");
+		}		
+	}
+	
 	protected void checkArticleContainerID(StringBuffer filter)
 	{
 		if (getArticleContainerID() != null && !getArticleContainerID().trim().equals(""))
@@ -138,6 +146,23 @@ public abstract class AbstractArticleContainerQuery<R extends ArticleContainer>
 		}
 	}
 	
+	private String creatorName = null;
+	/**
+	 * @return the creatorName
+	 */
+	public String getCreatorName()
+	{
+		return creatorName;
+	}
+
+	/**
+	 * @param creatorName the creatorName to set
+	 */
+	public void setCreatorName(String creatorName)
+	{
+		this.creatorName = creatorName;
+	}
+
 	private String customerName;
 	/**
 	 * returns the customerName

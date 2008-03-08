@@ -39,13 +39,17 @@ import javax.jdo.JDOHelper;
 import org.nightlabs.jfire.store.id.ProductTypeGroupID;
 import org.nightlabs.jfire.store.id.ProductTypeID;
 
-public class ProductTypeGroupSearchResult implements Serializable {
+public class ProductTypeGroupSearchResult 
+implements Serializable 
+{
 	private static final long serialVersionUID = 1L;
 
-	public static class Entry implements Serializable {
+	public static class Entry 
+	implements Serializable 
+	{
 		private static final long serialVersionUID = 1L;
 		private ProductTypeGroupID productTypeGroup;
-		private List productTypes = new LinkedList();
+		private List<ProductTypeID> productTypes = new LinkedList<ProductTypeID>();
 		
 		public Entry(ProductTypeGroupID productTypeGroupID) {
 			this.productTypeGroup = productTypeGroupID;
@@ -56,14 +60,14 @@ public class ProductTypeGroupSearchResult implements Serializable {
 		}
 
 		public void addProductType(ProductType productType) {
-			productTypes.add(JDOHelper.getObjectId(productType));
+			productTypes.add((ProductTypeID)JDOHelper.getObjectId(productType));
 		}
 		
 		public void addProductType(ProductTypeID productType) {
 			productTypes.add(productType);
 		}
 		
-		public List getProductTypes() {
+		public List<ProductTypeID> getProductTypes() {
 			return productTypes;
 		}
 		
@@ -72,27 +76,26 @@ public class ProductTypeGroupSearchResult implements Serializable {
 		}
 	}
 	
-	
-	private Map entries = new HashMap();
+	private Map<ProductTypeGroupID, Entry> entries = new HashMap<ProductTypeGroupID, Entry>();
 
 	public ProductTypeGroupSearchResult() {
 		super();
 	}
 	
-	public Collection getEntries() {
+	public Collection<Entry> getEntries() {
 		return entries.values();
 	}
 	
-	public Set getEventGroupIDs() {
+	public Set<ProductTypeGroupID> getProductTypesGroupIDs() {
 		return entries.keySet();
 	}
 	
 	public Entry getEntry(ProductTypeGroup productTypeGroup) {
-		return (Entry)entries.get(JDOHelper.getObjectId(productTypeGroup));
+		return entries.get(JDOHelper.getObjectId(productTypeGroup));
 	}
 	
 	public Entry getEntry(ProductTypeGroupID productTypeGroup) {
-		return (Entry)entries.get(productTypeGroup);
+		return entries.get(productTypeGroup);
 	}
 	
 	public void addEntry(Entry entry) {
@@ -104,7 +107,7 @@ public class ProductTypeGroupSearchResult implements Serializable {
 	}
 	
 	public void addEntry(ProductTypeGroup productTypeGroup) {
-		entries.put(JDOHelper.getObjectId(productTypeGroup), new Entry(productTypeGroup));
+		entries.put((ProductTypeGroupID)JDOHelper.getObjectId(productTypeGroup), new Entry(productTypeGroup));
 	}
 	
 	public void addType(ProductTypeGroup productTypeGroup, ProductType productType) {

@@ -1145,16 +1145,45 @@ if (!"".equals(row["City"]))
             <property name="paddingBottom">20pt</property>
             <expression name="valueExpr">articleContainerType = "";
 articleContainer = JFireReportingHelper.getVar("articleContainer");
-if (articleContainer.getClass().getSimpleName() == "Invoice") {
-  articleContainerType = "Invoice"; // TODO: Localize this
-} else if (articleContainer.getClass().getSimpleName() == "Offer") {
-  articleContainerType = "Offer"; // TODO: Localize this
-} else if (articleContainer.getClass().getSimpleName() == "Order") {
-  articleContainerType = "Order"; // TODO: Localize this
-} else if (articleContainer.getClass().getSimpleName() == "DeliveryNote") {
-  articleContainerType = "DeliveryNote"; // TODO: Localize this
-} 
+className = articleContainer.getClass().getSimpleName();
+articleContainerType = reportContext.getMessage("articleContainer.name."+className, reportContext.getLocale());
 articleContainerType + " " + articleContainer.getArticleContainerIDPrefix() + " / " + articleContainer.getArticleContainerIDAsString()</expression>
+            <property name="contentType">html</property>
+        </text-data>
+        <text-data id="218">
+            <property name="fontFamily">"Arial"</property>
+            <property name="fontWeight">bold</property>
+            <property name="color">#808080</property>
+            <property name="paddingTop">1pt</property>
+            <property name="paddingLeft">10pt</property>
+            <property name="paddingBottom">20pt</property>
+            <list-property name="visibility">
+                <structure>
+                    <property name="format">all</property>
+                    <expression name="valueExpr">articleContainer = JFireReportingHelper.getVar("articleContainer");
+className = articleContainer.getClass().getSimpleName();
+if (className != "Order") {
+  articleContainer.isFinalized()
+} else {
+  hide = true;
+  iter = articleContainer.getOffers().iterator();
+  while (iter.hasNext()) {
+    offer = iter.next();
+    if (!offer.isFinalized()) {
+      hide = false;
+      break;
+    }
+  }
+  hide
+}</expression>
+                </structure>
+            </list-property>
+            <expression name="valueExpr">articleContainer = JFireReportingHelper.getVar("articleContainer");
+className = articleContainer.getClass().getSimpleName();
+if (className == "Order")
+  reportContext.getMessage("message.draft.order", reportContext.getLocale())
+else
+  reportContext.getMessage("message.draft", reportContext.getLocale())</expression>
             <property name="contentType">html</property>
         </text-data>
         <table id="62">

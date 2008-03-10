@@ -29,6 +29,7 @@ package org.nightlabs.jfire.store;
 import java.io.Serializable;
 import java.util.Collection;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
@@ -67,11 +68,11 @@ implements Serializable
 			productTypes.add(productType);
 		}
 		
-		public List<ProductTypeID> getProductTypes() {
+		public List<ProductTypeID> getProductTypeIDs() {
 			return productTypes;
 		}
 		
-		public ProductTypeGroupID getProductTypeGroup() {
+		public ProductTypeGroupID getProductTypeGroupID() {
 			return productTypeGroup;
 		}
 	}
@@ -124,5 +125,14 @@ implements Serializable
 	
 	public int getSize() {
 		return entries.size();
+	}
+	
+	// TODO: don't iterate each time but build up when corresponding add-methods are called
+	public Set<ProductTypeID> getAllProductTypeIDs() {
+		Set<ProductTypeID> productTypeIDs = new HashSet<ProductTypeID>();
+		for (Map.Entry<ProductTypeGroupID, Entry> mapEntry : entries.entrySet()) {
+			productTypeIDs.addAll(mapEntry.getValue().getProductTypeIDs());
+		}
+		return productTypeIDs;
 	}
 }

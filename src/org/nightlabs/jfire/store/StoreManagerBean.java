@@ -97,6 +97,7 @@ import org.nightlabs.jfire.store.deliver.id.DeliveryQueueID;
 import org.nightlabs.jfire.store.deliver.id.ModeOfDeliveryFlavourID;
 import org.nightlabs.jfire.store.id.DeliveryNoteID;
 import org.nightlabs.jfire.store.id.DeliveryNoteLocalID;
+import org.nightlabs.jfire.store.id.ProductTypeGroupID;
 import org.nightlabs.jfire.store.id.ProductTypeID;
 import org.nightlabs.jfire.store.id.RepositoryTypeID;
 import org.nightlabs.jfire.store.id.UnitID;
@@ -2046,6 +2047,73 @@ implements SessionBean
 		}
 	}
 
+	/**
+	 * @param productTypeGroupID The ID of the desired <code>ProductTypeGroup</code>.
+	 *
+	 * @ejb.interface-method
+	 * @ejb.transaction type="Required"
+	 * @ejb.permission role-name="_Guest_"
+	 */
+	public ProductTypeGroup getProductTypeGroup(ProductTypeGroupID productTypeGroupID, 
+			String[] fetchGroups, int maxFetchDepth)
+	throws ModuleException
+	{
+		PersistenceManager pm = getPersistenceManager();
+		try {
+			if (fetchGroups != null)
+				pm.getFetchPlan().setGroups(fetchGroups);
+			pm.getFetchPlan().setMaxFetchDepth(maxFetchDepth);	
+			pm.getExtent(ProductTypeGroup.class);
+			return (ProductTypeGroup) pm.detachCopy(pm.getObjectById(productTypeGroupID));
+		} finally {
+			pm.close();
+		}
+	}
+	
+	/**
+	 * @param productTypeGroupIDs Either <code>null</code> in order to return all or instances of {@link ProductTypeGroupID}
+	 *		specifying a subset.
+	 *
+	 * @ejb.interface-method
+	 * @ejb.transaction type="Required"
+	 * @ejb.permission role-name="_Guest_"
+	 */
+	public Collection<ProductTypeGroup> getProductTypeGroups(Collection<ProductTypeGroupID> 
+		productTypeGroupIDs, String[] fetchGroups, int maxFetchDepth)
+	throws ModuleException
+	{
+		PersistenceManager pm = getPersistenceManager();
+		try {
+			if (fetchGroups != null)
+				pm.getFetchPlan().setGroups(fetchGroups);
+			pm.getFetchPlan().setMaxFetchDepth(maxFetchDepth);	
+
+// TODO reactivate as soon as JPOX bug is fixed.
+//			Query q;
+//			if (productTypeGroupIDs == null)
+//				q = pm.newQuery(ProductTypeGroup.class);
+//			else
+//				q = pm.newQuery(
+//					"SELECT " +
+//					"FROM " + ProductTypeGroup.class.getName() + " " +
+//					"WHERE paramEventGroupIDs.contains(JDOHelper.getObjectId(this)) " +
+//					"import java.util.Collection " +
+//					"PARAMETERS Collection paramEventGroupIDs");
+//
+//			Collection productTypeGroups = (Collection) q.execute(productTypeGroupIDs);
+
+			pm.getExtent(ProductTypeGroup.class);
+			ArrayList<ProductTypeGroup> productTypeGroups = new ArrayList<ProductTypeGroup>(productTypeGroupIDs.size());
+			for (ProductTypeGroupID productTypeGroupID : productTypeGroupIDs) {
+				productTypeGroups.add((ProductTypeGroup) pm.getObjectById(productTypeGroupID));
+			}
+
+			return pm.detachCopyAll(productTypeGroups);
+		} finally {
+			pm.close();
+		}
+	}
+	
 	// TODO: when all jpox bugs are fixed, implement generic storeProductType-Method
 //	/**
 //	 * @return Returns a newly detached instance of <tt>ProductType</tt>

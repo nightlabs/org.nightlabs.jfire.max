@@ -40,7 +40,6 @@ import javax.jdo.listener.AttachCallback;
 
 import org.apache.log4j.Logger;
 import org.nightlabs.jdo.ObjectID;
-import org.nightlabs.jdo.ObjectIDUtil;
 import org.nightlabs.jfire.idgenerator.IDGenerator;
 import org.nightlabs.jfire.jbpm.graph.def.Statable;
 import org.nightlabs.jfire.jbpm.graph.def.StatableLocal;
@@ -485,11 +484,15 @@ implements
 			_referencedObjectIDs.add(referencedObjectID);
 	}*/
 	
+	public Set<IssueLink> getIssueLinks() {
+		return issueLinks;
+	}
+	
 	public Set<ObjectID> getLinkObjectIDs() {
 		if (_linkObjectIDs == null) {
 			Set<ObjectID> ro = new HashSet<ObjectID>(issueLinks.size());
 			for (IssueLink issueLink : issueLinks) {
-				ObjectID objectID = ObjectIDUtil.createObjectID(issueLink.getLinkObjectID());
+				ObjectID objectID = issueLink.getLinkedObjectID();
 				ro.add(objectID);
 			}
 			_linkObjectIDs = ro;
@@ -497,13 +500,25 @@ implements
 		return Collections.unmodifiableSet(_linkObjectIDs);
 	}
 
-	public void addLinkObjectID(ObjectID linkObjectID) {
-		if (linkObjectID == null)
-			throw new IllegalArgumentException("linkObjectID must not be null!");
+//	public void addLinkObjectID(ObjectID linkObjectID) {
+//		if (linkObjectID == null)
+//			throw new IllegalArgumentException("linkObjectID must not be null!");
+//
+//		issueLinks.add(new IssueLink(this, IDGenerator.nextID(IssueLink.class), linkObjectID.toString(), new IssueLinkType()));
+//		if (_linkObjectIDs != null) // instead of managing our cache of ObjectID instances, we could alternatively simply null it here, but the current implementation is more efficient.
+//			_linkObjectIDs.add(linkObjectID);
+//	}
 
-		issueLinks.add(new IssueLink(this, IDGenerator.nextID(IssueLink.class), linkObjectID.toString(), new IssueLinkType()));
-		if (_linkObjectIDs != null) // instead of managing our cache of ObjectID instances, we could alternatively simply null it here, but the current implementation is more efficient.
-			_linkObjectIDs.add(linkObjectID);
+	public IssueLink createIssueLink(IssueLinkType issueLinkType, Object linkedObject)
+	{
+		IssueLink issueLink = new IssueLink(
+				IDGenerator.getOrganisationID(),
+				IDGenerator.nextID(IssueLink.class),
+				this, issueLinkType, linkedObject);
+
+		issueLinks.add(issueLink);
+
+		return issueLink;
 	}
 
 	public void removeLinkObjectID(ObjectID linkObjectID) {

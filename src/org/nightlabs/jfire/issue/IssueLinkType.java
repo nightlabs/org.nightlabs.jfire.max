@@ -1,8 +1,13 @@
 package org.nightlabs.jfire.issue;
 
 import java.io.Serializable;
+import java.util.Collection;
 import java.util.HashSet;
 import java.util.Set;
+
+import javax.jdo.JDOHelper;
+import javax.jdo.PersistenceManager;
+import javax.jdo.Query;
 
 /**
  * @author Chairat Kongarayawetchakun - chairat at nightlabs dot de
@@ -18,15 +23,26 @@ import java.util.Set;
  * @jdo.create-objectid-class
  * 		field-order="organisationID, issueLinkTypeID"
  * 
- * @jdo.fetch-group name="IssueLinkType.this" fetch-groups="default" fields="linkableObjectClassNames, issueLinkTypeName"
- * 
+ * @jdo.fetch-group name="IssueLinkType.this" fetch-groups="default" fields="linkableObjectClassNames, name"
+ *
+ * @jdo.query
+ *		name="getIssueLinkTypesForLinkableObjectClassNames"
+ *		query="SELECT WHERE this.linkableObjectClassNames.contains(:linkableObjectClassName)"
  */ 
-public class IssueLinkType 
+public class IssueLinkType
 implements Serializable 
 {
-	public static final String FETCH_GROUP_THIS = "IssueLinkType.this";
-	
 	private static final long serialVersionUID = 1L;
+
+	public static final String FETCH_GROUP_THIS = "IssueLinkType.this";
+
+	@SuppressWarnings("unchecked")
+	public static Collection<IssueLinkType> getIssueLinkTypes(PersistenceManager pm, Class<?> linkableObjectClass)
+	{
+		Query q = pm.newNamedQuery(IssueLinkType.class, "getIssueLinkTypesForLinkableObjectClassNames");
+		return (Collection<IssueLinkType>) q.execute(linkableObjectClass.getName());
+	}
+
 	/**
 	 * @jdo.field primary-key="true"
 	 * @jdo.column length="100"
@@ -50,13 +66,12 @@ implements Serializable
 	 *
 	 * @jdo.join
 	 */
-	
 	private Set<String> linkableObjectClassNames;
 	
 	/**
 	 * @jdo.field persistence-modifier="persistent" dependent="true" mapped-by="issueLinkType"
 	 */
-	private IssueLinkTypeName issueLinkTypeName;
+	private IssueLinkTypeName name;
 	/**
 	 * @deprecated Only for JDO!!!!
 	 */
@@ -67,7 +82,7 @@ implements Serializable
 		this.issueLinkTypeID = issueLinkTypeID;
 		
 		this.linkableObjectClassNames = new HashSet<String>();
-		this.issueLinkTypeName = new IssueLinkTypeName(this);
+		this.name = new IssueLinkTypeName(this);
 	}
 	
 	public Set<String> getLinkableObjectClassNames() {
@@ -82,12 +97,24 @@ implements Serializable
 		return issueLinkTypeID;
 	}
 	
-	public IssueLinkTypeName getIssueLinkTypeName() {
-		return issueLinkTypeName;
+	public IssueLinkTypeName getName() {
+		return name;
 	}
 	
 	protected void afterCreateIssueLink(IssueLink newIssueLink) { }
 	
 	protected void beforeDeleteIssueLink(IssueLink issueLinkToBeDeleted) { }
 	protected void afterDeleteIssueLink(IssueLink issueLinkDeleted) { }
+
+	protected PersistenceManager getPersistenceManager()
+	{
+		PersistenceManager pm = JDOHelper.getPersistenceManager(this);
+		if (pm == null)
+			throw new IllegalStateException("This instance of IssueLinkType is currently not persistent! Cannot obtain a PersistenceManager!");
+		return pm;
+	}
+
+//	protected Object detachLinkedObject(IssueLink issueLink) {
+//		return getPersistenceManager().detachCopy(issueLink.getLinkedObject());
+//	}
 }

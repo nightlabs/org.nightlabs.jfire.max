@@ -382,7 +382,9 @@ implements SessionBean{
 	 * @ejb.permission role-name="_Guest_"
 	 */
 	@SuppressWarnings("unchecked")
-	public List<IssueComment> getIssueComments(Collection<IssueCommentID> issueCommentIDs, String[] fetchGroups, int maxFetchDepth)
+	public List<IssueComment> getIssueComments(Collection<IssueCommentID> issueCommentIDs, 
+			String[] fetchGroups, 
+			int maxFetchDepth)
 	{
 		PersistenceManager pm = getPersistenceManager();
 		try {
@@ -865,22 +867,22 @@ implements SessionBean{
 			IssueLinkType issueLinkType;
 
 			issueLinkType = new IssueLinkType(getOrganisationID(), "Related");
-			issueLinkType.getIssueLinkTypeName().setText(Locale.ENGLISH.getLanguage(), "Related");
+			issueLinkType.getName().setText(Locale.ENGLISH.getLanguage(), "Related");
 			issueLinkType.getLinkableObjectClassNames().add("java.lang.Object");
 			issueLinkType = pm.makePersistent(issueLinkType);
 
 			issueLinkType = new IssueLinkType(getOrganisationID(), "Parent of");
-			issueLinkType.getIssueLinkTypeName().setText(Locale.ENGLISH.getLanguage(), "Parent of");
+			issueLinkType.getName().setText(Locale.ENGLISH.getLanguage(), "Parent of");
 			issueLinkType.getLinkableObjectClassNames().add("org.nightlabs.jfire.issue.Issue");
 			issueLinkType = pm.makePersistent(issueLinkType);
 			
 			issueLinkType = new IssueLinkType(getOrganisationID(), "Child of");
-			issueLinkType.getIssueLinkTypeName().setText(Locale.ENGLISH.getLanguage(), "Child of");
+			issueLinkType.getName().setText(Locale.ENGLISH.getLanguage(), "Child of");
 			issueLinkType.getLinkableObjectClassNames().add("org.nightlabs.jfire.issue.Issue");
 			issueLinkType = pm.makePersistent(issueLinkType);
 			
 			issueLinkType = new IssueLinkType(getOrganisationID(), "Duplicate");
-			issueLinkType.getIssueLinkTypeName().setText(Locale.ENGLISH.getLanguage(), "Duplicate");
+			issueLinkType.getName().setText(Locale.ENGLISH.getLanguage(), "Duplicate");
 			issueLinkType.getLinkableObjectClassNames().add("org.nightlabs.jfire.issue.Issue");
 			issueLinkType = pm.makePersistent(issueLinkType);
 			////////////////////////////////////////////////////////

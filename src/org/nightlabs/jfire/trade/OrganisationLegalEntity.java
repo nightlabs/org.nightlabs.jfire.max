@@ -177,8 +177,8 @@ implements StoreCallback
 					pm, organisationID, throwExceptionIfNotExistent);
 
 			if (organisation != null) {
-				
 				organisationLegalEntity = new OrganisationLegalEntity(organisation);
+				organisationLegalEntity.setDefaultCustomerGroup(Trader.getTrader(pm).getDefaultCustomerGroupForKnownCustomer());
 				try {
 					organisationLegalEntity = pm.makePersistent(organisationLegalEntity);
 				} catch (JDODataStoreException workaround) {

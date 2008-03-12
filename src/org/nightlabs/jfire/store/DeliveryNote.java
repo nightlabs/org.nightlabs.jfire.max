@@ -184,7 +184,7 @@ implements Serializable, ArticleContainer, Statable, DetachCallback
 	@Deprecated
 	protected DeliveryNote() { }
 
-	public DeliveryNote(User creator, OrganisationLegalEntity vendor,
+	public DeliveryNote(User creator, LegalEntity vendor,
 			LegalEntity customer, String deliveryNoteIDPrefix, long _deliveryNoteID)
 	{
 		if (creator == null)
@@ -254,7 +254,7 @@ implements Serializable, ArticleContainer, Statable, DetachCallback
 	/**
 	 * @jdo.field persistence-modifier="persistent"
 	 */
-	private OrganisationLegalEntity vendor;
+	private LegalEntity vendor;
 
 	/**
 	 * @jdo.field persistence-modifier="persistent"
@@ -414,7 +414,7 @@ implements Serializable, ArticleContainer, Statable, DetachCallback
 	public LegalEntity getCustomer() {
 		return customer;
 	}
-	public OrganisationLegalEntity getVendor() {
+	public LegalEntity getVendor() {
 		return vendor;
 	}
 

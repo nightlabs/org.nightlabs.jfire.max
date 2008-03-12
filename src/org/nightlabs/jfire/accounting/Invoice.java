@@ -203,7 +203,7 @@ implements Serializable, ArticleContainer, Statable, DetachCallback
 	protected Invoice() {}
 
 	public Invoice(
-			User creator, OrganisationLegalEntity vendor, LegalEntity customer,
+			User creator, LegalEntity vendor, LegalEntity customer,
 			String invoiceIDPrefix, long _invoiceID, Currency currency)
 	{
 		if (creator == null)
@@ -260,7 +260,7 @@ implements Serializable, ArticleContainer, Statable, DetachCallback
 	/**
 	 * @jdo.field persistence-modifier="persistent"
 	 */
-	private OrganisationLegalEntity vendor;
+	private LegalEntity vendor;
 
 	/**
 	 * @jdo.field persistence-modifier="persistent"
@@ -644,7 +644,7 @@ implements Serializable, ArticleContainer, Statable, DetachCallback
 	public Price getPrice() {
 		return price;
 	}
-	public OrganisationLegalEntity getVendor() {
+	public LegalEntity getVendor() {
 		return vendor;
 	}
 //	protected void setCurrency(Currency currency) {

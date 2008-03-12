@@ -385,7 +385,7 @@ implements Serializable, ArticleContainer, SegmentContainer, DetachCallback
 	/**
 	 * @jdo.field persistence-modifier="persistent"
 	 */
-	private OrganisationLegalEntity vendor;
+	private LegalEntity vendor;
 
 	/**
 	 * @jdo.field persistence-modifier="persistent"
@@ -546,7 +546,7 @@ implements Serializable, ArticleContainer, SegmentContainer, DetachCallback
 	protected Order() {}
 
 	public Order(
-			OrganisationLegalEntity vendor, LegalEntity customer,
+			LegalEntity vendor, LegalEntity customer,
 			String orderIDPrefix, long orderID,
 			Currency currency, User user)
 	{
@@ -636,7 +636,7 @@ implements Serializable, ArticleContainer, SegmentContainer, DetachCallback
 	/**
 	 * @return Returns the vendor.
 	 */
-	public OrganisationLegalEntity getVendor()
+	public LegalEntity getVendor()
 	{
 		return vendor;
 	}

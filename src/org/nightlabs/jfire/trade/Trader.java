@@ -520,7 +520,7 @@ public class Trader
 		return orderIDPrefix;
 	}
 
-	public Order createOrder(OrganisationLegalEntity vendor,
+	public Order createOrder(LegalEntity vendor,
 			LegalEntity customer, String orderIDPrefix, Currency currency)
 //	throws ModuleException
 	{
@@ -535,62 +535,24 @@ public class Trader
 		// LocalOrganisation localOrganisation =
 		// LocalOrganisation.getLocalOrganisation(pm);
 
-		if (getMandator().getPrimaryKey().equals(vendor.getPrimaryKey())) {
-			// local: the vendor is owning the datastore
+		if (!getMandator().equals(vendor) && (vendor instanceof OrganisationLegalEntity)) {
+			// TODO: Implement foreign stuff
+			throw new UnsupportedOperationException("NYI");
+		}
+		else {
+			// local: the vendor is the local organisation (owning this datastore) OR it is a locally managed non-organisation-LE
 			User user = SecurityReflector.getUserDescriptor().getUser(pm);
 
 			orderIDPrefix = getOrderIDPrefix(user, orderIDPrefix);
-//			if (orderIDPrefix == null) {
-//				TradeConfigModule tradeConfigModule;
-//				try {
-//					tradeConfigModule = (TradeConfigModule) Config.getConfig(
-//							getPersistenceManager(), getOrganisationID(), user).createConfigModule(TradeConfigModule.class);
-//				} catch (ModuleException x) {
-//					throw new RuntimeException(x); // should not happen.
-//				}
-//
-//				orderIDPrefix = tradeConfigModule.getActiveIDPrefixCf(Order.class.getName()).getDefaultIDPrefix();
-//			}
 
 			Order order = new Order(
-					getMandator(), customer,
+					vendor, customer,
 					orderIDPrefix, IDGenerator.nextID(Order.class, orderIDPrefix),
 					currency, user);
 
 			order = getPersistenceManager().makePersistent(order);
 			return order;
 		}
-//		if (!getOrganisationID().equals(vendor.getOrganisation())) {
-//			try {
-//
-//
-//
-//			} catch (ModuleException x) {
-//				throw x;
-//			} catch (Exception x) {
-//				throw new ModuleException(x);
-//			}
-//		}
-
-		// TODO: Implement foreign stuff
-		// // not local, means it's a remote organisation...
-		// // Thus, we delegate to the TradeManager of the other organisation.
-		// Hashtable props = Lookup.getInitialContextProps(pm, getOrganisationID());
-		// try {
-		// TradeManager tm = TradeManagerUtil.getHome(props).create();
-		// Order order = tm.createOrder(currency.getCurrencyID());
-		// tm.remove();
-		//
-		// String pk = order.getPrimaryKey();
-		// orders.put(pk, order);
-		// return order;
-		// } catch (ModuleException e) {
-		// throw e;
-		// } catch (Exception e) {
-		// throw new ModuleException(e);
-		// }
-		// return null;
-		throw new UnsupportedOperationException("NYI");
 	}
 
 //	public OrderRequirement createOrderRequirement(Order order)

@@ -262,7 +262,7 @@ implements StoreCallback
 		// all offers have the same vendor and customer
 		// and all offers have the same currency
 		String vendorPK = null;
-		OrganisationLegalEntity vendorLE = null;
+		LegalEntity vendorLE = null;
 		String customerPK = null;
 		LegalEntity customerLE = null;
 		Currency invoiceCurrency = null;

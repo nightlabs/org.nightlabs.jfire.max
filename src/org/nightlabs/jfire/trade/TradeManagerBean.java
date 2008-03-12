@@ -202,8 +202,71 @@ implements SessionBean
 		}
 	}
 
+	
 	/**
-	 * Creates a new order. This method is intended to be called by a user (not another
+	 * Creates a new Purchase order. This method is intended to be called by a user (not another
+	 * organisation).
+	 *
+	 * @param vendorID An <tt>Order</tt> is defined between a vendor (this <tt>Organisation</tt>) and a customer. This ID defines the customer.
+	 * @param currencyID What <tt>Currency</tt> to use for the new <tt>Order</tt>.
+	 * @param segmentTypeIDs May be <tt>null</tt>. If it is not <tt>null</tt>, a {@link Segment} will be created for each defined {@link SegmentType}. For each <tt>null</tt> entry within the array, a <tt>Segment</tt> with the {@link SegmentType#DEFAULT_SEGMENT_TYPE_ID} will be created.
+	 * @param fetchGroups What fields should be detached.
+	 *
+	 * @ejb.interface-method
+	 * @ejb.permission role-name="TradeManager-write"
+	 * @ejb.transaction type="Required"
+	 **/
+	public Order createPurchaseOrder(
+			AnchorID vendorID, String orderIDPrefix, CurrencyID currencyID,
+			SegmentTypeID[] segmentTypeIDs, String[] fetchGroups, int maxFetchDepth)
+//	throws ModuleException
+	{
+		if (vendorID == null)
+			throw new IllegalArgumentException("vendorID must not be null!");
+
+		if (currencyID == null)
+			throw new IllegalArgumentException("vendorID must not be null!");
+
+		PersistenceManager pm = getPersistenceManager();
+		try {
+			Trader trader = Trader.getTrader(pm);
+
+			pm.getExtent(Currency.class);
+			Currency currency = (Currency)pm.getObjectById(currencyID);
+
+			pm.getExtent(LegalEntity.class);
+			LegalEntity vendor = (LegalEntity) pm.getObjectById(vendorID);
+
+			Order order = trader.createOrder(vendor, trader.getMandator(),orderIDPrefix, currency);
+
+			if (segmentTypeIDs != null)
+				createSegments(pm, trader, order, segmentTypeIDs);
+
+			// TODO JPOX WORKAROUND BEGIN
+			// JDOHelper.getObjectId(order.getSegments().iterator().next()) returns null => trying to evict cache and reload a clean object
+			{
+				OrderID orderID = (OrderID) JDOHelper.getObjectId(order);
+				pm.evictAll();
+				order = (Order) pm.getObjectById(orderID);
+			}
+			// TODO JPOX WORKAROUND END
+
+			pm.getFetchPlan().setMaxFetchDepth(maxFetchDepth);
+			if (fetchGroups != null)
+				pm.getFetchPlan().setGroups(fetchGroups);
+
+			return pm.detachCopy(order);
+		} finally {
+			pm.close();
+		}
+	}
+	
+	
+	
+	
+	
+	/**
+	 * Creates a new Sale order. This method is intended to be called by a user (not another
 	 * organisation).
 	 *
 	 * @param customerID An <tt>Order</tt> is defined between a vendor (this <tt>Organisation</tt>) and a customer. This ID defines the customer.
@@ -215,7 +278,7 @@ implements SessionBean
 	 * @ejb.permission role-name="TradeManager-write"
 	 * @ejb.transaction type="Required"
 	 **/
-	public Order createOrder(
+	public Order createSaleOrder(
 			AnchorID customerID, String orderIDPrefix, CurrencyID currencyID,
 			SegmentTypeID[] segmentTypeIDs, String[] fetchGroups, int maxFetchDepth)
 //	throws ModuleException
@@ -259,7 +322,14 @@ implements SessionBean
 			pm.close();
 		}
 	}
-
+	
+	
+	
+	
+	
+	
+	
+	
 	private static void createSegments(PersistenceManager pm, Trader trader, Order order, SegmentTypeID[] segmentTypeIDs)
 	{
 		pm.getExtent(SegmentType.class);

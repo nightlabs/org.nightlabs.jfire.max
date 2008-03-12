@@ -144,7 +144,7 @@ public class OfferRequirement
 	}
 	
 	public void addPartnerOffer(Offer offer) {
-		OrganisationLegalEntity vendor = offer.getOrder().getVendor();
+		LegalEntity vendor = offer.getOrder().getVendor();
 		Offer other = vendor2offer.get(vendor);
 		if (offer.equals(other))
 			return; // already registered - ignore

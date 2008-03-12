@@ -50,6 +50,7 @@ import org.nightlabs.jfire.accounting.book.LocalAccountantDelegate;
 import org.nightlabs.jfire.accounting.priceconfig.AffectedProductType;
 import org.nightlabs.jfire.accounting.priceconfig.PriceConfigUtil;
 import org.nightlabs.jfire.accounting.priceconfig.id.PriceConfigID;
+import org.nightlabs.jfire.security.Authority;
 import org.nightlabs.jfire.security.User;
 import org.nightlabs.jfire.store.book.LocalStorekeeperDelegate;
 import org.nightlabs.jfire.store.id.ProductTypeID;
@@ -84,13 +85,10 @@ import org.nightlabs.util.Util;
 public class ProductTypeLocal
 implements Serializable, Inheritable, InheritanceCallbacks
 {
-	// TODO: add field authority for security checking
 	private static final long serialVersionUID = 1L;
 
 	private static final Logger logger = Logger.getLogger(ProductTypeLocal.class);
 
-	private int test;
-	
 	public static final String FETCH_GROUP_PRODUCT_TYPE = "ProductTypeLocal.productType";
 	public static final String FETCH_GROUP_HOME = "ProductTypeLocal.home";
 	public static final String FETCH_GROUP_LOCAL_ACCOUNTANT_DELEGATE = "ProductTypeLocal.localAccountantDelegate";
@@ -114,11 +112,6 @@ implements Serializable, Inheritable, InheritanceCallbacks
 	 * @jdo.field persistence-modifier="persistent"
 	 */
 	private ProductType productType;
-
-//	/**
-//	 * @jdo.field persistence-modifier="persistent"
-//	 */
-//	private Repository home;
 
 	/**
 	 * @jdo.field persistence-modifier="persistent"
@@ -160,6 +153,11 @@ implements Serializable, Inheritable, InheritanceCallbacks
 	protected Map<String, ProductTypeLocalFieldMetaData> fieldMetaDataMap;
 
 	/**
+	 * @jdo.field persistence-modifier="persistent"
+	 */
+	private Authority authority;
+
+	/**
 	 * @deprecated Only for JDO!
 	 */
 	@Deprecated
@@ -192,21 +190,6 @@ implements Serializable, Inheritable, InheritanceCallbacks
 	{
 		return productType;
 	}
-
-//	/**
-//	 * @see Repository#ANCHOR_TYPE_ID_HOME
-//	 */
-//	public Repository getHome()
-//	{
-//		return home;
-//	}
-//	public void setHome(Repository home)
-//	{
-//		if (home == null)
-//			throw new IllegalArgumentException("home must not be null!");
-//
-//		this.home = home;
-//	}
 
 	/**
 	 * The LocalAccountantDelegate is in charge of booking money to different
@@ -517,5 +500,32 @@ implements Serializable, Inheritable, InheritanceCallbacks
 			throw new IllegalStateException("This instance of " + this.getClass().getName() + " is not yet persistent or currently not attached to a datastore! Cannot obtain PersistenceManager!");
 
 		return pm;
+	}
+
+	/**
+	 * Get the currently assigned <code>Authority</code> or <code>null</code>.
+	 * <p>
+	 * If there is no authority assigned (i.e. this property is <code>null</code>), no additional access right
+	 * checks (besides the EJB method privileges) will be done. If there is an authority, access to the <code>ProductType</code>
+	 * and the <code>ProductTypeLocal</code> is only granted, if first the global (EJB method based) privileges allow the action
+	 * <b>and</b> second the assigned authority allows the action, as well.
+	 * </p>
+	 *
+	 * @return the <code>Authority</code> responsible for this <code>ProductType</code> or <code>null</code> if there is none assigned.
+	 */
+	public Authority getAuthority()
+	{
+		return authority;
+	}
+
+	/**
+	 * Set an <code>Authority</code> or <code>null</code>.
+	 * 
+	 * @param authority the new <code>Authority</code> or <code>null</code>.
+	 * @see #getAuthority()
+	 */
+	public void setAuthority(Authority authority)
+	{
+		this.authority = authority;
 	}
 }

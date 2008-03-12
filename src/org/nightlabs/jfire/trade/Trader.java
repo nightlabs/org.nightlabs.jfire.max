@@ -171,6 +171,10 @@ public class Trader
 		trader.defaultCustomerGroupForKnownCustomer = defaultCustomerGroup;
 		trader = pm.makePersistent(trader);
 
+		// Normally this is done by OrganisationLegalEntity.getOrganisationLegalEntity(...), but since this would cause an endless recursion, we skip it in this situation
+		// there and do it here.
+		trader.mandator.setDefaultCustomerGroup(defaultCustomerGroup);
+
 		logger.info("getTrader: ...new Trader instance created and persisted!");
 		return trader;
 	}

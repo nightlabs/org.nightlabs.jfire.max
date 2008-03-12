@@ -173,12 +173,10 @@ implements StoreCallback
 			organisationLegalEntity = (OrganisationLegalEntity)pm.getObjectById(
 					AnchorID.create(organisationID, ANCHOR_TYPE_ID_LEGAL_ENTITY, OrganisationLegalEntity.class.getName()));
 		} catch (JDOObjectNotFoundException e) {
-			Organisation organisation = Organisation.getOrganisation(
-					pm, organisationID, throwExceptionIfNotExistent);
+			Organisation organisation = Organisation.getOrganisation(pm, organisationID, throwExceptionIfNotExistent);
 
 			if (organisation != null) {
 				organisationLegalEntity = new OrganisationLegalEntity(organisation);
-				organisationLegalEntity.setDefaultCustomerGroup(Trader.getTrader(pm).getDefaultCustomerGroupForKnownCustomer());
 				try {
 					organisationLegalEntity = pm.makePersistent(organisationLegalEntity);
 				} catch (JDODataStoreException workaround) {

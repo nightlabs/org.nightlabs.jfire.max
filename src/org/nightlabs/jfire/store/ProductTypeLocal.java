@@ -89,6 +89,8 @@ implements Serializable, Inheritable, InheritanceCallbacks
 
 	private static final Logger logger = Logger.getLogger(ProductTypeLocal.class);
 
+	private int test;
+	
 	public static final String FETCH_GROUP_PRODUCT_TYPE = "ProductTypeLocal.productType";
 	public static final String FETCH_GROUP_HOME = "ProductTypeLocal.home";
 	public static final String FETCH_GROUP_LOCAL_ACCOUNTANT_DELEGATE = "ProductTypeLocal.localAccountantDelegate";

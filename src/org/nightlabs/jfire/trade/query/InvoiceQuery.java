@@ -27,16 +27,21 @@ public class InvoiceQuery
 	private Date bookDTMin = null;
 	private Date bookDTMax = null;
 
-//	@Override
-//	public Class getArticleContainerClass() {
-//		return Invoice.class;
-//	}
+	// Property IDs used for the PropertyChangeListeners
+	private static final String PROPERTY_PREFIX = "InvoiceQuery.";
+	public static final String PROPERTY_AMOUNT_PAID_MAX = PROPERTY_PREFIX + "amountPaidMax";
+	public static final String PROPERTY_AMOUNT_PAID_MIN = PROPERTY_PREFIX + "amountPaidMin";
+	public static final String PROPERTY_AMOUNT_TO_PAY_MAX = PROPERTY_PREFIX + "amountToPayMax";
+	public static final String PROPERTY_AMOUNT_TO_PAY_MIN = PROPERTY_PREFIX + "amountToPayMin";
+	public static final String PROPERTY_BOOK_DATE_MAX = PROPERTY_PREFIX + "bookDTMax";
+	public static final String PROPERTY_BOOK_DATE_MIN = PROPERTY_PREFIX + "bookDTMin";
+	public static final String PROPERTY_BOOKED = PROPERTY_PREFIX + "booked";
+	public static final String PROPERTY_CURRENCY = PROPERTY_PREFIX + "currencyID";
 
 	@Override
 	public String getArticleContainerIDMemberName() {
 		return "invoiceID";
 	}
-
 	@Override
 	public String getArticleContainerIDPrefixMemberName() {
 		return "invoiceIDPrefix";
@@ -100,7 +105,9 @@ public class InvoiceQuery
 
 	public void setAmountPaidMax(Long amountPaidMax)
 	{
+		final Long oldAmountPaidMax = this.amountPaidMax;
 		this.amountPaidMax = amountPaidMax;
+		notifyListeners(PROPERTY_AMOUNT_PAID_MAX, oldAmountPaidMax, amountPaidMax);
 	}
 
 	public Long getAmountPaidMin()
@@ -110,7 +117,9 @@ public class InvoiceQuery
 
 	public void setAmountPaidMin(Long amountPaidMin)
 	{
+		final Long oldAmountPaidMin = this.amountPaidMin;
 		this.amountPaidMin = amountPaidMin;
+		notifyListeners(PROPERTY_AMOUNT_PAID_MIN, oldAmountPaidMin, amountPaidMin);
 	}
 
 	public Long getAmountToPayMax()
@@ -120,7 +129,9 @@ public class InvoiceQuery
 
 	public void setAmountToPayMax(Long amountToPayMax)
 	{
+		final Long oldAmountToPayMax = this.amountToPayMax;
 		this.amountToPayMax = amountToPayMax;
+		notifyListeners(PROPERTY_AMOUNT_TO_PAY_MAX, oldAmountToPayMax, amountToPayMax);
 	}
 
 	public Long getAmountToPayMin()
@@ -130,7 +141,9 @@ public class InvoiceQuery
 
 	public void setAmountToPayMin(Long amountToPayMin)
 	{
+		final Long oldAmountToPayMin = this.amountToPayMin;
 		this.amountToPayMin = amountToPayMin;
+		notifyListeners(PROPERTY_AMOUNT_TO_PAY_MIN, oldAmountToPayMin, amountToPayMin);
 	}
 
 	public Boolean getBooked()
@@ -140,7 +153,9 @@ public class InvoiceQuery
 
 	public void setBooked(Boolean booked)
 	{
+		final Boolean oldBooked = this.booked;
 		this.booked = booked;
+		notifyListeners(PROPERTY_BOOKED, oldBooked, booked);
 	}
 
 	public Date getBookDTMax()
@@ -149,7 +164,9 @@ public class InvoiceQuery
 	}
 	public void setBookDTMax(Date bookDTMax)
 	{
+		final Date oldBookDTMax = this.bookDTMax;
 		this.bookDTMax = bookDTMax;
+		notifyListeners(PROPERTY_BOOK_DATE_MAX, oldBookDTMax, bookDTMax);
 	}
 
 	public Date getBookDTMin()
@@ -158,7 +175,9 @@ public class InvoiceQuery
 	}
 	public void setBookDTMin(Date bookDTMin)
 	{
+		final Date oldBookDTMin = this.bookDTMin;
 		this.bookDTMin = bookDTMin;
+		notifyListeners(PROPERTY_BOOK_DATE_MIN, oldBookDTMin, bookDTMin);
 	}
 
 }

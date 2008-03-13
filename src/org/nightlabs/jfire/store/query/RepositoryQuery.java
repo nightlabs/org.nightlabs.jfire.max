@@ -52,6 +52,16 @@ extends AbstractJDOQuery<Repository>
 	 */
 	private String ownerName = null;
 	
+	// Property IDs used for the PropertyChangeListeners
+	private static final String PROPERTY_PREFIX = "RepositoryQuery.";
+	public static final String PROPERTY_ANCHOR_ID = PROPERTY_PREFIX + "anchorID";
+	public static final String PROPERTY_ANCHOR_TYPE_ID = PROPERTY_PREFIX + "anchorTypeID";
+	public static final String PROPERTY_NAME = PROPERTY_PREFIX + "name";
+	public static final String PROPERTY_NAME_LANGUAGE_ID = PROPERTY_PREFIX + "nameLanguageID";
+	public static final String PROPERTY_OWNER_ID = PROPERTY_PREFIX + "ownerID";
+	public static final String PROPERTY_OWNER_NAME = PROPERTY_PREFIX + "ownerName";
+	public static final String PROPERTY_REPOSITORY_TYPE_ID = PROPERTY_PREFIX + "repositoryTypeID";
+	
 	@Override
 	protected Query prepareQuery()
 	{
@@ -135,8 +145,11 @@ extends AbstractJDOQuery<Repository>
 	 * set the name
 	 * @param name the name to set
 	 */
-	public void setName(String name) {
+	public void setName(String name)
+	{
+		final String oldName = this.name;
 		this.name = name;
+		notifyListeners(PROPERTY_NAME, oldName, name);
 	}
 
 	/**
@@ -151,8 +164,11 @@ extends AbstractJDOQuery<Repository>
 	 * set the nameLanguageID
 	 * @param nameLanguageID the nameLanguageID to set
 	 */
-	public void setNameLanguageID(String nameLanguageID) {
+	public void setNameLanguageID(String nameLanguageID)
+	{
+		final String oldNameLanguageID = this.nameLanguageID;
 		this.nameLanguageID = nameLanguageID;
+		notifyListeners(PROPERTY_NAME_LANGUAGE_ID, oldNameLanguageID, nameLanguageID);
 	}
 
 	/**
@@ -169,15 +185,20 @@ extends AbstractJDOQuery<Repository>
 	}
 	public void setRepositoryTypeID(RepositoryTypeID repositoryTypeID)
 	{
+		final RepositoryTypeID oldRepositoryTypeID = this.repositoryTypeID;
 		this.repositoryTypeID = repositoryTypeID;
+		notifyListeners(PROPERTY_REPOSITORY_TYPE_ID, oldRepositoryTypeID, repositoryTypeID);
 	}
 
 	/**
 	 * set the anchorID
 	 * @param anchorID the anchorID to set
 	 */
-	public void setAnchorID(String anchorID) {
+	public void setAnchorID(String anchorID)
+	{
+		final String oldAnchorID = this.anchorID;
 		this.anchorID = anchorID;
+		notifyListeners(PROPERTY_ANCHOR_ID, oldAnchorID, anchorID);
 	}
 
 	/**
@@ -192,8 +213,11 @@ extends AbstractJDOQuery<Repository>
 	 * set the anchorTypeID
 	 * @param anchorTypeID the anchorTypeID to set
 	 */
-	public void setAnchorTypeID(String anchorTypeID) {
+	public void setAnchorTypeID(String anchorTypeID)
+	{
+		final String oldAnchorTypeID = this.anchorTypeID;
 		this.anchorTypeID = anchorTypeID;
+		notifyListeners(PROPERTY_ANCHOR_TYPE_ID, oldAnchorTypeID, anchorTypeID);
 	}
 
 	/**
@@ -208,8 +232,11 @@ extends AbstractJDOQuery<Repository>
 	 * sets the {@link AnchorID} of the owner of the repository
 	 * @param ownerID the ownerID to set
 	 */
-	public void setOwnerID(AnchorID ownerID) {
+	public void setOwnerID(AnchorID ownerID)
+	{
+		final AnchorID oldOwnerID = this.ownerID;
 		this.ownerID = ownerID;
+		notifyListeners(PROPERTY_ANCHOR_ID, oldOwnerID, ownerID);
 	}
 
 	/**
@@ -224,8 +251,11 @@ extends AbstractJDOQuery<Repository>
 	 * sets the name (or part of it) of the owner of repository
 	 * @param ownerName the ownerName to set
 	 */
-	public void setOwnerName(String ownerName) {
+	public void setOwnerName(String ownerName)
+	{
+		final String oldOwnerName = this.ownerName;
 		this.ownerName = ownerName;
+		notifyListeners(PROPERTY_OWNER_NAME, oldOwnerName, ownerName);
 	}
 
 	@Override

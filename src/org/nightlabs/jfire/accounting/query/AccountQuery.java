@@ -25,11 +25,11 @@ public class AccountQuery
 	/**
 	 * the minium balance of the account to search for
 	 */
-	private long minBalance = -1;
+	private long minBalance = Long.MIN_VALUE;;
 	/**
 	 * the maximum balance of the account to search for
 	 */
-	private long maxBalance = -1;
+	private long maxBalance = Long.MAX_VALUE;
 	/**
 	 * the {@link CurrencyID} of the currency to search for
 	 */
@@ -38,10 +38,10 @@ public class AccountQuery
 	@SuppressWarnings("unused") // used as parameter in the JDOQL
 	private transient Currency currency = null;
 	/**
-	 * the name of the account to search for
+	 * the accountName of the account to search for
 	 */
-	private String name = null;
-	private String nameLanguageID = null;
+	private String accountName = null;
+	private String accountNameLanguageID = null;
 	/**
 	 * the anchorID to search for
 	 */
@@ -65,9 +65,22 @@ public class AccountQuery
 //	private transient Anchor owner;
 
 	/**
-	 * the name (or part of the name) of the owner
+	 * the accountName (or part of the accountName) of the owner
 	 */
 	private String ownerName = null;
+	
+	// Property IDs used for the PropertyChangeListeners
+	private static final String PROPERTY_PREFIX = "AccountQuery.";
+	public static final String PROPERTY_ACCOUNT_TYPE_ID = PROPERTY_PREFIX + "accountTypeID";
+	public static final String PROPERTY_ANCHOR_ID = PROPERTY_PREFIX + "anchorID";
+	public static final String PROPERTY_ANCHOR_TYPE_ID = PROPERTY_PREFIX + "anchorTypeID";
+	public static final String PROPERTY_CURRENCY_ID = PROPERTY_PREFIX + "currencyID";	
+	public static final String PROPERTY_MAX_BALANCE = PROPERTY_PREFIX + "maxBalance";	
+	public static final String PROPERTY_MIN_BALANCE = PROPERTY_PREFIX + "minBalance";	
+	public static final String PROPERTY_ACCOUNT_NAME = PROPERTY_PREFIX + "accountName";	
+	public static final String PROPERTY_ACCOUNT_NAME_LANGUAGE_ID = PROPERTY_PREFIX + "accountNameLanguageID";	
+	public static final String PROPERTY_OWNER_ID = PROPERTY_PREFIX + "ownerID";	
+	public static final String PROPERTY_OWNER_NAME = PROPERTY_PREFIX + "ownerName";	
 	
 	@Override
 	protected Query prepareQuery()
@@ -89,10 +102,10 @@ public class AccountQuery
 			filter.append("\n && this.accountType == :accountType");
 		}
 
-		if (minBalance >= 0)
+		if (minBalance != Long.MIN_VALUE)
 			filter.append("\n && this.balance >= :minBalance");
 			
-		if (maxBalance >= 0)
+		if (maxBalance != Long.MAX_VALUE)
 			filter.append("\n && this.balance <= :maxBalance");
 		
 		if (anchorTypeID != null)
@@ -101,9 +114,9 @@ public class AccountQuery
 		if (anchorID != null)
 			filter.append("\n && this.anchorID == :anchorID");
 			
-		if (name != null && !"".equals(name)) {
+		if (accountName != null && !"".equals(accountName)) {
 			filter.append("\n && ( ");
-			addFullTextSearch(filter, vars, "name");
+			addFullTextSearch(filter, vars, "accountName");
 			filter.append(")");
 		}
 		
@@ -145,11 +158,11 @@ public class AccountQuery
 		String varName = member+"Var";
 		vars.append(String.class.getName()+" "+varName);
 		String containsStr = "containsValue("+varName+")";
-		if (nameLanguageID != null)
-			containsStr = "containsEntry(:nameLanguageID, "+varName+")";
+		if (accountNameLanguageID != null)
+			containsStr = "containsEntry(:accountNameLanguageID, "+varName+")";
 		filter.append("\n (\n" +
 				"  this."+member+".names."+containsStr+"\n" +
-				"  && "+varName+".toLowerCase().matches(:name.toLowerCase())" +
+				"  && "+varName+".toLowerCase().matches(:accountName.toLowerCase())" +
 				" )");
 	}
 
@@ -165,8 +178,11 @@ public class AccountQuery
 	 * set the minBalance
 	 * @param minBalance the minBalance to set
 	 */
-	public void setMinBalance(long minBalance) {
+	public void setMinBalance(long minBalance)
+	{
+		final Long oldMinBalance = this.minBalance;
 		this.minBalance = minBalance;
+		notifyListeners(PROPERTY_MIN_BALANCE, oldMinBalance, minBalance);
 	}
 
 	/**
@@ -181,8 +197,11 @@ public class AccountQuery
 	 * set the maxBalance
 	 * @param maxBalance the maxBalance to set
 	 */
-	public void setMaxBalance(long maxBalance) {
+	public void setMaxBalance(long maxBalance)
+	{
+		final Long oldMaxBalance = this.maxBalance;
 		this.maxBalance = maxBalance;
+		notifyListeners(PROPERTY_MAX_BALANCE, oldMaxBalance, maxBalance);
 	}
 
 	/**
@@ -197,13 +216,18 @@ public class AccountQuery
 	 * set the currencyID
 	 * @param currencyID the currencyID to set
 	 */
-	public void setCurrencyID(CurrencyID currencyID) {
+	public void setCurrencyID(CurrencyID currencyID)
+	{
+		final CurrencyID oldCurrencyID = this.currencyID;
 		this.currencyID = currencyID;
+		notifyListeners(PROPERTY_CURRENCY_ID, oldCurrencyID, currencyID);
 	}
 
 	public void setAccountTypeID(AccountTypeID accountTypeID)
 	{
+		final AccountTypeID oldAccountTypeID = this.accountTypeID;
 		this.accountTypeID = accountTypeID;
+		notifyListeners(PROPERTY_ACCOUNT_TYPE_ID, oldAccountTypeID, accountTypeID);
 	}
 	public AccountTypeID getAccountTypeID()
 	{
@@ -211,35 +235,41 @@ public class AccountQuery
 	}
 
 	/**
-	 * returns the name.
-	 * @return the name
+	 * returns the accountName.
+	 * @return the accountName
 	 */
 	public String getName() {
-		return name;
+		return accountName;
 	}
 
 	/**
-	 * set the name
-	 * @param name the name to set
+	 * set the accountName
+	 * @param accountName the accountName to set
 	 */
-	public void setName(String name) {
-		this.name = name;
+	public void setAccountName(String accountName)
+	{
+		final String oldAccountName = this.accountName;
+		this.accountName = accountName;
+		notifyListeners(PROPERTY_ACCOUNT_NAME, oldAccountName, accountName);
 	}
 
 	/**
-	 * returns the nameLanguageID.
-	 * @return the nameLanguageID
+	 * returns the accountNameLanguageID.
+	 * @return the accountNameLanguageID
 	 */
 	public String getNameLanguageID() {
-		return nameLanguageID;
+		return accountNameLanguageID;
 	}
 
 	/**
-	 * set the nameLanguageID
-	 * @param nameLanguageID the nameLanguageID to set
+	 * set the accountNameLanguageID
+	 * @param accountNameLanguageID the accountNameLanguageID to set
 	 */
-	public void setNameLanguageID(String nameLanguageID) {
-		this.nameLanguageID = nameLanguageID;
+	public void setNameLanguageID(String nameLanguageID)
+	{
+		final String oldNameLanguageID = this.accountNameLanguageID;
+		this.accountNameLanguageID = nameLanguageID;
+		notifyListeners(PROPERTY_ACCOUNT_NAME_LANGUAGE_ID, oldNameLanguageID, nameLanguageID);
 	}
 
 	/**
@@ -254,8 +284,11 @@ public class AccountQuery
 	 * set the anchorID
 	 * @param anchorID the anchorID to set
 	 */
-	public void setAnchorID(String anchorID) {
+	public void setAnchorID(String anchorID)
+	{
+		final String oldAnchorID = this.anchorID;
 		this.anchorID = anchorID;
+		notifyListeners(PROPERTY_ANCHOR_ID, oldAnchorID, anchorID);
 	}
 
 	/**
@@ -270,8 +303,11 @@ public class AccountQuery
 	 * set the anchorTypeID
 	 * @param anchorTypeID the anchorTypeID to set
 	 */
-	public void setAnchorTypeID(String anchorTypeID) {
+	public void setAnchorTypeID(String anchorTypeID)
+	{
+		final String oldAnchorTypeID = this.anchorTypeID;
 		this.anchorTypeID = anchorTypeID;
+		notifyListeners(PROPERTY_ANCHOR_TYPE_ID, oldAnchorTypeID, anchorTypeID);
 	}
 
 	/**
@@ -286,8 +322,11 @@ public class AccountQuery
 	 * sets the ownerID
 	 * @param ownerID the ownerID to set
 	 */
-	public void setOwnerID(AnchorID ownerID) {
+	public void setOwnerID(AnchorID ownerID)
+	{
+		final AnchorID oldOwnerID = this.ownerID;
 		this.ownerID = ownerID;
+		notifyListeners(PROPERTY_OWNER_ID, oldOwnerID, ownerID);
 	}
 
 	/**
@@ -302,8 +341,11 @@ public class AccountQuery
 	 * sets the ownerName
 	 * @param ownerName the ownerName to set
 	 */
-	public void setOwnerName(String ownerName) {
+	public void setOwnerName(String ownerName)
+	{
+		final String oldOwnerName = this.ownerName;
 		this.ownerName = ownerName;
+		notifyListeners(PROPERTY_OWNER_NAME, oldOwnerName, ownerName);
 	}
 
 	@Override

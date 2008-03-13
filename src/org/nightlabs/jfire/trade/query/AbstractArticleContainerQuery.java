@@ -24,6 +24,20 @@ public abstract class AbstractArticleContainerQuery<R extends ArticleContainer>
 	private static final long serialVersionUID = 1L;
 	private static final Logger logger = Logger.getLogger(AbstractArticleContainerQuery.class);
 	
+	// Property IDs used for the PropertyChangeListeners
+	private static final String PROPERTY_PREFIX = "AbstractArticleContainerQuery.";
+	public static final String PROPERTY_ARTICLE_COUNT_MAX = PROPERTY_PREFIX + "articleCountMax";
+	public static final String PROPERTY_ARTICLE_COUNT_MIN = PROPERTY_PREFIX + "articleCountMin";
+	public static final String PROPERTY_ARTICLE_CONTAINER_ID = PROPERTY_PREFIX + "articleContainerID";
+	public static final String PROPERTY_CREATE_DATE_MAX = PROPERTY_PREFIX + "createDTMax";
+	public static final String PROPERTY_CREATE_DATE_MIN = PROPERTY_PREFIX + "createDTMin";
+	public static final String PROPERTY_CREATE_USER_ID = PROPERTY_PREFIX + "createUserID";
+	public static final String PROPERTY_CREATOR_NAME = PROPERTY_PREFIX + "creatorName";
+	public static final String PROPERTY_CUSTOMER_ID = PROPERTY_PREFIX + "customerID";
+	public static final String PROPERTY_CUSTOMER_NAME = PROPERTY_PREFIX + "customerName";
+	public static final String PROPERTY_VENDOR_ID = PROPERTY_PREFIX + "vendorID";
+	public static final String PROPERTY_VENDOR_NAME = PROPERTY_PREFIX + "vendorName";
+	
 	@Override
 	protected Query prepareQuery()
 	{
@@ -160,7 +174,9 @@ public abstract class AbstractArticleContainerQuery<R extends ArticleContainer>
 	 */
 	public void setCreatorName(String creatorName)
 	{
+		String oldCreatorName = this.creatorName;
 		this.creatorName = creatorName;
+		notifyListeners(PROPERTY_CREATOR_NAME, oldCreatorName, creatorName);
 	}
 
 	private String customerName;
@@ -176,8 +192,11 @@ public abstract class AbstractArticleContainerQuery<R extends ArticleContainer>
 	 * sets the customerName
 	 * @param customerName the customerName to set
 	 */
-	public void setCustomerName(String customerName) {
+	public void setCustomerName(String customerName)
+	{
+		final String oldCustomerName = this.customerName;
 		this.customerName = customerName;
+		notifyListeners(PROPERTY_CUSTOMER_NAME, oldCustomerName, customerName);
 	}
 	
 	private String vendorName;
@@ -193,8 +212,11 @@ public abstract class AbstractArticleContainerQuery<R extends ArticleContainer>
 	 * sets the vendorName
 	 * @param vendorName the vendorName to set
 	 */
-	public void setVendorName(String vendorName) {
+	public void setVendorName(String vendorName)
+	{
+		final String oldVendorName = this.vendorName;
 		this.vendorName = vendorName;
+		notifyListeners(PROPERTY_VENDOR_NAME, oldVendorName, vendorName);
 	}
 	
 	private String articleContainerID;
@@ -211,63 +233,86 @@ public abstract class AbstractArticleContainerQuery<R extends ArticleContainer>
 	 * @param articleContainerID the articleContainerID to set
 	 */
 	public void setArticleContainerID(String articleContainerID) {
+		String oldID = this.articleContainerID;
 		this.articleContainerID = articleContainerID;
+		notifyListeners(PROPERTY_ARTICLE_CONTAINER_ID, oldID, articleContainerID);
 	}
 	
 	private int articleCountMin = -1;
 	public int getArticleCountMin() {
 		return articleCountMin;
 	}
-	public void setArticleCountMin(int articleCountMin) {
+	public void setArticleCountMin(int articleCountMin)
+	{
+		int oldArticleCountMin = this.articleCountMin;
 		this.articleCountMin = articleCountMin;
+		notifyListeners(PROPERTY_ARTICLE_COUNT_MIN, oldArticleCountMin, articleCountMin);
 	}
 	
 	private int articleCountMax = -1;
 	public int getArticleCountMax() {
 		return articleCountMax;
 	}
-	public void setArticleCountMax(int articleCountMax) {
+	public void setArticleCountMax(int articleCountMax)
+	{
+		int oldCountMax = this.articleCountMax;
 		this.articleCountMax = articleCountMax;
+		notifyListeners(PROPERTY_ARTICLE_COUNT_MAX, oldCountMax, articleCountMax);
 	}
 	
 	private Date createDTMin = null;
 	public Date getCreateDTMin() {
 		return createDTMin;
 	}
-	public void setCreateDTMin(Date createDTMin) {
+	public void setCreateDTMin(Date createDTMin)
+	{
+		final Date oldCreateDTMin = this.createDTMin;
 		this.createDTMin = createDTMin;
+		notifyListeners(PROPERTY_CREATE_DATE_MIN, oldCreateDTMin, createDTMin);
 	}
 	
 	private Date createDTMax = null;
 	public Date getCreateDTMax() {
 		return createDTMax;
 	}
-	public void setCreateDTMax(Date createDTMax) {
+	public void setCreateDTMax(Date createDTMax)
+	{
+		final Date oldCreateDTMax = this.createDTMax; 
 		this.createDTMax = createDTMax;
+		notifyListeners(PROPERTY_CREATE_DATE_MAX, oldCreateDTMax, createDTMax);
 	}
 	
 	private UserID createUserID = null;
 	public UserID getCreateUserID() {
 		return createUserID;
 	}
-	public void setCreateUserID(UserID createUserID) {
+	public void setCreateUserID(UserID createUserID)
+	{
+		final UserID oldCreateUserID = this.createUserID;
 		this.createUserID = createUserID;
+		notifyListeners(PROPERTY_CREATE_USER_ID, oldCreateUserID, createUserID);
 	}
 	
 	private AnchorID vendorID = null;
 	public AnchorID getVendorID() {
 		return vendorID;
 	}
-	public void setVendorID(AnchorID vendorID) {
+	public void setVendorID(AnchorID vendorID)
+	{
+		final AnchorID oldVendorID = this.vendorID;
 		this.vendorID = vendorID;
+		notifyListeners(PROPERTY_VENDOR_ID, oldVendorID, vendorID);
 	}
 	
 	private AnchorID customerID = null;
 	public AnchorID getCustomerID() {
 		return customerID;
 	}
-	public void setCustomerID(AnchorID customerID) {
+	public void setCustomerID(AnchorID customerID)
+	{
+		final AnchorID oldCustomerID = this.customerID;
 		this.customerID = customerID;
+		notifyListeners(PROPERTY_CUSTOMER_ID, oldCustomerID, customerID);
 	}
 	
 //	/**

@@ -42,6 +42,23 @@ public abstract class AbstractProductTypeQuery<P extends ProductType>
 	private LocalAccountantDelegateID localAccountantDelegateID = null;
 	private ProductTypeGroupID productTypeGroupID = null;
 	
+	// Property IDs used for the PropertyChangeListeners
+	private static final String PROPERTY_PREFIX = "AbstractProductTypeQuery.";
+	public static final String PROPERTY_AVAILABLE = PROPERTY_PREFIX + "available";
+	public static final String PROPERTY_CLOSED = PROPERTY_PREFIX + "closed";
+	public static final String PROPERTY_CONFIRMED = PROPERTY_PREFIX + "confirmed";
+	public static final String PROPERTY_DELIVERY_CONFIGURATION_ID = PROPERTY_PREFIX + "deliveryConfigurationID";
+	public static final String PROPERTY_FULL_TEXT_LANGUAGE_ID = PROPERTY_PREFIX + "fullTextLanguageID";
+	public static final String PROPERTY_FULL_TEXT_SEARCH = PROPERTY_PREFIX + "fullTextSearch";
+	public static final String PROPERTY_INNER_PRICE_CONFIG_ID = PROPERTY_PREFIX + "innerPriceConfigID";
+	public static final String PROPERTY_LOCAL_ACCOUNTANT_DELEGATE_ID = PROPERTY_PREFIX + "localAccountantDelegateID";
+	public static final String PROPERTY_MAX_NESTED_PRODUCTTYPE_AMOUNT = PROPERTY_PREFIX + "maxNestedProductTypeAmount";
+	public static final String PROPERTY_MIN_NESTED_PRODUCTTYPE_AMOUNT = PROPERTY_PREFIX + "minNestedProductTypeAmount";
+	public static final String PROPERTY_OWNER_ID = PROPERTY_PREFIX + "ownerID";
+	public static final String PROPERTY_PRODUCTTYPE_GROUP_ID = PROPERTY_PREFIX + "productTypeGroupID";
+	public static final String PROPERTY_PUBLISHED = PROPERTY_PREFIX + "published";
+	public static final String PROPERTY_SALEABLE = PROPERTY_PREFIX + "saleable";
+
 	@Override
 	protected Query prepareQuery()
 	{
@@ -187,8 +204,11 @@ public abstract class AbstractProductTypeQuery<P extends ProductType>
 	 * Sets the filter to include only ProductTypes whose confirmed flag matches the given value.
 	 * @param confirmed the confirmed to set
 	 */
-	public void setConfirmed(Boolean confirmed) {
+	public void setConfirmed(Boolean confirmed)
+	{
+		final Boolean oldConfirmed = this.confirmed;
 		this.confirmed = confirmed;
+		notifyListeners(PROPERTY_CONFIRMED, oldConfirmed, confirmed);
 	}
 
 	/**
@@ -201,8 +221,11 @@ public abstract class AbstractProductTypeQuery<P extends ProductType>
 	/**
 	 * @param fullTextLanguageID the fullTextLanguageID to set
 	 */
-	public void setFullTextLanguageID(String fullTextLanguageID) {
+	public void setFullTextLanguageID(String fullTextLanguageID)
+	{
+		final String oldFullTextLanguageID = this.fullTextLanguageID;
 		this.fullTextLanguageID = fullTextLanguageID;
+		notifyListeners(PROPERTY_FULL_TEXT_LANGUAGE_ID, oldFullTextLanguageID, fullTextLanguageID);
 	}
 
 	/**
@@ -220,8 +243,11 @@ public abstract class AbstractProductTypeQuery<P extends ProductType>
 	 * 
 	 * @param fullTextSearch the fullTextSearch to set
 	 */
-	public void setFullTextSearch(String fullTextSearch) {
+	public void setFullTextSearch(String fullTextSearch)
+	{
+		final String oldFullTextSearch = this.fullTextSearch;
 		this.fullTextSearch = fullTextSearch;
+		notifyListeners(PROPERTY_FULL_TEXT_SEARCH, oldFullTextSearch, fullTextSearch);
 	}
 
 	/**
@@ -235,8 +261,11 @@ public abstract class AbstractProductTypeQuery<P extends ProductType>
 	 * Sets the filter to include only productTypes whose published flag matches the given value.
 	 * @param published the published to set
 	 */
-	public void setPublished(Boolean published) {
+	public void setPublished(Boolean published)
+	{
+		final Boolean oldPublished = this.published;
 		this.published = published;
+		notifyListeners(PROPERTY_PUBLISHED, oldPublished, published);
 	}
 
 	/**
@@ -250,8 +279,11 @@ public abstract class AbstractProductTypeQuery<P extends ProductType>
 	 * Sets the filter to include only productTypes whose saleable flag matches the given value.
 	 * @param saleable the saleable to set
 	 */
-	public void setSaleable(Boolean saleable) {
+	public void setSaleable(Boolean saleable)
+	{
+		final Boolean oldSaleable = this.saleable;
 		this.saleable = saleable;
+		notifyListeners(PROPERTY_SALEABLE, oldSaleable, saleable);
 	}
 
 	private StringBuffer filter = new StringBuffer();
@@ -281,8 +313,12 @@ public abstract class AbstractProductTypeQuery<P extends ProductType>
 	 * sets the minNestedProductTypeAmount
 	 * @param minNestedProductTypeAmount the minNestedProductTypeAmount to set
 	 */
-	public void setMinNestedProductTypeAmount(int minNestedProductTypeAmount) {
+	public void setMinNestedProductTypeAmount(int minNestedProductTypeAmount)
+	{
+		final Integer oldMinNestedProductTypeAmount = this.minNestedProductTypeAmount;
 		this.minNestedProductTypeAmount = minNestedProductTypeAmount;
+		notifyListeners(PROPERTY_MIN_NESTED_PRODUCTTYPE_AMOUNT, oldMinNestedProductTypeAmount, 
+			minNestedProductTypeAmount);
 	}
 
 	/**
@@ -297,8 +333,12 @@ public abstract class AbstractProductTypeQuery<P extends ProductType>
 	 * sets the maxNestedProductTypeAmount
 	 * @param maxNestedProductTypeAmount the maxNestedProductTypeAmount to set
 	 */
-	public void setMaxNestedProductTypeAmount(int maxNestedProductTypeAmount) {
+	public void setMaxNestedProductTypeAmount(int maxNestedProductTypeAmount)
+	{
+		final Integer oldMaxNestedProductTypeAmount = this.maxNestedProductTypeAmount;
 		this.maxNestedProductTypeAmount = maxNestedProductTypeAmount;
+		notifyListeners(PROPERTY_MAX_NESTED_PRODUCTTYPE_AMOUNT, oldMaxNestedProductTypeAmount, 
+			maxNestedProductTypeAmount);
 	}
 
 	/**
@@ -313,8 +353,11 @@ public abstract class AbstractProductTypeQuery<P extends ProductType>
 	 * sets the innerPriceConfigID
 	 * @param innerPriceConfigID the innerPriceConfigID to set
 	 */
-	public void setInnerPriceConfigID(PriceConfigID innerPriceConfigID) {
+	public void setInnerPriceConfigID(PriceConfigID innerPriceConfigID)
+	{
+		final PriceConfigID oldInnerPriceConfigID = this.innerPriceConfigID;
 		this.innerPriceConfigID = innerPriceConfigID;
+		notifyListeners(PROPERTY_INNER_PRICE_CONFIG_ID, oldInnerPriceConfigID, innerPriceConfigID);
 	}
 
 	/**
@@ -329,8 +372,11 @@ public abstract class AbstractProductTypeQuery<P extends ProductType>
 	 * sets the ownerID
 	 * @param ownerID the ownerID to set
 	 */
-	public void setOwnerID(AnchorID ownerID) {
+	public void setOwnerID(AnchorID ownerID)
+	{
+		final AnchorID oldOwnerID = this.ownerID;
 		this.ownerID = ownerID;
+		notifyListeners(PROPERTY_OWNER_ID, oldOwnerID, ownerID);
 	}
 
 	/**
@@ -345,9 +391,11 @@ public abstract class AbstractProductTypeQuery<P extends ProductType>
 	 * sets the deliveryConfigurationID
 	 * @param deliveryConfigurationID the deliveryConfigurationID to set
 	 */
-	public void setDeliveryConfigurationID(
-			DeliveryConfigurationID deliveryConfigurationID) {
+	public void setDeliveryConfigurationID(DeliveryConfigurationID deliveryConfigurationID)
+	{
+		final DeliveryConfigurationID oldDeliveryConfigurationID = this.deliveryConfigurationID;
 		this.deliveryConfigurationID = deliveryConfigurationID;
+		notifyListeners(PROPERTY_DELIVERY_CONFIGURATION_ID, oldDeliveryConfigurationID, deliveryConfigurationID);
 	}
 
 	/**
@@ -362,9 +410,12 @@ public abstract class AbstractProductTypeQuery<P extends ProductType>
 	 * sets the localAccountantDelegateID
 	 * @param localAccountantDelegateID the localAccountantDelegateID to set
 	 */
-	public void setLocalAccountantDelegateID(
-			LocalAccountantDelegateID localAccountantDelegateID) {
+	public void setLocalAccountantDelegateID(LocalAccountantDelegateID localAccountantDelegateID)
+	{
+		final LocalAccountantDelegateID oldLocalAccountantDelegateID = this.localAccountantDelegateID;
 		this.localAccountantDelegateID = localAccountantDelegateID;
+		notifyListeners(PROPERTY_LOCAL_ACCOUNTANT_DELEGATE_ID, oldLocalAccountantDelegateID, 
+			localAccountantDelegateID);
 	}
 
 	/**
@@ -379,8 +430,11 @@ public abstract class AbstractProductTypeQuery<P extends ProductType>
 	 * sets the productTypeGroupID
 	 * @param productTypeGroupID the productTypeGroupID to set
 	 */
-	public void setProductTypeGroupID(ProductTypeGroupID productTypeGroupID) {
+	public void setProductTypeGroupID(ProductTypeGroupID productTypeGroupID)
+	{
+		final ProductTypeGroupID oldProductTypeGroupID = this.productTypeGroupID;
 		this.productTypeGroupID = productTypeGroupID;
+		notifyListeners(PROPERTY_PRODUCTTYPE_GROUP_ID, oldProductTypeGroupID, productTypeGroupID);
 	}
 
 	/**
@@ -395,8 +449,11 @@ public abstract class AbstractProductTypeQuery<P extends ProductType>
 	 * sets the closed
 	 * @param closed the closed to set
 	 */
-	public void setClosed(Boolean closed) {
+	public void setClosed(Boolean closed)
+	{
+		final Boolean oldClosed = this.closed;
 		this.closed = closed;
+		notifyListeners(PROPERTY_CLOSED, oldClosed, closed);
 	}
 
 	/**
@@ -411,8 +468,11 @@ public abstract class AbstractProductTypeQuery<P extends ProductType>
 	 * sets the available
 	 * @param available the available to set
 	 */
-	public void setAvailable(Boolean available) {
+	public void setAvailable(Boolean available)
+	{
+		final Boolean oldAvailable = this.available;
 		this.available = available;
+		notifyListeners(PROPERTY_AVAILABLE, oldAvailable, available);
 	}
 
 }

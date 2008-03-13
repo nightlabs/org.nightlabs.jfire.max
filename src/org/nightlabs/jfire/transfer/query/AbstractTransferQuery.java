@@ -39,6 +39,15 @@ extends AbstractJDOQuery<T>
 	private transient Anchor otherAnchor = null;
 	// TODO JPOX WORKAROUND end
 
+	// Property IDs used for the PropertyChangeListeners
+	private static final String PROPERTY_PREFIX = "AbstractTransferQuery.";
+	public static final String PROPERTY_CURRENT_ANCHOR_ID = PROPERTY_PREFIX + "currentAnchorID";
+	public static final String PROPERTY_FROM_ANCHOR_ID = PROPERTY_PREFIX + "fromAnchorID";
+	public static final String PROPERTY_TO_ANCHOR_ID = PROPERTY_PREFIX + "toAnchorID";
+	public static final String PROPERTY_OTHER_ANCHOR_ID = PROPERTY_PREFIX + "otherAnchorID";
+	public static final String PROPERTY_TIMESTAMP_FROM = PROPERTY_PREFIX + "timestampFromIncl";
+	public static final String PROPERTY_TIMESTAMP_TO = PROPERTY_PREFIX + "timestampToIncl";
+	
 	protected abstract Class<? extends Transfer> getCandidateClass();
 
 	@Override
@@ -62,7 +71,7 @@ extends AbstractJDOQuery<T>
 			// TODO JPOX WORKAROUND begin
 			currentAnchor = (Anchor) pm.getObjectById(currentAnchorID);
 			filter.append(" && (this.from == :currentAnchor || this.to == :currentAnchor)");
-			// TODO JPOX WORKAROUND end
+			// TODO JPOX WORKAROUND endsetToAnchorID
 		}
 
 		if (otherAnchorID != null) {
@@ -124,7 +133,9 @@ extends AbstractJDOQuery<T>
 	}
 	public void setTimestampFromIncl(Date timestampFromIncl)
 	{
+		final Date oldTimestampFromIncl = this.timestampFromIncl;
 		this.timestampFromIncl = timestampFromIncl;
+		notifyListeners(PROPERTY_TIMESTAMP_FROM, oldTimestampFromIncl, timestampFromIncl);
 	}
 	public Date getTimestampToIncl()
 	{
@@ -132,7 +143,9 @@ extends AbstractJDOQuery<T>
 	}
 	public void setTimestampToIncl(Date timestampToIncl)
 	{
+		final Date oldTimestampToIncl = this.timestampToIncl;
 		this.timestampToIncl = timestampToIncl;
+		notifyListeners(PROPERTY_TIMESTAMP_TO, oldTimestampToIncl, timestampToIncl);
 	}
 
 	public AnchorID getCurrentAnchorID()
@@ -141,7 +154,9 @@ extends AbstractJDOQuery<T>
 	}
 	public void setCurrentAnchorID(AnchorID currentAnchorID)
 	{
+		final AnchorID oldCurrentAnchorID = this.currentAnchorID;
 		this.currentAnchorID = currentAnchorID;
+		notifyListeners(PROPERTY_CURRENT_ANCHOR_ID, oldCurrentAnchorID, currentAnchorID);
 	}
 	public AnchorID getOtherAnchorID()
 	{
@@ -149,7 +164,9 @@ extends AbstractJDOQuery<T>
 	}
 	public void setOtherAnchorID(AnchorID otherAnchorID)
 	{
+		final AnchorID oldOtherAnchorID = this.otherAnchorID;
 		this.otherAnchorID = otherAnchorID;
+		notifyListeners(PROPERTY_OTHER_ANCHOR_ID, oldOtherAnchorID, otherAnchorID);	
 	}
 
 	public AnchorID getFromAnchorID()
@@ -158,7 +175,9 @@ extends AbstractJDOQuery<T>
 	}
 	public void setFromAnchorID(AnchorID fromAnchorID)
 	{
+		final AnchorID oldFromAnchorID = this.fromAnchorID;
 		this.fromAnchorID = fromAnchorID;
+		notifyListeners(PROPERTY_FROM_ANCHOR_ID, oldFromAnchorID, fromAnchorID);
 	}
 	public AnchorID getToAnchorID()
 	{
@@ -166,6 +185,8 @@ extends AbstractJDOQuery<T>
 	}
 	public void setToAnchorID(AnchorID toAnchorID)
 	{
+		final AnchorID oldToAnchorID = this.toAnchorID;
 		this.toAnchorID = toAnchorID;
+		notifyListeners(PROPERTY_TO_ANCHOR_ID, oldToAnchorID, toAnchorID);
 	}
 }

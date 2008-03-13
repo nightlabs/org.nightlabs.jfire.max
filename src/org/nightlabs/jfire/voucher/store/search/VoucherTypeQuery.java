@@ -12,15 +12,11 @@ import org.nightlabs.jfire.voucher.store.VoucherType;
 public class VoucherTypeQuery
 extends AbstractProductTypeQuery<VoucherType>
 {
-
 	/**
-	 * 
+	 * The serial version id.
 	 */
 	private static final long serialVersionUID = 1L;
-
-	public VoucherTypeQuery() {
-	}
-
+	
 	@Override
 	protected Query prepareQuery()
 	{

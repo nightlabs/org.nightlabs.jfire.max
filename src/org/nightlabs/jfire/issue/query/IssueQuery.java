@@ -41,6 +41,21 @@ extends AbstractJDOQuery<Issue>
 	private Date updateTimestamp;
 	private Set<IssueLink> issueLinks;
 	
+	// Property IDs used for the PropertyChangeListeners
+	private static final String PROPERTY_PREFIX = "IssueQuery.";
+	public static final String PROPERTY_ASSIGNEE_ID = PROPERTY_PREFIX + "assigneeID";
+	public static final String PROPERTY_CREATE_TIMESTAMP = PROPERTY_PREFIX + "createTimestamp";
+	public static final String PROPERTY_ISSUE_COMMENT = PROPERTY_PREFIX + "issueComment";
+	public static final String PROPERTY_ISSUE_PRIORITY_ID = PROPERTY_PREFIX + "issuePriorityID";
+	public static final String PROPERTY_ISSUE_RESOLUTION_ID = PROPERTY_PREFIX + "issueResolutionID";
+	public static final String PROPERTY_ISSUE_SEVERITY_TYPE_ID = PROPERTY_PREFIX + "issueSeverityTypeID";
+	public static final String PROPERTY_ISSUE_SUBJECT = PROPERTY_PREFIX + "issueSubject";
+	public static final String PROPERTY_ISSUE_SUBJECT_AND_COMMENT = PROPERTY_PREFIX + "issueSubjectNComment";
+	public static final String PROPERTY_ISSUE_TYPE_ID = PROPERTY_PREFIX + "issueTypeID";
+	public static final String PROPERTY_ISSUE_LINKS = PROPERTY_PREFIX + "issueLinks";
+	public static final String PROPERTY_REPORTER_ID = PROPERTY_PREFIX + "reporterID";
+	public static final String PROPERTY_UPDATE_TIMESTAMP = PROPERTY_PREFIX + "updateTimestamp";
+	
 	@Override
 	protected Query prepareQuery() {
 		Query q = getPersistenceManager().newQuery(getResultType());
@@ -152,8 +167,31 @@ extends AbstractJDOQuery<Issue>
 		return issueSubject;
 	}
 	
+	/**
+	 * Helper that removes the '.*' from the beginning and end of the given string.
+	 * @param pattern the regexp pattern that should be cleansed of the '.*'
+	 * @return the pattern without '.*'.
+	 */
+	private String removeRegexpSearch(String pattern)
+	{
+		if (pattern == null)
+			return null;
+		
+		String result = pattern;
+		if (pattern.startsWith(".*"))
+		{
+			result = result.substring(2);
+		}
+		if (pattern.endsWith(".*"))
+		{
+			result = result.substring(0, result.length()-2);
+		}
+		return pattern;
+	}
+	
 	public void setIssueSubject(String issueSubject)
 	{
+		final String oldIssueSubject = removeRegexpSearch(this.issueSubject);
 		if (issueSubject == null || issueSubject.length() == 0)
 		{
 			this.issueSubject = null;
@@ -162,10 +200,12 @@ extends AbstractJDOQuery<Issue>
 		{
 			this.issueSubject = ".*" + issueSubject.toLowerCase() + ".*";
 		}
+		notifyListeners(PROPERTY_ISSUE_SUBJECT, oldIssueSubject, issueSubject);
 	}
 	
 	public void setIssueSubjectNComment(String issueSubjectNComment)
 	{
+		final String oldIssueSubjectNComment = removeRegexpSearch(this.issueSubjectNComment);
 		if (issueSubjectNComment == null || issueSubjectNComment.length() == 0)
 		{
 			this.issueSubjectNComment = null;			
@@ -174,6 +214,7 @@ extends AbstractJDOQuery<Issue>
 		{
 			this.issueSubjectNComment = ".*" + issueSubjectNComment.toLowerCase() + ".*";
 		}
+		notifyListeners(PROPERTY_ISSUE_SUBJECT_AND_COMMENT, oldIssueSubjectNComment, issueSubjectNComment);
 	}
 	
 	public String getIssueSubjectNComment() {
@@ -186,6 +227,7 @@ extends AbstractJDOQuery<Issue>
 	
 	public void setIssueComment(String issueComment)
 	{
+		final String oldIssueComment = removeRegexpSearch(this.issueComment);
 		if (issueComment == null || issueComment.length() == 0)
 		{
 			this.issueComment = null;
@@ -194,79 +236,107 @@ extends AbstractJDOQuery<Issue>
 		{
 			this.issueComment = ".*" + issueComment.toLowerCase() + ".*";
 		}
+		notifyListeners(PROPERTY_ISSUE_COMMENT, oldIssueComment, issueComment);
 	}
 	
 	public IssueTypeID getIssueTypeID() {
 		return issueTypeID;
 	}
 
-	public void setIssueTypeID(IssueTypeID issueTypeID) {
+	public void setIssueTypeID(IssueTypeID issueTypeID)
+	{
+		final IssueTypeID oldIssueTypeID = this.issueTypeID;
 		this.issueTypeID = issueTypeID;
+		notifyListeners(PROPERTY_ISSUE_TYPE_ID, oldIssueTypeID, issueTypeID);
 	}
 
 	public IssueSeverityTypeID getIssueSeverityTypeID() {
 		return issueSeverityTypeID;
 	}
 
-	public void setIssueSeverityTypeID(IssueSeverityTypeID issueSeverityTypeID) {
+	public void setIssueSeverityTypeID(IssueSeverityTypeID issueSeverityTypeID)
+	{
+		final IssueSeverityTypeID oldIssueSeverityTypeID = this.issueSeverityTypeID; 
 		this.issueSeverityTypeID = issueSeverityTypeID;
+		notifyListeners(PROPERTY_ISSUE_SEVERITY_TYPE_ID, oldIssueSeverityTypeID, issueSeverityTypeID);
 	}
 
 	public IssuePriorityID getIssuePriorityID() {
 		return issuePriorityID;
 	}
 
-	public void setIssuePriorityID(IssuePriorityID issuePriorityID) {
+	public void setIssuePriorityID(IssuePriorityID issuePriorityID)
+	{
+		final IssuePriorityID oldIssuePriorityID = this.issuePriorityID;
 		this.issuePriorityID = issuePriorityID;
+		notifyListeners(PROPERTY_ISSUE_PRIORITY_ID, oldIssuePriorityID, issuePriorityID);
 	}
 
 	public IssueResolutionID getIssueResolutionID() {
 		return issueResolutionID;
 	}
 	
-	public void setIssueResolutionID(IssueResolutionID issueResolutionID) {
+	public void setIssueResolutionID(IssueResolutionID issueResolutionID)
+	{
+		final IssueResolutionID oldIssueResolutionID = this.issueResolutionID;
 		this.issueResolutionID = issueResolutionID;
+		notifyListeners(PROPERTY_ISSUE_RESOLUTION_ID, oldIssueResolutionID, issueResolutionID);
 	}
 	
 	public UserID getReporterID() {
 		return reporterID;
 	}
 
-	public void setReporterID(UserID reporterID) {
+	public void setReporterID(UserID reporterID)
+	{
+		final UserID oldReporterID = this.reporterID;
 		this.reporterID = reporterID;
+		notifyListeners(PROPERTY_REPORTER_ID, oldReporterID, reporterID);
 	}
 
 	public UserID getAssigneeID() {
 		return assigneeID;
 	}
 
-	public void setAssigneeID(UserID assigneeID) {
+	public void setAssigneeID(UserID assigneeID)
+	{
+		final UserID oldAssigneeID = this.assigneeID;
 		this.assigneeID = assigneeID;
+		notifyListeners(PROPERTY_ASSIGNEE_ID, oldAssigneeID, assigneeID);
 	}
 
 	public Date getCreateTimestamp() {
 		return createTimestamp;
 	}
 
-	public void setCreateTimestamp(Date createTimestamp) {
+	public void setCreateTimestamp(Date createTimestamp)
+	{
+		final Date oldCreateTimestamp = this.createTimestamp;
 		this.createTimestamp = createTimestamp;
+		notifyListeners(PROPERTY_CREATE_TIMESTAMP, oldCreateTimestamp, createTimestamp);
 	}
 	
 	public Date getUpdateTimestamp() {
 		return updateTimestamp;
 	}
 
-	public void setUpdateTimestamp(Date updateTimestamp) {
+	public void setUpdateTimestamp(Date updateTimestamp)
+	{
+		final Date oldUpdateTimestamp = this.updateTimestamp; 
 		this.updateTimestamp = updateTimestamp;
+		notifyListeners(PROPERTY_UPDATE_TIMESTAMP, oldUpdateTimestamp, updateTimestamp);
 	}
 	
-//	public void setObjectIDs(Set<ObjectID> objectIDs) {
-//		this.issueLinks = objectIDs;
-//	}
-//	
-//	public Set<ObjectID> getIssueLinks() {
-//		return issueLinks;
-//	}
+	public void setIssueLinks(Set<IssueLink> issueLinks)
+	{
+		final Set<IssueLink> oldIssueLinks = this.issueLinks;
+		this.issueLinks = issueLinks;
+		notifyListeners(PROPERTY_ISSUE_LINKS, oldIssueLinks, issueLinks);
+	}
+	
+	public Set<IssueLink> getIssueLinks() {
+		return issueLinks;
+	}
 
 	@Override
 	protected Class<Issue> init()

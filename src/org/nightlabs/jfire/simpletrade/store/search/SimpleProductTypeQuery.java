@@ -14,14 +14,11 @@ public class SimpleProductTypeQuery
 extends AbstractProductTypeQuery<SimpleProductType>
 {
 	/**
-	 * 
+	 * The serial version id.
 	 */
 	private static final long serialVersionUID = 1L;
 	private static final Logger logger = Logger.getLogger(SimpleProductTypeQuery.class);
 	
-	public SimpleProductTypeQuery() {
-	}
-
 	@Override
 	protected Query prepareQuery()
 	{

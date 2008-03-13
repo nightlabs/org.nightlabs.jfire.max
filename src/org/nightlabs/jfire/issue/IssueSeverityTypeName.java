@@ -16,9 +16,8 @@ import org.nightlabs.i18n.I18nText;
  *
  * @jdo.inheritance strategy="new-table"
  *
- * @jdo.create-objectid-class
- * 
- * @jdo.fetch-group name="IssueSeverityTypeName.this" fetch-groups="default" fields="issueSeverityType, names"
+ * @jdo.create-objectid-class field-order="organisationID, issueSeverityTypeID"
+ *
  * @jdo.fetch-group name="IssueSeverityType.name" fetch-groups="default" fields="issueSeverityType, names"
  */ 
 public class IssueSeverityTypeName 

@@ -14,11 +14,13 @@ import javax.jdo.PersistenceManager;
 
 import org.jbpm.JbpmContext;
 import org.jbpm.graph.exe.ProcessInstance;
+import org.nightlabs.jdo.ObjectIDUtil;
 import org.nightlabs.jfire.issue.jbpm.JbpmConstants;
 import org.nightlabs.jfire.jbpm.JbpmLookup;
 import org.nightlabs.jfire.jbpm.graph.def.AbstractActionHandler;
 import org.nightlabs.jfire.jbpm.graph.def.ActionHandlerNodeEnter;
 import org.nightlabs.jfire.jbpm.graph.def.ProcessDefinition;
+import org.nightlabs.jfire.organisation.Organisation;
 import org.nightlabs.jfire.security.SecurityReflector;
 import org.nightlabs.util.Util;
 
@@ -127,10 +129,11 @@ implements Serializable{
 	/**
 	 * @deprecated Only for JDO!!!! 
 	 */
-	protected IssueType() {
-	}
-	
+	protected IssueType() { }
+
 	public IssueType(String organisationID, String issueTypeID) {
+		Organisation.assertValidOrganisationID(organisationID);
+		ObjectIDUtil.assertValidIDString(issueTypeID, "issueTypeID");
 		this.organisationID = organisationID;
 		this.issueTypeID = issueTypeID;
 		
@@ -225,7 +228,6 @@ implements Serializable{
 		} finally {
 			jbpmContext.close();
 		}
-		
 	}
 	
 	/**

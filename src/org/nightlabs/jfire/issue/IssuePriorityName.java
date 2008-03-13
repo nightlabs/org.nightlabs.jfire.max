@@ -17,7 +17,7 @@ import org.nightlabs.jfire.issue.id.IssuePriorityID;
  *
  * @jdo.inheritance strategy="new-table"
  *
- * @jdo.create-objectid-class
+ * @jdo.create-objectid-class field-order="organisationID, issuePriorityID"
  * 
  * @jdo.fetch-group name="IssuePriorityName.name" fetch-groups="default" fields="issuePriority, names"
  */ 

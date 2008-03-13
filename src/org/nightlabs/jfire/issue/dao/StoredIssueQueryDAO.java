@@ -1,17 +1,12 @@
 package org.nightlabs.jfire.issue.dao;
 
-import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 import java.util.Set;
 
-import javax.jdo.FetchPlan;
-
-import org.nightlabs.jdo.NLJDOHelper;
 import org.nightlabs.jfire.base.jdo.BaseJDOObjectDAO;
 import org.nightlabs.jfire.issue.IssueManager;
 import org.nightlabs.jfire.issue.IssueManagerUtil;
-import org.nightlabs.jfire.issue.IssuePriority;
 import org.nightlabs.jfire.issue.config.StoredIssueQuery;
 import org.nightlabs.jfire.issue.id.StoredIssueQueryID;
 import org.nightlabs.jfire.security.SecurityReflector;
@@ -53,14 +48,14 @@ extends BaseJDOObjectDAO<StoredIssueQueryID, StoredIssueQuery>
 		}
 	}
 
-	private static final String[] FETCH_GROUPS = { IssuePriority.FETCH_GROUP_THIS_ISSUE_PRIORITY, FetchPlan.DEFAULT };
-
-	public List<StoredIssueQuery> getStoredIssueQueries(ProgressMonitor monitor) {
-		try {
-			return new ArrayList<StoredIssueQuery>(retrieveJDOObjects(null, FETCH_GROUPS, NLJDOHelper.MAX_FETCH_DEPTH_NO_LIMIT, monitor));
-		} catch (Exception e) {
-			throw new RuntimeException("Error while fetching stored issue query: " + e.getMessage(), e); //$NON-NLS-1$
-		} 
+	public List<StoredIssueQuery> getStoredIssueQueries(String[] fetchGroups, int maxFetchDepth, ProgressMonitor monitor) {
+//		try {
+//			Set<StoredIssueQueryID> storedIssueQueryIDs =  // TODO need to ask the server for this
+//			return getJDOObjects(null, storedIssueQueryIDs, fetchGroups, maxFetchDepth, monitor));
+//		} catch (Exception e) {
+//			throw new RuntimeException(e);
+//		}
+		throw new UnsupportedOperationException("NYI");
 	}
 
 	public synchronized StoredIssueQuery getStoredIssueQuery(StoredIssueQueryID storedIssueQueryID, String[] fetchGroups, int maxFetchDepth, ProgressMonitor monitor)

@@ -40,7 +40,6 @@ public class IssueDAO extends BaseJDOObjectDAO<IssueID, Issue>{
 		try {
 			IssueManager im = IssueManagerUtil.getHome(SecurityReflector.getInitialContextProperties()).create();
 			return im.getIssues(issueIDs, fetchGroups, maxFetchDepth);
-
 		} catch (Exception e) {
 			monitor.setCanceled(true);
 			throw e;
@@ -74,6 +73,9 @@ public class IssueDAO extends BaseJDOObjectDAO<IssueID, Issue>{
 		try {
 			IssueManager im = IssueManagerUtil.getHome(SecurityReflector.getInitialContextProperties()).create();
 			Issue result = im.storeIssue(issue, get, fetchGroups, maxFetchDepth);
+			if (result != null)
+				getCache().put(null, result, fetchGroups, maxFetchDepth);
+
 			monitor.worked(1);
 			monitor.done();
 			return result;
@@ -112,15 +114,10 @@ public class IssueDAO extends BaseJDOObjectDAO<IssueID, Issue>{
 		monitor.done();
 		return issue;
 	}
-	
-	public synchronized List<Issue> getIssues(Set<IssueID> issueIDs, String[] fetchgroups, int maxFetchDepth, ProgressMonitor monitor) 
+
+	public synchronized List<Issue> getIssues(Set<IssueID> issueIDs, String[] fetchGroups, int maxFetchDepth, ProgressMonitor monitor) 
 	{
-		try {
-			IssueManager im = IssueManagerUtil.getHome(SecurityReflector.getInitialContextProperties()).create();
-			return im.getIssues(issueIDs, fetchgroups, maxFetchDepth);
-		} catch (Exception e) {
-			throw new RuntimeException(e);
-		}
+		return getJDOObjects(null, issueIDs, fetchGroups, maxFetchDepth, monitor);
 	}
 
 	/**
@@ -131,12 +128,13 @@ public class IssueDAO extends BaseJDOObjectDAO<IssueID, Issue>{
 	 * 					object, <code>monitor.worked(1)</code> will be called.
 	 * @return The issues.
 	 */
-	public synchronized Collection<Issue> getIssues(String[] fetchgroups, int maxFetchDepth, ProgressMonitor monitor) 
+	@SuppressWarnings("unchecked")
+	public synchronized Collection<Issue> getIssues(String[] fetchGroups, int maxFetchDepth, ProgressMonitor monitor) 
 	{
 		try {
 			IssueManager im = IssueManagerUtil.getHome(SecurityReflector.getInitialContextProperties()).create();
 			Set<IssueID> is = im.getIssueIDs();
-			return im.getIssues(is, fetchgroups, maxFetchDepth);
+			return getJDOObjects(null, is, fetchGroups, maxFetchDepth, monitor);
 		} catch (Exception e) {
 			throw new RuntimeException(e);
 		}

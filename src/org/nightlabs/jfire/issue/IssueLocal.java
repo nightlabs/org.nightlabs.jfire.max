@@ -25,20 +25,24 @@ import org.nightlabs.util.Util;
  *		detachable="true"
  *		table="JFireIssueTracking_IssueLocal"
  *
+ * @jdo.inheritance strategy="new-table"
+ *
  * @jdo.implements name="org.nightlabs.jfire.jbpm.graph.def.StatableLocal"
  * 
  * @jdo.create-objectid-class 
  * 		field-order="organisationID, issueID"
  * 		include-body="id/IssueLocalID.body.inc"
- * 
- * @jdo.fetch-group name="StatableLocal.state" fetch-groups="default" fields="state"
- * @jdo.fetch-group name="StatableLocal.states" fetch-groups="default" fields="states"
- * @jdo.fetch-group name="IssueLocal.state" fetch-groups="default" fields="state"
- * @jdo.fetch-group name="IssueLocal.states" fetch-groups="default" fields="states"
- * @jdo.fetch-group name="IssueLocal.this" fetch-groups="default" fields="state, states, issue"
  *
- * @jdo.inheritance strategy="new-table"
- **/
+ * @jdo.fetch-group name="IssueLocal.state" fields="state"
+ * @jdo.fetch-group name="IssueLocal.states" fields="states"
+ *
+ * @jdo.fetch-group name="IssueLocal.this" fetch-groups="default" fields="issue, state, states"
+ *
+ * @jdo.fetch-group name="Issue.issueLocal" fields="issue"
+ *
+ * @jdo.fetch-group name="StatableLocal.state" fields="state"
+ * @jdo.fetch-group name="StatableLocal.states" fields="states"
+ */
 public class IssueLocal 
 implements Serializable, StatableLocal
 {

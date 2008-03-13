@@ -19,21 +19,23 @@ import org.nightlabs.i18n.I18nText;
  *
  * @jdo.inheritance strategy="new-table"
  *
- * @jdo.create-objectid-class
+ * @jdo.create-objectid-class field-order="organisationID, issueTypeID"
  * 
  * @jdo.fetch-group name="IssueType.name" fetch-groups="default" fields="issueType, names"
  */ 
 public class IssueTypeName 
-extends I18nText{
+extends I18nText
+{
+	private static final long serialVersionUID = 1L;
 
 	/**
-	 * The serial version of this class.
+	 * @jdo.field primary-key="true"
+	 * @jdo.column length="100"
 	 */
-	private static final long serialVersionUID = 1L;
-	
+	private String organisationID;
 	/**
 	 * @jdo.field primary-key="true"
-	 * @jdo.field persistence-modifier="persistent"
+	 * @jdo.column length="100"
 	 */
 	private String issueTypeID;
 	
@@ -65,24 +67,31 @@ extends I18nText{
 	protected IssueTypeName() {
 	}
 	
-	public IssueTypeName(IssueType issueType){
+	public IssueTypeName(IssueType issueType) {
 		this.issueType = issueType;
+		organisationID = issueType.getOrganisationID();
 		issueTypeID = issueType.getIssueTypeID();
 	}
-	
-	/**
-	 * @see org.nightlabs.i18n.I18nText#getI18nMap()
-	 */
+
+	public String getOrganisationID() {
+		return organisationID;
+	}
+	public String getIssueTypeID() {
+		return issueTypeID;
+	}
+	public IssueType getIssueType() {
+		return issueType;
+	}
+
+	@Override
 	protected Map<String, String> getI18nMap()
 	{
 		return names;
 	}
 
-	/**
-	 * @see org.nightlabs.i18n.I18nText#getFallBackValue(java.lang.String)
-	 */
+	@Override
 	protected String getFallBackValue(String languageID)
 	{
-		return issueTypeID == null ? languageID : issueTypeID;
+		return organisationID + '/' + issueTypeID;
 	}
 }

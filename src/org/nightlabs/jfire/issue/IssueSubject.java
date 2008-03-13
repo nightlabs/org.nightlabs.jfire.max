@@ -4,6 +4,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 import org.nightlabs.i18n.I18nText;
+import org.nightlabs.jdo.ObjectIDUtil;
 
 /**
  * @author Chairat Kongarayawetchakun - chairat at nightlabs dot de
@@ -18,15 +19,13 @@ import org.nightlabs.i18n.I18nText;
  *
  * @jdo.create-objectid-class
  * 		field-order="organisationID, issueID"
- * 
+ *
  * @jdo.fetch-group name="Issue.subject" fetch-groups="default" fields="issue, names"
- * @jdo.fetch-group name="IssueSubject.this" fetch-groups="default" fields="issue, names"
- * @jdo.fetch-group name="IssueSubject.name" fetch-groups="default" fields="names"
  */ 
 public class IssueSubject 
 extends I18nText{
 	
-	public static final String FETCH_GROUP_THIS_ISSUE_SUBJECT = "IssueSubject.this";
+//	public static final String FETCH_GROUP_THIS_ISSUE_SUBJECT = "IssueSubject.this";
 	
 	/**
 	 * The serial version of this class.
@@ -68,45 +67,34 @@ extends I18nText{
 	/**
 	 * @deprecated Only for JDO!
 	 */
-	protected IssueSubject()
-	{
-	}
+	protected IssueSubject() { }
 
 	public IssueSubject(Issue issue)
 	{
-		this.organisationID = issue.getOrganisationID();
 		this.issue = issue;
-		issueID = issue.getIssueID();
+		this.organisationID = issue.getOrganisationID();
+		this.issueID = issue.getIssueID();
 	}
 
-	/**
-	 * @return Returns the organisationID.
-	 */
 	public String getOrganisationID() {
 		return organisationID;
 	}
-	
-	
-	/**
-	 * @param organisationID The organisationID to set.
-	 */
-	public void setOrganisationID(String organisationID) {
-		this.organisationID = organisationID;
+	public long getIssueID() {
+		return issueID;
+	}
+	public Issue getIssue() {
+		return issue;
 	}
 	
-	/**
-	 * @see org.nightlabs.i18n.I18nText#getI18nMap()
-	 */
+	@Override
 	protected Map<String, String> getI18nMap()
 	{
 		return names;
 	}
 
-	/**
-	 * @see org.nightlabs.i18n.I18nText#getFallBackValue(java.lang.String)
-	 */
+	@Override
 	protected String getFallBackValue(String languageID)
 	{
-		return issue == null ? languageID : "";
+		return organisationID + '/' + ObjectIDUtil.longObjectIDFieldToString(issueID);
 	}
 }

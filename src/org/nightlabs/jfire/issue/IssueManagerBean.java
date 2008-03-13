@@ -196,29 +196,47 @@ implements SessionBean{
 		}
 	}
 	
+//	/**
+//	 * @throws ModuleException
+//	 *
+//	 * @ejb.interface-method
+//	 * @ejb.transaction type="Required"
+//	 * @ejb.permission role-name="_Guest_"
+//	 */
+//	public Collection getIssuePriorities(String[] fetchGroups, int maxFetchDepth)
+//	throws ModuleException
+//	{
+//		PersistenceManager pm = getPersistenceManager();
+//		try {
+//			pm.getFetchPlan().setMaxFetchDepth(maxFetchDepth);
+//			if (fetchGroups != null)
+//				pm.getFetchPlan().setGroups(fetchGroups);
+//
+//			Query q = pm.newQuery(IssuePriority.class);
+//			return pm.detachCopyAll((Collection)q.execute());
+//		} finally {
+//			pm.close();
+//		}
+//	}
+
 	/**
-	 * @throws ModuleException
-	 *
 	 * @ejb.interface-method
-	 * @ejb.transaction type="Required"
+	 * @ejb.transaction type="Supports" @!This usually means that no transaction is opened which is significantly faster and recommended for all read-only EJB methods! Marco.
 	 * @ejb.permission role-name="_Guest_"
 	 */
-	public Collection getIssuePriorities(String[] fetchGroups, int maxFetchDepth)
-	throws ModuleException
+	@SuppressWarnings("unchecked")
+	public Set<IssuePriorityID> getIssuePriorityIDs()
 	{
 		PersistenceManager pm = getPersistenceManager();
 		try {
-			pm.getFetchPlan().setMaxFetchDepth(maxFetchDepth);
-			if (fetchGroups != null)
-				pm.getFetchPlan().setGroups(fetchGroups);
-
 			Query q = pm.newQuery(IssuePriority.class);
-			return pm.detachCopyAll((Collection)q.execute());
+			q.setResult("JDOHelper.getObjectId(this)");
+			return new HashSet<IssuePriorityID>((Collection)q.execute()); 
 		} finally {
 			pm.close();
 		}
 	}
-	
+
 	/**
 	 * @ejb.interface-method
 	 * @ejb.transaction type="Supports" @!This usually means that no transaction is opened which is significantly faster and recommended for all read-only EJB methods! Marco.

@@ -15,15 +15,13 @@ import org.nightlabs.util.Util;
  *
  * @jdo.create-objectid-class field-order="organisationID, issuePriorityID"
  *
- * @jdo.inheritance strategy = "new-table"
+ * @jdo.inheritance strategy="new-table"
  * 
  * @jdo.fetch-group name="IssuePriority.name" fetch-groups="default" fields="name"
- * @jdo.fetch-group name="IssuePriority.this" fetch-groups="default" fields="name"
  */
 public class IssuePriority
 implements Serializable{
 	
-	public static final String FETCH_GROUP_THIS_ISSUE_PRIORITY = "IssuePriority.this";
 	public static final String FETCH_GROUP_NAME = "IssuePriority.name";
 	
 	private static final long serialVersionUID = 1L;

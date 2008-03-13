@@ -73,24 +73,25 @@ import org.nightlabs.util.Util;
  *			PARAMETERS String paramIssueTypeID
  *			import java.lang.String"
  *
- * @jdo.fetch-group name="Issue.fileList" fetch-groups="default" fields="fileList"
- * @jdo.fetch-group name="Issue.description" fetch-groups="default" fields="description"
- * @jdo.fetch-group name="Issue.subject" fetch-groups="default" fields="subject" 
- * @jdo.fetch-group name="Issue.issuePriority" fetch-groups="default" fields="issuePriority"
- * @jdo.fetch-group name="Issue.issueSeverityType" fetch-groups="default" fields="issueSeverityType"
- * @jdo.fetch-group name="Issue.issueResolution" fetch-groups="default" fields="issueResolution"
- * @jdo.fetch-group name="Issue.state" fetch-groups="default" fields="state"
- * @jdo.fetch-group name="Issue.states" fetch-groups="default" fields="states"
- * @jdo.fetch-group name="Statable.state" fetch-groups="default" fields="state"
- * @jdo.fetch-group name="Statable.states" fetch-groups="default" fields="states"
- * @jdo.fetch-group name="Issue.issueLocal" fetch-groups="default" fields="issueLocal"
- * @jdo.fetch-group name="Issue.issueType" fetch-groups="default" fields="issueType"
- * @jdo.fetch-group name="Issue.comments" fetch-groups="default" fields="comments"
- * @jdo.fetch-group name="Issue.issueLinks" fetch-groups="default" fields="issueLinks"
+ * @jdo.fetch-group name="Issue.fileList" fields="fileList"
+ * @jdo.fetch-group name="Issue.description" fields="description"
+ * @jdo.fetch-group name="Issue.subject" fields="subject" 
+ * @jdo.fetch-group name="Issue.issuePriority" fields="issuePriority"
+ * @jdo.fetch-group name="Issue.issueSeverityType" fields="issueSeverityType"
+ * @jdo.fetch-group name="Issue.issueResolution" fields="issueResolution"
+ * @jdo.fetch-group name="Issue.state" fields="state"
+ * @jdo.fetch-group name="Issue.states" fields="states"
+ * @jdo.fetch-group name="Issue.issueLocal" fields="issueLocal"
+ * @jdo.fetch-group name="Issue.issueType" fields="issueType"
+ * @jdo.fetch-group name="Issue.comments" fields="comments"
+ * @jdo.fetch-group name="Issue.issueLinks" fields="issueLinks"
+ * @jdo.fetch-group name="Issue.propertySet" fields="propertySet"
+
  * @jdo.fetch-group name="Issue.this" fetch-groups="default" fields="fileList, issueType, issueLinks, description, subject, issuePriority, issueSeverityType, issueResolution, state, states, comments, issueLocal, reporter, assignee"
  *
- * @jdo.fetch-group name="Issue.propertySet" fetch-groups="default" fields="propertySet"
- **/
+ * @jdo.fetch-group name="Statable.state" fields="state"
+ * @jdo.fetch-group name="Statable.states" fields="states"
+ */
 public class Issue
 implements 	Serializable, AttachCallback, Statable, DeleteCallback
 {
@@ -106,9 +107,9 @@ implements 	Serializable, AttachCallback, Statable, DeleteCallback
 	public static final String FETCH_GROUP_STATES = "Issue.states";
 	public static final String FETCH_GROUP_ISSUE_PRIORITY = "Issue.issuePriority";
 	public static final String FETCH_GROUP_ISSUE_RESOLUTION = "Issue.issueResolution";
-	public static final String fETCH_GROUP_ISSUE_TYPE = "Issue.issueType";
+	public static final String FETCH_GROUP_ISSUE_TYPE = "Issue.issueType";
 	public static final String FETCH_GROUP_ISSUE_LOCAL = "Issue.issueLocal";
-	public static final String fETCH_GROUP_ISSUE_COMMENT = "Issue.comments";
+	public static final String FETCH_GROUP_ISSUE_COMMENT = "Issue.comments";
 	public static final String FETCH_GROUP_ISSUE_LINKS = "Issue.issueLinks";
 	
 	public static final String FETCH_GROUP_PROPERTY_SET = "Issue.propertySet";
@@ -189,12 +190,12 @@ implements 	Serializable, AttachCallback, Statable, DeleteCallback
 	private IssueSeverityType issueSeverityType;
 
 	/**
-	 * @jdo.field persistence-modifier="persistent" dependent="true"
+	 * @jdo.field persistence-modifier="persistent" dependent="true" mapped-by="issue"
 	 */
 	private IssueSubject subject;
 
 	/**
-	 * @jdo.field persistence-modifier="persistent" dependent="true"
+	 * @jdo.field persistence-modifier="persistent" dependent="true" mapped-by="issue"
 	 */
 	private IssueDescription description;
 

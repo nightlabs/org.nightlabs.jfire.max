@@ -26,7 +26,7 @@ import org.nightlabs.i18n.I18nText;
 public class IssueDescription 
 extends I18nText{
 	
-	public static final String FETCH_GROUP_THIS = "IssueDescription.this";
+	public static final String FETCH_GROUP_THIS_DESCRIPTION = "IssueDescription.this";
 	
 	/**
 	 * The serial version of this class.

@@ -2,7 +2,9 @@ package org.nightlabs.jfire.issue;
 
 import java.io.Serializable;
 import java.util.Collections;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 import javax.jdo.JDOHelper;
 import javax.jdo.PersistenceManager;
@@ -38,12 +40,12 @@ import org.nightlabs.util.Util;
  * @jdo.inheritance strategy="new-table"
  **/
 public class IssueLocal 
-implements Serializable, StatableLocal{
-	
+implements Serializable, StatableLocal
+{
 	private static final long serialVersionUID = 1L;
 	private static final Logger logger = Logger.getLogger(IssueLocal.class);
 
-	public static final String FETCH_GROUP_THIS = "IssueLocal.this";
+	public static final String FETCH_GROUP_THIS_ISSUE_LOCAL = "IssueLocal.this";
 	
 	/**
 	 * @jdo.field primary-key="true"
@@ -57,7 +59,7 @@ implements Serializable, StatableLocal{
 	private long issueID;
 	
 	/**
-	 * @jdo.field persistence-modifier="persistent" dependent="true"
+	 * @jdo.field persistence-modifier="persistent" @!dependent="true"
 	 */
 	private State state;
 	
@@ -68,9 +70,8 @@ implements Serializable, StatableLocal{
 	 *		persistence-modifier="persistent"
 	 *		collection-type="collection"
 	 *		element-type="State"
-	 *		dependent-value="true"
 	 *		table="JFireIssueTracking_IssueLocal_states"
-	 *		null-value="exception"
+	 *		@!dependent-value="true"
 	 *
 	 * @jdo.join
 	 */
@@ -208,5 +209,13 @@ implements Serializable, StatableLocal{
 	public String getPrimaryKey()
 	{
 		return primaryKey;
+	}
+
+	protected Set<State> clearStatesBeforeDelete() {
+		Set<State> res = new HashSet<State>(this.states);
+		res.add(this.state);
+		this.state = null;
+		this.states.clear();
+		return res;
 	}
 }

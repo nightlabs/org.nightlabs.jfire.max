@@ -23,7 +23,7 @@ import org.nightlabs.util.Util;
 public class IssueResolution
 implements Serializable{
 	
-	public static final String FETCH_GROUP_THIS = "IssueResolution.this";
+	public static final String FETCH_GROUP_THIS_ISSUE_RESOLUTION = "IssueResolution.this";
 	public static final String FETCH_GROUP_NAME = "IssueResolution.name";
 	
 	private static final long serialVersionUID = 1L;

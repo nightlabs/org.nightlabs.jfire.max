@@ -37,6 +37,7 @@ import java.util.Set;
 import javax.jdo.JDOHelper;
 import javax.jdo.PersistenceManager;
 import javax.jdo.listener.AttachCallback;
+import javax.jdo.listener.DeleteCallback;
 
 import org.apache.log4j.Logger;
 import org.nightlabs.jdo.ObjectID;
@@ -86,19 +87,18 @@ import org.nightlabs.util.Util;
  * @jdo.fetch-group name="Issue.issueType" fetch-groups="default" fields="issueType"
  * @jdo.fetch-group name="Issue.comments" fetch-groups="default" fields="comments"
  * @jdo.fetch-group name="Issue.issueLinks" fetch-groups="default" fields="issueLinks"
- * @jdo.fetch-group name="Issue.this" fetch-groups="default" fields="fileList, issueType, issueLinks, description, subject, issuePriority, issueSeverityType, issueResolution, state, states, comments, issueLocal, reporter, assignee" 
+ * @jdo.fetch-group name="Issue.this" fetch-groups="default" fields="fileList, issueType, issueLinks, description, subject, issuePriority, issueSeverityType, issueResolution, state, states, comments, issueLocal, reporter, assignee"
  *
  * @jdo.fetch-group name="Issue.propertySet" fetch-groups="default" fields="propertySet"
  **/
 public class Issue
-implements 	
-		Serializable, AttachCallback, Statable
+implements 	Serializable, AttachCallback, Statable, DeleteCallback
 {
 
 	private static final long serialVersionUID = 1L;
 	private static final Logger logger = Logger.getLogger(Issue.class);
 
-	public static final String FETCH_GROUP_THIS = "Issue.this";
+	public static final String FETCH_GROUP_THIS_ISSUE = "Issue.this";
 	public static final String FETCH_GROUP_DESCRIPTION = "Issue.description";
 	public static final String FETCH_GROUP_SUBJECT = "Issue.subject";
 	public static final String FETCH_GROUP_ISSUE_SEVERITY_TYPE = "Issue.issueSeverityType";
@@ -229,7 +229,7 @@ implements
 	private IssueLocal issueLocal;
 	
 	/**
-	 * @jdo.field persistence-modifier="persistent" dependent="true"
+	 * @jdo.field persistence-modifier="persistent" @!dependent="true"
 	 */
 	private State state;
 	
@@ -240,9 +240,8 @@ implements
 	 *		persistence-modifier="persistent"
 	 *		collection-type="collection"
 	 *		element-type="State"
-	 *		dependent-value="true"
 	 *		table="JFireIssueTracking_Issue_states"
-	 *		null-value="exception"
+	 *		@!dependent-value="true"
 	 *
 	 * @jdo.join
 	 */
@@ -651,7 +650,35 @@ implements
 	private void afterCreateIssueLink(IssueLink newIssueLink) {
 
 	}
-	
+
+	public IssueLocal getIssueLocal() {
+		return issueLocal;
+	}
+
 	private void beforeDeleteIssueLink(IssueLink issueLinkToBeDeleted) {}
 	private void afterDeleteIssueLink(IssueLink issueLinkDeleted) {}
+
+	
+
+	@Override
+	public void jdoPreDelete() {
+		PersistenceManager pm = getPersistenceManager();
+
+		Set<State> statesToDelete;
+		if (this.issueLocal == null)
+			statesToDelete = new HashSet<State>();
+		else
+			statesToDelete = new HashSet<State>(this.issueLocal.clearStatesBeforeDelete());
+
+		statesToDelete.addAll(this.states);
+		statesToDelete.add(this.state);
+
+		this.states.clear();
+		this.state = null;
+
+		pm.flush();
+
+		for (State state : statesToDelete)
+			pm.deletePersistent(state);
+	}
 }

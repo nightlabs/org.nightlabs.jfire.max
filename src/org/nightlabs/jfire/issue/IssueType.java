@@ -54,7 +54,7 @@ public class IssueType
 implements Serializable{
 	private static final long serialVersionUID = 1L;
 	
-	public static final String FETCH_GROUP_THIS = "IssueType.this";
+	public static final String FETCH_GROUP_THIS_ISSUE_TYPE = "IssueType.this";
 	public static final String FETCH_GROUP_NAME = "IssueType.name";
 	public static final String FETCH_GROUP_ISSUE_PRIORITIES = "IssueType.issuePriorities";
 	public static final String FETCH_GROUP_ISSUE_SEVERITY_TYPES = "IssueType.issueSeverityTypes";

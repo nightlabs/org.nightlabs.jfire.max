@@ -5,7 +5,6 @@ import java.rmi.RemoteException;
 import java.util.Collection;
 import java.util.Date;
 import java.util.HashSet;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Locale;
 import java.util.Set;
@@ -480,19 +479,21 @@ implements SessionBean{
 			StringBuffer filter = new StringBuffer();
 			
 			if (linkedObjectClass != null) {
-				filter.append("( this.linkableObjectClassNames.contains(varName) && varName.matches(\"" + linkedObjectClass.getName() + "\") )");
+				filter.append("( this.linkableObjectClassNames.contains(varName) && (varName.matches(\"" + linkedObjectClass.getName() + "\") ||  varName.matches(\"" + Object.class.getName() + "\")))");
 				query.declareVariables(String.class.getName() + " varName");
 			}
 			
+			
 			logger.info(filter.toString());
 			query.setFilter(filter.toString());
-			Collection c = (Collection)query.execute(linkedObjectClass);
-			Iterator i = c.iterator();
-			Collection ret = new HashSet();
-			while(i.hasNext())
-				ret.add(JDOHelper.getObjectId(i.next()));
+			
+			Collection issueLinkTypes = (Collection)query.execute(linkedObjectClass);
+			Collection result = new HashSet();
+			
+			for(Object issueLinkType : issueLinkTypes)
+				result.add(JDOHelper.getObjectId(issueLinkType));
 
-			return ret;
+			return result;
 		}
 		finally {
 			pm.close();
@@ -720,7 +721,7 @@ implements SessionBean{
 			logger.info("Initialization of " + JFireIssueTrackingEAR.MODULE_NAME + " started...");
 
 			pm.makePersistent(new ModuleMetaData(
-					JFireIssueTrackingEAR.MODULE_NAME, "0.9.3.0.beta", "0.9.3.0.beta")
+					JFireIssueTrackingEAR.MODULE_NAME, "0.9.3.0.0.beta", "0.9.3.0.0.beta")
 			);
 
 //			// check, whether the datastore is already initialized

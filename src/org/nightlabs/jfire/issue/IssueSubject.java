@@ -26,7 +26,7 @@ import org.nightlabs.i18n.I18nText;
 public class IssueSubject 
 extends I18nText{
 	
-	public static final String FETCH_GROUP_THIS = "IssueSubject.this";
+	public static final String FETCH_GROUP_THIS_ISSUE_SUBJECT = "IssueSubject.this";
 	
 	/**
 	 * The serial version of this class.

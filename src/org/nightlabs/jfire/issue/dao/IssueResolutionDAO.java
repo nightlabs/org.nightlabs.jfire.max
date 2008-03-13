@@ -52,7 +52,7 @@ extends BaseJDOObjectDAO<IssueResolutionID, IssueResolution>
 		}
 	}
 
-	private static final String[] FETCH_GROUPS = { IssueResolution.FETCH_GROUP_THIS, FetchPlan.DEFAULT };
+	private static final String[] FETCH_GROUPS = { IssueResolution.FETCH_GROUP_THIS_ISSUE_RESOLUTION, FetchPlan.DEFAULT };
 
 	public synchronized IssueResolution getIssueResolution(IssueResolutionID issueResolutionID, String[] fetchGroups, int maxFetchDepth, ProgressMonitor monitor)
 	{

@@ -53,7 +53,7 @@ extends BaseJDOObjectDAO<StoredIssueQueryID, StoredIssueQuery>
 		}
 	}
 
-	private static final String[] FETCH_GROUPS = { IssuePriority.FETCH_GROUP_THIS, FetchPlan.DEFAULT };
+	private static final String[] FETCH_GROUPS = { IssuePriority.FETCH_GROUP_THIS_ISSUE_PRIORITY, FetchPlan.DEFAULT };
 
 	public List<StoredIssueQuery> getStoredIssueQueries(ProgressMonitor monitor) {
 		try {

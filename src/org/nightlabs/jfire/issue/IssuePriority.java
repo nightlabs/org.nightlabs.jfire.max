@@ -23,7 +23,7 @@ import org.nightlabs.util.Util;
 public class IssuePriority
 implements Serializable{
 	
-	public static final String FETCH_GROUP_THIS = "IssuePriority.this";
+	public static final String FETCH_GROUP_THIS_ISSUE_PRIORITY = "IssuePriority.this";
 	public static final String FETCH_GROUP_NAME = "IssuePriority.name";
 	
 	private static final long serialVersionUID = 1L;

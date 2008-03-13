@@ -54,7 +54,7 @@ public class IssueSeverityTypeDAO
 		}
 	}
 
-	private static final String[] FETCH_GROUPS = { IssueSeverityType.FETCH_GROUP_THIS, FetchPlan.DEFAULT };
+	private static final String[] FETCH_GROUPS = { IssueSeverityType.FETCH_GROUP_THIS_ISSUE_SEVERITY_TYPE, FetchPlan.DEFAULT };
 
 	public synchronized IssueSeverityType getIssueSeverityType(IssueSeverityTypeID issueSeverityTypeID, String[] fetchGroups, int maxFetchDepth, ProgressMonitor monitor)
 	{

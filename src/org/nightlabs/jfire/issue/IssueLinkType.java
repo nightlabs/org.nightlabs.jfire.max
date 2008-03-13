@@ -34,7 +34,7 @@ implements Serializable
 {
 	private static final long serialVersionUID = 1L;
 
-	public static final String FETCH_GROUP_THIS = "IssueLinkType.this";
+	public static final String FETCH_GROUP_THIS_ISSUE_LINK_TYPE = "IssueLinkType.this";
 
 	@SuppressWarnings("unchecked")
 	public static Collection<IssueLinkType> getIssueLinkTypes(PersistenceManager pm, Class<?> linkableObjectClass)

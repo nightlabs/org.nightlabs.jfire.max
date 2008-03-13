@@ -42,7 +42,7 @@ import org.nightlabs.util.Util;
 public class IssueLink
 implements Serializable, DetachCallback
 {
-//	public static final String FETCH_GROUP_THIS_ISSUE_LINK = "IssueLink.this";
+	public static final String FETCH_GROUP_THIS_ISSUE_LINK = "IssueLink.this";
 	public static final String FETCH_GROUP_ISSUE_LINK_TYPE = "IssueLink.issueLinkType";
 	public static final String FETCH_GROUP_ISSUE = "IssueLink.issue";
 
@@ -61,18 +61,12 @@ implements Serializable, DetachCallback
 
 	private static final long serialVersionUID = 1L;
 
-//	public static Collection<IssueLink> getIssueLinksByIssueIDAndLinkedObjectID( 
 	/**
 	 * @jdo.field primary-key="true"
 	 * @jdo.column length="100"
 	 */
 	private String organisationID;
 	
-//	/**
-//	 * @jdo.field primary-key="true"
-//	 */
-//	private long issueID;
-
 	/**
 	 * @jdo.field primary-key="true"
 	 */

@@ -9,6 +9,7 @@ import org.apache.log4j.Logger;
 import org.nightlabs.jdo.ObjectID;
 import org.nightlabs.jdo.query.AbstractJDOQuery;
 import org.nightlabs.jfire.issue.Issue;
+import org.nightlabs.jfire.issue.IssueLink;
 import org.nightlabs.jfire.issue.id.IssuePriorityID;
 import org.nightlabs.jfire.issue.id.IssueResolutionID;
 import org.nightlabs.jfire.issue.id.IssueSeverityTypeID;
@@ -38,7 +39,7 @@ extends AbstractJDOQuery<Issue>
 	private UserID assigneeID;
 	private Date createTimestamp;
 	private Date updateTimestamp;
-	private Set<ObjectID> objectIDs;
+	private Set<IssueLink> issueLinks;
 	
 	@Override
 	protected Query prepareQuery() {
@@ -113,11 +114,25 @@ extends AbstractJDOQuery<Issue>
 		}
 		
 		// FIXME: chairat please rewrite this part as soon as you have refactored the linkage of objects to Issues. (marius)
-//		if (objectIDs != null && !objectIDs.isEmpty())
+		if (issueLinks != null && !issueLinks.isEmpty())
+		{
+			filter.append("\n && ( ");
+			filter.append("\n \t this.issueLinks.contains(varIssueLink) && \n \t (");
+			for (IssueLink issueLink : issueLinks)
+			{
+				ObjectID linkedObjectID = issueLink.getLinkedObjectID();
+				filter.append("\n \t \t varIssueLink.linkedObjectID.matches(" + linkedObjectID + ") ||");
+			}
+			filter.delete(filter.length() - 2, filter.length());
+			filter.append("\n \t )");
+			filter.append("\n && )");
+		}
+		
+//		if (issueLinks != null && !issueLinks.isEmpty())
 //		{
 //			filter.append("\n && ( ");
 //			filter.append("\n \t this.referencedObjectIDs.contains(varObjectID) && \n \t (");
-//			for (ObjectID objectID : objectIDs)
+//			for (ObjectID objectID : issueLinks)
 //			{
 //				String objectIDString = objectID.toString();
 //				filter.append("\n \t \t varObjectID.matches(" + objectIDString + ") ||");
@@ -245,13 +260,13 @@ extends AbstractJDOQuery<Issue>
 		this.updateTimestamp = updateTimestamp;
 	}
 	
-	public void setObjectIDs(Set<ObjectID> objectIDs) {
-		this.objectIDs = objectIDs;
-	}
-	
-	public Set<ObjectID> getObjectIDs() {
-		return objectIDs;
-	}
+//	public void setObjectIDs(Set<ObjectID> objectIDs) {
+//		this.issueLinks = objectIDs;
+//	}
+//	
+//	public Set<ObjectID> getIssueLinks() {
+//		return issueLinks;
+//	}
 
 	@Override
 	protected Class<Issue> init()

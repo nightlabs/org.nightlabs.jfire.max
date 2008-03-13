@@ -31,7 +31,7 @@ implements Serializable, AttachCallback
 {
 	private static final long serialVersionUID = 1L;
 
-	public static final String FETCH_GROUP_THIS = "IssueComment.this";
+	public static final String FETCH_GROUP_THIS_COMMENT = "IssueComment.this";
 	
 	/**
 	 * @jdo.field primary-key="true"

@@ -53,7 +53,7 @@ extends BaseJDOObjectDAO<IssueLinkTypeID, IssueLinkType>
 		}
 	}
 
-	private static final String[] FETCH_GROUPS = { IssueLinkType.FETCH_GROUP_THIS, FetchPlan.DEFAULT };
+	private static final String[] FETCH_GROUPS = { IssueLinkType.FETCH_GROUP_THIS_ISSUE_LINK_TYPE, FetchPlan.DEFAULT };
 
 	public synchronized IssueLinkType getIssueLinkType(IssueLinkTypeID issueLinkTypeID, String[] fetchGroups, int maxFetchDepth, ProgressMonitor monitor)
 	{
@@ -74,18 +74,18 @@ extends BaseJDOObjectDAO<IssueLinkTypeID, IssueLinkType>
 
 	/**
 	 * Get issue link types by link class name.
-	 * @param linkClass 
+	 * @param linkedClass 
 	 * @param fetchGroups Which fetch groups to use
 	 * @param maxFetchDepth Fetch depth or {@link NLJDOHelper#MAX_FETCH_DEPTH_NO_LIMIT}
 	 * @param monitor The progress monitor for this action.
 	 * 
 	 * @return The issue link types of the given linkClass.
 	 */
-	public synchronized List<IssueLinkType> getIssueLinkTypesByLinkClass(Class<? extends Object> linkClass, String[] fetchgroups, int maxFetchDepth, ProgressMonitor monitor)
+	public synchronized List<IssueLinkType> getIssueLinkTypesByLinkClass(Class<? extends Object> linkedClass, String[] fetchgroups, int maxFetchDepth, ProgressMonitor monitor)
 	{
 		try {
 			IssueManager im = IssueManagerUtil.getHome(SecurityReflector.getInitialContextProperties()).create();
-			Collection<IssueLinkTypeID> ids = im.getIssueLinkTypesByLinkedObjectClass(linkClass);
+			Collection<IssueLinkTypeID> ids = im.getIssueLinkTypesByLinkedObjectClass(linkedClass);
 			return getJDOObjects(null, ids, fetchgroups, maxFetchDepth, monitor);
 		} catch(Exception e) {
 			throw new RuntimeException("Getting issue link types failed", e);

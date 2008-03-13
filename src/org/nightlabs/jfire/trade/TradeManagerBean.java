@@ -1428,9 +1428,9 @@ implements SessionBean
 
 			logger.info("Initialization of JFireTrade-ConfigModules started...");
 
-			// version is {major}.{minor}.{release}-{patchlevel}-{suffix}
+			// version is {major}.{minor}.{release}.{patchlevel}.{suffix}
 			moduleMetaData = new ModuleMetaData(
-					JFireTradeEAR.MODULE_NAME, "0.9.3-0-beta", "0.9.3-0-beta");
+					JFireTradeEAR.MODULE_NAME, "0.9.3.0.beta", "0.9.3.0.beta");
 			pm.makePersistent(moduleMetaData);
 
 			ConfigSetup configSetup = ConfigSetup.getConfigSetup(

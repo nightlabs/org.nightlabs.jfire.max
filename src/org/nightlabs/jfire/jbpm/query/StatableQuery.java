@@ -22,7 +22,12 @@ public class StatableQuery
 	private static final long serialVersionUID = 1L;
 	private static final Logger logger = Logger.getLogger(StatableQuery.class);
 	
-//	public abstract Class getStatableClass();
+	// Property IDs used for the PropertyChangeListeners
+	private static final String PROPERTY_PREFIX = "StatableQuery.";
+	public static final String PROPERTY_ONLY_IN_SELECTED_STATE = PROPERTY_PREFIX + "onlyInSelectedState";
+	public static final String PROPERTY_STATE_CREATE_DATE_MAX = PROPERTY_PREFIX + "stateCreateDTMax";
+	public static final String PROPERTY_STATE_CREATE_DATE_MIN = PROPERTY_PREFIX + "stateCreateDTMin";
+	public static final String PROPERTY_STATE_DEFINITION_ID = PROPERTY_PREFIX + "stateDefinitionID";
 	
 	public StatableQuery()
 	{
@@ -109,8 +114,11 @@ public class StatableQuery
 	public StateDefinitionID getStateDefinitionID() {
 		return stateDefinitionID;
 	}
-	public void setStateDefinitionID(StateDefinitionID stateDefinitionID) {
+	public void setStateDefinitionID(StateDefinitionID stateDefinitionID)
+	{
+		final StateDefinitionID oldStateDefinitionID = this.stateDefinitionID;
 		this.stateDefinitionID = stateDefinitionID;
+		notifyListeners(PROPERTY_STATE_DEFINITION_ID, oldStateDefinitionID, stateDefinitionID);
 	}
 
 	/**
@@ -121,8 +129,11 @@ public class StatableQuery
 	public Date getStateCreateDTMin() {
 		return stateCreateDTMin;
 	}
-	public void setStateCreateDTMin(Date stateCreateDTMin) {
+	public void setStateCreateDTMin(Date stateCreateDTMin)
+	{
+		final Date oldStateCreateDTMin = this.stateCreateDTMin;
 		this.stateCreateDTMin = stateCreateDTMin;
+		notifyListeners(PROPERTY_STATE_CREATE_DATE_MIN, oldStateCreateDTMin, stateCreateDTMin);
 	}
 
 	/**
@@ -133,8 +144,11 @@ public class StatableQuery
 	public Date getStateCreateDTMax() {
 		return stateCreateDTMax;
 	}
-	public void setStateCreateDTMax(Date stateCreateDTMax) {
+	public void setStateCreateDTMax(Date stateCreateDTMax)
+	{
+		final Date oldStateCreateDTMax = this.stateCreateDTMax;
 		this.stateCreateDTMax = stateCreateDTMax;
+		notifyListeners(PROPERTY_STATE_CREATE_DATE_MAX, oldStateCreateDTMax, stateCreateDTMax);
 	}
 
 	/**
@@ -149,8 +163,12 @@ public class StatableQuery
 	public boolean isOnlyInSelectedState() {
 		return onlyInSelectedState;
 	}
-	public void setOnlyInSelectedState(boolean onlyInSelectedState) {
+	public void setOnlyInSelectedState(boolean onlyInSelectedState)
+	{
+		final Boolean oldOnlyInSelectedState = this.onlyInSelectedState;
 		this.onlyInSelectedState = onlyInSelectedState;
+		notifyListeners(PROPERTY_ONLY_IN_SELECTED_STATE, oldOnlyInSelectedState,
+			Boolean.valueOf(onlyInSelectedState));
 	}
 
 	@Override

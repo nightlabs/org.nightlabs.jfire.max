@@ -1,5 +1,5 @@
 /**
- * 
+ *
  */
 package org.nightlabs.jfire.reporting.scripting.javaclass.prop;
 
@@ -59,14 +59,14 @@ import org.nightlabs.jfire.security.SecurityReflector;
 public class PropertySet
 extends AbstractJFSScriptExecutorDelegate
 {
-	
+
 	/**
 	 * Logger used by this class.
 	 */
 	private static final Logger logger = Logger.getLogger(PropertySet.class);
 
 	public static final String PARAMETER_NAME_PROPERTY_SET_ID = "propertySetID";
-	
+
 	public static final String PROPERTY_NAME_LINK_CLASS = "linkClass";
 	public static final String PROPERTY_NAME_SCOPE = "scope";
 
@@ -98,7 +98,7 @@ extends AbstractJFSScriptExecutorDelegate
 			for (Iterator<StructBlock> iter = sortedBlocks.values().iterator(); iter.hasNext();) {
 				StructBlock structBlock = iter.next();
 				SortedMap<String, StructField> sortedFields = new TreeMap<String, StructField>();
-				for (Iterator<StructField> iterator = structBlock.getStructFields().iterator(); iterator.hasNext();) {
+				for (Iterator<StructField<? extends DataField>> iterator = structBlock.getStructFields().iterator(); iterator.hasNext();) {
 					StructField structField = iterator.next();
 					sortedFields.put(structField.getPrimaryKey(), structField);
 				}
@@ -122,7 +122,7 @@ extends AbstractJFSScriptExecutorDelegate
 		return metaData;
 	}
 
-	
+
 	protected String getColumnName(StructField structField) {
 		return structField.getStructBlockID() + "_" + structField.getStructFieldID();
 	}
@@ -139,16 +139,16 @@ extends AbstractJFSScriptExecutorDelegate
 		PropertySetID propertySetID = (PropertySetID) getParameterValue(PARAMETER_NAME_PROPERTY_SET_ID);
 		if (propertySetID == null)
 			throw new IllegalArgumentException("Parameter " + PARAMETER_NAME_PROPERTY_SET_ID + " is not set.");
-		
+
 		PersistenceManager pm = getScriptExecutorJavaClass().getPersistenceManager();
 		Set oldGroups = pm.getFetchPlan().getGroups();
 		int oldFetchDepth = pm.getFetchPlan().getMaxFetchDepth();
 		pm.getFetchPlan().setGroups(new String[] {FetchPlan.DEFAULT, org.nightlabs.jfire.prop.PropertySet.FETCH_GROUP_FULL_DATA});
 		pm.getFetchPlan().setMaxFetchDepth(NLJDOHelper.MAX_FETCH_DEPTH_NO_LIMIT);
-		
+
 		org.nightlabs.jfire.prop.PropertySet propertySet = (org.nightlabs.jfire.prop.PropertySet) pm.getObjectById(propertySetID);
 		logger.debug("Have propertySet");
-		
+
 		IStruct struct = StructLocal.getStructLocal(propertySet.getStructLocalLinkClass(), propertySet.getStructLocalScope(), pm);
 		propertySet = pm.detachCopy(propertySet);
 		pm.getFetchPlan().setGroups(oldGroups);
@@ -167,7 +167,7 @@ extends AbstractJFSScriptExecutorDelegate
 		for (Iterator<StructBlock> iter = sortedBlocks.values().iterator(); iter.hasNext();) {
 			StructBlock structBlock = iter.next();
 			SortedMap<String, StructField> sortedFields = new TreeMap<String, StructField>();
-			for (Iterator<StructField> iterator = structBlock.getStructFields().iterator(); iterator.hasNext();) {
+			for (Iterator<StructField<? extends DataField>> iterator = structBlock.getStructFields().iterator(); iterator.hasNext();) {
 				StructField structField = iterator.next();
 				sortedFields.put(structField.getPrimaryKey(), structField);
 			}
@@ -210,7 +210,7 @@ extends AbstractJFSScriptExecutorDelegate
 	}
 
 	private ScriptExecutorJavaClass scriptExecutorJavaClass;
-	
+
 	/* (non-Javadoc)
 	 * @see org.nightlabs.jfire.scripting.ScriptExecutorJavaClassDelegate#getScriptExecutorJavaClass()
 	 */

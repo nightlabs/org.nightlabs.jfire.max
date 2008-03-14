@@ -30,6 +30,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.Iterator;
+import java.util.List;
 import java.util.Locale;
 import java.util.Set;
 
@@ -155,11 +156,11 @@ public class DeliverProductTransfer extends ProductTransfer
 	 * @param articles Instances of {@link org.nightlabs.jfire.trade.Article}.
 	 * @return Returns instances of {@link org.nightlabs.jfire.store.Product}.
 	 */
-	protected static Collection getProductsFromArticles(Collection articles)
+	protected static Collection<Product> getProductsFromArticles(Collection<? extends Article> articles)
 	{
-		ArrayList res = new ArrayList(articles.size());
-		for (Iterator it = articles.iterator(); it.hasNext(); ) {
-			Article article = (Article) it.next();
+		List<Product> res = new ArrayList<Product>(articles.size());
+		for (Iterator<? extends Article> it = articles.iterator(); it.hasNext(); ) {
+			Article article = it.next();
 			Product product = article.getProduct();
 			if (product == null)
 				throw new IllegalArgumentException("Article \"" + article.getPrimaryKey() + "\" does not contain a Product!");

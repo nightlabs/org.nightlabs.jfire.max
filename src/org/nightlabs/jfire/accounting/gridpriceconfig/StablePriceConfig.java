@@ -154,8 +154,8 @@ implements IPackagePriceConfig, IResultPriceConfig
 	@Implement
 	public void resetPriceFragmentCalculationStati()
 	{
-		for (Iterator itPriceCells = this.getPriceCells().iterator(); itPriceCells.hasNext(); ) {
-			PriceCell priceCell = (PriceCell)itPriceCells.next();
+		for (Iterator<PriceCell> itPriceCells = this.getPriceCells().iterator(); itPriceCells.hasNext(); ) {
+			PriceCell priceCell = itPriceCells.next();
 			priceCell.resetPriceFragmentCalculationStati();
 		}
 	}
@@ -189,8 +189,8 @@ implements IPackagePriceConfig, IResultPriceConfig
 		// If the JDO implementation uses a shortcut (a direct JDOQL instead of loading the whole Map and then
 		// search for the key), the cell might exist and not be found. Hence, we load the whole Map and try it again.
 		if (priceCell == null) {
-			for (Iterator it = priceCells.entrySet().iterator(); it.hasNext();) {
-				Map.Entry me = (Map.Entry) it.next();
+			for (Iterator<Map.Entry<IPriceCoordinate, PriceCell>> it = priceCells.entrySet().iterator(); it.hasNext();) {
+				Map.Entry<IPriceCoordinate, PriceCell> me = it.next();
 				if (me.getKey().equals(priceCoordinate)) {
 					priceCell = (PriceCell) me.getValue();
 					break;
@@ -274,18 +274,18 @@ implements IPackagePriceConfig, IResultPriceConfig
 		if (_currency != null && !containsCurrency(_currency))
 			throw new IllegalArgumentException("Given Currency is not a registered parameter!");
 
-		Collection customerGroups = _customerGroup == null ? getCustomerGroups() : new SingleObjectList(_customerGroup);
-		Collection tariffs = _tariff == null ? getTariffs() : new SingleObjectList(_tariff);
-		Collection currencies = _currency == null ? getCurrencies() : new SingleObjectList(_currency);
+		Collection<CustomerGroup> customerGroups = _customerGroup == null ? getCustomerGroups() : new SingleObjectList(_customerGroup);
+		Collection<Tariff> tariffs = _tariff == null ? getTariffs() : new SingleObjectList(_tariff);
+		Collection<Currency> currencies = _currency == null ? getCurrencies() : new SingleObjectList(_currency);
 
-		for (Iterator itCustomerGroups = customerGroups.iterator(); itCustomerGroups.hasNext(); ) {
-			CustomerGroup customerGroup = (CustomerGroup)itCustomerGroups.next();
+		for (Iterator<CustomerGroup> itCustomerGroups = customerGroups.iterator(); itCustomerGroups.hasNext(); ) {
+			CustomerGroup customerGroup = itCustomerGroups.next();
 
-			for (Iterator itTariffs = tariffs.iterator(); itTariffs.hasNext(); ) {
-				Tariff tariff = (Tariff)itTariffs.next();
+			for (Iterator<Tariff> itTariffs = tariffs.iterator(); itTariffs.hasNext(); ) {
+				Tariff tariff = itTariffs.next();
 
-				for (Iterator itCurrencies = currencies.iterator(); itCurrencies.hasNext(); ) {
-					Currency currency = (Currency)itCurrencies.next();
+				for (Iterator<Currency> itCurrencies = currencies.iterator(); itCurrencies.hasNext(); ) {
+					Currency currency = itCurrencies.next();
 
 					createPriceCell(customerGroup, tariff, currency);
 				} // iterate Currency
@@ -379,18 +379,18 @@ implements IPackagePriceConfig, IResultPriceConfig
 //		if (_currency != null && !containsCurrency(_currency))
 //			throw new IllegalArgumentException("Given Currency is not a registered parameter!");
 
-		Collection customerGroups = _customerGroup == null ? getCustomerGroups() : new SingleObjectList(_customerGroup);
-		Collection tariffs = _tariff == null ? getTariffs() : new SingleObjectList(_tariff);
-		Collection currencies = _currency == null ? getCurrencies() : new SingleObjectList(_currency);
+		Collection<CustomerGroup> customerGroups = _customerGroup == null ? getCustomerGroups() : new SingleObjectList(_customerGroup);
+		Collection<Tariff> tariffs = _tariff == null ? getTariffs() : new SingleObjectList(_tariff);
+		Collection<Currency> currencies = _currency == null ? getCurrencies() : new SingleObjectList(_currency);
 
-		for (Iterator itCustomerGroups = customerGroups.iterator(); itCustomerGroups.hasNext(); ) {
-			CustomerGroup customerGroup = (CustomerGroup)itCustomerGroups.next();
+		for (Iterator<CustomerGroup> itCustomerGroups = customerGroups.iterator(); itCustomerGroups.hasNext(); ) {
+			CustomerGroup customerGroup = itCustomerGroups.next();
 
-			for (Iterator itTariffs = tariffs.iterator(); itTariffs.hasNext(); ) {
-				Tariff tariff = (Tariff)itTariffs.next();
+			for (Iterator<Tariff> itTariffs = tariffs.iterator(); itTariffs.hasNext(); ) {
+				Tariff tariff = itTariffs.next();
 				
-				for (Iterator itCurrencies = currencies.iterator(); itCurrencies.hasNext(); ) {
-					Currency currency = (Currency)itCurrencies.next();
+				for (Iterator<Currency> itCurrencies = currencies.iterator(); itCurrencies.hasNext(); ) {
+					Currency currency = itCurrencies.next();
 					
 					removePriceCell(customerGroup, tariff, currency);
 				} // iterate Currency

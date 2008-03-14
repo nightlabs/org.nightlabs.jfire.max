@@ -99,7 +99,7 @@ implements Serializable
 	 *
 	 * @!jdo.map-vendor-extension vendor-name="jpox" key="key-field" value="primaryKey"
 	 */
-	private Map flavours = new HashMap();
+	private Map<String, ModeOfDeliveryFlavour> flavours = new HashMap<String, ModeOfDeliveryFlavour>();
 
 	/**
 	 * @deprecated Only for JDO!
@@ -151,7 +151,7 @@ implements Serializable
 	/**
 	 * @return Returns the flavours.
 	 */
-	public Collection getFlavours()
+	public Collection<ModeOfDeliveryFlavour> getFlavours()
 	{
 		return flavours.values();
 	}

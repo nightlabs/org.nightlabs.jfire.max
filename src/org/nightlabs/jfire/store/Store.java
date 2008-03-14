@@ -756,23 +756,23 @@ implements StoreCallback
 	public void addArticlesToDeliveryNote(User user, DeliveryNote deliveryNote, Collection<? extends Article> articles)
 	throws DeliveryNoteEditException
 	{
-		for (Iterator it = articles.iterator(); it.hasNext(); ) {
-			Article article = (Article) it.next();
+		for (Iterator<? extends Article> it = articles.iterator(); it.hasNext(); ) {
+			Article article = it.next();
 			deliveryNote.addArticle(article);
 		}
 
-		Map productTypeActionHandler2Articles = getProductTypeActionHandler2ArticlesMap(getPersistenceManager(), articles);
-		for (Iterator it = productTypeActionHandler2Articles.entrySet().iterator(); it.hasNext();) {
-			Map.Entry me = (Map.Entry) it.next();
-			((ProductTypeActionHandler) me.getKey()).onAddArticlesToDeliveryNote(user, this, deliveryNote, (Collection) me.getValue());
+		Map<ProductTypeActionHandler, Set<Article>> productTypeActionHandler2Articles = getProductTypeActionHandler2ArticlesMap(getPersistenceManager(), articles);
+		for (Iterator<Map.Entry<ProductTypeActionHandler, Set<Article>>> it = productTypeActionHandler2Articles.entrySet().iterator(); it.hasNext();) {
+			Map.Entry<ProductTypeActionHandler, Set<Article>> me = it.next();
+			me.getKey().onAddArticlesToDeliveryNote(user, this, deliveryNote, me.getValue());
 		}
 	}
 
-	public void removeArticlesFromDeliveryNote(User user, DeliveryNote deliveryNote, Collection articles)
+	public void removeArticlesFromDeliveryNote(User user, DeliveryNote deliveryNote, Collection<Article> articles)
 	throws DeliveryNoteEditException
 	{
-		for (Iterator it = articles.iterator(); it.hasNext(); ) {
-			Article article = (Article) it.next();
+		for (Iterator<Article> it = articles.iterator(); it.hasNext(); ) {
+			Article article = it.next();
 			deliveryNote.removeArticle(article);
 		}
 	}
@@ -790,7 +790,7 @@ implements StoreCallback
 	 *		user's default value will be used.
 	 */
 	public DeliveryNote createDeliveryNote(
-			User user, Collection articles, String deliveryNoteIDPrefix)
+			User user, Collection<? extends Article> articles, String deliveryNoteIDPrefix)
 	throws DeliveryNoteEditException
 	{
 		if (articles.size() <= 0)
@@ -806,8 +806,8 @@ implements StoreCallback
 		LegalEntity vendorLE = null;
 		String customerPK = null;
 		LegalEntity customerLE = null;
-		for (Iterator iter = articles.iterator(); iter.hasNext();) {
-			Article article = (Article) iter.next();
+		for (Iterator<? extends Article> iter = articles.iterator(); iter.hasNext();) {
+			Article article = iter.next();
 			
 			if (vendorPK == null) {
 				vendorLE = article.getOffer().getOrder().getVendor();
@@ -881,15 +881,16 @@ implements StoreCallback
 				ProcessDefinitionAssignmentID.create(DeliveryNote.class, TradeSide.vendor));
 		processDefinitionAssignment.createProcessInstance(null, user, deliveryNote);
 
-		for (Iterator iter = articles.iterator(); iter.hasNext();) {
-			Article article = (Article) iter.next();
+		for (Iterator<? extends Article> iter = articles.iterator(); iter.hasNext();) {
+			Article article = iter.next();
 			deliveryNote.addArticle(article);
 		}
 
-		Map productTypeActionHandler2Articles = getProductTypeActionHandler2ArticlesMap(getPersistenceManager(), articles);
-		for (Iterator it = productTypeActionHandler2Articles.entrySet().iterator(); it.hasNext();) {
-			Map.Entry me = (Map.Entry) it.next();
-			((ProductTypeActionHandler) me.getKey()).onAddArticlesToDeliveryNote(user, this, deliveryNote, (Collection) me.getValue());
+		Map<ProductTypeActionHandler, Set<Article>> productTypeActionHandler2Articles = 
+			getProductTypeActionHandler2ArticlesMap(getPersistenceManager(), articles);
+		for (Iterator<Map.Entry<ProductTypeActionHandler, Set<Article>>> it = productTypeActionHandler2Articles.entrySet().iterator(); it.hasNext();) {
+			Map.Entry<ProductTypeActionHandler, Set<Article>> me = it.next();
+			me.getKey().onAddArticlesToDeliveryNote(user, this, deliveryNote, me.getValue());
 		}
 
 		return deliveryNote;
@@ -909,9 +910,9 @@ implements StoreCallback
 	public DeliveryNote createDeliveryNote(User user, ArticleContainer articleContainer, String deliveryNoteIDPrefix)
 	throws DeliveryNoteEditException
 	{
-		ArrayList articles = new ArrayList();
-		for (Iterator it = articleContainer.getArticles().iterator(); it.hasNext(); ) {
-			Article article = (Article) it.next();
+		ArrayList<Article> articles = new ArrayList<Article>();
+		for (Iterator<Article> it = articleContainer.getArticles().iterator(); it.hasNext(); ) {
+			Article article = it.next();
 			if (article.getDeliveryNote() == null)
 				articles.add(article);
 		}
@@ -943,7 +944,7 @@ implements StoreCallback
 		}
 
 		if (serverDeliveryProcessor == null) {
-			Collection c = ServerDeliveryProcessor.getServerDeliveryProcessorsForOneModeOfDeliveryFlavour(
+			Collection<ServerDeliveryProcessor> c = ServerDeliveryProcessor.getServerDeliveryProcessorsForOneModeOfDeliveryFlavour(
 					getPersistenceManager(),
 					modeOfDeliveryFlavour);
 			if (c.isEmpty())
@@ -988,7 +989,7 @@ implements StoreCallback
 	 * @return Either <tt>null</tt>, in case no DeliveryNote was passed or the partner
 	 *		(if at least one DeliveryNote has been passed in <tt>deliveryNotes</tt>).
 	 */
-	protected LegalEntity bookDeliveryNotesImplicitelyAndGetPartner(DeliverStage deliverStage, Collection deliveryNotes)
+	protected LegalEntity bookDeliveryNotesImplicitelyAndGetPartner(DeliverStage deliverStage, Collection<DeliveryNote> deliveryNotes)
 	{
 		if (deliveryNotes == null)
 			return null;
@@ -999,8 +1000,8 @@ implements StoreCallback
 //		LegalEntity mandator = getMandator();
 		LegalEntity mandator = getMandator();
 		LegalEntity partner = null;
-		for (Iterator it = deliveryNotes.iterator(); it.hasNext(); ) {
-			DeliveryNote deliveryNote = (DeliveryNote) it.next();
+		for (Iterator<DeliveryNote> it = deliveryNotes.iterator(); it.hasNext(); ) {
+			DeliveryNote deliveryNote = it.next();
 
 			if (mandator.equals(deliveryNote.getVendor())) {
 				if (partner == null)
@@ -1696,7 +1697,7 @@ implements StoreCallback
 		}
 
 		try {
-			ArrayList deliveryNotesToBookImplicitely = new ArrayList(deliveryData.getDelivery().getDeliveryNotes().size());
+			List<DeliveryNote> deliveryNotesToBookImplicitely = new ArrayList<DeliveryNote>(deliveryData.getDelivery().getDeliveryNotes().size());
 
 			for (DeliveryNote deliveryNote : deliveryData.getDelivery().getDeliveryNotes()) {
 				DeliveryNoteLocal deliveryNoteLocal = deliveryNote.getDeliveryNoteLocal();
@@ -1759,14 +1760,14 @@ implements StoreCallback
 
 		PersistenceManager pm = getPersistenceManager();
 
-		Set involvedAnchors = new HashSet();
-		ArrayList containers = new ArrayList(1);
+		Set<Anchor> involvedAnchors = new HashSet<Anchor>();
+		List<ProductTransfer> containers = new ArrayList<ProductTransfer>(1);
 		containers.add(deliverProductTransfer);
 		boolean failed = true;
 		try {
 	
-			for (Iterator it = deliverProductTransfer.getChildren().iterator(); it.hasNext(); ) {
-				ProductTransfer productTransfer = (ProductTransfer) it.next();
+			for (Iterator<ProductTransfer> it = deliverProductTransfer.getChildren().iterator(); it.hasNext(); ) {
+				ProductTransfer productTransfer = it.next();
 	
 				if (productTransfer.isBooked())
 					productTransfer.rollbackTransfer(user, involvedAnchors);

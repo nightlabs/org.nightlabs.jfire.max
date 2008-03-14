@@ -165,17 +165,19 @@ implements Serializable
 		 * key: {@link org.nightlabs.jfire.store.deliver.id.ModeOfDeliveryFlavourID} modeOfDeliveryFlavourID<br/>
 		 * value: {@link ModeOfDeliveryFlavour} modeOfDeliveryFlavour
 		 */
-		private Map modeOfDeliveryFlavours = new HashMap();
+		private Map<ModeOfDeliveryFlavourID, ModeOfDeliveryFlavour> modeOfDeliveryFlavours = 
+			new HashMap<ModeOfDeliveryFlavourID, ModeOfDeliveryFlavour>();
 
 		/**
 		 * Contains instances of {@link ModeOfDeliveryFlavourProductTypeGroup}.
 		 */
-		private List modeOfDeliveryFlavourProductTypeGroups = new ArrayList();
+		private List<ModeOfDeliveryFlavourProductTypeGroup> modeOfDeliveryFlavourProductTypeGroups = 
+			new ArrayList<ModeOfDeliveryFlavourProductTypeGroup>();
 
 		public void addModeOfDeliveryFlavour(ModeOfDeliveryFlavour modeOfDeliveryFlavour)
 		{
 			modeOfDeliveryFlavours.put(
-					JDOHelper.getObjectId(modeOfDeliveryFlavour),
+					(ModeOfDeliveryFlavourID)JDOHelper.getObjectId(modeOfDeliveryFlavour),
 					modeOfDeliveryFlavour);
 		}
 
@@ -191,7 +193,7 @@ implements Serializable
 		{
 			modeOfDeliveryFlavours.clear();
 		}
-		public Collection getModeOfDeliveryFlavours()
+		public Collection<ModeOfDeliveryFlavour> getModeOfDeliveryFlavours()
 		{
 			return modeOfDeliveryFlavours.values();
 		}
@@ -204,7 +206,7 @@ implements Serializable
 		{
 			modeOfDeliveryFlavourProductTypeGroups.add(modeOfDeliveryFlavourProductTypeGroup);
 		}
-		public List getModeOfDeliveryFlavourProductTypeGroups()
+		public List<ModeOfDeliveryFlavourProductTypeGroup> getModeOfDeliveryFlavourProductTypeGroups()
 		{
 			return Collections.unmodifiableList(modeOfDeliveryFlavourProductTypeGroups);
 		}
@@ -252,14 +254,14 @@ implements Serializable
 	implements Serializable
 	{
 		private static final long serialVersionUID = 1L;
-		private Set productTypeIDs = new HashSet();
-		private Set modeOfDeliveryFlavourIDs = new HashSet();
+		private Set<ProductTypeID> productTypeIDs = new HashSet<ProductTypeID>();
+		private Set<ModeOfDeliveryFlavourID> modeOfDeliveryFlavourIDs = new HashSet<ModeOfDeliveryFlavourID>();
 
 		public void addProductTypeID(ProductTypeID productTypeID)
 		{
 			productTypeIDs.add(productTypeID);
 		}
-		public void addProductTypeIDs(Collection productTypeIDs)
+		public void addProductTypeIDs(Collection<ProductTypeID> productTypeIDs)
 		{
 			productTypeIDs.addAll(productTypeIDs);
 		}
@@ -267,7 +269,7 @@ implements Serializable
 		{
 			productTypeIDs.remove(productTypeID);
 		}
-		public Set getProductTypeIDs()
+		public Set<ProductTypeID> getProductTypeIDs()
 		{
 			return Collections.unmodifiableSet(productTypeIDs);
 		}
@@ -284,7 +286,7 @@ implements Serializable
 		{
 			return modeOfDeliveryFlavourIDs.size();
 		}
-		public Set getModeOfDeliveryFlavourIDs()
+		public Set<ModeOfDeliveryFlavourID> getModeOfDeliveryFlavourIDs()
 		{
 			return Collections.unmodifiableSet(modeOfDeliveryFlavourIDs);
 		}
@@ -302,15 +304,15 @@ implements Serializable
 	{
 		ModeOfDeliveryFlavourProductTypeGroupCarrier res = new ModeOfDeliveryFlavourProductTypeGroupCarrier(customerGroupIDs);
 
-		Map modfAvailableForCustomerGroups = getAvailableModeOfDeliveryFlavoursMapForAllCustomerGroups(pm, customerGroupIDs, mergeMode);
+		Map<String, ModeOfDeliveryFlavour> modfAvailableForCustomerGroups = getAvailableModeOfDeliveryFlavoursMapForAllCustomerGroups(pm, customerGroupIDs, mergeMode);
 
-		Map deliveryConfigs = new HashMap();
-		Map groupsByDeliveryConfigPK = new HashMap();
-		HashSet modeOfDeliveryFlavourPKs = new HashSet();
+		Map<String, DeliveryConfiguration> deliveryConfigs = new HashMap<String, DeliveryConfiguration>();
+		Map<String, ModeOfDeliveryFlavourProductTypeGroup> groupsByDeliveryConfigPK = new HashMap<String, ModeOfDeliveryFlavourProductTypeGroup>();
+		Set<String> modeOfDeliveryFlavourPKs = new HashSet<String>();
 
 		pm.getExtent(ProductType.class);
-		for (Iterator itPT = productTypeIDs.iterator(); itPT.hasNext(); ) {
-			ProductTypeID productTypeID = (ProductTypeID) itPT.next();
+		for (Iterator<ProductTypeID> itPT = productTypeIDs.iterator(); itPT.hasNext(); ) {
+			ProductTypeID productTypeID = itPT.next();
 			ProductType productType = (ProductType) pm.getObjectById(productTypeID);
 
 			DeliveryConfiguration cf = productType.getDeliveryConfiguration();
@@ -324,11 +326,11 @@ implements Serializable
 				group = new ModeOfDeliveryFlavourProductTypeGroup();
 				groupsByDeliveryConfigPK.put(cfPK, group);
 
-				for (Iterator itMOD = cf.getModeOfDeliveries().iterator(); itMOD.hasNext(); ) {
-					ModeOfDelivery mod = (ModeOfDelivery) itMOD.next();
+				for (Iterator<ModeOfDelivery> itMOD = cf.getModeOfDeliveries().iterator(); itMOD.hasNext(); ) {
+					ModeOfDelivery mod = itMOD.next();
 
-					for (Iterator itMODF = mod.getFlavours().iterator(); itMODF.hasNext(); ) {
-						ModeOfDeliveryFlavour modf = (ModeOfDeliveryFlavour) itMODF.next();
+					for (Iterator<ModeOfDeliveryFlavour> itMODF = mod.getFlavours().iterator(); itMODF.hasNext(); ) {
+						ModeOfDeliveryFlavour modf = itMODF.next();
 						ModeOfDeliveryFlavourID modfID = (ModeOfDeliveryFlavourID) JDOHelper.getObjectId(modf);
 
 						// allowed by CustomerGroups?
@@ -339,8 +341,8 @@ implements Serializable
 					}
 				}
 
-				for (Iterator itMODF = cf.getModeOfDeliveryFlavours().iterator(); itMODF.hasNext(); ) {
-					ModeOfDeliveryFlavour modf = (ModeOfDeliveryFlavour) itMODF.next();
+				for (Iterator<ModeOfDeliveryFlavour> itMODF = cf.getModeOfDeliveryFlavours().iterator(); itMODF.hasNext(); ) {
+					ModeOfDeliveryFlavour modf = itMODF.next();
 					ModeOfDeliveryFlavourID modfID = (ModeOfDeliveryFlavourID) JDOHelper.getObjectId(modf);
 
 					// allowed by CustomerGroups?
@@ -356,8 +358,8 @@ implements Serializable
 			group.addProductTypeID(productTypeID);
 		}
 
-		for (Iterator it = modeOfDeliveryFlavourPKs.iterator(); it.hasNext(); ) {
-			String modfPK = (String) it.next();
+		for (Iterator<String> it = modeOfDeliveryFlavourPKs.iterator(); it.hasNext(); ) {
+			String modfPK = it.next();
 			ModeOfDeliveryFlavour modf = (ModeOfDeliveryFlavour) modfAvailableForCustomerGroups.get(modfPK);
 			if (modf == null)
 				throw new IllegalStateException("Found modeOfDeliveryPK \""+modfPK+"\" which is not registered in Map!");
@@ -406,16 +408,16 @@ implements Serializable
 	 *		key: String modeOfDeliveryFlavourPK<br/>
 	 *		value: ModeOfDeliveryFlavour modf
 	 */
-	protected static Map getAvailableModeOfDeliveryFlavoursMapForAllCustomerGroups(PersistenceManager pm, Collection<CustomerGroupID> customerGroupIDs, byte mergeMode)
+	protected static Map<String, ModeOfDeliveryFlavour> getAvailableModeOfDeliveryFlavoursMapForAllCustomerGroups(PersistenceManager pm, Collection<CustomerGroupID> customerGroupIDs, byte mergeMode)
 	{
 		if (mergeMode != MERGE_MODE_ADDITIVE && mergeMode != MERGE_MODE_SUBTRACTIVE)
 			throw new IllegalArgumentException("mergeMode invalid! Must be MERGE_MODE_UNION or MERGE_MODE_INTERSECTION!");
 
-		Map res = null;
-		for (Iterator itCustomerGroups = customerGroupIDs.iterator(); itCustomerGroups.hasNext(); ) {
-			CustomerGroupID customerGroupID = (CustomerGroupID) itCustomerGroups.next();
+		Map<String, ModeOfDeliveryFlavour> res = null;
+		for (Iterator<CustomerGroupID> itCustomerGroups = customerGroupIDs.iterator(); itCustomerGroups.hasNext(); ) {
+			CustomerGroupID customerGroupID = itCustomerGroups.next();
 
-			Map m = getAvailableModeOfDeliveryFlavoursMapForOneCustomerGroup(pm, customerGroupID.organisationID, customerGroupID.customerGroupID);
+			Map<String, ModeOfDeliveryFlavour> m = getAvailableModeOfDeliveryFlavoursMapForOneCustomerGroup(pm, customerGroupID.organisationID, customerGroupID.customerGroupID);
 
 			if (res == null) {
 				res = m;
@@ -423,18 +425,18 @@ implements Serializable
 			else {
 				if (mergeMode == MERGE_MODE_SUBTRACTIVE) {
 					// remove all missing
-					for (Iterator it = res.keySet().iterator(); it.hasNext(); ) {
-						String modfPK = (String) it.next();
+					for (Iterator<String> it = res.keySet().iterator(); it.hasNext(); ) {
+						String modfPK = it.next();
 						if (!m.containsKey(modfPK))
 							it.remove();
 					}
 				} // if (mergeMode == MERGE_MODE_INTERSECTION) {
 				else { // if (mergeMode == MERGE_MODE_UNION) {
 					// add all additional
-					for (Iterator it = res.entrySet().iterator(); it.hasNext(); ) {
-						Map.Entry me = (Map.Entry)it.next();
-						String modfPK = (String) me.getKey();
-						ModeOfDeliveryFlavour modf = (ModeOfDeliveryFlavour) me.getValue();
+					for (Iterator<Map.Entry<String, ModeOfDeliveryFlavour>> it = res.entrySet().iterator(); it.hasNext(); ) {
+						Map.Entry<String, ModeOfDeliveryFlavour> me = it.next();
+						String modfPK = me.getKey();
+						ModeOfDeliveryFlavour modf = me.getValue();
 						res.put(modfPK, modf);
 					}
 				} // if (mergeMode == MERGE_MODE_UNION) {
@@ -442,24 +444,24 @@ implements Serializable
 		}
 
 		if (res == null)
-			return new HashMap();
+			return new HashMap<String, ModeOfDeliveryFlavour>();
 		else
 			return res;
 	}
 
-	protected static Map getAvailableModeOfDeliveryFlavoursMapForOneCustomerGroup(PersistenceManager pm, String organisationID, String customerGroupID)
+	protected static Map<String, ModeOfDeliveryFlavour> getAvailableModeOfDeliveryFlavoursMapForOneCustomerGroup(PersistenceManager pm, String organisationID, String customerGroupID)
 	{
 		// WORKAROUND The normal query returns an empty result, probably because of issues with ORs.
-		Map m = new HashMap();
+		Map<String, ModeOfDeliveryFlavour> m = new HashMap<String, ModeOfDeliveryFlavour>();
 		Query query = pm.newNamedQuery(ModeOfDeliveryFlavour.class, "getAvailableModeOfDeliveryFlavoursForOneCustomerGroup_WORKAROUND1");
-		for (Iterator it = ((Collection)query.execute(organisationID, customerGroupID)).iterator(); it.hasNext(); ) {
-			ModeOfDeliveryFlavour modeOfDeliveryFlavour = (ModeOfDeliveryFlavour) it.next();
+		for (Iterator<ModeOfDeliveryFlavour> it = ((Collection)query.execute(organisationID, customerGroupID)).iterator(); it.hasNext(); ) {
+			ModeOfDeliveryFlavour modeOfDeliveryFlavour = it.next();
 			m.put(modeOfDeliveryFlavour.getPrimaryKey(), modeOfDeliveryFlavour);
 		}
 
 		query = pm.newNamedQuery(ModeOfDeliveryFlavour.class, "getAvailableModeOfDeliveryFlavoursForOneCustomerGroup_WORKAROUND2");
-		for (Iterator it = ((Collection)query.execute(organisationID, customerGroupID)).iterator(); it.hasNext(); ) {
-			ModeOfDeliveryFlavour modeOfDeliveryFlavour = (ModeOfDeliveryFlavour) it.next();
+		for (Iterator<ModeOfDeliveryFlavour> it = ((Collection)query.execute(organisationID, customerGroupID)).iterator(); it.hasNext(); ) {
+			ModeOfDeliveryFlavour modeOfDeliveryFlavour = it.next();
 			m.put(modeOfDeliveryFlavour.getPrimaryKey(), modeOfDeliveryFlavour);
 		}
 

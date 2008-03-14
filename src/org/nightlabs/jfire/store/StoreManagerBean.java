@@ -117,6 +117,7 @@ import org.nightlabs.jfire.trade.TradeSide;
 import org.nightlabs.jfire.trade.Trader;
 import org.nightlabs.jfire.trade.id.ArticleContainerID;
 import org.nightlabs.jfire.trade.id.ArticleID;
+import org.nightlabs.jfire.trade.id.CustomerGroupID;
 import org.nightlabs.jfire.trade.id.OfferID;
 import org.nightlabs.jfire.trade.id.OrderID;
 import org.nightlabs.jfire.trade.jbpm.ProcessDefinitionAssignment;
@@ -758,8 +759,8 @@ implements SessionBean
 	 */
 	public ModeOfDeliveryFlavourProductTypeGroupCarrier
 			getModeOfDeliveryFlavourProductTypeGroupCarrier(
-					Collection productTypeIDs,
-					Collection customerGroupIDs,
+					Collection<ProductTypeID> productTypeIDs,
+					Collection<CustomerGroupID> customerGroupIDs,
 					byte mergeMode,
 					String[] fetchGroups, int maxFetchDepth)
 	{
@@ -774,15 +775,15 @@ implements SessionBean
 				pm.getFetchPlan().setGroups(fetchGroups);
 
 			ModeOfDeliveryFlavourProductTypeGroupCarrier res_detached = new ModeOfDeliveryFlavourProductTypeGroupCarrier(customerGroupIDs);
-			for (Iterator it = res.getModeOfDeliveryFlavours().iterator(); it.hasNext(); ) {
-				ModeOfDeliveryFlavour modf = (ModeOfDeliveryFlavour) it.next();
+			for (Iterator<ModeOfDeliveryFlavour> it = res.getModeOfDeliveryFlavours().iterator(); it.hasNext(); ) {
+				ModeOfDeliveryFlavour modf = it.next();
 
 				res_detached.addModeOfDeliveryFlavour(
 						pm.detachCopy(modf));
 			}
 
-			for (Iterator it = res.getModeOfDeliveryFlavourProductTypeGroups().iterator(); it.hasNext(); ) {
-				ModeOfDeliveryFlavourProductTypeGroup group = (ModeOfDeliveryFlavourProductTypeGroup) it.next();
+			for (Iterator<ModeOfDeliveryFlavourProductTypeGroup> it = res.getModeOfDeliveryFlavourProductTypeGroups().iterator(); it.hasNext(); ) {
+				ModeOfDeliveryFlavourProductTypeGroup group = it.next();
 				res_detached.addModeOfDeliveryFlavourProductTypeGroup(group);
 			}
 
@@ -851,7 +852,7 @@ implements SessionBean
 	 * @ejb.permission role-name="_Guest_"
 	 */
 	public DeliveryNote createDeliveryNote(
-			Collection articleIDs, String deliveryNoteIDPrefix,
+			Collection<ArticleID> articleIDs, String deliveryNoteIDPrefix,
 			boolean get, String[] fetchGroups, int maxFetchDepth)
 	throws DeliveryNoteEditException
 	{
@@ -862,9 +863,9 @@ implements SessionBean
 			Trader trader = Trader.getTrader(pm);
 			Store store = trader.getStore();
 
-			ArrayList articles = new ArrayList(articleIDs.size());
-			for (Iterator it = articleIDs.iterator(); it.hasNext(); ) {
-				ArticleID articleID = (ArticleID) it.next();
+			List<Article> articles = new ArrayList<Article>(articleIDs.size());
+			for (Iterator<ArticleID> it = articleIDs.iterator(); it.hasNext(); ) {
+				ArticleID articleID = it.next();
 				Article article = (Article) pm.getObjectById(articleID);
 				Offer offer = article.getOffer();
 				OfferLocal offerLocal = offer.getOfferLocal();
@@ -945,8 +946,8 @@ implements SessionBean
 //				trader.confirmOffer(user, offerLocal);
 			}
 			else {
-				for (Iterator it = articleContainer.getArticles().iterator(); it.hasNext(); ) {
-					Article article = (Article) it.next();
+				for (Iterator<Article> it = articleContainer.getArticles().iterator(); it.hasNext(); ) {
+					Article article = it.next();
 					Offer offer = article.getOffer();
 					OfferLocal offerLocal = offer.getOfferLocal();
 					trader.validateOffer(offer);
@@ -982,7 +983,7 @@ implements SessionBean
 	 * @ejb.permission role-name="_Guest_"
 	 */
 	public DeliveryNote addArticlesToDeliveryNote(
-			DeliveryNoteID deliveryNoteID, Collection articleIDs,
+			DeliveryNoteID deliveryNoteID, Collection<ArticleID> articleIDs,
 			boolean validate, boolean get, String[] fetchGroups, int maxFetchDepth)
 	throws DeliveryNoteEditException
 	{
@@ -991,10 +992,10 @@ implements SessionBean
 			pm.getExtent(DeliveryNote.class);
 			pm.getExtent(Article.class);
 			DeliveryNote deliveryNote = (DeliveryNote) pm.getObjectById(deliveryNoteID);
-			Collection articles = new ArrayList(articleIDs.size());
-			for (Iterator it = articleIDs.iterator(); it.hasNext(); ) {
-				ArticleID articleID = (ArticleID) it.next();
-				articles.add(pm.getObjectById(articleID));
+			Collection<Article> articles = new ArrayList<Article>(articleIDs.size());
+			for (Iterator<ArticleID> it = articleIDs.iterator(); it.hasNext(); ) {
+				ArticleID articleID = it.next();
+				articles.add((Article)pm.getObjectById(articleID));
 			}
 
 			Store store = Store.getStore(pm);
@@ -1024,7 +1025,7 @@ implements SessionBean
 	 * @ejb.permission role-name="_Guest_"
 	 */
 	public DeliveryNote removeArticlesFromDeliveryNote(
-			DeliveryNoteID deliveryNoteID, Collection articleIDs,
+			DeliveryNoteID deliveryNoteID, Collection<ArticleID> articleIDs,
 			boolean validate, boolean get, String[] fetchGroups, int maxFetchDepth)
 	throws DeliveryNoteEditException
 	{
@@ -1033,10 +1034,10 @@ implements SessionBean
 			pm.getExtent(DeliveryNote.class);
 			pm.getExtent(Article.class);
 			DeliveryNote deliveryNote = (DeliveryNote) pm.getObjectById(deliveryNoteID);
-			Collection articles = new ArrayList(articleIDs.size());
-			for (Iterator it = articleIDs.iterator(); it.hasNext(); ) {
-				ArticleID articleID = (ArticleID) it.next();
-				articles.add(pm.getObjectById(articleID));
+			Collection<Article> articles = new ArrayList<Article>(articleIDs.size());
+			for (Iterator<ArticleID> it = articleIDs.iterator(); it.hasNext(); ) {
+				ArticleID articleID = it.next();
+				articles.add((Article)pm.getObjectById(articleID));
 			}
 
 			Store store = Store.getStore(pm);
@@ -1068,15 +1069,15 @@ implements SessionBean
 	 * @ejb.transaction type="Supports" @!This usually means that no transaction is opened which is significantly faster and recommended for all read-only EJB methods! Marco.
 	 * @ejb.permission role-name="_Guest_"
 	 */
-	public List deliverBegin(List deliveryDataList)
+	public List<DeliveryResult> deliverBegin(List<DeliveryData> deliveryDataList)
 	throws ModuleException
 	{
 		try {
 			StoreManagerLocal storeManagerLocal = StoreManagerUtil.getLocalHome().create();
 	
-			List resList = new ArrayList();
-			for (Iterator it = deliveryDataList.iterator(); it.hasNext(); ) {
-				DeliveryData deliveryData = (DeliveryData) it.next();
+			List<DeliveryResult> resList = new ArrayList<DeliveryResult>();
+			for (Iterator<DeliveryData> it = deliveryDataList.iterator(); it.hasNext(); ) {
+				DeliveryData deliveryData = it.next();
 
 				DeliveryResult res = null;
 				try {
@@ -1226,7 +1227,7 @@ implements SessionBean
 	 * @ejb.transaction type="Supports" @!This usually means that no transaction is opened which is significantly faster and recommended for all read-only EJB methods! Marco.
 	 * @ejb.permission role-name="_Guest_"
 	 */
-	public List deliverEnd(List deliveryIDs, List deliverEndClientResults, boolean forceRollback)
+	public List<DeliveryResult> deliverEnd(List<DeliveryID> deliveryIDs, List<DeliveryResult> deliverEndClientResults, boolean forceRollback)
 	throws ModuleException
 	{
 		try {
@@ -1235,11 +1236,11 @@ implements SessionBean
 			if (deliveryIDs.size() != deliverEndClientResults.size())
 				throw new IllegalArgumentException("deliveryIDs.size() != deliverEndClientResults.size()!!!");
 
-			List resList = new ArrayList();
-			Iterator itResults = deliverEndClientResults.iterator();
-			for (Iterator itIDs = deliveryIDs.iterator(); itIDs.hasNext(); ) {
-				DeliveryID deliveryID = (DeliveryID) itIDs.next();
-				DeliveryResult deliverEndClientResult = (DeliveryResult) itResults.next();
+			List<DeliveryResult> resList = new ArrayList<DeliveryResult>();
+			Iterator<DeliveryResult> itResults = deliverEndClientResults.iterator();
+			for (Iterator<DeliveryID> itIDs = deliveryIDs.iterator(); itIDs.hasNext(); ) {
+				DeliveryID deliveryID = itIDs.next();
+				DeliveryResult deliverEndClientResult = itResults.next();
 
 				DeliveryResult res = null;
 				try {
@@ -1283,7 +1284,7 @@ implements SessionBean
 	 * @ejb.transaction type="Supports" @!This usually means that no transaction is opened which is significantly faster and recommended for all read-only EJB methods! Marco.
 	 * @ejb.permission role-name="_Guest_"
 	 */
-	public List deliverDoWork(List deliveryIDs, List deliverDoWorkClientResults, boolean forceRollback)
+	public List<DeliveryResult> deliverDoWork(List<DeliveryID> deliveryIDs, List<DeliveryResult> deliverDoWorkClientResults, boolean forceRollback)
 	throws ModuleException
 	{
 		try {
@@ -1292,10 +1293,10 @@ implements SessionBean
 			if (deliveryIDs.size() != deliverDoWorkClientResults.size())
 				throw new IllegalArgumentException("deliveryIDs.size() != deliverDoWorkClientResults.size()!!!");
 
-			List resList = new ArrayList();
-			Iterator itResults = deliverDoWorkClientResults.iterator();
-			for (Iterator itIDs = deliveryIDs.iterator(); itIDs.hasNext(); ) {
-				DeliveryID deliveryID = (DeliveryID) itIDs.next();
+			List<DeliveryResult> resList = new ArrayList<DeliveryResult>();
+			Iterator<DeliveryResult> itResults = deliverDoWorkClientResults.iterator();
+			for (Iterator<DeliveryID> itIDs = deliveryIDs.iterator(); itIDs.hasNext(); ) {
+				DeliveryID deliveryID = itIDs.next();
 				DeliveryResult deliverDoWorkClientResult = (DeliveryResult) itResults.next();
 
 				DeliveryResult res = null;

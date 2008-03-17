@@ -35,7 +35,6 @@ import org.nightlabs.jdo.ObjectIDUtil;
 import org.nightlabs.jdo.moduleregistry.ModuleMetaData;
 import org.nightlabs.jfire.accounting.Account;
 import org.nightlabs.jfire.accounting.AccountType;
-import org.nightlabs.jfire.accounting.Accounting;
 import org.nightlabs.jfire.accounting.Currency;
 import org.nightlabs.jfire.accounting.book.id.LocalAccountantDelegateID;
 import org.nightlabs.jfire.accounting.id.CurrencyID;
@@ -114,7 +113,7 @@ import org.nightlabs.jfire.voucher.store.id.VoucherKeyID;
  * @ejb.bean name="jfire/ejb/JFireVoucher/VoucherManager"
  *           jndi-name="jfire/ejb/JFireVoucher/VoucherManager" type="Stateless"
  *           transaction-type="Container"
- * 
+ *
  * @ejb.util generate="physical"
  * @ejb.transaction type="Required"
  */
@@ -145,7 +144,7 @@ implements SessionBean
 
 	/**
 	 * @see javax.ejb.SessionBean#ejbRemove()
-	 * 
+	 *
 	 * @ejb.permission unchecked="true"
 	 */
 	@Implement
@@ -165,12 +164,12 @@ implements SessionBean
 			new ScriptingInitialiser(jsm, pm,
 					Organisation.DEV_ORGANISATION_ID).initialise(); // this is a
 																														// throw-away-instance
- 
+
 			DeliveryConfiguration deliveryConfiguration = checkDeliveryConfiguration(pm);
 			// check each time for ticketPrinter module, to register corresponding
 			// modeOfDeliveryFlavour if necessary
 			checkModeOfDeliveryFlavourTicketPrinter(pm);
-			
+
 			ModuleMetaData moduleMetaData = ModuleMetaData.getModuleMetaData(pm,
 					"JFireVoucher");
 			if (moduleMetaData != null)
@@ -204,9 +203,9 @@ implements SessionBean
 					Organisation.DEV_ORGANISATION_ID,
 					VoucherDeliveryNoteActionHandler.class.getName());
 			pm.makePersistent(voucherDeliveryNoteActionHandler);
-			
+
 //			DeliveryConfiguration deliveryConfiguration = checkDeliveryConfiguration(pm);
-			
+
 			// create root-VoucherType (if not yet existing)
 			pm.getExtent(VoucherType.class);
 			try {
@@ -285,7 +284,7 @@ implements SessionBean
 			Class.forName(ticketPrinterClassName);
 		} catch (ClassNotFoundException e2) {
 			// Tobias: I don't think it is necessary to "pollute" the server log with the exception
-			
+
 //			logger.info("Class "+ticketPrinterClassName+" could not be resolved, means TicketPrinter Module " +
 //					"is not deployed, will skip registering of ModeOfDeliveryFlavour " +
 //					JFireVoucherEAR.MODE_OF_DELIVERY_FLAVOUR_ID_VOUCHER_PRINT_VIA_TICKET_PRINTER, e2);
@@ -338,26 +337,26 @@ implements SessionBean
 				try {
 					ModeOfDelivery modeOfDelivery;
 					ModeOfDeliveryFlavour modeOfDeliveryFlavour;
-					
+
 					modeOfDelivery = (ModeOfDelivery) pm.getObjectById(ModeOfDeliveryConst.MODE_OF_DELIVERY_ID_MANUAL);
 					deliveryConfiguration.addModeOfDelivery(modeOfDelivery);
-					
+
 					modeOfDelivery = getModeOfDeliveryVoucherPrint(pm);
 
-					for (Iterator it = pm.getExtent(CustomerGroup.class).iterator(); it.hasNext(); ) {
-						CustomerGroup customerGroup = (CustomerGroup) it.next();
+					for (Iterator<CustomerGroup> it = pm.getExtent(CustomerGroup.class).iterator(); it.hasNext(); ) {
+						CustomerGroup customerGroup = it.next();
 						customerGroup.addModeOfDelivery(modeOfDelivery);
 					}
-					
+
 					modeOfDeliveryFlavour = modeOfDelivery.createFlavour(JFireVoucherEAR.MODE_OF_DELIVERY_FLAVOUR_ID_VOUCHER_PRINT_VIA_OPERATING_SYSTEM_PRINTER);
 					modeOfDeliveryFlavour.getName().setText(Locale.ENGLISH.getLanguage(), "Print To Operating System Printer");
 					modeOfDeliveryFlavour.getName().setText(Locale.GERMAN.getLanguage(), "Druck via Betriebssystem-Drucker");
-					
+
 					deliveryConfiguration.addModeOfDelivery(modeOfDelivery);
-					
+
 					ServerDeliveryProcessorClientSideVoucherPrint.getServerDeliveryProcessorClientSideVoucherPrint(pm).addModeOfDelivery(modeOfDelivery);
-					
-					
+
+
 					modeOfDelivery = (ModeOfDelivery) pm.getObjectById(ModeOfDeliveryConst.MODE_OF_DELIVERY_ID_DELIVER_TO_DELIVERY_QUEUE);
 					deliveryConfiguration.addModeOfDelivery(modeOfDelivery);
 
@@ -371,7 +370,7 @@ implements SessionBean
 		}
 		return deliveryConfiguration;
 	}
-	
+
 	/**
 	 * @ejb.interface-method
 	 * @ejb.transaction type="Supports" @!This usually means that no transaction is opened which is significantly faster and recommended for all read-only EJB methods! Marco.
@@ -576,7 +575,7 @@ implements SessionBean
 	 * @throws org.nightlabs.jfire.store.NotAvailableException
 	 *           in case there are not enough <tt>Voucher</tt>s available and
 	 *           the <tt>Product</tt>s cannot be created (because of a limit).
-	 * 
+	 *
 	 * @ejb.interface-method
 	 * @ejb.permission role-name="_Guest_"
 	 * @ejb.transaction type="Required"
@@ -679,7 +678,7 @@ implements SessionBean
 	 *          {@link ScriptRegistryItem#getScriptRegistryItemType()}
 	 *          {@link VoucherScriptingConstants#SCRIPT_REGISTRY_ITEM_TYPE_VOUCHER}
 	 *          will be executed and included in the result.
-	 * 
+	 *
 	 * @ejb.interface-method
 	 * @ejb.transaction type="Supports" @!This usually means that no transaction is opened which is significantly faster and recommended for all read-only EJB methods! Marco.
 	 * @ejb.permission role-name="_Guest_"
@@ -723,7 +722,7 @@ implements SessionBean
 
 						// scripts.addAll((Collection)q.execute(VoucherScriptingConstants.SCRIPT_REGISTRY_ITEM_TYPE_VOUCHER));
 						scripts
-								.addAll((Collection) q
+								.addAll((Collection<? extends Script>) q
 										.execute(VoucherScriptingConstants.SCRIPT_REGISTRY_ITEM_TYPE_TRADE_VOUCHER));
 					} else {
 						// TODO obtain the scripts via the voucher-layout-file,
@@ -802,12 +801,12 @@ implements SessionBean
 			try {
 				PersistenceManager pm = getPersistenceManager();
 				try {
-					User user = User.getUser(pm, getPrincipal());
-					PreviewParameterSet previewParameterSet = new PreviewParameterSet(
-							voucherTypeID);
+//					Variables are never used locally
+//					User user = User.getUser(pm, getPrincipal());
+//					PreviewParameterSet previewParameterSet = new PreviewParameterSet(voucherTypeID);
 
-					PreviewParameterSetExtension previewParameterSetExtension = ensureFinishedConfiguration(
-							pm, user, previewParameterSet);
+//					PreviewParameterSetExtension previewParameterSetExtension = ensureFinishedConfiguration(
+//							pm, user, previewParameterSet);
 
 					pm.getExtent(VoucherType.class);
 					VoucherType voucherType = (VoucherType) pm.getObjectById(voucherTypeID);
@@ -821,8 +820,8 @@ implements SessionBean
 			}
 		} catch (RuntimeException x) {
 			throw x;
-		} catch (ModuleException x) {
-			throw x;
+//		} catch (ModuleException x) {
+//			throw x;
 		} catch (Exception x) {
 			throw new ModuleException(x);
 		}
@@ -840,7 +839,7 @@ implements SessionBean
 	 * <code>transaction type="RequiresNew"</code> and to rollback the
 	 * transaction using <code>sessionContext.setRollbackOnly();</code>.
 	 * </p>
-	 * 
+	 *
 	 * @param pm
 	 *          The PersistenceManager used for the datastore access.
 	 * @param user
@@ -874,7 +873,7 @@ implements SessionBean
 		// finally, rollback the transaction
 
 		String organisationID = user.getOrganisationID();
-		Accounting accounting = Accounting.getAccounting(pm);
+//		Accounting accounting = Accounting.getAccounting(pm);
 		Store store = Store.getStore(pm);
 
 		PreviewParameterSetExtension previewParameterSetExtension = new PreviewParameterSetExtension();
@@ -887,9 +886,9 @@ implements SessionBean
 		// Currency
 		Extent extent = pm.getExtent(Currency.class);
 		if (previewParameterSet.getCurrencyID() == null) {
-			Iterator it = extent.iterator();
+			Iterator<Currency> it = extent.iterator();
 			if (it.hasNext())
-				previewParameterSetExtension.currency = (Currency) it.next();
+				previewParameterSetExtension.currency = it.next();
 			else {
 				previewParameterSetExtension.currency = new Currency("EUR", "EUR", 2);
 				pm.makePersistent(previewParameterSetExtension.currency);
@@ -1023,7 +1022,7 @@ implements SessionBean
 				// now the delivery itself
 				Delivery delivery = new Delivery(IDGenerator.getOrganisationID(), IDGenerator.nextID(Delivery.class));
 				delivery.setDeliveryDirection(Delivery.DELIVERY_DIRECTION_OUTGOING);
-				
+
 				delivery.setPartner(
 						trader.getMandator().equals(deliveryNote.getCustomer()) ?
 								deliveryNote.getVendor() : deliveryNote.getCustomer());
@@ -1098,7 +1097,7 @@ implements SessionBean
 				VoucherType voucherType = (VoucherType)article.getProduct().getProductType();
 				if (voucherType.getVoucherLayout() == null)
 					throw new IllegalStateException("voucherType.getVoucherLayout() == null! voucherType: " + voucherType.getPrimaryKey());
-				
+
 				res.getProductID2LayoutMap().put(productID, pm.detachCopy(voucherType.getVoucherLayout()));
 			}
 			return res;
@@ -1106,7 +1105,7 @@ implements SessionBean
 			pm.close();
 		}
 	}
-	
+
 	/**
 	 * @ejb.interface-method
 	 * @ejb.transaction type="Supports" @!This usually means that no transaction is opened which is significantly faster and recommended for all read-only EJB methods! Marco.

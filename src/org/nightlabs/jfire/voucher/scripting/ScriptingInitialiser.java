@@ -9,7 +9,6 @@ import org.nightlabs.jfire.idgenerator.IDGenerator;
 import org.nightlabs.jfire.organisation.Organisation;
 import org.nightlabs.jfire.scripting.ScriptCategory;
 import org.nightlabs.jfire.scripting.ScriptParameterSet;
-import org.nightlabs.jfire.scripting.ScriptRegistry;
 import org.nightlabs.jfire.scripting.ScriptingIntialiserException;
 import org.nightlabs.jfire.servermanager.JFireServerManager;
 import org.nightlabs.jfire.voucher.store.id.VoucherKeyID;
@@ -43,7 +42,8 @@ public class ScriptingInitialiser
 	// init Default ParameterSets
 	public void initialise() throws ScriptingIntialiserException
 	{
-		ScriptRegistry scriptRegistry = ScriptRegistry.getScriptRegistry(pm);
+//		Local variable never read
+//		ScriptRegistry scriptRegistry = ScriptRegistry.getScriptRegistry(pm);
 		ScriptCategory baseCategory;
 		ScriptCategory rootCategory;
 		ScriptParameterSet paramSet;
@@ -56,7 +56,7 @@ public class ScriptingInitialiser
 				VoucherScriptingConstants.SCRIPT_REGISTRY_ITEM_ID_CATEGORY_ROOT);
 		rootCategory.getName().setText(Locale.ENGLISH.getLanguage(), "JFireTrade");
 		rootCategory.getName().setText(Locale.GERMAN.getLanguage(), "JFireTrade");
-		
+
 		// Voucher category
 		baseCategory = org.nightlabs.jfire.scripting.ScriptingInitialiser.createCategory(
 				pm, rootCategory, organisationID,

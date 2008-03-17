@@ -24,8 +24,8 @@ public class VoucherStore
 {
 	public static VoucherStore getVoucherStore(PersistenceManager pm)
 	{
-		Iterator it = pm.getExtent(VoucherStore.class).iterator();
-		VoucherStore voucherStore = (VoucherStore) (it.hasNext() ? it.next() : null);
+		Iterator<VoucherStore> it = pm.getExtent(VoucherStore.class).iterator();
+		VoucherStore voucherStore = (it.hasNext() ? it.next() : null);
 
 		if (voucherStore == null) {
 			voucherStore = new VoucherStore();

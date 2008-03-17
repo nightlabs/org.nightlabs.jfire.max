@@ -89,7 +89,7 @@ public class VoucherTypeActionHandler
 	protected VoucherTypeActionHandler() { }
 
 	public VoucherTypeActionHandler(String organisationID,
-			String productTypeActionHandlerID, Class productTypeClass)
+			String productTypeActionHandlerID, Class<? extends ProductType> productTypeClass)
 	{
 		super(organisationID, productTypeActionHandlerID, productTypeClass);
 	}

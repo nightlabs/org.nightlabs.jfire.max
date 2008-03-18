@@ -1,11 +1,13 @@
 package org.nightlabs.jfire.jbpm.query;
 
 import java.util.Date;
+import java.util.List;
 
 import javax.jdo.Query;
 
 import org.apache.log4j.Logger;
 import org.nightlabs.jdo.query.AbstractJDOQuery;
+import org.nightlabs.jdo.query.AbstractSearchQuery;
 import org.nightlabs.jfire.jbpm.graph.def.Statable;
 import org.nightlabs.jfire.jbpm.graph.def.State;
 import org.nightlabs.jfire.trade.state.id.StateDefinitionID;
@@ -28,6 +30,32 @@ public class StatableQuery
 	public static final String PROPERTY_STATE_CREATE_DATE_MAX = PROPERTY_PREFIX + "stateCreateDTMax";
 	public static final String PROPERTY_STATE_CREATE_DATE_MIN = PROPERTY_PREFIX + "stateCreateDTMin";
 	public static final String PROPERTY_STATE_DEFINITION_ID = PROPERTY_PREFIX + "stateDefinitionID";
+	
+	@Override
+	public List<FieldChangeCarrier> getChangedFields(String propertyName)
+	{
+		final List<FieldChangeCarrier> changedFields = super.getChangedFields(propertyName);
+		final boolean allFields = AbstractSearchQuery.PROPERTY_WHOLE_QUERY.equals(propertyName);
+		
+		if (allFields || PROPERTY_ONLY_IN_SELECTED_STATE.equals(propertyName))
+		{
+			changedFields.add( new FieldChangeCarrier(propertyName, onlyInSelectedState) );
+		}
+		if (allFields || PROPERTY_STATE_CREATE_DATE_MAX.equals(propertyName))
+		{
+			changedFields.add( new FieldChangeCarrier(propertyName, stateCreateDTMax) );
+		}
+		if (allFields || PROPERTY_STATE_CREATE_DATE_MIN.equals(propertyName))
+		{
+			changedFields.add( new FieldChangeCarrier(propertyName, stateCreateDTMin) );
+		}
+		if (allFields || PROPERTY_STATE_DEFINITION_ID.equals(propertyName))
+		{
+			changedFields.add( new FieldChangeCarrier(propertyName, stateDefinitionID) );
+		}
+		
+		return changedFields;
+	}
 	
 	public StatableQuery()
 	{

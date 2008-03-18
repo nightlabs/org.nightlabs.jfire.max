@@ -1,7 +1,9 @@
 package org.nightlabs.jfire.trade.query;
 
 import java.util.Date;
+import java.util.List;
 
+import org.nightlabs.jdo.query.AbstractSearchQuery;
 import org.nightlabs.jfire.accounting.Currency;
 import org.nightlabs.jfire.accounting.Invoice;
 import org.nightlabs.jfire.accounting.id.CurrencyID;
@@ -180,4 +182,39 @@ public class InvoiceQuery
 		notifyListeners(PROPERTY_BOOK_DATE_MIN, oldBookDTMin, bookDTMin);
 	}
 
+	@Override
+	public List<FieldChangeCarrier> getChangedFields(String propertyName)
+	{
+		List<FieldChangeCarrier> changedFields = super.getChangedFields(propertyName);
+		boolean allFields = AbstractSearchQuery.PROPERTY_WHOLE_QUERY.equals(propertyName);
+		if (allFields || PROPERTY_AMOUNT_PAID_MAX.equals(propertyName))
+		{
+			changedFields.add( new FieldChangeCarrier(propertyName, amountPaidMax) );
+		}
+		if (allFields || PROPERTY_AMOUNT_PAID_MIN.equals(propertyName))
+		{
+			changedFields.add( new FieldChangeCarrier(propertyName, amountPaidMin) );
+		}
+		if (allFields || PROPERTY_AMOUNT_TO_PAY_MAX.equals(propertyName))
+		{
+			changedFields.add( new FieldChangeCarrier(propertyName, amountToPayMax) );
+		}
+		if (allFields || PROPERTY_AMOUNT_TO_PAY_MIN.equals(propertyName))
+		{
+			changedFields.add( new FieldChangeCarrier(propertyName, amountToPayMin) );
+		}
+		if (allFields || PROPERTY_BOOKED.equals(propertyName))
+		{
+			changedFields.add( new FieldChangeCarrier(propertyName, booked) );
+		}
+		if (allFields || PROPERTY_BOOK_DATE_MAX.equals(propertyName))
+		{
+			changedFields.add( new FieldChangeCarrier(propertyName, bookDTMax) );
+		}
+		if (allFields || PROPERTY_BOOK_DATE_MIN.equals(propertyName))
+		{
+			changedFields.add( new FieldChangeCarrier(propertyName, bookDTMin) );
+		}
+		return changedFields;
+	}
 }

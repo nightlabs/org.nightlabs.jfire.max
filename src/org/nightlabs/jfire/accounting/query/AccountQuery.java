@@ -1,9 +1,12 @@
 package org.nightlabs.jfire.accounting.query;
 
+import java.util.List;
+
 import javax.jdo.Query;
 
 import org.apache.log4j.Logger;
 import org.nightlabs.jdo.query.AbstractJDOQuery;
+import org.nightlabs.jdo.query.AbstractSearchQuery;
 import org.nightlabs.jfire.accounting.Account;
 import org.nightlabs.jfire.accounting.AccountType;
 import org.nightlabs.jfire.accounting.Currency;
@@ -82,6 +85,55 @@ public class AccountQuery
 	public static final String PROPERTY_OWNER_ID = PROPERTY_PREFIX + "ownerID";	
 	public static final String PROPERTY_OWNER_NAME = PROPERTY_PREFIX + "ownerName";	
 	
+	@Override
+	public List<FieldChangeCarrier> getChangedFields(String propertyName)
+	{
+		final List<FieldChangeCarrier> changedFields = super.getChangedFields(propertyName);
+		final boolean allFields = AbstractSearchQuery.PROPERTY_WHOLE_QUERY.equals(propertyName);
+		
+		if (allFields || PROPERTY_ACCOUNT_NAME.equals(propertyName))
+		{
+			changedFields.add( new FieldChangeCarrier(propertyName, accountName) );
+		}
+		if (allFields || PROPERTY_ACCOUNT_NAME_LANGUAGE_ID.equals(propertyName))
+		{
+			changedFields.add( new FieldChangeCarrier(propertyName, accountNameLanguageID) );
+		}
+		if (allFields || PROPERTY_ACCOUNT_TYPE_ID.equals(propertyName))
+		{
+			changedFields.add( new FieldChangeCarrier(propertyName, accountTypeID) );
+		}
+		if (allFields || PROPERTY_ANCHOR_ID.equals(propertyName))
+		{
+			changedFields.add( new FieldChangeCarrier(propertyName, anchorID) );
+		}
+		if (allFields || PROPERTY_ANCHOR_TYPE_ID.equals(propertyName))
+		{
+			changedFields.add( new FieldChangeCarrier(propertyName, anchorTypeID) );
+		}
+		if (allFields || PROPERTY_CURRENCY_ID.equals(propertyName))
+		{
+			changedFields.add( new FieldChangeCarrier(propertyName, currencyID) );
+		}
+		if (allFields || PROPERTY_MAX_BALANCE.equals(propertyName))
+		{
+			changedFields.add( new FieldChangeCarrier(propertyName, maxBalance) );
+		}
+		if (allFields || PROPERTY_MIN_BALANCE.equals(propertyName))
+		{
+			changedFields.add( new FieldChangeCarrier(propertyName, minBalance) );
+		}
+		if (allFields || PROPERTY_OWNER_ID.equals(propertyName))
+		{
+			changedFields.add( new FieldChangeCarrier(propertyName, ownerID) );
+		}
+		if (allFields || PROPERTY_OWNER_NAME.equals(propertyName))
+		{
+			changedFields.add( new FieldChangeCarrier(propertyName, ownerName) );
+		}
+		
+		return changedFields;
+	}
 	@Override
 	protected Query prepareQuery()
 	{

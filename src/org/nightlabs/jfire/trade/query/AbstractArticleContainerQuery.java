@@ -1,12 +1,14 @@
 package org.nightlabs.jfire.trade.query;
 
 import java.util.Date;
+import java.util.List;
 
 import javax.jdo.Query;
 
 import org.apache.log4j.Logger;
 import org.nightlabs.jdo.ObjectIDUtil;
 import org.nightlabs.jdo.query.AbstractJDOQuery;
+import org.nightlabs.jdo.query.AbstractSearchQuery;
 import org.nightlabs.jfire.security.id.UserID;
 import org.nightlabs.jfire.trade.ArticleContainer;
 import org.nightlabs.jfire.transfer.id.AnchorID;
@@ -315,12 +317,6 @@ public abstract class AbstractArticleContainerQuery<R extends ArticleContainer>
 		notifyListeners(PROPERTY_CUSTOMER_ID, oldCustomerID, customerID);
 	}
 	
-//	/**
-//	 * returns the class of the articleContainer
-//	 * @return the class of the articleContainer
-//	 */
-//	public abstract Class<R> getArticleContainerClass();
-	
 	/**
 	 * returns the name of the articleContainerID member
 	 * 
@@ -337,27 +333,57 @@ public abstract class AbstractArticleContainerQuery<R extends ArticleContainer>
 	 */
 	public abstract String getArticleContainerIDPrefixMemberName();
 
-//	/**
-//	 * the beginning of the range to include from the result
-//	 * by default 0
-//	 */
-//	private long rangeFromIncl = 0;
-//	public long getRangeFromIncl(){
-//		return rangeFromIncl;
-//	}
-//	public void setRangeFromIncl(long rangeFromIncl) {
-//		this.rangeFromIncl = rangeFromIncl;
-//	}
-//
-//	/**
-//	 * the end of the range to exclude from the result
-//	 * by default {@link Long#MAX_VALUE}
-//	 */
-//	private long rangeToExcl = Long.MAX_VALUE;
-//	public long getRangeToExcl() {
-//		return rangeToExcl;
-//	}
-//	public void setRangeToExcl(long rangeToExcl) {
-//		this.rangeToExcl = rangeToExcl;
-//	}
+	
+	@Override
+	public List<FieldChangeCarrier> getChangedFields(String propertyName)
+	{
+		List<FieldChangeCarrier> changedFields = super.getChangedFields(propertyName);
+		boolean allFields = AbstractSearchQuery.PROPERTY_WHOLE_QUERY.equals(propertyName);
+		
+		if (allFields || PROPERTY_ARTICLE_CONTAINER_ID.equals(propertyName))
+		{
+			changedFields.add(new FieldChangeCarrier(propertyName, articleContainerID));
+		}
+		if (allFields || PROPERTY_ARTICLE_COUNT_MAX.equals(propertyName))
+		{
+			changedFields.add(new FieldChangeCarrier(propertyName, articleCountMax));
+		}
+		if (allFields || PROPERTY_ARTICLE_COUNT_MIN.equals(propertyName))
+		{
+			changedFields.add(new FieldChangeCarrier(propertyName, articleCountMin));
+		}
+		if (allFields || PROPERTY_CREATE_DATE_MAX.equals(propertyName))
+		{
+			changedFields.add(new FieldChangeCarrier(propertyName, createDTMax));
+		}
+		if (allFields || PROPERTY_CREATE_DATE_MIN.equals(propertyName))
+		{
+			changedFields.add(new FieldChangeCarrier(propertyName, createDTMin));
+		}
+		if (allFields || PROPERTY_CREATE_USER_ID.equals(propertyName))
+		{
+			changedFields.add(new FieldChangeCarrier(propertyName, createUserID));
+		}
+		if (allFields || PROPERTY_CREATOR_NAME.equals(propertyName))
+		{
+			changedFields.add(new FieldChangeCarrier(propertyName, creatorName));
+		}
+		if (allFields || PROPERTY_CUSTOMER_ID.equals(propertyName))
+		{
+			changedFields.add(new FieldChangeCarrier(propertyName, customerID));
+		}
+		if (allFields || PROPERTY_CUSTOMER_NAME.equals(propertyName))
+		{
+			changedFields.add(new FieldChangeCarrier(propertyName, customerName));
+		}
+		if (allFields || PROPERTY_VENDOR_ID.equals(propertyName))
+		{
+			changedFields.add(new FieldChangeCarrier(propertyName, vendorID));
+		}
+		if (allFields || PROPERTY_VENDOR_NAME.equals(propertyName))
+		{
+			changedFields.add(new FieldChangeCarrier(propertyName, vendorName));
+		}
+		return changedFields;
+	}
 }

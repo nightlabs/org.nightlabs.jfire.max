@@ -11,11 +11,6 @@ public class OrderQuery
 {
 	private static final long serialVersionUID = 1L;
 
-//	@Override
-//	public Class getArticleContainerClass() {
-//		return Order.class;
-//	}
-
 	@Override
 	public String getArticleContainerIDMemberName() {
 		return "orderID";

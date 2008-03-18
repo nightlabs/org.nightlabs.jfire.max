@@ -1,9 +1,12 @@
 package org.nightlabs.jfire.store.search;
 
+import java.util.List;
+
 import javax.jdo.Query;
 
 import org.apache.log4j.Logger;
 import org.nightlabs.jdo.query.AbstractJDOQuery;
+import org.nightlabs.jdo.query.AbstractSearchQuery;
 import org.nightlabs.jfire.accounting.book.id.LocalAccountantDelegateID;
 import org.nightlabs.jfire.accounting.priceconfig.id.PriceConfigID;
 import org.nightlabs.jfire.store.ProductType;
@@ -475,4 +478,69 @@ public abstract class AbstractProductTypeQuery<P extends ProductType>
 		notifyListeners(PROPERTY_AVAILABLE, oldAvailable, available);
 	}
 
+	@Override
+	public List<FieldChangeCarrier> getChangedFields(String propertyName)
+	{
+		List<FieldChangeCarrier> changedFields = super.getChangedFields(propertyName);
+		boolean allFields = AbstractSearchQuery.PROPERTY_WHOLE_QUERY.equals(propertyName);
+		
+		if (allFields || PROPERTY_AVAILABLE.equals(propertyName))
+		{
+			changedFields.add( new FieldChangeCarrier(propertyName, available) );
+		}
+		if (allFields || PROPERTY_CLOSED.equals(propertyName))
+		{
+			changedFields.add( new FieldChangeCarrier(propertyName, closed) );
+		}
+		if (allFields || PROPERTY_CONFIRMED.equals(propertyName))
+		{
+			changedFields.add( new FieldChangeCarrier(propertyName, confirmed) );
+		}
+		if (allFields || PROPERTY_DELIVERY_CONFIGURATION_ID.equals(propertyName))
+		{
+			changedFields.add( new FieldChangeCarrier(propertyName, deliveryConfigurationID) );
+		}
+		if (allFields || PROPERTY_FULL_TEXT_LANGUAGE_ID.equals(propertyName))
+		{
+			changedFields.add( new FieldChangeCarrier(propertyName, fullTextLanguageID) );
+		}
+		if (allFields || PROPERTY_FULL_TEXT_SEARCH.equals(propertyName))
+		{
+			changedFields.add( new FieldChangeCarrier(propertyName, fullTextSearch) );
+		}
+		if (allFields || PROPERTY_INNER_PRICE_CONFIG_ID.equals(propertyName))
+		{
+			changedFields.add( new FieldChangeCarrier(propertyName, innerPriceConfigID) );
+		}
+		if (allFields || PROPERTY_LOCAL_ACCOUNTANT_DELEGATE_ID.equals(propertyName))
+		{
+			changedFields.add( new FieldChangeCarrier(propertyName, localAccountantDelegateID) );
+		}
+		if (allFields || PROPERTY_MAX_NESTED_PRODUCTTYPE_AMOUNT.equals(propertyName))
+		{
+			changedFields.add( new FieldChangeCarrier(propertyName, maxNestedProductTypeAmount) );
+		}
+		if (allFields || PROPERTY_MIN_NESTED_PRODUCTTYPE_AMOUNT.equals(propertyName))
+		{
+			changedFields.add( new FieldChangeCarrier(propertyName, minNestedProductTypeAmount) );
+		}
+		if (allFields || PROPERTY_OWNER_ID.equals(propertyName))
+		{
+			changedFields.add( new FieldChangeCarrier(propertyName, ownerID) );
+		}
+		if (allFields || PROPERTY_PRODUCTTYPE_GROUP_ID.equals(propertyName))
+		{
+			changedFields.add( new FieldChangeCarrier(propertyName, productTypeGroupID) );
+		}
+		if (allFields || PROPERTY_PUBLISHED.equals(propertyName))
+		{
+			changedFields.add( new FieldChangeCarrier(propertyName, published) );
+		}
+		if (allFields || PROPERTY_SALEABLE.equals(propertyName))
+		{
+			changedFields.add( new FieldChangeCarrier(propertyName, saleable) );
+		}
+		
+		return changedFields;
+	}
 }

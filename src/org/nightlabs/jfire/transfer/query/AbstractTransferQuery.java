@@ -1,11 +1,13 @@
 package org.nightlabs.jfire.transfer.query;
 
 import java.util.Date;
+import java.util.List;
 
 import javax.jdo.PersistenceManager;
 import javax.jdo.Query;
 
 import org.nightlabs.jdo.query.AbstractJDOQuery;
+import org.nightlabs.jdo.query.AbstractSearchQuery;
 import org.nightlabs.jfire.transfer.Anchor;
 import org.nightlabs.jfire.transfer.Transfer;
 import org.nightlabs.jfire.transfer.id.AnchorID;
@@ -16,9 +18,6 @@ extends AbstractJDOQuery<T>
 	private static final long serialVersionUID = 1L;
 	private Date timestampFromIncl = null;
 	private Date timestampToIncl = null;
-
-//	private long rangeFromIncl = 0;
-//	private long rangeToExcl = Long.MAX_VALUE;
 
 	private AnchorID fromAnchorID = null;
 	private AnchorID toAnchorID = null;
@@ -47,6 +46,40 @@ extends AbstractJDOQuery<T>
 	public static final String PROPERTY_OTHER_ANCHOR_ID = PROPERTY_PREFIX + "otherAnchorID";
 	public static final String PROPERTY_TIMESTAMP_FROM = PROPERTY_PREFIX + "timestampFromIncl";
 	public static final String PROPERTY_TIMESTAMP_TO = PROPERTY_PREFIX + "timestampToIncl";
+
+	@Override
+	public List<FieldChangeCarrier> getChangedFields(String propertyName)
+	{
+		final List<FieldChangeCarrier> changedFields = super.getChangedFields(propertyName);
+		final boolean allFields = AbstractSearchQuery.PROPERTY_WHOLE_QUERY.equals(propertyName);
+		
+		if (allFields || PROPERTY_CURRENT_ANCHOR_ID.equals(propertyName))
+		{
+			changedFields.add( new FieldChangeCarrier(propertyName, currentAnchorID) );
+		}
+		if (allFields || PROPERTY_FROM_ANCHOR_ID.equals(propertyName))
+		{
+			changedFields.add( new FieldChangeCarrier(propertyName, fromAnchorID) );
+		}
+		if (allFields || PROPERTY_OTHER_ANCHOR_ID.equals(propertyName))
+		{
+			changedFields.add( new FieldChangeCarrier(propertyName, otherAnchorID) );
+		}
+		if (allFields || PROPERTY_TIMESTAMP_FROM.equals(propertyName))
+		{
+			changedFields.add( new FieldChangeCarrier(propertyName, timestampFromIncl) );
+		}
+		if (allFields || PROPERTY_TIMESTAMP_TO.equals(propertyName))
+		{
+			changedFields.add( new FieldChangeCarrier(propertyName, timestampToIncl) );
+		}
+		if (allFields || PROPERTY_TO_ANCHOR_ID.equals(propertyName))
+		{
+			changedFields.add( new FieldChangeCarrier(propertyName, toAnchorID) );
+		}
+		
+		return changedFields;
+	}
 	
 	protected abstract Class<? extends Transfer> getCandidateClass();
 
@@ -111,22 +144,6 @@ extends AbstractJDOQuery<T>
 
 	protected abstract void setQueryResult(Query q);
 
-//	public long getRangeFromIncl()
-//	{
-//		return rangeFromIncl;
-//	}
-//	public void setRangeFromIncl(long rangeFromIncl)
-//	{
-//		this.rangeFromIncl = rangeFromIncl;
-//	}
-//	public long getRangeToExcl()
-//	{
-//		return rangeToExcl;
-//	}
-//	public void setRangeToExcl(long rangeToExcl)
-//	{
-//		this.rangeToExcl = rangeToExcl;
-//	}
 	public Date getTimestampFromIncl()
 	{
 		return timestampFromIncl;

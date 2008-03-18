@@ -1,9 +1,12 @@
 package org.nightlabs.jfire.store.query;
 
+import java.util.List;
+
 import javax.jdo.Query;
 
 import org.apache.log4j.Logger;
 import org.nightlabs.jdo.query.AbstractJDOQuery;
+import org.nightlabs.jdo.query.AbstractSearchQuery;
 import org.nightlabs.jfire.store.Repository;
 import org.nightlabs.jfire.store.RepositoryType;
 import org.nightlabs.jfire.store.id.RepositoryTypeID;
@@ -61,6 +64,44 @@ extends AbstractJDOQuery<Repository>
 	public static final String PROPERTY_OWNER_ID = PROPERTY_PREFIX + "ownerID";
 	public static final String PROPERTY_OWNER_NAME = PROPERTY_PREFIX + "ownerName";
 	public static final String PROPERTY_REPOSITORY_TYPE_ID = PROPERTY_PREFIX + "repositoryTypeID";
+	
+	@Override
+	public List<FieldChangeCarrier> getChangedFields(String propertyName)
+	{
+		final List<FieldChangeCarrier> changedFields = super.getChangedFields(propertyName);
+		final boolean allFields = AbstractSearchQuery.PROPERTY_WHOLE_QUERY.equals(propertyName);
+		
+		if (allFields || PROPERTY_ANCHOR_ID.equals(propertyName))
+		{
+			changedFields.add( new FieldChangeCarrier(propertyName, anchorID) );
+		}
+		if (allFields || PROPERTY_ANCHOR_TYPE_ID.equals(propertyName))
+		{
+			changedFields.add( new FieldChangeCarrier(propertyName, anchorTypeID) );
+		}
+		if (allFields || PROPERTY_NAME.equals(propertyName))
+		{
+			changedFields.add( new FieldChangeCarrier(propertyName, name) );
+		}
+		if (allFields || PROPERTY_NAME_LANGUAGE_ID.equals(propertyName))
+		{
+			changedFields.add( new FieldChangeCarrier(propertyName, nameLanguageID) );
+		}
+		if (allFields || PROPERTY_OWNER_ID.equals(propertyName))
+		{
+			changedFields.add( new FieldChangeCarrier(propertyName, ownerID) );
+		}
+		if (allFields || PROPERTY_OWNER_NAME.equals(propertyName))
+		{
+			changedFields.add( new FieldChangeCarrier(propertyName, ownerName) );
+		}
+		if (allFields || PROPERTY_REPOSITORY_TYPE_ID.equals(propertyName))
+		{
+			changedFields.add( new FieldChangeCarrier(propertyName, repositoryTypeID) );
+		}
+		
+		return changedFields;
+	}
 	
 	@Override
 	protected Query prepareQuery()

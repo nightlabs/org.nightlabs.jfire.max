@@ -1,6 +1,7 @@
 package org.nightlabs.jfire.issue.query;
 
 import java.util.Date;
+import java.util.List;
 import java.util.Set;
 
 import javax.jdo.Query;
@@ -8,6 +9,7 @@ import javax.jdo.Query;
 import org.apache.log4j.Logger;
 import org.nightlabs.jdo.ObjectID;
 import org.nightlabs.jdo.query.AbstractJDOQuery;
+import org.nightlabs.jdo.query.AbstractSearchQuery;
 import org.nightlabs.jfire.issue.Issue;
 import org.nightlabs.jfire.issue.IssueLink;
 import org.nightlabs.jfire.issue.id.IssuePriorityID;
@@ -55,6 +57,64 @@ extends AbstractJDOQuery<Issue>
 	public static final String PROPERTY_ISSUE_LINKS = PROPERTY_PREFIX + "issueLinks";
 	public static final String PROPERTY_REPORTER_ID = PROPERTY_PREFIX + "reporterID";
 	public static final String PROPERTY_UPDATE_TIMESTAMP = PROPERTY_PREFIX + "updateTimestamp";
+	
+	@Override
+	public List<FieldChangeCarrier> getChangedFields(String propertyName)
+	{
+		final List<FieldChangeCarrier> changedFields = super.getChangedFields(propertyName);
+		final boolean allFields = AbstractSearchQuery.PROPERTY_WHOLE_QUERY.equals(propertyName);
+		
+		if (allFields || PROPERTY_ASSIGNEE_ID.equals(propertyName))
+		{
+			changedFields.add( new FieldChangeCarrier(propertyName, assigneeID) );
+		}
+		if (allFields || PROPERTY_CREATE_TIMESTAMP.equals(propertyName))
+		{
+			changedFields.add( new FieldChangeCarrier(propertyName, createTimestamp) );
+		}
+		if (allFields || PROPERTY_ISSUE_COMMENT.equals(propertyName))
+		{
+			changedFields.add( new FieldChangeCarrier(propertyName, removeRegexpSearch(issueComment)) );
+		}
+		if (allFields || PROPERTY_ISSUE_LINKS.equals(propertyName))
+		{
+			changedFields.add( new FieldChangeCarrier(propertyName, issueLinks) );
+		}
+		if (allFields || PROPERTY_ISSUE_PRIORITY_ID.equals(propertyName))
+		{
+			changedFields.add( new FieldChangeCarrier(propertyName, issuePriorityID) );
+		}
+		if (allFields || PROPERTY_ISSUE_RESOLUTION_ID.equals(propertyName))
+		{
+			changedFields.add( new FieldChangeCarrier(propertyName, issueResolutionID) );
+		}
+		if (allFields || PROPERTY_ISSUE_SEVERITY_TYPE_ID.equals(propertyName))
+		{
+			changedFields.add( new FieldChangeCarrier(propertyName, issueSeverityTypeID) );
+		}
+		if (allFields || PROPERTY_ISSUE_SUBJECT.equals(propertyName))
+		{
+			changedFields.add( new FieldChangeCarrier(propertyName, removeRegexpSearch(issueSubject)) );
+		}
+		if (allFields || PROPERTY_ISSUE_SUBJECT_AND_COMMENT.equals(propertyName))
+		{
+			changedFields.add( new FieldChangeCarrier(propertyName, removeRegexpSearch(issueSubjectNComment)) );
+		}
+		if (allFields || PROPERTY_ISSUE_TYPE_ID.equals(propertyName))
+		{
+			changedFields.add( new FieldChangeCarrier(propertyName, issueTypeID) );
+		}
+		if (allFields || PROPERTY_REPORTER_ID.equals(propertyName))
+		{
+			changedFields.add( new FieldChangeCarrier(propertyName, reporterID) );
+		}
+		if (allFields || PROPERTY_UPDATE_TIMESTAMP.equals(propertyName))
+		{
+			changedFields.add( new FieldChangeCarrier(propertyName, updateTimestamp) );
+		}
+		
+		return changedFields;
+	}
 	
 	@Override
 	protected Query prepareQuery() {

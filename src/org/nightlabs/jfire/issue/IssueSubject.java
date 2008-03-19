@@ -20,12 +20,13 @@ import org.nightlabs.jdo.ObjectIDUtil;
  * @jdo.create-objectid-class
  * 		field-order="organisationID, issueID"
  *
- * @jdo.fetch-group name="Issue.subject" fetch-groups="default" fields="issue, names"
+ * @jdo.fetch-group name="IssueSubject.names" fields="names"
+ * @jdo.fetch-group name="Issue.subject" fields="issue, names"
  */ 
 public class IssueSubject 
 extends I18nText{
 	
-//	public static final String FETCH_GROUP_THIS_ISSUE_SUBJECT = "IssueSubject.this";
+	public static final String FETCH_GROUP_THIS_ISSUE_SUBJECT_NAMES = "IssueSubject.names";
 	
 	/**
 	 * The serial version of this class.

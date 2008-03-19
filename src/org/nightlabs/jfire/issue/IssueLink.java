@@ -33,18 +33,20 @@ import org.nightlabs.util.Util;
  *			this.issueID == :issueID &&
  *			this.issueLinkObjectID == :linkedObjectID                    
  *
- * @jdo.fetch-group name="IssueLink.this" fetch-groups="default" fields="issueLinkType, issue"
- * @jdo.fetch-group name="IssueLink.issueLinkType" fields="issueLinkType"
- * @jdo.fetch-group name="IssueLink.issue" fields="issue"
+ * @jdo.fetch-group name="IssueLink.linkedObject" fetch-groups="default" fields="linkedObject"
+ * @jdo.fetch-group name="IssueLink.linkedObjectClass" fetch-groups="default" fields="linkedObjectClass"
+ * @jdo.fetch-group name="IssueLink.issueLinkType" fetch-groups="default" fields="issueLinkType"
  *
- * @jdo.fetch-group name="Issue.issueLinks" fields="issue"
+ * @jdo.fetch-group name="IssueLink.this" fields="issue, issueLinkType, linkedObject, linkedObjectClass"
  */ 
 public class IssueLink
 implements Serializable, DetachCallback
 {
 	public static final String FETCH_GROUP_THIS_ISSUE_LINK = "IssueLink.this";
 	public static final String FETCH_GROUP_ISSUE_LINK_TYPE = "IssueLink.issueLinkType";
-	public static final String FETCH_GROUP_ISSUE = "IssueLink.issue";
+	public static final String FETCH_GROUP_ISSUE_LINKED_OBJECT = "IssueLink.linkedObject";
+	public static final String FETCH_GROUP_ISSUE_LINKED_OBJECT_CLASS = "IssueLink.linkedObjectClass";
+	
 
 	/**
 	 * Virtual fetch-group (not processed by JDO) to obtain the non-persistent property

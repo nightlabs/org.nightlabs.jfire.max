@@ -29,8 +29,6 @@ package org.nightlabs.jfire.accounting;
 import java.util.Map;
 import java.util.Set;
 
-import javax.jdo.Query;
-
 import org.nightlabs.jdo.search.SearchFilter;
 import org.nightlabs.jfire.accounting.id.AccountTypeID;
 import org.nightlabs.jfire.prop.search.PropSearchFilter;
@@ -211,13 +209,6 @@ public class AccountSearchFilter extends SearchFilter<Account>
 	 */
 	public void setPersonFilter(PropSearchFilter personFilter) {
 		this.personFilter = personFilter;
-	}
-
-	@Override
-	protected Query prepareQuery()
-	{
-		// TODO Auto-generated method stub
-		return null;
 	}
 
 	@Override

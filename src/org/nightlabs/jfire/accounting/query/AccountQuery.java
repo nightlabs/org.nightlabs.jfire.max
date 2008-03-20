@@ -28,11 +28,11 @@ public class AccountQuery
 	/**
 	 * the minium balance of the account to search for
 	 */
-	private long minBalance = Long.MIN_VALUE;;
+	private Long minBalance = Long.MIN_VALUE;;
 	/**
 	 * the maximum balance of the account to search for
 	 */
-	private long maxBalance = Long.MAX_VALUE;
+	private Long maxBalance = Long.MAX_VALUE;
 	/**
 	 * the {@link CurrencyID} of the currency to search for
 	 */
@@ -222,7 +222,7 @@ public class AccountQuery
 	 * returns the minBalance.
 	 * @return the minBalance
 	 */
-	public long getMinBalance() {
+	public Long getMinBalance() {
 		return minBalance;
 	}
 
@@ -230,7 +230,7 @@ public class AccountQuery
 	 * set the minBalance
 	 * @param minBalance the minBalance to set
 	 */
-	public void setMinBalance(long minBalance)
+	public void setMinBalance(Long minBalance)
 	{
 		final Long oldMinBalance = this.minBalance;
 		this.minBalance = minBalance;
@@ -241,7 +241,7 @@ public class AccountQuery
 	 * returns the maxBalance.
 	 * @return the maxBalance
 	 */
-	public long getMaxBalance() {
+	public Long getMaxBalance() {
 		return maxBalance;
 	}
 
@@ -249,7 +249,7 @@ public class AccountQuery
 	 * set the maxBalance
 	 * @param maxBalance the maxBalance to set
 	 */
-	public void setMaxBalance(long maxBalance)
+	public void setMaxBalance(Long maxBalance)
 	{
 		final Long oldMaxBalance = this.maxBalance;
 		this.maxBalance = maxBalance;

@@ -39,7 +39,7 @@ extends BaseJDOObjectDAO<PriceFragmentTypeID, PriceFragmentType>
 		monitor.beginTask("Loading Accounts", 1);
 		try {
 			AccountingManager am = AccountingManagerUtil.getHome(SecurityReflector.getInitialContextProperties()).create();
-			return am.getAccounts(objectIDs, fetchGroups, maxFetchDepth);
+			return am.getPriceFragmentTypes(objectIDs, fetchGroups, maxFetchDepth);
 			
 		} catch (Exception e) {
 			monitor.setCanceled(true);

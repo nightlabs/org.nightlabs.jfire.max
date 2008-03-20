@@ -277,7 +277,7 @@ extends AbstractJDOQuery<Repository>
 	{
 		final AnchorID oldOwnerID = this.ownerID;
 		this.ownerID = ownerID;
-		notifyListeners(PROPERTY_ANCHOR_ID, oldOwnerID, ownerID);
+		notifyListeners(PROPERTY_OWNER_ID, oldOwnerID, ownerID);
 	}
 
 	/**

@@ -28,17 +28,18 @@ public class AccountQuery
 	/**
 	 * the minium balance of the account to search for
 	 */
-	private Long minBalance = Long.MIN_VALUE;;
+	private Long minBalance = null;
 	/**
 	 * the maximum balance of the account to search for
 	 */
-	private Long maxBalance = Long.MAX_VALUE;
+	private Long maxBalance = null;
 	/**
 	 * the {@link CurrencyID} of the currency to search for
 	 */
 	private CurrencyID currencyID = null;
 	
-	@SuppressWarnings("unused") // used as parameter in the JDOQL
+	//used as parameter in the JDOQL, see reflective collecting of params in AbstractJDOQuery.
+	@SuppressWarnings("unused")
 	private transient Currency currency = null;
 	/**
 	 * the accountName of the account to search for
@@ -154,10 +155,10 @@ public class AccountQuery
 			filter.append("\n && this.accountType == :accountType");
 		}
 
-		if (minBalance != Long.MIN_VALUE)
+		if (minBalance != null)
 			filter.append("\n && this.balance >= :minBalance");
 			
-		if (maxBalance != Long.MAX_VALUE)
+		if (maxBalance != null)
 			filter.append("\n && this.balance <= :maxBalance");
 		
 		if (anchorTypeID != null)

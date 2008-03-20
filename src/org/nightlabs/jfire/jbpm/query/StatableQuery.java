@@ -9,7 +9,6 @@ import org.apache.log4j.Logger;
 import org.nightlabs.jdo.query.AbstractJDOQuery;
 import org.nightlabs.jdo.query.AbstractSearchQuery;
 import org.nightlabs.jfire.jbpm.graph.def.Statable;
-import org.nightlabs.jfire.jbpm.graph.def.State;
 import org.nightlabs.jfire.trade.state.id.StateDefinitionID;
 
 /**
@@ -95,7 +94,7 @@ public class StatableQuery
 		Query q = getPersistenceManager().newQuery(getStatableClass());
 		StringBuffer filter = new StringBuffer();
 		
-		filter.append(" true");
+		filter.append("true");
 		
 		if (stateDefinitionID != null)
 		{
@@ -107,8 +106,8 @@ public class StatableQuery
 						"stateVar.stateDefinition.stateDefinitionID == \""+stateDefinitionID.stateDefinitionID+"\"" +
 						"))");
 				
-				q.declareImports("import "+State.class.getName());
-				q.declareVariables(State.class.getName()+" stateVar");
+//				q.declareImports("import "+State.class.getName());
+//				q.declareVariables(State.class.getName()+" stateVar");
 			} else {
 				// TODO: JDOHelper.getObjectId(this.*) does not seem to work (java.lang.IndexOutOfBoundsException: Index: 3, Size: 3)
 //				filter.append("\n && JDOHelper.getObjectId(this.stateDefinition) == :stateDefinitionID");

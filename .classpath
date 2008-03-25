@@ -27,7 +27,7 @@
 	<classpathentry combineaccessrules="false" kind="src" path="/JFireJbpm"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/JFireBaseClientLib"/>
 	<classpathentry kind="var" path="ASM"/>
-	<classpathentry combineaccessrules="false" kind="src" path="/NightLabsJDOQuery"/>
+	<classpathentry combineaccessrules="false" kind="src" path="/NightLabsQueryJDO"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/NightLabsQuery"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/NightLabsJDO"/>
 	<classpathentry kind="output" path="bin"/>

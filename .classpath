@@ -30,5 +30,7 @@
 	<classpathentry kind="var" path="WORKSPACE/JFireJbpm/lib/jbpm/jbpm-3.1.4.jar"/>
 	<classpathentry kind="var" path="ASM"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/JFireNumericOrganisationID"/>
+	<classpathentry combineaccessrules="false" kind="src" path="/NightLabsJDOQuery"/>
+	<classpathentry combineaccessrules="false" kind="src" path="/NightLabsQuery"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>

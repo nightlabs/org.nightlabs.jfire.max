@@ -27,7 +27,7 @@
 	<classpathentry kind="lib" path="lib/jbpm/jbpm-3.1.4.jar" sourcepath="lib/jbpm/jbpm-3.1.4.zip"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/JFireBaseClientLib"/>
 	<classpathentry kind="var" path="ASM"/>
-	<classpathentry combineaccessrules="false" kind="src" path="/NightLabsJDOQuery"/>
+	<classpathentry combineaccessrules="false" kind="src" path="/NightLabsQueryJDO"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/NightLabsQuery"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>

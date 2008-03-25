@@ -37,7 +37,7 @@
 	<classpathentry kind="lib" path="dist/birt/lib/com.ibm.icu_3.6.1.v20070417.jar"/>
 	<classpathentry kind="var" path="APACHE_COMMONS/commons-lang.jar"/>
 	<classpathentry kind="var" path="ASM"/>
-	<classpathentry combineaccessrules="false" kind="src" path="/NightLabsJDOQuery"/>
+	<classpathentry combineaccessrules="false" kind="src" path="/NightLabsQueryJDO"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/NightLabsQuery"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>

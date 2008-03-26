@@ -126,6 +126,7 @@ implements Serializable, DetachCallback
 
 		this.organisationID = organisationID;
 //		this.issueID = issue.getIssueID();
+		this.issue = issue;
 		this.issueLinkID = issueLinkID;
 
 		this.linkedObject = linkedObject;

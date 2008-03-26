@@ -1,13 +1,9 @@
 package org.nightlabs.jfire.issue.dao;
 
-import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 import java.util.Set;
 
-import javax.jdo.FetchPlan;
-
-import org.nightlabs.jdo.NLJDOHelper;
 import org.nightlabs.jfire.base.jdo.BaseJDOObjectDAO;
 import org.nightlabs.jfire.issue.IssueManager;
 import org.nightlabs.jfire.issue.IssueManagerUtil;
@@ -15,7 +11,6 @@ import org.nightlabs.jfire.issue.IssueSeverityType;
 import org.nightlabs.jfire.issue.id.IssueSeverityTypeID;
 import org.nightlabs.jfire.security.SecurityReflector;
 import org.nightlabs.progress.ProgressMonitor;
-import org.nightlabs.progress.SubProgressMonitor;
 
 public class IssueSeverityTypeDAO
 		extends BaseJDOObjectDAO<IssueSeverityTypeID, IssueSeverityType>
@@ -41,36 +36,29 @@ public class IssueSeverityTypeDAO
 			String[] fetchGroups, int maxFetchDepth, ProgressMonitor monitor)
 			throws Exception
 	{
-		monitor.beginTask("Fetching IssueSeverityTypes...", 1); //$NON-NLS-1$
+		monitor.beginTask("Fetching "+objectIDs.size()+" severity types information", 1);
+		Collection<IssueSeverityType> issueSeverityTypes;
 		try {
 			IssueManager im = IssueManagerUtil.getHome(SecurityReflector.getInitialContextProperties()).create();
+			issueSeverityTypes = im.getIssueSeverityTypes(objectIDs, fetchGroups, maxFetchDepth);
 			monitor.worked(1);
-			return im.getIssueSeverityTypes(objectIDs, fetchGroups, maxFetchDepth);	
 		} catch (Exception e) {
-			monitor.setCanceled(true);
-			throw e;
-		} finally {
 			monitor.done();
+			throw new RuntimeException("Failed downloading severity types information!", e);
 		}
+		
+		monitor.done();
+		return issueSeverityTypes;
 	}
-
-	private static final String[] FETCH_GROUPS = { IssueSeverityType.FETCH_GROUP_THIS_ISSUE_SEVERITY_TYPE, FetchPlan.DEFAULT };
 
 	public synchronized IssueSeverityType getIssueSeverityType(IssueSeverityTypeID issueSeverityTypeID, String[] fetchGroups, int maxFetchDepth, ProgressMonitor monitor)
 	{
-		monitor.beginTask("Loading issueSeverityType "+issueSeverityTypeID.issueSeverityTypeID, 1);
-		IssueSeverityType issueSeverityType = getJDOObject(null, issueSeverityTypeID, fetchGroups, maxFetchDepth, new SubProgressMonitor(monitor, 1));
-		monitor.done();
-		return issueSeverityType;
+		return getJDOObject(null, issueSeverityTypeID, fetchGroups, maxFetchDepth, monitor);
 	}
 	
-	public List<IssueSeverityType> getIssueSeverityTypes(ProgressMonitor monitor)
+	public List<IssueSeverityType> getIssueSeverityTypes(Set<IssueSeverityTypeID> issueSeverityTypeIDs, String[] fetchGroups, int maxFetchDepth, ProgressMonitor monitor)
 	{
-		try {
-			return new ArrayList<IssueSeverityType>(retrieveJDOObjects(null, FETCH_GROUPS, NLJDOHelper.MAX_FETCH_DEPTH_NO_LIMIT, monitor));
-		} catch (Exception e) {
-			throw new RuntimeException("Error while fetching issue severity types: " + e.getMessage(), e); //$NON-NLS-1$
-		} 
+		return getJDOObjects(null, issueSeverityTypeIDs, fetchGroups, maxFetchDepth, monitor);
 	}
 
 	public IssueSeverityType storeIssueSeverityType(IssueSeverityType issueSeverityType, boolean get, String[] fetchGroups, int maxFetchDepth, ProgressMonitor monitor)

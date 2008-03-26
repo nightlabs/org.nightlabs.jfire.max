@@ -56,7 +56,8 @@ import org.nightlabs.jfire.jbpm.graph.def.State;
  */
 public class IssueManagerBean 
 extends BaseSessionBeanImpl
-implements SessionBean{
+implements SessionBean
+{
 
 	private static final long serialVersionUID = 1L;
 	/**
@@ -71,6 +72,7 @@ implements SessionBean{
 		logger.debug(this.getClass().getName() + ".setSessionContext("+sessionContext+")");
 		super.setSessionContext(sessionContext);
 	}
+	
 	/**
 	 * @ejb.create-method  
 	 * @ejb.permission role-name="_Guest_"
@@ -80,6 +82,7 @@ implements SessionBean{
 	{
 		logger.debug(this.getClass().getName() + ".ejbCreate()");
 	}
+	
 	/**
 	 * @see javax.ejb.SessionBean#ejbRemove()
 	 * 
@@ -292,28 +295,36 @@ implements SessionBean{
 		}
 	}
 
-	/**
-	 * @throws ModuleException
-	 *
-	 * @ejb.interface-method
-	 * @ejb.transaction type="Required"
-	 * @ejb.permission role-name="_Guest_"
-	 */
-	public Collection getIssueTypes(String[] fetchGroups, int maxFetchDepth)
-	throws ModuleException
-	{
-		PersistenceManager pm = getPersistenceManager();
-		try {
-			pm.getFetchPlan().setMaxFetchDepth(maxFetchDepth);
-			if (fetchGroups != null)
-				pm.getFetchPlan().setGroups(fetchGroups);
-
-			Query q = pm.newQuery(IssueType.class);
-			return pm.detachCopyAll((Collection)q.execute());
-		} finally {
-			pm.close();
-		}
-	}
+//	/**
+//	 * @throws ModuleException
+//	 *
+//	 * @ejb.interface-method
+//	 * @ejb.transaction type="Required"
+//	 * @ejb.permission role-name="_Guest_"
+//	 */
+//	public Collection getIssueTypes(String[] fetchGroups, int maxFetchDepth)
+//	throws ModuleException
+//	{
+//		PersistenceManager pm = getPersistenceManager();
+//		try {
+//			return NLJDOHelper.getDetachedObjectList(pm, userGroupIDs, null, fetchGroups, maxFetchDepth);
+//		}
+//		finally {
+//			pm.close();
+//		}
+//		
+//		PersistenceManager pm = getPersistenceManager();
+//		try {
+//			pm.getFetchPlan().setMaxFetchDepth(maxFetchDepth);
+//			if (fetchGroups != null)
+//				pm.getFetchPlan().setGroups(fetchGroups);
+//
+//			Query q = pm.newQuery(IssueType.class);
+//			return pm.detachCopyAll((Collection)q.execute());
+//		} finally {
+//			pm.close();
+//		}
+//	}
 	
 	/**
 	 * @ejb.interface-method
@@ -904,7 +915,6 @@ implements SessionBean{
 			issueLinkType.getName().setText(Locale.ENGLISH.getLanguage(), "Duplicate");
 			issueLinkType.getLinkableObjectClassNames().add("org.nightlabs.jfire.issue.Issue");
 			issueLinkType = pm.makePersistent(issueLinkType);
-			////////////////////////////////////////////////////////
 			
 			EditLockType issueEditLock = new EditLockType(EditLockTypeIssue.EDIT_LOCK_TYPE_ID);
 			issueEditLock = pm.makePersistent(issueEditLock);

@@ -57,15 +57,6 @@ public class IssueCommentDAO extends BaseJDOObjectDAO<IssueCommentID, IssueComme
 //		return getJDOObjects(null, issueTypeIDs, fetchgroups, maxFetchDepth, monitor);
 //	}
 
-	public synchronized Collection<IssueType> getIssueTypes(String[] fetchgroups, int maxFetchDepth, ProgressMonitor monitor) 
-	{
-		try {
-			IssueManager im = IssueManagerUtil.getHome(SecurityReflector.getInitialContextProperties()).create();
-			return im.getIssueTypes(fetchgroups, maxFetchDepth);
-		} catch (Exception e) {
-			throw new RuntimeException(e);
-		}
-	}
 	
 	public synchronized IssueComment storeIssueComment(IssueComment issueComment, String[] fetchgroups, int maxFetchDepth, ProgressMonitor monitor) 
 	{

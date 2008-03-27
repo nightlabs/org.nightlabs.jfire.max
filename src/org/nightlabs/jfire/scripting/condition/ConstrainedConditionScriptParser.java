@@ -163,6 +163,7 @@ public class ConstrainedConditionScriptParser
 			int lastIndex = text.lastIndexOf(generator.getCloseContainerString());
 			text = text.substring(firstIndex+1, lastIndex);
 			return parseConditionContainer(text, generator, simpleStringCondition);
+//			return parseConditionContainer(text, generator, true);
 		}
 		else {
 			ConditionContainer conditionContainer = new ConditionContainer();
@@ -192,7 +193,7 @@ public class ConstrainedConditionScriptParser
 					sb.append(string+" , ");
 				}
 				throw new IllegalArgumentException("Param text "+text+" does not contain any of " +
-						" the following combineOperators!");
+						" the following combineOperators: "+sb.toString());
 			}
 		}
 	}

@@ -341,6 +341,25 @@ implements SessionBean
 			pm.close();
 		}
 	}
+
+	/**
+	 * @ejb.interface-method
+	 * @ejb.transaction type="Supports"
+	 * @ejb.permission role-name="_Guest_"
+	 */
+	public Set<IssueTypeID> getAllIssueTypeIDs()
+	{
+		PersistenceManager pm = getPersistenceManager();
+		try
+		{
+			final Query allIDsQuery = pm.newNamedQuery(IssueType.class, IssueType.QUERY_ALL_ISSUETYPE_IDS);
+			return new HashSet<IssueTypeID>((Collection<IssueTypeID>)allIDsQuery.execute());
+		}
+		finally
+		{
+			pm.close();
+		}
+	}
 	
 	/**
 	 * @throws ModuleException

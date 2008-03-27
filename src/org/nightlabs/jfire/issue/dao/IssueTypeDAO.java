@@ -75,7 +75,7 @@ public class IssueTypeDAO extends BaseJDOObjectDAO<IssueTypeID, IssueType>
 	 * 					object, <code>monitor.worked(1)</code> will be called.
 	 * @return The requested issue object
 	 */
-	public synchronized IssueType getIssueType(IssueTypeID issueTypeID, String[] fetchGroups, int maxFetchDepth, ProgressMonitor monitor)
+	public IssueType getIssueType(IssueTypeID issueTypeID, String[] fetchGroups, int maxFetchDepth, ProgressMonitor monitor)
 	{
 		monitor.beginTask("Loading issueType " + issueTypeID.issueTypeID, 1);
 		IssueType issueType = getJDOObject(null, issueTypeID, fetchGroups, maxFetchDepth, new SubProgressMonitor(monitor, 1));
@@ -83,12 +83,33 @@ public class IssueTypeDAO extends BaseJDOObjectDAO<IssueTypeID, IssueType>
 		return issueType;
 	}
 	
-	public synchronized List<IssueType> getIssueTypes(Set<IssueTypeID> issueTypeIDs, String[] fetchgroups, int maxFetchDepth, ProgressMonitor monitor) 
+	public List<IssueType> getIssueTypes(Set<IssueTypeID> issueTypeIDs, String[] fetchgroups, int maxFetchDepth, ProgressMonitor monitor) 
 	{
 		monitor.beginTask("Loading issueTypes ", 1);
 		List<IssueType> issueTypes = getJDOObjects(null, issueTypeIDs, fetchgroups, maxFetchDepth, new SubProgressMonitor(monitor, 1)); 
 		monitor.done();
 		return issueTypes;
+	}
+	
+	@SuppressWarnings("unchecked")
+	public List<IssueType> getAllIssueTypes(String[] fetchgroups, int maxFetchDepth, ProgressMonitor monitor)
+	{
+		monitor.beginTask("Fetching all IssueTypes", 100);
+		try {
+			IssueManager im = IssueManagerUtil.getHome(SecurityReflector.getInitialContextProperties()).create();
+			monitor.worked(20);
+			Set<IssueTypeID> allTypeIDs = im.getAllIssueTypeIDs();
+			List<IssueType> allTypes = getIssueTypes(allTypeIDs, fetchgroups, maxFetchDepth, new SubProgressMonitor(monitor, 80));
+			monitor.done();
+			return allTypes;
+		}
+		catch (Exception e) {
+			monitor.setCanceled(true);
+			if (e instanceof RuntimeException)
+				throw (RuntimeException)e;
+			
+			throw new RuntimeException(e);
+		}
 	}
 
 //	/**

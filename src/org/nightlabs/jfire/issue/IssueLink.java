@@ -33,19 +33,19 @@ import org.nightlabs.util.Util;
  *			this.issueID == :issueID &&
  *			this.issueLinkObjectID == :linkedObjectID                    
  *
- * @jdo.fetch-group name="IssueLink.linkedObject" fetch-groups="default" fields="linkedObject"
+ * @jdo.fetch-group name="IssueLink.linkedObjectID" fetch-groups="default" fields="linkedObjectID"
  * @jdo.fetch-group name="IssueLink.linkedObjectClass" fetch-groups="default" fields="linkedObjectClass"
  * @jdo.fetch-group name="IssueLink.issueLinkType" fetch-groups="default" fields="issueLinkType"
  *
- * @jdo.fetch-group name="IssueLink.this" fields="issue, issueLinkType, linkedObject, linkedObjectClass"
+ * @jdo.fetch-group name="IssueLink.this" fields="issue, issueLinkType, linkedObjectID"
  */ 
 public class IssueLink
 implements Serializable, DetachCallback
 {
 	public static final String FETCH_GROUP_THIS_ISSUE_LINK = "IssueLink.this";
 	public static final String FETCH_GROUP_ISSUE_LINK_TYPE = "IssueLink.issueLinkType";
-	public static final String FETCH_GROUP_ISSUE_LINKED_OBJECT = "IssueLink.linkedObject";
-	public static final String FETCH_GROUP_ISSUE_LINKED_OBJECT_CLASS = "IssueLink.linkedObjectClass";
+	public static final String FETCH_GROUP_ISSUE_LINKED_OBJECT_ID = "IssueLink.linkedObjectID";
+//	public static final String FETCH_GROUP_ISSUE_LINKED_OBJECT_CLASS = "IssueLink.linkedObjectClass";
 	
 
 	/**
@@ -107,6 +107,7 @@ implements Serializable, DetachCallback
 	/**
 	 * @deprecated Only for JDO!!!!
 	 */
+	@Deprecated
 	protected IssueLink() {}
 
 	public IssueLink(String organisationID, long issueLinkID, Issue issue, IssueLinkType issueLinkType, Object linkedObject) {

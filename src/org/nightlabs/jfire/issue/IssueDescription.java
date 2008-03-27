@@ -22,8 +22,8 @@ import org.nightlabs.i18n.I18nText;
  * @jdo.fetch-group name="Issue.description" fields="issue, descriptions"
  */ 
 public class IssueDescription 
-extends I18nText{
-	
+	extends I18nText
+{
 	/**
 	 * The serial version of this class.
 	 */
@@ -52,9 +52,7 @@ extends I18nText{
 	 * 
 	 * @jdo.field
 	 *		persistence-modifier="persistent"
-	 *		collection-type="map"
-	 *		key-type="java.lang.String"
-	 *		value-type="java.lang.String"
+	 *		default-fetch-group="true"
 	 *		table="JFireIssueTracking_IssueDescription_descriptions"
 	 *		null-value="exception"
 	 *
@@ -65,6 +63,7 @@ extends I18nText{
 	/**
 	 * @deprecated Only for JDO!
 	 */
+	@Deprecated
 	protected IssueDescription()
 	{
 	}
@@ -94,6 +93,7 @@ extends I18nText{
 	/**
 	 * @see org.nightlabs.i18n.I18nText#getI18nMap()
 	 */
+	@Override
 	protected Map<String, String> getI18nMap()
 	{
 		return descriptions;
@@ -102,6 +102,7 @@ extends I18nText{
 	/**
 	 * @see org.nightlabs.i18n.I18nText#getFallBackValue(java.lang.String)
 	 */
+	@Override
 	protected String getFallBackValue(String languageID)
 	{
 		return issue == null ? languageID : "";

@@ -51,6 +51,8 @@ import org.nightlabs.util.Util;
  * @jdo.fetch-group name="IssueType.issueResolutions" fetch-groups="default" fields="issueResolutions"
  * @jdo.fetch-group name="IssueType.processDefinition" fetch-groups="default" fields="processDefinition"
  * @jdo.fetch-group name="IssueType.this" fetch-groups="default" fields="name, issuePriorities, issueSeverityTypes, issueResolutions, processDefinition"
+ * 
+ * @jdo.query name="getAllIssueTypeIDs" query="SELECT JDOHelper.getObjectId(this)"
  */
 public class IssueType
 implements Serializable{
@@ -61,6 +63,8 @@ implements Serializable{
 	public static final String FETCH_GROUP_ISSUE_PRIORITIES = "IssueType.issuePriorities";
 	public static final String FETCH_GROUP_ISSUE_SEVERITY_TYPES = "IssueType.issueSeverityTypes";
 	public static final String FETCH_GROUP_ISSUE_RESOLUTIONS = "IssueType.issueResolutions";
+	
+	public static final String QUERY_ALL_ISSUETYPE_IDS = "getAllIssueTypeIDs";
 	
 	/**
 	 * @jdo.field primary-key="true"
@@ -129,6 +133,7 @@ implements Serializable{
 	/**
 	 * @deprecated Only for JDO!!!! 
 	 */
+	@Deprecated
 	protected IssueType() { }
 
 	public IssueType(String organisationID, String issueTypeID) {

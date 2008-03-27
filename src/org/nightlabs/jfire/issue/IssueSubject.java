@@ -24,8 +24,8 @@ import org.nightlabs.jdo.ObjectIDUtil;
  * @jdo.fetch-group name="Issue.subject" fields="issue, names"
  */ 
 public class IssueSubject 
-extends I18nText{
-	
+	extends I18nText
+{	
 	public static final String FETCH_GROUP_THIS_ISSUE_SUBJECT_NAMES = "IssueSubject.names";
 	
 	/**
@@ -55,9 +55,7 @@ extends I18nText{
 	 * 
 	 * @jdo.field
 	 *		persistence-modifier="persistent"
-	 *		collection-type="map"
-	 *		key-type="java.lang.String"
-	 *		value-type="java.lang.String"
+	 *		default-fetch-group="true"
 	 *		table="JFireIssueTracking_IssueSubject_names"
 	 *		null-value="exception"
 	 *
@@ -68,6 +66,7 @@ extends I18nText{
 	/**
 	 * @deprecated Only for JDO!
 	 */
+	@Deprecated
 	protected IssueSubject() { }
 
 	public IssueSubject(Issue issue)

@@ -39,7 +39,6 @@ import javax.jdo.PersistenceManager;
 import javax.jdo.listener.AttachCallback;
 import javax.jdo.listener.DeleteCallback;
 
-import org.apache.log4j.Logger;
 import org.nightlabs.jdo.ObjectID;
 import org.nightlabs.jfire.idgenerator.IDGenerator;
 import org.nightlabs.jfire.jbpm.graph.def.Statable;
@@ -89,7 +88,10 @@ import org.nightlabs.util.Util;
  * @jdo.fetch-group name="Issue.reporter" fields="reporter"
  * @jdo.fetch-group name="Issue.assignee" fields="assignee"
  *
- * @jdo.fetch-group name="Issue.this" fetch-groups="default" fields="fileList, issueType, issueLinks, description, subject, issuePriority, issueSeverityType, issueResolution, state, states, comments, issueLocal, reporter, assignee"
+ * @jdo.fetch-group name="Issue.this" fetch-groups="default"
+ * 	fields="fileList, description, subject, issuePriority, issueSeverityType, issueResolution, 
+ * 					state, states, issueLocal, issueType, comments, issueLinks, propertySet,reporter,
+ * 					assignee"
  *
  * @jdo.fetch-group name="Statable.state" fields="state"
  * @jdo.fetch-group name="Statable.states" fields="states"
@@ -99,7 +101,7 @@ implements 	Serializable, AttachCallback, Statable, DeleteCallback
 {
 
 	private static final long serialVersionUID = 1L;
-	private static final Logger logger = Logger.getLogger(Issue.class);
+//	private static final Logger logger = Logger.getLogger(Issue.class);
 
 	public static final String FETCH_GROUP_THIS_ISSUE = "Issue.this";
 	public static final String FETCH_GROUP_DESCRIPTION = "Issue.description";
@@ -285,6 +287,7 @@ implements 	Serializable, AttachCallback, Statable, DeleteCallback
 	/**
 	 * @deprecated Constructor exists only for JDO! 
 	 */
+	@Deprecated
 	protected Issue() { }
 
 	public Issue(String organisationID, long issueID)

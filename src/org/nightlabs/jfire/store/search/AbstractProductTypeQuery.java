@@ -62,12 +62,15 @@ public abstract class AbstractProductTypeQuery<P extends ProductType>
 	public static final String PROPERTY_PUBLISHED = PROPERTY_PREFIX + "published";
 	public static final String PROPERTY_SALEABLE = PROPERTY_PREFIX + "saleable";
 
+	protected Query createQuery()
+	{
+		return getPersistenceManager().newQuery(getResultType());
+	}
+	
 	@Override
 	protected Query prepareQuery()
 	{
-		// FIXME: Query also subclasses when JPOX problem is solved
-		Query q = getPersistenceManager().newQuery(getPersistenceManager().getExtent(
-				ProductType.class, false));
+		Query q = createQuery(); 
 		
 		StringBuffer filter = getFilter();
 		StringBuffer vars = getVars();

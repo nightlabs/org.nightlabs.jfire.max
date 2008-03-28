@@ -1,5 +1,7 @@
 package org.nightlabs.jfire.store.search;
 
+import javax.jdo.Query;
+
 import org.nightlabs.jfire.store.ProductType;
 
 /**
@@ -9,7 +11,6 @@ import org.nightlabs.jfire.store.ProductType;
 public class BaseProductTypeQuery
 	extends AbstractProductTypeQuery<ProductType>
 {
-
 	/**
 	 * The serial version id.
 	 */
@@ -19,6 +20,14 @@ public class BaseProductTypeQuery
 	protected Class<ProductType> init()
 	{
 		return ProductType.class;
+	}
+	
+	@Override
+	protected Query createQuery()
+	{
+		return getPersistenceManager().newQuery(
+			getPersistenceManager().getExtent(getResultType(), true)
+			);
 	}
 
 }

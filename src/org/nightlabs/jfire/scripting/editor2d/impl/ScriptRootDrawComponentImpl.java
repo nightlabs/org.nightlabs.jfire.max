@@ -114,26 +114,22 @@ implements ScriptRootDrawComponent
 	}
 
 	public Map<Long, Script> getVisibleScripts() {
-		return getVisibleScripts(this);
+		// TODO all DrawComponents with a visibleScript should already be cached
+		// when visibleScript is assigned		
+		return getVisibleScripts(this, new HashMap<Long, Script>());
 	}
 	
 //	private static final Map<Long, Script> EMPTY_MAP = new HashMap<Long, Script>(0);
-	protected Map<Long, Script> getVisibleScripts(DrawComponentContainer dcc)
+	protected Map<Long, Script> getVisibleScripts(DrawComponent dc, Map<Long, Script> dcID2VisibleScript)
 	{
-		// TODO all DrawComponents with a visibleScript should already be cached
-		// when visibleScript is assigned
-		Map<Long, Script> dcID2VisibleScript = new HashMap<Long, Script>();
-		for (DrawComponent dc : dcc.getDrawComponents())
-		{
-			if (dc instanceof DrawComponentContainer) {
-				DrawComponentContainer container = (DrawComponentContainer) dc;
-				dcID2VisibleScript.putAll(getVisibleScripts(container));
-			}
-			else {
-				Script script = (Script) dc.getProperties().get(ScriptingConstants.PROP_VISIBLE_SCRIPT);
-				if (script != null) {
-					 dcID2VisibleScript.put(dc.getId(), script);
-				}
+		Script script = (Script) dc.getProperties().get(ScriptingConstants.PROP_VISIBLE_SCRIPT);
+		if (script != null) {
+			 dcID2VisibleScript.put(dc.getId(), script);
+		}
+		if (dc instanceof DrawComponentContainer) {
+			DrawComponentContainer dcc = (DrawComponentContainer) dc;
+			for (DrawComponent child : dcc.getDrawComponents()) {
+				dcID2VisibleScript.putAll(getVisibleScripts(child, dcID2VisibleScript));
 			}
 		}
 		return dcID2VisibleScript;

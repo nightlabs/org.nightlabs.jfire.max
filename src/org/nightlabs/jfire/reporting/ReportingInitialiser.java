@@ -779,7 +779,7 @@ public class ReportingInitialiser {
 			// check if its the default use case
 			boolean defUseCase = false;
 			String defaultStr = NLDOMUtil.getAttributeValue(useCaseNode, "default");
-			if (defaultStr != null || "".equals(defaultStr.trim())) {
+			if (defaultStr != null && ! "".equals(defaultStr.trim())) {
 				try {
 					defUseCase = Boolean.parseBoolean(defaultStr);
 				} catch (Exception e) {

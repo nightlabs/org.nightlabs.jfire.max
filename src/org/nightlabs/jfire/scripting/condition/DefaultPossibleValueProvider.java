@@ -78,7 +78,7 @@ extends PossibleValueProvider
 		ScriptRegistry scriptRegistry = ScriptRegistry.getScriptRegistry(pm);
 		Script script = scriptRegistry.getScript(getScriptRegistryItemType(),
 				getScriptRegistryItemID());
-		List scripts = new ArrayList<Script>(1);
+		List<Script> scripts = new ArrayList<Script>(1);
 		scripts.add(script);
 		try {
 			Map<ScriptRegistryItemID, Object> results = scriptRegistry.execute(scripts, parameterValues);
@@ -105,7 +105,7 @@ extends PossibleValueProvider
 		} catch (Exception e) {
 			logger.error("getPossibleValues() produced the following error "+e);
 		}
-		return Collections.EMPTY_LIST;
+		return Collections.emptyList();
 	}
 	 
 }

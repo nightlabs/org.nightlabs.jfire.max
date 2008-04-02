@@ -140,7 +140,7 @@ implements SessionBean
 		catch (JDOObjectNotFoundException e) {
 			// If no valueprovider is registered use the default
 			PossibleValueProvider provider = PossibleValueProvider.getDefaultPossibleValueProvider(getPersistenceManager(), script);
-			possibleValues = provider.getPossibleValues(parameterValues, valueLimit);
+			possibleValues = provider.getPossibleValues(parameterValues, valueLimit);			
 			logger.info("No possible values found for ScriptRegistryItemID "+scriptRegistryItemID+", use DefaultPossibleValueProvider!");
 		}
 		
@@ -150,14 +150,14 @@ implements SessionBean
 				variableName, compareOperators, possibleValues, valueLabelProviderClassName);
 //		sc.setPossibleValuesAreObjectIDs(script.isNeedsDetach());
 		
-//		if (logger.isDebugEnabled()) {
-			logger.info("scriptRegistryItemID = "+scriptRegistryItemID);
-			logger.info("variableName = "+variableName);
-			logger.info("scriptResultClass = "+script.getResultClassName());
-			logger.info("compareOperators.size() = "+compareOperators.size());
-			logger.info("possibleValues.size() = "+possibleValues.size());
-			logger.info("valueLabelProviderClassName = "+valueLabelProviderClassName);
-//		}
+		if (logger.isDebugEnabled()) {
+			logger.debug("scriptRegistryItemID = "+scriptRegistryItemID);
+			logger.debug("variableName = "+variableName);
+			logger.debug("scriptResultClass = "+script.getResultClassName());
+			logger.debug("compareOperators.size() = "+compareOperators.size());
+			logger.debug("possibleValues.size() = "+possibleValues.size());
+			logger.debug("valueLabelProviderClassName = "+valueLabelProviderClassName);
+		}
 		return sc;
 	}
 

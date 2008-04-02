@@ -86,6 +86,10 @@ public class ConstrainedConditionScriptParser
 				}
 				else {
 					valueString2Value.put(String.valueOf(value), value);
+					if (logger.isDebugEnabled()) {
+						logger.debug("valueString = "+String.valueOf(value));
+						logger.debug("value = "+value);
+					}
 				}
 			}
 		}

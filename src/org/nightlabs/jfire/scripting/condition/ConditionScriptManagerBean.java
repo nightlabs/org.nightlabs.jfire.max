@@ -164,7 +164,7 @@ implements SessionBean
 	/**
 	 * @ejb.interface-method
 	 * @ejb.permission role-name="_Guest_"
-	 * @ejb.transaction type="Supports" @!This usually means that no transaction is opened which is significantly faster and recommended for all read-only EJB methods! Marco.
+	 * @ejb.transaction type="Required" @!Is required because {@link #getScriptConditioner(PersistenceManager, ScriptRegistryItemID, Map, int)} can persist data
 	 */
 	public ScriptConditioner getScriptConditioner(ScriptRegistryItemID scriptRegistryItemID,
 			Map<String, Object> parameterValues, int valueLimit)
@@ -180,7 +180,7 @@ implements SessionBean
 	/**
 	 * @ejb.interface-method
 	 * @ejb.permission role-name="_Guest_"
-	 * @ejb.transaction type="Supports" @!This usually means that no transaction is opened which is significantly faster and recommended for all read-only EJB methods! Marco.
+	 * @ejb.transaction type="Required" @!Is required because {@link #getScriptConditioner(PersistenceManager, ScriptRegistryItemID, Map, int)} can persist data
 	 */
 	public Map<ScriptRegistryItemID, ScriptConditioner> getScriptConditioner(
 			Map<ScriptRegistryItemID, Map<String, Object>> scriptID2Paramters, int valueLimit)
@@ -192,7 +192,7 @@ implements SessionBean
 	/**
 	 * @ejb.interface-method
 	 * @ejb.permission role-name="_Guest_"
-	 * @ejb.transaction type="Supports" @!This usually means that no transaction is opened which is significantly faster and recommended for all read-only EJB methods! Marco.
+	 * @ejb.transaction type="Required" @!Is required because {@link #getScriptConditioner(PersistenceManager, ScriptRegistryItemID, Map, int)} can persist data
 	 */
 	public Map<ScriptRegistryItemID, ScriptConditioner> getScriptConditioner(
 			PersistenceManager pm, Map<ScriptRegistryItemID,
@@ -210,7 +210,7 @@ implements SessionBean
 	/**
 	 * @ejb.interface-method
 	 * @ejb.permission role-name="_Guest_"
-	 * @ejb.transaction type="Supports" @!This usually means that no transaction is opened which is significantly faster and recommended for all read-only EJB methods! Marco.
+	 * @ejb.transaction type="Required" @!Is required because {@link #getScriptConditioner(PersistenceManager, ScriptRegistryItemID, Map, int)} can persist data
 	 */
 	public Set<ScriptRegistryItemID> getConditionContextScriptIDs(ConditionContextProviderID providerID)
 	{

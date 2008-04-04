@@ -38,19 +38,19 @@ public class StatableQuery
 		
 		if (allFields || PROPERTY_ONLY_IN_SELECTED_STATE.equals(propertyName))
 		{
-			changedFields.add( new FieldChangeCarrier(propertyName, onlyInSelectedState) );
+			changedFields.add( new FieldChangeCarrier(PROPERTY_ONLY_IN_SELECTED_STATE, onlyInSelectedState) );
 		}
 		if (allFields || PROPERTY_STATE_CREATE_DATE_MAX.equals(propertyName))
 		{
-			changedFields.add( new FieldChangeCarrier(propertyName, stateCreateDTMax) );
+			changedFields.add( new FieldChangeCarrier(PROPERTY_STATE_CREATE_DATE_MAX, stateCreateDTMax) );
 		}
 		if (allFields || PROPERTY_STATE_CREATE_DATE_MIN.equals(propertyName))
 		{
-			changedFields.add( new FieldChangeCarrier(propertyName, stateCreateDTMin) );
+			changedFields.add( new FieldChangeCarrier(PROPERTY_STATE_CREATE_DATE_MIN, stateCreateDTMin) );
 		}
 		if (allFields || PROPERTY_STATE_DEFINITION_ID.equals(propertyName))
 		{
-			changedFields.add( new FieldChangeCarrier(propertyName, stateDefinitionID) );
+			changedFields.add( new FieldChangeCarrier(PROPERTY_STATE_DEFINITION_ID, stateDefinitionID) );
 		}
 		
 		return changedFields;

@@ -204,4 +204,10 @@ public class StatableQuery
 		return Statable.class;
 	}
 	
+	@Override
+	protected Class<? extends Statable> getResultType()
+	{
+		return statableClass != null ? statableClass : super.getResultType();
+	}
+	
 }

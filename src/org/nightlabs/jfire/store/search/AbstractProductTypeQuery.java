@@ -489,59 +489,59 @@ public abstract class AbstractProductTypeQuery<P extends ProductType>
 		
 		if (allFields || PROPERTY_AVAILABLE.equals(propertyName))
 		{
-			changedFields.add( new FieldChangeCarrier(propertyName, available) );
+			changedFields.add( new FieldChangeCarrier(PROPERTY_AVAILABLE, available) );
 		}
 		if (allFields || PROPERTY_CLOSED.equals(propertyName))
 		{
-			changedFields.add( new FieldChangeCarrier(propertyName, closed) );
+			changedFields.add( new FieldChangeCarrier(PROPERTY_CLOSED, closed) );
 		}
 		if (allFields || PROPERTY_CONFIRMED.equals(propertyName))
 		{
-			changedFields.add( new FieldChangeCarrier(propertyName, confirmed) );
+			changedFields.add( new FieldChangeCarrier(PROPERTY_CONFIRMED, confirmed) );
 		}
 		if (allFields || PROPERTY_DELIVERY_CONFIGURATION_ID.equals(propertyName))
 		{
-			changedFields.add( new FieldChangeCarrier(propertyName, deliveryConfigurationID) );
+			changedFields.add( new FieldChangeCarrier(PROPERTY_DELIVERY_CONFIGURATION_ID, deliveryConfigurationID) );
 		}
 		if (allFields || PROPERTY_FULL_TEXT_LANGUAGE_ID.equals(propertyName))
 		{
-			changedFields.add( new FieldChangeCarrier(propertyName, fullTextLanguageID) );
+			changedFields.add( new FieldChangeCarrier(PROPERTY_FULL_TEXT_LANGUAGE_ID, fullTextLanguageID) );
 		}
 		if (allFields || PROPERTY_FULL_TEXT_SEARCH.equals(propertyName))
 		{
-			changedFields.add( new FieldChangeCarrier(propertyName, fullTextSearch) );
+			changedFields.add( new FieldChangeCarrier(PROPERTY_FULL_TEXT_SEARCH, fullTextSearch) );
 		}
 		if (allFields || PROPERTY_INNER_PRICE_CONFIG_ID.equals(propertyName))
 		{
-			changedFields.add( new FieldChangeCarrier(propertyName, innerPriceConfigID) );
+			changedFields.add( new FieldChangeCarrier(PROPERTY_INNER_PRICE_CONFIG_ID, innerPriceConfigID) );
 		}
 		if (allFields || PROPERTY_LOCAL_ACCOUNTANT_DELEGATE_ID.equals(propertyName))
 		{
-			changedFields.add( new FieldChangeCarrier(propertyName, localAccountantDelegateID) );
+			changedFields.add( new FieldChangeCarrier(PROPERTY_LOCAL_ACCOUNTANT_DELEGATE_ID, localAccountantDelegateID) );
 		}
 		if (allFields || PROPERTY_MAX_NESTED_PRODUCTTYPE_AMOUNT.equals(propertyName))
 		{
-			changedFields.add( new FieldChangeCarrier(propertyName, maxNestedProductTypeAmount) );
+			changedFields.add( new FieldChangeCarrier(PROPERTY_MAX_NESTED_PRODUCTTYPE_AMOUNT, maxNestedProductTypeAmount) );
 		}
 		if (allFields || PROPERTY_MIN_NESTED_PRODUCTTYPE_AMOUNT.equals(propertyName))
 		{
-			changedFields.add( new FieldChangeCarrier(propertyName, minNestedProductTypeAmount) );
+			changedFields.add( new FieldChangeCarrier(PROPERTY_MIN_NESTED_PRODUCTTYPE_AMOUNT, minNestedProductTypeAmount) );
 		}
 		if (allFields || PROPERTY_OWNER_ID.equals(propertyName))
 		{
-			changedFields.add( new FieldChangeCarrier(propertyName, ownerID) );
+			changedFields.add( new FieldChangeCarrier(PROPERTY_OWNER_ID, ownerID) );
 		}
 		if (allFields || PROPERTY_PRODUCTTYPE_GROUP_ID.equals(propertyName))
 		{
-			changedFields.add( new FieldChangeCarrier(propertyName, productTypeGroupID) );
+			changedFields.add( new FieldChangeCarrier(PROPERTY_PRODUCTTYPE_GROUP_ID, productTypeGroupID) );
 		}
 		if (allFields || PROPERTY_PUBLISHED.equals(propertyName))
 		{
-			changedFields.add( new FieldChangeCarrier(propertyName, published) );
+			changedFields.add( new FieldChangeCarrier(PROPERTY_PUBLISHED, published) );
 		}
 		if (allFields || PROPERTY_SALEABLE.equals(propertyName))
 		{
-			changedFields.add( new FieldChangeCarrier(propertyName, saleable) );
+			changedFields.add( new FieldChangeCarrier(PROPERTY_SALEABLE, saleable) );
 		}
 		
 		return changedFields;

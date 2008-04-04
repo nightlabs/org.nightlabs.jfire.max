@@ -94,43 +94,43 @@ public class AccountQuery
 		
 		if (allFields || PROPERTY_ACCOUNT_NAME.equals(propertyName))
 		{
-			changedFields.add( new FieldChangeCarrier(propertyName, accountName) );
+			changedFields.add( new FieldChangeCarrier(PROPERTY_ACCOUNT_NAME, accountName) );
 		}
 		if (allFields || PROPERTY_ACCOUNT_NAME_LANGUAGE_ID.equals(propertyName))
 		{
-			changedFields.add( new FieldChangeCarrier(propertyName, accountNameLanguageID) );
+			changedFields.add( new FieldChangeCarrier(PROPERTY_ACCOUNT_NAME_LANGUAGE_ID, accountNameLanguageID) );
 		}
 		if (allFields || PROPERTY_ACCOUNT_TYPE_ID.equals(propertyName))
 		{
-			changedFields.add( new FieldChangeCarrier(propertyName, accountTypeID) );
+			changedFields.add( new FieldChangeCarrier(PROPERTY_ACCOUNT_TYPE_ID, accountTypeID) );
 		}
 		if (allFields || PROPERTY_ANCHOR_ID.equals(propertyName))
 		{
-			changedFields.add( new FieldChangeCarrier(propertyName, anchorID) );
+			changedFields.add( new FieldChangeCarrier(PROPERTY_ANCHOR_ID, anchorID) );
 		}
 		if (allFields || PROPERTY_ANCHOR_TYPE_ID.equals(propertyName))
 		{
-			changedFields.add( new FieldChangeCarrier(propertyName, anchorTypeID) );
+			changedFields.add( new FieldChangeCarrier(PROPERTY_ANCHOR_TYPE_ID, anchorTypeID) );
 		}
 		if (allFields || PROPERTY_CURRENCY_ID.equals(propertyName))
 		{
-			changedFields.add( new FieldChangeCarrier(propertyName, currencyID) );
+			changedFields.add( new FieldChangeCarrier(PROPERTY_CURRENCY_ID, currencyID) );
 		}
 		if (allFields || PROPERTY_MAX_BALANCE.equals(propertyName))
 		{
-			changedFields.add( new FieldChangeCarrier(propertyName, maxBalance) );
+			changedFields.add( new FieldChangeCarrier(PROPERTY_MAX_BALANCE, maxBalance) );
 		}
 		if (allFields || PROPERTY_MIN_BALANCE.equals(propertyName))
 		{
-			changedFields.add( new FieldChangeCarrier(propertyName, minBalance) );
+			changedFields.add( new FieldChangeCarrier(PROPERTY_MIN_BALANCE, minBalance) );
 		}
 		if (allFields || PROPERTY_OWNER_ID.equals(propertyName))
 		{
-			changedFields.add( new FieldChangeCarrier(propertyName, ownerID) );
+			changedFields.add( new FieldChangeCarrier(PROPERTY_OWNER_ID, ownerID) );
 		}
 		if (allFields || PROPERTY_OWNER_NAME.equals(propertyName))
 		{
-			changedFields.add( new FieldChangeCarrier(propertyName, ownerName) );
+			changedFields.add( new FieldChangeCarrier(PROPERTY_OWNER_NAME, ownerName) );
 		}
 		
 		return changedFields;

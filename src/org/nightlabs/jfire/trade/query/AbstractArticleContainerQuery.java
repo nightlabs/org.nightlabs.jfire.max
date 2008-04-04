@@ -342,47 +342,47 @@ public abstract class AbstractArticleContainerQuery<R extends ArticleContainer>
 		
 		if (allFields || PROPERTY_ARTICLE_CONTAINER_ID.equals(propertyName))
 		{
-			changedFields.add(new FieldChangeCarrier(propertyName, articleContainerID));
+			changedFields.add(new FieldChangeCarrier(PROPERTY_ARTICLE_CONTAINER_ID, articleContainerID));
 		}
 		if (allFields || PROPERTY_ARTICLE_COUNT_MAX.equals(propertyName))
 		{
-			changedFields.add(new FieldChangeCarrier(propertyName, articleCountMax));
+			changedFields.add(new FieldChangeCarrier(PROPERTY_ARTICLE_COUNT_MAX, articleCountMax));
 		}
 		if (allFields || PROPERTY_ARTICLE_COUNT_MIN.equals(propertyName))
 		{
-			changedFields.add(new FieldChangeCarrier(propertyName, articleCountMin));
+			changedFields.add(new FieldChangeCarrier(PROPERTY_ARTICLE_COUNT_MIN, articleCountMin));
 		}
 		if (allFields || PROPERTY_CREATE_DATE_MAX.equals(propertyName))
 		{
-			changedFields.add(new FieldChangeCarrier(propertyName, createDTMax));
+			changedFields.add(new FieldChangeCarrier(PROPERTY_CREATE_DATE_MAX, createDTMax));
 		}
 		if (allFields || PROPERTY_CREATE_DATE_MIN.equals(propertyName))
 		{
-			changedFields.add(new FieldChangeCarrier(propertyName, createDTMin));
+			changedFields.add(new FieldChangeCarrier(PROPERTY_CREATE_DATE_MIN, createDTMin));
 		}
 		if (allFields || PROPERTY_CREATE_USER_ID.equals(propertyName))
 		{
-			changedFields.add(new FieldChangeCarrier(propertyName, createUserID));
+			changedFields.add(new FieldChangeCarrier(PROPERTY_CREATE_USER_ID, createUserID));
 		}
 		if (allFields || PROPERTY_CREATOR_NAME.equals(propertyName))
 		{
-			changedFields.add(new FieldChangeCarrier(propertyName, creatorName));
+			changedFields.add(new FieldChangeCarrier(PROPERTY_CREATOR_NAME, creatorName));
 		}
 		if (allFields || PROPERTY_CUSTOMER_ID.equals(propertyName))
 		{
-			changedFields.add(new FieldChangeCarrier(propertyName, customerID));
+			changedFields.add(new FieldChangeCarrier(PROPERTY_CUSTOMER_ID, customerID));
 		}
 		if (allFields || PROPERTY_CUSTOMER_NAME.equals(propertyName))
 		{
-			changedFields.add(new FieldChangeCarrier(propertyName, customerName));
+			changedFields.add(new FieldChangeCarrier(PROPERTY_CUSTOMER_NAME, customerName));
 		}
 		if (allFields || PROPERTY_VENDOR_ID.equals(propertyName))
 		{
-			changedFields.add(new FieldChangeCarrier(propertyName, vendorID));
+			changedFields.add(new FieldChangeCarrier(PROPERTY_VENDOR_ID, vendorID));
 		}
 		if (allFields || PROPERTY_VENDOR_NAME.equals(propertyName))
 		{
-			changedFields.add(new FieldChangeCarrier(propertyName, vendorName));
+			changedFields.add(new FieldChangeCarrier(PROPERTY_VENDOR_NAME, vendorName));
 		}
 		return changedFields;
 	}

@@ -73,31 +73,31 @@ extends AbstractJDOQuery<Repository>
 		
 		if (allFields || PROPERTY_ANCHOR_ID.equals(propertyName))
 		{
-			changedFields.add( new FieldChangeCarrier(propertyName, anchorID) );
+			changedFields.add( new FieldChangeCarrier(PROPERTY_ANCHOR_ID, anchorID) );
 		}
 		if (allFields || PROPERTY_ANCHOR_TYPE_ID.equals(propertyName))
 		{
-			changedFields.add( new FieldChangeCarrier(propertyName, anchorTypeID) );
+			changedFields.add( new FieldChangeCarrier(PROPERTY_ANCHOR_TYPE_ID, anchorTypeID) );
 		}
 		if (allFields || PROPERTY_NAME.equals(propertyName))
 		{
-			changedFields.add( new FieldChangeCarrier(propertyName, name) );
+			changedFields.add( new FieldChangeCarrier(PROPERTY_NAME, name) );
 		}
 		if (allFields || PROPERTY_NAME_LANGUAGE_ID.equals(propertyName))
 		{
-			changedFields.add( new FieldChangeCarrier(propertyName, nameLanguageID) );
+			changedFields.add( new FieldChangeCarrier(PROPERTY_NAME_LANGUAGE_ID, nameLanguageID) );
 		}
 		if (allFields || PROPERTY_OWNER_ID.equals(propertyName))
 		{
-			changedFields.add( new FieldChangeCarrier(propertyName, ownerID) );
+			changedFields.add( new FieldChangeCarrier(PROPERTY_OWNER_ID, ownerID) );
 		}
 		if (allFields || PROPERTY_OWNER_NAME.equals(propertyName))
 		{
-			changedFields.add( new FieldChangeCarrier(propertyName, ownerName) );
+			changedFields.add( new FieldChangeCarrier(PROPERTY_OWNER_NAME, ownerName) );
 		}
 		if (allFields || PROPERTY_REPOSITORY_TYPE_ID.equals(propertyName))
 		{
-			changedFields.add( new FieldChangeCarrier(propertyName, repositoryTypeID) );
+			changedFields.add( new FieldChangeCarrier(PROPERTY_REPOSITORY_TYPE_ID, repositoryTypeID) );
 		}
 		
 		return changedFields;

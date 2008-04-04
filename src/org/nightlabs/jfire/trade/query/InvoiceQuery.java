@@ -189,31 +189,31 @@ public class InvoiceQuery
 		boolean allFields = AbstractSearchQuery.PROPERTY_WHOLE_QUERY.equals(propertyName);
 		if (allFields || PROPERTY_AMOUNT_PAID_MAX.equals(propertyName))
 		{
-			changedFields.add( new FieldChangeCarrier(propertyName, amountPaidMax) );
+			changedFields.add( new FieldChangeCarrier(PROPERTY_AMOUNT_PAID_MAX, amountPaidMax) );
 		}
 		if (allFields || PROPERTY_AMOUNT_PAID_MIN.equals(propertyName))
 		{
-			changedFields.add( new FieldChangeCarrier(propertyName, amountPaidMin) );
+			changedFields.add( new FieldChangeCarrier(PROPERTY_AMOUNT_PAID_MIN, amountPaidMin) );
 		}
 		if (allFields || PROPERTY_AMOUNT_TO_PAY_MAX.equals(propertyName))
 		{
-			changedFields.add( new FieldChangeCarrier(propertyName, amountToPayMax) );
+			changedFields.add( new FieldChangeCarrier(PROPERTY_AMOUNT_TO_PAY_MAX, amountToPayMax) );
 		}
 		if (allFields || PROPERTY_AMOUNT_TO_PAY_MIN.equals(propertyName))
 		{
-			changedFields.add( new FieldChangeCarrier(propertyName, amountToPayMin) );
+			changedFields.add( new FieldChangeCarrier(PROPERTY_AMOUNT_TO_PAY_MIN, amountToPayMin) );
 		}
 		if (allFields || PROPERTY_BOOKED.equals(propertyName))
 		{
-			changedFields.add( new FieldChangeCarrier(propertyName, booked) );
+			changedFields.add( new FieldChangeCarrier(PROPERTY_BOOKED, booked) );
 		}
 		if (allFields || PROPERTY_BOOK_DATE_MAX.equals(propertyName))
 		{
-			changedFields.add( new FieldChangeCarrier(propertyName, bookDTMax) );
+			changedFields.add( new FieldChangeCarrier(PROPERTY_BOOK_DATE_MAX, bookDTMax) );
 		}
 		if (allFields || PROPERTY_BOOK_DATE_MIN.equals(propertyName))
 		{
-			changedFields.add( new FieldChangeCarrier(propertyName, bookDTMin) );
+			changedFields.add( new FieldChangeCarrier(PROPERTY_BOOK_DATE_MIN, bookDTMin) );
 		}
 		return changedFields;
 	}

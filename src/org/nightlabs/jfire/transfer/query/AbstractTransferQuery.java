@@ -55,27 +55,27 @@ extends AbstractJDOQuery<T>
 		
 		if (allFields || PROPERTY_CURRENT_ANCHOR_ID.equals(propertyName))
 		{
-			changedFields.add( new FieldChangeCarrier(propertyName, currentAnchorID) );
+			changedFields.add( new FieldChangeCarrier(PROPERTY_CURRENT_ANCHOR_ID, currentAnchorID) );
 		}
 		if (allFields || PROPERTY_FROM_ANCHOR_ID.equals(propertyName))
 		{
-			changedFields.add( new FieldChangeCarrier(propertyName, fromAnchorID) );
+			changedFields.add( new FieldChangeCarrier(PROPERTY_FROM_ANCHOR_ID, fromAnchorID) );
 		}
 		if (allFields || PROPERTY_OTHER_ANCHOR_ID.equals(propertyName))
 		{
-			changedFields.add( new FieldChangeCarrier(propertyName, otherAnchorID) );
+			changedFields.add( new FieldChangeCarrier(PROPERTY_OTHER_ANCHOR_ID, otherAnchorID) );
 		}
 		if (allFields || PROPERTY_TIMESTAMP_FROM.equals(propertyName))
 		{
-			changedFields.add( new FieldChangeCarrier(propertyName, timestampFromIncl) );
+			changedFields.add( new FieldChangeCarrier(PROPERTY_TIMESTAMP_FROM, timestampFromIncl) );
 		}
 		if (allFields || PROPERTY_TIMESTAMP_TO.equals(propertyName))
 		{
-			changedFields.add( new FieldChangeCarrier(propertyName, timestampToIncl) );
+			changedFields.add( new FieldChangeCarrier(PROPERTY_TIMESTAMP_TO, timestampToIncl) );
 		}
 		if (allFields || PROPERTY_TO_ANCHOR_ID.equals(propertyName))
 		{
-			changedFields.add( new FieldChangeCarrier(propertyName, toAnchorID) );
+			changedFields.add( new FieldChangeCarrier(PROPERTY_TO_ANCHOR_ID, toAnchorID) );
 		}
 		
 		return changedFields;

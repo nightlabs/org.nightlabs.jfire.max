@@ -66,51 +66,51 @@ extends AbstractJDOQuery<Issue>
 		
 		if (allFields || PROPERTY_ASSIGNEE_ID.equals(propertyName))
 		{
-			changedFields.add( new FieldChangeCarrier(propertyName, assigneeID) );
+			changedFields.add( new FieldChangeCarrier(PROPERTY_ASSIGNEE_ID, assigneeID) );
 		}
 		if (allFields || PROPERTY_CREATE_TIMESTAMP.equals(propertyName))
 		{
-			changedFields.add( new FieldChangeCarrier(propertyName, createTimestamp) );
+			changedFields.add( new FieldChangeCarrier(PROPERTY_CREATE_TIMESTAMP, createTimestamp) );
 		}
 		if (allFields || PROPERTY_ISSUE_COMMENT.equals(propertyName))
 		{
-			changedFields.add( new FieldChangeCarrier(propertyName, removeRegexpSearch(issueComment)) );
+			changedFields.add( new FieldChangeCarrier(PROPERTY_ISSUE_COMMENT, removeRegexpSearch(issueComment)) );
 		}
 		if (allFields || PROPERTY_ISSUE_LINKS.equals(propertyName))
 		{
-			changedFields.add( new FieldChangeCarrier(propertyName, issueLinks) );
+			changedFields.add( new FieldChangeCarrier(PROPERTY_ISSUE_LINKS, issueLinks) );
 		}
 		if (allFields || PROPERTY_ISSUE_PRIORITY_ID.equals(propertyName))
 		{
-			changedFields.add( new FieldChangeCarrier(propertyName, issuePriorityID) );
+			changedFields.add( new FieldChangeCarrier(PROPERTY_ISSUE_PRIORITY_ID, issuePriorityID) );
 		}
 		if (allFields || PROPERTY_ISSUE_RESOLUTION_ID.equals(propertyName))
 		{
-			changedFields.add( new FieldChangeCarrier(propertyName, issueResolutionID) );
+			changedFields.add( new FieldChangeCarrier(PROPERTY_ISSUE_RESOLUTION_ID, issueResolutionID) );
 		}
 		if (allFields || PROPERTY_ISSUE_SEVERITY_TYPE_ID.equals(propertyName))
 		{
-			changedFields.add( new FieldChangeCarrier(propertyName, issueSeverityTypeID) );
+			changedFields.add( new FieldChangeCarrier(PROPERTY_ISSUE_SEVERITY_TYPE_ID, issueSeverityTypeID) );
 		}
 		if (allFields || PROPERTY_ISSUE_SUBJECT.equals(propertyName))
 		{
-			changedFields.add( new FieldChangeCarrier(propertyName, removeRegexpSearch(issueSubject)) );
+			changedFields.add( new FieldChangeCarrier(PROPERTY_ISSUE_SUBJECT, removeRegexpSearch(issueSubject)) );
 		}
 		if (allFields || PROPERTY_ISSUE_SUBJECT_AND_COMMENT.equals(propertyName))
 		{
-			changedFields.add( new FieldChangeCarrier(propertyName, removeRegexpSearch(issueSubjectNComment)) );
+			changedFields.add( new FieldChangeCarrier(PROPERTY_ISSUE_SUBJECT_AND_COMMENT, removeRegexpSearch(issueSubjectNComment)) );
 		}
 		if (allFields || PROPERTY_ISSUE_TYPE_ID.equals(propertyName))
 		{
-			changedFields.add( new FieldChangeCarrier(propertyName, issueTypeID) );
+			changedFields.add( new FieldChangeCarrier(PROPERTY_ISSUE_TYPE_ID, issueTypeID) );
 		}
 		if (allFields || PROPERTY_REPORTER_ID.equals(propertyName))
 		{
-			changedFields.add( new FieldChangeCarrier(propertyName, reporterID) );
+			changedFields.add( new FieldChangeCarrier(PROPERTY_REPORTER_ID, reporterID) );
 		}
 		if (allFields || PROPERTY_UPDATE_TIMESTAMP.equals(propertyName))
 		{
-			changedFields.add( new FieldChangeCarrier(propertyName, updateTimestamp) );
+			changedFields.add( new FieldChangeCarrier(PROPERTY_UPDATE_TIMESTAMP, updateTimestamp) );
 		}
 		
 		return changedFields;

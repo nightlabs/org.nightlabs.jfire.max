@@ -987,7 +987,7 @@ articleContainerType = reportContext.getMessage("articleContainer.name."+classNa
 articleContainerType + " " + articleContainer.getArticleContainerIDPrefix() + " / " + articleContainer.getArticleContainerIDAsString()</expression>
             <property name="contentType">html</property>
         </text-data>
-        <text-data id="215">
+        <text-data id="217">
             <property name="fontFamily">"Arial"</property>
             <property name="fontWeight">bold</property>
             <property name="color">#808080</property>

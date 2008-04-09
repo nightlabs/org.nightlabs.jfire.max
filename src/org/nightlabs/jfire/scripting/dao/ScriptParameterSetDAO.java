@@ -30,11 +30,28 @@ public class ScriptParameterSetDAO extends BaseJDOObjectDAO<ScriptRegistryItemID
 	};
 	
 	/**
-	 * 
+	 * A static instance of ScriptParameterSetDAO.
 	 */
-	public ScriptParameterSetDAO() {
-		// TODO Auto-generated constructor stub
+	private static ScriptParameterSetDAO sharedInstance;
+
+	/**
+	 * Returns a static instance of ScriptParameterSetDAO.
+	 * It will be lazily created on demand.
+	 *
+	 * @return A static instance of ScriptParameterSetDAO.
+	 */
+	public static ScriptParameterSetDAO sharedInstance() {
+		if (sharedInstance == null) {
+			synchronized (ScriptParameterSetDAO.class) {
+				if (sharedInstance == null) {
+					sharedInstance = new ScriptParameterSetDAO();
+				}
+			}
+		}
+		return sharedInstance;
 	}
+	
+	private ScriptParameterSetDAO() {}
 
 	/* (non-Javadoc)
 	 * @see org.nightlabs.jfire.base.jdo.JDOObjectDAO#retrieveJDOObjects(java.util.Set, java.lang.String[], int, org.eclipse.core.runtime.IProgressMonitor)
@@ -48,30 +65,7 @@ public class ScriptParameterSetDAO extends BaseJDOObjectDAO<ScriptRegistryItemID
 		return sm.getScriptParameterSets(objectIDs, fetchGroups, maxFetchDepth);
 	}
 	
-	
 	public ScriptParameterSet getScriptParameterSet(ScriptRegistryItemID scriptRegistryItemID, String[] fetchGroups, ProgressMonitor monitor) {
 		return getJDOObject(null, scriptRegistryItemID, fetchGroups, NLJDOHelper.MAX_FETCH_DEPTH_NO_LIMIT, monitor);
-	}
-
-	/**
-	 * A static instance of ScriptParameterSetDAO.
-	 */
-	private static ScriptParameterSetDAO sharedInstance;
-
-	/**
-	 * Returns a static instance of ScriptParameterSetDAO.
-	 * It will be layzily created on demand.
-	 *
-	 * @return A static instance of ScriptParameterSetDAO.
-	 */
-	public static ScriptParameterSetDAO sharedInstance() {
-		if (sharedInstance == null) {
-			synchronized (ScriptParameterSetDAO.class) {
-				if (sharedInstance == null) {
-					sharedInstance = new ScriptParameterSetDAO();
-				}
-			}
-		}
-		return sharedInstance;
 	}
 }

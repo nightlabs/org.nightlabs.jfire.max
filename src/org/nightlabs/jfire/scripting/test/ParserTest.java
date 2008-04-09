@@ -20,11 +20,9 @@ import org.nightlabs.jfire.scripting.id.ScriptRegistryItemID;
 
 public class ParserTest
 {
-
 	public static void main(String[] args)
 	{
 		String script = getScriptText();
-		
 		ConstrainedConditionGenerator generator = new JavaScriptConditionGenerator();
 		generator.setScriptConditioner(getScriptConditioner());
 
@@ -32,10 +30,9 @@ public class ParserTest
 //		String conditionText = generator.getScriptText(condition);
 		
 		String conditionText = generator.getScriptText(getCondition());
-		
+		boolean equals = script.equals(conditionText);
 		System.out.println("scriptText = "+script);
 		System.out.println("conditionText = "+conditionText);
-		boolean equals = script.equals(conditionText);
 		System.out.println("equals = "+equals);
 	}
 
@@ -44,13 +41,12 @@ public class ParserTest
 		String scriptIDName = "Test";
 		ScriptRegistryItemID scriptID = getScriptID();
 		Script script = getScript();
-		Collection possibleValues = new ArrayList();
+		Collection<Object> possibleValues = new ArrayList<Object>();
 //		possibleValues.add(new Tariff(organisationID, 0));
 		possibleValues.add(script);
 		ScriptConditioner sc = new ScriptConditioner(scriptID, script, scriptIDName,
 				DefaultCompareOperatorProvider.sharedInstance().getEqualOperators(),
 				possibleValues, LabelProvider.class.getName());
-		
 		Collection<ScriptConditioner> scs = new ArrayList<ScriptConditioner>();
 		scs.add(sc);
 		return scs;

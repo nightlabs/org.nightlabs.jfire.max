@@ -29,7 +29,7 @@ import java.util.Collection;
 
 
 /**
- * This Interface generates the language dependend syntax for the
+ * This Interface generates the language dependent syntax for the
  * operations described in {@link CombineOperator} and {@link CompareOperator}
  * 
  * @author Daniel.Mazurek [at] NightLabs [dot] de
@@ -48,8 +48,8 @@ public interface IConditionGenerator
 	
 	/**
 	 * 
-	 * @param condition the {@link ICondition} to transform into language dependend string
-	 * @return the language dependend string of the fiven condition
+	 * @param condition the {@link ICondition} to transform into language dependent string
+	 * @return the language dependent string of the given condition
 	 */
 	String getScriptText(ICondition condition);
 	

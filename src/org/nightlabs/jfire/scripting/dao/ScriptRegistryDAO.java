@@ -19,10 +19,29 @@ import org.nightlabs.progress.ProgressMonitor;
  */
 public class ScriptRegistryDAO extends BaseJDOObjectDAO<ScriptRegistryID, ScriptRegistry>
 {
-	
-	protected ScriptRegistryDAO() {
-		super();
+	/**
+	 * A static instance of ScriptRegistryDAO.
+	 */
+	private static ScriptRegistryDAO sharedInstance;
+
+	/**
+	 * Returns a static instance of ScriptRegistryDAO.
+	 * It will be lazily created on demand.
+	 *
+	 * @return A static instance of ScriptRegistryDAO.
+	 */
+	public static ScriptRegistryDAO sharedInstance() {
+		if (sharedInstance == null) {
+			synchronized (ScriptRegistryDAO.class) {
+				if (sharedInstance == null) {
+					sharedInstance = new ScriptRegistryDAO();
+				}
+			}
+		}
+		return sharedInstance;
 	}
+
+	private ScriptRegistryDAO() {}
 
 	@Override
 	protected Collection<ScriptRegistry> retrieveJDOObjects(Set<ScriptRegistryID> objectIDs, String[] fetchGroups, int maxFetchDepth, ProgressMonitor monitor) throws Exception
@@ -43,25 +62,4 @@ public class ScriptRegistryDAO extends BaseJDOObjectDAO<ScriptRegistryID, Script
 		}
 	}
 	
-	/**
-	 * A static instance of ScriptRegistryDAO.
-	 */
-	private static ScriptRegistryDAO sharedInstance;
-
-	/**
-	 * Returns a static instance of ScriptRegistryDAO.
-	 * It will be layzily created on demand.
-	 *
-	 * @return A static instance of ScriptRegistryDAO.
-	 */
-	public static ScriptRegistryDAO sharedInstance() {
-		if (sharedInstance == null) {
-			synchronized (ScriptRegistryDAO.class) {
-				if (sharedInstance == null) {
-					sharedInstance = new ScriptRegistryDAO();
-				}
-			}
-		}
-		return sharedInstance;
-	}
 }

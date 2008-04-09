@@ -40,30 +40,6 @@ import org.nightlabs.jfire.scripting.id.ScriptRegistryItemID;
 public interface ISimpleCondition
 extends ICondition
 {
-//	/**
-//	 * returns the name of the variable
-//	 * @return the name of the variable
-//	 */
-//	String getVariableName();
-//
-//	/**
-//	 * sets the variableName
-//	 * @param variableName the variableName to set
-//	 */
-//	void setVariableName(String variableName);
-	
-//	/**
-//	 * returns the value as string
-//	 * @return the value as string
-//	 */
-//	String getValueAsString();
-//
-//	/**
-//	 * sets the value as String
-//	 * @param s the value to set
-//	 */
-//	void setValueAsString(String s);
-
 	/**
 	 * returns the {@link ScriptRegistryItemID} which represents the variable
 	 * @return the ScriptRegistryItemID which represents the variable
@@ -88,7 +64,6 @@ extends ICondition
 	 */
 	void setValue(Object o);
 
-	
 	/**
 	 * returns the {@link CompareOperator} of the simple condition
 	 * @return the {@link CompareOperator} of the simple condition

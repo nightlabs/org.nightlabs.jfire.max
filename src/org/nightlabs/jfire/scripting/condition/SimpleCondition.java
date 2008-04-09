@@ -76,30 +76,5 @@ implements ISimpleCondition
 	public void setValue(Object value) {
 		this.value = value;
 	}
-		
-//	@Override
-//	public boolean equals(Object obj)
-//	{
-//		if (obj == null)
-//			return false;
-//		if (obj instanceof SimpleCondition) {
-//			SimpleCondition sc = (SimpleCondition) obj;
-//			if (!sc.getScriptRegistryItemID().equals(scriptRegistryItemID))
-//				return false;
-//			if (sc.getCompareOperator() != compareOperator)
-//				return false;
-//			if (!sc.getValue().equals(value))
-//				return false;
-//
-//			return true;
-//		}
-//		return false;
-//	}
-//
-//	@Override
-//	public int hashCode()
-//	{
-//		return scriptRegistryItemID.hashCode() + value.hashCode() + compareOperator.hashCode();
-//	}
-	
+
 }

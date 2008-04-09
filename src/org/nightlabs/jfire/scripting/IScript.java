@@ -28,6 +28,15 @@ package org.nightlabs.jfire.scripting;
 import java.io.Serializable;
 
 /**
+ * Base interface for all scripts which can be interpreted by the {@link ScriptRegistry}.
+ * An IScript knows its resultClass ({@link #getResultClass()}, its (optional) 
+ * String representation of the "script" ({@link #getText()} and its (optional)
+ * IScriptParameterSet ({@link #getParameterSet()} if the script has parameters.
+ * It also needs to know in which language it is written ({@link #getLanguage()}.
+ * Furthermore as many results for Scripts are JDO Objects we added some convenience 
+ * methods so that the script itself knows if the result needs to be detached and if so,
+ * with which fetch groups and with which fetch depth.
+ * 
  * @author Daniel.Mazurek [at] NightLabs [dot] de
  *
  */
@@ -47,44 +56,43 @@ extends Serializable
 	public String getLanguage();
 	
 	/**
-	 * 
+	 * Returns the {@link Class} for the script result.
 	 * @return the {@link Class} for the script result
 	 */
 	public Class getResultClass() throws ClassNotFoundException;
 	
 	/**
-	 * 
+	 * Returns the class name of the result as String.
 	 * @return the class name of the result as String
 	 */
 	public String getResultClassName();
 	
 	/**
 	 * Gets the actual code (usually in java script).
-	 *
 	 * @return Returns the actual script code.
 	 */
 	public String getText();
 	
 	/**
-	 * 
+	 * Return the {@link ScriptParameterSet} for the Script.
 	 * @return the {@link ScriptParameterSet} for the Script
 	 */
 	public IScriptParameterSet getParameterSet();
 	
 	/**
-	 * determines if the script value should be detached or not
+	 * Determines if the script value should be detached or not.
 	 * @return if the script value should be detached or not
 	 */
 	public boolean isNeedsDetach();
 	
 	/**
-	 * determines the maxFetchDepth if {@link IScript#isNeedsDetach()} returns true
+	 * Determines the maxFetchDepth if {@link IScript#isNeedsDetach()} returns true.
 	 * @return the maxFetchDepth if {@link IScript#isNeedsDetach()} returns true
 	 */
 	public int getMaxFetchDepth();
 	
 	/**
-	 * determines the fetchGroups which should be used if the {@link IScript#isNeedsDetach()} returns true
+	 * Determines the fetchGroups which should be used if the {@link IScript#isNeedsDetach()} returns true.
 	 * @return the fetchGroups which should be used if the {@link IScript#isNeedsDetach()} returns true
 	 */
 	public String[] getFetchGroups();

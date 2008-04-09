@@ -117,21 +117,16 @@ implements SessionBean
 		PersistenceManager pm;
 		pm = getPersistenceManager();
 		try {
-			
 			ModuleMetaData moduleMetaData = ModuleMetaData.getModuleMetaData(pm, JFireScriptingEAR.MODULE_NAME);
 			if (moduleMetaData == null) {
-			
-				logger.info("Initialization of JFireReporting started ...");
+				logger.info("Initialization of JFireScripting started ...");
 	
-				
 				// version is {major}.{minor}.{release}-{patchlevel}-{suffix}
 				moduleMetaData = new ModuleMetaData(
 						JFireScriptingEAR.MODULE_NAME, "0.9.3-0-beta", "0.9.3-0-beta");
 				pm.makePersistent(moduleMetaData);
-				logger.info("Persisted ModuleMetaData for JFireReporting with version 0.9.3-0-beta");
-
+				logger.info("Persisted ModuleMetaData for JFireScripting with version 0.9.3-0-beta");
 			}
-			
 		} finally {
 			pm.close();
 		}

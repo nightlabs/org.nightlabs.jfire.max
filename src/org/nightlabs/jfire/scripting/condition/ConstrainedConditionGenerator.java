@@ -40,14 +40,8 @@ import org.nightlabs.jfire.scripting.id.ScriptRegistryItemID;
 public abstract class ConstrainedConditionGenerator
 implements IConditionGenerator
 {
-//	public ConstrainedConditionGenerator(Collection<ScriptConditioner> scriptConditioners)
-//	{
-//		setScriptConditioner(scriptConditioners);
-//	}
-
 	public ConstrainedConditionGenerator()
 	{
-
 	}
 
 	private Collection<ScriptConditioner> scriptConditioners;
@@ -90,69 +84,6 @@ implements IConditionGenerator
 	}
 	
 	public abstract String getScriptText(ICondition condition);
-//	public String getScriptText(ICondition condition)
-//	{
-//		StringBuffer sb = new StringBuffer();
-//		getScriptText(condition, sb, false);
-//		return sb.toString();
-//	}
-//
-//	protected void getScriptText(ICondition condition, StringBuffer sb, boolean importInserted)
-//	{
-//		if (condition instanceof ISimpleCondition)
-//		{
-//			ISimpleCondition simpleCondition = (ISimpleCondition) condition;
-//			if (simpleCondition.getValue() instanceof PersistenceCapable) {
-//				if (!importInserted) {
-//					sb.insert(0, "importPackage(Packages.javax.jdo);");
-//					importInserted = true;
-//				}
-//			}
-//			String openContainer = getOpenContainerString();
-//			String closeContainer = getCloseContainerString();
-//			String operator = getCompareOperator(simpleCondition.getCompareOperator());
-//			String varName = getVariableString() + scriptID2Name.get(simpleCondition.getScriptRegistryItemID());
-//			Object value = simpleCondition.getValue();
-//			String valueName = "";
-//			String variableName = "";
-//			if (value instanceof PersistenceCapable)
-//			{
-//				variableName = "JDOHelper.getObjectId("+varName+").toString()";
-//				ObjectID objectID = (ObjectID) JDOHelper.getObjectId(value);
-//				String objectIDString = String.valueOf(objectID);
-//				valueName = "\""+objectIDString+"\"";
-//			}
-//			else {
-//				variableName = varName;
-//				// TODO: allow only primitive types
-//				valueName = String.valueOf(value);
-//			}
-//			sb.append(openContainer + variableName + operator + valueName + closeContainer);
-//		}
-//		else if (condition instanceof IConditionContainer)
-//		{
-//			IConditionContainer container = (IConditionContainer) condition;
-//			sb.append(getOpenContainerString());
-//			List<ICondition> conditions = container.getConditions();
-//			for (int i=0; i<conditions.size(); i++) {
-//				ICondition con = conditions.get(i);
-//				if (!importInserted) {
-//					if (con instanceof ISimpleCondition) {
-//						if (((ISimpleCondition)con).getValue() instanceof PersistenceCapable) {
-//							sb.insert(0, "importPackage(Packages.javax.jdo);");
-//							importInserted = true;
-//						}
-//					}
-//				}
-//				getScriptText(con, sb, importInserted);
-//				if (i != conditions.size()-1)
-//					sb.append(getCombineOperator(container.getCombineOperator()));
-//			}
-//			sb.append(getCloseContainerString());
-//		}
-//		else
-//			throw new RuntimeException("unknown implementation of ICondition "+condition);
-//	}
 		
 	/**
 	* returns the scriptLanguage depended String for all available
@@ -186,20 +117,20 @@ implements IConditionGenerator
 	/**
 	* 
 	* @return the String which represents the opening of a condition container,
-	* repectivly in many languages this represents a certain type of bracket
+	* respectively in many languages this represents a certain type of bracket
 	*/
 	public abstract String getOpenContainerString();
 	
 	/**
 	* 
 	* @return the String which represents the closing of a condition container,
-	* repectivly in many languages this represents a certain type of bracket
+	* respectively in many languages this represents a certain type of bracket
 	*/
 	public abstract String getCloseContainerString();
 	
 //	/**
 //	*
-//	* @return all {@link CompareOperator}s as List of Language dependend Strings
+//	* @return all {@link CompareOperator}s as List of Language dependent Strings
 //	*/
 //	public abstract List<String> getCompareOperators();
 	private List<String> compareOperatorStrings = null;
@@ -216,7 +147,7 @@ implements IConditionGenerator
 	
 //	/**
 //	*
-//	* @return all {@link CombineOperator}s as List of Language dependend Strings
+//	* @return all {@link CombineOperator}s as List of Language dependent Strings
 //	*/
 //	public abstract List<String> getCombineOperators();
 	private List<String> combineOperatorStrings = null;

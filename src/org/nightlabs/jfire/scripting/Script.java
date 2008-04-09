@@ -125,7 +125,7 @@ public class Script
 			this.setParameterSet(parent.getParameterSet());
 		} catch(JDODetachedFieldAccessException e) {
 			// When detached without parameterSet don't bother -> see ScriptRegistryItem.preStore
-			System.out.println("DEEBUG: Script instantiated with detached parent, parameterSet could not be set as it was not detached.");
+			System.out.println("DEBUG: Script instantiated with detached parent, parameterSet could not be set as it was not detached.");
 		}
 		// TODO remove this if jdo doesn't accept null arrays
 //		fetchGroups = new String[] {

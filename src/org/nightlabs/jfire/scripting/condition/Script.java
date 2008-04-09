@@ -34,15 +34,16 @@ import org.nightlabs.jfire.scripting.id.ScriptRegistryItemID;
 
 
 /**
+ * Implementation of the {@link IScript} interface which is NOT a JDO Object.
+ * This Implementation is e.g. used for so called visible scripts
+ * in the project JFireScriptingEditor2D.
+ *  
  * @author Daniel.Mazurek [at] NightLabs [dot] de
  *
  */
 public class Script
 implements IScript
 {
-	/**
-	 * 
-	 */
 	private static final long serialVersionUID = 1L;
 	public Script(String language, String text, Map<String, ScriptRegistryItemID> variableName2ScriptID)
 	{
@@ -72,7 +73,7 @@ implements IScript
 	}
 
 	/**
-	 * the script language dependend script
+	 * the script language dependent script
 	 */
 	private String text;
 	public String getText() {
@@ -83,8 +84,8 @@ implements IScript
 	}
 
 	/**
-	 * a map which maps variablenames of the scriptText to {@link ScriptRegistryItemID}
-	 * key: variablename of the scriptText
+	 * a map which maps variable names of the scriptText to {@link ScriptRegistryItemID}
+	 * key: variable name of the scriptText
 	 * value: the corresponding {@link ScriptRegistryItemID}
 	 */
 	private Map<String, ScriptRegistryItemID> variableName2ScriptID = new HashMap<String, ScriptRegistryItemID>();
@@ -108,8 +109,8 @@ implements IScript
 	}
 
 	/**
-	 * a map which maps the variablenames of the scriptText to the values
-	 * key: variablename of the scriptText
+	 * a map which maps the variable names of the scriptText to the values
+	 * key: variable name of the scriptText
 	 * value: the value of the script with the corresponding ScriptRegistryItemID, which can be determined from
 	 * {@link Script#getVariableName2ScriptID()}
 	 */
@@ -125,18 +126,22 @@ implements IScript
 		this.variableName2Value = variableName2Value;
 	}
 	
-	//***************************** Compatibilty Reasons for IScript **************************
-	private IScriptParameterSet parameterSet = new ConditionScriptParameterSet();
-	public IScriptParameterSet getParameterSet() {
+	//***************************** Compatibility Reasons for IScript **************************
+	private transient IScriptParameterSet parameterSet = null;
+	public IScriptParameterSet getParameterSet() 
+	{
+		if (parameterSet == null) {
+			parameterSet = new ConditionScriptParameterSet();
+		}
 		return parameterSet;
 	}
 	
-	private String[] fetchGroups = null;
+	private transient String[] fetchGroups = null;
 	public String[] getFetchGroups() {
 		return fetchGroups;
 	}
 	
-	private int maxFetchDepth = 0;
+	private transient int maxFetchDepth = 0;
 	public int getMaxFetchDepth() {
 		return maxFetchDepth;
 	}

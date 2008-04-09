@@ -119,7 +119,6 @@ implements ScriptRootDrawComponent
 		return getVisibleScripts(this, new HashMap<Long, Script>());
 	}
 	
-//	private static final Map<Long, Script> EMPTY_MAP = new HashMap<Long, Script>(0);
 	protected Map<Long, Script> getVisibleScripts(DrawComponent dc, Map<Long, Script> dcID2VisibleScript)
 	{
 		Script script = (Script) dc.getProperties().get(ScriptingConstants.PROP_VISIBLE_SCRIPT);

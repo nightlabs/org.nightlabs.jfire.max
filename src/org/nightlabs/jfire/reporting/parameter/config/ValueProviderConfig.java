@@ -99,6 +99,11 @@ implements ValueConsumer, Serializable, IGraphicalInfoProvider, DeleteCallback
 	/**
 	 * @jdo.field persistence-modifier="persistent"
 	 */
+	private boolean growVertically;
+	
+	/**
+	 * @jdo.field persistence-modifier="persistent"
+	 */
 	private int x;
 
 	/**
@@ -120,6 +125,9 @@ implements ValueConsumer, Serializable, IGraphicalInfoProvider, DeleteCallback
 		this.setup = setup;
 		this.message = new ValueProviderConfigMessage(this);
 		this.valueProviderConfigID = valueProviderConfigID;
+		// default values
+		showMessageInHeader = true;
+		growVertically = true;
 	}
 
 	/**
@@ -329,6 +337,25 @@ implements ValueConsumer, Serializable, IGraphicalInfoProvider, DeleteCallback
 		this.showMessageInHeader = showMessageInHeader;
 	}
 
+	/**
+	 * Defines whether the cell that renders the UI linked to this value provider config
+	 * should be arranged in the layou so the UI grabs vertically available space
+	 * and grows as the cell grows.
+	 * @return Whether the rendering cell should grow vertically 
+	 */
+	public boolean isGrowVertically() {
+		return growVertically;
+	}
+	
+	/**
+	 * See {@link #isGrowVertically()}.
+	 * 
+	 * @param growVertically The growVertically
+	 */
+	public void setGrowVertically(boolean growVertically) {
+		this.growVertically = growVertically;
+	}
+	
 	/** {@inheritDoc}
 	 */
 	@Override

@@ -690,16 +690,21 @@ public class ReportingInitialiser {
 					}
 					config.setAllowNullOutputValue(allowOutputNull);
 					
-					boolean showMessageInHeader = true;
 					String showMessage = NLDOMUtil.getAttributeValue(providerNode, "showMessageInHeader");
 					if (showMessage != null) {
 						try {
-							showMessageInHeader = Boolean.parseBoolean(showMessage);
+							config.setShowMessageInHeader(Boolean.parseBoolean(showMessage));
 						} catch (Exception e) {
-							showMessageInHeader = true;
 						}
 					}
-					config.setShowMessageInHeader(showMessageInHeader);
+					
+					String growVert = NLDOMUtil.getAttributeValue(providerNode, "growVertically");
+					if (growVert != null) {
+						try {
+							config.setGrowVertically(Boolean.parseBoolean(growVert));
+						} catch (Exception e) {
+						}
+					}
 					
 					createElementName(providerNode, "message", config.getMessage(), null);
 					

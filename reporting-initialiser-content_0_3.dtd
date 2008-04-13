@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<!-- Reporting Initialiser DTD - version 0.2 -->
+<!-- Reporting Initialiser DTD - version 0.3 -->
 <!-- Author: Alexander Bieber -->
 
 <!-- 
@@ -135,6 +135,7 @@
 	pageColumn NMTOKEN #IMPLIED
 	showMessageInHeader NMTOKEN #IMPLIED
 	allowNullOutputValue NMTOKEN #IMPLIED
+	growVertically NMTOKEN #IMPLIED
 	x NMTOKEN #IMPLIED
 	y NMTOKEN #IMPLIED
 >

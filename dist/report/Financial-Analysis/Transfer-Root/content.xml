@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<!DOCTYPE reporting_initialiser PUBLIC "-//NightLabs//Reporting Initialiser DTD V 0.2//EN" "http://www.nightlabs.de/dtd/reporting-initialiser-content_0_2.dtd">
+<!DOCTYPE reporting_initialiser PUBLIC "-//NightLabs//Reporting Initialiser DTD V 0.3//EN" "http://www.nightlabs.de/dtd/reporting-initialiser-content_0_3.dtd">
 <report-category 
 	id="Payment-Root"
 	type="JFireReportingTrade-FinancialAnalysis-Transfer"
@@ -27,7 +27,7 @@
 					<provider-config id="3" organisationID="dev.jfire.org" categoryID="JFireReportingTrade-ValueProviderCategory-Accounting" valueProviderID="AccountIDs" pageIndex="0" pageRow="1" pageColumn="0" allowNullOutputValue="false" showMessageInHeader="false" x="193" y="124" >
 						<message language="en">Select a list of accounts</message>
 					</provider-config>
-					<provider-config id="4" organisationID="dev.jfire.org" categoryID="JFireReporting-ValueProviderCategory-SimpleTypes" valueProviderID="org.nightlabs.util.TimePeriod" pageIndex="0" pageRow="0" pageColumn="0" allowNullOutputValue="true" showMessageInHeader="false" x="82" y="29" >
+					<provider-config id="4" organisationID="dev.jfire.org" categoryID="JFireReporting-ValueProviderCategory-SimpleTypes" valueProviderID="org.nightlabs.util.TimePeriod" pageIndex="0" pageRow="0" pageColumn="0" allowNullOutputValue="true" showMessageInHeader="false" growVertically="false" x="82" y="29" >
 						<message language="en">Select a time period</message>
 					</provider-config>
 				</value-provider-configs>

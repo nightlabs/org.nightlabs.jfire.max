@@ -47,7 +47,7 @@ import org.nightlabs.util.Util;
  * 
  */
 public class ScriptParameter
-		implements Serializable, Comparable // , IScriptParameter
+		implements Serializable, Comparable, IScriptParameter
 {
 	private static final long serialVersionUID = 1L;
 

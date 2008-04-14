@@ -34,164 +34,117 @@ import org.mozilla.javascript.NativeJavaObject;
 import org.mozilla.javascript.Scriptable;
 import org.mozilla.javascript.ScriptableObject;
 import org.mozilla.javascript.Undefined;
-import org.nightlabs.jdo.ObjectIDUtil;
-import org.nightlabs.jfire.scripting.id.ScriptRegistryItemID;
+import org.nightlabs.jfire.scripting.condition.VisibleScope;
 
 /**
  * @author Daniel.Mazurek [at] NightLabs [dot] de
  *
  */
-public class Main {
-
-	public Main() {
-		// TODO Auto-generated constructor stub
-	}
-
-//	public static void main(String[] args) {
-//		Context context = Context.enter();
-//		try {
-//			Scriptable scope = new ImporterTopLevel(context);
-//
-//			String sourceName = "Script";
-//			Object result = context.evaluateString(
-//					scope,
-////					"new Packages.org.nightlabs.jfire.scripting.test.Main();",
-////					"new java.lang.Long(\"5983724587634867435\")",
-////					"\"Blubb\"",
-//					"new java.util.Date()",
-//					sourceName, 1, null);
-//
-//			System.out.println("result=" + result);
-//			System.out.println("result.class=" + (result == null ? null : result.getClass().getName()));
-//
-//			if (result instanceof Undefined)
-//				result = null;
-//			else if (result instanceof NativeJavaObject)
-//				result = ((NativeJavaObject)result).unwrap();
-//			else if (result instanceof Boolean)
-//				; // fine - no conversion necessary
-//			else if (result instanceof Number)
-//				; // fine - no conversion necessary
-//			else if (result instanceof String)
-//				; // fine - no conversion necessary
-////			else
-////				throw new IllegalStateException("context.evaluateString(...) returned an object of an unknown type!");
-//
-//			System.out.println("AFTER CONVERSION");
-//			System.out.println("result=" + result);
-//			System.out.println("result.class=" + (result == null ? null : result.getClass().getName()));
-//		} finally {
-//			Context.exit();
-//		}
-//	}
+public class Main 
+{
+	public static final String LINE_BREAK = "\n";
 	
 	public static void main(String[] args)
-	{
-		runJavaScript();
-//		checkObjectIDEquals();
-	}
-
-	private static void checkObjectIDEquals()
-	{
-		ScriptRegistryItemID scriptID = getScriptRegistryItemID(TEST);
-		String scriptIDString = scriptID.toString();
-		String objectIDString = "jdo/org.nightlabs.jfire.scripting.id.ScriptRegistryItemID?organisationID=dev.jfire.org&scriptRegistryItemType=CrossTicketTrade-Type-Ticket&scriptRegistryItemID=Test";
-		Object objectID = ObjectIDUtil.createObjectID(objectIDString);
-		boolean idEquals = objectID.equals(scriptID);
-		boolean stringEquals = scriptIDString.equals(objectIDString);
-		System.out.println("objectID.equals(scriptID) = "+idEquals);
-		System.out.println("scriptIDString.equals(objectIDString) = "+stringEquals);
-	}
-	
-	private static void runJavaScript()
 	{
 		Context context = Context.enter();
 		try {
 			Scriptable scope = new ImporterTopLevel(context);
-
-			for (Map.Entry<String, Object> me : getParameterValues().entrySet())
-			{
-				Object js_value = Context.javaToJS(me.getValue(), scope);
-				ScriptableObject.putProperty(scope, me.getKey(), js_value);
-			}
-
-			String sourceName = "Script";
-			String scriptText = getScriptText();
-			System.out.println("scriptText = "+scriptText);
-			Object result = context.evaluateString(
-					scope,
-					scriptText,
-					sourceName, 1, null);
-
-			System.out.println("result=" + result);
-			System.out.println("result.class=" + (result == null ? null : result.getClass().getName()));
-
-			if (result instanceof Undefined)
-				result = null;
-			else if (result instanceof NativeJavaObject)
-				result = ((NativeJavaObject)result).unwrap();
-			else if (result instanceof Boolean)
-				; // fine - no conversion necessary
-			else if (result instanceof Number)
-				; // fine - no conversion necessary
-			else if (result instanceof String)
-				; // fine - no conversion necessary
-//			else
-//				throw new IllegalStateException("context.evaluateString(...) returned an object of an unknown type!");
-
-			System.out.println("AFTER CONVERSION");
-			System.out.println("result=" + result);
-			System.out.println("result.class=" + (result == null ? null : result.getClass().getName()));
+			VisibleScope visibleScope= new VisibleScope();
+			String varNameVisible = VisibleScope.VARIABLE_NAME;
+			Object js_pm = Context.javaToJS(visibleScope, scope);
+			ScriptableObject.putProperty(scope, varNameVisible, js_pm);
+			runJavaScript(context, scope, getScriptText(true), getParameterValues(true, visibleScope));
+			runJavaScript(context, scope, getScriptText(true), getParameterValues(true, visibleScope));
 		} finally {
 			Context.exit();
 		}
 	}
+
 	
-	private static final String TEST = "Test";
+//	private static void runJavaScript(String text, Map<String, Object> parameter)
+//	{
+//		Context context = Context.enter();
+//		try {
+//			Scriptable scope = new ImporterTopLevel(context);
+//
+////			boolean visible = false;
+////			String varNameVisible = "visible";
+////			Object js_pm = Context.javaToJS(visible, scope);
+////			ScriptableObject.putProperty(scope, varNameVisible, js_pm);			
+//
+//			runJavaScript(context, scope, text, parameter);
+//		} finally {
+//			Context.exit();
+//		}
+//	}
+
+	private static void runJavaScript(Context context, Scriptable scope, String text, 
+			Map<String, Object> parameter) 
+	{
+		context = Context.enter();
+		for (Map.Entry<String, Object> me : parameter.entrySet())
+		{
+			Object js_value = Context.javaToJS(me.getValue(), scope);
+			ScriptableObject.putProperty(scope, me.getKey(), js_value);
+		}
+
+		String sourceName = "Script";
+		String scriptText = text;
+		Object result = context.evaluateString(
+				scope,
+				scriptText,
+				sourceName, 1, null);
+
+		System.out.println("");
+		System.out.println("result=" + result);
+		System.out.println("result.class=" + (result == null ? null : result.getClass().getName()));
+
+		if (result instanceof Undefined)
+			result = null;
+		else if (result instanceof NativeJavaObject)
+			result = ((NativeJavaObject)result).unwrap();
+		else if (result instanceof Boolean)
+			; // fine - no conversion necessary
+		else if (result instanceof Number)
+			; // fine - no conversion necessary
+		else if (result instanceof String)
+			; // fine - no conversion necessary
+		context.exit();
+	}
 	
-	private static Map<String, Object> getParameterValues()
+	private static Map<String, Object> getParameterValues(boolean value, VisibleScope visibleScope)
 	{
 		Map<String, Object> parameter = new HashMap<String, Object>();
-		ScriptRegistryItemID scriptID = getScriptRegistryItemID(TEST);
-		parameter.put(TEST, scriptID);
-//		String scriptIDString = scriptID.toString();
-//		parameter.put(scriptIDName, scriptIDString);
-		System.out.println("scriptID = "+scriptID);
+		parameter.put("CustomerIsAnonymous", value);
+		parameter.put(VisibleScope.VARIABLE_NAME, visibleScope);
 		return parameter;
 	}
 
-	private static ScriptRegistryItemID getScriptRegistryItemID(String scriptIDName)
-	{
-		String organisationID = "dev.jfire.org";
-		String scriptType = "CrossTicketTrade-Type-Ticket";
-		return ScriptRegistryItemID.create(organisationID, scriptType, scriptIDName);
-	}
-		
-	private static String getScriptText()
+	private static String getScriptText(boolean value)
 	{
 		StringBuffer sb = new StringBuffer();
-		String objectIDString = getScriptRegistryItemID(TEST).toString();
-		sb.append("importPackage(Packages.javax.jdo);");
-
-//		sb.append("(");
-////		sb.append("("+TEST+".toString()==\""+objectIDString+"\""+")");
-//		sb.append("("+TEST+".toString()=="+objectIDString+")");
-//		sb.append("&&");
-////		sb.append("("+TEST+".toString()!=\""+objectIDString+"\""+")");
-//		sb.append("("+TEST+".toString()!="+objectIDString+")");
-//		sb.append(")");
-		
-//		sb.append("("+TEST+".toString()).equals(\""+objectIDString+"\")");
-//		sb.append("("+TEST+".toString()=="+objectIDString+")");
-		sb.append("("+TEST+".toString()==\""+objectIDString+"\""+")");
-//		sb.append(TEST+".equals(ObjectIDUtil.createObjectID(\""+objectIDString+"\"))");
-//		sb.append(TEST+"==(ObjectIDUtil.createObjectID(\""+objectIDString+"\"))");
-//		sb.append(TEST+"==\""+objectIDString+"\"");
-//		sb.append("5 == \"5.0\"");
-//		sb.append("ObjectIDUtil.createObjectID(\""+objectIDString+"\")");
-		
+		sb.append("expression = eval(CustomerIsAnonymous=="+value+");");
+		sb.append(LINE_BREAK);
+		sb.append("if (visibleScope.isVisible() == false) {");
+		sb.append(LINE_BREAK);
+		sb.append("	if (expression == true) {");
+		sb.append(LINE_BREAK);
+		sb.append("		visibleScope.setVisible(true)");
+		sb.append(LINE_BREAK);
+		sb.append("	}");
+		sb.append(LINE_BREAK);
+		sb.append("}");
+		sb.append(LINE_BREAK);
+		sb.append("else {");
+		sb.append(LINE_BREAK);
+		sb.append("	expression = false");
+		sb.append(LINE_BREAK);
+		sb.append("}");
+		sb.append(LINE_BREAK);
+		sb.append("expression");
 		String script = sb.toString();
-		System.out.println("script = "+script);
+		System.out.println(script);
 		return script;
 	}
+	
 }

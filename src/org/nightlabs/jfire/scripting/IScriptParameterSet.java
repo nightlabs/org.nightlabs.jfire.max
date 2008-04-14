@@ -28,6 +28,7 @@ package org.nightlabs.jfire.scripting;
 import java.io.Serializable;
 import java.util.Collection;
 import java.util.Set;
+import java.util.SortedSet;
 
 /**
  * @author Daniel.Mazurek [at] NightLabs [dot] de
@@ -36,10 +37,10 @@ import java.util.Set;
 public interface IScriptParameterSet
 extends Serializable
 {
-	public Collection<ScriptParameter> getParameters();
-	public Set<String> getParameterIDs();
-	
-//	public IScriptParameter createParameter(String scriptParameterID);
-//	public long getScriptParameterSetID();
-//	public void removeAllParameters();
+	public Collection<IScriptParameter> getParameters();
+	public Set<String> getParameterIDs();	
+	public IScriptParameter createParameter(String scriptParameterID);
+	public void removeAllParameters();
+	void removeParameter(String scriptParameterID);
+	SortedSet<IScriptParameter> getSortedParameters();
 }

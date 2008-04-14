@@ -258,31 +258,4 @@ public class Script
 	public boolean isNeedsDetach() {
 		return needsDetach;
 	}
-	
-//	/**
-//	* @jdo.field persistence-modifier="persistent"
-//	*/
-//	private String scriptExecutorClassName;
-//
-//	public String getScriptExecutorClassName()
-//	{
-//		return scriptExecutorClassName;
-//	}
-//
-//	public void setScriptExecutorClassName(String scriptExecutorClassName)
-//	{
-//		this.scriptExecutorClassName = scriptExecutorClassName;
-//	}
-//
-//	public Class getScriptExecutorClass()
-//		throws ClassNotFoundException
-//	{
-//		return Class.forName(scriptExecutorClassName);
-//	}
-//
-//	public void setScriptExecutorClass(Class scriptExecutorClass)
-//	{
-//		this.scriptExecutorClassName = scriptExecutorClass == null ? null : scriptExecutorClass.getName();
-//	}
-
 }

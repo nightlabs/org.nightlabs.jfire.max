@@ -29,8 +29,10 @@ package org.nightlabs.jfire.scripting;
 import java.util.Map;
 
 import javax.jdo.JDOHelper;
+import javax.jdo.PersistenceManager;
 import javax.jdo.spi.PersistenceCapable;
 
+import org.apache.log4j.Logger;
 import org.mozilla.javascript.Context;
 import org.mozilla.javascript.ImporterTopLevel;
 import org.mozilla.javascript.NativeJavaObject;
@@ -47,6 +49,7 @@ import org.mozilla.javascript.Undefined;
 public class ScriptExecutorJavaScript
 		extends ScriptExecutor
 {
+	private static final Logger logger = Logger.getLogger(ScriptExecutorJavaScript.class);
 	public static final String LANGUAGE_JAVA_SCRIPT = "JavaScript";
 	public static final String FILE_EXTENSION_JAVA_SCRIPT = "js";
 
@@ -79,9 +82,12 @@ public class ScriptExecutorJavaScript
 			if (script instanceof PersistenceCapable) {
 				sourceName = JDOHelper.getObjectId(script).toString();
 			}
+			
+			logger.warn("script.getText() = "+script.getText());
+			
 			Object result = context.evaluateString(
 					scope, script.getText(), sourceName, 1, null);
-
+			
 			if (result instanceof Undefined)
 				result = null;
 			else if (result instanceof NativeJavaObject)

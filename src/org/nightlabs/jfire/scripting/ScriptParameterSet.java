@@ -40,6 +40,7 @@ import javax.jdo.PersistenceManager;
 import javax.jdo.Query;
 
 import org.nightlabs.jdo.ObjectIDUtil;
+import org.nightlabs.util.CollectionUtil;
 
 /**
  * A ScriptParameterSet can only be manipulated by the owner organisation. Hence, it contains
@@ -97,8 +98,6 @@ import org.nightlabs.jdo.ObjectIDUtil;
 	 * @jdo.field
 	 *		persistence-modifier="persistent"
 	 *		collection-type="map"
-	 *		key-type="String"
-	 *		value-type="ScriptParameter"
 	 *		mapped-by="scriptParameterSet"
 	 *		dependent-value="true"
 	 *
@@ -106,16 +105,16 @@ import org.nightlabs.jdo.ObjectIDUtil;
 	 */
 	private Map<String, ScriptParameter> parameters;
 
-	/**
-	 * TODO: Is this needed
-	 * @jdo.field
-	 *		persistence-modifier="persistent"
-	 *		collection-type="collection"
-	 *		element-type="ScriptParameter"
-	 *		mapped-by="scriptParameterSet"
-	 *		dependent-element="true"
-	 */
-	private List<ScriptParameter> orderedParameters;
+//	/**
+//	 * TODO: Is this needed
+//	 * @jdo.field
+//	 *		persistence-modifier="persistent"
+//	 *		collection-type="collection"
+//	 *		element-type="ScriptParameter"
+//	 *		mapped-by="scriptParameterSet"
+//	 *		dependent-element="true"
+//	 */
+//	private List<ScriptParameter> orderedParameters;
 
 	/**
 	 * @jdo.field persistence-modifier="persistent" mapped-by="scriptParameterSet" dependent="true"
@@ -138,7 +137,7 @@ import org.nightlabs.jdo.ObjectIDUtil;
 		this.organisationID = organisationID;
 		this.scriptParameterSetID = scriptParameterSetID;
 		this.name = new ScriptParameterSetName(this);
-		parameters = new HashMap();
+		parameters = new HashMap<String, ScriptParameter>();
 		nextParameterOrderNumber = 0;
 	}
 
@@ -156,15 +155,15 @@ import org.nightlabs.jdo.ObjectIDUtil;
 		return Collections.unmodifiableSet(parameters.keySet());
 	}
 
-	public Collection<ScriptParameter> getParameters()
+	public Collection<IScriptParameter> getParameters()
 	{
-		return Collections.unmodifiableCollection(parameters.values());
-//		Collection<IScriptParameter> params = CollectionUtil.castCollection(parameters.values());
-//		return Collections.unmodifiableCollection(params);
+//		return Collections.unmodifiableCollection(parameters.values());
+		Collection<IScriptParameter> params = CollectionUtil.castCollection(parameters.values());
+		return Collections.unmodifiableCollection(params);
 	}
 	
-	public SortedSet<ScriptParameter> getSortedParameters() {
-		SortedSet sortedParams = new TreeSet(parameters.values());
+	public SortedSet<IScriptParameter> getSortedParameters() {
+		SortedSet<IScriptParameter> sortedParams = new TreeSet<IScriptParameter>(parameters.values());
 		return Collections.unmodifiableSortedSet(sortedParams);
 	}
 
@@ -177,7 +176,7 @@ import org.nightlabs.jdo.ObjectIDUtil;
 	 *		to reference the parameter.
 	 * @return Returns the newly created parameter (or a previously existing one).
 	 */
-	public ScriptParameter createParameter(String scriptParameterID)
+	public IScriptParameter createParameter(String scriptParameterID)
 	{
 		ScriptParameter res = parameters.get(scriptParameterID);
 		if (res != null)

@@ -164,7 +164,7 @@ public abstract class ScriptExecutor
 			preparing = false;
 		}
 	}
-	
+
 	/**
 	 * Called on {@link #prepare(Script, Map)} after the
 	 * validation of parameters.
@@ -258,21 +258,6 @@ public abstract class ScriptExecutor
 					undeclaredParameterIDs);
 	}
 
-//	/**
-//	 * Returns the script set with {@link #prepare(Script, Map)}.
-//	 * If prepare was not called prior to this method
-//	 * an {@link IllegalStateException} will be thrown.
-//	 *
-//	 * @return The script to execute.
-//	 */
-//	public Script getScript()
-//	{
-//		if (!isPrepared() && !preparing)
-//			throw new IllegalStateException("Cannot obtain script prior to prepare(...)! Call prepare(...) first!");
-//
-//		return script;
-//	}
-
 	/**
 	 * Returns the script set with {@link #prepare(Script, Map)}.
 	 * If prepare was not called prior to this method
@@ -308,7 +293,7 @@ public abstract class ScriptExecutor
 
 		return parameterValues;
 	}
-
+	
 	/**
 	 * This method checks whether it's prepared and calls {@link #doExecute() } then. You
 	 * must not override this method - implement {@link #doExecute() } instead!

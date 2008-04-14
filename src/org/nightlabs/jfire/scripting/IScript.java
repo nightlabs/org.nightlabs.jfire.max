@@ -74,11 +74,11 @@ extends Serializable
 	public String getText();
 	
 	/**
-	 * Return the {@link ScriptParameterSet} for the Script.
-	 * @return the {@link ScriptParameterSet} for the Script
+	 * Return the input {@link IScriptParameterSet} for the Script.
+	 * @return the input {@link IScriptParameterSet} for the Script
 	 */
 	public IScriptParameterSet getParameterSet();
-	
+		
 	/**
 	 * Determines if the script value should be detached or not.
 	 * @return if the script value should be detached or not
@@ -95,5 +95,5 @@ extends Serializable
 	 * Determines the fetchGroups which should be used if the {@link IScript#isNeedsDetach()} returns true.
 	 * @return the fetchGroups which should be used if the {@link IScript#isNeedsDetach()} returns true
 	 */
-	public String[] getFetchGroups();
+	public String[] getFetchGroups();	
 }

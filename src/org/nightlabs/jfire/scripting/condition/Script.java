@@ -28,8 +28,11 @@ package org.nightlabs.jfire.scripting.condition;
 import java.util.HashMap;
 import java.util.Map;
 
+import org.nightlabs.jfire.idgenerator.IDGenerator;
+import org.nightlabs.jfire.organisation.Organisation;
 import org.nightlabs.jfire.scripting.IScript;
 import org.nightlabs.jfire.scripting.IScriptParameterSet;
+import org.nightlabs.jfire.scripting.ScriptParameterSet;
 import org.nightlabs.jfire.scripting.id.ScriptRegistryItemID;
 
 
@@ -59,6 +62,22 @@ implements IScript
 		this.language = language;
 		this.text = text;
 		this.variableName2ScriptID = variableName2ScriptID;
+	}
+	
+	private boolean simpleScript = true;
+	/**
+	 * Return the simpleScript.
+	 * @return the simpleScript
+	 */
+	public boolean isSimpleScript() {
+		return simpleScript;
+	}
+	/**
+	 * Sets the simpleScript.
+	 * @param simpleScript the simpleScript to set
+	 */
+	public void setSimpleScript(boolean simpleScript) {
+		this.simpleScript = simpleScript;
 	}
 	
 	/**
@@ -125,17 +144,19 @@ implements IScript
 	public void setVariableName2Value(Map<String, Object> variableName2Value) {
 		this.variableName2Value = variableName2Value;
 	}
-	
-	//***************************** Compatibility Reasons for IScript **************************
-	private transient IScriptParameterSet parameterSet = null;
+
+	private IScriptParameterSet parameterSet = null;
 	public IScriptParameterSet getParameterSet() 
 	{
 		if (parameterSet == null) {
-			parameterSet = new ConditionScriptParameterSet();
+			parameterSet = new org.nightlabs.jfire.scripting.ScriptParameterSet(
+					Organisation.DEV_ORGANISATION_ID, IDGenerator.nextID(ScriptParameterSet.class));
 		}
 		return parameterSet;
 	}
-	
+		
+	//***************************** Compatibility Reasons for IScript **************************
+
 	private transient String[] fetchGroups = null;
 	public String[] getFetchGroups() {
 		return fetchGroups;

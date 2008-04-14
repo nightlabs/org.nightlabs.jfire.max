@@ -31,6 +31,14 @@ package org.nightlabs.jfire.scripting;
  */
 public interface IScriptParameter
 {
-//	public void setScriptParameterClass(Class scriptParameterClass);
-	public String getScriptParameterID();
+	String getScriptParameterID();
+	void setScriptParameterID(String scriptParameterID);
+	
+	int getOrderNumber();
+	
+	String getScriptParameterClassName();
+	void setScriptParameterClassName(String scriptParameterClassName);
+	
+	Class getScriptParameterClass() throws ClassNotFoundException;
+	void setScriptParameterClass(Class scriptParameterClass);
 }

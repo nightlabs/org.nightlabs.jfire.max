@@ -83,7 +83,8 @@ public class ScriptExecutorJavaScript
 				sourceName = JDOHelper.getObjectId(script).toString();
 			}
 			
-			logger.warn("script.getText() = "+script.getText());
+			if (logger.isDebugEnabled())
+				logger.debug("Executing JavasSript: "+script.getText());
 			
 			Object result = context.evaluateString(
 					scope, script.getText(), sourceName, 1, null);

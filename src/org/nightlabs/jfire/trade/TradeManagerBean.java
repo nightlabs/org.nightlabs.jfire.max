@@ -989,6 +989,10 @@ implements SessionBean
 	/**
 	 * Stores the given Person to a LegalEntity. If no LegalEntity with the right
 	 * AnchorID is found a new one will be created and made persistent.
+	 * <p>
+	 * Note that this method will throw an {@link IllegalArgumentException} on an
+	 * attempt to change the person of an anonymous {@link LegalEntity}.
+	 * </p>
 	 *
 	 * @param person The person to be set to the LegalEntity
 	 * @param get If true the created LegalEntity will be returned else null
@@ -1007,6 +1011,10 @@ implements SessionBean
 			if (fetchGroups != null)
 				pm.getFetchPlan().setGroups(fetchGroups);
 			Trader trader = Trader.getTrader(pm);
+			LegalEntity aLegalEntity = LegalEntity.getLegalEntity(pm, person);
+			if (aLegalEntity != null && aLegalEntity.isAnonymous()) {
+				throw new IllegalArgumentException("Attempt to change anonymous LegalEntity");
+			}
 			Person aPerson = pm.makePersistent(person);
 			LegalEntity legalEntity = trader.setPersonToLegalEntity(aPerson, true);
 			if (get)
@@ -1045,7 +1053,10 @@ implements SessionBean
 
 	/**
 	 * Stores the given LegalEntity.
-	 *
+	 * <p>
+	 * Note that this method will throw an {@link IllegalArgumentException} on an
+	 * attempt to change the person of an anonymous {@link LegalEntity}.
+	 * </p>
 	 * @param legalEntity The LegalEntity to be stored
 	 * @param get Whether the stored instance or null should be returned.
 	 * @param fetchGroups The fetchGroups the returned LegalEntity should be detached with
@@ -1059,6 +1070,8 @@ implements SessionBean
 	{
 		PersistenceManager pm = getPersistenceManager();
 		try {
+			if (legalEntity.isAnonymous())
+				throw new IllegalArgumentException("Attempt to change anonymous LegalEntity");
 			return NLJDOHelper.storeJDO(pm, legalEntity, get, fetchGroups, maxFetchDepth);
 		} finally {
 			pm.close();

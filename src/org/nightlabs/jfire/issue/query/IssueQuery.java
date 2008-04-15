@@ -117,8 +117,7 @@ extends AbstractJDOQuery<Issue>
 	}
 	
 	@Override
-	protected Query prepareQuery() {
-		Query q = getPersistenceManager().newQuery(getResultType());
+	protected void prepareQuery(Query q) {
 		StringBuilder filter = new StringBuilder("true");
 //		StringBuffer stringNames = new StringBuffer();
 		
@@ -219,7 +218,6 @@ extends AbstractJDOQuery<Issue>
 		
 		logger.info(filter.toString());
 		q.setFilter(filter.toString());
-		return q;
 	}
 
 	public String getIssueSubject()
@@ -399,7 +397,7 @@ extends AbstractJDOQuery<Issue>
 	}
 
 	@Override
-	protected Class<Issue> init()
+	protected Class<Issue> initCandidateClass()
 	{
 		return Issue.class;
 	}

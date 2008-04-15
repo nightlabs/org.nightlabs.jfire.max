@@ -213,4 +213,13 @@ public class StatableQuery
 		return statableClass != null ? statableClass : super.getCandidateClass();
 	}
 	
+	/**
+	 * We assume here that the result class == the set Statable class, but we can only return the
+	 * correct information when we have it.
+	 */
+	@Override
+	public Class<?> getResultClass()
+	{
+		return statableClass != null ? statableClass : super.getResultClass();
+	}
 }

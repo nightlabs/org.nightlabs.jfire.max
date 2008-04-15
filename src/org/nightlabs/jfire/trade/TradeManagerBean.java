@@ -1484,6 +1484,9 @@ implements SessionBean
 			EditLockType productTypeEditLock = new EditLockType(JFireTradeEAR.EDIT_LOCK_TYPE_ID_PRODUCT_TYPE);
 			productTypeEditLock = pm.makePersistent(productTypeEditLock);
 			// TODO do sth. with productTypeEditLock or remove this variable (btw. after pm.makePersistent(...) it is crutial to continue work with the result of this method!)
+			
+			// WORKAROUND JPOX Bug to avoid java.util.ConcurrentModificationException in OfferRequirement.getOfferRequirement(OfferRequirement.java:86) at runtime
+			pm.getExtent(OfferRequirement.class);
 		} finally {
 			pm.close();
 		}

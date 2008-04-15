@@ -35,7 +35,7 @@ extends AbstractProductTypeQuery<SimpleProductType>
 //	}
 
 	@Override
-	protected Class<SimpleProductType> init()
+	protected Class<SimpleProductType> initCandidateClass()
 	{
 		return SimpleProductType.class;
 	}

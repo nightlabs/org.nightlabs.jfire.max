@@ -58,7 +58,7 @@ public class SimpleProductTypeSearchFilter
 	}
 
 	@Override
-	protected Class<SimpleProductType> init()
+	protected Class<SimpleProductType> initCandidateClass()
 	{
 		return SimpleProductType.class;
 	}

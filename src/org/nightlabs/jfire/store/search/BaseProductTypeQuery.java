@@ -17,7 +17,7 @@ public class BaseProductTypeQuery
 	private static final long serialVersionUID = 1L;
 
 	@Override
-	protected Class<ProductType> init()
+	protected Class<ProductType> initCandidateClass()
 	{
 		return ProductType.class;
 	}
@@ -26,7 +26,7 @@ public class BaseProductTypeQuery
 	protected Query createQuery()
 	{
 		return getPersistenceManager().newQuery(
-			getPersistenceManager().getExtent(getResultType(), true)
+			getPersistenceManager().getExtent(getCandidateClass(), true)
 			);
 	}
 

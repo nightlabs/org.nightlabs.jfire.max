@@ -66,7 +66,7 @@ public class OfferQuery
 	}
 	
 	@Override
-	protected Class<Offer> init()
+	protected Class<Offer> initCandidateClass()
 	{
 		return Offer.class;
 	}

@@ -50,7 +50,7 @@ public class InvoiceQuery
 	}
 
 	@Override
-	protected Class<Invoice> init()
+	protected Class<Invoice> initCandidateClass()
 	{
 		return Invoice.class;
 	}

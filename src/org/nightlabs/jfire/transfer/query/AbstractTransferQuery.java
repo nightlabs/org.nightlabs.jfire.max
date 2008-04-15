@@ -9,7 +9,6 @@ import javax.jdo.Query;
 import org.nightlabs.jdo.query.AbstractJDOQuery;
 import org.nightlabs.jdo.query.AbstractSearchQuery;
 import org.nightlabs.jfire.transfer.Anchor;
-import org.nightlabs.jfire.transfer.Transfer;
 import org.nightlabs.jfire.transfer.id.AnchorID;
 
 public abstract class AbstractTransferQuery<T>
@@ -81,13 +80,10 @@ extends AbstractJDOQuery<T>
 		return changedFields;
 	}
 	
-	protected abstract Class<? extends Transfer> getCandidateClass();
-
 	@Override
-	protected Query prepareQuery()
+	protected void prepareQuery(Query q)
 	{
 		PersistenceManager pm = getPersistenceManager();
-		Query q = pm.newQuery(getCandidateClass());
 		StringBuffer filter = new StringBuffer();
 
 		filter.append("true");
@@ -136,8 +132,6 @@ extends AbstractJDOQuery<T>
 //		q.setRange(rangeFromIncl, rangeToExcl);
 		q.setOrdering("this.timestamp DESCENDING, organisationID ASCENDING, transferTypeID ASCENDING, transferID DESCENDING");
 		setQueryResult(q);
-
-		return q;
 	}
 
 	protected abstract void appendToFilter(Query q, StringBuffer filter);

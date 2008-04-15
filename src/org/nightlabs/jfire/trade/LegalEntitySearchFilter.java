@@ -60,7 +60,7 @@ public class LegalEntitySearchFilter
 //	}
 
 	@Override
-	protected Class<LegalEntity> init()
+	protected Class<LegalEntity> initCandidateClass()
 	{
 		return LegalEntity.class;
 	}

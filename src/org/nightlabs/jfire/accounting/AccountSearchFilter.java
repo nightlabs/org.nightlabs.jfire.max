@@ -212,7 +212,7 @@ public class AccountSearchFilter extends SearchFilter<Account>
 	}
 
 	@Override
-	protected Class<Account> init()
+	protected Class<Account> initCandidateClass()
 	{
 		return Account.class;
 	}

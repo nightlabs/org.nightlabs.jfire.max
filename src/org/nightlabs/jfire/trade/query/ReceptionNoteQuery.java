@@ -23,7 +23,7 @@ public class ReceptionNoteQuery
 	}
 
 	@Override
-	protected Class<ReceptionNote> init()
+	protected Class<ReceptionNote> initCandidateClass()
 	{
 		return ReceptionNote.class;
 	}

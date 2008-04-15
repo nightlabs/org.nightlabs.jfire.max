@@ -27,7 +27,7 @@ public class DeliveryNoteQuery
 	}
 
 	@Override
-	protected Class<DeliveryNote> init()
+	protected Class<DeliveryNote> initCandidateClass()
 	{
 		return DeliveryNote.class;
 	}

@@ -41,9 +41,8 @@ public abstract class AbstractArticleContainerQuery<R extends ArticleContainer>
 	public static final String PROPERTY_VENDOR_NAME = PROPERTY_PREFIX + "vendorName";
 	
 	@Override
-	protected Query prepareQuery()
+	protected void prepareQuery(Query q)
 	{
-		Query q = getPersistenceManager().newQuery(getResultType());
 		StringBuffer filter = new StringBuffer();
 		
 		filter.append("true");
@@ -87,8 +86,6 @@ public abstract class AbstractArticleContainerQuery<R extends ArticleContainer>
 		
 		if (logger.isDebugEnabled())
 			logger.debug("query = "+filter);
-		
-		return q;
 	}
 
 	/**

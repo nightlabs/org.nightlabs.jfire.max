@@ -22,7 +22,7 @@ public class OrderQuery
 	}
 
 	@Override
-	protected Class<Order> init()
+	protected Class<Order> initCandidateClass()
 	{
 		return Order.class;
 	}

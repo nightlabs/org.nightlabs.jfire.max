@@ -6,7 +6,7 @@ import org.nightlabs.annotation.Implement;
 import org.nightlabs.jfire.transfer.id.TransferID;
 
 public class MoneyTransferIDQuery
-	extends AbstractMoneyTransferQuery<TransferID>
+	extends AbstractMoneyTransferQuery
 {
 	private static final long serialVersionUID = 1L;
 
@@ -18,9 +18,9 @@ public class MoneyTransferIDQuery
 	}
 
 	@Override
-	protected Class<TransferID> init()
+	protected Class<?> initResultClass()
 	{
 		return TransferID.class;
 	}
-
+	
 }

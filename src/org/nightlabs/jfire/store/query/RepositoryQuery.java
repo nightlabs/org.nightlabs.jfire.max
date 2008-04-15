@@ -104,9 +104,8 @@ extends AbstractJDOQuery<Repository>
 	}
 	
 	@Override
-	protected Query prepareQuery()
+	protected void prepareQuery(Query q)
 	{
-		Query q = getPersistenceManager().newQuery(Repository.class);
 		StringBuffer filter = new StringBuffer();
 		StringBuffer vars = new StringBuffer();
 //		StringBuffer imports = new StringBuffer();
@@ -154,8 +153,6 @@ extends AbstractJDOQuery<Repository>
 		
 		q.setFilter(filter.toString());
 		q.declareVariables(vars.toString());
-		
-		return q;
 	}
 
 	private void addFullTextSearch(StringBuffer filter, StringBuffer vars, String member)
@@ -300,7 +297,7 @@ extends AbstractJDOQuery<Repository>
 	}
 
 	@Override
-	protected Class<Repository> init()
+	protected Class<Repository> initCandidateClass()
 	{
 		return Repository.class;
 	}

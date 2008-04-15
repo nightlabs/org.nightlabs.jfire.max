@@ -62,16 +62,15 @@ public abstract class AbstractProductTypeQuery<P extends ProductType>
 	public static final String PROPERTY_PUBLISHED = PROPERTY_PREFIX + "published";
 	public static final String PROPERTY_SALEABLE = PROPERTY_PREFIX + "saleable";
 
+	@Override
 	protected Query createQuery()
 	{
-		return getPersistenceManager().newQuery(getResultType());
+		return getPersistenceManager().newQuery(getCandidateClass());
 	}
 	
 	@Override
-	protected Query prepareQuery()
+	protected void prepareQuery(Query q)
 	{
-		Query q = createQuery(); 
-		
 		StringBuffer filter = getFilter();
 		StringBuffer vars = getVars();
 		
@@ -165,8 +164,6 @@ public abstract class AbstractProductTypeQuery<P extends ProductType>
 		
 		q.setFilter(filter.toString());
 		q.declareVariables(vars.toString());
-		
-		return q;
 	}
 
 	protected void addFullTextSearch(StringBuffer filter, StringBuffer vars, String member) {

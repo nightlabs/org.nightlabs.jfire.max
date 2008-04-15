@@ -26,7 +26,7 @@ public class AccountQuery
 	private static final Logger logger = Logger.getLogger(AccountQuery.class);
 
 	/**
-	 * the minium balance of the account to search for
+	 * the minimum balance of the account to search for
 	 */
 	private Long minBalance = null;
 	/**
@@ -136,9 +136,8 @@ public class AccountQuery
 		return changedFields;
 	}
 	@Override
-	protected Query prepareQuery()
+	protected void prepareQuery(Query q)
 	{
-		Query q = getPersistenceManager().newQuery(Account.class);
 		StringBuffer filter = new StringBuffer();
 		StringBuffer vars = new StringBuffer();
 //		StringBuffer imports = new StringBuffer();
@@ -199,8 +198,6 @@ public class AccountQuery
 		
 		q.setFilter(filter.toString());
 		q.declareVariables(vars.toString());
-		
-		return q;
 	}
 
 	private void addFullTextSearch(StringBuffer filter, StringBuffer vars, String member)
@@ -402,7 +399,7 @@ public class AccountQuery
 	}
 
 	@Override
-	protected Class<Account> init()
+	protected Class<Account> initCandidateClass()
 	{
 		return Account.class;
 	}

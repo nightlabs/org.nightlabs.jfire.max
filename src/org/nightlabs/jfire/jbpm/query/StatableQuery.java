@@ -87,11 +87,16 @@ public class StatableQuery
 	{
 		this.statableClass = statableClass;
 	}
+
+	@Override
+	protected Query createQuery()
+	{
+		return getPersistenceManager().newQuery(getStatableClass());
+	}
 	
 	@Override
-	protected Query prepareQuery()
+	protected void prepareQuery(Query q)
 	{
-		Query q = getPersistenceManager().newQuery(getStatableClass());
 		StringBuffer filter = new StringBuffer();
 		
 		filter.append("true");
@@ -130,8 +135,6 @@ public class StatableQuery
 		logger.debug("filter == "+filter);
 		
 		q.setFilter(filter.toString());
-		
-		return q;
 	}
 
 	/**
@@ -199,15 +202,15 @@ public class StatableQuery
 	}
 
 	@Override
-	protected Class<Statable> init()
+	protected Class<Statable> initCandidateClass()
 	{
 		return Statable.class;
 	}
 	
 	@Override
-	protected Class<? extends Statable> getResultType()
+	protected Class<? extends Statable> getCandidateClass()
 	{
-		return statableClass != null ? statableClass : super.getResultType();
+		return statableClass != null ? statableClass : super.getCandidateClass();
 	}
 	
 }

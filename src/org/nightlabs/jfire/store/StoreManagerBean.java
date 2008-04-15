@@ -522,7 +522,8 @@ implements SessionBean
 				pm.getFetchPlan().setGroups(fetchGroups);
 			
 			searchFilter.setPersistenceManager(pm);
-			Collection<? extends ProductType> productTypes = searchFilter.getResult();
+			Collection<? extends ProductType> productTypes = 
+				(Collection<? extends ProductType>) searchFilter.getResult();
 			return CollectionUtil.castCollection(NLJDOHelper.getDetachedQueryResultAsSet(pm, productTypes));
 		} finally {
 			pm.close();
@@ -538,7 +539,8 @@ implements SessionBean
 	 * @ejb.permission role-name="_Guest_"
 	 * @ejb.transaction type="Required"
 	 */
-	public Collection<? extends ProductTypeGroup> searchProductTypeGroups(ProductTypeGroupSearchFilter<?> searchFilter, String[] fetchGroups, int maxFetchDepth)
+	public Collection<? extends ProductTypeGroup> searchProductTypeGroups(
+		ProductTypeGroupSearchFilter<?> searchFilter, String[] fetchGroups, int maxFetchDepth)
 	{
 		PersistenceManager pm = getPersistenceManager();
 		try {
@@ -547,7 +549,8 @@ implements SessionBean
 				pm.getFetchPlan().setGroups(fetchGroups);
 
 			searchFilter.setPersistenceManager(pm);
-			Collection<? extends ProductTypeGroup> productTypeGroups = searchFilter.getResult();
+			Collection<? extends ProductTypeGroup> productTypeGroups = 
+				(Collection<? extends ProductTypeGroup>) searchFilter.getResult();
 //			Collection result = pm.detachCopyAll(productTypeGroups);
 			return CollectionUtil.castSet(NLJDOHelper.getDetachedQueryResultAsSet(pm, productTypeGroups));
 		} finally {
@@ -566,14 +569,16 @@ implements SessionBean
 	 * @ejb.permission role-name="_Guest_"
 	 * @ejb.transaction type="Required"
 	 */
-	public ProductTypeGroupSearchResult searchProductTypeGroups(ProductTypeGroupSearchFilter<?> searchFilter, boolean saleable)
+	public ProductTypeGroupSearchResult searchProductTypeGroups(
+		ProductTypeGroupSearchFilter<?> searchFilter, boolean saleable)
 	{
 		PersistenceManager pm = getPersistenceManager();
 		try {
 			ProductTypeGroupSearchResult searchResult = new ProductTypeGroupSearchResult();
 			
 			searchFilter.setPersistenceManager(pm);
-			Collection<? extends ProductTypeGroup> productTypeGroups = searchFilter.getResult();
+			Collection<? extends ProductTypeGroup> productTypeGroups = 
+				(Collection<? extends ProductTypeGroup>) searchFilter.getResult();
 			for (Iterator<? extends ProductTypeGroup> iter = productTypeGroups.iterator(); iter.hasNext();) {
 				ProductTypeGroup group = iter.next();
 				searchResult.addEntry(group);
@@ -1297,7 +1302,7 @@ implements SessionBean
 			Iterator<DeliveryResult> itResults = deliverDoWorkClientResults.iterator();
 			for (Iterator<DeliveryID> itIDs = deliveryIDs.iterator(); itIDs.hasNext(); ) {
 				DeliveryID deliveryID = itIDs.next();
-				DeliveryResult deliverDoWorkClientResult = (DeliveryResult) itResults.next();
+				DeliveryResult deliverDoWorkClientResult = itResults.next();
 
 				DeliveryResult res = null;
 				try {
@@ -1963,7 +1968,7 @@ implements SessionBean
 		PersistenceManager pm = getPersistenceManager();
 		try {
 			productTransferIDQuery.setPersistenceManager(pm);
-			return new ArrayList<TransferID>(productTransferIDQuery.getResult());
+			return new ArrayList<TransferID>((Collection<TransferID>)  productTransferIDQuery.getResult());
 		} finally {
 			pm.close();
 		}
@@ -1991,7 +1996,7 @@ implements SessionBean
 			for (ProductTransferQuery productTransferQuery : productTransferQueries) {
 				productTransferQuery.setPersistenceManager(pm);
 				productTransferQuery.setCandidates(productTransfers);
-				productTransfers = productTransferQuery.getResult();
+				productTransfers = (Collection<ProductTransfer>) productTransferQuery.getResult();
 			}
 
 			return NLJDOHelper.getObjectIDList(productTransfers);

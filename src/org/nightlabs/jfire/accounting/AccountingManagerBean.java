@@ -130,6 +130,7 @@ import org.nightlabs.jfire.trade.id.CustomerGroupID;
 import org.nightlabs.jfire.trade.id.OfferID;
 import org.nightlabs.jfire.trade.id.OrderID;
 import org.nightlabs.jfire.trade.jbpm.ProcessDefinitionAssignment;
+import org.nightlabs.jfire.trade.query.InvoiceQuery;
 import org.nightlabs.jfire.transfer.Anchor;
 import org.nightlabs.jfire.transfer.id.AnchorID;
 import org.nightlabs.jfire.transfer.id.TransferID;
@@ -734,7 +735,7 @@ public abstract class AccountingManagerBean
 				pm.getFetchPlan().setGroups(fetchGroups);
 			
 			searchFilter.setPersistenceManager(pm);
-			Collection<Account> accounts = searchFilter.getResult();
+			Collection<Account> accounts = (Collection<Account>) searchFilter.getResult();
 
 			if (fetchGroups != null)
 				pm.getFetchPlan().setGroups(fetchGroups);
@@ -2867,7 +2868,7 @@ public abstract class AccountingManagerBean
 		PersistenceManager pm = getPersistenceManager();
 		try {
 			productTransferIDQuery.setPersistenceManager(pm);
-			return new ArrayList<TransferID>(productTransferIDQuery.getResult());
+			return new ArrayList<TransferID>( (Collection<TransferID>) productTransferIDQuery.getResult());
 		} finally {
 			pm.close();
 		}
@@ -2894,7 +2895,7 @@ public abstract class AccountingManagerBean
 			for (MoneyTransferQuery productTransferQuery : moneyTransferQueries) {
 				productTransferQuery.setPersistenceManager(pm);
 				productTransferQuery.setCandidates(productTransfers);
-				productTransfers = productTransferQuery.getResult();
+				productTransfers = (Collection<MoneyTransfer>) productTransferQuery.getResult();
 			}
 
 			return NLJDOHelper.getObjectIDList(productTransfers);

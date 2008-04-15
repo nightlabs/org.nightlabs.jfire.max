@@ -10,7 +10,7 @@ import org.nightlabs.jfire.transfer.id.TransferID;
  * @author Marius Heinzmann - marius[at]nightlabs[dot]com
  */
 public class ProductTransferIDQuery
-	extends AbstractProductTransferQuery
+	extends ProductTransferQuery
 {
 	private static final long serialVersionUID = 1L;
 

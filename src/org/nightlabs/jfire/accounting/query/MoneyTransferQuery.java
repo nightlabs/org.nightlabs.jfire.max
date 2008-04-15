@@ -6,7 +6,7 @@ import org.nightlabs.annotation.Implement;
 import org.nightlabs.jfire.accounting.MoneyTransfer;
 import org.nightlabs.jfire.transfer.query.AbstractTransferQuery;
 
-public class AbstractMoneyTransferQuery
+public class MoneyTransferQuery
 	extends AbstractTransferQuery<MoneyTransfer>
 {
 	private static final long serialVersionUID = 1L;

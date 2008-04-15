@@ -57,7 +57,7 @@ public class VoucherTypeSearchFilter
 	}
 
 	@Override
-	protected Class<VoucherType> init()
+	protected Class<VoucherType> initCandidateClass()
 	{
 		return VoucherType.class;
 	}

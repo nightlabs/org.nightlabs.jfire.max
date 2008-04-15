@@ -27,7 +27,7 @@ extends AbstractProductTypeQuery<DynamicProductType>
 //	}
 
 	@Override
-	protected Class<DynamicProductType> init()
+	protected Class<DynamicProductType> initCandidateClass()
 	{
 		return DynamicProductType.class;
 	}

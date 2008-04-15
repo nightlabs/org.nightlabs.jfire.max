@@ -1271,7 +1271,7 @@ implements SessionBean
 		try {
 			pm.getFetchPlan().clearGroups();
 			searchFilter.setPersistenceManager(pm);
-			Collection<SimpleProductType> productTypes = searchFilter.getResult();
+			Collection<SimpleProductType> productTypes = (Collection<SimpleProductType>) searchFilter.getResult();
 			Collection<ProductTypeID> ids = new ArrayList<ProductTypeID>(productTypes.size());
 			for (ProductType	productType : productTypes)
 				ids.add(productType.getObjectId());

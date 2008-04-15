@@ -54,7 +54,7 @@ public class ReportCategorySearchFilter
 	}
 
 	@Override
-	protected Class<ReportCategory> init()
+	protected Class<ReportCategory> initCandidateClass()
 	{
 		return ReportCategory.class;
 	}

@@ -19,7 +19,7 @@ import org.nightlabs.jfire.transfer.id.AnchorID;
  * @author Marius Heinzmann - marius[at]nightlabs[dot]com
  */
 public class AccountQuery
-	extends AbstractJDOQuery<Account>
+	extends AbstractJDOQuery
 {
 	private static final long serialVersionUID = 1L;
 

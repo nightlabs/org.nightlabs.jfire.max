@@ -16,7 +16,7 @@ import org.nightlabs.jfire.transfer.id.AnchorID;
  * @author Marco Schulze - Marco at NightLabs dot de
  */
 public class RepositoryQuery
-extends AbstractJDOQuery<Repository>
+	extends AbstractJDOQuery
 {
 	private static final long serialVersionUID = 1L;
 

@@ -8,7 +8,7 @@ import org.nightlabs.jfire.transfer.id.AnchorID;
  *
  */
 public class ReceptionNoteQuery
-	extends AbstractArticleContainerQuery<ReceptionNote>
+	extends AbstractArticleContainerQuery
 {
 	private static final long serialVersionUID = 1L;
 

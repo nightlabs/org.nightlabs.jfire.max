@@ -32,8 +32,8 @@ import org.nightlabs.jdo.search.SearchFilter;
  * 
  * @author Alexander Bieber <alex[AT]nightlabs[DOT]de>
  */
-public abstract class ProductTypeGroupSearchFilter<R extends ProductTypeGroup>
-	extends SearchFilter<R>
+public abstract class ProductTypeGroupSearchFilter
+	extends SearchFilter
 {
 	public ProductTypeGroupSearchFilter(int conjunction)
 	{

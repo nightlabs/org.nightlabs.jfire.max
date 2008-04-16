@@ -97,9 +97,8 @@ extends BaseJDOObjectDAO<ArticleContainerID, ArticleContainer>
 		return getJDOObjects(null, articleContainerIDs, fetchGroups, maxFetchDepth, monitor);
 	}
 	
-	public <T extends ArticleContainer> Collection<T> getArticleContainersForQueries(
-//			Collection<JDOQuery<ArticleContainer>> queries,
-			QueryCollection<T, ? extends AbstractArticleContainerQuery<T>> queries,
+	public Collection<?> getArticleContainersForQueries(
+			QueryCollection<? extends AbstractArticleContainerQuery> queries,
 			String[] fetchGroups,
 			int maxFetchDepth, ProgressMonitor monitor)
 	{

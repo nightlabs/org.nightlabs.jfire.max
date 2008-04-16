@@ -32,8 +32,8 @@ import org.nightlabs.jdo.search.SearchFilter;
  * @author Alexander Bieber <alex[AT]nightlabs[DOT]de>
  *
  */
-public abstract class ProductTypeSearchFilter<R extends ProductType>
-	extends SearchFilter<R>
+public abstract class ProductTypeSearchFilter
+	extends SearchFilter
 {
 	private static final long serialVersionUID = 1L;
 

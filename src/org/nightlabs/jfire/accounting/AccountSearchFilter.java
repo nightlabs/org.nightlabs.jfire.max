@@ -38,7 +38,7 @@ import org.nightlabs.jfire.transfer.id.AnchorID;
  * @author Alexander Bieber <alex[AT]nightlabs[DOT]de>
  *
  */
-public class AccountSearchFilter extends SearchFilter<Account>
+public class AccountSearchFilter extends SearchFilter
 {
 	private static final long serialVersionUID = 1L;
 	private AnchorID owner;

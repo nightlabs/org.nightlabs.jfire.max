@@ -6,7 +6,7 @@ import org.nightlabs.jfire.store.ProductTransfer;
 import org.nightlabs.jfire.transfer.query.AbstractTransferQuery;
 
 public class ProductTransferQuery
-	extends AbstractTransferQuery<ProductTransfer>
+	extends AbstractTransferQuery
 {
 	private static final long serialVersionUID = 1L;
 

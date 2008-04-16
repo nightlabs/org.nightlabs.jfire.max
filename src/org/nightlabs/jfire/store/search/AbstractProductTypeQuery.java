@@ -21,8 +21,8 @@ import org.nightlabs.jfire.transfer.id.AnchorID;
  * @author Daniel.Mazurek [at] NightLabs [dot] de
  * @author Marius Heinzmann - marius[at]nightlabs[dot]com
  */
-public abstract class AbstractProductTypeQuery<P extends ProductType>
-	extends AbstractJDOQuery<P>
+public abstract class AbstractProductTypeQuery
+	extends AbstractJDOQuery
 {
 	private static final Logger logger = Logger.getLogger(AbstractProductTypeQuery.class);
 	

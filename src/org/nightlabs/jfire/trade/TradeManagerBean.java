@@ -1680,28 +1680,38 @@ implements SessionBean
 	 * @ejb.transaction type="Supports" @!This usually means that no transaction is opened which is significantly faster and recommended for all read-only EJB methods! Marco.
 	 */
 	@SuppressWarnings("unchecked")
-	public <R extends ArticleContainer> Set<ArticleContainerID> getArticleContainerIDs(QueryCollection<R, ? extends AbstractArticleContainerQuery<? extends R>> queries)
+	public <R extends ArticleContainer> Set<ArticleContainerID> getArticleContainerIDs(
+		QueryCollection<? extends AbstractArticleContainerQuery> queries)
 	{
+		if (queries == null)
+			return null;
+		
+		if (! ArticleContainer.class.isAssignableFrom(queries.getResultClass()))
+		{
+			throw new RuntimeException("Given QueryCollection has invalid return type! " +
+					"Invalid return type= "+ queries.getResultClassName());
+		}
+		
 		PersistenceManager pm = getPersistenceManager();
 		try {
 			pm.getFetchPlan().setMaxFetchDepth(1);
 			pm.getFetchPlan().setGroup(FetchPlan.DEFAULT);
 
-			JDOQueryCollectionDecorator<R, ? extends AbstractArticleContainerQuery<? extends R>> decoratedCollection;
+			JDOQueryCollectionDecorator<? extends AbstractArticleContainerQuery> decoratedCollection;
 			
 			// DO not add / apply generics to the instanceof check, the sun compiler doesn't like it
 			// and stop compilation with an "Unconvertible types" error!
 			if (queries instanceof JDOQueryCollectionDecorator)
 			{
-				decoratedCollection = (JDOQueryCollectionDecorator<R, ? extends AbstractArticleContainerQuery<? extends R>>) queries;
+				decoratedCollection = (JDOQueryCollectionDecorator<? extends AbstractArticleContainerQuery>) queries;
 			}
 			else
 			{
-				decoratedCollection = new JDOQueryCollectionDecorator<R, AbstractArticleContainerQuery<? extends R>>(queries);
+				decoratedCollection = new JDOQueryCollectionDecorator<AbstractArticleContainerQuery>(queries);
 			}
 			
 			decoratedCollection.setPersistenceManager(pm);			
-			Collection<R> articleContainers = decoratedCollection.executeQueries();
+			Collection<R> articleContainers = (Collection<R>) decoratedCollection.executeQueries();
 
 			return NLJDOHelper.getObjectIDSet(articleContainers);
 		} finally {
@@ -1800,7 +1810,7 @@ implements SessionBean
 	 * @ejb.transaction type="Supports" @!This usually means that no transaction is opened which is significantly faster and recommended for all read-only EJB methods! Marco.
 	 */
 	@SuppressWarnings("unchecked")
-	public Set<OfferID> getOfferIDs(QueryCollection<Offer, ? extends AbstractJDOQuery<? extends Offer>> queries)
+	public Set<OfferID> getOfferIDs(QueryCollection<? extends AbstractJDOQuery> queries)
 	{
 		if (queries == null)
 			throw new IllegalArgumentException("queries must not be null!");
@@ -1808,24 +1818,31 @@ implements SessionBean
 		if (queries.isEmpty())
 			throw new IllegalArgumentException("queries must not be empty!");
 
+		if (! Offer.class.isAssignableFrom(queries.getResultClass()))
+		{
+			throw new RuntimeException("Given QueryCollection has invalid return type! " +
+					"Invalid return type= "+ queries.getResultClassName());
+		}
+		
 		PersistenceManager pm = getPersistenceManager();
 		try {
 			pm.getFetchPlan().setMaxFetchDepth(1);
 			pm.getFetchPlan().setGroup(FetchPlan.DEFAULT);
 
-			JDOQueryCollectionDecorator<Offer, AbstractJDOQuery<? extends Offer>> decoratedQueries;
+			JDOQueryCollectionDecorator<AbstractJDOQuery> decoratedQueries;
 			
 			if (queries instanceof JDOQueryCollectionDecorator)
 			{
-				decoratedQueries = (JDOQueryCollectionDecorator<Offer, AbstractJDOQuery<? extends Offer>>) queries;
+				decoratedQueries = (JDOQueryCollectionDecorator<AbstractJDOQuery>) queries;
 			}
 			else
 			{
-				decoratedQueries = new JDOQueryCollectionDecorator<Offer, AbstractJDOQuery<? extends Offer>>(queries);
+				decoratedQueries = new JDOQueryCollectionDecorator<AbstractJDOQuery>(queries);
 			}
 			
 			decoratedQueries.setPersistenceManager(pm);
-			Collection<? extends Offer> offers = decoratedQueries.executeQueries();
+			Collection<? extends Offer> offers =
+				(Collection<? extends Offer>) decoratedQueries.executeQueries();
 
 			return NLJDOHelper.getObjectIDSet(offers);
 		} finally {
@@ -1839,26 +1856,36 @@ implements SessionBean
 	 * @ejb.transaction type="Supports" @!This usually means that no transaction is opened which is significantly faster and recommended for all read-only EJB methods! Marco.
 	 */
 	@SuppressWarnings("unchecked")
-	public Set<OrderID> getOrderIDs(QueryCollection<Order, ? extends AbstractJDOQuery<? extends Order>> queries)
+	public Set<OrderID> getOrderIDs(QueryCollection<? extends AbstractJDOQuery> queries)
 	{
+		if (queries == null)
+			return null;
+		
+		if (! Order.class.isAssignableFrom(queries.getResultClass()))
+		{
+			throw new RuntimeException("Given QueryCollection has invalid return type! " +
+					"Invalid return type= "+ queries.getResultClassName());
+		}
+		
 		PersistenceManager pm = getPersistenceManager();
 		try {
 			pm.getFetchPlan().setMaxFetchDepth(1);
 			pm.getFetchPlan().setGroup(FetchPlan.DEFAULT);
 
-			JDOQueryCollectionDecorator<Order, AbstractJDOQuery<? extends Order>> decoratedQueries;
+			JDOQueryCollectionDecorator<AbstractJDOQuery> decoratedQueries;
 			
 			if (queries instanceof JDOQueryCollectionDecorator)
 			{
-				decoratedQueries = (JDOQueryCollectionDecorator<Order, AbstractJDOQuery<? extends Order>>) queries;
+				decoratedQueries = (JDOQueryCollectionDecorator<AbstractJDOQuery>) queries;
 			}
 			else
 			{
-				decoratedQueries = new JDOQueryCollectionDecorator<Order, AbstractJDOQuery<? extends Order>>(queries);
+				decoratedQueries = new JDOQueryCollectionDecorator<AbstractJDOQuery>(queries);
 			}
 			
 			decoratedQueries.setPersistenceManager(pm);
-			Collection<? extends Order> orders = decoratedQueries.executeQueries();
+			Collection<? extends Order> orders =
+				(Collection<? extends Order>) decoratedQueries.executeQueries();
 			
 			return NLJDOHelper.getObjectIDSet(orders);
 		} finally {
@@ -1866,57 +1893,42 @@ implements SessionBean
 		}
 	}
 
-//	/**
-//	 * @ejb.interface-method
-//	 * @ejb.permission role-name="_Guest_"
-//	 * @ejb.transaction type="Supports" @!This usually means that no transaction is opened which is significantly faster and recommended for all read-only EJB methods! Marco.
-//	 */
-//	public Set<DeliveryNoteID> getDeliveryNoteIDs(Collection<JDOQuery> queries)
-//	{
-//		PersistenceManager pm = getPersistenceManager();
-//		try {
-//			pm.getFetchPlan().setMaxFetchDepth(1);
-//			pm.getFetchPlan().setGroup(FetchPlan.DEFAULT);
-//
-//			Collection<DeliveryNote> deliveryNotes = null;
-//			for (JDOQuery query : queries) {
-//				query.setPersistenceManager(pm);
-//				query.setCandidates(deliveryNotes);
-//				deliveryNotes = (Collection) query.getResult();
-//			}
-//
-//			return NLJDOHelper.getObjectIDSet(deliveryNotes);
-//		} finally {
-//			pm.close();
-//		}
-//	}
-
 	/**
 	 * @ejb.interface-method
 	 * @ejb.permission role-name="_Guest_"
 	 * @ejb.transaction type="Supports" @!This usually means that no transaction is opened which is significantly faster and recommended for all read-only EJB methods! Marco.
 	 */
 	@SuppressWarnings("unchecked")
-	public Set<ReceptionNoteID> getReceptionNoteIDs(QueryCollection<ReceptionNote, ? extends AbstractJDOQuery<? extends ReceptionNote>> queries)
+	public Set<ReceptionNoteID> getReceptionNoteIDs(QueryCollection<? extends AbstractJDOQuery> queries)
 	{
+		if (queries == null)
+			return null;
+		
+		if (! ReceptionNote.class.isAssignableFrom(queries.getResultClass()))
+		{
+			throw new RuntimeException("Given QueryCollection has invalid return type! " +
+					"Invalid return type= "+ queries.getResultClassName());
+		}
+		
 		PersistenceManager pm = getPersistenceManager();
 		try {
 			pm.getFetchPlan().setMaxFetchDepth(1);
 			pm.getFetchPlan().setGroup(FetchPlan.DEFAULT);
 
-			JDOQueryCollectionDecorator<ReceptionNote, AbstractJDOQuery<? extends ReceptionNote>> decoratedQueries;
+			JDOQueryCollectionDecorator<AbstractJDOQuery> decoratedQueries;
 			
 			if (queries instanceof JDOQueryCollectionDecorator)
 			{
-				decoratedQueries = (JDOQueryCollectionDecorator<ReceptionNote, AbstractJDOQuery<? extends ReceptionNote>>) queries;
+				decoratedQueries = (JDOQueryCollectionDecorator<AbstractJDOQuery>) queries;
 			}
 			else
 			{
-				decoratedQueries = new JDOQueryCollectionDecorator<ReceptionNote, AbstractJDOQuery<? extends ReceptionNote>>(queries);
+				decoratedQueries = new JDOQueryCollectionDecorator<AbstractJDOQuery>(queries);
 			}
 			
 			decoratedQueries.setPersistenceManager(pm);
-			Collection<ReceptionNote> receptionNotes = decoratedQueries.executeQueries();
+			Collection<ReceptionNote> receptionNotes =
+				(Collection<ReceptionNote>) decoratedQueries.executeQueries();
 			
 			return NLJDOHelper.getObjectIDSet(receptionNotes);
 		} finally {

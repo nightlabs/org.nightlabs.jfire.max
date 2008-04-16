@@ -2261,8 +2261,17 @@ public abstract class AccountingManagerBean
 	 * @ejb.transaction type="Supports" @!This usually means that no transaction is opened which is significantly faster and recommended for all read-only EJB methods! Marco.
 	 */
 	@SuppressWarnings("unchecked")
-	public Set<InvoiceID> getInvoiceIDs(QueryCollection<Invoice, ? extends AbstractJDOQuery<? extends Invoice>> invoiceQueries)
+	public Set<InvoiceID> getInvoiceIDs(QueryCollection<? extends AbstractJDOQuery> invoiceQueries)
 	{
+		if (invoiceQueries == null)
+			return null;
+		
+		if (! Invoice.class.isAssignableFrom(invoiceQueries.getResultClass()))
+		{
+			throw new RuntimeException("Given QueryCollection has invalid return type! " +
+					"Invalid return type= "+ invoiceQueries.getResultClassName());
+		}
+		
 		PersistenceManager pm = getPersistenceManager();
 		try {
 			pm.getFetchPlan().setMaxFetchDepth(1);
@@ -2270,14 +2279,14 @@ public abstract class AccountingManagerBean
 
 			if (! (invoiceQueries instanceof JDOQueryCollectionDecorator))
 			{
-				invoiceQueries = new JDOQueryCollectionDecorator<Invoice, AbstractJDOQuery<? extends Invoice>>(invoiceQueries);
+				invoiceQueries = new JDOQueryCollectionDecorator<AbstractJDOQuery>(invoiceQueries);
 			}
 			
-			JDOQueryCollectionDecorator<Invoice, AbstractJDOQuery<? extends Invoice>> queryCollection =
-				(JDOQueryCollectionDecorator<Invoice, AbstractJDOQuery<? extends Invoice>>) invoiceQueries;
+			JDOQueryCollectionDecorator<AbstractJDOQuery> queryCollection =
+				(JDOQueryCollectionDecorator<AbstractJDOQuery>) invoiceQueries;
 
 			queryCollection.setPersistenceManager(pm);
-			Collection<Invoice> invoices = queryCollection.executeQueries();
+			Collection<Invoice> invoices = (Collection<Invoice>) queryCollection.executeQueries();
 			
 			return NLJDOHelper.getObjectIDSet(invoices);
 		} finally {
@@ -2749,8 +2758,17 @@ public abstract class AccountingManagerBean
 	 * @ejb.transaction type="Supports" @!This usually means that no transaction is opened which is significantly faster and recommended for all read-only EJB methods! Marco.
 	 */
 	@SuppressWarnings("unchecked")
-	public Set<AnchorID> getAccountIDs(QueryCollection<Account, ? extends AbstractJDOQuery<? extends Account>> queries)
+	public Set<AnchorID> getAccountIDs(QueryCollection<? extends AbstractJDOQuery> queries)
 	{
+		if (queries == null)
+			return null;
+		
+		if (! Account.class.isAssignableFrom(queries.getResultClass()))
+		{
+			throw new RuntimeException("Given QueryCollection has invalid return type! " +
+					"Invalid return type= "+ queries.getResultClassName());
+		}
+		
 		PersistenceManager pm = getPersistenceManager();
 		try {
 			pm.getFetchPlan().setMaxFetchDepth(1);
@@ -2758,13 +2776,13 @@ public abstract class AccountingManagerBean
 
 			if (!(queries instanceof JDOQueryCollectionDecorator))
 			{
-				queries = new JDOQueryCollectionDecorator<Account, AbstractJDOQuery<? extends Account>>(queries);
+				queries = new JDOQueryCollectionDecorator<AbstractJDOQuery>(queries);
 			}
-			JDOQueryCollectionDecorator<Account, AbstractJDOQuery<? extends Account>> decoratedQueries =
-				(JDOQueryCollectionDecorator<Account, AbstractJDOQuery<? extends Account>>) queries;
+			JDOQueryCollectionDecorator<AbstractJDOQuery> decoratedQueries =
+				(JDOQueryCollectionDecorator<AbstractJDOQuery>) queries;
 			
 			decoratedQueries.setPersistenceManager(pm);
-			Collection<Account> accounts = decoratedQueries.executeQueries();
+			Collection<Account> accounts = (Collection<Account>) decoratedQueries.executeQueries();
 			
 			return NLJDOHelper.getObjectIDSet(accounts);
 		} finally {

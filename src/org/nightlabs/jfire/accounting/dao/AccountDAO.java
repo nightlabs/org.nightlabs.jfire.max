@@ -70,7 +70,7 @@ extends BaseJDOObjectDAO<AnchorID, Account>
 
 	@SuppressWarnings("unchecked")
 	public List<Account> getAccountsForQueries(
-		QueryCollection<? extends Account, ? extends AccountQuery> queries,	String[] fetchGroups,
+		QueryCollection<? extends AccountQuery> queries,	String[] fetchGroups,
 		int maxFetchDepth, ProgressMonitor monitor)
 	{
 		try {

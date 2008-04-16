@@ -58,7 +58,7 @@ public class ProductTransferDAO
 
 	@SuppressWarnings("unchecked")
 	public List<ProductTransfer> getProductTransfers(
-			QueryCollection<ProductTransfer, ProductTransferQuery> productTransferQueries,
+			QueryCollection<ProductTransferQuery> productTransferQueries,
 			String[] fetchGroups, int maxFetchDepth,
 			ProgressMonitor monitor)
 	{
@@ -72,7 +72,7 @@ public class ProductTransferDAO
 	}
 	
 	public List<ProductTransfer> getProductTransfersByIDQueries(
-		QueryCollection<TransferID, ProductTransferIDQuery> queries,
+		QueryCollection<ProductTransferIDQuery> queries,
 		String[] fetchGroups, int maxFetchDepth,
 		ProgressMonitor monitor)
 	{

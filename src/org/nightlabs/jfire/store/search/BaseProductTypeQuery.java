@@ -9,7 +9,7 @@ import org.nightlabs.jfire.store.ProductType;
  * @author Marius Heinzmann - marius[at]nightlabs[dot]com
  */
 public class BaseProductTypeQuery
-	extends AbstractProductTypeQuery<ProductType>
+	extends AbstractProductTypeQuery
 {
 	/**
 	 * The serial version id.

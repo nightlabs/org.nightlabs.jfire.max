@@ -480,8 +480,17 @@ implements SessionBean
 	 * @ejb.transaction type="Supports" @!This usually means that no transaction is opened which is significantly faster and recommended for all read-only EJB methods! Marco.
 	 */
 	@SuppressWarnings("unchecked")
-	public Set<DeliveryNoteID> getDeliveryNoteIDs(QueryCollection<DeliveryNote, ? extends AbstractJDOQuery<? extends DeliveryNote>> queries)
+	public Set<DeliveryNoteID> getDeliveryNoteIDs(QueryCollection<? extends AbstractJDOQuery> queries)
 	{
+		if (queries == null)
+			return null;
+		
+		if (! DeliveryNote.class.isAssignableFrom(queries.getResultClass()))
+		{
+			throw new RuntimeException("Given QueryCollection has invalid return type! " +
+					"Invalid return type= "+ queries.getResultClassName());
+		}
+		
 		PersistenceManager pm = getPersistenceManager();
 		try {
 			pm.getFetchPlan().setMaxFetchDepth(1);
@@ -489,14 +498,15 @@ implements SessionBean
 			
 			if (! (queries instanceof JDOQueryCollectionDecorator))
 			{
-				queries = new JDOQueryCollectionDecorator<DeliveryNote, AbstractJDOQuery<? extends DeliveryNote>>(queries);
+				queries = new JDOQueryCollectionDecorator<AbstractJDOQuery>(queries);
 			}
 
-			JDOQueryCollectionDecorator<DeliveryNote, AbstractJDOQuery<? extends DeliveryNote>> decoratedCollection =
-				(JDOQueryCollectionDecorator<DeliveryNote, AbstractJDOQuery<? extends DeliveryNote>>) queries;
+			JDOQueryCollectionDecorator<AbstractJDOQuery> decoratedCollection =
+				(JDOQueryCollectionDecorator<AbstractJDOQuery>) queries;
 			
 			decoratedCollection.setPersistenceManager(pm);
-			Collection<DeliveryNote> deliveryNotes = decoratedCollection.executeQueries();
+			Collection<DeliveryNote> deliveryNotes =
+				(Collection<DeliveryNote>) decoratedCollection.executeQueries();
 
 			return NLJDOHelper.getObjectIDSet(deliveryNotes);
 		} finally {
@@ -513,8 +523,12 @@ implements SessionBean
 	 * 
 	 * FIXME: move to SimpleTradeManager and others, check permissions there and return only the ids!
 	 */
-	public Collection<ProductType> searchProductTypes(ProductTypeSearchFilter<? extends ProductType> searchFilter, String[] fetchGroups, int maxFetchDepth)
+	public Collection<ProductType> searchProductTypes(ProductTypeSearchFilter searchFilter,
+		String[] fetchGroups, int maxFetchDepth)
 	{
+		if (searchFilter == null)
+			return null;
+		
 		PersistenceManager pm = getPersistenceManager();
 		try {
 			pm.getFetchPlan().setMaxFetchDepth(maxFetchDepth);
@@ -540,8 +554,11 @@ implements SessionBean
 	 * @ejb.transaction type="Required"
 	 */
 	public Collection<? extends ProductTypeGroup> searchProductTypeGroups(
-		ProductTypeGroupSearchFilter<?> searchFilter, String[] fetchGroups, int maxFetchDepth)
+		ProductTypeGroupSearchFilter searchFilter, String[] fetchGroups, int maxFetchDepth)
 	{
+		if (searchFilter == null)
+			return null;
+		
 		PersistenceManager pm = getPersistenceManager();
 		try {
 			pm.getFetchPlan().setMaxFetchDepth(maxFetchDepth);
@@ -570,7 +587,7 @@ implements SessionBean
 	 * @ejb.transaction type="Required"
 	 */
 	public ProductTypeGroupSearchResult searchProductTypeGroups(
-		ProductTypeGroupSearchFilter<?> searchFilter, boolean saleable)
+		ProductTypeGroupSearchFilter searchFilter, boolean saleable)
 	{
 		PersistenceManager pm = getPersistenceManager();
 		try {
@@ -1716,9 +1733,19 @@ implements SessionBean
 	 * @ejb.transaction type="Supports" @!This usually means that no transaction is opened which is significantly faster and recommended for all read-only EJB methods! Marco.
 	 */
 	@SuppressWarnings("unchecked")
-	public Set<ProductTypeID> getProductTypeIDs(QueryCollection<ProductType, ? extends AbstractProductTypeQuery<? extends ProductType>> productTypeQueries)
+	public Set<ProductTypeID> getProductTypeIDs(
+		QueryCollection<? extends AbstractProductTypeQuery> productTypeQueries)
 	{
-		// TODO: Implement Authority checking here
+		if (productTypeQueries == null)
+			return null;
+		
+		if (! ProductType.class.isAssignableFrom(productTypeQueries.getResultClass()))
+		{
+			throw new RuntimeException("Given QueryCollection has invalid return type! " +
+					"Invalid return type= "+ productTypeQueries.getResultClassName());
+		}
+		
+// TODO: Implement Authority checking here
 		PersistenceManager pm = getPersistenceManager();
 		try {
 			pm.getFetchPlan().setMaxFetchDepth(1);
@@ -1726,14 +1753,14 @@ implements SessionBean
 
 			if (! (productTypeQueries instanceof JDOQueryCollectionDecorator))
 			{
-				productTypeQueries = new JDOQueryCollectionDecorator<ProductType, AbstractProductTypeQuery<? extends ProductType>>(productTypeQueries);
+				productTypeQueries = new JDOQueryCollectionDecorator<AbstractProductTypeQuery>(productTypeQueries);
 			}
-			JDOQueryCollectionDecorator<ProductType, AbstractProductTypeQuery<? extends ProductType>> queries =
-				(JDOQueryCollectionDecorator<ProductType, AbstractProductTypeQuery<? extends ProductType>>) productTypeQueries;
+			JDOQueryCollectionDecorator<AbstractProductTypeQuery> queries =
+				(JDOQueryCollectionDecorator<AbstractProductTypeQuery>) productTypeQueries;
 			
 			queries.setPersistenceManager(pm);
 			
-			Collection<ProductType> productTypes = queries.executeQueries();
+			Collection<ProductType> productTypes = (Collection<ProductType>) queries.executeQueries();
 
 			return NLJDOHelper.getObjectIDSet(productTypes);
 		} finally {
@@ -1899,8 +1926,17 @@ implements SessionBean
 	 * @ejb.transaction type="Supports" @!This usually means that no transaction is opened which is significantly faster and recommended for all read-only EJB methods! Marco.
 	 */
 	@SuppressWarnings("unchecked")
-	public Set<AnchorID> getRepositoryIDs(QueryCollection<Repository, ? extends AbstractJDOQuery<? extends Repository>> queries)
+	public Set<AnchorID> getRepositoryIDs(QueryCollection<? extends AbstractJDOQuery> queries)
 	{
+		if (queries == null)
+			return null;
+		
+		if (! Repository.class.isAssignableFrom(queries.getResultClass()))
+		{
+			throw new RuntimeException("Given QueryCollection has invalid return type! " +
+					"Invalid return type= "+ queries.getResultClassName());
+		}
+		
 		PersistenceManager pm = getPersistenceManager();
 		try {
 			pm.getFetchPlan().setMaxFetchDepth(1);
@@ -1908,13 +1944,14 @@ implements SessionBean
 
 			if (! (queries instanceof JDOQueryCollectionDecorator))
 			{
-				queries = new JDOQueryCollectionDecorator<Repository, AbstractJDOQuery<? extends Repository>>(queries);
+				queries = new JDOQueryCollectionDecorator<AbstractJDOQuery>(queries);
 			}
-			JDOQueryCollectionDecorator<Repository, AbstractJDOQuery<? extends Repository>> repoQueries =
-				(JDOQueryCollectionDecorator<Repository, AbstractJDOQuery<? extends Repository>>) queries;
+			JDOQueryCollectionDecorator<AbstractJDOQuery> repoQueries =
+				(JDOQueryCollectionDecorator<AbstractJDOQuery>) queries;
 			
 			repoQueries.setPersistenceManager(pm);
-			Collection<? extends Repository> repositories = repoQueries.executeQueries();
+			Collection<? extends Repository> repositories =
+				(Collection<? extends Repository>) repoQueries.executeQueries();
 
 			return NLJDOHelper.getObjectIDSet(repositories);
 		} finally {
@@ -1988,8 +2025,17 @@ implements SessionBean
 	 * @ejb.permission role-name="_Guest_"
 	 */
 	public List<TransferID> getProductTransferIDs(
-		QueryCollection<ProductTransfer, ProductTransferQuery> productTransferQueries)
+		QueryCollection<ProductTransferQuery> productTransferQueries)
 	{
+		if (productTransferQueries == null)
+			return null;
+		
+		if (! ProductTransfer.class.isAssignableFrom(productTransferQueries.getResultClass()))
+		{
+			throw new RuntimeException("Given QueryCollection has invalid return type! " +
+					"Invalid return type= "+ productTransferQueries.getResultClassName());
+		}
+		
 		PersistenceManager pm = getPersistenceManager();
 		try {
 			Collection<ProductTransfer> productTransfers = null;

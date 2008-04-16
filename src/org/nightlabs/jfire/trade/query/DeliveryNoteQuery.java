@@ -7,14 +7,9 @@ import org.nightlabs.jfire.store.DeliveryNote;
  * @author Marius Heinzmann - marius[at]nightlabs[dot]com
  */
 public class DeliveryNoteQuery
-	extends AbstractArticleContainerQuery<DeliveryNote>
+	extends AbstractArticleContainerQuery
 {
 	private static final long serialVersionUID = 1L;
-
-//	@Override
-//	public Class<DeliveryNote> getArticleContainerClass() {
-//		return DeliveryNote.class;
-//	}
 
 	@Override
 	public String getArticleContainerIDMemberName() {

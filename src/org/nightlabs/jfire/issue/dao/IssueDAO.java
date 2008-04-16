@@ -141,8 +141,8 @@ public class IssueDAO extends BaseJDOObjectDAO<IssueID, Issue>{
 	}
 	
 	@SuppressWarnings("unchecked")
-	public List<Issue> getIssuesForQueries(QueryCollection<Issue, ? extends IssueQuery> queries, String[] fetchGroups,
-			int maxFetchDepth, ProgressMonitor monitor)
+	public List<Issue> getIssuesForQueries(QueryCollection<? extends IssueQuery> queries,
+		String[] fetchGroups, int maxFetchDepth, ProgressMonitor monitor)
 	{
 		try {
 			IssueManager im = IssueManagerUtil.getHome(SecurityReflector.getInitialContextProperties()).create();

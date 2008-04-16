@@ -444,25 +444,34 @@ implements SessionBean
 	 * @ejb.permission role-name="_Guest_"
 	 * @ejb.transaction type="Supports" @!This usually means that no transaction is opened which is significantly faster and recommended for all read-only EJB methods! Marco.
 	 */
-	public Set<IssueID> getIssueIDs(QueryCollection<Issue, ? extends AbstractJDOQuery<? extends Issue>> queries)
+	public Set<IssueID> getIssueIDs(QueryCollection<? extends AbstractJDOQuery> queries)
 	{
+		if (queries == null)
+			return null;
+		
+		if (! Issue.class.isAssignableFrom(queries.getResultClass()))
+		{
+			throw new RuntimeException("Given QueryCollection has invalid return type! " +
+					"Invalid return type= "+ queries.getResultClassName());
+		}
+		
 		PersistenceManager pm = getPersistenceManager();
 		try {
 			pm.getFetchPlan().setMaxFetchDepth(1);
 			pm.getFetchPlan().setGroup(FetchPlan.DEFAULT);
 
-			JDOQueryCollectionDecorator<Issue, ? extends AbstractSearchQuery<? extends Issue>> decoratedCollection;
+			JDOQueryCollectionDecorator<? extends AbstractSearchQuery> decoratedCollection;
 			if (queries instanceof JDOQueryCollectionDecorator)
 			{
-				decoratedCollection = (JDOQueryCollectionDecorator<Issue, ? extends AbstractSearchQuery<? extends Issue>>) queries;
+				decoratedCollection = (JDOQueryCollectionDecorator<? extends AbstractSearchQuery>) queries;
 			}
 			else
 			{
-				decoratedCollection = new JDOQueryCollectionDecorator<Issue, AbstractSearchQuery<? extends Issue>>(queries);
+				decoratedCollection = new JDOQueryCollectionDecorator<AbstractSearchQuery>(queries);
 			}
 			
 			decoratedCollection.setPersistenceManager(pm);
-			Collection<? extends Issue> issues = decoratedCollection.executeQueries();
+			Collection<? extends Issue> issues = (Collection<? extends Issue>) decoratedCollection.executeQueries();
 
 			return NLJDOHelper.getObjectIDSet(issues);
 		} finally {

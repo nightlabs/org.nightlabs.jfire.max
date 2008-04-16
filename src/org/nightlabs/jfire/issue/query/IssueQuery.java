@@ -24,7 +24,7 @@ import org.nightlabs.jfire.security.id.UserID;
  * @author Marius Heinzmann - marius[at]nightlabs[dot]com
  */
 public class IssueQuery 
-extends AbstractJDOQuery<Issue>
+	extends AbstractJDOQuery
 {
 	private static final long serialVersionUID = 1L;
 

@@ -8,7 +8,7 @@ import org.nightlabs.jfire.voucher.store.VoucherType;
  *
  */
 public class VoucherTypeQuery
-extends AbstractProductTypeQuery<VoucherType>
+	extends AbstractProductTypeQuery
 {
 	/**
 	 * The serial version id.

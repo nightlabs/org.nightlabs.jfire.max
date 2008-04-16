@@ -36,7 +36,7 @@ import org.nightlabs.jdo.search.SearchFilter;
  *
  */
 public class ReportCategorySearchFilter
-	extends SearchFilter<ReportCategory>
+	extends SearchFilter
 {
 	private static final long serialVersionUID = 1L;
 

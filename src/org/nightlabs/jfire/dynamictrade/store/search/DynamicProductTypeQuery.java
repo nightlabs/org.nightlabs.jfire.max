@@ -8,23 +8,9 @@ import org.nightlabs.jfire.store.search.AbstractProductTypeQuery;
  *
  */
 public class DynamicProductTypeQuery
-extends AbstractProductTypeQuery<DynamicProductType>
+extends AbstractProductTypeQuery
 {
 	private static final long serialVersionUID = 1L;
-
-//	@Override
-//	protected Query prepareQuery()
-//	{
-//		Query q = super.prepareQuery();
-//		// FIXME: Query also subclasses when JPOX problem is solved
-////		 = getPersistenceManager().newQuery(getPersistenceManager().getExtent(
-////				DynamicProductType.class, false));
-//		
-//		q.setFilter(getFilter().toString());
-//		q.declareVariables(getVars().toString());
-//
-//		return q;
-//	}
 
 	@Override
 	protected Class<DynamicProductType> initCandidateClass()

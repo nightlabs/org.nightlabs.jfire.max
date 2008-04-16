@@ -8,7 +8,7 @@ import org.nightlabs.jfire.store.search.AbstractProductTypeQuery;
  *
  */
 public class SimpleProductTypeQuery
-extends AbstractProductTypeQuery<SimpleProductType>
+	extends AbstractProductTypeQuery
 {
 	/**
 	 * The serial version id.

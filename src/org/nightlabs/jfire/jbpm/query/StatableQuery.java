@@ -14,11 +14,12 @@ import org.nightlabs.jfire.trade.state.id.StateDefinitionID;
 /**
  * A Query for searching for Implementations of {@link Statable}
  * org.nightlabs.jfire.jbpm.query
+ * 
  * @author Daniel.Mazurek [at] NightLabs [dot] de
- *
+ * @author Marius Heinzmann - marius[at]nightlabs[dot]com
  */
 public class StatableQuery
-	extends AbstractJDOQuery<Statable>
+	extends AbstractJDOQuery
 {
 	private static final long serialVersionUID = 1L;
 	private static final Logger logger = Logger.getLogger(StatableQuery.class);
@@ -210,7 +211,7 @@ public class StatableQuery
 	@Override
 	protected Class<? extends Statable> getCandidateClass()
 	{
-		return statableClass != null ? statableClass : super.getCandidateClass();
+		return (Class<? extends Statable>) (statableClass != null ? statableClass : super.getCandidateClass());
 	}
 	
 	/**

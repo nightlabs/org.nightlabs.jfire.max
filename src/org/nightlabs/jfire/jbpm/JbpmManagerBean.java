@@ -498,14 +498,17 @@ implements SessionBean
 	 * @ejb.transaction type="Supports" @!This usually means that no transaction is opened which is significantly faster and recommended for all read-only EJB methods! Marco.
 	 */
 	@SuppressWarnings("unchecked")
-	public Set<Statable> getStatables(QueryCollection<Statable, ? extends StatableQuery> statableQueries)
+	public Set<Statable> getStatables(QueryCollection<? extends StatableQuery> statableQueries)
 	{
+		if (statableQueries == null)
+			return null;
+		
 		PersistenceManager pm = getPersistenceManager();
 		try {
 			pm.getFetchPlan().setMaxFetchDepth(1);
 			pm.getFetchPlan().setGroup(FetchPlan.DEFAULT);
 
-			JDOQueryCollectionDecorator<Statable, StatableQuery> decoratedCollection;
+			JDOQueryCollectionDecorator<StatableQuery> decoratedCollection;
 			
 			// DO not apply generics to this instanceof check, otherwise the sun compiler will result in
 			// an error like this:
@@ -515,15 +518,15 @@ implements SessionBean
 //		   [javac] 			if (statableQueries instanceof JDOQueryCollectionDecorator<?, ?>)
 			if (statableQueries instanceof JDOQueryCollectionDecorator)
 			{
-				decoratedCollection = (JDOQueryCollectionDecorator<Statable, StatableQuery>) statableQueries; 
+				decoratedCollection = (JDOQueryCollectionDecorator<StatableQuery>) statableQueries; 
 			}
 			else
 			{
-				decoratedCollection = new JDOQueryCollectionDecorator<Statable, StatableQuery>(statableQueries);
+				decoratedCollection = new JDOQueryCollectionDecorator<StatableQuery>(statableQueries);
 			}
 
 			decoratedCollection.setPersistenceManager(pm);
-			Collection<Statable> statables = decoratedCollection.executeQueries();
+			Collection<Statable> statables = (Collection<Statable>) decoratedCollection.executeQueries();
 
 			return NLJDOHelper.getDetachedQueryResultAsSet(pm, statables);
 		} finally {

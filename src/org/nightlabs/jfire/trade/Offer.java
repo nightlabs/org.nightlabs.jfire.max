@@ -48,11 +48,13 @@ import org.nightlabs.jfire.accounting.Accounting;
 import org.nightlabs.jfire.accounting.AccountingPriceConfig;
 import org.nightlabs.jfire.accounting.Currency;
 import org.nightlabs.jfire.accounting.Price;
+import org.nightlabs.jfire.jbpm.graph.def.ActionHandlerNodeEnter;
 import org.nightlabs.jfire.jbpm.graph.def.Statable;
 import org.nightlabs.jfire.jbpm.graph.def.StatableLocal;
 import org.nightlabs.jfire.jbpm.graph.def.State;
 import org.nightlabs.jfire.security.User;
 import org.nightlabs.jfire.store.ProductType;
+import org.nightlabs.jfire.trade.jbpm.ActionHandlerFinalizeOffer;
 import org.nightlabs.jfire.transfer.id.AnchorID;
 import org.nightlabs.util.Util;
 
@@ -94,6 +96,7 @@ import org.nightlabs.util.Util;
  * @jdo.fetch-group name="Statable.state" fields="state"
  * @jdo.fetch-group name="Statable.states" fields="states"
  *
+ *
  * @!jdo.fetch-group name="FetchGroupsTrade.articleEdit" fetch-groups="default" fields="articles"
  * @jdo.fetch-group name="FetchGroupsTrade.articleContainerInEditor" fields="offerLocal, createUser, currency, finalizeUser, order, price, state, states"
  */
@@ -115,12 +118,6 @@ implements
 	public static final String FETCH_GROUP_ORDER = "Offer.order";
 	public static final String FETCH_GROUP_CREATE_USER = "Offer.createUser";
 	public static final String FETCH_GROUP_THIS_OFFER = "Offer.this";
-
-	// the following fetch-groups are virtual and processed in the detach callback
-	public static final String FETCH_GROUP_VENDOR_ID = "Offer.vendorID";
-	public static final String FETCH_GROUP_CUSTOMER_ID = "Offer.customerID";
-	public static final String FETCH_GROUP_VENDOR = "Offer.vendor";
-	public static final String FETCH_GROUP_CUSTOMER = "Offer.customer";
 	
 
 	/**

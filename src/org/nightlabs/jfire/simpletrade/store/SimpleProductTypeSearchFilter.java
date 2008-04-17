@@ -31,13 +31,15 @@ import java.util.Set;
 
 import org.nightlabs.jfire.organisation.LocalOrganisation;
 import org.nightlabs.jfire.store.ProductTypeSearchFilter;
+import org.nightlabs.jfire.trade.LegalEntity;
+import org.nightlabs.jfire.transfer.id.AnchorID;
 
 /**
  * @author Alexander Bieber <alex[AT]nightlabs[DOT]de>
  *
  */
 public class SimpleProductTypeSearchFilter
-	extends ProductTypeSearchFilter
+extends ProductTypeSearchFilter<SimpleProductType>
 {
 	private static final long serialVersionUID = 1L;
 
@@ -51,14 +53,31 @@ public class SimpleProductTypeSearchFilter
 	@Override
 	protected void prepareQuery(Set<Class<?>> imports, StringBuffer vars,
 			StringBuffer filter, StringBuffer params, Map<String, Object> paramMap,
-			StringBuffer result) {
-		filter.append("this.published && this.saleable && this.organisationID == myOrganisationID");
-		params.append("java.lang.String myOrganisationID");
-		paramMap.put("myOrganisationID", LocalOrganisation.getLocalOrganisation(getPersistenceManager()).getOrganisationID());
+			StringBuffer result)
+	{
+		filter.append("this.published && this.saleable");
+
+		AnchorID vendorID = getVendorID();
+		if (vendorID != null) {
+
+			filter.append(" && this.vendor.organisationID == :vendorOrganisationID");
+			filter.append(" && this.vendor.anchorTypeID == :vendorAnchorTypeID");
+			filter.append(" && this.vendor.anchorID == :vendorAnchorID");
+			paramMap.put("vendorOrganisationID", vendorID.organisationID);
+			paramMap.put("vendorAnchorTypeID", vendorID.anchorTypeID);
+			paramMap.put("vendorAnchorID", vendorID.anchorID);
+		}
+		else {
+			filter.append(" && this.organisationID == :myOrganisationID");
+			paramMap.put("myOrganisationID", LocalOrganisation.getLocalOrganisation(getPersistenceManager()).getOrganisationID());
+		}
+
+
+
 	}
 
 	@Override
-	protected Class<SimpleProductType> initCandidateClass()
+	protected Class<SimpleProductType> init()
 	{
 		return SimpleProductType.class;
 	}

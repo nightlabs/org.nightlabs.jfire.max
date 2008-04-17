@@ -39,7 +39,7 @@ import org.nightlabs.jfire.transfer.id.AnchorID;
  *
  */
 public class SimpleProductTypeSearchFilter
-extends ProductTypeSearchFilter<SimpleProductType>
+extends ProductTypeSearchFilter
 {
 	private static final long serialVersionUID = 1L;
 
@@ -72,14 +72,10 @@ extends ProductTypeSearchFilter<SimpleProductType>
 			paramMap.put("myOrganisationID", LocalOrganisation.getLocalOrganisation(getPersistenceManager()).getOrganisationID());
 		}
 
-
-
 	}
 
 	@Override
-	protected Class<SimpleProductType> init()
-	{
+	protected Class<?> initCandidateClass() {
 		return SimpleProductType.class;
 	}
-
 }

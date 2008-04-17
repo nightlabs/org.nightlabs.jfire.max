@@ -143,8 +143,8 @@ implements Serializable, ArticleContainer, SegmentContainer, DetachCallback
 {
 	private static final long serialVersionUID = 1L;
 
-	public static final String FETCH_GROUP_VENDOR = "Order.vendor";
-	public static final String FETCH_GROUP_CUSTOMER = "Order.customer";
+	public static final String FETCH_GROUP_VENDOR = "ArticleContainer.vendor";
+	public static final String FETCH_GROUP_CUSTOMER = "ArticleContainer.customer";
 	public static final String FETCH_GROUP_CUSTOMER_GROUP = "Order.customerGroup";
 	public static final String FETCH_GROUP_CURRENCY = "Order.currency";
 	public static final String FETCH_GROUP_ARTICLES = "Order.articles";

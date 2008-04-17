@@ -124,9 +124,7 @@ import org.nightlabs.util.Util;
  *            this.customer.anchorID == :paramCustomerID_anchorID
  *			ORDER BY orderID ASC"
  *
- * @jdo.fetch-group name="Order.vendor" fields="vendor"
  * @jdo.fetch-group name="Order.currency" fields="currency"
- * @jdo.fetch-group name="Order.customer" fields="customer"
  * @jdo.fetch-group name="Order.customerGroup" fields="customerGroup"
  * @jdo.fetch-group name="Order.articles" fields="articles"
  * @jdo.fetch-group name="Order.segments" fields="segments"
@@ -134,6 +132,9 @@ import org.nightlabs.util.Util;
  * @jdo.fetch-group name="Order.createUser" fields="createUser"
  * @jdo.fetch-group name="Order.changeUser" fields="changeUser"
  * @jdo.fetch-group name="Order.this" fetch-groups="default" fields="vendor, currency, customer, customerGroup, articles, segments, offers, createUser, changeUser"
+ * 
+ * @jdo.fetch-group name="ArticleContainer.vendor" fields="vendor"
+ * @jdo.fetch-group name="ArticleContainer.customer" fields="customer"
  *
  * @jdo.fetch-group name="FetchGroupsTrade.articleContainerInEditor" fields="vendor, currency, customer, customerGroup, segments, offers, createUser, changeUser"
  */
@@ -153,9 +154,6 @@ implements Serializable, ArticleContainer, SegmentContainer, DetachCallback
 	public static final String FETCH_GROUP_CHANGE_USER = "Order.changeUser";
 	public static final String FETCH_GROUP_THIS_ORDER = "Order.this";
 
-	// the following fetch-groups are virtual and processed in the detach callback
-	public static final String FETCH_GROUP_VENDOR_ID = "Order.vendorID";
-	public static final String FETCH_GROUP_CUSTOMER_ID = "Order.customerID";
 
 	/**
 	 * This method queries all <code>Order</code>s which exist between the given vendor and customer.

@@ -48,6 +48,9 @@ import org.nightlabs.util.Util;
  *
  * @jdo.fetch-group name="Statable.state" fields="state"
  * @jdo.fetch-group name="Statable.states" fields="states"
+ * 
+ * @jdo.fetch-group name="ArticleContainer.customer" fields="customer"
+ * @jdo.fetch-group name="ArticleContainer.vendor" fields="vendor"
  *
  * @jdo.fetch-group name="ReceptionNote.articles" fields="articles"
  * @jdo.fetch-group name="ReceptionNote.this" fetch-groups="default" fields="receptionNoteLocal, articles, createDT, createUser, state, states";
@@ -64,11 +67,7 @@ implements
 
 	public static final String FETCH_GROUP_THIS_RECEPTION_NOTE = "ReceptionNote.this";
 
-	// the following fetch-groups are virtual and processed in the detach callback
-	public static final String FETCH_GROUP_VENDOR_ID = "ReceptionNote.vendorID";
-	public static final String FETCH_GROUP_CUSTOMER_ID = "ReceptionNote.customerID";
-	public static final String FETCH_GROUP_VENDOR = "ReceptionNote.vendor";
-	public static final String FETCH_GROUP_CUSTOMER = "ReceptionNote.customer";
+
 
 	/**
 	 * @jdo.field primary-key="true"

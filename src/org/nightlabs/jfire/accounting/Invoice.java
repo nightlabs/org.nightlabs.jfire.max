@@ -110,12 +110,13 @@ import org.nightlabs.util.Util;
  * @jdo.fetch-group name="Invoice.articles" fields="articles"
  * @jdo.fetch-group name="Invoice.createUser" fields="createUser"
  * @jdo.fetch-group name="Invoice.currency" fields="currency"
- * @jdo.fetch-group name="Invoice.customer" fields="customer"
  * @jdo.fetch-group name="Invoice.discount" fields="discount"
  * @jdo.fetch-group name="Invoice.finalizeUser" fields="finalizeUser"
  * @jdo.fetch-group name="Invoice.price" fields="price"
- * @jdo.fetch-group name="Invoice.vendor" fields="vendor"
  * @jdo.fetch-group name="Invoice.this" fetch-groups="default" fields="invoiceLocal, articles, createUser, currency, customer, discount, finalizeUser, price, vendor, state, states"
+ * 
+ * @jdo.fetch-group name="ArticleContainer.customer" fields="customer"
+ * @jdo.fetch-group name="ArticleContainer.vendor" fields="vendor"
  *
  * @jdo.fetch-group name="FetchGroupsTrade.articleContainerInEditor" fields="invoiceLocal, createUser, currency, customer, discount, finalizeUser, price, vendor, state, states"
  *
@@ -131,16 +132,10 @@ implements Serializable, ArticleContainer, Statable, DetachCallback
 	public static final String FETCH_GROUP_ARTICLES = "Invoice.articles";
 	public static final String FETCH_GROUP_CREATE_USER = "Invoice.createUser";
 	public static final String FETCH_GROUP_CURRENCY = "Invoice.currency";
-	public static final String FETCH_GROUP_CUSTOMER = "Invoice.customer";
 	public static final String FETCH_GROUP_DISCOUNT = "Invoice.discount";
 	public static final String FETCH_GROUP_FINALIZE_USER = "Invoice.finalizeUser";
 	public static final String FETCH_GROUP_PRICE = "Invoice.price";
-	public static final String FETCH_GROUP_VENDOR = "Invoice.vendor";
 	public static final String FETCH_GROUP_THIS_INVOICE = "Invoice.this";
-
-	// the following fetch-groups are virtual and processed in the detach callback
-	public static final String FETCH_GROUP_VENDOR_ID = "Invoice.vendorID";
-	public static final String FETCH_GROUP_CUSTOMER_ID = "Invoice.customerID";
 
 	/**
 	 * This method queries all <code>Invoice</code>s which exist between the given vendor and customer.

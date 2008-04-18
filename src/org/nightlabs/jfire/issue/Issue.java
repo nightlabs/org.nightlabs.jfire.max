@@ -538,7 +538,7 @@ implements 	Serializable, AttachCallback, Statable, DeleteCallback
 			_linkObjectIDs.remove(linkObjectID);
 	}
 	
-	public void clearLinkObjectIDs()
+	public void clearIssueLinks()
 	{
 		issueLinks.clear();
 	}

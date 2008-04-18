@@ -117,16 +117,15 @@ implements Serializable, DetachCallback
 		if (linkedObject == null)
 			throw new IllegalArgumentException("linkedObject must not be null!");
 
-		if (linkedObject instanceof PersistenceCapable)
-			throw new IllegalArgumentException("linkedObject must implement the interface "+ PersistenceCapable.class.getName() +"!");
+		if (!(linkedObject instanceof PersistenceCapable))
+			throw new IllegalArgumentException("linkedObject must implement the interface "+ PersistenceCapable.class.getName() +"! linkedObject is an instance of " + linkedObject.getClass().getName() + ": " + linkedObject);
 
 		Object linkedObjectID = JDOHelper.getObjectId(linkedObject);
 
-		if (linkedObjectID instanceof ObjectID)
+		if (!(linkedObjectID instanceof ObjectID))
 			throw new IllegalArgumentException("The object-id of linkedObject is not an instance of " + ObjectID.class.getName() + "! It's an instance of: " + (linkedObjectID == null ? null : linkedObjectID.getClass().getName()));
 
 		this.organisationID = organisationID;
-//		this.issueID = issue.getIssueID();
 		this.issue = issue;
 		this.issueLinkID = issueLinkID;
 
@@ -142,9 +141,6 @@ implements Serializable, DetachCallback
 	public long getIssueLinkID() {
 		return issueLinkID;
 	}
-//	public long getIssueID() {
-//		return issueID;
-//	}
 
 	public Issue getIssue() {
 		return issue;

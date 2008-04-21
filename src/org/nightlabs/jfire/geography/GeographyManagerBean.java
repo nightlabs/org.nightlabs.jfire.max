@@ -359,97 +359,97 @@ implements SessionBean
 		}
 	}
 
-	/**
-	 * Returns the {@link Country} with the given name and {@link Locale}
-	 * @param countryName the name of the country
-	 * @param locale the {@link Locale} to search in the multiLanguage name of the country
-	 * @return the {@link Country} with the given name and {@link Locale}  
-	 * 
-	 * @ejb.interface-method
-	 * @ejb.permission role-name="_Guest_"
-	 */	
-	public Country getCountryByName(String countryName, Locale locale) 
-	{
-		PersistenceManager pm = getPersistenceManager();
-		try {
-			Collection<Country> countries = Country.getCountryByName(pm, countryName, locale);
-			if (countries != null && !countries.isEmpty()) {
-				return countries.iterator().next();
-			}
-			return null;			
-		} finally {
-			pm.close();
-		}
-	}
-	
-	/**
-	 * Returns the {@link Region} with the given name and {@link Locale}
-	 * @param regionName the name of the region
-	 * @param locale the {@link Locale} to search in the multiLanguage name of the region
-	 * @return the {@link Region} with the given name and {@link Locale}  
-	 *
-	 * @ejb.interface-method
-	 * @ejb.permission role-name="_Guest_"
-	 */	
-	public Region getRegionByName(String regionName, Locale locale) 
-	{
-		PersistenceManager pm = getPersistenceManager();
-		try {		
-			Collection<Region> regions = Region.getRegionByName(pm, regionName, locale);
-			if (regions != null && !regions.isEmpty()) {
-				return regions.iterator().next();
-			}
-			return null;
-		} finally {
-			pm.close();
-		}
-	}
-
-	/**
-	 * Returns the {@link City} with the given name and {@link Locale}
-	 * @param cityName the name of the city
-	 * @param locale the {@link Locale} to search in the multiLanguage name of the city
-	 * @return the {@link City} with the given name and {@link Locale}  
-	 * 
-	 * @ejb.interface-method
-	 * @ejb.permission role-name="_Guest_"
-	 */	
-	public City getCityByName(String cityName, Locale locale) 
-	{
-		PersistenceManager pm = getPersistenceManager();
-		try {				
-			Collection<City> cities = City.getCityByName(getPersistenceManager(), 
-					cityName, locale);
-			if (cities != null && !cities.isEmpty()) {
-				return cities.iterator().next();
-			}
-			return null;
-		} finally {
-			pm.close();
-		}
-	}
-
-	/**
-	 * Returns the {@link Location} with the given name and {@link Locale}
-	 * @param locationName the name of the location
-	 * @param locale the {@link Locale} to search in the multiLanguage name of the location
-	 * @return the {@link Location} with the given name and {@link Locale}  
- 	*
-	 * @ejb.interface-method
-	 * @ejb.permission role-name="_Guest_"
-	 */	
-	public Location getLocationByName(String locationName, Locale locale) 
-	{
-		PersistenceManager pm = getPersistenceManager();
-		try {						
-			Collection<Location> locations = Location.getLocationByName(pm, locationName, locale);
-			if (locations != null && !locations.isEmpty()) {
-				return locations.iterator().next();
-			}
-			return null;
-		} finally {
-			pm.close();
-		}
-	}
+//	/**
+//	 * Returns the {@link Country} with the given name and {@link Locale}
+//	 * @param countryName the name of the country
+//	 * @param locale the {@link Locale} to search in the multiLanguage name of the country
+//	 * @return the {@link Country} with the given name and {@link Locale}  
+//	 * 
+//	 * @ejb.interface-method
+//	 * @ejb.permission role-name="_Guest_"
+//	 */	
+//	public Country getCountryByName(String countryName, Locale locale) 
+//	{
+//		PersistenceManager pm = getPersistenceManager();
+//		try {
+//			Collection<Country> countries = Country.getCountryByName(pm, countryName, locale);
+//			if (countries != null && !countries.isEmpty()) {
+//				return countries.iterator().next();
+//			}
+//			return null;			
+//		} finally {
+//			pm.close();
+//		}
+//	}
+//	
+//	/**
+//	 * Returns the {@link Region} with the given name and {@link Locale}
+//	 * @param regionName the name of the region
+//	 * @param locale the {@link Locale} to search in the multiLanguage name of the region
+//	 * @return the {@link Region} with the given name and {@link Locale}  
+//	 *
+//	 * @ejb.interface-method
+//	 * @ejb.permission role-name="_Guest_"
+//	 */	
+//	public Region getRegionByName(String regionName, Locale locale) 
+//	{
+//		PersistenceManager pm = getPersistenceManager();
+//		try {		
+//			Collection<Region> regions = Region.getRegionByName(pm, regionName, locale);
+//			if (regions != null && !regions.isEmpty()) {
+//				return regions.iterator().next();
+//			}
+//			return null;
+//		} finally {
+//			pm.close();
+//		}
+//	}
+//
+//	/**
+//	 * Returns the {@link City} with the given name and {@link Locale}
+//	 * @param cityName the name of the city
+//	 * @param locale the {@link Locale} to search in the multiLanguage name of the city
+//	 * @return the {@link City} with the given name and {@link Locale}  
+//	 * 
+//	 * @ejb.interface-method
+//	 * @ejb.permission role-name="_Guest_"
+//	 */	
+//	public City getCityByName(String cityName, Locale locale) 
+//	{
+//		PersistenceManager pm = getPersistenceManager();
+//		try {				
+//			Collection<City> cities = City.getCityByName(getPersistenceManager(), 
+//					cityName, locale);
+//			if (cities != null && !cities.isEmpty()) {
+//				return cities.iterator().next();
+//			}
+//			return null;
+//		} finally {
+//			pm.close();
+//		}
+//	}
+//
+//	/**
+//	 * Returns the {@link Location} with the given name and {@link Locale}
+//	 * @param locationName the name of the location
+//	 * @param locale the {@link Locale} to search in the multiLanguage name of the location
+//	 * @return the {@link Location} with the given name and {@link Locale}  
+// 	*
+//	 * @ejb.interface-method
+//	 * @ejb.permission role-name="_Guest_"
+//	 */	
+//	public Location getLocationByName(String locationName, Locale locale) 
+//	{
+//		PersistenceManager pm = getPersistenceManager();
+//		try {						
+//			Collection<Location> locations = Location.getLocationByName(pm, locationName, locale);
+//			if (locations != null && !locations.isEmpty()) {
+//				return locations.iterator().next();
+//			}
+//			return null;
+//		} finally {
+//			pm.close();
+//		}
+//	}
 	
 }

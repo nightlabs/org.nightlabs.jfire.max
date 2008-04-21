@@ -57,13 +57,6 @@ import org.nightlabs.util.Util;
  * @jdo.fetch-group name="Country.name" fields="name"
  * @jdo.fetch-group name="Country.regions" fields="regions"
  * 
- * @jdo.query
- *		name="getCountryByName"
- *		query="SELECT
- *			WHERE
- *				this.name.names.get(paramLanguageID) == paramName
- *		PARAMETERS String paramLanguageID, String paramName
- *		import java.lang.String;
  */
 public class Country implements Serializable
 {
@@ -71,11 +64,6 @@ public class Country implements Serializable
 
 	public static final String FETCH_GROUP_NAME = "Country.name";
 	public static final String FETCH_GROUP_REGIONS = "Country.regions";
-
-	public static Collection<Country> getCountryByName(PersistenceManager pm, String name, Locale locale) {
-		Query q = pm.newNamedQuery(Country.class, "getCountryByName");
-		return (Collection<Country>)q.execute(locale.getLanguage(), name);
-	}
 	
 	/////// begin primary key ///////
 	/**

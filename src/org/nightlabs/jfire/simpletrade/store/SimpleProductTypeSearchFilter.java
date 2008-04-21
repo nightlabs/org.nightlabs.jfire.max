@@ -31,7 +31,6 @@ import java.util.Set;
 
 import org.nightlabs.jfire.organisation.LocalOrganisation;
 import org.nightlabs.jfire.store.ProductTypeSearchFilter;
-import org.nightlabs.jfire.trade.LegalEntity;
 import org.nightlabs.jfire.transfer.id.AnchorID;
 
 /**

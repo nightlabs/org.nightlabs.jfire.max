@@ -27,9 +27,13 @@
 package org.nightlabs.jfire.accounting;
 
 import java.io.Serializable;
+import java.util.Collection;
+import java.util.Locale;
 
 import javax.jdo.JDODetachedFieldAccessException;
 import javax.jdo.JDOHelper;
+import javax.jdo.PersistenceManager;
+import javax.jdo.Query;
 
 import org.nightlabs.jdo.ObjectIDUtil;
 import org.nightlabs.jfire.accounting.id.TariffID;
@@ -68,6 +72,14 @@ import org.nightlabs.util.Util;
  * @jdo.fetch-group name="FetchGroupsTrade.articleInDeliveryNoteEditor" fields="name"
  *
  * @jdo.fetch-group name="FetchGroupsPriceConfig.edit" fields="name"
+ * 
+ * @jdo.query
+ *		name="getTariffByName"
+ *		query="SELECT
+ *			WHERE
+ *				this.name.names.get(paramLanguageID)==paramName
+ *		PARAMETERS String paramLanguageID, String paramName
+ *		import java.lang.String;  
  */
 public class Tariff
 implements Serializable
@@ -80,6 +92,18 @@ implements Serializable
 	public static final String FETCH_GROUP_NAME = "Tariff.name";
 	public static final String FETCH_GROUP_THIS_TARIFF = "Tariff.this";
 
+	/**
+	 * Return a {@link Collection} of Tariffs with the given name in the given Locale language.
+	 * @param pm the PersistenceManager to use
+	 * @param name the name in the given locale language
+	 * @param locale the Locale to search with its language in the I18nText of the tariff  
+	 * @return a {@link Collection} of Tariffs with the given name in the given Locale language
+	 */
+	public static Collection<Tariff> getTariffByName(PersistenceManager pm, String name, Locale locale) {
+		Query q = pm.newNamedQuery(Tariff.class, "getTariffByName");
+		return (Collection<Tariff>)q.execute(locale.getLanguage(), name);
+	}
+	
 	/**
 	 * @jdo.field primary-key="true"
 	 * @jdo.column length="100"

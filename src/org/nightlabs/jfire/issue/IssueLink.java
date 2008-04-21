@@ -5,9 +5,15 @@ import java.util.Set;
 
 import javax.jdo.JDOHelper;
 import javax.jdo.PersistenceManager;
+import javax.jdo.listener.DeleteCallback;
 import javax.jdo.listener.DetachCallback;
+import javax.jdo.listener.InstanceLifecycleEvent;
+import javax.jdo.listener.StoreCallback;
+import javax.jdo.listener.StoreLifecycleListener;
 import javax.jdo.spi.PersistenceCapable;
 
+import org.apache.log4j.Logger;
+import org.nightlabs.jdo.NLJDOHelper;
 import org.nightlabs.jdo.ObjectID;
 import org.nightlabs.jdo.ObjectIDUtil;
 import org.nightlabs.util.Util;
@@ -40,8 +46,10 @@ import org.nightlabs.util.Util;
  * @jdo.fetch-group name="IssueLink.this" fields="issue, issueLinkType, linkedObjectID"
  */ 
 public class IssueLink
-implements Serializable, DetachCallback
+implements Serializable, DetachCallback, StoreCallback, DeleteCallback
 {
+	private static final Logger logger = Logger.getLogger(IssueLink.class);
+
 	public static final String FETCH_GROUP_THIS_ISSUE_LINK = "IssueLink.this";
 	public static final String FETCH_GROUP_ISSUE_LINK_TYPE = "IssueLink.issueLinkType";
 	public static final String FETCH_GROUP_ISSUE_LINKED_OBJECT_ID = "IssueLink.linkedObjectID";
@@ -211,10 +219,50 @@ implements Serializable, DetachCallback
 			detached.linkedObjectClass = attached.getLinkedObjectClass();
 	}
 
+	public String getPrimaryKey()
+	{
+		return organisationID + '/' + ObjectIDUtil.longObjectIDFieldToString(issueLinkID);
+	}
+
 	@Override
 	public void jdoPreDetach() {
 	}
 
+	@Override
+	public void jdoPreStore() {
+		if (logger.isDebugEnabled())
+			logger.debug("jdoPreStore: about to store IssueLink: " + getPrimaryKey());
+
+		getPersistenceManager().addInstanceLifecycleListener(new StoreLifecycleListener() {
+			@Override
+			public void preStore(InstanceLifecycleEvent event) {
+			}
+			@Override
+			public void postStore(InstanceLifecycleEvent event) {
+				if (!IssueLink.this.equals(event.getPersistentInstance()))
+					return;
+
+				getPersistenceManager().removeInstanceLifecycleListener(this);
+
+				if (NLJDOHelper.exists(getPersistenceManager(), IssueLink.this)) {
+					if (logger.isDebugEnabled())
+						logger.debug("jdoPreStore: the IssueLink " + getPrimaryKey() + " already exists - no need to call the IssueLinkType's afterCreateIssueLink callback method.");
+				}
+				else {
+					if (logger.isDebugEnabled())
+						logger.debug("jdoPreStore: the IssueLink " + getPrimaryKey() + " does NOT yet exist - calling the IssueLinkType's afterCreateIssueLink callback method.");
+					
+					getIssueLinkType().afterCreateIssueLink(IssueLink.this);
+				}
+			}
+		}, new Class[] { IssueLink.class });
+	}
+
+	@Override
+	public void jdoPreDelete() {
+		
+	}
+	
 	@Override
 	public int hashCode() {
 		final int prime = 31;

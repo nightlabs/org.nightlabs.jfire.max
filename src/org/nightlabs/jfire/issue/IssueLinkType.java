@@ -30,7 +30,7 @@ import javax.jdo.Query;
  *		query="SELECT WHERE this.linkableObjectClassNames.contains(:linkableObjectClassName)"
  */ 
 public class IssueLinkType
-implements Serializable 
+implements Serializable
 {
 	private static final long serialVersionUID = 1L;
 
@@ -157,6 +157,7 @@ implements Serializable
 		return pm;
 	}
 
+	
 //	protected Object detachLinkedObject(IssueLink issueLink) {
 //		return getPersistenceManager().detachCopy(issueLink.getLinkedObject());
 //	}

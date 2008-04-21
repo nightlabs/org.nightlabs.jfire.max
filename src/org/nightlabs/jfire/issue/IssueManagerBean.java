@@ -869,12 +869,12 @@ implements SessionBean
 			issueLinkType.getLinkableObjectClassNames().add("java.lang.Object");
 			issueLinkType = pm.makePersistent(issueLinkType);
 
-			issueLinkType = new IssueLinkType(getOrganisationID(), "Parent of");
+			issueLinkType = new IssueLinkTypeParentOf(getOrganisationID(), IssueLinkTypeParentOf.class.getName());
 			issueLinkType.getName().setText(Locale.ENGLISH.getLanguage(), "Parent of");
 			issueLinkType.getLinkableObjectClassNames().add("org.nightlabs.jfire.issue.Issue");
 			issueLinkType = pm.makePersistent(issueLinkType);
 			
-			issueLinkType = new IssueLinkType(getOrganisationID(), "Child of");
+			issueLinkType = new IssueLinkTypeChildOf(getOrganisationID(), IssueLinkTypeChildOf.class.getName());
 			issueLinkType.getName().setText(Locale.ENGLISH.getLanguage(), "Child of");
 			issueLinkType.getLinkableObjectClassNames().add("org.nightlabs.jfire.issue.Issue");
 			issueLinkType = pm.makePersistent(issueLinkType);

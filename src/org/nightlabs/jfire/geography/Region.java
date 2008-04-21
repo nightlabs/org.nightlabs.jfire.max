@@ -30,10 +30,12 @@ import java.io.Serializable;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.Locale;
 import java.util.Map;
 
 import javax.jdo.JDOHelper;
 import javax.jdo.PersistenceManager;
+import javax.jdo.Query;
 
 import org.nightlabs.jfire.geography.id.RegionID;
 import org.nightlabs.util.Util;
@@ -57,6 +59,14 @@ import org.nightlabs.util.Util;
  * @jdo.fetch-group name="Region.country" fields="country"
  * @jdo.fetch-group name="Region.name" fields="name"
  * @jdo.fetch-group name="Region.cities" fields="cities"
+ * 
+ * @jdo.query
+ *		name="getRegionByName"
+ *		query="SELECT
+ *			WHERE
+ *				this.name.names.get(paramLanguageID) == paramName
+ *		PARAMETERS String paramLanguageID, String paramName
+ *		import java.lang.String;
  */
 public class Region implements Serializable
 {
@@ -69,6 +79,11 @@ public class Region implements Serializable
 	public static final String FETCH_GROUP_NAME = "Region.name";
 	public static final String FETCH_GROUP_CITIES = "Region.cities";
 
+	public static Collection<Region> getRegionByName(PersistenceManager pm, String name, Locale locale) {
+		Query q = pm.newNamedQuery(Region.class, "getRegionByName");
+		return (Collection<Region>)q.execute(locale.getLanguage(), name);
+	}
+	
 	/////// begin primary key ///////
 	/**
 	 * @jdo.field primary-key="true"

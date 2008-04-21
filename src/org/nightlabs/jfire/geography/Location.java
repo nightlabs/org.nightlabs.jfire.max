@@ -27,8 +27,12 @@
 package org.nightlabs.jfire.geography;
 
 import java.io.Serializable;
+import java.util.Collection;
+import java.util.Locale;
 
 import javax.jdo.JDOHelper;
+import javax.jdo.PersistenceManager;
+import javax.jdo.Query;
 
 import org.nightlabs.jfire.geography.id.LocationID;
 import org.nightlabs.util.Util;
@@ -49,6 +53,14 @@ import org.nightlabs.util.Util;
  * @jdo.fetch-group name="Location.name" fields="name"
  * @jdo.fetch-group name="Location.city" fields="city"
  * @jdo.fetch-group name="Location.this" fields="city, district, name"
+ * 
+ * @jdo.query
+ *		name="getLocationByName"
+ *		query="SELECT
+ *			WHERE
+ *				this.name.names.get(paramLanguageID) == paramName
+ *		PARAMETERS String paramLanguageID, String paramName
+ *		import java.lang.String; 
  */
 public class Location implements Serializable
 {
@@ -61,6 +73,11 @@ public class Location implements Serializable
 	public static final String FETCH_GROUP_CITY = "Location.city";
 	public static final String FETCH_GROUP_THIS_LOCATION = "Location.this";
 
+	public static Collection<Location> getLocationByName(PersistenceManager pm, String name, Locale locale) {
+		Query q = pm.newNamedQuery(Location.class, "getLocationByName");
+		return (Collection<Location>)q.execute(locale.getLanguage(), name);
+	}
+	
 	/**
 	 * 2-char-iso-code
 	 *

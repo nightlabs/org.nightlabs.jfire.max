@@ -118,10 +118,35 @@ implements Serializable
 	public IssueLinkTypeName getName() {
 		return name;
 	}
-	
+
+	/**
+	 * Callback method triggered after a new {@link IssueLink} instance has been created and persisted to the datastore.
+	 * <p>
+	 * Override this method in your subclass of <code>IssueLinkType</code>, if you need to perform some code on creation
+	 * of <code>IssueLink</code>s.
+	 * </p>
+	 *
+	 * @param newIssueLink the newly created and already persisted (in the same transaction) IssueLink.
+	 * @see #beforeDeleteIssueLink(IssueLink)
+	 * @see #afterDeleteIssueLink(IssueLink)
+	 */
 	protected void afterCreateIssueLink(IssueLink newIssueLink) { }
-	
+
+	/**
+	 * Callback method triggered before an {@link IssueLink} instance has been deleted from the datastore.
+	 * 
+	 * @param issueLinkToBeDeleted the <code>IssueLink</code> that is about to be deleted.
+	 * @see #afterCreateIssueLink(IssueLink)
+	 * @see #afterDeleteIssueLink(IssueLink)
+	 */
 	protected void beforeDeleteIssueLink(IssueLink issueLinkToBeDeleted) { }
+	/**
+	 * Callback method triggered after an {@link IssueLink} instance has been deleted from the datastore.
+	 * 
+	 * @param issueLinkDeleted the <code>IssueLink</code> that has been deleted.
+	 * @see #afterCreateIssueLink(IssueLink)
+	 * @see #beforeDeleteIssueLink(IssueLink)
+	 */
 	protected void afterDeleteIssueLink(IssueLink issueLinkDeleted) { }
 
 	protected PersistenceManager getPersistenceManager()

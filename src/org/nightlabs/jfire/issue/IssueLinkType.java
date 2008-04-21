@@ -37,10 +37,28 @@ implements Serializable
 	public static final String FETCH_GROUP_THIS_ISSUE_LINK_TYPE = "IssueLinkType.this";
 
 	@SuppressWarnings("unchecked")
-	public static Collection<IssueLinkType> getIssueLinkTypes(PersistenceManager pm, Class<?> linkableObjectClass)
+	private static void populateIssueLinkTypes(PersistenceManager pm, Query q, Class<?> linkableObjectClass, Set<IssueLinkType> issueLinkTypes)
+	{
+		Class<?> loc = linkableObjectClass;
+		while (loc != null) {
+			issueLinkTypes.addAll((Collection<? extends IssueLinkType>) q.execute(loc.getName()));
+
+			for (Class<?> locInterface : loc.getInterfaces())
+				populateIssueLinkTypes(pm, q, locInterface, issueLinkTypes);
+
+			loc = loc.getSuperclass();
+		}
+	}
+
+	@SuppressWarnings("unchecked")
+	public static Set<IssueLinkType> getIssueLinkTypes(PersistenceManager pm, Class<?> linkableObjectClass)
 	{
 		Query q = pm.newNamedQuery(IssueLinkType.class, "getIssueLinkTypesForLinkableObjectClassNames");
-		return (Collection<IssueLinkType>) q.execute(linkableObjectClass.getName());
+
+		Set<IssueLinkType> issueLinkTypes = new HashSet<IssueLinkType>();
+		populateIssueLinkTypes(pm, q, linkableObjectClass, issueLinkTypes);
+
+		return issueLinkTypes;
 	}
 
 	/**

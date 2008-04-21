@@ -26,10 +26,20 @@
 
 package org.nightlabs.jfire.store.dao;
 
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
+import javax.jdo.FetchPlan;
+
+import org.nightlabs.jdo.query.QueryCollection;
+import org.nightlabs.jfire.base.jdo.BaseJDOObjectDAO;
+import org.nightlabs.jfire.security.SecurityReflector;
 import org.nightlabs.jfire.store.ProductType;
+import org.nightlabs.jfire.store.StoreManager;
+import org.nightlabs.jfire.store.StoreManagerUtil;
 import org.nightlabs.jfire.store.id.ProductTypeID;
 import org.nightlabs.progress.ProgressMonitor;
 
@@ -38,18 +48,94 @@ import org.nightlabs.progress.ProgressMonitor;
  *
  */
 public class ProductTypeDAO
-extends BaseProductTypeDAO
+extends BaseJDOObjectDAO<ProductTypeID, ProductType> 
 {
 	protected ProductTypeDAO() {
-		super();
 	}
-	
-	// TODO: Implement authority checking
+
+	/**
+	 * This method returns a new instance of <tt>Set</tt> with those
+	 * fetch groups that should always be used as a minimum.
+	 * <p>
+	 * Overwrite this method if you want to return more fetchgroups.
+	 *
+	 * @return Returns a <tt>Set</tt> with <tt>FetchPlan.DEFAULT</tt> and <tt>FetchPlan.VALUES</tt>.
+	 *
+	 * @see #getProductType(ProductTypeID, String[])
+	 */
+	protected Set<String> getMinimumFetchGroups()
+	{
+		Set<String> fgSet = new HashSet<String>();
+		fgSet.add(FetchPlan.DEFAULT);
+		return fgSet;
+	}
+
+	/**
+	 * @param productTypeID
+	 * @param The fetchGroups returned by {@link #getMinimumFetchGroups()} are always
+	 *		included. You only need to specify additional fetchgroups or leave
+	 *		this <tt>null</tt>.
+	 * @return An instance of <tt>ProductType</tt> either from the <tt>Cache</tt> or
+	 *		from the server.
+	 */
+	public ProductType getProductType(ProductTypeID productTypeID, String[] fetchGroups, int maxFetchDepth,
+			ProgressMonitor progressMonitor)
+	{
+		Set<String> fgSet = getMinimumFetchGroups();
+
+		if (fetchGroups == null)
+			fetchGroups = fgSet.toArray(new String[fgSet.size()]);
+		else {
+			fgSet.addAll(Arrays.asList(fetchGroups));
+			fetchGroups = fgSet.toArray(new String[fgSet.size()]);
+		}
+
+		return getJDOObject(null, productTypeID, fetchGroups, maxFetchDepth, progressMonitor);
+	}
+
+	// TODO: Implement Authority checking (needs to be in the EJB!)
+	@Override
+	protected Collection<ProductType> retrieveJDOObjects(Set<ProductTypeID> objectIDs, String[] fetchGroups,
+			int maxFetchDepth, ProgressMonitor progressMonitor)
+			throws Exception
+			{
+		progressMonitor.beginTask("Loading ProductTypes", 2); //$NON-NLS-1$
+		progressMonitor.worked(1);
+
+		StoreManager sm = storeManager;
+		if (sm == null)
+			sm = StoreManagerUtil.getHome(SecurityReflector.getInitialContextProperties()).create();
+
+		Collection<ProductType> productTypes = sm.getProductTypes(objectIDs, fetchGroups, maxFetchDepth);
+		progressMonitor.worked(2);
+		return productTypes;
+			}
+
+	private StoreManager storeManager;
+
+
+	//Optimized method that returns the ProductTypes using the QueryCollection
+	//and retrieving the Products Id
+
+	public synchronized List<ProductType> getProductTypes(QueryCollection<?> queryCollection, String[] fetchGroups,
+			int maxFetchDepth, ProgressMonitor progressMonitor)throws Exception
+			{
+		storeManager = StoreManagerUtil.getHome(SecurityReflector.getInitialContextProperties()).create();
+		Set<ProductTypeID> productTypeIDs = storeManager.getProductTypeIDs(queryCollection);
+
+		try {	
+			return getJDOObjects(null, productTypeIDs, fetchGroups, maxFetchDepth, progressMonitor);
+		} finally {
+			storeManager = null;
+		}
+			}
+
+	// TODO: Implement authority checking - should be done in the server!
 	public List<ProductType> getProductTypes(Set<ProductTypeID> productTypeIDs, String[] fetchGroups,
 			int maxFetchDepth, ProgressMonitor progressMonitor)
-	{
+			{
 		return getJDOObjects(null, productTypeIDs, fetchGroups, maxFetchDepth, progressMonitor);
-	}
+			}
 
 	private static ProductTypeDAO sharedInstance;
 

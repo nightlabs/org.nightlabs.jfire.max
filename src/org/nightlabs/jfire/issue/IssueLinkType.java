@@ -2,12 +2,17 @@ package org.nightlabs.jfire.issue;
 
 import java.io.Serializable;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.HashSet;
 import java.util.Set;
 
 import javax.jdo.JDOHelper;
 import javax.jdo.PersistenceManager;
 import javax.jdo.Query;
+
+import org.nightlabs.jfire.issue.id.IssueLinkTypeID;
+import org.nightlabs.jfire.organisation.Organisation;
+import org.nightlabs.util.Util;
 
 /**
  * @author Chairat Kongarayawetchakun - chairat at nightlabs dot de
@@ -19,6 +24,7 @@ import javax.jdo.Query;
  *		table="JFireIssueTracking_IssueLinkType"
  *
  * @jdo.inheritance strategy="new-table"
+ * @jdo.inheritance-discriminator strategy="class-name"
  *
  * @jdo.create-objectid-class
  * 		field-order="organisationID, issueLinkTypeID"
@@ -28,6 +34,13 @@ import javax.jdo.Query;
  * @jdo.query
  *		name="getIssueLinkTypesForLinkableObjectClassNames"
  *		query="SELECT WHERE this.linkableObjectClassNames.contains(:linkableObjectClassName)"
+ *
+ * @jdo.query
+ *		name="getIssuesLinkTypeByIssueLinkTypeID"
+ *		query="SELECT
+ *			WHERE this.issueLinkTypeID == paramIssueLinkTypeID                    
+ *			PARAMETERS String paramIssueLinkTypeID
+ *			import java.lang.String"
  */ 
 public class IssueLinkType
 implements Serializable
@@ -35,6 +48,13 @@ implements Serializable
 	private static final long serialVersionUID = 1L;
 
 	public static final String FETCH_GROUP_THIS_ISSUE_LINK_TYPE = "IssueLinkType.this";
+
+	// Of course there can be other types of IssueLinks (even created by the user without programming!), but
+	// the following ones are very basic and thus predefined by the jfire team. Some more constants can be found in the
+	// subclasses of IssueLinkType (e.g. IssueLinkTypeParentChild).
+	public static final IssueLinkTypeID ISSUE_LINK_TYPE_ID_RELATED = IssueLinkTypeID.create(Organisation.DEV_ORGANISATION_ID, "related");
+	public static final IssueLinkTypeID ISSUE_LINK_TYPE_ID_DUPLICATE = IssueLinkTypeID.create(Organisation.DEV_ORGANISATION_ID, "duplicate");
+	
 
 	@SuppressWarnings("unchecked")
 	private static void populateIssueLinkTypes(PersistenceManager pm, Query q, Class<?> linkableObjectClass, Set<IssueLinkType> issueLinkTypes)
@@ -70,7 +90,7 @@ implements Serializable
 	/**
 	 * @jdo.field primary-key="true"
 	 */
-	private String issueLinkTypeID;	
+	private String issueLinkTypeID;
 	
 	/**
 	 * String of the referenced object class names.
@@ -95,6 +115,10 @@ implements Serializable
 	 */
 	protected IssueLinkType() {}
 
+	public IssueLinkType(IssueLinkTypeID issueLinkTypeID) {
+		this(issueLinkTypeID.organisationID, issueLinkTypeID.issueLinkTypeID);
+	}
+
 	public IssueLinkType(String organisationID, String issueLinkTypeID) {
 		this.organisationID = organisationID;
 		this.issueLinkTypeID = issueLinkTypeID;
@@ -102,11 +126,43 @@ implements Serializable
 		this.linkableObjectClassNames = new HashSet<String>();
 		this.name = new IssueLinkTypeName(this);
 	}
-	
+
 	public Set<String> getLinkableObjectClassNames() {
-		return linkableObjectClassNames;
+		return Collections.unmodifiableSet(linkableObjectClassNames);
 	}
-	
+
+	/**
+	 * @jdo.field persistence-modifier="none"
+	 */
+	private transient Set<Class<?>> linkableObjectClasses;
+
+	public Set<Class<?>> getLinkableObjectClasses()
+	throws ClassNotFoundException
+	{
+		if (linkableObjectClasses == null) {
+			Set<Class<?>> set = new HashSet<Class<?>>(linkableObjectClassNames.size());
+			for (String linkableObjectClassName : linkableObjectClassNames)
+				set.add(Class.forName(linkableObjectClassName));
+
+			linkableObjectClasses = Collections.unmodifiableSet(set);
+		}
+		return linkableObjectClasses;
+	}
+
+	public boolean addLinkableObjectClass(Class<?> linkableObjectClass)
+	{
+		boolean res = linkableObjectClassNames.add(linkableObjectClass.getName());
+		linkableObjectClasses = null;
+		return res;
+	}
+
+	public boolean removeLinkableObjectClass(Class<?> linkableObjectClass)
+	{
+		boolean res = linkableObjectClassNames.remove(linkableObjectClass.getName());
+		linkableObjectClasses = null;
+		return res;
+	}
+
 	public String getOrganisationID() {
 		return organisationID;
 	}
@@ -127,27 +183,17 @@ implements Serializable
 	 * </p>
 	 *
 	 * @param newIssueLink the newly created and already persisted (in the same transaction) IssueLink.
-	 * @see #beforeDeleteIssueLink(IssueLink)
-	 * @see #afterDeleteIssueLink(IssueLink)
+	 * @see #preDeleteIssueLink(IssueLink)
 	 */
-	protected void afterCreateIssueLink(IssueLink newIssueLink) { }
+	protected void postCreateIssueLink(IssueLink newIssueLink) { }
 
 	/**
 	 * Callback method triggered before an {@link IssueLink} instance has been deleted from the datastore.
 	 * 
 	 * @param issueLinkToBeDeleted the <code>IssueLink</code> that is about to be deleted.
-	 * @see #afterCreateIssueLink(IssueLink)
-	 * @see #afterDeleteIssueLink(IssueLink)
+	 * @see #postCreateIssueLink(IssueLink)
 	 */
-	protected void beforeDeleteIssueLink(IssueLink issueLinkToBeDeleted) { }
-	/**
-	 * Callback method triggered after an {@link IssueLink} instance has been deleted from the datastore.
-	 * 
-	 * @param issueLinkDeleted the <code>IssueLink</code> that has been deleted.
-	 * @see #afterCreateIssueLink(IssueLink)
-	 * @see #beforeDeleteIssueLink(IssueLink)
-	 */
-	protected void afterDeleteIssueLink(IssueLink issueLinkDeleted) { }
+	protected void preDeleteIssueLink(IssueLink issueLinkToBeDeleted) { }
 
 	protected PersistenceManager getPersistenceManager()
 	{
@@ -157,8 +203,34 @@ implements Serializable
 		return pm;
 	}
 
-	
-//	protected Object detachLinkedObject(IssueLink issueLink) {
-//		return getPersistenceManager().detachCopy(issueLink.getLinkedObject());
-//	}
+	@SuppressWarnings("unchecked")
+	public static IssueLinkType getIssueLinkTypeByIssueLinkTypeID(PersistenceManager pm, String issueLinkTypeID)
+	{
+		Query q = pm.newNamedQuery(IssueLinkType.class, "getIssueLinkTypeByIssueLinkTypeID");
+		return (IssueLinkType)q.execute(issueLinkTypeID);
+	}
+
+	@Override
+	public boolean equals(Object obj)
+	{
+		if (obj == this)
+			return true;
+
+		if (!(obj instanceof IssueLinkType))
+			return false;
+
+		IssueLinkType o = (IssueLinkType) obj;
+
+		return
+			Util.equals(this.issueLinkTypeID, o.issueLinkTypeID) &&
+			Util.equals(this.organisationID, o.organisationID);
+	}
+
+	@Override
+	public int hashCode()
+	{
+		return
+			Util.hashCode(this.organisationID) ^
+			Util.hashCode(this.issueLinkTypeID);
+	}
 }

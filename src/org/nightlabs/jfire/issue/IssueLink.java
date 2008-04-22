@@ -252,7 +252,7 @@ implements Serializable, DetachCallback, StoreCallback, DeleteCallback
 					if (logger.isDebugEnabled())
 						logger.debug("jdoPreStore: the IssueLink " + getPrimaryKey() + " does NOT yet exist - calling the IssueLinkType's afterCreateIssueLink callback method.");
 					
-					getIssueLinkType().afterCreateIssueLink(IssueLink.this);
+					getIssueLinkType().postCreateIssueLink(IssueLink.this);
 				}
 			}
 		}, new Class[] { IssueLink.class });
@@ -260,9 +260,12 @@ implements Serializable, DetachCallback, StoreCallback, DeleteCallback
 
 	@Override
 	public void jdoPreDelete() {
-		
+		if (logger.isDebugEnabled())
+			logger.debug("jdoPreDelete: about to delete IssueLink: " + getPrimaryKey());
+
+		getIssueLinkType().preDeleteIssueLink(this);
 	}
-	
+
 	@Override
 	public int hashCode() {
 		final int prime = 31;

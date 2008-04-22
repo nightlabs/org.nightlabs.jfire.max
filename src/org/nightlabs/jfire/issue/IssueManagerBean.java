@@ -864,24 +864,24 @@ implements SessionBean
 			// Create the issueLinkTypes
 			IssueLinkType issueLinkType;
 
-			issueLinkType = new IssueLinkType(getOrganisationID(), "Related");
+			issueLinkType = new IssueLinkType(IssueLinkType.ISSUE_LINK_TYPE_ID_RELATED);
 			issueLinkType.getName().setText(Locale.ENGLISH.getLanguage(), "Related");
-			issueLinkType.getLinkableObjectClassNames().add("java.lang.Object");
+			issueLinkType.addLinkableObjectClass(Object.class);
 			issueLinkType = pm.makePersistent(issueLinkType);
 
-			issueLinkType = new IssueLinkTypeParentOf(getOrganisationID(), IssueLinkTypeParentOf.class.getName());
+			issueLinkType = new IssueLinkTypeParentChild(IssueLinkTypeParentChild.ISSUE_LINK_TYPE_ID_PARENT);
 			issueLinkType.getName().setText(Locale.ENGLISH.getLanguage(), "Parent of");
-			issueLinkType.getLinkableObjectClassNames().add("org.nightlabs.jfire.issue.Issue");
+			issueLinkType.addLinkableObjectClass(Issue.class);
 			issueLinkType = pm.makePersistent(issueLinkType);
 			
-			issueLinkType = new IssueLinkTypeChildOf(getOrganisationID(), IssueLinkTypeChildOf.class.getName());
+			issueLinkType = new IssueLinkTypeParentChild(IssueLinkTypeParentChild.ISSUE_LINK_TYPE_ID_CHILD);
 			issueLinkType.getName().setText(Locale.ENGLISH.getLanguage(), "Child of");
-			issueLinkType.getLinkableObjectClassNames().add("org.nightlabs.jfire.issue.Issue");
+			issueLinkType.addLinkableObjectClass(Issue.class);
 			issueLinkType = pm.makePersistent(issueLinkType);
 			
-			issueLinkType = new IssueLinkType(getOrganisationID(), "Duplicate");
+			issueLinkType = new IssueLinkType(IssueLinkType.ISSUE_LINK_TYPE_ID_DUPLICATE);
 			issueLinkType.getName().setText(Locale.ENGLISH.getLanguage(), "Duplicate");
-			issueLinkType.getLinkableObjectClassNames().add("org.nightlabs.jfire.issue.Issue");
+			issueLinkType.addLinkableObjectClass(Issue.class);
 			issueLinkType = pm.makePersistent(issueLinkType);
 			
 			EditLockType issueEditLock = new EditLockType(EditLockTypeIssue.EDIT_LOCK_TYPE_ID);

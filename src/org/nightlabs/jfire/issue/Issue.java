@@ -493,20 +493,20 @@ implements 	Serializable, AttachCallback, Statable, DeleteCallback
 	}*/
 	
 	public Set<IssueLink> getIssueLinks() {
-		return issueLinks;
+		return Collections.unmodifiableSet(issueLinks);
 	}
 	
-	public Set<ObjectID> getLinkObjectIDs() {
-		if (_linkObjectIDs == null) {
-			Set<ObjectID> ro = new HashSet<ObjectID>(issueLinks.size());
-			for (IssueLink issueLink : issueLinks) {
-				ObjectID objectID = issueLink.getLinkedObjectID();
-				ro.add(objectID);
-			}
-			_linkObjectIDs = ro;
-		}
-		return Collections.unmodifiableSet(_linkObjectIDs);
-	}
+//	public Set<ObjectID> getLinkObjectIDs() {
+//		if (_linkObjectIDs == null) {
+//			Set<ObjectID> ro = new HashSet<ObjectID>(issueLinks.size());
+//			for (IssueLink issueLink : issueLinks) {
+//				ObjectID objectID = issueLink.getLinkedObjectID();
+//				ro.add(objectID);
+//			}
+//			_linkObjectIDs = ro;
+//		}
+//		return Collections.unmodifiableSet(_linkObjectIDs);
+//	}
 
 //	public void addLinkObjectID(ObjectID linkObjectID) {
 //		if (linkObjectID == null)
@@ -517,6 +517,10 @@ implements 	Serializable, AttachCallback, Statable, DeleteCallback
 //			_linkObjectIDs.add(linkObjectID);
 //	}
 
+	/**
+	 * @param issueLinkType the type of the new <code>IssueLink</code>. Must not be <code>null</code>.
+	 * @param linkedObject The linked object (a persistence-capable JDO object) or an object-id (implementing {@link ObjectID}) identifying a persistence-capable JDO object. 
+	 */
 	public IssueLink createIssueLink(IssueLinkType issueLinkType, Object linkedObject)
 	{
 		IssueLink issueLink = new IssueLink(
@@ -529,24 +533,24 @@ implements 	Serializable, AttachCallback, Statable, DeleteCallback
 		return issueLink;
 	}
 
-	public void removeLinkObjectID(ObjectID linkObjectID) {
-		if (linkObjectID == null)
-			throw new IllegalArgumentException("linkObjectID must not be null!");
+	public void removeIssueLink(IssueLink issueLink) {
+		if (issueLink == null)
+			throw new IllegalArgumentException("issueLink must not be null!");
 
-		issueLinks.remove(linkObjectID.toString());
-		if (_linkObjectIDs != null)
-			_linkObjectIDs.remove(linkObjectID);
-	}
-	
-	public void clearIssueLinks()
-	{
-		issueLinks.clear();
+		issueLinks.remove(issueLink);
+//		if (_linkObjectIDs != null)
+//			_linkObjectIDs = null;
 	}
 
-	/**
-	 * @jdo.field persistence-modifier="none"
-	 */
-	private transient Set<ObjectID> _linkObjectIDs;
+//	public void clearIssueLinks()
+//	{
+//		issueLinks.clear();
+//	}
+
+//	/**
+//	 * @jdo.field persistence-modifier="none"
+//	 */
+//	private transient Set<ObjectID> _linkObjectIDs;
 
 
 	public IssueResolution getIssueResolution() {

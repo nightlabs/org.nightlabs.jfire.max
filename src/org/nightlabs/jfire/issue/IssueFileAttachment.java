@@ -3,6 +3,7 @@ package org.nightlabs.jfire.issue;
 import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.io.FileInputStream;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
@@ -13,7 +14,7 @@ import java.util.zip.InflaterInputStream;
 
 import org.apache.log4j.Logger;
 import org.nightlabs.io.DataBuffer;
-import org.nightlabs.util.Util;
+import org.nightlabs.util.IOUtil;
 
 /**
  * @author Chairat Kongarayawetchakun - chairat at nightlabs dot de
@@ -27,8 +28,10 @@ import org.nightlabs.util.Util;
  * @jdo.create-objectid-class field-order="organisationID, issueID, issueFileAttachmentID"
  *
  * @jdo.inheritance strategy = "new-table"
- * 
+ *
  * @jdo.fetch-group name="IssueFileAttachment.this" fetch-groups="default" fields="data"
+ *
+ * @jdo.fetch-group name="Issue.fileList" fields="issue"
  */
 public class IssueFileAttachment 
 implements Serializable{
@@ -85,6 +88,10 @@ implements Serializable{
 		
 		this.issueFileAttachmentID = issueFileAttachmentID;
 	}
+
+	public Issue getIssue() {
+		return issue;
+	}
 	
 	public void loadStream(InputStream in, long length, Date timeStamp, String name)
 	throws IOException
@@ -95,7 +102,7 @@ implements Serializable{
 			DataBuffer db = new DataBuffer((long) (length * 0.6));
 			OutputStream out = new DeflaterOutputStream(db.createOutputStream());
 			try {
-				Util.transferStreamData(in, out);
+				IOUtil.transferStreamData(in, out);
 			} finally {
 				out.close();
 			}
@@ -147,5 +154,21 @@ implements Serializable{
 	 */
 	public InputStream createFileAttachmentInputStream() {
 		return new InflaterInputStream(new ByteArrayInputStream(data));
+	}
+
+	public void saveFile(File file) throws IOException
+	{
+		FileOutputStream out = new FileOutputStream(file);
+		try {
+			InputStream in = createFileAttachmentInputStream();
+			try {
+				IOUtil.transferStreamData(in, out);
+			} finally {
+				in.close();
+			}
+		} finally {
+			out.close();
+		}
+		file.setLastModified(fileTimestamp.getTime());
 	}
 }

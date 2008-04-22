@@ -98,7 +98,7 @@ public class IssueTypeDAO extends BaseJDOObjectDAO<IssueTypeID, IssueType>
 		try {
 			IssueManager im = IssueManagerUtil.getHome(SecurityReflector.getInitialContextProperties()).create();
 			monitor.worked(20);
-			Set<IssueTypeID> allTypeIDs = im.getAllIssueTypeIDs();
+			Set<IssueTypeID> allTypeIDs = im.getIssueTypeIDs();
 			List<IssueType> allTypes = getIssueTypes(allTypeIDs, fetchgroups, maxFetchDepth, new SubProgressMonitor(monitor, 80));
 			monitor.done();
 			return allTypes;

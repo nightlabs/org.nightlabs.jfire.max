@@ -18,15 +18,13 @@ import org.nightlabs.i18n.I18nText;
  *
  * @jdo.create-objectid-class
  * 
- * @jdo.fetch-group name="IssueLinkTypeName.name" fetch-groups="default" fields="issueLinkType, names"
+ * @jdo.fetch-group name="IssueLinkType.name" fetch-groups="default" fields="issueLinkType, names"
  */ 
 public class IssueLinkTypeName 
-extends I18nText{
-	/**
-	 * The serial version of this class.
-	 */
+extends I18nText
+{
 	private static final long serialVersionUID = 1L;
-	
+
 	/**
 	 * @jdo.field primary-key="true"
 	 * @jdo.column length="100"
@@ -64,9 +62,7 @@ extends I18nText{
 	/**
 	 * @deprecated Only for JDO!
 	 */
-	protected IssueLinkTypeName()
-	{
-	}
+	protected IssueLinkTypeName() { }
 
 	public IssueLinkTypeName(IssueLinkType issueLinkType)
 	{
@@ -75,9 +71,7 @@ extends I18nText{
 		issueLinkTypeID = issueLinkType.getIssueLinkTypeID();
 	}
 
-	/**
-	 * @see org.nightlabs.i18n.I18nText#getI18nMap()
-	 */
+	@Override
 	protected Map<String, String> getI18nMap()
 	{
 		return names;
@@ -95,11 +89,9 @@ extends I18nText{
 		return issueLinkTypeID;
 	}
 
-	/**
-	 * @see org.nightlabs.i18n.I18nText#getFallBackValue(java.lang.String)
-	 */
+	@Override
 	protected String getFallBackValue(String languageID)
 	{
-		return issueLinkTypeID == null ? languageID : issueLinkTypeID;
+		return issueLinkTypeID;
 	}
 }

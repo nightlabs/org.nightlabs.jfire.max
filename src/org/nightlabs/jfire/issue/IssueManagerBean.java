@@ -345,38 +345,13 @@ implements SessionBean
 	 * @ejb.transaction type="Supports"
 	 * @ejb.permission role-name="_Guest_"
 	 */
-	public Set<IssueTypeID> getAllIssueTypeIDs()
-	{
-		PersistenceManager pm = getPersistenceManager();
-		try
-		{
-			final Query allIDsQuery = pm.newNamedQuery(IssueType.class, IssueType.QUERY_ALL_ISSUETYPE_IDS);
-			return new HashSet<IssueTypeID>((Collection<IssueTypeID>)allIDsQuery.execute());
-		}
-		finally
-		{
-			pm.close();
-		}
-	}
-	
-	/**
-	 * @throws ModuleException
-	 *
-	 * @ejb.interface-method
-	 * @ejb.transaction type="Required"
-	 * @ejb.permission role-name="_Guest_"
-	 */
-	public Collection getIssueSeverityTypes(String[] fetchGroups, int maxFetchDepth)
-	throws ModuleException
+	@SuppressWarnings("unchecked")
+	public Set<IssueTypeID> getIssueTypeIDs()
 	{
 		PersistenceManager pm = getPersistenceManager();
 		try {
-			pm.getFetchPlan().setMaxFetchDepth(maxFetchDepth);
-			if (fetchGroups != null)
-				pm.getFetchPlan().setGroups(fetchGroups);
-
-			Query q = pm.newQuery(IssueSeverityType.class);
-			return pm.detachCopyAll((Collection)q.execute());
+			final Query allIDsQuery = pm.newNamedQuery(IssueType.class, IssueType.QUERY_ALL_ISSUETYPE_IDS);
+			return new HashSet<IssueTypeID>((Collection<? extends IssueTypeID>)allIDsQuery.execute());
 		} finally {
 			pm.close();
 		}
@@ -397,30 +372,29 @@ implements SessionBean
 			pm.close();
 		}
 	}
-	
-	/**
-	 * @throws ModuleException
-	 *
-	 * @ejb.interface-method
-	 * @ejb.transaction type="Required"
-	 * @ejb.permission role-name="_Guest_"
-	 */
-	public Collection getIssueComments(String[] fetchGroups, int maxFetchDepth)
-	throws ModuleException
-	{
-		PersistenceManager pm = getPersistenceManager();
-		try {
-			pm.getFetchPlan().setMaxFetchDepth(maxFetchDepth);
-			if (fetchGroups != null)
-				pm.getFetchPlan().setGroups(fetchGroups);
 
-			Query q = pm.newQuery(IssueComment.class);
-			return pm.detachCopyAll((Collection)q.execute());
-		} finally {
-			pm.close();
-		}
-	}
-	
+//	/**
+//	 * @throws ModuleException
+//	 *
+//	 * @ejb.interface-method
+//	 * @ejb.transaction type="Required"
+//	 * @ejb.permission role-name="_Guest_"
+//	 */
+//	public Collection getIssueComments(String[] fetchGroups, int maxFetchDepth)
+//	{
+//		PersistenceManager pm = getPersistenceManager();
+//		try {
+//			pm.getFetchPlan().setMaxFetchDepth(maxFetchDepth);
+//			if (fetchGroups != null)
+//				pm.getFetchPlan().setGroups(fetchGroups);
+//
+//			Query q = pm.newQuery(IssueComment.class);
+//			return pm.detachCopyAll((Collection)q.execute());
+//		} finally {
+//			pm.close();
+//		}
+//	}
+
 	/**
 	 * @ejb.interface-method
 	 * @ejb.transaction type="Supports"
@@ -438,7 +412,7 @@ implements SessionBean
 			pm.close();
 		}
 	}
-	
+
 	/**
 	 * @ejb.interface-method
 	 * @ejb.permission role-name="_Guest_"
@@ -494,44 +468,23 @@ implements SessionBean
 			pm.close();
 		}
 	}
-	
+
 	/**
-	 * @throws ModuleException
-	 * 
 	 * @ejb.interface-method
+	 * @ejb.transaction type="Supports"
 	 * @ejb.permission role-name="_Guest_"
 	 */
-	public Collection getIssueLinkTypesByLinkedObjectClass(Class<? extends Object> linkedObjectClass)
-	throws ModuleException
+	public Set<IssueLinkTypeID> getIssueLinkTypeIDs(Class<? extends Object> linkableObjectClass)
 	{
 		PersistenceManager pm = getPersistenceManager();
-		try
-		{
-			Query query = pm.newQuery(IssueLinkType.class);
-			StringBuffer filter = new StringBuffer();
-			
-			if (linkedObjectClass != null) {
-				filter.append("( this.linkableObjectClassNames.contains(varName) && (varName.matches(\"" + linkedObjectClass.getName() + "\") ||  varName.matches(\"" + Object.class.getName() + "\")))");
-				query.declareVariables(String.class.getName() + " varName");
-			}
-			
-			
-			logger.info(filter.toString());
-			query.setFilter(filter.toString());
-			
-			Collection issueLinkTypes = (Collection)query.execute(linkedObjectClass);
-			Collection result = new HashSet();
-			
-			for(Object issueLinkType : issueLinkTypes)
-				result.add(JDOHelper.getObjectId(issueLinkType));
-
-			return result;
-		}
-		finally {
+		try {
+			Set<IssueLinkType> issueLinkTypes = IssueLinkType.getIssueLinkTypes(pm, linkableObjectClass);
+			return NLJDOHelper.getObjectIDSet(issueLinkTypes);
+		} finally {
 			pm.close();
 		}
 	}
-	
+
 	/**
 	 * @ejb.interface-method
 	 * @ejb.permission role-name="_Guest_"

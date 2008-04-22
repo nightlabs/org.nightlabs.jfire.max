@@ -10,6 +10,7 @@ import javax.jdo.JDOHelper;
 import javax.jdo.PersistenceManager;
 import javax.jdo.Query;
 
+import org.nightlabs.jdo.ObjectIDUtil;
 import org.nightlabs.jfire.issue.id.IssueLinkTypeID;
 import org.nightlabs.jfire.organisation.Organisation;
 import org.nightlabs.util.Util;
@@ -26,28 +27,24 @@ import org.nightlabs.util.Util;
  * @jdo.inheritance strategy="new-table"
  * @jdo.inheritance-discriminator strategy="class-name"
  *
- * @jdo.create-objectid-class
- * 		field-order="organisationID, issueLinkTypeID"
- * 
- * @jdo.fetch-group name="IssueLinkType.this" fetch-groups="default" fields="linkableObjectClassNames, name"
+ * @jdo.create-objectid-class field-order="organisationID, issueLinkTypeID"
+ *
+ * @jdo.fetch-group name="IssueLinkType.linkableObjectClassNames" fields="linkableObjectClassNames"
+ * @jdo.fetch-group name="IssueLinkType.name" fields="name"
  *
  * @jdo.query
  *		name="getIssueLinkTypesForLinkableObjectClassNames"
  *		query="SELECT WHERE this.linkableObjectClassNames.contains(:linkableObjectClassName)"
  *
- * @jdo.query
- *		name="getIssuesLinkTypeByIssueLinkTypeID"
- *		query="SELECT
- *			WHERE this.issueLinkTypeID == paramIssueLinkTypeID                    
- *			PARAMETERS String paramIssueLinkTypeID
- *			import java.lang.String"
  */ 
 public class IssueLinkType
 implements Serializable
 {
 	private static final long serialVersionUID = 1L;
 
-	public static final String FETCH_GROUP_THIS_ISSUE_LINK_TYPE = "IssueLinkType.this";
+	public static final String FETCH_GROUP_LINKABLE_OBJECT_CLASS_NAMES = "IssueLinkType.linkableObjectClassNames";
+	public static final String FETCH_GROUP_NAME = "IssueLinkType.name";
+	
 
 	// Of course there can be other types of IssueLinks (even created by the user without programming!), but
 	// the following ones are very basic and thus predefined by the jfire team. Some more constants can be found in the
@@ -120,6 +117,8 @@ implements Serializable
 	}
 
 	public IssueLinkType(String organisationID, String issueLinkTypeID) {
+		Organisation.assertValidOrganisationID(organisationID);
+		ObjectIDUtil.assertValidIDString(issueLinkTypeID, "issueLinkTypeID");
 		this.organisationID = organisationID;
 		this.issueLinkTypeID = issueLinkTypeID;
 		
@@ -201,13 +200,6 @@ implements Serializable
 		if (pm == null)
 			throw new IllegalStateException("This instance of IssueLinkType is currently not persistent! Cannot obtain a PersistenceManager!");
 		return pm;
-	}
-
-	@SuppressWarnings("unchecked")
-	public static IssueLinkType getIssueLinkTypeByIssueLinkTypeID(PersistenceManager pm, String issueLinkTypeID)
-	{
-		Query q = pm.newNamedQuery(IssueLinkType.class, "getIssueLinkTypeByIssueLinkTypeID");
-		return (IssueLinkType)q.execute(issueLinkTypeID);
 	}
 
 	@Override

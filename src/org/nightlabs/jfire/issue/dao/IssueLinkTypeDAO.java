@@ -1,11 +1,8 @@
 package org.nightlabs.jfire.issue.dao;
 
-import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 import java.util.Set;
-
-import javax.jdo.FetchPlan;
 
 import org.nightlabs.jdo.NLJDOHelper;
 import org.nightlabs.jfire.base.jdo.BaseJDOObjectDAO;
@@ -13,6 +10,7 @@ import org.nightlabs.jfire.issue.IssueLinkType;
 import org.nightlabs.jfire.issue.IssueManager;
 import org.nightlabs.jfire.issue.IssueManagerUtil;
 import org.nightlabs.jfire.issue.id.IssueLinkTypeID;
+import org.nightlabs.jfire.issue.id.IssueTypeID;
 import org.nightlabs.jfire.security.SecurityReflector;
 import org.nightlabs.progress.ProgressMonitor;
 import org.nightlabs.progress.SubProgressMonitor;
@@ -42,18 +40,19 @@ extends BaseJDOObjectDAO<IssueLinkTypeID, IssueLinkType>
 	{
 		monitor.beginTask("Fetching IssueLinkType...", 1); //$NON-NLS-1$
 		try {
-			IssueManager im = IssueManagerUtil.getHome(SecurityReflector.getInitialContextProperties()).create();
-			monitor.worked(1);
+			IssueManager im = issueManager;
+			if (im == null)
+				im = IssueManagerUtil.getHome(SecurityReflector.getInitialContextProperties()).create();
+
 			return im.getIssueLinkTypes(objectIDs, fetchGroups, maxFetchDepth);	
 		} catch (Exception e) {
 			monitor.setCanceled(true);
 			throw e;
 		} finally {
+			monitor.worked(1);
 			monitor.done();
 		}
 	}
-
-	private static final String[] FETCH_GROUPS = { IssueLinkType.FETCH_GROUP_THIS_ISSUE_LINK_TYPE, FetchPlan.DEFAULT };
 
 	public synchronized IssueLinkType getIssueLinkType(IssueLinkTypeID issueLinkTypeID, String[] fetchGroups, int maxFetchDepth, ProgressMonitor monitor)
 	{
@@ -62,11 +61,15 @@ extends BaseJDOObjectDAO<IssueLinkTypeID, IssueLinkType>
 		monitor.done();
 		return issueLinkType;
 	}
-	
-	public List<IssueLinkType> getIssueLinkTypes(ProgressMonitor monitor) 
+
+	private IssueManager issueManager;
+
+	public synchronized List<IssueLinkType> getIssueLinkTypes(String[] fetchGroups, int maxFetchDepth, ProgressMonitor monitor) 
 	{
 		try {
-			return new ArrayList<IssueLinkType>(retrieveJDOObjects(null, FETCH_GROUPS, NLJDOHelper.MAX_FETCH_DEPTH_NO_LIMIT, monitor));
+			issueManager = IssueManagerUtil.getHome(SecurityReflector.getInitialContextProperties()).create();
+			Set<IssueLinkTypeID> issueLinkTypeIDs = issueManager.getIssueLinkTypeIDs(null);
+			return getJDOObjects(null, issueLinkTypeIDs, fetchGroups, maxFetchDepth, monitor);
 		} catch (Exception e) {
 			throw new RuntimeException("Error while fetching issue link types: " + e.getMessage(), e); //$NON-NLS-1$
 		} 
@@ -85,7 +88,7 @@ extends BaseJDOObjectDAO<IssueLinkTypeID, IssueLinkType>
 	{
 		try {
 			IssueManager im = IssueManagerUtil.getHome(SecurityReflector.getInitialContextProperties()).create();
-			Collection<IssueLinkTypeID> ids = im.getIssueLinkTypesByLinkedObjectClass(linkedClass);
+			Collection<IssueLinkTypeID> ids = im.getIssueLinkTypeIDs(linkedClass);
 			return getJDOObjects(null, ids, fetchgroups, maxFetchDepth, monitor);
 		} catch(Exception e) {
 			throw new RuntimeException("Getting issue link types failed", e);

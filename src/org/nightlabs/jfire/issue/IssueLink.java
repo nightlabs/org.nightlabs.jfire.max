@@ -16,6 +16,8 @@ import org.apache.log4j.Logger;
 import org.nightlabs.jdo.NLJDOHelper;
 import org.nightlabs.jdo.ObjectID;
 import org.nightlabs.jdo.ObjectIDUtil;
+import org.nightlabs.jfire.idgenerator.IDGenerator;
+import org.nightlabs.jfire.organisation.Organisation;
 import org.nightlabs.util.Util;
 
 /**
@@ -118,20 +120,43 @@ implements Serializable, DetachCallback, StoreCallback, DeleteCallback
 	@Deprecated
 	protected IssueLink() {}
 
-	public IssueLink(String organisationID, long issueLinkID, Issue issue, IssueLinkType issueLinkType, Object linkedObject) {
+	/**
+	 * Create an instance of <code>IssueLink</code>.
+	 * 
+	 * @param organisationID the first part of the composite primary key - referencing the organisation which owns this <code>IssueLink</code>.
+	 * @param issueLinkID the second part of the composite primary key. Use {@link IDGenerator#nextID(Class)} with <code>IssueLink.class</code> to create an id.
+	 * @param issue the {@link Issue} to which this IssueLink belongs. Must not be <code>null</code>.
+	 * @param issueLinkType the type of the new <code>IssueLink</code>. Must not be <code>null</code>.
+	 * @param linkedObject The linked object (a persistence-capable JDO object) or an object-id (implementing {@link ObjectID}) identifying a persistence-capable JDO object.
+	 */
+	protected IssueLink(String organisationID, long issueLinkID, Issue issue, IssueLinkType issueLinkType, Object linkedObject) {
+		Organisation.assertValidOrganisationID(organisationID);
+		if (issueLinkID < 0)
+			throw new IllegalArgumentException("issueLinkID < 0");
+
 		if (issue == null)
 			throw new IllegalArgumentException("issue must not be null!");
 
 		if (linkedObject == null)
 			throw new IllegalArgumentException("linkedObject must not be null!");
 
-		if (!(linkedObject instanceof PersistenceCapable))
-			throw new IllegalArgumentException("linkedObject must implement the interface "+ PersistenceCapable.class.getName() +"! linkedObject is an instance of " + linkedObject.getClass().getName() + ": " + linkedObject);
+		Object linkedObjectID;
+		if (linkedObject instanceof ObjectID) {
+			linkedObjectID = linkedObject;
+			linkedObject = null;
+		}
+		else {
+			if (!(linkedObject instanceof PersistenceCapable))
+				throw new IllegalArgumentException("linkedObject must implement the interface "+ PersistenceCapable.class.getName() +" (or be the object-id of a PersistenceCapable object)! linkedObject is an instance of " + linkedObject.getClass().getName() + ": " + linkedObject);
 
-		Object linkedObjectID = JDOHelper.getObjectId(linkedObject);
+			linkedObjectID = JDOHelper.getObjectId(linkedObject);
+		}
 
 		if (!(linkedObjectID instanceof ObjectID))
 			throw new IllegalArgumentException("The object-id of linkedObject is not an instance of " + ObjectID.class.getName() + "! It's an instance of: " + (linkedObjectID == null ? null : linkedObjectID.getClass().getName()));
+
+		if (issueLinkType == null)
+			throw new IllegalArgumentException("issueLinkType == null");
 
 		this.organisationID = organisationID;
 		this.issue = issue;
@@ -141,7 +166,7 @@ implements Serializable, DetachCallback, StoreCallback, DeleteCallback
 		this.linkedObjectID = linkedObjectID.toString();
 		this.issueLinkType = issueLinkType;
 	}
-	
+
 	public String getOrganisationID() {
 		return organisationID;
 	}

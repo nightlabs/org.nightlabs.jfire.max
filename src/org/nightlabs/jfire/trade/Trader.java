@@ -529,10 +529,10 @@ public class Trader
 //	throws ModuleException
 	{
 		if (customer == null)
-			throw new NullPointerException("customer");
+			throw new IllegalArgumentException("customer must not be null!");
 
 		if (currency == null)
-			throw new NullPointerException("currency");
+			throw new IllegalArgumentException("currency must not be null!");
 
 		PersistenceManager pm = getPersistenceManager();
 
@@ -643,13 +643,18 @@ public class Trader
 
 	public Offer createOffer(User user, Order order, String offerIDPrefix) throws ModuleException
 	{
-		if (order.getVendor() == null)
+		LegalEntity vendor = order.getVendor();
+		if (vendor == null)
 			throw new IllegalStateException("order.getVendor() returned null!");
 
 		if (getMandator().getPrimaryKey() == null)
 			throw new IllegalStateException("getMandator().getPrimaryKey() returned null!");
 
-		if (getMandator().getPrimaryKey().equals(order.getVendor().getPrimaryKey())) {
+		if (!getMandator().equals(vendor) && (vendor instanceof OrganisationLegalEntity)) {
+			// TODO: Implement foreign stuff
+			throw new UnsupportedOperationException("NYI");
+		}
+		else {
 			if (offerIDPrefix == null) {
 				TradeConfigModule tradeConfigModule;
 				try {
@@ -677,24 +682,6 @@ public class Trader
 
 			return offer;
 		}
-		// TODO: Implement Offer creating on foreign servers
-		// // order is not local, thus we must delegate to the remote bean...
-		// Hashtable props = Lookup.getInitialContextProps(pm,
-		// vendor.getOrganisationID());
-		// try {
-		// TradeManager tm = TradeManagerUtil.getHome(props).create();
-		// Offer offer = tm.createOffer(OrderID.create(getOrganisationID(),
-		// getOrderID()));
-		// tm.remove();
-		// String pk = offer.getPrimaryKey();
-		// offers.put(pk, offer);
-		// return offer;
-		// } catch (ModuleException e) {
-		// throw e;
-		// } catch (Exception e) {
-		// throw new ModuleException(e);
-		// }
-		throw new UnsupportedOperationException("NYI");
 	}
 
 	public Set<Article> reverseArticles(User user, Offer reversingOffer, Collection<Article> reversedArticles)
@@ -787,6 +774,9 @@ public class Trader
 			Collection<? extends Product> products, ArticleCreator articleCreator, boolean allocate,
 			boolean allocateSynchronously) throws ModuleException
 	{
+		if (!segment.getOrder().equals(offer.getOrder()))
+			throw new IllegalArgumentException("segment.order != offer.order :: " + segment.getOrder().getPrimaryKey() + " != " + offer.getOrder().getPrimaryKey());
+
 		Collection<? extends Article> articles = articleCreator.createProductArticles(this, user, offer,
 				segment, products);
 

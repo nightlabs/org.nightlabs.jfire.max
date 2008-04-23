@@ -225,7 +225,7 @@ implements SessionBean
 			throw new IllegalArgumentException("vendorID must not be null!");
 
 		if (currencyID == null)
-			throw new IllegalArgumentException("vendorID must not be null!");
+			throw new IllegalArgumentException("currencyID must not be null!");
 
 		PersistenceManager pm = getPersistenceManager();
 		try {

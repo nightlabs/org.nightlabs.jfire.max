@@ -34,12 +34,12 @@ import org.nightlabs.util.Util;
  * @jdo.create-objectid-class
  * 		field-order="organisationID, issueLinkID"
  * 
- * @jdo.query
+ * @!jdo.query
  *		name="getIssueLinksByIssueIDAndLinkedObjectID"
  *		query="SELECT
  *			WHERE this.issueID == :issueID && 
  *			this.issueID == :issueID &&
- *			this.issueLinkObjectID == :linkedObjectID                    
+ *			this.linkedObjectID == :linkedObjectID                    
  *
  * @jdo.fetch-group name="IssueLink.linkedObjectID" fetch-groups="default" fields="linkedObjectID"
  * @jdo.fetch-group name="IssueLink.linkedObjectClass" fetch-groups="default" fields="linkedObjectClass"

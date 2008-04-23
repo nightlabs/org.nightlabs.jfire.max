@@ -10,7 +10,6 @@ import org.nightlabs.jfire.issue.IssueLinkType;
 import org.nightlabs.jfire.issue.IssueManager;
 import org.nightlabs.jfire.issue.IssueManagerUtil;
 import org.nightlabs.jfire.issue.id.IssueLinkTypeID;
-import org.nightlabs.jfire.issue.id.IssueTypeID;
 import org.nightlabs.jfire.security.SecurityReflector;
 import org.nightlabs.progress.ProgressMonitor;
 import org.nightlabs.progress.SubProgressMonitor;
@@ -34,9 +33,11 @@ extends BaseJDOObjectDAO<IssueLinkTypeID, IssueLinkType>
 
 	@SuppressWarnings("unchecked") //$NON-NLS-1$
 	@Override
-	protected Collection<IssueLinkType> retrieveJDOObjects(Set<IssueLinkTypeID> objectIDs,
-			String[] fetchGroups, int maxFetchDepth, ProgressMonitor monitor)
-			throws Exception 
+	protected Collection<IssueLinkType> retrieveJDOObjects(
+			Set<IssueLinkTypeID> objectIDs,
+			String[] fetchGroups, int maxFetchDepth, ProgressMonitor monitor
+	)
+	throws Exception 
 	{
 		monitor.beginTask("Fetching IssueLinkType...", 1); //$NON-NLS-1$
 		try {
@@ -54,7 +55,7 @@ extends BaseJDOObjectDAO<IssueLinkTypeID, IssueLinkType>
 		}
 	}
 
-	public synchronized IssueLinkType getIssueLinkType(IssueLinkTypeID issueLinkTypeID, String[] fetchGroups, int maxFetchDepth, ProgressMonitor monitor)
+	public IssueLinkType getIssueLinkType(IssueLinkTypeID issueLinkTypeID, String[] fetchGroups, int maxFetchDepth, ProgressMonitor monitor)
 	{
 		monitor.beginTask("Loading issueLinkType "+issueLinkTypeID.issueLinkTypeID, 1);
 		IssueLinkType issueLinkType = getJDOObject(null, issueLinkTypeID, fetchGroups, maxFetchDepth, new SubProgressMonitor(monitor, 1));
@@ -71,8 +72,10 @@ extends BaseJDOObjectDAO<IssueLinkTypeID, IssueLinkType>
 			Set<IssueLinkTypeID> issueLinkTypeIDs = issueManager.getIssueLinkTypeIDs(null);
 			return getJDOObjects(null, issueLinkTypeIDs, fetchGroups, maxFetchDepth, monitor);
 		} catch (Exception e) {
-			throw new RuntimeException("Error while fetching issue link types: " + e.getMessage(), e); //$NON-NLS-1$
-		} 
+			throw new RuntimeException(e);
+		} finally {
+			issueManager = null;
+		}
 	}
 
 	/**
@@ -84,30 +87,35 @@ extends BaseJDOObjectDAO<IssueLinkTypeID, IssueLinkType>
 	 * 
 	 * @return The issue link types of the given linkClass.
 	 */
-	public synchronized List<IssueLinkType> getIssueLinkTypesByLinkClass(Class<? extends Object> linkedClass, String[] fetchgroups, int maxFetchDepth, ProgressMonitor monitor)
+	public synchronized Collection<IssueLinkType> getIssueLinkTypes(Class<?> linkedObjectClass, String[] fetchGroups, int maxFetchDepth, ProgressMonitor monitor)
 	{
+		monitor.beginTask("Loading issue link types", 100);
 		try {
-			IssueManager im = IssueManagerUtil.getHome(SecurityReflector.getInitialContextProperties()).create();
-			Collection<IssueLinkTypeID> ids = im.getIssueLinkTypeIDs(linkedClass);
-			return getJDOObjects(null, ids, fetchgroups, maxFetchDepth, monitor);
+			issueManager = IssueManagerUtil.getHome(SecurityReflector.getInitialContextProperties()).create();
+			Set<IssueLinkTypeID> issueLinkTypeIDs = issueManager.getIssueLinkTypeIDs(linkedObjectClass);
+			monitor.worked(30);
+			return getJDOObjects(null, issueLinkTypeIDs, fetchGroups, maxFetchDepth, new SubProgressMonitor(monitor, 70));
 		} catch(Exception e) {
-			throw new RuntimeException("Getting issue link types failed", e);
+			throw new RuntimeException(e);
+		} finally {
+			issueManager = null;
 		}
 	}
+
 //	public IssueLinkType storeIssueLinkType(IssueLinkType issueLinkType, boolean get, String[] fetchGroups, int maxFetchDepth, ProgressMonitor monitor)
 //	{
-//		if (issueLinkType == null)
-//			throw new NullPointerException("Issue to save must not be null");
-//		monitor.beginTask("Storing issueLinkType: "+ issueLinkType.getIssueLinkTypeID(), 3);
-//		try {
-//			IssueManager im = IssueManagerUtil.getHome(SecurityReflector.getInitialContextProperties()).create();
-//			IssueLinkType result = im.storeIssueLinkType(issueLinkType, get, fetchGroups, maxFetchDepth);
-//			monitor.worked(1);
-//			monitor.done();
-//			return result;
-//		} catch (Exception e) {
-//			monitor.done();
-//			throw new RuntimeException("Error while storing IssueLinkType!\n" ,e);
-//		}
+//	if (issueLinkType == null)
+//	throw new NullPointerException("Issue to save must not be null");
+//	monitor.beginTask("Storing issueLinkType: "+ issueLinkType.getIssueLinkTypeID(), 3);
+//	try {
+//	IssueManager im = IssueManagerUtil.getHome(SecurityReflector.getInitialContextProperties()).create();
+//	IssueLinkType result = im.storeIssueLinkType(issueLinkType, get, fetchGroups, maxFetchDepth);
+//	monitor.worked(1);
+//	monitor.done();
+//	return result;
+//	} catch (Exception e) {
+//	monitor.done();
+//	throw new RuntimeException("Error while storing IssueLinkType!\n" ,e);
+//	}
 //	}
 }

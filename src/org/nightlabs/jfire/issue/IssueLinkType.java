@@ -29,34 +29,31 @@ import org.nightlabs.util.Util;
  *
  * @jdo.create-objectid-class field-order="organisationID, issueLinkTypeID"
  *
- * @jdo.fetch-group name="IssueLinkType.linkableObjectClassNames" fields="linkableObjectClassNames"
+ * @jdo.fetch-group name="IssueLinkType.linkedObjectClassNames" fields="linkedObjectClassNames"
  * @jdo.fetch-group name="IssueLinkType.name" fields="name"
  *
  * @jdo.query
- *		name="getIssueLinkTypesForLinkableObjectClassNames"
- *		query="SELECT WHERE this.linkableObjectClassNames.contains(:linkableObjectClassName)"
- *
+ *		name="getIssueLinkTypesForLinkedObjectClassName"
+ *		query="SELECT WHERE this.linkedObjectClassNames.contains(:linkedObjectClassName)"
  */ 
 public class IssueLinkType
 implements Serializable
 {
 	private static final long serialVersionUID = 1L;
 
-	public static final String FETCH_GROUP_LINKABLE_OBJECT_CLASS_NAMES = "IssueLinkType.linkableObjectClassNames";
+	public static final String FETCH_GROUP_LINKABLE_OBJECT_CLASS_NAMES = "IssueLinkType.linkedObjectClassNames";
 	public static final String FETCH_GROUP_NAME = "IssueLinkType.name";
-	
 
 	// Of course there can be other types of IssueLinks (even created by the user without programming!), but
 	// the following ones are very basic and thus predefined by the jfire team. Some more constants can be found in the
 	// subclasses of IssueLinkType (e.g. IssueLinkTypeParentChild).
 	public static final IssueLinkTypeID ISSUE_LINK_TYPE_ID_RELATED = IssueLinkTypeID.create(Organisation.DEV_ORGANISATION_ID, "related");
 	public static final IssueLinkTypeID ISSUE_LINK_TYPE_ID_DUPLICATE = IssueLinkTypeID.create(Organisation.DEV_ORGANISATION_ID, "duplicate");
-	
 
 	@SuppressWarnings("unchecked")
-	private static void populateIssueLinkTypes(PersistenceManager pm, Query q, Class<?> linkableObjectClass, Set<IssueLinkType> issueLinkTypes)
+	private static void populateIssueLinkTypes(PersistenceManager pm, Query q, Class<?> linkedObjectClass, Set<IssueLinkType> issueLinkTypes)
 	{
-		Class<?> loc = linkableObjectClass;
+		Class<?> loc = linkedObjectClass;
 		while (loc != null) {
 			issueLinkTypes.addAll((Collection<? extends IssueLinkType>) q.execute(loc.getName()));
 
@@ -68,12 +65,12 @@ implements Serializable
 	}
 
 	@SuppressWarnings("unchecked")
-	public static Set<IssueLinkType> getIssueLinkTypes(PersistenceManager pm, Class<?> linkableObjectClass)
+	public static Set<IssueLinkType> getIssueLinkTypes(PersistenceManager pm, Class<?> linkedObjectClass)
 	{
-		Query q = pm.newNamedQuery(IssueLinkType.class, "getIssueLinkTypesForLinkableObjectClassNames");
+		Query q = pm.newNamedQuery(IssueLinkType.class, "getIssueLinkTypesForLinkedObjectClassName");
 
 		Set<IssueLinkType> issueLinkTypes = new HashSet<IssueLinkType>();
-		populateIssueLinkTypes(pm, q, linkableObjectClass, issueLinkTypes);
+		populateIssueLinkTypes(pm, q, linkedObjectClass, issueLinkTypes);
 
 		return issueLinkTypes;
 	}
@@ -97,11 +94,11 @@ implements Serializable
 	 *		collection-type="collection"
 	 *		element-type="String"
 	 *		dependent-value="true"
-	 *		table="JFireIssueTracking_IssueLinkType_linkableObjectClassNames"
+	 *		table="JFireIssueTracking_IssueLinkType_linkedObjectClassNames"
 	 *
 	 * @jdo.join
 	 */
-	private Set<String> linkableObjectClassNames;
+	private Set<String> linkedObjectClassNames;
 	
 	/**
 	 * @jdo.field persistence-modifier="persistent" dependent="true" mapped-by="issueLinkType"
@@ -122,43 +119,49 @@ implements Serializable
 		this.organisationID = organisationID;
 		this.issueLinkTypeID = issueLinkTypeID;
 		
-		this.linkableObjectClassNames = new HashSet<String>();
+		this.linkedObjectClassNames = new HashSet<String>();
 		this.name = new IssueLinkTypeName(this);
 	}
 
-	public Set<String> getLinkableObjectClassNames() {
-		return Collections.unmodifiableSet(linkableObjectClassNames);
+	public Set<String> getLinkedObjectClassNames() {
+		return Collections.unmodifiableSet(linkedObjectClassNames);
 	}
 
 	/**
 	 * @jdo.field persistence-modifier="none"
 	 */
-	private transient Set<Class<?>> linkableObjectClasses;
+	private transient Set<Class<?>> linkedObjectClasses;
 
-	public Set<Class<?>> getLinkableObjectClasses()
+	public Set<Class<?>> getLinkedObjectClasses()
 	throws ClassNotFoundException
 	{
-		if (linkableObjectClasses == null) {
-			Set<Class<?>> set = new HashSet<Class<?>>(linkableObjectClassNames.size());
-			for (String linkableObjectClassName : linkableObjectClassNames)
-				set.add(Class.forName(linkableObjectClassName));
+		if (linkedObjectClasses == null) {
+			Set<Class<?>> set = new HashSet<Class<?>>(linkedObjectClassNames.size());
+			for (String linkedObjectClassName : linkedObjectClassNames)
+				set.add(Class.forName(linkedObjectClassName));
 
-			linkableObjectClasses = Collections.unmodifiableSet(set);
+			linkedObjectClasses = Collections.unmodifiableSet(set);
 		}
-		return linkableObjectClasses;
+		return linkedObjectClasses;
 	}
 
-	public boolean addLinkableObjectClass(Class<?> linkableObjectClass)
+	public void clearLinkedObjectClasses()
 	{
-		boolean res = linkableObjectClassNames.add(linkableObjectClass.getName());
-		linkableObjectClasses = null;
+		linkedObjectClassNames.clear();
+		linkedObjectClasses = null;
+	}
+
+	public boolean addLinkedObjectClass(Class<?> linkedObjectClass)
+	{
+		boolean res = linkedObjectClassNames.add(linkedObjectClass.getName());
+		linkedObjectClasses = null;
 		return res;
 	}
 
-	public boolean removeLinkableObjectClass(Class<?> linkableObjectClass)
+	public boolean removeLinkedObjectClass(Class<?> linkedObjectClass)
 	{
-		boolean res = linkableObjectClassNames.remove(linkableObjectClass.getName());
-		linkableObjectClasses = null;
+		boolean res = linkedObjectClassNames.remove(linkedObjectClass.getName());
+		linkedObjectClasses = null;
 		return res;
 	}
 

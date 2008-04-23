@@ -108,47 +108,6 @@ implements SessionBean
 
 	/**
 	 * @ejb.interface-method
-	 * @ejb.transaction type="Required"
-	 * @ejb.permission role-name="_Guest_"
-	 */
-	public Issue storeIssue(Issue issue, boolean get, String[] fetchGroups, int maxFetchDepth)
-	{
-		PersistenceManager pm = getPersistenceManager();
-		try {
-			boolean isNewIssue = !JDOHelper.isDetached(issue);
-			
-			pm.getFetchPlan().setMaxFetchDepth(maxFetchDepth);
-			if (fetchGroups != null)
-				pm.getFetchPlan().setGroups(fetchGroups);
-
-			if (issue.getCreateTimestamp() != null) {
-				issue.setUpdateTimestamp(new Date());
-			}
-			
-			Issue pIssue = pm.makePersistent(issue);
-
-			if (isNewIssue) {
-				pm.flush();
-				// create the ProcessInstance for new Issues
-				// TODO: WORKAROUND: Calling createProcessInstanceForIssue on pIssue.getIssueType() says that this IssueType is not persistent ?!?
-				IssueType type = (IssueType) pm.getObjectById(JDOHelper.getObjectId(pIssue.getIssueType()));
-				if (type == null) {
-					throw new IllegalStateException("Could not create ProcessInstance for new Issue as its type is null");
-				}
-				type.createProcessInstanceForIssue(pIssue);
-			}
-			
-			if (!get)
-				return null;
-
-			return pm.detachCopy(pIssue);
-		} finally {
-			pm.close();
-		}
-	}
-	
-	/**
-	 * @ejb.interface-method
 	 * @ejb.transaction type="Supports" @!This usually means that no transaction is opened which is significantly faster and recommended for all read-only EJB methods! Marco.
 	 * @ejb.permission role-name="_Guest_"
 	 */
@@ -159,6 +118,46 @@ implements SessionBean
 			Query q = pm.newQuery(Issue.class);
 			q.setResult("JDOHelper.getObjectId(this)");
 			return new HashSet<IssueID>((Collection<? extends IssueID>) q.execute());
+		} finally {
+			pm.close();
+		}
+	}
+	
+	/**
+	 * @ejb.interface-method
+	 * @ejb.permission role-name="_Guest_"
+	 * @ejb.transaction type="Supports" @!This usually means that no transaction is opened which is significantly faster and recommended for all read-only EJB methods! Marco.
+	 */
+	public Set<IssueID> getIssueIDs(QueryCollection<? extends AbstractJDOQuery> queries)
+	{
+		if (queries == null)
+			return null;
+		
+		if (! Issue.class.isAssignableFrom(queries.getResultClass()))
+		{
+			throw new RuntimeException("Given QueryCollection has invalid return type! " +
+					"Invalid return type= "+ queries.getResultClassName());
+		}
+		
+		PersistenceManager pm = getPersistenceManager();
+		try {
+			pm.getFetchPlan().setMaxFetchDepth(1);
+			pm.getFetchPlan().setGroup(FetchPlan.DEFAULT);
+
+			JDOQueryCollectionDecorator<? extends AbstractSearchQuery> decoratedCollection;
+			if (queries instanceof JDOQueryCollectionDecorator)
+			{
+				decoratedCollection = (JDOQueryCollectionDecorator<? extends AbstractSearchQuery>) queries;
+			}
+			else
+			{
+				decoratedCollection = new JDOQueryCollectionDecorator<AbstractSearchQuery>(queries);
+			}
+			
+			decoratedCollection.setPersistenceManager(pm);
+			Collection<? extends Issue> issues = (Collection<? extends Issue>) decoratedCollection.executeQueries();
+
+			return NLJDOHelper.getObjectIDSet(issues);
 		} finally {
 			pm.close();
 		}
@@ -192,6 +191,22 @@ implements SessionBean
 			Query q = pm.newQuery(IssueSeverityType.class);
 			q.setResult("JDOHelper.getObjectId(this)");
 			return new HashSet<IssueSeverityTypeID>((Collection<? extends IssueSeverityTypeID>) q.execute());
+		} finally {
+			pm.close();
+		}
+	}
+	
+	/**
+	 * @ejb.interface-method
+	 * @ejb.transaction type="Supports"
+	 * @ejb.permission role-name="_Guest_"
+	 */
+	@SuppressWarnings("unchecked")
+	public List<IssueSeverityType> getIssueSeverityTypes(Collection<IssueSeverityTypeID> issueSeverityTypeIDs, String[] fetchGroups, int maxFetchDepth)
+	{
+		PersistenceManager pm = getPersistenceManager();
+		try {
+			return NLJDOHelper.getDetachedObjectList(pm, issueSeverityTypeIDs, IssueSeverityType.class, fetchGroups, maxFetchDepth);
 		} finally {
 			pm.close();
 		}
@@ -357,21 +372,6 @@ implements SessionBean
 		}
 	}
 	
-	/**
-	 * @ejb.interface-method
-	 * @ejb.transaction type="Supports"
-	 * @ejb.permission role-name="_Guest_"
-	 */
-	@SuppressWarnings("unchecked")
-	public List<IssueSeverityType> getIssueSeverityTypes(Collection<IssueSeverityTypeID> issueSeverityTypeIDs, String[] fetchGroups, int maxFetchDepth)
-	{
-		PersistenceManager pm = getPersistenceManager();
-		try {
-			return NLJDOHelper.getDetachedObjectList(pm, issueSeverityTypeIDs, IssueSeverityType.class, fetchGroups, maxFetchDepth);
-		} finally {
-			pm.close();
-		}
-	}
 
 //	/**
 //	 * @throws ModuleException
@@ -415,46 +415,6 @@ implements SessionBean
 
 	/**
 	 * @ejb.interface-method
-	 * @ejb.permission role-name="_Guest_"
-	 * @ejb.transaction type="Supports" @!This usually means that no transaction is opened which is significantly faster and recommended for all read-only EJB methods! Marco.
-	 */
-	public Set<IssueID> getIssueIDs(QueryCollection<? extends AbstractJDOQuery> queries)
-	{
-		if (queries == null)
-			return null;
-		
-		if (! Issue.class.isAssignableFrom(queries.getResultClass()))
-		{
-			throw new RuntimeException("Given QueryCollection has invalid return type! " +
-					"Invalid return type= "+ queries.getResultClassName());
-		}
-		
-		PersistenceManager pm = getPersistenceManager();
-		try {
-			pm.getFetchPlan().setMaxFetchDepth(1);
-			pm.getFetchPlan().setGroup(FetchPlan.DEFAULT);
-
-			JDOQueryCollectionDecorator<? extends AbstractSearchQuery> decoratedCollection;
-			if (queries instanceof JDOQueryCollectionDecorator)
-			{
-				decoratedCollection = (JDOQueryCollectionDecorator<? extends AbstractSearchQuery>) queries;
-			}
-			else
-			{
-				decoratedCollection = new JDOQueryCollectionDecorator<AbstractSearchQuery>(queries);
-			}
-			
-			decoratedCollection.setPersistenceManager(pm);
-			Collection<? extends Issue> issues = (Collection<? extends Issue>) decoratedCollection.executeQueries();
-
-			return NLJDOHelper.getObjectIDSet(issues);
-		} finally {
-			pm.close();
-		}
-	}
-	
-	/**
-	 * @ejb.interface-method
 	 * @ejb.transaction type="Supports"
 	 * @ejb.permission role-name="_Guest_"
 	 */
@@ -468,23 +428,64 @@ implements SessionBean
 			pm.close();
 		}
 	}
-
+	
 	/**
 	 * @ejb.interface-method
 	 * @ejb.transaction type="Supports"
 	 * @ejb.permission role-name="_Guest_"
 	 */
-	public Set<IssueLinkTypeID> getIssueLinkTypeIDs(Class<? extends Object> linkableObjectClass)
+	public Set<IssueLinkTypeID> getIssueLinkTypeIDs(Class<? extends Object> linkedObjectClass)
 	{
 		PersistenceManager pm = getPersistenceManager();
 		try {
-			Set<IssueLinkType> issueLinkTypes = IssueLinkType.getIssueLinkTypes(pm, linkableObjectClass);
+			Set<IssueLinkType> issueLinkTypes = IssueLinkType.getIssueLinkTypes(pm, linkedObjectClass);
 			return NLJDOHelper.getObjectIDSet(issueLinkTypes);
 		} finally {
 			pm.close();
 		}
 	}
 
+	/**
+	 * @ejb.interface-method
+	 * @ejb.transaction type="Required"
+	 * @ejb.permission role-name="_Guest_"
+	 */
+	public Issue storeIssue(Issue issue, boolean get, String[] fetchGroups, int maxFetchDepth)
+	{
+		PersistenceManager pm = getPersistenceManager();
+		try {
+			boolean isNewIssue = !JDOHelper.isDetached(issue);
+			
+			pm.getFetchPlan().setMaxFetchDepth(maxFetchDepth);
+			if (fetchGroups != null)
+				pm.getFetchPlan().setGroups(fetchGroups);
+
+			if (issue.getCreateTimestamp() != null) {
+				issue.setUpdateTimestamp(new Date());
+			}
+			
+			Issue pIssue = pm.makePersistent(issue);
+
+			if (isNewIssue) {
+				pm.flush();
+				// create the ProcessInstance for new Issues
+				// TODO: WORKAROUND: Calling createProcessInstanceForIssue on pIssue.getIssueType() says that this IssueType is not persistent ?!?
+				IssueType type = (IssueType) pm.getObjectById(JDOHelper.getObjectId(pIssue.getIssueType()));
+				if (type == null) {
+					throw new IllegalStateException("Could not create ProcessInstance for new Issue as its type is null");
+				}
+				type.createProcessInstanceForIssue(pIssue);
+			}
+			
+			if (!get)
+				return null;
+
+			return pm.detachCopy(pIssue);
+		} finally {
+			pm.close();
+		}
+	}
+	
 	/**
 	 * @ejb.interface-method
 	 * @ejb.permission role-name="_Guest_"
@@ -819,22 +820,22 @@ implements SessionBean
 
 			issueLinkType = new IssueLinkType(IssueLinkType.ISSUE_LINK_TYPE_ID_RELATED);
 			issueLinkType.getName().setText(Locale.ENGLISH.getLanguage(), "Related");
-			issueLinkType.addLinkableObjectClass(Object.class);
+			issueLinkType.addLinkedObjectClass(Object.class);
 			issueLinkType = pm.makePersistent(issueLinkType);
 
 			issueLinkType = new IssueLinkTypeParentChild(IssueLinkTypeParentChild.ISSUE_LINK_TYPE_ID_PARENT);
 			issueLinkType.getName().setText(Locale.ENGLISH.getLanguage(), "Parent of");
-			issueLinkType.addLinkableObjectClass(Issue.class);
+			issueLinkType.addLinkedObjectClass(Issue.class);
 			issueLinkType = pm.makePersistent(issueLinkType);
 			
 			issueLinkType = new IssueLinkTypeParentChild(IssueLinkTypeParentChild.ISSUE_LINK_TYPE_ID_CHILD);
 			issueLinkType.getName().setText(Locale.ENGLISH.getLanguage(), "Child of");
-			issueLinkType.addLinkableObjectClass(Issue.class);
+			issueLinkType.addLinkedObjectClass(Issue.class);
 			issueLinkType = pm.makePersistent(issueLinkType);
 			
 			issueLinkType = new IssueLinkType(IssueLinkType.ISSUE_LINK_TYPE_ID_DUPLICATE);
 			issueLinkType.getName().setText(Locale.ENGLISH.getLanguage(), "Duplicate");
-			issueLinkType.addLinkableObjectClass(Issue.class);
+			issueLinkType.addLinkedObjectClass(Issue.class);
 			issueLinkType = pm.makePersistent(issueLinkType);
 			
 			EditLockType issueEditLock = new EditLockType(EditLockTypeIssue.EDIT_LOCK_TYPE_ID);

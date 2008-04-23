@@ -496,25 +496,25 @@ implements 	Serializable, AttachCallback, Statable, DeleteCallback
 		return Collections.unmodifiableSet(issueLinks);
 	}
 	
-//	public Set<ObjectID> getLinkObjectIDs() {
-//		if (_linkObjectIDs == null) {
+//	public Set<ObjectID> getLinkedObjectIDs() {
+//		if (_linkedObjectIDs == null) {
 //			Set<ObjectID> ro = new HashSet<ObjectID>(issueLinks.size());
 //			for (IssueLink issueLink : issueLinks) {
 //				ObjectID objectID = issueLink.getLinkedObjectID();
 //				ro.add(objectID);
 //			}
-//			_linkObjectIDs = ro;
+//			_linkedObjectIDs = ro;
 //		}
-//		return Collections.unmodifiableSet(_linkObjectIDs);
+//		return Collections.unmodifiableSet(_linkedObjectIDs);
 //	}
 
-//	public void addLinkObjectID(ObjectID linkObjectID) {
-//		if (linkObjectID == null)
-//			throw new IllegalArgumentException("linkObjectID must not be null!");
+//	public void addLinkedObjectID(ObjectID linkedObjectID) {
+//		if (linkedObjectID == null)
+//			throw new IllegalArgumentException("linkedObjectID must not be null!");
 //
-//		issueLinks.add(new IssueLink(this, IDGenerator.nextID(IssueLink.class), linkObjectID.toString(), new IssueLinkType()));
-//		if (_linkObjectIDs != null) // instead of managing our cache of ObjectID instances, we could alternatively simply null it here, but the current implementation is more efficient.
-//			_linkObjectIDs.add(linkObjectID);
+//		issueLinks.add(new IssueLink(this, IDGenerator.nextID(IssueLink.class), linkedObjectID.toString(), new IssueLinkType()));
+//		if (_linkedObjectIDs != null) // instead of managing our cache of ObjectID instances, we could alternatively simply null it here, but the current implementation is more efficient.
+//			_linkedObjectIDs.add(linkedObjectID);
 //	}
 
 	/**
@@ -538,8 +538,8 @@ implements 	Serializable, AttachCallback, Statable, DeleteCallback
 			throw new IllegalArgumentException("issueLink must not be null!");
 
 		issueLinks.remove(issueLink);
-//		if (_linkObjectIDs != null)
-//			_linkObjectIDs = null;
+//		if (_linkedObjectIDs != null)
+//			_linkedObjectIDs = null;
 	}
 
 //	public void clearIssueLinks()
@@ -550,7 +550,7 @@ implements 	Serializable, AttachCallback, Statable, DeleteCallback
 //	/**
 //	 * @jdo.field persistence-modifier="none"
 //	 */
-//	private transient Set<ObjectID> _linkObjectIDs;
+//	private transient Set<ObjectID> _linkedObjectIDs;
 
 
 	public IssueResolution getIssueResolution() {

@@ -28,6 +28,7 @@ package org.nightlabs.jfire.store;
 
 import java.io.Serializable;
 
+import org.apache.log4j.Logger;
 import org.nightlabs.inheritance.FieldMetaData;
 import org.nightlabs.inheritance.NotWritableException;
 
@@ -51,7 +52,8 @@ public class ProductTypeFieldMetaData
 implements org.nightlabs.inheritance.FieldMetaData, Serializable
 {
 	private static final long serialVersionUID = 1L;
-
+	private static final Logger logger = Logger.getLogger(ProductTypeFieldMetaData.class);
+	
 	/**
 	 * @jdo.field primary-key="true"
 	 * @jdo.column length="100"
@@ -103,6 +105,9 @@ implements org.nightlabs.inheritance.FieldMetaData, Serializable
 	{
 		setProductType(productType);
 		setFieldName(fieldName);
+		if (logger.isTraceEnabled()) {
+			logger.trace("new ProductTypeFieldMetaData created for productType "+productType+" and fieldName "+fieldName);
+		}
 	}
 
 	/**
@@ -212,6 +217,10 @@ implements org.nightlabs.inheritance.FieldMetaData, Serializable
 		if (!writable && !valueInherited)
 			throw new IllegalStateException("The field is not writable, thus the value must be inherited. Cannot set valueInherited to false!");
 
+		if (logger.isTraceEnabled()) {
+			logger.trace("setValueInherited = "+valueInherited+" for field "+fieldName+" and productType "+productType);
+		}
+		
 		this.valueInherited = valueInherited;
 	}
 

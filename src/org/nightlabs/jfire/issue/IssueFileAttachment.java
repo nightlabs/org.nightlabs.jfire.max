@@ -39,7 +39,7 @@ implements Serializable{
 	private static final Logger logger = Logger.getLogger(IssueFileAttachment.class);
 
 	public static final String FETCH_GROUP_THIS_FILEATTACHMENT = "IssueFileAttachment.this";
-	
+
 	/**
 	 * @jdo.field primary-key="true"
 	 * @jdo.column length="100"
@@ -50,22 +50,22 @@ implements Serializable{
 	 * @jdo.field primary-key="true"
 	 */
 	private long issueID;
-	
+
 	/**
 	 * @jdo.field primary-key="true"
 	 */
 	private long issueFileAttachmentID;
-	
+
 	/**
 	 * @jdo.field persistence-modifier="persistent" collection-type="array" serialized-element="true"
 	 */
 	private byte[] data;
-	
+
 	/**
 	 * @jdo.field persistence-modifier="persistent"
 	 */
 	private Date fileTimestamp;
-	
+
 	/**
 	 * @jdo.field persistence-modifier="persistent"
 	 */
@@ -75,24 +75,24 @@ implements Serializable{
 	 * @jdo.field persistence-modifier="persistent"
 	 */
 	private Issue issue;
-	
+
 	/**
 	 * @deprecated Only for JDO!!!!!!!!!
 	 */
 	protected IssueFileAttachment() {
 	}
-	
+
 	public IssueFileAttachment(Issue issue, long issueFileAttachmentID){
 		this.organisationID = issue.getOrganisationID();
 		this.issueID = issue.getIssueID();
-		
+
 		this.issueFileAttachmentID = issueFileAttachmentID;
 	}
 
 	public Issue getIssue() {
 		return issue;
 	}
-	
+
 	public void loadStream(InputStream in, long length, Date timeStamp, String name)
 	throws IOException
 	{
@@ -120,21 +120,21 @@ implements Serializable{
 			}
 		}
 	}
-	
+
 	public String getFileName() {
 		return fileName;
 	}
-	
+
 	public Date getFileTimestamp() {
 		return fileTimestamp;
 	}
-	
+
 	public void loadStream(InputStream in, String name) 
 	throws IOException 
 	{
 		loadStream(in, 10 * 1024, new Date(), name);
 	}
-	
+
 	public void loadFile(File f)
 	throws IOException
 	{
@@ -146,7 +146,7 @@ implements Serializable{
 			in.close();
 		}
 	}
-	
+
 	/**
 	 * Creates a new {@link InputStream} for the file attachment
 	 * that is wrapped by an {@link InflaterInputStream}.

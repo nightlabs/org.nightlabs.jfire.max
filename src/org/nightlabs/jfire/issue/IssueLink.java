@@ -258,6 +258,31 @@ implements Serializable, DetachCallback, StoreCallback, DeleteCallback
 		if (logger.isDebugEnabled())
 			logger.debug("jdoPreStore: about to store IssueLink: " + getPrimaryKey());
 
+		// TODO an object A should only have one IssueLink with the same type to another object B!
+		// There can be multiple links with different types between the same 2 objects, but never
+		// should there be multiple links with the same type to the same object.
+		//
+		// Imagine, we have issue 0A, issue 0B, linkedObject 1A, linkedObject 1B, IssueLinkType 01 and IssueLinkType 02:
+		// legal states:
+		// 1)
+		//		issue 0A --- IssueLinkType 01 --- linkedObject 1A
+		//		issue 0A --- IssueLinkType 01 --- linkedObject 1B
+		//
+		// 2)
+		//		issue 0A --- IssueLinkType 01 --- linkedObject 1A
+		//		issue 0A --- IssueLinkType 02 --- linkedObject 1A
+		//
+		// 3)
+		//		issue 0A --- IssueLinkType 01 --- linkedObject 1A
+		//		issue 0B --- IssueLinkType 01 --- linkedObject 1A
+		//
+		// ILlegal state:
+		//		issue 0A --- IssueLinkType 01 --- linkedObject 1A
+		//		issue 0A --- IssueLinkType 01 --- linkedObject 1A
+
+		// TODO check the states with some queries only if this instance of IssueLink is new (otherwise nothing is added)
+		// => use NLJDOHelper.exists(getPersistenceManager(), IssueLink.this)
+
 		getPersistenceManager().addInstanceLifecycleListener(new StoreLifecycleListener() {
 			@Override
 			public void preStore(InstanceLifecycleEvent event) {

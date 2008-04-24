@@ -1,6 +1,7 @@
 package org.nightlabs.jfire.issue;
 
-import org.nightlabs.jfire.idgenerator.IDGenerator;
+import javax.jdo.JDOHelper;
+
 import org.nightlabs.jfire.issue.id.IssueLinkTypeID;
 import org.nightlabs.jfire.organisation.Organisation;
 
@@ -35,15 +36,33 @@ extends IssueLinkType
 
 	@Override
 	protected void postCreateIssueLink(IssueLink newIssueLink) {
-		Issue issue = (Issue)getPersistenceManager().detachCopy(newIssueLink.getLinkedObject());
-		if (newIssueLink.getIssueLinkType().getIssueLinkTypeID().equals(ISSUE_LINK_TYPE_ID_PARENT.issueLinkTypeID)) 
-			issue.getIssueLinks().add(new IssueLink(issue.getOrganisationID(), IDGenerator.nextID(IssueLink.class), newIssueLink.getIssue(), this, issue));
-		if (newIssueLink.getIssueLinkType().getIssueLinkTypeID().equals(ISSUE_LINK_TYPE_ID_CHILD.issueLinkTypeID))
-			issue.getIssueLinks().add(new IssueLink(issue.getOrganisationID(), IDGenerator.nextID(IssueLink.class), newIssueLink.getIssue(), this, issue));
+		// create a reverse link - i.e. if we just created a parent-relationship, we need to add a child-relationship on the other side.
+
+		IssueLinkType issueLinkType = newIssueLink.getIssueLinkType();
+		IssueLinkTypeID issueLinkTypeID = (IssueLinkTypeID) JDOHelper.getObjectId(issueLinkType);
+		if (issueLinkTypeID == null)
+			throw new IllegalStateException("JDOHelper.getObjectId(newIssueLink.getIssueLinkType()) returned null!");
+
+		IssueLinkType issueLinkTypeForOtherSide = null;
+
+		if (ISSUE_LINK_TYPE_ID_PARENT.equals(issueLinkTypeID))
+			issueLinkTypeForOtherSide = (IssueLinkType) getPersistenceManager().getObjectById(ISSUE_LINK_TYPE_ID_CHILD);
+
+		if (ISSUE_LINK_TYPE_ID_CHILD.equals(issueLinkTypeID))
+			issueLinkTypeForOtherSide = (IssueLinkType) getPersistenceManager().getObjectById(ISSUE_LINK_TYPE_ID_PARENT);
+
+		if (issueLinkTypeForOtherSide != null) {
+			Issue issueOnOtherSide = (Issue) newIssueLink.getLinkedObject();
+
+			// TODO prevent this from causing an ETERNAL recursion.
+			// => find out, if the other side already has an issue-link of the required type pointing back
+
+			issueOnOtherSide.createIssueLink(issueLinkTypeForOtherSide, newIssueLink.getIssue());
+		}
 	}
 
 	@Override
 	protected void preDeleteIssueLink(IssueLink issueLinkToBeDeleted) {
-		
+		// TODO remove the reverse link
 	}
 }

@@ -26,13 +26,19 @@
 
 package org.nightlabs.jfire.issue;
 
+import java.io.FileDescriptor;
+import java.io.FileInputStream;
+import java.io.IOException;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
+import java.util.Map.Entry;
 
 import javax.jdo.JDOHelper;
 import javax.jdo.PersistenceManager;
@@ -237,6 +243,10 @@ implements 	Serializable, AttachCallback, Statable, DeleteCallback
 	private IssueLocal issueLocal;
 	
 	/**
+	 * @jdo.field persistence-modifier="none"
+	 */
+	private Map<FileDescriptor, String> issueFileAttachmentDescriptorMap;
+	/**
 	 * @jdo.field persistence-modifier="persistent" @!dependent="true"
 	 */
 	private State state;
@@ -301,12 +311,12 @@ implements 	Serializable, AttachCallback, Statable, DeleteCallback
 		
 		fileList = new ArrayList<IssueFileAttachment>();
 		comments = new ArrayList<IssueComment>();
-//		referencedObjectIDs = new HashSet<String>();
 		issueLinks = new HashSet<IssueLink>();
 		
 		this.issueLocal = new IssueLocal(this);
 		this.structLocalScope = StructLocal.DEFAULT_SCOPE;
 		this.propertySet = new PropertySet(organisationID, IDGenerator.nextID(PropertySet.class), Issue.class.getName(), structLocalScope);
+		this.issueFileAttachmentDescriptorMap = new HashMap<FileDescriptor, String>();
 	}
 	
 	public Issue(String organisationID, long issueID, IssueType issueType)
@@ -693,5 +703,24 @@ implements 	Serializable, AttachCallback, Statable, DeleteCallback
 
 		for (State state : statesToDelete)
 			pm.deletePersistent(state);
+	}
+
+	public void addIssueFileAttachmentDescriptor(FileDescriptor fileDescriptor, String name) {
+		issueFileAttachmentDescriptorMap.put(fileDescriptor, name);
+	}
+	
+	public void removeIssueFileAttachmentDescriptor(FileDescriptor fileDescriptor) {
+		issueFileAttachmentDescriptorMap.remove(fileDescriptor);
+	}
+	
+	public void createIssueFileAttachments() {
+		for (Entry<FileDescriptor, String> entry : issueFileAttachmentDescriptorMap.entrySet()) {
+			IssueFileAttachment issueFileAttachment = new IssueFileAttachment(this, IDGenerator.nextID(IssueFileAttachment.class));
+			try {
+				issueFileAttachment.loadStream(new FileInputStream(entry.getKey()), entry.getValue());
+			} catch (IOException e) {
+				throw new RuntimeException(e);
+			}
+		}
 	}
 }

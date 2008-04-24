@@ -29,6 +29,12 @@ import org.nightlabs.util.IOUtil;
  *
  * @jdo.inheritance strategy = "new-table"
  *
+ * TODO get rid of the "this" fetch-group and think about what you really need! In the attachment (i.e. an instance of this class), you
+ * will have to download the descriptive information (filename, timestamp, etc.) very often (every time you open an issue in your UI), but you
+ * need to load the "data" field only very very seldom. And the "data" field might contain a huge amount of data (imagine someone attaching
+ * a 500 MB log file to an issue!).
+ * In the future, please really think about what data you really need and manage your fetch-groups accordingly (minimize traffic and conserve bandwidth!).
+ *
  * @jdo.fetch-group name="IssueFileAttachment.this" fetch-groups="default" fields="data"
  *
  * @jdo.fetch-group name="Issue.fileList" fields="issue"
@@ -57,7 +63,8 @@ implements Serializable{
 	private long issueFileAttachmentID;
 
 	/**
-	 * @jdo.field persistence-modifier="persistent" collection-type="array" serialized-element="true"
+	 * @!jdo.field persistence-modifier="persistent" collection-type="array" serialized-element="true"
+	 * @jdo.field persistence-modifier="persistent" serialized="true"
 	 */
 	private byte[] data;
 

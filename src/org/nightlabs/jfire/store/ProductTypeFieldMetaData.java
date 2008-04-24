@@ -223,5 +223,65 @@ implements org.nightlabs.inheritance.FieldMetaData, Serializable
 		
 		this.valueInherited = valueInherited;
 	}
+	
+	/* (non-Javadoc)
+	 * @see java.lang.Object#hashCode()
+	 */
+	@Override
+	public int hashCode() {
+		final int prime = 31;
+		int result = 1;
+		result = prime * result + ((fieldName == null) ? 0 : fieldName.hashCode());
+		result = prime * result
+				+ ((organisationID == null) ? 0 : organisationID.hashCode());
+		result = prime * result
+				+ ((productType == null) ? 0 : productType.hashCode());
+		result = prime * result
+				+ ((productTypeID == null) ? 0 : productTypeID.hashCode());
+		result = prime * result + (valueInherited ? 1231 : 1237);
+		result = prime * result + (writable ? 1231 : 1237);
+		return result;
+	}
+	
+	/* (non-Javadoc)
+	 * @see java.lang.Object#equals(java.lang.Object)
+	 */
+	@Override
+	public boolean equals(Object obj) {
+		if (this == obj)
+			return true;
+		if (obj == null)
+			return false;
+		if (getClass() != obj.getClass())
+			return false;
+		final ProductTypeFieldMetaData other = (ProductTypeFieldMetaData) obj;
+		if (fieldName == null) {
+			if (other.fieldName != null)
+				return false;
+		} else if (!fieldName.equals(other.fieldName))
+			return false;
+		if (organisationID == null) {
+			if (other.organisationID != null)
+				return false;
+		} else if (!organisationID.equals(other.organisationID))
+			return false;
+		if (productType == null) {
+			if (other.productType != null)
+				return false;
+		} else if (!productType.equals(other.productType))
+			return false;
+		if (productTypeID == null) {
+			if (other.productTypeID != null)
+				return false;
+		} else if (!productTypeID.equals(other.productTypeID))
+			return false;
+		if (valueInherited != other.valueInherited)
+			return false;
+		if (writable != other.writable)
+			return false;
+		if (writableByChildren != other.writableByChildren)
+			return false;
+		return true;
+	}
 
 }

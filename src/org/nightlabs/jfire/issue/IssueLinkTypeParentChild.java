@@ -1,5 +1,7 @@
 package org.nightlabs.jfire.issue;
 
+import java.util.Set;
+
 import javax.jdo.JDOHelper;
 
 import org.nightlabs.jfire.issue.id.IssueLinkTypeID;
@@ -54,8 +56,13 @@ extends IssueLinkType
 		if (issueLinkTypeForOtherSide != null) {
 			Issue issueOnOtherSide = (Issue) newIssueLink.getLinkedObject();
 
-			// TODO prevent this from causing an ETERNAL recursion.
+			// prevent this from causing an ETERNAL recursion.
 			// => find out, if the other side already has an issue-link of the required type pointing back
+			Set<IssueLink> issueLinksOfIssueOnOtherSide = issueOnOtherSide.getIssueLinks();
+			for (IssueLink issueLinkOfIssueOnOtherSide : issueLinksOfIssueOnOtherSide) {
+				if (issueLinkOfIssueOnOtherSide.getIssueLinkType().equals(issueLinkTypeForOtherSide) )
+					return;
+			}
 
 			issueOnOtherSide.createIssueLink(issueLinkTypeForOtherSide, newIssueLink.getIssue());
 		}
@@ -63,6 +70,29 @@ extends IssueLinkType
 
 	@Override
 	protected void preDeleteIssueLink(IssueLink issueLinkToBeDeleted) {
-		// TODO remove the reverse link
+		// remove the reverse link
+		IssueLinkType issueLinkType = issueLinkToBeDeleted.getIssueLinkType();
+		IssueLinkTypeID issueLinkTypeID = (IssueLinkTypeID) JDOHelper.getObjectId(issueLinkType);
+		if (issueLinkTypeID == null)
+			throw new IllegalStateException("JDOHelper.getObjectId(issueLinkToBeDeleted.getIssueLinkType()) returned null!");
+
+		IssueLinkType issueLinkTypeForOtherSide = null;
+		if (ISSUE_LINK_TYPE_ID_PARENT.equals(issueLinkTypeID))
+			issueLinkTypeForOtherSide = (IssueLinkType) getPersistenceManager().getObjectById(ISSUE_LINK_TYPE_ID_CHILD);
+
+		if (ISSUE_LINK_TYPE_ID_CHILD.equals(issueLinkTypeID))
+			issueLinkTypeForOtherSide = (IssueLinkType) getPersistenceManager().getObjectById(ISSUE_LINK_TYPE_ID_PARENT);
+
+
+
+		Issue issueOnOtherSide = (Issue)issueLinkToBeDeleted.getLinkedObject();
+
+		Set<IssueLink> issueLinksOnOtherSide = issueOnOtherSide.getIssueLinks();
+		for (IssueLink issueLinkOnOtherSide : issueLinksOnOtherSide) {
+			if (issueLinkOnOtherSide.getLinkedObject().equals(issueLinkToBeDeleted.getLinkedObject())) {
+				if (issueLinkTypeForOtherSide.equals(issueLinkOnOtherSide.getIssueLinkType())) 
+						issueOnOtherSide.removeIssueLink(issueLinkOnOtherSide);
+			}
+		}
 	}
 }

@@ -27,10 +27,9 @@
 package org.nightlabs.jfire.issue;
 
 import java.io.FileDescriptor;
-import java.io.FileInputStream;
-import java.io.IOException;
 import java.io.Serializable;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
@@ -38,7 +37,6 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import java.util.Map.Entry;
 
 import javax.jdo.JDOHelper;
 import javax.jdo.PersistenceManager;
@@ -460,8 +458,16 @@ implements 	Serializable, AttachCallback, Statable, DeleteCallback
 		this.organisationID = organisationID;
 	}
 
-	public List<IssueFileAttachment> getFileList() {
-		return fileList;
+	public void addIssueFileAttachment(IssueFileAttachment issueFileAttachment) { 
+		fileList.add(issueFileAttachment);
+	}
+	
+	public void removeIssueFileAttachment(IssueFileAttachment issueFileAttachment) { 
+		fileList.remove(issueFileAttachment);
+	}
+	
+	public Collection<IssueFileAttachment> getIssueFileAttachments() {
+		return Collections.unmodifiableCollection(fileList);
 	}
 
 	public List<IssueComment> getComments() {
@@ -681,8 +687,6 @@ implements 	Serializable, AttachCallback, Statable, DeleteCallback
 	private void beforeDeleteIssueLink(IssueLink issueLinkToBeDeleted) {}
 	private void afterDeleteIssueLink(IssueLink issueLinkDeleted) {}
 
-	
-
 	@Override
 	public void jdoPreDelete() {
 		PersistenceManager pm = getPersistenceManager();
@@ -703,24 +707,5 @@ implements 	Serializable, AttachCallback, Statable, DeleteCallback
 
 		for (State state : statesToDelete)
 			pm.deletePersistent(state);
-	}
-
-	public void addIssueFileAttachmentDescriptor(FileDescriptor fileDescriptor, String name) {
-		issueFileAttachmentDescriptorMap.put(fileDescriptor, name);
-	}
-	
-	public void removeIssueFileAttachmentDescriptor(FileDescriptor fileDescriptor) {
-		issueFileAttachmentDescriptorMap.remove(fileDescriptor);
-	}
-	
-	public void createIssueFileAttachments() {
-		for (Entry<FileDescriptor, String> entry : issueFileAttachmentDescriptorMap.entrySet()) {
-			IssueFileAttachment issueFileAttachment = new IssueFileAttachment(this, IDGenerator.nextID(IssueFileAttachment.class));
-			try {
-				issueFileAttachment.loadStream(new FileInputStream(entry.getKey()), entry.getValue());
-			} catch (IOException e) {
-				throw new RuntimeException(e);
-			}
-		}
 	}
 }

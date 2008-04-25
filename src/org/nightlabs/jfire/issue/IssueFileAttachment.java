@@ -35,9 +35,8 @@ import org.nightlabs.util.IOUtil;
  * a 500 MB log file to an issue!).
  * In the future, please really think about what data you really need and manage your fetch-groups accordingly (minimize traffic and conserve bandwidth!).
  *
- * @jdo.fetch-group name="IssueFileAttachment.this" fetch-groups="default" fields="data"
- *
- * @jdo.fetch-group name="Issue.fileList" fields="issue"
+ * @jdo.fetch-group name="IssueFileAttachment.date" fields="date"
+ * @jdo.fetch-group name="IssueFileAttachment.issue" fields="issue"
  */
 public class IssueFileAttachment 
 implements Serializable{
@@ -92,7 +91,6 @@ implements Serializable{
 	public IssueFileAttachment(Issue issue, long issueFileAttachmentID){
 		this.organisationID = issue.getOrganisationID();
 		this.issueID = issue.getIssueID();
-
 		this.issueFileAttachmentID = issueFileAttachmentID;
 	}
 

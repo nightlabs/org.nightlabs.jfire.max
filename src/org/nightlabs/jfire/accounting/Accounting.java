@@ -319,7 +319,7 @@ implements StoreCallback
 				);
 		}
 
-		if (!vendorPK.equals(getMandator().getPrimaryKey()))
+		if (!vendorPK.equals(getMandator().getPrimaryKey()) && (vendorLE instanceof OrganisationLegalEntity)  )
 			throw new InvoiceEditException(
 				InvoiceEditException.REASON_FOREIGN_ORGANISATION,
 				"Attempt to create a Invoice not with the local organisation as vendor. Vendor is "+vendorPK

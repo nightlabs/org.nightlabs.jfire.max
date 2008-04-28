@@ -41,8 +41,8 @@ import org.nightlabs.util.Util;
  *			this.issueID == :issueID &&
  *			this.linkedObjectID == :linkedObjectID                    
  *
- * @jdo.fetch-group name="IssueLink.linkedObjectID" fetch-groups="default" fields="linkedObjectID"
- * @jdo.fetch-group name="IssueLink.linkedObjectClass" fetch-groups="default" fields="linkedObjectClass"
+ * jdo.fetch-group name="IssueLink.linkedObjectID" fetch-groups="default" fields="linkedObjectID"
+ * jdo.fetch-group name="IssueLink.linkedObjectClass" fetch-groups="default" fields="linkedObjectClass"
  * @jdo.fetch-group name="IssueLink.issueLinkType" fetch-groups="default" fields="issueLinkType"
  *
  * @jdo.fetch-group name="IssueLink.this" fields="issue, issueLinkType, linkedObjectID"
@@ -54,9 +54,6 @@ implements Serializable, DetachCallback, StoreCallback, DeleteCallback
 
 	public static final String FETCH_GROUP_THIS_ISSUE_LINK = "IssueLink.this";
 	public static final String FETCH_GROUP_ISSUE_LINK_TYPE = "IssueLink.issueLinkType";
-	public static final String FETCH_GROUP_ISSUE_LINKED_OBJECT_ID = "IssueLink.linkedObjectID";
-//	public static final String FETCH_GROUP_ISSUE_LINKED_OBJECT_CLASS = "IssueLink.linkedObjectClass";
-	
 
 	/**
 	 * Virtual fetch-group (not processed by JDO) to obtain the non-persistent property
@@ -258,7 +255,7 @@ implements Serializable, DetachCallback, StoreCallback, DeleteCallback
 		if (logger.isDebugEnabled())
 			logger.debug("jdoPreStore: about to store IssueLink: " + getPrimaryKey());
 
-		// TODO an object A should only have one IssueLink with the same type to another object B!
+		// an object A should only have one IssueLink with the same type to another object B!
 		// There can be multiple links with different types between the same 2 objects, but never
 		// should there be multiple links with the same type to the same object.
 		//
@@ -280,7 +277,7 @@ implements Serializable, DetachCallback, StoreCallback, DeleteCallback
 		//		issue 0A --- IssueLinkType 01 --- linkedObject 1A
 		//		issue 0A --- IssueLinkType 01 --- linkedObject 1A
 
-		// TODO check the states with some queries only if this instance of IssueLink is new (otherwise nothing is added)
+		// check the states with some queries only if this instance of IssueLink is new (otherwise nothing is added)
 		// => use NLJDOHelper.exists(getPersistenceManager(), IssueLink.this)
 
 		getPersistenceManager().addInstanceLifecycleListener(new StoreLifecycleListener() {

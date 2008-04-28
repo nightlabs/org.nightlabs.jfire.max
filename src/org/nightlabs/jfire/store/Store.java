@@ -853,7 +853,7 @@ implements StoreCallback
 
 		}
 
-		if (!vendorPK.equals(getMandator().getPrimaryKey()))
+		if (!vendorPK.equals(getMandator().getPrimaryKey()) && (vendorLE instanceof OrganisationLegalEntity))
 			throw new DeliveryNoteEditException(
 				DeliveryNoteEditException.REASON_FOREIGN_ORGANISATION,
 				"Attempt to create a DeliveryNote not with the local organisation as vendor. Vendor is "+vendorPK

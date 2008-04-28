@@ -91,6 +91,7 @@ import org.nightlabs.util.Util;
  *
  * @jdo.fetch-group name="Article.articleLocal" fields="articleLocal"
  * @jdo.fetch-group name="Article.segment" fields="segment"
+ * @jdo.fetch-group name="Article.currency" fields="currency"
  * @jdo.fetch-group name="Article.productType" fields="productType"
  * @jdo.fetch-group name="Article.product" fields="product"
  * @jdo.fetch-group name="Article.tariff" fields="tariff"
@@ -132,6 +133,7 @@ implements Serializable, DeleteCallback, DetachCallback, StoreCallback
 
 	public static final String FETCH_GROUP_ARTICLE_LOCAL = "Article.articleLocal";
 	public static final String FETCH_GROUP_SEGMENT = "Article.segment";
+	public static final String FETCH_GROUP_CURRENCY = "Article.currency";
 	public static final String FETCH_GROUP_PRODUCT_TYPE = "Article.productType";
 	public static final String FETCH_GROUP_PRODUCT = "Article.product";
 	public static final String FETCH_GROUP_PRICE = "Article.price";
@@ -1156,14 +1158,26 @@ implements Serializable, DeleteCallback, DetachCallback, StoreCallback
 		return referencedArticle;
 	}
 
+	/**
+	 * @return Whether or not this Article has already been reversed. Returns <code>true</code>,
+	 *         if {@link #getReversingArticle()} is assigned.
+	 */
 	public boolean isReversed()
 	{
 		return reversed;
 	}
+	/**
+	 * @return Whether or not this Article reverses another one. Returns <code>true</code>,
+	 *         if {@link #getReversedArticle()} is assigned.
+	 */
 	public boolean isReversing()
 	{
 		return reversing;
 	}
+	/**
+	 * @return This flag is set <code>true</code>, if the reversing offer is 
+	 *         somehow cancelled (rejected, expired, revoked, aborted etc.).
+	 */
 	public boolean isReversingAborted()
 	{
 		return isReversingAborted;

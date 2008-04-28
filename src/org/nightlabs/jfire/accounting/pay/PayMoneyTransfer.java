@@ -54,6 +54,10 @@ import org.nightlabs.jfire.transfer.id.TransferID;
  * A <tt>PayMoneyTransfer</tt> can be assigned to multiple {@link org.nightlabs.jfire.accounting.Invoice}s
  * by its connecitons to a {@link Payment}.
  * <p>
+ * <p>
+ * A {@link PayMoneyTransfer} is the container transfer for all sub-transfers made for the
+ * associated {@link Payment}.
+ * </p>
  *
  * @author Alexander Bieber <alex[AT]nightlabs[DOT]de>
  *

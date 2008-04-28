@@ -53,6 +53,9 @@ import org.nightlabs.util.Util;
 
 
 /**
+ * An {@link Order} is a collection of {@link Offer}s between two {@link LegalEntity}s,
+ * it knows all {@link Article} of the contained {@link Offer}.
+ * 
  * @author Niklas Schiffler <nick@nightlabs.de>
  * @author marco schulze - marco at nightlabs dot de
  * @author Alexander Bieber <alex[AT]nightlabs[DOT]de>

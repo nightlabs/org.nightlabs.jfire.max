@@ -45,7 +45,7 @@ import org.nightlabs.jfire.transfer.Anchor;
 
 /**
  * LocalAccountantDelegates are used by {@link org.nightlabs.jfire.accounting.book.LocalAccountant}
- * to assist in the booking procedure. A Delegate is registered per ProductType
+ * to assist in the booking procedure. A delegate is registered per ProductType
  * and will be asked to {@link #bookArticle(OrganisationLegalEntity, User, Invoice, ArticlePrice, BookMoneyTransfer, Map)}
  * when an invoice is booked.
  * 
@@ -192,16 +192,24 @@ public abstract class LocalAccountantDelegate implements Serializable {
 	/**
 	 * Called by LocalAccountant before all articles of an invoice are booked.
 	 * Gives the delegate the chance to initialize.
-	 * @param bookTransfer TODO
-	 * @param involvedAnchors TODO
+	 * 
+	 * @param mandator The mandator.
+	 * @param user The user that initiated the book.
+	 * @param invoice The invoice to book articles for.
+	 * @param bookTransfer The container {@link BookMoneyTransfer}
+	 * @param involvedAnchors A set of {@link Anchor} that should contain all involved ones when the book is finished.
 	 */
 	public void preBookArticles(OrganisationLegalEntity mandator, User user, Invoice invoice, BookMoneyTransfer bookTransfer, Set<Anchor> involvedAnchors) {}
 
 	/**
 	 * Called by LocalAccountant before all articles of an invoice are booked.
 	 * Gives the delegate the chance to clean up.
-	 * @param bookTransfer TODO
-	 * @param involvedAnchors TODO
+	 * 
+	 * @param mandator The mandator.
+	 * @param user The user that initiated the book.
+	 * @param invoice The invoice to book articles for.
+	 * @param bookTransfer The container {@link BookMoneyTransfer}
+	 * @param involvedAnchors A set of {@link Anchor} that contains all involved ones now that the book is finished.
 	 */
 	public void postBookArticles(OrganisationLegalEntity mandator, User user, Invoice invoice, BookMoneyTransfer bookTransfer, Set<Anchor> involvedAnchors) {}
 	

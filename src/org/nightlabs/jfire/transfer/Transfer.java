@@ -40,6 +40,9 @@ import org.nightlabs.jfire.idgenerator.IDGenerator;
 import org.nightlabs.jfire.security.User;
 
 /**
+ * A {@link Transfer} is used to describe the transfer of something (money or products)
+ * form one {@link Anchor} to another. 
+ * 
  * @author Marco Schulze - marco at nightlabs dot de
  *
  * @jdo.persistence-capable

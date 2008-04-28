@@ -966,9 +966,8 @@ implements StoreCallback
 	}
 
 	/**
-	 * This method is a noop, if the offer is already accepted. If the Offer cannot be accepted implicitely
-	 * (either because the business partner doesn't allow implicit acceptance or because the jBPM token is at
-	 * a position where this is not possible, an exception is thrown).
+	 * This method is a noop, if the invoice is already booked. If the invoice cannot be booked implicitely
+	 * (maybe because the jBPM token is at a position where this is not possible, an exception is thrown).
 	 */
 	protected void bookInvoiceImplicitely(Invoice invoice)
 	{

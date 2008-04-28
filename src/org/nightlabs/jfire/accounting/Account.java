@@ -45,6 +45,9 @@ import org.nightlabs.jfire.transfer.Anchor;
 import org.nightlabs.jfire.transfer.Transfer;
 
 /**
+ * Accounts are the anchors of {@link MoneyTransfer}s. They record the transfer amounts and
+ * maintain an account balance ({@link #getBalance()}). 
+ * 
  * @author Marco Schulze - marco at nightlabs dot de
  * @author Alexander Bieber <alex [AT] nightlabs [DOT] de>
  *

@@ -59,6 +59,9 @@ import org.nightlabs.jfire.transfer.id.AnchorID;
 import org.nightlabs.util.Util;
 
 /**
+ * An Offer is basically a collection of {@link Article}s along with
+ * status information.  
+ * 
  * @author Niklas Schiffler <nick@nightlabs.de>
  * @author marco schulze - marco at nightlabs dot de
  * @author Alexander Bieber <alex[AT]nightlabs[DOT]de>
@@ -199,7 +202,7 @@ implements
 
 	/**
 	 * An Offer is stable, if it does not change values when prices are recalculated.
-	 * Only stable Offers can be confirmed. An instable Offer can come into existence
+	 * Only stable Offers can be confirmed. An unstable Offer can come into existence
 	 * if conflicting PriceConfigs of two or more OfferItems interfere.
 	 * 
 	 * @jdo.field persistence-modifier="persistent"
@@ -505,7 +508,7 @@ implements
 	}
 
 	/**
-	 * This method recalculates all prices for all OfferItems. To be sure there's no
+	 * This method recalculates all prices for all {@link Article}s. To be sure there's no
 	 * indefinite price definition, it does it twice
 	 * (if there's a price config marked as isDependentOnOffer()=true).
 	 */
@@ -586,6 +589,16 @@ implements
 		return order;
 	}
 
+	/**
+	 * Returns the vendor {@link LegalEntity} of this Offer.
+	 * <p>
+	 * Note that this method will try to return the vendor
+	 * of the container ({@link Order}) if the vendor for this
+	 * instance was not detached (or is <code>null</code>).
+	 * </p>
+	 * @return The vendor {@link LegalEntity} of this Offer.
+	 * @throws JDODetachedFieldAccessException if the vendor was not detached.
+	 */
 	public LegalEntity getVendor()
 	{
 		if (vendor == null && !vendor_detached)
@@ -605,7 +618,14 @@ implements
 
 		return vendorID;
 	}
-
+	/**
+	 * Returns the customer {@link LegalEntity} of this Offer.
+	 * <p>
+	 * Note that this method will try to return the customer
+	 * of the container ({@link Order}) if the vendor for this
+	 * instance was not detached (or is <code>null</code>).
+	 * </p>
+	 */
 	public LegalEntity getCustomer()
 	{
 		if (customer == null && !customer_detached)
@@ -625,17 +645,27 @@ implements
 
 		return customerID;
 	}
-
+	/**
+	 * @return The date and time this {@link Offer} was created.
+	 */
 	public Date getCreateDT()
 	{
 		return createDT;
 	}
+	/**
+	 * @return The {@link User} that created this {@link Offer}.
+	 */
 	public User getCreateUser()
 	{
 		return createUser;
 	}
 
 	/**
+	 * An <tt>Offer</tt> is finalized, before it is sent on an asynchronous way (e.g. letter,
+	 * email) to the customer. After finalization the {@link Offer} can't be changed any more,
+	 * this avoids communication conflicts as it forces the generation
+	 * of a new <tt>Offer</tt> if the customer requests changes after reception.
+	 * 
 	 * @return Returns whether it's finalized.
 	 */
 	public boolean isFinalized()
@@ -684,6 +714,10 @@ implements
 	 */
 	private transient Set<Article> _articles = null;
 
+	/**
+	 * @return an <b>unmodifiable</b> set of the Articles of this {@link Offer}.
+	 * Do not attempt to change this set. 
+	 */
 	public Collection<Article> getArticles()
 	{
 		if (_articles == null)
@@ -699,11 +733,7 @@ implements
 	 * <br/><br/>
 	 * This method causes all prices to be recalculated and all products to be allocated (if they have
 	 * been released by timeout).
-	 * <p>
-	 * 
-	 * </p>
-	 *
-	 * @return
+	 * @return Whether this {@link Offer} is valid after the method call. 
 	 */
 	protected boolean validate()
 	{
@@ -759,11 +789,16 @@ implements
 	{
 		this.valid = valid;
 	}
-
+	/**
+	 * @return The date and time this {@link Offer} was finalized, or <code>null</code> if it was not finalized yet.
+	 */
 	public Date getFinalizeDT()
 	{
 		return finalizeDT;
 	}
+	/**
+	 * @return The {@link User} that finilized this {@link Offer}, or <code>null</code> if it was not finalized yet.
+	 */
 	public User getFinalizeUser()
 	{
 		return finalizeUser;
@@ -869,6 +904,10 @@ implements
 		this.states.add(currentState);
 	}
 
+	/**
+	 * Returns the {@link State} this order is currently in.
+	 * @return The {@link State} this order is currently in.
+	 */
 	public State getState()
 	{
 		return state;
@@ -879,6 +918,10 @@ implements
 	 */
 	private transient List<State> _states = null;
 
+	/**
+	 * Returns all {@link State}s this {@link Offer} passed (including the current one) and that were registered.
+	 * @return All {@link State}s this {@link Offer} already passed (including the current state).
+	 */
 	public List<State> getStates()
 	{
 		if (_states == null)
@@ -887,6 +930,12 @@ implements
 		return _states;
 	}
 
+	/**
+	 * Returns the {@link Price} of this {@link Offer}. It represents the sum
+	 * of all {@link ArticlePrice}s of the contained articles.
+	 * 
+	 * @return The {@link Price} of this {@link Offer}.
+	 */
 	public Price getPrice() {
 		return price;
 	}

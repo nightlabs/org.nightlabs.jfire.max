@@ -36,9 +36,11 @@ import org.nightlabs.jfire.trade.LegalEntity;
 import org.nightlabs.jfire.transfer.Anchor;
 
 /**
- * An <tt>BookMoneyTransfer</tt> is a <tt>MoneyTransfer</tt> which
- * happens between two LegalEntities.
- * This means, <tt>from</tt> and <tt>to</tt> must be instances of <tt>LegalEntity</tt>.
+ * A {@link BookMoneyTransfer} is created when an {@link Invoice} is booked. 
+ * It is the container transfer of all sub-transfers made for this booking process. 
+ * <p>
+ * The transfer happens between two LegalEntities. This means, 
+ * <tt>from</tt> and <tt>to</tt> must be instances of <tt>LegalEntity</tt>.
  *
  * @author Marco Schulze - marco at nightlabs dot de
  *
@@ -71,14 +73,12 @@ public class BookMoneyTransfer extends InvoiceMoneyTransfer
 	}
 
 	/**
-	 * BookMoneyTransfer associated to only one Invoice, used for invoice-bookings.
+	 * BookMoneyTransfer associated to only one Invoice, as it is used for invoice-bookings.
 	 *
-	 * @param transferRegistry
-	 * @param initiator
-	 * @param from
-	 * @param to
-	 * @param invoice
-	 * @param amount
+	 * @param initiator The user that initiated this transfer.
+	 * @param from The from-anchor for the new transfer.
+	 * @param to The to-anchor for the new transfer.
+	 * @param invoice The {@link Invoice} the new transfer should be 
 	 */
 	public BookMoneyTransfer(User initiator, Anchor from, Anchor to, Invoice invoice)
 	{

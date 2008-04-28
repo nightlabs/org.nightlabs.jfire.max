@@ -33,6 +33,10 @@ import org.nightlabs.jfire.transfer.Anchor;
 import org.nightlabs.jfire.transfer.Transfer;
 
 /**
+ * A {@link MoneyTransfer} is used to describe the transfer of money from one {@link Anchor}
+ * to another. When booked by an {@link Account}, its balance will be adjusted accordingly
+ * and the {@link MoneyTransfer} will store the Account balance before the transfer was booked. 
+ * 
  * @author Alexander Bieber <alex[AT]nightlabs[DOT]de>
  * 
  * @jdo.persistence-capable
@@ -263,7 +267,7 @@ public class MoneyTransfer extends Transfer
 	 * {@inheritDoc}
 	 * <p>
 	 * This implementation checks if the MoneyTransfer has a container. If so the description
-	 * of the container is returned, otherwise
+	 * of the container is returned, otherwise as String showing from and to anchor is returned. 
 	 * </p>
 	 */
 	@Override

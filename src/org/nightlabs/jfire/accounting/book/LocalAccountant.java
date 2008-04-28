@@ -37,13 +37,19 @@ import javax.jdo.PersistenceManager;
 
 import org.nightlabs.jfire.accounting.Invoice;
 import org.nightlabs.jfire.accounting.MoneyTransfer;
+import org.nightlabs.jfire.organisation.Organisation;
 import org.nightlabs.jfire.security.User;
+import org.nightlabs.jfire.store.ProductType;
 import org.nightlabs.jfire.trade.Article;
 import org.nightlabs.jfire.trade.LegalEntity;
 import org.nightlabs.jfire.trade.OrganisationLegalEntity;
 import org.nightlabs.jfire.transfer.Anchor;
 
 /**
+ * A {@link LocalAccountant} is responsible to split money to the {@link Organisation}s
+ * own accounts when payments are received/booked and to collect money from the correct
+ * accounts when payments are done by the organisation.
+ * 
  * @author Alexander Bieber <alex[AT]nightlabs[DOT]de>
  * 
  * @jdo.persistence-capable
@@ -83,8 +89,13 @@ public class LocalAccountant extends Accountant {
 	/**
 	 * Takes care of MoneyTransfers. This Accountant only handles
 	 * {@link BookMoneyTransfer}s and silently ignores all other {@link MoneyTransfer}s.
-	 * This method dispatches the right amounts from the associated Invoices to the configured
-	 * Accounts.
+	 * It will created sub-transfers with the given {@link BookMoneyTransfer} as container.
+	 * <p>
+	 * This method searches for the {@link LocalAccountantDelegate}s configured for the
+	 * {@link ProductType}s of the articles found in the {@link Invoice} referenced by the
+	 * given {@link BookMoneyTransfer} and delegates the work of creating the correct
+	 * sub-transfers to the according {@link LocalAccountantDelegate} found.
+	 * </p>
 	 * 
 	 * @see org.nightlabs.jfire.accounting.book.Accountant#bookTransfer(User, LegalEntity, MoneyTransfer, Map)
 	 */

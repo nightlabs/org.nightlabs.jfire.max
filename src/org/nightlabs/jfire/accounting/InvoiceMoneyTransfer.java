@@ -28,10 +28,16 @@ package org.nightlabs.jfire.accounting;
 
 import java.util.Set;
 
+import org.nightlabs.jfire.accounting.pay.Payment;
 import org.nightlabs.jfire.security.User;
 import org.nightlabs.jfire.transfer.Anchor;
 
 /**
+ * A {@link MoneyTransfer} is associated to one {@link Invoice}. It is 
+ * used for the transfers made when an {@link Invoice} is booked as well as for
+ * those transfers made for a {@link Payment}. The property {@link #getBookType()}
+ * is then set accordingly to either {@link #BOOK_TYPE_BOOK} or {@link #BOOK_TYPE_PAY}.
+ * 
  * @author Marco Schulze - marco at nightlabs dot de
  * 
  * @jdo.persistence-capable
@@ -46,8 +52,14 @@ public class InvoiceMoneyTransfer
 extends MoneyTransfer
 {
 	private static final long serialVersionUID = 1L;
-
+	
+	/**
+	 * Book-type set when the transfer is used as sub-transfer for a booking process.
+	 */
 	public static final String BOOK_TYPE_BOOK = "book";
+	/**
+	 * Book-type set when the transfer is used as sub-transfer made for a {@link Payment}.
+	 */
 	public static final String BOOK_TYPE_PAY = "pay";
 
 	/**
@@ -75,13 +87,14 @@ extends MoneyTransfer
 	}
 
 	/**
-	 * @param transferRegistry
-	 * @param container
-	 * @param initiator
-	 * @param from
-	 * @param to
-	 * @param currency
-	 * @param amount
+	 * Create a new {@link InvoiceMoneyTransfer} with no container.
+	 * 
+	 * @param bookType The book-type for the new transfer. The type defines whether the transfer is used for a booking or a payment.
+	 * @param initiator The user that initiated the transfer.
+	 * @param from The from-anchor for the new transfer.
+	 * @param to The to-anchor for the new transfer.
+	 * @param invoice The {@link Invoice} the new transfer should be linked to.
+	 * @param amount The amount of the transfer.
 	 */
 	public InvoiceMoneyTransfer(
 			String bookType,
@@ -94,12 +107,14 @@ extends MoneyTransfer
 	}
 
 	/**
-	 * @param transferRegistry
-	 * @param containerMoneyTransfer
-	 * @param from
-	 * @param to
-	 * @param invoice
-	 * @param amount
+	 * Create a new {@link InvoiceMoneyTransfer} for the given container.
+	 * 
+	 * @param bookType The book-type for the new transfer. The type defines whether the transfer is used for a booking or a payment.
+	 * @param containerMoneyTransfer The container-transfer for the new account.
+	 * @param from The from-anchor for the new transfer.
+	 * @param to The to-anchor for the new transfer.
+	 * @param invoice The {@link Invoice} the new transfer should be linked to.
+	 * @param amount The amount of the transfer.
 	 */
 	public InvoiceMoneyTransfer(
 			String bookType,
@@ -112,7 +127,7 @@ extends MoneyTransfer
 	}
 
 	/**
-	 * @return Returns the invoice.
+	 * @return Returns the invoice this transfer is associated to.
 	 */
 	public Invoice getInvoice()
 	{
@@ -120,6 +135,8 @@ extends MoneyTransfer
 	}
 
 	/**
+	 * Set the book-type of this transfer.
+	 * 
 	 * @param bookType The bookType to set.
 	 */
 	protected void setBookType(String bookType)
@@ -132,7 +149,10 @@ extends MoneyTransfer
 	}
 
 	/**
-	 * @return Returns the bookType.
+	 * Returns the book-type of this transfer. The book type tells whether the transfer was used during a booking or payment.
+	 * The return value should be one of {@link #BOOK_TYPE_BOOK} or {@link #BOOK_TYPE_PAY}.
+	 *  
+	 * @return The book-type.
 	 */
 	public String getBookType()
 	{

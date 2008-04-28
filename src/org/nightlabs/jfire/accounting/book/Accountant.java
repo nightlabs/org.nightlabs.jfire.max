@@ -37,7 +37,7 @@ import org.nightlabs.jfire.transfer.Anchor;
 /**
  * An Accountant is responsible for splitting money into several accounts and for
  * vetoing if a money transfer cannot be done. One Accountant can be responsible for an
- * undefinite number of Account-s or for only one. The main job of the Accountant is
+ * undefinite number of accounts or for only one. The main job of the Accountant is
  * to split amounts e.g. into certain taxes.
  *
  * @author Marco Schulze - marco at nightlabs dot de

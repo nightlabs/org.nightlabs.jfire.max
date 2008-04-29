@@ -833,7 +833,7 @@ implements SessionBean
 			issueLinkType.addLinkedObjectClass(Issue.class);
 			issueLinkType = pm.makePersistent(issueLinkType);
 			
-			issueLinkType = new IssueLinkType(IssueLinkType.ISSUE_LINK_TYPE_ID_DUPLICATE);
+			issueLinkType = new IssueLinkType(IssueLinkTypeDuplicate.ISSUE_LINK_TYPE_ID_DUPLICATE);
 			issueLinkType.getName().setText(Locale.ENGLISH.getLanguage(), "Duplicate");
 			issueLinkType.addLinkedObjectClass(Issue.class);
 			issueLinkType = pm.makePersistent(issueLinkType);

@@ -48,7 +48,6 @@ implements Serializable
 	// the following ones are very basic and thus predefined by the jfire team. Some more constants can be found in the
 	// subclasses of IssueLinkType (e.g. IssueLinkTypeParentChild).
 	public static final IssueLinkTypeID ISSUE_LINK_TYPE_ID_RELATED = IssueLinkTypeID.create(Organisation.DEV_ORGANISATION_ID, "related");
-	public static final IssueLinkTypeID ISSUE_LINK_TYPE_ID_DUPLICATE = IssueLinkTypeID.create(Organisation.DEV_ORGANISATION_ID, "duplicate");
 
 	@SuppressWarnings("unchecked")
 	private static void populateIssueLinkTypes(PersistenceManager pm, Query q, Class<?> linkedObjectClass, Set<IssueLinkType> issueLinkTypes)

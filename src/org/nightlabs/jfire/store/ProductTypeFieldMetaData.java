@@ -31,6 +31,8 @@ import java.io.Serializable;
 import org.apache.log4j.Logger;
 import org.nightlabs.inheritance.FieldMetaData;
 import org.nightlabs.inheritance.NotWritableException;
+import org.nightlabs.jdo.ObjectIDUtil;
+import org.nightlabs.util.Util;
 
 /**
  * @author Marco Schulze - marco at nightlabs dot de
@@ -100,13 +102,20 @@ implements org.nightlabs.inheritance.FieldMetaData, Serializable
 	 */
 	private boolean valueInherited = true;
 
-	protected ProductTypeFieldMetaData() { }
+	protected ProductTypeFieldMetaData() {
+		if (logger.isTraceEnabled()) {
+//			logger.trace("[" + ObjectIDUtil.intObjectIDFieldToString(System.identityHashCode(this)) + "] <init>()", new Exception("STACKTRACE"));
+			logger.trace("[" + ObjectIDUtil.intObjectIDFieldToString(System.identityHashCode(this)) + "] <init>()");
+		}
+	}
+
 	public ProductTypeFieldMetaData(ProductType productType, String fieldName)
 	{
 		setProductType(productType);
 		setFieldName(fieldName);
 		if (logger.isTraceEnabled()) {
-			logger.trace("new ProductTypeFieldMetaData created for productType "+productType+" and fieldName "+fieldName);
+//			logger.trace("[" + ObjectIDUtil.intObjectIDFieldToString(System.identityHashCode(this)) + "] <init>(ProductType, String): productType.pk="+productType.getPrimaryKey()+" fieldName=" + fieldName, new Exception("STACKTRACE"));
+			logger.trace("[" + ObjectIDUtil.intObjectIDFieldToString(System.identityHashCode(this)) + "] <init>(ProductType, String): productType.pk="+productType.getPrimaryKey()+" fieldName=" + fieldName);
 		}
 	}
 
@@ -218,70 +227,32 @@ implements org.nightlabs.inheritance.FieldMetaData, Serializable
 			throw new IllegalStateException("The field is not writable, thus the value must be inherited. Cannot set valueInherited to false!");
 
 		if (logger.isTraceEnabled()) {
-			logger.trace("setValueInherited = "+valueInherited+" for field "+fieldName+" and productType "+productType);
+			logger.trace("[" + ObjectIDUtil.intObjectIDFieldToString(System.identityHashCode(this)) + "] setValueInherited: "+valueInherited+" for field "+fieldName+" and productType "+productType.getPrimaryKey());
 		}
 		
 		this.valueInherited = valueInherited;
 	}
-	
-	/* (non-Javadoc)
-	 * @see java.lang.Object#hashCode()
-	 */
+
 	@Override
 	public int hashCode() {
 		final int prime = 31;
 		int result = 1;
-		result = prime * result + ((fieldName == null) ? 0 : fieldName.hashCode());
-		result = prime * result
-				+ ((organisationID == null) ? 0 : organisationID.hashCode());
-		result = prime * result
-				+ ((productType == null) ? 0 : productType.hashCode());
-		result = prime * result
-				+ ((productTypeID == null) ? 0 : productTypeID.hashCode());
-		result = prime * result + (valueInherited ? 1231 : 1237);
-		result = prime * result + (writable ? 1231 : 1237);
+		result = prime * result + Util.hashCode(organisationID);
+		result = prime * result + Util.hashCode(productTypeID);
+		result = prime * result + Util.hashCode(fieldName);
 		return result;
 	}
-	
-	/* (non-Javadoc)
-	 * @see java.lang.Object#equals(java.lang.Object)
-	 */
+
 	@Override
 	public boolean equals(Object obj) {
-		if (this == obj)
-			return true;
-		if (obj == null)
-			return false;
-		if (getClass() != obj.getClass())
-			return false;
-		final ProductTypeFieldMetaData other = (ProductTypeFieldMetaData) obj;
-		if (fieldName == null) {
-			if (other.fieldName != null)
-				return false;
-		} else if (!fieldName.equals(other.fieldName))
-			return false;
-		if (organisationID == null) {
-			if (other.organisationID != null)
-				return false;
-		} else if (!organisationID.equals(other.organisationID))
-			return false;
-		if (productType == null) {
-			if (other.productType != null)
-				return false;
-		} else if (!productType.equals(other.productType))
-			return false;
-		if (productTypeID == null) {
-			if (other.productTypeID != null)
-				return false;
-		} else if (!productTypeID.equals(other.productTypeID))
-			return false;
-		if (valueInherited != other.valueInherited)
-			return false;
-		if (writable != other.writable)
-			return false;
-		if (writableByChildren != other.writableByChildren)
-			return false;
-		return true;
+		if (this == obj) return true;
+		if (obj == null) return false;
+		if (getClass() != obj.getClass()) return false;
+		final ProductTypeFieldMetaData o = (ProductTypeFieldMetaData) obj;
+		return
+				Util.equals(this.organisationID, o.organisationID) &&
+				Util.equals(this.productTypeID, o.productTypeID) &&
+				Util.equals(this.fieldName, o.fieldName);
 	}
 
 }

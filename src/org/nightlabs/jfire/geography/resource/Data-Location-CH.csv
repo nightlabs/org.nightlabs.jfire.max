@@ -1,0 +1,4 @@
+CountryID;LocationID;CityID;DistrictID;LanguageID;LocationName
+CH;Basel.StJakobshalle;30836;;de;St.Jakobshalle
+CH;Basel.StJakobspark;30836;;de;St.Jakobspark
+CH;Zürich.OpenAirGelaende;32325;;de;Open Air Gelände

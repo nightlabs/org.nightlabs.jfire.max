@@ -8,7 +8,9 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.io.Serializable;
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
 import java.util.zip.DeflaterOutputStream;
 import java.util.zip.InflaterInputStream;
 
@@ -82,6 +84,15 @@ implements Serializable{
 	 */
 	private Issue issue;
 
+	/**
+	 * @jdo.field persistence-modifier="none"
+	 */
+	private transient List<File> _files = new ArrayList<File>();
+
+	public void setFile(File file) {
+		this._files.add(file);
+	}
+	
 	/**
 	 * @deprecated Only for JDO!!!!!!!!!
 	 */

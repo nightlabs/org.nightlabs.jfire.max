@@ -26,16 +26,13 @@
 
 package org.nightlabs.jfire.issue;
 
-import java.io.FileDescriptor;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Date;
-import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
-import java.util.Map;
 import java.util.Set;
 
 import javax.jdo.JDOHelper;
@@ -76,7 +73,7 @@ import org.nightlabs.util.Util;
  *			PARAMETERS String paramIssueTypeID
  *			import java.lang.String"
  *
- * @jdo.fetch-group name="Issue.fileList" fields="fileList"
+ * @jdo.fetch-group name="Issue.issueFileAttachments" fields="issueFileAttachments"
  * @jdo.fetch-group name="Issue.description" fields="description"
  * @jdo.fetch-group name="Issue.subject" fields="subject" 
  * @jdo.fetch-group name="Issue.issuePriority" fields="issuePriority"
@@ -93,7 +90,7 @@ import org.nightlabs.util.Util;
  * @jdo.fetch-group name="Issue.assignee" fields="assignee"
  *
  * @jdo.fetch-group name="Issue.this" fetch-groups="default"
- * 	fields="fileList, description, subject, issuePriority, issueSeverityType, issueResolution, 
+ * 	fields="issueFileAttachments, description, subject, issuePriority, issueSeverityType, issueResolution, 
  * 					state, states, issueLocal, issueType, comments, issueLinks, propertySet,reporter,
  * 					assignee"
  *
@@ -121,7 +118,7 @@ implements 	Serializable, AttachCallback, Statable, DeleteCallback
 	public static final String FETCH_GROUP_ISSUE_LINKS = "Issue.issueLinks";
 	public static final String FETCH_GROUP_ISSUE_REPORTER = "Issue.reporter";
 	public static final String FETCH_GROUP_ISSUE_ASSIGNEE = "Issue.assignee";
-	public static final String FETCH_GROUP_ISSUE_FILELIST = "Issue.fileList";
+	public static final String FETCH_GROUP_ISSUE_FILELIST = "Issue.issueFileAttachments";
 	
 	public static final String FETCH_GROUP_PROPERTY_SET = "Issue.propertySet";
 	/**
@@ -176,7 +173,7 @@ implements 	Serializable, AttachCallback, Statable, DeleteCallback
 	 *		dependent-value="true"
 	 *		mapped-by="issue"
 	 */
-	private List<IssueFileAttachment> fileList;
+	private List<IssueFileAttachment> issueFileAttachments;
 	
 	/**
 	 * Instances of {@link IssueComment}.
@@ -241,10 +238,6 @@ implements 	Serializable, AttachCallback, Statable, DeleteCallback
 	private IssueLocal issueLocal;
 	
 	/**
-	 * @jdo.field persistence-modifier="none"
-	 */
-	private Map<FileDescriptor, String> issueFileAttachmentDescriptorMap;
-	/**
 	 * @jdo.field persistence-modifier="persistent" @!dependent="true"
 	 */
 	private State state;
@@ -307,14 +300,13 @@ implements 	Serializable, AttachCallback, Statable, DeleteCallback
 		subject = new IssueSubject(this);
 		description = new IssueDescription(this);
 		
-		fileList = new ArrayList<IssueFileAttachment>();
+		issueFileAttachments = new ArrayList<IssueFileAttachment>();
 		comments = new ArrayList<IssueComment>();
 		issueLinks = new HashSet<IssueLink>();
 		
 		this.issueLocal = new IssueLocal(this);
 		this.structLocalScope = StructLocal.DEFAULT_SCOPE;
 		this.propertySet = new PropertySet(organisationID, IDGenerator.nextID(PropertySet.class), Issue.class.getName(), structLocalScope);
-		this.issueFileAttachmentDescriptorMap = new HashMap<FileDescriptor, String>();
 	}
 	
 	public Issue(String organisationID, long issueID, IssueType issueType)
@@ -458,16 +450,8 @@ implements 	Serializable, AttachCallback, Statable, DeleteCallback
 		this.organisationID = organisationID;
 	}
 
-	public void addIssueFileAttachment(IssueFileAttachment issueFileAttachment) { 
-		fileList.add(issueFileAttachment);
-	}
-	
-	public void removeIssueFileAttachment(IssueFileAttachment issueFileAttachment) { 
-		fileList.remove(issueFileAttachment);
-	}
-	
 	public Collection<IssueFileAttachment> getIssueFileAttachments() {
-		return Collections.unmodifiableCollection(fileList);
+		return Collections.unmodifiableCollection(issueFileAttachments);
 	}
 
 	public List<IssueComment> getComments() {
@@ -554,20 +538,7 @@ implements 	Serializable, AttachCallback, Statable, DeleteCallback
 			throw new IllegalArgumentException("issueLink must not be null!");
 
 		issueLinks.remove(issueLink);
-//		if (_linkedObjectIDs != null)
-//			_linkedObjectIDs = null;
 	}
-
-//	public void clearIssueLinks()
-//	{
-//		issueLinks.clear();
-//	}
-
-//	/**
-//	 * @jdo.field persistence-modifier="none"
-//	 */
-//	private transient Set<ObjectID> _linkedObjectIDs;
-
 
 	public IssueResolution getIssueResolution() {
 		return issueResolution;
@@ -676,16 +647,9 @@ implements 	Serializable, AttachCallback, Statable, DeleteCallback
 		return primaryKey;
 	}
 	
-	private void afterCreateIssueLink(IssueLink newIssueLink) {
-
-	}
-
 	public IssueLocal getIssueLocal() {
 		return issueLocal;
 	}
-
-	private void beforeDeleteIssueLink(IssueLink issueLinkToBeDeleted) {}
-	private void afterDeleteIssueLink(IssueLink issueLinkDeleted) {}
 
 	@Override
 	public void jdoPreDelete() {
@@ -707,5 +671,17 @@ implements 	Serializable, AttachCallback, Statable, DeleteCallback
 
 		for (State state : statesToDelete)
 			pm.deletePersistent(state);
+	}
+	
+	public boolean addIssueFileAttachment(IssueFileAttachment issueFileAttachment) {
+		return this.issueFileAttachments.add(issueFileAttachment);
+	}
+	
+	public boolean removeIssueFileAttachment(IssueFileAttachment issueFileAttachment) {
+		return this.issueFileAttachments.remove(issueFileAttachment);
+	}
+	
+	public Collection<IssueFileAttachment> getIssueFileAttahments() {
+		return Collections.unmodifiableCollection(issueFileAttachments);
 	}
 }

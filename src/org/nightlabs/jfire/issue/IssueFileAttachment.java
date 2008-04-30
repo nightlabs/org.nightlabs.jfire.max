@@ -85,15 +85,6 @@ implements Serializable{
 	private Issue issue;
 
 	/**
-	 * @jdo.field persistence-modifier="none"
-	 */
-	private transient List<File> _files = new ArrayList<File>();
-
-	public void setFile(File file) {
-		this._files.add(file);
-	}
-	
-	/**
 	 * @deprecated Only for JDO!!!!!!!!!
 	 */
 	protected IssueFileAttachment() {

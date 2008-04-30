@@ -40,7 +40,7 @@ import org.nightlabs.jfire.store.ProductType;
  */
 public class ArticleSegmentGroup
 {
-	private ArticleSegmentGroups articleSegmentGroups;
+	private ArticleSegmentGroupSet articleSegmentGroupSet;
 	private Segment segment;
 
 	/**
@@ -49,15 +49,15 @@ public class ArticleSegmentGroup
 	 */
 	private Map<String, ArticleProductTypeClassGroup> articleProductTypeClassGroups = Collections.synchronizedMap(new HashMap<String, ArticleProductTypeClassGroup>());
 
-	public ArticleSegmentGroup(ArticleSegmentGroups articleSegmentGroups, Segment segment)
+	public ArticleSegmentGroup(ArticleSegmentGroupSet articleSegmentGroupSet, Segment segment)
 	{
-		this.articleSegmentGroups = articleSegmentGroups;
+		this.articleSegmentGroupSet = articleSegmentGroupSet;
 		this.segment = segment;
 	}
 
-	public ArticleSegmentGroups getArticleSegmentGroups()
+	public ArticleSegmentGroupSet getArticleSegmentGroups()
 	{
-		return articleSegmentGroups;
+		return articleSegmentGroupSet;
 	}
 
 	public ArticleCarrier addArticle(Article article, boolean filterExisting) // better not synchronized to avoid deadlocks

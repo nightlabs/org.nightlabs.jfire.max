@@ -45,7 +45,7 @@ import org.nightlabs.jfire.trade.id.ArticleID;
  *
  * @author Marco Schulze - marco at nightlabs dot de
  */
-public class ArticleSegmentGroups
+public class ArticleSegmentGroupSet
 {
 	private ArticleContainerID articleContainerID;
 
@@ -91,7 +91,7 @@ public class ArticleSegmentGroups
 	 * {@link SegmentContainer} to provide {@link Segment}s even if no {@link Article}
 	 * exists.
 	 */
-	public ArticleSegmentGroups(ArticleContainer articleContainer)
+	public ArticleSegmentGroupSet(ArticleContainer articleContainer)
 	{
 		this.articleContainerID = (ArticleContainerID) JDOHelper.getObjectId(articleContainer);
 		if (articleContainerID == null)

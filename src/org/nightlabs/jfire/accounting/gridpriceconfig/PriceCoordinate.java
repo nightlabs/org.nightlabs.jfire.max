@@ -33,6 +33,7 @@ import java.util.Set;
 import javax.jdo.listener.StoreCallback;
 
 import org.apache.log4j.Logger;
+import org.nightlabs.jdo.ObjectID;
 import org.nightlabs.jdo.ObjectIDUtil;
 import org.nightlabs.jfire.accounting.Currency;
 import org.nightlabs.jfire.accounting.Tariff;
@@ -42,6 +43,7 @@ import org.nightlabs.jfire.accounting.priceconfig.PriceConfig;
 import org.nightlabs.jfire.idgenerator.IDGenerator;
 import org.nightlabs.jfire.trade.CustomerGroup;
 import org.nightlabs.jfire.trade.id.CustomerGroupID;
+import org.nightlabs.util.Util;
 
 /**
  * @author Marco Schulze - marco at nightlabs dot de
@@ -359,11 +361,26 @@ public class PriceCoordinate implements Serializable, StoreCallback, IPriceCoord
 		IPriceCoordinate other = (IPriceCoordinate)obj;
 
 		return
-				this.customerGroupPK.equals(other.getCustomerGroupPK()) &&
-				this.tariffPK.equals(other.getTariffPK()) &&
-				this.currencyID.equals(other.getCurrencyID());
+				Util.equals(this.customerGroupPK, other.getCustomerGroupPK()) &&
+				Util.equals(this.tariffPK, other.getTariffPK()) &&
+				Util.equals(this.currencyID, other.getCurrencyID());
 	}
 
+	/**
+	 * This method ignores the member <tt>PriceCoordinate.priceConfig</tt> <strong>and the
+	 * primary key</strong> to allow
+	 * cross-PriceConfig-addressing of cells using <tt>PriceCoordinate</tt> instances.
+	 *
+	 * @see java.lang.Object#hashCode()
+	 */
+	@Override
+	public int hashCode()
+	{
+		if (thisHashCode == 0)
+			thisHashCode = toString().hashCode();
+		return thisHashCode;
+	}
+	
 	/**
 	 * @jdo.field persistence-modifier="none"
 	 */
@@ -394,21 +411,6 @@ public class PriceCoordinate implements Serializable, StoreCallback, IPriceCoord
 	 * @jdo.field persistence-modifier="none"
 	 */
 	protected transient int thisHashCode = 0;
-
-	/**
-	 * This method ignores the member <tt>PriceCoordinate.priceConfig</tt> <strong>and the
-	 * primary key</strong> to allow
-	 * cross-PriceConfig-addressing of cells using <tt>PriceCoordinate</tt> instances.
-	 *
-	 * @see java.lang.Object#hashCode()
-	 */
-	@Override
-	public int hashCode()
-	{
-		if (thisHashCode == 0)
-			thisHashCode = toString().hashCode();
-		return thisHashCode;
-	}
 
 	public String getCurrencyID()
 	{
@@ -468,4 +470,5 @@ public class PriceCoordinate implements Serializable, StoreCallback, IPriceCoord
 //			this.priceCoordinateID = accounting.createPriceCoordinateID();
 		}
 	}
+
 }

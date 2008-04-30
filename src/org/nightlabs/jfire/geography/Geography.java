@@ -26,6 +26,7 @@
 
 package org.nightlabs.jfire.geography;
 
+import java.io.IOException;
 import java.text.Collator;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -237,13 +238,13 @@ public abstract class Geography
 	}
 	
 	/**
-	 * key: String countryID<br/>
+	 * key: CityID cityID<br/>
 	 * value: Map {<br/>
 	 *		key: String languageID<br/>
 	 *		value: List locations<br/>
 	 * }
 	 */
-	private transient Map<String, Map<String, List<Location>>> locationsSortedByLanguageIDByCountryID = null;
+	private transient Map<CityID, Map<String, List<Location>>> locationsSortedByLanguageIDByCityID = null;
 
 	/**
 	 * key: String countryID<br/>
@@ -366,15 +367,15 @@ public abstract class Geography
 		return Collections.unmodifiableCollection(city.getLocations());
 	}
 
-	public List<Location> getLocationsSorted(final CityID cityID, final Locale locale)
+	public synchronized List<Location> getLocationsSorted(final CityID cityID, final Locale locale)
 	{
-		if (locationsSortedByLanguageIDByCountryID == null)
-			locationsSortedByLanguageIDByCountryID = new HashMap<String, Map<String,List<Location>>>();
+		if (locationsSortedByLanguageIDByCityID == null)
+			locationsSortedByLanguageIDByCityID = new HashMap<CityID, Map<String,List<Location>>>();
 
-		Map<String,List<Location>> locationsSortedByLanguageID = locationsSortedByLanguageIDByCountryID.get(cityID.countryID);
+		Map<String,List<Location>> locationsSortedByLanguageID = locationsSortedByLanguageIDByCityID.get(cityID);
 		if (locationsSortedByLanguageID == null) {
 			locationsSortedByLanguageID = new HashMap<String, List<Location>>();
-			locationsSortedByLanguageIDByCountryID.put(cityID.countryID, locationsSortedByLanguageID);
+			locationsSortedByLanguageIDByCityID.put(cityID, locationsSortedByLanguageID);
 		}
 
 		final String languageID = locale.getLanguage();
@@ -1064,7 +1065,7 @@ public abstract class Geography
 		citiesSortedByLanguageIDByRegionID = null;
 		districtsByZipByRegionID = null;
 		locationsByLocationNameByLanguageIDByCityID = null;
-		locationsSortedByLanguageIDByCountryID = null;
+		locationsSortedByLanguageIDByCityID = null;
 	}
 
 	// countryIDs are ISO standard Strings - we don't need an ID generator method for them!

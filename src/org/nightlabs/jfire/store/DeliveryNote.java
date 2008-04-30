@@ -113,10 +113,11 @@ import org.nightlabs.util.Util;
  * @jdo.fetch-group name="DeliveryNote.deliveryNoteLocal" fields="deliveryNoteLocal"
  * @jdo.fetch-group name="DeliveryNote.articles" fields="articles"
  * @jdo.fetch-group name="DeliveryNote.createUser" fields="createUser"
- * @jdo.fetch-group name="DeliveryNote.customer" fields="customer"
  * @jdo.fetch-group name="DeliveryNote.finalizeUser" fields="finalizeUser"
- * @jdo.fetch-group name="DeliveryNote.vendor" fields="vendor"
  * @jdo.fetch-group name="DeliveryNote.this" fetch-groups="default" fields="deliveryNoteLocal, articles, createUser, customer, finalizeUser, vendor, state, states"
+ *
+ * @jdo.fetch-group name="ArticleContainer.vendor" fields="vendor"
+ * @jdo.fetch-group name="ArticleContainer.customer" fields="customer"
  *
  * @jdo.fetch-group name="FetchGroupsTrade.articleContainerInEditor" fields="deliveryNoteLocal, articles, createUser, customer, finalizeUser, vendor, state, states"
  *
@@ -131,14 +132,16 @@ implements Serializable, ArticleContainer, Statable, DetachCallback
 	public static final String FETCH_GROUP_DELIVERY_NOTE_LOCAL = "DeliveryNote.deliveryNoteLocal";
 	public static final String FETCH_GROUP_ARTICLES = "DeliveryNote.articles";
 	public static final String FETCH_GROUP_CREATE_USER = "DeliveryNote.createUser";
-	public static final String FETCH_GROUP_CUSTOMER = "DeliveryNote.customer";
 	public static final String FETCH_GROUP_FINALIZE_USER = "DeliveryNote.finalizeUser";
-	public static final String FETCH_GROUP_VENDOR = "DeliveryNote.vendor";
 	public static final String FETCH_GROUP_THIS_DELIVERY_NOTE = "DeliveryNote.this";
 
+	public static final String FETCH_GROUP_VENDOR = "ArticleContainer.vendor";
+	public static final String FETCH_GROUP_CUSTOMER = "ArticleContainer.customer";
+	
+	
 	// the following fetch-groups are virtual and processed in the detach callback
-	public static final String FETCH_GROUP_VENDOR_ID = "DeliveryNote.vendorID";
-	public static final String FETCH_GROUP_CUSTOMER_ID = "DeliveryNote.customerID";
+//	public static final String FETCH_GROUP_VENDOR_ID = "DeliveryNote.vendorID";
+//	public static final String FETCH_GROUP_CUSTOMER_ID = "DeliveryNote.customerID";
 
 	/**
 	 * This method queries all <code>DeliveryNote</code>s which exist between the given vendor and customer.

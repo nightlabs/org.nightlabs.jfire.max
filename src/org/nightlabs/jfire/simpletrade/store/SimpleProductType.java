@@ -47,6 +47,7 @@ import org.nightlabs.jfire.store.ProductType;
 import org.nightlabs.jfire.store.ProductTypeLocal;
 import org.nightlabs.jfire.store.id.ProductTypeID;
 import org.nightlabs.jfire.trade.CustomerGroupMapper;
+import org.nightlabs.jfire.trade.LegalEntity;
 
 /**
  * @author Marco Schulze - marco at nightlabs dot de

@@ -28,6 +28,7 @@ package org.nightlabs.jfire.scripting.editor2d;
 import java.util.Map;
 import java.util.Set;
 
+import org.nightlabs.editor2d.DrawComponent;
 import org.nightlabs.editor2d.RootDrawComponent;
 import org.nightlabs.jfire.scripting.condition.Script;
 import org.nightlabs.jfire.scripting.id.ScriptRegistryItemID;

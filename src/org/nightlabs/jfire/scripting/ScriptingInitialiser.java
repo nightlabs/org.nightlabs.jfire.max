@@ -45,8 +45,10 @@ import javax.jdo.PersistenceManager;
 import javax.xml.transform.TransformerException;
 
 import org.apache.log4j.Logger;
+import org.nightlabs.ModuleException;
 import org.nightlabs.i18n.I18nText;
 import org.nightlabs.jfire.idgenerator.IDGenerator;
+import org.nightlabs.jfire.organisation.Organisation;
 import org.nightlabs.jfire.scripting.id.ScriptRegistryItemID;
 import org.nightlabs.jfire.servermanager.JFireServerManager;
 import org.nightlabs.util.Util;

@@ -4,7 +4,6 @@ import java.util.HashMap;
 import java.util.Map;
 
 import org.nightlabs.i18n.I18nText;
-import org.nightlabs.jfire.issue.id.IssuePriorityID;
 
 /**
  * @author Chairat Kongarayawetchakun - chairat at nightlabs dot de

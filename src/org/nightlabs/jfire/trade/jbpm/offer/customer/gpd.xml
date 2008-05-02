@@ -1,25 +1,25 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<process-diagram name="dev.jfire.org:Offer.Customer" width="1085" height="597">
+<root-container name="dev.jfire.org:Offer.Customer" width="1047" height="1421">
   <node name="dev.jfire.org:sent" x="187" y="140" width="206" height="40">
-    <transition name="accept">
+    <edge>
       <label x="5" y="-10"/>
-    </transition>
-    <transition name="reject">
+    </edge>
+    <edge>
       <label x="5" y="-10"/>
-    </transition>
-    <transition name="dev.jfire.org:expired">
+    </edge>
+    <edge>
       <label x="5" y="-10"/>
-    </transition>
-    <transition name="dev.jfire.org:revoked">
+    </edge>
+    <edge>
       <label x="-79" y="-16"/>
-    </transition>
-    <transition name="dev.jfire.org:acceptedImplicitely">
+    </edge>
+    <edge>
       <label x="5" y="-10"/>
-    </transition>
-    <transition name="dev.jfire.org:acceptedForCrossTrade">
-      <label x="-258" y="5"/>
-    </transition>
+    </edge>
+    <edge>
+      <label x="-223" y="1"/>
+    </edge>
   </node>
   <node name="dev.jfire.org:customerRejected" x="304" y="350" width="236" height="40"/>
   <node name="dev.jfire.org:customerAccepted" x="7" y="351" width="242" height="40"/>
@@ -27,4 +27,4 @@
   <node name="dev.jfire.org:revoked" x="584" y="140" width="181" height="40"/>
   <node name="dev.jfire.org:acceptedImplicitely" x="271" y="41" width="249" height="40"/>
   <node name="dev.jfire.org:acceptedForCrossTrade" x="-38" y="39" width="287" height="40"/>
-</process-diagram>
+</root-container>

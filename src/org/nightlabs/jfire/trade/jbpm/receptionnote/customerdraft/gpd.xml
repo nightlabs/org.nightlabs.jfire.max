@@ -1,30 +1,30 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<process-diagram name="dev.jfire.org:ReceptionNote.Customer" width="742" height="637">
+<root-container name="dev.jfire.org:ReceptionNote.Customer" width="1008" height="1440">
   <node name="dev.jfire.org:created" x="4" y="4" width="206" height="40">
-    <transition name="finalize">
+    <edge>
       <label x="5" y="-10"/>
-    </transition>
+    </edge>
   </node>
   <node name="dev.jfire.org:finalized" x="3" y="105" width="210" height="40">
-    <transition name="dev.jfire.org:book">
+    <edge>
       <label x="5" y="-10"/>
-    </transition>
+    </edge>
   </node>
   <node name="dev.jfire.org:booked" x="4" y="206" width="210" height="40">
-    <transition name="dev.jfire.org:send">
-      <label x="5" y="-10"/>
+    <edge>
+      <label x="-22" y="-17"/>
       <bendpoint w1="162" h1="-28" w2="-148" h2="-29"/>
-    </transition>
-    <transition name="dev.jfire.org:deliver">
+    </edge>
+    <edge>
       <label x="3" y="-11"/>
-    </transition>
+    </edge>
   </node>
   <node name="dev.jfire.org:sent" x="326" y="207" width="187" height="40">
-    <transition name="">
+    <edge>
       <label x="5" y="-10"/>
       <bendpoint w1="-144" h1="24" w2="166" h2="25"/>
-    </transition>
+    </edge>
   </node>
   <node name="dev.jfire.org:delivered" x="3" y="321" width="214" height="40"/>
-</process-diagram>
+</root-container>

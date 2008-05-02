@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<root-container name="dev.jfire.org:Invoice.Vendor" width="1169" height="1390">
+<root-container name="dev.jfire.org:Invoice.Vendor" width="1180" height="1421">
   <node name="dev.jfire.org:created" x="97" y="21" width="206" height="40">
     <edge>
       <label x="-44" y="-17"/>
@@ -44,7 +44,7 @@
       <bendpoint w1="140" h1="206" w2="-192" h2="0"/>
     </edge>
     <edge>
-      <label x="-148" y="-31"/>
+      <label x="-100" y="-30"/>
     </edge>
     <edge>
       <label x="-48" y="-17"/>

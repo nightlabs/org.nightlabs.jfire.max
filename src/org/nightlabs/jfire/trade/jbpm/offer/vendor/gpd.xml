@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<root-container name="dev.jfire.org:Offer.Vendor" width="1468" height="1419">
+<root-container name="dev.jfire.org:Offer.Vendor" width="1465" height="1421">
   <node name="dev.jfire.org:created" x="-24" y="17" width="190" height="40">
     <edge>
       <label x="-122" y="-52"/>
@@ -35,7 +35,7 @@
       <label x="-79" y="96"/>
     </edge>
     <edge>
-      <label x="-81" y="-24"/>
+      <label x="-146" y="-17"/>
       <bendpoint w1="262" h1="-1" w2="1" h2="-47"/>
     </edge>
     <edge>

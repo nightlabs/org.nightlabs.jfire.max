@@ -18,7 +18,6 @@ import org.eclipse.datatools.connectivity.oda.IResultSetMetaData;
 import org.nightlabs.db.Record;
 import org.nightlabs.db.TableBuffer;
 import org.nightlabs.jfire.accounting.MoneyTransfer;
-import org.nightlabs.jfire.reporting.JFireReportingHelper;
 import org.nightlabs.jfire.reporting.oda.DataType;
 import org.nightlabs.jfire.reporting.oda.SQLResultSet;
 import org.nightlabs.jfire.reporting.oda.jfs.AbstractJFSScriptExecutorDelegate;
@@ -156,7 +155,7 @@ public class MoneyTransferList extends AbstractJFSScriptExecutorDelegate {
 				row.add(moneyTransfer.getTimestamp());
 				row.add(ReportingScriptUtil.getObjectJDOID(moneyTransfer.getCurrency()));
 				row.add(moneyTransfer.getAmount());
-				row.add(moneyTransfer.getDescription(JFireReportingHelper.getLocale()));
+				row.add(moneyTransfer.getDescription());
 				try {
 					buffer.addRecord(new Record(row));
 				} catch (Exception e) {

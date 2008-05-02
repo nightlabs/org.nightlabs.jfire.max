@@ -5,7 +5,6 @@ package org.nightlabs.jfire.reporting.trade.scripting;
 
 import java.util.Collection;
 import java.util.Iterator;
-import java.util.Locale;
 
 import javax.jdo.PersistenceManager;
 import javax.jdo.Query;
@@ -18,6 +17,7 @@ import org.nightlabs.jfire.reporting.oda.jfs.JFSResultSetMetaData;
 import org.nightlabs.jfire.scripting.ScriptException;
 import org.nightlabs.jfire.store.ProductType;
 import org.nightlabs.jfire.trade.Article;
+import org.nightlabs.util.NLLocale;
 
 /**
  * @author Alexander Bieber <alex [AT] nightlabs [DOT] de>
@@ -68,7 +68,7 @@ public class ScriptExecutorGeneralSalesStatistic extends AbstractJFSScriptExecut
 		for (Iterator<Object[]> iter = products.iterator(); iter.hasNext();) {
 			Object[] row = iter.next();
 			Object[] nRow = new Object[3];
-			nRow[0] = ((ProductType)row[0]).getName().getText(Locale.getDefault().getLanguage());
+			nRow[0] = ((ProductType)row[0]).getName().getText(NLLocale.getDefault().getLanguage());
 			nRow[1] = row[1];
 			nRow[2] = row[2];
 			resultSet.addRow(nRow);

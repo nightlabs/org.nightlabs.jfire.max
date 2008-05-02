@@ -36,8 +36,10 @@ import javax.jdo.JDOObjectNotFoundException;
 import javax.jdo.PersistenceManager;
 
 import org.apache.log4j.Logger;
+import org.eclipse.datatools.connectivity.oda.IQuery;
 import org.nightlabs.jdo.ObjectID;
 import org.nightlabs.jdo.ObjectIDUtil;
+import org.nightlabs.jfire.reporting.layout.render.RenderManager;
 import org.nightlabs.jfire.reporting.oda.jfs.JFSParameterUtil;
 
 import com.thoughtworks.xstream.XStream;

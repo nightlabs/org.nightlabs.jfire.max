@@ -31,6 +31,7 @@ import java.util.Map;
 
 import javax.jdo.PersistenceManager;
 
+import org.nightlabs.jfire.reporting.Birt;
 import org.nightlabs.jfire.reporting.Birt.OutputFormat;
 import org.nightlabs.jfire.reporting.layout.id.ReportRegistryID;
 import org.nightlabs.jfire.reporting.layout.render.ReportLayoutRenderer;

@@ -10,6 +10,7 @@ import javax.jdo.PersistenceManager;
 import org.eclipse.birt.report.engine.api.EngineException;
 import org.eclipse.birt.report.engine.api.IRunAndRenderTask;
 import org.nightlabs.jfire.reporting.Birt.OutputFormat;
+import org.nightlabs.jfire.reporting.layout.ReportRegistry;
 
 /**
  * ReportLayoutRenderer are responsible for rendering a report to a specific

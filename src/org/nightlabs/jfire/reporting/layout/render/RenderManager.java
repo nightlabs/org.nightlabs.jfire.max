@@ -52,6 +52,7 @@ import org.nightlabs.jfire.reporting.ReportingManagerFactory;
 import org.nightlabs.jfire.reporting.layout.ReportLayout;
 import org.nightlabs.jfire.reporting.layout.ReportRegistry;
 import org.nightlabs.jfire.reporting.platform.ServerResourceLocator;
+import org.nightlabs.util.NLLocale;
 
 /**
  * Helper to render reports on the server. Instances of {@link RenderManager}
@@ -159,7 +160,7 @@ public class RenderManager {
 				logger.debug("Opened reportlayout, creating RunAndRenderTask");
 			IRunAndRenderTask task = reportEngine.createRunAndRenderTask(report);
 			
-			Locale locale = Locale.getDefault();
+			Locale locale = NLLocale.getDefault();
 			if (renderRequest.getLocale() != null)
 				locale = renderRequest.getLocale();
 			else {

@@ -31,6 +31,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 import org.nightlabs.i18n.I18nText;
+import org.nightlabs.jfire.reporting.parameter.ValueProvider;
 
 /**
  * Description i18n text for {@link ValueProvider}s.

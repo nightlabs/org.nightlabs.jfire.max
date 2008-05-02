@@ -10,6 +10,7 @@ import java.util.Map;
 
 import org.nightlabs.jfire.reporting.Birt.OutputFormat;
 import org.nightlabs.jfire.reporting.layout.id.ReportRegistryItemID;
+import org.nightlabs.util.NLLocale;
 
 /**
  * Used as parameter for rendering methods.
@@ -48,7 +49,7 @@ public class RenderReportRequest implements Serializable {
 		this.setReportRegistryItemID(reportRegistryItemID);
 		this.setParameters(parameters);
 		this.setOutputFormat(outputFormat);
-		this.locale = Locale.getDefault();
+		this.locale = NLLocale.getDefault();
 	}
 	
 	/**

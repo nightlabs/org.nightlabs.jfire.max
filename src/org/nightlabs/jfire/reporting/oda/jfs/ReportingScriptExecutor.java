@@ -9,6 +9,8 @@ import org.eclipse.datatools.connectivity.oda.IResultSet;
 import org.eclipse.datatools.connectivity.oda.IResultSetMetaData;
 import org.nightlabs.jfire.scripting.Script;
 import org.nightlabs.jfire.scripting.ScriptException;
+import org.nightlabs.jfire.scripting.ScriptExecutor;
+import org.nightlabs.jfire.scripting.ScriptRegistry;
 
 /**
  * Common interface for {@link ScriptExecutor}s (JavaClass, JavaScript)

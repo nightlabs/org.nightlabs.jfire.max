@@ -7,6 +7,8 @@ import java.io.Serializable;
 
 import javax.jdo.listener.DeleteCallback;
 
+import org.nightlabs.jfire.reporting.parameter.ValueProvider;
+
 /**
  * This is used to represent a BIRT parameter within a {@link ValueAcquisitionSetup}.
  * These objects are always the end of the {@link ValueProvider} chain when

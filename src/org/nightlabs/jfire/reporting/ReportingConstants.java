@@ -8,11 +8,14 @@ import java.util.Collection;
 import java.util.Date;
 
 import org.nightlabs.jfire.organisation.Organisation;
+import org.nightlabs.jfire.organisation.id.OrganisationID;
 import org.nightlabs.jfire.reporting.parameter.id.ValueProviderCategoryID;
 import org.nightlabs.jfire.reporting.parameter.id.ValueProviderID;
 import org.nightlabs.jfire.security.User;
 import org.nightlabs.jfire.security.UserGroup;
+import org.nightlabs.jfire.security.id.UserID;
 import org.nightlabs.jfire.workstation.Workstation;
+import org.nightlabs.jfire.workstation.id.WorkstationID;
 import org.nightlabs.util.TimePeriod;
 
 /**

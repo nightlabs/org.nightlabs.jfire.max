@@ -8,11 +8,13 @@ import java.util.Map.Entry;
 import org.eclipse.datatools.connectivity.oda.IResultSet;
 import org.eclipse.datatools.connectivity.oda.IResultSetMetaData;
 import org.nightlabs.jfire.reporting.JFireReportingHelper;
+import org.nightlabs.jfire.reporting.oda.server.jfs.ServerJFSQueryProxy;
 import org.nightlabs.jfire.scripting.Script;
 import org.nightlabs.jfire.scripting.ScriptException;
 import org.nightlabs.jfire.scripting.ScriptExecutorJavaClass;
 import org.nightlabs.jfire.scripting.ScriptExecutorJavaClassDelegate;
 import org.nightlabs.jfire.scripting.ScriptParameterSet;
+import org.nightlabs.jfire.scripting.ScriptRegistry;
 
 /**
  * When JFireReporting is deployed this class is registered to the {@link ScriptRegistry}

@@ -263,23 +263,25 @@ implements SessionBean
 	{
 		logger.debug("Trying authentication for web customer: "+webCustomerID);
 		if(password == null) {
-			logger.debug("Customer authentication failed: No password given.");
+			logger.info("Customer authentication failed: No password given.");
 			return false;
 		}
 		String encryptedPassword = UserLocal.encryptPassword(password);
 		PersistenceManager pm = getPersistenceManager();
 		try {
 			WebCustomer wbc = (WebCustomer)pm.getObjectById(webCustomerID);
+			if(wbc.getConfirmationString() != null || wbc.getConfirmationStringDate() != null) {
+				logger.info("Account has not been confirmed yet");
+				return false;
+			}
 			if(wbc.getPassword().equals(encryptedPassword)) {
 				// login succeeded - reset second password
 				wbc.setSecondPassword(null);
 				wbc.setSecondPasswordDate(null);
-//				setSecondPassword(pm, webCustomerID, null);
 				logger.debug("Customer authentication successful.");
 				return true;
 			}
 			else {
-				
 				// try second password:
 				String secondPassword = wbc.getSecondPassword();
 				if(secondPassword != null) {
@@ -290,8 +292,6 @@ implements SessionBean
 						logger.debug("Replacing first password with second.");
 						wbc.setPassword(wbc.getSecondPassword());
 						wbc.setSecondPassword(null);
-//						setPassword(pm, webCustomerID, wbc.getSecondPassword());
-//						setSecondPassword(pm, webCustomerID, null);
 						return true;
 					} else {
 						logger.debug("Customer authentication (2nd pwd) failed: Passwords don't match.");
@@ -300,10 +300,8 @@ implements SessionBean
 				} else {
 					logger.debug("No second password found");
 				}
-				
 				logger.debug("Customer authentication failed: Passwords don't match.");
 				return false;
-				
 			}
 		}	catch (JDOObjectNotFoundException e) {
 			logger.error("Customer authentication failed: Customer not found: "+webCustomerID, e);
@@ -599,36 +597,7 @@ implements SessionBean
 			}
 		}
 	}
-	
-//	private static void setPassword(PersistenceManager pm, WebCustomerID webCustomerID, String encryptedPassword)
-//	{
-////		PersistenceManager pm = getPersistenceManager();
-////		try {
-//			logger.debug("Setting customer password");
-//			WebCustomer webCustomer = (WebCustomer)pm.getObjectById(webCustomerID);
-//			webCustomer.setPassword(encryptedPassword);
-////		} finally {
-////			pm.close();
-////		}
-//	}
-	
-//	private static void setSecondPassword(PersistenceManager pm, WebCustomerID webCustomerID, String encryptedPassword)
-//	{
-////		PersistenceManager pm = getPersistenceManager();
-////		try {
-//			logger.debug("Setting second customer password");
-//			WebCustomer webCustomer = (WebCustomer)pm.getObjectById(webCustomerID);
-//			webCustomer.setSecondPassword(encryptedPassword);
-//			// if the password doesnt get erased we have to set the current Time for a possible expiration
-//			if(encryptedPassword != null)
-//				webCustomer.setSecondPasswordDate(new Date());
-//			else
-//				webCustomer.setSecondPasswordDate(null);
-////		} finally {
-////			pm.close();
-////		}
-//	}
-	
+
 	/**
 	 * @ejb.interface-method
 	 * @ejb.transaction type="Required"
@@ -636,26 +605,19 @@ implements SessionBean
 	 */
 	public void storeAndSendConfirmation(WebCustomerID webCustomerID, String subject, String messageText, String confirmationString) throws Exception
 	{
-//		try {
-			// the confirmation String is random encrypted String
-//			String randomEncrypted = UserLocal.encryptPassword(UserLocal.createHumanPassword(8, 10));
-//			String subject = "Account confirmation for "+ webCustomerID.webCustomerID +" at the JFire demo webshop";
-//			// very temporarly
-//			String message = "Hello "+ webCustomerID.webCustomerID +
-//			"\n Thank you for registering at the JFire demo shop. Your account is created and must be activated before you can use it."+
-//			"To activate the account click on the following link or copy-paste it in your browser: http://127.0.0.1:8080/jfire-webshop/customer/?customerId="+webCustomerID.webCustomerID +"&action=confirm&cf="+ randomEncrypted;
-
 			if(sendBlockGroupMails(webCustomerID, subject, messageText))
 				// At least 1 mail has been sent succesfully
 				setConfirmationString(webCustomerID, confirmationString);
 			else
 				// sending all mails failed
 				throw new Exception("Sending mail failed");
-//		} catch (Exception e) {
-//			e.printStackTrace();
-//		}
 	}
 	
+	/**
+	 * @ejb.interface-method
+	 * @ejb.transaction type="Required"
+	 * @ejb.permission role-name="_Guest_"
+	 */
 	public void setConfirmationString(WebCustomerID webCustomerID, String confirmationString)
 	{
 		PersistenceManager pm = getPersistenceManager();
@@ -668,4 +630,5 @@ implements SessionBean
 			pm.close();
 		}
 	}
+
 }

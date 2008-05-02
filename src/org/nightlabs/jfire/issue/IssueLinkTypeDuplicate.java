@@ -3,6 +3,7 @@ package org.nightlabs.jfire.issue;
 import java.util.Set;
 
 import javax.jdo.JDOHelper;
+import javax.jdo.PersistenceManager;
 
 import org.jpox.FetchPlan;
 import org.nightlabs.jfire.issue.dao.IssueDAO;
@@ -38,7 +39,7 @@ extends IssueLinkType
 	}
 
 	@Override
-	protected void postCreateIssueLink(IssueLink newIssueLink) {
+	protected void postCreateIssueLink(PersistenceManager pm, IssueLink newIssueLink) {
 		// create a reverse link.
 
 		IssueLinkType issueLinkTypeDuplicate = newIssueLink.getIssueLinkType();
@@ -57,7 +58,7 @@ extends IssueLinkType
 		}
 
 		issueOnOtherSide.createIssueLink(issueLinkTypeDuplicate, newIssueLink.getIssue());
-		IssueDAO.sharedInstance().storeIssue(issueOnOtherSide, false, new String[]{FetchPlan.DEFAULT}, 0, null);
+		pm.makePersistent(issueOnOtherSide);
 	}
 
 	@Override

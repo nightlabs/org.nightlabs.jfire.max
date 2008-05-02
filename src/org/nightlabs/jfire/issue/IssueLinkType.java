@@ -186,7 +186,7 @@ implements Serializable
 	 * @param newIssueLink the newly created and already persisted (in the same transaction) IssueLink.
 	 * @see #preDeleteIssueLink(IssueLink)
 	 */
-	protected void postCreateIssueLink(IssueLink newIssueLink) { }
+	protected void postCreateIssueLink(PersistenceManager pm, IssueLink newIssueLink) { }
 
 	/**
 	 * Callback method triggered before an {@link IssueLink} instance has been deleted from the datastore.

@@ -3,6 +3,7 @@ package org.nightlabs.jfire.issue;
 import java.util.Set;
 
 import javax.jdo.JDOHelper;
+import javax.jdo.PersistenceManager;
 
 import org.jpox.FetchPlan;
 import org.nightlabs.jfire.issue.dao.IssueDAO;
@@ -39,7 +40,7 @@ extends IssueLinkType
 	}
 
 	@Override
-	protected void postCreateIssueLink(IssueLink newIssueLink) {
+	protected void postCreateIssueLink(PersistenceManager pm, IssueLink newIssueLink) {
 		// create a reverse link - i.e. if we just created a parent-relationship, we need to add a child-relationship on the other side.
 
 		IssueLinkType issueLinkType = newIssueLink.getIssueLinkType();
@@ -50,10 +51,10 @@ extends IssueLinkType
 		IssueLinkType issueLinkTypeForOtherSide = null;
 
 		if (ISSUE_LINK_TYPE_ID_PARENT.equals(issueLinkTypeID))
-			issueLinkTypeForOtherSide = (IssueLinkType) getPersistenceManager().getObjectById(ISSUE_LINK_TYPE_ID_CHILD);
+			issueLinkTypeForOtherSide = (IssueLinkType) pm.getObjectById(ISSUE_LINK_TYPE_ID_CHILD);
 
 		if (ISSUE_LINK_TYPE_ID_CHILD.equals(issueLinkTypeID))
-			issueLinkTypeForOtherSide = (IssueLinkType) getPersistenceManager().getObjectById(ISSUE_LINK_TYPE_ID_PARENT);
+			issueLinkTypeForOtherSide = (IssueLinkType) pm.getObjectById(ISSUE_LINK_TYPE_ID_PARENT);
 
 		if (issueLinkTypeForOtherSide != null) {
 			Issue issueOnOtherSide = (Issue) newIssueLink.getLinkedObject();
@@ -67,7 +68,7 @@ extends IssueLinkType
 			}
 
 			issueOnOtherSide.createIssueLink(issueLinkTypeForOtherSide, newIssueLink.getIssue());
-			IssueDAO.sharedInstance().storeIssue(issueOnOtherSide, false, new String[]{FetchPlan.DEFAULT}, 0, null);
+			pm.makePersistent(issueOnOtherSide);
 		}
 	}
 

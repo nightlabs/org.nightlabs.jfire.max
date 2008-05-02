@@ -301,7 +301,7 @@ implements Serializable, DetachCallback, StoreCallback, DeleteCallback
 					if (logger.isDebugEnabled()) {
 						logger.debug("jdoPreStore: the IssueLink " + getPrimaryKey() + " does NOT yet exist - calling the IssueLinkType's afterCreateIssueLink callback method.");
 					}
-					getIssueLinkType().postCreateIssueLink(IssueLink.this);
+					getIssueLinkType().postCreateIssueLink(getPersistenceManager(), IssueLink.this);
 				}
 			}
 		}, new Class[] { IssueLink.class });

@@ -2,6 +2,8 @@ package org.nightlabs.jfire.jbpm.graph.def;
 
 import java.util.List;
 
+import org.jbpm.graph.exe.ProcessInstance;
+
 /**
  * A {@link StatableLocal} should be assigned to a {@link Statable}
  * it also holds the current status and a list of passed status but not only

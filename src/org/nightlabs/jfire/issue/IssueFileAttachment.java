@@ -8,9 +8,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.io.Serializable;
-import java.util.ArrayList;
 import java.util.Date;
-import java.util.List;
 import java.util.zip.DeflaterOutputStream;
 import java.util.zip.InflaterInputStream;
 
@@ -84,6 +82,7 @@ implements Serializable{
 	 */
 	private Issue issue;
 
+	
 	/**
 	 * @deprecated Only for JDO!!!!!!!!!
 	 */

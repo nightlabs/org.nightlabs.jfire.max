@@ -4,6 +4,8 @@ import java.util.Set;
 
 import javax.jdo.JDOHelper;
 
+import org.jpox.FetchPlan;
+import org.nightlabs.jfire.issue.dao.IssueDAO;
 import org.nightlabs.jfire.issue.id.IssueLinkTypeID;
 import org.nightlabs.jfire.organisation.Organisation;
 
@@ -55,6 +57,7 @@ extends IssueLinkType
 		}
 
 		issueOnOtherSide.createIssueLink(issueLinkTypeDuplicate, newIssueLink.getIssue());
+		IssueDAO.sharedInstance().storeIssue(issueOnOtherSide, false, new String[]{FetchPlan.DEFAULT}, 0, null);
 	}
 
 	@Override
@@ -74,5 +77,7 @@ extends IssueLinkType
 					issueOnOtherSide.removeIssueLink(issueLinkOnOtherSide);
 			}
 		}
+		
+		IssueDAO.sharedInstance().storeIssue(issueOnOtherSide, false, new String[]{FetchPlan.DEFAULT}, 0, null);
 	}
 }

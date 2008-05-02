@@ -11,6 +11,7 @@ import org.nightlabs.jfire.base.Lookup;
 import org.nightlabs.jfire.numorgid.id.NumericOrganisationIdentifierID;
 import org.nightlabs.jfire.organisation.LocalOrganisation;
 import org.nightlabs.jfire.organisation.Organisation;
+import org.nightlabs.math.Base62Coder;
 
 /**
  * @jdo.persistence-capable

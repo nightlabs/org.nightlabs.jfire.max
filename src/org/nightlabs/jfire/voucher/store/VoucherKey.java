@@ -16,6 +16,7 @@ import org.nightlabs.jfire.accounting.PriceFragmentType;
 import org.nightlabs.jfire.accounting.pay.Payment;
 import org.nightlabs.jfire.accounting.priceconfig.PriceConfig;
 import org.nightlabs.jfire.security.User;
+import org.nightlabs.jfire.store.Product;
 import org.nightlabs.jfire.trade.Article;
 import org.nightlabs.jfire.voucher.accounting.VoucherRedemption;
 import org.nightlabs.jfire.voucher.store.id.VoucherKeyID;

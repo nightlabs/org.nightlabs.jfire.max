@@ -10,7 +10,7 @@ import org.nightlabs.ModuleException;
 import org.nightlabs.jfire.accounting.Account;
 import org.nightlabs.jfire.accounting.PriceFragmentType;
 import org.nightlabs.jfire.accounting.Tariff;
-import org.nightlabs.jfire.accounting.book.mappingbased.PFMappingAccountantDelegate;
+import org.nightlabs.jfire.accounting.book.mappingbased.MappingBasedAccountantDelegate;
 import org.nightlabs.jfire.accounting.gridpriceconfig.FormulaCell;
 import org.nightlabs.jfire.accounting.gridpriceconfig.PriceCoordinate;
 import org.nightlabs.jfire.accounting.id.CurrencyID;
@@ -154,7 +154,7 @@ extends Initialiser
 		
 
 		// configure moneyflow
-		PFMappingAccountantDelegate swDelegate = new PFMappingAccountantDelegate(organisationID, "softwareAccountantDelegate");
+		MappingBasedAccountantDelegate swDelegate = new MappingBasedAccountantDelegate(organisationID, "softwareAccountantDelegate");
 
 		swDelegate.addMoneyFlowMapping(
 				dataCreator.createPFMoneyFlowMapping(softwareDevelopment, dataCreator.getPriceFragmentTypeTotal(),
@@ -163,7 +163,7 @@ extends Initialiser
 				dataCreator.createPFMoneyFlowMapping(softwareDevelopment, dataCreator.getPriceFragmentTypeVatVal(),
 						accountSoftwareDevelopmentVatVal_revenue, accountSoftwareDevelopmentVatVal_expense));
 
-		PFMappingAccountantDelegate serviceDelegate = new PFMappingAccountantDelegate(organisationID, "serviceAccountantDelegate");
+		MappingBasedAccountantDelegate serviceDelegate = new MappingBasedAccountantDelegate(organisationID, "serviceAccountantDelegate");
 
 		serviceDelegate.addMoneyFlowMapping(
 				dataCreator.createPFMoneyFlowMapping(service, dataCreator.getPriceFragmentTypeTotal(),
@@ -173,7 +173,7 @@ extends Initialiser
 						accountServiceVatVal_revenue, accountServiceVatVal_expense));
 
 
-		PFMappingAccountantDelegate miscDelegate = new PFMappingAccountantDelegate(organisationID, "miscAccountantDelegate");
+		MappingBasedAccountantDelegate miscDelegate = new MappingBasedAccountantDelegate(organisationID, "miscAccountantDelegate");
 
 		miscDelegate.addMoneyFlowMapping(
 				dataCreator.createPFMoneyFlowMapping(misc, dataCreator.getPriceFragmentTypeTotal(),

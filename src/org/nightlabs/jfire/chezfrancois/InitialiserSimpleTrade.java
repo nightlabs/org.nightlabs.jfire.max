@@ -12,7 +12,7 @@ import org.nightlabs.ModuleException;
 import org.nightlabs.config.Config;
 import org.nightlabs.jfire.accounting.Account;
 import org.nightlabs.jfire.accounting.Tariff;
-import org.nightlabs.jfire.accounting.book.mappingbased.PFMappingAccountantDelegate;
+import org.nightlabs.jfire.accounting.book.mappingbased.MappingBasedAccountantDelegate;
 import org.nightlabs.jfire.accounting.gridpriceconfig.FormulaPriceConfig;
 import org.nightlabs.jfire.accounting.priceconfig.IInnerPriceConfig;
 import org.nightlabs.jfire.base.JFirePrincipal;
@@ -256,7 +256,7 @@ extends Initialiser
 		Account accessoriesVatVal_expense = dataCreator.createLocalExpenseAccount("accessories-vat-val.eur", "Accessories VAT Expense (EUR)");
 
 		// configure moneyflow
-		PFMappingAccountantDelegate wineAccountantDelegate = new PFMappingAccountantDelegate(organisationID, "wineAccountantDelegate");
+		MappingBasedAccountantDelegate wineAccountantDelegate = new MappingBasedAccountantDelegate(organisationID, "wineAccountantDelegate");
 		wine.getProductTypeLocal().getFieldMetaData("localAccountantDelegate").setValueInherited(false);
 		wine.getProductTypeLocal().setLocalAccountantDelegate(wineAccountantDelegate);
 
@@ -288,7 +288,7 @@ extends Initialiser
 				dataCreator.createPFMoneyFlowMapping(boxWhite, dataCreator.getPriceFragmentTypeVatVal(),
 						accountBoxWhiteVatVal_revenue, accountBoxWhiteVatVal_expense));
 
-		PFMappingAccountantDelegate accessoriesAccountantDelegate = new PFMappingAccountantDelegate(organisationID, "accessoriesAccountantDelegate");
+		MappingBasedAccountantDelegate accessoriesAccountantDelegate = new MappingBasedAccountantDelegate(organisationID, "accessoriesAccountantDelegate");
 		accessories.getProductTypeLocal().getFieldMetaData("localAccountantDelegate").setValueInherited(false);
 		accessories.getProductTypeLocal().setLocalAccountantDelegate(accessoriesAccountantDelegate);
 

@@ -28,11 +28,11 @@ package org.nightlabs.jfire.transfer;
 
 import java.io.Serializable;
 import java.util.Collection;
-import java.util.Locale;
 import java.util.Set;
 
 import javax.jdo.JDOHelper;
 import javax.jdo.PersistenceManager;
+import javax.jdo.listener.DetachCallback;
 
 import org.nightlabs.jdo.ObjectIDUtil;
 import org.nightlabs.jfire.organisation.Organisation;
@@ -63,12 +63,13 @@ import org.nightlabs.util.Util;
  * @jdo.fetch-group name="Anchor.this" fetch-groups="default"
  */
 public abstract class Anchor
-	implements Serializable
+	implements Serializable, DetachCallback
 {
 	private static final long serialVersionUID = 1L;
 
 	//	public static final String FETCH_GROUP_TRANSFERS = "Anchor.transfers";
 	public static final String FETCH_GROUP_THIS_ANCHOR = "Anchor.this";
+	public static final String FETCH_GROUP_DESCRIPTION = "Anchor.description";
 
 	/**
 	 * @jdo.field primary-key="true"
@@ -216,7 +217,7 @@ public abstract class Anchor
 	 * Do NOT call this method directly! Use {@link Transfer#bookTransfer(User, Map)}
 	 * instead!
 	 * <p>
-	 * This method does some checks andcalls <tt>internalBookTransfer</tt>. It is not
+	 * This method does some checks and calls <tt>internalBookTransfer</tt>. It is not
 	 * recommended to overwrite this method. It's
 	 * better to overwrite {@link #internalBookTransfer(Transfer, User, Map)} instead!
 	 *
@@ -337,11 +338,54 @@ public abstract class Anchor
 	}
 	
 	/**
-	 * Should return a description of this Anchor.
-	 * @param locale The locale for the description.
+	 * @jdo.field persistence-modifier="none"
+	 */
+	private String description = null;
+	
+	/**
+	 * @jdo.field persistence-modifier="none"
+	 */
+	private boolean description_detached = false;
+	
+	/**
+	 * Returns a human readable description for this Transfer
+	 * for the default Locale of the current user. 
+	 * 
+	 * @return returns a human readable description for this Transfer
+	 */
+	public String getDescription() {
+		if (description == null && !description_detached)
+			description = internalGetDescription();
+		
+		return description;
+	}
+	
+	/**
+	 * Checks for the {@link #FETCH_GROUP_DESCRIPTION} and
+	 * set the non-persitent member for the description.
+	 */
+	@Override
+	public void jdoPostDetach(Object _attached) {
+		Anchor attached = (Anchor) _attached;
+		Anchor detached = this;
+		PersistenceManager pm = attached.getPersistenceManager();
+		if (pm.getFetchPlan().getGroups().contains(FETCH_GROUP_DESCRIPTION)) {
+			detached.description_detached = true;
+			detached.description = attached.getDescription();
+		}
+	}
+	
+	@Override
+	public void jdoPreDetach() {
+	}	
+	
+	/**
+	 * This should return a human readable description of this anchor.
+	 * <p>
+	 * Note that this method can assume that it is called on attached instances of Anchor.
 	 * @return A description of this Anchor.
 	 */
-	public abstract String getDescription(Locale locale);
+	protected abstract String internalGetDescription();
 	
 	@Override
 	public boolean equals(Object obj)

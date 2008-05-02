@@ -29,7 +29,6 @@ package org.nightlabs.jfire.store.book;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
-import java.util.Locale;
 
 import javax.jdo.JDOHelper;
 import javax.jdo.PersistenceManager;
@@ -128,7 +127,7 @@ public class BookProductTransfer extends DeliveryNoteProductTransfer
 	}
 	
 	@Override
-	public String getDescription(Locale locale) {
+	protected String internalGetDescription() {
 		return String.format(
 				"Booking of delivery note %s",
 				getDeliveryNote().getPrimaryKey()

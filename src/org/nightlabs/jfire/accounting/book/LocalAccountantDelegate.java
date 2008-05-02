@@ -240,7 +240,7 @@ public abstract class LocalAccountantDelegate implements Serializable {
 	protected PersistenceManager getPersistenceManager() {
 		PersistenceManager pm = JDOHelper.getPersistenceManager(this);
 		if (pm == null)
-			throw new IllegalStateException("This instance of PFMappingAccountantDelegate is not persistent. Can't get PersistenceManager");
+			throw new IllegalStateException("This instance of MappingBasedAccountantDelegate is not persistent. Can't get PersistenceManager");
 		return pm;
 	}
 	

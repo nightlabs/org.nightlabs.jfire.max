@@ -10,6 +10,8 @@ import javax.jdo.JDOObjectNotFoundException;
 import javax.jdo.PersistenceManager;
 import javax.jdo.Query;
 
+import org.nightlabs.jfire.accounting.gridpriceconfig.GridPriceConfig;
+import org.nightlabs.jfire.store.ProductType;
 import org.nightlabs.jfire.trade.id.CustomerGroupID;
 import org.nightlabs.jfire.trade.id.CustomerGroupMappingID;
 import org.nightlabs.util.Util;

@@ -1113,7 +1113,7 @@ implements StoreCallback
 			// TODO how to generate the IDs here? Give the user the possibility to define rules (e.g. number ranges)
 			account = new Account(
 					this.getOrganisationID(),
-					"partner." + ObjectIDUtil.longObjectIDFieldToString(IDGenerator.nextID(Anchor.class, Account.ANCHOR_TYPE_ID_ACCOUNT + "partner")),
+					"partner." + ObjectIDUtil.longObjectIDFieldToString(IDGenerator.nextID(Anchor.class, Account.ANCHOR_TYPE_ID_ACCOUNT + ".partner")),
 					accountType, partner, currency);
 			account = getPersistenceManager().makePersistent(account);
 			account.setOwner(partner);

@@ -41,6 +41,7 @@ import javax.jdo.JDOHelper;
 import javax.jdo.PersistenceManager;
 
 import org.nightlabs.jfire.accounting.Account;
+import org.nightlabs.jfire.accounting.Accounting;
 import org.nightlabs.jfire.accounting.Currency;
 import org.nightlabs.jfire.accounting.Invoice;
 import org.nightlabs.jfire.accounting.InvoiceMoneyTransfer;
@@ -60,6 +61,7 @@ import org.nightlabs.jfire.transfer.Anchor;
 import org.nightlabs.util.CollectionUtil;
 
 /**
+ * 
  * @author Alexander Bieber <alex[AT]nightlabs[DOT]de>
  * 
  * @jdo.persistence-capable identity-type="application"
@@ -69,18 +71,18 @@ import org.nightlabs.util.CollectionUtil;
  * 
  * @jdo.inheritance strategy = "new-table"
  * 
- * @jdo.fetch-group name="PFMappingAccountantDelegate.moneyFlowMappings"
+ * @jdo.fetch-group name="MappingBasedAccountantDelegate.moneyFlowMappings"
  *                  fields="moneyFlowMappings"
- * @jdo.fetch-group name="PFMappingAccountantDelegate.this"
+ * @jdo.fetch-group name="MappingBasedAccountantDelegate.this"
  *                  fields="moneyFlowMappings"
  */
-public class PFMappingAccountantDelegate
+public class MappingBasedAccountantDelegate
 		extends LocalAccountantDelegate
 {
 
-	public static final String FETCH_GROUP_MONEY_FLOW_MAPPINGS = "PFMappingAccountantDelegate.moneyFlowMappings";
+	public static final String FETCH_GROUP_MONEY_FLOW_MAPPINGS = "MappingBasedAccountantDelegate.moneyFlowMappings";
 
-	public static final String FETCH_GROUP_THIS_PF_LOCAL_ACCOUNTANT_DELEGATE = "PFMappingAccountantDelegate.this";
+	public static final String FETCH_GROUP_THIS_MAPPING_BASED_ACCOUNTANT_DELEGATE = "MappingBasedAccountantDelegate.this";
 
 	/**
 	 * @jdo.field persistence-modifier="persistent" collection-type="collection"
@@ -95,13 +97,13 @@ public class PFMappingAccountantDelegate
 	 * LOG4J logger used by this class
 	 */
 	private static final org.apache.log4j.Logger logger = org.apache.log4j.Logger
-			.getLogger(PFMappingAccountantDelegate.class);
+			.getLogger(MappingBasedAccountantDelegate.class);
 
 	/**
 	 * @deprecated Only for JDO
 	 */
 	@Deprecated
-	public PFMappingAccountantDelegate()
+	public MappingBasedAccountantDelegate()
 	{
 		super();
 	}
@@ -110,7 +112,7 @@ public class PFMappingAccountantDelegate
 	 * @param accountant
 	 * @param productType
 	 */
-	public PFMappingAccountantDelegate(String organisationID,
+	public MappingBasedAccountantDelegate(String organisationID,
 			String localAccountantDelegateID)
 	{
 		super(organisationID, localAccountantDelegateID);
@@ -122,7 +124,7 @@ public class PFMappingAccountantDelegate
 	 * @param organisationID
 	 * @param localAccountantDelegateID
 	 */
-	public PFMappingAccountantDelegate(LocalAccountantDelegate parent,
+	public MappingBasedAccountantDelegate(LocalAccountantDelegate parent,
 			String organisationID, String localAccountantDelegateID)
 	{
 		super(parent, organisationID, localAccountantDelegateID);
@@ -319,7 +321,7 @@ public class PFMappingAccountantDelegate
 			if (nested == null) {
 				nested = new LinkedList<ResolveProductTypeProvider>();
 				for (NestedProductTypeLocal nestedType : productType.getProductTypeLocal().getNestedProductTypeLocals()) {
-					nested.add(new ProductTypeProvider(PFMappingAccountantDelegate
+					nested.add(new ProductTypeProvider(MappingBasedAccountantDelegate
 							.getPackageType(nestedType), nestedType.getInnerProductTypeLocal().getProductType()));
 				}
 			}
@@ -362,7 +364,7 @@ public class PFMappingAccountantDelegate
 			if (nested == null) {
 				nested = new LinkedList<ResolveProductTypeProvider>();
 				for (ArticlePrice nestedPrice : articlePrice.getNestedArticlePrices()) {
-					nested.add(new ArticlePriceTypeProvider(PFMappingAccountantDelegate
+					nested.add(new ArticlePriceTypeProvider(MappingBasedAccountantDelegate
 							.getPackageType(nestedPrice), nestedPrice));
 				}
 			}
@@ -510,10 +512,10 @@ public class PFMappingAccountantDelegate
 		}
 		else {
 			LocalAccountantDelegate _delegate = productTypeProvider.getProductType().getProductTypeLocal().getLocalAccountantDelegate();
-			if (_delegate != null && !(_delegate instanceof PFMappingAccountantDelegate))
+			if (_delegate != null && !(_delegate instanceof MappingBasedAccountantDelegate))
 				return; // not compatible
 
-			PFMappingAccountantDelegate delegate = (PFMappingAccountantDelegate) _delegate;
+			MappingBasedAccountantDelegate delegate = (MappingBasedAccountantDelegate) _delegate;
 			if (delegate == null)
 				return; // No delegate assigned to the productType
 
@@ -547,14 +549,14 @@ public class PFMappingAccountantDelegate
 		while (!delegateHierarchy.isEmpty()) {
 			LocalAccountantDelegate _delegate = (LocalAccountantDelegate) delegateHierarchy
 					.removeLast();
-			if (!(_delegate instanceof PFMappingAccountantDelegate)) {
+			if (!(_delegate instanceof MappingBasedAccountantDelegate)) {
 				throw new IllegalStateException(
 						"There is an inconsistencey in the hierarchy of the LocalAccountantDelegate: "
 								+ _delegate.getLocalAccountantDelegateID()
 								+ " one of its nodes is not an "
-								+ PFMappingAccountantDelegate.class.getSimpleName());
+								+ MappingBasedAccountantDelegate.class.getSimpleName());
 			}
-			PFMappingAccountantDelegate delegate = (PFMappingAccountantDelegate) _delegate;
+			MappingBasedAccountantDelegate delegate = (MappingBasedAccountantDelegate) _delegate;
 			LinkedList<ProductType> productTypeHierarchy = new LinkedList<ProductType>();
 			ProductType pTypeRun = productType;
 			while (pTypeRun != null) {
@@ -693,9 +695,9 @@ public class PFMappingAccountantDelegate
 			Set<Anchor> involvedAnchors)
 	{
 		LocalAccountantDelegate delegate = productType.getProductTypeLocal().getLocalAccountantDelegate();
-		if (delegate instanceof PFMappingAccountantDelegate) {
+		if (delegate instanceof MappingBasedAccountantDelegate) {
 			// Have to delegate the booking of this product-type to its own delegate
-			((PFMappingAccountantDelegate) delegate).bookProductTypeParts(mandator,
+			((MappingBasedAccountantDelegate) delegate).bookProductTypeParts(mandator,
 					user, resolvedMappings, articlePriceStack, bookInvoiceTransfers,
 					delegationLevel + 1, container, involvedAnchors);
 			return;
@@ -1260,6 +1262,14 @@ public class PFMappingAccountantDelegate
 			BookMoneyTransfer container, Set<Anchor> involvedAnchors)
 	{
 		PersistenceManager pm = getPersistenceManager();
+		OrganisationLegalEntity mandator = Accounting.getAccounting(pm).getMandator();
+		Invoice invoice = container.getInvoice();
+		boolean revertTransferDirection = false;
+		if (invoice.getCustomer().equals(mandator)) {
+			// if the local organisation is the customer of the invoice
+			// we revert the transfer direction of ALL resolved transfers!
+			revertTransferDirection = true;
+		}
 		for (Iterator iter = bookInvoiceTransfers.entrySet().iterator(); iter
 				.hasNext();) {
 			Map.Entry entry = (Map.Entry) iter.next();
@@ -1280,8 +1290,16 @@ public class PFMappingAccountantDelegate
 							+ transfer.getAmount());
 					balance += transfer.getAmount();
 				}
+				// revert direction of transfers with negative amount.
 				Anchor aFrom = (balance > 0) ? from : to;
 				Anchor aTo = (balance > 0) ? to : from;
+				
+				if (revertTransferDirection) {
+					Anchor tmp = aFrom;
+					aFrom = aTo;
+					aTo = tmp;
+				}
+				
 				if (balance != 0) {
 					InvoiceMoneyTransfer moneyTransfer = new InvoiceMoneyTransfer(
 							InvoiceMoneyTransfer.BOOK_TYPE_BOOK, container, aFrom, aTo,
@@ -1745,7 +1763,7 @@ public class PFMappingAccountantDelegate
 					amount *= -1;
 				}
 
-				return new PFMappingAccountantDelegate.BookInvoiceTransfer(from, to,
+				return new MappingBasedAccountantDelegate.BookInvoiceTransfer(from, to,
 						amount);
 
 			}
@@ -1758,7 +1776,7 @@ public class PFMappingAccountantDelegate
 			Collection<BookInvoiceTransfer> transfers)
 	{
 		for (BookInvoiceTransfer transfer : transfers) {
-			logger.info(prefix + transfers.toString());
+			logger.info(prefix + transfer.toString());
 		}
 	}
 }

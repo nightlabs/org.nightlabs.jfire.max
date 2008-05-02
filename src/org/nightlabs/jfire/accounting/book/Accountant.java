@@ -33,14 +33,21 @@ import org.nightlabs.jfire.accounting.MoneyTransfer;
 import org.nightlabs.jfire.security.User;
 import org.nightlabs.jfire.trade.LegalEntity;
 import org.nightlabs.jfire.transfer.Anchor;
+import org.nightlabs.jfire.transfer.Transfer;
 
 /**
  * An Accountant is responsible for splitting money into several accounts and for
  * vetoing if a money transfer cannot be done. One Accountant can be responsible for an
  * undefinite number of accounts or for only one. The main job of the Accountant is
  * to split amounts e.g. into certain taxes.
+ * <p>
+ * The entry point for an accountants work is the {@link #bookTransfer(User, LegalEntity, MoneyTransfer, Set)}
+ * method that is called by {@link LegalEntity} when it books a Transfer itself (Each {@link LegalEntity} has
+ * an {@link Accountant} assigned).
+ * </p>
  *
  * @author Marco Schulze - marco at nightlabs dot de
+ * @author Alexander Bieber <!-- alex [AT] nightlabs [DOT] de -->
  *
  * @jdo.persistence-capable
  *		identity-type="application"
@@ -93,5 +100,17 @@ public abstract class Accountant implements Serializable
 	{
 		return accountantID;
 	}
+	
+	/**
+	 * This method is called by {@link LegalEntity} when it books the given 
+	 * {@link Transfer} itself and gives this Accountant the opportunity to
+	 * perform further action, like creating sub-transfers for the given
+	 * one.
+	 *  
+	 * @param user The user that initiated the given transfer.
+	 * @param mandator The mandator this accountant acts on behalf of.
+	 * @param transfer The transfer to book.
+	 * @param involvedAnchors All {@link Anchor}s involved in the booking process.
+	 */
 	public abstract void bookTransfer(User user, LegalEntity mandator, MoneyTransfer transfer, Set<Anchor> involvedAnchors);
 }

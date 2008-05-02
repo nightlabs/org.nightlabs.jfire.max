@@ -30,7 +30,6 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
-import java.util.Locale;
 import java.util.Map;
 import java.util.Set;
 
@@ -40,6 +39,7 @@ import javax.jdo.PersistenceManager;
 import javax.jdo.Query;
 
 import org.nightlabs.jdo.ObjectIDUtil;
+import org.nightlabs.jfire.accounting.Account;
 import org.nightlabs.jfire.accounting.MoneyTransfer;
 import org.nightlabs.jfire.accounting.book.Accountant;
 import org.nightlabs.jfire.accounting.id.CurrencyID;
@@ -381,6 +381,17 @@ public class LegalEntity extends Anchor
 			throw new IllegalArgumentException("I know only MoneyTransfer and ProductTransfer! Your container of type " + containers.getClass() + " cannot be processed!");
 	}
 
+	/**
+	 * The bookMoneyTransfer method of a {@link LegalEntity} adjusts the balance-map (balance per Currency)
+	 * and more importantly delegates to the {@link Account} set for the {@link LegalEntity}.
+	 * It gives the {@link Accountant} the possibility to perform further actions.
+	 * 
+	 * @see Accountant#bookTransfer(User, LegalEntity, MoneyTransfer, Set)
+	 * 
+	 * @param transfer The transfer to book.
+	 * @param user The user that initiated the transfer.
+	 * @param involvedAnchors All {@link Anchor}s involved in the booking process. 
+	 */
 	protected void bookMoneyTransfer(MoneyTransfer transfer, User user, Set<Anchor> involvedAnchors)
 	{
 		if (accountant == null)
@@ -623,7 +634,7 @@ public class LegalEntity extends Anchor
 	}
 
 	@Override
-	public String getDescription(Locale locale) {
+	protected String internalGetDescription() {
 		return getPerson().getDisplayName();
 	}
 }

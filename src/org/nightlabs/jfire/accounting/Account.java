@@ -31,7 +31,6 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
-import java.util.Locale;
 import java.util.Map;
 import java.util.Set;
 
@@ -43,6 +42,7 @@ import org.nightlabs.jfire.security.User;
 import org.nightlabs.jfire.trade.LegalEntity;
 import org.nightlabs.jfire.transfer.Anchor;
 import org.nightlabs.jfire.transfer.Transfer;
+import org.nightlabs.util.NLLocale;
 
 /**
  * Accounts are the anchors of {@link MoneyTransfer}s. They record the transfer amounts and
@@ -448,8 +448,8 @@ public class Account extends Anchor
 	}
 	
 	@Override
-	public String getDescription(Locale locale) {
-		return getName().getText(locale.getLanguage());
+	protected String internalGetDescription() {
+		return getName().getText(NLLocale.getDefault().getLanguage());
 	}
 
 //	/**

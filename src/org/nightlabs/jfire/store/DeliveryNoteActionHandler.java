@@ -6,8 +6,10 @@ import javax.jdo.JDOHelper;
 import javax.jdo.PersistenceManager;
 
 import org.nightlabs.jfire.security.User;
+import org.nightlabs.jfire.store.deliver.Delivery;
 import org.nightlabs.jfire.store.deliver.DeliveryData;
 import org.nightlabs.jfire.store.deliver.DeliveryException;
+import org.nightlabs.jfire.store.deliver.ServerDeliveryProcessor;
 import org.nightlabs.util.Util;
 
 

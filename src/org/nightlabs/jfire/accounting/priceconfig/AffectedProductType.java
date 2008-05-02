@@ -2,6 +2,7 @@ package org.nightlabs.jfire.accounting.priceconfig;
 
 import java.io.Serializable;
 
+import org.nightlabs.jfire.store.ProductType;
 import org.nightlabs.jfire.store.id.ProductTypeID;
 
 public class AffectedProductType

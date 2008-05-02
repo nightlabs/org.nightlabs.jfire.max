@@ -9,12 +9,15 @@ import javax.jdo.Query;
 
 import org.jbpm.JbpmContext;
 import org.jbpm.graph.exe.ProcessInstance;
+import org.nightlabs.jfire.accounting.Invoice;
 import org.nightlabs.jfire.jbpm.JbpmLookup;
 import org.nightlabs.jfire.jbpm.graph.def.AbstractActionHandler;
 import org.nightlabs.jfire.jbpm.graph.def.ActionHandlerNodeEnter;
 import org.nightlabs.jfire.jbpm.graph.def.ProcessDefinition;
 import org.nightlabs.jfire.jbpm.graph.def.Statable;
 import org.nightlabs.jfire.security.User;
+import org.nightlabs.jfire.store.DeliveryNote;
+import org.nightlabs.jfire.trade.Offer;
 import org.nightlabs.jfire.trade.TradeSide;
 
 /**

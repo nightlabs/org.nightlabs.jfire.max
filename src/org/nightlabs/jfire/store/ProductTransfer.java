@@ -31,7 +31,6 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
-import java.util.Locale;
 import java.util.Map;
 import java.util.Set;
 
@@ -234,12 +233,12 @@ implements Serializable, DetachCallback
 	 * </p>
 	 */
 	@Override
-	public String getDescription(Locale locale) {
+	protected String internalGetDescription() {
 		if (getContainer() != null)
-			return getContainer().getDescription(locale);
+			return getContainer().getDescription();
 		return String.format(
 				"ProductTransfer from %s to %s",
-				getFrom().getDescription(locale), getTo().getDescription(locale)
+				getFrom().getDescription(), getTo().getDescription()
 			);
 	}
 	

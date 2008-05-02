@@ -26,7 +26,6 @@
 
 package org.nightlabs.jfire.accounting;
 
-import java.util.Locale;
 
 import org.nightlabs.jfire.security.User;
 import org.nightlabs.jfire.transfer.Anchor;
@@ -271,12 +270,13 @@ public class MoneyTransfer extends Transfer
 	 * </p>
 	 */
 	@Override
-	public String getDescription(Locale locale) {
+	protected String internalGetDescription() {
 		if (getContainer() != null)
-			return getContainer().getDescription(locale);
+			return getContainer().getDescription();
 		return String.format(
 				"MoneyTransfer from %s to %s",
-				getFrom().getDescription(locale), getTo().getDescription(locale)
+				getFrom().getDescription(), getTo().getDescription()
 			);
 	}
+	
 }

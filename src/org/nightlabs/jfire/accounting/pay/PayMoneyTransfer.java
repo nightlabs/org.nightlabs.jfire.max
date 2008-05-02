@@ -28,7 +28,6 @@ package org.nightlabs.jfire.accounting.pay;
 
 import java.util.Collection;
 import java.util.Iterator;
-import java.util.Locale;
 
 import javax.jdo.JDOHelper;
 import javax.jdo.PersistenceManager;
@@ -182,7 +181,7 @@ public class PayMoneyTransfer extends MoneyTransfer
 	}
 	
 	@Override
-	public String getDescription(Locale locale) {
+	protected String internalGetDescription() {
 		String invoiceStr = "";
 		for (Iterator<Invoice> it = getPayment().getInvoices().iterator(); it.hasNext();) {
 			Invoice invoice = it.next();

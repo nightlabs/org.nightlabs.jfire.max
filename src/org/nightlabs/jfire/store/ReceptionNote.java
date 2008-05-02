@@ -14,6 +14,7 @@ import javax.jdo.listener.AttachCallback;
 import javax.jdo.listener.DetachCallback;
 
 import org.nightlabs.jdo.ObjectIDUtil;
+import org.nightlabs.jfire.jbpm.graph.def.ActionHandlerNodeEnter;
 import org.nightlabs.jfire.jbpm.graph.def.Statable;
 import org.nightlabs.jfire.jbpm.graph.def.StatableLocal;
 import org.nightlabs.jfire.jbpm.graph.def.State;

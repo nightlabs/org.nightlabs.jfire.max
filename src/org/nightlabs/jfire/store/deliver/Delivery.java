@@ -43,6 +43,7 @@ import org.nightlabs.jdo.ObjectIDUtil;
 import org.nightlabs.jfire.idgenerator.IDGenerator;
 import org.nightlabs.jfire.security.User;
 import org.nightlabs.jfire.store.DeliveryNote;
+import org.nightlabs.jfire.store.deliver.ServerDeliveryProcessor.DeliverParams;
 import org.nightlabs.jfire.store.deliver.id.DeliveryID;
 import org.nightlabs.jfire.store.deliver.id.ModeOfDeliveryFlavourID;
 import org.nightlabs.jfire.store.deliver.id.ServerDeliveryProcessorID;
@@ -51,6 +52,7 @@ import org.nightlabs.jfire.trade.Article;
 import org.nightlabs.jfire.trade.ArticleLocal;
 import org.nightlabs.jfire.trade.LegalEntity;
 import org.nightlabs.jfire.trade.id.ArticleID;
+import org.nightlabs.jfire.transfer.Transfer;
 import org.nightlabs.jfire.transfer.id.AnchorID;
 
 /**

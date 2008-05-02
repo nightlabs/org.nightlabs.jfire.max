@@ -44,6 +44,7 @@ import org.nightlabs.jfire.idgenerator.IDGenerator;
 import org.nightlabs.jfire.organisation.Organisation;
 import org.nightlabs.jfire.store.Store;
 import org.nightlabs.jfire.store.StoreManager;
+import org.nightlabs.jfire.store.StoreManagerHelperBean;
 import org.nightlabs.jfire.store.StoreManagerHelperLocal;
 import org.nightlabs.jfire.store.StoreManagerHelperUtil;
 import org.nightlabs.jfire.store.StoreManagerUtil;

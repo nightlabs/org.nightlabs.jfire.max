@@ -63,14 +63,14 @@ import org.nightlabs.jdo.query.JDOQueryCollectionDecorator;
 import org.nightlabs.jdo.query.QueryCollection;
 import org.nightlabs.jfire.accounting.book.LocalAccountantDelegate;
 import org.nightlabs.jfire.accounting.book.id.LocalAccountantDelegateID;
+import org.nightlabs.jfire.accounting.book.mappingbased.MappingBasedAccountantDelegate;
 import org.nightlabs.jfire.accounting.book.mappingbased.MoneyFlowDimension;
 import org.nightlabs.jfire.accounting.book.mappingbased.MoneyFlowMapping;
 import org.nightlabs.jfire.accounting.book.mappingbased.OwnerDimension;
-import org.nightlabs.jfire.accounting.book.mappingbased.PFMappingAccountantDelegate;
 import org.nightlabs.jfire.accounting.book.mappingbased.PriceFragmentDimension;
 import org.nightlabs.jfire.accounting.book.mappingbased.SourceOrganisationDimension;
-import org.nightlabs.jfire.accounting.book.mappingbased.PFMappingAccountantDelegate.ResolvedMapEntry;
-import org.nightlabs.jfire.accounting.book.mappingbased.PFMappingAccountantDelegate.ResolvedMapKey;
+import org.nightlabs.jfire.accounting.book.mappingbased.MappingBasedAccountantDelegate.ResolvedMapEntry;
+import org.nightlabs.jfire.accounting.book.mappingbased.MappingBasedAccountantDelegate.ResolvedMapKey;
 import org.nightlabs.jfire.accounting.gridpriceconfig.GridPriceConfig;
 import org.nightlabs.jfire.accounting.gridpriceconfig.GridPriceConfigUtil;
 import org.nightlabs.jfire.accounting.id.AccountTypeID;
@@ -1122,9 +1122,9 @@ public abstract class AccountingManagerBean
 		
 		ProductType productType = (ProductType) pm.getObjectById(productTypeID);
 		LocalAccountantDelegate delegate = (LocalAccountantDelegate) pm.getObjectById(localAccountantDelegateID);
-		if (!(delegate instanceof PFMappingAccountantDelegate))
-			throw new IllegalArgumentException("MoneyFlowMappings can only be resolved for instances of " + PFMappingAccountantDelegate.class.getName() + " but object with ID \"" + localAccountantDelegateID + "\" is an instance of " + delegate.getClass().getName());
-		Map<ResolvedMapKey, ResolvedMapEntry> resolvedMappings = ((PFMappingAccountantDelegate) delegate).resolveProductTypeMappings(productType);
+		if (!(delegate instanceof MappingBasedAccountantDelegate))
+			throw new IllegalArgumentException("MoneyFlowMappings can only be resolved for instances of " + MappingBasedAccountantDelegate.class.getName() + " but object with ID \"" + localAccountantDelegateID + "\" is an instance of " + delegate.getClass().getName());
+		Map<ResolvedMapKey, ResolvedMapEntry> resolvedMappings = ((MappingBasedAccountantDelegate) delegate).resolveProductTypeMappings(productType);
 		Map<ResolvedMapKey, ResolvedMapEntry> result = new HashMap<ResolvedMapKey, ResolvedMapEntry>();
 		for (Entry<ResolvedMapKey, ResolvedMapEntry> entry : resolvedMappings.entrySet()) {
 			ResolvedMapEntry persitentMapEntry = entry.getValue();

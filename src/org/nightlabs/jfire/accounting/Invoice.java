@@ -44,6 +44,8 @@ import javax.jdo.listener.DetachCallback;
 
 import org.nightlabs.jdo.ObjectIDUtil;
 import org.nightlabs.jfire.accounting.id.InvoiceID;
+import org.nightlabs.jfire.accounting.jbpm.ActionHandlerFinalizeInvoice;
+import org.nightlabs.jfire.jbpm.graph.def.ActionHandlerNodeEnter;
 import org.nightlabs.jfire.jbpm.graph.def.Statable;
 import org.nightlabs.jfire.jbpm.graph.def.StatableLocal;
 import org.nightlabs.jfire.jbpm.graph.def.State;
@@ -53,7 +55,6 @@ import org.nightlabs.jfire.trade.ArticleContainer;
 import org.nightlabs.jfire.trade.LegalEntity;
 import org.nightlabs.jfire.trade.Offer;
 import org.nightlabs.jfire.trade.Order;
-import org.nightlabs.jfire.trade.OrganisationLegalEntity;
 import org.nightlabs.jfire.trade.id.ArticleID;
 import org.nightlabs.jfire.transfer.Transfer;
 import org.nightlabs.jfire.transfer.id.AnchorID;

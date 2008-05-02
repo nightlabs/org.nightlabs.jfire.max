@@ -91,6 +91,7 @@ import org.nightlabs.jfire.trade.id.ArticleID;
 import org.nightlabs.jfire.trade.jbpm.ProcessDefinitionAssignment;
 import org.nightlabs.jfire.trade.jbpm.id.ProcessDefinitionAssignmentID;
 import org.nightlabs.jfire.transfer.Anchor;
+import org.nightlabs.jfire.transfer.Transfer;
 
 /**
  * The Store is responsible for managing all ProductTypes and Products

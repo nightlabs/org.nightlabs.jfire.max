@@ -28,7 +28,6 @@ package org.nightlabs.jfire.store;
 
 import java.util.Collection;
 import java.util.Iterator;
-import java.util.Locale;
 import java.util.Set;
 
 import javax.jdo.JDOHelper;
@@ -40,6 +39,7 @@ import org.nightlabs.jfire.trade.LegalEntity;
 import org.nightlabs.jfire.transfer.Anchor;
 import org.nightlabs.jfire.transfer.Transfer;
 import org.nightlabs.jfire.transfer.id.AnchorID;
+import org.nightlabs.util.NLLocale;
 
 /**
  * @author Marco Schulze - marco at nightlabs dot de
@@ -298,8 +298,8 @@ public class Repository extends Anchor
 	}
 
 	@Override
-	public String getDescription(Locale locale) {
-		return getName().getText(locale.getLanguage());
+	protected String internalGetDescription() {
+		return getName().getText(NLLocale.getDefault().getLanguage());
 	}
 
 }

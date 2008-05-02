@@ -27,6 +27,7 @@
 package org.nightlabs.jfire.accounting;
 
 import org.nightlabs.jfire.accounting.id.InvoiceID;
+import org.nightlabs.jfire.store.DeliveryNote;
 import org.nightlabs.jfire.trade.ArticleContainerException;
 import org.nightlabs.jfire.trade.id.ArticleID;
 

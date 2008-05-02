@@ -34,6 +34,7 @@ import javax.jdo.PersistenceManager;
 import org.nightlabs.jdo.ObjectIDUtil;
 import org.nightlabs.jfire.idgenerator.IDGenerator;
 import org.nightlabs.jfire.security.User;
+import org.nightlabs.jfire.trade.Article;
 
 /**
  * @author Marco Schulze - marco at nightlabs dot de

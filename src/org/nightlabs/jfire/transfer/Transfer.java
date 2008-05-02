@@ -28,11 +28,11 @@ package org.nightlabs.jfire.transfer;
 
 import java.io.Serializable;
 import java.util.Date;
-import java.util.Locale;
 import java.util.Set;
 
 import javax.jdo.JDOHelper;
 import javax.jdo.PersistenceManager;
+import javax.jdo.listener.DetachCallback;
 
 import org.apache.log4j.Logger;
 import org.nightlabs.jdo.ObjectIDUtil;
@@ -41,9 +41,10 @@ import org.nightlabs.jfire.security.User;
 
 /**
  * A {@link Transfer} is used to describe the transfer of something (money or products)
- * form one {@link Anchor} to another. 
+ * form one {@link Anchor} to another.
  * 
  * @author Marco Schulze - marco at nightlabs dot de
+ * @author Alexander Bieber <!-- alex [AT] nightlabs [DOT] de -->
  *
  * @jdo.persistence-capable
  *		identity-type="application"
@@ -63,7 +64,7 @@ import org.nightlabs.jfire.security.User;
  * @jdo.fetch-group name="Transfer.this" fields="container, from, to, initiator"
  */
 public abstract class Transfer
-implements Serializable
+implements Serializable, DetachCallback
 {
 	private static final long serialVersionUID = 1L;
 
@@ -74,6 +75,8 @@ implements Serializable
 	public static final String FETCH_GROUP_TO = "Transfer.to";
 	public static final String FETCH_GROUP_INITIATOR = "Transfer.initiator";
 	public static final String FETCH_GROUP_THIS_TRANSFER = "Transfer.this";
+	
+	public static final String FETCH_GROUP_DESCRIPTION = "Transfer.description";
 
 	/**
 	 * @jdo.field primary-key="true"
@@ -298,6 +301,16 @@ implements Serializable
 		this.bookedTo = bookedTo;
 	}
 
+	/**
+	 * Returns whether this Transfer was already booked. Note, that it will also return
+	 * <code>false</code> after {@link #rollbackTransfer(User, Set)} was invoked. 
+	 * <p>
+	 * Note, that this method will throw and {@link IllegalStateException}
+	 * if only one of the Anchors (to or from) registered the booking of
+	 * the Transfer by setting {@link #setBookedFrom(boolean)} or {@link #setBookedFrom(boolean)}.
+	 * </p>
+	 * @return Whether this Transfer was already booked.
+	 */
 	public boolean isBooked()
 	{
 		if (bookedFrom && !bookedTo)
@@ -310,9 +323,26 @@ implements Serializable
 	}
 
 	/**
-	 * This method calls <tt>from.bookTransfer(...)</tt> and
-	 * <tt>to.bookTransfer(...)</tt>. Some special implementations
-	 * might do other stuff, too.
+	 * This method is called when a new Transfer is created an it should
+	 * be registered in the system.
+	 * <p>
+	 * It calls the bookTransfer method of the to-anchor
+	 * and the from-anchor. The anchors are then themselves responsible
+	 * to perform necessary actions reflecting the new transfer.
+	 * For example a LegalEntity will delegate the work to its Accountant.
+	 * </p>
+	 * <p>
+	 * Note, that the Anchors of the Transfer must call either {@link #setBookedFrom(boolean)}
+	 * or {@link #setBookedTo(boolean)} in order tell the Transfer that
+	 * it was booked.
+	 * </p>
+	 * <p>
+	 * Some sub-classes of Transfer might do additional stuff, too.
+	 * For example an InvoiceMoneyTransfer registers the amount paid
+	 * in the Invoice.
+	 * </p>
+	 * @param user The user that initiated the booking (creation) of this transfer
+	 * @param involvedAnchors All {@link Anchor}s involved in the booking process.
 	 */
 	public void bookTransfer(User user, Set<Anchor> involvedAnchors)
 	{
@@ -326,6 +356,23 @@ implements Serializable
 		to.bookTransfer(user, this, involvedAnchors);
 	}
 
+	/**
+	 * This method is called when an existing and already booked
+	 * Transfer should be rolled back, i.e. the actions upon booking
+	 * should be undone.
+	 * <p>
+	 * This method calls the rollbackTransfer method of the to-anchor
+	 * and the from-anchor. The anchors are then themselves responsible
+	 * to perform necessary actions reflecting the rolled back transfer.
+	 * </p>
+	 * <p>
+	 * Some sub-classes of Transfer might do additional stuff, too.
+	 * For example an InvoiceMoneyTransfer registers the rolled back amount
+	 * in the Invoice.
+	 * </p> 
+	 * @param user The user that initiated the transfer rollback. 
+	 * @param involvedAnchors All {@link Anchor}s involved in the rollback proccss.
+	 */
 	public void rollbackTransfer(User user, Set<Anchor> involvedAnchors)
 	{
 		if (logger.isInfoEnabled()) {
@@ -337,7 +384,15 @@ implements Serializable
 		from.rollbackTransfer(user, this, involvedAnchors);
 		to.rollbackTransfer(user, this, involvedAnchors);
 	}
-
+	
+	/**
+	 * Returns the {@link PersistenceManager} this Transfer 
+	 * is associated with. This method will fail if the
+	 * Transfer is not attached, an {@link IllegalStateException}
+	 * will then be thrown.
+	 * 
+	 * @return The {@link PersistenceManager} this Transfer is associated with.
+	 */
 	protected PersistenceManager getPersistenceManager()
 	{
 		PersistenceManager pm = JDOHelper.getPersistenceManager(this);
@@ -348,12 +403,52 @@ implements Serializable
 	}
 	
 	/**
+	 * @jdo.field persistence-modifier="none"
+	 */
+	private String description = null;
+	
+	/**
+	 * @jdo.field persistence-modifier="none"
+	 */
+	private boolean description_detached = false;
+	
+	/**
+	 * Returns a human readable description for this Transfer.
+	 * 
+	 * @return returns a human readable description for this Transfer
+	 */
+	public String getDescription() {
+		if (description == null && !description_detached)
+			description = internalGetDescription();
+		
+		return description;
+	}
+	
+	/**
 	 * This should return a human readable description of the transfer.
 	 * <p>
-	 * Note that this method should only be called on attached instances of Transfer.
+	 * Note that this method can assume that it is called on attached instances of Transfer.
 	 * </p>
-	 * @param locale The locale for the description.
 	 * @return A human readable description of the transfer.
 	 */
-	public abstract String getDescription(Locale locale);
+	protected abstract String internalGetDescription();
+	
+	/**
+	 * Checks for the {@link #FETCH_GROUP_DESCRIPTION} and
+	 * set the non-persitent member for the description.
+	 */
+	@Override
+	public void jdoPostDetach(Object _attached) {
+		Transfer attached = (Transfer) _attached;
+		Transfer detached = this;
+		PersistenceManager pm = attached.getPersistenceManager();
+		if (pm.getFetchPlan().getGroups().contains(FETCH_GROUP_DESCRIPTION)) {
+			detached.description_detached = true;
+			detached.description = attached.getDescription();
+		}
+	}
+	
+	@Override
+	public void jdoPreDetach() {
+	}
 }

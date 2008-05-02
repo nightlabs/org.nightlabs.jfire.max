@@ -1,9 +1,9 @@
 package org.nightlabs.jfire.accounting;
 
-import java.util.Locale;
 
 import org.nightlabs.jfire.security.User;
 import org.nightlabs.jfire.transfer.Anchor;
+import org.nightlabs.util.NLLocale;
 
 /**
  * @author Chairat Kongarayawetchakun <chairatk[AT]nightlabs[DOT]de>
@@ -56,7 +56,9 @@ public class ManualMoneyTransfer extends MoneyTransfer
 	}
 	
 	@Override
-	public String getDescription(Locale locale) {
+	protected String internalGetDescription() {
+		if (reason != null)
+			return reason.getText(NLLocale.getDefault().getLanguage());
 		return String.format(
 				"Manual moneytransfer"
 			);

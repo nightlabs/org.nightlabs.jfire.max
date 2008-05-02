@@ -31,7 +31,6 @@ import java.util.Collection;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
-import java.util.Locale;
 import java.util.Set;
 
 import javax.jdo.JDOHelper;
@@ -217,7 +216,7 @@ public class DeliverProductTransfer extends ProductTransfer
 	}
 	
 	@Override
-	public String getDescription(Locale locale) {
+	protected String internalGetDescription() {
 		return String.format(
 				"Delivery %s",
 				getDelivery().getPrimaryKey()

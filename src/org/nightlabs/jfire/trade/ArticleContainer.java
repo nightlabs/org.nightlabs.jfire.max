@@ -29,6 +29,7 @@ package org.nightlabs.jfire.trade;
 import java.util.Collection;
 import java.util.Date;
 
+import org.nightlabs.jdo.ObjectIDUtil;
 import org.nightlabs.jfire.security.User;
 import org.nightlabs.jfire.transfer.id.AnchorID;
 

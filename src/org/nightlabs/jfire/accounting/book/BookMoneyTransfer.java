@@ -26,7 +26,6 @@
 
 package org.nightlabs.jfire.accounting.book;
 
-import java.util.Locale;
 
 import org.apache.log4j.Logger;
 import org.nightlabs.jfire.accounting.Invoice;
@@ -95,7 +94,7 @@ public class BookMoneyTransfer extends InvoiceMoneyTransfer
 	}
 	
 	@Override
-	public String getDescription(Locale locale) {
+	protected String internalGetDescription() {
 		return String.format(
 				"Booking of invoice %s",
 				getInvoice().getPrimaryKey()

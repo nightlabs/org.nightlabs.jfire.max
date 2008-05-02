@@ -285,7 +285,7 @@ implements Serializable, DetachCallback, StoreCallback, DeleteCallback
 			@Override
 			public void preStore(InstanceLifecycleEvent event) {
 				if (NLJDOHelper.exists(getPersistenceManager(), IssueLink.this)) {
-					
+					isExisting = true;
 					if (logger.isDebugEnabled())
 						logger.debug("jdoPreStore: the IssueLink " + getPrimaryKey() + " already exists - no need to call the IssueLinkType's afterCreateIssueLink callback method.");
 				}

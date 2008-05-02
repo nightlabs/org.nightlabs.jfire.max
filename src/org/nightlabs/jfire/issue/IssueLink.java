@@ -281,8 +281,14 @@ implements Serializable, DetachCallback, StoreCallback, DeleteCallback
 		// => use NLJDOHelper.exists(getPersistenceManager(), IssueLink.this)
 
 		getPersistenceManager().addInstanceLifecycleListener(new StoreLifecycleListener() {
+			boolean isExisting = false;
 			@Override
 			public void preStore(InstanceLifecycleEvent event) {
+				if (NLJDOHelper.exists(getPersistenceManager(), IssueLink.this)) {
+					
+					if (logger.isDebugEnabled())
+						logger.debug("jdoPreStore: the IssueLink " + getPrimaryKey() + " already exists - no need to call the IssueLinkType's afterCreateIssueLink callback method.");
+				}
 			}
 			@Override
 			public void postStore(InstanceLifecycleEvent event) {
@@ -290,17 +296,12 @@ implements Serializable, DetachCallback, StoreCallback, DeleteCallback
 					return;
 
 				getPersistenceManager().removeInstanceLifecycleListener(this);
-
-				if (NLJDOHelper.exists(getPersistenceManager(), IssueLink.this)) {
-					if (logger.isDebugEnabled())
-						logger.debug("jdoPreStore: the IssueLink " + getPrimaryKey() + " already exists - no need to call the IssueLinkType's afterCreateIssueLink callback method.");
-				}
-				else {
+				
+				if (!isExisting)
 					if (logger.isDebugEnabled())
 						logger.debug("jdoPreStore: the IssueLink " + getPrimaryKey() + " does NOT yet exist - calling the IssueLinkType's afterCreateIssueLink callback method.");
 					
 					getIssueLinkType().postCreateIssueLink(IssueLink.this);
-				}
 			}
 		}, new Class[] { IssueLink.class });
 	}

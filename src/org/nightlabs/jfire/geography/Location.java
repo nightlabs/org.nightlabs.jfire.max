@@ -27,12 +27,8 @@
 package org.nightlabs.jfire.geography;
 
 import java.io.Serializable;
-import java.util.Collection;
-import java.util.Locale;
 
 import javax.jdo.JDOHelper;
-import javax.jdo.PersistenceManager;
-import javax.jdo.Query;
 
 import org.nightlabs.jfire.geography.id.LocationID;
 import org.nightlabs.util.Util;

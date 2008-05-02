@@ -34,8 +34,6 @@ import java.util.Locale;
 import java.util.Map;
 
 import javax.jdo.JDOHelper;
-import javax.jdo.PersistenceManager;
-import javax.jdo.Query;
 
 import org.nightlabs.jfire.geography.id.CityID;
 import org.nightlabs.util.Util;

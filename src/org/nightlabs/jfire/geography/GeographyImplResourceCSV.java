@@ -11,7 +11,9 @@ import java.util.StringTokenizer;
 import org.apache.log4j.Logger;
 import org.nightlabs.annotation.Implement;
 import org.nightlabs.jdo.ObjectIDUtil;
+import org.nightlabs.jfire.security.SecurityReflector;
 import org.nightlabs.util.CollectionUtil;
+import org.nightlabs.util.NLLocale;
 
 public class GeographyImplResourceCSV
 extends Geography
@@ -595,7 +597,7 @@ extends Geography
 						}
 
 						if ("".equals(districtName))
-							districtName = city.getName().getText(Locale.getDefault().getLanguage());
+							districtName = city.getName().getText(NLLocale.getDefault().getLanguage());
 
 						double latitude = 0;
 						try {
@@ -723,7 +725,7 @@ extends Geography
 						}
 
 						if (!district.getCity().getCityID().equals(cityID)) {
-							String languageID = Locale.getDefault().getLanguage();
+							String languageID = NLLocale.getDefault().getLanguage();
 							City csvCity = cities.get(City.getPrimaryKey(countryID, csvOrganisationID, cityID));
 							String csvCityName = csvCity == null ? "{unknown city}" : csvCity.getName().getText(languageID);
 

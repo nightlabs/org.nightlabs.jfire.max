@@ -11,6 +11,7 @@ import javax.jdo.PersistenceManager;
 
 import org.nightlabs.io.DataBuffer;
 import org.nightlabs.jfire.base.Lookup;
+import org.nightlabs.jfire.security.SecurityReflector;
 import org.nightlabs.util.IOUtil;
 
 /**

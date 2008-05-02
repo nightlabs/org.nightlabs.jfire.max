@@ -43,6 +43,7 @@ import org.apache.log4j.Logger;
 import org.nightlabs.jfire.geography.Country;
 import org.nightlabs.jfire.geography.Geography;
 import org.nightlabs.jfire.geography.GeographyImplResourceCSV;
+import org.nightlabs.util.NLLocale;
 
 public class CreateCountryCSVFromLocale
 {
@@ -71,7 +72,7 @@ public class CreateCountryCSVFromLocale
 			logger.info("Loading countries from "+Locale.class.getName()+"...");
 			String[] countryIDs = Locale.getISOCountries();
 			String[] languageIDs = Locale.getISOLanguages();
-			String defaultLanguageID = Locale.getDefault().getLanguage();
+			String defaultLanguageID = NLLocale.getDefault().getLanguage();
 
 			int countryCount = 0;
 			int countryLangCount = 0;

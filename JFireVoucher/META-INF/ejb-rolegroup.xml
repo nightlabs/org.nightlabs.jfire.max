@@ -1,0 +1,73 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE ejb-rolegroup
+PUBLIC "-//NightLabs GmbH//DTD JFire role groups 1.0//EN"
+"http://www.nightlabs.de/dtd/ejb-rolegroup_1_0.dtd">
+
+<ejb-rolegroup>
+	<rolegroups defaultgroup="JFireVoucher.Admin">
+
+		<rolegroup id="JFireVoucher.VoucherType.edit">
+			<name>Edit voucher types</name>
+			<name language="de">Gutscheintypen bearbeiten</name>
+
+			<description>Edit voucher types, i.e. create new ones, change name and other properties etc.</description>
+			<description language="de">Gutscheintypen bearbeiten, also neue erstellen, den Namen und andere Eigenschaften ändern etc.</description>
+			
+			<roles>
+				<role id="org.nightlabs.jfire.voucher.VoucherManager.VoucherType.read"/>
+			</roles>			
+		</rolegroup>
+
+		<rolegroup id="JFireVoucher.VoucherType.view">
+			<name>View voucher types</name>
+			<name language="de">Gutscheintypen anzeigen</name>
+			<description>View voucher types</description>
+			<description language="de">Gutscheintypen anzeigen</description>
+			
+			<roles>
+				<role id="org.nightlabs.jfire.voucher.VoucherManager.VoucherType.read"/>
+			</roles>			
+		</rolegroup>
+
+		<rolegroup id="JFireVoucher.Voucher.sell">
+			<name>Sell vouchers</name>
+			<name language="de">Gutscheine verkaufen</name>
+
+			<description>Sell vouchers</description>
+			<description language="de">Gutscheine verkaufen</description>
+
+			<includerolegroup id="JFireVoucher.VoucherType.view"/>
+			<roles>
+				<role id="org.nightlabs.jfire.voucher.VoucherManager.Voucher.sell"/>
+			</roles>			
+		</rolegroup>
+
+		<rolegroup id="JFireVoucher.Voucher.reverse">
+			<name>Reverse vouchers</name>
+			<name language="de">Gutscheine stornieren</name>
+
+			<description>Reverse vouchers</description>
+			<description language="de">Gutscheine stornieren</description>
+
+			<includerolegroup id="JFireVoucher.VoucherType.view"/>
+			<roles>
+				<role id="org.nightlabs.jfire.voucher.VoucherManager.Voucher.reverse"/>
+			</roles>			
+		</rolegroup>
+
+		<rolegroup id="JFireVoucher.Admin">
+			<!-- This rolegroup is defined as "defaultgroup". This means, all roles that are not mentioned
+					in this file, but declared in ejb-jar.xml, will be registered within this rolegroup.
+			-->
+		
+			<name>Administrate vouchers</name>
+			<name language="de">Gutscheine verwalten</name>
+			<description>This group contains all rights that exist in the voucher module.</description>
+			<description language="de">Diese Gruppe beinhaltet alle Rechte, die im Gutscheinmodul existieren.</description>
+			<includerolegroup id="JFireVoucher.Voucher.sell"/>
+			<includerolegroup id="JFireVoucher.Voucher.reverse"/>
+			<includerolegroup id="JFireVoucher.VoucherType.edit"/>
+		</rolegroup>
+
+	</rolegroups>
+</ejb-rolegroup>

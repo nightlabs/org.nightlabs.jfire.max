@@ -115,6 +115,9 @@ public abstract class ReportRegistryItem implements Serializable, DetachCallback
 	public static final String FETCH_GROUP_PARENT_CATEGORY_ID = "ReportRegistryItem.parentCategoryID";
 	public static final String FETCH_GROUP_NAME = "ReportRegistryItem.name";
 	public static final String FETCH_GROUP_DESCRIPTION = "ReportRegistryItem.description";
+	/**
+	 * @deprecated The *.this-FetchGroups lead to bad programming style and are therefore deprecated, now. They should be removed soon! 
+	 */
 	public static final String FETCH_GROUP_THIS_REPORT_REGISTRY_ITEM = "ReportRegistryItem.this";
 	
 	

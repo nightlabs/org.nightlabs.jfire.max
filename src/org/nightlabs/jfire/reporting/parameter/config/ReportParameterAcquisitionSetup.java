@@ -51,6 +51,9 @@ implements Serializable
 	public static final String FETCH_GROUP_DEFAULT_USE_CASE = "ReportParameterAcquisitionSetup.defaultUseCase";
 	public static final String FETCH_GROUP_REPORT_LAYOUT = "ReportParameterAcquisitionSetup.reportLayout";
 	public static final String FETCH_GROUP_VALUE_ACQUISITION_SETUPS = "ReportParameterAcquisitionSetup.valueAcquisitionSetups";
+	/**
+	 * @deprecated The *.this-FetchGroups lead to bad programming style and are therefore deprecated, now. They should be removed soon! 
+	 */
 	public static final String FETCH_GROUP_THIS_REPORT_PARAMETER_ACQUISITION_SETUP = "ReportParameterAcquisitionSetup.this";
 			 
 			 

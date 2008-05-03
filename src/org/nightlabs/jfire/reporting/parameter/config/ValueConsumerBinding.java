@@ -37,6 +37,9 @@ public class ValueConsumerBinding implements Serializable {
 	
 	public static final String FETCH_GROUP_CONSUMER = "ValueConsumerBinding.consumer";
 	public static final String FETCH_GROUP_PROVIDER = "ValueConsumerBinding.provider";
+	/**
+	 * @deprecated The *.this-FetchGroups lead to bad programming style and are therefore deprecated, now. They should be removed soon! 
+	 */
 	public static final String FETCH_GROUP_THIS_VALUE_CONSUMER_BINDING = "ValueConsumerBinding.this";
 	
 	/**

@@ -53,6 +53,9 @@ implements Serializable
 	public static final String FETCH_GROUP_PARAMETER_CONFIGS = "ValueAcquisitionSetup.parameterConfigs";
 	public static final String FETCH_GROUP_VALUE_PROVIDER_CONFIGS = "ValueAcquisitionSetup.valueProviderConfigs";
 	public static final String FETCH_GROUP_VALUE_CONSUMER_BINDINGS = "ValueAcquisitionSetup.valueConsumerBindings";
+	/**
+	 * @deprecated The *.this-FetchGroups lead to bad programming style and are therefore deprecated, now. They should be removed soon! 
+	 */
 	public static final String FETCH_GROUP_THIS_VALUE_ACQUISITION_SETUP = "ValueAcquisitionSetup.this";
 
 	/**

@@ -75,6 +75,9 @@ public class ReportCategory extends ReportRegistryItem implements NestableReport
 	
 	// TODO: Would be great to have recursion depth here and for ReportRegistryItem.parentItem when thinking of caching in client
 	public static final String FETCH_GROUP_CHILD_ITEMS = "ReportCategory.childItems";
+	/**
+	 * @deprecated The *.this-FetchGroups lead to bad programming style and are therefore deprecated, now. They should be removed soon! 
+	 */
 	public static final String FETCH_GROUP_THIS_REPORT_CATEGORY = "ReportCategory.this";
 	
 	

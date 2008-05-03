@@ -63,6 +63,9 @@ public class ValueProvider implements Serializable, DetachCallback {
 	public static final String FETCH_GROUP_CATEGORY = "ValueProvider.category";
 	public static final String FETCH_GROUP_CATEGORY_ID = "ValueProvider.categoryID";
 	public static final String FETCH_GROUP_INPUT_PARAMETERS = "ValueProvider.inputParameters";
+	/**
+	 * @deprecated The *.this-FetchGroups lead to bad programming style and are therefore deprecated, now. They should be removed soon! 
+	 */
 	public static final String FETCH_GROUP_THIS_VALUE_PROVIDER = "ValueProvider.this";
 			 
 	/**

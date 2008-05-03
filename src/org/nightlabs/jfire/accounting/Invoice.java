@@ -136,6 +136,9 @@ implements Serializable, ArticleContainer, Statable, DetachCallback
 	public static final String FETCH_GROUP_DISCOUNT = "Invoice.discount";
 	public static final String FETCH_GROUP_FINALIZE_USER = "Invoice.finalizeUser";
 	public static final String FETCH_GROUP_PRICE = "Invoice.price";
+	/**
+	 * @deprecated The *.this-FetchGroups lead to bad programming style and are therefore deprecated, now. They should be removed soon! 
+	 */
 	public static final String FETCH_GROUP_THIS_INVOICE = "Invoice.this";
 
 	/**

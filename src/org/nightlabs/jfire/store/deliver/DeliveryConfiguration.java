@@ -78,6 +78,9 @@ implements Serializable
 	public static final String FETCH_GROUP_INCLUDED_CLIENT_DELIVERY_PROCESSOR_FACTORY_IDS = "DeliveryConfiguration.includedClientDeliveryProcessorFactoryIDs";
 	public static final String FETCH_GROUP_EXCLUDED_CLIENT_DELIVERY_PROCESSOR_FACTORY_IDS = "DeliveryConfiguration.excludedClientDeliveryProcessorFactoryIDs";
 	public static final String FETCH_GROUP_CROSS_TRADE_DELIVERY_COORDINATOR = "DeliveryConfiguration.crossTradeDeliveryCoordinator";
+	/**
+	 * @deprecated The *.this-FetchGroups lead to bad programming style and are therefore deprecated, now. They should be removed soon! 
+	 */
 	public static final String FETCH_GROUP_THIS_DELIVERY_CONFIGURATION = "DeliveryConfiguration.this";
 
 	/**

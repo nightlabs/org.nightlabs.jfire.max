@@ -214,6 +214,9 @@ implements
 //	public static final String FETCH_GROUP_LOCAL_ACCOUNTANT_DELEGATE = "ProductType.localAccountantDelegate";
 //	public static final String FETCH_GROUP_LOCAL_STOREKEEPER_DELEGATE = "ProductType.localStorekeeperDelegate";
 	public static final String FETCH_GROUP_PRODUCT_TYPE_LOCAL = "ProductType.productTypeLocal";
+	/**
+	 * @deprecated The *.this-FetchGroups lead to bad programming style and are therefore deprecated, now. They should be removed soon! 
+	 */
 	public static final String FETCH_GROUP_THIS_PRODUCT_TYPE = "ProductType.this";
 	
 	public static final String CANNOT_MAKE_SALEABLE_REASON_NOT_PUBLISHED = "ProductType.cannotMakeSaleable.notPublished";

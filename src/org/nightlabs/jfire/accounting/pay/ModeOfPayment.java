@@ -69,6 +69,9 @@ implements Serializable
 
 	public static final String FETCH_GROUP_NAME = "ModeOfPayment.name";
 	public static final String FETCH_GROUP_FLAVOURS = "ModeOfPayment.flavours";
+	/**
+	 * @deprecated The *.this-FetchGroups lead to bad programming style and are therefore deprecated, now. They should be removed soon! 
+	 */
 	public static final String FETCH_GROUP_THIS_MODE_OF_PAYMENT = "ModeOfPayment.this";
 
 	/**

@@ -68,6 +68,9 @@ public abstract class Anchor
 	private static final long serialVersionUID = 1L;
 
 	//	public static final String FETCH_GROUP_TRANSFERS = "Anchor.transfers";
+	/**
+	 * @deprecated The *.this-FetchGroups lead to bad programming style and are therefore deprecated, now. They should be removed soon! 
+	 */
 	public static final String FETCH_GROUP_THIS_ANCHOR = "Anchor.this";
 	public static final String FETCH_GROUP_DESCRIPTION = "Anchor.description";
 

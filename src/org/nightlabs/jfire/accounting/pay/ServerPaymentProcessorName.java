@@ -53,6 +53,9 @@ public class ServerPaymentProcessorName extends I18nText
 	private static final long serialVersionUID = 1L;
 	public static final String FETCH_GROUP_NAMES = "ServerPaymentProcessorName.names";
 	public static final String FETCH_GROUP_SERVER_PAYMENT_PROCESSOR = "ServerPaymentProcessorName.serverPaymentProcessor";
+	/**
+	 * @deprecated The *.this-FetchGroups lead to bad programming style and are therefore deprecated, now. They should be removed soon! 
+	 */
 	public static final String FETCH_GROUP_THIS_SERVER_PAYMENT_PROCESSOR_NAME = "ServerPaymentProcessorName.this";
 
 	/**

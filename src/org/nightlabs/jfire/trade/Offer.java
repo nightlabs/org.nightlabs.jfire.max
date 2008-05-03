@@ -120,6 +120,9 @@ implements
 	public static final String FETCH_GROUP_CURRENCY = "Offer.currency";
 	public static final String FETCH_GROUP_ORDER = "Offer.order";
 	public static final String FETCH_GROUP_CREATE_USER = "Offer.createUser";
+	/**
+	 * @deprecated The *.this-FetchGroups lead to bad programming style and are therefore deprecated, now. They should be removed soon! 
+	 */
 	public static final String FETCH_GROUP_THIS_OFFER = "Offer.this";
 	
 

@@ -64,6 +64,9 @@ public class Repository extends Anchor
 	public static final String FETCH_GROUP_OWNER = "Repository.owner";
 	public static final String FETCH_GROUP_NAME = "Repository.name";
 	public static final String FETCH_GROUP_REPOSITORY_TYPE = "Repository.repositoryType";
+	/**
+	 * @deprecated The *.this-FetchGroups lead to bad programming style and are therefore deprecated, now. They should be removed soon! 
+	 */
 	public static final String FETCH_GROUP_THIS_REPOSITORY = "Repository.this";
 
 //	/**

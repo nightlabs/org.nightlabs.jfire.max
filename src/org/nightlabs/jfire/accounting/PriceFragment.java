@@ -65,6 +65,9 @@ public class PriceFragment
 	public static final String FETCH_GROUP_PRICE = "PriceFragment.price";
 	public static final String FETCH_GROUP_CURRENCY = "PriceFragment.currency";
 	public static final String FETCH_GROUP_PRICE_FRAGMENT_TYPE = "PriceFragment.priceFragmentType";
+	/**
+	 * @deprecated The *.this-FetchGroups lead to bad programming style and are therefore deprecated, now. They should be removed soon! 
+	 */
 	public static final String FETCH_GROUP_THIS_PRICE_FRAGMENT = "PriceFragment.this";
 
 	/**

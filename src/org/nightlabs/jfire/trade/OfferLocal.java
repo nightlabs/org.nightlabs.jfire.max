@@ -80,6 +80,9 @@ implements Serializable, StatableLocal
 	public static final String FETCH_GROUP_ACCEPT_USER = "OfferLocal.acceptUser";
 	public static final String FETCH_GROUP_REJECT_USER = "OfferLocal.rejectUser";
 	public static final String FETCH_GROUP_CONFIRM_USER = "OfferLocal.confirmUser";
+	/**
+	 * @deprecated The *.this-FetchGroups lead to bad programming style and are therefore deprecated, now. They should be removed soon! 
+	 */
 	public static final String FETCH_GROUP_THIS_OFFER_LOCAL = "OfferLocal.this";
 
 	/**

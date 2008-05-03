@@ -43,6 +43,7 @@ import org.nightlabs.inheritance.FieldInheriter;
 import org.nightlabs.inheritance.FieldMetaData;
 import org.nightlabs.inheritance.Inheritable;
 import org.nightlabs.inheritance.InheritanceCallbacks;
+import org.nightlabs.inheritance.StaticFieldMetaData;
 import org.nightlabs.jdo.FetchPlanBackup;
 import org.nightlabs.jdo.NLJDOHelper;
 import org.nightlabs.jdo.inheritance.JDOSimpleFieldInheriter;
@@ -51,6 +52,7 @@ import org.nightlabs.jfire.accounting.priceconfig.AffectedProductType;
 import org.nightlabs.jfire.accounting.priceconfig.PriceConfigUtil;
 import org.nightlabs.jfire.accounting.priceconfig.id.PriceConfigID;
 import org.nightlabs.jfire.security.Authority;
+import org.nightlabs.jfire.security.AuthorityType;
 import org.nightlabs.jfire.security.User;
 import org.nightlabs.jfire.store.book.LocalStorekeeperDelegate;
 import org.nightlabs.jfire.store.id.ProductTypeID;
@@ -78,6 +80,7 @@ import org.nightlabs.util.Util;
  * @jdo.fetch-group name="ProductTypeLocal.localStorekeeperDelegate" fields="localStorekeeperDelegate"
  * @jdo.fetch-group name="ProductTypeLocal.nestedProductTypeLocals" fields="nestedProductTypeLocals"
  * @jdo.fetch-group name="ProductTypeLocal.fieldMetaDataMap" fields="fieldMetaDataMap"
+ * @jdo.fetch-group name="ProductTypeLocal.authority" fields="authority, authorityType"
  *
  * @jdo.fetch-group name="ProductType.productTypeLocal" fields="productType"
  * @jdo.fetch-group name="ProductType.this" fields="productType"
@@ -95,6 +98,11 @@ implements Serializable, Inheritable, InheritanceCallbacks
 	public static final String FETCH_GROUP_LOCAL_STOREKEEPER_DELEGATE = "ProductTypeLocal.localStorekeeperDelegate";
 	public static final String FETCH_GROUP_FIELD_METADATA_MAP = "ProductTypeLocal.fieldMetaDataMap";
 	public static final String FETCH_GROUP_NESTED_PRODUCT_TYPE_LOCALS = "ProductTypeLocal.nestedProductTypeLocals";
+
+	/**
+	 * loads both fields {@link #authority} and {@link #authorityType}, because the <code>AuthorityType</code> is the same instance anyway.
+	 */
+	public static final String FETCH_GROUP_AUTHORITY = "ProductTypeLocal.authority";
 
 	/**
 	 * @jdo.field primary-key="true"
@@ -151,6 +159,15 @@ implements Serializable, Inheritable, InheritanceCallbacks
 	 * @jdo.key mapped-by="fieldName"
 	 */
 	protected Map<String, ProductTypeLocalFieldMetaData> fieldMetaDataMap;
+
+	/**
+	 * The authority type for this product type. In an inheritance tree of product types, this must be the same for all product types.
+	 * That's why the {@link ProductTypeActionHandler#getAuthorityType(ProductType)} is called once for the root object only, the other
+	 * instances inherit this value.
+	 *
+	 * @jdo.field persistence-modifier="persistent"
+	 */
+	private AuthorityType authorityType;
 
 	/**
 	 * @jdo.field persistence-modifier="persistent"
@@ -246,6 +263,9 @@ implements Serializable, Inheritable, InheritanceCallbacks
 		if (fieldName.startsWith("tmpInherit"))
 			return null;
 
+		if ("authorityType".equals(fieldName))
+			return new StaticFieldMetaData(fieldName);
+
 // TODO the below checks for nestedProductTypes should be removed after a few months transition time.
 		if ("nestedProductTypes".equals(fieldName))
 			throw new IllegalArgumentException("The field 'nestedProductTypes' has been renamed to 'nestedProductTypeLocals' while it was moved to ProductTypeLocal!");
@@ -291,6 +311,9 @@ implements Serializable, Inheritable, InheritanceCallbacks
 
 	public void preInherit(Inheritable mother, Inheritable child)
 	{
+		if (getAuthority() == null);
+		if (getAuthorityType() == null);
+		
 		if (child == this) {
 			// check whether the nestedPoductTypes change - in this case we will recalculate prices after inheritance in postInherit(...)
 			// we copy the current nestedProductTypeLocals to tmpInherit_nestedProductTypes - then we compare them afterwards
@@ -502,6 +525,17 @@ implements Serializable, Inheritable, InheritanceCallbacks
 		return pm;
 	}
 
+	public AuthorityType getAuthorityType() {
+		return authorityType;
+	}
+
+	public void setAuthorityType(AuthorityType authorityType) {
+		if (this.authorityType != null && !this.authorityType.equals(authorityType))
+			throw new IllegalStateException("A different AuthorityType has already been assigned! Cannot change this value afterwards! Currently assigned: " + JDOHelper.getObjectId(this.authorityType) + " New value: " + JDOHelper.getObjectId(authorityType));
+
+		this.authorityType = authorityType;
+	}
+
 	/**
 	 * Get the currently assigned <code>Authority</code> or <code>null</code>.
 	 * <p>
@@ -526,6 +560,11 @@ implements Serializable, Inheritable, InheritanceCallbacks
 	 */
 	public void setAuthority(Authority authority)
 	{
+		if (authority != null) {
+			// check if the AuthorityType is correct.
+			if (!authority.getAuthorityType().equals(authorityType))
+				throw new IllegalArgumentException("authority.authorityType does not match this.authorityType! authority: " + JDOHelper.getObjectId(authority) + " this: " + JDOHelper.getObjectId(this));
+		}
 		this.authority = authority;
 	}
 }

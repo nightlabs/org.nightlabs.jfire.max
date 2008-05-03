@@ -77,6 +77,9 @@ implements Serializable, StatableLocal
 	
 	public static final String FETCH_GROUP_INVOICE = "InvoiceLocal.invoice";
 	public static final String FETCH_GROUP_BOOK_USER = "InvoiceLocal.bookUser";
+	/**
+	 * @deprecated The *.this-FetchGroups lead to bad programming style and are therefore deprecated, now. They should be removed soon! 
+	 */
 	public static final String FETCH_GROUP_THIS_INVOICE_LOCAL = "InvoiceLocal.this";
 
 	/**

@@ -93,6 +93,9 @@ public class LegalEntity extends Anchor
 	public static final String FETCH_GROUP_ACCOUNTANT = "LegalEntity.accountant";
 	public static final String FETCH_GROUP_STOREKEEPER = "LegalEntity.storekeeper";
 	public static final String FETCH_GROUP_PERSON = "LegalEntity.person";
+	/**
+	 * @deprecated The *.this-FetchGroups lead to bad programming style and are therefore deprecated, now. They should be removed soon! 
+	 */
 	public static final String FETCH_GROUP_THIS_LEGAL_ENTITY = "LegalEntity.this";
 	public static final String FETCH_GROUP_CUSTOMER_GROUPS = "LegalEntity.customerGroups";
 	public static final String FETCH_GROUP_DEFAULT_CUSTOMER_GROUP = "LegalEntity.defaultCustomerGroup";

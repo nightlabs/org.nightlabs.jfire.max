@@ -67,6 +67,9 @@ public class CustomerGroup implements Serializable
 	public static final String CUSTOMER_GROUP_ID_RESELLER = "CustomerGroup-reseller";
 
 	public static final String FETCH_GROUP_NAME = "CustomerGroup.name";
+	/**
+	 * @deprecated The *.this-FetchGroups lead to bad programming style and are therefore deprecated, now. They should be removed soon! 
+	 */
 	public static final String FETCH_GROUP_THIS_CUSTOMER_GROUP = "CustomerGroup.this";
 
 //	public static final String DEFAULT_CUSTOMER_GROUP_ID = "default";

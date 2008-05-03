@@ -63,6 +63,9 @@ implements Serializable
 
 	public static final String FETCH_GROUP_PACKAGE_PRODUCT_TYPE = "NestedProductTypeLocal.packageProductTypeLocal";
 	public static final String FETCH_GROUP_INNER_PRODUCT_TYPE = "NestedProductTypeLocal.innerProductTypeLocal";
+	/**
+	 * @deprecated The *.this-FetchGroups lead to bad programming style and are therefore deprecated, now. They should be removed soon! 
+	 */
 	public static final String FETCH_GROUP_THIS_PACKAGED_PRODUCT_TYPE = "NestedProductTypeLocal.this";
 
 	/**

@@ -60,6 +60,9 @@ public class SummaryAccount extends Account
 //	public static final String ANCHOR_TYPE_ID_SUMMARY = "Account.Summary";
 
 	public static final String FETCH_GROUP_SUMMED_ACCOUNTS = "SummaryAccount.summedAccounts";
+	/**
+	 * @deprecated The *.this-FetchGroups lead to bad programming style and are therefore deprecated, now. They should be removed soon! 
+	 */
 	public static final String FETCH_GROUP_THIS_SUMMARY_ACCOUNT = "SummaryAccount.this";
 
 	/**

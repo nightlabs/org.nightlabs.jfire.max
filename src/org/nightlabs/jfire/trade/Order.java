@@ -153,6 +153,9 @@ implements Serializable, ArticleContainer, SegmentContainer, DetachCallback
 	public static final String FETCH_GROUP_OFFERS = "Order.offers";
 	public static final String FETCH_GROUP_CREATE_USER = "Order.createUser";
 	public static final String FETCH_GROUP_CHANGE_USER = "Order.changeUser";
+	/**
+	 * @deprecated The *.this-FetchGroups lead to bad programming style and are therefore deprecated, now. They should be removed soon! 
+	 */
 	public static final String FETCH_GROUP_THIS_ORDER = "Order.this";
 
 

@@ -133,6 +133,9 @@ implements Serializable, ArticleContainer, Statable, DetachCallback
 	public static final String FETCH_GROUP_ARTICLES = "DeliveryNote.articles";
 	public static final String FETCH_GROUP_CREATE_USER = "DeliveryNote.createUser";
 	public static final String FETCH_GROUP_FINALIZE_USER = "DeliveryNote.finalizeUser";
+	/**
+	 * @deprecated The *.this-FetchGroups lead to bad programming style and are therefore deprecated, now. They should be removed soon! 
+	 */
 	public static final String FETCH_GROUP_THIS_DELIVERY_NOTE = "DeliveryNote.this";
 
 	public static final String FETCH_GROUP_VENDOR = "ArticleContainer.vendor";

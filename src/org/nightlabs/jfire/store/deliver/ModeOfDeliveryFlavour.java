@@ -144,6 +144,9 @@ implements Serializable
 	public static final String FETCH_GROUP_NAME = "ModeOfDeliveryFlavour.name";
 	public static final String FETCH_GROUP_MODE_OF_DELIVERY = "ModeOfDeliveryFlavour.modeOfDelivery";
 	public static final String FETCH_GROUP_ICON_16X16_DATA = "ModeOfDeliveryFlavour.icon16x16Data";
+	/**
+	 * @deprecated The *.this-FetchGroups lead to bad programming style and are therefore deprecated, now. They should be removed soon! 
+	 */
 	public static final String FETCH_GROUP_THIS_MODE_OF_DELIVERY_FLAVOUR = "ModeOfDeliveryFlavour.this";
 
 	public static class ModeOfDeliveryFlavourProductTypeGroupCarrier

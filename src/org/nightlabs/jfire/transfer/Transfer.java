@@ -74,6 +74,9 @@ implements Serializable, DetachCallback
 	public static final String FETCH_GROUP_FROM = "Transfer.from";
 	public static final String FETCH_GROUP_TO = "Transfer.to";
 	public static final String FETCH_GROUP_INITIATOR = "Transfer.initiator";
+	/**
+	 * @deprecated The *.this-FetchGroups lead to bad programming style and are therefore deprecated, now. They should be removed soon! 
+	 */
 	public static final String FETCH_GROUP_THIS_TRANSFER = "Transfer.this";
 	
 	public static final String FETCH_GROUP_DESCRIPTION = "Transfer.description";

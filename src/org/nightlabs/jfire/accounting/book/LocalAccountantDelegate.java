@@ -87,6 +87,9 @@ public abstract class LocalAccountantDelegate implements Serializable {
 	
 	public static final String FETCH_GROUP_NAME = "LocalAccountantDelegate.name";
 	public static final String FETCH_GROUP_EXTENDED_ACCOUNTANT_DELEGATE = "LocalAccountantDelegate.extendedAccountantDelegate";
+	/**
+	 * @deprecated The *.this-FetchGroups lead to bad programming style and are therefore deprecated, now. They should be removed soon! 
+	 */
 	public static final String FETCH_GROUP_THIS_LOCAL_ACCOUNTANT_DELEGATE = "LocalAccountantDelegate.this";
 	
 	public static final String QUERY_GET_CHILD_DELEGATES = "getChildDelegates";

@@ -77,6 +77,9 @@ public class ArticlePrice extends org.nightlabs.jfire.accounting.Price
 	public static final String FETCH_GROUP_NESTED_ARTICLE_PRICES_NO_LIMIT = "ArticlePrice.nestedArticlePrices[-1]";
 	public static final String FETCH_GROUP_ORIG_PRICE = "ArticlePrice.origPrice";
 	public static final String FETCH_GROUP_ARTICLE = "ArticlePrice.article";
+	/**
+	 * @deprecated The *.this-FetchGroups lead to bad programming style and are therefore deprecated, now. They should be removed soon! 
+	 */
 	public static final String FETCH_GROUP_THIS_ARTICLE_PRICE = "ArticlePrice.this";
 
 	/**

@@ -80,6 +80,9 @@ public class Segment implements Serializable
 
 	public static final String FETCH_GROUP_ORDER = "Segment.order";
 	public static final String FETCH_GROUP_SEGMENT_TYPE = "Segment.segmentType";
+	/**
+	 * @deprecated The *.this-FetchGroups lead to bad programming style and are therefore deprecated, now. They should be removed soon! 
+	 */
 	public static final String FETCH_GROUP_THIS_SEGMENT = "Segment.this";
 
 	public static Set<SegmentTypeID> getSegmentTypeIDs(PersistenceManager pm, Order order)

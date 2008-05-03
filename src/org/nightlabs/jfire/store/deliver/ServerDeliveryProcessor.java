@@ -116,6 +116,9 @@ implements Serializable, DetachCallback
 
 	public static final String FETCH_GROUP_MODE_OF_DELIVERY_FLAVOURS = "ServerDeliveryProcessor.modeOfDeliveryFlavours";
 
+	/**
+	 * @deprecated The *.this-FetchGroups lead to bad programming style and are therefore deprecated, now. They should be removed soon! 
+	 */
 	public static final String FETCH_GROUP_THIS_SERVER_DELIVERY_PROCESSOR = "ServerDeliveryProcessor.this";
 
 

@@ -55,6 +55,7 @@ import org.nightlabs.jfire.jbpm.graph.def.State;
 import org.nightlabs.jfire.jbpm.graph.def.Transition;
 import org.nightlabs.jfire.jbpm.graph.def.id.ProcessDefinitionID;
 import org.nightlabs.jfire.organisation.LocalOrganisation;
+import org.nightlabs.jfire.security.AuthorityType;
 import org.nightlabs.jfire.security.SecurityReflector;
 import org.nightlabs.jfire.security.User;
 import org.nightlabs.jfire.store.book.BookProductTransfer;
@@ -564,7 +565,12 @@ implements StoreCallback
 				throw new IllegalStateException("JPOX Workaround failed: There's no ProductTypeLocal!");
 		}
 		// TODO JPOX WORKAROUND - end
-		
+
+		if (productType.getExtendedProductType() == null) {
+			AuthorityType authorityType = ProductTypeActionHandler.getProductTypeActionHandler(pm, productType.getClass()).getAuthorityType(productType);
+			productType.getProductTypeLocal().setAuthorityType(authorityType);
+		}
+
 		return productType;
 	}
 

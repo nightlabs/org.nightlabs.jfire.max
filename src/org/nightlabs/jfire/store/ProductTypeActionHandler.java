@@ -36,6 +36,7 @@ import java.util.Map;
 import java.util.Set;
 
 import javax.jdo.JDOHelper;
+import javax.jdo.JDOObjectNotFoundException;
 import javax.jdo.PersistenceManager;
 import javax.jdo.Query;
 
@@ -47,8 +48,10 @@ import org.nightlabs.jfire.accounting.Invoice;
 import org.nightlabs.jfire.base.JFirePrincipal;
 import org.nightlabs.jfire.base.Lookup;
 import org.nightlabs.jfire.organisation.Organisation;
+import org.nightlabs.jfire.security.AuthorityType;
 import org.nightlabs.jfire.security.SecurityReflector;
 import org.nightlabs.jfire.security.User;
+import org.nightlabs.jfire.security.id.AuthorityTypeID;
 import org.nightlabs.jfire.store.deliver.Delivery;
 import org.nightlabs.jfire.store.deliver.DeliveryData;
 import org.nightlabs.jfire.store.deliver.id.DeliveryDataID;
@@ -969,6 +972,45 @@ public abstract class ProductTypeActionHandler
 	public void onDeliverEnd_storeDeliverEndServerResult(JFirePrincipal principal, Delivery delivery, Set<? extends Article> articles)
 	{
 	}
+
+	/**
+	 * Get the authority-type for a product type, which is the root element in an inheritance tree.
+	 * <p>
+	 * In an inheritance tree of product types, the assigned <code>AuthorityType</code> must be the same for all product types
+	 * (i.e. all children throughout the whole tree must have the same <code>AuthorityType</code>).
+	 * That's why this method is called once for the root element only, the other
+	 * instances of <code>ProductType</code> inherit this value.
+	 * </p>
+	 * The result of this method will be passed to {@link ProductTypeLocal#setAuthorityType(AuthorityType)} by
+	 * {@link Store#addProductType(User, ProductType)}.
+	 *
+	 * @return the AuthorityType for the given root product type.
+	 */
+	public AuthorityType getAuthorityType(ProductType rootProductType)
+	{
+		PersistenceManager pm = getPersistenceManager();
+		AuthorityTypeID authorityTypeID = getAuthorityTypeID(rootProductType);
+		AuthorityType authorityType = null;
+		try {
+			authorityType = (AuthorityType) pm.getObjectById(authorityTypeID);
+		} catch (JDOObjectNotFoundException x) {
+			authorityType = pm.makePersistent(createAuthorityType(authorityTypeID, rootProductType));
+		}
+		return authorityType;
+	}
+
+	/**
+	 * Create the AuthorityType defined by the given <code>authorityTypeID</code>. This is usually done during
+	 * datastore initialisation. You should populate the role groups by calling
+	 * {@link AuthorityType#addRoleGroup(org.nightlabs.jfire.security.RoleGroup)}.
+	 *
+	 * @param authorityTypeID
+	 * @param rootProductType
+	 * @return
+	 */
+	protected abstract AuthorityType createAuthorityType(AuthorityTypeID authorityTypeID, ProductType rootProductType);
+
+	public abstract AuthorityTypeID getAuthorityTypeID(ProductType rootProductType);
 
 //	/**
 //	 * Create/return an existing repository which is used to put a newly created product into it.

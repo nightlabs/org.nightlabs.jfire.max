@@ -374,7 +374,7 @@ public class MappingBasedAccountantDelegate
 
 	/**
 	 * Resolves all MoneyFlowMappings for the ProductTypes involved in the given
-	 * invoice. For a docu on the structure of the result see
+	 * invoice. For a documentation on the structure of the result see
 	 * {@link #resolveProductTypeMappings(ProductType)}
 	 * 
 	 * @param invoice
@@ -405,7 +405,7 @@ public class MappingBasedAccountantDelegate
 	 * returned here. Within the ResolvedMapEntries mappings are stored in an Map
 	 * with key (String) mappingKey and value {@link MoneyFlowMapping}. Upon
 	 * resolving mappings the delegation hierarchy and the productType hierarchy
-	 * are itearted from top down. Hereby matching mappings will be added to the
+	 * are iterated from top down. Hereby matching mappings will be added to the
 	 * resolved map with a fake mappingKey pretending that the mapping was made
 	 * for the ProductType searched for. By that mappings from child delegates and
 	 * for child-ProductTypes will overwrite the ones from their parents. For

@@ -162,7 +162,6 @@ public class PFMoneyFlowMapping extends MoneyFlowMapping
 	 * @see org.nightlabs.jfire.accounting.book.mappingbased.MoneyFlowMapping#addMappingsToMap(org.nightlabs.jfire.store.ProductType, java.util.Map)
 	 */
 	@Override
-	@Implement
 	public void addMappingsToMap(ProductType productType, Map<String, MoneyFlowMapping> resolvedMappings) {
 		// TODO: Add here instance multiple times for wildcards
 		resolvedMappings.put(

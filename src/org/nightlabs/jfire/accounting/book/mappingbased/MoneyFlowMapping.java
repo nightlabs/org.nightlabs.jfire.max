@@ -40,8 +40,9 @@ import org.nightlabs.jfire.trade.ArticlePrice;
 import org.nightlabs.util.Util;
 
 /**
- * Abstract mapping to an Account. Subclasses can add conditions on which money
- * should be transfered to the Account of this Mapping.
+ * Abstract mapping to an revenue and expense accounts. This class has the productType the package-type 
+ * and a currency as matching-condition. Subclasses may add conditions on which money
+ * should be transfered to the accounts of this mapping.
  * 
  * @author Alexander Bieber <alex[AT]nightlabs[DOT]de>
  * 
@@ -229,6 +230,9 @@ public abstract class MoneyFlowMapping implements Serializable {
 //		return (account != null) ? account.getPrimaryKey() : null;
 //	}
 
+	/**
+	 * @return The Account money should be transfered to when the ProductType of this mapping is sold.
+	 */	
 	public Account getRevenueAccount()
 	{
 		return revenueAccount;
@@ -240,6 +244,10 @@ public abstract class MoneyFlowMapping implements Serializable {
 //	public String getRevenueAccountPK() {
 //		return revenueAccount == null ? null : revenueAccount.getPrimaryKey();
 //	}
+	
+	/**
+	 * @return The Account money should be transfered from when the ProductType of this mapping is purchased.
+	 */	
 	public Account getExpenseAccount()
 	{
 		return expenseAccount;
@@ -302,15 +310,14 @@ public abstract class MoneyFlowMapping implements Serializable {
 			LocalAccountantDelegate localAccountantDelegate) {
 		this.localAccountantDelegate = localAccountantDelegate;
 	}
-
-	/**
-	 * @param productType TODO
-	 * @return
-	 */
-	public String getMappingKey(ProductType productType) {
-		return getMappingKey(getProductTypePK(), packageType, getCurrencyID())+"/"+getMappingConditionKey(productType);
-	}
 	
+	/**
+	 * Get an unique key for identifying this mapping, but for the given
+	 * ProductType. This can be used to simulate that a mapping was
+	 * defined for a different ProductType.
+	 * @param productType The ProductType to generate the key with.
+	 * @return An unique key for identifying this mapping
+	 */
 	public String simulateMappingKeyForProductType(ProductType productType) {
 		return getMappingKey(productType.getPrimaryKey(), packageType, getCurrencyID())+"/"+getMappingConditionKey(productType);
 	}
@@ -320,18 +327,38 @@ public abstract class MoneyFlowMapping implements Serializable {
 	}
 	
 	/**
-	 * Should return a
-	 * @return
+	 * Subclasses should return an unique key for the additional condition
+	 * (beside product-type, package-type and currency) that the bring
+	 * to the mapping. As an example, mappings based on price-fragments
+	 * would return the price-fragments primary key here.
+	 * 
+	 * @return An unique key for the additional condition
 	 */
 	public abstract String getMappingConditionKey(ProductType productType);
 	
-	public void populateResolvedMap() {
-		
-	}
-	
+	/**
+	 * Subclasses should add themselves to the given map but with a key
+	 * simulating that the mapping was made for the given ProductType
+	 * and not for the ProductType defined for the mapping. Subclasses
+	 * may use {@link #simulateMappingKeyPartForProductType(ProductType)}
+	 * for creating the simulated key.
+	 * The rest of the key should be the values of the dimensions of
+	 * the mapping for the given product-type. This is used later
+	 * to lookup a mapping for a given set of dimension values. 
+	 * 
+	 * @param productType The productType to simulate the mapping for.
+	 * @param resolvedMappings The map to add the mapping to.
+	 */
 	public abstract void addMappingsToMap(ProductType productType, Map<String, MoneyFlowMapping> resolvedMappings);
 	
-	
+	/**
+	 * Get an unique key identifying a mapping.
+	 *  
+	 * @param productTypePK The productTypes primary key of the mapping. 
+	 * @param packageType The package-type set for the mapping
+	 * @param currencyID The currencyID of the mapping.
+	 * @return An unique key identifying a mapping.
+	 */
 	public static String getMappingKey(
 			String productTypePK,
 			String packageType,
@@ -341,6 +368,13 @@ public abstract class MoneyFlowMapping implements Serializable {
 		return productTypePK+"/"+packageType+"/"+currencyID;
 	}
 	
+	/**
+	 * Return the amount of money this mapping takes from the given {@link ArticlePrice}
+	 * according to the given dimension values. 
+	 * An example is for example a mapping based on price-fragments that will extract and return
+	 * the amount of that price-fragment out of the {@link ArticlePrice}.
+	 * @return The amount from the given {@link ArticlePrice} this mapping is responsible for.
+	 */
 	// TODO: Must check for taking from multiple amounts
 	public abstract long getArticlePriceDimensionAmount(Map dimensionValues, ArticlePrice articlePrice);
 
@@ -350,13 +384,23 @@ public abstract class MoneyFlowMapping implements Serializable {
 //		setCurrency((Currency)getPersistenceManager().getObjectById(CurrencyID.create(getCurrencyID())));
 //		validateMapping();
 //	}
-
+	
+	/**
+	 * Check and validate this mappings state/properties.
+	 */
 	public abstract void validateMapping();
 	
 	protected PersistenceManager getPersistenceManager() {
 		return JDOHelper.getPersistenceManager(this);
 	}
-	
+	/**
+	 * Check if this mapping was made for the given {@link ProductType} and
+	 * the given package-type.
+	 * 
+	 * @param productType The {@link ProductType} to check.
+	 * @param packageType The package-type to check. 
+	 * @return Whether this mapping matches.
+	 */
 	public abstract boolean matches(ProductType productType, String packageType);
 
 	@Override

@@ -62,6 +62,9 @@ implements Serializable
 
 	private static final Logger logger = Logger.getLogger(PossibleValueProvider.class);
 
+	/**
+	 * @deprecated The *.this-FetchGroups lead to bad programming style and are therefore deprecated, now. They should be removed soon! 
+	 */
 	public static final String FETCH_GROUP_THIS_POSSIBLE_VALUE_PROVIDER = "PossibleValueProvider.this";
 	
 	public static final int LIMIT_UNLIMITED = -1;

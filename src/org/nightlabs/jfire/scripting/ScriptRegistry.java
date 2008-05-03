@@ -76,6 +76,9 @@ implements Serializable
 	
 	private static final long serialVersionUID = 1L;
 
+	/**
+	 * @deprecated The *.this-FetchGroups lead to bad programming style and are therefore deprecated, now. They should be removed soon! 
+	 */
 	public static final String FETCH_GROUP_THIS_SCRIPT_REGISTRY = "ScriptRegistry.this";
 	
 	/**

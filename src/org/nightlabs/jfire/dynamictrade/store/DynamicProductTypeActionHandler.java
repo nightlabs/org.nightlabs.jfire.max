@@ -7,7 +7,10 @@ import java.util.Hashtable;
 import javax.jdo.PersistenceManager;
 
 import org.nightlabs.annotation.Implement;
+import org.nightlabs.jfire.organisation.Organisation;
+import org.nightlabs.jfire.security.AuthorityType;
 import org.nightlabs.jfire.security.User;
+import org.nightlabs.jfire.security.id.AuthorityTypeID;
 import org.nightlabs.jfire.store.NestedProductTypeLocal;
 import org.nightlabs.jfire.store.Product;
 import org.nightlabs.jfire.store.ProductLocator;
@@ -33,6 +36,8 @@ import org.nightlabs.jfire.trade.id.SegmentID;
 public class DynamicProductTypeActionHandler
 		extends ProductTypeActionHandler
 {
+	public static final AuthorityTypeID AUTHORITY_TYPE_ID = AuthorityTypeID.create(Organisation.DEV_ORGANISATION_ID, DynamicProductType.class.getName());
+
 //	/**
 //	 * This is the {@link org.nightlabs.jfire.transfer.Anchor#getAnchorID()} of
 //	 * the {@link Repository} which becomes the factory-output-repository for all
@@ -149,4 +154,15 @@ public class DynamicProductTypeActionHandler
 		throw new UnsupportedOperationException("DynamicProductTypes do not support cross-trade!");
 	}
 
+	@Override
+	public AuthorityTypeID getAuthorityTypeID(ProductType rootProductType) {
+		return AUTHORITY_TYPE_ID;
+	}
+
+	@Override
+	protected AuthorityType createAuthorityType(AuthorityTypeID authorityTypeID, ProductType rootProductType) {
+		AuthorityType authorityType = new AuthorityType(authorityTypeID);
+		// TODO configure access rights completely - implement manual checking where necessary!
+		return authorityType;
+	}
 }

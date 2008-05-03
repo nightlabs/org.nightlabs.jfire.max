@@ -57,7 +57,9 @@ import org.nightlabs.util.Util;
 public class IssueType
 implements Serializable{
 	private static final long serialVersionUID = 1L;
-	
+	/**
+	 * @deprecated The *.this-FetchGroups lead to bad programming style and are therefore deprecated, now. They should be removed soon! 
+	 */
 	public static final String FETCH_GROUP_THIS_ISSUE_TYPE = "IssueType.this";
 	public static final String FETCH_GROUP_NAME = "IssueType.name";
 	public static final String FETCH_GROUP_ISSUE_PRIORITIES = "IssueType.issuePriorities";

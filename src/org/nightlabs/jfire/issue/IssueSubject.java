@@ -26,6 +26,9 @@ import org.nightlabs.jdo.ObjectIDUtil;
 public class IssueSubject 
 	extends I18nText
 {	
+	/**
+	 * @deprecated The *.this-FetchGroups lead to bad programming style and are therefore deprecated, now. They should be removed soon! 
+	 */
 	public static final String FETCH_GROUP_THIS_ISSUE_SUBJECT_NAMES = "IssueSubject.names";
 	
 	/**

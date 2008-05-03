@@ -52,6 +52,9 @@ implements Serializable, DetachCallback, StoreCallback, DeleteCallback
 {
 	private static final Logger logger = Logger.getLogger(IssueLink.class);
 
+	/**
+	 * @deprecated The *.this-FetchGroups lead to bad programming style and are therefore deprecated, now. They should be removed soon! 
+	 */
 	public static final String FETCH_GROUP_THIS_ISSUE_LINK = "IssueLink.this";
 	public static final String FETCH_GROUP_ISSUE_LINK_TYPE = "IssueLink.issueLinkType";
 

@@ -16,7 +16,10 @@ import org.nightlabs.jdo.NLJDOHelper;
 import org.nightlabs.jfire.accounting.Price;
 import org.nightlabs.jfire.accounting.TariffMapping;
 import org.nightlabs.jfire.accounting.id.TariffID;
+import org.nightlabs.jfire.organisation.Organisation;
+import org.nightlabs.jfire.security.AuthorityType;
 import org.nightlabs.jfire.security.User;
+import org.nightlabs.jfire.security.id.AuthorityTypeID;
 import org.nightlabs.jfire.simpletrade.SimpleTradeManager;
 import org.nightlabs.jfire.simpletrade.SimpleTradeManagerUtil;
 import org.nightlabs.jfire.store.NestedProductTypeLocal;
@@ -47,6 +50,8 @@ import org.nightlabs.util.CollectionUtil;
 public class SimpleProductTypeActionHandler
 		extends ProductTypeActionHandler
 {
+	public static final AuthorityTypeID AUTHORITY_TYPE_ID = AuthorityTypeID.create(Organisation.DEV_ORGANISATION_ID, SimpleProductType.class.getName());
+
 	/**
 	 * @deprecated Only for JDO!
 	 */
@@ -134,6 +139,21 @@ public class SimpleProductTypeActionHandler
 					Product.FETCH_GROUP_PRODUCT_TYPE,
 					Price.FETCH_GROUP_FRAGMENTS, ArticlePrice.FETCH_GROUP_PACKAGE_ARTICLE_PRICE
 				}, NLJDOHelper.MAX_FETCH_DEPTH_NO_LIMIT);
+	}
+
+	@Override
+	public AuthorityTypeID getAuthorityTypeID(ProductType rootProductType) {
+		return AUTHORITY_TYPE_ID;
+	}
+
+	@Override
+	protected AuthorityType createAuthorityType(AuthorityTypeID authorityTypeID, ProductType rootProductType) {
+		PersistenceManager pm = getPersistenceManager();
+		AuthorityType authorityType = new AuthorityType(authorityTypeID);
+		// TODO configure access rights completely - implement manual checking where necessary!
+		// hmmm...maybe there should only be one "ProductType.edit" instead of one for each implementation - we have the authorities anyway and can control per ProductType if that right is available or not - so we should better reduce the number of rights!
+//		authorityType.addRoleGroup((RoleGroup) pm.getObjectById(RoleGroupID.create("JFireSimpleTrade.SimpleProductType.edit")));
+		return authorityType;
 	}
 
 }

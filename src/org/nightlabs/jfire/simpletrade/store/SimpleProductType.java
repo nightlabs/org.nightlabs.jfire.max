@@ -90,7 +90,9 @@ import org.nightlabs.jfire.trade.LegalEntity;
 public class SimpleProductType extends ProductType
 {
 	private static final long serialVersionUID = 1L;
-	
+	/**
+	 * @deprecated The *.this-FetchGroups lead to bad programming style and are therefore deprecated, now. They should be removed soon! 
+	 */
 	public static final String FETCH_GROUP_THIS_SIMPLE_PRODUCT_TYPE = "SimpleProductType.this";
 	public static final String FETCH_GROUP_PROPERTY_SET = "SimpleProductType.propertySet";
 

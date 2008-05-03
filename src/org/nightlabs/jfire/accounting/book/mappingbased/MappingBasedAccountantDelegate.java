@@ -405,8 +405,8 @@ public class MappingBasedAccountantDelegate
 	 * returned here. Within the ResolvedMapEntries mappings are stored in an Map
 	 * with key (String) mappingKey and value {@link MoneyFlowMapping}. Upon
 	 * resolving mappings the delegation hierarchy and the productType hierarchy
-	 * are iterated from top down. Hereby matching mappings will be added to the
-	 * resolved map with a fake mappingKey pretending that the mapping was made
+	 * are iterated from top down. Hereby all mappings that match mappings will be added to the
+	 * resolved map with a fake mapping-key pretending that the mapping was made
 	 * for the ProductType searched for. By that mappings from child delegates and
 	 * for child-ProductTypes will overwrite the ones from their parents. For
 	 * example:
@@ -473,7 +473,7 @@ public class MappingBasedAccountantDelegate
 	 * Resolves the mappings for the given productType. If there are Mappings
 	 * defined within this LocalAccountantDelegate for the given ProductType and
 	 * packageType, then the configuration is defined by this delegate for the
-	 * given ProductType and packageType. This mehtod will resolve the mappings
+	 * given ProductType and packageType. This method will resolve the mappings
 	 * for the given productType and recurse into its nested ProductTypes. If no
 	 * mapping was defined for the given ProductType or one of its Parents neither
 	 * in this delegate nor in one of its parents, then the
@@ -709,7 +709,7 @@ public class MappingBasedAccountantDelegate
 	}
 
 	/**
-	 * Tries to book all money concerning the given ProductType. It is intented to
+	 * Tries to book all money concerning the given ProductType. It is intended to
 	 * be called from the implementation of
 	 * {@link #bookArticle(OrganisationLegalEntity, User, Invoice, Article, BookMoneyTransfer, Map)}
 	 * with the top-level ArticlePrice in the articlePriceStack parameter.

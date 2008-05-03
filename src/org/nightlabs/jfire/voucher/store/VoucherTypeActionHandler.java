@@ -11,7 +11,11 @@ import javax.jdo.Query;
 import org.apache.log4j.Logger;
 import org.nightlabs.annotation.Implement;
 import org.nightlabs.jfire.organisation.Organisation;
+import org.nightlabs.jfire.security.AuthorityType;
+import org.nightlabs.jfire.security.RoleGroup;
 import org.nightlabs.jfire.security.User;
+import org.nightlabs.jfire.security.id.AuthorityTypeID;
+import org.nightlabs.jfire.security.id.RoleGroupID;
 import org.nightlabs.jfire.store.DeliveryNote;
 import org.nightlabs.jfire.store.NestedProductTypeLocal;
 import org.nightlabs.jfire.store.Product;
@@ -39,6 +43,8 @@ public class VoucherTypeActionHandler
 		extends ProductTypeActionHandler
 {
 	private static final Logger logger = Logger.getLogger(VoucherTypeActionHandler.class);
+
+	public static final AuthorityTypeID AUTHORITY_TYPE_ID = AuthorityTypeID.create(Organisation.DEV_ORGANISATION_ID, VoucherType.class.getName());
 
 //	/**
 //	 * This is the {@link org.nightlabs.jfire.transfer.Anchor#getAnchorID()} of
@@ -164,5 +170,24 @@ public class VoucherTypeActionHandler
 			Offer partnerOffer, OfferID partnerOfferID, SegmentID partnerSegmentID, ProductType nestedProductType, Collection<NestedProductTypeLocal> nestedProductTypeLocals) throws Exception
 	{
 		throw new UnsupportedOperationException("Vouchers cannot be traded accross organisations!");
+	}
+
+	@Override
+	public AuthorityTypeID getAuthorityTypeID(ProductType rootProductType) {
+		return AUTHORITY_TYPE_ID;
+	}
+
+	@Override
+	protected AuthorityType createAuthorityType(AuthorityTypeID authorityTypeID, ProductType rootProductType) {
+		PersistenceManager pm = getPersistenceManager();
+		AuthorityType authorityType = new AuthorityType(authorityTypeID);
+		// TODO configure access rights completely - implement manual checking where necessary!
+		// hmmm...maybe there should only be one "ProductType.edit" instead of one for each implementation - we have the authorities anyway and can control per ProductType if that right is available or not - so we should better reduce the number of rights!
+		authorityType.addRoleGroup((RoleGroup) pm.getObjectById(RoleGroupID.create("JFireVoucher.VoucherType.edit")));
+		authorityType.addRoleGroup((RoleGroup) pm.getObjectById(RoleGroupID.create("JFireVoucher.VoucherType.view")));
+		authorityType.addRoleGroup((RoleGroup) pm.getObjectById(RoleGroupID.create("JFireVoucher.Voucher.sell")));
+		authorityType.addRoleGroup((RoleGroup) pm.getObjectById(RoleGroupID.create("JFireVoucher.Voucher.reverse")));
+//		authorityType.addRoleGroup((RoleGroup) pm.getObjectById(RoleGroupID.create("JFireVoucher.Admin"))); // admin is probably not necessary
+		return authorityType;
 	}
 }

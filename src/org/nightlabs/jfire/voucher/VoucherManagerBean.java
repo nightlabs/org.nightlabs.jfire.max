@@ -375,7 +375,7 @@ implements SessionBean
 	/**
 	 * @ejb.interface-method
 	 * @ejb.transaction type="Supports" @!This usually means that no transaction is opened which is significantly faster and recommended for all read-only EJB methods! Marco.
-	 * @ejb.permission role-name="_Guest_"
+	 * @ejb.permission role-name="org.nightlabs.jfire.voucher.VoucherManager.VoucherType.read"
 	 */
 	@SuppressWarnings("unchecked")
 	public Set<ProductTypeID> getChildVoucherTypeIDs(
@@ -392,7 +392,7 @@ implements SessionBean
 	/**
 	 * @ejb.interface-method
 	 * @ejb.transaction type="Supports" @!This usually means that no transaction is opened which is significantly faster and recommended for all read-only EJB methods! Marco.
-	 * @ejb.permission role-name="_Guest_"
+	 * @ejb.permission role-name="org.nightlabs.jfire.voucher.VoucherManager.VoucherType.read"
 	 */
 	@SuppressWarnings("unchecked")
 	public List<VoucherType> getVoucherTypes(Collection<ProductTypeID> voucherTypeIDs, String[] fetchGroups, int maxFetchDepth)

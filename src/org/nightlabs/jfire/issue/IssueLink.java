@@ -283,31 +283,40 @@ implements Serializable, DetachCallback, StoreCallback, DeleteCallback
 		// check the states with some queries only if this instance of IssueLink is new (otherwise nothing is added)
 		// => use NLJDOHelper.exists(getPersistenceManager(), IssueLink.this)
 
-		getPersistenceManager().addInstanceLifecycleListener(new StoreLifecycleListener() {
+		getPersistenceManager().addInstanceLifecycleListener(new StoreLifecycleListener()
+		{
 			boolean isExisting = false;
 			@Override
-			public void preStore(InstanceLifecycleEvent event) {
-				if (NLJDOHelper.exists(getPersistenceManager(), IssueLink.this)) {
+			public void preStore(InstanceLifecycleEvent event)
+			{
+				if (NLJDOHelper.exists(getPersistenceManager(), IssueLink.this)) 
+				{
 					isExisting = true;
 					if (logger.isDebugEnabled())
-						logger.debug("jdoPreStore: the IssueLink " + getPrimaryKey() + " already exists - no need to call the IssueLinkType's afterCreateIssueLink callback method.");
+						logger.debug("jdoPreStore: the IssueLink " + getPrimaryKey() + " already exists - no need to call the IssueLinkType's postCreateIssueLink callback method.");
 				}
 			}
 			@Override
-			public void postStore(InstanceLifecycleEvent event) {
+			public void postStore(InstanceLifecycleEvent event) 
+			{
 				if (!IssueLink.this.equals(event.getPersistentInstance()))
 					return;
 
-				getPersistenceManager().removeInstanceLifecycleListener(this);
 				
-				if (!isExisting) {
-					if (logger.isDebugEnabled()) {
-						logger.debug("jdoPreStore: the IssueLink " + getPrimaryKey() + " does NOT yet exist - calling the IssueLinkType's afterCreateIssueLink callback method.");
+				
+				if (!isExisting)
+				{
+					if (logger.isDebugEnabled()) 
+					{
+						logger.debug("jdoPreStore: the IssueLink " + getPrimaryKey() + " does NOT yet exist - calling the IssueLinkType's postCreateIssueLink callback method.");
 					}
 					getIssueLinkType().postCreateIssueLink(getPersistenceManager(), IssueLink.this);
 				}
+				
+				getPersistenceManager().removeInstanceLifecycleListener(this);
 			}
-		}, new Class[] { IssueLink.class });
+		},
+		new Class[] { IssueLink.class });
 	}
 
 	@Override

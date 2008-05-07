@@ -683,8 +683,4 @@ implements 	Serializable, AttachCallback, Statable, DeleteCallback
 	public boolean removeIssueFileAttachment(IssueFileAttachment issueFileAttachment) {
 		return this.issueFileAttachments.remove(issueFileAttachment);
 	}
-	
-	public Collection<IssueFileAttachment> getIssueFileAttahments() {
-		return Collections.unmodifiableCollection(issueFileAttachments);
-	}
 }

@@ -32,6 +32,7 @@ import org.nightlabs.jfire.base.BaseSessionBeanImpl;
 import org.nightlabs.jfire.editlock.EditLockType;
 import org.nightlabs.jfire.issue.history.IssueHistory;
 import org.nightlabs.jfire.issue.id.IssueCommentID;
+import org.nightlabs.jfire.issue.id.IssueFileAttachmentID;
 import org.nightlabs.jfire.issue.id.IssueID;
 import org.nightlabs.jfire.issue.id.IssueLinkTypeID;
 import org.nightlabs.jfire.issue.id.IssueLocalID;
@@ -125,6 +126,23 @@ implements SessionBean
 	
 	/**
 	 * @ejb.interface-method
+	 * @ejb.transaction type="Supports" @!This usually means that no transaction is opened which is significantly faster and recommended for all read-only EJB methods! Marco.
+	 * @ejb.permission role-name="_Guest_"
+	 */
+	public Set<IssueFileAttachmentID> getIssueFileAttachmentIDs()
+	{
+		PersistenceManager pm = getPersistenceManager();
+		try {
+			Query q = pm.newQuery(IssueFileAttachment.class);
+			q.setResult("JDOHelper.getObjectId(this)");
+			return new HashSet<IssueFileAttachmentID>((Collection<? extends IssueFileAttachmentID>) q.execute());
+		} finally {
+			pm.close();
+		}
+	}
+	
+	/**
+	 * @ejb.interface-method
 	 * @ejb.permission role-name="_Guest_"
 	 * @ejb.transaction type="Supports" @!This usually means that no transaction is opened which is significantly faster and recommended for all read-only EJB methods! Marco.
 	 */
@@ -174,6 +192,22 @@ implements SessionBean
 		PersistenceManager pm = getPersistenceManager();
 		try {
 			return NLJDOHelper.getDetachedObjectList(pm, issueIDs, Issue.class, fetchGroups, maxFetchDepth);
+		} finally {
+			pm.close();
+		}
+	}
+	
+	/**
+	 * @ejb.interface-method
+	 * @ejb.transaction type="Supports" @!This usually means that no transaction is opened which is significantly faster and recommended for all read-only EJB methods! Marco.
+	 * @ejb.permission role-name="_Guest_"
+	 */
+	@SuppressWarnings("unchecked")
+	public List<IssueFileAttachment> getIssueFileAttachments(Collection<IssueFileAttachmentID> issueFileAttachmentIDs, String[] fetchGroups, int maxFetchDepth)
+	{
+		PersistenceManager pm = getPersistenceManager();
+		try {
+			return NLJDOHelper.getDetachedObjectList(pm, issueFileAttachmentIDs, IssueFileAttachment.class, fetchGroups, maxFetchDepth);
 		} finally {
 			pm.close();
 		}

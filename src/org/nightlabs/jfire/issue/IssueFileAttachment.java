@@ -35,7 +35,7 @@ import org.nightlabs.util.IOUtil;
  * a 500 MB log file to an issue!).
  * In the future, please really think about what data you really need and manage your fetch-groups accordingly (minimize traffic and conserve bandwidth!).
  *
- * @jdo.fetch-group name="IssueFileAttachment.date" fields="date"
+ * @jdo.fetch-group name="IssueFileAttachment.data" fields="data"
  * @jdo.fetch-group name="IssueFileAttachment.issue" fields="issue"
  */
 public class IssueFileAttachment 

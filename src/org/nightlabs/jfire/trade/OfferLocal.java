@@ -34,6 +34,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
+import org.apache.log4j.Logger;
 import org.nightlabs.jfire.jbpm.graph.def.ActionHandlerNodeEnter;
 import org.nightlabs.jfire.jbpm.graph.def.Statable;
 import org.nightlabs.jfire.jbpm.graph.def.StatableLocal;
@@ -75,6 +76,8 @@ public class OfferLocal
 implements Serializable, StatableLocal
 {
 	private static final long serialVersionUID = 1L;
+
+	private static final Logger logger = Logger.getLogger(OfferLocal.class);
 
 	public static final String FETCH_GROUP_OFFER = "OfferLocal.offer";
 	public static final String FETCH_GROUP_ACCEPT_USER = "OfferLocal.acceptUser";
@@ -386,6 +389,9 @@ implements Serializable, StatableLocal
 		if (currentState == null)
 			throw new IllegalArgumentException("state must not be null!");
 
+		if (logger.isDebugEnabled())
+			logger.debug("setState: offer=" + getPrimaryKey() + " (" + this + ") state=" + currentState.getPrimaryKey());
+
 		this.state = currentState;
 		try { // TODO remove this workaround as soon as JPOX is fixed
 			this.states.add(currentState);
@@ -426,5 +432,9 @@ implements Serializable, StatableLocal
 	public void setJbpmProcessInstanceId(long jbpmProcessInstanceId)
 	{
 		this.jbpmProcessInstanceId = jbpmProcessInstanceId;
+	}
+
+	public String getPrimaryKey() {
+		return Offer.getPrimaryKey(organisationID, offerIDPrefix, offerID); 
 	}
 }

@@ -43,6 +43,7 @@ import javax.jdo.Query;
 import javax.jdo.listener.AttachCallback;
 import javax.jdo.listener.DetachCallback;
 
+import org.apache.log4j.Logger;
 import org.nightlabs.jdo.ObjectIDUtil;
 import org.nightlabs.jfire.accounting.Accounting;
 import org.nightlabs.jfire.accounting.AccountingPriceConfig;
@@ -114,6 +115,8 @@ implements
 {
 	private static final long serialVersionUID = 1L;
 
+	private static final Logger logger = Logger.getLogger(Offer.class);
+
 	public static final String FETCH_GROUP_OFFER_LOCAL = "Offer.offerLocal";
 	public static final String FETCH_GROUP_PRICE = "Offer.price";
 	public static final String FETCH_GROUP_ARTICLES = "Offer.articles";
@@ -124,7 +127,7 @@ implements
 	 * @deprecated The *.this-FetchGroups lead to bad programming style and are therefore deprecated, now. They should be removed soon! 
 	 */
 	public static final String FETCH_GROUP_THIS_OFFER = "Offer.this";
-	
+
 
 	/**
 	 * @return a <tt>Collection</tt> of <tt>Offer</tt>
@@ -902,6 +905,9 @@ implements
 
 		if (!currentState.getStateDefinition().isPublicState())
 			throw new IllegalArgumentException("state.stateDefinition.publicState is false!");
+
+		if (logger.isDebugEnabled())
+			logger.debug("setState: offer=" + getPrimaryKey() + " (" + this + ") state=" + currentState.getPrimaryKey());
 
 		this.state = currentState;
 		this.states.add(currentState);

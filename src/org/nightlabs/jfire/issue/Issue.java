@@ -636,10 +636,10 @@ implements 	Serializable, AttachCallback, Statable, DeleteCallback
 			Util.hashCode(this.issueID);
 	}
 
-	/**
-	 * @jdo.field persistence-modifier="persistent"
-	 */
-	private String primaryKey;
+//	/**
+//	 * @jdo.field persistence-modifier="persistent"
+//	 */
+//	private String primaryKey;
 
 	public static String getPrimaryKey(String organisationID, long issueID)
 	{
@@ -647,7 +647,7 @@ implements 	Serializable, AttachCallback, Statable, DeleteCallback
 	}
 	public String getPrimaryKey()
 	{
-		return primaryKey;
+		return organisationID + '/' + Long.toString(issueID);
 	}
 	
 	public IssueLocal getIssueLocal() {

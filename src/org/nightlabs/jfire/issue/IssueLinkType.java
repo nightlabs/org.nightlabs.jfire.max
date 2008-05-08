@@ -194,7 +194,7 @@ implements Serializable
 	 * @param issueLinkToBeDeleted the <code>IssueLink</code> that is about to be deleted.
 	 * @see #postCreateIssueLink(IssueLink)
 	 */
-	protected void preDeleteIssueLink(IssueLink issueLinkToBeDeleted) { }
+	protected void preDeleteIssueLink(PersistenceManager pm, IssueLink issueLinkToBeDeleted) { }
 
 	protected PersistenceManager getPersistenceManager()
 	{

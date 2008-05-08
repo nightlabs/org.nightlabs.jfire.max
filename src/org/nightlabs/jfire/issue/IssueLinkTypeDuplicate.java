@@ -62,7 +62,7 @@ extends IssueLinkType
 	}
 
 	@Override
-	protected void preDeleteIssueLink(IssueLink issueLinkToBeDeleted) {
+	protected void preDeleteIssueLink(PersistenceManager pm, IssueLink issueLinkToBeDeleted) {
 		// remove the reverse link
 		IssueLinkType issueLinkTypeDuplicate = issueLinkToBeDeleted.getIssueLinkType();
 		IssueLinkTypeID issueLinkTypeDuplicateID = (IssueLinkTypeID) JDOHelper.getObjectId(issueLinkTypeDuplicate);
@@ -79,6 +79,7 @@ extends IssueLinkType
 			}
 		}
 		
-		IssueDAO.sharedInstance().storeIssue(issueOnOtherSide, false, new String[]{FetchPlan.DEFAULT}, 0, null);
+		pm.makePersistent(issueOnOtherSide);
+//		IssueDAO.sharedInstance().storeIssue(issueOnOtherSide, false, new String[]{FetchPlan.DEFAULT}, 0, null);
 	}
 }

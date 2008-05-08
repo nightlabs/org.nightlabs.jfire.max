@@ -6,6 +6,7 @@ import java.util.Set;
 import javax.jdo.JDOHelper;
 import javax.jdo.PersistenceManager;
 import javax.jdo.listener.DeleteCallback;
+import javax.jdo.listener.DeleteLifecycleListener;
 import javax.jdo.listener.DetachCallback;
 import javax.jdo.listener.InstanceLifecycleEvent;
 import javax.jdo.listener.StoreCallback;
@@ -78,17 +79,17 @@ implements Serializable, DetachCallback, StoreCallback, DeleteCallback
 	 * @jdo.column length="100"
 	 */
 	private String organisationID;
-	
+
 	/**
 	 * @jdo.field primary-key="true"
 	 */
 	private long issueLinkID;
-	
+
 	/**
 	 * @jdo.field persistence-modifier="persistent"
 	 */
 	private Issue issue;
-	
+
 	/**
 	 * @jdo.field persistence-modifier="persistent"
 	 */
@@ -113,7 +114,7 @@ implements Serializable, DetachCallback, StoreCallback, DeleteCallback
 	 * @jdo.field persistence-modifier="none"
 	 */
 	private Class<?> linkedObjectClass;
-	
+
 	/**
 	 * @deprecated Only for JDO!!!!
 	 */
@@ -170,7 +171,7 @@ implements Serializable, DetachCallback, StoreCallback, DeleteCallback
 	public String getOrganisationID() {
 		return organisationID;
 	}
-	
+
 	public long getIssueLinkID() {
 		return issueLinkID;
 	}
@@ -185,7 +186,7 @@ implements Serializable, DetachCallback, StoreCallback, DeleteCallback
 
 		return _linkedObjectID;
 	}
-	
+
 	public IssueLinkType getIssueLinkType() {
 		return issueLinkType;
 	}
@@ -285,16 +286,11 @@ implements Serializable, DetachCallback, StoreCallback, DeleteCallback
 
 		getPersistenceManager().addInstanceLifecycleListener(new StoreLifecycleListener()
 		{
-			boolean isExisting = false;
+//			boolean isExisting = false;
 			@Override
 			public void preStore(InstanceLifecycleEvent event)
 			{
-				if (NLJDOHelper.exists(getPersistenceManager(), IssueLink.this)) 
-				{
-					isExisting = true;
-					if (logger.isDebugEnabled())
-						logger.debug("jdoPreStore: the IssueLink " + getPrimaryKey() + " already exists - no need to call the IssueLinkType's postCreateIssueLink callback method.");
-				}
+				//never used.
 			}
 			@Override
 			public void postStore(InstanceLifecycleEvent event) 
@@ -302,17 +298,22 @@ implements Serializable, DetachCallback, StoreCallback, DeleteCallback
 				if (!IssueLink.this.equals(event.getPersistentInstance()))
 					return;
 
-				
-				
-				if (!isExisting)
+				/*if (NLJDOHelper.exists(getPersistenceManager(), IssueLink.this)) 
 				{
-					if (logger.isDebugEnabled()) 
-					{
-						logger.debug("jdoPreStore: the IssueLink " + getPrimaryKey() + " does NOT yet exist - calling the IssueLinkType's postCreateIssueLink callback method.");
-					}
-					getIssueLinkType().postCreateIssueLink(getPersistenceManager(), IssueLink.this);
+				isExisting = true;
+				if (logger.isDebugEnabled())
+				logger.debug("jdoPreStore: the IssueLink " + getPrimaryKey() + " already exists - no need to call the IssueLinkType's postCreateIssueLink callback method.");
 				}
-				
+
+				if (!isExisting)
+				{*/
+				if (logger.isDebugEnabled()) 
+				{
+					logger.debug("jdoPreStore: the IssueLink " + getPrimaryKey() + " does NOT yet exist - calling the IssueLinkType's postCreateIssueLink callback method.");
+				}
+				getIssueLinkType().postCreateIssueLink(getPersistenceManager(), IssueLink.this);
+//				}
+
 				getPersistenceManager().removeInstanceLifecycleListener(this);
 			}
 		},
@@ -324,7 +325,18 @@ implements Serializable, DetachCallback, StoreCallback, DeleteCallback
 		if (logger.isDebugEnabled())
 			logger.debug("jdoPreDelete: about to delete IssueLink: " + getPrimaryKey());
 
-		getIssueLinkType().preDeleteIssueLink(this);
+		getPersistenceManager().addInstanceLifecycleListener(new DeleteLifecycleListener() {
+			@Override
+			public void postDelete(InstanceLifecycleEvent arg0) {
+				//
+			}
+
+			@Override
+			public void preDelete(InstanceLifecycleEvent arg0) {
+				getIssueLinkType().preDeleteIssueLink(getPersistenceManager(), IssueLink.this);
+			}
+		},
+		new Class[] { IssueLink.class });
 	}
 
 	@Override
@@ -344,7 +356,7 @@ implements Serializable, DetachCallback, StoreCallback, DeleteCallback
 		final IssueLink other = (IssueLink) obj;
 
 		return
-				Util.equals(this.organisationID, other.organisationID) &&
-				Util.equals(this.issueLinkID, other.issueLinkID);
+		Util.equals(this.organisationID, other.organisationID) &&
+		Util.equals(this.issueLinkID, other.issueLinkID);
 	}
 }

@@ -9,6 +9,7 @@ import javax.jdo.PersistenceManager;
 
 import org.nightlabs.jdo.NLJDOHelper;
 import org.nightlabs.jdo.ObjectID;
+import org.nightlabs.jdo.ObjectIDUtil;
 import org.nightlabs.jfire.security.User;
 import org.nightlabs.jfire.trade.state.id.StateID;
 
@@ -175,4 +176,8 @@ implements Serializable
 		return createDT;
 	}
 
+	public String getPrimaryKey()
+	{
+		return organisationID + '/' + ObjectIDUtil.longObjectIDFieldToString(stateID);
+	}
 }

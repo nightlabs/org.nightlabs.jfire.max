@@ -11,6 +11,7 @@ import javax.jdo.PersistenceManager;
 
 import org.nightlabs.annotation.Implement;
 import org.nightlabs.jfire.accounting.Account;
+import org.nightlabs.jfire.accounting.Accounting;
 import org.nightlabs.jfire.accounting.Invoice;
 import org.nightlabs.jfire.accounting.InvoiceMoneyTransfer;
 import org.nightlabs.jfire.accounting.book.BookMoneyTransfer;
@@ -20,8 +21,13 @@ import org.nightlabs.jfire.trade.Article;
 import org.nightlabs.jfire.trade.ArticlePrice;
 import org.nightlabs.jfire.trade.OrganisationLegalEntity;
 import org.nightlabs.jfire.transfer.Anchor;
+import org.nightlabs.jfire.voucher.store.VoucherType;
 
 /**
+ * {@link VoucherLocalAccountantDelegate} is assigned to ProductTypes of type
+ * {@link VoucherType}. It directs money from/to an account defined for
+ * the delegate. Account for this delegate are defined per currency.  
+ * 
  * @author Marco Schulze - Marco at NightLabs dot de
  *
  * @jdo.persistence-capable
@@ -124,6 +130,15 @@ extends LocalAccountantDelegate
 		long amount = articlePrice.getAmount();
 
 		if (amount < 0) {
+			Anchor tmp = from;
+			from = to;
+			to = tmp;
+		}
+		
+		Invoice invoice = container.getInvoice();
+		if (invoice.getCustomer().equals(mandator)) {
+			// if the local organisation is the customer of the invoice
+			// we revert the transfer direction of ALL resolved transfers!
 			Anchor tmp = from;
 			from = to;
 			to = tmp;

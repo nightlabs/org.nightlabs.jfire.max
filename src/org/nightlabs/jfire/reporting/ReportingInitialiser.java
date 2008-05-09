@@ -31,6 +31,7 @@ import javax.xml.transform.TransformerException;
 import org.apache.log4j.Logger;
 import org.nightlabs.ModuleException;
 import org.nightlabs.i18n.I18nText;
+import org.nightlabs.jfire.base.JFireBaseEAR;
 import org.nightlabs.jfire.idgenerator.IDGenerator;
 import org.nightlabs.jfire.organisation.Organisation;
 import org.nightlabs.jfire.reporting.layout.ReportCategory;
@@ -778,7 +779,8 @@ public class ReportingInitialiser {
 
 
 			// TODO JPOX WORKAROUND : this was not needed with JPOX 1.1 - but now we seem to need it
-			pm.flush();
+			if (JFireBaseEAR.JPOX_WORKAROUND_FLUSH_ENABLED)
+				pm.flush();
 
 
 			// check if its the default use case

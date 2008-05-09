@@ -154,7 +154,7 @@ implements SessionBean
 	/**
 	 * @ejb.interface-method
 	 * @ejb.permission role-name="_Guest_"
-	 * @ejb.transaction type="Supports" @!This usually means that no transaction is opened which is significantly faster and recommended for all read-only EJB methods! Marco.
+	 * @!ejb.transaction type="Supports" @!This usually means that no transaction is opened which is significantly faster and recommended for all read-only EJB methods! Marco.
 	 */
 	public Collection<Country> getCountries(String[] fetchGroups, int maxFetchDepth)
 	{
@@ -180,7 +180,7 @@ implements SessionBean
 	/**
 	 * @ejb.interface-method
 	 * @ejb.permission role-name="_Guest_"
-	 * @ejb.transaction type="Supports" @!This usually means that no transaction is opened which is significantly faster and recommended for all read-only EJB methods! Marco.
+	 * @!ejb.transaction type="Supports" @!This usually means that no transaction is opened which is significantly faster and recommended for all read-only EJB methods! Marco.
 	 */
 	public Country getCountry(CountryID countryID, String[] fetchGroups, int maxFetchDepth)
 	{
@@ -201,7 +201,7 @@ implements SessionBean
 	/**
 	 * @ejb.interface-method
 	 * @ejb.permission role-name="_Guest_"
-	 * @ejb.transaction type="Supports" @!This usually means that no transaction is opened which is significantly faster and recommended for all read-only EJB methods! Marco.
+	 * @!ejb.transaction type="Supports" @!This usually means that no transaction is opened which is significantly faster and recommended for all read-only EJB methods! Marco.
 	 */
 	public Region getRegion(RegionID regionID, String[] fetchGroups, int maxFetchDepth)
 	{
@@ -222,7 +222,7 @@ implements SessionBean
 	/**
 	 * @ejb.interface-method
 	 * @ejb.permission role-name="_Guest_"
-	 * @ejb.transaction type="Supports" @!This usually means that no transaction is opened which is significantly faster and recommended for all read-only EJB methods! Marco.
+	 * @!ejb.transaction type="Supports" @!This usually means that no transaction is opened which is significantly faster and recommended for all read-only EJB methods! Marco.
 	 */
 	public City getCity(CityID cityID, String[] fetchGroups, int maxFetchDepth)
 	{
@@ -243,7 +243,7 @@ implements SessionBean
 	/**
 	 * @ejb.interface-method
 	 * @ejb.permission role-name="_Guest_"
-	 * @ejb.transaction type="Supports" @!This usually means that no transaction is opened which is significantly faster and recommended for all read-only EJB methods! Marco.
+	 * @!ejb.transaction type="Supports" @!This usually means that no transaction is opened which is significantly faster and recommended for all read-only EJB methods! Marco.
 	 */
 	public Location getLocation(LocationID locationID, String[] fetchGroups, int maxFetchDepth)
 	{

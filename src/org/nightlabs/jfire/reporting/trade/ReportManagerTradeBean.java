@@ -44,6 +44,7 @@ import org.nightlabs.jfire.accounting.id.TariffID;
 import org.nightlabs.jfire.accounting.pay.id.ModeOfPaymentFlavourID;
 import org.nightlabs.jfire.accounting.pay.id.ModeOfPaymentID;
 import org.nightlabs.jfire.base.BaseSessionBeanImpl;
+import org.nightlabs.jfire.base.JFireBaseEAR;
 import org.nightlabs.jfire.config.id.ConfigModuleInitialiserID;
 import org.nightlabs.jfire.organisation.Organisation;
 import org.nightlabs.jfire.reporting.ReportingInitialiserException;
@@ -249,7 +250,10 @@ implements SessionBean
 				new NameEntry[] {new NameEntry(Locale.ENGLISH.getLanguage(), "Select an invoice")}
 			);
 		invoiceByCustomer.getInputParameters().clear();
-		pm.flush();
+
+		if (JFireBaseEAR.JPOX_WORKAROUND_FLUSH_ENABLED)
+			pm.flush();
+
 		invoiceByCustomer.addInputParameter(new ValueProviderInputParameter(invoiceByCustomer, "customer", AnchorID.class.getName()));
 		
 		
@@ -260,7 +264,10 @@ implements SessionBean
 				new NameEntry[] {new NameEntry(Locale.ENGLISH.getLanguage(), "Select an invoice")}
 			);
 		invoiceByCustomerAndPeriod.getInputParameters().clear();
-		pm.flush();
+
+		if (JFireBaseEAR.JPOX_WORKAROUND_FLUSH_ENABLED)
+			pm.flush();
+
 		invoiceByCustomerAndPeriod.addInputParameter(new ValueProviderInputParameter(invoiceByCustomer, "customer", AnchorID.class.getName()));
 		invoiceByCustomerAndPeriod.addInputParameter(new ValueProviderInputParameter(invoiceByCustomer, "from", Date.class.getName()));
 		invoiceByCustomerAndPeriod.addInputParameter(new ValueProviderInputParameter(invoiceByCustomer, "to", Date.class.getName()));
@@ -273,7 +280,10 @@ implements SessionBean
 				new NameEntry[] {new NameEntry(Locale.ENGLISH.getLanguage(), "Select an invoice")}
 			);
 		invoiceByArticleType.getInputParameters().clear();
-		pm.flush();
+
+		if (JFireBaseEAR.JPOX_WORKAROUND_FLUSH_ENABLED)
+			pm.flush();
+
 		invoiceByArticleType.addInputParameter(new ValueProviderInputParameter(invoiceByCustomer, "productType", ProductTypeID.class.getName()));
 		
 /** New Parameters **/
@@ -297,7 +307,10 @@ implements SessionBean
 				new NameEntry[] {new NameEntry(Locale.ENGLISH.getLanguage(), "Select an order")}
 			);
 		orderByCustomer.getInputParameters().clear();
-		pm.flush();
+
+		if (JFireBaseEAR.JPOX_WORKAROUND_FLUSH_ENABLED)
+			pm.flush();
+
 		orderByCustomer.addInputParameter(new ValueProviderInputParameter(orderByCustomer, "customer", AnchorID.class.getName()));
 		
 		// offer category
@@ -319,7 +332,10 @@ implements SessionBean
 				new NameEntry[] {new NameEntry(Locale.ENGLISH.getLanguage(), "Select an offer")}
 			);
 		offerByCustomer.getInputParameters().clear();
-		pm.flush();
+
+		if (JFireBaseEAR.JPOX_WORKAROUND_FLUSH_ENABLED)
+			pm.flush();
+
 		offerByCustomer.addInputParameter(new ValueProviderInputParameter(offerByCustomer, "customer", AnchorID.class.getName()));
 		
 		// deliveryNote category
@@ -341,7 +357,10 @@ implements SessionBean
 				new NameEntry[] {new NameEntry(Locale.ENGLISH.getLanguage(), "Select an delivery note")}
 			);
 		deliveryNoteByCustomer.getInputParameters().clear();
-		pm.flush();
+
+		if (JFireBaseEAR.JPOX_WORKAROUND_FLUSH_ENABLED)
+			pm.flush();
+
 		deliveryNoteByCustomer.addInputParameter(new ValueProviderInputParameter(deliveryNoteByCustomer, "customer", AnchorID.class.getName()));
 		
 		

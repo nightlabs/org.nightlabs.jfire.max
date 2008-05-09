@@ -50,6 +50,7 @@ import org.nightlabs.jfire.accounting.gridpriceconfig.PriceCalculator;
 import org.nightlabs.jfire.accounting.gridpriceconfig.StablePriceConfig;
 import org.nightlabs.jfire.accounting.priceconfig.IInnerPriceConfig;
 import org.nightlabs.jfire.accounting.priceconfig.PriceConfig;
+import org.nightlabs.jfire.base.JFireBaseEAR;
 import org.nightlabs.jfire.idgenerator.IDGenerator;
 import org.nightlabs.jfire.prop.IStruct;
 import org.nightlabs.jfire.prop.PropertySet;
@@ -217,16 +218,18 @@ extends DataCreator
 		props.deflate(); // and it should always be imploded before storing it into the datastore. Marco.
 
 		// TODO JPOX WORKAROUND : this fails sometimes - hence we retry a few times
-		for (int tryCounter = 0; tryCounter < 10; ++tryCounter) {
-			try {
-				pm.makePersistent(props);
-				props = null;
-				break; // successful => break retry loop
-			} catch (Exception x) {
-				// ignore and try again
+		if (JFireBaseEAR.JPOX_WORKAROUND_FLUSH_ENABLED) {
+			for (int tryCounter = 0; tryCounter < 10; ++tryCounter) {
+				try {
+					pm.makePersistent(props);
+					props = null;
+					break; // successful => break retry loop
+				} catch (Exception x) {
+					// ignore and try again
+				}
+				pm.flush();
+				pm.evictAll();
 			}
-			pm.flush();
-			pm.evictAll();
 		}
 		if (props != null)
 			pm.makePersistent(props);

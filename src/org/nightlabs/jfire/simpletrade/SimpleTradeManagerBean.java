@@ -74,6 +74,7 @@ import org.nightlabs.jfire.accounting.priceconfig.FetchGroupsPriceConfig;
 import org.nightlabs.jfire.accounting.priceconfig.PriceConfigUtil;
 import org.nightlabs.jfire.accounting.priceconfig.id.PriceConfigID;
 import org.nightlabs.jfire.base.BaseSessionBeanImpl;
+import org.nightlabs.jfire.base.JFireBaseEAR;
 import org.nightlabs.jfire.base.JFireException;
 import org.nightlabs.jfire.jdo.notification.persistent.PersistentNotificationEJB;
 import org.nightlabs.jfire.jdo.notification.persistent.PersistentNotificationEJBUtil;
@@ -489,7 +490,7 @@ implements SessionBean
 	
 	/**
 	 * @ejb.interface-method
-	 * @ejb.transaction type="Supports" @!This usually means that no transaction is opened which is significantly faster and recommended for all read-only EJB methods! Marco.
+	 * @!ejb.transaction type="Supports" @!This usually means that no transaction is opened which is significantly faster and recommended for all read-only EJB methods! Marco.
 	 * @ejb.permission role-name="_Guest_"
 	 */
 	public Set<ProductTypeID> getChildSimpleProductTypeIDs(
@@ -505,7 +506,7 @@ implements SessionBean
 
 	/**
 	 * @ejb.interface-method
-	 * @ejb.transaction type="Supports" @!This usually means that no transaction is opened which is significantly faster and recommended for all read-only EJB methods! Marco.
+	 * @!ejb.transaction type="Supports" @!This usually means that no transaction is opened which is significantly faster and recommended for all read-only EJB methods! Marco.
 	 * @ejb.permission role-name="_Guest_"
 	 */
 	public SimpleProductType getSimpleProductType(
@@ -524,7 +525,7 @@ implements SessionBean
 	
 	/**
 	 * @ejb.interface-method
-	 * @ejb.transaction type="Supports" @!This usually means that no transaction is opened which is significantly faster and recommended for all read-only EJB methods! Marco.
+	 * @!ejb.transaction type="Supports" @!This usually means that no transaction is opened which is significantly faster and recommended for all read-only EJB methods! Marco.
 	 * @ejb.permission role-name="_Guest_"
 	 */
 	public List<SimpleProductType> getSimpleProductTypes(
@@ -592,7 +593,7 @@ implements SessionBean
 			}
 
 			// TODO JPOX WORKAROUND: In cross-organisation trade and some other situations, we get JDODetachedFieldAccessExceptions, even though the object should be persistent - trying a workaround
-			{
+			if (JFireBaseEAR.JPOX_WORKAROUND_FLUSH_ENABLED) {
 				ProductTypeID productTypeID = (ProductTypeID) JDOHelper.getObjectId(productType);
 				pm.flush();
 				pm.evictAll();
@@ -957,17 +958,19 @@ implements SessionBean
 //			        at org.jpox.resource.PersistenceManagerImpl.detachCopyAll(PersistenceManagerImpl.java:1000)
 //			        at org.nightlabs.jfire.simpletrade.SimpleTradeManagerBean.createArticles(SimpleTradeManagerBean.java:745)
 
-			List<ArticleID> articleIDs = NLJDOHelper.getObjectIDList(articles);
-			for (int tryCounter = 0; tryCounter < 10; ++tryCounter) {
-				pm.flush();
-				pm.evictAll();
-				articles = NLJDOHelper.getObjectList(pm, articleIDs, Article.class);
-				try {
-					Collection<? extends Article> detachedArticles = null;
-					detachedArticles = pm.detachCopyAll(articles);
-					return detachedArticles;
-				} catch (Exception x) {
-					logger.warn("Detaching Articles failed! Trying it again. tryCounter="+tryCounter, x);
+			if (JFireBaseEAR.JPOX_WORKAROUND_FLUSH_ENABLED) {
+				List<ArticleID> articleIDs = NLJDOHelper.getObjectIDList(articles);
+				for (int tryCounter = 0; tryCounter < 10; ++tryCounter) {
+					pm.flush();
+					pm.evictAll();
+					articles = NLJDOHelper.getObjectList(pm, articleIDs, Article.class);
+					try {
+						Collection<? extends Article> detachedArticles = null;
+						detachedArticles = pm.detachCopyAll(articles);
+						return detachedArticles;
+					} catch (Exception x) {
+						logger.warn("Detaching Articles failed! Trying it again. tryCounter="+tryCounter, x);
+					}
 				}
 			}
 
@@ -980,7 +983,7 @@ implements SessionBean
 
 	/**
 	 * @ejb.interface-method
-	 * @ejb.transaction type="Supports" @!This usually means that no transaction is opened which is significantly faster and recommended for all read-only EJB methods! Marco.
+	 * @!ejb.transaction type="Supports" @!This usually means that no transaction is opened which is significantly faster and recommended for all read-only EJB methods! Marco.
 	 * @ejb.permission role-name="_Guest_"
 	 */
 	public Set<ProductTypeID> getPublishedSimpleProductTypeIDs()
@@ -1000,7 +1003,7 @@ implements SessionBean
 
 	/**
 	 * @ejb.interface-method
-	 * @ejb.transaction type="Supports" @!This usually means that no transaction is opened which is significantly faster and recommended for all read-only EJB methods! Marco.
+	 * @!ejb.transaction type="Supports" @!This usually means that no transaction is opened which is significantly faster and recommended for all read-only EJB methods! Marco.
 	 * @ejb.permission role-name="_Guest_"
 	 */
 	public List<SimpleProductType> getSimpleProductTypesForReseller(Collection<ProductTypeID> productTypeIDs)
@@ -1141,7 +1144,7 @@ implements SessionBean
 	 * @return a <tt>Collection</tt> of {@link TariffPricePair}
 	 *
 	 * @ejb.interface-method
-	 * @ejb.transaction type="Supports" @!This usually means that no transaction is opened which is significantly faster and recommended for all read-only EJB methods! Marco.
+	 * @!ejb.transaction type="Supports" @!This usually means that no transaction is opened which is significantly faster and recommended for all read-only EJB methods! Marco.
 	 * @ejb.permission role-name="_Guest_"
 	 */
 	public Collection<TariffPricePair> getTariffPricePairs(
@@ -1261,7 +1264,7 @@ implements SessionBean
 	 * 
 	 * @ejb.interface-method
 	 * @ejb.permission role-name="_Guest_"
-	 * @ejb.transaction type="Supports" @!This usually means that no transaction is opened which is significantly faster and recommended for all read-only EJB methods! Marco.
+	 * @!ejb.transaction type="Supports" @!This usually means that no transaction is opened which is significantly faster and recommended for all read-only EJB methods! Marco.
 	 * 
 	 * FIXME: Use {@link AbstractJDOQuery} instead of search filter and get only ids from the datastore
 	 */

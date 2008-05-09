@@ -18,10 +18,10 @@
 	<classpathentry combineaccessrules="false" kind="src" path="/JFireBase"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/JFireBaseBean"/>
 	<classpathentry kind="var" path="JDO2" sourcepath="JPOX_SRC"/>
-	<classpathentry kind="var" path="JPOX" sourcepath="JPOX_SRC"/>
+	<classpathentry kind="var" path="DATANUCLEUS_CORE"/> <classpathentry kind="var" path="DATANUCLEUS_JAVA5"/>
 	<classpathentry kind="var" path="LOG4J"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/JFireServerManager"/>
-	<classpathentry kind="var" path="JPOXENHANCER"/>
+	<classpathentry kind="var" path="DATANUCLEUS_ENHANCER"/>
 	<classpathentry kind="src" path="/JFireTrade"/>
 	<classpathentry kind="var" path="WORKSPACE/JFireJbpm/lib/jbpm/jbpm-3.1.4.jar"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/JFireJbpm"/>

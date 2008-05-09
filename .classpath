@@ -16,14 +16,14 @@
 	<classpathentry kind="var" path="JBOSS/server/default/lib/jpl-util.jar"/>
 	<classpathentry kind="var" path="LOG4J"/>
 	<classpathentry kind="var" path="JDO2" sourcepath="/JDO2_SRC"/>
-	<classpathentry kind="var" path="JPOX" sourcepath="JPOX_SRC"/>
+	<classpathentry kind="var" path="DATANUCLEUS_CORE"/> <classpathentry kind="var" path="DATANUCLEUS_JAVA5"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/NightLabsBase"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/NightLabsJDO"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/JFireBase"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/JFireBaseBean"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/JFireServerManager"/>
 	<classpathentry kind="var" path="RHINO" sourcepath="/RHINO_SRC"/>
-	<classpathentry kind="var" path="JPOXENHANCER"/>
+	<classpathentry kind="var" path="DATANUCLEUS_ENHANCER"/>
 	<classpathentry kind="var" path="APACHE_COMMONS/commons-lang.jar"/>
 	<classpathentry kind="var" path="WORKSPACE/JFireJbpm/lib/jbpm/jbpm-3.1.4.jar"/>
 	<classpathentry kind="var" path="WORKSPACE/JFireBaseClientLib/dist/JFireBaseClientLib.jar" sourcepath="/WORKSPACE/JFireBaseClientLib/src"/>

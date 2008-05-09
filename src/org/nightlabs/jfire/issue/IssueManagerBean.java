@@ -29,6 +29,7 @@ import org.nightlabs.jdo.query.AbstractSearchQuery;
 import org.nightlabs.jdo.query.JDOQueryCollectionDecorator;
 import org.nightlabs.jdo.query.QueryCollection;
 import org.nightlabs.jfire.base.BaseSessionBeanImpl;
+import org.nightlabs.jfire.base.JFireBaseEAR;
 import org.nightlabs.jfire.editlock.EditLockType;
 import org.nightlabs.jfire.issue.history.IssueHistory;
 import org.nightlabs.jfire.issue.id.IssueCommentID;
@@ -109,7 +110,7 @@ implements SessionBean
 
 	/**
 	 * @ejb.interface-method
-	 * @ejb.transaction type="Supports" @!This usually means that no transaction is opened which is significantly faster and recommended for all read-only EJB methods! Marco.
+	 * @!ejb.transaction type="Supports" @!This usually means that no transaction is opened which is significantly faster and recommended for all read-only EJB methods! Marco.
 	 * @ejb.permission role-name="_Guest_"
 	 */
 	public Set<IssueID> getIssueIDs()
@@ -144,7 +145,7 @@ implements SessionBean
 	/**
 	 * @ejb.interface-method
 	 * @ejb.permission role-name="_Guest_"
-	 * @ejb.transaction type="Supports" @!This usually means that no transaction is opened which is significantly faster and recommended for all read-only EJB methods! Marco.
+	 * @!ejb.transaction type="Supports" @!This usually means that no transaction is opened which is significantly faster and recommended for all read-only EJB methods! Marco.
 	 */
 	public Set<IssueID> getIssueIDs(QueryCollection<? extends AbstractJDOQuery> queries)
 	{
@@ -183,7 +184,7 @@ implements SessionBean
 	
 	/**
 	 * @ejb.interface-method
-	 * @ejb.transaction type="Supports" @!This usually means that no transaction is opened which is significantly faster and recommended for all read-only EJB methods! Marco.
+	 * @!ejb.transaction type="Supports" @!This usually means that no transaction is opened which is significantly faster and recommended for all read-only EJB methods! Marco.
 	 * @ejb.permission role-name="_Guest_"
 	 */
 	@SuppressWarnings("unchecked")
@@ -196,10 +197,10 @@ implements SessionBean
 			pm.close();
 		}
 	}
-	
+
 	/**
 	 * @ejb.interface-method
-	 * @ejb.transaction type="Supports" @!This usually means that no transaction is opened which is significantly faster and recommended for all read-only EJB methods! Marco.
+	 * @!ejb.transaction type="Supports" @!This usually means that no transaction is opened which is significantly faster and recommended for all read-only EJB methods! Marco.
 	 * @ejb.permission role-name="_Guest_"
 	 */
 	@SuppressWarnings("unchecked")
@@ -212,10 +213,10 @@ implements SessionBean
 			pm.close();
 		}
 	}
-	
+
 	/**
 	 * @ejb.interface-method
-	 * @ejb.transaction type="Supports" @!This usually means that no transaction is opened which is significantly faster and recommended for all read-only EJB methods! Marco.
+	 * @!ejb.transaction type="Supports" @!This usually means that no transaction is opened which is significantly faster and recommended for all read-only EJB methods! Marco.
 	 * @ejb.permission role-name="_Guest_"
 	 */
 	public Set<IssueSeverityTypeID> getIssueSeverityTypeIDs()
@@ -232,7 +233,7 @@ implements SessionBean
 	
 	/**
 	 * @ejb.interface-method
-	 * @ejb.transaction type="Supports"
+	 * @!ejb.transaction type="Supports"
 	 * @ejb.permission role-name="_Guest_"
 	 */
 	@SuppressWarnings("unchecked")
@@ -271,7 +272,7 @@ implements SessionBean
 
 	/**
 	 * @ejb.interface-method
-	 * @ejb.transaction type="Supports" @!This usually means that no transaction is opened which is significantly faster and recommended for all read-only EJB methods! Marco.
+	 * @!ejb.transaction type="Supports" @!This usually means that no transaction is opened which is significantly faster and recommended for all read-only EJB methods! Marco.
 	 * @ejb.permission role-name="_Guest_"
 	 */
 	@SuppressWarnings("unchecked")
@@ -289,7 +290,7 @@ implements SessionBean
 
 	/**
 	 * @ejb.interface-method
-	 * @ejb.transaction type="Supports" @!This usually means that no transaction is opened which is significantly faster and recommended for all read-only EJB methods! Marco.
+	 * @!ejb.transaction type="Supports" @!This usually means that no transaction is opened which is significantly faster and recommended for all read-only EJB methods! Marco.
 	 * @ejb.permission role-name="_Guest_"
 	 */
 	@SuppressWarnings("unchecked")
@@ -328,7 +329,7 @@ implements SessionBean
 	
 	/**
 	 * @ejb.interface-method
-	 * @ejb.transaction type="Supports" @!This usually means that no transaction is opened which is significantly faster and recommended for all read-only EJB methods! Marco.
+	 * @!ejb.transaction type="Supports" @!This usually means that no transaction is opened which is significantly faster and recommended for all read-only EJB methods! Marco.
 	 * @ejb.permission role-name="_Guest_"
 	 */
 	@SuppressWarnings("unchecked")
@@ -375,7 +376,7 @@ implements SessionBean
 	
 	/**
 	 * @ejb.interface-method
-	 * @ejb.transaction type="Supports"
+	 * @!ejb.transaction type="Supports"
 	 * @ejb.permission role-name="_Guest_"
 	 */
 	@SuppressWarnings("unchecked")
@@ -391,7 +392,7 @@ implements SessionBean
 
 	/**
 	 * @ejb.interface-method
-	 * @ejb.transaction type="Supports"
+	 * @!ejb.transaction type="Supports"
 	 * @ejb.permission role-name="_Guest_"
 	 */
 	@SuppressWarnings("unchecked")
@@ -431,7 +432,7 @@ implements SessionBean
 
 	/**
 	 * @ejb.interface-method
-	 * @ejb.transaction type="Supports"
+	 * @!ejb.transaction type="Supports"
 	 * @ejb.permission role-name="_Guest_"
 	 */
 	@SuppressWarnings("unchecked")
@@ -449,7 +450,7 @@ implements SessionBean
 
 	/**
 	 * @ejb.interface-method
-	 * @ejb.transaction type="Supports"
+	 * @!ejb.transaction type="Supports"
 	 * @ejb.permission role-name="_Guest_"
 	 */
 	@SuppressWarnings("unchecked")
@@ -465,7 +466,7 @@ implements SessionBean
 	
 	/**
 	 * @ejb.interface-method
-	 * @ejb.transaction type="Supports"
+	 * @!ejb.transaction type="Supports"
 	 * @ejb.permission role-name="_Guest_"
 	 */
 	public Set<IssueLinkTypeID> getIssueLinkTypeIDs(Class<? extends Object> linkedObjectClass)
@@ -501,13 +502,20 @@ implements SessionBean
 			Issue pIssue = pm.makePersistent(issue);
 
 			if (isNewIssue) {
-				pm.flush();
-				// create the ProcessInstance for new Issues
-				// TODO: WORKAROUND: Calling createProcessInstanceForIssue on pIssue.getIssueType() says that this IssueType is not persistent ?!?
-				IssueType type = (IssueType) pm.getObjectById(JDOHelper.getObjectId(pIssue.getIssueType()));
-				if (type == null) {
-					throw new IllegalStateException("Could not create ProcessInstance for new Issue as its type is null");
+				IssueType type;
+
+				if (JFireBaseEAR.JPOX_WORKAROUND_FLUSH_ENABLED) {				
+					pm.flush();
+					// create the ProcessInstance for new Issues
+					// TODO: WORKAROUND: Calling createProcessInstanceForIssue on pIssue.getIssueType() says that this IssueType is not persistent ?!?
+					type = (IssueType) pm.getObjectById(JDOHelper.getObjectId(pIssue.getIssueType()));
+					if (type == null) {
+						throw new IllegalStateException("Could not create ProcessInstance for new Issue as its type is null");
+					}
 				}
+				else
+					type = pIssue.getIssueType();
+
 				type.createProcessInstanceForIssue(pIssue);
 			}
 			

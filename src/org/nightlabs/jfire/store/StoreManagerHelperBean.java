@@ -44,6 +44,7 @@ import javax.jdo.PersistenceManager;
 
 import org.nightlabs.jdo.NLJDOHelper;
 import org.nightlabs.jfire.base.BaseSessionBeanImpl;
+import org.nightlabs.jfire.base.JFireBaseEAR;
 import org.nightlabs.jfire.base.Lookup;
 import org.nightlabs.jfire.security.User;
 import org.nightlabs.jfire.store.deliver.CrossTradeDeliveryCoordinator;
@@ -241,7 +242,8 @@ implements SessionBean
 				}
 
 				if (!reversedArticleIDs.isEmpty()) {
-					pm.flush(); // TODO JPOX WORKAROUND - maybe it helps agains the update-problem (see 2nd workaround below)
+					if (JFireBaseEAR.JPOX_WORKAROUND_FLUSH_ENABLED)
+						pm.flush(); // TODO JPOX WORKAROUND - maybe it helps against the update-problem (see 2nd workaround below)
 
 					TradeManager tradeManager = TradeManagerUtil.getHome(Lookup.getInitialContextProperties(pm, partnerOrganisationID)).create();
 					Offer offer = tradeManager.createCrossTradeReverseOffer(reversedArticleIDs, null);
@@ -249,14 +251,18 @@ implements SessionBean
 					offer = pm.makePersistent(offer);
 
 					// TODO JPOX WORKAROUND BEGIN
-					OfferID offerID = (OfferID) JDOHelper.getObjectId(offer);
-					pm.flush();
-					pm.evictAll();
-					offer = (Offer) pm.getObjectById(offerID);
+					if (JFireBaseEAR.JPOX_WORKAROUND_FLUSH_ENABLED) {
+						OfferID offerID = (OfferID) JDOHelper.getObjectId(offer);
+						pm.flush();
+						pm.evictAll();
+						offer = (Offer) pm.getObjectById(offerID);
+					}
+					// TODO JPOX WORKAROUND END
+
+					// sanity check we should IMHO always do - even without the JPOX workaround being present
 					for (Article article : offer.getArticles()) {
 						article.checkReversing();
 					}
-					// TODO JPOX WORKAROUND END
 
 					// create the local objects
 					new OfferLocal(offer); // self-registering

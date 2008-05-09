@@ -45,6 +45,7 @@ import org.nightlabs.jdo.NLJDOHelper;
 import org.nightlabs.jdo.ObjectIDUtil;
 import org.nightlabs.jfire.accounting.Accounting;
 import org.nightlabs.jfire.accounting.Invoice;
+import org.nightlabs.jfire.base.JFireBaseEAR;
 import org.nightlabs.jfire.base.JFirePrincipal;
 import org.nightlabs.jfire.base.Lookup;
 import org.nightlabs.jfire.organisation.Organisation;
@@ -839,8 +840,10 @@ public abstract class ProductTypeActionHandler
 			nestedProductIDs.add((ProductID) JDOHelper.getObjectId(nestedProduct));
 		} // for (ProductLocal nestedProductLocal : product.getProductLocal().getNestedProductLocals()) {
 
-		pm.flush();
-		pm.evictAll();
+		if (JFireBaseEAR.JPOX_WORKAROUND_FLUSH_ENABLED) {
+			pm.flush();
+			pm.evictAll();
+		}
 
 		if (organisationID2partnerNestedProductIDs_releaseOnly != null)
 			findAndReleaseCrossTradeArticlesForProductIDs(organisationID2partnerNestedProductIDs_releaseOnly);

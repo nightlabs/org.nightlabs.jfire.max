@@ -46,6 +46,7 @@ import org.apache.log4j.Logger;
 import org.jbpm.JbpmContext;
 import org.jbpm.graph.exe.ProcessInstance;
 import org.nightlabs.ModuleException;
+import org.nightlabs.jfire.base.JFireBaseEAR;
 import org.nightlabs.jfire.config.Config;
 import org.nightlabs.jfire.idgenerator.IDGenerator;
 import org.nightlabs.jfire.jbpm.JbpmLookup;
@@ -429,10 +430,12 @@ implements StoreCallback
 
 		productType.createProductTypeLocal(user);
 		// TODO JPOX WORKAROUND - begin
-		try {
-			pm.flush();
-		} catch (Exception x) {
-			logger.warn("JPOX bug: creating ProductTypeLocal caused an exception!", x);
+		if (JFireBaseEAR.JPOX_WORKAROUND_FLUSH_ENABLED) {
+			try {
+				pm.flush();
+			} catch (Exception x) {
+				logger.warn("JPOX bug: creating ProductTypeLocal caused an exception!", x);
+			}
 		}
 
 //	19:30:18,983 WARN  [SQL] Insert of object "org.nightlabs.jfire.voucher.store.VoucherTypeLocal@8a80d8" using statement "INSERT INTO `JFIRETRADE_PRODUCTTYPELOCAL` (`PRODUCT_TYPE_ORGANISATION_ID_OID`,`PRODUCT_TYPE_PRODUCT_TYPE_ID_OID`,`LOCAL_ACCOUNTANT_DELEGATE_LOCAL_ACCOUNTANT_DELEGATE_ID_OID`,`LOCAL_ACCOUNTANT_DELEGATE_ORGANISATION_ID_OID`,`LOCAL_STOREKEEPER_DELEGATE_LOCAL_STOREKEEPER_DELEGATE_ID_OID`,`LOCAL_STOREKEEPER_DELEGATE_ORGANISATION_ID_OID`,`HOME_ANCHOR_ID_OID`,`HOME_ANCHOR_TYPE_ID_OID`,`HOME_ORGANISATION_ID_OID`,`ORGANISATION_ID`,`PRODUCT_TYPE_ID`) VALUES (?,?,?,?,?,?,?,?,?,?,?)" failed : Duplicate entry 'chezfrancois.jfire.org-ostern_a7n' for key 1
@@ -557,7 +560,7 @@ implements StoreCallback
 //	        at org.jboss.remoting.transport.socket.ServerThread.run(ServerThread.java:165)
 
 
-		{
+		if (JFireBaseEAR.JPOX_WORKAROUND_FLUSH_ENABLED) {
 			ProductTypeID productTypeID = (ProductTypeID) JDOHelper.getObjectId(productType);
 			pm.evictAll();
 			productType = (ProductType) pm.getObjectById(productTypeID);

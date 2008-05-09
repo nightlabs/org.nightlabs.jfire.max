@@ -923,20 +923,20 @@ implements
 	}
 
 	/**
-	 * @jdo.field persistence-modifier="none"
-	 */
-	private transient List<State> _states = null;
-
-	/**
 	 * Returns all {@link State}s this {@link Offer} passed (including the current one) and that were registered.
 	 * @return All {@link State}s this {@link Offer} already passed (including the current state).
 	 */
 	public List<State> getStates()
 	{
-		if (_states == null)
-			_states = Collections.unmodifiableList(states);
+		if (logger.isDebugEnabled()) {
+			logger.debug("getStates: offer=" + getPrimaryKey() + " (" + this + ") returning these states:");
 
-		return _states;
+			for (State state : states) {
+				logger.debug("  * " + state.getPrimaryKey());
+			}
+		}
+
+		return Collections.unmodifiableList(states);
 	}
 
 	/**

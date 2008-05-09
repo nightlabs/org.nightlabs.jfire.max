@@ -34,6 +34,8 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
+import javax.jdo.JDOHelper;
+
 import org.apache.log4j.Logger;
 import org.nightlabs.jfire.jbpm.graph.def.ActionHandlerNodeEnter;
 import org.nightlabs.jfire.jbpm.graph.def.Statable;
@@ -230,7 +232,12 @@ implements Serializable, StatableLocal
 	 */
 	public boolean isAccepted()
 	{
-		return acceptDT != null;
+		boolean result = acceptDT != null;
+
+		if (logger.isDebugEnabled())
+			logger.debug("isAccepted: offerLocal=" + getPrimaryKey() + " (" + this + "): " + result);
+
+		return result;
 	}
 	/**
 	 * Instead of accepting, a customer may decide to reject an <tt>Offer</tt>.
@@ -261,8 +268,15 @@ implements Serializable, StatableLocal
 	 */
 	protected void accept(User user)
 	{
-		if (isAccepted())
+		if (logger.isDebugEnabled())
+			logger.debug("accept: offerLocal=" + getPrimaryKey() + " (" + this + ")");
+
+		if (isAccepted()) {
+			if (logger.isDebugEnabled())
+				logger.debug("accept: offerLocal=" + getPrimaryKey() + " (" + this + "): This offer is already accepted => returning silently without action.");
+
 			return;
+		}
 
 		if (!offer.isFinalized())
 			throw new IllegalStateException("This Offer ("+offer.getPrimaryKey()+") is not finalized! Call setFinalized() first!");
@@ -390,12 +404,13 @@ implements Serializable, StatableLocal
 			throw new IllegalArgumentException("state must not be null!");
 
 		if (logger.isDebugEnabled())
-			logger.debug("setState: offer=" + getPrimaryKey() + " (" + this + ") state=" + currentState.getPrimaryKey());
+			logger.debug("setState: offerLocal=" + getPrimaryKey() + " (" + this + ") state=" + currentState.getPrimaryKey() + " JDOHelper.getPersistenceManager(this)=" + JDOHelper.getPersistenceManager(this));
 
 		this.state = currentState;
 		try { // TODO remove this workaround as soon as JPOX is fixed
 			this.states.add(currentState);
 		} catch (Exception x) { // JPOX WORKAROUND (we get a Duplicate key exception)
+			logger.warn("this.states.add(...) failed!", x);
 			if (!x.getMessage().contains("Duplicate entry"))
 				throw new RuntimeException(x);
 		}
@@ -406,17 +421,17 @@ implements Serializable, StatableLocal
 		return state;
 	}
 
-	/**
-	 * @jdo.field persistence-modifier="none"
-	 */
-	private transient List<State> _states = null;
-
 	public List<State> getStates()
 	{
-		if (_states == null)
-			_states = Collections.unmodifiableList(states);
+		if (logger.isDebugEnabled()) {
+			logger.debug("getStates: offerLocal=" + getPrimaryKey() + " (" + this + ") returning " + states.size() + " states. JDOHelper.getPersistenceManager(this)=" + JDOHelper.getPersistenceManager(this));
 
-		return _states;
+			for (State state : states) {
+				logger.debug("  * " + state.getPrimaryKey());
+			}
+		}
+
+		return Collections.unmodifiableList(states);
 	}
 
 	/**

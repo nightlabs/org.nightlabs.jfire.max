@@ -228,7 +228,7 @@ implements Serializable
 
 	/**
 	 * @jdo.field persistence-modifier="persistent"
-	 * @jdo.column jdbc-type="LONGVARCHAR"
+	 * @jdo.column sql-type="CLOB"
 	 */
 	private String errorStackTrace = null;
 

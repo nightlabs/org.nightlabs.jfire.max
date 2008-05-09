@@ -579,7 +579,7 @@ implements Serializable, DeleteCallback, DetachCallback, StoreCallback
 	 * specifying where the root exception happened.
 	 *
 	 * @jdo.field persistence-modifier="persistent"
-	 * @jdo.column jdbc-type="LONGVARCHAR"
+	 * @jdo.column sql-type="CLOB"
 	 */
 	private String allocationExceptionStackTrace = null;
 
@@ -609,7 +609,7 @@ implements Serializable, DeleteCallback, DetachCallback, StoreCallback
 	 * specifying where the root exception happened.
 	 *
 	 * @jdo.field persistence-modifier="persistent"
-	 * @jdo.column jdbc-type="LONGVARCHAR"
+	 * @jdo.column sql-type="CLOB"
 	 */
 	private String releaseExceptionStackTrace = null;
 

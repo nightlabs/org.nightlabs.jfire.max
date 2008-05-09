@@ -8,9 +8,9 @@
 	<classpathentry combineaccessrules="false" kind="src" path="/JFireServerManager"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/NightLabsBase"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/NightLabsJDO"/>
-	<classpathentry sourcepath="JPOX_SRC" kind="var" path="JDO2"/>
-	<classpathentry sourcepath="JPOX_SRC" kind="var" path="JPOX"/>
-	<classpathentry sourcepath="/JPOXENHANCER_SRC" kind="var" path="JPOXENHANCER"/>
+	<classpathentry kind="var" path="JDO2"/>
+	<classpathentry kind="var" path="DATANUCLEUS_CORE"/> <classpathentry kind="var" path="DATANUCLEUS_JAVA5"/>
+	<classpathentry kind="var" path="DATANUCLEUS_ENHANCER"/>
 	<classpathentry kind="var" path="LOG4J"/>
 	<classpathentry sourcepath="/RHINO_SRC" kind="var" path="RHINO"/>
 	<classpathentry kind="var" path="JBOSS/server/default/lib/bcel.jar"/>

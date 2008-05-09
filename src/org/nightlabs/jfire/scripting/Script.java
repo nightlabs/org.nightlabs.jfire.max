@@ -107,7 +107,7 @@ public class Script
 	 * This field stores the actual code of the script which will be executed.
 	 *
 	 * @jdo.field persistence-modifier="persistent"
-	 * @jdo.column jdbc-type="LONGVARCHAR"
+	 * @jdo.column sql-type="CLOB"
 	 */
 	private String text;
 

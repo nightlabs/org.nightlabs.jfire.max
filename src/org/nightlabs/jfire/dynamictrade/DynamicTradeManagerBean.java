@@ -29,6 +29,7 @@ import org.nightlabs.jfire.accounting.priceconfig.FetchGroupsPriceConfig;
 import org.nightlabs.jfire.accounting.priceconfig.IInnerPriceConfig;
 import org.nightlabs.jfire.accounting.priceconfig.id.PriceConfigID;
 import org.nightlabs.jfire.base.BaseSessionBeanImpl;
+import org.nightlabs.jfire.base.JFireBaseEAR;
 import org.nightlabs.jfire.dynamictrade.accounting.priceconfig.DynamicTradePriceConfig;
 import org.nightlabs.jfire.dynamictrade.accounting.priceconfig.PackagePriceConfig;
 import org.nightlabs.jfire.dynamictrade.store.DynamicProduct;
@@ -169,7 +170,7 @@ implements SessionBean
 
 	/**
 	 * @ejb.interface-method
-	 * @ejb.transaction type="Supports" @!This usually means that no transaction is opened which is significantly faster and recommended for all read-only EJB methods! Marco.
+	 * @!ejb.transaction type="Supports" @!This usually means that no transaction is opened which is significantly faster and recommended for all read-only EJB methods! Marco.
 	 * @ejb.permission role-name="_Guest_"
 	 */
 	public Set<ProductTypeID> getChildDynamicProductTypeIDs(
@@ -185,7 +186,7 @@ implements SessionBean
 
 	/**
 	 * @ejb.interface-method
-	 * @ejb.transaction type="Supports" @!This usually means that no transaction is opened which is significantly faster and recommended for all read-only EJB methods! Marco.
+	 * @!ejb.transaction type="Supports" @!This usually means that no transaction is opened which is significantly faster and recommended for all read-only EJB methods! Marco.
 	 * @ejb.permission role-name="_Guest_"
 	 */
 	public Set<ProductTypeID> getDynamicProductTypeIDs(Byte inheritanceNature, Boolean saleable) {
@@ -221,7 +222,7 @@ implements SessionBean
 
 	/**
 	 * @ejb.interface-method
-	 * @ejb.transaction type="Supports" @!This usually means that no transaction is opened which is significantly faster and recommended for all read-only EJB methods! Marco.
+	 * @!ejb.transaction type="Supports" @!This usually means that no transaction is opened which is significantly faster and recommended for all read-only EJB methods! Marco.
 	 * @ejb.permission role-name="_Guest_"
 	 */
 	public List<DynamicProductType> getDynamicProductTypes(
@@ -353,7 +354,7 @@ implements SessionBean
 	/**
 	 * @ejb.interface-method
 	 * @ejb.permission role-name="_Guest_"
-	 * @ejb.transaction type="Supports" @!This usually means that no transaction is opened which is significantly faster and recommended for all read-only EJB methods! Marco.
+	 * @!ejb.transaction type="Supports" @!This usually means that no transaction is opened which is significantly faster and recommended for all read-only EJB methods! Marco.
 	 */
 	public Set<PriceConfigID> getDynamicTradePriceConfigIDs()
 	{
@@ -370,7 +371,7 @@ implements SessionBean
 	/**
 	 * @ejb.interface-method
 	 * @ejb.permission role-name="_Guest_"
-	 * @ejb.transaction type="Supports" @!This usually means that no transaction is opened which is significantly faster and recommended for all read-only EJB methods! Marco.
+	 * @!ejb.transaction type="Supports" @!This usually means that no transaction is opened which is significantly faster and recommended for all read-only EJB methods! Marco.
 	 */
 	public List<DynamicTradePriceConfig> getDynamicTradePriceConfigs(Collection<PriceConfigID> dynamicTradePriceConfigIDs, String[] fetchGroups, int maxFetchDepth)
 	{
@@ -531,10 +532,15 @@ implements SessionBean
 			if (singlePrice != null) {
 				product.getSinglePrice().setAmount(0);
 				product.getSinglePrice().clearFragments();
-				pm.flush();
+
+				if (JFireBaseEAR.JPOX_WORKAROUND_FLUSH_ENABLED)
+					pm.flush();
+
 				product.getSinglePrice().sumPrice(singlePrice);
 				recalculatePrice = true;
-				pm.flush();
+
+				if (JFireBaseEAR.JPOX_WORKAROUND_FLUSH_ENABLED)
+					pm.flush();
 			}
 
 			if (recalculatePrice) {
@@ -543,7 +549,10 @@ implements SessionBean
 				while (++tryCounter < 20) { // TODO remove this workaround!
 					try {
 						price = pm.makePersistent(price);
-						pm.flush();
+
+						if (JFireBaseEAR.JPOX_WORKAROUND_FLUSH_ENABLED)
+							pm.flush();
+
 						break;
 					} catch (Exception x) {
 						// ignore

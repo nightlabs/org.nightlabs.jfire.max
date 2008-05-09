@@ -36,7 +36,7 @@ import org.nightlabs.i18n.I18nText;
  *
  * @jdo.persistence-capable
  *		identity-type="application"
- *		objectid-class="org.nightlabs.jfire.trade.state.id.StateDefinitionNameID"
+ *		objectid-class="org.nightlabs.jfire.jbpm.graph.def.id.StateDefinitionNameID"
  *		detachable="true"
  *		table="JFireJbpm_StateDefinitionName"
  *

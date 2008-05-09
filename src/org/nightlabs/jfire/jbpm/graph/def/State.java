@@ -10,15 +10,15 @@ import javax.jdo.PersistenceManager;
 import org.nightlabs.jdo.NLJDOHelper;
 import org.nightlabs.jdo.ObjectID;
 import org.nightlabs.jdo.ObjectIDUtil;
+import org.nightlabs.jfire.jbpm.graph.def.id.StateID;
 import org.nightlabs.jfire.security.User;
-import org.nightlabs.jfire.trade.state.id.StateID;
 
 /**
  * @author Marco Schulze - marco at nightlabs dot de
  *
  * @jdo.persistence-capable
  *		identity-type="application"
- *		objectid-class="org.nightlabs.jfire.trade.state.id.StateID"
+ *		objectid-class="org.nightlabs.jfire.jbpm.graph.def.id.StateID"
  *		detachable="true"
  *		table="JFireJbpm_State"
  *

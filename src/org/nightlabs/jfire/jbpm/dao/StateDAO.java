@@ -9,8 +9,8 @@ import org.nightlabs.jfire.base.jdo.BaseJDOObjectDAO;
 import org.nightlabs.jfire.jbpm.JbpmManager;
 import org.nightlabs.jfire.jbpm.JbpmManagerUtil;
 import org.nightlabs.jfire.jbpm.graph.def.State;
+import org.nightlabs.jfire.jbpm.graph.def.id.StateID;
 import org.nightlabs.jfire.security.SecurityReflector;
-import org.nightlabs.jfire.trade.state.id.StateID;
 import org.nightlabs.progress.ProgressMonitor;
 
 public class StateDAO

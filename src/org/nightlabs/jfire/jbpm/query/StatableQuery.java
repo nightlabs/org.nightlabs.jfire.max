@@ -9,7 +9,7 @@ import org.apache.log4j.Logger;
 import org.nightlabs.jdo.query.AbstractJDOQuery;
 import org.nightlabs.jdo.query.AbstractSearchQuery;
 import org.nightlabs.jfire.jbpm.graph.def.Statable;
-import org.nightlabs.jfire.trade.state.id.StateDefinitionID;
+import org.nightlabs.jfire.jbpm.graph.def.id.StateDefinitionID;
 
 /**
  * A Query for searching for Implementations of {@link Statable}

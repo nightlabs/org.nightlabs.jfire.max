@@ -9,8 +9,8 @@ import javax.jdo.Query;
 
 import org.nightlabs.jfire.idgenerator.IDGenerator;
 import org.nightlabs.jfire.jbpm.graph.def.id.ProcessDefinitionID;
+import org.nightlabs.jfire.jbpm.graph.def.id.StateDefinitionID;
 import org.nightlabs.jfire.jbpm.graph.def.id.TransitionID;
-import org.nightlabs.jfire.trade.state.id.StateDefinitionID;
 
 /**
  * @author Marco Schulze - marco at nightlabs dot de

@@ -37,14 +37,14 @@ import org.nightlabs.jfire.jbpm.graph.def.State;
 import org.nightlabs.jfire.jbpm.graph.def.StateDefinition;
 import org.nightlabs.jfire.jbpm.graph.def.Transition;
 import org.nightlabs.jfire.jbpm.graph.def.id.ProcessDefinitionID;
+import org.nightlabs.jfire.jbpm.graph.def.id.StateDefinitionID;
+import org.nightlabs.jfire.jbpm.graph.def.id.StateID;
 import org.nightlabs.jfire.jbpm.graph.def.id.TransitionID;
 import org.nightlabs.jfire.jbpm.query.StatableQuery;
 import org.nightlabs.jfire.servermanager.JFireServerManager;
 import org.nightlabs.jfire.servermanager.config.JFireServerConfigModule;
 import org.nightlabs.jfire.servermanager.deploy.DeployOverwriteBehaviour;
 import org.nightlabs.jfire.servermanager.deploy.DeploymentJarItem;
-import org.nightlabs.jfire.trade.state.id.StateDefinitionID;
-import org.nightlabs.jfire.trade.state.id.StateID;
 import org.nightlabs.math.Base36Coder;
 import org.nightlabs.util.IOUtil;
 

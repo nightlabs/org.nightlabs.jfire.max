@@ -10,8 +10,8 @@ import javax.jdo.Query;
 import org.jbpm.graph.node.EndState;
 import org.nightlabs.jfire.idgenerator.IDGenerator;
 import org.nightlabs.jfire.jbpm.graph.def.id.ProcessDefinitionID;
+import org.nightlabs.jfire.jbpm.graph.def.id.StateDefinitionID;
 import org.nightlabs.jfire.security.User;
-import org.nightlabs.jfire.trade.state.id.StateDefinitionID;
 import org.nightlabs.util.Util;
 
 /**
@@ -19,7 +19,7 @@ import org.nightlabs.util.Util;
  *
  * @jdo.persistence-capable
  *		identity-type="application"
- *		objectid-class="org.nightlabs.jfire.trade.state.id.StateDefinitionID"
+ *		objectid-class="org.nightlabs.jfire.jbpm.graph.def.id.StateDefinitionID"
  *		detachable="true"
  *		table="JFireJbpm_StateDefinition"
  *

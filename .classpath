@@ -16,8 +16,8 @@
 			<attribute name="javadoc_location" value="file:/home/tobias/java/jdo_javadoc/apidocs/"/>
 		</attributes>
 	</classpathentry>
-	<classpathentry kind="var" path="JPOXENHANCER" sourcepath="/JPOXENHANCER_SRC"/>
-	<classpathentry kind="var" path="JPOX" sourcepath="JPOX_SRC"/>
+	<classpathentry kind="var" path="DATANUCLEUS_ENHANCER"/>
+	<classpathentry kind="var" path="DATANUCLEUS_CORE"/> <classpathentry kind="var" path="DATANUCLEUS_JAVA5"/>
 	<classpathentry kind="var" path="BCEL"/>
 	<classpathentry kind="var" path="JBOSS/server/default/lib/mail.jar"/>
 	<classpathentry kind="output" path="bin"/>

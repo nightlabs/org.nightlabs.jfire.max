@@ -21,8 +21,8 @@
 	<classpathentry kind="var" path="LOG4J"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/JFireBaseBean"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/JFireServerManager"/>
-	<classpathentry kind="var" path="JPOX" sourcepath="JPOX_SRC"/>
-	<classpathentry kind="var" path="JPOXENHANCER" sourcepath="/JPOXENHANCER_SRC"/>
+	<classpathentry kind="var" path="DATANUCLEUS_CORE"/> <classpathentry kind="var" path="DATANUCLEUS_JAVA5"/>
+	<classpathentry kind="var" path="DATANUCLEUS_ENHANCER"/>
 	<classpathentry kind="var" path="JBOSS/server/default/lib/hibernate3.jar"/>
 	<classpathentry kind="lib" path="lib/jbpm/jbpm-3.1.4.jar" sourcepath="lib/jbpm/jbpm-3.1.4.zip"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/JFireBaseClientLib"/>

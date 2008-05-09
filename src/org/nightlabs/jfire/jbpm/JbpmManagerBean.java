@@ -216,7 +216,7 @@ implements SessionBean
 
 					// Create the 1st descriptor TEMPLATE (which will be processed again) for SchemaExport in the tmp dir.
 					hibernateConfigTemplateIncludeFiles.clear();
-					hibernateConfigTemplateIncludeFiles.put("DATASOURCE", new File(jfireJbpmEarDirectory, "hibernate-" + HibernateEnvironmentMode.SCHEMA_EXPORT + '-' + cfmod.getDatabase().getDatabaseDriverName_noTx()+"-cfg.template.xml.inc"));
+					hibernateConfigTemplateIncludeFiles.put("DATASOURCE", new File(jfireJbpmEarDirectory, "hibernate-" + HibernateEnvironmentMode.SCHEMA_EXPORT + '-' + cfmod.getDatabase().getDatabaseDriverName_noTx() + "-cfg.template.xml.inc"));
 					File hibernateConfigTemplateSchemaExport = new File(tmpFolder, "hibernate-"+ HibernateEnvironmentMode.SCHEMA_EXPORT +"-cfg.template.xml");
 					createHibernateConfigTemplate(hibernateConfigTemplateSchemaExport, hibernateMainConfigTemplateFile, hibernateConfigTemplateIncludeFiles);
 
@@ -229,7 +229,8 @@ implements SessionBean
 
 					// Create the 2nd descriptor TEMPLATE for Runtime.
 					hibernateConfigTemplateIncludeFiles.clear();
-					hibernateConfigTemplateIncludeFiles.put("DATASOURCE", new File(jfireJbpmEarDirectory, "hibernate-" + HibernateEnvironmentMode.RUNTIME + '-' + cfmod.getDatabase().getDatabaseDriverName_xa()+"-cfg.template.xml.inc"));
+					hibernateConfigTemplateIncludeFiles.put("DATASOURCE", new File(jfireJbpmEarDirectory, "hibernate-" + HibernateEnvironmentMode.RUNTIME + '-' + cfmod.getDatabase().getDatabaseDriverName_xa() + "-cfg.template.xml.inc"));
+//					hibernateConfigTemplateIncludeFiles.put("DATASOURCE", new File(jfireJbpmEarDirectory, "hibernate-" + HibernateEnvironmentMode.RUNTIME + '-' + cfmod.getDatabase().getDatabaseDriverName_localTx() + "-cfg.template.xml.inc"));
 					File hibernateConfigTemplateRuntime = new File(tmpFolder, "hibernate-"+ HibernateEnvironmentMode.RUNTIME +"-cfg.template.xml");
 					createHibernateConfigTemplate(hibernateConfigTemplateRuntime, hibernateMainConfigTemplateFile, hibernateConfigTemplateIncludeFiles);
 
@@ -318,7 +319,7 @@ implements SessionBean
 
 	/**
 	 * @ejb.interface-method
-	 * @ejb.transaction type="Supports" @!This usually means that no transaction is opened which is significantly faster and recommended for all read-only EJB methods! Marco.
+	 * @!ejb.transaction type="Supports" @!This usually means that no transaction is opened which is significantly faster and recommended for all read-only EJB methods! Marco.
 	 * @ejb.permission role-name="_Guest_"
 	 */
 	public List<State> getStates(Set<StateID> stateIDs, String[] fetchGroups, int maxFetchDepth)
@@ -333,7 +334,7 @@ implements SessionBean
 
 	/**
 	 * @ejb.interface-method
-	 * @ejb.transaction type="Supports" @!This usually means that no transaction is opened which is significantly faster and recommended for all read-only EJB methods! Marco.
+	 * @!ejb.transaction type="Supports" @!This usually means that no transaction is opened which is significantly faster and recommended for all read-only EJB methods! Marco.
 	 * @ejb.permission role-name="_Guest_"
 	 */
 	public Set<StateID> getStateIDs(ObjectID statableID)
@@ -350,7 +351,7 @@ implements SessionBean
 	 * @param userExecutable If <code>null</code>, it is ignored. If not <code>null</code>, the query filters only transitions where userExecutable has this value.
 	 *
 	 * @ejb.interface-method
-	 * @ejb.transaction type="Supports" @!This usually means that no transaction is opened which is significantly faster and recommended for all read-only EJB methods! Marco.
+	 * @!ejb.transaction type="Supports" @!This usually means that no transaction is opened which is significantly faster and recommended for all read-only EJB methods! Marco.
 	 * @ejb.permission role-name="_Guest_"
 	 */
 	public Set<TransitionID> getTransitionIDs(StateID stateID, Boolean userExecutable)
@@ -382,7 +383,7 @@ implements SessionBean
 	 * @param userExecutable If <code>null</code>, it is ignored. If not <code>null</code>, the query filters only transitions where userExecutable has this value.
 	 *
 	 * @ejb.interface-method
-	 * @ejb.transaction type="Supports" @!This usually means that no transaction is opened which is significantly faster and recommended for all read-only EJB methods! Marco.
+	 * @!ejb.transaction type="Supports" @!This usually means that no transaction is opened which is significantly faster and recommended for all read-only EJB methods! Marco.
 	 * @ejb.permission role-name="_Guest_"
 	 */
 	public Set<TransitionID> getTransitionIDs(StateDefinitionID stateDefinitionID, Boolean userExecutable)
@@ -411,7 +412,7 @@ implements SessionBean
 
 	/**
 	 * @ejb.interface-method
-	 * @ejb.transaction type="Supports" @!This usually means that no transaction is opened which is significantly faster and recommended for all read-only EJB methods! Marco.
+	 * @!ejb.transaction type="Supports" @!This usually means that no transaction is opened which is significantly faster and recommended for all read-only EJB methods! Marco.
 	 * @ejb.permission role-name="_Guest_"
 	 */
 	public List<Transition> getTransitions(Set<TransitionID> transitionIDs, String[] fetchGroups, int maxFetchDepth)
@@ -495,7 +496,7 @@ implements SessionBean
 	 *
 	 * @ejb.interface-method
 	 * @ejb.permission role-name="_Guest_"
-	 * @ejb.transaction type="Supports" @!This usually means that no transaction is opened which is significantly faster and recommended for all read-only EJB methods! Marco.
+	 * @!ejb.transaction type="Supports" @!This usually means that no transaction is opened which is significantly faster and recommended for all read-only EJB methods! Marco.
 	 */
 	@SuppressWarnings("unchecked")
 	public Set<Statable> getStatables(QueryCollection<? extends StatableQuery> statableQueries)

@@ -1,8 +1,5 @@
 package org.nightlabs.jfire.jbpm.graph.def;
 
-import java.util.HashMap;
-import java.util.Map;
-
 import javax.jdo.PersistenceManager;
 
 import org.jbpm.graph.def.ActionHandler;
@@ -25,44 +22,49 @@ implements ActionHandler
 	 */
 	public static final String VARIABLE_NAME_STATABLE_ID = "statableID";
 
-//	// TODO JPOX WORKAROUND: We should get only one real PersistenceManager within one transaction
-//	// so that every of the "virtual" PersistenceManagers sees the same data. Currently this is not
-//	// the case (they use separate data), so we bind the PersistenceManager here to a ThreadLocal.
-//	private static ThreadLocal<PersistenceManager> persistenceManagerThreadLocal = new ThreadLocal<PersistenceManager>();
-	private static ThreadLocal<Map<String, PersistenceManager>> persistenceManagerThreadLocal = new ThreadLocal<Map<String,PersistenceManager>>() {
-		@Override
-		protected Map<String, PersistenceManager> initialValue()
-		{
-			return new HashMap<String, PersistenceManager>();
-		}
-	};
+////	// TODO JPOX WORKAROUND: We should get only one real PersistenceManager within one transaction
+////	// so that every of the "virtual" PersistenceManagers sees the same data. Currently this is not
+////	// the case (they use separate data), so we bind the PersistenceManager here to a ThreadLocal.
+////	private static ThreadLocal<PersistenceManager> persistenceManagerThreadLocal = new ThreadLocal<PersistenceManager>();
+//	private static ThreadLocal<Map<String, PersistenceManager>> persistenceManagerThreadLocal = new ThreadLocal<Map<String,PersistenceManager>>() {
+//		@Override
+//		protected Map<String, PersistenceManager> initialValue()
+//		{
+//			return new HashMap<String, PersistenceManager>();
+//		}
+//	};
 
 	private PersistenceManager persistenceManager = null;
 
 	protected PersistenceManager getPersistenceManager()
 	{
-		// TODO JPOX WORKAROUND: begin
-		// If the PMF would return a delegate to the SAME PM in all calls within the same transaction,
-		// it would be sufficient to cache it only in the local object instance (solely for performance reasons).
-		// But since we get multiple PMs which don't see each others data, we must ensure that we always work with the same one.
-		String currentOrganisationID = null;
+//		// TODO JPOX WORKAROUND: begin
+//		// If the PMF would return a delegate to the SAME PM in all calls within the same transaction,
+//		// it would be sufficient to cache it only in the local object instance (solely for performance reasons).
+//		// But since we get multiple PMs which don't see each others data, we must ensure that we always work with the same one.
+//		String currentOrganisationID = null;
+//		if (persistenceManager == null) {
+//			currentOrganisationID = SecurityReflector.getUserDescriptor().getOrganisationID();
+//			persistenceManager = persistenceManagerThreadLocal.get().get(currentOrganisationID);
+//		}
+//
+//		if (persistenceManager != null && persistenceManager.isClosed())
+//			persistenceManager = null;
+//
+//		if (persistenceManager == null) {
+//			if (currentOrganisationID == null)
+//				currentOrganisationID = SecurityReflector.getUserDescriptor().getOrganisationID();
+//
+//			persistenceManager = new Lookup(currentOrganisationID).getPersistenceManager();
+//
+//			persistenceManagerThreadLocal.get().put(currentOrganisationID, persistenceManager);
+//		}
+//		// TODO JPOX WORKAROUND: end
+
 		if (persistenceManager == null) {
-			currentOrganisationID = SecurityReflector.getUserDescriptor().getOrganisationID();
-			persistenceManager = persistenceManagerThreadLocal.get().get(currentOrganisationID);
-		}
-
-		if (persistenceManager != null && persistenceManager.isClosed())
-			persistenceManager = null;
-
-		if (persistenceManager == null) {
-			if (currentOrganisationID == null)
-				currentOrganisationID = SecurityReflector.getUserDescriptor().getOrganisationID();
-
+			String currentOrganisationID = SecurityReflector.getUserDescriptor().getOrganisationID();
 			persistenceManager = new Lookup(currentOrganisationID).getPersistenceManager();
-
-			persistenceManagerThreadLocal.get().put(currentOrganisationID, persistenceManager);
 		}
-		// TODO JPOX WORKAROUND: end
 
 		return persistenceManager;
 	}

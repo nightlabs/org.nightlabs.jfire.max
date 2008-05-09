@@ -1,6 +1,6 @@
 <!--
   Generic j2ee and webapp (jboss/tomcat/jpox/xdoclet) ant build file 
-  Version: 2007-12-10.00
+  Version: 2008-05-09.00
   Author: marc [at] nightlabs [dot] de
   Author: marco [at] nightlabs [dot] de
   Author: tobias [at] nightlabs [dot] de
@@ -599,7 +599,7 @@
       <pathelement path="${java.class.path}" />
     	<fileset dir="." includes="${project.path.includes}" />
     </path>
-    <taskdef name="jpoxenhancer" classname="org.jpox.enhancer.tools.EnhancerTask">
+    <taskdef name="jpoxenhancer" classname="org.datanucleus.enhancer.tools.EnhancerTask">
       <classpath refid="jpoxenhancer.classpath"/>    	
     </taskdef>
     <jpoxenhancer classpathref="jpoxenhancer.classpath"

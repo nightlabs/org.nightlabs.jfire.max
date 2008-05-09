@@ -53,13 +53,13 @@ public class ProcessDefinitionVersion
 
 	/**
 	 * @jdo.field persistence-modifier="persistent"
-	 * @jdo.column jdbc-type="LONGVARCHAR"
+	 * @jdo.column sql-type="CLOB"
 	 */
 	private String processDefinitionXml;
 
 	/**
 	 * @jdo.field persistence-modifier="persistent"
-	 * @jdo.column jdbc-type="LONGVARCHAR"
+	 * @jdo.column sql-type="CLOB"
 	 */
 	private String gpdXml;
 

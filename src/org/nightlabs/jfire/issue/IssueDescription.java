@@ -71,7 +71,7 @@ public class IssueDescription
 	{
 		this.issue = issue;
 		this.organisationID = issue.getOrganisationID();
-		issueID = issue.getIssueID();
+		this.issueID = issue.getIssueID();
 	}
 
 	/**
@@ -80,15 +80,11 @@ public class IssueDescription
 	public String getOrganisationID() {
 		return organisationID;
 	}
-	
-	
-	/**
-	 * @param organisationID The organisationID to set.
-	 */
-	public void setOrganisationID(String organisationID) {
-		this.organisationID = organisationID;
+
+	public long getIssueID() {
+		return issueID;
 	}
-	
+
 	/**
 	 * @see org.nightlabs.i18n.I18nText#getI18nMap()
 	 */

@@ -70,7 +70,7 @@ public class ProcessDefinitionVersion
 
 	/**
 	 * @jdo.field persistence-modifier="persistent"
-	 * 						collection-type="array"
+	 * @jdo.column sql-type="BLOB"
 	 */
 	private byte[] processImageData;
 

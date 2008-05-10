@@ -67,8 +67,8 @@ implements Serializable{
 	private long issueFileAttachmentID;
 
 	/**
-	 * @!jdo.field persistence-modifier="persistent" collection-type="array" serialized-element="true"
 	 * @jdo.field persistence-modifier="persistent" serialized="true"
+	 * @jdo.column sql-type="BLOB"
 	 */
 	private byte[] data;
 

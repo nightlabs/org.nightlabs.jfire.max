@@ -130,6 +130,7 @@ implements Serializable
 	 * and encoded using UTF-8.
 	 *
 	 * @jdo.field persistence-modifier="persistent"
+	 * @jdo.column sql-type="BLOB"
 	 */
 	private byte[] data;
 

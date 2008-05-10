@@ -90,6 +90,7 @@ public class ReportLayoutLocalisationData implements StoreCallback, Serializable
 	
 	/**
 	 * @jdo.field persistence-modifier="persistent"
+	 * @jdo.column sql-type="BLOB"
 	 */
 	private byte[] localisationData;
 	

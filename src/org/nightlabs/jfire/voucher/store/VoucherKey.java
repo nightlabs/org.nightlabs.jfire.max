@@ -131,7 +131,7 @@ implements Serializable
 	private User reversedUser;
 
 	/**
-	 * @jdo.field persistence-modifier="persistent" unique="true"
+	 * @jdo.field persistence-modifier="persistent" unique="true" null-value="exception"
 	 * @jdo.column length="50"
 	 */
 	private String voucherKey;

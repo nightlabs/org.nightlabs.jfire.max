@@ -35,7 +35,7 @@ extends InvoiceMoneyTransfer
 	}
 
 	/**
-	 * @jdo.field persistence-modifier="persistent" unique="true"
+	 * @jdo.field persistence-modifier="persistent" unique="true" null-value="exception"
 	 */
 	private Article article;
 

@@ -191,7 +191,7 @@ public abstract class ProductTypeActionHandler
 	/**
 	 * Class or interface. If it's a class, it must extend {@link ProductType}.
 	 *
-	 * @jdo.field persistence-modifier="persistent" unique="true"
+	 * @jdo.field persistence-modifier="persistent" unique="true" null-value="exception"
 	 */
 	private String productTypeClassName;
 

@@ -161,7 +161,7 @@ implements 	Serializable, AttachCallback, Statable, DeleteCallback
 	 *		persistence-modifier="persistent"
 	 *		collection-type="collection"
 	 *		element-type="IssueLink"
-	 *		dependent-value="true"
+	 *		dependent-element="true"
 	 *		mapped-by="issue"
 	 */
 	private Set<IssueLink> issueLinks;

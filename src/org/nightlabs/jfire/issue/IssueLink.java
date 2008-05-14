@@ -14,7 +14,6 @@ import javax.jdo.listener.StoreLifecycleListener;
 import javax.jdo.spi.PersistenceCapable;
 
 import org.apache.log4j.Logger;
-import org.nightlabs.jdo.NLJDOHelper;
 import org.nightlabs.jdo.ObjectID;
 import org.nightlabs.jdo.ObjectIDUtil;
 import org.nightlabs.jfire.idgenerator.IDGenerator;
@@ -290,6 +289,10 @@ implements Serializable, DetachCallback, StoreCallback, DeleteCallback
 			@Override
 			public void preStore(InstanceLifecycleEvent event)
 			{
+				if (logger.isDebugEnabled()) 
+				{
+					logger.debug("jdoPreStore: StoreLifecycleListener.preStore : the IssueLink " + getPrimaryKey() + " does NOT yet exist.");
+				}
 				//never used.
 			}
 			@Override
@@ -309,7 +312,7 @@ implements Serializable, DetachCallback, StoreCallback, DeleteCallback
 				{*/
 				if (logger.isDebugEnabled()) 
 				{
-					logger.debug("jdoPreStore: the IssueLink " + getPrimaryKey() + " does NOT yet exist - calling the IssueLinkType's postCreateIssueLink callback method.");
+					logger.debug("jdoPreStore: StoreLifecycleListener.postStore the IssueLink " + getPrimaryKey() + " does NOT yet exist - calling the IssueLinkType's postCreateIssueLink callback method.");
 				}
 				getIssueLinkType().postCreateIssueLink(getPersistenceManager(), IssueLink.this);
 //				}
@@ -327,13 +330,20 @@ implements Serializable, DetachCallback, StoreCallback, DeleteCallback
 
 		getPersistenceManager().addInstanceLifecycleListener(new DeleteLifecycleListener() {
 			@Override
-			public void postDelete(InstanceLifecycleEvent arg0) {
-				//
-			}
-
-			@Override
-			public void preDelete(InstanceLifecycleEvent arg0) {
+			public void preDelete(InstanceLifecycleEvent e) {
+				if (logger.isDebugEnabled()) 
+				{
+					logger.debug("jdoPreDelete: DeleteLifecycleListener.preDelete about to delete " + getPrimaryKey() + ".");
+				}
 				getIssueLinkType().preDeleteIssueLink(getPersistenceManager(), IssueLink.this);
+			}
+			
+			@Override
+			public void postDelete(InstanceLifecycleEvent e) {
+				if (logger.isDebugEnabled()) 
+				{
+					logger.debug("jdoPreDelete: DeleteLifecycleListener.postDelete after delete " + getPrimaryKey() + ".");
+				}
 			}
 		},
 		new Class[] { IssueLink.class });

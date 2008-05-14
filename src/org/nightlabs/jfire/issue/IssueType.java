@@ -65,6 +65,7 @@ implements Serializable{
 	public static final String FETCH_GROUP_ISSUE_PRIORITIES = "IssueType.issuePriorities";
 	public static final String FETCH_GROUP_ISSUE_SEVERITY_TYPES = "IssueType.issueSeverityTypes";
 	public static final String FETCH_GROUP_ISSUE_RESOLUTIONS = "IssueType.issueResolutions";
+	public static final String FETCH_GROUP_PROCESS_DEFINITION = "IssueType.processDefinition";
 	
 	public static final String QUERY_ALL_ISSUETYPE_IDS = "getAllIssueTypeIDs";
 	

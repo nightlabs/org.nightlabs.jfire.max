@@ -295,7 +295,7 @@ implements SessionBean
 	 * @throws SecurityException if writing is not allowed.
 	 */
 	private void assertWritingAllowed()
-	throws org.nightlabs.jfire.security.SecurityException
+	throws SecurityException
 	{
 		if (!hasRootOrganisation()) // if there is no root-organisation, writing is allowed
 			return;
@@ -305,7 +305,7 @@ implements SessionBean
 		if (getOrganisationID().equals(rootOrganisationID)) // if we are the root-organisation, writing is ok
 			return;
 
-		throw new org.nightlabs.jfire.security.SecurityException("Writing geography template data is exclusively allowed to the root-organisation (" + rootOrganisationID + ") when using JFire in network mode (with a root-organisation present). Your organisation (" + getOrganisationID() + ") cannot modify the network-wide geography data!");
+		throw new SecurityException("Writing geography template data is exclusively allowed to the root-organisation (" + rootOrganisationID + ") when using JFire in network mode (with a root-organisation present). Your organisation (" + getOrganisationID() + ") cannot modify the network-wide geography data!");
 	}
 
 	/**
@@ -314,7 +314,7 @@ implements SessionBean
 	 * @ejb.permission role-name="_Guest_"
 	 */
 	public void storeGeographyTemplateCountryData(Country storedCountry)
-	throws IOException, org.nightlabs.jfire.security.SecurityException
+	throws IOException, SecurityException
 	{
 		assertWritingAllowed();
 
@@ -389,7 +389,7 @@ implements SessionBean
 	 * @ejb.permission role-name="_Guest_"
 	 */
 	public void storeGeographyTemplateRegionData(Region storedRegion)
-	throws IOException, org.nightlabs.jfire.security.SecurityException
+	throws IOException, SecurityException
 	{
 		assertWritingAllowed();
 
@@ -465,7 +465,7 @@ implements SessionBean
 	 * @ejb.permission role-name="_Guest_"
 	 */
 	public void storeGeographyTemplateCityData(City storedCity)
-	throws IOException, org.nightlabs.jfire.security.SecurityException
+	throws IOException, SecurityException
 	{
 		assertWritingAllowed();
 
@@ -543,7 +543,7 @@ implements SessionBean
 	 * @ejb.permission role-name="_Guest_"
 	 */
 	public void storeGeographyTemplateLocationData(Location storedLocation)
-	throws IOException, org.nightlabs.jfire.security.SecurityException
+	throws IOException, SecurityException
 	{
 		assertWritingAllowed();
 
@@ -623,7 +623,7 @@ implements SessionBean
 	 * @ejb.permission role-name="_Guest_"
 	 */
 	public void storeGeographyTemplateDistrictData(District storedDistrict)
-	throws IOException, org.nightlabs.jfire.security.SecurityException
+	throws IOException, SecurityException
 	{
 		assertWritingAllowed();
 

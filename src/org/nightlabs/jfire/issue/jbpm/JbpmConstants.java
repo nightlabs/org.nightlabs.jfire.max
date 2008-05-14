@@ -15,7 +15,9 @@ import org.nightlabs.jfire.organisation.Organisation;
  * @author Alexander Bieber <!-- alex [AT] nightlabs [DOT] de -->
  *
  */
-public class JbpmConstants {
+public class JbpmConstants
+{
+	private JbpmConstants() { }
 
 	public static final String NODE_NAME_NEW = Organisation.DEV_ORGANISATION_ID + ":new";
 	public static final String NODE_NAME_OPEN = Organisation.DEV_ORGANISATION_ID + ":open";
@@ -84,11 +86,4 @@ public class JbpmConstants {
 		stateDefinition.getDescription().setText(Locale.ENGLISH.getLanguage(), description);
 		stateDefinition.setPublicState(publicState);
 	}
-	
-	/**
-	 */
-	public JbpmConstants() {
-	}
-	
-	
 }

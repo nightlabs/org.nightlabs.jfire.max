@@ -2,6 +2,7 @@ package org.nightlabs.jfire.jbpm.graph.def;
 
 import javax.jdo.PersistenceManager;
 
+import org.apache.log4j.Logger;
 import org.jbpm.graph.def.ActionHandler;
 import org.jbpm.graph.exe.ExecutionContext;
 import org.jbpm.graph.exe.ProcessInstance;
@@ -94,6 +95,14 @@ implements ActionHandler
 
 	private void clear()
 	{
+		if (persistenceManager != null) {
+			try {
+				persistenceManager.close();
+			} catch (Exception x) {
+				Logger.getLogger(AbstractActionHandler.class).error("Exception while closing PersistenceManager!", x);
+			}
+		}
+		
 		persistenceManager = null;
 		statableID = null;
 		statable = null;

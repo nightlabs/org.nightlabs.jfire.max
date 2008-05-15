@@ -26,14 +26,13 @@
 
 package org.nightlabs.jfire.store;
 
-import org.nightlabs.jdo.search.SearchFilter;
 
 /**
  * 
  * @author Alexander Bieber <alex[AT]nightlabs[DOT]de>
  */
 public abstract class ProductTypeGroupSearchFilter
-	extends SearchFilter
+	extends VendorDependentSearchFilter
 {
 	public ProductTypeGroupSearchFilter(int conjunction)
 	{

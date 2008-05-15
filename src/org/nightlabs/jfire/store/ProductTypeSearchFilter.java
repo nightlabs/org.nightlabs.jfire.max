@@ -27,32 +27,15 @@
 package org.nightlabs.jfire.store;
 
 import org.nightlabs.jdo.search.SearchFilter;
-import org.nightlabs.jfire.transfer.id.AnchorID;
 
 /**
  * @author Alexander Bieber <alex[AT]nightlabs[DOT]de>
  * @author Fitas Amine <fitas at nightlabs dot com> 
  */
 public abstract class ProductTypeSearchFilter
-	extends SearchFilter
+	extends VendorDependentSearchFilter
 {
 	private static final long serialVersionUID = 1L;
-
-	private AnchorID vendorID = null;
-
-	/**
-	 * @return Returns the VendorID.
-	 */
-	public AnchorID  getVendorID() {
-		return vendorID;
-	}
-
-	/**
-	 * @param anchorTypeID The VendorID to set.
-	 */
-	public void setVendorID(AnchorID  vendorID) {
-		this.vendorID = vendorID;
-	}
 
 	/**
 	 * @param conjunction the conjunction

@@ -984,7 +984,7 @@ public abstract class ProductTypeActionHandler
 	 * That's why this method is called once for the root element only, the other
 	 * instances of <code>ProductType</code> inherit this value.
 	 * </p>
-	 * The result of this method will be passed to {@link ProductTypeLocal#setAuthorityType(AuthorityType)} by
+	 * The result of this method will be passed to {@link ProductTypeLocal#setSecuringAuthorityType(AuthorityType)} by
 	 * {@link Store#addProductType(User, ProductType)}.
 	 *
 	 * @return the AuthorityType for the given root product type.

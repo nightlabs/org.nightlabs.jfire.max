@@ -53,6 +53,7 @@ import org.nightlabs.jfire.accounting.priceconfig.PriceConfigUtil;
 import org.nightlabs.jfire.accounting.priceconfig.id.PriceConfigID;
 import org.nightlabs.jfire.security.Authority;
 import org.nightlabs.jfire.security.AuthorityType;
+import org.nightlabs.jfire.security.SecuredObject;
 import org.nightlabs.jfire.security.User;
 import org.nightlabs.jfire.store.book.LocalStorekeeperDelegate;
 import org.nightlabs.jfire.store.id.ProductTypeID;
@@ -80,13 +81,13 @@ import org.nightlabs.util.Util;
  * @jdo.fetch-group name="ProductTypeLocal.localStorekeeperDelegate" fields="localStorekeeperDelegate"
  * @jdo.fetch-group name="ProductTypeLocal.nestedProductTypeLocals" fields="nestedProductTypeLocals"
  * @jdo.fetch-group name="ProductTypeLocal.fieldMetaDataMap" fields="fieldMetaDataMap"
- * @jdo.fetch-group name="ProductTypeLocal.authority" fields="authority, authorityType"
+ * @jdo.fetch-group name="ProductTypeLocal.securingAuthority" fields="securingAuthority, securingAuthorityType"
  *
  * @jdo.fetch-group name="ProductType.productTypeLocal" fields="productType"
  * @jdo.fetch-group name="ProductType.this" fields="productType"
  */
 public class ProductTypeLocal
-implements Serializable, Inheritable, InheritanceCallbacks
+implements Serializable, Inheritable, InheritanceCallbacks, SecuredObject
 {
 	private static final long serialVersionUID = 1L;
 
@@ -100,9 +101,9 @@ implements Serializable, Inheritable, InheritanceCallbacks
 	public static final String FETCH_GROUP_NESTED_PRODUCT_TYPE_LOCALS = "ProductTypeLocal.nestedProductTypeLocals";
 
 	/**
-	 * loads both fields {@link #authority} and {@link #authorityType}, because the <code>AuthorityType</code> is the same instance anyway.
+	 * loads both fields {@link #securingAuthority} and {@link #securingAuthorityType}, because the <code>AuthorityType</code> is the same instance anyway.
 	 */
-	public static final String FETCH_GROUP_AUTHORITY = "ProductTypeLocal.authority";
+	public static final String FETCH_GROUP_AUTHORITY = "ProductTypeLocal.securingAuthority";
 
 	/**
 	 * @jdo.field primary-key="true"
@@ -161,18 +162,18 @@ implements Serializable, Inheritable, InheritanceCallbacks
 	protected Map<String, ProductTypeLocalFieldMetaData> fieldMetaDataMap;
 
 	/**
-	 * The authority type for this product type. In an inheritance tree of product types, this must be the same for all product types.
+	 * The securingAuthority type for this product type. In an inheritance tree of product types, this must be the same for all product types.
 	 * That's why the {@link ProductTypeActionHandler#getAuthorityType(ProductType)} is called once for the root object only, the other
 	 * instances inherit this value.
 	 *
 	 * @jdo.field persistence-modifier="persistent"
 	 */
-	private AuthorityType authorityType;
+	private AuthorityType securingAuthorityType;
 
 	/**
 	 * @jdo.field persistence-modifier="persistent"
 	 */
-	private Authority authority;
+	private Authority securingAuthority;
 
 	/**
 	 * @deprecated Only for JDO!
@@ -263,7 +264,7 @@ implements Serializable, Inheritable, InheritanceCallbacks
 		if (fieldName.startsWith("tmpInherit"))
 			return null;
 
-		if ("authorityType".equals(fieldName))
+		if ("securingAuthorityType".equals(fieldName))
 			return new StaticFieldMetaData(fieldName);
 
 // TODO the below checks for nestedProductTypes should be removed after a few months transition time.
@@ -311,8 +312,8 @@ implements Serializable, Inheritable, InheritanceCallbacks
 
 	public void preInherit(Inheritable mother, Inheritable child)
 	{
-		if (getAuthority() == null);
-		if (getAuthorityType() == null);
+		if (getSecuringAuthority() == null);
+		if (getSecuringAuthorityType() == null);
 		
 		if (child == this) {
 			// check whether the nestedPoductTypes change - in this case we will recalculate prices after inheritance in postInherit(...)
@@ -525,46 +526,55 @@ implements Serializable, Inheritable, InheritanceCallbacks
 		return pm;
 	}
 
-	public AuthorityType getAuthorityType() {
-		return authorityType;
+	@Override
+	public AuthorityType getSecuringAuthorityType() {
+		return securingAuthorityType;
 	}
 
-	public void setAuthorityType(AuthorityType authorityType) {
-		if (this.authorityType != null && !this.authorityType.equals(authorityType))
-			throw new IllegalStateException("A different AuthorityType has already been assigned! Cannot change this value afterwards! Currently assigned: " + JDOHelper.getObjectId(this.authorityType) + " New value: " + JDOHelper.getObjectId(authorityType));
+	public void setSecuringAuthorityType(AuthorityType authorityType) {
+		if (this.securingAuthorityType != null && !this.securingAuthorityType.equals(authorityType))
+			throw new IllegalStateException("A different AuthorityType has already been assigned! Cannot change this value afterwards! Currently assigned: " + JDOHelper.getObjectId(this.securingAuthorityType) + " New value: " + JDOHelper.getObjectId(authorityType));
 
-		this.authorityType = authorityType;
+		this.securingAuthorityType = authorityType;
 	}
 
 	/**
 	 * Get the currently assigned <code>Authority</code> or <code>null</code>.
 	 * <p>
-	 * If there is no authority assigned (i.e. this property is <code>null</code>), no additional access right
-	 * checks (besides the EJB method privileges) will be done. If there is an authority, access to the <code>ProductType</code>
+	 * If there is no securingAuthority assigned (i.e. this property is <code>null</code>), no additional access right
+	 * checks (besides the EJB method privileges) will be done. If there is an securingAuthority, access to the <code>ProductType</code>
 	 * and the <code>ProductTypeLocal</code> is only granted, if first the global (EJB method based) privileges allow the action
-	 * <b>and</b> second the assigned authority allows the action, as well.
+	 * <b>and</b> second the assigned securingAuthority allows the action, as well.
+	 * </p>
+	 * <p>
+	 * {@inheritDoc}
 	 * </p>
 	 *
 	 * @return the <code>Authority</code> responsible for this <code>ProductType</code> or <code>null</code> if there is none assigned.
 	 */
-	public Authority getAuthority()
+	@Override
+	public Authority getSecuringAuthority()
 	{
-		return authority;
+		return securingAuthority;
 	}
 
 	/**
 	 * Set an <code>Authority</code> or <code>null</code>.
+	 * <p>
+	 * {@inheritDoc}
+	 * </p>
 	 * 
-	 * @param authority the new <code>Authority</code> or <code>null</code>.
-	 * @see #getAuthority()
+	 * @param securingAuthority the new <code>Authority</code> or <code>null</code>.
+	 * @see #getSecuringAuthority()
 	 */
-	public void setAuthority(Authority authority)
+	@Override
+	public void setSecuringAuthority(Authority authority)
 	{
 		if (authority != null) {
 			// check if the AuthorityType is correct.
-			if (!authority.getAuthorityType().equals(authorityType))
-				throw new IllegalArgumentException("authority.authorityType does not match this.authorityType! authority: " + JDOHelper.getObjectId(authority) + " this: " + JDOHelper.getObjectId(this));
+			if (!authority.getAuthorityType().equals(securingAuthorityType))
+				throw new IllegalArgumentException("securingAuthority.authorityType does not match this.authorityType! securingAuthority: " + JDOHelper.getObjectId(authority) + " this: " + JDOHelper.getObjectId(this));
 		}
-		this.authority = authority;
+		this.securingAuthority = authority;
 	}
 }

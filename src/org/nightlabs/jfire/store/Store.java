@@ -571,7 +571,7 @@ implements StoreCallback
 
 		if (productType.getExtendedProductType() == null) {
 			AuthorityType authorityType = ProductTypeActionHandler.getProductTypeActionHandler(pm, productType.getClass()).getAuthorityType(productType);
-			productType.getProductTypeLocal().setAuthorityType(authorityType);
+			productType.getProductTypeLocal().setSecuringAuthorityType(authorityType);
 		}
 
 		return productType;

@@ -81,7 +81,8 @@ import org.nightlabs.util.Util;
  * @jdo.fetch-group name="ProductTypeLocal.localStorekeeperDelegate" fields="localStorekeeperDelegate"
  * @jdo.fetch-group name="ProductTypeLocal.nestedProductTypeLocals" fields="nestedProductTypeLocals"
  * @jdo.fetch-group name="ProductTypeLocal.fieldMetaDataMap" fields="fieldMetaDataMap"
- * @jdo.fetch-group name="ProductTypeLocal.securingAuthority" fields="securingAuthority, securingAuthorityType"
+ *
+ * @jdo.fetch-group name="SecuredObject.securingAuthority" fields="securingAuthority, securingAuthorityType"
  *
  * @jdo.fetch-group name="ProductType.productTypeLocal" fields="productType"
  * @jdo.fetch-group name="ProductType.this" fields="productType"
@@ -100,10 +101,10 @@ implements Serializable, Inheritable, InheritanceCallbacks, SecuredObject
 	public static final String FETCH_GROUP_FIELD_METADATA_MAP = "ProductTypeLocal.fieldMetaDataMap";
 	public static final String FETCH_GROUP_NESTED_PRODUCT_TYPE_LOCALS = "ProductTypeLocal.nestedProductTypeLocals";
 
-	/**
-	 * loads both fields {@link #securingAuthority} and {@link #securingAuthorityType}, because the <code>AuthorityType</code> is the same instance anyway.
-	 */
-	public static final String FETCH_GROUP_AUTHORITY = "ProductTypeLocal.securingAuthority";
+//	/**
+//	 * loads both fields {@link #securingAuthority} and {@link #securingAuthorityType}, because the <code>AuthorityType</code> is the same instance anyway.
+//	 */
+//	public static final String FETCH_GROUP_SECURING_AUTHORITY = "ProductTypeLocal.securingAuthority";
 
 	/**
 	 * @jdo.field primary-key="true"

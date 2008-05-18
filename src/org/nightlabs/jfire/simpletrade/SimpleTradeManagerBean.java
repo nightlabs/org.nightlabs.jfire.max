@@ -992,8 +992,8 @@ implements SessionBean
 		try {
 			Query q = pm.newQuery(SimpleProductType.class);
 			q.setResult("JDOHelper.getObjectId(this)");
-			q.setFilter("this.published");
-			Collection<ProductTypeID> res = CollectionUtil.castCollection((Collection<?>)q.execute());
+			q.setFilter("this.published && this.organisationID == :localOrganisationID");
+			Collection<ProductTypeID> res = CollectionUtil.castCollection((Collection<?>)q.execute(getOrganisationID()));
 			return new HashSet<ProductTypeID>(res);
 		} finally {
 			pm.close();

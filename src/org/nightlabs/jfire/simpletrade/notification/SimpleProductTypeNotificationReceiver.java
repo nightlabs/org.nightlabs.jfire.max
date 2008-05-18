@@ -106,6 +106,9 @@ extends NotificationReceiver
 		while (!productTypes.isEmpty()) {
 			for (Iterator<SimpleProductType> itPT = productTypes.iterator(); itPT.hasNext(); ) {
 				SimpleProductType simpleProductType = itPT.next();
+
+				NLJDOHelper.makeDirtyAllFieldsRecursively(simpleProductType);
+
 				if (simpleProductType.getExtendedProductType() == null || NLJDOHelper.exists(pm, simpleProductType.getExtendedProductType())) {
 					if (simpleProductType.getPackagePriceConfig() != null)
 						priceConfigIDs.add((PriceConfigID) JDOHelper.getObjectId(simpleProductType.getPackagePriceConfig()));
@@ -118,6 +121,9 @@ extends NotificationReceiver
 									user,
 									simpleProductType);
 						}
+
+						if (simpleProductType.getName() == null)
+							throw new IllegalStateException("simpleProductType.getName() == null after replication!");
 					} catch (Exception x) {
 						logger.error("Adding SimpleProductType \"" + simpleProductType.getPrimaryKey() + "\" to Store failed!", x);
 						throw x instanceof RuntimeException ? (RuntimeException)x : new RuntimeException(x);

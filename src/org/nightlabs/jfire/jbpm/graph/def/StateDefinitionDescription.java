@@ -98,7 +98,7 @@ public class StateDefinitionDescription extends I18nText
 	 *		null-value="exception"
 	 *
 	 * @jdo.key-column length="5"
-	 * @jdo.value-column jdbc-type="LONGVARCHAR"
+	 * @jdo.value-column sql-type="CLOB"
 	 *
 	 * @jdo.join
 	 */

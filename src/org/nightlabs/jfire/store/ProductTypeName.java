@@ -34,9 +34,6 @@ public class ProductTypeName
 extends I18nText
 implements Inheritable
 {
-	/**
-	 * 
-	 */
 	private static final long serialVersionUID = 1L;
 
 	/**
@@ -86,18 +83,12 @@ implements Inheritable
 		this.names = new HashMap<String, String>();
 	}
 	
-	/**
-	 * @see org.nightlabs.i18n.I18nText#getI18nMap()
-	 */
 	@Override
-	protected Map getI18nMap()
+	protected Map<String, String> getI18nMap()
 	{
 		return names;
 	}
 	
-	/**
-	 * @see org.nightlabs.i18n.I18nText#getFallBackValue(java.lang.String)
-	 */
 	@Override
 	protected String getFallBackValue(String languageID)
 	{

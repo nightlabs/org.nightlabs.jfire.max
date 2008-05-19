@@ -74,7 +74,7 @@ public class FormulaCell implements Serializable
 	 *		null-value="exception"
 	 *
 	 * @jdo.key-column length="100"
-	 * @jdo.value-column jdbc-type="LONGVARCHAR"
+	 * @jdo.value-column sql-type="CLOB"
 	 *
 	 * @jdo.join
 	 */
@@ -98,6 +98,8 @@ public class FormulaCell implements Serializable
 	private long formulaID;
 
 	/**
+	 * @!jdo.field persistence-modifier="persistent" null-value="exception"
+	 * TODO DataNucleus workaround: the above null-value="exception" is correct but causes exceptions during cross-datastore-replication 
 	 * @jdo.field persistence-modifier="persistent"
 	 */
 	private PriceConfig priceConfig;
@@ -123,6 +125,8 @@ public class FormulaCell implements Serializable
 	}
 
 	/**
+	 * @!jdo.field persistence-modifier="persistent" null-value="exception"
+	 * TODO DataNucleus workaround: the above null-value="exception" is correct but causes exceptions during cross-datastore-replication 
 	 * @jdo.field persistence-modifier="persistent"
 	 */
 	private PriceCoordinate priceCoordinate;

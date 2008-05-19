@@ -80,12 +80,61 @@ public class GridPriceConfigUtil
 	public static void assertConsistency(PersistenceManager pm, Set<PriceConfigID> priceConfigIDs)
 	{
 		long start = System.currentTimeMillis();
-		Query q = pm.newQuery(PriceCoordinate.class);
-		q.setResult("count(this.priceCoordinateID)");
-		q.setFilter("this.priceConfig == null");
-		Long count = (Long) q.execute();
-		if (count.intValue() != 0)
-			throw new IllegalStateException("Datastore is inconsistent! Found " + count + " priceCoordinates with PriceCoordinate.priceConfig == null!");
+		{
+			Query q = pm.newQuery(PriceCoordinate.class);
+//			q.setResult("count(this.priceCoordinateID)");
+			q.setResult("count(this)");
+			q.setFilter("this.priceConfig == null");
+			Long count = (Long) q.execute();
+			if (count.intValue() != 0)
+				throw new IllegalStateException("Datastore is inconsistent! Found " + count + " PriceCoordinate instances with PriceCoordinate.priceConfig == null!");
+		}
+
+
+		{
+			Query q = pm.newQuery(PriceCell.class);
+//			q.setResult("count(this.priceID)");
+			q.setResult("count(this)");
+			q.setFilter("this.price == null");
+			Long count = (Long) q.execute();
+			if (count.intValue() != 0)
+				throw new IllegalStateException("Datastore is inconsistent! Found " + count + " PriceCell instances with PriceCell.price == null!");
+		}
+		{
+			Query q = pm.newQuery(PriceCell.class);
+			q.setResult("count(this)");
+			q.setFilter("this.priceCoordinate == null");
+			Long count = (Long) q.execute();
+			if (count.intValue() != 0)
+				throw new IllegalStateException("Datastore is inconsistent! Found " + count + " PriceCell instances with PriceCell.priceCoordinate == null!");
+		}
+		{
+			Query q = pm.newQuery(PriceCell.class);
+			q.setResult("count(this)");
+			q.setFilter("this.priceConfig == null");
+			Long count = (Long) q.execute();
+			if (count.intValue() != 0)
+				throw new IllegalStateException("Datastore is inconsistent! Found " + count + " PriceCell instances with PriceCell.priceConfig == null!");
+		}
+
+
+		{
+			Query q = pm.newQuery(FormulaCell.class);
+			q.setResult("count(this)");
+			q.setFilter("this.priceCoordinate == null");
+			Long count = (Long) q.execute();
+			if (count.intValue() != 0)
+				throw new IllegalStateException("Datastore is inconsistent! Found " + count + " FormulaCell instances with FormulaCell.priceCoordinate == null!");
+		}
+		{
+			Query q = pm.newQuery(FormulaCell.class);
+			q.setResult("count(this)");
+			q.setFilter("this.priceConfig == null");
+			Long count = (Long) q.execute();
+			if (count.intValue() != 0)
+				throw new IllegalStateException("Datastore is inconsistent! Found " + count + " FormulaCell instances with FormulaCell.priceConfig == null!");
+		}
+
 
 		long duration = System.currentTimeMillis() - start;
 		if (duration > 1000)

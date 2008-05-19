@@ -354,12 +354,13 @@ implements StoreCallback
 		PersistenceManager pm = getPersistenceManager();
 		productType = pm.makePersistent(productType);
 
-		// JPOX WORKAROUND there seems to be a JPOX bug causing the object not to be cleanly replaced by the attached one
-		{
-			ProductTypeID productTypeID = (ProductTypeID) JDOHelper.getObjectId(productType);
-			pm.evictAll();
-			productType = (ProductType) pm.getObjectById(productTypeID);
-		}
+//		// JPOX WORKAROUND there seems to be a JPOX bug causing the object not to be cleanly replaced by the attached one
+//		if (JFireBaseEAR.JPOX_WORKAROUND_FLUSH_ENABLED) {
+//			pm.flush();
+//			ProductTypeID productTypeID = (ProductTypeID) JDOHelper.getObjectId(productType);
+//			pm.evictAll();
+//			productType = (ProductType) pm.getObjectById(productTypeID);
+//		}
 
 //		15:34:20,427 ERROR [LogInterceptor] RuntimeException in method: public abstract org.nightlabs.ipanema.ticketing.store.Event org.nightlabs.ipanema.ticketing.TicketingManager.storeEvent(org.nightlabs.ipanema.ticketing.store.Event,boolean,java.lang.String[],int) throws org.nightlabs.ModuleException,java.rmi.RemoteException:
 //			javax.jdo.JDODetachedFieldAccessException: You have just attempted to access field "extendedProductType" yet this field was not detached when you detached the object. Either dont access this field, or detach the field when detaching the object.
@@ -428,15 +429,16 @@ implements StoreCallback
 //		ProductTypeActionHandler productTypeActionHandler = ProductTypeActionHandler.getProductTypeActionHandler(getPersistenceManager(), productType.getClass());
 //		Repository defaultHomeRepository = productTypeActionHandler.getDefaultHomeRepository(productType);
 
-		productType.createProductTypeLocal(user);
-		// TODO JPOX WORKAROUND - begin
-		if (JFireBaseEAR.JPOX_WORKAROUND_FLUSH_ENABLED) {
-			try {
-				pm.flush();
-			} catch (Exception x) {
-				logger.warn("JPOX bug: creating ProductTypeLocal caused an exception!", x);
-			}
-		}
+		ProductTypeLocal productTypeLocal = productType.createProductTypeLocal(user);
+		productType.setProductTypeLocal(pm.makePersistent(productTypeLocal));
+//		// TODO JPOX WORKAROUND - begin
+//		if (JFireBaseEAR.JPOX_WORKAROUND_FLUSH_ENABLED) {
+//			try {
+//				pm.flush();
+//			} catch (Exception x) {
+//				logger.warn("JPOX bug: creating ProductTypeLocal caused an exception!", x);
+//			}
+//		}
 
 //	19:30:18,983 WARN  [SQL] Insert of object "org.nightlabs.jfire.voucher.store.VoucherTypeLocal@8a80d8" using statement "INSERT INTO `JFIRETRADE_PRODUCTTYPELOCAL` (`PRODUCT_TYPE_ORGANISATION_ID_OID`,`PRODUCT_TYPE_PRODUCT_TYPE_ID_OID`,`LOCAL_ACCOUNTANT_DELEGATE_LOCAL_ACCOUNTANT_DELEGATE_ID_OID`,`LOCAL_ACCOUNTANT_DELEGATE_ORGANISATION_ID_OID`,`LOCAL_STOREKEEPER_DELEGATE_LOCAL_STOREKEEPER_DELEGATE_ID_OID`,`LOCAL_STOREKEEPER_DELEGATE_ORGANISATION_ID_OID`,`HOME_ANCHOR_ID_OID`,`HOME_ANCHOR_TYPE_ID_OID`,`HOME_ORGANISATION_ID_OID`,`ORGANISATION_ID`,`PRODUCT_TYPE_ID`) VALUES (?,?,?,?,?,?,?,?,?,?,?)" failed : Duplicate entry 'chezfrancois.jfire.org-ostern_a7n' for key 1
 //	19:30:18,987 ERROR [LogInterceptor] RuntimeException in method: public abstract org.nightlabs.jfire.voucher.store.VoucherType org.nightlabs.jfire.voucher.VoucherManager.storeVoucherType(org.nightlabs.jfire.voucher.store.VoucherType,boolean,java.lang.String[],int) throws java.rmi.RemoteException:
@@ -560,14 +562,14 @@ implements StoreCallback
 //	        at org.jboss.remoting.transport.socket.ServerThread.run(ServerThread.java:165)
 
 
-		if (JFireBaseEAR.JPOX_WORKAROUND_FLUSH_ENABLED) {
-			ProductTypeID productTypeID = (ProductTypeID) JDOHelper.getObjectId(productType);
-			pm.evictAll();
-			productType = (ProductType) pm.getObjectById(productTypeID);
-			if (productType.getProductTypeLocal() == null)
-				throw new IllegalStateException("JPOX Workaround failed: There's no ProductTypeLocal!");
-		}
-		// TODO JPOX WORKAROUND - end
+//		if (JFireBaseEAR.JPOX_WORKAROUND_FLUSH_ENABLED) {
+//			ProductTypeID productTypeID = (ProductTypeID) JDOHelper.getObjectId(productType);
+//			pm.evictAll();
+//			productType = (ProductType) pm.getObjectById(productTypeID);
+//			if (productType.getProductTypeLocal() == null)
+//				throw new IllegalStateException("JPOX Workaround failed: There's no ProductTypeLocal!");
+//		}
+//		// TODO JPOX WORKAROUND - end
 
 		if (productType.getExtendedProductType() == null) {
 			AuthorityType authorityType = ProductTypeActionHandler.getProductTypeActionHandler(pm, productType.getClass()).getAuthorityType(productType);

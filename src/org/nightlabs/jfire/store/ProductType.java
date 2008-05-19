@@ -1498,7 +1498,7 @@ implements
 //public abstract I18nText getName();
 	
 	/**
-	 * @jdo.field persistence-modifier="persistent" mapped-by="productType"
+	 * @jdo.field persistence-modifier="persistent" mapped-by="productType" dependent="true"
 	 */
 	private ProductTypeName name;
 	/**
@@ -1507,7 +1507,7 @@ implements
 	 * @return the {@link I18nText} which stores the name of the productType
 	 * in a  {@link ProductTypeName}
 	 */
-	public I18nText getName() {
+	public ProductTypeName getName() {
 		return name;
 	}
 

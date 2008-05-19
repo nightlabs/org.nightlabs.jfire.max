@@ -85,6 +85,7 @@ public class AccountName extends I18nText
 		this.anchorTypeID = account.getAnchorTypeID();
 		this.anchorID = account.getAnchorID();
 		this.account = account;
+		this.names = new HashMap<String, String>();
 	}
 
 	/**
@@ -102,19 +103,13 @@ public class AccountName extends I18nText
 	 *
 	 * @jdo.join
 	 */
-	protected Map names = new HashMap();
-	
-	/**
-	 * @see org.nightlabs.i18n.I18nText#getI18nMap()
-	 */
+	protected Map<String, String> names;
+
 	@Override
-	protected Map getI18nMap() {
+	protected Map<String, String> getI18nMap() {
 		return names;
 	}
 
-	/**
-	 * @see org.nightlabs.i18n.I18nText#getFallBackValue(java.lang.String)
-	 */
 	@Override
 	protected String getFallBackValue(String languageID) {
 		return anchorID;

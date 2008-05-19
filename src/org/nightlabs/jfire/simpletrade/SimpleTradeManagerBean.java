@@ -49,10 +49,12 @@ import javax.jdo.JDOHelper;
 import javax.jdo.JDOObjectNotFoundException;
 import javax.jdo.PersistenceManager;
 import javax.jdo.Query;
+
 import org.apache.log4j.Logger;
 import org.nightlabs.ModuleException;
 import org.nightlabs.jdo.NLJDOHelper;
 import org.nightlabs.jdo.moduleregistry.ModuleMetaData;
+import org.nightlabs.jdo.query.AbstractJDOQuery;
 import org.nightlabs.jfire.accounting.Price;
 import org.nightlabs.jfire.accounting.Tariff;
 import org.nightlabs.jfire.accounting.TariffMapper;
@@ -117,7 +119,6 @@ import org.nightlabs.jfire.trade.id.CustomerGroupID;
 import org.nightlabs.jfire.trade.id.OfferID;
 import org.nightlabs.jfire.trade.id.SegmentID;
 import org.nightlabs.util.CollectionUtil;
-
 
 /**
  * @ejb.bean name="jfire/ejb/JFireSimpleTrade/SimpleTradeManager"
@@ -698,8 +699,8 @@ implements SessionBean
 	}
 
 	/**
-	 * @return Returns the {@link Property}s for the given simpleProductTypeIDs trimmed so that they only contain the given structFieldIDs.
-	 * @see Property#detachPropertyWithTrimmedFieldList(PersistenceManager, Property, Set, String[], int)
+	 * @return Returns the {@link PropertySet}s for the given simpleProductTypeIDs trimmed so that they only contain the given structFieldIDs.
+	 * @see PropertySet#detachPropertySetWithTrimmedFieldList(PersistenceManager, PropertySet, Set, String[], int)
 	 *
 	 * @ejb.interface-method
 	 * @ejb.permission role-name="SimpleTradeManager.Admin"
@@ -716,7 +717,7 @@ implements SessionBean
 		try {
 			for (ProductTypeID productTypeID : simpleProductTypeIDs) {
 				SimpleProductType productType = (SimpleProductType) pm.getObjectById(productTypeID);
-				PropertySet detached = PropertySet.detachPropertyWithTrimmedFieldList(
+				PropertySet detached = PropertySet.detachPropertySetWithTrimmedFieldList(
 						pm,
 						productType.getPropertySet(), structFieldIDs,
 						fetchGroups, maxFetchDepth
@@ -1013,6 +1014,7 @@ implements SessionBean
 			pm.getExtent(SimpleProductType.class);
 			pm.getFetchPlan().setGroups(new String[] {
 					FetchPlan.DEFAULT,
+					ProductType.FETCH_GROUP_NAME,
 					FetchGroupsPriceConfig.FETCH_GROUP_EDIT,
 					DeliveryConfiguration.FETCH_GROUP_THIS_DELIVERY_CONFIGURATION,
 					OrganisationLegalEntity.FETCH_GROUP_ORGANISATION,
@@ -1033,10 +1035,12 @@ implements SessionBean
 				// and we need to replace the price config - actually it should be sufficient to simply omit the inner price config
 				// as the package price config contains only stable prices
 
-				// we simply touch every field we need - the others should not be loaded and thus not detached then.
-				simpleProductType.getName().getTexts();
+				// we simply touch every field we need (and don't have in the fetch-groups yet) - the others should not be loaded and thus not detached then.
+//				simpleProductType.getName().getTexts(); // loaded via fetch-group
+//				simpleProductType.getName().getProductType();
 				simpleProductType.getPackagePriceConfig();
 				simpleProductType.getOwner();
+				simpleProductType.getVendor();
 				simpleProductType.getExtendedProductType();
 				simpleProductType.getDeliveryConfiguration();
 
@@ -1053,10 +1057,6 @@ implements SessionBean
 					Set<CustomerGroupID> unavailableCustomerGroupIDs = new HashSet<CustomerGroupID>();
 					GridPriceConfig gridPriceConfig = (GridPriceConfig) simpleProductType.getPackagePriceConfig();
 					
-					//FIXME Check whether this loop is necessary
-					for (@SuppressWarnings("unused") CustomerGroup customerGroup : gridPriceConfig.getCustomerGroups()) {
-					}
-	
 					for (CustomerGroupID customerGroupID : unavailableCustomerGroupIDs)
 						gridPriceConfig.removeCustomerGroup(customerGroupID.organisationID, customerGroupID.customerGroupID);
 				}
@@ -1080,6 +1080,7 @@ implements SessionBean
 	throws JFireException
 	{
 		try {
+			boolean rollback = true;
 			PersistenceManager pm = getPersistenceManager();
 			try {
 				Hashtable<?, ?> initialContextProperties = getInitialContextProperties(emitterOrganisationID);
@@ -1114,7 +1115,11 @@ implements SessionBean
 //
 //				productTypes = pm.makePersistentAll(productTypes);
 //				return productTypes.iterator().next();
+				rollback = false;
 			} finally {
+				if (rollback)
+					sessionContext.setRollbackOnly();
+
 				pm.close();
 			}
 		} catch (Exception x) {

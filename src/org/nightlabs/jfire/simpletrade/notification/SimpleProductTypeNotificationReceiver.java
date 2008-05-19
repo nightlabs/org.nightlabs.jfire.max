@@ -107,13 +107,14 @@ extends NotificationReceiver
 			for (Iterator<SimpleProductType> itPT = productTypes.iterator(); itPT.hasNext(); ) {
 				SimpleProductType simpleProductType = itPT.next();
 
-				NLJDOHelper.makeDirtyAllFieldsRecursively(simpleProductType);
-
 				if (simpleProductType.getExtendedProductType() == null || NLJDOHelper.exists(pm, simpleProductType.getExtendedProductType())) {
 					if (simpleProductType.getPackagePriceConfig() != null)
 						priceConfigIDs.add((PriceConfigID) JDOHelper.getObjectId(simpleProductType.getPackagePriceConfig()));
 
 					try {
+
+						NLJDOHelper.makeDirtyAllFieldsRecursively(simpleProductType);
+
 						if (NLJDOHelper.exists(pm, simpleProductType))
 							simpleProductType = pm.makePersistent(simpleProductType);
 						else {

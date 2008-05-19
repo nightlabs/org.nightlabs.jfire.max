@@ -88,7 +88,7 @@ extends I18nText
 	 *
 	 * @jdo.join
 	 *
-	 * @jdo.value-column jdbc-type="LONGVARCHAR"
+	 * @jdo.value-column sql-type="CLOB"
 	 */
 	protected Map texts;
 

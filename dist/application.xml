@@ -5,4 +5,7 @@
 	<module>
 		<ejb>JFireVoucher.jar</ejb>
 	</module>
+	<module>
+		<java>JFireVoucherEditor2D.jar</java>
+	</module>	
 </application>

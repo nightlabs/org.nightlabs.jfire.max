@@ -96,6 +96,12 @@ public class SimpleProductType extends ProductType
 	public static final String FETCH_GROUP_THIS_SIMPLE_PRODUCT_TYPE = "SimpleProductType.this";
 	public static final String FETCH_GROUP_PROPERTY_SET = "SimpleProductType.propertySet";
 
+	public static final class FieldName
+	{
+		public static final String propertySet = "propertySet";
+		public static final String structLocalScope = "structLocalScope";		
+	};
+	
 	/**
 	 * Note, that this method does only return instances of {@link SimpleProductType} while
 	 * the same-named method {@link ProductType#getChildProductTypes(PersistenceManager, ProductTypeID)}
@@ -133,8 +139,6 @@ public class SimpleProductType extends ProductType
 		super(organisationID, productTypeID, extendedProductType, inheritanceNature, packageNature);
 		this.structLocalScope = StructLocal.DEFAULT_SCOPE;
 		this.propertySet = new PropertySet(organisationID, IDGenerator.nextID(PropertySet.class), SimpleProductType.class.getName(), structLocalScope);
-//		this.name = new SimpleProductTypeName(this);
-//		getFieldMetaData("name").setValueInherited(false);
 	}
 
 	@Override
@@ -188,7 +192,7 @@ public class SimpleProductType extends ProductType
 
 	@Override
 	public FieldInheriter getFieldInheriter(String fieldName) {
-		if ("propertySet".equals(fieldName))
+		if (FieldName.propertySet.equals(fieldName))
 			return new JDOInheritableFieldInheriter();
 
 		return super.getFieldInheriter(fieldName);
@@ -197,7 +201,7 @@ public class SimpleProductType extends ProductType
 	@Override
 	public FieldMetaData getFieldMetaData(String fieldName, boolean createMissingMetaData)
 	{
-		if ("packagePriceConfig".equals(fieldName))
+		if (ProductType.FieldName.packagePriceConfig.equals(fieldName))
 			return null;
 
 		return super.getFieldMetaData(fieldName, createMissingMetaData);

@@ -50,6 +50,11 @@ extends ProductType
 	
 	private static final long serialVersionUID = 1L;
 
+	public static final class FieldName
+	{
+		public static final String voucherLayout = "voucherLayout";
+	};
+	
 	@SuppressWarnings("unchecked")
 	public static Collection<VoucherType> getChildVoucherTypes(PersistenceManager pm, ProductTypeID parentVoucherTypeID)
 	{

@@ -289,8 +289,8 @@ public class GridPriceConfigUtil
 			ProductType pt = (ProductType) pm.getObjectById(assignInnerPriceConfigCommand.getProductTypeID());
 			IInnerPriceConfig pc = assignInnerPriceConfigCommand.getInnerPriceConfigID() == null ? null : (IInnerPriceConfig) pm.getObjectById(assignInnerPriceConfigCommand.getInnerPriceConfigID());
 			boolean applyInheritance = false;
-			if (pt.getFieldMetaData("innerPriceConfig").isValueInherited() != assignInnerPriceConfigCommand.isInnerPriceConfigInherited()) {
-				pt.getFieldMetaData("innerPriceConfig").setValueInherited(assignInnerPriceConfigCommand.isInnerPriceConfigInherited());
+			if (pt.getFieldMetaData(ProductType.FieldName.innerPriceConfig).isValueInherited() != assignInnerPriceConfigCommand.isInnerPriceConfigInherited()) {
+				pt.getFieldMetaData(ProductType.FieldName.innerPriceConfig).setValueInherited(assignInnerPriceConfigCommand.isInnerPriceConfigInherited());
 				applyInheritance = true;
 			}
 			if (!Util.equals(pc, pt.getInnerPriceConfig())) {

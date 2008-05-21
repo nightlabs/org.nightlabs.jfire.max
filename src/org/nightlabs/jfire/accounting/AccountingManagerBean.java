@@ -2614,8 +2614,8 @@ public abstract class AccountingManagerBean
 			pm.getExtent(ProductType.class);
 			ProductType res = (ProductType) pm.getObjectById(productTypeID);
 			res.getName().getTexts();
-			res.getFieldMetaData("innerPriceConfig", false);
-			res.getFieldMetaData("packagePriceConfig", false);
+			res.getFieldMetaData(ProductType.FieldName.innerPriceConfig, false);
+			res.getFieldMetaData(ProductType.FieldName.packagePriceConfig, false);
 			res.getProductTypeLocal().getProductType();
 
 			// load main price configs

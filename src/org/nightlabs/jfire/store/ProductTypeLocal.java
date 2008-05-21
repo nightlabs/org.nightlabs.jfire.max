@@ -106,6 +106,21 @@ implements Serializable, Inheritable, InheritanceCallbacks, SecuredObject
 //	 */
 //	public static final String FETCH_GROUP_SECURING_AUTHORITY = "ProductTypeLocal.securingAuthority";
 
+	public static final class FieldName
+	{
+		public static final String fieldMetaDataMap = "fieldMetaDataMap";
+		public static final String localAccountantDelegate = "localAccountantDelegate";
+		public static final String localStorekeeperDelegate = "localStorekeeperDelegate";
+		public static final String nestedProductTypeLocals = "nestedProductTypeLocals";
+		public static final String organisationID = "organisationID";
+		public static final String productType = "productType";
+		public static final String productTypeID = "productTypeID";
+		public static final String securingAuthority = "securingAuthority";
+		public static final String selfForVirtualSelfPackaging = "selfForVirtualSelfPackaging";
+		public static final String tmpInherit_innerPriceConfigID = "tmpInherit_innerPriceConfigID";
+		public static final String tmpInherit_nestedProductTypes = "tmpInherit_nestedProductTypes";
+	};
+	
 	/**
 	 * @jdo.field primary-key="true"
 	 * @jdo.column length="100"
@@ -245,7 +260,7 @@ implements Serializable, Inheritable, InheritanceCallbacks, SecuredObject
 
 	public FieldInheriter getFieldInheriter(String fieldName)
 	{
-		if ("nestedProductTypeLocals".equals(fieldName))
+		if (FieldName.nestedProductTypeLocals.equals(fieldName))
 			return new NestedProductTypeLocalMapInheriter();
 
 		return new JDOSimpleFieldInheriter();
@@ -257,15 +272,19 @@ implements Serializable, Inheritable, InheritanceCallbacks, SecuredObject
 	{
 		return getFieldMetaData(fieldName, true);
 	}
+	
 	public FieldMetaData getFieldMetaData(String fieldName, boolean createMissingMetaData)
 	{
 		if (fieldName.startsWith("jdo"))
 			return null;
 
-		if (fieldName.startsWith("tmpInherit"))
+		if (fieldName.equals(FieldName.tmpInherit_innerPriceConfigID))
 			return null;
 
-		if ("securingAuthorityType".equals(fieldName))
+		if (fieldName.equals(FieldName.tmpInherit_nestedProductTypes))
+			return null;
+		
+		if (FieldName.securingAuthority.equals(fieldName))
 			return new StaticFieldMetaData(fieldName);
 
 // TODO the below checks for nestedProductTypes should be removed after a few months transition time.
@@ -276,13 +295,13 @@ implements Serializable, Inheritable, InheritanceCallbacks, SecuredObject
 		synchronized (nonInheritableFields) {
 			if (nonInheritableFields.isEmpty()) {
 				// PK fields
-				nonInheritableFields.add("organisationID");
-				nonInheritableFields.add("productTypeID");
+				nonInheritableFields.add(FieldName.organisationID);
+				nonInheritableFields.add(FieldName.productTypeID);
 
 				// other fields
-				nonInheritableFields.add("productType");
-				nonInheritableFields.add("fieldMetaDataMap");
-				nonInheritableFields.add("selfForVirtualSelfPackaging");
+				nonInheritableFields.add(FieldName.productType);
+				nonInheritableFields.add(FieldName.fieldMetaDataMap);
+				nonInheritableFields.add(FieldName.selfForVirtualSelfPackaging);
 			}
 
 			if (nonInheritableFields.contains(fieldName))
@@ -291,7 +310,7 @@ implements Serializable, Inheritable, InheritanceCallbacks, SecuredObject
 
 		ProductTypeLocalFieldMetaData fmd = fieldMetaDataMap.get(fieldName);
 		if (fmd == null && createMissingMetaData) {
-			if ("nestedProductTypeLocals".equals(fieldName))
+			if (FieldName.nestedProductTypeLocals.equals(fieldName))
 				fmd = new ProductTypeLocalMapFieldMetaData(this, fieldName);
 			else
 				fmd = new ProductTypeLocalFieldMetaData(this, fieldName);

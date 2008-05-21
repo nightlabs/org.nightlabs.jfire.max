@@ -187,6 +187,32 @@ implements
 
 	private static final Logger logger = Logger.getLogger(ProductType.class);
 
+	public static final class FieldName
+	{
+		public static final String closed = "closed";
+		public static final String confirmed = "confirmed";
+		public static final String deliveryConfiguration = "deliveryConfiguration";
+		public static final String extendedProductType = "extendedProductType";
+		public static final String extendedProductTypeID = "extendedProductTypeID";
+		public static final String extendedProductTypeID_detached = "extendedProductTypeID_detached";
+		public static final String fieldMetaDataMap = "fieldMetaDataMap";
+		public static final String inheritanceNature = "inheritanceNature";
+		public static final String innerPriceConfig = "innerPriceConfig";
+		public static final String managedProductTypeGroup = "managedProductTypeGroup";
+		public static final String name = "name";
+		public static final String organisationID = "organisationID";
+		public static final String owner = "owner";
+		public static final String packageNature = "packageNature";
+		public static final String packagePriceConfig = "packagePriceConfig";
+		public static final String productAvailable = "productAvailable";
+		public static final String productTypeGroups = "productTypeGroups";
+		public static final String productTypeID = "productTypeID";
+		public static final String productTypeLocal = "productTypeLocal";
+		public static final String published = "published";
+		public static final String saleable = "saleable";
+		public static final String vendor = "vendor";
+	};
+
 	/**
 	 * This fetch-group (named "ProductType.name") must be used in all descendents of this class
 	 * to ensure that the method {@link #getName()} can be used.
@@ -548,8 +574,6 @@ implements
 	 */
 	private DeliveryConfiguration deliveryConfiguration = null;
 
-	protected static String EMPTYSTRING = "";
-
 	/**
 	 * @deprecated Only for JDO!
 	 */
@@ -617,7 +641,7 @@ implements
 		fieldMetaDataMap = new HashMap<String, ProductTypeFieldMetaData>();
 		
 		this.name = new ProductTypeName(this);
-		FieldMetaData fmd = getFieldMetaData("name");
+		FieldMetaData fmd = getFieldMetaData(FieldName.name);
 		if (fmd != null)
 			fmd.setValueInherited(false);
 	}

@@ -24,6 +24,7 @@ import org.nightlabs.jfire.security.User;
 import org.nightlabs.jfire.store.CannotConfirmProductTypeException;
 import org.nightlabs.jfire.store.CannotMakeProductTypeSaleableException;
 import org.nightlabs.jfire.store.CannotPublishProductTypeException;
+import org.nightlabs.jfire.store.ProductTypeLocal;
 import org.nightlabs.jfire.store.id.ProductTypeID;
 import org.nightlabs.jfire.trade.id.CustomerGroupID;
 
@@ -184,13 +185,16 @@ extends Initialiser
 
 		dataCreator.getRootDynamicProductType().applyInheritance();
 
-		softwareDevelopment.getProductTypeLocal().getFieldMetaData("localAccountantDelegate").setValueInherited(false);
+		softwareDevelopment.getProductTypeLocal().getFieldMetaData(
+				ProductTypeLocal.FieldName.localAccountantDelegate).setValueInherited(false);
 		softwareDevelopment.getProductTypeLocal().setLocalAccountantDelegate(swDelegate);
 		softwareDevelopment.applyInheritance();
-		service.getProductTypeLocal().getFieldMetaData("localAccountantDelegate").setValueInherited(false);
+		service.getProductTypeLocal().getFieldMetaData(
+				ProductTypeLocal.FieldName.localAccountantDelegate).setValueInherited(false);
 		service.getProductTypeLocal().setLocalAccountantDelegate(serviceDelegate);
 		service.applyInheritance();
-		misc.getProductTypeLocal().getFieldMetaData("localAccountantDelegate").setValueInherited(false);
+		misc.getProductTypeLocal().getFieldMetaData(
+				ProductTypeLocal.FieldName.localAccountantDelegate).setValueInherited(false);
 		misc.getProductTypeLocal().setLocalAccountantDelegate(miscDelegate);
 		misc.applyInheritance();
 

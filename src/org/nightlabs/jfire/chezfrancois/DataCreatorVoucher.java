@@ -12,6 +12,7 @@ import org.nightlabs.jfire.store.CannotConfirmProductTypeException;
 import org.nightlabs.jfire.store.CannotMakeProductTypeSaleableException;
 import org.nightlabs.jfire.store.CannotPublishProductTypeException;
 import org.nightlabs.jfire.store.ProductType;
+import org.nightlabs.jfire.store.ProductTypeLocal;
 import org.nightlabs.jfire.store.id.ProductTypeID;
 import org.nightlabs.jfire.voucher.accounting.VoucherLocalAccountantDelegate;
 import org.nightlabs.jfire.voucher.store.VoucherType;
@@ -54,7 +55,7 @@ public class DataCreatorVoucher
 		setNames(pt.getName(), names);
 
 		if (packagePriceConfig != null) {
-			pt.getFieldMetaData("packagePriceConfig").setValueInherited(false);
+			pt.getFieldMetaData(ProductType.FieldName.packagePriceConfig).setValueInherited(false);
 			pt.setPackagePriceConfig(packagePriceConfig);
 		}
 		else {
@@ -64,7 +65,7 @@ public class DataCreatorVoucher
 		pt = (VoucherType) store.addProductType(user, pt);
 
 		if (localAccountantDelegate != null) {
-			pt.getProductTypeLocal().getFieldMetaData("localAccountantDelegate").setValueInherited(false);
+			pt.getProductTypeLocal().getFieldMetaData(ProductTypeLocal.FieldName.localAccountantDelegate).setValueInherited(false);
 			pt.getProductTypeLocal().setLocalAccountantDelegate(localAccountantDelegate);
 		}
 		else
@@ -88,7 +89,7 @@ public class DataCreatorVoucher
 				organisationID, productTypeID, category, ProductType.INHERITANCE_NATURE_LEAF, ProductType.PACKAGE_NATURE_OUTER);
 		setNames(pt.getName(), names);
 		if (packagePriceConfig != null) {
-			pt.getFieldMetaData("packagePriceConfig").setValueInherited(false);
+			pt.getFieldMetaData(ProductType.FieldName.packagePriceConfig).setValueInherited(false);
 			pt.setPackagePriceConfig(packagePriceConfig);
 		}
 		else
@@ -97,7 +98,7 @@ public class DataCreatorVoucher
 		pt = (VoucherType) store.addProductType(user, pt);
 
 		if (localAccountantDelegate != null) {
-			pt.getProductTypeLocal().getFieldMetaData("localAccountantDelegate").setValueInherited(false);
+			pt.getProductTypeLocal().getFieldMetaData(ProductTypeLocal.FieldName.localAccountantDelegate).setValueInherited(false);
 			pt.getProductTypeLocal().setLocalAccountantDelegate(localAccountantDelegate);
 		}
 		else

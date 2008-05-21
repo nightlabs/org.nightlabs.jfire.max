@@ -56,7 +56,7 @@ extends DataCreator
 		setNames(pt.getName(), names);
 
 		if (innerPriceConfig != null) {
-			pt.getFieldMetaData("innerPriceConfig").setValueInherited(false);
+			pt.getFieldMetaData(ProductType.FieldName.innerPriceConfig).setValueInherited(false);
 			pt.setInnerPriceConfig(innerPriceConfig);
 		}
 		else {
@@ -83,7 +83,7 @@ extends DataCreator
 		setNames(pt.getName(), names);
 		pt.setPackagePriceConfig(new PackagePriceConfig(IDGenerator.getOrganisationID(), PriceConfig.createPriceConfigID()));
 		if (innerPriceConfig != null) {
-			pt.getFieldMetaData("innerPriceConfig").setValueInherited(false);
+			pt.getFieldMetaData(ProductType.FieldName.innerPriceConfig).setValueInherited(false);
 			pt.setInnerPriceConfig(innerPriceConfig);
 		}
 		else {

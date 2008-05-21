@@ -32,6 +32,7 @@ import org.nightlabs.jfire.simpletrade.store.SimpleProductType;
 import org.nightlabs.jfire.store.CannotConfirmProductTypeException;
 import org.nightlabs.jfire.store.CannotMakeProductTypeSaleableException;
 import org.nightlabs.jfire.store.CannotPublishProductTypeException;
+import org.nightlabs.jfire.store.ProductTypeLocal;
 import org.nightlabs.jfire.store.id.ProductTypeID;
 import org.nightlabs.jfire.trade.Article;
 import org.nightlabs.jfire.trade.CustomerGroup;
@@ -194,10 +195,10 @@ extends Initialiser
 		boxMerlotFrance2001.getProductTypeLocal().createNestedProductTypeLocal(bottleMerlotFrance2001.getProductTypeLocal()).setQuantity(6);
 		boxMerlotCalifornia2003.getProductTypeLocal().createNestedProductTypeLocal(bottleMerlotCalifornia2003.getProductTypeLocal()).setQuantity(6);
 
-		boxMerlotAustralia2001.getProductTypeLocal().getFieldMetaData("nestedProductTypeLocals").setValueInherited(false);
-		boxMerlotAustralia2004.getProductTypeLocal().getFieldMetaData("nestedProductTypeLocals").setValueInherited(false);
-		boxMerlotFrance2001.getProductTypeLocal().getFieldMetaData("nestedProductTypeLocals").setValueInherited(false);
-		boxMerlotCalifornia2003.getProductTypeLocal().getFieldMetaData("nestedProductTypeLocals").setValueInherited(false);
+		boxMerlotAustralia2001.getProductTypeLocal().getFieldMetaData(ProductTypeLocal.FieldName.nestedProductTypeLocals).setValueInherited(false);
+		boxMerlotAustralia2004.getProductTypeLocal().getFieldMetaData(ProductTypeLocal.FieldName.nestedProductTypeLocals).setValueInherited(false);
+		boxMerlotFrance2001.getProductTypeLocal().getFieldMetaData(ProductTypeLocal.FieldName.nestedProductTypeLocals).setValueInherited(false);
+		boxMerlotCalifornia2003.getProductTypeLocal().getFieldMetaData(ProductTypeLocal.FieldName.nestedProductTypeLocals).setValueInherited(false);
 
 		// create ProductTypes: accessories
 		IInnerPriceConfig priceConfigChocolate = dataCreator.createFixPriceConfig(
@@ -257,7 +258,7 @@ extends Initialiser
 
 		// configure moneyflow
 		MappingBasedAccountantDelegate wineAccountantDelegate = new MappingBasedAccountantDelegate(organisationID, "wineAccountantDelegate");
-		wine.getProductTypeLocal().getFieldMetaData("localAccountantDelegate").setValueInherited(false);
+		wine.getProductTypeLocal().getFieldMetaData(ProductTypeLocal.FieldName.localAccountantDelegate).setValueInherited(false);
 		wine.getProductTypeLocal().setLocalAccountantDelegate(wineAccountantDelegate);
 
 		wineAccountantDelegate.addMoneyFlowMapping(
@@ -289,7 +290,7 @@ extends Initialiser
 						accountBoxWhiteVatVal_revenue, accountBoxWhiteVatVal_expense));
 
 		MappingBasedAccountantDelegate accessoriesAccountantDelegate = new MappingBasedAccountantDelegate(organisationID, "accessoriesAccountantDelegate");
-		accessories.getProductTypeLocal().getFieldMetaData("localAccountantDelegate").setValueInherited(false);
+		accessories.getProductTypeLocal().getFieldMetaData(ProductTypeLocal.FieldName.localAccountantDelegate).setValueInherited(false);
 		accessories.getProductTypeLocal().setLocalAccountantDelegate(accessoriesAccountantDelegate);
 
 		accessoriesAccountantDelegate.addMoneyFlowMapping(

@@ -118,7 +118,7 @@ extends DataCreator
 				organisationID, productTypeID, category, ProductType.INHERITANCE_NATURE_LEAF, ProductType.PACKAGE_NATURE_OUTER);
 		setNames(pt.getName(), names);
 		pt.setPackagePriceConfig(new StablePriceConfig(IDGenerator.getOrganisationID(), PriceConfig.createPriceConfigID()));
-		pt.getFieldMetaData("innerPriceConfig").setValueInherited(false);
+		pt.getFieldMetaData(ProductType.FieldName.innerPriceConfig).setValueInherited(false);
 //		pt.getFieldMetaData("localAccountantDelegate").setValueInherited(false); // TODO this should be a field of ProductTypeLocal - not ProductType!
 //		pt.getFieldMetaData("localStorekeeperDelegate").setValueInherited(false); // TODO this should be a field of ProductTypeLocal - not ProductType!
 		pt.setInnerPriceConfig(innerPriceConfig);
@@ -147,7 +147,7 @@ extends DataCreator
 		SimpleProductTypeStruct.getSimpleProductTypeStruct(productType.getOrganisationID(), pm);
 		IStruct struct = StructLocal.getStructLocal(SimpleProductType.class, StructLocal.DEFAULT_SCOPE, pm);
 		PropertySet props = productType.getPropertySet();
-		productType.getFieldMetaData("propertySet").setValueInherited(false);
+		productType.getFieldMetaData(SimpleProductType.FieldName.propertySet).setValueInherited(false);
 		pm.getFetchPlan().setGroups(new String[] {FetchPlan.DEFAULT, PropertySet.FETCH_GROUP_DATA_FIELDS, PropertySet.FETCH_GROUP_FULL_DATA});
 		pm.getFetchPlan().setMaxFetchDepth(NLJDOHelper.MAX_FETCH_DEPTH_NO_LIMIT);
 

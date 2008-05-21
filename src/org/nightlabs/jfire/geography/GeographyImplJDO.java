@@ -88,7 +88,7 @@ extends GeographyImplResourceCSV
 			}
 			return data == null ? null : new InflaterInputStream(new ByteArrayInputStream(data));
 		} finally {
-//			pm.close(); // This should be correct, but causes some problems in certain situations. And as it's a RA, the container will close it for us anyway (even though there might be a warning). Marco.
+			pm.close();
 		}
 	}
 
@@ -105,7 +105,7 @@ extends GeographyImplResourceCSV
 			}
 			return data == null ? null : new InflaterInputStream(new ByteArrayInputStream(data));
 		} finally {
-//			pm.close(); // This should be correct, but causes some problems in certain situations. And as it's a RA, the container will close it for us anyway (even though there might be a warning). Marco.
+			pm.close();
 		}
 	}
 
@@ -122,7 +122,7 @@ extends GeographyImplResourceCSV
 			}
 			return data == null ? null : new InflaterInputStream(new ByteArrayInputStream(data));
 		} finally {
-//			pm.close(); // This should be correct, but causes some problems in certain situations. And as it's a RA, the container will close it for us anyway (even though there might be a warning). Marco.
+			pm.close();
 		}
 	}
 
@@ -139,7 +139,7 @@ extends GeographyImplResourceCSV
 			}
 			return data == null ? null : new InflaterInputStream(new ByteArrayInputStream(data));
 		} finally {
-//			pm.close(); // This should be correct, but causes some problems in certain situations. And as it's a RA, the container will close it for us anyway (even though there might be a warning). Marco.
+			pm.close();
 		}
 	}
 
@@ -156,7 +156,7 @@ extends GeographyImplResourceCSV
 			}
 			return data == null ? null : new InflaterInputStream(new ByteArrayInputStream(data));
 		} finally {
-//			pm.close(); // This should be correct, but causes some problems in certain situations. And as it's a RA, the container will close it for us anyway (even though there might be a warning). Marco.
+			pm.close();
 		}
 	}
 
@@ -173,7 +173,7 @@ extends GeographyImplResourceCSV
 			}
 			return data == null ? null : new InflaterInputStream(new ByteArrayInputStream(data));
 		} finally {
-//			pm.close(); // This should be correct, but causes some problems in certain situations. And as it's a RA, the container will close it for us anyway (even though there might be a warning). Marco.
+			pm.close();
 		}
 	}
 }

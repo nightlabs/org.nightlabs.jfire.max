@@ -106,6 +106,13 @@ implements Serializable, Inheritable, InheritanceCallbacks, SecuredObject
 //	 */
 //	public static final String FETCH_GROUP_SECURING_AUTHORITY = "ProductTypeLocal.securingAuthority";
 
+	/**
+	 * This class defines constants for the field names of implementation of
+	 * {@link Inheritable}, to avoid the use of "hardcoded" Strings for retrieving
+	 * {@link FieldMetaData} or {@link FieldInheriter}.  
+	 * In the future the JFire project will probably autogenerate this class,
+	 * but until then you should implement it manually.
+	 */	
 	public static final class FieldName
 	{
 		public static final String fieldMetaDataMap = "fieldMetaDataMap";

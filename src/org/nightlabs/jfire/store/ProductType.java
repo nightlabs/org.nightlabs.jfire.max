@@ -187,6 +187,13 @@ implements
 
 	private static final Logger logger = Logger.getLogger(ProductType.class);
 
+	/**
+	 * This class defines constants for the field names of implementation of
+	 * {@link Inheritable}, to avoid the use of "hardcoded" Strings for retrieving
+	 * {@link FieldMetaData} or {@link FieldInheriter}.  
+	 * In the future the JFire project will probably autogenerate this class,
+	 * but until then you should implement it manually.
+	 */
 	public static final class FieldName
 	{
 		public static final String closed = "closed";

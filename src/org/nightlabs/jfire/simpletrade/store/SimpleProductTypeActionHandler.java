@@ -18,6 +18,7 @@ import org.nightlabs.jfire.accounting.TariffMapping;
 import org.nightlabs.jfire.accounting.id.TariffID;
 import org.nightlabs.jfire.organisation.Organisation;
 import org.nightlabs.jfire.security.AuthorityType;
+import org.nightlabs.jfire.security.RoleGroup;
 import org.nightlabs.jfire.security.User;
 import org.nightlabs.jfire.security.id.AuthorityTypeID;
 import org.nightlabs.jfire.simpletrade.SimpleTradeManager;
@@ -34,6 +35,7 @@ import org.nightlabs.jfire.trade.ArticlePrice;
 import org.nightlabs.jfire.trade.Offer;
 import org.nightlabs.jfire.trade.id.OfferID;
 import org.nightlabs.jfire.trade.id.SegmentID;
+import org.nightlabs.jfire.trade.security.RoleConstants;
 import org.nightlabs.util.CollectionUtil;
 
 /**
@@ -151,8 +153,10 @@ public class SimpleProductTypeActionHandler
 		PersistenceManager pm = getPersistenceManager();
 		AuthorityType authorityType = new AuthorityType(authorityTypeID);
 		// TODO configure access rights completely - implement manual checking where necessary!
-		// hmmm...maybe there should only be one "ProductType.edit" instead of one for each implementation - we have the authorities anyway and can control per ProductType if that right is available or not - so we should better reduce the number of rights!
-//		authorityType.addRoleGroup((RoleGroup) pm.getObjectById(RoleGroupID.create("JFireSimpleTrade.SimpleProductType.edit")));
+		authorityType.addRoleGroup((RoleGroup) pm.getObjectById(RoleConstants.seeProductType));
+		authorityType.addRoleGroup((RoleGroup) pm.getObjectById(RoleConstants.sellProductType));
+		authorityType.addRoleGroup((RoleGroup) pm.getObjectById(RoleConstants.reverseProductType));
+		authorityType.addRoleGroup((RoleGroup) pm.getObjectById(RoleConstants.editProductType));
 		return authorityType;
 	}
 

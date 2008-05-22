@@ -196,13 +196,13 @@ implements Serializable
 	 */
 	protected void preDeleteIssueLink(PersistenceManager pm, IssueLink issueLinkToBeDeleted) { }
 
-	protected PersistenceManager getPersistenceManager()
-	{
-		PersistenceManager pm = JDOHelper.getPersistenceManager(this);
-		if (pm == null)
-			throw new IllegalStateException("This instance of IssueLinkType is currently not persistent! Cannot obtain a PersistenceManager!");
-		return pm;
-	}
+//	protected PersistenceManager getPersistenceManager()
+//	{
+//		PersistenceManager pm = JDOHelper.getPersistenceManager(this);
+//		if (pm == null)
+//			throw new IllegalStateException("This instance of IssueLinkType is currently not persistent! Cannot obtain a PersistenceManager!");
+//		return pm;
+//	}
 
 	@Override
 	public boolean equals(Object obj)

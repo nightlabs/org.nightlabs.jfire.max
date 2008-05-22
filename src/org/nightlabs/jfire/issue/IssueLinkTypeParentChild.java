@@ -68,7 +68,7 @@ extends IssueLinkType
 			}
 
 			issueOnOtherSide.createIssueLink(issueLinkTypeForOtherSide, newIssueLink.getIssue());
-			pm.makePersistent(issueOnOtherSide);
+			JDOHelper.getPersistenceManager(issueOnOtherSide).makePersistent(issueOnOtherSide);
 		}
 	}
 
@@ -82,10 +82,10 @@ extends IssueLinkType
 
 		IssueLinkType issueLinkTypeForOtherSide = null;
 		if (ISSUE_LINK_TYPE_ID_PARENT.equals(issueLinkTypeIDToBeDeleted))
-			issueLinkTypeForOtherSide = (IssueLinkType) getPersistenceManager().getObjectById(ISSUE_LINK_TYPE_ID_CHILD);
+			issueLinkTypeForOtherSide = (IssueLinkType) pm.getObjectById(ISSUE_LINK_TYPE_ID_CHILD);
 
 		if (ISSUE_LINK_TYPE_ID_CHILD.equals(issueLinkTypeIDToBeDeleted))
-			issueLinkTypeForOtherSide = (IssueLinkType) getPersistenceManager().getObjectById(ISSUE_LINK_TYPE_ID_PARENT);
+			issueLinkTypeForOtherSide = (IssueLinkType) pm.getObjectById(ISSUE_LINK_TYPE_ID_PARENT);
 
 
 
@@ -100,7 +100,7 @@ extends IssueLinkType
 			}
 		}
 		
-		pm.makePersistent(issueOnOtherSide);
+		JDOHelper.getPersistenceManager(issueOnOtherSide).makePersistent(issueOnOtherSide);
 //		IssueDAO.sharedInstance().storeIssue(issueOnOtherSide, false, new String[]{FetchPlan.DEFAULT}, 0, null);
 	}
 }

@@ -155,7 +155,7 @@ implements SessionBean
 	@SuppressWarnings("unchecked")
 	private void initRegisterConfigModules(PersistenceManager pm)
 	{
-		// Register all Reporing config-Modules
+		// Register all Reporting-ConfigModules
 		ConfigSetup configSetup = ConfigSetup.getConfigSetup(
 				pm,
 				getOrganisationID(),

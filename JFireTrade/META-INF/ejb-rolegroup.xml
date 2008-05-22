@@ -14,5 +14,19 @@ PUBLIC "-//NightLabs GmbH//DTD JFire role groups 1.0//EN"
 			<description>This is a temporary rolegroup - we will configure proper roles when all is complete.</description>
 		</rolegroup>
 
+		<rolegroup id="org.nightlabs.jfire.trade.seeProductType">
+			<name>See product types</name>
+			<description>See product types with all their properties.</description>
+		</rolegroup>
+
+		<rolegroup id="org.nightlabs.jfire.trade.sellProductType">
+		</rolegroup>
+
+		<rolegroup id="org.nightlabs.jfire.trade.reverseProductType">
+		</rolegroup>
+
+		<rolegroup id="org.nightlabs.jfire.trade.editProductType">
+		</rolegroup>
+
 	</rolegroups>
 </ejb-rolegroup>

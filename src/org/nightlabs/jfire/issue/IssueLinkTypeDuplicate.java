@@ -58,7 +58,7 @@ extends IssueLinkType
 		}
 
 		issueOnOtherSide.createIssueLink(issueLinkTypeDuplicate, newIssueLink.getIssue());
-		JDOHelper.getPersistenceManager(issueOnOtherSide).makePersistent(issueOnOtherSide);
+		pm.makePersistent(issueOnOtherSide);
 	}
 
 	@Override
@@ -78,8 +78,8 @@ extends IssueLinkType
 					issueOnOtherSide.removeIssueLink(issueLinkOnOtherSide);
 			}
 		}
-		
-		JDOHelper.getPersistenceManager(issueOnOtherSide).makePersistent(issueOnOtherSide);
+
+		pm.makePersistent(issueOnOtherSide);
 //		IssueDAO.sharedInstance().storeIssue(issueOnOtherSide, false, new String[]{FetchPlan.DEFAULT}, 0, null);
 	}
 }

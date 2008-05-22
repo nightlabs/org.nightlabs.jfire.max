@@ -6,7 +6,6 @@ import java.util.Set;
 import javax.jdo.JDOHelper;
 import javax.jdo.PersistenceManager;
 import javax.jdo.listener.DeleteCallback;
-import javax.jdo.listener.DeleteLifecycleListener;
 import javax.jdo.listener.DetachCallback;
 import javax.jdo.listener.InstanceLifecycleEvent;
 import javax.jdo.listener.StoreCallback;
@@ -14,6 +13,7 @@ import javax.jdo.listener.StoreLifecycleListener;
 import javax.jdo.spi.PersistenceCapable;
 
 import org.apache.log4j.Logger;
+import org.nightlabs.jdo.NLJDOHelper;
 import org.nightlabs.jdo.ObjectID;
 import org.nightlabs.jdo.ObjectIDUtil;
 import org.nightlabs.jfire.idgenerator.IDGenerator;
@@ -281,46 +281,50 @@ implements Serializable, DetachCallback, StoreCallback, DeleteCallback
 		//		issue 0A --- IssueLinkType 01 --- linkedObject 1A
 
 		// check the states with some queries only if this instance of IssueLink is new (otherwise nothing is added)
-		// => use NLJDOHelper.exists(getPersistenceManager(), IssueLink.this)
+		// => use NLJDOHelper.exists(getPersistenceManager(), this)
 
-		getPersistenceManager().addInstanceLifecycleListener(new StoreLifecycleListener()
-		{
-//			boolean isExisting = false;
-			@Override
-			public void preStore(InstanceLifecycleEvent event)
-			{
-				if (logger.isDebugEnabled()) 
-				{
-					logger.debug("jdoPreStore: StoreLifecycleListener.preStore : the IssueLink " + getPrimaryKey() + " does NOT yet exist.");
-				}
-				//never used.
-			}
-			@Override
-			public void postStore(InstanceLifecycleEvent event) 
-			{
-				if (!IssueLink.this.equals(event.getPersistentInstance()))
-					return;
-
-				/*if (NLJDOHelper.exists(getPersistenceManager(), IssueLink.this)) 
-				{
-				isExisting = true;
-				if (logger.isDebugEnabled())
+		boolean isExisting = NLJDOHelper.exists(getPersistenceManager(), this); // we check in jdoPreStore, because in postStore, it of course always exists (since postStore is called *after* the data is written)
+		if (isExisting) {
+			if (logger.isDebugEnabled())
 				logger.debug("jdoPreStore: the IssueLink " + getPrimaryKey() + " already exists - no need to call the IssueLinkType's postCreateIssueLink callback method.");
-				}
+		}
+		else {
+			if (logger.isDebugEnabled()) 
+				logger.debug("jdoPreStore: the IssueLink " + getPrimaryKey() + " does NOT yet exist - registering StoreLifecycleListener in order to react on postStore.");
 
-				if (!isExisting)
-				{*/
-				if (logger.isDebugEnabled()) 
-				{
-					logger.debug("jdoPreStore: StoreLifecycleListener.postStore the IssueLink " + getPrimaryKey() + " does NOT yet exist - calling the IssueLinkType's postCreateIssueLink callback method.");
-				}
-				getIssueLinkType().postCreateIssueLink(getPersistenceManager(), IssueLink.this);
-//				}
+			getPersistenceManager().addInstanceLifecycleListener(
+					new StoreLifecycleListener()
+					{
+						@Override
+						public void preStore(InstanceLifecycleEvent event)
+						{
+							// nothing to do
+						}
+						@Override
+						public void postStore(InstanceLifecycleEvent event) 
+						{
+							if (!IssueLink.this.equals(event.getPersistentInstance())) {
+								if (logger.isDebugEnabled()) 
+									logger.debug("jdoPreStore: StoreLifecycleListener.postStore: triggered for the wrong object (" + JDOHelper.getObjectId(event.getPersistentInstance()) + ") instead of the IssueLink " + getPrimaryKey() + ". Thus, we silently ignore it.");
 
-				getPersistenceManager().removeInstanceLifecycleListener(this);
-			}
-		},
-		new Class[] { IssueLink.class });
+								// sth. else has been persisted => return and ignore it.
+								return;
+							}
+
+							// Since the listener is triggered for the right object, it has done what it is supposed to do and should be 
+							// removed *before* anything can go wrong.
+							getPersistenceManager().removeInstanceLifecycleListener(this);
+
+							if (logger.isDebugEnabled()) 
+								logger.debug("jdoPreStore: StoreLifecycleListener.postStore: the IssueLink " + getPrimaryKey() + " does NOT yet exist - calling the IssueLinkType's postCreateIssueLink callback method.");
+
+							getIssueLinkType().postCreateIssueLink(getPersistenceManager(), IssueLink.this);
+						}
+					},
+					new Class[] { IssueLink.class }
+			);
+
+		}
 	}
 
 	@Override
@@ -328,25 +332,7 @@ implements Serializable, DetachCallback, StoreCallback, DeleteCallback
 		if (logger.isDebugEnabled())
 			logger.debug("jdoPreDelete: about to delete IssueLink: " + getPrimaryKey());
 
-		getPersistenceManager().addInstanceLifecycleListener(new DeleteLifecycleListener() {
-			@Override
-			public void preDelete(InstanceLifecycleEvent e) {
-				if (logger.isDebugEnabled()) 
-				{
-					logger.debug("jdoPreDelete: DeleteLifecycleListener.preDelete about to delete " + getPrimaryKey() + ".");
-				}
-				getIssueLinkType().preDeleteIssueLink(getPersistenceManager(), IssueLink.this);
-			}
-			
-			@Override
-			public void postDelete(InstanceLifecycleEvent e) {
-				if (logger.isDebugEnabled()) 
-				{
-					logger.debug("jdoPreDelete: DeleteLifecycleListener.postDelete after delete " + getPrimaryKey() + ".");
-				}
-			}
-		},
-		new Class[] { IssueLink.class });
+		getIssueLinkType().preDeleteIssueLink(getPersistenceManager(), IssueLink.this);
 	}
 
 	@Override
@@ -365,8 +351,6 @@ implements Serializable, DetachCallback, StoreCallback, DeleteCallback
 		if (getClass() != obj.getClass()) return false;
 		final IssueLink other = (IssueLink) obj;
 
-		return
-		Util.equals(this.organisationID, other.organisationID) &&
-		Util.equals(this.issueLinkID, other.issueLinkID);
+		return Util.equals(this.organisationID, other.organisationID) && Util.equals(this.issueLinkID, other.issueLinkID);
 	}
 }

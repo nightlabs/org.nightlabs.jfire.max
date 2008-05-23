@@ -2,11 +2,9 @@ package org.nightlabs.jfire.issue;
 
 import java.util.Set;
 
-import javax.jdo.FetchPlan;
 import javax.jdo.JDOHelper;
 import javax.jdo.PersistenceManager;
 
-import org.nightlabs.jfire.issue.dao.IssueDAO;
 import org.nightlabs.jfire.issue.id.IssueLinkTypeID;
 import org.nightlabs.jfire.organisation.Organisation;
 
@@ -58,7 +56,7 @@ extends IssueLinkType
 		}
 
 		issueOnOtherSide.createIssueLink(issueLinkTypeDuplicate, newIssueLink.getIssue());
-		pm.makePersistent(issueOnOtherSide);
+//		pm.makePersistent(issueOnOtherSide); // @chairat: why do you call this? The issueOnOtherSide is already persistent - isn't it? I commented it out, therefore. Marco.
 	}
 
 	@Override
@@ -78,6 +76,6 @@ extends IssueLinkType
 			}
 		}
 
-		pm.makePersistent(issueOnOtherSide);
+//		pm.makePersistent(issueOnOtherSide); // @chairat: why do you call this? The issueOnOtherSide is already persistent - isn't it? I commented it out, therefore. Marco.
 	}
 }

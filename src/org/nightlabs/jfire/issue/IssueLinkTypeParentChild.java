@@ -101,6 +101,5 @@ extends IssueLinkType
 		}
 
 		pm.makePersistent(issueOnOtherSide);
-//		IssueDAO.sharedInstance().storeIssue(issueOnOtherSide, false, new String[]{FetchPlan.DEFAULT}, 0, null);
 	}
 }

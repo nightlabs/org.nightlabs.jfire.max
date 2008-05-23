@@ -73,13 +73,11 @@ extends IssueLinkType
 		
 		Set<IssueLink> issueLinksOnOtherSide = issueOnOtherSide.getIssueLinks();
 		for (IssueLink issueLinkOnOtherSide : issueLinksOnOtherSide) {
-			if (issueLinkTypeDuplicate.equals(issueLinkOnOtherSide.getIssueLinkType())) {
-				if (issueLinkOnOtherSide.getLinkedObject().equals(issueLinkToBeDeleted.getIssue()))
+			if (issueLinkTypeDuplicate.equals(issueLinkOnOtherSide.getIssueLinkType()) && issueLinkOnOtherSide.getLinkedObject().equals(issueLinkToBeDeleted.getIssue())) {
 					issueOnOtherSide.removeIssueLink(issueLinkOnOtherSide);
 			}
 		}
 
 		pm.makePersistent(issueOnOtherSide);
-//		IssueDAO.sharedInstance().storeIssue(issueOnOtherSide, false, new String[]{FetchPlan.DEFAULT}, 0, null);
 	}
 }

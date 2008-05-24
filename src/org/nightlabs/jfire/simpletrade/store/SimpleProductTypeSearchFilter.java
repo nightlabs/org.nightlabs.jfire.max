@@ -35,16 +35,13 @@ import org.nightlabs.jfire.transfer.id.AnchorID;
 
 /**
  * @author Alexander Bieber <alex[AT]nightlabs[DOT]de>
- *
+ * @author marco schulze - marco at nightlabs dot de
  */
 public class SimpleProductTypeSearchFilter
 extends ProductTypeSearchFilter
 {
 	private static final long serialVersionUID = 1L;
 
-	/**
-	 * @param conjunction
-	 */
 	public SimpleProductTypeSearchFilter(int conjunction) {
 		super(conjunction);
 	}
@@ -58,13 +55,16 @@ extends ProductTypeSearchFilter
 
 		AnchorID vendorID = getVendorID();
 		if (vendorID != null) {
+			// JDOHelper.getObjectId(...) can now be used in queries. Hence, simplifying it:
+			filter.append(" && JDOHelper.getObjectId(this.vendor) == :vendorID");
+			paramMap.put("vendorID", vendorID);
 
-			filter.append(" && this.vendor.organisationID == :vendorOrganisationID");
-			filter.append(" && this.vendor.anchorTypeID == :vendorAnchorTypeID");
-			filter.append(" && this.vendor.anchorID == :vendorAnchorID");
-			paramMap.put("vendorOrganisationID", vendorID.organisationID);
-			paramMap.put("vendorAnchorTypeID", vendorID.anchorTypeID);
-			paramMap.put("vendorAnchorID", vendorID.anchorID);
+//			filter.append(" && this.vendor.organisationID == :vendorOrganisationID");
+//			filter.append(" && this.vendor.anchorTypeID == :vendorAnchorTypeID");
+//			filter.append(" && this.vendor.anchorID == :vendorAnchorID");
+//			paramMap.put("vendorOrganisationID", vendorID.organisationID);
+//			paramMap.put("vendorAnchorTypeID", vendorID.anchorTypeID);
+//			paramMap.put("vendorAnchorID", vendorID.anchorID);
 		}
 		else {
 			filter.append(" && this.organisationID == :myOrganisationID");

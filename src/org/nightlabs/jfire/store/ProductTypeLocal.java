@@ -46,15 +46,16 @@ import org.nightlabs.inheritance.InheritanceCallbacks;
 import org.nightlabs.inheritance.StaticFieldMetaData;
 import org.nightlabs.jdo.FetchPlanBackup;
 import org.nightlabs.jdo.NLJDOHelper;
+import org.nightlabs.jdo.ObjectIDUtil;
 import org.nightlabs.jdo.inheritance.JDOSimpleFieldInheriter;
 import org.nightlabs.jfire.accounting.book.LocalAccountantDelegate;
 import org.nightlabs.jfire.accounting.priceconfig.AffectedProductType;
 import org.nightlabs.jfire.accounting.priceconfig.PriceConfigUtil;
 import org.nightlabs.jfire.accounting.priceconfig.id.PriceConfigID;
-import org.nightlabs.jfire.security.Authority;
-import org.nightlabs.jfire.security.AuthorityType;
 import org.nightlabs.jfire.security.SecuredObject;
 import org.nightlabs.jfire.security.User;
+import org.nightlabs.jfire.security.id.AuthorityID;
+import org.nightlabs.jfire.security.id.AuthorityTypeID;
 import org.nightlabs.jfire.store.book.LocalStorekeeperDelegate;
 import org.nightlabs.jfire.store.id.ProductTypeID;
 import org.nightlabs.util.Util;
@@ -82,8 +83,6 @@ import org.nightlabs.util.Util;
  * @jdo.fetch-group name="ProductTypeLocal.nestedProductTypeLocals" fields="nestedProductTypeLocals"
  * @jdo.fetch-group name="ProductTypeLocal.fieldMetaDataMap" fields="fieldMetaDataMap"
  *
- * @jdo.fetch-group name="SecuredObject.securingAuthority" fields="securingAuthority, securingAuthorityType"
- *
  * @jdo.fetch-group name="ProductType.productTypeLocal" fields="productType"
  * @jdo.fetch-group name="ProductType.this" fields="productType"
  */
@@ -104,7 +103,7 @@ implements Serializable, Inheritable, InheritanceCallbacks, SecuredObject
 //	/**
 //	 * loads both fields {@link #securingAuthority} and {@link #securingAuthorityType}, because the <code>AuthorityType</code> is the same instance anyway.
 //	 */
-//	public static final String FETCH_GROUP_SECURING_AUTHORITY = "ProductTypeLocal.securingAuthority";
+//	public static final String FETCH_GROUP_ALL = "ProductTypeLocal.securingAuthority";
 
 	/**
 	 * This class defines constants for the field names of implementation of
@@ -191,12 +190,12 @@ implements Serializable, Inheritable, InheritanceCallbacks, SecuredObject
 	 *
 	 * @jdo.field persistence-modifier="persistent"
 	 */
-	private AuthorityType securingAuthorityType;
+	private String securingAuthorityTypeID;
 
 	/**
 	 * @jdo.field persistence-modifier="persistent"
 	 */
-	private Authority securingAuthority;
+	private String securingAuthorityID;
 
 	/**
 	 * @deprecated Only for JDO!
@@ -339,8 +338,8 @@ implements Serializable, Inheritable, InheritanceCallbacks, SecuredObject
 
 	public void preInherit(Inheritable mother, Inheritable child)
 	{
-		if (getSecuringAuthority() == null);
-		if (getSecuringAuthorityType() == null);
+		if (getSecuringAuthorityID() == null);
+		if (getSecuringAuthorityTypeID() == null);
 		
 		if (child == this) {
 			// check whether the nestedPoductTypes change - in this case we will recalculate prices after inheritance in postInherit(...)
@@ -554,15 +553,15 @@ implements Serializable, Inheritable, InheritanceCallbacks, SecuredObject
 	}
 
 	@Override
-	public AuthorityType getSecuringAuthorityType() {
-		return securingAuthorityType;
+	public AuthorityTypeID getSecuringAuthorityTypeID() {
+		return (AuthorityTypeID) ObjectIDUtil.createObjectID(securingAuthorityTypeID);
 	}
 
-	public void setSecuringAuthorityType(AuthorityType authorityType) {
-		if (this.securingAuthorityType != null && !this.securingAuthorityType.equals(authorityType))
-			throw new IllegalStateException("A different AuthorityType has already been assigned! Cannot change this value afterwards! Currently assigned: " + JDOHelper.getObjectId(this.securingAuthorityType) + " New value: " + JDOHelper.getObjectId(authorityType));
+	public void setSecuringAuthorityTypeID(AuthorityTypeID authorityTypeID) {
+//		if (this.securingAuthorityType != null && !this.securingAuthorityType.equals(authorityType))
+//			throw new IllegalStateException("A different AuthorityType has already been assigned! Cannot change this value afterwards! Currently assigned: " + JDOHelper.getObjectId(this.securingAuthorityType) + " New value: " + JDOHelper.getObjectId(authorityType));
 
-		this.securingAuthorityType = authorityType;
+		this.securingAuthorityTypeID = authorityTypeID == null ? null : authorityTypeID.toString();
 	}
 
 	/**
@@ -580,9 +579,9 @@ implements Serializable, Inheritable, InheritanceCallbacks, SecuredObject
 	 * @return the <code>Authority</code> responsible for this <code>ProductType</code> or <code>null</code> if there is none assigned.
 	 */
 	@Override
-	public Authority getSecuringAuthority()
+	public AuthorityID getSecuringAuthorityID()
 	{
-		return securingAuthority;
+		return (AuthorityID) ObjectIDUtil.createObjectID(securingAuthorityID);
 	}
 
 	/**
@@ -592,16 +591,16 @@ implements Serializable, Inheritable, InheritanceCallbacks, SecuredObject
 	 * </p>
 	 * 
 	 * @param securingAuthority the new <code>Authority</code> or <code>null</code>.
-	 * @see #getSecuringAuthority()
+	 * @see #getSecuringAuthorityID()
 	 */
 	@Override
-	public void setSecuringAuthority(Authority authority)
+	public void setSecuringAuthorityID(AuthorityID authorityID)
 	{
-		if (authority != null) {
-			// check if the AuthorityType is correct.
-			if (!authority.getAuthorityType().equals(securingAuthorityType))
-				throw new IllegalArgumentException("securingAuthority.authorityType does not match this.authorityType! securingAuthority: " + JDOHelper.getObjectId(authority) + " this: " + JDOHelper.getObjectId(this));
-		}
-		this.securingAuthority = authority;
+//		if (authorityID != null) {
+//			// check if the AuthorityType is correct.
+//			if (!authorityID.getAuthorityType().equals(securingAuthorityType))
+//				throw new IllegalArgumentException("securingAuthority.authorityType does not match this.authorityType! securingAuthority: " + JDOHelper.getObjectId(authorityID) + " this: " + JDOHelper.getObjectId(this));
+//		}
+		this.securingAuthorityID = authorityID == null ? null : authorityID.toString();
 	}
 }

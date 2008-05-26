@@ -46,7 +46,6 @@ import org.apache.log4j.Logger;
 import org.jbpm.JbpmContext;
 import org.jbpm.graph.exe.ProcessInstance;
 import org.nightlabs.ModuleException;
-import org.nightlabs.jfire.base.JFireBaseEAR;
 import org.nightlabs.jfire.config.Config;
 import org.nightlabs.jfire.idgenerator.IDGenerator;
 import org.nightlabs.jfire.jbpm.JbpmLookup;
@@ -59,6 +58,7 @@ import org.nightlabs.jfire.organisation.LocalOrganisation;
 import org.nightlabs.jfire.security.AuthorityType;
 import org.nightlabs.jfire.security.SecurityReflector;
 import org.nightlabs.jfire.security.User;
+import org.nightlabs.jfire.security.id.AuthorityTypeID;
 import org.nightlabs.jfire.store.book.BookProductTransfer;
 import org.nightlabs.jfire.store.book.LocalStorekeeper;
 import org.nightlabs.jfire.store.book.PartnerStorekeeper;
@@ -573,7 +573,8 @@ implements StoreCallback
 
 		if (productType.getExtendedProductType() == null) {
 			AuthorityType authorityType = ProductTypeActionHandler.getProductTypeActionHandler(pm, productType.getClass()).getAuthorityType(productType);
-			productType.getProductTypeLocal().setSecuringAuthorityType(authorityType);
+			AuthorityTypeID authorityTypeID = (AuthorityTypeID) JDOHelper.getObjectId(authorityType);
+			productType.getProductTypeLocal().setSecuringAuthorityTypeID(authorityTypeID);
 		}
 
 		return productType;

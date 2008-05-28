@@ -52,6 +52,8 @@ import org.nightlabs.jfire.accounting.book.LocalAccountantDelegate;
 import org.nightlabs.jfire.accounting.priceconfig.AffectedProductType;
 import org.nightlabs.jfire.accounting.priceconfig.PriceConfigUtil;
 import org.nightlabs.jfire.accounting.priceconfig.id.PriceConfigID;
+import org.nightlabs.jfire.security.Authority;
+import org.nightlabs.jfire.security.AuthorityType;
 import org.nightlabs.jfire.security.SecuredObject;
 import org.nightlabs.jfire.security.User;
 import org.nightlabs.jfire.security.id.AuthorityID;
@@ -363,10 +365,12 @@ implements Serializable, Inheritable, InheritanceCallbacks, SecuredObject
 		}
 
 		// ensure that these fields are loaded
-//		if (home == null);
 		if (localAccountantDelegate == null);
 		if (localStorekeeperDelegate == null);
 		nestedProductTypeLocals.size();
+
+		if (securingAuthorityTypeID == null);
+		if (securingAuthorityID == null);
 	}
 
 	/**
@@ -558,17 +562,17 @@ implements Serializable, Inheritable, InheritanceCallbacks, SecuredObject
 	}
 
 	public void setSecuringAuthorityTypeID(AuthorityTypeID authorityTypeID) {
-//		if (this.securingAuthorityType != null && !this.securingAuthorityType.equals(authorityType))
-//			throw new IllegalStateException("A different AuthorityType has already been assigned! Cannot change this value afterwards! Currently assigned: " + JDOHelper.getObjectId(this.securingAuthorityType) + " New value: " + JDOHelper.getObjectId(authorityType));
+		if (this.securingAuthorityTypeID != null && !this.getSecuringAuthorityTypeID().equals(authorityTypeID))
+			throw new IllegalStateException("A different AuthorityType has already been assigned! Cannot change this value afterwards! Currently assigned: " + this.securingAuthorityTypeID + " New value: " + authorityTypeID);
 
 		this.securingAuthorityTypeID = authorityTypeID == null ? null : authorityTypeID.toString();
 	}
 
 	/**
-	 * Get the currently assigned <code>Authority</code> or <code>null</code>.
+	 * Get the currently assigned <code>AuthorityID</code> or <code>null</code>.
 	 * <p>
 	 * If there is no securingAuthority assigned (i.e. this property is <code>null</code>), no additional access right
-	 * checks (besides the EJB method privileges) will be done. If there is an securingAuthority, access to the <code>ProductType</code>
+	 * checks (besides the EJB method privileges) will be done. If there is a securingAuthority, access to the <code>ProductType</code>
 	 * and the <code>ProductTypeLocal</code> is only granted, if first the global (EJB method based) privileges allow the action
 	 * <b>and</b> second the assigned securingAuthority allows the action, as well.
 	 * </p>
@@ -576,7 +580,7 @@ implements Serializable, Inheritable, InheritanceCallbacks, SecuredObject
 	 * {@inheritDoc}
 	 * </p>
 	 *
-	 * @return the <code>Authority</code> responsible for this <code>ProductType</code> or <code>null</code> if there is none assigned.
+	 * @return the identifier of the <code>Authority</code> responsible for this <code>ProductType</code> or <code>null</code> if there is none assigned.
 	 */
 	@Override
 	public AuthorityID getSecuringAuthorityID()
@@ -585,22 +589,35 @@ implements Serializable, Inheritable, InheritanceCallbacks, SecuredObject
 	}
 
 	/**
-	 * Set an <code>Authority</code> or <code>null</code>.
+	 * Set an <code>AuthorityID</code> or <code>null</code>.
 	 * <p>
 	 * {@inheritDoc}
 	 * </p>
 	 * 
-	 * @param securingAuthority the new <code>Authority</code> or <code>null</code>.
+	 * @param authorityID the new <code>AuthorityID</code> or <code>null</code>.
 	 * @see #getSecuringAuthorityID()
 	 */
 	@Override
 	public void setSecuringAuthorityID(AuthorityID authorityID)
 	{
-//		if (authorityID != null) {
-//			// check if the AuthorityType is correct.
-//			if (!authorityID.getAuthorityType().equals(securingAuthorityType))
-//				throw new IllegalArgumentException("securingAuthority.authorityType does not match this.authorityType! securingAuthority: " + JDOHelper.getObjectId(authorityID) + " this: " + JDOHelper.getObjectId(this));
-//		}
+		// Already obtain the PM directly at the beginning of the method so that it
+		// always fails outside of the server (independent from the parameter).
+		PersistenceManager pm = getPersistenceManager();
+
+		if (Util.equals(authorityID, this.getSecuringAuthorityID()))
+			return; // no change => no need to do anything
+
+		if (authorityID != null) {
+			// check if the AuthorityType is correct. this is done already by JFireSecurityManager.assignAuthority(...), but just to be absolutely sure
+			// since this method might be called by someone else.
+			Authority authority = (Authority) pm.getObjectById(authorityID);
+			AuthorityType securingAuthorityType = (AuthorityType) pm.getObjectById(getSecuringAuthorityTypeID());
+
+			if (!authority.getAuthorityType().equals(securingAuthorityType))
+				throw new IllegalArgumentException("securingAuthority.authorityType does not match this.securingAuthorityTypeID! securingAuthority: " + authorityID + " this: " + JDOHelper.getObjectId(this));
+		}
 		this.securingAuthorityID = authorityID == null ? null : authorityID.toString();
+
+		getProductType().applyInheritance();
 	}
 }

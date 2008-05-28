@@ -70,7 +70,7 @@ implements Serializable, DetachCallback, StoreCallback, DeleteCallback
 	 * i.e. the property 
 	 */
 	public static final String FETCH_GROUP_LINKED_OBJECT_CLASS = "IssueLink.linkedObjectClass";
-
+	
 	private static final long serialVersionUID = 1L;
 
 	/**
@@ -127,7 +127,7 @@ implements Serializable, DetachCallback, StoreCallback, DeleteCallback
 	 * @param issueLinkID the second part of the composite primary key. Use {@link IDGenerator#nextID(Class)} with <code>IssueLink.class</code> to create an id.
 	 * @param issue the {@link Issue} to which this IssueLink belongs. Must not be <code>null</code>.
 	 * @param issueLinkType the type of the new <code>IssueLink</code>. Must not be <code>null</code>.
-	 * @param linkedObject The linked object (a persistence-capable JDO object) or an object-id (implementing {@link ObjectID}) identifying a persistence-capable JDO object.
+	 * @param linkedObject The linked object (a persistence-capable JDO object).
 	 */
 	protected IssueLink(String organisationID, long issueLinkID, Issue issue, IssueLinkType issueLinkType, Object linkedObject) {
 		Organisation.assertValidOrganisationID(organisationID);
@@ -140,17 +140,38 @@ implements Serializable, DetachCallback, StoreCallback, DeleteCallback
 		if (linkedObject == null)
 			throw new IllegalArgumentException("linkedObject must not be null!");
 
-		Object linkedObjectID;
-		if (linkedObject instanceof ObjectID) {
-			linkedObjectID = linkedObject;
-			linkedObject = null;
-		}
-		else {
-			if (!(linkedObject instanceof PersistenceCapable))
-				throw new IllegalArgumentException("linkedObject must implement the interface "+ PersistenceCapable.class.getName() +" (or be the object-id of a PersistenceCapable object)! linkedObject is an instance of " + linkedObject.getClass().getName() + ": " + linkedObject);
+		if (!(linkedObject instanceof PersistenceCapable))
+			throw new IllegalArgumentException("linkedObject must implement the interface "+ PersistenceCapable.class.getName() +" (or be the object-id of a PersistenceCapable object)! linkedObject is an instance of " + linkedObject.getClass().getName() + ": " + linkedObject);
 
-			linkedObjectID = JDOHelper.getObjectId(linkedObject);
-		}
+		linkedObjectID = JDOHelper.getObjectId(linkedObject).toString();
+
+		if (issueLinkType == null)
+			throw new IllegalArgumentException("issueLinkType == null");
+
+		this.organisationID = organisationID;
+		this.issue = issue;
+		this.issueLinkID = issueLinkID;
+
+		this.linkedObject = linkedObject;
+		this.issueLinkType = issueLinkType;
+	}
+	
+	/**
+	 * Create an instance of <code>IssueLink</code>.
+	 * 
+	 * @param organisationID the first part of the composite primary key - referencing the organisation which owns this <code>IssueLink</code>.
+	 * @param issueLinkID the second part of the composite primary key. Use {@link IDGenerator#nextID(Class)} with <code>IssueLink.class</code> to create an id.
+	 * @param issue the {@link Issue} to which this IssueLink belongs. Must not be <code>null</code>.
+	 * @param issueLinkType the type of the new <code>IssueLink</code>. Must not be <code>null</code>.
+	 * @param linkedObjectID an object-id (implementing {@link ObjectID}) identifying a persistence-capable JDO object.
+	 */
+	protected IssueLink(String organisationID, long issueLinkID, Issue issue, IssueLinkType issueLinkType, ObjectID linkedObjectID, Class<?> linkedObjectClass) {
+		Organisation.assertValidOrganisationID(organisationID);
+		if (issueLinkID < 0)
+			throw new IllegalArgumentException("issueLinkID < 0");
+
+		if (issue == null)
+			throw new IllegalArgumentException("issue must not be null!");
 
 		if (!(linkedObjectID instanceof ObjectID))
 			throw new IllegalArgumentException("The object-id of linkedObject is not an instance of " + ObjectID.class.getName() + "! It's an instance of: " + (linkedObjectID == null ? null : linkedObjectID.getClass().getName()));
@@ -161,10 +182,11 @@ implements Serializable, DetachCallback, StoreCallback, DeleteCallback
 		this.organisationID = organisationID;
 		this.issue = issue;
 		this.issueLinkID = issueLinkID;
-
-		this.linkedObject = linkedObject;
 		this.linkedObjectID = linkedObjectID.toString();
 		this.issueLinkType = issueLinkType;
+		
+		this._linkedObjectID = linkedObjectID;
+		this.linkedObjectClass = linkedObjectClass;
 	}
 
 	public String getOrganisationID() {

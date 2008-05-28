@@ -56,7 +56,6 @@ extends IssueLinkType
 		}
 
 		issueOnOtherSide.createIssueLink(issueLinkTypeDuplicate, newIssueLink.getIssue());
-//		pm.makePersistent(issueOnOtherSide); // @chairat: why do you call this? The issueOnOtherSide is already persistent - isn't it? I commented it out, therefore. Marco.
 	}
 
 	@Override
@@ -75,7 +74,5 @@ extends IssueLinkType
 					issueOnOtherSide.removeIssueLink(issueLinkOnOtherSide);
 			}
 		}
-
-//		pm.makePersistent(issueOnOtherSide); // @chairat: why do you call this? The issueOnOtherSide is already persistent - isn't it? I commented it out, therefore. Marco.
 	}
 }

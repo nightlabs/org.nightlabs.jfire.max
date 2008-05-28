@@ -3,6 +3,7 @@ package org.nightlabs.jfire.dynamictrade.store;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Hashtable;
+import java.util.Locale;
 
 import javax.jdo.PersistenceManager;
 
@@ -162,6 +163,13 @@ public class DynamicProductTypeActionHandler
 	@Override
 	protected AuthorityType createAuthorityType(AuthorityTypeID authorityTypeID, ProductType rootProductType) {
 		AuthorityType authorityType = new AuthorityType(authorityTypeID);
+
+		authorityType.getName().setText(Locale.ENGLISH.getLanguage(), "Dynamic product types");
+		authorityType.getDescription().setText(Locale.ENGLISH.getLanguage(), "Authorities of this type control the access rights for dynamic product types.");
+
+		authorityType.getName().setText(Locale.GERMAN.getLanguage(), "Dynamische Producttypen");
+		authorityType.getDescription().setText(Locale.GERMAN.getLanguage(), "Vollmachten dieses Typs kontrollieren den Zugriff auf dynamische Producttypen.");
+
 		// TODO configure access rights completely - implement manual checking where necessary!
 		return authorityType;
 	}

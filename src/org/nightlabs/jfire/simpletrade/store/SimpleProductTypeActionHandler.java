@@ -5,6 +5,7 @@ import java.util.Collection;
 import java.util.Hashtable;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Locale;
 
 import javax.jdo.FetchPlan;
 import javax.jdo.JDOHelper;
@@ -152,6 +153,13 @@ public class SimpleProductTypeActionHandler
 	protected AuthorityType createAuthorityType(AuthorityTypeID authorityTypeID, ProductType rootProductType) {
 		PersistenceManager pm = getPersistenceManager();
 		AuthorityType authorityType = new AuthorityType(authorityTypeID);
+
+		authorityType.getName().setText(Locale.ENGLISH.getLanguage(), "Simple product types");
+		authorityType.getDescription().setText(Locale.ENGLISH.getLanguage(), "Authorities of this type control the access rights for simple product types.");
+
+		authorityType.getName().setText(Locale.GERMAN.getLanguage(), "Einfache Producttypen");
+		authorityType.getDescription().setText(Locale.GERMAN.getLanguage(), "Vollmachten dieses Typs kontrollieren den Zugriff auf einfache Producttypen.");
+
 		// TODO configure access rights completely - implement manual checking where necessary!
 		authorityType.addRoleGroup((RoleGroup) pm.getObjectById(RoleConstants.seeProductType));
 		authorityType.addRoleGroup((RoleGroup) pm.getObjectById(RoleConstants.sellProductType));

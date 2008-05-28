@@ -23,6 +23,7 @@ import org.nightlabs.jfire.security.RoleGroup;
 import org.nightlabs.jfire.security.RoleGroupRef;
 import org.nightlabs.jfire.security.User;
 import org.nightlabs.jfire.security.UserGroup;
+import org.nightlabs.jfire.security.UserGroupLocal;
 import org.nightlabs.jfire.security.UserGroupRef;
 import org.nightlabs.jfire.security.UserLocal;
 import org.nightlabs.jfire.security.id.AuthorityID;
@@ -312,25 +313,25 @@ extends Initialiser
 		UserGroup userGroup = new UserGroup(organisationID, User.USERID_PREFIX_TYPE_USERGROUP + "SalesAgents");
 		userGroup.setName("Sales Agents");
 		userGroup.setDescription("This group is blablabla.");
-		new UserLocal(userGroup);
+		new UserGroupLocal(userGroup);
 		userGroup = pm.makePersistent(userGroup);
 
 		userGroup = new UserGroup(organisationID, User.USERID_PREFIX_TYPE_USERGROUP + "SalesManagers");
 		userGroup.setName("Sales Managers");
 		userGroup.setDescription("This group is blablabla.");
-		new UserLocal(userGroup);
+		new UserGroupLocal(userGroup);
 		userGroup = pm.makePersistent(userGroup);
 
 		userGroup = new UserGroup(organisationID, User.USERID_PREFIX_TYPE_USERGROUP + "Statistics");
 		userGroup.setName("Statistics");
 		userGroup.setDescription("This group consists out of the statistics guys.");
-		new UserLocal(userGroup);
+		new UserGroupLocal(userGroup);
 		userGroup = pm.makePersistent(userGroup);
 
 		userGroup = new UserGroup(organisationID, User.USERID_PREFIX_TYPE_USERGROUP + "TheOthers");
 		userGroup.setName("The Others");
 		userGroup.setDescription("This group is trallali trallala.");
-		new UserLocal(userGroup);
+		new UserGroupLocal(userGroup);
 		userGroup = pm.makePersistent(userGroup);
 
 		Trader trader = Trader.getTrader(pm);
@@ -370,7 +371,7 @@ extends Initialiser
 		userGroup = new UserGroup(organisationID, User.USERID_PREFIX_TYPE_USERGROUP + "Administrators");
 		userGroup.setName("Administrators");
 		userGroup.setDescription("This group has all access rights within its organisation.");
-		new UserLocal(userGroup);
+		new UserGroupLocal(userGroup);
 		userGroup = pm.makePersistent(userGroup);
 		userGroup.addUser(user00);
 		userGroup.addUser(user01);

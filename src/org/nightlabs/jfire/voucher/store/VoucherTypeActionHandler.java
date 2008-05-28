@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Hashtable;
 import java.util.Iterator;
+import java.util.Locale;
 
 import javax.jdo.PersistenceManager;
 import javax.jdo.Query;
@@ -181,6 +182,13 @@ public class VoucherTypeActionHandler
 	protected AuthorityType createAuthorityType(AuthorityTypeID authorityTypeID, ProductType rootProductType) {
 		PersistenceManager pm = getPersistenceManager();
 		AuthorityType authorityType = new AuthorityType(authorityTypeID);
+
+		authorityType.getName().setText(Locale.ENGLISH.getLanguage(), "Voucher types");
+		authorityType.getDescription().setText(Locale.ENGLISH.getLanguage(), "Authorities of this type control the access rights for voucher types.");
+
+		authorityType.getName().setText(Locale.GERMAN.getLanguage(), "Gutscheintypen");
+		authorityType.getDescription().setText(Locale.GERMAN.getLanguage(), "Vollmachten dieses Typs kontrollieren den Zugriff auf Gutscheintypen.");
+
 		// TODO configure access rights completely - implement manual checking where necessary!
 		// hmmm...maybe there should only be one "ProductType.edit" instead of one for each implementation - we have the authorities anyway and can control per ProductType if that right is available or not - so we should better reduce the number of rights!
 		authorityType.addRoleGroup((RoleGroup) pm.getObjectById(RoleGroupID.create("JFireVoucher.VoucherType.edit")));

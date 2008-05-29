@@ -70,8 +70,12 @@ extends IssueLinkType
 		
 		Set<IssueLink> issueLinksOnOtherSide = issueOnOtherSide.getIssueLinks();
 		for (IssueLink issueLinkOnOtherSide : issueLinksOnOtherSide) {
-			if (issueLinkTypeDuplicate.equals(issueLinkOnOtherSide.getIssueLinkType()) && issueLinkOnOtherSide.getLinkedObject().equals(issueLinkToBeDeleted.getIssue())) {
-					issueOnOtherSide.removeIssueLink(issueLinkOnOtherSide);
+			Object otherSideObject = issueLinkOnOtherSide.getLinkedObject();
+			Object thisSideObject = issueLinkToBeDeleted.getIssue();
+			
+			if (otherSideObject.equals(thisSideObject)) {
+				if (issueLinkTypeDuplicate.equals(issueLinkOnOtherSide.getIssueLinkType())) 
+						issueOnOtherSide.removeIssueLink(issueLinkOnOtherSide);
 			}
 		}
 	}

@@ -93,13 +93,13 @@ extends IssueLinkType
 
 		Set<IssueLink> issueLinksOnOtherSide = issueOnOtherSide.getIssueLinks();
 		for (IssueLink issueLinkOnOtherSide : issueLinksOnOtherSide) {
-			//TODO Not sure yet!!!
-			if (issueLinkOnOtherSide.getLinkedObject().equals(issueLinkToBeDeleted.getIssue())) {
+			Object otherSideObject = issueLinkOnOtherSide.getLinkedObject();
+			Object thisSideObject = issueLinkToBeDeleted.getIssue();
+			
+			if (otherSideObject.equals(thisSideObject)) {
 				if (issueLinkTypeForOtherSide.equals(issueLinkOnOtherSide.getIssueLinkType())) 
 						issueOnOtherSide.removeIssueLink(issueLinkOnOtherSide);
 			}
 		}
-
-		pm.makePersistent(issueOnOtherSide);
 	}
 }

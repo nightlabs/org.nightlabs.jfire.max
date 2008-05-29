@@ -522,7 +522,7 @@ implements 	Serializable, AttachCallback, Statable, DeleteCallback
 
 	/**
 	 * @param issueLinkType the type of the new <code>IssueLink</code>. Must not be <code>null</code>.
-	 * @param linkedObject The linked object (a persistence-capable JDO object) or an object-id (implementing {@link ObjectID}) identifying a persistence-capable JDO object. 
+	 * @param linkedObject The linked object (a persistence-capable JDO object). 
 	 */
 	public IssueLink createIssueLink(IssueLinkType issueLinkType, Object linkedObject)
 	{
@@ -538,7 +538,8 @@ implements 	Serializable, AttachCallback, Statable, DeleteCallback
 	
 	/**
 	 * @param issueLinkType the type of the new <code>IssueLink</code>. Must not be <code>null</code>.
-	 * @param linkedObject The linked object (a persistence-capable JDO object) or an object-id (implementing {@link ObjectID}) identifying a persistence-capable JDO object. 
+	 * @param linkedObjectID  an object-id (implementing {@link ObjectID}) identifying a persistence-capable JDO object.
+	 * @param linkedObjectClass The linked object class(a persistence-capable JDO object). 
 	 */
 	public IssueLink createIssueLink(IssueLinkType issueLinkType, ObjectID linkedObjectID, Class<?> linkedObjectClass)
 	{

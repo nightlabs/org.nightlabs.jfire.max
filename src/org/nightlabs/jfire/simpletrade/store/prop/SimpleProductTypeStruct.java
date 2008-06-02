@@ -1,5 +1,5 @@
 /**
- * 
+ *
  */
 package org.nightlabs.jfire.simpletrade.store.prop;
 
@@ -45,7 +45,7 @@ public class SimpleProductTypeStruct {
 		}
 		return productTypeStruct;
 	}
-	
+
 
 	public static void createStandardStructure(IStruct productTypeStruct) {
 		try {
@@ -59,9 +59,11 @@ public class SimpleProductTypeStruct {
 
 			sb.addStructField(descShort);
 			sb.addStructField(descLong);
-			
+
 			productTypeStruct.addStructBlock(sb);
-			
+
+			// --------
+
 			sb = PropHelper.createStructBlock(productTypeStruct, IMAGES, "Images", "Bilder");
 			sb.setUnique(false);
 			ImageStructField largeImage = PropHelper.createImageField(sb, IMAGES_LARGE_IMAGE, "Large image", "Grosses Bild");
@@ -77,10 +79,22 @@ public class SimpleProductTypeStruct {
 
 			sb.addStructField(largeImage);
 			sb.addStructField(smallImage);
-			
+
 			productTypeStruct.addStructBlock(sb);
-			
-			
+
+			// --------
+
+			// TODO: seems not to work:
+//			sb = PropHelper.createStructBlock(productTypeStruct, XINFO, "Extended Information", "Erweiterte Informationen");
+//			sb.setUnique(false);
+//			HTMLStructField info = new HTMLStructField(sb, XINFO_INFO);
+//			info.getName().setText(Locale.GERMAN.getLanguage(), "Produktinformationen");
+//			info.getName().setText(Locale.ENGLISH.getLanguage(), "Product information");
+//
+//			sb.addStructField(info);
+//
+//			productTypeStruct.addStructBlock(sb);
+
 		} catch (Throwable t) {
 			throw new RuntimeException(t);
 		}
@@ -98,6 +112,8 @@ public class SimpleProductTypeStruct {
 	public static final StructBlockID IMAGES = StructBlockID.create(DEV_ORGANISATION_ID,"SimpleProductType.images");
 	public static final StructFieldID IMAGES_SMALL_IMAGE = StructFieldID.create(IMAGES,"SmallImage");
 	public static final StructFieldID IMAGES_LARGE_IMAGE = StructFieldID.create(IMAGES,"LargeImage");
-	
+
+	public static final StructBlockID XINFO = StructBlockID.create(DEV_ORGANISATION_ID, "SimpleProductType.xinfo");
+	public static final StructFieldID XINFO_INFO = StructFieldID.create(IMAGES, "Info");
 
 }

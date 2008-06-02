@@ -22,7 +22,7 @@ import org.nightlabs.jfire.transfer.id.AnchorID;
  * @author Marius Heinzmann - marius[at]nightlabs[dot]com
  */
 public abstract class AbstractProductTypeQuery
-	extends AbstractJDOQuery
+extends AbstractJDOQuery
 {
 	private static final Logger logger = Logger.getLogger(AbstractProductTypeQuery.class);
 	
@@ -43,7 +43,8 @@ public abstract class AbstractProductTypeQuery
 	private Boolean available = null;
 	private DeliveryConfigurationID deliveryConfigurationID = null;
 	private LocalAccountantDelegateID localAccountantDelegateID = null;
-	private ProductTypeGroupID productTypeGroupID = null;
+	private ProductTypeGroupID productTypeGroupID = null;	
+	private AnchorID vendorID = null;
 	
 	// Property IDs used for the PropertyChangeListeners
 	private static final String PROPERTY_PREFIX = "AbstractProductTypeQuery.";
@@ -61,6 +62,7 @@ public abstract class AbstractProductTypeQuery
 	public static final String PROPERTY_PRODUCTTYPE_GROUP_ID = PROPERTY_PREFIX + "productTypeGroupID";
 	public static final String PROPERTY_PUBLISHED = PROPERTY_PREFIX + "published";
 	public static final String PROPERTY_SALEABLE = PROPERTY_PREFIX + "saleable";
+	public static final String PROPERTY_VENDOR_ID = PROPERTY_PREFIX + "vendorID";
 
 	@Override
 	protected Query createQuery()
@@ -155,6 +157,18 @@ public abstract class AbstractProductTypeQuery
 				"this.managedProductTypeGroup.organisationID == \""+productTypeGroupID.organisationID+"\" && " +
 				"this.managedProductTypeGroup.productTypeGroupID == \""+productTypeGroupID.productTypeGroupID+"\"" +
 						")");
+		}
+
+		if (vendorID != null)
+		{
+			// TODO: JDOHelper.getObjectId(this.*) does not seem to work
+//			filter.append("\n && JDOHelper.getObjectId(this.vendor) == :vendorID");
+			// WORKAROUND:
+			filter.append("\n && (" +
+					"this.owner.organisationID == \""+vendorID.organisationID+"\" && " +
+					"this.owner.anchorTypeID == \""+vendorID.anchorTypeID+"\" && " +
+					"this.owner.anchorID == \""+vendorID.anchorID+"\"" +
+							")");
 		}
 		
 		logger.debug("Vars:");
@@ -478,6 +492,24 @@ public abstract class AbstractProductTypeQuery
 		notifyListeners(PROPERTY_AVAILABLE, oldAvailable, available);
 	}
 
+	/**
+	 * Return the vendorID.
+	 * @return the vendorID
+	 */
+	public AnchorID getVendorID() {
+		return vendorID;
+	}
+
+	/**
+	 * Sets the vendorID.
+	 * @param vendorID the vendorID to set
+	 */
+	public void setVendorID(AnchorID vendorID) {
+		final AnchorID oldVendorID = this.vendorID;
+		this.vendorID = vendorID;
+		notifyListeners(PROPERTY_VENDOR_ID, oldVendorID, vendorID);
+	}
+
 	@Override
 	public List<FieldChangeCarrier> getChangedFields(String propertyName)
 	{
@@ -539,6 +571,10 @@ public abstract class AbstractProductTypeQuery
 		if (allFields || PROPERTY_SALEABLE.equals(propertyName))
 		{
 			changedFields.add( new FieldChangeCarrier(PROPERTY_SALEABLE, saleable) );
+		}
+		if (allFields || PROPERTY_VENDOR_ID.equals(propertyName))
+		{
+			changedFields.add( new FieldChangeCarrier(PROPERTY_VENDOR_ID, vendorID) );
 		}
 		
 		return changedFields;

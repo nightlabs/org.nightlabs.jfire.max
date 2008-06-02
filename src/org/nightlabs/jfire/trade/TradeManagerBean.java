@@ -1004,7 +1004,6 @@ implements SessionBean
 	 */
 	public LegalEntity storePersonAsLegalEntity(Person person, boolean get, String[] fetchGroups, int maxFetchDepth)
 	{
-
 		PersistenceManager pm = getPersistenceManager();
 		try {
 			pm.getFetchPlan().setMaxFetchDepth(maxFetchDepth);
@@ -1012,11 +1011,13 @@ implements SessionBean
 				pm.getFetchPlan().setGroups(fetchGroups);
 			Trader trader = Trader.getTrader(pm);
 			LegalEntity aLegalEntity = LegalEntity.getLegalEntity(pm, person);
-			if (aLegalEntity != null && aLegalEntity.isAnonymous()) {
-				throw new IllegalArgumentException("Attempt to change anonymous LegalEntity");
-			}
-			Person aPerson = pm.makePersistent(person);
-			LegalEntity legalEntity = trader.setPersonToLegalEntity(aPerson, true);
+
+			if (aLegalEntity != null && aLegalEntity.isAnonymous())
+				person = aLegalEntity.getPerson();
+			else
+				person = pm.makePersistent(person);
+
+			LegalEntity legalEntity = trader.setPersonToLegalEntity(person, true);
 			if (get)
 				return pm.detachCopy(legalEntity);
 			else

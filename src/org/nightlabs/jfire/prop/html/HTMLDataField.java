@@ -1,10 +1,11 @@
 package org.nightlabs.jfire.prop.html;
 
+import java.util.ArrayList;
 import java.util.List;
 
-import org.nightlabs.eclipse.ui.fckeditor.IFCKEditorContent;
-import org.nightlabs.eclipse.ui.fckeditor.IFCKEditorContentFile;
-import org.nightlabs.eclipse.ui.fckeditor.IFCKEditorContentFileFactory;
+import org.nightlabs.htmlcontent.IFCKEditorContent;
+import org.nightlabs.htmlcontent.IFCKEditorContentFile;
+import org.nightlabs.htmlcontent.IFCKEditorContentFileFactory;
 import org.nightlabs.jfire.prop.DataBlock;
 import org.nightlabs.jfire.prop.DataField;
 import org.nightlabs.jfire.prop.PropertySet;
@@ -18,8 +19,7 @@ import org.nightlabs.jfire.prop.StructField;
  *
  * @jdo.inheritance strategy="new-table"
  *
- * TODO: files...:
- * @jdo.fetch-group name="FetchGroupsProp.fullData" fetch-groups="default" fields="html,files"
+ * @jdo.fetch-group name="FetchGroupsProp.fullData" fetch-groups="default" fields="html, files"
  *
  * @author Marc Klinger - marc[at]nightlabs[dot]de
  */
@@ -36,15 +36,20 @@ public class HTMLDataField extends DataField implements IFCKEditorContent
 	private String html;
 
 	/**
-	 * @jdo.field persistence-modifier="persistent"
-	 * TODO: jdo list
+	 * @jdo.field
+	 * 		persistence-modifier="persistent"
+	 * 		collection-type="collection"
+	 * 		element-type="org.nightlabs.jfire.prop.StructBlockOrderItem"
+	 * 		mapped-by="structLocal"
+	 * 		dependent-element="true"
+	 *		null-value="exception"
 	 */
 	private List<IFCKEditorContentFile> files;
 
 	/**
 	 * Create a new HTMLDataField instance.
 	 */
-	public HTMLDataField()
+	protected HTMLDataField()
 	{
 		super();
 	}
@@ -55,6 +60,7 @@ public class HTMLDataField extends DataField implements IFCKEditorContent
 	public HTMLDataField(DataBlock block, StructField<? extends DataField> field)
 	{
 		super(block, field);
+		files = new ArrayList<IFCKEditorContentFile>();
 	}
 
 	/**
@@ -63,6 +69,7 @@ public class HTMLDataField extends DataField implements IFCKEditorContent
 	public HTMLDataField(String organisationID, long propertySetID, DataField cloneField)
 	{
 		super(organisationID, propertySetID, cloneField);
+		files = new ArrayList<IFCKEditorContentFile>();
 	}
 
 	/* (non-Javadoc)
@@ -71,8 +78,13 @@ public class HTMLDataField extends DataField implements IFCKEditorContent
 	@Override
 	public DataField cloneDataField(PropertySet propertySet)
 	{
-		// TODO Auto-generated method stub
-		return null;
+		HTMLDataField htmlDataField = new HTMLDataField(
+				propertySet.getOrganisationID(),
+				propertySet.getPropertySetID(),
+				this);
+		htmlDataField.setHtml(getHtml());
+		htmlDataField.setFiles(new ArrayList<IFCKEditorContentFile>(getFiles()));
+		return htmlDataField;
 	}
 
 	/* (non-Javadoc)
@@ -81,49 +93,77 @@ public class HTMLDataField extends DataField implements IFCKEditorContent
 	@Override
 	public boolean isEmpty()
 	{
-		// TODO Auto-generated method stub
-		return false;
+		return
+			(getHtml() == null || getHtml().isEmpty()) &&
+			(getFiles() == null || getFiles().isEmpty());
 	}
 
+	/* (non-Javadoc)
+	 * @see org.nightlabs.eclipse.ui.fckeditor.IFCKEditorContent#addFile(org.nightlabs.eclipse.ui.fckeditor.IFCKEditorContentFile)
+	 */
 	@Override
 	public void addFile(IFCKEditorContentFile file)
 	{
 		files.add(file);
 	}
 
+	/* (non-Javadoc)
+	 * @see org.nightlabs.eclipse.ui.fckeditor.IFCKEditorContent#getFile(long)
+	 */
 	@Override
 	public IFCKEditorContentFile getFile(long fileId)
 	{
-		// TODO Auto-generated method stub
+		for (IFCKEditorContentFile file : getFiles())
+	        if(file.getFileId() == fileId)
+	        	return file;
 		return null;
 	}
 
+	/* (non-Javadoc)
+	 * @see org.nightlabs.eclipse.ui.fckeditor.IFCKEditorContent#getFileFactory()
+	 */
 	@Override
 	public IFCKEditorContentFileFactory getFileFactory()
 	{
-		// TODO Auto-generated method stub
-		return null;
+		return new IFCKEditorContentFileFactory() {
+			@Override
+            public IFCKEditorContentFile createContentFile()
+            {
+				return new HTMLContentFile();
+            }
+		};
 	}
 
+	/* (non-Javadoc)
+	 * @see org.nightlabs.eclipse.ui.fckeditor.IFCKEditorContent#getFiles()
+	 */
 	@Override
 	public List<IFCKEditorContentFile> getFiles()
 	{
-		// TODO Auto-generated method stub
-		return null;
+		return files;
 	}
 
+	/* (non-Javadoc)
+	 * @see org.nightlabs.eclipse.ui.fckeditor.IFCKEditorContent#getHtml()
+	 */
 	@Override
 	public String getHtml()
 	{
 		return html;
 	}
 
+	/* (non-Javadoc)
+	 * @see org.nightlabs.eclipse.ui.fckeditor.IFCKEditorContent#setFiles(java.util.List)
+	 */
 	@Override
 	public void setFiles(List<IFCKEditorContentFile> files)
 	{
-		// TODO Auto-generated method stub
+		this.files = files;
 	}
 
+	/* (non-Javadoc)
+	 * @see org.nightlabs.eclipse.ui.fckeditor.IFCKEditorContent#setHtml(java.lang.String)
+	 */
 	@Override
 	public void setHtml(String html)
 	{

@@ -10,6 +10,6 @@
 	<classpathentry kind="var" path="DATANUCLEUS_ENHANCER"/>
 	<classpathentry kind="src" path="ejbsrc"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/JFireBase"/>
-	<classpathentry combineaccessrules="false" kind="src" path="/org.nightlabs.eclipse.ui.fckeditor"/>
+	<classpathentry combineaccessrules="false" kind="src" path="/NightLabsHTMLContent"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>

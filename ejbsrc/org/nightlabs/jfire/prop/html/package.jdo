@@ -1,0 +1,84 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE jdo PUBLIC "-//Sun Microsystems, Inc.//DTD Java Data Objects Metadata 2.0//EN" "http://java.sun.com/dtd/jdo_2_0.dtd">
+
+<jdo>
+
+  <package name="org.nightlabs.jfire.prop.html">
+
+     <class name="HTMLDataField"
+            identity-type="application"
+            table="JFireBase_Prop_HTMLDataField"
+            persistence-capable-superclass="org.nightlabs.jfire.prop.DataField"
+            detachable="true"
+     > 
+
+         <inheritance
+                      strategy="new-table"
+         >
+         </inheritance>
+
+        <field name="html"
+               persistence-modifier="persistent"
+        > 
+
+        </field>
+
+        <field name="files"
+               persistence-modifier="persistent"
+               null-value="exception"
+               mapped-by="structLocal"
+        > 
+
+          <collection
+                      element-type="org.nightlabs.jfire.prop.StructBlockOrderItem"
+                      dependent-element="true"
+          > 
+
+          </collection>
+
+        </field>
+
+      <fetch-group
+                   name="FetchGroupsProp.fullData"
+      >
+         <field name="html"
+         />
+         <field name="files"
+         />
+         <fetch-group name="default"/>
+      </fetch-group>
+
+     </class>
+
+     <class name="HTMLStructField"
+            identity-type="application"
+            table="JFireBase_Prop_HTMLStructField"
+            persistence-capable-superclass="org.nightlabs.jfire.prop.StructField"
+            detachable="true"
+     > 
+
+          <implements name="org.nightlabs.jfire.prop.StructField"/>
+
+         <inheritance
+                      strategy="new-table"
+         >
+         </inheritance>
+
+      <fetch-group
+                   name="IStruct.fullData"
+      >
+         <fetch-group name="default"/>
+      </fetch-group>
+
+     </class>
+
+  </package> 
+
+  <!--
+   To use additional vendor extensions, create a vendor-extensions.xml file that
+   contains the additional extensions (in extension tags) and place it in your
+   projects merge dir.  
+  -->
+
+</jdo>
+

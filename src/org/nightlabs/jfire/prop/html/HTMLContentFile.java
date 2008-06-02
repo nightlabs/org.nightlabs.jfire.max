@@ -2,7 +2,7 @@ package org.nightlabs.jfire.prop.html;
 
 import java.util.Date;
 
-import org.nightlabs.eclipse.ui.fckeditor.IFCKEditorContentFile;
+import org.nightlabs.htmlcontent.IFCKEditorContentFile;
 
 /**
  * TODO: persistence

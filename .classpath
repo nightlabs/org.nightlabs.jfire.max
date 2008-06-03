@@ -11,5 +11,7 @@
 	<classpathentry kind="src" path="ejbsrc"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/JFireBase"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/NightLabsHTMLContent"/>
+	<classpathentry combineaccessrules="false" kind="src" path="/NightLabsJDO"/>
+	<classpathentry combineaccessrules="false" kind="src" path="/NightLabsBase"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>

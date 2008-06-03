@@ -5,7 +5,6 @@ import java.util.List;
 import javax.jdo.Query;
 
 import org.apache.log4j.Logger;
-import org.nightlabs.jdo.query.AbstractJDOQuery;
 import org.nightlabs.jdo.query.AbstractSearchQuery;
 import org.nightlabs.jfire.accounting.book.id.LocalAccountantDelegateID;
 import org.nightlabs.jfire.accounting.priceconfig.id.PriceConfigID;
@@ -22,7 +21,8 @@ import org.nightlabs.jfire.transfer.id.AnchorID;
  * @author Marius Heinzmann - marius[at]nightlabs[dot]com
  */
 public abstract class AbstractProductTypeQuery
-extends AbstractJDOQuery
+//extends AbstractJDOQuery
+extends VendorDependentQuery
 {
 	private static final Logger logger = Logger.getLogger(AbstractProductTypeQuery.class);
 	
@@ -44,7 +44,7 @@ extends AbstractJDOQuery
 	private DeliveryConfigurationID deliveryConfigurationID = null;
 	private LocalAccountantDelegateID localAccountantDelegateID = null;
 	private ProductTypeGroupID productTypeGroupID = null;	
-	private AnchorID vendorID = null;
+//	private AnchorID vendorID = null;
 	
 	// Property IDs used for the PropertyChangeListeners
 	private static final String PROPERTY_PREFIX = "AbstractProductTypeQuery.";
@@ -62,7 +62,7 @@ extends AbstractJDOQuery
 	public static final String PROPERTY_PRODUCTTYPE_GROUP_ID = PROPERTY_PREFIX + "productTypeGroupID";
 	public static final String PROPERTY_PUBLISHED = PROPERTY_PREFIX + "published";
 	public static final String PROPERTY_SALEABLE = PROPERTY_PREFIX + "saleable";
-	public static final String PROPERTY_VENDOR_ID = PROPERTY_PREFIX + "vendorID";
+//	public static final String PROPERTY_VENDOR_ID = PROPERTY_PREFIX + "vendorID";
 
 	@Override
 	protected Query createQuery()
@@ -73,10 +73,11 @@ extends AbstractJDOQuery
 	@Override
 	protected void prepareQuery(Query q)
 	{
+		super.prepareQuery(q);
 		StringBuffer filter = getFilter();
 		StringBuffer vars = getVars();
 		
-		filter.append("\n");
+		filter.append("\n && ");
 		filter.append("true");
 		
 		if (fullTextSearch != null) {
@@ -159,17 +160,17 @@ extends AbstractJDOQuery
 						")");
 		}
 
-		if (vendorID != null)
-		{
-			// TODO: JDOHelper.getObjectId(this.*) does not seem to work
-//			filter.append("\n && JDOHelper.getObjectId(this.vendor) == :vendorID");
-			// WORKAROUND:
-			filter.append("\n && (" +
-					"this.owner.organisationID == \""+vendorID.organisationID+"\" && " +
-					"this.owner.anchorTypeID == \""+vendorID.anchorTypeID+"\" && " +
-					"this.owner.anchorID == \""+vendorID.anchorID+"\"" +
-							")");
-		}
+//		if (vendorID != null)
+//		{
+//			// TODO: JDOHelper.getObjectId(this.*) does not seem to work
+////			filter.append("\n && JDOHelper.getObjectId(this.vendor) == :vendorID");
+//			// WORKAROUND:
+//			filter.append("\n && (" +
+//					"this.vendor.organisationID == \""+vendorID.organisationID+"\" && " +
+//					"this.vendor.anchorTypeID == \""+vendorID.anchorTypeID+"\" && " +
+//					"this.vendor.anchorID == \""+vendorID.anchorID+"\"" +
+//							")");
+//		}
 		
 		logger.debug("Vars:");
 		logger.debug(vars.toString());
@@ -192,22 +193,6 @@ extends AbstractJDOQuery
 				"  this."+member+".names."+containsStr+"\n" +
 				"  && "+varName+".toLowerCase().matches(:fullTextSearch.toLowerCase())" +
 				" )");
-	}
-
-	protected void addImport(String importClass) {
-//		getImports().append("import "+importClass+"; "+"\n");
-		if (getImports().length() > 0)
-			getImports().append("; ");
-		
-		getImports().append("import "+importClass);
-	}
-
-	protected void addVariable(String className, String variableName) {
-//		getVars().append(className+" "+variableName+"; ");
-		if (getVars().length() > 0)
-			getVars().append("; ");
-		
-		getVars().append(className+" "+variableName);
 	}
 	
 	/**
@@ -301,21 +286,6 @@ extends AbstractJDOQuery
 		final Boolean oldSaleable = this.saleable;
 		this.saleable = saleable;
 		notifyListeners(PROPERTY_SALEABLE, oldSaleable, saleable);
-	}
-
-	private StringBuffer filter = new StringBuffer();
-	protected StringBuffer getFilter() {
-		return filter;
-	}
-	
-	private StringBuffer vars = new StringBuffer();
-	protected StringBuffer getVars() {
-		return vars;
-	}
-	
-	private StringBuffer imports = new StringBuffer();
-	protected StringBuffer getImports() {
-		return imports;
 	}
 
 	/**
@@ -492,23 +462,23 @@ extends AbstractJDOQuery
 		notifyListeners(PROPERTY_AVAILABLE, oldAvailable, available);
 	}
 
-	/**
-	 * Return the vendorID.
-	 * @return the vendorID
-	 */
-	public AnchorID getVendorID() {
-		return vendorID;
-	}
-
-	/**
-	 * Sets the vendorID.
-	 * @param vendorID the vendorID to set
-	 */
-	public void setVendorID(AnchorID vendorID) {
-		final AnchorID oldVendorID = this.vendorID;
-		this.vendorID = vendorID;
-		notifyListeners(PROPERTY_VENDOR_ID, oldVendorID, vendorID);
-	}
+//	/**
+//	 * Return the vendorID.
+//	 * @return the vendorID
+//	 */
+//	public AnchorID getVendorID() {
+//		return vendorID;
+//	}
+//
+//	/**
+//	 * Sets the vendorID.
+//	 * @param vendorID the vendorID to set
+//	 */
+//	public void setVendorID(AnchorID vendorID) {
+//		final AnchorID oldVendorID = this.vendorID;
+//		this.vendorID = vendorID;
+//		notifyListeners(PROPERTY_VENDOR_ID, oldVendorID, vendorID);
+//	}
 
 	@Override
 	public List<FieldChangeCarrier> getChangedFields(String propertyName)
@@ -572,10 +542,10 @@ extends AbstractJDOQuery
 		{
 			changedFields.add( new FieldChangeCarrier(PROPERTY_SALEABLE, saleable) );
 		}
-		if (allFields || PROPERTY_VENDOR_ID.equals(propertyName))
-		{
-			changedFields.add( new FieldChangeCarrier(PROPERTY_VENDOR_ID, vendorID) );
-		}
+//		if (allFields || PROPERTY_VENDOR_ID.equals(propertyName))
+//		{
+//			changedFields.add( new FieldChangeCarrier(PROPERTY_VENDOR_ID, vendorID) );
+//		}
 		
 		return changedFields;
 	}

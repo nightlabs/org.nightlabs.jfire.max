@@ -6,13 +6,11 @@ package org.nightlabs.jfire.reporting.trade.scripting.javaclass.payment;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
 import javax.jdo.JDOHelper;
-import javax.jdo.JDOObjectNotFoundException;
 import javax.jdo.PersistenceManager;
 import javax.jdo.Query;
 
@@ -30,8 +28,6 @@ import org.nightlabs.jfire.reporting.oda.jfs.JFSResultSetMetaData;
 import org.nightlabs.jfire.reporting.oda.jfs.JFSResultUtil;
 import org.nightlabs.jfire.reporting.oda.jfs.ReportingScriptUtil;
 import org.nightlabs.jfire.scripting.ScriptException;
-import org.nightlabs.jfire.security.User;
-import org.nightlabs.jfire.security.UserGroup;
 import org.nightlabs.jfire.security.id.UserID;
 import org.nightlabs.jfire.transfer.id.AnchorID;
 import org.nightlabs.util.TimePeriod;
@@ -86,7 +82,7 @@ public class PaymentList extends AbstractJFSScriptExecutorDelegate {
 	public Object doExecute() throws ScriptException {
 		// Map<String, Object> param = getScriptExecutorJavaClass().getParameterValues();
 		Collection<UserID> users = getObjectParameterValue("userIDs", Collection.class);
-		Collection<UserID> userGroups = getObjectParameterValue("userGroupIDs", Collection.class);
+//		Collection<UserID> userGroups = getObjectParameterValue("userGroupIDs", Collection.class);
 		Collection<AnchorID> partnerIDs = getObjectParameterValue("partnerIDs", Collection.class);;
 		Collection<ModeOfPaymentFlavourID> modeOfPaymentFlavourIDs = getObjectParameterValue("modeOfPaymentFlavourIDs", Collection.class);;
 		TimePeriod beginTimePeriod = getObjectParameterValue("beginTimePeriod", TimePeriod.class);
@@ -95,22 +91,22 @@ public class PaymentList extends AbstractJFSScriptExecutorDelegate {
 		PersistenceManager pm = getScriptExecutorJavaClass().getPersistenceManager();
 
 		// translate the given user-groups into users
-		if (userGroups != null) {
-			for (UserID userGroupID : userGroups) {
-				UserGroup userGroup = null;
-				try {
-					userGroup = (UserGroup) pm.getObjectById(userGroupID);
-				} catch (JDOObjectNotFoundException e) {
-					throw new ScriptException("Parameter userGroupIDs references non-existing UserGroup!", e);
-				}
-				for (User user : userGroup.getUsers()) {
-					if (users == null) {
-						users = new HashSet<UserID>();
-					}
-					users.add((UserID) pm.getObjectById(user));
-				}
-			}
-		}
+//		if (userGroups != null) {
+//			for (UserID userGroupID : userGroups) {
+//				UserGroup userGroup = null;
+//				try {
+//					userGroup = (UserGroup) pm.getObjectById(userGroupID);
+//				} catch (JDOObjectNotFoundException e) {
+//					throw new ScriptException("Parameter userGroupIDs references non-existing UserGroup!", e);
+//				}
+//				for (UserLocal userLocal : userGroup.getAuthorizedObject().getMembers()) {
+//					if (users == null) {
+//						users = new HashSet<UserID>();
+//					}
+//					users.add(UserID.create(userLocal.getOrganisationID(), userLocal.getUserID()));
+//				}
+//			}
+//		}
 		
 		StringBuffer jdoql = new StringBuffer();
 		 jdoql.append("SELECT "+

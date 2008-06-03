@@ -190,19 +190,19 @@ implements SessionBean
 					new NameEntry[] {new NameEntry(Locale.ENGLISH.getLanguage(), "Select a list of users")}
 			);
 
-			ReportParameterUtil.createValueProvider(pm, jfireObjects, ReportingConstants.VALUE_PROVIDER_ID_USER_GROUP, UserID.class.getName(),
-					new NameEntry[] {new NameEntry(Locale.ENGLISH.getLanguage(), "User group")},
-					new NameEntry[] {new NameEntry(Locale.ENGLISH.getLanguage(), "Let the user select a user group.")},
-					new NameEntry[] {new NameEntry(Locale.ENGLISH.getLanguage(), "Select a user group")}
-			);
+//			ReportParameterUtil.createValueProvider(pm, jfireObjects, ReportingConstants.VALUE_PROVIDER_ID_USER_GROUP, UserID.class.getName(),
+//					new NameEntry[] {new NameEntry(Locale.ENGLISH.getLanguage(), "User group")},
+//					new NameEntry[] {new NameEntry(Locale.ENGLISH.getLanguage(), "Let the user select a user group.")},
+//					new NameEntry[] {new NameEntry(Locale.ENGLISH.getLanguage(), "Select a user group")}
+//			);
+//
+//			ReportParameterUtil.createValueProvider(pm, jfireObjects, ReportingConstants.VALUE_PROVIDER_ID_USER_GROUPS,
+//					Collection.class.getName() + "<" + UserID.class.getName() + ">",
+//					new NameEntry[] {new NameEntry(Locale.ENGLISH.getLanguage(), "List of user groups")},
+//					new NameEntry[] {new NameEntry(Locale.ENGLISH.getLanguage(), "Let the user select a list of user groups.")},
+//					new NameEntry[] {new NameEntry(Locale.ENGLISH.getLanguage(), "Select a list of user groups")}
+//			);
 
-			ReportParameterUtil.createValueProvider(pm, jfireObjects, ReportingConstants.VALUE_PROVIDER_ID_USER_GROUPS,
-					Collection.class.getName() + "<" + UserID.class.getName() + ">",
-					new NameEntry[] {new NameEntry(Locale.ENGLISH.getLanguage(), "List of user groups")},
-					new NameEntry[] {new NameEntry(Locale.ENGLISH.getLanguage(), "Let the user select a list of user groups.")},
-					new NameEntry[] {new NameEntry(Locale.ENGLISH.getLanguage(), "Select a list of user groups")}
-			);
-			
 			ReportParameterUtil.createValueProvider(pm, jfireObjects, ReportingConstants.VALUE_PROVIDER_ID_ORGANISATION, OrganisationID.class.getName(),
 					new NameEntry[] {new NameEntry(Locale.ENGLISH.getLanguage(), "Organisation")},
 					new NameEntry[] {new NameEntry(Locale.ENGLISH.getLanguage(), "Let the user select an organisation.")},

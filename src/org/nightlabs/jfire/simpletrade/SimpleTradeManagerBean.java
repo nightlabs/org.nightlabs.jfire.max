@@ -91,8 +91,8 @@ import org.nightlabs.jfire.simpletrade.notification.SimpleProductTypeNotificatio
 import org.nightlabs.jfire.simpletrade.notification.SimpleProductTypeNotificationReceiver;
 import org.nightlabs.jfire.simpletrade.store.SimpleProductType;
 import org.nightlabs.jfire.simpletrade.store.SimpleProductTypeActionHandler;
-import org.nightlabs.jfire.simpletrade.store.SimpleProductTypeSearchFilter;
 import org.nightlabs.jfire.simpletrade.store.prop.SimpleProductTypeStruct;
+import org.nightlabs.jfire.simpletrade.store.search.SimpleProductTypeQuery;
 import org.nightlabs.jfire.store.CannotPublishProductTypeException;
 import org.nightlabs.jfire.store.NestedProductTypeLocal;
 import org.nightlabs.jfire.store.Product;
@@ -1263,29 +1263,28 @@ implements SessionBean
 		}
 	}
 
-
-	/**
-	 * Searches with the given searchFilter for {@link SimpleProductType}s.
-	 * 
-	 * @ejb.interface-method
-	 * @ejb.permission role-name="_Guest_"
-	 * @!ejb.transaction type="Supports" @!This usually means that no transaction is opened which is significantly faster and recommended for all read-only EJB methods! Marco.
-	 * 
-	 * FIXME: Use {@link AbstractJDOQuery} instead of search filter and get only ids from the datastore
-	 */
-	public Collection<ProductTypeID> searchProductTypes(SimpleProductTypeSearchFilter searchFilter)
-	{
-		PersistenceManager pm = getPersistenceManager();
-		try {
-			pm.getFetchPlan().clearGroups();
-			searchFilter.setPersistenceManager(pm);
-			Collection<SimpleProductType> productTypes = (Collection<SimpleProductType>) searchFilter.getResult();
-			Collection<ProductTypeID> ids = new ArrayList<ProductTypeID>(productTypes.size());
-			for (ProductType	productType : productTypes)
-				ids.add(productType.getObjectId());
-			return ids;
-		} finally {
-			pm.close();
-		}
-	}
+	// Is never used as this is done generic by the ProductTypeDAO
+//	/**
+//	 * Searches with the given searchQuery for {@link SimpleProductType}s.
+//	 * 
+//	 * @ejb.interface-method
+//	 * @ejb.permission role-name="_Guest_"
+//	 * @!ejb.transaction type="Supports" @!This usually means that no transaction is opened which is significantly faster and recommended for all read-only EJB methods! Marco.
+//	 * 
+//	 */
+//	public Collection<ProductTypeID> searchProductTypes(SimpleProductTypeQuery searchQuery)
+//	{
+//		PersistenceManager pm = getPersistenceManager();
+//		try {
+//			pm.getFetchPlan().clearGroups();
+//			searchQuery.setPersistenceManager(pm);
+//			Collection<SimpleProductType> productTypes = (Collection<SimpleProductType>) searchQuery.getResult();
+//			Collection<ProductTypeID> ids = new ArrayList<ProductTypeID>(productTypes.size());
+//			for (ProductType	productType : productTypes)
+//				ids.add(productType.getObjectId());
+//			return ids;
+//		} finally {
+//			pm.close();
+//		}
+//	}
 }

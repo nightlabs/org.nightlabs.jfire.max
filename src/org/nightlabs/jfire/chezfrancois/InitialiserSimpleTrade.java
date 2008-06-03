@@ -22,10 +22,8 @@ import org.nightlabs.jfire.security.Authority;
 import org.nightlabs.jfire.security.RoleGroup;
 import org.nightlabs.jfire.security.RoleGroupRef;
 import org.nightlabs.jfire.security.User;
-import org.nightlabs.jfire.security.UserGroup;
-import org.nightlabs.jfire.security.UserGroupLocal;
-import org.nightlabs.jfire.security.UserGroupRef;
-import org.nightlabs.jfire.security.UserLocal;
+import org.nightlabs.jfire.security.UserSecurityGroup;
+import org.nightlabs.jfire.security.UserSecurityGroupRef;
 import org.nightlabs.jfire.security.id.AuthorityID;
 import org.nightlabs.jfire.servermanager.config.OrganisationCf;
 import org.nightlabs.jfire.servermanager.config.OrganisationConfigModule;
@@ -310,29 +308,25 @@ extends Initialiser
 		dataCreator.makeAllLeavesSaleable();
 		
 		
-		UserGroup userGroup = new UserGroup(organisationID, User.USERID_PREFIX_TYPE_USERGROUP + "SalesAgents");
-		userGroup.setName("Sales Agents");
-		userGroup.setDescription("This group is blablabla.");
-		new UserGroupLocal(userGroup);
-		userGroup = pm.makePersistent(userGroup);
+		UserSecurityGroup userSecurityGroup = new UserSecurityGroup(organisationID, "SalesAgents");
+		userSecurityGroup.setName("Sales Agents");
+		userSecurityGroup.setDescription("This group is blablabla.");
+		userSecurityGroup = pm.makePersistent(userSecurityGroup);
 
-		userGroup = new UserGroup(organisationID, User.USERID_PREFIX_TYPE_USERGROUP + "SalesManagers");
-		userGroup.setName("Sales Managers");
-		userGroup.setDescription("This group is blablabla.");
-		new UserGroupLocal(userGroup);
-		userGroup = pm.makePersistent(userGroup);
+		userSecurityGroup = new UserSecurityGroup(organisationID, "SalesManagers");
+		userSecurityGroup.setName("Sales Managers");
+		userSecurityGroup.setDescription("This group is blablabla.");
+		userSecurityGroup = pm.makePersistent(userSecurityGroup);
 
-		userGroup = new UserGroup(organisationID, User.USERID_PREFIX_TYPE_USERGROUP + "Statistics");
-		userGroup.setName("Statistics");
-		userGroup.setDescription("This group consists out of the statistics guys.");
-		new UserGroupLocal(userGroup);
-		userGroup = pm.makePersistent(userGroup);
+		userSecurityGroup = new UserSecurityGroup(organisationID, "Statistics");
+		userSecurityGroup.setName("Statistics");
+		userSecurityGroup.setDescription("This group consists out of the statistics guys.");
+		userSecurityGroup = pm.makePersistent(userSecurityGroup);
 
-		userGroup = new UserGroup(organisationID, User.USERID_PREFIX_TYPE_USERGROUP + "TheOthers");
-		userGroup.setName("The Others");
-		userGroup.setDescription("This group is trallali trallala.");
-		new UserGroupLocal(userGroup);
-		userGroup = pm.makePersistent(userGroup);
+		userSecurityGroup = new UserSecurityGroup(organisationID, "TheOthers");
+		userSecurityGroup.setName("The Others");
+		userSecurityGroup.setDescription("This group is trallali trallala.");
+		userSecurityGroup = pm.makePersistent(userSecurityGroup);
 
 		Trader trader = Trader.getTrader(pm);
 		CustomerGroup customerGroupDefault = trader.getDefaultCustomerGroupForKnownCustomer();
@@ -349,7 +343,7 @@ extends Initialiser
 				User admin = User.getUser(pm, orgCf.getOrganisationID(), adminID);
 			}
 		}
-		
+
 		// create some more users
 		User user00 = dataCreator.createUser("user00", "test", "Chez Francois", "Miller", "Adam", "adam.miller@chezfrancois.co.th");
 		LegalEntity legalEntity00 = dataCreator.createLegalEntity(user00.getPerson());
@@ -368,21 +362,32 @@ extends Initialiser
 				01, 2008, "Comment for Marco Schulze");
 		User user02 = dataCreator.createUser("marco", "test", person);
 
-		userGroup = new UserGroup(organisationID, User.USERID_PREFIX_TYPE_USERGROUP + "Administrators");
-		userGroup.setName("Administrators");
-		userGroup.setDescription("This group has all access rights within its organisation.");
-		new UserGroupLocal(userGroup);
-		userGroup = pm.makePersistent(userGroup);
-		userGroup.addUser(user00);
-		userGroup.addUser(user01);
-		userGroup.addUser(user02);
-		userGroup.addUser(user03);
+		userSecurityGroup = new UserSecurityGroup(organisationID, "Administrators");
+		userSecurityGroup.setName("Administrators");
+		userSecurityGroup.setDescription("This group has all access rights within its organisation.");
+		userSecurityGroup = pm.makePersistent(userSecurityGroup);
+		
+//		{ // TODO WORKAROUND DATANUCLEUS
+//			pm.flush();
+//			pm.evictAll();
+//			dataCreator = new DataCreatorSimpleTrade(pm, User.getUser(pm, getPrincipal()));
+//			userSecurityGroup = (UserSecurityGroup) pm.getObjectById(UserSecurityGroupID.create(organisationID, "Administrators"));
+//			user00 = (User) pm.getObjectById(UserID.create(organisationID, "user00"));
+//			user01 = (User) pm.getObjectById(UserID.create(organisationID, "user01"));
+//			user02 = (User) pm.getObjectById(UserID.create(organisationID, "marco"));
+//			user03 = (User) pm.getObjectById(UserID.create(organisationID, "alex"));
+//		}
+
+		userSecurityGroup.addMember(user00.getUserLocal());
+		userSecurityGroup.addMember(user01.getUserLocal());
+		userSecurityGroup.addMember(user02.getUserLocal());
+		userSecurityGroup.addMember(user03.getUserLocal());
 
 		Authority authority = (Authority) pm.getObjectById(AuthorityID.create(organisationID, Authority.AUTHORITY_ID_ORGANISATION));
 
-		UserGroupRef userGroupRef = (UserGroupRef) authority.createUserRef(userGroup);
-		authority.createUserRef(user00);
-		authority.createUserRef(user01);
+		UserSecurityGroupRef userGroupRef = (UserSecurityGroupRef) authority.createAuthorizedObjectRef(userSecurityGroup);
+		authority.createAuthorizedObjectRef(user00.getUserLocal());
+		authority.createAuthorizedObjectRef(user01.getUserLocal());
 
 		for (Iterator<RoleGroup> it = pm.getExtent(RoleGroup.class).iterator(); it.hasNext(); ) {
 			RoleGroup roleGroup = it.next();

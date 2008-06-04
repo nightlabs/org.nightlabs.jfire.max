@@ -124,7 +124,6 @@ import org.nightlabs.jfire.trade.id.OrderID;
 import org.nightlabs.jfire.trade.jbpm.ProcessDefinitionAssignment;
 import org.nightlabs.jfire.transfer.id.AnchorID;
 import org.nightlabs.jfire.transfer.id.TransferID;
-import org.nightlabs.util.CollectionUtil;
 
 /**
  *
@@ -1660,14 +1659,12 @@ implements SessionBean
 	}
 
 	/**
-	 *
 	 * @ejb.interface-method
 	 * @ejb.permission role-name="_Guest_"
 	 * @!ejb.transaction type="Supports" @!This usually means that no transaction is opened which is significantly faster and recommended for all read-only EJB methods! Marco.
 	 */
 	@SuppressWarnings("unchecked")
-	public Set<ProductTypeID> getProductTypeIDs(
-		QueryCollection<? extends AbstractProductTypeQuery> productTypeQueries)
+	public Set<ProductTypeID> getProductTypeIDs(QueryCollection<? extends AbstractProductTypeQuery> productTypeQueries)
 	{
 		if (productTypeQueries == null)
 			return null;
@@ -1678,7 +1675,6 @@ implements SessionBean
 					"Invalid return type= "+ productTypeQueries.getResultClassName());
 		}
 		
-// TODO: Implement Authority checking here
 		PersistenceManager pm = getPersistenceManager();
 		try {
 			pm.getFetchPlan().setMaxFetchDepth(1);
@@ -1695,12 +1691,28 @@ implements SessionBean
 			
 			Collection<ProductType> productTypes = (Collection<ProductType>) queries.executeQueries();
 
+// TODO: Implement Authority checking here - only the role is missing - the rest is just the following line. marco.
+//			productTypes = Authority.filterSecuredObjects(pm, productTypes, getPrincipal(), roleID);
+
 			return NLJDOHelper.getObjectIDSet(productTypes);
 		} finally {
 			pm.close();
 		}
 	}
 
+	/**
+	 *
+	 * @ejb.interface-method
+	 * @ejb.permission role-name="_Guest_"
+	 * @!ejb.transaction type="Supports" @!This usually means that no transaction is opened which is significantly faster and recommended for all read-only EJB methods! Marco.
+	 */
+	@SuppressWarnings("unchecked")
+	public Set<ProductTypeID> getProductTypes(
+			QueryCollection<? extends AbstractProductTypeQuery> productTypeQueries)
+	{
+		return getProductTypeIDs(productTypeQueries);
+	}
+	
 	/**
 	 *
 	 * @ejb.interface-method

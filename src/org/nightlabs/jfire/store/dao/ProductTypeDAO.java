@@ -53,6 +53,14 @@ extends BaseJDOObjectDAO<ProductTypeID, ProductType>
 	protected ProductTypeDAO() {
 	}
 
+	private static ProductTypeDAO sharedInstance;
+
+	public static ProductTypeDAO sharedInstance() {
+		if (sharedInstance == null)
+			sharedInstance = new ProductTypeDAO();
+		return sharedInstance;
+	}
+	
 	/**
 	 * This method returns a new instance of <tt>Set</tt> with those
 	 * fetch groups that should always be used as a minimum.
@@ -96,9 +104,9 @@ extends BaseJDOObjectDAO<ProductTypeID, ProductType>
 	// TODO: Implement Authority checking (needs to be in the EJB!)
 	@Override
 	protected Collection<ProductType> retrieveJDOObjects(Set<ProductTypeID> objectIDs, String[] fetchGroups,
-			int maxFetchDepth, ProgressMonitor progressMonitor)
-			throws Exception
-			{
+	int maxFetchDepth, ProgressMonitor progressMonitor)
+	throws Exception
+	{
 		progressMonitor.beginTask("Loading ProductTypes", 2); //$NON-NLS-1$
 		progressMonitor.worked(1);
 
@@ -109,7 +117,7 @@ extends BaseJDOObjectDAO<ProductTypeID, ProductType>
 		Collection<ProductType> productTypes = sm.getProductTypes(objectIDs, fetchGroups, maxFetchDepth);
 		progressMonitor.worked(2);
 		return productTypes;
-			}
+	}
 
 	private StoreManager storeManager;
 
@@ -118,31 +126,22 @@ extends BaseJDOObjectDAO<ProductTypeID, ProductType>
 	//and retrieving the Products Id
 
 	public synchronized List<ProductType> getProductTypes(QueryCollection<?> queryCollection, String[] fetchGroups,
-			int maxFetchDepth, ProgressMonitor progressMonitor)throws Exception
-			{
+	int maxFetchDepth, ProgressMonitor progressMonitor)throws Exception
+	{
 		storeManager = StoreManagerUtil.getHome(SecurityReflector.getInitialContextProperties()).create();
-		Set<ProductTypeID> productTypeIDs = storeManager.getProductTypeIDs(queryCollection);
-
 		try {	
+			Set<ProductTypeID> productTypeIDs = storeManager.getProductTypeIDs(queryCollection);
 			return getJDOObjects(null, productTypeIDs, fetchGroups, maxFetchDepth, progressMonitor);
 		} finally {
 			storeManager = null;
 		}
-			}
+	}
 
 	// TODO: Implement authority checking - should be done in the server!
 	public List<ProductType> getProductTypes(Set<ProductTypeID> productTypeIDs, String[] fetchGroups,
-			int maxFetchDepth, ProgressMonitor progressMonitor)
-			{
+	int maxFetchDepth, ProgressMonitor progressMonitor)
+	{
 		return getJDOObjects(null, productTypeIDs, fetchGroups, maxFetchDepth, progressMonitor);
-			}
-
-	private static ProductTypeDAO sharedInstance;
-
-	public static ProductTypeDAO sharedInstance() {
-		if (sharedInstance == null)
-			sharedInstance = new ProductTypeDAO();
-		return sharedInstance;
 	}
 
 }

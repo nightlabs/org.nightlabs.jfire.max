@@ -12,7 +12,7 @@
 -->
       <fileset dir="${project.dir}/${project.name}">
         <include name="META-INF/ejb-jar.xml"/>
-      	<include name="META-INF/ejb-rolegroup.xml"/>
+      	<include name="META-INF/jfire-security.xml"/>
        	<include name="META-INF/jboss.xml"/>
         <include name="META-INF/datastoreinit.xml"/>
 <!--

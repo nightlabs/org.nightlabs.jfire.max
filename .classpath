@@ -4,7 +4,6 @@
 	<classpathentry kind="var" path="JBOSS/client/jboss-j2ee.jar"/>
 	<classpathentry kind="src" path="ejbsrc"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/JFireScriptingEditor2D"/>
-	<classpathentry combineaccessrules="false" kind="src" path="/JFireVoucher"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/NightLabsBase"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/NightLabsEditor2D"/>
 	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER"/>

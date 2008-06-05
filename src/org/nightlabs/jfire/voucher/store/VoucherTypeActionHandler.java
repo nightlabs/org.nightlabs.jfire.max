@@ -45,7 +45,7 @@ public class VoucherTypeActionHandler
 {
 	private static final Logger logger = Logger.getLogger(VoucherTypeActionHandler.class);
 
-	public static final AuthorityTypeID AUTHORITY_TYPE_ID = AuthorityTypeID.create(Organisation.DEV_ORGANISATION_ID, VoucherType.class.getName());
+	public static final AuthorityTypeID AUTHORITY_TYPE_ID = AuthorityTypeID.create(VoucherType.class.getName());
 
 //	/**
 //	 * This is the {@link org.nightlabs.jfire.transfer.Anchor#getAnchorID()} of

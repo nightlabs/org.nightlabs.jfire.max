@@ -675,7 +675,7 @@
       <fileset dir="${project.dir}/${bin.dir}" excludes="${dist.bin.excludes}" includes="${dist.bin.includes}"/>
       <fileset dir="${project.dir}/${meta.dir}">
         <include name="META-INF/ejb-jar.xml"/>
-      	<include name="META-INF/ejb-rolegroup.xml"/>
+      	<include name="META-INF/jfire-security.xml"/>
        	<include name="META-INF/jboss.xml"/>
 		<include name="META-INF/datastoreinit.xml"/>
       	<include name="META-INF/serverinit.xml"/>

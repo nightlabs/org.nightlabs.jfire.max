@@ -37,7 +37,7 @@ import org.nightlabs.jfire.trade.id.SegmentID;
 public class DynamicProductTypeActionHandler
 		extends ProductTypeActionHandler
 {
-	public static final AuthorityTypeID AUTHORITY_TYPE_ID = AuthorityTypeID.create(Organisation.DEV_ORGANISATION_ID, DynamicProductType.class.getName());
+	public static final AuthorityTypeID AUTHORITY_TYPE_ID = AuthorityTypeID.create(DynamicProductType.class.getName());
 
 //	/**
 //	 * This is the {@link org.nightlabs.jfire.transfer.Anchor#getAnchorID()} of

@@ -1009,9 +1009,10 @@ public abstract class ProductTypeActionHandler
 	 *
 	 * @param authorityTypeID
 	 * @param rootProductType
-	 * @return
+	 * @return the new <code>AuthorityType</code>
+	 * @deprecated AuthorityTypes should be declared in the jfire-security.xml and not here anymore! See 
 	 */
-	protected abstract AuthorityType createAuthorityType(AuthorityTypeID authorityTypeID, ProductType rootProductType);
+	protected AuthorityType createAuthorityType(AuthorityTypeID authorityTypeID, ProductType rootProductType) { throw new UnsupportedOperationException("Declare your AuthorityType in the jfire-security.xml!"); }
 
 	public abstract AuthorityTypeID getAuthorityTypeID(ProductType rootProductType);
 

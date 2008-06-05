@@ -74,6 +74,7 @@ extends VendorDependentQuery
 	protected void prepareQuery(Query q)
 	{
 		super.prepareQuery(q);
+		
 		StringBuffer filter = getFilter();
 		StringBuffer vars = getVars();
 		
@@ -94,7 +95,10 @@ extends VendorDependentQuery
 		
 		if (saleable != null)
 			filter.append("\n && this.saleable == :saleable");
-				
+
+		if (closed != null)
+			filter.append("\n && this.closed == :closed");
+		
 		if (available != null)
 			filter.append("\n && this.available == :available");
 		

@@ -868,6 +868,11 @@ implements Serializable, ArticleContainer, SegmentContainer, DetachCallback
 				Util.hashCode(this.orderIDPrefix) ^
 				Util.hashCode(this.orderID);
 	}
+
+	@Override
+	public String toString() {
+		return this.getClass().getName() + '@' + Integer.toHexString(System.identityHashCode(this)) + '[' + organisationID + ',' + orderIDPrefix + ',' + ObjectIDUtil.longObjectIDFieldToString(orderID) + ']';
+	}
 	
 	/*
 	 * (non-Javadoc)

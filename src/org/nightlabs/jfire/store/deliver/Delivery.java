@@ -54,6 +54,7 @@ import org.nightlabs.jfire.trade.LegalEntity;
 import org.nightlabs.jfire.trade.id.ArticleID;
 import org.nightlabs.jfire.transfer.Transfer;
 import org.nightlabs.jfire.transfer.id.AnchorID;
+import org.nightlabs.util.Util;
 
 /**
  * @author Marco Schulze - marco at nightlabs dot de
@@ -1482,8 +1483,8 @@ implements Serializable, StoreCallback
 	public int hashCode() {
 		final int prime = 31;
 		int result = 1;
-		result = prime * result + (int) (deliveryID ^ (deliveryID >>> 32));
 		result = prime * result + ((organisationID == null) ? 0 : organisationID.hashCode());
+		result = prime * result + (int) (deliveryID ^ (deliveryID >>> 32));
 		return result;
 	}
 	
@@ -1492,20 +1493,18 @@ implements Serializable, StoreCallback
 	 */
 	@Override
 	public boolean equals(Object obj) {
-		if (this == obj)
-			return true;
-		if (obj == null)
-			return false;
-		if (!(obj instanceof Delivery))
-			return false;
+		if (this == obj) return true;
+		if (obj == null) return false;
+		if (this.getClass() != obj.getClass()) return false;
 		final Delivery other = (Delivery) obj;
-		if (deliveryID != other.deliveryID)
-			return false;
-		if (organisationID == null) {
-			if (other.organisationID != null)
-				return false;
-		} else if (!organisationID.equals(other.organisationID))
-			return false;
-		return true;
+		return (
+				Util.equals(this.organisationID, other.organisationID) &&
+				Util.equals(this.deliveryID, other.deliveryID)
+		);
+	}
+
+	@Override
+	public String toString() {
+		return this.getClass().getName() + '@' + Integer.toHexString(System.identityHashCode(this)) + '[' + organisationID + ',' + ObjectIDUtil.longObjectIDFieldToString(deliveryID) + ']';
 	}
 }

@@ -443,34 +443,23 @@ public abstract class PriceConfig implements Serializable, StoreCallback, IPrice
 	@Override
 	public int hashCode()
 	{
-		return Util.hashCode(this.organisationID) + Util.hashCode(this.priceConfigID);
+		return (31 * Util.hashCode(this.organisationID)) + Util.hashCode(this.priceConfigID);
 	}
 
 	@Override
 	public boolean equals(Object obj)
 	{
 		if (obj == this) return true;
-		if (!(obj instanceof IPriceConfig)) return false;
+		if (obj == null) return false;
+		if (this.getClass() != obj.getClass()) return false;
 
 		IPriceConfig other = (IPriceConfig) obj;
 
 		return Util.equals(this.organisationID, other.getOrganisationID()) && Util.equals(this.priceConfigID, other.getPriceConfigID());
 	}
 
-//	/**
-//	 * @jdo.field persistence-modifier="none"
-//	 */
-//	private transient int adjustParametersCounter = 0;
-//
-//	/**
-//	 *
-//	 */
-//	public void beginAdjustParameters()
-//	{
-//
-//	}
-//	public void endAdjustParameters()
-//	{
-//
-//	}
+	@Override
+	public String toString() {
+		return this.getClass().getName() + '@' + Integer.toHexString(System.identityHashCode(this)) + '[' + organisationID + ',' + priceConfigID + ']';
+	}
 }

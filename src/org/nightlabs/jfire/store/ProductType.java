@@ -1616,11 +1616,6 @@ implements
 		this.productTypeLocal = productTypeLocal;
 	}
 
-	public String toString()
-	{
-		return this.getClass().getName() + '{' + getPrimaryKey() + '}';
-	}
-
 	protected ProductTypeLocal createProductTypeLocal(User user)
 	{
 		return new ProductTypeLocal(user, this); // self-registering
@@ -1651,21 +1646,25 @@ implements
 	@Override
 	public int hashCode()
 	{
-		return Util.hashCode(organisationID) ^ Util.hashCode(productTypeID);
+		return (31 * Util.hashCode(organisationID)) ^ Util.hashCode(productTypeID);
 	}
+
 	@Override
 	public boolean equals(Object obj)
 	{
-		if (this == obj)
-			return true;
-
-		if (!(obj instanceof ProductType))
-			return false;
+		if (this == obj) return true;
+		if (obj == null) return false;
+		if (this.getClass() != obj.getClass()) return false;
 
 		ProductType o = (ProductType) obj;
-
-		return
+		return (
 				Util.equals(this.organisationID, o.organisationID) &&
-				Util.equals(this.productTypeID, o.productTypeID);
+				Util.equals(this.productTypeID, o.productTypeID)
+		);
+	}
+
+	@Override
+	public String toString() {
+		return this.getClass().getName() + '@' + Integer.toHexString(System.identityHashCode(this)) + '[' + organisationID + ',' + productTypeID + ']';
 	}
 }

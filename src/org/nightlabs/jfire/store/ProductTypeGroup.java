@@ -36,6 +36,7 @@ import javax.jdo.Query;
 import javax.jdo.listener.DetachCallback;
 
 import org.nightlabs.jfire.store.id.ProductTypeGroupID;
+import org.nightlabs.util.Util;
 
 /**
  * @author Marco Schulze - marco at nightlabs dot de
@@ -230,5 +231,31 @@ implements Serializable, DetachCallback
 		if (fetchGroups.contains(FETCH_GROUP_PRODUCT_TYPES) || fetchGroups.contains(FetchPlan.ALL))
 			detached.productTypes = pm.detachCopyAll(
 					getProductTypes(pm, (ProductTypeGroupID) JDOHelper.getObjectId(attached)));
+	}
+
+	@Override
+	public int hashCode() {
+		final int prime = 31;
+		int result = 1;
+		result = prime * result + ((organisationID == null) ? 0 : organisationID.hashCode());
+		result = prime * result + ((productTypeGroupID == null) ? 0 : productTypeGroupID.hashCode());
+		return result;
+	}
+
+	@Override
+	public boolean equals(Object obj) {
+		if (this == obj) return true;
+		if (obj == null) return false;
+		if (getClass() != obj.getClass()) return false;
+		final ProductTypeGroup other = (ProductTypeGroup) obj;
+		return (
+				Util.equals(this.organisationID, other.organisationID) &&
+				Util.equals(this.productTypeGroupID, other.productTypeGroupID)
+		);
+	}
+
+	@Override
+	public String toString() {
+		return this.getClass().getName() + '@' + Integer.toHexString(System.identityHashCode(this)) + '[' + organisationID + ',' + productTypeGroupID + ']';
 	}
 }

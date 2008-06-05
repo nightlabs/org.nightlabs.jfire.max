@@ -425,4 +425,10 @@ implements
 	public int getArticleCount() {
 		return articleCount;
 	}
+
+	@Override
+	public String toString() {
+		return this.getClass().getName() + '@' + Integer.toHexString(System.identityHashCode(this)) + '[' + organisationID + ',' + receptionNoteIDPrefix + ',' + ObjectIDUtil.longObjectIDFieldToString(receptionNoteID) + ']';
+	}
+
 }

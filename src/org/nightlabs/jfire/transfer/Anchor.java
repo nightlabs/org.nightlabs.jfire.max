@@ -177,7 +177,7 @@ public abstract class Anchor
 	}
 
 	/**
-	 * Do NOT call this method directly! Use {@link Transfer#bookTransfer(User, Set)}
+	 * Do NOT call this method directly! Use {@link Transfer#bookTransfer(User, java.util.Set)}
 	 * instead!
 	 */
 	public void rollbackTransfer(User user, Transfer transfer, Set<Anchor> involvedAnchors)
@@ -217,12 +217,12 @@ public abstract class Anchor
 	protected abstract void internalRollbackTransfer(Transfer transfer, User user, Set<Anchor> involvedAnchors);
 
 	/**
-	 * Do NOT call this method directly! Use {@link Transfer#bookTransfer(User, Map)}
+	 * Do NOT call this method directly! Use {@link Transfer#bookTransfer(User, java.util.Set)}
 	 * instead!
 	 * <p>
 	 * This method does some checks and calls <tt>internalBookTransfer</tt>. It is not
 	 * recommended to overwrite this method. It's
-	 * better to overwrite {@link #internalBookTransfer(Transfer, User, Map)} instead!
+	 * better to overwrite {@link #internalBookTransfer(Transfer, User, Set)} instead!
 	 *
 	 * @param transfer The transfer to be booked.
 	 * @param involvedAnchors Every <tt>Anchor</tt> must register itself in this <tt>Map</tt> with the <tt>Anchor.primaryKey</tt> as key and the <tt>Anchor</tt> as value.
@@ -411,5 +411,10 @@ public abstract class Anchor
 	public int hashCode()
 	{
 		return Util.hashCode(organisationID) ^ Util.hashCode(anchorTypeID) ^ Util.hashCode(anchorID);
+	}
+
+	@Override
+	public String toString() {
+		return this.getClass().getName() + '@' + Integer.toHexString(System.identityHashCode(this)) + '[' + organisationID + ',' + anchorTypeID + ',' + anchorID + ']';
 	}
 }

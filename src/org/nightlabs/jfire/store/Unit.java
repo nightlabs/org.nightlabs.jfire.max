@@ -118,7 +118,12 @@ implements Serializable, StoreCallback
 	@Override
 	public int hashCode()
 	{
-		return Util.hashCode(organisationID) + Util.hashCode(unitID);
+		return (31 * Util.hashCode(organisationID)) + Util.hashCode(unitID);
+	}
+
+	@Override
+	public String toString() {
+		return this.getClass().getName() + '@' + Integer.toHexString(System.identityHashCode(this)) + '[' + organisationID + ',' + unitID + ']';
 	}
 
 	/**

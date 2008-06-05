@@ -747,6 +747,11 @@ implements Serializable, ArticleContainer, Statable, DetachCallback
 				Util.hashCode(this.invoiceID);
 	}
 
+	@Override
+	public String toString() {
+		return this.getClass().getName() + '@' + Integer.toHexString(System.identityHashCode(this)) + '[' + organisationID + ',' + invoiceIDPrefix + ',' + ObjectIDUtil.longObjectIDFieldToString(invoiceID) + ']';
+	}
+
 	/**
 	 * This method is <b>not</b> intended to be called directly. It is called by
 	 * {@link State#State(String, long, User, Statable, org.nightlabs.jfire.jbpm.graph.def.StateDefinition)}

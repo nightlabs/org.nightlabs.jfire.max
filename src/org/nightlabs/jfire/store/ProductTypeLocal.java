@@ -620,4 +620,29 @@ implements Serializable, Inheritable, InheritanceCallbacks, SecuredObject
 
 		getProductType().applyInheritance();
 	}
+
+	@Override
+	public int hashCode()
+	{
+		return (31 * Util.hashCode(organisationID)) ^ Util.hashCode(productTypeID);
+	}
+
+	@Override
+	public boolean equals(Object obj)
+	{
+		if (this == obj) return true;
+		if (obj == null) return false;
+		if (this.getClass() != obj.getClass()) return false;
+
+		ProductTypeLocal o = (ProductTypeLocal) obj;
+		return (
+				Util.equals(this.organisationID, o.organisationID) &&
+				Util.equals(this.productTypeID, o.productTypeID)
+		);
+	}
+
+	@Override
+	public String toString() {
+		return this.getClass().getName() + '@' + Integer.toHexString(System.identityHashCode(this)) + '[' + organisationID + ',' + productTypeID + ']';
+	}
 }

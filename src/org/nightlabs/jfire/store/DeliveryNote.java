@@ -667,6 +667,10 @@ implements Serializable, ArticleContainer, Statable, DetachCallback
 				Util.hashCode(this.deliveryNoteID);
 	}
 
+	@Override
+	public String toString() {
+		return this.getClass().getName() + '@' + Integer.toHexString(System.identityHashCode(this)) + '[' + organisationID + ',' + deliveryNoteIDPrefix + ',' + ObjectIDUtil.longObjectIDFieldToString(deliveryNoteID) + ']';
+	}
 
 	/**
 	 * This method is <b>not</b> intended to be called directly. It is called by

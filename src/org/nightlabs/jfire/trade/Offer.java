@@ -893,6 +893,11 @@ implements
 		return Util.hashCode(organisationID) ^ Util.hashCode(offerIDPrefix) ^ Util.hashCode(offerID);
 	}
 
+	@Override
+	public String toString() {
+		return this.getClass().getName() + '@' + Integer.toHexString(System.identityHashCode(this)) + '[' + organisationID + ',' + offerIDPrefix + ',' + ObjectIDUtil.longObjectIDFieldToString(offerID) + ']';
+	}
+
 	/**
 	 * This method is <b>not</b> intended to be called directly. It is called by
 	 * {@link State#State(String, long, User, Statable, org.nightlabs.jfire.jbpm.graph.def.StateDefinition)}

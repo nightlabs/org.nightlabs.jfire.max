@@ -43,12 +43,15 @@ import org.nightlabs.jfire.accounting.Currency;
 import org.nightlabs.jfire.accounting.Invoice;
 import org.nightlabs.jfire.accounting.id.CurrencyID;
 import org.nightlabs.jfire.accounting.id.InvoiceID;
+import org.nightlabs.jfire.accounting.pay.ServerPaymentProcessor.PayParams;
 import org.nightlabs.jfire.accounting.pay.id.ModeOfPaymentFlavourID;
 import org.nightlabs.jfire.accounting.pay.id.PaymentID;
 import org.nightlabs.jfire.accounting.pay.id.ServerPaymentProcessorID;
 import org.nightlabs.jfire.security.User;
 import org.nightlabs.jfire.trade.LegalEntity;
+import org.nightlabs.jfire.transfer.Transfer;
 import org.nightlabs.jfire.transfer.id.AnchorID;
+import org.nightlabs.util.Util;
 
 /**
  * {@link Payment}s are created when invoices or parts of invoices are paid. Therefore
@@ -343,7 +346,7 @@ implements Serializable, StoreCallback
 	 * A rollback has been done and the {@link org.nightlabs.jfire.accounting.pay.PayMoneyTransfer}
 	 * including all dependent {@link org.nightlabs.jfire.accounting.MoneyTransfer}s have
 	 * been deleted. All involved anchors got previously informed by
-	 * {@link org.nightlabs.jfire.transfer.Anchor#rollbackTransfer(User, Transfer, Map)}.
+	 * {@link org.nightlabs.jfire.transfer.Anchor#rollbackTransfer(User, Transfer, Set)}.
 	 * <p>
 	 * Note: If the <tt>PayMoneyTransfer</tt> has not been booked (but only created),
 	 * it will of course not be rolled back on the anchors, but the status will be
@@ -1258,22 +1261,18 @@ implements Serializable, StoreCallback
 	 */
 	@Override
 	public boolean equals(Object obj) {
-		if (this == obj)
-			return true;
-		if (obj == null)
-			return false;
-		if (!(obj instanceof Payment))
-			return false;
+		if (this == obj) return true;
+		if (obj == null) return false;
+		if (this.getClass() != obj.getClass()) return false;
 		final Payment other = (Payment) obj;
-		if (organisationID == null) {
-			if (other.organisationID != null)
-				return false;
-		} else if (!organisationID.equals(other.organisationID))
-			return false;
-		if (paymentID != other.paymentID)
-			return false;
-		return true;
+		return (
+				Util.equals(this.organisationID, other.organisationID) &&
+				Util.equals(this.paymentID, other.paymentID)
+		);
 	}
 	
-	
+	@Override
+	public String toString() {
+		return this.getClass().getName() + '@' + Integer.toHexString(System.identityHashCode(this)) + '[' + organisationID + ',' + ObjectIDUtil.longObjectIDFieldToString(paymentID) + ']';
+	}
 }

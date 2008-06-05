@@ -53,7 +53,7 @@ import org.nightlabs.util.CollectionUtil;
 public class SimpleProductTypeActionHandler
 		extends ProductTypeActionHandler
 {
-	public static final AuthorityTypeID AUTHORITY_TYPE_ID = AuthorityTypeID.create(Organisation.DEV_ORGANISATION_ID, SimpleProductType.class.getName());
+	public static final AuthorityTypeID AUTHORITY_TYPE_ID = AuthorityTypeID.create(SimpleProductType.class.getName());
 
 	/**
 	 * @deprecated Only for JDO!

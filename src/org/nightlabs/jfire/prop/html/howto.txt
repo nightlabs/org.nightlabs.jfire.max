@@ -5,4 +5,8 @@
 4. Create a UI dependent struct field factory that extends AbstractStructFieldFactory
 5. Create AbstractStructFieldEditor<YourStructField>
 6. Struct field editor factory extends AbstractStructFieldEditorFactory
-7. Extennsion Point org.nightlabs.jfire.base.ui.propStructField
+7. Extension Point org.nightlabs.jfire.base.ui.propStructField
+
+8. Create DataFieldEditor extends AbstractDataFieldEditor<YourDataField>
+9. Create DataFieldEditorFactory extends AbstractDataFieldEditorFactory<YourDataField>
+10. Register data field editor factory with extension point org.nightlabs.jfire.base.ui.propDataFieldEditorFactory 

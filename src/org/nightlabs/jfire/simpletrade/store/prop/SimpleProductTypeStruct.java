@@ -14,6 +14,7 @@ import org.nightlabs.jfire.prop.PropHelper;
 import org.nightlabs.jfire.prop.Struct;
 import org.nightlabs.jfire.prop.StructBlock;
 import org.nightlabs.jfire.prop.StructLocal;
+import org.nightlabs.jfire.prop.html.HTMLStructField;
 import org.nightlabs.jfire.prop.id.StructBlockID;
 import org.nightlabs.jfire.prop.id.StructFieldID;
 import org.nightlabs.jfire.prop.structfield.I18nTextStructField;
@@ -84,16 +85,15 @@ public class SimpleProductTypeStruct {
 
 			// --------
 
-			// TODO: seems not to work:
-//			sb = PropHelper.createStructBlock(productTypeStruct, XINFO, "Extended Information", "Erweiterte Informationen");
-//			sb.setUnique(false);
-//			HTMLStructField info = new HTMLStructField(sb, XINFO_INFO);
-//			info.getName().setText(Locale.GERMAN.getLanguage(), "Produktinformationen");
-//			info.getName().setText(Locale.ENGLISH.getLanguage(), "Product information");
-//
-//			sb.addStructField(info);
-//
-//			productTypeStruct.addStructBlock(sb);
+			sb = PropHelper.createStructBlock(productTypeStruct, XINFO, "Extended Information", "Erweiterte Informationen");
+			sb.setUnique(false);
+			HTMLStructField info = new HTMLStructField(sb, XINFO_INFO);
+			info.getName().setText(Locale.GERMAN.getLanguage(), "Produktinformationen");
+			info.getName().setText(Locale.ENGLISH.getLanguage(), "Product information");
+
+			sb.addStructField(info);
+
+			productTypeStruct.addStructBlock(sb);
 
 		} catch (Throwable t) {
 			throw new RuntimeException(t);

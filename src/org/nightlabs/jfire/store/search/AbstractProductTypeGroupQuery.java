@@ -7,9 +7,9 @@ import java.util.List;
 
 import javax.jdo.Query;
 
+import org.apache.log4j.Logger;
 import org.nightlabs.jdo.query.AbstractSearchQuery;
 import org.nightlabs.jfire.store.ProductType;
-import org.nightlabs.jfire.store.ProductTypeGroup;
 
 /**
  * @author Daniel Mazurek - daniel [at] nightlabs [dot] de
@@ -18,6 +18,8 @@ import org.nightlabs.jfire.store.ProductTypeGroup;
 public abstract class AbstractProductTypeGroupQuery 
 extends VendorDependentQuery
 {
+	private static final Logger logger = Logger.getLogger(AbstractProductTypeGroupQuery.class);
+	
 	private static final String PROPERTY_PREFIX = "AbstractProductTypeGroupQuery.";
 	public static final String PROPERTY_FULL_TEXT_LANGUAGE_ID = PROPERTY_PREFIX + "fullTextLanguageID";
 	public static final String PROPERTY_FULL_TEXT_SEARCH = PROPERTY_PREFIX + "fullTextSearch";
@@ -25,6 +27,7 @@ extends VendorDependentQuery
 	public static final String PROPERTY_CONFIRMED = PROPERTY_PREFIX + "confirmed";
 	public static final String PROPERTY_PUBLISHED = PROPERTY_PREFIX + "published";
 	public static final String PROPERTY_SALEABLE = PROPERTY_PREFIX + "saleable";
+	public static final String PROPERTY_ORGANISATION_ID = PROPERTY_PREFIX + "organisationID";
 
 	private Boolean published = null;
 	private Boolean confirmed = null;
@@ -34,6 +37,8 @@ extends VendorDependentQuery
 	private String fullTextLanguageID = null;
 	private String fullTextSearch = null;
 
+	private String organisationID = null;
+	
 	/* (non-Javadoc)
 	 * @see org.nightlabs.jdo.query.AbstractJDOQuery#prepareQuery(javax.jdo.Query)
 	 */
@@ -44,17 +49,16 @@ extends VendorDependentQuery
 		StringBuffer vars = getVars();
 		StringBuffer imports = getImports();
 		
-//		filter.append("productType.productTypeGroups.containsValue(this)");
-//		FIXME Workaround for JPOX - begin
-		filter.append("productType.productTypeGroups.containsValue(workaroundGroup) &&");
-		filter.append("workaroundGroup == this");
-		vars.append(ProductTypeGroup.class.getName()+" workaroundGroup;");
-		addImport(ProductTypeGroup.class.getName());
-//		FIXME Workaround for JPOX - end
+		filter.append("productType.productTypeGroups.containsValue(this)");
+////		FIXME Workaround for JPOX - begin
+//		filter.append("productType.productTypeGroups.containsValue(workaroundGroup) &&");
+//		filter.append("workaroundGroup == this");
+//		vars.append(ProductTypeGroup.class.getName()+" workaroundGroup;");
+//		addImport(ProductTypeGroup.class.getName());
+////		FIXME Workaround for JPOX - end
 
-		filter.append(" && ");
-		filter.append("productType.organisationID == :myOrganisationID");
-//		paramMap.put("myOrganisationID", LocalOrganisation.getLocalOrganisation(getPersistenceManager()).getOrganisationID());
+		if (organisationID != null)
+			filter.append("\n && this.organisationID == :organisationID");
 
 		if (fullTextSearch != null) {
 			filter.append("\n && ( ");
@@ -75,34 +79,21 @@ extends VendorDependentQuery
 			filter.append("\n && productType.closed == :closed");
 
 		if (getVendorID() != null)
-			filter.append("\n && productType.vendorID == :vendorID");
+			filter.append("\n && JDOHelper.getObjectId(productType.vendor) == :vendorID");
 
-//		int dateCount = 0;
-//		if (isUsePerformaceTimeFilter()) {
-//			if ((getPerformanceTimeFilters() != null) && (getPerformanceTimeFilters().size() > 0) ) {
-//				filter.append(" && (");
-//				for (Iterator iter = getPerformanceTimeFilters().iterator(); iter.hasNext();) {
-//					PerformanceTimeFilterItem filterItem = (PerformanceTimeFilterItem) iter.next();
-//					filterItem.appendSubQuery(dateCount, 0, imports, vars, filter, params, paramMap);
-//					if (iter.hasNext()) {
-//						switch (getPerformanceTimeFilterConjunction()) {
-//							case SearchFilter.CONJUNCTION_AND:
-//								filter.append(" && ");
-//								break;
-//							case SearchFilter.CONJUNCTION_OR:
-//								filter.append(" || ");
-//								break;
-//						}
-//					}
-//				}
-//				filter.append(")");
-//			}
-//		}
-		
 		vars.append(ProductType.class.getName()+" productType;");
 		addImport(ProductType.class.getName());
 
-//		result.append("distinct this");		 
+//		result.append("distinct this");	
+		if (logger.isDebugEnabled()) {
+			logger.debug("Vars:");
+			logger.debug(vars.toString());
+			logger.debug("Filter:");
+			logger.debug(filter.toString());			
+		}
+
+		q.setFilter(filter.toString());
+		q.declareVariables(vars.toString());		
 	}
 
 	protected void addFullTextSearch(StringBuffer filter, StringBuffer vars, String member) {
@@ -139,7 +130,7 @@ extends VendorDependentQuery
 	 * Sets the saleable.
 	 * @param saleable the saleable to set
 	 */
-	public void setSaleable(boolean saleable) {
+	public void setSaleable(Boolean saleable) {
 		this.saleable = saleable;
 	}
 
@@ -147,7 +138,7 @@ extends VendorDependentQuery
 	 * Sets the published.
 	 * @param published the published to set
 	 */
-	public void setPublished(boolean published) {
+	public void setPublished(Boolean published) {
 		this.published = published;
 	}	
 	
@@ -201,7 +192,7 @@ extends VendorDependentQuery
 	 * Sets the filter to include only ProductTypeGroupes which have ProductTypes whose confirmed flag matches the given value.
 	 * @param confirmed the confirmed to set
 	 */
-	public void setConfirmed(boolean confirmed)
+	public void setConfirmed(Boolean confirmed)
 	{
 		final Boolean oldConfirmed = this.confirmed;
 		this.confirmed = confirmed;
@@ -220,13 +211,31 @@ extends VendorDependentQuery
 	 * sets the closed
 	 * @param closed the closed to set
 	 */
-	public void setClosed(boolean closed)
+	public void setClosed(Boolean closed)
 	{
 		final Boolean oldClosed = this.closed;
 		this.closed = closed;
 		notifyListeners(PROPERTY_CLOSED, oldClosed, closed);
 	}
 	
+	/**
+	 * Returns the organisationID.
+	 * @return the organisationID
+	 */
+	public String getOrganisationID() {
+		return organisationID;
+	}
+
+	/**
+	 * Sets the organisationID.
+	 * @param organisationID the organisationID to set
+	 */
+	public void setOrganisationID(String organisationID) {
+		String oldOrganisationID = this.organisationID;
+		this.organisationID = organisationID;
+		notifyListeners(PROPERTY_ORGANISATION_ID, oldOrganisationID, organisationID);
+	}
+
 	@Override
 	public List<FieldChangeCarrier> getChangedFields(String propertyName)
 	{
@@ -256,6 +265,10 @@ extends VendorDependentQuery
 		if (allFields || PROPERTY_SALEABLE.equals(propertyName))
 		{
 			changedFields.add( new FieldChangeCarrier(PROPERTY_SALEABLE, saleable) );
+		}
+		if (allFields || PROPERTY_ORGANISATION_ID.equals(propertyName))
+		{
+			changedFields.add( new FieldChangeCarrier(PROPERTY_ORGANISATION_ID, organisationID) );
 		}
 		
 		return changedFields;

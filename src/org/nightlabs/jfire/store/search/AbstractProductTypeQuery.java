@@ -44,7 +44,8 @@ extends VendorDependentQuery
 	private DeliveryConfigurationID deliveryConfigurationID = null;
 	private LocalAccountantDelegateID localAccountantDelegateID = null;
 	private ProductTypeGroupID productTypeGroupID = null;	
-//	private AnchorID vendorID = null;
+
+	private String organisationID = null;
 	
 	// Property IDs used for the PropertyChangeListeners
 	private static final String PROPERTY_PREFIX = "AbstractProductTypeQuery.";
@@ -62,7 +63,7 @@ extends VendorDependentQuery
 	public static final String PROPERTY_PRODUCTTYPE_GROUP_ID = PROPERTY_PREFIX + "productTypeGroupID";
 	public static final String PROPERTY_PUBLISHED = PROPERTY_PREFIX + "published";
 	public static final String PROPERTY_SALEABLE = PROPERTY_PREFIX + "saleable";
-//	public static final String PROPERTY_VENDOR_ID = PROPERTY_PREFIX + "vendorID";
+	public static final String PROPERTY_ORGANISATION_ID = PROPERTY_PREFIX + "organisationID";
 
 	@Override
 	protected Query createQuery()
@@ -102,84 +103,72 @@ extends VendorDependentQuery
 		if (available != null)
 			filter.append("\n && this.available == :available");
 		
-		if (innerPriceConfigID != null)
-		{
-			// TODO: JDOHelper.getObjectId(this.*) does not seem to work (java.lang.IndexOutOfBoundsException: Index: 3, Size: 3)
-//			filter.append("\n && JDOHelper.getObjectId(this.innerPriceConfig) == :innerPriceConfigID");
-			// WORKAROUND:
-			filter.append("\n && (" +
-					"this.innerPriceConfig.organisationID == \""+innerPriceConfigID.organisationID+"\" && " +
-					"this.innerPriceConfig.priceConfigID == \""+innerPriceConfigID.priceConfigID+"\"" +
-							")");
-		}
-		
 		if (minNestedProductTypeAmount >= 0)
 			filter.append("\n && :minNestedProductTypeAmount < this.nestedProductTypes.size()");
 
 		if (maxNestedProductTypeAmount >= 0)
 			filter.append("\n && :maxNestedProductTypeAmount > this.nestedProductTypes.size()");
 		
+		if (innerPriceConfigID != null)
+		{
+			filter.append("\n && JDOHelper.getObjectId(this.innerPriceConfig) == :innerPriceConfigID");
+//			// WORKAROUND:
+//			filter.append("\n && (" +
+//					"this.innerPriceConfig.organisationID == \""+innerPriceConfigID.organisationID+"\" && " +
+//					"this.innerPriceConfig.priceConfigID == \""+innerPriceConfigID.priceConfigID+"\"" +
+//							")");
+		}
+				
 		if (ownerID != null)
 		{
-			// TODO: JDOHelper.getObjectId(this.*) does not seem to work
-//			filter.append("\n && JDOHelper.getObjectId(this.owner) == :ownerID");
-			// WORKAROUND:
-			filter.append("\n && (" +
-					"this.owner.organisationID == \""+ownerID.organisationID+"\" && " +
-					"this.owner.anchorTypeID == \""+ownerID.anchorTypeID+"\" && " +
-					"this.owner.anchorID == \""+ownerID.anchorID+"\"" +
-							")");
+			filter.append("\n && JDOHelper.getObjectId(this.owner) == :ownerID");
+//			// WORKAROUND:
+//			filter.append("\n && (" +
+//					"this.owner.organisationID == \""+ownerID.organisationID+"\" && " +
+//					"this.owner.anchorTypeID == \""+ownerID.anchorTypeID+"\" && " +
+//					"this.owner.anchorID == \""+ownerID.anchorID+"\"" +
+//							")");
 		}
 		
 		if (deliveryConfigurationID != null)
 		{
-			// TODO: JDOHelper.getObjectId(this.*) does not seem to work
-//		filter.append("\n && JDOHelper.getObjectId(this.deliveryConfiguration) == :deliveryConfigurationID");
-			// WORKAROUND:
-			filter.append("\n && (" +
-				"this.deliveryConfigurationID.organisationID == \""+deliveryConfigurationID.organisationID+"\" && " +
-				"this.deliveryConfigurationID.deliveryConfigurationID == \""+deliveryConfigurationID.deliveryConfigurationID+"\"" +
-						")");
+			filter.append("\n && JDOHelper.getObjectId(this.deliveryConfiguration) == :deliveryConfigurationID");
+//			// WORKAROUND:
+//			filter.append("\n && (" +
+//				"this.deliveryConfigurationID.organisationID == \""+deliveryConfigurationID.organisationID+"\" && " +
+//				"this.deliveryConfigurationID.deliveryConfigurationID == \""+deliveryConfigurationID.deliveryConfigurationID+"\"" +
+//						")");
 		}
 		
 		if (localAccountantDelegateID != null)
 		{
-			// TODO: JDOHelper.getObjectId(this.*) does not seem to work
-//		filter.append("\n && JDOHelper.getObjectId(this.localAccountantDelegate) == :localAccountantDelegateID");
-			// WORKAROUND:
-			filter.append("\n && (" +
-				"this.localAccountantDelegate.organisationID == \""+localAccountantDelegateID.organisationID+"\" && " +
-				"this.localAccountantDelegate.localAccountantDelegateID == \""+localAccountantDelegateID.localAccountantDelegateID+"\"" +
-						")");
+			filter.append("\n && JDOHelper.getObjectId(this.localAccountantDelegate) == :localAccountantDelegateID");
+//			// WORKAROUND:
+//			filter.append("\n && (" +
+//				"this.localAccountantDelegate.organisationID == \""+localAccountantDelegateID.organisationID+"\" && " +
+//				"this.localAccountantDelegate.localAccountantDelegateID == \""+localAccountantDelegateID.localAccountantDelegateID+"\"" +
+//						")");
 		}
 
 		if (productTypeGroupID != null)
 		{
-			// TODO: JDOHelper.getObjectId(this.*) does not seem to work
-//		filter.append("\n && JDOHelper.getObjectId(this.managedProductTypeGroup) == :productTypeGroupID");
-			// WORKAROUND:
-			filter.append("\n && (" +
-				"this.managedProductTypeGroup.organisationID == \""+productTypeGroupID.organisationID+"\" && " +
-				"this.managedProductTypeGroup.productTypeGroupID == \""+productTypeGroupID.productTypeGroupID+"\"" +
-						")");
-		}
-
-//		if (vendorID != null)
-//		{
-//			// TODO: JDOHelper.getObjectId(this.*) does not seem to work
-////			filter.append("\n && JDOHelper.getObjectId(this.vendor) == :vendorID");
+			filter.append("\n && JDOHelper.getObjectId(this.managedProductTypeGroup) == :productTypeGroupID");
 //			// WORKAROUND:
 //			filter.append("\n && (" +
-//					"this.vendor.organisationID == \""+vendorID.organisationID+"\" && " +
-//					"this.vendor.anchorTypeID == \""+vendorID.anchorTypeID+"\" && " +
-//					"this.vendor.anchorID == \""+vendorID.anchorID+"\"" +
-//							")");
-//		}
+//				"this.managedProductTypeGroup.organisationID == \""+productTypeGroupID.organisationID+"\" && " +
+//				"this.managedProductTypeGroup.productTypeGroupID == \""+productTypeGroupID.productTypeGroupID+"\"" +
+//						")");
+		}
 		
-		logger.debug("Vars:");
-		logger.debug(vars.toString());
-		logger.debug("Filter:");
-		logger.debug(filter.toString());
+		if (organisationID != null)
+			filter.append("\n && this.organisationID == :organisationID");
+		
+		if (logger.isDebugEnabled()) {
+			logger.debug("Vars:");
+			logger.debug(vars.toString());
+			logger.debug("Filter:");
+			logger.debug(filter.toString());			
+		}
 		
 		q.setFilter(filter.toString());
 		q.declareVariables(vars.toString());
@@ -466,23 +455,23 @@ extends VendorDependentQuery
 		notifyListeners(PROPERTY_AVAILABLE, oldAvailable, available);
 	}
 
-//	/**
-//	 * Return the vendorID.
-//	 * @return the vendorID
-//	 */
-//	public AnchorID getVendorID() {
-//		return vendorID;
-//	}
-//
-//	/**
-//	 * Sets the vendorID.
-//	 * @param vendorID the vendorID to set
-//	 */
-//	public void setVendorID(AnchorID vendorID) {
-//		final AnchorID oldVendorID = this.vendorID;
-//		this.vendorID = vendorID;
-//		notifyListeners(PROPERTY_VENDOR_ID, oldVendorID, vendorID);
-//	}
+	/**
+	 * Returns the organisationID.
+	 * @return the organisationID
+	 */
+	public String getOrganisationID() {
+		return organisationID;
+	}
+
+	/**
+	 * Sets the organisationID.
+	 * @param organisationID the organisationID to set
+	 */
+	public void setOrganisationID(String organisationID) {
+		String oldOrganisationID = this.organisationID;
+		this.organisationID = organisationID;
+		notifyListeners(PROPERTY_ORGANISATION_ID, oldOrganisationID, organisationID);
+	}
 
 	@Override
 	public List<FieldChangeCarrier> getChangedFields(String propertyName)
@@ -546,10 +535,10 @@ extends VendorDependentQuery
 		{
 			changedFields.add( new FieldChangeCarrier(PROPERTY_SALEABLE, saleable) );
 		}
-//		if (allFields || PROPERTY_VENDOR_ID.equals(propertyName))
-//		{
-//			changedFields.add( new FieldChangeCarrier(PROPERTY_VENDOR_ID, vendorID) );
-//		}
+		if (allFields || PROPERTY_ORGANISATION_ID.equals(propertyName))
+		{
+			changedFields.add( new FieldChangeCarrier(PROPERTY_ORGANISATION_ID, organisationID) );
+		}
 		
 		return changedFields;
 	}

@@ -46,14 +46,13 @@ extends AbstractJDOQuery
 
 		if (vendorID != null)
 		{
-			// TODO: JDOHelper.getObjectId(this.*) does not seem to work
-//			filter.append("\n && JDOHelper.getObjectId(this.vendor) == :vendorID");
-			// TODO: WORKAROUND: JPOX
-			filter.append("\n && (" +
-					"this.vendor.organisationID == \""+vendorID.organisationID+"\" && " +
-					"this.vendor.anchorTypeID == \""+vendorID.anchorTypeID+"\" && " +
-					"this.vendor.anchorID == \""+vendorID.anchorID+"\"" +
-							")");
+			filter.append("\n && JDOHelper.getObjectId(this.vendor) == :vendorID");
+//			// TODO: WORKAROUND: JPOX
+//			filter.append("\n && (" +
+//					"this.vendor.organisationID == \""+vendorID.organisationID+"\" && " +
+//					"this.vendor.anchorTypeID == \""+vendorID.anchorTypeID+"\" && " +
+//					"this.vendor.anchorID == \""+vendorID.anchorID+"\"" +
+//							")");
 		}
 		
 //		checkAdditionalFields(filter);

@@ -6,10 +6,7 @@ import javax.jdo.Query;
 
 import org.apache.log4j.Logger;
 import org.nightlabs.jdo.query.AbstractSearchQuery;
-import org.nightlabs.jfire.accounting.book.id.LocalAccountantDelegateID;
-import org.nightlabs.jfire.accounting.priceconfig.id.PriceConfigID;
 import org.nightlabs.jfire.store.ProductType;
-import org.nightlabs.jfire.store.deliver.id.DeliveryConfigurationID;
 import org.nightlabs.jfire.store.id.ProductTypeGroupID;
 import org.nightlabs.jfire.transfer.id.AnchorID;
 
@@ -36,13 +33,13 @@ extends VendorDependentQuery
 	private Boolean saleable = null;
 	private Boolean closed = null;
 	
-	private PriceConfigID innerPriceConfigID = null;
 	private int minNestedProductTypeAmount = -1;
 	private int maxNestedProductTypeAmount = -1;
 	private AnchorID ownerID = null;
 	private Boolean available = null;
-	private DeliveryConfigurationID deliveryConfigurationID = null;
-	private LocalAccountantDelegateID localAccountantDelegateID = null;
+//	private PriceConfigID innerPriceConfigID = null;	
+//	private DeliveryConfigurationID deliveryConfigurationID = null;
+//	private LocalAccountantDelegateID localAccountantDelegateID = null;
 	private ProductTypeGroupID productTypeGroupID = null;	
 
 	private String organisationID = null;
@@ -52,11 +49,8 @@ extends VendorDependentQuery
 	public static final String PROPERTY_AVAILABLE = PROPERTY_PREFIX + "available";
 	public static final String PROPERTY_CLOSED = PROPERTY_PREFIX + "closed";
 	public static final String PROPERTY_CONFIRMED = PROPERTY_PREFIX + "confirmed";
-	public static final String PROPERTY_DELIVERY_CONFIGURATION_ID = PROPERTY_PREFIX + "deliveryConfigurationID";
 	public static final String PROPERTY_FULL_TEXT_LANGUAGE_ID = PROPERTY_PREFIX + "fullTextLanguageID";
 	public static final String PROPERTY_FULL_TEXT_SEARCH = PROPERTY_PREFIX + "fullTextSearch";
-	public static final String PROPERTY_INNER_PRICE_CONFIG_ID = PROPERTY_PREFIX + "innerPriceConfigID";
-	public static final String PROPERTY_LOCAL_ACCOUNTANT_DELEGATE_ID = PROPERTY_PREFIX + "localAccountantDelegateID";
 	public static final String PROPERTY_MAX_NESTED_PRODUCTTYPE_AMOUNT = PROPERTY_PREFIX + "maxNestedProductTypeAmount";
 	public static final String PROPERTY_MIN_NESTED_PRODUCTTYPE_AMOUNT = PROPERTY_PREFIX + "minNestedProductTypeAmount";
 	public static final String PROPERTY_OWNER_ID = PROPERTY_PREFIX + "ownerID";
@@ -64,6 +58,10 @@ extends VendorDependentQuery
 	public static final String PROPERTY_PUBLISHED = PROPERTY_PREFIX + "published";
 	public static final String PROPERTY_SALEABLE = PROPERTY_PREFIX + "saleable";
 	public static final String PROPERTY_ORGANISATION_ID = PROPERTY_PREFIX + "organisationID";
+
+//	public static final String PROPERTY_INNER_PRICE_CONFIG_ID = PROPERTY_PREFIX + "innerPriceConfigID";
+//	public static final String PROPERTY_LOCAL_ACCOUNTANT_DELEGATE_ID = PROPERTY_PREFIX + "localAccountantDelegateID";	
+//	public static final String PROPERTY_DELIVERY_CONFIGURATION_ID = PROPERTY_PREFIX + "deliveryConfigurationID";
 
 	@Override
 	protected Query createQuery()
@@ -108,56 +106,25 @@ extends VendorDependentQuery
 
 		if (maxNestedProductTypeAmount >= 0)
 			filter.append("\n && :maxNestedProductTypeAmount > this.nestedProductTypes.size()");
-		
-		if (innerPriceConfigID != null)
-		{
-			filter.append("\n && JDOHelper.getObjectId(this.innerPriceConfig) == :innerPriceConfigID");
-//			// WORKAROUND:
-//			filter.append("\n && (" +
-//					"this.innerPriceConfig.organisationID == \""+innerPriceConfigID.organisationID+"\" && " +
-//					"this.innerPriceConfig.priceConfigID == \""+innerPriceConfigID.priceConfigID+"\"" +
-//							")");
-		}
-				
-		if (ownerID != null)
-		{
+						
+		if (ownerID != null) {
 			filter.append("\n && JDOHelper.getObjectId(this.owner) == :ownerID");
-//			// WORKAROUND:
-//			filter.append("\n && (" +
-//					"this.owner.organisationID == \""+ownerID.organisationID+"\" && " +
-//					"this.owner.anchorTypeID == \""+ownerID.anchorTypeID+"\" && " +
-//					"this.owner.anchorID == \""+ownerID.anchorID+"\"" +
-//							")");
 		}
 		
-		if (deliveryConfigurationID != null)
-		{
-			filter.append("\n && JDOHelper.getObjectId(this.deliveryConfiguration) == :deliveryConfigurationID");
-//			// WORKAROUND:
-//			filter.append("\n && (" +
-//				"this.deliveryConfigurationID.organisationID == \""+deliveryConfigurationID.organisationID+"\" && " +
-//				"this.deliveryConfigurationID.deliveryConfigurationID == \""+deliveryConfigurationID.deliveryConfigurationID+"\"" +
-//						")");
-		}
-		
-		if (localAccountantDelegateID != null)
-		{
-			filter.append("\n && JDOHelper.getObjectId(this.localAccountantDelegate) == :localAccountantDelegateID");
-//			// WORKAROUND:
-//			filter.append("\n && (" +
-//				"this.localAccountantDelegate.organisationID == \""+localAccountantDelegateID.organisationID+"\" && " +
-//				"this.localAccountantDelegate.localAccountantDelegateID == \""+localAccountantDelegateID.localAccountantDelegateID+"\"" +
-//						")");
-		}
+//		if (innerPriceConfigID != null) {
+//			filter.append("\n && JDOHelper.getObjectId(this.innerPriceConfig) == :innerPriceConfigID");
+//		}
+//		
+//		if (deliveryConfigurationID != null) {
+//			filter.append("\n && JDOHelper.getObjectId(this.deliveryConfiguration) == :deliveryConfigurationID");
+//		}
+//		
+//		if (localAccountantDelegateID != null) {
+//			filter.append("\n && JDOHelper.getObjectId(this.localAccountantDelegate) == :localAccountantDelegateID");
+//		}
 
-		if (productTypeGroupID != null)
-		{
+		if (productTypeGroupID != null) {
 			filter.append("\n && JDOHelper.getObjectId(this.managedProductTypeGroup) == :productTypeGroupID");
-//			// WORKAROUND:
-//			filter.append("\n && (" +
-//				"this.managedProductTypeGroup.organisationID == \""+productTypeGroupID.organisationID+"\" && " +
-//				"this.managedProductTypeGroup.productTypeGroupID == \""+productTypeGroupID.productTypeGroupID+"\"" +
-//						")");
 		}
 		
 		if (organisationID != null)
@@ -321,24 +288,24 @@ extends VendorDependentQuery
 			maxNestedProductTypeAmount);
 	}
 
-	/**
-	 * returns the innerPriceConfigID.
-	 * @return the innerPriceConfigID
-	 */
-	public PriceConfigID getInnerPriceConfigID() {
-		return innerPriceConfigID;
-	}
-
-	/**
-	 * sets the innerPriceConfigID
-	 * @param innerPriceConfigID the innerPriceConfigID to set
-	 */
-	public void setInnerPriceConfigID(PriceConfigID innerPriceConfigID)
-	{
-		final PriceConfigID oldInnerPriceConfigID = this.innerPriceConfigID;
-		this.innerPriceConfigID = innerPriceConfigID;
-		notifyListeners(PROPERTY_INNER_PRICE_CONFIG_ID, oldInnerPriceConfigID, innerPriceConfigID);
-	}
+//	/**
+//	 * returns the innerPriceConfigID.
+//	 * @return the innerPriceConfigID
+//	 */
+//	public PriceConfigID getInnerPriceConfigID() {
+//		return innerPriceConfigID;
+//	}
+//
+//	/**
+//	 * sets the innerPriceConfigID
+//	 * @param innerPriceConfigID the innerPriceConfigID to set
+//	 */
+//	public void setInnerPriceConfigID(PriceConfigID innerPriceConfigID)
+//	{
+//		final PriceConfigID oldInnerPriceConfigID = this.innerPriceConfigID;
+//		this.innerPriceConfigID = innerPriceConfigID;
+//		notifyListeners(PROPERTY_INNER_PRICE_CONFIG_ID, oldInnerPriceConfigID, innerPriceConfigID);
+//	}
 
 	/**
 	 * returns the ownerID.
@@ -359,44 +326,44 @@ extends VendorDependentQuery
 		notifyListeners(PROPERTY_OWNER_ID, oldOwnerID, ownerID);
 	}
 
-	/**
-	 * returns the deliveryConfigurationID.
-	 * @return the deliveryConfigurationID
-	 */
-	public DeliveryConfigurationID getDeliveryConfigurationID() {
-		return deliveryConfigurationID;
-	}
-
-	/**
-	 * sets the deliveryConfigurationID
-	 * @param deliveryConfigurationID the deliveryConfigurationID to set
-	 */
-	public void setDeliveryConfigurationID(DeliveryConfigurationID deliveryConfigurationID)
-	{
-		final DeliveryConfigurationID oldDeliveryConfigurationID = this.deliveryConfigurationID;
-		this.deliveryConfigurationID = deliveryConfigurationID;
-		notifyListeners(PROPERTY_DELIVERY_CONFIGURATION_ID, oldDeliveryConfigurationID, deliveryConfigurationID);
-	}
-
-	/**
-	 * returns the localAccountantDelegateID.
-	 * @return the localAccountantDelegateID
-	 */
-	public LocalAccountantDelegateID getLocalAccountantDelegateID() {
-		return localAccountantDelegateID;
-	}
-
-	/**
-	 * sets the localAccountantDelegateID
-	 * @param localAccountantDelegateID the localAccountantDelegateID to set
-	 */
-	public void setLocalAccountantDelegateID(LocalAccountantDelegateID localAccountantDelegateID)
-	{
-		final LocalAccountantDelegateID oldLocalAccountantDelegateID = this.localAccountantDelegateID;
-		this.localAccountantDelegateID = localAccountantDelegateID;
-		notifyListeners(PROPERTY_LOCAL_ACCOUNTANT_DELEGATE_ID, oldLocalAccountantDelegateID, 
-			localAccountantDelegateID);
-	}
+//	/**
+//	 * returns the deliveryConfigurationID.
+//	 * @return the deliveryConfigurationID
+//	 */
+//	public DeliveryConfigurationID getDeliveryConfigurationID() {
+//		return deliveryConfigurationID;
+//	}
+//
+//	/**
+//	 * sets the deliveryConfigurationID
+//	 * @param deliveryConfigurationID the deliveryConfigurationID to set
+//	 */
+//	public void setDeliveryConfigurationID(DeliveryConfigurationID deliveryConfigurationID)
+//	{
+//		final DeliveryConfigurationID oldDeliveryConfigurationID = this.deliveryConfigurationID;
+//		this.deliveryConfigurationID = deliveryConfigurationID;
+//		notifyListeners(PROPERTY_DELIVERY_CONFIGURATION_ID, oldDeliveryConfigurationID, deliveryConfigurationID);
+//	}
+//
+//	/**
+//	 * returns the localAccountantDelegateID.
+//	 * @return the localAccountantDelegateID
+//	 */
+//	public LocalAccountantDelegateID getLocalAccountantDelegateID() {
+//		return localAccountantDelegateID;
+//	}
+//
+//	/**
+//	 * sets the localAccountantDelegateID
+//	 * @param localAccountantDelegateID the localAccountantDelegateID to set
+//	 */
+//	public void setLocalAccountantDelegateID(LocalAccountantDelegateID localAccountantDelegateID)
+//	{
+//		final LocalAccountantDelegateID oldLocalAccountantDelegateID = this.localAccountantDelegateID;
+//		this.localAccountantDelegateID = localAccountantDelegateID;
+//		notifyListeners(PROPERTY_LOCAL_ACCOUNTANT_DELEGATE_ID, oldLocalAccountantDelegateID, 
+//			localAccountantDelegateID);
+//	}
 
 	/**
 	 * returns the productTypeGroupID.
@@ -491,10 +458,6 @@ extends VendorDependentQuery
 		{
 			changedFields.add( new FieldChangeCarrier(PROPERTY_CONFIRMED, confirmed) );
 		}
-		if (allFields || PROPERTY_DELIVERY_CONFIGURATION_ID.equals(propertyName))
-		{
-			changedFields.add( new FieldChangeCarrier(PROPERTY_DELIVERY_CONFIGURATION_ID, deliveryConfigurationID) );
-		}
 		if (allFields || PROPERTY_FULL_TEXT_LANGUAGE_ID.equals(propertyName))
 		{
 			changedFields.add( new FieldChangeCarrier(PROPERTY_FULL_TEXT_LANGUAGE_ID, fullTextLanguageID) );
@@ -502,14 +465,6 @@ extends VendorDependentQuery
 		if (allFields || PROPERTY_FULL_TEXT_SEARCH.equals(propertyName))
 		{
 			changedFields.add( new FieldChangeCarrier(PROPERTY_FULL_TEXT_SEARCH, fullTextSearch) );
-		}
-		if (allFields || PROPERTY_INNER_PRICE_CONFIG_ID.equals(propertyName))
-		{
-			changedFields.add( new FieldChangeCarrier(PROPERTY_INNER_PRICE_CONFIG_ID, innerPriceConfigID) );
-		}
-		if (allFields || PROPERTY_LOCAL_ACCOUNTANT_DELEGATE_ID.equals(propertyName))
-		{
-			changedFields.add( new FieldChangeCarrier(PROPERTY_LOCAL_ACCOUNTANT_DELEGATE_ID, localAccountantDelegateID) );
 		}
 		if (allFields || PROPERTY_MAX_NESTED_PRODUCTTYPE_AMOUNT.equals(propertyName))
 		{
@@ -539,6 +494,18 @@ extends VendorDependentQuery
 		{
 			changedFields.add( new FieldChangeCarrier(PROPERTY_ORGANISATION_ID, organisationID) );
 		}
+//		if (allFields || PROPERTY_DELIVERY_CONFIGURATION_ID.equals(propertyName))
+//		{
+//			changedFields.add( new FieldChangeCarrier(PROPERTY_DELIVERY_CONFIGURATION_ID, deliveryConfigurationID) );
+//		}		
+//		if (allFields || PROPERTY_INNER_PRICE_CONFIG_ID.equals(propertyName))
+//		{
+//			changedFields.add( new FieldChangeCarrier(PROPERTY_INNER_PRICE_CONFIG_ID, innerPriceConfigID) );
+//		}
+//		if (allFields || PROPERTY_LOCAL_ACCOUNTANT_DELEGATE_ID.equals(propertyName))
+//		{
+//			changedFields.add( new FieldChangeCarrier(PROPERTY_LOCAL_ACCOUNTANT_DELEGATE_ID, localAccountantDelegateID) );
+//		}
 		
 		return changedFields;
 	}

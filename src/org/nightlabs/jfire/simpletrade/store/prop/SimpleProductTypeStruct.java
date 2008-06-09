@@ -114,6 +114,6 @@ public class SimpleProductTypeStruct {
 	public static final StructFieldID IMAGES_LARGE_IMAGE = StructFieldID.create(IMAGES,"LargeImage");
 
 	public static final StructBlockID XINFO = StructBlockID.create(DEV_ORGANISATION_ID, "SimpleProductType.xinfo");
-	public static final StructFieldID XINFO_INFO = StructFieldID.create(IMAGES, "Info");
+	public static final StructFieldID XINFO_INFO = StructFieldID.create(XINFO, "Info");
 
 }

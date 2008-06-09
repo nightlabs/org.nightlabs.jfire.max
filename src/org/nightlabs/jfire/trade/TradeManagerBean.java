@@ -151,7 +151,7 @@ implements SessionBean
 	 * @ejb.transaction type="Required"
 	 * @ejb.permission role-name="_Guest_"
 	 */
-	public OrderID createQuickSaleWorkOrder(AnchorID customerID, String orderIDPrefix, String currencyID,
+	public OrderID createQuickSaleWorkOrder(AnchorID customerID, String orderIDPrefix, CurrencyID currencyID,
 			SegmentTypeID[] segmentTypeIDs)
 	throws ModuleException
 	{
@@ -185,7 +185,7 @@ implements SessionBean
 
 			if (orderID == null) {
 				LegalEntity customer = (LegalEntity) pm.getObjectById(customerID);
-				Currency currency = (Currency) pm.getObjectById(CurrencyID.create(currencyID));
+				Currency currency = (Currency) pm.getObjectById(currencyID);
 				Order order = trader.createOrder(vendor, customer, orderIDPrefix, currency);
 				if (segmentTypeIDs != null)
 					createSegments(pm, trader, order, segmentTypeIDs);

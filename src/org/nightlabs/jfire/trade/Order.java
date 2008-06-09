@@ -45,6 +45,7 @@ import javax.jdo.listener.DetachCallback;
 
 import org.nightlabs.jdo.ObjectIDUtil;
 import org.nightlabs.jfire.accounting.Currency;
+import org.nightlabs.jfire.accounting.id.CurrencyID;
 import org.nightlabs.jfire.security.User;
 import org.nightlabs.jfire.security.id.UserID;
 import org.nightlabs.jfire.trade.id.OrderID;
@@ -191,7 +192,7 @@ implements Serializable, ArticleContainer, SegmentContainer, DetachCallback
 	@SuppressWarnings("unchecked")
 	public static List<OrderID> getQuickSaleWorkOrderIDCandidates(
 			PersistenceManager pm, AnchorID vendorID, AnchorID customerID,
-			UserID createUserID, String orderIDPrefix, String currencyID)
+			UserID createUserID, String orderIDPrefix, CurrencyID currencyID)
 	{
 		Query q = pm.newNamedQuery(Order.class, "getQuickSaleWorkOrderIDCandidates_WORKAROUND");
 		Map params = new HashMap();
@@ -202,7 +203,7 @@ implements Serializable, ArticleContainer, SegmentContainer, DetachCallback
 		params.put("paramCreateUser_organisationID", createUserID.organisationID);
 		params.put("paramCreateUser_userID", createUserID.userID);
 		params.put("orderIDPrefix", orderIDPrefix);
-		params.put("currencyID", currencyID);
+		params.put("currencyID", currencyID.currencyID);
 		Collection<Order> orders = (Collection<Order>) q.executeWithMap(params);
 		List<OrderID> orderIDs = new ArrayList<OrderID>();
 		for (Iterator<Order> it = orders.iterator(); it.hasNext(); ) {

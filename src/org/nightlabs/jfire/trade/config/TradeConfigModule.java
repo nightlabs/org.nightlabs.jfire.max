@@ -1,14 +1,24 @@
-package org.nightlabs.jfire.trade;
+package org.nightlabs.jfire.trade.config;
 
+import java.util.Collection;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.Map;
+
+import javax.jdo.JDOHelper;
+import javax.jdo.JDOObjectNotFoundException;
+import javax.jdo.PersistenceManager;
+import javax.jdo.Query;
 
 import org.nightlabs.annotation.Implement;
 import org.nightlabs.jfire.accounting.Currency;
 import org.nightlabs.jfire.accounting.Invoice;
+import org.nightlabs.jfire.accounting.id.CurrencyID;
 import org.nightlabs.jfire.config.ConfigModule;
 import org.nightlabs.jfire.idgenerator.IDGenerator;
 import org.nightlabs.jfire.store.DeliveryNote;
+import org.nightlabs.jfire.trade.Offer;
+import org.nightlabs.jfire.trade.Order;
 
 /**
  * @author Marco Schulze - marco at nightlabs dot de
@@ -20,11 +30,17 @@ import org.nightlabs.jfire.store.DeliveryNote;
  *		table="JFireTrade_TradeConfigModule"
  *
  * @jdo.inheritance strategy = "new-table"
+ *
+ * @jdo.fetch-group name="TradeConfigModule.currency" fields="currency"
+ * @jdo.fetch-group name="TradeConfigModule.idPrefixCfs" fields="idPrefixCfs"
  */
 public class TradeConfigModule
 		extends ConfigModule
 {
 	private static final long serialVersionUID = 1L;
+
+	public static final String FETCH_GROUP_CURRENCY = "TradeConfigModule.currency";
+	public static final String FETCH_GROUP_ID_PREFIX_CFS = "TradeConfigModule.idPrefixCfs";
 
 	/**
 	 * Which currency is used by the user group / user.
@@ -49,7 +65,6 @@ public class TradeConfigModule
 	 *		null-value="exception"
 	 *		@!mapped-by="tradeConfigModule" // not possible because of inheritance - we don't want to copy IDPrefixCfs!
 	 *
-	 * @!jdo.key mapped-by="articleContainerClassName"
 	 * @jdo.join
 	 */
 	private Map<String, IDPrefixCf> idPrefixCfs = null;
@@ -59,7 +74,40 @@ public class TradeConfigModule
 	@Override
 	@Implement
 	public void init() {
+		PersistenceManager pm = JDOHelper.getPersistenceManager(this);
+		if (pm == null)
+			throw new IllegalStateException("JDOHelper.getPersistenceManager(this) returned null!");
+
 		idPrefixCfs = new HashMap<String, IDPrefixCf>();
+
+		try {
+			this.currency = (Currency) pm.getObjectById(CurrencyID.create("EUR"));
+		} catch (JDOObjectNotFoundException x) {
+			// EUR does not exist - initialise below with the first one that exists
+		}
+
+		if (this.currency == null) {
+			Query q = pm.newQuery(Currency.class);
+			q.setOrdering("this.currencyID ASCENDING"); // we sort it to ensure that it's always the same 
+			Collection<?> c = (Collection<?>) q.execute();
+			Iterator<?> it = c.iterator();
+			if (it.hasNext())
+				this.currency = (Currency) it.next();
+			else
+				throw new IllegalStateException("There is no Currency in the datastore! Cannot initialise TradeConfigModule!");
+		}
+	}
+
+	public CurrencyID getCurrencyID()
+	{
+		if (this.currency == null)
+			return null;
+
+		CurrencyID currencyID = (CurrencyID) JDOHelper.getObjectId(this.currency);
+		if (currencyID == null)
+			throw new IllegalStateException("JDOHelper.getObjectId(this.currency) returned null!");
+
+		return currencyID;
 	}
 
 	public Currency getCurrency()

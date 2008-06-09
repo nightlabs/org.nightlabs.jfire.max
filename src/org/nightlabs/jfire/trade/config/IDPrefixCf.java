@@ -1,4 +1,4 @@
-package org.nightlabs.jfire.trade;
+package org.nightlabs.jfire.trade.config;
 
 import java.io.Serializable;
 import java.util.Calendar;

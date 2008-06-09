@@ -39,8 +39,6 @@ public class HTMLDataField extends DataField implements IFCKEditorContent
 	 * @jdo.field
 	 * 		persistence-modifier="persistent"
 	 * 		collection-type="collection"
-	 * 		element-type="org.nightlabs.jfire.prop.StructBlockOrderItem"
-	 * 		mapped-by="structLocal"
 	 * 		dependent-element="true"
 	 *		null-value="exception"
 	 */

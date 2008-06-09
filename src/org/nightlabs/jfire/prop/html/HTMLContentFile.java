@@ -3,22 +3,81 @@ package org.nightlabs.jfire.prop.html;
 import java.util.Date;
 
 import org.nightlabs.htmlcontent.IFCKEditorContentFile;
+import org.nightlabs.jfire.idgenerator.IDGenerator;
 
 /**
- * TODO: persistence
+ * @jdo.persistence-capable identity-type="application"
+ *                          detachable="true"
+ *                          table="JFireBase_Prop_HTMLDataFieldFile"
+ *                          objectid-class="org.nightlabs.jfire.prop.html.id.HTMLContentFileID"
  *
+ * @jdo.create-objectid-class field-order="organisationID, fileId"
+ * 
  * @author Marc Klinger - marc[at]nightlabs[dot]de
  */
 public class HTMLContentFile implements IFCKEditorContentFile
 {
+	/**
+	 * @jdo.field primary-key="true"
+	 * @jdo.column length="100"
+	 */
+	private String organisationID;
+
+	/**
+	 * @jdo.field primary-key="true"
+	 */
+	private long fileId;
+	
+	/**
+	 * @jdo.field persistence-modifier="persistent"
+	 */
+	private Date changeDT;
+
+	/**
+	 * @jdo.field persistence-modifier="persistent"
+	 */
+	private String contentType;
+	
+	/**
+	 * @jdo.field persistence-modifier="persistent"
+	 */
+	private byte[] data;
+	
+	/**
+	 * @jdo.field persistence-modifier="persistent"
+	 */
+	private String description;
+	
+	/**
+	 * @jdo.field persistence-modifier="persistent"
+	 */
+	private String name;
+	
+	/**
+	 * Create a new HTMLContentFile instance.
+	 * For JDO only!
+	 */
+	protected HTMLContentFile()
+	{
+	}
+	
+	/**
+	 * Create a new HTMLContentFile instance.
+	 * @param dataField The parent data field
+	 */
+	public HTMLContentFile(HTMLDataField dataField)
+	{
+		this.organisationID = dataField.getOrganisationID();
+		this.fileId = IDGenerator.nextID(HTMLContentFile.class);
+	}
+	
 	/* (non-Javadoc)
 	 * @see org.nightlabs.eclipse.ui.fckeditor.IFCKEditorContentFile#getChangeDT()
 	 */
 	@Override
 	public Date getChangeDT()
 	{
-		// TODO Auto-generated method stub
-		return null;
+		return changeDT;
 	}
 
 	/* (non-Javadoc)
@@ -27,8 +86,7 @@ public class HTMLContentFile implements IFCKEditorContentFile
 	@Override
 	public String getContentType()
 	{
-		// TODO Auto-generated method stub
-		return null;
+		return contentType;
 	}
 
 	/* (non-Javadoc)
@@ -37,8 +95,7 @@ public class HTMLContentFile implements IFCKEditorContentFile
 	@Override
 	public byte[] getData()
 	{
-		// TODO Auto-generated method stub
-		return null;
+		return data;
 	}
 
 	/* (non-Javadoc)
@@ -47,8 +104,7 @@ public class HTMLContentFile implements IFCKEditorContentFile
 	@Override
 	public String getDescription()
 	{
-		// TODO Auto-generated method stub
-		return null;
+		return description;
 	}
 
 	/* (non-Javadoc)
@@ -57,8 +113,7 @@ public class HTMLContentFile implements IFCKEditorContentFile
 	@Override
 	public long getFileId()
 	{
-		// TODO Auto-generated method stub
-		return 0;
+		return fileId;
 	}
 
 	/* (non-Javadoc)
@@ -67,8 +122,7 @@ public class HTMLContentFile implements IFCKEditorContentFile
 	@Override
 	public String getName()
 	{
-		// TODO Auto-generated method stub
-		return null;
+		return name;
 	}
 
 	/* (non-Javadoc)
@@ -87,8 +141,7 @@ public class HTMLContentFile implements IFCKEditorContentFile
 	@Override
 	public void setContentType(String contentType)
 	{
-		// TODO Auto-generated method stub
-
+		this.contentType = contentType;
 	}
 
 	/* (non-Javadoc)
@@ -97,8 +150,7 @@ public class HTMLContentFile implements IFCKEditorContentFile
 	@Override
 	public void setData(byte[] data)
 	{
-		// TODO Auto-generated method stub
-
+		this.data = data;
 	}
 
 	/* (non-Javadoc)
@@ -107,8 +159,7 @@ public class HTMLContentFile implements IFCKEditorContentFile
 	@Override
 	public void setDescription(String description)
 	{
-		// TODO Auto-generated method stub
-
+		this.description = description;
 	}
 
 	/* (non-Javadoc)
@@ -117,7 +168,15 @@ public class HTMLContentFile implements IFCKEditorContentFile
 	@Override
 	public void setName(String name)
 	{
-		// TODO Auto-generated method stub
+		this.name = name;
+	}
 
+	/**
+	 * Get the organisationID.
+	 * @return the organisationID
+	 */
+	public String getOrganisationID()
+	{
+		return organisationID;
 	}
 }

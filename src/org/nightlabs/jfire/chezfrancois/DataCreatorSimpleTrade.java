@@ -26,6 +26,7 @@
 
 package org.nightlabs.jfire.chezfrancois;
 
+import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
@@ -39,6 +40,7 @@ import javax.jdo.PersistenceManager;
 
 import org.apache.log4j.Logger;
 import org.nightlabs.ModuleException;
+import org.nightlabs.htmlcontent.IFCKEditorContentFile;
 import org.nightlabs.jdo.NLJDOHelper;
 import org.nightlabs.jfire.accounting.Currency;
 import org.nightlabs.jfire.accounting.PriceFragmentType;
@@ -57,6 +59,8 @@ import org.nightlabs.jfire.prop.PropertySet;
 import org.nightlabs.jfire.prop.StructLocal;
 import org.nightlabs.jfire.prop.datafield.I18nTextDataField;
 import org.nightlabs.jfire.prop.datafield.ImageDataField;
+import org.nightlabs.jfire.prop.html.HTMLContentFile;
+import org.nightlabs.jfire.prop.html.HTMLDataField;
 import org.nightlabs.jfire.security.User;
 import org.nightlabs.jfire.simpletrade.store.SimpleProductType;
 import org.nightlabs.jfire.simpletrade.store.prop.SimpleProductTypeStruct;
@@ -68,6 +72,7 @@ import org.nightlabs.jfire.store.id.ProductTypeID;
 import org.nightlabs.jfire.trade.CustomerGroup;
 import org.nightlabs.jfire.trade.CustomerGroupMapper;
 import org.nightlabs.jfire.trade.LegalEntity;
+import org.nightlabs.util.IOUtil;
 
 public class DataCreatorSimpleTrade
 extends DataCreator
@@ -186,12 +191,12 @@ extends DataCreator
 			try {
 				smallImg.loadStream(in, smallImage, smallImageContentType);
 			} catch (IOException e) {
-				logger.error(e);
+				logger.error("Error loading image", e);
 			} finally {
 				try {
 					in.close();
 				} catch (IOException e) {
-					logger.error(e);
+					logger.error("Error loading image", e);
 				}
 			}
 		}
@@ -206,15 +211,51 @@ extends DataCreator
 			try {
 				largeImg.loadStream(in, largeImage, largeImageContentType);
 			} catch (IOException e) {
-				logger.error(e);
+				logger.error("Error loading image", e);
 			} finally {
 				try {
 					in.close();
 				} catch (IOException e) {
-					logger.error(e);
+					logger.error("Error loading image", e);
 				}
 			}
 		}
+		
+		
+		HTMLDataField html;
+		try {
+			html = (HTMLDataField)props.getDataField(SimpleProductTypeStruct.XINFO_INFO);
+		} catch (Exception e) {
+			throw new RuntimeException(e);
+		}
+		in = getClass().getResourceAsStream("resource/"+largeImage);
+		if (in != null) {
+			html.setHtml("<p>Mein <b>langer</b>, <i>langer</i>, <u>langer</u> Text und ein Bild</p>");
+			try {
+				ByteArrayOutputStream out = new ByteArrayOutputStream();
+				IOUtil.transferStreamData(in, out);
+				HTMLContentFile file = new HTMLContentFile(html);
+				file.setData(out.toByteArray());
+				file.setName(largeImage);
+				file.setContentType(largeImageContentType);
+				file.setDescription(largeImage);
+//				List<IFCKEditorContentFile> files = html.getFiles();
+//				files.add(file);
+//				html.setFiles(files);
+				html.addFile(file);
+			} catch(IOException e) {
+				logger.error("Error loading image", e);
+			} finally {
+				try {
+					in.close();
+				} catch (IOException e) {
+					logger.error("Error loading image", e);
+				}
+			}
+		} else {
+			html.setHtml("<p>Mein <b>langer</b>, <i>langer</i>, <u>langer</u> Text ohne Bild</p>");
+		}
+		
 		props.deflate(); // and it should always be imploded before storing it into the datastore. Marco.
 
 		// TODO JPOX WORKAROUND : this fails sometimes - hence we retry a few times

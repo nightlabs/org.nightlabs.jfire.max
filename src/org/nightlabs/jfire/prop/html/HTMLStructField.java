@@ -8,7 +8,7 @@ import org.nightlabs.jfire.prop.id.StructFieldID;
 /**
  * @jdo.persistence-capable identity-type="application"
  *                          persistence-capable-superclass="org.nightlabs.jfire.prop.StructField"
- *                          detachable="true" table="JFireBase_Prop_HTMLStructField"
+ *                          detachable="true" table="JFireHTMLProp_HTMLStructField"
  *
  * @jdo.implements name="org.nightlabs.jfire.prop.StructField"
  *

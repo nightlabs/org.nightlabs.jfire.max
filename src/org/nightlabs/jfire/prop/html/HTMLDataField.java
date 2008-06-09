@@ -15,7 +15,7 @@ import org.nightlabs.jfire.prop.StructField;
  * @jdo.persistence-capable identity-type="application"
  *                          persistence-capable-superclass="org.nightlabs.jfire.prop.DataField"
  *                          detachable="true"
- *                          table="JFireBase_Prop_HTMLDataField"
+ *                          table="JFireHTMLProp_HTMLDataField"
  *
  * @jdo.inheritance strategy="new-table"
  *
@@ -38,9 +38,13 @@ public class HTMLDataField extends DataField implements IFCKEditorContent
 	/**
 	 * @jdo.field
 	 * 		persistence-modifier="persistent"
-	 * 		collection-type="collection"
+	 * 		collection-type="list"
 	 * 		dependent-element="true"
 	 *		null-value="exception"
+	 *		element-type="org.nightlabs.jfire.prop.html.HTMLContentFile"
+	 *		table="JFireHTMLProp_HTMLDataField_Files"
+	 * 
+	 * @jdo.join
 	 */
 	private List<IFCKEditorContentFile> files;
 

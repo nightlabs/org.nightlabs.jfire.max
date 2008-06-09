@@ -8,9 +8,11 @@ import org.nightlabs.jfire.idgenerator.IDGenerator;
 /**
  * @jdo.persistence-capable identity-type="application"
  *                          detachable="true"
- *                          table="JFireBase_Prop_HTMLDataFieldFile"
+ *                          table="JFireHTMLProp_HTMLContentFile"
  *                          objectid-class="org.nightlabs.jfire.prop.html.id.HTMLContentFileID"
  *
+ * @jdo.fetch-group name="FetchGroupsProp.fullData" fetch-groups="default" fields="data,changeDT"
+ * 
  * @jdo.create-objectid-class field-order="organisationID, fileId"
  * 
  * @author Marc Klinger - marc[at]nightlabs[dot]de
@@ -40,6 +42,7 @@ public class HTMLContentFile implements IFCKEditorContentFile
 	
 	/**
 	 * @jdo.field persistence-modifier="persistent"
+	 * @jdo.column sql-type="BLOB"
 	 */
 	private byte[] data;
 	
@@ -69,6 +72,7 @@ public class HTMLContentFile implements IFCKEditorContentFile
 	{
 		this.organisationID = dataField.getOrganisationID();
 		this.fileId = IDGenerator.nextID(HTMLContentFile.class);
+		this.changeDT = new Date();
 	}
 	
 	/* (non-Javadoc)
@@ -131,8 +135,10 @@ public class HTMLContentFile implements IFCKEditorContentFile
 	@Override
 	public boolean isImageFile()
 	{
-		// TODO Auto-generated method stub
-		return false;
+		String contentType = getContentType();
+		if(contentType == null)
+			return false;
+		return "image/jpeg".equals(contentType) || "image/png".equals(contentType) || "image/gif".equals(contentType);
 	}
 
 	/* (non-Javadoc)

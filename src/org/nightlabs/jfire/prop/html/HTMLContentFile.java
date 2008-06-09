@@ -1,5 +1,6 @@
 package org.nightlabs.jfire.prop.html;
 
+import java.io.Serializable;
 import java.util.Date;
 
 import org.nightlabs.htmlcontent.IFCKEditorContentFile;
@@ -17,7 +18,7 @@ import org.nightlabs.jfire.idgenerator.IDGenerator;
  * 
  * @author Marc Klinger - marc[at]nightlabs[dot]de
  */
-public class HTMLContentFile implements IFCKEditorContentFile
+public class HTMLContentFile implements IFCKEditorContentFile, Serializable
 {
 	/**
 	 * @jdo.field primary-key="true"

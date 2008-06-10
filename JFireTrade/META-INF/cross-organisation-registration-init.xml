@@ -1,0 +1,6 @@
+<!DOCTYPE organisation-initialisation
+		PUBLIC "-//NightLabs GmbH//DTD Cross Organisation Registration Initialisation 1.0//EN"
+		"http://www.nightlabs.de/dtd/cross-organisation-registration-init_1_0.dtd">
+<cross-organisation-registration-initialisation>
+	<init bean="jfire/ejb/JFireTrade/TradeManager" method="crossOrganisationRegistrationCallback" />
+</cross-organisation-registration-initialisation>

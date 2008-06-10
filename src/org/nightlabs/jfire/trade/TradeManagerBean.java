@@ -43,6 +43,7 @@ import javax.jdo.FetchPlan;
 import javax.jdo.JDOHelper;
 import javax.jdo.PersistenceManager;
 import javax.jdo.Query;
+import javax.naming.NamingException;
 
 import org.apache.log4j.Logger;
 import org.jbpm.JbpmContext;
@@ -61,6 +62,7 @@ import org.nightlabs.jfire.accounting.id.TariffID;
 import org.nightlabs.jfire.base.BaseSessionBeanImpl;
 import org.nightlabs.jfire.config.ConfigSetup;
 import org.nightlabs.jfire.config.UserConfigSetup;
+import org.nightlabs.jfire.crossorganisationregistrationinit.Context;
 import org.nightlabs.jfire.editlock.EditLock;
 import org.nightlabs.jfire.editlock.EditLockType;
 import org.nightlabs.jfire.idgenerator.IDNamespaceDefault;
@@ -923,7 +925,7 @@ implements SessionBean
 
 	/**
 	 * This method delegates to
-	 * {@link OrganisationLegalEntity#getOrganisationLegalEntity(PersistenceManager, String, boolean)}.
+	 * {@link OrganisationLegalEntity#getOrganisationLegalEntity(PersistenceManager, String)}.
 	 *
 	 * @ejb.interface-method
 	 * @ejb.permission role-name="_Guest_"
@@ -939,7 +941,7 @@ implements SessionBean
 				pm.getFetchPlan().setGroups(fetchGroups);
 
 			OrganisationLegalEntity ole = OrganisationLegalEntity.getOrganisationLegalEntity(
-					pm, organisationID, throwExceptionIfNotExistent);
+					pm, organisationID);
 
 			return pm.detachCopy(ole);
 		} finally {
@@ -1988,6 +1990,34 @@ implements SessionBean
 				pm.getFetchPlan().setGroups(fetchGroups);
 
 			return pm.detachCopyAll(articles);
+		} finally {
+			pm.close();
+		}
+	}
+
+	/**
+	 * @ejb.interface-method
+	 * @ejb.permission role-name="_System_"
+	 * @ejb.transaction type="Required"
+	 */
+	public void crossOrganisationRegistrationCallback(Context context) throws Exception
+	{
+		PersistenceManager pm = getPersistenceManager();
+		try {
+			// I think it's not necessary to ask the other organisation for its OrganisationLegalEntity. We have the person already
+			// here, thus we can simply create it.
+			OrganisationLegalEntity.getOrganisationLegalEntity(pm, context.getOtherOrganisationID());
+
+//			// fetch the OrganisationLegalEntity of the other organisation
+//			TradeManager otherTradeManager = TradeManagerUtil.getHome(getInitialContextProperties(context.getOtherOrganisationID())).create();
+//			LegalEntity le = otherTradeManager.getLegalEntity(
+//					AnchorID.create(context.getOtherOrganisationID(), LegalEntity.ANCHOR_TYPE_ID_LEGAL_ENTITY, OrganisationLegalEntity.class.getName()),
+//					new String[] { FetchPlan.DEFAULT, LegalEntity.FETCH_GROUP_PERSON },
+//					NLJDOHelper.MAX_FETCH_DEPTH_NO_LIMIT
+//			);
+//
+//			if (!(le instanceof OrganisationLegalEntity))
+//				throw new IllegalStateException();
 		} finally {
 			pm.close();
 		}

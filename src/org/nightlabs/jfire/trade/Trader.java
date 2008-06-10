@@ -347,7 +347,7 @@ public class Trader
 	{
 		PersistenceManager pm = getPersistenceManager();
 		return OrganisationLegalEntity.getOrganisationLegalEntity(pm,
-				organisationID, true);
+				organisationID);
 
 		// if (organisationLegalEntity != null)
 		// return organisationLegalEntity;

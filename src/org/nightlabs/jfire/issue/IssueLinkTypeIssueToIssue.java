@@ -29,7 +29,7 @@ extends IssueLinkType
 		
 	}
 
-	public abstract Issue getIssueFromAnotherSide();
+	public abstract IssueLinkType getReverseIssueLinkType(PersistenceManager pm, IssueLinkTypeID newIssueLinkTypeID);
 	
 	@Override
 	protected void postCreateIssueLink(PersistenceManager pm, IssueLink newIssueLink) {

@@ -15,7 +15,7 @@ import org.nightlabs.jfire.organisation.Organisation;
  *
  * @jdo.persistence-capable
  *		identity-type="application"
- *		persistence-capable-superclass="org.nightlabs.jfire.issue.IssueLinkTypeIssueToIssue"
+ *		persistence-capable-superclass="org.nightlabs.jfire.issue.IssueLinkType"
  *		detachable="true"
  *
  * @jdo.inheritance strategy="superclass-table"
@@ -40,26 +40,21 @@ extends IssueLinkTypeIssueToIssue
 	}
 
 	@Override
-	public Issue getIssueFromAnotherSide() {
-		return null;
-	}
-	
-//	@Override
-//	protected void postCreateIssueLink(PersistenceManager pm, IssueLink newIssueLink) {
-//		// create a reverse link - i.e. if we just created a parent-relationship, we need to add a child-relationship on the other side.
-//
-//		IssueLinkType issueLinkType = newIssueLink.getIssueLinkType();
-//		IssueLinkTypeID issueLinkTypeID = (IssueLinkTypeID) JDOHelper.getObjectId(issueLinkType);
-//		if (issueLinkTypeID == null)
-//			throw new IllegalStateException("JDOHelper.getObjectId(newIssueLink.getIssueLinkType()) returned null!");
-//
-//		IssueLinkType issueLinkTypeForOtherSide = null;
-//
+	public IssueLinkType getReverseIssueLinkType(PersistenceManager pm, IssueLinkTypeID newIssueLinkTypeID) {
+		
+		IssueLinkType issueLinkTypeForOtherSide = null;
+
 //		if (ISSUE_LINK_TYPE_ID_PARENT.equals(issueLinkTypeID))
 //			issueLinkTypeForOtherSide = (IssueLinkType) pm.getObjectById(ISSUE_LINK_TYPE_ID_CHILD);
 //
 //		if (ISSUE_LINK_TYPE_ID_CHILD.equals(issueLinkTypeID))
 //			issueLinkTypeForOtherSide = (IssueLinkType) pm.getObjectById(ISSUE_LINK_TYPE_ID_PARENT);
+		return null;
+	}
+	
+//	@Override
+//	protected void postCreateIssueLink(PersistenceManager pm, IssueLink newIssueLink) {
+
 //
 //		if (issueLinkTypeForOtherSide != null) {
 //			Issue issueOnOtherSide = (Issue) newIssueLink.getLinkedObject();

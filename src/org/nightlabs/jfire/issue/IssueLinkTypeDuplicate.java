@@ -1,5 +1,7 @@
 package org.nightlabs.jfire.issue;
 
+import javax.jdo.PersistenceManager;
+
 import org.nightlabs.jfire.issue.id.IssueLinkTypeID;
 import org.nightlabs.jfire.organisation.Organisation;
 
@@ -8,7 +10,7 @@ import org.nightlabs.jfire.organisation.Organisation;
  *
  * @jdo.persistence-capable
  *		identity-type="application"
- *		persistence-capable-superclass="org.nightlabs.jfire.issue.IssueLinkTypeIssueToIssue"
+ *		persistence-capable-superclass="org.nightlabs.jfire.issue.IssueLinkType"
  *		detachable="true"
  *
  * @jdo.inheritance strategy="superclass-table"
@@ -32,7 +34,7 @@ extends IssueLinkTypeIssueToIssue
 	}
 
 	@Override
-	public Issue getIssueFromAnotherSide() {
+	public IssueLinkType getReverseIssueLinkType(PersistenceManager pm, IssueLinkTypeID newIssueLinkTypeID) {
 		return null;
 	}
 	

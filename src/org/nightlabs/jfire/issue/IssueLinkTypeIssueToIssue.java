@@ -57,20 +57,22 @@ extends IssueLinkType
 	@Override
 	protected void preDeleteIssueLink(PersistenceManager pm, IssueLink issueLinkToBeDeleted) {
 		// remove the reverse link
-		IssueLinkType issueLinkTypeDuplicate = issueLinkToBeDeleted.getIssueLinkType();
-		IssueLinkTypeID issueLinkTypeDuplicateID = (IssueLinkTypeID) JDOHelper.getObjectId(issueLinkTypeDuplicate);
-		if (issueLinkTypeDuplicateID == null)
+		IssueLinkType issueLinkTypeToBeDeleted = issueLinkToBeDeleted.getIssueLinkType();
+		IssueLinkTypeID issueLinkTypeIDToBeDeleted = (IssueLinkTypeID) JDOHelper.getObjectId(issueLinkTypeToBeDeleted);
+		if (issueLinkTypeIDToBeDeleted == null)
 			throw new IllegalStateException("JDOHelper.getObjectId(issueLinkToBeDeleted.getIssueLinkType()) returned null!");
 
+		IssueLinkType issueLinkTypeOnAnotherSide = getReverseIssueLinkType(pm, issueLinkTypeIDToBeDeleted);
+		
 		Issue issueOnOtherSide = (Issue)issueLinkToBeDeleted.getLinkedObject();
 
 		Set<IssueLink> issueLinksOnOtherSide = issueOnOtherSide.getIssueLinks();
 		for (IssueLink issueLinkOnOtherSide : issueLinksOnOtherSide) {
-			Object otherSideObject = issueLinkOnOtherSide.getLinkedObject();
+			Object anotherSideObject = issueLinkOnOtherSide.getLinkedObject();
 			Object thisSideObject = issueLinkToBeDeleted.getIssue();
 
-			if (otherSideObject.equals(thisSideObject)) {
-				if (issueLinkTypeDuplicate.equals(issueLinkOnOtherSide.getIssueLinkType())) 
+			if (anotherSideObject.equals(thisSideObject)) {
+				if (issueLinkTypeOnAnotherSide.equals(issueLinkOnOtherSide.getIssueLinkType())) 
 					issueOnOtherSide.removeIssueLink(issueLinkOnOtherSide);
 			}
 		}

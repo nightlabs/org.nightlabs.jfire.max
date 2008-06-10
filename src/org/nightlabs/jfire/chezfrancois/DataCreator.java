@@ -225,7 +225,7 @@ public class DataCreator
 	{
 		if (organisationLegalEntity == null)
 			organisationLegalEntity = OrganisationLegalEntity.getOrganisationLegalEntity(
-				pm, organisationID, true);
+				pm, organisationID);
 
 		return organisationLegalEntity;
 	}

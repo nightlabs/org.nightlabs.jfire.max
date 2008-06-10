@@ -1520,6 +1520,10 @@ implements SessionBean
 			Order order = (Order) pm.getObjectById(orderID);
 			LegalEntity newCustomer = (LegalEntity) pm.getObjectById(customerID);
 
+			// check if the vendor is the local organisation - otherwise the customer MUST NOT be changed
+			if (!Trader.getTrader(pm).getMandator().equals(order.getVendor()))
+				throw new UnsupportedOperationException("The customer must not be changed, if the vendor is not the local organisation! Cannot perform the requested operation for: " + order);
+
 			// check offers for finalization
 			for (Offer offer : order.getOffers()) {
 				 if (offer.isFinalized())

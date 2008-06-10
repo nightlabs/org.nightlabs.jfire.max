@@ -10,7 +10,7 @@ import org.nightlabs.jfire.organisation.Organisation;
  *
  * @jdo.persistence-capable
  *		identity-type="application"
- *		persistence-capable-superclass="org.nightlabs.jfire.issue.IssueLinkType"
+ *		persistence-capable-superclass="org.nightlabs.jfire.issue.IssueLinkTypeIssueToIssue"
  *		detachable="true"
  *
  * @jdo.inheritance strategy="superclass-table"
@@ -38,28 +38,6 @@ extends IssueLinkTypeIssueToIssue
 		return null;
 	}
 	
-//	@Override
-//	protected void postCreateIssueLink(PersistenceManager pm, IssueLink newIssueLink) {
-//		// create a reverse link.
-//
-//		IssueLinkType issueLinkTypeDuplicate = newIssueLink.getIssueLinkType();
-//		IssueLinkTypeID issueLinkTypeDuplicateID = (IssueLinkTypeID) JDOHelper.getObjectId(issueLinkTypeDuplicate);
-//		if (issueLinkTypeDuplicateID == null)
-//			throw new IllegalStateException("JDOHelper.getObjectId(newIssueLink.getIssueLinkType()) returned null!");
-//
-//		Issue issueOnOtherSide = (Issue) newIssueLink.getLinkedObject();
-//
-//		// prevent this from causing an ETERNAL recursion.
-//		// => find out, if the other side already has an issue-link of the required type pointing back
-//		Set<IssueLink> issueLinksOfIssueOnOtherSide = issueOnOtherSide.getIssueLinks();
-//		for (IssueLink issueLinkOfIssueOnOtherSide : issueLinksOfIssueOnOtherSide) {
-//			if (issueLinkOfIssueOnOtherSide.getIssueLinkType().equals(issueLinkTypeDuplicate)  && issueLinkOfIssueOnOtherSide.getLinkedObject().equals(newIssueLink.getIssue())) 
-//				return;
-//		}
-//
-//		issueOnOtherSide.createIssueLink(issueLinkTypeDuplicate, newIssueLink.getIssue());
-//	}
-//
 //	@Override
 //	protected void preDeleteIssueLink(PersistenceManager pm, IssueLink issueLinkToBeDeleted) {
 //		// remove the reverse link

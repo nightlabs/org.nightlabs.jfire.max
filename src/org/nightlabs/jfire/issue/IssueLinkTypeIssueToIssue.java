@@ -34,22 +34,24 @@ extends IssueLinkType
 	@Override
 	protected void postCreateIssueLink(PersistenceManager pm, IssueLink newIssueLink) {
 		// create a reverse link.
-		IssueLinkType issueLinkTypeDuplicate = newIssueLink.getIssueLinkType();
-		IssueLinkTypeID issueLinkTypeDuplicateID = (IssueLinkTypeID) JDOHelper.getObjectId(issueLinkTypeDuplicate);
-		if (issueLinkTypeDuplicateID == null)
+		IssueLinkType issueLinkType = newIssueLink.getIssueLinkType();
+		IssueLinkTypeID issueLinkTypeID = (IssueLinkTypeID) JDOHelper.getObjectId(issueLinkType);
+		if (issueLinkTypeID == null)
 			throw new IllegalStateException("JDOHelper.getObjectId(newIssueLink.getIssueLinkType()) returned null!");
 
+		IssueLinkType issueLinkTypeOnOtherSide = getReverseIssueLinkType(pm, issueLinkTypeID);
+		
 		Issue issueOnOtherSide = (Issue) newIssueLink.getLinkedObject();
 
 		// prevent this from causing an ETERNAL recursion.
 		// => find out, if the other side already has an issue-link of the required type pointing back
 		Set<IssueLink> issueLinksOfIssueOnOtherSide = issueOnOtherSide.getIssueLinks();
 		for (IssueLink issueLinkOfIssueOnOtherSide : issueLinksOfIssueOnOtherSide) {
-			if (issueLinkOfIssueOnOtherSide.getIssueLinkType().equals(issueLinkTypeDuplicate)  && issueLinkOfIssueOnOtherSide.getLinkedObject().equals(newIssueLink.getIssue())) 
+			if (issueLinkOfIssueOnOtherSide.getIssueLinkType().equals(issueLinkTypeOnOtherSide)  && issueLinkOfIssueOnOtherSide.getLinkedObject().equals(newIssueLink.getIssue())) 
 				return;
 		}
 
-		issueOnOtherSide.createIssueLink(issueLinkTypeDuplicate, newIssueLink.getIssue());
+		issueOnOtherSide.createIssueLink(issueLinkType, newIssueLink.getIssue());
 	}
 	
 	@Override

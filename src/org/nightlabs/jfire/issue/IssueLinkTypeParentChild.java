@@ -15,7 +15,7 @@ import org.nightlabs.jfire.organisation.Organisation;
  *
  * @jdo.persistence-capable
  *		identity-type="application"
- *		persistence-capable-superclass="org.nightlabs.jfire.issue.IssueLinkType"
+ *		persistence-capable-superclass="org.nightlabs.jfire.issue.IssueLinkTypeIssueToIssue"
  *		detachable="true"
  *
  * @jdo.inheritance strategy="superclass-table"
@@ -41,37 +41,15 @@ extends IssueLinkTypeIssueToIssue
 
 	@Override
 	public IssueLinkType getReverseIssueLinkType(PersistenceManager pm, IssueLinkTypeID newIssueLinkTypeID) {
-		
 		IssueLinkType issueLinkTypeForOtherSide = null;
+		if (ISSUE_LINK_TYPE_ID_PARENT.equals(newIssueLinkTypeID))
+			issueLinkTypeForOtherSide = (IssueLinkType) pm.getObjectById(ISSUE_LINK_TYPE_ID_CHILD);
 
-//		if (ISSUE_LINK_TYPE_ID_PARENT.equals(issueLinkTypeID))
-//			issueLinkTypeForOtherSide = (IssueLinkType) pm.getObjectById(ISSUE_LINK_TYPE_ID_CHILD);
-//
-//		if (ISSUE_LINK_TYPE_ID_CHILD.equals(issueLinkTypeID))
-//			issueLinkTypeForOtherSide = (IssueLinkType) pm.getObjectById(ISSUE_LINK_TYPE_ID_PARENT);
-		return null;
+		if (ISSUE_LINK_TYPE_ID_CHILD.equals(newIssueLinkTypeID))
+			issueLinkTypeForOtherSide = (IssueLinkType) pm.getObjectById(ISSUE_LINK_TYPE_ID_PARENT);
+		return issueLinkTypeForOtherSide;
 	}
 	
-//	@Override
-//	protected void postCreateIssueLink(PersistenceManager pm, IssueLink newIssueLink) {
-
-//
-//		if (issueLinkTypeForOtherSide != null) {
-//			Issue issueOnOtherSide = (Issue) newIssueLink.getLinkedObject();
-//
-//			// prevent this from causing an ETERNAL recursion.
-//			// => find out, if the other side already has an issue-link of the required type pointing back
-//			Set<IssueLink> issueLinksOfIssueOnOtherSide = issueOnOtherSide.getIssueLinks();
-//			for (IssueLink issueLinkOfIssueOnOtherSide : issueLinksOfIssueOnOtherSide) {
-//				if (issueLinkOfIssueOnOtherSide.getIssueLinkType().equals(issueLinkTypeForOtherSide) )
-//					return;
-//			}
-//
-//			issueOnOtherSide.createIssueLink(issueLinkTypeForOtherSide, newIssueLink.getIssue());
-//			pm.makePersistent(issueOnOtherSide);
-//		}
-//	}
-//
 //	@Override
 //	protected void preDeleteIssueLink(PersistenceManager pm, IssueLink issueLinkToBeDeleted) {
 //		// remove the reverse link

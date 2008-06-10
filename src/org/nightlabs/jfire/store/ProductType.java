@@ -769,6 +769,12 @@ implements
 	 */
 	public void setVendor(LegalEntity vendor)
 	{
+		if (Util.equals(this.vendor, vendor))
+			return;
+
+		if (this.confirmed)
+			throw new IllegalStateException("Cannot assign a vendor to a confirmed ProductType!");
+
 		this.vendor = vendor;
 	}
 
@@ -1008,6 +1014,10 @@ implements
 
 			fieldMetaDataMap.put(fieldName, fmd);
 		} // if (fmd == null) {
+
+		// ensure that the vendor is not changed anymore after a ProductType has been confirmed.
+		if (confirmed && FieldName.vendor.equals(fieldName) && fmd != null && fmd.isValueInherited())
+			fmd.setValueInherited(false);
 
 		return fmd;
 	}

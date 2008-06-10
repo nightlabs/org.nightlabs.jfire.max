@@ -471,8 +471,7 @@ implements SessionBean
 								if (account.getOwner() == null) {
 									if (organisationLegalEntity == null)
 										organisationLegalEntity = OrganisationLegalEntity
-										.getOrganisationLegalEntity(pm, getOrganisationID(),
-												true);
+										.getOrganisationLegalEntity(pm, getOrganisationID());
 
 									account.setOwner(organisationLegalEntity);
 								}

@@ -1,6 +1,6 @@
 <!--
   Generic j2ee and webapp (jboss/tomcat/jpox/xdoclet) ant build file 
-  Version: 2008-06-10.00
+  Version: 2008-06-10.01
   Author: marc [at] nightlabs [dot] de
   Author: marco [at] nightlabs [dot] de
   Author: tobias [at] nightlabs [dot] de
@@ -681,6 +681,7 @@
       	<include name="META-INF/organisation-init.xml"/>
       	<include name="META-INF/serverinit.xml"/>
       	<include name="META-INF/server-init.xml"/>
+      	<include name="META-INF/cross-organisation-registration-init.xml"/>
         <include name="META-INF/*-ds.xml"/>
         <include name="META-INF/ra.xml"/>
       </fileset>

@@ -39,19 +39,19 @@ extends IssueLinkType
 		if (issueLinkTypeID == null)
 			throw new IllegalStateException("JDOHelper.getObjectId(newIssueLink.getIssueLinkType()) returned null!");
 
-		IssueLinkType issueLinkTypeOnOtherSide = getReverseIssueLinkType(pm, issueLinkTypeID);
+		IssueLinkType issueLinkTypeForAnotherSide = getReverseIssueLinkType(pm, issueLinkTypeID);
 		
-		Issue issueOnOtherSide = (Issue) newIssueLink.getLinkedObject();
+		Issue issueOnAnotherSide = (Issue) newIssueLink.getLinkedObject();
 
 		// prevent this from causing an ETERNAL recursion.
 		// => find out, if the other side already has an issue-link of the required type pointing back
-		Set<IssueLink> issueLinksOfIssueOnOtherSide = issueOnOtherSide.getIssueLinks();
+		Set<IssueLink> issueLinksOfIssueOnOtherSide = issueOnAnotherSide.getIssueLinks();
 		for (IssueLink issueLinkOfIssueOnOtherSide : issueLinksOfIssueOnOtherSide) {
-			if (issueLinkOfIssueOnOtherSide.getIssueLinkType().equals(issueLinkTypeOnOtherSide)  && issueLinkOfIssueOnOtherSide.getLinkedObject().equals(newIssueLink.getIssue())) 
+			if (issueLinkOfIssueOnOtherSide.getIssueLinkType().equals(issueLinkTypeForAnotherSide)  && issueLinkOfIssueOnOtherSide.getLinkedObject().equals(newIssueLink.getIssue())) 
 				return;
 		}
 
-		issueOnOtherSide.createIssueLink(issueLinkType, newIssueLink.getIssue());
+		issueOnAnotherSide.createIssueLink(issueLinkTypeForAnotherSide, newIssueLink.getIssue());
 	}
 	
 	@Override

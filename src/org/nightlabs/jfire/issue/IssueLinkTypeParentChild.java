@@ -51,6 +51,25 @@ extends IssueLinkTypeIssueToIssue
 	}
 	
 //	@Override
+//	protected void postCreateIssueLink(PersistenceManager pm, IssueLink newIssueLink) {
+
+//		if (issueLinkTypeForOtherSide != null) {
+//			Issue issueOnOtherSide = (Issue) newIssueLink.getLinkedObject();
+//
+//			// prevent this from causing an ETERNAL recursion.
+//			// => find out, if the other side already has an issue-link of the required type pointing back
+//			Set<IssueLink> issueLinksOfIssueOnOtherSide = issueOnOtherSide.getIssueLinks();
+//			for (IssueLink issueLinkOfIssueOnOtherSide : issueLinksOfIssueOnOtherSide) {
+//				if (issueLinkOfIssueOnOtherSide.getIssueLinkType().equals(issueLinkTypeForOtherSide) )
+//					return;
+//			}
+//
+//			issueOnOtherSide.createIssueLink(issueLinkTypeForOtherSide, newIssueLink.getIssue());
+//			pm.makePersistent(issueOnOtherSide);
+//		}
+//	}
+//
+//	@Override
 //	protected void preDeleteIssueLink(PersistenceManager pm, IssueLink issueLinkToBeDeleted) {
 //		// remove the reverse link
 //		IssueLinkType issueLinkTypeToBeDeleted = issueLinkToBeDeleted.getIssueLinkType();

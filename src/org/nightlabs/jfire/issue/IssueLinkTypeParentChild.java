@@ -15,7 +15,7 @@ import org.nightlabs.jfire.organisation.Organisation;
  *
  * @jdo.persistence-capable
  *		identity-type="application"
- *		persistence-capable-superclass="org.nightlabs.jfire.issue.IssueLinkType"
+ *		persistence-capable-superclass="org.nightlabs.jfire.issue.IssueLinkTypeIssueToIssue"
  *		detachable="true"
  *
  * @jdo.inheritance strategy="superclass-table"

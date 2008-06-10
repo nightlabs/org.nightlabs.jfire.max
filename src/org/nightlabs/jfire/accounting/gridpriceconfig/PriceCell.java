@@ -50,9 +50,9 @@ import org.nightlabs.jfire.accounting.priceconfig.PriceConfig;
  * @jdo.fetch-group name="PriceCell.price" fields="price"
  * @jdo.fetch-group name="PriceCell.priceConfig" fields="priceConfig"
  * @jdo.fetch-group name="PriceCell.priceCoordinate" fields="priceCoordinate"
- * @jdo.fetch-group name="PriceCell.this" fetch-groups="default" fields="price, priceConfig, priceCoordinate"
+ * @!jdo.fetch-group name="PriceCell.this" fetch-groups="default" fields="price, priceConfig, priceCoordinate"
  *
- * @jdo.fetch-group name="FetchGroupsPriceConfig.edit" fetch-groups="default" fields="price, priceCoordinate"
+ * @jdo.fetch-group name="FetchGroupsPriceConfig.edit" fetch-groups="default" fields="priceConfig[-1], price[-1], priceCoordinate[-1]"
  *
  * @jdo.query name = "getPriceCellsForCustomerGroupAndCurrency" query = "SELECT
  *		WHERE
@@ -69,10 +69,10 @@ public class PriceCell implements Serializable
 	public static final String FETCH_GROUP_PRICE = "PriceCell.price";
 	public static final String FETCH_GROUP_PRICE_CONFIG = "PriceCell.priceConfig";
 	public static final String FETCH_GROUP_PRICE_COORDINATE = "PriceCell.priceCoordinate";
-	/**
-	 * @deprecated The *.this-FetchGroups lead to bad programming style and are therefore deprecated, now. They should be removed soon! 
-	 */
-	public static final String FETCH_GROUP_THIS_PRICE_CELL = "PriceCell.this";
+//	/**
+//	 * @deprecated The *.this-FetchGroups lead to bad programming style and are therefore deprecated, now. They should be removed soon! 
+//	 */
+//	public static final String FETCH_GROUP_THIS_PRICE_CELL = "PriceCell.this";
 
 	/**
 	 * @jdo.field primary-key="true"

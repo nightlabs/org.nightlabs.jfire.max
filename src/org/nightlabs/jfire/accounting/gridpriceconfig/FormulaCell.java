@@ -51,7 +51,7 @@ import org.nightlabs.jfire.accounting.priceconfig.PriceConfig;
  * @jdo.fetch-group name="FormulaCell.priceCoordinate" fields="priceCoordinate"
  * @jdo.fetch-group name="FormulaCell.priceFragmentFormulas" fields="priceFragmentFormulas"
  *
- * @jdo.fetch-group name="FetchGroupsPriceConfig.edit" fetch-groups="default" fields="priceCoordinate, priceFragmentFormulas"
+ * @jdo.fetch-group name="FetchGroupsPriceConfig.edit" fetch-groups="default" fields="priceConfig[-1], priceCoordinate[-1], priceFragmentFormulas[-1]"
  */
 public class FormulaCell implements Serializable
 {

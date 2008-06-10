@@ -1,7 +1,7 @@
-<!DOCTYPE datastore-initialization
+<!DOCTYPE organisation-initialisation
 		PUBLIC "-//NightLabs GmbH//DTD Datastore Initialization 1.1//EN"
 		"http://www.nightlabs.de/dtd/datastoreinit_1_1.dtd">
-<datastore-initialisation>
+<organisation-initialisation>
 	<init bean="jfire/ejb/JFireReportingTrade/ReportManagerTrade" method="initializeScripting">
 		<depends module="JFireReporting.ear"/>
 	</init>
@@ -50,4 +50,4 @@ Therefore, we simply try it twice.
 			method="initializeScripting2" />
 	</init>
 
-</datastore-initialisation>
+</organisation-initialisation>

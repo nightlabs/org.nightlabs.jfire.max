@@ -31,6 +31,7 @@ import java.rmi.RemoteException;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashSet;
+import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Set;
@@ -43,7 +44,6 @@ import javax.jdo.FetchPlan;
 import javax.jdo.JDOHelper;
 import javax.jdo.PersistenceManager;
 import javax.jdo.Query;
-import javax.naming.NamingException;
 
 import org.apache.log4j.Logger;
 import org.jbpm.JbpmContext;
@@ -71,6 +71,7 @@ import org.nightlabs.jfire.jbpm.graph.def.ProcessDefinition;
 import org.nightlabs.jfire.jbpm.graph.def.Statable;
 import org.nightlabs.jfire.jbpm.graph.def.State;
 import org.nightlabs.jfire.jbpm.graph.def.id.ProcessDefinitionID;
+import org.nightlabs.jfire.organisation.Organisation;
 import org.nightlabs.jfire.person.Person;
 import org.nightlabs.jfire.security.User;
 import org.nightlabs.jfire.security.id.UserID;
@@ -1490,6 +1491,11 @@ implements SessionBean
 			
 			// WORKAROUND JPOX Bug to avoid java.util.ConcurrentModificationException in OfferRequirement.getOfferRequirement(OfferRequirement.java:86) at runtime
 			pm.getExtent(OfferRequirement.class);
+
+			// In case the JFireTrade module is deployed into a running server, there might already exist cooperations
+			// with other organisations => need to create OrganisationLegalEntities - see #crossOrganisationRegistrationCallback(...)
+			for (Iterator<Organisation> it = pm.getExtent(Organisation.class).iterator(); it.hasNext(); )
+				OrganisationLegalEntity.getOrganisationLegalEntity(pm, it.next().getOrganisationID());
 		} finally {
 			pm.close();
 		}
@@ -2007,17 +2013,8 @@ implements SessionBean
 			// I think it's not necessary to ask the other organisation for its OrganisationLegalEntity. We have the person already
 			// here, thus we can simply create it.
 			OrganisationLegalEntity.getOrganisationLegalEntity(pm, context.getOtherOrganisationID());
-
-//			// fetch the OrganisationLegalEntity of the other organisation
-//			TradeManager otherTradeManager = TradeManagerUtil.getHome(getInitialContextProperties(context.getOtherOrganisationID())).create();
-//			LegalEntity le = otherTradeManager.getLegalEntity(
-//					AnchorID.create(context.getOtherOrganisationID(), LegalEntity.ANCHOR_TYPE_ID_LEGAL_ENTITY, OrganisationLegalEntity.class.getName()),
-//					new String[] { FetchPlan.DEFAULT, LegalEntity.FETCH_GROUP_PERSON },
-//					NLJDOHelper.MAX_FETCH_DEPTH_NO_LIMIT
-//			);
-//
-//			if (!(le instanceof OrganisationLegalEntity))
-//				throw new IllegalStateException();
+			// Note, that this is done for all existing organisations in #initialise() as well, because the JFireTrade module
+			// might be deployed, AFTER a JFire server is already running for a long time.
 		} finally {
 			pm.close();
 		}

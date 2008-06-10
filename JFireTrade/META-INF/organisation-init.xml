@@ -1,7 +1,7 @@
-<!DOCTYPE datastore-initialisation
-		PUBLIC "-//NightLabs GmbH//DTD Datastore Initialisation 1.2//EN"
-		"http://www.nightlabs.de/dtd/datastoreinit_1_2.dtd">
-<datastore-initialisation>
+<!DOCTYPE organisation-initialisation
+		PUBLIC "-//NightLabs GmbH//DTD Organisation Initialisation 1.0//EN"
+		"http://www.nightlabs.de/dtd/organisation-init_1_0.dtd">
+<organisation-initialisation>
 	<init bean="jfire/ejb/JFireTrade/AccountingManager" method="initialise">
 		<depends module="JFireJbpm.ear"/>
 		<depends module="JFireBase.ear"
@@ -66,4 +66,4 @@ Therefore, we simply try it twice.
 			bean="jfire/ejb/JFireTrade/TradeManager"
 			method="initialise" />
 	</init>
-</datastore-initialisation>
+</organisation-initialisation>

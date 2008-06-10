@@ -67,6 +67,7 @@ import org.nightlabs.jfire.store.deliver.DeliveryConfiguration;
 import org.nightlabs.jfire.store.id.ProductTypeGroupID;
 import org.nightlabs.jfire.store.id.ProductTypeID;
 import org.nightlabs.jfire.trade.LegalEntity;
+import org.nightlabs.jfire.trade.OrganisationLegalEntity;
 import org.nightlabs.util.Util;
 
 /**
@@ -773,7 +774,13 @@ implements
 			return;
 
 		if (this.confirmed)
-			throw new IllegalStateException("Cannot assign a vendor to a confirmed ProductType!");
+			throw new IllegalStateException("Cannot assign a vendor to a confirmed ProductType! " + this);
+
+		if (vendor instanceof OrganisationLegalEntity) {
+			OrganisationLegalEntity orgaVendor = (OrganisationLegalEntity) vendor;
+			if (!this.organisationID.equals(orgaVendor.getOrganisationID()))
+				throw new IllegalStateException("Cannot assign a foreign OrganisationLegalEntity as vendor of a ProductType! " + this + " " + vendor);
+		}
 
 		this.vendor = vendor;
 	}

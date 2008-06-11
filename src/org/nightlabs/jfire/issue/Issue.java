@@ -46,6 +46,7 @@ import org.nightlabs.jfire.jbpm.graph.def.Statable;
 import org.nightlabs.jfire.jbpm.graph.def.StatableLocal;
 import org.nightlabs.jfire.jbpm.graph.def.State;
 import org.nightlabs.jfire.prop.PropertySet;
+import org.nightlabs.jfire.prop.Struct;
 import org.nightlabs.jfire.prop.StructLocal;
 import org.nightlabs.jfire.security.User;
 import org.nightlabs.util.CollectionUtil;
@@ -101,7 +102,7 @@ public class Issue
 implements 	Serializable, AttachCallback, Statable, DeleteCallback
 {
 
-	private static final long serialVersionUID = 1L;
+	private static final long serialVersionUID = 20080610L;
 //	private static final Logger logger = Logger.getLogger(Issue.class);
 
 	/**
@@ -289,6 +290,21 @@ implements 	Serializable, AttachCallback, Statable, DeleteCallback
 	}
 	
 	/**
+	 * The scope of the Struct by which the propertySet is build from.
+	 * 
+	 * @jdo.field persistence-modifier="persistent" null-value="exception" indexed="true"
+	 */
+	private String structScope;
+	
+	/**
+	 * Returns the scope of the Struct by which the propertySet is build from.
+	 * @return The scope of the Struct by which the propertySet is build from.
+	 */
+	public String getStructScope() {
+		return structScope;
+	}
+	
+	/**
 	 * @deprecated Constructor exists only for JDO! 
 	 */
 	@Deprecated
@@ -308,8 +324,12 @@ implements 	Serializable, AttachCallback, Statable, DeleteCallback
 		issueLinks = new HashSet<IssueLink>();
 		
 		this.issueLocal = new IssueLocal(this);
+		this.structScope = Struct.DEFAULT_SCOPE;
 		this.structLocalScope = StructLocal.DEFAULT_SCOPE;
-		this.propertySet = new PropertySet(organisationID, IDGenerator.nextID(PropertySet.class), Issue.class.getName(), structLocalScope);
+		this.propertySet = new PropertySet(
+				organisationID, IDGenerator.nextID(PropertySet.class), 
+				Issue.class.getName(), 
+				structScope, structLocalScope);
 	}
 	
 	public Issue(String organisationID, long issueID, IssueType issueType)

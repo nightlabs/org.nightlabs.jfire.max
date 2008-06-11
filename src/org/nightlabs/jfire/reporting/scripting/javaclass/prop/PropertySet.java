@@ -20,6 +20,7 @@ import org.eclipse.datatools.connectivity.oda.IResultSetMetaData;
 import org.nightlabs.jdo.NLJDOHelper;
 import org.nightlabs.jfire.prop.DataField;
 import org.nightlabs.jfire.prop.IStruct;
+import org.nightlabs.jfire.prop.Struct;
 import org.nightlabs.jfire.prop.StructBlock;
 import org.nightlabs.jfire.prop.StructField;
 import org.nightlabs.jfire.prop.StructLocal;
@@ -44,7 +45,7 @@ import org.nightlabs.jfire.security.SecurityReflector;
  * Currently only {@link NumberDataField} and {@link II18nTextDataField} field types are supported.
  * The script takes one parameter:
  * <ul>
- *   <li><code>propertyID</code>: The {@link PropertyID} of the {@link Property} to access.</li>
+ *   <li><code>propertySetID</code>: The {@link PropertySetID} of the {@link PropertySet} to access.</li>
  * </ul>
  * <p>
  * At design-time the script does not know for which linkClass and scope the metad-data should be created,
@@ -89,7 +90,9 @@ extends AbstractJFSScriptExecutorDelegate
 				throw new IllegalArgumentException("Query property scope was not set.");
 			}
 			metaData.addColumn("DisplayName", DataType.STRING);
-			IStruct struct = StructLocal.getStructLocal(linkClass, scope, pm);
+			// TODO: Struct.DEFAULT_SCOPE is used here, which limits the usages of this query to this scope. 
+			//       On the long run this should become a parameter and only if it is not set the default should apply.
+			IStruct struct = StructLocal.getStructLocal(linkClass, Struct.DEFAULT_SCOPE, scope, pm);
 			SortedMap<String, StructBlock> sortedBlocks = new TreeMap<String, StructBlock>();
 			for (Iterator<StructBlock> iter = struct.getStructBlocks().iterator(); iter.hasNext();) {
 				StructBlock structBlock = iter.next();
@@ -149,7 +152,9 @@ extends AbstractJFSScriptExecutorDelegate
 		org.nightlabs.jfire.prop.PropertySet propertySet = (org.nightlabs.jfire.prop.PropertySet) pm.getObjectById(propertySetID);
 		logger.debug("Have propertySet");
 
-		IStruct struct = StructLocal.getStructLocal(propertySet.getStructLocalLinkClass(), propertySet.getStructLocalScope(), pm);
+		IStruct struct = StructLocal.getStructLocal(
+				propertySet.getStructLocalLinkClass(), 
+				propertySet.getStructScope(), propertySet.getStructLocalScope(), pm);
 		propertySet = pm.detachCopy(propertySet);
 		pm.getFetchPlan().setGroups(oldGroups);
 		pm.getFetchPlan().setMaxFetchDepth(oldFetchDepth);

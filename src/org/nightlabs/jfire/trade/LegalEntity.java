@@ -102,8 +102,6 @@ public class LegalEntity extends Anchor
 
 	public static final String ANCHOR_TYPE_ID_LEGAL_ENTITY = "LegalEntity";
 
-	public static final String PROPERTY_SET_SCOPE = StructLocal.DEFAULT_SCOPE;
-
 	public static LegalEntity getLegalEntityForPerson(PersistenceManager pm, PropertySetID personID)
 	{
 		Person person = (Person) pm.getObjectById(personID);
@@ -155,7 +153,7 @@ public class LegalEntity extends Anchor
 
 		// It's better to have a Person for EVERY LegalEntity
 		Person person = new Person(IDGenerator.getOrganisationID(), IDGenerator.nextID(PropertySet.class));
-		IStruct struct = StructLocal.getStructLocal(Person.class, PROPERTY_SET_SCOPE, pm);
+		IStruct struct = StructLocal.getStructLocal(Person.class, Person.STRUCT_SCOPE, Person.STRUCT_LOCAL_SCOPE, pm);
 		person.inflate(struct);
 		try {
 			// TODO: name should be multi language 

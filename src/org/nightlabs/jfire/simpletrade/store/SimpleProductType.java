@@ -41,6 +41,7 @@ import org.nightlabs.jfire.accounting.gridpriceconfig.PriceCalculationException;
 import org.nightlabs.jfire.accounting.gridpriceconfig.PriceCalculator;
 import org.nightlabs.jfire.idgenerator.IDGenerator;
 import org.nightlabs.jfire.prop.PropertySet;
+import org.nightlabs.jfire.prop.Struct;
 import org.nightlabs.jfire.prop.StructLocal;
 import org.nightlabs.jfire.security.User;
 import org.nightlabs.jfire.store.ProductType;
@@ -89,7 +90,7 @@ import org.nightlabs.jfire.trade.LegalEntity;
  */
 public class SimpleProductType extends ProductType
 {
-	private static final long serialVersionUID = 1L;
+	private static final long serialVersionUID = 20080610L;
 	/**
 	 * @deprecated The *.this-FetchGroups lead to bad programming style and are therefore deprecated, now. They should be removed soon! 
 	 */
@@ -137,8 +138,12 @@ public class SimpleProductType extends ProductType
 			byte inheritanceNature, byte packageNature)
 	{
 		super(organisationID, productTypeID, extendedProductType, inheritanceNature, packageNature);
+		this.structScope = Struct.DEFAULT_SCOPE;
 		this.structLocalScope = StructLocal.DEFAULT_SCOPE;
-		this.propertySet = new PropertySet(organisationID, IDGenerator.nextID(PropertySet.class), SimpleProductType.class.getName(), structLocalScope);
+		this.propertySet = new PropertySet(
+				organisationID, IDGenerator.nextID(PropertySet.class), 
+				SimpleProductType.class.getName(), 
+				structScope, structLocalScope);
 	}
 
 	@Override
@@ -159,6 +164,22 @@ public class SimpleProductType extends ProductType
 		} catch (PriceCalculationException e) {
 			throw new RuntimeException(e);
 		}
+	}
+	
+	/**
+	 * The scope of the Struct by which the StructLocal 
+	 * of the PropertySet of this SimpleProductType is build from.
+	 * 
+	 * @jdo.field persistence-modifier="persistent" null-value="exception" indexed="true"
+	 */
+	private String structScope;
+	
+	/**
+	 * @return The scope of the Struct by which the StructLocal 
+	 * of the PropertySet of this SimpleProductType is build from.
+	 */
+	public String getStructScope() {
+		return structScope;
 	}
 	
 	/**

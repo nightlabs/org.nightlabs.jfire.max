@@ -31,10 +31,10 @@ public class SimpleProductTypeStruct {
 		Struct productTypeStruct = null;
 		StructLocal productTypeStructLocal = null;
 		try {
-			productTypeStruct = Struct.getStruct(organisationID, SimpleProductType.class, pm);
+			productTypeStruct = Struct.getStruct(organisationID, SimpleProductType.class, Struct.DEFAULT_SCOPE, pm);
 		} catch (JDOObjectNotFoundException e) {
 			// person struct not persisted yet.
-			productTypeStruct = new Struct(organisationID, SimpleProductType.class.getName());
+			productTypeStruct = new Struct(organisationID, SimpleProductType.class.getName(), Struct.DEFAULT_SCOPE);
 			createStandardStructure(productTypeStruct);
 			productTypeStruct.getName().setText(Locale.ENGLISH.getLanguage(), "Simple products");
 			productTypeStruct.getName().setText(Locale.GERMAN.getLanguage(), "Einfache Produkte");

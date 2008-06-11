@@ -26,7 +26,7 @@ extends IssueLinkType
 	protected IssueLinkTypeIssueToIssue() { }
 	
 	public IssueLinkTypeIssueToIssue(IssueLinkTypeID issueLinkTypeID) {
-		
+		super(issueLinkTypeID);
 	}
 
 	public abstract IssueLinkType getReverseIssueLinkType(PersistenceManager pm, IssueLinkTypeID newIssueLinkTypeID);

@@ -40,7 +40,6 @@ import javax.jdo.PersistenceManager;
 
 import org.apache.log4j.Logger;
 import org.nightlabs.ModuleException;
-import org.nightlabs.htmlcontent.IFCKEditorContentFile;
 import org.nightlabs.jdo.NLJDOHelper;
 import org.nightlabs.jfire.accounting.Currency;
 import org.nightlabs.jfire.accounting.PriceFragmentType;
@@ -56,6 +55,7 @@ import org.nightlabs.jfire.base.JFireBaseEAR;
 import org.nightlabs.jfire.idgenerator.IDGenerator;
 import org.nightlabs.jfire.prop.IStruct;
 import org.nightlabs.jfire.prop.PropertySet;
+import org.nightlabs.jfire.prop.Struct;
 import org.nightlabs.jfire.prop.StructLocal;
 import org.nightlabs.jfire.prop.datafield.I18nTextDataField;
 import org.nightlabs.jfire.prop.datafield.ImageDataField;
@@ -150,7 +150,7 @@ extends DataCreator
 	
 	public void createWineProperties(PersistenceManager pm, SimpleProductType productType, String englishShort, String germanShort, String englishLong, String germanLong, String smallImage, String smallImageContentType, String largeImage, String largeImageContentType) {
 		SimpleProductTypeStruct.getSimpleProductTypeStruct(productType.getOrganisationID(), pm);
-		IStruct struct = StructLocal.getStructLocal(SimpleProductType.class, StructLocal.DEFAULT_SCOPE, pm);
+		IStruct struct = StructLocal.getStructLocal(SimpleProductType.class, Struct.DEFAULT_SCOPE, StructLocal.DEFAULT_SCOPE, pm);
 		PropertySet props = productType.getPropertySet();
 		productType.getFieldMetaData(SimpleProductType.FieldName.propertySet).setValueInherited(false);
 		pm.getFetchPlan().setGroups(new String[] {FetchPlan.DEFAULT, PropertySet.FETCH_GROUP_DATA_FIELDS, PropertySet.FETCH_GROUP_FULL_DATA});

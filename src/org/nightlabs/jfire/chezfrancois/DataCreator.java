@@ -405,7 +405,7 @@ public class DataCreator
 		if (personStruct == null) {
 			// We have to work with the StructLocal here...
 			// personStruct = Struct.getStruct(getOrganisationLegalEntity().getOrganisationID(), Person.class, pm);
-			personStruct = StructLocal.getStructLocal(getOrganisationLegalEntity().getOrganisationID(), Person.class.getName(), StructLocal.DEFAULT_SCOPE, pm);
+			personStruct = StructLocal.getStructLocal(getOrganisationLegalEntity().getOrganisationID(), Person.class.getName(), Person.STRUCT_SCOPE, Person.STRUCT_LOCAL_SCOPE, pm);
 		}
 
 		return personStruct;

@@ -263,11 +263,8 @@ implements SessionBean
 			pm.close();
 		}
 	}
-	
-	
-	
-	
-	
+
+
 	/**
 	 * Creates a new Sale order. This method is intended to be called by a user (not another
 	 * organisation).
@@ -325,14 +322,8 @@ implements SessionBean
 			pm.close();
 		}
 	}
-	
-	
-	
-	
-	
-	
-	
-	
+
+
 	private static void createSegments(PersistenceManager pm, Trader trader, Order order, SegmentTypeID[] segmentTypeIDs)
 	{
 		pm.getExtent(SegmentType.class);

@@ -51,7 +51,7 @@ import org.nightlabs.jfire.person.Person;
 import org.nightlabs.jfire.person.PersonStruct;
 import org.nightlabs.jfire.prop.IStruct;
 import org.nightlabs.jfire.prop.PropertySet;
-import org.nightlabs.jfire.prop.Struct;
+import org.nightlabs.jfire.prop.StructLocal;
 import org.nightlabs.jfire.prop.datafield.TextDataField;
 import org.nightlabs.jfire.scripting.Script;
 import org.nightlabs.jfire.scripting.ScriptRegistry;
@@ -970,9 +970,9 @@ implements SessionBean
 				// find or create an Order
 				Trader trader = Trader.getTrader(pm);
 
-				// FIXME should be StructLocal
-				IStruct personStruct = Struct.getStruct(getOrganisationID(),
-						Person.class, pm);
+				IStruct personStruct = StructLocal.getStructLocal(getOrganisationID(),
+						Person.class.getName(), 
+						Person.STRUCT_SCOPE, Person.STRUCT_LOCAL_SCOPE, pm);
 				Person person = new Person(getOrganisationID(), IDGenerator
 						.nextID(PropertySet.class));
 				person.inflate(personStruct);

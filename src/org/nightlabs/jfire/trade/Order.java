@@ -800,11 +800,13 @@ implements Serializable, ArticleContainer, SegmentContainer, DetachCallback
 	public void addArticle(Article article)
 	{
 		articles.add(article);
+		articleCount = articles.size();
 	}
 
 	public void removeArticle(Article article)
 	{
 		articles.remove(article.getPrimaryKey());
+		articleCount = articles.size();
 	}
 
 	protected PersistenceManager getPersistenceManager()

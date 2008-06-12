@@ -302,8 +302,7 @@ implements SessionBean
 	 * @ejb.transaction type="Required"
 	 */
 	public Collection<ScriptParameterSet> getScriptParameterSets(
-			String organisationID,
-			String[] fetchGroups, int maxFetchDepth)
+			String organisationID, String[] fetchGroups, int maxFetchDepth)
 	{
 		PersistenceManager pm;
 		pm = getPersistenceManager();
@@ -379,7 +378,7 @@ implements SessionBean
 	 * @ejb.transaction type="Required"
 	 */
 	@SuppressWarnings("unchecked")
-	public Collection<ScriptParameterSet> getScriptParameterSets(
+	public Collection<ScriptParameterSet> getScriptParameterSetsForScriptRegistryItemIDs(
 			Collection<ScriptRegistryItemID> scriptParameterSetID,
 			String[] fetchGroups, int maxFetchDepth
 		)
@@ -397,6 +396,31 @@ implements SessionBean
 					parameterSets.add(item.getParameterSet());
 			}
 			return pm.detachCopyAll(parameterSets);
+		} finally {
+			pm.close();
+		}
+	}
+
+	/**
+	 * Returns the {@link ScriptParameterSet}s for the given {@link ScriptParameterSetID}s.
+	 * @throws ModuleException
+	 *
+	 * @ejb.interface-method
+	 * @ejb.permission role-name="_Guest_"
+	 * @ejb.transaction type="Required"
+	 */
+	@SuppressWarnings("unchecked")
+	public Collection<ScriptParameterSet> getScriptParameterSets(
+			Collection<ScriptParameterSetID> scriptParameterSetIDs,
+			String[] fetchGroups, int maxFetchDepth)
+	{
+		PersistenceManager pm;
+		pm = getPersistenceManager();
+		try {
+			pm.getFetchPlan().setMaxFetchDepth(maxFetchDepth);
+			if (fetchGroups != null)
+				pm.getFetchPlan().setGroups(fetchGroups);
+			return NLJDOHelper.getDetachedObjectSet(pm, scriptParameterSetIDs, ScriptParameterSet.class, fetchGroups, maxFetchDepth);
 		} finally {
 			pm.close();
 		}

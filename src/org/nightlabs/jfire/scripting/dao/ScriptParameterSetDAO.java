@@ -1,71 +1,78 @@
 /**
- * 
+ *
  */
 package org.nightlabs.jfire.scripting.dao;
 
 import java.util.Collection;
 import java.util.Set;
 
-import javax.jdo.FetchPlan;
-
-import org.nightlabs.jdo.NLJDOHelper;
 import org.nightlabs.jfire.base.jdo.BaseJDOObjectDAO;
 import org.nightlabs.jfire.scripting.ScriptManager;
 import org.nightlabs.jfire.scripting.ScriptManagerUtil;
 import org.nightlabs.jfire.scripting.ScriptParameterSet;
-import org.nightlabs.jfire.scripting.id.ScriptRegistryItemID;
+import org.nightlabs.jfire.scripting.id.ScriptParameterSetID;
 import org.nightlabs.jfire.security.SecurityReflector;
 import org.nightlabs.progress.ProgressMonitor;
 
 /**
- * @author Alexander Bieber <!-- alex [AT] nightlabs [DOT] de -->
+ * Accessor for ScriptParameterSets.
  *
+ * @author Alexander Bieber <alex[AT]nightlabs[ÐOT]de>
+ * @author Daniel Mazurek <daniel[AT]nightlabs[ÐOT]de>
  */
-public class ScriptParameterSetDAO extends BaseJDOObjectDAO<ScriptRegistryItemID, ScriptParameterSet> {
-
-	public static final String[] DEFAULT_FETCH_GROUPS = new String[] {
-		FetchPlan.DEFAULT,
-		ScriptParameterSet.FETCH_GROUP_PARAMETERS,
-		ScriptParameterSet.FETCH_GROUP_NAME
-	};
-	
-	/**
-	 * A static instance of ScriptParameterSetDAO.
-	 */
+public class ScriptParameterSetDAO 
+extends BaseJDOObjectDAO<ScriptParameterSetID, ScriptParameterSet>
+{
 	private static ScriptParameterSetDAO sharedInstance;
 
-	/**
-	 * Returns a static instance of ScriptParameterSetDAO.
-	 * It will be lazily created on demand.
-	 *
-	 * @return A static instance of ScriptParameterSetDAO.
-	 */
 	public static ScriptParameterSetDAO sharedInstance() {
-		if (sharedInstance == null) {
-			synchronized (ScriptParameterSetDAO.class) {
-				if (sharedInstance == null) {
-					sharedInstance = new ScriptParameterSetDAO();
-				}
-			}
-		}
+		if (sharedInstance == null)
+			sharedInstance = new ScriptParameterSetDAO();
 		return sharedInstance;
 	}
 	
 	private ScriptParameterSetDAO() {}
-
-	/* (non-Javadoc)
-	 * @see org.nightlabs.jfire.base.jdo.JDOObjectDAO#retrieveJDOObjects(java.util.Set, java.lang.String[], int, org.eclipse.core.runtime.IProgressMonitor)
+	
+	/**
+	 * Returns the collection of all {@link ScriptParameterSet}s for the given organisationID
 	 */
-	@SuppressWarnings("unchecked")
-	@Override
-	protected Collection<ScriptParameterSet> retrieveJDOObjects(
-			Set<ScriptRegistryItemID> objectIDs, String[] fetchGroups,
-			int maxFetchDepth, ProgressMonitor monitor) throws Exception {
-		ScriptManager sm = ScriptManagerUtil.getHome(SecurityReflector.getInitialContextProperties()).create();
-		return sm.getScriptParameterSets(objectIDs, fetchGroups, maxFetchDepth);
+	public Collection<ScriptParameterSet> getScriptParameterSets(String organisationID, String[] fetchGroups, int maxFetchDepth, 
+			ProgressMonitor monitor) 
+	{
+		try {
+			ScriptManager sm = ScriptManagerUtil.getHome(SecurityReflector.getInitialContextProperties()).create();
+			Set<ScriptParameterSetID> ids = sm.getAllScriptParameterSetIDs(organisationID);
+			return getJDOObjects(null, ids, fetchGroups, maxFetchDepth, monitor);
+		} catch (Exception e) {
+			throw new RuntimeException(e);
+		}
+	}
+
+	public ScriptParameterSet getScriptParameterSet(ScriptParameterSetID scriptParameterSetID, String[] fetchGroups, int maxFetchDepth,
+			ProgressMonitor monitor) 
+	{
+		return getJDOObject(null, scriptParameterSetID, fetchGroups, maxFetchDepth, monitor);
 	}
 	
-	public ScriptParameterSet getScriptParameterSet(ScriptRegistryItemID scriptRegistryItemID, String[] fetchGroups, ProgressMonitor monitor) {
-		return getJDOObject(null, scriptRegistryItemID, fetchGroups, NLJDOHelper.MAX_FETCH_DEPTH_NO_LIMIT, monitor);
+	/* (non-Javadoc)
+	 * @see org.nightlabs.jfire.base.jdo.BaseJDOObjectDAO#retrieveJDOObjects(java.util.Set, java.lang.String[], int, org.nightlabs.progress.ProgressMonitor)
+	 */
+	@Override
+	protected Collection<ScriptParameterSet> retrieveJDOObjects(
+			Set<ScriptParameterSetID> objectIDs, String[] fetchGroups,
+			int maxFetchDepth, ProgressMonitor monitor) throws Exception 
+	{
+		monitor.beginTask("Loading ScriptParameterSets", 100);
+		try {
+			ScriptManager sm = ScriptManagerUtil.getHome(SecurityReflector.getInitialContextProperties()).create();
+			monitor.worked(50);
+			Collection<ScriptParameterSet> result = sm.getScriptParameterSets(objectIDs, fetchGroups, maxFetchDepth);
+			monitor.worked(50);
+			return result;
+		}
+		finally {
+			monitor.done();
+		}
 	}
+
 }

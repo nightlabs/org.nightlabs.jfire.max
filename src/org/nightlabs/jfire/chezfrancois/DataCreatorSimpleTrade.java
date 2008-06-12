@@ -359,7 +359,7 @@ extends DataCreator
 		setNames(formulaPriceConfig.getName(), names);
 		
 		CustomerGroup customerGroupDefault = trader.getDefaultCustomerGroupForKnownCustomer();
-		CustomerGroup customerGroupAnonymous = LegalEntity.getAnonymousCustomer(pm).getDefaultCustomerGroup();
+		CustomerGroup customerGroupAnonymous = LegalEntity.getAnonymousLegalEntity(pm).getDefaultCustomerGroup();
 		formulaPriceConfig.addCustomerGroup(customerGroupDefault);
 		formulaPriceConfig.addCustomerGroup(customerGroupAnonymous);
 		formulaPriceConfig.addCurrency(euro);

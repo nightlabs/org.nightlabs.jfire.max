@@ -399,10 +399,10 @@ extends Initialiser
 			userGroupRef.addRoleGroupRef(roleGroupRef);
 		}
 
-		dataCreator.createOrderForEndcustomer(LegalEntity.getAnonymousCustomer(pm));
-		dataCreator.createOrderForEndcustomer(LegalEntity.getAnonymousCustomer(pm));
+		dataCreator.createOrderForEndcustomer(LegalEntity.getAnonymousLegalEntity(pm));
+		dataCreator.createOrderForEndcustomer(LegalEntity.getAnonymousLegalEntity(pm));
 		dataCreator.createOrderForEndcustomer(legalEntity00);
-		dataCreator.createOrderForEndcustomer(LegalEntity.getAnonymousCustomer(pm));
+		dataCreator.createOrderForEndcustomer(LegalEntity.getAnonymousLegalEntity(pm));
 		dataCreator.createOrderForEndcustomer(legalEntity00);
 
 		logger.info("Initialization of JFireChezFrancois complete!");

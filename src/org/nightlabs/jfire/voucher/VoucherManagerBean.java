@@ -228,7 +228,7 @@ implements SessionBean
 				store.setProductTypeStatus_published(user, rootVoucherType);
 			}
 
-			LegalEntity anonymousCustomer = LegalEntity.getAnonymousCustomer(pm);
+			LegalEntity anonymousCustomer = LegalEntity.getAnonymousLegalEntity(pm);
 			CustomerGroup anonymousCustomerGroup = anonymousCustomer
 					.getDefaultCustomerGroup();
 

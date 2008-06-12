@@ -17,9 +17,7 @@ import org.nightlabs.jdo.NLJDOHelper;
 import org.nightlabs.jfire.accounting.Price;
 import org.nightlabs.jfire.accounting.TariffMapping;
 import org.nightlabs.jfire.accounting.id.TariffID;
-import org.nightlabs.jfire.organisation.Organisation;
 import org.nightlabs.jfire.security.AuthorityType;
-import org.nightlabs.jfire.security.RoleGroup;
 import org.nightlabs.jfire.security.User;
 import org.nightlabs.jfire.security.id.AuthorityTypeID;
 import org.nightlabs.jfire.simpletrade.SimpleTradeManager;
@@ -36,7 +34,6 @@ import org.nightlabs.jfire.trade.ArticlePrice;
 import org.nightlabs.jfire.trade.Offer;
 import org.nightlabs.jfire.trade.id.OfferID;
 import org.nightlabs.jfire.trade.id.SegmentID;
-import org.nightlabs.jfire.trade.security.RoleConstants;
 import org.nightlabs.util.CollectionUtil;
 
 /**
@@ -161,10 +158,10 @@ public class SimpleProductTypeActionHandler
 		authorityType.getDescription().setText(Locale.GERMAN.getLanguage(), "Vollmachten dieses Typs kontrollieren den Zugriff auf einfache Producttypen.");
 
 		// TODO configure access rights completely - implement manual checking where necessary!
-		authorityType.addRoleGroup((RoleGroup) pm.getObjectById(RoleConstants.seeProductType));
-		authorityType.addRoleGroup((RoleGroup) pm.getObjectById(RoleConstants.sellProductType));
-		authorityType.addRoleGroup((RoleGroup) pm.getObjectById(RoleConstants.reverseProductType));
-		authorityType.addRoleGroup((RoleGroup) pm.getObjectById(RoleConstants.editProductType));
+//		authorityType.addRoleGroup((RoleGroup) pm.getObjectById(RoleConstants.seeProductType));
+//		authorityType.addRoleGroup((RoleGroup) pm.getObjectById(RoleConstants.sellProductType));
+//		authorityType.addRoleGroup((RoleGroup) pm.getObjectById(RoleConstants.reverseProductType));
+//		authorityType.addRoleGroup((RoleGroup) pm.getObjectById(RoleConstants.editProductType));
 		return authorityType;
 	}
 

@@ -310,12 +310,12 @@ extends Initialiser
 		
 		UserSecurityGroup userSecurityGroup = new UserSecurityGroup(organisationID, "SalesAgents");
 		userSecurityGroup.setName("Sales Agents");
-		userSecurityGroup.setDescription("This group is blablabla.");
+		userSecurityGroup.setDescription("This is the sales agents group");
 		userSecurityGroup = pm.makePersistent(userSecurityGroup);
 
 		userSecurityGroup = new UserSecurityGroup(organisationID, "SalesManagers");
 		userSecurityGroup.setName("Sales Managers");
-		userSecurityGroup.setDescription("This group is blablabla.");
+		userSecurityGroup.setDescription("This is the sales managers group");
 		userSecurityGroup = pm.makePersistent(userSecurityGroup);
 
 		userSecurityGroup = new UserSecurityGroup(organisationID, "Statistics");
@@ -325,7 +325,7 @@ extends Initialiser
 
 		userSecurityGroup = new UserSecurityGroup(organisationID, "TheOthers");
 		userSecurityGroup.setName("The Others");
-		userSecurityGroup.setDescription("This group is trallali trallala.");
+		userSecurityGroup.setDescription("This group represents all users which don't fit in any other group");
 		userSecurityGroup = pm.makePersistent(userSecurityGroup);
 
 		Trader trader = Trader.getTrader(pm);

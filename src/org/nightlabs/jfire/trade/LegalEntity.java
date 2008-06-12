@@ -138,7 +138,7 @@ public class LegalEntity extends Anchor
 	 * @return the <tt>LegalEntity</tt> which represents the anonymous customer. If this
 	 * <tt>LegalEntity</tt> does not yet exist, it will be created.
 	 */
-	public static LegalEntity getAnonymousCustomer(PersistenceManager pm)
+	public static LegalEntity getAnonymousLegalEntity(PersistenceManager pm)
 	{
 		String organisationID = LocalOrganisation.getLocalOrganisation(pm).getOrganisationID();
 		try {
@@ -539,7 +539,7 @@ public class LegalEntity extends Anchor
 	/**
 	 * @param anonymous Whether or not this <tt>LegalEntity</tt> is anonymous.
 	 *
-	 * @see #getAnonymousCustomer(PersistenceManager)
+	 * @see #getAnonymousLegalEntity(PersistenceManager)
 	 * @see #isAnonymous()
 	 */
 	protected void setAnonymous(boolean anonymousCustomer)

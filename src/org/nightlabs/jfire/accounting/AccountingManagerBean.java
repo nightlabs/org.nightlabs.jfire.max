@@ -331,7 +331,7 @@ public abstract class AccountingManagerBean
 
 
 
-			LegalEntity anonymousCustomer = LegalEntity.getAnonymousCustomer(pm);
+			LegalEntity anonymousCustomer = LegalEntity.getAnonymousLegalEntity(pm);
 			CustomerGroup anonymousCustomerGroup = anonymousCustomer.getDefaultCustomerGroup();
 
 			//		 create some ModeOfPayments

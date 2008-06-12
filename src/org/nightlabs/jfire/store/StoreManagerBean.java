@@ -262,7 +262,7 @@ implements SessionBean
 			Store store = Store.getStore(pm);
 			Trader trader = Trader.getTrader(pm);
 
-			LegalEntity anonymousCustomer = LegalEntity.getAnonymousCustomer(pm);
+			LegalEntity anonymousCustomer = LegalEntity.getAnonymousLegalEntity(pm);
 			CustomerGroup anonymousCustomerGroup = anonymousCustomer.getDefaultCustomerGroup();
 
 			//		 create fundamental set of ModeOfDelivery/ModeOfDeliveryFlavour

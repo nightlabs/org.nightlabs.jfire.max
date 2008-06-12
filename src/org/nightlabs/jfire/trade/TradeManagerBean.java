@@ -152,7 +152,7 @@ implements SessionBean
 	 *
 	 * @ejb.interface-method
 	 * @ejb.transaction type="Required"
-	 * @ejb.permission role-name="_Guest_"
+	 * @ejb.permission role-name="org.nightlabs.jfire.trade.createOrder"
 	 */
 	public OrderID createQuickSaleWorkOrder(AnchorID customerID, String orderIDPrefix, CurrencyID currencyID,
 			SegmentTypeID[] segmentTypeIDs)
@@ -216,7 +216,7 @@ implements SessionBean
 	 * @param fetchGroups What fields should be detached.
 	 *
 	 * @ejb.interface-method
-	 * @ejb.permission role-name="TradeManager-write"
+	 * @ejb.permission role-name="org.nightlabs.jfire.trade.createOrder"
 	 * @ejb.transaction type="Required"
 	 **/
 	public Order createPurchaseOrder(
@@ -275,7 +275,7 @@ implements SessionBean
 	 * @param fetchGroups What fields should be detached.
 	 *
 	 * @ejb.interface-method
-	 * @ejb.permission role-name="TradeManager-write"
+	 * @ejb.permission role-name="org.nightlabs.jfire.trade.createOrder"
 	 * @ejb.transaction type="Required"
 	 **/
 	public Order createSaleOrder(
@@ -347,7 +347,7 @@ implements SessionBean
 	 *		same {@link SegmentType}.
 	 *
 	 * @ejb.interface-method
-	 * @ejb.permission role-name="_Guest_"
+	 * @ejb.permission role-name="org.nightlabs.jfire.trade.createOrder"
 	 * @ejb.transaction type="Required"
 	 */
 	public Collection<Segment> createCrossTradeSegments(OrderID orderID, Collection<SegmentTypeID> segmentTypeIDs)
@@ -379,7 +379,7 @@ implements SessionBean
 	 * @param customerGroupID Either <code>null</code> (then the default will be used) or an ID of a {@link CustomerGroup} which is allowed to the customer.
 	 *
 	 * @ejb.interface-method
-	 * @ejb.permission role-name="_Guest_"
+	 * @ejb.permission role-name="org.nightlabs.jfire.trade.createOrder"
 	 * @ejb.transaction type="Required"
 	 */
 	public Order createCrossTradeOrder(String orderIDPrefix, String currencyID, CustomerGroupID customerGroupID, Collection<SegmentTypeID> segmentTypeIDs)
@@ -437,7 +437,7 @@ implements SessionBean
 	 * @throws ModuleException
 	 *
 	 * @ejb.interface-method
-	 * @ejb.permission role-name="_Guest_"
+	 * @ejb.permission role-name="org.nightlabs.jfire.trade.createOffer"
 	 * @ejb.transaction type="Required"
 	 */
 	public Offer createCrossTradeOffer(OrderID orderID, String offerIDPrefix)
@@ -459,7 +459,6 @@ implements SessionBean
 				Offer.FETCH_GROUP_CURRENCY, Statable.FETCH_GROUP_STATE, Statable.FETCH_GROUP_STATES,
 				State.FETCH_GROUP_STATABLE, State.FETCH_GROUP_STATE_DEFINITION, State.FETCH_GROUP_USER
 			});
-//			pm.getFetchPlan().setDetachmentOptions(FetchPlan.DETACH_LOAD_FIELDS); // TODO shouldn't we omit this line? our default is to have UNload as well and it's imho cleaner to unload
 
 			return pm.detachCopy(offer);
 		} finally {
@@ -469,10 +468,10 @@ implements SessionBean
 
 	/**
 	 * @ejb.interface-method
-	 * @ejb.permission role-name="_Guest_"
+	 * @ejb.permission role-name="org.nightlabs.jfire.trade.createOffer"
 	 * @ejb.transaction type="Required"
 	 */
-	public Offer createCrossTradeReverseOffer(Collection<ArticleID> reversedArticleIDs, String offerIDPrefix) // , boolean acceptForCrossTrade)
+	public Offer createCrossTradeReverseOffer(Collection<ArticleID> reversedArticleIDs, String offerIDPrefix)
 	throws ModuleException
 	{
 		if (!getPrincipal().userIsOrganisation())
@@ -483,18 +482,10 @@ implements SessionBean
 			User user = User.getUser(pm, getPrincipal());
 			Trader trader = Trader.getTrader(pm);
 			pm.getExtent(Order.class);
+
+			// TODO check whether for all requested Articles, the user is allowed to perform reverse!
 			Set<Article> reversedArticles = NLJDOHelper.getObjectSet(pm, reversedArticleIDs, Article.class);
 			Offer offer = trader.createReverseOffer(user, reversedArticles, offerIDPrefix);
-
-//			if (acceptForCrossTrade) {
-//				JbpmContext jbpmContext = JbpmLookup.getJbpmConfiguration().createJbpmContext();
-//				try {
-//					ProcessInstance processInstance = jbpmContext.getProcessInstanceForUpdate(offer.getOfferLocal().getJbpmProcessInstanceId());
-//					processInstance.signal(JbpmConstantsOffer.Vendor.TRANSITION_NAME_ACCEPT_FOR_CROSS_TRADE);
-//				} finally {
-//					jbpmContext.close();
-//				}
-//			}
 
 			pm.getFetchPlan().setMaxFetchDepth(NLJDOHelper.MAX_FETCH_DEPTH_NO_LIMIT);
 			pm.getFetchPlan().setGroups(new String[] {
@@ -513,41 +504,6 @@ implements SessionBean
 		}
 	}
 
-//	/**
-//	 * @ejb.interface-method
-//	 * @ejb.permission role-name="_Guest_"
-//	 * @ejb.transaction type="Required"
-//	 **/
-//	public Map<Integer, Collection<? extends Article>> createCrossTradeArticles(
-//			OfferID offerID, ProductTypeID[] productTypeIDs, int[] quantities, ProductLocator[] productLocators)
-//	{
-//		if (!getPrincipal().userIsOrganisation())
-//			throw new IllegalStateException("This method cannot be called by a user who is not an organisation!");
-//
-//		if (productTypeIDs.length != quantities.length)
-//			throw new IllegalArgumentException("productTypeIDs.length != quantities.length");
-//
-//		if (productTypeIDs.length != productLocators.length)
-//			throw new IllegalArgumentException("productTypeIDs.length != productLocators.length");
-//
-//		PersistenceManager pm = getPersistenceManager();
-//		try {
-//			User user = User.getUser(pm, getPrincipal());
-//
-//			Map<Integer, Collection<? extends Article>> res = new HashMap<Integer, Collection<? extends Article>>();
-//
-//			for (int index = 0; index < productTypeIDs.length; ++index) {
-//				ProductType productType = (ProductType) pm.getObjectById(productTypeIDs[index]);
-//				ProductTypeActionHandler productTypeActionHandler = ProductTypeActionHandler.getProductTypeActionHandler(pm, productType.getClass());
-//				Collection<? extends Article> articles = productTypeActionHandler.createCrossTradeArticles(user, productType, quantities[index], productLocators[index]);
-//				res.put(index, articles);
-//			}
-//
-//			return res;
-//		} finally {
-//			pm.close();
-//		}
-//	}
 
 	/**
 	 * Creates a new Offer within a given Order.
@@ -556,7 +512,7 @@ implements SessionBean
 	 * @throws ModuleException
 	 *
 	 * @ejb.interface-method
-	 * @ejb.permission role-name="TradeManager-write"
+	 * @ejb.permission role-name="org.nightlabs.jfire.trade.createOffer"
 	 * @ejb.transaction type="Required"
 	 **/
 	public Offer createOffer(OrderID orderID, String offerIDPrefix, String[] fetchGroups, int maxFetchDepth)
@@ -579,15 +535,14 @@ implements SessionBean
 		}
 	}
 
-// works now via jBPM
 //	/**
-//	 * Finalizes the specified {@link Offer}.
+//	 * Rejects the specified {@link Offer}.
 //	 *
 //	 * @ejb.interface-method
 //	 * @ejb.permission role-name="TradeManager-write"
 //	 * @ejb.transaction type="Required"
 //	 **/
-//	public Offer finalizeOffer(OfferID offerID, boolean get, String[] fetchGroups, int maxFetchDepth)
+//	public Offer rejectOffer(OfferID offerID, boolean get, String[] fetchGroups, int maxFetchDepth)
 //	throws ModuleException
 //	{
 //		PersistenceManager pm = getPersistenceManager();
@@ -601,106 +556,10 @@ implements SessionBean
 //			}
 //
 //			Offer offer = (Offer) pm.getObjectById(offerID);
-//			Trader.getTrader(pm).finalizeOffer(User.getUser(pm, getPrincipal()), offer);
+//			Trader.getTrader(pm).rejectOffer(User.getUser(pm, getPrincipal()), offer);
 //
 //			if (get)
-//				return (Offer) pm.detachCopy(offer);
-//			else
-//				return null;
-//		} finally {
-//			pm.close();
-//		}
-//	}
-
-//	/**
-//	 * Accepts the specified {@link Offer}.
-//	 *
-//	 * @ejb.interface-method
-//	 * @ejb.permission role-name="TradeManager-write"
-//	 * @ejb.transaction type="Required"
-//	 **/
-//	public Offer acceptOffer(OfferID offerID, boolean get, String[] fetchGroups, int maxFetchDepth)
-//	throws ModuleException
-//	{
-//		PersistenceManager pm = getPersistenceManager();
-//		try {
-//			pm.getExtent(Offer.class);
-//
-//			if (get) {
-//				pm.getFetchPlan().setMaxFetchDepth(maxFetchDepth);
-//				if (fetchGroups != null)
-//					pm.getFetchPlan().setGroups(fetchGroups);
-//			}
-//
-//			Offer offer = (Offer) pm.getObjectById(offerID);
-//			Trader.getTrader(pm).acceptOffer(User.getUser(pm, getPrincipal()), offer);
-//
-//			if (get)
-//				return (Offer) pm.detachCopy(offer);
-//			else
-//				return null;
-//		} finally {
-//			pm.close();
-//		}
-//	}
-
-	/**
-	 * Rejects the specified {@link Offer}.
-	 *
-	 * @ejb.interface-method
-	 * @ejb.permission role-name="TradeManager-write"
-	 * @ejb.transaction type="Required"
-	 **/
-	public Offer rejectOffer(OfferID offerID, boolean get, String[] fetchGroups, int maxFetchDepth)
-	throws ModuleException
-	{
-		PersistenceManager pm = getPersistenceManager();
-		try {
-			pm.getExtent(Offer.class);
-
-			if (get) {
-				pm.getFetchPlan().setMaxFetchDepth(maxFetchDepth);
-				if (fetchGroups != null)
-					pm.getFetchPlan().setGroups(fetchGroups);
-			}
-
-			Offer offer = (Offer) pm.getObjectById(offerID);
-			Trader.getTrader(pm).rejectOffer(User.getUser(pm, getPrincipal()), offer);
-
-			if (get)
-				return pm.detachCopy(offer);
-			else
-				return null;
-		} finally {
-			pm.close();
-		}
-	}
-
-//	/**
-//	 * Confirms the specified {@link Offer}.
-//	 *
-//	 * @ejb.interface-method
-//	 * @ejb.permission role-name="TradeManager-write"
-//	 * @ejb.transaction type="Required"
-//	 **/
-//	public Offer confirmOffer(OfferID offerID, boolean get, String[] fetchGroups, int maxFetchDepth)
-//	throws ModuleException
-//	{
-//		PersistenceManager pm = getPersistenceManager();
-//		try {
-//			pm.getExtent(Offer.class);
-//
-//			if (get) {
-//				pm.getFetchPlan().setMaxFetchDepth(maxFetchDepth);
-//				if (fetchGroups != null)
-//					pm.getFetchPlan().setGroups(fetchGroups);
-//			}
-//
-//			Offer offer = (Offer) pm.getObjectById(offerID);
-//			Trader.getTrader(pm).confirmOffer(User.getUser(pm, getPrincipal()), offer);
-//
-//			if (get)
-//				return (Offer) pm.detachCopy(offer);
+//				return pm.detachCopy(offer);
 //			else
 //				return null;
 //		} finally {
@@ -712,7 +571,7 @@ implements SessionBean
 	 * @param orderID The orderID defining the Order for which to find all non-finalized offers.
 	 *
 	 * @ejb.interface-method
-	 * @ejb.permission role-name="TradeManager-read"
+	 * @ejb.permission role-name="org.nightlabs.jfire.trade.queryOffers"
 	 * @ejb.transaction type="Required"
 	 **/
 	public List<Offer> getNonFinalizedNonEndedOffers(OrderID orderID, String[] fetchGroups, int maxFetchDepth)
@@ -733,7 +592,7 @@ implements SessionBean
 	}
 
 	/**
-	 * In order to reverse an <code>Article</code>, you need to create a new "negative" or "inversed"
+	 * In order to reverse an <code>Article</code>, you need to create a new "negative" or "reversing"
 	 * <code>Article</code>. This is done by this method: It creates new <code>Article</code>s within
 	 * the specified {@link Offer} reversing all the specified <code>Article</code>s.
 	 *
@@ -747,7 +606,7 @@ implements SessionBean
 	 * @throws ModuleException
 	 *
 	 * @ejb.interface-method
-	 * @ejb.permission role-name="TradeManager-write"
+	 * @ejb.permission role-name="org.nightlabs.jfire.trade.reverseProductType"
 	 * @ejb.transaction type="Required"
 	 **/
 	public Collection<Article> reverseArticles(OfferID offerID, Collection<ArticleID> reversedArticleIDs, boolean get, String[] fetchGroups, int maxFetchDepth)
@@ -765,7 +624,7 @@ implements SessionBean
 				Article article = (Article) pm.getObjectById(articleID);
 				if (order == null)
 					order = article.getOrder();
-				else if (!order.getPrimaryKey().equals(article.getOrder().getPrimaryKey()))
+				else if (!order.equals(article.getOrder()))
 					throw new IllegalArgumentException("Not all Articles are in the same Order!");
 
 				reversedArticles.add(article);
@@ -773,15 +632,12 @@ implements SessionBean
 			if (order == null)
 				throw new IllegalArgumentException("Collection reversedArticleIDs must not be empty!");
 
+			if (!order.equals(offer.getOrder()))
+				throw new IllegalArgumentException("Specified offer is not in the same order as the specified articles!");
+
 			User user = User.getUser(pm, getPrincipal());
 
-//			List reversingArticles = get ? new ArrayList(reversedArticles.size()) : null;
-//			for (Iterator it = reversedArticles.iterator(); it.hasNext(); ) {
-//				Article reversedArticle = (Article) it.next();
-//				Article reversingArticle = Trader.getTrader(pm).reverseArticle(user, offer, reversedArticle);
-//				if (reversingArticles != null)
-//					reversingArticles.add(reversingArticle);
-//			}
+			// TODO check for all requested articles, whether 'org.nightlabs.jfire.trade.reverseProductType' is allowed!
 			Collection<Article> reversingArticles = Trader.getTrader(pm).reverseArticles(user, offer, reversedArticles);
 
 			offer.validate();
@@ -819,7 +675,7 @@ implements SessionBean
 	 * @throws ModuleException
 	 *
 	 * @ejb.interface-method
-	 * @ejb.permission role-name="TradeManager-write"
+	 * @ejb.permission role-name="org.nightlabs.jfire.trade.createOffer"
 	 * @ejb.transaction type="Required"
 	 **/
 	public Offer createReverseOffer(
@@ -832,6 +688,8 @@ implements SessionBean
 			Set<Article> reversedArticles = NLJDOHelper.getObjectSet(pm, reversedArticleIDs, Article.class);
 			User user = User.getUser(pm, getPrincipal());
 			Trader trader = Trader.getTrader(pm);
+
+			// TODO check for all requested articles, whether 'org.nightlabs.jfire.trade.reverseProductType' is allowed!
 			Offer offer = trader.createReverseOffer(user, reversedArticles, offerIDPrefix);
 
 			offer.validate();
@@ -849,57 +707,15 @@ implements SessionBean
 		}
 	}
 
-//	/**
-//	 * In order to reverse an <code>Article</code>, you need to create a new "negative" or "inversed"
-//	 * <code>Article</code>. This is done by this method: It creates a new <code>Article</code> within
-//	 * the specified {@link Offer} reversing the specified <code>Article</code>.
-//	 *
-//	 * @param offerID The offerID which defines the {@link Offer} in which to create the new <code>Article</code>.
-//	 * @param reversedArticleID The ID of the original <code>Article</code> that shall be reversed.
-//	 * @param get Whether or not to return a detached <code>Article</code>.
-//	 * @return Returns the newly created reversing Article or <code>null</code>, depending on <code>get</code>.
-//	 * @throws ModuleException
-//	 *
-//	 * @ejb.interface-method
-//	 * @ejb.permission role-name="TradeManager-write"
-//	 * @ejb.transaction type="Required"
-//	 **/
-//	public Article reverseArticle(
-//			OfferID offerID, ArticleID reversedArticleID, boolean get, String[] fetchGroups, int maxFetchDepth)
-//	throws ModuleException
-//	{
-//		PersistenceManager pm = getPersistenceManager();
-//		try {
-//			pm.getExtent(Offer.class);
-//			pm.getExtent(Article.class);
-//			User user = User.getUser(pm, getPrincipal());
-//			Offer offer = (Offer) pm.getObjectById(offerID);
-//			Article reversedArticle = (Article) pm.getObjectById(reversedArticleID);
-//
-//			Article article = Trader.getTrader(pm).reverseArticle(user, offer, reversedArticle);
-//
-//			if (!get)
-//				return null;
-//
-//			if (fetchGroups != null)
-//				pm.getFetchPlan().setGroups(fetchGroups);
-//
-//			return (Article)pm.detachCopy(article);
-//		} finally {
-//			pm.close();
-//		}
-//	}
-
-
 	/**
 	 * This method delegates to
-	 * {@link LegalEntity#getAnonymousCustomer(PersistenceManager)}.
+	 * {@link LegalEntity#getAnonymousLegalEntity(PersistenceManager)}.
 	 *
 	 * @ejb.interface-method
-	 * @ejb.permission role-name="_Guest_"
+	 * @ejb.permission role-name="_Guest_" // I think it's OK if everyone can read the anonymous business partner. Marco.
 	 * @ejb.transaction type="Required"
 	 */
-	public LegalEntity getAnonymousCustomer(String[] fetchGroups, int maxFetchDepth)
+	public LegalEntity getAnonymousLegalEntity(String[] fetchGroups, int maxFetchDepth)
 	throws ModuleException
 	{
 		PersistenceManager pm = getPersistenceManager();
@@ -908,7 +724,7 @@ implements SessionBean
 			if (fetchGroups != null)
 				pm.getFetchPlan().setGroups(fetchGroups);
 
-			LegalEntity le = LegalEntity.getAnonymousCustomer(pm);
+			LegalEntity le = LegalEntity.getAnonymousLegalEntity(pm);
 			return pm.detachCopy(le);
 		} finally {
 			pm.close();
@@ -920,7 +736,7 @@ implements SessionBean
 	 * {@link OrganisationLegalEntity#getOrganisationLegalEntity(PersistenceManager, String)}.
 	 *
 	 * @ejb.interface-method
-	 * @ejb.permission role-name="_Guest_"
+	 * @ejb.permission role-name="_Guest_" // At least for now, it's IMHO OK to make this information public. Marco.
 	 * @ejb.transaction type="Required"
 	 */
 	public OrganisationLegalEntity getOrganisationLegalEntity(
@@ -952,7 +768,7 @@ implements SessionBean
 	 * @return Returns instances of {@link Order}.
 	 *
 	 * @ejb.interface-method
-	 * @ejb.permission role-name="_Guest_"
+	 * @ejb.permission role-name="org.nightlabs.jfire.trade.queryOrders"
 	 * @!ejb.transaction type="Supports" @!This usually means that no transaction is opened which is significantly faster and recommended for all read-only EJB methods! Marco.
 	 */
 	public List<OrderID> getOrderIDs(AnchorID vendorID, AnchorID customerID, long rangeBeginIdx, long rangeEndIdx)
@@ -967,7 +783,7 @@ implements SessionBean
 
 	/**
 	 * @ejb.interface-method
-	 * @ejb.permission role-name="_Guest_"
+	 * @ejb.permission role-name="org.nightlabs.jfire.trade.queryOrders"
 	 * @!ejb.transaction type="Supports" @!This usually means that no transaction is opened which is significantly faster and recommended for all read-only EJB methods! Marco.
 	 */
 	public List<Order> getOrders(Set<OrderID> orderIDs, String[] fetchGroups, int maxFetchDepth)
@@ -1452,7 +1268,7 @@ implements SessionBean
 			Trader trader = Trader.getTrader(pm);
 
 			// ensure that the anonymous customer exists
-			LegalEntity.getAnonymousCustomer(pm);
+			LegalEntity.getAnonymousLegalEntity(pm);
 
 			// persist process definitions
 			ProcessDefinition processDefinitionOfferCustomer;

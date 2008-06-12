@@ -4,21 +4,37 @@
 		xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
 		xsi:schemaLocation="urn:jfire.org:jfire-security_1_0 https://www.jfire.org/schema/jfire-security_1_0.xsd "
 >
-		<role-group id="TradeTemp">
-			<description>This is a temporary rolegroup - we will configure proper roles when all is complete.</description>
-		</role-group>
+	<role-group id="org.nightlabs.jfire.trade.seeProductType">
+		<name>See product types</name>
+		<description>See product types with all their properties.</description>
+	</role-group>
 
-		<role-group id="org.nightlabs.jfire.trade.seeProductType">
-			<name>See product types</name>
-			<description>See product types with all their properties.</description>
-		</role-group>
+	<role-group id="org.nightlabs.jfire.trade.sellProductType">
+	</role-group>
 
-		<role-group id="org.nightlabs.jfire.trade.sellProductType">
-		</role-group>
+	<role-group id="org.nightlabs.jfire.trade.reverseProductType">
+		<role id="org.nightlabs.jfire.trade.reverseProductType"/>
+	</role-group>
 
-		<role-group id="org.nightlabs.jfire.trade.reverseProductType">
-		</role-group>
+	<role-group id="org.nightlabs.jfire.trade.editUnconfirmedProductType">
+	</role-group>
 
-		<role-group id="org.nightlabs.jfire.trade.editProductType">
-		</role-group>
+	<role-group id="org.nightlabs.jfire.trade.editConfirmedProductType">
+	</role-group>
+
+	<role-group id="org.nightlabs.jfire.trade.createOrder">
+		<role id="org.nightlabs.jfire.trade.createOrder"/>
+	</role-group>
+
+	<role-group id="org.nightlabs.jfire.trade.createOffer">
+		<role id="org.nightlabs.jfire.trade.createOffer"/>
+	</role-group>
+
+	<role-group id="org.nightlabs.jfire.trade.queryOffers">
+		<role id="org.nightlabs.jfire.trade.queryOffers"/>
+	</role-group>
+
+	<role-group id="org.nightlabs.jfire.trade.queryOrders">
+		<role id="org.nightlabs.jfire.trade.queryOrders"/>
+	</role-group>
 </jfire-security>

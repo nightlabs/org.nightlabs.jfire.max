@@ -87,10 +87,9 @@ implements SessionBean
 	}
 
 	/**
-	 * @see javax.ejb.SessionBean#ejbRemove()
-	 * 
 	 * @ejb.permission unchecked="true"
 	 */
+	@Override
 	public void ejbRemove() throws EJBException, RemoteException
 	{
 	}

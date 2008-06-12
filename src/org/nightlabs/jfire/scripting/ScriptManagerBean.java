@@ -32,6 +32,7 @@ import java.util.Collection;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Set;
 
 import javax.ejb.CreateException;
 import javax.ejb.EJBException;
@@ -302,8 +303,7 @@ implements SessionBean
 	 */
 	public Collection<ScriptParameterSet> getScriptParameterSets(
 			String organisationID,
-			String[] fetchGroups, int maxFetchDepth
-		)
+			String[] fetchGroups, int maxFetchDepth)
 	{
 		PersistenceManager pm;
 		pm = getPersistenceManager();
@@ -319,6 +319,25 @@ implements SessionBean
 				result.add(paramSet);
 			}
 			return result;
+		} finally {
+			pm.close();
+		}
+	}
+	
+	/**
+	 * @throws ModuleException
+	 *
+	 * @ejb.interface-method
+	 * @ejb.permission role-name="_Guest_"
+	 * @ejb.transaction type="Required"
+	 */
+	public Set<ScriptParameterSetID> getAllScriptParameterSetIDs(String organisationID)
+	{
+		PersistenceManager pm;
+		pm = getPersistenceManager();
+		try {
+			Collection paramSets = ScriptParameterSet.getParameterSetsByOrganisation(pm, organisationID);
+			return NLJDOHelper.getObjectIDSet(paramSets);
 		} finally {
 			pm.close();
 		}

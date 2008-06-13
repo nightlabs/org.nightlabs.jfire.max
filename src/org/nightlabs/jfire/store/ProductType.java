@@ -958,6 +958,7 @@ implements
 	{
 		return getFieldMetaData(fieldName, true);
 	}
+	
 	public org.nightlabs.inheritance.FieldMetaData getFieldMetaData(String fieldName, boolean createMissingMetaData)
 	{
 		if (isClosed())
@@ -970,9 +971,9 @@ implements
 			return null;
 
 // TODO the below checks for localAccountantDelegate and localStorekeeperDelegate should be removed after a few months transition time.
-		if ("localAccountantDelegate".equals(fieldName))
+		if (ProductTypeLocal.FieldName.localAccountantDelegate.equals(fieldName))
 			throw new IllegalArgumentException("The field 'localAccountantDelegate' has been moved to ProductTypeLocal!");
-		if ("localStorekeeperDelegate".equals(fieldName))
+		if (ProductTypeLocal.FieldName.localStorekeeperDelegate.equals(fieldName))
 			throw new IllegalArgumentException("The field 'localStorekeeperDelegate' has been moved to ProductTypeLocal!");
 // END to do
 
@@ -983,31 +984,32 @@ implements
 			throw new IllegalArgumentException("The field 'nestedProductTypeLocals' is in class ProductTypeLocal!");
 // END to do
 
-		if ("productTypeLocal".equals(fieldName))
-			return new StaticFieldMetaData("productTypeLocal");
+		if (FieldName.productTypeLocal.equals(fieldName))
+			return new StaticFieldMetaData(FieldName.productTypeLocal);
 
 		synchronized (nonInheritableFields) {
 			if (nonInheritableFields.isEmpty()) {
 				// PK fields
-				nonInheritableFields.add("organisationID");
-				nonInheritableFields.add("productTypeID");
+				nonInheritableFields.add(FieldName.organisationID);
+				nonInheritableFields.add(FieldName.productTypeID);
+				// TODO this field doesn't exist anymore, right?
 				nonInheritableFields.add("primaryKey");
 
 				// other fields
-				nonInheritableFields.add("closed");
-				nonInheritableFields.add("confirmed");
-				nonInheritableFields.add("fieldMetaDataMap");
-				nonInheritableFields.add("extendedProductType");
-				nonInheritableFields.add("inheritanceNature");
-				nonInheritableFields.add("managedProductTypeGroup");
-				nonInheritableFields.add("packageNature");
-				nonInheritableFields.add("productAvailable");
-				nonInheritableFields.add("productTypeGroups");
+				nonInheritableFields.add(FieldName.closed);
+				nonInheritableFields.add(FieldName.confirmed);
+				nonInheritableFields.add(FieldName.fieldMetaDataMap);
+				nonInheritableFields.add(FieldName.extendedProductType);
+				nonInheritableFields.add(FieldName.inheritanceNature);
+				nonInheritableFields.add(FieldName.managedProductTypeGroup);
+				nonInheritableFields.add(FieldName.packageNature);
+				nonInheritableFields.add(FieldName.productAvailable);
+				nonInheritableFields.add(FieldName.productTypeGroups);
 //				nonInheritableFields.add("productTypeLocal");
-				nonInheritableFields.add("published");
-				nonInheritableFields.add("saleable");
-				nonInheritableFields.add("extendedProductTypeID");
-				nonInheritableFields.add("extendedProductTypeID_detached");
+				nonInheritableFields.add(FieldName.published);
+				nonInheritableFields.add(FieldName.saleable);
+				nonInheritableFields.add(FieldName.extendedProductTypeID);
+				nonInheritableFields.add(FieldName.extendedProductTypeID_detached);
 //				nonInheritableFields.add("packagePriceConfig");
 			}
 
@@ -1031,10 +1033,10 @@ implements
 
 	public FieldInheriter getFieldInheriter(String fieldName)
 	{
-		if ("productTypeLocal".equals(fieldName))
+		if (FieldName.productTypeLocal.equals(fieldName))
 			return new JDOInheritableFieldInheriter();
 
-		if ("name".equals(fieldName))
+		if (FieldName.name.equals(fieldName))
 			return new JDOInheritableFieldInheriter();
 
 		return new JDOSimpleFieldInheriter();

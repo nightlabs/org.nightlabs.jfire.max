@@ -152,11 +152,10 @@ implements Serializable, ArticleContainer, Statable, DetachCallback
 	 * @param rangeEndIdx Either -1, if no range shall be specified, or a positive number (incl. 0) defining the index where the range shall end (exclusive).
 	 * @return Returns instances of {@link Invoice}.
 	 */
-	@SuppressWarnings("unchecked")
 	public static List<InvoiceID> getInvoiceIDs(PersistenceManager pm, AnchorID vendorID, AnchorID customerID, long rangeBeginIdx, long rangeEndIdx)
 	{
 		Query query = pm.newNamedQuery(Invoice.class, "getInvoiceIDsByVendorAndCustomer");
-		Map params = new HashMap();
+		Map<String, Object> params = new HashMap<String, Object>();
 		params.put("paramVendorID_organisationID", vendorID.organisationID);
 		params.put("paramVendorID_anchorID", vendorID.anchorID);
 		params.put("paramCustomerID_organisationID", customerID.organisationID);
@@ -165,19 +164,19 @@ implements Serializable, ArticleContainer, Statable, DetachCallback
 		if (rangeBeginIdx >= 0 && rangeEndIdx >= 0)
 			query.setRange(rangeBeginIdx, rangeEndIdx);
 
-		return (List<InvoiceID>) query.executeWithMap(params);
+		return CollectionUtil.castList((List<?>) query.executeWithMap(params));
 	}
 
-	public static List getNonFinalizedInvoices(PersistenceManager pm, AnchorID vendorID, AnchorID customerID)
+	public static List<Invoice> getNonFinalizedInvoices(PersistenceManager pm, AnchorID vendorID, AnchorID customerID)
 	{
 		Query query = pm.newNamedQuery(Invoice.class, "getNonFinalizedInvoicesByVendorAndCustomer");
-		Map params = new HashMap();
+		Map<String, Object> params = new HashMap<String, Object>();
 		params.put("paramVendorID_organisationID", vendorID.organisationID);
 		params.put("paramVendorID_anchorID", vendorID.anchorID);
 		params.put("paramCustomerID_organisationID", customerID.organisationID);
 		params.put("paramCustomerID_anchorID", customerID.anchorID);
 
-		return (List) query.executeWithMap(params);
+		return CollectionUtil.castList((List<?>) query.executeWithMap(params));
 	}
 
 	/**

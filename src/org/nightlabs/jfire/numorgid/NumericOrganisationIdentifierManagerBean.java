@@ -14,6 +14,7 @@ import org.nightlabs.jfire.idgenerator.IDGenerator;
 import org.nightlabs.jfire.idgenerator.IDNamespace;
 import org.nightlabs.jfire.idgenerator.id.IDNamespaceID;
 import org.nightlabs.jfire.numorgid.id.NumericOrganisationIdentifierID;
+import org.nightlabs.jfire.organisation.id.OrganisationID;
 import org.nightlabs.jfire.security.User;
 
 /**
@@ -55,6 +56,12 @@ implements SessionBean
 
 			if (! localOrganisationID.equals(rootOrganisationID))
 				throw new IllegalStateException("You must not call this method for any other organisation than the root organisation. I am " + localOrganisationID + " - ask " + rootOrganisationID);
+
+			try {
+				pm.getObjectById(OrganisationID.create(clientOrganisationID));
+			} catch (JDOObjectNotFoundException x) {
+				throw new IllegalStateException("There is no Organisation object existing for: " + clientOrganisationID);
+			}
 
 			NumericOrganisationIdentifierID numericOrganisationIdentifierID = NumericOrganisationIdentifierID.create(clientOrganisationID);
 			try {

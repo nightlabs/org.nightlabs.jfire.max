@@ -8,14 +8,12 @@ import javax.ejb.SessionBean;
 import javax.ejb.SessionContext;
 import javax.jdo.JDOObjectNotFoundException;
 import javax.jdo.PersistenceManager;
-import javax.naming.InitialContext;
 
 import org.nightlabs.jfire.base.BaseSessionBeanImpl;
 import org.nightlabs.jfire.idgenerator.IDGenerator;
 import org.nightlabs.jfire.idgenerator.IDNamespace;
 import org.nightlabs.jfire.idgenerator.id.IDNamespaceID;
 import org.nightlabs.jfire.numorgid.id.NumericOrganisationIdentifierID;
-import org.nightlabs.jfire.organisation.Organisation;
 import org.nightlabs.jfire.security.User;
 
 /**
@@ -42,7 +40,8 @@ implements SessionBean
 	 * @ejb.permission role-name="_Guest_"
 	 * @ejb.transaction type="Required"
 	 **/
-	public int getNumericOrganisationID() {
+	public int getNumericOrganisationID()
+	{
 		PersistenceManager pm = getPersistenceManager();
 		try {
 			String clientOrganisationID = getUserID();
@@ -52,17 +51,7 @@ implements SessionBean
 			clientOrganisationID = clientOrganisationID.substring(User.USERID_PREFIX_TYPE_ORGANISATION.length());
 
 			String localOrganisationID = getOrganisationID();
-			String rootOrganisationID;
-			try {
-				InitialContext initialContext = new InitialContext();
-				try {
-					rootOrganisationID = Organisation.getRootOrganisationID(initialContext);
-				} finally {
-					initialContext.close();
-				}
-			} catch (Exception x) {
-				throw new RuntimeException("Acquiring the rootOrganisationID failed.");
-			}
+			String rootOrganisationID = getRootOrganisationID();
 
 			if (! localOrganisationID.equals(rootOrganisationID))
 				throw new IllegalStateException("You must not call this method for any other organisation than the root organisation. I am " + localOrganisationID + " - ask " + rootOrganisationID);
@@ -82,12 +71,11 @@ implements SessionBean
 			NumericOrganisationIdentifier numericOrganisationIdentifier = new NumericOrganisationIdentifier(clientOrganisationID, (int) id);
 			numericOrganisationIdentifier = pm.makePersistent(numericOrganisationIdentifier);
 			return numericOrganisationIdentifier.getNumericOrganisationID();
-			
 		} finally {
 			pm.close();
 		}
 	}
-	
+
 	/**
 	 * Initialises an organisation datastore to be used with numeric organisation IDs.
 	 * 
@@ -95,22 +83,16 @@ implements SessionBean
 	 * @ejb.permission role-name="_System_"
 	 * @ejb.transaction type="Required"
 	 */
-	public void initialise() {
+	public void initialise()
+	{
 		PersistenceManager pm = getPersistenceManager();
 		try {
 			String localOrganisationID = getOrganisationID();
-			String rootOrganisationID;
-			try {
-				InitialContext initialContext = new InitialContext();
-				try {
-					rootOrganisationID = Organisation.getRootOrganisationID(initialContext);
-				} finally {
-					initialContext.close();
-				}
-			} catch (Exception x) {
-				throw new RuntimeException("Acquiring the rootOrganisationID failed.");
-			}
-			
+			String rootOrganisationID = getRootOrganisationID();
+
+			if (! localOrganisationID.equals(rootOrganisationID))
+				return; // We only want to assign a numeric organisation ID for the root organisation
+
 			// Set conservative settings for the ID generator to not waste numeric organisation IDs due to the caching strategy
 			IDNamespace idNamespace;
 			try {
@@ -124,14 +106,10 @@ implements SessionBean
 				idNamespace = pm.makePersistent(idNamespace);
 			}
 
-			if (! localOrganisationID.equals(rootOrganisationID))
-				return; // We only want to assign a numeric organisation ID for the root organisation
-			
 			try {
 				NumericOrganisationIdentifierID numericOrganisationIdentifierID = NumericOrganisationIdentifierID.create(rootOrganisationID);
 				pm.getObjectById(numericOrganisationIdentifierID);
-				// if the id already exists, we simply return since the init has already happened once.
-				return;
+				// if the id already exists, there's nothing to do
 			} catch (JDOObjectNotFoundException x) {
 				// otherwise we create it
 				NumericOrganisationIdentifier numericOrganisationIdentifier = new NumericOrganisationIdentifier(rootOrganisationID, NumericOrganisationIdentifier.ROOT_ORGANISATION_NUMERIC_ORGANISATION_ID);
@@ -141,32 +119,27 @@ implements SessionBean
 			pm.close();
 		}
 	}
-	
-	/**
-	 * @see org.nightlabs.jfire.base.BaseSessionBeanImpl#setSessionContext(javax.ejb.SessionContext)
-	 */
+
 	@Override
 	public void setSessionContext(SessionContext sessionContext)
 	throws EJBException, RemoteException
 	{
 		super.setSessionContext(sessionContext);
 	}
-	/**
-	 * @see org.nightlabs.jfire.base.BaseSessionBeanImpl#unsetSessionContext()
-	 */
 	@Override
 	public void unsetSessionContext() {
 		super.unsetSessionContext();
 	}
-	
+
 	/**
 	 * @ejb.create-method
 	 * @ejb.permission role-name="_Guest_"
 	 */
 	public void ejbCreate() throws CreateException { }
-	
+
 	/**
 	 * @ejb.permission unchecked="true"
 	 */
+	@Override
 	public void ejbRemove() throws EJBException, RemoteException { }
 }

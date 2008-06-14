@@ -37,7 +37,11 @@ public class NumericOrganisationIdentifier {
 	 * i.e. "zzzz" => {@link Base62Coder}) and defines the highest possible value for a numeric organisation ID.
 	 */
 	public static final int MAX_NUMERIC_ORGANISATION_ID = 14776335;
-	
+
+	/**
+	 * The root organisation has by definition the numeric id 0 and this constant can be used to access it - hard-coding
+	 * values is bad practice!
+	 */
 	public static final int ROOT_ORGANISATION_NUMERIC_ORGANISATION_ID = 0;
 
 	/**

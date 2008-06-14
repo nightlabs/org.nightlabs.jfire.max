@@ -13,6 +13,5 @@
 	</init>
 	<init
 		bean="jfire/ejb/JFireGeography/GeographyTemplateDataManager"
-		method="initialiseJDOLifecycleListeners"
-		priority="980" />
+		method="initialiseJDOLifecycleListeners" />
 </organisation-initialisation>

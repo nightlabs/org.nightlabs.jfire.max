@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE cross-organisation-registration-initialisation
+		PUBLIC "-//NightLabs GmbH//DTD Organisation Initialisation 1.0//EN"
+		"http://www.nightlabs.de/dtd/cross-organisation-registration-init_1_0.dtd">
+<cross-organisation-registration-initialisation>
+  <init
+		bean="jfire/ejb/JFireGeography/GeographyTemplateDataManager"
+		method="initialiseJDOLifecycleListeners" />
+</cross-organisation-registration-initialisation>

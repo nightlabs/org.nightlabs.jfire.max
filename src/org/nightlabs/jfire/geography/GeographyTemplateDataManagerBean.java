@@ -52,6 +52,7 @@ import org.nightlabs.jdo.moduleregistry.ModuleMetaData;
 import org.nightlabs.jfire.asyncinvoke.AsyncInvoke;
 import org.nightlabs.jfire.asyncinvoke.Invocation;
 import org.nightlabs.jfire.base.BaseSessionBeanImpl;
+import org.nightlabs.jfire.crossorganisationregistrationinit.Context;
 import org.nightlabs.jfire.geography.id.CSVID;
 import org.nightlabs.jfire.geography.id.CityID;
 import org.nightlabs.jfire.geography.id.CountryID;
@@ -65,6 +66,7 @@ import org.nightlabs.jfire.jdo.notification.persistent.PersistentNotificationEJB
 import org.nightlabs.jfire.jdo.notification.persistent.SubscriptionUtil;
 import org.nightlabs.jfire.jdo.notification.persistent.id.NotificationReceiverID;
 import org.nightlabs.jfire.organisation.Organisation;
+import org.nightlabs.jfire.organisation.id.OrganisationID;
 import org.nightlabs.util.IOUtil;
 import org.nightlabs.version.MalformedVersionException;
 
@@ -81,14 +83,7 @@ public abstract class GeographyTemplateDataManagerBean
 extends BaseSessionBeanImpl
 implements SessionBean
 {
-	/**
-	 * 
-	 */
 	private static final long serialVersionUID = 1L;
-
-	/**
-	 * LOG4J logger used by this class
-	 */
 	private static final Logger logger = Logger.getLogger(GeographyTemplateDataManagerBean.class);
 
 	private static final String COUNTRY_CSV_HEADER = "CountryID;LanguageID;CountryName\n";
@@ -96,10 +91,7 @@ implements SessionBean
 	private static final String CITY_CSV_HEADER = "CountryID;CityID;RegionID;LanguageID;CityName\n";
 	private static final String LOCATION_CSV_HEADER = "CountryID;LocationID;CityID;DistrictID;LanguageID;LocationName\n";
 	private static final String DISTRICT_CSV_HEADER = "CountryID;CityID;DistrictID;LanguageID;DistrictName;Latitute;Longitude\n";
-	
-	/**
-	 * @see org.nightlabs.jfire.base.BaseSessionBeanImpl#setSessionContext(javax.ejb.SessionContext)
-	 */
+
 	@Override
 	public void setSessionContext(SessionContext sessionContext)
 	throws EJBException, RemoteException
@@ -107,9 +99,6 @@ implements SessionBean
 		logger.debug(this.getClass().getName() + ".setSessionContext("+sessionContext+")");
 		super.setSessionContext(sessionContext);
 	}
-	/**
-	 * @see org.nightlabs.jfire.base.BaseSessionBeanImpl#unsetSessionContext()
-	 */
 	@Override
 	public void unsetSessionContext() {
 		super.unsetSessionContext();
@@ -124,31 +113,48 @@ implements SessionBean
 		logger.debug(this.getClass().getName() + ".ejbCreate()");
 	}
 	/**
-	 * @see javax.ejb.SessionBean#ejbRemove()
-	 * 
 	 * @ejb.permission unchecked="true"
 	 */
+	@Override
 	public void ejbRemove() throws EJBException, RemoteException
 	{
 		logger.debug(this.getClass().getName() + ".ejbRemove()");
 	}
 
-	/**
-	 * @see javax.ejb.SessionBean#ejbActivate()
-	 */
+	@Override
 	public void ejbActivate() throws EJBException, RemoteException
 	{
 		logger.debug(this.getClass().getName() + ".ejbActivate()");
 	}
-	/**
-	 * @see javax.ejb.SessionBean#ejbPassivate()
-	 */
+	@Override
 	public void ejbPassivate() throws EJBException, RemoteException
 	{
 		logger.debug(this.getClass().getName() + ".ejbPassivate()");
 	}
 
 	/**
+	 * This cross-organisation-registration-init is executed every time the organisation
+	 * registers another organisation, but it only does sth. if the other organisation
+	 * is the root-organisation. In this case, it executes {@link #initialiseJDOLifecycleListeners()}.
+	 *
+	 * @ejb.interface-method
+	 * @ejb.transaction type="Required"
+	 * @ejb.permission role-name="_System_"
+	 */
+	public void initialiseJDOLifecycleListeners(Context context)
+	throws Exception
+	{
+		if (context.getOtherOrganisationID().equals(getRootOrganisationID()))
+			initialiseJDOLifecycleListeners();
+		else
+			logger.info("initialiseJDOLifecycleListeners: Other organisation is not the root organisation => nothing to do.");
+	}
+
+	/**
+	 * This organisation-init method is executed on every startup in case the Geography module has been deployed
+	 * into an existing server and the organisation is already registered at the root-organisation. In this
+	 * case {@link #initialiseJDOLifecycleListeners(Context)} is never called. 
+	 *
 	 * @ejb.interface-method
 	 * @ejb.transaction type="Required"
 	 * @ejb.permission role-name="_System_"
@@ -171,9 +177,16 @@ implements SessionBean
 				logger.info("initialiseJDOLifecycleListeners: NotificationReceiver for CSV changes in the root organisation has already been registered. Skipping!");
 				return; // it exists already => doing nothing
 			} catch (JDOObjectNotFoundException x) {
-				// fine, it doesn't exist => register the persistent lifecycle listener
+				// it doesn't exist => register the persistent lifecycle listener
 			}
 
+			// check if the root-organisation is already registered
+			try {
+				pm.getObjectById(OrganisationID.create(rootOrganisationID));
+			} catch (JDOObjectNotFoundException x) {
+				logger.info("initialiseJDOLifecycleListeners: NotificationReceiver does not yet exist, but I cannot register the JDO lifecycle listener in the root organisation, because the root organisation is not yet registered.");
+				return;
+			}
 			logger.info("initialiseJDOLifecycleListeners: NotificationReceiver does not yet exist. Will register persistent JDO lifecycle listener in root organisation and persist NotificationReceiver now.");
 
 			GeographyTemplateDataNotificationFilter notificationFilter = new GeographyTemplateDataNotificationFilter(

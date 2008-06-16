@@ -846,6 +846,12 @@ implements SessionBean
 			// Create the resolutions
 			IssueResolution issueResolution;
 			
+			issueResolution = new IssueResolution(getOrganisationID(), IssueResolution.ISSUE_RESOLUTION_ID_NOT_ASSIGNED.issueResolutionID);
+			issueResolution.getName().setText(Locale.ENGLISH.getLanguage(), "Not assigned");
+			issueResolution = pm.makePersistent(issueResolution);
+			issueType.getIssueResolutions().add(issueResolution);
+			issueType2.getIssueResolutions().add(issueResolution);
+			
 			issueResolution = new IssueResolution(getOrganisationID(), "Open");
 			issueResolution.getName().setText(Locale.ENGLISH.getLanguage(), "Open");
 			issueResolution = pm.makePersistent(issueResolution);

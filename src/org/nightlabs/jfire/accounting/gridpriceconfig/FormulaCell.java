@@ -127,8 +127,9 @@ public class FormulaCell implements Serializable
 	}
 
 	/**
-	 * @!jdo.field persistence-modifier="persistent" null-value="exception"
-	 * TODO DataNucleus workaround: the above null-value="exception" is correct but causes exceptions during cross-datastore-replication 
+	 * This field is <code>null</code>, if this is the fallbackFormulaCell of a FormulaPriceConfig
+	 * (see {@link #FormulaCell(PriceConfig)} below).
+	 * 
 	 * @jdo.field persistence-modifier="persistent"
 	 */
 	private PriceCoordinate priceCoordinate;
@@ -140,14 +141,18 @@ public class FormulaCell implements Serializable
 	protected FormulaCell() { }
 
 	/**
-	 * This constructor is used for the <tt>FormulaConfig.fallbackFormulaCell</tt>,
+	 * This constructor is used for the <tt>FormulaPriceConfig.fallbackFormulaCell</tt>,
 	 * which doesn't have a <tt>PriceCoordinate</tt>.
 	 *
-	 * @param priceConfig The <tt>FormulaPriceConfig</tt> which created this cell.
+	 * @param priceConfig the <tt>FormulaPriceConfig</tt> which created this cell.
 	 */
 	public FormulaCell(PriceConfig priceConfig)
 	{
 		this.priceConfig = priceConfig;
+
+		if (!(this.priceConfig instanceof FormulaPriceConfig))
+			throw new IllegalArgumentException("priceConfig must be an instance of FormulaPriceConfig but is not! " + this.priceConfig);
+
 		this.organisationID = priceConfig.getOrganisationID();
 		this.priceConfigID = priceConfig.getPriceConfigID();
 		this.formulaID = priceConfig.createPriceID();
@@ -157,6 +162,10 @@ public class FormulaCell implements Serializable
 	public FormulaCell(PriceCoordinate priceCoordinate)
 	{
 		this.priceConfig = priceCoordinate.getPriceConfig();
+
+		if (!(this.priceConfig instanceof FormulaPriceConfig))
+			throw new IllegalArgumentException("priceCoordinate.priceConfig must be an instance of FormulaPriceConfig but is not! " + this.priceConfig);
+
 		this.organisationID = priceConfig.getOrganisationID();
 		this.priceConfigID = priceConfig.getPriceConfigID();
 		this.formulaID = priceConfig.createPriceID();

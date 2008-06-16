@@ -2,6 +2,9 @@ package org.nightlabs.jfire.issue;
 
 import java.io.Serializable;
 
+import org.nightlabs.jfire.issue.id.IssueLinkTypeID;
+import org.nightlabs.jfire.issue.id.IssueResolutionID;
+import org.nightlabs.jfire.organisation.Organisation;
 import org.nightlabs.util.Util;
 
 /**
@@ -21,12 +24,11 @@ import org.nightlabs.util.Util;
  * @jdo.fetch-group name="IssueResolution.this" fetch-groups="default" fields="name"
  */
 public class IssueResolution
-implements Serializable{
-	/**
-	 * @deprecated The *.this-FetchGroups lead to bad programming style and are therefore deprecated, now. They should be removed soon! 
-	 */
-	public static final String FETCH_GROUP_THIS_ISSUE_RESOLUTION = "IssueResolution.this";
+implements Serializable
+{
 	public static final String FETCH_GROUP_NAME = "IssueResolution.name";
+	
+	public static final IssueResolutionID ISSUE_RESOLUTION_ID_NOT_ASSIGNED = IssueResolutionID.create(Organisation.DEV_ORGANISATION_ID, "Not assigned");
 	
 	private static final long serialVersionUID = 1L;
 	/**

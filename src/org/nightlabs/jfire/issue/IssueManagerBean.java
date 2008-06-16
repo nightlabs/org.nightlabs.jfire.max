@@ -845,13 +845,36 @@ implements SessionBean
 			
 			// Create the resolutions
 			IssueResolution issueResolution;
+			
+			issueResolution = new IssueResolution(getOrganisationID(), "Open");
+			issueResolution.getName().setText(Locale.ENGLISH.getLanguage(), "Open");
+			issueResolution = pm.makePersistent(issueResolution);
+			issueType.getIssueResolutions().add(issueResolution);
+			issueType2.getIssueResolutions().add(issueResolution);
 
-			issueResolution = new IssueResolution(getOrganisationID(), "Fix");
-			issueResolution.getName().setText(Locale.ENGLISH.getLanguage(), "Fix");
+			issueResolution = new IssueResolution(getOrganisationID(), "Fixed");
+			issueResolution.getName().setText(Locale.ENGLISH.getLanguage(), "Fixed");
 			issueResolution = pm.makePersistent(issueResolution);
 			issueType.getIssueResolutions().add(issueResolution);
 			issueType2.getIssueResolutions().add(issueResolution);
 			
+			issueResolution = new IssueResolution(getOrganisationID(), "Reopened");
+			issueResolution.getName().setText(Locale.ENGLISH.getLanguage(), "Reopened");
+			issueResolution = pm.makePersistent(issueResolution);
+			issueType.getIssueResolutions().add(issueResolution);
+			issueType2.getIssueResolutions().add(issueResolution);
+			
+			issueResolution = new IssueResolution(getOrganisationID(), "Not fixable");
+			issueResolution.getName().setText(Locale.ENGLISH.getLanguage(), "Not fixable");
+			issueResolution = pm.makePersistent(issueResolution);
+			issueType.getIssueResolutions().add(issueResolution);
+			issueType2.getIssueResolutions().add(issueResolution);
+			
+			issueResolution = new IssueResolution(getOrganisationID(), "Won't fix");
+			issueResolution.getName().setText(Locale.ENGLISH.getLanguage(), "Won't fix");
+			issueResolution = pm.makePersistent(issueResolution);
+			issueType.getIssueResolutions().add(issueResolution);
+			issueType2.getIssueResolutions().add(issueResolution);
 			
 			// create the process definitions.
 			issueType.readProcessDefinition(IssueType.class.getResource("jbpm/status/"));

@@ -30,9 +30,11 @@ import java.io.Serializable;
 import java.util.HashMap;
 import java.util.Map;
 
+import org.nightlabs.jdo.ObjectIDUtil;
 import org.nightlabs.jfire.accounting.Price;
 import org.nightlabs.jfire.accounting.priceconfig.IPriceConfig;
 import org.nightlabs.jfire.accounting.priceconfig.PriceConfig;
+import org.nightlabs.util.Util;
 
 /**
  * @author Marco Schulze - marco at nightlabs dot de
@@ -241,5 +243,33 @@ public class PriceCell implements Serializable
 		if (priceFragmentsCalculationStatus == null)
 			priceFragmentsCalculationStatus = new HashMap();
 		priceFragmentsCalculationStatus.put(priceFragmentTypePK, status);
+	}
+
+	@Override
+	public int hashCode() {
+		final int prime = 31;
+		int result = 1;
+		result = prime * result + ((organisationID == null) ? 0 : organisationID.hashCode());
+		result = prime * result + ((priceConfigID == null) ? 0 : priceConfigID.hashCode());
+		result = prime * result + (int) (priceID ^ (priceID >>> 32));
+		return result;
+	}
+
+	@Override
+	public boolean equals(Object obj) {
+		if (this == obj) return true;
+		if (obj == null) return false;
+		if (getClass() != obj.getClass()) return false;
+		final PriceCell other = (PriceCell) obj;
+		return (
+				Util.equals(this.organisationID, other.organisationID) &&
+				Util.equals(this.priceConfigID, other.priceConfigID) &&
+				Util.equals(this.priceID, other.priceID)
+		);
+	}
+
+	@Override
+	public String toString() {
+		return this.getClass().getName() + '@' + Integer.toHexString(System.identityHashCode(this)) + '[' + organisationID + ',' + priceConfigID + ',' + ObjectIDUtil.longObjectIDFieldToString(priceID) + ']';
 	}
 }

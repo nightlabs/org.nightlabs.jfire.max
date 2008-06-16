@@ -29,6 +29,7 @@ package org.nightlabs.jfire.accounting.gridpriceconfig;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashSet;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Locale;
 import java.util.Set;
@@ -47,6 +48,7 @@ import org.nightlabs.jfire.accounting.Tariff;
 import org.nightlabs.jfire.accounting.priceconfig.AffectedProductType;
 import org.nightlabs.jfire.accounting.priceconfig.FetchGroupsPriceConfig;
 import org.nightlabs.jfire.accounting.priceconfig.IInnerPriceConfig;
+import org.nightlabs.jfire.accounting.priceconfig.IPriceConfig;
 import org.nightlabs.jfire.accounting.priceconfig.PriceConfigUtil;
 import org.nightlabs.jfire.accounting.priceconfig.id.PriceConfigID;
 import org.nightlabs.jfire.organisation.LocalOrganisation;
@@ -93,7 +95,6 @@ public class GridPriceConfigUtil
 
 		{
 			Query q = pm.newQuery(PriceCell.class);
-//			q.setResult("count(this.priceID)");
 			q.setResult("count(this)");
 			q.setFilter("this.price == null");
 			Long count = (Long) q.execute();
@@ -103,29 +104,21 @@ public class GridPriceConfigUtil
 		{
 			Query q = pm.newQuery(PriceCell.class);
 			q.setResult("count(this)");
-			q.setFilter("this.priceCoordinate == null");
-			Long count = (Long) q.execute();
-			if (count.intValue() != 0)
-				throw new IllegalStateException("Datastore is inconsistent! Found " + count + " PriceCell instances with PriceCell.priceCoordinate == null!");
-		}
-		{
-			Query q = pm.newQuery(PriceCell.class);
-			q.setResult("count(this)");
 			q.setFilter("this.priceConfig == null");
 			Long count = (Long) q.execute();
 			if (count.intValue() != 0)
 				throw new IllegalStateException("Datastore is inconsistent! Found " + count + " PriceCell instances with PriceCell.priceConfig == null!");
 		}
-
-
 		{
-			Query q = pm.newQuery(FormulaCell.class);
+			Query q = pm.newQuery(PriceCell.class);
 			q.setResult("count(this)");
 			q.setFilter("this.priceCoordinate == null");
 			Long count = (Long) q.execute();
 			if (count.intValue() != 0)
-				throw new IllegalStateException("Datastore is inconsistent! Found " + count + " FormulaCell instances with FormulaCell.priceCoordinate == null!");
+				throw new IllegalStateException("Datastore is inconsistent! Found " + count + " PriceCell instances with PriceCell.priceCoordinate == null!");
 		}
+
+
 		{
 			Query q = pm.newQuery(FormulaCell.class);
 			q.setResult("count(this)");
@@ -134,7 +127,21 @@ public class GridPriceConfigUtil
 			if (count.intValue() != 0)
 				throw new IllegalStateException("Datastore is inconsistent! Found " + count + " FormulaCell instances with FormulaCell.priceConfig == null!");
 		}
+		{
+			Query q = pm.newQuery(FormulaCell.class);
+			q.setFilter("this.priceCoordinate == null");
+			for (Iterator<?> it = ((Collection<?>)q.execute()).iterator(); it.hasNext(); ) {
+				FormulaCell formulaCell = (FormulaCell) it.next();
+				IPriceConfig pc = formulaCell.getPriceConfig();
+				if (!(pc instanceof FormulaPriceConfig))
+					throw new IllegalStateException("Datastore is inconsistent! Found a FormulaCell where FormulaCell.priceConfig is not an instance of FormulaPriceConfig, but " + (pc == null ? null : pc.getClass().getName()) + "! " + formulaCell);
 
+				FormulaPriceConfig fpc = (FormulaPriceConfig) pc;
+
+				if (!formulaCell.equals(fpc.getFallbackFormulaCell(false)))
+					throw new IllegalStateException("Datastore is inconsistent! Found a FormulaCell where thisFormulaCell.priceCoordinate is null, but thisFormulaCell.priceConfig.fallbackFormulaCell != thisFormulaCell! " + formulaCell);
+			}
+		}
 
 		long duration = System.currentTimeMillis() - start;
 		if (duration > 1000)

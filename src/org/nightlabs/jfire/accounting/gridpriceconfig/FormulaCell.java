@@ -30,9 +30,11 @@ import java.io.Serializable;
 import java.util.HashMap;
 import java.util.Map;
 
+import org.nightlabs.jdo.ObjectIDUtil;
 import org.nightlabs.jfire.accounting.PriceFragmentType;
 import org.nightlabs.jfire.accounting.id.PriceFragmentTypeID;
 import org.nightlabs.jfire.accounting.priceconfig.PriceConfig;
+import org.nightlabs.util.Util;
 
 /**
  * @author Marco Schulze - marco at nightlabs dot de
@@ -247,5 +249,34 @@ public class FormulaCell implements Serializable
 			priceFragmentFormulas.remove(priceFragmentTypePK);
 		else
 			priceFragmentFormulas.put(priceFragmentTypePK, formula);
+	}
+
+	@Override
+	public int hashCode() {
+		final int prime = 31;
+		int result = 1;
+		result = prime * result + ((organisationID == null) ? 0 : organisationID.hashCode());
+		result = prime * result + ((priceConfigID == null) ? 0 : priceConfigID.hashCode());
+		result = prime * result + (int) (formulaID ^ (formulaID >>> 32));
+		return result;
+	}
+
+	@Override
+	public boolean equals(Object obj) {
+		if (this == obj) return true;
+		if (obj == null) return false;
+		if (getClass() != obj.getClass()) return false;
+
+		final FormulaCell other = (FormulaCell) obj;
+		return (
+				Util.equals(this.organisationID, other.organisationID) &&
+				Util.equals(this.priceConfigID, other.priceConfigID) &&
+				Util.equals(this.formulaID, other.formulaID)
+		);
+	}
+
+	@Override
+	public String toString() {
+		return this.getClass().getName() + '@' + Integer.toHexString(System.identityHashCode(this)) + '[' + organisationID + ',' + priceConfigID + ',' + ObjectIDUtil.longObjectIDFieldToString(formulaID) + ']';
 	}
 }

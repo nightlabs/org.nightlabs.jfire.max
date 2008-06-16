@@ -2969,4 +2969,19 @@ public abstract class AccountingManagerBean
 			pm.close();
 		}
 	}
+	
+	/**
+	 * @ejb.interface-method
+	 * @ejb.transaction type="Required"
+	 * @ejb.permission role-name="_Guest_"
+	 */
+	public PriceFragmentType storePriceFragmentType(PriceFragmentType priceFragmentType, boolean get, String[] fetchGroups, int maxFetchDepth)
+	{
+		PersistenceManager pm = getPersistenceManager();
+		try {
+			return NLJDOHelper.storeJDO(pm, priceFragmentType, get, fetchGroups, maxFetchDepth);
+		} finally {
+			pm.close();
+		}
+	}
 }

@@ -31,7 +31,9 @@ import java.io.Serializable;
 import javax.jdo.JDOObjectNotFoundException;
 import javax.jdo.PersistenceManager;
 
+import org.nightlabs.jdo.ObjectIDUtil;
 import org.nightlabs.jfire.accounting.id.PriceFragmentTypeID;
+import org.nightlabs.jfire.idgenerator.IDGenerator;
 import org.nightlabs.jfire.organisation.Organisation;
 import org.nightlabs.util.Util;
 
@@ -71,6 +73,11 @@ public class PriceFragmentType
 	public static final String FETCH_GROUP_NAME = "PriceFragmentType.name";
 	public static final String FETCH_GROUP_CONTAINER_PRICE_FRAGMENT_TYPE = "PriceFragmentType.containerPriceFragmentType";
 
+	public static String createNextPriceFragmentTypeID()
+	{
+		return ObjectIDUtil.longObjectIDFieldToString(IDGenerator.nextID(PriceFragmentType.class));
+	}	
+	
 	/**
 	 * @jdo.field primary-key="true"
 	 * @jdo.column length="100"

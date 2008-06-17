@@ -885,7 +885,7 @@ currency.toDouble(row["amount"])</expression>
                             <text-data id="620">
                                 <property name="fontFamily">"Arial Narrow"</property>
                                 <expression name="valueExpr">account = JFireReportingHelper.getJDOObject(row["queryAccountJDOID"]);
-account.getDescription(JFireReportingHelper.getLocale()) + " (" + account.getPrimaryKey() + ")";</expression>
+account.getDescription() + " (" + account.getPrimaryKey() + ")";</expression>
                                 <property name="contentType">html</property>
                             </text-data>
                         </cell>
@@ -1044,7 +1044,7 @@ account.getDescription(JFireReportingHelper.getLocale()) + " (" + account.getPri
  ""
 else {
   account = JFireReportingHelper.getJDOObject(row["fromAnchorJDOID"]);
-  account.getDescription(JFireReportingHelper.getLocale())
+  account.getDescription()
 }</expression>
                             <property name="contentType">html</property>
                         </text-data>
@@ -1057,7 +1057,7 @@ else {
  ""
 else {
   account = JFireReportingHelper.getJDOObject(row["toAnchorJDOID"]);
-  account.getDescription(JFireReportingHelper.getLocale())
+  account.getDescription()
 }</expression>
                             <property name="contentType">html</property>
                         </text-data>

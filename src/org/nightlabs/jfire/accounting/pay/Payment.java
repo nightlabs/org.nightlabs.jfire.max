@@ -810,7 +810,7 @@ implements Serializable, StoreCallback
 // IDs for the transfer to the server - the following fields are not stored in the DB
 
 	/**
-	 * @jdo.field persistence-modifier="transactional"
+	 * @jdo.field persistence-modifier="none"
 	 */
 	private Collection invoiceIDs = null;
 
@@ -820,17 +820,17 @@ implements Serializable, StoreCallback
 	private ModeOfPaymentFlavourID modeOfPaymentFlavourID = null;
 
 	/**
-	 * @jdo.field persistence-modifier="transactional"
+	 * @jdo.field persistence-modifier="none"
 	 */
 	private CurrencyID currencyID = null;
 
 	/**
-	 * @jdo.field persistence-modifier="transactional"
+	 * @jdo.field persistence-modifier="none"
 	 */
 	private AnchorID partnerID = null;
 
 	/**
-	 * @jdo.field persistence-modifier="transactional"
+	 * @jdo.field persistence-modifier="none"
 	 */
 	private AnchorID partnerAccountID = null;
 

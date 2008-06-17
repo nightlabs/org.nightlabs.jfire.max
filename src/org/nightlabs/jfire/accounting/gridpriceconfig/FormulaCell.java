@@ -150,8 +150,8 @@ public class FormulaCell implements Serializable
 	{
 		this.priceConfig = priceConfig;
 
-		if (!(this.priceConfig instanceof FormulaPriceConfig))
-			throw new IllegalArgumentException("priceConfig must be an instance of FormulaPriceConfig but is not! " + this.priceConfig);
+		if (!(this.priceConfig instanceof IFormulaPriceConfig))
+			throw new IllegalArgumentException("priceConfig must be an instance of IFormulaPriceConfig but is not! " + this.priceConfig);
 
 		this.organisationID = priceConfig.getOrganisationID();
 		this.priceConfigID = priceConfig.getPriceConfigID();
@@ -163,8 +163,8 @@ public class FormulaCell implements Serializable
 	{
 		this.priceConfig = priceCoordinate.getPriceConfig();
 
-		if (!(this.priceConfig instanceof FormulaPriceConfig))
-			throw new IllegalArgumentException("priceCoordinate.priceConfig must be an instance of FormulaPriceConfig but is not! " + this.priceConfig);
+		if (!(this.priceConfig instanceof IFormulaPriceConfig))
+			throw new IllegalArgumentException("priceCoordinate.priceConfig must be an instance of IFormulaPriceConfig but is not! " + this.priceConfig);
 
 		this.organisationID = priceConfig.getOrganisationID();
 		this.priceConfigID = priceConfig.getPriceConfigID();

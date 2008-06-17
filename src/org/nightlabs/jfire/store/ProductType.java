@@ -1044,15 +1044,13 @@ implements
 
 	public void preInherit(Inheritable mother, Inheritable child)
 	{
-		// Tobias: This is not necessary anymore when the JDOInheritanceManager is used
-		// hmmm... JDOInheritanceManager doesn't work reliably => we need this! :-( Marco.
-		
+		// JDOInheritanceManager uses PersistenceManager.retrieve, which works often,
+		// but not reliably => we need this! :-( Marco.
+
 		// access all non-simple fields in order to ensure, they're loaded by JDO
 		if (productTypeLocal == null);
 		if (deliveryConfiguration == null);
 		if (innerPriceConfig == null);
-//		if (localAccountantDelegate == null);
-//		if (localStorekeeperDelegate == null);
 		if (packagePriceConfig == null);
 		if (owner == null);
 		if (vendor == null);

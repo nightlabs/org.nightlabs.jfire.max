@@ -30,6 +30,7 @@ import java.io.Serializable;
 import java.util.HashMap;
 import java.util.Map;
 
+import org.apache.log4j.Logger;
 import org.nightlabs.jdo.ObjectIDUtil;
 import org.nightlabs.jfire.accounting.Price;
 import org.nightlabs.jfire.accounting.priceconfig.IPriceConfig;
@@ -67,6 +68,7 @@ import org.nightlabs.util.Util;
 public class PriceCell implements Serializable
 {
 	private static final long serialVersionUID = 1L;
+	private static final Logger logger = Logger.getLogger(PriceCell.class);
 
 	public static final String FETCH_GROUP_PRICE = "PriceCell.price";
 	public static final String FETCH_GROUP_PRICE_CONFIG = "PriceCell.priceConfig";
@@ -120,6 +122,8 @@ public class PriceCell implements Serializable
 	@Deprecated
 	protected PriceCell()
 	{
+		if (logger.isDebugEnabled())
+			logger.debug("PriceCell jdo-only-constructor: " + this);
 	}
 
 	public PriceCell(IPriceCoordinate priceCoordinate)
@@ -128,6 +132,9 @@ public class PriceCell implements Serializable
 		this.organisationID = priceConfig.getOrganisationID();
 		this.priceConfigID = priceConfig.getPriceConfigID();
 		this.priceID = priceConfig.createPriceID();
+
+		if (logger.isDebugEnabled())
+			logger.debug("PriceCell manual-constructor: " + this + " priceCoordinate=" + priceCoordinate);
 
 		if (!(priceCoordinate instanceof PriceCoordinate))
 			throw new IllegalArgumentException("priceCoordinate of type \""+priceCoordinate.getClass().getName()+"\" implements IPriceCoordinate, but does NOT extend \""+PriceCoordinate.class.getName()+"\"! It MUST (directly or indirectly) extend this class!");
@@ -171,7 +178,15 @@ public class PriceCell implements Serializable
 	 */
 	public PriceCoordinate getPriceCoordinate()
 	{
-		return priceCoordinate;
+		try {	
+			return priceCoordinate;
+		} catch (Exception x) {
+			logger.info("getPriceCoordinate: " + this, x);
+			if (x instanceof RuntimeException)
+				throw (RuntimeException)x;
+			else
+				throw new RuntimeException(x);
+		}
 	}
 	/**
 	 * @return Returns the formulaID.

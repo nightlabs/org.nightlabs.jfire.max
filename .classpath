@@ -34,5 +34,9 @@
 	<classpathentry kind="var" path="ASM"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/JFireHTMLProp"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/NightLabsHTMLContent"/>
+	<classpathentry combineaccessrules="false" kind="src" path="/JFireScriptingEditor2D"/>
+	<classpathentry combineaccessrules="false" kind="src" path="/JFireVoucherEditor2D"/>
+	<classpathentry combineaccessrules="false" kind="src" path="/NightLabsEditor2D"/>
+	<classpathentry combineaccessrules="false" kind="src" path="/JFireScripting"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>

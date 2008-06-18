@@ -757,40 +757,36 @@ public PayMoneyTransfer payBegin(PayParams payParams)
 	/**
 	 * @jdo.field persistence-modifier="none"
 	 */
-	private String requirementCheckKey;
+	private CheckRequirementsResult requirementCheckResult;
 	
 	/**
-	 * This method returns null if all requirements are met and a descriptive string
+	 * This method returns null if all requirements are met and a descriptive CheckRequirementsResult
 	 * otherwise.
 	 * 
-	 * @return null if all requirements are met and a descriptive string otherwise.
+	 * @return null if all requirements are met and a descriptive CheckRequirementsResult otherwise.
 	 */
-	public String getRequirementCheckKey() {
-		return requirementCheckKey;
+	public CheckRequirementsResult getRequirementCheckResult() {
+		return requirementCheckResult;
 	}
-
-//	public void setRequirementCheckKey(String reqMsg) {
-//		this.requirementCheckKey = reqMsg;
-//	}
 
 	/**
 	 * This method is not supposed to be called from outside.
-	 * Extendors should implement {@link #_checkRequirements(CheckRequirementsEnvironment)} instead of this method.
+	 * Subclasses should implement {@link #_checkRequirements(CheckRequirementsEnvironment)} instead of this method.
 	 * @param checkRequirementsEnvironment TODO
 	 */
 	public void checkRequirements(CheckRequirementsEnvironment checkRequirementsEnvironment) {
-		requirementCheckKey = _checkRequirements(checkRequirementsEnvironment);
+		requirementCheckResult = _checkRequirements(checkRequirementsEnvironment);
 	}
 
 	/**
-	 * Extendors should override this method if their {@link ServerPaymentProcessor} if
+	 * Subclasses should override this method if their {@link ServerPaymentProcessor} if
 	 * it needs to ensure some requirements before it can be used. If everything is ok, this
 	 * method should return null. Otherwise a string describing the failure should be returned.
 	 * @param checkRequirementsEnvironment TODO
 	 * 
-	 * @return null if everything is ok, a descriptive string otherwise.
+	 * @return null if everything is ok, a descriptive CheckRequirementsResult otherwise.
 	 */
-	protected String _checkRequirements(CheckRequirementsEnvironment checkRequirementsEnvironment) {
+	protected CheckRequirementsResult _checkRequirements(CheckRequirementsEnvironment checkRequirementsEnvironment) {
 		return null;
 	}
 
@@ -803,7 +799,7 @@ public PayMoneyTransfer payBegin(PayParams payParams)
 		ServerPaymentProcessor detached = this;
 		ServerPaymentProcessor attached = (ServerPaymentProcessor) o;
 
-		detached.requirementCheckKey = attached.requirementCheckKey;
+		detached.requirementCheckResult = attached.requirementCheckResult;
 	}
 
 	@Override

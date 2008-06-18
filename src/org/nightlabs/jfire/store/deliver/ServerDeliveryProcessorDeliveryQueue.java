@@ -12,6 +12,7 @@ import org.nightlabs.jfire.organisation.Organisation;
 import org.nightlabs.jfire.security.SecurityReflector;
 import org.nightlabs.jfire.security.User;
 import org.nightlabs.jfire.store.deliver.id.ServerDeliveryProcessorID;
+import org.nightlabs.jfire.store.resource.Messages;
 import org.nightlabs.jfire.transfer.Anchor;
 
 /**
@@ -34,6 +35,8 @@ extends ServerDeliveryProcessor
 {
 	private static final Logger logger = Logger.getLogger(ServerDeliveryProcessorDeliveryQueue.class);
 
+	public static final String ERROR_CODE_NO_DELIVERY_QUEUE_DEFINED = ServerDeliveryProcessorDeliveryQueue.class.getName() + "." + "NO_DELIVERY_QUEUE_DEFINED"; //$NON-NLS-1$ //$NON-NLS-2$
+	
 	private static final long serialVersionUID = 1L;
 
 	/** @jdo.field persistence-modifier="none" */
@@ -48,7 +51,8 @@ extends ServerDeliveryProcessor
 
 		} catch (JDOObjectNotFoundException e) {
 			serverDeliveryProcessorDeliveryQueue = new ServerDeliveryProcessorDeliveryQueue(Organisation.DEV_ORGANISATION_ID,	ServerDeliveryProcessorDeliveryQueue.class.getName());
-			serverDeliveryProcessorDeliveryQueue.getName().setText(Locale.ENGLISH.getLanguage(), "Server Delivery Processor for delivering to a delivery queue");
+			serverDeliveryProcessorDeliveryQueue.getName().setText(Locale.ENGLISH.getLanguage(), "Server Delivery Processor for delivering to a delivery queue"); //$NON-NLS-1$
+			serverDeliveryProcessorDeliveryQueue.getName().setText(Locale.GERMAN.getLanguage(), "Server LieferProcessor für das Liefern in eine Lieferwarteschlange"); //$NON-NLS-1$
 
 			serverDeliveryProcessorDeliveryQueue = pm.makePersistent(serverDeliveryProcessorDeliveryQueue);
 		}
@@ -75,7 +79,7 @@ extends ServerDeliveryProcessor
 	@Implement
 	public Anchor getAnchorOutside(DeliverParams deliverParams) {
 		// I think this doesn't matter since the delivery will be postponed anyway and thus no transfer done.
-		return getRepositoryOutside(deliverParams, "anchorOutside.deliveryQueue");
+		return getRepositoryOutside(deliverParams, "anchorOutside.deliveryQueue"); //$NON-NLS-1$
 	}
 
 	@Override
@@ -84,7 +88,7 @@ extends ServerDeliveryProcessor
 		// Attach DeliveryActionHandlerDeliveryQueue
 		PersistenceManager pm = getPersistenceManager();
 		deliverParams.deliveryData.getDelivery().getDeliveryLocal().addDeliveryActionHandler(DeliveryActionHandlerDeliveryQueue.getDeliveryActionHandlerDeliveryQueue(pm));
-		logger.debug("Attached DeliveryActionHandlerDeliveryQueue to delivery '" + deliverParams.deliveryData.getDelivery().getPrimaryKey() + "'");
+		logger.debug("Attached DeliveryActionHandlerDeliveryQueue to delivery '" + deliverParams.deliveryData.getDelivery().getPrimaryKey() + "'"); //$NON-NLS-1$ //$NON-NLS-2$
 		
 		return new DeliveryResult(DeliveryResult.CODE_POSTPONED, null, null);
 	}
@@ -120,7 +124,7 @@ extends ServerDeliveryProcessor
 
 			return dData.getTargetQueue();
 		}
-		throw new IllegalArgumentException("deliveryData is not of type DeliveryDataDeliveryQueue");
+		throw new IllegalArgumentException("deliveryData is not of type DeliveryDataDeliveryQueue"); //$NON-NLS-1$
 	}
 
 	private DeliveryQueueConfigModule getDeliveryQueueConfigModule() {
@@ -134,10 +138,14 @@ extends ServerDeliveryProcessor
 	}
 
 	@Override
-	protected String _checkRequirements(CheckRequirementsEnvironment checkRequirementsEnvironment) {
+	protected CheckRequirementsResult _checkRequirements(CheckRequirementsEnvironment checkRequirementsEnvironment) {
 		DeliveryQueueConfigModule cfMod = getDeliveryQueueConfigModule();
-		if (cfMod.getVisibleDeliveryQueues().isEmpty())
-			return "No delivery queues defined.";
+		if (cfMod.getVisibleDeliveryQueues().isEmpty()) 
+		{
+			String resultCode = ERROR_CODE_NO_DELIVERY_QUEUE_DEFINED;
+			String message = Messages.getString("org.nightlabs.jfire.store.deliver.ServerDeliveryProcessorDeliveryQueue.message.noDeliveryQueueDefined"); //$NON-NLS-1$
+			return new CheckRequirementsResult(resultCode, message);
+		}
 		else
 			return null;
 	}

@@ -89,12 +89,12 @@ implements Serializable
 	 */
 	private static final long serialVersionUID = 1L;
 	
-	public static final String FETCH_GROUP_NAME = "Tariff.name";
+	public static final String FETCH_GROUP_NAME = "Tariff.name"; //$NON-NLS-1$
 
 	/**
 	 * @deprecated The *.this-FetchGroups lead to bad programming style and are therefore deprecated, now. They should be removed soon! 
 	 */
-	public static final String FETCH_GROUP_THIS_TARIFF = "Tariff.this";
+	public static final String FETCH_GROUP_THIS_TARIFF = "Tariff.this"; //$NON-NLS-1$
 
 	/**
 	 * Return a {@link Collection} of Tariffs with the given name in the given Locale language.
@@ -104,7 +104,7 @@ implements Serializable
 	 * @return a {@link Collection} of Tariffs with the given name in the given Locale language
 	 */
 	public static Collection<Tariff> getTariffByName(PersistenceManager pm, String name, Locale locale) {
-		Query q = pm.newNamedQuery(Tariff.class, "getTariffByName");
+		Query q = pm.newNamedQuery(Tariff.class, "getTariffByName"); //$NON-NLS-1$
 		return (Collection<Tariff>)q.execute(locale.getLanguage(), name);
 	}
 	

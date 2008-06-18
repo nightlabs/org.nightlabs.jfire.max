@@ -33,7 +33,7 @@ public class TariffOrderConfigModule extends ConfigModule {
 	 */
 	private Map<Tariff, Integer> tariffOrderMap = null;
 	
-	public static final String FETCH_GROUP_TARIFF_ORDER_CONFIG_MODULE = "TariffOrderConfigModule.this";
+	public static final String FETCH_GROUP_TARIFF_ORDER_CONFIG_MODULE = "TariffOrderConfigModule.this"; //$NON-NLS-1$
 
 	@Override
 	public void init() {

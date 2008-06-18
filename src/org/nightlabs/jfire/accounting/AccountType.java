@@ -29,43 +29,43 @@ implements Serializable
 {
 	private static final long serialVersionUID = 1L;
 
-	public static final String FETCH_GROUP_NAME = "AccountType.name";
+	public static final String FETCH_GROUP_NAME = "AccountType.name"; //$NON-NLS-1$
 
 	/**
 	 * anchorTypeID for revenue accounts of the local organisation.
 	 */
-	public static final AccountTypeID ACCOUNT_TYPE_ID_LOCAL_REVENUE = AccountTypeID.create(Organisation.DEV_ORGANISATION_ID, "Local.Revenue");
+	public static final AccountTypeID ACCOUNT_TYPE_ID_LOCAL_REVENUE = AccountTypeID.create(Organisation.DEV_ORGANISATION_ID, "Local.Revenue"); //$NON-NLS-1$
 
 	/**
 	 * anchorTypeID for expense accounts of the Local organisation
 	 */
-	public static final AccountTypeID ACCOUNT_TYPE_ID_LOCAL_EXPENSE = AccountTypeID.create(Organisation.DEV_ORGANISATION_ID, "Local.Expense");
+	public static final AccountTypeID ACCOUNT_TYPE_ID_LOCAL_EXPENSE = AccountTypeID.create(Organisation.DEV_ORGANISATION_ID, "Local.Expense"); //$NON-NLS-1$
 
 	/**
 	 * anchorTypeID for accounts of trading partners when they acting as vendor
 	 */
-	public static final AccountTypeID ACCOUNT_TYPE_ID_PARTNER_VENDOR = AccountTypeID.create(Organisation.DEV_ORGANISATION_ID, "Partner.Vendor");
+	public static final AccountTypeID ACCOUNT_TYPE_ID_PARTNER_VENDOR = AccountTypeID.create(Organisation.DEV_ORGANISATION_ID, "Partner.Vendor"); //$NON-NLS-1$
 	
 	/**
 	 * anchorTypeID for accounts of trading partners when they acting as customer
 	 */
-	public static final AccountTypeID ACCOUNT_TYPE_ID_PARTNER_CUSTOMER = AccountTypeID.create(Organisation.DEV_ORGANISATION_ID, "Partner.Customer");
+	public static final AccountTypeID ACCOUNT_TYPE_ID_PARTNER_CUSTOMER = AccountTypeID.create(Organisation.DEV_ORGANISATION_ID, "Partner.Customer"); //$NON-NLS-1$
 
 	/**
 	 * anchorTypeID for accounts of trading partners when they overpay multiple invoices and
 	 * it cannot be determined whether the partner is a customer or a vendor.
 	 */
-	public static final AccountTypeID ACCOUNT_TYPE_ID_PARTNER_NEUTRAL = AccountTypeID.create(Organisation.DEV_ORGANISATION_ID, "Partner.Neutral");
+	public static final AccountTypeID ACCOUNT_TYPE_ID_PARTNER_NEUTRAL = AccountTypeID.create(Organisation.DEV_ORGANISATION_ID, "Partner.Neutral"); //$NON-NLS-1$
 
 	/**
 	 * anchorTypeID for accounts that are used during payment. They represent money that's outside
 	 * the organisation (means paid to a partner), hence their {@link #isOutside()} property is <code>true</code>.
 	 */
-	public static final AccountTypeID ACCOUNT_TYPE_ID_OUTSIDE = AccountTypeID.create(Organisation.DEV_ORGANISATION_ID, "Outside");
+	public static final AccountTypeID ACCOUNT_TYPE_ID_OUTSIDE = AccountTypeID.create(Organisation.DEV_ORGANISATION_ID, "Outside"); //$NON-NLS-1$
 
-	public static final AccountTypeID ACCOUNT_TYPE_ID_SUMMARY = AccountTypeID.create(Organisation.DEV_ORGANISATION_ID, "Summary");
+	public static final AccountTypeID ACCOUNT_TYPE_ID_SUMMARY = AccountTypeID.create(Organisation.DEV_ORGANISATION_ID, "Summary"); //$NON-NLS-1$
 
-	public static final String ANCHOR_TYPE_ID_PREFIX_OUTSIDE = "outside#";
+	public static final String ANCHOR_TYPE_ID_PREFIX_OUTSIDE = "outside#"; //$NON-NLS-1$
 
 	/**
 	 * @jdo.field primary-key="true"
@@ -105,7 +105,7 @@ implements Serializable
 	public AccountType(String organisationID, String accountTypeID, boolean outside)
 	{
 		Organisation.assertValidOrganisationID(organisationID);
-		ObjectIDUtil.assertValidIDString(accountTypeID, "accountTypeID");
+		ObjectIDUtil.assertValidIDString(accountTypeID, "accountTypeID"); //$NON-NLS-1$
 
 		this.organisationID = organisationID;
 		this.accountTypeID = accountTypeID;

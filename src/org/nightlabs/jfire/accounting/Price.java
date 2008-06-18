@@ -68,12 +68,12 @@ public class Price
 {
 	private static final long serialVersionUID = 1L;
 
-	public static final String FETCH_GROUP_CURRENCY = "Price.currency";
-	public static final String FETCH_GROUP_FRAGMENTS = "Price.fragments";
+	public static final String FETCH_GROUP_CURRENCY = "Price.currency"; //$NON-NLS-1$
+	public static final String FETCH_GROUP_FRAGMENTS = "Price.fragments"; //$NON-NLS-1$
 	/**
 	 * @deprecated The *.this-FetchGroups lead to bad programming style and are therefore deprecated, now. They should be removed soon! 
 	 */
-	public static final String FETCH_GROUP_THIS_PRICE = "Price.this";
+	public static final String FETCH_GROUP_THIS_PRICE = "Price.this"; //$NON-NLS-1$
 
 	/**
 	 * @jdo.field primary-key="true"
@@ -159,25 +159,25 @@ public class Price
 	public Price(String organisationID, String priceConfigID, long priceID, Currency currency)
 	{
 		if (priceID < 0) {
-			if (!"".equals(organisationID))
-				throw new IllegalArgumentException("organisationID must be empty if priceID < 0! organisationID: " + organisationID);
+			if (!"".equals(organisationID)) //$NON-NLS-1$
+				throw new IllegalArgumentException("organisationID must be empty if priceID < 0! organisationID: " + organisationID); //$NON-NLS-1$
 
-			if (!"".equals(priceConfigID))
-				throw new IllegalArgumentException("priceConfigID must be empty if priceID < 0! priceConfigID: " + priceConfigID);
+			if (!"".equals(priceConfigID)) //$NON-NLS-1$
+				throw new IllegalArgumentException("priceConfigID must be empty if priceID < 0! priceConfigID: " + priceConfigID); //$NON-NLS-1$
 		}
 		else {
 			if (!ObjectIDUtil.isValidIDString(organisationID))
-				throw new IllegalArgumentException("organisationID must a valid ID, if priceID >= 0! organisationID: " + organisationID);
+				throw new IllegalArgumentException("organisationID must a valid ID, if priceID >= 0! organisationID: " + organisationID); //$NON-NLS-1$
 
 			if (!ObjectIDUtil.isValidIDString(priceConfigID))
-				throw new IllegalArgumentException("priceConfigID must a valid ID, if priceID >= 0! priceConfigID: " + priceConfigID);
+				throw new IllegalArgumentException("priceConfigID must a valid ID, if priceID >= 0! priceConfigID: " + priceConfigID); //$NON-NLS-1$
 		}
 
 		this.organisationID = organisationID;
 		this.priceConfigID = priceConfigID;
 		this.priceID = priceID;
 		if (currency == null)
-			throw new NullPointerException("currency");
+			throw new NullPointerException("currency"); //$NON-NLS-1$
 		this.currency = currency;
 		this.fragments = new HashMap<String, PriceFragment>();
 	}
@@ -280,7 +280,7 @@ public class Price
 		if (priceFragmentTotal == null) {
 			PersistenceManager pm = JDOHelper.getPersistenceManager(this);
 			if (pm == null)
-				throw new IllegalStateException("This instance of Price ("+getPrimaryKey()+") does neither have a PriceFragment for the PriceFragmentType \"_Total_\" nor is it attached to a datastore (=> cannot lookup the PriceFragmentType). You must either use setAmount(PriceFragmentType, long) or call this method when the PriceFragment already exists or when this Price is currently persistent (connected to the datastore).");
+				throw new IllegalStateException("This instance of Price ("+getPrimaryKey()+") does neither have a PriceFragment for the PriceFragmentType \"_Total_\" nor is it attached to a datastore (=> cannot lookup the PriceFragmentType). You must either use setAmount(PriceFragmentType, long) or call this method when the PriceFragment already exists or when this Price is currently persistent (connected to the datastore)."); //$NON-NLS-1$ //$NON-NLS-2$
 
 			PriceFragmentType pftTotal = (PriceFragmentType) pm.getObjectById(PriceFragmentType.PRICE_FRAGMENT_TYPE_ID_TOTAL);
 			priceFragmentTotal = createPriceFragment(pftTotal);
@@ -336,7 +336,7 @@ public class Price
 			fragment = virtualFragments.get(priceFragmentTypePK);
 		}
 		if (fragment == null && throwExceptionIfNotExistent)
-			throw new IllegalArgumentException("No PriceFragment registered with priceFragmentTypePK=\""+priceFragmentTypePK+"\"!");
+			throw new IllegalArgumentException("No PriceFragment registered with priceFragmentTypePK=\""+priceFragmentTypePK+"\"!"); //$NON-NLS-1$ //$NON-NLS-2$
 		return fragment;
 	}
 
@@ -385,7 +385,7 @@ public class Price
 	public PriceFragment createPriceFragment(PriceFragmentType priceFragmentType)
 	{
 		if (priceFragmentType == null)
-			throw new NullPointerException("priceFragmentType");
+			throw new NullPointerException("priceFragmentType"); //$NON-NLS-1$
 
 		PriceFragment fragment = fragments.get(priceFragmentType.getPrimaryKey());
 		if (fragment == null) {
@@ -406,7 +406,7 @@ public class Price
 	public PriceFragment createVirtualPriceFragment(PriceFragmentType priceFragmentType)
 	{
 		if (priceFragmentType == null)
-			throw new NullPointerException("priceFragmentType");
+			throw new NullPointerException("priceFragmentType"); //$NON-NLS-1$
 
 		PriceFragment fragment = virtualFragments.get(priceFragmentType.getPrimaryKey());
 		if (fragment == null) {
@@ -493,10 +493,10 @@ public class Price
 	public long getAmount(String priceFragmentTypeOrganisationID, String priceFragmentTypeID, boolean includeVirtual)
 	{
 		if (priceFragmentTypeOrganisationID != null && priceFragmentTypeID == null)
-			throw new IllegalArgumentException("priceFragmentTypeOrganisationID is not null, but priceFragmentTypeID is null! Either none or both must be null!");
+			throw new IllegalArgumentException("priceFragmentTypeOrganisationID is not null, but priceFragmentTypeID is null! Either none or both must be null!"); //$NON-NLS-1$
 
 		if (priceFragmentTypeOrganisationID == null && priceFragmentTypeID != null)
-			throw new IllegalArgumentException("priceFragmentTypeOrganisationID is null, but priceFragmentTypeID is not null! Either none or both must be null!");
+			throw new IllegalArgumentException("priceFragmentTypeOrganisationID is null, but priceFragmentTypeID is not null! Either none or both must be null!"); //$NON-NLS-1$
 
 		if (priceFragmentTypeID == null || (
 						PriceFragmentType.PRICE_FRAGMENT_TYPE_ID_TOTAL.organisationID.equals(priceFragmentTypeOrganisationID) &&

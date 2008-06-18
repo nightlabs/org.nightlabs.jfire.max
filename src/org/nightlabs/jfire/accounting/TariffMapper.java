@@ -98,7 +98,7 @@ public class TariffMapper
 //		}
 
 		if (throwExceptionIfNotFound && res == null)
-			throw new IllegalArgumentException("No mapping found to map from sourceTariffID.organisationID=\"" + localTariffID.organisationID + "\" to productTypeOrganisationID=\"" + partnerOrganisationID + "\"!");
+			throw new IllegalArgumentException("No mapping found to map from sourceTariffID.organisationID=\"" + localTariffID.organisationID + "\" to productTypeOrganisationID=\"" + partnerOrganisationID + "\"!"); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
 
 		return res;
 	}

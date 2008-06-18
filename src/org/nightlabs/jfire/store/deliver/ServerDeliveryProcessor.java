@@ -694,11 +694,11 @@ implements Serializable, DetachCallback
 	 */
 	protected abstract DeliveryResult externalDeliverRollback(DeliverParams deliverParams)
 	throws DeliveryException;
-	
+		
 	/**
 	 * @jdo.field persistence-modifier="none"
 	 */
-	private String requirementCheckKey;
+	private CheckRequirementsResult requirementCheckResult;
 	
 	/**
 	 * This method returns null if all requirements are met and a descriptive string
@@ -706,32 +706,31 @@ implements Serializable, DetachCallback
 	 * 
 	 * @return null if all requirements are met and a descriptive string otherwise.
 	 */
-	public String getRequirementCheckKey() {
-		return requirementCheckKey;
+	public CheckRequirementsResult getRequirementCheckResult() {
+		return requirementCheckResult;
 	}
-
-//	public void setRequirementCheckKey(String reqCheckKey) {
-//		this.requirementCheckKey = reqCheckKey;
-//	}
 
 	/**
 	 * This method is not supposed to be called from outside.
-	 * Extendors should implement {@link #_checkRequirements(CheckRequirementsEnvironment)} instead of this method.
-	 * @param checkRequirementsEnvironment TODO
+	 * Subclasses should implement {@link #_checkRequirements(CheckRequirementsEnvironment)} instead of this method.
+	 * @param checkRequirementsEnvironment the CheckRequirementsEnvironment object
+	 * containing the necessary information for the delivery 
 	 */
 	public void checkRequirements(CheckRequirementsEnvironment checkRequirementsEnvironment) {
-		requirementCheckKey = _checkRequirements(checkRequirementsEnvironment);
+		requirementCheckResult = _checkRequirements(checkRequirementsEnvironment);
 	}
 
 	/**
-	 * Extendors should override this method if their {@link ServerDeliveryProcessor} if
+	 * Subclasses should override this method if their {@link ServerDeliveryProcessor} if
 	 * it needs to ensure some requirements before it can be used. If everything is ok, this
-	 * method should return null. Otherwise a string describing the failure should be returned.
-	 * @param checkRequirementsEnvironment TODO
+	 * method should return null. Otherwise a {@link CheckRequirementsResult} describing the 
+	 * failure should be returned.
+	 * @param checkRequirementsEnvironment the CheckRequirementsResult with an appropriate
+	 * localized error message and error code or null if everything is ok
 	 * 
-	 * @return null if everything is ok, a descriptive string otherwise.
+	 * @return null if everything is ok, a descriptive CheckRequirementsResult otherwise.
 	 */
-	protected String _checkRequirements(CheckRequirementsEnvironment checkRequirementsEnvironment) {
+	protected CheckRequirementsResult _checkRequirements(CheckRequirementsEnvironment checkRequirementsEnvironment) {
 		return null;
 	}
 
@@ -744,7 +743,7 @@ implements Serializable, DetachCallback
 		ServerDeliveryProcessor detached = this;
 		ServerDeliveryProcessor attached = (ServerDeliveryProcessor) o;
 
-		detached.requirementCheckKey = attached.requirementCheckKey;
+		detached.requirementCheckResult = attached.requirementCheckResult;
 	}
 
 	@Override

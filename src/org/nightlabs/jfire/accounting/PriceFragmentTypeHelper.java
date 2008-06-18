@@ -29,10 +29,10 @@ public class PriceFragmentTypeHelper
 		public final PriceFragmentTypeID VAT_DE_7_VAL;
 
 		{
-			VAT_DE_19_NET = PriceFragmentTypeID.create(getPriceFragmentTypeOrganisationID(), "vat-de-19-net");
-			VAT_DE_19_VAL = PriceFragmentTypeID.create(getPriceFragmentTypeOrganisationID(), "vat-de-19-val");
-			VAT_DE_7_NET = PriceFragmentTypeID.create(getPriceFragmentTypeOrganisationID(), "vat-de-7-net");
-			VAT_DE_7_VAL = PriceFragmentTypeID.create(getPriceFragmentTypeOrganisationID(), "vat-de-7-val");
+			VAT_DE_19_NET = PriceFragmentTypeID.create(getPriceFragmentTypeOrganisationID(), "vat-de-19-net"); //$NON-NLS-1$
+			VAT_DE_19_VAL = PriceFragmentTypeID.create(getPriceFragmentTypeOrganisationID(), "vat-de-19-val"); //$NON-NLS-1$
+			VAT_DE_7_NET = PriceFragmentTypeID.create(getPriceFragmentTypeOrganisationID(), "vat-de-7-net"); //$NON-NLS-1$
+			VAT_DE_7_VAL = PriceFragmentTypeID.create(getPriceFragmentTypeOrganisationID(), "vat-de-7-val"); //$NON-NLS-1$
 		}
 	}
 
@@ -41,8 +41,8 @@ public class PriceFragmentTypeHelper
 		public final PriceFragmentTypeID VAT_CH_7_6_VAL;
 
 		{
-			VAT_CH_7_6_NET = PriceFragmentTypeID.create(getPriceFragmentTypeOrganisationID(), "vat-ch-7_6-net");
-			VAT_CH_7_6_VAL = PriceFragmentTypeID.create(getPriceFragmentTypeOrganisationID(), "vat-ch-7_6-val");
+			VAT_CH_7_6_NET = PriceFragmentTypeID.create(getPriceFragmentTypeOrganisationID(), "vat-ch-7_6-net"); //$NON-NLS-1$
+			VAT_CH_7_6_VAL = PriceFragmentTypeID.create(getPriceFragmentTypeOrganisationID(), "vat-ch-7_6-val"); //$NON-NLS-1$
 		}
 	}
 

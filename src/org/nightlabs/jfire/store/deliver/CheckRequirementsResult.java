@@ -3,6 +3,7 @@
  */
 package org.nightlabs.jfire.store.deliver;
 
+import java.io.Serializable;
 
 /**
  * Result object can be returned by {@link ServerDeliveryProcessor}s,
@@ -11,8 +12,9 @@ package org.nightlabs.jfire.store.deliver;
  * 
  * @author Daniel Mazurek - daniel [at] nightlabs [dot] de
  */
-public class CheckRequirementsResult {
-
+public class CheckRequirementsResult
+implements Serializable
+{
 	private String localizedMessage;
 	private String resultCode;
 	

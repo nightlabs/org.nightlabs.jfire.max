@@ -3,6 +3,8 @@
  */
 package org.nightlabs.jfire.accounting.pay;
 
+import java.io.Serializable;
+
 
 /**
  * Result object can be returned by {@link ServerPaymentProcessor}s,
@@ -11,8 +13,9 @@ package org.nightlabs.jfire.accounting.pay;
  * 
  * @author Daniel Mazurek - daniel [at] nightlabs [dot] de
  */
-public class CheckRequirementsResult {
-
+public class CheckRequirementsResult
+implements Serializable
+{
 	private String localizedMessage;
 	private String resultCode;
 	

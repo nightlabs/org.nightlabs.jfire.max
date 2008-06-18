@@ -57,7 +57,7 @@ public class ServerPaymentProcessorDebitNoteGermany extends ServerPaymentProcess
 					ServerPaymentProcessorID.create(Organisation.DEV_ORGANISATION_ID, ServerPaymentProcessorDebitNoteGermany.class.getName()));
 		} catch (JDOObjectNotFoundException e) {
 			serverPaymentProcessorDebitNote = new ServerPaymentProcessorDebitNoteGermany(Organisation.DEV_ORGANISATION_ID, ServerPaymentProcessorDebitNoteGermany.class.getName());
-			pm.makePersistent(serverPaymentProcessorDebitNote);
+			serverPaymentProcessorDebitNote = pm.makePersistent(serverPaymentProcessorDebitNote);
 		}
 
 		return serverPaymentProcessorDebitNote;

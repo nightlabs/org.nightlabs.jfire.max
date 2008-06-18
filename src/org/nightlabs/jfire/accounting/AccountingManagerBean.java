@@ -2532,21 +2532,17 @@ public abstract class AccountingManagerBean
 
 			Collection<ServerPaymentProcessor> c = ServerPaymentProcessor.getServerPaymentProcessorsForOneModeOfPaymentFlavour(
 					pm, modeOfPaymentFlavourID);
-			
-//			Map<String, String> requirementMsgMap = new HashMap<String, String>();
-//
+
 			for (ServerPaymentProcessor pp : c) {
 				pp.checkRequirements(checkRequirementsEnvironment);
-//				requirementMsgMap.put(pp.getPrimaryKey(), pp.getRequirementCheckKey());
 			}
 
+			// Because the checkRequirements method might have manipulated the fetch-plan, we set it again.
+			pm.getFetchPlan().setMaxFetchDepth(maxFetchDepth);
+			if (fetchGroups != null)
+				pm.getFetchPlan().setGroups(fetchGroups);
+
 			c = pm.detachCopyAll(c);
-
-//			for (ServerPaymentProcessor pp : c) {
-//				String reqMsg = requirementMsgMap.get(pp.getServerPaymentProcessorID());
-//				pp.setRequirementCheckKey(reqMsg);
-//			}
-
 			return c;
 		} finally {
 			pm.close();

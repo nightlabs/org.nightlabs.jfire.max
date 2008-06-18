@@ -44,19 +44,11 @@ import org.nightlabs.i18n.I18nText;
  *
  * @jdo.create-objectid-class field-order="organisationID, serverPaymentProcessorID"
  *
- * @jdo.fetch-group name="ServerPaymentProcessorName.names" fields="names"
- * @jdo.fetch-group name="ServerPaymentProcessorName.serverPaymentProcessor" fields="serverPaymentProcessor"
- * @jdo.fetch-group name="ServerPaymentProcessorName.this" fetch-groups="default" fields="serverPaymentProcessor, names"
+ * @jdo.fetch-group name="ServerPaymentProcessor.name" fields="names, serverPaymentProcessor"
  */
 public class ServerPaymentProcessorName extends I18nText
 {
 	private static final long serialVersionUID = 1L;
-	public static final String FETCH_GROUP_NAMES = "ServerPaymentProcessorName.names";
-	public static final String FETCH_GROUP_SERVER_PAYMENT_PROCESSOR = "ServerPaymentProcessorName.serverPaymentProcessor";
-	/**
-	 * @deprecated The *.this-FetchGroups lead to bad programming style and are therefore deprecated, now. They should be removed soon! 
-	 */
-	public static final String FETCH_GROUP_THIS_SERVER_PAYMENT_PROCESSOR_NAME = "ServerPaymentProcessorName.this";
 
 	/**
 	 * @jdo.field primary-key="true"
@@ -82,6 +74,7 @@ public class ServerPaymentProcessorName extends I18nText
 		this.serverPaymentProcessor = serverPaymentProcessor;
 		this.organisationID = serverPaymentProcessor.getOrganisationID();
 		this.serverPaymentProcessorID = serverPaymentProcessor.getServerPaymentProcessorID();
+		this.names = new HashMap<String, String>();
 	}
 
 	/**
@@ -103,13 +96,13 @@ public class ServerPaymentProcessorName extends I18nText
 	 *
 	 * @jdo.join
 	 */
-	protected Map names = new HashMap();
+	protected Map<String, String> names;
 
 	/**
 	 * @see org.nightlabs.i18n.I18nText#getI18nMap()
 	 */
 	@Override
-	protected Map getI18nMap()
+	protected Map<String, String> getI18nMap()
 	{
 		return names;
 	}

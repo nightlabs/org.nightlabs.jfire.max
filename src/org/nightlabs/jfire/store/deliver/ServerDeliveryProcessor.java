@@ -67,7 +67,6 @@ import org.nightlabs.util.Util;
  * @jdo.fetch-group name="ServerDeliveryProcessor.name" fields="name"
  * @jdo.fetch-group name="ServerDeliveryProcessor.modeOfDeliveries" fields="modeOfDeliveries"
  * @jdo.fetch-group name="ServerDeliveryProcessor.modeOfDeliveryFlavours" fields="modeOfDeliveryFlavours"
- * @jdo.fetch-group name="ServerDeliveryProcessor.this" fetch-groups="default" fields="name, modeOfDeliveries, modeOfDeliveryFlavours"
  *
  * @jdo.query name="getServerDeliveryProcessorsForOneModeOfDeliveryFlavour_WORKAROUND1"
  *            query="SELECT
@@ -108,19 +107,13 @@ import org.nightlabs.util.Util;
 public abstract class ServerDeliveryProcessor
 implements Serializable, DetachCallback
 {
-	private static final long serialVersionUID = 1L;
+	private static final long serialVersionUID = 2L;
 
 	public static final String FETCH_GROUP_NAME = "ServerDeliveryProcessor.name";
 
 	public static final String FETCH_GROUP_MODE_OF_DELIVERIES = "ServerDeliveryProcessor.modeOfDeliveries";
 
 	public static final String FETCH_GROUP_MODE_OF_DELIVERY_FLAVOURS = "ServerDeliveryProcessor.modeOfDeliveryFlavours";
-
-	/**
-	 * @deprecated The *.this-FetchGroups lead to bad programming style and are therefore deprecated, now. They should be removed soon! 
-	 */
-	public static final String FETCH_GROUP_THIS_SERVER_DELIVERY_PROCESSOR = "ServerDeliveryProcessor.this";
-
 
 	/**
 	 * @return Returns a <tt>Collection</tt> with instances of type
@@ -191,6 +184,11 @@ implements Serializable, DetachCallback
 	private String primaryKey;
 
 	/**
+	 * @jdo.field persistence-modifier="persistent" dependent="true" mapped-by="serverDeliveryProcessor"
+	 */
+	private ServerDeliveryProcessorName name;
+
+	/**
 	 * This <tt>Map</tt> stores all {@link ModeOfDelivery}s which supported by
 	 * this <tt>ServerDeliveryProcessor</tt>. This means that all their flavours
 	 * are included. If only some specific {@link ModeOfDeliveryFlavour}s are
@@ -230,11 +228,6 @@ implements Serializable, DetachCallback
 	 * @jdo.join
 	 */
 	private Map<String, ModeOfDeliveryFlavour> modeOfDeliveryFlavours;
-
-	/**
-	 * @jdo.field persistence-modifier="persistent" dependent="true" mapped-by="serverDeliveryProcessor"
-	 */
-	private ServerDeliveryProcessorName name;
 
 	/**
 	 * @deprecated Only of JDO!

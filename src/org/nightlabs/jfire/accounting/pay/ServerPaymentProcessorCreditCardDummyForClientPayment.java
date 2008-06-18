@@ -43,11 +43,11 @@ import org.nightlabs.jfire.transfer.Anchor;
  *		identity-type="application"
  *		persistence-capable-superclass="org.nightlabs.jfire.accounting.pay.ServerPaymentProcessor"
  *		detachable="true"
- *		table="JFireTrade_ServerPaymentProcessorCreditCardDummyForClientPayment"
  *
  * @jdo.inheritance strategy="superclass-table"
  */
-public class ServerPaymentProcessorCreditCardDummyForClientPayment extends ServerPaymentProcessor
+public class ServerPaymentProcessorCreditCardDummyForClientPayment
+extends ServerPaymentProcessor
 {
 	private static final long serialVersionUID = 1L;
 
@@ -60,7 +60,7 @@ public class ServerPaymentProcessorCreditCardDummyForClientPayment extends Serve
 					ServerPaymentProcessorID.create(Organisation.DEV_ORGANISATION_ID, ServerPaymentProcessorCreditCardDummyForClientPayment.class.getName()));
 		} catch (JDOObjectNotFoundException e) {
 			serverPaymentProcessorSaferPay = new ServerPaymentProcessorCreditCardDummyForClientPayment(Organisation.DEV_ORGANISATION_ID, ServerPaymentProcessorCreditCardDummyForClientPayment.class.getName());
-			pm.makePersistent(serverPaymentProcessorSaferPay);
+			serverPaymentProcessorSaferPay = pm.makePersistent(serverPaymentProcessorSaferPay);
 		}
 
 		return serverPaymentProcessorSaferPay;
@@ -74,19 +74,12 @@ public class ServerPaymentProcessorCreditCardDummyForClientPayment extends Serve
 	{
 	}
 
-	/**
-	 * @param organisationID
-	 * @param serverPaymentProcessorID
-	 */
 	public ServerPaymentProcessorCreditCardDummyForClientPayment(String organisationID,
 			String serverPaymentProcessorID)
 	{
 		super(organisationID, serverPaymentProcessorID);
 	}
 
-	/**
-	 * @see org.nightlabs.jfire.accounting.pay.ServerPaymentProcessor#getAnchorOutside(org.nightlabs.jfire.accounting.pay.ServerPaymentProcessor.PayParams)
-	 */
 	@Override
 	public Anchor getAnchorOutside(PayParams payParams)
 	{
@@ -94,22 +87,12 @@ public class ServerPaymentProcessorCreditCardDummyForClientPayment extends Serve
 		return treasury;
 	}
 
-	/**
-	 * @see org.nightlabs.jfire.accounting.pay.ServerPaymentProcessor#externalPayBegin(org.nightlabs.jfire.accounting.pay.ServerPaymentProcessor.PayParams)
-	 */
 	@Override
 	protected PaymentResult externalPayBegin(PayParams payParams) throws PaymentException
 	{
-//		return new PaymentResult(
-//				payParams.accounting.getOrganisationID(),
-//				PaymentResult.CODE_POSTPONED,
-//				null, null);
 		return null;
 	}
 
-	/**
-	 * @see org.nightlabs.jfire.accounting.pay.ServerPaymentProcessor#externalPayDoWork(org.nightlabs.jfire.accounting.pay.ServerPaymentProcessor.PayParams)
-	 */
 	@Override
 	protected PaymentResult externalPayDoWork(PayParams payParams)
 			throws PaymentException
@@ -117,18 +100,12 @@ public class ServerPaymentProcessorCreditCardDummyForClientPayment extends Serve
 		return null;
 	}
 
-	/**
-	 * @see org.nightlabs.jfire.accounting.pay.ServerPaymentProcessor#externalPayCommit(org.nightlabs.jfire.accounting.pay.ServerPaymentProcessor.PayParams)
-	 */
 	@Override
 	protected PaymentResult externalPayCommit(PayParams payParams) throws PaymentException
 	{
 		return null;
 	}
 
-	/**
-	 * @see org.nightlabs.jfire.accounting.pay.ServerPaymentProcessor#externalPayRollback(org.nightlabs.jfire.accounting.pay.ServerPaymentProcessor.PayParams)
-	 */
 	@Override
 	protected PaymentResult externalPayRollback(PayParams payParams) throws PaymentException
 	{

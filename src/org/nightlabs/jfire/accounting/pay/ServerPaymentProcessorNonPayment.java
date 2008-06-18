@@ -63,7 +63,7 @@ extends ServerPaymentProcessor
 					ServerPaymentProcessorID.create(Organisation.DEV_ORGANISATION_ID, ServerPaymentProcessorNonPayment.class.getName()));
 		} catch (JDOObjectNotFoundException e) {
 			serverPaymentProcessorNonPayment = new ServerPaymentProcessorNonPayment(Organisation.DEV_ORGANISATION_ID, ServerPaymentProcessorNonPayment.class.getName());
-			pm.makePersistent(serverPaymentProcessorNonPayment);
+			serverPaymentProcessorNonPayment = pm.makePersistent(serverPaymentProcessorNonPayment);
 		}
 
 		return serverPaymentProcessorNonPayment;

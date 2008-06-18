@@ -51,7 +51,6 @@ import org.nightlabs.jfire.transfer.Anchor;
  */
 public class ServerPaymentProcessorCash
 extends ServerPaymentProcessor
-// implements StoreCallback
 {
 	private static final long serialVersionUID = 1L;
 
@@ -64,7 +63,7 @@ extends ServerPaymentProcessor
 					ServerPaymentProcessorID.create(Organisation.DEV_ORGANISATION_ID, ServerPaymentProcessorCash.class.getName()));
 		} catch (JDOObjectNotFoundException e) {
 			serverPaymentProcessorCash = new ServerPaymentProcessorCash(Organisation.DEV_ORGANISATION_ID, ServerPaymentProcessorCash.class.getName());
-			pm.makePersistent(serverPaymentProcessorCash);
+			serverPaymentProcessorCash = pm.makePersistent(serverPaymentProcessorCash);
 		}
 
 		return serverPaymentProcessorCash;
@@ -78,19 +77,12 @@ extends ServerPaymentProcessor
 	{
 	}
 
-	/**
-	 * @param organisationID
-	 * @param serverPaymentProcessorID
-	 */
 	public ServerPaymentProcessorCash(String organisationID,
 			String serverPaymentProcessorID)
 	{
 		super(organisationID, serverPaymentProcessorID);
 	}
 
-	/**
-	 * @see org.nightlabs.jfire.accounting.pay.ServerPaymentProcessor#getAnchorOutside(org.nightlabs.jfire.accounting.pay.ServerPaymentProcessor.PayParams)
-	 */
 	@Override
 	public Anchor getAnchorOutside(PayParams payParams)
 	{
@@ -98,18 +90,12 @@ extends ServerPaymentProcessor
 		return treasury;
 	}
 
-	/**
-	 * @see org.nightlabs.jfire.accounting.pay.ServerPaymentProcessor#externalPayBegin(org.nightlabs.jfire.accounting.pay.ServerPaymentProcessor.PayParams)
-	 */
 	@Override
 	protected PaymentResult externalPayBegin(PayParams payParams) throws PaymentException
 	{
 		return null;
 	}
 
-	/**
-	 * @see org.nightlabs.jfire.accounting.pay.ServerPaymentProcessor#externalPayDoWork(org.nightlabs.jfire.accounting.pay.ServerPaymentProcessor.PayParams)
-	 */
 	@Override
 	protected PaymentResult externalPayDoWork(PayParams payParams)
 			throws PaymentException
@@ -117,36 +103,16 @@ extends ServerPaymentProcessor
 		return null;
 	}
 
-	/**
-	 * @see org.nightlabs.jfire.accounting.pay.ServerPaymentProcessor#externalPayCommit(org.nightlabs.jfire.accounting.pay.ServerPaymentProcessor.PayParams)
-	 */
 	@Override
 	protected PaymentResult externalPayCommit(PayParams payParams) throws PaymentException
 	{
 		return null;
 	}
 
-	/**
-	 * @see org.nightlabs.jfire.accounting.pay.ServerPaymentProcessor#externalPayRollback(org.nightlabs.jfire.accounting.pay.ServerPaymentProcessor.PayParams)
-	 */
 	@Override
 	protected PaymentResult externalPayRollback(PayParams payParams) throws PaymentException
 	{
 		return null;
 	}
-
-//	/**
-//	 * @see javax.jdo.listener.StoreCallback#jdoPreStore()
-//	 */
-//	public void jdoPreStore()
-//	{
-//		// If this processor is persisted the first time, we subscribe the
-//		// ModeOfPayment s
-//		if (JDOHelper.isNew(this)) {
-//			PersistenceManager pm = getPersistenceManager();
-//
-//
-//		} // if (JDOHelper.isNew(this)) {
-//	}
 
 }

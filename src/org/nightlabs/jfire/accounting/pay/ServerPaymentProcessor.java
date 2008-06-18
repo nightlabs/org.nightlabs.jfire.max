@@ -70,7 +70,6 @@ import org.nightlabs.util.Util;
  * @jdo.fetch-group name="ServerPaymentProcessor.name" fields="name"
  * @jdo.fetch-group name="ServerPaymentProcessor.modeOfPayments" fields="modeOfPayments"
  * @jdo.fetch-group name="ServerPaymentProcessor.modeOfPaymentFlavours" fields="modeOfPaymentFlavours"
- * @jdo.fetch-group name="ServerPaymentProcessor.this" fetch-groups="default" fields="name, modeOfPayments, modeOfPaymentFlavours"
  *
  * @!jdo.query name="getServerPaymentProcessorsForOneModeOfPaymentFlavour"
  *            query="SELECT
@@ -130,18 +129,13 @@ import org.nightlabs.util.Util;
 public abstract class ServerPaymentProcessor
 implements Serializable, DetachCallback
 {
-	private static final long serialVersionUID = 1L;
+	private static final long serialVersionUID = 2L;
 
 	public static final String FETCH_GROUP_NAME = "ServerPaymentProcessor.name";
 
 	public static final String FETCH_GROUP_MODE_OF_PAYMENTS = "ServerPaymentProcessor.modeOfPayments";
 
 	public static final String FETCH_GROUP_MODE_OF_PAYMENT_FLAVOURS = "ServerPaymentProcessor.modeOfPaymentFlavours";
-
-	/**
-	 * @deprecated The *.this-FetchGroups lead to bad programming style and are therefore deprecated, now. They should be removed soon! 
-	 */
-	public static final String FETCH_GROUP_THIS_SERVER_PAYMENT_PROCESSOR = "ServerPaymentProcessor.this";
 
 	/**
 	 * @return Returns a <tt>Collection</tt> with instances of type
@@ -228,6 +222,11 @@ implements Serializable, DetachCallback
 	private String primaryKey;
 
 	/**
+	 * @jdo.field persistence-modifier="persistent" dependent="true" mapped-by="serverPaymentProcessor"
+	 */
+	private ServerPaymentProcessorName name;
+
+	/**
 	 * This <tt>Map</tt> stores all {@link ModeOfPayment}s which supported by
 	 * this <tt>ServerPaymentProcessor</tt>. This means that all their flavours
 	 * are included. If only some specific {@link ModeOfPaymentFlavour}s are
@@ -268,11 +267,6 @@ implements Serializable, DetachCallback
 	 * @jdo.join
 	 */
 	private Map<String, ModeOfPaymentFlavour> modeOfPaymentFlavours;
-
-	/**
-	 * @jdo.field persistence-modifier="persistent" dependent="true" mapped-by="serverPaymentProcessor"
-	 */
-	private ServerPaymentProcessorName name;
 
 	/**
 	 * @deprecated This constructor exists only for JDO and should never be used

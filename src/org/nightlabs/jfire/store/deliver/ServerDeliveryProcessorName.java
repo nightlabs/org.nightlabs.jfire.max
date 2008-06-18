@@ -44,19 +44,11 @@ import org.nightlabs.i18n.I18nText;
  *
  * @jdo.create-objectid-class field-order="organisationID, serverDeliveryProcessorID"
  *
- * @jdo.fetch-group name="ServerDeliveryProcessorName.names" fields="names"
- * @jdo.fetch-group name="ServerDeliveryProcessorName.serverDeliveryProcessor" fields="serverDeliveryProcessor"
- * @jdo.fetch-group name="ServerDeliveryProcessorName.this" fetch-groups="default" fields="serverDeliveryProcessor, names"
+ * @jdo.fetch-group name="ServerDeliveryProcessor.name" fields="names, serverDeliveryProcessor"
  */
 public class ServerDeliveryProcessorName extends I18nText
 {
 	private static final long serialVersionUID = 1L;
-	public static final String FETCH_GROUP_NAMES = "ServerDeliveryProcessorName.names";
-	public static final String FETCH_GROUP_SERVER_DELIVERY_PROCESSOR = "ServerDeliveryProcessorName.serverDeliveryProcessor";
-	/**
-	 * @deprecated The *.this-FetchGroups lead to bad programming style and are therefore deprecated, now. They should be removed soon! 
-	 */
-	public static final String FETCH_GROUP_THIS_SERVER_DELIVERY_PROCESSOR_NAME = "ServerDeliveryProcessorName.this";
 
 	/**
 	 * @jdo.field primary-key="true"
@@ -83,6 +75,7 @@ public class ServerDeliveryProcessorName extends I18nText
 		this.serverDeliveryProcessor = serverDeliveryProcessor;
 		this.organisationID = serverDeliveryProcessor.getOrganisationID();
 		this.serverDeliveryProcessorID = serverDeliveryProcessor.getServerDeliveryProcessorID();
+		this.names = new HashMap<String, String>();
 	}
 
 	/**
@@ -104,13 +97,13 @@ public class ServerDeliveryProcessorName extends I18nText
 	 *
 	 * @jdo.join
 	 */
-	protected Map names = new HashMap();
+	protected Map<String, String> names;
 
 	/**
 	 * @see org.nightlabs.i18n.I18nText#getI18nMap()
 	 */
 	@Override
-	protected Map getI18nMap()
+	protected Map<String, String> getI18nMap()
 	{
 		return names;
 	}
@@ -124,4 +117,7 @@ public class ServerDeliveryProcessorName extends I18nText
 		return ServerDeliveryProcessor.getPrimaryKey(organisationID, serverDeliveryProcessorID);
 	}
 
+	public ServerDeliveryProcessor getServerDeliveryProcessor() {
+		return serverDeliveryProcessor;
+	}
 }

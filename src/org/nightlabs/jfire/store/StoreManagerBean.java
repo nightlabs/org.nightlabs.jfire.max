@@ -779,22 +779,16 @@ implements SessionBean
 			Collection<ServerDeliveryProcessor> c = ServerDeliveryProcessor.getServerDeliveryProcessorsForOneModeOfDeliveryFlavour(
 					pm, modeOfDeliveryFlavourID);
 			
-//			Map<String, String> requirementMsgMap = new HashMap<String, String>();
-//
 			for (ServerDeliveryProcessor pp : c) {
 				pp.checkRequirements(checkRequirementsEnvironment);
-//				requirementMsgMap.put(pp.getServerDeliveryProcessorID(), pp.getRequirementCheckKey());
 			}
 
-			c = pm.detachCopyAll(c);
-			
-//			for (ServerDeliveryProcessor pp : c) {
-//				String reqMsg = requirementMsgMap.get(pp.getServerDeliveryProcessorID());
-//				pp.setRequirementCheckKey(reqMsg);
-//			}
+			// Because the checkRequirements method might have manipulated the fetch-plan, we set it again.
+			pm.getFetchPlan().setMaxFetchDepth(maxFetchDepth);
+			if (fetchGroups != null)
+				pm.getFetchPlan().setGroups(fetchGroups);
 
-			return c;
-			
+			return pm.detachCopyAll(c);
 		} finally {
 			pm.close();
 		}

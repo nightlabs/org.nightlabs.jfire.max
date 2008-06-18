@@ -28,5 +28,17 @@ public class VoucherScriptingConstants
 					Organisation.DEV_ORGANISATION_ID,
 					SCRIPT_REGISTRY_ITEM_TYPE_TRADE_VOUCHER,
 					"VoucherKey");
+		
+		public static final ScriptRegistryItemID SCRIPT_REGISTRY_ITEM_ID_SCRIPT_VOUCHER_NAME =
+			ScriptRegistryItemID.create(
+					Organisation.DEV_ORGANISATION_ID,
+					SCRIPT_REGISTRY_ITEM_TYPE_TRADE_VOUCHER,
+					"VoucherName");
+		
+		public static final ScriptRegistryItemID SCRIPT_REGISTRY_ITEM_ID_SCRIPT_VOUCHER_PRICE =
+			ScriptRegistryItemID.create(
+					Organisation.DEV_ORGANISATION_ID,
+					SCRIPT_REGISTRY_ITEM_TYPE_TRADE_VOUCHER,
+					"VoucherPrice");
 	}
 }

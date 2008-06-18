@@ -870,13 +870,13 @@ implements SessionBean
 			issueType.getIssueResolutions().add(issueResolution);
 			issueType2.getIssueResolutions().add(issueResolution);
 			
-			issueResolution = new IssueResolution(getOrganisationID(), "Not fixable");
+			issueResolution = new IssueResolution(getOrganisationID(), "NotFixable");
 			issueResolution.getName().setText(Locale.ENGLISH.getLanguage(), "Not fixable");
 			issueResolution = pm.makePersistent(issueResolution);
 			issueType.getIssueResolutions().add(issueResolution);
 			issueType2.getIssueResolutions().add(issueResolution);
 			
-			issueResolution = new IssueResolution(getOrganisationID(), "Won't fix");
+			issueResolution = new IssueResolution(getOrganisationID(), "WillNotFix");
 			issueResolution.getName().setText(Locale.ENGLISH.getLanguage(), "Won't fix");
 			issueResolution = pm.makePersistent(issueResolution);
 			issueType.getIssueResolutions().add(issueResolution);

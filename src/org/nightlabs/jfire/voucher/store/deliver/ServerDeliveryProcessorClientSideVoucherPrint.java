@@ -17,6 +17,7 @@ import org.nightlabs.jfire.trade.id.ArticleID;
 import org.nightlabs.jfire.transfer.Anchor;
 import org.nightlabs.jfire.voucher.resource.Messages;
 import org.nightlabs.jfire.voucher.store.VoucherType;
+import org.nightlabs.util.NLLocale;
 
 /**
  * This implementation of {@link ServerDeliveryProcessor} is used for client-sided voucher print.
@@ -110,7 +111,7 @@ extends ServerDeliveryProcessor
 
 			if (voucherType.getVoucherLayout() == null) 
 			{
-				String message = String.format(Messages.getString("org.nightlabs.jfire.voucher.store.deliver.ServerDeliveryProcessorClientSideVoucherPrint.message.noVoucherLayout"), voucherType.getName()); //$NON-NLS-1$
+				String message = String.format(Messages.getString("org.nightlabs.jfire.voucher.store.deliver.ServerDeliveryProcessorClientSideVoucherPrint.message.noVoucherLayout"), voucherType.getName().getText(NLLocale.getDefault())); //$NON-NLS-1$
 				return new CheckRequirementsResult(ERROR_CODE_MISSING_VOUCHER_LAYOUT, message);
 			}
 		} // for (ArticleID articleID : articleIDs) {

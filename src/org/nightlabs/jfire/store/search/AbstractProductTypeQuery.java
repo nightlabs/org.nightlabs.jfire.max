@@ -22,7 +22,7 @@ public abstract class AbstractProductTypeQuery
 extends VendorDependentQuery
 {
 	private static final Logger logger = Logger.getLogger(AbstractProductTypeQuery.class);
-	
+	 
 	private static final long serialVersionUID = 3L;
 
 	private String fullTextLanguageID = null;
@@ -41,8 +41,9 @@ extends VendorDependentQuery
 //	private DeliveryConfigurationID deliveryConfigurationID = null;
 //	private LocalAccountantDelegateID localAccountantDelegateID = null;
 	private ProductTypeGroupID productTypeGroupID = null;	
-
 	private String organisationID = null;
+	// this value is hardcoded to avoid finding productType categories
+	private byte inheritanceNature = ProductType.INHERITANCE_NATURE_LEAF;
 	
 	// Property IDs used for the PropertyChangeListeners
 	private static final String PROPERTY_PREFIX = "AbstractProductTypeQuery.";
@@ -129,6 +130,8 @@ extends VendorDependentQuery
 		
 		if (organisationID != null)
 			filter.append("\n && this.organisationID == :organisationID");
+		
+		filter.append("\n && this.inheritanceNature == :inheritanceNature");
 		
 		if (logger.isDebugEnabled()) {
 			logger.debug("Vars:");
@@ -438,6 +441,14 @@ extends VendorDependentQuery
 		String oldOrganisationID = this.organisationID;
 		this.organisationID = organisationID;
 		notifyListeners(PROPERTY_ORGANISATION_ID, oldOrganisationID, organisationID);
+	}
+	
+	/**
+	 * Returns the inheritanceNature.
+	 * @return the inheritanceNature
+	 */
+	public byte getInheritanceNature() {
+		return inheritanceNature;
 	}
 
 	@Override

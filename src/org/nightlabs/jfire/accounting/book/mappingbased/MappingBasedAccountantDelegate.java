@@ -385,10 +385,7 @@ public class MappingBasedAccountantDelegate
 	public Map<ResolvedMapKey, ResolvedMapEntry> resolveProductTypeMappings(
 			Invoice invoice)
 	{
-		// Map<ResolvedMapKey, ResolvedMapEntry> result = new
-		// HashMap<ResolvedMapKey, ResolvedMapEntry>();
-		// FIXME: Not typed because of BCEL bug
-		Map result = new HashMap();
+		 Map<ResolvedMapKey, ResolvedMapEntry> result = new HashMap<ResolvedMapKey, ResolvedMapEntry>();
 		for (Article article : invoice.getArticles()) {
 			ArticlePriceTypeProvider provider = new ArticlePriceTypeProvider(
 					getPackageType(article.getPrice()), article.getPrice());
@@ -437,10 +434,7 @@ public class MappingBasedAccountantDelegate
 	public Map<ResolvedMapKey, ResolvedMapEntry> resolveProductTypeMappings(
 			ProductType productType)
 	{
-		// Map<ResolvedMapKey, ResolvedMapEntry> result = new
-		// HashMap<ResolvedMapKey, ResolvedMapEntry>();
-		// FIXME: Not typed because of BCEL bug
-		Map result = new HashMap();
+		 Map<ResolvedMapKey, ResolvedMapEntry> result = new HashMap<ResolvedMapKey, ResolvedMapEntry>();
 		resolveProductTypeMappings(productType, result, 0);
 		return result;
 	}
@@ -536,8 +530,7 @@ public class MappingBasedAccountantDelegate
 	protected ResolvedMapEntry addProductTypeMappings(ProductType productType,
 			String packageType, int delegationLevel)
 	{
-		// FIXME: not typed because of BCEL bug
-		LinkedList delegateHierarchy = new LinkedList();
+		LinkedList<LocalAccountantDelegate> delegateHierarchy = new LinkedList<LocalAccountantDelegate>();
 		LocalAccountantDelegate delegateRun = this;
 		while (delegateRun != null) {
 			delegateHierarchy.add(delegateRun);
@@ -576,9 +569,9 @@ public class MappingBasedAccountantDelegate
 						}
 						// The entries made here by the mapping should
 						// fake the mapping key and pretend the mapping was made on
-						// exacly the productType the mapping was searched for.
+						// exactly the productType the mapping was searched for.
 						// Doing so mappings from parent-delegates as well as for
-						// parent-productTypes are overwritten by children declerations
+						// parent-productTypes are overwritten by children declarations
 						mapping.addMappingsToMap(productType, entry.getResolvedMappings());
 					}
 				}

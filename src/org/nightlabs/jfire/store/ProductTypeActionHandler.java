@@ -340,7 +340,6 @@ public abstract class ProductTypeActionHandler
 			Set<SegmentTypeID> segmentTypeIDsWithTheCurrentInstanceOnly = new HashSet<SegmentTypeID>();
 			segmentTypeIDsWithTheCurrentInstanceOnly.add((SegmentTypeID) JDOHelper.getObjectId(segmentType));
 
-			// TODO we should remove the anchorTypeID from the following method's parameter list
 			OrganisationLegalEntity partner = OrganisationLegalEntity.getOrganisationLegalEntity(pm, partnerOrganisationID);
 
 			Hashtable<?, ?> initialContextProperties = Lookup.getInitialContextProperties(pm, partnerOrganisationID);

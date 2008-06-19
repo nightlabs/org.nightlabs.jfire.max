@@ -1865,7 +1865,6 @@ public class Trader
 //			Set segmentTypeIDsWithTheCurrentInstanceOnly = new HashSet();
 //			segmentTypeIDsWithTheCurrentInstanceOnly.add(JDOHelper.getObjectId(segmentType));
 //
-//			// TODO we should remove the anchorTypeID from the following method's parameter list
 //			OrganisationLegalEntity partner = OrganisationLegalEntity.getOrganisationLegalEntity(pm, partnerOrganisationID, OrganisationLegalEntity.ANCHOR_TYPE_ID_ORGANISATION, true);
 //
 //			Hashtable initialContextProperties = Lookup.getInitialContextProperties(pm, partnerOrganisationID);

@@ -992,8 +992,6 @@ implements
 				// PK fields
 				nonInheritableFields.add(FieldName.organisationID);
 				nonInheritableFields.add(FieldName.productTypeID);
-				// TODO this field doesn't exist anymore, right?
-				nonInheritableFields.add("primaryKey");
 
 				// other fields
 				nonInheritableFields.add(FieldName.closed);

@@ -7,9 +7,11 @@
 	<role-group id="org.nightlabs.jfire.trade.seeProductType">
 		<name>See product types</name>
 		<description>See product types with all their properties.</description>
+		<role id="org.nightlabs.jfire.trade.seeProductType"/>
 	</role-group>
 
 	<role-group id="org.nightlabs.jfire.trade.sellProductType">
+		<role id="org.nightlabs.jfire.trade.sellProductType"/>
 	</role-group>
 
 	<role-group id="org.nightlabs.jfire.trade.reverseProductType">
@@ -17,9 +19,11 @@
 	</role-group>
 
 	<role-group id="org.nightlabs.jfire.trade.editUnconfirmedProductType">
+		<role id="org.nightlabs.jfire.trade.editUnconfirmedProductType"/>
 	</role-group>
 
 	<role-group id="org.nightlabs.jfire.trade.editConfirmedProductType">
+		<role id="org.nightlabs.jfire.trade.editConfirmedProductType"/>
 	</role-group>
 
 	<role-group id="org.nightlabs.jfire.trade.createOrder">
@@ -36,5 +40,13 @@
 
 	<role-group id="org.nightlabs.jfire.trade.queryOrders">
 		<role id="org.nightlabs.jfire.trade.queryOrders"/>
+	</role-group>
+
+	<role-group id="org.nightlabs.jfire.trade.queryDeliveryNotes">
+		<role id="org.nightlabs.jfire.trade.queryDeliveryNotes"/>
+	</role-group>
+
+	<role-group id="org.nightlabs.jfire.trade.queryInvoices">
+		<role id="org.nightlabs.jfire.trade.queryInvoices"/>
 	</role-group>
 </jfire-security>

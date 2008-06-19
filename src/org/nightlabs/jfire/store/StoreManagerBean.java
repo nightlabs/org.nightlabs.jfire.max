@@ -71,6 +71,8 @@ import org.nightlabs.jfire.idgenerator.IDNamespaceDefault;
 import org.nightlabs.jfire.jbpm.JbpmLookup;
 import org.nightlabs.jfire.jbpm.graph.def.ProcessDefinition;
 import org.nightlabs.jfire.organisation.Organisation;
+import org.nightlabs.jfire.security.Authority;
+import org.nightlabs.jfire.security.ResolveSecuringAuthorityStrategy;
 import org.nightlabs.jfire.security.User;
 import org.nightlabs.jfire.store.book.DefaultLocalStorekeeperDelegate;
 import org.nightlabs.jfire.store.deliver.CheckRequirementsEnvironment;
@@ -115,6 +117,7 @@ import org.nightlabs.jfire.trade.OfferLocal;
 import org.nightlabs.jfire.trade.OfferRequirement;
 import org.nightlabs.jfire.trade.Order;
 import org.nightlabs.jfire.trade.OrganisationLegalEntity;
+import org.nightlabs.jfire.trade.RoleConstants;
 import org.nightlabs.jfire.trade.TradeSide;
 import org.nightlabs.jfire.trade.Trader;
 import org.nightlabs.jfire.trade.id.ArticleContainerID;
@@ -127,6 +130,7 @@ import org.nightlabs.jfire.transfer.id.AnchorID;
 import org.nightlabs.jfire.transfer.id.TransferID;
 
 /**
+ * @author marco schulze - marco at nightlabs dot de
  *
  * @ejb.bean name="jfire/ejb/JFireTrade/StoreManager"
  *					 jndi-name="jfire/ejb/JFireTrade/StoreManager"
@@ -442,7 +446,7 @@ implements SessionBean
 
 	/**
 	 * @ejb.interface-method
-	 * @ejb.permission role-name="_Guest_"
+	 * @ejb.permission role-name="org.nightlabs.jfire.trade.queryDeliveryNotes"
 	 * @!ejb.transaction type="Supports" @!This usually means that no transaction is opened which is significantly faster and recommended for all read-only EJB methods! Marco.
 	 */
 	@SuppressWarnings("unchecked")
@@ -458,7 +462,7 @@ implements SessionBean
 	
 	/**
 	 * @ejb.interface-method
-	 * @ejb.permission role-name="_Guest_"
+	 * @ejb.permission role-name="org.nightlabs.jfire.trade.queryDeliveryNotes"
 	 * @!ejb.transaction type="Supports" @!This usually means that no transaction is opened which is significantly faster and recommended for all read-only EJB methods! Marco.
 	 */
 	public DeliveryNote getDeliveryNote(DeliveryNoteID deliveryID, String[] fetchGroups, int maxFetchDepth)
@@ -477,7 +481,7 @@ implements SessionBean
 	
 	/**
 	 * @ejb.interface-method
-	 * @ejb.permission role-name="_Guest_"
+	 * @ejb.permission role-name="org.nightlabs.jfire.trade.queryDeliveryNotes"
 	 * @!ejb.transaction type="Supports" @!This usually means that no transaction is opened which is significantly faster and recommended for all read-only EJB methods! Marco.
 	 */
 	@SuppressWarnings("unchecked")
@@ -557,35 +561,74 @@ implements SessionBean
 //		}
 //	}
 	
+//	/**
+//	 * @ejb.interface-method
+//	 * @ejb.permission role-name="org.nightlabs.jfire.trade.seeProductType"
+//	 * @!ejb.transaction type="Supports" @!This usually means that no transaction is opened which is significantly faster and recommended for all read-only EJB methods! Marco.
+//	 */
+//	public ProductType getProductType(ProductTypeID productTypeID, String[] fetchGroups, int maxFetchDepth)
+//	{
+//		PersistenceManager pm = getPersistenceManager();
+//		try {
+//			pm.getFetchPlan().setMaxFetchDepth(maxFetchDepth);
+//			if (fetchGroups != null)
+//				pm.getFetchPlan().setGroups(fetchGroups);
+//
+//			ProductType productType = (ProductType) pm.getObjectById(productTypeID);
+//
+//			Authority.resolveSecuringAuthority(
+//					pm,
+//					productType.getProductTypeLocal(),
+//					ResolveSecuringAuthorityStrategy.allow
+//			).assertContainsRoleRef(
+//					getPrincipal(),
+//					RoleConstants.seeProductType
+//			);
+//
+//			return (ProductType) pm.detachCopy(productType);
+//		} finally {
+//			pm.close();
+//		}
+//	}
+
 	/**
 	 * @ejb.interface-method
-	 * @ejb.permission role-name="org.nightlabs.jfire.store.StoreManager#getProductType"
-	 * @!ejb.transaction type="Supports" @!This usually means that no transaction is opened which is significantly faster and recommended for all read-only EJB methods! Marco.
-	 */
-	public ProductType getProductType(ProductTypeID productTypeID, String[] fetchGroups, int maxFetchDepth)
-	{
-		PersistenceManager pm = getPersistenceManager();
-		try {
-			pm.getFetchPlan().setMaxFetchDepth(maxFetchDepth);
-			if (fetchGroups != null)
-				pm.getFetchPlan().setGroups(fetchGroups);
-
-			return (ProductType) pm.detachCopy(pm.getObjectById(productTypeID));
-		} finally {
-			pm.close();
-		}
-	}
-
-	/**
-	 * @ejb.interface-method
-	 * @ejb.permission role-name="_Guest_"
+	 * @ejb.permission role-name="org.nightlabs.jfire.trade.seeProductType"
 	 * @!ejb.transaction type="Supports" @!This usually means that no transaction is opened which is significantly faster and recommended for all read-only EJB methods! Marco.
 	 */
 	public List<ProductType> getProductTypes(Set<ProductTypeID> productTypeIDs, String[] fetchGroups, int maxFetchDepth)
 	{
 		PersistenceManager pm = getPersistenceManager();
 		try {
-			return NLJDOHelper.getDetachedObjectList(pm, productTypeIDs, ProductType.class, fetchGroups, maxFetchDepth);
+			List<ProductTypeLocal> productTypeLocals = new ArrayList<ProductTypeLocal>(productTypeIDs.size());
+			for (ProductTypeID productTypeID : productTypeIDs) {
+				ProductType productType = (ProductType) pm.getObjectById(productTypeID);
+				ProductTypeLocal productTypeLocal = productType.getProductTypeLocal();
+				if (productTypeLocal == null)
+					throw new IllegalStateException("productType.productTypeLocal is null: " + productType);
+
+				productTypeLocals.add(productTypeLocal);
+			}
+
+			productTypeLocals = Authority.filterSecuredObjects(
+					pm,
+					productTypeLocals,
+					getPrincipal(),
+					RoleConstants.seeProductType,
+					ResolveSecuringAuthorityStrategy.allow
+			);
+
+			List<ProductType> productTypes = new ArrayList<ProductType>(productTypeLocals.size());
+			for (ProductTypeLocal productTypeLocal : productTypeLocals) {
+				ProductType productType = productTypeLocal.getProductType();
+				if (productType == null)
+					throw new IllegalStateException("productTypeLocal.productType is null: " + productTypeLocal);
+
+				productTypes.add(pm.detachCopy(productType));
+			}
+			return productTypes;
+
+//			return NLJDOHelper.getDetachedObjectList(pm, productTypeIDs, ProductType.class, fetchGroups, maxFetchDepth);
 		} finally {
 			pm.close();
 		}

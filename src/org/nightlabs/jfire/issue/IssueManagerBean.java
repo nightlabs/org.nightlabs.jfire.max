@@ -757,10 +757,6 @@ implements SessionBean
 			issueType.getName().setText(Locale.ENGLISH.getLanguage(), "Default");
 			issueType = pm.makePersistent(issueType);
 
-			IssueType issueType2 = new IssueType(getOrganisationID(), "Customer");
-			issueType2.getName().setText(Locale.ENGLISH.getLanguage(), "Customer");
-			issueType2 = pm.makePersistent(issueType2);
-
 			// Create the statuses
 			IssueSeverityType issueSeverityType;
 
@@ -768,13 +764,11 @@ implements SessionBean
 			issueSeverityType.getIssueSeverityTypeText().setText(Locale.ENGLISH.getLanguage(), "Minor");
 			issueSeverityType = pm.makePersistent(issueSeverityType);
 			issueType.getIssueSeverityTypes().add(issueSeverityType);
-			issueType2.getIssueSeverityTypes().add(issueSeverityType);
 
 			issueSeverityType = new IssueSeverityType(getOrganisationID(), IssueSeverityType.ISSUE_SEVERITY_TYPE_MAJOR);
 			issueSeverityType.getIssueSeverityTypeText().setText(Locale.ENGLISH.getLanguage(), "Major");
 			issueSeverityType = pm.makePersistent(issueSeverityType);
 			issueType.getIssueSeverityTypes().add(issueSeverityType);
-			issueType2.getIssueSeverityTypes().add(issueSeverityType);
 			
 			issueSeverityType = new IssueSeverityType(getOrganisationID(), IssueSeverityType.ISSUE_SEVERITY_TYPE_CRASH);
 			issueSeverityType.getIssueSeverityTypeText().setText(Locale.ENGLISH.getLanguage(), "Crash");
@@ -814,19 +808,16 @@ implements SessionBean
 			issuePriority.getIssuePriorityText().setText(Locale.ENGLISH.getLanguage(), "None");
 			issuePriority = pm.makePersistent(issuePriority);
 			issueType.getIssuePriorities().add(issuePriority);
-			issueType2.getIssuePriorities().add(issuePriority);
 
 			issuePriority = new IssuePriority(getOrganisationID(), "Low");
 			issuePriority.getIssuePriorityText().setText(Locale.ENGLISH.getLanguage(), "Low");
 			issuePriority = pm.makePersistent(issuePriority);
 			issueType.getIssuePriorities().add(issuePriority);
-			issueType2.getIssuePriorities().add(issuePriority);
 			
 			issuePriority = new IssuePriority(getOrganisationID(), "Normal");
 			issuePriority.getIssuePriorityText().setText(Locale.ENGLISH.getLanguage(), "Normal");
 			issuePriority = pm.makePersistent(issuePriority);
 			issueType.getIssuePriorities().add(issuePriority);
-			issueType2.getIssuePriorities().add(issuePriority);
 			
 			issuePriority = new IssuePriority(getOrganisationID(), "High");
 			issuePriority.getIssuePriorityText().setText(Locale.ENGLISH.getLanguage(), "High");
@@ -850,41 +841,34 @@ implements SessionBean
 			issueResolution.getName().setText(Locale.ENGLISH.getLanguage(), "Not assigned");
 			issueResolution = pm.makePersistent(issueResolution);
 			issueType.getIssueResolutions().add(issueResolution);
-			issueType2.getIssueResolutions().add(issueResolution);
 			
 			issueResolution = new IssueResolution(getOrganisationID(), "Open");
 			issueResolution.getName().setText(Locale.ENGLISH.getLanguage(), "Open");
 			issueResolution = pm.makePersistent(issueResolution);
 			issueType.getIssueResolutions().add(issueResolution);
-			issueType2.getIssueResolutions().add(issueResolution);
 
 			issueResolution = new IssueResolution(getOrganisationID(), "Fixed");
 			issueResolution.getName().setText(Locale.ENGLISH.getLanguage(), "Fixed");
 			issueResolution = pm.makePersistent(issueResolution);
 			issueType.getIssueResolutions().add(issueResolution);
-			issueType2.getIssueResolutions().add(issueResolution);
 			
 			issueResolution = new IssueResolution(getOrganisationID(), "Reopened");
 			issueResolution.getName().setText(Locale.ENGLISH.getLanguage(), "Reopened");
 			issueResolution = pm.makePersistent(issueResolution);
 			issueType.getIssueResolutions().add(issueResolution);
-			issueType2.getIssueResolutions().add(issueResolution);
 			
 			issueResolution = new IssueResolution(getOrganisationID(), "NotFixable");
 			issueResolution.getName().setText(Locale.ENGLISH.getLanguage(), "Not fixable");
 			issueResolution = pm.makePersistent(issueResolution);
 			issueType.getIssueResolutions().add(issueResolution);
-			issueType2.getIssueResolutions().add(issueResolution);
 			
 			issueResolution = new IssueResolution(getOrganisationID(), "WillNotFix");
 			issueResolution.getName().setText(Locale.ENGLISH.getLanguage(), "Won't fix");
 			issueResolution = pm.makePersistent(issueResolution);
 			issueType.getIssueResolutions().add(issueResolution);
-			issueType2.getIssueResolutions().add(issueResolution);
 			
 			// create the process definitions.
 			issueType.readProcessDefinition(IssueType.class.getResource("jbpm/status/"));
-			issueType2.readProcessDefinition(IssueType.class.getResource("jbpm/status/"));
 	
 			// Create the issueLinkTypes
 			IssueLinkType issueLinkType;

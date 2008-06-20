@@ -97,6 +97,15 @@ public class TariffPricePairDAO
 			CurrencyID currencyID,
 			ProgressMonitor monitor)
 	{
+		if (priceConfigID == null)
+			throw new IllegalArgumentException("priceConfigID must not be null!");
+		
+		if (customerGroupID == null)
+			throw new IllegalArgumentException("customerGroupID must not be null!");
+
+		if (currencyID == null)
+			throw new IllegalArgumentException("currencyID must not be null!");
+		
 		String key = customerGroupID.toString() + "::" + priceConfigID.toString() + "::" + currencyID.toString();
 
 //		TariffPricePairsCarrier tppc = (TariffPricePairsCarrier) tariffPricePairsCarriers.get(key);

@@ -133,8 +133,8 @@ public class GridPriceConfigUtil
 			for (Iterator<?> it = ((Collection<?>)q.execute()).iterator(); it.hasNext(); ) {
 				FormulaCell formulaCell = (FormulaCell) it.next();
 				IPriceConfig pc = formulaCell.getPriceConfig();
-				if (!(pc instanceof FormulaPriceConfig))
-					throw new IllegalStateException("Datastore is inconsistent! Found a FormulaCell where FormulaCell.priceConfig is not an instance of FormulaPriceConfig, but " + (pc == null ? null : pc.getClass().getName()) + "! " + formulaCell);
+				if (!(pc instanceof IFormulaPriceConfig))
+					throw new IllegalStateException("Datastore is inconsistent! Found a FormulaCell where FormulaCell.priceConfig is not an instance of IFormulaPriceConfig, but " + (pc == null ? null : pc.getClass().getName()) + "! " + formulaCell);
 
 				FormulaPriceConfig fpc = (FormulaPriceConfig) pc;
 

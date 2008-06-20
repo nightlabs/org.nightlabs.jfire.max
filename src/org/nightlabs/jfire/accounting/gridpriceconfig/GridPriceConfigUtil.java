@@ -56,17 +56,7 @@ import org.nightlabs.jfire.store.ProductType;
 import org.nightlabs.jfire.trade.CustomerGroup;
 import org.nightlabs.util.Util;
 
-/**
- * @!ejb.bean name="jfire/ejb/JFireTrade/GridPriceConfigManager"
- *           jndi-name="jfire/ejb/JFireTrade/GridPriceConfigManager"
- *           type="Stateless"
- *           transaction-type="Container"
- *
- * @!ejb.util generate = "physical"
- */
 public class GridPriceConfigUtil
-//extends BaseSessionBeanImpl
-//implements SessionBean
 {
 	private static final Logger logger = Logger.getLogger(GridPriceConfigUtil.class);
 
@@ -136,7 +126,7 @@ public class GridPriceConfigUtil
 				if (!(pc instanceof IFormulaPriceConfig))
 					throw new IllegalStateException("Datastore is inconsistent! Found a FormulaCell where FormulaCell.priceConfig is not an instance of IFormulaPriceConfig, but " + (pc == null ? null : pc.getClass().getName()) + "! " + formulaCell);
 
-				FormulaPriceConfig fpc = (FormulaPriceConfig) pc;
+				IFormulaPriceConfig fpc = (IFormulaPriceConfig) pc;
 
 				if (!formulaCell.equals(fpc.getFallbackFormulaCell(false)))
 					throw new IllegalStateException("Datastore is inconsistent! Found a FormulaCell where thisFormulaCell.priceCoordinate is null, but thisFormulaCell.priceConfig.fallbackFormulaCell != thisFormulaCell! " + formulaCell);
@@ -147,55 +137,6 @@ public class GridPriceConfigUtil
 		if (duration > 1000)
 			Logger.getLogger(GridPriceConfig.class).warn("Consistency check took very long: " + duration + " msec", new Exception());
 	}
-
-//	/**
-//	 * @see org.nightlabs.jfire.base.BaseSessionBeanImpl#setSessionContext(javax.ejb.SessionContext)
-//	 */
-//	public void setSessionContext(SessionContext sessionContext)
-//			throws EJBException, RemoteException
-//	{
-//		logger.debug(this.getClass().getName() + ".setSessionContext("+sessionContext+")");
-//		super.setSessionContext(sessionContext);
-//	}
-//	/**
-//	 * @see org.nightlabs.jfire.base.BaseSessionBeanImpl#unsetSessionContext()
-//	 */
-//	public void unsetSessionContext() {
-//		super.unsetSessionContext();
-//	}
-//	/**
-//	 * @ejb.create-method
-//	 * @ejb.permission role-name="_Guest_"
-//	 */
-//	public void ejbCreate()
-//	throws CreateException
-//	{
-//		logger.debug(this.getClass().getName() + ".ejbCreate()");
-//	}
-//	/**
-//	 * @see javax.ejb.SessionBean#ejbRemove()
-//	 *
-//	 * @ejb.permission unchecked="true"
-//	 */
-//	public void ejbRemove() throws EJBException, RemoteException
-//	{
-//		logger.debug(this.getClass().getName() + ".ejbRemove()");
-//	}
-//
-//	/**
-//	 * @see javax.ejb.SessionBean#ejbActivate()
-//	 */
-//	public void ejbActivate() throws EJBException, RemoteException
-//	{
-//		logger.debug(this.getClass().getName() + ".ejbActivate()");
-//	}
-//	/**
-//	 * @see javax.ejb.SessionBean#ejbPassivate()
-//	 */
-//	public void ejbPassivate() throws EJBException, RemoteException
-//	{
-//		logger.debug(this.getClass().getName() + ".ejbPassivate()");
-//	}
 
 	public static void logGridPriceConfig(GridPriceConfig priceConfig)
 	{
@@ -248,7 +189,6 @@ public class GridPriceConfigUtil
 	}
 
 	/**
-	 *
 	 * @param assignInnerPriceConfigCommand If not <code>null</code>, the specified ProductType will get an <code>innerPriceConfig</code> assigned and the inheritance-meta-data adjusted.
 	 */
 	public static <T extends GridPriceConfig> Collection<T> storePriceConfigs(
@@ -267,16 +207,6 @@ public class GridPriceConfigUtil
 
 		// prevent writing a partner-PriceConfig
 		String localOrganisationID = LocalOrganisation.getLocalOrganisation(pm).getOrganisationID();
-
-//		if (!PriceCalculator.class.isAssignableFrom(priceCalculatorClass))
-//			throw new IllegalArgumentException("priceCalculatorClass " + (priceCalculatorClass == null ? null : priceCalculatorClass.getName()) + " does not extend " + PriceCalculator.class.getName());
-//
-//		Constructor priceCalculatorConstructor;
-//		try {
-//			priceCalculatorConstructor = priceCalculatorClass.getConstructor(new Class[] { ProductType.class });
-//		} catch (NoSuchMethodException x) {
-//			throw new IllegalArgumentException("priceCalculatorClass " + priceCalculatorClass.getName() + " does not have a constructor taking one parameter of type " + ProductType.class.getName(), x);
-//		}
 
 		// store all price configs and put the living objects into priceConfigs
 		Set<T> priceConfigs = new HashSet<T>();
@@ -367,63 +297,7 @@ public class GridPriceConfigUtil
 				FetchPlan.DEFAULT,
 				FetchGroupsPriceConfig.FETCH_GROUP_EDIT});
 
-//		pm.getFetchPlan().setMaxFetchDepth(maxFetchDepth);
-//		if (fetchGroups != null)
-//			pm.getFetchPlan().setGroups(fetchGroups);
-
 		return pm.detachCopyAll(priceConfigs);
 	}
-
-//	protected static Pattern tariffPKSplitPattern = null;
-//
-//	/**
-//	 * @return a <tt>Collection</tt> of {@link TariffPricePair}
-//	 *
-//	 * @!ejb.interface-method
-//	 * @!ejb.transaction type="Supports"
-//	 * @!ejb.permission role-name="_Guest_"
-//	 */
-//	public static Collection<TariffPricePair> getTariffPricePairs(
-//			PersistenceManager pm,
-//			PriceConfigID priceConfigID, CustomerGroupID customerGroupID, CurrencyID currencyID,
-//			String[] tariffFetchGroups, String[] priceFetchGroups)
-//			{
-//		if (tariffPKSplitPattern == null)
-//			tariffPKSplitPattern = Pattern.compile("/");
-//
-//		// TODO use setResult and put all this logic into the JDO query!
-//		StablePriceConfig priceConfig = (StablePriceConfig) pm.getObjectById(priceConfigID);
-//		Collection priceCells = priceConfig.getPriceCells(
-//				CustomerGroup.getPrimaryKey(customerGroupID.organisationID, customerGroupID.customerGroupID),
-//				currencyID.currencyID);
-//
-//		Collection<TariffPricePair> res = new ArrayList<TariffPricePair>();
-//
-//		for (Iterator it = priceCells.iterator(); it.hasNext(); ) {
-//			PriceCell priceCell = (PriceCell) it.next();
-//			String tariffPK = priceCell.getPriceCoordinate().getTariffPK();
-//			String[] tariffPKParts = tariffPKSplitPattern.split(tariffPK);
-//			if (tariffPKParts.length != 2)
-//				throw new IllegalStateException("How the hell can it happen that the tariffPK does not consist out of two parts?");
-//
-//			String tariffOrganisationID = tariffPKParts[0];
-//			long tariffID = Long.parseLong(tariffPKParts[1]);
-//
-//			if (tariffFetchGroups != null)
-//				pm.getFetchPlan().setGroups(tariffFetchGroups);
-//
-//			Tariff tariff = (Tariff) pm.getObjectById(TariffID.create(tariffOrganisationID, tariffID));
-//			tariff = (Tariff) pm.detachCopy(tariff);
-//
-//			if (priceFetchGroups != null)
-//				pm.getFetchPlan().setGroups(priceFetchGroups);
-//
-//			Price price = (Price) pm.detachCopy(priceCell.getPrice());
-//
-//			res.add(new TariffPricePair(tariff, price));
-//		}
-//
-//		return res;
-//			}
 
 }

@@ -876,7 +876,7 @@ implements Serializable, ArticleContainer, SegmentContainer, DetachCallback
 	public String toString() {
 		return this.getClass().getName() + '@' + Integer.toHexString(System.identityHashCode(this)) + '[' + organisationID + ',' + orderIDPrefix + ',' + ObjectIDUtil.longObjectIDFieldToString(orderID) + ']';
 	}
-	
+
 	/*
 	 * (non-Javadoc)
 	 * @see org.nightlabs.jfire.trade.ArticleContainer#getArticleCount()

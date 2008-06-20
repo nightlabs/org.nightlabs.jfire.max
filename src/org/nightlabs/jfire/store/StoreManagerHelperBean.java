@@ -246,7 +246,8 @@ implements SessionBean
 
 					TradeManager tradeManager = TradeManagerUtil.getHome(Lookup.getInitialContextProperties(pm, partnerOrganisationID)).create();
 					Offer offer = tradeManager.createCrossTradeReverseOffer(reversedArticleIDs, null);
-					offer.makeAllDirty();
+					NLJDOHelper.makeDirtyAllFieldsRecursively(offer);
+//					offer.makeAllDirty();
 					offer = pm.makePersistent(offer);
 
 					// TODO JPOX WORKAROUND BEGIN

@@ -18,6 +18,7 @@
       <transition name="dev.jfire.org:customerRejected" to="dev.jfire.org:customerRejected"></transition>
       <transition name="accept" to="dev.jfire.org:accepted"></transition>
       <transition name="dev.jfire.org:send" to="dev.jfire.org:sent"></transition>
+		<transition to="dev.jfire.org:accepted" name="dev.jfire.org:acceptImplicitely"></transition>
    </state>
    <end-state name="dev.jfire.org:expired"></end-state>
    <end-state name="dev.jfire.org:aborted"></end-state>

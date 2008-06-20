@@ -27,7 +27,6 @@
 package org.nightlabs.jfire.trade;
 
 import java.io.Serializable;
-import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Date;
@@ -95,20 +94,19 @@ import org.nightlabs.util.Util;
  * @jdo.fetch-group name="Offer.currency" fields="currency"
  * @jdo.fetch-group name="Offer.order" fields="order"
  * @jdo.fetch-group name="Offer.createUser" fields="createUser"
- * @jdo.fetch-group name="Offer.this" fetch-groups="default" fields="offerLocal, createUser, currency, finalizeUser, order, articles, price, state, states"
+ * @jdo.fetch-group name="Offer.finalizeUser" fields="finalizeUser"
+ * @jdo.fetch-group name="Offer.segments" fields="segments"
  *
  * @jdo.fetch-group name="Statable.state" fields="state"
  * @jdo.fetch-group name="Statable.states" fields="states"
  *
- *
- * @!jdo.fetch-group name="FetchGroupsTrade.articleEdit" fetch-groups="default" fields="articles"
- * @jdo.fetch-group name="FetchGroupsTrade.articleContainerInEditor" fields="offerLocal, createUser, currency, finalizeUser, order, price, state, states"
+ * @jdo.fetch-group name="FetchGroupsTrade.articleContainerInEditor" fields="offerLocal, segments, createUser, currency, finalizeUser, order, price, state, states"
  */
 public class Offer
 implements
 		Serializable,
 		ArticleContainer,
-//		SegmentContainer, // TODO we must implement SegmentContainer here!
+		SegmentContainer,
 		Statable,
 		DetachCallback,
 		AttachCallback
@@ -123,11 +121,8 @@ implements
 	public static final String FETCH_GROUP_CURRENCY = "Offer.currency";
 	public static final String FETCH_GROUP_ORDER = "Offer.order";
 	public static final String FETCH_GROUP_CREATE_USER = "Offer.createUser";
-	/**
-	 * @deprecated The *.this-FetchGroups lead to bad programming style and are therefore deprecated, now. They should be removed soon! 
-	 */
-	public static final String FETCH_GROUP_THIS_OFFER = "Offer.this";
-
+	public static final String FETCH_GROUP_FINALIZE_USER = "Offer.finalizeUser";
+	public static final String FETCH_GROUP_SEGMENTS = "Offer.segments";
 
 	/**
 	 * @return a <tt>Collection</tt> of <tt>Offer</tt>
@@ -176,35 +171,16 @@ implements
 	 */
 	private Currency currency;
 
-// TODO Offer must implement SegmentContainer!
-//	/**
-//	 * @jdo.field
-//	 *		persistence-modifier="persistent"
-//	 *		collection-type="collection"
-//	 *		element-type="Segment"
-//	 *		table="JFireTrade_Offer_segments"
-//	 *
-//	 * @jdo.join
-//	 */
-//	private Set<Segment> segments;
-
-//	/**
-//	 * key: String invoicePK<br/>
-//	 * value: Invoice invoice
-//	 * <br/><br/>
-//	 *
-//	 * @jdo.field
-//	 *		persistence-modifier="persistent"
-//	 *		collection-type="map"
-//	 *		key-type="java.lang.String"
-//	 *		value-type="org.nightlabs.jfire.accounting.Invoice"
-//	 *		@!mapped-by="offer"
-//	 *
-//	 * @jdo.join
-//	 *
-//	 * @!jdo.map-vendor-extension vendor-name="jpox" key="key-field" value="primaryKey"
-//	 */
-//	private Map invoices = new HashMap();
+	/**
+	 * @jdo.field
+	 *		persistence-modifier="persistent"
+	 *		collection-type="collection"
+	 *		element-type="Segment"
+	 *		table="JFireTrade_Offer_segments"
+	 *
+	 * @jdo.join
+	 */
+	private Set<Segment> segments;
 
 	/**
 	 * An Offer is stable, if it does not change values when prices are recalculated.
@@ -838,22 +814,22 @@ implements
 		// are detached as well, if FetchPlan.ALL is passed. So we don't need to separately handle this case.
 		// The only problem might arise from a limited max-fetch-depth, but this is IMHO so rare that it doesn't justify the
 		// additional overhead here and performance loss. We can add it later, if really needed.
-		if (fetchGroups.contains(FETCH_GROUP_THIS_OFFER) || fetchGroups.contains(FETCH_GROUP_VENDOR)) {
+		if (fetchGroups.contains(FETCH_GROUP_VENDOR)) {
 			detached.vendor = pm.detachCopy(attached.getVendor());
 			detached.vendor_detached = true;
 		}
 
-		if (fetchGroups.contains(FETCH_GROUP_THIS_OFFER) || fetchGroups.contains(FETCH_GROUP_CUSTOMER)) {
+		if (fetchGroups.contains(FETCH_GROUP_CUSTOMER)) {
 			detached.customer = pm.detachCopy(attached.getCustomer());
 			detached.customer_detached = true;
 		}
 
-		if (fetchGroups.contains(FETCH_GROUP_THIS_OFFER) || fetchGroups.contains(FETCH_GROUP_VENDOR_ID)) {
+		if (fetchGroups.contains(FETCH_GROUP_VENDOR_ID)) {
 			detached.vendorID = attached.getVendorID();
 			detached.vendorID_detached = true;
 		}
 
-		if (fetchGroups.contains(FETCH_GROUP_THIS_OFFER) || fetchGroups.contains(FETCH_GROUP_CUSTOMER_ID)) {
+		if (fetchGroups.contains(FETCH_GROUP_CUSTOMER_ID)) {
 			detached.customerID = attached.getCustomerID();
 			detached.customerID_detached = true;
 		}
@@ -962,50 +938,63 @@ implements
 		return articleCount;
 	}
 
-	/**
-	 * This is a temporary method until this problem is solved: http://www.jpox.org/servlet/forum/viewthread?thread=4718
-	 */
-	public void makeAllDirty()
+//	/**
+//	 * This is a temporary method until this problem is solved: http://www.jpox.org/servlet/forum/viewthread?thread=4718
+//	 */
+//	public void makeAllDirty()
+//	{
+//		if (!JDOHelper.isDetached(this))
+//			throw new IllegalStateException("This method may only be called while this object is detached!");
+//
+//		try {
+//			State s = state;
+//			state = null;
+//			state = s;
+//		} catch (JDODetachedFieldAccessException x) {
+//			// ignore
+//		}
+//
+//		try {
+//			Price p = price;
+//			price = null;
+//			price = p;
+//		} catch (JDODetachedFieldAccessException x) {
+//			// ignore
+//		}
+//
+//		try {
+//			ArrayList<State> ss = new ArrayList<State>(this.states);
+//			this.states.clear();
+//			for (State state : ss) {
+//				this.states.add(state);
+//				// TODO delegate "makeAllDirty"
+//			}
+//		} catch (JDODetachedFieldAccessException x) {
+//			// ignore
+//		}
+//
+//		try {
+//			ArrayList<Article> aa = new ArrayList<Article>(this.articles);
+//			this.articles.clear();
+//			for (Article article : aa) {
+//				this.articles.add(article);
+//				article.makeAllDirty();
+//			}
+//		} catch (JDODetachedFieldAccessException x) {
+//			// ignore
+//		}
+//	}
+
+	@Override
+	public Collection<Segment> getSegments() {
+		return Collections.unmodifiableCollection(segments);
+	}
+
+	public void addSegment(Segment segment)
 	{
-		if (!JDOHelper.isDetached(this))
-			throw new IllegalStateException("This method may only be called while this object is detached!");
+		if (!this.getOrder().equals(segment.getOrder()))
+			throw new IllegalArgumentException("this.order != segment.order :: " + this + " " + segment);
 
-		try {
-			State s = state;
-			state = null;
-			state = s;
-		} catch (JDODetachedFieldAccessException x) {
-			// ignore
-		}
-
-		try {
-			Price p = price;
-			price = null;
-			price = p;
-		} catch (JDODetachedFieldAccessException x) {
-			// ignore
-		}
-
-		try {
-			ArrayList<State> ss = new ArrayList<State>(this.states);
-			this.states.clear();
-			for (State state : ss) {
-				this.states.add(state);
-				// TODO delegate "makeAllDirty"
-			}
-		} catch (JDODetachedFieldAccessException x) {
-			// ignore
-		}
-
-		try {
-			ArrayList<Article> aa = new ArrayList<Article>(this.articles);
-			this.articles.clear();
-			for (Article article : aa) {
-				this.articles.add(article);
-				article.makeAllDirty();
-			}
-		} catch (JDODetachedFieldAccessException x) {
-			// ignore
-		}
+		segments.add(segment);
 	}
 }

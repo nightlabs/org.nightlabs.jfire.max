@@ -206,4 +206,9 @@ public class Segment implements Serializable
 	{
 		return Util.hashCode(organisationID) ^ Util.hashCode(segmentID);
 	}
+
+	@Override
+	public String toString() {
+		return this.getClass().getName() + '@' + Integer.toHexString(System.identityHashCode(this)) + '[' + organisationID + ',' + ObjectIDUtil.longObjectIDFieldToString(segmentID) + ']';
+	}
 }

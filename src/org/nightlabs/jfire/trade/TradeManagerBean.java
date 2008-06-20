@@ -522,8 +522,17 @@ implements SessionBean
 		try {
 			Trader trader = Trader.getTrader(pm);
 			pm.getExtent(Order.class);
-			Offer offer = trader.createOffer(
-					User.getUser(pm, getPrincipal()), (Order) pm.getObjectById(orderID, true), offerIDPrefix);
+			Order order = (Order) pm.getObjectById(orderID);
+			Offer offer = trader.createOffer(User.getUser(pm, getPrincipal()), order, offerIDPrefix);
+
+			// At the moment, we add the first default segment we find in the order automatically to the offer.
+			// This should be changed later, since not every offer requires the default segment... Marco.
+			for (Segment segment : order.getSegments()) {
+				if (JDOHelper.getObjectId(segment.getSegmentType()).equals(SegmentType.DEFAULT_SEGMENT_TYPE_ID)) {
+					offer.addSegment(segment);
+					break;
+				}
+			}
 
 			pm.getFetchPlan().setMaxFetchDepth(maxFetchDepth);
 			if (fetchGroups != null)

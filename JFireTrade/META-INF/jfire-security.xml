@@ -6,15 +6,21 @@
 >
 	<role-group id="org.nightlabs.jfire.trade.seeProductType">
 		<name>See product types</name>
+		<name language="de">Produkttypen sehen</name>
 		<description>See product types with all their properties.</description>
+		<description language="de">Produkttypen mit all ihren Eigenschaften sehen.</description>
 		<role id="org.nightlabs.jfire.trade.seeProductType"/>
 	</role-group>
 
 	<role-group id="org.nightlabs.jfire.trade.sellProductType">
+		<name>Sell</name>
+		<name language="de">Verkaufen</name>
 		<role id="org.nightlabs.jfire.trade.sellProductType"/>
 	</role-group>
 
 	<role-group id="org.nightlabs.jfire.trade.reverseProductType">
+		<name>Reverse</name>
+		<name language="de">Stornieren</name>
 		<role id="org.nightlabs.jfire.trade.reverseProductType"/>
 	</role-group>
 

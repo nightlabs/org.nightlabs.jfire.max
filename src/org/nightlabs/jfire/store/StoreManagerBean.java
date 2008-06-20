@@ -600,6 +600,10 @@ implements SessionBean
 	{
 		PersistenceManager pm = getPersistenceManager();
 		try {
+			pm.getFetchPlan().setMaxFetchDepth(maxFetchDepth);
+			if (fetchGroups != null)
+				pm.getFetchPlan().setGroups(fetchGroups);
+			
 			List<ProductTypeLocal> productTypeLocals = new ArrayList<ProductTypeLocal>(productTypeIDs.size());
 			for (ProductTypeID productTypeID : productTypeIDs) {
 				ProductType productType = (ProductType) pm.getObjectById(productTypeID);

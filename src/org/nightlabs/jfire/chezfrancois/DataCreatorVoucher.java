@@ -11,7 +11,6 @@ import javax.jdo.JDOObjectNotFoundException;
 import javax.jdo.PersistenceManager;
 
 import org.nightlabs.editor2d.Layer;
-import org.nightlabs.editor2d.TextDrawComponent;
 import org.nightlabs.i18n.unit.resolution.IResolutionUnit;
 import org.nightlabs.i18n.unit.resolution.ResolutionImpl;
 import org.nightlabs.jfire.accounting.priceconfig.IPackagePriceConfig;
@@ -33,7 +32,6 @@ import org.nightlabs.jfire.voucher.editor2d.iofilter.VoucherXStreamFilter;
 import org.nightlabs.jfire.voucher.scripting.VoucherLayout;
 import org.nightlabs.jfire.voucher.scripting.VoucherScriptingConstants;
 import org.nightlabs.jfire.voucher.store.VoucherType;
-import org.nightlabs.print.page.A4Page;
 import org.nightlabs.print.page.A5Page;
 import org.nightlabs.print.page.PredefinedPageUtil;
 

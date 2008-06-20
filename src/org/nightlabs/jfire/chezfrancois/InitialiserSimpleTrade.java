@@ -83,7 +83,7 @@ extends Initialiser
 		"Merlot");
 		SimpleProductType bottleCabernetSauvignon = dataCreator.createCategory(bottleRed, "bottle-cabernet-sauvignon",
 		"Cabernet Sauvignon");
-		
+
 		// FIXME
 		@SuppressWarnings("unused")
 		SimpleProductType bottlePinotNoir = dataCreator.createCategory(bottleRed, "bottle-pinot-noir",
@@ -95,6 +95,10 @@ extends Initialiser
 				"France", "Frankreich", "France");
 		SimpleProductType bottleMerlotCalifornia = dataCreator.createCategory(bottleMerlot, "bottle-merlot-california",
 				"California", "Kalifornien", "Californie");
+		SimpleProductType bottleMerlotItaly = dataCreator.createCategory(bottleMerlot, "bottle-merlot-italy",
+				"Italy", "Italien", "Italie");
+
+
 
 		SimpleProductType bottleCabernetSauvignonFrance = dataCreator.createCategory(bottleCabernetSauvignon, "bottle-cabernet-sauvignon-france",
 				"France", "Frankreich", "France");
@@ -127,6 +131,11 @@ extends Initialiser
 				"Merlot 2003 (California)", "Merlot 2003 (Kalifornien)", "Merlot 2003 (Californie)");
 		dataCreator.createWineProperties(pm, bottleMerlotCalifornia2003, "Merlot from California 2001", "Merlot aus Kalifornien 2001",
 				"Merlot from the south of Californias (vintage 2001)", "Merlot aus dem Süden Kaliforniens (Jahrgang 2001)", "merlot_small.jpg", contentTypeJpeg, "merlot_large.jpg", contentTypeJpeg);
+		SimpleProductType bottleMerlotItaly2001 = dataCreator.createLeaf(bottleMerlotItaly, "bottle-merlot-italy-2001", priceConfigCheapWines,
+				"Merlot 2001 (Italy)", "Merlot 2001 (Italien)", "Merlot 2001 (Italy)");
+		dataCreator.createWineProperties(pm, bottleMerlotItaly2001, "Merlot from California 2001", "Merlot aus Kalifornien 2001",
+				"Merlot from the south of Italy (vintage 2001)", "Merlot aus dem Süden Kaliforniens (Jahrgang 2001)", "merlot_small.jpg", contentTypeJpeg, "merlot_large.jpg", contentTypeJpeg);
+
 
 		SimpleProductType bottleCabernetSauvignonFrance2002 = dataCreator.createLeaf(bottleCabernetSauvignonFrance, "bottle-cabernet-sauvignon-france-2002", priceConfigMiddleWines,
 				"Cabernet Sauvignon 2002 (France)", "Cabernet Sauvignon 2002 (Frankreich)", "Cabernet Sauvignon 2002 (France)");
@@ -171,6 +180,9 @@ extends Initialiser
 				"France", "Frankreich", "France");
 		SimpleProductType boxMerlotCalifornia = dataCreator.createCategory(boxMerlot, "box-merlot-california",
 				"California", "Kalifornien", "Californie");
+		SimpleProductType boxMerlotItaly = dataCreator.createCategory(boxMerlot, "box-merlot-california",
+				"Italy", "Kalifornien", "Italie");
+
 
 		SimpleProductType boxMerlotAustralia2001 = dataCreator.createLeaf(boxMerlotAustralia, "box-merlot-australia-2001", priceConfigBox6Bottles90Percent,
 				"Box (6): Merlot 2001 (Australia)", "Karton (6): Merlot 2001 (Australien)", "Caisse (6): Merlot 2001 (Australie)");
@@ -189,15 +201,34 @@ extends Initialiser
 		dataCreator.createWineProperties(pm, boxMerlotAustralia2001, "Box (6): Merlot 2001 (Australia) from Australia", "Karton Merlot aus Australien",
 				"Box (6): Merlot 2001 (Australia) from Australia", "Karton Merlot aus Australien", "merlot_box_small.jpg", contentTypeJpeg, "merlot_box_large.jpg", contentTypeJpeg);
 
+		SimpleProductType boxMerlotItaly2001 = dataCreator.createLeaf(boxMerlotItaly, "box-merlot-italy-2001", priceConfigBox6Bottles90Percent,
+				"Box (6): Merlot 2001 (Italy)", "Karton (6): Merlot 2003 (Italien)", "Caisse (6): Merlot 2003 (Italie)");
+		dataCreator.createWineProperties(pm, boxMerlotItaly2001, "Box (6): Merlot 2001 (Australia) from Italy", "Karton Merlot aus Italien",
+				"Box (6): Merlot 2001 (Italy) from Italy", "Karton Merlot aus Italien", "merlot_box_small.jpg", contentTypeJpeg, "merlot_box_large.jpg", contentTypeJpeg);
+
+
+
+
+
+
+
+
+
 		boxMerlotAustralia2001.getProductTypeLocal().createNestedProductTypeLocal(bottleMerlotAustralia2001.getProductTypeLocal()).setQuantity(6);
 		boxMerlotAustralia2004.getProductTypeLocal().createNestedProductTypeLocal(bottleMerlotAustralia2004.getProductTypeLocal()).setQuantity(6);
 		boxMerlotFrance2001.getProductTypeLocal().createNestedProductTypeLocal(bottleMerlotFrance2001.getProductTypeLocal()).setQuantity(6);
 		boxMerlotCalifornia2003.getProductTypeLocal().createNestedProductTypeLocal(bottleMerlotCalifornia2003.getProductTypeLocal()).setQuantity(6);
+		boxMerlotItaly2001.getProductTypeLocal().createNestedProductTypeLocal(bottleMerlotCalifornia2003.getProductTypeLocal()).setQuantity(6);
+
+
 
 		boxMerlotAustralia2001.getProductTypeLocal().getFieldMetaData(ProductTypeLocal.FieldName.nestedProductTypeLocals).setValueInherited(false);
 		boxMerlotAustralia2004.getProductTypeLocal().getFieldMetaData(ProductTypeLocal.FieldName.nestedProductTypeLocals).setValueInherited(false);
 		boxMerlotFrance2001.getProductTypeLocal().getFieldMetaData(ProductTypeLocal.FieldName.nestedProductTypeLocals).setValueInherited(false);
 		boxMerlotCalifornia2003.getProductTypeLocal().getFieldMetaData(ProductTypeLocal.FieldName.nestedProductTypeLocals).setValueInherited(false);
+		boxMerlotItaly2001.getProductTypeLocal().getFieldMetaData(ProductTypeLocal.FieldName.nestedProductTypeLocals).setValueInherited(false);
+
+
 
 		// create ProductTypes: accessories
 		IInnerPriceConfig priceConfigChocolate = dataCreator.createFixPriceConfig(
@@ -211,14 +242,14 @@ extends Initialiser
 				"Accessories", "Zubehör", "Accessoires");
 		SimpleProductType chocolate = dataCreator.createCategory(accessories, "chocolate",
 				"Chocolate", "Schokolade", "Chocolat");
-		
+
 		// FIXME
 		@SuppressWarnings("unused")
 		SimpleProductType sarotti = dataCreator.createLeaf(chocolate, "sarotti", priceConfigChocolate,
 		"Sarotti");
 		SimpleProductType corkscrew = dataCreator.createCategory(accessories, "corkscrew",
 				"Corkscrew", "Korkenzieher", "Tire-bouchon");
-		
+
 		// FIXME
 		@SuppressWarnings("unused")
 		SimpleProductType corkscrewStainlessSteel = dataCreator.createLeaf(corkscrew, "corkscrew-stainless-steel", priceConfigCorkScrew,
@@ -306,8 +337,8 @@ extends Initialiser
 
 		logger.info("Chezfrancois Created all SimpleProductTypes; publishing, confirming and making available now!");
 		dataCreator.makeAllLeavesSaleable();
-		
-		
+
+
 		UserSecurityGroup userSecurityGroup = new UserSecurityGroup(organisationID, "SalesAgents");
 		userSecurityGroup.setName("Sales Agents");
 		userSecurityGroup.setDescription("This is the sales agents group");
@@ -355,6 +386,10 @@ extends Initialiser
 		LegalEntity legalEntity03 = dataCreator.createLegalEntity(user03.getPerson());
 		legalEntity03.setDefaultCustomerGroup(customerGroupDefault);
 
+
+		boxMerlotItaly2001.setVendor(legalEntity03);
+
+
 		Person person = dataCreator.createPerson("NightLabs GmbH", "Marco", "Schulze", "marco@nightlabs.de", new Date(),
 				PersonStruct.PERSONALDATA_SALUTATION_MR, "Dr.", "Teststrasse", "79100", "Freiburg", "Baden-Württemberg", "Deutschland",
 				"49", "761", "123456789", "49", "761", "987654321", "Marco Schulze", 123456789, "68090000", "TestBank",
@@ -366,16 +401,16 @@ extends Initialiser
 		userSecurityGroup.setName("Administrators");
 		userSecurityGroup.setDescription("This group has all access rights within its organisation.");
 		userSecurityGroup = pm.makePersistent(userSecurityGroup);
-		
+
 //		{ // TODO WORKAROUND DATANUCLEUS
-//			pm.flush();
-//			pm.evictAll();
-//			dataCreator = new DataCreatorSimpleTrade(pm, User.getUser(pm, getPrincipal()));
-//			userSecurityGroup = (UserSecurityGroup) pm.getObjectById(UserSecurityGroupID.create(organisationID, "Administrators"));
-//			user00 = (User) pm.getObjectById(UserID.create(organisationID, "user00"));
-//			user01 = (User) pm.getObjectById(UserID.create(organisationID, "user01"));
-//			user02 = (User) pm.getObjectById(UserID.create(organisationID, "marco"));
-//			user03 = (User) pm.getObjectById(UserID.create(organisationID, "alex"));
+//		pm.flush();
+//		pm.evictAll();
+//		dataCreator = new DataCreatorSimpleTrade(pm, User.getUser(pm, getPrincipal()));
+//		userSecurityGroup = (UserSecurityGroup) pm.getObjectById(UserSecurityGroupID.create(organisationID, "Administrators"));
+//		user00 = (User) pm.getObjectById(UserID.create(organisationID, "user00"));
+//		user01 = (User) pm.getObjectById(UserID.create(organisationID, "user01"));
+//		user02 = (User) pm.getObjectById(UserID.create(organisationID, "marco"));
+//		user03 = (User) pm.getObjectById(UserID.create(organisationID, "alex"));
 //		}
 
 		userSecurityGroup.addMember(user00.getUserLocal());

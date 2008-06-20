@@ -207,28 +207,17 @@ extends Initialiser
 				"Box (6): Merlot 2001 (Italy) from Italy", "Karton Merlot aus Italien", "merlot_box_small.jpg", contentTypeJpeg, "merlot_box_large.jpg", contentTypeJpeg);
 
 
-
-
-
-
-
-
-
 		boxMerlotAustralia2001.getProductTypeLocal().createNestedProductTypeLocal(bottleMerlotAustralia2001.getProductTypeLocal()).setQuantity(6);
 		boxMerlotAustralia2004.getProductTypeLocal().createNestedProductTypeLocal(bottleMerlotAustralia2004.getProductTypeLocal()).setQuantity(6);
 		boxMerlotFrance2001.getProductTypeLocal().createNestedProductTypeLocal(bottleMerlotFrance2001.getProductTypeLocal()).setQuantity(6);
 		boxMerlotCalifornia2003.getProductTypeLocal().createNestedProductTypeLocal(bottleMerlotCalifornia2003.getProductTypeLocal()).setQuantity(6);
 		boxMerlotItaly2001.getProductTypeLocal().createNestedProductTypeLocal(bottleMerlotCalifornia2003.getProductTypeLocal()).setQuantity(6);
 
-
-
 		boxMerlotAustralia2001.getProductTypeLocal().getFieldMetaData(ProductTypeLocal.FieldName.nestedProductTypeLocals).setValueInherited(false);
 		boxMerlotAustralia2004.getProductTypeLocal().getFieldMetaData(ProductTypeLocal.FieldName.nestedProductTypeLocals).setValueInherited(false);
 		boxMerlotFrance2001.getProductTypeLocal().getFieldMetaData(ProductTypeLocal.FieldName.nestedProductTypeLocals).setValueInherited(false);
 		boxMerlotCalifornia2003.getProductTypeLocal().getFieldMetaData(ProductTypeLocal.FieldName.nestedProductTypeLocals).setValueInherited(false);
 		boxMerlotItaly2001.getProductTypeLocal().getFieldMetaData(ProductTypeLocal.FieldName.nestedProductTypeLocals).setValueInherited(false);
-
-
 
 		// create ProductTypes: accessories
 		IInnerPriceConfig priceConfigChocolate = dataCreator.createFixPriceConfig(
@@ -330,15 +319,11 @@ extends Initialiser
 				dataCreator.createPFMoneyFlowMapping(accessories, dataCreator.getPriceFragmentTypeVatVal(),
 						accessoriesVatVal_revenue, accessoriesVatVal_expense));
 
-
 		// apply inheritance (e.g. because of LocalAccountantDelegates)
 		wine.applyInheritance();
 		accessories.applyInheritance();
 
-		logger.info("Chezfrancois Created all SimpleProductTypes; publishing, confirming and making available now!");
-		dataCreator.makeAllLeavesSaleable();
-
-
+		// create UserSecurity Groups
 		UserSecurityGroup userSecurityGroup = new UserSecurityGroup(organisationID, "SalesAgents");
 		userSecurityGroup.setName("Sales Agents");
 		userSecurityGroup.setDescription("This is the sales agents group");
@@ -386,9 +371,7 @@ extends Initialiser
 		LegalEntity legalEntity03 = dataCreator.createLegalEntity(user03.getPerson());
 		legalEntity03.setDefaultCustomerGroup(customerGroupDefault);
 
-
 		boxMerlotItaly2001.setVendor(legalEntity03);
-
 
 		Person person = dataCreator.createPerson("NightLabs GmbH", "Marco", "Schulze", "marco@nightlabs.de", new Date(),
 				PersonStruct.PERSONALDATA_SALUTATION_MR, "Dr.", "Teststrasse", "79100", "Freiburg", "Baden-Württemberg", "Deutschland",
@@ -433,15 +416,17 @@ extends Initialiser
 
 			userGroupRef.addRoleGroupRef(roleGroupRef);
 		}
+		
+		logger.info("Chezfrancois Created all SimpleProductTypes; publishing, confirming and making available now!");
+		dataCreator.makeAllLeavesSaleable();
 
 		dataCreator.createOrderForEndcustomer(LegalEntity.getAnonymousLegalEntity(pm));
 		dataCreator.createOrderForEndcustomer(LegalEntity.getAnonymousLegalEntity(pm));
 		dataCreator.createOrderForEndcustomer(legalEntity00);
 		dataCreator.createOrderForEndcustomer(LegalEntity.getAnonymousLegalEntity(pm));
-		dataCreator.createOrderForEndcustomer(legalEntity00);
-
+		dataCreator.createOrderForEndcustomer(legalEntity00);		
+		
 		logger.info("Initialization of JFireChezFrancois complete!");
-
 
 		logger.info("Initializing JDO for Article.class...");
 		pm.getExtent(Article.class);

@@ -32,7 +32,7 @@ import org.nightlabs.jfire.voucher.editor2d.iofilter.VoucherXStreamFilter;
 import org.nightlabs.jfire.voucher.scripting.VoucherLayout;
 import org.nightlabs.jfire.voucher.scripting.VoucherScriptingConstants;
 import org.nightlabs.jfire.voucher.store.VoucherType;
-import org.nightlabs.print.page.A5Page;
+import org.nightlabs.print.page.A4Page;
 import org.nightlabs.print.page.PredefinedPageUtil;
 
 public class DataCreatorVoucher
@@ -147,7 +147,7 @@ public class DataCreatorVoucher
 			root = factory.createScriptRootDrawComponent(true);		
 			root.setResolution(new ResolutionImpl(IResolutionUnit.dpiUnit, 300));
 			Rectangle pageBounds = PredefinedPageUtil.getPageBounds(
-					root.getModelUnit(), new A5Page());
+					root.getModelUnit(), new A4Page());
 			root.getCurrentPage().setPageBounds(pageBounds);
 			Layer layer = root.getCurrentLayer();
 			

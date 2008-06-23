@@ -128,6 +128,7 @@ import org.nightlabs.jfire.trade.id.OrderID;
 import org.nightlabs.jfire.trade.jbpm.ProcessDefinitionAssignment;
 import org.nightlabs.jfire.transfer.id.AnchorID;
 import org.nightlabs.jfire.transfer.id.TransferID;
+import org.nightlabs.util.CollectionUtil;
 
 /**
  * @author marco schulze - marco at nightlabs dot de
@@ -2077,26 +2078,27 @@ implements SessionBean
 		}
 	}
 
-	/**
-	 * This method is faster than {@link #getProductTransferIDs(Collection)}, because
-	 * it directly queries object-ids.
-	 *
-	 * @param productTransferIDQuery The query to execute.
-	 *
-	 * @ejb.interface-method
-	 * @!ejb.transaction type="Supports" @!This usually means that no transaction is opened which is significantly faster and recommended for all read-only EJB methods! Marco.
-	 * @ejb.permission role-name="_Guest_"
-	 */
-	public List<TransferID> getProductTransferIDs(ProductTransferIDQuery productTransferIDQuery)
-	{
-		PersistenceManager pm = getPersistenceManager();
-		try {
-			productTransferIDQuery.setPersistenceManager(pm);
-			return new ArrayList<TransferID>((Collection<TransferID>)  productTransferIDQuery.getResult());
-		} finally {
-			pm.close();
-		}
-	}
+//	/**
+//	 * This method is faster than {@link #getProductTransferIDs(Collection)}, because
+//	 * it directly queries object-ids.
+//	 *
+//	 * @param productTransferIDQuery The query to execute.
+//	 *
+//	 * @ejb.interface-method
+//	 * @!ejb.transaction type="Supports" @!This usually means that no transaction is opened which is significantly faster and recommended for all read-only EJB methods! Marco.
+//	 * @ejb.permission role-name="_Guest_"
+//	 */
+//	public List<TransferID> getProductTransferIDs(ProductTransferIDQuery productTransferIDQuery)
+//	{
+//		PersistenceManager pm = getPersistenceManager();
+//		try {
+//			productTransferIDQuery.setPersistenceManager(pm);
+//			Collection<TransferID> transferIDs = CollectionUtil.castCollection(productTransferIDQuery.getResult());
+//			return new ArrayList<TransferID>(transferIDs);
+//		} finally {
+//			pm.close();
+//		}
+//	}
 
 	/**
 	 * Unlike {@link #getProductTransferIDs(ProductTransferIDQuery)}, this method allows
@@ -2111,28 +2113,40 @@ implements SessionBean
 	 * @!ejb.transaction type="Supports" @!This usually means that no transaction is opened which is significantly faster and recommended for all read-only EJB methods! Marco.
 	 * @ejb.permission role-name="_Guest_"
 	 */
-	public List<TransferID> getProductTransferIDs(
-		QueryCollection<ProductTransferQuery> productTransferQueries)
+	public List<TransferID> getProductTransferIDs(QueryCollection<? extends ProductTransferQuery> productTransferQueries)
 	{
 		if (productTransferQueries == null)
-			return null;
-		
-		if (! ProductTransfer.class.isAssignableFrom(productTransferQueries.getResultClass()))
-		{
-			throw new RuntimeException("Given QueryCollection has invalid return type! " +
-					"Invalid return type= "+ productTransferQueries.getResultClassName());
-		}
-		
+			throw new IllegalArgumentException("productTransferQueries must not be null!");
+
+		if (productTransferQueries.isEmpty())
+			return new ArrayList<TransferID>(0);
+
 		PersistenceManager pm = getPersistenceManager();
 		try {
-			Collection<ProductTransfer> productTransfers = null;
-			for (ProductTransferQuery productTransferQuery : productTransferQueries) {
-				productTransferQuery.setPersistenceManager(pm);
-				productTransferQuery.setCandidates(productTransfers);
-				productTransfers = (Collection<ProductTransfer>) productTransferQuery.getResult();
-			}
+			if (ProductTransfer.class.isAssignableFrom(productTransferQueries.getResultClass())) {
+//				Collection<ProductTransfer> productTransfers = null;
+//				for (ProductTransferQuery productTransferQuery : productTransferQueries) {
+//					productTransferQuery.setPersistenceManager(pm);
+//					productTransferQuery.setCandidates(productTransfers);
+//					productTransfers = CollectionUtil.castCollection(productTransferQuery.getResult());
+//				}
+//				return NLJDOHelper.getObjectIDList(productTransfers);
 
-			return NLJDOHelper.getObjectIDList(productTransfers);
+				JDOQueryCollectionDecorator<? extends ProductTransferQuery> decorator = new JDOQueryCollectionDecorator<ProductTransferQuery>(productTransferQueries);
+				decorator.setPersistenceManager(pm);
+				return NLJDOHelper.getObjectIDList(decorator.executeQueries());
+			}
+			else if (TransferID.class.isAssignableFrom(productTransferQueries.getResultClass())) {
+				if (productTransferQueries.size() != 1)
+					throw new IllegalArgumentException("productTransferQueries has result-class TransferID, but contains more than 1 query. Since a query returning object-ids is not cascadable, this is illegal!");
+
+				JDOQueryCollectionDecorator<? extends ProductTransferQuery> decorator = new JDOQueryCollectionDecorator<ProductTransferQuery>(productTransferQueries);
+				decorator.setPersistenceManager(pm);
+				Collection<TransferID> productTransferIDs = CollectionUtil.castCollection(decorator.executeQueries());
+				return new ArrayList<TransferID>(productTransferIDs);
+			}
+			else
+				throw new RuntimeException("Given QueryCollection has invalid return type! Invalid return type: "+ productTransferQueries.getResultClassName());
 		} finally {
 			pm.close();
 		}

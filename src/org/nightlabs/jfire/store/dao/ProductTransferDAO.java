@@ -10,7 +10,6 @@ import org.nightlabs.jfire.security.SecurityReflector;
 import org.nightlabs.jfire.store.ProductTransfer;
 import org.nightlabs.jfire.store.StoreManager;
 import org.nightlabs.jfire.store.StoreManagerUtil;
-import org.nightlabs.jfire.store.query.ProductTransferIDQuery;
 import org.nightlabs.jfire.store.query.ProductTransferQuery;
 import org.nightlabs.jfire.transfer.id.TransferID;
 import org.nightlabs.progress.ProgressMonitor;
@@ -41,24 +40,24 @@ public class ProductTransferDAO
 		return sm.getProductTransfers(productTransferIDs, fetchGroups, maxFetchDepth);
 	}
 
-	@SuppressWarnings("unchecked")
-	public List<ProductTransfer> getProductTransfers(
-			ProductTransferIDQuery productTransferIDQuery,
-			String[] fetchGroups, int maxFetchDepth,
-			ProgressMonitor monitor)
-	{
-		try {
-			StoreManager sm = StoreManagerUtil.getHome(SecurityReflector.getInitialContextProperties()).create();
-			List<TransferID> transferIDs = sm.getProductTransferIDs(productTransferIDQuery);
-			return getJDOObjects(null, transferIDs, fetchGroups, maxFetchDepth, monitor);
-		} catch (Exception e) {
-			throw new RuntimeException(e);
-		}
-	}
+//	@SuppressWarnings("unchecked")
+//	public List<ProductTransfer> getProductTransfers(
+//			ProductTransferIDQuery productTransferIDQuery,
+//			String[] fetchGroups, int maxFetchDepth,
+//			ProgressMonitor monitor)
+//	{
+//		try {
+//			StoreManager sm = StoreManagerUtil.getHome(SecurityReflector.getInitialContextProperties()).create();
+//			List<TransferID> transferIDs = sm.getProductTransferIDs(productTransferIDQuery);
+//			return getJDOObjects(null, transferIDs, fetchGroups, maxFetchDepth, monitor);
+//		} catch (Exception e) {
+//			throw new RuntimeException(e);
+//		}
+//	}
 
 	@SuppressWarnings("unchecked")
 	public List<ProductTransfer> getProductTransfers(
-			QueryCollection<ProductTransferQuery> productTransferQueries,
+			QueryCollection<? extends ProductTransferQuery> productTransferQueries,
 			String[] fetchGroups, int maxFetchDepth,
 			ProgressMonitor monitor)
 	{
@@ -70,21 +69,21 @@ public class ProductTransferDAO
 			throw new RuntimeException(e);
 		}
 	}
-	
-	public List<ProductTransfer> getProductTransfersByIDQueries(
-		QueryCollection<ProductTransferIDQuery> queries,
-		String[] fetchGroups, int maxFetchDepth,
-		ProgressMonitor monitor)
-	{
-		try
-		{
-			StoreManager sm = StoreManagerUtil.getHome(SecurityReflector.getInitialContextProperties()).create();
-			List<TransferID> transferIDs = sm.getProductTransferIDs(queries);
-			return getJDOObjects(null, transferIDs, fetchGroups, maxFetchDepth, monitor);
-		}
-		catch (Exception e)
-		{
-			throw new RuntimeException("Problem fetching ProductTransfers:", e);
-		}
-	}
+
+//	public List<ProductTransfer> getProductTransfersByIDQueries(
+//		QueryCollection<ProductTransferIDQuery> queries,
+//		String[] fetchGroups, int maxFetchDepth,
+//		ProgressMonitor monitor)
+//	{
+//		try
+//		{
+//			StoreManager sm = StoreManagerUtil.getHome(SecurityReflector.getInitialContextProperties()).create();
+//			List<TransferID> transferIDs = sm.getProductTransferIDs(queries);
+//			return getJDOObjects(null, transferIDs, fetchGroups, maxFetchDepth, monitor);
+//		}
+//		catch (Exception e)
+//		{
+//			throw new RuntimeException("Problem fetching ProductTransfers:", e);
+//		}
+//	}
 }

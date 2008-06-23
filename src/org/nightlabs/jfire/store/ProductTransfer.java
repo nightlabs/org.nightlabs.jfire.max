@@ -31,11 +31,13 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Iterator;
 import java.util.Map;
 import java.util.Set;
 
 import javax.jdo.FetchPlan;
 import javax.jdo.PersistenceManager;
+import javax.jdo.Query;
 import javax.jdo.listener.DetachCallback;
 
 import org.nightlabs.jfire.security.User;
@@ -56,7 +58,7 @@ import org.nightlabs.jfire.transfer.Transfer;
  * @jdo.fetch-group name="ProductTransfer.products" fields="products"
  *
  * @jdo.query
- *		name="getProductTypeID2productCount"
+ *		name="getProductType2productCount"
  *		query="
  *				SELECT product.productType, count(product)
  *				WHERE this == :productTransfer && this.products.contains(product)
@@ -148,6 +150,9 @@ implements Serializable, DetachCallback
 	{
 		// TODO We must - either here or somewhere else - ensure that all the nested products are transferred, too (and have the same repository as the package product afterwards).
 		super.bookTransfer(user, involvedAnchors);
+		
+		// hmmm... I'm not sure, maybe it's better to leave them were they are (i.e. only track till they are used in a "factory" to "produce" another product).
+		// Before changing sth. here, we should think about it again. Marco.
 	}
 
 	public int getProductCount()
@@ -158,28 +163,26 @@ implements Serializable, DetachCallback
 		return productCount.intValue();
 	}
 
-	@SuppressWarnings("unchecked")
 	public Map<ProductType, Integer> getProductType2productCountMap()
 	{
 		if (productType2productCountMap == null) {
-			Map m = new HashMap();
+			Map<ProductType, Integer> m = new HashMap<ProductType, Integer>();
 
 //			// TODO JPOX WORKAROUND begin
 //			Query q1 = getPersistenceManager().newNamedQuery(ProductTransfer.class, "WORKAROUND_getProductTypesForProducts");
 //			Query q2 = getPersistenceManager().newNamedQuery(ProductTransfer.class, "WORKAROUND_getProductCountForProductType");
-//			Collection productTypeIDs = (Collection) q1.execute(this);
-//			for (Iterator itPTID = productTypeIDs.iterator(); itPTID.hasNext();) {
+//			Collection<?> productTypeIDs = (Collection<?>) q1.execute(this);
+//			for (Iterator<?> itPTID = productTypeIDs.iterator(); itPTID.hasNext();) {
 //				ProductType productType = (ProductType) itPTID.next();
 //				Long count = (Long) q2.execute(this, productType);
-//				ProductTypeID productTypeID = (ProductTypeID) JDOHelper.getObjectId(productType);
-//				m.put(productTypeID, new Integer(count.intValue()));
+//				m.put(productType, new Integer(count.intValue()));
 //			}
 //			// TODO JPOX WORKAROUND end
 
-				// Fuck, the workaround fails too! Will do it very inefficiently:
+			// Fuck, the workaround fails too! Will do it very inefficiently:
+			// I hope, https://www.jfire.org/modules/bugs/view.php?id=233 is fixed soon.
 			for (Product product : products) {
 				ProductType productType = product.getProductType();
-//				ProductTypeID productTypeID = (ProductTypeID) JDOHelper.getObjectId(product.getProductType());
 				Integer count = (Integer) m.get(productType);
 
 				if (count == null)
@@ -190,11 +193,11 @@ implements Serializable, DetachCallback
 				m.put(productType, count);
 			}
 
-//			Query q = getPersistenceManager().newNamedQuery(ProductTransfer.class, "getProductTypeID2productCount");
-//			Collection res = (Collection) q.execute(this);
-//			for (Iterator iterator = res.iterator(); iterator.hasNext();) {
+//			Query q = getPersistenceManager().newNamedQuery(ProductTransfer.class, "getProductType2productCount");
+//			Collection<?> res = (Collection<?>) q.execute(this);
+//			for (Iterator<?> iterator = res.iterator(); iterator.hasNext();) {
 //				Object[] record = (Object[]) iterator.next();
-//				m.put(record[0], record[1]);
+//				m.put((ProductType)record[0], new Integer(((Number)record[1]).intValue()));
 ////				m.put(JDOHelper.getObjectId(record[0]), record[1]);
 //			}
 

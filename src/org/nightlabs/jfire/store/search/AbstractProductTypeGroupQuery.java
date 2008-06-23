@@ -10,6 +10,7 @@ import javax.jdo.Query;
 import org.apache.log4j.Logger;
 import org.nightlabs.jdo.query.AbstractSearchQuery;
 import org.nightlabs.jfire.store.ProductType;
+import org.nightlabs.jfire.store.ProductType.FieldName;
 
 /**
  * @author Daniel Mazurek - daniel [at] nightlabs [dot] de
@@ -17,6 +18,7 @@ import org.nightlabs.jfire.store.ProductType;
  */
 public abstract class AbstractProductTypeGroupQuery 
 extends VendorDependentQuery
+implements ISaleAccessQuery
 {
 	private static final Logger logger = Logger.getLogger(AbstractProductTypeGroupQuery.class);
 	
@@ -48,38 +50,32 @@ extends VendorDependentQuery
 		StringBuffer filter = getFilter();
 		StringBuffer vars = getVars();
 		StringBuffer imports = getImports();
-		
-		filter.append("productType.productTypeGroups.containsValue(this)");
-////		FIXME Workaround for JPOX - begin
-//		filter.append("productType.productTypeGroups.containsValue(workaroundGroup) &&");
-//		filter.append("workaroundGroup == this");
-//		vars.append(ProductTypeGroup.class.getName()+" workaroundGroup;");
-//		addImport(ProductTypeGroup.class.getName());
-////		FIXME Workaround for JPOX - end
+				
+		filter.append("productType."+FieldName.productTypeGroups+".containsValue(this)");
 
 		if (organisationID != null)
-			filter.append("\n && this.organisationID == :organisationID");
+			filter.append("\n && this."+org.nightlabs.jfire.store.ProductTypeGroup.FieldName.organisationID+" == :"+org.nightlabs.jfire.store.ProductTypeGroup.FieldName.organisationID);
 
 		if (fullTextSearch != null) {
 			filter.append("\n && ( ");
-			addFullTextSearch(filter, vars, "name");
+			addFullTextSearch(filter, vars, FieldName.name);
 			filter.append("\n )");
 		}
 
 		if (published != null)
-			filter.append("\n && productType.published == :published");
-		
+			filter.append("\n && productType."+FieldName.published+" == :published");
+
 		if (confirmed != null)
-			filter.append("\n && productType.confirmed == :confirmed");
-		
+			filter.append("\n && productType."+FieldName.confirmed+" == :confirmed");
+
 		if (saleable != null)
-			filter.append("\n && productType.saleable == :saleable");
-				
+			filter.append("\n && productType."+FieldName.saleable+" == :saleable");
+
 		if (closed != null)
-			filter.append("\n && productType.closed == :closed");
+			filter.append("\n && productType."+FieldName.closed+" == :closed");
 
 		if (getVendorID() != null)
-			filter.append("\n && JDOHelper.getObjectId(productType.vendor) == :vendorID");
+			filter.append("\n && JDOHelper.getObjectId(productType."+FieldName.vendor+") == :vendorID");
 
 		vars.append(ProductType.class.getName()+" productType;");
 		addImport(ProductType.class.getName());
@@ -114,7 +110,7 @@ extends VendorDependentQuery
 	 * Returns whether only published ProductTypes should be searched for. 
 	 * @return whether only published ProductTypes should be searched for.
 	 */
-	public boolean getPublished() {
+	public Boolean getPublished() {
 		return published;
 	}
 
@@ -122,7 +118,7 @@ extends VendorDependentQuery
 	 * Returns whether only saleable ProductTypes should be searched for.
 	 * @return whether only saleable ProductTypes should be searched for.
 	 */
-	public boolean getSaleable() {
+	public Boolean getSaleable() {
 		return saleable;
 	}
 
@@ -131,7 +127,9 @@ extends VendorDependentQuery
 	 * @param saleable the saleable to set
 	 */
 	public void setSaleable(Boolean saleable) {
+		Boolean oldSaleable = this.saleable;
 		this.saleable = saleable;
+		notifyListeners(PROPERTY_SALEABLE, oldSaleable, saleable);
 	}
 
 	/**
@@ -139,7 +137,9 @@ extends VendorDependentQuery
 	 * @param published the published to set
 	 */
 	public void setPublished(Boolean published) {
+		Boolean oldPublished = this.published;
 		this.published = published;
+		notifyListeners(PROPERTY_PUBLISHED, oldPublished, published);
 	}	
 	
 	/**

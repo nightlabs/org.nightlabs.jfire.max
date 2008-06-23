@@ -7,6 +7,7 @@ import javax.jdo.Query;
 import org.apache.log4j.Logger;
 import org.nightlabs.jdo.query.AbstractSearchQuery;
 import org.nightlabs.jfire.store.ProductType;
+import org.nightlabs.jfire.store.ProductType.FieldName;
 import org.nightlabs.jfire.store.id.ProductTypeGroupID;
 import org.nightlabs.jfire.transfer.id.AnchorID;
 
@@ -20,6 +21,7 @@ import org.nightlabs.jfire.transfer.id.AnchorID;
 public abstract class AbstractProductTypeQuery
 //extends AbstractJDOQuery
 extends VendorDependentQuery
+implements ISaleAccessQuery
 {
 	private static final Logger logger = Logger.getLogger(AbstractProductTypeQuery.class);
 	 
@@ -36,7 +38,7 @@ extends VendorDependentQuery
 	private int minNestedProductTypeAmount = -1;
 	private int maxNestedProductTypeAmount = -1;
 	private AnchorID ownerID = null;
-	private Boolean available = null;
+//	private Boolean available = null;
 //	private PriceConfigID innerPriceConfigID = null;	
 //	private DeliveryConfigurationID deliveryConfigurationID = null;
 //	private LocalAccountantDelegateID localAccountantDelegateID = null;
@@ -84,33 +86,32 @@ extends VendorDependentQuery
 		
 		if (fullTextSearch != null) {
 			filter.append("\n && ( ");
-			addFullTextSearch(filter, vars, "name");
+			addFullTextSearch(filter, vars, FieldName.name);
 			filter.append("\n )");
 		}
 		
 		if (published != null)
-			filter.append("\n && this.published == :published");
+			filter.append("\n && this."+FieldName.published+" == :published");
 		
 		if (confirmed != null)
-			filter.append("\n && this.confirmed == :confirmed");
+			filter.append("\n && this."+FieldName.confirmed+" == :confirmed");
 		
 		if (saleable != null)
-			filter.append("\n && this.saleable == :saleable");
+			filter.append("\n && this."+FieldName.saleable+" == :saleable");
 
 		if (closed != null)
-			filter.append("\n && this.closed == :closed");
-		
-		if (available != null)
-			filter.append("\n && this.available == :available");
-		
+			filter.append("\n && this."+FieldName.closed+" == :closed");
+				
 		if (minNestedProductTypeAmount >= 0)
-			filter.append("\n && :minNestedProductTypeAmount < this.nestedProductTypes.size()");
+			filter.append("\n && :minNestedProductTypeAmount < this."+FieldName.productTypeLocal+"."+
+					org.nightlabs.jfire.store.ProductTypeLocal.FieldName.nestedProductTypeLocals+".size()");
 
 		if (maxNestedProductTypeAmount >= 0)
-			filter.append("\n && :maxNestedProductTypeAmount > this.nestedProductTypes.size()");
+			filter.append("\n && :maxNestedProductTypeAmount > this."+FieldName.productTypeLocal+"."+
+					org.nightlabs.jfire.store.ProductTypeLocal.FieldName.nestedProductTypeLocals+".size()");
 						
 		if (ownerID != null) {
-			filter.append("\n && JDOHelper.getObjectId(this.owner) == :ownerID");
+			filter.append("\n && JDOHelper.getObjectId(this."+FieldName.owner+") == :ownerID");
 		}
 		
 //		if (innerPriceConfigID != null) {
@@ -126,14 +127,14 @@ extends VendorDependentQuery
 //		}
 
 		if (productTypeGroupID != null) {
-			filter.append("\n && JDOHelper.getObjectId(this.managedProductTypeGroup) == :productTypeGroupID");
+			filter.append("\n && JDOHelper.getObjectId(this."+FieldName.managedProductTypeGroup+") == :productTypeGroupID");
 		}
 		
 		if (organisationID != null)
-			filter.append("\n && this.organisationID == :organisationID");
+			filter.append("\n && this."+FieldName.organisationID+" == :organisationID");
 		
 		if (inheritanceNature != null)
-			filter.append("\n && this.inheritanceNature == :inheritanceNature");
+			filter.append("\n && this."+FieldName.inheritanceNature+" == :inheritanceNature");
 		
 		if (logger.isDebugEnabled()) {
 			logger.debug("Vars:");
@@ -408,24 +409,24 @@ extends VendorDependentQuery
 		notifyListeners(PROPERTY_CLOSED, oldClosed, closed);
 	}
 
-	/**
-	 * returns the available.
-	 * @return the available
-	 */
-	public Boolean getAvailable() {
-		return available;
-	}
-
-	/**
-	 * sets the available
-	 * @param available the available to set
-	 */
-	public void setAvailable(Boolean available)
-	{
-		final Boolean oldAvailable = this.available;
-		this.available = available;
-		notifyListeners(PROPERTY_AVAILABLE, oldAvailable, available);
-	}
+//	/**
+//	 * returns the available.
+//	 * @return the available
+//	 */
+//	public Boolean getAvailable() {
+//		return available;
+//	}
+//
+//	/**
+//	 * sets the available
+//	 * @param available the available to set
+//	 */
+//	public void setAvailable(Boolean available)
+//	{
+//		final Boolean oldAvailable = this.available;
+//		this.available = available;
+//		notifyListeners(PROPERTY_AVAILABLE, oldAvailable, available);
+//	}
 
 	/**
 	 * Returns the organisationID.
@@ -467,10 +468,10 @@ extends VendorDependentQuery
 		List<FieldChangeCarrier> changedFields = super.getChangedFields(propertyName);
 		boolean allFields = AbstractSearchQuery.PROPERTY_WHOLE_QUERY.equals(propertyName);
 		
-		if (allFields || PROPERTY_AVAILABLE.equals(propertyName))
-		{
-			changedFields.add( new FieldChangeCarrier(PROPERTY_AVAILABLE, available) );
-		}
+//		if (allFields || PROPERTY_AVAILABLE.equals(propertyName))
+//		{
+//			changedFields.add( new FieldChangeCarrier(PROPERTY_AVAILABLE, available) );
+//		}
 		if (allFields || PROPERTY_CLOSED.equals(propertyName))
 		{
 			changedFields.add( new FieldChangeCarrier(PROPERTY_CLOSED, closed) );

@@ -35,6 +35,9 @@ import javax.jdo.PersistenceManager;
 import javax.jdo.Query;
 import javax.jdo.listener.DetachCallback;
 
+import org.nightlabs.inheritance.FieldInheriter;
+import org.nightlabs.inheritance.FieldMetaData;
+import org.nightlabs.inheritance.Inheritable;
 import org.nightlabs.jfire.store.id.ProductTypeGroupID;
 import org.nightlabs.util.Util;
 
@@ -68,6 +71,23 @@ implements Serializable, DetachCallback
 	 */
 	public static final String FETCH_GROUP_PRODUCT_TYPES = "ProductTypeGroup.productTypes";
 
+	/**
+	 * This class defines constants for the field names of implementation of
+	 * {@link Inheritable}, to avoid the use of "hardcoded" Strings for retrieving
+	 * {@link FieldMetaData} or {@link FieldInheriter}.  
+	 * In the future the JFire project will probably autogenerate this class,
+	 * but until then you should implement it manually.
+	 */
+	public static final class FieldName
+	{
+		public static final String managedByProductType = "managedByProductType";
+		public static final String name = "name";
+		public static final String organisationID = "organisationID";
+		public static final String primaryKey = "primaryKey";
+		public static final String productTypeGroupID = "productTypeGroupID";
+		public static final String productTypes = "productTypes";
+	};
+	
 	/**
 	 * @jdo.field primary-key="true"
 	 * @jdo.column length="100"

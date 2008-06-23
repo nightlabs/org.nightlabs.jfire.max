@@ -31,6 +31,7 @@ import java.util.Map;
 
 import org.nightlabs.annotation.Implement;
 import org.nightlabs.i18n.I18nText;
+import org.nightlabs.jfire.transfer.Anchor;
 
 /**
  * @author Alexander Bieber <alex[AT]nightlabs[DOT]de>
@@ -113,7 +114,8 @@ public class RepositoryName extends I18nText
 	@Override
 	@Implement
 	protected String getFallBackValue(String languageID) {
-		return anchorID;
+		return Anchor.getPrimaryKey(organisationID, anchorTypeID, anchorID);
+//		return anchorID;
 	}
 
 	public String getOrganisationID() {

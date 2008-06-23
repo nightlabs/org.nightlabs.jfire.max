@@ -42,8 +42,8 @@ extends VendorDependentQuery
 //	private LocalAccountantDelegateID localAccountantDelegateID = null;
 	private ProductTypeGroupID productTypeGroupID = null;	
 	private String organisationID = null;
-	// this value is hardcoded to avoid finding productType categories
-	private byte inheritanceNature = ProductType.INHERITANCE_NATURE_LEAF;
+	// this value is initially set to avoid finding productType categories by default
+	private Byte inheritanceNature = ProductType.INHERITANCE_NATURE_LEAF;
 	
 	// Property IDs used for the PropertyChangeListeners
 	private static final String PROPERTY_PREFIX = "AbstractProductTypeQuery.";
@@ -59,6 +59,7 @@ extends VendorDependentQuery
 	public static final String PROPERTY_PUBLISHED = PROPERTY_PREFIX + "published";
 	public static final String PROPERTY_SALEABLE = PROPERTY_PREFIX + "saleable";
 	public static final String PROPERTY_ORGANISATION_ID = PROPERTY_PREFIX + "organisationID";
+	public static final String PROPERTY_INHERITANCE_NATURE = PROPERTY_PREFIX + "inheritanceNature";
 
 //	public static final String PROPERTY_INNER_PRICE_CONFIG_ID = PROPERTY_PREFIX + "innerPriceConfigID";
 //	public static final String PROPERTY_LOCAL_ACCOUNTANT_DELEGATE_ID = PROPERTY_PREFIX + "localAccountantDelegateID";	
@@ -131,7 +132,8 @@ extends VendorDependentQuery
 		if (organisationID != null)
 			filter.append("\n && this.organisationID == :organisationID");
 		
-		filter.append("\n && this.inheritanceNature == :inheritanceNature");
+		if (inheritanceNature != null)
+			filter.append("\n && this.inheritanceNature == :inheritanceNature");
 		
 		if (logger.isDebugEnabled()) {
 			logger.debug("Vars:");
@@ -447,8 +449,16 @@ extends VendorDependentQuery
 	 * Returns the inheritanceNature.
 	 * @return the inheritanceNature
 	 */
-	public byte getInheritanceNature() {
+	public Byte getInheritanceNature() {
 		return inheritanceNature;
+	}
+	
+	/**
+	 * Sets the inheritanceNature.
+	 * @param inheritanceNature the inheritanceNature to set
+	 */
+	public void setInheritanceNature(Byte inheritanceNature) {
+		this.inheritanceNature = inheritanceNature;
 	}
 
 	@Override
@@ -505,6 +515,11 @@ extends VendorDependentQuery
 		{
 			changedFields.add( new FieldChangeCarrier(PROPERTY_ORGANISATION_ID, organisationID) );
 		}
+		if (allFields || PROPERTY_INHERITANCE_NATURE.equals(propertyName))
+		{
+			changedFields.add( new FieldChangeCarrier(PROPERTY_INHERITANCE_NATURE, inheritanceNature) );
+		}
+		
 //		if (allFields || PROPERTY_DELIVERY_CONFIGURATION_ID.equals(propertyName))
 //		{
 //			changedFields.add( new FieldChangeCarrier(PROPERTY_DELIVERY_CONFIGURATION_ID, deliveryConfigurationID) );

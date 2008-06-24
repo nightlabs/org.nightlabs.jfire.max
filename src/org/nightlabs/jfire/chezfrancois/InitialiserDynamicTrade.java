@@ -144,7 +144,7 @@ extends Initialiser
 
 		DynamicProductType swDevProjectD = dataCreator.createLeaf(softwareDevelopment, "softwareDevelopment.projectD", null, legalEntityVendor, "Project D", "Projekt D");
 		
-		DynamicProductType service = dataCreator.createCategory(null, serviceID.productTypeID, null, null, "Service", "Dienstleistung");
+		DynamicProductType service = dataCreator.createCategory(null, serviceID.productTypeID, null, "Service", "Dienstleistung");
 		
 		// FIXME
 		@SuppressWarnings("unused")

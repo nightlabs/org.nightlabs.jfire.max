@@ -444,6 +444,19 @@ public class DataCreator
 //		return legalEntity;
 	}
 
+	public LegalEntity createLegalVendor(
+			String userID, String password,
+			String personCompany, String personName, String personFirstName, String personEMail) throws DataBlockNotFoundException, DataBlockGroupNotFoundException, DataFieldNotFoundException, SecurityException
+	{
+		User user = createUser(userID,password,personCompany,personName,personFirstName,personEMail);
+		Trader trader = Trader.getTrader(pm);
+		LegalEntity legalEntity = createLegalEntity(user.getPerson());
+		legalEntity.setDefaultCustomerGroup(trader.getDefaultCustomerGroupForKnownCustomer());		
+		
+		return legalEntity;
+	}
+	
+	
 	public Order createOrderForEndcustomer(LegalEntity customer)
 	throws ModuleException
 	{

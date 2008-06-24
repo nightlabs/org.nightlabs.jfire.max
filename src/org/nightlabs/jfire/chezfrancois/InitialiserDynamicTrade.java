@@ -26,6 +26,7 @@ import org.nightlabs.jfire.store.CannotMakeProductTypeSaleableException;
 import org.nightlabs.jfire.store.CannotPublishProductTypeException;
 import org.nightlabs.jfire.store.ProductTypeLocal;
 import org.nightlabs.jfire.store.id.ProductTypeID;
+import org.nightlabs.jfire.trade.LegalEntity;
 import org.nightlabs.jfire.trade.id.CustomerGroupID;
 
 public class InitialiserDynamicTrade
@@ -139,6 +140,8 @@ extends Initialiser
 		@SuppressWarnings("unused")
 		DynamicProductType swDevProjectC = dataCreator.createLeaf(softwareDevelopment, "softwareDevelopment.projectC", null, "Project C", "Projekt C");
 
+		DynamicProductType swDevProjectD = dataCreator.createLeaf(softwareDevelopment, "softwareDevelopment.projectD", null, "Project D", "Projekt D");
+
 		
 		DynamicProductType service = dataCreator.createCategory(null, serviceID.productTypeID, null, "Service", "Dienstleistung");
 		
@@ -153,7 +156,11 @@ extends Initialiser
 		
 		DynamicProductType misc = dataCreator.createLeaf(null, miscID.productTypeID, null, "Miscellaneous", "Verschiedenes");
 		
-
+		
+		LegalEntity legalEntityVendor  = dataCreator.createLegalVendor("alexandra", "test", "Weinexport  GmbH", "Kessler", "Alexandra", "Alexandra@chezfrancois.co.th");
+		swDevProjectD.setVendor(legalEntityVendor);
+		
+		
 		// configure moneyflow
 		MappingBasedAccountantDelegate swDelegate = new MappingBasedAccountantDelegate(organisationID, "softwareAccountantDelegate");
 

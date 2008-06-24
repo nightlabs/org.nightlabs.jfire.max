@@ -371,8 +371,14 @@ extends Initialiser
 		LegalEntity legalEntity03 = dataCreator.createLegalEntity(user03.getPerson());
 		legalEntity03.setDefaultCustomerGroup(customerGroupDefault);
 
-		boxMerlotItaly2001.setVendor(legalEntity03);
-
+		
+		LegalEntity legalEntityVendor  = dataCreator.createLegalVendor("alexandra", "test", "Weinexport  GmbH", "Kessler", "Alexandra", "Alexandra@chezfrancois.co.th");
+		
+		
+		// add simple products demo for a demo vendor to test the purchase
+		boxMerlotItaly2001.setVendor(legalEntityVendor);
+		bottleMerlotItaly2001.setVendor(legalEntityVendor);
+		
 		Person person = dataCreator.createPerson("NightLabs GmbH", "Marco", "Schulze", "marco@nightlabs.de", new Date(),
 				PersonStruct.PERSONALDATA_SALUTATION_MR, "Dr.", "Teststrasse", "79100", "Freiburg", "Baden-Württemberg", "Deutschland",
 				"49", "761", "123456789", "49", "761", "987654321", "Marco Schulze", 123456789, "68090000", "TestBank",

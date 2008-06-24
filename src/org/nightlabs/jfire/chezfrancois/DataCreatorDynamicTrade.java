@@ -18,6 +18,7 @@ import org.nightlabs.jfire.store.CannotMakeProductTypeSaleableException;
 import org.nightlabs.jfire.store.CannotPublishProductTypeException;
 import org.nightlabs.jfire.store.ProductType;
 import org.nightlabs.jfire.store.id.ProductTypeID;
+import org.nightlabs.jfire.trade.LegalEntity;
 
 public class DataCreatorDynamicTrade
 extends DataCreator
@@ -72,7 +73,7 @@ extends DataCreator
 	private List<DynamicProductType> createdLeafs = new ArrayList<DynamicProductType>();
 
 	public DynamicProductType createLeaf(DynamicProductType category, String productTypeID,
-			IInnerPriceConfig innerPriceConfig,
+			IInnerPriceConfig innerPriceConfig, LegalEntity vendor,
 			String ... names) throws CannotPublishProductTypeException, CannotConfirmProductTypeException
 	{
 		if (category == null)
@@ -89,6 +90,14 @@ extends DataCreator
 		else {
 			pt.setInnerPriceConfig(category.getInnerPriceConfig());
 		}
+		
+		if (vendor != null) {
+			pt.setVendor(vendor);
+			pt.setOwner(vendor);
+			pt.getFieldMetaData(ProductType.FieldName.vendor).setValueInherited(false);
+			pt.getFieldMetaData(ProductType.FieldName.owner).setValueInherited(false);
+		}
+		
 		pt = (DynamicProductType) store.addProductType(user, pt); // , DynamicProductTypeActionHandler.getDefaultHome(pm, pt));
 		store.setProductTypeStatus_published(user, pt);
 		store.setProductTypeStatus_confirmed(user, pt);

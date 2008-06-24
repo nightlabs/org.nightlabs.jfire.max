@@ -130,36 +130,34 @@ extends Initialiser
 		
 		DynamicProductType softwareDevelopment = dataCreator.createCategory(null, softwareDevelopmentID.productTypeID, null, "Software Development", "Software-Entwicklung");
 		
-		// FIXME
-		@SuppressWarnings("unused")
-		DynamicProductType swDevJFire = dataCreator.createLeaf(softwareDevelopment, "softwareDevelopment.jfire", null, "JFire");
-		@SuppressWarnings("unused")
-		DynamicProductType swDevProjectA = dataCreator.createLeaf(softwareDevelopment, "softwareDevelopment.projectA", null, "Project A", "Projekt A");
-		@SuppressWarnings("unused")
-		DynamicProductType swDevProjectB = dataCreator.createLeaf(softwareDevelopment, "softwareDevelopment.projectB", null, "Project B", "Projekt B");
-		@SuppressWarnings("unused")
-		DynamicProductType swDevProjectC = dataCreator.createLeaf(softwareDevelopment, "softwareDevelopment.projectC", null, "Project C", "Projekt C");
-
-		DynamicProductType swDevProjectD = dataCreator.createLeaf(softwareDevelopment, "softwareDevelopment.projectD", null, "Project D", "Projekt D");
-
-		
-		DynamicProductType service = dataCreator.createCategory(null, serviceID.productTypeID, null, "Service", "Dienstleistung");
-		
-		
-		// FIXME
-		@SuppressWarnings("unused")
-		DynamicProductType serviceJFire = dataCreator.createLeaf(service, "service.jfire", null, "JFire");
-		@SuppressWarnings("unused")
-		DynamicProductType serviceNetwork = dataCreator.createLeaf(service, "service.network", null, "Network", "Netzwerk");
-		@SuppressWarnings("unused")
-		DynamicProductType serviceWebserver = dataCreator.createLeaf(service, "service.webserver", null, "Webserver");
-		
-		DynamicProductType misc = dataCreator.createLeaf(null, miscID.productTypeID, null, "Miscellaneous", "Verschiedenes");
-		
-		
 		LegalEntity legalEntityVendor  = dataCreator.createLegalVendor("alexandra", "test", "Weinexport  GmbH", "Kessler", "Alexandra", "Alexandra@chezfrancois.co.th");
-		swDevProjectD.setVendor(legalEntityVendor);
 		
+		// FIXME
+		@SuppressWarnings("unused")
+		DynamicProductType swDevJFire = dataCreator.createLeaf(softwareDevelopment, "softwareDevelopment.jfire", null, null, "JFire");
+		@SuppressWarnings("unused")
+		DynamicProductType swDevProjectA = dataCreator.createLeaf(softwareDevelopment, "softwareDevelopment.projectA", null, null, "Project A", "Projekt A");
+		@SuppressWarnings("unused")
+		DynamicProductType swDevProjectB = dataCreator.createLeaf(softwareDevelopment, "softwareDevelopment.projectB", null, null, "Project B", "Projekt B");
+		@SuppressWarnings("unused")
+		DynamicProductType swDevProjectC = dataCreator.createLeaf(softwareDevelopment, "softwareDevelopment.projectC", null, null, "Project C", "Projekt C");
+
+		DynamicProductType swDevProjectD = dataCreator.createLeaf(softwareDevelopment, "softwareDevelopment.projectD", null, legalEntityVendor, "Project D", "Projekt D");
+		
+		DynamicProductType service = dataCreator.createCategory(null, serviceID.productTypeID, null, null, "Service", "Dienstleistung");
+		
+		// FIXME
+		@SuppressWarnings("unused")
+		DynamicProductType serviceJFire = dataCreator.createLeaf(service, "service.jfire", null, null, "JFire");
+		@SuppressWarnings("unused")
+		DynamicProductType serviceNetwork = dataCreator.createLeaf(service, "service.network", null, null, "Network", "Netzwerk");
+		@SuppressWarnings("unused")
+		DynamicProductType serviceWebserver = dataCreator.createLeaf(service, "service.webserver", null, null, "Webserver");
+		
+		DynamicProductType misc = dataCreator.createLeaf(null, miscID.productTypeID, null, null, "Miscellaneous", "Verschiedenes");
+		
+	// can not be set here because setting the vendor for an already confirmed ProductType is not possible
+//		swDevProjectD.setVendor(legalEntityVendor);		
 		
 		// configure moneyflow
 		MappingBasedAccountantDelegate swDelegate = new MappingBasedAccountantDelegate(organisationID, "softwareAccountantDelegate");

@@ -26,7 +26,9 @@ import org.nightlabs.jfire.store.CannotMakeProductTypeSaleableException;
 import org.nightlabs.jfire.store.CannotPublishProductTypeException;
 import org.nightlabs.jfire.store.ProductType;
 import org.nightlabs.jfire.store.ProductTypeLocal;
+import org.nightlabs.jfire.store.ProductType.FieldName;
 import org.nightlabs.jfire.store.id.ProductTypeID;
+import org.nightlabs.jfire.trade.LegalEntity;
 import org.nightlabs.jfire.voucher.accounting.VoucherLocalAccountantDelegate;
 import org.nightlabs.jfire.voucher.editor2d.iofilter.VoucherXStreamFilter;
 import org.nightlabs.jfire.voucher.scripting.VoucherLayout;
@@ -97,7 +99,8 @@ public class DataCreatorVoucher
 
 	public VoucherType createLeaf(VoucherType category, String productTypeID,
 			IPackagePriceConfig packagePriceConfig, VoucherLocalAccountantDelegate localAccountantDelegate,
-			String ... names) throws CannotPublishProductTypeException, CannotConfirmProductTypeException
+			LegalEntity vendor, String ... names) 
+	throws CannotPublishProductTypeException, CannotConfirmProductTypeException
 	{
 		if (category == null)
 			category = rootVoucherType;
@@ -121,7 +124,13 @@ public class DataCreatorVoucher
 		else
 			pt.getProductTypeLocal().setLocalAccountantDelegate(category.getProductTypeLocal().getLocalAccountantDelegate());
 
-
+		if (vendor != null) {
+			pt.setVendor(vendor);
+			pt.setOwner(vendor);
+			pt.getFieldMetaData(ProductType.FieldName.vendor).setValueInherited(false);
+			pt.getFieldMetaData(ProductType.FieldName.owner).setValueInherited(false);
+		}
+		
 		store.setProductTypeStatus_published(user, pt);
 		store.setProductTypeStatus_confirmed(user, pt);
 //		store.setProductTypeStatus_saleable(user, pt, true);

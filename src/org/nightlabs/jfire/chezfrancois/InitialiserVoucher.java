@@ -67,8 +67,6 @@ extends Initialiser
 		priceConfig40.addCurrency(dataCreator.getCurrencyEUR());
 		priceConfig40.setPrice(dataCreator.getCurrencyEUR(), new Long(4000));
 
-		
-		
 		AccountType accountType = (AccountType) pm.getObjectById(JFireVoucherEAR.ACCOUNT_TYPE_ID_VOUCHER);
 		Account accountNormalEur = new Account(organisationID, "voucherType.normal.eur", accountType, dataCreator.getOrganisationLegalEntity(), dataCreator.getCurrencyEUR());
 		Account accountXmasEur = new Account(organisationID, "voucherType.xmas.eur", accountType, dataCreator.getOrganisationLegalEntity(), dataCreator.getCurrencyEUR());
@@ -79,37 +77,34 @@ extends Initialiser
 		VoucherLocalAccountantDelegate localAccountantDelegateXmas = new VoucherLocalAccountantDelegate(organisationID, "voucherType.xmas");
 		localAccountantDelegateXmas.setAccount(dataCreator.getCurrencyEUR().getCurrencyID(), accountXmasEur);
 		
+		LegalEntity legalEntityVendor = dataCreator.createLegalVendor("alexandra", "test", "Weinexport  GmbH", "Kessler", "Alexandra", "Alexandra@chezfrancois.co.th");		
+		
 		VoucherType normal = dataCreator.createCategory(null, voucherTypeNormalID.productTypeID, localAccountantDelegateNormal, null, "Normal");
-		VoucherType normal10 = dataCreator.createLeaf(normal, "voucherType.normal.10", priceConfig10, null, "Voucher 10", "Gutschein 10");		
-		VoucherType normal20 = dataCreator.createLeaf(normal, "voucherType.normal.20", priceConfig20, null, "Voucher 20", "Gutschein 20");		
-		VoucherType normal40 = dataCreator.createLeaf(normal, "voucherType.normal.40", priceConfig40, null, "Voucher 40", "Gutschein 40");
-		VoucherType normal50 = dataCreator.createLeaf(normal, "voucherType.normal.50", priceConfig50, null, "Voucher 50", "Gutschein 50");
+		VoucherType normal10 = dataCreator.createLeaf(normal, "voucherType.normal.10", priceConfig10, null, null, "Voucher 10", "Gutschein 10");		
+		VoucherType normal20 = dataCreator.createLeaf(normal, "voucherType.normal.20", priceConfig20, null, null, "Voucher 20", "Gutschein 20");		
+		VoucherType normal40 = dataCreator.createLeaf(normal, "voucherType.normal.40", priceConfig40, null, legalEntityVendor, "Voucher 40", "Gutschein 40");
+		VoucherType normal50 = dataCreator.createLeaf(normal, "voucherType.normal.50", priceConfig50, null, null, "Voucher 50", "Gutschein 50");
 
-		
-		
 		VoucherType xmas = dataCreator.createCategory(null, "voucherType.xmas", localAccountantDelegateXmas, null, "Christmas", "Weihnachten");
-		VoucherType xmas10 = dataCreator.createLeaf(xmas, "voucherType.xmas.10", priceConfig10, null, "Voucher Christmas Special 10", "Weihnachts-Spezial-Gutschein 10");
-		VoucherType xmas20 = dataCreator.createLeaf(xmas, "voucherType.xmas.20", priceConfig20, null, "Voucher Christmas Special 20", "Weihnachts-Spezial-Gutschein 20");
-		VoucherType xmas40 = dataCreator.createLeaf(xmas, "voucherType.xmas.40", priceConfig50, null, "Voucher Christmas Special 40", "Weihnachts-Spezial-Gutschein 40");
-		VoucherType xmas50 = dataCreator.createLeaf(xmas, "voucherType.xmas.50", priceConfig50, null, "Voucher Christmas Special 50", "Weihnachts-Spezial-Gutschein 50");
-		
-		
-		
-		LegalEntity legalEntityVendor = dataCreator.createLegalVendor("alexandra", "test", "Weinexport  GmbH", "Kessler", "Alexandra", "Alexandra@chezfrancois.co.th");
-	
-		
-		normal40.setVendor(legalEntityVendor);
-		xmas40.setVendor(legalEntityVendor);
-		
+		VoucherType xmas10 = dataCreator.createLeaf(xmas, "voucherType.xmas.10", priceConfig10, null, null, "Voucher Christmas Special 10", "Weihnachts-Spezial-Gutschein 10");
+		VoucherType xmas20 = dataCreator.createLeaf(xmas, "voucherType.xmas.20", priceConfig20, null, null, "Voucher Christmas Special 20", "Weihnachts-Spezial-Gutschein 20");
+		VoucherType xmas40 = dataCreator.createLeaf(xmas, "voucherType.xmas.40", priceConfig50, null, legalEntityVendor, "Voucher Christmas Special 40", "Weihnachts-Spezial-Gutschein 40");
+		VoucherType xmas50 = dataCreator.createLeaf(xmas, "voucherType.xmas.50", priceConfig50, null, null, "Voucher Christmas Special 50", "Weihnachts-Spezial-Gutschein 50");
+				
+		// Could nto be done here because once a ProductType has been confirmed the vendor can not be set anymore
+//		normal40.setVendor(legalEntityVendor);
+//		xmas40.setVendor(legalEntityVendor);
 		
 		VoucherLayout voucherLayout = dataCreator.createVoucherLayout();
 		if (voucherLayout != null) {
 			normal10.setVoucherLayout(voucherLayout);
 			normal20.setVoucherLayout(voucherLayout);
+			normal40.setVoucherLayout(voucherLayout);
 			normal50.setVoucherLayout(voucherLayout);
 			
 			xmas10.setVoucherLayout(voucherLayout);
 			xmas20.setVoucherLayout(voucherLayout);
+			xmas40.setVoucherLayout(voucherLayout);
 			xmas50.setVoucherLayout(voucherLayout);
 		}
 		

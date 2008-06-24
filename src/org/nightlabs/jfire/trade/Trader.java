@@ -382,38 +382,20 @@ public class Trader
 		if (person == null)
 			throw new IllegalArgumentException("person must not be null!");
 
-//		String anchorID = person.getPrimaryKey().replace('/', '#');
-//		AnchorID oAnchorID = AnchorID.create(getMandator().getOrganisationID(),	LegalEntity.ANCHOR_TYPE_ID_LEGAL_ENTITY, anchorID);
-
-//		LegalEntity legalEntity = null;
-//		PersistenceManager pm = getPersistenceManager();
-//		boolean found = true;
-//		try {
-//			legalEntity = (LegalEntity) pm.getObjectById(oAnchorID);
-//		} catch (JDOObjectNotFoundException e) {
-//			legalEntity = new LegalEntity(oAnchorID.organisationID,
-//					oAnchorID.anchorID);
-//			legalEntity
-//					.setDefaultCustomerGroup(getDefaultCustomerGroupForKnownCustomer());
-//			found = false;
-//		}
 		PersistenceManager pm = getPersistenceManager();
 		boolean found = true;
 
 		LegalEntity legalEntity = LegalEntity.getLegalEntity(pm, person);
 		if (legalEntity == null) {
 			found = false;
-			String anchorID = LegalEntity.nextAnchorID();
-			legalEntity = new LegalEntity(IDGenerator.getOrganisationID(), anchorID);
+			legalEntity = new LegalEntity(IDGenerator.getOrganisationID(), LegalEntity.nextAnchorID());
 			legalEntity.setDefaultCustomerGroup(getDefaultCustomerGroupForKnownCustomer());
 		}
 
 		legalEntity.setPerson(person);
-		if (makePersistent && !found) {
-			if (!JDOHelper.isPersistent(legalEntity)) {
-				pm.makePersistent(legalEntity);
-			}
-		}
+		if (makePersistent && !found)
+			legalEntity = pm.makePersistent(legalEntity); // if it already is persistent, this call has simply no effect - no problem
+
 		return legalEntity;
 	}
 

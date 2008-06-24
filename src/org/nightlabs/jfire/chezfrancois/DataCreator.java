@@ -80,6 +80,7 @@ import org.nightlabs.jfire.trade.OrganisationLegalEntity;
 import org.nightlabs.jfire.trade.SegmentType;
 import org.nightlabs.jfire.trade.Trader;
 import org.nightlabs.jfire.trade.id.CustomerGroupID;
+import org.nightlabs.jfire.transfer.id.AnchorID;
 
 public class DataCreator
 {
@@ -437,25 +438,48 @@ public class DataCreator
 
 		Trader trader = Trader.getTrader(pm);
 		return trader.setPersonToLegalEntity(person, true);
-//		LegalEntity legalEntity = new LegalEntity(
-//		person.getOrganisationID(), LegalEntity.ANCHOR_TYPE_ID_LEGAL_ENTITY, ObjectIDUtil.longObjectIDFieldToString(person.getPropertyID()));
-//		legalEntity.setPerson(person);
-//		pm.makePersistent(legalEntity);
-//		return legalEntity;
 	}
 
-	public LegalEntity createLegalVendor(
-			String userID, String password,
-			String personCompany, String personName, String personFirstName, String personEMail) throws DataBlockNotFoundException, DataBlockGroupNotFoundException, DataFieldNotFoundException, SecurityException
-			{
-		User user = createUser(userID,password,personCompany,personName,personFirstName,personEMail);
-		Trader trader = Trader.getTrader(pm);
-		LegalEntity legalEntity = createLegalEntity(user.getPerson());
-		legalEntity.setDefaultCustomerGroup(trader.getDefaultCustomerGroupForKnownCustomer());		
+	/**
+	 * This method creates a vendor. If this vendor already exists, it is returned without any write action.
+	 */
+	public LegalEntity createVendor1()
+	throws DataBlockNotFoundException, DataBlockGroupNotFoundException, DataFieldNotFoundException
+	{
+		return createVendor("alexandra.kessler", "Weinexport GmbH", "Kessler", "Alexandra", "Alexandra@Weinexport.co.th");
+	}
 
-		return legalEntity;
-			}
+	/**
+	 * This method creates a vendor with the specified properties. If a vendor with the ID specified by <code>_vendorID</code>
+	 * already exists, this method returns it without changing it. In this case, the parameters <code>company</code>,
+	 * <code>name</code> etc. are ignored.
+	 *
+	 * @param _vendorID the local part of the primary key (within the namespace of the current <code>organisationID</code>).
+	 * @param company the name of the company.
+	 * @param name the name of the contact person.
+	 * @param firstName the first name of the contact person.
+	 * @param eMail the e-mail address of the company/contact person.
+	 * @return the new or previously existing vendor.
+	 */
+	public LegalEntity createVendor(String _vendorID, String company, String name, String firstName, String eMail)
+	throws DataBlockNotFoundException, DataBlockGroupNotFoundException, DataFieldNotFoundException
+	{
+		pm.getExtent(LegalEntity.class); // ensure meta-data is loaded
 
+		AnchorID vendorID = AnchorID.create(organisationID, LegalEntity.ANCHOR_TYPE_ID_LEGAL_ENTITY, _vendorID);
+		try {
+			return (LegalEntity) pm.getObjectById(vendorID);
+		} catch (JDOObjectNotFoundException x) {
+			// vendor does not exist => create it below
+		}
+
+		Person vendorPerson = createPerson(company, name, firstName, eMail);
+		LegalEntity vendor = new LegalEntity(vendorID.organisationID, vendorID.anchorID);
+		vendor = pm.makePersistent(vendor);
+		vendor.setPerson(vendorPerson);
+		vendor.setDefaultCustomerGroup(Trader.getTrader(pm).getDefaultCustomerGroupForKnownCustomer());
+		return vendor;
+	}
 
 	public Order createOrderForEndcustomer(LegalEntity customer)
 	throws ModuleException

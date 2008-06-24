@@ -129,8 +129,8 @@ extends Initialiser
 		Account accountServiceVatVal_expense = dataCreator.createLocalExpenseAccount("service-vat-val.eur", "Service VAT Expense (EUR)");
 		
 		DynamicProductType softwareDevelopment = dataCreator.createCategory(null, softwareDevelopmentID.productTypeID, null, "Software Development", "Software-Entwicklung");
-		
-		LegalEntity legalEntityVendor  = dataCreator.createLegalVendor("alexandra", "test", "Weinexport  GmbH", "Kessler", "Alexandra", "Alexandra@chezfrancois.co.th");
+
+		LegalEntity vendor  = dataCreator.createVendor1();
 		
 		// FIXME
 		@SuppressWarnings("unused")
@@ -142,7 +142,7 @@ extends Initialiser
 		@SuppressWarnings("unused")
 		DynamicProductType swDevProjectC = dataCreator.createLeaf(softwareDevelopment, "softwareDevelopment.projectC", null, null, "Project C", "Projekt C");
 
-		DynamicProductType swDevProjectD = dataCreator.createLeaf(softwareDevelopment, "softwareDevelopment.projectD", null, legalEntityVendor, "Project D", "Projekt D");
+		DynamicProductType swDevProjectD = dataCreator.createLeaf(softwareDevelopment, "softwareDevelopment.projectD", null, vendor, "Project D", "Projekt D");
 		
 		DynamicProductType service = dataCreator.createCategory(null, serviceID.productTypeID, null, "Service", "Dienstleistung");
 		

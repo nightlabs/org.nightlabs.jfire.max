@@ -31,6 +31,7 @@ import org.nightlabs.jfire.simpletrade.store.SimpleProductType;
 import org.nightlabs.jfire.store.CannotConfirmProductTypeException;
 import org.nightlabs.jfire.store.CannotMakeProductTypeSaleableException;
 import org.nightlabs.jfire.store.CannotPublishProductTypeException;
+import org.nightlabs.jfire.store.ProductType;
 import org.nightlabs.jfire.store.ProductTypeLocal;
 import org.nightlabs.jfire.store.id.ProductTypeID;
 import org.nightlabs.jfire.trade.Article;
@@ -371,14 +372,20 @@ extends Initialiser
 		LegalEntity legalEntity03 = dataCreator.createLegalEntity(user03.getPerson());
 		legalEntity03.setDefaultCustomerGroup(customerGroupDefault);
 
-		
-		LegalEntity legalEntityVendor  = dataCreator.createLegalVendor("alexandra", "test", "Weinexport  GmbH", "Kessler", "Alexandra", "Alexandra@chezfrancois.co.th");
-		
-		
+
+		LegalEntity vendor  = dataCreator.createVendor1();
+
 		// add simple products demo for a demo vendor to test the purchase
-		boxMerlotItaly2001.setVendor(legalEntityVendor);
-		bottleMerlotItaly2001.setVendor(legalEntityVendor);
-		
+		boxMerlotItaly2001.setVendor(vendor);
+		boxMerlotItaly2001.setOwner(vendor);
+		boxMerlotItaly2001.getFieldMetaData(ProductType.FieldName.vendor).setValueInherited(false);
+		boxMerlotItaly2001.getFieldMetaData(ProductType.FieldName.owner).setValueInherited(false);
+
+		bottleMerlotItaly2001.setVendor(vendor);
+		bottleMerlotItaly2001.setOwner(vendor);
+		bottleMerlotItaly2001.getFieldMetaData(ProductType.FieldName.vendor).setValueInherited(false);
+		bottleMerlotItaly2001.getFieldMetaData(ProductType.FieldName.owner).setValueInherited(false);
+
 		Person person = dataCreator.createPerson("NightLabs GmbH", "Marco", "Schulze", "marco@nightlabs.de", new Date(),
 				PersonStruct.PERSONALDATA_SALUTATION_MR, "Dr.", "Teststrasse", "79100", "Freiburg", "Baden-Württemberg", "Deutschland",
 				"49", "761", "123456789", "49", "761", "987654321", "Marco Schulze", 123456789, "68090000", "TestBank",

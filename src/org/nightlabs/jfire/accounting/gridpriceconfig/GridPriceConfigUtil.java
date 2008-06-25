@@ -26,10 +26,12 @@
 
 package org.nightlabs.jfire.accounting.gridpriceconfig;
 
+import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.Iterator;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Locale;
 import java.util.Set;
@@ -40,6 +42,7 @@ import javax.jdo.PersistenceManager;
 import javax.jdo.Query;
 
 import org.apache.log4j.Logger;
+import org.nightlabs.jdo.FetchPlanBackup;
 import org.nightlabs.jdo.NLJDOHelper;
 import org.nightlabs.jfire.accounting.Currency;
 import org.nightlabs.jfire.accounting.Price;
@@ -52,7 +55,9 @@ import org.nightlabs.jfire.accounting.priceconfig.IPriceConfig;
 import org.nightlabs.jfire.accounting.priceconfig.PriceConfigUtil;
 import org.nightlabs.jfire.accounting.priceconfig.id.PriceConfigID;
 import org.nightlabs.jfire.organisation.LocalOrganisation;
+import org.nightlabs.jfire.store.NestedProductTypeLocal;
 import org.nightlabs.jfire.store.ProductType;
+import org.nightlabs.jfire.store.id.ProductTypeID;
 import org.nightlabs.jfire.trade.CustomerGroup;
 import org.nightlabs.util.Util;
 
@@ -300,4 +305,108 @@ public class GridPriceConfigUtil
 		return pm.detachCopyAll(priceConfigs);
 	}
 
+// FIXME WORKAROUND for JPOX - begin
+	private static void resolveExtendedProductTypes(PersistenceManager pm, ProductType attachedPT, ProductType detachedPT)
+	{
+		while (attachedPT != null) {
+			attachedPT = attachedPT.getExtendedProductType();
+			System.out.println(attachedPT == null ? null : attachedPT.getPrimaryKey());
+			ProductType extPT = null;
+			if (attachedPT != null)
+				extPT = pm.detachCopy(attachedPT);
+			try {
+				Method method = ProductType.class.getDeclaredMethod("setExtendedProductType", new Class[] {ProductType.class});
+				method.setAccessible(true);
+				method.invoke(detachedPT, extPT);
+			} catch (Exception e) {
+				e.printStackTrace();
+			}
+			detachedPT = extPT;
+		}
+	}
+//FIXME WORKAROUND for JPOX - end
+
+	public static ProductType detachProductTypeForPriceConfigEditing(PersistenceManager pm, ProductTypeID productTypeID)
+	{
+		FetchPlan fetchPlan = pm.getFetchPlan();
+		FetchPlanBackup fetchPlanBackup = NLJDOHelper.backupFetchPlan(fetchPlan);
+		try {
+			fetchPlan.setDetachmentOptions(FetchPlan.DETACH_LOAD_FIELDS);
+			fetchPlan.setMaxFetchDepth(-1);
+			fetchPlan.setGroups(new String[] {
+					FetchPlan.DEFAULT,
+					FetchGroupsPriceConfig.FETCH_GROUP_EDIT});
+
+			pm.getExtent(ProductType.class);
+			ProductType res = (ProductType) pm.getObjectById(productTypeID);
+			res.getName().getTexts();
+			res.getFieldMetaData(ProductType.FieldName.innerPriceConfig, false);
+			res.getFieldMetaData(ProductType.FieldName.packagePriceConfig, false);
+			res.getProductTypeLocal().getProductType();
+
+			// load main price configs
+			res.getPackagePriceConfig();
+			res.getInnerPriceConfig();
+
+			// load all extended ProductType-s
+			ProductType pt = res;
+			while (pt != null) {
+				pt = pt.getExtendedProductType();
+				System.out.println(pt == null ? null : pt.getPrimaryKey());
+			}
+
+			// load all nested ProductType-s
+			for (NestedProductTypeLocal npt : res.getProductTypeLocal().getNestedProductTypeLocals()) {
+				npt.getPackageProductTypeLocal();
+				ProductType ipt = npt.getInnerProductTypeLocal().getProductType();
+				ipt.getProductTypeLocal().getProductType();
+				ipt.getName().getTexts();
+				ipt.getPackagePriceConfig();
+				ipt.getInnerPriceConfig();
+				pt = ipt;
+				while (pt != null) {
+					pt = pt.getExtendedProductType();
+					System.out.println(pt == null ? null : pt.getPrimaryKey());
+				}
+			}
+
+			ProductType detachedRes = pm.detachCopy(res);
+
+			// FIXME WORKAROUND for JPOX - begin
+			resolveExtendedProductTypes(pm, res, detachedRes);
+
+			for (NestedProductTypeLocal attached_npt : res.getProductTypeLocal().getNestedProductTypeLocals()) {
+				NestedProductTypeLocal detached_npt = detachedRes.getProductTypeLocal().getNestedProductTypeLocal(attached_npt.getInnerProductTypePrimaryKey(), true);
+
+				resolveExtendedProductTypes(pm,
+						attached_npt.getInnerProductTypeLocal().getProductType(),
+						detached_npt.getInnerProductTypeLocal().getProductType());
+			}
+			// FIXME WORKAROUND for JPOX - end
+
+			if (logger.isDebugEnabled()) {
+				LinkedList<ProductType> productTypes = new LinkedList<ProductType>();
+				productTypes.add(detachedRes);
+
+				for (NestedProductTypeLocal npt : detachedRes.getProductTypeLocal().getNestedProductTypeLocals())
+					productTypes.add(npt.getInnerProductTypeLocal().getProductType());
+
+				for (ProductType productType : productTypes) {
+					logger.debug("getProductTypeForPriceConfigEditing: productType="+productType.getPrimaryKey());
+					if (productType.getInnerPriceConfig() instanceof GridPriceConfig) {
+						logger.debug("innerPriceConfig:");
+						GridPriceConfigUtil.logGridPriceConfig((GridPriceConfig)productType.getInnerPriceConfig());
+					}
+					if (productType.getPackagePriceConfig() instanceof GridPriceConfig) {
+						logger.debug("packagePriceConfig:");
+						GridPriceConfigUtil.logGridPriceConfig((GridPriceConfig)productType.getPackagePriceConfig());
+					}
+				}
+			}
+
+			return detachedRes;
+		} finally {
+			NLJDOHelper.restoreFetchPlan(fetchPlan, fetchPlanBackup);
+		}
+	}
 }

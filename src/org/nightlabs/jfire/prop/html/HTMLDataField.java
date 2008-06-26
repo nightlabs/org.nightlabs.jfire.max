@@ -131,7 +131,7 @@ public class HTMLDataField extends DataField implements IFCKEditorContent
 			@Override
             public IFCKEditorContentFile createContentFile()
             {
-				return new HTMLContentFile();
+				return new HTMLContentFile(HTMLDataField.this);
             }
 		};
 	}

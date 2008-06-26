@@ -21,6 +21,11 @@ import org.nightlabs.jfire.idgenerator.IDGenerator;
 public class HTMLContentFile implements IFCKEditorContentFile, Serializable
 {
 	/**
+	 * The serial version of this class.
+	 */
+	private static final long serialVersionUID = 1L;
+
+	/**
 	 * @jdo.field primary-key="true"
 	 * @jdo.column length="100"
 	 */
@@ -59,8 +64,9 @@ public class HTMLContentFile implements IFCKEditorContentFile, Serializable
 	
 	/**
 	 * Create a new HTMLContentFile instance.
-	 * For JDO only!
+	 * @deprecated For JDO only!
 	 */
+	@Deprecated
 	protected HTMLContentFile()
 	{
 	}

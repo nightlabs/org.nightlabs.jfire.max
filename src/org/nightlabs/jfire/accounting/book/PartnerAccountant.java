@@ -74,17 +74,10 @@ public class PartnerAccountant extends Accountant
 	protected PartnerAccountant() {
 	}
 
-	/**
-	 * @param organisationID
-	 * @param accountantID
-	 */
 	public PartnerAccountant(String organisationID, String accountantID) {
 		super(organisationID, accountantID);
 	}
 
-	/**
-	 * @see org.nightlabs.jfire.accounting.book.Accountant#bookTransfer(User, LegalEntity, MoneyTransfer, Map)
-	 */
 	@Override
 	public void bookTransfer(User user, LegalEntity mandator, MoneyTransfer transfer, Set<Anchor> involvedAnchors) {
 		if (transfer instanceof BookMoneyTransfer)
@@ -298,48 +291,42 @@ public class PartnerAccountant extends Accountant
 
 		// Sort Invoices
 		// sort order is finalizeDT, organisationID, invoiceID
-		List sortedInvoices = new LinkedList(payMoneyTransfer.getPayment().getInvoices());
-		Comparator comparator = new Comparator() {
-			public int compare(Object arg0, Object arg1) {
-				if ( (arg0 instanceof Invoice) && (arg1 instanceof Invoice) ) {
-					Invoice inv0 = (Invoice)arg0;
-					Invoice inv1 = (Invoice)arg1;
-					long inv0Time = inv0.getFinalizeDT().getTime();
-					long inv1Time = inv1.getFinalizeDT().getTime();
+		List<Invoice> sortedInvoices = new LinkedList<Invoice>(payMoneyTransfer.getPayment().getInvoices());
+		Comparator<Invoice> comparator = new Comparator<Invoice>() {
+			public int compare(Invoice inv0, Invoice inv1) {
+				long inv0Time = inv0.getFinalizeDT().getTime();
+				long inv1Time = inv1.getFinalizeDT().getTime();
 
-					if (inv0Time == inv1Time) {
-						if (inv0.getOrganisationID().equals(inv1.getOrganisationID())) {
-							if (inv0.getInvoiceID() < inv1.getInvoiceID())
-								return -1;
-							else if (inv0.getInvoiceID() > inv1.getInvoiceID())
-								return 1;
-							else
-								return 0;
-						}
-						else
-							return inv0.getOrganisationID().compareTo(inv1.getOrganisationID());
-					}
-					else {
-						if (inv0Time > inv1Time)
+				if (inv0Time == inv1Time) {
+					if (inv0.getOrganisationID().equals(inv1.getOrganisationID())) {
+						if (inv0.getInvoiceID() < inv1.getInvoiceID())
+							return -1;
+						else if (inv0.getInvoiceID() > inv1.getInvoiceID())
 							return 1;
 						else
-							return -1;
+							return 0;
 					}
+					else
+						return inv0.getOrganisationID().compareTo(inv1.getOrganisationID());
 				}
-				else
-					return -1;
+				else {
+					if (inv0Time > inv1Time)
+						return 1;
+					else
+						return -1;
+				}
 			}
 		};
 		Collections.sort(sortedInvoices,comparator);
-		
-		
+
+
 
 		// classify Invoices and compute overallBalance
 		boolean partnerTransferTo = payMoneyTransfer.getAnchorType(partner) == Transfer.ANCHORTYPE_TO; // (payMoneyTransfer.getTo() != null) && (payMoneyTransfer.getTo().getPrimaryKey().equals(partner.getPrimaryKey()));
 		boolean partnerTransferFrom = !partnerTransferTo;
 
-		List invoicesPayMoney = new LinkedList();
-		List invoicesReceiveMoney = new LinkedList();
+		List<TransferInvoiceEntry> invoicesPayMoney = new LinkedList<TransferInvoiceEntry>();
+		List<TransferInvoiceEntry> invoicesReceiveMoney = new LinkedList<TransferInvoiceEntry>();
 
 		Accounting accounting = Accounting.getAccounting(pm);
 
@@ -357,13 +344,13 @@ public class PartnerAccountant extends Accountant
 		 */
 		long allInvoicesBalance = 0;
 
-		for (Iterator iter = sortedInvoices.iterator(); iter.hasNext();) {
-			Invoice invoice = (Invoice) iter.next();
-			boolean partnerInvoiceCustomer = invoice.getCustomer().getPrimaryKey().equals(partner.getPrimaryKey());
+		for (Invoice invoice : sortedInvoices) {
+			boolean partnerInvoiceCustomer = invoice.getCustomer().equals(partner);
 			boolean partnerInvoiceVendor = !partnerInvoiceCustomer;
 
 			long invoiceBalance = 0;
-			if (partnerTransferFrom && partnerInvoiceVendor)
+//			if (partnerTransferFrom && partnerInvoiceVendor)
+			if (partnerInvoiceVendor)
 				invoiceBalance = - invoice.getInvoiceLocal().getAmountToPay();
 			else
 				invoiceBalance = invoice.getInvoiceLocal().getAmountToPay();

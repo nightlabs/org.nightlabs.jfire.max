@@ -393,10 +393,10 @@ public abstract class Anchor
 	@Override
 	public boolean equals(Object obj)
 	{
-		if (this == obj)
-			return true;
+		if (this == obj) return true;
+		if (obj == null) return false;
 
-		if (!(obj instanceof Anchor))
+		if (obj.getClass() != this.getClass())
 			return false;
 
 		Anchor o = (Anchor) obj;
@@ -408,9 +408,13 @@ public abstract class Anchor
 	}
 
 	@Override
-	public int hashCode()
-	{
-		return Util.hashCode(organisationID) ^ Util.hashCode(anchorTypeID) ^ Util.hashCode(anchorID);
+	public int hashCode() {
+		final int prime = 31;
+		int result = 1;
+		result = prime * result + Util.hashCode(organisationID);
+		result = prime * result + Util.hashCode(anchorTypeID);
+		result = prime * result + Util.hashCode(anchorID);
+		return result;
 	}
 
 	@Override

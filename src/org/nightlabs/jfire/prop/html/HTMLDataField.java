@@ -32,6 +32,7 @@ public class HTMLDataField extends DataField implements IFCKEditorContent
 
 	/**
 	 * @jdo.field persistence-modifier="persistent"
+	 * @jdo.column sql-type="CLOB"
 	 */
 	private String html;
 

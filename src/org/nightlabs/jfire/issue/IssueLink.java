@@ -373,6 +373,7 @@ implements Serializable, DetachCallback, StoreCallback, DeleteCallback
 		if (getClass() != obj.getClass()) return false;
 		final IssueLink other = (IssueLink) obj;
 
-		return Util.equals(this.organisationID, other.organisationID) && Util.equals(this.issueLinkID, other.issueLinkID);
+		return Util.equals(this.organisationID, other.organisationID) && Util.equals(this.issueLinkID, other.issueLinkID) 
+		&& Util.equals(this.linkedObjectID, other.linkedObjectID) && Util.equals(this.issueLinkID, other.issueLinkID);
 	}
 }

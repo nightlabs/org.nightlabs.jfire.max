@@ -3,6 +3,7 @@ package org.nightlabs.jfire.store.deliver;
 import java.rmi.RemoteException;
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -41,7 +42,11 @@ public class DeliveryQueueDAO extends BaseJDOObjectDAO<DeliveryQueueID, Delivery
 		return getDeliveryQueues(Arrays.asList(new DeliveryQueueID[] { deliveryQueueId }), fetchGroups, maxFetchDepth, monitor).iterator().next();
 	}
 	
-	public synchronized Collection<DeliveryQueue> getDeliveryQueues(Collection<DeliveryQueueID> deliveryQueueIds, String[] fetchGroups, int maxFetchDepth, ProgressMonitor monitor) {
+	public synchronized Collection<DeliveryQueue> getDeliveryQueues(Collection<DeliveryQueueID> deliveryQueueIds, String[] fetchGroups, int maxFetchDepth, ProgressMonitor monitor) 
+	{
+		if (deliveryQueueIds == null || deliveryQueueIds.isEmpty()) {
+			return Collections.emptySet();
+		}
 		try {
 			return retrieveJDOObjects(new HashSet<DeliveryQueueID>(deliveryQueueIds), fetchGroups, maxFetchDepth, monitor);
 		} catch (Exception e) {

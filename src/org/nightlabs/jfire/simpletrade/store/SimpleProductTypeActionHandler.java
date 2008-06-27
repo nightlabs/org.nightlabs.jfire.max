@@ -154,8 +154,8 @@ public class SimpleProductTypeActionHandler
 		authorityType.getName().setText(Locale.ENGLISH.getLanguage(), "Simple product types");
 		authorityType.getDescription().setText(Locale.ENGLISH.getLanguage(), "Authorities of this type control the access rights for simple product types.");
 
-		authorityType.getName().setText(Locale.GERMAN.getLanguage(), "Einfache Producttypen");
-		authorityType.getDescription().setText(Locale.GERMAN.getLanguage(), "Vollmachten dieses Typs kontrollieren den Zugriff auf einfache Producttypen.");
+		authorityType.getName().setText(Locale.GERMAN.getLanguage(), "Einfache Produkttypen");
+		authorityType.getDescription().setText(Locale.GERMAN.getLanguage(), "Vollmachten dieses Typs kontrollieren den Zugriff auf einfache Produkttypen.");
 
 		// TODO configure access rights completely - implement manual checking where necessary!
 //		authorityType.addRoleGroup((RoleGroup) pm.getObjectById(RoleConstants.seeProductType));

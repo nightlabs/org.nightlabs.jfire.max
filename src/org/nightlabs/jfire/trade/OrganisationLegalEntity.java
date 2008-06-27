@@ -37,7 +37,18 @@ import org.nightlabs.jfire.transfer.Anchor;
 import org.nightlabs.jfire.transfer.id.AnchorID;
 
 /**
+ * Each JFire organisation known by a given organisation is represented in its datastore
+ * with instances of this class. This also includes the local organisation. 
+ * The primary key of the instances will be made up using
+ * the following schema:
+ * <ul>
+ *   <li>organisationID: The organistionID of the represented organisation.</li>
+ *   <li>anchorTypeID: {@link LegalEntity#ANCHOR_TYPE_ID_LEGAL_ENTITY}</li>
+ *   <li>anchorID: fully qualified class name of {@link OrganisationLegalEntity}</li>
+ * </ul> 
+ * 
  * @author Marco Schulze - marco at nightlabs dot de
+ * @author Alexander Bieber <!-- alex [AT] nightlabs [DOT] de -->
  * 
  * @jdo.persistence-capable
  *		identity-type="application"
@@ -68,28 +79,8 @@ implements StoreCallback
 		return Anchor.getPrimaryKey(organisationID, anchorTypeID, OrganisationLegalEntity.class.getName());
 	}
 
-//	/**
-//	 * key: String orderPK<br/>
-//	 * value: Order order
-//	 * <br/><br/>
-//	 *
-//	 * @jdo.field
-//	 *		persistence-modifier="persistent"
-//	 *		collection-type="map"
-//	 *		key-type="java.lang.String"
-//	 *		value-type="Order"
-//	 *		dependent="true"
-//	 *
-//	 * @jdo.join
-//	 */
-//	private Map orders = new HashMap();
-
-//	private String localOrganisationID;
-//	private boolean localOrganisation;
-
 	protected OrganisationLegalEntity() { }
 
-	// TODO Why do I have to pass the anchorTypeID? Isn't this the same for all OrganisationLegalEntities?! Marco.
 	protected OrganisationLegalEntity(org.nightlabs.jfire.organisation.Organisation organisation)
 	{
 		super(organisation.getOrganisationID(), OrganisationLegalEntity.class.getName());
@@ -138,21 +129,6 @@ implements StoreCallback
 		return organisation;
 	}
 
-//	/**
-//	 * @return Returns the localOrganisation.
-//	 */
-//	public boolean isLocalOrganisation()
-//	{
-//		return localOrganisation;
-//	}
-//	/**
-//	 * @return Returns the localOrganisationID.
-//	 */
-//	protected String getLocalOrganisationID()
-//	{
-//		return localOrganisationID;
-//	}
-
 	/**
 	 * @param pm The {@link PersistenceManager} to use.
 	 * @param organisationID The id specifying the <tt>Organisation</tt> for which the <tt>LegalEntity</tt> is desired.
@@ -168,10 +144,10 @@ implements StoreCallback
 	)
 	{
 		OrganisationLegalEntity organisationLegalEntity = null;
+		AnchorID orgAnchorID = getOrganisationLegalEntityID(organisationID);
 		try {
 			pm.getExtent(OrganisationLegalEntity.class);
-			organisationLegalEntity = (OrganisationLegalEntity)pm.getObjectById(
-					AnchorID.create(organisationID, ANCHOR_TYPE_ID_LEGAL_ENTITY, OrganisationLegalEntity.class.getName()));
+			organisationLegalEntity = (OrganisationLegalEntity)pm.getObjectById(orgAnchorID);
 		} catch (JDOObjectNotFoundException e) {
 			Organisation organisation = Organisation.getOrganisation(pm, organisationID, true);
 
@@ -224,4 +200,17 @@ implements StoreCallback
 //		if (getPerson() == null)
 //			setPerson(organisation.getPerson());
 	}
+	
+	/**
+	 * Returns the {@link AnchorID} referencing the {@link OrganisationLegalEntity}
+	 * of the given organisationID.
+	 * 
+	 * @param organisationID The id of the organisation to reference.
+	 * @return The {@link AnchorID} referencing the {@link OrganisationLegalEntity}
+	 * of the given organisationID.
+	 */
+	public static AnchorID getOrganisationLegalEntityID(String organisationID) {
+		return AnchorID.create(organisationID, ANCHOR_TYPE_ID_LEGAL_ENTITY, OrganisationLegalEntity.class.getName());
+	}
+	
 }

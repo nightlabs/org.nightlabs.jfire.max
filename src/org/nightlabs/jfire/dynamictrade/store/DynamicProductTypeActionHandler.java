@@ -167,8 +167,8 @@ public class DynamicProductTypeActionHandler
 		authorityType.getName().setText(Locale.ENGLISH.getLanguage(), "Dynamic product types");
 		authorityType.getDescription().setText(Locale.ENGLISH.getLanguage(), "Authorities of this type control the access rights for dynamic product types.");
 
-		authorityType.getName().setText(Locale.GERMAN.getLanguage(), "Dynamische Producttypen");
-		authorityType.getDescription().setText(Locale.GERMAN.getLanguage(), "Vollmachten dieses Typs kontrollieren den Zugriff auf dynamische Producttypen.");
+		authorityType.getName().setText(Locale.GERMAN.getLanguage(), "Dynamische Produkttypen");
+		authorityType.getDescription().setText(Locale.GERMAN.getLanguage(), "Vollmachten dieses Typs kontrollieren den Zugriff auf dynamische Produkttypen.");
 
 		// TODO configure access rights completely - implement manual checking where necessary!
 		return authorityType;

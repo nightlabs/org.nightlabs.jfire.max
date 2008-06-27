@@ -72,4 +72,9 @@ public interface IPriceCoordinate
 	 * @return The organisationID-part of the tariffPK that is returned by {@link #getTariffPK()} or <code>null</code>, if no tariffPK set.
 	 */
 	String getTariffOrganisationID();
+
+	/**
+	 * Check all dimension's values and throw an {@link IllegalStateException} if one of them is <code>null</code>.
+	 */
+	void assertAllDimensionValuesAssigned();
 }

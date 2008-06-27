@@ -27,8 +27,8 @@
 package org.nightlabs.jfire.accounting.gridpriceconfig;
 
 import java.util.Collection;
+import java.util.Collections;
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.Map;
 
@@ -141,7 +141,7 @@ implements IFormulaPriceConfig
 	 *
 	 * @jdo.field persistence-modifier="persistent" dependent="true"
 	 */
-	private FormulaCell fallbackFormulaCell;
+	protected FormulaCell fallbackFormulaCell;
 
 	/**
 	 * @deprecated Only for JDO!
@@ -220,9 +220,9 @@ implements IFormulaPriceConfig
 	 */
 	private Map<String, ProductType> productTypes = new HashMap<String, ProductType>();
 
-	public Collection getProductTypes()
+	public Collection<ProductType> getProductTypes()
 	{
-		return productTypes.values();
+		return Collections.unmodifiableCollection(productTypes.values());
 	}
 	public void addProductType(ProductType productType)
 	{
@@ -254,9 +254,19 @@ implements IFormulaPriceConfig
 		if (formulaCell == null) {
 			formulaCell = new FormulaCell((PriceCoordinate)priceCoordinate);
 			formulaCell.setMapOwner(this);
-			formulaCells.put(priceCoordinate, formulaCell);
+//			formulaCells.put(priceCoordinate, formulaCell);
+			putFormulaCell(priceCoordinate, formulaCell);
 		}
 		return formulaCell;
+	}
+
+	protected void putFormulaCell(IPriceCoordinate priceCoordinate, FormulaCell formulaCell)
+	{
+		priceCoordinate.assertAllDimensionValuesAssigned();
+		if (formulaCell == null)
+			throw new IllegalArgumentException("formulaCell must not be null!");
+
+		formulaCells.put(priceCoordinate, formulaCell);
 	}
 
 	public FormulaCell getFormulaCell(
@@ -269,6 +279,7 @@ implements IFormulaPriceConfig
 				tariff, currency);
 		return getFormulaCell(priceCoordinate, throwExceptionIfNotExistent);
 	}
+	@Override
 	public FormulaCell getFormulaCell(IPriceCoordinate priceCoordinate, boolean throwExceptionIfNotExistent)
 	{
 		FormulaCell formulaCell = formulaCells.get(priceCoordinate);
@@ -276,8 +287,7 @@ implements IFormulaPriceConfig
 		// If the JDO implementation uses a shortcut (a direct JDOQL instead of loading the whole Map and then
 		// searching for the key), the cell might exist and not be found. Hence, we load the whole Map and try it again.
 		if (formulaCell == null) {
-			for (Iterator it = formulaCells.entrySet().iterator(); it.hasNext();) {
-				Map.Entry me = (Map.Entry) it.next();
+			for (Map.Entry<IPriceCoordinate, FormulaCell> me : formulaCells.entrySet()) {
 				if (me.getKey().equals(priceCoordinate)) {
 					formulaCell = (FormulaCell) me.getValue();
 					break;
@@ -302,12 +312,14 @@ implements IFormulaPriceConfig
 	/**
 	 * @see org.nightlabs.jfire.accounting.gridpriceconfig.IFormulaPriceConfig#getFallbackFormulaCell(boolean)
 	 */
+	@Override
 	public FormulaCell getFallbackFormulaCell(boolean throwExceptionIfNotExistent)
 	{
 		if (throwExceptionIfNotExistent && fallbackFormulaCell == null)
 			throw new NullPointerException("There is no fallbackFormulaCell defined!");
 		return fallbackFormulaCell;
 	}
+	@Override
 	public FormulaCell createFallbackFormulaCell()
 	{
 		if (fallbackFormulaCell == null) {
@@ -316,12 +328,12 @@ implements IFormulaPriceConfig
 		return fallbackFormulaCell;
 	}
 
-	private static boolean isWhiteSpace(char c)
+	protected static boolean isWhiteSpace(char c)
 	{
 		return c == ' ' || c == '\n' || c == '\r' || c == '\t' || c == '\f';
 	}
-	
-	private static String prepareFormula(String formula)
+
+	protected static String prepareFormula(String formula)
 	{
 		if (formula != null) {
 			// TODO can this be done with a regular expression?
@@ -337,6 +349,7 @@ implements IFormulaPriceConfig
 		return formula;
 	}
 
+	@Override
 	public void setFallbackFormula(PriceFragmentType priceFragmentType, String formula)
 	{
 		formula = prepareFormula(formula);
@@ -367,6 +380,7 @@ implements IFormulaPriceConfig
 	 * @param priceFragmentType Must not be <tt>null</tt>.
 	 * @param formula Can be <tt>null</tt>.
 	 */
+	@Override
 	public void setFormula(IPriceCoordinate priceCoordinate, PriceFragmentType priceFragmentType, String formula)
 	{
 		formula = prepareFormula(formula);
@@ -415,6 +429,7 @@ implements IFormulaPriceConfig
 	/**
 	 * @see org.nightlabs.jfire.accounting.priceconfig.IPriceConfig#createNestedArticlePrice(IPackagePriceConfig, org.nightlabs.jfire.trade.Article, LinkedList, org.nightlabs.jfire.trade.ArticlePrice, org.nightlabs.jfire.trade.ArticlePrice, LinkedList, org.nightlabs.jfire.store.NestedProductTypeLocal, LinkedList)
 	 */
+	@Override
 	public ArticlePrice createNestedArticlePrice(
 			IPackagePriceConfig packagePriceConfig, Article article,
 			LinkedList<IPriceConfig> priceConfigStack, ArticlePrice topLevelArticlePrice,
@@ -437,6 +452,7 @@ implements IFormulaPriceConfig
 	/**
 	 * @see org.nightlabs.jfire.accounting.priceconfig.IPriceConfig#createNestedArticlePrice(IPackagePriceConfig, org.nightlabs.jfire.trade.Article, LinkedList, org.nightlabs.jfire.trade.ArticlePrice, org.nightlabs.jfire.trade.ArticlePrice, LinkedList, NestedProductTypeLocal, LinkedList, org.nightlabs.jfire.store.Product, LinkedList)
 	 */
+	@Override
 	public ArticlePrice createNestedArticlePrice(
 			IPackagePriceConfig packagePriceConfig, Article article,
 			LinkedList<IPriceConfig> priceConfigStack, ArticlePrice topLevelArticlePrice,

@@ -26,8 +26,8 @@
 
 package org.nightlabs.jfire.accounting.gridpriceconfig;
 
-import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.LinkedList;
@@ -113,8 +113,6 @@ implements IPackagePriceConfig, IResultPriceConfig
 	 *		dependent-value="true"
 	 *
 	 * @jdo.key mapped-by="priceCoordinate"
-	 *
-	 * @!jdo.map-vendor-extension vendor-name="jpox" key="key-field" value="priceCoordinate"
 	 */
 	private Map<IPriceCoordinate, PriceCell> priceCells;
 
@@ -142,9 +140,10 @@ implements IPackagePriceConfig, IResultPriceConfig
 	}
 
 	@Implement
+	@Override
 	public Collection<PriceCell> getPriceCells()
 	{
-		return priceCells.values();
+		return Collections.unmodifiableCollection(priceCells.values());
 	}
 	/**
 	 * This method drops all calculation stati for all <tt>PriceFragment</tt> s
@@ -152,6 +151,7 @@ implements IPackagePriceConfig, IResultPriceConfig
 	 * them to <tt>CALCULATIONSTATUS_DIRTY</tt>.
 	 */
 	@Implement
+	@Override
 	public void resetPriceFragmentCalculationStati()
 	{
 		for (Iterator<PriceCell> itPriceCells = this.getPriceCells().iterator(); itPriceCells.hasNext(); ) {
@@ -182,6 +182,7 @@ implements IPackagePriceConfig, IResultPriceConfig
 	}
 
 	@Implement
+	@Override
 	public PriceCell getPriceCell(IPriceCoordinate priceCoordinate, boolean throwExceptionIfNotExistent)
 	{
 		PriceCell priceCell = priceCells.get(priceCoordinate);
@@ -204,6 +205,7 @@ implements IPackagePriceConfig, IResultPriceConfig
 	}
 
 	@Implement
+	@Override
 	public PriceCell createPriceCell(IPriceCoordinate priceCoordinate)
 	{
 		if (priceCoordinate.getPriceConfig() == null ||
@@ -213,9 +215,19 @@ implements IPackagePriceConfig, IResultPriceConfig
 		PriceCell priceCell = getPriceCell(priceCoordinate, false);
 		if (priceCell == null) {
 			priceCell = new PriceCell(priceCoordinate);
-			priceCells.put(priceCoordinate, priceCell);
+//			priceCells.put(priceCoordinate, priceCell);
+			putPriceCell(priceCoordinate, priceCell);
 		}
 		return priceCell;
+	}
+
+	protected void putPriceCell(IPriceCoordinate priceCoordinate, PriceCell priceCell)
+	{
+		priceCoordinate.assertAllDimensionValuesAssigned();
+		if (priceCell == null)
+			throw new IllegalArgumentException("priceCell must not be null");
+
+		priceCells.put(priceCoordinate, priceCell);
 	}
 
 	protected void removePriceCell(
@@ -231,17 +243,6 @@ implements IPackagePriceConfig, IResultPriceConfig
 	protected void removePriceCell(PriceCoordinate priceCoordinate)
 	{
 		priceCells.remove(priceCoordinate);
-	}
-
-	protected static class SingleObjectList extends ArrayList
-	{
-		private static final long serialVersionUID = 1L;
-
-		public SingleObjectList(Object obj)
-		{
-			super(1);
-			add(obj);
-		}
 	}
 
 	/**
@@ -274,9 +275,9 @@ implements IPackagePriceConfig, IResultPriceConfig
 		if (_currency != null && !containsCurrency(_currency))
 			throw new IllegalArgumentException("Given Currency is not a registered parameter!");
 
-		Collection<CustomerGroup> customerGroups = _customerGroup == null ? getCustomerGroups() : new SingleObjectList(_customerGroup);
-		Collection<Tariff> tariffs = _tariff == null ? getTariffs() : new SingleObjectList(_tariff);
-		Collection<Currency> currencies = _currency == null ? getCurrencies() : new SingleObjectList(_currency);
+		Collection<CustomerGroup> customerGroups = _customerGroup == null ? getCustomerGroups() : Collections.singleton(_customerGroup);
+		Collection<Tariff> tariffs = _tariff == null ? getTariffs() : Collections.singleton(_tariff);
+		Collection<Currency> currencies = _currency == null ? getCurrencies() : Collections.singleton(_currency);
 
 		for (Iterator<CustomerGroup> itCustomerGroups = customerGroups.iterator(); itCustomerGroups.hasNext(); ) {
 			CustomerGroup customerGroup = itCustomerGroups.next();
@@ -379,9 +380,9 @@ implements IPackagePriceConfig, IResultPriceConfig
 //		if (_currency != null && !containsCurrency(_currency))
 //			throw new IllegalArgumentException("Given Currency is not a registered parameter!");
 
-		Collection<CustomerGroup> customerGroups = _customerGroup == null ? getCustomerGroups() : new SingleObjectList(_customerGroup);
-		Collection<Tariff> tariffs = _tariff == null ? getTariffs() : new SingleObjectList(_tariff);
-		Collection<Currency> currencies = _currency == null ? getCurrencies() : new SingleObjectList(_currency);
+		Collection<CustomerGroup> customerGroups = _customerGroup == null ? getCustomerGroups() : Collections.singleton(_customerGroup);
+		Collection<Tariff> tariffs = _tariff == null ? getTariffs() : Collections.singleton(_tariff);
+		Collection<Currency> currencies = _currency == null ? getCurrencies() : Collections.singleton(_currency);
 
 		for (Iterator<CustomerGroup> itCustomerGroups = customerGroups.iterator(); itCustomerGroups.hasNext(); ) {
 			CustomerGroup customerGroup = itCustomerGroups.next();

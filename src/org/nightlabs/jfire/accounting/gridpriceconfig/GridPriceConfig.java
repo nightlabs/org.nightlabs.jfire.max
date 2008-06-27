@@ -70,7 +70,7 @@ import org.nightlabs.jfire.trade.id.CustomerGroupID;
  *
  * @jdo.fetch-group name="FetchGroupsPriceConfig.edit" fetch-groups="default" fields="customerGroups, tariffs"
  */
-public abstract class GridPriceConfig extends PriceConfig
+public abstract class GridPriceConfig extends PriceConfig implements IGridPriceConfig
 {
 	private static final long serialVersionUID = 1L;
 	public static final String FETCH_GROUP_CUSTOMER_GROUPS = "GridPriceConfig.customerGroups";
@@ -123,6 +123,9 @@ public abstract class GridPriceConfig extends PriceConfig
 		super(organisationID, priceConfigID);
 	}
 
+	/* (non-Javadoc)
+	 * @see org.nightlabs.jfire.accounting.gridpriceconfig.IGridPriceConfig#isDependentOnOffer()
+	 */
 	@Override
 	@Implement
 	public boolean isDependentOnOffer()
@@ -130,21 +133,30 @@ public abstract class GridPriceConfig extends PriceConfig
 		return false;
 	}
 
-	/**
-	 * @return Returns the customerGroups.
+	/* (non-Javadoc)
+	 * @see org.nightlabs.jfire.accounting.gridpriceconfig.IGridPriceConfig#getCustomerGroups()
 	 */
 	public Collection<CustomerGroup> getCustomerGroups()
 	{
 		return customerGroups.values();
 	}
+	/* (non-Javadoc)
+	 * @see org.nightlabs.jfire.accounting.gridpriceconfig.IGridPriceConfig#addCustomerGroup(org.nightlabs.jfire.trade.CustomerGroup)
+	 */
 	public boolean addCustomerGroup(CustomerGroup customerGroup)
 	{
 		return null == customerGroups.put(customerGroup.getPrimaryKey(), customerGroup);
 	}
+	/* (non-Javadoc)
+	 * @see org.nightlabs.jfire.accounting.gridpriceconfig.IGridPriceConfig#getCustomerGroup(org.nightlabs.jfire.trade.id.CustomerGroupID, boolean)
+	 */
 	public CustomerGroup getCustomerGroup(CustomerGroupID customerGroupID, boolean throwExceptionIfNotExistent)
 	{
 		return getCustomerGroup(customerGroupID.organisationID, customerGroupID.customerGroupID, throwExceptionIfNotExistent);
 	}
+	/* (non-Javadoc)
+	 * @see org.nightlabs.jfire.accounting.gridpriceconfig.IGridPriceConfig#getCustomerGroup(java.lang.String, java.lang.String, boolean)
+	 */
 	public CustomerGroup getCustomerGroup(String organisationID, String customerGroupID, boolean throwExceptionIfNotExistent)
 	{
 		CustomerGroup customerGroup = customerGroups.get(CustomerGroup.getPrimaryKey(organisationID, customerGroupID));
@@ -152,31 +164,46 @@ public abstract class GridPriceConfig extends PriceConfig
 			throw new IllegalArgumentException("No CustomerGroup registered with organisationID=\""+organisationID+"\" customerGroupID=\""+customerGroupID+"\"!");
 		return customerGroup;
 	}
+	/* (non-Javadoc)
+	 * @see org.nightlabs.jfire.accounting.gridpriceconfig.IGridPriceConfig#containsCustomerGroup(org.nightlabs.jfire.trade.CustomerGroup)
+	 */
 	public boolean containsCustomerGroup(CustomerGroup customerGroup)
 	{
 		return customerGroups.containsKey(customerGroup.getPrimaryKey());
 	}
+	/* (non-Javadoc)
+	 * @see org.nightlabs.jfire.accounting.gridpriceconfig.IGridPriceConfig#removeCustomerGroup(java.lang.String, java.lang.String)
+	 */
 	public CustomerGroup removeCustomerGroup(String organisationID, String customerGroupID)
 	{
 		return customerGroups.remove(
 				CustomerGroup.getPrimaryKey(organisationID, customerGroupID));
 	}
 
-	/**
-	 * @return Returns the tariffs.
+	/* (non-Javadoc)
+	 * @see org.nightlabs.jfire.accounting.gridpriceconfig.IGridPriceConfig#getTariffs()
 	 */
 	public Collection<Tariff> getTariffs()
 	{
 		return tariffs.values();
 	}
+	/* (non-Javadoc)
+	 * @see org.nightlabs.jfire.accounting.gridpriceconfig.IGridPriceConfig#addTariff(org.nightlabs.jfire.accounting.Tariff)
+	 */
 	public boolean addTariff(Tariff tariff)
 	{
 		return null == tariffs.put(tariff.getPrimaryKey(), tariff);
 	}
+	/* (non-Javadoc)
+	 * @see org.nightlabs.jfire.accounting.gridpriceconfig.IGridPriceConfig#getTariff(org.nightlabs.jfire.accounting.id.TariffID, boolean)
+	 */
 	public Tariff getTariff(TariffID tariffID, boolean throwExceptionIfNotExistent)
 	{
 		return getTariff(tariffID.organisationID, tariffID.tariffID, throwExceptionIfNotExistent);
 	}
+	/* (non-Javadoc)
+	 * @see org.nightlabs.jfire.accounting.gridpriceconfig.IGridPriceConfig#getTariff(java.lang.String, java.lang.String, boolean)
+	 */
 	public Tariff getTariff(String organisationID, String tariffID, boolean throwExceptionIfNotExistent)
 	{
 		Tariff tariff = tariffs.get(Tariff.getPrimaryKey(organisationID, tariffID));
@@ -185,50 +212,47 @@ public abstract class GridPriceConfig extends PriceConfig
 
 		return tariff;
 	}
+	/* (non-Javadoc)
+	 * @see org.nightlabs.jfire.accounting.gridpriceconfig.IGridPriceConfig#containsTariff(org.nightlabs.jfire.accounting.Tariff)
+	 */
 	public boolean containsTariff(Tariff tariff)
 	{
 		return tariffs.containsKey(tariff.getPrimaryKey());
 	}
+	/* (non-Javadoc)
+	 * @see org.nightlabs.jfire.accounting.gridpriceconfig.IGridPriceConfig#removeTariff(java.lang.String, java.lang.String)
+	 */
 	public Tariff removeTariff(String organisationID, String tariffID)
 	{
 		return tariffs.remove(Tariff.getPrimaryKey(organisationID, tariffID));
 	}
 
+	/* (non-Javadoc)
+	 * @see org.nightlabs.jfire.accounting.gridpriceconfig.IGridPriceConfig#removeTariff(org.nightlabs.jfire.accounting.Tariff)
+	 */
 	public void removeTariff(Tariff tariff)
 	{
 		tariffs.remove(Tariff.getPrimaryKey(tariff.getOrganisationID(), tariff.getTariffID()));
 	}
 
+	/* (non-Javadoc)
+	 * @see org.nightlabs.jfire.accounting.gridpriceconfig.IGridPriceConfig#clearTariffs()
+	 */
 	public void clearTariffs()
 	{
 		tariffs.clear();
 	}
 
-	/**
-	 * Calls {@link #adoptParameters(GridPriceConfig, boolean)} with <tt>onlyAdd=false</tt>.
+	/* (non-Javadoc)
+	 * @see org.nightlabs.jfire.accounting.gridpriceconfig.IGridPriceConfig#adoptParameters(org.nightlabs.jfire.accounting.priceconfig.IPriceConfig)
 	 */
 	public void adoptParameters(IPriceConfig other)
 	{
 		adoptParameters(other, false);
 	}
 	
-	/**
-	 * This method adjusts the own parameter config according to the given other
-	 * TicketingPriceConfig. After this method has been called, this instance
-	 * has the same <tt>CustomerGroup</tt> s, <tt>SaleMode</tt> s, <tt>Tariff</tt> s,
-	 * <tt>CategorySet</tt> s and <tt>Currency</tt> s as the other. While adopting it,
-	 * the two descendants <tt>FormulaPriceConfig</tt> and <tt>StablePriceConfig</tt>
-	 * create missing formula/price cells and remove cells that are not needed anymore.
-	 * <p>
-	 * Note, that this method leaves the <tt>PriceFragmentType</tt> s untouched!
-	 * <tt>PriceFragmentType</tt> s are different, because they do not define cells, but
-	 * are fragments within a cell. Additionally, we need to handover all fragments and
-	 * cannot ignore any. All the other parameters are filtered by whatever the guiding
-	 * inner price config defines, but <tt>PriceFragmentType</tt> s are merged (i.e. one
-	 * occurence anywhere in the package forces the packagePriceConfig to know it).
-	 *
-	 * @param other The other GridPriceConfig from which to take over the parameter config.
-	 * @param onlyAdd If this is true, no parameter will be removed and only missing params added.
+	/* (non-Javadoc)
+	 * @see org.nightlabs.jfire.accounting.gridpriceconfig.IGridPriceConfig#adoptParameters(org.nightlabs.jfire.accounting.priceconfig.IPriceConfig, boolean)
 	 */
 	public void adoptParameters(IPriceConfig _other, boolean onlyAdd)
 	{

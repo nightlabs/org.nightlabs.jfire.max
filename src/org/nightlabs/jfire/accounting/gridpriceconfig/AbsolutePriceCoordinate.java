@@ -30,10 +30,10 @@ import org.nightlabs.jfire.accounting.Currency;
 import org.nightlabs.jfire.accounting.PriceFragmentType;
 import org.nightlabs.jfire.accounting.Tariff;
 import org.nightlabs.jfire.accounting.id.PriceFragmentTypeID;
-import org.nightlabs.jfire.accounting.priceconfig.PriceConfig;
 import org.nightlabs.jfire.store.ProductType;
 import org.nightlabs.jfire.store.id.ProductTypeID;
 import org.nightlabs.jfire.trade.CustomerGroup;
+import org.nightlabs.util.Util;
 
 /**
  * @author Marco Schulze - marco at nightlabs dot de
@@ -74,9 +74,10 @@ public class AbsolutePriceCoordinate extends PriceCoordinate implements IAbsolut
 //		this.priceFragmentTypePK = priceFragmentTypePK != null ? priceFragmentTypePK : priceCoordinate.getPriceFragmentTypePK();
 //	}
 	/**
-	 * <strong>WARNING:</strong> This constructor should not be used in java code! An instance
-	 * created by it, cannot be persisted into the database! It is
-	 * only intended for usage as address in javascript formulas!
+	 * <strong>WARNING:</strong> When using this constructor in java code, one of the
+	 * arguments <b>must</b> be the PriceConfig to which this coordinate belongs!
+	 * Otherwise, it cannot be persisted into the database! Without the owning price config
+	 * in the parameter list, it is only intended for usage as address in javascript formulas!
 	 *
 	 * @param customerGroupPK Either <tt>null</tt> (which means the same <tt>CustomerGroup</tt>
 	 *		as the current cell's location) or the PK of another cell's location
@@ -99,27 +100,27 @@ public class AbsolutePriceCoordinate extends PriceCoordinate implements IAbsolut
 	{
 		super(dimensionValues);
 
-		ProductTypeID productTypeID = (ProductTypeID) getDimensionValue(dimensionValues, ProductTypeID.class);
+		ProductTypeID productTypeID = (ProductTypeID) getDimensionValue(dimensionValues, ProductTypeID.class, ProductType.class);
 		if (productTypeID != null)
 			this.productTypePK = productTypeID.getPrimaryKey();
 
-		PriceFragmentTypeID priceFragmentTypeID = (PriceFragmentTypeID) getDimensionValue(dimensionValues, PriceFragmentTypeID.class);
+		PriceFragmentTypeID priceFragmentTypeID = (PriceFragmentTypeID) getDimensionValue(dimensionValues, PriceFragmentTypeID.class, PriceFragmentType.class);
 		if (priceFragmentTypeID != null)
 			this.priceFragmentTypePK = priceFragmentTypeID.getPrimaryKey();
 	}
 
-	/**
-	 * @deprecated Use {@link #AbsolutePriceCoordinate(Object[])} instead!
-	 */
-	@Deprecated
-	public AbsolutePriceCoordinate(
-			String customerGroupPK, String tariffPK, String currencyID,
-			String productTypePK, String priceFragmentTypePK)
-	{
-		super(customerGroupPK, tariffPK, currencyID);
-		this.productTypePK = productTypePK;
-		this.priceFragmentTypePK = priceFragmentTypePK;
-	}
+//	/**
+//	 * @deprecated Use {@link #AbsolutePriceCoordinate(Object[])} instead!
+//	 */
+//	@Deprecated
+//	public AbsolutePriceCoordinate(
+//			String customerGroupPK, String tariffPK, String currencyID,
+//			String productTypePK, String priceFragmentTypePK)
+//	{
+//		super(customerGroupPK, tariffPK, currencyID);
+//		this.productTypePK = productTypePK;
+//		this.priceFragmentTypePK = priceFragmentTypePK;
+//	}
 
 	public AbsolutePriceCoordinate(
 			IAbsolutePriceCoordinate currentCell, IAbsolutePriceCoordinate address)
@@ -133,34 +134,24 @@ public class AbsolutePriceCoordinate extends PriceCoordinate implements IAbsolut
 					address.getPriceFragmentTypePK() : currentCell.getPriceFragmentTypePK();
 	}
 
-	public AbsolutePriceCoordinate(
-			IPriceCoordinate priceCoordinate, ProductType productType,
-			PriceFragmentType priceFragmentType)
-	{
-		super(priceCoordinate);
-		this.productTypePK = productType.getPrimaryKey();
-		this.priceFragmentTypePK = priceFragmentType.getPrimaryKey();
-	}
+//	public AbsolutePriceCoordinate(
+//			IPriceCoordinate priceCoordinate, ProductType productType,
+//			PriceFragmentType priceFragmentType)
+//	{
+//		super(priceCoordinate);
+//		this.productTypePK = productType.getPrimaryKey();
+//		this.priceFragmentTypePK = priceFragmentType.getPrimaryKey();
+//	}
 
-	/**
-	 * @param priceConfig
-	 * @param customerGroup
-	 * @param saleMode
-	 * @param tariff
-	 * @param category
-	 * @param currency
-	 * @param productInfo
-	 * @param priceFragmentType
-	 */
-	public AbsolutePriceCoordinate(PriceConfig priceConfig,
-			CustomerGroup customerGroup, Tariff tariff,
-			Currency currency, ProductType productType,
-			PriceFragmentType priceFragmentType)
-	{
-		super(priceConfig, customerGroup, tariff, currency);
-		this.productTypePK = productType.getPrimaryKey();
-		this.priceFragmentTypePK = priceFragmentType.getPrimaryKey();
-	}
+//	public AbsolutePriceCoordinate(PriceConfig priceConfig,
+//			CustomerGroup customerGroup, Tariff tariff,
+//			Currency currency, ProductType productType,
+//			PriceFragmentType priceFragmentType)
+//	{
+//		super(priceConfig, customerGroup, tariff, currency);
+//		this.productTypePK = productType.getPrimaryKey();
+//		this.priceFragmentTypePK = priceFragmentType.getPrimaryKey();
+//	}
 
 	public String getPriceFragmentTypePK()
 	{
@@ -188,10 +179,10 @@ public class AbsolutePriceCoordinate extends PriceCoordinate implements IAbsolut
 	@Override
 	public String toString()
 	{
-		if (thisString == null) {
-			StringBuffer sb = new StringBuffer();
+//		if (thisString == null) {
+			StringBuilder sb = new StringBuilder();
 			sb.append(this.getClass().getName());
-			sb.append('{');
+			sb.append('[');
 			sb.append(this.getCustomerGroupPK());
 			sb.append(',');
 			sb.append(this.getTariffPK());
@@ -201,10 +192,16 @@ public class AbsolutePriceCoordinate extends PriceCoordinate implements IAbsolut
 			sb.append(this.productTypePK);
 			sb.append(',');
 			sb.append(this.priceFragmentTypePK);
-			sb.append('}');
-			thisString = sb.toString();
-		}
-		return thisString;
+			sb.append(']');
+			return sb.toString();
+//			thisString = sb.toString();
+//		}
+//		return thisString;
+	}
+
+	@Override
+	public int hashCode() {
+		return (super.hashCode() * 31 + Util.hashCode(productTypePK)) * 31 + Util.hashCode(priceFragmentTypePK);
 	}
 
 	@Override
@@ -223,5 +220,16 @@ public class AbsolutePriceCoordinate extends PriceCoordinate implements IAbsolut
 		return
 				this.productTypePK.equals(other.getProductTypePK()) &&
 				this.priceFragmentTypePK.equals(other.getPriceFragmentTypePK());
+	}
+
+	@Override
+	public void assertAllDimensionValuesAssigned() {
+		super.assertAllDimensionValuesAssigned();
+
+		if (productTypePK == null)
+			throw new IllegalStateException("productTypePK == null");
+
+		if (priceFragmentTypePK == null)
+			throw new IllegalStateException("priceFragmentTypePK == null");
 	}
 }

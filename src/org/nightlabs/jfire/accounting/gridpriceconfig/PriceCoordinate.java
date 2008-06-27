@@ -30,6 +30,7 @@ import java.io.Serializable;
 import java.util.HashSet;
 import java.util.Set;
 
+import javax.jdo.JDOHelper;
 import javax.jdo.listener.StoreCallback;
 
 import org.apache.log4j.Logger;
@@ -39,6 +40,7 @@ import org.nightlabs.jfire.accounting.Currency;
 import org.nightlabs.jfire.accounting.Tariff;
 import org.nightlabs.jfire.accounting.id.CurrencyID;
 import org.nightlabs.jfire.accounting.id.TariffID;
+import org.nightlabs.jfire.accounting.priceconfig.IPriceConfig;
 import org.nightlabs.jfire.accounting.priceconfig.PriceConfig;
 import org.nightlabs.jfire.idgenerator.IDGenerator;
 import org.nightlabs.jfire.trade.CustomerGroup;
@@ -107,23 +109,22 @@ public class PriceCoordinate implements Serializable, StoreCallback, IPriceCoord
 	 */
 	private PriceConfig priceConfig;
 
-	public PriceCoordinate()
-	{
-	}
+	public PriceCoordinate() { }
 
-	public PriceCoordinate(PriceConfig priceConfig, IPriceCoordinate priceCoordinate)
-	{
-		this.priceConfig = priceConfig;
-
-		this.customerGroupPK = priceCoordinate.getCustomerGroupPK();
-		this.tariffPK = priceCoordinate.getTariffPK();
-		this.currencyID = priceCoordinate.getCurrencyID();
-	}
+//	public PriceCoordinate(IPriceConfig priceConfig, IPriceCoordinate priceCoordinate)
+//	{
+//		this.priceConfig = (PriceConfig) priceConfig;
+//
+//		this.customerGroupPK = priceCoordinate.getCustomerGroupPK();
+//		this.tariffPK = priceCoordinate.getTariffPK();
+//		this.currencyID = priceCoordinate.getCurrencyID();
+//	}
 
 	/**
-	 * <strong>WARNING:</strong> An instance created by this constructor cannot be persisted
-	 * into the database! It is only intended for usage as address in javascript formulas or
-	 * similar purposes!
+	 * <strong>WARNING:</strong> When using this constructor in java code, one of the
+	 * arguments <b>must</b> be the PriceConfig to which this coordinate belongs!
+	 * Otherwise, it cannot be persisted into the database! Without the owning price config
+	 * in the parameter list, it is only intended for usage as address in javascript formulas!
 	 * <p>
 	 * This constructor takes the values for each dimension as the java5 open parameter
 	 * (internally handled as array) <code>dimensionValues</code>. Every class
@@ -135,6 +136,9 @@ public class PriceCoordinate implements Serializable, StoreCallback, IPriceCoord
 	 * Additionally, it converts {@link String}s starting with {@link ObjectIDUtil#JDO_PREFIX} +
 	 * {@link ObjectIDUtil#JDO_PREFIX_SEPARATOR} to {@link ObjectID}s using the method
 	 * {@link ObjectIDUtil#createObjectID(String)}.
+	 * </p>
+	 * <p>
+	 * Furthermore, instead of passing object-ids it is possible to pass JDO objects directly.
 	 * </p>
 	 * <p>
 	 * The base implementation of <code>PriceCoordinate</code> processes values for the following classes:
@@ -173,28 +177,37 @@ public class PriceCoordinate implements Serializable, StoreCallback, IPriceCoord
 		convertStringsToObjectIDs(dimensionValues);
 		assertDimensionValuesUniqueClasses(dimensionValues);
 
-		CustomerGroupID customerGroupID = (CustomerGroupID) getDimensionValue(dimensionValues, CustomerGroupID.class);
+		this.priceConfig = getPriceConfigFromDimensionValues(dimensionValues);
+		IPriceCoordinate otherPriceCoordinate = getPriceCoordinateFromDimensionValues(dimensionValues);
+		if (otherPriceCoordinate != null) {
+			this.customerGroupPK = otherPriceCoordinate.getCustomerGroupPK();
+			this.tariffPK = otherPriceCoordinate.getTariffPK();
+			this.currencyID = otherPriceCoordinate.getCurrencyID();
+		}
+
+		CustomerGroupID customerGroupID = (CustomerGroupID) getDimensionValue(dimensionValues, CustomerGroupID.class, CustomerGroup.class);
 		if (customerGroupID != null)
 			this.customerGroupPK = customerGroupID.getPrimaryKey();
 
-		TariffID tariffID = (TariffID) getDimensionValue(dimensionValues, TariffID.class);
+		TariffID tariffID = (TariffID) getDimensionValue(dimensionValues, TariffID.class, Tariff.class);
 		if (tariffID != null)
 			this.tariffPK = tariffID.getPrimaryKey();
 
-		CurrencyID currencyID = (CurrencyID) getDimensionValue(dimensionValues, CurrencyID.class);
+		CurrencyID currencyID = (CurrencyID) getDimensionValue(dimensionValues, CurrencyID.class, Currency.class);
 		if (currencyID != null)
 			this.currencyID = currencyID.currencyID;
 	}
-	/**
-	 * @deprecated Only used for downward compatibility! Use {@link #PriceCoordinate(Object[])} instead!
-	 */
-	@Deprecated
-	public PriceCoordinate(String customerGroupPK, String tariffPK, String currencyID)
-	{
-		this.customerGroupPK = customerGroupPK;
-		this.tariffPK = tariffPK;
-		this.currencyID = currencyID;
-	}
+
+//	/**
+//	 * @deprecated Only used for downward compatibility! Use {@link #PriceCoordinate(Object[])} instead!
+//	 */
+//	@Deprecated
+//	public PriceCoordinate(String customerGroupPK, String tariffPK, String currencyID)
+//	{
+//		this.customerGroupPK = customerGroupPK;
+//		this.tariffPK = tariffPK;
+//		this.currencyID = currencyID;
+//	}
 
 	private static void convertStringsToObjectIDs(Object[] dimensionValues)
 	{
@@ -224,16 +237,36 @@ public class PriceCoordinate implements Serializable, StoreCallback, IPriceCoord
 		if (dimensionValues == null || dimensionValues.length == 0)
 			return;
 
-		Set dimensionValueClasses = new HashSet(dimensionValues.length);
+		Set<Class<?>> dimensionValueClasses = new HashSet<Class<?>>(dimensionValues.length);
 		for (int i = 0; i < dimensionValues.length; i++) {
 			Object dimensionValue = dimensionValues[i];
 			if (dimensionValue == null)
 				continue;
 
-			Class dimensionValueClass = dimensionValue.getClass();
-			if (dimensionValueClasses.contains(dimensionValueClass))
+			Class<?> dimensionValueClass = dimensionValue.getClass();
+			if (!dimensionValueClasses.add(dimensionValueClass))
 				throw new IllegalArgumentException("dimensionValues contains multiple values for the same dimensionClass: " + dimensionValueClass.getName());
 		}
+	}
+
+	protected static IPriceCoordinate getPriceCoordinateFromDimensionValues(Object[] dimensionValues)
+	{
+		for (int i = 0; i < dimensionValues.length; i++) {
+			Object dimensionValue = dimensionValues[i];
+			if (dimensionValue instanceof IPriceCoordinate)
+				return (IPriceCoordinate) dimensionValue;
+		}
+		return null;		
+	}
+
+	protected static PriceConfig getPriceConfigFromDimensionValues(Object[] dimensionValues)
+	{
+		for (int i = 0; i < dimensionValues.length; i++) {
+			Object dimensionValue = dimensionValues[i];
+			if (dimensionValue instanceof IPriceConfig)
+				return (PriceConfig) dimensionValue; // every class implementing IPriceConfig must be a subclass of PriceConfig
+		}
+		return null;		
 	}
 
 	/**
@@ -241,27 +274,35 @@ public class PriceCoordinate implements Serializable, StoreCallback, IPriceCoord
 	 * in the given <code>dimensionValues</code> and returns it. If there is none, it returns <code>null</code>.
 	 *
 	 * @param dimensionValues the parts (i.e. one value per dimension) of the coordinate
-	 * @param dimensionClass the class specifying the dimension
+	 * @param dimensionObjectIDClass the class specifying the dimension
 	 * @return the first instance of the specified class or <code>null</code>, if it does not exist.
 	 */
-	protected static Object getDimensionValue(Object[] dimensionValues, Class<? extends Object> dimensionClass)
+	protected static Object getDimensionValue(Object[] dimensionValues, Class<?> dimensionObjectIDClass, Class<?> dimensionObjectClass)
 	{
 		for (int i = 0; i < dimensionValues.length; i++) {
 			Object dimensionValue = dimensionValues[i];
-			if (dimensionClass.isInstance(dimensionValue))
+			if (dimensionObjectIDClass.isInstance(dimensionValue))
 				return dimensionValue;
+
+			if (dimensionObjectClass.isInstance(dimensionValue)) {
+				Object objectID = JDOHelper.getObjectId(dimensionValue);
+				if (objectID == null)
+					throw new IllegalArgumentException("dimensionValue \"" + dimensionValue + "\" is an instance of " + dimensionObjectClass + " but has no object-id assigned!");
+
+				return objectID;
+			}
 		}
 		return null;
 	}
 
-	public PriceCoordinate(IPriceCoordinate priceCoordinate)
-	{
-		this.priceConfig = priceCoordinate.getPriceConfig();
-
-		this.customerGroupPK = priceCoordinate.getCustomerGroupPK();
-		this.tariffPK = priceCoordinate.getTariffPK();
-		this.currencyID = priceCoordinate.getCurrencyID();
-	}
+//	public PriceCoordinate(IPriceCoordinate priceCoordinate)
+//	{
+//		this.priceConfig = priceCoordinate.getPriceConfig();
+//
+//		this.customerGroupPK = priceCoordinate.getCustomerGroupPK();
+//		this.tariffPK = priceCoordinate.getTariffPK();
+//		this.currencyID = priceCoordinate.getCurrencyID();
+//	}
 
 	/**
 	 * This constructor creates a <tt>PriceCoordinate</tt> which is identical to
@@ -308,17 +349,17 @@ public class PriceCoordinate implements Serializable, StoreCallback, IPriceCoord
 //		this.currencyID = currencyID != null ? currencyID : priceCoordinate.getCurrencyID();
 //	}
 
-	public PriceCoordinate(
-			PriceConfig priceConfig,
-			CustomerGroup customerGroup,
-			Tariff tariff, Currency currency)
-	{
-		this.priceConfig = priceConfig;
-		
-		this.customerGroupPK = customerGroup.getPrimaryKey();
-		this.tariffPK = tariff.getPrimaryKey();
-		this.currencyID = currency.getCurrencyID();
-	}
+//	public PriceCoordinate(
+//			IPriceConfig priceConfig,
+//			CustomerGroup customerGroup,
+//			Tariff tariff, Currency currency)
+//	{
+//		this.priceConfig = (PriceConfig) priceConfig;
+//		
+//		this.customerGroupPK = customerGroup.getPrimaryKey();
+//		this.tariffPK = tariff.getPrimaryKey();
+//		this.currencyID = currency.getCurrencyID();
+//	}
 
 	/**
 	 * @jdo.field persistence-modifier="none"
@@ -343,6 +384,18 @@ public class PriceCoordinate implements Serializable, StoreCallback, IPriceCoord
 			tariffOrganisationID = getFirstPartOfPrimaryKeyString(tariffPK);
 
 		return tariffOrganisationID;
+	}
+
+	@Override
+	public void assertAllDimensionValuesAssigned() {
+		if (customerGroupPK == null)
+			throw new IllegalStateException("customerGroupPK == null");
+
+		if (tariffPK == null)
+			throw new IllegalStateException("tariffPK == null");
+
+		if (currencyID == null)
+			throw new IllegalStateException("currencyID == null");
 	}
 
 	/**
@@ -379,15 +432,17 @@ public class PriceCoordinate implements Serializable, StoreCallback, IPriceCoord
 	@Override
 	public int hashCode()
 	{
-		if (thisHashCode == 0)
-			thisHashCode = toString().hashCode();
-		return thisHashCode;
+		return (Util.hashCode(customerGroupPK) * 31 + Util.hashCode(tariffPK)) * 31 + Util.hashCode(currencyID);
+
+//		if (thisHashCode == 0)
+//			thisHashCode = toString().hashCode();
+//		return thisHashCode;
 	}
-	
-	/**
-	 * @jdo.field persistence-modifier="none"
-	 */
-	protected transient String thisString = null;
+
+//	/**
+//	 * @jdo.field persistence-modifier="none"
+//	 */
+//	protected transient String thisString = null;
 
 	/**
 	 * @see java.lang.Object#toString()
@@ -395,25 +450,26 @@ public class PriceCoordinate implements Serializable, StoreCallback, IPriceCoord
 	@Override
 	public String toString()
 	{
-		if (thisString == null) {
-			StringBuffer sb = new StringBuffer();
+//		if (thisString == null) {
+			StringBuilder sb = new StringBuilder();
 			sb.append(this.getClass().getName());
-			sb.append('{');
+			sb.append('[');
 			sb.append(this.customerGroupPK);
 			sb.append(',');
 			sb.append(this.tariffPK);
 			sb.append(',');
 			sb.append(this.currencyID);
-			sb.append('}');
-			thisString = sb.toString();
-		}
-		return thisString;
+			sb.append(']');
+			return sb.toString();
+//			thisString = sb.toString();
+//		}
+//		return thisString;
 	}
 
-	/**
-	 * @jdo.field persistence-modifier="none"
-	 */
-	protected transient int thisHashCode = 0;
+//	/**
+//	 * @jdo.field persistence-modifier="none"
+//	 */
+//	protected transient int thisHashCode = 0;
 
 	public String getCurrencyID()
 	{
@@ -438,23 +494,23 @@ public class PriceCoordinate implements Serializable, StoreCallback, IPriceCoord
 	public void setCurrencyID(String currencyID)
 	{
 		this.currencyID = currencyID;
-		thisString = null;
-		thisHashCode = 0;
+//		thisString = null;
+//		thisHashCode = 0;
 	}
 
 	public void setCustomerGroupPK(String customerGroupPK)
 	{
 		this.customerGroupPK = customerGroupPK;
-		thisString = null;
-		thisHashCode = 0;
+//		thisString = null;
+//		thisHashCode = 0;
 	}
 
 	public void setTariffPK(String tariffPK)
 	{
 		this.tariffPK = tariffPK;
 		this.tariffOrganisationID = null;
-		thisString = null;
-		thisHashCode = 0;
+//		thisString = null;
+//		thisHashCode = 0;
 	}
 
 	public void jdoPreStore()

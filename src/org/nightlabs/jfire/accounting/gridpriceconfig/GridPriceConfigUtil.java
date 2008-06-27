@@ -38,6 +38,7 @@ import java.util.Set;
 
 import javax.jdo.FetchPlan;
 import javax.jdo.JDODetachedFieldAccessException;
+import javax.jdo.JDOHelper;
 import javax.jdo.PersistenceManager;
 import javax.jdo.Query;
 
@@ -156,7 +157,11 @@ public class GridPriceConfigUtil
 					logger.debug("    customerGroup=" + customerGroup.getPrimaryKey() + " ("+customerGroup.getName().getText(Locale.ENGLISH.getLanguage())+")");
 					for (Tariff tariff : priceConfig.getTariffs()) {
 						logger.debug("      tariff=" + tariff.getPrimaryKey() + " ("+tariff.getName().getText(Locale.ENGLISH.getLanguage())+")");
-						PriceCoordinate priceCoordinate = new PriceCoordinate(customerGroup.getPrimaryKey(), tariff.getPrimaryKey(), currency.getCurrencyID());
+						PriceCoordinate priceCoordinate = new PriceCoordinate(
+								JDOHelper.getObjectId(customerGroup),
+								JDOHelper.getObjectId(tariff),
+								JDOHelper.getObjectId(currency)
+						);
 						if (priceConfig instanceof IFormulaPriceConfig) {
 							FormulaCell formulaCell = ((IFormulaPriceConfig)priceConfig).getFormulaCell(priceCoordinate, false);
 							for (PriceFragmentType priceFragmentType : priceConfig.getPriceFragmentTypes()) {

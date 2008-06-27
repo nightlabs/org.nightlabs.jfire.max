@@ -80,6 +80,7 @@ public class CellReflector
 		this.priceCalculator = priceCalculator;
 		this.packageProductType = packageProductType;
 		this.coordinate = coordinate;
+		this.coordinate.assertAllDimensionValuesAssigned();
 		this.nestedProductTypeLocal = nestedProductTypeLocal;
 		this.productType = nestedProductTypeLocal.getInnerProductTypeLocal().getProductType();
 	}
@@ -327,7 +328,10 @@ public class CellReflector
 		Collection<ResolvedPriceCell> priceCells = new LinkedList<ResolvedPriceCell>();
 
 		IAbsolutePriceCoordinate absoluteCoordinate = createAbsolutePriceCoordinate(address);
+		absoluteCoordinate.assertAllDimensionValuesAssigned();
+
 		IPriceCoordinate localPriceCoordinate = createLocalPriceCoordinate(address);
+		localPriceCoordinate.assertAllDimensionValuesAssigned();
 
 		String productTypePK = absoluteCoordinate.getProductTypePK();
 		String priceFragmentTypePK = absoluteCoordinate.getPriceFragmentTypePK();
@@ -354,7 +358,8 @@ public class CellReflector
 			// filter the cell itself out if everything is identical
 			if (!foundProductTypePK.equals(this.getCoordinate().getProductTypePK()) ||
 					!localPriceCoordinate.equals(this.getCoordinate()) ||
-					!priceFragmentTypePK.equals(this.getCoordinate().getPriceFragmentTypePK())) {
+					!priceFragmentTypePK.equals(this.getCoordinate().getPriceFragmentTypePK()))
+			{
 
 //				String innerProductTypeOrganisationID = packagedProductType.getInnerProductTypeOrganisationID();
 ////				String packageProductTypeOrganisationID = packagedProductType.getPackageProductTypeOrganisationID();

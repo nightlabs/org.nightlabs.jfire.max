@@ -417,6 +417,8 @@ public class PriceCalculator
 		// Now, all preparation is done and we can start calculation:
 		for (PriceCell outerPriceCell : packagePriceConfig.getPriceCells()) {
 			PriceCoordinate priceCoordinate = outerPriceCell.getPriceCoordinate();
+			priceCoordinate.assertAllDimensionValuesAssigned();
+
 			for (PriceFragmentType priceFragmentType : packagePriceConfig.getPriceFragmentTypes()) {
 				long outerPriceCellAmount = 0;
 
@@ -425,8 +427,7 @@ public class PriceCalculator
 
 //					if (innerProductType.isPackageInner() || innerProductType == packageProductType) {
 //						IPriceConfig innerPriceConfig = innerProductType.getInnerPriceConfig();
-						PriceCell innerPriceCell = calculatePriceCell(
-								nestedProductTypeLocal, priceFragmentType, priceCoordinate);
+						PriceCell innerPriceCell = calculatePriceCell(nestedProductTypeLocal, priceFragmentType, priceCoordinate);
 	
 						if (innerPriceCell != null) { // it might be null, because the packaging is quite free and cells might be missing
 							long amount = innerPriceCell.getPrice().getAmount(priceFragmentType);

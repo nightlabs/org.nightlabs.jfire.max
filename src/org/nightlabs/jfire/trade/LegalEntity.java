@@ -64,6 +64,18 @@ import org.nightlabs.jfire.transfer.Transfer;
 import org.nightlabs.jfire.transfer.id.AnchorID;
 
 /**
+ * A JFire organisation manages all its business partners as instances of {@link LegalEntity}. 
+ * This includes local customers and vendors/suppliers that are not other JFire organisations. 
+ * These {@link LegalEntity}s will have the id of the local organisation as {@link #getOrganisationID()},
+ * {@link LegalEntity#ANCHOR_TYPE_ID_LEGAL_ENTITY} as {@link #getAnchorTypeID()} and
+ * a unique {@link #getAnchorID()}.
+ * <p>
+ * Note that other JFire organisations are represented as instances of {@link OrganisationLegalEntity}
+ * and will have their organisationID as {@link OrganisationLegalEntity#getOrganisation()}. This also
+ * includes the local organisation.
+ * </p>
+ * 
+ * 
  * @author Marco Schulze - marco at nightlabs dot de
  * @author Alexander Bieber <alex[AT]nightlabs[DOT]de>
  *

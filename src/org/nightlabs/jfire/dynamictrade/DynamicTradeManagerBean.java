@@ -13,6 +13,7 @@ import javax.ejb.EJBException;
 import javax.ejb.SessionBean;
 import javax.ejb.SessionContext;
 import javax.jdo.FetchPlan;
+import javax.jdo.JDOHelper;
 import javax.jdo.JDOObjectNotFoundException;
 import javax.jdo.PersistenceManager;
 import javax.jdo.Query;
@@ -286,9 +287,67 @@ implements SessionBean
 			if (NLJDOHelper.exists(pm, dynamicProductType)) {
 				dynamicProductType = pm.makePersistent(dynamicProductType);
 			} else {
-				dynamicProductType = (DynamicProductType) Store.getStore(pm).addProductType(User.getUser(pm, getPrincipal()),
+				dynamicProductType = (DynamicProductType) Store.getStore(pm).addProductType(
+						User.getUser(pm, getPrincipal()),
 						dynamicProductType);
-//						DynamicProductTypeActionHandler.getDefaultHome(pm, dynamicProductType));
+
+				// TODO DataNucleus WORKAROUND
+//				1141698 ERROR ({no user}) [LogInterceptor] RuntimeException in method: public abstract org.nightlabs.jfire.dynamictrade.store.DynamicProductType org.nightlabs.jfire.dynamictrade.DynamicTradeManager.storeDynamicProductType(org.nightlabs.jfire.dynamictrade.store.DynamicProductType,boolean,java.lang.String[],int) throws java.rmi.RemoteException:
+//					java.lang.IllegalStateException: There is no PersistenceManager assigned to this object (it is currently not persistent): org.nightlabs.jfire.dynamictrade.store.DynamicProductType@11feafe[chezfrancois.jfire.org,service]
+//					        at org.nightlabs.jdo.inheritance.JDOInheritanceManager.provideFields(JDOInheritanceManager.java:32)
+//					        at org.nightlabs.jdo.inheritance.JDOInheritanceManager.inheritAllFields(JDOInheritanceManager.java:22)
+//					        at org.nightlabs.jfire.store.ProductType.applyInheritance(ProductType.java:1107)
+//					        at org.nightlabs.jfire.dynamictrade.DynamicTradeManagerBean.storeDynamicProductType(DynamicTradeManagerBean.java:295)
+//					        at sun.reflect.NativeMethodAccessorImpl.invoke0(Native Method)
+//					        at sun.reflect.NativeMethodAccessorImpl.invoke(NativeMethodAccessorImpl.java:39)
+//					        at sun.reflect.DelegatingMethodAccessorImpl.invoke(DelegatingMethodAccessorImpl.java:25)
+//					        at java.lang.reflect.Method.invoke(Method.java:597)
+//					        at org.jboss.invocation.Invocation.performCall(Invocation.java:359)
+//					        at org.jboss.ejb.StatelessSessionContainer$ContainerInterceptor.invoke(StatelessSessionContainer.java:237)
+//					        at org.jboss.resource.connectionmanager.CachedConnectionInterceptor.invoke(CachedConnectionInterceptor.java:158)
+//					        at org.jboss.ejb.plugins.StatelessSessionInstanceInterceptor.invoke(StatelessSessionInstanceInterceptor.java:169)
+//					        at org.jboss.ejb.plugins.CallValidationInterceptor.invoke(CallValidationInterceptor.java:63)
+//					        at org.jboss.ejb.plugins.AbstractTxInterceptor.invokeNext(AbstractTxInterceptor.java:121)
+//					        at org.jboss.ejb.plugins.TxInterceptorCMT.runWithTransactions(TxInterceptorCMT.java:350)
+//					        at org.jboss.ejb.plugins.TxInterceptorCMT.invoke(TxInterceptorCMT.java:181)
+//					        at org.jboss.ejb.plugins.SecurityInterceptor.invoke(SecurityInterceptor.java:168)
+//					        at org.jboss.ejb.plugins.LogInterceptor.invoke(LogInterceptor.java:205)
+//					        at org.jboss.ejb.plugins.ProxyFactoryFinderInterceptor.invoke(ProxyFactoryFinderInterceptor.java:138)
+//					        at org.jboss.ejb.SessionContainer.internalInvoke(SessionContainer.java:648)
+//					        at org.jboss.ejb.Container.invoke(Container.java:960)
+//					        at sun.reflect.GeneratedMethodAccessor126.invoke(Unknown Source)
+//					        at sun.reflect.DelegatingMethodAccessorImpl.invoke(DelegatingMethodAccessorImpl.java:25)
+//					        at java.lang.reflect.Method.invoke(Method.java:597)
+//					        at org.jboss.mx.interceptor.ReflectedDispatcher.invoke(ReflectedDispatcher.java:155)
+//					        at org.jboss.mx.server.Invocation.dispatch(Invocation.java:94)
+//					        at org.jboss.mx.server.Invocation.invoke(Invocation.java:86)
+//					        at org.jboss.mx.server.AbstractMBeanInvoker.invoke(AbstractMBeanInvoker.java:264)
+//					        at org.jboss.mx.server.MBeanServerImpl.invoke(MBeanServerImpl.java:659)
+//					        at org.jboss.invocation.unified.server.UnifiedInvoker.invoke(UnifiedInvoker.java:231)
+//					        at sun.reflect.GeneratedMethodAccessor220.invoke(Unknown Source)
+//					        at sun.reflect.DelegatingMethodAccessorImpl.invoke(DelegatingMethodAccessorImpl.java:25)
+//					        at java.lang.reflect.Method.invoke(Method.java:597)
+//					        at org.jboss.mx.interceptor.ReflectedDispatcher.invoke(ReflectedDispatcher.java:155)
+//					        at org.jboss.mx.server.Invocation.dispatch(Invocation.java:94)
+//					        at org.jboss.mx.server.Invocation.invoke(Invocation.java:86)
+//					        at org.jboss.mx.server.AbstractMBeanInvoker.invoke(AbstractMBeanInvoker.java:264)
+//					        at org.jboss.mx.server.MBeanServerImpl.invoke(MBeanServerImpl.java:659)
+//					        at javax.management.MBeanServerInvocationHandler.invoke(MBeanServerInvocationHandler.java:288)
+//					        at $Proxy16.invoke(Unknown Source)
+//					        at org.jboss.remoting.ServerInvoker.invoke(ServerInvoker.java:769)
+//					        at org.jboss.remoting.transport.socket.ServerThread.processInvocation(ServerThread.java:573)
+//					        at org.jboss.remoting.transport.socket.ServerThread.dorun(ServerThread.java:387)
+//					        at org.jboss.remoting.transport.socket.ServerThread.run(ServerThread.java:166)
+
+				if (JFireBaseEAR.JPOX_WORKAROUND_FLUSH_ENABLED) {
+					ProductTypeID productTypeID = (ProductTypeID) JDOHelper.getObjectId(dynamicProductType);
+					if (productTypeID == null)
+						throw new IllegalStateException("JDOHelper.getObjectId(dynamicProductType) returned null!");
+
+					pm.flush();
+					pm.evictAll();
+					dynamicProductType = (DynamicProductType) pm.getObjectById(productTypeID);
+				}
 			}
 
 			// take care about the inheritance

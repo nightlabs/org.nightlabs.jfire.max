@@ -493,18 +493,18 @@ implements SessionBean
 				voucherType = (VoucherType) Store.getStore(pm).addProductType(User.getUser(pm, getPrincipal()), voucherType);
 			}
 
-			// take care about the inheritance
-			voucherType.applyInheritance();
-
-			if (!get)
-				return null;
-
 			if (JFireBaseEAR.JPOX_WORKAROUND_FLUSH_ENABLED) { // TODO JPOX WORKAROUND
 				pm.flush();
 				ProductTypeID vtid = (ProductTypeID) JDOHelper.getObjectId(voucherType);
 				pm.evictAll();
 				voucherType = (VoucherType) pm.getObjectById(vtid);
 			}
+
+			// take care about the inheritance
+			voucherType.applyInheritance();
+
+			if (!get)
+				return null;
 
 			VoucherType detachedVoucherType = pm.detachCopy(voucherType);
 			return detachedVoucherType;

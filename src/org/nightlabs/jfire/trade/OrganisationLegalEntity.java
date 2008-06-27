@@ -37,8 +37,8 @@ import org.nightlabs.jfire.transfer.Anchor;
 import org.nightlabs.jfire.transfer.id.AnchorID;
 
 /**
- * Each JFire organisation known by a given organisation is represented in its datastore
- * with instances of this class. This also includes the local organisation. 
+ * All organisations known by a JFire organisation are represented in its datastore
+ * with instances of this class. Note, that this also includes the local organisation. 
  * The primary key of the instances will be made up using
  * the following schema:
  * <ul>

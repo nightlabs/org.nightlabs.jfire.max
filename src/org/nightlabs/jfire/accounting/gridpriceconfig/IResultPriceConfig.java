@@ -36,7 +36,7 @@ import org.nightlabs.jfire.accounting.priceconfig.IPriceConfig;
  */
 public interface IResultPriceConfig extends IPackagePriceConfig
 {
-	void resetPriceFragmentCalculationStati();
+	void resetPriceFragmentCalculationStatus();
 	void adoptParameters(IPriceConfig priceConfig);
 	PriceCell createPriceCell(IPriceCoordinate priceCoordinate);
 	PriceCell getPriceCell(IPriceCoordinate priceCoordinate, boolean throwExceptionIfNotExistent);

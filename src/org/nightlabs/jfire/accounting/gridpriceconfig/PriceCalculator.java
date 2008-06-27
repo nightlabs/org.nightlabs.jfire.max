@@ -225,7 +225,7 @@ public class PriceCalculator
 							innerProductType.getPrimaryKey(), packageProductType.getPrimaryKey(), false);
 
 					if (resultPriceConfig != null) {
-						resultPriceConfig.resetPriceFragmentCalculationStati();
+						resultPriceConfig.resetPriceFragmentCalculationStatus();
 					}
 					else {
 						resultPriceConfig = createResultPriceConfig();
@@ -335,7 +335,7 @@ public class PriceCalculator
 		// set all PriceCells to the status dirty
 		// TODO do we really want to always recalculate all cells if sth. changed?
 		// To keep track over dependencies is too complicated...
-		packagePriceConfig.resetPriceFragmentCalculationStati();
+		packagePriceConfig.resetPriceFragmentCalculationStatus();
 		for (NestedProductTypeLocal nestedProductTypeLocal : virtualPackagedProductTypes.values()) {
 			ProductType innerProductType = nestedProductTypeLocal.getInnerProductTypeLocal().getProductType();
 			IPriceConfig priceConfig = innerProductType.getPriceConfigInPackage(
@@ -350,7 +350,7 @@ public class PriceCalculator
 				IResultPriceConfig resultPriceConfig = (IResultPriceConfig) fpc.getPackagingResultPriceConfig(
 						innerProductType.getPrimaryKey(), packageProductType.getPrimaryKey(), true);
 
-				resultPriceConfig.resetPriceFragmentCalculationStati();
+				resultPriceConfig.resetPriceFragmentCalculationStatus();
 			}
 		}
 		

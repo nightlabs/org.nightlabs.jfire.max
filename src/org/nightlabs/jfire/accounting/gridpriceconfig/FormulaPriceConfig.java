@@ -125,11 +125,8 @@ implements IFormulaPriceConfig
 	 *		dependent-key="true"
 	 *		dependent-value="true"
 	 *		mapped-by="mapOwner"
-	 *		@!mapped-by="priceConfig"
 	 *
 	 * @jdo.key mapped-by="priceCoordinate"
-	 *
-	 * @!jdo.map-vendor-extension vendor-name="jpox" key="key-field" value="priceCoordinate"
 	 */
 	private Map<IPriceCoordinate, FormulaCell> formulaCells = new HashMap<IPriceCoordinate, FormulaCell>();
 
@@ -253,7 +250,6 @@ implements IFormulaPriceConfig
 		FormulaCell formulaCell = getFormulaCell(priceCoordinate, false);
 		if (formulaCell == null) {
 			formulaCell = new FormulaCell((PriceCoordinate)priceCoordinate);
-			formulaCell.setMapOwner(this);
 //			formulaCells.put(priceCoordinate, formulaCell);
 			putFormulaCell(priceCoordinate, formulaCell);
 		}
@@ -266,6 +262,7 @@ implements IFormulaPriceConfig
 		if (formulaCell == null)
 			throw new IllegalArgumentException("formulaCell must not be null!");
 
+		formulaCell.setMapOwner(this);
 		formulaCells.put(priceCoordinate, formulaCell);
 	}
 

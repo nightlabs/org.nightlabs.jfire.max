@@ -26,6 +26,7 @@
 
 package org.nightlabs.jfire.accounting.gridpriceconfig;
 
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
@@ -33,9 +34,11 @@ import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.Map;
 
+import javax.jdo.JDOHelper;
 import javax.jdo.PersistenceManager;
 import javax.jdo.Query;
 
+import org.apache.log4j.Logger;
 import org.nightlabs.annotation.Implement;
 import org.nightlabs.jfire.accounting.Currency;
 import org.nightlabs.jfire.accounting.Tariff;
@@ -47,6 +50,7 @@ import org.nightlabs.jfire.store.Product;
 import org.nightlabs.jfire.trade.Article;
 import org.nightlabs.jfire.trade.ArticlePrice;
 import org.nightlabs.jfire.trade.CustomerGroup;
+import org.nightlabs.util.CollectionUtil;
 
 /**
  * @author Marco Schulze - marco at nightlabs dot de
@@ -77,6 +81,7 @@ extends GridPriceConfig
 implements IPackagePriceConfig, IResultPriceConfig
 {
 	private static final long serialVersionUID = 1L;
+	private static final Logger logger = Logger.getLogger(StablePriceConfig.class);
 
 	public static final String FETCH_GROUP_PRICE_CELLS = "StablePriceConfig.priceCells";
 
@@ -146,17 +151,51 @@ implements IPackagePriceConfig, IResultPriceConfig
 		return Collections.unmodifiableCollection(priceCells.values());
 	}
 	/**
-	 * This method drops all calculation stati for all <tt>PriceFragment</tt> s
+	 * This method drops all calculation status for all <tt>PriceFragment</tt> s
 	 * in all <tt>PriceCell</tt> s which is equivalent to setting
 	 * them to <tt>CALCULATIONSTATUS_DIRTY</tt>.
 	 */
 	@Implement
 	@Override
-	public void resetPriceFragmentCalculationStati()
+	public void resetPriceFragmentCalculationStatus()
 	{
-		for (Iterator<PriceCell> itPriceCells = this.getPriceCells().iterator(); itPriceCells.hasNext(); ) {
-			PriceCell priceCell = itPriceCells.next();
-			priceCell.resetPriceFragmentCalculationStati();
+		for (Map.Entry<IPriceCoordinate, PriceCell> me : new ArrayList<Map.Entry<IPriceCoordinate, PriceCell>>(priceCells.entrySet())) { // new ArrayList, because we might call putPriceCell(...)
+			PriceCell priceCell = me.getValue();
+			if (priceCell == null) {
+				IPriceCoordinate priceCoordinate = me.getKey();
+				if (priceCoordinate != null) {
+					// TODO DataNucleus WORKAROUND!!! It should never happen that a null value comes into this map in the first place.
+					// We try to find it.
+					logger.warn("resetPriceFragmentCalculationStatus: found entry in priceCells with a key but without a value! key=" + me.getKey() +" this=" + this);
+
+					PersistenceManager pm = JDOHelper.getPersistenceManager(this);
+					if (pm == null)
+						logger.warn("resetPriceFragmentCalculationStatus: this StablePriceConfig is currently not attached to a datastore! Cannot obtain PersistenceManager to find lost object! this=" + this);
+					else {
+						Query q = pm.newQuery(PriceCell.class);
+						q.setFilter("this.priceConfig == :priceConfig");
+						Collection<PriceCell> c = CollectionUtil.castCollection((Collection<?>)q.execute(this));
+						for (PriceCell pc : c) {
+							if (priceCoordinate.equals(pc.getPriceCoordinate())) {
+								priceCell = pc;
+								break;
+							}
+						}
+
+						if (priceCell == null)
+							logger.warn("resetPriceFragmentCalculationStatus: could not find lost PriceCell via JDO query! this=" + this + " priceCoordinate=" + priceCoordinate);
+						else {
+							putPriceCell(priceCoordinate, priceCell);
+						}
+					}
+				}
+				// DataNucleus WORKAROUND - END
+
+				if (priceCell == null)
+					throw new IllegalStateException("priceCells contains null value for key=" + me.getKey() +" this=" + this);
+			}
+
+			priceCell.resetPriceFragmentCalculationStatus();
 		}
 	}
 	
@@ -227,6 +266,9 @@ implements IPackagePriceConfig, IResultPriceConfig
 		if (priceCell == null)
 			throw new IllegalArgumentException("priceCell must not be null");
 
+		if (logger.isDebugEnabled())
+			logger.debug("putPriceCell: priceCoordinate=" + priceCoordinate + " priceCell=" + priceCell);
+
 		priceCells.put(priceCoordinate, priceCell);
 	}
 
@@ -242,6 +284,9 @@ implements IPackagePriceConfig, IResultPriceConfig
 
 	protected void removePriceCell(PriceCoordinate priceCoordinate)
 	{
+		if (logger.isDebugEnabled())
+			logger.debug("removePriceCell: " + priceCoordinate);
+
 		priceCells.remove(priceCoordinate);
 	}
 
@@ -449,5 +494,4 @@ implements IPackagePriceConfig, IResultPriceConfig
 				productStack,
 				priceCell.getPrice());
 	}
-
 }

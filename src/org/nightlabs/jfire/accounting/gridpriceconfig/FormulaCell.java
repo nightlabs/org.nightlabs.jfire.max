@@ -104,24 +104,24 @@ public class FormulaCell implements Serializable
 	 * TODO DataNucleus workaround: the above null-value="exception" is correct but causes exceptions during cross-datastore-replication 
 	 * @jdo.field persistence-modifier="persistent"
 	 */
-	private PriceConfig priceConfig;
+	private FormulaPriceConfig priceConfig;
 
 	/**
 	 * This is used in mapped-by of the FormulaPriceConfig.
 	 *
 	 * @jdo.field persistence-modifier="persistent"
 	 */
-	private PriceConfig mapOwner;
+	private FormulaPriceConfig mapOwner;
 
 	/**
 	 * @param mapOwner The mapOwner to set.
 	 */
-	public void setMapOwner(PriceConfig mapOwner)
+	public void setMapOwner(FormulaPriceConfig mapOwner)
 	{
 		this.mapOwner = mapOwner;
 	}
 
-	public PriceConfig getMapOwner()
+	public FormulaPriceConfig getMapOwner()
 	{
 		return mapOwner;
 	}
@@ -146,7 +146,7 @@ public class FormulaCell implements Serializable
 	 *
 	 * @param priceConfig the <tt>FormulaPriceConfig</tt> which created this cell.
 	 */
-	public FormulaCell(PriceConfig priceConfig)
+	public FormulaCell(FormulaPriceConfig priceConfig)
 	{
 		this.priceConfig = priceConfig;
 
@@ -161,7 +161,7 @@ public class FormulaCell implements Serializable
 	}
 	public FormulaCell(PriceCoordinate priceCoordinate)
 	{
-		this.priceConfig = priceCoordinate.getPriceConfig();
+		this.priceConfig = (FormulaPriceConfig) priceCoordinate.getPriceConfig();
 
 		if (!(this.priceConfig instanceof IFormulaPriceConfig))
 			throw new IllegalArgumentException("priceCoordinate.priceConfig must be an instance of IFormulaPriceConfig but is not! " + this.priceConfig);

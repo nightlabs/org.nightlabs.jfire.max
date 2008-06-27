@@ -34,7 +34,6 @@ import org.apache.log4j.Logger;
 import org.nightlabs.jdo.ObjectIDUtil;
 import org.nightlabs.jfire.accounting.Price;
 import org.nightlabs.jfire.accounting.priceconfig.IPriceConfig;
-import org.nightlabs.jfire.accounting.priceconfig.PriceConfig;
 import org.nightlabs.util.Util;
 
 /**
@@ -100,7 +99,7 @@ public class PriceCell implements Serializable
 	 * TODO DataNucleus workaround: the above null-value="exception" is correct but causes exceptions during cross-datastore-replication 
 	 * @jdo.field persistence-modifier="persistent"
 	 */
-	private PriceConfig priceConfig;
+	private StablePriceConfig priceConfig;
 
 	/**
 	 * @!jdo.field persistence-modifier="persistent" null-value="exception"
@@ -128,7 +127,7 @@ public class PriceCell implements Serializable
 
 	public PriceCell(IPriceCoordinate priceCoordinate)
 	{
-		this.priceConfig = priceCoordinate.getPriceConfig();
+		this.priceConfig = (StablePriceConfig) priceCoordinate.getPriceConfig();
 		this.organisationID = priceConfig.getOrganisationID();
 		this.priceConfigID = priceConfig.getPriceConfigID();
 		this.priceID = priceConfig.createPriceID();
@@ -230,13 +229,13 @@ public class PriceCell implements Serializable
 	 *
 	 * @see org.nightlabs.jfire.accounting.PriceFragmentType#PRICEFRAGMENTTYPEID_TOTAL
 	 */
-	protected transient Map priceFragmentsCalculationStatus = null;
+	protected transient Map<String, String> priceFragmentsCalculationStatus = null;
 
 	/**
 	 * This method drops all stati which is equivalent to setting them to
 	 * <tt>CALCULATIONSTATUS_DIRTY</tt>.
 	 */
-	public void resetPriceFragmentCalculationStati()
+	public void resetPriceFragmentCalculationStatus()
 	{
 		priceFragmentsCalculationStatus = null;
 	}
@@ -255,8 +254,14 @@ public class PriceCell implements Serializable
 
 	public void setPriceFragmentCalculationStatus(String priceFragmentTypePK, String status)
 	{
+		if (priceFragmentTypePK == null)
+			throw new IllegalArgumentException("priceFragmentTypePK must not be null!");
+		if (status == null)
+			throw new IllegalArgumentException("status must not be null!");
+
 		if (priceFragmentsCalculationStatus == null)
-			priceFragmentsCalculationStatus = new HashMap();
+			priceFragmentsCalculationStatus = new HashMap<String, String>();
+
 		priceFragmentsCalculationStatus.put(priceFragmentTypePK, status);
 	}
 

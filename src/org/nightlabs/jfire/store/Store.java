@@ -355,13 +355,13 @@ implements StoreCallback
 		PersistenceManager pm = getPersistenceManager();
 		productType = pm.makePersistent(productType);
 
-		// JPOX WORKAROUND there seems to be a JPOX bug causing the object not to be cleanly replaced by the attached one
-		if (JFireBaseEAR.JPOX_WORKAROUND_FLUSH_ENABLED) {
-			pm.flush();
-			ProductTypeID productTypeID = (ProductTypeID) JDOHelper.getObjectId(productType);
-			pm.evictAll();
-			productType = (ProductType) pm.getObjectById(productTypeID);
-		}
+//		// JPOX WORKAROUND there seems to be a JPOX bug causing the object not to be cleanly replaced by the attached one
+//		if (JFireBaseEAR.JPOX_WORKAROUND_FLUSH_ENABLED) {
+//			pm.flush();
+//			ProductTypeID productTypeID = (ProductTypeID) JDOHelper.getObjectId(productType);
+//			pm.evict(productType);
+//			productType = (ProductType) pm.getObjectById(productTypeID);
+//		}
 
 //		15:34:20,427 ERROR [LogInterceptor] RuntimeException in method: public abstract org.nightlabs.ipanema.ticketing.store.Event org.nightlabs.ipanema.ticketing.TicketingManager.storeEvent(org.nightlabs.ipanema.ticketing.store.Event,boolean,java.lang.String[],int) throws org.nightlabs.ModuleException,java.rmi.RemoteException:
 //			javax.jdo.JDODetachedFieldAccessException: You have just attempted to access field "extendedProductType" yet this field was not detached when you detached the object. Either dont access this field, or detach the field when detaching the object.
@@ -431,7 +431,8 @@ implements StoreCallback
 //		Repository defaultHomeRepository = productTypeActionHandler.getDefaultHomeRepository(productType);
 
 		ProductTypeLocal productTypeLocal = productType.createProductTypeLocal(user);
-		productType.setProductTypeLocal(pm.makePersistent(productTypeLocal));
+		productTypeLocal = pm.makePersistent(productTypeLocal);
+		productType.setProductTypeLocal(productTypeLocal);
 //		// TODO JPOX WORKAROUND - begin
 //		if (JFireBaseEAR.JPOX_WORKAROUND_FLUSH_ENABLED) {
 //			try {
@@ -565,7 +566,8 @@ implements StoreCallback
 
 //		if (JFireBaseEAR.JPOX_WORKAROUND_FLUSH_ENABLED) {
 //			ProductTypeID productTypeID = (ProductTypeID) JDOHelper.getObjectId(productType);
-//			pm.evictAll();
+//			pm.evict(productTypeLocal);
+//			pm.evict(productType);
 //			productType = (ProductType) pm.getObjectById(productTypeID);
 //			if (productType.getProductTypeLocal() == null)
 //				throw new IllegalStateException("JPOX Workaround failed: There's no ProductTypeLocal!");

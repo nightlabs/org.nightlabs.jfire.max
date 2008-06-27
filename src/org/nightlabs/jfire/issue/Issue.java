@@ -550,10 +550,6 @@ implements 	Serializable, AttachCallback, Statable, DeleteCallback
 				IDGenerator.getOrganisationID(),
 				IDGenerator.nextID(IssueLink.class),
 				this, issueLinkType, linkedObject);
-
-		if (issueLinks.contains(issueLink)) {
-			return null;
-		}
 		
 		issueLinks.add(issueLink);
 

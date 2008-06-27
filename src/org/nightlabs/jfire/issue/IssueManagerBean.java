@@ -479,6 +479,24 @@ implements SessionBean
 			pm.close();
 		}
 	}
+	
+	/**
+	 * @ejb.interface-method
+	 * @!ejb.transaction type="Supports"
+	 * @ejb.permission role-name="_Guest_"
+	 */
+	public Set<IssueLinkTypeID> getIssueLinkTypeIDs()
+	{
+		PersistenceManager pm = getPersistenceManager();
+		try {
+			Query q = pm.newQuery(IssueLinkType.class);
+			q.setResult("JDOHelper.getObjectId(this)");
+			return new HashSet<IssueLinkTypeID>((Collection)q.execute()); 
+		} finally {
+			pm.close();
+		}
+	}
+	
 
 	/**
 	 * @ejb.interface-method

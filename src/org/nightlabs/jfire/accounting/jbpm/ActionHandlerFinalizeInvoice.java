@@ -57,11 +57,11 @@ extends AbstractActionHandler
 		User user = SecurityReflector.getUserDescriptor().getUser(pm);
 
 		if (
-				(!invoice.getVendor().getPrimaryKey().equals(accounting.getMandator().getPrimaryKey()))
+				(!invoice.getVendor().equals(accounting.getMandator()))
 				&&
-				(!invoice.getCustomer().getPrimaryKey().equals(accounting.getMandator().getPrimaryKey()))
-			)
-			throw new IllegalArgumentException("Can not finalize an invoice where the mandator is neither vendor nor customer of the invoice!");
+				(!invoice.getCustomer().equals(accounting.getMandator()))
+		)
+			throw new IllegalArgumentException("Cannot finalize an invoice where the mandator is neither vendor nor customer of the invoice!");
 
 		// invoice.setFinalized(...) does nothing, if it is already finalized.
 		invoice.setFinalized(user);

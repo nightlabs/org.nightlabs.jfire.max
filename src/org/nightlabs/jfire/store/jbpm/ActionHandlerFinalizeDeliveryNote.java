@@ -56,8 +56,12 @@ extends AbstractActionHandler
 		Accounting accounting = Accounting.getAccounting(pm);
 		User user = SecurityReflector.getUserDescriptor().getUser(pm);
 
-		if (!deliveryNote.getVendor().getPrimaryKey().equals(accounting.getMandator().getPrimaryKey()))
-			throw new IllegalArgumentException("Can not finalize an deliveryNote where mandator is not vendor of this deliveryNote!");
+		if (
+				(!deliveryNote.getVendor().equals(accounting.getMandator()))
+				&&
+				(!deliveryNote.getCustomer().equals(accounting.getMandator()))
+		)
+			throw new IllegalArgumentException("Cannot finalize a delivery note where the mandator is neither vendor nor customer of the delivery note!");
 
 		// deliveryNote.setFinalized(...) does nothing, if it is already finalized.
 		deliveryNote.setFinalized(user);

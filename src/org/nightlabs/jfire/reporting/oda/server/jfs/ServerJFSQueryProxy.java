@@ -96,6 +96,7 @@ public class ServerJFSQueryProxy extends AbstractJFSQueryProxy {
 			try {
 				return getJFSResultSet(pm, getScriptRegistryItemID(), getJFSQueryPropertySet(), getNamedParameters());
 			} catch (Exception e) {
+				logger.error("Could not get ResultSet", e);
 				OdaException ex = new OdaException("Could not get ResultSet "+e.getMessage());
 				ex.initCause(e);
 				throw ex;

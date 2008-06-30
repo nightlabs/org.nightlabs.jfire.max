@@ -1,10 +1,12 @@
 package org.nightlabs.jfire.issue;
 
 import java.io.Serializable;
+import java.util.Collection;
 import java.util.Set;
 
 import javax.jdo.JDOHelper;
 import javax.jdo.PersistenceManager;
+import javax.jdo.Query;
 import javax.jdo.listener.DeleteCallback;
 import javax.jdo.listener.DetachCallback;
 import javax.jdo.listener.InstanceLifecycleEvent;
@@ -40,6 +42,13 @@ import org.nightlabs.util.Util;
  *			WHERE this.issueID == :issueID && 
  *			this.issueID == :issueID &&
  *			this.linkedObjectID == :linkedObjectID                    
+ * 
+ * @jdo.query
+ *		name="getIssueLinkByLinkedObjectID"
+ *		query="SELECT
+ *			WHERE this.linkedObjectID == paramLinkedObjectID
+ *			PARAMETERS String paramLinkedObjectID
+ *			import java.lang.String"
  *
  * jdo.fetch-group name="IssueLink.linkedObjectID" fetch-groups="default" fields="linkedObjectID"
  * jdo.fetch-group name="IssueLink.linkedObjectClass" fetch-groups="default" fields="linkedObjectClass"
@@ -243,6 +252,19 @@ implements Serializable, DetachCallback, StoreCallback, DeleteCallback
 		}
 	};
 
+	/**
+	 * @param pm The <code>PersistenceManager</code> that should be used to access the datastore.
+	 * @param linkedObjectID
+	 * @return Returns instances of <code>IssueLink</code>.
+	 */
+	@SuppressWarnings("unchecked")
+	protected static Collection<IssueLink> getIssueLinkByLinkedObjectID(PersistenceManager pm, String linkedObjectID)
+	{
+		Query q = pm.newNamedQuery(IssueLink.class, "getIssueLinkByLinkedObjectID");
+		return (Collection<IssueLink>)q.execute(
+			linkedObjectID);
+	}
+	
 	@Override
 	public void jdoPostDetach(Object object) {
 		IssueLink detached = this;
@@ -309,12 +331,19 @@ implements Serializable, DetachCallback, StoreCallback, DeleteCallback
 		if (isExisting) {
 			if (logger.isDebugEnabled())
 				logger.debug("jdoPreStore: the IssueLink " + getPrimaryKey() + " already exists - no need to call the IssueLinkType's postCreateIssueLink callback method.");
-			throw new IllegalStateException("This issueLink is already in the issue.");
 		}
 		else {
 			if (logger.isDebugEnabled()) 
 				logger.debug("jdoPreStore: the IssueLink " + getPrimaryKey() + " does NOT yet exist - registering StoreLifecycleListener in order to react on postStore.");
 
+			Collection<IssueLink> issueLinks = IssueLink.getIssueLinkByLinkedObjectID(getPersistenceManager(), linkedObjectID);
+			if (issueLinks != null && issueLinks.size() > 1) {
+				for (IssueLink issueLink : issueLinks) {
+					if (issue.getIssueID() == issueLink.getIssue().getIssueID() &&
+						issueLinkType.getIssueLinkTypeID().equals(issueLink.getIssueLinkType().getIssueLinkTypeID()))
+						throw new IllegalStateException("There is already issueLink with the same issue and issueLinkType for this : " + linkedObjectID);						
+				}
+			}
 			getPersistenceManager().addInstanceLifecycleListener(
 					new StoreLifecycleListener()
 					{
@@ -374,7 +403,7 @@ implements Serializable, DetachCallback, StoreCallback, DeleteCallback
 		if (getClass() != obj.getClass()) return false;
 		final IssueLink other = (IssueLink) obj;
 
-		return Util.equals(this.organisationID, other.organisationID) && Util.equals(this.issueLinkID, other.issueLinkID) 
-		&& Util.equals(this.linkedObjectID, other.linkedObjectID) && Util.equals(this.issueLinkType, other.issueLinkType);
+		return Util.equals(this.organisationID, other.organisationID) 
+		&& Util.equals(this.issueLinkID, other.issueLinkID);
 	}
 }

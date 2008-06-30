@@ -56,6 +56,7 @@ public class IssueDescription
 	 *		null-value="exception"
 	 *
 	 * @jdo.join
+	 * @jdo.value-column sql-type="CLOB"
 	 */
 	protected Map<String, String> descriptions = new HashMap<String, String>();
 

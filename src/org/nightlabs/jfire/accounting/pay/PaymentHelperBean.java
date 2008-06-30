@@ -118,7 +118,7 @@ implements SessionBean
 			new PaymentLocal(paymentData.getPayment());
 			
 			paymentData.getPayment().initUser(User.getUser(pm, getPrincipal()));
-			pm.makePersistent(paymentData);
+			paymentData = pm.makePersistent(paymentData);
 
 			if (paymentData.getPayment().getPartner() == null) {
 				String mandatorPK = Accounting.getAccounting(pm).getMandator().getPrimaryKey();
@@ -218,7 +218,7 @@ implements SessionBean
 					);
 
 			if (!JDOHelper.isPersistent(payDoWorkServerResult))
-				pm.makePersistent(payDoWorkServerResult);
+				payDoWorkServerResult = pm.makePersistent(payDoWorkServerResult);
 			paymentData.getPayment().setPayDoWorkServerResult(payDoWorkServerResult);
 
 			pm.getFetchPlan().setMaxFetchDepth(maxFetchDepth);
@@ -260,7 +260,7 @@ implements SessionBean
 			}
 
 			if (!JDOHelper.isPersistent(payEndServerResult))
-				pm.makePersistent(payEndServerResult);
+				payEndServerResult = pm.makePersistent(payEndServerResult);
 			paymentData.getPayment().setPayEndServerResult(payEndServerResult);
 			// get InvoiceIDs
 			Collection invoiceIDs = paymentData.getPayment().getInvoiceIDs();
@@ -314,10 +314,7 @@ implements SessionBean
 			pm.getExtent(Payment.class);
 			Payment payment = (Payment) pm.getObjectById(paymentID);
 
-			if (JDOHelper.isDetached(payBeginServerResult))
-				payBeginServerResult = pm.makePersistent(payBeginServerResult);
-			else
-				pm.makePersistent(payBeginServerResult);
+			payBeginServerResult = pm.makePersistent(payBeginServerResult);
 
 //			PaymentResult old = payment.getPayBeginServerResult();
 //			if (old != null) {
@@ -359,10 +356,7 @@ implements SessionBean
 			pm.getExtent(Payment.class);
 			Payment payment = (Payment) pm.getObjectById(paymentID);
 
-			if (JDOHelper.isDetached(payDoWorkServerResult))
-				payDoWorkServerResult = pm.makePersistent(payDoWorkServerResult);
-			else
-				pm.makePersistent(payDoWorkServerResult);
+			payDoWorkServerResult = pm.makePersistent(payDoWorkServerResult);
 
 			payment.setPayDoWorkServerResult(payDoWorkServerResult);
 
@@ -400,10 +394,7 @@ implements SessionBean
 			pm.getExtent(Payment.class);
 			Payment payment = (Payment) pm.getObjectById(paymentID);
 
-			if (JDOHelper.isDetached(payEndServerResult))
-				payEndServerResult = pm.makePersistent(payEndServerResult);
-			else
-				pm.makePersistent(payEndServerResult);
+			payEndServerResult = pm.makePersistent(payEndServerResult);
 
 			payment.setPayEndServerResult(payEndServerResult);
 

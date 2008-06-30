@@ -185,15 +185,16 @@ public class PartnerStorekeeper extends Storekeeper
 	 */
 	public Repository getInitialRepositoryForForeignProduct(Product product)
 	{
-		String partnerOrganisationID = product.getOrganisationID();
+//		String partnerOrganisationID = product.getOrganisationID();
 		PersistenceManager pm = getPersistenceManager();
 		Store store = Store.getStore(pm);
 
-		if (partnerOrganisationID.equals(store.getOrganisationID()))
+		if (store.getMandator().equals(product.getProductType().getVendor()))
 			throw new IllegalStateException("This method should never be called for a local product! " + JDOHelper.getObjectId(product));
 
-		LegalEntity repositoryOwner = OrganisationLegalEntity.getOrganisationLegalEntity(
-				pm, partnerOrganisationID);
+//		LegalEntity repositoryOwner = OrganisationLegalEntity.getOrganisationLegalEntity(
+//				pm, partnerOrganisationID);
+		LegalEntity repositoryOwner = product.getProductType().getVendor();
 
 		return createPartnerOutsideRepository(pm, store.getOrganisationID(), repositoryOwner);
 	}

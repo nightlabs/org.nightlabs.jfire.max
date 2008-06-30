@@ -672,6 +672,7 @@ implements StoreCallback
 				}
 			}
 		} catch (Exception x) {
+			logger.error(x.toString(), x);
 			throw new PaymentException(
 					new PaymentResult(
 							PaymentResult.CODE_FAILED,
@@ -684,8 +685,10 @@ implements StoreCallback
 				paymentActionHandler.onPayEnd(paymentData);
 			}
 		} catch (PaymentException x) {
+			logger.error(x.toString(), x);
 			throw x;
 		} catch (Exception e) {
+			logger.error(e.toString(), e);
 			throw new PaymentException(new PaymentResult(
 					PaymentResult.CODE_FAILED, "Calling PaymentActionHandler.onPayEnd failed! localOrganisation="+getOrganisationID(), e));
 		}
@@ -706,6 +709,7 @@ implements StoreCallback
 				}
 			}
 		} catch (Exception x) {
+			logger.error("Signalling transition \"" + JbpmConstantsInvoice.Both.TRANSITION_NAME_PAY + "\" failed!", x);
 			throw new PaymentException(
 					new PaymentResult(
 							PaymentResult.CODE_FAILED,

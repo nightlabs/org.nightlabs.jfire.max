@@ -295,7 +295,7 @@ public class DefaultLocalStorekeeperDelegate extends LocalStorekeeperDelegate
 	@Override
 	public Repository getInitialRepositoryForLocalProduct(Product product)
 	{
-		if (!getStore().getOrganisationID().equals(product.getOrganisationID()))
+		if (!getStore().getMandator().equals(product.getProductType().getVendor()))
 			throw new IllegalStateException("The product is a foreign product! This should never happen, since Store should call getPartnerStorekeeper().getInitialForeignRepository(...)!");
 
 		return getHomeRepository(product);

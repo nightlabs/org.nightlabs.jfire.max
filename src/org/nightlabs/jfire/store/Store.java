@@ -610,7 +610,8 @@ implements StoreCallback
 //		Repository initialRepository = ProductTypeActionHandler.getProductTypeActionHandler(pm, product.getProductType().getClass()).getInitialRepository(product);
 
 		Repository initialRepository;
-		if (this.getOrganisationID().equals(product.getOrganisationID()))
+//		if (this.getOrganisationID().equals(product.getOrganisationID()))
+		if (this.getMandator().equals(product.getProductType().getVendor()))
 			initialRepository = getInitialRepositoryForLocalProduct(product);
 		else
 			initialRepository = getInitialRepositoryForForeignProduct(product);
@@ -1691,6 +1692,7 @@ implements StoreCallback
 				}
 			}
 		} catch (Exception x) {
+			logger.error(x.toString(), x);
 			throw new DeliveryException(
 					new DeliveryResult(
 							DeliveryResult.CODE_FAILED,
@@ -1705,8 +1707,10 @@ implements StoreCallback
 					deliveryActionHandler.onFollowUpDeliverEnd(deliveryData.getDelivery(), precursorDelivery);
 				}
 			} catch (DeliveryException x) {
+				logger.error(x.toString(), x);
 				throw x;
 			} catch (Exception e) {
+				logger.error(e.toString(), e);
 				throw new DeliveryException(new DeliveryResult(
 						DeliveryResult.CODE_FAILED, "Calling DeliveryActionHandler.onFollowUpDeliverEnd failed! localOrganisation="+getOrganisationID(), e));
 			}
@@ -1739,6 +1743,7 @@ implements StoreCallback
 
 			bookDeliveryNotesImplicitelyAndGetPartner(DeliverStage.deliverEnd, deliveryNotesToBookImplicitely);
 		} catch (Exception x) {
+			logger.error("Signalling transition \"" + JbpmConstantsDeliveryNote.Both.TRANSITION_NAME_DELIVER + "\" failed!", x);
 			throw new DeliveryException(
 					new DeliveryResult(
 							DeliveryResult.CODE_FAILED,

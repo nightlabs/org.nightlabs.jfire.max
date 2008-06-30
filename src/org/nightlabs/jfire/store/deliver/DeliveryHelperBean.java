@@ -176,7 +176,7 @@ implements SessionBean
 					user, deliveryData);
 
 			if (!JDOHelper.isPersistent(deliverBeginServerResult))
-				pm.makePersistent(deliverBeginServerResult);
+				deliverBeginServerResult = pm.makePersistent(deliverBeginServerResult);
 			deliveryData.getDelivery().setDeliverBeginServerResult(deliverBeginServerResult);
 
 			pm.getFetchPlan().setMaxFetchDepth(maxFetchDepth);
@@ -234,7 +234,7 @@ implements SessionBean
 					);
 
 			if (!JDOHelper.isPersistent(deliverDoWorkServerResult))
-				pm.makePersistent(deliverDoWorkServerResult);
+				deliverDoWorkServerResult = pm.makePersistent(deliverDoWorkServerResult);
 			deliveryData.getDelivery().setDeliverDoWorkServerResult(deliverDoWorkServerResult);
 
 			pm.getFetchPlan().setMaxFetchDepth(maxFetchDepth);
@@ -275,7 +275,7 @@ implements SessionBean
 			}
 
 			if (!JDOHelper.isPersistent(deliverEndServerResult))
-				pm.makePersistent(deliverEndServerResult);
+				deliverEndServerResult = pm.makePersistent(deliverEndServerResult);
 			deliveryData.getDelivery().setDeliverEndServerResult(deliverEndServerResult);
 
 			pm.getFetchPlan().setMaxFetchDepth(maxFetchDepth);
@@ -442,10 +442,7 @@ implements SessionBean
 			pm.getExtent(Delivery.class);
 			Delivery delivery = (Delivery) pm.getObjectById(deliveryID);
 
-			if (JDOHelper.isDetached(deliverDoWorkServerResult))
-				deliverDoWorkServerResult = pm.makePersistent(deliverDoWorkServerResult);
-			else
-				pm.makePersistent(deliverDoWorkServerResult);
+			deliverDoWorkServerResult = pm.makePersistent(deliverDoWorkServerResult);
 
 			delivery.setDeliverDoWorkServerResult(deliverDoWorkServerResult);
 
@@ -483,10 +480,7 @@ implements SessionBean
 			pm.getExtent(Delivery.class);
 			Delivery delivery = (Delivery) pm.getObjectById(deliveryID);
 
-			if (JDOHelper.isDetached(deliverEndServerResult))
-				deliverEndServerResult = pm.makePersistent(deliverEndServerResult);
-			else
-				pm.makePersistent(deliverEndServerResult);
+			deliverEndServerResult = pm.makePersistent(deliverEndServerResult);
 
 			delivery.setDeliverEndServerResult(deliverEndServerResult);
 

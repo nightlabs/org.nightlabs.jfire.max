@@ -309,6 +309,7 @@ implements Serializable, DetachCallback, StoreCallback, DeleteCallback
 		if (isExisting) {
 			if (logger.isDebugEnabled())
 				logger.debug("jdoPreStore: the IssueLink " + getPrimaryKey() + " already exists - no need to call the IssueLinkType's postCreateIssueLink callback method.");
+			throw new IllegalStateException("This issueLink is already in the issue.");
 		}
 		else {
 			if (logger.isDebugEnabled()) 
@@ -374,6 +375,6 @@ implements Serializable, DetachCallback, StoreCallback, DeleteCallback
 		final IssueLink other = (IssueLink) obj;
 
 		return Util.equals(this.organisationID, other.organisationID) && Util.equals(this.issueLinkID, other.issueLinkID) 
-		&& Util.equals(this.linkedObjectID, other.linkedObjectID) && Util.equals(this.issueLinkID, other.issueLinkID);
+		&& Util.equals(this.linkedObjectID, other.linkedObjectID) && Util.equals(this.issueLinkType, other.issueLinkType);
 	}
 }

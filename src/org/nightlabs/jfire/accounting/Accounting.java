@@ -127,9 +127,9 @@ implements StoreCallback
 	 */
 	public static Accounting getAccounting(PersistenceManager pm)
 	{
-		Iterator it = pm.getExtent(Accounting.class).iterator();
+		Iterator<Accounting> it = pm.getExtent(Accounting.class).iterator();
 		if (it.hasNext())
-			return (Accounting)it.next();
+			return it.next();
 
 		Accounting accounting = new Accounting();
 
@@ -357,26 +357,24 @@ implements StoreCallback
 		return invoice;
 	}
 
-	public void addArticlesToInvoice(User user, Invoice invoice, Collection articles)
+	public void addArticlesToInvoice(User user, Invoice invoice, Collection<? extends Article> articles)
 	throws InvoiceEditException
 	{
-		Map productTypeActionHandler2Articles = new HashMap();
-		for (Iterator it = articles.iterator(); it.hasNext(); ) {
-			Article article = (Article) it.next();
+		Map<ProductTypeActionHandler, List<Article>> productTypeActionHandler2Articles = new HashMap<ProductTypeActionHandler, List<Article>>();
+		for (Article article : articles) {
 			invoice.addArticle(article);
 
 			ProductTypeActionHandler productTypeActionHandler = ProductTypeActionHandler.getProductTypeActionHandler(
 					getPersistenceManager(), article.getProductType().getClass());
-			List al = (List) productTypeActionHandler2Articles.get(productTypeActionHandler);
+			List<Article> al = productTypeActionHandler2Articles.get(productTypeActionHandler);
 			if (al == null) {
-				al = new LinkedList();
+				al = new LinkedList<Article>();
 				productTypeActionHandler2Articles.put(productTypeActionHandler, al);
 			}
 			al.add(article);
 		}
-		for (Iterator it = productTypeActionHandler2Articles.entrySet().iterator(); it.hasNext();) {
-			Map.Entry me = (Map.Entry) it.next();
-			((ProductTypeActionHandler) me.getKey()).onAddArticlesToInvoice(user, this, invoice, (List) me.getValue());
+		for (Map.Entry<ProductTypeActionHandler, List<Article>> me : productTypeActionHandler2Articles.entrySet()) {
+			((ProductTypeActionHandler) me.getKey()).onAddArticlesToInvoice(user, this, invoice, me.getValue());
 		}
 	}
 

@@ -1290,12 +1290,6 @@ implements Serializable, DeleteCallback, DetachCallback, StoreCallback
 		}
 	}
 
-	@Override
-	public String toString()
-	{
-		return this.getClass().getName() + '{' + getPrimaryKey() + '}';
-	}
-
 	public void setAllocationException(String allocationExceptionClass, String allocationExceptionMessage, String allocationExceptionStackTrace)
 	{
 		this.allocationExceptionClass = allocationExceptionClass;
@@ -1408,6 +1402,11 @@ implements Serializable, DeleteCallback, DetachCallback, StoreCallback
 		ArticleLocal al = new ArticleLocal(this);
 		setArticleLocal(al);
 		return al;
+	}
+
+	@Override
+	public String toString() {
+		return this.getClass().getName() + '@' + Integer.toHexString(System.identityHashCode(this)) + '[' + organisationID + ',' + ObjectIDUtil.longObjectIDFieldToString(articleID) + ']';
 	}
 
 	@Override

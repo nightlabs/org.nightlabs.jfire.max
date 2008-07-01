@@ -384,6 +384,9 @@ implements Serializable, ArticleContainer, Statable, DetachCallback
 			);
 		}
 
+		if (!article.isAllocated())
+			throw new IllegalArgumentException("Article is not allocated! " + article);
+
 		InvoiceID invoiceID = article.getInvoiceID();
 		if (invoiceID != null) {
 			throw new InvoiceEditException(

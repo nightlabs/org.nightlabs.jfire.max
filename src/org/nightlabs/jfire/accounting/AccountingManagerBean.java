@@ -27,7 +27,6 @@
 package org.nightlabs.jfire.accounting;
 
 import java.io.IOException;
-import java.lang.reflect.Method;
 import java.rmi.RemoteException;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -71,7 +70,6 @@ import org.nightlabs.jfire.accounting.book.mappingbased.PriceFragmentDimension;
 import org.nightlabs.jfire.accounting.book.mappingbased.SourceOrganisationDimension;
 import org.nightlabs.jfire.accounting.book.mappingbased.MappingBasedAccountantDelegate.ResolvedMapEntry;
 import org.nightlabs.jfire.accounting.book.mappingbased.MappingBasedAccountantDelegate.ResolvedMapKey;
-import org.nightlabs.jfire.accounting.gridpriceconfig.GridPriceConfig;
 import org.nightlabs.jfire.accounting.gridpriceconfig.GridPriceConfigUtil;
 import org.nightlabs.jfire.accounting.id.AccountTypeID;
 import org.nightlabs.jfire.accounting.id.CurrencyID;
@@ -100,7 +98,6 @@ import org.nightlabs.jfire.accounting.pay.id.ModeOfPaymentID;
 import org.nightlabs.jfire.accounting.pay.id.PaymentDataID;
 import org.nightlabs.jfire.accounting.pay.id.PaymentID;
 import org.nightlabs.jfire.accounting.priceconfig.AffectedProductType;
-import org.nightlabs.jfire.accounting.priceconfig.FetchGroupsPriceConfig;
 import org.nightlabs.jfire.accounting.priceconfig.PriceConfigUtil;
 import org.nightlabs.jfire.accounting.priceconfig.id.PriceConfigID;
 import org.nightlabs.jfire.accounting.query.MoneyTransferIDQuery;
@@ -111,7 +108,6 @@ import org.nightlabs.jfire.jbpm.JbpmLookup;
 import org.nightlabs.jfire.jbpm.graph.def.ProcessDefinition;
 import org.nightlabs.jfire.security.User;
 import org.nightlabs.jfire.store.DeliveryNote;
-import org.nightlabs.jfire.store.NestedProductTypeLocal;
 import org.nightlabs.jfire.store.ProductType;
 import org.nightlabs.jfire.store.id.DeliveryNoteID;
 import org.nightlabs.jfire.store.id.ProductTypeID;
@@ -1441,7 +1437,7 @@ public abstract class AccountingManagerBean
 	 * @ejb.permission role-name="_Guest_"
 	 */
 	public Invoice addArticlesToInvoice(
-			InvoiceID invoiceID, Collection articleIDs,
+			InvoiceID invoiceID, Collection<ArticleID> articleIDs,
 			boolean validate, boolean get, String[] fetchGroups, int maxFetchDepth)
 		throws ModuleException
 	{
@@ -1450,10 +1446,9 @@ public abstract class AccountingManagerBean
 			pm.getExtent(Invoice.class);
 			pm.getExtent(Article.class);
 			Invoice invoice = (Invoice) pm.getObjectById(invoiceID);
-			Collection<Object> articles = new ArrayList<Object>(articleIDs.size());
-			for (Iterator it = articleIDs.iterator(); it.hasNext(); ) {
-				ArticleID articleID = (ArticleID) it.next();
-				articles.add(pm.getObjectById(articleID));
+			Collection<Article> articles = new ArrayList<Article>(articleIDs.size());
+			for (ArticleID articleID : articleIDs) {
+				articles.add((Article) pm.getObjectById(articleID));
 			}
 
 			Accounting accounting = Accounting.getAccounting(pm);

@@ -516,6 +516,9 @@ implements Serializable, ArticleContainer, Statable, DetachCallback
 			);
 		}
 
+		if (!article.isAllocated())
+			throw new IllegalArgumentException("Article is not allocated! " + article);
+
 		DeliveryNoteID deliveryNoteID = article.getDeliveryNoteID();
 		if (deliveryNoteID != null) {
 			throw new DeliveryNoteEditException(

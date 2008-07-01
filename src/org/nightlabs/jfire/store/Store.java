@@ -129,9 +129,9 @@ implements StoreCallback
 	 */
 	public static Store getStore(PersistenceManager pm)
 	{
-		Iterator<?> it = pm.getExtent(Store.class).iterator();
+		Iterator<Store> it = pm.getExtent(Store.class).iterator();
 		if (it.hasNext()) {
-			Store store = (Store)it.next();
+			Store store = it.next();
 
 			// TODO remove this debug stuff
 			String securityReflectorOrganisationID = SecurityReflector.getUserDescriptor().getOrganisationID();

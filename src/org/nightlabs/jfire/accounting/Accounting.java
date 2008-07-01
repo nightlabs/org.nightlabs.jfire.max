@@ -400,7 +400,7 @@ implements StoreCallback
 	{
 		ArrayList<Article> articles = new ArrayList<Article>();
 		for (Article article : articleContainer.getArticles()) {
-			if (article.getInvoice() == null)
+			if (article.getInvoice() == null && article.isAllocated()) // https://www.jfire.org/modules/bugs/view.php?id=751
 				articles.add(article);
 		}
 		return createInvoice(user, articles, invoiceIDPrefix);

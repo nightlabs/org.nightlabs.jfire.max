@@ -930,7 +930,7 @@ implements StoreCallback
 		ArrayList<Article> articles = new ArrayList<Article>();
 		for (Iterator<Article> it = articleContainer.getArticles().iterator(); it.hasNext(); ) {
 			Article article = it.next();
-			if (article.getDeliveryNote() == null)
+			if (article.getDeliveryNote() == null && article.isAllocated()) // https://www.jfire.org/modules/bugs/view.php?id=751
 				articles.add(article);
 		}
 		return createDeliveryNote(user, articles, deliveryNoteIDPrefix);

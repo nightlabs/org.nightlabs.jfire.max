@@ -2,6 +2,8 @@ package org.nightlabs.jfire.issue;
 
 import java.io.Serializable;
 import java.util.Collection;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Set;
 
 import javax.jdo.JDOHelper;
@@ -35,15 +37,16 @@ import org.nightlabs.util.Util;
  *
  * @jdo.create-objectid-class
  * 		field-order="organisationID, issueLinkID"
- * 
- * @!jdo.query
- *		name="getIssueLinksByIssueIDAndLinkedObjectID"
- *		query="SELECT
- *			WHERE this.issueID == :issueID && 
- *			this.issueID == :issueID &&
- *			this.linkedObjectID == :linkedObjectID                    
- * 
+ *
  * @jdo.query
+ *		name="getIssueLinksByIssueAndIssueLinkTypeAndLinkedObjectID"
+ *		query="SELECT
+ *			WHERE
+ *				this.issue == :issue &&
+ *				this.issueLinkType == :issueLinkType &&
+ *				this.linkedObjectID == :linkedObjectID"
+ *
+ * @!jdo.query
  *		name="getIssueLinkByLinkedObjectID"
  *		query="SELECT
  *			WHERE this.linkedObjectID == paramLinkedObjectID
@@ -258,11 +261,14 @@ implements Serializable, DetachCallback, StoreCallback, DeleteCallback
 	 * @return Returns instances of <code>IssueLink</code>.
 	 */
 	@SuppressWarnings("unchecked")
-	protected static Collection<IssueLink> getIssueLinkByLinkedObjectID(PersistenceManager pm, String linkedObjectID)
+	protected static Collection<IssueLink> getIssueLinksByIssueAndIssueLinkTypeAndLinkedObjectID(PersistenceManager pm, Issue issue, IssueLinkType issueLinkType, String linkedObjectID)
 	{
-		Query q = pm.newNamedQuery(IssueLink.class, "getIssueLinkByLinkedObjectID");
-		return (Collection<IssueLink>)q.execute(
-			linkedObjectID);
+		Query q = pm.newNamedQuery(IssueLink.class, "getIssueLinksByIssueAndIssueLinkTypeAndLinkedObjectID");
+		Map<String, Object> params = new HashMap<String, Object>(3);
+		params.put("issue", issue);
+		params.put("issueLinkType", issueLinkType);
+		params.put("linkedObjectID", linkedObjectID);
+		return (Collection<IssueLink>)q.executeWithMap(params);
 	}
 	
 	@Override
@@ -336,14 +342,14 @@ implements Serializable, DetachCallback, StoreCallback, DeleteCallback
 			if (logger.isDebugEnabled()) 
 				logger.debug("jdoPreStore: the IssueLink " + getPrimaryKey() + " does NOT yet exist - registering StoreLifecycleListener in order to react on postStore.");
 
-			Collection<IssueLink> issueLinks = IssueLink.getIssueLinkByLinkedObjectID(getPersistenceManager(), linkedObjectID);
-			if (issueLinks != null && issueLinks.size() > 1) {
-				for (IssueLink issueLink : issueLinks) {
-					if (issue.getIssueID() == issueLink.getIssue().getIssueID() &&
-						issueLinkType.getIssueLinkTypeID().equals(issueLink.getIssueLinkType().getIssueLinkTypeID()))
-						throw new IllegalStateException("There is already issueLink with the same issue and issueLinkType for this : " + linkedObjectID);						
-				}
+			Collection<IssueLink> issueLinks = IssueLink.getIssueLinksByIssueAndIssueLinkTypeAndLinkedObjectID(getPersistenceManager(), issue, issueLinkType, linkedObjectID);
+			// Since this IssueLink is not yet existing in the datastore (we checked above for existance), issueLinks
+			// must be empty. If it's not, we throw an exception
+			if (!issueLinks.isEmpty()) {
+				IssueLink otherIssueLink = issueLinks.iterator().next();
+				throw new IllegalStateException("There is already an IssueLink with the same issue and issueLinkType! otherIssueLink=" + otherIssueLink + " thisIssueLink=" + this + " issueLinkType=" + this.issueLinkType + " linkedObjectID=" + linkedObjectID);
 			}
+
 			getPersistenceManager().addInstanceLifecycleListener(
 					new StoreLifecycleListener()
 					{
@@ -403,7 +409,20 @@ implements Serializable, DetachCallback, StoreCallback, DeleteCallback
 		if (getClass() != obj.getClass()) return false;
 		final IssueLink other = (IssueLink) obj;
 
-		return Util.equals(this.organisationID, other.organisationID) 
-		&& Util.equals(this.issueLinkID, other.issueLinkID);
+		return Util.equals(this.organisationID, other.organisationID) && Util.equals(this.issueLinkID, other.issueLinkID);
+	}
+
+	@Override
+	public String toString() {
+		return (
+				this.getClass().getName()
+				+ '@'
+				+ Integer.toHexString(System.identityHashCode(this))
+				+ '['
+				+ organisationID
+				+ ','
+				+ ObjectIDUtil.longObjectIDFieldToString(issueLinkID)
+				+ ']'
+		);
 	}
 }

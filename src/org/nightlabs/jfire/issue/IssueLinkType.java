@@ -207,24 +207,33 @@ implements Serializable
 	@Override
 	public boolean equals(Object obj)
 	{
-		if (obj == this)
-			return true;
-
-		if (!(obj instanceof IssueLinkType))
-			return false;
-
+		if (obj == this) return true;
+		if (obj == null) return false;
+		if (obj.getClass() != this.getClass()) return false;
 		IssueLinkType o = (IssueLinkType) obj;
-
-		return
-			Util.equals(this.issueLinkTypeID, o.issueLinkTypeID) &&
-			Util.equals(this.organisationID, o.organisationID);
+		return (
+				Util.equals(this.issueLinkTypeID, o.issueLinkTypeID) &&
+				Util.equals(this.organisationID, o.organisationID)
+		);
 	}
 
 	@Override
 	public int hashCode()
 	{
-		return
-			Util.hashCode(this.organisationID) ^
-			Util.hashCode(this.issueLinkTypeID);
+		return (31 * Util.hashCode(organisationID)) ^ Util.hashCode(issueLinkTypeID);
+	}
+
+	@Override
+	public String toString() {
+		return (
+				this.getClass().getName()
+				+ '@'
+				+ Integer.toHexString(System.identityHashCode(this))
+				+ '['
+				+ organisationID
+				+ ','
+				+ issueLinkTypeID
+				+ ']'
+		);
 	}
 }

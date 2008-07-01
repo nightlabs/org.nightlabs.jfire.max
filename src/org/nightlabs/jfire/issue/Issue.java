@@ -41,6 +41,7 @@ import javax.jdo.listener.AttachCallback;
 import javax.jdo.listener.DeleteCallback;
 
 import org.nightlabs.jdo.ObjectID;
+import org.nightlabs.jdo.ObjectIDUtil;
 import org.nightlabs.jfire.idgenerator.IDGenerator;
 import org.nightlabs.jfire.jbpm.graph.def.Statable;
 import org.nightlabs.jfire.jbpm.graph.def.StatableLocal;
@@ -652,14 +653,10 @@ implements 	Serializable, AttachCallback, Statable, DeleteCallback
 	@Override
 	public boolean equals(Object obj)
 	{
-		if (obj == this)
-			return true;
-
-		if (!(obj instanceof Issue))
-			return false;
-
+		if (obj == this) return true;
+		if (obj == null) return false;
+		if (this.getClass() != obj.getClass()) return false;
 		Issue o = (Issue) obj;
-
 		return
 			Util.equals(this.organisationID, o.organisationID) &&
 			Util.equals(this.issueID, o.issueID);
@@ -668,9 +665,21 @@ implements 	Serializable, AttachCallback, Statable, DeleteCallback
 	@Override
 	public int hashCode()
 	{
-		return
-			Util.hashCode(this.organisationID) ^
-			Util.hashCode(this.issueID);
+		return (31 * Util.hashCode(organisationID)) ^ Util.hashCode(issueID);
+	}
+
+	@Override
+	public String toString() {
+		return (
+				this.getClass().getName()
+				+ '@'
+				+ Integer.toHexString(System.identityHashCode(this))
+				+ '['
+				+ organisationID
+				+ ','
+				+ ObjectIDUtil.longObjectIDFieldToString(issueID)
+				+ ']'
+		);
 	}
 
 //	/**

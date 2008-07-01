@@ -29,13 +29,13 @@ SimpleProductType, DynamicProductType and VoucherType
 					<parameter id="0" name="articleContainerID" type="org.nightlabs.jfire.trade.id.ArticleContainerID" x="650" y="46" />
 				</parameters>
 				<value-provider-configs>
-					<provider-config id="1" organisationID="dev.jfire.org" categoryID="JFireReportingTrade-ValueProviderCategory-TradeDocuments-Order" valueProviderID="ByOrder" pageIndex="1" pageOrder="0" allowNullOutputValue="false" showMessageInHeader="false" x="375" y="46" >
+					<provider-config id="1" organisationID="dev.jfire.org" categoryID="JFireReportingTrade-ValueProviderCategory-TradeDocuments-Order" valueProviderID="ByOrder" pageIndex="1" pageOrder="0" allowNullOutputValue="false" showMessageInHeader="true" x="375" y="46" >
 						<message language="en">Select an order</message>
 						<message language="de">Suchen Sie einen Auftrag aus</message>						
 					</provider-config>
-					<provider-config id="2" organisationID="dev.jfire.org" categoryID="JFireReportingTrade-ValueProviderCategory-LegalEntity" valueProviderID="Search" pageIndex="0" pageOrder="0" allowNullOutputValue="false" showMessageInHeader="false" x="100" y="46" >
+					<provider-config id="2" organisationID="dev.jfire.org" categoryID="JFireReportingTrade-ValueProviderCategory-LegalEntity" valueProviderID="Search" pageIndex="0" pageOrder="0" allowNullOutputValue="false" showMessageInHeader="true" x="100" y="46" >
 						<message language="en">Select a customer</message>
-						<message language="en">Suchen Sie einen Kunden aus</message>
+						<message language="de">Suchen Sie einen Kunden aus</message>
 					</provider-config>
 				</value-provider-configs>
 				<value-consumer-bindings>

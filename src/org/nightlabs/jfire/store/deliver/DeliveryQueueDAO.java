@@ -48,7 +48,7 @@ public class DeliveryQueueDAO extends BaseJDOObjectDAO<DeliveryQueueID, Delivery
 			return Collections.emptySet();
 		}
 		try {
-			return retrieveJDOObjects(new HashSet<DeliveryQueueID>(deliveryQueueIds), fetchGroups, maxFetchDepth, monitor);
+			return getJDOObjects(null, new HashSet<DeliveryQueueID>(deliveryQueueIds), fetchGroups, maxFetchDepth, monitor);
 		} catch (Exception e) {
 			throw new RuntimeException(e);
 		}

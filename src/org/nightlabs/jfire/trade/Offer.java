@@ -496,7 +496,7 @@ implements
 	 */
 	public synchronized void calculatePrice()
 	{
-//	 TODO put this logic into the bean?!
+//	 TODO put this logic into the bean?! No, but maybe into Trader! Marco.
 		PersistenceManager pm = JDOHelper.getPersistenceManager(this);
 		if (pm == null)
 			throw new IllegalStateException("This instance of Offer is not persistent! Cannot calculate the price!");
@@ -541,8 +541,7 @@ implements
 		if (pm == null)
 			throw new IllegalStateException("This instance of offer is currently not persistent!");
 
-		for (Iterator it = articles.iterator(); it.hasNext(); ) {
-			Article article = (Article)it.next();
+		for (Article article : articles) {
 			if (all || article.isPriceDependentOnOffer()) {
 				if (article.isPriceDependentOnOffer())
 					containsPricesDependentOnOffer = true;

@@ -1829,7 +1829,7 @@ public class Trader
 
 		for (Map.Entry<Offer, Set<Article>> me : offers.entrySet()) {
 			Offer offer = me.getKey();
-			validateOffer(offer);
+			validateOffer(offer, true);
 			for (OfferActionHandler offerActionHandler : offer.getOfferLocal().getOfferActionHandlers())
 				offerActionHandler.onArticlesTariffChanged(user, offer, me.getValue());
 		}

@@ -129,8 +129,8 @@ public class FormulaCell implements Serializable
 	/**
 	 * This field is <code>null</code>, if this is the fallbackFormulaCell of a FormulaPriceConfig
 	 * (see {@link #FormulaCell(PriceConfig)} below).
-	 * 
-	 * @jdo.field persistence-modifier="persistent"
+	 *
+	 * @jdo.field persistence-modifier="persistent" dependent="true"
 	 */
 	private PriceCoordinate priceCoordinate;
 

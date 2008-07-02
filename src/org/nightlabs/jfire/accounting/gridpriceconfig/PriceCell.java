@@ -102,9 +102,9 @@ public class PriceCell implements Serializable
 	private StablePriceConfig priceConfig;
 
 	/**
-	 * @!jdo.field persistence-modifier="persistent" null-value="exception"
+	 * @!jdo.field persistence-modifier="persistent" dependent="true" null-value="exception"
 	 * TODO DataNucleus workaround: the above null-value="exception" is correct but causes exceptions during cross-datastore-replication 
-	 * @jdo.field persistence-modifier="persistent"
+	 * @jdo.field persistence-modifier="persistent" dependent="true"
 	 */
 	private PriceCoordinate priceCoordinate;
 

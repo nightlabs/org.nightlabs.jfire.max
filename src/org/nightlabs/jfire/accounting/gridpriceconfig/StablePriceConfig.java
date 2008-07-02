@@ -30,11 +30,12 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.Map;
+import java.util.Set;
 
-import javax.jdo.JDOHelper;
 import javax.jdo.PersistenceManager;
 import javax.jdo.Query;
 
@@ -50,7 +51,6 @@ import org.nightlabs.jfire.store.Product;
 import org.nightlabs.jfire.trade.Article;
 import org.nightlabs.jfire.trade.ArticlePrice;
 import org.nightlabs.jfire.trade.CustomerGroup;
-import org.nightlabs.util.CollectionUtil;
 
 /**
  * @author Marco Schulze - marco at nightlabs dot de
@@ -104,22 +104,49 @@ implements IPackagePriceConfig, IResultPriceConfig
 		return (Collection<PriceCell>) query.execute(this, customerGroupPK, currencyID);
 	}
 
+//	/**
+//	 * key: PriceCoordinate priceCoordinate<br/>
+//	 * value: PriceCell priceCell
+//	 *
+//	 * @jdo.field
+//	 *		persistence-modifier="persistent"
+//	 *		collection-type="map"
+//	 *		key-type="PriceCoordinate"
+//	 *		value-type="PriceCell"
+//	 *		mapped-by="priceConfig"
+//	 *		dependent-key="true"
+//	 *		dependent-value="true"
+//	 *
+//	 * @jdo.key mapped-by="priceCoordinate"
+//	 */
+//	private Map<IPriceCoordinate, PriceCell> priceCells;
+
 	/**
-	 * key: PriceCoordinate priceCoordinate<br/>
-	 * value: PriceCell priceCell
-	 *
 	 * @jdo.field
 	 *		persistence-modifier="persistent"
-	 *		collection-type="map"
-	 *		key-type="PriceCoordinate"
-	 *		value-type="PriceCell"
+	 *		collection-type="collection"
+	 *		element-type="PriceCell"
 	 *		mapped-by="priceConfig"
-	 *		dependent-key="true"
-	 *		dependent-value="true"
-	 *
-	 * @jdo.key mapped-by="priceCoordinate"
+	 *		dependent-element="true"
 	 */
-	private Map<IPriceCoordinate, PriceCell> priceCells;
+	private Set<PriceCell> priceCells;
+
+	/**
+	 * @jdo.field persistence-modifier="none"
+	 */
+	private transient Map<IPriceCoordinate, PriceCell> priceCoordinate2priceCell;
+
+	protected Map<IPriceCoordinate, PriceCell> getPriceCoordinate2priceCell()
+	{
+		if (priceCoordinate2priceCell == null) {
+			Map<IPriceCoordinate, PriceCell> m = new HashMap<IPriceCoordinate, PriceCell>();
+			for (PriceCell priceCell : priceCells)
+				m.put(priceCell.getPriceCoordinate(), priceCell);
+
+			priceCoordinate2priceCell = m;
+		}
+		return priceCoordinate2priceCell;
+	}
 
 	/**
 	 * @deprecated Only for JDO!
@@ -134,7 +161,7 @@ implements IPackagePriceConfig, IResultPriceConfig
 	public StablePriceConfig(String organisationID, String priceConfigID)
 	{
 		super(organisationID, priceConfigID);
-		priceCells = new HashMap<IPriceCoordinate, PriceCell>();
+		priceCells = new HashSet<PriceCell>();
 	}
 
 	@Override
@@ -148,7 +175,7 @@ implements IPackagePriceConfig, IResultPriceConfig
 	@Override
 	public Collection<PriceCell> getPriceCells()
 	{
-		return Collections.unmodifiableCollection(priceCells.values());
+		return Collections.unmodifiableCollection(priceCells);
 	}
 	/**
 	 * This method drops all calculation status for all <tt>PriceFragment</tt> s
@@ -159,41 +186,42 @@ implements IPackagePriceConfig, IResultPriceConfig
 	@Override
 	public void resetPriceFragmentCalculationStatus()
 	{
-		for (Map.Entry<IPriceCoordinate, PriceCell> me : new ArrayList<Map.Entry<IPriceCoordinate, PriceCell>>(priceCells.entrySet())) { // new ArrayList, because we might call putPriceCell(...)
-			PriceCell priceCell = me.getValue();
-			if (priceCell == null) {
-				IPriceCoordinate priceCoordinate = me.getKey();
-				if (priceCoordinate != null) {
-					// TODO DataNucleus WORKAROUND!!! It should never happen that a null value comes into this map in the first place.
-					// We try to find it.
-					logger.warn("resetPriceFragmentCalculationStatus: found entry in priceCells with a key but without a value! key=" + me.getKey() +" this=" + this);
-
-					PersistenceManager pm = JDOHelper.getPersistenceManager(this);
-					if (pm == null)
-						logger.warn("resetPriceFragmentCalculationStatus: this StablePriceConfig is currently not attached to a datastore! Cannot obtain PersistenceManager to find lost object! this=" + this);
-					else {
-						Query q = pm.newQuery(PriceCell.class);
-						q.setFilter("this.priceConfig == :priceConfig");
-						Collection<PriceCell> c = CollectionUtil.castCollection((Collection<?>)q.execute(this));
-						for (PriceCell pc : c) {
-							if (priceCoordinate.equals(pc.getPriceCoordinate())) {
-								priceCell = pc;
-								break;
-							}
-						}
-
-						if (priceCell == null)
-							logger.warn("resetPriceFragmentCalculationStatus: could not find lost PriceCell via JDO query! this=" + this + " priceCoordinate=" + priceCoordinate);
-						else {
-							putPriceCell(priceCoordinate, priceCell);
-						}
-					}
-				}
-				// DataNucleus WORKAROUND - END
-
-				if (priceCell == null)
-					throw new IllegalStateException("priceCells contains null value for key=" + me.getKey() +" this=" + this);
-			}
+//		for (Map.Entry<IPriceCoordinate, PriceCell> me : new ArrayList<Map.Entry<IPriceCoordinate, PriceCell>>(priceCells.entrySet())) { // new ArrayList, because we might call putPriceCell(...)
+		for (PriceCell priceCell : new ArrayList<PriceCell>(priceCells)) { // new ArrayList, because we might call putPriceCell(...)
+//			PriceCell priceCell = me.getValue();
+//			if (priceCell == null) {
+//				IPriceCoordinate priceCoordinate = me.getKey();
+//				if (priceCoordinate != null) {
+//					// TODO DataNucleus WORKAROUND!!! It should never happen that a null value comes into this map in the first place.
+//					// We try to find it.
+//					logger.warn("resetPriceFragmentCalculationStatus: found entry in priceCells with a key but without a value! key=" + me.getKey() +" this=" + this);
+//
+//					PersistenceManager pm = JDOHelper.getPersistenceManager(this);
+//					if (pm == null)
+//						logger.warn("resetPriceFragmentCalculationStatus: this StablePriceConfig is currently not attached to a datastore! Cannot obtain PersistenceManager to find lost object! this=" + this);
+//					else {
+//						Query q = pm.newQuery(PriceCell.class);
+//						q.setFilter("this.priceConfig == :priceConfig");
+//						Collection<PriceCell> c = CollectionUtil.castCollection((Collection<?>)q.execute(this));
+//						for (PriceCell pc : c) {
+//							if (priceCoordinate.equals(pc.getPriceCoordinate())) {
+//								priceCell = pc;
+//								break;
+//							}
+//						}
+//
+//						if (priceCell == null)
+//							logger.warn("resetPriceFragmentCalculationStatus: could not find lost PriceCell via JDO query! this=" + this + " priceCoordinate=" + priceCoordinate);
+//						else {
+//							putPriceCell(priceCoordinate, priceCell);
+//						}
+//					}
+//				}
+//				// DataNucleus WORKAROUND - END
+//
+//				if (priceCell == null)
+//					throw new IllegalStateException("priceCells contains null value for key=" + me.getKey() +" this=" + this);
+//			}
 
 			priceCell.resetPriceFragmentCalculationStatus();
 		}
@@ -224,19 +252,19 @@ implements IPackagePriceConfig, IResultPriceConfig
 	@Override
 	public PriceCell getPriceCell(IPriceCoordinate priceCoordinate, boolean throwExceptionIfNotExistent)
 	{
-		PriceCell priceCell = priceCells.get(priceCoordinate);
+		PriceCell priceCell = getPriceCoordinate2priceCell().get(priceCoordinate);
 
-		// If the JDO implementation uses a shortcut (a direct JDOQL instead of loading the whole Map and then
-		// search for the key), the cell might exist and not be found. Hence, we load the whole Map and try it again.
-		if (priceCell == null) {
-			for (Iterator<Map.Entry<IPriceCoordinate, PriceCell>> it = priceCells.entrySet().iterator(); it.hasNext();) {
-				Map.Entry<IPriceCoordinate, PriceCell> me = it.next();
-				if (me.getKey().equals(priceCoordinate)) {
-					priceCell = (PriceCell) me.getValue();
-					break;
-				}
-			}
-		}
+//		// If the JDO implementation uses a shortcut (a direct JDOQL instead of loading the whole Map and then
+//		// search for the key), the cell might exist and not be found. Hence, we load the whole Map and try it again.
+//		if (priceCell == null) {
+//			for (Iterator<Map.Entry<IPriceCoordinate, PriceCell>> it = priceCells.entrySet().iterator(); it.hasNext();) {
+//				Map.Entry<IPriceCoordinate, PriceCell> me = it.next();
+//				if (me.getKey().equals(priceCoordinate)) {
+//					priceCell = (PriceCell) me.getValue();
+//					break;
+//				}
+//			}
+//		}
 
 		if (throwExceptionIfNotExistent && priceCell == null)
 			throw new IllegalArgumentException("No PriceCell found for "+priceCoordinate);
@@ -255,13 +283,14 @@ implements IPackagePriceConfig, IResultPriceConfig
 		if (priceCell == null) {
 			priceCell = new PriceCell(priceCoordinate);
 //			priceCells.put(priceCoordinate, priceCell);
-			putPriceCell(priceCoordinate, priceCell);
+			putPriceCell(priceCell);
 		}
 		return priceCell;
 	}
 
-	protected void putPriceCell(IPriceCoordinate priceCoordinate, PriceCell priceCell)
+	protected void putPriceCell(PriceCell priceCell)
 	{
+		IPriceCoordinate priceCoordinate = priceCell.getPriceCoordinate();
 		priceCoordinate.assertAllDimensionValuesAssigned();
 		if (priceCell == null)
 			throw new IllegalArgumentException("priceCell must not be null");
@@ -269,7 +298,13 @@ implements IPackagePriceConfig, IResultPriceConfig
 		if (logger.isDebugEnabled())
 			logger.debug("putPriceCell: priceCoordinate=" + priceCoordinate + " priceCell=" + priceCell);
 
-		priceCells.put(priceCoordinate, priceCell);
+		PriceCell oldPriceCell = getPriceCoordinate2priceCell().get(priceCoordinate);
+		if (oldPriceCell != null && !oldPriceCell.equals(priceCell))
+			priceCells.remove(oldPriceCell);
+
+//		priceCells.put(priceCoordinate, priceCell);
+		priceCells.add(priceCell);
+		priceCoordinate2priceCell.put(priceCoordinate, priceCell);
 	}
 
 	protected void removePriceCell(
@@ -287,7 +322,10 @@ implements IPackagePriceConfig, IResultPriceConfig
 		if (logger.isDebugEnabled())
 			logger.debug("removePriceCell: " + priceCoordinate);
 
-		priceCells.remove(priceCoordinate);
+//		priceCells.remove(priceCoordinate);
+		PriceCell oldPriceCell = getPriceCoordinate2priceCell().get(priceCoordinate);
+		if (oldPriceCell != null)
+			priceCells.remove(oldPriceCell);
 	}
 
 	/**

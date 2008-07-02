@@ -29,8 +29,10 @@ package org.nightlabs.jfire.accounting.gridpriceconfig;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.Map;
+import java.util.Set;
 
 import org.nightlabs.jfire.accounting.Currency;
 import org.nightlabs.jfire.accounting.PriceFragmentType;
@@ -113,22 +115,49 @@ implements IFormulaPriceConfig
 		packagingResultPriceConfigs.clear();
 	}
 
+//	/**
+//	 * key: PriceCoordinate priceCoordinate<br/>
+//	 * value: FormulaCell formulaCell
+//	 *
+//	 * @jdo.field
+//	 *		persistence-modifier="persistent"
+//	 *		collection-type="map"
+//	 *		key-type="PriceCoordinate"
+//	 *		value-type="FormulaCell"
+//	 *		dependent-key="true"
+//	 *		dependent-value="true"
+//	 *		mapped-by="mapOwner"
+//	 *
+//	 * @jdo.key mapped-by="priceCoordinate"
+//	 */
+//	private Map<IPriceCoordinate, FormulaCell> formulaCells;
+
 	/**
-	 * key: PriceCoordinate priceCoordinate<br/>
-	 * value: FormulaCell formulaCell
-	 *
 	 * @jdo.field
 	 *		persistence-modifier="persistent"
-	 *		collection-type="map"
-	 *		key-type="PriceCoordinate"
-	 *		value-type="FormulaCell"
-	 *		dependent-key="true"
-	 *		dependent-value="true"
+	 *		collection-type="collection"
+	 *		element-type="FormulaCell"
+	 *		dependent-element="true"
 	 *		mapped-by="mapOwner"
-	 *
-	 * @jdo.key mapped-by="priceCoordinate"
 	 */
-	private Map<IPriceCoordinate, FormulaCell> formulaCells = new HashMap<IPriceCoordinate, FormulaCell>();
+	private Set<FormulaCell> formulaCells;
+
+	/**
+	 * @jdo.field persistence-modifier="none"
+	 */
+	private transient Map<IPriceCoordinate, FormulaCell> priceCoordinate2formulaCell;
+
+	protected Map<IPriceCoordinate, FormulaCell> getPriceCoordinate2formulaCell() {
+		if (priceCoordinate2formulaCell == null) {
+			Map<IPriceCoordinate, FormulaCell> m = new HashMap<IPriceCoordinate, FormulaCell>();
+			for (FormulaCell formulaCell : formulaCells)
+				m.put(formulaCell.getPriceCoordinate(), formulaCell);
+
+			priceCoordinate2formulaCell = m;
+		}
+
+		return priceCoordinate2formulaCell;
+	}
 
 	/**
 	 * In case, there is a cell missing for a certain coordinate, this
@@ -154,6 +183,8 @@ implements IFormulaPriceConfig
 	public FormulaPriceConfig(String organisationID, String priceConfigID)
 	{
 		super(organisationID, priceConfigID);
+//		formulaCells = new HashMap<IPriceCoordinate, FormulaCell>();
+		formulaCells = new HashSet<FormulaCell>();
 	}
 
 //	/**
@@ -251,19 +282,27 @@ implements IFormulaPriceConfig
 		if (formulaCell == null) {
 			formulaCell = new FormulaCell((PriceCoordinate)priceCoordinate);
 //			formulaCells.put(priceCoordinate, formulaCell);
-			putFormulaCell(priceCoordinate, formulaCell);
+			putFormulaCell(formulaCell);
 		}
 		return formulaCell;
 	}
 
-	protected void putFormulaCell(IPriceCoordinate priceCoordinate, FormulaCell formulaCell)
+	protected void putFormulaCell(FormulaCell formulaCell)
 	{
+		IPriceCoordinate priceCoordinate = formulaCell.getPriceCoordinate();
 		priceCoordinate.assertAllDimensionValuesAssigned();
 		if (formulaCell == null)
 			throw new IllegalArgumentException("formulaCell must not be null!");
 
 		formulaCell.setMapOwner(this);
-		formulaCells.put(priceCoordinate, formulaCell);
+//		formulaCells.put(priceCoordinate, formulaCell);
+
+		FormulaCell oldFormulaCell = getPriceCoordinate2formulaCell().get(priceCoordinate);
+		if (oldFormulaCell != null && !oldFormulaCell.equals(formulaCell))
+			formulaCells.remove(oldFormulaCell);
+
+		formulaCells.add(formulaCell);
+		priceCoordinate2formulaCell.put(priceCoordinate, formulaCell);
 	}
 
 	public FormulaCell getFormulaCell(
@@ -279,18 +318,18 @@ implements IFormulaPriceConfig
 	@Override
 	public FormulaCell getFormulaCell(IPriceCoordinate priceCoordinate, boolean throwExceptionIfNotExistent)
 	{
-		FormulaCell formulaCell = formulaCells.get(priceCoordinate);
+		FormulaCell formulaCell = getPriceCoordinate2formulaCell().get(priceCoordinate);
 
-		// If the JDO implementation uses a shortcut (a direct JDOQL instead of loading the whole Map and then
-		// searching for the key), the cell might exist and not be found. Hence, we load the whole Map and try it again.
-		if (formulaCell == null) {
-			for (Map.Entry<IPriceCoordinate, FormulaCell> me : formulaCells.entrySet()) {
-				if (me.getKey().equals(priceCoordinate)) {
-					formulaCell = (FormulaCell) me.getValue();
-					break;
-				}
-			}
-		}
+//		// If the JDO implementation uses a shortcut (a direct JDOQL instead of loading the whole Map and then
+//		// searching for the key), the cell might exist and not be found. Hence, we load the whole Map and try it again.
+//		if (formulaCell == null) {
+//			for (Map.Entry<IPriceCoordinate, FormulaCell> me : formulaCells.entrySet()) {
+//				if (me.getKey().equals(priceCoordinate)) {
+//					formulaCell = (FormulaCell) me.getValue();
+//					break;
+//				}
+//			}
+//		}
 
 		if (throwExceptionIfNotExistent && formulaCell == null)
 			throw new IllegalArgumentException("No FormulaCell found for "+priceCoordinate);

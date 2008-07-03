@@ -133,7 +133,7 @@ public class IssueQuery
 		
 		if (issueSubjectNComment != null) {
 			filter.append("\n && comments.contains(varComment) && varComment.text.toLowerCase().matches(:issueSubjectNComment) ");
-			filter.append("\n && subject.names.containsValue(varSubject) && varSubject.toLowerCase().matches(:issueSubject) ");
+			filter.append("\n && subject.names.containsValue(varSubject) && varSubject.toLowerCase().matches(:issueSubjectNComment) ");
 //			q.declareVariables(IssueComment.class.getName() + " varComment");
 //			q.declareVariables(String.class.getName() + " varSubject");
 		}

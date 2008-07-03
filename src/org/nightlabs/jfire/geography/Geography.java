@@ -54,8 +54,6 @@ import org.nightlabs.jfire.idgenerator.IDGenerator;
 import org.nightlabs.jfire.organisation.Organisation;
 import org.nightlabs.jfire.security.SecurityReflector;
 
-import com.sun.corba.se.impl.orbutil.ObjectUtility;
-
 /**
  * Geography data access class.
  * @author Marco Schulze - marco at nightlabs dot de

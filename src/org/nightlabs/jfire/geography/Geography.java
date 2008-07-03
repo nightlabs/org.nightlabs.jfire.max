@@ -45,6 +45,7 @@ import javax.naming.InitialContext;
 
 import org.apache.log4j.Logger;
 import org.nightlabs.datastructure.FulltextMap;
+import org.nightlabs.jdo.ObjectIDUtil;
 import org.nightlabs.jfire.geography.id.CityID;
 import org.nightlabs.jfire.geography.id.CountryID;
 import org.nightlabs.jfire.geography.id.LocationID;
@@ -52,6 +53,8 @@ import org.nightlabs.jfire.geography.id.RegionID;
 import org.nightlabs.jfire.idgenerator.IDGenerator;
 import org.nightlabs.jfire.organisation.Organisation;
 import org.nightlabs.jfire.security.SecurityReflector;
+
+import com.sun.corba.se.impl.orbutil.ObjectUtility;
 
 /**
  * Geography data access class.
@@ -1075,8 +1078,7 @@ public abstract class Geography
 		if (!IDGenerator.getOrganisationID().equals(organisationID))
 			throw new IllegalArgumentException("Can only generate an ID for the organisation '"+IDGenerator.getOrganisationID()+"' - the argument is invalid: " + organisationID);
 
-		return String.valueOf(IDGenerator.nextID(Region.class.getName() + "#" + countryID));
-//		throw new UnsupportedOperationException("NYI");
+		return ObjectIDUtil.longObjectIDFieldToString(IDGenerator.nextID(Region.class.getName() + "#" + countryID));
 	}
 
 	public static String nextCityID(String countryID, String organisationID)
@@ -1084,7 +1086,7 @@ public abstract class Geography
 		if (!IDGenerator.getOrganisationID().equals(organisationID))
 			throw new IllegalArgumentException("Can only generate an ID for the organisation '"+IDGenerator.getOrganisationID()+"' - the argument is invalid: " + organisationID);
 
-		return String.valueOf(IDGenerator.nextID(City.class.getName() + "#" + countryID));
+		return ObjectIDUtil.longObjectIDFieldToString(IDGenerator.nextID(City.class.getName() + "#" + countryID));
 	}
 
 	// TODO implement the other ID generator methods - don't forget to initialise the namespace correctly!
@@ -1093,6 +1095,6 @@ public abstract class Geography
 		if (!IDGenerator.getOrganisationID().equals(organisationID))
 			throw new IllegalArgumentException("Can only generate an ID for the organisation '"+IDGenerator.getOrganisationID()+"' - the argument is invalid: " + organisationID);
 
-		return String.valueOf(IDGenerator.nextID(Location.class.getName() + "#" + countryID));
+		return ObjectIDUtil.longObjectIDFieldToString(IDGenerator.nextID(Location.class.getName() + "#" + countryID));
 	}
 }

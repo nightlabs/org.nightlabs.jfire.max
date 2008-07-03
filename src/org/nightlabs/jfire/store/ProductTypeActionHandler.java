@@ -389,7 +389,7 @@ public abstract class ProductTypeActionHandler
 				}
 
 				ProcessDefinitionAssignment processDefinitionAssignment = (ProcessDefinitionAssignment) getPersistenceManager().getObjectById(
-						ProcessDefinitionAssignmentID.create(Offer.class, TradeSide.customer));
+						ProcessDefinitionAssignmentID.create(Offer.class, TradeSide.customerCrossOrganisation));
 				processDefinitionAssignment.createProcessInstance(null, user, partnerOffer);
 			}
 			OfferID partnerOfferID = (OfferID) JDOHelper.getObjectId(partnerOffer);

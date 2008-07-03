@@ -164,7 +164,7 @@ implements SessionBean
 
 			// create a Jbpm ProcessInstance
 			ProcessDefinitionAssignment processDefinitionAssignment = (ProcessDefinitionAssignment) getPersistenceManager().getObjectById(
-					ProcessDefinitionAssignmentID.create(DeliveryNote.class, TradeSide.customer));
+					ProcessDefinitionAssignmentID.create(DeliveryNote.class, TradeSide.customerCrossOrganisation));
 			processDefinitionAssignment.createProcessInstance(null, user, deliveryNote);
 
 			DeliveryNoteID deliveryNoteID = (DeliveryNoteID) JDOHelper.getObjectId(deliveryNote);

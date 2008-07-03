@@ -368,16 +368,16 @@ implements SessionBean
 
 			// persist process definitions
 			ProcessDefinition processDefinitionDeliveryNoteCustomer;
-			processDefinitionDeliveryNoteCustomer = store.storeProcessDefinitionDeliveryNote(TradeSide.customer, ProcessDefinitionAssignment.class.getResource("deliverynote/customer/"));
-			pm.makePersistent(new ProcessDefinitionAssignment(DeliveryNote.class, TradeSide.customer, processDefinitionDeliveryNoteCustomer));
+			processDefinitionDeliveryNoteCustomer = store.storeProcessDefinitionDeliveryNote(TradeSide.customerCrossOrganisation, ProcessDefinitionAssignment.class.getResource("deliverynote/customer/"));
+			pm.makePersistent(new ProcessDefinitionAssignment(DeliveryNote.class, TradeSide.customerCrossOrganisation, processDefinitionDeliveryNoteCustomer));
 
 			ProcessDefinition processDefinitionDeliveryNoteVendor;
 			processDefinitionDeliveryNoteVendor = store.storeProcessDefinitionDeliveryNote(TradeSide.vendor, ProcessDefinitionAssignment.class.getResource("deliverynote/vendor/"));
 			pm.makePersistent(new ProcessDefinitionAssignment(DeliveryNote.class, TradeSide.vendor, processDefinitionDeliveryNoteVendor));
 
 			ProcessDefinition processDefinitionReceptionNoteCustomer;
-			processDefinitionReceptionNoteCustomer = store.storeProcessDefinitionReceptionNote(TradeSide.customer, ProcessDefinitionAssignment.class.getResource("receptionnote/customer/"));
-			pm.makePersistent(new ProcessDefinitionAssignment(ReceptionNote.class, TradeSide.customer, processDefinitionReceptionNoteCustomer));
+			processDefinitionReceptionNoteCustomer = store.storeProcessDefinitionReceptionNote(TradeSide.customerCrossOrganisation, ProcessDefinitionAssignment.class.getResource("receptionnote/customer/"));
+			pm.makePersistent(new ProcessDefinitionAssignment(ReceptionNote.class, TradeSide.customerCrossOrganisation, processDefinitionReceptionNoteCustomer));
 
 			// TODO create and persist ProcessDefinition for ReceptionNote.Vendor
 

@@ -1280,9 +1280,13 @@ implements SessionBean
 			LegalEntity.getAnonymousLegalEntity(pm);
 
 			// persist process definitions
-			ProcessDefinition processDefinitionOfferCustomer;
-			processDefinitionOfferCustomer = trader.storeProcessDefinitionOffer(TradeSide.customer, ProcessDefinitionAssignment.class.getResource("offer/customer/"));
-			pm.makePersistent(new ProcessDefinitionAssignment(Offer.class, TradeSide.customer, processDefinitionOfferCustomer));
+			ProcessDefinition processDefinitionOfferCustomerLocal;
+			processDefinitionOfferCustomerLocal = trader.storeProcessDefinitionOffer(TradeSide.customerLocal, ProcessDefinitionAssignment.class.getResource("offer/customer/local/"));
+			pm.makePersistent(new ProcessDefinitionAssignment(Offer.class, TradeSide.customerLocal, processDefinitionOfferCustomerLocal));
+
+			ProcessDefinition processDefinitionOfferCustomerCrossOrg;
+			processDefinitionOfferCustomerCrossOrg = trader.storeProcessDefinitionOffer(TradeSide.customerCrossOrganisation, ProcessDefinitionAssignment.class.getResource("offer/customer/crossorganisation/"));
+			pm.makePersistent(new ProcessDefinitionAssignment(Offer.class, TradeSide.customerCrossOrganisation, processDefinitionOfferCustomerCrossOrg));
 
 			ProcessDefinition processDefinitionOfferVendor;
 			processDefinitionOfferVendor = trader.storeProcessDefinitionOffer(TradeSide.vendor, ProcessDefinitionAssignment.class.getResource("offer/vendor/"));

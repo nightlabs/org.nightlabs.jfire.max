@@ -626,18 +626,29 @@ public class Trader
 
 	public Offer createOffer(User user, Order order, String offerIDPrefix) throws ModuleException
 	{
+		TradeSide tradeSide;
+
 		LegalEntity vendor = order.getVendor();
 		if (vendor == null)
 			throw new IllegalStateException("order.getVendor() returned null!");
 
-		if (getMandator().getPrimaryKey() == null)
-			throw new IllegalStateException("getMandator().getPrimaryKey() returned null!");
+		LegalEntity customer = order.getCustomer();
+		if (customer == null)
+			throw new IllegalStateException("order.getCustomer() returned null!");
 
-		if (!getMandator().equals(vendor) && (vendor instanceof OrganisationLegalEntity)) {
+		if (getMandator().equals(customer) && (vendor instanceof OrganisationLegalEntity)) {
+			tradeSide = TradeSide.customerCrossOrganisation;
 			// TODO: Implement foreign stuff
 			throw new UnsupportedOperationException("NYI");
 		}
 		else {
+			if (getMandator().equals(vendor))
+				tradeSide = TradeSide.vendor;
+			else if (getMandator().equals(customer))
+				tradeSide = TradeSide.customerLocal;
+			else
+				throw new IllegalStateException("mandator is neither customer nor vendor! order=" + order + " mandator=" + getMandator());
+
 			if (offerIDPrefix == null) {
 				TradeConfigModule tradeConfigModule;
 				try {
@@ -660,7 +671,7 @@ public class Trader
 			validateOffer(offer);
 
 			ProcessDefinitionAssignment processDefinitionAssignment = (ProcessDefinitionAssignment) getPersistenceManager().getObjectById(
-					ProcessDefinitionAssignmentID.create(Offer.class, TradeSide.vendor));
+					ProcessDefinitionAssignmentID.create(Offer.class, tradeSide));
 			processDefinitionAssignment.createProcessInstance(null, user, offer);
 
 			return offer;
@@ -1652,12 +1663,14 @@ public class Trader
 		// we add the events+actionhandlers
 		ActionHandlerNodeEnter.register(jbpmProcessDefinition);
 
-		if (TradeSide.vendor == tradeSide) {
+		if (TradeSide.vendor == tradeSide || TradeSide.customerLocal == tradeSide) {
 			ActionHandlerFinalizeOffer.register(jbpmProcessDefinition);
-			ActionHandlerFinalizeOfferForCrossTrade.register(jbpmProcessDefinition);
 			ActionHandlerSendOffer.register(jbpmProcessDefinition);
 			ActionHandlerAcceptOffer.register(jbpmProcessDefinition);
 			ActionHandlerAcceptOfferImplicitelyVendor.register(jbpmProcessDefinition);
+		}
+		if (TradeSide.vendor == tradeSide) {
+			ActionHandlerFinalizeOfferForCrossTrade.register(jbpmProcessDefinition);
 		}
 
 		// store it
@@ -1743,7 +1756,7 @@ public class Trader
 //				transition.setUserExecutable(false);
 			}
 			break;
-			case customer:
+			case customerCrossOrganisation:
 			{
 				// give known StateDefinitions a name and a description
 				setStateDefinitionProperties(processDefinition, JbpmConstantsOffer.Customer.NODE_NAME_CUSTOMER_ACCEPTED,
@@ -1779,6 +1792,11 @@ public class Trader
 //				transition = (Transition) pm.getObjectById(JbpmConstantsOffer.Customer.getTransitionID_sent_2_revoked(processDefinitionID));
 //				transition.getName().setText(Locale.ENGLISH.getLanguage(), "revoked");
 //				transition.setUserExecutable(false);
+			}
+			break;
+			case customerLocal:
+			{
+				// later...
 			}
 			break;
 			default:

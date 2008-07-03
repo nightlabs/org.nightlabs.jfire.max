@@ -453,8 +453,8 @@ public abstract class AccountingManagerBean
 
 			// persist process definitions
 			ProcessDefinition processDefinitionInvoiceCustomer;
-			processDefinitionInvoiceCustomer = accounting.storeProcessDefinitionInvoice(TradeSide.customer, ProcessDefinitionAssignment.class.getResource("invoice/customer/"));
-			pm.makePersistent(new ProcessDefinitionAssignment(Invoice.class, TradeSide.customer, processDefinitionInvoiceCustomer));
+			processDefinitionInvoiceCustomer = accounting.storeProcessDefinitionInvoice(TradeSide.customerCrossOrganisation, ProcessDefinitionAssignment.class.getResource("invoice/customer/"));
+			pm.makePersistent(new ProcessDefinitionAssignment(Invoice.class, TradeSide.customerCrossOrganisation, processDefinitionInvoiceCustomer));
 
 			ProcessDefinition processDefinitionInvoiceVendor;
 			processDefinitionInvoiceVendor = accounting.storeProcessDefinitionInvoice(TradeSide.vendor, ProcessDefinitionAssignment.class.getResource("invoice/vendor/"));

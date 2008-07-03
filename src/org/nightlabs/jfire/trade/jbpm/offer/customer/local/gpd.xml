@@ -1,0 +1,74 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<root-container name="dev.jfire.org:Offer.CustomerLocal" width="1166" height="1424">
+  <node name="dev.jfire.org:created" x="-24" y="17" width="190" height="40">
+    <edge>
+      <label x="-122" y="-52"/>
+      <bendpoint w1="231" h1="75" w2="-1" h2="-114"/>
+    </edge>
+    <edge>
+      <label x="-26" y="-15"/>
+    </edge>
+    <edge>
+      <label x="-12" y="5"/>
+    </edge>
+  </node>
+  <node name="dev.jfire.org:rejected" x="456" y="336" width="217" height="40"/>
+  <node name="dev.jfire.org:accepted" x="-28" y="313" width="199" height="40"/>
+  <node name="dev.jfire.org:finalized" x="208" y="206" width="190" height="40">
+    <edge>
+      <label x="-15" y="-45"/>
+      <bendpoint w1="98" h1="208" w2="-163" h2="6"/>
+    </edge>
+    <edge>
+      <label x="5" y="-10"/>
+      <bendpoint w1="92" h1="274" w2="-169" h2="0"/>
+    </edge>
+    <edge>
+      <label x="5" y="-10"/>
+      <bendpoint w1="101" h1="129" w2="-160" h2="-1"/>
+    </edge>
+    <edge>
+      <label x="-107" y="4"/>
+      <bendpoint w1="0" h1="285" w2="232" h2="0"/>
+    </edge>
+    <edge>
+      <label x="-2" y="-17"/>
+      <bendpoint w1="-158" h1="-1" w2="74" h2="-108"/>
+    </edge>
+    <edge>
+      <label x="-49" y="-15"/>
+      <bendpoint w1="-57" h1="-51" w2="272" h2="-53"/>
+      <bendpoint w1="-211" h1="-51" w2="118" h2="-53"/>
+    </edge>
+    <edge>
+      <label x="-75" y="10"/>
+    </edge>
+  </node>
+  <node name="dev.jfire.org:expired" x="456" y="408" width="217" height="40"/>
+  <node name="dev.jfire.org:aborted" x="453" y="16" width="217" height="40"/>
+  <node name="dev.jfire.org:revoked" x="456" y="480" width="217" height="40"/>
+  <node name="dev.jfire.org:customerAccepted" x="-41" y="491" width="225" height="40">
+    <edge>
+      <label x="5" y="-10"/>
+    </edge>
+  </node>
+  <node name="dev.jfire.org:sent" x="-134" y="208" width="216" height="40">
+    <edge>
+      <label x="-53" y="-12"/>
+      <bendpoint w1="122" h1="-33" w2="-207" h2="-31"/>
+      <bendpoint w1="233" h1="-33" w2="-96" h2="-31"/>
+    </edge>
+    <edge>
+      <label x="-82" y="-4"/>
+    </edge>
+    <edge>
+      <label x="5" y="-10"/>
+    </edge>
+  </node>
+  <node name="dev.jfire.org:acceptedImplicitely" x="-156" y="105" width="261" height="40">
+    <edge>
+      <label x="3" y="-8"/>
+    </edge>
+  </node>
+</root-container>

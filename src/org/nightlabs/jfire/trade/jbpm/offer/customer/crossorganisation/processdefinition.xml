@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
 <process-definition
-  xmlns=""  name="dev.jfire.org:Offer.Customer">
+  xmlns=""  name="dev.jfire.org:Offer.CustomerCrossOrganisation">
    <start-state name="dev.jfire.org:sent">
       <transition name="accept" to="dev.jfire.org:customerAccepted"></transition>
       <transition name="reject" to="dev.jfire.org:customerRejected"></transition>

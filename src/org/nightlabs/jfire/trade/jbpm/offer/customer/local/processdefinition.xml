@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<process-definition
+  xmlns=""  name="dev.jfire.org:Offer.CustomerLocal">
+   <start-state name="dev.jfire.org:created">
+      <transition name="finalize" to="dev.jfire.org:finalized"></transition>
+      <transition name="abort" to="dev.jfire.org:aborted"></transition>
+      <transition name="dev.jfire.org:acceptImplicitely" to="dev.jfire.org:acceptedImplicitely"></transition>
+   </start-state>
+   <end-state name="dev.jfire.org:rejected"></end-state>
+   <end-state name="dev.jfire.org:accepted"></end-state>
+   <state name="dev.jfire.org:finalized">
+      <transition name="dev.jfire.org:expire" to="dev.jfire.org:expired"></transition>
+      <transition name="revoke" to="dev.jfire.org:revoked"></transition>
+      <transition name="reject" to="dev.jfire.org:rejected"></transition>
+      <transition name="dev.jfire.org:customerAccepted" to="dev.jfire.org:customerAccepted"></transition>
+      <transition name="accept" to="dev.jfire.org:accepted"></transition>
+      <transition name="dev.jfire.org:send" to="dev.jfire.org:sent"></transition>
+		<transition to="dev.jfire.org:accepted" name="dev.jfire.org:acceptImplicitely"></transition>
+   </state>
+   <end-state name="dev.jfire.org:expired"></end-state>
+   <end-state name="dev.jfire.org:aborted"></end-state>
+   <end-state name="dev.jfire.org:revoked"></end-state>
+
+
+	<event type="process-end">
+		<action name="org.nightlabs.jfire.trade.jbpm.ActionHandlerOfferProcessEnd" class="org.nightlabs.jfire.trade.jbpm.ActionHandlerOfferProcessEnd"></action>
+	</event>
+   <node name="dev.jfire.org:customerAccepted">
+      <transition name="accept" to="dev.jfire.org:accepted"></transition>
+   </node>
+   <node name="dev.jfire.org:sent">
+      <transition name="dev.jfire.org:send" to="dev.jfire.org:finalized"></transition>
+      <transition name="sendImplicitely" to="dev.jfire.org:accepted"></transition>
+      <transition name="" to="dev.jfire.org:accepted"></transition>
+   </node>
+   <node name="dev.jfire.org:acceptedImplicitely">
+      <transition name="sendImplicitely" to="dev.jfire.org:sent"></transition>
+   </node>
+</process-definition>

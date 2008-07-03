@@ -1837,7 +1837,7 @@ implements StoreCallback
 			{
 			}
 			break;
-			case customer:
+			case customerCrossOrganisation:
 			{
 			}
 			break;
@@ -1878,7 +1878,7 @@ implements StoreCallback
 				}
 			}
 			break;
-			case customer:
+			case customerCrossOrganisation:
 			{
 			}
 			break;

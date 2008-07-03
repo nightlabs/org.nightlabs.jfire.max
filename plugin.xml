@@ -1,6 +1,10 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <?eclipse version="3.2"?>
 <plugin>
+
+<!-- TODO: Removed for the 0.9.4 release: 
+  https://www.jfire.org/modules/bugs/view.php?id=729
+  https://www.jfire.org/modules/bugs/view.php?id=731          
     <extension
          point="org.eclipse.datatools.connectivity.oda.dataSource">
       <dataSource
@@ -101,6 +105,7 @@
          </properties>
       </dataSet>
    </extension>
+-->   
    <extension
          point="org.eclipse.datatools.connectivity.oda.dataSource">
       <dataSource

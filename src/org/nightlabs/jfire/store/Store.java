@@ -46,7 +46,6 @@ import org.apache.log4j.Logger;
 import org.jbpm.JbpmContext;
 import org.jbpm.graph.exe.ProcessInstance;
 import org.nightlabs.ModuleException;
-import org.nightlabs.jfire.base.JFireBaseEAR;
 import org.nightlabs.jfire.config.Config;
 import org.nightlabs.jfire.idgenerator.IDGenerator;
 import org.nightlabs.jfire.jbpm.JbpmLookup;
@@ -987,7 +986,8 @@ implements StoreCallback
 		JbpmContext jbpmContext = JbpmLookup.getJbpmConfiguration().createJbpmContext();
 		try {
 			ProcessInstance processInstance = jbpmContext.getProcessInstance(deliveryNote.getDeliveryNoteLocal().getJbpmProcessInstanceId());
-			processInstance.signal(JbpmConstantsDeliveryNote.Vendor.TRANSITION_NAME_BOOK_IMPLICITELY);
+			if (processInstance.getRootToken().getNode().getLeavingTransition(JbpmConstantsDeliveryNote.Vendor.TRANSITION_NAME_BOOK_IMPLICITELY) != null)
+				processInstance.signal(JbpmConstantsDeliveryNote.Vendor.TRANSITION_NAME_BOOK_IMPLICITELY);
 		} finally {
 			jbpmContext.close();
 		}
@@ -1027,9 +1027,6 @@ implements StoreCallback
 					if (!partner.equals(deliveryNote.getCustomer()))
 						throw new IllegalArgumentException("Customer of deliveryNote \"" + deliveryNote.getPrimaryKey() + "\" does not match other deliveryNotes' partners! Expected partner \"" + partner.getPrimaryKey() + "\", but found \"" + deliveryNote.getCustomer().getPrimaryKey() + "\"!");
 				}
-
-				if (DeliverStage.deliverBegin == deliverStage)
-					bookDeliveryNoteImplicitely(deliveryNote);
 			} // vendor is mandator
 			else {
 				if (!mandator.equals(deliveryNote.getCustomer()))
@@ -1041,10 +1038,10 @@ implements StoreCallback
 					if (!partner.equals(deliveryNote.getVendor()))
 						throw new IllegalArgumentException("Vendor of deliveryNote \"" + deliveryNote.getPrimaryKey() + "\" does not match other deliveryNotes' partners! Expected partner \"" + partner.getPrimaryKey() + "\", but found \"" + deliveryNote.getVendor().getPrimaryKey() + "\"!");
 				}
-
-				if (DeliverStage.deliverEnd == deliverStage)
-					bookDeliveryNoteImplicitely(deliveryNote);
 			}
+
+//			if (DeliverStage.deliverEnd == deliverStage) // we check now whether booking implicitely is possible and do it if so - no matter what stage.
+			bookDeliveryNoteImplicitely(deliveryNote);
 		}
 
 		return partner;
@@ -1840,6 +1837,9 @@ implements StoreCallback
 			case customerCrossOrganisation:
 			{
 			}
+			case customerLocal:
+			{
+			}
 			break;
 			default:
 				throw new IllegalStateException("Unknown TradeSide: " + tradeSide);
@@ -1880,6 +1880,11 @@ implements StoreCallback
 			break;
 			case customerCrossOrganisation:
 			{
+				// TODO some names and descriptions
+			}
+			case customerLocal:
+			{
+				// TODO some names and descriptions
 			}
 			break;
 			default:

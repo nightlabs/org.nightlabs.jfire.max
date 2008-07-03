@@ -1,27 +1,27 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<process-diagram name="dev.jfire.org:DeliveryNote.Customer" width="940" height="671">
+<root-container name="dev.jfire.org:DeliveryNote.CustomerCrossOrganisation" width="1009" height="1443">
   <node name="dev.jfire.org:sent" x="4" y="4" width="206" height="40">
-    <transition name="createReceptionNote">
+    <edge>
       <label x="5" y="-10"/>
-    </transition>
-    <transition name="dev.jfire.org:deliver">
+    </edge>
+    <edge>
       <label x="5" y="-10"/>
-    </transition>
+    </edge>
   </node>
   <node name="dev.jfire.org:createdReceptionNote" x="347" y="116" width="268" height="40"/>
   <node name="dev.jfire.org:booked" x="4" y="296" width="205" height="40"/>
   <node name="dev.jfire.org:delivered" x="4" y="152" width="206" height="40">
-    <transition name="dev.jfire.org:book">
+    <edge>
       <label x="5" y="-10"/>
-    </transition>
-    <transition name="dev.jfire.org:bookImplicitely">
+    </edge>
+    <edge>
       <label x="-36" y="-22"/>
-    </transition>
+    </edge>
   </node>
   <node name="dev.jfire.org:bookedImplicitely" x="307" y="215" width="254" height="40">
-    <transition name="">
+    <edge>
       <label x="5" y="-10"/>
-    </transition>
+    </edge>
   </node>
-</process-diagram>
+</root-container>

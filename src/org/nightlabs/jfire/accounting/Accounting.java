@@ -249,7 +249,7 @@ implements StoreCallback
 	 * @param user The user which is responsible for creation of this invoice.
 	 * @param articles The {@link Article}s that shall be added to the invoice. Must not be empty (because the customer is looked up from the articles).
 	 */
-	public Invoice createInvoice(User user, Collection articles, String invoiceIDPrefix)
+	public Invoice createInvoice(User user, Collection<? extends Article> articles, String invoiceIDPrefix)
 	throws InvoiceEditException
 	{
 		if (articles.size() <= 0)
@@ -261,21 +261,20 @@ implements StoreCallback
 		// Make sure all offerItems are not yet in an invoice.
 		// all offers have the same vendor and customer
 		// and all offers have the same currency
-		String vendorPK = null;
+//		String vendorPK = null;
 		LegalEntity vendorLE = null;
-		String customerPK = null;
+//		String customerPK = null;
 		LegalEntity customerLE = null;
 		Currency invoiceCurrency = null;
-		for (Iterator iter = articles.iterator(); iter.hasNext();) {
-			Article article = (Article) iter.next();
-			
-			if (vendorPK == null) {
+		for (Article article : articles) {
+
+			if (vendorLE == null) {
 				vendorLE = article.getOffer().getOrder().getVendor();
-				vendorPK = vendorLE.getPrimaryKey();
+//				vendorPK = vendorLE.getPrimaryKey();
 			}
-			if (customerPK == null) {
+			if (customerLE == null) {
 				customerLE = article.getOffer().getOrder().getCustomer();
-				customerPK = customerLE.getPrimaryKey();
+//				customerPK = customerLE.getPrimaryKey();
 			}
 			if (invoiceCurrency == null)
 				invoiceCurrency = article.getPrice().getCurrency();
@@ -291,9 +290,9 @@ implements StoreCallback
 				);
 			}
 
-			if (!vendorPK.equals(articleOrder.getVendor().getPrimaryKey())
+			if (!vendorLE.equals(articleOrder.getVendor())
 						||
-					!customerPK.equals(articleOrder.getCustomer().getPrimaryKey())
+					!customerLE.equals(articleOrder.getCustomer())
 					)
 			{
 				throw new InvoiceEditException(
@@ -319,11 +318,23 @@ implements StoreCallback
 				);
 		}
 
-		if (!vendorPK.equals(getMandator().getPrimaryKey()) && (vendorLE instanceof OrganisationLegalEntity)  )
+		TradeSide tradeSide;
+
+		if (customerLE.equals(getMandator()) && (vendorLE instanceof OrganisationLegalEntity)) {
+			tradeSide = TradeSide.customerCrossOrganisation;
+
+			// TODO this should be implemented later - at the moment we don't support this yet.
 			throw new InvoiceEditException(
 				InvoiceEditException.REASON_FOREIGN_ORGANISATION,
-				"Attempt to create a Invoice not with the local organisation as vendor. Vendor is "+vendorPK
+				"Attempt to create a Invoice not with the local organisation as vendor. Vendor is "+vendorLE
 			);
+		}
+		else if (customerLE.equals(getMandator()))
+			tradeSide = TradeSide.customerLocal;
+		else if (vendorLE.equals(getMandator()))
+			tradeSide = TradeSide.vendor;
+		else
+			throw new IllegalArgumentException("The mandator is neither involved as vendor nor as customer!");
 
 		if (invoiceIDPrefix == null) {
 			TradeConfigModule tradeConfigModule;
@@ -345,7 +356,7 @@ implements StoreCallback
 		invoice = getPersistenceManager().makePersistent(invoice);
 
 		ProcessDefinitionAssignment processDefinitionAssignment = (ProcessDefinitionAssignment) getPersistenceManager().getObjectById(
-				ProcessDefinitionAssignmentID.create(Invoice.class, TradeSide.vendor));
+				ProcessDefinitionAssignmentID.create(Invoice.class, tradeSide));
 		processDefinitionAssignment.createProcessInstance(null, user, invoice);
 
 		addArticlesToInvoice(user, invoice, articles);
@@ -1186,7 +1197,7 @@ implements StoreCallback
 		// we add the events+actionhandlers
 		ActionHandlerNodeEnter.register(jbpmProcessDefinition);
 
-		if (TradeSide.vendor == tradeSide) {
+		if (TradeSide.vendor == tradeSide || TradeSide.customerLocal == tradeSide) {
 			ActionHandlerFinalizeInvoice.register(jbpmProcessDefinition);
 			ActionHandlerBookInvoiceImplicitely.register(jbpmProcessDefinition);
 		}
@@ -1264,6 +1275,10 @@ implements StoreCallback
 			case customerCrossOrganisation:
 			{
 
+			}
+			case customerLocal:
+			{
+				// TODO set the names. Or even better implement a framework that reads some XML files colocated with the processdefinition.xml
 			}
 			break;
 			default:

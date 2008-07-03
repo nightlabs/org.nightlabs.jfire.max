@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
 <process-definition
-  xmlns=""  name="dev.jfire.org:Invoice.Customer">
+  xmlns=""  name="dev.jfire.org:Invoice.CustomerCrossOrganisation">
    <start-state name="dev.jfire.org:sent">
       <transition name="book" to="dev.jfire.org:booked"></transition>
       <transition name="dispute" to="disputeStarted.beforeBook"></transition>

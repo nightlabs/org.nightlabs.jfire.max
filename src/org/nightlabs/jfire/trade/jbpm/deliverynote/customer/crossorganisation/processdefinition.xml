@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
 <process-definition
-  xmlns=""  name="dev.jfire.org:DeliveryNote.Customer">
+  xmlns=""  name="dev.jfire.org:DeliveryNote.CustomerCrossOrganisation">
    <start-state name="dev.jfire.org:sent">
       <transition name="createReceptionNote" to="dev.jfire.org:createdReceptionNote"></transition>
       <transition name="dev.jfire.org:deliver" to="dev.jfire.org:delivered"></transition>

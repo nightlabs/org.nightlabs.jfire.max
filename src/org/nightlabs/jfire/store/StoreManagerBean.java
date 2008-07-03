@@ -367,19 +367,24 @@ implements SessionBean
 			serverDeliveryProcessorJFire.getName().setText(Locale.ENGLISH.getLanguage(), "JFire Internal Delivery");
 
 			// persist process definitions
-			ProcessDefinition processDefinitionDeliveryNoteCustomer;
-			processDefinitionDeliveryNoteCustomer = store.storeProcessDefinitionDeliveryNote(TradeSide.customerCrossOrganisation, ProcessDefinitionAssignment.class.getResource("deliverynote/customer/"));
-			pm.makePersistent(new ProcessDefinitionAssignment(DeliveryNote.class, TradeSide.customerCrossOrganisation, processDefinitionDeliveryNoteCustomer));
+			ProcessDefinition processDefinitionDeliveryNoteCustomerLocal;
+			processDefinitionDeliveryNoteCustomerLocal = store.storeProcessDefinitionDeliveryNote(TradeSide.customerLocal, ProcessDefinitionAssignment.class.getResource("deliverynote/customer/local/"));
+			pm.makePersistent(new ProcessDefinitionAssignment(DeliveryNote.class, TradeSide.customerLocal, processDefinitionDeliveryNoteCustomerLocal));
+
+			ProcessDefinition processDefinitionDeliveryNoteCustomerCrossOrg;
+			processDefinitionDeliveryNoteCustomerCrossOrg = store.storeProcessDefinitionDeliveryNote(TradeSide.customerCrossOrganisation, ProcessDefinitionAssignment.class.getResource("deliverynote/customer/crossorganisation/"));
+			pm.makePersistent(new ProcessDefinitionAssignment(DeliveryNote.class, TradeSide.customerCrossOrganisation, processDefinitionDeliveryNoteCustomerCrossOrg));
 
 			ProcessDefinition processDefinitionDeliveryNoteVendor;
 			processDefinitionDeliveryNoteVendor = store.storeProcessDefinitionDeliveryNote(TradeSide.vendor, ProcessDefinitionAssignment.class.getResource("deliverynote/vendor/"));
 			pm.makePersistent(new ProcessDefinitionAssignment(DeliveryNote.class, TradeSide.vendor, processDefinitionDeliveryNoteVendor));
 
 			ProcessDefinition processDefinitionReceptionNoteCustomer;
-			processDefinitionReceptionNoteCustomer = store.storeProcessDefinitionReceptionNote(TradeSide.customerCrossOrganisation, ProcessDefinitionAssignment.class.getResource("receptionnote/customer/"));
+			processDefinitionReceptionNoteCustomer = store.storeProcessDefinitionReceptionNote(TradeSide.customerCrossOrganisation, ProcessDefinitionAssignment.class.getResource("receptionnote/customer/crossorganisation/"));
 			pm.makePersistent(new ProcessDefinitionAssignment(ReceptionNote.class, TradeSide.customerCrossOrganisation, processDefinitionReceptionNoteCustomer));
 
 			// TODO create and persist ProcessDefinition for ReceptionNote.Vendor
+			// TODO and for customerLocal
 
 			IDNamespaceDefault idNamespaceDefault = IDNamespaceDefault.createIDNamespaceDefault(pm, getOrganisationID(), DeliveryNote.class);
 			idNamespaceDefault.setCacheSizeServer(0);

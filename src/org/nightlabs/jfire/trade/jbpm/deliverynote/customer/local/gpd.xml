@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<root-container name="dev.jfire.org:DeliveryNote.Vendor" width="742" height="637">
+<root-container name="dev.jfire.org:DeliveryNote.CustomerLocal" width="1009" height="1443">
   <node name="dev.jfire.org:created" x="5" y="6" width="206" height="40">
     <edge>
       <label x="5" y="-10"/>

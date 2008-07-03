@@ -1,0 +1,91 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<root-container name="dev.jfire.org:Invoice.CustomerLocal" width="1181" height="1424">
+  <node name="dev.jfire.org:created" x="97" y="21" width="206" height="40">
+    <edge>
+      <label x="-44" y="-17"/>
+    </edge>
+    <edge>
+      <label x="5" y="-10"/>
+    </edge>
+    <edge>
+      <label x="2" y="31"/>
+      <bendpoint w1="-257" h1="0" w2="-1" h2="-174"/>
+    </edge>
+  </node>
+  <node name="dev.jfire.org:finalized" x="97" y="109" width="207" height="40">
+    <edge>
+      <label x="-155" y="-11"/>
+    </edge>
+  </node>
+  <node name="dev.jfire.org:aborted" x="420" y="21" width="221" height="40"/>
+  <node name="dev.jfire.org:doubtful" x="427" y="402" width="214" height="40">
+    <edge>
+      <label x="-128" y="1"/>
+      <bendpoint w1="-87" h1="41" w2="246" h2="0"/>
+    </edge>
+    <edge>
+      <label x="5" y="-10"/>
+    </edge>
+    <edge>
+      <label x="34" y="-14"/>
+      <bendpoint w1="-45" h1="-38" w2="287" h2="168"/>
+      <bendpoint w1="-197" h1="-38" w2="135" h2="168"/>
+    </edge>
+  </node>
+  <node name="dev.jfire.org:uncollectable" x="429" y="581" width="207" height="40"/>
+  <node name="dev.jfire.org:paid" x="104" y="443" width="195" height="40"/>
+  <node name="dev.jfire.org:booked" x="98" y="196" width="208" height="40">
+    <edge>
+      <label x="20" y="-14"/>
+      <bendpoint w1="140" h1="206" w2="-192" h2="0"/>
+    </edge>
+    <edge>
+      <label x="-100" y="-30"/>
+    </edge>
+    <edge>
+      <label x="-48" y="-17"/>
+    </edge>
+    <edge>
+      <label x="10" y="-2"/>
+    </edge>
+  </node>
+  <node name="dev.jfire.org:bookedUnreceivable" x="414" y="499" width="240" height="40">
+    <edge>
+      <label x="5" y="-10"/>
+    </edge>
+  </node>
+  <node name="dev.jfire.org:bookedImplicitely" x="-171" y="195" width="230" height="40">
+    <edge>
+      <label x="5" y="-10"/>
+    </edge>
+  </node>
+  <node name="dev.jfire.org:sentPreCollectionLetter" x="397" y="297" width="273" height="40">
+    <edge>
+      <label x="-45" y="-53"/>
+    </edge>
+    <edge>
+      <label x="5" y="-10"/>
+    </edge>
+  </node>
+  <node name="dev.jfire.org:sentReminder" x="423" y="196" width="221" height="40">
+    <edge>
+      <label x="5" y="-10"/>
+      <bendpoint w1="175" h1="0" w2="188" h2="-208"/>
+      <bendpoint w1="175" h1="206" w2="188" h2="-2"/>
+    </edge>
+    <edge>
+      <label x="9" y="-5"/>
+      <bendpoint w1="-180" h1="61" w2="152" h2="-186"/>
+    </edge>
+    <edge>
+      <label x="5" y="-10"/>
+    </edge>
+  </node>
+  <node name="dev.jfire.org:sent" x="425" y="85" width="170" height="40">
+    <edge>
+      <label x="5" y="-10"/>
+      <bendpoint w1="-110" h1="-2" w2="198" h2="-113"/>
+    </edge>
+  </node>
+</root-container>

@@ -41,8 +41,12 @@ public class JbpmConstantsDeliveryNote
 		public static final String TRANSITION_NAME_SEND = Organisation.DEV_ORGANISATION_ID + ":send";
 	}
 
-	public static class Customer {
-		public static final String NODE_NAME_CREATED_RECEPTION_NOTE  = Organisation.DEV_ORGANISATION_ID + ":createdReceptionNote";
+	public static class CustomerLocal {
+		public static final String TRANSITION_NAME_BOOK_IMPLICITELY = Vendor.TRANSITION_NAME_BOOK_IMPLICITELY;
+	}
+
+	public static class CustomerCrossOrganisation {
+//		public static final String NODE_NAME_CREATED_RECEPTION_NOTE  = Organisation.DEV_ORGANISATION_ID + ":createdReceptionNote";
 	}
 
 	private JbpmConstantsDeliveryNote() { }

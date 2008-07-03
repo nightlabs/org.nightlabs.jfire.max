@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<root-container name="dev.jfire.org:Invoice.Customer" width="1008" height="1442">
+<root-container name="dev.jfire.org:Invoice.CustomerCrossOrganisation" width="1009" height="1445">
   <node name="dev.jfire.org:sent" x="3" y="3" width="216" height="40">
     <edge>
       <label x="0" y="-10"/>

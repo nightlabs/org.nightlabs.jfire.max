@@ -29,19 +29,6 @@ public class JbpmConstantsInvoice
 	}
 
 	public static class Vendor {
-//		/**
-//		 * <p>
-//		 * This is the default process definition id as provided by the developer team. If a user uploads and assigns
-//		 * another process definition, the id will be different. A normal user cannot upload a process definition with
-//		 * this id.
-//		 * </p>
-//		 * <p>
-//		 * Which process definition will be used, is defined by {@link ProcessDefinitionAssignment} instances.
-//		 * </p>
-//		 */
-//		public static final ProcessDefinitionID PROCESS_DEFINITION_ID = ProcessDefinitionID.create(
-//				Organisation.DEV_ORGANISATION_ID, "Invoice.Vendor");
-
 		public static final String NODE_NAME_CREATED       = Organisation.DEV_ORGANISATION_ID + ":created";
 		public static final String NODE_NAME_FINALIZED     = Organisation.DEV_ORGANISATION_ID + ":finalized";
 		public static final String NODE_NAME_ABORTED       = Organisation.DEV_ORGANISATION_ID + ":aborted";
@@ -66,19 +53,12 @@ public class JbpmConstantsInvoice
 		public static final String TRANSITION_NAME_BOOK_IMPLICITELY = Organisation.DEV_ORGANISATION_ID + ":bookImplicitely";
 	}
 
-	public static class Customer {
-//		/**
-//		 * <p>
-//		 * This is the default process definition id as provided by the developer team. If a user uploads and assigns
-//		 * another process definition, the id will be different. A normal user cannot upload a process definition with
-//		 * this id.
-//		 * </p>
-//		 * <p>
-//		 * Which process definition will be used, is defined by {@link ProcessDefinitionAssignment} instances.
-//		 * </p>
-//		 */
-//		public static final ProcessDefinitionID PROCESS_DEFINITION_ID = ProcessDefinitionID.create(
-//				Organisation.DEV_ORGANISATION_ID, "Invoice.Customer");
+	public static class CustomerLocal {
+		public static final String TRANSITION_NAME_BOOK_IMPLICITELY = Vendor.TRANSITION_NAME_BOOK_IMPLICITELY;
+	}
+
+	public static class CustomerCrossOrganisation {
+		
 	}
 
 	private JbpmConstantsInvoice() { }

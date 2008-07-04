@@ -18,10 +18,12 @@
 	<classpathentry combineaccessrules="false" kind="src" path="/NightLabsBase"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/JFireBase"/>
 	<classpathentry kind="var" path="LOG4J"/>
-	<classpathentry kind="var" path="DATANUCLEUS_CORE"/> <classpathentry kind="var" path="DATANUCLEUS_JAVA5"/>
+	<classpathentry kind="var" path="DATANUCLEUS_CORE"/>
+	<classpathentry kind="var" path="DATANUCLEUS_JAVA5"/>
 	<classpathentry kind="var" path="DATANUCLEUS_ENHANCER"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/JFireBaseBean"/>
 	<classpathentry kind="var" path="ASM"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/JFireServerManager"/>
+	<classpathentry combineaccessrules="false" kind="src" path="/NightLabsJDO"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>

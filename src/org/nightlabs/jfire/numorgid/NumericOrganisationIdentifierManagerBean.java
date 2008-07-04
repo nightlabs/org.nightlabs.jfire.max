@@ -9,6 +9,7 @@ import javax.ejb.SessionContext;
 import javax.jdo.JDOObjectNotFoundException;
 import javax.jdo.PersistenceManager;
 
+import org.nightlabs.jdo.moduleregistry.ModuleMetaData;
 import org.nightlabs.jfire.base.BaseSessionBeanImpl;
 import org.nightlabs.jfire.idgenerator.IDGenerator;
 import org.nightlabs.jfire.idgenerator.IDNamespace;
@@ -91,6 +92,7 @@ implements SessionBean
 	 * @ejb.transaction type="Required"
 	 */
 	public void initialise()
+	throws Exception
 	{
 		PersistenceManager pm = getPersistenceManager();
 		try {
@@ -99,6 +101,12 @@ implements SessionBean
 
 			if (! localOrganisationID.equals(rootOrganisationID))
 				return; // We only want to assign a numeric organisation ID for the root organisation
+
+			if (ModuleMetaData.getModuleMetaData(pm, JFireNumericOrganisationIDEAR.MODULE_NAME) == null) {
+				pm.makePersistent(new ModuleMetaData(
+						JFireNumericOrganisationIDEAR.MODULE_NAME, "0.9.4.0.0.beta", "0.9.4.0.0.beta")
+				);
+			}
 
 			// Set conservative settings for the ID generator to not waste numeric organisation IDs due to the caching strategy
 			IDNamespace idNamespace;

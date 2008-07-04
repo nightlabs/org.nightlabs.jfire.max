@@ -125,10 +125,11 @@ public class MoneyTransferList extends AbstractJFSScriptExecutorDelegate {
 					// TODO: WORKAROUND: JPOX Bug
 //					jdoql.append("JDOHelper.getObjectId(this.initiator) == :initiatorID" + i);
 //					jdoParams.put("initiatorID" + i, initiatorID);
-					jdoql.append("(this.inititaotr == :intiator" + i);
+					jdoql.append("(this.initiator == :initiator" + i);
 					jdoParams.put("initiator" + i, pm.getObjectById(initiatorID));
 					if (it.hasNext())
 						jdoql.append("|| ");
+					i++;
 				}
 				jdoql.append(")");
 			}

@@ -305,15 +305,15 @@ implements 	Serializable, AttachCallback, Statable, DeleteCallback
 		return structScope;
 	}
 	
-	/**
-	 * @jdo.field persistence-modifier="persistent"
-	 */
-	private Date startTimestamp;
-
-	/**
-	 * @jdo.field persistence-modifier="persistent"
-	 */
-	private Date finishTimestamp;
+//	/**
+//	 * @jdo.field persistence-modifier="persistent"
+//	 */
+//	private Date startTimestamp;
+//
+//	/**
+//	 * @jdo.field persistence-modifier="persistent"
+//	 */
+//	private Date finishTimestamp;
 	
 	/**
 	 * @deprecated Constructor exists only for JDO! 
@@ -325,7 +325,7 @@ implements 	Serializable, AttachCallback, Statable, DeleteCallback
 	{
 		this.organisationID = organisationID;
 		this.createTimestamp = new Date();
-		this.startTimestamp = new Date();
+//		this.startTimestamp = new Date();
 		this.issueID = issueID;
 		
 		subject = new IssueSubject(this);
@@ -405,34 +405,34 @@ implements 	Serializable, AttachCallback, Statable, DeleteCallback
 	public void setUpdateTimestamp(Date timestamp) {
 		this.updateTimestamp = timestamp;
 	}
-	
-	/**
-	 * @return Returns the start timestamp.
-	 */
-	public Date getStartTimestamp() {
-		return startTimestamp;
-	}
 
-	/**
-	 * @param timestamp The timestamp to set.
-	 */
-	public void setStartTimestamp(Date timestamp) {
-		this.startTimestamp = timestamp;
-	}
-
-	/**
-	 * @return Returns the finish timestamp.
-	 */
-	public Date getFinishTimestamp() {
-		return finishTimestamp;
-	}
-
-	/**
-	 * @param timestamp The timestamp to set.
-	 */
-	public void setFinishTimestamp(Date timestamp) {
-		this.finishTimestamp = timestamp;
-	}
+//	/**
+//	 * @return Returns the start timestamp.
+//	 */
+//	public Date getStartTimestamp() {
+//		return startTimestamp;
+//	}
+//
+//	/**
+//	 * @param timestamp The timestamp to set.
+//	 */
+//	public void setStartTimestamp(Date timestamp) {
+//		this.startTimestamp = timestamp;
+//	}
+//
+//	/**
+//	 * @return Returns the finish timestamp.
+//	 */
+//	public Date getFinishTimestamp() {
+//		return finishTimestamp;
+//	}
+//
+//	/**
+//	 * @param timestamp The timestamp to set.
+//	 */
+//	public void setFinishTimestamp(Date timestamp) {
+//		this.finishTimestamp = timestamp;
+//	}
 
 	/**
 	 * @return Returns the description.

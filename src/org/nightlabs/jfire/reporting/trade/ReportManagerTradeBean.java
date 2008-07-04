@@ -39,6 +39,7 @@ import javax.jdo.JDOObjectNotFoundException;
 import javax.jdo.PersistenceManager;
 
 import org.apache.log4j.Logger;
+import org.nightlabs.jdo.moduleregistry.ModuleMetaData;
 import org.nightlabs.jfire.accounting.id.CurrencyID;
 import org.nightlabs.jfire.accounting.id.TariffID;
 import org.nightlabs.jfire.accounting.pay.id.ModeOfPaymentFlavourID;
@@ -156,7 +157,7 @@ implements SessionBean
 	 * @ejb.permission role-name="_System_"
 	 * @ejb.transaction type="Required"
 	 */
-	public void initializeReporting2() throws ReportingInitialiserException
+	public void initializeReporting2() throws Exception
 	{
 		initializeReporting();
 	}
@@ -169,12 +170,19 @@ implements SessionBean
 	 * @ejb.permission role-name="_System_"
 	 * @ejb.transaction type="Required"
 	 */
-	public void initializeReporting() throws ReportingInitialiserException
+	public void initializeReporting() throws Exception
 	{
 		PersistenceManager pm;
 		pm = getPersistenceManager();
 		JFireServerManager jfireServerManager = getJFireServerManager();
 		try {
+			ModuleMetaData moduleMetaData = ModuleMetaData.getModuleMetaData(pm, JFireReportingTradeEAR.MODULE_NAME);
+			if (moduleMetaData != null)
+				return;
+
+			pm.makePersistent(new ModuleMetaData(
+					JFireReportingTradeEAR.MODULE_NAME, "0.9.4.0.0.beta", "0.9.4.0.0.beta")
+			);
 
 			// initialise meta-data
 			pm.getExtent(ReportLayoutCfModInitialiserArticleContainerLayouts.class);

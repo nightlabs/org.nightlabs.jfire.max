@@ -128,6 +128,7 @@ public class PaymentList extends AbstractJFSScriptExecutorDelegate {
 				jdoParams.put("userID" + i, userID);
 				if (iterator.hasNext())
 					jdoql.append("|| ");
+				i++;
 			}
 			jdoql.append(") ");
 		}
@@ -145,6 +146,7 @@ public class PaymentList extends AbstractJFSScriptExecutorDelegate {
 				jdoParams.put("partner"+i, pm.getObjectById(partnerID));
 				if (iterator.hasNext())
 					jdoql.append("|| ");
+				i++;
 			}
 			jdoql.append(") ");
 		}
@@ -162,6 +164,7 @@ public class PaymentList extends AbstractJFSScriptExecutorDelegate {
 				jdoParams.put("modeOfPaymentFlavour" + i, pm.getObjectById(modeOfPaymentFlavourID));
 				if (iterator.hasNext())
 					jdoql.append("|| ");
+				i++;
 			}
 			jdoql.append(") ");
 		}

@@ -168,7 +168,7 @@ public class AccountQuery
 			
 		if (accountName != null && !"".equals(accountName)) {
 			filter.append("\n && ( ");
-			addFullTextSearch(filter, vars, "accountName");
+			addFullTextSearch(filter, vars, "name");
 			filter.append(")");
 		}
 		

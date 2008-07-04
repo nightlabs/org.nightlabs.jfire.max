@@ -1095,4 +1095,13 @@ public abstract class Geography
 
 		return ObjectIDUtil.longObjectIDFieldToString(IDGenerator.nextID(Location.class.getName() + "#" + countryID));
 	}
+	
+	public static String nextDistrictID(String districtID, String organisationID)
+	{
+		if (!IDGenerator.getOrganisationID().equals(organisationID))
+			throw new IllegalArgumentException("Can only generate an ID for the organisation '"+IDGenerator.getOrganisationID()+"' - the argument is invalid: " + organisationID);
+
+		return ObjectIDUtil.longObjectIDFieldToString(IDGenerator.nextID(District.class.getName() + "#" + districtID));
+	}
+	
 }

@@ -187,7 +187,7 @@ implements SessionBean
 		try {
 			String organisationID = getOrganisationID();
 
-			ModuleMetaData moduleMetaData = ModuleMetaData.getModuleMetaData(pm, "JFireSimpleTrade");
+			ModuleMetaData moduleMetaData = ModuleMetaData.getModuleMetaData(pm, JFireSimpleTradeEAR.MODULE_NAME);
 			if (moduleMetaData != null)
 				return;
 
@@ -195,7 +195,7 @@ implements SessionBean
 
 			// version is {major}.{minor}.{release}-{patchlevel}-{suffix}
 			moduleMetaData = new ModuleMetaData(
-					"JFireSimpleTrade", "0.9.4-0-beta", "0.9.4-0-beta");
+					JFireSimpleTradeEAR.MODULE_NAME, "0.9.4-0-beta", "0.9.4-0-beta");
 			pm.makePersistent(moduleMetaData);
 			
 			SimpleProductTypeStruct.getSimpleProductTypeStruct(organisationID, pm);

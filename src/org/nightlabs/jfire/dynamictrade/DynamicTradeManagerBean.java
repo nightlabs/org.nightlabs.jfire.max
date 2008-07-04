@@ -21,6 +21,7 @@ import javax.jdo.Query;
 import org.nightlabs.ModuleException;
 import org.nightlabs.i18n.I18nText;
 import org.nightlabs.jdo.NLJDOHelper;
+import org.nightlabs.jdo.moduleregistry.ModuleMetaData;
 import org.nightlabs.jfire.accounting.Price;
 import org.nightlabs.jfire.accounting.Tariff;
 import org.nightlabs.jfire.accounting.gridpriceconfig.AssignInnerPriceConfigCommand;
@@ -112,11 +113,19 @@ implements SessionBean
 	 * @ejb.permission role-name="_System_"
 	 * @ejb.transaction type="Required"
 	 */
-	public void initialise() throws CannotPublishProductTypeException
+	public void initialise() throws Exception
 	{
 		PersistenceManager pm = getPersistenceManager();
 		try {
 			String organisationID = getOrganisationID();
+
+			ModuleMetaData moduleMetaData = ModuleMetaData.getModuleMetaData(pm, JFireDynamicTradeEAR.MODULE_NAME);
+			if (moduleMetaData != null)
+				return;
+
+			pm.makePersistent(new ModuleMetaData(
+					JFireDynamicTradeEAR.MODULE_NAME, "0.9.4.0.0.beta", "0.9.4.0.0.beta")
+			);
 
 			// initialise meta-data
 			pm.getExtent(DynamicProductType.class);

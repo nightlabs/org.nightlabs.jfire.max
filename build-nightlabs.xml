@@ -1,436 +1,419 @@
 <!--
-  Generic eclipse/rcp-plugin ant build file (version 2007-12-13)
+  Generic eclipse/rcp-plugin ant build file 
+  Version: 2008-04-23
   Author: marc [at] nightlabs [dot] de
   Author: marco [at] nightlabs [dot] de
   Author: marius [at] nightlabs [dot] de
 
   Do NOT modify this file!!! It must be the same in all eclipse/rcp-plugins!
-  Instead, you can create local ant build files:
+  
+  To extend this build file you can create ant build files in this directory that 
+  are executed before (*pre.xml) or after (*post.xml) the targets in this file:
     - build-nightlabs-clean.pre.xml
     - build-nightlabs-clean.post.xml
     - build-nightlabs-compile.pre.xml
     - build-nightlabs-compile.post.xml
-    - build-nightlabs-dist.bin.pre.xml
-    - build-nightlabs-dist.bin.post.xml
-    - build-nightlabs-dist.plugin.jar.pre.xml
-    - build-nightlabs-dist.plugin.jar.post.xml
-    - build-nightlabs-dist.plugin.pre.xml
-    - build-nightlabs-dist.plugin.post.xml
+    - build-nightlabs-dist.pre.xml
+    - build-nightlabs-dist.post.xml
     - build-nightlabs-deploy.pre.xml
     - build-nightlabs-deploy.post.xml
+    
+  Additionally, you have the possibility to overwrite the internal targets completely
+  by creating the following ant build files in the local directory:
+    - build-nightlabs-clean.xml
+    - build-nightlabs-compile.xml
+    - build-nightlabs-dist.xml
+    - build-nightlabs-deploy.xml
+    
+  Properties debug can be switched on by setting "debug.properties=true" in one of the
+  used .properties files (build-nightlabs.properties is recommended).
 -->
-<project default="dist">
+<project default="dist" name="nightlabs.rcp">
+	<target name="clean" depends="internal.init" description="Clean the project">
+		<doexternal target="clean.pre"/>
+		<doexternal target="clean" else-target="clean.impl"/>
+		<doexternal target="clean.post"/>
+	</target>
 	
-  <target name="init.osgi.pre">
-  	<!-- check if we have an osgi bundle manifest -->
-  	<available file="META-INF/MANIFEST.MF" property="osgi.manifest.available"/>
-  </target>
-  	
-  <target name="init.osgi" depends="init.osgi.pre" if="osgi.manifest.available">
-    <property file="META-INF/MANIFEST.MF"/>  	
-    <!-- use magic regexp style to extract the bundle's
-         name from the MANIFEST.MF
-         could be Bundle-SymbolicName: my.bundle.name; other-prop:=propvalue; ...
-    -->
-    <loadfile
-      property="project.name"
-      srcFile="META-INF/MANIFEST.MF">
-      <filterchain>
-        <tokenfilter>
-          <containsregex
-              pattern="^Bundle-SymbolicName:\s*(.+)\;.*$"
-              replace="\1"/>
-        </tokenfilter>
-        <striplinebreaks/>
-      </filterchain>
-    </loadfile>
-  </target>
+	<target name="compile" depends="internal.init" description="Compile the project">
+		<doexternal target="compile.pre"/>
+		<doexternal target="compile" else-target="compile.impl"/>
+		<doexternal target="compile.post"/>
+	</target>
+
+	<target name="dist" depends="compile" description="Create a distrubution package for the project">
+		<doexternal target="dist.pre"/>
+		<doexternal target="dist" else-target="dist.impl"/>
+		<doexternal target="dist.post"/>
+	</target>
+
+	<target name="deploy" depends="dist" description="Deploy the project">
+		<doexternal target="deploy.pre"/>
+		<doexternal target="deploy" else-target="deploy.impl"/>
+		<doexternal target="deploy.post"/>
+	</target>
+
+	<target name="clean.impl">
+	    <delete includeEmptyDirs="true" verbose="true">
+			<fileset dir="${project.dir}" excludes="${clean.excludes}" includes="${clean.includes}"/>      
+	    </delete>
+	</target>
 	
-  <!-- Initialize all needed properties -->
-  <target name="init" depends="init.osgi">
-  	<!-- Set the name of this file. Is there another way?? -->
-  	<property name="build.file" value="build-nightlabs.xml"/>
+	<target name="compile.impl">
+	    <mkdir dir="${project.dir}/${bin.dir}"/>
+	    <javac debug="${javac.debug}" encoding="UTF-8" source="${javac.source}" target="${javac.target}" destdir="${project.dir}/${bin.dir}" classpath="${project.path}">
+	      <src path="${project.dir}/${src.dir}"/>
+	    </javac>
+	    <copy todir="${project.dir}/${bin.dir}">
+	      <fileset dir="${project.dir}/${src.dir}" excludes="**/*.java"/>
+	    </copy>
+	</target>
+	
+	<target name="dist.impl">
+	    <mkdir dir="${project.dir}/${dist.dir}/plugins"/>
+		
+	    <mkdir dir="${project.dir}/${dist.dir}/plugins/${project.name}_${project.version}"/>
+	    <copy todir="${project.dir}/${dist.dir}/plugins/${project.name}_${project.version}">
+	      <fileset dir="${project.dir}" includes="${bin.includes}"/>
+	    </copy>
+		<antcall target="internal.dist.binjar"/>
+		<antcall target="internal.dist.innerjar"/>
+		<antcall target="internal.dist.direct"/>
+		<replaceregexp 
+			file="${project.dir}/${dist.dir}/plugins/${project.name}_${project.version}/META-INF/MANIFEST.MF" 
+			match="Bundle-Version: ${project.versionwithoutqualifier}\.qualifier"
+			replace="Bundle-Version: ${project.version}"/>
+		
+		<antcall target="internal.dist.pluginjar"/>
+		<antcall target="internal.dist.removeplugindir"/>
+	</target>
+	
+	<target name="deploy.impl">
+		<if boolean="${rcp.deploy.allplatforms.enable}" then-target="internal.deploy.allplatforms"/>
+		<if boolean="${rcp.deploy.win32.enable}" then-target="internal.deploy.win32"/>
+		<if boolean="${rcp.deploy.linux-gtk32.enable}" then-target="internal.deploy.linux-gtk32"/>
+		<if boolean="${rcp.deploy.linux-gtk64.enable}" then-target="internal.deploy.linux-gtk64"/>
+	</target>
+	
+	
+	<!-- ############ INTERNAL TASKS ############ -->
+	
+	<target name="internal.init" depends="internal.init.base, internal.init.osgi, internal.init.version.qualifier, internal.init.version.noqualifier, internal.init.debug">
+		<condition property="internal.do.dist.pluginjar"><istrue value="${dist.pluginjar.enable}"/></condition>
+		<condition property="internal.deploy.includes" value="${project.name}_${project.version}.jar"><istrue value="${dist.pluginjar.enable}"/></condition>
+		<condition property="internal.do.dist.plugindir"><istrue value="${dist.plugindir.enable}"/></condition>
+		<condition property="internal.deploy.includes" value="${project.name}_${project.version}/**/*"><istrue value="${dist.plugindir.enable}"/></condition>
+	</target>
+	
+	<target name="internal.init.base">
+		<!-- load the config files -->
+	  	<property file="build-nightlabs-path.properties"/>
+	    <property file="build-nightlabs.properties"/>
+	    <property file="build.properties"/>
+		<!-- TODO: is this still needed? -->
+	    <xmlproperty file="plugin.xml" collapseAttributes="true"/>
+		
+		<!-- get the build identifier string from build.properties
+		     note that this might lead to unexpected results if there
+		     are more than one "source..." and "output..." entries. -->
+		<grep property="project.buildid"
+		      srcFile="build.properties"
+		      pattern="^source\.(.+?)\s*=.*$"/>
 
-  	<property file="build-nightlabs-path.properties"/>
-    <property file="build-nightlabs.properties"/>
-    <property file="build.properties"/>
-  	
-    <xmlproperty file="plugin.xml" collapseAttributes="true"/>
+		<!-- finf out if there should be an inner jar. This is true
+		     if the source entry is in the form "source.xyz.jar". -->
+		<grep property="internal.do.distinnerjar"
+		      srcFile="build.properties"
+		      pattern="^source\.(.+).jar\s*=.*$"/>
 
-  	<condition property="javac.debug" value="true">
-  	  <not>
-  	    <isset property="javac.debug"/>
-  	  </not>
-    </condition>
-  	
-  	<!-- java compiler option: source (e.g. "1.3", "1.4", "1.5") -->
-  	<condition property="javac.source" value="6">
-  	  <not>
-  	    <isset property="javac.source"/>
-  	  </not>
-    </condition>
+		<!-- java compiler option default: debugging -->
+		<property name="javac.debug" value="true"/>
+	  	<!-- java compiler option default: source (e.g. "1.3", "1.4", "1.5") -->
+	  	<property name="javac.source" value="6"/>
+	 	<!-- java compiler option default: target (e.g. "1.3", "1.4", "1.5") -->
+	  	<property name="javac.target" value="${javac.source}"/>
+		
+		<!-- project dir default -->
+		<property name="project.dir" value="."/>
+		<!-- taken from build.properties -->
+		<nestedproperty property="src.dir" first="source." second="${project.buildid}"/>
+		<nestedproperty property="bin.dir" first="output." second="${project.buildid}"/>
+		
+		<property name="lib.dir" value="lib"/>
+		<property name="rcp.deploy.allplatforms.dir" value="/tmp/rcp/all/plugins"/>
+		<property name="rcp.deploy.allplatforms.enable" value="true"/>
+		<property name="rcp.deploy.win32.dir" value="/tmp/rcp/win32/plugins"/>
+		<property name="rcp.deploy.win32.enable" value="false"/>
+		<property name="rcp.deploy.linux-gtk32.dir" value="/tmp/rcp/linux-gtk32/plugins"/>
+		<property name="rcp.deploy.linux-gtk32.enable" value="false"/>
+		<property name="rcp.deploy.linux-gtk64.dir" value="/tmp/rcp/linux-gtk64/plugins"/>
+		<property name="rcp.deploy.linux-gtk64.enable" value="false"/>
+		<property name="dist.dir" value="dist"/>
+		<property name="dist.pluginjar.enable" value="true"/>
+		<property name="dist.plugindir.enable" value="false"/>
+		
+	  	<!--
+	  		find out, whether we deploy a plugin or a feature and set the property ${rcp.deploy.subdir} to:
+	  			- "plugins"
+	  			- "features"
+	  	-->
+	  	<available file="${project.dir}/feature.xml" property="rcp.deploy.subdir" value="features"/>
+	   	<property name="rcp.deploy.subdir" value="plugins"/>
+		
+		<available property="internal.do.usemanifest" file="${project.dir}/META-INF/MANIFEST.MF"/>
+		<condition property="internal.do.debug"><istrue value="${debug.properties}"/></condition>
+	</target>
 
- 	<!-- java compiler option: target (e.g. "1.3", "1.4", "1.5") -->
-  	<condition property="javac.target" value="${javac.source}">
-  	  <not>
-  	    <isset property="javac.target"/>
-  	  </not>
-    </condition>
+	<target name="internal.init.osgi" if="internal.do.usemanifest">
+		<property file="${project.dir}/META-INF/MANIFEST.MF"/>
+		<!-- use magic regexp style to extract the bundle's
+		     name from the MANIFEST.MF
+		     could be Bundle-SymbolicName: my.bundle.name; other-prop:=propvalue; ...
+		-->
+		<grep
+			property="project.name"
+			srcFile="${project.dir}/META-INF/MANIFEST.MF"
+			pattern="^Bundle-SymbolicName:\s*(.+)\;.*$"/>
+		<grep
+			property="project.name"
+			srcFile="${project.dir}/META-INF/MANIFEST.MF"
+			pattern="^Bundle-SymbolicName:\s*(.+)$"/>
 
-    <!-- use magic regexp style to extract the plugins 
-         jar filename from build.properties. The filename
-         is given in the form "source.<filename> = <srcdir> -->
-    <loadfile
-      property="project.fileName"
-      srcFile="build.properties">
-      <filterchain>
-        <tokenfilter>
-          <containsregex 
-          	pattern="^source\.(.+)\.jar.*$"
-          	replace="\1"
-          />
-        </tokenfilter>
-        <striplinebreaks/>
-      </filterchain>
-    </loadfile>
+		<grep
+			property="internal.do.useversionqualifier"
+			srcFile="${project.dir}/META-INF/MANIFEST.MF"
+			pattern="^Bundle-Version:\s*(.+\.qualifier)$"/>
 
-  	<property name="project.jar" value="${project.fileName}.jar" />
-  	
-    <!-- get src.dir from build.properties -->
-    <loadfile
-      property="src.dir"
-      srcFile="build.properties">
-      <filterchain>
-        <tokenfilter>
-          <containsregex
-              pattern="^source\.${project.jar}\s*=\s*(.*)$"
-              replace="\1"/>
-        </tokenfilter>
-        <striplinebreaks/>
-      </filterchain>
-    </loadfile>
+		<!-- set if using qualifier -->
+		<grep
+			property="project.versionwithoutqualifier"
+			srcFile="${project.dir}/META-INF/MANIFEST.MF"
+			pattern="^Bundle-Version:\s*(.+)\.qualifier$"/>
 
-   	<condition property="src.dir" value="src">
-  	  <not>
-  	    <isset property="src.dir"/>
-  	  </not>
-    </condition>
+		<!-- set if not using qualifier -->
+		<grep
+			property="project.versionwithoutqualifier"
+			srcFile="${project.dir}/META-INF/MANIFEST.MF"
+			pattern="^Bundle-Version:\s*(.+)$"/>
+	</target>
+	
+	<target name="internal.init.version.qualifier" if="internal.do.useversionqualifier">
+	    <condition property="project.versionqualifier" value="${forceContextQualifier}">
+	      <and>
+	        <not><isset property="project.versionqualifier"/></not>
+	        <isset property="forceContextQualifier"/>
+	      </and>
+	    </condition>
+		<property name="project.versionqualifier" value="local"/>
+		<property name="project.version" value="${project.versionwithoutqualifier}.${project.versionqualifier}"/>
+	</target>
 
-    <!-- get bin.dir from build.properties -->
-    <loadfile
-      property="bin.dir"
-      srcFile="build.properties">
-      <filterchain>
-        <tokenfilter>
-          <containsregex
-              pattern="^output\.${project.jar}\s*=\s*(.*)$"
-              replace="\1"/>
-        </tokenfilter>
-        <striplinebreaks/>
-      </filterchain>
-    </loadfile>
+	<target name="internal.init.version.noqualifier" unless="internal.do.useversionqualifier">
+		<property name="project.version" value="${project.versionwithoutqualifier}"/>
+	</target>
 
-  	<!--
-  		find out, whether we deploy a plugin or a feature and set the property ${rcp.deploy.subdir} to:
-  			- "plugins"
-  			- "features"
-  	-->
-  	<available file="${project.dir}/feature.xml" property="rcp.deploy.subdir" value="features"/>
+	<target name="internal.init.debug" if="internal.do.debug">
+		<echo>project.buildid: ${project.buildid}</echo>
+		<echo>project.buildinnerjar: ${project.buildinnerjar}</echo>
+	    <echo>project name: ${project.name}</echo>
+	    <echo>project version: ${project.version}</echo>
+	    <echo>project dir: ${project.dir}</echo>
+	    <echo>src dir: ${project.dir}/${src.dir}</echo>
+	    <echo>bin dir: ${project.dir}/${bin.dir}</echo>
+	    <echo>dist dir: ${project.dir}/${dist.dir}</echo>
+	    <echo>clean includes: ${clean.includes}</echo>
+	    <echo>clean excludes: ${clean.excludes}</echo>
+	    <echo>project path: ${project.path}</echo>
+	    <echo>rcp.deploy.allplatforms.enable: ${rcp.deploy.allplatforms.enable}</echo>
+	  	<echo>rcp.deploy.allplatforms.dir: ${rcp.deploy.allplatforms.dir}</echo>
+	  	<echo>rcp.deploy.win32.enable: ${rcp.deploy.win32.enable}</echo>
+	  	<echo>rcp.deploy.win32.dir: ${rcp.deploy.win32.dir}</echo>
+	  	<echo>rcp.deploy.linux-gtk32.enable: ${rcp.deploy.linux-gtk32.enable}</echo>
+	  	<echo>rcp.deploy.linux-gtk32.dir: ${rcp.deploy.linux-gtk32.dir}</echo>
+	  	<echo>rcp.deploy.linux-gtk64.enable: ${rcp.deploy.linux-gtk64.enable}</echo>
+	  	<echo>rcp.deploy.linux-gtk64.dir: ${rcp.deploy.linux-gtk64.dir}</echo>
+		<echo>javac.debug: ${javac.debug}</echo>
+		<echo>javac.source: ${javac.source}</echo>
+		<echo>javac.target: ${javac.target}</echo>
+	</target>
+	
+	<target name="internal.dist.pluginjar" if="internal.do.dist.pluginjar">
+		<jar destfile="${project.dir}/${dist.dir}/plugins/${project.name}_${project.version}.jar" 
+			manifest="${project.dir}/${dist.dir}/plugins/${project.name}_${project.version}/META-INF/MANIFEST.MF">
+			<fileset dir="${project.dir}/${dist.dir}/plugins/${project.name}_${project.version}">
+				<include name="**/*"/>
+			</fileset>
+		</jar>
+	</target>
 
-   	<condition property="rcp.deploy.subdir" value="plugins">
-  	  <not>
-  	    <isset property="rcp.deploy.subdir"/>
-  	  </not>
-    </condition>
+	<target name="internal.dist.removeplugindir" unless="internal.do.dist.plugindir">
+		<delete dir="${project.dir}/${dist.dir}/plugins/${project.name}_${project.version}"/>
+	</target>
 
-   	<condition property="bin.dir" value="bin">
-  	  <not>
-  	    <isset property="bin.dir"/>
-  	  </not>
-    </condition>
+	<target name="internal.dist.binjar">
+		<jar destfile="${project.dir}/${dist.dir}/${project.name}.jar">
+			<fileset dir="${project.dir}/${bin.dir}">
+    			<include name="**/*"/>
+			</fileset>
+		</jar>
+	</target>
+	
+	<target name="internal.dist.innerjar" if="internal.do.distinnerjar">
+		<jar destfile="${project.dir}/${dist.dir}/plugins/${project.name}_${project.version}/${project.buildid}">
+			<fileset dir="${project.dir}/${bin.dir}">
+    			<include name="**/*"/>
+			</fileset>
+		</jar>
+	</target>
 
-    <!-- set project.dir to "." if not already defined -->
-    <condition property="project.dir" value=".">
-      <not><isset property="project.dir"/></not>
-    </condition>
+	<target name="internal.dist.direct" unless="internal.do.distinnerjar">
+		<copy todir="${project.dir}/${dist.dir}/plugins/${project.name}_${project.version}">
+			<fileset dir="${project.dir}/${bin.dir}">
+    			<include name="**/*"/>
+			</fileset>
+		</copy>
+	</target>
+	
+	<target name="internal.deploy.allplatforms">
+		<doDeploy platform="allplatforms"/>
+	</target>
 
-    <!-- set dist.dir to "dist" if not already defined -->
-    <condition property="dist.dir" value="dist">
-      <not><isset property="dist.dir"/></not>
-    </condition>
+	<target name="internal.deploy.win32">
+		<doDeploy platform="win32"/>
+	</target>
 
-    <!-- use the plugin-id from MANIFEST.MF as project.name
-         if not already defined. -->
-    <condition property="project.name" value="${Bundle-SymbolicName}">
-      <and>
-        <not><isset property="project.name"/></not>
-        <isset property="Bundle-SymbolicName"/>
-      </and>
-    </condition>
-    <!-- use the plugin-id from plugin.xml as project.name
-         if not already defined. -->
-    <condition property="project.name" value="${plugin.id}">
-      <and>
-        <not><isset property="project.name"/></not>
-        <isset property="plugin.id"/>
-      </and>
-    </condition>
+	<target name="internal.deploy.linux-gtk32">
+		<doDeploy platform="linux-gtk32"/>
+	</target>
 
-    <!-- use the plugin-version from MANIFEST.MF as project.version
-         if not already defined. -->
-    <condition property="project.version" value="${Bundle-Version}">
-      <and>
-        <not><isset property="project.version"/></not>
-        <isset property="Bundle-Version"/>
-      </and>
-    </condition>
-    <!-- use the plugin-version from plugin.xml as project.version
-         if not already defined. -->
-    <condition property="project.version" value="${plugin.version}">
-      <and>
-        <not><isset property="project.version"/></not>
-        <isset property="plugin.version"/>
-      </and>
-    </condition>
+	<target name="internal.deploy.linux-gtk64">
+		<doDeploy platform="linux-gtk64"/>
+	</target>
+	
+	
+	
+	<!-- ############ MACROS ############ -->
+	
+    <macrodef name="grep">
+        <attribute name="srcFile"/>
+        <attribute name="property"/>
+        <attribute name="pattern"/>
+    	<attribute name="replace" default="\1"/>
+        <sequential>
+    		<loadfile
+    		      property="@{property}"
+    		      srcFile="@{srcFile}">
+    		      <filterchain>
+    		        <tokenfilter>
+    		          <containsregex 
+    		          	pattern="@{pattern}"
+    		          	replace="@{replace}"
+    		          />
+    		        </tokenfilter>
+    		        <striplinebreaks/>
+    		      </filterchain>
+    		    </loadfile>
+    	</sequential>
+    </macrodef>
 
-	<condition property="lib.dir" value="lib">
-		<not><isset property="lib.dir"/></not>
-	</condition>
+    <macrodef name="nestedproperty">
+    	<attribute name="property"/>
+        <attribute name="first"/>
+        <attribute name="second"/>
+        <sequential>
+            <property name="@{property}" value="${@{first}@{second}}"/>
+        </sequential>
+    </macrodef>
 
-	<condition property="rcp.deploy.allplatforms.dir" value="/tmp/rcp/all/plugins">
-		<not><isset property="rcp.deploy.allplatforms.dir"/></not>
-	</condition>
-
-	<condition property="rcp.deploy.allplatforms.enable" value="true">
-		<not><isset property="rcp.deploy.allplatforms.enable"/></not>
-	</condition>
-
-	<condition property="rcp.deploy.win32.dir" value="/tmp/rcp/win32/plugins">
-		<not><isset property="rcp.deploy.win32.dir"/></not>
-	</condition>
-
-  	<condition property="rcp.deploy.win32.enable" value="false">
-		<not><isset property="rcp.deploy.win32.enable"/></not>
-	</condition>
-
-	<condition property="rcp.deploy.linux-gtk32.dir" value="/tmp/rcp/linux-gtk32/plugins">
-		<not><isset property="rcp.deploy.linux-gtk32.dir"/></not>
-	</condition>
-
-	<condition property="rcp.deploy.linux-gtk32.enable" value="false">
-		<not><isset property="rcp.deploy.linux-gtk32.enable"/></not>
-	</condition>
-
-	<condition property="rcp.deploy.linux-gtk64.dir" value="/tmp/rcp/linux-gtk64/plugins">
-		<not><isset property="rcp.deploy.linux-gtk64.dir"/></not>
-	</condition>
-
-	<condition property="rcp.deploy.linux-gtk64.enable" value="false">
-		<not><isset property="rcp.deploy.linux-gtk64.enable"/></not>
-	</condition>
-
-    <!-- print properties for debugging -->
-    <echo>project name: ${project.name}</echo>
-    <echo>project version: ${project.version}</echo>
-    <echo>project dir: ${project.dir}</echo>
-    <echo>project jar: ${project.jar}</echo>
-    <echo>src dir: ${project.dir}/${src.dir}</echo>
-    <echo>bin dir: ${project.dir}/${bin.dir}</echo>
-    <echo>dist dir: ${project.dir}/${dist.dir}</echo>
-    <echo>clean includes: ${clean.includes}</echo>
-    <echo>clean excludes: ${clean.excludes}</echo>
-    <echo>project path: ${project.path}</echo>
-    <echo>rcp.deploy.allplatforms.enable: ${rcp.deploy.allplatforms.enable}</echo>
-  	<echo>rcp.deploy.allplatforms.dir: ${rcp.deploy.allplatforms.dir}</echo>
-  	<echo>rcp.deploy.win32.enable: ${rcp.deploy.win32.enable}</echo>
-  	<echo>rcp.deploy.win32.dir: ${rcp.deploy.win32.dir}</echo>
-  	<echo>rcp.deploy.linux-gtk32.enable: ${rcp.deploy.linux-gtk32.enable}</echo>
-  	<echo>rcp.deploy.linux-gtk32.dir: ${rcp.deploy.linux-gtk32.dir}</echo>
-  	<echo>rcp.deploy.linux-gtk64.enable: ${rcp.deploy.linux-gtk64.enable}</echo>
-  	<echo>rcp.deploy.linux-gtk64.dir: ${rcp.deploy.linux-gtk64.dir}</echo>
-
-  </target>
-
-	<!-- This macro executes a target in the local buildfile
-	       (attribute target extended with the prefix "build-nightlabs-" and the suffix ".xml")
-	       if a given value is true (attribute boolean) and the local build file exists. -->
-	<macrodef name="dolocaliftrue">
+	<!-- This macro executes a target in a given buildfile
+       (attributes then-target, then-buildfile) if a given
+       value is true (attribute boolean). Otherwise (if
+       boolean is false) it executes an alternative target
+       (attributes else-target, else-buildfile). Else attributes
+       are optional.
+       The macro does this by creating a temporary 
+       buildfile and calling back this buildfile from
+       there. -->
+	<macrodef name="if_impl">
 		<attribute name="boolean"/>
+		<attribute name="then-target"/>
+		<attribute name="then-buildfile" />
+		<attribute name="else-target" default="" />
+		<attribute name="else-buildfile" default="" />
+		<sequential>
+			<tempfile property="tmpbuildfile.@{then-target}-@{then-buildfile}-@{else-target}-@{else-buildfile}-@{boolean}.name" prefix=".tmpbuild-" suffix=".xml" />
+			<property name="tmpbuildfile.@{then-target}-@{then-buildfile}-@{else-target}-@{else-buildfile}-@{boolean}.content.pre" value="&lt;project name=&quot;tmp-build&quot; default=&quot;run&quot;&gt;&lt;delete file=&quot;${tmpbuildfile.@{then-target}-@{then-buildfile}-@{else-target}-@{else-buildfile}-@{boolean}.name}&quot; deleteonexit=&quot;true&quot; quiet=&quot;true&quot;/&gt;&lt;target name=&quot;run&quot;&gt;"/>
+			<property name="tmpbuildfile.@{then-target}-@{then-buildfile}-@{else-target}-@{else-buildfile}-@{boolean}.content.post" value="&lt;/target&gt;&lt;/project&gt;"/>
+			<condition property="tmpbuildfile.@{then-target}-@{then-buildfile}-@{else-target}-@{else-buildfile}-@{boolean}.content" value="&lt;ant antfile=&quot;@{then-buildfile}&quot; target=&quot;@{then-target}&quot;/&gt;">
+				<istrue value="@{boolean}"/>
+			</condition>
+			<condition property="tmpbuildfile.@{then-target}-@{then-buildfile}-@{else-target}-@{else-buildfile}-@{boolean}.content" value="&lt;ant antfile=&quot;@{else-buildfile}&quot; target=&quot;@{else-target}&quot;/&gt;">
+				<and>
+					<not><istrue value="@{boolean}"/></not>
+					<not><equals arg1="@{else-buildfile}" arg2="" trim="true"/></not>
+					<not><equals arg1="@{else-target}" arg2="" trim="true"/></not>
+				</and>
+			</condition>
+			<condition property="tmpbuildfile.@{then-target}-@{then-buildfile}-@{else-target}-@{else-buildfile}-@{boolean}.content" value="">
+				<not><isset property="tmpbuildfile.@{then-target}-@{then-buildfile}-@{else-target}-@{else-buildfile}-@{boolean}.content"/></not>
+			</condition>
+			<echo file="${tmpbuildfile.@{then-target}-@{then-buildfile}-@{else-target}-@{else-buildfile}-@{boolean}.name}">${tmpbuildfile.@{then-target}-@{then-buildfile}-@{else-target}-@{else-buildfile}-@{boolean}.content.pre}${tmpbuildfile.@{then-target}-@{then-buildfile}-@{else-target}-@{else-buildfile}-@{boolean}.content}${tmpbuildfile.@{then-target}-@{then-buildfile}-@{else-target}-@{else-buildfile}-@{boolean}.content.post}</echo>
+			<ant antfile="${tmpbuildfile.@{then-target}-@{then-buildfile}-@{else-target}-@{else-buildfile}-@{boolean}.name}"/>
+			<!--
+			<delete quiet="true" file="${tmpbuildfile.@{then-target}-@{then-buildfile}-@{else-target}-@{else-buildfile}-@{boolean}.name}"/>
+			-->
+		</sequential>
+	</macrodef>
+
+	<macrodef name="if">
+		<attribute name="boolean"/>
+		<attribute name="then-target"/>
+		<attribute name="then-buildfile" default="${ant.file}" />
+		<attribute name="else-target" default="" />
+		<attribute name="else-buildfile" default="${ant.file}" />
+		<sequential>
+			<if_impl boolean="@{boolean}" then-buildfile="@{then-buildfile}" then-target="@{then-target}" else-buildfile="@{else-buildfile}" else-target="@{else-target}" />
+		</sequential>
+	</macrodef>
+
+	<!-- This macro executes a target in an external buildfile
+	       (attribute target extended with the prefix "build-nightlabs-" and the suffix ".xml")
+	       if the external build file exists and boolean is true. If boolean
+	       is false or the external file does not exists else-target will be
+	       executed. If no else target is given, nothing will happen. -->
+	<macrodef name="doexternal">
+		<attribute name="boolean" default="true" />
 		<attribute name="target"/>
+		<attribute name="else-buildfile" default="${ant.file}" />
+		<attribute name="else-target" default="" />
 		<sequential>
 		  	<!-- ${doexec} is set to true, if the build-nightlabs-@{target}.xml exists
-		  		and ${boolean} is true. In this case, the local file will be called. -->
+		  		In this case, the external target will be called. -->
 			<property name="build.file.local-@{target}-@{boolean}" value="build-nightlabs-@{target}.xml"/>
-		  	<available file="${build.file.local-@{target}-@{boolean}}" property="doexec-@{target}-@{boolean}" value="@{boolean}"/>
+	  	<available file="${build.file.local-@{target}-@{boolean}}" property="doexec-@{target}-@{boolean}" value="@{boolean}"/>
 			<condition property="doexec-@{target}-@{boolean}" value="false">
 				<not><isset property="doexec-@{target}-@{boolean}"/></not>
 			</condition>
-
-			<echo>doexec-@{target}-@{boolean}: ${doexec-@{target}-@{boolean}}</echo>
-
-			<internal_doiftrue boolean="${doexec-@{target}-@{boolean}}" target="@{target}" buildfile="${build.file.local-@{target}-@{boolean}}"/>
+			<if 
+					boolean="${doexec-@{target}-@{boolean}}" 
+					then-buildfile="${build.file.local-@{target}-@{boolean}}" 
+					then-target="@{target}"
+					else-buildfile="@{else-buildfile}"
+					else-target="@{else-target}"/>
 		</sequential>
 	</macrodef>
-
-	<!-- This macro executes a target in this buildfile
-       (attribute target) if a given value is true
-       (attribute boolean) by creating a temporary 
-       buildfile and calling back this buildfile from
-       there. -->
-	<macrodef name="doiftrue">
-		<attribute name="boolean"/>
-		<attribute name="target"/>
-		<sequential>
-			<internal_doiftrue boolean="@{boolean}" target="@{target}" buildfile="${build.file}"/>
-		</sequential>
-	</macrodef>
-
-	<!-- This macro executes a target in this buildfile
-       (attribute target) if a given value is true
-       (attribute boolean) by creating a temporary 
-       buildfile and calling back this buildfile from
-       there. -->
-	<macrodef name="internal_doiftrue">
-		<attribute name="boolean"/>
-		<attribute name="target"/>
-		<attribute name="buildfile"/>
-		<sequential>
-			<property name="tmpbuildfile.@{target}-@{boolean}-@{buildfile}.name" value=".tmpbuild-@{target}-@{boolean}.xml"/>
-			<property name="tmpbuildfile.@{target}-@{boolean}-@{buildfile}.content.pre" value="&lt;project name=&quot;tmp-build&quot; default=&quot;run&quot;&gt;&lt;target name=&quot;run&quot;&gt;"/>
-			<property name="tmpbuildfile.@{target}-@{boolean}-@{buildfile}.content.post" value="&lt;/target&gt;&lt;/project&gt;"/>
-			<condition property="tmpbuildfile.@{target}-@{boolean}-@{buildfile}.content" value="&lt;ant antfile=&quot;@{buildfile}&quot; target=&quot;@{target}&quot;/&gt;">
-				<istrue value="@{boolean}"/>
-			</condition>
-			<condition property="tmpbuildfile.@{target}-@{boolean}-@{buildfile}.content" value="">
-				<not><isset property="tmpbuildfile.@{target}-@{boolean}-@{buildfile}.content"/></not>
-			</condition>
-			<echo file="${tmpbuildfile.@{target}-@{boolean}-@{buildfile}.name}">${tmpbuildfile.@{target}-@{boolean}-@{buildfile}.content.pre}${tmpbuildfile.@{target}-@{boolean}-@{buildfile}.content}${tmpbuildfile.@{target}-@{boolean}-@{buildfile}.content.post}</echo>
-			<ant antfile="${tmpbuildfile.@{target}-@{boolean}-@{buildfile}.name}"/>
-			<delete file="${tmpbuildfile.@{target}-@{boolean}-@{buildfile}.name}"/>
-		</sequential>
-	</macrodef>
-
-
-	<!-- ############################################ -->
-
-	<!-- Delete all created files according to
-       properties clean.includes and clean.excludes -->
-	<target name="clean" depends="init">
-		<dolocaliftrue boolean="true" target="clean.pre"/>
-    <!-- could we scan project.dir recursively to
-         find .cvsignore files and delete all
-         files/dirs mentioned there?? -->
-    <delete includeEmptyDirs="true" verbose="true">
-			<fileset dir="${project.dir}" excludes="${clean.excludes}" includes="${clean.includes}"/>      
-    </delete>
-		<dolocaliftrue boolean="true" target="clean.post"/>
-  </target>
-
-	<!-- Compile all source files and copy all non-java
-       files from src.dir to bin.dir -->
-  <target name="compile" depends="init">
-  	<dolocaliftrue boolean="true" target="compile.pre"/>
-    <mkdir dir="${project.dir}/${bin.dir}"/>
-    <javac debug="${javac.debug}" encoding="UTF-8" source="${javac.source}" target="${javac.target}" destdir="${project.dir}/${bin.dir}" classpath="${project.path}">
-      <src path="${project.dir}/${src.dir}"/>
-    </javac>
-    <copy todir="${project.dir}/${bin.dir}">
-      <fileset dir="${project.dir}/${src.dir}" excludes="**/*.java"/>
-    </copy>
-  	<dolocaliftrue boolean="true" target="compile.post"/>
-  </target>
-
-	<!-- Create all available dist formats -->
-  <target name="dist" depends="dist.bin, dist.plugin.jar, dist.plugin">
-  </target>
-
-	<!-- Create the plugins jar file -->
-  <target name="dist.bin" depends="compile">
-  	<dolocaliftrue boolean="true" target="dist.bin.pre"/>
-    <mkdir dir="${project.dir}/${dist.dir}/" />
-    <delete file="${project.dir}/${dist.dir}/${project.name}" failonerror="false" />
-    <jar jarfile="${project.dir}/${dist.dir}/${project.jar}" index="true" duplicate="fail">
-      <fileset dir="${project.dir}/${bin.dir}">
-        <include name="**/*.*"/>
-      </fileset>
-    </jar>
-  	<dolocaliftrue boolean="true" target="dist.bin.post"/>
-  </target>
 	
-	<!-- Create the plugins jar containing all files needed to run it as an RCP Plugin -->
-  <target name="dist.plugin.jar" depends="dist.plugin">
-  	<dolocaliftrue boolean="true" target="dist.plugin.jar.pre"/>
-    <mkdir dir="${project.dir}/${dist.dir}/" />
-    <delete file="${project.dir}/${dist.dir}/${project.fileName}_${project.version}.jar" failonerror="false" />
-<!-- isn't this too complicated? why not simply take the subdir which has been created by the dist.plugin task? => reusing code
-    <jar jarfile="${project.dir}/${dist.dir}/${project.fileName}_${project.version}.jar" 
-    	duplicate="fail" manifest="${project.dir}/META-INF/MANIFEST.MF">
-    	<fileset dir="${project.dir}" includes="${bin.includes}"></fileset>
-    	<fileset dir="${project.dir}/${dist.dir}" includes="${project.jar}"></fileset>
-    </jar>
--->
-  	<jar jarfile="${project.dir}/${dist.dir}/${project.fileName}_${project.version}.jar" 
-  	  	duplicate="fail" manifest="${project.dir}/META-INF/MANIFEST.MF">
-  		<fileset dir="${project.dir}/${dist.dir}/${project.name}_${project.version}" includes="**/*" />
-  	</jar>
-  	<dolocaliftrue boolean="true" target="dist.plugin.jar.post"/>
-  </target>
-
-	<!-- Create a plugin distribution directory and archive -->
-  <target name="dist.plugin" depends="dist.bin">
-  	<dolocaliftrue boolean="true" target="dist.plugin.pre"/>
-    <mkdir dir="${project.dir}/${dist.dir}/${project.name}_${project.version}"/>
-    <copy todir="${project.dir}/${dist.dir}/${project.name}_${project.version}">
-      <fileset dir="${project.dir}/${dist.dir}" includes="${project.jar}"/>
-      <fileset dir="${project.dir}" includes="${bin.includes}"/>
-    </copy>
-<!-- We create JAR files now, because they can directly be put into an update-site. The tar.gz-files aren't necessary anymore and only slow down the build process.
-    <tar destfile="${project.dir}/${dist.dir}/${project.name}_${project.version}.tar.gz" compression="gzip">
-      <tarfileset dir="${project.dir}/${dist.dir}/${project.name}_${project.version}"
-        prefix="plugins/${project.name}_${project.version}"/>
-    </tar>
--->
-  	<dolocaliftrue boolean="true" target="dist.plugin.post"/>
-  </target>
-
-	<!-- deploy the plugin to the RCP(s) -->
-	<target name="deploy" depends="dist" description="Deploy this project to the RCP">
-		<dolocaliftrue boolean="true" target="deploy.pre"/>
-		<doiftrue boolean="${rcp.deploy.allplatforms.enable}" target="deploy.allplatforms"/>
-		<doiftrue boolean="${rcp.deploy.win32.enable}" target="deploy.win32"/>
-		<doiftrue boolean="${rcp.deploy.linux-gtk32.enable}" target="deploy.linux-gtk32"/>
-		<doiftrue boolean="${rcp.deploy.linux-gtk64.enable}" target="deploy.linux-gtk64"/>
-		<dolocaliftrue boolean="true" target="deploy.post"/>
-	</target>
-
-
 	<!-- = = = = = = = = = = = = = = = = =
 	    macrodef: doDeploy (used by all deploy.* targets)
 	    = = = = = = = = = = = = = = = = = -->
 	<macrodef name="doDeploy">
 		<attribute name="platform" />
 		<sequential>
-			<mkdir dir="${rcp.deploy.@{platform}.dir}/${rcp.deploy.subdir}/${project.name}_${project.version}"/>
-			<copy todir="${rcp.deploy.@{platform}.dir}/${rcp.deploy.subdir}/${project.name}_${project.version}">
-				<fileset dir="${project.dir}/${dist.dir}/${project.name}_${project.version}" includes="**/*"/>
+			<mkdir dir="${rcp.deploy.@{platform}.dir}/${rcp.deploy.subdir}"/>
+			<copy todir="${rcp.deploy.@{platform}.dir}/${rcp.deploy.subdir}">
+				<fileset dir="${project.dir}/${dist.dir}/plugins" includes="${internal.deploy.includes}"/>
 			</copy>
 		</sequential>
 	</macrodef>
-
-	<target name="deploy.allplatforms" depends="dist" description="Deploy this project to the RCP (all platforms)">
-		<doDeploy platform="allplatforms"/>
-	</target>
-
-	<target name="deploy.win32" depends="dist" description="Deploy this project to the RCP (win32)">
-		<doDeploy platform="win32"/>
-	</target>
-
-	<target name="deploy.linux-gtk32" depends="dist" description="Deploy this project to the RCP (linux-gtk32)">
-		<doDeploy platform="linux-gtk32"/>
-	</target>
-
-	<target name="deploy.linux-gtk64" depends="dist" description="Deploy this project to the RCP (linux-gtk64)">
-		<doDeploy platform="linux-gtk64"/>
-	</target>
-
+	
 </project>

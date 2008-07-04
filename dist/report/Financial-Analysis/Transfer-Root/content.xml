@@ -10,7 +10,7 @@
 	<report
 		file="TransferReport.rptdesign" 
 		id="TransferReport"
-		overwriteOnInit="false"
+		overwriteOnInit="true"
 	>
 		<name language="de">Transferbericht</name>
 		<name language="en">Transfer report</name>
@@ -24,11 +24,13 @@
 					<parameter id="2" name="initiatorIDs" type="string" x="610" y="154" />
 				</parameters>
 				<value-provider-configs>
-					<provider-config id="3" organisationID="dev.jfire.org" categoryID="JFireReportingTrade-ValueProviderCategory-Accounting" valueProviderID="AccountIDs" pageIndex="0" pageRow="1" pageColumn="0" allowNullOutputValue="false" showMessageInHeader="false" x="193" y="124" >
+					<provider-config id="3" organisationID="dev.jfire.org" categoryID="JFireReportingTrade-ValueProviderCategory-Accounting" valueProviderID="AccountIDs" pageIndex="0" pageRow="1" pageColumn="0" allowNullOutputValue="false" showMessageInHeader="true" x="193" y="124" >
 						<message language="en">Select a list of accounts</message>
+						<message language="de">Wählen Sie die Konten für den Bericht</message>
 					</provider-config>
-					<provider-config id="4" organisationID="dev.jfire.org" categoryID="JFireReporting-ValueProviderCategory-SimpleTypes" valueProviderID="org.nightlabs.util.TimePeriod" pageIndex="0" pageRow="0" pageColumn="0" allowNullOutputValue="true" showMessageInHeader="false" growVertically="false" x="82" y="29" >
+					<provider-config id="4" organisationID="dev.jfire.org" categoryID="JFireReporting-ValueProviderCategory-SimpleTypes" valueProviderID="org.nightlabs.util.TimePeriod" pageIndex="0" pageRow="0" pageColumn="0" allowNullOutputValue="true" showMessageInHeader="true" growVertically="false" x="82" y="29" >
 						<message language="en">Select a time period</message>
+						<message language="de">Wählen Sie einen Zeitraum für den Bericht</message>
 					</provider-config>
 				</value-provider-configs>
 				<value-consumer-bindings>

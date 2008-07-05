@@ -14,7 +14,9 @@ import javax.ejb.EJBException;
 import javax.ejb.SessionBean;
 import javax.ejb.SessionContext;
 import javax.jdo.FetchPlan;
+import javax.jdo.JDODetachedFieldAccessException;
 import javax.jdo.JDOHelper;
+import javax.jdo.JDOObjectNotFoundException;
 import javax.jdo.PersistenceManager;
 import javax.jdo.Query;
 
@@ -22,6 +24,7 @@ import org.apache.log4j.Logger;
 import org.jbpm.JbpmContext;
 import org.jbpm.graph.exe.ProcessInstance;
 import org.nightlabs.ModuleException;
+import org.nightlabs.jdo.FetchPlanBackup;
 import org.nightlabs.jdo.NLJDOHelper;
 import org.nightlabs.jdo.moduleregistry.ModuleMetaData;
 import org.nightlabs.jdo.query.AbstractJDOQuery;
@@ -41,8 +44,10 @@ import org.nightlabs.jfire.issue.id.IssuePriorityID;
 import org.nightlabs.jfire.issue.id.IssueResolutionID;
 import org.nightlabs.jfire.issue.id.IssueSeverityTypeID;
 import org.nightlabs.jfire.issue.id.IssueTypeID;
+import org.nightlabs.jfire.issue.jbpm.JbpmConstants;
 import org.nightlabs.jfire.jbpm.JbpmLookup;
 import org.nightlabs.jfire.jbpm.graph.def.State;
+import org.nightlabs.util.Util;
 
 /**
  * @author Chairat Kongarayawetchakun - chairat[AT]nightlabs[DOT]de
@@ -507,19 +512,54 @@ implements SessionBean
 	{
 		PersistenceManager pm = getPersistenceManager();
 		try {
-			boolean isNewIssue = !JDOHelper.isDetached(issue);
-			
 			pm.getFetchPlan().setMaxFetchDepth(maxFetchDepth);
 			if (fetchGroups != null)
 				pm.getFetchPlan().setGroups(fetchGroups);
 
+			pm.getExtent(Issue.class);
+			Issue oldPersistentIssue = null;
+			try {
+				IssueID issueID = (IssueID) JDOHelper.getObjectId(issue);
+				if (issueID != null)
+					oldPersistentIssue = (Issue) pm.getObjectById(issueID);
+			} catch (JDOObjectNotFoundException x) {
+				// silently ignore - oldPersistentIssue is null since it does not yet exist in the datastore
+			}
+
 			if (issue.getCreateTimestamp() != null) {
 				issue.setUpdateTimestamp(new Date());
 			}
-			
+
+			boolean doUnassign;
+			if (oldPersistentIssue == null)
+				doUnassign = false;
+			else {
+				try {
+					doUnassign = oldPersistentIssue.getAssignee() != null && issue.getAssignee() == null;
+				} catch (JDODetachedFieldAccessException x) {
+					doUnassign = false;
+				}
+			}
+
+			boolean doAssign;
+			try {
+				doAssign = issue.getAssignee() != null;
+				if (doAssign && oldPersistentIssue != null)
+					doAssign = !Util.equals(issue.getAssignee(), oldPersistentIssue.getAssignee());
+			} catch (JDODetachedFieldAccessException x) {
+				doAssign = false;
+			}
+
+			String jbpmTransitionName = null;
+			if (doAssign)
+				jbpmTransitionName = JbpmConstants.TRANSITION_NAME_ASSIGN;
+
+			if (doUnassign)
+				jbpmTransitionName = JbpmConstants.TRANSITION_NAME_UNASSIGN;
+
 			Issue pIssue = pm.makePersistent(issue);
 
-			if (isNewIssue) {
+			if (pIssue.getIssueLocal().getJbpmProcessInstanceId() < 0) {
 				IssueType type;
 
 				if (JFireBaseEAR.JPOX_WORKAROUND_FLUSH_ENABLED) {				
@@ -536,7 +576,21 @@ implements SessionBean
 
 				type.createProcessInstanceForIssue(pIssue);
 			}
-			
+
+			if (jbpmTransitionName != null) {
+				// performing a transition might cause the fetch-plan to be modified => backup + restore
+				FetchPlanBackup fetchPlanBackup = NLJDOHelper.backupFetchPlan(pm.getFetchPlan());
+				JbpmContext jbpmContext = JbpmLookup.getJbpmConfiguration().createJbpmContext();
+				try {
+					ProcessInstance processInstance = jbpmContext.getProcessInstanceForUpdate(issue.getIssueLocal().getJbpmProcessInstanceId());
+					if (processInstance.getRootToken().getNode().hasLeavingTransition(jbpmTransitionName))
+						processInstance.signal(jbpmTransitionName);
+				} finally {
+					jbpmContext.close();
+				}
+				NLJDOHelper.restoreFetchPlan(pm.getFetchPlan(), fetchPlanBackup);
+			}
+
 			if (!get)
 				return null;
 
@@ -699,8 +753,13 @@ implements SessionBean
 			
 			if (get) {
 				pm.getExtent(Issue.class);
-				pm.getFetchPlan().setGroups(fetchGroups);
+				if (fetchGroups != null)
+					pm.getFetchPlan().setGroups(fetchGroups);
+				else
+					pm.getFetchPlan().setGroup(FetchPlan.DEFAULT);
+
 				pm.getFetchPlan().setMaxFetchDepth(maxFetchDepth);
+				pm.getFetchPlan().setDetachmentOptions(FetchPlan.DETACH_LOAD_FIELDS | FetchPlan.DETACH_UNLOAD_FIELDS);
 				Issue issue = (Issue) pm.getObjectById(issueID);
 				return pm.detachCopy(issue);
 			}

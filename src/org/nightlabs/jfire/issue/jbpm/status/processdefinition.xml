@@ -8,7 +8,7 @@
 		<transition to="dev.jfire.org:open" name="open"></transition>
 		<transition to="dev.jfire.org:openedImplicitely" name="acknowledge"></transition>
 		<transition to="dev.jfire.org:openedImplicitely" name="confirm"></transition>
-		<transition to="dev.jfire.org:openedImplicitely" name="assign"></transition>
+		<transition to="dev.jfire.org:openedImplicitely" name="dev.jfire.org:assign"></transition>
 		<transition to="dev.jfire.org:openedImplicitely" name="resolve"></transition>
 		<transition to="dev.jfire.org:openedImplicitely" name="close"></transition>
 	</start-state>
@@ -17,7 +17,7 @@
 	<state name="dev.jfire.org:acknowledged">
 		<transition to="dev.jfire.org:confirmed" name="confirm"></transition>
 		<transition to="dev.jfire.org:rejected" name="reject"></transition>
-		<transition to="dev.jfire.org:confirmedImplicitely" name="assign"></transition>
+		<transition to="dev.jfire.org:confirmedImplicitely" name="dev.jfire.org:assign"></transition>
 		<transition to="dev.jfire.org:confirmedImplicitely" name="resolve"></transition>
 		<transition to="dev.jfire.org:confirmedImplicitely" name="close"></transition>
 	</state>
@@ -25,11 +25,12 @@
 	<state name="dev.jfire.org:assigned">
 		<transition to="dev.jfire.org:rejected" name="reject"></transition>
 		<transition to="dev.jfire.org:resolved" name="resolve"></transition>
-		<transition to="dev.jfire.org:resolvedImplicitely" name="close"></transition>		
+		<transition to="dev.jfire.org:resolvedImplicitely" name="close"></transition>
+		<transition to="dev.jfire.org:open" name="dev.jfire.org:unassign"></transition>		
 	</state>
 
 	<state name="dev.jfire.org:confirmed">
-		<transition to="dev.jfire.org:assigned" name="assign"></transition>
+		<transition to="dev.jfire.org:assigned" name="dev.jfire.org:assign"></transition>
 	</state>
 
 	<state name="dev.jfire.org:resolved">
@@ -49,7 +50,7 @@
 		</event>
 		<action class="org.nightlabs.jfire.jbpm.graph.def.TransitionPassThroughActionHandler"></action>
 		<transition to="dev.jfire.org:confirmed" name="confirm"></transition>
-		<transition to="dev.jfire.org:confirmedImplicitely" name="assign"></transition>
+		<transition to="dev.jfire.org:confirmedImplicitely" name="dev.jfire.org:assign"></transition>
 		<transition to="dev.jfire.org:confirmedImplicitely" name="resolve"></transition>
 		<transition to="dev.jfire.org:confirmedImplicitely" name="close"></transition>
 	</node>
@@ -59,7 +60,7 @@
 			<action class="org.nightlabs.jfire.jbpm.graph.def.TransitionPassThroughActionHandler"></action>
 		</event>
 		<action class="org.nightlabs.jfire.jbpm.graph.def.TransitionPassThroughActionHandler"></action>
-		<transition to="dev.jfire.org:assigned" name="assign"></transition>
+		<transition to="dev.jfire.org:assigned" name="dev.jfire.org:assign"></transition>
 		<transition to="dev.jfire.org:resolved" name="resolve"></transition>
 		<transition to="dev.jfire.org:resolvedImplicitely" name="close"></transition>
 	</node>
@@ -78,7 +79,7 @@
 
 	<state name="dev.jfire.org:open">
 		<transition to="dev.jfire.org:acknowledgedImplicitely" name="confirm"></transition>
-		<transition to="dev.jfire.org:acknowledgedImplicitely" name="assign"></transition>
+		<transition to="dev.jfire.org:acknowledgedImplicitely" name="dev.jfire.org:assign"></transition>
 		<transition to="dev.jfire.org:acknowledgedImplicitely" name="resolve"></transition>
 		<transition to="dev.jfire.org:acknowledgedImplicitely" name="close"></transition>
 		<transition to="dev.jfire.org:acknowledged" name="acknowledge"></transition>
@@ -92,7 +93,7 @@
 		<action class="org.nightlabs.jfire.jbpm.graph.def.TransitionPassThroughActionHandler"></action>
 		<transition to="dev.jfire.org:acknowledged" name="acknowledge"></transition>
 		<transition to="dev.jfire.org:acknowledgedImplicitely" name="confirm"></transition>
-		<transition to="dev.jfire.org:acknowledgedImplicitely" name="assign"></transition>
+		<transition to="dev.jfire.org:acknowledgedImplicitely" name="dev.jfire.org:assign"></transition>
 		<transition to="dev.jfire.org:acknowledgedImplicitely" name="resolve"></transition>
 		<transition to="dev.jfire.org:acknowledgedImplicitely" name="close"></transition>
 	</node>

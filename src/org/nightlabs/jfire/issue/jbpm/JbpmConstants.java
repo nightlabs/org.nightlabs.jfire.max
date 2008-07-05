@@ -13,11 +13,16 @@ import org.nightlabs.jfire.organisation.Organisation;
 
 /**
  * @author Alexander Bieber <!-- alex [AT] nightlabs [DOT] de -->
- *
  */
 public class JbpmConstants
 {
 	private JbpmConstants() { }
+
+	// TODO a this class should only hold constants for those nodes + transitions that are really required to be known
+	// by the system internally. I guess, at the moment, most of the nodes + transitions here are only used to define
+	// a name and a description. This should be done by some descriptor file - see https://www.jfire.org/modules/bugs/view.php?id=386
+	// As soon as issue 386 is resolved, we should remove here what's really needed in order to provide maximum flexibility when
+	// designing process definitions.
 
 	public static final String NODE_NAME_NEW = Organisation.DEV_ORGANISATION_ID + ":new";
 	public static final String NODE_NAME_OPEN = Organisation.DEV_ORGANISATION_ID + ":open";
@@ -32,15 +37,30 @@ public class JbpmConstants
 	public static final String NODE_NAME_REOPENED = Organisation.DEV_ORGANISATION_ID + ":reopened";
 	public static final String NODE_NAME_REJECTED = Organisation.DEV_ORGANISATION_ID + ":rejected";
 
-	public static final String TRANSITION_NAME_NEW = "new";
-	public static final String TRANSITION_NAME_OPEN = "open";
-	public static final String TRANSITION_NAME_ACKNOWLEDGE = "acknowledge";
-	public static final String TRANSITION_NAME_CONFIRM = "confirm";
-	public static final String TRANSITION_NAME_ASSIGN = "assign";
-	public static final String TRANSITION_NAME_RESOLVE = "resolve";
-	public static final String TRANSITION_NAME_CLOSE = "close";
-	public static final String TRANSITION_NAME_REOPEN = "reopen";
-	public static final String TRANSITION_NAME_REJECT = "reject";
+//	public static final String TRANSITION_NAME_NEW = "new";
+//	public static final String TRANSITION_NAME_OPEN = "open";
+//	public static final String TRANSITION_NAME_ACKNOWLEDGE = "acknowledge";
+//	public static final String TRANSITION_NAME_CONFIRM = "confirm";
+//	public static final String TRANSITION_NAME_ASSIGN = "assign";
+//	public static final String TRANSITION_NAME_RESOLVE = "resolve";
+//	public static final String TRANSITION_NAME_CLOSE = "close";
+//	public static final String TRANSITION_NAME_REOPEN = "reopen";
+//	public static final String TRANSITION_NAME_REJECT = "reject";
+
+	/**
+	 * This transition is used to automatically move to the state "assigned" when a user is assigned to
+	 * an issue. If this transition is not available at the time this un-assignment
+	 * is done, no transition will be automatically performed (and no exception will be thrown!).
+	 */
+	public static final String TRANSITION_NAME_ASSIGN = Organisation.DEV_ORGANISATION_ID + ":assign";
+
+	/**
+	 * This transition is used to automatically move to a non-assigned state (usually "open") when
+	 * the assignee of an issue is cleared. If this transition is not available at the time this un-assignment
+	 * is done, no transition will be automatically performed (and no exception will be thrown!).
+	 */
+	public static final String TRANSITION_NAME_UNASSIGN = Organisation.DEV_ORGANISATION_ID + ":unassign";
+
 	/**
 	 * Sets the State properties for the standard IssueTracking workflow.
 	 * @param processDefinition The {@link ProcessDefinition} to use.

@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<root-container name="dev.jfire.org:IssueType" width="1262" height="709">
+<root-container name="dev.jfire.org:IssueType" width="1219" height="1516">
   <node name="dev.jfire.org:new" x="48" y="-72" width="253" height="36">
     <edge>
       <label x="5" y="-10"/>
@@ -58,6 +58,11 @@
     </edge>
     <edge>
       <label x="5" y="-10"/>
+    </edge>
+    <edge>
+      <label x="0" y="-79"/>
+      <bendpoint w1="-311" h1="-166" w2="-312" h2="122"/>
+      <bendpoint w1="-311" h1="-288" w2="-312" h2="0"/>
     </edge>
   </node>
   <node name="dev.jfire.org:confirmed" x="48" y="216" width="253" height="36">
@@ -153,7 +158,6 @@
       <label x="5" y="-10"/>
     </edge>
   </node>
-  <node name="dev.jfire.org:rejected" x="-228" y="247" width="202" height="36"/>
   <node name="dev.jfire.org:openedImplicitely" x="684" y="-51" width="223" height="36">
     <edge>
       <label x="5" y="-10"/>
@@ -175,4 +179,5 @@
       <bendpoint w1="-57" h1="95" w2="246" h2="-76"/>
     </edge>
   </node>
+  <node name="dev.jfire.org:rejected" x="-228" y="247" width="202" height="36"/>
 </root-container>

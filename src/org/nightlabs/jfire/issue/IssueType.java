@@ -218,7 +218,11 @@ implements Serializable{
 	public void readProcessDefinition(URL jbpmProcessDefinitionURL) throws IOException {
 		org.jbpm.graph.def.ProcessDefinition jbpmProcessDefinition = ProcessDefinition.readProcessDefinition(jbpmProcessDefinitionURL);
 		ActionHandlerNodeEnter.register(jbpmProcessDefinition);
-		// TODO: This will fail if called more than once, need to add version ?
+		// Question: This will fail if called more than once, need to add version ?
+		// Answer: No this will not fail, because jBPM saves a new process definition with the same name under a different
+		// ID. When looking for a process definition, it always returns the latest one with the name. This way, it can
+		// finish started processes with the old version, while new processes use the new version of the process definition.
+		// Marco.
 		jbpmProcessDefinition.setName(getOrganisationID() + ":IssueType-" + getIssueTypeID());
 		this.processDefinition = ProcessDefinition.storeProcessDefinition(getPersistenceManager(), null, jbpmProcessDefinition, jbpmProcessDefinitionURL);
 		JbpmConstants.initStandardProcessDefinition(this.processDefinition);

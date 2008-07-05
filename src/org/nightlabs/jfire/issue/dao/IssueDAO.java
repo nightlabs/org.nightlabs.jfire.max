@@ -72,6 +72,8 @@ public class IssueDAO extends BaseJDOObjectDAO<IssueID, Issue>{
 		monitor.beginTask("Storing issue: "+ issue.getIssueID(), 3);
 		try {
 			IssueManager im = IssueManagerUtil.getHome(SecurityReflector.getInitialContextProperties()).create();
+			monitor.worked(1);
+
 			Issue result = im.storeIssue(issue, get, fetchGroups, maxFetchDepth);
 			if (result != null)
 				getCache().put(null, result, fetchGroups, maxFetchDepth);
@@ -81,7 +83,7 @@ public class IssueDAO extends BaseJDOObjectDAO<IssueID, Issue>{
 			return result;
 		} catch (Exception e) {
 			monitor.done();
-			throw new RuntimeException("Error while storing Issue!\n" ,e);
+			throw new RuntimeException(e);
 		}
 	}
 	
@@ -150,6 +152,29 @@ public class IssueDAO extends BaseJDOObjectDAO<IssueID, Issue>{
 			return getJDOObjects(null, issueIDs, fetchGroups, maxFetchDepth, monitor);			
 		} catch (Exception x) {
 			throw new RuntimeException(x);
+		}
+	}
+
+	public synchronized Issue signalIssue(IssueID issueID, String jbpmTransitionName, boolean get, String[] fetchGroups, int maxFetchDepth, ProgressMonitor monitor)
+	{
+		if(issueID == null)
+			throw new NullPointerException("issueID must not be null");
+
+		monitor.beginTask("Performing transition for issue "+ issueID, 3);
+		try {
+			IssueManager im = IssueManagerUtil.getHome(SecurityReflector.getInitialContextProperties()).create();
+			monitor.worked(1);
+			
+			Issue result = im.signalIssue(issueID, jbpmTransitionName, get, fetchGroups, maxFetchDepth);
+			if (result != null)
+				getCache().put(null, result, fetchGroups, maxFetchDepth);
+
+			monitor.worked(1);
+			monitor.done();
+			return result;
+		} catch (Exception e) {
+			monitor.done();
+			throw new RuntimeException(e);
 		}
 	}
 }

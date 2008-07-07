@@ -80,7 +80,6 @@ implements BarcodeDrawComponent
 		this.humanReadable = printHumanReadable;
 		this.widthScale = widthScale;
 		this.orientation = orientation;
-//		this.width = height;
 		this.height = height;
 		this.scriptRegistryItemID = scriptID;
 		this.scriptRegistryItemIDKeyStr = scriptRegistryItemID.toString();
@@ -201,7 +200,6 @@ implements BarcodeDrawComponent
 		
 		getBarcode().setDrawingText(isHumanReadable());
 		getBarcode().setResolution(getModelResolution());
-//		getBarcode().setResolution(300);
 						
 		double barWidth = getBarWidth(getWidthScale());
 		getBarcode().setBarWidth(barWidth);
@@ -239,18 +237,6 @@ implements BarcodeDrawComponent
 			logger.debug("this.getBounds() = "+this.getBounds());
 		}
 	}
-		
-//	/* (non-Javadoc)
-//	 * @see org.nightlabs.editor2d.impl.DrawComponentImpl#getBounds()
-//	 */
-//	@Override
-//	public Rectangle getBounds()
-//	{
-//		if (bounds == null) {
-//			bounds = getBarcode().getBounds();
-//		}
-//		return bounds;
-//	}
 
 	/* (non-Javadoc)
 	 * @see org.nightlabs.editor2d.impl.DrawComponentImpl#getBounds()
@@ -266,11 +252,39 @@ implements BarcodeDrawComponent
 		}
 		return bounds;
 	}
-	
-	/**
-	 * FIXME Check the use of this field and remove it if not used or indented to be used.
-	 */
-//	private static final IUnit mmUnit = new MMUnit();
+		
+//	protected double getBarWidth(WidthScale scale)
+//	{
+//		double width = 1;
+//		switch (scale)
+//		{
+//			case SCALE_1:
+//				width = 4d;
+//				break;
+//			case SCALE_2:
+//				width = 5;
+//				break;
+//			case SCALE_3:
+//				width = 3;
+//				break;
+//			case SCALE_4:
+//				width = 2;
+//				break;
+//			default:
+//				width = 5;
+//				break;
+//		}
+//		
+//		int resolution = getModelResolution();
+//		double factor = (resolution) / 300d;
+//		double scaledWidth = width * factor;
+//		if (logger.isDebugEnabled()) {
+//			logger.debug("width = " + width);
+//			logger.debug("ModelUnit Factor = "+factor);
+//			logger.debug("ScaledBarWidth = " + scaledWidth);
+//		}
+//		return scaledWidth;
+//	}
 	
 	protected double getBarWidth(WidthScale scale)
 	{
@@ -278,19 +292,19 @@ implements BarcodeDrawComponent
 		switch (scale)
 		{
 			case SCALE_1:
-				width = 4d;
+				width = 2d;
 				break;
 			case SCALE_2:
-				width = 5;
+				width = 3d;
 				break;
 			case SCALE_3:
-				width = 3;
+				width = 4d;
 				break;
 			case SCALE_4:
-				width = 2;
+				width = 5d;
 				break;
 			default:
-				width = 5;
+				width = 3d;
 				break;
 		}
 		
@@ -303,106 +317,7 @@ implements BarcodeDrawComponent
 			logger.debug("ScaledBarWidth = " + scaledWidth);
 		}
 		return scaledWidth;
-		
-//		return width;
-	}
-	
-//	protected double getBarWidth(WidthScale scale)
-//	{
-//		int barWidth = UnitUtil.getModelValue(DEFAULT_BAR_WIDTH, getRoot().getModelUnit(), mmUnit);
-//		return barWidth * getScaleFactor(scale);
-//	}
-//	private int getScaleFactor(WidthScale scale)
-//	{
-//		switch (scale)
-//		{
-////			case SCALE_1:
-////				return 1;
-////			case SCALE_2:
-////				return 2;
-////			case SCALE_3:
-////				return 3;
-////			case SCALE_4:
-////				return 4;
-//		case SCALE_1:
-//			return 4;
-//		case SCALE_2:
-//			return 5;
-//		case SCALE_3:
-//			return 3;
-//		case SCALE_4:
-//			return 2;
-//		default:
-//			return 3;
-//		}
-//	}
-	
-//	protected double getBarWidth(WidthScale scale)
-//	{
-////		double widthInMM = 70;
-////		switch (scale)
-////		{
-////			case SCALE_1:
-////				widthInMM = 56;
-////				break;
-////			case SCALE_2:
-////				widthInMM = 70;
-////				break;
-////			case SCALE_3:
-////				widthInMM = 42;
-////				break;
-////			case SCALE_4:
-////				widthInMM = 28;
-////				break;
-////			default:
-////				widthInMM = 70;
-////				break;
-////		}
-//		double widthInMM = 0.70;
-//		switch (scale)
-//		{
-//			case SCALE_1:
-//				widthInMM = 0.56;
-//				break;
-//			case SCALE_2:
-//				widthInMM = 0.70;
-//				break;
-//			case SCALE_3:
-//				widthInMM = 0.42;
-//				break;
-//			case SCALE_4:
-//				widthInMM = 0.28;
-//				break;
-//			default:
-//				widthInMM = 0.70;
-//				break;
-//		}
-//
-//		double barWidth = UnitUtil.getModelValue(widthInMM, getRoot().getModelUnit(), mmUnit);
-//		if (logger.isDebugEnabled()) {
-//			logger.debug("widthInMM = " + widthInMM);
-//			logger.debug("ModelUnit Factor = "+getRoot().getModelUnit().getFactor());
-//			logger.debug("ScaledBarWidth = " + barWidth);
-//		}
-//		return barWidth;
-//	}
-
-//	protected double getBarWidth(WidthScale scale)
-//	{
-//		switch (scale)
-//		{
-//			case SCALE_1:
-//				return 4;
-//			case SCALE_2:
-//				return 5;
-//			case SCALE_3:
-//				return 3;
-//			case SCALE_4:
-//				return 2;
-//			default:
-//				return 3;
-//		}
-//	}
+	}	
 	
 	protected Font getScaledFont(Font f)
 	{
@@ -465,6 +380,7 @@ implements BarcodeDrawComponent
 	public Object getScriptValue() {
 		return scriptValue;
 	}
+	
 	public void setScriptValue(Object scriptValue) {
 		this.scriptValue = scriptValue;
 		if (scriptValue instanceof String) {

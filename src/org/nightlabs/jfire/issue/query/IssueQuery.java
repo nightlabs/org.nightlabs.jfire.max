@@ -119,27 +119,21 @@ public class IssueQuery
 	@Override
 	protected void prepareQuery(Query q) {
 		StringBuilder filter = new StringBuilder("true");
-//		StringBuffer stringNames = new StringBuffer();
 		
 		if (issueSubject != null) {
 			filter.append("\n && subject.names.containsValue(varSubject) && varSubject.toLowerCase().matches(:issueSubject) ");
-//			q.declareVariables(String.class.getName() + " varSubject");
 		}
 		
 		if (issueComment != null) {
 			filter.append("\n && comments.contains(varComment) && varComment.text.toLowerCase().matches(:issueComment) ");
-//			q.declareVariables(IssueComment.class.getName() + " varComment");
 		}
 		
 		if (issueSubjectNComment != null) {
 			filter.append("\n && (subject.names.containsValue(varSubject) && varSubject.toLowerCase().matches(:issueSubjectNComment))  ");
 			filter.append("\n && (comments.contains(varComment) && varComment.text.toLowerCase().matches(:issueSubjectNComment)) ");
-//			q.declareVariables(IssueComment.class.getName() + " varComment");
-//			q.declareVariables(String.class.getName() + " varSubject");
 		}
 
 		if (issueTypeID != null) {
-//			filter.append("JDOHelper.getObjectId(this.issueType) == :issueTypeID && ");
 			filter.append("\n && issueType.organisationID == :issueTypeID.organisationID ");
 			filter.append("\n && issueType.issueTypeID == :issueTypeID.issueTypeID ");
 		}

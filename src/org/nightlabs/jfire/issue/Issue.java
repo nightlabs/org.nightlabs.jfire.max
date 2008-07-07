@@ -364,6 +364,11 @@ implements 	Serializable, AttachCallback, Statable, DeleteCallback
 		return issueID;
 	}
 
+	public String getIssueIDAsString()
+	{
+		return ObjectIDUtil.longObjectIDFieldToString(issueID);
+	}
+	
 	/**
 	 * @return Returns the issueType.
 	 */

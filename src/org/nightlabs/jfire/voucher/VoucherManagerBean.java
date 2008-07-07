@@ -1000,9 +1000,23 @@ implements SessionBean
 
 				SegmentType segmentType = SegmentType.getDefaultSegmentType(pm);
 				Segment segment = trader.createSegment(order, segmentType);
-				SegmentID segmentID = (SegmentID) JDOHelper.getObjectId(segment);
-				Collection<? extends Article> articles = createArticles(pm, segmentID, null,
-						previewParameterSet.getVoucherTypeID(), 1);
+				Offer offer = trader.createOffer(user, order, null);
+
+				// find / create Products
+				VoucherType voucherType = (VoucherType) pm.getObjectById(previewParameterSet.getVoucherTypeID());
+				NestedProductTypeLocal pseudoNestedPT = new NestedProductTypeLocal(null, voucherType.getProductTypeLocal(), 1);
+
+				Collection<? extends Product> products = store.findProducts(
+						user,
+						voucherType,
+						pseudoNestedPT,
+						null
+				);
+
+				Collection<? extends Article> articles = trader.createArticles(
+						user, offer, segment, products,
+						new ArticleCreator(null), true, true
+				);
 
 				Article article = articles.iterator().next();
 				Voucher voucher = (Voucher) article.getProduct();

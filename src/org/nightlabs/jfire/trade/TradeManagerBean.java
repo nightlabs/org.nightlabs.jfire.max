@@ -1263,7 +1263,7 @@ implements SessionBean
 
 			// version is {major}.{minor}.{release}.{patchlevel}.{suffix}
 			moduleMetaData = new ModuleMetaData(
-					JFireTradeEAR.MODULE_NAME, "0.9.4.0.beta", "0.9.4.0.beta");
+					JFireTradeEAR.MODULE_NAME, "0.9.5.0.beta", "0.9.5.0.beta");
 			pm.makePersistent(moduleMetaData);
 
 			ConfigSetup configSetup = ConfigSetup.getConfigSetup(

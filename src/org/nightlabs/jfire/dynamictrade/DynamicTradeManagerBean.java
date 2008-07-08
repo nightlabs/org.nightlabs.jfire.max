@@ -124,7 +124,7 @@ implements SessionBean
 				return;
 
 			pm.makePersistent(new ModuleMetaData(
-					JFireDynamicTradeEAR.MODULE_NAME, "0.9.4.0.0.beta", "0.9.4.0.0.beta")
+					JFireDynamicTradeEAR.MODULE_NAME, "0.9.5.0.0.beta", "0.9.5.0.0.beta")
 			);
 
 			// initialise meta-data

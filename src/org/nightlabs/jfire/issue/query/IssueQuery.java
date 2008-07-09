@@ -191,6 +191,11 @@ public class IssueQuery
 			filter.append("\n && this.updateTimestamp >= :updateTimestamp ");
 		}
 		
+		if (issueLinkTypeID != null) {
+			filter.append("\n && this.issueLinkType.organisationID == :issueLinkTypeID.organisationID ");
+			filter.append("\n && this.issueLinkType.issueLinkTypeID == :issueLinkTypeID.issueLinkTypeID ");
+		}
+		
 		// FIXME: chairat please rewrite this part as soon as you have refactored the linkage of objects to Issues. (marius)
 		if (issueLinks != null && !issueLinks.isEmpty())
 		{

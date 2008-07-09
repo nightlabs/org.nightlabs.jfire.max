@@ -12,6 +12,7 @@ import org.nightlabs.jdo.query.AbstractJDOQuery;
 import org.nightlabs.jdo.query.AbstractSearchQuery;
 import org.nightlabs.jfire.issue.Issue;
 import org.nightlabs.jfire.issue.IssueLink;
+import org.nightlabs.jfire.issue.id.IssueLinkTypeID;
 import org.nightlabs.jfire.issue.id.IssuePriorityID;
 import org.nightlabs.jfire.issue.id.IssueResolutionID;
 import org.nightlabs.jfire.issue.id.IssueSeverityTypeID;
@@ -41,22 +42,31 @@ public class IssueQuery
 	private UserID assigneeID;
 	private Date createTimestamp;
 	private Date updateTimestamp;
+	private IssueLinkTypeID issueLinkTypeID;
 	private Set<IssueLink> issueLinks;
 	
 	// Property IDs used for the PropertyChangeListeners
 	private static final String PROPERTY_PREFIX = "IssueQuery.";
+	
+	public static final String PROPERTY_REPORTER_ID = PROPERTY_PREFIX + "reporterID";
 	public static final String PROPERTY_ASSIGNEE_ID = PROPERTY_PREFIX + "assigneeID";
+
 	public static final String PROPERTY_CREATE_TIMESTAMP = PROPERTY_PREFIX + "createTimestamp";
-	public static final String PROPERTY_ISSUE_COMMENT = PROPERTY_PREFIX + "issueComment";
+	public static final String PROPERTY_UPDATE_TIMESTAMP = PROPERTY_PREFIX + "updateTimestamp";
+	
+	public static final String PROPERTY_ISSUE_TYPE_ID = PROPERTY_PREFIX + "issueTypeID";
 	public static final String PROPERTY_ISSUE_PRIORITY_ID = PROPERTY_PREFIX + "issuePriorityID";
 	public static final String PROPERTY_ISSUE_RESOLUTION_ID = PROPERTY_PREFIX + "issueResolutionID";
 	public static final String PROPERTY_ISSUE_SEVERITY_TYPE_ID = PROPERTY_PREFIX + "issueSeverityTypeID";
+
 	public static final String PROPERTY_ISSUE_SUBJECT = PROPERTY_PREFIX + "issueSubject";
 	public static final String PROPERTY_ISSUE_SUBJECT_AND_COMMENT = PROPERTY_PREFIX + "issueSubjectNComment";
-	public static final String PROPERTY_ISSUE_TYPE_ID = PROPERTY_PREFIX + "issueTypeID";
+	public static final String PROPERTY_ISSUE_COMMENT = PROPERTY_PREFIX + "issueComment";
+	
+	public static final String PROPERTY_ISSUE_LINK_TYPE_ID = PROPERTY_PREFIX + "issueLinkTypeID";
 	public static final String PROPERTY_ISSUE_LINKS = PROPERTY_PREFIX + "issueLinks";
-	public static final String PROPERTY_REPORTER_ID = PROPERTY_PREFIX + "reporterID";
-	public static final String PROPERTY_UPDATE_TIMESTAMP = PROPERTY_PREFIX + "updateTimestamp";
+	
+	
 	
 	@Override
 	public List<FieldChangeCarrier> getChangedFields(String propertyName)
@@ -64,6 +74,10 @@ public class IssueQuery
 		final List<FieldChangeCarrier> changedFields = super.getChangedFields(propertyName);
 		final boolean allFields = AbstractSearchQuery.PROPERTY_WHOLE_QUERY.equals(propertyName);
 		
+		if (allFields || PROPERTY_REPORTER_ID.equals(propertyName))
+		{
+			changedFields.add( new FieldChangeCarrier(PROPERTY_REPORTER_ID, reporterID) );
+		}
 		if (allFields || PROPERTY_ASSIGNEE_ID.equals(propertyName))
 		{
 			changedFields.add( new FieldChangeCarrier(PROPERTY_ASSIGNEE_ID, assigneeID) );
@@ -72,13 +86,17 @@ public class IssueQuery
 		{
 			changedFields.add( new FieldChangeCarrier(PROPERTY_CREATE_TIMESTAMP, createTimestamp) );
 		}
-		if (allFields || PROPERTY_ISSUE_COMMENT.equals(propertyName))
+		if (allFields || PROPERTY_UPDATE_TIMESTAMP.equals(propertyName))
 		{
-			changedFields.add( new FieldChangeCarrier(PROPERTY_ISSUE_COMMENT, removeRegexpSearch(issueComment)) );
+			changedFields.add( new FieldChangeCarrier(PROPERTY_UPDATE_TIMESTAMP, updateTimestamp) );
 		}
 		if (allFields || PROPERTY_ISSUE_LINKS.equals(propertyName))
 		{
 			changedFields.add( new FieldChangeCarrier(PROPERTY_ISSUE_LINKS, issueLinks) );
+		}
+		if (allFields || PROPERTY_ISSUE_TYPE_ID.equals(propertyName))
+		{
+			changedFields.add( new FieldChangeCarrier(PROPERTY_ISSUE_TYPE_ID, issueTypeID) );
 		}
 		if (allFields || PROPERTY_ISSUE_PRIORITY_ID.equals(propertyName))
 		{
@@ -96,21 +114,13 @@ public class IssueQuery
 		{
 			changedFields.add( new FieldChangeCarrier(PROPERTY_ISSUE_SUBJECT, removeRegexpSearch(issueSubject)) );
 		}
+		if (allFields || PROPERTY_ISSUE_COMMENT.equals(propertyName))
+		{
+			changedFields.add( new FieldChangeCarrier(PROPERTY_ISSUE_COMMENT, removeRegexpSearch(issueComment)) );
+		}
 		if (allFields || PROPERTY_ISSUE_SUBJECT_AND_COMMENT.equals(propertyName))
 		{
 			changedFields.add( new FieldChangeCarrier(PROPERTY_ISSUE_SUBJECT_AND_COMMENT, removeRegexpSearch(issueSubjectNComment)) );
-		}
-		if (allFields || PROPERTY_ISSUE_TYPE_ID.equals(propertyName))
-		{
-			changedFields.add( new FieldChangeCarrier(PROPERTY_ISSUE_TYPE_ID, issueTypeID) );
-		}
-		if (allFields || PROPERTY_REPORTER_ID.equals(propertyName))
-		{
-			changedFields.add( new FieldChangeCarrier(PROPERTY_REPORTER_ID, reporterID) );
-		}
-		if (allFields || PROPERTY_UPDATE_TIMESTAMP.equals(propertyName))
-		{
-			changedFields.add( new FieldChangeCarrier(PROPERTY_UPDATE_TIMESTAMP, updateTimestamp) );
 		}
 		
 		return changedFields;
@@ -367,7 +377,6 @@ public class IssueQuery
 		this.createTimestamp = createTimestamp;
 		notifyListeners(PROPERTY_CREATE_TIMESTAMP, oldCreateTimestamp, createTimestamp);
 	}
-	
 	public Date getUpdateTimestamp() {
 		return updateTimestamp;
 	}
@@ -377,6 +386,17 @@ public class IssueQuery
 		final Date oldUpdateTimestamp = this.updateTimestamp; 
 		this.updateTimestamp = updateTimestamp;
 		notifyListeners(PROPERTY_UPDATE_TIMESTAMP, oldUpdateTimestamp, updateTimestamp);
+	}
+	
+	public IssueLinkTypeID getIssueLinkTypeID() {
+		return issueLinkTypeID;
+	}
+
+	public void setIssueLinkTypeID(IssueLinkTypeID issueLinkTypeID)
+	{
+		final IssueLinkTypeID oldIssueLinkTypeID = this.issueLinkTypeID;
+		this.issueLinkTypeID = issueLinkTypeID;
+		notifyListeners(PROPERTY_ISSUE_LINK_TYPE_ID, oldIssueLinkTypeID, issueLinkTypeID);
 	}
 	
 	public void setIssueLinks(Set<IssueLink> issueLinks)

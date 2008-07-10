@@ -10,6 +10,8 @@ import org.nightlabs.jdo.ObjectIDUtil;
 import org.nightlabs.jdo.query.AbstractJDOQuery;
 import org.nightlabs.jdo.query.AbstractSearchQuery;
 import org.nightlabs.jfire.security.id.UserID;
+import org.nightlabs.jfire.store.id.ProductID;
+import org.nightlabs.jfire.trade.Article;
 import org.nightlabs.jfire.trade.ArticleContainer;
 import org.nightlabs.jfire.transfer.id.AnchorID;
 
@@ -39,11 +41,13 @@ public abstract class AbstractArticleContainerQuery
 	public static final String PROPERTY_CUSTOMER_NAME = PROPERTY_PREFIX + "customerName";
 	public static final String PROPERTY_VENDOR_ID = PROPERTY_PREFIX + "vendorID";
 	public static final String PROPERTY_VENDOR_NAME = PROPERTY_PREFIX + "vendorName";
+	public static final String PROPERTY_PRODUCT_ID = PROPERTY_PREFIX + "productID";
 	
 	@Override
 	protected void prepareQuery(Query q)
 	{
-		StringBuffer filter = new StringBuffer();
+		StringBuffer filter = getFilter();
+		StringBuffer vars = getVars();
 		
 		filter.append("true");
 		
@@ -64,7 +68,7 @@ public abstract class AbstractArticleContainerQuery
 
 		if (createDTMax != null)
 			filter.append("\n && this.createDT <= :createDTMax");
-		
+				
 		if (createUserID != null)
 		{
 			// FIXME: JPOX Bug JDOHelper.getObjectId(this.*) does not seem to work (java.lang.IndexOutOfBoundsException: Index: 3, Size: 3)
@@ -78,6 +82,7 @@ public abstract class AbstractArticleContainerQuery
 	  // own to method to allow override for Offer where it is different
 		checkVendor(filter);
 		checkCustomer(filter);
+		checkProductID(filter, vars, getArticleContainerArticlesMemberName());
 		
 		// append filter for the additional fields of the implementing class.
 		checkAdditionalFields(filter);
@@ -158,6 +163,20 @@ public abstract class AbstractArticleContainerQuery
 			")");
 		}
 	}
+	
+	protected void checkProductID(StringBuffer filter, StringBuffer vars, String member) 
+	{
+		if (productID != null) {
+			if (vars.length() > 0)
+				vars.append("; ");
+			String varName = member+"Var";
+			vars.append(Article.class.getName()+" "+varName);
+			filter.append(" && \n (" +
+					"  this."+member+".contains("+varName+")" + 
+					"  && JDOHelper.getObjectID("+varName+".product).equals("+productID+"))" +
+					" )");
+		}
+	}	
 	
 	private String creatorName = null;
 	/**
@@ -314,6 +333,24 @@ public abstract class AbstractArticleContainerQuery
 		notifyListeners(PROPERTY_CUSTOMER_ID, oldCustomerID, customerID);
 	}
 	
+	private ProductID productID = null;
+	
+	/**
+	 * Returns the productID.
+	 * @return the productID
+	 */
+	public ProductID getProductID() {
+		return productID;
+	}
+
+	/**
+	 * Sets the productID.
+	 * @param productID the productID to set
+	 */
+	public void setProductID(ProductID productID) {
+		this.productID = productID;
+	}
+
 	/**
 	 * returns the name of the articleContainerID member
 	 * 
@@ -330,6 +367,18 @@ public abstract class AbstractArticleContainerQuery
 	 */
 	public abstract String getArticleContainerIDPrefixMemberName();
 
+	/**
+	 * Returns the default member name of the Collection of Articles
+	 * returned by {@link ArticleContainer#getArticles()} of the 
+	 * ArticleContainer implementation.
+	 * 
+	 * @return the default member name of the Collection of Articles
+	 * returned by {@link ArticleContainer#getArticles()} of the 
+	 * ArticleContainer implementation 
+	 */
+	public String getArticleContainerArticlesMemberName() {
+		return "articles";
+	}
 	
 	@Override
 	public List<FieldChangeCarrier> getChangedFields(String propertyName)
@@ -381,6 +430,10 @@ public abstract class AbstractArticleContainerQuery
 		{
 			changedFields.add(new FieldChangeCarrier(PROPERTY_VENDOR_NAME, vendorName));
 		}
+		if (allFields || PROPERTY_PRODUCT_ID.equals(propertyName))
+		{
+			changedFields.add(new FieldChangeCarrier(PROPERTY_PRODUCT_ID, productID));
+		}		
 		return changedFields;
 	}
 }

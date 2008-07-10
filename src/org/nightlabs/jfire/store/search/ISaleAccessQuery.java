@@ -3,7 +3,11 @@
  */
 package org.nightlabs.jfire.store.search;
 
+import org.nightlabs.jfire.store.ProductType;
+
 /**
+ * Interface for Queries which can query the common sale access states of {@link ProductType}s,
+ * like confirmed, published, salebale and closed.  
  * @author Daniel Mazurek - daniel [at] nightlabs [dot] de
  *
  */

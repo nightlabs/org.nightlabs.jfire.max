@@ -64,6 +64,20 @@ implements Serializable
 	public static final String FETCH_GROUP_PRODUCT_TYPE = "Product.productType";
 
 	/**
+	 * This class defines constants for the field names to avoid the use 
+	 * of "hardcoded" Strings for field names.  
+	 * In the future the JFire project will probably autogenerate this class,
+	 * but until then you should implement it manually.
+	 */
+	public static final class FieldName
+	{
+		public static final String organisationID = "organisationID";
+		public static final String productID = "productID";
+		public static final String productLocal = "productLocal";
+		public static final String productType = "productType";
+	};
+	
+	/**
 	 * @jdo.field primary-key="true"
 	 * @jdo.column length="100"
 	 */

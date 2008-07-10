@@ -19,7 +19,6 @@ import org.nightlabs.jfire.transfer.id.AnchorID;
  * @author Marius Heinzmann - marius[at]nightlabs[dot]com
  */
 public abstract class AbstractProductTypeQuery
-//extends AbstractJDOQuery
 extends VendorDependentQuery
 implements ISaleAccessQuery
 {
@@ -92,16 +91,16 @@ implements ISaleAccessQuery
 		
 		if (published != null)
 			filter.append("\n && this."+FieldName.published+" == :published");
-		
+
 		if (confirmed != null)
 			filter.append("\n && this."+FieldName.confirmed+" == :confirmed");
-		
+
 		if (saleable != null)
 			filter.append("\n && this."+FieldName.saleable+" == :saleable");
 
 		if (closed != null)
 			filter.append("\n && this."+FieldName.closed+" == :closed");
-				
+
 		if (minNestedProductTypeAmount >= 0)
 			filter.append("\n && :minNestedProductTypeAmount < this."+FieldName.productTypeLocal+"."+
 					org.nightlabs.jfire.store.ProductTypeLocal.FieldName.nestedProductTypeLocals+".size()");
@@ -109,11 +108,11 @@ implements ISaleAccessQuery
 		if (maxNestedProductTypeAmount >= 0)
 			filter.append("\n && :maxNestedProductTypeAmount > this."+FieldName.productTypeLocal+"."+
 					org.nightlabs.jfire.store.ProductTypeLocal.FieldName.nestedProductTypeLocals+".size()");
-						
+
 		if (ownerID != null) {
 			filter.append("\n && JDOHelper.getObjectId(this."+FieldName.owner+") == :ownerID");
 		}
-		
+
 //		if (innerPriceConfigID != null) {
 //			filter.append("\n && JDOHelper.getObjectId(this.innerPriceConfig) == :innerPriceConfigID");
 //		}
@@ -129,20 +128,20 @@ implements ISaleAccessQuery
 		if (productTypeGroupID != null) {
 			filter.append("\n && JDOHelper.getObjectId(this."+FieldName.managedProductTypeGroup+") == :productTypeGroupID");
 		}
-		
+
 		if (organisationID != null)
 			filter.append("\n && this."+FieldName.organisationID+" == :organisationID");
-		
+
 		if (inheritanceNature != null)
 			filter.append("\n && this."+FieldName.inheritanceNature+" == :inheritanceNature");
-		
+
 		if (logger.isDebugEnabled()) {
 			logger.debug("Vars:");
 			logger.debug(vars.toString());
 			logger.debug("Filter:");
 			logger.debug(filter.toString());			
 		}
-		
+
 		q.setFilter(filter.toString());
 		q.declareVariables(vars.toString());
 	}

@@ -10,11 +10,15 @@ import javax.jdo.Query;
 import org.apache.log4j.Logger;
 import org.nightlabs.jdo.query.AbstractSearchQuery;
 import org.nightlabs.jfire.store.ProductType;
+import org.nightlabs.jfire.store.ProductTypeGroup;
 import org.nightlabs.jfire.store.ProductType.FieldName;
 
 /**
+ * Abstract base class for queries which searches for {@link ProductTypeGroup}s. 
+ * Every field that's <code>null</code> is ignored,
+ * every field containing a value will cause the query to filter all non-matching instances.
+ *  
  * @author Daniel Mazurek - daniel [at] nightlabs [dot] de
- *
  */
 public abstract class AbstractProductTypeGroupQuery 
 extends VendorDependentQuery

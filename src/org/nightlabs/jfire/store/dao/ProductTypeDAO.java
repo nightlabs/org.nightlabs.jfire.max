@@ -107,15 +107,14 @@ extends BaseJDOObjectDAO<ProductTypeID, ProductType>
 	int maxFetchDepth, ProgressMonitor progressMonitor)
 	throws Exception
 	{
-		progressMonitor.beginTask("Loading ProductTypes", 2); //$NON-NLS-1$
-		progressMonitor.worked(1);
-
+		progressMonitor.beginTask("Loading ProductTypes", 200);
 		StoreManager sm = storeManager;
 		if (sm == null)
 			sm = StoreManagerUtil.getHome(SecurityReflector.getInitialContextProperties()).create();
 
+		progressMonitor.worked(100);
 		Collection<ProductType> productTypes = sm.getProductTypes(objectIDs, fetchGroups, maxFetchDepth);
-		progressMonitor.worked(2);
+		progressMonitor.worked(100);
 		return productTypes;
 	}
 

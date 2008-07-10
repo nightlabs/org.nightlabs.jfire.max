@@ -100,12 +100,14 @@ import org.nightlabs.jfire.store.deliver.id.DeliveryQueueID;
 import org.nightlabs.jfire.store.deliver.id.ModeOfDeliveryFlavourID;
 import org.nightlabs.jfire.store.id.DeliveryNoteID;
 import org.nightlabs.jfire.store.id.DeliveryNoteLocalID;
+import org.nightlabs.jfire.store.id.ProductID;
 import org.nightlabs.jfire.store.id.ProductTypeGroupID;
 import org.nightlabs.jfire.store.id.ProductTypeID;
 import org.nightlabs.jfire.store.id.RepositoryTypeID;
 import org.nightlabs.jfire.store.id.UnitID;
 import org.nightlabs.jfire.store.query.ProductTransferIDQuery;
 import org.nightlabs.jfire.store.query.ProductTransferQuery;
+import org.nightlabs.jfire.store.search.AbstractProductQuery;
 import org.nightlabs.jfire.store.search.AbstractProductTypeGroupQuery;
 import org.nightlabs.jfire.store.search.AbstractProductTypeQuery;
 import org.nightlabs.jfire.trade.Article;
@@ -597,6 +599,20 @@ implements SessionBean
 //		}
 //	}
 
+	/**
+	 * @ejb.interface-method
+	 * @ejb.permission role-name="_Guest_"
+	 * @!ejb.transaction type="Supports" @!This usually means that no transaction is opened which is significantly faster and recommended for all read-only EJB methods! Marco.
+	 */	
+	public List<Product> getProducts(Set<ProductID> productIDs, String[] fetchGroups, int maxFetchDepth) {
+		PersistenceManager pm = getPersistenceManager();
+		try {
+			return NLJDOHelper.getDetachedObjectList(pm, productIDs, Product.class, fetchGroups, maxFetchDepth);
+		} finally {
+			pm.close();
+		}
+	}
+	
 	/**
 	 * @ejb.interface-method
 	 * @ejb.permission role-name="org.nightlabs.jfire.trade.seeProductType"
@@ -1710,6 +1726,45 @@ implements SessionBean
 		} finally {
 			pm.close();
 		}
+	}
+
+	/**
+	 * @ejb.interface-method
+	 * @ejb.permission role-name="_Guest_"
+	 * @!ejb.transaction type="Supports" @!This usually means that no transaction is opened which is significantly faster and recommended for all read-only EJB methods! Marco.
+	 */	
+	public Set<ProductID> getProductIDs(QueryCollection<? extends AbstractProductQuery> productQueries)
+	{
+		if (productQueries == null)
+			return null;
+
+		if (!Product.class.isAssignableFrom(productQueries.getResultClass())) {
+			throw new RuntimeException("Given QueryCollection has invalid return type! " +
+					"Invalid return type= "+ productQueries.getResultClassName());			
+		}
+
+		PersistenceManager pm = getPersistenceManager();
+		try {
+			pm.getFetchPlan().setMaxFetchDepth(1);
+			pm.getFetchPlan().setGroup(FetchPlan.DEFAULT);
+
+			if (!(productQueries instanceof JDOQueryCollectionDecorator)){
+				productQueries = new JDOQueryCollectionDecorator<AbstractProductQuery>(productQueries);
+			}
+			JDOQueryCollectionDecorator<AbstractProductQuery> queries =
+				(JDOQueryCollectionDecorator<AbstractProductQuery>) productQueries;
+
+			queries.setPersistenceManager(pm);
+
+			Collection<Product> products = (Collection<Product>) queries.executeQueries();
+
+// TODO: Implement Authority checking here - only the role is missing - the rest is just the following line. marco.
+//			products = Authority.filterSecuredObjects(pm, products, getPrincipal(), roleID);
+
+			return NLJDOHelper.getObjectIDSet(products);
+		} finally {
+			pm.close();
+		}		
 	}
 
 	/**

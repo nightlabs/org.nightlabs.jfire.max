@@ -69,7 +69,7 @@ extends BaseJDOObjectDAO<IssueLinkTypeID, IssueLinkType>
 	{
 		try {
 			issueManager = IssueManagerUtil.getHome(SecurityReflector.getInitialContextProperties()).create();
-			Set<IssueLinkTypeID> issueLinkTypeIDs = issueManager.getIssueLinkTypeIDs(null);
+			Set<IssueLinkTypeID> issueLinkTypeIDs = issueManager.getIssueLinkTypeIDs();
 			return getJDOObjects(null, issueLinkTypeIDs, fetchGroups, maxFetchDepth, monitor);
 		} catch (Exception e) {
 			throw new RuntimeException(e);

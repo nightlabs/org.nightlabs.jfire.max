@@ -4,10 +4,12 @@ import java.util.Date;
 import java.util.List;
 import java.util.Set;
 
+import javax.jdo.JDOHelper;
 import javax.jdo.Query;
 
 import org.apache.log4j.Logger;
 import org.nightlabs.jdo.ObjectID;
+import org.nightlabs.jdo.ObjectIDUtil;
 import org.nightlabs.jdo.query.AbstractJDOQuery;
 import org.nightlabs.jdo.query.AbstractSearchQuery;
 import org.nightlabs.jfire.issue.Issue;
@@ -192,25 +194,25 @@ public class IssueQuery
 		}
 		
 		if (issueLinkTypeID != null) {
-			filter.append("\n && this.issueLinkType.organisationID == :issueLinkTypeID.organisationID ");
-			filter.append("\n && this.issueLinkType.issueLinkTypeID == :issueLinkTypeID.issueLinkTypeID ");
+			filter.append("\n && (this.issueLinks.contains(varIssueLinkType) && (varIssueLinkType.issueLinkType.organisationID == :issueLinkTypeID.organisationID))");
+			filter.append("\n && (this.issueLinks.contains(varIssueLinkType) && (varIssueLinkType.issueLinkType.issueLinkTypeID == :issueLinkTypeID.issueLinkTypeID))");
 		}
 		
 		// FIXME: chairat please rewrite this part as soon as you have refactored the linkage of objects to Issues. (marius)
-		if (issueLinks != null && !issueLinks.isEmpty())
-		{
-			filter.append("\n && ( ");
-			filter.append("\n \t this.issueLinks.contains(varIssueLink) && \n \t (");
-			for (IssueLink issueLink : issueLinks)
-			{
-				ObjectID linkedObjectID = issueLink.getLinkedObjectID();
-				filter.append("\n \t \t varIssueLink.linkedObjectID.matches(" + linkedObjectID + ") ||");
-			}
-			filter.delete(filter.length() - 2, filter.length());
-			filter.append("\n \t )");
-			filter.append("\n && )");
-		}
-		
+//		if (issueLinks != null && !issueLinks.isEmpty())
+//		{
+//			filter.append("\n && ( ");
+//			filter.append("\n \t this.issueLinks.contains(varIssueLink) && \n \t (");
+//			for (IssueLink issueLink : issueLinks)
+//			{
+//				ObjectID linkedObjectID = issueLink.getLinkedObjectID();
+//				filter.append("\n \t \t varIssueLink.linkedObjectID.matches(" + linkedObjectID + ") ||");
+//			}
+//			filter.delete(filter.length() - 2, filter.length());
+//			filter.append("\n \t )");
+//			filter.append("\n && )");
+//		}
+//		
 //		if (issueLinks != null && !issueLinks.isEmpty())
 //		{
 //			filter.append("\n && ( ");

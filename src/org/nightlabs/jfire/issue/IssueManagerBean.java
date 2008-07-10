@@ -478,6 +478,9 @@ implements SessionBean
 	{
 		PersistenceManager pm = getPersistenceManager();
 		try {
+			if (linkedObjectClass == null) {
+				linkedObjectClass = Object.class;
+			}
 			Set<IssueLinkType> issueLinkTypes = IssueLinkType.getIssueLinkTypes(pm, linkedObjectClass);
 			return NLJDOHelper.getObjectIDSet(issueLinkTypes);
 		} finally {

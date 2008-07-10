@@ -92,6 +92,10 @@ public class IssueQuery
 		{
 			changedFields.add( new FieldChangeCarrier(PROPERTY_UPDATE_TIMESTAMP, updateTimestamp) );
 		}
+		if (allFields || PROPERTY_ISSUE_LINK_TYPE_ID.equals(propertyName))
+		{
+			changedFields.add( new FieldChangeCarrier(PROPERTY_ISSUE_LINK_TYPE_ID, issueLinkTypeID) );
+		}
 		if (allFields || PROPERTY_ISSUE_LINKS.equals(propertyName))
 		{
 			changedFields.add( new FieldChangeCarrier(PROPERTY_ISSUE_LINKS, issueLinks) );

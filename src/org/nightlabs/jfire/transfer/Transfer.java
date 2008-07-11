@@ -349,9 +349,10 @@ implements Serializable, DetachCallback
 	 */
 	public void bookTransfer(User user, Set<Anchor> involvedAnchors)
 	{
-		if (logger.isInfoEnabled()) {
-			logger.info("bookTransfer: pk=\"" + getPrimaryKey() + "\" from.pk=\"" + (from == null ? null : from.getPrimaryKey()) + "\"" + " to.pk=\"" + (to == null ? null : to.getPrimaryKey()) + "\"");
-		}
+// we log in MoneyTransfer and ProductTransfer in order to have the amount / products in the log as well
+//		if (logger.isInfoEnabled()) {
+//			logger.info("bookTransfer: pk=\"" + getPrimaryKey() + "\" from.pk=\"" + (from == null ? null : from.getPrimaryKey()) + "\"" + " to.pk=\"" + (to == null ? null : to.getPrimaryKey()) + "\"");
+//		}
 
 		getPersistenceManager(); // ensure we're attached
 

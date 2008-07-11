@@ -27,6 +27,9 @@
 package org.nightlabs.jfire.accounting;
 
 
+import java.util.Set;
+
+import org.apache.log4j.Logger;
 import org.nightlabs.jfire.security.User;
 import org.nightlabs.jfire.transfer.Anchor;
 import org.nightlabs.jfire.transfer.Transfer;
@@ -51,6 +54,7 @@ import org.nightlabs.jfire.transfer.Transfer;
 public class MoneyTransfer extends Transfer
 {
 	private static final long serialVersionUID = 1L;
+	private static final Logger logger = Logger.getLogger(MoneyTransfer.class);
 
 	public static final String TRANSFERTYPEID = "MoneyTransfer";
 	
@@ -278,5 +282,12 @@ public class MoneyTransfer extends Transfer
 				getFrom().getDescription(), getTo().getDescription()
 			);
 	}
-	
+
+	@Override
+	public void bookTransfer(User user, Set<Anchor> involvedAnchors) {
+		if (logger.isDebugEnabled()) {
+			logger.debug("bookTransfer: this.pk=\"" + getPrimaryKey() + "\" from.pk=\"" + (getFrom() == null ? null : getFrom().getPrimaryKey()) + "\"" + " to.pk=\"" + (getTo() == null ? null : getTo().getPrimaryKey()) + "\" amount=\"" + amount + "\" curreny=\"" + (currency == null ? null : currency.getCurrencyID()) + "\"");
+		}
+		super.bookTransfer(user, involvedAnchors);
+	}
 }

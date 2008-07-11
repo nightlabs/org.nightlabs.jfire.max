@@ -224,7 +224,8 @@ public class PriceFragmentType
 	public boolean equals(Object obj)
 	{
 		if (this == obj) return true;
-		if (!(obj instanceof PriceFragmentType)) return false;
+		if (obj == null) return false;
+		if (obj.getClass() != this.getClass()) return false;
 		PriceFragmentType o = (PriceFragmentType) obj;
 		return Util.equals(this.organisationID, o.organisationID) && Util.equals(this.priceFragmentTypeID, o.priceFragmentTypeID);
 	}

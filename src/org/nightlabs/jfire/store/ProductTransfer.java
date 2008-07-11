@@ -31,15 +31,14 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
-import java.util.Iterator;
 import java.util.Map;
 import java.util.Set;
 
 import javax.jdo.FetchPlan;
 import javax.jdo.PersistenceManager;
-import javax.jdo.Query;
 import javax.jdo.listener.DetachCallback;
 
+import org.apache.log4j.Logger;
 import org.nightlabs.jfire.security.User;
 import org.nightlabs.jfire.transfer.Anchor;
 import org.nightlabs.jfire.transfer.Transfer;
@@ -88,6 +87,7 @@ extends Transfer
 implements Serializable, DetachCallback
 {
 	private static final long serialVersionUID = 1L;
+	private static final Logger logger = Logger.getLogger(ProductTransfer.class);
 
 	public static final String FETCH_GROUP_PRODUCTS = "ProductTransfer.products";
 
@@ -148,6 +148,10 @@ implements Serializable, DetachCallback
 	@Override
 	public void bookTransfer(User user, Set<Anchor> involvedAnchors)
 	{
+		if (logger.isDebugEnabled()) {
+			logger.debug("bookTransfer: this.pk=\"" + getPrimaryKey() + "\" from.pk=\"" + (getFrom() == null ? null : getFrom().getPrimaryKey()) + "\"" + " to.pk=\"" + (getTo() == null ? null : getTo().getPrimaryKey()) + "\" productCount=\"" + productCount + "\"");
+		}
+
 		// TODO We must - either here or somewhere else - ensure that all the nested products are transferred, too (and have the same repository as the package product afterwards).
 		super.bookTransfer(user, involvedAnchors);
 		
@@ -244,5 +248,5 @@ implements Serializable, DetachCallback
 				getFrom().getDescription(), getTo().getDescription()
 			);
 	}
-	
+
 }

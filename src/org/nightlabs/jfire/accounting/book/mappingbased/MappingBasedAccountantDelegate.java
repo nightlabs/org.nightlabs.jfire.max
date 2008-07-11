@@ -794,10 +794,9 @@ public class MappingBasedAccountantDelegate
 		// List dimensionIDs = getMoneyFlowDimensionIDs();
 		Article bookArticle = articlePriceStack.get(0).getArticle();
 
-		List dimensions = getDimensionLeafNodes(bookArticle, productType);
+		List<DimensionNode> dimensions = getDimensionLeafNodes(bookArticle, productType);
 
-		for (Iterator iter = dimensions.iterator(); iter.hasNext();) {
-			DimensionNode dimensionNode = (DimensionNode) iter.next();
+		for (DimensionNode dimensionNode : dimensions) {
 			MoneyFlowMapping mapping = getMoneyFlowMapping(resolvedMappings,
 					productType, packageType, dimensionNode.getDimensionValues(),
 					currency);
@@ -807,15 +806,11 @@ public class MappingBasedAccountantDelegate
 				// have configuration for this productType, packageType and
 				// dimensionValues
 				// resolve the anchor to get the money from
-				Collection bookTransfers = getBookInvoiceTransfersForDimensionValues(
+				Collection<BookInvoiceTransfer> bookTransfers = getBookInvoiceTransfersForDimensionValues(
 						mandator, articlePriceStack, dimensionNode.getDimensionValues(),
 						mapping, resolvedMappings, container);
-				for (Iterator iterator = bookTransfers.iterator(); iterator.hasNext();) {
-					BookInvoiceTransfer biTransfer = (BookInvoiceTransfer) iterator
-							.next();
-					if (biTransfer.getFrom() == null
-							|| biTransfer.getFrom().getPrimaryKey().equals(
-									biTransfer.getTo().getPrimaryKey()))
+				for (BookInvoiceTransfer biTransfer : bookTransfers) {
+					if (biTransfer.getFrom() == null || biTransfer.getFrom().equals(biTransfer.getTo()))
 						biTransfer.setFrom(mandator);
 
 					// reverse if amount negative
@@ -825,8 +820,7 @@ public class MappingBasedAccountantDelegate
 						biTransfer.setTo(tmpAnchor);
 					}
 
-					if (biTransfer.getFrom().getPrimaryKey().equals(
-							biTransfer.getTo().getPrimaryKey()))
+					if (biTransfer.getFrom().equals(biTransfer.getTo()))
 						continue;
 
 					Map<Anchor, Collection<BookInvoiceTransfer>> toTransfers = bookInvoiceTransfers
@@ -950,9 +944,13 @@ public class MappingBasedAccountantDelegate
 			ProductType productType, String packageType,
 			Map<String, String> dimensionValues, Currency currency)
 	{
-		return getMoneyFlowMapping(resolvedMappings, (ProductTypeID) JDOHelper
-				.getObjectId(productType), packageType, dimensionValues, currency
-				.getCurrencyID());
+		return getMoneyFlowMapping(
+				resolvedMappings,
+				(ProductTypeID) JDOHelper.getObjectId(productType),
+				packageType,
+				dimensionValues,
+				currency.getCurrencyID()
+		);
 	}
 
 	/**
@@ -974,10 +972,9 @@ public class MappingBasedAccountantDelegate
 		ResolvedMapEntry entry = resolvedMappings.get(key);
 		if (entry == null)
 			return null;
-		MoneyFlowMapping mapping = entry.getResolvedMappings()
-				.get(
-						getMoneyFlowMappingKey(productTypeID, packageType, dimensionValues,
-								currencyID));
+		MoneyFlowMapping mapping = entry.getResolvedMappings().get(
+						getMoneyFlowMappingKey(productTypeID, packageType, dimensionValues, currencyID)
+		);
 		return mapping;
 	}
 
@@ -1056,11 +1053,11 @@ public class MappingBasedAccountantDelegate
 	public static String getPackageType(NestedProductTypeLocal nestedProductTypeLocal)
 	{
 		String innerPPK = nestedProductTypeLocal.getInnerProductTypePrimaryKey();
-		String packagePPK = nestedProductTypeLocal.getPackageProductTypeLocal()
-				.getPrimaryKey();
-		return (packagePPK.equals(innerPPK) || nestedProductTypeLocal
-				.getInnerProductTypeLocal().getProductType().isPackageInner()) ? MoneyFlowMapping.PACKAGE_TYPE_INNER
-				: MoneyFlowMapping.PACKAGE_TYPE_PACKAGE;
+		String packagePPK = nestedProductTypeLocal.getPackageProductTypeLocal().getPrimaryKey();
+		return (
+				(packagePPK.equals(innerPPK) || nestedProductTypeLocal.getInnerProductTypeLocal().getProductType().isPackageInner()) ?
+						MoneyFlowMapping.PACKAGE_TYPE_INNER : MoneyFlowMapping.PACKAGE_TYPE_PACKAGE
+		);
 	}
 
 	/* ************************* Resolve dimension code *********************** */
@@ -1199,8 +1196,7 @@ public class MappingBasedAccountantDelegate
 	 * Return a list with all leaf DimensionNodes in the resolved tree, so the
 	 * list will contain every possible dimension-value-permutation.
 	 * 
-	 * @param bookArticle
-	 *          TODO
+	 * @param bookArticle TODO document this!
 	 */
 	public List<DimensionNode> getDimensionLeafNodes(Article bookArticle,
 			ProductType productType)
@@ -1219,10 +1215,8 @@ public class MappingBasedAccountantDelegate
 		if (node.children.size() <= 0)
 			leaves.add(node);
 		else {
-			for (Iterator iter = node.children.iterator(); iter.hasNext();) {
-				DimensionNode childNode = (DimensionNode) iter.next();
+			for (DimensionNode childNode : node.children)
 				addDimensionLeaves(leaves, childNode);
-			}
 		}
 	}
 
@@ -1230,23 +1224,16 @@ public class MappingBasedAccountantDelegate
 	 * Get all possible values of the MoneyFlowDimension with the given
 	 * moneyFlowDimensionID.
 	 * 
-	 * @param moneyFlowDimensionID
-	 *          The id of the MoneyFlowDimension the the values should be searched
-	 *          for.
-	 * @param bookArticle
-	 *          TODO
+	 * @param moneyFlowDimensionID the id of the MoneyFlowDimension the values should be searched for.
+	 * @param bookArticle TODO document this!
 	 */
-	protected List<String> getDimensionValues(String moneyFlowDimensionID,
-			Article bookArticle, ProductType productType)
+	protected List<String> getDimensionValues(String moneyFlowDimensionID, Article bookArticle, ProductType productType)
 	{
-		MoneyFlowDimension dimension = MoneyFlowDimension.getMoneyFlowDimension(
-				getPersistenceManager(), moneyFlowDimensionID);
+		MoneyFlowDimension dimension = MoneyFlowDimension.getMoneyFlowDimension(getPersistenceManager(), moneyFlowDimensionID);
 		if (dimension == null)
-			throw new IllegalStateException(
-					"Could not find MoneyFlowDimension for id " + moneyFlowDimensionID
-							+ ".");
-		return CollectionUtil.array2ArrayList(dimension.getValues(productType,
-				bookArticle));
+			throw new IllegalStateException("Could not find MoneyFlowDimension for id " + moneyFlowDimensionID + ".");
+
+		return CollectionUtil.array2ArrayList(dimension.getValues(productType, bookArticle));
 	}
 
 	protected void bookInvoiceTransfers(
@@ -1263,42 +1250,46 @@ public class MappingBasedAccountantDelegate
 			// we revert the transfer direction of ALL resolved transfers!
 			revertTransferDirection = true;
 		}
-		for (Iterator iter = bookInvoiceTransfers.entrySet().iterator(); iter
-				.hasNext();) {
-			Map.Entry entry = (Map.Entry) iter.next();
-			Anchor from = (Anchor) entry.getKey();
-			Map toTransfers = (Map) entry.getValue();
-			logger.info("Starting book BookInvoiceTransfers from "
-					+ from.getPrimaryKey());
-			for (Iterator iterator = toTransfers.entrySet().iterator(); iterator
-					.hasNext();) {
-				Map.Entry toEntry = (Map.Entry) iterator.next();
-				Anchor to = (Anchor) toEntry.getKey();
-				Collection transfers = (Collection) toEntry.getValue();
+		for (Map.Entry<Anchor, Map<Anchor, Collection<BookInvoiceTransfer>>> entry : bookInvoiceTransfers.entrySet()) {
+			Anchor from = entry.getKey();
+			Map<Anchor, Collection<BookInvoiceTransfer>> toTransfers = entry.getValue();
+			if (logger.isDebugEnabled())
+				logger.debug("bookInvoiceTransfers: starting book from " + from.getPrimaryKey());
+
+			for (Map.Entry<Anchor, Collection<BookInvoiceTransfer>> toEntry : toTransfers.entrySet()) {
+				Anchor to = toEntry.getKey();
+				Collection<BookInvoiceTransfer> transfers = toEntry.getValue();
 				long balance = 0;
-				for (Iterator it = transfers.iterator(); it.hasNext();) {
-					BookInvoiceTransfer transfer = (BookInvoiceTransfer) it.next();
-					logger.info("  bookInvoiceTransfers to "
-							+ transfer.getTo().getPrimaryKey() + " with amount: "
-							+ transfer.getAmount());
+				for (BookInvoiceTransfer transfer : transfers) {
+					if (logger.isDebugEnabled()) {
+						logger.debug("  bookInvoiceTransfers to "
+								+ transfer.getTo().getPrimaryKey() + " with amount: "
+								+ transfer.getAmount());
+					}
 					balance += transfer.getAmount();
 				}
 				// revert direction of transfers with negative amount.
 				Anchor aFrom = (balance > 0) ? from : to;
 				Anchor aTo = (balance > 0) ? to : from;
-				
+
 				if (revertTransferDirection) {
+					if (logger.isDebugEnabled())
+						logger.debug("bookInvoiceTransfers: reverting transfer-direction.");
+
 					Anchor tmp = aFrom;
 					aFrom = aTo;
 					aTo = tmp;
 				}
-				
+
 				if (balance != 0) {
 					InvoiceMoneyTransfer moneyTransfer = new InvoiceMoneyTransfer(
-							InvoiceMoneyTransfer.BOOK_TYPE_BOOK, container, aFrom, aTo,
-							container.getInvoice(), Math.abs(balance));
-					moneyTransfer = pm
-							.makePersistent(moneyTransfer);
+							InvoiceMoneyTransfer.BOOK_TYPE_BOOK, container,
+							aFrom, aTo,
+							container.getInvoice(),
+							Math.abs(balance)
+					);
+
+					moneyTransfer = pm.makePersistent(moneyTransfer);
 					moneyTransfer.bookTransfer(user, involvedAnchors);
 				}
 			}
@@ -1322,12 +1313,12 @@ public class MappingBasedAccountantDelegate
 	public String getMoneyFlowMappingKey(ProductTypeID productTypeID,
 			String packageType, Map<String, String> dimensionValues, String currencyID)
 	{
-		String mappingKey = MoneyFlowMapping.getMappingKey(ProductType
-				.getPrimaryKey(productTypeID.organisationID,
-						productTypeID.productTypeID), packageType, currencyID);
+		String mappingKey = MoneyFlowMapping.getMappingKey(
+				ProductType.getPrimaryKey(productTypeID.organisationID, productTypeID.productTypeID),
+				packageType, currencyID
+		);
 		for (String dimensionID : getMoneyFlowDimensionIDs()) {
-			mappingKey = mappingKey + "/"
-					+ (dimensionValues.get(dimensionID));
+			mappingKey = mappingKey + "/" + (dimensionValues.get(dimensionID));
 		}
 		return mappingKey;
 	}
@@ -1387,17 +1378,13 @@ public class MappingBasedAccountantDelegate
 			BookMoneyTransfer bookMoneyTransfer)
 	{
 		// get the priceFragment of interest
-		String priceFragmentTypePK = dimensionValues
-				.get(PriceFragmentDimension.MONEY_FLOW_DIMENSION_ID);
-		if (priceFragmentTypePK == null || "".equals(priceFragmentTypePK))
-			throw new IllegalArgumentException(
-					"No value could be found in the dimensionValues Map for Dimension "
-							+ PriceFragmentDimension.MONEY_FLOW_DIMENSION_ID);
+		String priceFragmentTypePK = dimensionValues.get(PriceFragmentDimension.MONEY_FLOW_DIMENSION_ID);
 
-		PriceFragmentTypeID typeID = PriceFragmentType
-				.primaryKeyToPriceFragmentTypeID(priceFragmentTypePK);
-		PriceFragmentType priceFragmentType = (PriceFragmentType) getPersistenceManager()
-				.getObjectById(typeID);
+		if (priceFragmentTypePK == null || "".equals(priceFragmentTypePK))
+			throw new IllegalArgumentException("No value could be found in the dimensionValues Map for Dimension " + PriceFragmentDimension.MONEY_FLOW_DIMENSION_ID);
+
+		PriceFragmentTypeID typeID = PriceFragmentType.primaryKeyToPriceFragmentTypeID(priceFragmentTypePK);
+		PriceFragmentType priceFragmentType = (PriceFragmentType) getPersistenceManager().getObjectById(typeID);
 
 		// now if it is total then book all fragments contained in total
 		// TODO: Check here if is container not only total
@@ -1418,8 +1405,7 @@ public class MappingBasedAccountantDelegate
 	 * Searches for transfers for all PriceFragments the given one is the
 	 * container.
 	 * 
-	 * @param bookMoneyTransfer
-	 *          TODO
+	 * @param bookMoneyTransfer TODO document this!
 	 */
 	protected Collection<BookInvoiceTransfer> getBookInvoiceTransferForContainerFragmentType(
 			OrganisationLegalEntity mandator, PriceFragmentType priceFragmentType,
@@ -1431,12 +1417,10 @@ public class MappingBasedAccountantDelegate
 		// Get the PriceFragmentTypes that are defined for the given container
 		ArticlePrice price = articlePriceStack.getFirst();
 		Set<PriceFragmentType> containedFragmentTypes = new HashSet<PriceFragmentType>();
-		for (Iterator iter = price.getFragments().iterator(); iter.hasNext();) {
-			PriceFragment fragment = (PriceFragment) iter.next();
-			PriceFragmentType container = fragment.getPriceFragmentType()
-					.getContainerPriceFragmentType();
+		for (PriceFragment fragment : price.getFragments()) {
+			PriceFragmentType container = fragment.getPriceFragmentType().getContainerPriceFragmentType();
 			if (container != null) {
-				if (priceFragmentType.getPrimaryKey().equals(container.getPrimaryKey())) {
+				if (priceFragmentType.equals(container)) {
 					containedFragmentTypes.add(fragment.getPriceFragmentType());
 				}
 			}
@@ -1445,12 +1429,9 @@ public class MappingBasedAccountantDelegate
 		Collection<BookInvoiceTransfer> result = new LinkedList<BookInvoiceTransfer>();
 
 		// iterate all contained types
-		for (Iterator iter = containedFragmentTypes.iterator(); iter.hasNext();) {
-			PriceFragmentType containedType = (PriceFragmentType) iter.next();
-			Map<String, String> fakeDimValues = new HashMap<String, String>(
-					dimensionValues);
-			fakeDimValues.put(PriceFragmentDimension.MONEY_FLOW_DIMENSION_ID,
-					containedType.getPrimaryKey());
+		for (PriceFragmentType containedType : containedFragmentTypes) {
+			Map<String, String> fakeDimValues = new HashMap<String, String>(dimensionValues);
+			fakeDimValues.put(PriceFragmentDimension.MONEY_FLOW_DIMENSION_ID, containedType.getPrimaryKey());
 			// find the transfer for the current type
 			Collection<BookInvoiceTransfer> singleTransfers = getBookInvoiceTransfersForSingleFragmentType(
 					mandator, containedType, articlePriceStack, fakeDimValues,
@@ -1551,25 +1532,18 @@ public class MappingBasedAccountantDelegate
 	protected void prepareArticlePrice(PriceFragmentType containerFragmentType,
 			PriceFragmentType restPriceFragmentType, ArticlePrice articlePrice)
 	{
-		String totalPK = containerFragmentType.getPrimaryKey();
 		long defAmount = 0;
-		for (Iterator iter = articlePrice.getFragments().iterator(); iter.hasNext();) {
-			PriceFragment fragment = (PriceFragment) iter.next();
+		for (PriceFragment fragment : articlePrice.getFragments()) {
 			if (fragment.getPriceFragmentType().getContainerPriceFragmentType() == null)
 				continue;
-			if (fragment.getPriceFragmentType().getContainerPriceFragmentType()
-					.getPrimaryKey().equals(totalPK)) {
+			if (containerFragmentType.equals(fragment.getPriceFragmentType().getContainerPriceFragmentType())) {
 				defAmount += fragment.getAmount();
 			}
 		}
 		long totalAmount = articlePrice.getAmount(containerFragmentType);
-		articlePrice
-				.setAmount(restPriceFragmentType, totalAmount - defAmount, true);
-		for (Iterator iter = articlePrice.getNestedArticlePrices().iterator(); iter
-				.hasNext();) {
-			ArticlePrice nestedArticlePrice = (ArticlePrice) iter.next();
-			prepareArticlePrice(containerFragmentType, restPriceFragmentType,
-					nestedArticlePrice);
+		articlePrice.setAmount(restPriceFragmentType, totalAmount - defAmount, true);
+		for (ArticlePrice nestedArticlePrice : articlePrice.getNestedArticlePrices()) {
+			prepareArticlePrice(containerFragmentType, restPriceFragmentType, nestedArticlePrice);
 		}
 	}
 
@@ -1583,8 +1557,7 @@ public class MappingBasedAccountantDelegate
 		List<PriceFragmentType> priceFragmentTypes = new LinkedList<PriceFragmentType>();
 		priceFragmentTypes.add(priceFragmentType);
 
-		PriceFragmentType totalPType = PriceFragmentType
-				.getTotalPriceFragmentType(getPersistenceManager());
+		PriceFragmentType totalPType = PriceFragmentType.getTotalPriceFragmentType(getPersistenceManager());
 
 		// if we look for the priceFragmentType of interest for total in all upper
 		// packages
@@ -1595,12 +1568,13 @@ public class MappingBasedAccountantDelegate
 		List<PriceFragmentType> totalPTypes = new ArrayList<PriceFragmentType>(1);
 		totalPTypes.add(totalPType);
 
-		Iterator iterator = articlePriceStack.iterator();
-		logger.info("Search BookAnchors for single pricefragment: "
-				+ priceFragmentType.getName().getText("en"));
+		Iterator<? extends ArticlePrice> iterator = articlePriceStack.iterator();
+		if (logger.isDebugEnabled())
+			logger.debug("getBookInvoiceTransferForSingleFragmentType: search BookAnchors for single pricefragment: " + priceFragmentType.getName().getText("en"));
+
 		int count = 0;
 		while (iterator.hasNext()) {
-			ArticlePrice upperArticlePrice = (ArticlePrice) iterator.next();
+			ArticlePrice upperArticlePrice = iterator.next();
 			List<PriceFragmentType> pTypeParam = null;
 			if (count == 0) {
 				if (forContainer) {
@@ -1618,15 +1592,18 @@ public class MappingBasedAccountantDelegate
 
 			count++;
 
-			logger.info("Search for ArticlePricePType: "
-					+ upperArticlePrice.getProductType().getName().getText("en"));
+			if (logger.isDebugEnabled())
+				logger.debug("getBookInvoiceTransferForSingleFragmentType: search for ArticlePricePType: " + upperArticlePrice.getProductType().getName().getText("en"));
+
 			BookInvoiceTransfer result = getBookInvoiceTransferForSingleFragmentType(
 					mandator, upperArticlePrice, articlePriceStack, dimensionValues,
 					pTypeParam, resolvedMapping, resolvedMappings, bookMoneyTransfer);
-			logger.info("Found: " + result);
+
+			if (logger.isDebugEnabled())
+				logger.debug("getBookInvoiceTransferForSingleFragmentType: found: " + result);
+
 			if (result != null)
 				return result;
-
 		}
 
 		// for (Iterator itPriceFragmentTypes = priceFragmentTypes.iterator();
@@ -1683,10 +1660,8 @@ public class MappingBasedAccountantDelegate
 	{
 		String upperPackageType = getPackageType(upperArticlePrice);
 		for (PriceFragmentType searchPriceFragmentType : searchPriceFragmentTypes) {
-			Map<String, String> fakeDimValues = new HashMap<String, String>(
-					dimensionValues);
-			fakeDimValues.put(PriceFragmentDimension.MONEY_FLOW_DIMENSION_ID,
-					searchPriceFragmentType.getPrimaryKey());
+			Map<String, String> fakeDimValues = new HashMap<String, String>(dimensionValues);
+			fakeDimValues.put(PriceFragmentDimension.MONEY_FLOW_DIMENSION_ID, searchPriceFragmentType.getPrimaryKey());
 			PFMoneyFlowMapping packagingUpperMapping = (PFMoneyFlowMapping) getMoneyFlowMapping(
 					resolvedMappings, upperArticlePrice.getProductType(),
 					upperPackageType, fakeDimValues, upperArticlePrice.getCurrency());
@@ -1741,10 +1716,8 @@ public class MappingBasedAccountantDelegate
 				else
 					throw new IllegalStateException("Mandator \"" + mandator.getPrimaryKey() + "\" is neither vendor nor customer of invoice \"" + invoice.getPrimaryKey() + "\"!");
 
-				assert resolvedMappingAccount == null;
-
-				assert false : "Test Test Test"; // TODO remove this line!
-
+				if (resolvedMappingAccount == null)
+					throw new IllegalStateException("resolvedMappingAccount is null!");
 
 				if (amount >= 0) {
 					from = packagingUpperMappingAccount;
@@ -1756,20 +1729,19 @@ public class MappingBasedAccountantDelegate
 					amount *= -1;
 				}
 
-				return new MappingBasedAccountantDelegate.BookInvoiceTransfer(from, to,
-						amount);
-
+				return new MappingBasedAccountantDelegate.BookInvoiceTransfer(from, to, amount);
 			}
 		}
 		return null;
 
 	}
 
-	private void logBookInvoiceTransfers(String prefix,
-			Collection<BookInvoiceTransfer> transfers)
+	private void logBookInvoiceTransfers(String prefix, Collection<BookInvoiceTransfer> transfers)
 	{
-		for (BookInvoiceTransfer transfer : transfers) {
-			logger.info(prefix + transfer.toString());
-		}
+		if (!logger.isDebugEnabled())
+			return;
+
+		for (BookInvoiceTransfer transfer : transfers)
+			logger.debug(prefix + transfer.toString());
 	}
 }

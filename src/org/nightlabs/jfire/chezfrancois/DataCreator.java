@@ -288,8 +288,8 @@ public class DataCreator
 				priceFragmentType,
 				euro
 		);
-		mapping.setOwner(getOrganisationLegalEntity());
-		mapping.setSourceOrganisationID(organisationID);
+		mapping.setOwner(null);
+		mapping.setSourceOrganisationID(null);
 		mapping.setRevenueAccount(revenueAccount);
 		mapping.setExpenseAccount(expenseAccount);
 

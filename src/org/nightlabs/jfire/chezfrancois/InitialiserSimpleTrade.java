@@ -181,8 +181,8 @@ extends Initialiser
 				"France", "Frankreich", "France");
 		SimpleProductType boxMerlotCalifornia = dataCreator.createCategory(boxMerlot, "box-merlot-california",
 				"California", "Kalifornien", "Californie");
-		SimpleProductType boxMerlotItaly = dataCreator.createCategory(boxMerlot, "box-merlot-california",
-				"Italy", "Kalifornien", "Italie");
+		SimpleProductType boxMerlotItaly = dataCreator.createCategory(boxMerlot, "box-merlot-italy",
+				"Italy", "Italien", "Italie");
 
 
 		SimpleProductType boxMerlotAustralia2001 = dataCreator.createLeaf(boxMerlotAustralia, "box-merlot-australia-2001", priceConfigBox6Bottles90Percent,
@@ -203,7 +203,7 @@ extends Initialiser
 				"Box (6): Merlot 2001 (Australia) from Australia", "Karton Merlot aus Australien", "merlot_box_small.jpg", contentTypeJpeg, "merlot_box_large.jpg", contentTypeJpeg);
 
 		SimpleProductType boxMerlotItaly2001 = dataCreator.createLeaf(boxMerlotItaly, "box-merlot-italy-2001", priceConfigBox6Bottles90Percent,
-				"Box (6): Merlot 2001 (Italy)", "Karton (6): Merlot 2003 (Italien)", "Caisse (6): Merlot 2003 (Italie)");
+				"Box (6): Merlot 2001 (Italy)", "Karton (6): Merlot 2001 (Italien)", "Caisse (6): Merlot 2001 (Italie)");
 		dataCreator.createWineProperties(pm, boxMerlotItaly2001, "Box (6): Merlot 2001 (Australia) from Italy", "Karton Merlot aus Italien",
 				"Box (6): Merlot 2001 (Italy) from Italy", "Karton Merlot aus Italien", "merlot_box_small.jpg", contentTypeJpeg, "merlot_box_large.jpg", contentTypeJpeg);
 
@@ -212,7 +212,7 @@ extends Initialiser
 		boxMerlotAustralia2004.getProductTypeLocal().createNestedProductTypeLocal(bottleMerlotAustralia2004.getProductTypeLocal()).setQuantity(6);
 		boxMerlotFrance2001.getProductTypeLocal().createNestedProductTypeLocal(bottleMerlotFrance2001.getProductTypeLocal()).setQuantity(6);
 		boxMerlotCalifornia2003.getProductTypeLocal().createNestedProductTypeLocal(bottleMerlotCalifornia2003.getProductTypeLocal()).setQuantity(6);
-		boxMerlotItaly2001.getProductTypeLocal().createNestedProductTypeLocal(bottleMerlotCalifornia2003.getProductTypeLocal()).setQuantity(6);
+		boxMerlotItaly2001.getProductTypeLocal().createNestedProductTypeLocal(bottleMerlotItaly2001.getProductTypeLocal()).setQuantity(6);
 
 		boxMerlotAustralia2001.getProductTypeLocal().getFieldMetaData(ProductTypeLocal.FieldName.nestedProductTypeLocals).setValueInherited(false);
 		boxMerlotAustralia2004.getProductTypeLocal().getFieldMetaData(ProductTypeLocal.FieldName.nestedProductTypeLocals).setValueInherited(false);

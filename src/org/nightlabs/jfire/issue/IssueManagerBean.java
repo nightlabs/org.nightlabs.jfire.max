@@ -4,9 +4,11 @@ import java.io.IOException;
 import java.rmi.RemoteException;
 import java.util.Collection;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Locale;
+import java.util.Map;
 import java.util.Set;
 
 import javax.ejb.CreateException;
@@ -26,8 +28,6 @@ import org.jbpm.graph.exe.ProcessInstance;
 import org.nightlabs.ModuleException;
 import org.nightlabs.jdo.FetchPlanBackup;
 import org.nightlabs.jdo.NLJDOHelper;
-import org.nightlabs.jdo.ObjectID;
-import org.nightlabs.jdo.ObjectIDUtil;
 import org.nightlabs.jdo.moduleregistry.ModuleMetaData;
 import org.nightlabs.jdo.query.AbstractJDOQuery;
 import org.nightlabs.jdo.query.AbstractSearchQuery;
@@ -253,6 +253,37 @@ implements SessionBean
 		} finally {
 			pm.close();
 		}
+	}
+	
+	/**
+	 * @ejb.interface-method
+	 * @!ejb.transaction type="Supports"
+	 * @ejb.permission role-name="_Guest_"
+	 */
+	@SuppressWarnings("unchecked")
+	public Collection<IssueHistory> getIssueHistoryByIssue(Issue issue)
+	{
+		PersistenceManager pm = getPersistenceManager();
+		try {
+			return getIssueHistoryByIssue(pm, issue);
+		} finally {
+			pm.close();
+		}
+	}
+	
+	/**
+	 * @param pm The <code>PersistenceManager</code> that should be used to access the datastore.
+	 * @param issue
+	 * @return Returns instances of <code>IssueHistory</code>.
+	 */
+	@SuppressWarnings("unchecked")
+	protected static Collection<IssueHistory> getIssueHistoryByIssue(PersistenceManager pm, Issue issue)
+	{
+		Query q = pm.newNamedQuery(IssueHistory.class, "getIssueHistoriesByOrganisationIDAndIssueID");
+		Map<String, Object> params = new HashMap<String, Object>(3);
+		params.put("issueID", issue.getIssueID());
+		params.put("organisationID", issue.getOrganisationID());
+		return (Collection<IssueHistory>)q.executeWithMap(params);
 	}
 	
 //	/**

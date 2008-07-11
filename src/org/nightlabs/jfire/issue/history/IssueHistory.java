@@ -2,10 +2,18 @@ package org.nightlabs.jfire.issue.history;
 
 import java.io.Serializable;
 import java.lang.reflect.Method;
+import java.util.Collection;
 import java.util.Date;
+import java.util.HashMap;
+import java.util.Map;
+
+import javax.jdo.PersistenceManager;
+import javax.jdo.Query;
 
 import org.apache.log4j.Logger;
 import org.nightlabs.jfire.issue.Issue;
+import org.nightlabs.jfire.issue.IssueLink;
+import org.nightlabs.jfire.issue.IssueLinkType;
 import org.nightlabs.util.Util;
 
 /**
@@ -22,13 +30,10 @@ import org.nightlabs.util.Util;
  * @jdo.create-objectid-class
  *		field-order="organisationID, issueID, issueHistoryID"
  *
- * jdo.query
+ * @jdo.query
  *		name="getIssueHistoriesByOrganisationIDAndIssueID"
  *		query="SELECT
- *			WHERE this.issueID == paramIssueID &&
- *				  this.organisationID == paramOrganisationID                    
- *			PARAMETERS long paramIssueID, String paramOrganisationID
- *			import java.lang.String"
+ *			WHERE this.issueID == :issueID && this.organisationID == :organisationID"                    
  *
  * @jdo.fetch-group name="IssueHistory.issue" fields="issue"
  * 
@@ -128,12 +133,23 @@ implements Serializable{
 		return issue;
 	}
 
+	/**
+	 * @param pm The <code>PersistenceManager</code> that should be used to access the datastore.
+	 * @param issue
+	 * @return Returns instances of <code>IssueHistory</code>.
+	 */
+	@SuppressWarnings("unchecked")
+	protected static Collection<IssueHistory> getIssueHistoryByIssue(PersistenceManager pm, Issue issue)
+	{
+		Query q = pm.newNamedQuery(IssueHistory.class, "getIssueHistoriesByOrganisationIDAndIssueID");
+		Map<String, Object> params = new HashMap<String, Object>(3);
+		params.put("issueID", issue.getIssueID());
+		params.put("organisationID", issue.getOrganisationID());
+		return (Collection<IssueHistory>)q.executeWithMap(params);
+	}
+	
 	private void generateHistory(Issue oldIssue, Issue newIssue)
 	{
-//		for (Method method : oldIssue.getClass().getDeclaredMethods()) {
-//			method.
-//		}
-		
 		if (!Util.equals(oldIssue.getComments(), newIssue.getComments())) 
 		{
 			

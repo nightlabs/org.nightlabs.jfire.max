@@ -36,6 +36,7 @@ implements Serializable, AttachCallback
 	 */
 	public static final String FETCH_GROUP_THIS_COMMENT = "IssueComment.this";
 	
+	public static final String FETCH_GROUP_USER = "IssueComment.user";
 	/**
 	 * @jdo.field primary-key="true"
 	 * @jdo.column length="100"

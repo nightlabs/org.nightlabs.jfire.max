@@ -68,10 +68,10 @@ import org.nightlabs.util.Util;
  * @jdo.create-objectid-class
  *		field-order="organisationID, issueID"
  *
- * @jdo.query
+ * jdo.query
  *		name="getIssuesByIssueTypeID"
  *		query="SELECT
- *			WHERE this.issueTypeID == paramIssueTypeID                    
+ *			WHERE this.issueTypeID == paramIssueTypeID                     
  *			PARAMETERS String paramIssueTypeID
  *			import java.lang.String"
  *

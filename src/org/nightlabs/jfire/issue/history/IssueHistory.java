@@ -1,10 +1,12 @@
 package org.nightlabs.jfire.issue.history;
 
 import java.io.Serializable;
+import java.lang.reflect.Method;
 import java.util.Date;
 
 import org.apache.log4j.Logger;
 import org.nightlabs.jfire.issue.Issue;
+import org.nightlabs.util.Util;
 
 /**
  * @author Chairat Kongarayawetchakun <!-- chairat at nightlabs dot de -->
@@ -21,12 +23,15 @@ import org.nightlabs.jfire.issue.Issue;
  *		field-order="organisationID, issueID, issueHistoryID"
  *
  * jdo.query
- *		name="getIssueHistoriesByIssueID"
+ *		name="getIssueHistoriesByOrganisationIDAndIssueID"
  *		query="SELECT
- *			WHERE this.issueID == paramIssueID                    
- *			PARAMETERS String paramIssueID
+ *			WHERE this.issueID == paramIssueID &&
+ *				  this.organisationID == paramOrganisationID                    
+ *			PARAMETERS long paramIssueID, String paramOrganisationID
  *			import java.lang.String"
  *
+ * @jdo.fetch-group name="IssueHistory.issue" fields="issue"
+ * 
  * @jdo.fetch-group name="IssueHistory.this" fetch-groups="default" fields="description"
  *
  **/
@@ -40,6 +45,7 @@ implements Serializable{
 	 * @deprecated The *.this-FetchGroups lead to bad programming style and are therefore deprecated, now. They should be removed soon! 
 	 */
 	public static final String FETCH_GROUP_THIS = "IssueHistory.this";
+	public static final String FETCH_GROUP_ISSUE = "IssueHistory.issue";
 	/**
 	 * @jdo.field primary-key="true"
 	 * @jdo.column length="100"
@@ -60,13 +66,13 @@ implements Serializable{
 	 * @jdo.field persistence-modifier="persistent"
 	 * @jdo.column length="100"
 	 */
-	private String fields;
+	private String field;
 
 	/**
 	 * @jdo.field persistence-modifier="persistent"
 	 * @jdo.column length="100"
 	 */
-	private String changes;
+	private String change;
 
 	/**
 	 * @jdo.field persistence-modifier="persistent"
@@ -78,20 +84,26 @@ implements Serializable{
 	 */
 	private Date createTimestamp;
 
+	/**
+	 * @deprecated Constructor exists only for JDO! 
+	 */
+	@Deprecated
 	protected IssueHistory() { }
 
-	public IssueHistory(Issue issue, long issueHistoryID)
+	public IssueHistory(Issue oldIssue, Issue newIssue, long issueHistoryID)
 	{
-		if (issue == null)
-			throw new NullPointerException("issue");
+		if (oldIssue == null)
+			throw new NullPointerException("newIssue");
 
-		this.organisationID = issue.getOrganisationID();
-		this.issueID = issue.getIssueID();
+		this.organisationID = oldIssue.getOrganisationID();
+		this.issueID = oldIssue.getIssueID();
 
-		this.issue = issue;
+		this.issue = oldIssue;
 		this.issueHistoryID = issueHistoryID;
 
 		this.createTimestamp = new Date();
+
+		generateHistory(oldIssue, newIssue);
 	}
 
 	/**
@@ -116,19 +128,65 @@ implements Serializable{
 		return issue;
 	}
 
-	public String getFields() {
-		return fields;
-	}
+	private void generateHistory(Issue oldIssue, Issue newIssue)
+	{
+//		for (Method method : oldIssue.getClass().getDeclaredMethods()) {
+//			method.
+//		}
+		
+		if (!Util.equals(oldIssue.getComments(), newIssue.getComments())) 
+		{
+			
+		}
 
-	public String getChanges() {
-		return changes;
-	}
+		if (!Util.equals(oldIssue.getAssignee(), newIssue.getAssignee())) 
+		{
 
-	public void setFields(String fields) {
-		this.fields = fields;
-	}
+		}
 
-	public void setChanges(String changes) {
-		this.changes = changes;
+		if (!Util.equals(oldIssue.getReporter(), newIssue.getReporter())) 
+		{
+
+		}
+
+		if (!Util.equals(oldIssue.getIssueFileAttachments(), newIssue.getIssueFileAttachments())) 
+		{
+
+		}
+
+		if (!Util.equals(oldIssue.getIssueLinks(), newIssue.getIssueLinks())) 
+		{
+
+		}
+
+		if (!Util.equals(oldIssue.getIssuePriority(), newIssue.getIssuePriority())) 
+		{
+
+		}
+		
+		if (!Util.equals(oldIssue.getIssueSeverityType(), newIssue.getIssueSeverityType())) 
+		{
+
+		}
+		
+		if (!Util.equals(oldIssue.getIssueResolution(), newIssue.getIssueResolution())) 
+		{
+
+		}
+		
+		if (!Util.equals(oldIssue.getIssueType(), newIssue.getIssueType())) 
+		{
+
+		}
+		
+		if (!Util.equals(oldIssue.getState(), newIssue.getState())) 
+		{
+
+		}
+		
+		if (!Util.equals(oldIssue.getIssueResolution(), newIssue.getIssueResolution())) 
+		{
+
+		}
 	}
 }

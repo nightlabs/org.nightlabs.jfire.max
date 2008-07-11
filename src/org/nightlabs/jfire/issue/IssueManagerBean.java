@@ -26,6 +26,8 @@ import org.jbpm.graph.exe.ProcessInstance;
 import org.nightlabs.ModuleException;
 import org.nightlabs.jdo.FetchPlanBackup;
 import org.nightlabs.jdo.NLJDOHelper;
+import org.nightlabs.jdo.ObjectID;
+import org.nightlabs.jdo.ObjectIDUtil;
 import org.nightlabs.jdo.moduleregistry.ModuleMetaData;
 import org.nightlabs.jdo.query.AbstractJDOQuery;
 import org.nightlabs.jdo.query.AbstractSearchQuery;
@@ -34,6 +36,7 @@ import org.nightlabs.jdo.query.QueryCollection;
 import org.nightlabs.jfire.base.BaseSessionBeanImpl;
 import org.nightlabs.jfire.base.JFireBaseEAR;
 import org.nightlabs.jfire.editlock.EditLockType;
+import org.nightlabs.jfire.idgenerator.IDGenerator;
 import org.nightlabs.jfire.issue.history.IssueHistory;
 import org.nightlabs.jfire.issue.id.IssueCommentID;
 import org.nightlabs.jfire.issue.id.IssueFileAttachmentID;
@@ -515,16 +518,14 @@ implements SessionBean
 	{
 		PersistenceManager pm = getPersistenceManager();
 		try {
-			pm.getFetchPlan().setMaxFetchDepth(maxFetchDepth);
-			if (fetchGroups != null)
-				pm.getFetchPlan().setGroups(fetchGroups);
-
-			pm.getExtent(Issue.class);
 			Issue oldPersistentIssue = null;
 			try {
 				IssueID issueID = (IssueID) JDOHelper.getObjectId(issue);
-				if (issueID != null)
+				if (issueID != null) {
 					oldPersistentIssue = (Issue) pm.getObjectById(issueID);
+					IssueHistory issueHistory = new IssueHistory(oldPersistentIssue, issue, IDGenerator.nextID(IssueHistory.class));
+					storeIssueHistory(issueHistory, false, new String[]{FetchPlan.DEFAULT}, NLJDOHelper.MAX_FETCH_DEPTH_NO_LIMIT);
+				}
 			} catch (JDOObjectNotFoundException x) {
 				// silently ignore - oldPersistentIssue is null since it does not yet exist in the datastore
 			}
@@ -560,7 +561,7 @@ implements SessionBean
 			if (doUnassign)
 				jbpmTransitionName = JbpmConstants.TRANSITION_NAME_UNASSIGN;
 
-			Issue pIssue = pm.makePersistent(issue);
+			Issue pIssue = NLJDOHelper.storeJDO(pm, issue, get, fetchGroups, maxFetchDepth);
 
 			if (pIssue.getIssueLocal().getJbpmProcessInstanceId() < 0) {
 				IssueType type;
@@ -594,13 +595,26 @@ implements SessionBean
 				NLJDOHelper.restoreFetchPlan(pm.getFetchPlan(), fetchPlanBackup);
 			}
 
-			if (!get)
-				return null;
-
-			return pm.detachCopy(pIssue);
+			return pIssue;
 		} finally {
 			pm.close();
 		}
+	}
+	
+	/**
+	 * @ejb.interface-method
+	 * @ejb.permission role-name="_Guest_"
+	 * @ejb.transaction type="Required"
+	 */	
+	public IssueHistory storeIssueHistory(IssueHistory issueHistory, boolean get, String[] fetchGroups, int maxFetchDepth)
+	{
+		PersistenceManager pm = getPersistenceManager();
+		try {
+			return NLJDOHelper.storeJDO(pm, issueHistory, get, fetchGroups, maxFetchDepth);
+		}//try
+		finally {
+			pm.close();
+		}//finally
 	}
 	
 	/**
@@ -711,22 +725,6 @@ implements SessionBean
 			pm.getExtent(Issue.class, true);
 			pm.deletePersistent(issue);
 			pm.flush();
-		}//try
-		finally {
-			pm.close();
-		}//finally
-	}
-	
-	/**
-	 * @ejb.interface-method
-	 * @ejb.permission role-name="_Guest_"
-	 * @ejb.transaction type="Required"
-	 */	
-	public IssueHistory createIssueHistory(IssueHistory issueHistory, boolean get, String[] fetchGroups, int maxFetchDepth) 
-	{
-		PersistenceManager pm = getPersistenceManager();
-		try{
-			return NLJDOHelper.storeJDO(pm, issueHistory, get, fetchGroups, maxFetchDepth);
 		}//try
 		finally {
 			pm.close();

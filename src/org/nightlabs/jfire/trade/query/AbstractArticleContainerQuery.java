@@ -87,6 +87,8 @@ public abstract class AbstractArticleContainerQuery
 		// append filter for the additional fields of the implementing class.
 		checkAdditionalFields(filter);
 		q.setFilter(filter.toString());
+		q.declareVariables(vars.toString());
+		
 //		q.setRange(rangeFromIncl, rangeToExcl);
 		
 		if (logger.isDebugEnabled())
@@ -173,7 +175,7 @@ public abstract class AbstractArticleContainerQuery
 			vars.append(Article.class.getName()+" "+varName);
 			filter.append(" && \n (" +
 					"  this."+member+".contains("+varName+")" + 
-					"  && JDOHelper.getObjectID("+varName+".product).equals("+productID+"))" +
+					"  && JDOHelper.getObjectId("+varName+".product) == :productID" +
 					" )");
 		}
 	}	

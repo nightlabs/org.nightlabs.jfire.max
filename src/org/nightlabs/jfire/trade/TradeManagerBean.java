@@ -42,6 +42,7 @@ import javax.ejb.SessionBean;
 import javax.ejb.SessionContext;
 import javax.jdo.FetchPlan;
 import javax.jdo.JDOHelper;
+import javax.jdo.JDOObjectNotFoundException;
 import javax.jdo.PersistenceManager;
 import javax.jdo.Query;
 
@@ -73,10 +74,18 @@ import org.nightlabs.jfire.jbpm.graph.def.State;
 import org.nightlabs.jfire.jbpm.graph.def.id.ProcessDefinitionID;
 import org.nightlabs.jfire.organisation.Organisation;
 import org.nightlabs.jfire.person.Person;
+import org.nightlabs.jfire.security.SecurityReflector;
 import org.nightlabs.jfire.security.User;
 import org.nightlabs.jfire.security.id.UserID;
+import org.nightlabs.jfire.store.Product;
 import org.nightlabs.jfire.store.ReceptionNote;
+import org.nightlabs.jfire.store.id.ProductID;
 import org.nightlabs.jfire.store.id.ReceptionNoteID;
+import org.nightlabs.jfire.store.reverse.AlreadyReversedArticleReverseProductError;
+import org.nightlabs.jfire.store.reverse.IReverseProductError;
+import org.nightlabs.jfire.store.reverse.NoArticlesFoundReverseProductError;
+import org.nightlabs.jfire.store.reverse.OfferNotAcceptedReverseProductError;
+import org.nightlabs.jfire.store.reverse.ReverseProductException;
 import org.nightlabs.jfire.trade.config.LegalEntityViewConfigModule;
 import org.nightlabs.jfire.trade.id.ArticleContainerID;
 import org.nightlabs.jfire.trade.id.ArticleID;
@@ -86,6 +95,7 @@ import org.nightlabs.jfire.trade.id.OfferID;
 import org.nightlabs.jfire.trade.id.OfferLocalID;
 import org.nightlabs.jfire.trade.id.OrderID;
 import org.nightlabs.jfire.trade.id.SegmentTypeID;
+import org.nightlabs.jfire.trade.jbpm.JbpmConstantsOffer;
 import org.nightlabs.jfire.trade.jbpm.ProcessDefinitionAssignment;
 import org.nightlabs.jfire.trade.query.AbstractArticleContainerQuery;
 import org.nightlabs.jfire.transfer.id.AnchorID;
@@ -1839,4 +1849,120 @@ implements SessionBean
 			pm.close();
 		}
 	}
+	
+	/**
+	 * Returns the reversing {@link Offer} which defines the reverse for the {@link Product}
+	 * of the given {@link ProductID}. 
+	 * If the Article where the {@link Product} with the given {@link ProductID} is referenced, 
+	 * can not be reversed, a {@link ReverseProductException} is thrown which contains {@link IReverseProductError}s 
+	 * which describe why not.
+	 * 
+	 * @param productID the {@link ProductID} to get the reversing {@link Offer} for.   
+	 * @ejb.interface-method
+	 * @ejb.transaction type="Required"
+	 * @ejb.permission role-name="_Guest_"
+	 */	
+	public Offer createReverseOfferForProduct(ProductID productID)
+	throws ModuleException
+	{
+		PersistenceManager pm = getPersistenceManager();
+		try {
+			Product product = null;
+			try {
+				product = (Product) pm.getObjectById(productID);
+			} catch (JDOObjectNotFoundException x) {
+				return null;
+			}
+			
+			ReverseProductException result = new ReverseProductException(productID);
+			// get all articles for product
+			Set<Article> articles = Article.getArticles(pm, product);
+			if (articles == null || articles.isEmpty()) {
+				// no article found
+				String description = "There was not article found for the given product";
+				IReverseProductError error = new NoArticlesFoundReverseProductError(description);
+				result.addReverseProductResultError(error);
+				throw result;
+			}
+
+//			Set<ArticleID> articleIDs = NLJDOHelper.getObjectIDSet(articles);
+//			result.setArticleIDs(articleIDs);
+
+			// collect all allocated articles
+			Set<Article> allocatedArticles = new HashSet<Article>();			
+			for (Article article : articles) {
+				if (article.isAllocated()) {
+					allocatedArticles.add(article);
+				}
+			}
+			
+			String description = null;
+			// check if more than 1 Article is allocated
+			if (allocatedArticles.size() > 1) {
+				if (allocatedArticles.size() == 2) {
+					Article reversingArticle = null;
+					Article reversedArticle = null;
+					for (Article article : allocatedArticles) { 
+						if (article.isReversing()) {
+							if (reversingArticle != null) {
+								throw new IllegalStateException("There are 2 reversing articles existing");
+							}
+							reversingArticle = article;
+						}
+						if (article.isReversed()) {
+							if (reversedArticle != null) {
+								throw new IllegalStateException("There are 2 reversed articles existing");
+							}
+							reversedArticle = article;
+						}
+					}
+					description = "There already exists an reversed article";
+					AlreadyReversedArticleReverseProductError error = new AlreadyReversedArticleReverseProductError(description);
+					error.setReversedArticleID((ArticleID) JDOHelper.getObjectId(reversedArticle));
+					error.setReversingArticleID((ArticleID) JDOHelper.getObjectId(reversingArticle));
+					result.addReverseProductResultError(error);
+					throw result;
+				}
+				else {
+					description = String.format("There are %s articles allocated and none is reversing", allocatedArticles.size());
+					throw new IllegalStateException(description);
+				}
+			}
+			else {
+				Article article = allocatedArticles.iterator().next();
+				// check if offer is accepted from both sides
+				if (!State.hasState(pm, article.getOfferID(), JbpmConstantsOffer.Both.NODE_NAME_ACCEPTED_IMPLICITELY)) {
+					description = "The offer ist not successfully accepted from both sides";
+					OfferNotAcceptedReverseProductError error = new OfferNotAcceptedReverseProductError(description);
+					error.setOfferID(article.getOfferID());
+					result.addReverseProductResultError(error);
+					throw result;
+				}
+				else {
+					// everything is ok, article can be reversed, so create reversing offer
+					TradeManager tm;
+					try {
+//						tm = TradeManagerUtil.getHome(SecurityReflector.getInitialContextProperties()).create();
+//						Offer offer = tm.createReverseOffer(articleIDs, null, true, null, 1);
+						User user = User.getUser(pm, getPrincipal());
+						Trader trader = Trader.getTrader(pm);
+						// TODO check for all requested articles, whether 'org.nightlabs.jfire.trade.reverseProductType' is allowed!
+						Offer offer = trader.createReverseOffer(user, articles, null);
+						offer.validate();
+//						OfferID reversingOfferID = (OfferID) JDOHelper.getObjectId(offer);
+//						result.setReversingOfferID(reversingOfferID);
+						return offer;
+					} catch (Exception e) {
+						throw new ModuleException(e);
+					}
+				}
+			}
+			
+//			result.setDescription(description);
+//			result.setProductReversable(description == null);
+//			return result;			
+		} finally {
+			pm.close();
+		}
+	}	
 }

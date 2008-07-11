@@ -124,6 +124,10 @@ import org.nightlabs.util.Util;
  * @jdo.query
  *		name="getArticleByOfferAndProduct"
  *		query="SELECT UNIQUE WHERE this.offer == :offer && this.product == :product"
+ *
+ * @jdo.query
+ *		name="getArticlesByProduct"
+ *		query="SELECT WHERE this.product == :product"
  */
 public class Article
 implements Serializable, DeleteCallback, DetachCallback, StoreCallback
@@ -193,6 +197,23 @@ implements Serializable, DeleteCallback, DetachCallback, StoreCallback
 		return (Article) q.execute(offer, product);
 	}
 
+	/**
+	 * Returns the Set of of {@link Article}s where the given {@link Product} is referenced 
+	 * or <code>null</code>, if no {@link Article}s can be found matching the
+	 * specified <code>Product</code>.
+	 * 
+	 * @param pm The {@link PersistenceManager} used to access the datastore.
+	 * @param product The {@link Product} referenced by the searched <code>Article</code>s.
+	 * @return Either <code>null</code>, if no {@link Article}s can be found matching the
+	 *		specified <code>Product</code>.
+	 */
+	@SuppressWarnings("unchecked")
+	public static Set<Article> getArticles(PersistenceManager pm, Product product)
+	{
+		Query q = pm.newNamedQuery(Article.class, "getArticlesByProduct");
+		return new HashSet<Article>((Collection<Article>) q.execute(product));
+	}
+	
 	public static Map<Class<? extends ProductType>, Set<Article>> getProductTypeClass2articleSetMapFromArticleContainers(Collection<? extends ArticleContainer> articleContainers)
 	{
 		Map<Class<? extends ProductType>, Set<Article>> result = new HashMap<Class<? extends ProductType>, Set<Article>>();

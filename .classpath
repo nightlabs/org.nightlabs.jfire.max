@@ -25,5 +25,6 @@
 	<classpathentry kind="var" path="ASM"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/JFireServerManager"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/NightLabsJDO"/>
+	<classpathentry combineaccessrules="false" kind="src" path="/JFireBaseClientLib"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>

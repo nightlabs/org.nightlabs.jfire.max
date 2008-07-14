@@ -84,18 +84,12 @@ implements SessionBean
 	private static final long serialVersionUID = 1L;
 	public static final Logger logger = Logger.getLogger(ReportManagerTradeBean.class);
 
-	/**
-	 * @see com.nightlabs.jfire.base.BaseSessionBeanImpl#setSessionContext(javax.ejb.SessionContext)
-	 */
 	@Override
 	public void setSessionContext(SessionContext sessionContext)
 	throws EJBException, RemoteException
 	{
 		super.setSessionContext(sessionContext);
 	}
-	/**
-	 * @see com.nightlabs.jfire.base.BaseSessionBeanImpl#unsetSessionContext()
-	 */
 	@Override
 	public void unsetSessionContext() {
 		super.unsetSessionContext();

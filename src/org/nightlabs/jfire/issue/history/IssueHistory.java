@@ -51,6 +51,9 @@ implements Serializable{
 	 */
 	public static final String FETCH_GROUP_THIS = "IssueHistory.this";
 	public static final String FETCH_GROUP_ISSUE = "IssueHistory.issue";
+	
+	public static final String QUERY_ISSUE_HISTORIES_BY_ORGANISATION_ID_AND_ISSUE_ID = "getIssueHistoriesByOrganisationIDAndIssueID";
+	
 	/**
 	 * @jdo.field primary-key="true"
 	 * @jdo.column length="100"

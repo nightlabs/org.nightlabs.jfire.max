@@ -36,7 +36,6 @@ import org.nightlabs.jdo.query.QueryCollection;
 import org.nightlabs.jfire.base.BaseSessionBeanImpl;
 import org.nightlabs.jfire.base.JFireBaseEAR;
 import org.nightlabs.jfire.editlock.EditLockType;
-import org.nightlabs.jfire.idgenerator.IDGenerator;
 import org.nightlabs.jfire.issue.history.IssueHistory;
 import org.nightlabs.jfire.issue.id.IssueCommentID;
 import org.nightlabs.jfire.issue.id.IssueFileAttachmentID;
@@ -554,8 +553,8 @@ implements SessionBean
 				IssueID issueID = (IssueID) JDOHelper.getObjectId(issue);
 				if (issueID != null) {
 					oldPersistentIssue = (Issue) pm.getObjectById(issueID);
-					IssueHistory issueHistory = new IssueHistory(oldPersistentIssue, issue, IDGenerator.nextID(IssueHistory.class));
-					storeIssueHistory(issueHistory, false, new String[]{FetchPlan.DEFAULT}, NLJDOHelper.MAX_FETCH_DEPTH_NO_LIMIT);
+//					IssueHistory issueHistory = new IssueHistory(oldPersistentIssue, issue, IDGenerator.nextID(IssueHistory.class));
+//					storeIssueHistory(issueHistory, false, new String[]{FetchPlan.DEFAULT}, NLJDOHelper.MAX_FETCH_DEPTH_NO_LIMIT);
 				}
 			} catch (JDOObjectNotFoundException x) {
 				// silently ignore - oldPersistentIssue is null since it does not yet exist in the datastore

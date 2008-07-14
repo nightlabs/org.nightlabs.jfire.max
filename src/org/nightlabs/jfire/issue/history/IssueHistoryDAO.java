@@ -46,11 +46,13 @@ public class IssueHistoryDAO extends BaseJDOObjectDAO<IssueHistoryID, IssueHisto
 	}
 
 	@SuppressWarnings("unchecked")
-	public Collection<IssueHistory> getIssueHistoryByIssue(Issue issue)
+	public Collection<IssueHistory> getIssueHistoryByIssue(Issue issue, ProgressMonitor monitor)
 	{
+		monitor.beginTask("Loading issue histories"+ issue.getIssueID(), 1);
 		try {
 			IssueManager im = IssueManagerUtil.getHome(SecurityReflector.getInitialContextProperties()).create();
 			Collection<IssueHistory> issueHistories = im.getIssueHistoryByIssue(issue);
+			monitor.done();
 			return issueHistories;			
 		} catch (Exception x) {
 			throw new RuntimeException(x);

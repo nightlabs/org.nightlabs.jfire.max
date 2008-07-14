@@ -133,9 +133,11 @@ public class IssueDAO extends BaseJDOObjectDAO<IssueID, Issue>{
 	@SuppressWarnings("unchecked")
 	public synchronized Collection<Issue> getIssues(String[] fetchGroups, int maxFetchDepth, ProgressMonitor monitor) 
 	{
+		monitor.beginTask("Loading issues", 1);
 		try {
 			IssueManager im = IssueManagerUtil.getHome(SecurityReflector.getInitialContextProperties()).create();
 			Set<IssueID> is = im.getIssueIDs();
+			monitor.done();
 			return getJDOObjects(null, is, fetchGroups, maxFetchDepth, monitor);
 		} catch (Exception e) {
 			throw new RuntimeException(e);

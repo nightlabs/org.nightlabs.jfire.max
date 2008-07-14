@@ -39,7 +39,7 @@ public class SimpleProductTypeStruct {
 			productTypeStruct.getName().setText(Locale.ENGLISH.getLanguage(), "Simple products");
 			productTypeStruct.getName().setText(Locale.GERMAN.getLanguage(), "Einfache Produkte");
 			productTypeStruct = pm.makePersistent(productTypeStruct);
-			productTypeStructLocal = new StructLocal(productTypeStruct, StructLocal.DEFAULT_SCOPE);
+			productTypeStructLocal = new StructLocal(productTypeStruct, organisationID, StructLocal.DEFAULT_SCOPE);
 			productTypeStructLocal.getName().setText(Locale.ENGLISH.getLanguage(), "Default simple product structure");
 			productTypeStructLocal.getName().setText(Locale.GERMAN.getLanguage(), "Standard Struktur für einfache Produkte");
 			pm.makePersistent(productTypeStructLocal);

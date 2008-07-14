@@ -970,9 +970,9 @@ implements SessionBean
 				// find or create an Order
 				Trader trader = Trader.getTrader(pm);
 
-				IStruct personStruct = StructLocal.getStructLocal(getOrganisationID(),
+				IStruct personStruct = StructLocal.getStructLocal(pm, getOrganisationID(),
 						Person.class.getName(), 
-						Person.STRUCT_SCOPE, Person.STRUCT_LOCAL_SCOPE, pm);
+						Person.STRUCT_SCOPE, Person.STRUCT_LOCAL_SCOPE);
 				Person person = new Person(getOrganisationID(), IDGenerator
 						.nextID(PropertySet.class));
 				person.inflate(personStruct);

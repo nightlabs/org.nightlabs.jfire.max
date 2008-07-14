@@ -119,10 +119,10 @@ public class NumericOrganisationIdentifier {
 
 	public static NumericOrganisationIdentifier getNumericOrganisationIdentifier(PersistenceManager pm, String organisationID)
 	{
-		NumericOrganisationIdentifier numericOrganisationID = null;
+		NumericOrganisationIdentifier numericOrganisationIdentifier = null;
 		try {
 			NumericOrganisationIdentifierID id = NumericOrganisationIdentifierID.create(organisationID);
-			numericOrganisationID = (NumericOrganisationIdentifier) pm.getObjectById(id);
+			numericOrganisationIdentifier = (NumericOrganisationIdentifier) pm.getObjectById(id);
 		} catch (JDOObjectNotFoundException e) {
 			String rootOrganisationID = null;
 			Hashtable<?,?> rootOrganisationInitialContextProperties;
@@ -147,15 +147,15 @@ public class NumericOrganisationIdentifier {
 
 			try {
 				NumericOrganisationIdentifierManager noim = NumericOrganisationIdentifierManagerUtil.getHome(rootOrganisationInitialContextProperties).create();
-				numericOrganisationID = noim.getNumericOrganisationIdentifier(organisationID, null);
+				numericOrganisationIdentifier = noim.getNumericOrganisationIdentifier(organisationID, null);
 			} catch (Exception x) {
 				throw new RuntimeException("Communication with root-organisation failed!", x);
 			}
 
-			numericOrganisationID = pm.makePersistent(numericOrganisationID);
+			numericOrganisationIdentifier = pm.makePersistent(numericOrganisationIdentifier);
 		}
 
-		return numericOrganisationID;
+		return numericOrganisationIdentifier;
 	}
 
 	public static NumericOrganisationIdentifier getNumericOrganisationIdentifier(PersistenceManager pm, int numericOrganisationID)

@@ -74,7 +74,6 @@ import org.nightlabs.jfire.jbpm.graph.def.State;
 import org.nightlabs.jfire.jbpm.graph.def.id.ProcessDefinitionID;
 import org.nightlabs.jfire.organisation.Organisation;
 import org.nightlabs.jfire.person.Person;
-import org.nightlabs.jfire.security.SecurityReflector;
 import org.nightlabs.jfire.security.User;
 import org.nightlabs.jfire.security.id.UserID;
 import org.nightlabs.jfire.store.Product;
@@ -1881,12 +1880,10 @@ implements SessionBean
 				// no article found
 				String description = "There was not article found for the given product";
 				IReverseProductError error = new NoArticlesFoundReverseProductError(description);
-				result.addReverseProductResultError(error);
+//				result.addReverseProductResultError(error);
+				result.setReverseProductError(error);
 				throw result;
 			}
-
-//			Set<ArticleID> articleIDs = NLJDOHelper.getObjectIDSet(articles);
-//			result.setArticleIDs(articleIDs);
 
 			// collect all allocated articles
 			Set<Article> allocatedArticles = new HashSet<Article>();			
@@ -1920,7 +1917,8 @@ implements SessionBean
 					AlreadyReversedArticleReverseProductError error = new AlreadyReversedArticleReverseProductError(description);
 					error.setReversedArticleID((ArticleID) JDOHelper.getObjectId(reversedArticle));
 					error.setReversingArticleID((ArticleID) JDOHelper.getObjectId(reversingArticle));
-					result.addReverseProductResultError(error);
+//					result.addReverseProductResultError(error);
+					result.setReverseProductError(error);
 					throw result;
 				}
 				else {
@@ -1935,32 +1933,25 @@ implements SessionBean
 					description = "The offer ist not successfully accepted from both sides";
 					OfferNotAcceptedReverseProductError error = new OfferNotAcceptedReverseProductError(description);
 					error.setOfferID(article.getOfferID());
-					result.addReverseProductResultError(error);
+//					result.addReverseProductResultError(error);
+					result.setReverseProductError(error);
 					throw result;
 				}
 				else {
 					// everything is ok, article can be reversed, so create reversing offer
 					TradeManager tm;
 					try {
-//						tm = TradeManagerUtil.getHome(SecurityReflector.getInitialContextProperties()).create();
-//						Offer offer = tm.createReverseOffer(articleIDs, null, true, null, 1);
 						User user = User.getUser(pm, getPrincipal());
 						Trader trader = Trader.getTrader(pm);
 						// TODO check for all requested articles, whether 'org.nightlabs.jfire.trade.reverseProductType' is allowed!
 						Offer offer = trader.createReverseOffer(user, articles, null);
 						offer.validate();
-//						OfferID reversingOfferID = (OfferID) JDOHelper.getObjectId(offer);
-//						result.setReversingOfferID(reversingOfferID);
 						return offer;
 					} catch (Exception e) {
 						throw new ModuleException(e);
 					}
 				}
 			}
-			
-//			result.setDescription(description);
-//			result.setProductReversable(description == null);
-//			return result;			
 		} finally {
 			pm.close();
 		}

@@ -1,5 +1,7 @@
 package org.nightlabs.jfire.accounting;
 
+import java.io.Serializable;
+
 import javax.jdo.JDOHelper;
 import javax.jdo.PersistenceManager;
 
@@ -25,6 +27,7 @@ import org.nightlabs.util.Util;
  * @jdo.create-objectid-class field-order="organisationID, invoiceActionHandlerID"
  */
 public class InvoiceActionHandler
+implements Serializable
 {
 	/**
 	 * @jdo.field primary-key="true"

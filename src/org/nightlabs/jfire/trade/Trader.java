@@ -1361,27 +1361,23 @@ public class Trader
 							+ getToStringList(articles)
 							+ "\" cannot be allocated, because it is currently in state releasePending!");
 
-		Map productTypeClass2ProductTypeActionHandler = new HashMap();
-		for (Iterator iter = articles.iterator(); iter.hasNext();) {
-			Article article = (Article) iter.next();
-			Class ptClazz = article.getProductType().getClass();
+		Map<Class<? extends ProductType>, ProductTypeActionHandler> productTypeClass2ProductTypeActionHandler = new HashMap<Class<? extends ProductType>, ProductTypeActionHandler>();
+		for (Article article : articles) {
+			Class<? extends ProductType> ptClazz = article.getProductType().getClass();
 			if (productTypeClass2ProductTypeActionHandler.containsKey(ptClazz))
 				continue;
 
-			productTypeClass2ProductTypeActionHandler.put(ptClazz, ProductTypeActionHandler.getProductTypeActionHandler(
-					getPersistenceManager(), ptClazz));
+			productTypeClass2ProductTypeActionHandler.put(
+					ptClazz,
+					ProductTypeActionHandler.getProductTypeActionHandler(getPersistenceManager(), ptClazz)
+			);
 		}
 
-		PersistenceManager pm = getPersistenceManager();
-
-		Map productTypeActionHandler2Articles = new HashMap();
-		for (Iterator iter = articles.iterator(); iter.hasNext();) {
-			Article article = (Article) iter.next();
-
+		Map<ProductTypeActionHandler, List<Article>> productTypeActionHandler2Articles = new HashMap<ProductTypeActionHandler, List<Article>>();
+		for (Article article : articles) {
 			Product product = article.getProduct();
 			if (product == null)
-				throw new IllegalStateException("Articles '" + article.getPrimaryKey()
-						+ "' does not have a product!");
+				throw new IllegalStateException("Article '" + article.getPrimaryKey() + "' does not have a product!");
 
 			ProductLocal productLocal = product.getProductLocal();
 
@@ -1406,37 +1402,36 @@ public class Trader
 			IPackagePriceConfig packagePriceConfig = product.getProductType()
 					.getPackagePriceConfig();
 
-			pm.flush();
-
-			// TODO remove this JPOX Workaround - getting:
-			// com.mysql.jdbc.exceptions.MySQLIntegrityConstraintViolationException: Duplicate entry 'chezfrancois.jfire.org-9-8' for key 1
+//			pm.flush();
+//
+//			// TODO remove this JPOX Workaround - getting:
+//			// com.mysql.jdbc.exceptions.MySQLIntegrityConstraintViolationException: Duplicate entry 'chezfrancois.jfire.org-9-8' for key 1
 			ArticlePrice articlePrice = packagePriceConfig.createArticlePrice(article);
-			for (int tryCounter = 0; tryCounter < 10; ++tryCounter) {
-				try {
-					articlePrice = pm.makePersistent(articlePrice);
-					break;
-				} catch (Exception x) {
-					logger.warn("Persisting articlePrice instance failed! Trying it again. tryCounter=" + tryCounter, x);
-				}
-			}
+//			for (int tryCounter = 0; tryCounter < 10; ++tryCounter) {
+//				try {
+//					articlePrice = pm.makePersistent(articlePrice);
+//					break;
+//				} catch (Exception x) {
+//					logger.warn("Persisting articlePrice instance failed! Trying it again. tryCounter=" + tryCounter, x);
+//				}
+//			}
 			article.setPrice(articlePrice);
 
-			pm.flush();
+//			pm.flush();
 
 //			ProductTypeActionHandler productTypeActionHandler = ProductTypeActionHandler.getProductTypeActionHandler(
 //					getPersistenceManager(), article.getProductType().getClass());
 			ProductTypeActionHandler productTypeActionHandler = (ProductTypeActionHandler) productTypeClass2ProductTypeActionHandler.get(article.getProductType().getClass());
-			List al = (List) productTypeActionHandler2Articles.get(productTypeActionHandler);
+			List<Article> al = productTypeActionHandler2Articles.get(productTypeActionHandler);
 			if (al == null) {
-				al = new LinkedList();
+				al = new LinkedList<Article>();
 				productTypeActionHandler2Articles.put(productTypeActionHandler, al);
 			}
 			al.add(article);
 		}
-		getPersistenceManager().flush(); // TODO is this necessary? JPOX Bug
-		for (Iterator it = productTypeActionHandler2Articles.entrySet().iterator(); it.hasNext();) {
-			Map.Entry me = (Map.Entry) it.next();
-			((ProductTypeActionHandler) me.getKey()).onAllocateArticlesBegin(user, this, (List) me.getValue());
+//		getPersistenceManager().flush(); // TODO is this necessary? JPOX Bug
+		for (Map.Entry<ProductTypeActionHandler, List<Article>> me : productTypeActionHandler2Articles.entrySet()) {
+			((ProductTypeActionHandler) me.getKey()).onAllocateArticlesBegin(user, this, me.getValue());
 		}
 	}
 
@@ -1468,15 +1463,13 @@ public class Trader
 
 		ProductTypeActionHandlerCache productTypeActionHandlerCache = new ProductTypeActionHandlerCache(getPersistenceManager());
 
-		Map productTypeActionHandler2Articles = new HashMap();
-		for (Iterator iter = articles.iterator(); iter.hasNext();) {
-			Article article = (Article) iter.next();
+		Map<ProductTypeActionHandler, List<Article>> productTypeActionHandler2Articles = new HashMap<ProductTypeActionHandler, List<Article>>();
+		for (Article article : articles) {
 			Product product = article.getProduct();
 
 			ProductTypeActionHandler productTypeActionHandler = productTypeActionHandlerCache.getProductTypeActionHandler(product);
 			// delegate assembling to the product (give it a chance to intercept)
 			productTypeActionHandler.assembleProduct(user, productTypeActionHandlerCache, product);
-//			product.assemble(user); // TODO delegate to ProductTypeActionHandler instead?! (and thus remove the Product.assemble(...)
 
 			IPackagePriceConfig packagePriceConfig = product.getProductType()
 					.getPackagePriceConfig();
@@ -1486,19 +1479,16 @@ public class Trader
 			article.setAllocated(true);
 			article.setAllocationPending(false);
 
-//			ProductTypeActionHandler productTypeActionHandler = ProductTypeActionHandler.getProductTypeActionHandler(
-//					getPersistenceManager(), article.getProductType().getClass());
-			List al = (List) productTypeActionHandler2Articles.get(productTypeActionHandler);
+			List<Article> al = productTypeActionHandler2Articles.get(productTypeActionHandler);
 			if (al == null) {
-				al = new LinkedList();
+				al = new LinkedList<Article>();
 				productTypeActionHandler2Articles.put(productTypeActionHandler, al);
 			}
 			al.add(article);
 		}
 
-		for (Iterator it = productTypeActionHandler2Articles.entrySet().iterator(); it.hasNext();) {
-			Map.Entry me = (Map.Entry) it.next();
-			((ProductTypeActionHandler) me.getKey()).onAllocateArticlesEnd(user, this, (List) me.getValue());
+		for (Map.Entry<ProductTypeActionHandler, List<Article>> me : productTypeActionHandler2Articles.entrySet()) {
+			((ProductTypeActionHandler) me.getKey()).onAllocateArticlesEnd(user, this, me.getValue());
 		}
 	}
 

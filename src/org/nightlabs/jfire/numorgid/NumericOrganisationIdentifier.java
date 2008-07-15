@@ -1,5 +1,6 @@
 package org.nightlabs.jfire.numorgid;
 
+import java.io.Serializable;
 import java.util.Hashtable;
 
 import javax.jdo.JDOObjectNotFoundException;
@@ -30,8 +31,9 @@ import org.nightlabs.math.Base62Coder;
  *		name="getNumericOrganisationIdentifierByNumericID"
  *		query="SELECT UNIQUE WHERE numericOrganisationID == :numericOrganisationID"
  */
-public class NumericOrganisationIdentifier {
-	
+public class NumericOrganisationIdentifier
+implements Serializable
+{
 	/** @jdo.field primary-key="true" */
 	private String organisationID;
 	

@@ -153,7 +153,11 @@ implements SessionBean
 
 			if (!hasRootOrganisation()) {
 				// For test systems it's good to have a valid value
-				pm.makePersistent(new NumericOrganisationIdentifier(getOrganisationID(), NumericOrganisationIdentifier.MAX_NUMERIC_ORGANISATION_ID));
+				try {
+					pm.getObjectById(NumericOrganisationIdentifierID.create(getOrganisationID()));
+				} catch (JDOObjectNotFoundException x) {
+					pm.makePersistent(new NumericOrganisationIdentifier(getOrganisationID(), NumericOrganisationIdentifier.MAX_NUMERIC_ORGANISATION_ID));
+				}
 			}
 
 			if (ModuleMetaData.getModuleMetaData(pm, JFireNumericOrganisationIDEAR.MODULE_NAME) == null) {

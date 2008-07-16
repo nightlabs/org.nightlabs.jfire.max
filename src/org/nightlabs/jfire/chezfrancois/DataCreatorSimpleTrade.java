@@ -240,7 +240,7 @@ extends DataCreator
 				file.setName(largeImage);
 				file.setContentType(largeImageContentType);
 				file.setDescription(largeImage);
-				imageLink = "fckeditorfile://"+file.getFileId()+"."+ContentTypeUtil.getFileExtension(file);
+				imageLink = "fckeditorfile://"+file.getFileId()+ContentTypeUtil.getFileExtension(file);
 //				List<IFCKEditorContentFile> files = html.getFiles();
 //				files.add(file);
 //				html.setFiles(files);
@@ -256,12 +256,15 @@ extends DataCreator
 			}
 		}
 
+		String largeTextEn = loadText("wine-wikipedia_en.html");
+		String largeTextDe = loadText("wine-wikipedia_de.html");
+
 		if(imageLink != null) {
-			html.setText(Locale.GERMAN.getLanguage(), "<p>Mein <b>langer</b>, <i>langer</i>, <u>langer</u> Text und ein Bild</p><p><img src=\""+imageLink+"\"/></p>");
-			html.setText(Locale.ENGLISH.getLanguage(), "<p>This is my text in english. This contains an image.</p><p><img src=\""+imageLink+"\"/></p>");
+			html.setText(Locale.ENGLISH.getLanguage(), "<p>This is my text in english. This contains an image.</p><p><img src=\""+imageLink+"\"/></p>"+largeTextEn);
+			html.setText(Locale.GERMAN.getLanguage(), "<p>Mein <b>langer</b>, <i>langer</i>, <u>langer</u> Text und ein Bild</p><p><img src=\""+imageLink+"\"/></p>"+largeTextDe);
 		} else {
-			html.setText(Locale.GERMAN.getLanguage(), "<p>Mein <b>langer</b>, <i>langer</i>, <u>langer</u> Text ohne Bild</p>");
-			html.setText(Locale.ENGLISH.getLanguage(), "<p>This is my text in english. No image.</p>");
+			html.setText(Locale.ENGLISH.getLanguage(), "<p>This is my text in english. No image.</p>"+largeTextEn);
+			html.setText(Locale.GERMAN.getLanguage(), "<p>Mein <b>langer</b>, <i>langer</i>, <u>langer</u> Text ohne Bild</p>"+largeTextDe);
 		}
 
 		props.deflate(); // and it should always be imploded before storing it into the datastore. Marco.
@@ -282,6 +285,22 @@ extends DataCreator
 		}
 		if (props != null)
 			pm.makePersistent(props);
+	}
+
+	private String loadText(String fileName)
+	{
+		InputStream in;
+		String text = "";
+		in = getClass().getResourceAsStream("resource/"+fileName);
+		if (in != null) {
+			try {
+				text = IOUtil.readTextFile(in, "UTF-8");
+			} catch (IOException e) {
+				logger.error("Error loading text", e);
+				text = "";
+			}
+		}
+		return text;
 	}
 
 	public void calculatePrices()

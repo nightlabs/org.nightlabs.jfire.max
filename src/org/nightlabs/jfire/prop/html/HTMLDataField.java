@@ -1,7 +1,9 @@
 package org.nightlabs.jfire.prop.html;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import org.nightlabs.htmlcontent.IFCKEditorContent;
 import org.nightlabs.htmlcontent.IFCKEditorContentFile;
@@ -19,11 +21,11 @@ import org.nightlabs.jfire.prop.StructField;
  *
  * @jdo.inheritance strategy="new-table"
  *
- * @jdo.fetch-group name="FetchGroupsProp.fullData" fetch-groups="default" fields="html, files"
+ * @jdo.fetch-group name="FetchGroupsProp.fullData" fetch-groups="default" fields="texts, files"
  *
  * @author Marc Klinger - marc[at]nightlabs[dot]de
  */
-public class HTMLDataField extends DataField implements IFCKEditorContent
+public class HTMLDataField extends DataField
 {
 	/**
 	 * The serial version of this class.
@@ -31,10 +33,20 @@ public class HTMLDataField extends DataField implements IFCKEditorContent
 	private static final long serialVersionUID = 1L;
 
 	/**
-	 * @jdo.field persistence-modifier="persistent"
-	 * @jdo.column sql-type="CLOB"
+	 * key: String languageID<br/>
+	 * value: String html text
+	 *
+	 * @jdo.field
+	 *		persistence-modifier="persistent"
+	 *		collection-type="map"
+	 *		key-type="java.lang.String"
+	 *		value-type="java.lang.String"
+	 *		table="JFireHTMLProp_HTMLDataField_Texts"
+	 *
+	 * @jdo.join
+	 * @jdo.value-column sql-type="CLOB"
 	 */
-	private String html;
+	private Map<String, String> texts;
 
 	/**
 	 * @jdo.field
@@ -44,14 +56,16 @@ public class HTMLDataField extends DataField implements IFCKEditorContent
 	 *		null-value="exception"
 	 *		element-type="org.nightlabs.jfire.prop.html.HTMLContentFile"
 	 *		table="JFireHTMLProp_HTMLDataField_Files"
-	 * 
+	 *
 	 * @jdo.join
 	 */
 	private List<IFCKEditorContentFile> files;
 
 	/**
 	 * Create a new HTMLDataField instance.
+	 * @deprecated For JDO only
 	 */
+	@Deprecated
 	protected HTMLDataField()
 	{
 		super();
@@ -63,6 +77,7 @@ public class HTMLDataField extends DataField implements IFCKEditorContent
 	public HTMLDataField(DataBlock block, StructField<? extends DataField> field)
 	{
 		super(block, field);
+		texts = new HashMap<String, String>();
 		files = new ArrayList<IFCKEditorContentFile>();
 	}
 
@@ -85,7 +100,7 @@ public class HTMLDataField extends DataField implements IFCKEditorContent
 				propertySet.getOrganisationID(),
 				propertySet.getPropertySetID(),
 				this);
-		htmlDataField.setHtml(getHtml());
+		htmlDataField.setTexts(new HashMap<String, String>(getTexts()));
 		htmlDataField.setFiles(new ArrayList<IFCKEditorContentFile>(getFiles()));
 		return htmlDataField;
 	}
@@ -97,24 +112,16 @@ public class HTMLDataField extends DataField implements IFCKEditorContent
 	public boolean isEmpty()
 	{
 		return
-			(getHtml() == null || getHtml().isEmpty()) &&
+			(getTexts() == null || getTexts().isEmpty()) &&
 			(getFiles() == null || getFiles().isEmpty());
 	}
 
-	/* (non-Javadoc)
-	 * @see org.nightlabs.eclipse.ui.fckeditor.IFCKEditorContent#addFile(org.nightlabs.eclipse.ui.fckeditor.IFCKEditorContentFile)
-	 */
-	@Override
-	public void addFile(IFCKEditorContentFile file)
+	private void addFile(IFCKEditorContentFile file)
 	{
 		files.add(file);
 	}
 
-	/* (non-Javadoc)
-	 * @see org.nightlabs.eclipse.ui.fckeditor.IFCKEditorContent#getFile(long)
-	 */
-	@Override
-	public IFCKEditorContentFile getFile(long fileId)
+	private IFCKEditorContentFile getFile(long fileId)
 	{
 		for (IFCKEditorContentFile file : getFiles())
 	        if(file.getFileId() == fileId)
@@ -122,11 +129,7 @@ public class HTMLDataField extends DataField implements IFCKEditorContent
 		return null;
 	}
 
-	/* (non-Javadoc)
-	 * @see org.nightlabs.eclipse.ui.fckeditor.IFCKEditorContent#getFileFactory()
-	 */
-	@Override
-	public IFCKEditorContentFileFactory getFileFactory()
+	private IFCKEditorContentFileFactory getFileFactory()
 	{
 		return new IFCKEditorContentFileFactory() {
 			@Override
@@ -137,39 +140,96 @@ public class HTMLDataField extends DataField implements IFCKEditorContent
 		};
 	}
 
-	/* (non-Javadoc)
-	 * @see org.nightlabs.eclipse.ui.fckeditor.IFCKEditorContent#getFiles()
-	 */
-	@Override
 	public List<IFCKEditorContentFile> getFiles()
 	{
 		return files;
 	}
 
-	/* (non-Javadoc)
-	 * @see org.nightlabs.eclipse.ui.fckeditor.IFCKEditorContent#getHtml()
-	 */
-	@Override
-	public String getHtml()
-	{
-		return html;
-	}
-
-	/* (non-Javadoc)
-	 * @see org.nightlabs.eclipse.ui.fckeditor.IFCKEditorContent#setFiles(java.util.List)
-	 */
-	@Override
 	public void setFiles(List<IFCKEditorContentFile> files)
 	{
 		this.files = files;
 	}
 
-	/* (non-Javadoc)
-	 * @see org.nightlabs.eclipse.ui.fckeditor.IFCKEditorContent#setHtml(java.lang.String)
-	 */
-	@Override
-	public void setHtml(String html)
+	public Map<String, String> getTexts()
 	{
-		this.html = html;
+		return texts;
+	}
+
+	public void setTexts(Map<String, String> texts)
+	{
+		this.texts = texts;
+	}
+
+	public String getText(String languageId)
+	{
+		return texts.get(languageId);
+	}
+
+	public void setText(String languageId, String html)
+	{
+		texts.put(languageId, html);
+	}
+
+	/**
+	 * Inner class to provide a {@link IFCKEditorContent} implementation
+	 * that takes care of i18n facilities of {@link HTMLDataField}.
+	 */
+	private static class HTMLDataFieldFCKEditorContent implements IFCKEditorContent
+	{
+		private HTMLDataField htmlDataField;
+		private String languageId;
+
+		HTMLDataFieldFCKEditorContent(HTMLDataField htmlDataField, String languageId)
+		{
+			this.htmlDataField = htmlDataField;
+			this.languageId = languageId;
+		}
+
+		@Override
+		public void addFile(IFCKEditorContentFile file)
+		{
+			htmlDataField.addFile(file);
+		}
+
+		@Override
+		public IFCKEditorContentFile getFile(long fileId)
+		{
+			return htmlDataField.getFile(fileId);
+		}
+
+		@Override
+		public IFCKEditorContentFileFactory getFileFactory()
+		{
+			return htmlDataField.getFileFactory();
+		}
+
+		@Override
+		public List<IFCKEditorContentFile> getFiles()
+		{
+			return htmlDataField.getFiles();
+		}
+
+		@Override
+		public String getHtml()
+		{
+			return htmlDataField.getText(languageId);
+		}
+
+		@Override
+		public void setFiles(List<IFCKEditorContentFile> files)
+		{
+			htmlDataField.setFiles(files);
+		}
+
+		@Override
+		public void setHtml(String html)
+		{
+			htmlDataField.setText(languageId, html);
+		}
+	}
+
+	public IFCKEditorContent getContent(String languageId)
+	{
+		return new HTMLDataFieldFCKEditorContent(this, languageId);
 	}
 }

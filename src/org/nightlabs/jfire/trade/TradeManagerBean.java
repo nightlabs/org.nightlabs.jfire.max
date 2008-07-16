@@ -1861,7 +1861,13 @@ implements SessionBean
 	 * @ejb.transaction type="Required"
 	 * @ejb.permission role-name="_Guest_"
 	 */	
-	public Offer createReverseOfferForProduct(ProductID productID)
+	public Offer createReverseOfferForProduct(
+			ProductID productID,
+			boolean completeOffer,
+			boolean get,
+			String[] fetchGroups,
+			int maxFetchDepth
+	)
 	throws ModuleException
 	{
 		PersistenceManager pm = getPersistenceManager();
@@ -1872,7 +1878,7 @@ implements SessionBean
 			} catch (JDOObjectNotFoundException x) {
 				return null;
 			}
-			
+
 			ReverseProductException result = new ReverseProductException(productID);
 			// get all articles for product
 			Set<Article> articles = Article.getArticles(pm, product);
@@ -1892,7 +1898,7 @@ implements SessionBean
 					allocatedArticles.add(article);
 				}
 			}
-			
+
 			String description = null;
 			// check if more than 1 Article is allocated
 			if (allocatedArticles.size() > 1) {
@@ -1926,34 +1932,60 @@ implements SessionBean
 					throw new IllegalStateException(description);
 				}
 			}
+
+			// exactly one allocated article found
+			Article article = allocatedArticles.iterator().next();
+			articles.clear();
+			articles.add(article);
+			Offer offer = article.getOffer();
+
+			Trader trader = Trader.getTrader(pm);
+			if (!trader.getMandator().equals(offer.getVendor()))
+				throw new UnsupportedOperationException("NYI");
+
+			// check if offer is accepted from both sides
+			if (!State.hasState(pm, article.getOfferID(), JbpmConstantsOffer.Vendor.NODE_NAME_ACCEPTED)) {
+				description = "The offer ist not accepted.";
+				OfferNotAcceptedReverseProductError error = new OfferNotAcceptedReverseProductError(description);
+				error.setOfferID(article.getOfferID());
+//				result.addReverseProductResultError(error);
+				result.setReverseProductError(error);
+				throw result;
+			}
 			else {
-				Article article = allocatedArticles.iterator().next();
-				// check if offer is accepted from both sides
-				if (!State.hasState(pm, article.getOfferID(), JbpmConstantsOffer.Both.NODE_NAME_ACCEPTED_IMPLICITELY)) {
-					description = "The offer ist not successfully accepted from both sides";
-					OfferNotAcceptedReverseProductError error = new OfferNotAcceptedReverseProductError(description);
-					error.setOfferID(article.getOfferID());
-//					result.addReverseProductResultError(error);
-					result.setReverseProductError(error);
-					throw result;
-				}
-				else {
-					// everything is ok, article can be reversed, so create reversing offer
-					TradeManager tm;
-					try {
-						User user = User.getUser(pm, getPrincipal());
-						Trader trader = Trader.getTrader(pm);
-						// TODO check for all requested articles, whether 'org.nightlabs.jfire.trade.reverseProductType' is allowed!
-						Offer offer = trader.createReverseOffer(user, articles, null);
-						offer.validate();
-						return offer;
-					} catch (Exception e) {
-						throw new ModuleException(e);
+				// everything is ok, article can be reversed, so create reversing offer
+				try {
+					User user = User.getUser(pm, getPrincipal());
+					// check if complete offer should be reversed
+					if (completeOffer) {
+						Collection<Article> offerArticles = offer.getArticles();
+						Set<Article> reversableArticles = new HashSet<Article>();
+						// remove all reversing articles from offer
+						for (Article offerArticle : offerArticles) {
+							if (!offerArticle.isReversing() && !offerArticle.isReversed()) {
+								reversableArticles.add(offerArticle);
+							}
+						}
+						articles = reversableArticles;
 					}
+					Offer reversingOffer = trader.createReverseOffer(user, articles, null);
+					reversingOffer.validate();
+					
+					if (!get)
+						return null;
+
+					pm.getFetchPlan().setMaxFetchDepth(maxFetchDepth);
+					if (fetchGroups != null)
+						pm.getFetchPlan().setGroups(fetchGroups);
+					
+					return pm.detachCopy(reversingOffer);
+				} catch (Exception e) {
+					throw new ModuleException(e);
 				}
 			}
 		} finally {
 			pm.close();
 		}
-	}	
+	}
+	
 }

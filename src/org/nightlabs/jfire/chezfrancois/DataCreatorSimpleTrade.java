@@ -40,6 +40,7 @@ import javax.jdo.PersistenceManager;
 
 import org.apache.log4j.Logger;
 import org.nightlabs.ModuleException;
+import org.nightlabs.htmlcontent.ContentTypeUtil;
 import org.nightlabs.jdo.NLJDOHelper;
 import org.nightlabs.jfire.accounting.Currency;
 import org.nightlabs.jfire.accounting.PriceFragmentType;
@@ -132,12 +133,12 @@ extends DataCreator
 		store.setProductTypeStatus_published(user, pt);
 //		store.setProductTypeStatus_confirmed(user, pt);
 //		store.setProductTypeStatus_saleable(user, pt, true);
-		
+
 		createdLeafIDs.add((ProductTypeID) JDOHelper.getObjectId(pt));
 
 		return pt;
 	}
-	
+
 	public void makeAllLeavesSaleable()
 	throws CannotMakeProductTypeSaleableException, CannotConfirmProductTypeException
 	{
@@ -147,7 +148,7 @@ extends DataCreator
 			store.setProductTypeStatus_saleable(user, pt, true);
 		}
 	}
-	
+
 	public void createWineProperties(PersistenceManager pm, SimpleProductType productType, String englishShort, String germanShort, String englishLong, String germanLong, String smallImage, String smallImageContentType, String largeImage, String largeImageContentType) {
 		SimpleProductTypeStruct.getSimpleProductTypeStruct(productType.getOrganisationID(), pm);
 		IStruct struct = StructLocal.getStructLocal(SimpleProductType.class, Struct.DEFAULT_SCOPE, StructLocal.DEFAULT_SCOPE, pm);
@@ -162,7 +163,7 @@ extends DataCreator
 		// Why not explode attached, when intending to set all properties ;-)
 		if (JDOHelper.isPersistent(props))
 			props = pm.detachCopy(props);
-		
+
 		props.inflate(struct);
 		I18nTextDataField shortDesc;
 		try {
@@ -220,17 +221,17 @@ extends DataCreator
 				}
 			}
 		}
-		
-		
+
+
 		HTMLDataField html;
 		try {
 			html = (HTMLDataField)props.getDataField(SimpleProductTypeStruct.XINFO_INFO);
 		} catch (Exception e) {
 			throw new RuntimeException(e);
 		}
+		String imageLink = null;
 		in = getClass().getResourceAsStream("resource/"+largeImage);
 		if (in != null) {
-			html.setHtml("<p>Mein <b>langer</b>, <i>langer</i>, <u>langer</u> Text und ein Bild</p>");
 			try {
 				ByteArrayOutputStream out = new ByteArrayOutputStream();
 				IOUtil.transferStreamData(in, out);
@@ -239,10 +240,11 @@ extends DataCreator
 				file.setName(largeImage);
 				file.setContentType(largeImageContentType);
 				file.setDescription(largeImage);
+				imageLink = "fckeditorfile://"+file.getFileId()+"."+ContentTypeUtil.getFileExtension(file);
 //				List<IFCKEditorContentFile> files = html.getFiles();
 //				files.add(file);
 //				html.setFiles(files);
-				html.addFile(file);
+				html.getFiles().add(file);
 			} catch(IOException e) {
 				logger.error("Error loading image", e);
 			} finally {
@@ -252,10 +254,16 @@ extends DataCreator
 					logger.error("Error loading image", e);
 				}
 			}
-		} else {
-			html.setHtml("<p>Mein <b>langer</b>, <i>langer</i>, <u>langer</u> Text ohne Bild</p>");
 		}
-		
+
+		if(imageLink != null) {
+			html.setText(Locale.GERMAN.getLanguage(), "<p>Mein <b>langer</b>, <i>langer</i>, <u>langer</u> Text und ein Bild</p><p><img src=\""+imageLink+"\"/></p>");
+			html.setText(Locale.ENGLISH.getLanguage(), "<p>This is my text in english. This contains an image.</p><p><img src=\""+imageLink+"\"/></p>");
+		} else {
+			html.setText(Locale.GERMAN.getLanguage(), "<p>Mein <b>langer</b>, <i>langer</i>, <u>langer</u> Text ohne Bild</p>");
+			html.setText(Locale.ENGLISH.getLanguage(), "<p>This is my text in english. No image.</p>");
+		}
+
 		props.deflate(); // and it should always be imploded before storing it into the datastore. Marco.
 
 		// TODO JPOX WORKAROUND : this fails sometimes - hence we retry a few times
@@ -357,7 +365,7 @@ extends DataCreator
 		StablePriceConfig stablePriceConfig = new StablePriceConfig(IDGenerator.getOrganisationID(), PriceConfig.createPriceConfigID());
 		FormulaPriceConfig formulaPriceConfig = new FormulaPriceConfig(IDGenerator.getOrganisationID(), PriceConfig.createPriceConfigID());
 		setNames(formulaPriceConfig.getName(), names);
-		
+
 		CustomerGroup customerGroupDefault = trader.getDefaultCustomerGroupForKnownCustomer();
 		CustomerGroup customerGroupAnonymous = LegalEntity.getAnonymousLegalEntity(pm).getDefaultCustomerGroup();
 		formulaPriceConfig.addCustomerGroup(customerGroupDefault);
@@ -405,7 +413,7 @@ extends DataCreator
 		for (int i = 0; i < formulas.length; i++) {
 			String formula = formulas[i];
 			Tariff tariff = tariffs[i];
-		
+
 			FormulaCell cell = formulaPriceConfig.createFormulaCell(customerGroupDefault, tariff, euro);
 			cell.setFormula(totalPriceFragmentType, formula);
 		}

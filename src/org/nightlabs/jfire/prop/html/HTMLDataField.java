@@ -116,12 +116,12 @@ public class HTMLDataField extends DataField
 			(getFiles() == null || getFiles().isEmpty());
 	}
 
-	private void addFile(IFCKEditorContentFile file)
+	public void addFile(IFCKEditorContentFile file)
 	{
 		files.add(file);
 	}
 
-	private IFCKEditorContentFile getFile(long fileId)
+	public IFCKEditorContentFile getFile(long fileId)
 	{
 		for (IFCKEditorContentFile file : getFiles())
 	        if(file.getFileId() == fileId)
@@ -129,7 +129,7 @@ public class HTMLDataField extends DataField
 		return null;
 	}
 
-	private IFCKEditorContentFileFactory getFileFactory()
+	public IFCKEditorContentFileFactory getFileFactory()
 	{
 		return new IFCKEditorContentFileFactory() {
 			@Override

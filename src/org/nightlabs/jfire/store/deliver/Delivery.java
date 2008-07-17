@@ -77,7 +77,9 @@ public class Delivery
 implements Serializable, StoreCallback
 {
 	private static final long serialVersionUID = 1L;
-	
+
+	// TODO this field should not be here! The place for use-case-specific fetch-groups is
+	// an external class like for example FetchGroupsTrade! Marco.
 	public static final String FETCH_GROUP_DELIVERY_TABLE_DATA = "DeliveryTableData";
 
 	public static final String DELIVERY_DIRECTION_INCOMING = "incoming";

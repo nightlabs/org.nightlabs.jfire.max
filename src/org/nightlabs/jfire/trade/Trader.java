@@ -54,7 +54,9 @@ import org.nightlabs.ModuleException;
 import org.nightlabs.jdo.NLJDOHelper;
 import org.nightlabs.jfire.accounting.Accounting;
 import org.nightlabs.jfire.accounting.Currency;
+import org.nightlabs.jfire.accounting.Invoice;
 import org.nightlabs.jfire.accounting.Tariff;
+import org.nightlabs.jfire.accounting.jbpm.JbpmConstantsInvoice;
 import org.nightlabs.jfire.accounting.priceconfig.IPackagePriceConfig;
 import org.nightlabs.jfire.asyncinvoke.AsyncInvoke;
 import org.nightlabs.jfire.asyncinvoke.AsyncInvokeEnvelope;
@@ -85,7 +87,12 @@ import org.nightlabs.jfire.store.ProductType;
 import org.nightlabs.jfire.store.ProductTypeActionHandler;
 import org.nightlabs.jfire.store.ProductTypeActionHandlerCache;
 import org.nightlabs.jfire.store.Store;
+import org.nightlabs.jfire.store.id.ProductID;
+import org.nightlabs.jfire.store.jbpm.JbpmConstantsDeliveryNote;
 import org.nightlabs.jfire.trade.config.TradeConfigModule;
+import org.nightlabs.jfire.trade.history.ProductHistory;
+import org.nightlabs.jfire.trade.history.ProductHistoryItem;
+import org.nightlabs.jfire.trade.history.ProductHistoryItem.ProductHistoryItemType;
 import org.nightlabs.jfire.trade.id.ArticleID;
 import org.nightlabs.jfire.trade.id.OfferID;
 import org.nightlabs.jfire.trade.jbpm.ActionHandlerAcceptOffer;
@@ -1843,6 +1850,110 @@ public class Trader
 		}
 	}
 
+	/**
+	 * Returns the {@link ProductHistory} for the given {@link Product}.
+	 * 
+	 * @param product the Product to obtain an {@link ProductHistory} for
+	 * @return the {@link ProductHistory} for the given {@link Product}.
+	 */
+	public ProductHistory getProductHistory(Product product) 
+	{
+		if (product == null)
+			return null;
+		
+		ProductHistory productHistory = new ProductHistory((ProductID)JDOHelper.getObjectId(product));
+		
+		PersistenceManager pm = getPersistenceManager();
+		try {
+			// get all articles for the product
+			Set<Article> articles = Article.getArticles(pm, product);
+			if (articles != null && !articles.isEmpty()) 
+			{				
+				Set<Offer> offers = new HashSet<Offer>();
+				Set<Order> orders = new HashSet<Order>();
+				Set<Invoice> invoices = new HashSet<Invoice>();
+				Set<DeliveryNote> deliveryNotes = new HashSet<DeliveryNote>();
+				
+				// collect all articleContainers for all articles 
+				for (Article article : articles) 
+				{
+					if (article.getOffer() != null) {
+						offers.add(article.getOffer());
+					}
+					if (article.getOrder() != null) {
+						orders.add(article.getOrder());
+					}
+					if (article.getInvoice() != null) {
+						invoices.add(article.getInvoice());
+					}
+					if (article.getDeliveryNote() != null) {
+						deliveryNotes.add(article.getDeliveryNote());
+					}
+					
+					// check for offers with the state accepted
+					for (Offer offer : offers) {
+						List<State> states = offer.getStates();
+						for (State state : states) {
+							if (state.getStateDefinition().getJbpmNodeName().equals(
+									JbpmConstantsOffer.Customer.NODE_NAME_CUSTOMER_ACCEPTED))
+							{
+								ProductHistoryItem productHistoryItem = new ProductHistoryItem(
+										offer.getCreateUser(), 
+										"Offer accepted", 
+										"Offer has been accpted",
+										offer, offer.getCustomer(), null, null, 
+										offer.getCreateDT(), ProductHistoryItemType.OFFER_ACCEPTED);
+								productHistory.addProductHistoryItem(productHistoryItem);
+							}
+						}
+					}
+					
+					// check for invoices with the state finalized
+					for (Invoice invoice : invoices) {
+						List<State> states = invoice.getStates();
+						for (State state : states) {
+							if (state.getStateDefinition().getJbpmNodeName().equals(
+									JbpmConstantsInvoice.Vendor.NODE_NAME_FINALIZED))
+							{
+								ProductHistoryItem productHistoryItem = new ProductHistoryItem(
+										invoice.getCreateUser(),
+										"Invoice finalized",
+										"Invoice has been finalized",
+										invoice, invoice.getCustomer(), null, null, 
+										invoice.getCreateDT(), ProductHistoryItemType.INVOICE_FINALIZED);
+								productHistory.addProductHistoryItem(productHistoryItem);
+							}
+						}
+					}
+
+					// check for DeliveryNotes with the state finalized
+					for (DeliveryNote deliveryNote : deliveryNotes) {
+						List<State> states = deliveryNote.getStates();
+						for (State state : states) {
+							if (state.getStateDefinition().getJbpmNodeName().equals(
+									JbpmConstantsDeliveryNote.Vendor.NODE_NAME_FINALIZED))
+							{
+								ProductHistoryItem productHistoryItem = new ProductHistoryItem(
+										deliveryNote.getCreateUser(),
+										"DeliveryNote finalized",
+										"DeliveryNote has been finalized",
+										deliveryNote, deliveryNote.getCustomer(), null, null, 
+										deliveryNote.getCreateDT(), ProductHistoryItemType.DELIVERY_NOTE_FINALIZED);
+								productHistory.addProductHistoryItem(productHistoryItem);
+							}
+						}						
+					}
+					
+					// TODO: check for payments and deliveries
+				}
+			}
+			return productHistory;			
+		} 
+		finally {
+			pm.close();
+		}
+	}
+	
 //	public Collection<? extends Article> onProductAssemble_importNestedProduct(User user, Product packageProduct, String partnerOrganisationID, Collection<NestedProductTypeLocal> partnerNestedProductTypes)
 //	{
 //		try {

@@ -35,20 +35,19 @@ public class SimpleProductTypeStruct {
 		} catch (JDOObjectNotFoundException e) {
 			// person struct not persisted yet.
 			productTypeStruct = new Struct(organisationID, SimpleProductType.class.getName(), Struct.DEFAULT_SCOPE);
-			createStandardStructure(productTypeStruct);
+			createDefaultStructure(productTypeStruct);
 			productTypeStruct.getName().setText(Locale.ENGLISH.getLanguage(), "Simple products");
 			productTypeStruct.getName().setText(Locale.GERMAN.getLanguage(), "Einfache Produkte");
 			productTypeStruct = pm.makePersistent(productTypeStruct);
 			productTypeStructLocal = new StructLocal(productTypeStruct, organisationID, StructLocal.DEFAULT_SCOPE);
 			productTypeStructLocal.getName().setText(Locale.ENGLISH.getLanguage(), "Default simple product structure");
-			productTypeStructLocal.getName().setText(Locale.GERMAN.getLanguage(), "Standard Struktur für einfache Produkte");
-			pm.makePersistent(productTypeStructLocal);
+			productTypeStructLocal.getName().setText(Locale.GERMAN.getLanguage(), "Standardstruktur für einfache Produkte");
+			productTypeStructLocal = pm.makePersistent(productTypeStructLocal);
 		}
 		return productTypeStruct;
 	}
 
-
-	public static void createStandardStructure(IStruct productTypeStruct) {
+	private static void createDefaultStructure(IStruct productTypeStruct) {
 		try {
 
 			StructBlock sb = PropHelper.createStructBlock(productTypeStruct, DESCRIPTION, "Description", "Beschreibung");
@@ -101,7 +100,7 @@ public class SimpleProductTypeStruct {
 	}
 
 
-	// *************** STANDARD StructBlocks StructField IDs ***************************
+	// *************** DEFAULT StructBlocks StructField IDs ***************************
 
 	public static final String DEV_ORGANISATION_ID = Organisation.DEV_ORGANISATION_ID;
 

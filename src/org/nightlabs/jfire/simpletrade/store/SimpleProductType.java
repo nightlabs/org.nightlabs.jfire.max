@@ -138,8 +138,15 @@ public class SimpleProductType extends ProductType
 			byte inheritanceNature, byte packageNature)
 	{
 		super(organisationID, productTypeID, extendedProductType, inheritanceNature, packageNature);
-		this.structScope = Struct.DEFAULT_SCOPE;
-		this.structLocalScope = StructLocal.DEFAULT_SCOPE;
+//		this.structScope = Struct.DEFAULT_SCOPE;
+//		this.structLocalScope = StructLocal.DEFAULT_SCOPE;
+
+		// I have no idea, why there were fields for structScope and structLocalScope in this class
+		// when a PropertySet is assigned in a 1-1-relationship and has these fields, too. IMHO they
+		// do not need to be stored twice and thus I commented the fields in this class.
+		String structScope = Struct.DEFAULT_SCOPE;
+		String structLocalScope = StructLocal.DEFAULT_SCOPE;
+
 		this.propertySet = new PropertySet(
 				organisationID, IDGenerator.nextID(PropertySet.class), 
 				SimpleProductType.class.getName(), 
@@ -166,36 +173,36 @@ public class SimpleProductType extends ProductType
 		}
 	}
 	
-	/**
-	 * The scope of the Struct by which the StructLocal 
-	 * of the PropertySet of this SimpleProductType is build from.
-	 * 
-	 * @jdo.field persistence-modifier="persistent" null-value="exception" indexed="true"
-	 */
-	private String structScope;
-	
-	/**
-	 * @return The scope of the Struct by which the StructLocal 
-	 * of the PropertySet of this SimpleProductType is build from.
-	 */
-	public String getStructScope() {
-		return structScope;
-	}
-	
-	/**
-	 * The scope of the StructLocal by which the propertySet is build from.
-	 * 
-	 * @jdo.field persistence-modifier="persistent" null-value="exception" indexed="true"
-	 */
-	private String structLocalScope;
-	
-	/**
-	 * Returns the scope of the StructLocal by which the propertySet is build from.
-	 * @return The scope of the StructLocal by which the propertySet is build from.
-	 */
-	public String getStructLocalScope() {
-		return structLocalScope;
-	}
+//	/**
+//	 * The scope of the Struct by which the StructLocal 
+//	 * of the PropertySet of this SimpleProductType is build from.
+//	 * 
+//	 * @jdo.field persistence-modifier="persistent" null-value="exception" indexed="true"
+//	 */
+//	private String structScope;
+//	
+//	/**
+//	 * @return The scope of the Struct by which the StructLocal 
+//	 * of the PropertySet of this SimpleProductType is build from.
+//	 */
+//	public String getStructScope() {
+//		return structScope;
+//	}
+//	
+//	/**
+//	 * The scope of the StructLocal by which the propertySet is build from.
+//	 * 
+//	 * @jdo.field persistence-modifier="persistent" null-value="exception" indexed="true"
+//	 */
+//	private String structLocalScope;
+//	
+//	/**
+//	 * Returns the scope of the StructLocal by which the propertySet is build from.
+//	 * @return The scope of the StructLocal by which the propertySet is build from.
+//	 */
+//	public String getStructLocalScope() {
+//		return structLocalScope;
+//	}
 	
 	/**
 	 * @jdo.field persistence-modifier="persistent"
@@ -234,8 +241,8 @@ public class SimpleProductType extends ProductType
 		super.preInherit(mother, child);
 		if (propertySet != null)
 			; // do nothing, just ensure the field is loaded by jdo
-		if (structLocalScope != null)
-			; // do nothing, just ensure the field is loaded by jdo
+//		if (structLocalScope != null)
+//			; // do nothing, just ensure the field is loaded by jdo
 	}
 
 //	/**

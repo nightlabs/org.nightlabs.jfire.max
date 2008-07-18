@@ -1,6 +1,9 @@
 package org.nightlabs.jfire.trade.history;
 
+import java.io.Serializable;
 import java.util.Date;
+
+import javax.jdo.PersistenceManager;
 
 import org.nightlabs.jfire.accounting.pay.ModeOfPaymentFlavour;
 import org.nightlabs.jfire.security.User;
@@ -16,8 +19,11 @@ import org.nightlabs.jfire.trade.LegalEntity;
  * @author Daniel Mazurek - daniel [at] nightlabs [dot] de
  *
  */
-public class ProductHistoryItem 
+public class ProductHistoryItem
+implements Serializable
 {
+	private static final long serialVersionUID = 1L;
+
 	public enum ProductHistoryItemType {
 		ALLOCATION,
 		PAYMENT,
@@ -137,4 +143,15 @@ public class ProductHistoryItem
 		return type;
 	}
 	
+	/**
+	 * Detaches all fields of this {@link ProductHistoryItem}.
+	 * @param pm the PersistenceManager used for detaching
+	 */
+	public void detachCopy(PersistenceManager pm) {
+		this.articleContainer = pm.detachCopy(this.articleContainer);
+		this.customer = pm.detachCopy(this.customer);
+		this.modeOfDeliveryFlavour = pm.detachCopy(modeOfDeliveryFlavour);
+		this.modeOfPaymentFlavour = pm.detachCopy(modeOfPaymentFlavour);
+		this.user = pm.detachCopy(this.user);
+	}
 }

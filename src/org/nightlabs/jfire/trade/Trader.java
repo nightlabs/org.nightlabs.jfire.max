@@ -1860,98 +1860,115 @@ public class Trader
 	{
 		if (product == null)
 			return null;
-		
-		ProductHistory productHistory = new ProductHistory((ProductID)JDOHelper.getObjectId(product));
-		
-		PersistenceManager pm = getPersistenceManager();
-		try {
-			// get all articles for the product
-			Set<Article> articles = Article.getArticles(pm, product);
-			if (articles != null && !articles.isEmpty()) 
-			{				
-				Set<Offer> offers = new HashSet<Offer>();
-				Set<Order> orders = new HashSet<Order>();
-				Set<Invoice> invoices = new HashSet<Invoice>();
-				Set<DeliveryNote> deliveryNotes = new HashSet<DeliveryNote>();
-				
-				// collect all articleContainers for all articles 
-				for (Article article : articles) 
-				{
-					if (article.getOffer() != null) {
-						offers.add(article.getOffer());
-					}
-					if (article.getOrder() != null) {
-						orders.add(article.getOrder());
-					}
-					if (article.getInvoice() != null) {
-						invoices.add(article.getInvoice());
-					}
-					if (article.getDeliveryNote() != null) {
-						deliveryNotes.add(article.getDeliveryNote());
-					}
-					
-					// check for offers with the state accepted
-					for (Offer offer : offers) {
-						List<State> states = offer.getStates();
-						for (State state : states) {
-							if (state.getStateDefinition().getJbpmNodeName().equals(
-									JbpmConstantsOffer.Customer.NODE_NAME_CUSTOMER_ACCEPTED))
-							{
-								ProductHistoryItem productHistoryItem = new ProductHistoryItem(
-										offer.getCreateUser(), 
-										"Offer accepted", 
-										"Offer has been accpted",
-										offer, offer.getCustomer(), null, null, 
-										offer.getCreateDT(), ProductHistoryItemType.OFFER_ACCEPTED);
-								productHistory.addProductHistoryItem(productHistoryItem);
-							}
-						}
-					}
-					
-					// check for invoices with the state finalized
-					for (Invoice invoice : invoices) {
-						List<State> states = invoice.getStates();
-						for (State state : states) {
-							if (state.getStateDefinition().getJbpmNodeName().equals(
-									JbpmConstantsInvoice.Vendor.NODE_NAME_FINALIZED))
-							{
-								ProductHistoryItem productHistoryItem = new ProductHistoryItem(
-										invoice.getCreateUser(),
-										"Invoice finalized",
-										"Invoice has been finalized",
-										invoice, invoice.getCustomer(), null, null, 
-										invoice.getCreateDT(), ProductHistoryItemType.INVOICE_FINALIZED);
-								productHistory.addProductHistoryItem(productHistoryItem);
-							}
-						}
-					}
 
-					// check for DeliveryNotes with the state finalized
-					for (DeliveryNote deliveryNote : deliveryNotes) {
-						List<State> states = deliveryNote.getStates();
-						for (State state : states) {
-							if (state.getStateDefinition().getJbpmNodeName().equals(
-									JbpmConstantsDeliveryNote.Vendor.NODE_NAME_FINALIZED))
-							{
-								ProductHistoryItem productHistoryItem = new ProductHistoryItem(
-										deliveryNote.getCreateUser(),
-										"DeliveryNote finalized",
-										"DeliveryNote has been finalized",
-										deliveryNote, deliveryNote.getCustomer(), null, null, 
-										deliveryNote.getCreateDT(), ProductHistoryItemType.DELIVERY_NOTE_FINALIZED);
-								productHistory.addProductHistoryItem(productHistoryItem);
-							}
-						}						
-					}
-					
-					// TODO: check for payments and deliveries
+		ProductHistory productHistory = new ProductHistory((ProductID)JDOHelper.getObjectId(product));
+
+		PersistenceManager pm = getPersistenceManager();
+		// get all articles for the product
+		Set<Article> articles = Article.getArticles(pm, product);
+		if (articles != null && !articles.isEmpty()) 
+		{
+			Set<Offer> offers = new HashSet<Offer>();
+			Set<Order> orders = new HashSet<Order>();
+			Set<Invoice> invoices = new HashSet<Invoice>();
+			Set<DeliveryNote> deliveryNotes = new HashSet<DeliveryNote>();
+
+			// collect all articleContainers for all articles 
+			for (Article article : articles) 
+			{
+				if (article.getOffer() != null) {
+					offers.add(article.getOffer());
 				}
+				if (article.getOrder() != null) {
+					orders.add(article.getOrder());
+				}
+				if (article.getInvoice() != null) {
+					invoices.add(article.getInvoice());
+				}
+				if (article.getDeliveryNote() != null) {
+					deliveryNotes.add(article.getDeliveryNote());
+				}
+
+				// check for offers with the state accepted
+				for (Offer offer : offers) {
+					List<State> states = offer.getStates();
+					for (State state : states) {
+						String nodeName = state.getStateDefinition().getJbpmNodeName();
+						if (logger.isDebugEnabled()) {
+							logger.debug("NodeName = "+nodeName+" for state "+state+" of offer "+offer);
+							logger.debug("NODE_NAME_CUSTOMER_ACCEPTED = "+JbpmConstantsOffer.Customer.NODE_NAME_CUSTOMER_ACCEPTED);								
+						}
+						if (nodeName.equals(JbpmConstantsOffer.Customer.NODE_NAME_CUSTOMER_ACCEPTED)) {
+							ProductHistoryItem productHistoryItem = new ProductHistoryItem(
+									offer.getCreateUser(), 
+									"Offer accepted", 
+									"Offer has been accpted",
+									offer, offer.getCustomer(), null, null, 
+									offer.getCreateDT(), ProductHistoryItemType.OFFER_ACCEPTED);
+							productHistory.addProductHistoryItem(productHistoryItem);
+							if (logger.isDebugEnabled()) {
+								logger.debug("offer "+offer+" has state has statedefinition with nodeName "+JbpmConstantsOffer.Customer.NODE_NAME_CUSTOMER_ACCEPTED);
+								logger.debug("Create appropriate ProductHistoryItem");
+							}
+						}
+					}
+				}
+
+				// check for invoices with the state finalized
+				for (Invoice invoice : invoices) {
+					List<State> states = invoice.getStates();
+					for (State state : states) {
+						String nodeName = state.getStateDefinition().getJbpmNodeName();
+						if (logger.isDebugEnabled()) {
+							logger.debug("NodeName = "+nodeName+" for state "+state+" of invoice "+invoice);
+							logger.debug("NODE_NAME_FINALIZED = "+JbpmConstantsInvoice.Vendor.NODE_NAME_FINALIZED);								
+						}
+						if (nodeName.equals(JbpmConstantsInvoice.Vendor.NODE_NAME_FINALIZED)) {
+							ProductHistoryItem productHistoryItem = new ProductHistoryItem(
+									invoice.getCreateUser(),
+									"Invoice finalized",
+									"Invoice has been finalized",
+									invoice, invoice.getCustomer(), null, null, 
+									invoice.getCreateDT(), ProductHistoryItemType.INVOICE_FINALIZED);
+							productHistory.addProductHistoryItem(productHistoryItem);
+							if (logger.isDebugEnabled()) {
+								logger.debug("invoice "+invoice+" has state has statedefinition with nodeName "+JbpmConstantsInvoice.Vendor.NODE_NAME_FINALIZED);
+								logger.debug("Create appropriate ProductHistoryItem");
+							}								
+						}
+					}
+				}
+
+				// check for DeliveryNotes with the state finalized
+				for (DeliveryNote deliveryNote : deliveryNotes) {
+					List<State> states = deliveryNote.getStates();
+					for (State state : states) {
+						String nodeName = state.getStateDefinition().getJbpmNodeName();
+						if (logger.isDebugEnabled()) {
+							logger.debug("NodeName = "+nodeName+" for state "+state+" of deliveryNote "+deliveryNote);
+							logger.debug("NODE_NAME_FINALIZED = "+JbpmConstantsDeliveryNote.Vendor.NODE_NAME_FINALIZED);
+						}
+						if (nodeName.equals(JbpmConstantsDeliveryNote.Vendor.NODE_NAME_FINALIZED))
+						{
+							ProductHistoryItem productHistoryItem = new ProductHistoryItem(
+									deliveryNote.getCreateUser(),
+									"DeliveryNote finalized",
+									"DeliveryNote has been finalized",
+									deliveryNote, deliveryNote.getCustomer(), null, null, 
+									deliveryNote.getCreateDT(), ProductHistoryItemType.DELIVERY_NOTE_FINALIZED);
+							productHistory.addProductHistoryItem(productHistoryItem);
+							if (logger.isDebugEnabled()) {
+								logger.debug("deliveryNote "+deliveryNote+" has state has statedefinition with nodeName "+JbpmConstantsDeliveryNote.Vendor.NODE_NAME_FINALIZED);
+								logger.debug("Create appropriate ProductHistoryItem");
+							}
+						}
+					}						
+				}
+
+				// TODO: check for payments and deliveries
 			}
-			return productHistory;			
-		} 
-		finally {
-			pm.close();
 		}
+		return productHistory;			
 	}
 	
 //	public Collection<? extends Article> onProductAssemble_importNestedProduct(User user, Product packageProduct, String partnerOrganisationID, Collection<NestedProductTypeLocal> partnerNestedProductTypes)

@@ -1,10 +1,12 @@
 package org.nightlabs.jfire.trade.history;
 
+import java.io.Serializable;
 import java.util.Collections;
-import java.util.Comparator;
 import java.util.Set;
 import java.util.SortedSet;
 import java.util.TreeSet;
+
+import javax.jdo.PersistenceManager;
 
 import org.nightlabs.jfire.store.Product;
 import org.nightlabs.jfire.store.id.ProductID;
@@ -16,19 +18,14 @@ import org.nightlabs.jfire.store.id.ProductID;
  * @author Daniel Mazurek - daniel [at] nightlabs [dot] de
  *
  */
-public class ProductHistory 
+public class ProductHistory
+implements Serializable
 {
-	public static Comparator<ProductHistoryItem> productHistoryItemComparator = new Comparator<ProductHistoryItem>(){
-		@Override
-		public int compare(ProductHistoryItem phi1, ProductHistoryItem phi2) {
-			if (phi1.getCreateDT() != null && phi2.getCreateDT() != null) {
-				return phi1.getCreateDT().compareTo(phi2.getCreateDT());
-			}
-			return 0;
-		}
-	};
+	private static final long serialVersionUID = 1L;
+	
 	private ProductID productID; 
-	private SortedSet<ProductHistoryItem> productHistoryItems = new TreeSet<ProductHistoryItem>(productHistoryItemComparator);
+	private SortedSet<ProductHistoryItem> productHistoryItems = new TreeSet<ProductHistoryItem>(
+			new ProductHistoryItemComparator());
 	
 	/**
 	 * Creates an {@link ProductHistory} for the {@link Product} with the given {@link ProductID}. 
@@ -60,5 +57,17 @@ public class ProductHistory
 	 */
 	public void addProductHistoryItem(ProductHistoryItem productHistoryItem) {
 		productHistoryItems.add(productHistoryItem);
+	}
+	
+	/**
+	 * Detaches this {@link ProductHistory} object including all
+	 * {@link ProductHistoryItem}s. 
+	 * @param pm the PersistenceManager used for detaching
+	 */
+	public void detachCopy(PersistenceManager pm) 
+	{
+		for (ProductHistoryItem item : productHistoryItems) {
+			item.detachCopy(pm);
+		}
 	}
 }

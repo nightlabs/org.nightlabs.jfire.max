@@ -1,10 +1,10 @@
 package org.nightlabs.jfire.trade.history;
 
 import java.io.Serializable;
+import java.util.ArrayList;
 import java.util.Collections;
+import java.util.List;
 import java.util.Set;
-import java.util.SortedSet;
-import java.util.TreeSet;
 
 import javax.jdo.PersistenceManager;
 
@@ -24,8 +24,9 @@ implements Serializable
 	private static final long serialVersionUID = 1L;
 	
 	private ProductID productID; 
-	private SortedSet<ProductHistoryItem> productHistoryItems = new TreeSet<ProductHistoryItem>(
-			new ProductHistoryItemComparator());
+//	private SortedSet<ProductHistoryItem> productHistoryItems = new TreeSet<ProductHistoryItem>(
+//			new ProductHistoryItemComparator());
+	private List<ProductHistoryItem> productHistoryItems = new ArrayList<ProductHistoryItem>();
 	
 	/**
 	 * Creates an {@link ProductHistory} for the {@link Product} with the given {@link ProductID}. 
@@ -47,10 +48,18 @@ implements Serializable
 	 * Returns the productHistoryItems.
 	 * @return the productHistoryItems
 	 */
-	public SortedSet<ProductHistoryItem> getProductHistoryItems() {
-		return Collections.unmodifiableSortedSet(productHistoryItems);
+	public List<ProductHistoryItem> getProductHistoryItems() {
+		return Collections.unmodifiableList(productHistoryItems);
 	}
 
+//	/**
+//	 * Returns the productHistoryItems.
+//	 * @return the productHistoryItems
+//	 */
+//	public SortedSet<ProductHistoryItem> getProductHistoryItems() {
+//		return Collections.unmodifiableSortedSet(productHistoryItems);
+//	}
+	
 	/**
 	 * Adds an ProductHistoryItem.
 	 * @param productHistoryItem the ProductHistoryItem to add

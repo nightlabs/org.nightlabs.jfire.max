@@ -56,7 +56,6 @@ import org.nightlabs.jfire.accounting.Accounting;
 import org.nightlabs.jfire.accounting.Currency;
 import org.nightlabs.jfire.accounting.Invoice;
 import org.nightlabs.jfire.accounting.Tariff;
-import org.nightlabs.jfire.accounting.jbpm.JbpmConstantsInvoice;
 import org.nightlabs.jfire.accounting.priceconfig.IPackagePriceConfig;
 import org.nightlabs.jfire.asyncinvoke.AsyncInvoke;
 import org.nightlabs.jfire.asyncinvoke.AsyncInvokeEnvelope;
@@ -88,7 +87,6 @@ import org.nightlabs.jfire.store.ProductTypeActionHandler;
 import org.nightlabs.jfire.store.ProductTypeActionHandlerCache;
 import org.nightlabs.jfire.store.Store;
 import org.nightlabs.jfire.store.id.ProductID;
-import org.nightlabs.jfire.store.jbpm.JbpmConstantsDeliveryNote;
 import org.nightlabs.jfire.trade.config.TradeConfigModule;
 import org.nightlabs.jfire.trade.history.ProductHistory;
 import org.nightlabs.jfire.trade.history.ProductHistoryItem;
@@ -1888,85 +1886,63 @@ public class Trader
 				if (article.getDeliveryNote() != null) {
 					deliveryNotes.add(article.getDeliveryNote());
 				}
-
-				// check for offers with the state accepted
-				for (Offer offer : offers) {
-					List<State> states = offer.getStates();
-					for (State state : states) {
-						String nodeName = state.getStateDefinition().getJbpmNodeName();
-						if (logger.isDebugEnabled()) {
-							logger.debug("NodeName = "+nodeName+" for state "+state+" of offer "+offer);
-							logger.debug("NODE_NAME_CUSTOMER_ACCEPTED = "+JbpmConstantsOffer.Customer.NODE_NAME_CUSTOMER_ACCEPTED);								
-						}
-						if (nodeName.equals(JbpmConstantsOffer.Customer.NODE_NAME_CUSTOMER_ACCEPTED)) {
-							ProductHistoryItem productHistoryItem = new ProductHistoryItem(
-									offer.getCreateUser(), 
-									"Offer accepted", 
-									"Offer has been accpted",
-									offer, offer.getCustomer(), null, null, 
-									offer.getCreateDT(), ProductHistoryItemType.OFFER_ACCEPTED);
-							productHistory.addProductHistoryItem(productHistoryItem);
-							if (logger.isDebugEnabled()) {
-								logger.debug("offer "+offer+" has state has statedefinition with nodeName "+JbpmConstantsOffer.Customer.NODE_NAME_CUSTOMER_ACCEPTED);
-								logger.debug("Create appropriate ProductHistoryItem");
-							}
-						}
-					}
-				}
-
-				// check for invoices with the state finalized
-				for (Invoice invoice : invoices) {
-					List<State> states = invoice.getStates();
-					for (State state : states) {
-						String nodeName = state.getStateDefinition().getJbpmNodeName();
-						if (logger.isDebugEnabled()) {
-							logger.debug("NodeName = "+nodeName+" for state "+state+" of invoice "+invoice);
-							logger.debug("NODE_NAME_FINALIZED = "+JbpmConstantsInvoice.Vendor.NODE_NAME_FINALIZED);								
-						}
-						if (nodeName.equals(JbpmConstantsInvoice.Vendor.NODE_NAME_FINALIZED)) {
-							ProductHistoryItem productHistoryItem = new ProductHistoryItem(
-									invoice.getCreateUser(),
-									"Invoice finalized",
-									"Invoice has been finalized",
-									invoice, invoice.getCustomer(), null, null, 
-									invoice.getCreateDT(), ProductHistoryItemType.INVOICE_FINALIZED);
-							productHistory.addProductHistoryItem(productHistoryItem);
-							if (logger.isDebugEnabled()) {
-								logger.debug("invoice "+invoice+" has state has statedefinition with nodeName "+JbpmConstantsInvoice.Vendor.NODE_NAME_FINALIZED);
-								logger.debug("Create appropriate ProductHistoryItem");
-							}								
-						}
-					}
-				}
-
-				// check for DeliveryNotes with the state finalized
-				for (DeliveryNote deliveryNote : deliveryNotes) {
-					List<State> states = deliveryNote.getStates();
-					for (State state : states) {
-						String nodeName = state.getStateDefinition().getJbpmNodeName();
-						if (logger.isDebugEnabled()) {
-							logger.debug("NodeName = "+nodeName+" for state "+state+" of deliveryNote "+deliveryNote);
-							logger.debug("NODE_NAME_FINALIZED = "+JbpmConstantsDeliveryNote.Vendor.NODE_NAME_FINALIZED);
-						}
-						if (nodeName.equals(JbpmConstantsDeliveryNote.Vendor.NODE_NAME_FINALIZED))
-						{
-							ProductHistoryItem productHistoryItem = new ProductHistoryItem(
-									deliveryNote.getCreateUser(),
-									"DeliveryNote finalized",
-									"DeliveryNote has been finalized",
-									deliveryNote, deliveryNote.getCustomer(), null, null, 
-									deliveryNote.getCreateDT(), ProductHistoryItemType.DELIVERY_NOTE_FINALIZED);
-							productHistory.addProductHistoryItem(productHistoryItem);
-							if (logger.isDebugEnabled()) {
-								logger.debug("deliveryNote "+deliveryNote+" has state has statedefinition with nodeName "+JbpmConstantsDeliveryNote.Vendor.NODE_NAME_FINALIZED);
-								logger.debug("Create appropriate ProductHistoryItem");
-							}
-						}
-					}						
-				}
-
-				// TODO: check for payments and deliveries
 			}
+
+			// check offers
+			for (Offer offer : offers) {
+				List<State> states = offer.getStates();
+				for (State state : states) {
+					String nodeName = state.getStateDefinition().getJbpmNodeName();
+					if (logger.isDebugEnabled()) {
+						logger.debug("NodeName = "+nodeName+" for state "+state+" of offer "+offer);
+					}
+					ProductHistoryItem productHistoryItem = new ProductHistoryItem(
+							offer.getCreateUser(),
+							state.getStateDefinition().getName().getText(), 
+							state.getStateDefinition().getDescription().getText(),
+							offer, offer.getCustomer(), null, null, 
+							offer.getCreateDT(), ProductHistoryItemType.OFFER);
+					productHistory.addProductHistoryItem(productHistoryItem);
+				}
+			}
+			
+			// check invoices
+			for (Invoice invoice : invoices) {
+				List<State> states = invoice.getStates();
+				for (State state : states) {
+					String nodeName = state.getStateDefinition().getJbpmNodeName();
+					if (logger.isDebugEnabled()) {
+						logger.debug("NodeName = "+nodeName+" for state "+state+" of invoice "+invoice);								
+					}
+					ProductHistoryItem productHistoryItem = new ProductHistoryItem(
+							invoice.getCreateUser(),
+							state.getStateDefinition().getName().getText(),
+							state.getStateDefinition().getDescription().getText(),
+							invoice, invoice.getCustomer(), null, null, 
+							invoice.getCreateDT(), ProductHistoryItemType.INVOICE);
+					productHistory.addProductHistoryItem(productHistoryItem);
+				} 
+			}
+
+			// check delivery notes
+			for (DeliveryNote deliveryNote : deliveryNotes) {
+				List<State> states = deliveryNote.getStates();
+				for (State state : states) {
+					String nodeName = state.getStateDefinition().getJbpmNodeName();
+					if (logger.isDebugEnabled()) {
+						logger.debug("NodeName = "+nodeName+" for state "+state+" of deliveryNote "+deliveryNote);
+					}						
+					ProductHistoryItem productHistoryItem = new ProductHistoryItem(
+							deliveryNote.getCreateUser(),
+							state.getStateDefinition().getName().getText(),
+							state.getStateDefinition().getDescription().getText(),
+							deliveryNote, deliveryNote.getCustomer(), null, null, 
+							deliveryNote.getCreateDT(), ProductHistoryItemType.DELIVERY_NOTE);
+					productHistory.addProductHistoryItem(productHistoryItem);
+				}
+			}
+				
+			// TODO: check for payments and deliveries
 		}
 		return productHistory;			
 	}

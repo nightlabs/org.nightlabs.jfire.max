@@ -1,12 +1,12 @@
 package org.nightlabs.jfire.trade.recurring;
 
 
-/*
+/**
  * @author Fitas Amine <fitas@nightlabs.de>
  *
  * @jdo.persistence-capable
  *		identity-type="application"
- *		objectid-class="org.nightlabs.jfire.trade.id.RecurringOfferConfigurationID"
+ *		objectid-class="org.nightlabs.jfire.trade.recurring.id.RecurringOfferConfigurationID"
  *		detachable="true"
  *		table="JFireTrade_RecurringOfferConfiguration"
  *

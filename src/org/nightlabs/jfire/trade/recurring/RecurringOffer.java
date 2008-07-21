@@ -5,7 +5,7 @@ import org.nightlabs.jfire.trade.Offer;
 import org.nightlabs.jfire.trade.Order;
 
 
-/*
+/**
  * @author Fitas Amine <fitas@nightlabs.de>
  * @jdo.persistence-capable
  *		identity-type="application"

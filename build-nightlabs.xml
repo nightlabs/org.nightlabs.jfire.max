@@ -1,6 +1,6 @@
 <!--
   Generic j2ee and webapp (jboss/tomcat/jpox/xdoclet) ant build file 
-  Version: 2008-06-10.01
+  Version: 2008-07-21
   Author: marc [at] nightlabs [dot] de
   Author: marco [at] nightlabs [dot] de
   Author: tobias [at] nightlabs [dot] de
@@ -173,10 +173,12 @@
     <echo>j2ee.client.enable: ${j2ee.client.enable}</echo>
     <echo>dist.bin.includes: ${dist.bin.includes}</echo>
     <echo>dist.bin.excludes: ${dist.bin.excludes}</echo>
-    <echo>dist.bin.includes: ${dist.bin.includes}</echo>
-    <echo>dist.bin.excludes: ${dist.bin.excludes}</echo>
   	<echo>project.path: ${project.path}</echo>
   	<echo>project.path.includes: ${project.path.includes}</echo>
+  	<echo>project.path.dirincludes: ${project.path.dirincludes}</echo>
+	<echo>javac.debug: ${javac.debug}</echo>
+	<echo>javac.source: ${javac.source}</echo>
+	<echo>javac.target: ${javac.target}</echo>
   </target>
 	
 	
@@ -376,8 +378,8 @@
     <property name="xdoclet.force" value="true"/>
     <property name="container.type" value="ejb-jar"/>
     <taskdef name="ejbdoclet" classname="xdoclet.modules.ejb.EjbDocletTask">
-			<classpath refid="xdoclet.classpath"/>
-		</taskdef>
+	  <classpath refid="xdoclet.classpath"/>
+	</taskdef>
 
     <ejbdoclet destdir="${project.dir}/${ejbsrc.dir}" 
       mergedir="${ejb.dd.dir}" excludedtags="@version,@author,@todo" 
@@ -570,25 +572,27 @@
 	
 	<!-- Set up environment for xdoclet. Then call the needed
        xdoclet subtasks -->
-	<target name="xdoclet.impl">
-    <path id="xdoclet.classpath">
-      <pathelement location="${project.dir}/${bin.dir}" />
-    	<fileset dir="${eclipse.sdk}/plugins">
-        <include name="**/ant.jar"/>
-        <include name="**/sf.net.xdoclet*/*.jar"/>
-        <include name="**/org.apache.log4j*/**/*.jar"/>
-        <include name="**/org.apache.commons*/**/*.jar"/>
-    	</fileset>
-      <!-- append the external classpath lastly -->
-      <pathelement path="${java.class.path}" />
-      <!-- append the path sent through eclipse to classpath -->
-      <pathelement path="${project.path}" />
-    	<!-- append ${project.path.includes} -->
-    	<fileset dir="." includes="${project.path.includes}" />
-    </path>
-    <if boolean="${j2ee.xdoclet.jdodoclet.enable}" then-target="xdoclet.jdodoclet"/>
-    <if boolean="${j2ee.xdoclet.ejbdoclet.enable}" then-target="xdoclet.ejbdoclet"/>
-	</target>	
+    <target name="xdoclet.impl">
+        <path id="xdoclet.classpath">
+          <pathelement location="${project.dir}/${bin.dir}" />
+          <fileset dir="${eclipse.sdk}/plugins">
+            <include name="**/ant.jar"/>
+            <include name="**/sf.net.xdoclet*/*.jar"/>
+            <include name="**/org.apache.log4j*/**/*.jar"/>
+            <include name="**/org.apache.commons*/**/*.jar"/>
+          </fileset>
+          <!-- append the external classpath lastly -->
+          <pathelement path="${java.class.path}" />
+          <!-- append the path sent through eclipse to classpath -->
+          <pathelement path="${project.path}" />
+          <!-- append ${project.path.includes} -->
+          <fileset dir="." includes="${project.path.includes}" />
+          <!-- append ${project.path.dirincludes} -->
+          <dirset dir="." includes="${project.path.dirincludes}" />
+        </path>
+        <if boolean="${j2ee.xdoclet.jdodoclet.enable}" then-target="xdoclet.jdodoclet"/>
+        <if boolean="${j2ee.xdoclet.ejbdoclet.enable}" then-target="xdoclet.ejbdoclet"/>
+    </target>	
 	
 	<!-- run jpox enhancer -->
   <target name="jpoxenhance.impl">
@@ -597,17 +601,21 @@
       <pathelement path="${project.dir}/${ejbsrc.dir}"/>
       <pathelement path="${project.path}" />
       <pathelement path="${java.class.path}" />
-    	<fileset dir="." includes="${project.path.includes}" />
+      <!-- append ${project.path.includes} -->
+      <fileset dir="." includes="${project.path.includes}" />
+      <!-- append ${project.path.dirincludes} -->
+      <dirset dir="." includes="${project.path.dirincludes}" />
     </path>
     <taskdef name="jpoxenhancer" classname="org.datanucleus.enhancer.tools.EnhancerTask">
-      <classpath refid="jpoxenhancer.classpath"/>    	
+      <classpath refid="jpoxenhancer.classpath"/>
     </taskdef>
     <jpoxenhancer classpathref="jpoxenhancer.classpath"
         dir="${project.dir}/${bin.dir}"
         failonerror="true"
         fork="false"
         verbose="true"
-    		enhancerName="asm">
+    	enhancerName="asm"
+    	filesuffixes="jdo,class">
     </jpoxenhancer>
   </target>	
 	
@@ -619,11 +627,11 @@
     <path id="javac.classpath">
       <pathelement path="${project.path}" />
       <pathelement path="${java.class.path}" />
-    	<fileset dir="." includes="${project.path.includes}" />
+      <!-- append ${project.path.includes} -->
+      <fileset dir="." includes="${project.path.includes}" />
+      <!-- append ${project.path.dirincludes} -->
+      <dirset dir="." includes="${project.path.dirincludes}" />
     </path>
-	<echo message="javac.debug = ${javac.debug}"/>
-	<echo message="javac.source = ${javac.source}"/>
-	<echo message="javac.target = ${javac.target}"/>
     <javac debug="${javac.debug}" encoding="UTF-8" source="${javac.source}" target="${javac.target}" destdir="${project.dir}/${bin.dir}" classpathref="javac.classpath">
       <src path="${project.dir}/${src.dir}"/>
       <src path="${project.dir}/${ejbsrc.dir}"/>
@@ -642,11 +650,11 @@
     <path id="javac.classpath">
       <pathelement path="${project.path}" />
       <pathelement path="${java.class.path}" />
-    	<fileset dir="." includes="${project.path.includes}" />
+      <!-- append ${project.path.includes} -->
+      <fileset dir="." includes="${project.path.includes}" />
+      <!-- append ${project.path.dirincludes} -->
+      <dirset dir="." includes="${project.path.dirincludes}" />
     </path>
-	<echo message="javac.debug = ${javac.debug}"/>
-	<echo message="javac.source = ${javac.source}"/>
-	<echo message="javac.target = ${javac.target}"/>
     <javac debug="${javac.debug}" encoding="UTF-8" source="${javac.source}" target="${javac.target}" destdir="${project.dir}/${bin.dir}" classpathref="javac.classpath" excludes="${j2ee.clientbuild.excludes}" includes="${j2ee.clientbuild.includes}">
       <src path="${project.dir}/${src.dir}"/>
       <src path="${project.dir}/${ejbsrc.dir}"/>

@@ -1,6 +1,6 @@
 <!--
   Generic j2ee and webapp (jboss/tomcat/jpox/xdoclet) ant build file 
-  Version: 2008-07-11
+  Version: 2008-07-21
   Author: marc [at] nightlabs [dot] de
   Author: marco [at] nightlabs [dot] de
   Author: tobias [at] nightlabs [dot] de
@@ -607,14 +607,15 @@
       <dirset dir="." includes="${project.path.dirincludes}" />
     </path>
     <taskdef name="jpoxenhancer" classname="org.datanucleus.enhancer.tools.EnhancerTask">
-      <classpath refid="jpoxenhancer.classpath"/>    	
+      <classpath refid="jpoxenhancer.classpath"/>
     </taskdef>
     <jpoxenhancer classpathref="jpoxenhancer.classpath"
         dir="${project.dir}/${bin.dir}"
         failonerror="true"
         fork="false"
         verbose="true"
-    		enhancerName="asm">
+    	enhancerName="asm"
+    	filesuffixes="jdo,class">
     </jpoxenhancer>
   </target>	
 	

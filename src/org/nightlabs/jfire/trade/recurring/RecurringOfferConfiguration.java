@@ -13,7 +13,7 @@ package org.nightlabs.jfire.trade.recurring;
  * @jdo.version strategy="version-number"
  * @jdo.inheritance strategy="new-table"
  *
- *
+ * @jdo.create-objectid-class field-order="organisationID, RecurringOfferConfigurationID"
  *
  */
 public class RecurringOfferConfiguration {

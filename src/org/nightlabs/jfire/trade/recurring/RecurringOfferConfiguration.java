@@ -16,5 +16,5 @@ public class RecurringOfferConfiguration {
 	{
 		return false;
 	}
-	
+
 }

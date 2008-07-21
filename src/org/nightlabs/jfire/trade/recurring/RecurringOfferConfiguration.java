@@ -18,8 +18,17 @@ package org.nightlabs.jfire.trade.recurring;
  */
 public class RecurringOfferConfiguration {
 
+	/**
+	 * @jdo.field primary-key="true"
+	 * @jdo.column length="100"
+	 */
+	private String organisationID;
 
-
+	/**
+	 * @jdo.field primary-key="true"
+	 */
+	private long RecurringOfferConfigurationID;
+	
 	boolean createInvoice()
 	{
 		return false;

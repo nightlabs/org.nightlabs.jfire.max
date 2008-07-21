@@ -31,6 +31,12 @@ public class RecurringOfferConfiguration {
 	 */
 	private long RecurringOfferConfigurationID;
 	
+	public RecurringOfferConfiguration(String organisationID,
+			long recurringOfferConfigurationID) {
+		this.organisationID = organisationID;
+		RecurringOfferConfigurationID = recurringOfferConfigurationID;
+	}
+
 	/**
 	 * @deprecated Only for JDO!
 	 */

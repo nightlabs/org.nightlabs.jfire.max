@@ -31,6 +31,10 @@ public class RecurringOfferConfiguration {
 	 */
 	private long RecurringOfferConfigurationID;
 	
+	public RecurringOfferConfiguration() {
+
+	}
+
 	boolean createInvoice()
 	{
 		return false;

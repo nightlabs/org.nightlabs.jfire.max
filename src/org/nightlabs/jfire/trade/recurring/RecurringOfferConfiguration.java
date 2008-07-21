@@ -31,9 +31,11 @@ public class RecurringOfferConfiguration {
 	 */
 	private long RecurringOfferConfigurationID;
 	
-	public RecurringOfferConfiguration() {
-
-	}
+	/**
+	 * @deprecated Only for JDO!
+	 */
+	@Deprecated
+	protected RecurringOfferConfiguration() {}
 
 	boolean createInvoice()
 	{

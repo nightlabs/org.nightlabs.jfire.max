@@ -30,6 +30,11 @@ public class RecurringOffer extends Offer {
 	 */
 	private RecurringOfferConfiguration recurringOfferConfiguration;
 
+	/**
+	 * @deprecated Only for JDO!
+	 */
+	@Deprecated
+	protected RecurringOffer() {}
 
 	public RecurringOffer(User user, Order order, String offerIDPrefix,
 			long offerID) {

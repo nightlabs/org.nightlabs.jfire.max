@@ -21,7 +21,12 @@ import org.nightlabs.jfire.trade.Order;
  *
  **/
 public class RecurringOrder extends Order {
-
+	/**
+	 * @deprecated Only for JDO!
+	 */
+	@Deprecated
+	protected RecurringOrder() { }
+	
 	public RecurringOrder(LegalEntity vendor, LegalEntity customer,
 			String orderIDPrefix, long orderID, Currency currency, User user) {
 		super(vendor, customer, orderIDPrefix, orderID, currency, user);

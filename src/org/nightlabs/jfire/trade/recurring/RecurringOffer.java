@@ -15,7 +15,7 @@ import org.nightlabs.jfire.trade.Order;
  *
  * @jdo.inheritance strategy="new-table"
  * 
- * @jdo.fetch-group name="RecurringOffer.recurringOfferConfiguration" fields="accountant"
+ * @jdo.fetch-group name="RecurringOffer.recurringOfferConfiguration" fields="recurringOfferConfiguration"
  * 
  * 
  * 

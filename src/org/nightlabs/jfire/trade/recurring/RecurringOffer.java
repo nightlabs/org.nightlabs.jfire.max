@@ -1,9 +1,6 @@
 package org.nightlabs.jfire.trade.recurring;
 
-import org.nightlabs.jfire.organisation.Organisation;
 import org.nightlabs.jfire.security.User;
-import org.nightlabs.jfire.store.Product;
-import org.nightlabs.jfire.store.ProductTypeActionHandler;
 import org.nightlabs.jfire.trade.Offer;
 import org.nightlabs.jfire.trade.Order;
 
@@ -18,10 +15,19 @@ import org.nightlabs.jfire.trade.Order;
  *
  * @jdo.inheritance strategy="new-table"
  * 
+ * @jdo.fetch-group name="RecurringOffer.recurringOfferConfiguration" fields="accountant"
+ * 
+ * 
  * 
  */
 public class RecurringOffer extends Offer {
 
+
+	public static final String FETCH_GROUP_RECURRING_OFFER_CONFIGURATION = "RecurringOffer.recurringOfferConfiguration";
+
+	/**
+	 * @jdo.field persistence-modifier="persistent"
+	 */
 	private RecurringOfferConfiguration recurringOfferConfiguration;
 
 

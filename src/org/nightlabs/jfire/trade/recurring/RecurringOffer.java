@@ -19,9 +19,6 @@ import org.nightlabs.jfire.trade.Order;
  * @jdo.inheritance strategy="new-table"
  * 
  */
-
-
-
 public class RecurringOffer extends Offer {
 
 	private RecurringOfferConfiguration recurringOfferConfiguration;

@@ -39,7 +39,7 @@ public class RecurringOfferConfiguration {
 	 */
 	private long recurringOfferConfigurationID;
 
-	public RecurringOfferConfiguration(String organisationID,
+	public RecurringOfferConfiguration(User user,String organisationID,
 			long recurringOfferConfigurationID) {
 		this.organisationID = organisationID;
 		this.recurringOfferConfigurationID = recurringOfferConfigurationID;
@@ -47,7 +47,7 @@ public class RecurringOfferConfiguration {
 		TaskID taskID = TaskID.create(organisationID,TASK_TYPE_ID_RECURRED_OFFER_CREATOR_TASK, _taskID);
 		this.creatorTask = new Task(
 	    	    taskID,
-	    	    null,
+	    	    user,
 	    	    "",
 	    	    "");	
 	}
@@ -83,5 +83,13 @@ public class RecurringOfferConfiguration {
 
 	public Task getCreatorTask() {
 		return creatorTask;
+	}
+
+	public String getOrganisationID() {
+		return organisationID;
+	}
+
+	public long getRecurringOfferConfigurationID() {
+		return recurringOfferConfigurationID;
 	}
 }

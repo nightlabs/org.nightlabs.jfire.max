@@ -553,7 +553,7 @@ implements SessionBean
 			boolean isNewIssue = !JDOHelper.isDetached(issue);
 
 			if (isNewIssue) {
-				pIssue = NLJDOHelper.storeJDO(pm, issue, get, fetchGroups, maxFetchDepth);
+				pIssue = pm.makePersistent(issue);
 				
 				IssueType type;
 
@@ -561,15 +561,15 @@ implements SessionBean
 					pm.flush();
 					// create the ProcessInstance for new Issues
 					// TODO: WORKAROUND: Calling createProcessInstanceForIssue on pIssue.getIssueType() says that this IssueType is not persistent ?!?
-					type = (IssueType) pm.getObjectById(JDOHelper.getObjectId(issue.getIssueType()));
+					type = (IssueType) pm.getObjectById(JDOHelper.getObjectId(pIssue.getIssueType()));
 					if (type == null) {
 						throw new IllegalStateException("Could not create ProcessInstance for new Issue as its type is null");
 					}
 				}
 				else
-					type = issue.getIssueType();
+					type = pIssue.getIssueType();
 
-				type.createProcessInstanceForIssue(issue);
+				type.createProcessInstanceForIssue(pIssue);
 			}
 			else {
 				if (issue.getCreateTimestamp() != null) {
@@ -627,17 +627,16 @@ implements SessionBean
 					NLJDOHelper.restoreFetchPlan(pm.getFetchPlan(), fetchPlanBackup);
 				}
 
-				pm.getFetchPlan().setMaxFetchDepth(maxFetchDepth);
-				if (fetchGroups != null)
-					pm.getFetchPlan().setGroups(fetchGroups);
-
-
 				pIssue = pm.makePersistent(issue);
 			}
 
 			if (!get)
 				return null;
 
+			pm.getFetchPlan().setMaxFetchDepth(maxFetchDepth);
+			if (fetchGroups != null)
+				pm.getFetchPlan().setGroups(fetchGroups);
+			
 			return pm.detachCopy(pIssue);
 		} finally {
 			pm.close();

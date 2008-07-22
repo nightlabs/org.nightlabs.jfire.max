@@ -1,5 +1,7 @@
 package org.nightlabs.jfire.trade.recurring;
 
+import org.nightlabs.jfire.timer.Task;
+
 
 /**
  * @author Fitas Amine <fitas@nightlabs.de>
@@ -19,7 +21,7 @@ package org.nightlabs.jfire.trade.recurring;
 public class RecurringOfferConfiguration {
 
 	private static final long serialVersionUID = 1L;
-	
+
 	/**
 	 * @jdo.field primary-key="true"
 	 * @jdo.column length="100"
@@ -30,11 +32,11 @@ public class RecurringOfferConfiguration {
 	 * @jdo.field primary-key="true"
 	 */
 	private long recurringOfferConfigurationID;
-	
+
 	public RecurringOfferConfiguration(String organisationID,
 			long recurringOfferConfigurationID) {
 		this.organisationID = organisationID;
-		recurringOfferConfigurationID = recurringOfferConfigurationID;
+		this.recurringOfferConfigurationID = recurringOfferConfigurationID;
 	}
 
 	/**
@@ -43,14 +45,30 @@ public class RecurringOfferConfiguration {
 	@Deprecated
 	protected RecurringOfferConfiguration() {}
 
-	boolean createInvoice()
-	{
-		return false;
+	/**
+	 * @jdo.field persistence-modifier="persistent"
+	 */
+	private boolean createInvoice;
+
+	/**
+	 * @jdo.field persistence-modifier="persistent"
+	 */
+	private boolean createDelivery;
+
+	/**
+	 * @jdo.field persistence-modifier="persistent"
+	 */
+	private Task creatorTask;
+
+	public boolean isCreateInvoice() {
+		return createInvoice;
 	}
 
-	boolean createDelivery()
-	{
-		return false;
+	public boolean isCreateDelivery() {
+		return createDelivery;
 	}
 
+	public Task getCreatorTask() {
+		return creatorTask;
+	}
 }

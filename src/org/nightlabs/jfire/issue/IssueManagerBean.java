@@ -70,12 +70,12 @@ implements SessionBean
 
 	@Override
 	public void setSessionContext(SessionContext sessionContext)
-			throws EJBException, RemoteException
+	throws EJBException, RemoteException
 	{
 		logger.debug(this.getClass().getName() + ".setSessionContext("+sessionContext+")");
 		super.setSessionContext(sessionContext);
 	}
-	
+
 	/**
 	 * @ejb.create-method  
 	 * @ejb.permission role-name="_Guest_"
@@ -85,7 +85,7 @@ implements SessionBean
 	{
 		logger.debug(this.getClass().getName() + ".ejbCreate()");
 	}
-	
+
 	/**
 	 * @see javax.ejb.SessionBean#ejbRemove()
 	 * 
@@ -95,7 +95,7 @@ implements SessionBean
 	{
 		logger.debug(this.getClass().getName() + ".ejbRemove()");
 	}
-	
+
 	/**
 	 * @see javax.ejb.SessionBean#ejbActivate()
 	 */
@@ -127,7 +127,7 @@ implements SessionBean
 			pm.close();
 		}
 	}
-	
+
 	/**
 	 * @ejb.interface-method
 	 * @ejb.transaction type="Supports" @!This usually means that no transaction is opened which is significantly faster and recommended for all read-only EJB methods! Marco.
@@ -144,7 +144,7 @@ implements SessionBean
 			pm.close();
 		}
 	}
-	
+
 	/**
 	 * @ejb.interface-method
 	 * @ejb.permission role-name="_Guest_"
@@ -154,13 +154,13 @@ implements SessionBean
 	{
 		if (queries == null)
 			return null;
-		
+
 		if (! Issue.class.isAssignableFrom(queries.getResultClass()))
 		{
 			throw new RuntimeException("Given QueryCollection has invalid return type! " +
 					"Invalid return type= "+ queries.getResultClassName());
 		}
-		
+
 		PersistenceManager pm = getPersistenceManager();
 		try {
 			pm.getFetchPlan().setMaxFetchDepth(1);
@@ -175,7 +175,7 @@ implements SessionBean
 			{
 				decoratedCollection = new JDOQueryCollectionDecorator<AbstractSearchQuery>(queries);
 			}
-			
+
 			decoratedCollection.setPersistenceManager(pm);
 			Collection<? extends Issue> issues = (Collection<? extends Issue>) decoratedCollection.executeQueries();
 
@@ -184,7 +184,7 @@ implements SessionBean
 			pm.close();
 		}
 	}
-	
+
 	/**
 	 * @ejb.interface-method
 	 * @!ejb.transaction type="Supports" @!This usually means that no transaction is opened which is significantly faster and recommended for all read-only EJB methods! Marco.
@@ -233,7 +233,7 @@ implements SessionBean
 			pm.close();
 		}
 	}
-	
+
 	/**
 	 * @ejb.interface-method
 	 * @!ejb.transaction type="Supports"
@@ -249,7 +249,7 @@ implements SessionBean
 			pm.close();
 		}
 	}
-	
+
 	/**
 	 * @ejb.interface-method
 	 * @!ejb.transaction type="Supports"
@@ -265,7 +265,7 @@ implements SessionBean
 			pm.close();
 		}
 	}
-	
+
 	/**
 	 * @param pm The <code>PersistenceManager</code> that should be used to access the datastore.
 	 * @param issue
@@ -280,28 +280,28 @@ implements SessionBean
 		params.put("organisationID", issue.getOrganisationID());
 		return (Collection<IssueHistory>)q.executeWithMap(params);
 	}
-	
+
 //	/**
-//	 * @throws ModuleException
-//	 *
-//	 * @ejb.interface-method
-//	 * @ejb.transaction type="Required"
-//	 * @ejb.permission role-name="_Guest_"
-//	 */
+//	* @throws ModuleException
+//	*
+//	* @ejb.interface-method
+//	* @ejb.transaction type="Required"
+//	* @ejb.permission role-name="_Guest_"
+//	*/
 //	public Collection getIssuePriorities(String[] fetchGroups, int maxFetchDepth)
 //	throws ModuleException
 //	{
-//		PersistenceManager pm = getPersistenceManager();
-//		try {
-//			pm.getFetchPlan().setMaxFetchDepth(maxFetchDepth);
-//			if (fetchGroups != null)
-//				pm.getFetchPlan().setGroups(fetchGroups);
-//
-//			Query q = pm.newQuery(IssuePriority.class);
-//			return pm.detachCopyAll((Collection)q.execute());
-//		} finally {
-//			pm.close();
-//		}
+//	PersistenceManager pm = getPersistenceManager();
+//	try {
+//	pm.getFetchPlan().setMaxFetchDepth(maxFetchDepth);
+//	if (fetchGroups != null)
+//	pm.getFetchPlan().setGroups(fetchGroups);
+
+//	Query q = pm.newQuery(IssuePriority.class);
+//	return pm.detachCopyAll((Collection)q.execute());
+//	} finally {
+//	pm.close();
+//	}
 //	}
 
 	/**
@@ -337,7 +337,7 @@ implements SessionBean
 			pm.close();
 		}
 	}
-	
+
 	/**
 	 * @throws ModuleException
 	 *
@@ -360,7 +360,7 @@ implements SessionBean
 			pm.close();
 		}
 	}
-	
+
 	/**
 	 * @ejb.interface-method
 	 * @!ejb.transaction type="Supports" @!This usually means that no transaction is opened which is significantly faster and recommended for all read-only EJB methods! Marco.
@@ -378,36 +378,36 @@ implements SessionBean
 	}
 
 //	/**
-//	 * @throws ModuleException
-//	 *
-//	 * @ejb.interface-method
-//	 * @ejb.transaction type="Required"
-//	 * @ejb.permission role-name="_Guest_"
-//	 */
+//	* @throws ModuleException
+//	*
+//	* @ejb.interface-method
+//	* @ejb.transaction type="Required"
+//	* @ejb.permission role-name="_Guest_"
+//	*/
 //	public Collection getIssueTypes(String[] fetchGroups, int maxFetchDepth)
 //	throws ModuleException
 //	{
-//		PersistenceManager pm = getPersistenceManager();
-//		try {
-//			return NLJDOHelper.getDetachedObjectList(pm, userGroupIDs, null, fetchGroups, maxFetchDepth);
-//		}
-//		finally {
-//			pm.close();
-//		}
-//		
-//		PersistenceManager pm = getPersistenceManager();
-//		try {
-//			pm.getFetchPlan().setMaxFetchDepth(maxFetchDepth);
-//			if (fetchGroups != null)
-//				pm.getFetchPlan().setGroups(fetchGroups);
-//
-//			Query q = pm.newQuery(IssueType.class);
-//			return pm.detachCopyAll((Collection)q.execute());
-//		} finally {
-//			pm.close();
-//		}
+//	PersistenceManager pm = getPersistenceManager();
+//	try {
+//	return NLJDOHelper.getDetachedObjectList(pm, userGroupIDs, null, fetchGroups, maxFetchDepth);
 //	}
-	
+//	finally {
+//	pm.close();
+//	}
+
+//	PersistenceManager pm = getPersistenceManager();
+//	try {
+//	pm.getFetchPlan().setMaxFetchDepth(maxFetchDepth);
+//	if (fetchGroups != null)
+//	pm.getFetchPlan().setGroups(fetchGroups);
+
+//	Query q = pm.newQuery(IssueType.class);
+//	return pm.detachCopyAll((Collection)q.execute());
+//	} finally {
+//	pm.close();
+//	}
+//	}
+
 	/**
 	 * @ejb.interface-method
 	 * @!ejb.transaction type="Supports"
@@ -440,28 +440,28 @@ implements SessionBean
 			pm.close();
 		}
 	}
-	
+
 
 //	/**
-//	 * @throws ModuleException
-//	 *
-//	 * @ejb.interface-method
-//	 * @ejb.transaction type="Required"
-//	 * @ejb.permission role-name="_Guest_"
-//	 */
+//	* @throws ModuleException
+//	*
+//	* @ejb.interface-method
+//	* @ejb.transaction type="Required"
+//	* @ejb.permission role-name="_Guest_"
+//	*/
 //	public Collection getIssueComments(String[] fetchGroups, int maxFetchDepth)
 //	{
-//		PersistenceManager pm = getPersistenceManager();
-//		try {
-//			pm.getFetchPlan().setMaxFetchDepth(maxFetchDepth);
-//			if (fetchGroups != null)
-//				pm.getFetchPlan().setGroups(fetchGroups);
-//
-//			Query q = pm.newQuery(IssueComment.class);
-//			return pm.detachCopyAll((Collection)q.execute());
-//		} finally {
-//			pm.close();
-//		}
+//	PersistenceManager pm = getPersistenceManager();
+//	try {
+//	pm.getFetchPlan().setMaxFetchDepth(maxFetchDepth);
+//	if (fetchGroups != null)
+//	pm.getFetchPlan().setGroups(fetchGroups);
+
+//	Query q = pm.newQuery(IssueComment.class);
+//	return pm.detachCopyAll((Collection)q.execute());
+//	} finally {
+//	pm.close();
+//	}
 //	}
 
 	/**
@@ -473,14 +473,14 @@ implements SessionBean
 	public List<IssueComment> getIssueComments(Collection<IssueCommentID> issueCommentIDs, 
 			String[] fetchGroups, 
 			int maxFetchDepth)
-	{
+			{
 		PersistenceManager pm = getPersistenceManager();
 		try {
 			return NLJDOHelper.getDetachedObjectList(pm, issueCommentIDs, IssueComment.class, fetchGroups, maxFetchDepth);
 		} finally {
 			pm.close();
 		}
-	}
+			}
 
 	/**
 	 * @ejb.interface-method
@@ -497,7 +497,7 @@ implements SessionBean
 			pm.close();
 		}
 	}
-	
+
 	/**
 	 * @ejb.interface-method
 	 * @!ejb.transaction type="Supports"
@@ -516,7 +516,7 @@ implements SessionBean
 			pm.close();
 		}
 	}
-	
+
 	/**
 	 * @ejb.interface-method
 	 * @!ejb.transaction type="Supports"
@@ -533,7 +533,7 @@ implements SessionBean
 			pm.close();
 		}
 	}
-	
+
 
 	/**
 	 * @ejb.interface-method
@@ -543,77 +543,79 @@ implements SessionBean
 	public Issue storeIssue(Issue issue, boolean get, String[] fetchGroups, int maxFetchDepth)
 	{
 		PersistenceManager pm = getPersistenceManager();
+		Issue pIssue = null;
 		try {
 			boolean isNewIssue = !JDOHelper.isDetached(issue);
-			
-			pm.getFetchPlan().setMaxFetchDepth(maxFetchDepth);
-			if (fetchGroups != null)
-				pm.getFetchPlan().setGroups(fetchGroups);
-
-			if (issue.getCreateTimestamp() != null) {
-				issue.setUpdateTimestamp(new Date());
-			}
-			
-			Issue pIssue = pm.makePersistent(issue);
 
 			if (isNewIssue) {
+				pIssue = NLJDOHelper.storeJDO(pm, issue, get, fetchGroups, maxFetchDepth);
+				
 				IssueType type;
 
 				if (JFireBaseEAR.JPOX_WORKAROUND_FLUSH_ENABLED) {				
 					pm.flush();
 					// create the ProcessInstance for new Issues
 					// TODO: WORKAROUND: Calling createProcessInstanceForIssue on pIssue.getIssueType() says that this IssueType is not persistent ?!?
-					type = (IssueType) pm.getObjectById(JDOHelper.getObjectId(pIssue.getIssueType()));
+					type = (IssueType) pm.getObjectById(JDOHelper.getObjectId(issue.getIssueType()));
 					if (type == null) {
 						throw new IllegalStateException("Could not create ProcessInstance for new Issue as its type is null");
 					}
 				}
 				else
-					type = pIssue.getIssueType();
+					type = issue.getIssueType();
 
-				type.createProcessInstanceForIssue(pIssue);
+				type.createProcessInstanceForIssue(issue);
 			}
 			else {
-				IssueID issueID = (IssueID) JDOHelper.getObjectId(issue);
-				Issue oldPersistentIssue = (Issue) pm.getObjectById(issueID);
-				
-				IssueHistory issueHistory = new IssueHistory(oldPersistentIssue, issue, IDGenerator.nextID(IssueHistory.class));
-				storeIssueHistory(issueHistory, false, new String[]{FetchPlan.DEFAULT}, NLJDOHelper.MAX_FETCH_DEPTH_NO_LIMIT);
-				
 				if (issue.getCreateTimestamp() != null) {
 					issue.setUpdateTimestamp(new Date());
 				}
-				
+
+				IssueID issueID = (IssueID) JDOHelper.getObjectId(issue);
+				Issue oldPersistentIssue = (Issue) pm.getObjectById(issueID);
+
+				IssueHistory issueHistory = new IssueHistory(oldPersistentIssue, issue, IDGenerator.nextID(IssueHistory.class));
+				storeIssueHistory(issueHistory, false, new String[]{FetchPlan.DEFAULT}, NLJDOHelper.MAX_FETCH_DEPTH_NO_LIMIT);
+
+				if (issue.getCreateTimestamp() != null) {
+					issue.setUpdateTimestamp(new Date());
+				}
+
 //				boolean doUnassign;
 //				if (oldPersistentIssue == null)
-//					doUnassign = false;
+//				doUnassign = false;
 //				else {
-//					try {
-//						doUnassign = oldPersistentIssue.getAssignee() != null && issue.getAssignee() == null;
-//					} catch (JDODetachedFieldAccessException x) {
-//						doUnassign = false;
-//					}
+//				try {
+//				doUnassign = oldPersistentIssue.getAssignee() != null && issue.getAssignee() == null;
+//				} catch (JDODetachedFieldAccessException x) {
+//				doUnassign = false;
+//				}
 //				}
 
 //				boolean doAssign;
 //				try {
-//					doAssign = issue.getAssignee() != null;
-//					if (doAssign && oldPersistentIssue != null)
-//						doAssign = !Util.equals(issue.getAssignee(), oldPersistentIssue.getAssignee());
+//				doAssign = issue.getAssignee() != null;
+//				if (doAssign && oldPersistentIssue != null)
+//				doAssign = !Util.equals(issue.getAssignee(), oldPersistentIssue.getAssignee());
 //				} catch (JDODetachedFieldAccessException x) {
-//					doAssign = false;
+//				doAssign = false;
 //				}
 
 //				String jbpmTransitionName = null;
 //				if (doAssign)
-//					jbpmTransitionName = JbpmConstants.TRANSITION_NAME_ASSIGN;
-//
-//				if (doUnassign)
-//					jbpmTransitionName = JbpmConstants.TRANSITION_NAME_UNASSIGN;
+//				jbpmTransitionName = JbpmConstants.TRANSITION_NAME_ASSIGN;
 
+//				if (doUnassign)
+//				jbpmTransitionName = JbpmConstants.TRANSITION_NAME_UNASSIGN;
+
+				pm.getFetchPlan().setMaxFetchDepth(maxFetchDepth);
+				if (fetchGroups != null)
+					pm.getFetchPlan().setGroups(fetchGroups);
+
+				
 				pIssue = pm.makePersistent(issue);
 			}
-			
+
 			if (!get)
 				return null;
 
@@ -622,7 +624,7 @@ implements SessionBean
 			pm.close();
 		}
 	}
-	
+
 	/**
 	 * @ejb.interface-method
 	 * @ejb.permission role-name="_Guest_"
@@ -638,7 +640,7 @@ implements SessionBean
 			pm.close();
 		}//finally
 	}
-	
+
 	/**
 	 * @ejb.interface-method
 	 * @ejb.permission role-name="_Guest_"
@@ -654,7 +656,7 @@ implements SessionBean
 			pm.close();
 		}//finally
 	}
-	
+
 	/**
 	 * @ejb.interface-method
 	 * @ejb.permission role-name="_Guest_"
@@ -670,7 +672,7 @@ implements SessionBean
 			pm.close();
 		}//finally
 	}
-	
+
 	/**
 	 * @ejb.interface-method
 	 * @ejb.permission role-name="_Guest_"
@@ -702,7 +704,7 @@ implements SessionBean
 			pm.close();
 		}//finally
 	}
-	
+
 	/**
 	 * @ejb.interface-method
 	 * @ejb.permission role-name="_Guest_"
@@ -718,7 +720,7 @@ implements SessionBean
 			pm.close();
 		}//finally
 	}
-	
+
 	/**
 	 * @ejb.interface-method
 	 * @ejb.permission role-name="_Guest_"
@@ -733,13 +735,13 @@ implements SessionBean
 			Issue issue = (Issue) pm.getObjectById(issueID);
 
 			//FIXME: We can not remove states righnow. Don't know why??????
-			
+
 			pm.getExtent(State.class, true);
 			for (State state : issue.getStates()) {
 				pm.deletePersistent(state);		
 			}
 			pm.flush();
-			
+
 			pm.getExtent(IssueLocal.class, true);
 			pm.deletePersistent(issue.getStatableLocal());
 			pm.flush();
@@ -752,7 +754,7 @@ implements SessionBean
 			pm.close();
 		}//finally
 	}
-	
+
 	/**
 	 * @ejb.interface-method
 	 * @ejb.transaction type="Required"
@@ -764,16 +766,16 @@ implements SessionBean
 		try {
 			IssueLocal issueLocal = (IssueLocal) pm.getObjectById(IssueLocalID.create(issueID));
 			JbpmContext jbpmContext = JbpmLookup.getJbpmConfiguration().createJbpmContext();
-			
+
 			try {
 				ProcessInstance processInstance = jbpmContext.getProcessInstanceForUpdate(issueLocal.getJbpmProcessInstanceId());
 				processInstance.signal(jbpmTransitionName);
 			} finally {
 				jbpmContext.close();
 			}
-			
+
 			pm.flush();
-			
+
 			if (get) {
 				pm.getExtent(Issue.class);
 				if (fetchGroups != null)
@@ -786,14 +788,14 @@ implements SessionBean
 				Issue issue = (Issue) pm.getObjectById(issueID);
 				return pm.detachCopy(issue);
 			}
-			
+
 		} finally {
 			pm.close();
 		}
-		
+
 		return null;
 	}
-	
+
 	/**
 	 * @throws IOException While loading an icon from a local resource, this might happen and we don't care in the initialise method.
 	 *
@@ -820,35 +822,35 @@ implements SessionBean
 //			// check, whether the datastore is already initialized
 //			pm.getExtent(IssueStatus.class);
 //			try {
-//				pm.getObjectById(IssueStatusID.create("N"), true);
-//				return; // already initialized
+//			pm.getObjectById(IssueStatusID.create("N"), true);
+//			return; // already initialized
 //			} catch (JDOObjectNotFoundException x) {
-//				// datastore not yet initialized
+//			// datastore not yet initialized
 //			}
-//
+
 //			// Create the statuses
 //			IssueStatus issueStatus;
-//
+
 //			issueStatus = new IssueStatus(IssueStatus.ISSUE_STATUS_NEW);
 //			issueStatus.getIssueStatusText().setText(Locale.ENGLISH.getLanguage(), "New");
 //			pm.makePersistent(issueStatus);
-//
+
 //			issueStatus = new IssueStatus(IssueStatus.ISSUE_STATUS_FEEDBACK);
 //			issueStatus.getIssueStatusText().setText(Locale.ENGLISH.getLanguage(), "Feedback");
 //			pm.makePersistent(issueStatus);
-//			
+
 //			issueStatus = new IssueStatus(IssueStatus.ISSUE_STATUS_ACKNOWLEDGED);
 //			issueStatus.getIssueStatusText().setText(Locale.ENGLISH.getLanguage(), "Acknowledged");
 //			pm.makePersistent(issueStatus);
-//			
+
 //			issueStatus = new IssueStatus(IssueStatus.ISSUE_STATUS_CONFIRMED);
 //			issueStatus.getIssueStatusText().setText(Locale.ENGLISH.getLanguage(), "Confirmed");
 //			pm.makePersistent(issueStatus);
-//			
+
 //			issueStatus = new IssueStatus(IssueStatus.ISSUE_STATUS_RESOLVED);
 //			issueStatus.getIssueStatusText().setText(Locale.ENGLISH.getLanguage(), "Resolved");
 //			pm.makePersistent(issueStatus);
-//			
+
 //			issueStatus = new IssueStatus(IssueStatus.ISSUE_STATUS_CLOSE);
 //			issueStatus.getIssueStatusText().setText(Locale.ENGLISH.getLanguage(), "Close");
 //			pm.makePersistent(issueStatus);
@@ -869,32 +871,32 @@ implements SessionBean
 			issueSeverityType.getIssueSeverityTypeText().setText(Locale.ENGLISH.getLanguage(), "Major");
 			issueSeverityType = pm.makePersistent(issueSeverityType);
 			issueType.getIssueSeverityTypes().add(issueSeverityType);
-			
+
 			issueSeverityType = new IssueSeverityType(getOrganisationID(), IssueSeverityType.ISSUE_SEVERITY_TYPE_CRASH);
 			issueSeverityType.getIssueSeverityTypeText().setText(Locale.ENGLISH.getLanguage(), "Crash");
 			issueSeverityType = pm.makePersistent(issueSeverityType);
 			issueType.getIssueSeverityTypes().add(issueSeverityType);
-			
+
 			issueSeverityType = new IssueSeverityType(getOrganisationID(), IssueSeverityType.ISSUE_SEVERITY_TYPE_BLOCK);
 			issueSeverityType.getIssueSeverityTypeText().setText(Locale.ENGLISH.getLanguage(), "Block");
 			issueSeverityType = pm.makePersistent(issueSeverityType);
 			issueType.getIssueSeverityTypes().add(issueSeverityType);
-			
+
 			issueSeverityType = new IssueSeverityType(getOrganisationID(), IssueSeverityType.ISSUE_SEVERITY_TYPE_FEATURE);
 			issueSeverityType.getIssueSeverityTypeText().setText(Locale.ENGLISH.getLanguage(), "Feature");
 			issueSeverityType = pm.makePersistent(issueSeverityType);
 			issueType.getIssueSeverityTypes().add(issueSeverityType);
-			
+
 			issueSeverityType = new IssueSeverityType(getOrganisationID(), IssueSeverityType.ISSUE_SEVERITY_TYPE_TRIVIAL);
 			issueSeverityType.getIssueSeverityTypeText().setText(Locale.ENGLISH.getLanguage(), "Trivial");
 			issueSeverityType = pm.makePersistent(issueSeverityType);
 			issueType.getIssueSeverityTypes().add(issueSeverityType);
-			
+
 			issueSeverityType = new IssueSeverityType(getOrganisationID(), IssueSeverityType.ISSUE_SEVERITY_TYPE_TEXT);
 			issueSeverityType.getIssueSeverityTypeText().setText(Locale.ENGLISH.getLanguage(), "Text");
 			issueSeverityType = pm.makePersistent(issueSeverityType);
 			issueType.getIssueSeverityTypes().add(issueSeverityType);
-			
+
 			issueSeverityType = new IssueSeverityType(getOrganisationID(), IssueSeverityType.ISSUE_SEVERITY_TYPE_TWEAK);
 			issueSeverityType.getIssueSeverityTypeText().setText(Locale.ENGLISH.getLanguage(), "Tweak");
 			issueSeverityType = pm.makePersistent(issueSeverityType);
@@ -913,35 +915,35 @@ implements SessionBean
 			issuePriority.getIssuePriorityText().setText(Locale.ENGLISH.getLanguage(), "Low");
 			issuePriority = pm.makePersistent(issuePriority);
 			issueType.getIssuePriorities().add(issuePriority);
-			
+
 			issuePriority = new IssuePriority(getOrganisationID(), "Normal");
 			issuePriority.getIssuePriorityText().setText(Locale.ENGLISH.getLanguage(), "Normal");
 			issuePriority = pm.makePersistent(issuePriority);
 			issueType.getIssuePriorities().add(issuePriority);
-			
+
 			issuePriority = new IssuePriority(getOrganisationID(), "High");
 			issuePriority.getIssuePriorityText().setText(Locale.ENGLISH.getLanguage(), "High");
 			issuePriority = pm.makePersistent(issuePriority);
 			issueType.getIssuePriorities().add(issuePriority);
-			
+
 			issuePriority = new IssuePriority(getOrganisationID(), "Urgent");
 			issuePriority.getIssuePriorityText().setText(Locale.ENGLISH.getLanguage(), "Urgent");
 			issuePriority = pm.makePersistent(issuePriority);
 			issueType.getIssuePriorities().add(issuePriority);
-			
+
 			issuePriority = new IssuePriority(getOrganisationID(), "Immediate");
 			issuePriority.getIssuePriorityText().setText(Locale.ENGLISH.getLanguage(), "Immediate");
 			issuePriority = pm.makePersistent(issuePriority);
 			issueType.getIssuePriorities().add(issuePriority);
-			
+
 			// Create the resolutions
 			IssueResolution issueResolution;
-			
+
 			issueResolution = new IssueResolution(getOrganisationID(), IssueResolution.ISSUE_RESOLUTION_ID_NOT_ASSIGNED.issueResolutionID);
 			issueResolution.getName().setText(Locale.ENGLISH.getLanguage(), "Not assigned");
 			issueResolution = pm.makePersistent(issueResolution);
 			issueType.getIssueResolutions().add(issueResolution);
-			
+
 			issueResolution = new IssueResolution(getOrganisationID(), "Open");
 			issueResolution.getName().setText(Locale.ENGLISH.getLanguage(), "Open");
 			issueResolution = pm.makePersistent(issueResolution);
@@ -951,25 +953,25 @@ implements SessionBean
 			issueResolution.getName().setText(Locale.ENGLISH.getLanguage(), "Fixed");
 			issueResolution = pm.makePersistent(issueResolution);
 			issueType.getIssueResolutions().add(issueResolution);
-			
+
 			issueResolution = new IssueResolution(getOrganisationID(), "Reopened");
 			issueResolution.getName().setText(Locale.ENGLISH.getLanguage(), "Reopened");
 			issueResolution = pm.makePersistent(issueResolution);
 			issueType.getIssueResolutions().add(issueResolution);
-			
+
 			issueResolution = new IssueResolution(getOrganisationID(), "NotFixable");
 			issueResolution.getName().setText(Locale.ENGLISH.getLanguage(), "Not fixable");
 			issueResolution = pm.makePersistent(issueResolution);
 			issueType.getIssueResolutions().add(issueResolution);
-			
+
 			issueResolution = new IssueResolution(getOrganisationID(), "WillNotFix");
 			issueResolution.getName().setText(Locale.ENGLISH.getLanguage(), "Won't fix");
 			issueResolution = pm.makePersistent(issueResolution);
 			issueType.getIssueResolutions().add(issueResolution);
-			
+
 			// create the process definitions.
 			issueType.readProcessDefinition(IssueType.class.getResource("jbpm/status/"));
-	
+
 			// Create the issueLinkTypes
 			IssueLinkType issueLinkType;
 
@@ -982,17 +984,17 @@ implements SessionBean
 			issueLinkType.getName().setText(Locale.ENGLISH.getLanguage(), "Parent of");
 			issueLinkType.addLinkedObjectClass(Issue.class);
 			issueLinkType = pm.makePersistent(issueLinkType);
-			
+
 			issueLinkType = new IssueLinkTypeParentChild(IssueLinkTypeParentChild.ISSUE_LINK_TYPE_ID_CHILD);
 			issueLinkType.getName().setText(Locale.ENGLISH.getLanguage(), "Child of");
 			issueLinkType.addLinkedObjectClass(Issue.class);
 			issueLinkType = pm.makePersistent(issueLinkType);
-			
+
 			issueLinkType = new IssueLinkTypeDuplicate(IssueLinkTypeDuplicate.ISSUE_LINK_TYPE_ID_DUPLICATE);
 			issueLinkType.getName().setText(Locale.ENGLISH.getLanguage(), "Duplicate");
 			issueLinkType.addLinkedObjectClass(Issue.class);
 			issueLinkType = pm.makePersistent(issueLinkType);
-			
+
 			EditLockType issueEditLock = new EditLockType(EditLockTypeIssue.EDIT_LOCK_TYPE_ID);
 			issueEditLock = pm.makePersistent(issueEditLock);
 			//------------------------------------------------

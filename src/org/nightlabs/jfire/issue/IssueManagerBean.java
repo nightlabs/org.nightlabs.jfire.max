@@ -16,6 +16,7 @@ import javax.ejb.EJBException;
 import javax.ejb.SessionBean;
 import javax.ejb.SessionContext;
 import javax.jdo.FetchPlan;
+import javax.jdo.JDODetachedFieldAccessException;
 import javax.jdo.JDOHelper;
 import javax.jdo.PersistenceManager;
 import javax.jdo.Query;
@@ -24,6 +25,7 @@ import org.apache.log4j.Logger;
 import org.jbpm.JbpmContext;
 import org.jbpm.graph.exe.ProcessInstance;
 import org.nightlabs.ModuleException;
+import org.nightlabs.jdo.FetchPlanBackup;
 import org.nightlabs.jdo.NLJDOHelper;
 import org.nightlabs.jdo.moduleregistry.ModuleMetaData;
 import org.nightlabs.jdo.query.AbstractJDOQuery;
@@ -44,8 +46,10 @@ import org.nightlabs.jfire.issue.id.IssuePriorityID;
 import org.nightlabs.jfire.issue.id.IssueResolutionID;
 import org.nightlabs.jfire.issue.id.IssueSeverityTypeID;
 import org.nightlabs.jfire.issue.id.IssueTypeID;
+import org.nightlabs.jfire.issue.jbpm.JbpmConstants;
 import org.nightlabs.jfire.jbpm.JbpmLookup;
 import org.nightlabs.jfire.jbpm.graph.def.State;
+import org.nightlabs.util.Util;
 
 /**
  * @author Chairat Kongarayawetchakun - chairat[AT]nightlabs[DOT]de
@@ -260,7 +264,8 @@ implements SessionBean
 	{
 		PersistenceManager pm = getPersistenceManager();
 		try {
-			return getIssueHistoryByIssue(pm, issue);
+			Collection<IssueHistory> ih = getIssueHistoryByIssue(pm, issue);
+			return ih;
 		} finally {
 			pm.close();
 		}
@@ -581,38 +586,52 @@ implements SessionBean
 					issue.setUpdateTimestamp(new Date());
 				}
 
-//				boolean doUnassign;
-//				if (oldPersistentIssue == null)
-//				doUnassign = false;
-//				else {
-//				try {
-//				doUnassign = oldPersistentIssue.getAssignee() != null && issue.getAssignee() == null;
-//				} catch (JDODetachedFieldAccessException x) {
-//				doUnassign = false;
-//				}
-//				}
+				boolean doUnassign;
+				if (oldPersistentIssue == null)
+					doUnassign = false;
+				else {
+					try {
+						doUnassign = oldPersistentIssue.getAssignee() != null && issue.getAssignee() == null;
+					} catch (JDODetachedFieldAccessException x) {
+						doUnassign = false;
+					}
+				}
 
-//				boolean doAssign;
-//				try {
-//				doAssign = issue.getAssignee() != null;
-//				if (doAssign && oldPersistentIssue != null)
-//				doAssign = !Util.equals(issue.getAssignee(), oldPersistentIssue.getAssignee());
-//				} catch (JDODetachedFieldAccessException x) {
-//				doAssign = false;
-//				}
+				boolean doAssign;
+				try {
+					doAssign = issue.getAssignee() != null;
+					if (doAssign && oldPersistentIssue != null)
+						doAssign = !Util.equals(issue.getAssignee(), oldPersistentIssue.getAssignee());
+				} catch (JDODetachedFieldAccessException x) {
+					doAssign = false;
+				}
 
-//				String jbpmTransitionName = null;
-//				if (doAssign)
-//				jbpmTransitionName = JbpmConstants.TRANSITION_NAME_ASSIGN;
+				String jbpmTransitionName = null;
+				if (doAssign)
+					jbpmTransitionName = JbpmConstants.TRANSITION_NAME_ASSIGN;
 
-//				if (doUnassign)
-//				jbpmTransitionName = JbpmConstants.TRANSITION_NAME_UNASSIGN;
+				if (doUnassign)
+					jbpmTransitionName = JbpmConstants.TRANSITION_NAME_UNASSIGN;
+
+				if (jbpmTransitionName != null) {
+					// performing a transition might cause the fetch-plan to be modified => backup + restore
+					FetchPlanBackup fetchPlanBackup = NLJDOHelper.backupFetchPlan(pm.getFetchPlan());
+					JbpmContext jbpmContext = JbpmLookup.getJbpmConfiguration().createJbpmContext();
+					try {
+						ProcessInstance processInstance = jbpmContext.getProcessInstanceForUpdate(issue.getIssueLocal().getJbpmProcessInstanceId());
+						if (processInstance.getRootToken().getNode().hasLeavingTransition(jbpmTransitionName))
+							processInstance.signal(jbpmTransitionName);
+					} finally {
+						jbpmContext.close();
+					}
+					NLJDOHelper.restoreFetchPlan(pm.getFetchPlan(), fetchPlanBackup);
+				}
 
 				pm.getFetchPlan().setMaxFetchDepth(maxFetchDepth);
 				if (fetchGroups != null)
 					pm.getFetchPlan().setGroups(fetchGroups);
 
-				
+
 				pIssue = pm.makePersistent(issue);
 			}
 

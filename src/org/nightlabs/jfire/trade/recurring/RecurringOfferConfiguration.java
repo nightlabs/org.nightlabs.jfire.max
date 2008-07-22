@@ -1,6 +1,10 @@
 package org.nightlabs.jfire.trade.recurring;
 
+import org.nightlabs.jdo.ObjectIDUtil;
+import org.nightlabs.jfire.security.User;
 import org.nightlabs.jfire.timer.Task;
+import org.nightlabs.jfire.timer.id.TaskID;
+import org.nightlabs.math.Base36Coder;
 
 
 /**
@@ -21,7 +25,9 @@ import org.nightlabs.jfire.timer.Task;
 public class RecurringOfferConfiguration {
 
 	private static final long serialVersionUID = 1L;
-
+	public static final String TASK_TYPE_ID_RECURRED_OFFER_CREATOR_TASK = "RecurredOfferCreatorTask";
+	
+	
 	/**
 	 * @jdo.field primary-key="true"
 	 * @jdo.column length="100"
@@ -37,6 +43,13 @@ public class RecurringOfferConfiguration {
 			long recurringOfferConfigurationID) {
 		this.organisationID = organisationID;
 		this.recurringOfferConfigurationID = recurringOfferConfigurationID;
+	    String _taskID =  ObjectIDUtil.longObjectIDFieldToString(recurringOfferConfigurationID);
+		TaskID taskID = TaskID.create(organisationID,TASK_TYPE_ID_RECURRED_OFFER_CREATOR_TASK, _taskID);
+		this.creatorTask = new Task(
+	    	    taskID,
+	    	    null,
+	    	    "",
+	    	    "");	
 	}
 
 	/**

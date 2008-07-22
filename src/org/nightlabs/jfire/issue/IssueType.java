@@ -55,7 +55,8 @@ import org.nightlabs.util.Util;
  * @jdo.query name="getAllIssueTypeIDs" query="SELECT JDOHelper.getObjectId(this)"
  */
 public class IssueType
-implements Serializable{
+implements Serializable
+{
 	private static final long serialVersionUID = 1L;
 	/**
 	 * @deprecated The *.this-FetchGroups lead to bad programming style and are therefore deprecated, now. They should be removed soon! 

@@ -1,19 +1,17 @@
 package org.nightlabs.jfire.issue.history;
 
 import java.io.Serializable;
-import java.lang.reflect.Method;
 import java.util.Collection;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 
+import javax.jdo.JDOHelper;
 import javax.jdo.PersistenceManager;
 import javax.jdo.Query;
 
 import org.apache.log4j.Logger;
 import org.nightlabs.jfire.issue.Issue;
-import org.nightlabs.jfire.issue.IssueLink;
-import org.nightlabs.jfire.issue.IssueLinkType;
 import org.nightlabs.util.Util;
 
 /**
@@ -36,15 +34,14 @@ import org.nightlabs.util.Util;
  *			WHERE this.issueID == :issueID && this.organisationID == :organisationID"                    
  *
  * @jdo.fetch-group name="IssueHistory.issue" fields="issue"
- * 
  * @jdo.fetch-group name="IssueHistory.this" fetch-groups="default" fields="description"
  *
  **/
 public class IssueHistory
-implements Serializable{
-
+implements Serializable 
+{
 	private static final long serialVersionUID = 1L;
-	private static final Logger logger = Logger.getLogger(Issue.class);
+	private static final Logger logger = Logger.getLogger(IssueHistory.class);
 
 	/**
 	 * @deprecated The *.this-FetchGroups lead to bad programming style and are therefore deprecated, now. They should be removed soon! 
@@ -207,5 +204,38 @@ implements Serializable{
 		{
 
 		}
+	}
+	
+	/**
+	 * Internal method.
+	 * @return The PersistenceManager associated with this object. 
+	 */
+	protected PersistenceManager getPersistenceManager() {
+		PersistenceManager issueHistoryPM = JDOHelper.getPersistenceManager(this);
+		if (issueHistoryPM == null)
+			throw new IllegalStateException("This instance of " + this.getClass().getName() + " is not persistent, can not get a PersistenceManager!");
+
+		return issueHistoryPM;
+	}	
+	
+	@Override
+	public boolean equals(Object obj)
+	{
+		if (obj == this) return true;
+		if (!(obj instanceof IssueHistory)) return false;
+		IssueHistory o = (IssueHistory) obj;
+		return
+			Util.equals(this.organisationID, o.organisationID) && 
+			Util.equals(this.issueID, o.issueID) &&
+			Util.equals(this.issueHistoryID, o.issueHistoryID);
+	}
+
+	@Override
+	public int hashCode()
+	{
+		return 
+			Util.hashCode(organisationID) ^
+			Util.hashCode(issueID) ^
+			Util.hashCode(issueHistoryID);
 	}
 }

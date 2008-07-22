@@ -264,6 +264,11 @@ implements SessionBean
 	{
 		PersistenceManager pm = getPersistenceManager();
 		try {
+			Query q = pm.newNamedQuery(IssueHistory.class, "getIssueHistoriesByOrganisationIDAndIssueID");
+			Map<String, Object> params = new HashMap<String, Object>(3);
+			params.put("issueID", issue.getIssueID());
+			params.put("organisationID", issue.getOrganisationID());
+			
 			Collection<IssueHistory> ih = getIssueHistoryByIssue(pm, issue);
 			return ih;
 		} finally {
@@ -279,7 +284,7 @@ implements SessionBean
 	@SuppressWarnings("unchecked")
 	protected static Collection<IssueHistory> getIssueHistoryByIssue(PersistenceManager pm, Issue issue)
 	{
-		Query q = pm.newNamedQuery(IssueHistory.class, "getIssueHistoriesByOrganisationIDAndIssueID");
+		final Query q = pm.newNamedQuery(IssueHistory.class, IssueHistory.QUERY_ISSUE_HISTORIES_BY_ORGANISATION_ID_AND_ISSUE_ID);
 		Map<String, Object> params = new HashMap<String, Object>(3);
 		params.put("issueID", issue.getIssueID());
 		params.put("organisationID", issue.getOrganisationID());

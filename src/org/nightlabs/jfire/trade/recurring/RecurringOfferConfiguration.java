@@ -29,12 +29,12 @@ public class RecurringOfferConfiguration {
 	/**
 	 * @jdo.field primary-key="true"
 	 */
-	private long RecurringOfferConfigurationID;
+	private long recurringOfferConfigurationID;
 	
 	public RecurringOfferConfiguration(String organisationID,
 			long recurringOfferConfigurationID) {
 		this.organisationID = organisationID;
-		RecurringOfferConfigurationID = recurringOfferConfigurationID;
+		recurringOfferConfigurationID = recurringOfferConfigurationID;
 	}
 
 	/**

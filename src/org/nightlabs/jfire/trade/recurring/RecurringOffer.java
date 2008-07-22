@@ -29,7 +29,10 @@ public class RecurringOffer extends Offer {
 	 * @jdo.field persistence-modifier="persistent"
 	 */
 	private RecurringOfferConfiguration recurringOfferConfiguration;
-
+	
+	private RecurringOffer recurringOffer;
+	
+	
 	/**
 	 * @deprecated Only for JDO!
 	 */
@@ -44,6 +47,14 @@ public class RecurringOffer extends Offer {
 
 	}
 
+	public RecurringOfferConfiguration getRecurringOfferConfiguration() {
+		return recurringOfferConfiguration;
+	}
+
+
+	public RecurringOffer getRecurringOffer() {
+		return recurringOffer;
+	}
 
 
 }

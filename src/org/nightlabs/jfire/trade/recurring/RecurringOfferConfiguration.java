@@ -15,7 +15,7 @@ import org.nightlabs.jfire.timer.Task;
  * @jdo.version strategy="version-number"
  * @jdo.inheritance strategy="new-table"
  *
- * @jdo.create-objectid-class field-order="organisationID, RecurringOfferConfigurationID"
+ * @jdo.create-objectid-class field-order="organisationID, recurringOfferConfigurationID"
  *
  */
 public class RecurringOfferConfiguration {

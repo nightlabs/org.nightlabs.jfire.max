@@ -269,27 +269,27 @@ implements SessionBean
 			params.put("issueID", issue.getIssueID());
 			params.put("organisationID", issue.getOrganisationID());
 			
-			Collection<IssueHistory> ih = getIssueHistoryByIssue(pm, issue);
+			Collection<IssueHistory> ih = (Collection<IssueHistory>)q.executeWithMap(params);;
 			return ih;
 		} finally {
 			pm.close();
 		}
 	}
 
-	/**
-	 * @param pm The <code>PersistenceManager</code> that should be used to access the datastore.
-	 * @param issue
-	 * @return Returns instances of <code>IssueHistory</code>.
-	 */
-	@SuppressWarnings("unchecked")
-	protected static Collection<IssueHistory> getIssueHistoryByIssue(PersistenceManager pm, Issue issue)
-	{
-		final Query q = pm.newNamedQuery(IssueHistory.class, IssueHistory.QUERY_ISSUE_HISTORIES_BY_ORGANISATION_ID_AND_ISSUE_ID);
-		Map<String, Object> params = new HashMap<String, Object>(3);
-		params.put("issueID", issue.getIssueID());
-		params.put("organisationID", issue.getOrganisationID());
-		return (Collection<IssueHistory>)q.executeWithMap(params);
-	}
+//	/**
+//	 * @param pm The <code>PersistenceManager</code> that should be used to access the datastore.
+//	 * @param issue
+//	 * @return Returns instances of <code>IssueHistory</code>.
+//	 */
+//	@SuppressWarnings("unchecked")
+//	protected static Collection<IssueHistory> getIssueHistoryByIssue(PersistenceManager pm, Issue issue)
+//	{
+//		final Query q = pm.newNamedQuery(IssueHistory.class, IssueHistory.QUERY_ISSUE_HISTORIES_BY_ORGANISATION_ID_AND_ISSUE_ID);
+//		Map<String, Object> params = new HashMap<String, Object>(3);
+//		params.put("issueID", issue.getIssueID());
+//		params.put("organisationID", issue.getOrganisationID());
+//		return (Collection<IssueHistory>)q.executeWithMap(params);
+//	}
 
 //	/**
 //	* @throws ModuleException

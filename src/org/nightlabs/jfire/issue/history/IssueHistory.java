@@ -257,7 +257,7 @@ implements Serializable
 		{
 			changeText.append("Changed resolution");
 			changeText.append(" from ");
-			changeText.append(oldIssue.getIssueResolution().getName().getText());
+			changeText.append(oldIssue.getIssueResolution() == null?"None":oldIssue.getIssueResolution().getName().getText());
 			changeText.append(" ---> ");
 			changeText.append(newIssue.getIssueResolution().getName().getText());
 			changeText.append("\n");

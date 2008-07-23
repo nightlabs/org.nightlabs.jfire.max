@@ -138,6 +138,10 @@ implements Serializable
 		return createTimestamp;
 	}
 	
+	public String getChange() {
+		return change;
+	}
+	
 	/**
 	 * @param pm The <code>PersistenceManager</code> that should be used to access the datastore.
 	 * @param issue
@@ -156,60 +160,130 @@ implements Serializable
 	
 	private void generateHistory(Issue oldIssue, Issue newIssue)
 	{
+		StringBuffer changeText = new StringBuffer();
+		
+		if (!Util.equals(oldIssue.getDescription().getText(), newIssue.getDescription().getText())) 
+		{
+			changeText.append("Changed description");
+			changeText.append(" from ");
+			changeText.append(oldIssue.getDescription().getText());
+			changeText.append(" ---> ");
+			changeText.append(newIssue.getDescription());
+			changeText.append("\n");
+			
+		}
+		
+		if (!Util.equals(oldIssue.getSubject().getText(), newIssue.getSubject().getText())) 
+		{
+			changeText.append("Changed subject");
+			changeText.append(" from ");
+			changeText.append(oldIssue.getSubject().getText());
+			changeText.append(" ---> ");
+			changeText.append(newIssue.getSubject().getText());
+			changeText.append("\n");
+		}
+		
 		if (!Util.equals(oldIssue.getComments(), newIssue.getComments())) 
 		{
-			
+			changeText.append("Add Comment(s)");
+//			changeText.append(" from ");
+//			changeText.append();
+//			changeText.append(" ---> ");
+//			changeText.append();
+			changeText.append("\n");
 		}
 
 		if (!Util.equals(oldIssue.getAssignee(), newIssue.getAssignee())) 
 		{
-
+			changeText.append("Changed assignee");
+			changeText.append(" from ");
+			changeText.append(oldIssue.getAssignee().getName());
+			changeText.append(" ---> ");
+			changeText.append(newIssue.getAssignee().getName());
+			changeText.append("\n");
 		}
 
 		if (!Util.equals(oldIssue.getReporter(), newIssue.getReporter())) 
 		{
-
+			changeText.append("Changed reporter");
+			changeText.append(" from ");
+			changeText.append(oldIssue.getReporter().getName());
+			changeText.append(" ---> ");
+			changeText.append(newIssue.getReporter().getName());
+			changeText.append("\n");
 		}
 
-		if (!Util.equals(oldIssue.getIssueFileAttachments(), newIssue.getIssueFileAttachments())) 
+		if (!Util.equals(oldIssue.getIssueFileAttachments().size(), newIssue.getIssueFileAttachments().size())) 
 		{
-
+			changeText.append("Changed file attachments");
+//			changeText.append(" from ");
+//			changeText.append();
+//			changeText.append(" ---> ");
+//			changeText.append();
+			changeText.append("\n");
 		}
 
 		if (!Util.equals(oldIssue.getIssueLinks(), newIssue.getIssueLinks())) 
 		{
-
+			changeText.append("Changed issue links");
+//			changeText.append(" from ");
+//			changeText.append();
+//			changeText.append(" ---> ");
+//			changeText.append();
+			changeText.append("\n");
 		}
 
 		if (!Util.equals(oldIssue.getIssuePriority(), newIssue.getIssuePriority())) 
 		{
-
+			changeText.append("Changed priority");
+			changeText.append(" from ");
+			changeText.append(oldIssue.getIssuePriority().getIssuePriorityText().getText());
+			changeText.append(" ---> ");
+			changeText.append(newIssue.getIssuePriority().getIssuePriorityText().getText());
+			changeText.append("\n");
 		}
 		
 		if (!Util.equals(oldIssue.getIssueSeverityType(), newIssue.getIssueSeverityType())) 
 		{
-
+			changeText.append("Changed severity type");
+			changeText.append(" from ");
+			changeText.append(oldIssue.getIssueSeverityType().getIssueSeverityTypeText().getText());
+			changeText.append(" ---> ");
+			changeText.append(newIssue.getIssueSeverityType().getIssueSeverityTypeText().getText());
+			changeText.append("\n");
 		}
 		
 		if (!Util.equals(oldIssue.getIssueResolution(), newIssue.getIssueResolution())) 
 		{
-
+			changeText.append("Changed resolution");
+			changeText.append(" from ");
+			changeText.append(oldIssue.getIssueResolution().getName().getText());
+			changeText.append(" ---> ");
+			changeText.append(newIssue.getIssueResolution().getName().getText());
+			changeText.append("\n");
 		}
 		
 		if (!Util.equals(oldIssue.getIssueType(), newIssue.getIssueType())) 
 		{
-
+			changeText.append("Changed issue type");
+			changeText.append(" from ");
+			changeText.append(oldIssue.getIssueType().getName().getText());
+			changeText.append(" ---> ");
+			changeText.append(newIssue.getIssueType().getName().getText());
+			changeText.append("\n");
 		}
 		
-		if (!Util.equals(oldIssue.getState(), newIssue.getState())) 
+		if (!Util.equals(oldIssue.getState().getStateID(), newIssue.getState().getStateID())) 
 		{
-
+			changeText.append("Changed state");
+			changeText.append(" from ");
+			changeText.append(oldIssue.getState().getStateDefinition().getName().getText());
+			changeText.append(" ---> ");
+			changeText.append(newIssue.getState().getStateDefinition().getName().getText());
+			changeText.append("\n");
 		}
 		
-		if (!Util.equals(oldIssue.getIssueResolution(), newIssue.getIssueResolution())) 
-		{
-
-		}
+		this.change = changeText.toString();
 	}
 	
 	/**

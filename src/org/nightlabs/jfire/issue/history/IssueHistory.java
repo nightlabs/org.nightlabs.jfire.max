@@ -76,7 +76,7 @@ implements Serializable
 
 	/**
 	 * @jdo.field persistence-modifier="persistent"
-	 * @jdo.column length="100"
+	 * @jdo.column length="255"
 	 */
 	private String change;
 
@@ -223,15 +223,15 @@ implements Serializable
 			changeText.append("\n");
 		}
 
-		if (!Util.equals(oldIssue.getIssueLinks(), newIssue.getIssueLinks())) 
-		{
-			changeText.append("Changed issue links");
-//			changeText.append(" from ");
-//			changeText.append();
-//			changeText.append(" ---> ");
-//			changeText.append();
-			changeText.append("\n");
-		}
+//		if (!Util.equals(oldIssue.getIssueLinks(), newIssue.getIssueLinks())) 
+//		{
+//			changeText.append("Changed issue links");
+////			changeText.append(" from ");
+////			changeText.append();
+////			changeText.append(" ---> ");
+////			changeText.append();
+//			changeText.append("\n");
+//		}
 
 		if (!Util.equals(oldIssue.getIssuePriority(), newIssue.getIssuePriority())) 
 		{

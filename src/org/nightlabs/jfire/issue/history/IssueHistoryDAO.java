@@ -1,13 +1,14 @@
 package org.nightlabs.jfire.issue.history;
 
 import java.util.Collection;
+import java.util.List;
 import java.util.Set;
 
 import org.nightlabs.jfire.base.jdo.BaseJDOObjectDAO;
-import org.nightlabs.jfire.issue.Issue;
 import org.nightlabs.jfire.issue.IssueManager;
 import org.nightlabs.jfire.issue.IssueManagerUtil;
 import org.nightlabs.jfire.issue.history.id.IssueHistoryID;
+import org.nightlabs.jfire.issue.id.IssueID;
 import org.nightlabs.jfire.security.SecurityReflector;
 import org.nightlabs.progress.ProgressMonitor;
 
@@ -31,10 +32,10 @@ public class IssueHistoryDAO extends BaseJDOObjectDAO<IssueHistoryID, IssueHisto
 			String[] fetchGroups, int maxFetchDepth, ProgressMonitor monitor)
 			throws Exception {
 
-		monitor.beginTask("Loading Issues", 1);
+		monitor.beginTask("Loading Issue Histories", 1);
 		try {
 			IssueManager im = IssueManagerUtil.getHome(SecurityReflector.getInitialContextProperties()).create();
-			return im.getIssues(issueHistoryIDs, fetchGroups, maxFetchDepth);
+			return im.getIssueHistories(issueHistoryIDs, fetchGroups, maxFetchDepth);
 		} catch (Exception e) {
 			monitor.setCanceled(true);
 			throw e;
@@ -44,14 +45,33 @@ public class IssueHistoryDAO extends BaseJDOObjectDAO<IssueHistoryID, IssueHisto
 			monitor.done();
 		}
 	}
+	
+	private IssueManager issueManager;
 
-	@SuppressWarnings("unchecked")
-	public Collection<IssueHistory> getIssueHistoryByIssue(Issue issue, ProgressMonitor monitor)
+	public synchronized List<IssueHistory> getIssueHistories(IssueID issueID,
+			String[] fetchGroups, int maxFetchDepth,
+			ProgressMonitor monitor)
 	{
-		monitor.beginTask("Loading issue histories"+ issue.getIssueID(), 1);
+		try {
+			issueManager = IssueManagerUtil.getHome(SecurityReflector.getInitialContextProperties()).create();
+			try {
+				Collection<IssueHistoryID> issueHistoryIDs = issueManager.getIssueHistoryIDsByIssueID(issueID);
+				return getJDOObjects(null, issueHistoryIDs, fetchGroups, maxFetchDepth, monitor);
+			} finally {
+				issueManager = null;
+			}
+		} catch (Exception x) {
+			throw new RuntimeException(x);
+		}
+	}
+	
+	@SuppressWarnings("unchecked")
+	public Collection<IssueHistory> getIssueHistories(Collection<IssueHistoryID> issueHistoryIDs, String[] fetchGroups, int maxFetchDepth, ProgressMonitor monitor)
+	{
+		monitor.beginTask("Loading issue histories...", 1);
 		try {
 			IssueManager im = IssueManagerUtil.getHome(SecurityReflector.getInitialContextProperties()).create();
-			Collection<IssueHistory> issueHistories = im.getIssueHistoryByIssue(issue);
+			Collection<IssueHistory> issueHistories = im.getIssueHistories(issueHistoryIDs, fetchGroups, maxFetchDepth);
 			monitor.done();
 			return issueHistories;			
 		} catch (Exception x) {

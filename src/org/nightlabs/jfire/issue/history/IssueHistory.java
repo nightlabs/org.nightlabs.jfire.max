@@ -12,6 +12,7 @@ import javax.jdo.Query;
 
 import org.apache.log4j.Logger;
 import org.nightlabs.jfire.issue.Issue;
+import org.nightlabs.jfire.issue.id.IssueID;
 import org.nightlabs.util.Util;
 
 /**
@@ -29,12 +30,12 @@ import org.nightlabs.util.Util;
  *		field-order="organisationID, issueID, issueHistoryID"
  *
  * @jdo.query
- *		name="getIssueHistoriesByOrganisationIDAndIssueID"
+ *		name="getIssueHistoryIDsByOrganisationIDAndIssueID"
  *		query="SELECT
  *			WHERE this.issueID == :issueID && this.organisationID == :organisationID"                    
  *
  * @jdo.fetch-group name="IssueHistory.issue" fields="issue"
- * @jdo.fetch-group name="IssueHistory.this" fetch-groups="default" fields="description"
+ * @jdo.fetch-group name="IssueHistory.this" fetch-groups="default" fields="createTimestamp"
  *
  **/
 public class IssueHistory
@@ -49,7 +50,7 @@ implements Serializable
 	public static final String FETCH_GROUP_THIS = "IssueHistory.this";
 	public static final String FETCH_GROUP_ISSUE = "IssueHistory.issue";
 	
-	public static final String QUERY_ISSUE_HISTORIES_BY_ORGANISATION_ID_AND_ISSUE_ID = "getIssueHistoriesByOrganisationIDAndIssueID";
+	public static final String QUERY_ISSUE_HISTORYIDS_BY_ORGANISATION_ID_AND_ISSUE_ID = "getIssueHistoryIDsByOrganisationIDAndIssueID";
 	
 	/**
 	 * @jdo.field primary-key="true"
@@ -133,18 +134,23 @@ implements Serializable
 		return issue;
 	}
 
+	public Date getCreateTimeStamp() {
+		return createTimestamp;
+	}
+	
 	/**
 	 * @param pm The <code>PersistenceManager</code> that should be used to access the datastore.
 	 * @param issue
 	 * @return Returns instances of <code>IssueHistory</code>.
 	 */
-	@SuppressWarnings("unchecked")
-	protected static Collection<IssueHistory> getIssueHistoryByIssue(PersistenceManager pm, Issue issue)
+	public static Collection<IssueHistory> getIssueHistoryByIssue(PersistenceManager pm, IssueID issueID)
 	{
-		Query q = pm.newNamedQuery(IssueHistory.class, "getIssueHistoriesByOrganisationIDAndIssueID");
-		Map<String, Object> params = new HashMap<String, Object>(3);
-		params.put("issueID", issue.getIssueID());
-		params.put("organisationID", issue.getOrganisationID());
+		Query q = pm.newNamedQuery(IssueHistory.class, IssueHistory.QUERY_ISSUE_HISTORYIDS_BY_ORGANISATION_ID_AND_ISSUE_ID);
+		
+		Map<String, Object> params = new HashMap<String, Object>(2);
+		params.put("issueID", issueID.issueID);
+		params.put("organisationID", issueID.organisationID);
+		
 		return (Collection<IssueHistory>)q.executeWithMap(params);
 	}
 	

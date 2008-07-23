@@ -37,6 +37,7 @@ import org.nightlabs.jfire.base.JFireBaseEAR;
 import org.nightlabs.jfire.editlock.EditLockType;
 import org.nightlabs.jfire.idgenerator.IDGenerator;
 import org.nightlabs.jfire.issue.history.IssueHistory;
+import org.nightlabs.jfire.issue.history.id.IssueHistoryID;
 import org.nightlabs.jfire.issue.id.IssueCommentID;
 import org.nightlabs.jfire.issue.id.IssueFileAttachmentID;
 import org.nightlabs.jfire.issue.id.IssueID;
@@ -260,37 +261,32 @@ implements SessionBean
 	 * @ejb.permission role-name="_Guest_"
 	 */
 	@SuppressWarnings("unchecked")
-	public Collection<IssueHistory> getIssueHistoryByIssue(Issue issue)
+	public Collection<IssueHistoryID> getIssueHistoryIDsByIssueID(IssueID issueID)
 	{
 		PersistenceManager pm = getPersistenceManager();
 		try {
-			Query q = pm.newNamedQuery(IssueHistory.class, "getIssueHistoriesByOrganisationIDAndIssueID");
-			Map<String, Object> params = new HashMap<String, Object>(3);
-			params.put("issueID", issue.getIssueID());
-			params.put("organisationID", issue.getOrganisationID());
-			
-			Collection<IssueHistory> ih = (Collection<IssueHistory>)q.executeWithMap(params);;
-			return ih;
+			return NLJDOHelper.getObjectIDSet(IssueHistory.getIssueHistoryByIssue(pm, issueID));
 		} finally {
 			pm.close();
 		}
 	}
 
-//	/**
-//	 * @param pm The <code>PersistenceManager</code> that should be used to access the datastore.
-//	 * @param issue
-//	 * @return Returns instances of <code>IssueHistory</code>.
-//	 */
-//	@SuppressWarnings("unchecked")
-//	protected static Collection<IssueHistory> getIssueHistoryByIssue(PersistenceManager pm, Issue issue)
-//	{
-//		final Query q = pm.newNamedQuery(IssueHistory.class, IssueHistory.QUERY_ISSUE_HISTORIES_BY_ORGANISATION_ID_AND_ISSUE_ID);
-//		Map<String, Object> params = new HashMap<String, Object>(3);
-//		params.put("issueID", issue.getIssueID());
-//		params.put("organisationID", issue.getOrganisationID());
-//		return (Collection<IssueHistory>)q.executeWithMap(params);
-//	}
-
+	/**
+	 * @ejb.interface-method
+	 * @!ejb.transaction type="Supports"
+	 * @ejb.permission role-name="_Guest_"
+	 */
+	@SuppressWarnings("unchecked")
+	public List<IssueHistory> getIssueHistories(Collection<IssueHistoryID> issueHistoryIDs, String[] fetchGroups, int maxFetchDepth)
+	{
+		PersistenceManager pm = getPersistenceManager();
+		try {
+			return NLJDOHelper.getDetachedObjectList(pm, issueHistoryIDs, IssueHistory.class, fetchGroups, maxFetchDepth);
+		} finally {
+			pm.close();
+		}
+	}
+	
 //	/**
 //	* @throws ModuleException
 //	*

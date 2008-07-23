@@ -104,14 +104,14 @@ public class FormulaCell implements Serializable
 	 * TODO DataNucleus workaround: the above null-value="exception" is correct but causes exceptions during cross-datastore-replication 
 	 * @jdo.field persistence-modifier="persistent"
 	 */
-	private FormulaPriceConfig priceConfig;
+	private PriceConfig priceConfig;
 
 	/**
 	 * This is used in mapped-by of the FormulaPriceConfig.
 	 *
 	 * @jdo.field persistence-modifier="persistent"
 	 */
-	private FormulaPriceConfig mapOwner;
+	private PriceConfig mapOwner;
 
 	/**
 	 * @param mapOwner The mapOwner to set.
@@ -123,7 +123,7 @@ public class FormulaCell implements Serializable
 
 	public FormulaPriceConfig getMapOwner()
 	{
-		return mapOwner;
+		return (FormulaPriceConfig) mapOwner;
 	}
 
 	/**

@@ -168,7 +168,7 @@ implements Serializable
 			changeText.append(" from ");
 			changeText.append(oldIssue.getDescription().getText());
 			changeText.append(" ---> ");
-			changeText.append(newIssue.getDescription());
+			changeText.append(newIssue.getDescription().getText());
 			changeText.append("\n");
 			
 		}

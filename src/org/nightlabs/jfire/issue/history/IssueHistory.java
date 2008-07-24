@@ -147,7 +147,7 @@ implements Serializable
 		return issue;
 	}
 
-	public Date getCreateTimeStamp() {
+	public Date getCreateTimestamp() {
 		return createTimestamp;
 	}
 	

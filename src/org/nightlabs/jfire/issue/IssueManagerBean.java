@@ -151,6 +151,10 @@ implements SessionBean
 	}
 
 	/**
+	 * @param queries the QueryCollection containing all queries that shall be chained
+	 *		in order to retrieve the result. The result of one query is passed to the
+	 *		next one using the {@link AbstractJDOQuery#setCandidates(Collection)}.
+	 *
 	 * @ejb.interface-method
 	 * @ejb.permission role-name="_Guest_"
 	 * @!ejb.transaction type="Supports" @!This usually means that no transaction is opened which is significantly faster and recommended for all read-only EJB methods! Marco.
@@ -542,6 +546,14 @@ implements SessionBean
 
 
 	/**
+	 * Stores the given Issue. If the issue is a new issue, do the initializing process instance.
+	 * If not new, do the issue history creation process & check the assignee for do the 
+	 * state assignment.
+	 * 
+	 * @param issue The issue to be stored
+	 * @param get If true the created I will be returned else null
+	 * @param fetchGroups The fetchGroups the returned Issue should be detached with
+	 * 
 	 * @ejb.interface-method
 	 * @ejb.transaction type="Required"
 	 * @ejb.permission role-name="_Guest_"
@@ -753,8 +765,6 @@ implements SessionBean
 			pm.getExtent(Issue.class, true);
 			Issue issue = (Issue) pm.getObjectById(issueID);
 
-			//FIXME: We can not remove states righnow. Don't know why??????
-
 			pm.getExtent(State.class, true);
 			for (State state : issue.getStates()) {
 				pm.deletePersistent(state);		
@@ -775,6 +785,13 @@ implements SessionBean
 	}
 
 	/**
+	 * Signal the issue to change its state.
+	 * 
+	 * @param issueID The issueID to be changed
+	 * @param jbpmTransitionName a node name that defined in JbpmConstants
+	 * @param get If true the created I will be returned else null
+	 * @param fetchGroups The fetchGroups the returned Issue should be detached with 
+	 * 
 	 * @ejb.interface-method
 	 * @ejb.transaction type="Required"
 	 * @ejb.permission role-name="_Guest_"

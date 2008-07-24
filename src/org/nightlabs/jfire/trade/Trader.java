@@ -663,7 +663,7 @@ public class Trader
 					throw new RuntimeException(x); // should not happen.
 				}
 
-				offerIDPrefix = tradeConfigModule.getActiveIDPrefixCf(DeliveryNote.class.getName()).getDefaultIDPrefix();
+				offerIDPrefix = tradeConfigModule.getActiveIDPrefixCf(Offer.class.getName()).getDefaultIDPrefix();
 			}
 
 			Offer offer = new Offer(

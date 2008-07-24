@@ -51,12 +51,6 @@ public class IssueCommentDAO extends BaseJDOObjectDAO<IssueCommentID, IssueComme
 		}
 	}
 	
-//	public synchronized List<IssueType> getIssueTypes(Set<IssueTypeID> issueTypeIDs, String[] fetchgroups, int maxFetchDepth, ProgressMonitor monitor) 
-//	{
-//		return getJDOObjects(null, issueTypeIDs, fetchgroups, maxFetchDepth, monitor);
-//	}
-
-	
 	public synchronized IssueComment storeIssueComment(IssueComment issueComment, String[] fetchgroups, int maxFetchDepth, ProgressMonitor monitor) 
 	{
 		try {

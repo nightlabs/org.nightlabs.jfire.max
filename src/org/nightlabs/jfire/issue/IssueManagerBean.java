@@ -291,29 +291,6 @@ implements SessionBean
 		}
 	}
 	
-//	/**
-//	* @throws ModuleException
-//	*
-//	* @ejb.interface-method
-//	* @ejb.transaction type="Required"
-//	* @ejb.permission role-name="_Guest_"
-//	*/
-//	public Collection getIssuePriorities(String[] fetchGroups, int maxFetchDepth)
-//	throws ModuleException
-//	{
-//	PersistenceManager pm = getPersistenceManager();
-//	try {
-//	pm.getFetchPlan().setMaxFetchDepth(maxFetchDepth);
-//	if (fetchGroups != null)
-//	pm.getFetchPlan().setGroups(fetchGroups);
-
-//	Query q = pm.newQuery(IssuePriority.class);
-//	return pm.detachCopyAll((Collection)q.execute());
-//	} finally {
-//	pm.close();
-//	}
-//	}
-
 	/**
 	 * @ejb.interface-method
 	 * @!ejb.transaction type="Supports" @!This usually means that no transaction is opened which is significantly faster and recommended for all read-only EJB methods! Marco.
@@ -854,42 +831,6 @@ implements SessionBean
 			pm.makePersistent(new ModuleMetaData(
 					JFireIssueTrackingEAR.MODULE_NAME, "0.9.5.0.0.beta", "0.9.5.0.0.beta")
 			);
-
-//			// check, whether the datastore is already initialized
-//			pm.getExtent(IssueStatus.class);
-//			try {
-//			pm.getObjectById(IssueStatusID.create("N"), true);
-//			return; // already initialized
-//			} catch (JDOObjectNotFoundException x) {
-//			// datastore not yet initialized
-//			}
-
-//			// Create the statuses
-//			IssueStatus issueStatus;
-
-//			issueStatus = new IssueStatus(IssueStatus.ISSUE_STATUS_NEW);
-//			issueStatus.getIssueStatusText().setText(Locale.ENGLISH.getLanguage(), "New");
-//			pm.makePersistent(issueStatus);
-
-//			issueStatus = new IssueStatus(IssueStatus.ISSUE_STATUS_FEEDBACK);
-//			issueStatus.getIssueStatusText().setText(Locale.ENGLISH.getLanguage(), "Feedback");
-//			pm.makePersistent(issueStatus);
-
-//			issueStatus = new IssueStatus(IssueStatus.ISSUE_STATUS_ACKNOWLEDGED);
-//			issueStatus.getIssueStatusText().setText(Locale.ENGLISH.getLanguage(), "Acknowledged");
-//			pm.makePersistent(issueStatus);
-
-//			issueStatus = new IssueStatus(IssueStatus.ISSUE_STATUS_CONFIRMED);
-//			issueStatus.getIssueStatusText().setText(Locale.ENGLISH.getLanguage(), "Confirmed");
-//			pm.makePersistent(issueStatus);
-
-//			issueStatus = new IssueStatus(IssueStatus.ISSUE_STATUS_RESOLVED);
-//			issueStatus.getIssueStatusText().setText(Locale.ENGLISH.getLanguage(), "Resolved");
-//			pm.makePersistent(issueStatus);
-
-//			issueStatus = new IssueStatus(IssueStatus.ISSUE_STATUS_CLOSE);
-//			issueStatus.getIssueStatusText().setText(Locale.ENGLISH.getLanguage(), "Close");
-//			pm.makePersistent(issueStatus);
 
 			IssueType issueType = new IssueType(getOrganisationID(), "Default");
 			issueType.getName().setText(Locale.ENGLISH.getLanguage(), "Default");

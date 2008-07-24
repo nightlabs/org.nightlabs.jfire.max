@@ -142,20 +142,6 @@ implements 	Serializable, AttachCallback, Statable, DeleteCallback
 	 */
 	private IssueType issueType;
 
-//	/**
-//	 * Instances of String that are representations of {@link ObjectID}s.
-//	 *
-//	 * @jdo.field
-//	 *		persistence-modifier="persistent"
-//	 *		collection-type="collection"
-//	 *		element-type="String"
-//	 *		dependent-value="true"
-//	 *		table="JFireIssueTracking_Issue_referencedObjectIDs"
-//	 *
-//	 * @jdo.join
-//	 */
-//	private Set<String> referencedObjectIDs;
-	
 	/**
 	 * Instances of IssueLink that are representations of {@link ObjectID}s.
 	 *
@@ -725,11 +711,6 @@ implements 	Serializable, AttachCallback, Statable, DeleteCallback
 				+ ']'
 		);
 	}
-
-//	/**
-//	 * @jdo.field persistence-modifier="persistent"
-//	 */
-//	private String primaryKey;
 
 	public static String getPrimaryKey(String organisationID, long issueID)
 	{

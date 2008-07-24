@@ -101,21 +101,4 @@ extends BaseJDOObjectDAO<IssueLinkTypeID, IssueLinkType>
 			issueManager = null;
 		}
 	}
-
-//	public IssueLinkType storeIssueLinkType(IssueLinkType issueLinkType, boolean get, String[] fetchGroups, int maxFetchDepth, ProgressMonitor monitor)
-//	{
-//	if (issueLinkType == null)
-//	throw new NullPointerException("Issue to save must not be null");
-//	monitor.beginTask("Storing issueLinkType: "+ issueLinkType.getIssueLinkTypeID(), 3);
-//	try {
-//	IssueManager im = IssueManagerUtil.getHome(SecurityReflector.getInitialContextProperties()).create();
-//	IssueLinkType result = im.storeIssueLinkType(issueLinkType, get, fetchGroups, maxFetchDepth);
-//	monitor.worked(1);
-//	monitor.done();
-//	return result;
-//	} catch (Exception e) {
-//	monitor.done();
-//	throw new RuntimeException("Error while storing IssueLinkType!\n" ,e);
-//	}
-//	}
 }

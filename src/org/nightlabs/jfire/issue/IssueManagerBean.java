@@ -4,11 +4,9 @@ import java.io.IOException;
 import java.rmi.RemoteException;
 import java.util.Collection;
 import java.util.Date;
-import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Locale;
-import java.util.Map;
 import java.util.Set;
 
 import javax.ejb.CreateException;
@@ -50,6 +48,8 @@ import org.nightlabs.jfire.issue.id.IssueTypeID;
 import org.nightlabs.jfire.issue.jbpm.JbpmConstants;
 import org.nightlabs.jfire.jbpm.JbpmLookup;
 import org.nightlabs.jfire.jbpm.graph.def.State;
+import org.nightlabs.jfire.security.SecurityReflector;
+import org.nightlabs.jfire.security.User;
 import org.nightlabs.util.Util;
 
 /**
@@ -580,9 +580,9 @@ implements SessionBean
 				IssueID issueID = (IssueID) JDOHelper.getObjectId(issue);
 				Issue oldPersistentIssue = (Issue) pm.getObjectById(issueID);
 
-				IssueHistory issueHistory = new IssueHistory(oldPersistentIssue, issue, IDGenerator.nextID(IssueHistory.class));
+				User user = SecurityReflector.getUserDescriptor().getUser(pm);
+				IssueHistory issueHistory = new IssueHistory(user, oldPersistentIssue, issue, IDGenerator.nextID(IssueHistory.class));
 				storeIssueHistory(issueHistory, false, new String[]{FetchPlan.DEFAULT}, NLJDOHelper.MAX_FETCH_DEPTH_NO_LIMIT);
-
 				if (issue.getCreateTimestamp() != null) {
 					issue.setUpdateTimestamp(new Date());
 				}

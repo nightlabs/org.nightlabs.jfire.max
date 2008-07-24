@@ -11,8 +11,14 @@ import javax.jdo.PersistenceManager;
 import javax.jdo.Query;
 
 import org.apache.log4j.Logger;
+import org.nightlabs.j2ee.LoginData;
+import org.nightlabs.jdo.NLJDOHelper;
 import org.nightlabs.jfire.issue.Issue;
 import org.nightlabs.jfire.issue.id.IssueID;
+import org.nightlabs.jfire.security.SecurityReflector;
+import org.nightlabs.jfire.security.User;
+import org.nightlabs.jfire.security.dao.UserDAO;
+import org.nightlabs.progress.NullProgressMonitor;
 import org.nightlabs.util.Util;
 
 /**
@@ -35,6 +41,7 @@ import org.nightlabs.util.Util;
  *			WHERE this.issueID == :issueID && this.organisationID == :organisationID"                    
  *
  * @jdo.fetch-group name="IssueHistory.issue" fields="issue"
+ * @jdo.fetch-group name="IssueHistory.user" fields="user"
  * @jdo.fetch-group name="IssueHistory.this" fetch-groups="default" fields="createTimestamp"
  *
  **/
@@ -49,6 +56,7 @@ implements Serializable
 	 */
 	public static final String FETCH_GROUP_THIS = "IssueHistory.this";
 	public static final String FETCH_GROUP_ISSUE = "IssueHistory.issue";
+	public static final String FETCH_GROUP_USER = "IssueHistory.user";
 	
 	public static final String QUERY_ISSUE_HISTORYIDS_BY_ORGANISATION_ID_AND_ISSUE_ID = "getIssueHistoryIDsByOrganisationIDAndIssueID";
 	
@@ -83,6 +91,11 @@ implements Serializable
 	/**
 	 * @jdo.field persistence-modifier="persistent"
 	 */
+	private User user;
+	
+	/**
+	 * @jdo.field persistence-modifier="persistent"
+	 */
 	private Issue issue;
 
 	/**
@@ -96,7 +109,7 @@ implements Serializable
 	@Deprecated
 	protected IssueHistory() { }
 
-	public IssueHistory(Issue oldIssue, Issue newIssue, long issueHistoryID)
+	public IssueHistory(User user, Issue oldIssue, Issue newIssue, long issueHistoryID)
 	{
 		if (oldIssue == null)
 			throw new NullPointerException("newIssue");
@@ -108,7 +121,7 @@ implements Serializable
 		this.issueHistoryID = issueHistoryID;
 
 		this.createTimestamp = new Date();
-
+		this.user = user;
 		generateHistory(oldIssue, newIssue);
 	}
 
@@ -142,6 +155,9 @@ implements Serializable
 		return change;
 	}
 	
+	public User getUser() {
+		return user;
+	}
 	/**
 	 * @param pm The <code>PersistenceManager</code> that should be used to access the datastore.
 	 * @param issue
@@ -273,7 +289,7 @@ implements Serializable
 			changeText.append("\n");
 		}
 		
-		if (!Util.equals(oldIssue.getState().getStateID(), newIssue.getState().getStateID())) 
+		if (!Util.equals(oldIssue.getState().getStateDefinition(), newIssue.getState().getStateDefinition())) 
 		{
 			changeText.append("Changed state");
 			changeText.append(" from ");

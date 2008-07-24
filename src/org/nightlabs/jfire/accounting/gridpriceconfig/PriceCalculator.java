@@ -417,6 +417,9 @@ public class PriceCalculator
 		// Now, all preparation is done and we can start calculation:
 		for (PriceCell outerPriceCell : packagePriceConfig.getPriceCells()) {
 			PriceCoordinate priceCoordinate = outerPriceCell.getPriceCoordinate();
+			if (!getPriceCoordinateClass().isInstance(priceCoordinate))
+				throw new IllegalStateException("outerPriceCell.getPriceCoordinate() returned a PriceCoordinate of an invalid type! expectedPriceCoordinateClass=" + getPriceCoordinateClass() + " priceCoordinate="+ priceCoordinate +" outerPriceCell=" + outerPriceCell + " packagePriceConfig=" + packagePriceConfig);
+
 			priceCoordinate.assertAllDimensionValuesAssigned();
 
 			for (PriceFragmentType priceFragmentType : packagePriceConfig.getPriceFragmentTypes()) {
@@ -440,6 +443,16 @@ public class PriceCalculator
 				outerPriceCell.getPrice().setAmount(priceFragmentType, outerPriceCellAmount);
 			}
 		}
+	}
+
+	/**
+	 * @deprecated This method exists only temporarily for debugging reasons. Do not use it!
+	 * TODO remove this class - see https://bt.nightlabs.de//view.php?id=862
+	 */
+	@Deprecated
+	protected Class<? extends PriceCoordinate> getPriceCoordinateClass()
+	{
+		return PriceCoordinate.class;
 	}
 
 	public IPriceCoordinate createMappedLocalPriceCoordinate(

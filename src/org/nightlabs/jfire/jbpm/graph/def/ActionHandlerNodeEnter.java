@@ -19,6 +19,12 @@ import org.nightlabs.jfire.idgenerator.IDGenerator;
 import org.nightlabs.jfire.security.SecurityReflector;
 import org.nightlabs.jfire.security.User;
 
+/**
+ * {@link ActionHandlerNodeEnter} registers the node entered in the {@link Statable}
+ * of the running process. It resolves the {@link Statable} by a variable set in the
+ * process execution context with the key {@link AbstractActionHandler#VARIABLE_NAME_STATABLE_ID}
+ * where the StatableID is stored.
+ */
 public class ActionHandlerNodeEnter
 extends AbstractActionHandler
 {

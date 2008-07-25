@@ -225,7 +225,6 @@ public class RecurringTrader {
 		}
 	}
 
-
 	public RecurringOfferConfiguration storeRecurringOfferConfiguration(RecurringOfferConfiguration configuration, boolean get, String[] fetchGroups, int maxFetchDepth)
 	{
 		PersistenceManager pm = getPersistenceManager();
@@ -233,40 +232,4 @@ public class RecurringTrader {
 	}
 
 
-	public Collection<? extends Article> createArticles(User user, Offer offer, Segment segment,
-			Collection<ProductType> productTypes, ArticleCreator articleCreator)throws ModuleException
-			{
-		if (!segment.getOrder().equals(offer.getOrder()))
-			throw new IllegalArgumentException("segment.order != offer.order :: " + segment.getOrder().getPrimaryKey() + " != " + offer.getOrder().getPrimaryKey());
-
-		PersistenceManager pm = getPersistenceManager();
-
-
-		Trader trader = Trader.getTrader(pm);
-
-		Collection<? extends Article> articles = articleCreator.createProductTypeArticles(trader, user, offer,
-				segment, productTypes);
-
-		for (Article article : articles) {
-			article.createArticleLocal(user);
-		}
-
-		// WORKAROUND begin
-		articles = pm.makePersistentAll(articles);
-		// WORKAROUND end
-
-		offer.addArticles(articles);
-			// create the Articles' prices
-			for (Article article : articles) {
-				IPackagePriceConfig packagePriceConfig = article.getProductType()
-				.getPackagePriceConfig();
-				article.setPrice(packagePriceConfig.createArticlePrice(article));
-			}
-
-			trader.validateOffer(offer, false);
-
-			return articles;
-		}
-
-
-			}
+}

@@ -1,34 +1,34 @@
 package org.nightlabs.jfire.trade.recurring;
 
-import java.util.Collection;
+import java.io.IOException;
+import java.net.URL;
 import java.util.Iterator;
+import java.util.Locale;
 
 import javax.jdo.JDOHelper;
+import javax.jdo.JDOObjectNotFoundException;
 import javax.jdo.PersistenceManager;
 
 import org.nightlabs.ModuleException;
 import org.nightlabs.jdo.NLJDOHelper;
 import org.nightlabs.jfire.accounting.Currency;
-import org.nightlabs.jfire.accounting.priceconfig.IPackagePriceConfig;
 import org.nightlabs.jfire.config.Config;
 import org.nightlabs.jfire.idgenerator.IDGenerator;
-import org.nightlabs.jfire.organisation.LocalOrganisation;
+import org.nightlabs.jfire.jbpm.graph.def.ActionHandlerNodeEnter;
+import org.nightlabs.jfire.jbpm.graph.def.ProcessDefinition;
+import org.nightlabs.jfire.jbpm.graph.def.StateDefinition;
+import org.nightlabs.jfire.jbpm.graph.def.Transition;
+import org.nightlabs.jfire.jbpm.graph.def.id.ProcessDefinitionID;
 import org.nightlabs.jfire.security.SecurityReflector;
 import org.nightlabs.jfire.security.User;
-import org.nightlabs.jfire.store.DeliveryNote;
-import org.nightlabs.jfire.store.Product;
-import org.nightlabs.jfire.store.ProductType;
-import org.nightlabs.jfire.trade.Article;
-import org.nightlabs.jfire.trade.ArticleCreator;
 import org.nightlabs.jfire.trade.LegalEntity;
-import org.nightlabs.jfire.trade.Offer;
 import org.nightlabs.jfire.trade.OfferLocal;
 import org.nightlabs.jfire.trade.Order;
 import org.nightlabs.jfire.trade.OrganisationLegalEntity;
-import org.nightlabs.jfire.trade.Segment;
 import org.nightlabs.jfire.trade.TradeSide;
 import org.nightlabs.jfire.trade.Trader;
 import org.nightlabs.jfire.trade.config.TradeConfigModule;
+import org.nightlabs.jfire.trade.jbpm.JbpmConstantsOffer;
 import org.nightlabs.jfire.trade.jbpm.ProcessDefinitionAssignment;
 import org.nightlabs.jfire.trade.jbpm.id.ProcessDefinitionAssignmentID;
 
@@ -231,5 +231,109 @@ public class RecurringTrader {
 		return NLJDOHelper.storeJDO(pm, configuration, get, fetchGroups, maxFetchDepth);
 	}
 
+	/**
+	 * TODO: Copied from Trader and modified. All the Process initialization should be done from the definition files not from code.
+	 */
+	public ProcessDefinition storeProcessDefinitionRecurringOffer(TradeSide tradeSide, URL jbpmProcessDefinitionURL)
+	throws IOException
+	{
+		PersistenceManager pm = getPersistenceManager();
 
+		org.jbpm.graph.def.ProcessDefinition jbpmProcessDefinition = ProcessDefinition.readProcessDefinition(jbpmProcessDefinitionURL);
+
+		// The ActionHandlerNodeEnter is added for all nodes!
+		ActionHandlerNodeEnter.register(jbpmProcessDefinition);
+		// All other handlers are configured in the process definition file		
+
+		// store the process definition
+		ProcessDefinition processDefinition = ProcessDefinition.storeProcessDefinition(pm, null, jbpmProcessDefinition, jbpmProcessDefinitionURL);
+		ProcessDefinitionID processDefinitionID = (ProcessDefinitionID) JDOHelper.getObjectId(processDefinition);
+
+		// The stuff below should be done generically from the process definition!
+		
+		setStateDefinitionProperties(processDefinition, JbpmConstantsOffer.Both.NODE_NAME_SENT,
+				"sent",
+				"The Offer has been sent from the vendor to the customer.",
+				true);
+
+		setStateDefinitionProperties(processDefinition, JbpmConstantsOffer.Both.NODE_NAME_REVOKED,
+				"revoked",
+				"The Offer has been revoked by the vendor. The result is the same as if the customer had rejected the offer. A new Offer needs to be created in order to continue the interaction.",
+				true);
+
+		setStateDefinitionProperties(processDefinition, JbpmConstantsOffer.Both.NODE_NAME_EXPIRED,
+				"expired",
+				"The Offer has expired - the customer waited too long. A new Offer needs to be created in order to continue the interaction.",
+				true);
+
+		switch (tradeSide) {
+			case vendor:
+			{
+				// give known StateDefinitions a name and a description
+				setStateDefinitionProperties(processDefinition, JbpmConstantsOffer.Vendor.NODE_NAME_CREATED,
+						"created",
+						"The Offer has been newly created. This is the first state in the Offer related workflow.",
+						true);
+
+				setStateDefinitionProperties(processDefinition, JbpmConstantsOffer.Vendor.NODE_NAME_ABORTED,
+						"aborted",
+						"The Offer has been aborted by the vendor (before finalization). A new Offer needs to be created in order to continue the interaction.",
+						true);
+
+				setStateDefinitionProperties(processDefinition, JbpmConstantsOffer.Vendor.NODE_NAME_FINALIZED,
+						"finalized",
+						"The Offer has been finalized. After that, it cannot be modified anymore. A modification would require revocation and recreation.",
+						true);
+
+				setStateDefinitionProperties(processDefinition, JbpmConstantsOffer.Vendor.NODE_NAME_ACCEPTED,
+						"accepted",
+						"The Offer has been accepted by the customer. That turns the offer into a binding contract.",
+						true);
+
+				setStateDefinitionProperties(processDefinition, JbpmConstantsOffer.Vendor.NODE_NAME_REJECTED,
+						"rejected",
+						"The Offer has been rejected by the customer. A new Offer needs to be created in order to continue the interaction.",
+						true);
+
+				// give known Transitions a name
+				for (Transition transition : Transition.getTransitions(pm, processDefinitionID, JbpmConstantsOffer.Vendor.TRANSITION_NAME_ACCEPT_IMPLICITELY)) {
+					transition.setUserExecutable(false);
+				}
+
+				for (Transition transition : Transition.getTransitions(pm, processDefinitionID, JbpmConstantsOffer.Vendor.TRANSITION_NAME_CUSTOMER_ACCEPTED)) {
+					transition.setUserExecutable(false);
+				}
+
+				for (Transition transition : Transition.getTransitions(pm, processDefinitionID, JbpmConstantsOffer.Vendor.TRANSITION_NAME_CUSTOMER_REJECTED)) {
+					transition.setUserExecutable(false);
+				}
+
+			}
+			break;
+			default:
+				throw new IllegalStateException("Unknown TradeSide: " + tradeSide);
+		}
+
+		return processDefinition;
+	}
+
+
+	/**
+	 * TODO: Copied from Trader. All the Process initialization should be done from the definition files not from code.
+	 */
+	private static void setStateDefinitionProperties(
+			ProcessDefinition processDefinition, String jbpmNodeName,
+			String name, String description, boolean publicState)
+	{
+		StateDefinition stateDefinition;
+		try {
+			stateDefinition = StateDefinition.getStateDefinition(processDefinition, jbpmNodeName);
+		} catch (JDOObjectNotFoundException x) {
+			return;
+		}
+		stateDefinition.getName().setText(Locale.ENGLISH.getLanguage(), name);
+		stateDefinition.getDescription().setText(Locale.ENGLISH.getLanguage(), description);
+		stateDefinition.setPublicState(publicState);
+	}
+	
 }

@@ -1,0 +1,92 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<root-container name="dev.jfire.org:RecurringOffer.Vendor" width="986" height="699">
+  <node name="dev.jfire.org:created" x="324" y="12" width="217" height="36">
+    <edge>
+      <label x="5" y="-10"/>
+    </edge>
+    <edge>
+      <label x="5" y="-10"/>
+    </edge>
+    <edge>
+      <label x="-76" y="21"/>
+      <bendpoint w1="-312" h1="0" w2="0" h2="-84"/>
+    </edge>
+  </node>
+  <node name="dev.jfire.org:rejected" x="768" y="72" width="217" height="36"/>
+  <node name="dev.jfire.org:finalized" x="324" y="144" width="217" height="36">
+    <edge>
+      <label x="-62" y="8"/>
+    </edge>
+    <edge>
+      <label x="5" y="-10"/>
+    </edge>
+    <edge>
+      <label x="5" y="-10"/>
+    </edge>
+    <edge>
+      <label x="-65" y="10"/>
+    </edge>
+    <edge>
+      <label x="-99" y="-17"/>
+    </edge>
+    <edge>
+      <label x="61" y="-54"/>
+      <bendpoint w1="-230" h1="129" w2="82" h2="-159"/>
+    </edge>
+    <edge>
+      <label x="-38" y="-2"/>
+    </edge>
+    <edge>
+      <label x="-47" y="-27"/>
+    </edge>
+  </node>
+  <node name="dev.jfire.org:expired" x="768" y="264" width="217" height="36"/>
+  <node name="dev.jfire.org:aborted" x="768" y="12" width="217" height="36"/>
+  <node name="dev.jfire.org:revoked" x="768" y="204" width="217" height="36"/>
+  <node name="dev.jfire.org:recurrenceStopped" x="768" y="432" width="217" height="36"/>
+  <node name="dev.jfire.org:customerAccepted" x="324" y="300" width="217" height="36">
+    <edge>
+      <label x="5" y="-10"/>
+    </edge>
+  </node>
+  <node name="dev.jfire.org:customerRejected" x="768" y="144" width="217" height="36">
+    <edge>
+      <label x="6" y="-3"/>
+    </edge>
+  </node>
+  <node name="dev.jfire.org:sent" x="12" y="216" width="217" height="36">
+    <edge>
+      <label x="-38" y="-25"/>
+      <bendpoint w1="127" h1="-68" w2="-185" h2="4"/>
+    </edge>
+    <edge>
+      <label x="5" y="-10"/>
+    </edge>
+    <edge>
+      <label x="5" y="-10"/>
+    </edge>
+  </node>
+  <node name="dev.jfire.org:acceptedImplicitely" x="12" y="96" width="217" height="36">
+    <edge>
+      <label x="5" y="-10"/>
+    </edge>
+  </node>
+  <node name="dev.jfire.org:accepted" x="12" y="432" width="217" height="36">
+    <edge>
+      <label x="-49" y="-8"/>
+    </edge>
+    <edge>
+      <label x="8" y="4"/>
+      <bendpoint w1="0" h1="111" w2="-312" h2="3"/>
+    </edge>
+  </node>
+  <node name="dev.jfire.org:recurrenceStarted" x="324" y="540" width="217" height="36">
+    <edge>
+      <label x="-100" y="3"/>
+    </edge>
+    <edge>
+      <label x="-67" y="-4"/>
+    </edge>
+  </node>
+</root-container>

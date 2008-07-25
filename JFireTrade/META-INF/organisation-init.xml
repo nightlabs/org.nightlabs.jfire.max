@@ -27,6 +27,13 @@
 			bean="jfire/ejb/JFireBaseBean/PropertyManager"
 			method="initialise" />
 	</init>
+	<init bean="jfire/ejb/JFireTrade/RecurringTradeManager" method="initialise">
+		<depends module="JFireTrade.ear"
+			archive="JFireTrade.jar"
+			bean="jfire/ejb/JFireTrade/TradeManager"
+			method="initialise" />
+	</init>
+	
 
 <!--
 TODO JPOX WORKAROUND

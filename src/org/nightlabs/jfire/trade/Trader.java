@@ -1606,6 +1606,39 @@ public class Trader
 		}
 	}
 
+	/**
+	 * You must NOT call this method directly. It is called by {@link ActionHandlerFinalizeOffer}.
+	 */
+	public void onFinalizeOffer(User user, Offer offer)
+	throws RemoteException, CreateException, NamingException
+	{
+		PersistenceManager pm = getPersistenceManager();
+
+		// check whether we have to finalize remote offers as well
+		OfferRequirement offerRequirement = OfferRequirement.getOfferRequirement(pm, offer, false);
+		if (offerRequirement != null) {
+			for (Iterator itO = offerRequirement.getPartnerOffers().iterator(); itO.hasNext(); ) {
+				Offer partnerOffer = (Offer) itO.next();
+
+				LegalEntity vendor = partnerOffer.getOrder().getVendor();
+				if (!(vendor instanceof OrganisationLegalEntity))
+					throw new IllegalStateException("Vendor of Offer " + partnerOffer.getPrimaryKey() + " is not an OrganisationLegalEntity, even though this Offer is part of the OfferRequirements for Offer " + offer.getPrimaryKey());
+
+				String partnerOrganisationID = vendor.getOrganisationID();
+
+				TradeManager tradeManager = TradeManagerUtil.getHome(Lookup.getInitialContextProperties(pm, partnerOrganisationID)).create();
+//				tradeManager.signalOffer((OfferID) JDOHelper.getObjectId(partnerOffer), JbpmConstantsOffer.Vendor.TRANSITION_NAME_ACCEPT_FOR_CROSS_TRADE);
+				tradeManager.signalOffer((OfferID) JDOHelper.getObjectId(partnerOffer), JbpmConstantsOffer.Vendor.TRANSITION_NAME_FINALIZE_FOR_CROSS_TRADE);
+				// TODO this is not yet the right handling of JBPM - needs to be fixed! Isn't this correct, now? Marco.
+			} // for (Iterator itO = offerRequirement.getPartnerOffers().iterator(); itO.hasNext(); ) {
+		} // if (offerRequirement != null) {
+
+		offer.setFinalized(user);
+		for (OfferActionHandler offerActionHandler : offer.getOfferLocal().getOfferActionHandlers()) {
+			offerActionHandler.onFinalizeOffer(user, offer);
+		}	
+	}
+	
 	public void rejectOffer(User user, OfferLocal offerLocal)
 	{
 		offerLocal.reject(user);
@@ -1674,6 +1707,12 @@ public class Trader
 		stateDefinition.setPublicState(publicState);
 	}
 
+	/**
+	 * TODO: Most things done here should be configured in the process definition xml file, not in code.
+	 *       Examples: 
+	 *          * the action handlers on certain nodes
+	 *          * The names of the nodes/states/transitions should also be in a xml file 
+	 */
 	public ProcessDefinition storeProcessDefinitionOffer(TradeSide tradeSide, URL jbpmProcessDefinitionURL)
 	throws IOException
 	{

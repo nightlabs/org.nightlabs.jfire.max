@@ -11,6 +11,10 @@ import org.nightlabs.jfire.jbpm.graph.def.ActionHandlerNodeEnter;
 import org.nightlabs.jfire.trade.Offer;
 import org.nightlabs.jfire.trade.OrganisationLegalEntity;
 
+/**
+ * This action handler leaves the node using the same transition it was entered with.
+ * It is registered for {@link JbpmConstantsOffer.Both#NODE_NAME_SENT}.
+ */
 public class ActionHandlerSendOffer
 extends AbstractActionHandler
 {

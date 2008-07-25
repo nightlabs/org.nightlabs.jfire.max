@@ -730,11 +730,37 @@ public class Trader
 	 * @param productTypes
 	 *          Instances of {@link ProductType}.
 	 */
-	public Collection<Article> createArticles(User user, Offer offer, Segment segment,
+	public Collection<? extends Article>  createArticles(User user, Offer offer, Segment segment,
 			Collection<ProductType> productTypes, ArticleCreator articleCreator)
 			throws ModuleException
 	{
-		throw new UnsupportedOperationException("NYI");
+		if (!segment.getOrder().equals(offer.getOrder()))
+			throw new IllegalArgumentException("segment.order != offer.order :: " + segment.getOrder().getPrimaryKey() + " != " + offer.getOrder().getPrimaryKey());
+
+		PersistenceManager pm = getPersistenceManager();
+
+		
+		Collection<? extends Article> articles = articleCreator.createProductTypeArticles(this, user, offer,
+				segment, productTypes);
+
+		for (Article article : articles) {
+			article.createArticleLocal(user);
+		}
+		// WORKAROUND begin
+		articles = pm.makePersistentAll(articles);
+		// WORKAROUND end
+
+		offer.addArticles(articles);
+		// create the Articles' prices
+		for (Article article : articles) {
+			IPackagePriceConfig packagePriceConfig = article.getProductType()
+			.getPackagePriceConfig();
+			article.setPrice(packagePriceConfig.createArticlePrice(article));
+		}
+
+		offer.validate();
+
+		return articles;			
 	}
 
 	/**

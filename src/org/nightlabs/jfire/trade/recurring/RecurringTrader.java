@@ -6,6 +6,7 @@ import javax.jdo.JDOHelper;
 import javax.jdo.PersistenceManager;
 
 import org.nightlabs.ModuleException;
+import org.nightlabs.jdo.NLJDOHelper;
 import org.nightlabs.jfire.accounting.Currency;
 import org.nightlabs.jfire.config.Config;
 import org.nightlabs.jfire.idgenerator.IDGenerator;
@@ -162,20 +163,20 @@ public class RecurringTrader {
 				tradeSide = TradeSide.customerLocal;
 			else
 				throw new IllegalStateException("mandator is neither customer nor vendor! order=" + recurringOrder + " mandator=" + mandator);
-			
-			
+
+
 			offerIDPrefix = getOfferIDPrefix(user, offerIDPrefix);
-			
+
 //			if (offerIDPrefix == null) {
-//				TradeConfigModule tradeConfigModule;
-//				try {
-//					tradeConfigModule = (TradeConfigModule) Config.getConfig(
-//							getPersistenceManager(), organisationID, user).createConfigModule(TradeConfigModule.class);
-//				} catch (ModuleException x) {
-//					throw new RuntimeException(x); // should not happen.
-//				}
-//
-//				offerIDPrefix = tradeConfigModule.getActiveIDPrefixCf(DeliveryNote.class.getName()).getDefaultIDPrefix();
+//			TradeConfigModule tradeConfigModule;
+//			try {
+//			tradeConfigModule = (TradeConfigModule) Config.getConfig(
+//			getPersistenceManager(), organisationID, user).createConfigModule(TradeConfigModule.class);
+//			} catch (ModuleException x) {
+//			throw new RuntimeException(x); // should not happen.
+//			}
+
+//			offerIDPrefix = tradeConfigModule.getActiveIDPrefixCf(DeliveryNote.class.getName()).getDefaultIDPrefix();
 //			}
 
 			RecurringOffer recurringOffer = new RecurringOffer(
@@ -228,11 +229,16 @@ public class RecurringTrader {
 			return recurringOrder;
 		}
 	}
-	
 
 
-	
-	
-		
-	
+	public RecurringOfferConfiguration storeRecurringOfferConfiguration(RecurringOfferConfiguration configuration, boolean get, String[] fetchGroups, int maxFetchDepth)
+	{
+		PersistenceManager pm = getPersistenceManager();
+		try {
+			return NLJDOHelper.storeJDO(pm, configuration, get, fetchGroups, maxFetchDepth);
+		} finally {
+			pm.close();
+		}
+	}
+
 }

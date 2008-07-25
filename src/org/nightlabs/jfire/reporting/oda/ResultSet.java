@@ -152,13 +152,13 @@ public abstract class ResultSet implements IResultSet, Serializable {
 	}
 	
 	@SuppressWarnings("unchecked")
-	private Object checkColObject(int index, Class objectClass) throws OdaException {
+	private <T> T checkColObject(int index, Class<T> objectClass) throws OdaException {
 		Object o = getColObject(index);
 		if (o != null) {
 			if (!objectClass.isAssignableFrom(o.getClass()))
 				throw new OdaException("Column "+index+" can not be treated as "+objectClass.getName()+" it is "+o.getClass().getName());
 		}
-		return o;
+		return (T) o;
 	}
 	
 	public int findColumn(String columnName) {
@@ -169,7 +169,8 @@ public abstract class ResultSet implements IResultSet, Serializable {
 	 * @see org.eclipse.datatools.connectivity.oda.IResultSet#getString(int)
 	 */
 	public String getString(int index) throws OdaException {
-		return (String)checkColObject(index, String.class);
+		String s = checkColObject(index, String.class);
+		return s != null ? s : "";
 	}
 
 	/* (non-Javadoc)
@@ -183,7 +184,8 @@ public abstract class ResultSet implements IResultSet, Serializable {
 	 * @see org.eclipse.datatools.connectivity.oda.IResultSet#getInt(int)
 	 */
 	public int getInt(int index) throws OdaException {
-		return ((Number)checkColObject(index, Integer.class)).intValue();
+		Integer i = checkColObject(index, Integer.class);
+		return i != null ? i.intValue() : 0;
 	}
 
 	/* (non-Javadoc)
@@ -197,7 +199,8 @@ public abstract class ResultSet implements IResultSet, Serializable {
 	 * @see org.eclipse.datatools.connectivity.oda.IResultSet#getDouble(int)
 	 */
 	public double getDouble(int index) throws OdaException {
-		return ((Number)checkColObject(index, Double.class)).doubleValue();
+		Double d = checkColObject(index, Double.class);
+		return d != null ? d.doubleValue() : 0d;
 	}
 
 	/* (non-Javadoc)
@@ -211,8 +214,8 @@ public abstract class ResultSet implements IResultSet, Serializable {
 	 * @see org.eclipse.datatools.connectivity.oda.IResultSet#getBigDecimal(int)
 	 */
 	public BigDecimal getBigDecimal(int index) throws OdaException {
-		//return new BigDecimal(getDouble(index));
-		return new BigDecimal(((Long)checkColObject(index, Long.class)).longValue());
+		Long l = checkColObject(index, Long.class);
+		return new BigDecimal(l != null ? l.longValue() : 0);
 	}
 
 	/* (non-Javadoc)
@@ -226,10 +229,8 @@ public abstract class ResultSet implements IResultSet, Serializable {
 	 * @see org.eclipse.datatools.connectivity.oda.IResultSet#getDate(int)
 	 */
 	public Date getDate(int index) throws OdaException {
-		java.util.Date date = (java.util.Date) checkColObject(index, java.util.Date.class);
-		if (date == null)
-			return new Date(0);
-		return new Date(date.getTime());
+		java.util.Date date = checkColObject(index, java.util.Date.class);
+		return new Date(date != null ? date.getTime() : 0);
 	}
 
 	/* (non-Javadoc)
@@ -243,10 +244,8 @@ public abstract class ResultSet implements IResultSet, Serializable {
 	 * @see org.eclipse.datatools.connectivity.oda.IResultSet#getTime(int)
 	 */
 	public Time getTime(int index) throws OdaException {
-		return new Time(
-				((java.util.Date)checkColObject(index, java.util.Date.class))
-					.getTime()
-						);
+		java.util.Date date = checkColObject(index, java.util.Date.class); 
+		return new Time(date != null ? date.getTime() : 0);
 	}
 
 	/* (non-Javadoc)
@@ -260,10 +259,8 @@ public abstract class ResultSet implements IResultSet, Serializable {
 	 * @see org.eclipse.datatools.connectivity.oda.IResultSet#getTimestamp(int)
 	 */
 	public Timestamp getTimestamp(int index) throws OdaException {
-		return new Timestamp(
-				((java.util.Date)checkColObject(index, java.util.Date.class))
-					.getTime()
-						);
+		java.util.Date date = checkColObject(index, java.util.Date.class); 
+		return new Timestamp(date != null ? date.getTime() : 0);
 	}
 
 	/* (non-Javadoc)
@@ -312,7 +309,8 @@ public abstract class ResultSet implements IResultSet, Serializable {
 	 * {@inheritDoc}
 	 */
 	public boolean getBoolean(int index) throws OdaException {
-		return (Boolean) checkColObject(index, Boolean.class);
+		Boolean b = checkColObject(index, Boolean.class);
+		return b != null ? b : false;
 	}
 	
 

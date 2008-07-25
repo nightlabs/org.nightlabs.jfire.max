@@ -46,7 +46,7 @@ import com.thoughtworks.xstream.XStream;
 import com.thoughtworks.xstream.io.xml.XppDriver;
 
 /**
- * Helper to be used static by the ODA runtime driver implementations
+ * Helper to be used statically by the ODA runtime driver implementations
  * as well as from within the BIRT layouts.
  * <p>
  * It provides access to an {@link PersistenceManager} which is set by

@@ -7,17 +7,13 @@ import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Locale;
-import java.util.Set;
 import java.util.SortedMap;
 import java.util.TreeMap;
 
-import javax.jdo.FetchPlan;
 import javax.jdo.JDOHelper;
 import javax.jdo.PersistenceManager;
 
-import org.apache.log4j.Logger;
 import org.eclipse.datatools.connectivity.oda.IResultSetMetaData;
-import org.nightlabs.jdo.NLJDOHelper;
 import org.nightlabs.jfire.prop.DataField;
 import org.nightlabs.jfire.prop.IStruct;
 import org.nightlabs.jfire.prop.Struct;
@@ -26,6 +22,7 @@ import org.nightlabs.jfire.prop.StructField;
 import org.nightlabs.jfire.prop.StructLocal;
 import org.nightlabs.jfire.prop.datafield.DateDataField;
 import org.nightlabs.jfire.prop.datafield.II18nTextDataField;
+import org.nightlabs.jfire.prop.datafield.ImageDataField;
 import org.nightlabs.jfire.prop.datafield.NumberDataField;
 import org.nightlabs.jfire.prop.id.PropertySetID;
 import org.nightlabs.jfire.prop.id.StructFieldID;
@@ -42,7 +39,23 @@ import org.nightlabs.jfire.security.SecurityReflector;
 
 /**
  * A reporting data set script that gives access to the datafields of a {@link org.nightlabs.jfire.prop.PropertySet}.
- * Currently only {@link NumberDataField} and {@link II18nTextDataField} field types are supported.
+ * Currently only {@link NumberDataField}, {@link II18nTextDataField} and {@link ImageDataField} field types are supported.
+ * <p>
+ * <ul>
+ *   <li>For {@link NumberDataField}s columns of either {@link DataType#INTEGER} or {@link DataType#DOUBLE} will be added,
+ *       depending on how the corresponding {@link NumberStructField} is configured</li>. The column value will then 
+ *       be either {@link Integer} or {@link Double}.
+ *   </li>
+ *   <li>For {@link II18nTextDataField}s columns of either {@link DataType#STRING} will be added. The column value
+ *       will be translated using the {@link Locale} from {@link JFireReportingHelper#getLocale()}.
+ *   </li>
+ *   <li>For {@link ImageDataField}s columns of either {@link DataType#STRING} will be added. The column value
+ *       will the String representation of the {@link ImageDataField}s id-object, or the empty string if no
+ *       image was was stored for that field. The image URLs can then be obtained using 
+ *       {@link PropertySetReportingHelper#getImageURL(String)} passing column value. 
+ *   </li>
+ * </ul>
+ * </p>
  * The script takes one parameter:
  * <ul>
  *   <li><code>propertySetID</code>: The {@link PropertySetID} of the {@link PropertySet} to access.</li>
@@ -61,10 +74,7 @@ public class PropertySet
 extends AbstractJFSScriptExecutorDelegate
 {
 
-	/**
-	 * Logger used by this class.
-	 */
-	private static final Logger logger = Logger.getLogger(PropertySet.class);
+//	private static final Logger logger = Logger.getLogger(PropertySet.class);
 
 	public static final String PARAMETER_NAME_PROPERTY_SET_ID = "propertySetID";
 
@@ -100,13 +110,13 @@ extends AbstractJFSScriptExecutorDelegate
 			}
 			for (Iterator<StructBlock> iter = sortedBlocks.values().iterator(); iter.hasNext();) {
 				StructBlock structBlock = iter.next();
-				SortedMap<String, StructField> sortedFields = new TreeMap<String, StructField>();
+				SortedMap<String, StructField<? extends DataField>> sortedFields = new TreeMap<String, StructField<? extends DataField>>();
 				for (Iterator<StructField<? extends DataField>> iterator = structBlock.getStructFields().iterator(); iterator.hasNext();) {
-					StructField structField = iterator.next();
+					StructField<? extends DataField> structField = iterator.next();
 					sortedFields.put(structField.getPrimaryKey(), structField);
 				}
-				for (Iterator<StructField> iterator = sortedFields.values().iterator(); iterator.hasNext();) {
-					StructField structField = iterator.next();
+				for (Iterator<StructField<? extends DataField>> iterator = sortedFields.values().iterator(); iterator.hasNext();) {
+					StructField<? extends DataField> structField = iterator.next();
 					if (structField instanceof NumberStructField) {
 						NumberStructField numberStructField = (NumberStructField) structField;
 						if (numberStructField.isInteger())
@@ -117,8 +127,12 @@ extends AbstractJFSScriptExecutorDelegate
 					else if (structField instanceof DateStructField) {
 						metaData.addColumn(getColumnName(structField), DataType.DATE);
 					}
-					else if (II18nTextDataField.class.isAssignableFrom(structField.getDataFieldClass()))
+					else if (II18nTextDataField.class.isAssignableFrom(structField.getDataFieldClass())) {
 						metaData.addColumn(getColumnName(structField), DataType.STRING);
+					}
+					else if (ImageDataField.class.isAssignableFrom(structField.getDataFieldClass())) {
+						metaData.addColumn(getColumnName(structField), DataType.STRING);
+					}
 				}
 			}
 		}
@@ -126,7 +140,7 @@ extends AbstractJFSScriptExecutorDelegate
 	}
 
 
-	protected String getColumnName(StructField structField) {
+	protected String getColumnName(StructField<? extends DataField> structField) {
 		return structField.getStructBlockID() + "_" + structField.getStructFieldID();
 	}
 
@@ -144,23 +158,21 @@ extends AbstractJFSScriptExecutorDelegate
 			throw new IllegalArgumentException("Parameter " + PARAMETER_NAME_PROPERTY_SET_ID + " is not set.");
 
 		PersistenceManager pm = getScriptExecutorJavaClass().getPersistenceManager();
-		Set oldGroups = pm.getFetchPlan().getGroups();
-		int oldFetchDepth = pm.getFetchPlan().getMaxFetchDepth();
-		pm.getFetchPlan().setGroups(new String[] {FetchPlan.DEFAULT, org.nightlabs.jfire.prop.PropertySet.FETCH_GROUP_FULL_DATA});
-		pm.getFetchPlan().setMaxFetchDepth(NLJDOHelper.MAX_FETCH_DEPTH_NO_LIMIT);
+//		Set oldGroups = pm.getFetchPlan().getGroups();
+//		int oldFetchDepth = pm.getFetchPlan().getMaxFetchDepth();
+//		pm.getFetchPlan().setGroups(new String[] {FetchPlan.DEFAULT, org.nightlabs.jfire.prop.PropertySet.FETCH_GROUP_FULL_DATA});
+//		pm.getFetchPlan().setMaxFetchDepth(NLJDOHelper.MAX_FETCH_DEPTH_NO_LIMIT);
 
 		org.nightlabs.jfire.prop.PropertySet propertySet = (org.nightlabs.jfire.prop.PropertySet) pm.getObjectById(propertySetID);
-		logger.debug("Have propertySet");
 
 		IStruct struct = StructLocal.getStructLocal(
 				propertySet.getStructLocalLinkClass(), 
 				propertySet.getStructScope(), propertySet.getStructLocalScope(), pm);
-		propertySet = pm.detachCopy(propertySet);
-		pm.getFetchPlan().setGroups(oldGroups);
-		pm.getFetchPlan().setMaxFetchDepth(oldFetchDepth);
-		logger.debug("Property detached");
-		// have to detach, as explode might modify the person
-		propertySet.inflate(struct);
+		// no need to detach any more, data is obtained via getPersitentDataField()
+//		propertySet = pm.detachCopy(propertySet);
+//		pm.getFetchPlan().setGroups(oldGroups);
+//		pm.getFetchPlan().setMaxFetchDepth(oldFetchDepth);
+//		propertySet.inflate(struct);
 		List<Object> elements = new LinkedList<Object>();
 		Locale locale = JFireReportingHelper.getLocale();
 		SortedMap<String, StructBlock> sortedBlocks = new TreeMap<String, StructBlock>();
@@ -171,34 +183,40 @@ extends AbstractJFSScriptExecutorDelegate
 		}
 		for (Iterator<StructBlock> iter = sortedBlocks.values().iterator(); iter.hasNext();) {
 			StructBlock structBlock = iter.next();
-			SortedMap<String, StructField> sortedFields = new TreeMap<String, StructField>();
+			SortedMap<String, StructField<? extends DataField>> sortedFields = new TreeMap<String, StructField<? extends DataField>>();
 			for (Iterator<StructField<? extends DataField>> iterator = structBlock.getStructFields().iterator(); iterator.hasNext();) {
-				StructField structField = iterator.next();
+				StructField<? extends DataField> structField = iterator.next();
 				sortedFields.put(structField.getPrimaryKey(), structField);
 			}
-			for (Iterator<StructField> iterator = sortedFields.values().iterator(); iterator.hasNext();) {
-				StructField structField = iterator.next();
+			for (Iterator<StructField<? extends DataField>> iterator = sortedFields.values().iterator(); iterator.hasNext();) {
+				StructField<? extends DataField> structField = iterator.next();
 				DataField field;
 				try {
-					field = propertySet.getDataField((StructFieldID)JDOHelper.getObjectId(structField));
+					field = propertySet.getPersistentDataFieldByIndex((StructFieldID)JDOHelper.getObjectId(structField), 0);
 				} catch (Exception e) {
 					throw new ScriptException(e);
-				}
+				}				
 				if (structField instanceof NumberStructField) {
 					NumberStructField numberStructField = (NumberStructField) structField;
 					if (numberStructField.isInteger())
-						elements.add(((NumberDataField)field).getIntValue());
+						elements.add(field != null ? ((NumberDataField)field).getIntValue() : null);
 					else
-						elements.add(((NumberDataField)field).getDoubleValue());
+						elements.add(field != null ? ((NumberDataField)field).getDoubleValue() : null);
 				}
 				else if (structField instanceof DateStructField) {
-					elements.add(((DateDataField)field).getDate());
+					elements.add(field != null ? ((DateDataField)field).getDate() : null);
 				}
 				else if (II18nTextDataField.class.isAssignableFrom(structField.getDataFieldClass())) {
-					if (field.isEmpty()) {
+					if (field == null || field.isEmpty()) {
 						elements.add("");
 					} else {
 						elements.add(((II18nTextDataField) field).getText(locale));
+					}
+				} else if (ImageDataField.class.isAssignableFrom(structField.getDataFieldClass())) {
+					if (field != null) {
+						elements.add(JDOHelper.getObjectId(field).toString());
+					} else {
+						elements.add(null);
 					}
 				}
 			}

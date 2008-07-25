@@ -1,5 +1,6 @@
 package org.nightlabs.jfire.trade.recurring;
 
+import java.util.Collection;
 import java.util.Iterator;
 
 import javax.jdo.JDOHelper;
@@ -8,16 +9,23 @@ import javax.jdo.PersistenceManager;
 import org.nightlabs.ModuleException;
 import org.nightlabs.jdo.NLJDOHelper;
 import org.nightlabs.jfire.accounting.Currency;
+import org.nightlabs.jfire.accounting.priceconfig.IPackagePriceConfig;
 import org.nightlabs.jfire.config.Config;
 import org.nightlabs.jfire.idgenerator.IDGenerator;
 import org.nightlabs.jfire.organisation.LocalOrganisation;
 import org.nightlabs.jfire.security.SecurityReflector;
 import org.nightlabs.jfire.security.User;
 import org.nightlabs.jfire.store.DeliveryNote;
+import org.nightlabs.jfire.store.Product;
+import org.nightlabs.jfire.store.ProductType;
+import org.nightlabs.jfire.trade.Article;
+import org.nightlabs.jfire.trade.ArticleCreator;
 import org.nightlabs.jfire.trade.LegalEntity;
+import org.nightlabs.jfire.trade.Offer;
 import org.nightlabs.jfire.trade.OfferLocal;
 import org.nightlabs.jfire.trade.Order;
 import org.nightlabs.jfire.trade.OrganisationLegalEntity;
+import org.nightlabs.jfire.trade.Segment;
 import org.nightlabs.jfire.trade.TradeSide;
 import org.nightlabs.jfire.trade.Trader;
 import org.nightlabs.jfire.trade.config.TradeConfigModule;
@@ -164,20 +172,7 @@ public class RecurringTrader {
 			else
 				throw new IllegalStateException("mandator is neither customer nor vendor! order=" + recurringOrder + " mandator=" + mandator);
 
-
 			offerIDPrefix = getOfferIDPrefix(user, offerIDPrefix);
-
-//			if (offerIDPrefix == null) {
-//			TradeConfigModule tradeConfigModule;
-//			try {
-//			tradeConfigModule = (TradeConfigModule) Config.getConfig(
-//			getPersistenceManager(), organisationID, user).createConfigModule(TradeConfigModule.class);
-//			} catch (ModuleException x) {
-//			throw new RuntimeException(x); // should not happen.
-//			}
-
-//			offerIDPrefix = tradeConfigModule.getActiveIDPrefixCf(DeliveryNote.class.getName()).getDefaultIDPrefix();
-//			}
 
 			RecurringOffer recurringOffer = new RecurringOffer(
 					user, recurringOrder,
@@ -234,11 +229,44 @@ public class RecurringTrader {
 	public RecurringOfferConfiguration storeRecurringOfferConfiguration(RecurringOfferConfiguration configuration, boolean get, String[] fetchGroups, int maxFetchDepth)
 	{
 		PersistenceManager pm = getPersistenceManager();
-		try {
-			return NLJDOHelper.storeJDO(pm, configuration, get, fetchGroups, maxFetchDepth);
-		} finally {
-			pm.close();
-		}
+		return NLJDOHelper.storeJDO(pm, configuration, get, fetchGroups, maxFetchDepth);
 	}
 
-}
+
+	public Collection<? extends Article> createArticles(User user, Offer offer, Segment segment,
+			Collection<ProductType> productTypes, ArticleCreator articleCreator)throws ModuleException
+			{
+		if (!segment.getOrder().equals(offer.getOrder()))
+			throw new IllegalArgumentException("segment.order != offer.order :: " + segment.getOrder().getPrimaryKey() + " != " + offer.getOrder().getPrimaryKey());
+
+		PersistenceManager pm = getPersistenceManager();
+
+
+		Trader trader = Trader.getTrader(pm);
+
+		Collection<? extends Article> articles = articleCreator.createProductTypeArticles(trader, user, offer,
+				segment, productTypes);
+
+		for (Article article : articles) {
+			article.createArticleLocal(user);
+		}
+
+		// WORKAROUND begin
+		articles = pm.makePersistentAll(articles);
+		// WORKAROUND end
+
+		offer.addArticles(articles);
+			// create the Articles' prices
+			for (Article article : articles) {
+				IPackagePriceConfig packagePriceConfig = article.getProductType()
+				.getPackagePriceConfig();
+				article.setPrice(packagePriceConfig.createArticlePrice(article));
+			}
+
+			trader.validateOffer(offer, false);
+
+			return articles;
+		}
+
+
+			}

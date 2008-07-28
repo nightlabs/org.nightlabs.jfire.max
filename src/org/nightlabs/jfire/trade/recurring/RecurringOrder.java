@@ -21,6 +21,9 @@ import org.nightlabs.jfire.trade.Order;
  *
  **/
 public class RecurringOrder extends Order {
+	
+	private static final long serialVersionUID = 1L;
+
 	/**
 	 * @deprecated Only for JDO!
 	 */

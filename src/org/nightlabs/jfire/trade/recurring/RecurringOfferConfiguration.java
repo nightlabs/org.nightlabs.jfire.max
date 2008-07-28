@@ -4,7 +4,6 @@ import org.nightlabs.jdo.ObjectIDUtil;
 import org.nightlabs.jfire.security.User;
 import org.nightlabs.jfire.timer.Task;
 import org.nightlabs.jfire.timer.id.TaskID;
-import org.nightlabs.math.Base36Coder;
 
 
 /**

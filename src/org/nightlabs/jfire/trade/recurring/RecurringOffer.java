@@ -1,20 +1,8 @@
 package org.nightlabs.jfire.trade.recurring;
 
-import java.util.Collection;
-
-import javax.jdo.PersistenceManager;
-
-import org.nightlabs.ModuleException;
-import org.nightlabs.jdo.NLJDOHelper;
-import org.nightlabs.jfire.accounting.priceconfig.IPackagePriceConfig;
 import org.nightlabs.jfire.security.User;
-import org.nightlabs.jfire.store.ProductType;
-import org.nightlabs.jfire.trade.Article;
-import org.nightlabs.jfire.trade.ArticleCreator;
 import org.nightlabs.jfire.trade.Offer;
 import org.nightlabs.jfire.trade.Order;
-import org.nightlabs.jfire.trade.Segment;
-import org.nightlabs.jfire.trade.Trader;
 
 
 /**
@@ -29,11 +17,10 @@ import org.nightlabs.jfire.trade.Trader;
  * 
  * @jdo.fetch-group name="RecurringOffer.recurringOfferConfiguration" fields="recurringOfferConfiguration"
  * 
- * 
- * 
  */
 public class RecurringOffer extends Offer {
 
+	private static final long serialVersionUID = 1L;
 
 	public static final String FETCH_GROUP_RECURRING_OFFER_CONFIGURATION = "RecurringOffer.recurringOfferConfiguration";
 

@@ -17,11 +17,11 @@ import org.nightlabs.jfire.trade.Order;
  * 
  * @jdo.fetch-group name="RecurringOffer.recurringOffer" fields="recurringOffer"
  * 
- * 
- * 
  */
-public class RecurredOffer extends Offer{
+public class RecurredOffer extends Offer {
 
+	private static final long serialVersionUID = 1L;
+	
 	/**
 	 * @jdo.field persistence-modifier="persistent"
 	 */
@@ -39,6 +39,14 @@ public class RecurredOffer extends Offer{
 
 	}
 
-
+	/**
+	 * Returns the {@link RecurringOffer} that was the template 
+	 * for this {@link RecurredOffer}.
+	 *   
+	 * @return the {@link RecurringOffer} that was the template for this {@link RecurredOffer}.
+	 */
+	public RecurringOffer getRecurringOffer() {
+		return recurringOffer;
+	}
 
 }

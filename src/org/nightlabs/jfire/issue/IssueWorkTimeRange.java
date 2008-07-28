@@ -28,11 +28,11 @@ import org.nightlabs.util.Util;
  * @jdo.fetch-group name="IssueTimeRange.this" fetch-groups="default" fields="createTimestamp"
  *
  **/
-public class IssueTimeRange
+public class IssueWorkTimeRange
 implements Serializable 
 {
 	private static final long serialVersionUID = 1L;
-	private static final Logger logger = Logger.getLogger(IssueTimeRange.class);
+	private static final Logger logger = Logger.getLogger(IssueWorkTimeRange.class);
 
 	/**
 	 * @deprecated The *.this-FetchGroups lead to bad programming style and are therefore deprecated, now. They should be removed soon! 
@@ -83,9 +83,9 @@ implements Serializable
 	 * @deprecated Constructor exists only for JDO! 
 	 */
 	@Deprecated
-	protected IssueTimeRange() { }
+	protected IssueWorkTimeRange() { }
 
-	public IssueTimeRange(User user, Issue oldIssue, Issue newIssue, long issueHistoryID)
+	public IssueWorkTimeRange(User user, Issue oldIssue, Issue newIssue, long issueHistoryID)
 	{
 	}
 
@@ -135,8 +135,8 @@ implements Serializable
 	public boolean equals(Object obj)
 	{
 		if (obj == this) return true;
-		if (!(obj instanceof IssueTimeRange)) return false;
-		IssueTimeRange o = (IssueTimeRange) obj;
+		if (!(obj instanceof IssueWorkTimeRange)) return false;
+		IssueWorkTimeRange o = (IssueWorkTimeRange) obj;
 		return
 			Util.equals(this.organisationID, o.organisationID) && 
 			Util.equals(this.issueID, o.issueID) &&

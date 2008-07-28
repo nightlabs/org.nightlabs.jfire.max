@@ -50,6 +50,7 @@ import org.nightlabs.jfire.organisation.Organisation;
 import org.nightlabs.jfire.prop.PropertySet;
 import org.nightlabs.jfire.prop.Struct;
 import org.nightlabs.jfire.prop.StructLocal;
+import org.nightlabs.jfire.security.SecurityReflector;
 import org.nightlabs.jfire.security.User;
 import org.nightlabs.util.CollectionUtil;
 import org.nightlabs.util.Util;
@@ -69,13 +70,6 @@ import org.nightlabs.util.Util;
  * @jdo.create-objectid-class
  *		field-order="organisationID, issueID"
  *
- * jdo.query
- *		name="getIssuesByIssueTypeID"
- *		query="SELECT
- *			WHERE this.issueTypeID == paramIssueTypeID                     
- *			PARAMETERS String paramIssueTypeID
- *			import java.lang.String"
- *
  * @jdo.fetch-group name="Issue.issueFileAttachments" fields="issueFileAttachments"
  * @jdo.fetch-group name="Issue.description" fields="description"
  * @jdo.fetch-group name="Issue.subject" fields="subject" 
@@ -91,11 +85,7 @@ import org.nightlabs.util.Util;
  * @jdo.fetch-group name="Issue.propertySet" fields="propertySet"
  * @jdo.fetch-group name="Issue.reporter" fields="reporter"
  * @jdo.fetch-group name="Issue.assignee" fields="assignee"
- *
- * @jdo.fetch-group name="Issue.this" fetch-groups="default"
- * 	fields="issueFileAttachments, description, subject, issuePriority, issueSeverityType, issueResolution, 
- * 					state, states, issueLocal, issueType, comments, issueLinks, propertySet,reporter,
- * 					assignee"
+ * @jdo.fetch-group name="Issue.issueWorkTimeRanges" fields="issueWorkTimeRanges"
  *
  * @jdo.fetch-group name="Statable.state" fields="state"
  * @jdo.fetch-group name="Statable.states" fields="states"
@@ -106,10 +96,6 @@ implements 	Serializable, AttachCallback, Statable, DeleteCallback
 
 	private static final long serialVersionUID = 20080610L;
 
-	/**
-	 * @deprecated The *.this-FetchGroups lead to bad programming style and are therefore deprecated, now. They should be removed soon! 
-	 */
-	public static final String FETCH_GROUP_THIS_ISSUE = "Issue.this";
 	public static final String FETCH_GROUP_DESCRIPTION = "Issue.description";
 	public static final String FETCH_GROUP_SUBJECT = "Issue.subject";
 	public static final String FETCH_GROUP_ISSUE_SEVERITY_TYPE = "Issue.issueSeverityType";
@@ -119,10 +105,11 @@ implements 	Serializable, AttachCallback, Statable, DeleteCallback
 	public static final String FETCH_GROUP_ISSUE_RESOLUTION = "Issue.issueResolution";
 	public static final String FETCH_GROUP_ISSUE_TYPE = "Issue.issueType";
 	public static final String FETCH_GROUP_ISSUE_LOCAL = "Issue.issueLocal";
-	public static final String FETCH_GROUP_ISSUE_COMMENT = "Issue.comments";
+	public static final String FETCH_GROUP_ISSUE_COMMENTS = "Issue.comments";
 	public static final String FETCH_GROUP_ISSUE_LINKS = "Issue.issueLinks";
 	public static final String FETCH_GROUP_ISSUE_REPORTER = "Issue.reporter";
 	public static final String FETCH_GROUP_ISSUE_ASSIGNEE = "Issue.assignee";
+	public static final String FETCH_GROUP_ISSUE_WORK_TIME_RANGES = "Issue.issueWorkTimeRanges";
 	public static final String FETCH_GROUP_ISSUE_FILELIST = "Issue.issueFileAttachments";
 	
 	public static final String FETCH_GROUP_PROPERTY_SET = "Issue.propertySet";
@@ -323,6 +310,7 @@ implements 	Serializable, AttachCallback, Statable, DeleteCallback
 		issueFileAttachments = new ArrayList<IssueFileAttachment>();
 		comments = new ArrayList<IssueComment>();
 		issueLinks = new HashSet<IssueLink>();
+		issueWorkTimeRanges = new HashSet<IssueWorkTimeRange>();
 		
 		this.issueLocal = new IssueLocal(this);
 		this.structScope = Struct.DEFAULT_SCOPE;
@@ -732,5 +720,9 @@ implements 	Serializable, AttachCallback, Statable, DeleteCallback
 	
 	public boolean removeIssueFileAttachment(IssueFileAttachment issueFileAttachment) {
 		return this.issueFileAttachments.remove(issueFileAttachment);
+	}
+	
+	public boolean startWorking(Date date) {
+		return this.issueWorkTimeRanges.add(new IssueWorkTimeRange());
 	}
 }

@@ -29,6 +29,11 @@ import org.nightlabs.util.Util;
  * @jdo.fetch-group name="IssueWorkTimeRange.user" fields="user"
  * @jdo.fetch-group name="IssueWorkTimeRange.from" fields="from"
  * @jdo.fetch-group name="IssueWorkTimeRange.to" fields="to"
+ * 
+ * @jdo.query
+ *		name="getIssueWorkTimeRangeByUserAndIssueID"
+ *		query="SELECT
+ *			WHERE this.user == :user && this.issueID== :issueID"
  *
  **/
 public class IssueWorkTimeRange
@@ -41,6 +46,8 @@ implements Serializable
 	public static final String FETCH_GROUP_USER = "IssueWorkTimeRange.user";
 	public static final String FETCH_GROUP_FROM = "IssueWorkTimeRange.from";
 	public static final String FETCH_GROUP_TO = "IssueWorkTimeRange.to";
+	
+	public static final String QUERY_ISSUE_WORK_TIME_RANGE_BY_USER_AND_ISSUE_ID = "getIssueWorkTimeRangeByUserAndIssueID";
 	
 	/**
 	 * @jdo.field primary-key="true"

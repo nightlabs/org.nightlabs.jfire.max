@@ -93,7 +93,6 @@ import org.nightlabs.util.Util;
 public class Issue
 implements 	Serializable, AttachCallback, Statable, DeleteCallback
 {
-
 	private static final long serialVersionUID = 20080610L;
 
 	public static final String FETCH_GROUP_DESCRIPTION = "Issue.description";
@@ -113,6 +112,7 @@ implements 	Serializable, AttachCallback, Statable, DeleteCallback
 	public static final String FETCH_GROUP_ISSUE_FILELIST = "Issue.issueFileAttachments";
 	
 	public static final String FETCH_GROUP_PROPERTY_SET = "Issue.propertySet";
+	
 	/**
 	 * @jdo.field primary-key="true"
 	 * @jdo.column length="100"
@@ -188,24 +188,39 @@ implements 	Serializable, AttachCallback, Statable, DeleteCallback
 	private IssueSeverityType issueSeverityType;
 
 	/**
-	 * @jdo.field persistence-modifier="persistent" dependent="true" mapped-by="issue"
+	 * @jdo.field 	
+	 * 		persistence-modifier="persistent" 
+	 * 		dependent="true" 
+	 * 		mapped-by="issue"
 	 */
 	private IssueSubject subject;
 
 	/**
-	 * @jdo.field persistence-modifier="persistent" dependent="true" mapped-by="issue"
+	 * @jdo.field 
+	 * 		persistence-modifier="persistent" 
+	 * 		dependent="true" 
+	 * 		mapped-by="issue"
 	 */
 	private IssueDescription description;
 
 	/**
-	 * @jdo.field persistence-modifier="persistent" load-fetch-group="all"
+	 * @jdo.field 
+	 * 		persistence-modifier="persistent" 
+	 * 		load-fetch-group="all"
 	 */
 	private User reporter; 
 	
 	/**
-	 * @jdo.field persistence-modifier="persistent" load-fetch-group="all"
+	 * @jdo.field 
+	 * 		persistence-modifier="persistent" 
+	 * 		load-fetch-group="all"
 	 */
 	private User assignee; 
+	
+	/**
+	 * @jdo.field persistence-modifier="persistent" 
+	 */
+	private boolean isStarted = false;; 
 
 	/**
 	 * @jdo.field persistence-modifier="persistent"
@@ -223,7 +238,10 @@ implements 	Serializable, AttachCallback, Statable, DeleteCallback
 	private IssueResolution issueResolution;
 	
 	/**
-	 * @jdo.field persistence-modifier="persistent" mapped-by="issue" dependent="true"
+	 * @jdo.field 
+	 * 		persistence-modifier="persistent" 
+	 * 		mapped-by="issue" 
+	 * 		dependent="true"
 	 */
 	private IssueLocal issueLocal;
 	
@@ -722,7 +740,16 @@ implements 	Serializable, AttachCallback, Statable, DeleteCallback
 		return this.issueFileAttachments.remove(issueFileAttachment);
 	}
 	
-	public boolean startWorking(Date date) {
-		return this.issueWorkTimeRanges.add(new IssueWorkTimeRange());
+	public boolean isStarted()
+	{
+		return isStarted;
+	}
+	
+	public boolean startWorking() {
+		return this.issueWorkTimeRanges.add(new IssueWorkTimeRange(organisationID, assignee, this));
+	}
+	
+	public boolean endWorking(Date date) {
+		return this.issueWorkTimeRanges.add(new IssueWorkTimeRange(organisationID, assignee, this));
 	}
 }

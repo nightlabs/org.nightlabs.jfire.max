@@ -86,7 +86,9 @@ implements Serializable
 	private Double durationHours;
 	
 	/**
-	 * @jdo.field persistence-modifier="persistent"
+	 * @jdo.field 
+	 * 		persistence-modifier="persistent"
+	 * 		load-fetch-group="all"
 	 */
 	private User user;
 

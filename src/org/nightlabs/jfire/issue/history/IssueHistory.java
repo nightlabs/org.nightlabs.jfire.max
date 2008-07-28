@@ -43,7 +43,6 @@ import org.nightlabs.util.Util;
  *
  * @jdo.fetch-group name="IssueHistory.issue" fields="issue"
  * @jdo.fetch-group name="IssueHistory.user" fields="user"
- * @jdo.fetch-group name="IssueHistory.this" fetch-groups="default" fields="createTimestamp"
  *
  **/
 public class IssueHistory
@@ -52,10 +51,6 @@ implements Serializable
 	private static final long serialVersionUID = 1L;
 	private static final Logger logger = Logger.getLogger(IssueHistory.class);
 
-	/**
-	 * @deprecated The *.this-FetchGroups lead to bad programming style and are therefore deprecated, now. They should be removed soon! 
-	 */
-	public static final String FETCH_GROUP_THIS = "IssueHistory.this";
 	public static final String FETCH_GROUP_ISSUE = "IssueHistory.issue";
 	public static final String FETCH_GROUP_USER = "IssueHistory.user";
 	

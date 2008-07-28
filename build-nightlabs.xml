@@ -1,6 +1,6 @@
 <!--
   Generic j2ee and webapp (jboss/tomcat/jpox/xdoclet) ant build file 
-  Version: 2008-07-21
+  Version: 2008-07-28
   Author: marc [at] nightlabs [dot] de
   Author: marco [at] nightlabs [dot] de
   Author: tobias [at] nightlabs [dot] de
@@ -609,6 +609,7 @@
     <taskdef name="jpoxenhancer" classname="org.datanucleus.enhancer.tools.EnhancerTask">
       <classpath refid="jpoxenhancer.classpath"/>
     </taskdef>
+<!--
     <jpoxenhancer classpathref="jpoxenhancer.classpath"
         dir="${project.dir}/${bin.dir}"
         failonerror="true"
@@ -616,6 +617,21 @@
         verbose="true"
     	enhancerName="asm"
     	filesuffixes="jdo,class">
+    </jpoxenhancer>
+
+    This fails on Windows, because there are too many files found and obviously passed to a java system call as parameter.
+    Windows seems to have a limit on paramter length. Therefore, we temporarily go back to only jdo-files (not classes).
+    Marco.
+
+	See: https://www.jfire.org/modules/bugs/view.php?id=861
+-->
+    <jpoxenhancer classpathref="jpoxenhancer.classpath"
+        dir="${project.dir}/${bin.dir}"
+        failonerror="true"
+        fork="false"
+        verbose="true"
+    	enhancerName="asm"
+    	filesuffixes="jdo">
     </jpoxenhancer>
   </target>	
 	

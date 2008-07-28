@@ -46,6 +46,7 @@ import org.nightlabs.jfire.idgenerator.IDGenerator;
 import org.nightlabs.jfire.jbpm.graph.def.Statable;
 import org.nightlabs.jfire.jbpm.graph.def.StatableLocal;
 import org.nightlabs.jfire.jbpm.graph.def.State;
+import org.nightlabs.jfire.organisation.Organisation;
 import org.nightlabs.jfire.prop.PropertySet;
 import org.nightlabs.jfire.prop.Struct;
 import org.nightlabs.jfire.prop.StructLocal;
@@ -104,7 +105,6 @@ implements 	Serializable, AttachCallback, Statable, DeleteCallback
 {
 
 	private static final long serialVersionUID = 20080610L;
-//	private static final Logger logger = Logger.getLogger(Issue.class);
 
 	/**
 	 * @deprecated The *.this-FetchGroups lead to bad programming style and are therefore deprecated, now. They should be removed soon! 
@@ -165,6 +165,18 @@ implements 	Serializable, AttachCallback, Statable, DeleteCallback
 	 *		mapped-by="issue"
 	 */
 	private List<IssueFileAttachment> issueFileAttachments;
+	
+	/**
+	 * Instances of IssueWorkTimeRange.
+	 *
+	 * @jdo.field
+	 *		persistence-modifier="persistent"
+	 *		collection-type="collection"
+	 *		element-type="IssueWorkTimeRange"
+	 *		dependent-element="true"
+	 *		mapped-by="issue"
+	 */
+	private Set<IssueWorkTimeRange> issueWorkTimeRanges;
 	
 	/**
 	 * Instances of {@link IssueComment}.
@@ -291,16 +303,6 @@ implements 	Serializable, AttachCallback, Statable, DeleteCallback
 		return structScope;
 	}
 	
-//	/**
-//	 * @jdo.field persistence-modifier="persistent"
-//	 */
-//	private Date startTimestamp;
-//
-//	/**
-//	 * @jdo.field persistence-modifier="persistent"
-//	 */
-//	private Date finishTimestamp;
-	
 	/**
 	 * @deprecated Constructor exists only for JDO! 
 	 */
@@ -309,9 +311,10 @@ implements 	Serializable, AttachCallback, Statable, DeleteCallback
 
 	public Issue(String organisationID, long issueID)
 	{
+		Organisation.assertValidOrganisationID(organisationID);
+		
 		this.organisationID = organisationID;
 		this.createTimestamp = new Date();
-//		this.startTimestamp = new Date();
 		this.issueID = issueID;
 		
 		subject = new IssueSubject(this);
@@ -396,34 +399,6 @@ implements 	Serializable, AttachCallback, Statable, DeleteCallback
 	public void setUpdateTimestamp(Date timestamp) {
 		this.updateTimestamp = timestamp;
 	}
-
-//	/**
-//	 * @return Returns the start timestamp.
-//	 */
-//	public Date getStartTimestamp() {
-//		return startTimestamp;
-//	}
-//
-//	/**
-//	 * @param timestamp The timestamp to set.
-//	 */
-//	public void setStartTimestamp(Date timestamp) {
-//		this.startTimestamp = timestamp;
-//	}
-//
-//	/**
-//	 * @return Returns the finish timestamp.
-//	 */
-//	public Date getFinishTimestamp() {
-//		return finishTimestamp;
-//	}
-//
-//	/**
-//	 * @param timestamp The timestamp to set.
-//	 */
-//	public void setFinishTimestamp(Date timestamp) {
-//		this.finishTimestamp = timestamp;
-//	}
 
 	/**
 	 * @return Returns the description.
@@ -510,6 +485,10 @@ implements 	Serializable, AttachCallback, Statable, DeleteCallback
 
 	public List<IssueComment> getComments() {
 		return comments;
+	}
+	
+	public Collection<IssueWorkTimeRange> getIssueWorkTimeRanges() {
+		return Collections.unmodifiableCollection(issueWorkTimeRanges);
 	}
 	
 //	/**

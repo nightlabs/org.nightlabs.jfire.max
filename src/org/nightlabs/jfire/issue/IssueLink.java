@@ -143,6 +143,7 @@ implements Serializable, DetachCallback, StoreCallback, DeleteCallback
 	 */
 	protected IssueLink(String organisationID, long issueLinkID, Issue issue, IssueLinkType issueLinkType, Object linkedObject) {
 		Organisation.assertValidOrganisationID(organisationID);
+		
 		if (issueLinkID < 0)
 			throw new IllegalArgumentException("issueLinkID < 0");
 

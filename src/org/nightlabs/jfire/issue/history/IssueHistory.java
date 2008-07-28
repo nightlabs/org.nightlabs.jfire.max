@@ -15,6 +15,7 @@ import org.nightlabs.j2ee.LoginData;
 import org.nightlabs.jdo.NLJDOHelper;
 import org.nightlabs.jfire.issue.Issue;
 import org.nightlabs.jfire.issue.id.IssueID;
+import org.nightlabs.jfire.organisation.Organisation;
 import org.nightlabs.jfire.security.SecurityReflector;
 import org.nightlabs.jfire.security.User;
 import org.nightlabs.jfire.security.dao.UserDAO;
@@ -109,12 +110,13 @@ implements Serializable
 	@Deprecated
 	protected IssueHistory() { }
 
-	public IssueHistory(User user, Issue oldIssue, Issue newIssue, long issueHistoryID)
+	public IssueHistory(String organisationID, User user, Issue oldIssue, Issue newIssue, long issueHistoryID)
 	{
+		Organisation.assertValidOrganisationID(organisationID);
 		if (oldIssue == null)
 			throw new NullPointerException("newIssue");
 
-		this.organisationID = oldIssue.getOrganisationID();
+		this.organisationID = organisationID;
 		this.issueID = oldIssue.getIssueID();
 
 		this.issue = oldIssue;

@@ -225,6 +225,22 @@ implements SessionBean
 			pm.close();
 		}
 	}
+	
+	/**
+	 * @ejb.interface-method
+	 * @!ejb.transaction type="Supports" @!This usually means that no transaction is opened which is significantly faster and recommended for all read-only EJB methods! Marco.
+	 * @ejb.permission role-name="_Guest_"
+	 */
+	@SuppressWarnings("unchecked")
+	public List<IssueWorkTimeRange> getIssueWorkTimeRanges(Collection<IssueWorkTimeRange> issueWorkTimeRangeIDs, String[] fetchGroups, int maxFetchDepth)
+	{
+		PersistenceManager pm = getPersistenceManager();
+		try {
+			return NLJDOHelper.getDetachedObjectList(pm, issueWorkTimeRangeIDs, IssueWorkTimeRange.class, fetchGroups, maxFetchDepth);
+		} finally {
+			pm.close();
+		}
+	}
 
 	/**
 	 * @ejb.interface-method
@@ -570,7 +586,7 @@ implements SessionBean
 				Issue oldPersistentIssue = (Issue) pm.getObjectById(issueID);
 
 				User user = SecurityReflector.getUserDescriptor().getUser(pm);
-				IssueHistory issueHistory = new IssueHistory(user, oldPersistentIssue, issue, IDGenerator.nextID(IssueHistory.class));
+				IssueHistory issueHistory = new IssueHistory(oldPersistentIssue.getOrganisationID(), user, oldPersistentIssue, issue, IDGenerator.nextID(IssueHistory.class));
 				storeIssueHistory(issueHistory, false, new String[]{FetchPlan.DEFAULT}, NLJDOHelper.MAX_FETCH_DEPTH_NO_LIMIT);
 				if (issue.getCreateTimestamp() != null) {
 					issue.setUpdateTimestamp(new Date());

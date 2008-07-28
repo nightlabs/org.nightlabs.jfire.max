@@ -7,6 +7,7 @@ import javax.jdo.JDOHelper;
 import javax.jdo.PersistenceManager;
 
 import org.apache.log4j.Logger;
+import org.nightlabs.jfire.organisation.Organisation;
 import org.nightlabs.jfire.security.User;
 import org.nightlabs.util.Util;
 
@@ -15,17 +16,19 @@ import org.nightlabs.util.Util;
  *
  * @jdo.persistence-capable
  *		identity-type="application"
- *		objectid-class="org.nightlabs.jfire.issue.history.id.IssueTimeRangeID"
+ *		objectid-class="org.nightlabs.jfire.issue.id.IssueWorkTimeRangeID"
  *		detachable="true"
- *		table="JFireIssueTracking_IssueTimeRange"
+ *		table="JFireIssueTracking_IssueWorkTimeRange"
  *
  * @jdo.inheritance strategy="new-table"
  *
  * @jdo.create-objectid-class
- *		field-order="organisationID, issueID, issueTimeRangeID"
+ *		field-order="organisationID, issueID, issueWorkTimeRangeID"
  *
- * @jdo.fetch-group name="IssueTimeRange.issue" fields="issue"
- * @jdo.fetch-group name="IssueTimeRange.this" fetch-groups="default" fields="createTimestamp"
+ * @jdo.fetch-group name="IssueWorkTimeRange.issue" fields="issue"
+ * @jdo.fetch-group name="IssueWorkTimeRange.user" fields="user"
+ * @jdo.fetch-group name="IssueWorkTimeRange.from" fields="from"
+ * @jdo.fetch-group name="IssueWorkTimeRange.to" fields="to"
  *
  **/
 public class IssueWorkTimeRange
@@ -34,12 +37,10 @@ implements Serializable
 	private static final long serialVersionUID = 1L;
 	private static final Logger logger = Logger.getLogger(IssueWorkTimeRange.class);
 
-	/**
-	 * @deprecated The *.this-FetchGroups lead to bad programming style and are therefore deprecated, now. They should be removed soon! 
-	 */
-	public static final String FETCH_GROUP_THIS = "IssueTimeRange.this";
-	public static final String FETCH_GROUP_ISSUE = "IssueTimeRange.issue";
-	public static final String FETCH_GROUP_USER = "IssueTimeRange.user";
+	public static final String FETCH_GROUP_ISSUE = "IssueWorkTimeRange.issue";
+	public static final String FETCH_GROUP_USER = "IssueWorkTimeRange.user";
+	public static final String FETCH_GROUP_FROM = "IssueWorkTimeRange.from";
+	public static final String FETCH_GROUP_TO = "IssueWorkTimeRange.to";
 	
 	/**
 	 * @jdo.field primary-key="true"
@@ -55,19 +56,7 @@ implements Serializable
 	/**
 	 * @jdo.field primary-key="true"
 	 */
-	private long issueTimeRangeID;
-
-	/**
-	 * @jdo.field persistence-modifier="persistent"
-	 * @jdo.column length="100"
-	 */
-	private String field;
-
-	/**
-	 * @jdo.field persistence-modifier="persistent"
-	 * @jdo.column length="255"
-	 */
-	private String change;
+	private long issueWorkTimeRangeID;
 
 	/**
 	 * @jdo.field persistence-modifier="persistent"
@@ -77,7 +66,22 @@ implements Serializable
 	/**
 	 * @jdo.field persistence-modifier="persistent"
 	 */
-	private Date createTimestamp;
+	private Date from;
+	
+	/**
+	 * @jdo.field persistence-modifier="persistent"
+	 */
+	private Date to;
+	
+	/**
+	 * @jdo.field persistence-modifier="persistent"
+	 */
+	private Double durationHours;
+	
+	/**
+	 * @jdo.field persistence-modifier="persistent"
+	 */
+	private User user;
 
 	/**
 	 * @deprecated Constructor exists only for JDO! 
@@ -85,8 +89,19 @@ implements Serializable
 	@Deprecated
 	protected IssueWorkTimeRange() { }
 
-	public IssueWorkTimeRange(User user, Issue oldIssue, Issue newIssue, long issueHistoryID)
+	public IssueWorkTimeRange(String organisationID, User user, Issue issue)
 	{
+		Organisation.assertValidOrganisationID(organisationID);
+		
+		if (issue == null)
+			throw new IllegalArgumentException("issue must not be null!");
+		
+		if (user == null)
+			throw new IllegalArgumentException("user must not be null!");
+		
+		this.organisationID = organisationID;
+		this.issue = issue;
+		this.user = user;
 	}
 
 	/**
@@ -103,20 +118,33 @@ implements Serializable
 		return issueID;
 	}
 
-	public long getIssueTimeRangeID() {
-		return issueTimeRangeID;
-	}
-
 	public Issue getIssue(){
 		return issue;
 	}
 
-	public Date getCreateTimestamp() {
-		return createTimestamp;
+	public Date getFrom() {
+		return from;
 	}
 	
-	public String getChange() {
-		return change;
+	public Date getTo() {
+		return to;
+	}
+	
+	public Double getDurationHours() {
+		return durationHours;
+	}
+	
+	public User getUser() {
+		return user;
+	}
+	
+	public void setFrom(Date from) {
+		this.from = from;
+	}
+	
+	public void setTo(Date to) {
+		this.to = to;
+		this.durationHours = new Double(to.getTime() - from.getTime());
 	}
 	
 	/**
@@ -124,11 +152,11 @@ implements Serializable
 	 * @return The PersistenceManager associated with this object. 
 	 */
 	protected PersistenceManager getPersistenceManager() {
-		PersistenceManager issueTimeRangePM = JDOHelper.getPersistenceManager(this);
-		if (issueTimeRangePM == null)
+		PersistenceManager issueWorkTimeRangePM = JDOHelper.getPersistenceManager(this);
+		if (issueWorkTimeRangePM == null)
 			throw new IllegalStateException("This instance of " + this.getClass().getName() + " is not persistent, can not get a PersistenceManager!");
 
-		return issueTimeRangePM;
+		return issueWorkTimeRangePM;
 	}	
 	
 	@Override
@@ -140,7 +168,7 @@ implements Serializable
 		return
 			Util.equals(this.organisationID, o.organisationID) && 
 			Util.equals(this.issueID, o.issueID) &&
-			Util.equals(this.issueTimeRangeID, o.issueTimeRangeID);
+			Util.equals(this.issueWorkTimeRangeID, o.issueWorkTimeRangeID);
 	}
 
 	@Override
@@ -149,6 +177,6 @@ implements Serializable
 		return 
 			Util.hashCode(organisationID) ^
 			Util.hashCode(issueID) ^
-			Util.hashCode(issueTimeRangeID);
+			Util.hashCode(issueWorkTimeRangeID);
 	}
 }

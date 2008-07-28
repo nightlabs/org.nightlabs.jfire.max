@@ -33,16 +33,30 @@ import javax.ejb.CreateException;
 import javax.ejb.EJBException;
 import javax.ejb.SessionBean;
 import javax.ejb.SessionContext;
+import javax.jdo.JDOHelper;
 import javax.jdo.JDOObjectNotFoundException;
 import javax.jdo.PersistenceManager;
 
 import org.apache.log4j.Logger;
 import org.nightlabs.ModuleException;
+import org.nightlabs.jdo.NLJDOHelper;
+import org.nightlabs.jfire.accounting.Currency;
+import org.nightlabs.jfire.accounting.id.CurrencyID;
 import org.nightlabs.jfire.base.BaseSessionBeanImpl;
 import org.nightlabs.jfire.jbpm.graph.def.ProcessDefinition;
 import org.nightlabs.jfire.jbpm.graph.def.id.ProcessDefinitionID;
+import org.nightlabs.jfire.security.User;
+import org.nightlabs.jfire.trade.LegalEntity;
+import org.nightlabs.jfire.trade.Offer;
+import org.nightlabs.jfire.trade.Order;
+import org.nightlabs.jfire.trade.Segment;
+import org.nightlabs.jfire.trade.SegmentType;
 import org.nightlabs.jfire.trade.TradeSide;
+import org.nightlabs.jfire.trade.Trader;
+import org.nightlabs.jfire.trade.id.OrderID;
+import org.nightlabs.jfire.trade.id.SegmentTypeID;
 import org.nightlabs.jfire.trade.jbpm.ProcessDefinitionAssignment;
+import org.nightlabs.jfire.transfer.id.AnchorID;
 import org.nightlabs.version.MalformedVersionException;
 
 
@@ -138,5 +152,188 @@ implements SessionBean
 			pm.close();
 		}
 	}
+	
+	
+	private static void createSegments(PersistenceManager pm, Trader trader, Order order, SegmentTypeID[] segmentTypeIDs)
+	{
+		pm.getExtent(SegmentType.class);
+		for (int i = 0; i < segmentTypeIDs.length; ++i) {
+			SegmentTypeID segmentTypeID = segmentTypeIDs[i];
+			SegmentType segmentType = null;
+			if (segmentTypeID != null) {
+				segmentType = (SegmentType) pm.getObjectById(segmentTypeID);
+			}
+			trader.createSegment(order, segmentType);
+		}
+	}
+	
+	
+	/**
+	 * Creates a new Recurring Purchase order. This method is intended to be called by a user (not another
+	 * organisation).
+	 *
+	 * @param vendorID An <tt>Order</tt> is defined between a vendor (this <tt>Organisation</tt>) and a customer. This ID defines the customer.
+	 * @param currencyID What <tt>Currency</tt> to use for the new <tt>Order</tt>.
+	 * @param segmentTypeIDs May be <tt>null</tt>. If it is not <tt>null</tt>, a {@link Segment} will be created for each defined {@link SegmentType}. For each <tt>null</tt> entry within the array, a <tt>Segment</tt> with the {@link SegmentType#DEFAULT_SEGMENT_TYPE_ID} will be created.
+	 * @param fetchGroups What fields should be detached.
+	 *
+	 * @ejb.interface-method
+	 * @ejb.permission role-name="org.nightlabs.jfire.trade.recurring.createOrder"
+	 * @ejb.transaction type="Required"
+	 **/
+	public RecurringOrder createPurchaseRecurringOrder(
+			AnchorID vendorID, String orderIDPrefix, CurrencyID currencyID,
+			SegmentTypeID[] segmentTypeIDs, String[] fetchGroups, int maxFetchDepth)
+//	throws ModuleException
+	{
+		if (vendorID == null)
+			throw new IllegalArgumentException("vendorID must not be null!");
+
+		if (currencyID == null)
+			throw new IllegalArgumentException("currencyID must not be null!");
+
+		PersistenceManager pm = getPersistenceManager();
+		try {
+			RecurringTrader recurringTrader = RecurringTrader.getRecurringTrader(pm);
+			Trader trader = Trader.getTrader(pm);
+
+			pm.getExtent(Currency.class);
+			Currency currency = (Currency)pm.getObjectById(currencyID);
+
+			pm.getExtent(LegalEntity.class);
+			LegalEntity vendor = (LegalEntity) pm.getObjectById(vendorID);
+
+			RecurringOrder recurringOrder = recurringTrader.createRecurringOrder(vendor, trader.getMandator(),orderIDPrefix, currency);
+
+			if (segmentTypeIDs != null)
+				createSegments(pm, trader, recurringOrder, segmentTypeIDs);
+
+			// TODO JPOX WORKAROUND BEGIN
+			// JDOHelper.getObjectId(order.getSegments().iterator().next()) returns null => trying to evict cache and reload a clean object
+			{
+				OrderID orderID = (OrderID) JDOHelper.getObjectId(recurringOrder);
+				pm.evictAll();
+				recurringOrder = (RecurringOrder) pm.getObjectById(orderID);
+			}
+			// TODO JPOX WORKAROUND END
+
+			pm.getFetchPlan().setMaxFetchDepth(maxFetchDepth);
+			if (fetchGroups != null)
+				pm.getFetchPlan().setGroups(fetchGroups);
+
+			return pm.detachCopy(recurringOrder);
+		} finally {
+			pm.close();
+		}
+	}
+
+	
+	
+	/**
+	 * Creates a new Sale Recurring order. This method is intended to be called by a user (not another
+	 * organisation).
+	 *
+	 * @param customerID An <tt>Order</tt> is defined between a vendor (this <tt>Organisation</tt>) and a customer. This ID defines the customer.
+	 * @param currencyID What <tt>Currency</tt> to use for the new <tt>Order</tt>.
+	 * @param segmentTypeIDs May be <tt>null</tt>. If it is not <tt>null</tt>, a {@link Segment} will be created for each defined {@link SegmentType}. For each <tt>null</tt> entry within the array, a <tt>Segment</tt> with the {@link SegmentType#DEFAULT_SEGMENT_TYPE_ID} will be created.
+	 * @param fetchGroups What fields should be detached.
+	 *
+	 * @ejb.interface-method
+	 * @ejb.permission role-name="org.nightlabs.jfire.trade.recurring.createOrder"
+	 * @ejb.transaction type="Required"
+	 **/
+	public RecurringOrder createSaleRecurringOrder(
+			AnchorID customerID, String orderIDPrefix, CurrencyID currencyID,
+			SegmentTypeID[] segmentTypeIDs, String[] fetchGroups, int maxFetchDepth)
+//	throws ModuleException
+	{
+		if (customerID == null)
+			throw new IllegalArgumentException("customerID must not be null!");
+
+		if (currencyID == null)
+			throw new IllegalArgumentException("currencyID must not be null!");
+
+		PersistenceManager pm = getPersistenceManager();
+		try {
+			RecurringTrader recurringTrader = RecurringTrader.getRecurringTrader(pm);
+			Trader trader = Trader.getTrader(pm);
+			
+			pm.getExtent(Currency.class);
+			Currency currency = (Currency)pm.getObjectById(currencyID);
+
+			pm.getExtent(LegalEntity.class);
+			LegalEntity customer = (LegalEntity) pm.getObjectById(customerID);
+
+			RecurringOrder order = recurringTrader.createRecurringOrder(trader.getMandator(), customer, orderIDPrefix, currency);
+
+			if (segmentTypeIDs != null)
+				createSegments(pm, trader, order, segmentTypeIDs);
+			{
+				OrderID orderID = (OrderID) JDOHelper.getObjectId(order);
+				pm.evictAll();
+				order = (RecurringOrder) pm.getObjectById(orderID);
+			}
+
+			pm.getFetchPlan().setMaxFetchDepth(maxFetchDepth);
+			if (fetchGroups != null)
+				pm.getFetchPlan().setGroups(fetchGroups);
+
+			return pm.detachCopy(order);
+		} finally {
+			pm.close();
+		}
+	}
+
+	
+	/**
+	 * Creates a new Recurring Offer within a given Recurring Order.
+	 *
+	 * @param orderID The orderID defining the Order in which to create a new Offer.
+	 * @throws ModuleException
+	 *
+	 * @ejb.interface-method
+	 * @ejb.permission role-name="org.nightlabs.jfire.trade.recurring.createOffer"
+	 * @ejb.transaction type="Required"
+	 **/
+	public RecurringOffer createRecurringOffer(OrderID orderID, String offerIDPrefix, String[] fetchGroups, int maxFetchDepth)
+	throws ModuleException
+	{
+		
+		
+		PersistenceManager pm = getPersistenceManager();
+		try {
+			 RecurringTrader trader =  RecurringTrader.getRecurringTrader(pm);
+			pm.getExtent(RecurringOrder.class);
+			RecurringOrder order = (RecurringOrder) pm.getObjectById(orderID);
+			RecurringOffer offer = trader.createRecurringOffer(User.getUser(pm, getPrincipal()), order, offerIDPrefix);
+
+			for (Segment segment : order.getSegments()) {
+				if (JDOHelper.getObjectId(segment.getSegmentType()).equals(SegmentType.DEFAULT_SEGMENT_TYPE_ID)) {
+					offer.addSegment(segment);
+					break;
+				}
+			}
+			pm.getFetchPlan().setMaxFetchDepth(maxFetchDepth);
+			if (fetchGroups != null)
+				pm.getFetchPlan().setGroups(fetchGroups);
+
+			return pm.detachCopy(offer);
+		} finally {
+			pm.close();
+		}
+	}
+	
+	/**
+	 * @ejb.interface-method
+	 * @ejb.permission role-name="org.nightlabs.jfire.trade.recurring.storeOffer"
+	 * @ejb.transaction type="Required"
+	 **/
+	public RecurringOfferConfiguration storeRecurringOfferConfiguration(RecurringOfferConfiguration configuration, boolean get, String[] fetchGroups, int maxFetchDepth)
+	{
+		PersistenceManager pm = getPersistenceManager();
+		return NLJDOHelper.storeJDO(pm, configuration, get, fetchGroups, maxFetchDepth);
+	}
+	
+	
 
 }

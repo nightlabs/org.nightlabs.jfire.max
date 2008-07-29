@@ -28,6 +28,7 @@ package org.nightlabs.jfire.trade.recurring;
 
 import java.io.IOException;
 import java.rmi.RemoteException;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
 
@@ -81,7 +82,7 @@ implements SessionBean
 	 * LOG4J logger used by this class
 	 */
 	private static final Logger logger = Logger.getLogger(RecurringTradeManagerBean.class);
-	
+
 	private static final String RECURRING_OFFER_PROCESS_DEFINITION_NAME_VENDOR = "RecurringOffer.Vendor";
 
 	////////////////////// EJB "constuctor" ////////////////////////////
@@ -112,7 +113,7 @@ implements SessionBean
 	 */
 	@Override
 	public void setSessionContext(SessionContext ctx)
-		throws EJBException, RemoteException
+	throws EJBException, RemoteException
 	{
 		super.setSessionContext(ctx);
 	}
@@ -131,14 +132,14 @@ implements SessionBean
 		PersistenceManager pm = getPersistenceManager();
 		try {
 			RecurringTrader recurringTrader = RecurringTrader.getRecurringTrader(pm);
-			
+
 			// get Extents for the new classes is necessary because otherwise 
 			// DataNucleus creates queries on non-existing tables when no instance of those
 			// classes was persisted yet and the tables were not lazily created
 			pm.getExtent(RecurringOrder.class);
 			pm.getExtent(RecurringOffer.class);
 			pm.getExtent(RecurredOffer.class);
-			
+
 			// persist process definitions
 			ProcessDefinitionID processDefinitionOfferVendorID = ProcessDefinitionID.create(Organisation.DEV_ORGANISATION_ID, RECURRING_OFFER_PROCESS_DEFINITION_NAME_VENDOR);
 			ProcessDefinition processDefinitionOfferVendor;
@@ -149,13 +150,13 @@ implements SessionBean
 				pm.makePersistent(new ProcessDefinitionAssignment(RecurringOffer.class, TradeSide.vendor, processDefinitionOfferVendor));
 			}
 			// TODO: Need process definitions for customer side later
-			
+
 		} finally {
 			pm.close();
 		}
 	}
-	
-	
+
+
 	private static void createSegments(PersistenceManager pm, Trader trader, Order order, SegmentTypeID[] segmentTypeIDs)
 	{
 		pm.getExtent(SegmentType.class);
@@ -168,8 +169,8 @@ implements SessionBean
 			trader.createSegment(order, segmentType);
 		}
 	}
-	
-	
+
+
 	/**
 	 * Creates a new Recurring Purchase order. This method is intended to be called by a user (not another
 	 * organisation).
@@ -229,8 +230,8 @@ implements SessionBean
 		}
 	}
 
-	
-	
+
+
 	/**
 	 * Creates a new Sale Recurring order. This method is intended to be called by a user (not another
 	 * organisation).
@@ -259,7 +260,7 @@ implements SessionBean
 		try {
 			RecurringTrader recurringTrader = RecurringTrader.getRecurringTrader(pm);
 			Trader trader = Trader.getTrader(pm);
-			
+
 			pm.getExtent(Currency.class);
 			Currency currency = (Currency)pm.getObjectById(currencyID);
 
@@ -286,7 +287,7 @@ implements SessionBean
 		}
 	}
 
-	
+
 	/**
 	 * Creates a new Recurring Offer within a given Recurring Order.
 	 *
@@ -300,11 +301,11 @@ implements SessionBean
 	public RecurringOffer createRecurringOffer(OrderID orderID, String offerIDPrefix, String[] fetchGroups, int maxFetchDepth)
 	throws ModuleException
 	{
-		
-		
+
+
 		PersistenceManager pm = getPersistenceManager();
 		try {
-			 RecurringTrader trader =  RecurringTrader.getRecurringTrader(pm);
+			RecurringTrader trader =  RecurringTrader.getRecurringTrader(pm);
 			pm.getExtent(RecurringOrder.class);
 			RecurringOrder order = (RecurringOrder) pm.getObjectById(orderID);
 			RecurringOffer offer = trader.createRecurringOffer(User.getUser(pm, getPrincipal()), order, offerIDPrefix);
@@ -324,7 +325,7 @@ implements SessionBean
 			pm.close();
 		}
 	}
-	
+
 	/**
 	 * @ejb.interface-method
 	 * @ejb.permission role-name="org.nightlabs.jfire.trade.recurring.storeOffer"
@@ -339,8 +340,8 @@ implements SessionBean
 			pm.close();
 		}
 	}
-	
-	
+
+
 	/**
 	 * @ejb.interface-method
 	 * @ejb.permission role-name="org.nightlabs.jfire.trade.recurring.queryOrders"
@@ -355,7 +356,7 @@ implements SessionBean
 			pm.close();
 		}
 	}
-	
+
 	/**
 	 * @ejb.interface-method
 	 * @ejb.permission role-name="org.nightlabs.jfire.trade.recurring.queryOffers"
@@ -370,7 +371,21 @@ implements SessionBean
 			pm.close();
 		}
 	}
-	
 
-	
+	/**
+	 *
+	 * @ejb.interface-method
+	 * @ejb.permission role-name="org.nightlabs.jfire.trade.recurring.queryOrders"
+	 * @!ejb.transaction type="Supports" 
+	 */
+	public List<OrderID> getRecurringOrderIDs(AnchorID vendorID, AnchorID customerID, long rangeBeginIdx, long rangeEndIdx)
+	{
+		PersistenceManager pm = getPersistenceManager();
+		try {
+			return new ArrayList<OrderID>(Order.getOrderIDs(pm, vendorID, customerID, rangeBeginIdx, rangeEndIdx));
+		} finally {
+			pm.close();
+		}
+	}
+
 }

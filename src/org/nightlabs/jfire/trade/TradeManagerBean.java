@@ -56,6 +56,7 @@ import org.nightlabs.jdo.query.AbstractJDOQuery;
 import org.nightlabs.jdo.query.JDOQueryCollectionDecorator;
 import org.nightlabs.jdo.query.QueryCollection;
 import org.nightlabs.jfire.accounting.Currency;
+import org.nightlabs.jfire.accounting.Invoice;
 import org.nightlabs.jfire.accounting.Tariff;
 import org.nightlabs.jfire.accounting.TariffOrderConfigModule;
 import org.nightlabs.jfire.accounting.id.CurrencyID;
@@ -76,6 +77,7 @@ import org.nightlabs.jfire.organisation.Organisation;
 import org.nightlabs.jfire.person.Person;
 import org.nightlabs.jfire.security.User;
 import org.nightlabs.jfire.security.id.UserID;
+import org.nightlabs.jfire.store.DeliveryNote;
 import org.nightlabs.jfire.store.Product;
 import org.nightlabs.jfire.store.ReceptionNote;
 import org.nightlabs.jfire.store.id.ProductID;
@@ -1270,6 +1272,13 @@ implements SessionBean
 
 			logger.info("Initialization of JFireTrade-ConfigModules started...");
 
+			// WORKAROUND JPOX Bug to avoid problems with creating workflows as State.statable is defined as interface and has subclassed implementations
+			pm.getExtent(Order.class);
+			pm.getExtent(Offer.class);
+			pm.getExtent(Invoice.class);
+			pm.getExtent(ReceptionNote.class);
+			pm.getExtent(DeliveryNote.class);
+			
 			// version is {major}.{minor}.{release}.{patchlevel}.{suffix}
 			moduleMetaData = new ModuleMetaData(
 					JFireTradeEAR.MODULE_NAME, "0.9.5.0.beta", "0.9.5.0.beta");
@@ -1989,3 +1998,4 @@ implements SessionBean
 	}
 	
 }
+

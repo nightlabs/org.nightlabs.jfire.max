@@ -90,6 +90,7 @@ import org.nightlabs.jfire.store.deliver.ModeOfDeliveryFlavour;
 import org.nightlabs.jfire.store.deliver.ServerDeliveryProcessor;
 import org.nightlabs.jfire.store.deliver.ServerDeliveryProcessorDeliveryQueue;
 import org.nightlabs.jfire.store.deliver.ServerDeliveryProcessorJFire;
+import org.nightlabs.jfire.store.deliver.ServerDeliveryProcessorMailingPhysicalDefault;
 import org.nightlabs.jfire.store.deliver.ServerDeliveryProcessorManual;
 import org.nightlabs.jfire.store.deliver.ServerDeliveryProcessorNonDelivery;
 import org.nightlabs.jfire.store.deliver.ModeOfDeliveryFlavour.ModeOfDeliveryFlavourProductTypeGroup;
@@ -152,9 +153,9 @@ implements SessionBean
 	 * LOG4J logger used by this class
 	 */
 	private static final Logger logger = Logger.getLogger(StoreManagerBean.class);
-	
+
 	////////////////////// EJB "constuctor" ////////////////////////////
-	
+
 	/**
 	 * @ejb.create-method
 	 * @ejb.permission role-name="_Guest_"
@@ -281,7 +282,7 @@ implements SessionBean
 			modeOfDeliveryFlavour.loadIconFromResource();
 			modeOfDeliveryFlavour.getName().setText(Locale.ENGLISH.getLanguage(), "Personal Delivery (manually from hand to hand)");
 			modeOfDeliveryFlavour.getName().setText(Locale.GERMAN.getLanguage(), "Persönliche Lieferung (manuell von Hand zu Hand)");
-			pm.makePersistent(modeOfDelivery);
+			modeOfDelivery = pm.makePersistent(modeOfDelivery);
 			trader.getDefaultCustomerGroupForKnownCustomer().addModeOfDelivery(modeOfDelivery);
 			anonymousCustomerGroup.addModeOfDelivery(modeOfDelivery);
 
@@ -291,28 +292,29 @@ implements SessionBean
 			// nonDelivery
 			modeOfDelivery = new ModeOfDelivery(ModeOfDeliveryConst.MODE_OF_DELIVERY_ID_NON_DELIVERY);
 			modeOfDelivery.getName().setText(Locale.ENGLISH.getLanguage(), "Non-Delivery");
-			modeOfDelivery.getName().setText(Locale.GERMAN.getLanguage(), "Nichtversand");
+			modeOfDelivery.getName().setText(Locale.GERMAN.getLanguage(), "Nichtlieferung");
 			modeOfDeliveryFlavour = modeOfDelivery.createFlavour(Organisation.DEV_ORGANISATION_ID, "nonDelivery");
 			modeOfDeliveryFlavour.getName().setText(Locale.ENGLISH.getLanguage(), "Non-Delivery");
-			modeOfDeliveryFlavour.getName().setText(Locale.GERMAN.getLanguage(), "Nichtversand");
-			pm.makePersistent(modeOfDelivery);
+			modeOfDeliveryFlavour.getName().setText(Locale.GERMAN.getLanguage(), "Nichtlieferung");
+			modeOfDelivery = pm.makePersistent(modeOfDelivery);
 			trader.getDefaultCustomerGroupForKnownCustomer().addModeOfDelivery(modeOfDelivery);
 			ModeOfDelivery modeOfDeliveryNonDelivery = modeOfDelivery;
-			
+
 			// mailing.physical
 			modeOfDelivery = new ModeOfDelivery(ModeOfDeliveryConst.MODE_OF_DELIVERY_ID_MAILING_PHYSICAL);
-			modeOfDelivery.getName().setText(Locale.ENGLISH.getLanguage(), "Mailing Delivery (physical)");
+			modeOfDelivery.getName().setText(Locale.ENGLISH.getLanguage(), "Mailing delivery (physical)");
 			modeOfDelivery.getName().setText(Locale.GERMAN.getLanguage(), "Postversand (physisch)");
 			modeOfDeliveryFlavour = modeOfDelivery.createFlavour(Organisation.DEV_ORGANISATION_ID, "mailing.physical.default");
-			modeOfDeliveryFlavour.getName().setText(Locale.ENGLISH.getLanguage(), "Mailing Delivery by default service");
+			modeOfDeliveryFlavour.getName().setText(Locale.ENGLISH.getLanguage(), "Mailing delivery via default service provider");
 			modeOfDeliveryFlavour.getName().setText(Locale.GERMAN.getLanguage(), "Postversand via Standard-Dienstleister");
-			modeOfDeliveryFlavour = modeOfDelivery.createFlavour(Organisation.DEV_ORGANISATION_ID, "mailing.physical.DHL");
-			modeOfDeliveryFlavour.getName().setText(Locale.ENGLISH.getLanguage(), "Mailing Delivery via DHL");
-			modeOfDeliveryFlavour.getName().setText(Locale.GERMAN.getLanguage(), "Postversand via DHL");
-			modeOfDeliveryFlavour = modeOfDelivery.createFlavour(Organisation.DEV_ORGANISATION_ID, "mailing.physical.UPS");
-			modeOfDeliveryFlavour.getName().setText(Locale.ENGLISH.getLanguage(), "Mailing Delivery via UPS");
-			modeOfDeliveryFlavour.getName().setText(Locale.GERMAN.getLanguage(), "Postversand via UPS");
-			pm.makePersistent(modeOfDelivery);
+			ModeOfDeliveryFlavour modeOfDeliveryFlavourMailingPhysicalDefault = modeOfDeliveryFlavour;
+//			modeOfDeliveryFlavour = modeOfDelivery.createFlavour(Organisation.DEV_ORGANISATION_ID, "mailing.physical.DHL");
+//			modeOfDeliveryFlavour.getName().setText(Locale.ENGLISH.getLanguage(), "Mailing delivery via DHL");
+//			modeOfDeliveryFlavour.getName().setText(Locale.GERMAN.getLanguage(), "Postversand via DHL");
+//			modeOfDeliveryFlavour = modeOfDelivery.createFlavour(Organisation.DEV_ORGANISATION_ID, "mailing.physical.UPS");
+//			modeOfDeliveryFlavour.getName().setText(Locale.ENGLISH.getLanguage(), "Mailing delivery via UPS");
+//			modeOfDeliveryFlavour.getName().setText(Locale.GERMAN.getLanguage(), "Postversand via UPS");
+			modeOfDelivery = pm.makePersistent(modeOfDelivery);
 			trader.getDefaultCustomerGroupForKnownCustomer().addModeOfDelivery(modeOfDelivery);
 			anonymousCustomerGroup.addModeOfDelivery(modeOfDelivery);
 
@@ -320,12 +322,12 @@ implements SessionBean
 			modeOfDelivery = new ModeOfDelivery(ModeOfDeliveryConst.MODE_OF_DELIVERY_ID_MAILING_VIRTUAL);
 			modeOfDelivery.getName().setText(Locale.ENGLISH.getLanguage(), "Virtual Delivery (online)");
 			modeOfDelivery.getName().setText(Locale.GERMAN.getLanguage(), "Virtuelle Lieferung (online)");
-			modeOfDeliveryFlavour = modeOfDelivery.createFlavour(Organisation.DEV_ORGANISATION_ID, "mailing.virtual.email");
-			modeOfDeliveryFlavour.getName().setText(Locale.ENGLISH.getLanguage(), "Delivery by eMail");
-			modeOfDeliveryFlavour.getName().setText(Locale.GERMAN.getLanguage(), "Zustellung via eMail");
-			pm.makePersistent(modeOfDelivery);
-			trader.getDefaultCustomerGroupForKnownCustomer().addModeOfDelivery(modeOfDelivery);
-			anonymousCustomerGroup.addModeOfDelivery(modeOfDelivery);
+//			modeOfDeliveryFlavour = modeOfDelivery.createFlavour(Organisation.DEV_ORGANISATION_ID, "mailing.virtual.email");
+//			modeOfDeliveryFlavour.getName().setText(Locale.ENGLISH.getLanguage(), "Delivery by eMail");
+//			modeOfDeliveryFlavour.getName().setText(Locale.GERMAN.getLanguage(), "Zustellung via eMail");
+//			pm.makePersistent(modeOfDelivery);
+//			trader.getDefaultCustomerGroupForKnownCustomer().addModeOfDelivery(modeOfDelivery);
+//			anonymousCustomerGroup.addModeOfDelivery(modeOfDelivery);
 
 			modeOfDelivery = new ModeOfDelivery(ModeOfDeliveryConst.MODE_OF_DELIVERY_ID_JFIRE);
 			modeOfDelivery.getName().setText(Locale.ENGLISH.getLanguage(), "JFire Internal Delivery");
@@ -334,10 +336,10 @@ implements SessionBean
 			ModeOfDeliveryFlavour modeOfDeliveryFlavourJFire = modeOfDeliveryFlavour;
 			modeOfDeliveryFlavour.getName().setText(Locale.ENGLISH.getLanguage(), "JFire Internal Delivery");
 			modeOfDeliveryFlavour.getName().setText(Locale.GERMAN.getLanguage(), "JFire-interne Lieferung");
-			pm.makePersistent(modeOfDelivery);
+			modeOfDelivery = pm.makePersistent(modeOfDelivery);
 //			trader.getDefaultCustomerGroupForKnownCustomer().addModeOfDelivery(modeOfDelivery);
 //			anonymousCustomerGroup.addModeOfDelivery(modeOfDelivery);
-			
+
 			// deliveryQueue
 			modeOfDelivery = new ModeOfDelivery(ModeOfDeliveryConst.MODE_OF_DELIVERY_ID_DELIVER_TO_DELIVERY_QUEUE);
 			modeOfDelivery.getName().setText(Locale.ENGLISH.getLanguage(), "Deliver to Delivery Queue");
@@ -345,7 +347,7 @@ implements SessionBean
 			modeOfDeliveryFlavour = modeOfDelivery.createFlavour(Organisation.DEV_ORGANISATION_ID, "deliverToDeliveryQueue");
 			modeOfDeliveryFlavour.getName().setText(Locale.ENGLISH.getLanguage(), "Deliver to Delivery Queue");
 			modeOfDeliveryFlavour.getName().setText(Locale.GERMAN.getLanguage(), "Lieferung in Lieferwarteschlange");
-			pm.makePersistent(modeOfDelivery);
+			modeOfDelivery = pm.makePersistent(modeOfDelivery);
 			ModeOfDelivery modeOfDeliveryDeliveryQueue = modeOfDelivery;
 			trader.getDefaultCustomerGroupForKnownCustomer().addModeOfDelivery(modeOfDelivery);
 			anonymousCustomerGroup.addModeOfDelivery(modeOfDeliveryDeliveryQueue);
@@ -360,7 +362,12 @@ implements SessionBean
 			serverDeliveryProcessorNonDelivery.addModeOfDelivery(modeOfDeliveryNonDelivery);
 			serverDeliveryProcessorNonDelivery.getName().setText(Locale.ENGLISH.getLanguage(), "Non-Delivery (delivery will be postponed)");
 			serverDeliveryProcessorNonDelivery.getName().setText(Locale.GERMAN.getLanguage(), "Nichtlieferung (Lieferung wird verschoben)");
-			
+
+			ServerDeliveryProcessorMailingPhysicalDefault serverDeliveryProcessorMailingPhysicalDefault = ServerDeliveryProcessorMailingPhysicalDefault.getServerDeliveryProcessorMailingPhysicalDefault(pm);
+			serverDeliveryProcessorMailingPhysicalDefault.addModeOfDeliveryFlavour(modeOfDeliveryFlavourMailingPhysicalDefault);
+			serverDeliveryProcessorMailingPhysicalDefault.getName().setText(Locale.ENGLISH.getLanguage(), "Physical mail via default service provider");
+			serverDeliveryProcessorMailingPhysicalDefault.getName().setText(Locale.GERMAN.getLanguage(), "Postversand via Standard-Dienstleister");
+
 			ServerDeliveryProcessorDeliveryQueue serverDeliveryProcessorDeliveryQueue = ServerDeliveryProcessorDeliveryQueue.getServerDeliveryProcessorDeliveryQueue(pm);
 			serverDeliveryProcessorDeliveryQueue.addModeOfDelivery(modeOfDeliveryDeliveryQueue);
 
@@ -467,7 +474,7 @@ implements SessionBean
 			pm.close();
 		}
 	}
-	
+
 	/**
 	 * @ejb.interface-method
 	 * @ejb.permission role-name="org.nightlabs.jfire.trade.queryDeliveryNotes"
@@ -486,7 +493,7 @@ implements SessionBean
 			pm.close();
 		}
 	}
-	
+
 	/**
 	 * @ejb.interface-method
 	 * @ejb.permission role-name="org.nightlabs.jfire.trade.queryDeliveryNotes"
@@ -497,18 +504,18 @@ implements SessionBean
 	{
 		if (queries == null)
 			return null;
-		
+
 		if (! DeliveryNote.class.isAssignableFrom(queries.getResultClass()))
 		{
 			throw new RuntimeException("Given QueryCollection has invalid return type! " +
 					"Invalid return type= "+ queries.getResultClassName());
 		}
-		
+
 		PersistenceManager pm = getPersistenceManager();
 		try {
 			pm.getFetchPlan().setMaxFetchDepth(1);
 			pm.getFetchPlan().setGroup(FetchPlan.DEFAULT);
-			
+
 			if (! (queries instanceof JDOQueryCollectionDecorator))
 			{
 				queries = new JDOQueryCollectionDecorator<AbstractJDOQuery>(queries);
@@ -516,7 +523,7 @@ implements SessionBean
 
 			JDOQueryCollectionDecorator<AbstractJDOQuery> decoratedCollection =
 				(JDOQueryCollectionDecorator<AbstractJDOQuery>) queries;
-			
+
 			decoratedCollection.setPersistenceManager(pm);
 			Collection<DeliveryNote> deliveryNotes =
 				(Collection<DeliveryNote>) decoratedCollection.executeQueries();
@@ -528,47 +535,47 @@ implements SessionBean
 	}
 
 //	/**
-//	 * Searches with the given QueryCollection of subclasses of 
+//	 * Searches with the given QueryCollection of subclasses of
 //	 * <code>AbstractProductTypeGroupQuery<\code> for {@link ProductTypeGroup}s.
 //	 * This method creates a ProductTypeGroupIDSearchResult out of the
 //	 * result.
-//	 * 
+//	 *
 //	 * @ejb.interface-method
 //	 * @ejb.permission role-name="_Guest_"
 //	 * @ejb.transaction type="Required"
-//	 */	
+//	 */
 //	public ProductTypeGroupIDSearchResult getProductTypeGroupSearchResult(QueryCollection<? extends AbstractProductTypeGroupQuery> productTypeGroupQueries)
 //	{
 //		if (productTypeGroupQueries == null)
 //			return null;
-//		
+//
 //		if (! ProductTypeGroup.class.isAssignableFrom(productTypeGroupQueries.getResultClass()))
 //		{
 //			throw new RuntimeException("Given QueryCollection has invalid return type! " +
 //					"Invalid return type= "+ productTypeGroupQueries.getResultClassName());
 //		}
-//		
+//
 //// TODO: Implement Authority checking here
 //		PersistenceManager pm = getPersistenceManager();
 //		try {
 //			pm.getFetchPlan().setMaxFetchDepth(1);
 //			pm.getFetchPlan().setGroup(FetchPlan.DEFAULT);
-//			
+//
 //			if (! (productTypeGroupQueries instanceof JDOQueryCollectionDecorator)) {
 //				productTypeGroupQueries = new JDOQueryCollectionDecorator<AbstractProductTypeGroupQuery>(productTypeGroupQueries);
 //			}
-//			
+//
 //			JDOQueryCollectionDecorator<AbstractProductTypeGroupQuery> queries =
-//				(JDOQueryCollectionDecorator<AbstractProductTypeGroupQuery>) productTypeGroupQueries;			
+//				(JDOQueryCollectionDecorator<AbstractProductTypeGroupQuery>) productTypeGroupQueries;
 //			queries.setPersistenceManager(pm);
-//			
+//
 //			Collection<ProductTypeGroup> productTypeGroups = (Collection<ProductTypeGroup>) queries.executeQueries();
 //			return ProductTypeGroupIDSearchResult.createProductTypeGroupSearchResult(productTypeGroups);
 //		} finally {
 //			pm.close();
 //		}
 //	}
-	
+
 //	/**
 //	 * @ejb.interface-method
 //	 * @ejb.permission role-name="org.nightlabs.jfire.trade.seeProductType"
@@ -603,7 +610,7 @@ implements SessionBean
 	 * @ejb.interface-method
 	 * @ejb.permission role-name="_Guest_"
 	 * @!ejb.transaction type="Supports" @!This usually means that no transaction is opened which is significantly faster and recommended for all read-only EJB methods! Marco.
-	 */	
+	 */
 	public List<Product> getProducts(Set<ProductID> productIDs, String[] fetchGroups, int maxFetchDepth) {
 		PersistenceManager pm = getPersistenceManager();
 		try {
@@ -612,7 +619,7 @@ implements SessionBean
 			pm.close();
 		}
 	}
-	
+
 	/**
 	 * @ejb.interface-method
 	 * @ejb.permission role-name="org.nightlabs.jfire.trade.seeProductType"
@@ -625,7 +632,7 @@ implements SessionBean
 			pm.getFetchPlan().setMaxFetchDepth(maxFetchDepth);
 			if (fetchGroups != null)
 				pm.getFetchPlan().setGroups(fetchGroups);
-			
+
 			List<ProductTypeLocal> productTypeLocals = new ArrayList<ProductTypeLocal>(productTypeIDs.size());
 			for (ProductTypeID productTypeID : productTypeIDs) {
 				ProductType productType = (ProductType) pm.getObjectById(productTypeID);
@@ -847,7 +854,7 @@ implements SessionBean
 
 			Collection<ServerDeliveryProcessor> c = ServerDeliveryProcessor.getServerDeliveryProcessorsForOneModeOfDeliveryFlavour(
 					pm, modeOfDeliveryFlavourID);
-			
+
 			for (ServerDeliveryProcessor pp : c) {
 				pp.checkRequirements(checkRequirementsEnvironment);
 			}
@@ -926,7 +933,7 @@ implements SessionBean
 	 * Creates an DeliveryNote for all <tt>Article</tt>s the Offer identified by
 	 * the given offerID. If get is true a detached version of the
 	 * DeliveryNote will be returned.
-	 * 
+	 *
 	 * @param offerID OfferID of the offer to be delivered.
 	 * @param get Whether a detached version of the created DeliveryNote should be returned, otherwise null will be returned.
 	 * @param fetchGroups Array ouf fetch-groups the deliveryNote should be detached with.
@@ -1047,7 +1054,7 @@ implements SessionBean
 
 	/**
 	 * @throws DeliveryNoteEditException
-	 * 
+	 *
 	 * @ejb.interface-method
 	 * @ejb.transaction type="Required"
 	 * @ejb.permission role-name="_Guest_"
@@ -1102,7 +1109,7 @@ implements SessionBean
 	{
 		try {
 			StoreManagerLocal storeManagerLocal = StoreManagerUtil.getLocalHome().create();
-	
+
 			List<DeliveryResult> resList = new ArrayList<DeliveryResult>();
 			for (Iterator<DeliveryData> it = deliveryDataList.iterator(); it.hasNext(); ) {
 				DeliveryData deliveryData = it.next();
@@ -1240,7 +1247,7 @@ implements SessionBean
 		}
 	}
 
-	
+
 	/**
 	 * @param deliveryIDs Instances of {@link DeliveryID}
 	 * @param deliverEndClientResults Instances of {@link DeliveryResult} corresponding
@@ -1515,7 +1522,7 @@ implements SessionBean
 	{
 		private static final long serialVersionUID = 1L;
 
-		private DeliveryID deliveryID;
+		private final DeliveryID deliveryID;
 
 		/**
 		 * @param deliveryID This ID references the {@link Delivery} to the end-customer-side (or next-reseller-side). Hence, this
@@ -1643,7 +1650,7 @@ implements SessionBean
 
 						for (Map.Entry<Boolean, Set<Article>> me3 : me2.getValue().entrySet()) {
 //							Boolean directionIncoming = me3.getKey();
-							
+
 							Set<Article> backhandArticles = me3.getValue();
 
 							// Because of transactional problems, crossTradeDeliveryCoordinator.performCrossTradeDelivery(...) will spawn an additional AsyncInvoke
@@ -1732,7 +1739,7 @@ implements SessionBean
 	 * @ejb.interface-method
 	 * @ejb.permission role-name="_Guest_"
 	 * @!ejb.transaction type="Supports" @!This usually means that no transaction is opened which is significantly faster and recommended for all read-only EJB methods! Marco.
-	 */	
+	 */
 	public Set<ProductID> getProductIDs(QueryCollection<? extends AbstractProductQuery> productQueries)
 	{
 		if (productQueries == null)
@@ -1740,7 +1747,7 @@ implements SessionBean
 
 		if (!Product.class.isAssignableFrom(productQueries.getResultClass())) {
 			throw new RuntimeException("Given QueryCollection has invalid return type! " +
-					"Invalid return type= "+ productQueries.getResultClassName());			
+					"Invalid return type= "+ productQueries.getResultClassName());
 		}
 
 		PersistenceManager pm = getPersistenceManager();
@@ -1764,7 +1771,7 @@ implements SessionBean
 			return NLJDOHelper.getObjectIDSet(products);
 		} finally {
 			pm.close();
-		}		
+		}
 	}
 
 	/**
@@ -1777,13 +1784,13 @@ implements SessionBean
 	{
 		if (productTypeQueries == null)
 			return null;
-		
+
 		if (! ProductType.class.isAssignableFrom(productTypeQueries.getResultClass()))
 		{
 			throw new RuntimeException("Given QueryCollection has invalid return type! " +
 					"Invalid return type= "+ productTypeQueries.getResultClassName());
 		}
-		
+
 		PersistenceManager pm = getPersistenceManager();
 		try {
 			pm.getFetchPlan().setMaxFetchDepth(1);
@@ -1795,9 +1802,9 @@ implements SessionBean
 			}
 			JDOQueryCollectionDecorator<AbstractProductTypeQuery> queries =
 				(JDOQueryCollectionDecorator<AbstractProductTypeQuery>) productTypeQueries;
-			
+
 			queries.setPersistenceManager(pm);
-			
+
 			Collection<ProductType> productTypes = (Collection<ProductType>) queries.executeQueries();
 
 // TODO: Implement Authority checking here - only the role is missing - the rest is just the following line. marco.
@@ -1821,26 +1828,26 @@ implements SessionBean
 	{
 		return getProductTypeIDs(productTypeQueries);
 	}
-	
+
 	/**
 	 *
 	 * @ejb.interface-method
 	 * @ejb.permission role-name="_Guest_"
 	 * @!ejb.transaction type="Supports" @!This usually means that no transaction is opened which is significantly faster and recommended for all read-only EJB methods! Marco.
 	 */
-	@SuppressWarnings("unchecked")	
+	@SuppressWarnings("unchecked")
 	public Set<ProductTypeGroupID> getProductTypeGroupIDs(
 			QueryCollection<? extends AbstractProductTypeGroupQuery> productTypeGroupQueries)
 	{
 		if (productTypeGroupQueries == null)
 			return null;
-		
+
 		if (! ProductTypeGroup.class.isAssignableFrom(productTypeGroupQueries.getResultClass()))
 		{
 			throw new RuntimeException("Given QueryCollection has invalid return type! " +
 					"Invalid return type= "+ productTypeGroupQueries.getResultClassName());
 		}
-		
+
 // TODO: Implement Authority checking here
 		PersistenceManager pm = getPersistenceManager();
 		try {
@@ -1853,9 +1860,9 @@ implements SessionBean
 			}
 			JDOQueryCollectionDecorator<AbstractProductTypeGroupQuery> queries =
 				(JDOQueryCollectionDecorator<AbstractProductTypeGroupQuery>) productTypeGroupQueries;
-			
+
 			queries.setPersistenceManager(pm);
-			
+
 			Collection<ProductTypeGroup> productTypeGroups = (Collection<ProductTypeGroup>) queries.executeQueries();
 
 			return NLJDOHelper.getObjectIDSet(productTypeGroups);
@@ -1870,19 +1877,19 @@ implements SessionBean
 	 * @ejb.permission role-name="_Guest_"
 	 * @!ejb.transaction type="Supports" @!This usually means that no transaction is opened which is significantly faster and recommended for all read-only EJB methods! Marco.
 	 */
-	@SuppressWarnings("unchecked")	
+	@SuppressWarnings("unchecked")
 	public ProductTypeGroupIDSearchResult getProductTypeGroupSearchResult(
 			QueryCollection<? extends AbstractProductTypeGroupQuery> productTypeGroupQueries)
 	{
 		if (productTypeGroupQueries == null)
 			return null;
-		
+
 		if (! ProductTypeGroup.class.isAssignableFrom(productTypeGroupQueries.getResultClass()))
 		{
 			throw new RuntimeException("Given QueryCollection has invalid return type! " +
 					"Invalid return type= "+ productTypeGroupQueries.getResultClassName());
 		}
-		
+
 //TODO: Implement Authority checking here
 		PersistenceManager pm = getPersistenceManager();
 		try {
@@ -1894,12 +1901,12 @@ implements SessionBean
 			}
 			JDOQueryCollectionDecorator<AbstractProductTypeGroupQuery> queries =
 				(JDOQueryCollectionDecorator<AbstractProductTypeGroupQuery>) productTypeGroupQueries;
-			
+
 			queries.setPersistenceManager(pm);
-			
+
 			Collection<ProductTypeGroup> productTypeGroups = (Collection<ProductTypeGroup>) queries.executeQueries();
 
-			ProductTypeGroupIDSearchResult result = new ProductTypeGroupIDSearchResult(); 
+			ProductTypeGroupIDSearchResult result = new ProductTypeGroupIDSearchResult();
 			for (Iterator<? extends ProductTypeGroup> iter = productTypeGroups.iterator(); iter.hasNext();) {
 				ProductTypeGroup group = iter.next();
 				ProductTypeGroupID groupID = (ProductTypeGroupID) JDOHelper.getObjectId(group);
@@ -1915,14 +1922,14 @@ implements SessionBean
 			pm.close();
 		}
 	}
-	
+
 	/**
 	 * Returns the {@link DeliveryQueue}s identified by the given IDs.
 	 * @param deliveryQueueIds The IDs of the DeliveryQueues to be returned.
 	 * @param fetchGroups The fetch groups to be used to detach the DeliveryQueues
 	 * @param fetchDepth The fetch depth to be used to detach the DeliveryQueues (-1 for unlimited)
 	 * @return the {@link DeliveryQueue}s identified by the given IDs.
-	 * 
+	 *
 	 * @ejb.interface-method
 	 * @ejb.permission role-name="_Guest_"
 	 */
@@ -1932,22 +1939,22 @@ implements SessionBean
 			pm.getFetchPlan().setFetchSize(fetchDepth);
 			if (fetchGroups != null)
 				pm.getFetchPlan().setGroups(fetchGroups);
-			
+
 			return pm.detachCopyAll(pm.getObjectsById(deliveryQueueIds));
 		} finally {
 			pm.close();
 		}
 	}
-	
+
 	/**
 	 * Stores the given DeliveryQueues in the data store.
-	 * 
+	 *
 	 * @param deliveryQueues The {@link DeliveryQueue} to be stored
 	 * @param get Indicates whether this method should return a collection containing the detached copies of the stored DeliveryQueues.
 	 * @param fetchGroups The fetchGroups to be used when get == true
 	 * @param fetchDepth The fetchDepth to be used when get == true
 	 * @return A collection of the detached copies of the stored {@link DeliveryQueue}s
-	 * 
+	 *
 	 * @ejb.interface-method
 	 * @ejb.permission role-name="_Guest_"
 	 */
@@ -1957,9 +1964,9 @@ implements SessionBean
 			pm.getFetchPlan().setFetchSize(fetchDepth);
 			if (fetchGroups != null)
 				pm.getFetchPlan().setGroups(fetchGroups);
-			
+
 			deliveryQueues = pm.makePersistentAll(deliveryQueues);
-			
+
 			if (get)
 				return pm.detachCopyAll(deliveryQueues);
 			else
@@ -1968,14 +1975,14 @@ implements SessionBean
 			pm.close();
 		}
 	}
-	
+
 	/**
 	 * Returns all {@link DeliveryQueue}s available.
 	 * @return All {@link DeliveryQueue}s available.
-	 * 
+	 *
 	 * @ejb.interface-method
 	 * @ejb.permission role-name="_Guest_"
-	 * 
+	 *
 	 * @param fetchGroups The desired fetch groups
 	 * @param fetchDepth The desired JDO fetch depth
 	 * @param includeDeleted Determines whether delivery queues marked as deleted are also returned.
@@ -1984,20 +1991,20 @@ implements SessionBean
 		PersistenceManager pm = getPersistenceManager();
 		try {
 			pm.getFetchPlan().setMaxFetchDepth(fetchDepth);
-			
+
 			if (fetchGroups != null)
 				pm.getFetchPlan().setGroups(fetchGroups);
-			
+
 			return pm.detachCopyAll(DeliveryQueue.getDeliveryQueues(pm, includeDeleted));
 		} finally {
 			pm.close();
 		}
 	}
-	
+
 	/**
 	 * Returns the {@link DeliveryQueueID}s of all {@link DeliveryQueue}s available.
 	 * @return The {@link DeliveryQueueID}s of all {@link DeliveryQueue}s available.
-	 * 
+	 *
 	 * @param includeDefunct Sets whether defunct delivery queues should be included in the returned collection.
 	 * @ejb.interface-method
 	 * @ejb.permission role-name="_Guest_"
@@ -2010,12 +2017,12 @@ implements SessionBean
 			pm.close();
 		}
 	}
-	
+
 	/**
 	 * Stores the given {@link DeliveryQueue}.
 	 * @param pq The {@link DeliveryQueue} to be stored.
 	 * @return A detached copy of the persisted {@link DeliveryQueue}.
-	 * 
+	 *
 	 * @ejb.interface-method
 	 * @ejb.permission role-name="_Guest_"
 	 */
@@ -2024,12 +2031,12 @@ implements SessionBean
 		tmp.add(pq);
 		return storeDeliveryQueues(tmp).get(0);
 	}
-	
+
 	/**
 	 * Stores all {@link DeliveryQueue}s in the given collection.
 	 * @param deliveryQueues The collection of the {@link DeliveryQueue}s to be stored.
 	 * @return A list of detached copies of the stored delivery queues.
-	 * 
+	 *
 	 * @ejb.interface-method
 	 * @ejb.permission role-name="_Guest_"
 	 */
@@ -2046,17 +2053,17 @@ implements SessionBean
 	/**
 	 * Returns all {@link DeliveryQueue}s available without the ones that have been marked as deleted.
 	 * @return All {@link DeliveryQueue}s available without the ones that have been marked as deleted.
-	 * 
+	 *
 	 * @ejb.interface-method
 	 * @ejb.permission role-name="_Guest_"
-	 * 
+	 *
 	 * @param fetchGroups The desired fetch groups
 	 * @param fetchDepth The desired JDO fetch depth
 	 */
 	public Collection<DeliveryQueue> getAvailableDeliveryQueues(String[] fetchGroups, int fetchDepth) {
 		return getAvailableDeliveryQueues(fetchGroups, fetchDepth, false);
 	}
-	
+
 	private List<DeliveryQueue> storeDeliveryQueues(Collection<DeliveryQueue> deliveryQueues, PersistenceManager pm) {
 		List<DeliveryQueue> pqs = new LinkedList<DeliveryQueue>();
 		for (DeliveryQueue clientPQ : deliveryQueues) {
@@ -2078,13 +2085,13 @@ implements SessionBean
 	{
 		if (queries == null)
 			return null;
-		
+
 		if (! Repository.class.isAssignableFrom(queries.getResultClass()))
 		{
 			throw new RuntimeException("Given QueryCollection has invalid return type! " +
 					"Invalid return type= "+ queries.getResultClassName());
 		}
-		
+
 		PersistenceManager pm = getPersistenceManager();
 		try {
 			pm.getFetchPlan().setMaxFetchDepth(1);
@@ -2096,7 +2103,7 @@ implements SessionBean
 			}
 			JDOQueryCollectionDecorator<AbstractJDOQuery> repoQueries =
 				(JDOQueryCollectionDecorator<AbstractJDOQuery>) queries;
-			
+
 			repoQueries.setPersistenceManager(pm);
 			Collection<? extends Repository> repositories =
 				(Collection<? extends Repository>) repoQueries.executeQueries();
@@ -2267,7 +2274,7 @@ implements SessionBean
 	 * @ejb.transaction type="Required"
 	 * @ejb.permission role-name="_Guest_"
 	 */
-	public ProductTypeGroup getProductTypeGroup(ProductTypeGroupID productTypeGroupID, 
+	public ProductTypeGroup getProductTypeGroup(ProductTypeGroupID productTypeGroupID,
 			String[] fetchGroups, int maxFetchDepth)
 	throws ModuleException
 	{
@@ -2275,14 +2282,14 @@ implements SessionBean
 		try {
 			if (fetchGroups != null)
 				pm.getFetchPlan().setGroups(fetchGroups);
-			pm.getFetchPlan().setMaxFetchDepth(maxFetchDepth);	
+			pm.getFetchPlan().setMaxFetchDepth(maxFetchDepth);
 			pm.getExtent(ProductTypeGroup.class);
 			return (ProductTypeGroup) pm.detachCopy(pm.getObjectById(productTypeGroupID));
 		} finally {
 			pm.close();
 		}
 	}
-	
+
 	/**
 	 * @param productTypeGroupIDs Either <code>null</code> in order to return all or instances of {@link ProductTypeGroupID}
 	 *		specifying a subset.
@@ -2291,7 +2298,7 @@ implements SessionBean
 	 * @ejb.transaction type="Required"
 	 * @ejb.permission role-name="_Guest_"
 	 */
-	public Collection<ProductTypeGroup> getProductTypeGroups(Collection<ProductTypeGroupID> 
+	public Collection<ProductTypeGroup> getProductTypeGroups(Collection<ProductTypeGroupID>
 		productTypeGroupIDs, String[] fetchGroups, int maxFetchDepth)
 	throws ModuleException
 	{
@@ -2299,7 +2306,7 @@ implements SessionBean
 		try {
 			if (fetchGroups != null)
 				pm.getFetchPlan().setGroups(fetchGroups);
-			pm.getFetchPlan().setMaxFetchDepth(maxFetchDepth);	
+			pm.getFetchPlan().setMaxFetchDepth(maxFetchDepth);
 
 // TODO reactivate as soon as JPOX bug is fixed.
 //			Query q;
@@ -2326,7 +2333,7 @@ implements SessionBean
 			pm.close();
 		}
 	}
-	
+
 	// TODO: when all jpox bugs are fixed, implement generic storeProductType-Method
 //	/**
 //	 * @return Returns a newly detached instance of <tt>ProductType</tt>
@@ -2430,5 +2437,5 @@ implements SessionBean
 //			pm.close();
 //		}
 //	}
-	
+
 }

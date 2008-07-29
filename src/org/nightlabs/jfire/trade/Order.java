@@ -77,25 +77,12 @@ import org.nightlabs.util.Util;
  *		field-order="organisationID, orderIDPrefix, orderID"
  *		add-interfaces="org.nightlabs.jfire.trade.id.ArticleContainerID"
  *
- * @!jdo.query
- *		name="getOrdersByVendorAndCustomer"
- *		query="SELECT
- *			WHERE JDOHelper.getObjectId(vendor) == paramVendorID &&
- *			      JDOHelper.getObjectId(customer) == paramCustomerID
- *			PARAMETERS AnchorID paramVendorID, AnchorID paramCustomerID
- *			import org.nightlabs.jfire.transfer.id.AnchorID"
- *
  * @jdo.query
  *		name="getOrderIDsByVendorAndCustomer"
  *		query="SELECT JDOHelper.getObjectId(this)
- *			WHERE vendor.organisationID == paramVendorID_organisationID &&
- *            vendor.anchorID == paramVendorID_anchorID &&
- *			      customer.organisationID == paramCustomerID_organisationID &&
- *            customer.anchorID == paramCustomerID_anchorID
- *			PARAMETERS String paramVendorID_organisationID, String paramVendorID_anchorID,
- *                 String paramCustomerID_organisationID, String paramCustomerID_anchorID
- *			import java.lang.String
- *			ORDER BY orderID DESC"
+ *			WHERE JDOHelper.getObjectId(vendor) == :vendorID &&
+ *			      JDOHelper.getObjectId(customer) == :customerID
+ *			import org.nightlabs.jfire.transfer.id.AnchorID"
  *
  * @!jdo.query
  *		name="getQuickSaleWorkOrderIDCandidates"
@@ -174,19 +161,11 @@ implements Serializable, ArticleContainer, SegmentContainer, DetachCallback
 	@SuppressWarnings("unchecked")
 	public static List<OrderID> getOrderIDs(PersistenceManager pm, Class<? extends Order> orderClass, boolean subclasses, AnchorID vendorID, AnchorID customerID, long rangeBeginIdx, long rangeEndIdx)
 	{
-		
-		
-		//Query query = pm.newNamedQuery(Order.class, "getOrderIDsByVendorAndCustomer");
-//		return (Collection) query.execute(vendorID, customerID);
-// WORKAROUND JDOQL with ObjectID doesn't work yet.
-		
-		pm.getExtent(orderClass,subclasses);	
-		Query query = pm.newNamedQuery(orderClass, "getOrderIDsByVendorAndCustomer");
+		Query query = pm.newNamedQuery(Order.class, "getOrderIDsByVendorAndCustomer");
+		query.setCandidates(pm.getExtent(orderClass, subclasses));
 		Map params = new HashMap();
-		params.put("paramVendorID_organisationID", vendorID.organisationID);
-		params.put("paramVendorID_anchorID", vendorID.anchorID);
-		params.put("paramCustomerID_organisationID", customerID.organisationID);
-		params.put("paramCustomerID_anchorID", customerID.anchorID);
+		params.put("vendorID", vendorID);
+		params.put("customerID", customerID);
 
 		if (rangeBeginIdx >= 0 && rangeEndIdx >= 0)
 			query.setRange(rangeBeginIdx, rangeEndIdx);

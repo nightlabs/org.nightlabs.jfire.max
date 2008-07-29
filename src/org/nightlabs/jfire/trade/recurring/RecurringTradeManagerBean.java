@@ -372,20 +372,5 @@ implements SessionBean
 		}
 	}
 
-	/**
-	 *
-	 * @ejb.interface-method
-	 * @ejb.permission role-name="org.nightlabs.jfire.trade.recurring.queryOrders"
-	 * @!ejb.transaction type="Supports" 
-	 */
-	public List<OrderID> getRecurringOrderIDs(AnchorID vendorID, AnchorID customerID, long rangeBeginIdx, long rangeEndIdx)
-	{
-		PersistenceManager pm = getPersistenceManager();
-		try {
-			return new ArrayList<OrderID>(Order.getOrderIDs(pm, vendorID, customerID, rangeBeginIdx, rangeEndIdx));
-		} finally {
-			pm.close();
-		}
-	}
-
+	
 }

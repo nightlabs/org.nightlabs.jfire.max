@@ -172,11 +172,16 @@ implements Serializable, ArticleContainer, SegmentContainer, DetachCallback
 	 * @return Returns instances of {@link Order}.
 	 */
 	@SuppressWarnings("unchecked")
-	public static List<OrderID> getOrderIDs(PersistenceManager pm, AnchorID vendorID, AnchorID customerID, long rangeBeginIdx, long rangeEndIdx)
+	public static List<OrderID> getOrderIDs(PersistenceManager pm, Class<? extends Order> orderClass, boolean subclasses, AnchorID vendorID, AnchorID customerID, long rangeBeginIdx, long rangeEndIdx)
 	{
-		Query query = pm.newNamedQuery(Order.class, "getOrderIDsByVendorAndCustomer");
+		
+		
+		//Query query = pm.newNamedQuery(Order.class, "getOrderIDsByVendorAndCustomer");
 //		return (Collection) query.execute(vendorID, customerID);
 // WORKAROUND JDOQL with ObjectID doesn't work yet.
+		
+		pm.getExtent(orderClass,subclasses);	
+		Query query = pm.newNamedQuery(orderClass, "getOrderIDsByVendorAndCustomer");
 		Map params = new HashMap();
 		params.put("paramVendorID_organisationID", vendorID.organisationID);
 		params.put("paramVendorID_anchorID", vendorID.anchorID);

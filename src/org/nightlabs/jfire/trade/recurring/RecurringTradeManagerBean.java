@@ -28,6 +28,8 @@ package org.nightlabs.jfire.trade.recurring;
 
 import java.io.IOException;
 import java.rmi.RemoteException;
+import java.util.List;
+import java.util.Set;
 
 import javax.ejb.CreateException;
 import javax.ejb.EJBException;
@@ -47,11 +49,13 @@ import org.nightlabs.jfire.jbpm.graph.def.ProcessDefinition;
 import org.nightlabs.jfire.jbpm.graph.def.id.ProcessDefinitionID;
 import org.nightlabs.jfire.security.User;
 import org.nightlabs.jfire.trade.LegalEntity;
+import org.nightlabs.jfire.trade.Offer;
 import org.nightlabs.jfire.trade.Order;
 import org.nightlabs.jfire.trade.Segment;
 import org.nightlabs.jfire.trade.SegmentType;
 import org.nightlabs.jfire.trade.TradeSide;
 import org.nightlabs.jfire.trade.Trader;
+import org.nightlabs.jfire.trade.id.OfferID;
 import org.nightlabs.jfire.trade.id.OrderID;
 import org.nightlabs.jfire.trade.id.SegmentTypeID;
 import org.nightlabs.jfire.trade.jbpm.ProcessDefinitionAssignment;
@@ -334,5 +338,36 @@ implements SessionBean
 	}
 	
 	
+	/**
+	 * @ejb.interface-method
+	 * @ejb.permission role-name="org.nightlabs.jfire.trade.recurring.queryOrders"
+	 * @!ejb.transaction type="Supports" 
+	 */
+	public List<RecurringOrder> getOrders(Set<OrderID> orderIDs, String[] fetchGroups, int maxFetchDepth)
+	{
+		PersistenceManager pm = getPersistenceManager();
+		try {
+			return NLJDOHelper.getDetachedObjectList(pm, orderIDs, RecurringOrder.class, fetchGroups, maxFetchDepth);
+		} finally {
+			pm.close();
+		}
+	}
+	
+	/**
+	 * @ejb.interface-method
+	 * @ejb.permission role-name="org.nightlabs.jfire.trade.recurring.queryOffers"
+	 * @!ejb.transaction type="Supports" 
+	 */
+	public List<RecurringOffer> getOffers(Set<OfferID> offerIDs, String[] fetchGroups, int maxFetchDepth)
+	{
+		PersistenceManager pm = getPersistenceManager();
+		try {
+			return NLJDOHelper.getDetachedObjectList(pm, offerIDs, RecurringOffer.class, fetchGroups, maxFetchDepth);
+		} finally {
+			pm.close();
+		}
+	}
+	
 
+	
 }

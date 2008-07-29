@@ -153,7 +153,7 @@ implements SessionBean
 	public void unsetSessionContext() {
 		super.unsetSessionContext();
 	}
-	
+
 	/**
 	 * @ejb.create-method
 	 * @ejb.permission role-name="_Guest_"
@@ -167,12 +167,12 @@ implements SessionBean
 	 * @ejb.permission unchecked="true"
 	 */
 	public void ejbRemove() throws EJBException, RemoteException { }
-	
+
 	/**
 	 * This method is called by the datastore initialisation mechanism.
 	 * It creates the root simple product for the organisation itself.
 	 * Simple products of other organisations must be imported.
-	 * 
+	 *
 	 * @throws ModuleException
 	 * @throws CannotPublishProductTypeException
 	 *
@@ -197,7 +197,7 @@ implements SessionBean
 			moduleMetaData = new ModuleMetaData(
 					JFireSimpleTradeEAR.MODULE_NAME, "0.9.5-0-beta", "0.9.5-0-beta");
 			pm.makePersistent(moduleMetaData);
-			
+
 			SimpleProductTypeStruct.getSimpleProductTypeStruct(organisationID, pm);
 
 			SimpleProductTypeActionHandler simpleProductTypeActionHandler = new SimpleProductTypeActionHandler(
@@ -216,20 +216,20 @@ implements SessionBean
 
 			try {
 				ModeOfDelivery modeOfDelivery;
-				
+
 				modeOfDelivery = (ModeOfDelivery) pm.getObjectById(ModeOfDeliveryConst.MODE_OF_DELIVERY_ID_MANUAL);
 				deliveryConfiguration.addModeOfDelivery(modeOfDelivery);
-	
-				modeOfDelivery = (ModeOfDelivery) pm.getObjectById(ModeOfDeliveryConst.MODE_OF_DELIVERY_ID_MAILING_VIRTUAL);
-				deliveryConfiguration.addModeOfDelivery(modeOfDelivery);
+
+//				modeOfDelivery = (ModeOfDelivery) pm.getObjectById(ModeOfDeliveryConst.MODE_OF_DELIVERY_ID_MAILING_VIRTUAL);
+//				deliveryConfiguration.addModeOfDelivery(modeOfDelivery);
 
 				modeOfDelivery = (ModeOfDelivery) pm.getObjectById(ModeOfDeliveryConst.MODE_OF_DELIVERY_ID_MAILING_PHYSICAL);
 				deliveryConfiguration.addModeOfDelivery(modeOfDelivery);
-				
+
 				modeOfDelivery = (ModeOfDelivery) pm.getObjectById(ModeOfDeliveryConst.MODE_OF_DELIVERY_ID_DELIVER_TO_DELIVERY_QUEUE);
 				deliveryConfiguration.addModeOfDelivery(modeOfDelivery);
 
-				pm.makePersistent(deliveryConfiguration);
+				deliveryConfiguration = pm.makePersistent(deliveryConfiguration);
 			} catch (JDOObjectNotFoundException x) {
 				logger.warn("Could not populate default DeliveryConfiguration for JFireSimpleTrade with ModeOfDelivery s!", x);
 			}
@@ -246,7 +246,7 @@ implements SessionBean
 			store.setProductTypeStatus_published(user, rootSimpleProductType);
 
 			// give the root product type a property set
-			
+
 
 //			// TEST add test products
 //			// TODO remove this test stuff
@@ -486,7 +486,7 @@ implements SessionBean
 //			pm.close();
 //		}
 //	}
-	
+
 	/**
 	 * @ejb.interface-method
 	 * @!ejb.transaction type="Supports" @!This usually means that no transaction is opened which is significantly faster and recommended for all read-only EJB methods! Marco.
@@ -521,7 +521,7 @@ implements SessionBean
 			pm.close();
 		}
 	}
-	
+
 	/**
 	 * @ejb.interface-method
 	 * @!ejb.transaction type="Supports" @!This usually means that no transaction is opened which is significantly faster and recommended for all read-only EJB methods! Marco.
@@ -538,7 +538,7 @@ implements SessionBean
 			pm.close();
 		}
 	}
-	
+
 	/**
 	 * @return Returns a newly detached instance of <tt>SimpleProductType</tt> if <tt>get</tt> is true - otherwise <tt>null</tt>.
 	 *
@@ -727,7 +727,7 @@ implements SessionBean
 			pm.close();
 		}
 	}
-	
+
 //	/**
 //	 * @return Returns a newly detached instance of <tt>SimpleProductType</tt> if <tt>get</tt> is true - otherwise <tt>null</tt>.
 //	 *
@@ -855,7 +855,7 @@ implements SessionBean
 			ProductType pt = (ProductType) pm.getObjectById(productTypeID);
 			if (!(pt instanceof SimpleProductType))
 				throw new IllegalArgumentException("productTypeID \""+productTypeID+"\" specifies a ProductType of type \""+pt.getClass().getName()+"\", but must be \""+SimpleProductType.class.getName()+"\"!");
-			
+
 			SimpleProductType productType = (SimpleProductType)pt;
 
 			Tariff tariff = (Tariff) pm.getObjectById(tariffID);
@@ -1054,7 +1054,7 @@ implements SessionBean
 				else if (simpleProductType.getPackagePriceConfig() instanceof GridPriceConfig) {
 					Set<CustomerGroupID> unavailableCustomerGroupIDs = new HashSet<CustomerGroupID>();
 					GridPriceConfig gridPriceConfig = (GridPriceConfig) simpleProductType.getPackagePriceConfig();
-					
+
 					for (CustomerGroupID customerGroupID : unavailableCustomerGroupIDs)
 						gridPriceConfig.removeCustomerGroup(customerGroupID.organisationID, customerGroupID.customerGroupID);
 				}
@@ -1264,11 +1264,11 @@ implements SessionBean
 	// Is never used as this is done generic by the ProductTypeDAO
 //	/**
 //	 * Searches with the given searchQuery for {@link SimpleProductType}s.
-//	 * 
+//	 *
 //	 * @ejb.interface-method
 //	 * @ejb.permission role-name="_Guest_"
 //	 * @!ejb.transaction type="Supports" @!This usually means that no transaction is opened which is significantly faster and recommended for all read-only EJB methods! Marco.
-//	 * 
+//	 *
 //	 */
 //	public Collection<ProductTypeID> searchProductTypes(SimpleProductTypeQuery searchQuery)
 //	{

@@ -47,9 +47,9 @@ import org.nightlabs.jfire.accounting.id.CurrencyID;
 import org.nightlabs.jfire.base.BaseSessionBeanImpl;
 import org.nightlabs.jfire.jbpm.graph.def.ProcessDefinition;
 import org.nightlabs.jfire.jbpm.graph.def.id.ProcessDefinitionID;
+import org.nightlabs.jfire.organisation.Organisation;
 import org.nightlabs.jfire.security.User;
 import org.nightlabs.jfire.trade.LegalEntity;
-import org.nightlabs.jfire.trade.Offer;
 import org.nightlabs.jfire.trade.Order;
 import org.nightlabs.jfire.trade.Segment;
 import org.nightlabs.jfire.trade.SegmentType;
@@ -140,7 +140,7 @@ implements SessionBean
 			pm.getExtent(RecurredOffer.class);
 			
 			// persist process definitions
-			ProcessDefinitionID processDefinitionOfferVendorID = ProcessDefinitionID.create(getOrganisationID(), RECURRING_OFFER_PROCESS_DEFINITION_NAME_VENDOR);
+			ProcessDefinitionID processDefinitionOfferVendorID = ProcessDefinitionID.create(Organisation.DEV_ORGANISATION_ID, RECURRING_OFFER_PROCESS_DEFINITION_NAME_VENDOR);
 			ProcessDefinition processDefinitionOfferVendor;
 			try {
 				processDefinitionOfferVendor = (ProcessDefinition) pm.getObjectById(processDefinitionOfferVendorID);
@@ -149,7 +149,6 @@ implements SessionBean
 				pm.makePersistent(new ProcessDefinitionAssignment(RecurringOffer.class, TradeSide.vendor, processDefinitionOfferVendor));
 			}
 			// TODO: Need process definitions for customer side later
-			
 			
 		} finally {
 			pm.close();
@@ -334,7 +333,11 @@ implements SessionBean
 	public RecurringOfferConfiguration storeRecurringOfferConfiguration(RecurringOfferConfiguration configuration, boolean get, String[] fetchGroups, int maxFetchDepth)
 	{
 		PersistenceManager pm = getPersistenceManager();
-		return NLJDOHelper.storeJDO(pm, configuration, get, fetchGroups, maxFetchDepth);
+		try {
+			return RecurringTrader.getRecurringTrader(pm).storeRecurringOfferConfiguration(configuration, get, fetchGroups, maxFetchDepth);
+		} finally {
+			pm.close();
+		}
 	}
 	
 	
@@ -343,7 +346,7 @@ implements SessionBean
 	 * @ejb.permission role-name="org.nightlabs.jfire.trade.recurring.queryOrders"
 	 * @!ejb.transaction type="Supports" 
 	 */
-	public List<RecurringOrder> getOrders(Set<OrderID> orderIDs, String[] fetchGroups, int maxFetchDepth)
+	public List<RecurringOrder> getRecurringOrders(Set<OrderID> orderIDs, String[] fetchGroups, int maxFetchDepth)
 	{
 		PersistenceManager pm = getPersistenceManager();
 		try {
@@ -358,7 +361,7 @@ implements SessionBean
 	 * @ejb.permission role-name="org.nightlabs.jfire.trade.recurring.queryOffers"
 	 * @!ejb.transaction type="Supports" 
 	 */
-	public List<RecurringOffer> getOffers(Set<OfferID> offerIDs, String[] fetchGroups, int maxFetchDepth)
+	public List<RecurringOffer> getRecurringOffers(Set<OfferID> offerIDs, String[] fetchGroups, int maxFetchDepth)
 	{
 		PersistenceManager pm = getPersistenceManager();
 		try {

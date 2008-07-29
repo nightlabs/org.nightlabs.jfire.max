@@ -14,6 +14,9 @@ import org.nightlabs.jfire.trade.Order;
  *		table="JFireTrade_RecurredOffer"
  *
  * @jdo.inheritance strategy="new-table"
+ *
+ * @jdo.implements name="org.nightlabs.jfire.trade.ArticleContainer"
+ * @jdo.implements name="org.nightlabs.jfire.jbpm.graph.def.Statable"
  * 
  * @jdo.fetch-group name="RecurringOffer.recurringOffer" fields="recurringOffer"
  * 

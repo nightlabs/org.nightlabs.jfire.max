@@ -50,7 +50,6 @@ import org.nightlabs.jfire.organisation.Organisation;
 import org.nightlabs.jfire.prop.PropertySet;
 import org.nightlabs.jfire.prop.Struct;
 import org.nightlabs.jfire.prop.StructLocal;
-import org.nightlabs.jfire.security.SecurityReflector;
 import org.nightlabs.jfire.security.User;
 import org.nightlabs.util.CollectionUtil;
 import org.nightlabs.util.Util;
@@ -110,9 +109,9 @@ implements 	Serializable, AttachCallback, Statable, DeleteCallback
 	public static final String FETCH_GROUP_ISSUE_ASSIGNEE = "Issue.assignee";
 	public static final String FETCH_GROUP_ISSUE_WORK_TIME_RANGES = "Issue.issueWorkTimeRanges";
 	public static final String FETCH_GROUP_ISSUE_FILELIST = "Issue.issueFileAttachments";
-	
+
 	public static final String FETCH_GROUP_PROPERTY_SET = "Issue.propertySet";
-	
+
 	/**
 	 * @jdo.field primary-key="true"
 	 * @jdo.column length="100"
@@ -140,7 +139,7 @@ implements 	Serializable, AttachCallback, Statable, DeleteCallback
 	 *		mapped-by="issue"
 	 */
 	private Set<IssueLink> issueLinks;
-	
+
 	/**
 	 * Instances of {@link IssueFileAttachment}.
 	 *
@@ -152,7 +151,7 @@ implements 	Serializable, AttachCallback, Statable, DeleteCallback
 	 *		mapped-by="issue"
 	 */
 	private List<IssueFileAttachment> issueFileAttachments;
-	
+
 	/**
 	 * Instances of IssueWorkTimeRange.
 	 *
@@ -163,8 +162,8 @@ implements 	Serializable, AttachCallback, Statable, DeleteCallback
 	 *		dependent-element="true"
 	 *		mapped-by="issue"
 	 */
-	private Set<IssueWorkTimeRange> issueWorkTimeRanges;
-	
+	private List<IssueWorkTimeRange> issueWorkTimeRanges;
+
 	/**
 	 * Instances of {@link IssueComment}.
 	 *
@@ -176,7 +175,7 @@ implements 	Serializable, AttachCallback, Statable, DeleteCallback
 	 *		mapped-by="issue"
 	 */
 	private List<IssueComment> comments;
-	
+
 	/**
 	 * @jdo.field persistence-modifier="persistent"
 	 */
@@ -209,14 +208,14 @@ implements 	Serializable, AttachCallback, Statable, DeleteCallback
 	 * 		load-fetch-group="all"
 	 */
 	private User reporter; 
-	
+
 	/**
 	 * @jdo.field 
 	 * 		persistence-modifier="persistent" 
 	 * 		load-fetch-group="all"
 	 */
 	private User assignee; 
-	
+
 	/**
 	 * @jdo.field persistence-modifier="persistent" 
 	 */
@@ -236,7 +235,7 @@ implements 	Serializable, AttachCallback, Statable, DeleteCallback
 	 * @jdo.field persistence-modifier="persistent"
 	 */
 	private IssueResolution issueResolution;
-	
+
 	/**
 	 * @jdo.field 
 	 * 		persistence-modifier="persistent" 
@@ -244,12 +243,12 @@ implements 	Serializable, AttachCallback, Statable, DeleteCallback
 	 * 		dependent="true"
 	 */
 	private IssueLocal issueLocal;
-	
+
 	/**
 	 * @jdo.field persistence-modifier="persistent" @!dependent="true"
 	 */
 	private State state;
-	
+
 	/**
 	 * This is the history of <b>public</b> {@link State}s with the newest last and the oldest first.
 	 *
@@ -263,12 +262,12 @@ implements 	Serializable, AttachCallback, Statable, DeleteCallback
 	 * @jdo.join
 	 */
 	private List<State> states;
-	
+
 	/**
 	 * @jdo.field persistence-modifier="persistent"
 	 */
 	private PropertySet propertySet;
-	
+
 	/**
 	 * Returns the property set of this {@link Issue}.
 	 * 
@@ -277,14 +276,14 @@ implements 	Serializable, AttachCallback, Statable, DeleteCallback
 	public PropertySet getPropertySet() {
 		return propertySet;
 	}
-	
+
 	/**
 	 * The scope of the StructLocal by which the propertySet is build from.
 	 * 
 	 * @jdo.field persistence-modifier="persistent" null-value="exception" indexed="true"
 	 */
 	private String structLocalScope;
-	
+
 	/**
 	 * Returns the scope of the StructLocal by which the propertySet is build from.
 	 * @return The scope of the StructLocal by which the propertySet is build from.
@@ -292,14 +291,14 @@ implements 	Serializable, AttachCallback, Statable, DeleteCallback
 	public String getStructLocalScope() {
 		return structLocalScope;
 	}
-	
+
 	/**
 	 * The scope of the Struct by which the propertySet is build from.
 	 * 
 	 * @jdo.field persistence-modifier="persistent" null-value="exception" indexed="true"
 	 */
 	private String structScope;
-	
+
 	/**
 	 * Returns the scope of the Struct by which the propertySet is build from.
 	 * @return The scope of the Struct by which the propertySet is build from.
@@ -307,7 +306,7 @@ implements 	Serializable, AttachCallback, Statable, DeleteCallback
 	public String getStructScope() {
 		return structScope;
 	}
-	
+
 	/**
 	 * @deprecated Constructor exists only for JDO! 
 	 */
@@ -317,19 +316,19 @@ implements 	Serializable, AttachCallback, Statable, DeleteCallback
 	public Issue(String organisationID, long issueID)
 	{
 		Organisation.assertValidOrganisationID(organisationID);
-		
+
 		this.organisationID = organisationID;
 		this.createTimestamp = new Date();
 		this.issueID = issueID;
-		
+
 		subject = new IssueSubject(this);
 		description = new IssueDescription(this);
-		
+
 		issueFileAttachments = new ArrayList<IssueFileAttachment>();
 		comments = new ArrayList<IssueComment>();
 		issueLinks = new HashSet<IssueLink>();
-		issueWorkTimeRanges = new HashSet<IssueWorkTimeRange>();
-		
+		issueWorkTimeRanges = new ArrayList<IssueWorkTimeRange>();
+
 		this.issueLocal = new IssueLocal(this);
 		this.structScope = Struct.DEFAULT_SCOPE;
 		this.structLocalScope = StructLocal.DEFAULT_SCOPE;
@@ -338,7 +337,7 @@ implements 	Serializable, AttachCallback, Statable, DeleteCallback
 				Issue.class.getName(), 
 				structScope, structLocalScope);
 	}
-	
+
 	public Issue(String organisationID, long issueID, IssueType issueType)
 	{
 		this(organisationID, issueID);
@@ -363,7 +362,7 @@ implements 	Serializable, AttachCallback, Statable, DeleteCallback
 	{
 		return ObjectIDUtil.longObjectIDFieldToString(issueID);
 	}
-	
+
 	/**
 	 * @return Returns the issueType.
 	 */
@@ -492,20 +491,20 @@ implements 	Serializable, AttachCallback, Statable, DeleteCallback
 	public List<IssueComment> getComments() {
 		return comments;
 	}
-	
+
 	public Collection<IssueWorkTimeRange> getIssueWorkTimeRanges() {
 		return Collections.unmodifiableCollection(issueWorkTimeRanges);
 	}
-	
+
 //	/**
-//	 * @deprecated It is not good practice to expose 1-n-relationships in a JDO object. Since this Set here is solely linking simple Strings, it works fine,
-//	 * but to be consistent, there should never be the possibility (in a JDO object) to replace the set (in non-JDO-objects there are many reasons to do the same,
-//	 * as well). Therefore you should better have add and remove methods here and remove the setter.
-//	 * As you see below, I've hidden the internal String management more or less completely and instead work with instances of {@link ObjectID} - which
-//	 * is a much nicer API. This couldn't be easily done when exposing the Set<String> referencedObjectIDs directly. 
-//	 */
+//	* @deprecated It is not good practice to expose 1-n-relationships in a JDO object. Since this Set here is solely linking simple Strings, it works fine,
+//	* but to be consistent, there should never be the possibility (in a JDO object) to replace the set (in non-JDO-objects there are many reasons to do the same,
+//	* as well). Therefore you should better have add and remove methods here and remove the setter.
+//	* As you see below, I've hidden the internal String management more or less completely and instead work with instances of {@link ObjectID} - which
+//	* is a much nicer API. This couldn't be easily done when exposing the Set<String> referencedObjectIDs directly. 
+//	*/
 //	public void setReferencedObjectIDs(Set<String> objIds) {
-//		this.referencedObjectIDs = objIds;
+//	this.referencedObjectIDs = objIds;
 //	}
 
 	// This method should be named "getReferencedObjectIDs()". Please rename it, after you removed the above method, which currently blocks the name
@@ -530,30 +529,30 @@ implements 	Serializable, AttachCallback, Statable, DeleteCallback
 		if (_referencedObjectIDs != null) // instead of managing our cache of ObjectID instances, we could alternatively simply null it here, but the current implementation is more efficient.
 			_referencedObjectIDs.add(referencedObjectID);
 	}*/
-	
+
 	public Set<IssueLink> getIssueLinks() {
 		return Collections.unmodifiableSet(issueLinks);
 	}
-	
+
 //	public Set<ObjectID> getLinkedObjectIDs() {
-//		if (_linkedObjectIDs == null) {
-//			Set<ObjectID> ro = new HashSet<ObjectID>(issueLinks.size());
-//			for (IssueLink issueLink : issueLinks) {
-//				ObjectID objectID = issueLink.getLinkedObjectID();
-//				ro.add(objectID);
-//			}
-//			_linkedObjectIDs = ro;
-//		}
-//		return Collections.unmodifiableSet(_linkedObjectIDs);
+//	if (_linkedObjectIDs == null) {
+//	Set<ObjectID> ro = new HashSet<ObjectID>(issueLinks.size());
+//	for (IssueLink issueLink : issueLinks) {
+//	ObjectID objectID = issueLink.getLinkedObjectID();
+//	ro.add(objectID);
+//	}
+//	_linkedObjectIDs = ro;
+//	}
+//	return Collections.unmodifiableSet(_linkedObjectIDs);
 //	}
 
 //	public void addLinkedObjectID(ObjectID linkedObjectID) {
-//		if (linkedObjectID == null)
-//			throw new IllegalArgumentException("linkedObjectID must not be null!");
-//
-//		issueLinks.add(new IssueLink(this, IDGenerator.nextID(IssueLink.class), linkedObjectID.toString(), new IssueLinkType()));
-//		if (_linkedObjectIDs != null) // instead of managing our cache of ObjectID instances, we could alternatively simply null it here, but the current implementation is more efficient.
-//			_linkedObjectIDs.add(linkedObjectID);
+//	if (linkedObjectID == null)
+//	throw new IllegalArgumentException("linkedObjectID must not be null!");
+
+//	issueLinks.add(new IssueLink(this, IDGenerator.nextID(IssueLink.class), linkedObjectID.toString(), new IssueLinkType()));
+//	if (_linkedObjectIDs != null) // instead of managing our cache of ObjectID instances, we could alternatively simply null it here, but the current implementation is more efficient.
+//	_linkedObjectIDs.add(linkedObjectID);
 //	}
 
 	/**
@@ -566,12 +565,12 @@ implements 	Serializable, AttachCallback, Statable, DeleteCallback
 				IDGenerator.getOrganisationID(),
 				IDGenerator.nextID(IssueLink.class),
 				this, issueLinkType, linkedObject);
-		
+
 		issueLinks.add(issueLink);
 
 		return issueLink;
 	}
-	
+
 	/**
 	 * @param issueLinkType the type of the new <code>IssueLink</code>. Must not be <code>null</code>.
 	 * @param linkedObjectID  an object-id (implementing {@link ObjectID}) identifying a persistence-capable JDO object.
@@ -599,7 +598,7 @@ implements 	Serializable, AttachCallback, Statable, DeleteCallback
 	public IssueResolution getIssueResolution() {
 		return issueResolution;
 	}
-	
+
 	public void setIssueResolution(IssueResolution issueResolution) {
 		this.issueResolution = issueResolution;
 	}
@@ -610,14 +609,14 @@ implements 	Serializable, AttachCallback, Statable, DeleteCallback
 	public StatableLocal getStatableLocal() {
 		return issueLocal;
 	}
-	
+
 	/**
 	 * {@inheritDoc}}
 	 */
 	public State getState() {
 		return state;
 	}
-	
+
 	/**
 	 * @jdo.field persistence-modifier="none"
 	 */
@@ -630,7 +629,7 @@ implements 	Serializable, AttachCallback, Statable, DeleteCallback
 
 		return _states;
 	}
-	
+
 	/**
 	 * {@inheritDoc}}
 	 */
@@ -646,7 +645,7 @@ implements 	Serializable, AttachCallback, Statable, DeleteCallback
 			getIssueType().createProcessInstanceForIssue(this);
 		}
 	}
-	
+
 	/**
 	 * See {@link #jdoPreStore()}.
 	 */
@@ -656,7 +655,7 @@ implements 	Serializable, AttachCallback, Statable, DeleteCallback
 
 	public void jdoPreAttach() {
 	}
-	
+
 	protected PersistenceManager getPersistenceManager()
 	{
 		PersistenceManager pm = JDOHelper.getPersistenceManager(this);
@@ -673,8 +672,8 @@ implements 	Serializable, AttachCallback, Statable, DeleteCallback
 		if (this.getClass() != obj.getClass()) return false;
 		Issue o = (Issue) obj;
 		return
-			Util.equals(this.organisationID, o.organisationID) &&
-			Util.equals(this.issueID, o.issueID);
+		Util.equals(this.organisationID, o.organisationID) &&
+		Util.equals(this.issueID, o.issueID);
 	}
 
 	@Override
@@ -705,7 +704,7 @@ implements 	Serializable, AttachCallback, Statable, DeleteCallback
 	{
 		return organisationID + '/' + Long.toString(issueID);
 	}
-	
+
 	public IssueLocal getIssueLocal() {
 		return issueLocal;
 	}
@@ -731,25 +730,39 @@ implements 	Serializable, AttachCallback, Statable, DeleteCallback
 		for (State state : statesToDelete)
 			pm.deletePersistent(state);
 	}
-	
+
 	public boolean addIssueFileAttachment(IssueFileAttachment issueFileAttachment) {
 		return this.issueFileAttachments.add(issueFileAttachment);
 	}
-	
+
 	public boolean removeIssueFileAttachment(IssueFileAttachment issueFileAttachment) {
 		return this.issueFileAttachments.remove(issueFileAttachment);
 	}
-	
+
 	public boolean isStarted()
 	{
 		return isStarted;
 	}
-	
-	public boolean startWorking() {
-		return this.issueWorkTimeRanges.add(new IssueWorkTimeRange(organisationID, assignee, this));
+
+	public boolean startWorking(Date date) {
+		if (isStarted) {
+			return false;
+		}
+
+		isStarted = true;
+		IssueWorkTimeRange wt = new IssueWorkTimeRange(organisationID, assignee, this);
+		wt.setFrom(date);
+		return this.issueWorkTimeRanges.add(wt);
 	}
-	
+
 	public boolean endWorking(Date date) {
-		return this.issueWorkTimeRanges.add(new IssueWorkTimeRange(organisationID, assignee, this));
+		if (!isStarted) {
+			return false;
+		}
+
+		isStarted = false;
+		IssueWorkTimeRange wt = issueWorkTimeRanges.get(issueWorkTimeRanges.size() - 1);
+		wt.setTo(date);
+		return true;
 	}
 }

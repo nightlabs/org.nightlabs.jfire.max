@@ -28,7 +28,6 @@ package org.nightlabs.jfire.trade.recurring;
 
 import java.io.IOException;
 import java.rmi.RemoteException;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
 
@@ -187,7 +186,6 @@ implements SessionBean
 	public RecurringOrder createPurchaseRecurringOrder(
 			AnchorID vendorID, String orderIDPrefix, CurrencyID currencyID,
 			SegmentTypeID[] segmentTypeIDs, String[] fetchGroups, int maxFetchDepth)
-//	throws ModuleException
 	{
 		if (vendorID == null)
 			throw new IllegalArgumentException("vendorID must not be null!");
@@ -248,7 +246,6 @@ implements SessionBean
 	public RecurringOrder createSaleRecurringOrder(
 			AnchorID customerID, String orderIDPrefix, CurrencyID currencyID,
 			SegmentTypeID[] segmentTypeIDs, String[] fetchGroups, int maxFetchDepth)
-//	throws ModuleException
 	{
 		if (customerID == null)
 			throw new IllegalArgumentException("customerID must not be null!");
@@ -301,8 +298,6 @@ implements SessionBean
 	public RecurringOffer createRecurringOffer(OrderID orderID, String offerIDPrefix, String[] fetchGroups, int maxFetchDepth)
 	throws ModuleException
 	{
-
-
 		PersistenceManager pm = getPersistenceManager();
 		try {
 			RecurringTrader trader =  RecurringTrader.getRecurringTrader(pm);
@@ -335,6 +330,8 @@ implements SessionBean
 	{
 		PersistenceManager pm = getPersistenceManager();
 		try {
+			// The store storeRecurringOfferConfiguration of RecurringTrader
+			// obtains its own PersistenceManager, that will also be the one here
 			return RecurringTrader.getRecurringTrader(pm).storeRecurringOfferConfiguration(configuration, get, fetchGroups, maxFetchDepth);
 		} finally {
 			pm.close();

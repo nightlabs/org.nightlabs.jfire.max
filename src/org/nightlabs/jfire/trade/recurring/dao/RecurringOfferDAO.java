@@ -10,6 +10,7 @@ import org.nightlabs.jfire.trade.id.OfferID;
 import org.nightlabs.jfire.trade.recurring.RecurringOffer;
 import org.nightlabs.jfire.trade.recurring.RecurringTradeManager;
 import org.nightlabs.jfire.trade.recurring.RecurringTradeManagerUtil;
+
 import org.nightlabs.progress.ProgressMonitor;
 
 public class RecurringOfferDAO extends BaseJDOObjectDAO<OfferID, RecurringOffer>
@@ -31,11 +32,13 @@ public class RecurringOfferDAO extends BaseJDOObjectDAO<OfferID, RecurringOffer>
 	@Override
 	protected Collection<RecurringOffer> retrieveJDOObjects(Set<OfferID> offerIDs,
 			String[] fetchGroups, int maxFetchDepth, ProgressMonitor monitor)
-	throws Exception 
-	{
-		RecurringTradeManager rtm = RecurringTradeManagerUtil.getHome(SecurityReflector.getInitialContextProperties()).create();
-		return rtm.getRecurringOffers(offerIDs, fetchGroups, maxFetchDepth);
-	}
+			throws Exception
+			{
+		
+		
+		RecurringTradeManager tm = RecurringTradeManagerUtil.getHome(SecurityReflector.getInitialContextProperties()).create();
+		return tm.getRecurringOffers(offerIDs, fetchGroups, maxFetchDepth);
+			}
 
 	public RecurringOffer getRecurringOffer(OfferID offerID, String[] fetchGroups, int maxFetchDepth, ProgressMonitor monitor)
 	{
@@ -46,5 +49,6 @@ public class RecurringOfferDAO extends BaseJDOObjectDAO<OfferID, RecurringOffer>
 	{
 		return getJDOObjects(null, offerIDs, fetchGroups, maxFetchDepth, monitor);
 	}
+
 
 } 

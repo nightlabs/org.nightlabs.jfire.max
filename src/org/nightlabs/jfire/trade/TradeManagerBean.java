@@ -795,7 +795,7 @@ implements SessionBean
 	{
 		PersistenceManager pm = getPersistenceManager();
 		try {
-			return new ArrayList<OrderID>(Order.getOrderIDs(pm,orderClass, subclasses,vendorID, customerID, rangeBeginIdx, rangeEndIdx));
+			return new ArrayList<OrderID>(Order.getOrderIDs(pm, orderClass, subclasses,vendorID, customerID, rangeBeginIdx, rangeEndIdx));
 		} finally {
 			pm.close();
 		}

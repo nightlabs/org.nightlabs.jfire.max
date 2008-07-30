@@ -750,6 +750,7 @@ implements 	Serializable, AttachCallback, Statable, DeleteCallback
 		}
 
 		isStarted = true;
+		
 		IssueWorkTimeRange wt = new IssueWorkTimeRange(organisationID, assignee, this);
 		wt.setFrom(date);
 		return this.issueWorkTimeRanges.add(wt);
@@ -761,8 +762,12 @@ implements 	Serializable, AttachCallback, Statable, DeleteCallback
 		}
 
 		isStarted = false;
-		IssueWorkTimeRange wt = issueWorkTimeRanges.get(issueWorkTimeRanges.size() - 1);
+		IssueWorkTimeRange wt = getLastestIssueWorkTimeRange();
 		wt.setTo(date);
 		return true;
+	}
+	
+	public IssueWorkTimeRange getLastestIssueWorkTimeRange() {
+		return issueWorkTimeRanges.size() > 0 ? issueWorkTimeRanges.get(issueWorkTimeRanges.size() -1) : null;
 	}
 }

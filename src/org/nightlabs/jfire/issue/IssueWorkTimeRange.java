@@ -6,6 +6,7 @@ import java.util.Date;
 import javax.jdo.JDOHelper;
 import javax.jdo.PersistenceManager;
 
+import org.nightlabs.jfire.idgenerator.IDGenerator;
 import org.nightlabs.jfire.organisation.Organisation;
 import org.nightlabs.jfire.security.User;
 import org.nightlabs.util.Util;
@@ -107,6 +108,7 @@ implements Serializable
 		if (user == null)
 			throw new IllegalArgumentException("user must not be null!");
 		
+		this.issueWorkTimeRangeID = IDGenerator.nextID(IssueWorkTimeRange.class);
 		this.organisationID = organisationID;
 		this.issue = issue;
 		this.user = user;

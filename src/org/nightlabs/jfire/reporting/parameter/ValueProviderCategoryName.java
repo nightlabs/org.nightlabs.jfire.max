@@ -47,7 +47,7 @@ import org.nightlabs.i18n.I18nText;
  *
  * @jdo.create-objectid-class field-order="organisationID, valueProviderCategoryID"
  *
- * @jdo.fetch-group name="ValueProvider.name" fields="valueProvider, names"
+ * @jdo.fetch-group name="ValueProvider.name" fields="valueProviderCategory, names"
  */
 public class ValueProviderCategoryName extends I18nText implements Serializable {
 	

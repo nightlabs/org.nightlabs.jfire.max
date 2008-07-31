@@ -26,6 +26,12 @@ import org.nightlabs.jfire.trade.Article;
  *
  * @jdo.create-objectid-class field-order="organisationID, recurringTradeProductTypeActionHandlerID"
  *
+ * @jdo.query name="getRecurringTradeProductTypeActionHandlerByProductTypeClassName" query="
+ *		SELECT UNIQUE
+ *		WHERE this.recurringTradeproductTypeClassName == pProductTypeClassName
+ *		PARAMETERS String pProductTypeClassName
+ *		import java.lang.String"
+ *
  */
 public abstract class RecurringTradeProductTypeActionHandler {
 
@@ -48,7 +54,7 @@ public abstract class RecurringTradeProductTypeActionHandler {
 	private String recurringTradeproductTypeClassName;
 
 
-	
+
 	public String getOrganisationID() {
 		return organisationID;
 	}
@@ -63,7 +69,7 @@ public abstract class RecurringTradeProductTypeActionHandler {
 		return recurringTradeproductTypeClassName;
 	}
 
-		
+
 	/**
 	 * @deprecated Only for JDO!
 	 */
@@ -89,21 +95,31 @@ public abstract class RecurringTradeProductTypeActionHandler {
 			if (!ProductType.class.isAssignableFrom(recurringProductTypeClass))
 				throw new IllegalArgumentException("productTypeClass is a class, but does not extend " + ProductType.class.getName() + "!");
 		}
-		
+
 		this.organisationID = organisationID;
 		this.recurringTradeProductTypeActionHandlerID = recurringProductTypeActionHandlerID;
 		this.recurringTradeproductTypeClassName = recurringProductTypeClass.getName();
 
 	}
 
-
 	public static RecurringTradeProductTypeActionHandler getRecurringTradeProductTypeActionHandler(PersistenceManager pm, Class<? extends ProductType> productTypeClass)
 	{
 		Class<?> searchClass = productTypeClass;
-		
-		
 		while (searchClass != null) {
-			RecurringTradeProductTypeActionHandler res = _getProductTypeActionHandler(pm, searchClass);
+
+			Query q = pm.newNamedQuery(RecurringTradeProductTypeActionHandler.class, "getRecurringTradeProductTypeActionHandlerByProductTypeClassName");
+			RecurringTradeProductTypeActionHandler res = (RecurringTradeProductTypeActionHandler) q.execute(searchClass.getName());
+
+			Class<?>[] interfaces = searchClass.getInterfaces();
+			if (interfaces.length > 1) {
+				for (int i = 0; i < interfaces.length; i++) {
+					Class<?> intf = interfaces[i];
+					res = (RecurringTradeProductTypeActionHandler) q.execute(intf.getName());
+					if (res != null)
+						return res;
+				}
+			}
+
 			if (res != null)
 				return res;
 
@@ -114,24 +130,6 @@ public abstract class RecurringTradeProductTypeActionHandler {
 	}
 
 
-	private static RecurringTradeProductTypeActionHandler _getProductTypeActionHandler(PersistenceManager pm, Class<?> searchClass)
-	{
-		Query q = pm.newNamedQuery(RecurringTradeProductTypeActionHandler.class, "getProductTypeActionHandlerByProductTypeClassName");
-		RecurringTradeProductTypeActionHandler res = (RecurringTradeProductTypeActionHandler) q.execute(searchClass.getName());
-		if (res != null)
-			return res;
 
-		Class<?>[] interfaces = searchClass.getInterfaces();
-		if (interfaces.length > 1) {
-			for (int i = 0; i < interfaces.length; i++) {
-				Class<?> intf = interfaces[i];
-				res = (RecurringTradeProductTypeActionHandler) q.execute(intf.getName());
-				if (res != null)
-					return res;
-			}
-		}
 
-		return null;
-	}
-	
 }

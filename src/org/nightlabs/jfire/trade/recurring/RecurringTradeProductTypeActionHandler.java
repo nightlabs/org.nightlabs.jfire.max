@@ -7,7 +7,9 @@ import javax.jdo.PersistenceManager;
 import javax.jdo.Query;
 
 import org.nightlabs.jdo.ObjectIDUtil;
+import org.nightlabs.jfire.organisation.Organisation;
 import org.nightlabs.jfire.store.ProductType;
+import org.nightlabs.jfire.store.ProductTypeActionHandler;
 import org.nightlabs.jfire.store.ProductTypeActionHandlerNotFoundException;
 import org.nightlabs.jfire.trade.Article;
 
@@ -79,7 +81,14 @@ public abstract class RecurringTradeProductTypeActionHandler {
 
 	public abstract Map<Article, Article> createArticles(RecurredOffer offer, Set<Article> recurringArticles);
 
-
+	/**
+	 * @param organisationID First part of primary key: The identifier of that organisation which defined this handler.
+	 *		Use {@link Organisation#DEV_ORGANISATION_ID} if you contribute directly to a JFire project and your own
+	 *		organisation's unique identifier (i.e. your domain), if you write an own project.
+	 * @param productTypeActionHandlerID The ID within the scope of the <code>organisationID</code>
+	 * @param productTypeClass The class for which this handler shall be responsible. It will apply to all
+	 *		inherited classes as well, except if there is another handler registered for the extended type.
+	 */
 	public RecurringTradeProductTypeActionHandler(
 			String organisationID, String recurringProductTypeActionHandlerID,
 			Class<? extends ProductType> recurringProductTypeClass)
@@ -102,6 +111,26 @@ public abstract class RecurringTradeProductTypeActionHandler {
 
 	}
 
+	/**
+	 * This method finds the right handler for the given class (which must extend {@link ProductType}).
+	 * Therefore, the method traverses the inheritance and searches for all parent classes and for
+	 * all interfaces.
+	 * <p>
+	 * The search order is like this:
+	 * <ul>
+	 * <li>class</li>
+	 * <li>interfaces in declaration order</li>
+	 * <li>superclass</li>
+	 * <li>interfaces of superclass in declaration order</li>
+	 * <li>...and so on for all super-super-[...]-classes...</li>
+	 * </ul>
+	 * </p>
+	 *
+	 * @param pm The <code>PersistenceManager</code> to be used for accessing the datastore.
+	 * @param productTypeClass The class (must be an inheritent of {@link ProductType}) for which to find a handler.
+	 * @return Returns an instance of {@link ProductTypeActionHandler}. Never returns <code>null</code>.
+	 * @throws ProductTypeActionHandlerNotFoundException If no handler is registered for the given class or one of its
+	 */	
 	public static RecurringTradeProductTypeActionHandler getRecurringTradeProductTypeActionHandler(PersistenceManager pm, Class<? extends ProductType> productTypeClass)
 	{
 		Class<?> searchClass = productTypeClass;

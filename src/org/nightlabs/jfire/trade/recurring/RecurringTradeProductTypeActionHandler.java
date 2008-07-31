@@ -3,6 +3,7 @@ package org.nightlabs.jfire.trade.recurring;
 import java.util.Map;
 import java.util.Set;
 
+import javax.jdo.JDOHelper;
 import javax.jdo.PersistenceManager;
 import javax.jdo.Query;
 
@@ -81,6 +82,15 @@ public abstract class RecurringTradeProductTypeActionHandler {
 
 	public abstract Map<Article, Article> createArticles(RecurredOffer offer, Set<Article> recurringArticles);
 
+	protected PersistenceManager getPersistenceManager()
+	{
+		PersistenceManager pm = JDOHelper.getPersistenceManager(this);
+		if (pm == null)
+			throw new IllegalStateException("This instance of " + this.getClass().getName() + " is not yet persistent or currently not attached to a datastore! Cannot obtain PersistenceManager!");
+
+		return pm;
+	}
+	
 	/**
 	 * @param organisationID First part of primary key: The identifier of that organisation which defined this handler.
 	 *		Use {@link Organisation#DEV_ORGANISATION_ID} if you contribute directly to a JFire project and your own

@@ -42,7 +42,7 @@ public class DeliveryQueueDAO extends BaseJDOObjectDAO<DeliveryQueueID, Delivery
 		return getDeliveryQueues(Arrays.asList(new DeliveryQueueID[] { deliveryQueueId }), fetchGroups, maxFetchDepth, monitor).iterator().next();
 	}
 	
-	public synchronized Collection<DeliveryQueue> getDeliveryQueues(Collection<DeliveryQueueID> deliveryQueueIds, String[] fetchGroups, int maxFetchDepth, ProgressMonitor monitor) 
+	public synchronized Collection<DeliveryQueue> getDeliveryQueues(Collection<DeliveryQueueID> deliveryQueueIds, String[] fetchGroups, int maxFetchDepth, ProgressMonitor monitor)
 	{
 		if (deliveryQueueIds == null || deliveryQueueIds.isEmpty()) {
 			return Collections.emptySet();
@@ -55,7 +55,11 @@ public class DeliveryQueueDAO extends BaseJDOObjectDAO<DeliveryQueueID, Delivery
 	}
 	
 	public synchronized DeliveryQueue storeDeliveryQueue(DeliveryQueue deliveryQueue, boolean get, String[] fetchGroups, int maxFetchDepth, ProgressMonitor monitor) {
-		return storeDeliveryQueues(Arrays.asList(new DeliveryQueue[] { deliveryQueue}), get, fetchGroups, maxFetchDepth, monitor).iterator().next();
+		Collection<DeliveryQueue> result = storeDeliveryQueues(Collections.singleton(deliveryQueue), get, fetchGroups, maxFetchDepth, monitor);
+		if (get)
+			return result.iterator().next();
+		else
+			return null;
 	}
 	
 	public synchronized Collection<DeliveryQueue> storeDeliveryQueues(Collection<DeliveryQueue> deliveryQueues, boolean get, String[] fetchGroups, int maxFetchDepth, ProgressMonitor monitor) {

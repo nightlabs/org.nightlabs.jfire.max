@@ -296,6 +296,15 @@ implements Serializable
 			changeText.append("\n");
 		}
 		
+		if (!Util.equals(oldIssue.isStarted(), newIssue.isStarted())) 
+		{
+			changeText.append("Changed status");
+			changeText.append(" from ");
+			changeText.append(oldIssue.isStarted() ? "Working" : "Stopped");
+			changeText.append(" ---> ");
+			changeText.append(newIssue.isStarted() ? "Working" : "Stopped");
+		}
+		
 		this.change = changeText.toString();
 	}
 	

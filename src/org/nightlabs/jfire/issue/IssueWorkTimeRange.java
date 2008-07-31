@@ -83,7 +83,7 @@ implements Serializable
 	/**
 	 * @jdo.field persistence-modifier="persistent"
 	 */
-	private Double durationHours;
+	private Double duration;
 	
 	/**
 	 * @jdo.field 
@@ -140,8 +140,8 @@ implements Serializable
 		return to;
 	}
 	
-	public Double getDurationHours() {
-		return durationHours;
+	public Double getDuration() {
+		return duration;
 	}
 	
 	public User getUser() {
@@ -154,7 +154,7 @@ implements Serializable
 	
 	public void setTo(Date to) {
 		this.to = to;
-		this.durationHours = new Double(to.getTime() - from.getTime());
+		this.duration = new Double(to.getTime() - from.getTime());
 	}
 	
 	/**

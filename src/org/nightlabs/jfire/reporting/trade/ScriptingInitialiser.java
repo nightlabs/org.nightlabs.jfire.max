@@ -3,11 +3,14 @@ package org.nightlabs.jfire.reporting.trade;
 import java.io.File;
 import java.util.Locale;
 
+import javax.jdo.JDOObjectNotFoundException;
 import javax.jdo.PersistenceManager;
 
 import org.nightlabs.ModuleException;
+import org.nightlabs.jfire.reporting.scripting.ScriptingConstants;
 import org.nightlabs.jfire.scripting.ScriptCategory;
 import org.nightlabs.jfire.scripting.ScriptingIntialiserException;
+import org.nightlabs.jfire.scripting.id.ScriptRegistryItemID;
 import org.nightlabs.jfire.servermanager.JFireServerManager;
 
 /**
@@ -35,13 +38,24 @@ public class ScriptingInitialiser {
 			String organisationID
 		) throws ScriptingIntialiserException
 	{
-		ScriptCategory rootCategory = org.nightlabs.jfire.scripting.ScriptingInitialiser.createCategory(
-				pm, null,
+		ScriptRegistryItemID rootCatID = ScriptRegistryItemID.create(
+				organisationID, ScriptingConstants.SCRIPT_REGISTRY_ITEM_TYPE_ROOT,
+				ScriptingConstants.SCRIPT_REGISTRY_ITEM_ID_CATEGORY_ROOT);
+		
+		ScriptCategory rootCategory = null;
+		try {
+			rootCategory = (ScriptCategory) pm.getObjectById(rootCatID);
+		} catch (JDOObjectNotFoundException e) {
+			throw new IllegalStateException("Could not find root Reporting ScriptCategory. Was it intialized correctly?", e);
+		}
+		
+		ScriptCategory tradeCategory = org.nightlabs.jfire.scripting.ScriptingInitialiser.createCategory(
+				pm, rootCategory,
 				organisationID,
 				ScriptingTradeConstants.SCRIPT_REGISTRY_ITEM_TYPE_ROOT,
-				ScriptingTradeConstants.SCRIPT_REGISTRY_ITEM_ID_CATEGORY_ROOT);
-		rootCategory.getName().setText(Locale.ENGLISH.getLanguage(), "JFire Trade Scripting");
-		rootCategory.getName().setText(Locale.GERMAN.getLanguage(), "JFire Trade Scripting");
+				ScriptingTradeConstants.SCRIPT_REGISTRY_ITEM_ID_CATEGORY_TRADE);
+		tradeCategory.getName().setText(Locale.ENGLISH.getLanguage(), "Trade scripts");
+		tradeCategory.getName().setText(Locale.GERMAN.getLanguage(), "Trade scripts");
 		
 		
 		String j2eeBaseDir = jfireServerManager.getJFireServerConfigModule().getJ2ee().getJ2eeDeployBaseDirectory();
@@ -52,8 +66,8 @@ public class ScriptingInitialiser {
 			if (subDirs[i].isDirectory()) {
 				new org.nightlabs.jfire.scripting.ScriptingInitialiser(
 						scriptDirSuffix+File.separator+subDirs[i].getName(),
-						rootCategory,
-						ScriptingTradeConstants.SCRIPT_REGISTRY_ITEM_TYPE_TRADE_SCRIPT,
+						tradeCategory,
+						ScriptingTradeConstants.SCRIPT_REGISTRY_ITEM_TYPE_SCRIPT_TRADE,
 						jfireServerManager,
 						pm,
 						organisationID

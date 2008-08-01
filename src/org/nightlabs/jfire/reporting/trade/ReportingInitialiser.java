@@ -43,7 +43,7 @@ public class ReportingInitialiser {
 				new org.nightlabs.jfire.reporting.ReportingInitialiser(
 						reportDirSuffix+File.separator+subDirs[i].getName(),
 						rootCategory,
-						ScriptingTradeConstants.SCRIPT_REGISTRY_ITEM_TYPE_TRADE_SCRIPT,
+						ScriptingTradeConstants.SCRIPT_REGISTRY_ITEM_TYPE_SCRIPT_TRADE,
 						jfireServerManager,
 						pm,
 						organisationID

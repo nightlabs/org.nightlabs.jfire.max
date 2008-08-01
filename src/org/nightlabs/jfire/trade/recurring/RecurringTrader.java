@@ -58,11 +58,11 @@ public class RecurringTrader {
 
 
 	/**
-	 * This method returns the singleton instance of Trader. If there is no
-	 * instance of Trader in the datastore, yet, it will be created.
+	 * This method returns the singleton instance of {@link RecurringTrader}. If there is no
+	 * instance of {@link RecurringTrader} in the datastore, yet, it will be created.
 	 *
-	 * @param pm
-	 * @return
+	 * @param pm The PersistenceManager to retrieve the {@link RecurringTrader} with.
+	 * @return The {@link RecurringTrader} of the datastore of the given PersistenceManager.
 	 */
 	public static RecurringTrader getRecurringTrader(PersistenceManager pm)
 	{
@@ -96,8 +96,10 @@ public class RecurringTrader {
 		return res;
 	}
 
-
-
+	/**
+	 * @return the {@link PersistenceManager} associated with this {@link RecurringTrader}
+	 * will fail if the instance is not attached.
+	 */
 	protected PersistenceManager getPersistenceManager()
 	{
 		PersistenceManager pm = JDOHelper.getPersistenceManager(this);
@@ -107,7 +109,6 @@ public class RecurringTrader {
 
 		return pm;
 	}
-
 
 
 	public String getOrderIDPrefix(User user, String orderIDPrefix)
@@ -144,10 +145,10 @@ public class RecurringTrader {
 	}
 
 	/**
-	 * This method creates a new RecurredOffer from an existing recurringOffer
+	 * This method creates a new {@link RecurredOffer} from an existing {@link RecurringOffer}
 	 *
-	 * @param recurringOffer the Recurringoffer
-	 * @return newly created recurredOffer
+	 * @param recurringOffer the {@link RecurringOffer}
+	 * @return newly created {@link RecurredOffer}
 	 */
 	public RecurredOffer createRecurredOffer(RecurringOffer recurringOffer) throws ModuleException
 	{

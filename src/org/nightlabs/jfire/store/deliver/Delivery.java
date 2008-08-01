@@ -71,7 +71,7 @@ import org.nightlabs.util.Util;
  *		field-order="organisationID, deliveryID"
  *		include-body="id/DeliveryID.body.inc"
  *
- * @jdo.fetch-group name="DeliveryTableData" fetch-groups="default" fields="user, endDT, partner, articles, articleIDs"
+ * @jdo.fetch-group name="DeliveryTableData" fetch-groups="default" fields="user, endDT, partner, articles, articleIDs, deliveryNotes"
  */
 public class Delivery
 implements Serializable, StoreCallback
@@ -861,7 +861,7 @@ implements Serializable, StoreCallback
 	}
 
 	/**
-	 * @jdo.field persistence-modifier="transactional"
+	 * @jdo.field persistence-modifier="none"
 	 */
 	private Set<DeliveryNoteID> deliveryNoteIDs = null;
 

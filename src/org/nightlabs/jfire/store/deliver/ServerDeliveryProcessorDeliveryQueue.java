@@ -17,7 +17,7 @@ import org.nightlabs.jfire.transfer.Anchor;
 
 /**
  * This implementation of {@link org.nightlabs.jfire.store.deliver.ServerDeliveryProcessor}
- * represents delivery to a delivery queue. These delivers can be then processed later.
+ * represents delivery to a delivery queue. These deliveries can be then processed later.
  *
  * @author Tobias Langner <!-- tobias[dot]langner[at]nightlabs[dot]de -->
  * @author Marco Schulze - marco at nightlabs dot de
@@ -140,7 +140,7 @@ extends ServerDeliveryProcessor
 	@Override
 	protected CheckRequirementsResult _checkRequirements(CheckRequirementsEnvironment checkRequirementsEnvironment) {
 		DeliveryQueueConfigModule cfMod = getDeliveryQueueConfigModule();
-		if (cfMod.getVisibleDeliveryQueues().isEmpty()) 
+		if (cfMod.getVisibleDeliveryQueues().isEmpty())
 		{
 			String resultCode = ERROR_CODE_NO_DELIVERY_QUEUE_DEFINED;
 			String message = Messages.getString("org.nightlabs.jfire.store.deliver.ServerDeliveryProcessorDeliveryQueue.message.noDeliveryQueueDefined"); //$NON-NLS-1$

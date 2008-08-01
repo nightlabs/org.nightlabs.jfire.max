@@ -14,7 +14,6 @@ import javax.jdo.Query;
 import javax.jdo.listener.AttachCallback;
 import javax.jdo.listener.DetachCallback;
 
-import org.apache.log4j.Logger;
 import org.nightlabs.jfire.idgenerator.IDGenerator;
 import org.nightlabs.jfire.store.deliver.id.DeliveryID;
 import org.nightlabs.jfire.store.deliver.id.DeliveryQueueID;
@@ -51,7 +50,7 @@ import org.nightlabs.jfire.store.deliver.id.DeliveryQueueID;
  */
 public class DeliveryQueue implements Serializable, AttachCallback, DetachCallback {
 	
-	private static final Logger logger = Logger.getLogger(DeliveryQueue.class);
+//	private static final Logger logger = Logger.getLogger(DeliveryQueue.class);
 	
 	public static final String FETCH_GROUP_DELIVERY_QUEUE = "DeliveryQueue.this";
 	public static final String FETCH_GROUP_NAME = "DeliveryQueue.name";

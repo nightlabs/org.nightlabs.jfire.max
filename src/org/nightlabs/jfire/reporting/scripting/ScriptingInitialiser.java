@@ -41,9 +41,16 @@ public class ScriptingInitialiser {
 				organisationID,
 				ScriptingConstants.SCRIPT_REGISTRY_ITEM_TYPE_ROOT,
 				ScriptingConstants.SCRIPT_REGISTRY_ITEM_ID_CATEGORY_ROOT);
-		rootCategory.getName().setText(Locale.ENGLISH.getLanguage(), "JFire Reporting Base Scripting");
-		rootCategory.getName().setText(Locale.GERMAN.getLanguage(), "JFire Reporting Base Scripting");
+		rootCategory.getName().setText(Locale.ENGLISH.getLanguage(), "Reporting");
+		rootCategory.getName().setText(Locale.GERMAN.getLanguage(), "Reporting");
 		
+		ScriptCategory baseCategory = org.nightlabs.jfire.scripting.ScriptingInitialiser.createCategory(
+				pm, rootCategory,
+				organisationID,
+				ScriptingConstants.SCRIPT_REGISTRY_ITEM_TYPE_ROOT,
+				ScriptingConstants.SCRIPT_REGISTRY_ITEM_ID_CATEGORY_BASE);
+		baseCategory.getName().setText(Locale.ENGLISH.getLanguage(), "Base scripts");
+		baseCategory.getName().setText(Locale.GERMAN.getLanguage(), "Base scripts");
 		
 		String j2eeBaseDir = jfireServerManager.getJFireServerConfigModule().getJ2ee().getJ2eeDeployBaseDirectory();
 		String scriptDirSuffix = JFireReportingEAR.MODULE_NAME+".ear"+File.separator+"script";
@@ -53,8 +60,8 @@ public class ScriptingInitialiser {
 			if (subDirs[i].isDirectory()) {
 				new org.nightlabs.jfire.scripting.ScriptingInitialiser(
 						scriptDirSuffix+File.separator+subDirs[i].getName(),
-						rootCategory,
-						ScriptingConstants.SCRIPT_REGISTRY_ITEM_TYPE_TRADE_SCRIPT,
+						baseCategory,
+						ScriptingConstants.SCRIPT_REGISTRY_ITEM_ID_CATEGORY_BASE,
 						jfireServerManager,
 						pm,
 						organisationID

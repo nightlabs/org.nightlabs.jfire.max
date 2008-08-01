@@ -56,6 +56,7 @@ import org.nightlabs.jfire.accounting.Accounting;
 import org.nightlabs.jfire.accounting.Currency;
 import org.nightlabs.jfire.accounting.Invoice;
 import org.nightlabs.jfire.accounting.Tariff;
+import org.nightlabs.jfire.accounting.pay.Payment;
 import org.nightlabs.jfire.accounting.priceconfig.IPackagePriceConfig;
 import org.nightlabs.jfire.asyncinvoke.AsyncInvoke;
 import org.nightlabs.jfire.asyncinvoke.AsyncInvokeEnvelope;
@@ -86,6 +87,7 @@ import org.nightlabs.jfire.store.ProductType;
 import org.nightlabs.jfire.store.ProductTypeActionHandler;
 import org.nightlabs.jfire.store.ProductTypeActionHandlerCache;
 import org.nightlabs.jfire.store.Store;
+import org.nightlabs.jfire.store.deliver.Delivery;
 import org.nightlabs.jfire.store.id.ProductID;
 import org.nightlabs.jfire.trade.config.TradeConfigModule;
 import org.nightlabs.jfire.trade.history.ProductHistory;
@@ -101,6 +103,7 @@ import org.nightlabs.jfire.trade.jbpm.ActionHandlerSendOffer;
 import org.nightlabs.jfire.trade.jbpm.JbpmConstantsOffer;
 import org.nightlabs.jfire.trade.jbpm.ProcessDefinitionAssignment;
 import org.nightlabs.jfire.trade.jbpm.id.ProcessDefinitionAssignmentID;
+import org.nightlabs.l10n.NumberFormatter;
 
 /**
  * Trader is responsible for purchase and sale. It manages orders, offers and
@@ -1965,8 +1968,12 @@ public class Trader
 							offer.getCreateUser(),
 							state.getStateDefinition().getName().getText(), 
 							state.getStateDefinition().getDescription().getText(),
-							offer, offer.getCustomer(), null, null, 
-							offer.getCreateDT(), ProductHistoryItemType.OFFER);
+							offer, 
+							offer.getCustomer(), 
+							null, 
+							null, 
+							offer.getCreateDT(), 
+							ProductHistoryItemType.OFFER);
 					productHistory.addProductHistoryItem(productHistoryItem);
 				}
 			}
@@ -1983,10 +1990,29 @@ public class Trader
 							invoice.getCreateUser(),
 							state.getStateDefinition().getName().getText(),
 							state.getStateDefinition().getDescription().getText(),
-							invoice, invoice.getCustomer(), null, null, 
-							invoice.getCreateDT(), ProductHistoryItemType.INVOICE);
+							invoice, 
+							invoice.getCustomer(), 
+							null, 
+							null, 
+							invoice.getCreateDT(), 
+							ProductHistoryItemType.INVOICE);
 					productHistory.addProductHistoryItem(productHistoryItem);
-				} 
+				}
+				
+				Collection<Payment> payments = Payment.getPaymentsForInvoice(pm, invoice);
+				for (Payment payment : payments) {
+					ProductHistoryItem productHistoryItem = new ProductHistoryItem(
+							payment.getUser(),
+							NumberFormatter.formatCurrency(payment.getAmount(), payment.getCurrency()),
+							payment.getReasonForPayment(),
+							invoice, 
+							payment.getPartner(),
+							null,
+							payment.getModeOfPaymentFlavour(),  
+							payment.getBeginDT(),
+							ProductHistoryItemType.PAYMENT);
+					productHistory.addProductHistoryItem(productHistoryItem);					
+				}
 			}
 
 			// check delivery notes
@@ -2001,13 +2027,30 @@ public class Trader
 							deliveryNote.getCreateUser(),
 							state.getStateDefinition().getName().getText(),
 							state.getStateDefinition().getDescription().getText(),
-							deliveryNote, deliveryNote.getCustomer(), null, null, 
-							deliveryNote.getCreateDT(), ProductHistoryItemType.DELIVERY_NOTE);
+							deliveryNote, 
+							deliveryNote.getCustomer(), 
+							null, 
+							null, 
+							deliveryNote.getCreateDT(), 
+							ProductHistoryItemType.DELIVERY_NOTE);
+					productHistory.addProductHistoryItem(productHistoryItem);
+				}
+				Collection<Delivery> deliveries = Delivery.getDeliveriesForDeliveryNote(pm, deliveryNote);
+				for (Delivery delivery : deliveries) {
+					ProductHistoryItem productHistoryItem = new ProductHistoryItem(
+							delivery.getUser(),
+							"Delivery",
+							"",
+							deliveryNote, 
+							delivery.getPartner(), 
+							delivery.getModeOfDeliveryFlavour(), 
+							null, 
+							delivery.getBeginDT(),
+							ProductHistoryItemType.DELIVERY);
 					productHistory.addProductHistoryItem(productHistoryItem);
 				}
 			}
-				
-			// TODO: check for payments and deliveries
+
 		}
 		return productHistory;			
 	}

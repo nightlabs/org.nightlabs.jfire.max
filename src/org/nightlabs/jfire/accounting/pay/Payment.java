@@ -35,6 +35,7 @@ import java.util.Set;
 
 import javax.jdo.JDOHelper;
 import javax.jdo.PersistenceManager;
+import javax.jdo.Query;
 import javax.jdo.listener.StoreCallback;
 
 import org.nightlabs.jdo.ObjectIDUtil;
@@ -90,6 +91,12 @@ import org.nightlabs.util.Util;
  * @jdo.fetch-group name="Payment.partner" fields="partner"
  * @jdo.fetch-group name="Payment.partnerAccount" fields="partnerAccount"
  * @jdo.fetch-group name="Payment.modeOfPaymentFlavour" fields="modeOfPaymentFlavour"
+ * 
+ * @jdo.query
+ * 	name="getPaymentsForInvoice"
+ * 	query="SELECT
+ *			WHERE
+ *				this.invoices.contains(:invoice)"
  */
 public class Payment
 implements Serializable, StoreCallback
@@ -115,6 +122,12 @@ implements Serializable, StoreCallback
 	public static final String FETCH_GROUP_PARTNER_ACCOUNT = "Payment.partnerAccount";
 	public static final String FETCH_GROUP_MODE_OF_PAYMENT_FLAVOUR = "Payment.modeOfPaymentFlavour";
 
+	@SuppressWarnings("unchecked")
+	public static Collection<Payment> getPaymentsForInvoice(PersistenceManager pm, Invoice invoice) {
+		Query q = pm.newNamedQuery(Payment.class, "getPaymentsForInvoice");
+		return (Collection<Payment>) q.execute(invoice);
+	}
+	
 	/**
 	 * @jdo.field primary-key="true"
 	 * @jdo.column length="100"

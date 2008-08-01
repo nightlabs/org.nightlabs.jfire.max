@@ -35,6 +35,7 @@ import java.util.Set;
 
 import javax.jdo.JDOHelper;
 import javax.jdo.PersistenceManager;
+import javax.jdo.Query;
 import javax.jdo.listener.StoreCallback;
 
 import org.apache.log4j.Logger;
@@ -71,6 +72,12 @@ import org.nightlabs.util.Util;
  *		field-order="organisationID, deliveryID"
  *		include-body="id/DeliveryID.body.inc"
  *
+ * @jdo.query
+ * 	name="getDeliveriesForDeliveryNote"
+ * 	query="SELECT
+ *			WHERE
+ *				this.deliveryNotes.contains(:deliveryNote)"
+ *
  * @jdo.fetch-group name="DeliveryTableData" fetch-groups="default" fields="user, endDT, partner, articles, articleIDs, deliveryNotes"
  */
 public class Delivery
@@ -86,6 +93,12 @@ implements Serializable, StoreCallback
 
 	public static final String DELIVERY_DIRECTION_OUTGOING = "outgoing";
 
+	@SuppressWarnings("unchecked")
+	public static Collection<Delivery> getDeliveriesForDeliveryNote(PersistenceManager pm, DeliveryNote deliveryNote) {
+		Query q = pm.newNamedQuery(Delivery.class, "getDeliveriesForDeliveryNote");
+		return (Collection<Delivery>) q.execute(deliveryNote);
+	}
+	
 	/**
 	 * @jdo.field primary-key="true"
 	 * @jdo.column length="100"

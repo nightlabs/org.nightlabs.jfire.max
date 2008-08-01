@@ -108,6 +108,8 @@ public class RecurringTrader {
 		return pm;
 	}
 
+
+
 	public String getOrderIDPrefix(User user, String orderIDPrefix)
 	{
 		if (orderIDPrefix == null) {
@@ -141,8 +143,38 @@ public class RecurringTrader {
 		return orderIDPrefix;
 	}
 
+	/**
+	 * This method creates a new RecurredOffer from an existing recurringOffer
+	 *
+	 * @param recurringOffer the Recurringoffer
+	 * @return newly created recurredOffer
+	 */
+	public RecurredOffer createRecurredOffer(RecurringOffer recurringOffer) throws ModuleException
+	{
+
+		PersistenceManager pm = getPersistenceManager();
+		Trader trader = Trader.getTrader(pm);
+
+		Order order = trader.createOrder(recurringOffer.getVendor(),
+				recurringOffer.getCustomer(), null, recurringOffer.getCurrency());
 
 
+		User user = SecurityReflector.getUserDescriptor().getUser(pm);
+
+		String offerIDPrefix = recurringOffer.getOfferIDPrefix();
+
+		RecurredOffer recurredOffer = new RecurredOffer(
+				user, order,
+				offerIDPrefix, IDGenerator.nextID(RecurringOffer.class, offerIDPrefix));
+
+		recurredOffer = getPersistenceManager().makePersistent(recurredOffer);
+		trader.validateOffer(recurredOffer);
+
+		return recurredOffer;
+	}
+
+	
+	
 	public RecurringOffer createRecurringOffer(User user, RecurringOrder recurringOrder, String offerIDPrefix) throws ModuleException
 	{
 		TradeSide tradeSide;
@@ -250,7 +282,7 @@ public class RecurringTrader {
 		ProcessDefinitionID processDefinitionID = (ProcessDefinitionID) JDOHelper.getObjectId(processDefinition);
 
 		// The stuff below should be done generically from the process definition!
-		
+
 		setStateDefinitionProperties(processDefinition, JbpmConstantsOffer.Both.NODE_NAME_SENT,
 				"sent",
 				"The Offer has been sent from the vendor to the customer.",
@@ -267,51 +299,51 @@ public class RecurringTrader {
 				true);
 
 		switch (tradeSide) {
-			case vendor:
-			{
-				// give known StateDefinitions a name and a description
-				setStateDefinitionProperties(processDefinition, JbpmConstantsOffer.Vendor.NODE_NAME_CREATED,
-						"created",
-						"The Offer has been newly created. This is the first state in the Offer related workflow.",
-						true);
+		case vendor:
+		{
+			// give known StateDefinitions a name and a description
+			setStateDefinitionProperties(processDefinition, JbpmConstantsOffer.Vendor.NODE_NAME_CREATED,
+					"created",
+					"The Offer has been newly created. This is the first state in the Offer related workflow.",
+					true);
 
-				setStateDefinitionProperties(processDefinition, JbpmConstantsOffer.Vendor.NODE_NAME_ABORTED,
-						"aborted",
-						"The Offer has been aborted by the vendor (before finalization). A new Offer needs to be created in order to continue the interaction.",
-						true);
+			setStateDefinitionProperties(processDefinition, JbpmConstantsOffer.Vendor.NODE_NAME_ABORTED,
+					"aborted",
+					"The Offer has been aborted by the vendor (before finalization). A new Offer needs to be created in order to continue the interaction.",
+					true);
 
-				setStateDefinitionProperties(processDefinition, JbpmConstantsOffer.Vendor.NODE_NAME_FINALIZED,
-						"finalized",
-						"The Offer has been finalized. After that, it cannot be modified anymore. A modification would require revocation and recreation.",
-						true);
+			setStateDefinitionProperties(processDefinition, JbpmConstantsOffer.Vendor.NODE_NAME_FINALIZED,
+					"finalized",
+					"The Offer has been finalized. After that, it cannot be modified anymore. A modification would require revocation and recreation.",
+					true);
 
-				setStateDefinitionProperties(processDefinition, JbpmConstantsOffer.Vendor.NODE_NAME_ACCEPTED,
-						"accepted",
-						"The Offer has been accepted by the customer. That turns the offer into a binding contract.",
-						true);
+			setStateDefinitionProperties(processDefinition, JbpmConstantsOffer.Vendor.NODE_NAME_ACCEPTED,
+					"accepted",
+					"The Offer has been accepted by the customer. That turns the offer into a binding contract.",
+					true);
 
-				setStateDefinitionProperties(processDefinition, JbpmConstantsOffer.Vendor.NODE_NAME_REJECTED,
-						"rejected",
-						"The Offer has been rejected by the customer. A new Offer needs to be created in order to continue the interaction.",
-						true);
+			setStateDefinitionProperties(processDefinition, JbpmConstantsOffer.Vendor.NODE_NAME_REJECTED,
+					"rejected",
+					"The Offer has been rejected by the customer. A new Offer needs to be created in order to continue the interaction.",
+					true);
 
-				// give known Transitions a name
-				for (Transition transition : Transition.getTransitions(pm, processDefinitionID, JbpmConstantsOffer.Vendor.TRANSITION_NAME_ACCEPT_IMPLICITELY)) {
-					transition.setUserExecutable(false);
-				}
-
-				for (Transition transition : Transition.getTransitions(pm, processDefinitionID, JbpmConstantsOffer.Vendor.TRANSITION_NAME_CUSTOMER_ACCEPTED)) {
-					transition.setUserExecutable(false);
-				}
-
-				for (Transition transition : Transition.getTransitions(pm, processDefinitionID, JbpmConstantsOffer.Vendor.TRANSITION_NAME_CUSTOMER_REJECTED)) {
-					transition.setUserExecutable(false);
-				}
-
+			// give known Transitions a name
+			for (Transition transition : Transition.getTransitions(pm, processDefinitionID, JbpmConstantsOffer.Vendor.TRANSITION_NAME_ACCEPT_IMPLICITELY)) {
+				transition.setUserExecutable(false);
 			}
-			break;
-			default:
-				throw new IllegalStateException("Unknown TradeSide: " + tradeSide);
+
+			for (Transition transition : Transition.getTransitions(pm, processDefinitionID, JbpmConstantsOffer.Vendor.TRANSITION_NAME_CUSTOMER_ACCEPTED)) {
+				transition.setUserExecutable(false);
+			}
+
+			for (Transition transition : Transition.getTransitions(pm, processDefinitionID, JbpmConstantsOffer.Vendor.TRANSITION_NAME_CUSTOMER_REJECTED)) {
+				transition.setUserExecutable(false);
+			}
+
+		}
+		break;
+		default:
+			throw new IllegalStateException("Unknown TradeSide: " + tradeSide);
 		}
 
 		return processDefinition;
@@ -335,5 +367,5 @@ public class RecurringTrader {
 		stateDefinition.getDescription().setText(Locale.ENGLISH.getLanguage(), description);
 		stateDefinition.setPublicState(publicState);
 	}
-	
+
 }

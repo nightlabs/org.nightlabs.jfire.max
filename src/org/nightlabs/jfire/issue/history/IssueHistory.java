@@ -210,9 +210,9 @@ implements Serializable
 		{
 			changeText.append("Changed assignee");
 			changeText.append(" from ");
-			changeText.append(oldIssue.getAssignee() == null?" - ": oldIssue.getAssignee().getName());
+			changeText.append(oldIssue.getAssignee() == null? " - " : oldIssue.getAssignee().getName());
 			changeText.append(" ---> ");
-			changeText.append(newIssue.getAssignee().getName());
+			changeText.append(newIssue.getAssignee() == null? " - " : newIssue.getAssignee().getName());
 			changeText.append("\n");
 		}
 

@@ -2,8 +2,13 @@ package org.nightlabs.jfire.trade.recurring;
 
 import java.io.IOException;
 import java.net.URL;
+import java.util.Collection;
+import java.util.HashSet;
 import java.util.Iterator;
+import java.util.LinkedList;
+import java.util.List;
 import java.util.Locale;
+import java.util.Set;
 
 import javax.jdo.JDOHelper;
 import javax.jdo.JDOObjectNotFoundException;
@@ -21,10 +26,17 @@ import org.nightlabs.jfire.jbpm.graph.def.Transition;
 import org.nightlabs.jfire.jbpm.graph.def.id.ProcessDefinitionID;
 import org.nightlabs.jfire.security.SecurityReflector;
 import org.nightlabs.jfire.security.User;
+import org.nightlabs.jfire.store.Product;
+import org.nightlabs.jfire.store.ProductType;
+import org.nightlabs.jfire.store.Store;
+import org.nightlabs.jfire.trade.Article;
+import org.nightlabs.jfire.trade.ArticleCreator;
 import org.nightlabs.jfire.trade.LegalEntity;
 import org.nightlabs.jfire.trade.OfferLocal;
 import org.nightlabs.jfire.trade.Order;
 import org.nightlabs.jfire.trade.OrganisationLegalEntity;
+import org.nightlabs.jfire.trade.Segment;
+import org.nightlabs.jfire.trade.SegmentType;
 import org.nightlabs.jfire.trade.TradeSide;
 import org.nightlabs.jfire.trade.Trader;
 import org.nightlabs.jfire.trade.config.TradeConfigModule;
@@ -155,10 +167,10 @@ public class RecurringTrader {
 
 		PersistenceManager pm = getPersistenceManager();
 		Trader trader = Trader.getTrader(pm);
-
+		 Store store = Store.getStore(pm);
+		 
 		Order order = trader.createOrder(recurringOffer.getVendor(),
 				recurringOffer.getCustomer(), null, recurringOffer.getCurrency());
-
 
 		User user = SecurityReflector.getUserDescriptor().getUser(pm);
 
@@ -171,11 +183,51 @@ public class RecurringTrader {
 		recurredOffer = getPersistenceManager().makePersistent(recurredOffer);
 		trader.validateOffer(recurredOffer);
 
+
+		// Loop through all the segments
+
+		Set<Article> collected  = new HashSet<Article>();
+
+		for (Segment segment : recurringOffer.getSegments()) {
+
+			Order ord = segment.getOrder();		
+
+			// get the articles in all the order 		
+
+			for (Article article1 : ord.getArticles())
+			{
+				ProductType pt = article1.getProductType();
+//				get all the articles of the same product type
+				for (Article article : ord.getArticles()) 
+				{	
+					if(pt.equals(article.getProductType()))
+						collected.add(article);			
+
+				}	
+
+				
+				// find  Products
+				Collection<? extends Product> products = store.findProducts(user, pt, null, null); // we create exactly one => no NestedProductTypeLocal needed
+				
+				if (products.size() != 1)
+					throw new IllegalStateException("store.findProducts(...) created " + products.size() + " instead of exactly 1 product!");
+				
+				Collection<? extends Article> articles = trader.createArticles(user, recurredOffer, segment, products,
+						new ArticleCreator(null), true, false);
+				
+
+				collected.clear();
+			}
+
+
+		}
+
+
 		return recurredOffer;
 	}
 
-	
-	
+
+
 	public RecurringOffer createRecurringOffer(User user, RecurringOrder recurringOrder, String offerIDPrefix) throws ModuleException
 	{
 		TradeSide tradeSide;

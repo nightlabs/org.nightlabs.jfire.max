@@ -101,6 +101,9 @@ import org.nightlabs.jfire.trade.id.SegmentTypeID;
 import org.nightlabs.jfire.trade.jbpm.JbpmConstantsOffer;
 import org.nightlabs.jfire.trade.jbpm.ProcessDefinitionAssignment;
 import org.nightlabs.jfire.trade.query.AbstractArticleContainerQuery;
+import org.nightlabs.jfire.trade.recurring.RecurredOffer;
+import org.nightlabs.jfire.trade.recurring.RecurringOffer;
+import org.nightlabs.jfire.trade.recurring.RecurringOrder;
 import org.nightlabs.jfire.transfer.id.AnchorID;
 import org.nightlabs.version.MalformedVersionException;
 
@@ -218,7 +221,7 @@ implements SessionBean
 		}
 	}
 
-	
+
 	/**
 	 * Creates a new Purchase order. This method is intended to be called by a user (not another
 	 * organisation).
@@ -1267,6 +1270,16 @@ implements SessionBean
 	{
 		PersistenceManager pm = getPersistenceManager();
 		try {
+			// WORKAROUND JPOX Bug to avoid problems with creating workflows as State.statable is defined as interface and has subclassed implementations
+			pm.getExtent(Order.class);
+			pm.getExtent(Offer.class);
+			pm.getExtent(Invoice.class);
+			pm.getExtent(ReceptionNote.class);
+			pm.getExtent(DeliveryNote.class);
+			pm.getExtent(RecurringOffer.class);
+			pm.getExtent(RecurredOffer.class);
+			pm.getExtent(RecurringOrder.class);
+
 			ModuleMetaData moduleMetaData = ModuleMetaData.getModuleMetaData(pm, JFireTradeEAR.MODULE_NAME);
 
 			if (moduleMetaData != null)
@@ -1274,13 +1287,6 @@ implements SessionBean
 
 			logger.info("Initialization of JFireTrade-ConfigModules started...");
 
-			// WORKAROUND JPOX Bug to avoid problems with creating workflows as State.statable is defined as interface and has subclassed implementations
-			pm.getExtent(Order.class);
-			pm.getExtent(Offer.class);
-			pm.getExtent(Invoice.class);
-			pm.getExtent(ReceptionNote.class);
-			pm.getExtent(DeliveryNote.class);
-			
 			// version is {major}.{minor}.{release}.{patchlevel}.{suffix}
 			moduleMetaData = new ModuleMetaData(
 					JFireTradeEAR.MODULE_NAME, "0.9.5.0.beta", "0.9.5.0.beta");
@@ -1335,7 +1341,7 @@ implements SessionBean
 			EditLockType productTypeEditLock = new EditLockType(JFireTradeEAR.EDIT_LOCK_TYPE_ID_PRODUCT_TYPE);
 			productTypeEditLock = pm.makePersistent(productTypeEditLock);
 			// TODO do sth. with productTypeEditLock or remove this variable (btw. after pm.makePersistent(...) it is crutial to continue work with the result of this method!)
-			
+
 			// WORKAROUND JPOX Bug to avoid java.util.ConcurrentModificationException in OfferRequirement.getOfferRequirement(OfferRequirement.java:86) at runtime
 			pm.getExtent(OfferRequirement.class);
 
@@ -1545,20 +1551,20 @@ implements SessionBean
 	{
 		if (queries == null)
 			return null;
-		
+
 		if (! ArticleContainer.class.isAssignableFrom(queries.getResultClass()))
 		{
 			throw new RuntimeException("Given QueryCollection has invalid return type! " +
 					"Invalid return type= "+ queries.getResultClassName());
 		}
-		
+
 		PersistenceManager pm = getPersistenceManager();
 		try {
 			pm.getFetchPlan().setMaxFetchDepth(1);
 			pm.getFetchPlan().setGroup(FetchPlan.DEFAULT);
 
 			JDOQueryCollectionDecorator<? extends AbstractArticleContainerQuery> decoratedCollection;
-			
+
 			// DO not add / apply generics to the instanceof check, the sun compiler doesn't like it
 			// and stop compilation with an "Unconvertible types" error!
 			if (queries instanceof JDOQueryCollectionDecorator)
@@ -1569,7 +1575,7 @@ implements SessionBean
 			{
 				decoratedCollection = new JDOQueryCollectionDecorator<AbstractArticleContainerQuery>(queries);
 			}
-			
+
 			decoratedCollection.setPersistenceManager(pm);
 			Collection<R> articleContainers = (Collection<R>) decoratedCollection.executeQueries();
 
@@ -1683,14 +1689,14 @@ implements SessionBean
 			throw new RuntimeException("Given QueryCollection has invalid return type! " +
 					"Invalid return type= "+ queries.getResultClassName());
 		}
-		
+
 		PersistenceManager pm = getPersistenceManager();
 		try {
 			pm.getFetchPlan().setMaxFetchDepth(1);
 			pm.getFetchPlan().setGroup(FetchPlan.DEFAULT);
 
 			JDOQueryCollectionDecorator<AbstractJDOQuery> decoratedQueries;
-			
+
 			if (queries instanceof JDOQueryCollectionDecorator)
 			{
 				decoratedQueries = (JDOQueryCollectionDecorator<AbstractJDOQuery>) queries;
@@ -1699,7 +1705,7 @@ implements SessionBean
 			{
 				decoratedQueries = new JDOQueryCollectionDecorator<AbstractJDOQuery>(queries);
 			}
-			
+
 			decoratedQueries.setPersistenceManager(pm);
 			Collection<? extends Offer> offers =
 				(Collection<? extends Offer>) decoratedQueries.executeQueries();
@@ -1720,20 +1726,20 @@ implements SessionBean
 	{
 		if (queries == null)
 			return null;
-		
+
 		if (! Order.class.isAssignableFrom(queries.getResultClass()))
 		{
 			throw new RuntimeException("Given QueryCollection has invalid return type! " +
 					"Invalid return type= "+ queries.getResultClassName());
 		}
-		
+
 		PersistenceManager pm = getPersistenceManager();
 		try {
 			pm.getFetchPlan().setMaxFetchDepth(1);
 			pm.getFetchPlan().setGroup(FetchPlan.DEFAULT);
 
 			JDOQueryCollectionDecorator<AbstractJDOQuery> decoratedQueries;
-			
+
 			if (queries instanceof JDOQueryCollectionDecorator)
 			{
 				decoratedQueries = (JDOQueryCollectionDecorator<AbstractJDOQuery>) queries;
@@ -1742,11 +1748,11 @@ implements SessionBean
 			{
 				decoratedQueries = new JDOQueryCollectionDecorator<AbstractJDOQuery>(queries);
 			}
-			
+
 			decoratedQueries.setPersistenceManager(pm);
 			Collection<? extends Order> orders =
 				(Collection<? extends Order>) decoratedQueries.executeQueries();
-			
+
 			return NLJDOHelper.getObjectIDSet(orders);
 		} finally {
 			pm.close();
@@ -1763,20 +1769,20 @@ implements SessionBean
 	{
 		if (queries == null)
 			return null;
-		
+
 		if (! ReceptionNote.class.isAssignableFrom(queries.getResultClass()))
 		{
 			throw new RuntimeException("Given QueryCollection has invalid return type! " +
 					"Invalid return type= "+ queries.getResultClassName());
 		}
-		
+
 		PersistenceManager pm = getPersistenceManager();
 		try {
 			pm.getFetchPlan().setMaxFetchDepth(1);
 			pm.getFetchPlan().setGroup(FetchPlan.DEFAULT);
 
 			JDOQueryCollectionDecorator<AbstractJDOQuery> decoratedQueries;
-			
+
 			if (queries instanceof JDOQueryCollectionDecorator)
 			{
 				decoratedQueries = (JDOQueryCollectionDecorator<AbstractJDOQuery>) queries;
@@ -1785,11 +1791,11 @@ implements SessionBean
 			{
 				decoratedQueries = new JDOQueryCollectionDecorator<AbstractJDOQuery>(queries);
 			}
-			
+
 			decoratedQueries.setPersistenceManager(pm);
 			Collection<ReceptionNote> receptionNotes =
 				(Collection<ReceptionNote>) decoratedQueries.executeQueries();
-			
+
 			return NLJDOHelper.getObjectIDSet(receptionNotes);
 		} finally {
 			pm.close();
@@ -1866,14 +1872,14 @@ implements SessionBean
 			pm.close();
 		}
 	}
-	
+
 	/**
 	 * Returns the reversing {@link Offer} which defines the reverse for the {@link Product}
 	 * of the given {@link ProductID}.
 	 * If the Article where the {@link Product} with the given {@link ProductID} is referenced,
 	 * can not be reversed, a {@link ReverseProductException} is thrown which contains {@link IReverseProductError}s
 	 * which describe why not.
-	 * 
+	 *
 	 * @param productID the {@link ProductID} to get the reversing {@link Offer} for.
 	 * @ejb.interface-method
 	 * @ejb.transaction type="Required"
@@ -1988,14 +1994,14 @@ implements SessionBean
 					}
 					Offer reversingOffer = trader.createReverseOffer(user, articles, null);
 					reversingOffer.validate();
-					
+
 					if (!get)
 						return null;
 
 					pm.getFetchPlan().setMaxFetchDepth(maxFetchDepth);
 					if (fetchGroups != null)
 						pm.getFetchPlan().setGroups(fetchGroups);
-					
+
 					return pm.detachCopy(reversingOffer);
 				} catch (Exception e) {
 					throw new ModuleException(e);
@@ -2005,6 +2011,6 @@ implements SessionBean
 			pm.close();
 		}
 	}
-	
+
 }
 

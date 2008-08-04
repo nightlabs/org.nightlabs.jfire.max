@@ -33,6 +33,8 @@ import javax.jdo.JDOHelper;
 import javax.jdo.PersistenceManager;
 import javax.jdo.listener.DetachCallback;
 
+import org.nightlabs.jfire.accounting.Invoice;
+import org.nightlabs.jfire.accounting.InvoiceLocal;
 import org.nightlabs.jfire.store.deliver.Delivery;
 import org.nightlabs.jfire.store.deliver.id.DeliveryID;
 
@@ -61,7 +63,7 @@ import org.nightlabs.jfire.store.deliver.id.DeliveryID;
 public class ArticleLocal
 implements Serializable, DetachCallback
 {
-	private static final long serialVersionUID = 1L;
+	private static final long serialVersionUID = 2L;
 
 	// the following fetch-groups are virtual and processed in the detach callback
 	public static final String FETCH_GROUP_DELIVERY_ID = "Article.deliveryID";
@@ -101,6 +103,11 @@ implements Serializable, DetachCallback
 	 * @jdo.field persistence-modifier="persistent"
 	 */
 	private boolean delivered = false;
+
+	/**
+	 * @jdo.field persistence-modifier="none"
+	 */
+	private Boolean invoicePaid = null;
 
 	public void setDelivery(Delivery delivery)
 	{
@@ -162,6 +169,24 @@ implements Serializable, DetachCallback
 		return pm;
 	}
 
+	/**
+	 * Find out whether the invoice is paid completely (i.e. {@link InvoiceLocal#getAmountToPay()} is 0).
+	 *
+	 * @return <code>true</code>, if the amount-to-pay of the corresponding invoice is 0.
+	 */
+	public boolean isInvoicePaid()
+	{
+		if (invoicePaid == null) {
+			Invoice invoice = getArticle().getInvoice();
+			if (invoice == null)
+				return false;
+
+			// If an invoice is assigned, there should always be an InvoiceLocal.
+			return invoice.getInvoiceLocal().getAmountToPay() == 0;
+		}
+		return invoicePaid.booleanValue();
+	}
+
 	public void jdoPreDetach()
 	{
 	}
@@ -170,7 +195,7 @@ implements Serializable, DetachCallback
 		ArticleLocal attached = (ArticleLocal)_attached;
 		ArticleLocal detached = this;
 
-		Collection fetchGroups = attached.getPersistenceManager().getFetchPlan().getGroups();
+		Collection<?> fetchGroups = attached.getPersistenceManager().getFetchPlan().getGroups();
 
 		boolean fetchGroupsArticleInEditor =
 			fetchGroups.contains(FetchGroupsTrade.FETCH_GROUP_ARTICLE_IN_ORDER_EDITOR) ||
@@ -183,5 +208,8 @@ implements Serializable, DetachCallback
 			detached.deliveryID = attached.getDeliveryID();
 			detached.deliveryID_detached = true;
 		}
+
+		if (fetchGroupsArticleInEditor)
+			detached.invoicePaid = attached.isInvoicePaid();
 	}
 }

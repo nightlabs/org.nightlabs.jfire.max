@@ -33,11 +33,14 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
+import javax.jdo.JDOHelper;
+
 import org.nightlabs.jfire.jbpm.graph.def.ActionHandlerNodeEnter;
 import org.nightlabs.jfire.jbpm.graph.def.Statable;
 import org.nightlabs.jfire.jbpm.graph.def.StatableLocal;
 import org.nightlabs.jfire.jbpm.graph.def.State;
 import org.nightlabs.jfire.security.User;
+import org.nightlabs.jfire.trade.Article;
 import org.nightlabs.util.CollectionUtil;
 
 /**
@@ -74,12 +77,13 @@ public class InvoiceLocal
 implements Serializable, StatableLocal
 {
 	private static final long serialVersionUID = 1L;
-	
+
 	public static final String FETCH_GROUP_INVOICE = "InvoiceLocal.invoice";
 	public static final String FETCH_GROUP_BOOK_USER = "InvoiceLocal.bookUser";
 	/**
-	 * @deprecated The *.this-FetchGroups lead to bad programming style and are therefore deprecated, now. They should be removed soon! 
+	 * @deprecated The *.this-FetchGroups lead to bad programming style and are therefore deprecated, now. They should be removed soon!
 	 */
+	@Deprecated
 	public static final String FETCH_GROUP_THIS_INVOICE_LOCAL = "InvoiceLocal.this";
 
 	/**
@@ -104,7 +108,7 @@ implements Serializable, StatableLocal
 
 	/**
 	 * This member represents the amount already paid.
-	 * 
+	 *
 	 * @jdo.field persistence-modifier="persistent"
 	 */
 	private long amountPaid;
@@ -213,6 +217,14 @@ implements Serializable, StatableLocal
 	protected void incAmountPaid(long diffAmount)
 	{
 		this.amountPaid = amountPaid + diffAmount;
+
+		if (getAmountToPay() == 0) {
+			// Make all ArticleLocal instances dirty since they have the non-persistent flag invoicePaid
+			// and require refreshing in the client.
+
+			for (Article article : getInvoice().getArticles())
+				JDOHelper.makeDirty(article.getArticleLocal(), "articleID");
+		}
 	}
 
 	public long getAmountPaid() {

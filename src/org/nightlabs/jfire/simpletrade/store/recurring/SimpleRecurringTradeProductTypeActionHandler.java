@@ -54,7 +54,7 @@ extends RecurringTradeProductTypeActionHandler{
 
 
 	@Override
-	public  Map<Article, Article> createArticles(RecurredOffer offer, Set<Article> recurringArticles)
+	public  Map<Article, Article> createArticles(RecurredOffer offer, Set<Article> recurringArticles,Segment segment)
 	{	
 //		Map<Article, Article> map;
 //		Article article;
@@ -69,8 +69,6 @@ extends RecurringTradeProductTypeActionHandler{
 //		
 //		ProductType pt;
 //		
-//		SegmentType segmentType = SegmentType.getDefaultSegmentType(pm);
-//		Segment segment = trader.createSegment(offer.getOrder(), segmentType);
 //		
 //		for (Iterator<Article> it = recurringArticles.iterator(); it.hasNext(); ) 
 //		{	

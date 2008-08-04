@@ -167,7 +167,4 @@ public abstract class RecurringTradeProductTypeActionHandler {
 		throw new ProductTypeActionHandlerNotFoundException(productTypeClass, "There is no handler registered for " + productTypeClass.getName());
 	}
 
-
-
-
 }

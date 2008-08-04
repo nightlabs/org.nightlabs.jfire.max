@@ -3,11 +3,11 @@ package org.nightlabs.jfire.trade.recurring;
 import java.io.IOException;
 import java.net.URL;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Iterator;
-import java.util.LinkedList;
-import java.util.List;
 import java.util.Locale;
 import java.util.Map;
+import java.util.Set;
 
 import javax.jdo.JDOHelper;
 import javax.jdo.JDOObjectNotFoundException;
@@ -26,7 +26,6 @@ import org.nightlabs.jfire.jbpm.graph.def.id.ProcessDefinitionID;
 import org.nightlabs.jfire.security.SecurityReflector;
 import org.nightlabs.jfire.security.User;
 import org.nightlabs.jfire.store.ProductType;
-import org.nightlabs.jfire.store.Store;
 import org.nightlabs.jfire.trade.Article;
 import org.nightlabs.jfire.trade.LegalEntity;
 import org.nightlabs.jfire.trade.OfferLocal;
@@ -164,7 +163,6 @@ public class RecurringTrader {
 
 		PersistenceManager pm = getPersistenceManager();
 		Trader trader = Trader.getTrader(pm);
-		Store store = Store.getStore(pm);
 
 		Order order = trader.createOrder(recurringOffer.getVendor(),
 				recurringOffer.getCustomer(), null, recurringOffer.getCurrency());
@@ -187,22 +185,44 @@ public class RecurringTrader {
 
 
 		// Loop through all the segments
-		Map<SegmentType, Map<Class<? extends ProductType>, List<Article> >> collected_map =  new HashMap<SegmentType, Map<Class<? extends ProductType>, List<Article>>>();
+		Map<SegmentType, Map<Class<? extends ProductType>, Set<Article>>> segmentTypes2PTClass2Articles =  new HashMap<SegmentType, Map<Class<? extends ProductType>, Set<Article>>>();
 
 		for (Article recurringArticle : recurringOffer.getArticles()) {
 			SegmentType segmentType = recurringArticle.getSegment().getSegmentType();
-			Map<Class<? extends ProductType>, List<Article>> collected = collected_map.get(segmentType);
-			if (collected == null) {
-				collected = new HashMap<Class<? extends ProductType>, List<Article>>();
-				collected_map.put(segmentType, collected);
+			Map<Class<? extends ProductType>, Set<Article>> ptClass2Articles = segmentTypes2PTClass2Articles.get(segmentType);
+			if (ptClass2Articles == null) {
+				ptClass2Articles = new HashMap<Class<? extends ProductType>, Set<Article>>();
+				segmentTypes2PTClass2Articles.put(segmentType, ptClass2Articles);
 			}
 			Class<? extends ProductType> productTypeClass = recurringArticle.getProductType().getClass();
-			List<Article> articles = collected.get(productTypeClass);
+			Set<Article> articles = ptClass2Articles.get(productTypeClass);
 			if (articles == null) {
-				articles = new LinkedList<Article>();
-				collected.put(productTypeClass, articles);
+				articles = new HashSet<Article>();
+				ptClass2Articles.put(productTypeClass, articles);
 			}
 			articles.add(recurringArticle);
+		}
+		
+		// put the Segments of the new RecurredOffer in a map (only fore easy lookup later)
+		Map<SegmentType, Segment> recurredSegments = new HashMap<SegmentType, Segment>();
+		for (Segment segment : recurredOffer.getSegments()) {
+			recurredSegments.put(segment.getSegmentType(), segment);
+		}
+		
+		// iterate the cummulated articles by segment type
+		for (Map.Entry<SegmentType, Map<Class<? extends ProductType>, Set<Article>>> segmentEntry : segmentTypes2PTClass2Articles.entrySet()) {
+			for (Map.Entry<Class<? extends ProductType>, Set<Article>> classEntry : segmentEntry.getValue().entrySet()) {
+				// for each segment type
+				// for each class of ProductType find the corresponding RecurringTradeProductTypeActionHandler
+				RecurringTradeProductTypeActionHandler handler = 
+					RecurringTradeProductTypeActionHandler.getRecurringTradeProductTypeActionHandler(pm, classEntry.getKey());
+				if (handler == null)
+					throw new IllegalStateException("Could not find a " + RecurringTradeProductTypeActionHandler.class.getName() + 
+							" for the ProductType class " + classEntry.getKey());
+				// and let the handler create the articles based on the Articles in the RecurringOffer
+				handler.createArticles(recurredOffer, classEntry.getValue(), recurredSegments.get(segmentEntry.getKey()));
+			}
+			
 		}
 
 		return recurredOffer;

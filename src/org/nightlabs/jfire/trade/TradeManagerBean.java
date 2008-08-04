@@ -64,6 +64,7 @@ import org.nightlabs.jfire.accounting.id.TariffID;
 import org.nightlabs.jfire.base.BaseSessionBeanImpl;
 import org.nightlabs.jfire.config.ConfigSetup;
 import org.nightlabs.jfire.config.UserConfigSetup;
+import org.nightlabs.jfire.config.WorkstationConfigSetup;
 import org.nightlabs.jfire.crossorganisationregistrationinit.Context;
 import org.nightlabs.jfire.editlock.EditLock;
 import org.nightlabs.jfire.editlock.EditLockType;
@@ -88,6 +89,7 @@ import org.nightlabs.jfire.store.reverse.NoArticlesFoundReverseProductError;
 import org.nightlabs.jfire.store.reverse.OfferNotAcceptedReverseProductError;
 import org.nightlabs.jfire.store.reverse.ReverseProductException;
 import org.nightlabs.jfire.trade.config.LegalEntityViewConfigModule;
+import org.nightlabs.jfire.trade.config.TradePrintingConfigModule;
 import org.nightlabs.jfire.trade.id.ArticleContainerID;
 import org.nightlabs.jfire.trade.id.ArticleID;
 import org.nightlabs.jfire.trade.id.CustomerGroupID;
@@ -1291,6 +1293,13 @@ implements SessionBean
 				);
 			configSetup.getConfigModuleClasses().add(LegalEntityViewConfigModule.class.getName());
 			configSetup.getConfigModuleClasses().add(TariffOrderConfigModule.class.getName());
+			
+			ConfigSetup workstationConfigSetup = ConfigSetup.getConfigSetup(
+					pm,
+					getOrganisationID(),
+					WorkstationConfigSetup.CONFIG_SETUP_TYPE_WORKSTATION
+			);
+			workstationConfigSetup.getConfigModuleClasses().add(TradePrintingConfigModule.class.getName());
 
 			Trader trader = Trader.getTrader(pm);
 
@@ -1561,7 +1570,7 @@ implements SessionBean
 				decoratedCollection = new JDOQueryCollectionDecorator<AbstractArticleContainerQuery>(queries);
 			}
 			
-			decoratedCollection.setPersistenceManager(pm);			
+			decoratedCollection.setPersistenceManager(pm);
 			Collection<R> articleContainers = (Collection<R>) decoratedCollection.executeQueries();
 
 			return NLJDOHelper.getObjectIDSet(articleContainers);
@@ -1860,16 +1869,16 @@ implements SessionBean
 	
 	/**
 	 * Returns the reversing {@link Offer} which defines the reverse for the {@link Product}
-	 * of the given {@link ProductID}. 
-	 * If the Article where the {@link Product} with the given {@link ProductID} is referenced, 
-	 * can not be reversed, a {@link ReverseProductException} is thrown which contains {@link IReverseProductError}s 
+	 * of the given {@link ProductID}.
+	 * If the Article where the {@link Product} with the given {@link ProductID} is referenced,
+	 * can not be reversed, a {@link ReverseProductException} is thrown which contains {@link IReverseProductError}s
 	 * which describe why not.
 	 * 
-	 * @param productID the {@link ProductID} to get the reversing {@link Offer} for.   
+	 * @param productID the {@link ProductID} to get the reversing {@link Offer} for.
 	 * @ejb.interface-method
 	 * @ejb.transaction type="Required"
 	 * @ejb.permission role-name="_Guest_"
-	 */	
+	 */
 	public Offer createReverseOfferForProduct(
 			ProductID productID,
 			boolean completeOffer,
@@ -1901,7 +1910,7 @@ implements SessionBean
 			}
 
 			// collect all allocated articles
-			Set<Article> allocatedArticles = new HashSet<Article>();			
+			Set<Article> allocatedArticles = new HashSet<Article>();
 			for (Article article : articles) {
 				if (article.isAllocated()) {
 					allocatedArticles.add(article);
@@ -1914,7 +1923,7 @@ implements SessionBean
 				if (allocatedArticles.size() == 2) {
 					Article reversingArticle = null;
 					Article reversedArticle = null;
-					for (Article article : allocatedArticles) { 
+					for (Article article : allocatedArticles) {
 						if (article.isReversing()) {
 							if (reversingArticle != null) {
 								throw new IllegalStateException("There are 2 reversing articles existing");

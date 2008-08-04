@@ -3,6 +3,7 @@ package org.nightlabs.jfire.trade.recurring;
 import java.io.IOException;
 import java.net.URL;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
@@ -30,6 +31,7 @@ import org.nightlabs.jfire.store.ProductType;
 import org.nightlabs.jfire.store.Store;
 import org.nightlabs.jfire.trade.Article;
 import org.nightlabs.jfire.trade.LegalEntity;
+import org.nightlabs.jfire.trade.Offer;
 import org.nightlabs.jfire.trade.OfferLocal;
 import org.nightlabs.jfire.trade.Order;
 import org.nightlabs.jfire.trade.OrganisationLegalEntity;
@@ -160,7 +162,7 @@ public class RecurringTrader {
 	 * @param recurringOffer the {@link RecurringOffer}
 	 * @return newly created {@link RecurredOffer}
 	 */
-	public RecurredOffer createRecurredOffer(RecurringOffer recurringOffer) throws ModuleException
+	public RecurredOffer createRecurredOffer(RecurringOffer recurringOffer)
 	{
 
 		PersistenceManager pm = getPersistenceManager();
@@ -179,46 +181,48 @@ public class RecurringTrader {
 			trader.createSegment(order, segment.getSegmentType());
 		}
 		
-		RecurredOffer recurredOffer = new RecurredOffer(
-				user, order,
-				offerIDPrefix, IDGenerator.nextID(RecurringOffer.class, offerIDPrefix));
+		RecurredOffer recurredOffer = createRecurredOffer(user, order, offerIDPrefix);
 
-		recurredOffer = getPersistenceManager().makePersistent(recurredOffer);
-		trader.validateOffer(recurredOffer);
+		// Loop over all articles in the given offer and group
+		// them by SegmentType and ProductType-class
+		Map<SegmentType, Map<Class<? extends ProductType>, Set<Article>>> segmentTypes2PTClass2Articles =  new HashMap<SegmentType, Map<Class<? extends ProductType>, Set<Article>>>();
 
-
-		// Loop through all the segments
-		Map<SegmentType, Map<Class<? extends ProductType>, List<Article> >> collected_map =  new HashMap<SegmentType, Map<Class<? extends ProductType>, List<Article>>>();
-
-		
-		
 		for (Article recurringArticle : recurringOffer.getArticles()) {
 			SegmentType segmentType = recurringArticle.getSegment().getSegmentType();
-			Map<Class<? extends ProductType>, List<Article>> collected = collected_map.get(segmentType);
-			if (collected == null) {
-				collected = new HashMap<Class<? extends ProductType>, List<Article>>();
-				collected_map.put(segmentType, collected);
+			Map<Class<? extends ProductType>, Set<Article>> ptClass2Articles = segmentTypes2PTClass2Articles.get(segmentType);
+			if (ptClass2Articles == null) {
+				ptClass2Articles = new HashMap<Class<? extends ProductType>, Set<Article>>();
+				segmentTypes2PTClass2Articles.put(segmentType, ptClass2Articles);
 			}
 			Class<? extends ProductType> productTypeClass = recurringArticle.getProductType().getClass();
-			List<Article> articles = collected.get(productTypeClass);
+			Set<Article> articles = ptClass2Articles.get(productTypeClass);
 			if (articles == null) {
-				articles = new LinkedList<Article>();
-				collected.put(productTypeClass, articles);
+				articles = new HashSet<Article>();
+				ptClass2Articles.put(productTypeClass, articles);
 			}
 			articles.add(recurringArticle);
 		}
+		
+		// loop over the segments added to the order
+		for (Segment segment : order.getSegments()) {
+			Map<Class<? extends ProductType>, Set<Article>> collected = segmentTypes2PTClass2Articles.get(segment.getSegmentType());
+			if (collected != null) { // it is possible that there are segments with no articles in the RecurringOffer				
+				// add each segment to the RecurredOffer
+				recurredOffer.addSegment(segment);
+				for (Iterator< Class<? extends ProductType>> it = collected.keySet().iterator(); it.hasNext();)
+				{
+					// now for each ProductType class find the handler and let him create the articles 
+					Class<? extends ProductType> pt = it.next();
 
-		for (Segment segment : recurringOffer.getSegments()) {	
-			Map<Class<? extends ProductType>, List<Article>> collected = collected_map.get(segment.getSegmentType());
-			for (    Iterator< Class<? extends ProductType>> it = collected.keySet().iterator(); it.hasNext();)
-			{
-				Class<? extends ProductType> pt = it.next();
-				
-				List<Article> articles = collected.get(pt);
-					
-				RecurringTradeProductTypeActionHandler handler =RecurringTradeProductTypeActionHandler.getRecurringTradeProductTypeActionHandler(pm, pt);
-				
-				handler.createArticles(recurredOffer, (Set<Article>) articles, segment);
+					Set<Article> articles = collected.get(pt);
+
+					RecurringTradeProductTypeActionHandler handler = RecurringTradeProductTypeActionHandler.getRecurringTradeProductTypeActionHandler(pm, pt);
+					if (handler == null)
+						throw new IllegalStateException("Could not find a " + RecurringTradeProductTypeActionHandler.class.getName() + 
+								" for the ProductType class " + pt);
+
+					handler.createArticles(recurredOffer, articles, segment);
+				}
 			}
 		
 		}
@@ -229,8 +233,17 @@ public class RecurringTrader {
 	}
 
 
-
-	public RecurringOffer createRecurringOffer(User user, RecurringOrder recurringOrder, String offerIDPrefix) throws ModuleException
+	/**
+	 * Creates a new {@link RecurringOffer}.
+	 * A {@link RecurringOffer} has a workflow differing from normal 
+	 * offers as it serves as a template for the creation of {@link RecurredOffer}s.
+	 * 
+	 * @param user The user that created the Offer.
+	 * @param recurringOrder The {@link RecurringOrder} the new {@link RecurringOffer} should be part of.
+	 * @param offerIDPrefix The prefix for the id of the new offer. This might be <code>null</code>.
+	 * @return The newly create {@link RecurringOffer}.
+	 */
+	public RecurringOffer createRecurringOffer(User user, RecurringOrder recurringOrder, String offerIDPrefix)
 	{
 		TradeSide tradeSide;
 
@@ -277,11 +290,68 @@ public class RecurringTrader {
 			return recurringOffer;
 		}
 	}
+	
+	/**
+	 * Creates a new {@link RecurredOffer} for the given {@link Order}.
+	 * 
+	 * @param user The user that created the Offer.
+	 * @param order The {@link Order} the new {@link RecurredOffer} should be part of.
+	 * @param offerIDPrefix The prefix for the id of the new offer. This might be <code>null</code>. 
+	 * @return The newly created {@link RecurredOffer}·
+	 */
+	public RecurredOffer createRecurredOffer(User user, Order order, String offerIDPrefix)
+	{
+		TradeSide tradeSide;
+
+		LegalEntity vendor = order.getVendor();
+		if (vendor == null)
+			throw new IllegalStateException("order.getVendor() returned null!");
+
+		LegalEntity customer = order.getCustomer();
+		if (customer == null)
+			throw new IllegalStateException("order.getCustomer() returned null!");
+
+		PersistenceManager pm = getPersistenceManager();
+		Trader trader = Trader.getTrader(pm);
+		OrganisationLegalEntity mandator = trader.getMandator();
+
+		if (mandator.equals(customer) && (vendor instanceof OrganisationLegalEntity)) {
+			tradeSide = TradeSide.customerCrossOrganisation;
+			// TODO: Implement foreign stuff
+			throw new UnsupportedOperationException("NYI");
+		}
+		else {
+			if (mandator.equals(vendor))
+				tradeSide = TradeSide.vendor;
+			else if (mandator.equals(customer))
+				tradeSide = TradeSide.customerLocal;
+			else
+				throw new IllegalStateException("mandator is neither customer nor vendor! order=" + order + " mandator=" + mandator);
+
+			offerIDPrefix = getOfferIDPrefix(user, offerIDPrefix);
+
+			RecurredOffer recurredOffer = new RecurredOffer(
+					user, order,
+					offerIDPrefix, IDGenerator.nextID(RecurringOffer.class, offerIDPrefix));
+
+			new OfferLocal(recurredOffer); // OfferLocal registers itself in Offer
+
+			recurredOffer = getPersistenceManager().makePersistent(recurredOffer);
+			trader.validateOffer(recurredOffer);
+
+			// RecurredOffer has the same workflow definition as other offers,
+			// thus we persist a workflow from the assignment to Offer.class
+			ProcessDefinitionAssignment processDefinitionAssignment = (ProcessDefinitionAssignment) getPersistenceManager().getObjectById(
+					ProcessDefinitionAssignmentID.create(Offer.class, tradeSide));
+			processDefinitionAssignment.createProcessInstance(null, user, recurredOffer);
+
+			return recurredOffer;
+		}
+	}	
 
 
 	public RecurringOrder createRecurringOrder(LegalEntity vendor,
 			LegalEntity customer, String orderIDPrefix, Currency currency)
-//	throws ModuleException
 	{
 		if (customer == null)
 			throw new IllegalArgumentException("customer must not be null!");

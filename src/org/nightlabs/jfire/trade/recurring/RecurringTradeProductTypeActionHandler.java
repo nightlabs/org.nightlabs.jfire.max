@@ -13,6 +13,7 @@ import org.nightlabs.jfire.store.ProductType;
 import org.nightlabs.jfire.store.ProductTypeActionHandler;
 import org.nightlabs.jfire.store.ProductTypeActionHandlerNotFoundException;
 import org.nightlabs.jfire.trade.Article;
+import org.nightlabs.jfire.trade.Segment;
 
 /**
  *
@@ -79,7 +80,7 @@ public abstract class RecurringTradeProductTypeActionHandler {
 	protected RecurringTradeProductTypeActionHandler() { }	
 
 
-	public abstract Map<Article, Article> createArticles(RecurredOffer offer, Set<Article> recurringArticles);
+	public abstract Map<Article, Article> createArticles(RecurredOffer offer, Set<Article> recurringArticles,Segment segment);
 
 	protected PersistenceManager getPersistenceManager()
 	{

@@ -64,7 +64,7 @@ import org.nightlabs.util.Util;
 /**
  * @author Alexander Bieber <!-- alex at nightlabs dot de -->
  * @author Marco Schulze - Marco at NightLabs dot de
- * 
+ *
  * @jdo.persistence-capable
  *		identity-type="application"
  *		objectid-class="org.nightlabs.jfire.accounting.id.InvoiceID"
@@ -115,7 +115,7 @@ import org.nightlabs.util.Util;
  * @jdo.fetch-group name="Invoice.finalizeUser" fields="finalizeUser"
  * @jdo.fetch-group name="Invoice.price" fields="price"
  * @jdo.fetch-group name="Invoice.this" fetch-groups="default" fields="invoiceLocal, articles, createUser, currency, customer, discount, finalizeUser, price, vendor, state, states"
- * 
+ *
  * @jdo.fetch-group name="ArticleContainer.customer" fields="customer"
  * @jdo.fetch-group name="ArticleContainer.vendor" fields="vendor"
  *
@@ -137,8 +137,9 @@ implements Serializable, ArticleContainer, Statable, DetachCallback
 	public static final String FETCH_GROUP_FINALIZE_USER = "Invoice.finalizeUser";
 	public static final String FETCH_GROUP_PRICE = "Invoice.price";
 	/**
-	 * @deprecated The *.this-FetchGroups lead to bad programming style and are therefore deprecated, now. They should be removed soon! 
+	 * @deprecated The *.this-FetchGroups lead to bad programming style and are therefore deprecated, now. They should be removed soon!
 	 */
+	@Deprecated
 	public static final String FETCH_GROUP_THIS_INVOICE = "Invoice.this";
 
 	/**
@@ -220,7 +221,7 @@ implements Serializable, ArticleContainer, Statable, DetachCallback
 
 		if (currency == null)
 			throw new NullPointerException("currency");
-		
+
 		PersistenceManager pm = JDOHelper.getPersistenceManager(vendor);
 		if (pm == null)
 			throw new IllegalStateException("vendor is not persistent! Could not get a PersistenceManager from it!");
@@ -251,7 +252,7 @@ implements Serializable, ArticleContainer, Statable, DetachCallback
 	private String primaryKey;
 
 	/**
-	 * @jdo.field persistence-modifier="persistent" mapped-by="invoice"
+	 * @jdo.field persistence-modifier="persistent" mapped-by="invoice" dependent="true"
 	 */
 	private InvoiceLocal invoiceLocal;
 
@@ -282,7 +283,7 @@ implements Serializable, ArticleContainer, Statable, DetachCallback
 	 * @jdo.field persistence-modifier="none"
 	 */
 	private boolean customerID_detached = false;
-	
+
 	/**
 	 * @jdo.field persistence-modifier="persistent"
 	 */
@@ -327,7 +328,7 @@ implements Serializable, ArticleContainer, Statable, DetachCallback
 	 *		mapped-by="invoice"
 	 */
 	private Set<Article> articles;
-	
+
 	/**
 	 * @jdo.field persistence-modifier="persistent"
 	 */
@@ -427,7 +428,7 @@ implements Serializable, ArticleContainer, Statable, DetachCallback
 
 		this.valid = false;
 		article.setInvoice(this);
-		
+
 		this.articleCount = articles.size();
 	}
 
@@ -442,7 +443,7 @@ implements Serializable, ArticleContainer, Statable, DetachCallback
 			this.valid = false;
 			article.setInvoice(null);
 		}
-		
+
 		this.articleCount = articles.size();
 	}
 
@@ -450,24 +451,24 @@ implements Serializable, ArticleContainer, Statable, DetachCallback
 	 * @jdo.field persistence-modifier="persistent"
 	 */
 	private Discount discount;
-	
+
 	/**
 	 * Creation date of this Invoice.
-	 * 
+	 *
 	 * @jdo.field persistence-modifier="persistent"
 	 */
 	private Date createDT;
-	
+
 	/**
 	 * The user who created this Invoice.
-	 * 
+	 *
 	 * @jdo.field persistence-modifier="persistent"
 	 */
 	private User createUser = null;
 
 	/**
 	 * This member represents the sum of all prices of all invoice items.
-	 * 
+	 *
 	 * @jdo.field persistence-modifier="persistent"
 	 */
 	private Price price;
@@ -520,7 +521,7 @@ implements Serializable, ArticleContainer, Statable, DetachCallback
 	 * @jdo.field persistence-modifier="persistent"
 	 */
 	private Date finalizeDT  = null;
-	
+
 	/**
 	 * Represents the currency of all offerItems within this invoice.
 	 * An Invoice can only contain offerItems with the same currency.
@@ -788,7 +789,7 @@ implements Serializable, ArticleContainer, Statable, DetachCallback
 
 		return _states;
 	}
-	
+
 	/*
 	 * (non-Javadoc)
 	 * @see org.nightlabs.jfire.trade.ArticleContainer#getArticleCount()

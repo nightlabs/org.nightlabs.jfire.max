@@ -54,6 +54,9 @@ Caused by: javax.jdo.JDOException: Invalid state, closed or no mc
         at org.jpox.resource.PersistenceManagerImpl.getObjectById(PersistenceManagerImpl.java:605)
 
 Therefore, we simply try it twice.
+
+This bug has been fixed a long time ago. All these inits are unnecessary now, except for TradeManager.initialise2() which
+is for a new problem: http://www.jpox.org/servlet/jira/browse/NUCCORE-93
 -->
 	<init bean="jfire/ejb/JFireTrade/AccountingManager" method="initialise2">
 		<depends module="JFireTrade.ear"

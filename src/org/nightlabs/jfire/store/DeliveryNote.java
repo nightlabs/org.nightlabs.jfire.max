@@ -134,14 +134,15 @@ implements Serializable, ArticleContainer, Statable, DetachCallback
 	public static final String FETCH_GROUP_CREATE_USER = "DeliveryNote.createUser";
 	public static final String FETCH_GROUP_FINALIZE_USER = "DeliveryNote.finalizeUser";
 	/**
-	 * @deprecated The *.this-FetchGroups lead to bad programming style and are therefore deprecated, now. They should be removed soon! 
+	 * @deprecated The *.this-FetchGroups lead to bad programming style and are therefore deprecated, now. They should be removed soon!
 	 */
+	@Deprecated
 	public static final String FETCH_GROUP_THIS_DELIVERY_NOTE = "DeliveryNote.this";
 
 	public static final String FETCH_GROUP_VENDOR = "ArticleContainer.vendor";
 	public static final String FETCH_GROUP_CUSTOMER = "ArticleContainer.customer";
-	
-	
+
+
 	// the following fetch-groups are virtual and processed in the detach callback
 //	public static final String FETCH_GROUP_VENDOR_ID = "DeliveryNote.vendorID";
 //	public static final String FETCH_GROUP_CUSTOMER_ID = "DeliveryNote.customerID";
@@ -202,7 +203,7 @@ implements Serializable, ArticleContainer, Statable, DetachCallback
 
 		if (customer == null)
 			throw new NullPointerException("customer");
-		
+
 		ObjectIDUtil.assertValidIDString(deliveryNoteIDPrefix, "deliveryNoteIDPrefix");
 
 		if (_deliveryNoteID < 0)
@@ -210,7 +211,7 @@ implements Serializable, ArticleContainer, Statable, DetachCallback
 
 //		if (currency == null)
 //			throw new NullPointerException("currency");
-		
+
 		PersistenceManager pm = JDOHelper.getPersistenceManager(vendor);
 		if (pm == null)
 			throw new IllegalStateException("vendor is not persistent! Could not get a PersistenceManager from it!");
@@ -254,7 +255,7 @@ implements Serializable, ArticleContainer, Statable, DetachCallback
 	private String primaryKey;
 
 	/**
-	 * @jdo.field persistence-modifier="persistent" mapped-by="deliveryNote"
+	 * @jdo.field persistence-modifier="persistent" mapped-by="deliveryNote" dependent="true"
 	 */
 	private DeliveryNoteLocal deliveryNoteLocal;
 
@@ -354,7 +355,7 @@ implements Serializable, ArticleContainer, Statable, DetachCallback
 
 	/**
 	 * The user who created this DeliveryNote.
-	 * 
+	 *
 	 * @jdo.field persistence-modifier="persistent"
 	 */
 	private User createUser = null;
@@ -466,7 +467,7 @@ implements Serializable, ArticleContainer, Statable, DetachCallback
 	 * @jdo.field persistence-modifier="persistent"
 	 */
 	private boolean valid = false;
-	
+
 	/**
 	 * This member stores the user who finilized this DeliveryNote.
 	 *
@@ -561,7 +562,7 @@ implements Serializable, ArticleContainer, Statable, DetachCallback
 		this.valid = false;
 		article.setDeliveryNote(this);
 	}
-	
+
 	public void removeArticle(Article article)
 	throws DeliveryNoteEditException
 	{
@@ -615,7 +616,7 @@ implements Serializable, ArticleContainer, Statable, DetachCallback
 	public Date getFinalizeDT() {
 		return finalizeDT;
 	}
-	
+
 	protected PersistenceManager getPersistenceManager()
 	{
 		PersistenceManager pm = JDOHelper.getPersistenceManager(this);

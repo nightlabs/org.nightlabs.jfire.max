@@ -60,8 +60,8 @@ import org.nightlabs.util.Util;
 
 /**
  * An Offer is basically a collection of {@link Article}s along with
- * status information.  
- * 
+ * status information.
+ *
  * @author Niklas Schiffler <nick@nightlabs.de>
  * @author marco schulze - marco at nightlabs dot de
  * @author Alexander Bieber <alex[AT]nightlabs[DOT]de>
@@ -157,7 +157,7 @@ implements
 	private String primaryKey;
 
 	/**
-	 * @jdo.field persistence-modifier="persistent" mapped-by="offer"
+	 * @jdo.field persistence-modifier="persistent" mapped-by="offer" dependent="true"
 	 */
 	private OfferLocal offerLocal;
 
@@ -186,7 +186,7 @@ implements
 	 * An Offer is stable, if it does not change values when prices are recalculated.
 	 * Only stable Offers can be confirmed. An unstable Offer can come into existence
 	 * if conflicting PriceConfigs of two or more OfferItems interfere.
-	 * 
+	 *
 	 * @jdo.field persistence-modifier="persistent"
 	 */
 	private boolean stable;
@@ -194,7 +194,7 @@ implements
 	/**
 	 * An Offer is only valid if it is stable and has been validated. It needs to be
 	 * valid, before it can be finalized.
-	 * 
+	 *
 	 * @jdo.field persistence-modifier="persistent"
 	 */
 	private boolean valid = false;
@@ -253,7 +253,7 @@ implements
 
 	/**
 	 * This member represents the sum of all prices of all offer items.
-	 * 
+	 *
 	 * @jdo.field persistence-modifier="persistent"
 	 */
 	private Price price;
@@ -316,7 +316,7 @@ implements
 	 * @jdo.join
 	 */
 	private List<State> states;
-	
+
 	/**
 	 * @jdo.field persistence-modifier="persistent"
 	 */
@@ -440,7 +440,7 @@ implements
 			this.articles.add(article);
 			this.order.addArticle(article);
 		}
-		
+
 		this.articleCount = articles.size();
 	}
 
@@ -461,7 +461,7 @@ implements
 			attachable = false;
 		else
 			this.order.addArticle(article);
-		
+
 		this.articleCount = articles.size();
 	}
 
@@ -526,7 +526,7 @@ implements
 	/**
 	 * This method calculates all offerItem's prices and the offer's price. It's a local helper method
 	 * called by calculatePrice().
-	 * 
+	 *
 	 * @param all If all=false, it does not recalculate the price of an Article,
 	 *	if Article.isPriceDependentFromOffer() returns false.
 	 *	If all=true, all prices of all items are recalculated.
@@ -536,7 +536,7 @@ implements
 		price.clearFragments();
 		price.setAmount(0);
 		containsPricesDependentOnOffer = false;
-		
+
 		PersistenceManager pm = JDOHelper.getPersistenceManager(this);
 		if (pm == null)
 			throw new IllegalStateException("This instance of offer is currently not persistent!");
@@ -646,7 +646,7 @@ implements
 	 * email) to the customer. After finalization the {@link Offer} can't be changed any more,
 	 * this avoids communication conflicts as it forces the generation
 	 * of a new <tt>Offer</tt> if the customer requests changes after reception.
-	 * 
+	 *
 	 * @return Returns whether it's finalized.
 	 */
 	public boolean isFinalized()
@@ -697,7 +697,7 @@ implements
 
 	/**
 	 * @return an <b>unmodifiable</b> set of the Articles of this {@link Offer}.
-	 * Do not attempt to change this set. 
+	 * Do not attempt to change this set.
 	 */
 	public Collection<Article> getArticles()
 	{
@@ -714,7 +714,7 @@ implements
 	 * <br/><br/>
 	 * This method causes all prices to be recalculated and all products to be allocated (if they have
 	 * been released by timeout).
-	 * @return Whether this {@link Offer} is valid after the method call. 
+	 * @return Whether this {@link Offer} is valid after the method call.
 	 */
 	protected boolean validate()
 	{
@@ -725,7 +725,7 @@ implements
 
 		// TODO here, we should make sure, we have requirement-offers, which can
 		// be fulfilled.
-		
+
 		// if (all requirement-offers are valid)
 		boolean _valid = true;
 
@@ -922,13 +922,13 @@ implements
 	/**
 	 * Returns the {@link Price} of this {@link Offer}. It represents the sum
 	 * of all {@link ArticlePrice}s of the contained articles.
-	 * 
+	 *
 	 * @return The {@link Price} of this {@link Offer}.
 	 */
 	public Price getPrice() {
 		return price;
 	}
-	
+
 	/*
 	 * (non-Javadoc)
 	 * @see org.nightlabs.jfire.trade.ArticleContainer#getArticleCount()

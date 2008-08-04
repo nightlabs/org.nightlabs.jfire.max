@@ -73,6 +73,7 @@ import org.nightlabs.jfire.jbpm.JbpmLookup;
 import org.nightlabs.jfire.jbpm.graph.def.ProcessDefinition;
 import org.nightlabs.jfire.jbpm.graph.def.Statable;
 import org.nightlabs.jfire.jbpm.graph.def.State;
+import org.nightlabs.jfire.jbpm.graph.def.StateDefinition;
 import org.nightlabs.jfire.jbpm.graph.def.id.ProcessDefinitionID;
 import org.nightlabs.jfire.organisation.Organisation;
 import org.nightlabs.jfire.person.Person;
@@ -1255,7 +1256,34 @@ implements SessionBean
 	public void initialise2()
 	throws IOException, MalformedVersionException
 	{
-		initialise();
+		// WORKAROUND JPOX Bug to avoid problems with creating workflows as State.statable is defined as interface and has subclassed implementations
+		// http://www.jpox.org/servlet/jira/browse/NUCCORE-93
+		PersistenceManager pm = getPersistenceManager();
+		try {
+			User user = User.getUser(pm, getPrincipal());
+
+			Order order = new Order(
+					OrganisationLegalEntity.getOrganisationLegalEntity(pm, getOrganisationID()),
+					LegalEntity.getAnonymousLegalEntity(pm),
+					"test",
+					0,
+					pm.getExtent(Currency.class).iterator().next(),
+					user
+			);
+			order = pm.makePersistent(order);
+
+			Offer offer = new Offer(user, order, "test", 0);
+			new OfferLocal(offer);
+			offer = pm.makePersistent(offer);
+			pm.flush();
+			StateDefinition stateDefinition = pm.getExtent(StateDefinition.class).iterator().next();
+			stateDefinition.createState(user, offer);
+
+			// force rollback (we don't want any of this test stuff in the database)
+		} finally {
+			pm.close();
+		}
+		sessionContext.setRollbackOnly();
 	}
 
 	/**
@@ -1271,6 +1299,7 @@ implements SessionBean
 		PersistenceManager pm = getPersistenceManager();
 		try {
 			// WORKAROUND JPOX Bug to avoid problems with creating workflows as State.statable is defined as interface and has subclassed implementations
+			// http://www.jpox.org/servlet/jira/browse/NUCCORE-93
 			pm.getExtent(Order.class);
 			pm.getExtent(Offer.class);
 			pm.getExtent(Invoice.class);
@@ -1299,7 +1328,7 @@ implements SessionBean
 				);
 			configSetup.getConfigModuleClasses().add(LegalEntityViewConfigModule.class.getName());
 			configSetup.getConfigModuleClasses().add(TariffOrderConfigModule.class.getName());
-			
+
 			ConfigSetup workstationConfigSetup = ConfigSetup.getConfigSetup(
 					pm,
 					getOrganisationID(),

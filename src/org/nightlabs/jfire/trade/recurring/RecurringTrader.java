@@ -184,7 +184,8 @@ public class RecurringTrader {
 		trader.validateOffer(recurredOffer);
 
 
-		// Loop through all the segments
+		// Loop over all articles in the given offer and group
+		// them by SegmentType and ProductType-class
 		Map<SegmentType, Map<Class<? extends ProductType>, Set<Article>>> segmentTypes2PTClass2Articles =  new HashMap<SegmentType, Map<Class<? extends ProductType>, Set<Article>>>();
 
 		for (Article recurringArticle : recurringOffer.getArticles()) {

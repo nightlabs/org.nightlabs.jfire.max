@@ -80,7 +80,7 @@ public abstract class RecurringTradeProductTypeActionHandler {
 	protected RecurringTradeProductTypeActionHandler() { }	
 
 
-	public abstract Map<Article, Article> createArticles(RecurredOffer offer, Set<Article> recurringArticles,Segment segment);
+	public abstract Map<Article, Article> createArticles(RecurredOffer offer, Set<Article> recurringArticles, Segment segment);
 
 	protected PersistenceManager getPersistenceManager()
 	{

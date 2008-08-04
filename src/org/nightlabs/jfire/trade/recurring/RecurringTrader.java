@@ -2,16 +2,12 @@ package org.nightlabs.jfire.trade.recurring;
 
 import java.io.IOException;
 import java.net.URL;
-import java.util.ArrayList;
-import java.util.Collection;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
-import java.util.Set;
 
 import javax.jdo.JDOHelper;
 import javax.jdo.JDOObjectNotFoundException;
@@ -19,7 +15,6 @@ import javax.jdo.PersistenceManager;
 
 import org.nightlabs.ModuleException;
 import org.nightlabs.jdo.NLJDOHelper;
-import org.nightlabs.jfire.accounting.Account;
 import org.nightlabs.jfire.accounting.Currency;
 import org.nightlabs.jfire.config.Config;
 import org.nightlabs.jfire.idgenerator.IDGenerator;
@@ -30,11 +25,9 @@ import org.nightlabs.jfire.jbpm.graph.def.Transition;
 import org.nightlabs.jfire.jbpm.graph.def.id.ProcessDefinitionID;
 import org.nightlabs.jfire.security.SecurityReflector;
 import org.nightlabs.jfire.security.User;
-import org.nightlabs.jfire.store.Product;
 import org.nightlabs.jfire.store.ProductType;
 import org.nightlabs.jfire.store.Store;
 import org.nightlabs.jfire.trade.Article;
-import org.nightlabs.jfire.trade.ArticleCreator;
 import org.nightlabs.jfire.trade.LegalEntity;
 import org.nightlabs.jfire.trade.OfferLocal;
 import org.nightlabs.jfire.trade.Order;
@@ -181,8 +174,9 @@ public class RecurringTrader {
 		String offerIDPrefix = recurringOffer.getOfferIDPrefix();
 
 		// create the new segment for the order
-		for (Segment segment : recurringOffer.getSegments()) 		
-		trader.createSegment(order, segment.getSegmentType());
+		for (Segment segment : recurringOffer.getSegments()) { 		
+			trader.createSegment(order, segment.getSegmentType());
+		}
 		
 		RecurredOffer recurredOffer = new RecurredOffer(
 				user, order,
@@ -193,33 +187,23 @@ public class RecurringTrader {
 
 
 		// Loop through all the segments
-		Map<SegmentType, Map<Class, List<Article> >> collected_map =  new HashMap<SegmentType, Map<Class, List<Article> >> ();
-		
+		Map<SegmentType, Map<Class<? extends ProductType>, List<Article> >> collected_map =  new HashMap<SegmentType, Map<Class<? extends ProductType>, List<Article>>>();
 
-		for (Segment segment : recurringOffer.getSegments()) {
-
-		   Order ord = segment.getOrder();	
-		  Map <Class, List<Article>> collected =new HashMap<Class, List<Article>>();
-			
-			// get the articles in all the order 		
-
-			for (Article article1 : ord.getArticles())
-			{
-				ProductType pt = article1.getProductType();
-				List<Article> art  = new ArrayList<Article>();
-				//				get all the articles of the same product type
-				for (Article article : ord.getArticles()) 
-				{	
-					if(pt.equals(article.getProductType()))
-						art.add(article);			
-
-				}	
-				collected.put(article1.getProductType().getClass(), art);
+		for (Article recurringArticle : recurringOffer.getArticles()) {
+			SegmentType segmentType = recurringArticle.getSegment().getSegmentType();
+			Map<Class<? extends ProductType>, List<Article>> collected = collected_map.get(segmentType);
+			if (collected == null) {
+				collected = new HashMap<Class<? extends ProductType>, List<Article>>();
+				collected_map.put(segmentType, collected);
 			}
-
-			collected_map.put(segment.getSegmentType() , collected );
+			Class<? extends ProductType> productTypeClass = recurringArticle.getProductType().getClass();
+			List<Article> articles = collected.get(productTypeClass);
+			if (articles == null) {
+				articles = new LinkedList<Article>();
+				collected.put(productTypeClass, articles);
+			}
+			articles.add(recurringArticle);
 		}
-
 
 		return recurredOffer;
 	}

@@ -2,12 +2,15 @@ package org.nightlabs.jfire.trade.recurring;
 
 import java.io.IOException;
 import java.net.URL;
+import java.util.ArrayList;
 import java.util.Collection;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Locale;
+import java.util.Map;
 import java.util.Set;
 
 import javax.jdo.JDOHelper;
@@ -16,6 +19,7 @@ import javax.jdo.PersistenceManager;
 
 import org.nightlabs.ModuleException;
 import org.nightlabs.jdo.NLJDOHelper;
+import org.nightlabs.jfire.accounting.Account;
 import org.nightlabs.jfire.accounting.Currency;
 import org.nightlabs.jfire.config.Config;
 import org.nightlabs.jfire.idgenerator.IDGenerator;
@@ -167,8 +171,8 @@ public class RecurringTrader {
 
 		PersistenceManager pm = getPersistenceManager();
 		Trader trader = Trader.getTrader(pm);
-		 Store store = Store.getStore(pm);
-		 
+		Store store = Store.getStore(pm);
+
 		Order order = trader.createOrder(recurringOffer.getVendor(),
 				recurringOffer.getCustomer(), null, recurringOffer.getCurrency());
 
@@ -176,6 +180,10 @@ public class RecurringTrader {
 
 		String offerIDPrefix = recurringOffer.getOfferIDPrefix();
 
+		// create the new segment for the order
+		for (Segment segment : recurringOffer.getSegments()) 		
+		trader.createSegment(order, segment.getSegmentType());
+		
 		RecurredOffer recurredOffer = new RecurredOffer(
 				user, order,
 				offerIDPrefix, IDGenerator.nextID(RecurringOffer.class, offerIDPrefix));
@@ -185,41 +193,31 @@ public class RecurringTrader {
 
 
 		// Loop through all the segments
-
-		Set<Article> collected  = new HashSet<Article>();
+		Map<SegmentType, Map<Class, List<Article> >> collected_map =  new HashMap<SegmentType, Map<Class, List<Article> >> ();
+		
 
 		for (Segment segment : recurringOffer.getSegments()) {
 
-			Order ord = segment.getOrder();		
-
+		   Order ord = segment.getOrder();	
+		  Map <Class, List<Article>> collected =new HashMap<Class, List<Article>>();
+			
 			// get the articles in all the order 		
 
 			for (Article article1 : ord.getArticles())
 			{
 				ProductType pt = article1.getProductType();
-//				get all the articles of the same product type
+				List<Article> art  = new ArrayList<Article>();
+				//				get all the articles of the same product type
 				for (Article article : ord.getArticles()) 
 				{	
 					if(pt.equals(article.getProductType()))
-						collected.add(article);			
+						art.add(article);			
 
 				}	
-
-				
-				// find  Products
-				Collection<? extends Product> products = store.findProducts(user, pt, null, null); // we create exactly one => no NestedProductTypeLocal needed
-				
-				if (products.size() != 1)
-					throw new IllegalStateException("store.findProducts(...) created " + products.size() + " instead of exactly 1 product!");
-				
-				Collection<? extends Article> articles = trader.createArticles(user, recurredOffer, segment, products,
-						new ArticleCreator(null), true, false);
-				
-
-				collected.clear();
+				collected.put(article1.getProductType().getClass(), art);
 			}
 
-
+			collected_map.put(segment.getSegmentType() , collected );
 		}
 
 

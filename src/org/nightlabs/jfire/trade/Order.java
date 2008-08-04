@@ -56,7 +56,7 @@ import org.nightlabs.util.Util;
 /**
  * An {@link Order} is a collection of {@link Offer}s between two {@link LegalEntity}s,
  * it knows all {@link Article} of the contained {@link Offer}.
- * 
+ *
  * @author Niklas Schiffler <nick@nightlabs.de>
  * @author marco schulze - marco at nightlabs dot de
  * @author Alexander Bieber <alex[AT]nightlabs[DOT]de>
@@ -82,7 +82,8 @@ import org.nightlabs.util.Util;
  *		query="SELECT JDOHelper.getObjectId(this)
  *			WHERE JDOHelper.getObjectId(vendor) == :vendorID &&
  *			      JDOHelper.getObjectId(customer) == :customerID
- *			import org.nightlabs.jfire.transfer.id.AnchorID"
+ *			import org.nightlabs.jfire.transfer.id.AnchorID
+ *			ORDER BY orderID DESC"
  *
  * @!jdo.query
  *		name="getQuickSaleWorkOrderIDCandidates"
@@ -123,7 +124,7 @@ import org.nightlabs.util.Util;
  * @jdo.fetch-group name="Order.createUser" fields="createUser"
  * @jdo.fetch-group name="Order.changeUser" fields="changeUser"
  * @jdo.fetch-group name="Order.this" fetch-groups="default" fields="vendor, currency, customer, customerGroup, articles, segments, offers, createUser, changeUser"
- * 
+ *
  * @jdo.fetch-group name="ArticleContainer.vendor" fields="vendor"
  * @jdo.fetch-group name="ArticleContainer.customer" fields="customer"
  *
@@ -142,8 +143,9 @@ implements Serializable, ArticleContainer, SegmentContainer, DetachCallback
 	public static final String FETCH_GROUP_CREATE_USER = "Order.createUser";
 	public static final String FETCH_GROUP_CHANGE_USER = "Order.changeUser";
 	/**
-	 * @deprecated The *.this-FetchGroups lead to bad programming style and are therefore deprecated, now. They should be removed soon! 
+	 * @deprecated The *.this-FetchGroups lead to bad programming style and are therefore deprecated, now. They should be removed soon!
 	 */
+	@Deprecated
 	public static final String FETCH_GROUP_THIS_ORDER = "Order.this";
 
 
@@ -363,7 +365,7 @@ implements Serializable, ArticleContainer, SegmentContainer, DetachCallback
 	 * @jdo.field primary-key="true"
 	 */
 	private long orderID;
-	
+
 	/**
 	 * @jdo.field persistence-modifier="persistent"
 	 */
@@ -515,12 +517,12 @@ implements Serializable, ArticleContainer, SegmentContainer, DetachCallback
 	 * @jdo.field persistence-modifier="none"
 	 */
 	private AnchorID customerID = null;
-	
+
 	/**
 	 * @jdo.field persistence-modifier="none"
 	 */
 	private boolean customerID_detached = false;
-	
+
 	/**
 	 * @jdo.field persistence-modifier="persistent"
 	 */

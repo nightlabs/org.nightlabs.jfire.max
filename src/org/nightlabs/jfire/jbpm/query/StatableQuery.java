@@ -1,20 +1,18 @@
 package org.nightlabs.jfire.jbpm.query;
 
 import java.util.Date;
-import java.util.List;
 
 import javax.jdo.Query;
 
 import org.apache.log4j.Logger;
 import org.nightlabs.jdo.query.AbstractJDOQuery;
-import org.nightlabs.jdo.query.AbstractSearchQuery;
 import org.nightlabs.jfire.jbpm.graph.def.Statable;
 import org.nightlabs.jfire.jbpm.graph.def.id.StateDefinitionID;
 
 /**
  * A Query for searching for Implementations of {@link Statable}
  * org.nightlabs.jfire.jbpm.query
- * 
+ *
  * @author Daniel.Mazurek [at] NightLabs [dot] de
  * @author Marius Heinzmann - marius[at]nightlabs[dot]com
  */
@@ -23,55 +21,30 @@ public class StatableQuery
 {
 	private static final long serialVersionUID = 1L;
 	private static final Logger logger = Logger.getLogger(StatableQuery.class);
-	
-	// Property IDs used for the PropertyChangeListeners
-	private static final String PROPERTY_PREFIX = "StatableQuery.";
-	public static final String PROPERTY_ONLY_IN_SELECTED_STATE = PROPERTY_PREFIX + "onlyInSelectedState";
-	public static final String PROPERTY_STATE_CREATE_DATE_MAX = PROPERTY_PREFIX + "stateCreateDTMax";
-	public static final String PROPERTY_STATE_CREATE_DATE_MIN = PROPERTY_PREFIX + "stateCreateDTMin";
-	public static final String PROPERTY_STATE_DEFINITION_ID = PROPERTY_PREFIX + "stateDefinitionID";
-	
-	@Override
-	public List<FieldChangeCarrier> getChangedFields(String propertyName)
+
+	public static final class FieldName
 	{
-		final List<FieldChangeCarrier> changedFields = super.getChangedFields(propertyName);
-		final boolean allFields = AbstractSearchQuery.PROPERTY_WHOLE_QUERY.equals(propertyName);
-		
-		if (allFields || PROPERTY_ONLY_IN_SELECTED_STATE.equals(propertyName))
-		{
-			changedFields.add( new FieldChangeCarrier(PROPERTY_ONLY_IN_SELECTED_STATE, onlyInSelectedState) );
-		}
-		if (allFields || PROPERTY_STATE_CREATE_DATE_MAX.equals(propertyName))
-		{
-			changedFields.add( new FieldChangeCarrier(PROPERTY_STATE_CREATE_DATE_MAX, stateCreateDTMax) );
-		}
-		if (allFields || PROPERTY_STATE_CREATE_DATE_MIN.equals(propertyName))
-		{
-			changedFields.add( new FieldChangeCarrier(PROPERTY_STATE_CREATE_DATE_MIN, stateCreateDTMin) );
-		}
-		if (allFields || PROPERTY_STATE_DEFINITION_ID.equals(propertyName))
-		{
-			changedFields.add( new FieldChangeCarrier(PROPERTY_STATE_DEFINITION_ID, stateDefinitionID) );
-		}
-		
-		return changedFields;
+		public static final String onlyInSelectedState = "onlyInSelectedState";
+		public static final String stateCreateDTMax = "stateCreateDTMax";
+		public static final String stateCreateDTMin = "stateCreateDTMin";
+		public static final String stateDefinitionID = "stateDefinitionID";
 	}
-	
+
 	public StatableQuery()
 	{
 	}
-	
+
 	public StatableQuery(Class<? extends Statable> statableClass)
 	{
 		if (statableClass == null)
 			throw new IllegalArgumentException("Param statableClass must not be null");
-		
+
 		if (!Statable.class.isAssignableFrom(statableClass))
 			throw new IllegalArgumentException("Param statableClass must implement the interface "+Statable.class);
-		
+
 		this.statableClass = statableClass;
 	}
-	
+
 	/**
 	 * the Implementation class of the {@link Statable} Interface
 	 */
@@ -79,9 +52,9 @@ public class StatableQuery
 	public Class<? extends Statable> getStatableClass() {
 		return statableClass;
 	}
-	
+
 	/**
-	 * 
+	 *
 	 * @param statableClass
 	 */
 	public void setStatableClass(Class<? extends Statable> statableClass)
@@ -94,24 +67,24 @@ public class StatableQuery
 	{
 		return getPersistenceManager().newQuery(getStatableClass());
 	}
-	
+
 	@Override
 	protected void prepareQuery(Query q)
 	{
 		StringBuffer filter = new StringBuffer();
-		
+
 		filter.append("true");
-		
-		if (stateDefinitionID != null)
+
+		if (isFieldEnabled(FieldName.stateDefinitionID) && stateDefinitionID != null)
 		{
-			if (!onlyInSelectedState) {
+			if (!onlyInSelectedState || ! isFieldEnabled(FieldName.onlyInSelectedState)) {
 				filter.append("\n && (this.states.contains(stateVar) && ( " +
 						"stateVar.stateDefinition.processDefinitionOrganisationID == \""+stateDefinitionID.processDefinitionOrganisationID+"\" && " +
 						"stateVar.stateDefinition.processDefinitionID == \""+stateDefinitionID.processDefinitionID+"\" && " +
 						"stateVar.stateDefinition.stateDefinitionOrganisationID == \""+stateDefinitionID.stateDefinitionOrganisationID+"\" && " +
 						"stateVar.stateDefinition.stateDefinitionID == \""+stateDefinitionID.stateDefinitionID+"\"" +
 						"))");
-				
+
 //				q.declareImports("import "+State.class.getName());
 //				q.declareVariables(State.class.getName()+" stateVar");
 			} else {
@@ -127,14 +100,14 @@ public class StatableQuery
 			}
 		}
 
-		if (stateCreateDTMin != null)
+		if (isFieldEnabled(FieldName.stateCreateDTMin) && stateCreateDTMin != null)
 			filter.append("\n && this.createDT >= :stateCreateDTMin");
 
-		if (stateCreateDTMax != null)
+		if (isFieldEnabled(FieldName.stateCreateDTMax) && stateCreateDTMax != null)
 			filter.append("\n && this.createDT <= :stateCreateDTMax");
-	
+
 		logger.debug("filter == "+filter);
-		
+
 		q.setFilter(filter.toString());
 	}
 
@@ -149,7 +122,7 @@ public class StatableQuery
 	{
 		final StateDefinitionID oldStateDefinitionID = this.stateDefinitionID;
 		this.stateDefinitionID = stateDefinitionID;
-		notifyListeners(PROPERTY_STATE_DEFINITION_ID, oldStateDefinitionID, stateDefinitionID);
+		notifyListeners(FieldName.stateDefinitionID, oldStateDefinitionID, stateDefinitionID);
 	}
 
 	/**
@@ -164,7 +137,7 @@ public class StatableQuery
 	{
 		final Date oldStateCreateDTMin = this.stateCreateDTMin;
 		this.stateCreateDTMin = stateCreateDTMin;
-		notifyListeners(PROPERTY_STATE_CREATE_DATE_MIN, oldStateCreateDTMin, stateCreateDTMin);
+		notifyListeners(FieldName.stateCreateDTMin, oldStateCreateDTMin, stateCreateDTMin);
 	}
 
 	/**
@@ -179,16 +152,16 @@ public class StatableQuery
 	{
 		final Date oldStateCreateDTMax = this.stateCreateDTMax;
 		this.stateCreateDTMax = stateCreateDTMax;
-		notifyListeners(PROPERTY_STATE_CREATE_DATE_MAX, oldStateCreateDTMax, stateCreateDTMax);
+		notifyListeners(FieldName.stateCreateDTMax, oldStateCreateDTMax, stateCreateDTMax);
 	}
 
 	/**
 	 * if onlyInSelectedState is true, the query matches only, if the StateDefinitionID of the
 	 * Statable.getState().getStateDefinition() is exact the one in the query
-	 * 
+	 *
 	 * if onlyInSelectedState is false the query matches, if the {@link Statable} once,
 	 * has passed the getStateDefinitionID() of the query
-	 * 
+	 *
 	 */
 	private boolean onlyInSelectedState = false;
 	public boolean isOnlyInSelectedState() {
@@ -198,7 +171,7 @@ public class StatableQuery
 	{
 		final Boolean oldOnlyInSelectedState = this.onlyInSelectedState;
 		this.onlyInSelectedState = onlyInSelectedState;
-		notifyListeners(PROPERTY_ONLY_IN_SELECTED_STATE, oldOnlyInSelectedState,
+		notifyListeners(FieldName.onlyInSelectedState, oldOnlyInSelectedState,
 			Boolean.valueOf(onlyInSelectedState));
 	}
 
@@ -207,13 +180,13 @@ public class StatableQuery
 	{
 		return Statable.class;
 	}
-	
+
 	@Override
 	protected Class<? extends Statable> getCandidateClass()
 	{
 		return (Class<? extends Statable>) (statableClass != null ? statableClass : super.getCandidateClass());
 	}
-	
+
 	/**
 	 * We assume here that the result class == the set Statable class, but we can only return the
 	 * correct information when we have it.

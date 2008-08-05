@@ -1,17 +1,12 @@
 package org.nightlabs.jfire.issue.query;
 
 import java.util.Date;
-import java.util.List;
 import java.util.Set;
 
-import javax.jdo.JDOHelper;
 import javax.jdo.Query;
 
 import org.apache.log4j.Logger;
-import org.nightlabs.jdo.ObjectID;
-import org.nightlabs.jdo.ObjectIDUtil;
 import org.nightlabs.jdo.query.AbstractJDOQuery;
-import org.nightlabs.jdo.query.AbstractSearchQuery;
 import org.nightlabs.jfire.issue.Issue;
 import org.nightlabs.jfire.issue.IssueLink;
 import org.nightlabs.jfire.issue.id.IssueLinkTypeID;
@@ -22,17 +17,17 @@ import org.nightlabs.jfire.issue.id.IssueTypeID;
 import org.nightlabs.jfire.security.id.UserID;
 
 /**
- * 
+ *
  * @author Chairat Kongarayawetchakun <!-- chairat at nightlabs dot de -->
  * @author Marius Heinzmann - marius[at]nightlabs[dot]com
  */
-public class IssueQuery 
+public class IssueQuery
 	extends AbstractJDOQuery
 {
 	private static final long serialVersionUID = 1L;
 
 	private static final Logger logger = Logger.getLogger(IssueQuery.class);
-	
+
 	private String issueSubject;
 	private String issueComment;
 	private String issueSubjectNComment;
@@ -46,162 +41,94 @@ public class IssueQuery
 	private Date updateTimestamp;
 	private IssueLinkTypeID issueLinkTypeID;
 	private Set<IssueLink> issueLinks;
-	
-	// Property IDs used for the PropertyChangeListeners
-	private static final String PROPERTY_PREFIX = "IssueQuery.";
-	
-	public static final String PROPERTY_REPORTER_ID = PROPERTY_PREFIX + "reporterID";
-	public static final String PROPERTY_ASSIGNEE_ID = PROPERTY_PREFIX + "assigneeID";
 
-	public static final String PROPERTY_CREATE_TIMESTAMP = PROPERTY_PREFIX + "createTimestamp";
-	public static final String PROPERTY_UPDATE_TIMESTAMP = PROPERTY_PREFIX + "updateTimestamp";
-	
-	public static final String PROPERTY_ISSUE_TYPE_ID = PROPERTY_PREFIX + "issueTypeID";
-	public static final String PROPERTY_ISSUE_PRIORITY_ID = PROPERTY_PREFIX + "issuePriorityID";
-	public static final String PROPERTY_ISSUE_RESOLUTION_ID = PROPERTY_PREFIX + "issueResolutionID";
-	public static final String PROPERTY_ISSUE_SEVERITY_TYPE_ID = PROPERTY_PREFIX + "issueSeverityTypeID";
-
-	public static final String PROPERTY_ISSUE_SUBJECT = PROPERTY_PREFIX + "issueSubject";
-	public static final String PROPERTY_ISSUE_SUBJECT_AND_COMMENT = PROPERTY_PREFIX + "issueSubjectNComment";
-	public static final String PROPERTY_ISSUE_COMMENT = PROPERTY_PREFIX + "issueComment";
-	
-	public static final String PROPERTY_ISSUE_LINK_TYPE_ID = PROPERTY_PREFIX + "issueLinkTypeID";
-	public static final String PROPERTY_ISSUE_LINKS = PROPERTY_PREFIX + "issueLinks";
-	
-	
-	
-	@Override
-	public List<FieldChangeCarrier> getChangedFields(String propertyName)
+	public static final class FieldName
 	{
-		final List<FieldChangeCarrier> changedFields = super.getChangedFields(propertyName);
-		final boolean allFields = AbstractSearchQuery.PROPERTY_WHOLE_QUERY.equals(propertyName);
-		
-		if (allFields || PROPERTY_REPORTER_ID.equals(propertyName))
-		{
-			changedFields.add( new FieldChangeCarrier(PROPERTY_REPORTER_ID, reporterID) );
-		}
-		if (allFields || PROPERTY_ASSIGNEE_ID.equals(propertyName))
-		{
-			changedFields.add( new FieldChangeCarrier(PROPERTY_ASSIGNEE_ID, assigneeID) );
-		}
-		if (allFields || PROPERTY_CREATE_TIMESTAMP.equals(propertyName))
-		{
-			changedFields.add( new FieldChangeCarrier(PROPERTY_CREATE_TIMESTAMP, createTimestamp) );
-		}
-		if (allFields || PROPERTY_UPDATE_TIMESTAMP.equals(propertyName))
-		{
-			changedFields.add( new FieldChangeCarrier(PROPERTY_UPDATE_TIMESTAMP, updateTimestamp) );
-		}
-		if (allFields || PROPERTY_ISSUE_LINK_TYPE_ID.equals(propertyName))
-		{
-			changedFields.add( new FieldChangeCarrier(PROPERTY_ISSUE_LINK_TYPE_ID, issueLinkTypeID) );
-		}
-		if (allFields || PROPERTY_ISSUE_LINKS.equals(propertyName))
-		{
-			changedFields.add( new FieldChangeCarrier(PROPERTY_ISSUE_LINKS, issueLinks) );
-		}
-		if (allFields || PROPERTY_ISSUE_TYPE_ID.equals(propertyName))
-		{
-			changedFields.add( new FieldChangeCarrier(PROPERTY_ISSUE_TYPE_ID, issueTypeID) );
-		}
-		if (allFields || PROPERTY_ISSUE_PRIORITY_ID.equals(propertyName))
-		{
-			changedFields.add( new FieldChangeCarrier(PROPERTY_ISSUE_PRIORITY_ID, issuePriorityID) );
-		}
-		if (allFields || PROPERTY_ISSUE_RESOLUTION_ID.equals(propertyName))
-		{
-			changedFields.add( new FieldChangeCarrier(PROPERTY_ISSUE_RESOLUTION_ID, issueResolutionID) );
-		}
-		if (allFields || PROPERTY_ISSUE_SEVERITY_TYPE_ID.equals(propertyName))
-		{
-			changedFields.add( new FieldChangeCarrier(PROPERTY_ISSUE_SEVERITY_TYPE_ID, issueSeverityTypeID) );
-		}
-		if (allFields || PROPERTY_ISSUE_SUBJECT.equals(propertyName))
-		{
-			changedFields.add( new FieldChangeCarrier(PROPERTY_ISSUE_SUBJECT, removeRegexpSearch(issueSubject)) );
-		}
-		if (allFields || PROPERTY_ISSUE_COMMENT.equals(propertyName))
-		{
-			changedFields.add( new FieldChangeCarrier(PROPERTY_ISSUE_COMMENT, removeRegexpSearch(issueComment)) );
-		}
-		if (allFields || PROPERTY_ISSUE_SUBJECT_AND_COMMENT.equals(propertyName))
-		{
-			changedFields.add( new FieldChangeCarrier(PROPERTY_ISSUE_SUBJECT_AND_COMMENT, removeRegexpSearch(issueSubjectNComment)) );
-		}
-		
-		return changedFields;
+		public static final String reporterID = "reporterID";
+		public static final String assigneeID = "assigneeID";
+		public static final String createTimestamp = "createTimestamp";
+		public static final String updateTimestamp = "updateTimestamp";
+		public static final String issueTypeID = "issueTypeID";
+		public static final String issuePriorityID = "issuePriorityID";
+		public static final String issueResolutionID = "issueResolutionID";
+		public static final String issueSeverityTypeID = "issueSeverityTypeID";
+		public static final String issueSubject = "issueSubject";
+		public static final String issueSubjectNComment = "issueSubjectNComment";
+		public static final String issueComment = "issueComment";
+		public static final String issueLinkTypeID = "issueLinkTypeID";
+		public static final String issueLinks = "issueLinks";
 	}
-	
+
 	@Override
 	protected void prepareQuery(Query q) {
 		StringBuilder filter = new StringBuilder("true");
-		
-		if (issueSubject != null) {
+
+		if (isFieldEnabled(FieldName.issueSubject) && issueSubject != null) {
 			filter.append("\n && subject.names.containsValue(varSubject) && varSubject.toLowerCase().matches(:issueSubject) ");
 		}
-		
-		if (issueComment != null) {
+
+		if (isFieldEnabled(FieldName.issueComment) && issueComment != null) {
 			filter.append("\n && comments.contains(varComment) && varComment.text.toLowerCase().matches(:issueComment) ");
 		}
-		
-		if (issueSubjectNComment != null) {
+
+		if (isFieldEnabled(FieldName.issueSubjectNComment) && issueSubjectNComment != null) {
 			filter.append("\n && (subject.names.containsValue(varSubject) && varSubject.toLowerCase().matches(:issueSubjectNComment))  ");
 			filter.append("\n && (comments.contains(varComment) && varComment.text.toLowerCase().matches(:issueSubjectNComment)) ");
 		}
 
-		if (issueTypeID != null) {
+		if (isFieldEnabled(FieldName.issueTypeID) && issueTypeID != null) {
 			filter.append("\n && issueType.organisationID == :issueTypeID.organisationID ");
 			filter.append("\n && issueType.issueTypeID == :issueTypeID.issueTypeID ");
 		}
-		
-		if (issueSeverityTypeID != null) {
+
+		if (isFieldEnabled(FieldName.issueSeverityTypeID) && issueSeverityTypeID != null) {
 			filter.append("\n && this.issueSeverityType.organisationID == :issueSeverityTypeID.organisationID ");
 			filter.append("\n && this.issueSeverityType.issueSeverityTypeID == :issueSeverityTypeID.issueSeverityTypeID ");
 		}
-		
-		if (issuePriorityID != null) {
+
+		if (isFieldEnabled(FieldName.issuePriorityID) && issuePriorityID != null) {
 			// FIXME: JPOX Bug JDOHelper.getObjectId(this.*) does not seem to work (java.lang.IndexOutOfBoundsException: Index: 3, Size: 3)
 //			filter.append("JDOHelper.getObjectId(this.issuePriority) == :issuePriorityID && ");
 			// WORKAROUND:
 			filter.append("\n && this.issuePriority.organisationID == :issuePriorityID.organisationID ");
 			filter.append("\n &&  this.issuePriority.issuePriorityID == :issuePriorityID.issuePriorityID ");
 		}
-		
-		if (issueResolutionID != null) {
+
+		if (isFieldEnabled(FieldName.issueResolutionID) && issueResolutionID != null) {
 			// FIXME: JPOX Bug JDOHelper.getObjectId(this.*) does not seem to work (java.lang.IndexOutOfBoundsException: Index: 3, Size: 3)
 //			filter.append("JDOHelper.getObjectId(this.issueResolution) == :issueResolutionID && ");
 			// WORKAROUND:
 			filter.append("\n && this.issueResolution.organisationID == :issueResolutionID.organisationID ");
 			filter.append("\n && this.issueResolution.issueResolutionID == :issueResolutionID.issueResolutionID ");
 		}
-		
-		if (reporterID != null) {
+
+		if (isFieldEnabled(FieldName.reporterID) && reporterID != null) {
 //			filter.append("JDOHelper.getObjectId(this.reporter) == :reporterID && ");
 			filter.append("\n && this.reporter.organisationID == :reporterID.organisationID ");
 			filter.append("\n && this.reporter.userID == :reporterID.userID ");
 		}
-		
-		if (assigneeID != null) {
+
+		if (isFieldEnabled(FieldName.assigneeID) && assigneeID != null) {
 //			filter.append("JDOHelper.getObjectId(this.assignee) == :assigneeID && ");
 			filter.append("\n && this.assignee.organisationID == :assigneeID.organisationID ");
 			filter.append("\n && this.assignee.userID == :assigneeID.userID ");
 		}
-	
-		if (createTimestamp != null) {
+
+		if (isFieldEnabled(FieldName.createTimestamp) && createTimestamp != null) {
 //			filter.append("JDOHelper.getObjectId(this.createTimestamp) == :createTimestamp && ");
 			filter.append("\n && this.createTimestamp >= :createTimestamp ");
 		}
-		
-		if (updateTimestamp != null) {
+
+		if (isFieldEnabled(FieldName.updateTimestamp) && updateTimestamp != null) {
 //			filter.append("JDOHelper.getObjectId(this.updateTimestamp) == :updateTimestamp && ");
 			filter.append("\n && this.updateTimestamp >= :updateTimestamp ");
 		}
-		
-		if (issueLinkTypeID != null) {
+
+		if (isFieldEnabled(FieldName.issueLinkTypeID) && issueLinkTypeID != null) {
 			filter.append("\n && (this.issueLinks.contains(varIssueLinkType) && (varIssueLinkType.issueLinkType.organisationID == :issueLinkTypeID.organisationID))");
 			filter.append("\n && (this.issueLinks.contains(varIssueLinkType) && (varIssueLinkType.issueLinkType.issueLinkTypeID == :issueLinkTypeID.issueLinkTypeID))");
 		}
-		
+
 		// FIXME: chairat please rewrite this part as soon as you have refactored the linkage of objects to Issues. (marius)
 //		if (issueLinks != null && !issueLinks.isEmpty())
 //		{
@@ -216,7 +143,7 @@ public class IssueQuery
 //			filter.append("\n \t )");
 //			filter.append("\n && )");
 //		}
-//		
+//
 //		if (issueLinks != null && !issueLinks.isEmpty())
 //		{
 //			filter.append("\n && ( ");
@@ -230,7 +157,7 @@ public class IssueQuery
 //			filter.append("\n \t )");
 //			filter.append("\n && )");
 //		}
-		
+
 		logger.info(filter.toString());
 		q.setFilter(filter.toString());
 	}
@@ -239,7 +166,7 @@ public class IssueQuery
 	{
 		return issueSubject;
 	}
-	
+
 	/**
 	 * Helper that removes the '.*' from the beginning and end of the given string.
 	 * @param pattern the regexp pattern that should be cleansed of the '.*'
@@ -249,7 +176,7 @@ public class IssueQuery
 	{
 		if (pattern == null)
 			return null;
-		
+
 		String result = pattern;
 		if (pattern.startsWith(".*"))
 		{
@@ -261,7 +188,7 @@ public class IssueQuery
 		}
 		return pattern;
 	}
-	
+
 	public void setIssueSubject(String issueSubject)
 	{
 		final String oldIssueSubject = removeRegexpSearch(this.issueSubject);
@@ -273,31 +200,31 @@ public class IssueQuery
 		{
 			this.issueSubject = ".*" + issueSubject.toLowerCase() + ".*";
 		}
-		notifyListeners(PROPERTY_ISSUE_SUBJECT, oldIssueSubject, issueSubject);
+		notifyListeners(FieldName.issueSubject, oldIssueSubject, issueSubject);
 	}
-	
+
 	public void setIssueSubjectNComment(String issueSubjectNComment)
 	{
 		final String oldIssueSubjectNComment = removeRegexpSearch(this.issueSubjectNComment);
 		if (issueSubjectNComment == null || issueSubjectNComment.length() == 0)
 		{
-			this.issueSubjectNComment = null;			
+			this.issueSubjectNComment = null;
 		}
 		else
 		{
 			this.issueSubjectNComment = ".*" + issueSubjectNComment.toLowerCase() + ".*";
 		}
-		notifyListeners(PROPERTY_ISSUE_SUBJECT_AND_COMMENT, oldIssueSubjectNComment, issueSubjectNComment);
+		notifyListeners(FieldName.issueSubjectNComment, oldIssueSubjectNComment, issueSubjectNComment);
 	}
-	
+
 	public String getIssueSubjectNComment() {
 		return issueSubjectNComment;
 	}
-	
+
 	public String getIssueComment() {
 		return issueComment;
 	}
-	
+
 	public void setIssueComment(String issueComment)
 	{
 		final String oldIssueComment = removeRegexpSearch(this.issueComment);
@@ -309,9 +236,9 @@ public class IssueQuery
 		{
 			this.issueComment = ".*" + issueComment.toLowerCase() + ".*";
 		}
-		notifyListeners(PROPERTY_ISSUE_COMMENT, oldIssueComment, issueComment);
+		notifyListeners(FieldName.issueComment, oldIssueComment, issueComment);
 	}
-	
+
 	public IssueTypeID getIssueTypeID() {
 		return issueTypeID;
 	}
@@ -320,7 +247,7 @@ public class IssueQuery
 	{
 		final IssueTypeID oldIssueTypeID = this.issueTypeID;
 		this.issueTypeID = issueTypeID;
-		notifyListeners(PROPERTY_ISSUE_TYPE_ID, oldIssueTypeID, issueTypeID);
+		notifyListeners(FieldName.issueTypeID, oldIssueTypeID, issueTypeID);
 	}
 
 	public IssueSeverityTypeID getIssueSeverityTypeID() {
@@ -329,9 +256,9 @@ public class IssueQuery
 
 	public void setIssueSeverityTypeID(IssueSeverityTypeID issueSeverityTypeID)
 	{
-		final IssueSeverityTypeID oldIssueSeverityTypeID = this.issueSeverityTypeID; 
+		final IssueSeverityTypeID oldIssueSeverityTypeID = this.issueSeverityTypeID;
 		this.issueSeverityTypeID = issueSeverityTypeID;
-		notifyListeners(PROPERTY_ISSUE_SEVERITY_TYPE_ID, oldIssueSeverityTypeID, issueSeverityTypeID);
+		notifyListeners(FieldName.issueSeverityTypeID, oldIssueSeverityTypeID, issueSeverityTypeID);
 	}
 
 	public IssuePriorityID getIssuePriorityID() {
@@ -342,20 +269,20 @@ public class IssueQuery
 	{
 		final IssuePriorityID oldIssuePriorityID = this.issuePriorityID;
 		this.issuePriorityID = issuePriorityID;
-		notifyListeners(PROPERTY_ISSUE_PRIORITY_ID, oldIssuePriorityID, issuePriorityID);
+		notifyListeners(FieldName.issuePriorityID, oldIssuePriorityID, issuePriorityID);
 	}
 
 	public IssueResolutionID getIssueResolutionID() {
 		return issueResolutionID;
 	}
-	
+
 	public void setIssueResolutionID(IssueResolutionID issueResolutionID)
 	{
 		final IssueResolutionID oldIssueResolutionID = this.issueResolutionID;
 		this.issueResolutionID = issueResolutionID;
-		notifyListeners(PROPERTY_ISSUE_RESOLUTION_ID, oldIssueResolutionID, issueResolutionID);
+		notifyListeners(FieldName.issueResolutionID, oldIssueResolutionID, issueResolutionID);
 	}
-	
+
 	public UserID getReporterID() {
 		return reporterID;
 	}
@@ -364,7 +291,7 @@ public class IssueQuery
 	{
 		final UserID oldReporterID = this.reporterID;
 		this.reporterID = reporterID;
-		notifyListeners(PROPERTY_REPORTER_ID, oldReporterID, reporterID);
+		notifyListeners(FieldName.reporterID, oldReporterID, reporterID);
 	}
 
 	public UserID getAssigneeID() {
@@ -375,7 +302,7 @@ public class IssueQuery
 	{
 		final UserID oldAssigneeID = this.assigneeID;
 		this.assigneeID = assigneeID;
-		notifyListeners(PROPERTY_ASSIGNEE_ID, oldAssigneeID, assigneeID);
+		notifyListeners(FieldName.assigneeID, oldAssigneeID, assigneeID);
 	}
 
 	public Date getCreateTimestamp() {
@@ -386,7 +313,7 @@ public class IssueQuery
 	{
 		final Date oldCreateTimestamp = this.createTimestamp;
 		this.createTimestamp = createTimestamp;
-		notifyListeners(PROPERTY_CREATE_TIMESTAMP, oldCreateTimestamp, createTimestamp);
+		notifyListeners(FieldName.createTimestamp, oldCreateTimestamp, createTimestamp);
 	}
 	public Date getUpdateTimestamp() {
 		return updateTimestamp;
@@ -394,11 +321,11 @@ public class IssueQuery
 
 	public void setUpdateTimestamp(Date updateTimestamp)
 	{
-		final Date oldUpdateTimestamp = this.updateTimestamp; 
+		final Date oldUpdateTimestamp = this.updateTimestamp;
 		this.updateTimestamp = updateTimestamp;
-		notifyListeners(PROPERTY_UPDATE_TIMESTAMP, oldUpdateTimestamp, updateTimestamp);
+		notifyListeners(FieldName.updateTimestamp, oldUpdateTimestamp, updateTimestamp);
 	}
-	
+
 	public IssueLinkTypeID getIssueLinkTypeID() {
 		return issueLinkTypeID;
 	}
@@ -407,16 +334,16 @@ public class IssueQuery
 	{
 		final IssueLinkTypeID oldIssueLinkTypeID = this.issueLinkTypeID;
 		this.issueLinkTypeID = issueLinkTypeID;
-		notifyListeners(PROPERTY_ISSUE_LINK_TYPE_ID, oldIssueLinkTypeID, issueLinkTypeID);
+		notifyListeners(FieldName.issueLinkTypeID, oldIssueLinkTypeID, issueLinkTypeID);
 	}
-	
+
 	public void setIssueLinks(Set<IssueLink> issueLinks)
 	{
 		final Set<IssueLink> oldIssueLinks = this.issueLinks;
 		this.issueLinks = issueLinks;
-		notifyListeners(PROPERTY_ISSUE_LINKS, oldIssueLinks, issueLinks);
+		notifyListeners(FieldName.issueLinks, oldIssueLinks, issueLinks);
 	}
-	
+
 	public Set<IssueLink> getIssueLinks() {
 		return issueLinks;
 	}

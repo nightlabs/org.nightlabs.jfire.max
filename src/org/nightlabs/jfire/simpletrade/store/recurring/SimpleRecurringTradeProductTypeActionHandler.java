@@ -7,6 +7,7 @@ import java.util.Set;
 
 import javax.jdo.PersistenceManager;
 
+import org.nightlabs.ModuleException;
 import org.nightlabs.jfire.security.SecurityReflector;
 import org.nightlabs.jfire.security.User;
 import org.nightlabs.jfire.simpletrade.store.SimpleProductType;
@@ -56,41 +57,45 @@ extends RecurringTradeProductTypeActionHandler{
 	@Override
 	public  Map<Article, Article> createArticles(RecurredOffer offer, Set<Article> recurringArticles,Segment segment)
 	{	
-//		Map<Article, Article> map;
-//		Article article;
-//		
-//		PersistenceManager pm = getPersistenceManager();
-//		
-//	    Trader trader = Trader.getTrader(pm);
-//		
-//	    Store store = Store.getStore(pm);
-//		
-//		User user = SecurityReflector.getUserDescriptor().getUser(pm);
-//		
-//		ProductType pt;
-//		
-//		
-//		for (Iterator<Article> it = recurringArticles.iterator(); it.hasNext(); ) 
-//		{	
-//			article = it.next();
-//		    pt = article.getProductType();
-//		
-//		}
-//	
-//		SimpleProductType productType = (SimpleProductType)pt;		
-//		
-//		// find  Products
-//		Collection<? extends Product> products = store.findProducts(user, productType, null, null); // we create exactly one => no NestedProductTypeLocal needed
-//		if (products.size() != 1)
-//			throw new IllegalStateException("store.findProducts(...) created " + products.size() + " instead of exactly 1 product!");
-//		
-//		Collection<? extends Article> articles = trader.createArticles(user, offer, segment, products,
-//				new ArticleCreator(null), true, false);
-//
-//
-//		
-//		return (Map<Article, Article>) articles;
-	    return null;
+		Map<Article, Article> map;
+		Article article;
+		
+		PersistenceManager pm = getPersistenceManager();
+		
+	    Trader trader = Trader.getTrader(pm);
+		
+	    Store store = Store.getStore(pm);
+		
+		User user = SecurityReflector.getUserDescriptor().getUser(pm);
+		
+		ProductType pt = null;
+		
+		for (Iterator<Article> it = recurringArticles.iterator(); it.hasNext(); ) 
+		{	
+			article = it.next();
+		    pt = article.getProductType();
+		
+		}
+	
+		SimpleProductType productType = (SimpleProductType)pt;		
+		
+		// find  Products
+		Collection<? extends Product> products = store.findProducts(user, productType, null, null); // we create exactly one => no NestedProductTypeLocal needed
+		if (products.size() != 1)
+			throw new IllegalStateException("store.findProducts(...) created " + products.size() + " instead of exactly 1 product!");
+		
+		Collection<? extends Article> articles =null;
+		try {
+			articles = trader.createArticles(user, offer, segment, products,
+					new ArticleCreator(null), true, false);
+		} catch (ModuleException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+
+
+		
+		return (Map<Article, Article>) articles;
 	}
 
 

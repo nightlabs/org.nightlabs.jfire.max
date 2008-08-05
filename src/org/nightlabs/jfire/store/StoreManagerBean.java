@@ -1690,6 +1690,31 @@ implements SessionBean
 			pm.close();
 		}
 	}
+	
+	/**
+	 * This method returns the delivery with the respective ID.
+	 * 
+	 * @param deliveryID The ID of the delivery to be retrieved.
+	 * @param fetchGroups The fetch groups to be used.
+	 * @param maxFetchDepth The max fetch depth to be used.
+	 * @return A detached copy of the delivery with the respective ID.
+	 * 
+ 	 * @ejb.interface-method
+	 * @ejb.permission role-name="_Guest_"
+	 * @ejb.transaction type="Required"
+	 */
+	public Delivery getDelivery(DeliveryID deliveryID, String[] fetchGroups, int maxFetchDepth) {
+		PersistenceManager pm = getPersistenceManager();
+		try {
+			pm.getFetchPlan().setMaxFetchDepth(maxFetchDepth);
+			if (fetchGroups != null)
+				pm.getFetchPlan().setGroups(fetchGroups);
+			Delivery delivery = (Delivery) pm.getObjectById(deliveryID);
+			return pm.detachCopy(delivery);
+		} finally {
+			pm.close();
+		}
+	}
 
 	/**
 	 * This method queries all <code>Invoice</code>s which exist between the given vendor and customer and

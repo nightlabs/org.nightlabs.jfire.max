@@ -36,6 +36,7 @@ import java.util.Set;
 import javax.jdo.JDOHelper;
 import javax.jdo.PersistenceManager;
 import javax.jdo.Query;
+import javax.jdo.listener.DetachCallback;
 import javax.jdo.listener.StoreCallback;
 
 import org.apache.log4j.Logger;
@@ -81,17 +82,20 @@ import org.nightlabs.util.Util;
  * @jdo.fetch-group name="DeliveryTableData" fetch-groups="default" fields="user, endDT, partner, articles, articleIDs, deliveryNotes"
  */
 public class Delivery
-implements Serializable, StoreCallback
+implements Serializable, StoreCallback, DetachCallback
 {
 	private static final long serialVersionUID = 1L;
 
 	// TODO this field should not be here! The place for use-case-specific fetch-groups is
 	// an external class like for example FetchGroupsTrade! Marco.
 	public static final String FETCH_GROUP_DELIVERY_TABLE_DATA = "DeliveryTableData";
+	
+	public static final String FETCH_GROUP_DELIVERY_NOTE_IDS = "deliveryNoteIDs";
 
 	public static final String DELIVERY_DIRECTION_INCOMING = "incoming";
 
 	public static final String DELIVERY_DIRECTION_OUTGOING = "outgoing";
+	
 
 	@SuppressWarnings("unchecked")
 	public static Collection<Delivery> getDeliveriesForDeliveryNote(PersistenceManager pm, DeliveryNote deliveryNote) {
@@ -1488,6 +1492,29 @@ implements Serializable, StoreCallback
 		
 		if (precursorIDSet != null && precursorSet == null) {
 			precursorSet = NLJDOHelper.getObjectSet(pm, precursorIDSet, Delivery.class);
+		}
+	}
+	
+	protected PersistenceManager getPersistenceManager()
+	{
+		PersistenceManager pm = JDOHelper.getPersistenceManager(this);
+		if (pm == null)
+			throw new IllegalStateException("This instance of Delivery has currently no PersistenceManager assigned!");
+
+		return pm;
+	}
+	
+	@Override
+	public void jdoPreDetach() {
+	}
+	
+	@Override
+	public void jdoPostDetach(Object attachedObj) {
+		Delivery attached = (Delivery) attachedObj;
+		Delivery detached = this;
+		Set<String> fetchGroups = attached.getPersistenceManager().getFetchPlan().getGroups();
+		if (fetchGroups.contains(FETCH_GROUP_DELIVERY_NOTE_IDS)) {
+			detached.deliveryNoteIDs = NLJDOHelper.getObjectIDSet(attached.deliveryNotes);
 		}
 	}
 	

@@ -65,6 +65,8 @@ import org.nightlabs.util.Util;
  *		table="JFireIssueTracking_Issue"
  *
  * @jdo.inheritance strategy="new-table"
+ * 
+ * @jdo.implements name="org.nightlabs.jfire.jbpm.graph.def.Statable"
  *
  * @jdo.create-objectid-class
  *		field-order="organisationID, issueID"

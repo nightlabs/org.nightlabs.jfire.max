@@ -1,38 +1,33 @@
-/**
- * 
- */
 package org.nightlabs.jfire.store.search;
-
-import java.util.List;
 
 import javax.jdo.PersistenceManager;
 import javax.jdo.Query;
 
 import org.nightlabs.jdo.query.AbstractJDOQuery;
-import org.nightlabs.jdo.query.AbstractSearchQuery;
 import org.nightlabs.jfire.store.Product;
-import org.nightlabs.jfire.store.Product.FieldName;
 import org.nightlabs.jfire.store.id.ProductTypeID;
 
 /**
- * Abstract base class for queries which searches for {@link Product}s. 
+ * Abstract base class for queries which searches for {@link Product}s.
  * Every field that's <code>null</code> is ignored,
  * every field containing a value will cause the query to filter all non-matching instances.
- * 
+ *
  * @author Daniel Mazurek - daniel [at] nightlabs [dot] de
  */
-public abstract class AbstractProductQuery 
-extends AbstractJDOQuery 
+public abstract class AbstractProductQuery
+extends AbstractJDOQuery
 {
-	private static final String PROPERTY_PREFIX = "AbstractProductQuery";
-	public static final String PROPERTY_ORGANISATION_ID = PROPERTY_PREFIX + "organisationID";
-	public static final String PROPERTY_PRODUCT_ID = PROPERTY_PREFIX + "productID";
-	public static final String PROPERTY_PRODUCT_TYPE_ID = PROPERTY_PREFIX + "productTypeID";
-	
+	public static final class FieldName
+	{
+		public static final String organisationID = "organisationID";
+		public static final String productID = "productID";
+		public static final String productTypeID = "productTypeID";
+	}
+
 	private String organisationID;
 	private Long productID;
 	private ProductTypeID productTypeID;
-	
+
 	/* (non-Javadoc)
 	 * @see org.nightlabs.jdo.query.AbstractJDOQuery#prepareQuery(javax.jdo.Query)
 	 */
@@ -41,20 +36,20 @@ extends AbstractJDOQuery
 		PersistenceManager pm = getPersistenceManager();
 		StringBuffer filter = getFilter();
 		filter.append("true");
-	
-		if (productTypeID != null) {
-			filter.append("\n && JDOHelper.getObjectId(this."+FieldName.productType+") == :productTypeID");
+
+		if (isFieldEnabled(FieldName.productTypeID) && productTypeID != null) {
+			filter.append("\n && JDOHelper.getObjectId(this."+Product.FieldName.productType+") == :"+FieldName.productTypeID);
 		}
-		if (organisationID != null) {
-			filter.append("\n && this."+FieldName.organisationID+" == :organisationID");
+		if (isFieldEnabled(FieldName.organisationID) && organisationID != null) {
+			filter.append("\n && this."+Product.FieldName.organisationID+" == :"+FieldName.organisationID);
 		}
-		if (productID != null) {
-			filter.append("\n && this."+FieldName.productID+" == :productID");
+		if (isFieldEnabled(FieldName.productID) && productID != null) {
+			filter.append("\n && this."+Product.FieldName.productID+" == :"+FieldName.productID);
 		}
-		
+
 		q.setFilter(filter.toString());
 	}
-	
+
 	/**
 	 * Returns the organisationID.
 	 * @return the organisationID
@@ -62,7 +57,7 @@ extends AbstractJDOQuery
 	public String getOrganisationID() {
 		return organisationID;
 	}
-	
+
 	/**
 	 * Sets the organisationID.
 	 * @param organisationID the organisationID to set
@@ -70,7 +65,7 @@ extends AbstractJDOQuery
 	public void setOrganisationID(String organisationID) {
 		this.organisationID = organisationID;
 	}
-	
+
 	/**
 	 * Returns the productID.
 	 * @return the productID
@@ -78,7 +73,7 @@ extends AbstractJDOQuery
 	public long getProductID() {
 		return productID;
 	}
-	
+
 	/**
 	 * Sets the productID.
 	 * @param productID the productID to set
@@ -86,7 +81,7 @@ extends AbstractJDOQuery
 	public void setProductID(long productID) {
 		this.productID = productID;
 	}
-	
+
 	/**
 	 * Returns the productTypeID.
 	 * @return the productTypeID
@@ -94,7 +89,7 @@ extends AbstractJDOQuery
 	public ProductTypeID getProductTypeID() {
 		return productTypeID;
 	}
-	
+
 	/**
 	 * Sets the productTypeID.
 	 * @param productTypeID the productTypeID to set
@@ -102,22 +97,5 @@ extends AbstractJDOQuery
 	public void setProductTypeID(ProductTypeID productTypeID) {
 		this.productTypeID = productTypeID;
 	}
-	
-	@Override
-	public List<FieldChangeCarrier> getChangedFields(String propertyName)
-	{
-		List<FieldChangeCarrier> changedFields = super.getChangedFields(propertyName);
-		boolean allFields = AbstractSearchQuery.PROPERTY_WHOLE_QUERY.equals(propertyName);
-		
-		if (allFields || PROPERTY_ORGANISATION_ID.equals(propertyName)) {
-			changedFields.add( new FieldChangeCarrier(PROPERTY_ORGANISATION_ID, organisationID) );
-		}
-		if (allFields || PROPERTY_PRODUCT_ID.equals(propertyName)) {
-			changedFields.add( new FieldChangeCarrier(PROPERTY_PRODUCT_ID, productID) );
-		}
-		if (allFields || PROPERTY_PRODUCT_TYPE_ID.equals(propertyName)){
-			changedFields.add( new FieldChangeCarrier(PROPERTY_PRODUCT_TYPE_ID, productTypeID) );
-		}		
-		return changedFields;
-	}	
+
 }

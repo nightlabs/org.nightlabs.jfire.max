@@ -1,12 +1,9 @@
 package org.nightlabs.jfire.store.query;
 
-import java.util.List;
-
 import javax.jdo.Query;
 
 import org.apache.log4j.Logger;
 import org.nightlabs.jdo.query.AbstractJDOQuery;
-import org.nightlabs.jdo.query.AbstractSearchQuery;
 import org.nightlabs.jfire.store.Repository;
 import org.nightlabs.jfire.store.RepositoryType;
 import org.nightlabs.jfire.store.id.RepositoryTypeID;
@@ -21,7 +18,7 @@ public class RepositoryQuery
 	private static final long serialVersionUID = 1L;
 
 	private static final Logger logger = Logger.getLogger(RepositoryQuery.class);
-	
+
 	/**
 	 * the name of the repository to search for
 	 */
@@ -49,87 +46,50 @@ public class RepositoryQuery
 	 * the {@link AnchorID} of the owner
 	 */
 	private AnchorID ownerID = null;
-	
+
 	/**
 	 * the name (or part of it) of the owner
 	 */
 	private String ownerName = null;
-	
-	// Property IDs used for the PropertyChangeListeners
-	private static final String PROPERTY_PREFIX = "RepositoryQuery.";
-	public static final String PROPERTY_ANCHOR_ID = PROPERTY_PREFIX + "anchorID";
-	public static final String PROPERTY_ANCHOR_TYPE_ID = PROPERTY_PREFIX + "anchorTypeID";
-	public static final String PROPERTY_NAME = PROPERTY_PREFIX + "name";
-	public static final String PROPERTY_NAME_LANGUAGE_ID = PROPERTY_PREFIX + "nameLanguageID";
-	public static final String PROPERTY_OWNER_ID = PROPERTY_PREFIX + "ownerID";
-	public static final String PROPERTY_OWNER_NAME = PROPERTY_PREFIX + "ownerName";
-	public static final String PROPERTY_REPOSITORY_TYPE_ID = PROPERTY_PREFIX + "repositoryTypeID";
-	
-	@Override
-	public List<FieldChangeCarrier> getChangedFields(String propertyName)
+
+	public static final class FieldName
 	{
-		final List<FieldChangeCarrier> changedFields = super.getChangedFields(propertyName);
-		final boolean allFields = AbstractSearchQuery.PROPERTY_WHOLE_QUERY.equals(propertyName);
-		
-		if (allFields || PROPERTY_ANCHOR_ID.equals(propertyName))
-		{
-			changedFields.add( new FieldChangeCarrier(PROPERTY_ANCHOR_ID, anchorID) );
-		}
-		if (allFields || PROPERTY_ANCHOR_TYPE_ID.equals(propertyName))
-		{
-			changedFields.add( new FieldChangeCarrier(PROPERTY_ANCHOR_TYPE_ID, anchorTypeID) );
-		}
-		if (allFields || PROPERTY_NAME.equals(propertyName))
-		{
-			changedFields.add( new FieldChangeCarrier(PROPERTY_NAME, name) );
-		}
-		if (allFields || PROPERTY_NAME_LANGUAGE_ID.equals(propertyName))
-		{
-			changedFields.add( new FieldChangeCarrier(PROPERTY_NAME_LANGUAGE_ID, nameLanguageID) );
-		}
-		if (allFields || PROPERTY_OWNER_ID.equals(propertyName))
-		{
-			changedFields.add( new FieldChangeCarrier(PROPERTY_OWNER_ID, ownerID) );
-		}
-		if (allFields || PROPERTY_OWNER_NAME.equals(propertyName))
-		{
-			changedFields.add( new FieldChangeCarrier(PROPERTY_OWNER_NAME, ownerName) );
-		}
-		if (allFields || PROPERTY_REPOSITORY_TYPE_ID.equals(propertyName))
-		{
-			changedFields.add( new FieldChangeCarrier(PROPERTY_REPOSITORY_TYPE_ID, repositoryTypeID) );
-		}
-		
-		return changedFields;
+		public static final String anchorID = "anchorID";
+		public static final String anchorTypeID = "anchorTypeID";
+		public static final String name = "name";
+		public static final String nameLanguageID = "nameLanguageID";
+		public static final String ownerID = "ownerID";
+		public static final String ownerName = "ownerName";
+		public static final String repositoryTypeID = "repositoryTypeID";
 	}
-	
+
 	@Override
 	protected void prepareQuery(Query q)
 	{
 		StringBuffer filter = new StringBuffer();
 		StringBuffer vars = new StringBuffer();
 //		StringBuffer imports = new StringBuffer();
-		
+
 		filter.append(" true");
 
-		if (anchorTypeID != null)
+		if (isFieldEnabled(FieldName.anchorTypeID) && anchorTypeID != null)
 			filter.append("\n && this.anchorTypeID == :anchorTypeID");
-			
-		if (anchorID != null)
+
+		if (isFieldEnabled(FieldName.anchorID) && anchorID != null)
 			filter.append("\n && this.anchorID == :anchorID");
 
-		if (repositoryTypeID != null) {
+		if (isFieldEnabled(FieldName.repositoryTypeID) && repositoryTypeID != null) {
 			repositoryType = (RepositoryType) getPersistenceManager().getObjectById(repositoryTypeID);
 			filter.append("\n && this.repositoryType == :repositoryType");
 		}
 
-		if (name != null && !"".equals(name)) {
+		if (isFieldEnabled(FieldName.name) && name != null && !"".equals(name)) {
 			filter.append("\n && ( ");
 			addFullTextSearch(filter, vars, "name");
 			filter.append(")");
 		}
 
-		if (ownerID != null) {
+		if (isFieldEnabled(FieldName.ownerID) && ownerID != null) {
 			// FIXME: JPOX Bug JDOHelper.getObjectId(this.*) does not seem to work (java.lang.IndexOutOfBoundsException: Index: 3, Size: 3)
 //		filter.append("\n && JDOHelper.getObjectId(this.owner) == :ownerID");
 		// WORKAROUND:
@@ -139,18 +99,18 @@ public class RepositoryQuery
 				"this.owner.anchorID == \""+ownerID.anchorID+"\"" +
 						")");
 		}
-		
-		if (ownerName != null && !"".equals(ownerName)) {
+
+		if (isFieldEnabled(FieldName.ownerName) && ownerName != null && !"".equals(ownerName)) {
 			filter.append("\n && (this.owner.person.displayName.toLowerCase().indexOf(\""+ownerName.toLowerCase()+"\") >= 0)");
 		}
-		
+
 		if (logger.isDebugEnabled()) {
 			logger.debug("Vars:");
 			logger.debug(vars.toString());
 			logger.debug("Filter:");
 			logger.debug(filter.toString());
 		}
-		
+
 		q.setFilter(filter.toString());
 		q.declareVariables(vars.toString());
 	}
@@ -159,7 +119,7 @@ public class RepositoryQuery
 	{
 		if (vars.length() > 0)
 			vars.append("; ");
-		
+
 		String varName = member+"Var";
 		vars.append(String.class.getName()+" "+varName);
 		String containsStr = "containsValue("+varName+")";
@@ -187,7 +147,7 @@ public class RepositoryQuery
 	{
 		final String oldName = this.name;
 		this.name = name;
-		notifyListeners(PROPERTY_NAME, oldName, name);
+		notifyListeners(FieldName.name, oldName, name);
 	}
 
 	/**
@@ -206,7 +166,7 @@ public class RepositoryQuery
 	{
 		final String oldNameLanguageID = this.nameLanguageID;
 		this.nameLanguageID = nameLanguageID;
-		notifyListeners(PROPERTY_NAME_LANGUAGE_ID, oldNameLanguageID, nameLanguageID);
+		notifyListeners(FieldName.nameLanguageID, oldNameLanguageID, nameLanguageID);
 	}
 
 	/**
@@ -225,7 +185,7 @@ public class RepositoryQuery
 	{
 		final RepositoryTypeID oldRepositoryTypeID = this.repositoryTypeID;
 		this.repositoryTypeID = repositoryTypeID;
-		notifyListeners(PROPERTY_REPOSITORY_TYPE_ID, oldRepositoryTypeID, repositoryTypeID);
+		notifyListeners(FieldName.repositoryTypeID, oldRepositoryTypeID, repositoryTypeID);
 	}
 
 	/**
@@ -236,7 +196,7 @@ public class RepositoryQuery
 	{
 		final String oldAnchorID = this.anchorID;
 		this.anchorID = anchorID;
-		notifyListeners(PROPERTY_ANCHOR_ID, oldAnchorID, anchorID);
+		notifyListeners(FieldName.anchorID, oldAnchorID, anchorID);
 	}
 
 	/**
@@ -255,7 +215,7 @@ public class RepositoryQuery
 	{
 		final String oldAnchorTypeID = this.anchorTypeID;
 		this.anchorTypeID = anchorTypeID;
-		notifyListeners(PROPERTY_ANCHOR_TYPE_ID, oldAnchorTypeID, anchorTypeID);
+		notifyListeners(FieldName.anchorTypeID, oldAnchorTypeID, anchorTypeID);
 	}
 
 	/**
@@ -274,7 +234,7 @@ public class RepositoryQuery
 	{
 		final AnchorID oldOwnerID = this.ownerID;
 		this.ownerID = ownerID;
-		notifyListeners(PROPERTY_OWNER_ID, oldOwnerID, ownerID);
+		notifyListeners(FieldName.ownerID, oldOwnerID, ownerID);
 	}
 
 	/**
@@ -293,7 +253,7 @@ public class RepositoryQuery
 	{
 		final String oldOwnerName = this.ownerName;
 		this.ownerName = ownerName;
-		notifyListeners(PROPERTY_OWNER_NAME, oldOwnerName, ownerName);
+		notifyListeners(FieldName.ownerName, oldOwnerName, ownerName);
 	}
 
 	@Override
@@ -301,5 +261,5 @@ public class RepositoryQuery
 	{
 		return Repository.class;
 	}
-		
+
 }

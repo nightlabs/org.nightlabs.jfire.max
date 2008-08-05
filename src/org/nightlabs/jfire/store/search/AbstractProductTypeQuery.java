@@ -1,146 +1,112 @@
 package org.nightlabs.jfire.store.search;
 
-import java.util.List;
-
 import javax.jdo.Query;
 
-import org.apache.log4j.Logger;
-import org.nightlabs.jdo.query.AbstractSearchQuery;
 import org.nightlabs.jfire.store.ProductType;
-import org.nightlabs.jfire.store.ProductType.FieldName;
 import org.nightlabs.jfire.store.id.ProductTypeGroupID;
 import org.nightlabs.jfire.transfer.id.AnchorID;
 
 /**
  * Searches {@link ProductType}s. Every field that's <code>null</code> is ignored,
  * every field containing a value will cause the query to filter all non-matching instances.
- * 
+ *
  * @author Daniel.Mazurek [at] NightLabs [dot] de
  * @author Marius Heinzmann - marius[at]nightlabs[dot]com
  */
 public abstract class AbstractProductTypeQuery
-extends VendorDependentQuery
-implements ISaleAccessQuery
+	extends VendorDependentQuery
+	implements ISaleAccessQuery
 {
-	private static final Logger logger = Logger.getLogger(AbstractProductTypeQuery.class);
-	 
-	private static final long serialVersionUID = 3L;
+	private static final long serialVersionUID = 4L;
 
 	private String fullTextLanguageID = null;
 	private String fullTextSearch = null;
-	
+
 	private Boolean published = null;
 	private Boolean confirmed = null;
 	private Boolean saleable = null;
 	private Boolean closed = null;
-	
+
 	private int minNestedProductTypeAmount = -1;
 	private int maxNestedProductTypeAmount = -1;
 	private AnchorID ownerID = null;
-//	private Boolean available = null;
-//	private PriceConfigID innerPriceConfigID = null;	
-//	private DeliveryConfigurationID deliveryConfigurationID = null;
-//	private LocalAccountantDelegateID localAccountantDelegateID = null;
-	private ProductTypeGroupID productTypeGroupID = null;	
+	private ProductTypeGroupID productTypeGroupID = null;
 	private String organisationID = null;
 	// this value is initially set to avoid finding productType categories by default
 	private Byte inheritanceNature = ProductType.INHERITANCE_NATURE_LEAF;
-	
-	// Property IDs used for the PropertyChangeListeners
-	private static final String PROPERTY_PREFIX = "AbstractProductTypeQuery.";
-	public static final String PROPERTY_AVAILABLE = PROPERTY_PREFIX + "available";
-	public static final String PROPERTY_CLOSED = PROPERTY_PREFIX + "closed";
-	public static final String PROPERTY_CONFIRMED = PROPERTY_PREFIX + "confirmed";
-	public static final String PROPERTY_FULL_TEXT_LANGUAGE_ID = PROPERTY_PREFIX + "fullTextLanguageID";
-	public static final String PROPERTY_FULL_TEXT_SEARCH = PROPERTY_PREFIX + "fullTextSearch";
-	public static final String PROPERTY_MAX_NESTED_PRODUCTTYPE_AMOUNT = PROPERTY_PREFIX + "maxNestedProductTypeAmount";
-	public static final String PROPERTY_MIN_NESTED_PRODUCTTYPE_AMOUNT = PROPERTY_PREFIX + "minNestedProductTypeAmount";
-	public static final String PROPERTY_OWNER_ID = PROPERTY_PREFIX + "ownerID";
-	public static final String PROPERTY_PRODUCTTYPE_GROUP_ID = PROPERTY_PREFIX + "productTypeGroupID";
-	public static final String PROPERTY_PUBLISHED = PROPERTY_PREFIX + "published";
-	public static final String PROPERTY_SALEABLE = PROPERTY_PREFIX + "saleable";
-	public static final String PROPERTY_ORGANISATION_ID = PROPERTY_PREFIX + "organisationID";
-	public static final String PROPERTY_INHERITANCE_NATURE = PROPERTY_PREFIX + "inheritanceNature";
 
-//	public static final String PROPERTY_INNER_PRICE_CONFIG_ID = PROPERTY_PREFIX + "innerPriceConfigID";
-//	public static final String PROPERTY_LOCAL_ACCOUNTANT_DELEGATE_ID = PROPERTY_PREFIX + "localAccountantDelegateID";	
-//	public static final String PROPERTY_DELIVERY_CONFIGURATION_ID = PROPERTY_PREFIX + "deliveryConfigurationID";
+	public static final class FieldName
+	{
+		public static final String closed = "closed";
+		public static final String confirmed = "confirmed";
+		public static final String fullTextLanguageID = "fullTextLanguageID";
+		public static final String fullTextSearch = "fullTextSearch";
+		public static final String maxNestedProductTypeAmount = "maxNestedProductTypeAmount";
+		public static final String minNestedProductTypeAmount = "minNestedProductTypeAmount";
+		public static final String ownerID = "ownerID";
+		public static final String productTypeGroupID = "productTypeGroupID";
+		public static final String published = "published";
+		public static final String saleable = "saleable";
+		public static final String organisationID = "organisationID";
+		public static final String inheritanceNature = "inheritanceNature";
+	}
 
 	@Override
 	protected Query createQuery()
 	{
 		return getPersistenceManager().newQuery(getCandidateClass());
 	}
-	
+
 	@Override
 	protected void prepareQuery(Query q)
 	{
-		super.prepareQuery(q);
-		
 		StringBuffer filter = getFilter();
 		StringBuffer vars = getVars();
-		
-		filter.append("\n && ");
+
 		filter.append("true");
-		
-		if (fullTextSearch != null) {
+
+		if (isFieldEnabled(FieldName.fullTextSearch) && fullTextSearch != null) {
 			filter.append("\n && ( ");
-			addFullTextSearch(filter, vars, FieldName.name);
+			addFullTextSearch(filter, vars, ProductType.FieldName.name);
 			filter.append("\n )");
 		}
-		
-		if (published != null)
-			filter.append("\n && this."+FieldName.published+" == :published");
 
-		if (confirmed != null)
-			filter.append("\n && this."+FieldName.confirmed+" == :confirmed");
+		if (isFieldEnabled(FieldName.published) && published != null)
+			filter.append("\n && this."+ProductType.FieldName.published+" == :published");
 
-		if (saleable != null)
-			filter.append("\n && this."+FieldName.saleable+" == :saleable");
+		if (isFieldEnabled(FieldName.confirmed) && confirmed != null)
+			filter.append("\n && this."+ProductType.FieldName.confirmed+" == :confirmed");
 
-		if (closed != null)
-			filter.append("\n && this."+FieldName.closed+" == :closed");
+		if (isFieldEnabled(FieldName.saleable) && saleable != null)
+			filter.append("\n && this."+ProductType.FieldName.saleable+" == :saleable");
 
-		if (minNestedProductTypeAmount >= 0)
-			filter.append("\n && :minNestedProductTypeAmount < this."+FieldName.productTypeLocal+"."+
+		if (isFieldEnabled(FieldName.closed) && closed != null)
+			filter.append("\n && this."+ProductType.FieldName.closed+" == :closed");
+
+		if (isFieldEnabled(FieldName.minNestedProductTypeAmount) && minNestedProductTypeAmount >= 0)
+			filter.append("\n && :minNestedProductTypeAmount < this."+ProductType.FieldName.productTypeLocal+"."+
 					org.nightlabs.jfire.store.ProductTypeLocal.FieldName.nestedProductTypeLocals+".size()");
 
-		if (maxNestedProductTypeAmount >= 0)
-			filter.append("\n && :maxNestedProductTypeAmount > this."+FieldName.productTypeLocal+"."+
+		if (isFieldEnabled(FieldName.maxNestedProductTypeAmount) && maxNestedProductTypeAmount >= 0)
+			filter.append("\n && :maxNestedProductTypeAmount > this."+ProductType.FieldName.productTypeLocal+"."+
 					org.nightlabs.jfire.store.ProductTypeLocal.FieldName.nestedProductTypeLocals+".size()");
 
-		if (ownerID != null) {
-			filter.append("\n && JDOHelper.getObjectId(this."+FieldName.owner+") == :ownerID");
+		if (isFieldEnabled(FieldName.ownerID) && ownerID != null) {
+			filter.append("\n && JDOHelper.getObjectId(this."+ProductType.FieldName.owner+") == :ownerID");
 		}
 
-//		if (innerPriceConfigID != null) {
-//			filter.append("\n && JDOHelper.getObjectId(this.innerPriceConfig) == :innerPriceConfigID");
-//		}
-//		
-//		if (deliveryConfigurationID != null) {
-//			filter.append("\n && JDOHelper.getObjectId(this.deliveryConfiguration) == :deliveryConfigurationID");
-//		}
-//		
-//		if (localAccountantDelegateID != null) {
-//			filter.append("\n && JDOHelper.getObjectId(this.localAccountantDelegate) == :localAccountantDelegateID");
-//		}
-
-		if (productTypeGroupID != null) {
-			filter.append("\n && JDOHelper.getObjectId(this."+FieldName.managedProductTypeGroup+") == :productTypeGroupID");
+		if (isFieldEnabled(FieldName.productTypeGroupID) && productTypeGroupID != null) {
+			filter.append("\n && JDOHelper.getObjectId(this."+ProductType.FieldName.managedProductTypeGroup+") == :productTypeGroupID");
 		}
 
-		if (organisationID != null)
-			filter.append("\n && this."+FieldName.organisationID+" == :organisationID");
+		if (isFieldEnabled(FieldName.organisationID) && organisationID != null)
+			filter.append("\n && this."+ProductType.FieldName.organisationID+" == :organisationID");
 
-		if (inheritanceNature != null)
-			filter.append("\n && this."+FieldName.inheritanceNature+" == :inheritanceNature");
+		if (isFieldEnabled(FieldName.inheritanceNature) && inheritanceNature != null)
+			filter.append("\n && this."+ProductType.FieldName.inheritanceNature+" == :inheritanceNature");
 
-		if (logger.isDebugEnabled()) {
-			logger.debug("Vars:");
-			logger.debug(vars.toString());
-			logger.debug("Filter:");
-			logger.debug(filter.toString());			
-		}
+		if (isFieldEnabled(VendorDependentQuery.FieldName.vendorID) && getVendorID() != null)
+			filter.append("\n && JDOHelper.getObjectId(this."+ProductType.FieldName.vendor+") == :vendorID");
 
 		q.setFilter(filter.toString());
 		q.declareVariables(vars.toString());
@@ -159,7 +125,7 @@ implements ISaleAccessQuery
 				"  && "+varName+".toLowerCase().matches(:fullTextSearch.toLowerCase())" +
 				" )");
 	}
-	
+
 	/**
 	 * @return the confirmed
 	 */
@@ -175,7 +141,7 @@ implements ISaleAccessQuery
 	{
 		final Boolean oldConfirmed = this.confirmed;
 		this.confirmed = confirmed;
-		notifyListeners(PROPERTY_CONFIRMED, oldConfirmed, confirmed);
+		notifyListeners(FieldName.confirmed, oldConfirmed, confirmed);
 	}
 
 	/**
@@ -192,7 +158,7 @@ implements ISaleAccessQuery
 	{
 		final String oldFullTextLanguageID = this.fullTextLanguageID;
 		this.fullTextLanguageID = fullTextLanguageID;
-		notifyListeners(PROPERTY_FULL_TEXT_LANGUAGE_ID, oldFullTextLanguageID, fullTextLanguageID);
+		notifyListeners(FieldName.fullTextLanguageID, oldFullTextLanguageID, fullTextLanguageID);
 	}
 
 	/**
@@ -207,14 +173,14 @@ implements ISaleAccessQuery
 	 * matches the given fullTextSearch. The match will be performed
 	 * following the rules of {@link String#matches(String)}, i.e.
 	 * you need to pass a regular expression here.
-	 * 
+	 *
 	 * @param fullTextSearch the fullTextSearch to set
 	 */
 	public void setFullTextSearch(String fullTextSearch)
 	{
 		final String oldFullTextSearch = this.fullTextSearch;
 		this.fullTextSearch = fullTextSearch;
-		notifyListeners(PROPERTY_FULL_TEXT_SEARCH, oldFullTextSearch, fullTextSearch);
+		notifyListeners(FieldName.fullTextSearch, oldFullTextSearch, fullTextSearch);
 	}
 
 	/**
@@ -232,7 +198,7 @@ implements ISaleAccessQuery
 	{
 		final Boolean oldPublished = this.published;
 		this.published = published;
-		notifyListeners(PROPERTY_PUBLISHED, oldPublished, published);
+		notifyListeners(FieldName.published, oldPublished, published);
 	}
 
 	/**
@@ -250,7 +216,7 @@ implements ISaleAccessQuery
 	{
 		final Boolean oldSaleable = this.saleable;
 		this.saleable = saleable;
-		notifyListeners(PROPERTY_SALEABLE, oldSaleable, saleable);
+		notifyListeners(FieldName.saleable, oldSaleable, saleable);
 	}
 
 	/**
@@ -269,7 +235,7 @@ implements ISaleAccessQuery
 	{
 		final Integer oldMinNestedProductTypeAmount = this.minNestedProductTypeAmount;
 		this.minNestedProductTypeAmount = minNestedProductTypeAmount;
-		notifyListeners(PROPERTY_MIN_NESTED_PRODUCTTYPE_AMOUNT, oldMinNestedProductTypeAmount, 
+		notifyListeners(FieldName.minNestedProductTypeAmount, oldMinNestedProductTypeAmount,
 			minNestedProductTypeAmount);
 	}
 
@@ -289,28 +255,9 @@ implements ISaleAccessQuery
 	{
 		final Integer oldMaxNestedProductTypeAmount = this.maxNestedProductTypeAmount;
 		this.maxNestedProductTypeAmount = maxNestedProductTypeAmount;
-		notifyListeners(PROPERTY_MAX_NESTED_PRODUCTTYPE_AMOUNT, oldMaxNestedProductTypeAmount, 
+		notifyListeners(FieldName.maxNestedProductTypeAmount, oldMaxNestedProductTypeAmount,
 			maxNestedProductTypeAmount);
 	}
-
-//	/**
-//	 * returns the innerPriceConfigID.
-//	 * @return the innerPriceConfigID
-//	 */
-//	public PriceConfigID getInnerPriceConfigID() {
-//		return innerPriceConfigID;
-//	}
-//
-//	/**
-//	 * sets the innerPriceConfigID
-//	 * @param innerPriceConfigID the innerPriceConfigID to set
-//	 */
-//	public void setInnerPriceConfigID(PriceConfigID innerPriceConfigID)
-//	{
-//		final PriceConfigID oldInnerPriceConfigID = this.innerPriceConfigID;
-//		this.innerPriceConfigID = innerPriceConfigID;
-//		notifyListeners(PROPERTY_INNER_PRICE_CONFIG_ID, oldInnerPriceConfigID, innerPriceConfigID);
-//	}
 
 	/**
 	 * returns the ownerID.
@@ -328,47 +275,8 @@ implements ISaleAccessQuery
 	{
 		final AnchorID oldOwnerID = this.ownerID;
 		this.ownerID = ownerID;
-		notifyListeners(PROPERTY_OWNER_ID, oldOwnerID, ownerID);
+		notifyListeners(FieldName.ownerID, oldOwnerID, ownerID);
 	}
-
-//	/**
-//	 * returns the deliveryConfigurationID.
-//	 * @return the deliveryConfigurationID
-//	 */
-//	public DeliveryConfigurationID getDeliveryConfigurationID() {
-//		return deliveryConfigurationID;
-//	}
-//
-//	/**
-//	 * sets the deliveryConfigurationID
-//	 * @param deliveryConfigurationID the deliveryConfigurationID to set
-//	 */
-//	public void setDeliveryConfigurationID(DeliveryConfigurationID deliveryConfigurationID)
-//	{
-//		final DeliveryConfigurationID oldDeliveryConfigurationID = this.deliveryConfigurationID;
-//		this.deliveryConfigurationID = deliveryConfigurationID;
-//		notifyListeners(PROPERTY_DELIVERY_CONFIGURATION_ID, oldDeliveryConfigurationID, deliveryConfigurationID);
-//	}
-//
-//	/**
-//	 * returns the localAccountantDelegateID.
-//	 * @return the localAccountantDelegateID
-//	 */
-//	public LocalAccountantDelegateID getLocalAccountantDelegateID() {
-//		return localAccountantDelegateID;
-//	}
-//
-//	/**
-//	 * sets the localAccountantDelegateID
-//	 * @param localAccountantDelegateID the localAccountantDelegateID to set
-//	 */
-//	public void setLocalAccountantDelegateID(LocalAccountantDelegateID localAccountantDelegateID)
-//	{
-//		final LocalAccountantDelegateID oldLocalAccountantDelegateID = this.localAccountantDelegateID;
-//		this.localAccountantDelegateID = localAccountantDelegateID;
-//		notifyListeners(PROPERTY_LOCAL_ACCOUNTANT_DELEGATE_ID, oldLocalAccountantDelegateID, 
-//			localAccountantDelegateID);
-//	}
 
 	/**
 	 * returns the productTypeGroupID.
@@ -386,7 +294,7 @@ implements ISaleAccessQuery
 	{
 		final ProductTypeGroupID oldProductTypeGroupID = this.productTypeGroupID;
 		this.productTypeGroupID = productTypeGroupID;
-		notifyListeners(PROPERTY_PRODUCTTYPE_GROUP_ID, oldProductTypeGroupID, productTypeGroupID);
+		notifyListeners(FieldName.productTypeGroupID, oldProductTypeGroupID, productTypeGroupID);
 	}
 
 	/**
@@ -405,27 +313,8 @@ implements ISaleAccessQuery
 	{
 		final Boolean oldClosed = this.closed;
 		this.closed = closed;
-		notifyListeners(PROPERTY_CLOSED, oldClosed, closed);
+		notifyListeners(FieldName.closed, oldClosed, closed);
 	}
-
-//	/**
-//	 * returns the available.
-//	 * @return the available
-//	 */
-//	public Boolean getAvailable() {
-//		return available;
-//	}
-//
-//	/**
-//	 * sets the available
-//	 * @param available the available to set
-//	 */
-//	public void setAvailable(Boolean available)
-//	{
-//		final Boolean oldAvailable = this.available;
-//		this.available = available;
-//		notifyListeners(PROPERTY_AVAILABLE, oldAvailable, available);
-//	}
 
 	/**
 	 * Returns the organisationID.
@@ -442,9 +331,9 @@ implements ISaleAccessQuery
 	public void setOrganisationID(String organisationID) {
 		String oldOrganisationID = this.organisationID;
 		this.organisationID = organisationID;
-		notifyListeners(PROPERTY_ORGANISATION_ID, oldOrganisationID, organisationID);
+		notifyListeners(FieldName.organisationID, oldOrganisationID, organisationID);
 	}
-	
+
 	/**
 	 * Returns the inheritanceNature.
 	 * @return the inheritanceNature
@@ -452,7 +341,7 @@ implements ISaleAccessQuery
 	public Byte getInheritanceNature() {
 		return inheritanceNature;
 	}
-	
+
 	/**
 	 * Sets the inheritanceNature.
 	 * @param inheritanceNature the inheritanceNature to set
@@ -461,78 +350,4 @@ implements ISaleAccessQuery
 		this.inheritanceNature = inheritanceNature;
 	}
 
-	@Override
-	public List<FieldChangeCarrier> getChangedFields(String propertyName)
-	{
-		List<FieldChangeCarrier> changedFields = super.getChangedFields(propertyName);
-		boolean allFields = AbstractSearchQuery.PROPERTY_WHOLE_QUERY.equals(propertyName);
-		
-//		if (allFields || PROPERTY_AVAILABLE.equals(propertyName))
-//		{
-//			changedFields.add( new FieldChangeCarrier(PROPERTY_AVAILABLE, available) );
-//		}
-		if (allFields || PROPERTY_CLOSED.equals(propertyName))
-		{
-			changedFields.add( new FieldChangeCarrier(PROPERTY_CLOSED, closed) );
-		}
-		if (allFields || PROPERTY_CONFIRMED.equals(propertyName))
-		{
-			changedFields.add( new FieldChangeCarrier(PROPERTY_CONFIRMED, confirmed) );
-		}
-		if (allFields || PROPERTY_FULL_TEXT_LANGUAGE_ID.equals(propertyName))
-		{
-			changedFields.add( new FieldChangeCarrier(PROPERTY_FULL_TEXT_LANGUAGE_ID, fullTextLanguageID) );
-		}
-		if (allFields || PROPERTY_FULL_TEXT_SEARCH.equals(propertyName))
-		{
-			changedFields.add( new FieldChangeCarrier(PROPERTY_FULL_TEXT_SEARCH, fullTextSearch) );
-		}
-		if (allFields || PROPERTY_MAX_NESTED_PRODUCTTYPE_AMOUNT.equals(propertyName))
-		{
-			changedFields.add( new FieldChangeCarrier(PROPERTY_MAX_NESTED_PRODUCTTYPE_AMOUNT, maxNestedProductTypeAmount) );
-		}
-		if (allFields || PROPERTY_MIN_NESTED_PRODUCTTYPE_AMOUNT.equals(propertyName))
-		{
-			changedFields.add( new FieldChangeCarrier(PROPERTY_MIN_NESTED_PRODUCTTYPE_AMOUNT, minNestedProductTypeAmount) );
-		}
-		if (allFields || PROPERTY_OWNER_ID.equals(propertyName))
-		{
-			changedFields.add( new FieldChangeCarrier(PROPERTY_OWNER_ID, ownerID) );
-		}
-		if (allFields || PROPERTY_PRODUCTTYPE_GROUP_ID.equals(propertyName))
-		{
-			changedFields.add( new FieldChangeCarrier(PROPERTY_PRODUCTTYPE_GROUP_ID, productTypeGroupID) );
-		}
-		if (allFields || PROPERTY_PUBLISHED.equals(propertyName))
-		{
-			changedFields.add( new FieldChangeCarrier(PROPERTY_PUBLISHED, published) );
-		}
-		if (allFields || PROPERTY_SALEABLE.equals(propertyName))
-		{
-			changedFields.add( new FieldChangeCarrier(PROPERTY_SALEABLE, saleable) );
-		}
-		if (allFields || PROPERTY_ORGANISATION_ID.equals(propertyName))
-		{
-			changedFields.add( new FieldChangeCarrier(PROPERTY_ORGANISATION_ID, organisationID) );
-		}
-		if (allFields || PROPERTY_INHERITANCE_NATURE.equals(propertyName))
-		{
-			changedFields.add( new FieldChangeCarrier(PROPERTY_INHERITANCE_NATURE, inheritanceNature) );
-		}
-		
-//		if (allFields || PROPERTY_DELIVERY_CONFIGURATION_ID.equals(propertyName))
-//		{
-//			changedFields.add( new FieldChangeCarrier(PROPERTY_DELIVERY_CONFIGURATION_ID, deliveryConfigurationID) );
-//		}		
-//		if (allFields || PROPERTY_INNER_PRICE_CONFIG_ID.equals(propertyName))
-//		{
-//			changedFields.add( new FieldChangeCarrier(PROPERTY_INNER_PRICE_CONFIG_ID, innerPriceConfigID) );
-//		}
-//		if (allFields || PROPERTY_LOCAL_ACCOUNTANT_DELEGATE_ID.equals(propertyName))
-//		{
-//			changedFields.add( new FieldChangeCarrier(PROPERTY_LOCAL_ACCOUNTANT_DELEGATE_ID, localAccountantDelegateID) );
-//		}
-		
-		return changedFields;
-	}
 }

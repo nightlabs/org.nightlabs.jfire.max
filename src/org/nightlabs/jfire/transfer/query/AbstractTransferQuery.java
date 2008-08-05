@@ -1,13 +1,11 @@
 package org.nightlabs.jfire.transfer.query;
 
 import java.util.Date;
-import java.util.List;
 
 import javax.jdo.PersistenceManager;
 import javax.jdo.Query;
 
 import org.nightlabs.jdo.query.AbstractJDOQuery;
-import org.nightlabs.jdo.query.AbstractSearchQuery;
 import org.nightlabs.jfire.transfer.Anchor;
 import org.nightlabs.jfire.transfer.id.AnchorID;
 
@@ -37,49 +35,16 @@ public abstract class AbstractTransferQuery
 	private transient Anchor otherAnchor = null;
 	// TODO JPOX WORKAROUND end
 
-	// Property IDs used for the PropertyChangeListeners
-	private static final String PROPERTY_PREFIX = "AbstractTransferQuery.";
-	public static final String PROPERTY_CURRENT_ANCHOR_ID = PROPERTY_PREFIX + "currentAnchorID";
-	public static final String PROPERTY_FROM_ANCHOR_ID = PROPERTY_PREFIX + "fromAnchorID";
-	public static final String PROPERTY_TO_ANCHOR_ID = PROPERTY_PREFIX + "toAnchorID";
-	public static final String PROPERTY_OTHER_ANCHOR_ID = PROPERTY_PREFIX + "otherAnchorID";
-	public static final String PROPERTY_TIMESTAMP_FROM = PROPERTY_PREFIX + "timestampFromIncl";
-	public static final String PROPERTY_TIMESTAMP_TO = PROPERTY_PREFIX + "timestampToIncl";
-
-	@Override
-	public List<FieldChangeCarrier> getChangedFields(String propertyName)
+	public static final class FieldName
 	{
-		final List<FieldChangeCarrier> changedFields = super.getChangedFields(propertyName);
-		final boolean allFields = AbstractSearchQuery.PROPERTY_WHOLE_QUERY.equals(propertyName);
-		
-		if (allFields || PROPERTY_CURRENT_ANCHOR_ID.equals(propertyName))
-		{
-			changedFields.add( new FieldChangeCarrier(PROPERTY_CURRENT_ANCHOR_ID, currentAnchorID) );
-		}
-		if (allFields || PROPERTY_FROM_ANCHOR_ID.equals(propertyName))
-		{
-			changedFields.add( new FieldChangeCarrier(PROPERTY_FROM_ANCHOR_ID, fromAnchorID) );
-		}
-		if (allFields || PROPERTY_OTHER_ANCHOR_ID.equals(propertyName))
-		{
-			changedFields.add( new FieldChangeCarrier(PROPERTY_OTHER_ANCHOR_ID, otherAnchorID) );
-		}
-		if (allFields || PROPERTY_TIMESTAMP_FROM.equals(propertyName))
-		{
-			changedFields.add( new FieldChangeCarrier(PROPERTY_TIMESTAMP_FROM, timestampFromIncl) );
-		}
-		if (allFields || PROPERTY_TIMESTAMP_TO.equals(propertyName))
-		{
-			changedFields.add( new FieldChangeCarrier(PROPERTY_TIMESTAMP_TO, timestampToIncl) );
-		}
-		if (allFields || PROPERTY_TO_ANCHOR_ID.equals(propertyName))
-		{
-			changedFields.add( new FieldChangeCarrier(PROPERTY_TO_ANCHOR_ID, toAnchorID) );
-		}
-		
-		return changedFields;
+		public static final String currentAnchorID = "currentAnchorID";
+		public static final String fromAnchorID = "fromAnchorID";
+		public static final String toAnchorID = "toAnchorID";
+		public static final String otherAnchorID = "otherAnchorID";
+		public static final String timestampFromIncl = "timestampFromIncl";
+		public static final String timestampToIncl = "timestampToIncl";
 	}
-	
+
 	@Override
 	protected void prepareQuery(Query q)
 	{
@@ -88,14 +53,14 @@ public abstract class AbstractTransferQuery
 
 		filter.append("true");
 
-		if (timestampFromIncl != null)
+		if (isFieldEnabled(FieldName.timestampFromIncl) && timestampFromIncl != null)
 			filter.append(" && this.timestamp >= :timestampFromIncl");
 
-		if (timestampToIncl != null)
+		if (isFieldEnabled(FieldName.timestampToIncl) && timestampToIncl != null)
 			filter.append(" && this.timestamp <= :timestampToIncl");
 
 
-		if (currentAnchorID != null) {
+		if (isFieldEnabled(FieldName.currentAnchorID) && currentAnchorID != null) {
 //			filter.append(" && (JDOHelper.getObjectId(this.from) == :currentAnchorID || JDOHelper.getObjectId(this.to) == :currentAnchorID)");
 			// TODO JPOX WORKAROUND begin
 			currentAnchor = (Anchor) pm.getObjectById(currentAnchorID);
@@ -103,7 +68,7 @@ public abstract class AbstractTransferQuery
 			// TODO JPOX WORKAROUND endsetToAnchorID
 		}
 
-		if (otherAnchorID != null) {
+		if (isFieldEnabled(FieldName.otherAnchorID) && otherAnchorID != null) {
 //			filter.append(" && (JDOHelper.getObjectId(this.from) == :otherAnchorID || JDOHelper.getObjectId(this.to) == :otherAnchorID)");
 			// TODO JPOX WORKAROUND begin
 			otherAnchor = (Anchor) pm.getObjectById(otherAnchorID);
@@ -111,7 +76,7 @@ public abstract class AbstractTransferQuery
 			// TODO JPOX WORKAROUND end
 		}
 
-		if (fromAnchorID != null) {
+		if (isFieldEnabled(FieldName.fromAnchorID) && fromAnchorID != null) {
 //			filter.append(" && JDOHelper.getObjectId(this.from) == :fromAnchorID");
 			// TODO JPOX WORKAROUND begin
 			fromAnchor = (Anchor) pm.getObjectById(fromAnchorID);
@@ -119,7 +84,7 @@ public abstract class AbstractTransferQuery
 			// TODO JPOX WORKAROUND end
 		}
 
-		if (toAnchorID != null) {
+		if (isFieldEnabled(FieldName.toAnchorID) && toAnchorID != null) {
 //			filter.append(" && JDOHelper.getObjectId(this.to) == :toAnchorID");
 			// TODO JPOX WORKAROUND begin
 			toAnchor = (Anchor) pm.getObjectById(toAnchorID);
@@ -146,7 +111,7 @@ public abstract class AbstractTransferQuery
 	{
 		final Date oldTimestampFromIncl = this.timestampFromIncl;
 		this.timestampFromIncl = timestampFromIncl;
-		notifyListeners(PROPERTY_TIMESTAMP_FROM, oldTimestampFromIncl, timestampFromIncl);
+		notifyListeners(FieldName.timestampFromIncl, oldTimestampFromIncl, timestampFromIncl);
 	}
 	public Date getTimestampToIncl()
 	{
@@ -156,7 +121,7 @@ public abstract class AbstractTransferQuery
 	{
 		final Date oldTimestampToIncl = this.timestampToIncl;
 		this.timestampToIncl = timestampToIncl;
-		notifyListeners(PROPERTY_TIMESTAMP_TO, oldTimestampToIncl, timestampToIncl);
+		notifyListeners(FieldName.timestampToIncl, oldTimestampToIncl, timestampToIncl);
 	}
 
 	public AnchorID getCurrentAnchorID()
@@ -167,7 +132,7 @@ public abstract class AbstractTransferQuery
 	{
 		final AnchorID oldCurrentAnchorID = this.currentAnchorID;
 		this.currentAnchorID = currentAnchorID;
-		notifyListeners(PROPERTY_CURRENT_ANCHOR_ID, oldCurrentAnchorID, currentAnchorID);
+		notifyListeners(FieldName.currentAnchorID, oldCurrentAnchorID, currentAnchorID);
 	}
 	public AnchorID getOtherAnchorID()
 	{
@@ -177,7 +142,7 @@ public abstract class AbstractTransferQuery
 	{
 		final AnchorID oldOtherAnchorID = this.otherAnchorID;
 		this.otherAnchorID = otherAnchorID;
-		notifyListeners(PROPERTY_OTHER_ANCHOR_ID, oldOtherAnchorID, otherAnchorID);	
+		notifyListeners(FieldName.otherAnchorID, oldOtherAnchorID, otherAnchorID);
 	}
 
 	public AnchorID getFromAnchorID()
@@ -188,7 +153,7 @@ public abstract class AbstractTransferQuery
 	{
 		final AnchorID oldFromAnchorID = this.fromAnchorID;
 		this.fromAnchorID = fromAnchorID;
-		notifyListeners(PROPERTY_FROM_ANCHOR_ID, oldFromAnchorID, fromAnchorID);
+		notifyListeners(FieldName.fromAnchorID, oldFromAnchorID, fromAnchorID);
 	}
 	public AnchorID getToAnchorID()
 	{
@@ -198,6 +163,6 @@ public abstract class AbstractTransferQuery
 	{
 		final AnchorID oldToAnchorID = this.toAnchorID;
 		this.toAnchorID = toAnchorID;
-		notifyListeners(PROPERTY_TO_ANCHOR_ID, oldToAnchorID, toAnchorID);
+		notifyListeners(FieldName.toAnchorID, oldToAnchorID, toAnchorID);
 	}
 }

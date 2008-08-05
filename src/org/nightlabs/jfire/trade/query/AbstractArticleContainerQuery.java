@@ -1,14 +1,12 @@
 package org.nightlabs.jfire.trade.query;
 
 import java.util.Date;
-import java.util.List;
 
 import javax.jdo.Query;
 
 import org.apache.log4j.Logger;
 import org.nightlabs.jdo.ObjectIDUtil;
 import org.nightlabs.jdo.query.AbstractJDOQuery;
-import org.nightlabs.jdo.query.AbstractSearchQuery;
 import org.nightlabs.jfire.security.id.UserID;
 import org.nightlabs.jfire.store.id.ProductID;
 import org.nightlabs.jfire.trade.Article;
@@ -16,9 +14,9 @@ import org.nightlabs.jfire.trade.ArticleContainer;
 import org.nightlabs.jfire.transfer.id.AnchorID;
 
 /**
- * {@link AbstractJDOQuery} implementation which can be used together with
- * {@link AbstractArticleContainerQuickSearchEntry}s
- * 
+ * {@link AbstractJDOQuery} implementation which can be used to send simple queries to the database
+ * retrieving all kinds of ArticleContainers.
+ *
  * @author Daniel Mazurek - daniel <at> nightlabs <dot> de
  * @author Marius Heinzmann - marius[at]nightlabs[dot]com
  */
@@ -27,49 +25,55 @@ public abstract class AbstractArticleContainerQuery
 {
 	private static final long serialVersionUID = 1L;
 	private static final Logger logger = Logger.getLogger(AbstractArticleContainerQuery.class);
-	
-	// Property IDs used for the PropertyChangeListeners
-	private static final String PROPERTY_PREFIX = "AbstractArticleContainerQuery.";
-	public static final String PROPERTY_ARTICLE_COUNT_MAX = PROPERTY_PREFIX + "articleCountMax";
-	public static final String PROPERTY_ARTICLE_COUNT_MIN = PROPERTY_PREFIX + "articleCountMin";
-	public static final String PROPERTY_ARTICLE_CONTAINER_ID = PROPERTY_PREFIX + "articleContainerID";
-	public static final String PROPERTY_CREATE_DATE_MAX = PROPERTY_PREFIX + "createDTMax";
-	public static final String PROPERTY_CREATE_DATE_MIN = PROPERTY_PREFIX + "createDTMin";
-	public static final String PROPERTY_CREATE_USER_ID = PROPERTY_PREFIX + "createUserID";
-	public static final String PROPERTY_CREATOR_NAME = PROPERTY_PREFIX + "creatorName";
-	public static final String PROPERTY_CUSTOMER_ID = PROPERTY_PREFIX + "customerID";
-	public static final String PROPERTY_CUSTOMER_NAME = PROPERTY_PREFIX + "customerName";
-	public static final String PROPERTY_VENDOR_ID = PROPERTY_PREFIX + "vendorID";
-	public static final String PROPERTY_VENDOR_NAME = PROPERTY_PREFIX + "vendorName";
-	public static final String PROPERTY_PRODUCT_ID = PROPERTY_PREFIX + "productID";
-	
+
+	/**
+	 * Static final class containing all field names of this query and which can be used to create the
+	 * identifier for the enabled-flags of the corresponding fields via
+	 * {@link #getEnabledFieldName(String)}.
+	 */
+	public static final class FieldName
+	{
+		public static final String articleCountMax = "articleCountMax";
+		public static final String articleCountMin = "articleCountMin";
+		public static final String articleContainerID = "articleContainerID";
+		public static final String createDTMax = "createDTMax";
+		public static final String createDTMin = "createDTMin";
+		public static final String createUserID = "createUserID";
+		public static final String creatorName = "creatorName";
+		public static final String customerID = "customerID";
+		public static final String customerName = "customerName";
+		public static final String vendorID = "vendorID";
+		public static final String vendorName = "vendorName";
+		public static final String productID = "productID";
+	}
+
 	@Override
 	protected void prepareQuery(Query q)
 	{
 		StringBuffer filter = getFilter();
 		StringBuffer vars = getVars();
-		
+
 		filter.append("true");
-		
+
 		// own methods to allow override e.g. for Offer where for customerName it is different
 		checkCustomerName(filter);
 		checkVendorName(filter);
 		checkArticleContainerID(filter);
-		
+
 		// check creation time and counts
-		if (articleCountMin >= 0)
+		if (isFieldEnabled(FieldName.articleCountMin) && articleCountMin >= 0)
 			filter.append("\n && :articleCountMin < this.articles.size()");
-		
-		if (articleCountMax >= 0)
+
+		if (isFieldEnabled(FieldName.articleCountMax) && articleCountMax >= 0)
 			filter.append("\n && :articleCountMax > this.articles.size()");
 
-		if (createDTMin != null)
+		if (isFieldEnabled(FieldName.createDTMin) && createDTMin != null)
 			filter.append("\n && this.createDT >= :createDTMin");
 
-		if (createDTMax != null)
+		if (isFieldEnabled(FieldName.createDTMax) && createDTMax != null)
 			filter.append("\n && this.createDT <= :createDTMax");
-				
-		if (createUserID != null)
+
+		if (isFieldEnabled(FieldName.createUserID) && createUserID != null)
 		{
 			// FIXME: JPOX Bug JDOHelper.getObjectId(this.*) does not seem to work (java.lang.IndexOutOfBoundsException: Index: 3, Size: 3)
 //		filter.append("\n && JDOHelper.getObjectId(this.createUser) == :createUserID");
@@ -79,18 +83,17 @@ public abstract class AbstractArticleContainerQuery
 				"this.createUser.userID == \""+createUserID.userID+"\"" +
 						")");
 		}
+
 	  // own to method to allow override for Offer where it is different
 		checkVendor(filter);
 		checkCustomer(filter);
 		checkProductID(filter, vars, getArticleContainerArticlesMemberName());
-		
+
 		// append filter for the additional fields of the implementing class.
 		checkAdditionalFields(filter);
 		q.setFilter(filter.toString());
 		q.declareVariables(vars.toString());
-		
-//		q.setRange(rangeFromIncl, rangeToExcl);
-		
+
 		if (logger.isDebugEnabled())
 			logger.debug("query = "+filter);
 	}
@@ -104,37 +107,38 @@ public abstract class AbstractArticleContainerQuery
 
 	protected void checkVendorName(StringBuffer filter)
 	{
-		if (getVendorName() != null)
+		if (isFieldEnabled(FieldName.vendorName) &&	getVendorName() != null)
 			filter.append("\n && (this.vendor.person.displayName.toLowerCase().indexOf(\""+vendorName.toLowerCase()+"\") >= 0)");
 	}
-	
+
 	protected void checkCustomerName(StringBuffer filter)
 	{
-		if (getCustomerName() != null)
+		if (isFieldEnabled(FieldName.customerName) && getCustomerName() != null)
 			filter.append("\n && (this.customer.person.displayName.toLowerCase().indexOf(\""+customerName.toLowerCase()+"\") >= 0)");
 	}
-	
+
 	protected void checkCreatorName(StringBuilder filter)
 	{
-		if (creatorName != null)
+		if (isFieldEnabled(FieldName.creatorName) && creatorName != null)
 		{
 			filter.append("\n && (this.createUser.person.displayName.toLowerCase().indexOf(\""+creatorName.toLowerCase()+"\") >= 0)");
-		}		
+		}
 	}
-	
+
 	protected void checkArticleContainerID(StringBuffer filter)
 	{
-		if (getArticleContainerID() != null && !getArticleContainerID().trim().equals(""))
+		if (isFieldEnabled(FieldName.articleContainerID) &&
+				getArticleContainerID() != null && !getArticleContainerID().trim().equals(""))
 //			filter.append("\n && (this."+getArticleContainerIDMemberName()+" == \""+ObjectIDUtil.parseLongObjectIDField(articleContainerID)+"\"");
 			filter.append("\n && (this."+getArticleContainerIDMemberName()+" == "+ObjectIDUtil.parseLongObjectIDField(articleContainerID)+")");
 	}
-	
+
 	/**
-	 * Crops all elements from given vendor anchor. 
+	 * Crops all elements from given vendor anchor.
 	 * @param filter the filter to write the query into.
 	 */
 	protected void checkVendor(StringBuffer filter) {
-		if (vendorID != null)
+		if (isFieldEnabled(FieldName.vendorID) && vendorID != null)
 		{
 			// FIXME: JPOX Bug JDOHelper.getObjectId(this.*) does not seem to work (java.lang.IndexOutOfBoundsException: Index: 3, Size: 3)
 //			filter.append("\n && JDOHelper.getObjectId(this.vendor) == :vendorID");
@@ -144,16 +148,16 @@ public abstract class AbstractArticleContainerQuery
 				"this.vendor.anchorTypeID == \""+vendorID.anchorTypeID+"\" && " +
 				"this.vendor.anchorID == \""+vendorID.anchorID+"\"" +
 			")");
-		}	
+		}
 	}
-	
+
 	// own to method to allow override for Offer where it is different
 	/**
-	 * Crops all elements from given customer anchor. 
+	 * Crops all elements from given customer anchor.
 	 * @param filter the filter to write the query into.
 	 */
 	protected void checkCustomer(StringBuffer filter) {
-		if (getCustomerID() != null)
+		if (isFieldEnabled(FieldName.customerID) &&	getCustomerID() != null)
 		{
 			// FIXME: JPOX Bug JDOHelper.getObjectId(this.*) does not seem to work (java.lang.IndexOutOfBoundsException: Index: 3, Size: 3)
 //			filter.append("\n && JDOHelper.getObjectId(this.customer) == :customerID");
@@ -165,21 +169,21 @@ public abstract class AbstractArticleContainerQuery
 			")");
 		}
 	}
-	
-	protected void checkProductID(StringBuffer filter, StringBuffer vars, String member) 
+
+	protected void checkProductID(StringBuffer filter, StringBuffer vars, String member)
 	{
-		if (productID != null) {
+		if (isFieldEnabled(FieldName.productID) && productID != null) {
 			if (vars.length() > 0)
 				vars.append("; ");
 			String varName = member+"Var";
 			vars.append(Article.class.getName()+" "+varName);
 			filter.append(" && \n (" +
-					"  this."+member+".contains("+varName+")" + 
+					"  this."+member+".contains("+varName+")" +
 					"  && JDOHelper.getObjectId("+varName+".product) == :productID" +
 					" )");
 		}
-	}	
-	
+	}
+
 	private String creatorName = null;
 	/**
 	 * @return the creatorName
@@ -196,7 +200,7 @@ public abstract class AbstractArticleContainerQuery
 	{
 		String oldCreatorName = this.creatorName;
 		this.creatorName = creatorName;
-		notifyListeners(PROPERTY_CREATOR_NAME, oldCreatorName, creatorName);
+		notifyListeners(FieldName.creatorName, oldCreatorName, creatorName);
 	}
 
 	private String customerName;
@@ -216,9 +220,9 @@ public abstract class AbstractArticleContainerQuery
 	{
 		final String oldCustomerName = this.customerName;
 		this.customerName = customerName;
-		notifyListeners(PROPERTY_CUSTOMER_NAME, oldCustomerName, customerName);
+		notifyListeners(FieldName.customerName, oldCustomerName, customerName);
 	}
-	
+
 	private String vendorName;
 	/**
 	 * returns the vendorName
@@ -236,9 +240,9 @@ public abstract class AbstractArticleContainerQuery
 	{
 		final String oldVendorName = this.vendorName;
 		this.vendorName = vendorName;
-		notifyListeners(PROPERTY_VENDOR_NAME, oldVendorName, vendorName);
+		notifyListeners(FieldName.vendorName, oldVendorName, vendorName);
 	}
-	
+
 	private String articleContainerID;
 	/**
 	 * returns the articleContainerID
@@ -255,9 +259,9 @@ public abstract class AbstractArticleContainerQuery
 	public void setArticleContainerID(String articleContainerID) {
 		String oldID = this.articleContainerID;
 		this.articleContainerID = articleContainerID;
-		notifyListeners(PROPERTY_ARTICLE_CONTAINER_ID, oldID, articleContainerID);
+		notifyListeners(FieldName.articleContainerID, oldID, articleContainerID);
 	}
-	
+
 	private int articleCountMin = -1;
 	public int getArticleCountMin() {
 		return articleCountMin;
@@ -266,9 +270,9 @@ public abstract class AbstractArticleContainerQuery
 	{
 		int oldArticleCountMin = this.articleCountMin;
 		this.articleCountMin = articleCountMin;
-		notifyListeners(PROPERTY_ARTICLE_COUNT_MIN, oldArticleCountMin, articleCountMin);
+		notifyListeners(FieldName.articleCountMin, oldArticleCountMin, articleCountMin);
 	}
-	
+
 	private int articleCountMax = -1;
 	public int getArticleCountMax() {
 		return articleCountMax;
@@ -277,9 +281,9 @@ public abstract class AbstractArticleContainerQuery
 	{
 		int oldCountMax = this.articleCountMax;
 		this.articleCountMax = articleCountMax;
-		notifyListeners(PROPERTY_ARTICLE_COUNT_MAX, oldCountMax, articleCountMax);
+		notifyListeners(FieldName.articleCountMax, oldCountMax, articleCountMax);
 	}
-	
+
 	private Date createDTMin = null;
 	public Date getCreateDTMin() {
 		return createDTMin;
@@ -288,20 +292,20 @@ public abstract class AbstractArticleContainerQuery
 	{
 		final Date oldCreateDTMin = this.createDTMin;
 		this.createDTMin = createDTMin;
-		notifyListeners(PROPERTY_CREATE_DATE_MIN, oldCreateDTMin, createDTMin);
+		notifyListeners(FieldName.createDTMin, oldCreateDTMin, createDTMin);
 	}
-	
+
 	private Date createDTMax = null;
 	public Date getCreateDTMax() {
 		return createDTMax;
 	}
 	public void setCreateDTMax(Date createDTMax)
 	{
-		final Date oldCreateDTMax = this.createDTMax; 
+		final Date oldCreateDTMax = this.createDTMax;
 		this.createDTMax = createDTMax;
-		notifyListeners(PROPERTY_CREATE_DATE_MAX, oldCreateDTMax, createDTMax);
+		notifyListeners(FieldName.createDTMax, oldCreateDTMax, createDTMax);
 	}
-	
+
 	private UserID createUserID = null;
 	public UserID getCreateUserID() {
 		return createUserID;
@@ -310,9 +314,9 @@ public abstract class AbstractArticleContainerQuery
 	{
 		final UserID oldCreateUserID = this.createUserID;
 		this.createUserID = createUserID;
-		notifyListeners(PROPERTY_CREATE_USER_ID, oldCreateUserID, createUserID);
+		notifyListeners(FieldName.createUserID, oldCreateUserID, createUserID);
 	}
-	
+
 	private AnchorID vendorID = null;
 	public AnchorID getVendorID() {
 		return vendorID;
@@ -321,9 +325,9 @@ public abstract class AbstractArticleContainerQuery
 	{
 		final AnchorID oldVendorID = this.vendorID;
 		this.vendorID = vendorID;
-		notifyListeners(PROPERTY_VENDOR_ID, oldVendorID, vendorID);
+		notifyListeners(FieldName.vendorID, oldVendorID, vendorID);
 	}
-	
+
 	private AnchorID customerID = null;
 	public AnchorID getCustomerID() {
 		return customerID;
@@ -332,11 +336,10 @@ public abstract class AbstractArticleContainerQuery
 	{
 		final AnchorID oldCustomerID = this.customerID;
 		this.customerID = customerID;
-		notifyListeners(PROPERTY_CUSTOMER_ID, oldCustomerID, customerID);
+		notifyListeners(FieldName.customerID, oldCustomerID, customerID);
 	}
-	
+
 	private ProductID productID = null;
-	
 	/**
 	 * Returns the productID.
 	 * @return the productID
@@ -355,15 +358,15 @@ public abstract class AbstractArticleContainerQuery
 
 	/**
 	 * returns the name of the articleContainerID member
-	 * 
+	 *
 	 * @return the name of the member which defines the value
 	 * which is returned by {@link ArticleContainer#getArticleContainerID()}
 	 */
 	public abstract String getArticleContainerIDMemberName();
-	
+
 	/**
 	 * returns the name of the articleContainerIDPrefix member
-	 * 
+	 *
 	 * @return the name of the member which defines the value
 	 * which is returned by {@link ArticleContainer#getArticleContainerIDPrefix()}
 	 */
@@ -371,71 +374,15 @@ public abstract class AbstractArticleContainerQuery
 
 	/**
 	 * Returns the default member name of the Collection of Articles
-	 * returned by {@link ArticleContainer#getArticles()} of the 
+	 * returned by {@link ArticleContainer#getArticles()} of the
 	 * ArticleContainer implementation.
-	 * 
+	 *
 	 * @return the default member name of the Collection of Articles
-	 * returned by {@link ArticleContainer#getArticles()} of the 
-	 * ArticleContainer implementation 
+	 * returned by {@link ArticleContainer#getArticles()} of the
+	 * ArticleContainer implementation
 	 */
 	public String getArticleContainerArticlesMemberName() {
 		return "articles";
 	}
-	
-	@Override
-	public List<FieldChangeCarrier> getChangedFields(String propertyName)
-	{
-		List<FieldChangeCarrier> changedFields = super.getChangedFields(propertyName);
-		boolean allFields = AbstractSearchQuery.PROPERTY_WHOLE_QUERY.equals(propertyName);
-		
-		if (allFields || PROPERTY_ARTICLE_CONTAINER_ID.equals(propertyName))
-		{
-			changedFields.add(new FieldChangeCarrier(PROPERTY_ARTICLE_CONTAINER_ID, articleContainerID));
-		}
-		if (allFields || PROPERTY_ARTICLE_COUNT_MAX.equals(propertyName))
-		{
-			changedFields.add(new FieldChangeCarrier(PROPERTY_ARTICLE_COUNT_MAX, articleCountMax));
-		}
-		if (allFields || PROPERTY_ARTICLE_COUNT_MIN.equals(propertyName))
-		{
-			changedFields.add(new FieldChangeCarrier(PROPERTY_ARTICLE_COUNT_MIN, articleCountMin));
-		}
-		if (allFields || PROPERTY_CREATE_DATE_MAX.equals(propertyName))
-		{
-			changedFields.add(new FieldChangeCarrier(PROPERTY_CREATE_DATE_MAX, createDTMax));
-		}
-		if (allFields || PROPERTY_CREATE_DATE_MIN.equals(propertyName))
-		{
-			changedFields.add(new FieldChangeCarrier(PROPERTY_CREATE_DATE_MIN, createDTMin));
-		}
-		if (allFields || PROPERTY_CREATE_USER_ID.equals(propertyName))
-		{
-			changedFields.add(new FieldChangeCarrier(PROPERTY_CREATE_USER_ID, createUserID));
-		}
-		if (allFields || PROPERTY_CREATOR_NAME.equals(propertyName))
-		{
-			changedFields.add(new FieldChangeCarrier(PROPERTY_CREATOR_NAME, creatorName));
-		}
-		if (allFields || PROPERTY_CUSTOMER_ID.equals(propertyName))
-		{
-			changedFields.add(new FieldChangeCarrier(PROPERTY_CUSTOMER_ID, customerID));
-		}
-		if (allFields || PROPERTY_CUSTOMER_NAME.equals(propertyName))
-		{
-			changedFields.add(new FieldChangeCarrier(PROPERTY_CUSTOMER_NAME, customerName));
-		}
-		if (allFields || PROPERTY_VENDOR_ID.equals(propertyName))
-		{
-			changedFields.add(new FieldChangeCarrier(PROPERTY_VENDOR_ID, vendorID));
-		}
-		if (allFields || PROPERTY_VENDOR_NAME.equals(propertyName))
-		{
-			changedFields.add(new FieldChangeCarrier(PROPERTY_VENDOR_NAME, vendorName));
-		}
-		if (allFields || PROPERTY_PRODUCT_ID.equals(propertyName))
-		{
-			changedFields.add(new FieldChangeCarrier(PROPERTY_PRODUCT_ID, productID));
-		}		
-		return changedFields;
-	}
+
 }

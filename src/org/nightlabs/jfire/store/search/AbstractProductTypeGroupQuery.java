@@ -1,39 +1,35 @@
-/**
- * 
- */
 package org.nightlabs.jfire.store.search;
-
-import java.util.List;
 
 import javax.jdo.Query;
 
 import org.apache.log4j.Logger;
-import org.nightlabs.jdo.query.AbstractSearchQuery;
 import org.nightlabs.jfire.store.ProductType;
 import org.nightlabs.jfire.store.ProductTypeGroup;
-import org.nightlabs.jfire.store.ProductType.FieldName;
 
 /**
- * Abstract base class for queries which searches for {@link ProductTypeGroup}s. 
+ * Abstract base class for queries which searches for {@link ProductTypeGroup}s.
  * Every field that's <code>null</code> is ignored,
  * every field containing a value will cause the query to filter all non-matching instances.
- *  
+ *
  * @author Daniel Mazurek - daniel [at] nightlabs [dot] de
+ * @author Marius Heinzmann - marius[at]nightlabs[dot]com
  */
-public abstract class AbstractProductTypeGroupQuery 
-extends VendorDependentQuery
-implements ISaleAccessQuery
+public abstract class AbstractProductTypeGroupQuery
+	extends VendorDependentQuery
+	implements ISaleAccessQuery
 {
 	private static final Logger logger = Logger.getLogger(AbstractProductTypeGroupQuery.class);
-	
-	private static final String PROPERTY_PREFIX = "AbstractProductTypeGroupQuery.";
-	public static final String PROPERTY_FULL_TEXT_LANGUAGE_ID = PROPERTY_PREFIX + "fullTextLanguageID";
-	public static final String PROPERTY_FULL_TEXT_SEARCH = PROPERTY_PREFIX + "fullTextSearch";
-	public static final String PROPERTY_CLOSED = PROPERTY_PREFIX + "closed";
-	public static final String PROPERTY_CONFIRMED = PROPERTY_PREFIX + "confirmed";
-	public static final String PROPERTY_PUBLISHED = PROPERTY_PREFIX + "published";
-	public static final String PROPERTY_SALEABLE = PROPERTY_PREFIX + "saleable";
-	public static final String PROPERTY_ORGANISATION_ID = PROPERTY_PREFIX + "organisationID";
+
+	public static final class FieldName
+	{
+		public static final String fullTextLanguageID = "fullTextLanguageID";
+		public static final String fullTextSearch = "fullTextSearch";
+		public static final String closed = "closed";
+		public static final String confirmed = "confirmed";
+		public static final String published = "published";
+		public static final String saleable = "saleable";
+		public static final String organisationID = "organisationID";
+	}
 
 	private Boolean published = null;
 	private Boolean confirmed = null;
@@ -44,56 +40,55 @@ implements ISaleAccessQuery
 	private String fullTextSearch = null;
 
 	private String organisationID = null;
-	
+
 	/* (non-Javadoc)
 	 * @see org.nightlabs.jdo.query.AbstractJDOQuery#prepareQuery(javax.jdo.Query)
 	 */
 	@Override
-	protected void prepareQuery(Query q) {
-//		super.prepareQuery(q);
+	protected void prepareQuery(Query q)
+	{
 		StringBuffer filter = getFilter();
 		StringBuffer vars = getVars();
-		StringBuffer imports = getImports();
-				
-		filter.append("productType."+FieldName.productTypeGroups+".containsValue(this)");
 
-		if (organisationID != null)
+		filter.append("productType."+ProductType.FieldName.productTypeGroups+".containsValue(this)");
+
+		if (isFieldEnabled(FieldName.organisationID) && organisationID != null)
 			filter.append("\n && this."+org.nightlabs.jfire.store.ProductTypeGroup.FieldName.organisationID+" == :"+org.nightlabs.jfire.store.ProductTypeGroup.FieldName.organisationID);
 
-		if (fullTextSearch != null) {
+		if (isFieldEnabled(FieldName.fullTextSearch) && fullTextSearch != null) {
 			filter.append("\n && ( ");
-			addFullTextSearch(filter, vars, FieldName.name);
+			addFullTextSearch(filter, vars, ProductType.FieldName.name);
 			filter.append("\n )");
 		}
 
-		if (published != null)
-			filter.append("\n && productType."+FieldName.published+" == :published");
+		if (isFieldEnabled(FieldName.published) && published != null)
+			filter.append("\n && productType."+ProductType.FieldName.published+" == :published");
 
-		if (confirmed != null)
-			filter.append("\n && productType."+FieldName.confirmed+" == :confirmed");
+		if (isFieldEnabled(FieldName.confirmed) && confirmed != null)
+			filter.append("\n && productType."+ProductType.FieldName.confirmed+" == :confirmed");
 
-		if (saleable != null)
-			filter.append("\n && productType."+FieldName.saleable+" == :saleable");
+		if (isFieldEnabled(FieldName.saleable) && saleable != null)
+			filter.append("\n && productType."+ProductType.FieldName.saleable+" == :saleable");
 
-		if (closed != null)
-			filter.append("\n && productType."+FieldName.closed+" == :closed");
+		if (isFieldEnabled(FieldName.closed) && closed != null)
+			filter.append("\n && productType."+ProductType.FieldName.closed+" == :closed");
 
-		if (getVendorID() != null)
-			filter.append("\n && JDOHelper.getObjectId(productType."+FieldName.vendor+") == :vendorID");
+		if (isFieldEnabled(VendorDependentQuery.FieldName.vendorID) && getVendorID() != null)
+			filter.append("\n && JDOHelper.getObjectId(productType."+ProductType.FieldName.vendor+") == :vendorID");
 
 		vars.append(ProductType.class.getName()+" productType;");
 		addImport(ProductType.class.getName());
 
-//		result.append("distinct this");	
+//		result.append("distinct this");
 		if (logger.isDebugEnabled()) {
 			logger.debug("Vars:");
 			logger.debug(vars.toString());
 			logger.debug("Filter:");
-			logger.debug(filter.toString());			
+			logger.debug(filter.toString());
 		}
 
 		q.setFilter(filter.toString());
-		q.declareVariables(vars.toString());		
+		q.declareVariables(vars.toString());
 	}
 
 	protected void addFullTextSearch(StringBuffer filter, StringBuffer vars, String member) {
@@ -109,9 +104,9 @@ implements ISaleAccessQuery
 				"  && "+varName+".toLowerCase().matches(:fullTextSearch.toLowerCase())" +
 				" )");
 	}
-	
+
 	/**
-	 * Returns whether only published ProductTypes should be searched for. 
+	 * Returns whether only published ProductTypes should be searched for.
 	 * @return whether only published ProductTypes should be searched for.
 	 */
 	public Boolean getPublished() {
@@ -133,7 +128,7 @@ implements ISaleAccessQuery
 	public void setSaleable(Boolean saleable) {
 		Boolean oldSaleable = this.saleable;
 		this.saleable = saleable;
-		notifyListeners(PROPERTY_SALEABLE, oldSaleable, saleable);
+		notifyListeners(FieldName.saleable, oldSaleable, saleable);
 	}
 
 	/**
@@ -143,9 +138,9 @@ implements ISaleAccessQuery
 	public void setPublished(Boolean published) {
 		Boolean oldPublished = this.published;
 		this.published = published;
-		notifyListeners(PROPERTY_PUBLISHED, oldPublished, published);
-	}	
-	
+		notifyListeners(FieldName.published, oldPublished, published);
+	}
+
 	/**
 	 * @return the fullTextLanguageID
 	 */
@@ -160,7 +155,7 @@ implements ISaleAccessQuery
 	{
 		final String oldFullTextLanguageID = this.fullTextLanguageID;
 		this.fullTextLanguageID = fullTextLanguageID;
-		notifyListeners(PROPERTY_FULL_TEXT_LANGUAGE_ID, oldFullTextLanguageID, fullTextLanguageID);
+		notifyListeners(FieldName.fullTextLanguageID, oldFullTextLanguageID, fullTextLanguageID);
 	}
 
 	/**
@@ -175,16 +170,16 @@ implements ISaleAccessQuery
 	 * matches the given fullTextSearch. The match will be performed
 	 * following the rules of {@link String#matches(String)}, i.e.
 	 * you need to pass a regular expression here.
-	 * 
+	 *
 	 * @param fullTextSearch the fullTextSearch to set
 	 */
 	public void setFullTextSearch(String fullTextSearch)
 	{
 		final String oldFullTextSearch = this.fullTextSearch;
 		this.fullTextSearch = fullTextSearch;
-		notifyListeners(PROPERTY_FULL_TEXT_SEARCH, oldFullTextSearch, fullTextSearch);
+		notifyListeners(FieldName.fullTextSearch, oldFullTextSearch, fullTextSearch);
 	}
-		
+
 	/**
 	 * @return the confirmed
 	 */
@@ -200,9 +195,9 @@ implements ISaleAccessQuery
 	{
 		final Boolean oldConfirmed = this.confirmed;
 		this.confirmed = confirmed;
-		notifyListeners(PROPERTY_CONFIRMED, oldConfirmed, confirmed);
+		notifyListeners(FieldName.confirmed, oldConfirmed, confirmed);
 	}
-	
+
 	/**
 	 * returns the closed.
 	 * @return the closed
@@ -219,9 +214,9 @@ implements ISaleAccessQuery
 	{
 		final Boolean oldClosed = this.closed;
 		this.closed = closed;
-		notifyListeners(PROPERTY_CLOSED, oldClosed, closed);
+		notifyListeners(FieldName.closed, oldClosed, closed);
 	}
-	
+
 	/**
 	 * Returns the organisationID.
 	 * @return the organisationID
@@ -237,44 +232,7 @@ implements ISaleAccessQuery
 	public void setOrganisationID(String organisationID) {
 		String oldOrganisationID = this.organisationID;
 		this.organisationID = organisationID;
-		notifyListeners(PROPERTY_ORGANISATION_ID, oldOrganisationID, organisationID);
+		notifyListeners(FieldName.organisationID, oldOrganisationID, organisationID);
 	}
 
-	@Override
-	public List<FieldChangeCarrier> getChangedFields(String propertyName)
-	{
-		List<FieldChangeCarrier> changedFields = super.getChangedFields(propertyName);
-		boolean allFields = AbstractSearchQuery.PROPERTY_WHOLE_QUERY.equals(propertyName);
-		
-		if (allFields || PROPERTY_CLOSED.equals(propertyName))
-		{
-			changedFields.add( new FieldChangeCarrier(PROPERTY_CLOSED, closed) );
-		}
-		if (allFields || PROPERTY_CONFIRMED.equals(propertyName))
-		{
-			changedFields.add( new FieldChangeCarrier(PROPERTY_CONFIRMED, confirmed) );
-		}
-		if (allFields || PROPERTY_FULL_TEXT_LANGUAGE_ID.equals(propertyName))
-		{
-			changedFields.add( new FieldChangeCarrier(PROPERTY_FULL_TEXT_LANGUAGE_ID, fullTextLanguageID) );
-		}
-		if (allFields || PROPERTY_FULL_TEXT_SEARCH.equals(propertyName))
-		{
-			changedFields.add( new FieldChangeCarrier(PROPERTY_FULL_TEXT_SEARCH, fullTextSearch) );
-		}
-		if (allFields || PROPERTY_PUBLISHED.equals(propertyName))
-		{
-			changedFields.add( new FieldChangeCarrier(PROPERTY_PUBLISHED, published) );
-		}
-		if (allFields || PROPERTY_SALEABLE.equals(propertyName))
-		{
-			changedFields.add( new FieldChangeCarrier(PROPERTY_SALEABLE, saleable) );
-		}
-		if (allFields || PROPERTY_ORGANISATION_ID.equals(propertyName))
-		{
-			changedFields.add( new FieldChangeCarrier(PROPERTY_ORGANISATION_ID, organisationID) );
-		}
-		
-		return changedFields;
-	}
 }

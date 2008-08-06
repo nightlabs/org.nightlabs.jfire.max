@@ -16,6 +16,7 @@ import javax.jdo.PersistenceManager;
 import org.nightlabs.ModuleException;
 import org.nightlabs.jdo.NLJDOHelper;
 import org.nightlabs.jfire.accounting.Currency;
+import org.nightlabs.jfire.accounting.Invoice;
 import org.nightlabs.jfire.config.Config;
 import org.nightlabs.jfire.idgenerator.IDGenerator;
 import org.nightlabs.jfire.jbpm.graph.def.ActionHandlerNodeEnter;
@@ -153,6 +154,24 @@ public class RecurringTrader {
 		return orderIDPrefix;
 	}
 
+	public String getInvoiceIDPrefix(User user, String invoiceIDPrefix)
+	{
+		if (invoiceIDPrefix == null) {
+			TradeConfigModule tradeConfigModule;
+			try {
+				tradeConfigModule = (TradeConfigModule) Config.getConfig(
+						getPersistenceManager(), getOrganisationID(), user).createConfigModule(TradeConfigModule.class);
+			} catch (ModuleException x) {
+				throw new RuntimeException(x); // should not happen.
+			}
+
+			invoiceIDPrefix = tradeConfigModule.getActiveIDPrefixCf(Invoice.class.getName()).getDefaultIDPrefix();
+		}
+		return invoiceIDPrefix;
+	}	
+	
+	
+	
 	/**
 	 * This method creates a new {@link RecurredOffer} from an existing {@link RecurringOffer}
 	 *

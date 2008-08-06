@@ -43,11 +43,14 @@ import org.apache.log4j.Logger;
 import org.nightlabs.ModuleException;
 import org.nightlabs.jdo.NLJDOHelper;
 import org.nightlabs.jfire.accounting.Currency;
+import org.nightlabs.jfire.accounting.Invoice;
 import org.nightlabs.jfire.accounting.id.CurrencyID;
 import org.nightlabs.jfire.base.BaseSessionBeanImpl;
+import org.nightlabs.jfire.idgenerator.IDGenerator;
 import org.nightlabs.jfire.jbpm.graph.def.ProcessDefinition;
 import org.nightlabs.jfire.jbpm.graph.def.id.ProcessDefinitionID;
 import org.nightlabs.jfire.organisation.Organisation;
+import org.nightlabs.jfire.security.SecurityReflector;
 import org.nightlabs.jfire.security.User;
 import org.nightlabs.jfire.trade.LegalEntity;
 import org.nightlabs.jfire.trade.Order;
@@ -55,6 +58,7 @@ import org.nightlabs.jfire.trade.Segment;
 import org.nightlabs.jfire.trade.SegmentType;
 import org.nightlabs.jfire.trade.TradeSide;
 import org.nightlabs.jfire.trade.Trader;
+import org.nightlabs.jfire.trade.config.TradeConfigModule;
 import org.nightlabs.jfire.trade.id.OfferID;
 import org.nightlabs.jfire.trade.id.OrderID;
 import org.nightlabs.jfire.trade.id.SegmentTypeID;
@@ -170,6 +174,43 @@ implements SessionBean
 	}
 
 
+
+	public RecurredOffer CreateRecurredOffer(RecurringOffer recurringOffer)
+	{
+
+		PersistenceManager pm = getPersistenceManager();
+		RecurredOffer offer = null;
+		String invoiceIDPrefix = null;
+		User user = SecurityReflector.getUserDescriptor().getUser(pm);
+
+		try {
+			RecurringTrader recurringTrader = RecurringTrader.getRecurringTrader(pm);
+			offer = recurringTrader.createRecurredOffer(recurringOffer);
+
+			if(recurringOffer.getRecurringOfferConfiguration().isCreateInvoice())
+			{
+				invoiceIDPrefix = recurringTrader.getInvoiceIDPrefix(user,invoiceIDPrefix);
+
+				Invoice invoice = new Invoice(
+						user, recurringOffer.getVendor(), recurringOffer.getCustomer(),
+						invoiceIDPrefix, IDGenerator.nextID(Invoice.class, invoiceIDPrefix),
+						recurringOffer.getCurrency());
+
+				invoice = pm.makePersistent(invoice);
+
+			}
+
+		} catch (ModuleException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		finally {
+			pm.close();
+		}
+		return offer;
+
+	}
+
 	/**
 	 * Creates a new Recurring Purchase order. This method is intended to be called by a user (not another
 	 * organisation).
@@ -197,7 +238,6 @@ implements SessionBean
 		try {
 			RecurringTrader recurringTrader = RecurringTrader.getRecurringTrader(pm);
 			Trader trader = Trader.getTrader(pm);
-
 			pm.getExtent(Currency.class);
 			Currency currency = (Currency)pm.getObjectById(currencyID);
 
@@ -369,5 +409,5 @@ implements SessionBean
 		}
 	}
 
-	
+
 }

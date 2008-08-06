@@ -80,7 +80,15 @@ public abstract class RecurringTradeProductTypeActionHandler {
 	@Deprecated
 	protected RecurringTradeProductTypeActionHandler() { }	
 
-
+	/**	
+	 * creates a new Article in the given RecurredOffer for each template article passed as parameter.
+	 *
+	 * @param  offer the recurredOffer created in the recurringTrader s createrecurredOffer
+	 * @param  recurringArticles a collection list of articles
+	 * @param  segment current segment in the order
+	 *
+	 * @return return a Map where the template article is mapped to the newly created article.
+	 */
 	public abstract Map<Article, Article> createArticles(RecurredOffer offer, Set<Article> recurringArticles, Segment segment) throws ModuleException;
 
 	protected PersistenceManager getPersistenceManager()
@@ -91,7 +99,7 @@ public abstract class RecurringTradeProductTypeActionHandler {
 
 		return pm;
 	}
-	
+
 	/**
 	 * @param organisationID First part of primary key: The identifier of that organisation which defined this handler.
 	 *		Use {@link Organisation#DEV_ORGANISATION_ID} if you contribute directly to a JFire project and your own
@@ -146,12 +154,12 @@ public abstract class RecurringTradeProductTypeActionHandler {
 	{
 		Class<?> searchClass = productTypeClass;
 		Query q = pm.newNamedQuery(RecurringTradeProductTypeActionHandler.class, "getRecurringTradeProductTypeActionHandlerByProductTypeClassName");
-		
+
 		while (searchClass != null) {
 			RecurringTradeProductTypeActionHandler res = (RecurringTradeProductTypeActionHandler) q.execute(searchClass.getName());
 			if (res != null)
 				return res;
-			
+
 			Class<?>[] interfaces = searchClass.getInterfaces();
 			if (interfaces.length > 1) {
 				for (int i = 0; i < interfaces.length; i++) {
@@ -161,7 +169,7 @@ public abstract class RecurringTradeProductTypeActionHandler {
 						return res;
 				}
 			}
-			
+
 			searchClass = searchClass.getSuperclass();
 		}
 

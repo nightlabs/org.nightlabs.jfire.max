@@ -10,7 +10,6 @@ import javax.jdo.Query;
 import org.nightlabs.ModuleException;
 import org.nightlabs.jdo.ObjectIDUtil;
 import org.nightlabs.jfire.organisation.Organisation;
-import org.nightlabs.jfire.store.Product;
 import org.nightlabs.jfire.store.ProductType;
 import org.nightlabs.jfire.store.ProductTypeActionHandler;
 import org.nightlabs.jfire.store.ProductTypeActionHandlerNotFoundException;
@@ -18,7 +17,9 @@ import org.nightlabs.jfire.trade.Article;
 import org.nightlabs.jfire.trade.Segment;
 
 /**
- *
+ * {@link RecurringTradeProductTypeActionHandler}s are used by the {@link RecurringTrader}
+ * to create {@link Article}s for {@link RecurredOffer}s on the basis of Articles in a {@link RecurringOffer}.
+ * 
  * @author Fitas Amine- fitas at nightlabs dot de
  *
  * @jdo.persistence-capable
@@ -82,11 +83,12 @@ public abstract class RecurringTradeProductTypeActionHandler {
 	protected RecurringTradeProductTypeActionHandler() { }	
 
 	/**	
-	 *  Implement this method to creates a new Article in the given RecurredOffer for each template article passed as parameter.
+	 * Implement this method to create a new article in the given RecurredOffer for each template article passed as parameter.
+	 * The parameter articles come from a {@link RecurringOffer}).
 	 *
-	 * @param  offer the recurredOffer created in the recurringTrader s createrecurredOffer
-	 * @param  recurringArticles a collection list of articles
-	 * @param  segment current segment in the order
+	 * @param offer the recurredOffer created in the recurringTrader s createrecurredOffer
+	 * @param recurringArticles a collection list of articles
+	 * @param segment current segment in the order
 	 *
 	 * @return return a Map where the template article is mapped to the newly created article.
 	 */

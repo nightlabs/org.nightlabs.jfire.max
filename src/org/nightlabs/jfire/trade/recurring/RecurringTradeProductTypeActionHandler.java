@@ -10,6 +10,7 @@ import javax.jdo.Query;
 import org.nightlabs.ModuleException;
 import org.nightlabs.jdo.ObjectIDUtil;
 import org.nightlabs.jfire.organisation.Organisation;
+import org.nightlabs.jfire.store.Product;
 import org.nightlabs.jfire.store.ProductType;
 import org.nightlabs.jfire.store.ProductTypeActionHandler;
 import org.nightlabs.jfire.store.ProductTypeActionHandlerNotFoundException;
@@ -81,7 +82,7 @@ public abstract class RecurringTradeProductTypeActionHandler {
 	protected RecurringTradeProductTypeActionHandler() { }	
 
 	/**	
-	 * creates a new Article in the given RecurredOffer for each template article passed as parameter.
+	 *  Implement this method to creates a new Article in the given RecurredOffer for each template article passed as parameter.
 	 *
 	 * @param  offer the recurredOffer created in the recurringTrader s createrecurredOffer
 	 * @param  recurringArticles a collection list of articles

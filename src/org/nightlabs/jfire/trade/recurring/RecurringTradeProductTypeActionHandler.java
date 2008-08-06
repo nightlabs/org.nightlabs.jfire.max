@@ -7,6 +7,7 @@ import javax.jdo.JDOHelper;
 import javax.jdo.PersistenceManager;
 import javax.jdo.Query;
 
+import org.nightlabs.ModuleException;
 import org.nightlabs.jdo.ObjectIDUtil;
 import org.nightlabs.jfire.organisation.Organisation;
 import org.nightlabs.jfire.store.ProductType;
@@ -80,7 +81,7 @@ public abstract class RecurringTradeProductTypeActionHandler {
 	protected RecurringTradeProductTypeActionHandler() { }	
 
 
-	public abstract Map<Article, Article> createArticles(RecurredOffer offer, Set<Article> recurringArticles, Segment segment);
+	public abstract Map<Article, Article> createArticles(RecurredOffer offer, Set<Article> recurringArticles, Segment segment) throws ModuleException;
 
 	protected PersistenceManager getPersistenceManager()
 	{

@@ -5,8 +5,6 @@ import java.net.URL;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
-import java.util.LinkedList;
-import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.Set;
@@ -28,7 +26,6 @@ import org.nightlabs.jfire.jbpm.graph.def.id.ProcessDefinitionID;
 import org.nightlabs.jfire.security.SecurityReflector;
 import org.nightlabs.jfire.security.User;
 import org.nightlabs.jfire.store.ProductType;
-import org.nightlabs.jfire.store.Store;
 import org.nightlabs.jfire.trade.Article;
 import org.nightlabs.jfire.trade.LegalEntity;
 import org.nightlabs.jfire.trade.Offer;
@@ -161,13 +158,13 @@ public class RecurringTrader {
 	 *
 	 * @param recurringOffer the {@link RecurringOffer}
 	 * @return newly created {@link RecurredOffer}
+	 * @throws ModuleException If creating the recurred articles fails.
 	 */
-	public RecurredOffer createRecurredOffer(RecurringOffer recurringOffer)
+	public RecurredOffer createRecurredOffer(RecurringOffer recurringOffer) throws ModuleException
 	{
 
 		PersistenceManager pm = getPersistenceManager();
 		Trader trader = Trader.getTrader(pm);
-		Store store = Store.getStore(pm);
 
 		Order order = trader.createOrder(recurringOffer.getVendor(),
 				recurringOffer.getCustomer(), null, recurringOffer.getCurrency());
@@ -224,10 +221,7 @@ public class RecurringTrader {
 					handler.createArticles(recurredOffer, articles, segment);
 				}
 			}
-		
 		}
-			
-			
 		
 		return recurredOffer;
 	}

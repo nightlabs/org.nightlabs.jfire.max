@@ -175,8 +175,6 @@ implements SessionBean
 		}
 	}
 
-
-
 	/**
 	 * this method is an EJB Timer Interface and will be called by the timer
 	 */	

@@ -53,6 +53,8 @@ import org.nightlabs.jfire.jbpm.graph.def.id.ProcessDefinitionID;
 import org.nightlabs.jfire.organisation.Organisation;
 import org.nightlabs.jfire.security.SecurityReflector;
 import org.nightlabs.jfire.security.User;
+import org.nightlabs.jfire.timer.Task;
+import org.nightlabs.jfire.timer.id.TaskID;
 import org.nightlabs.jfire.trade.LegalEntity;
 import org.nightlabs.jfire.trade.Order;
 import org.nightlabs.jfire.trade.Segment;
@@ -175,7 +177,27 @@ implements SessionBean
 
 
 
-	public RecurredOffer CreateRecurredOffer(RecurringOffer recurringOffer)
+	/**
+	 * this method is an EJB Timer Interface and will be called by the timer
+	 */	
+	public void createRecurredOfferTimed(TaskID taskID)
+	throws Exception
+	{
+		PersistenceManager pm = getPersistenceManager();
+		try {
+			
+			Task task = (Task) pm.getObjectById(taskID);
+			RecurringOffer recurringOffer =  (RecurringOffer)pm.getObjectById((OfferID) task.getParam());
+			// Create the recurred Offer
+			createRecurredOffer(recurringOffer);
+
+
+		} finally {
+			pm.close();
+		}
+	}
+
+	public RecurredOffer createRecurredOffer(RecurringOffer recurringOffer)
 	{
 
 		PersistenceManager pm = getPersistenceManager();

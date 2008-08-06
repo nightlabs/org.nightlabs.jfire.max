@@ -1,5 +1,7 @@
 package org.nightlabs.jfire.trade.recurring;
 
+import javax.jdo.JDOHelper;
+
 import org.nightlabs.jdo.ObjectIDUtil;
 import org.nightlabs.jfire.security.User;
 import org.nightlabs.jfire.timer.Task;
@@ -25,8 +27,8 @@ public class RecurringOfferConfiguration {
 
 	private static final long serialVersionUID = 1L;
 	public static final String TASK_TYPE_ID_RECURRED_OFFER_CREATOR_TASK = "RecurredOfferCreatorTask";
-	
-	
+
+
 	/**
 	 * @jdo.field primary-key="true"
 	 * @jdo.column length="100"
@@ -38,17 +40,21 @@ public class RecurringOfferConfiguration {
 	 */
 	private long recurringOfferConfigurationID;
 
-	public RecurringOfferConfiguration(User user,String organisationID,
+	public RecurringOfferConfiguration(RecurringOffer recurringOffer , User user,String organisationID,
 			long recurringOfferConfigurationID) {
 		this.organisationID = organisationID;
+		this.recurringOffer = recurringOffer;
 		this.recurringOfferConfigurationID = recurringOfferConfigurationID;
-	    String _taskID =  ObjectIDUtil.longObjectIDFieldToString(recurringOfferConfigurationID);
+		String _taskID =  ObjectIDUtil.longObjectIDFieldToString(recurringOfferConfigurationID);
 		TaskID taskID = TaskID.create(organisationID,TASK_TYPE_ID_RECURRED_OFFER_CREATOR_TASK, _taskID);
 		this.creatorTask = new Task(
-	    	    taskID,
-	    	    user,
-	    	    "",
-	    	    "");	
+				taskID,
+				user,
+				"",
+		"");	
+
+		creatorTask.setParam(JDOHelper.getObjectId(recurringOffer));
+				
 	}
 
 	/**
@@ -61,6 +67,12 @@ public class RecurringOfferConfiguration {
 	 * @jdo.field persistence-modifier="persistent"
 	 */
 	private boolean createInvoice;
+
+	/**
+	 * @jdo.field persistence-modifier="persistent"
+	 */	
+	private RecurringOffer recurringOffer; 
+
 
 	/**
 	 * @jdo.field persistence-modifier="persistent"
@@ -90,5 +102,9 @@ public class RecurringOfferConfiguration {
 
 	public long getRecurringOfferConfigurationID() {
 		return recurringOfferConfigurationID;
+	}
+
+	public RecurringOffer getRecurringOffer() {
+		return recurringOffer;
 	}
 }

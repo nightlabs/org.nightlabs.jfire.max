@@ -1,5 +1,6 @@
 package org.nightlabs.jfire.simpletrade.store.recurring;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
@@ -81,8 +82,11 @@ extends RecurringTradeProductTypeActionHandler{
 				throw new IllegalStateException("store.findProducts(...) created " + products.size() + " instead of exactly 1 product!");
 
 			try {
-				articleCreated = (Article) trader.createArticles(user, offer, segment, products,
+				ArrayList<? extends Article> articles=  (ArrayList<? extends Article>) trader.createArticles(user, offer, segment, products,
 						new ArticleCreator(null), true, false);
+				if (articles.size() != 1)
+					throw new IllegalStateException("store.findProducts(...) created " + products.size() + " instead of exactly 1 product!");
+				articleCreated = articles.get(0);
 			} catch (ModuleException e) {
 				// TODO Auto-generated catch block
 				e.printStackTrace();

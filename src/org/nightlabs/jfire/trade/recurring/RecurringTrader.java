@@ -79,14 +79,8 @@ public class RecurringTrader {
 		Iterator<?> it = pm.getExtent(RecurringTrader.class).iterator();
 		if (it.hasNext()) {
 			RecurringTrader recurringTrader = (RecurringTrader) it.next();
-			// TODO remove this debug stuff
-			String securityReflectorOrganisationID = SecurityReflector.getUserDescriptor().getOrganisationID();
-			if (!securityReflectorOrganisationID.equals(recurringTrader.getOrganisationID()))
-				throw new IllegalStateException("SecurityReflector returned organisationID " + securityReflectorOrganisationID + " but Trader.organisationID=" + recurringTrader.getOrganisationID());
-			// TODO end debug
 			return recurringTrader;
 		}
-
 
 		RecurringTrader recurringTrader = new RecurringTrader();
 		recurringTrader.organisationID = SecurityReflector.getUserDescriptor().getOrganisationID();

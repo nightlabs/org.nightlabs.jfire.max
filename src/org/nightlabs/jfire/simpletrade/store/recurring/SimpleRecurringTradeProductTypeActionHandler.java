@@ -1,10 +1,9 @@
 package org.nightlabs.jfire.simpletrade.store.recurring;
 
-import java.util.ArrayList;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
-import java.util.Collection;
 import java.util.Set;
 
 import javax.jdo.PersistenceManager;
@@ -15,11 +14,11 @@ import org.nightlabs.jfire.security.User;
 import org.nightlabs.jfire.simpletrade.store.SimpleProductType;
 import org.nightlabs.jfire.store.Product;
 import org.nightlabs.jfire.store.ProductType;
+import org.nightlabs.jfire.store.ProductTypeActionHandler;
 import org.nightlabs.jfire.store.Store;
 import org.nightlabs.jfire.trade.Article;
 import org.nightlabs.jfire.trade.ArticleCreator;
 import org.nightlabs.jfire.trade.Segment;
-import org.nightlabs.jfire.trade.SegmentType;
 import org.nightlabs.jfire.trade.Trader;
 import org.nightlabs.jfire.trade.recurring.RecurredOffer;
 import org.nightlabs.jfire.trade.recurring.RecurringTradeProductTypeActionHandler;
@@ -55,7 +54,7 @@ extends RecurringTradeProductTypeActionHandler{
 
 
 	@Override
-	public  Map<Article, Article> createArticles(RecurredOffer offer, Set<Article> recurringArticles,Segment segment)
+	public  Map<Article, Article> createArticles(RecurredOffer offer, Set<Article> recurringArticles,Segment segment) throws ModuleException
 	{	
 		Map<Article, Article> articlesMap=  new HashMap<Article, Article>();
 
@@ -67,8 +66,7 @@ extends RecurringTradeProductTypeActionHandler{
 		User user = SecurityReflector.getUserDescriptor().getUser(pm);
 
 		ProductType pt = null;
-		Article articleCreated =null;
-
+		
 		for (Iterator<Article> it = recurringArticles.iterator(); it.hasNext(); ) 
 		{	
 			article = it.next();
@@ -81,18 +79,12 @@ extends RecurringTradeProductTypeActionHandler{
 			if (products.size() != 1)
 				throw new IllegalStateException("store.findProducts(...) created " + products.size() + " instead of exactly 1 product!");
 
-			try {
-				ArrayList<? extends Article> articles=  (ArrayList<? extends Article>) trader.createArticles(user, offer, segment, products,
-						new ArticleCreator(null), true, false);
-				if (articles.size() != 1)
-					throw new IllegalStateException("store.findProducts(...) created " + products.size() + " instead of exactly 1 product!");
-				articleCreated = articles.get(0);
-			} catch (ModuleException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			}
-
-			articlesMap.put(article,articleCreated);
+			Collection<? extends Article> articles=  trader.createArticles(user, offer, segment, products,
+					new ArticleCreator(null), true, false);
+			if (articles.size() != 1)
+				throw new IllegalStateException("trader.createArticles(...) created " + articles.size() + " instead of exactly 1 article!");
+				
+			articlesMap.put(article, articles.iterator().next());
 
 		}
 

@@ -42,6 +42,7 @@ import javax.jdo.PersistenceManager;
 import org.apache.log4j.Logger;
 import org.nightlabs.ModuleException;
 import org.nightlabs.jdo.NLJDOHelper;
+import org.nightlabs.jfire.accounting.Accounting;
 import org.nightlabs.jfire.accounting.Currency;
 import org.nightlabs.jfire.accounting.Invoice;
 import org.nightlabs.jfire.accounting.id.CurrencyID;
@@ -58,7 +59,6 @@ import org.nightlabs.jfire.trade.Segment;
 import org.nightlabs.jfire.trade.SegmentType;
 import org.nightlabs.jfire.trade.TradeSide;
 import org.nightlabs.jfire.trade.Trader;
-import org.nightlabs.jfire.trade.config.TradeConfigModule;
 import org.nightlabs.jfire.trade.id.OfferID;
 import org.nightlabs.jfire.trade.id.OrderID;
 import org.nightlabs.jfire.trade.id.SegmentTypeID;
@@ -182,6 +182,7 @@ implements SessionBean
 		RecurredOffer offer = null;
 		String invoiceIDPrefix = null;
 		User user = SecurityReflector.getUserDescriptor().getUser(pm);
+		Accounting account = Accounting.getAccounting(pm);
 
 		try {
 			RecurringTrader recurringTrader = RecurringTrader.getRecurringTrader(pm);
@@ -198,6 +199,7 @@ implements SessionBean
 
 				invoice = pm.makePersistent(invoice);
 
+				account.addArticlesToInvoice(user, invoice,recurringOffer.getArticles());
 			}
 
 		} catch (ModuleException e) {

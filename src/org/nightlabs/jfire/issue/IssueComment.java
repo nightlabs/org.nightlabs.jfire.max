@@ -55,7 +55,7 @@ implements Serializable, AttachCallback
 	private String commentID;
 	
 	/**
-	 * @jdo.column length="100"
+	 * @jdo.column sql-type="clob"
 	 */
 	private String text;
 	

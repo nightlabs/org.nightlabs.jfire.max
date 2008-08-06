@@ -63,6 +63,7 @@ public class IssueSubject
 	 *		null-value="exception"
 	 *
 	 * @jdo.join
+	 * @jdo.value-column sql-type="CLOB"
 	 */
 	protected Map<String, String> names = new HashMap<String, String>();
 

@@ -184,18 +184,16 @@ implements SessionBean
 		PersistenceManager pm = getPersistenceManager();
 		User user = SecurityReflector.getUserDescriptor().getUser(pm);
 		Accounting account = Accounting.getAccounting(pm);
-
 		try {
 			Task task = (Task) pm.getObjectById(taskID);
 			RecurringOffer recurringOffer =  (RecurringOffer)pm.getObjectById((OfferID) task.getParam());
 			// Create the recurred Offer
-
 			RecurringTrader recurringTrader = RecurringTrader.getRecurringTrader(pm);
-			recurringTrader.createRecurredOffer(recurringOffer);
+			RecurredOffer  recurredOffer =  recurringTrader.createRecurredOffer(recurringOffer);
 
 			if(recurringOffer.getRecurringOfferConfiguration().isCreateInvoice())
 			{
-				account.createInvoice(user, recurringOffer.getArticles(), null);		
+				account.createInvoice(user, recurredOffer.getArticles(), null);		
 			}	
 		} finally {
 			pm.close();
